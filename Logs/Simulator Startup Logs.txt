@@ -46,3 +46,20 @@
 [Info     - 20201206160942]: Raising event Startup: startupComponent:Tactile Feedback in target ahk_pid 7424
 [Info     - 20201206160944]: Component Motion Feedback is deactived
 [Info     - 20201206160950]: Raising event Startup: stopStartupSong in target ahk_pid 7424
+[Critical - 20201206163110]: ---------------------------------------------------------------
+[Critical - 20201206163110]:                  Running Simulator Startup
+[Critical - 20201206163110]: ---------------------------------------------------------------
+[Info     - 20201206163111]: Starting Simulator Controller
+[Info     - 20201206163114]: Raising event Startup: playStartupSong in target ahk_pid 5460
+[Info     - 20201206163114]: Component Voice Recognition is actived
+[Info     - 20201206163114]: Starting component Voice Recognition
+[Info     - 20201206163114]: Raising event Startup: startupComponent:Voice Recognition in target ahk_pid 5460
+[Info     - 20201206163116]: Component Face Recognition is deactived
+[Info     - 20201206163116]: Component View Tracking is actived
+[Info     - 20201206163116]: Starting component View Tracking
+[Info     - 20201206163116]: Raising event Startup: startupComponent:View Tracking in target ahk_pid 5460
+[Info     - 20201206163118]: Component Tactile Feedback is actived
+[Info     - 20201206163118]: Starting component Tactile Feedback
+[Info     - 20201206163118]: Raising event Startup: startupComponent:Tactile Feedback in target ahk_pid 5460
+[Info     - 20201206163120]: Component Motion Feedback is deactived
+[Info     - 20201206163139]: Dispatching event Startup: exitStartup

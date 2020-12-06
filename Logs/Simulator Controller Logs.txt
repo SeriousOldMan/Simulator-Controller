@@ -2234,3 +2234,155 @@
 [Info     - 20201206160942]: Starting application Tactile Feedback
 [Info     - 20201206160942]: Application Tactile Feedback started
 [Info     - 20201206160950]: Dispatching event Startup: stopStartupSong
+[Critical - 20201206163112]: ---------------------------------------------------------------
+[Critical - 20201206163112]:                  Running Simulator Controller
+[Critical - 20201206163112]: ---------------------------------------------------------------
+[Info     - 20201206163112]: Controller layout initialized: # 0 1-Way Toggles, # 5 2-Way Toggles, # 8 Buttons, # 2 Dials
+[Info     - 20201206163113]: Plugin System (Active) registered
+[Info     - 20201206163113]: Activating plugin System
+[Info     - 20201206163113]: Connecting 2WayToggle.1 to action SystemPlugin.ModeSelectorAction
+[Info     - 20201206163113]: Mode Launch registered for plugin System
+[Info     - 20201206163113]: Setting controller mode to Launch
+[Info     - 20201206163113]: Activating mode Launch
+[Info     - 20201206163113]: Connecting Button.1 to action ACC
+[Info     - 20201206163113]: Connecting Button.2 to action RST
+[Info     - 20201206163113]: Connecting Button.3 to action MoTeC
+[Info     - 20201206163113]: Connecting Button.4 to action TS
+[Info     - 20201206163113]: Connecting Button.5 to action FanaLab
+[Info     - 20201206163113]: Connecting Button.6 to action SmartCtrl
+[Info     - 20201206163113]: Connecting Button.8 to action Shutdown
+[Info     - 20201206163113]: Connecting Button.7 to action SystemPlugin.LogoToggleAction
+[Info     - 20201206163113]: Plugin Motion Feedback (Active) registered
+[Info     - 20201206163113]: Activating plugin Motion Feedback
+[Info     - 20201206163113]: Mode Motion registered for plugin Motion Feedback
+[Info     - 20201206163113]: Activating plugin Motion Feedback
+[Info     - 20201206163113]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206163113]: Plugin Tactile Feedback (Active) registered
+[Info     - 20201206163113]: Activating plugin Tactile Feedback
+[Info     - 20201206163113]: Mode Pedal Vibration registered for plugin Tactile Feedback
+[Info     - 20201206163113]: Mode Chassis Vibration registered for plugin Tactile Feedback
+[Info     - 20201206163113]: Activating plugin Tactile Feedback
+[Info     - 20201206163113]: Connecting 2WayToggle.3 to action Pedal Vibration
+[Info     - 20201206163113]: Connecting 2WayToggle.4 to action Front Vibration
+[Info     - 20201206163113]: Connecting 2WayToggle.5 to action Rear Vibration
+[Info     - 20201206163113]: Plugin AC (Active) registered
+[Info     - 20201206163113]: Activating plugin AC
+[Info     - 20201206163113]: Plugin ACC (Active) registered
+[Info     - 20201206163113]: Activating plugin ACC
+[Info     - 20201206163113]: Mode Drive registered for plugin ACC
+[Info     - 20201206163114]: Dispatching event Startup: playStartupSong
+[Info     - 20201206163114]: Dispatching event Startup: startupComponent:Voice Recognition
+[Info     - 20201206163115]: Starting application Voice Recognition
+[Info     - 20201206163115]: Application Voice Recognition started
+[Info     - 20201206163116]: Dispatching event Startup: startupComponent:View Tracking
+[Info     - 20201206163117]: Starting application View Tracking
+[Info     - 20201206163117]: Application View Tracking started
+[Info     - 20201206163118]: Dispatching event Startup: startupComponent:Tactile Feedback
+[Info     - 20201206163118]: Starting application Tactile Feedback
+[Info     - 20201206163118]: Application Tactile Feedback started
+[Info     - 20201206163139]: Firing action ACC for Button.1
+[Info     - 20201206163139]: Starting application Assetto Corsa Competizione
+[Info     - 20201206163139]: Starting application Assetto Corsa Competizione
+[Info     - 20201206163139]: Application Assetto Corsa Competizione started
+[Info     - 20201206163139]: Raising event Startup: exitStartup in target ahk_exe Simulator Startup.exe
+[Info     - 20201206163140]: Deactivating mode Launch
+[Info     - 20201206163140]: Disconnecting Button.1 from action ACC
+[Info     - 20201206163140]: Disconnecting Button.2 from action RST
+[Info     - 20201206163140]: Disconnecting Button.3 from action MoTeC
+[Info     - 20201206163140]: Disconnecting Button.4 from action TS
+[Info     - 20201206163140]: Disconnecting Button.5 from action FanaLab
+[Info     - 20201206163140]: Disconnecting Button.6 from action SmartCtrl
+[Info     - 20201206163140]: Disconnecting Button.8 from action Shutdown
+[Info     - 20201206163140]: Disconnecting Button.7 from action SystemPlugin.LogoToggleAction
+[Info     - 20201206163140]: Setting controller mode to Drive
+[Info     - 20201206163140]: Activating mode Drive
+[Info     - 20201206163140]: Connecting Button.1 to action WTF!
+[Info     - 20201206163140]: Connecting Button.2 to action Idiot
+[Info     - 20201206163140]: Connecting Button.3 to action Lrn ur brk pnts
+[Info     - 20201206163140]: Connecting Button.4 to action Sorry
+[Info     - 20201206163140]: Connecting Button.5 to action Thx
+[Info     - 20201206163140]: Connecting Button.6 to action Good job
+[Info     - 20201206163140]: Connecting Button.7 to action Great fight
+[Info     - 20201206163140]: Connecting Button.8 to action Clean race pls
+[Info     - 20201206163145]: Deactivating mode Drive
+[Info     - 20201206163145]: Disconnecting Button.1 from action WTF!
+[Info     - 20201206163145]: Disconnecting Button.2 from action Idiot
+[Info     - 20201206163145]: Disconnecting Button.3 from action Lrn ur brk pnts
+[Info     - 20201206163145]: Disconnecting Button.4 from action Sorry
+[Info     - 20201206163145]: Disconnecting Button.5 from action Thx
+[Info     - 20201206163145]: Disconnecting Button.6 from action Good job
+[Info     - 20201206163145]: Disconnecting Button.7 from action Great fight
+[Info     - 20201206163145]: Disconnecting Button.8 from action Clean race pls
+[Info     - 20201206163145]: Setting controller mode to Launch
+[Info     - 20201206163145]: Activating mode Launch
+[Info     - 20201206163145]: Connecting Button.1 to action ACC
+[Info     - 20201206163145]: Connecting Button.2 to action RST
+[Info     - 20201206163145]: Connecting Button.3 to action MoTeC
+[Info     - 20201206163145]: Connecting Button.4 to action TS
+[Info     - 20201206163145]: Connecting Button.5 to action FanaLab
+[Info     - 20201206163145]: Connecting Button.6 to action SmartCtrl
+[Info     - 20201206163145]: Connecting Button.8 to action Shutdown
+[Info     - 20201206163145]: Connecting Button.7 to action SystemPlugin.LogoToggleAction
+[Info     - 20201206163146]: Raising event Startup: playStartupSong in current process
+[Info     - 20201206163146]: Dispatching event Startup: playStartupSong
+[Info     - 20201206163146]: Raising event Startup: exitStartup in target ahk_exe Simulator Startup.exe
+[Info     - 20201206163146]: Deactivating mode Launch
+[Info     - 20201206163146]: Disconnecting Button.1 from action ACC
+[Info     - 20201206163146]: Disconnecting Button.2 from action RST
+[Info     - 20201206163146]: Disconnecting Button.3 from action MoTeC
+[Info     - 20201206163146]: Disconnecting Button.4 from action TS
+[Info     - 20201206163146]: Disconnecting Button.5 from action FanaLab
+[Info     - 20201206163146]: Disconnecting Button.6 from action SmartCtrl
+[Info     - 20201206163146]: Disconnecting Button.8 from action Shutdown
+[Info     - 20201206163146]: Disconnecting Button.7 from action SystemPlugin.LogoToggleAction
+[Info     - 20201206163146]: Setting controller mode to Drive
+[Info     - 20201206163146]: Activating mode Drive
+[Info     - 20201206163146]: Connecting Button.1 to action WTF!
+[Info     - 20201206163146]: Connecting Button.2 to action Idiot
+[Info     - 20201206163146]: Connecting Button.3 to action Lrn ur brk pnts
+[Info     - 20201206163146]: Connecting Button.4 to action Sorry
+[Info     - 20201206163146]: Connecting Button.5 to action Thx
+[Info     - 20201206163146]: Connecting Button.6 to action Good job
+[Info     - 20201206163146]: Connecting Button.7 to action Great fight
+[Info     - 20201206163146]: Connecting Button.8 to action Clean race pls
+[Info     - 20201206164826]: Deactivating mode Drive
+[Info     - 20201206164826]: Disconnecting Button.1 from action WTF!
+[Info     - 20201206164826]: Disconnecting Button.2 from action Idiot
+[Info     - 20201206164826]: Disconnecting Button.3 from action Lrn ur brk pnts
+[Info     - 20201206164826]: Disconnecting Button.4 from action Sorry
+[Info     - 20201206164826]: Disconnecting Button.5 from action Thx
+[Info     - 20201206164826]: Disconnecting Button.6 from action Good job
+[Info     - 20201206164826]: Disconnecting Button.7 from action Great fight
+[Info     - 20201206164826]: Disconnecting Button.8 from action Clean race pls
+[Info     - 20201206164826]: Setting controller mode to Launch
+[Info     - 20201206164826]: Activating mode Launch
+[Info     - 20201206164826]: Connecting Button.1 to action ACC
+[Info     - 20201206164826]: Connecting Button.2 to action RST
+[Info     - 20201206164826]: Connecting Button.3 to action MoTeC
+[Info     - 20201206164826]: Connecting Button.4 to action TS
+[Info     - 20201206164826]: Connecting Button.5 to action FanaLab
+[Info     - 20201206164826]: Connecting Button.6 to action SmartCtrl
+[Info     - 20201206164826]: Connecting Button.8 to action Shutdown
+[Info     - 20201206164826]: Connecting Button.7 to action SystemPlugin.LogoToggleAction
+[Info     - 20201206172856]: Firing action Launch for 2WayToggle.1
+[Info     - 20201206172856]: Deactivating mode Launch
+[Info     - 20201206172856]: Disconnecting Button.1 from action ACC
+[Info     - 20201206172856]: Disconnecting Button.2 from action RST
+[Info     - 20201206172856]: Disconnecting Button.3 from action MoTeC
+[Info     - 20201206172856]: Disconnecting Button.4 from action TS
+[Info     - 20201206172856]: Disconnecting Button.5 from action FanaLab
+[Info     - 20201206172856]: Disconnecting Button.6 from action SmartCtrl
+[Info     - 20201206172856]: Disconnecting Button.8 from action Shutdown
+[Info     - 20201206172856]: Disconnecting Button.7 from action SystemPlugin.LogoToggleAction
+[Info     - 20201206172856]: Setting controller mode to Motion
+[Info     - 20201206172856]: Activating mode Motion
+[Info     - 20201206172856]: Connecting Dial.1 to action Motion Intensity
+[Info     - 20201206172856]: Connecting Button.1 to action Heave
+[Info     - 20201206172856]: Connecting Button.2 to action Surge 1
+[Info     - 20201206172856]: Connecting Button.3 to action Surge 2
+[Info     - 20201206172856]: Connecting Button.4 to action Sway
+[Info     - 20201206172856]: Connecting Button.5 to action Pitch
+[Info     - 20201206172856]: Connecting Button.6 to action Roll
+[Info     - 20201206172856]: Connecting Button.7 to action Traction Loss
+[Info     - 20201206172856]: Connecting Button.8 to action Effect Intensity
+[Info     - 20201206172856]: Connecting Dial.2 to action MotionFeedbackPlugin.EffectIntensityAction

@@ -1,0 +1,256 @@
+{
+  "OutputManager": {
+    "ArduinoSettings": {
+      "ArduinoPluginDisabled": false,
+      "MaxChannels": 12,
+      "DeviceType": 1,
+      "IsEnabled": true,
+      "MinimumForce": 0,
+      "Threshold": 0,
+      "EffectToChannelsMapStore": {
+        "WheelsSlipContainer": {
+          "Front": {
+            "MapsStore": "0;0;100;|1;0;100;|2;0;100;|3;0;100;|4;0;100;|5;0;100;|6;0;100;|7;0;100;|8;0;100;|9;0;100;|10;0;100;|11;0;100;"
+          },
+          "Rear": {
+            "MapsStore": "0;0;100;|1;0;100;|2;0;100;|3;0;100;|4;0;100;|5;0;100;|6;0;100;|7;0;100;|8;0;100;|9;0;100;|10;0;100;|11;0;100;"
+          }
+        },
+        "WheelsLockContainer": {
+          "All": {
+            "MapsStore": "0;0;100;|1;0;100;|2;0;100;|3;0;100;|4;0;100;|5;0;100;|6;0;100;|7;0;100;|8;0;100;|9;0;100;|10;0;100;|11;0;100;"
+          }
+        },
+        "ABSActiveEffectContainer": {
+          "All": {
+            "MapsStore": "0;0;100;|1;1;100;|2;0;100;|3;0;100;|4;0;100;|5;0;100;|6;0;100;|7;0;100;|8;0;100;|9;0;100;|10;0;100;|11;0;100;"
+          }
+        },
+        "TCActiveEffectContainer": {
+          "All": {
+            "MapsStore": "0;1;100;|1;0;100;|2;0;100;|3;0;100;|4;0;100;|5;0;100;|6;0;100;|7;0;100;|8;0;100;|9;0;100;|10;0;100;|11;0;100;"
+          }
+        }
+      },
+      "GlobalChannelsSettings": {
+        "Custom": {
+          "MapsStore": "0;0;40;|1;0;40;|2;0;100;|3;0;100;|4;0;100;|5;0;100;|6;0;100;|7;0;100;|8;0;100;|9;0;100;|10;0;100;|11;0;100;"
+        }
+      },
+      "Name": "Arduino motors and fans",
+      "OutputId": "Arduino",
+      "ShowPerEffectsLevels": false
+    },
+    "FanatecSettings": {
+      "MaxChannels": 2,
+      "DeviceType": 5,
+      "IsEnabled": false,
+      "MinimumForce": 80,
+      "Threshold": 25,
+      "EffectToChannelsMapStore": {},
+      "GlobalChannelsSettings": {},
+      "Name": "Fanatec pedals (USB only)",
+      "OutputId": "Fanatec",
+      "ShowPerEffectsLevels": false
+    },
+    "ForcefeelSettings": {
+      "MaxChannels": 8,
+      "DeviceType": 2,
+      "IsEnabled": false,
+      "MinimumForce": 10,
+      "Threshold": 5,
+      "EffectToChannelsMapStore": {},
+      "GlobalChannelsSettings": {},
+      "Name": "ForceFeel Pad",
+      "OutputId": "ForceFeel",
+      "ShowPerEffectsLevels": false
+    },
+    "GameTrixSettings": {
+      "MaxChannels": 6,
+      "DeviceType": 3,
+      "IsEnabled": false,
+      "MinimumForce": 10,
+      "Threshold": 5,
+      "EffectToChannelsMapStore": {},
+      "GlobalChannelsSettings": {},
+      "Name": "GameTrix Pad",
+      "OutputId": "GameTrix",
+      "ShowPerEffectsLevels": false
+    },
+    "GameTrixJetPadSettings": {
+      "MaxChannels": 2,
+      "DeviceType": 4,
+      "IsEnabled": false,
+      "MinimumForce": 10,
+      "Threshold": 5,
+      "EffectToChannelsMapStore": {},
+      "GlobalChannelsSettings": {},
+      "Name": "GameTrix JetPad",
+      "OutputId": "GameTrixJetPad",
+      "ShowPerEffectsLevels": false
+    },
+    "OutputMode": 0,
+    "TypeName": "VibrationOutputManager"
+  },
+  "IncludeOutputSettingsInProfile": true,
+  "UnmuteEffectsAfterSimhubRestart": false,
+  "AutomaticSwitch": false,
+  "EffectsContainers": [
+    {
+      "EffectsContainers": [
+        {
+          "Filter": {
+            "Duration": 60,
+            "MaxValue": 1.0,
+            "ShowDurationWarn": false,
+            "FilterType": "PulseFilter"
+          },
+          "IsMuted": false,
+          "IncrementGainAction": {
+            "Trigger": "CLI.increaseABSVibration",
+            "PressType": 4
+          },
+          "DecrementGainAction": {
+            "Trigger": "CLI.decreaseABSVibration",
+            "PressType": 4
+          },
+          "ContainerId": "f0ea7acb-b543-414f-a50c-adb4f58b8a87",
+          "ContainerType": "ABSActiveEffectContainer",
+          "Description": "Provides feedback when ABS is currently active",
+          "AggregationMode": null,
+          "Gain": 100.0,
+          "IsEnabled": true,
+          "Output": {
+            "AssignToChannelGroup": false,
+            "ChannelGroupName": "",
+            "PropertyName": null,
+            "ExportProperty": false,
+            "DisableOutput": false,
+            "OutputType": "VibrationOutput"
+          },
+          "Algorythm": null
+        },
+        {
+          "IsLock": false,
+          "LockSensibility": 50.0,
+          "BrakeFilter": 40,
+          "Filter": {
+            "GammaValue": 1.0,
+            "InputGain": 100.0,
+            "MinimumForce": 0,
+            "Threshold": 0,
+            "FilterType": "GammaFilter"
+          },
+          "IsMuted": false,
+          "ContainerId": "801aff1d-3c4f-4199-b052-86b09214103d",
+          "ContainerType": "WheelsLockContainer",
+          "Description": "Provide localized wheel slip and lock feedback under braking",
+          "AggregationMode": "Mono",
+          "Gain": 50.0,
+          "IsEnabled": false,
+          "Output": {
+            "AssignToChannelGroup": false,
+            "ChannelGroupName": "",
+            "PropertyName": null,
+            "ExportProperty": false,
+            "DisableOutput": false,
+            "OutputType": "VibrationOutput"
+          },
+          "Algorythm": null
+        },
+        {
+          "BrakeFilter": 10,
+          "Filter": {
+            "GammaValue": 1.0,
+            "InputGain": 100.0,
+            "MinimumForce": 0,
+            "Threshold": 0,
+            "FilterType": "GammaFilter"
+          },
+          "MuteWhenLockEffectIsActive": false,
+          "ThrottleFilter": 10,
+          "UseBrakeFilter": false,
+          "UseThrottleFilter": true,
+          "IsMuted": false,
+          "ContainerId": "5911cc28-f4e4-4533-8e98-991e5d831d8f",
+          "ContainerType": "WheelsSlipContainer",
+          "Description": "Provide localized wheel slip feedback",
+          "AggregationMode": "Front/Rear",
+          "Gain": 50.0,
+          "IsEnabled": false,
+          "Output": {
+            "AssignToChannelGroup": false,
+            "ChannelGroupName": "",
+            "PropertyName": null,
+            "ExportProperty": false,
+            "DisableOutput": false,
+            "OutputType": "VibrationOutput"
+          },
+          "Algorythm": null
+        },
+        {
+          "Filter": {
+            "Duration": 60,
+            "MaxValue": 1.0,
+            "ShowDurationWarn": false,
+            "FilterType": "PulseFilter"
+          },
+          "IsMuted": false,
+          "IncrementGainAction": {
+            "Trigger": "CLI.increaseTCVibration",
+            "PressType": 4
+          },
+          "DecrementGainAction": {
+            "Trigger": "CLI.decreaseTCVibration",
+            "PressType": 4
+          },
+          "ContainerId": "cd83d521-bcc0-416b-b0ab-30a406129f46",
+          "ContainerType": "TCActiveEffectContainer",
+          "Description": "Provides feedback when TC is currently active",
+          "AggregationMode": null,
+          "Gain": 100.0,
+          "IsEnabled": true,
+          "Output": {
+            "AssignToChannelGroup": false,
+            "ChannelGroupName": "",
+            "PropertyName": null,
+            "ExportProperty": false,
+            "DisableOutput": false,
+            "OutputType": "VibrationOutput"
+          },
+          "Algorythm": null
+        }
+      ],
+      "Filter": null,
+      "IsMuted": false,
+      "ToggleMute": {
+        "Trigger": "CLI.togglePedalVibration",
+        "PressType": 4
+      },
+      "IncrementGainAction": {
+        "Trigger": "CLI.increasePedalVibration",
+        "PressType": 4
+      },
+      "DecrementGainAction": {
+        "Trigger": "CLI.decreasePedalVibration",
+        "PressType": 4
+      },
+      "ContainerId": "e200f872-45e5-4a6e-b4aa-28eb20a61421",
+      "ContainerType": "GroupContainer",
+      "Description": "Pedal Vibration",
+      "AggregationMode": null,
+      "Gain": 80.0,
+      "IsEnabled": true,
+      "Output": null,
+      "Algorythm": null
+    }
+  ],
+  "AutoCalibrationRatio2": 100,
+  "GameCode": "AssettoCorsaCompetizione",
+  "LastLoaded": "2020-10-28T21:36:24.6072775+01:00",
+  "Name": "ACC Standard",
+  "ProfileId": "7dd89fba-cdf3-45f3-b877-c8b9c4114be6",
+  "OutputMode": 0,
+  "GlobalGain": 50.0,
+  "UseProfileGain": false
+}

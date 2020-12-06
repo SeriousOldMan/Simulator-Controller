@@ -1,0 +1,2236 @@
+[Critical - 20201205090923]: ---------------------------------------------------------------
+[Critical - 20201205090923]:                  Running Simulator Controller
+[Critical - 20201205090923]: ---------------------------------------------------------------
+[Critical - 20201205091021]: ---------------------------------------------------------------
+[Critical - 20201205091021]:                  Running Simulator Controller
+[Critical - 20201205091021]: ---------------------------------------------------------------
+[Critical - 20201205091154]: ---------------------------------------------------------------
+[Critical - 20201205091154]:                  Running Simulator Controller
+[Critical - 20201205091154]: ---------------------------------------------------------------
+[Critical - 20201205182222]: ---------------------------------------------------------------
+[Critical - 20201205182222]:                  Running Simulator Controller
+[Critical - 20201205182222]: ---------------------------------------------------------------
+[Critical - 20201206074040]: ---------------------------------------------------------------
+[Critical - 20201206074040]:                  Running Simulator Controller
+[Critical - 20201206074040]: ---------------------------------------------------------------
+[Info     - 20201206074040]: Controller layout initialized: # 0 1-Way Toggles, # 5 2-Way Toggles, # 8 Buttons, # 2 Dials
+[Info     - 20201206074040]: Plugin System (Active) registered
+[Info     - 20201206074040]: Activating plugin System
+[Info     - 20201206074040]: Connecting 2WayToggle.1 to action 
+[Info     - 20201206074040]: Mode Launch registered for plugin 
+[Info     - 20201206074040]: Setting controller mode to Launch
+[Info     - 20201206074040]: Activating mode Launch
+[Info     - 20201206074040]: Connecting Button.1 to action ACC
+[Info     - 20201206074040]: Connecting Button.2 to action RST
+[Info     - 20201206074040]: Connecting Button.3 to action MoTeC
+[Info     - 20201206074040]: Connecting Button.4 to action TS
+[Info     - 20201206074040]: Connecting Button.5 to action FanaLab
+[Info     - 20201206074040]: Connecting Button.6 to action SmartCtrl
+[Info     - 20201206074040]: Connecting Button.8 to action Shutdown
+[Info     - 20201206074040]: Connecting Button.7 to action 
+[Info     - 20201206074040]: Plugin Motion Feedback (Active) registered
+[Info     - 20201206074040]: Activating plugin Motion Feedback
+[Info     - 20201206074040]: Mode Motion registered for plugin 
+[Warn     - 20201206074040]: Controller function 1.0 not found in plugin Motion Feedback - please check the setup
+[Warn     - 20201206074040]: Controller function 1.0 not found in plugin Motion Feedback - please check the setup
+[Warn     - 20201206074040]: Controller function 1.2 not found in plugin Motion Feedback - please check the setup
+[Info     - 20201206074040]: Activating plugin Motion Feedback
+[Info     - 20201206074040]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206074040]: Starting application Motion Feedback
+[Info     - 20201206074040]: Application Motion Feedback started
+[Info     - 20201206074044]: Firing action Launch for 2WayToggle.1
+[Info     - 20201206074044]: Deactivating mode Launch
+[Info     - 20201206074044]: Disconnecting Button.1 from action ACC
+[Info     - 20201206074044]: Disconnecting Button.2 from action RST
+[Info     - 20201206074044]: Disconnecting Button.3 from action MoTeC
+[Info     - 20201206074044]: Disconnecting Button.4 from action TS
+[Info     - 20201206074044]: Disconnecting Button.5 from action FanaLab
+[Info     - 20201206074044]: Disconnecting Button.6 from action SmartCtrl
+[Info     - 20201206074044]: Disconnecting Button.8 from action Shutdown
+[Info     - 20201206074044]: Disconnecting Button.7 from action 
+[Info     - 20201206074044]: Setting controller mode to Motion
+[Info     - 20201206074044]: Activating mode Motion
+[Info     - 20201206074044]: Connecting Dial.1 to action Motion Intensity
+[Info     - 20201206074044]: Connecting Button.1 to action Heave
+[Info     - 20201206074044]: Connecting Button.4 to action Sway
+[Info     - 20201206074044]: Connecting Button.5 to action Pitch
+[Info     - 20201206074044]: Connecting Button.6 to action Roll
+[Info     - 20201206074044]: Connecting Button.8 to action Effect Intensity
+[Info     - 20201206074044]: Connecting Dial.2 to action 
+[Info     - 20201206074050]: Firing action Motion for 2WayToggle.1
+[Info     - 20201206074050]: Deactivating mode Motion
+[Info     - 20201206074050]: Disconnecting Dial.1 from action Motion Intensity
+[Info     - 20201206074050]: Disconnecting Button.1 from action Heave
+[Info     - 20201206074050]: Disconnecting Button.4 from action Sway
+[Info     - 20201206074050]: Disconnecting Button.5 from action Pitch
+[Info     - 20201206074050]: Disconnecting Button.6 from action Roll
+[Info     - 20201206074050]: Disconnecting Button.8 from action Effect Intensity
+[Info     - 20201206074050]: Disconnecting Dial.2 from action 
+[Info     - 20201206074050]: Setting controller mode to Launch
+[Info     - 20201206074050]: Activating mode Launch
+[Info     - 20201206074050]: Connecting Button.1 to action ACC
+[Info     - 20201206074050]: Connecting Button.2 to action RST
+[Info     - 20201206074050]: Connecting Button.3 to action MoTeC
+[Info     - 20201206074050]: Connecting Button.4 to action TS
+[Info     - 20201206074050]: Connecting Button.5 to action FanaLab
+[Info     - 20201206074050]: Connecting Button.6 to action SmartCtrl
+[Info     - 20201206074050]: Connecting Button.8 to action Shutdown
+[Info     - 20201206074050]: Connecting Button.7 to action 
+[Info     - 20201206074050]: Deactivating plugin Motion Feedback
+[Info     - 20201206074050]: Disconnecting 2WayToggle.2 from action Motion
+[Info     - 20201206074050]: Activating plugin Motion Feedback
+[Info     - 20201206074050]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206074052]: Plugin Tactile Feedback (Active) registered
+[Info     - 20201206074052]: Activating plugin Tactile Feedback
+[Info     - 20201206074052]: Mode Pedal Vibration registered for plugin 
+[Info     - 20201206074129]: Mode Chassis Vibration registered for plugin 
+[Info     - 20201206074131]: Activating plugin Tactile Feedback
+[Info     - 20201206074131]: Connecting 2WayToggle.3 to action Pedal Vibration
+[Info     - 20201206074131]: Connecting 2WayToggle.5 to action Rear Vibration
+[Info     - 20201206074131]: Plugin AC (Active) registered
+[Info     - 20201206074131]: Activating plugin AC
+[Info     - 20201206074131]: Plugin ACC (Active) registered
+[Info     - 20201206074131]: Activating plugin ACC
+[Info     - 20201206074131]: Mode Drive registered for plugin 
+[Critical - 20201206074139]: ---------------------------------------------------------------
+[Critical - 20201206074139]:                  Running Simulator Controller
+[Critical - 20201206074139]: ---------------------------------------------------------------
+[Critical - 20201206074139]: ---------------------------------------------------------------
+[Critical - 20201206074139]:                  Running Simulator Controller
+[Critical - 20201206074139]: ---------------------------------------------------------------
+[Info     - 20201206074139]: Controller layout initialized: # 0 1-Way Toggles, # 5 2-Way Toggles, # 8 Buttons, # 2 Dials
+[Info     - 20201206074139]: Controller layout initialized: # 0 1-Way Toggles, # 5 2-Way Toggles, # 8 Buttons, # 2 Dials
+[Info     - 20201206074139]: Plugin System (Active) registered
+[Info     - 20201206074139]: Activating plugin System
+[Info     - 20201206074139]: Connecting 2WayToggle.1 to action 
+[Info     - 20201206074139]: Plugin System (Active) registered
+[Info     - 20201206074139]: Activating plugin System
+[Info     - 20201206074139]: Connecting 2WayToggle.1 to action 
+[Info     - 20201206074139]: Connecting Button.6 to action SmartCtrl
+[Info     - 20201206074139]: Connecting Button.8 to action Shutdown
+[Info     - 20201206074139]: Connecting Button.7 to action 
+[Info     - 20201206074139]: Plugin Motion Feedback (Active) registered
+[Info     - 20201206074139]: Activating plugin Motion Feedback
+[Info     - 20201206074139]: Mode Motion registered for plugin 
+[Warn     - 20201206074139]: Controller function 1.0 not found in plugin Motion Feedback - please check the setup
+[Warn     - 20201206074139]: Controller function 1.0 not found in plugin Motion Feedback - please check the setup
+[Warn     - 20201206074139]: Controller function 1.2 not found in plugin Motion Feedback - please check the setup
+[Info     - 20201206074139]: Connecting Button.7 to action 
+[Info     - 20201206074139]: Plugin Motion Feedback (Active) registered
+[Info     - 20201206074139]: Activating plugin Motion Feedback
+[Info     - 20201206074139]: Mode Motion registered for plugin 
+[Warn     - 20201206074139]: Controller function 1.0 not found in plugin Motion Feedback - please check the setup
+[Warn     - 20201206074139]: Controller function 1.0 not found in plugin Motion Feedback - please check the setup
+[Warn     - 20201206074139]: Controller function 1.2 not found in plugin Motion Feedback - please check the setup
+[Info     - 20201206074139]: Activating plugin Motion Feedback
+[Info     - 20201206074139]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206074143]: Deactivating plugin Motion Feedback
+[Info     - 20201206074143]: Disconnecting 2WayToggle.2 from action Motion
+[Info     - 20201206074143]: Activating plugin Motion Feedback
+[Info     - 20201206074143]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206074143]: Deactivating plugin Motion Feedback
+[Info     - 20201206074143]: Disconnecting 2WayToggle.2 from action Motion
+[Info     - 20201206074143]: Activating plugin Motion Feedback
+[Info     - 20201206074143]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206074143]: Plugin Tactile Feedback (Active) registered
+[Info     - 20201206074143]: Activating plugin Tactile Feedback
+[Info     - 20201206074143]: Mode Pedal Vibration registered for plugin 
+[Info     - 20201206074143]: Mode Chassis Vibration registered for plugin 
+[Warn     - 20201206074143]: Controller function  not found in plugin Tactile Feedback - please check the setup
+[Info     - 20201206074143]: Activating plugin Tactile Feedback
+[Info     - 20201206074143]: Connecting 2WayToggle.3 to action Pedal Vibration
+[Info     - 20201206074143]: Connecting 2WayToggle.5 to action Rear Vibration
+[Info     - 20201206074143]: Plugin AC (Active) registered
+[Info     - 20201206074143]: Activating plugin AC
+[Info     - 20201206074143]: Plugin ACC (Active) registered
+[Info     - 20201206074143]: Activating plugin ACC
+[Info     - 20201206074143]: Mode Drive registered for plugin 
+[Info     - 20201206074143]: Plugin Tactile Feedback (Active) registered
+[Info     - 20201206074143]: Activating plugin Tactile Feedback
+[Info     - 20201206074143]: Mode Pedal Vibration registered for plugin 
+[Info     - 20201206074143]: Mode Chassis Vibration registered for plugin 
+[Warn     - 20201206074143]: Controller function  not found in plugin Tactile Feedback - please check the setup
+[Info     - 20201206074143]: Activating plugin Tactile Feedback
+[Info     - 20201206074143]: Connecting 2WayToggle.3 to action Pedal Vibration
+[Info     - 20201206074143]: Connecting 2WayToggle.5 to action Rear Vibration
+[Info     - 20201206074143]: Plugin AC (Active) registered
+[Info     - 20201206074143]: Activating plugin AC
+[Info     - 20201206074143]: Plugin ACC (Active) registered
+[Info     - 20201206074143]: Activating plugin ACC
+[Info     - 20201206074143]: Mode Drive registered for plugin 
+[Info     - 20201206074151]: Firing action Launch for 2WayToggle.1
+[Info     - 20201206074151]: Deactivating mode Launch
+[Info     - 20201206074151]: Disconnecting Button.1 from action ACC
+[Info     - 20201206074151]: Firing action Launch for 2WayToggle.1
+[Info     - 20201206074151]: Deactivating mode Launch
+[Info     - 20201206074151]: Disconnecting Button.1 from action ACC
+[Info     - 20201206074151]: Disconnecting Button.2 from action RST
+[Info     - 20201206074151]: Disconnecting Button.3 from action MoTeC
+[Info     - 20201206074151]: Disconnecting Button.4 from action TS
+[Info     - 20201206074151]: Disconnecting Button.5 from action FanaLab
+[Info     - 20201206074151]: Disconnecting Button.6 from action SmartCtrl
+[Info     - 20201206074151]: Disconnecting Button.8 from action Shutdown
+[Info     - 20201206074151]: Disconnecting Button.7 from action 
+[Info     - 20201206074151]: Setting controller mode to Motion
+[Info     - 20201206074151]: Activating mode Motion
+[Info     - 20201206074151]: Connecting Dial.1 to action Motion Intensity
+[Info     - 20201206074151]: Connecting Button.1 to action Heave
+[Info     - 20201206074151]: Connecting Button.4 to action Sway
+[Info     - 20201206074151]: Connecting Button.5 to action Pitch
+[Info     - 20201206074151]: Connecting Button.6 to action Roll
+[Info     - 20201206074151]: Connecting Button.8 to action Effect Intensity
+[Info     - 20201206074151]: Connecting Dial.2 to action 
+[Critical - 20201206074240]: ---------------------------------------------------------------
+[Critical - 20201206074240]:                  Running Simulator Controller
+[Critical - 20201206074240]: ---------------------------------------------------------------
+[Info     - 20201206074240]: Controller layout initialized: # 0 1-Way Toggles, # 5 2-Way Toggles, # 8 Buttons, # 2 Dials
+[Info     - 20201206074240]: Plugin System (Active) registered
+[Info     - 20201206074240]: Activating plugin System
+[Info     - 20201206074240]: Connecting 2WayToggle.1 to action 
+[Info     - 20201206074240]: Mode Launch registered for plugin 
+[Info     - 20201206074240]: Setting controller mode to Launch
+[Info     - 20201206074240]: Activating mode Launch
+[Info     - 20201206074240]: Connecting Button.1 to action ACC
+[Info     - 20201206074240]: Connecting Button.2 to action RST
+[Info     - 20201206074240]: Connecting Button.3 to action MoTeC
+[Info     - 20201206074240]: Connecting Button.4 to action TS
+[Info     - 20201206074240]: Connecting Button.5 to action FanaLab
+[Info     - 20201206074240]: Connecting Button.6 to action SmartCtrl
+[Info     - 20201206074240]: Connecting Button.8 to action Shutdown
+[Info     - 20201206074240]: Connecting Button.7 to action 
+[Info     - 20201206074240]: Plugin Motion Feedback (Active) registered
+[Info     - 20201206074240]: Activating plugin Motion Feedback
+[Info     - 20201206074240]: Mode Motion registered for plugin 
+[Warn     - 20201206074240]: Controller function 1.0 not found in plugin Motion Feedback - please check the setup
+[Warn     - 20201206074240]: Controller function 1.0 not found in plugin Motion Feedback - please check the setup
+[Warn     - 20201206074240]: Controller function 1.2 not found in plugin Motion Feedback - please check the setup
+[Info     - 20201206074240]: Activating plugin Motion Feedback
+[Info     - 20201206074240]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206074244]: Deactivating plugin Motion Feedback
+[Info     - 20201206074244]: Disconnecting 2WayToggle.2 from action Motion
+[Info     - 20201206074244]: Activating plugin Motion Feedback
+[Info     - 20201206074244]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206074244]: Plugin Tactile Feedback (Active) registered
+[Info     - 20201206074244]: Activating plugin Tactile Feedback
+[Info     - 20201206074244]: Mode Pedal Vibration registered for plugin 
+[Info     - 20201206074244]: Mode Chassis Vibration registered for plugin 
+[Warn     - 20201206074244]: Controller function  not found in plugin Tactile Feedback - please check the setup
+[Info     - 20201206074244]: Activating plugin Tactile Feedback
+[Info     - 20201206074244]: Connecting 2WayToggle.3 to action Pedal Vibration
+[Info     - 20201206074244]: Connecting 2WayToggle.5 to action Rear Vibration
+[Info     - 20201206074244]: Plugin AC (Active) registered
+[Info     - 20201206074244]: Activating plugin AC
+[Info     - 20201206074244]: Plugin ACC (Active) registered
+[Info     - 20201206074244]: Activating plugin ACC
+[Info     - 20201206074244]: Mode Drive registered for plugin 
+[Info     - 20201206074246]: Firing action Launch for 2WayToggle.1
+[Info     - 20201206074246]: Deactivating mode Launch
+[Info     - 20201206074246]: Disconnecting Button.1 from action ACC
+[Info     - 20201206074246]: Disconnecting Button.2 from action RST
+[Info     - 20201206074246]: Disconnecting Button.3 from action MoTeC
+[Info     - 20201206074246]: Disconnecting Button.4 from action TS
+[Info     - 20201206074246]: Disconnecting Button.5 from action FanaLab
+[Info     - 20201206074247]: Disconnecting Button.6 from action SmartCtrl
+[Info     - 20201206074247]: Disconnecting Button.8 from action Shutdown
+[Info     - 20201206074247]: Disconnecting Button.7 from action 
+[Info     - 20201206074247]: Setting controller mode to Motion
+[Info     - 20201206074247]: Activating mode Motion
+[Info     - 20201206074247]: Connecting Dial.1 to action Motion Intensity
+[Info     - 20201206074247]: Connecting Button.1 to action Heave
+[Info     - 20201206074247]: Connecting Button.4 to action Sway
+[Info     - 20201206074247]: Connecting Button.5 to action Pitch
+[Info     - 20201206074247]: Connecting Button.6 to action Roll
+[Info     - 20201206074247]: Connecting Button.8 to action Effect Intensity
+[Info     - 20201206074247]: Connecting Dial.2 to action 
+[Critical - 20201206074342]: Unhandled exception encountered in  at line : 
+[Critical - 20201206074405]: ---------------------------------------------------------------
+[Critical - 20201206074405]:                  Running Simulator Controller
+[Critical - 20201206074405]: ---------------------------------------------------------------
+[Info     - 20201206074405]: Controller layout initialized: # 0 1-Way Toggles, # 5 2-Way Toggles, # 8 Buttons, # 2 Dials
+[Info     - 20201206074405]: Plugin System (Active) registered
+[Info     - 20201206074405]: Activating plugin System
+[Info     - 20201206074405]: Connecting 2WayToggle.1 to action 
+[Info     - 20201206074405]: Mode Launch registered for plugin 
+[Info     - 20201206074405]: Setting controller mode to Launch
+[Info     - 20201206074405]: Activating mode Launch
+[Info     - 20201206074405]: Connecting Button.1 to action ACC
+[Info     - 20201206074405]: Connecting Button.2 to action RST
+[Info     - 20201206074405]: Connecting Button.3 to action MoTeC
+[Info     - 20201206074405]: Connecting Button.4 to action TS
+[Info     - 20201206074405]: Connecting Button.5 to action FanaLab
+[Info     - 20201206074405]: Connecting Button.6 to action SmartCtrl
+[Info     - 20201206074405]: Connecting Button.8 to action Shutdown
+[Info     - 20201206074405]: Connecting Button.7 to action 
+[Info     - 20201206074405]: Plugin Motion Feedback (Active) registered
+[Info     - 20201206074405]: Activating plugin Motion Feedback
+[Info     - 20201206074405]: Mode Motion registered for plugin 
+[Warn     - 20201206074405]: Controller function 1.0 not found in plugin Motion Feedback - please check the setup
+[Warn     - 20201206074405]: Controller function 1.0 not found in plugin Motion Feedback - please check the setup
+[Warn     - 20201206074405]: Controller function 1.2 not found in plugin Motion Feedback - please check the setup
+[Info     - 20201206074405]: Activating plugin Motion Feedback
+[Info     - 20201206074405]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206074409]: Deactivating plugin Motion Feedback
+[Info     - 20201206074409]: Disconnecting 2WayToggle.2 from action Motion
+[Info     - 20201206074409]: Activating plugin Motion Feedback
+[Info     - 20201206074409]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206074409]: Plugin Tactile Feedback (Active) registered
+[Info     - 20201206074409]: Activating plugin Tactile Feedback
+[Info     - 20201206074409]: Mode Pedal Vibration registered for plugin 
+[Info     - 20201206074409]: Mode Chassis Vibration registered for plugin 
+[Warn     - 20201206074409]: Controller function  not found in plugin Tactile Feedback - please check the setup
+[Info     - 20201206074409]: Activating plugin Tactile Feedback
+[Info     - 20201206074409]: Connecting 2WayToggle.3 to action Pedal Vibration
+[Info     - 20201206074409]: Connecting 2WayToggle.5 to action Rear Vibration
+[Info     - 20201206074409]: Plugin AC (Active) registered
+[Info     - 20201206074409]: Activating plugin AC
+[Info     - 20201206074409]: Plugin ACC (Active) registered
+[Info     - 20201206074409]: Activating plugin ACC
+[Info     - 20201206074409]: Mode Drive registered for plugin 
+[Info     - 20201206074411]: Firing action Launch for 2WayToggle.1
+[Info     - 20201206074411]: Deactivating mode Launch
+[Info     - 20201206074411]: Disconnecting Button.1 from action ACC
+[Info     - 20201206074411]: Disconnecting Button.2 from action RST
+[Info     - 20201206074411]: Disconnecting Button.3 from action MoTeC
+[Info     - 20201206074411]: Disconnecting Button.4 from action TS
+[Info     - 20201206074411]: Disconnecting Button.5 from action FanaLab
+[Info     - 20201206074411]: Disconnecting Button.6 from action SmartCtrl
+[Info     - 20201206074411]: Disconnecting Button.8 from action Shutdown
+[Info     - 20201206074411]: Disconnecting Button.7 from action 
+[Info     - 20201206074411]: Setting controller mode to Motion
+[Info     - 20201206074411]: Activating mode Motion
+[Info     - 20201206074411]: Connecting Dial.1 to action Motion Intensity
+[Info     - 20201206074411]: Connecting Button.1 to action Heave
+[Info     - 20201206074411]: Connecting Button.4 to action Sway
+[Info     - 20201206074411]: Connecting Button.5 to action Pitch
+[Info     - 20201206074411]: Connecting Button.6 to action Roll
+[Info     - 20201206074411]: Connecting Button.8 to action Effect Intensity
+[Info     - 20201206074411]: Connecting Dial.2 to action 
+[Info     - 20201206074414]: Firing action Motion for 2WayToggle.1
+[Info     - 20201206074414]: Deactivating mode Motion
+[Info     - 20201206074414]: Disconnecting Dial.1 from action Motion Intensity
+[Info     - 20201206074414]: Disconnecting Button.1 from action Heave
+[Info     - 20201206074414]: Disconnecting Button.4 from action Sway
+[Info     - 20201206074414]: Disconnecting Button.5 from action Pitch
+[Info     - 20201206074414]: Disconnecting Button.6 from action Roll
+[Info     - 20201206074414]: Disconnecting Button.8 from action Effect Intensity
+[Info     - 20201206074414]: Disconnecting Dial.2 from action 
+[Info     - 20201206074414]: Setting controller mode to Pedal Vibration
+[Info     - 20201206074414]: Activating mode Pedal Vibration
+[Info     - 20201206074414]: Connecting Dial.1 to action Pedal Vibration
+[Info     - 20201206074414]: Connecting Button.1 to action Increase TC
+[Info     - 20201206074414]: Connecting Button.5 to action Decrease TC
+[Info     - 20201206074414]: Connecting Button.2 to action Increase ABS
+[Info     - 20201206074414]: Connecting Button.6 to action Decrease ABS
+[Info     - 20201206074416]: Firing action Pedal Vibration for 2WayToggle.1
+[Info     - 20201206074416]: Deactivating mode Pedal Vibration
+[Info     - 20201206074416]: Disconnecting Dial.1 from action Pedal Vibration
+[Info     - 20201206074416]: Disconnecting Button.1 from action Increase TC
+[Info     - 20201206074416]: Disconnecting Button.5 from action Decrease TC
+[Info     - 20201206074416]: Disconnecting Button.2 from action Increase ABS
+[Info     - 20201206074416]: Disconnecting Button.6 from action Decrease ABS
+[Info     - 20201206074416]: Setting controller mode to Chassis Vibration
+[Info     - 20201206074416]: Activating mode Chassis Vibration
+[Info     - 20201206074416]: Connecting Dial.2 to action Pedal Vibration
+[Info     - 20201206074416]: Connecting Button.1 to action Increase RPMS
+[Info     - 20201206074416]: Connecting Button.5 to action Decrease RPMS
+[Info     - 20201206074416]: Connecting Button.2 to action Increase Shift
+[Info     - 20201206074416]: Connecting Button.6 to action Decrease Shift
+[Info     - 20201206074416]: Connecting Button.3 to action Increase Whls Lck
+[Info     - 20201206074416]: Connecting Button.7 to action Decrease Whls Lck
+[Info     - 20201206074416]: Connecting Button.4 to action Increase Whls Slip
+[Info     - 20201206074416]: Connecting Button.8 to action Decrease Whls Slip
+[Info     - 20201206074418]: Firing action Chassis Vibration for 2WayToggle.1
+[Info     - 20201206074418]: Deactivating mode Chassis Vibration
+[Info     - 20201206074418]: Disconnecting Dial.2 from action Pedal Vibration
+[Info     - 20201206074418]: Disconnecting Button.1 from action Increase RPMS
+[Info     - 20201206074418]: Disconnecting Button.5 from action Decrease RPMS
+[Info     - 20201206074418]: Disconnecting Button.2 from action Increase Shift
+[Info     - 20201206074418]: Disconnecting Button.6 from action Decrease Shift
+[Info     - 20201206074418]: Disconnecting Button.3 from action Increase Whls Lck
+[Info     - 20201206074418]: Disconnecting Button.7 from action Decrease Whls Lck
+[Info     - 20201206074418]: Disconnecting Button.4 from action Increase Whls Slip
+[Info     - 20201206074418]: Disconnecting Button.8 from action Decrease Whls Slip
+[Info     - 20201206074418]: Setting controller mode to Launch
+[Info     - 20201206074418]: Activating mode Launch
+[Info     - 20201206074418]: Connecting Button.1 to action ACC
+[Info     - 20201206074418]: Connecting Button.2 to action RST
+[Info     - 20201206074418]: Connecting Button.3 to action MoTeC
+[Info     - 20201206074418]: Connecting Button.4 to action TS
+[Info     - 20201206074418]: Connecting Button.5 to action FanaLab
+[Info     - 20201206074419]: Connecting Button.6 to action SmartCtrl
+[Info     - 20201206074419]: Connecting Button.8 to action Shutdown
+[Info     - 20201206074419]: Connecting Button.7 to action 
+[Info     - 20201206074420]: Firing action Launch for 2WayToggle.1
+[Info     - 20201206074420]: Deactivating mode Launch
+[Info     - 20201206074420]: Disconnecting Button.1 from action ACC
+[Info     - 20201206074420]: Disconnecting Button.2 from action RST
+[Info     - 20201206074420]: Disconnecting Button.3 from action MoTeC
+[Info     - 20201206074420]: Disconnecting Button.4 from action TS
+[Info     - 20201206074420]: Disconnecting Button.5 from action FanaLab
+[Info     - 20201206074420]: Disconnecting Button.6 from action SmartCtrl
+[Info     - 20201206074420]: Disconnecting Button.8 from action Shutdown
+[Info     - 20201206074420]: Disconnecting Button.7 from action 
+[Info     - 20201206074420]: Setting controller mode to Motion
+[Info     - 20201206074420]: Activating mode Motion
+[Info     - 20201206074420]: Connecting Dial.1 to action Motion Intensity
+[Info     - 20201206074420]: Connecting Button.1 to action Heave
+[Info     - 20201206074420]: Connecting Button.4 to action Sway
+[Info     - 20201206074420]: Connecting Button.5 to action Pitch
+[Info     - 20201206074420]: Connecting Button.6 to action Roll
+[Info     - 20201206074420]: Connecting Button.8 to action Effect Intensity
+[Info     - 20201206074420]: Connecting Dial.2 to action 
+[Critical - 20201206074454]: ---------------------------------------------------------------
+[Critical - 20201206074454]:                  Running Simulator Controller
+[Critical - 20201206074454]: ---------------------------------------------------------------
+[Info     - 20201206074454]: Controller layout initialized: # 0 1-Way Toggles, # 5 2-Way Toggles, # 8 Buttons, # 2 Dials
+[Info     - 20201206074454]: Plugin System (Active) registered
+[Info     - 20201206074454]: Activating plugin System
+[Info     - 20201206074454]: Connecting 2WayToggle.1 to action 
+[Info     - 20201206074454]: Mode Launch registered for plugin 
+[Info     - 20201206074454]: Setting controller mode to Launch
+[Info     - 20201206074454]: Activating mode Launch
+[Info     - 20201206074454]: Connecting Button.1 to action ACC
+[Info     - 20201206074454]: Connecting Button.2 to action RST
+[Info     - 20201206074454]: Connecting Button.3 to action MoTeC
+[Info     - 20201206074454]: Connecting Button.4 to action TS
+[Info     - 20201206074454]: Connecting Button.5 to action FanaLab
+[Info     - 20201206074454]: Connecting Button.6 to action SmartCtrl
+[Info     - 20201206074454]: Connecting Button.8 to action Shutdown
+[Info     - 20201206074454]: Connecting Button.7 to action 
+[Info     - 20201206074454]: Plugin Motion Feedback (Active) registered
+[Info     - 20201206074454]: Activating plugin Motion Feedback
+[Info     - 20201206074454]: Mode Motion registered for plugin 
+[Warn     - 20201206074454]: Controller function 1.0 not found in plugin Motion Feedback - please check the setup
+[Warn     - 20201206074454]: Controller function 1.0 not found in plugin Motion Feedback - please check the setup
+[Warn     - 20201206074454]: Controller function 1.2 not found in plugin Motion Feedback - please check the setup
+[Info     - 20201206074454]: Activating plugin Motion Feedback
+[Info     - 20201206074454]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206074458]: Deactivating plugin Motion Feedback
+[Info     - 20201206074458]: Disconnecting 2WayToggle.2 from action Motion
+[Info     - 20201206074458]: Activating plugin Motion Feedback
+[Info     - 20201206074458]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206074459]: Plugin Tactile Feedback (Active) registered
+[Info     - 20201206074459]: Activating plugin Tactile Feedback
+[Info     - 20201206074459]: Mode Pedal Vibration registered for plugin 
+[Info     - 20201206074459]: Mode Chassis Vibration registered for plugin 
+[Warn     - 20201206074459]: Controller function  not found in plugin Tactile Feedback - please check the setup
+[Info     - 20201206074459]: Activating plugin Tactile Feedback
+[Info     - 20201206074459]: Connecting 2WayToggle.3 to action Pedal Vibration
+[Info     - 20201206074459]: Connecting 2WayToggle.5 to action Rear Vibration
+[Info     - 20201206074459]: Plugin AC (Active) registered
+[Info     - 20201206074459]: Activating plugin AC
+[Info     - 20201206074459]: Plugin ACC (Active) registered
+[Info     - 20201206074459]: Activating plugin ACC
+[Info     - 20201206074459]: Mode Drive registered for plugin 
+[Critical - 20201206074505]: ---------------------------------------------------------------
+[Critical - 20201206074505]:                  Running Simulator Controller
+[Critical - 20201206074505]: ---------------------------------------------------------------
+[Info     - 20201206074510]: Controller layout initialized: # 0 1-Way Toggles, # 5 2-Way Toggles, # 8 Buttons, # 2 Dials
+[Info     - 20201206074510]: Plugin System (Active) registered
+[Info     - 20201206074510]: Activating plugin System
+[Info     - 20201206074510]: Connecting 2WayToggle.1 to action 
+[Info     - 20201206074510]: Mode Launch registered for plugin 
+[Info     - 20201206074510]: Setting controller mode to Launch
+[Info     - 20201206074510]: Activating mode Launch
+[Info     - 20201206074510]: Connecting Button.1 to action ACC
+[Info     - 20201206074510]: Connecting Button.2 to action RST
+[Info     - 20201206074510]: Connecting Button.3 to action MoTeC
+[Info     - 20201206074510]: Connecting Button.4 to action TS
+[Info     - 20201206074510]: Connecting Button.5 to action FanaLab
+[Info     - 20201206074510]: Connecting Button.6 to action SmartCtrl
+[Info     - 20201206074510]: Connecting Button.8 to action Shutdown
+[Info     - 20201206074510]: Connecting Button.7 to action 
+[Info     - 20201206074510]: Plugin Motion Feedback (Active) registered
+[Info     - 20201206074510]: Activating plugin Motion Feedback
+[Info     - 20201206074510]: Mode Motion registered for plugin 
+[Warn     - 20201206074510]: Controller function 1.0 not found in plugin Motion Feedback - please check the setup
+[Warn     - 20201206074510]: Controller function 1.0 not found in plugin Motion Feedback - please check the setup
+[Warn     - 20201206074510]: Controller function 1.2 not found in plugin Motion Feedback - please check the setup
+[Info     - 20201206074510]: Activating plugin Motion Feedback
+[Info     - 20201206074510]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206074514]: Deactivating plugin Motion Feedback
+[Info     - 20201206074514]: Disconnecting 2WayToggle.2 from action Motion
+[Info     - 20201206074514]: Activating plugin Motion Feedback
+[Info     - 20201206074514]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206074514]: Plugin Tactile Feedback (Active) registered
+[Info     - 20201206074514]: Activating plugin Tactile Feedback
+[Info     - 20201206074514]: Mode Pedal Vibration registered for plugin 
+[Info     - 20201206074514]: Mode Chassis Vibration registered for plugin 
+[Warn     - 20201206074514]: Controller function  not found in plugin Tactile Feedback - please check the setup
+[Info     - 20201206074514]: Activating plugin Tactile Feedback
+[Info     - 20201206074514]: Connecting 2WayToggle.3 to action Pedal Vibration
+[Info     - 20201206074514]: Connecting 2WayToggle.5 to action Rear Vibration
+[Info     - 20201206074514]: Plugin AC (Active) registered
+[Info     - 20201206074514]: Activating plugin AC
+[Info     - 20201206074514]: Plugin ACC (Active) registered
+[Info     - 20201206074514]: Activating plugin ACC
+[Info     - 20201206074514]: Mode Drive registered for plugin 
+[Critical - 20201206074608]: ---------------------------------------------------------------
+[Critical - 20201206074608]:                  Running Simulator Controller
+[Critical - 20201206074608]: ---------------------------------------------------------------
+[Info     - 20201206074609]: Controller layout initialized: # 0 1-Way Toggles, # 5 2-Way Toggles, # 8 Buttons, # 2 Dials
+[Info     - 20201206074609]: Plugin System (Active) registered
+[Info     - 20201206074609]: Activating plugin System
+[Info     - 20201206074609]: Connecting 2WayToggle.1 to action 
+[Info     - 20201206074609]: Mode Launch registered for plugin 
+[Info     - 20201206074609]: Setting controller mode to Launch
+[Info     - 20201206074609]: Activating mode Launch
+[Info     - 20201206074609]: Connecting Button.1 to action ACC
+[Info     - 20201206074609]: Connecting Button.2 to action RST
+[Info     - 20201206074609]: Connecting Button.3 to action MoTeC
+[Info     - 20201206074609]: Connecting Button.4 to action TS
+[Info     - 20201206074609]: Connecting Button.5 to action FanaLab
+[Info     - 20201206074609]: Connecting Button.6 to action SmartCtrl
+[Info     - 20201206074609]: Connecting Button.8 to action Shutdown
+[Info     - 20201206074609]: Connecting Button.7 to action 
+[Info     - 20201206074609]: Plugin Motion Feedback (Active) registered
+[Info     - 20201206074609]: Activating plugin Motion Feedback
+[Info     - 20201206074609]: Mode Motion registered for plugin 
+[Warn     - 20201206074609]: Controller function 1.0 not found in plugin Motion Feedback - please check the setup
+[Warn     - 20201206074609]: Controller function 1.0 not found in plugin Motion Feedback - please check the setup
+[Warn     - 20201206074609]: Controller function 1.2 not found in plugin Motion Feedback - please check the setup
+[Info     - 20201206074609]: Activating plugin Motion Feedback
+[Info     - 20201206074609]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206074611]: Firing action Launch for 2WayToggle.1
+[Info     - 20201206074611]: Deactivating mode Launch
+[Info     - 20201206074611]: Disconnecting Button.1 from action ACC
+[Info     - 20201206074611]: Disconnecting Button.2 from action RST
+[Info     - 20201206074611]: Disconnecting Button.3 from action MoTeC
+[Info     - 20201206074611]: Disconnecting Button.4 from action TS
+[Info     - 20201206074611]: Disconnecting Button.5 from action FanaLab
+[Info     - 20201206074611]: Disconnecting Button.6 from action SmartCtrl
+[Info     - 20201206074611]: Disconnecting Button.8 from action Shutdown
+[Info     - 20201206074611]: Disconnecting Button.7 from action 
+[Info     - 20201206074611]: Setting controller mode to Motion
+[Info     - 20201206074611]: Activating mode Motion
+[Info     - 20201206074611]: Connecting Dial.1 to action Motion Intensity
+[Info     - 20201206074611]: Connecting Button.1 to action Heave
+[Info     - 20201206074611]: Connecting Button.4 to action Sway
+[Info     - 20201206074611]: Connecting Button.5 to action Pitch
+[Info     - 20201206074611]: Connecting Button.6 to action Roll
+[Info     - 20201206074611]: Connecting Button.8 to action Effect Intensity
+[Info     - 20201206074611]: Connecting Dial.2 to action 
+[Info     - 20201206074613]: Deactivating plugin Motion Feedback
+[Info     - 20201206074613]: Disconnecting 2WayToggle.2 from action Motion
+[Info     - 20201206074613]: Activating plugin Motion Feedback
+[Info     - 20201206074613]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206074613]: Plugin Tactile Feedback (Active) registered
+[Info     - 20201206074613]: Activating plugin Tactile Feedback
+[Warn     - 20201206074613]: Controller function  not found in plugin Tactile Feedback - please check the setup
+[Info     - 20201206074613]: Mode Pedal Vibration registered for plugin 
+[Info     - 20201206074613]: Mode Chassis Vibration registered for plugin 
+[Warn     - 20201206074613]: Controller function  not found in plugin Tactile Feedback - please check the setup
+[Info     - 20201206074613]: Activating plugin Tactile Feedback
+[Info     - 20201206074613]: Connecting 2WayToggle.3 to action Pedal Vibration
+[Info     - 20201206074613]: Connecting 2WayToggle.5 to action Rear Vibration
+[Info     - 20201206074613]: Plugin AC (Active) registered
+[Info     - 20201206074613]: Activating plugin AC
+[Info     - 20201206074613]: Plugin ACC (Active) registered
+[Info     - 20201206074613]: Activating plugin ACC
+[Info     - 20201206074613]: Mode Drive registered for plugin 
+[Info     - 20201206074616]: Firing action Motion for 2WayToggle.1
+[Info     - 20201206074616]: Deactivating mode Motion
+[Info     - 20201206074616]: Disconnecting Dial.1 from action Motion Intensity
+[Info     - 20201206074616]: Disconnecting Button.1 from action Heave
+[Info     - 20201206074616]: Disconnecting Button.4 from action Sway
+[Info     - 20201206074616]: Disconnecting Button.5 from action Pitch
+[Info     - 20201206074616]: Disconnecting Button.6 from action Roll
+[Info     - 20201206074616]: Disconnecting Button.8 from action Effect Intensity
+[Info     - 20201206074616]: Disconnecting Dial.2 from action 
+[Info     - 20201206074617]: Setting controller mode to Pedal Vibration
+[Info     - 20201206074617]: Activating mode Pedal Vibration
+[Info     - 20201206074617]: Connecting Dial.1 to action Pedal Vibration
+[Info     - 20201206074617]: Connecting Button.1 to action Increase TC
+[Info     - 20201206074617]: Connecting Button.5 to action Decrease TC
+[Info     - 20201206074617]: Connecting Button.2 to action Increase ABS
+[Info     - 20201206074617]: Connecting Button.6 to action Decrease ABS
+[Info     - 20201206074618]: Firing action Pedal Vibration for 2WayToggle.1
+[Info     - 20201206074618]: Deactivating mode Pedal Vibration
+[Info     - 20201206074618]: Disconnecting Dial.1 from action Pedal Vibration
+[Info     - 20201206074618]: Disconnecting Button.1 from action Increase TC
+[Info     - 20201206074618]: Disconnecting Button.5 from action Decrease TC
+[Info     - 20201206074618]: Disconnecting Button.2 from action Increase ABS
+[Info     - 20201206074618]: Disconnecting Button.6 from action Decrease ABS
+[Info     - 20201206074618]: Setting controller mode to Chassis Vibration
+[Info     - 20201206074618]: Activating mode Chassis Vibration
+[Info     - 20201206074618]: Connecting Dial.2 to action Pedal Vibration
+[Info     - 20201206074618]: Connecting Button.1 to action Increase RPMS
+[Info     - 20201206074618]: Connecting Button.5 to action Decrease RPMS
+[Info     - 20201206074618]: Connecting Button.2 to action Increase Shift
+[Info     - 20201206074618]: Connecting Button.6 to action Decrease Shift
+[Info     - 20201206074618]: Connecting Button.3 to action Increase Whls Lck
+[Info     - 20201206074618]: Connecting Button.7 to action Decrease Whls Lck
+[Info     - 20201206074618]: Connecting Button.4 to action Increase Whls Slip
+[Info     - 20201206074618]: Connecting Button.8 to action Decrease Whls Slip
+[Info     - 20201206074619]: Firing action Chassis Vibration for 2WayToggle.1
+[Info     - 20201206074619]: Deactivating mode Chassis Vibration
+[Info     - 20201206074619]: Disconnecting Dial.2 from action Pedal Vibration
+[Info     - 20201206074619]: Disconnecting Button.1 from action Increase RPMS
+[Info     - 20201206074619]: Disconnecting Button.5 from action Decrease RPMS
+[Info     - 20201206074619]: Disconnecting Button.2 from action Increase Shift
+[Info     - 20201206074619]: Disconnecting Button.6 from action Decrease Shift
+[Info     - 20201206074619]: Disconnecting Button.3 from action Increase Whls Lck
+[Info     - 20201206074619]: Disconnecting Button.7 from action Decrease Whls Lck
+[Info     - 20201206074619]: Disconnecting Button.4 from action Increase Whls Slip
+[Info     - 20201206074619]: Disconnecting Button.8 from action Decrease Whls Slip
+[Info     - 20201206074619]: Setting controller mode to Launch
+[Info     - 20201206074619]: Activating mode Launch
+[Info     - 20201206074619]: Connecting Button.1 to action ACC
+[Info     - 20201206074619]: Connecting Button.2 to action RST
+[Info     - 20201206074619]: Connecting Button.3 to action MoTeC
+[Info     - 20201206074619]: Connecting Button.4 to action TS
+[Info     - 20201206074619]: Connecting Button.5 to action FanaLab
+[Info     - 20201206074619]: Connecting Button.6 to action SmartCtrl
+[Info     - 20201206074619]: Connecting Button.8 to action Shutdown
+[Info     - 20201206074619]: Connecting Button.7 to action 
+[Critical - 20201206074808]: ---------------------------------------------------------------
+[Critical - 20201206074808]:                  Running Simulator Controller
+[Critical - 20201206074808]: ---------------------------------------------------------------
+[Info     - 20201206074808]: Controller layout initialized: # 0 1-Way Toggles, # 5 2-Way Toggles, # 8 Buttons, # 2 Dials
+[Info     - 20201206074808]: Plugin System (Active) registered
+[Info     - 20201206074808]: Activating plugin System
+[Info     - 20201206074808]: Connecting 2WayToggle.1 to action 
+[Info     - 20201206074808]: Mode Launch registered for plugin 
+[Info     - 20201206074808]: Setting controller mode to Launch
+[Info     - 20201206074808]: Activating mode Launch
+[Info     - 20201206074808]: Connecting Button.1 to action ACC
+[Info     - 20201206074808]: Connecting Button.2 to action RST
+[Info     - 20201206074808]: Connecting Button.3 to action MoTeC
+[Info     - 20201206074808]: Connecting Button.4 to action TS
+[Info     - 20201206074808]: Connecting Button.5 to action FanaLab
+[Info     - 20201206074808]: Connecting Button.6 to action SmartCtrl
+[Info     - 20201206074808]: Connecting Button.8 to action Shutdown
+[Info     - 20201206074808]: Connecting Button.7 to action 
+[Info     - 20201206074808]: Plugin Motion Feedback (Active) registered
+[Info     - 20201206074808]: Activating plugin Motion Feedback
+[Info     - 20201206074808]: Mode Motion registered for plugin 
+[Warn     - 20201206074808]: Controller function 1.0 not found in plugin Motion Feedback - please check the setup
+[Warn     - 20201206074808]: Controller function 1.0 not found in plugin Motion Feedback - please check the setup
+[Warn     - 20201206074808]: Controller function 1.2 not found in plugin Motion Feedback - please check the setup
+[Info     - 20201206074808]: Activating plugin Motion Feedback
+[Info     - 20201206074808]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206074812]: Deactivating plugin Motion Feedback
+[Info     - 20201206074812]: Disconnecting 2WayToggle.2 from action Motion
+[Info     - 20201206074812]: Activating plugin Motion Feedback
+[Info     - 20201206074812]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206074812]: Plugin Tactile Feedback (Active) registered
+[Info     - 20201206074812]: Activating plugin Tactile Feedback
+[Warn     - 20201206074812]: Controller function  not found in plugin Tactile Feedback - please check the setup
+[Info     - 20201206074812]: Mode Pedal Vibration registered for plugin 
+[Info     - 20201206074812]: Mode Chassis Vibration registered for plugin 
+[Warn     - 20201206074812]: Controller function  not found in plugin Tactile Feedback - please check the setup
+[Info     - 20201206074812]: Activating plugin Tactile Feedback
+[Info     - 20201206074812]: Connecting 2WayToggle.3 to action Pedal Vibration
+[Info     - 20201206074812]: Connecting 2WayToggle.5 to action Rear Vibration
+[Info     - 20201206074813]: Plugin AC (Active) registered
+[Info     - 20201206074813]: Activating plugin AC
+[Info     - 20201206074813]: Plugin ACC (Active) registered
+[Info     - 20201206074813]: Activating plugin ACC
+[Info     - 20201206074813]: Mode Drive registered for plugin 
+[Critical - 20201206074923]: ---------------------------------------------------------------
+[Critical - 20201206074923]:                  Running Simulator Controller
+[Critical - 20201206074923]: ---------------------------------------------------------------
+[Info     - 20201206074923]: Controller layout initialized: # 0 1-Way Toggles, # 5 2-Way Toggles, # 8 Buttons, # 2 Dials
+[Info     - 20201206074923]: Plugin System (Active) registered
+[Info     - 20201206074923]: Activating plugin System
+[Info     - 20201206074923]: Connecting 2WayToggle.1 to action 
+[Info     - 20201206074923]: Mode Launch registered for plugin 
+[Info     - 20201206074923]: Setting controller mode to Launch
+[Info     - 20201206074923]: Activating mode Launch
+[Info     - 20201206074923]: Connecting Button.1 to action ACC
+[Info     - 20201206074923]: Connecting Button.2 to action RST
+[Info     - 20201206074923]: Connecting Button.3 to action MoTeC
+[Info     - 20201206074923]: Connecting Button.4 to action TS
+[Info     - 20201206074923]: Connecting Button.5 to action FanaLab
+[Info     - 20201206074923]: Connecting Button.6 to action SmartCtrl
+[Info     - 20201206074923]: Connecting Button.8 to action Shutdown
+[Info     - 20201206074923]: Connecting Button.7 to action 
+[Info     - 20201206074923]: Plugin Motion Feedback (Active) registered
+[Info     - 20201206074923]: Activating plugin Motion Feedback
+[Info     - 20201206074923]: Mode Motion registered for plugin 
+[Warn     - 20201206074923]: Controller function 1.0 not found in plugin Motion Feedback - please check the setup
+[Warn     - 20201206074923]: Controller function 1.0 not found in plugin Motion Feedback - please check the setup
+[Warn     - 20201206074923]: Controller function 1.2 not found in plugin Motion Feedback - please check the setup
+[Info     - 20201206074923]: Activating plugin Motion Feedback
+[Info     - 20201206074923]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206074927]: Deactivating plugin Motion Feedback
+[Info     - 20201206074927]: Disconnecting 2WayToggle.2 from action Motion
+[Info     - 20201206074927]: Activating plugin Motion Feedback
+[Info     - 20201206074927]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206074927]: Plugin Tactile Feedback (Active) registered
+[Info     - 20201206074927]: Activating plugin Tactile Feedback
+[Info     - 20201206074927]: Mode Pedal Vibration registered for plugin 
+[Info     - 20201206074927]: Mode Chassis Vibration registered for plugin 
+[Info     - 20201206074927]: Activating plugin Tactile Feedback
+[Info     - 20201206074927]: Connecting 2WayToggle.3 to action Pedal Vibration
+[Info     - 20201206074927]: Connecting 2WayToggle.4 to action Front Vibration
+[Info     - 20201206074927]: Connecting 2WayToggle.5 to action Rear Vibration
+[Info     - 20201206074927]: Plugin AC (Active) registered
+[Info     - 20201206074927]: Activating plugin AC
+[Info     - 20201206074927]: Plugin ACC (Active) registered
+[Info     - 20201206074927]: Activating plugin ACC
+[Info     - 20201206074927]: Mode Drive registered for plugin 
+[Info     - 20201206074934]: Firing action Launch for 2WayToggle.1
+[Info     - 20201206074934]: Deactivating mode Launch
+[Info     - 20201206074934]: Disconnecting Button.1 from action ACC
+[Info     - 20201206074934]: Disconnecting Button.2 from action RST
+[Info     - 20201206074934]: Disconnecting Button.3 from action MoTeC
+[Info     - 20201206074934]: Disconnecting Button.4 from action TS
+[Info     - 20201206074934]: Disconnecting Button.5 from action FanaLab
+[Info     - 20201206074934]: Disconnecting Button.6 from action SmartCtrl
+[Info     - 20201206074934]: Disconnecting Button.8 from action Shutdown
+[Info     - 20201206074934]: Disconnecting Button.7 from action 
+[Info     - 20201206074934]: Setting controller mode to Motion
+[Info     - 20201206074934]: Activating mode Motion
+[Info     - 20201206074934]: Connecting Dial.1 to action Motion Intensity
+[Info     - 20201206074934]: Connecting Button.1 to action Heave
+[Info     - 20201206074934]: Connecting Button.4 to action Sway
+[Info     - 20201206074934]: Connecting Button.5 to action Pitch
+[Info     - 20201206074934]: Connecting Button.6 to action Roll
+[Info     - 20201206074934]: Connecting Button.8 to action Effect Intensity
+[Info     - 20201206074934]: Connecting Dial.2 to action 
+[Info     - 20201206074936]: Firing action Motion for 2WayToggle.1
+[Info     - 20201206074936]: Deactivating mode Motion
+[Info     - 20201206074936]: Disconnecting Dial.1 from action Motion Intensity
+[Info     - 20201206074936]: Disconnecting Button.1 from action Heave
+[Info     - 20201206074936]: Disconnecting Button.4 from action Sway
+[Info     - 20201206074936]: Disconnecting Button.5 from action Pitch
+[Info     - 20201206074936]: Disconnecting Button.6 from action Roll
+[Info     - 20201206074936]: Disconnecting Button.8 from action Effect Intensity
+[Info     - 20201206074936]: Disconnecting Dial.2 from action 
+[Info     - 20201206074936]: Setting controller mode to Pedal Vibration
+[Info     - 20201206074936]: Activating mode Pedal Vibration
+[Info     - 20201206074936]: Connecting Dial.1 to action Pedal Vibration
+[Info     - 20201206074936]: Connecting Button.1 to action Increase TC
+[Info     - 20201206074936]: Connecting Button.5 to action Decrease TC
+[Info     - 20201206074936]: Connecting Button.2 to action Increase ABS
+[Info     - 20201206074937]: Connecting Button.6 to action Decrease ABS
+[Info     - 20201206074939]: Firing action Pedal Vibration for 2WayToggle.1
+[Info     - 20201206074939]: Deactivating mode Pedal Vibration
+[Info     - 20201206074939]: Disconnecting Dial.1 from action Pedal Vibration
+[Info     - 20201206074939]: Disconnecting Button.1 from action Increase TC
+[Info     - 20201206074939]: Disconnecting Button.5 from action Decrease TC
+[Info     - 20201206074939]: Disconnecting Button.2 from action Increase ABS
+[Info     - 20201206074939]: Disconnecting Button.6 from action Decrease ABS
+[Info     - 20201206074939]: Setting controller mode to Chassis Vibration
+[Info     - 20201206074939]: Activating mode Chassis Vibration
+[Info     - 20201206074939]: Connecting Dial.1 to action Front Vibration
+[Info     - 20201206074939]: Connecting Dial.2 to action Pedal Vibration
+[Info     - 20201206074939]: Connecting Button.1 to action Increase RPMS
+[Info     - 20201206074939]: Connecting Button.5 to action Decrease RPMS
+[Info     - 20201206074939]: Connecting Button.2 to action Increase Shift
+[Info     - 20201206074939]: Connecting Button.6 to action Decrease Shift
+[Info     - 20201206074939]: Connecting Button.3 to action Increase Whls Lck
+[Info     - 20201206074939]: Connecting Button.7 to action Decrease Whls Lck
+[Info     - 20201206074939]: Connecting Button.4 to action Increase Whls Slip
+[Info     - 20201206074939]: Connecting Button.8 to action Decrease Whls Slip
+[Critical - 20201206075823]: ---------------------------------------------------------------
+[Critical - 20201206075823]:                  Running Simulator Controller
+[Critical - 20201206075823]: ---------------------------------------------------------------
+[Critical - 20201206075823]: ---------------------------------------------------------------
+[Critical - 20201206075823]:                  Running Simulator Controller
+[Critical - 20201206075823]: ---------------------------------------------------------------
+[Info     - 20201206075823]: Controller layout initialized: # 0 1-Way Toggles, # 5 2-Way Toggles, # 8 Buttons, # 2 Dials
+[Info     - 20201206075824]: Plugin System (Active) registered
+[Info     - 20201206075824]: Activating plugin System
+[Info     - 20201206075824]: Connecting 2WayToggle.1 to action 
+[Info     - 20201206075824]: Mode Launch registered for plugin 
+[Info     - 20201206075824]: Setting controller mode to Launch
+[Info     - 20201206075824]: Activating mode Launch
+[Info     - 20201206075824]: Connecting Button.1 to action ACC
+[Info     - 20201206075824]: Connecting Button.2 to action RST
+[Info     - 20201206075824]: Connecting Button.3 to action MoTeC
+[Info     - 20201206075824]: Connecting Button.4 to action TS
+[Info     - 20201206075824]: Connecting Button.5 to action FanaLab
+[Info     - 20201206075824]: Connecting Button.6 to action SmartCtrl
+[Info     - 20201206075824]: Connecting Button.8 to action Shutdown
+[Info     - 20201206075824]: Connecting Button.7 to action 
+[Info     - 20201206075824]: Plugin Motion Feedback (Active) registered
+[Info     - 20201206075824]: Activating plugin Motion Feedback
+[Info     - 20201206075824]: Mode Motion registered for plugin 
+[Info     - 20201206075824]: Activating plugin Motion Feedback
+[Info     - 20201206075824]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206075824]: Plugin Tactile Feedback (Active) registered
+[Info     - 20201206075824]: Activating plugin Tactile Feedback
+[Info     - 20201206075824]: Mode Pedal Vibration registered for plugin 
+[Info     - 20201206075824]: Mode Chassis Vibration registered for plugin 
+[Info     - 20201206075824]: Activating plugin Tactile Feedback
+[Info     - 20201206075824]: Connecting 2WayToggle.3 to action Pedal Vibration
+[Info     - 20201206075824]: Connecting 2WayToggle.4 to action Front Vibration
+[Info     - 20201206075824]: Connecting 2WayToggle.5 to action Rear Vibration
+[Info     - 20201206075824]: Plugin AC (Active) registered
+[Info     - 20201206075824]: Activating plugin AC
+[Info     - 20201206075824]: Plugin ACC (Active) registered
+[Info     - 20201206075824]: Activating plugin ACC
+[Info     - 20201206075824]: Mode Drive registered for plugin 
+[Info     - 20201206075826]: Firing action Launch for 2WayToggle.1
+[Info     - 20201206075826]: Deactivating mode Launch
+[Info     - 20201206075826]: Disconnecting Button.1 from action ACC
+[Info     - 20201206075826]: Disconnecting Button.2 from action RST
+[Info     - 20201206075826]: Disconnecting Button.3 from action MoTeC
+[Info     - 20201206075826]: Disconnecting Button.4 from action TS
+[Info     - 20201206075826]: Disconnecting Button.5 from action FanaLab
+[Info     - 20201206075826]: Disconnecting Button.6 from action SmartCtrl
+[Info     - 20201206075826]: Disconnecting Button.8 from action Shutdown
+[Info     - 20201206075826]: Disconnecting Button.7 from action 
+[Info     - 20201206075826]: Setting controller mode to Motion
+[Info     - 20201206075826]: Activating mode Motion
+[Info     - 20201206075826]: Connecting Dial.1 to action Motion Intensity
+[Info     - 20201206075826]: Connecting Button.1 to action Heave
+[Info     - 20201206075826]: Connecting Button.2 to action Surge 1
+[Info     - 20201206075826]: Connecting Button.3 to action Surge 2
+[Info     - 20201206075826]: Connecting Button.4 to action Sway
+[Info     - 20201206075826]: Connecting Button.5 to action Pitch
+[Info     - 20201206075826]: Connecting Button.6 to action Roll
+[Info     - 20201206075826]: Connecting Button.7 to action Traction Loss
+[Info     - 20201206075826]: Connecting Button.8 to action Effect Intensity
+[Info     - 20201206075826]: Connecting Dial.2 to action 
+[Info     - 20201206075829]: Firing action Motion for 2WayToggle.1
+[Info     - 20201206075829]: Deactivating mode Motion
+[Info     - 20201206075829]: Disconnecting Dial.1 from action Motion Intensity
+[Info     - 20201206075829]: Disconnecting Button.1 from action Heave
+[Info     - 20201206075829]: Disconnecting Button.2 from action Surge 1
+[Info     - 20201206075829]: Disconnecting Button.3 from action Surge 2
+[Info     - 20201206075829]: Disconnecting Button.4 from action Sway
+[Info     - 20201206075829]: Disconnecting Button.5 from action Pitch
+[Info     - 20201206075829]: Disconnecting Button.6 from action Roll
+[Info     - 20201206075829]: Disconnecting Button.7 from action Traction Loss
+[Info     - 20201206075829]: Disconnecting Button.8 from action Effect Intensity
+[Info     - 20201206075829]: Disconnecting Dial.2 from action 
+[Info     - 20201206075829]: Setting controller mode to Pedal Vibration
+[Info     - 20201206075829]: Activating mode Pedal Vibration
+[Info     - 20201206075829]: Connecting Dial.1 to action Pedal Vibration
+[Info     - 20201206075829]: Connecting Button.1 to action Increase TC
+[Info     - 20201206075829]: Connecting Button.5 to action Decrease TC
+[Info     - 20201206075829]: Connecting Button.2 to action Increase ABS
+[Info     - 20201206075829]: Connecting Button.6 to action Decrease ABS
+[Info     - 20201206075831]: Firing action Pedal Vibration for 2WayToggle.1
+[Info     - 20201206075831]: Deactivating mode Pedal Vibration
+[Info     - 20201206075831]: Disconnecting Dial.1 from action Pedal Vibration
+[Info     - 20201206075831]: Disconnecting Button.1 from action Increase TC
+[Info     - 20201206075831]: Disconnecting Button.5 from action Decrease TC
+[Info     - 20201206075831]: Disconnecting Button.2 from action Increase ABS
+[Info     - 20201206075831]: Disconnecting Button.6 from action Decrease ABS
+[Info     - 20201206075831]: Setting controller mode to Chassis Vibration
+[Info     - 20201206075831]: Activating mode Chassis Vibration
+[Info     - 20201206075831]: Connecting Dial.1 to action Front Vibration
+[Info     - 20201206075831]: Connecting Dial.2 to action Rear Vibration
+[Info     - 20201206075831]: Connecting Button.1 to action Increase RPMS
+[Info     - 20201206075831]: Connecting Button.5 to action Decrease RPMS
+[Info     - 20201206075831]: Connecting Button.2 to action Increase Shift
+[Info     - 20201206075831]: Connecting Button.6 to action Decrease Shift
+[Info     - 20201206075831]: Connecting Button.3 to action Increase Whls Lck
+[Info     - 20201206075831]: Connecting Button.7 to action Decrease Whls Lck
+[Info     - 20201206075831]: Connecting Button.4 to action Increase Whls Slip
+[Info     - 20201206075831]: Connecting Button.8 to action Decrease Whls Slip
+[Critical - 20201206080322]: ---------------------------------------------------------------
+[Critical - 20201206080322]:                  Running Simulator Controller
+[Critical - 20201206080322]: ---------------------------------------------------------------
+[Info     - 20201206080322]: Controller layout initialized: # 0 1-Way Toggles, # 5 2-Way Toggles, # 8 Buttons, # 2 Dials
+[Info     - 20201206080323]: Plugin System (Active) registered
+[Info     - 20201206080323]: Activating plugin System
+[Info     - 20201206080323]: Connecting 2WayToggle.1 to action 
+[Info     - 20201206080323]: Mode Launch registered for plugin 
+[Info     - 20201206080323]: Setting controller mode to Launch
+[Info     - 20201206080323]: Activating mode Launch
+[Info     - 20201206080323]: Connecting Button.1 to action ACC
+[Info     - 20201206080323]: Connecting Button.2 to action RST
+[Info     - 20201206080323]: Connecting Button.3 to action MoTeC
+[Info     - 20201206080323]: Connecting Button.4 to action TS
+[Info     - 20201206080323]: Connecting Button.5 to action FanaLab
+[Info     - 20201206080323]: Connecting Button.6 to action SmartCtrl
+[Info     - 20201206080323]: Connecting Button.8 to action Shutdown
+[Info     - 20201206080323]: Connecting Button.7 to action 
+[Info     - 20201206080323]: Plugin Motion Feedback (Active) registered
+[Info     - 20201206080323]: Activating plugin Motion Feedback
+[Info     - 20201206080323]: Mode Motion registered for plugin 
+[Info     - 20201206080323]: Activating plugin Motion Feedback
+[Info     - 20201206080323]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206080323]: Plugin Tactile Feedback (Active) registered
+[Info     - 20201206080323]: Activating plugin Tactile Feedback
+[Info     - 20201206080323]: Mode Pedal Vibration registered for plugin 
+[Info     - 20201206080323]: Mode Chassis Vibration registered for plugin 
+[Info     - 20201206080323]: Activating plugin Tactile Feedback
+[Info     - 20201206080323]: Connecting 2WayToggle.3 to action Pedal Vibration
+[Info     - 20201206080323]: Connecting 2WayToggle.4 to action Front Vibration
+[Info     - 20201206080323]: Connecting 2WayToggle.5 to action Rear Vibration
+[Info     - 20201206080323]: Plugin AC (Active) registered
+[Info     - 20201206080323]: Activating plugin AC
+[Info     - 20201206080323]: Plugin ACC (Active) registered
+[Info     - 20201206080323]: Activating plugin ACC
+[Info     - 20201206080323]: Mode Drive registered for plugin 
+[Critical - 20201206080452]: ---------------------------------------------------------------
+[Critical - 20201206080452]:                  Running Simulator Controller
+[Critical - 20201206080452]: ---------------------------------------------------------------
+[Critical - 20201206080452]: ---------------------------------------------------------------
+[Critical - 20201206080452]:                  Running Simulator Controller
+[Critical - 20201206080452]: ---------------------------------------------------------------
+[Info     - 20201206080452]: Controller layout initialized: # 0 1-Way Toggles, # 5 2-Way Toggles, # 8 Buttons, # 2 Dials
+[Info     - 20201206080452]: Plugin System (Active) registered
+[Info     - 20201206080452]: Activating plugin System
+[Info     - 20201206080452]: Connecting 2WayToggle.1 to action 
+[Info     - 20201206080452]: Mode Launch registered for plugin 
+[Info     - 20201206080452]: Setting controller mode to Launch
+[Info     - 20201206080452]: Activating mode Launch
+[Info     - 20201206080452]: Connecting Button.1 to action ACC
+[Info     - 20201206080452]: Connecting Button.2 to action RST
+[Info     - 20201206080452]: Connecting Button.3 to action MoTeC
+[Info     - 20201206080452]: Connecting Button.4 to action TS
+[Info     - 20201206080452]: Connecting Button.5 to action FanaLab
+[Info     - 20201206080452]: Connecting Button.6 to action SmartCtrl
+[Info     - 20201206080452]: Connecting Button.8 to action Shutdown
+[Info     - 20201206080452]: Connecting Button.7 to action 
+[Info     - 20201206080452]: Plugin Motion Feedback (Active) registered
+[Info     - 20201206080452]: Activating plugin Motion Feedback
+[Info     - 20201206080452]: Mode Motion registered for plugin 
+[Info     - 20201206080452]: Activating plugin Motion Feedback
+[Info     - 20201206080452]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206080454]: Plugin Tactile Feedback (Active) registered
+[Info     - 20201206080454]: Activating plugin Tactile Feedback
+[Info     - 20201206080454]: Mode Pedal Vibration registered for plugin 
+[Info     - 20201206080454]: Mode Chassis Vibration registered for plugin 
+[Info     - 20201206080454]: Activating plugin Tactile Feedback
+[Info     - 20201206080454]: Connecting 2WayToggle.3 to action Pedal Vibration
+[Info     - 20201206080454]: Connecting 2WayToggle.4 to action Front Vibration
+[Info     - 20201206080454]: Connecting 2WayToggle.5 to action Rear Vibration
+[Info     - 20201206080454]: Plugin AC (Active) registered
+[Info     - 20201206080454]: Activating plugin AC
+[Info     - 20201206080454]: Plugin ACC (Active) registered
+[Info     - 20201206080454]: Activating plugin ACC
+[Info     - 20201206080454]: Mode Drive registered for plugin 
+[Critical - 20201206080703]: ---------------------------------------------------------------
+[Critical - 20201206080703]:                  Running Simulator Controller
+[Critical - 20201206080703]: ---------------------------------------------------------------
+[Info     - 20201206080703]: Controller layout initialized: # 0 1-Way Toggles, # 5 2-Way Toggles, # 8 Buttons, # 2 Dials
+[Info     - 20201206080703]: Plugin System (Active) registered
+[Info     - 20201206080703]: Activating plugin System
+[Info     - 20201206080703]: Connecting 2WayToggle.1 to action 
+[Info     - 20201206080703]: Mode Launch registered for plugin 
+[Info     - 20201206080703]: Setting controller mode to Launch
+[Info     - 20201206080703]: Activating mode Launch
+[Info     - 20201206080703]: Connecting Button.1 to action ACC
+[Info     - 20201206080703]: Connecting Button.2 to action RST
+[Info     - 20201206080703]: Connecting Button.3 to action MoTeC
+[Info     - 20201206080703]: Connecting Button.4 to action TS
+[Info     - 20201206080703]: Connecting Button.5 to action FanaLab
+[Info     - 20201206080703]: Connecting Button.6 to action SmartCtrl
+[Info     - 20201206080704]: Connecting Button.8 to action Shutdown
+[Info     - 20201206080704]: Connecting Button.7 to action 
+[Info     - 20201206080704]: Plugin Motion Feedback (Active) registered
+[Info     - 20201206080704]: Activating plugin Motion Feedback
+[Info     - 20201206080704]: Mode Motion registered for plugin 
+[Info     - 20201206080704]: Activating plugin Motion Feedback
+[Info     - 20201206080704]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206080707]: Deactivating plugin Motion Feedback
+[Info     - 20201206080707]: Disconnecting 2WayToggle.2 from action Motion
+[Info     - 20201206080707]: Activating plugin Motion Feedback
+[Info     - 20201206080707]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206080708]: Plugin Tactile Feedback (Active) registered
+[Info     - 20201206080708]: Activating plugin Tactile Feedback
+[Info     - 20201206080708]: Mode Pedal Vibration registered for plugin 
+[Info     - 20201206080708]: Mode Chassis Vibration registered for plugin 
+[Info     - 20201206080708]: Activating plugin Tactile Feedback
+[Info     - 20201206080708]: Connecting 2WayToggle.3 to action Pedal Vibration
+[Info     - 20201206080708]: Connecting 2WayToggle.4 to action Front Vibration
+[Info     - 20201206080708]: Connecting 2WayToggle.5 to action Rear Vibration
+[Info     - 20201206080708]: Plugin AC (Active) registered
+[Info     - 20201206080708]: Activating plugin AC
+[Info     - 20201206080708]: Plugin ACC (Active) registered
+[Info     - 20201206080708]: Activating plugin ACC
+[Info     - 20201206080708]: Mode Drive registered for plugin 
+[Critical - 20201206080729]: ---------------------------------------------------------------
+[Critical - 20201206080729]:                  Running Simulator Controller
+[Critical - 20201206080729]: ---------------------------------------------------------------
+[Info     - 20201206080729]: Controller layout initialized: # 0 1-Way Toggles, # 5 2-Way Toggles, # 8 Buttons, # 2 Dials
+[Critical - 20201206080729]: ---------------------------------------------------------------
+[Critical - 20201206080729]:                  Running Simulator Controller
+[Critical - 20201206080729]: ---------------------------------------------------------------
+[Info     - 20201206080729]: Controller layout initialized: # 0 1-Way Toggles, # 5 2-Way Toggles, # 8 Buttons, # 2 Dials
+[Info     - 20201206080730]: Plugin System (Active) registered
+[Info     - 20201206080730]: Activating plugin System
+[Info     - 20201206080730]: Connecting 2WayToggle.1 to action 
+[Info     - 20201206080730]: Mode Launch registered for plugin 
+[Info     - 20201206080730]: Setting controller mode to Launch
+[Info     - 20201206080730]: Activating mode Launch
+[Info     - 20201206080730]: Connecting Button.1 to action ACC
+[Info     - 20201206080730]: Connecting Button.2 to action RST
+[Info     - 20201206080730]: Connecting Button.3 to action MoTeC
+[Info     - 20201206080730]: Connecting Button.4 to action TS
+[Info     - 20201206080730]: Connecting Button.5 to action FanaLab
+[Info     - 20201206080730]: Connecting Button.6 to action SmartCtrl
+[Info     - 20201206080730]: Connecting Button.8 to action Shutdown
+[Info     - 20201206080730]: Connecting Button.7 to action 
+[Info     - 20201206080730]: Plugin Motion Feedback (Active) registered
+[Info     - 20201206080730]: Activating plugin Motion Feedback
+[Info     - 20201206080730]: Mode Motion registered for plugin 
+[Info     - 20201206080730]: Activating plugin Motion Feedback
+[Info     - 20201206080730]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206080734]: Deactivating plugin Motion Feedback
+[Info     - 20201206080734]: Disconnecting 2WayToggle.2 from action Motion
+[Info     - 20201206080734]: Activating plugin Motion Feedback
+[Info     - 20201206080734]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206080734]: Plugin Tactile Feedback (Active) registered
+[Info     - 20201206080734]: Activating plugin Tactile Feedback
+[Info     - 20201206080734]: Mode Pedal Vibration registered for plugin 
+[Info     - 20201206080734]: Mode Chassis Vibration registered for plugin 
+[Info     - 20201206080734]: Activating plugin Tactile Feedback
+[Info     - 20201206080734]: Connecting 2WayToggle.3 to action Pedal Vibration
+[Info     - 20201206080734]: Connecting 2WayToggle.4 to action Front Vibration
+[Info     - 20201206080734]: Connecting 2WayToggle.5 to action Rear Vibration
+[Info     - 20201206080734]: Plugin AC (Active) registered
+[Info     - 20201206080734]: Activating plugin AC
+[Info     - 20201206080734]: Plugin ACC (Active) registered
+[Info     - 20201206080734]: Activating plugin ACC
+[Info     - 20201206080734]: Mode Drive registered for plugin 
+[Info     - 20201206080934]: Firing action Launch for 2WayToggle.1
+[Info     - 20201206080934]: Deactivating mode Launch
+[Info     - 20201206080934]: Disconnecting Button.1 from action ACC
+[Info     - 20201206080934]: Disconnecting Button.2 from action RST
+[Info     - 20201206080934]: Disconnecting Button.3 from action MoTeC
+[Info     - 20201206080934]: Disconnecting Button.4 from action TS
+[Info     - 20201206080934]: Disconnecting Button.5 from action FanaLab
+[Info     - 20201206080934]: Disconnecting Button.6 from action SmartCtrl
+[Info     - 20201206080934]: Disconnecting Button.8 from action Shutdown
+[Info     - 20201206080934]: Disconnecting Button.7 from action 
+[Info     - 20201206080934]: Setting controller mode to Motion
+[Info     - 20201206080934]: Activating mode Motion
+[Info     - 20201206080934]: Connecting Dial.1 to action Motion Intensity
+[Info     - 20201206080934]: Connecting Button.1 to action Heave
+[Info     - 20201206080934]: Connecting Button.2 to action Surge 1
+[Info     - 20201206080934]: Connecting Button.3 to action Surge 2
+[Info     - 20201206080934]: Connecting Button.4 to action Sway
+[Info     - 20201206080934]: Connecting Button.5 to action Pitch
+[Info     - 20201206080935]: Connecting Button.6 to action Roll
+[Info     - 20201206080935]: Connecting Button.7 to action Traction Loss
+[Info     - 20201206080935]: Connecting Button.8 to action Effect Intensity
+[Info     - 20201206080935]: Connecting Dial.2 to action 
+[Info     - 20201206080938]: Firing action Motion for 2WayToggle.1
+[Info     - 20201206080938]: Deactivating mode Motion
+[Info     - 20201206080938]: Disconnecting Dial.1 from action Motion Intensity
+[Info     - 20201206080938]: Disconnecting Button.1 from action Heave
+[Info     - 20201206080938]: Disconnecting Button.2 from action Surge 1
+[Info     - 20201206080938]: Disconnecting Button.3 from action Surge 2
+[Info     - 20201206080938]: Disconnecting Button.4 from action Sway
+[Info     - 20201206080938]: Disconnecting Button.5 from action Pitch
+[Info     - 20201206080938]: Disconnecting Button.6 from action Roll
+[Info     - 20201206080938]: Disconnecting Button.7 from action Traction Loss
+[Info     - 20201206080938]: Disconnecting Button.8 from action Effect Intensity
+[Info     - 20201206080938]: Disconnecting Dial.2 from action 
+[Info     - 20201206080938]: Setting controller mode to Pedal Vibration
+[Info     - 20201206080938]: Activating mode Pedal Vibration
+[Info     - 20201206080938]: Connecting Dial.1 to action Pedal Vibration
+[Info     - 20201206080938]: Connecting Button.1 to action Increase TC
+[Info     - 20201206080938]: Connecting Button.5 to action Decrease TC
+[Info     - 20201206080938]: Connecting Button.2 to action Increase ABS
+[Info     - 20201206080938]: Connecting Button.6 to action Decrease ABS
+[Info     - 20201206080941]: Firing action Decrease TC for Button.5
+[Info     - 20201206080944]: Firing action Decrease TC for Button.5
+[Info     - 20201206080945]: Firing action Increase TC for Button.1
+[Info     - 20201206080947]: Firing action Increase TC for Button.1
+[Info     - 20201206080949]: Firing action Increase TC for Button.1
+[Info     - 20201206080951]: Firing action Increase TC for Button.1
+[Info     - 20201206080958]: Firing action Decrease ABS for Button.6
+[Info     - 20201206081000]: Firing action Increase ABS for Button.2
+[Info     - 20201206081003]: Firing action Pedal Vibration for Dial.1
+[Info     - 20201206081006]: Firing action Pedal Vibration for Dial.1
+[Info     - 20201206081010]: Firing action Pedal Vibration for 2WayToggle.3
+[Info     - 20201206081012]: Firing action Pedal Vibration for 2WayToggle.3
+[Info     - 20201206081019]: Firing action Front Vibration for 2WayToggle.4
+[Info     - 20201206081022]: Firing action Front Vibration for 2WayToggle.4
+[Info     - 20201206081024]: Firing action Pedal Vibration for 2WayToggle.1
+[Info     - 20201206081024]: Deactivating mode Pedal Vibration
+[Info     - 20201206081024]: Disconnecting Dial.1 from action Pedal Vibration
+[Info     - 20201206081024]: Disconnecting Button.1 from action Increase TC
+[Info     - 20201206081024]: Disconnecting Button.5 from action Decrease TC
+[Info     - 20201206081024]: Disconnecting Button.2 from action Increase ABS
+[Info     - 20201206081024]: Disconnecting Button.6 from action Decrease ABS
+[Info     - 20201206081024]: Setting controller mode to Chassis Vibration
+[Info     - 20201206081024]: Activating mode Chassis Vibration
+[Info     - 20201206081024]: Connecting Dial.1 to action Front Vibration
+[Info     - 20201206081024]: Connecting Dial.2 to action Rear Vibration
+[Info     - 20201206081024]: Connecting Button.1 to action Increase RPMS
+[Info     - 20201206081024]: Connecting Button.5 to action Decrease RPMS
+[Info     - 20201206081024]: Connecting Button.2 to action Increase Shift
+[Info     - 20201206081024]: Connecting Button.6 to action Decrease Shift
+[Info     - 20201206081024]: Connecting Button.3 to action Increase Whls Lck
+[Info     - 20201206081024]: Connecting Button.7 to action Decrease Whls Lck
+[Info     - 20201206081024]: Connecting Button.4 to action Increase Whls Slip
+[Info     - 20201206081024]: Connecting Button.8 to action Decrease Whls Slip
+[Info     - 20201206081026]: Firing action Increase Whls Lck for Button.3
+[Info     - 20201206081028]: Firing action Decrease Whls Lck for Button.7
+[Info     - 20201206081032]: Firing action Increase Whls Slip for Button.4
+[Info     - 20201206081033]: Firing action Decrease Whls Slip for Button.8
+[Info     - 20201206081104]: Firing action Decrease Whls Slip for Button.8
+[Info     - 20201206081107]: Firing action Increase Whls Slip for Button.4
+[Info     - 20201206081114]: Firing action Rear Vibration for Dial.2
+[Info     - 20201206081116]: Firing action Rear Vibration for Dial.2
+[Info     - 20201206081117]: Firing action Front Vibration for Dial.1
+[Info     - 20201206081118]: Firing action Front Vibration for Dial.1
+[Info     - 20201206081119]: Firing action Chassis Vibration for 2WayToggle.1
+[Info     - 20201206081119]: Deactivating mode Chassis Vibration
+[Info     - 20201206081119]: Disconnecting Dial.1 from action Front Vibration
+[Info     - 20201206081119]: Disconnecting Dial.2 from action Rear Vibration
+[Info     - 20201206081119]: Disconnecting Button.1 from action Increase RPMS
+[Info     - 20201206081119]: Disconnecting Button.5 from action Decrease RPMS
+[Info     - 20201206081119]: Disconnecting Button.2 from action Increase Shift
+[Info     - 20201206081119]: Disconnecting Button.6 from action Decrease Shift
+[Info     - 20201206081119]: Disconnecting Button.3 from action Increase Whls Lck
+[Info     - 20201206081119]: Disconnecting Button.7 from action Decrease Whls Lck
+[Info     - 20201206081119]: Disconnecting Button.4 from action Increase Whls Slip
+[Info     - 20201206081119]: Disconnecting Button.8 from action Decrease Whls Slip
+[Info     - 20201206081119]: Setting controller mode to Launch
+[Info     - 20201206081119]: Activating mode Launch
+[Info     - 20201206081119]: Connecting Button.1 to action ACC
+[Info     - 20201206081119]: Connecting Button.2 to action RST
+[Info     - 20201206081119]: Connecting Button.3 to action MoTeC
+[Info     - 20201206081119]: Connecting Button.4 to action TS
+[Info     - 20201206081119]: Connecting Button.5 to action FanaLab
+[Info     - 20201206081119]: Connecting Button.6 to action SmartCtrl
+[Info     - 20201206081119]: Connecting Button.8 to action Shutdown
+[Info     - 20201206081119]: Connecting Button.7 to action 
+[Info     - 20201206081123]: Firing action Launch for 2WayToggle.1
+[Info     - 20201206081123]: Deactivating mode Launch
+[Info     - 20201206081123]: Disconnecting Button.1 from action ACC
+[Info     - 20201206081123]: Disconnecting Button.2 from action RST
+[Info     - 20201206081123]: Disconnecting Button.3 from action MoTeC
+[Info     - 20201206081123]: Disconnecting Button.4 from action TS
+[Info     - 20201206081123]: Disconnecting Button.5 from action FanaLab
+[Info     - 20201206081123]: Disconnecting Button.6 from action SmartCtrl
+[Info     - 20201206081123]: Disconnecting Button.8 from action Shutdown
+[Info     - 20201206081123]: Disconnecting Button.7 from action 
+[Info     - 20201206081123]: Setting controller mode to Motion
+[Info     - 20201206081123]: Activating mode Motion
+[Info     - 20201206081123]: Connecting Dial.1 to action Motion Intensity
+[Info     - 20201206081123]: Connecting Button.1 to action Heave
+[Info     - 20201206081123]: Connecting Button.2 to action Surge 1
+[Info     - 20201206081123]: Connecting Button.3 to action Surge 2
+[Info     - 20201206081123]: Connecting Button.4 to action Sway
+[Info     - 20201206081123]: Connecting Button.5 to action Pitch
+[Info     - 20201206081123]: Connecting Button.6 to action Roll
+[Info     - 20201206081123]: Connecting Button.7 to action Traction Loss
+[Info     - 20201206081123]: Connecting Button.8 to action Effect Intensity
+[Info     - 20201206081123]: Connecting Dial.2 to action 
+[Info     - 20201206081126]: Firing action Effect Intensity for Button.8
+[Info     - 20201206081133]: Firing action Effect Intensity for Button.8
+[Info     - 20201206081138]: Firing action Motion Intensity for Dial.1
+[Info     - 20201206081141]: Firing action Motion Intensity for Dial.1
+[Info     - 20201206081144]: Firing action Motion Intensity for Dial.1
+[Info     - 20201206081147]: Firing action Motion Intensity for Dial.1
+[Info     - 20201206081152]: Firing action Motion for 2WayToggle.1
+[Info     - 20201206081152]: Deactivating mode Motion
+[Info     - 20201206081152]: Disconnecting Dial.1 from action Motion Intensity
+[Info     - 20201206081152]: Disconnecting Button.1 from action Heave
+[Info     - 20201206081152]: Disconnecting Button.2 from action Surge 1
+[Info     - 20201206081152]: Disconnecting Button.3 from action Surge 2
+[Info     - 20201206081152]: Disconnecting Button.4 from action Sway
+[Info     - 20201206081152]: Disconnecting Button.5 from action Pitch
+[Info     - 20201206081152]: Disconnecting Button.6 from action Roll
+[Info     - 20201206081152]: Disconnecting Button.7 from action Traction Loss
+[Info     - 20201206081152]: Disconnecting Button.8 from action Effect Intensity
+[Info     - 20201206081152]: Disconnecting Dial.2 from action 
+[Info     - 20201206081152]: Setting controller mode to Pedal Vibration
+[Info     - 20201206081152]: Activating mode Pedal Vibration
+[Info     - 20201206081152]: Connecting Dial.1 to action Pedal Vibration
+[Info     - 20201206081152]: Connecting Button.1 to action Increase TC
+[Info     - 20201206081152]: Connecting Button.5 to action Decrease TC
+[Info     - 20201206081152]: Connecting Button.2 to action Increase ABS
+[Info     - 20201206081152]: Connecting Button.6 to action Decrease ABS
+[Info     - 20201206081153]: Firing action Pedal Vibration for 2WayToggle.1
+[Info     - 20201206081153]: Deactivating mode Pedal Vibration
+[Info     - 20201206081153]: Disconnecting Dial.1 from action Pedal Vibration
+[Info     - 20201206081153]: Disconnecting Button.1 from action Increase TC
+[Info     - 20201206081153]: Disconnecting Button.5 from action Decrease TC
+[Info     - 20201206081153]: Disconnecting Button.2 from action Increase ABS
+[Info     - 20201206081153]: Disconnecting Button.6 from action Decrease ABS
+[Info     - 20201206081153]: Setting controller mode to Motion
+[Info     - 20201206081153]: Activating mode Motion
+[Info     - 20201206081153]: Connecting Dial.1 to action Motion Intensity
+[Info     - 20201206081153]: Connecting Button.1 to action Heave
+[Info     - 20201206081153]: Connecting Button.2 to action Surge 1
+[Info     - 20201206081153]: Connecting Button.3 to action Surge 2
+[Info     - 20201206081153]: Connecting Button.4 to action Sway
+[Info     - 20201206081153]: Connecting Button.5 to action Pitch
+[Info     - 20201206081153]: Connecting Button.6 to action Roll
+[Info     - 20201206081153]: Connecting Button.7 to action Traction Loss
+[Info     - 20201206081153]: Connecting Button.8 to action Effect Intensity
+[Info     - 20201206081153]: Connecting Dial.2 to action 
+[Info     - 20201206081154]: Firing action Motion for 2WayToggle.1
+[Info     - 20201206081154]: Deactivating mode Motion
+[Info     - 20201206081154]: Disconnecting Dial.1 from action Motion Intensity
+[Info     - 20201206081154]: Disconnecting Button.1 from action Heave
+[Info     - 20201206081154]: Disconnecting Button.2 from action Surge 1
+[Info     - 20201206081154]: Disconnecting Button.3 from action Surge 2
+[Info     - 20201206081154]: Disconnecting Button.4 from action Sway
+[Info     - 20201206081154]: Disconnecting Button.5 from action Pitch
+[Info     - 20201206081154]: Disconnecting Button.6 from action Roll
+[Info     - 20201206081154]: Disconnecting Button.7 from action Traction Loss
+[Info     - 20201206081154]: Disconnecting Button.8 from action Effect Intensity
+[Info     - 20201206081154]: Disconnecting Dial.2 from action 
+[Info     - 20201206081154]: Setting controller mode to Launch
+[Info     - 20201206081154]: Activating mode Launch
+[Info     - 20201206081154]: Connecting Button.1 to action ACC
+[Info     - 20201206081154]: Connecting Button.2 to action RST
+[Info     - 20201206081154]: Connecting Button.3 to action MoTeC
+[Info     - 20201206081154]: Connecting Button.4 to action TS
+[Info     - 20201206081154]: Connecting Button.5 to action FanaLab
+[Info     - 20201206081154]: Connecting Button.6 to action SmartCtrl
+[Info     - 20201206081154]: Connecting Button.8 to action Shutdown
+[Info     - 20201206081154]: Connecting Button.7 to action 
+[Info     - 20201206081157]: Firing action MoTeC for Button.3
+[Info     - 20201206081157]: Starting application MoTeC Telemetry
+[Info     - 20201206081157]: Application MoTeC Telemetry started
+[Info     - 20201206081205]: Firing action MoTeC for Button.3
+[Info     - 20201206081205]: Stopping application MoTeC Telemetry
+[Critical - 20201206081551]: ---------------------------------------------------------------
+[Critical - 20201206081551]:                  Running Simulator Controller
+[Critical - 20201206081551]: ---------------------------------------------------------------
+[Info     - 20201206081551]: Controller layout initialized: # 0 1-Way Toggles, # 5 2-Way Toggles, # 8 Buttons, # 2 Dials
+[Info     - 20201206081551]: Plugin System (Active) registered
+[Info     - 20201206081551]: Activating plugin System
+[Info     - 20201206081551]: Connecting 2WayToggle.1 to action 
+[Info     - 20201206081551]: Mode Launch registered for plugin 
+[Info     - 20201206081551]: Setting controller mode to Launch
+[Info     - 20201206081551]: Activating mode Launch
+[Info     - 20201206081551]: Connecting Button.1 to action ACC
+[Info     - 20201206081551]: Connecting Button.2 to action RST
+[Info     - 20201206081551]: Connecting Button.3 to action MoTeC
+[Info     - 20201206081551]: Connecting Button.4 to action TS
+[Info     - 20201206081551]: Connecting Button.5 to action FanaLab
+[Info     - 20201206081551]: Connecting Button.6 to action SmartCtrl
+[Info     - 20201206081551]: Connecting Button.8 to action Shutdown
+[Info     - 20201206081551]: Connecting Button.7 to action 
+[Info     - 20201206081551]: Plugin Motion Feedback (Active) registered
+[Info     - 20201206081551]: Activating plugin Motion Feedback
+[Info     - 20201206081551]: Mode Motion registered for plugin 
+[Info     - 20201206081551]: Activating plugin Motion Feedback
+[Info     - 20201206081551]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206081555]: Deactivating plugin Motion Feedback
+[Info     - 20201206081555]: Disconnecting 2WayToggle.2 from action Motion
+[Info     - 20201206081555]: Activating plugin Motion Feedback
+[Info     - 20201206081555]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206081556]: Plugin Tactile Feedback (Active) registered
+[Info     - 20201206081556]: Activating plugin Tactile Feedback
+[Info     - 20201206081556]: Mode Pedal Vibration registered for plugin 
+[Info     - 20201206081556]: Mode Chassis Vibration registered for plugin 
+[Info     - 20201206081556]: Activating plugin Tactile Feedback
+[Info     - 20201206081556]: Connecting 2WayToggle.3 to action Pedal Vibration
+[Info     - 20201206081556]: Connecting 2WayToggle.4 to action Front Vibration
+[Info     - 20201206081556]: Connecting 2WayToggle.5 to action Rear Vibration
+[Info     - 20201206081556]: Plugin AC (Active) registered
+[Info     - 20201206081556]: Activating plugin AC
+[Info     - 20201206081556]: Plugin ACC (Active) registered
+[Info     - 20201206081556]: Activating plugin ACC
+[Info     - 20201206081556]: Mode Drive registered for plugin 
+[Info     - 20201206081601]: Firing action MoTeC for Button.3
+[Info     - 20201206081601]: Starting application MoTeC Telemetry
+[Info     - 20201206081601]: Application MoTeC Telemetry started
+[Info     - 20201206081613]: Firing action MoTeC for Button.3
+[Info     - 20201206081613]: Stopping application MoTeC Telemetry
+[Info     - 20201206081617]: Firing action MoTeC for Button.3
+[Info     - 20201206081617]: Starting application MoTeC Telemetry
+[Info     - 20201206081617]: Application MoTeC Telemetry started
+[Info     - 20201206081624]: Firing action MoTeC for Button.3
+[Info     - 20201206081624]: Stopping application MoTeC Telemetry
+[Info     - 20201206081629]: Firing action RST for Button.2
+[Info     - 20201206081629]: Starting application RST Telemetry
+[Info     - 20201206081629]: Starting application RST Telemetry
+[Info     - 20201206081629]: Application RST Telemetry started
+[Info     - 20201206081836]: Firing action RST for Button.2
+[Info     - 20201206081836]: Stopping application RST Telemetry
+[Info     - 20201206081842]: Firing action RST for Button.2
+[Info     - 20201206081842]: Starting application RST Telemetry
+[Info     - 20201206081842]: Starting application RST Telemetry
+[Info     - 20201206081842]: Application RST Telemetry started
+[Critical - 20201206082038]: ---------------------------------------------------------------
+[Critical - 20201206082038]:                  Running Simulator Controller
+[Critical - 20201206082038]: ---------------------------------------------------------------
+[Critical - 20201206082038]: ---------------------------------------------------------------
+[Critical - 20201206082038]:                  Running Simulator Controller
+[Critical - 20201206082038]: ---------------------------------------------------------------
+[Info     - 20201206082038]: Controller layout initialized: # 0 1-Way Toggles, # 5 2-Way Toggles, # 8 Buttons, # 2 Dials
+[Info     - 20201206082038]: Plugin System (Active) registered
+[Info     - 20201206082038]: Activating plugin System
+[Info     - 20201206082038]: Connecting 2WayToggle.1 to action 
+[Info     - 20201206082038]: Mode Launch registered for plugin 
+[Info     - 20201206082038]: Setting controller mode to Launch
+[Info     - 20201206082038]: Activating mode Launch
+[Info     - 20201206082038]: Connecting Button.1 to action ACC
+[Info     - 20201206082038]: Connecting Button.2 to action RST
+[Info     - 20201206082038]: Connecting Button.3 to action MoTeC
+[Info     - 20201206082038]: Connecting Button.4 to action TS
+[Info     - 20201206082038]: Connecting Button.5 to action FanaLab
+[Info     - 20201206082038]: Connecting Button.6 to action SmartCtrl
+[Info     - 20201206082038]: Connecting Button.8 to action Shutdown
+[Info     - 20201206082038]: Connecting Button.3 to action MoTeC
+[Info     - 20201206082038]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206082038]: Connecting Button.6 to action SmartCtrl
+[Info     - 20201206082038]: Connecting Button.8 to action Shutdown
+[Info     - 20201206082038]: Connecting Button.7 to action 
+[Info     - 20201206082038]: Plugin Motion Feedback (Active) registered
+[Info     - 20201206082038]: Activating plugin Motion Feedback
+[Info     - 20201206082038]: Mode Motion registered for plugin 
+[Info     - 20201206082038]: Activating plugin Motion Feedback
+[Info     - 20201206082038]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206082042]: Deactivating plugin Motion Feedback
+[Info     - 20201206082042]: Disconnecting 2WayToggle.2 from action Motion
+[Info     - 20201206082042]: Activating plugin Motion Feedback
+[Info     - 20201206082042]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206082042]: Deactivating plugin Motion Feedback
+[Info     - 20201206082042]: Disconnecting 2WayToggle.2 from action Motion
+[Info     - 20201206082042]: Activating plugin Motion Feedback
+[Info     - 20201206082042]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206082042]: Plugin Tactile Feedback (Active) registered
+[Info     - 20201206082042]: Activating plugin Tactile Feedback
+[Info     - 20201206082042]: Mode Pedal Vibration registered for plugin 
+[Info     - 20201206082042]: Mode Chassis Vibration registered for plugin 
+[Info     - 20201206082042]: Activating plugin Tactile Feedback
+[Info     - 20201206082042]: Connecting 2WayToggle.3 to action Pedal Vibration
+[Info     - 20201206082042]: Connecting 2WayToggle.4 to action Front Vibration
+[Info     - 20201206082042]: Connecting 2WayToggle.5 to action Rear Vibration
+[Info     - 20201206082042]: Plugin AC (Active) registered
+[Info     - 20201206082042]: Activating plugin AC
+[Info     - 20201206082042]: Connecting 2WayToggle.4 to action Front Vibration
+[Info     - 20201206082042]: Connecting 2WayToggle.5 to action Rear Vibration
+[Info     - 20201206082042]: Plugin AC (Active) registered
+[Info     - 20201206082042]: Activating plugin AC
+[Info     - 20201206082042]: Plugin ACC (Active) registered
+[Info     - 20201206082042]: Activating plugin ACC
+[Info     - 20201206082042]: Mode Drive registered for plugin 
+[Info     - 20201206082047]: Firing action RST for Button.2
+[Critical - 20201206082047]: Unhandled exception encountered in D:\Controller\Sources\Includes\Functions.ahk at line 290: 1
+[Critical - 20201206082210]: ---------------------------------------------------------------
+[Critical - 20201206082210]:                  Running Simulator Controller
+[Critical - 20201206082210]: ---------------------------------------------------------------
+[Info     - 20201206082210]: Controller layout initialized: # 0 1-Way Toggles, # 5 2-Way Toggles, # 8 Buttons, # 2 Dials
+[Info     - 20201206082210]: Plugin System (Active) registered
+[Info     - 20201206082210]: Activating plugin System
+[Info     - 20201206082210]: Connecting 2WayToggle.1 to action 
+[Info     - 20201206082210]: Mode Launch registered for plugin 
+[Info     - 20201206082210]: Setting controller mode to Launch
+[Info     - 20201206082210]: Activating mode Launch
+[Info     - 20201206082210]: Connecting Button.1 to action ACC
+[Info     - 20201206082210]: Connecting Button.2 to action RST
+[Info     - 20201206082210]: Connecting Button.3 to action MoTeC
+[Info     - 20201206082210]: Connecting Button.4 to action TS
+[Info     - 20201206082210]: Connecting Button.5 to action FanaLab
+[Info     - 20201206082210]: Connecting Button.6 to action SmartCtrl
+[Info     - 20201206082210]: Connecting Button.8 to action Shutdown
+[Info     - 20201206082210]: Connecting Button.7 to action 
+[Info     - 20201206082210]: Plugin Motion Feedback (Active) registered
+[Info     - 20201206082210]: Activating plugin Motion Feedback
+[Info     - 20201206082210]: Mode Motion registered for plugin 
+[Info     - 20201206082210]: Activating plugin Motion Feedback
+[Info     - 20201206082210]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206082214]: Deactivating plugin Motion Feedback
+[Info     - 20201206082214]: Disconnecting 2WayToggle.2 from action Motion
+[Info     - 20201206082214]: Activating plugin Motion Feedback
+[Info     - 20201206082214]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206082214]: Plugin Tactile Feedback (Active) registered
+[Info     - 20201206082214]: Activating plugin Tactile Feedback
+[Info     - 20201206082214]: Mode Pedal Vibration registered for plugin 
+[Info     - 20201206082214]: Mode Chassis Vibration registered for plugin 
+[Info     - 20201206082214]: Activating plugin Tactile Feedback
+[Info     - 20201206082214]: Connecting 2WayToggle.3 to action Pedal Vibration
+[Info     - 20201206082214]: Connecting 2WayToggle.4 to action Front Vibration
+[Info     - 20201206082214]: Connecting 2WayToggle.5 to action Rear Vibration
+[Info     - 20201206082216]: Plugin AC (Active) registered
+[Info     - 20201206082216]: Activating plugin AC
+[Info     - 20201206082216]: Plugin ACC (Active) registered
+[Info     - 20201206082216]: Activating plugin ACC
+[Info     - 20201206082216]: Mode Drive registered for plugin 
+[Info     - 20201206082329]: Firing action RST for Button.2
+[Info     - 20201206082329]: Stopping application RST Telemetry
+[Critical - 20201206082416]: ---------------------------------------------------------------
+[Critical - 20201206082416]:                  Running Simulator Controller
+[Critical - 20201206082416]: ---------------------------------------------------------------
+[Info     - 20201206082416]: Controller layout initialized: # 0 1-Way Toggles, # 5 2-Way Toggles, # 8 Buttons, # 2 Dials
+[Info     - 20201206082416]: Plugin System (Active) registered
+[Info     - 20201206082416]: Activating plugin System
+[Info     - 20201206082416]: Connecting 2WayToggle.1 to action 
+[Info     - 20201206082416]: Mode Launch registered for plugin 
+[Info     - 20201206082416]: Setting controller mode to Launch
+[Info     - 20201206082416]: Activating mode Launch
+[Info     - 20201206082416]: Connecting Button.1 to action ACC
+[Info     - 20201206082416]: Connecting Button.2 to action RST
+[Info     - 20201206082416]: Connecting Button.3 to action MoTeC
+[Info     - 20201206082416]: Connecting Button.4 to action TS
+[Info     - 20201206082416]: Connecting Button.5 to action FanaLab
+[Info     - 20201206082416]: Connecting Button.6 to action SmartCtrl
+[Info     - 20201206082416]: Connecting Button.8 to action Shutdown
+[Info     - 20201206082416]: Connecting Button.7 to action 
+[Info     - 20201206082416]: Plugin Motion Feedback (Active) registered
+[Info     - 20201206082416]: Activating plugin Motion Feedback
+[Info     - 20201206082416]: Mode Motion registered for plugin 
+[Info     - 20201206082416]: Activating plugin Motion Feedback
+[Info     - 20201206082416]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206082420]: Deactivating plugin Motion Feedback
+[Info     - 20201206082420]: Disconnecting 2WayToggle.2 from action Motion
+[Info     - 20201206082420]: Activating plugin Motion Feedback
+[Info     - 20201206082420]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206082420]: Firing action RST for Button.2
+[Info     - 20201206082420]: Starting application RST Telemetry
+[Info     - 20201206082420]: Starting application RST Telemetry
+[Info     - 20201206082420]: Application RST Telemetry started
+[Info     - 20201206082437]: Plugin Tactile Feedback (Active) registered
+[Info     - 20201206082437]: Activating plugin Tactile Feedback
+[Info     - 20201206082437]: Mode Pedal Vibration registered for plugin 
+[Info     - 20201206082437]: Mode Chassis Vibration registered for plugin 
+[Info     - 20201206082437]: Activating plugin Tactile Feedback
+[Info     - 20201206082437]: Connecting 2WayToggle.3 to action Pedal Vibration
+[Info     - 20201206082437]: Connecting 2WayToggle.4 to action Front Vibration
+[Info     - 20201206082437]: Connecting 2WayToggle.5 to action Rear Vibration
+[Info     - 20201206082437]: Plugin AC (Active) registered
+[Info     - 20201206082437]: Activating plugin AC
+[Info     - 20201206082437]: Plugin ACC (Active) registered
+[Info     - 20201206082437]: Activating plugin ACC
+[Info     - 20201206082437]: Mode Drive registered for plugin 
+[Info     - 20201206082509]: Firing action RST for Button.2
+[Info     - 20201206082509]: Stopping application RST Telemetry
+[Critical - 20201206082525]: ---------------------------------------------------------------
+[Critical - 20201206082525]:                  Running Simulator Controller
+[Critical - 20201206082525]: ---------------------------------------------------------------
+[Critical - 20201206082525]: ---------------------------------------------------------------
+[Critical - 20201206082525]:                  Running Simulator Controller
+[Critical - 20201206082525]: ---------------------------------------------------------------
+[Info     - 20201206082525]: Controller layout initialized: # 0 1-Way Toggles, # 5 2-Way Toggles, # 8 Buttons, # 2 Dials
+[Info     - 20201206082525]: Controller layout initialized: # 0 1-Way Toggles, # 5 2-Way Toggles, # 8 Buttons, # 2 Dials
+[Info     - 20201206082525]: Plugin System (Active) registered
+[Info     - 20201206082525]: Activating plugin System
+[Info     - 20201206082525]: Connecting 2WayToggle.1 to action 
+[Info     - 20201206082525]: Mode Launch registered for plugin 
+[Info     - 20201206082525]: Setting controller mode to Launch
+[Info     - 20201206082525]: Mode Launch registered for plugin 
+[Info     - 20201206082525]: Setting controller mode to Launch
+[Info     - 20201206082525]: Activating mode Launch
+[Info     - 20201206082525]: Connecting Button.1 to action ACC
+[Info     - 20201206082525]: Connecting Button.2 to action RST
+[Info     - 20201206082525]: Connecting Button.3 to action MoTeC
+[Info     - 20201206082525]: Connecting Button.4 to action TS
+[Info     - 20201206082525]: Connecting Button.5 to action FanaLab
+[Info     - 20201206082525]: Connecting Button.6 to action SmartCtrl
+[Info     - 20201206082525]: Connecting Button.8 to action Shutdown
+[Info     - 20201206082525]: Connecting Button.7 to action 
+[Info     - 20201206082525]: Plugin Motion Feedback (Active) registered
+[Info     - 20201206082525]: Activating plugin Motion Feedback
+[Info     - 20201206082525]: Mode Motion registered for plugin 
+[Info     - 20201206082525]: Activating plugin Motion Feedback
+[Info     - 20201206082525]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206082529]: Deactivating plugin Motion Feedback
+[Info     - 20201206082529]: Disconnecting 2WayToggle.2 from action Motion
+[Info     - 20201206082529]: Activating plugin Motion Feedback
+[Info     - 20201206082529]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206082529]: Deactivating plugin Motion Feedback
+[Info     - 20201206082529]: Disconnecting 2WayToggle.2 from action Motion
+[Info     - 20201206082529]: Activating plugin Motion Feedback
+[Info     - 20201206082529]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206082529]: Plugin Tactile Feedback (Active) registered
+[Info     - 20201206082529]: Activating plugin Tactile Feedback
+[Info     - 20201206082529]: Mode Pedal Vibration registered for plugin 
+[Info     - 20201206082529]: Mode Chassis Vibration registered for plugin 
+[Info     - 20201206082529]: Activating plugin Tactile Feedback
+[Info     - 20201206082529]: Connecting 2WayToggle.3 to action Pedal Vibration
+[Info     - 20201206082529]: Plugin Tactile Feedback (Active) registered
+[Info     - 20201206082529]: Activating plugin Tactile Feedback
+[Info     - 20201206082530]: Mode Pedal Vibration registered for plugin 
+[Info     - 20201206082530]: Mode Chassis Vibration registered for plugin 
+[Info     - 20201206082530]: Activating plugin Tactile Feedback
+[Info     - 20201206082530]: Connecting 2WayToggle.3 to action Pedal Vibration
+[Info     - 20201206082530]: Connecting 2WayToggle.4 to action Front Vibration
+[Info     - 20201206082530]: Connecting 2WayToggle.5 to action Rear Vibration
+[Info     - 20201206082530]: Plugin AC (Active) registered
+[Info     - 20201206082530]: Activating plugin AC
+[Info     - 20201206082530]: Plugin ACC (Active) registered
+[Info     - 20201206082530]: Activating plugin ACC
+[Info     - 20201206082530]: Mode Drive registered for plugin 
+[Info     - 20201206082530]: Firing action RST for Button.2
+[Info     - 20201206082530]: Starting application RST Telemetry
+[Info     - 20201206082530]: Starting application RST Telemetry
+[Info     - 20201206082530]: Application RST Telemetry started
+[Critical - 20201206082545]: ---------------------------------------------------------------
+[Critical - 20201206082545]:                  Running Simulator Controller
+[Critical - 20201206082545]: ---------------------------------------------------------------
+[Info     - 20201206082545]: Controller layout initialized: # 0 1-Way Toggles, # 5 2-Way Toggles, # 8 Buttons, # 2 Dials
+[Info     - 20201206082545]: Plugin System (Active) registered
+[Info     - 20201206082545]: Activating plugin System
+[Info     - 20201206082545]: Connecting 2WayToggle.1 to action 
+[Info     - 20201206082545]: Mode Launch registered for plugin 
+[Info     - 20201206082545]: Setting controller mode to Launch
+[Info     - 20201206082545]: Activating mode Launch
+[Info     - 20201206082545]: Connecting Button.1 to action ACC
+[Info     - 20201206082545]: Connecting Button.2 to action RST
+[Info     - 20201206082545]: Connecting Button.3 to action MoTeC
+[Info     - 20201206082545]: Connecting Button.4 to action TS
+[Info     - 20201206082545]: Connecting Button.5 to action FanaLab
+[Info     - 20201206082545]: Connecting Button.6 to action SmartCtrl
+[Info     - 20201206082545]: Connecting Button.8 to action Shutdown
+[Info     - 20201206082545]: Connecting Button.7 to action 
+[Info     - 20201206082545]: Plugin Motion Feedback (Active) registered
+[Info     - 20201206082545]: Activating plugin Motion Feedback
+[Info     - 20201206082545]: Mode Motion registered for plugin 
+[Info     - 20201206082545]: Activating plugin Motion Feedback
+[Info     - 20201206082545]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206082549]: Deactivating plugin Motion Feedback
+[Info     - 20201206082549]: Disconnecting 2WayToggle.2 from action Motion
+[Info     - 20201206082549]: Activating plugin Motion Feedback
+[Info     - 20201206082549]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206082550]: Plugin Tactile Feedback (Active) registered
+[Info     - 20201206082550]: Activating plugin Tactile Feedback
+[Info     - 20201206082550]: Mode Pedal Vibration registered for plugin 
+[Info     - 20201206082550]: Mode Chassis Vibration registered for plugin 
+[Info     - 20201206082550]: Activating plugin Tactile Feedback
+[Info     - 20201206082550]: Connecting 2WayToggle.3 to action Pedal Vibration
+[Info     - 20201206082550]: Connecting 2WayToggle.4 to action Front Vibration
+[Info     - 20201206082550]: Connecting 2WayToggle.5 to action Rear Vibration
+[Info     - 20201206082550]: Plugin AC (Active) registered
+[Info     - 20201206082550]: Activating plugin AC
+[Info     - 20201206082551]: Plugin ACC (Active) registered
+[Info     - 20201206082551]: Activating plugin ACC
+[Info     - 20201206082551]: Mode Drive registered for plugin 
+[Info     - 20201206082553]: Firing action RST for Button.2
+[Info     - 20201206082553]: Stopping application RST Telemetry
+[Info     - 20201206082602]: Firing action RST for Button.2
+[Info     - 20201206082602]: Starting application RST Telemetry
+[Info     - 20201206082602]: Starting application RST Telemetry
+[Info     - 20201206082602]: Application RST Telemetry started
+[Critical - 20201206082652]: ---------------------------------------------------------------
+[Critical - 20201206082652]:                  Running Simulator Controller
+[Critical - 20201206082652]: ---------------------------------------------------------------
+[Info     - 20201206082652]: Controller layout initialized: # 0 1-Way Toggles, # 5 2-Way Toggles, # 8 Buttons, # 2 Dials
+[Info     - 20201206082652]: Plugin System (Active) registered
+[Info     - 20201206082652]: Activating plugin System
+[Info     - 20201206082652]: Connecting 2WayToggle.1 to action 
+[Info     - 20201206082652]: Mode Launch registered for plugin 
+[Info     - 20201206082652]: Setting controller mode to Launch
+[Info     - 20201206082652]: Activating mode Launch
+[Info     - 20201206082652]: Connecting Button.1 to action ACC
+[Info     - 20201206082652]: Connecting Button.2 to action RST
+[Info     - 20201206082652]: Connecting Button.3 to action MoTeC
+[Info     - 20201206082652]: Connecting Button.4 to action TS
+[Info     - 20201206082652]: Connecting Button.5 to action FanaLab
+[Info     - 20201206082652]: Connecting Button.6 to action SmartCtrl
+[Info     - 20201206082652]: Connecting Button.8 to action Shutdown
+[Info     - 20201206082652]: Connecting Button.7 to action 
+[Info     - 20201206082652]: Plugin Motion Feedback (Active) registered
+[Info     - 20201206082652]: Activating plugin Motion Feedback
+[Info     - 20201206082652]: Mode Motion registered for plugin 
+[Info     - 20201206082652]: Activating plugin Motion Feedback
+[Info     - 20201206082652]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206082656]: Deactivating plugin Motion Feedback
+[Info     - 20201206082656]: Disconnecting 2WayToggle.2 from action Motion
+[Info     - 20201206082656]: Activating plugin Motion Feedback
+[Info     - 20201206082656]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206082657]: Plugin Tactile Feedback (Active) registered
+[Info     - 20201206082657]: Activating plugin Tactile Feedback
+[Info     - 20201206082657]: Mode Pedal Vibration registered for plugin 
+[Info     - 20201206082657]: Mode Chassis Vibration registered for plugin 
+[Info     - 20201206082657]: Activating plugin Tactile Feedback
+[Info     - 20201206082657]: Connecting 2WayToggle.3 to action Pedal Vibration
+[Info     - 20201206082657]: Connecting 2WayToggle.4 to action Front Vibration
+[Info     - 20201206082657]: Connecting 2WayToggle.5 to action Rear Vibration
+[Info     - 20201206082657]: Plugin AC (Active) registered
+[Info     - 20201206082657]: Activating plugin AC
+[Info     - 20201206082657]: Plugin ACC (Active) registered
+[Info     - 20201206082657]: Activating plugin ACC
+[Info     - 20201206082657]: Mode Drive registered for plugin 
+[Info     - 20201206082659]: Firing action RST for Button.2
+[Info     - 20201206082659]: Stopping application RST Telemetry
+[Info     - 20201206082703]: Firing action RST for Button.2
+[Info     - 20201206082703]: Starting application RST Telemetry
+[Info     - 20201206082703]: Starting application RST Telemetry
+[Info     - 20201206082703]: Application RST Telemetry started
+[Info     - 20201206082719]: Firing action MoTeC for Button.3
+[Info     - 20201206082719]: Starting application MoTeC Telemetry
+[Info     - 20201206082719]: Application MoTeC Telemetry started
+[Info     - 20201206082727]: Firing action MoTeC for Button.3
+[Info     - 20201206082727]: Stopping application MoTeC Telemetry
+[Info     - 20201206082734]: Firing action MoTeC for Button.3
+[Info     - 20201206082734]: Starting application MoTeC Telemetry
+[Info     - 20201206082734]: Application MoTeC Telemetry started
+[Info     - 20201206082740]: Firing action MoTeC for Button.3
+[Info     - 20201206082740]: Stopping application MoTeC Telemetry
+[Critical - 20201206082849]: ---------------------------------------------------------------
+[Critical - 20201206082849]:                  Running Simulator Controller
+[Critical - 20201206082849]: ---------------------------------------------------------------
+[Info     - 20201206082849]: Controller layout initialized: # 0 1-Way Toggles, # 5 2-Way Toggles, # 8 Buttons, # 2 Dials
+[Info     - 20201206082849]: Plugin System (Active) registered
+[Info     - 20201206082849]: Activating plugin System
+[Info     - 20201206082849]: Connecting 2WayToggle.1 to action 
+[Info     - 20201206082849]: Mode Launch registered for plugin 
+[Info     - 20201206082849]: Setting controller mode to Launch
+[Info     - 20201206082849]: Activating mode Launch
+[Info     - 20201206082849]: Connecting Button.1 to action ACC
+[Info     - 20201206082849]: Connecting Button.2 to action RST
+[Info     - 20201206082849]: Connecting Button.3 to action MoTeC
+[Info     - 20201206082849]: Connecting Button.4 to action TS
+[Info     - 20201206082849]: Connecting Button.5 to action FanaLab
+[Info     - 20201206082849]: Connecting Button.6 to action SmartCtrl
+[Info     - 20201206082849]: Connecting Button.8 to action Shutdown
+[Info     - 20201206082849]: Connecting Button.7 to action 
+[Info     - 20201206082849]: Plugin Motion Feedback (Active) registered
+[Info     - 20201206082849]: Activating plugin Motion Feedback
+[Info     - 20201206082849]: Mode Motion registered for plugin 
+[Info     - 20201206082849]: Activating plugin Motion Feedback
+[Info     - 20201206082849]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206082853]: Deactivating plugin Motion Feedback
+[Info     - 20201206082853]: Disconnecting 2WayToggle.2 from action Motion
+[Info     - 20201206082853]: Activating plugin Motion Feedback
+[Info     - 20201206082853]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206082853]: Plugin Tactile Feedback (Active) registered
+[Info     - 20201206082853]: Activating plugin Tactile Feedback
+[Info     - 20201206082853]: Mode Pedal Vibration registered for plugin 
+[Info     - 20201206082853]: Mode Chassis Vibration registered for plugin 
+[Info     - 20201206082853]: Activating plugin Tactile Feedback
+[Info     - 20201206082853]: Connecting 2WayToggle.3 to action Pedal Vibration
+[Info     - 20201206082853]: Firing action RST for Button.2
+[Info     - 20201206082854]: Stopping application RST Telemetry
+[Info     - 20201206082854]: Connecting 2WayToggle.4 to action Front Vibration
+[Info     - 20201206082854]: Connecting 2WayToggle.5 to action Rear Vibration
+[Info     - 20201206082855]: Plugin AC (Active) registered
+[Info     - 20201206082855]: Activating plugin AC
+[Info     - 20201206082855]: Plugin ACC (Active) registered
+[Info     - 20201206082855]: Activating plugin ACC
+[Info     - 20201206082855]: Mode Drive registered for plugin 
+[Info     - 20201206082857]: Firing action MoTeC for Button.3
+[Info     - 20201206082857]: Starting application MoTeC Telemetry
+[Info     - 20201206082857]: Application MoTeC Telemetry started
+[Info     - 20201206082904]: Firing action MoTeC for Button.3
+[Info     - 20201206082904]: Stopping application MoTeC Telemetry
+[Info     - 20201206082908]: Firing action MoTeC for Button.3
+[Info     - 20201206082908]: Starting application MoTeC Telemetry
+[Info     - 20201206082908]: Application MoTeC Telemetry started
+[Critical - 20201206083039]: ---------------------------------------------------------------
+[Critical - 20201206083039]:                  Running Simulator Controller
+[Critical - 20201206083039]: ---------------------------------------------------------------
+[Info     - 20201206083039]: Controller layout initialized: # 0 1-Way Toggles, # 5 2-Way Toggles, # 8 Buttons, # 2 Dials
+[Info     - 20201206083040]: Plugin System (Active) registered
+[Info     - 20201206083040]: Activating plugin System
+[Info     - 20201206083040]: Connecting 2WayToggle.1 to action 
+[Info     - 20201206083040]: Mode Launch registered for plugin 
+[Info     - 20201206083040]: Setting controller mode to Launch
+[Info     - 20201206083040]: Activating mode Launch
+[Info     - 20201206083040]: Connecting Button.1 to action ACC
+[Info     - 20201206083040]: Connecting Button.2 to action RST
+[Info     - 20201206083040]: Connecting Button.3 to action MoTeC
+[Info     - 20201206083040]: Connecting Button.4 to action TS
+[Info     - 20201206083040]: Connecting Button.5 to action FanaLab
+[Info     - 20201206083040]: Connecting Button.6 to action SmartCtrl
+[Info     - 20201206083040]: Connecting Button.8 to action Shutdown
+[Info     - 20201206083040]: Connecting Button.7 to action 
+[Info     - 20201206083040]: Plugin Motion Feedback (Active) registered
+[Info     - 20201206083040]: Activating plugin Motion Feedback
+[Info     - 20201206083040]: Mode Motion registered for plugin 
+[Info     - 20201206083040]: Activating plugin Motion Feedback
+[Info     - 20201206083040]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206083044]: Deactivating plugin Motion Feedback
+[Info     - 20201206083044]: Disconnecting 2WayToggle.2 from action Motion
+[Info     - 20201206083044]: Activating plugin Motion Feedback
+[Info     - 20201206083044]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206083044]: Plugin Tactile Feedback (Active) registered
+[Info     - 20201206083044]: Activating plugin Tactile Feedback
+[Info     - 20201206083044]: Mode Pedal Vibration registered for plugin 
+[Info     - 20201206083044]: Mode Chassis Vibration registered for plugin 
+[Info     - 20201206083044]: Activating plugin Tactile Feedback
+[Info     - 20201206083044]: Connecting 2WayToggle.3 to action Pedal Vibration
+[Info     - 20201206083044]: Connecting 2WayToggle.4 to action Front Vibration
+[Info     - 20201206083044]: Connecting 2WayToggle.5 to action Rear Vibration
+[Info     - 20201206083045]: Plugin AC (Active) registered
+[Info     - 20201206083045]: Activating plugin AC
+[Info     - 20201206083045]: Plugin ACC (Active) registered
+[Info     - 20201206083045]: Activating plugin ACC
+[Info     - 20201206083045]: Mode Drive registered for plugin 
+[Info     - 20201206083046]: Firing action MoTeC for Button.3
+[Info     - 20201206083046]: Stopping application MoTeC Telemetry
+[Critical - 20201206083156]: ---------------------------------------------------------------
+[Critical - 20201206083156]:                  Running Simulator Controller
+[Critical - 20201206083156]: ---------------------------------------------------------------
+[Info     - 20201206083156]: Controller layout initialized: # 0 1-Way Toggles, # 5 2-Way Toggles, # 8 Buttons, # 2 Dials
+[Info     - 20201206083156]: Plugin System (Active) registered
+[Info     - 20201206083156]: Activating plugin System
+[Info     - 20201206083156]: Connecting 2WayToggle.1 to action 
+[Info     - 20201206083156]: Mode Launch registered for plugin 
+[Info     - 20201206083156]: Setting controller mode to Launch
+[Info     - 20201206083156]: Activating mode Launch
+[Info     - 20201206083156]: Connecting Button.1 to action ACC
+[Info     - 20201206083156]: Connecting Button.2 to action RST
+[Info     - 20201206083156]: Connecting Button.3 to action MoTeC
+[Info     - 20201206083156]: Connecting Button.4 to action TS
+[Info     - 20201206083156]: Connecting Button.5 to action FanaLab
+[Info     - 20201206083156]: Connecting Button.6 to action SmartCtrl
+[Info     - 20201206083156]: Connecting Button.8 to action Shutdown
+[Info     - 20201206083156]: Connecting Button.7 to action 
+[Info     - 20201206083156]: Plugin Motion Feedback (Active) registered
+[Info     - 20201206083156]: Activating plugin Motion Feedback
+[Info     - 20201206083156]: Mode Motion registered for plugin 
+[Info     - 20201206083156]: Activating plugin Motion Feedback
+[Info     - 20201206083156]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206083220]: Deactivating plugin Motion Feedback
+[Info     - 20201206083220]: Disconnecting 2WayToggle.2 from action Motion
+[Info     - 20201206083220]: Activating plugin Motion Feedback
+[Info     - 20201206083220]: Connecting 2WayToggle.2 to action Motion
+[Critical - 20201206083337]: ---------------------------------------------------------------
+[Critical - 20201206083337]:                  Running Simulator Controller
+[Critical - 20201206083337]: ---------------------------------------------------------------
+[Info     - 20201206083337]: Controller layout initialized: # 0 1-Way Toggles, # 5 2-Way Toggles, # 8 Buttons, # 2 Dials
+[Info     - 20201206083338]: Plugin System (Active) registered
+[Info     - 20201206083338]: Activating plugin System
+[Info     - 20201206083338]: Connecting 2WayToggle.1 to action 
+[Info     - 20201206083338]: Mode Launch registered for plugin 
+[Info     - 20201206083338]: Setting controller mode to Launch
+[Info     - 20201206083338]: Activating mode Launch
+[Info     - 20201206083338]: Connecting Button.1 to action ACC
+[Info     - 20201206083338]: Connecting Button.2 to action RST
+[Info     - 20201206083338]: Connecting Button.3 to action MoTeC
+[Info     - 20201206083338]: Connecting Button.4 to action TS
+[Info     - 20201206083338]: Connecting Button.5 to action FanaLab
+[Info     - 20201206083338]: Connecting Button.6 to action SmartCtrl
+[Info     - 20201206083338]: Connecting Button.8 to action Shutdown
+[Info     - 20201206083338]: Connecting Button.7 to action 
+[Info     - 20201206083338]: Plugin Motion Feedback (Active) registered
+[Info     - 20201206083338]: Activating plugin Motion Feedback
+[Info     - 20201206083338]: Mode Motion registered for plugin 
+[Info     - 20201206083338]: Activating plugin Motion Feedback
+[Info     - 20201206083338]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206083342]: Deactivating plugin Motion Feedback
+[Info     - 20201206083342]: Disconnecting 2WayToggle.2 from action Motion
+[Info     - 20201206083342]: Activating plugin Motion Feedback
+[Info     - 20201206083342]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206083342]: Plugin Tactile Feedback (Active) registered
+[Info     - 20201206083342]: Activating plugin Tactile Feedback
+[Info     - 20201206083342]: Mode Pedal Vibration registered for plugin 
+[Info     - 20201206083342]: Mode Chassis Vibration registered for plugin 
+[Info     - 20201206083342]: Activating plugin Tactile Feedback
+[Info     - 20201206083342]: Connecting 2WayToggle.3 to action Pedal Vibration
+[Info     - 20201206083342]: Connecting 2WayToggle.4 to action Front Vibration
+[Info     - 20201206083342]: Connecting 2WayToggle.5 to action Rear Vibration
+[Info     - 20201206083342]: Plugin AC (Active) registered
+[Info     - 20201206083342]: Activating plugin AC
+[Info     - 20201206083342]: Plugin ACC (Active) registered
+[Info     - 20201206083342]: Activating plugin ACC
+[Info     - 20201206083342]: Mode Drive registered for plugin 
+[Info     - 20201206083346]: Firing action MoTeC for Button.3
+[Info     - 20201206083346]: Starting application MoTeC Telemetry
+[Info     - 20201206083346]: Application MoTeC Telemetry started
+[Info     - 20201206083354]: Firing action MoTeC for Button.3
+[Info     - 20201206083354]: Stopping application MoTeC Telemetry
+[Info     - 20201206083357]: Firing action RST for Button.2
+[Info     - 20201206083357]: Starting application RST Telemetry
+[Info     - 20201206083357]: Starting application RST Telemetry
+[Info     - 20201206083357]: Application RST Telemetry started
+[Info     - 20201206083416]: Firing action RST for Button.2
+[Info     - 20201206083416]: Stopping application RST Telemetry
+[Info     - 20201206083420]: Firing action SmartCtrl for Button.6
+[Info     - 20201206083420]: Starting application Heusinkveld SmartControl
+[Info     - 20201206083420]: Application Heusinkveld SmartControl started
+[Info     - 20201206083423]: Firing action SmartCtrl for Button.6
+[Info     - 20201206083423]: Stopping application Heusinkveld SmartControl
+[Critical - 20201206083611]: ---------------------------------------------------------------
+[Critical - 20201206083611]:                  Running Simulator Controller
+[Critical - 20201206083611]: ---------------------------------------------------------------
+[Info     - 20201206083611]: Controller layout initialized: # 0 1-Way Toggles, # 5 2-Way Toggles, # 8 Buttons, # 2 Dials
+[Info     - 20201206083611]: Plugin System (Active) registered
+[Info     - 20201206083611]: Activating plugin System
+[Info     - 20201206083611]: Connecting 2WayToggle.1 to action 
+[Info     - 20201206083611]: Mode Launch registered for plugin 
+[Info     - 20201206083611]: Setting controller mode to Launch
+[Info     - 20201206083611]: Activating mode Launch
+[Info     - 20201206083611]: Connecting Button.1 to action ACC
+[Info     - 20201206083611]: Connecting Button.2 to action RST
+[Info     - 20201206083611]: Connecting Button.3 to action MoTeC
+[Info     - 20201206083611]: Connecting Button.4 to action TS
+[Info     - 20201206083611]: Connecting Button.5 to action FanaLab
+[Info     - 20201206083611]: Connecting Button.6 to action SmartCtrl
+[Info     - 20201206083611]: Connecting Button.8 to action Shutdown
+[Info     - 20201206083611]: Connecting Button.7 to action 
+[Info     - 20201206083611]: Plugin Motion Feedback (Active) registered
+[Info     - 20201206083611]: Activating plugin Motion Feedback
+[Info     - 20201206083611]: Mode Motion registered for plugin 
+[Info     - 20201206083611]: Activating plugin Motion Feedback
+[Info     - 20201206083611]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206083614]: Firing action MoTeC for Button.3
+[Info     - 20201206083614]: Starting application MoTeC Telemetry
+[Info     - 20201206083614]: Application MoTeC Telemetry started
+[Info     - 20201206083615]: Deactivating plugin Motion Feedback
+[Info     - 20201206083615]: Disconnecting 2WayToggle.2 from action Motion
+[Info     - 20201206083615]: Activating plugin Motion Feedback
+[Info     - 20201206083615]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206083617]: Plugin Tactile Feedback (Active) registered
+[Info     - 20201206083617]: Activating plugin Tactile Feedback
+[Info     - 20201206083617]: Mode Pedal Vibration registered for plugin 
+[Info     - 20201206083617]: Mode Chassis Vibration registered for plugin 
+[Info     - 20201206083617]: Activating plugin Tactile Feedback
+[Info     - 20201206083617]: Connecting 2WayToggle.3 to action Pedal Vibration
+[Info     - 20201206083617]: Connecting 2WayToggle.4 to action Front Vibration
+[Info     - 20201206083617]: Connecting 2WayToggle.5 to action Rear Vibration
+[Info     - 20201206083617]: Plugin AC (Active) registered
+[Info     - 20201206083617]: Activating plugin AC
+[Info     - 20201206083617]: Plugin ACC (Active) registered
+[Info     - 20201206083617]: Activating plugin ACC
+[Info     - 20201206083617]: Mode Drive registered for plugin 
+[Info     - 20201206083620]: Firing action RST for Button.2
+[Info     - 20201206083620]: Starting application RST Telemetry
+[Info     - 20201206083620]: Starting application RST Telemetry
+[Info     - 20201206083620]: Application RST Telemetry started
+[Critical - 20201206083655]: ---------------------------------------------------------------
+[Critical - 20201206083655]:                  Running Simulator Controller
+[Critical - 20201206083655]: ---------------------------------------------------------------
+[Info     - 20201206083655]: Controller layout initialized: # 0 1-Way Toggles, # 5 2-Way Toggles, # 8 Buttons, # 2 Dials
+[Info     - 20201206083655]: Plugin System (Active) registered
+[Info     - 20201206083655]: Activating plugin System
+[Info     - 20201206083655]: Connecting 2WayToggle.1 to action 
+[Info     - 20201206083655]: Mode Launch registered for plugin 
+[Info     - 20201206083655]: Setting controller mode to Launch
+[Info     - 20201206083655]: Activating mode Launch
+[Info     - 20201206083655]: Connecting Button.1 to action ACC
+[Info     - 20201206083655]: Connecting Button.2 to action RST
+[Info     - 20201206083655]: Connecting Button.3 to action MoTeC
+[Info     - 20201206083655]: Connecting Button.4 to action TS
+[Info     - 20201206083655]: Connecting Button.5 to action FanaLab
+[Info     - 20201206083655]: Connecting Button.6 to action SmartCtrl
+[Info     - 20201206083655]: Connecting Button.8 to action Shutdown
+[Info     - 20201206083655]: Connecting Button.7 to action 
+[Info     - 20201206083655]: Plugin Motion Feedback (Active) registered
+[Info     - 20201206083655]: Activating plugin Motion Feedback
+[Info     - 20201206083655]: Mode Motion registered for plugin 
+[Info     - 20201206083655]: Activating plugin Motion Feedback
+[Info     - 20201206083655]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206083659]: Deactivating plugin Motion Feedback
+[Info     - 20201206083659]: Disconnecting 2WayToggle.2 from action Motion
+[Info     - 20201206083659]: Activating plugin Motion Feedback
+[Info     - 20201206083659]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206083659]: Plugin Tactile Feedback (Active) registered
+[Info     - 20201206083659]: Activating plugin Tactile Feedback
+[Info     - 20201206083659]: Mode Pedal Vibration registered for plugin 
+[Info     - 20201206083659]: Mode Chassis Vibration registered for plugin 
+[Info     - 20201206083659]: Activating plugin Tactile Feedback
+[Info     - 20201206083659]: Connecting 2WayToggle.3 to action Pedal Vibration
+[Info     - 20201206083659]: Connecting 2WayToggle.4 to action Front Vibration
+[Info     - 20201206083659]: Connecting 2WayToggle.5 to action Rear Vibration
+[Info     - 20201206083659]: Plugin AC (Active) registered
+[Info     - 20201206083659]: Activating plugin AC
+[Info     - 20201206083659]: Plugin ACC (Active) registered
+[Info     - 20201206083701]: Activating plugin ACC
+[Info     - 20201206083701]: Mode Drive registered for plugin 
+[Critical - 20201206091228]: ---------------------------------------------------------------
+[Critical - 20201206091228]:                  Running Simulator Controller
+[Critical - 20201206091228]: ---------------------------------------------------------------
+[Info     - 20201206091228]: Controller layout initialized: # 0 1-Way Toggles, # 5 2-Way Toggles, # 8 Buttons, # 2 Dials
+[Info     - 20201206091228]: Plugin System (Active) registered
+[Info     - 20201206091228]: Activating plugin System
+[Info     - 20201206091228]: Connecting 2WayToggle.1 to action 
+[Info     - 20201206091228]: Mode Launch registered for plugin 
+[Info     - 20201206091228]: Setting controller mode to Launch
+[Info     - 20201206091228]: Activating mode Launch
+[Info     - 20201206091228]: Connecting Button.1 to action ACC
+[Info     - 20201206091228]: Connecting Button.2 to action RST
+[Info     - 20201206091228]: Connecting Button.3 to action MoTeC
+[Info     - 20201206091229]: Connecting Button.4 to action TS
+[Info     - 20201206091229]: Connecting Button.5 to action FanaLab
+[Info     - 20201206091229]: Connecting Button.6 to action SmartCtrl
+[Info     - 20201206091229]: Connecting Button.8 to action Shutdown
+[Info     - 20201206091229]: Connecting Button.7 to action 
+[Info     - 20201206091229]: Plugin Motion Feedback (Active) registered
+[Info     - 20201206091229]: Activating plugin Motion Feedback
+[Info     - 20201206091229]: Mode Motion registered for plugin 
+[Info     - 20201206091229]: Activating plugin Motion Feedback
+[Info     - 20201206091229]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206091229]: Plugin Tactile Feedback (Active) registered
+[Info     - 20201206091229]: Activating plugin Tactile Feedback
+[Info     - 20201206091229]: Mode Pedal Vibration registered for plugin 
+[Info     - 20201206091229]: Mode Chassis Vibration registered for plugin 
+[Info     - 20201206091229]: Activating plugin Tactile Feedback
+[Info     - 20201206091229]: Connecting 2WayToggle.3 to action Pedal Vibration
+[Info     - 20201206091229]: Connecting 2WayToggle.4 to action Front Vibration
+[Info     - 20201206091229]: Connecting 2WayToggle.5 to action Rear Vibration
+[Info     - 20201206091229]: Plugin AC (Active) registered
+[Info     - 20201206091229]: Activating plugin AC
+[Info     - 20201206091229]: Plugin ACC (Active) registered
+[Info     - 20201206091229]: Activating plugin ACC
+[Info     - 20201206091229]: Mode Drive registered for plugin 
+[Info     - 20201206091230]: Dispatching event Startup: playStartupSong
+[Info     - 20201206091230]: Dispatching event Startup: startupComponent:Voice Recognition
+[Info     - 20201206091230]: Starting application Voice Recognition
+[Info     - 20201206091230]: Application Voice Recognition started
+[Info     - 20201206091232]: Dispatching event Startup: startupComponent:View Tracking
+[Info     - 20201206091232]: Starting application View Tracking
+[Info     - 20201206091232]: Application View Tracking started
+[Info     - 20201206091234]: Dispatching event Startup: startupComponent:Tactile Feedback
+[Info     - 20201206091234]: Starting application Tactile Feedback
+[Info     - 20201206091234]: Application Tactile Feedback started
+[Info     - 20201206091237]: Dispatching event Startup: startupSimulator:Assetto Corsa Competizione
+[Info     - 20201206091237]: Starting application Assetto Corsa Competizione
+[Info     - 20201206091237]: Starting application Assetto Corsa Competizione
+[Info     - 20201206091237]: Application Assetto Corsa Competizione started
+[Info     - 20201206091237]: Raising event Startup: playStartupSong in current process
+[Info     - 20201206091237]: Dispatching event Startup: playStartupSong
+[Info     - 20201206091243]: Raising event Startup: exitStartup in target ahk_exe Simulator Startup.exe
+[Info     - 20201206091243]: Deactivating mode Launch
+[Info     - 20201206091243]: Disconnecting Button.1 from action ACC
+[Info     - 20201206091243]: Disconnecting Button.2 from action RST
+[Info     - 20201206091243]: Disconnecting Button.3 from action MoTeC
+[Info     - 20201206091243]: Disconnecting Button.4 from action TS
+[Info     - 20201206091243]: Disconnecting Button.5 from action FanaLab
+[Info     - 20201206091243]: Disconnecting Button.6 from action SmartCtrl
+[Info     - 20201206091243]: Disconnecting Button.8 from action Shutdown
+[Info     - 20201206091243]: Disconnecting Button.7 from action 
+[Info     - 20201206091243]: Setting controller mode to Drive
+[Info     - 20201206091243]: Activating mode Drive
+[Info     - 20201206091243]: Connecting Button.1 to action WTF!
+[Info     - 20201206091243]: Connecting Button.2 to action Idiot
+[Info     - 20201206091243]: Connecting Button.3 to action Lrn ur brk pnts
+[Info     - 20201206091243]: Connecting Button.4 to action Sorry
+[Info     - 20201206091243]: Connecting Button.5 to action Thx
+[Info     - 20201206091243]: Connecting Button.6 to action Good job
+[Info     - 20201206091243]: Connecting Button.7 to action Great fight
+[Info     - 20201206091243]: Connecting Button.8 to action Clean race pls
+[Info     - 20201206092821]: Stopping application Assetto Corsa Competizione
+[Info     - 20201206092829]: Deactivating mode Drive
+[Info     - 20201206092829]: Disconnecting Button.1 from action WTF!
+[Info     - 20201206092829]: Disconnecting Button.2 from action Idiot
+[Info     - 20201206092829]: Disconnecting Button.3 from action Lrn ur brk pnts
+[Info     - 20201206092829]: Disconnecting Button.4 from action Sorry
+[Info     - 20201206092829]: Disconnecting Button.5 from action Thx
+[Info     - 20201206092829]: Disconnecting Button.6 from action Good job
+[Info     - 20201206092829]: Disconnecting Button.7 from action Great fight
+[Info     - 20201206092829]: Disconnecting Button.8 from action Clean race pls
+[Info     - 20201206092829]: Setting controller mode to Launch
+[Info     - 20201206092829]: Activating mode Launch
+[Info     - 20201206092829]: Connecting Button.1 to action ACC
+[Info     - 20201206092829]: Connecting Button.2 to action RST
+[Info     - 20201206092829]: Connecting Button.3 to action MoTeC
+[Info     - 20201206092829]: Connecting Button.4 to action TS
+[Info     - 20201206092829]: Connecting Button.5 to action FanaLab
+[Info     - 20201206092829]: Connecting Button.6 to action SmartCtrl
+[Info     - 20201206092829]: Connecting Button.8 to action Shutdown
+[Info     - 20201206092829]: Connecting Button.7 to action 
+[Critical - 20201206115319]: ---------------------------------------------------------------
+[Critical - 20201206115319]:                  Running Simulator Controller
+[Critical - 20201206115319]: ---------------------------------------------------------------
+[Info     - 20201206115320]: Controller layout initialized: # 0 1-Way Toggles, # 5 2-Way Toggles, # 8 Buttons, # 2 Dials
+[Info     - 20201206115320]: Plugin System (Active) registered
+[Info     - 20201206115320]: Activating plugin System
+[Info     - 20201206115320]: Connecting 2WayToggle.1 to action 
+[Info     - 20201206115320]: Mode Launch registered for plugin 
+[Info     - 20201206115320]: Setting controller mode to Launch
+[Info     - 20201206115320]: Activating mode Launch
+[Info     - 20201206115320]: Connecting Button.1 to action ACC
+[Info     - 20201206115320]: Connecting Button.2 to action RST
+[Info     - 20201206115320]: Connecting Button.3 to action MoTeC
+[Info     - 20201206115320]: Connecting Button.4 to action TS
+[Info     - 20201206115320]: Connecting Button.5 to action FanaLab
+[Info     - 20201206115320]: Connecting Button.6 to action SmartCtrl
+[Info     - 20201206115320]: Connecting Button.8 to action Shutdown
+[Info     - 20201206115320]: Connecting Button.7 to action 
+[Info     - 20201206115320]: Plugin Motion Feedback (Active) registered
+[Info     - 20201206115320]: Activating plugin Motion Feedback
+[Info     - 20201206115320]: Mode Motion registered for plugin 
+[Info     - 20201206115320]: Activating plugin Motion Feedback
+[Info     - 20201206115320]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206115320]: Plugin Tactile Feedback (Active) registered
+[Info     - 20201206115320]: Activating plugin Tactile Feedback
+[Info     - 20201206115320]: Mode Pedal Vibration registered for plugin 
+[Info     - 20201206115320]: Mode Chassis Vibration registered for plugin 
+[Info     - 20201206115320]: Activating plugin Tactile Feedback
+[Info     - 20201206115320]: Connecting 2WayToggle.3 to action Pedal Vibration
+[Info     - 20201206115320]: Connecting 2WayToggle.4 to action Front Vibration
+[Info     - 20201206115320]: Connecting 2WayToggle.5 to action Rear Vibration
+[Info     - 20201206115320]: Plugin AC (Active) registered
+[Info     - 20201206115320]: Activating plugin AC
+[Info     - 20201206115320]: Plugin ACC (Active) registered
+[Info     - 20201206115320]: Activating plugin ACC
+[Info     - 20201206115320]: Mode Drive registered for plugin 
+[Info     - 20201206115321]: Dispatching event Startup: stopStartupSong
+[Critical - 20201206115731]: ---------------------------------------------------------------
+[Critical - 20201206115731]:                  Running Simulator Controller
+[Critical - 20201206115731]: ---------------------------------------------------------------
+[Info     - 20201206115731]: Controller layout initialized: # 0 1-Way Toggles, # 5 2-Way Toggles, # 8 Buttons, # 2 Dials
+[Info     - 20201206115731]: Plugin System (Active) registered
+[Info     - 20201206115731]: Activating plugin System
+[Info     - 20201206115731]: Connecting 2WayToggle.1 to action SystemPlugin.ModeSelectorAction
+[Info     - 20201206115731]: Mode Launch registered for plugin 
+[Info     - 20201206115731]: Setting controller mode to Launch
+[Info     - 20201206115731]: Activating mode Launch
+[Info     - 20201206115731]: Connecting Button.1 to action ACC
+[Info     - 20201206115731]: Connecting Button.2 to action RST
+[Info     - 20201206115731]: Connecting Button.3 to action MoTeC
+[Info     - 20201206115731]: Connecting Button.4 to action TS
+[Info     - 20201206115731]: Connecting Button.5 to action FanaLab
+[Info     - 20201206115731]: Connecting Button.6 to action SmartCtrl
+[Info     - 20201206115731]: Connecting Button.8 to action Shutdown
+[Info     - 20201206115731]: Connecting Button.7 to action SystemPlugin.LogoToggleAction
+[Info     - 20201206115731]: Plugin Motion Feedback (Active) registered
+[Info     - 20201206115731]: Activating plugin Motion Feedback
+[Info     - 20201206115731]: Mode Motion registered for plugin 
+[Info     - 20201206115731]: Activating plugin Motion Feedback
+[Info     - 20201206115731]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206115731]: Plugin Tactile Feedback (Active) registered
+[Info     - 20201206115731]: Activating plugin Tactile Feedback
+[Info     - 20201206115731]: Mode Pedal Vibration registered for plugin 
+[Info     - 20201206115731]: Mode Chassis Vibration registered for plugin 
+[Info     - 20201206115731]: Activating plugin Tactile Feedback
+[Info     - 20201206115731]: Connecting 2WayToggle.3 to action Pedal Vibration
+[Info     - 20201206115731]: Connecting 2WayToggle.4 to action Front Vibration
+[Info     - 20201206115731]: Connecting 2WayToggle.5 to action Rear Vibration
+[Info     - 20201206115731]: Plugin AC (Active) registered
+[Info     - 20201206115731]: Activating plugin AC
+[Info     - 20201206115731]: Plugin ACC (Active) registered
+[Info     - 20201206115731]: Activating plugin ACC
+[Info     - 20201206115731]: Mode Drive registered for plugin 
+[Critical - 20201206120454]: ---------------------------------------------------------------
+[Critical - 20201206120454]:                  Running Simulator Controller
+[Critical - 20201206120454]: ---------------------------------------------------------------
+[Info     - 20201206120454]: Controller layout initialized: # 0 1-Way Toggles, # 5 2-Way Toggles, # 8 Buttons, # 2 Dials
+[Info     - 20201206120454]: Plugin System (Active) registered
+[Info     - 20201206120454]: Activating plugin System
+[Info     - 20201206120454]: Connecting 2WayToggle.1 to action SystemPlugin.ModeSelectorAction
+[Info     - 20201206120454]: Mode Launch registered for plugin 
+[Info     - 20201206120454]: Setting controller mode to Launch
+[Info     - 20201206120454]: Activating mode Launch
+[Info     - 20201206120454]: Connecting Button.1 to action ACC
+[Info     - 20201206120454]: Connecting Button.2 to action RST
+[Info     - 20201206120454]: Connecting Button.3 to action MoTeC
+[Info     - 20201206120454]: Connecting Button.4 to action TS
+[Info     - 20201206120454]: Connecting Button.5 to action FanaLab
+[Info     - 20201206120454]: Connecting Button.6 to action SmartCtrl
+[Info     - 20201206120454]: Connecting Button.8 to action Shutdown
+[Info     - 20201206120454]: Connecting Button.7 to action SystemPlugin.LogoToggleAction
+[Info     - 20201206120454]: Plugin Motion Feedback (Active) registered
+[Info     - 20201206120454]: Activating plugin Motion Feedback
+[Info     - 20201206120454]: Mode Motion registered for plugin 
+[Info     - 20201206120454]: Activating plugin Motion Feedback
+[Info     - 20201206120454]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206120454]: Plugin Tactile Feedback (Active) registered
+[Info     - 20201206120454]: Activating plugin Tactile Feedback
+[Info     - 20201206120454]: Mode Pedal Vibration registered for plugin 
+[Info     - 20201206120454]: Mode Chassis Vibration registered for plugin 
+[Info     - 20201206120454]: Activating plugin Tactile Feedback
+[Info     - 20201206120454]: Connecting 2WayToggle.3 to action Pedal Vibration
+[Info     - 20201206120454]: Connecting 2WayToggle.4 to action Front Vibration
+[Info     - 20201206120454]: Connecting 2WayToggle.5 to action Rear Vibration
+[Info     - 20201206120454]: Plugin AC (Active) registered
+[Info     - 20201206120454]: Activating plugin AC
+[Info     - 20201206120454]: Plugin ACC (Active) registered
+[Info     - 20201206120454]: Activating plugin ACC
+[Info     - 20201206120454]: Mode Drive registered for plugin 
+[Critical - 20201206120732]: ---------------------------------------------------------------
+[Critical - 20201206120732]:                  Running Simulator Controller
+[Critical - 20201206120732]: ---------------------------------------------------------------
+[Info     - 20201206120732]: Controller layout initialized: # 0 1-Way Toggles, # 5 2-Way Toggles, # 8 Buttons, # 2 Dials
+[Info     - 20201206120732]: Plugin System (Active) registered
+[Info     - 20201206120732]: Activating plugin System
+[Info     - 20201206120732]: Connecting 2WayToggle.1 to action SystemPlugin.ModeSelectorAction
+[Info     - 20201206120732]: Mode Launch registered for plugin System
+[Info     - 20201206120732]: Setting controller mode to Launch
+[Info     - 20201206120732]: Activating mode Launch
+[Info     - 20201206120732]: Connecting Button.1 to action ACC
+[Info     - 20201206120732]: Connecting Button.2 to action RST
+[Info     - 20201206120732]: Connecting Button.3 to action MoTeC
+[Info     - 20201206120732]: Connecting Button.4 to action TS
+[Info     - 20201206120732]: Connecting Button.5 to action FanaLab
+[Info     - 20201206120732]: Connecting Button.6 to action SmartCtrl
+[Info     - 20201206120732]: Connecting Button.8 to action Shutdown
+[Info     - 20201206120732]: Connecting Button.7 to action SystemPlugin.LogoToggleAction
+[Info     - 20201206120732]: Plugin Motion Feedback (Active) registered
+[Info     - 20201206120732]: Activating plugin Motion Feedback
+[Info     - 20201206120732]: Mode Motion registered for plugin Motion Feedback
+[Info     - 20201206120732]: Activating plugin Motion Feedback
+[Info     - 20201206120732]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206120732]: Plugin Tactile Feedback (Active) registered
+[Info     - 20201206120732]: Activating plugin Tactile Feedback
+[Info     - 20201206120732]: Mode Pedal Vibration registered for plugin Tactile Feedback
+[Info     - 20201206120732]: Mode Chassis Vibration registered for plugin Tactile Feedback
+[Info     - 20201206120732]: Activating plugin Tactile Feedback
+[Info     - 20201206120732]: Connecting 2WayToggle.3 to action Pedal Vibration
+[Info     - 20201206120732]: Connecting 2WayToggle.4 to action Front Vibration
+[Info     - 20201206120732]: Connecting 2WayToggle.5 to action Rear Vibration
+[Info     - 20201206120732]: Plugin AC (Active) registered
+[Info     - 20201206120732]: Activating plugin AC
+[Info     - 20201206120732]: Plugin ACC (Active) registered
+[Info     - 20201206120732]: Activating plugin ACC
+[Info     - 20201206120732]: Mode Drive registered for plugin ACC
+[Critical - 20201206134720]: ---------------------------------------------------------------
+[Critical - 20201206134720]:                  Running Simulator Controller
+[Critical - 20201206134720]: ---------------------------------------------------------------
+[Info     - 20201206134720]: Controller layout initialized: # 0 1-Way Toggles, # 5 2-Way Toggles, # 8 Buttons, # 2 Dials
+[Info     - 20201206134720]: Plugin System (Active) registered
+[Info     - 20201206134720]: Activating plugin System
+[Info     - 20201206134720]: Connecting 2WayToggle.1 to action SystemPlugin.ModeSelectorAction
+[Info     - 20201206134720]: Mode Launch registered for plugin System
+[Info     - 20201206134720]: Setting controller mode to Launch
+[Info     - 20201206134720]: Activating mode Launch
+[Info     - 20201206134720]: Connecting Button.1 to action ACC
+[Info     - 20201206134720]: Connecting Button.2 to action RST
+[Info     - 20201206134720]: Connecting Button.3 to action MoTeC
+[Info     - 20201206134720]: Connecting Button.4 to action TS
+[Info     - 20201206134720]: Connecting Button.5 to action FanaLab
+[Info     - 20201206134720]: Connecting Button.6 to action SmartCtrl
+[Info     - 20201206134720]: Connecting Button.8 to action Shutdown
+[Info     - 20201206134720]: Connecting Button.7 to action SystemPlugin.LogoToggleAction
+[Info     - 20201206134720]: Plugin Motion Feedback (Active) registered
+[Info     - 20201206134720]: Activating plugin Motion Feedback
+[Info     - 20201206134720]: Mode Motion registered for plugin Motion Feedback
+[Info     - 20201206134720]: Activating plugin Motion Feedback
+[Info     - 20201206134720]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206134720]: Plugin Tactile Feedback (Active) registered
+[Info     - 20201206134720]: Activating plugin Tactile Feedback
+[Info     - 20201206134720]: Mode Pedal Vibration registered for plugin Tactile Feedback
+[Info     - 20201206134720]: Mode Chassis Vibration registered for plugin Tactile Feedback
+[Info     - 20201206134720]: Activating plugin Tactile Feedback
+[Info     - 20201206134720]: Connecting 2WayToggle.3 to action Pedal Vibration
+[Info     - 20201206134720]: Connecting 2WayToggle.4 to action Front Vibration
+[Info     - 20201206134720]: Connecting 2WayToggle.5 to action Rear Vibration
+[Info     - 20201206134720]: Plugin AC (Active) registered
+[Info     - 20201206134720]: Activating plugin AC
+[Info     - 20201206134720]: Plugin ACC (Active) registered
+[Info     - 20201206134720]: Activating plugin ACC
+[Info     - 20201206134720]: Mode Drive registered for plugin ACC
+[Info     - 20201206134724]: Firing action Launch for 2WayToggle.1
+[Info     - 20201206134724]: Deactivating mode Launch
+[Info     - 20201206134724]: Disconnecting Button.1 from action ACC
+[Info     - 20201206134724]: Disconnecting Button.2 from action RST
+[Info     - 20201206134724]: Disconnecting Button.3 from action MoTeC
+[Info     - 20201206134724]: Disconnecting Button.4 from action TS
+[Info     - 20201206134724]: Disconnecting Button.5 from action FanaLab
+[Info     - 20201206134724]: Disconnecting Button.6 from action SmartCtrl
+[Info     - 20201206134724]: Disconnecting Button.8 from action Shutdown
+[Info     - 20201206134724]: Disconnecting Button.7 from action SystemPlugin.LogoToggleAction
+[Info     - 20201206134724]: Setting controller mode to Motion
+[Info     - 20201206134724]: Activating mode Motion
+[Info     - 20201206134724]: Connecting Dial.1 to action Motion Intensity
+[Info     - 20201206134724]: Connecting Button.1 to action Heave
+[Info     - 20201206134724]: Connecting Button.2 to action Surge 1
+[Info     - 20201206134724]: Connecting Button.3 to action Surge 2
+[Info     - 20201206134724]: Connecting Button.4 to action Sway
+[Info     - 20201206134724]: Connecting Button.5 to action Pitch
+[Info     - 20201206134724]: Connecting Button.6 to action Roll
+[Info     - 20201206134724]: Connecting Button.7 to action Traction Loss
+[Info     - 20201206134724]: Connecting Button.8 to action Effect Intensity
+[Info     - 20201206134724]: Connecting Dial.2 to action MotionFeedbackPlugin.EffectIntensityAction
+[Info     - 20201206134726]: Firing action Motion for 2WayToggle.1
+[Info     - 20201206134726]: Deactivating mode Motion
+[Info     - 20201206134726]: Disconnecting Dial.1 from action Motion Intensity
+[Info     - 20201206134726]: Disconnecting Button.1 from action Heave
+[Info     - 20201206134726]: Disconnecting Button.2 from action Surge 1
+[Info     - 20201206134726]: Disconnecting Button.3 from action Surge 2
+[Info     - 20201206134726]: Disconnecting Button.4 from action Sway
+[Info     - 20201206134726]: Disconnecting Button.5 from action Pitch
+[Info     - 20201206134726]: Disconnecting Button.6 from action Roll
+[Info     - 20201206134726]: Disconnecting Button.7 from action Traction Loss
+[Info     - 20201206134726]: Disconnecting Button.8 from action Effect Intensity
+[Info     - 20201206134726]: Disconnecting Dial.2 from action MotionFeedbackPlugin.EffectIntensityAction
+[Info     - 20201206134726]: Setting controller mode to Pedal Vibration
+[Info     - 20201206134726]: Activating mode Pedal Vibration
+[Info     - 20201206134726]: Connecting Dial.1 to action Pedal Vibration
+[Info     - 20201206134726]: Connecting Button.1 to action Increase TC
+[Info     - 20201206134726]: Connecting Button.5 to action Decrease TC
+[Info     - 20201206134726]: Connecting Button.2 to action Increase ABS
+[Info     - 20201206134726]: Connecting Button.6 to action Decrease ABS
+[Info     - 20201206134727]: Firing action Pedal Vibration for 2WayToggle.1
+[Info     - 20201206134727]: Deactivating mode Pedal Vibration
+[Info     - 20201206134727]: Disconnecting Dial.1 from action Pedal Vibration
+[Info     - 20201206134727]: Disconnecting Button.1 from action Increase TC
+[Info     - 20201206134727]: Disconnecting Button.5 from action Decrease TC
+[Info     - 20201206134727]: Disconnecting Button.2 from action Increase ABS
+[Info     - 20201206134727]: Disconnecting Button.6 from action Decrease ABS
+[Info     - 20201206134727]: Setting controller mode to Chassis Vibration
+[Info     - 20201206134727]: Activating mode Chassis Vibration
+[Info     - 20201206134727]: Connecting Dial.1 to action Front Vibration
+[Info     - 20201206134727]: Connecting Dial.2 to action Rear Vibration
+[Info     - 20201206134727]: Connecting Button.1 to action Increase RPMS
+[Info     - 20201206134727]: Connecting Button.5 to action Decrease RPMS
+[Info     - 20201206134727]: Connecting Button.2 to action Increase Shift
+[Info     - 20201206134727]: Connecting Button.6 to action Decrease Shift
+[Info     - 20201206134727]: Connecting Button.3 to action Increase Whls Lck
+[Info     - 20201206134727]: Connecting Button.7 to action Decrease Whls Lck
+[Info     - 20201206134727]: Connecting Button.4 to action Increase Whls Slip
+[Info     - 20201206134727]: Connecting Button.8 to action Decrease Whls Slip
+[Info     - 20201206134728]: Firing action Chassis Vibration for 2WayToggle.1
+[Info     - 20201206134728]: Deactivating mode Chassis Vibration
+[Info     - 20201206134728]: Disconnecting Dial.1 from action Front Vibration
+[Info     - 20201206134728]: Disconnecting Dial.2 from action Rear Vibration
+[Info     - 20201206134728]: Disconnecting Button.1 from action Increase RPMS
+[Info     - 20201206134728]: Disconnecting Button.5 from action Decrease RPMS
+[Info     - 20201206134728]: Disconnecting Button.2 from action Increase Shift
+[Info     - 20201206134728]: Disconnecting Button.6 from action Decrease Shift
+[Info     - 20201206134728]: Disconnecting Button.3 from action Increase Whls Lck
+[Info     - 20201206134728]: Disconnecting Button.7 from action Decrease Whls Lck
+[Info     - 20201206134728]: Disconnecting Button.4 from action Increase Whls Slip
+[Info     - 20201206134728]: Disconnecting Button.8 from action Decrease Whls Slip
+[Info     - 20201206134728]: Setting controller mode to Drive
+[Info     - 20201206134728]: Activating mode Drive
+[Info     - 20201206134728]: Connecting Button.1 to action WTF!
+[Info     - 20201206134728]: Connecting Button.2 to action Idiot
+[Info     - 20201206134728]: Connecting Button.3 to action Lrn ur brk pnts
+[Info     - 20201206134728]: Connecting Button.4 to action Sorry
+[Info     - 20201206134728]: Connecting Button.5 to action Thx
+[Info     - 20201206134728]: Connecting Button.6 to action Good job
+[Info     - 20201206134728]: Connecting Button.7 to action Great fight
+[Info     - 20201206134728]: Connecting Button.8 to action Clean race pls
+[Info     - 20201206134730]: Firing action Drive for 2WayToggle.1
+[Info     - 20201206134730]: Deactivating mode Drive
+[Info     - 20201206134730]: Disconnecting Button.1 from action WTF!
+[Info     - 20201206134730]: Disconnecting Button.2 from action Idiot
+[Info     - 20201206134730]: Disconnecting Button.3 from action Lrn ur brk pnts
+[Info     - 20201206134730]: Disconnecting Button.4 from action Sorry
+[Info     - 20201206134730]: Disconnecting Button.5 from action Thx
+[Info     - 20201206134730]: Disconnecting Button.6 from action Good job
+[Info     - 20201206134730]: Disconnecting Button.7 from action Great fight
+[Info     - 20201206134730]: Disconnecting Button.8 from action Clean race pls
+[Info     - 20201206134730]: Setting controller mode to Chassis Vibration
+[Info     - 20201206134730]: Activating mode Chassis Vibration
+[Info     - 20201206134730]: Connecting Dial.1 to action Front Vibration
+[Info     - 20201206134730]: Connecting Dial.2 to action Rear Vibration
+[Info     - 20201206134730]: Connecting Button.1 to action Increase RPMS
+[Info     - 20201206134730]: Connecting Button.5 to action Decrease RPMS
+[Info     - 20201206134730]: Connecting Button.2 to action Increase Shift
+[Info     - 20201206134730]: Connecting Button.6 to action Decrease Shift
+[Info     - 20201206134730]: Connecting Button.3 to action Increase Whls Lck
+[Info     - 20201206134730]: Connecting Button.7 to action Decrease Whls Lck
+[Info     - 20201206134730]: Connecting Button.4 to action Increase Whls Slip
+[Info     - 20201206134730]: Connecting Button.8 to action Decrease Whls Slip
+[Critical - 20201206160936]: ---------------------------------------------------------------
+[Critical - 20201206160936]:                  Running Simulator Controller
+[Critical - 20201206160936]: ---------------------------------------------------------------
+[Info     - 20201206160936]: Controller layout initialized: # 0 1-Way Toggles, # 5 2-Way Toggles, # 8 Buttons, # 2 Dials
+[Info     - 20201206160936]: Plugin System (Active) registered
+[Info     - 20201206160936]: Activating plugin System
+[Info     - 20201206160936]: Connecting 2WayToggle.1 to action SystemPlugin.ModeSelectorAction
+[Info     - 20201206160936]: Mode Launch registered for plugin System
+[Info     - 20201206160936]: Setting controller mode to Launch
+[Info     - 20201206160936]: Activating mode Launch
+[Info     - 20201206160936]: Connecting Button.1 to action ACC
+[Info     - 20201206160936]: Connecting Button.2 to action RST
+[Info     - 20201206160936]: Connecting Button.3 to action MoTeC
+[Info     - 20201206160936]: Connecting Button.4 to action TS
+[Info     - 20201206160936]: Connecting Button.5 to action FanaLab
+[Info     - 20201206160936]: Connecting Button.6 to action SmartCtrl
+[Info     - 20201206160936]: Connecting Button.8 to action Shutdown
+[Info     - 20201206160936]: Connecting Button.7 to action SystemPlugin.LogoToggleAction
+[Info     - 20201206160936]: Plugin Motion Feedback (Active) registered
+[Info     - 20201206160936]: Activating plugin Motion Feedback
+[Info     - 20201206160936]: Mode Motion registered for plugin Motion Feedback
+[Info     - 20201206160936]: Activating plugin Motion Feedback
+[Info     - 20201206160936]: Connecting 2WayToggle.2 to action Motion
+[Info     - 20201206160936]: Plugin Tactile Feedback (Active) registered
+[Info     - 20201206160936]: Activating plugin Tactile Feedback
+[Info     - 20201206160936]: Mode Pedal Vibration registered for plugin Tactile Feedback
+[Info     - 20201206160936]: Mode Chassis Vibration registered for plugin Tactile Feedback
+[Info     - 20201206160936]: Activating plugin Tactile Feedback
+[Info     - 20201206160936]: Connecting 2WayToggle.3 to action Pedal Vibration
+[Info     - 20201206160936]: Connecting 2WayToggle.4 to action Front Vibration
+[Info     - 20201206160936]: Connecting 2WayToggle.5 to action Rear Vibration
+[Info     - 20201206160936]: Plugin AC (Active) registered
+[Info     - 20201206160936]: Activating plugin AC
+[Info     - 20201206160936]: Plugin ACC (Active) registered
+[Info     - 20201206160936]: Activating plugin ACC
+[Info     - 20201206160936]: Mode Drive registered for plugin ACC
+[Info     - 20201206160937]: Dispatching event Startup: playStartupSong
+[Info     - 20201206160938]: Dispatching event Startup: startupComponent:Voice Recognition
+[Info     - 20201206160938]: Starting application Voice Recognition
+[Info     - 20201206160938]: Application Voice Recognition started
+[Info     - 20201206160940]: Dispatching event Startup: startupComponent:View Tracking
+[Info     - 20201206160940]: Starting application View Tracking
+[Info     - 20201206160940]: Application View Tracking started
+[Info     - 20201206160942]: Dispatching event Startup: startupComponent:Tactile Feedback
+[Info     - 20201206160942]: Starting application Tactile Feedback
+[Info     - 20201206160942]: Application Tactile Feedback started
+[Info     - 20201206160950]: Dispatching event Startup: stopStartupSong

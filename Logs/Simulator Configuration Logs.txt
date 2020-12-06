@@ -1,0 +1,27 @@
+[Critical - 20201206080923]: ---------------------------------------------------------------
+[Critical - 20201206080923]:                  Running Simulator Configuration
+[Critical - 20201206080923]: ---------------------------------------------------------------
+[Critical - 20201206085151]: ---------------------------------------------------------------
+[Critical - 20201206085151]:                  Running Simulator Configuration
+[Critical - 20201206085151]: ---------------------------------------------------------------
+[Critical - 20201206090024]: ---------------------------------------------------------------
+[Critical - 20201206090024]:                  Running Simulator Configuration
+[Critical - 20201206090024]: ---------------------------------------------------------------
+[Critical - 20201206090028]: ---------------------------------------------------------------
+[Critical - 20201206090028]:                  Running Simulator Configuration
+[Critical - 20201206090028]: ---------------------------------------------------------------
+[Info     - 20201206090028]: Home path set to D:\Controller
+[Info     - 20201206090028]: AutoHotkey path set to C:\Program Files\AutoHotkey
+[Info     - 20201206090028]: NirCmd executable set to D:\Programme\NirCmd\NirCmd.exe
+[Critical - 20201206090540]: ---------------------------------------------------------------
+[Critical - 20201206090540]:                  Running Simulator Configuration
+[Critical - 20201206090540]: ---------------------------------------------------------------
+[Critical - 20201206090544]: ---------------------------------------------------------------
+[Critical - 20201206090544]:                  Running Simulator Configuration
+[Critical - 20201206090544]: ---------------------------------------------------------------
+[Info     - 20201206090544]: Home path set to D:\Controller
+[Info     - 20201206090544]: AutoHotkey path set to C:\Program Files\AutoHotkey
+[Info     - 20201206090544]: NirCmd executable set to D:\Programme\NirCmd\NirCmd.exe
+[Critical - 20201206134702]: ---------------------------------------------------------------
+[Critical - 20201206134702]:                  Running Simulator Configuration
+[Critical - 20201206134702]: ---------------------------------------------------------------

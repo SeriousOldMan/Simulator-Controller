@@ -1,0 +1,392 @@
+[Critical - 20201205090740]: ---------------------------------------------------------------
+[Critical - 20201205090740]:                  Running Simulator Tools
+[Critical - 20201205090740]: ---------------------------------------------------------------
+[Critical - 20201205090858]: ---------------------------------------------------------------
+[Critical - 20201205090858]:                  Running Simulator Tools
+[Critical - 20201205090858]: ---------------------------------------------------------------
+[Critical - 20201205091007]: ---------------------------------------------------------------
+[Critical - 20201205091007]:                  Running Simulator Tools
+[Critical - 20201205091007]: ---------------------------------------------------------------
+[Critical - 20201206065250]: ---------------------------------------------------------------
+[Critical - 20201206065250]:                  Running Simulator Tools
+[Critical - 20201206065250]: ---------------------------------------------------------------
+[Warn     - 20201206065250]: AutoHotkey path not set
+[Critical - 20201206073935]: ---------------------------------------------------------------
+[Critical - 20201206073935]:                  Running Simulator Tools
+[Critical - 20201206073935]: ---------------------------------------------------------------
+[Info     - 20201206073938]: Cleaning *.bak Files
+[Info     - 20201206073939]: Building Simulator Controller
+[Info     - 20201206073939]: Simulator Controller or dependent files out of date - needs recompile
+[Info     - 20201206073939]: Compiling D:\Controller\Sources\Tools\..\..\Sources\Controller\Simulator Controller.ahk
+[Info     - 20201206073944]: Building Simulator Configuration
+[Info     - 20201206073944]: Checking all files in D:\Controller\Sources\Tools\..\..\Sources\Includes\
+[Info     - 20201206073944]: Checking file D:\Controller\Sources\Tools\..\..\Sources\Includes\Classes.ahk for modification
+[Info     - 20201206073944]: File D:\Controller\Sources\Tools\..\..\Sources\Includes\Classes.ahk found more recent than 20201206065259
+[Info     - 20201206073944]: Simulator Configuration or dependent files out of date - needs recompile
+[Info     - 20201206073944]: Compiling D:\Controller\Sources\Tools\..\..\Sources\Startup\Simulator Configuration.ahk
+[Info     - 20201206073946]: Building Simulator Startup
+[Info     - 20201206073946]: Checking all files in D:\Controller\Sources\Tools\..\..\Sources\Includes\
+[Info     - 20201206073946]: Checking file D:\Controller\Sources\Tools\..\..\Sources\Includes\Classes.ahk for modification
+[Info     - 20201206073946]: File D:\Controller\Sources\Tools\..\..\Sources\Includes\Classes.ahk found more recent than 20201206065302
+[Info     - 20201206073946]: Simulator Startup or dependent files out of date - needs recompile
+[Info     - 20201206073946]: Compiling D:\Controller\Sources\Tools\..\..\Sources\Startup\Simulator Startup.ahk
+[Info     - 20201206073949]: Building Simulator Setup
+[Info     - 20201206073949]: Checking all files in D:\Controller\Sources\Tools\..\..\Sources\Includes\
+[Info     - 20201206073949]: Checking file D:\Controller\Sources\Tools\..\..\Sources\Includes\Classes.ahk for modification
+[Info     - 20201206073949]: File D:\Controller\Sources\Tools\..\..\Sources\Includes\Classes.ahk found more recent than 20201206065305
+[Info     - 20201206073949]: Simulator Setup or dependent files out of date - needs recompile
+[Info     - 20201206073949]: Compiling D:\Controller\Sources\Tools\..\..\Sources\Tools\Simulator Setup.ahk
+[Info     - 20201206073953]: Building Simulator Tools
+[Info     - 20201206073953]: Simulator Tools or dependent files out of date - needs recompile
+[Info     - 20201206073953]: Compiling D:\Controller\Sources\Tools\..\..\Sources\Tools\Simulator Tools.ahk
+[Critical - 20201206083655]: ---------------------------------------------------------------
+[Critical - 20201206083655]:                  Running Simulator Tools
+[Critical - 20201206083655]: ---------------------------------------------------------------
+[Info     - 20201206083703]: Cleaning *.bak Files
+[Info     - 20201206083704]: Building Simulator Controller
+[Info     - 20201206083704]: Simulator Controller or dependent files out of date - needs recompile
+[Info     - 20201206083704]: Compiling D:\Controller\Sources\Tools\..\..\Sources\Controller\Simulator Controller.ahk
+[Info     - 20201206083709]: Building Simulator Configuration
+[Info     - 20201206083709]: Checking all files in D:\Controller\Sources\Tools\..\..\Sources\Includes\
+[Info     - 20201206083709]: Checking file D:\Controller\Sources\Tools\..\..\Sources\Includes\Classes.ahk for modification
+[Info     - 20201206083709]: Checking file D:\Controller\Sources\Tools\..\..\Sources\Includes\Constants.ahk for modification
+[Info     - 20201206083709]: Checking file D:\Controller\Sources\Tools\..\..\Sources\Includes\Functions.ahk for modification
+[Info     - 20201206083709]: File D:\Controller\Sources\Tools\..\..\Sources\Includes\Functions.ahk found more recent than 20201206073944
+[Info     - 20201206083709]: Simulator Configuration or dependent files out of date - needs recompile
+[Info     - 20201206083709]: Compiling D:\Controller\Sources\Tools\..\..\Sources\Startup\Simulator Configuration.ahk
+[Info     - 20201206083711]: Building Simulator Startup
+[Info     - 20201206083711]: Checking all files in D:\Controller\Sources\Tools\..\..\Sources\Includes\
+[Info     - 20201206083711]: Checking file D:\Controller\Sources\Tools\..\..\Sources\Includes\Classes.ahk for modification
+[Info     - 20201206083711]: Checking file D:\Controller\Sources\Tools\..\..\Sources\Includes\Constants.ahk for modification
+[Info     - 20201206083711]: Checking file D:\Controller\Sources\Tools\..\..\Sources\Includes\Functions.ahk for modification
+[Info     - 20201206083711]: File D:\Controller\Sources\Tools\..\..\Sources\Includes\Functions.ahk found more recent than 20201206073946
+[Info     - 20201206083711]: Simulator Startup or dependent files out of date - needs recompile
+[Info     - 20201206083711]: Compiling D:\Controller\Sources\Tools\..\..\Sources\Startup\Simulator Startup.ahk
+[Info     - 20201206083715]: Building Simulator Setup
+[Info     - 20201206083715]: Checking all files in D:\Controller\Sources\Tools\..\..\Sources\Includes\
+[Info     - 20201206083715]: Checking file D:\Controller\Sources\Tools\..\..\Sources\Includes\Classes.ahk for modification
+[Info     - 20201206083715]: Checking file D:\Controller\Sources\Tools\..\..\Sources\Includes\Constants.ahk for modification
+[Info     - 20201206083715]: Checking file D:\Controller\Sources\Tools\..\..\Sources\Includes\Functions.ahk for modification
+[Info     - 20201206083715]: File D:\Controller\Sources\Tools\..\..\Sources\Includes\Functions.ahk found more recent than 20201206073950
+[Info     - 20201206083715]: Simulator Setup or dependent files out of date - needs recompile
+[Info     - 20201206083715]: Compiling D:\Controller\Sources\Tools\..\..\Sources\Tools\Simulator Setup.ahk
+[Info     - 20201206083718]: Building Simulator Tools
+[Info     - 20201206083718]: Checking all files in D:\Controller\Sources\Tools\..\..\Sources\Includes\
+[Info     - 20201206083718]: Checking file D:\Controller\Sources\Tools\..\..\Sources\Includes\Classes.ahk for modification
+[Info     - 20201206083718]: Checking file D:\Controller\Sources\Tools\..\..\Sources\Includes\Constants.ahk for modification
+[Info     - 20201206083718]: Checking file D:\Controller\Sources\Tools\..\..\Sources\Includes\Functions.ahk for modification
+[Info     - 20201206083718]: File D:\Controller\Sources\Tools\..\..\Sources\Includes\Functions.ahk found more recent than 20201206073953
+[Info     - 20201206083718]: Simulator Tools or dependent files out of date - needs recompile
+[Info     - 20201206083718]: Compiling D:\Controller\Sources\Tools\..\..\Sources\Tools\Simulator Tools.ahk
+[Critical - 20201206085512]: ---------------------------------------------------------------
+[Critical - 20201206085512]:                  Running Simulator Tools
+[Critical - 20201206085512]: ---------------------------------------------------------------
+[Info     - 20201206085515]: Cleaning *.bak Files
+[Info     - 20201206085517]: Building Simulator Controller
+[Info     - 20201206085517]: Checking all files in D:\Controller\Binaries\..\Sources\Includes
+[Info     - 20201206085517]: Checking file D:\Controller\Binaries\..\Sources\Includes\Includes.ahk for modification
+[Info     - 20201206085517]: Checking all files in D:\Controller\Binaries\..\Sources\Controller\Plugins\
+[Info     - 20201206085517]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\AC Plugin.ahk for modification
+[Info     - 20201206085517]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\ACC Plugin.ahk for modification
+[Info     - 20201206085517]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\ButtonBox Plugin.ahk for modification
+[Info     - 20201206085517]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\Core Plugin.ahk for modification
+[Info     - 20201206085517]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\Motion Feedback Plugin.ahk for modification
+[Info     - 20201206085517]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\Plugins.ahk for modification
+[Info     - 20201206085517]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\RST Plugin.ahk for modification
+[Info     - 20201206085517]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\System Plugin.ahk for modification
+[Info     - 20201206085517]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\Tactile Feedback Plugin.ahk for modification
+[Info     - 20201206085517]: Building Simulator Configuration
+[Info     - 20201206085517]: Checking all files in D:\Controller\Binaries\..\Sources\Includes
+[Info     - 20201206085517]: Checking file D:\Controller\Binaries\..\Sources\Includes\Includes.ahk for modification
+[Info     - 20201206085517]: Checking all files in D:\Controller\Binaries\..\Sources\Startup\Libraries\
+[Info     - 20201206085517]: Checking file D:\Controller\Binaries\..\Sources\Startup\Libraries\Configuration Editor.ahk for modification
+[Info     - 20201206085517]: Building Simulator Startup
+[Info     - 20201206085517]: Checking all files in D:\Controller\Binaries\..\Sources\Includes
+[Info     - 20201206085517]: Checking file D:\Controller\Binaries\..\Sources\Includes\Includes.ahk for modification
+[Info     - 20201206085517]: Checking all files in D:\Controller\Binaries\..\Sources\Startup\Libraries\
+[Info     - 20201206085517]: Checking file D:\Controller\Binaries\..\Sources\Startup\Libraries\Configuration Editor.ahk for modification
+[Info     - 20201206085517]: Building Simulator Setup
+[Info     - 20201206085517]: Checking all files in D:\Controller\Binaries\..\Sources\Includes
+[Info     - 20201206085517]: Checking file D:\Controller\Binaries\..\Sources\Includes\Includes.ahk for modification
+[Critical - 20201206085528]: ---------------------------------------------------------------
+[Critical - 20201206085528]:                  Running Simulator Tools
+[Critical - 20201206085528]: ---------------------------------------------------------------
+[Info     - 20201206085531]: Cleaning *.bak Files
+[Info     - 20201206085532]: Building Simulator Controller
+[Info     - 20201206085532]: Checking all files in D:\Controller\Binaries\..\Sources\Includes
+[Info     - 20201206085532]: Checking file D:\Controller\Binaries\..\Sources\Includes\Includes.ahk for modification
+[Info     - 20201206085532]: Checking all files in D:\Controller\Binaries\..\Sources\Controller\Plugins\
+[Info     - 20201206085532]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\AC Plugin.ahk for modification
+[Info     - 20201206085532]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\ACC Plugin.ahk for modification
+[Info     - 20201206085532]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\ButtonBox Plugin.ahk for modification
+[Info     - 20201206085532]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\Core Plugin.ahk for modification
+[Info     - 20201206085532]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\Motion Feedback Plugin.ahk for modification
+[Info     - 20201206085532]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\Plugins.ahk for modification
+[Info     - 20201206085532]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\RST Plugin.ahk for modification
+[Info     - 20201206085532]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\System Plugin.ahk for modification
+[Info     - 20201206085532]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\Tactile Feedback Plugin.ahk for modification
+[Info     - 20201206085532]: Building Simulator Configuration
+[Info     - 20201206085532]: Checking all files in D:\Controller\Binaries\..\Sources\Includes
+[Info     - 20201206085532]: Checking file D:\Controller\Binaries\..\Sources\Includes\Includes.ahk for modification
+[Info     - 20201206085532]: Checking all files in D:\Controller\Binaries\..\Sources\Startup\Libraries\
+[Info     - 20201206085532]: Checking file D:\Controller\Binaries\..\Sources\Startup\Libraries\Configuration Editor.ahk for modification
+[Info     - 20201206085532]: Building Simulator Startup
+[Info     - 20201206085532]: Checking all files in D:\Controller\Binaries\..\Sources\Includes
+[Info     - 20201206085532]: Checking file D:\Controller\Binaries\..\Sources\Includes\Includes.ahk for modification
+[Info     - 20201206085532]: Checking all files in D:\Controller\Binaries\..\Sources\Startup\Libraries\
+[Info     - 20201206085532]: Checking file D:\Controller\Binaries\..\Sources\Startup\Libraries\Configuration Editor.ahk for modification
+[Info     - 20201206085532]: Building Simulator Setup
+[Info     - 20201206085532]: Checking all files in D:\Controller\Binaries\..\Sources\Includes
+[Info     - 20201206085532]: Checking file D:\Controller\Binaries\..\Sources\Includes\Includes.ahk for modification
+[Critical - 20201206085919]: ---------------------------------------------------------------
+[Critical - 20201206085919]:                  Running Simulator Tools
+[Critical - 20201206085919]: ---------------------------------------------------------------
+[Info     - 20201206085922]: Cleaning *.bak Files
+[Info     - 20201206085923]: Building Simulator Controller
+[Info     - 20201206085923]: Checking all files in D:\Controller\Binaries\..\Sources\Includes
+[Info     - 20201206085923]: Checking file D:\Controller\Binaries\..\Sources\Includes\Includes.ahk for modification
+[Info     - 20201206085923]: Checking all files in D:\Controller\Binaries\..\Sources\Controller\Plugins\
+[Info     - 20201206085923]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\AC Plugin.ahk for modification
+[Info     - 20201206085923]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\ACC Plugin.ahk for modification
+[Info     - 20201206085923]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\ButtonBox Plugin.ahk for modification
+[Info     - 20201206085923]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\Core Plugin.ahk for modification
+[Info     - 20201206085923]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\Motion Feedback Plugin.ahk for modification
+[Info     - 20201206085923]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\Plugins.ahk for modification
+[Info     - 20201206085923]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\RST Plugin.ahk for modification
+[Info     - 20201206085923]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\System Plugin.ahk for modification
+[Info     - 20201206085923]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\Tactile Feedback Plugin.ahk for modification
+[Info     - 20201206085923]: Building Simulator Configuration
+[Info     - 20201206085923]: Checking all files in D:\Controller\Binaries\..\Sources\Includes
+[Info     - 20201206085923]: Checking file D:\Controller\Binaries\..\Sources\Includes\Includes.ahk for modification
+[Info     - 20201206085923]: Checking all files in D:\Controller\Binaries\..\Sources\Startup\Libraries\
+[Info     - 20201206085923]: Checking file D:\Controller\Binaries\..\Sources\Startup\Libraries\Configuration Editor.ahk for modification
+[Info     - 20201206085923]: Building Simulator Startup
+[Info     - 20201206085923]: Checking all files in D:\Controller\Binaries\..\Sources\Includes
+[Info     - 20201206085923]: Checking file D:\Controller\Binaries\..\Sources\Includes\Includes.ahk for modification
+[Info     - 20201206085923]: Checking all files in D:\Controller\Binaries\..\Sources\Startup\Libraries\
+[Info     - 20201206085923]: Checking file D:\Controller\Binaries\..\Sources\Startup\Libraries\Configuration Editor.ahk for modification
+[Info     - 20201206085923]: Building Simulator Setup
+[Info     - 20201206085923]: Checking all files in D:\Controller\Binaries\..\Sources\Includes
+[Info     - 20201206085923]: Checking file D:\Controller\Binaries\..\Sources\Includes\Includes.ahk for modification
+[Critical - 20201206090307]: ---------------------------------------------------------------
+[Critical - 20201206090307]:                  Running Simulator Tools
+[Critical - 20201206090307]: ---------------------------------------------------------------
+[Info     - 20201206090310]: Cleaning *.bak Files
+[Info     - 20201206090311]: Building Simulator Controller
+[Info     - 20201206090311]: Checking all files in D:\Controller\Sources\Tools\..\..\Sources\Includes\
+[Info     - 20201206090311]: Checking file D:\Controller\Sources\Tools\..\..\Sources\Includes\Classes.ahk for modification
+[Info     - 20201206090311]: File D:\Controller\Sources\Tools\..\..\Sources\Includes\Classes.ahk found more recent than 20201206083705
+[Info     - 20201206090311]: Simulator Controller or dependent files out of date - needs recompile
+[Info     - 20201206090311]: Compiling D:\Controller\Sources\Tools\..\..\Sources\Controller\Simulator Controller.ahk
+[Info     - 20201206090315]: Building Simulator Configuration
+[Info     - 20201206090315]: Checking all files in D:\Controller\Sources\Tools\..\..\Sources\Includes\
+[Info     - 20201206090315]: Checking file D:\Controller\Sources\Tools\..\..\Sources\Includes\Classes.ahk for modification
+[Info     - 20201206090315]: File D:\Controller\Sources\Tools\..\..\Sources\Includes\Classes.ahk found more recent than 20201206083709
+[Info     - 20201206090315]: Simulator Configuration or dependent files out of date - needs recompile
+[Info     - 20201206090315]: Compiling D:\Controller\Sources\Tools\..\..\Sources\Startup\Simulator Configuration.ahk
+[Info     - 20201206090317]: Building Simulator Startup
+[Info     - 20201206090317]: Checking all files in D:\Controller\Sources\Tools\..\..\Sources\Includes\
+[Info     - 20201206090317]: Checking file D:\Controller\Sources\Tools\..\..\Sources\Includes\Classes.ahk for modification
+[Info     - 20201206090317]: File D:\Controller\Sources\Tools\..\..\Sources\Includes\Classes.ahk found more recent than 20201206083711
+[Info     - 20201206090317]: Simulator Startup or dependent files out of date - needs recompile
+[Info     - 20201206090317]: Compiling D:\Controller\Sources\Tools\..\..\Sources\Startup\Simulator Startup.ahk
+[Info     - 20201206090320]: Building Simulator Setup
+[Info     - 20201206090320]: Checking all files in D:\Controller\Sources\Tools\..\..\Sources\Includes\
+[Info     - 20201206090320]: Checking file D:\Controller\Sources\Tools\..\..\Sources\Includes\Classes.ahk for modification
+[Info     - 20201206090320]: File D:\Controller\Sources\Tools\..\..\Sources\Includes\Classes.ahk found more recent than 20201206083715
+[Info     - 20201206090320]: Simulator Setup or dependent files out of date - needs recompile
+[Info     - 20201206090320]: Compiling D:\Controller\Sources\Tools\..\..\Sources\Tools\Simulator Setup.ahk
+[Info     - 20201206090323]: Building Simulator Tools
+[Info     - 20201206090323]: Checking all files in D:\Controller\Sources\Tools\..\..\Sources\Includes\
+[Info     - 20201206090323]: Checking file D:\Controller\Sources\Tools\..\..\Sources\Includes\Classes.ahk for modification
+[Info     - 20201206090323]: File D:\Controller\Sources\Tools\..\..\Sources\Includes\Classes.ahk found more recent than 20201206083718
+[Info     - 20201206090323]: Simulator Tools or dependent files out of date - needs recompile
+[Info     - 20201206090323]: Compiling D:\Controller\Sources\Tools\..\..\Sources\Tools\Simulator Tools.ahk
+[Critical - 20201206090349]: ---------------------------------------------------------------
+[Critical - 20201206090349]:                  Running Simulator Tools
+[Critical - 20201206090349]: ---------------------------------------------------------------
+[Info     - 20201206090352]: Cleaning *.bak Files
+[Info     - 20201206090353]: Building Simulator Controller
+[Info     - 20201206090353]: Checking all files in D:\Controller\Binaries\..\Sources\Includes
+[Info     - 20201206090353]: Checking file D:\Controller\Binaries\..\Sources\Includes\Includes.ahk for modification
+[Info     - 20201206090353]: Checking all files in D:\Controller\Binaries\..\Sources\Controller\Plugins\
+[Info     - 20201206090353]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\AC Plugin.ahk for modification
+[Info     - 20201206090353]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\ACC Plugin.ahk for modification
+[Info     - 20201206090353]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\ButtonBox Plugin.ahk for modification
+[Info     - 20201206090353]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\Core Plugin.ahk for modification
+[Info     - 20201206090353]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\Motion Feedback Plugin.ahk for modification
+[Info     - 20201206090353]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\Plugins.ahk for modification
+[Info     - 20201206090353]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\RST Plugin.ahk for modification
+[Info     - 20201206090353]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\System Plugin.ahk for modification
+[Info     - 20201206090353]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\Tactile Feedback Plugin.ahk for modification
+[Info     - 20201206090353]: Building Simulator Configuration
+[Info     - 20201206090353]: Checking all files in D:\Controller\Binaries\..\Sources\Includes
+[Info     - 20201206090353]: Checking file D:\Controller\Binaries\..\Sources\Includes\Includes.ahk for modification
+[Info     - 20201206090353]: Checking all files in D:\Controller\Binaries\..\Sources\Startup\Libraries\
+[Info     - 20201206090353]: Checking file D:\Controller\Binaries\..\Sources\Startup\Libraries\Configuration Editor.ahk for modification
+[Info     - 20201206090353]: Building Simulator Startup
+[Info     - 20201206090353]: Checking all files in D:\Controller\Binaries\..\Sources\Includes
+[Info     - 20201206090353]: Checking file D:\Controller\Binaries\..\Sources\Includes\Includes.ahk for modification
+[Info     - 20201206090353]: Checking all files in D:\Controller\Binaries\..\Sources\Startup\Libraries\
+[Info     - 20201206090353]: Checking file D:\Controller\Binaries\..\Sources\Startup\Libraries\Configuration Editor.ahk for modification
+[Info     - 20201206090353]: Building Simulator Setup
+[Info     - 20201206090353]: Checking all files in D:\Controller\Binaries\..\Sources\Includes
+[Info     - 20201206090353]: Checking file D:\Controller\Binaries\..\Sources\Includes\Includes.ahk for modification
+[Critical - 20201206090519]: ---------------------------------------------------------------
+[Critical - 20201206090519]:                  Running Simulator Tools
+[Critical - 20201206090519]: ---------------------------------------------------------------
+[Info     - 20201206090524]: Cleaning *.bak Files
+[Info     - 20201206090525]: Building Simulator Controller
+[Info     - 20201206090525]: Checking all files in D:\Controller\Sources\Tools\..\..\Sources\Includes\
+[Info     - 20201206090525]: Checking file D:\Controller\Sources\Tools\..\..\Sources\Includes\Classes.ahk for modification
+[Info     - 20201206090525]: File D:\Controller\Sources\Tools\..\..\Sources\Includes\Classes.ahk found more recent than 20201206090311
+[Info     - 20201206090525]: Simulator Controller or dependent files out of date - needs recompile
+[Info     - 20201206090525]: Compiling D:\Controller\Sources\Tools\..\..\Sources\Controller\Simulator Controller.ahk
+[Info     - 20201206090529]: Building Simulator Configuration
+[Info     - 20201206090529]: Checking all files in D:\Controller\Sources\Tools\..\..\Sources\Includes\
+[Info     - 20201206090529]: Checking file D:\Controller\Sources\Tools\..\..\Sources\Includes\Classes.ahk for modification
+[Info     - 20201206090529]: File D:\Controller\Sources\Tools\..\..\Sources\Includes\Classes.ahk found more recent than 20201206090315
+[Info     - 20201206090529]: Simulator Configuration or dependent files out of date - needs recompile
+[Info     - 20201206090529]: Compiling D:\Controller\Sources\Tools\..\..\Sources\Startup\Simulator Configuration.ahk
+[Info     - 20201206090532]: Building Simulator Startup
+[Info     - 20201206090532]: Checking all files in D:\Controller\Sources\Tools\..\..\Sources\Includes\
+[Info     - 20201206090532]: Checking file D:\Controller\Sources\Tools\..\..\Sources\Includes\Classes.ahk for modification
+[Info     - 20201206090532]: File D:\Controller\Sources\Tools\..\..\Sources\Includes\Classes.ahk found more recent than 20201206090317
+[Info     - 20201206090532]: Simulator Startup or dependent files out of date - needs recompile
+[Info     - 20201206090532]: Compiling D:\Controller\Sources\Tools\..\..\Sources\Startup\Simulator Startup.ahk
+[Info     - 20201206090535]: Building Simulator Setup
+[Info     - 20201206090535]: Checking all files in D:\Controller\Sources\Tools\..\..\Sources\Includes\
+[Info     - 20201206090535]: Checking file D:\Controller\Sources\Tools\..\..\Sources\Includes\Classes.ahk for modification
+[Info     - 20201206090535]: File D:\Controller\Sources\Tools\..\..\Sources\Includes\Classes.ahk found more recent than 20201206090320
+[Info     - 20201206090535]: Simulator Setup or dependent files out of date - needs recompile
+[Info     - 20201206090535]: Compiling D:\Controller\Sources\Tools\..\..\Sources\Tools\Simulator Setup.ahk
+[Info     - 20201206090539]: Building Simulator Tools
+[Info     - 20201206090539]: Checking all files in D:\Controller\Sources\Tools\..\..\Sources\Includes\
+[Info     - 20201206090539]: Checking file D:\Controller\Sources\Tools\..\..\Sources\Includes\Classes.ahk for modification
+[Info     - 20201206090539]: File D:\Controller\Sources\Tools\..\..\Sources\Includes\Classes.ahk found more recent than 20201206090323
+[Info     - 20201206090539]: Simulator Tools or dependent files out of date - needs recompile
+[Info     - 20201206090539]: Compiling D:\Controller\Sources\Tools\..\..\Sources\Tools\Simulator Tools.ahk
+[Critical - 20201206090635]: ---------------------------------------------------------------
+[Critical - 20201206090635]:                  Running Simulator Tools
+[Critical - 20201206090635]: ---------------------------------------------------------------
+[Info     - 20201206090638]: Cleaning *.bak Files
+[Info     - 20201206090639]: Building Simulator Controller
+[Info     - 20201206090639]: Checking all files in D:\Controller\Binaries\..\Sources\Includes\
+[Info     - 20201206090639]: Checking file D:\Controller\Binaries\..\Sources\Includes\Classes.ahk for modification
+[Info     - 20201206090639]: Checking file D:\Controller\Binaries\..\Sources\Includes\Constants.ahk for modification
+[Info     - 20201206090639]: Checking file D:\Controller\Binaries\..\Sources\Includes\Functions.ahk for modification
+[Info     - 20201206090639]: Checking file D:\Controller\Binaries\..\Sources\Includes\Includes.ahk for modification
+[Info     - 20201206090639]: Checking file D:\Controller\Binaries\..\Sources\Includes\Variables.ahk for modification
+[Info     - 20201206090639]: Checking all files in D:\Controller\Binaries\..\Sources\Controller\Plugins\
+[Info     - 20201206090639]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\AC Plugin.ahk for modification
+[Info     - 20201206090639]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\ACC Plugin.ahk for modification
+[Info     - 20201206090639]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\ButtonBox Plugin.ahk for modification
+[Info     - 20201206090639]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\Core Plugin.ahk for modification
+[Info     - 20201206090639]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\Motion Feedback Plugin.ahk for modification
+[Info     - 20201206090639]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\Plugins.ahk for modification
+[Info     - 20201206090639]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\RST Plugin.ahk for modification
+[Info     - 20201206090639]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\System Plugin.ahk for modification
+[Info     - 20201206090639]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\Tactile Feedback Plugin.ahk for modification
+[Info     - 20201206090639]: Building Simulator Configuration
+[Info     - 20201206090639]: Checking all files in D:\Controller\Binaries\..\Sources\Includes\
+[Info     - 20201206090639]: Checking file D:\Controller\Binaries\..\Sources\Includes\Classes.ahk for modification
+[Info     - 20201206090639]: Checking file D:\Controller\Binaries\..\Sources\Includes\Constants.ahk for modification
+[Info     - 20201206090639]: Checking file D:\Controller\Binaries\..\Sources\Includes\Functions.ahk for modification
+[Info     - 20201206090639]: Checking file D:\Controller\Binaries\..\Sources\Includes\Includes.ahk for modification
+[Info     - 20201206090639]: Checking file D:\Controller\Binaries\..\Sources\Includes\Variables.ahk for modification
+[Info     - 20201206090639]: Checking all files in D:\Controller\Binaries\..\Sources\Startup\Libraries\
+[Info     - 20201206090639]: Checking file D:\Controller\Binaries\..\Sources\Startup\Libraries\Configuration Editor.ahk for modification
+[Info     - 20201206090639]: Building Simulator Startup
+[Info     - 20201206090639]: Checking all files in D:\Controller\Binaries\..\Sources\Includes\
+[Info     - 20201206090639]: Checking file D:\Controller\Binaries\..\Sources\Includes\Classes.ahk for modification
+[Info     - 20201206090639]: Checking file D:\Controller\Binaries\..\Sources\Includes\Constants.ahk for modification
+[Info     - 20201206090639]: Checking file D:\Controller\Binaries\..\Sources\Includes\Functions.ahk for modification
+[Info     - 20201206090639]: Checking file D:\Controller\Binaries\..\Sources\Includes\Includes.ahk for modification
+[Info     - 20201206090639]: Checking file D:\Controller\Binaries\..\Sources\Includes\Variables.ahk for modification
+[Info     - 20201206090639]: Checking all files in D:\Controller\Binaries\..\Sources\Startup\Libraries\
+[Info     - 20201206090639]: Checking file D:\Controller\Binaries\..\Sources\Startup\Libraries\Configuration Editor.ahk for modification
+[Info     - 20201206090640]: Building Simulator Setup
+[Info     - 20201206090640]: Checking all files in D:\Controller\Binaries\..\Sources\Includes\
+[Info     - 20201206090640]: Checking file D:\Controller\Binaries\..\Sources\Includes\Classes.ahk for modification
+[Info     - 20201206090640]: Checking file D:\Controller\Binaries\..\Sources\Includes\Constants.ahk for modification
+[Info     - 20201206090640]: Checking file D:\Controller\Binaries\..\Sources\Includes\Functions.ahk for modification
+[Info     - 20201206090640]: Checking file D:\Controller\Binaries\..\Sources\Includes\Includes.ahk for modification
+[Info     - 20201206090640]: Checking file D:\Controller\Binaries\..\Sources\Includes\Variables.ahk for modification
+[Critical - 20201206120756]: ---------------------------------------------------------------
+[Critical - 20201206120756]:                  Running Simulator Tools
+[Critical - 20201206120756]: ---------------------------------------------------------------
+[Info     - 20201206120759]: Cleaning *.bak Files
+[Info     - 20201206120800]: Building Simulator Controller
+[Info     - 20201206120800]: Simulator Controller or dependent files out of date - needs recompile
+[Info     - 20201206120800]: Compiling D:\Controller\Binaries\..\Sources\Controller\Simulator Controller.ahk
+[Info     - 20201206120804]: Building Simulator Configuration
+[Info     - 20201206120804]: Checking all files in D:\Controller\Binaries\..\Sources\Includes\
+[Info     - 20201206120804]: Checking file D:\Controller\Binaries\..\Sources\Includes\Classes.ahk for modification
+[Info     - 20201206120804]: Checking file D:\Controller\Binaries\..\Sources\Includes\Constants.ahk for modification
+[Info     - 20201206120804]: Checking file D:\Controller\Binaries\..\Sources\Includes\Functions.ahk for modification
+[Info     - 20201206120804]: Checking file D:\Controller\Binaries\..\Sources\Includes\Includes.ahk for modification
+[Info     - 20201206120804]: Checking file D:\Controller\Binaries\..\Sources\Includes\Variables.ahk for modification
+[Info     - 20201206120804]: Checking all files in D:\Controller\Binaries\..\Sources\Startup\Libraries\
+[Info     - 20201206120804]: Checking file D:\Controller\Binaries\..\Sources\Startup\Libraries\Configuration Editor.ahk for modification
+[Info     - 20201206120804]: Building Simulator Startup
+[Info     - 20201206120804]: Checking all files in D:\Controller\Binaries\..\Sources\Includes\
+[Info     - 20201206120804]: Checking file D:\Controller\Binaries\..\Sources\Includes\Classes.ahk for modification
+[Info     - 20201206120804]: Checking file D:\Controller\Binaries\..\Sources\Includes\Constants.ahk for modification
+[Info     - 20201206120804]: Checking file D:\Controller\Binaries\..\Sources\Includes\Functions.ahk for modification
+[Info     - 20201206120804]: Checking file D:\Controller\Binaries\..\Sources\Includes\Includes.ahk for modification
+[Info     - 20201206120804]: Checking file D:\Controller\Binaries\..\Sources\Includes\Variables.ahk for modification
+[Info     - 20201206120804]: Checking all files in D:\Controller\Binaries\..\Sources\Startup\Libraries\
+[Info     - 20201206120804]: Checking file D:\Controller\Binaries\..\Sources\Startup\Libraries\Configuration Editor.ahk for modification
+[Info     - 20201206120804]: Building Simulator Setup
+[Info     - 20201206120804]: Checking all files in D:\Controller\Binaries\..\Sources\Includes\
+[Info     - 20201206120804]: Checking file D:\Controller\Binaries\..\Sources\Includes\Classes.ahk for modification
+[Info     - 20201206120804]: Checking file D:\Controller\Binaries\..\Sources\Includes\Constants.ahk for modification
+[Info     - 20201206120804]: Checking file D:\Controller\Binaries\..\Sources\Includes\Functions.ahk for modification
+[Info     - 20201206120804]: Checking file D:\Controller\Binaries\..\Sources\Includes\Includes.ahk for modification
+[Info     - 20201206120804]: Checking file D:\Controller\Binaries\..\Sources\Includes\Variables.ahk for modification
+[Critical - 20201206121145]: ---------------------------------------------------------------
+[Critical - 20201206121145]:                  Running Simulator Tools
+[Critical - 20201206121145]: ---------------------------------------------------------------
+[Info     - 20201206121148]: Cleaning *.bak Files
+[Info     - 20201206121149]: Building Simulator Controller
+[Info     - 20201206121149]: Checking all files in D:\Controller\Binaries\..\Sources\Includes\
+[Info     - 20201206121149]: Checking file D:\Controller\Binaries\..\Sources\Includes\Classes.ahk for modification
+[Info     - 20201206121149]: Checking file D:\Controller\Binaries\..\Sources\Includes\Constants.ahk for modification
+[Info     - 20201206121149]: Checking file D:\Controller\Binaries\..\Sources\Includes\Functions.ahk for modification
+[Info     - 20201206121149]: Checking file D:\Controller\Binaries\..\Sources\Includes\Includes.ahk for modification
+[Info     - 20201206121149]: Checking file D:\Controller\Binaries\..\Sources\Includes\Variables.ahk for modification
+[Info     - 20201206121149]: Checking all files in D:\Controller\Binaries\..\Sources\Controller\Plugins\
+[Info     - 20201206121149]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\AC Plugin.ahk for modification
+[Info     - 20201206121149]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\ACC Plugin.ahk for modification
+[Info     - 20201206121149]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\ButtonBox Plugin.ahk for modification
+[Info     - 20201206121149]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\Core Plugin.ahk for modification
+[Info     - 20201206121149]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\Motion Feedback Plugin.ahk for modification
+[Info     - 20201206121149]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\Plugins.ahk for modification
+[Info     - 20201206121149]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\RST Plugin.ahk for modification
+[Info     - 20201206121149]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\System Plugin.ahk for modification
+[Info     - 20201206121149]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\Tactile Feedback Plugin.ahk for modification
+[Info     - 20201206121149]: Building Simulator Configuration
+[Info     - 20201206121149]: Checking all files in D:\Controller\Binaries\..\Sources\Includes\
+[Info     - 20201206121149]: Checking file D:\Controller\Binaries\..\Sources\Includes\Classes.ahk for modification
+[Info     - 20201206121149]: Checking file D:\Controller\Binaries\..\Sources\Includes\Constants.ahk for modification
+[Info     - 20201206121149]: Checking file D:\Controller\Binaries\..\Sources\Includes\Functions.ahk for modification
+[Info     - 20201206121149]: Checking file D:\Controller\Binaries\..\Sources\Includes\Includes.ahk for modification
+[Info     - 20201206121149]: Checking file D:\Controller\Binaries\..\Sources\Includes\Variables.ahk for modification
+[Info     - 20201206121149]: Checking all files in D:\Controller\Binaries\..\Sources\Startup\Libraries\
+[Info     - 20201206121149]: Checking file D:\Controller\Binaries\..\Sources\Startup\Libraries\Configuration Editor.ahk for modification
+[Info     - 20201206121149]: Building Simulator Startup
+[Info     - 20201206121149]: Checking all files in D:\Controller\Binaries\..\Sources\Includes\
+[Info     - 20201206121149]: Checking file D:\Controller\Binaries\..\Sources\Includes\Classes.ahk for modification
+[Info     - 20201206121149]: Checking file D:\Controller\Binaries\..\Sources\Includes\Constants.ahk for modification
+[Info     - 20201206121149]: Checking file D:\Controller\Binaries\..\Sources\Includes\Functions.ahk for modification
+[Info     - 20201206121149]: Checking file D:\Controller\Binaries\..\Sources\Includes\Includes.ahk for modification
+[Info     - 20201206121149]: Checking file D:\Controller\Binaries\..\Sources\Includes\Variables.ahk for modification
+[Info     - 20201206121149]: Checking all files in D:\Controller\Binaries\..\Sources\Startup\Libraries\
+[Info     - 20201206121149]: Checking file D:\Controller\Binaries\..\Sources\Startup\Libraries\Configuration Editor.ahk for modification
+[Info     - 20201206121149]: Building Simulator Setup
+[Info     - 20201206121149]: Checking all files in D:\Controller\Binaries\..\Sources\Includes\
+[Info     - 20201206121149]: Checking file D:\Controller\Binaries\..\Sources\Includes\Classes.ahk for modification
+[Info     - 20201206121149]: Checking file D:\Controller\Binaries\..\Sources\Includes\Constants.ahk for modification
+[Info     - 20201206121149]: Checking file D:\Controller\Binaries\..\Sources\Includes\Functions.ahk for modification
+[Info     - 20201206121149]: Checking file D:\Controller\Binaries\..\Sources\Includes\Includes.ahk for modification
+[Info     - 20201206121149]: Checking file D:\Controller\Binaries\..\Sources\Includes\Variables.ahk for modification

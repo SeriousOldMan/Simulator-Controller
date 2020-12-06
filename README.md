@@ -7,7 +7,9 @@ Simulator Controller is a modular and extandable adminstration and controller ap
   - Connect all your external controller, like button boxes, to one single center of control
   - Configurable, visual feedback for your controller actions
     - Define your own button box layout and integrate it with the Simulator Controller using the simple plugin support
+    
     ![](./Resources/DocumentationImages/Button%20Box%202.JPG)
+    
     - Code your own functions to be called by the controller buttons and switches using the simple, object-oriented scripting language
   - Configure all additional applications to your taste, including the games used for your virtual races
     - Add splash screens and title melodies

@@ -1,13 +1,12 @@
 # Simulator Controller
 
-
 Simulator Controller is a modular and extandable adminstration and controller application for complex Sim Racing Rigs. At the core is a comprehensive plugin capable automation framework, which can use almost any external controller hardware, such as button boxes, to control typical simulator components such as SimHub, SimFeedback and alike. But there are a lot more functionality and features available to make the life of all of us virtual racers even more fun and simple.
 
 ### Main features
 
   - Connect all your external controller, like button boxes, to one single center of control
   - Configurable, visual feedback for your controller actions
-    - Define your own button box layout ([Resources/DocumentationImages/Button Box 1.jpg], [Resources/DocumentationImages/Button Box 2.jpg]) and integrate it with the Simulator Controller using the simple plugin support
+    - Define your own button box layout ([Sample 1](https://github.com/SeriousOldMen/Simulator-Controller/blob/main/Resources/DocumentationImages/Button%20Box%201.JPG), [Sample 2](https://github.com/SeriousOldMen/Simulator-Controller/blob/main/Resources/DocumentationImages/Button%20Box%202.JPG)) and integrate it with the Simulator Controller using the simple plugin support
     - Code your own functions to be called by the controller buttons and switches using the simple, object-oriented scripting language
   - Configure all additional applications to your taste, including the games used for your virtual races
     - Add splash screens and title melodies
@@ -25,14 +24,13 @@ Simulator Controller is fully implemented in AutoHotkey, a very sophisticated an
 
   - Automated build tool for developers
   - Sophisticated logging, tracing and debug support to track down any errors, when developing your own plugins
-  - Fully graphical setup and configuration utilities ([Resources/DocumentationImages/Setup Tool.jpg], [Resources/DocumentationImages/Configuration Tool.jpg])
+  - Fully graphical setup and configuration utilities ([Setup Tool](https://github.com/SeriousOldMen/Simulator-Controller/blob/main/Resources/DocumentationImages/Setup%20Tool.JPG), [Configuration Tool](https://github.com/SeriousOldMen/Simulator-Controller/blob/main/Resources/DocumentationImages/Configuration%20Tool.JPG))
 
 ### Documentation
 
-Coming soon. In the meantime use all the given goodies, especially the very large sample configuration as a staring point.
+Coming soon. In the meantime use all the given goodies, especially the very large sample configuration as a starting point.
 
 ### Included Plugins
-
 
 | Plugin | Description |
 | ------ | ------ |
@@ -55,8 +53,6 @@ Want to contribute? Great!
 
   - Found a bug, or even built a new feature. Even better. Please contact me, and I will give you access to the code repository.
 
-
-
 ### Todos
 
  - Add full documentation Wiki
@@ -65,6 +61,5 @@ License
 ----
 
 (2020) Creative Commons - BY-NC-SA - by Oliver Juwig (TheBigO)
-
 
 **Free Software, Hell Yeah!**

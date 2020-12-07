@@ -6,7 +6,7 @@ Simulator Controller is a modular and extandable adminstration and controller ap
 
 If you find this tool useful, please help me with the further development. Any donation contributed will be used only to support the project.
 
-<div style="text-align:center">[![](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/donate?hosted_button_id=7GV86ZPS95SL6)</div>
+[![](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/donate?hosted_button_id=7GV86ZPS95SL6)
 
 Thank you very much for your support!
 

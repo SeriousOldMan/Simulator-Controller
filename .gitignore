@@ -1,4 +1,4 @@
-Logs/*.txt
-Binaries/*.exe
+Logs/*.*
+Binaries/*.*
 desktop.ini
 

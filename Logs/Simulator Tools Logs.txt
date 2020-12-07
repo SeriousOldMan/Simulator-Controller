@@ -390,3 +390,49 @@
 [Info     - 20201206121149]: Checking file D:\Controller\Binaries\..\Sources\Includes\Functions.ahk for modification
 [Info     - 20201206121149]: Checking file D:\Controller\Binaries\..\Sources\Includes\Includes.ahk for modification
 [Info     - 20201206121149]: Checking file D:\Controller\Binaries\..\Sources\Includes\Variables.ahk for modification
+[Critical - 20201207042017]: ---------------------------------------------------------------
+[Critical - 20201207042017]:                  Running Simulator Tools
+[Critical - 20201207042017]: ---------------------------------------------------------------
+[Info     - 20201207042020]: Cleaning *.bak Files
+[Info     - 20201207042021]: Building Simulator Controller
+[Info     - 20201207042021]: Checking all files in D:\Controller\Binaries\..\Sources\Includes\
+[Info     - 20201207042021]: Checking file D:\Controller\Binaries\..\Sources\Includes\Classes.ahk for modification
+[Info     - 20201207042021]: Checking file D:\Controller\Binaries\..\Sources\Includes\Constants.ahk for modification
+[Info     - 20201207042021]: Checking file D:\Controller\Binaries\..\Sources\Includes\Functions.ahk for modification
+[Info     - 20201207042021]: Checking file D:\Controller\Binaries\..\Sources\Includes\Includes.ahk for modification
+[Info     - 20201207042021]: Checking file D:\Controller\Binaries\..\Sources\Includes\Variables.ahk for modification
+[Info     - 20201207042021]: Checking all files in D:\Controller\Binaries\..\Sources\Controller\Plugins\
+[Info     - 20201207042021]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\AC Plugin.ahk for modification
+[Info     - 20201207042021]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\ACC Plugin.ahk for modification
+[Info     - 20201207042021]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\ButtonBox Plugin.ahk for modification
+[Info     - 20201207042021]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\Core Plugin.ahk for modification
+[Info     - 20201207042021]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\Motion Feedback Plugin.ahk for modification
+[Info     - 20201207042021]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\Plugins.ahk for modification
+[Info     - 20201207042021]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\RST Plugin.ahk for modification
+[Info     - 20201207042021]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\System Plugin.ahk for modification
+[Info     - 20201207042021]: Checking file D:\Controller\Binaries\..\Sources\Controller\Plugins\Tactile Feedback Plugin.ahk for modification
+[Info     - 20201207042021]: Building Simulator Configuration
+[Info     - 20201207042021]: Checking all files in D:\Controller\Binaries\..\Sources\Includes\
+[Info     - 20201207042021]: Checking file D:\Controller\Binaries\..\Sources\Includes\Classes.ahk for modification
+[Info     - 20201207042021]: Checking file D:\Controller\Binaries\..\Sources\Includes\Constants.ahk for modification
+[Info     - 20201207042021]: Checking file D:\Controller\Binaries\..\Sources\Includes\Functions.ahk for modification
+[Info     - 20201207042021]: Checking file D:\Controller\Binaries\..\Sources\Includes\Includes.ahk for modification
+[Info     - 20201207042021]: Checking file D:\Controller\Binaries\..\Sources\Includes\Variables.ahk for modification
+[Info     - 20201207042021]: Checking all files in D:\Controller\Binaries\..\Sources\Startup\Libraries\
+[Info     - 20201207042021]: Checking file D:\Controller\Binaries\..\Sources\Startup\Libraries\Configuration Editor.ahk for modification
+[Info     - 20201207042021]: Building Simulator Startup
+[Info     - 20201207042021]: Checking all files in D:\Controller\Binaries\..\Sources\Includes\
+[Info     - 20201207042021]: Checking file D:\Controller\Binaries\..\Sources\Includes\Classes.ahk for modification
+[Info     - 20201207042021]: Checking file D:\Controller\Binaries\..\Sources\Includes\Constants.ahk for modification
+[Info     - 20201207042021]: Checking file D:\Controller\Binaries\..\Sources\Includes\Functions.ahk for modification
+[Info     - 20201207042021]: Checking file D:\Controller\Binaries\..\Sources\Includes\Includes.ahk for modification
+[Info     - 20201207042021]: Checking file D:\Controller\Binaries\..\Sources\Includes\Variables.ahk for modification
+[Info     - 20201207042021]: Checking all files in D:\Controller\Binaries\..\Sources\Startup\Libraries\
+[Info     - 20201207042021]: Checking file D:\Controller\Binaries\..\Sources\Startup\Libraries\Configuration Editor.ahk for modification
+[Info     - 20201207042022]: Building Simulator Setup
+[Info     - 20201207042022]: Checking all files in D:\Controller\Binaries\..\Sources\Includes\
+[Info     - 20201207042022]: Checking file D:\Controller\Binaries\..\Sources\Includes\Classes.ahk for modification
+[Info     - 20201207042022]: Checking file D:\Controller\Binaries\..\Sources\Includes\Constants.ahk for modification
+[Info     - 20201207042022]: Checking file D:\Controller\Binaries\..\Sources\Includes\Functions.ahk for modification
+[Info     - 20201207042022]: Checking file D:\Controller\Binaries\..\Sources\Includes\Includes.ahk for modification
+[Info     - 20201207042022]: Checking file D:\Controller\Binaries\..\Sources\Includes\Variables.ahk for modification

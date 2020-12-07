@@ -15,12 +15,12 @@ Thank you very much for your support!
   - Connect all your external controller, like button boxes, to one single center of control
     - Define an unlimited number of collections of functions and actions, call modes, for your controller. Switch between modes simply by pushing a button or switch a toggle on your controller. Here is an example of several layers of functions and actions cobined in five modes:
 	
-	![](./Resources/Documentation\ Images/Button%20Box%20Layout.png)
+	![](./Resources/Documentation%20Images/Button%20Box%20Layout.png)
 	
   - Configurable, visual feedback for your controller actions
     - Define your own button box visual and integrate it with the Simulator Controller using the simple plugin support. Depending on configuration, this window will popup whenever an action is triggered from your controller, even during active simulation
     
-    ![](./Resources/Documentation\ Images/Button%20Box%202.JPG)
+    ![](./Resources/Documentation%20Images/Button%20Box%202.JPG)
     
     - Code your own functions to be called by the controller buttons and switches using the simple, object-oriented scripting language
   - Configure all additional applications to your taste, including the simulation games used for your virtual races
@@ -42,7 +42,7 @@ Simulator Controller is fully implemented in AutoHotkey, a very sophisticated an
   - Sophisticated logging, tracing and debug support to track down any errors, when developing your own plugins
   - Fully graphical setup and configuration utilities
   
-  ![](./Resources/Documentation\ Images/Setup%20Tool.JPG) ![](./Resources/Documentation\ Images/Configuration%20Tool.JPG)
+  ![](./Resources/Documentation%20Images/Setup%20Tool.JPG) ![](./Resources/Documentation%20Images/Configuration%20Tool.JPG)
 
 ### Included Plugins
 

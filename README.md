@@ -14,16 +14,22 @@ Thank you very much for your support!
 
 Download one of the builds below and unzip anywhere you like. Then run the setup tool available in the Binaries folder and configure your environment. AutoHotkey is not necessary if you are not building your own plugins, but you need an understanding of the Hotkey syntax to bind your controller hardware to the plugin functions and actions using the setup tool. For convience, place links to **Simulator Startup** and **Simulator Configuration** in the Windows Start Menu. You can also configure the software to automatically start with Windows using the setup tool.
 
-Latest stable build:      1.0.0 (will be available soon)
-Latest development build: [0.9.1-alpha](https://www.dropbox.com/s/sxdkktw7prt5lpi/Simulator%20Controller%200.9.1a.zip?dl=1)
+#### Latest development build
+
+[0.9.1-alpha](https://www.dropbox.com/s/sxdkktw7prt5lpi/Simulator%20Controller%200.9.1a.zip?dl=1)
+
+#### Latest stable build
+
+**Will be available soon**
 
 ### Main features
 
   - Connect all your external controller, like button boxes, to one single center of control
-    - Define an unlimited number of collections of functions and actions, call modes, for your controller. Switch between modes simply by pushing a button or switch a toggle on your controller. Here is an example of several layers of functions and actions cobined in five modes:
+    - An unlimited number of layers of functions and actions, called modes, can be defined for your controller. Switch between modes simply by pushing a button or switch a toggle on your controller. Here is an example of several layers of functions and actions combined in five modes:
 	
 	![](./Resources/Documentation%20Images/Button%20Box%20Layout.png)
 	
+	- Modes are defined and handled by plugins, which can be implemented using an objecct oriented scripting language.
   - Configurable, visual feedback for your controller actions
     - Define your own button box visual and integrate it with the Simulator Controller using the simple plugin support. Depending on configuration, this window will popup whenever an action is triggered from your controller, even during active simulation
     

@@ -12,7 +12,7 @@ Thank you very much for your support!
 
 ### Download and Installation
 
-Download one of the builds below and unzip anywhere you like. Then run the setup tool available in the Binaries folder and configure your environment. AutoHotkey is not necessary if you are not building your own plugins, but you need an understanding of the Hotkey syntax to bind your controller hardware to the plugin functions and actions using the setup tool. For convience, place links to **Simulator Startup** and **Simulator Configuration** in the Windows Start Menu. You can also configure the software to automatically start with Windows using the setup tool.
+Download one of the builds below and unzip anywhere you like. Then run the setup tool available in the Binaries folder and configure your environment. AutoHotkey is not necessary, if you not want to create your own plugins, but you need an understanding of the Hotkey syntax to bind your controller hardware to the plugin functions and actions using the setup tool. For convience, place links to **Simulator Startup** and **Simulator Configuration** in the Windows Start Menu. You can also configure the software to automatically start with Windows using the setup tool.
 
 #### Latest development build
 
@@ -20,7 +20,7 @@ Download one of the builds below and unzip anywhere you like. Then run the setup
 
 #### Latest stable build
 
-**Will be available soon**
+*Will be available soon*
 
 ### Main features
 

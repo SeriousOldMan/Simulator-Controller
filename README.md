@@ -16,7 +16,7 @@ If you find this tool useful, please help me with the further development. Any d
 	![](./Resources/DocumentationImages/Button%20Box%20Layout.png)
 	
   - Configurable, visual feedback for your controller actions
-    - Define your own button box layout and integrate it with the Simulator Controller using the simple plugin support
+    - Define your own button box visual and integrate it with the Simulator Controller using the simple plugin support. Depending on configuration, this window will popup whenever an action is triggered from your controller, even during active simulation
     
     ![](./Resources/DocumentationImages/Button%20Box%202.JPG)
     

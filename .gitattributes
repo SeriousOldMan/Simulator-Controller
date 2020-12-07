@@ -1,6 +1,6 @@
 # Auto detect text files and perform LF normalization
 * text=auto
-Resources/Splash Images/Blancpain[[:space:]]2019.wav filter=lfs diff=lfs merge=lfs -text
-Resources/Splash Images/Blancpain[[:space:]]2019.gif filter=lfs diff=lfs merge=lfs -text
+Resources/Splash\ Images/Blancpain[[:space:]]2019.wav filter=lfs diff=lfs merge=lfs -text
+Resources/Splash\ Images/Blancpain[[:space:]]2019.gif filter=lfs diff=lfs merge=lfs -text
 Blancpain*.wav filter=lfs diff=lfs merge=lfs -text
 Blancpain*.gif filter=lfs diff=lfs merge=lfs -text

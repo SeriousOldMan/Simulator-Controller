@@ -405,6 +405,7 @@ runBuildTargets() {
 					
 					targetBinary := sourceDirectory . "\" . compiledFile
 					
+					FileCreateDir % SubStr(kBinariesDirectory, 1, StrLen(kBinariesDirectory) - 1)
 					FileMove %targetBinary%, %kBinariesDirectory%, 1
 				}
 				else

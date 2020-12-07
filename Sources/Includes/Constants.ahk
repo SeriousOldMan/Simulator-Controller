@@ -20,7 +20,7 @@ global kConfigDirectory = A_ScriptDir . (A_IsCompiled ? "\..\Config\" : "\..\..\
 global kLogsDirectory = A_ScriptDir . (A_IsCompiled ? "\..\Logs\" : "\..\..\Logs\")
 
 global kSplashImagesDirectory = kResourcesDirectory . "Splash Images\"
-global kButtonBoxImagesDirectory = kResourcesDirectory . "ButtonBox Images\"
+global kButtonBoxImagesDirectory = kResourcesDirectory . "Button Box Images\"
 global kIconsDirectory = kResourcesDirectory . "Icons\"
 
 global kSimulatorConfigurationFile = kConfigDirectory . "Simulator Configuration.ini"

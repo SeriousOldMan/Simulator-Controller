@@ -154,13 +154,13 @@ class SimulatorStartup extends ConfigurationItem {
 	
 	updateSplash(runningIndex) {
 		if (!kSilentMode && !kSplashVideo)
-			if (runningIndex == 2)
+			if (runningIndex == 1)
 				showSplash("Porsche 911 GT3.jpg")
-			else if (runningIndex == 4)
+			else if (runningIndex == 2)
 				showSplash("McLaren 720s GT3.jpg")
-			else if (runningIndex == 6)
+			else if (runningIndex == 4)
 				showSplash("Lamborghini Huracan Evo GT3.jpg")
-			else if (runningIndex == 8)
+			else if (runningIndex == 5)
 				showSplash("Mercedes AMG GT3.jpg")
 	}
 	
@@ -278,6 +278,9 @@ class SimulatorStartup extends ConfigurationItem {
 ;;;-------------------------------------------------------------------------;;;
 
 startSimulator() {
+	if !(FileExist(kSplashImagesDirectory . "Blancpain 2019.gif"))
+		kSplashVideo := false
+	
 	icon := kIconsDirectory . "Start.ico"
 		
 	Menu Tray, Icon, %icon%, , 1

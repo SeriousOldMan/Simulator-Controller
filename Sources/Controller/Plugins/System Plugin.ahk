@@ -287,9 +287,16 @@ class SystemPlugin extends ControllerPlugin {
 	
 	playStartupSong() {
 		if (!kSilentMode && !this.iStartupSongIsPlaying) {
-			SoundPlay % kSplashImagesDirectory . "Blancpain 2019.wav"
+			try {
+				if FileExist(kSplashImagesDirectory . "Blancpain 2019.wav") {
+					SoundPlay % kSplashImagesDirectory . "Blancpain 2019.wav"
 			
-			this.iStartupSongIsPlaying := true
+					this.iStartupSongIsPlaying := true
+				}
+			}
+			catch exception {
+				; Ignore
+			}
 		}
 	}
 	

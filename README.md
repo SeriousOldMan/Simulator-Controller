@@ -8,6 +8,8 @@ If you find this tool useful, please help me with the further development. Any d
 
 [![](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/donate?hosted_button_id=7GV86ZPS95SL6)
 
+Thank you very much for your support!
+
 ### Main features
 
   - Connect all your external controller, like button boxes, to one single center of control

@@ -11,7 +11,7 @@ If you find this tool useful, please help me with the further development. Any d
 ### Main features
 
   - Connect all your external controller, like button boxes, to one single center of control
-    - Define an unlimited number of collections of functions and actions, call modes, for your controller. Switch between modes simply by pushing a button or switch a toggle on your controller
+    - Define an unlimited number of collections of functions and actions, call modes, for your controller. Switch between modes simply by pushing a button or switch a toggle on your controller. Here is an example of several layers of functions and actions cobined in five modes:
 	
 	![](./Resources/DocumentationImages/Button%20Box%20Layout.png)
 	

@@ -78,7 +78,11 @@ Coming soon. In the meantime use all the given goodies, especially the very larg
 
 ### Installation
 
-Download the complete package and unzip anywhere you like. Then run the setup tool available in the Binaries folder and configure your environment. AutoHotkey is not necessary if you are not building your own plugins, but you need an understanding of the Hotkey syntax to bind your controller hardware to the plugin functions and actions using the setup tool. 
+Download the complete package and unzip anywhere you like. Then run the setup tool available in the Binaries folder and configure your environment. AutoHotkey is not necessary if you are not building your own plugins, but you need an understanding of the Hotkey syntax to bind your controller hardware to the plugin functions and actions using the setup tool.
+
+### Known issues
+
+1. Sometimes, the ingame sound volume is not correctly resetted after playing the startup melody. In those situations, you can use the mixer utility of Windows to bring the volume back up.
 
 ### Development
 

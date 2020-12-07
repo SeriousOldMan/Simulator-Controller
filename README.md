@@ -1,6 +1,6 @@
 # Simulator Controller
 
-Simulator Controller is a modular and extandable adminstration and controller application for complex Sim Racing Rigs. At the core is a comprehensive plugin capable automation framework, which can use almost any external controller hardware, such as button boxes, to control typical simulator components such as SimHub, SimFeedback and alike. But there are a lot more functionality and features available to make the life of all of us virtual racers even more fun and simple.
+Simulator Controller is a modular and extandable adminstration and controller application for complex Sim Racing Rigs. At the core is a comprehensive plugin capable automation framework, which can use almost any external controller hardware, such as button boxes, to control typical simulator components such as SimHub, SimFeedback and alike. But there are a lot more functionality and features available to make the life of all of us virtual racers even more fun and simple. You will find a comprehensive overwiew of all features later in this document, but first things first...
 
 ### Donation
 
@@ -9,6 +9,10 @@ If you find this tool useful, please help me with the further development. Any d
 [![](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/donate?hosted_button_id=7GV86ZPS95SL6)
 
 Thank you very much for your support!
+
+### Download and Installation
+
+[Download](https://www.dropbox.com/s/sxdkktw7prt5lpi/Simulator%20Controller%200.9.1a.zip?dl=0) the latest stable release build and unzip anywhere you like. Then run the setup tool available in the Binaries folder and configure your environment. AutoHotkey is not necessary if you are not building your own plugins, but you need an understanding of the Hotkey syntax to bind your controller hardware to the plugin functions and actions using the setup tool. For convience, place links to **Simulator Startup** and **Simulator Configuration** in the Windows Start Menu. You can also configure the software to automatically start with Windows using the setup tool.
 
 ### Main features
 
@@ -75,10 +79,6 @@ The following applications are not part of the distribution and are not strictly
 ### Documentation
 
 Coming soon. In the meantime use all the given goodies, especially the very large sample configuration as a starting point.
-
-### Installation
-
-Download the complete package and unzip anywhere you like. Then run the setup tool available in the Binaries folder and configure your environment. AutoHotkey is not necessary if you are not building your own plugins, but you need an understanding of the Hotkey syntax to bind your controller hardware to the plugin functions and actions using the setup tool.
 
 ### Known issues
 

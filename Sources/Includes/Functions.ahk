@@ -487,6 +487,9 @@ readConfiguration(configFile) {
 }
 
 writeConfiguration(configFile, configuration) {
+	SplitPath configFile, , directory
+	FileCreateDir %directory%
+		
 	for section, keyValues in configuration {
 		pairs := ""
 		

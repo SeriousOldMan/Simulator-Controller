@@ -33,7 +33,7 @@ class ConfigurationItem {
 	iConfiguration := false
 	
 	Configuration[] {
-        get {
+        Get {
             return this.iConfiguration
         }
     }
@@ -87,25 +87,25 @@ class Application extends ConfigurationItem {
 	iRunningPID := 0
 	
 	Application[] {
-        get {
+        Get {
             return this.iApplication
         }
     }
 	
 	ExePath[] {
-        get {
+        Get {
             return this.iExePath
         }
     }
 	
 	WorkingDirectory[] {
-        get {
+        Get {
             return this.iWorkingDirectory
         }
     }
 	
 	WindowTitle[] {
-        get {
+        Get {
             return this.iWindowTitle
         }
     }
@@ -129,7 +129,7 @@ class Application extends ConfigurationItem {
     }
 	
 	CurrentPID[] {
-		get {
+		Get {
 			return this.iRunningPID
 		}
 	}
@@ -268,9 +268,13 @@ class Application extends ConfigurationItem {
 	run(application, exePath, workingDirectory, options := "", wait := false) {
 		try {
 			if wait {
-				RunWait %exePath%, %workingDirectory%, %options%, pid
+				RunWait %exePath%, %workingDirectory%, %options%
+				
+				result := ErrorLevel
+				
+				logMessage(kLogInfo, "Application " . application . " executed with result code " . result)
 			
-				return ErrorLevel
+				return result
 			}
 			else {
 				Run %exePath%, %workingDirectory%, %options%, pid

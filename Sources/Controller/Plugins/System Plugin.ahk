@@ -408,6 +408,7 @@ muteSimulator() {
 		
 		mouseClicked(false)
 		
+		HotKey Escape, mouseClicked
 		HotKey ~LButton, mouseClicked
 	}
 }
@@ -415,8 +416,9 @@ muteSimulator() {
 unmuteSimulator() {
 	local plugin := SimulatorController.Instance.findPlugin(kSystemPlugin)
 	
-	if (plugin.MouseClicked || GetKeyState("LButton")) {
+	if (plugin.MouseClicked || GetKeyState("LButton") || GetKeyState("Escape")) {
 		HotKey ~LButton, Off
+		HotKey Escape, Off
 		
 		SetTimer unmuteSimulator, Off
 

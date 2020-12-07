@@ -4,9 +4,13 @@ Simulator Controller is a modular and extandable adminstration and controller ap
 
 ### Donation
 
-If you find this tool useful, please help me with the further development. Any donation contributed will be used only to support the project.
+If you find this tool useful, please help me with the further development. Any donation contributed will be used only to support the project. [Please donate with PayPal](https://www.paypal.com/donate?hosted_button_id=7GV86ZPS95SL6)].
 
-[[Donate using PayPal](https://www.paypal.com/donate?hosted_button_id=7GV86ZPS95SL6)]
+<form action="https://www.paypal.com/donate" method="post" target="_top">
+<input type="hidden" name="hosted_button_id" value="7GV86ZPS95SL6" />
+<input type="image" src="https://www.paypalobjects.com/en_US/DK/i/btn/btn_donateCC_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" />
+<img alt="" border="0" src="https://www.paypal.com/en_DE/i/scr/pixel.gif" width="1" height="1" />
+</form>
 
 ### Main features
 
@@ -58,13 +62,13 @@ The following applications are not part of the distribution and are not strictly
 
 | Application | Description |
 | ------ | ------ |
-| [[AutoHotkey](https://www.autohotkey.com/)] | [Development Only] Object oriented scripting language. You need it, if you want to develop your own plugins |
-| [[NirCmd](https://www.nirsoft.net/utils/nircmd.html)] | [Optional] Extended Windows command shell. Used by Simulator Controller to control ingame sound volume settings during startup. |
-| [[VoiceMacro](http://www.voicemacro.net/)] | [Optional] Connects to your microphone and translates voice commands to complex keyboard and/or mouse input. These macros can be connected to Simulator Controller as external input to control functions and actions identical to your hardware controller. |
-| [[AITrack](https://github.com/AIRLegend/aitrack)] | [Optional] Neat little tool which uses neural networks to detect your viewing angle on a dashcam video stream. Used in conjunction with opentrack to control your ingame viewing angle. |
-| [[opentrack](https://sourceforge.net/projects/opentrack.mirror/)] | [Optional] Connects to your simulation game and controls the viewing angle using the freetrack protocol. Several input methods are supported, sich as analog joysticks or UDP based sources such as AITrack. |
-| [[SimHub](https://www.simhubdash.com/)] | [Optional] Versatile, multipurpose software collection for simulation games. Generate vibration using bass shakers or vibration motors using a fully integrated Arduino development environment. Additional features support the definition of custom dashboards. |
-| [[SimFeedback](https://www.opensfx.com/)] | [Optional] Not only a software, but a complete DIY project for building motion rigs. SimFeedback controls the motion actuators using visual control curves, which translate the ingame physics data to complex and very fast rig movements. |
+| [AutoHotkey](https://www.autohotkey.com/) | [Development Only] Object oriented scripting language. You need it, if you want to develop your own plugins |
+| [NirCmd](https://www.nirsoft.net/utils/nircmd.html) | [Optional] Extended Windows command shell. Used by Simulator Controller to control ingame sound volume settings during startup. |
+| [VoiceMacro](http://www.voicemacro.net/) | [Optional] Connects to your microphone and translates voice commands to complex keyboard and/or mouse input. These macros can be connected to Simulator Controller as external input to control functions and actions identical to your hardware controller. |
+| [AITrack](https://github.com/AIRLegend/aitrack) | [Optional] Neat little tool which uses neural networks to detect your viewing angle on a dashcam video stream. Used in conjunction with opentrack to control your ingame viewing angle. |
+| [opentrack](https://sourceforge.net/projects/opentrack.mirror/) | [Optional] Connects to your simulation game and controls the viewing angle using the freetrack protocol. Several input methods are supported, sich as analog joysticks or UDP based sources such as AITrack. |
+| [SimHub](https://www.simhubdash.com/) | [Optional] Versatile, multipurpose software collection for simulation games. Generate vibration using bass shakers or vibration motors using a fully integrated Arduino development environment. Additional features support the definition of custom dashboards. |
+| [SimFeedback](https://www.opensfx.com/) | [Optional] Not only a software, but a complete DIY project for building motion rigs. SimFeedback controls the motion actuators using visual control curves, which translate the ingame physics data to complex and very fast rig movements. |
 
 
 ### Documentation

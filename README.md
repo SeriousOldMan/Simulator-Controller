@@ -12,7 +12,7 @@ Thank you very much for your support!
 
 ### Download and Installation
 
-[Download](https://www.dropbox.com/s/sxdkktw7prt5lpi/Simulator%20Controller%200.9.1a.zip?dl=0) the latest stable release build and unzip anywhere you like. Then run the setup tool available in the Binaries folder and configure your environment. AutoHotkey is not necessary if you are not building your own plugins, but you need an understanding of the Hotkey syntax to bind your controller hardware to the plugin functions and actions using the setup tool. For convience, place links to **Simulator Startup** and **Simulator Configuration** in the Windows Start Menu. You can also configure the software to automatically start with Windows using the setup tool.
+[Download](https://www.dropbox.com/s/sxdkktw7prt5lpi/Simulator%20Controller%200.9.1a.zip?dl=1) the latest stable release build and unzip anywhere you like. Then run the setup tool available in the Binaries folder and configure your environment. AutoHotkey is not necessary if you are not building your own plugins, but you need an understanding of the Hotkey syntax to bind your controller hardware to the plugin functions and actions using the setup tool. For convience, place links to **Simulator Startup** and **Simulator Configuration** in the Windows Start Menu. You can also configure the software to automatically start with Windows using the setup tool.
 
 ### Main features
 

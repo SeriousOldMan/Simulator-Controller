@@ -100,7 +100,7 @@ Want to contribute? Great!
 
   - Build your own plugins and  offer them on GitHub. Contact me and I will add a link to your plugin in this documentation.
 
-  - Found a bug, or even built a new feature. Even better. Please contact me, and I will give you access to the code repository.
+  - Found a bug, or built a new feature? Even better. Please contact me, and I will give you access to the code repository.
 
 ### Todos
 

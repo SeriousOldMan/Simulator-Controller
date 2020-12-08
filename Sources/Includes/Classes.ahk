@@ -690,7 +690,7 @@ class Plugin extends ConfigurationItem {
 	}
 	
 	getArgumentValue(argument, default := false) {
-		if this.Arguments.HasKey(argument) {
+		if this.hasArgument(argument) {
 			arguments := this.Arguments
 		
 			return arguments[argument]

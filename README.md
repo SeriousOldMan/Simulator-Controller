@@ -1,6 +1,6 @@
 # Simulator Controller
 
-Simulator Controller is a modular and extandable adminstration and controller application for complex Sim Racing Rigs. At the core is a comprehensive plugin capable automation framework, which can use almost any external controller hardware, such as button boxes, to control typical simulator components such as SimHub, SimFeedback and alike. But there are a lot more functionality and features available to make the life of all of us virtual racers even more fun and simple. You will find a comprehensive overwiew of all features later in this document, but first things first...
+Simulator Controller is a modular and extandable adminstration and controller application for complex Sim Racing Rigs. At the core is a comprehensive plugin capable automation framework, which can use almost any external controller hardware, such as button boxes, to control typical simulator components such as SimHub, SimFeedback and alike. But there are a lot more functionality and features available to make the life of all of us virtual racers even more fun and simple. You will find a [comprehensive overwiew](https://github.com/SeriousOldMan/Simulator-Controller#main-features) of all features later in this document, but first things first...
 
 ### Donation
 
@@ -30,14 +30,14 @@ For further convinience, you can place links to **Simulator Startup** and **Simu
 	
 	![](./Resources/Documentation%20Images/Button%20Box%20Layout.png)
 	
-	- Modes are defined and handled by plugins, which can be implemented using an objecct oriented scripting language.
+	- Modes are defined and handled by [plugins](https://github.com/SeriousOldMan/Simulator-Controller#included-plugins), which can be implemented using an objecct oriented scripting language.
   - Configurable, visual feedback for your controller actions
     - Define your own button box visual and integrate it with the Simulator Controller using the simple plugin support. Depending on configuration, this window will popup whenever an action is triggered from your controller, even during active simulation
     
     ![](./Resources/Documentation%20Images/Button%20Box%202.JPG)
     
     - Code your own functions to be called by the controller buttons and switches using the simple, object-oriented scripting language
-  - Configure all additional applications to your taste, including the simulation games used for your virtual races
+  - Configure all additional [applications](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications) to your taste, including the simulation games used for your virtual races
     - Start and stop applications from your controller hardware or automatically upon configurable events
     - Add splash screens and title melodies for a more emotional startup experience
     - Fully support for sophisticated application automation - for example, start your favorite voice chat software like TeamSpeak and automatically switch to your standard channel 

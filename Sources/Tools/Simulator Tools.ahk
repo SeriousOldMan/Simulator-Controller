@@ -259,7 +259,7 @@ editTargets(command := "") {
 		Gui TE:Font, Norm, Arial
 		Gui TE:Font, Italic, Arial
 	
-		Gui TE:Add, GroupBox, YP+30 w220 h120, Cleanup
+		Gui TE:Add, GroupBox, YP+30 w220 h140, Cleanup
 	
 		Gui TE:Font, Norm, Arial
 	
@@ -273,7 +273,7 @@ editTargets(command := "") {
 		Gui TE:Font, Norm, Arial
 		Gui TE:Font, Italic, Arial
 	
-		Gui TE:Add, GroupBox, XP-10 YP+30 w220 h140, Compile
+		Gui TE:Add, GroupBox, XP-10 YP+30 w220 h120, Compile
 	
 		Gui TE:Font, Norm, Arial
 	

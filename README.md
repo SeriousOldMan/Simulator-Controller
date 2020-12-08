@@ -52,38 +52,38 @@ Simulator Controller is fully implemented in AutoHotkey, a very sophisticated an
 
 ### Additional features
 
-  - Automated build tool for developers
-  - Sophisticated logging, tracing and debug support to track down any errors, when developing your own plugins
+  - Configurable and automated build tool for developers
+  - Sophisticated logging, tracing and debug support to track down any errors while developing your own plugins
   - Fully graphical setup and configuration utilities
   
   ![](./Resources/Documentation%20Images/Configuration%20Tool.JPG) ![](./Resources/Documentation%20Images/Setup%20Tool.JPG)
 
 ### Included Plugins
 
-These plugins are part of the Simulator Controller distribution. Beside providing functionality to the core, they can be used as templates for building your own plugins. They range from very simple functional additions with only a small number of lines of code up to very complex, multi-class behemoths controlling external software such as SimHub.
+These plugins are part of the Simulator Controller distribution. Beside providing functionality to the core, they may be used as templates for building your own plugins. They range from very simple functional additions with only a small number of lines of code up to very complex, multi-class behemoths controlling external software such as SimHub.
 
 | Plugin | Description |
 | ------ | ------ |
-| System | Handles multiple button box pages and starting and stopping of all applications |
-| Tactile Feedback | Support for pedal and chassis vibration using SimHub |
-| Motion Feedback | Support for rig motion feedback using SimFeedback |
-| ACC | Support for staring and stopping Assetto Corsa Competizione |
-| AC | Support for staring and stopping Assetto Corsa |
-| Button Box | Tools for building your own button box visuals |
+| System | Handles multiple button box pages and starting and stopping of all applications. |
+| Tactile Feedback | Support for pedal and chassis vibration using SimHub. |
+| Motion Feedback | Support for rig motion feedback using SimFeedback. |
+| ACC | Support for starting and stopping Assetto Corsa Competizione. |
+| AC | Support for starting and stopping Assetto Corsa. |
+| Button Box | Tools for building your own button box visuals. An easy to understand example will help you building the screen representation of your own button boxes. |
 
 ### Third party applications
 
-The following applications are not part of the distribution and are not strictly necessary to use Simulator Controller. But Simulator Controller is aware of these components and will use them, if available.
+The following applications are not part of the distribution and are not strictly necessary for Simulator Controller. But Simulator Controller is aware of these components and will integrate them for a better overall experience, if available.
 
 | Application | Description |
 | ------ | ------ |
-| [AutoHotkey](https://www.autohotkey.com/) | [Development Only] Object oriented scripting language. You need it, if you want to develop your own plugins |
+| [AutoHotkey](https://www.autohotkey.com/) | [Development Only] Object oriented scripting language. You need it, if you want to develop your own plugins. |
 | [NirCmd](https://www.nirsoft.net/utils/nircmd.html) | [Optional] Extended Windows command shell. Used by Simulator Controller to control ingame sound volume settings during startup. |
 | [VoiceMacro](http://www.voicemacro.net/) | [Optional] Connects to your microphone and translates voice commands to complex keyboard and/or mouse input. These macros can be connected to Simulator Controller as external input to control functions and actions identical to your hardware controller. |
 | [AITrack](https://github.com/AIRLegend/aitrack) | [Optional] Neat little tool which uses neural networks to detect your viewing angle on a dashcam video stream. Used in conjunction with opentrack to control your ingame viewing angle. |
-| [opentrack](https://sourceforge.net/projects/opentrack.mirror/) | [Optional] Connects to your simulation game and controls the viewing angle using the freetrack protocol. Several input methods are supported, sich as analog joysticks or UDP based sources such as AITrack. |
-| [SimHub](https://www.simhubdash.com/) | [Optional] Versatile, multipurpose software collection for simulation games. Generate vibration using bass shakers or vibration motors using a fully integrated Arduino development environment. Additional features support the definition of custom dashboards. |
-| [SimFeedback](https://www.opensfx.com/) | [Optional] Not only a software, but a complete DIY project for building motion rigs. SimFeedback controls the motion actuators using visual control curves, which translate the ingame physics data to complex and very fast rig movements. |
+| [opentrack](https://sourceforge.net/projects/opentrack.mirror/) | [Optional] Connects to your simulation game and controls the viewing angle using the freetrack protocol. Several input methods are supported, for example analog joysticks or UDP based sources such as AITrack. |
+| [SimHub](https://www.simhubdash.com/) | [Optional] Versatile, multipurpose software collection for simulation games. Generate vibration using bass shakers or vibration motors using a fully integrated Arduino development environment. Additional features support the definition of custom dashboards. A special plugin is available to control the tactile feedback options of SimHub, such as vibration strength, with a touch of a button. |
+| [SimFeedback](https://www.opensfx.com/) | [Optional] Not only a software, but a complete DIY project for building motion rigs. SimFeedback controls the motion actuators using visual control curves, which translate the ingame physics data to complex and very fast rig movements. Here also, a plugin is available to use your controller for controlling SimFeedback. |
 
 
 ### Documentation

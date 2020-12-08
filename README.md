@@ -16,7 +16,7 @@ Download one of the builds below and unzip anywhere you like. Then run the setup
 
 #### Latest development build
 
-[0.9.1-alpha](https://www.dropbox.com/s/sxdkktw7prt5lpi/Simulator%20Controller%200.9.1a.zip?dl=1)
+[0.9.1-alpha](https://www.dropbox.com/s/v9m80hkprcegz6v/Simulator%20Controller%200.9.1a.zip?dl=1)
 
 #### Latest stable build
 

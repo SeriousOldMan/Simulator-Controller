@@ -529,13 +529,14 @@ class SimulatorController extends ConfigurationItem {
 		else if (this.iShowLogo && !this.iLogoIsVisible) {
 			static videoPlayer
 	
+			info := kVersion . " - 2020 by Oliver Juwig`nCreative Commons - BY-NC-SA"
 			logo := this.getLogo()
 			image := "1:" . logo
 
 			x := A_ScreenWidth - 229
 			y := A_ScreenHeight - 259
 		
-			SplashImage %image%, B FS8 CWD0D0D0 w229 x%x% y%y% ZH180 ZW209, 2020`, Oliver Juwig`nCreative Commons - BY-NC-SA, Modular Simulator`nController System
+			SplashImage %image%, B FS8 CWD0D0D0 w229 x%x% y%y% ZH180 ZW209, %info%, Modular Simulator`nController System
 	
 			WinSet Transparent, 192, , Creative Commons - BY-NC-SA
 		

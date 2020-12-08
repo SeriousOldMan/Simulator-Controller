@@ -1,3 +1,4 @@
-Version=0.9.1
-RC=1.0.0
-Date=12/07/2020
+[Version]
+Current=0.9.1-alpha
+Target=1.0.0
+Date=12/08/2020

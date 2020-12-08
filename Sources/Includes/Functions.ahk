@@ -186,13 +186,14 @@ showSplash(image, alwaysOnTop := true) {
 	vSplashCounter += 1
 	vLastImage := image
 	
+	info := kVersion . " - 2020 by Oliver Juwig, Creative Commons - BY-NC-SA"
 	image :=  vSplashCounter . ":" . kSplashImagesDirectory . image
 	options := "B FS8 CWD0D0D0 w800 x" . Round((A_ScreenWidth - 800) / 2) . " y" . Round(A_ScreenHeight / 4) . " ZH-1 ZW780"
 	
 	if !alwaysOnTop
 		options := "A " . options
 	
-	SplashImage %image%, %options%, 2020`, Oliver Juwig`, Creative Commons - BY-NC-SA, Modular Simulator Controller System
+	SplashImage %image%, %options%, %info%, Modular Simulator Controller System
 }
 
 hideSplash() {
@@ -524,8 +525,10 @@ newConfiguration() {
 }
 
 loadSimulatorConfiguration() {
+	kVersion := getConfigurationValue(readConfiguration(kHomeDirectory . "VERSION"), "Version", "Current", "0.0.0")
+	
 	logMessage(kLogCritical, "---------------------------------------------------------------")
-	logMessage(kLogCritical, "                 Running " . StrSplit(A_ScriptName, ".")[1])
+	logMessage(kLogCritical, "           Running " . StrSplit(A_ScriptName, ".")[1] . " (" . kVersion . ")")
 	logMessage(kLogCritical, "---------------------------------------------------------------")
 		
 	kSimulatorConfiguration := readConfiguration(kSimulatorConfigurationFile)

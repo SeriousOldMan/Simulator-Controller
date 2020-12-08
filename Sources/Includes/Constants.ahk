@@ -27,6 +27,10 @@ global kSimulatorConfigurationFile = kConfigDirectory . "Simulator Configuration
 global kControllerConfigurationFile = kConfigDirectory . "Simulator Controller.ini"
 global kToolsConfigurationFile = kConfigDirectory . "Simulator Tools.ini"
 
+global kUndefined = "__Undefined__"
+
+global kVersion = kUndefined
+
 global kSimulatorConfiguration
 
 global kSilentMode = false
@@ -41,8 +45,6 @@ global kCustomType = "Custom"
 
 global kTrue = "true"
 global kFalse = "false"
-
-global kUndefined = "__Undefined__"
 
 global kActivate = "activate"
 global kDeactivate = "deactivate"

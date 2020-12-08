@@ -56,7 +56,7 @@ Simulator Controller is fully implemented in AutoHotkey, a very sophisticated an
   - Sophisticated logging, tracing and debug support to track down any errors, when developing your own plugins
   - Fully graphical setup and configuration utilities
   
-  ![](./Resources/Documentation%20Images/Setup%20Tool.JPG) ![](./Resources/Documentation%20Images/Configuration%20Tool.JPG)
+  ![](./Resources/Documentation%20Images/Configuration%20Tool.JPG) ![](./Resources/Documentation%20Images/Setup%20Tool.JPG)
 
 ### Included Plugins
 

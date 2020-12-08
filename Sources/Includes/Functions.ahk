@@ -330,7 +330,7 @@ values2String(delimiter, values*) {
 	
 inList(list, value) {
 	for index, candidate in list
-		if (candidate == value)
+		if (candidate = value)
 			return index
 			
 	return false

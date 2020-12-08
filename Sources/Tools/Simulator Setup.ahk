@@ -813,14 +813,17 @@ global applicationDeleteButton
 global applicationUpdateButton
 		
 class ApplicationsTab extends ConfigurationItemList {
-	Applications[] {
+	Applications[types := false] {
 		Get {
 			local application
 			
 			result := []
 			
 			for index, application in this.iItemsList
-				result.Push(application[2])
+				if !types
+					result.Push(application[2])
+				else if inList(types, application[1])
+					result.Push(application[2])
 				
 			return result
 		}
@@ -1452,7 +1455,7 @@ class LaunchpadTab extends ConfigurationItemList {
 	loadApplicationChoices(application := false) {
 		launchpadApplicationsList := []
 		
-		for ignore, launchpadApplication in ApplicationsTab.Instance.Applications
+		for ignore, launchpadApplication in ApplicationsTab.Instance.Applications[["Other"]]
 			launchpadApplicationsList.Push(launchpadApplication.Application)
 		
 		launchpadApplicationDropdown := (application ? inList(launchpadApplicationsList, application) : 0)

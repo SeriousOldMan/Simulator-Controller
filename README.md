@@ -108,6 +108,6 @@ Want to contribute? Great!
 
 ### License
 
-This software is provided as is. You are free to use for any purpose and modify it to your needs, but commercial use is strictly prohibited.
+This software is provided as is. You are free to use it for any purpose and modify it to your needs, but commercial use is strictly prohibited.
 
 (2020) Creative Commons - BY-NC-SA - by Oliver Juwig (TheBigO)

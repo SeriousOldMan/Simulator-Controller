@@ -46,7 +46,7 @@ For further convinience, you can place links to **Simulator Startup** and **Simu
     - Fully customizable plugins supplied for total control of SimHub and SimFeedback - change your settings while racing using the dials and switches on your favorite button box
     - Send your predefined kudos and rants to the ingame chat without touching the keyboard
   - Additional support to trigger every function and action from external sources like a voice or gesture recognition software to always keep your hands on the wheel
-  - Builtin support for visual head tracking to control ingame viewing angle - see third party applications below
+  - Builtin support for visual head tracking to control ingame viewing angle - see [third party applications](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications) below
 
 Simulator Controller is fully implemented in AutoHotkey, a very sophisticated and object-oriented Windows automation scripting language, which is capable to control keyboard and other input devices with a simple macro language. On the other hand, AutoHotkey also has a lot of robotics capabilities to automate software packages, which do not provide an external APIs by simulating mouse clicks and keyboard input. You can write your own plugins using the AutoHotkey language. Full source code for all prebuilt plugins with different complexity from simple to advanced is provided to help you get started.
 

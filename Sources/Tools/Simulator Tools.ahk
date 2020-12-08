@@ -50,9 +50,9 @@ global kBuildTargets = [["Simulator Controller", true, 3000
 					  , ["Simulator Startup", true, 2000
 					   , kSourcesDirectory . "Startup\Simulator Startup.ahk", kBinariesDirectory . "Simulator Startup.exe"
 					   , [kSourcesDirectory . "Startup\Libraries\"]]
-					  , ["Simulator Setup", false, 2000
+					  , ["Simulator Setup", true, 2000
 					   , kSourcesDirectory . "Tools\Simulator Setup.ahk", kBinariesDirectory . "Simulator Setup.exe"]
-					  , ["Simulator Tools", false, 2000
+					  , ["Simulator Tools", true, 2000
 					   , kSourcesDirectory . "Tools\Simulator Tools.ahk", kBinariesDirectory . "Simulator Tools.exe"]]
 
 global kBuildProgressSteps = kCleanupTargets.Length() + kBuildTargets.Length() + 1
@@ -436,11 +436,14 @@ prepareTargets(targets, settings) {
 }
 
 runTargets() {
-	readToolsConfiguration(vCleanupSettings, vBuildSettings)
+	if (!FileExist(kToolsConfigurationFile) || GetKeyState("Ctrl")) {
+		readToolsConfiguration(vCleanupSettings, vBuildSettings)
 	
-	if GetKeyState("Ctrl")
 		if !editTargets()
 			ExitApp 0
+	}
+	else
+		readToolsConfiguration(vCleanupSettings, vBuildSettings)
 	
 	icon := kIconsDirectory . "Tools.ico"
 	

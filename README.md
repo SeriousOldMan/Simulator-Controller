@@ -12,7 +12,8 @@ Thank you very much for your support!
 
 ### Download and Installation
 
-Download one of the builds below and unzip anywhere you like. Then run the setup tool available in the Binaries folder and configure your environment. AutoHotkey is not necessary, if you not want to create your own plugins, but you need an understanding of the Hotkey syntax to bind your controller hardware to the plugin functions and actions using the setup tool. For convience, place links to **Simulator Startup** and **Simulator Configuration** in the Windows Start Menu. You can also configure the software to automatically start with Windows using the setup tool.
+Download one of the builds below and unzip anywhere you like. Then run the setup tool available in the Binaries folder and configure your environment (you may want to delete all *.ini files the Config folder to start out with a really fresh setup, but be sure to make a backup copy elsewhere for later reference, especially for the *Simulator Configuration.ini* file. An installation of the underlying programming language [AutoHotkey](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications) is only necessary, if you want to create your own plugins, but you need a good understanding of the Hotkey syntax to bind your controller hardware to the plugin functions and actions using the setup tool.
+For further convinience, you can place links to **Simulator Startup** and **Simulator Configuration** in the Windows Start Menu. You can also configure the software to automatically start with Windows by checking the *Start with Windows* in the first tab of the setup tool.
 
 #### Latest development build
 

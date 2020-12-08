@@ -58,7 +58,7 @@ Simulator Controller is fully implemented in AutoHotkey, a very sophisticated an
   
   ![](./Resources/Documentation%20Images/Configuration%20Tool.JPG) ![](./Resources/Documentation%20Images/Setup%20Tool.JPG)
 
-### Included Plugins
+### Included plugins
 
 These plugins are part of the Simulator Controller distribution. Beside providing functionality to the core, they may be used as templates for building your own plugins. They range from very simple functional additions with only a small number of lines of code up to very complex, multi-class behemoths controlling external software such as SimHub.
 

@@ -782,6 +782,12 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			WinMinimize % this.iMotionApplication.WindowTitle
 	}
 	
+	resetToInitialState() {
+		this.resetMotionIntensity()
+		this.resetEffectStates()
+		this.resetEffectIntensities()
+	}
+	
 	startMotion(force := false) {
 		if (force || !this.MotionActive) {
 			if kSimFeedbackConnector {
@@ -821,9 +827,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		if (force || this.MotionActive) {
 			if kSimFeedbackConnector {
 				if this.MotionActive {
-					this.resetMotionIntensity()
-					this.resetEffectStates()
-					this.resetEffectIntensities()
+					this.resetToInitialState()
 					
 					this.callSimFeedback("StopMotion")
 				
@@ -836,9 +840,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 				wasHidden := this.showMotionWindow()
 
 				if this.MotionActive {
-					this.resetMotionIntensity()
-					this.resetEffectStates()
-					this.resetEffectIntensities()
+					this.resetToInitialState()
 			
 					ControlClick Stop, % this.iMotionApplication.WindowTitle
 					Sleep 100
@@ -902,7 +904,7 @@ initializeMotionFeedbackPlugin() {
 	kSimFeedback := getConfigurationValue(controller.Configuration, kMotionFeedbackPlugin, "Exe Path", false)
 	
 	if (!kSimFeedback || !FileExist(kSimFeedback)) {
-		logMessage(kLogCritical, "Configured application path for Motion Feedback (" . kSimFeedback . ") not found - please check the setup...")
+		logMessage(kLogCritical, "Plugin Motion Feedback deactivated, because the configured application path (" . kSimFeedback . ") cannot be found - please check the setup...")
 		
 		return
 	}

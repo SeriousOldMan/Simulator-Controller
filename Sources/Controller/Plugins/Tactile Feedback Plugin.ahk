@@ -319,7 +319,7 @@ initializeSimHubPlugin() {
 	kSimHub := getConfigurationValue(controller.Configuration, kTactileFeedbackPlugin, "Exe Path", false)
 	
 	if (!kSimHub || !FileExist(kSimHub)) {
-		logMessage(kLogCritical, "Configured application path for Tactile Feedback (" . kSimHub . ") not found - please check the setup...")
+		logMessage(kLogCritical, "Plugin Tactile Feedback deactivated, because the configured application path (" . kSimHub . ") cannot be found - please check the setup...")
 		
 		return
 	}

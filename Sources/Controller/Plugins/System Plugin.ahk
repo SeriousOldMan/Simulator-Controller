@@ -285,11 +285,11 @@ class SystemPlugin extends ControllerPlugin {
 		iMouseClicked := clicked
 	}
 	
-	playStartupSong() {
+	playStartupSong(songFile) {
 		if (!kSilentMode && !this.iStartupSongIsPlaying) {
 			try {
-				if FileExist(kSplashImagesDirectory . "Blancpain 2019.wav") {
-					SoundPlay % kSplashImagesDirectory . "Blancpain 2019.wav"
+				if FileExist(kSplashImagesDirectory . songFile) {
+					SoundPlay % kSplashImagesDirectory . songFile
 			
 					this.iStartupSongIsPlaying := true
 				}
@@ -529,8 +529,8 @@ shutdownSimulator(simulator) {
 	return false
 }
 
-playStartupSong() {
-	SimulatorController.Instance.findPlugin(kSystemPlugin).playStartupSong()
+playStartupSong(songFile) {
+	SimulatorController.Instance.findPlugin(kSystemPlugin).playStartupSong(songFile)
 	
 	SetTimer muteSimulator, 1000
 }
@@ -546,12 +546,7 @@ handleStartupEvents(event, data) {
 		data := StrSplit(data, ":")
 		
 		function := data[1]
-		arguments := StrSplit(data[2], ",")
-		
-		numArguments := arguments.Length()
-		
-		Loop %numArguments%
-			arguments[A_Index] := Trim(arguments[A_Index], A_Space)
+		arguments := string2Values(",", data[2])
 			
 		withProtection(function, arguments*)
 	}

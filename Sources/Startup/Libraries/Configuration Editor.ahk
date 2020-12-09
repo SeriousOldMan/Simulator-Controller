@@ -96,6 +96,26 @@ checkButtonBoxSimulationDuration() {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+computeStartupSongs() {
+	files := []
+	
+	Loop Files, % kSplashImagesDirectory . "*.wav"
+	{
+		SplitPath A_LoopFilePath, soundFile
+		
+		files.Push(soundFile)
+	}
+	
+	Loop Files, % kSplashImagesDirectory . "*.mp3"
+	{
+		SplitPath A_LoopFilePath, soundFile
+		
+		files.Push(soundFile)
+	}
+	
+	return files
+}
+
 editConfiguration(ByRef configurationOrCommand, withCancel := false) {
 	static result
 	static newConfiguration
@@ -115,8 +135,14 @@ editConfiguration(ByRef configurationOrCommand, withCancel := false) {
 	static buttonBoxSimulation
 	static buttonBoxSimulationDuration
 	static buttonBoxPosition
+	
 	static startup
 	static startOption
+	
+	static visualsOption
+	
+	static playSong
+	static songOption
 	
 	static coreSettings
 	static feedbackSettings
@@ -164,6 +190,9 @@ restart:
 		setConfigurationValue(newConfiguration, "Controller", "Button Box Duration", (buttonBox ? buttonBoxDuration : false))
 		setConfigurationValue(newConfiguration, "Controller", "Button Box Simulation Duration", (buttonBoxSimulation ? buttonBoxSimulationDuration : false))
 		setConfigurationValue(newConfiguration, "Controller", "Button Box Position", buttonBoxPosition)
+		
+		setConfigurationValue(newConfiguration, "Startup", "Video", visualsOption == "Blancpain 2019 Video")
+		setConfigurationValue(newConfiguration, "Startup", "Song", (playSong ? songOption : false))
 		
 		setConfigurationValue(newConfiguration, "Startup", "Simulator", (startup ? startOption : false))
 		
@@ -304,6 +333,28 @@ restart:
 			chosen := 4
 			
 		Gui CE:Add, DropDownList, X120 YP-5 w100 Choose%chosen% vbuttonBoxPosition, % values2String("|", choices*)
+		
+		hasVideo := FileExist(kSplashImagesDirectory . "Blancpain 2019.gif")
+		chosen := (hasVideo ? getConfigurationValue(configurationOrCommand, "Startup", "Video", false) + 1 : 1)
+		visualsOption := ((chosen == 2) ? "Blancpain 2019 Video" : "GT3 Cars")
+		options := hasVideo ? "GT3 Cars|Blancpain 2019 Video" : "GT3 Cars"
+		
+		Gui CE:Add, Text, X10 Y+20, Splash Screen
+		Gui CE:Add, DropDownList, X90 YP-5 w140 Choose%chosen% vvisualsOption, %options%
+		
+		songOption := getConfigurationValue(configurationOrCommand, "Startup", "Song", false)
+		playSong := (songOption != false)
+		
+		Gui CE:Add, CheckBox, X10 Checked%playSong% vplaySong, Play song
+		
+		songs := computeStartupSongs()
+		
+		chosen := inList(songs, songOption)
+		
+		if (!chosen && (songs.Length() > 0))
+			chosen := 1
+			
+		Gui CE:Add, DropDownList, X90 YP-5 w140 Choose%chosen% vsongOption, % values2String("|", songs*)
 	
 		startupOption := getConfigurationValue(configurationOrCommand, "Startup", "Simulator", false)
 		startup := (startupOption != false)
@@ -317,7 +368,7 @@ restart:
 		if ((chosen == 0) && (simulators.Length() > 0))
 			chosen := 1
 		
-		Gui CE:Add, DropDownList, X+0 YP-5 w175 Choose%chosen% vstartOption, % values2String("|", simulators*)
+		Gui CE:Add, DropDownList, X90 YP-5 w140 Choose%chosen% vstartOption, % values2String("|", simulators*)
 	 
 		Gui CE:Add, Button, X10 Y+20 w220 grunSetup, Setup...
 		

@@ -183,9 +183,13 @@ initializeTrayMessageQueue() {
 ;;;-------------------------------------------------------------------------;;;
 
 showSplash(image, alwaysOnTop := true) {
+	lastSplash := vSplashCounter
 	vSplashCounter += 1
 	vLastImage := image
 	
+	if (vSplashCounter > 10)
+		vSplashCounter := 1
+		
 	info := kVersion . " - 2020 by Oliver Juwig, Creative Commons - BY-NC-SA"
 	image :=  vSplashCounter . ":" . kSplashImagesDirectory . image
 	options := "B FS8 CWD0D0D0 w800 x" . Round((A_ScreenWidth - 800) / 2) . " y" . Round(A_ScreenHeight / 4) . " ZH-1 ZW780"
@@ -194,10 +198,16 @@ showSplash(image, alwaysOnTop := true) {
 		options := "A " . options
 	
 	SplashImage %image%, %options%, %info%, Modular Simulator Controller System
+	
+	if (lastSplash > 0)
+		hideSplash(lastSplash)
 }
 
-hideSplash() {
-	SplashImage %vSplashCounter%:Off
+hideSplash(splashCounter := false) {
+	if !splashCounter
+		splashCounter := vSplashCounter
+		
+	SplashImage %splashCounter%:Off
 }
 
 showSplashAnimation(gif) {

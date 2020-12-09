@@ -825,6 +825,22 @@ class ControllerPlugin extends Plugin {
 			this.Controller.registerPlugin(this)
 	}
 	
+	findMode(name) {
+		for ignore, mode in this.Modes
+			if (mode.Mode = name)
+				return mode
+		
+		return false
+	}
+	
+	findAction(label) {
+		for ignore, candidate in this.Actions
+			if (candidate.Label = label)
+				return candidate
+			
+		return false
+	}
+	
 	registerMode(mode) {
 		if !inList(this.Modes, mode)
 			this.Modes.Push(mode)
@@ -836,14 +852,6 @@ class ControllerPlugin extends Plugin {
 	registerAction(action) {
 		if !inList(this.Actions, action)
 			this.Actions.Push(action)
-	}
-	
-	findAction(label) {
-		for ignore, candidate in this.Actions
-			if (candidate.Label = label)
-				return candidate
-			
-		return false
 	}
 	
 	isActive() {

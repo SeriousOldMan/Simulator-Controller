@@ -67,22 +67,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		}
 		
 		fireAction(function, trigger) {
-			command := this.iCommand
-			
-			try {
-				RunWait "%kSimHub%" -triggerinput %command%, , Hide
-			}
-			catch exception {
-				logMessage(kLogCritical, "Error while starting Motion Feedback (" . kSimHub . "): " . exception.Message . " - please check the setup")
-				
-				SplashTextOn 800, 60, Modular Simulator Controller System, Cannot start SimHub (%kSimHub%) `n`nPlease run the setup tool...
-						
-				Sleep 5000
-							
-				SplashTextOff
-					
-				return 0
-			}
+			callSimHub(this.iCommand)
 		}
 	}
 
@@ -98,22 +83,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		}
 		
 		fireAction(function, trigger) {
-			command := (((trigger = "On") || (trigger = "Increase") || (trigger == "Push")) ? this.iUpCommand : this.iDownCommand)
-			
-			try {
-				RunWait "%kSimHub%" -triggerinput %command%, , Hide
-			}
-			catch exception {
-				logMessage(kLogCritical, "Error while connecting to SimHub (" . kSimHub . "): " . exception.Message . " - please check the setup")
-				
-				SplashTextOn 800, 60, Modular Simulator Controller System, Cannot connect to SimHub (%kSimHub%) `n`nPlease run the setup tool...
-						
-				Sleep 5000
-							
-				SplashTextOff
-					
-				return 0
-			}
+			callSimHub(((trigger = "On") || (trigger = "Increase") || (trigger == "Push")) ? this.iUpCommand : this.iDownCommand)
 		}
 	}
 
@@ -288,6 +258,24 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+callSimHub(command) {
+	try {
+		logMessage(kLogInfo, "Sending command '" . command . "' to SimHub (" . kSimHub . ")")
+		
+		RunWait "%kSimHub%" -triggerinput %command%, , Hide
+	}
+	catch exception {
+		logMessage(kLogCritical, "Error while connecting to SimHub (" . kSimHub . "): " . exception.Message . " - please check the setup")
+		
+		SplashTextOn 800, 60, Modular Simulator Controller System, Cannot connect to SimHub (%kSimHub%) `n`nPlease run the setup tool...
+				
+		Sleep 5000
+					
+		SplashTextOff
+			
+		return 0
+	}
+}
 
 activatePedalVibration() {
 	action := SimulatorController.Instance.findPlugin(kTactileFeedbackPlugin).findAction("Pedal Vibration")

@@ -33,6 +33,8 @@ global kEffectsSliderMaxX = 950
 global kEffectsSliderWidth = kEffectsSliderMaxX - kEffectsSliderMinX
 global kEffectsSliderY = [305, 400, 495, 590, 685, 780, 875]
 
+global kSimFeedbackConnector := false
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Public Constant Section                         ;;;
@@ -158,21 +160,22 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		}
 		
 		fireAction(function, trigger) {
-			if (this.Active && ((trigger = "Off") || (trigger == "Push"))) {
+			if (this.Active && ((trigger = "Off") || (trigger == "Push")))
 				this.Plugin.stopMotion()
+			else if (!this.Active && ((trigger = "On") || (trigger == "Push")))
+				this.Plugin.startMotion()
 				
+			if this.Active {				
+				trayMessage(this.Label, "State: On")
+			
+				function.setText(this.Label, "Green")
+			}
+			else {
 				this.Plugin.findMode(kMotionMode).deselectEffect()
 				
 				trayMessage(this.Label, "State: Off")
 			
 				function.setText(this.Label, "Gray")
-			}
-			else if (!this.Active && ((trigger = "On") || (trigger == "Push"))) {
-				this.Plugin.startMotion()
-				
-				trayMessage(this.Label, "State: On")
-			
-				function.setText(this.Label, "Green")
 			}
 		}
 	}
@@ -332,6 +335,14 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		
 		base.__New(controller, name, configuration)
 		
+		kSimFeedbackConnector := this.getArgumentValue("connector", false)
+		
+		if !FileExist(kSimFeedbackConnector) {
+			logMessage(kLogCritical, "Configured application path for SimFeedback connector (" . kSimFeedbackConnector . ") not found - please check the setup...")
+			
+			kSimFeedbackConnector := false
+		}
+		
 		motionArguments := string2Values(A_Space, this.getArgumentValue("motion", ""))
 		motionEffectsArguments := string2Values(",", this.getArgumentValue("motionEffects", ""))
 		motionEffectIntensityArguments := string2Values(A_Space, this.getArgumentValue("motionEffectIntensity", ""))
@@ -409,44 +420,59 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	}
 	
 	loadEffectStateFromSimFeedback(effect) {
-		effect := inList(this.kEffects, effect)
+		if kSimFeedbackConnector
+			this.iCurrentEffectStates[inList(this.kEffects, effect)] := !callSimFeedback("EffectIsMuted", effect)
+		else {
+			effect := inList(this.kEffects, effect)
 		
-		/*
-		yCoordinate := kEffectMuteToggleY[effect]
+			/*
+			yCoordinate := kEffectMuteToggleY[effect]
+				
+			MouseMove kEffectMuteToggleX, yCoordinate, 0
+			MouseGetPos posX, posY, window, muteToggle
 			
-		MouseMove kEffectMuteToggleX, yCoordinate, 0
-		MouseGetPos posX, posY, window, muteToggle
-		
-		ControlGet isChecked, Checked, , %muteToggle%, % this.iMotionApplication.WindowTitle
-		*/
-		isChecked := this.kInitialEffectStates[effect]
-		
-		this.iCurrentEffectStates[effect] := isChecked
+			ControlGet isChecked, Checked, , %muteToggle%, % this.iMotionApplication.WindowTitle
+			*/
+			isChecked := this.kInitialEffectStates[effect]
+			
+			this.iCurrentEffectStates[effect] := isChecked
+		}
 	}
 	
 	loadEffectIntensityFromSimFeedback(effect) {
-		effect := inList(this.kEffects, effect)
+		if kSimFeedbackConnector
+			this.iCurrentEffectIntensities[inList(this.kEffects, effect)] := Round(callSimFeedback("EffectIntensityGet", effect) / 10, 1)
+		else {
+			effect := inList(this.kEffects, effect)
 		
-		this.iCurrentEffectIntensities[effect] := this.kInitialEffectIntensities[effect]
+			this.iCurrentEffectIntensities[effect] := this.kInitialEffectIntensities[effect]
+		}
 	}	
 	
 	loadMotionStateFromSimFeedback() {
-		isActive := false
+		if kSimFeedbackConnector
+			this.iIsMotionActive := callSimFeedback("IsRunning")
+		else {
+			isActive := false
 		
-		try {
-			ControlGetPos, posX, posY, , , Stop, % this.iMotionApplication.WindowTitle
+			try {
+				ControlGetPos, posX, posY, , , Stop, % this.iMotionApplication.WindowTitle
+				
+				if ((posX && (posX != "")) && (posY && (posY != "")))
+					isActive := true
+			}
+			catch exception {
+			}
 			
-			if ((posX && (posX != "")) && (posY && (posY != "")))
-				isActive := true
+			this.iIsMotionActive := isActive
 		}
-		catch exception {
-		}
-		
-		this.iIsMotionActive := isActive
 	}
 	
 	loadMotionIntensityFromSimFeedback() {
-		this.iCurrentMotionIntensity := this.kInitialMotionIntensity
+		if kSimFeedbackConnector
+			this.iCurrentMotionIntensity := callSimFeedback("GetOverallIntensity")
+		else
+			this.iCurrentMotionIntensity := this.kInitialMotionIntensity
 	}
 	
 	loadFromSimFeedback() {
@@ -506,47 +532,68 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	
 	toggleEffect(effect) {
 		if this.iMotionApplication.isRunning() {
-			effect := inList(this.kEffects, effect)
-		
-			yCoordinate := kEffectMuteToggleY[effect]
+			if kSimFeedbackConnector {
+				callSimFeedback("EffectToggle", effect)
+				
+				this.loadEffectStateFromSimFeedback(effect)
+			}
+			else {
+				effect := inList(this.kEffects, effect)
 			
-			ControlClick X%kEffectMuteToggleX% Y%yCoordinate%, % this.iMotionApplication.WindowTitle
-			Sleep 100
+				yCoordinate := kEffectMuteToggleY[effect]
+				
+				ControlClick X%kEffectMuteToggleX% Y%yCoordinate%, % this.iMotionApplication.WindowTitle
+				Sleep 100
 
-			this.iCurrentEffectStates[effect] := !this.iCurrentEffectStates[effect]
+				this.iCurrentEffectStates[effect] := !this.iCurrentEffectStates[effect]
+			}
 		}
 	}
 
 	setEffectIntensity(effect, targetIntensity) {
-		if this.iMotionApplication.isRunning() {
-			effect := inList(this.kEffects, effect)
-			currentIntensity := this.iCurrentEffectIntensities[effect]
-		
-			if ((targetIntensity != currentIntensity) && (targetIntensity >= kEffectIntensityMin) && (targetIntensity <= kEffectIntensityMax)) {
-				sliderY := kEffectsSliderY[effect]
+		if (this.iMotionApplication.isRunning() && (targetIntensity >= kEffectIntensityMin) && (targetIntensity <= kEffectIntensityMax)) {
+			if kSimFeedbackConnector {
+				callSimFeedback("EffectIntensitySet", effect, Round(targetIntensity * 10))
 				
-				MouseClickDrag Left, kEffectsSliderMinX + Round(kEffectsSliderWidth * (currentIntensity / kEffectIntensityRange))
-								   , sliderY
-								   , kEffectsSliderMinX + Round(kEffectsSliderWidth * (targetIntensity / kEffectIntensityRange))
-								   , sliderY
-				Sleep 100
-				
-				this.iCurrentEffectIntensities[effect] := targetIntensity
+				this.loadEffectIntensityFromSimFeedback(effect)
+			}
+			else {
+				effect := inList(this.kEffects, effect)
+				currentIntensity := this.iCurrentEffectIntensities[effect]
+			
+				if (targetIntensity != currentIntensity) {
+					sliderY := kEffectsSliderY[effect]
+					
+					MouseClickDrag Left, kEffectsSliderMinX + Round(kEffectsSliderWidth * (currentIntensity / kEffectIntensityRange))
+									   , sliderY
+									   , kEffectsSliderMinX + Round(kEffectsSliderWidth * (targetIntensity / kEffectIntensityRange))
+									   , sliderY
+					Sleep 100
+					
+					this.iCurrentEffectIntensities[effect] := targetIntensity
+				}
 			}
 		}
 	}
 	
 	setMotionIntensity(targetIntensity) {
-		if this.iMotionApplication.isRunning()
-			if (targetIntensity != this.iCurrentMotionIntensity) {
-				MouseClickDrag Left, kMotionSliderMinX + Round(kMotionSliderWidth * (this.iCurrentMotionIntensity / kMotionIntensityRange))
-								   , kMotionSliderY
-								   , kMotionSliderMinX + Round(kMotionSliderWidth * (targetIntensity / kMotionIntensityRange))
-								   , kMotionSliderY
-				Sleep 100
+		if this.iMotionApplication.isRunning() {
+			if kSimFeedbackConnector {
+				callSimFeedback("SetOverallIntensity", targetIntensity)
 				
-				this.iCurrentMotionIntensity := targetIntensity			
+				this.loadMotionIntensityFromSimFeedback()
 			}
+			else
+				if (targetIntensity != this.iCurrentMotionIntensity) {
+					MouseClickDrag Left, kMotionSliderMinX + Round(kMotionSliderWidth * (this.iCurrentMotionIntensity / kMotionIntensityRange))
+									   , kMotionSliderY
+									   , kMotionSliderMinX + Round(kMotionSliderWidth * (targetIntensity / kMotionIntensityRange))
+									   , kMotionSliderY
+					Sleep 100
+				
+					this.iCurrentMotionIntensity := targetIntensity
+				}
+		}
 	}
 	
 	requireSimFeedback() {
@@ -554,7 +601,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		
 		if !this.iMotionApplication.isRunning()
 			startSimFeedback()
-		else {
+		else if !kSimFeedbackConnector {
 			windowTitle := this.iMotionApplication.WindowTitle
 			
 			WinWait %windowTitle%, , 20
@@ -570,69 +617,91 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	}
 	
 	increaseMotionIntensity() {
-		if ((this.iCurrentMotionIntensity + kMotionIntensityIncrement) < kMotionIntensityMax) {
-			wasHidden := this.showMotionWindow()
+		if ((this.iCurrentMotionIntensity + kMotionIntensityIncrement) < kMotionIntensityMax)
+			if kSimFeedbackConnector
+				this.setMotionIntensity(this.iCurrentMotionIntensity + kMotionIntensityIncrement)
+			else {
+				wasHidden := this.showMotionWindow()
 			
-			this.setMotionIntensity(this.iCurrentMotionIntensity + kMotionIntensityIncrement)
-			
-			if wasHidden
-				this.hideMotionWindow()
-		}
+				this.setMotionIntensity(this.iCurrentMotionIntensity + kMotionIntensityIncrement)
+				
+				if wasHidden
+					this.hideMotionWindow()
+			}
 	}
 	
 	decreaseMotionIntensity() {
-		if ((this.iCurrentMotionIntensity - kMotionIntensityIncrement) > kMotionIntensityMin) {
+		if ((this.iCurrentMotionIntensity - kMotionIntensityIncrement) > kMotionIntensityMin)
+			if kSimFeedbackConnector
+				this.setMotionIntensity(this.iCurrentMotionIntensity - kMotionIntensityIncrement)
+			else {
+				wasHidden := this.showMotionWindow()
+					
+				this.setMotionIntensity(this.iCurrentMotionIntensity - kMotionIntensityIncrement)
+				
+				if wasHidden
+					this.hideMotionWindow()
+			}
+	}
+	
+	unmuteEffect(effect) {
+		if kSimFeedbackConnector
+			this.toggleEffect(effect)
+		else {
 			wasHidden := this.showMotionWindow()
-			
-			this.setMotionIntensity(this.iCurrentMotionIntensity - kMotionIntensityIncrement)
+		
+			if !this.getEffectState(effect) {
+				this.toggleEffect(effect)
+				Sleep 100
+			}
 			
 			if wasHidden
 				this.hideMotionWindow()
 		}
 	}
 	
-	unmuteEffect(effect) {
-		wasHidden := this.showMotionWindow()
-		
-		if !this.getEffectState(effect) {
-			this.toggleEffect(effect)
-			Sleep 100
-		}
-		
-		if wasHidden
-			this.hideMotionWindow()
-	}
-	
 	muteEffect(effect) {
-		wasHidden := this.showMotionWindow()
-		
-		if this.getEffectState(effect) {
+		if kSimFeedbackConnector
 			this.toggleEffect(effect)
-			Sleep 100
+		else {
+			wasHidden := this.showMotionWindow()
+			
+			if this.getEffectState(effect) {
+				this.toggleEffect(effect)
+				Sleep 100
+			}
+			
+			if wasHidden
+				this.hideMotionWindow()
 		}
-		
-		if wasHidden
-			this.hideMotionWindow()
 	}
 	
 	increaseEffectIntensity(effect) {
-		wasHidden := this.showMotionWindow()
+		if kSimFeedbackConnector
+			this.setEffectIntensity(effect, this.iCurrentEffectIntensities[inList(this.kEffects, effect)] + kEffectIntensityIncrement)
+		else {
+			wasHidden := this.showMotionWindow()
 		
-		this.setEffectIntensity(effect, this.iCurrentEffectIntensities[inList(this.kEffects, effect)] + kEffectIntensityIncrement)
-		Sleep 100
-		
-		if wasHidden
-			this.hideMotionWindow()
+			this.setEffectIntensity(effect, this.iCurrentEffectIntensities[inList(this.kEffects, effect)] + kEffectIntensityIncrement)
+			Sleep 100
+			
+			if wasHidden
+				this.hideMotionWindow()
+		}
 	}
 	
 	decreaseEffectIntensity(effect) {
-		wasHidden := this.showMotionWindow()
+		if kSimFeedbackConnector
+			this.setEffectIntensity(effect, this.iCurrentEffectIntensities[inList(this.kEffects, effect)] - kEffectIntensityIncrement)
+		else {
+			wasHidden := this.showMotionWindow()
 		
-		this.setEffectIntensity(effect, this.iCurrentEffectIntensities[inList(this.kEffects, effect)] - kEffectIntensityIncrement)
-		Sleep 100
-		
-		if wasHidden
-			this.hideMotionWindow()
+			this.setEffectIntensity(effect, this.iCurrentEffectIntensities[inList(this.kEffects, effect)] - kEffectIntensityIncrement)
+			Sleep 100
+			
+			if wasHidden
+				this.hideMotionWindow()
+		}
 	}
 
 	resetEffectIntensities() {
@@ -674,38 +743,50 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	}
 	
 	startMotion(force := false) {
-		if (force || !this.MotionActive) {
-			wasHidden := this.showMotionWindow()
-
-			if !this.MotionActive {
-				ControlClick Start, % this.iMotionApplication.WindowTitle
-				Sleep 100
-		
-				this.iIsMotionActive := true
+		if (force || !this.MotionActive)
+			if kSimFeedbackConnector {
+				callSimFeedback("StartMotion")
+				
+				this.loadMotionStateFromSimFeedback()
 			}
-		
-			if wasHidden
-				this.hideMotionWindow()
-		}
+			else {
+				wasHidden := this.showMotionWindow()
+
+				if !this.MotionActive {
+					ControlClick Start, % this.iMotionApplication.WindowTitle
+					Sleep 100
+			
+					this.iIsMotionActive := true
+				}
+			
+				if wasHidden
+					this.hideMotionWindow()
+			}
 	}
 	
 	stopMotion(force := false) {
-		if (force || this.MotionActive) {
-			wasHidden := this.showMotionWindow()
-
-			if this.MotionActive {
-				this.resetMotionIntensity()
-				this.resetEffectIntensities()
-		
-				ControlClick Stop, % this.iMotionApplication.WindowTitle
-				Sleep 100
-		
-				this.iIsMotionActive := false
-			}
+		if (force || this.MotionActive)
+			if kSimFeedbackConnector {
+				callSimFeedback("StopMotion")
 				
-			if wasHidden
-				this.hideMotionWindow()
-		}
+				this.loadMotionStateFromSimFeedback()
+			}
+			else {
+				wasHidden := this.showMotionWindow()
+
+				if this.MotionActive {
+					this.resetMotionIntensity()
+					this.resetEffectIntensities()
+			
+					ControlClick Stop, % this.iMotionApplication.WindowTitle
+					Sleep 100
+			
+					this.iIsMotionActive := false
+				}
+					
+				if wasHidden
+					this.hideMotionWindow()
+			}
 	}
 }
 
@@ -713,7 +794,31 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
-
+	
+callSimFeedback(arguments*) {
+	try {
+		arguments := values2String(A_Space, arguments*)
+		
+		for index, argument in arguments
+			arguments[index] := """" . argument . """"
+		
+		RunWait "%kSimFeedbackConnector%" %arguments%, , Hide
+		
+		return ErrorLevel
+	}
+	catch exception {
+		logMessage(kLogCritical, "Error while connecting to SimFeedback (" . kSimFeedbackConnector . "): " . exception.Message . " - please check the setup")
+		
+		SplashTextOn 800, 60, Modular Simulator Controller System, Cannot connect to SimFeedback (%kSimFeedbackConnector%) `n`nPlease run the setup tool...
+				
+		Sleep 5000
+					
+		SplashTextOff
+			
+		return 0
+	}
+}
+	
 blinkEffectLabels() {
 	protectionOn()
 	
@@ -728,13 +833,17 @@ blinkEffectLabels() {
 startSimFeedback() {
 	simFeedback := new Application("Motion Feedback", SimulatorController.Instance.Configuration)
 	
-	windowTitle := simFeedback.WindowTitle
-	
-	simFeedback.startup(false)
-	
-	WinWait %windowTitle%, , 20
-	WinMaximize %windowTitle%
-	WinMinimize %windowTitle%
+	if kSimFeedbackConnector
+		simFeedback.startup(false, false, "Hide")
+	else {
+		windowTitle := simFeedback.WindowTitle
+		
+		simFeedback.startup(false)
+		
+		WinWait %windowTitle%, , 20
+		WinMaximize %windowTitle%
+		WinMinimize %windowTitle%
+	}
 }
 
 initializeMotionFeedbackPlugin() {
@@ -742,8 +851,11 @@ initializeMotionFeedbackPlugin() {
 	
 	kSimFeedback := getConfigurationValue(controller.Configuration, kMotionFeedbackPlugin, "Exe Path", false)
 	
-	if !kSimFeedback
+	if (!kSimFeedback || !FileExist(kSimFeedback)) {
+		logMessage(kLogCritical, "Configured application path for Motion Feedback (" . kSimFeedback . ") not found - please check the setup...")
+		
 		return
+	}
 
 	new MotionFeedbackPlugin(controller, kMotionFeedbackPlugin, controller.Configuration)
 }
@@ -753,7 +865,7 @@ initializeMotionFeedbackPlugin() {
 ;;;                        Controller Action Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-enableMotion() {
+startMotion() {
 	protectionOn()
 	
 	try {
@@ -766,7 +878,7 @@ enableMotion() {
 	}
 }
 
-disableMotion() {
+stopMotion() {
 	protectionOn()
 	
 	try {

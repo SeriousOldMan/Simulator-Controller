@@ -874,7 +874,7 @@ class ApplicationsTab extends ConfigurationItemList {
 		Gui SE:Add, Text, x147 y427 w116 h23 +0x200 +Center, Shutdown
 		Gui SE:Add, Edit, x147 y451 w116 h21 VapplicationShutdownEdit, %applicationShutdownEdit%
 		
-		Gui SE:Add, Text, x274 y427 w116 h23 +0x200 +Center, Running?
+		Gui SE:Add, Text, x274 y417 w116 h23 +0x200 +Center, Running?
 		Gui SE:Add, Edit, x274 y451 w116 h21 VapplicationIsRunningEdit, %applicationIsRunningEdit%
 
 		Gui SE:Add, Button, x184 y490 w46 h23 VapplicationAddButton gaddItem, Add

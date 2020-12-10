@@ -209,6 +209,30 @@ hideSplash(splashCounter := false) {
 		
 	SplashImage %splashCounter%:Off
 }
+	
+rotateSplash(alwaysOnTop := true) {
+	static number := 1
+	static pictures := false
+	static numPictures := 0
+	
+	if !pictures {
+		Loop Files, % kSplashImagesDirectory . "*.jpg"
+		{
+			if !pictures
+				pictures := []
+				
+			pictures.Push(A_LoopFileName)
+		}
+		
+		numPictures := pictures.Length()
+	}
+	
+	if (number > numPictures)
+		number := 1
+	
+	if (number <= numPictures)
+		showSplash(pictures[number++], alwaysOnTop)
+}
 
 showSplashAnimation(gif) {
 	video := kSplashImagesDirectory . gif

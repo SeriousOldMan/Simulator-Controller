@@ -359,6 +359,8 @@ runBuildTargets(ByRef buildProgress) {
 			build := true
 		
 		if build {
+			rotateSplash(false)
+			
 			logMessage(kLogInfo, targetName . " or dependent files out of date - needs recompile")
 			logMessage(kLogInfo, "Compiling " . targetSource)
 
@@ -474,7 +476,7 @@ runTargets() {
 	
 	Menu Tray, Icon, %icon%, , 1
 	
-	showSplash("McLaren 720s GT3.jpg", false)
+	rotateSplash(false)
 	
 	Sleep 1000
 	
@@ -486,6 +488,8 @@ runTargets() {
 	buildProgress := 0
 	
 	prepareTargets(buildProgress)
+	
+	rotateSplash(false)
 	
 	Progress, , %A_Space%, Running Targets
 	

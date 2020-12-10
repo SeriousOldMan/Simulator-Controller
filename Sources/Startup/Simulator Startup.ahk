@@ -152,29 +152,9 @@ class SimulatorStartup extends ConfigurationItem {
 		}
 	}
 	
-	nextSplashPicture() {
-		static number := 1
-		static pictures := false
-		static numPictures := 0
-		
+	rotateSplash() {
 		if (!kSilentMode && !kSplashVideo) {
-			if !pictures {
-				Loop Files, % kSplashImagesDirectory . "*.jpg"
-				{
-					if !pictures
-						pictures := []
-						
-					pictures.Push(A_LoopFileName)
-				}
-				
-				numPictures := pictures.Length()
-			}
-			
-			if (number > numPictures)
-				number := 1
-			
-			if (number <= numPictures)
-				showSplash(pictures[number++])
+			rotateSplash()
 		}
 	}
 	
@@ -194,7 +174,7 @@ class SimulatorStartup extends ConfigurationItem {
 				
 				logMessage(kLogInfo, "Component " . component . " is actived")
 				
-				this.nextSplashPicture()
+				this.rotateSplash()
 				
 				this.startComponent(component)
 				
@@ -227,7 +207,7 @@ class SimulatorStartup extends ConfigurationItem {
 		
 		if !kSilentMode
 			if !kSplashVideo
-				this.nextSplashPicture()
+				this.rotateSplash()
 			else
 				showSplash(kSplashVideo)
 		
@@ -292,7 +272,7 @@ class SimulatorStartup extends ConfigurationItem {
 			vStartupFinished := true
 			
 			Loop {
-				this.nextSplashPicture()
+				this.rotateSplash()
 				
 				Sleep 3000
 			}

@@ -301,6 +301,8 @@ runCleanTargets(ByRef buildProgress) {
 				Loop Files, *.*
 					FileDelete %A_LoopFilePath%
 			
+				Progress %buildProgress%, % "Deleting " . A_LoopFileName . "..."
+			
 				SetWorkingDir %currentDirectory%
 			}
 			else if (FileExist(fileOrFolder) != "") {
@@ -432,7 +434,7 @@ prepareTargets(ByRef buildProgress) {
 		if build {
 			arguments := substituteVariables(arguments)
 			
-			vCleanupTargets.Push(Array(target, string2Values(",", arguments)))
+			vCleanupTargets.Push(Array(target, string2Values(",", arguments)*))
 		}
 	
 		Sleep 200

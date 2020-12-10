@@ -3,7 +3,7 @@ Binaries Folder=%kBinariesDirectory%
 Logs Folder=%kLogsDirectory%
 Simulator Controller.ini=%kControllerConfigurationFile%
 Simulator Tools.ini=%kToolsConfigurationFile%
-*.bak Files=%kHomeDirectory%, *.ahk.bak, Recursive
+*.bak Files=%kHomeDirectory%, *.ahk.bak, R
 [Build]
 Simulator Controller=%kBinariesDirectory%Simulator Controller.exe <- %kSourcesDirectory%Controller\Simulator Controller.ahk; %kIncludesDirectory%, %kSourcesDirectory%Controller\Plugins\
 Simulator Configuration=%kBinariesDirectory%Simulator Configuration.exe <- %kSourcesDirectory%Startup\Simulator Configuration.ahk; %kIncludesDirectory%, %kSourcesDirectory%Startup\Libraries\

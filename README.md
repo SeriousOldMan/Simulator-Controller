@@ -30,7 +30,7 @@ For further convinience, you can place links to **Simulator Startup** and **Simu
   - Connect all your external controller, like button boxes, to one single center of control
     - An unlimited number of layers of functions and actions, called modes, can be defined for your controller. Switch between modes simply by pushing a button or switch a toggle on your controller. Here is an example of several layers of functions and actions combined in five modes:
 	
-	![](./Resources/Documentation%20Images/Button%20Box%20Layout.png)
+	![](./Resources/Documentation%20Images/Button%20Box%20Layout.jpg)
 	
 	- Modes are defined and handled by [plugins](https://github.com/SeriousOldMan/Simulator-Controller#included-plugins), which can be implemented using an objecct oriented scripting language.
   - Configurable, visual feedback for your controller actions

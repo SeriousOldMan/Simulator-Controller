@@ -152,7 +152,7 @@ class SimulatorStartup extends ConfigurationItem {
 		}
 	}
 	
-	nextSplash() {
+	nextSplashPicture() {
 		static number := 1
 		static pictures := false
 		static numPictures := 0
@@ -194,7 +194,7 @@ class SimulatorStartup extends ConfigurationItem {
 				
 				logMessage(kLogInfo, "Component " . component . " is actived")
 				
-				this.nextSplash()
+				this.nextSplashPicture()
 				
 				this.startComponent(component)
 				
@@ -227,7 +227,7 @@ class SimulatorStartup extends ConfigurationItem {
 		
 		if !kSilentMode
 			if !kSplashVideo
-				this.nextSplash()
+				this.nextSplashPicture()
 			else
 				showSplash(kSplashVideo)
 		
@@ -292,7 +292,7 @@ class SimulatorStartup extends ConfigurationItem {
 			vStartupFinished := true
 			
 			Loop {
-				this.nextSplash()
+				this.nextSplashPicture()
 				
 				Sleep 3000
 			}

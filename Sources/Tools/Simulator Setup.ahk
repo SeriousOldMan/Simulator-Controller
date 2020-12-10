@@ -675,6 +675,8 @@ class PluginsTab extends ConfigurationItemList {
 		Gui SE:Add, Text, x16 y432 w86 h23 +0x200, Arguments
 		Gui SE:Add, Edit, x110 y432 w285 h48 VpluginArgumentsEdit, %pluginArgumentsEdit%
 		
+		Gui SE:Add, Button, x16 y490 w92 h23 gopenLabelsEditor, Edit Labels...
+		
 		Gui SE:Add, Button, x184 y490 w46 h23 VpluginAddButton gaddItem, Add
 		Gui SE:Add, Button, x232 y490 w50 h23 Disabled VpluginDeleteButton gdeleteItem, Delete
 		Gui SE:Add, Button, x340 y490 w55 h23 Disabled VpluginUpdateButton gupdateItem, Update
@@ -792,6 +794,10 @@ comparePlugins(p1, p2) {
 		return true
 	else
 		return (p1.Plugin >= p2.Plugin)
+}
+
+openLabelsEditor() {
+	Run % "notepad.exe " . """" . kConfigDirectory . "Controller Plugin Labels.ini"""
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;

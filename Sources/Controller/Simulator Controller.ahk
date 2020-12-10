@@ -433,18 +433,34 @@ class SimulatorController extends ConfigurationItem {
 
 	simulatorStartup(simulator) {
 		local plugin
+		local buttonBox
 	
 		for ignore, plugin in this.Plugins
 			if this.isActive(plugin)
 				plugin.simulatorStartup(simulator)
+		
+		buttonBox := this.ButtonBox
+		
+		if ((buttonBox != false) && buttonBox.isVisible()) {
+			buttonBox.hide()
+			buttonBox.show()
+		}
 	}
 	
 	simulatorShutdown() {
 		local plugin
+		local buttonBox
 		
 		for ignore, plugin in this.Plugins
 			if this.isActive(plugin) 
 				plugin.simulatorShutdown()
+		
+		buttonBox := this.ButtonBox
+		
+		if ((buttonBox != false) && buttonBox.isVisible()) {
+			buttonBox.hide()
+			buttonBox.show()
+		}
 	}	
 	
 	connectAction(function, action) {
@@ -634,7 +650,10 @@ class SimulatorControllerFunction {
 	}
 	
 	setText(text, color := "Black") {
-		this.Controller.ButtonBox.setControlText(this, text, color)
+		btnBox := this.Controller.ButtonBox
+		
+		if (btnBox != false)
+			btnBox.setControlText(this, text, color)
 	}
 	
 	enable(trigger) {

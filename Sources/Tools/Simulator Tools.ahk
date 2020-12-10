@@ -34,6 +34,9 @@ ListLines Off					; Disable execution history
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+global kToolsConfigurationFile = kConfigDirectory . "Simulator Tools.ini"
+global kToolsTargetsFile = kConfigDirectory . "Simulator Tools.targets"
+
 global kCompiler = kAHKDirectory . "Compiler\ahk2exe.exe"
 
 global kSave = "save"
@@ -105,7 +108,7 @@ checkDependencies(dependencies, modification) {
 }
 
 readToolsConfiguration(ByRef cleanupSettings, ByRef buildSettings) {
-	targets := readConfiguration(kConfigDirectory . "Simulator Tools.targets")
+	targets := readConfiguration(kToolsTargetsFile)
 	configuration := readConfiguration(kToolsConfigurationFile)
 	
 	cleanupSettings := Object()
@@ -416,7 +419,7 @@ substituteVariables(string) {
 }
 
 prepareTargets(ByRef buildProgress) {
-	targets := readConfiguration(kConfigDirectory . "Simulator Tools.targets")
+	targets := readConfiguration(kToolsTargetsFile)
 	
 	for target, arguments in getConfigurationSectionValues(targets, "Cleanup", Object()) {
 		buildProgress +=1

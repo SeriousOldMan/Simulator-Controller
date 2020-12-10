@@ -25,7 +25,6 @@ global kIconsDirectory = kResourcesDirectory . "Icons\"
 
 global kSimulatorConfigurationFile = kConfigDirectory . "Simulator Configuration.ini"
 global kControllerConfigurationFile = kConfigDirectory . "Simulator Controller.ini"
-global kToolsConfigurationFile = kConfigDirectory . "Simulator Tools.ini"
 
 global kUndefined = "__Undefined__"
 

@@ -1,6 +1,5 @@
 [Cleanup]
 Binaries Folder=%kBinariesDirectory%
-Config Folder=%kConfigDirectory%
 Logs Folder=%kLogsDirectory%
 Simulator Controller.ini=%kControllerConfigurationFile%
 Simulator Tools.ini=%kToolsConfigurationFile%

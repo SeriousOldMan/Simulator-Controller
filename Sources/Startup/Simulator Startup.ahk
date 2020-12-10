@@ -47,7 +47,7 @@ ListLines Off					; Disable execution history
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kSplashVideo = true
+global kSplashVideo = false
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -152,20 +152,30 @@ class SimulatorStartup extends ConfigurationItem {
 		}
 	}
 	
-	updateSplash(number) {
-		if (!kSilentMode && !kSplashVideo)
-			if (number < 2)
-				showSplash("Porsche 911 GT3.jpg")
-			else if (number < 3)
-				showSplash("McLaren 720s GT3.jpg")
-			else if (number < 4)
-				showSplash("Lamborghini Huracan Evo GT3.jpg")
-			else if (number < 5)
-				showSplash("Mercedes AMG GT3.jpg")
-			else if (number < 6)
-				showSplash("720s GT3.gif")
-			else if (number < 7)
-				showSplash("Blancpain.jpg")
+	updateSplash() {
+		static number := 1
+		static pictures := false
+		static numPictures := 0
+		
+		if (!kSilentMode && !kSplashVideo) {
+			if !pictures {
+				Loop Files, % kSplashImagesDirectory . "*.jpg"
+				{
+					if !pictures
+						pictures := []
+						
+					pictures.Push(A_LoopFileName)
+				}
+				
+				numPictures := pictures.Length()
+			}
+			
+			if (number > numPictures)
+				number := 1
+			
+			if (number <= numPictures)
+				showSplash(pictures[number++])
+		}
 	}
 	
 	startComponent(component) {
@@ -184,7 +194,7 @@ class SimulatorStartup extends ConfigurationItem {
 				
 				logMessage(kLogInfo, "Component " . component . " is actived")
 				
-				this.updateSplash(runningIndex)
+				this.updateSplash()
 				
 				this.startComponent(component)
 				
@@ -217,9 +227,9 @@ class SimulatorStartup extends ConfigurationItem {
 		
 		if !kSilentMode
 			if !kSplashVideo
-				showSplash("Ferrari 488 GT3.jpg")
+				this.updateSplash()
 			else
-				showSplash("Blancpain 2019.gif")
+				showSplash(kSplashVideo)
 		
 		Sleep 1000
 		
@@ -252,7 +262,7 @@ class SimulatorStartup extends ConfigurationItem {
 			}
 				
 			if kSplashVideo
-				showSplashAnimation("Blancpain 2019.gif")
+				showSplashAnimation(kSplashVideo)
 		}
 
 		if !kSilentMode
@@ -281,13 +291,8 @@ class SimulatorStartup extends ConfigurationItem {
 			
 			vStartupFinished := true
 			
-			index := 0
-			
 			Loop {
-				if (index == 6)
-					index := 0
-				
-				this.updateSplash(++index)
+				this.updateSplash()
 				
 				Sleep 3000
 			}
@@ -305,7 +310,8 @@ class SimulatorStartup extends ConfigurationItem {
 startSimulator() {
 	configuration := readConfiguration(kControllerConfigurationFile)
 	
-	kSplashVideo := (getConfigurationValue(configuration, "Startup", "Video", false) && FileExist(kSplashImagesDirectory . "Blancpain 2019.gif"))
+	video := getConfigurationValue(configuration, "Startup", "Video", false)
+	kSplashVideo := (video && FileExist(kSplashImagesDirectory . video)) ? video : false
 	
 	icon := kIconsDirectory . "Start.ico"
 		

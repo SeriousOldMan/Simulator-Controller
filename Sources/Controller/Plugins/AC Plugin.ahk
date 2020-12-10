@@ -56,7 +56,7 @@ startAC() {
 				protectionOff()
 	
 				try {
-					showSplash("AC Logo.jpg")
+					showSplash("Simulator Splash Images\AC Splash.jpg")
 	
 					raiseEvent(false, "Startup", "playStartupSong")
 	

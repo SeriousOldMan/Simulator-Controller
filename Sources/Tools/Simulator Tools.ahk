@@ -34,29 +34,6 @@ ListLines Off					; Disable execution history
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kCleanupTargets = [["Binaries Folder", false, 1000, kBinariesDirectory]
-						, ["Config Folder", false, 1000, kConfigDirectory]
-						, ["Logs Folder", false, 1000, kLogsDirectory]
-						, ["Simulator Controller.ini", false, 1000, kControllerConfigurationFile]
-						, ["Simulator Tools.ini", false, 1000, kToolsConfigurationFile]
-						, ["*.bak Files", true, 1000]]
-
-global kBuildTargets = [["Simulator Controller", true, 3000
-					   , kSourcesDirectory . "Controller\Simulator Controller.ahk", kBinariesDirectory . "Simulator Controller.exe"
-					   , [kSourcesDirectory . "Controller\Plugins\"]]
-					  , ["Simulator Configuration", true, 1000
-					   , kSourcesDirectory . "Startup\Simulator Configuration.ahk", kBinariesDirectory . "Simulator Configuration.exe"
-					   , [kSourcesDirectory . "Startup\Libraries\"]]
-					  , ["Simulator Startup", true, 2000
-					   , kSourcesDirectory . "Startup\Simulator Startup.ahk", kBinariesDirectory . "Simulator Startup.exe"
-					   , [kSourcesDirectory . "Startup\Libraries\"]]
-					  , ["Simulator Setup", true, 2000
-					   , kSourcesDirectory . "Tools\Simulator Setup.ahk", kBinariesDirectory . "Simulator Setup.exe"]
-					  , ["Simulator Tools", true, 2000
-					   , kSourcesDirectory . "Tools\Simulator Tools.ahk", kBinariesDirectory . "Simulator Tools.exe"]]
-
-global kBuildProgressSteps = kCleanupTargets.Length() + kBuildTargets.Length() + 1
-
 global kCompiler = kAHKDirectory . "Compiler\ahk2exe.exe"
 
 global kSave = "save"
@@ -68,10 +45,11 @@ global kCancel = "cancel"
 ;;;                        Private Variable Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+global vCleanupTargets = []
+global vBuildTargets = []
+
 global vCleanupSettings = Object()
 global vBuildSettings = Object()
-
-global vBuildProgress = 0
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -109,10 +87,6 @@ checkDirectoryDependency(directory, modification) {
 	return false
 }
 
-checkLibraryDependency(modification) {
-	return checkDirectoryDependency(kIncludesDirectory, modification)
-}
-
 checkDependencies(dependencies, modification) {
 	for ignore, fileOrFolder in dependencies {
 		attributes := FileExist(fileOrFolder)
@@ -131,22 +105,17 @@ checkDependencies(dependencies, modification) {
 }
 
 readToolsConfiguration(ByRef cleanupSettings, ByRef buildSettings) {
+	targets := readConfiguration(kConfigDirectory . "Simulator Tools.targets")
 	configuration := readConfiguration(kToolsConfigurationFile)
 	
 	cleanupSettings := Object()
 	buildSettings := Object()
 	
-	for ignore, target in kCleanupTargets {
-		key := target[1]
+	for target, rule in getConfigurationSectionValues(targets, "Cleanup", Object())
+		cleanupSettings[target] := getConfigurationValue(configuration, "Cleanup", target, InStr(target, "*.ahk") ? true : false)
 	
-		cleanupSettings[key] := getConfigurationValue(configuration, "Cleanup", key, target[2])
-	}
-	
-	for ignore, target in kBuildTargets {
-		key := target[1]
-	
-		buildSettings[key] := getConfigurationValue(configuration, "Build", key, target[2])
-	}
+	for target, rule in getConfigurationSectionValues(targets, "Build", Object())
+		buildSettings[target] := getConfigurationValue(configuration, "Build", target, true)
 	
 	if A_IsCompiled
 		buildSettings["Simulator Tools"] := false
@@ -155,17 +124,11 @@ readToolsConfiguration(ByRef cleanupSettings, ByRef buildSettings) {
 writeToolsConfiguration(cleanupSettings, buildSettings) {
 	configuration := newConfiguration()
 	
-	for ignore, target in kCleanupTargets {
-		key := target[1]
-	
-		setConfigurationValue(configuration, "Cleanup", key, cleanupSettings[key])
-	}
-	
-	for ignore, target in kBuildTargets {
-		key := target[1]
-	
-		setConfigurationValue(configuration, "Build", key, buildSettings[key])
-	}
+	for target, setting in cleanupSettings
+		setConfigurationValue(configuration, "Cleanup", target, setting)
+		
+	for target, setting in buildSettings
+		setConfigurationValue(configuration, "Build", target, setting)
 	
 	writeConfiguration(kToolsConfigurationFile, configuration)
 }
@@ -181,36 +144,38 @@ cancelTargets() {
 editTargets(command := "") {
 	static result
 	
-	static cleanBinaries
-	static cleanConfig
-	static cleanLogs
-	static cleanStartupIni
-	static cleanToolsIni
-	static cleanBakFiles
-	static buildNeuralNetwork
-	static buildSimulatorController
-	static buildSimulatorConfiguration
-	static buildSimulatorStartup
-	static buildSimulatorSetup
-	static buildSimulatorTools
+	static cleanupVariable1
+	static cleanupVariable2
+	static cleanupVariable3
+	static cleanupVariable4
+	static cleanupVariable5
+	static cleanupVariable6
+	static cleanupVariable7
+	static cleanupVariable8
+	
+	static buildVariable1
+	static buildVariable2
+	static buildVariable3
+	static buildVariable4
+	static buildVariable5
+	static buildVariable6
+	static buildVariable7
+	static buildVariable8
 	
 	if (command == kSave) {
 		Gui TE:Submit
 		
-		startupSettings := Object()
+		for target, setting in vCleanupSettings {
+			cleanupVariable := "cleanupVariable" . A_Index
+			
+			vCleanupSettings[target] := %cleanupVariable%
+		}
 		
-		vCleanupSettings["Binaries Folder"] := cleanBinaries
-		vCleanupSettings["Config Folder"] := cleanConfig
-		vCleanupSettings["Logs Folder"] := cleanLogs
-		vCleanupSettings["Simulator Controller.ini"] := cleanStartupIni
-		vCleanupSettings["Simulator Tools.ini"] := cleanToolsIni
-		vCleanupSettings["*.bak Files"] := cleanBakFiles
-		
-		vBuildSettings["Simulator Controller"] := buildSimulatorController
-		vBuildSettings["Simulator Configuration"] := buildSimulatorConfiguration
-		vBuildSettings["Simulator Startup"] := buildSimulatorStartup
-		vBuildSettings["Simulator Setup"] := buildSimulatorSetup
-		vBuildSettings["Simulator Tools"] := buildSimulatorTools
+		for target, setting in vBuildSettings {
+			buildVariable := "buildVariable" . A_Index
+			
+			vBuildSettings[target] := %buildVariable%
+		}
 		
 		writeToolsConfiguration(vCleanupSettings, vBuildSettings)
 		
@@ -231,18 +196,11 @@ editTargets(command := "") {
 	else {
 		result := false
 		
-		cleanBinaries := vCleanupSettings["Binaries Folder"]
-		cleanConfig := vCleanupSettings["Config Folder"]
-		cleanLogs := vCleanupSettings["Logs Folder"]
-		cleanStartupIni := vCleanupSettings["Simulator Controller.ini"]
-		cleanToolsIni := vCleanupSettings["Simulator Tools.ini"]
-		cleanBakFiles := vCleanupSettings["*.bak Files"]
+		if (vCleanupSettings.Length() > 8)
+			Throw "Too many cleanup targets detected in editTargets..."
 		
-		buildSimulatorController := vBuildSettings["Simulator Controller"]
-		buildSimulatorConfiguration := vBuildSettings["Simulator Configuration"]
-		buildSimulatorStartup := vBuildSettings["Simulator Startup"]
-		buildSimulatorSetup := vBuildSettings["Simulator Setup"]
-		buildSimulatorTools := A_IsCompiled ? false : vBuildSettings["Simulator Tools"]
+		if (vBuildSettings.Length() > 8)
+			Throw "Too many build targets detected in editTargets..."
 		
 		Gui TE:-border -Caption
 		Gui TE:Color, D0D0D0
@@ -258,33 +216,54 @@ editTargets(command := "") {
 	
 		Gui TE:Font, Norm, Arial
 		Gui TE:Font, Italic, Arial
-	
-		Gui TE:Add, GroupBox, YP+30 w220 h140, Cleanup
+		
+		cleanupHeight := 20 + (vCleanupSettings.Count() * 20)
+		
+		if (cleanupHeight == 20)
+			cleanupHeight := 40
+			
+		Gui TE:Add, GroupBox, YP+30 w220 h%cleanupHeight%, Cleanup
 	
 		Gui TE:Font, Norm, Arial
 	
-		Gui TE:Add, CheckBox, YP+20 XP+10 Checked%cleanBinaries% vcleanBinaries, Binaries Folder
-		Gui TE:Add, CheckBox, Checked%cleanConfig% vcleanConfig, Config Folder
-		Gui TE:Add, CheckBox, Checked%cleanLogs% vcleanLogs, Logs Folder
-		Gui TE:Add, CheckBox, Checked%cleanStartupIni% vcleanStartupIni, Simulator Controller.ini
-		Gui TE:Add, CheckBox, Checked%cleanToolsIni% vcleanToolsIni, Simulator Tools.ini
-		Gui TE:Add, CheckBox, Checked%cleanBakFiles% vcleanBakFiles, *.bak Files
+		if (vCleanupSettings.Count() > 0)
+			for target, setting in vCleanupSettings {
+				option := ""
+				
+				if (A_Index == 1)
+					option := option . " YP+20 XP+10"
+					
+				Gui TE:Add, CheckBox, %option% Checked%setting% vcleanupVariable%A_Index%, %target%
+			}
+		else
+			Gui TE:Add, Text, YP+20 XP+10, No targets found...
 	
 		Gui TE:Font, Norm, Arial
 		Gui TE:Font, Italic, Arial
 	
-		Gui TE:Add, GroupBox, XP-10 YP+30 w220 h120, Compile
+		buildHeight := 20 + (vBuildSettings.Count() * 20)
+		
+		if (buildHeight == 20)
+			buildHeight := 40
+			
+		Gui TE:Add, GroupBox, XP-10 YP+30 w220 h%buildHeight%, Build
 	
 		Gui TE:Font, Norm, Arial
 	
-		Gui TE:Add, CheckBox, YP+20 XP+10 Checked%buildSimulatorController% vbuildSimulatorController, Simulator Controller
-		Gui TE:Add, CheckBox, Checked%buildSimulatorConfiguration% vbuildSimulatorConfiguration, Simulator Configuration
-		Gui TE:Add, CheckBox, Checked%buildSimulatorStartup% vbuildSimulatorStartup, Simulator Startup
-		Gui TE:Add, CheckBox, Checked%buildSimulatorSetup% vbuildSimulatorSetup, Simulator Setup
-		
-		disabledState := A_IsCompiled ? "Disabled" : ""
-		
-		Gui TE:Add, CheckBox, %disabledState% Checked%buildSimulatorTools% vbuildSimulatorTools, Simulator Tools
+		if (vBuildSettings.Count() > 0)
+			for target, setting in vBuildSettings {
+				option := ""
+				
+				if (A_Index == 1)
+					option := option . " YP+20 XP+10"
+					
+				if (target == "Simulator Tools")
+					option := option . (A_IsCompiled ? " Disabled" : "")
+					
+				Gui TE:Add, CheckBox, %option% Checked%setting% vbuildVariable%A_Index%, %target%
+			}
+		else
+			Gui TE:Add, Text, YP+20 XP+10, No targets found...
 	 
 		Gui TE:Add, Button, Default X10 Y+20 w100 gsaveTargets, &Build
 		Gui TE:Add, Button, X+20 w100 gcancelTargets, &Cancel
@@ -300,138 +279,181 @@ editTargets(command := "") {
 	}
 }
 
-runCleanTargets() {
-	for ignore, target in kCleanupTargets {
+runCleanTargets(ByRef buildProgress) {
+	for ignore, target in vCleanupTargets {
 		targetName := target[1]
 	
-		if vCleanupSettings[targetName] {
-			Progress %vBuildProgress%, % "Cleaning " . targetName . "..."
+		Progress %buildProgress%, % "Cleaning " . targetName . "..."
 			
-			logMessage(kLogInfo, "Cleaning " . targetName)
-	
-			if (target.Length() > 3) {
-				fileOrFolder := target[4]
-				
-				if (InStr(FileExist(fileOrFolder), "D")) {
-					currentDirectory := A_WorkingDir
+		logMessage(kLogInfo, "Cleaning " . targetName)
+
+		if (target.Length() == 2) {
+			fileOrFolder := target[2]
 			
-					SetWorkingDir %fileOrFolder%
-				
-					Loop Files, *.*
-						FileDelete %A_LoopFilePath%
-				
-					SetWorkingDir %currentDirectory%
-				}
-				else if (FileExist(fileOrFolder) != "") {
-					FileDelete %fileOrFolder%
-				}
-			}
-			else if (targetName == "*.bak Files") {
+			if (InStr(FileExist(fileOrFolder), "D")) {
 				currentDirectory := A_WorkingDir
+		
+				SetWorkingDir %fileOrFolder%
 			
-				SetWorkingDir %kHomeDirectory%
-				
-				Loop Files, *.ahk.bak, R
-				{
+				Loop Files, *.*
 					FileDelete %A_LoopFilePath%
-				
-					Progress %vBuildProgress%, % "Deleting " . A_LoopFileName . "..."
 			
-					Sleep 100
-				}
-				
 				SetWorkingDir %currentDirectory%
 			}
-				
-			Sleep target[3]
+			else if (FileExist(fileOrFolder) != "") {
+				FileDelete %fileOrFolder%
+			}
 		}
-		else	
-			Sleep 100
-				
-		vBuildProgress += Round(100 / kBuildProgressSteps)
+		else {
+			currentDirectory := A_WorkingDir
+			directory := target[2]
+			pattern := target[3]
+			options := ((target[4] && (target[4] != "")) ? target[4] : "")
 			
-		Progress %vBuildProgress%
+			SetWorkingDir %directory%
+			
+			Loop Files, %pattern%, %options%
+			{
+				FileDelete %A_LoopFilePath%
+			
+				Progress %buildProgress%, % "Deleting " . A_LoopFileName . "..."
+		
+				Sleep 100
+			}
+			
+			SetWorkingDir %currentDirectory%
+		}
+			
+		Sleep 1000
+				
+		buildProgress += Round(100 / (vCleanupTargets.Length() + vBuildTargets.Length() + 1))
+			
+		Progress %buildProgress%
 	}
 }
 
-runBuildTargets() {
-	for ignore, target in kBuildTargets {
+runBuildTargets(ByRef buildProgress) {
+	for ignore, target in vBuildTargets {
 		targetName := target[1]
-		wait := target[3]
 	
-		if vBuildSettings[targetName] {
-			Progress %vBuildProgress%, % "Compiling " . targetName . "..."
+		Progress %buildProgress%, % "Compiling " . targetName . "..."
 			
-			logMessage(kLogInfo, "Building " . targetName)
-	
-			if (target.Length() > 3) {
-				build := false
-				
-				targetSource := target[4]
-				targetBinary := target[5]
-				
-				FileGetTime srcLastModified, %targetSource%, M
-				FileGetTime binLastModified, %targetBinary%, M
-				
-				if binLastModified {
-					build := (build || (ErrorLevel || (srcLastModified > binLastModified)))
-					build := (build || checkLibraryDependency(binLastModified))
-				
-					if (!build && (target.Length() > 5))
-						build := checkDependencies(target[6], binLastModified)
-				}
-				else
-					build := true
-				
-				if build {
-					logMessage(kLogInfo, targetName . " or dependent files out of date - needs recompile")
-					logMessage(kLogInfo, "Compiling " . targetSource)
-	
-					try {
-						RunWait % kCompiler . " /in """ . targetSource . """"
-					}
-					catch exception {
-						logMessage(kLogCritical, "Cannot compile " . targetSource . " - source file or AHK Compiler (" . kCompiler . ") not found")
-					
-						SplashTextOn 800, 60, Modular Simulator Controller System - Compiler, Cannot compile %targetSource%: `n`nSource file or AHK Compiler (%kCompiler%) not found...
-						
-						Sleep 5000
-						
-						SplashTextOff
-					}
-					
-					SplitPath targetBinary, compiledFile
-					SplitPath targetSource, , sourceDirectory 
-					
-					targetBinary := sourceDirectory . "\" . compiledFile
-					
-					FileCreateDir % SubStr(kBinariesDirectory, 1, StrLen(kBinariesDirectory) - 1)
-					FileMove %targetBinary%, %kBinariesDirectory%, 1
-				}
-				else
-					wait := 100
-			}
-				
-			Sleep %wait%
+		logMessage(kLogInfo, "Building " . targetName)
+
+		build := false
+		
+		targetSource := target[2]
+		targetBinary := target[3]
+		
+		FileGetTime srcLastModified, %targetSource%, M
+		FileGetTime binLastModified, %targetBinary%, M
+		
+		if binLastModified {
+			build := (build || (ErrorLevel || (srcLastModified > binLastModified)))
+			build := (build || checkDependencies(target[4], binLastModified))
 		}
 		else
-			Sleep 100
+			build := true
 		
-		vBuildProgress += Round(100 / kBuildProgressSteps)
+		if build {
+			logMessage(kLogInfo, targetName . " or dependent files out of date - needs recompile")
+			logMessage(kLogInfo, "Compiling " . targetSource)
+
+			try {
+				RunWait % kCompiler . " /in """ . targetSource . """"
+			}
+			catch exception {
+				logMessage(kLogCritical, "Cannot compile " . targetSource . " - source file or AHK Compiler (" . kCompiler . ") not found")
 			
-		Progress %vBuildProgress%
+				SplashTextOn 800, 60, Modular Simulator Controller System - Compiler, Cannot compile %targetSource%: `n`nSource file or AHK Compiler (%kCompiler%) not found...
+				
+				Sleep 5000
+				
+				SplashTextOff
+			}
+			
+			SplitPath targetBinary, compiledFile, targetDirectory
+			SplitPath targetSource, , sourceDirectory 
+			
+			compiledFile := sourceDirectory . "\" . compiledFile
+			
+			FileCreateDir %targetDirectory%
+			FileMove %compiledFile%, %targetDirectory%, 1
+		}
+			
+		Sleep 1000
+		
+		buildProgress += Round(100 / (vCleanupTargets.Length() + vBuildTargets.Length() + 1))
+			
+		Progress %buildProgress%
 	}
 }
 
-prepareTargets(targets, settings) {
-	for ignore, target in targets {
-		targetName := target[1]
+substituteVariables(string) {
+	result := string
 	
-		vBuildProgress +=1
+	Loop {
+		startPos := InStr(result, "%")
 		
-		Progress, %vBuildProgress%, % targetName . ": " . (settings[targetName] ? "Yes" : "No")
+		if startPos {
+			startPos += 1
+			endPos := InStr(result, "%", false, startPos)
+			
+			if endPos {
+				variable := SubStr(result, startPos, endPos - startPos)
+				path := %variable%
+				
+				result := StrReplace(result, "%" . variable . "%", path)
+			}
+			else
+				Throw "Second % not found while scanning (" . string . ") for variables in substituteVariables..."
+		}
+		else
+			break
+	}
+		
+	return result
+}
+
+prepareTargets(ByRef buildProgress) {
+	targets := readConfiguration(kConfigDirectory . "Simulator Tools.targets")
 	
-		Sleep 100
+	for target, arguments in getConfigurationSectionValues(targets, "Cleanup", Object()) {
+		buildProgress +=1
+		build := vCleanupSettings[target]
+		
+		Progress, %buildProgress%, % target . ": " . (build ? "Yes" : "No")
+		
+		if build {
+			arguments := substituteVariables(arguments)
+			
+			vCleanupTargets.Push(Array(target, string2Values(",", arguments)))
+		}
+	
+		Sleep 200
+	}
+	
+	for target, arguments in getConfigurationSectionValues(targets, "Build", Object()) {
+		buildProgress +=1
+		build := vBuildSettings[target]
+		
+		Progress, %buildProgress%, % target . ": " . (build ? "Yes" : "No")
+		
+		if build {
+			arguments := substituteVariables(arguments)
+			
+			rule := string2Values("<-", arguments)
+			binary := rule[1]
+			
+			arguments := string2Values(";", rule[2])
+			
+			source := arguments[1]
+			dependencies := string2Values(",", arguments[2])
+		
+			vBuildTargets.Push(Array(target, source, binary, dependencies))
+		}
+	
+		Sleep 200
 	}
 }
 
@@ -458,15 +480,14 @@ runTargets() {
 	
 	Progress 1:B w300 x%x% y%y% FS8 CWD0D0D0 CBGreen, %A_Space%, Preparing Targets
 
-	prepareTargets(kCleanupTargets, vCleanupSettings)
-	prepareTargets(kBuildTargets, vBuildSettings)
+	buildProgress := 0
 	
-	Sleep 100
+	prepareTargets(buildProgress)
 	
 	Progress, , %A_Space%, Running Targets
 	
-	runCleanTargets()
-	runBuildTargets()
+	runCleanTargets(buildProgress)
+	runBuildTargets(buildProgress)
 		
 	Progress 100, Done
 	
@@ -483,8 +504,6 @@ runTargets() {
 ;;;-------------------------------------------------------------------------;;;
 
 runTargets()
-
-return
 
 
 ;;;-------------------------------------------------------------------------;;;

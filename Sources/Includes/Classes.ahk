@@ -437,7 +437,7 @@ class ControllerFunction extends ConfigurationItem {
 	
 	loadFromDescriptor(trigger, value) {
 		if InStr(trigger, " Action") {
-			trigger := SubStr(trigger, 1, StrLen(trigger) - 7)
+			trigger := SubStr(trigger, 1, StrLen(trigger) - StrLen(" Action"))
 			
 			this.iActions[trigger] := this.computeAction(trigger, value)
 		}

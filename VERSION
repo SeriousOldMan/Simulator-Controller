@@ -1,5 +1,5 @@
 [Version]
-Current=0.9.5-beta
+Current=0.9.6-beta
 Target=1.0.0
-Features=Startup song configuration, SimFeedback stream integration
+Features=Configurable build targets, Configurable splash screens
 Date=12/09/2020

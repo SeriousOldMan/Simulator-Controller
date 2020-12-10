@@ -109,7 +109,7 @@ startACC() {
 				protectionOff()
 	
 				try {
-					showSplash("ACC Logo.jpg")
+					showSplash("Simulator Splash Images\ACC Splash.jpg")
 	
 					raiseEvent(false, "Startup", "playStartupSong")
 					

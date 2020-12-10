@@ -191,7 +191,7 @@ restart:
 		setConfigurationValue(newConfiguration, "Controller", "Button Box Simulation Duration", (buttonBoxSimulation ? buttonBoxSimulationDuration : false))
 		setConfigurationValue(newConfiguration, "Controller", "Button Box Position", buttonBoxPosition)
 		
-		setConfigurationValue(newConfiguration, "Startup", "Video", visualsOption == "Blancpain 2019 Video")
+		setConfigurationValue(newConfiguration, "Startup", "Video", (visualsOption == "Pictures Carousel") ? false : visualsOption)
 		setConfigurationValue(newConfiguration, "Startup", "Song", (playSong ? songOption : false))
 		
 		setConfigurationValue(newConfiguration, "Startup", "Simulator", (startup ? startOption : false))
@@ -334,10 +334,20 @@ restart:
 			
 		Gui CE:Add, DropDownList, X120 YP-5 w100 Choose%chosen% vbuttonBoxPosition, % values2String("|", choices*)
 		
-		hasVideo := FileExist(kSplashImagesDirectory . "Blancpain 2019.gif")
-		chosen := (hasVideo ? getConfigurationValue(configurationOrCommand, "Startup", "Video", false) + 1 : 1)
-		visualsOption := ((chosen == 2) ? "Blancpain 2019 Video" : "GT3 Cars")
-		options := hasVideo ? "GT3 Cars|Blancpain 2019 Video" : "GT3 Cars"
+		video := getConfigurationValue(configurationOrCommand, "Startup", "Video", false)
+		
+		videos := []
+		
+		Loop Files, % kSplashImagesDirectory . "*.gif"
+			videos.Push(A_LoopFileName)
+		
+		chosen := (video ? (inList(videos, video) + 1) : 1)
+		
+		visualsOption := ((chosen == 1) ? "Pictures Carousel" : videos[chosen - 1])
+		options := "Pictures Carousel"
+		
+		if (videos.Length() > 0)
+			options := (options . "|" . values2String("|", videos*))
 		
 		Gui CE:Add, Text, X10 Y+20, Splash Screen
 		Gui CE:Add, DropDownList, X90 YP-5 w140 Choose%chosen% vvisualsOption, %options%

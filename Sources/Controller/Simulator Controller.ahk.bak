@@ -1132,7 +1132,7 @@ updateSimulatorState() {
 		else {
 			SetTimer updateSimulatorState, 1000
 
-			if ((btnBox != false) && !btnBox.isVisible())
+			if !ButtonBox.Instance.isVisible()
 				controller.showLogo()
 		}
 	}

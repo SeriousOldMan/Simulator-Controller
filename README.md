@@ -66,12 +66,12 @@ These plugins are part of the Simulator Controller distribution. Beside providin
 
 | Plugin | Description |
 | ------ | ------ |
-| System | Handles multiple button box pages and starting and stopping of all applications. |
-| Tactile Feedback | Support for pedal and chassis vibration using SimHub. |
-| Motion Feedback | Support for rig motion feedback using SimFeedback. |
-| ACC | Support for starting and stopping Assetto Corsa Competizione. |
-| AC | Support for starting and stopping Assetto Corsa. |
-| Button Box | Tools for building your own button box visuals. An easy to understand example will help you building the screen representation of your own button boxes. |
+| System | Handles multiple button box layers and manages all applications configured for your simulation setup. |
+| Tactile Feedback | Fully configurable support for pedal and chassis vibration using [SimHub](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications). |
+| Motion Feedback | Fully configurable support for rig motion feedback using [SimFeedback](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications). |
+| ACC | Special support for starting and stopping Assetto Corsa Competizione from your hardware controller and supplies functions and actions for configurable, automated chat messages in a multiplayer game. Although quite small with little more than 100 lines of code, this plugin uses configuration based data and defines a simulator-dependent mode. Therefore it supplies a good showcase when starting your own plugin development. |
+| AC | Special support for starting and stopping Assetto Corsa from your hardware controller. |
+| Button Box | Tools for building your own button box / controller visuals. An easy to understand example will help you building the screen representation of your own button boxes. |
 
 ### Third party applications
 

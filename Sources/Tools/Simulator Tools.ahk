@@ -466,7 +466,7 @@ runTargets() {
 	if (!FileExist(kToolsConfigurationFile) || GetKeyState("Ctrl")) {
 		readToolsConfiguration(vCleanupSettings, vBuildSettings)
 	
-		if !editTargets()
+		if (!editTargets() && !isDebug())
 			ExitApp 0
 	}
 	else

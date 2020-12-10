@@ -906,7 +906,8 @@ initializeMotionFeedbackPlugin() {
 	if (!kSimFeedback || !FileExist(kSimFeedback)) {
 		logMessage(kLogCritical, "Plugin Motion Feedback deactivated, because the configured application path (" . kSimFeedback . ") cannot be found - please check the setup...")
 		
-		return
+		if !isDebug()
+			return
 	}
 
 	new MotionFeedbackPlugin(controller, kMotionFeedbackPlugin, controller.Configuration)

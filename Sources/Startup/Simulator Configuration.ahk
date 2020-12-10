@@ -48,6 +48,8 @@ showConfigurationEditor() {
 	
 	if (editConfiguration(configuration) == kSave)
 		writeConfiguration(kControllerConfigurationFile, configuration)
+	
+	ExitApp 0
 }
 
 
@@ -56,5 +58,3 @@ showConfigurationEditor() {
 ;;;-------------------------------------------------------------------------;;;
 
 showConfigurationEditor()
-	
-ExitApp 0

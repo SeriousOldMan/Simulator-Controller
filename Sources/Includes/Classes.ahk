@@ -1,5 +1,5 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Global Constants Library        ;;;
+;;;   Modular Simulator Controller System - Global Classes Library          ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2020) Creative Commons - BY-NC-SA                        ;;;
@@ -211,7 +211,7 @@ class Application extends ConfigurationItem {
 		
 		logMessage(kLogInfo, "Stopping application " . this.Application)
 		
-		if (special && (specialShutdown && (specialShutdown != ""))) {
+		if (special && specialShutdown && (specialShutdown != "")) {
 			if IsLabel(specialShutdown)
 				Gosub %specialShutdown%
 			else
@@ -237,13 +237,12 @@ class Application extends ConfigurationItem {
 		}
 	}
 	
-	isRunning() {
-		if (this.iSpecialIsRunning && (this.iSpecialIsRunning != "")) {
-			specialIsRunning := this.iSpecialIsRunning
-			
+	isRunning(special := true) {
+		specialIsRunning := this.iSpecialIsRunning
+		
+		if (special && specialIsRunning && (specialIsRunning != ""))
 			if %specialIsRunning%()
 				return true
-		}
 		
 		result := false
 		
@@ -325,6 +324,12 @@ class ControllerFunction extends ConfigurationItem {
 		}
 	}
 	
+	Trigger[] {
+		Get {
+			Throw "Virtual property ControllerFunction.Trigger must be overriden in a subclass..."
+		}
+	}
+	
 	Hotkeys[trigger := false, asText := false] {
 		Get {
 			if trigger {
@@ -345,12 +350,6 @@ class ControllerFunction extends ConfigurationItem {
 			}
 			else
 				return this.iHotkeys
-		}
-	}
-	
-	Trigger[] {
-		Get {
-			Throw "Virtual property ControllerFunction.Trigger must be overriden in a subclass..."
 		}
 	}
 	
@@ -503,7 +502,9 @@ class ControllerFunction extends ConfigurationItem {
 		return (action != false) ? Func(action[1]).Bind(action[2]*) : false
 	}
 	
-	fireAction(action) {
+	fireAction(trigger) {
+		action := this.Actions[trigger]
+		
 		if action
 			%action%()
 	}
@@ -685,8 +686,8 @@ class Plugin extends ConfigurationItem {
 		return result
 	}
 	
-	hasArgument(argument) {
-		return this.Arguments.HasKey(argument)
+	hasArgument(parameter) {
+		return this.Arguments.HasKey(parameter)
 	}
 	
 	getArgumentValue(argument, default := false) {

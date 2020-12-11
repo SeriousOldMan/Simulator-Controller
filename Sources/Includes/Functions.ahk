@@ -177,6 +177,51 @@ initializeTrayMessageQueue() {
 	SetTimer trayMessageQueue, 500
 }
 
+loadSimulatorConfiguration() {
+	kVersion := getConfigurationValue(readConfiguration(kHomeDirectory . "VERSION"), "Version", "Current", "0.0.0")
+	
+	logMessage(kLogCritical, "---------------------------------------------------------------")
+	logMessage(kLogCritical, "           Running " . StrSplit(A_ScriptName, ".")[1] . " (" . kVersion . ")")
+	logMessage(kLogCritical, "---------------------------------------------------------------")
+		
+	kSimulatorConfiguration := readConfiguration(kSimulatorConfigurationFile)
+	
+	if (kSimulatorConfiguration.Count() == 0)
+		logMessage(kLogCritical, "No configuration found - please run the Setup tool...")	
+	
+	path := getConfigurationValue(kSimulatorConfiguration, "Configuration", "Home Path")
+	if path {
+		kHomeDirectory := path . "\"
+		
+		logMessage(kLogInfo, "Home path set to " . path)
+	}
+	else
+		logMessage(kLogWarn, "Home path not set")
+	
+	path := getConfigurationValue(kSimulatorConfiguration, "Configuration", "AHK Path")
+	if path {
+		kAHKDirectory := path . "\"
+		
+		logMessage(kLogInfo, "AutoHotkey path set to " . path)
+	}
+	else
+		logMessage(kLogWarn, "AutoHotkey path not set")
+	
+	path := getConfigurationValue(kSimulatorConfiguration, "Configuration", "NirCmd Path")
+	if path {
+		kNirCmd := path . "\NirCmd.exe"
+		
+		logMessage(kLogInfo, "NirCmd executable set to " . kNirCmd)
+	}
+	else
+		logMessage(kLogWarn, "NirCmd executable not configured")
+		
+	vDebug := getConfigurationValue(kSimulatorConfiguration, "Configuration", "Debug", false)
+	vLogLevel := inList(["Info", "Warn", "Critical", "Off"], getConfigurationValue(kSimulatorConfiguration, "Configuration", "Log Level", "Warn"))
+		
+	kSilentMode := getConfigurationValue(kSimulatorConfiguration, "Configuration", "Silent Mode", false)
+}
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Public Function Declaration Section                  ;;;
@@ -556,51 +601,6 @@ getConfigurationSectionValues(configuration, section, default := false) {
 
 newConfiguration() {
 	return Object()
-}
-
-loadSimulatorConfiguration() {
-	kVersion := getConfigurationValue(readConfiguration(kHomeDirectory . "VERSION"), "Version", "Current", "0.0.0")
-	
-	logMessage(kLogCritical, "---------------------------------------------------------------")
-	logMessage(kLogCritical, "           Running " . StrSplit(A_ScriptName, ".")[1] . " (" . kVersion . ")")
-	logMessage(kLogCritical, "---------------------------------------------------------------")
-		
-	kSimulatorConfiguration := readConfiguration(kSimulatorConfigurationFile)
-	
-	if (kSimulatorConfiguration.Count() == 0)
-		logMessage(kLogCritical, "No configuration found - please run the Setup tool...")	
-	
-	path := getConfigurationValue(kSimulatorConfiguration, "Configuration", "Home Path")
-	if path {
-		kHomeDirectory := path . "\"
-		
-		logMessage(kLogInfo, "Home path set to " . path)
-	}
-	else
-		logMessage(kLogWarn, "Home path not set")
-	
-	path := getConfigurationValue(kSimulatorConfiguration, "Configuration", "AHK Path")
-	if path {
-		kAHKDirectory := path . "\"
-		
-		logMessage(kLogInfo, "AutoHotkey path set to " . path)
-	}
-	else
-		logMessage(kLogWarn, "AutoHotkey path not set")
-	
-	path := getConfigurationValue(kSimulatorConfiguration, "Configuration", "NirCmd Path")
-	if path {
-		kNirCmd := path . "\NirCmd.exe"
-		
-		logMessage(kLogInfo, "NirCmd executable set to " . kNirCmd)
-	}
-	else
-		logMessage(kLogWarn, "NirCmd executable not configured")
-		
-	vDebug := getConfigurationValue(kSimulatorConfiguration, "Configuration", "Debug", false)
-	vLogLevel := inList(["Info", "Warn", "Critical", "Off"], getConfigurationValue(kSimulatorConfiguration, "Configuration", "Log Level", "Warn"))
-		
-	kSilentMode := getConfigurationValue(kSimulatorConfiguration, "Configuration", "Silent Mode", false)
 }
 
 setConfigurationValue(configuration, section, key, value) {

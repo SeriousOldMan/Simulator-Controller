@@ -91,7 +91,7 @@ The following applications are not part of the distribution and are not strictly
 
 ### Documentation
 
-Coming soon. In the meantime use all the given goodies, especially the very large sample configuration as a starting point.
+Currently work in progress. In the meantime use all the given goodies, especially the very large sample configuration as a starting point.
 
 ### Known issues
 

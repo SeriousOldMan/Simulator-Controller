@@ -15,6 +15,8 @@ The Simulator Controller framework has been build around the similar named Singl
 
 A specific hardware control element is represented in code by instances of the class SimulatorControllerFunction (*). For a controller function to be useful, it must be connected to a ControllerAction (*), which implements the functionality, which should triggered by the hardware controller. These connections are of dynamic nature, which means that the function mapping of the hardware controller may be changed anytime. This is, in the end, the capability used when switching between modes.
 
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Class%20Diagram%201.JPG)
+
 ### Plugins
 
 

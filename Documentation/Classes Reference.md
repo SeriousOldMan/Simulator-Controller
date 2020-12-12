@@ -147,8 +147,6 @@ Concrete implementation for single state switches, for example a momentary ignit
 
 ***
 
-## SimulatorController extends ConfigurationItem
-
 ## ButtonFunction extends [ControllerFunction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference/_edit#abstract-controllerfunction-extends-configurationitem-classesahk) ([Classes.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Classes.ahk))
 Concrete implementation for simple push buttons. The triggers returned by *Trigger[]* are ["Push"].
 
@@ -191,7 +189,7 @@ Returns the values for the given argument as string, or the supplied *default* v
 
 # Controller Classes
 
-All the following classes are part of the Simulator Controller core framewor defined in the [Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk) script. In many cases they are based upon one of the configuration classes above.
+All the following classes are part of the Simulator Controller core framework defined in the [Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk) script. In many cases they are based upon one of the configuration classes above.
 
 ## [Singleton] SimulatorController extends [ConfigurationItem](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-classesahk) ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
 This class implements the core functionality of Simulator Controller. The single instance manages a set of plugins and the connection between hardware functions of a given controller or button box and the actions implemented by these plugins.
@@ -253,6 +251,8 @@ Note: Normally, this method is called by the constructor of the plugin. Therefor
 
 #### *registerMode(plugin :: ControllerPlugin, mode :: ControllerMode)*
 Registers the given mode of the given plugin for the controller.
+
+Note: Normally, this method is called by the *registerMode* method of the plugin. Therefore it is almost always unnecessary to call *registerMode* for the controller directly. But, since all side effects of *registerMode* are idempotent, so you can call it for your peace of mind as often as you like.
 
 #### *isActive(modeOrPlugin :: TypeUnion(ControllerPlugin, ControllerMode))*
 Returns *true*, if the given plugin or mode is active. Plugins may be deactivated according to configuration information, whereas modes may be deactivated based on a dynamic test. For example, modes might only be active, if a simulator game is running.

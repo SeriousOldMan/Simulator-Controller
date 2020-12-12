@@ -840,8 +840,7 @@ class ControllerPlugin extends Plugin {
 		
 		base.__New(name, configuration)
 		
-		if (this.Controller != false)
-			this.Controller.registerPlugin(this)
+		this.Controller.registerPlugin(this)
 	}
 	
 	findMode(name) {

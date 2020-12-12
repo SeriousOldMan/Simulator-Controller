@@ -30,13 +30,13 @@ For further convinience, you can place links to **Simulator Startup** and **Simu
   - Connect all your external controller, like button boxes, to one single center of control
     - An unlimited number of layers of functions and actions, called modes, can be defined for your controller. Switch between modes simply by pushing a button or switch a toggle on your controller. Here is an example of several layers of functions and actions combined in five modes:
 	
-	![](./Resources/Documentation%20Images/Button%20Box%20Layout.jpg)
+	![](./Documentation/Images/Button%20Box%20Layout.jpg)
 	
 	- Modes are defined and handled by [plugins](https://github.com/SeriousOldMan/Simulator-Controller#included-plugins), which can be implemented using an objecct oriented scripting language.
   - Configurable, visual feedback for your controller actions
     - Define your own button box visual and integrate it with the Simulator Controller using the simple plugin support. Depending on configuration, this window will popup whenever an action is triggered from your controller, even during active simulation
     
-    ![](./Resources/Documentation%20Images/Button%20Box%202.JPG)
+    ![](./Documentation/Images/Button%20Box%202.JPG)
     
     - Code your own functions to be called by the controller buttons and switches using the simple, object-oriented scripting language
   - Configure all additional [applications](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications) to your taste, including the simulation games used for your virtual races
@@ -58,7 +58,7 @@ Simulator Controller is fully implemented in AutoHotkey, a very sophisticated an
   - Sophisticated logging, tracing and debug support to track down any errors while developing your own plugins
   - Fully graphical setup and configuration utilities
   
-  ![](./Resources/Documentation%20Images/Configuration%20Tool.JPG) ![](./Resources/Documentation%20Images/Setup%20Tool.JPG)
+  ![](./Documentation/Images/Configuration%20Tool.JPG) ![](./Documentation/Images/Setup%20Tool.JPG)
 
 ### Included plugins
 

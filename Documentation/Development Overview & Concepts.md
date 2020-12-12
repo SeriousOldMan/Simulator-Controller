@@ -4,18 +4,18 @@ The architecture of Simulator Controller has been designed with extensibility in
 
 ### Plugin Integration
 
-When the Simulator Controller starts up, it includes one single file in *Sources/Controller/Plugins* folder: [Plugins.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Plugins/Plugins.ahk). This file must be modified to include all the plugins needed for your specific configuration.
+When the Simulator Controller starts up, a single file in the *Sources/Controller/Plugins* folder will be included using the AutoHotkey #Include directive: [Plugins.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Plugins/Plugins.ahk). This file may be modified to include all the plugin script required for your specific configuration.
 
-A plugin must not follow a specific pattern, it simply loads and executes code in the AutoHotkey language, after the single [SimulatorController](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#singleton-simulatorcontroller-extends-configurationitem-simulator-controllerahk) has been created. *Real* plugins will extend the ControllerPlugin (*) class and will provide additional functionality for your controller box.
+Although a plugin script may execute any code written in the AutoHotkey language, but *real* plugins will extend the ControllerPlugin (*) class and typically provide additional functionality for your controller box. The following sections will introduce step by step all the concepts and classes needed to implement your own plugins.
 
 
 ### General Concepts
 
 The Simulator Controller framework has been build around the similar named Singleton Class [SimulatorController](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#singleton-simulatorcontroller-extends-configurationitem-simulator-controllerahk). This class implements the complete control flow between the hardware controller elements like buttons, dials and switches and the functionalities provided by a plugin. Since the number of hardware control elements is limited, functionalities may be grouped in so called modes, which may be activated or deactivated as a group. Each mode belongs to a given plugin and only on mode may be active at a given point in time. From the user point of view a mode defines a set of controls as a switchable layer for the hardware controller. In addition, plugins may bind functionality to controller functions independent of a specific mode. This functionality will be available all the time. An example will make it more clear: A toggle switch to enable or disable rig motion feedback might be always available, but detailed control over specific effect intensities might only be necessary, while finetuning the feedback levels.
 
-A specific hardware control element is represented in code by instances of the class SimulatorControllerFunction (*). For a controller function to be useful, it must be connected to a ControllerAction (*), which implements the functionality, which should triggered by the hardware controller. These connections are of dynamic nature, which means that the function mapping of the hardware controller may be changed anytime. This is, in the end, the capability used when switching between modes.
+A specific hardware control element is represented in code by an instance of the class SimulatorControllerFunction (*). For a controller function to be useful, it must be connected to a ControllerAction (*), which implements the functionality that should be triggered by the hardware controller. These connections are of dynamic nature, which means that the functional mapping for the hardware controller can be changed anytime. This is first and foremostused when switching between modes, but it can also be used to create context sensitive function mappings.
 
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Class%20Diagram%201.JPG)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Documentation/Images/Class%20Diagram%201.JPG)
 
 ### Plugins
 

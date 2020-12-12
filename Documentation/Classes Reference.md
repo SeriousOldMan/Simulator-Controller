@@ -342,22 +342,22 @@ Concrete implementation for two state toggle switches, like On/Off switches. The
 
 ***
 
-## 1WayToggleFunction extends [SimulatorControllerFunction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-simulatorcontrollerfunction-simulator-controllerahk) ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
+## Controller1WayToggleFunction extends [SimulatorControllerFunction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-simulatorcontrollerfunction-simulator-controllerahk) ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
 Concrete implementation for single state switches, for example a momentary ignition switch. The triggers returned by *Trigger[]* are ["On"].
 
 ***
 
-## ButtonFunction extends [SimulatorControllerFunction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-simulatorcontrollerfunction-simulator-controllerahk) ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
+## ControllerButtonFunction extends [SimulatorControllerFunction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-simulatorcontrollerfunction-simulator-controllerahk) ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
 Concrete implementation for simple push buttons. The triggers returned by *Trigger[]* are ["Push"].
 
 ***
 
-## DialFunction extends [SimulatorControllerFunction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-simulatorcontrollerfunction-simulator-controllerahk) ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
+## ControllerDialFunction extends [SimulatorControllerFunction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-simulatorcontrollerfunction-simulator-controllerahk) ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
 Concrete implementation for rotary dials. The triggers returned by *Trigger[]* are ["Increase", "Decrease"] for the two different rotary directions.
 
 ***
 
-## CustomFunction extends [SimulatorControllerFunction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-simulatorcontrollerfunction-simulator-controllerahk) ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
+## ControllerCustomFunction extends [SimulatorControllerFunction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-simulatorcontrollerfunction-simulator-controllerahk) ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
 Concrete implementation for custom or external function. The triggers returned by *Trigger[]* are ["Call"] for a generic activation of the function. Normally, custom functions are not bound to a hardware controller, but serve as an interface for other event sources, like a voice control software or a keyboard macro tool.
 
 ***

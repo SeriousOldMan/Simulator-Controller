@@ -102,7 +102,7 @@ Low level method to start Windows applications. See above functions for an expla
 ***
 
 ## [Abstract] ControllerFunction extends [ConfigurationItem](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-classesahk) ([Classes.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Classes.ahk))
-This abstract class defines the protocol for all functions available for a given controller hardware. A function, which might be buttons, dials and swwitches, defines actions, which react to triggers. To connect to the underlying hardware, a controller function defines several hotkeys (*) per trigger, which is used by AutoHotkey to detect that a button has been pressed, a dial rotated and so on. At this point, the actions that might be triggered can be simple function calls in the script language, but more versatile capabilites will be defined by the plugin (*) framework, where actions will be implemented by specialized classes.
+This abstract class defines the protocol for all functions available for a given controller hardware. A function, which might be buttons, dials and swwitches, defines actions, which react to triggers. To connect to the underlying hardware, a controller function defines several hotkeys (*) per trigger, which is used by AutoHotkey to detect that a button has been pressed, a dial rotated and so on. At this point, the actions that might be triggered can be simple function calls in the script language, but more versatile capabilites will be defined by the [plugin framework](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts#overview), where actions will be implemented by specialized classes.
 
 ### Public Properties
 
@@ -137,28 +137,33 @@ Creates an instance of a specific subclass of *ControllerFunction* according to 
 
 ***
 
-## 2WayToggleFunction extends [ControllerFunction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference/_edit#abstract-controllerfunction-extends-configurationitem-classesahk) ([Classes.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Classes.ahk))
+## 2WayToggleFunction extends [ControllerFunction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-controllerfunction-extends-configurationitem-classesahk) ([Classes.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Classes.ahk))
 Concrete implementation for two state toggle switches, like On/Off switches. The triggers returned by *Trigger[]* are ["On", "Off"].
 
 ***
 
-## 1WayToggleFunction extends [ControllerFunction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference/_edit#abstract-controllerfunction-extends-configurationitem-classesahk) ([Classes.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Classes.ahk))
+## 1WayToggleFunction extends [ControllerFunction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-controllerfunction-extends-configurationitem-classesahk) ([Classes.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Classes.ahk))
 Concrete implementation for single state switches, for example a momentary ignition switch. The triggers returned by *Trigger[]* are ["On"].
 
 ***
 
-## ButtonFunction extends [ControllerFunction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference/_edit#abstract-controllerfunction-extends-configurationitem-classesahk) ([Classes.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Classes.ahk))
+## ButtonFunction extends [ControllerFunction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-controllerfunction-extends-configurationitem-classesahk) ([Classes.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Classes.ahk))
 Concrete implementation for simple push buttons. The triggers returned by *Trigger[]* are ["Push"].
 
 ***
 
-## DialFunction extends [ControllerFunction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference/_edit#abstract-controllerfunction-extends-configurationitem-classesahk) ([Classes.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Classes.ahk))
+## DialFunction extends [ControllerFunction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-controllerfunction-extends-configurationitem-classesahk) ([Classes.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Classes.ahk))
 Concrete implementation for rotary dials. The triggers returned by *Trigger[]* are ["Increase", "Decrease"] for the two different rotary directions.
 
 ***
 
+## CustomFunction extends [ControllerFunction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-controllerfunction-extends-configurationitem-classesahk) ([Classes.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Classes.ahk))
+Concrete implementation for custom or external function. The triggers returned by *Trigger[]* are ["Call"] for a generic activation of the function. Normally, custom functions are not bound to a hardware controller, but serve as an interface for other event sources, like a voice control software or a keyboard macro tool.
+
+***
+
 ## Plugin extends [ConfigurationItem](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-classesahk) ([Classes.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Classes.ahk))
-A plugin is used by the Simulator Controller framework to integrate custome code and extensions. Plugins can be configured by the setup tool (*). Especially the more complex plugins may define a set of configuration parameters to define the function mapping, initial values for dynamic parameters, and so on. A special subclass named ControllerPlugin (*) exists, which provides additional functionality to interact with the single instance of SimulatorController (*), handle plugin modes and connect to controller functions. The base class *Plugin* only provides the functionality necessary for configuration handling.
+A plugin is used by the Simulator Controller framework to integrate custome code and extensions. Plugins can be configured by the setup tool (*). Especially the more complex plugins may define a set of configuration parameters to define the function mapping, initial values for dynamic parameters, and so on. A special subclass named ControllerPlugin (*) exists, which provides additional functionality to interact with the single instance of [SimulatorController](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#singleton-simulatorcontroller-extends-configurationitem-simulator-controllerahk), handle plugin modes and connect to controller functions. The base class *Plugin* only provides the functionality necessary for configuration handling.
 
 ### Public Properties
 
@@ -185,6 +190,7 @@ Returns *true*, if an argument with values has been supplied for the given param
 #### *getArgumentValue(argument, default := false)*
 Returns the values for the given argument as string, or the supplied *default* value otherwise.
 	
+***
 ***
 
 # Controller Classes
@@ -230,7 +236,7 @@ Constructs a new *SimulatorController* instance. Both configuration parameters a
 Since *SimulatorController* is a singleton class, the single instance might be accessed after construction by referencing *SimulatorController.Instance*.
 
 #### [Factory Method] *createControllerFunction(descriptor :: String, configuration :: ConfigurationMap)*
-Returns an instance of SimulatorControllerFunction (*) according to the givven descriptor.
+Returns an instance of [SimulatorControllerFunction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-simulatorcontrollerfunction-simulator-controllerahk) according to the givven descriptor.
 
 #### *findPlugin(name :: String)*
 Searches for a plugin with the given name. Returns *false*, if not found.
@@ -276,4 +282,82 @@ Disconnects the given action from the given function. Normally, *disconnectActio
 This is some sort of dispatcher method, since in the end, the fireAction (*) method of the corresponding action is called. This action is retrieved using [findAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#findactionfunction--simulatorcontrollerfunction-trigger--string).
 
 #### *setMode(newMode :: ControllerMode)*
-Switches the controller to a different mode. The currently active mode will receive a deactivation and the new mode will be activated, thereby connecting all its actions to the controller functions.
+Switches the controller to a different mode. The currently active mode will receive a deactivation and the new mode will be activated, thereby connecting all its actions to the correspondiing controller functions.
+
+***
+
+## [Abstract] SimulatorControllerFunction ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
+This is the root class of all controller functions used by the Simulator Controller framework. As already mentioned elsewhere, due to restrictions in the AutoHotkey language (no multiple inheritance or multiple interface implementation capabilities) , this class (and all of its subclasses) does not inherit from the configurable [ControllerFunction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-controllerfunction-extends-configurationitem-classesahk) class. But the protocol of *ControllerFunction* is completely implemented and *SimulatorControllerFunction* and its descendants use some sort of delegation pattern to connect to the configuration information.
+
+### Public Properties
+
+#### *Controller[]*
+Returns the controller, for which this function has been defined.
+
+#### *Function[]*
+Returns the wrapped original class, an instance of [ControllerFunction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-controllerfunction-extends-configurationitem-classesahk).
+
+#### *Type[]*
+Returns the [type constant](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#controller-function-types-constantsahk) of the given function. This property must be implemented by a concrete subclass.
+	
+#### *Number[]*
+Returns the running number of the controller function. For example Button # 3...
+	
+#### *Descriptor[]*
+The resource descriptor of the given function. Typically looks like "Button.3" or "Dial.2".
+	
+#### *Trigger[]*
+Returns a list of all triggers available for this controller function. A button class might return ["Push"], beacause only this single functionality is provided, whereas a dial function might return ["Increase", "Decrease"].
+	
+#### *Hotkeys[trigger :: String := false]*
+Returns all the hotkeys for all triggers handled by this controller function. Depending on the argument, this might be a map for all triggers or the result for one specific trigger. See the [original method](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#hotkeystrigger--string--false-astext--boolean--false) in *ControllerFunction* for more information.
+
+#### *Actions[trigger :: String := false]*
+Similar to the *Hotkeys* property, this property returns the defined actions. See the [original method](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#actionstrigger--string--false-astext--boolean--false) in *ControllerFunction* for more information.
+
+### Public Methods
+
+#### *__New(controller :: SimulatorController, function :: ControllerFunction)*
+Constructs an instance of *SimulatorControllerFunction*. The supplied function must be an instance of wrapped class [ControllerFunction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-controllerfunction-extends-configurationitem-classesahk).
+
+#### *enable(trigger :: String)*
+Enables the given trigger (for example "Push") for this controller function, which means, that the connected action can be triggered by the hardware controller.
+
+#### *disable(trigger :: String)*
+Disables the given trigger (for example "Push") for this controller function, which means, that the connected action cannot be triggered anymore by the hardware controller.
+
+#### *setText(test :: String, color :: String := "Black")*
+If the controller has an associated visual representation of the hardware controller, label of the function might be changed with this method. The given color must be a defined HTML color descriptor.
+
+#### *connectAction(action :: ControllerAction)*
+Connects or binds the function to the given action. From now on, every trigger of the hardware controller will result in an activation of the [fireAction](*) method of the action, as long as the function is currently enabled for the trigger in question. Functions will be connected normally during the activation of plugins or modes.
+
+#### *disconnectAction(action :: ControllerAction)*
+Disconnects the function from the given action. Functions will be disconnected normally during the deactivation of plugins or modes.
+
+***
+
+## Controller2WayToggleFunction extends [SimulatorControllerFunction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-simulatorcontrollerfunction-simulator-controllerahk) ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
+Concrete implementation for two state toggle switches, like On/Off switches. The triggers returned by *Trigger[]* are ["On", "Off"].
+
+***
+
+## 1WayToggleFunction extends [SimulatorControllerFunction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-simulatorcontrollerfunction-simulator-controllerahk) ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
+Concrete implementation for single state switches, for example a momentary ignition switch. The triggers returned by *Trigger[]* are ["On"].
+
+***
+
+## ButtonFunction extends [SimulatorControllerFunction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-simulatorcontrollerfunction-simulator-controllerahk) ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
+Concrete implementation for simple push buttons. The triggers returned by *Trigger[]* are ["Push"].
+
+***
+
+## DialFunction extends [SimulatorControllerFunction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-simulatorcontrollerfunction-simulator-controllerahk) ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
+Concrete implementation for rotary dials. The triggers returned by *Trigger[]* are ["Increase", "Decrease"] for the two different rotary directions.
+
+***
+
+## CustomFunction extends [SimulatorControllerFunction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-simulatorcontrollerfunction-simulator-controllerahk) ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
+Concrete implementation for custom or external function. The triggers returned by *Trigger[]* are ["Call"] for a generic activation of the function. Normally, custom functions are not bound to a hardware controller, but serve as an interface for other event sources, like a voice control software or a keyboard macro tool.
+
+***

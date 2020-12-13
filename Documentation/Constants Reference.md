@@ -4,8 +4,8 @@ The following constants may be used to refer to all the relevant locations of th
 #### *kHomeDirectory, kResourcesDirectory, kSourcesDirectory, kIncludesDirectory, kBinariesDirectory, kConfigDirectory, kLogsDirectory*
 All these constants define paths pointing to a specific folder in the Simulator Controller distribution. In deviation to Windows standards, the paths contain a trailing backslash, since in allmost all cases, a filename will be concatenated to one of these constants in order to access this file.
 
-#### *kSplashImagesDirectory, kButtonBoxImagesDirectory, kIconsDirectory*
-Paths for graphical resources.
+#### *kSplashMediaDirectory, kButtonBoxImagesDirectory, kIconsDirectory*
+Paths for graphical and audio resources.
 
 #### *kSimulatorConfigurationFile, kControllerConfigurationFile*
 Paths for the most important configuration files used by Simulator Controller.
@@ -16,7 +16,7 @@ Paths for the most important configuration files used by Simulator Controller.
 One global configuration map exists for simulator controller, which define the capabilities, the controller mapping and the configuration of all active plugins.
 
 #### *kSimulatorConfiguration*
-The global configuration map. This map is read from *kSimulatorConfigurationFile* and the content is maintained by the setup tool (*)
+The global configuration map. This map is read from *kSimulatorConfigurationFile* and the content is maintained by the [setup tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#setup).
 
 ***
 

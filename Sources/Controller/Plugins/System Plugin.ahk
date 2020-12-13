@@ -284,8 +284,8 @@ class SystemPlugin extends ControllerPlugin {
 	playStartupSong(songFile) {
 		if (!kSilentMode && !this.iStartupSongIsPlaying) {
 			try {
-				if FileExist(kSplashImagesDirectory . songFile) {
-					SoundPlay % kSplashImagesDirectory . songFile
+				if FileExist(kSplashMediaDirectory . songFile) {
+					SoundPlay % kSplashMediaDirectory . songFile
 			
 					this.iStartupSongIsPlaying := true
 				}

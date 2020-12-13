@@ -99,14 +99,14 @@ checkButtonBoxSimulationDuration() {
 computeStartupSongs() {
 	files := []
 	
-	Loop Files, % kSplashImagesDirectory . "*.wav"
+	Loop Files, % kSplashMediaDirectory . "*.wav"
 	{
 		SplitPath A_LoopFilePath, soundFile
 		
 		files.Push(soundFile)
 	}
 	
-	Loop Files, % kSplashImagesDirectory . "*.mp3"
+	Loop Files, % kSplashMediaDirectory . "*.mp3"
 	{
 		SplitPath A_LoopFilePath, soundFile
 		
@@ -338,7 +338,7 @@ restart:
 		
 		videos := []
 		
-		Loop Files, % kSplashImagesDirectory . "*.gif"
+		Loop Files, % kSplashMediaDirectory . "*.gif"
 			videos.Push(A_LoopFileName)
 		
 		chosen := (video ? (inList(videos, video) + 1) : 1)

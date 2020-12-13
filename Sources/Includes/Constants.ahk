@@ -19,7 +19,7 @@ global kBinariesDirectory = A_ScriptDir . (A_IsCompiled ? "\..\Binaries\" : "\..
 global kConfigDirectory = A_ScriptDir . (A_IsCompiled ? "\..\Config\" : "\..\..\Config\")
 global kLogsDirectory = A_ScriptDir . (A_IsCompiled ? "\..\Logs\" : "\..\..\Logs\")
 
-global kSplashImagesDirectory = kResourcesDirectory . "Splash Images\"
+global kSplashMediaDirectory = kResourcesDirectory . "Splash Images\"
 global kButtonBoxImagesDirectory = kResourcesDirectory . "Button Box Images\"
 global kIconsDirectory = kResourcesDirectory . "Icons\"
 

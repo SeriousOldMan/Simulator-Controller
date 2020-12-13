@@ -236,7 +236,7 @@ showSplash(image, alwaysOnTop := true) {
 		vSplashCounter := 1
 		
 	info := kVersion . " - 2020 by Oliver Juwig, Creative Commons - BY-NC-SA"
-	image :=  vSplashCounter . ":" . kSplashImagesDirectory . image
+	image :=  vSplashCounter . ":" . kSplashMediaDirectory . image
 	options := "B FS8 CWD0D0D0 w800 x" . Round((A_ScreenWidth - 800) / 2) . " y" . Round(A_ScreenHeight / 4) . " ZH-1 ZW780"
 	
 	if !alwaysOnTop
@@ -261,7 +261,7 @@ rotateSplash(alwaysOnTop := true) {
 	static numPictures := 0
 	
 	if !pictures {
-		Loop Files, % kSplashImagesDirectory . "*.jpg"
+		Loop Files, % kSplashMediaDirectory . "*.jpg"
 		{
 			if !pictures
 				pictures := []
@@ -280,7 +280,7 @@ rotateSplash(alwaysOnTop := true) {
 }
 
 showSplashAnimation(gif) {
-	video := kSplashImagesDirectory . gif
+	video := kSplashMediaDirectory . gif
 
 	Gui VP:-Border -Caption ; borderless
 	Gui VP:Add, ActiveX, x0 y0 w780 h415 vvVideoPlayer, shell explorer

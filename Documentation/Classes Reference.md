@@ -1,11 +1,11 @@
 # Configuration Classes
 
-The following classes are defined in the [Classes.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Classes.ahk) script. They define objects, that can be loaded from or can be saved to a configuration file maintained by the setup tool (*). Many of these classes will be subclassed and extended with more functionality in other files of the Simulator Controller framework, especially in the script [Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk). These classes are described further down [below](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controller-classes).
+The following classes are defined in the [Classes.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Classes.ahk) script. They define objects, that can be loaded from or can be saved to a configuration file maintained by the [setup tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#setup). Many of these classes will be subclassed and extended with more functionality in other files of the Simulator Controller framework, especially in the script [Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk). These classes are described further down [below](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controller-classes).
 
 
 ## [Abstract] ConfigurationItem ([Classes.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Classes.ahk))
 
-This is the base class for all objects, that can be stored to or retrieved from a configuration file. Generally, configurations are maintaned by the setup tool (*). During runtime, all configuration items are accessible through the global constant *kSimulatorConfiguration*.
+This is the base class for all objects, that can be stored to or retrieved from a configuration file. Generally, configurations are maintaned by the [setup tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#setup). During runtime, all configuration items are accessible through the global constant *kSimulatorConfiguration*.
 
 ### Public Properties
 
@@ -163,7 +163,7 @@ Concrete implementation for custom or external function. The triggers returned b
 ***
 
 ## Plugin extends [ConfigurationItem](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-classesahk) ([Classes.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Classes.ahk))
-A plugin is used by the Simulator Controller framework to integrate custome code and extensions. Plugins can be configured by the setup tool (*). Especially the more complex plugins may define a set of configuration parameters to define the function mapping, initial values for dynamic parameters, and so on. A special subclass named [ControllerPlugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controllerplugin-extends-plugin-simulator-controllerahk) exists, which provides additional functionality to interact with the single instance of [SimulatorController](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#singleton-simulatorcontroller-extends-configurationitem-simulator-controllerahk), handle plugin modes and connect to controller functions. The base class *Plugin* only provides the functionality necessary for configuration handling.
+A plugin is used by the Simulator Controller framework to integrate custome code and extensions. Plugins can be configured by the [setup tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#setup). Especially the more complex plugins may define a set of configuration parameters to define the function mapping, initial values for dynamic parameters, and so on. A special subclass named [ControllerPlugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controllerplugin-extends-plugin-simulator-controllerahk) exists, which provides additional functionality to interact with the single instance of [SimulatorController](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#singleton-simulatorcontroller-extends-configurationitem-simulator-controllerahk), handle plugin modes and connect to controller functions. The base class *Plugin* only provides the functionality necessary for configuration handling.
 
 ### Public Properties
 
@@ -496,19 +496,19 @@ This class property returns the single instance of *ButtonBox*.
 Returns the corresponding controller.
 	
 #### *Num1WayToggles[]*
-The number of 1-way toggle switches of the button box. This is maintained by the setup tool (*)
+The number of 1-way toggle switches of the button box. This is maintained by the [setup tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#setup).
 
 #### *Num2WayToggles[]*
-The number of 2-way toggle switches of the button box. This is maintained by the setup tool (*)
+The number of 2-way toggle switches of the button box. This is maintained by the [setup tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#setup).
 
 #### *NumButtons[]*
-The number of simple push buttons of the button box. This is maintained by the setup tool (*)
+The number of simple push buttons of the button box. This is maintained by the [setup tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#setup).
 
 #### *NumDials[]*
-The number of rotary dials of the button box. This is maintained by the setup tool (*)
+The number of rotary dials of the button box. This is maintained by the [setup tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#setup).
 
 #### *VisibleDuration[]*
-The time in milliseconds, the button box may be visible, after an action has been triggered. This time, which is maintained by the setup tool (*), may be different depending on a currently running simulation.
+The time in milliseconds, the button box may be visible, after an action has been triggered. This time, which is maintained by the [setup tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#setup), may be different depending on a currently running simulation.
 
 ### Public Methods
 

@@ -202,11 +202,14 @@ This class implements the core functionality of Simulator Controller. The single
 
 ### Public Properties
 
+#### [Class] *Instance[]*
+This class property returns the single instance of *SimulatorController*.
+
 #### *ControllerConfiguration[]*
 Returns the controller configuration map, not to be confused with the complete simulator configration map. This small configuration defines settings for controller notifications such as tray tips and buttonbox visuals and is maintained by the configuration tool (*).
 	
 #### *ButtonBox[]*
-Returns an instance of the singleton class ButtonBox (*). This instance must be created by a specialized plugin. See [this simple example](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Plugins/ButtonBox%20Plugin.ahk) for reference.
+Returns an instance of the singleton class [ButtonBox](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-singleton-buttonbox-extends-configurationitem-simulator-controllerahk). This instance must be created by a specialized plugin. See [this simple example](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Plugins/ButtonBox%20Plugin.ahk) for reference.
 	
 #### *Functions[]*
 Returns a list of all functions defined by all registered plugins.
@@ -249,6 +252,9 @@ Searches for a controller function with the given descriptor. Returns *false*, i
 
 #### *getAction(function :: ControllerFunction, trigger :: String)*
 Returns the controller action for the given function / trigger combination. Only currently active actions, which are bound to a function by their mode or plugin, are considered. Returns *false*, if there is no action currently connected to the function.
+
+#### *registerButtonBox(buttonBox :: ButtonBox)*
+Registers a visual representation for the hardware controller. This method is automatically call by the constructor of [ButtonBox](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-singleton-buttonbox-extends-configurationitem-simulator-controllerahk).
 
 #### *registerPlugin(plugin :: ControllerPlugin)*
 Registers the given plugin for the controller. If the plugin is active, the *activate* method will be invoked, thereby allowing the plugin to register some actions for controller functions.
@@ -475,3 +481,51 @@ Constructs an instance of *ControllerAction*.
 
 #### [Abstract] *fireAction(function :: ControllerFunction, trigger :: String)*
 This method must be implemented by every subclass of *ControllerAction* and act according to the supplied trigger argument.
+
+***
+
+## [Abstract Singleton] ButtonBox extends [ConfigurationItem](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-classesahk) ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
+The single instance of this class will implement a visual representation of your hardware controller. Althoug the Simulator Controller will provide complete functionality even without a visual representation, it is much more fun, to get a visual feedback. A subclass of *ButtonBox* must use the [Gui capabilities](https://www.autohotkey.com/docs/commands/Gui.htm) of the AutoHotkey language, to implement the visuals. See [this simple example](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Plugins/ButtonBox%20Plugin.ahk) for reference.
+
+### Public Properties
+
+#### [Class] *Instance[]*
+This class property returns the single instance of *ButtonBox*.
+
+#### *Controller[]*
+Returns the corresponding controller.
+	
+#### *Num1WayToggles[]*
+The number of 1-way toggle switches of the button box. This is maintained by the setup tool (*)
+
+#### *Num2WayToggles[]*
+The number of 2-way toggle switches of the button box. This is maintained by the setup tool (*)
+
+#### *NumButtons[]*
+The number of simple push buttons of the button box. This is maintained by the setup tool (*)
+
+#### *NumDials[]*
+The number of rotary dials of the button box. This is maintained by the setup tool (*)
+
+#### *VisibleDuration[]*
+The time in milliseconds, the button box may be visible, after an action has been triggered. This time, which is maintained by the setup tool (*), may be different depending on a currently running simulation.
+
+### Public Methods
+
+#### *__New(controller :: SimulatorController, configuration :: ConfigurationMap := false)*
+Constructs a button box. The single instance will be bound to the *Instance* property of teh *ButtonBox* class. The button box is automatically registered for the controller using [registerButtonBox](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#registerbuttonboxbuttonbox--buttonbox).
+	
+#### [Abstract] *createWindow(ByRef window :: String, ByRef windowWidth :: Integer, ByRef windowHeight :: Integer)*
+This method must be implemented by a subclass of *ButtonBox*. The window with its Gui controls for the visual representation of the button box must be created and the Gui prefix for this window (see the [AutoHotkey documentation](https://www.autohotkey.com/docs/commands/Gui.htm) for an explanation), and its width and height must be returned through the reference parameters of the method call.
+
+#### [Abstract] *getControlHandle(descriptor :: String)*
+This method must be implememnted by subclasses. For each visual representation of a controller function, which will a have an associated label or text field, a [GuiControl handle](https://www.autohotkey.com/docs/commands/GuiControl.htm) must be returned, or *false*, if there is no such text control. The given descriptor will identify the function according to the standard format, like "Button.3".
+	
+#### *isVisible()*
+Returns *true*, if the button box window is currently visible.
+	
+#### *show()*
+Shows the button box window according to the visibility rules defined in the configuration. This method is called automatically by the framework after each potential visual change.
+
+#### *hide()*
+Hides the button box window again. This method is automatically called, after the visible duration defined in the configuration has elapsed with no trigger event in between.

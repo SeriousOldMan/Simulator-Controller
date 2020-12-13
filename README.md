@@ -88,10 +88,9 @@ The following applications are not part of the distribution and are not strictly
 | [SimFeedback](https://www.opensfx.com/) | [Optional] Not only a software, but a complete DIY project for building motion rigs. SimFeedback controls the motion actuators using visual control curves, which translate the ingame physics data to complex and very fast rig movements. Here also, a plugin is integrated in Simulator Controller to use your hardware controller for controlling SimFeedback. |
 | [SFX-100-Streamdeck](https://github.com/ashupp/SFX-100-Streamdeck) | [Optional] This extension for SimFeedback is used to connect to SimFeedback in order to control effect states and intensities. If not used, a subset of the SimFeedback settings will be controlled by mouse automation, which on a side effect requires the SimFeedback window to be the topmost. Since this is not really funny, while currently trying to overtake one of your opponents in a difficult chicane, I strongly advice to install the connector extension, but this requires the *commercial* expert license for SimFeedback. |
 
-
 ### Documentation
 
-Currently work in progress. In the meantime use all the given goodies, especially the very large sample configuration as a starting point.
+See the [wiki](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts) for a complete documentation, how to develop your own plugins. The user documentation, especially, how to setup and configure the Simulator Controller, is currently work in progress. But since all that is supported by graphical user interfaces, you may start already using the very large sample configuration as a starting point.
 
 ### Known issues
 

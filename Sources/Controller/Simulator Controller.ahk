@@ -151,12 +151,14 @@ class ButtonBox extends ConfigurationItem {
 		if (window != false) {
 			handle := this.getControlHandle(function.Descriptor)
     
-			Gui %window%:Font, c%color%
-			GuiControl Text, %handle%, % text
-			GuiControl Font, %handle%
-			Gui %window%:Font
+			if (handle != false) {
+				Gui %window%:Font, c%color%
+				GuiControl Text, %handle%, % text
+				GuiControl Font, %handle%
+				Gui %window%:Font
 			
-			this.show()
+				this.show()
+			}
 		}
 	}
 	

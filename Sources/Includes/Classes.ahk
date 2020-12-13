@@ -298,17 +298,17 @@ class Application extends ConfigurationItem {
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; Abstract Class:          Configurable Controller Function               ;;;
+;;; Abstract Class:          Configurable Function                          ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class ControllerFunction extends ConfigurationItem {
+class Function extends ConfigurationItem {
 	iNumber := 0
 	iHotkeys := {}
 	iActions := {}
 	
 	Type[] {
 		Get {
-			Throw "Virtual property ControllerFunction.Type must be overriden in a subclass..."
+			Throw "Virtual property Function.Type must be overriden in a subclass..."
 		}
 	}
 	
@@ -326,7 +326,7 @@ class ControllerFunction extends ConfigurationItem {
 	
 	Trigger[] {
 		Get {
-			Throw "Virtual property ControllerFunction.Trigger must be overriden in a subclass..."
+			Throw "Virtual property Function.Trigger must be overriden in a subclass..."
 		}
 	}
 	
@@ -455,7 +455,7 @@ class ControllerFunction extends ConfigurationItem {
 		}
 	}
 	
-	createControllerFunction(descriptor, configuration := false, onHotkeys := false, onAction := false, offHotkeys := false, offAction := false) {
+	createFunction(descriptor, configuration := false, onHotkeys := false, onAction := false, offHotkeys := false, offAction := false) {
 		descriptor := ConfigurationItem.splitDescriptor(descriptor)
 		
 		switch descriptor[1] {
@@ -470,7 +470,7 @@ class ControllerFunction extends ConfigurationItem {
 			case kCustomType:
 				return new CustomFunction(descriptor[2], configuration, onHotkeys, onAction)
 			default:
-				Throw "Unknown controller function (" . descriptor[1] . ") detected in ControllerFunction.createControllerFunction..."
+				Throw "Unknown controller function (" . descriptor[1] . ") detected in Function.createFunction..."
 		}
 	}
 	
@@ -514,7 +514,7 @@ class ControllerFunction extends ConfigurationItem {
 ;;; [Controller Functions}:  Function for 1-way Toggle Switches             ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class 1WayToggleFunction extends ControllerFunction {
+class 1WayToggleFunction extends Function {
 	Type[] {
 		Get {
 			return k1WayToggleType
@@ -532,7 +532,7 @@ class 1WayToggleFunction extends ControllerFunction {
 ;;; [Controller Functions}:  Function for 2-way Toggle Switches             ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class 2WayToggleFunction extends ControllerFunction {
+class 2WayToggleFunction extends Function {
 	Type[] {
 		Get {
 			return k2WayToggleType
@@ -550,7 +550,7 @@ class 2WayToggleFunction extends ControllerFunction {
 ;;; [Controller Functions}:  Function for Push Buttons                      ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class ButtonFunction extends ControllerFunction {
+class ButtonFunction extends Function {
 	Type[] {
 		Get {
 			return kButtonType
@@ -568,7 +568,7 @@ class ButtonFunction extends ControllerFunction {
 ;;; [Controller Functions}:  Function for Rotary Dials                      ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class DialFunction extends ControllerFunction {
+class DialFunction extends Function {
 	Type[] {
 		Get {
 			return kDialType
@@ -586,7 +586,7 @@ class DialFunction extends ControllerFunction {
 ;;; [Controller Functions}:  Action for Custom Controls                     ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class CustomFunction extends ControllerFunction {
+class CustomFunction extends Function {
 	Type[] {
 		Get {
 			return kCustomType

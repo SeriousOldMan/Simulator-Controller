@@ -28,7 +28,7 @@ Define the various log levels used by the logging functions. See [Debugging and 
 ***
 
 ## Controller Function Types ([Constants.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Constants.ahk))
-Used to identify the different types of controller functions in a configuration map. See the subclasses of [ControllerFunction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#2waytogglefunction-extends-controllerfunction-classesahk) for reference.
+Used to identify the different types of controller functions in a configuration map. See the subclasses of [Function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-function-extends-configurationitem-classesahk) for reference.
 
 #### *k1WayToggleType, k2WayToggleType, kButtonType, kDialType, kCustomType*
 All currently defined controller function types.

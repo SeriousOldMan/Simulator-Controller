@@ -332,6 +332,8 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	}
 	
 	__New(controller, name, configuration := false) {
+		local function
+		
 		this.iMotionApplication := new Application("Motion Feedback", configuration)
 		
 		base.__New(controller, name, configuration)
@@ -502,7 +504,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	}
 		
 	createEffectToggleAction(controller, mode, functionDescriptor, effect) {
-		function := this.Controller.findFunction(functionDescriptor)
+		local function := this.Controller.findFunction(functionDescriptor)
 		
 		if (function != false)
 			mode.registerAction(new this.EffectToggleAction(function, mode, effect))

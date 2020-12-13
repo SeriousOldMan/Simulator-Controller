@@ -81,6 +81,8 @@ class ACCPlugin extends ControllerPlugin {
 	}
 	
 	loadFromConfiguration(configuration) {
+		local function
+		
 		base.loadFromConfiguration(configuration)
 		
 		for descriptor, message in getConfigurationSectionValues(configuration, "Chat Messages", Object()) {

@@ -1168,15 +1168,17 @@ class FunctionsList extends ConfigurationItemList {
 			descriptor := ConfigurationItem.descriptor(descriptor[1], descriptor[2])
 			
 			if !this.iFunctions.HasKey(descriptor) {
-				function := ControllerFunction.createControllerFunction(descriptor, configuration)
+				func := Function.createFunction(descriptor, configuration)
 				
-				this.iFunctions[descriptor] := function
-				this.iItemsList.Push(function)
+				this.iFunctions[descriptor] := func
+				this.iItemsList.Push(func)
 			}
 		}
 	}
 		
 	saveToConfiguration(configuration) {
+		local function
+		
 		for ignore, function in this.iItemsList
 			function.saveToConfiguration(configuration)
 	}
@@ -1219,6 +1221,8 @@ class FunctionsList extends ConfigurationItemList {
 	}
 	
 	loadList(items) {
+		local function
+		
 		Gui ListView, % this.ListHandle
 	
 		this.iItemsList := Array()
@@ -1333,7 +1337,7 @@ class FunctionsList extends ConfigurationItemList {
 				functionOffActionEdit := ""
 			}
 			
-			return ControllerFunction.createControllerFunction(ConfigurationItem.descriptor(functionType, functionNumberEdit), false, functionOnHotkeysEdit, functionOnActionEdit, functionOffHotkeysEdit, functionOffActionEdit)
+			return Function.createFunction(ConfigurationItem.descriptor(functionType, functionNumberEdit), false, functionOnHotkeysEdit, functionOnActionEdit, functionOffHotkeysEdit, functionOffActionEdit)
 		}
 		else {
 			OnMessage(0x44, "translateMsgBoxButtons")
@@ -1345,7 +1349,7 @@ class FunctionsList extends ConfigurationItemList {
 	}
 	
 	addItem() {
-		function := this.buildItemFromEditor(true)
+		local function := this.buildItemFromEditor(true)
 	
 		if function
 			if this.iFunctions.HasKey(function.Descriptor) {
@@ -1369,7 +1373,7 @@ class FunctionsList extends ConfigurationItemList {
 	}
 	
 	updateItem() {
-		function := this.buildItemFromEditor()
+		local function := this.buildItemFromEditor()
 	
 		if function
 			if (function.Descriptor != this.iItemsList[this.iCurrentItemIndex].Descriptor) {

@@ -592,7 +592,7 @@ class SimulatorController extends ConfigurationItem {
 	}
 }
 
-class SimulatorControllerFunction {
+class ControllerFunction {
 	iController := false
 	iFunction := false
 	
@@ -708,7 +708,7 @@ class SimulatorControllerFunction {
 	}
 }
 
-class Controller1WayToggleFunction extends SimulatorControllerFunction {
+class Controller1WayToggleFunction extends ControllerFunction {
 	class Inner1WayToggleFunction extends 1WayToggleFunction {
 		iOuterFunction := false
 			
@@ -728,7 +728,7 @@ class Controller1WayToggleFunction extends SimulatorControllerFunction {
 	}
 }
 
-class Controller2WayToggleFunction extends SimulatorControllerFunction {
+class Controller2WayToggleFunction extends ControllerFunction {
 	class Inner2WayToggleFunction extends 2WayToggleFunction {
 		iOuterFunction := false
 			
@@ -748,7 +748,7 @@ class Controller2WayToggleFunction extends SimulatorControllerFunction {
 	}
 }
 
-class ControllerButtonFunction extends SimulatorControllerFunction {
+class ControllerButtonFunction extends ControllerFunction {
 	class InnerButtonFunction extends ButtonFunction {
 		iOuterFunction := false
 			
@@ -768,7 +768,7 @@ class ControllerButtonFunction extends SimulatorControllerFunction {
 	}
 }
 
-class ControllerDialFunction extends SimulatorControllerFunction {
+class ControllerDialFunction extends ControllerFunction {
 	class InnerDialFunction extends DialFunction {
 		iOuterFunction := false
 			
@@ -788,7 +788,7 @@ class ControllerDialFunction extends SimulatorControllerFunction {
 	}
 }
 
-class ControllerCustomFunction extends SimulatorControllerFunction {
+class ControllerCustomFunction extends ControllerFunction {
 	class InnerCustomFunction extends CustomFunction {
 		iOuterFunction := false
 			
@@ -1183,6 +1183,8 @@ initializeSimulatorController() {
 ;;;-------------------------------------------------------------------------;;;
 
 pushButton(buttonNumber) {
+	local function
+	
 	descriptor := ConfigurationItem.descriptor(kButtonType, buttonNumber)
 	function := SimulatorController.Instance.findFunction(descriptor)
 	
@@ -1193,6 +1195,8 @@ pushButton(buttonNumber) {
 }
 
 rotateDial(dialNumber, direction) {
+	local function
+	
 	if (direction = "increase")
 		direction := "Increase"
 	else if (direction = "decrease")
@@ -1213,6 +1217,8 @@ rotateDial(dialNumber, direction) {
 }
 
 switchToggle(toggleType, toggleNumber, mode := "activate") {
+	local function
+	
 	descriptor := ConfigurationItem.descriptor(toggleType, toggleNumber)
 	function := SimulatorController.Instance.findFunction(descriptor^)
 	

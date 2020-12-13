@@ -204,6 +204,8 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 	}
 
 	createPluginToggleAction(label, command, descriptor, initialState) {
+		local function
+		
 		if (descriptor != false) {
 			function := this.Controller.findFunction(descriptor)
 			
@@ -215,7 +217,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 	}
 
 	createPluginDialAction(mode, label, effect, descriptor) {
-		function := this.Controller.findFunction(descriptor)
+		local function := this.Controller.findFunction(descriptor)
 		
 		if (function != false)
 			mode.registerAction(new this.FXChangeAction(function, label, effect, kIncrease, kDecrease))
@@ -224,7 +226,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 	}
 	
 	createModeAction(labelsDatabase, controller, mode, effect, increaseFunction, decreaseFunction := false) {
-		function := this.Controller.findFunction(increaseFunction)
+		local function := this.Controller.findFunction(increaseFunction)
 		
 		if !decreaseFunction {
 			if (function != false)

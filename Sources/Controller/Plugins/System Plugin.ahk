@@ -212,6 +212,8 @@ class SystemPlugin extends ControllerPlugin {
 	}
 	
 	loadFromConfiguration(configuration) {
+		local function
+		
 		base.loadFromConfiguration(configuration)
 	
 		descriptor := this.getArgumentValue("modeSelector")
@@ -439,6 +441,8 @@ updateApplicationStates() {
 }
 
 updateModeSelector() {
+	local function
+	
 	static lastMode := false
 	static countdown := 10
 	static modeSelectorMode := false
@@ -542,6 +546,8 @@ stopStartupSong() {
 }
 
 handleStartupEvents(event, data) {
+	local function
+	
 	if InStr(data, ":") {
 		data := StrSplit(data, ":")
 		

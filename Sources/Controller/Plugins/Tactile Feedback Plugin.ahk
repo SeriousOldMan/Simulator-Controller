@@ -161,12 +161,6 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 			this.Function.setText(this.Label)
 		}
 	}
-
-	Plugin[] {
-		Get {
-			return kTactileFeedbackPlugin
-		}
-	}
 	
 	__New(controller, name, configuration := false) {
 		base.__New(controller, name, configuration)

@@ -163,7 +163,7 @@ Concrete implementation for custom or external function. The triggers returned b
 ***
 
 ## Plugin extends [ConfigurationItem](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-classesahk) ([Classes.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Classes.ahk))
-A plugin is used by the Simulator Controller framework to integrate custome code and extensions. Plugins can be configured by the setup tool (*). Especially the more complex plugins may define a set of configuration parameters to define the function mapping, initial values for dynamic parameters, and so on. A special subclass named ControllerPlugin (*) exists, which provides additional functionality to interact with the single instance of [SimulatorController](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#singleton-simulatorcontroller-extends-configurationitem-simulator-controllerahk), handle plugin modes and connect to controller functions. The base class *Plugin* only provides the functionality necessary for configuration handling.
+A plugin is used by the Simulator Controller framework to integrate custome code and extensions. Plugins can be configured by the setup tool (*). Especially the more complex plugins may define a set of configuration parameters to define the function mapping, initial values for dynamic parameters, and so on. A special subclass named [ControllerPlugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controllerplugin-extends-plugin-simulator-controllerahk) exists, which provides additional functionality to interact with the single instance of [SimulatorController](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#singleton-simulatorcontroller-extends-configurationitem-simulator-controllerahk), handle plugin modes and connect to controller functions. The base class *Plugin* only provides the functionality necessary for configuration handling.
 
 ### Public Properties
 
@@ -247,8 +247,8 @@ Searches for a mode with the given name. Returns *false*, if not found.
 #### *findFunction(name :: String)*
 Searches for a controller function with the given descriptor. Returns *false*, if not found.
 
-#### *findAction(function :: ControllerFunction, trigger :: String)*
-Searches for a controller action for the given function / trigger combination. Only currently active actions, which are bound to a function by their mode or plugin, are considered. Returns *false*, if not found.
+#### *getAction(function :: ControllerFunction, trigger :: String)*
+Returns the controller action for the given function / trigger combination. Only currently active actions, which are bound to a function by their mode or plugin, are considered. Returns *false*, if there is no action currently connected to the function.
 
 #### *registerPlugin(plugin :: ControllerPlugin)*
 Registers the given plugin for the controller. If the plugin is active, the *activate* method will be invoked, thereby allowing the plugin to register some actions for controller functions.
@@ -258,7 +258,7 @@ Note: Normally, this method is called by the constructor of the plugin. Therefor
 #### *registerMode(plugin :: ControllerPlugin, mode :: ControllerMode)*
 Registers the given mode of the given plugin for the controller.
 
-Note: Normally, this method is called by the *registerMode* method of the plugin. Therefore it is almost always unnecessary to call *registerMode* for the controller directly. But, since all side effects of *registerMode* are idempotent, so you can call it for your peace of mind as often as you like.
+Note: Normally, this method is called by the *registerMode* method of the plugin. Therefore it is almost always unnecessary to call *registerMode* for the controller directly. But, since all side effects of *registerMode* are idempotent, you can call it for your peace of mind as often as you like.
 
 #### *isActive(modeOrPlugin :: TypeUnion(ControllerPlugin, ControllerMode))*
 Returns *true*, if the given plugin or mode is active. Plugins may be deactivated according to configuration information, whereas modes may be deactivated based on a dynamic test. For example, modes might only be active, if a simulator game is running.
@@ -273,13 +273,13 @@ This method is called when a simulation is starting up. The info is distributed 
 This method is called when a simulation has terminated. The info is distributed to all registered plugins.
 
 #### *connectAction(function :: ControllerFunction, action :: ControllerAction)*
-Connects a given action unambiguously to the given function. All future activation of the function by the controller hardware will trigger the given action. Normally, *connectAction* is called during activation (*) of plugins and modes.
+Connects a given action unambiguously to the given function. All future activation of the function by the controller hardware will trigger the given action. Normally, *connectAction* is called during [activation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#activate) of plugins and modes.
 
 #### *disconnectAction(function :: ControllerFunction, action :: ControllerAction)*
-Disconnects the given action from the given function. Normally, *disconnectAction* is called during deactivation (*) of plugins and modes.
+Disconnects the given action from the given function. Normally, *disconnectAction* is called during [deactivation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#deactivate) of plugins and modes.
 
 #### *fireAction(function :: ControllerFunction, trigger :: String)*
-This is some sort of dispatcher method, since in the end, the fireAction (*) method of the corresponding action is called. This action is retrieved using [findAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#findactionfunction--controllerfunction-trigger--string).
+This is some sort of dispatcher method, since in the end, the [fireAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-fireactionfunction--controllerfunction-trigger--string) method of the corresponding action is called. This action is retrieved using [getAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#getactionfunction--controllerfunction-trigger--string).
 
 #### *setMode(newMode :: ControllerMode)*
 Switches the controller to a different mode. The currently active mode will receive a deactivation and the new mode will be activated, thereby connecting all its actions to the correspondiing controller functions.
@@ -330,7 +330,7 @@ Disables the given trigger (for example "Push") for this controller function, wh
 If the controller has an associated visual representation of the hardware controller, label of the function might be changed with this method. The given color must be a defined HTML color descriptor.
 
 #### *connectAction(action :: ControllerAction)*
-Connects or binds the function to the given action. From now on, every trigger of the hardware controller will result in an activation of the [fireAction](*) method of the action, as long as the function is currently enabled for the trigger in question. Functions will be connected normally during the activation of plugins or modes.
+Connects or binds the function to the given action. From now on, every trigger of the hardware controller will result in an activation of the [fireAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-fireactionfunction--controllerfunction-trigger--string) method of the action, as long as the function is currently enabled for the trigger in question. Functions will be connected normally during the activation of plugins or modes.
 
 #### *disconnectAction(action :: ControllerAction)*
 Disconnects the function from the given action. Functions will be disconnected normally during the deactivation of plugins or modes.
@@ -361,3 +361,117 @@ Concrete implementation for rotary dials. The triggers returned by *Trigger[]* a
 Concrete implementation for custom or external function. The triggers returned by *Trigger[]* are ["Call"] for a generic activation of the function. Normally, custom functions are not bound to a hardware controller, but serve as an interface for other event sources, like a voice control software or a keyboard macro tool.
 
 ***
+
+## ControllerPlugin extends [Plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#plugin-extends-configurationitem-classesahk) ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
+This is the main class, that must be implemented to extend the functionality of the simulator controller. Tha base class [Plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#plugin-extends-configurationitem-classesahk) provides all the configuration information, wherease *ControllerPlugin* defines the protocol to interact with the simulator controller and, most important, supplies [modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controllermode-simulator-controllerahk) and [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controlleraction-simulator-controllerahk).
+
+### Public Properties
+
+#### *Controller[]* {
+Returns the controller, where this plugin has been registered.
+	
+#### *Modes[]*
+A list of all [modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controllermode-simulator-controllerahk) defined by this plugin.
+	
+#### *Actions[]*
+A list of all actions defined by this plugin.
+
+### Public Methods
+
+#### *__New(controller :: SimulatorController, name :: String, configuration :: ConfigurationMap)*
+Constructs an instance of *ControllerPlugin*. All parameters are required.
+
+#### *findMode(name :: String)*
+Searches for a mode defined by this plugin with the given name. Returns *false*, if not found.
+
+#### *findAction(label :: String)*
+Searches for an action with the given name defined by this plugin. Returns *false*, if not found.
+
+#### *registerMode(mode :: ControllerMode)*
+Registers the given mode in the plugin.
+
+Note: Normally, this method is called by the constructor method of the mode. Therefore it is almost always unnecessary to call *registerMode* for the plugin directly. But, since all side effects of *registerMode* are idempotent, you can call it for your peace of mind as often as you like.
+
+#### *registerAction(action :: ControllerAction)*
+Registers the given action in the plugin. In deviation from all other *register...* methods, *registerAction* is not called automatically by the constructor of [ControllerAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controlleraction-simulator-controllerahk), since actions might be defined for plugins or for modes.
+
+#### *isActive()*
+Returns *true*, if the plugin is considered active. The default implementation is based on the [Active](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#active) property of the base class and therefore adheres to the configuration.
+
+#### *activate()*
+This method is called by the controller, when the plugin needs to be activated. Normally, an active plugin gets activated in the moment, when it is registered in the controller. The default implementation connects all plugin actions to their respective functions.
+
+#### *deactivate()*
+This method is called by the controller, when the plugin needs to be deactivated. The default implemention of the controller never deactivates plugins, but a subclass may provide this functionality. The default implementation of *deactivate* disconnects all plugin actions from their respective functions.
+
+#### *runningSimulator()*
+Plugins, that have an understanding of simulator games and can detect their running state, may implement this method to return the name of a currently running simulation.
+
+#### *simulatorStartup(simulator :: String)*
+This is an event handler method called by the controller to notify the plugin, that a simulation just has been started. A plugin may, for example, switch to a specific mode, specialized for the given simulator.
+
+#### *simulatorShutdown()*
+This is an event handler method called by the controller to notify the plugin, that a simulation just has been stopped.
+
+***
+
+## ControllerMode ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
+Controller modes represent a layer or group of functionality for the hardware controller. All the actions, that are part of this group, will be defined by the mode. Only one mode may be active for the controller in any given point in time.
+	
+### Public Properties
+
+#### [Abstract] *Mode[]*
+Returns the name of the mode, wich might by displayed in the visual representation of the hardware controller, for example a button box. This property must be implemented by all subclasses.
+	
+#### *Plugin[]*
+Returns the plugin, which has defined this mode.
+	
+#### *Controller[]*
+The controller, where the plugin of this mode has been registered.
+
+#### *Actions[]*
+A list of all actions defined by this mode.
+
+### Public Methods
+	
+#### *__New(plugin :: ControllerPlugin)*
+Constructs a new mode. [registerMode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#registermodemode--controllermode) is called for the given plugin.
+
+#### *registerAction(action :: ControllerAction)*
+Registers the given action for this mode. In deviation from some other *register...* methods, *registerAction* is not called automatically by the constructor of [ControllerAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controlleraction-simulator-controllerahk), since actions might be defined for plugins or for modes.
+
+#### *findAction(label :: String)*
+Searches for an action with the given name defined by this mode. Returns *false*, if not found.
+
+#### *isActive()*
+Return *true*, if this mode is currently active, which means, that it can be an active mode for the controller. The default implementation will check, whether the mode is dependent on a specific running simulator and will act accordingly.
+
+#### *activate()*
+This method is called by the controller, when the mode will be activated. The default implementation connects all plugin actions to their respective functions.
+
+#### *deactivate()*
+This method is called by the controller, when the mode will be deactivated. The default implementation of *deactivate* disconnects all plugin actions from their respective functions.
+
+***
+
+## ControllerAction ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
+This little class represents the actions, which can be connected to the hardware controller functions. An action simply consists of a label, which may be displayed on the visual representation of the controller hardware and the *fireAction* method, which implements the triggerable functionality.
+
+### Public Properties
+
+#### *Function[]*
+Returns the function, to which this action will be connected, when the correspoding plugin or mode is active.
+	
+#### *Controller[]*
+The controller, where the corresponding function has been registered.
+	
+#### *Label[]*
+Returns the label of this action.
+	
+### Public Methods
+
+#### *__New(function :: ControllerFunction, label :: String := "")*
+Constructs an instance of *ControllerAction*.
+
+#### [Abstract] *fireAction(function :: ControllerFunction, trigger :: String)*
+This method must be implemented by every subclass of *ControllerAction* and act according to the supplied trigger argument.

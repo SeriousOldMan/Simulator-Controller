@@ -171,12 +171,6 @@ class SystemPlugin extends ControllerPlugin {
 		}
 	}
 	
-	Plugin[] {
-		Get {
-			return kSystemPlugin
-		}
-	}
-	
 	ModeSelector[] {
 		Get {
 			return this.iModeSelector

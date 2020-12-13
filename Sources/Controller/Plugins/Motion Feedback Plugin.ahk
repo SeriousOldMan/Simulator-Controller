@@ -313,12 +313,6 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		}
 	}
 
-	Plugin[] {
-		Get {
-			return kMotionFeedbackPlugin
-		}
-	}
-
 	MotionActive[] {
 		Get {
 			return this.iIsMotionActive

@@ -53,12 +53,6 @@ class ACCPlugin extends ControllerPlugin {
 			Send {Enter}
 		}
 	}
-
-	Plugin[] {
-		Get {
-			return kACCPlugin
-		}
-	}
 	
 	__New(controller, name, configuration := false) {
 		this.iDriveMode := new this.DriveMode(this)

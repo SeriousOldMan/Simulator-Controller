@@ -380,7 +380,7 @@ class SimulatorController extends ConfigurationItem {
 		return (functions.HasKey(descriptor) ? functions[descriptor] : false)
 	}
 	
-	findAction(function, trigger) {
+	getAction(function, trigger) {
 		return (this.iFunctionActions.HasKey(function) ? this.iFunctionActions[function] : false)
 	}
 	
@@ -480,7 +480,7 @@ class SimulatorController extends ConfigurationItem {
 	}
 	
 	fireAction(function, trigger) {
-		action := this.findAction(function, trigger)
+		action := this.getAction(function, trigger)
 		
 		if (action != false) {
 			this.iLastEvent := A_TickCount
@@ -810,12 +810,6 @@ class ControllerPlugin extends Plugin {
 	iController := false
 	iModes := []
 	iActions := []
-	
-	Plugin[] {
-		Get {
-			Throw "Virtual property ControllerPlugin.Plugin must be overriden in a subclass..."
-		}
-	}
 	
 	Controller[] {
 		Get {

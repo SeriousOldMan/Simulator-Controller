@@ -19,12 +19,6 @@ global kACPlugin = "AC"
 class ACPlugin extends ControllerPlugin {
 	iACApplication := false
 	
-	Plugin[] {
-		Get {
-			return kACPlugin
-		}
-	}
-	
 	ACApplication[] {
 		Get {
 			return this.iACApplication

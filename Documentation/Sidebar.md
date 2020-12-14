@@ -21,6 +21,7 @@
     - [Overview](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts#overview)
     - [Code Example](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts#example)
     - [Debugging](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts#debugging)
+    - [Using the Build Tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts#using-the-build-tool)
   - [Constants Reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference)
   - [Functions Reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference)
   - [Classes Reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference)

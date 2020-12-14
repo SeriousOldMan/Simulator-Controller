@@ -10,7 +10,7 @@ The distribution of Simulator Controller includes a set of predefined plugins, w
 
 All plugins can be configured in the [Plugins tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#tab-plugins) of the setup tool.
 
-### Plugin *Systen*
+### Plugin *System*
 
 ### Plugin *Tactile Feedback*
 

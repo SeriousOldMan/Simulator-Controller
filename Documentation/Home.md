@@ -16,4 +16,4 @@ Welcome to the Simulator Controller documentation. Here you will find everything
     Complete set of information for developers, which want to create their own plugins.  
 	
   
-If you have any questions that have not been answered here, please feel free to contact me, but please be sure to have read anything related in the documentation in advance. If you want to report a bug, please open an issue. And last, but not least, if you want to contribute, feel free to contact me as well.
+If you have any questions that have not been answered here, please feel free to contact me, but please be sure to have read anything related in the documentation already. If you want to report a bug, please open an issue on GitHub. And last, but not least, if you want to contribute, feel free to contact me as well.

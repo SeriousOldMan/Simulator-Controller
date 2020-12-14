@@ -1,4 +1,8 @@
+[Home](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Home)
+------
+
 [Installation & Setup](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup)
+------
   - [Installation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#installation)
   - [Setup](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#setup)
     - [General](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#tab-general)
@@ -8,7 +12,11 @@
     - [Launchpad](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#tab-launchpad)
     - [Chat](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#tab-chat)
 
+[Plugins & Modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes)
+------
+
 [Development Guide](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts)
+------
   - [Overview & Concepts](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts)
     - [Overview](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts#overview)
     - [Code Example](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts#example)

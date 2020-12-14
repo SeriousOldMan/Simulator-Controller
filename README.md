@@ -108,7 +108,7 @@ Want to contribute? Great!
 
 ### Todos
 
- - Add full documentation Wiki and a FAQ
+ - Finalize documentation Wiki...
 
 ### License
 

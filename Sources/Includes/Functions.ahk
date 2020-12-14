@@ -306,43 +306,8 @@ isDebug() {
 	return vDebug
 }
 
-setDebug(debug) {
-	vDebug := debug
-	
-	state := debug ? "Enabled" : "Disabled"
-	
-	TrayTip Modular Simulator Controller System, Debug: %state%
-}
-
 getLogLevel() {
 	return vLogLevel
-}
-
-setLogLevel(level) {
-	vLogLevel := Min(kLogOff, Max(level, kLogInfo))
-	
-	state := "Unknown"
-	
-	switch vLogLevel {
-		case kLogInfo:
-			state := "Info"
-		case kLogWarn:
-			state := "Warn"
-		case kLogCritical:
-			state := "Critical"
-		case kLogOff:
-			state := "Off"
-	}
-
-	TrayTip Modular Simulator Controller System, Log Level: %state%
-}
-
-increaseLogLevel() {
-	setLogLevel(getLogLevel() - 1)
-}
-
-decreaseLogLevel() {
-	setLogLevel(getLogLevel() + 1)
 }
 
 logMessage(logLevel, message) {
@@ -610,6 +575,46 @@ setConfigurationValue(configuration, section, key, value) {
 removeConfigurationValue(configuration, section, key) {
 	if configuration.HasKey(section)
 		configuration[section].Delete(key)
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                        Controller Action Section                        ;;;
+;;;-------------------------------------------------------------------------;;;
+
+setDebug(debug) {
+	vDebug := debug
+	
+	state := debug ? "Enabled" : "Disabled"
+	
+	TrayTip Modular Simulator Controller System, Debug: %state%
+}
+
+setLogLevel(level) {
+	vLogLevel := Min(kLogOff, Max(level, kLogInfo))
+	
+	state := "Unknown"
+	
+	switch vLogLevel {
+		case kLogInfo:
+			state := "Info"
+		case kLogWarn:
+			state := "Warn"
+		case kLogCritical:
+			state := "Critical"
+		case kLogOff:
+			state := "Off"
+	}
+
+	TrayTip Modular Simulator Controller System, Log Level: %state%
+}
+
+increaseLogLevel() {
+	setLogLevel(getLogLevel() - 1)
+}
+
+decreaseLogLevel() {
+	setLogLevel(getLogLevel() + 1)
 }
 
 

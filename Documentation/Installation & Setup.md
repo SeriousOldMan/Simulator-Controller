@@ -6,7 +6,7 @@ Whenever you will install a new release in the future, you need to save your own
 
 ## Installing additional components
 
-As already mentioned in the [README](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/README.md#third-party-applications) of a lot of third party applications, that might be controlled by Simulator Controller or will enhance the user experience. Please take a look at this list and decide, which ones you want to install. If you want to start your own plugin development or even change the code of the Simulator Controller itself, you definitely need to have [AutoHotkey](https://www.autohotkey.com/) installed. Beside that, I recommend at least [VoiceMacro](http://www.voicemacro.net/) for handling voice commands, and depending on your rig setup, [SimHub](https://www.simhubdash.com/) and [SimFeedback](https://www.opensfx.com/). For the later two, very sophisticated support is built into the Simulator Controller already.
+As already mentioned in the [README](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/README.md#third-party-applications) of a lot of third party applications, that might be controlled by Simulator Controller or will enhance the user experience. Please take a look at this list and decide, which ones you want to install. If you want to start your own plugin development or even change the code of the Simulator Controller itself, you definitely need to have [AutoHotkey](https://www.autohotkey.com/) installed. Beside that, I recommend at least [VoiceMacro](http://www.voicemacro.net/) for handling voice commands, and depending on your equipment setup, [SimHub](https://www.simhubdash.com/) and [SimFeedback](https://www.opensfx.com/). For the later two, very sophisticated support is built into the Simulator Controller already.
 
 ## Using your own pictures, videos and sounds for all the splash screens
 
@@ -14,7 +14,7 @@ The startup process of Simulator Controller can entertain you with splash images
 
 # Setup
 
-The different components of Simulator Controller can be customized to a large extent. Part of this customization is handled by the setup process, which typically you need to do only once, or maybe, when the configuration of your simulation rig might change in the future. This overall setup is handled by a specialized graphical tool, which will be described in the following chapter. Other customization, which address special aspects of the operation of the different applications of Simulator Controller, are handled by configuration dialogs, which will be described in the corresponding documentation chapter about these applications.
+The different components of Simulator Controller can be customized to a large extent. Part of this customization is handled by the setup process, which typically you need to do only once, or maybe, when the configuration of your simulation equipment might change in the future. This overall setup is handled by a specialized graphical tool, which will be described in the following chapters. Additional customization, which address special aspects of the operation of the different applications of Simulator Controller, is possible by using seperate configuration dialogs. See the documentation on [how to use](*) the Simulator Controller for more information.
 
 ## Running the setup tool
 
@@ -101,7 +101,7 @@ Below you will find only a brief and incomplete overview over the possible hotke
 
 An action is simply a textual representation of a function call in the scripting language. It simply looks like this: "setMode(Pedal Vibration)", which means, that the "Pedal Vibration" mode should be selected as the active layer for your hardware controller. You can provide zero or more arguments to the function call. All arguments will be passed as strings to the function with the exception of *true* and *false*, which will be passed as literal values (1 and 0).
 
-You can use the following functions for your actions:
+Although you may call any globally defined function, you should use the following functions for your actions, since they are specially prepared to be called from an external source:
 
 | Function | Parameter(s) | Plugin | Description |
 | ------ | ------ | ------ | ------ |
@@ -117,11 +117,11 @@ You can use the following functions for your actions:
 | stopSimulation | - | System Plugin | Stops the currently running simulation game. |
 | enablePedalVibration | - | Tactile Feedback | Enables the pedal vibration motors, that might be mounted to your pedals. Available depending on the concrete configuration. |
 | disablePedalVibration | - | Tactile Feedback | Disables the pedal vibration motors, that might be mounted to your pedals. Available depending on the concrete configuration. |
-| enableFrontChassisVibration | - | Tactile Feedback | Enables the chassis vibration bass shakers that might be mounted to the front of your simulation rig. Available depending on the concrete configuration. |
-| disableFrontChassisVibration | - | Tactile Feedback | Disables the chassis vibration bass shakers that might be mounted to the front of your simulation rig. Available depending on the concrete configuration. |
-| enableRearChassisVibration | - | Tactile Feedback | Enables the chassis vibration bass shakers that might be mounted to the rear of your simulation rig. Available depending on the concrete configuration. |
-| disableRearChassisVibration | - | Tactile Feedback | Disables the chassis vibration bass shakers that might be mounted to the rear of your simulation rig. Available depending on the concrete configuration. |
-| disableRearChassisVibration | - | Tactile Feedback | Disables the chassis vibration bass shakers that might be mounted to the rear of your simulation rig. Available depending on the concrete configuration. |
+| enableFrontChassisVibration | - | Tactile Feedback | Enables the chassis vibration bass shakers that might be mounted to the front of your Simulation Rig. Available depending on the concrete configuration. |
+| disableFrontChassisVibration | - | Tactile Feedback | Disables the chassis vibration bass shakers that might be mounted to the front of your Simulation Rig. Available depending on the concrete configuration. |
+| enableRearChassisVibration | - | Tactile Feedback | Enables the chassis vibration bass shakers that might be mounted to the rear of your Simulation Rig. Available depending on the concrete configuration. |
+| disableRearChassisVibration | - | Tactile Feedback | Disables the chassis vibration bass shakers that might be mounted to the rear of your Simulation Rig. Available depending on the concrete configuration. |
+| disableRearChassisVibration | - | Tactile Feedback | Disables the chassis vibration bass shakers that might be mounted to the rear of your Simulation Rig. Available depending on the concrete configuration. |
 | startMotion | - | Motion Feedback | Starts the motion feedback system of your simulation rig. Available depending on the concrete configuration. |
 | stopMotion | - | Motion Feedback | Stops the motion feedback system of your simulation rig and brings the rig back to its resting position. Available depending on the concrete configuration. |
 

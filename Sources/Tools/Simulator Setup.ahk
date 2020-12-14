@@ -308,8 +308,6 @@ class SetupEditor extends ConfigurationItem {
 		Gui SE:Add, Text, YP+20 w398 Center, Setup
 
 		Gui SE:Font, Norm, Arial
-
-		Gui SE:Add, Button, x8 y528 w100 h23 gtoggleKeyDetector, Key Detector...
 		
 		Gui SE:Add, Button, x152 y528 w80 h23 Default gsaveAndExit, Ok
 		Gui SE:Add, Button, x240 y528 w80 h23 gcancelAndExit, Cancel
@@ -367,15 +365,6 @@ class SetupEditor extends ConfigurationItem {
 		Gui SE:Hide
 	}
 	
-}
-
-toggleKeyDetector() {
-	vShowKeyDetector := !vShowKeyDetector
-	
-	if vShowKeyDetector
-		SetTimer showKeyDetector, 100
-	else
-		ToolTip, , , 1
 }
 
 saveAndExit() {
@@ -1072,6 +1061,8 @@ class ControllerTab extends ConfigurationItemTab {
 		Gui SE:Add, Edit, x312 y120 w39 h21 Number VdialsEdit, %dialsEdit%
 		Gui SE:Add, UpDown, x352 y120 w18 h21, %dialsEdit%
 		
+		Gui SE:Add, Button, x16 y490 w100 h23 gtoggleKeyDetector, Key Detector...
+		
 		this.iFunctionsList := new FunctionsList(configuration)
 	}
 	
@@ -1099,6 +1090,15 @@ class ControllerTab extends ConfigurationItemTab {
 		
 		this.iFunctionsList.saveToConfiguration(configuration)
 	}
+}
+
+toggleKeyDetector() {
+	vShowKeyDetector := !vShowKeyDetector
+	
+	if vShowKeyDetector
+		SetTimer showKeyDetector, 100
+	else
+		ToolTip, , , 1
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;

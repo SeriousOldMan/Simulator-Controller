@@ -38,6 +38,7 @@ global kChassisVibrationMode = "Chassis Vibration"
 ;;;-------------------------------------------------------------------------;;;
 	
 class TactileFeedbackPlugin extends ControllerPlugin {
+	iVibrationApplication := false
 	iPedalVibrationMode := false
 	iChassisVibrationMode := false
 
@@ -47,6 +48,10 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 				return kPedalVibrationMode
 			}
 		}
+		
+		isActive() {
+			return (base.isActive() && this.Plugin.Application.isRunning())
+		}
 	}
 
 	class ChassisVibrationMode extends ControllerMode {
@@ -54,6 +59,10 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 			Get {
 				return kChassisVibrationMode
 			}
+		}
+		
+		isActive() {
+			return (base.isActive() && this.Plugin.Application.isRunning())
 		}
 	}
 	
@@ -103,6 +112,14 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		}
 		
 		fireAction(function, trigger) {
+			local plugin := this.Controller.findPlugin(kTactileFeedbackPlugin)
+			
+			if !plugin.Application.isRunning() {
+				plugin.requireSimHub()
+			
+				return
+			}
+			
 			if (this.iIsActive && ((trigger = "Off") || (trigger == "Push"))) {
 				base.fireAction(function, trigger)
 				this.iIsActive := false
@@ -162,8 +179,16 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		}
 	}
 	
+	Application[] {
+		Get {
+			return this.iVibrationApplication
+		}
+	}
+	
 	__New(controller, name, configuration := false) {
 		base.__New(controller, name, configuration)
+		
+		this.iVibrationApplication := new Application(kTactileFeedbackPlugin, configuration)
 		
 		pedalVibrationArguments := string2Values(A_Space, this.getArgumentValue("pedalVibration", ""))
 		frontChassisVibrationArguments := string2Values(A_Space, this.getArgumentValue("frontChassisVibration", ""))
@@ -246,8 +271,23 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 	activate() {
 		base.activate()
 	
+		isRunning := this.Application.isRunning()
+		
 		for ignore, action in this.Actions
-			action.Function.setText(action.Label, action.Active ? "Green" : "Black")
+			action.Function.setText(action.Label, isRunning ? (action.Active ? "Green" : "Black") : "Olive")
+	}
+	
+	requireSimHub() {
+		if !this.Application.isRunning() {
+			this.Application.startup()
+			
+			Loop {
+				Sleep 500
+			} until this.Application.isRunning()
+			
+			this.deactivate()
+			this.activate()
+		}
 	}
 }
 

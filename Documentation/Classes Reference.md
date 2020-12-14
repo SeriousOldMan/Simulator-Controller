@@ -191,7 +191,6 @@ Returns *true*, if an argument with values has been supplied for the given param
 Returns the values for the given argument as string, or the supplied *default* value otherwise.
 	
 ***
-***
 
 # Controller Classes
 

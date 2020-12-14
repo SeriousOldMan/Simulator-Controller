@@ -130,6 +130,10 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			this.selectEffect(false)
 		}
 		
+		isActive() {
+			return (base.isActive() && this.Plugin.Application.isRunning())
+		}
+		
 		activate() {
 			base.activate()
 			
@@ -312,6 +316,12 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 				mode.chooseEffect()
 		}
 	}
+	
+	Application[] {
+		Get {
+			return this.iMotionApplication
+		}
+	}
 
 	MotionActive[] {
 		Get {
@@ -328,7 +338,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	__New(controller, name, configuration := false) {
 		local function
 		
-		this.iMotionApplication := new Application("Motion Feedback", configuration)
+		this.iMotionApplication := new Application(kMotionFeedbackPlugin, configuration)
 		
 		base.__New(controller, name, configuration)
 		
@@ -509,9 +519,11 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	activate() {
 		base.activate()
 	
+		isRunning := this.Application.isRunning()
+		
 		action := this.findAction("Motion")
 		
-		action.Function.setText(action.Label, action.Active ? "Green" : "Gray")
+		action.Function.setText(action.Label, isRunning ? (action.Active ? "Green" : "Black") : "Olive")
 	}
 	
 	callSimFeedback(arguments*) {

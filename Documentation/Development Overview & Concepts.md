@@ -1,6 +1,6 @@
 ## Introduction
 
-The architecture of Simulator Controller has been designed with extensibility in mind. Since every racing rig is unique and there are so many different applications out there for sim racers, the core of Simulator Controller is build around a very flexible and generic concept. Plugins may be used to provide additional functionality ranging from simple code additions up to very complex, object-oriented extensions of the Simulator Controller itself.
+The architecture of Simulator Controller has been designed with extensibility in mind. Since every simulation equipment is unique and there are so many different applications out there for sim racers, the core of Simulator Controller is build around a very flexible and generic concept. Plugins may be used to provide additional functionality ranging from simple code additions up to very complex, object-oriented extensions of the Simulator Controller itself.
 
 ### Plugin Integration
 
@@ -157,3 +157,25 @@ As capable, as the AutoHotkey language is, as bad is it, when it comes to avoidi
 	myObject.methodCall("foo", "bar")[42]
 
 Therefore it can be very annoying to track down errors in AutoHotkey. But there is help available. First of all, use one of the AutoHotkey aware editors with debugging, inspection and single-stepping support. You will find an overview of the available editors [here](https://www.autohotkey.com/docs/AHKL_DBGPClients.htm). Second, and maybe even more important, the Simulator Controller has extensive logging capabilties integrated. Most of the times, you will detect a coding error in your plugin simply by looking at the activity trace in the log file. Log files reside in the *Logs* folder and the log level can be changed using the [setup tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#setup). But be careful, since at log level *Info*, the log files can grow quite fast.
+
+## Using the Build Tool
+
+A simple build tool is part of the Simulator Controller distribution. It is rule based like the good old Unix make tool and will compile all the applications, that are part of Simulator Controller and put them in the Binaries folder. Additionaly, you can define some cleanup tasks, for example to clear the *Logs* folder or removing backup files. You can find the build tool in the *Binaries* folder, it is named *Simulator Tools.exe* Simply start it with a double click and it will scan all source files and will recreate all outdated binaries.
+
+The build rules are defined in the file *Simulator Tools.targets* in the *Config* folder. A typical build rule will look like this:
+
+	Simulator Controller=
+		%kBinariesDirectory%Simulator Controller.exe <- %kSourcesDirectory%Controller\Simulator Controller.ahk;
+														%kIncludesDirectory%, %kSourcesDirectory%Controller\Plugins\
+
+Note: You cannot normally format the rules like in this example, since due to technical restrictions, the complete rule must be kept on one line without CRs or LFs.
+
+This rule defines the *Simulator Controller.exe* application in the *Binaries* folder as the target. The main source file will be *Sources\Controller\Simulator Controller.ahk* and there are additional files in the *Includes* and in the *Plugins* folder, that will be checked for modification.
+
+Normally you will never need to change the build rules when developing your own plugins, as long as they will reside in the *Plugins* folder. But, if you decide to put them elsewhere, you might want to add an dependency to this place.
+
+You can decide, which targets you want to include in your build run by holding down the Control key when starting the build tool. A small window will open where you can activate or deactivate all the targets. This settings will be saved for all consecutive runs of the build tool.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Documentation/Images/Build%20Tool.JPG)
+
+Note: You can cancel a build run anytime by pressing the Escape key.

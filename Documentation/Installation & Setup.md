@@ -24,7 +24,7 @@ The setup tool is located in the *Binaries* folder and is named *Simulator Setup
 
 The tool is divided in tabs for each aspect of the setup process. You will find an explanation of each tab and its content below. Before you start experimenting with the setup tool, be sure to make a backup copy of the current configuration file *Simulator Configuration.ini* in the *Config* folder, just to be safe. But you will always find a fresh copy in the *Sources\Tools\Config Templates* folder for your peace of mind.
 
-Hint: Beside simply running the setup tool by double clicking it, there are two hidden modifiers. First, if you hold the control key down while starting the setup tool, any currently available configuration file in the *Config* folder will be ignored and the setup will start with a fresh, completely empty configuration. And if you hold the shift key down, additional options for developer will be available. These will automatically be available, when an active AutoHotkey installation is detected (by checking if the folder C:\Program Files\AutoHotkey is available).
+Hint: Beside simply running the setup tool by double clicking it, there are two hidden modifiers. First, if you hold the Control key down while starting the setup tool, any currently available configuration file in the *Config* folder will be ignored and the setup will start with a fresh, completely empty configuration. And if you hold the Shift key down, additional options for developer will be available. These will automatically be available, when an active AutoHotkey installation is detected (by checking if the folder C:\Program Files\AutoHotkey is available).
 
 ## Using the setup tool
 

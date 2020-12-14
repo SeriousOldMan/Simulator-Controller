@@ -105,9 +105,14 @@ startACC() {
 				protectionOff()
 	
 				try {
-					showSplash("Simulator Splash Images\ACC Splash.jpg")
+					if !kSilentMode {
+						showSplash("Simulator Splash Images\ACC Splash.jpg")
 	
-					raiseEvent(false, "Startup", "playStartupSong")
+						songFile := getConfigurationValue(SimulatorController.Instance.ControllerConfiguration, "Startup", "Song", false)
+				
+						if (songFile && FileExist(kSplashMediaDirectory . songFile))
+							raiseEvent(false, "Startup", "playStartupSong:" . songFile)
+					}
 					
 					posX := Round((A_ScreenWidth - 300) / 2)
 					posY := A_ScreenHeight - 150
@@ -132,8 +137,9 @@ startACC() {
 				}
 				finally {
 					protectionOn()
-	
-					hideSplash()
+					
+					if !kSilentMode
+						hideSplash()
 				}
 			}
 }

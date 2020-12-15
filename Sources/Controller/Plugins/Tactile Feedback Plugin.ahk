@@ -13,13 +13,6 @@
 
 global kVibrationIntensityIncrement = 5
 
-global kEffectMappings = {TC: ["TC", "Increase TC", "Decrease TC"]
-						, ABS: ["ABS", "Increase ABS", "Decrease ABS"]
-						, RPMS: ["RPMS", "Increase RPMS", "Decrease RPMS"]
-						, GearShift: ["Gear Shift", "Increase Shift", "Decrease Shift"]
-						, WheelsLock: ["Wheels Lock", "Increase Whls Lck", "Decrease Whls Lck"]
-						, WheelsSlip: ["Wheels Slip", "Increase Whls Slip", "Decrease Whls Slip"]}
-
 global kSimHub
 
 						

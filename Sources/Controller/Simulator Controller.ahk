@@ -463,7 +463,52 @@ class SimulatorController extends ConfigurationItem {
 			buttonBox.hide()
 			buttonBox.show()
 		}
-	}	
+	}
+	
+	startSimulator(application, splashImage := false) {
+		if !application.isRunning()
+			if (application.startup(false))
+				if (!kSilentMode && splashImage) {
+					protectionOff()
+		
+					try {
+						showSplash(splashImage)
+		
+						songFile := getConfigurationValue(this.ControllerConfiguration, "Startup", "Song", false)
+				
+						if (songFile && FileExist(kSplashMediaDirectory . songFile))
+							raiseEvent(false, "Startup", "playStartupSong:" . songFile)
+						
+						posX := Round((A_ScreenWidth - 300) / 2)
+						posY := A_ScreenHeight - 150
+		
+						name := application.Application
+						
+						Progress B w300 x%posX% y%posY% FS8 CWD0D0D0 CBGreen, %name%, Starting Simulator
+
+						started := false
+
+						Loop {
+							if (A_Index >= 100)
+								break
+						
+							Progress %A_Index%
+
+							if (!started && application.isRunning())
+								started := true
+		
+							Sleep % started ? 10 : 100
+						}
+					
+						Progress Off
+					}
+					finally {
+						protectionOn()
+		
+						hideSplash()
+					}
+				}
+	}
 	
 	connectAction(function, action) {
 		logMessage(kLogInfo, "Connecting " . function.Descriptor . " to action " . getLabelForLogMessage(action))

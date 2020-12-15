@@ -99,49 +99,8 @@ class ACCPlugin extends ControllerPlugin {
 ;;;-------------------------------------------------------------------------;;;
 
 startACC() {
-	if !isACCRunning()
-		if (new Application("Assetto Corsa Competizione", SimulatorController.Instance.Configuration).startup(false))
-			if !kSilentMode {
-				protectionOff()
-	
-				try {
-					if !kSilentMode {
-						showSplash("Simulator Splash Images\ACC Splash.jpg")
-	
-						songFile := getConfigurationValue(SimulatorController.Instance.ControllerConfiguration, "Startup", "Song", false)
-				
-						if (songFile && FileExist(kSplashMediaDirectory . songFile))
-							raiseEvent(false, "Startup", "playStartupSong:" . songFile)
-					}
-					
-					posX := Round((A_ScreenWidth - 300) / 2)
-					posY := A_ScreenHeight - 150
-	
-					Progress B w300 x%posX% y%posY% FS8 CWD0D0D0 CBGreen, Assetto Corsa Competizione, Starting Simulator
-
-					started := false
-
-					Loop {
-						if (A_Index >= 100)
-							break
-					
-						Progress %A_Index%
-
-						if (!started && isACCRunning())
-							started := true
-	
-						Sleep % started ? 10 : 100
-					}
-
-					Progress Off
-				}
-				finally {
-					protectionOn()
-					
-					if !kSilentMode
-						hideSplash()
-				}
-			}
+	SimulatorController.Instance.startSimulator(new Application("Assetto Corsa Competizione", SimulatorController.Instance.Configuration)
+											  , "Simulator Splash Images\ACC Splash.jpg")
 }
 
 stopACC() {

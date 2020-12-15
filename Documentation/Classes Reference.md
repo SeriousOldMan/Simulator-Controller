@@ -277,6 +277,9 @@ This method is called when a simulation is starting up. The info is distributed 
 #### *simulatorShutdown()*
 This method is called when a simulation has terminated. The info is distributed to all registered plugins.
 
+#### *startSimulator(application :: Application, splashImage :: String := false)*
+Starts the simulator represented by the given application. The [startup](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#startupspecial--boolean--true-wait--boolean--false-options--string--) method of *Application* will be called with *false* for the *special* parameter, so that *startSimulator* can be used by a special startup handler provided by plugins without creating an infinite recursion. If *splashImage* is supplied, the startup process will run verbose, showing a splash screen and a progress bar, and possibly playing a startup song. *splashImage* must be a partial path relative to [kSplashMediaDirectory](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#ksplashmediadirectory-kbuttonboximagesdirectory-kiconsdirectory), for example "Simulator Splash Images\ACC Splash.jpg".
+
 #### *connectAction(function :: ControllerFunction, action :: ControllerAction)*
 Connects a given action unambiguously to the given function. All future activation of the function by the controller hardware will trigger the given action. Normally, *connectAction* is called during [activation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#activate) of plugins and modes.
 

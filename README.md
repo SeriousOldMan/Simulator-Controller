@@ -25,7 +25,7 @@ See the complete documentation about [Installation & Setup](https://github.com/S
 
 #### Latest stable builds
 
-*Will be available soon*
+[1.0.0-stable](https://www.dropbox.com/s/wefwtszdqvhz28f/Simulator%20Controller%201.0.0-stable.zip?dl=1)
 
 ### Main features
 

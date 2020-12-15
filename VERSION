@@ -1,5 +1,5 @@
 [Version]
-Current=0.9.8-beta
+Current=1.0.0-stable
 Target=1.0.0
-Features=Configurable build targets, Configurable splash screens
-Date=12/14/2020
+Features=Full documentation
+Date=12/15/2020

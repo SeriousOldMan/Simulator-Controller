@@ -1,5 +1,5 @@
 [Version]
-Current=1.0.0-stable
-Target=1.0.0
-Features=Full documentation
+Current=1.0.1-dev
+Target=1.0.1-stable
+Features=Bug Fixes & Maintenance
 Date=12/15/2020

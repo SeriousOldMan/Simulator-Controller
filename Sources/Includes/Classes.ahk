@@ -245,21 +245,29 @@ class Application extends ConfigurationItem {
 				return true
 		
 		result := false
+		curDetectHiddenWindows := A_DetectHiddenWindows
 		
-		if (this.iRunningPID > 0) {
-			Process Exist, % this.isRunningPID
+		DetectHiddenWindows On
+		
+		try {
+			if (this.iRunningPID > 0) {
+				Process Exist, % this.isRunningPID
+				
+				result := result || (ErrorLevel != 0) || WinExist("ahk_pid " . this.iRunningPID)
+			}
 			
-			result := result || (ErrorLevel != 0) || WinExist("ahk_pid " . this.iRunningPID)
+			if (!result && (this.WindowTitle != ""))
+				result := result || (WinExist(this.WindowTitle) != 0)
+				
+			if (!result && (this.iRunningPID > 0))
+				result := result || WinExist("ahk_pid " . this.iRunningPID)
+			
+			if (!result && (this.ExePath != ""))
+				result := result || WinExist("ahk_exe " . this.ExePath)
 		}
-		
-		if (!result && (this.WindowTitle != ""))
-			result := result || (WinExist(this.WindowTitle) != 0)
-			
-		if (!result && (this.iRunningPID > 0))
-			result := result || WinExist("ahk_pid " . this.iRunningPID)
-		
-		if (!result && (this.ExePath != ""))
-			result := result || WinExist("ahk_exe " . this.ExePath)
+		finally {
+			DetectHiddenWindows % curDetectHiddenWindows
+		}
 		
 		return result
 	}

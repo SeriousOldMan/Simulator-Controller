@@ -102,7 +102,7 @@ Low level method to start Windows applications. See above functions for an expla
 ***
 
 ## [Abstract] Function extends [ConfigurationItem](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-classesahk) ([Classes.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Classes.ahk))
-This abstract class defines the protocol for all functions available for a given controller hardware. A function, which might be buttons, dials and swwitches, defines actions, which react to triggers. To connect to the underlying hardware, a controller function defines several hotkeys (*) per trigger, which is used by AutoHotkey to detect that a button has been pressed, a dial rotated and so on. At this point, the actions that might be triggered can be simple function calls in the script language, but more versatile capabilites will be defined by the [plugin framework](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts#overview), where actions will be implemented by specialized classes.
+This abstract class defines the protocol for all functions available for a given controller hardware. A function, which might be buttons, dials and swwitches, defines actions, which react to triggers. To connect to the underlying hardware, a controller function defines several [hotkeys](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#hotkeys) per trigger, which is used by AutoHotkey to detect that a button has been pressed, a dial rotated and so on. At this point, the actions that might be triggered can be simple function calls in the script language, but more versatile capabilites will be defined by the [plugin framework](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts#overview), where actions will be implemented by specialized classes.
 
 ### Public Properties
 
@@ -205,7 +205,7 @@ This class implements the core functionality of Simulator Controller. The single
 This class property returns the single instance of *SimulatorController*.
 
 #### *ControllerConfiguration[]*
-Returns the controller configuration map, not to be confused with the complete simulator configration map. This small configuration defines settings for controller notifications such as tray tips and buttonbox visuals and is maintained by the configuration tool (*).
+Returns the controller configuration map, not to be confused with the complete simulator configration map. This small configuration defines settings for controller notifications such as tray tips and buttonbox visuals and is maintained by the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--configuration).
 	
 #### *ButtonBox[]*
 Returns an instance of the singleton class [ButtonBox](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-singleton-buttonbox-extends-configurationitem-simulator-controllerahk). This instance must be created by a specialized plugin. See [this simple example](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Plugins/ButtonBox%20Plugin.ahk) for reference.
@@ -234,7 +234,7 @@ Returns the single instance of *SimulatorController*.
 ### Public Methods
 
 #### *__New(simulatorConfiguration :: ConfigurationMap, controllerConfiguration :: ConfigurationMap)*
-Constructs a new *SimulatorController* instance. Both configuration parameters are required. The first expects the general simulator contfiguration map (see [kSimulatorConfiguration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#global-configuration-map-constantsahk) for reference), the second is the small configuration map maintained by the configuration tool (*) and stored in a configuration file referenced by [kControllerConfigurationFile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#ksimulatorconfigurationfile-kcontrollerconfigurationfile).
+Constructs a new *SimulatorController* instance. Both configuration parameters are required. The first expects the general simulator contfiguration map (see [kSimulatorConfiguration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#global-configuration-map-constantsahk) for reference), the second is the small configuration map maintained by the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--configuration) and stored in a configuration file referenced by [kControllerConfigurationFile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#ksimulatorconfigurationfile-kcontrollerconfigurationfile).
 Since *SimulatorController* is a singleton class, the single instance might be accessed after construction by referencing *SimulatorController.Instance*.
 
 #### [Factory Method] *createControllerFunction(descriptor :: String, configuration :: ConfigurationMap)*

@@ -12,7 +12,7 @@ All plugins can be configured in the [Plugins tab](https://github.com/SeriousOld
 
 ## Plugin *System*
 
-The "System" plugin is a required part of the core Simulator Controller framework and therefore cannot be deactivated or deleted in the [setup tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#setup). This plugin handles all the applications during the startup process (*) and provides a controller action to switch between the different modes on your hardware controller.
+The "System" plugin is a required part of the core Simulator Controller framework and therefore cannot be deactivated or deleted in the [setup tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#setup). This plugin handles all the applications during the [startup process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--configuration) and provides a controller action to switch between the different modes on your hardware controller.
 
 ### Mode *Launch*
 

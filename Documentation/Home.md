@@ -1,19 +1,7 @@
-Welcome to the Simulator Controller documentation. Here you will find everything to understand, install, setup and use your complete solution for getting the best experience from your immersive simulationn games. The documentation is devided into sections:
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Documentation/Images/Splash%20Screen.JPG)
 
-  - [Overview](*)  
-    Useful information about Simulator Controller and quirks & features.  
-	
-  - [Installation & Setup](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup)   
-    Maybe the most important part of the documentation, this part decribes how to install and setup Simulator Controller. Especially the second part gives you complete information how to configure all parts to be a perfect fit to your simulation equipment.  
-	
-  - [Using Simulator Controller](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller)  
-    General information how to start and use the Simulator Controller and how to use the available runtime options.	 
-	
-  - [Plugin & Modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes)  
-    Reference information for all the builtin plugins and modes.  
-	
-  - [Development Guide](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts)  
-    Complete set of information for developers, which want to create their own plugins.  
-	
-  
-If you have any questions that have not been answered here, please feel free to contact me, but please be sure to have read anything related in the documentation in advance. If you want to report a bug, please open an issue. And last, but not least, if you want to contribute, feel free to contact me as well.
+Thanks for your interest in Simulator Controller, a set of tools for a better user experience in modular simulation rigs. At the core of Simulator Controller is an extendable controller framwork, which can use any hardware controller (typically a button box in simulation rigs) to control almost all applications and simulation games used in your specific setup and that simultaneously. Before diving into this very extensive documentation, I recommend a first reading of the [README](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/README.md) document in the GitHub repository for a general introduction.
+
+A little lecture in history: Simulator Controller started a few months ago as a tiny collection of keyboard macros to automate some repetitive tasks in Assetto Corsa Competizione. But as usual, the code base grew very fast and several weeks ago, I decided to conduct a compplete rewrite in a plugin capable, object oriented architecture. The current distribution consists of five applications and thousands of lines of code. The solution is fully configurable with a graphical, user friendly [setup tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#setup) and provide a [plugin interface](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts) for developers.
+
+And now it's time to start with the [Overview](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Overview)...

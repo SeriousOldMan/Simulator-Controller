@@ -38,7 +38,7 @@ After the startup process is completed, the splash screen of *Simulator Startup*
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Documentation/Images/Button%20Box%201.JPG)
 
-Normally, the active mode on your hardware controller will be the "Launch" mode, so that you can launch additional applications by the touch of a button. For a complete documentation on everything available in the *Simulator Controller* application, please consult the documentation about [Plugins & modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes).
+Normally, the active mode on your hardware controller will be the "Launch" mode, so that you can launch additional applications by the touch of a button. For a complete documentation on everything available in the *Simulator Controller* application, please consult the documentation about [Plugins & Modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes).
 
 ## And now it's time
 

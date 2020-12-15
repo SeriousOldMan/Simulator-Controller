@@ -14,7 +14,7 @@ The startup process of Simulator Controller can entertain you with splash images
 
 # Setup
 
-The different components of Simulator Controller can be customized to a large extent. Part of this customization is handled by the setup process, which typically you need to do only once, or maybe, when the configuration of your simulation equipment might change in the future. This overall setup is handled by a specialized graphical tool, which will be described in the following chapters. Additional customization, which address special aspects of the operation of the different applications of Simulator Controller, is possible by using seperate configuration dialogs. See the documentation on [how to use](*) the Simulator Controller for more information.
+The different components of Simulator Controller can be customized to a large extent. Part of this customization is handled by the setup process, which typically you need to do only once, or maybe, when the configuration of your simulation equipment might change in the future. This overall setup is handled by a specialized graphical tool, which will be described in the following chapters. Additional customization, which address special aspects of the operation of the different applications of Simulator Controller, is possible by using seperate configuration dialogs. See the documentation on [how to use](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller) the Simulator Controller for more information.
 
 ## Running the setup tool
 
@@ -139,7 +139,7 @@ You need to specify a small label text to display on the visual representation o
 
 ### Tab *Chat*
 
-Many simulation games provide an ingame multiplayer text based chat system. Since it is very difficult and also dangerous to a certain extent to type while driving or flying, you can configure predefined chat messages on this tab. These may be used by several plugins for specific simulators, to help you to send a kudos to your oppenents or even insult or offend them. Chat messages will typically used in a mode of a specific plugin for a simulation game. See the [ACCPlugin](*) for an example.
+Many simulation games provide an ingame multiplayer text based chat system. Since it is very difficult and also dangerous to a certain extent to type while driving or flying, you can configure predefined chat messages on this tab. These may be used by several plugins for specific simulators, to help you to send a kudos to your oppenents or even insult or offend them. Chat messages will typically used in a mode of a specific plugin for a simulation game. See the [ACCPlugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-acc) for an example.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Documentation/Images/Setup%20Tab%206.JPG)
 

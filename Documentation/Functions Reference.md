@@ -79,7 +79,7 @@ Sorts the given array in place, using *comparator*. This function will receive t
 ***
 
 ## Splash Screen Handling ([Functions.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Functions.ahk))
-Several applications of Simulator Controller uses a splash window to entertain the user while performing their operations. The splash screen shows different pictures or even an animation using a GIF. All resources are loacated in the *Resources/Splash Images* folder of the Simulator Controller distribution. The user can switch between rotating pictures or a GIF animation using the configuration tool (*)
+Several applications of Simulator Controller uses a splash window to entertain the user while performing their operations. The splash screen shows different pictures or even an animation using a GIF. All resources are loacated in the *Resources/Splash Images* folder of the Simulator Controller distribution. The user can switch between rotating pictures or a GIF animation using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--configuration).
 
 #### *showSplash(image :: String, alwaysOnTop :: Boolean := true)*
 *image* must be the name of a JPG file (without any path information) located in the *Resources/Splash Images* folder. *showSplash* opens the splash screen showing this picture.

@@ -1,4 +1,4 @@
-[Home](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Home)
+[Overview](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Overview)
 ------
 
 [Installation & Setup](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup)

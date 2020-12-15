@@ -92,7 +92,7 @@ The following applications are not part of the distribution and are not strictly
 
 ### Documentation
 
-See the [wiki](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts) for a complete documentation, how to develop your own plugins. The user documentation, especially, how to setup and configure the Simulator Controller, is currently work in progress. But since all that is supported by graphical user interfaces, you may start already using the very large sample configuration as a starting point.
+A very [extensive documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki) will guide you through the setup and configuration process and will help you to understand the inner concepts and all the functions & features of Simulator Controller. For developers, who want to create their own plugins a complete [devlopers guide & reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts) is available as well.
 
 ### Known issues
 
@@ -102,13 +102,13 @@ See the [wiki](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Develo
 
 Want to contribute? Great!
 
-  - Build your own plugins and  offer them on GitHub. Contact me and I will add a link to your plugin in this documentation.
+  - Build your own plugins and offer them on GitHub. Contact me and I will add a link to your plugin in this documentation.
 
   - Found a bug, or built a new feature? Even better. Please contact me, and I will give you access to the code repository.
 
 ### Todos
 
- - Finalize documentation Wiki...
+ - First and offical stable release build...
 
 ### License
 

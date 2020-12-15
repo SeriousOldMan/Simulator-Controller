@@ -213,6 +213,8 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 			this.createModeAction(labelsDatabase, controller, chassisMode, string2Values(A_Space, effect)*)
 		
 		controller.registerPlugin(this)
+		
+		SetTimer updateVibrationState, 1000
 	}
 
 	createPluginToggleAction(label, command, descriptor, initialState) {
@@ -282,12 +284,42 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 			this.activate()
 		}
 	}
+	
+	updateVibrationState() {
+		static isRunning := "__Undefined__"
+		
+		if (isRunning == kUndefined)
+			isRunning := this.Application.isRunning()
+		
+		if (isRunning != this.Application.isRunning()) {
+			protectionOn()
+			
+			try {
+				if ((this.Controller.ActiveMode == this.findMode(kPedalVibrationMode)) || (this.Controller.ActiveMode == this.findMode(kChassisVibrationMode)))
+					this.Controller.rotateMode()
+						
+				this.deactivate()
+				this.activate()
+		
+				isRunning := !isRunning
+				
+				setTimer updateVibrationState, % isRunning ? 5000 : 1000
+			}
+			finally {
+				protectionOff()
+			}
+		}
+	}
 }
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+updateVibrationState() {
+	SimulatorController.Instance.findPlugin(kTactileFeedbackPlugin).updateVibrationState()
+}
 
 callSimHub(command) {
 	try {

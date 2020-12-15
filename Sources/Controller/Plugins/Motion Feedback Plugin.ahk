@@ -420,10 +420,12 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		
 		controller.registerPlugin(this)
 		
-		if ((motionArguments[1] = "On") && !this.MotionActive && !this.iMotionApplication.isRunning())
+		if ((motionArguments[1] = "On") && !this.MotionActive && !this.Application.isRunning())
 			this.startMotion(true)
-		else if ((motionArguments[1] = "Off") && this.iMotionApplication.isRunning())
+		else if ((motionArguments[1] = "Off") && this.Application.isRunning())
 			this.stopMotion(true)
+		
+		SetTimer updateMotionState, 50
 	}
 	
 	loadEffectStateFromSimFeedback(effect) {
@@ -498,7 +500,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			
 		mode := this.findMode(kMotionMode)
 	
-		if (this.ActiveMode == mode) {
+		if (this.Controller.ActiveMode == mode) {
 			mode.deactivate()
 			mode.activate()
 		}
@@ -821,7 +823,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			
 			mode := this.findMode(kMotionMode)
 		
-			if (this.ActiveMode == mode) {
+			if (this.Controller.ActiveMode == mode) {
 				mode.deactivate()
 				mode.activate()
 			}
@@ -862,7 +864,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			
 			mode := this.findMode(kMotionMode)
 		
-			if (this.ActiveMode == mode) {
+			if (this.Controller.ActiveMode == mode) {
 				mode.deactivate()
 				mode.activate()
 			}
@@ -871,13 +873,47 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			this.activate()
 		}
 	}
+	
+	updateMotionState() {
+		static isRunning := "__Undefined__"
+		
+		if (isRunning == kUndefined)
+			isRunning := this.Application.isRunning()
+		
+		if (isRunning != this.Application.isRunning()) {
+			protectionOn()
+			
+			try {
+				isRunning := !isRunning
+				
+				if isRunning
+					this.requireSimFeedback()
+				else {
+					if (this.Controller.ActiveMode == this.findMode(kMotionMode))
+						this.Controller.rotateMode()
+						
+					this.deactivate()
+					this.activate()
+				}
+				
+				setTimer updateMotionState, % isRunning ? 5000 : 1000
+			}
+			finally {
+				protectionOff()
+			}
+		}
+	}
 }
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
-	
+
+updateMotionState() {
+	SimulatorController.Instance.findPlugin(kMotionFeedbackPlugin).updateMotionState()
+}
+
 blinkEffectLabels() {
 	protectionOn()
 	

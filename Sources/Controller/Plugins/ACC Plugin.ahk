@@ -63,7 +63,7 @@ class ACCPlugin extends ControllerPlugin {
 	}
 	
 	runningSimulator() {
-		return isACCRunning() ? "Assetto Corsa Competizione" : false
+		return (isACCRunning() ? "Assetto Corsa Competizione" : false)
 	}
 	
 	simulatorStartup(simulator) {

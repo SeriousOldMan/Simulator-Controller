@@ -32,7 +32,7 @@ class ACPlugin extends ControllerPlugin {
 	}
 	
 	runningSimulator() {
-		return this.iACApplication.isRunning() ? "Assetto Corsa" : false
+		return (this.ACApplication.isRunning() ? "Assetto Corsa" : false)
 	}
 }
 

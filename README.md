@@ -19,9 +19,7 @@ See the complete documentation about [Installation & Setup](https://github.com/S
 
 #### Latest development builds
 
-[0.9.1-alpha](https://www.dropbox.com/s/v9m80hkprcegz6v/Simulator%20Controller%200.9.1a.zip?dl=1)
-
-[0.9.5-beta](https://www.dropbox.com/s/sxyg0fvwmdr3xtu/Simulator%20Controller%200.9.5b.zip?dl=1)
+Currently none, please use the latest stable build...
 
 #### Latest stable builds
 

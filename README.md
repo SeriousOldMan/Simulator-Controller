@@ -98,6 +98,8 @@ A very [extensive documentation](https://github.com/SeriousOldMan/Simulator-Cont
 
 ### Development
 
+For new features coming in the next release, take a look at the [Release Infos](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Infos).
+
 Want to contribute? Great!
 
   - Build your own plugins and offer them on GitHub. Contact me and I will add a link to your plugin in this documentation.

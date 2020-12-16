@@ -289,6 +289,11 @@ class SystemPlugin extends ControllerPlugin {
 			
 					this.iStartupSongIsPlaying := true
 				}
+				else if FileExist(A_MyDocuments . "\Simulator Controller\Splash Media\" . songFile) {
+					SoundPlay % A_MyDocuments . "\Simulator Controller\Splash Media\" . songFile
+			
+					this.iStartupSongIsPlaying := true
+				}
 			}
 			catch exception {
 				; Ignore
@@ -304,6 +309,7 @@ class SystemPlugin extends ControllerPlugin {
 				SoundPlay NonExistent.avi
 			}
 			catch ignore {
+				; Ignore
 			}
 		
 			this.iStartupSongIsPlaying := false

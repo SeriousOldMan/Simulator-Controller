@@ -98,7 +98,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			
 			if (this.Controller.ActiveMode == this)
 				for index, effect in this.Plugin.kEffects
-					this.findAction(effect).updateLabel(!this.iEffectsAreHighlighted)
+					this.Plugin.EffectToggleAction.findAction(effect).updateLabel(!this.iEffectsAreHighlighted)
 			
 			this.iEffectsAreHighlighted := !this.iEffectsAreHighlighted
 		}
@@ -140,7 +140,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			this.deselectEffect()
 			
 			for index, effect in this.Plugin.kEffects
-				this.findAction(effect).updateLabel(false)
+				this.Plugin.EffectToggleAction.findAction(effect).updateLabel(false)
 		}
 		
 		deactivate() {
@@ -200,10 +200,10 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			}
 		}
 		
-		__New(function, motionMode, effect) {
+		__New(function, motionMode, label) {
 			this.iMotionMode := motionMode
 			
-			base.__New(function, effect)
+			base.__New(function, label)
 		}
 	}
 			
@@ -231,9 +231,12 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	}
 
 	class EffectToggleAction extends MotionFeedbackPlugin.MotionModeAction {
+		static sLabelsDatabase := false
+		iEffect := false
+		
 		Effect[] {
 			Get {
-				return this.Label
+				return this.iEffect
 			}
 		}
 		
@@ -241,6 +244,20 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			Get {
 				return this.Plugin.getEffectState(this.Effect)
 			}
+		}
+		
+		__New(function, motionMode, effect) {
+			this.iMotionMode := motionMode
+			
+			if !this.sLabelsDatabase
+				this.sLabelsDatabase := readConfiguration(kConfigDirectory . "Controller Plugin Labels.ini")
+			
+			label := getConfigurationValue(this.sLabelsDatabase, "Motion Feedback", effect, false)
+			
+			if (!label || (label == ""))
+				label := effect
+				
+			base.__New(function, motionMode, label)
 		}
 		
 		fireAction(function, trigger) {
@@ -268,6 +285,15 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 				this.Function.setText(this.Label, "Green")
 			else
 				this.Function.setText(this.Label, "Gray")
+		}
+		
+		findAction(effect) {
+			label := getConfigurationValue(this.sLabelsDatabase, "Motion Feedback", effect, false)
+			
+			if (!label || (label == ""))
+				label := effect
+				
+			return this.Mode.findAction(label)
 		}
 	}
 			

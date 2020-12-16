@@ -1,7 +1,10 @@
 Welcome to the Simulator Controller documentation. Here you will find everything to understand, install, setup and use your complete solution for getting the best experience from your immersive simulationn games. The documentation is devided into the following sections:
 
   - [README](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/README.md)  
-    Useful information about Simulator Controller project and its functions & features.  
+    Useful information about Simulator Controller project and its functions & features. 
+
+  - [Release Infos](*)  
+    Here you will find information about the current or previous releases. 
 	
   - [Installation & Setup](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup)   
     Maybe the most important part of the documentation, this part decribes how to install and setup Simulator Controller. Especially the second part gives you complete information how to configure all parts to be a perfect fit to your simulation equipment.  

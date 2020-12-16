@@ -32,18 +32,13 @@ ListLines Off					; Disable execution history
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                         Public Constant Section                         ;;;
-;;;-------------------------------------------------------------------------;;;
-
-global kAllTrigger = "__All Trigger__"
-
-
-;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 global kLogoBright = kResourcesDirectory . "Logo Bright.gif"
 global kLogoDark = kResourcesDirectory . "Logo Dark.gif"
+
+global kAllTrigger = "__All Trigger__"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -356,7 +351,7 @@ class SimulatorController extends ConfigurationItem {
 			case kCustomType:
 				return new ControllerCustomFunction(this, descriptor[2], configuration)
 			default:
-				Throw "Unknown controller function (" . descriptor[1] . ") detected in SimulatorController.createControllerFunction..."
+				Throw "Unknown controller function descriptor (" . descriptor[1] . ") detected in SimulatorController.createControllerFunction..."
 		}
 	}
 	
@@ -443,7 +438,7 @@ class SimulatorController extends ConfigurationItem {
 		
 		buttonBox := this.ButtonBox
 		
-		if ((buttonBox != false) && buttonBox.isVisible()) {
+		if (buttonBox != false) {
 			buttonBox.hide()
 			buttonBox.show()
 		}
@@ -459,7 +454,7 @@ class SimulatorController extends ConfigurationItem {
 		
 		buttonBox := this.ButtonBox
 		
-		if ((buttonBox != false) && buttonBox.isVisible()) {
+		if (buttonBox != false) {
 			buttonBox.hide()
 			buttonBox.show()
 		}
@@ -703,7 +698,7 @@ class ControllerFunction {
 			btnBox.setControlText(this, text, color)
 	}
 	
-	enable(trigger) {
+	enable(trigger := "__All Trigger__") {
 		if (trigger == kAllTrigger)
 			for ignore, trigger in this.Trigger
 				setHotkeyEnabled(this, trigger, true)
@@ -711,7 +706,7 @@ class ControllerFunction {
 			setHotkeyEnabled(this, trigger, true)
 	}
 	
-	disable(trigger) {
+	disable(trigger := "__All Trigger__") {
 		if (trigger == kAllTrigger)
 			for ignore, trigger in this.Function.Trigger
 				setHotkeyEnabled(this, trigger, false)
@@ -1315,3 +1310,4 @@ initializeSimulatorController()
 ;;;-------------------------------------------------------------------------;;;
 
 #Include Plugins\Plugins.ahk
+#Include %A_MyDocuments%\Simulator Controller\Plugins\Plugins.ahk

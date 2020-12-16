@@ -106,7 +106,8 @@ Want to contribute? Great!
 
 ### Todos
 
- - First and offical stable release build...
+  1. Fix some bugs
+  2. Create a folder in the documents folder of the user for their own media files and plugins
 
 ### License
 

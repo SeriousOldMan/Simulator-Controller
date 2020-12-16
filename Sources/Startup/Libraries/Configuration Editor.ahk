@@ -113,6 +113,20 @@ computeStartupSongs() {
 		files.Push(soundFile)
 	}
 	
+	Loop Files, % A_MyDocuments . "\Simulator Controller\Splash Media\*.wav"
+	{
+		SplitPath A_LoopFilePath, soundFile
+		
+		files.Push(soundFile)
+	}
+	
+	Loop Files, % A_MyDocuments . "\Simulator Controller\Splash Media\*.mp3"
+	{
+		SplitPath A_LoopFilePath, soundFile
+		
+		files.Push(soundFile)
+	}
+	
 	return files
 }
 

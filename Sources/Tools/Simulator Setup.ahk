@@ -1709,17 +1709,21 @@ saveConfiguration(configurationFile, editor) {
 
 	writeConfiguration(configurationFile, configuration)
 	
-	EnvGet startupShortCut, appdata
-	
-	startupShortCut := startupShortCut . "\Microsoft\Windows\Start Menu\Programs\Startup\Simulator Startup.lnk"
+	startupLink := A_Startup . "\Simulator Startup.lnk"
 	
 	if getConfigurationValue(configuration, "Configuration", "Start With Windows", false) {
 		startupExe := kBinariesDirectory . "Simulator Startup.exe"
 		
-		FileCreateShortCut %startupExe%, %startupShortCut%, %kBinariesDirectory%
+		FileCreateShortCut %startupExe%, %startupLink%, %kBinariesDirectory%
 	}
 	else
-		FileDelete %startupShortCut%
+		FileDelete %startupLink%
+		
+	FileCreateDir %A_MyDocuments%\Simulator Controller
+	FileCreateDir %A_MyDocuments%\Simulator Controller\Splash Media
+	FileCreateDir %A_MyDocuments%\Simulator Controller\Plugins
+	
+	FileCopy %kSourcesDirectory%Tools\Setup Templates\Plugins.ahk, %A_MyDocuments%\Simulator Controller\Plugins
 }
 
 editSetup() {

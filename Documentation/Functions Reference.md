@@ -82,16 +82,16 @@ Sorts the given array in place, using *comparator*. This function will receive t
 Several applications of Simulator Controller uses a splash window to entertain the user while performing their operations. The splash screen shows different pictures or even an animation using a GIF. All resources are loacated in the *Resources/Splash Images* folder of the Simulator Controller distribution. The user can switch between rotating pictures or a GIF animation using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--configuration).
 
 #### *showSplash(image :: String, alwaysOnTop :: Boolean := true)*
-*image* must be the name of a JPG file (without any path information) located in the *Resources/Splash Images* folder. *showSplash* opens the splash screen showing this picture.
+*showSplash* opens the splash screen showing a picture. *image* must either be a partial path for a JPG or GIF file relative to [kSplashMediaDirectory](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#ksplashmediadirectory-kbuttonboximagesdirectory-kiconsdirectory), for example "Simulator Splash Images\ACC Splash.jpg", or a partial path relative to the *Simulator Controller\Splash Media* folder, which is located in the *Documents* folder of the current user, or an absolute path. 
 
 #### *rotateSplash(alwaysOnTop :: Boolean := true)*
-Uses all JPG files in the Resources/Splash Images* folder as a carousel and shows the next picture.
+Uses all JPG files available in [kSplashMediaDirectory](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#ksplashmediadirectory-kbuttonboximagesdirectory-kiconsdirectory) or in the *Simulator Controller\Splash Media* folder, which is located in the *Documents* folder of the current user, as a kind of picture carousel. Every call to *rotateSplash* will show the next picture.
 
 #### *hideSplash()*
 Closes the current splash window.
 
 #### *showSplashAnimation(gif :: String)*
-*gif* must be the name of a GIF file (without any path information) located in the *Resources/Splash Images* folder. *showSplashAnimation* will show this gif in the currently open splash screen window.
+*gif* must be the name of a GIF file located in [kSplashMediaDirectory](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#ksplashmediadirectory-kbuttonboximagesdirectory-kiconsdirectory) or in the *Simulator Controller\Splash Media* folder, which is located in the *Documents* folder of the current user. *showSplashAnimation* will show this animated GIF in the currently open splash screen window.
 
 #### *hideSplashAnimation()*
 Finishes the current animation, but the splash screen window stays open.

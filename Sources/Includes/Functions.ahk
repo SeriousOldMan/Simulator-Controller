@@ -228,6 +228,14 @@ loadSimulatorConfiguration() {
 ;;;-------------------------------------------------------------------------;;;
 
 showSplash(image, alwaysOnTop := true) {
+	SplitPath image, , , , , driveName
+
+	if (!driveName || (driveName == ""))
+		if FileExist(kSplashMediaDirectory . image)
+			image := kSplashMediaDirectory . image
+		else if FileExist(A_MyDocuments . "\Simulator Controller\Splash Media\* . image)
+			image := A_MyDocuments . "\Simulator Controller\Splash Media\* . image
+	
 	lastSplash := vSplashCounter
 	vSplashCounter += 1
 	vLastImage := image
@@ -236,7 +244,7 @@ showSplash(image, alwaysOnTop := true) {
 		vSplashCounter := 1
 		
 	info := kVersion . " - 2020 by Oliver Juwig, Creative Commons - BY-NC-SA"
-	image :=  vSplashCounter . ":" . kSplashMediaDirectory . image
+	image :=  vSplashCounter . ":" . image
 	options := "B FS8 CWD0D0D0 w800 x" . Round((A_ScreenWidth - 800) / 2) . " y" . Round(A_ScreenHeight / 4) . " ZH-1 ZW780"
 	
 	if !alwaysOnTop
@@ -261,13 +269,13 @@ rotateSplash(alwaysOnTop := true) {
 	static numPictures := 0
 	
 	if !pictures {
+		pictures := []
+		
 		Loop Files, % kSplashMediaDirectory . "*.jpg"
-		{
-			if !pictures
-				pictures := []
-				
-			pictures.Push(A_LoopFileName)
-		}
+			pictures.Push(A_LoopFileLongPath)
+		
+		Loop Files, % A_MyDocuments . "\Simulator Controller\Splash Media\*.jpg"
+			pictures.Push(A_LoopFileLongPath)
 		
 		numPictures := pictures.Length()
 	}
@@ -280,7 +288,13 @@ rotateSplash(alwaysOnTop := true) {
 }
 
 showSplashAnimation(gif) {
-	video := kSplashMediaDirectory . gif
+	SplitPath gif, , , , , driveName
+
+	if (!driveName || (driveName == ""))
+		if FileExist(kSplashMediaDirectory . gif)
+			gif := kSplashMediaDirectory . gif
+		else if FileExist(A_MyDocuments . "\Simulator Controller\Splash Media\* . gif)
+			gif := A_MyDocuments . "\Simulator Controller\Splash Media\* . gif
 
 	Gui VP:-Border -Caption ; borderless
 	Gui VP:Add, ActiveX, x0 y0 w780 h415 vvVideoPlayer, shell explorer

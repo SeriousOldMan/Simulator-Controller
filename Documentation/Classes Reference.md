@@ -1,16 +1,15 @@
 # Configuration Classes
 
-The following classes are defined in the [Classes.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Classes.ahk) script. They define objects, that can be loaded from or can be saved to a configuration file maintained by the [setup tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#setup). Many of these classes will be subclassed and extended with more functionality in other files of the Simulator Controller framework, especially in the script [Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk). These classes are described further down [below](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controller-classes).
-
+The following classes are defined in the [Classes.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Classes.ahk) script. They define objects, that can be loaded from or can be saved to a configuration file maintained by the [setup tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#setup). Many of these classes will be subclassed and extended with more functionality in other files of the Simulator Controller framework, especially in the script [Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk). These classes are described [further down below](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controller-classes).
 
 ## [Abstract] ConfigurationItem ([Classes.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Classes.ahk))
 
-This is the base class for all objects, that can be stored to or retrieved from a configuration file. Generally, configurations are maintaned by the [setup tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#setup). During runtime, all configuration items are accessible through the global constant *kSimulatorConfiguration*.
+This is the base class for all objects, that can be stored to or retrieved from a configuration file. Generally, configurations are maintaned by the [setup tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#setup). During runtime, all configuration data is accessible through the global constant *kSimulatorConfiguration*.
 
 ### Public Properties
 
 #### *Configuration[]*
-The configuration map, this item belongs to, or *false*, if the item wasn't created from a configuration.
+The configuration map this item belongs to, or *false*, if the item wasn't created from a configuration.
 
 ### Public Methods
 
@@ -54,7 +53,7 @@ Returns an array with all different parts of the supplied descriptor string.
 ***
 
 ## Application extends [ConfigurationItem](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-classesahk) ([Classes.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Classes.ahk))
-This configuration item represents an application on the current Windows installation.
+This configuration item represents an application in the current Windows installation.
 
 ### Public Properties
 
@@ -71,13 +70,13 @@ Returns the directory, where the application will be executed.
 Returns the pattern used to identify an active window for the given application. Fully supports the AutoHotkey *winTitle* syntax. See the AutoHotkey [documentation](https://www.autohotkey.com/docs/misc/WinTitle.htm) for reference.
 	
 #### *SpecialStartup[]*
-Returns the name of a script function to be invoked as a special startup method, or false, if no special startup method is applicable. Special startup methods may be defined to perform some additional tasks, after an application has been started, or to provide a custom splash screen, for example. See the [ACC Plugin](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Plugins/ACC%20Plugin.ahk) for an example of a custom splash screen.
+Returns the name of a script function to be invoked as a special startup method, or *false*, if no special startup method is applicable. Special startup methods may be defined to perform some additional tasks, after an application has been started, or to provide a custom splash screen, for example. See the [ACC Plugin](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Plugins/ACC%20Plugin.ahk) for an example of a custom splash screen.
 
 #### *SpecialShutdown[]*
-Returns the name of a script function to be invoked as a special shutdown method, or false, if no special shutdown method is applicable. Ses the ACC Plugin mentioned above for an example as well.
+Returns the name of a script function to be invoked as a special shutdown method, or *false*, if no special shutdown method is applicable. Ses the ACC Plugin mentioned above for an example as well.
 	
 #### *SpecialIsRunning[]*
-Returns the name of the special script function used to test whether the application is running, or false, if no special method is applicable.
+Returns the name of the special script function used to test whether the application is running, or *false*, if no special method is applicable.
 	
 #### *CurrentPID[]*
 If the application is running and has been started by the *startup* method below, this property returns the Windows process id associated with the running process.
@@ -102,7 +101,7 @@ Low level method to start Windows applications. See above functions for an expla
 ***
 
 ## [Abstract] Function extends [ConfigurationItem](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-classesahk) ([Classes.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Classes.ahk))
-This abstract class defines the protocol for all functions available for a given controller hardware. A function, which might be buttons, dials and swwitches, defines actions, which react to triggers. To connect to the underlying hardware, a controller function defines several [hotkeys](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#hotkeys) per trigger, which is used by AutoHotkey to detect that a button has been pressed, a dial rotated and so on. At this point, the actions that might be triggered can be simple function calls in the script language, but more versatile capabilites will be defined by the [plugin framework](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts#overview), where actions will be implemented by specialized classes.
+This abstract class defines the protocol for all functions available for a given controller hardware. A function, which might be buttons, dials and swwitches, defines actions, which react to triggers. To connect to the underlying hardware, a controller function defines several [hotkeys](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#hotkeys) per trigger, which is used by AutoHotkey to detect that a button has been pressed, a dial rotated and so on. At this point, the actions that might be triggered will be simple calls to global function in the script language, but more versatile capabilites will be defined by the [plugin framework](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts#overview), where actions will be implemented by specialized classes.
 
 ### Public Properties
 
@@ -110,7 +109,7 @@ This abstract class defines the protocol for all functions available for a given
 Returns the [type constant](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#controller-function-types-constantsahk) of the given function. This property must be implemented by a concrete subclass.
 	
 #### *Number[]*
-Returns the running number of the controller function. For example Button # 3...
+Returns the running number of the controller function. For example Button # **3**...
 	
 #### *Descriptor[]*
 The resource descriptor of the given function. Typically looks like "Button.3" or "Dial.2".
@@ -119,7 +118,7 @@ The resource descriptor of the given function. Typically looks like "Button.3" o
 Returns a list of all triggers available for this controller function. A button class might return ["Push"], beacause only this single functionality is provided, whereas a dial function might return ["Increase", "Decrease"].
 	
 #### *Hotkeys[trigger :: String := false, asText :: Boolean := false]*
-Returns all the hotkeys for all triggers handled by this controller function. Depending on the first argument, this might be a map for all triggers or the result for one specific trigger. The second argument determines, what is returned for a specific trigger, either directly or as part of the map. When *asText* is not supplied or false, a list of all hotkeys is returned. If supplied and *true*, one single string representation is returned, where all the hotkeys are delimited by " | ", for example "<^<!F1 | Joy2".
+Returns all the hotkeys for the triggers handled by this controller function. Depending on the first argument, this might be a map for all triggers or the result for one specific trigger. The second argument determines, what is returned for a specific trigger, either directly or as part of the map. When *asText* has not been supplied or is *false*, a list of all hotkeys is returned. If supplied and *true*, one single string representation is returned, where all the hotkeys are delimited by " | ", for example "<^<!F1 | Joy2".
 
 #### *Actions[trigger :: String := false, asText :: Boolean := false]*
 Similar to the *Hotkeys* property, this property returns the defined actions. The textual representation of an action looks like a script fragment, like "startSimulator(Assetto Corsa Competizione)", whereas the non-text representation is a callable function object.
@@ -158,12 +157,12 @@ Concrete implementation for rotary dials. The triggers returned by *Trigger[]* a
 ***
 
 ## CustomFunction extends [Function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-function-extends-configurationitem-classesahk) ([Classes.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Classes.ahk))
-Concrete implementation for custom or external function. The triggers returned by *Trigger[]* are ["Call"] for a generic activation of the function. Normally, custom functions are not bound to a hardware controller, but serve as an interface for other event sources, like a voice control software or a keyboard macro tool.
+Concrete implementation for a custom or external function. The triggers returned by *Trigger[]* are ["Call"] for a generic activation of the function. Normally, custom functions are not bound to a hardware controller, but serve as an interface for other event sources, like a voice control software or a keyboard macro tool.
 
 ***
 
 ## Plugin extends [ConfigurationItem](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-classesahk) ([Classes.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Classes.ahk))
-A plugin is used by the Simulator Controller framework to integrate custome code and extensions. Plugins can be configured by the [setup tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#setup). Especially the more complex plugins may define a set of configuration parameters to define the function mapping, initial values for dynamic parameters, and so on. A special subclass named [ControllerPlugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controllerplugin-extends-plugin-simulator-controllerahk) exists, which provides additional functionality to interact with the single instance of [SimulatorController](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#singleton-simulatorcontroller-extends-configurationitem-simulator-controllerahk), handle plugin modes and connect to controller functions. The base class *Plugin* only provides the functionality necessary for configuration handling.
+A plugin is used by the Simulator Controller framework to integrate custom code and extensions. Plugins can be configured by the [setup tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#setup). Especially the more complex plugins may define a set of configuration parameters to define the function mapping, initial values for dynamic parameters, and so on. A special subclass named [ControllerPlugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controllerplugin-extends-plugin-simulator-controllerahk) exists, which provides additional functionality to interact with the single instance of [SimulatorController](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#singleton-simulatorcontroller-extends-configurationitem-simulator-controllerahk), handle plugin modes and connect to controller functions. The base class *Plugin* only provides the functionality necessary for configuration reading and writing.
 
 ### Public Properties
 
@@ -174,27 +173,27 @@ Returns the name of the plugin.
 Returns *true*, if the plugin is to be considered active according to the configuration.
 	
 #### *Simulators[]*
-Returns a list of names of simulation games, this plugin is aware of. In the default implementation, the modes of a given plugin will only be active, if one of these simulators are running. If the list is empty, the plugin and its modes are independently active.
+Returns a list of names of simulation games, this plugin is aware of. In the default implementation, the modes of a given plugin will only be active, if one of these simulators is currently running. If the list is empty, the plugin and its modes are independently active.
 
 #### *Arguments[asText := false]*
-Returns a map of all arguments supplied to the plugin, or, if, *asText* has been supplied and is *true*, a string representation, which can be stored in the configuration map.
+Returns a map of all arguments supplied to the plugin, or, if *asText* has been supplied and is *true*, a string representation, which can be stored in the configuration map.
 
 ### Public Methods
 
 #### *__New(plugin :: String, configuration :: ConfigurationMap := false, active :: Boolean := false, simulators :: String := "", arguments :: String := "")*
 Constructs a new plugin instance. If *configuration* has been supplied, the instance is initialized from the configuration. Otherwise the *simulators* may be a ","-delimited string of simulator names and arguments might supply all the plugin arguments also in their texutal representation, which follows the following format: "parameter1: value11, value12, value13; parameter2: value21, value22; ..."
 
-#### *hasArgument(parameter)*
+#### *hasArgument(parameter :: String)*
 Returns *true*, if an argument with values has been supplied for the given parameter name.
 	
-#### *getArgumentValue(argument, default := false)*
+#### *getArgumentValue(argument :: String, default := false)*
 Returns the values for the given argument as string, or the supplied *default* value otherwise.
 	
 ***
 
 # Controller Classes
 
-All the following classes are part of the Simulator Controller core framework defined in the [Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk) script. In many cases they are based upon one of the configuration classes above.
+All the following classes are part of the Simulator Controller core framework defined in the [Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk) script. In many cases they are based on one of the configuration classes above.
 
 ## [Singleton] SimulatorController extends [ConfigurationItem](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-classesahk) ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
 This class implements the core functionality of Simulator Controller. The single instance manages a set of plugins and the connection between hardware functions of a given controller or button box and the actions implemented by these plugins.
@@ -208,13 +207,13 @@ This class property returns the single instance of *SimulatorController*.
 Returns the controller configuration map, not to be confused with the complete simulator configration map. This small configuration defines settings for controller notifications such as tray tips and buttonbox visuals and is maintained by the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--configuration).
 	
 #### *ButtonBox[]*
-Returns an instance of the singleton class [ButtonBox](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-singleton-buttonbox-extends-configurationitem-simulator-controllerahk). This instance must be created by a specialized plugin. See [this simple example](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Plugins/ButtonBox%20Plugin.ahk) for reference.
+Returns an instance of the singleton class [ButtonBox](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-singleton-buttonbox-extends-configurationitem-simulator-controllerahk). This instance must be created by a specialized plugin and registered in the controller by calling [registerButtonBox](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#registerbuttonboxbuttonbox--buttonbox). See [this simple example](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Plugins/ButtonBox%20Plugin.ahk) for reference.
 	
 #### *Functions[]*
-Returns a list of all functions defined by all registered plugins.
+Returns a list of all functions defined in the underlying configuration.
 	
 #### *Plugins[]*
-Returns a list of all registered pluings. Some of these plugins might be inactive according to the configuration.
+Returns a list of all registered plugins. Some of these plugins might be inactive according to the configuration.
 	
 #### *Modes[]*
 A list of all modes defined by all plugins. Here also, not all modes might be active in a given situation.
@@ -226,7 +225,7 @@ The currently active mode. This mode defines the currently active layer of contr
 If a simulation game is currently running, the name of this application is returned by this property.
 	
 #### *LastEvent[]*
-This property returns an integer representing the time of the last hardware event as reported by the special AutoHotkey variable [A_TickCount](https://www.autohotkey.com/docs/Variables.htm#TickCount).
+This property returns an integer representing the time of the last controller hardware event as reported by the special AutoHotkey variable [A_TickCount](https://www.autohotkey.com/docs/Variables.htm#TickCount).
 
 #### [Class Property] *Instance[]*
 Returns the single instance of *SimulatorController*.
@@ -234,7 +233,7 @@ Returns the single instance of *SimulatorController*.
 ### Public Methods
 
 #### *__New(simulatorConfiguration :: ConfigurationMap, controllerConfiguration :: ConfigurationMap)*
-Constructs a new *SimulatorController* instance. Both configuration parameters are required. The first expects the general simulator contfiguration map (see [kSimulatorConfiguration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#global-configuration-map-constantsahk) for reference), the second is the small configuration map maintained by the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--configuration) and stored in a configuration file referenced by [kControllerConfigurationFile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#ksimulatorconfigurationfile-kcontrollerconfigurationfile).
+Constructs a new *SimulatorController* instance. Both configuration parameters are required. The first expects the general simulator configuration map (see [kSimulatorConfiguration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#global-configuration-map-constantsahk) for reference), the second is the small configuration map maintained by the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--configuration) and stored in a configuration file referenced by [kControllerConfigurationFile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#ksimulatorconfigurationfile-kcontrollerconfigurationfile).
 Since *SimulatorController* is a singleton class, the single instance might be accessed after construction by referencing *SimulatorController.Instance*.
 
 #### [Factory Method] *createControllerFunction(descriptor :: String, configuration :: ConfigurationMap)*
@@ -253,7 +252,7 @@ Searches for a controller function with the given descriptor. Returns *false*, i
 Returns the controller action for the given function / trigger combination. Only currently active actions, which are bound to a function by their mode or plugin, are considered. Returns *false*, if there is no action currently connected to the function.
 
 #### *registerButtonBox(buttonBox :: ButtonBox)*
-Registers a visual representation for the hardware controller. This method is automatically call by the constructor of [ButtonBox](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-singleton-buttonbox-extends-configurationitem-simulator-controllerahk).
+Registers a visual representation for the hardware controller. This method is automatically called by the constructor of [ButtonBox](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-singleton-buttonbox-extends-configurationitem-simulator-controllerahk).
 
 #### *registerPlugin(plugin :: ControllerPlugin)*
 Registers the given plugin for the controller. If the plugin is active, the *activate* method will be invoked, thereby allowing the plugin to register some actions for controller functions.
@@ -266,10 +265,10 @@ Registers the given mode of the given plugin for the controller.
 Note: Normally, this method is called by the *registerMode* method of the plugin. Therefore it is almost always unnecessary to call *registerMode* for the controller directly. But, since all side effects of *registerMode* are idempotent, you can call it for your peace of mind as often as you like.
 
 #### *isActive(modeOrPlugin :: TypeUnion(ControllerPlugin, ControllerMode))*
-Returns *true*, if the given plugin or mode is active. Plugins may be deactivated according to configuration information, whereas modes may be deactivated based on a dynamic test. For example, modes might only be active, if a simulator game is running.
+Returns *true*, if the given plugin or mode is active. Plugins may be deactivated according to configuration information, whereas modes may be deactivated based on a dynamic test, for example, whether a simulator is currently running.
 
 #### *runningSimulator()*
-Returns the name of the currently running simulation game or *false*, if no simulation is running, *false* is returned.
+Returns the name of the currently running simulation game or *false*, if no simulation is running.
 
 #### *simulatorStartup(simulator :: String)*
 This method is called when a simulation is starting up. The info is distributed to all registered plugins.
@@ -278,7 +277,7 @@ This method is called when a simulation is starting up. The info is distributed 
 This method is called when a simulation has terminated. The info is distributed to all registered plugins.
 
 #### *startSimulator(application :: Application, splashImage :: String := false)*
-Starts the simulator represented by the given application. The [startup](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#startupspecial--boolean--true-wait--boolean--false-options--string--) method of *Application* will be called with *false* for the *special* parameter, so that *startSimulator* can be used by a special startup handler provided by plugins without creating an infinite recursion. If *splashImage* is supplied, the startup process will run verbose, showing a splash screen and a progress bar, and possibly playing a startup song. *splashImage* must be a partial path relative to [kSplashMediaDirectory](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#ksplashmediadirectory-kbuttonboximagesdirectory-kiconsdirectory), for example "Simulator Splash Images\ACC Splash.jpg".
+Starts the simulator represented by the given application. The [startup](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#startupspecial--boolean--true-wait--boolean--false-options--string--) method of *Application* will be called with *false* for the *special* parameter, so that *startSimulator* can be used by a special startup handler provided by plugins without creating an infinite recursion. If *splashImage* is supplied, the startup process will run verbose, showing a splash screen and a progress bar, and possibly playing a startup song. *splashImage* must either be a partial path for a JPG or GIF file relative to [kSplashMediaDirectory](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#ksplashmediadirectory-kbuttonboximagesdirectory-kiconsdirectory), for example "Simulator Splash Images\ACC Splash.jpg", or a partial path relative to the *Simulator Controller\Splash Media* folder, which is located in the *Documents* folder of the current user, or an absolute path.
 
 #### *connectAction(function :: ControllerFunction, action :: ControllerAction)*
 Connects a given action unambiguously to the given function. All future activation of the function by the controller hardware will trigger the given action. Normally, *connectAction* is called during [activation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#activate) of plugins and modes.
@@ -287,15 +286,15 @@ Connects a given action unambiguously to the given function. All future activati
 Disconnects the given action from the given function. Normally, *disconnectAction* is called during [deactivation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#deactivate) of plugins and modes.
 
 #### *fireAction(function :: ControllerFunction, trigger :: String)*
-This is some sort of dispatcher method, since in the end, the [fireAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-fireactionfunction--controllerfunction-trigger--string) method of the corresponding action is called. This action is retrieved using [getAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#getactionfunction--controllerfunction-trigger--string).
+This is a dispatcher method, since in the end, the [fireAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-fireactionfunction--controllerfunction-trigger--string) method of the corresponding action is called. This action is retrieved using [getAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#getactionfunction--controllerfunction-trigger--string).
 
 #### *setMode(newMode :: ControllerMode)*
-Switches the controller to a different mode. The currently active mode will receive a deactivation and the new mode will be activated, thereby connecting all its actions to the correspondiing controller functions.
+Switches the controller to a different mode. The currently active mode will be [deactivated](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#deactivate) and the new mode will be [activated](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#activate), thereby connecting all its actions to the correspondiing controller functions.
 
 ***
 
 ## [Abstract] ControllerFunction ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
-This is the root class of all controller functions used by the Simulator Controller framework. Due to restrictions in the AutoHotkey language (no multiple inheritance or multiple interface implementation capabilities) , this class (and all of its subclasses) does not inherit from the configurable [Function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-function-extends-configurationitem-classesahk) class. But the protocol of *Function* is completely implemented and *ControllerFunction* and its descendants use some sort of delegation pattern to connect to the configuration information.
+This is the root class of all controller functions used by the Simulator Controller framework. Due to restrictions in the AutoHotkey language (no multiple inheritance or multiple interface implementation capabilities), this class (and all of its subclasses) does not inherit from the configurable [Function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-function-extends-configurationitem-classesahk) class. But the protocol of *Function* is completely implemented and *ControllerFunction* and all its descendants use some sort of delegation pattern to connect to the configuration information of *Function*.
 
 ### Public Properties
 
@@ -309,11 +308,11 @@ Returns the wrapped original class, an instance of [Function](https://github.com
 Returns the [type constant](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#controller-function-types-constantsahk) of the given function. This property must be implemented by a concrete subclass.
 	
 #### *Number[]*
-Returns the running number of the controller function. For example Button # 3...
+Returns the running number of the controller function. For example Button # **3**...
 	
 #### *Descriptor[]*
 The resource descriptor of the given function. Typically looks like "Button.3" or "Dial.2".
-	
+
 #### *Trigger[]*
 Returns a list of all triggers available for this controller function. A button class might return ["Push"], beacause only this single functionality is provided, whereas a dial function might return ["Increase", "Decrease"].
 	
@@ -321,27 +320,27 @@ Returns a list of all triggers available for this controller function. A button 
 Returns all the hotkeys for all triggers handled by this controller function. Depending on the argument, this might be a map for all triggers or the result for one specific trigger. See the [original method](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#hotkeystrigger--string--false-astext--boolean--false) in *Function* for more information.
 
 #### *Actions[trigger :: String := false]*
-Similar to the *Hotkeys* property, this property returns the defined actions. See the [original method](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#actionstrigger--string--false-astext--boolean--false) in *Function* for more information.
+Similar to the *Hotkeys* property, this property returns the defined actions. See the [original method](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#actionstrigger--string--false-astext--boolean--false) in *Function* for more information. The actions returned here will be function objects, that in the end will activate the *fireAction* method of [ControllerAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controlleraction-simulator-controllerahk). 
 
 ### Public Methods
 
 #### *__New(controller :: SimulatorController, function :: Function)*
-Constructs an instance of *ControllerFunction*. The supplied *function* must be an instance of wrapped class [Function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-function-extends-configurationitem-classesahk), which provides the configuration information.
+Constructs an instance of *ControllerFunction*. The supplied *function* must be an instance of the wrapped class [Function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-function-extends-configurationitem-classesahk), which provides the configuration information.
 
-#### *enable(trigger :: String)*
-Enables the given trigger (for example "Push") for this controller function, which means, that the connected action can be triggered by the hardware controller.
+#### *enable(trigger :: String := false)*
+Enables the given trigger (for example "Push") for this controller function, which means, that the connected action can be triggered by the hardware controller. If *trigger* is not supplied, all triggers will be enabled.
 
-#### *disable(trigger :: String)*
-Disables the given trigger (for example "Push") for this controller function, which means, that the connected action cannot be triggered anymore by the hardware controller.
+#### *disable(trigger :: String := false)*
+Disables the given trigger (for example "Push") for this controller function, which means, that the connected action cannot be triggered anymore by the hardware controller. If *trigger* is not supplied, all triggers will be disabled.
 
 #### *setText(test :: String, color :: String := "Black")*
-If the controller has an associated visual representation of the hardware controller, label of the function might be changed with this method. The given color must be a defined HTML color descriptor.
+If the controller has an associated visual representation of the hardware controller, the visual label of the function might be changed with this method. The given color must be a defined HTML color descriptor.
 
 #### *connectAction(action :: ControllerAction)*
-Connects or binds the function to the given action. From now on, every trigger of the hardware controller will result in an activation of the [fireAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-fireactionfunction--controllerfunction-trigger--string) method of the action, as long as the function is currently enabled for the trigger in question. Functions will be connected normally during the activation of plugins or modes.
+Connects or binds the function to the given action. From now on, every trigger of the hardware controller will result in an activation of the [fireAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-fireactionfunction--controllerfunction-trigger--string) method of the action, as long as the function is currently enabled for the trigger in question. Normally, functions will be connected during the activation of plugins or modes.
 
 #### *disconnectAction(action :: ControllerAction)*
-Disconnects the function from the given action. Functions will be disconnected normally during the deactivation of plugins or modes.
+Disconnects the function from the given action. Normally, functions will be disconnected during the deactivation of plugins or modes.
 
 ***
 
@@ -371,7 +370,7 @@ Concrete implementation for custom or external function. The triggers returned b
 ***
 
 ## ControllerPlugin extends [Plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#plugin-extends-configurationitem-classesahk) ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
-This is the main class, that must be implemented to extend the functionality of the simulator controller. Tha base class [Plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#plugin-extends-configurationitem-classesahk) provides all the configuration information, wherease *ControllerPlugin* defines the protocol to interact with the simulator controller and, most important, supplies [modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controllermode-simulator-controllerahk) and [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controlleraction-simulator-controllerahk).
+This is the central class, that must be implemented to extend the functionality of the Simulator Controller. Tha base class [Plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#plugin-extends-configurationitem-classesahk) provides all the configuration information, wherease *ControllerPlugin* defines the protocol to interact with the simulator controller and, most important, supplies [modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controllermode-simulator-controllerahk) and [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controlleraction-simulator-controllerahk).
 
 ### Public Properties
 
@@ -382,7 +381,7 @@ Returns the controller, where this plugin has been registered.
 A list of all [modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controllermode-simulator-controllerahk) defined by this plugin.
 	
 #### *Actions[]*
-A list of all actions defined by this plugin.
+A list of all actions defined by this plugin. Only the actions defined directly for the plugin will be returned, not including the actions defined by the modes of the plugin.
 
 ### Public Methods
 
@@ -401,10 +400,10 @@ Registers the given mode in the plugin.
 Note: Normally, this method is called by the constructor method of the mode. Therefore it is almost always unnecessary to call *registerMode* for the plugin directly. But, since all side effects of *registerMode* are idempotent, you can call it for your peace of mind as often as you like.
 
 #### *registerAction(action :: ControllerAction)*
-Registers the given action in the plugin. In deviation from all other *register...* methods, *registerAction* is not called automatically by the constructor of [ControllerAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controlleraction-simulator-controllerahk), since actions might be defined for plugins or for modes.
+Registers the given action in the plugin. In deviation from all other *register...* methods, *registerAction* is not called automatically by the constructor of [ControllerAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controlleraction-simulator-controllerahk), since actions may be defined both for plugins or for modes. Therefore you need to register a new action for the right owner object.
 
 #### *isActive()*
-Returns *true*, if the plugin is considered active. The default implementation is based on the [Active](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#active) property of the base class and therefore adheres to the configuration.
+Returns *true*, if the plugin is to be considered active. The default implementation is based on the [Active](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#active) property of the base class and therefore adheres to the configuration.
 
 #### *activate()*
 This method is called by the controller, when the plugin needs to be activated. Normally, an active plugin gets activated in the moment, when it is registered in the controller. The default implementation connects all plugin actions to their respective functions.
@@ -413,10 +412,10 @@ This method is called by the controller, when the plugin needs to be activated. 
 This method is called by the controller, when the plugin needs to be deactivated. The default implemention of the controller never deactivates plugins, but a subclass may provide this functionality. The default implementation of *deactivate* disconnects all plugin actions from their respective functions.
 
 #### *runningSimulator()*
-Plugins, that have an understanding of simulator games and can detect their running state, may implement this method to return the name of a currently running simulation.
+Plugins, that have an understanding of simulation games and can detect their running state, may implement this method to return the name of a currently running simulation.
 
 #### *simulatorStartup(simulator :: String)*
-This is an event handler method called by the controller to notify the plugin, that a simulation just has been started. A plugin may, for example, switch to a specific mode, specialized for the given simulator.
+This is an event handler method called by the controller to notify the plugin, that a simulation just has been started. A plugin may, for example, switch to a specific mode specialized for the given simulator.
 
 #### *simulatorShutdown()*
 This is an event handler method called by the controller to notify the plugin, that a simulation just has been stopped.
@@ -424,12 +423,12 @@ This is an event handler method called by the controller to notify the plugin, t
 ***
 
 ## ControllerMode ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
-Controller modes represent a layer or group of functionality for the hardware controller. All the actions, that are part of this group, will be defined by the mode. Only one mode may be active for the controller in any given point in time.
+Controller modes represent a layer or group of functionality for the hardware controller. All the actions, that are part of this group, will be defined by the mode. Only one mode may be active for the controller at any given point in time.
 	
 ### Public Properties
 
 #### [Abstract] *Mode[]*
-Returns the name of the mode, wich might by displayed in the visual representation of the hardware controller, for example a button box. This property must be implemented by all subclasses.
+Returns the name of the mode, wich might be displayed in the visual representation of the hardware controller, for example a button box. This property must be implemented by all subclasses.
 	
 #### *Plugin[]*
 Returns the plugin, which has defined this mode.
@@ -446,19 +445,19 @@ A list of all actions defined by this mode.
 Constructs a new mode. [registerMode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#registermodemode--controllermode) is called for the given plugin.
 
 #### *registerAction(action :: ControllerAction)*
-Registers the given action for this mode. In deviation from some other *register...* methods, *registerAction* is not called automatically by the constructor of [ControllerAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controlleraction-simulator-controllerahk), since actions might be defined for plugins or for modes.
+Registers the given action for this mode. In deviation from some other *register...* methods, *registerAction* is not called automatically by the constructor of [ControllerAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controlleraction-simulator-controllerahk), since actions might be defined for plugins or for modes. Therefore you need to register a new action for the right owner object.
 
 #### *findAction(label :: String)*
-Searches for an action with the given name defined by this mode. Returns *false*, if not found.
+Searches for an action with the given label or name defined by this mode. Returns *false*, if not found.
 
 #### *isActive()*
-Return *true*, if this mode is currently active, which means, that it can be an active mode for the controller. The default implementation will check, whether the mode is dependent on a specific running simulator and will act accordingly.
+Return *true*, if this mode is currently active, which means, that it can be activated by the controller. The default implementation will check, whether the mode is dependent on a specific running simulator and will act accordingly.
 
 #### *activate()*
-This method is called by the controller, when the mode will be activated. The default implementation connects all plugin actions to their respective functions.
+This method is called by the controller, when the mode will be activated. The default implementation connects all mode actions to their respective functions.
 
 #### *deactivate()*
-This method is called by the controller, when the mode will be deactivated. The default implementation of *deactivate* disconnects all plugin actions from their respective functions.
+This method is called by the controller, when the mode will be deactivated. The default implementation of *deactivate* disconnects all mode actions from their respective functions.
 
 ***
 
@@ -487,7 +486,7 @@ This method must be implemented by every subclass of *ControllerAction* and act 
 ***
 
 ## [Abstract Singleton] ButtonBox extends [ConfigurationItem](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-classesahk) ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
-The single instance of this class will implement a visual representation of your hardware controller. Althoug the Simulator Controller will provide complete functionality even without a visual representation, it is much more fun, to get a visual feedback. A subclass of *ButtonBox* must use the [Gui capabilities](https://www.autohotkey.com/docs/commands/Gui.htm) of the AutoHotkey language, to implement the visuals. See [this simple example](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Plugins/ButtonBox%20Plugin.ahk) for reference.
+The single instance of this class will implement a visual representation of your hardware controller. Althoug the Simulator Controller will provide complete functionality even without a visual representation, it is much more fun to see what happens. A subclass of *ButtonBox* must use the [Gui capabilities](https://www.autohotkey.com/docs/commands/Gui.htm) of the AutoHotkey language to implement the graphical representation. See [this simple example](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Plugins/ButtonBox%20Plugin.ahk) for reference.
 
 ### Public Properties
 
@@ -510,18 +509,18 @@ The number of simple push buttons of the button box. This is maintained by the [
 The number of rotary dials of the button box. This is maintained by the [setup tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#setup).
 
 #### *VisibleDuration[]*
-The time in milliseconds, the button box may be visible, after an action has been triggered. This time, which is maintained by the [setup tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#setup), may be different depending on a currently running simulation.
+The time in milliseconds, the button box may be visible after an action has been triggered. You can specify two different durations with the [setup tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#setup), depending being in a running simulation or not.
 
 ### Public Methods
 
 #### *__New(controller :: SimulatorController, configuration :: ConfigurationMap := false)*
-Constructs a button box. The single instance will be bound to the *Instance* property of teh *ButtonBox* class. The button box is automatically registered for the controller using [registerButtonBox](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#registerbuttonboxbuttonbox--buttonbox).
+Constructs a button box. The single instance will be bound to the *Instance* property of the *ButtonBox* class. The button box is automatically registered for the given controller using [registerButtonBox](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#registerbuttonboxbuttonbox--buttonbox).
 	
 #### [Abstract] *createWindow(ByRef window :: String, ByRef windowWidth :: Integer, ByRef windowHeight :: Integer)*
 This method must be implemented by a subclass of *ButtonBox*. The window with its Gui controls for the visual representation of the button box must be created and the Gui prefix for this window (see the [AutoHotkey documentation](https://www.autohotkey.com/docs/commands/Gui.htm) for an explanation), and its width and height must be returned through the reference parameters of the method call.
 
 #### [Abstract] *getControlHandle(descriptor :: String)*
-This method must be implememnted by subclasses. For each visual representation of a controller function, which will a have an associated label or text field, a [GuiControl handle](https://www.autohotkey.com/docs/commands/GuiControl.htm) must be returned, or *false*, if there is no such text control. The given descriptor will identify the function according to the standard format, like "Button.3".
+This method must be implememnted by subclasses. For each visual representation of a controller function, which will a have an associated label or text field, a [GuiControl handle](https://www.autohotkey.com/docs/commands/GuiControl.htm) must be returned, or *false*, if there is no such text control. The given descriptor will identify the function according to the standard descriptor format, like "Button.3".
 	
 #### *isVisible()*
 Returns *true*, if the button box window is currently visible.
@@ -530,4 +529,4 @@ Returns *true*, if the button box window is currently visible.
 Shows the button box window according to the visibility rules defined in the configuration. This method is called automatically by the framework after each potential visual change.
 
 #### *hide()*
-Hides the button box window again. This method is automatically called, after the visible duration defined in the configuration has elapsed with no trigger event in between.
+Hides the button box window again. This method is automatically called, after the visible duration defined in the configuration has elapsed with no hardware trigger event in between.

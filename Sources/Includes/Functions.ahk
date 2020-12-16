@@ -233,8 +233,8 @@ showSplash(image, alwaysOnTop := true) {
 	if (!driveName || (driveName == ""))
 		if FileExist(kSplashMediaDirectory . image)
 			image := kSplashMediaDirectory . image
-		else if FileExist(A_MyDocuments . "\Simulator Controller\Splash Media\* . image)
-			image := A_MyDocuments . "\Simulator Controller\Splash Media\* . image
+		else if FileExist(A_MyDocuments . "\Simulator Controller\Splash Media\" . image)
+			image := A_MyDocuments . "\Simulator Controller\Splash Media\" . image
 	
 	lastSplash := vSplashCounter
 	vSplashCounter += 1
@@ -288,13 +288,15 @@ rotateSplash(alwaysOnTop := true) {
 }
 
 showSplashAnimation(gif) {
+	video := gif
+	
 	SplitPath gif, , , , , driveName
 
 	if (!driveName || (driveName == ""))
 		if FileExist(kSplashMediaDirectory . gif)
-			gif := kSplashMediaDirectory . gif
-		else if FileExist(A_MyDocuments . "\Simulator Controller\Splash Media\* . gif)
-			gif := A_MyDocuments . "\Simulator Controller\Splash Media\* . gif
+			video := kSplashMediaDirectory . gif
+		else if FileExist(A_MyDocuments . "\Simulator Controller\Splash Media\" . gif)
+			video := A_MyDocuments . "\Simulator Controller\Splash Media\" . gif
 
 	Gui VP:-Border -Caption ; borderless
 	Gui VP:Add, ActiveX, x0 y0 w780 h415 vvVideoPlayer, shell explorer

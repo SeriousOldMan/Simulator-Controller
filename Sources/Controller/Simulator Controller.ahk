@@ -162,6 +162,8 @@ class ButtonBox extends ConfigurationItem {
 	}
 	
 	updateVisibility() {
+		this.Controller.updateLastEvent()
+		
 		this.show(false)
 	}
 	
@@ -521,11 +523,15 @@ class SimulatorController extends ConfigurationItem {
 		this.iFunctionActions.Delete(function)
 	}
 	
+	updateLastEvent() {
+		this.iLastEvent := A_TickCount
+	}
+	
 	fireAction(function, trigger) {
 		action := this.getAction(function, trigger)
 		
 		if (action != false) {
-			this.iLastEvent := A_TickCount
+			this.updateLastEvent()
 			
 			logMessage(kLogInfo, "Firing action " . getLabelForLogMessage(action) . " for " . function.Descriptor)
 			

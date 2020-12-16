@@ -17,9 +17,11 @@ For further convinience, you can place links to **Simulator Startup** and **Simu
 
 See the complete documentation about [Installation & Setup](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#installation) for more information.
 
-#### Latest development builds
+Below you will find download links for the current development build and the two latest stable releases. For release information, even for a preview on upcoming features in the next stable build, please take a look at the [release information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Infos).
 
-Currently none, please use the latest stable build...
+#### Latest development build
+
+[1.0.1-dev](https://www.dropbox.com/s/3klup8bcihoji3i/Simulator%20Controller%201.0.1-dev.zip?dl=1)
 
 #### Latest stable builds
 

@@ -108,13 +108,13 @@ Want to contribute? Great!
 
   - Found a bug, or built a new feature? Even better. Please contact me, and I will give you access to the code repository.
 
-### Todos
+### To Do
 
   1. Fix some bugs
-  2. Create a folder in the documents folder of the user for their own media files and plugins
+  2. Create a folder in the User *Documents* folder for own media files and plugins
 
 ### License
 
-This software is provided as is. You are free to use it for any purpose and modify it to your needs, but commercial use is strictly prohibited.
+This software is provided as is. You are free to use it for any purpose and modify it to your needs, as long as you do not use it for any commercial purposes.
 
 (2020) Creative Commons - BY-NC-SA - by Oliver Juwig (TheBigO)

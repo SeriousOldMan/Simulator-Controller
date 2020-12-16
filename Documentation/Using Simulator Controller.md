@@ -34,11 +34,13 @@ Last, but not least, you can choose a simulation game from your list of Simulato
 
 After closing the configuration dialog, the actual startup process begins. Normally, you will be greeted by a splash screen and will see a pogress bar which informs you about what the system is currently doing. If you decide to stop the startup process, you can do this by pressing Escape anytime. If you decide that you want to start your favorite simulation (the first one in the Simulators list (see the [General tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#tab-general) in the setup tool) after the startup process has finished, you can do this, even if you haven't checked the startup option in the configuration dialog above, by holding down the Control key during the startup process.
 
-After the startup process is completed, the splash screen of *Simulator Startup* may stay open, if a video is playing. You can close it by pressing Escape or it will disappear automatically, if a simulator has been started. But *Simulator Controller.exe* including all configured [plugins](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes) has been started and now is in complete control of your simulation rig. Depending on your configuration, you will see the visual representation of your controller hardware, i.e. a button box.
+After the startup process is completed, the splash screen of *Simulator Startup* may stay open still playing a video or showing pictures. You can close it anytime by pressing Escape or it will disappear automatically, when a simulator starts up. But the background process *Simulator Controller.exe* including all the configured [plugins](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes) will keep running and now is in complete control of your simulation rig. Depending on your configuration, you will see the visual representation of your controller hardware, i.e. a button box.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Documentation/Images/Button%20Box%201.JPG)
 
 Normally, the active mode on your hardware controller will be the "Launch" mode, so that you can launch additional applications by the touch of a button. For a complete documentation on everything available in the *Simulator Controller* application, please consult the documentation about [Plugins & Modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes).
+
+Normally, it is not necessary to close *Simulator Controller.exe*, since it does not use many system resources. But if necessary, you can locate its icon, a small silverish gear, in the System Tray (at the lower right side of the Windows taskbar), right click the icon and choose Exit.
 
 ## And now it's time
 

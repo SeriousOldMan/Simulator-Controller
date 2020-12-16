@@ -13,22 +13,23 @@ Paths for the most important configuration files used by Simulator Controller.
 ***
 
 ## Global Configuration Map ([Constants.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Constants.ahk))
-One global configuration map exists for simulator controller, which define the capabilities, the controller mapping and the configuration of all active plugins.
+One global configuration map exists for Simulator Controller, which define the capabilities, the controller mapping and the configuration of all active plugins.
 
 #### *kSimulatorConfiguration*
-The global configuration map. This map is read from *kSimulatorConfigurationFile* and the content is maintained by the [setup tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#setup).
+The global configuration map, which is read from *kSimulatorConfigurationFile*. The content is fully maintained by the [setup tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#setup).
 
 ***
 
 ## Log Levels ([Constants.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Constants.ahk))
+See the dcoumentation about [Debugging & Logging](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#debugging-and-logging-functionsahk) for more information.
 
 #### *kLogInfo, kLogWarn, kLogCritical, kLogOff*
-Define the various log levels used by the logging functions. See [Debugging and Logging](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#debugging-and-logging-functionsahk) for more information.
+Define the various log levels used by the logging functions. These are numerical values where *kLogInfo* < *kLogWarn* < *kLogCritical* < *kLogOff*.
 
 ***
 
 ## Controller Function Types ([Constants.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Constants.ahk))
-Used to identify the different types of controller functions in a configuration map. See the subclasses of [Function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-function-extends-configurationitem-classesahk) for reference.
+Used to identify the different types of hardware controller functions in a configuration map. See the subclasses of [Function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-function-extends-configurationitem-classesahk) for reference.
 
 #### *k1WayToggleType, k2WayToggleType, kButtonType, kDialType, kCustomType*
 All currently defined controller function types.
@@ -45,7 +46,7 @@ May be used by functions to denote a default value for optional parameters that 
 The current version of Simulator Controller according to the VERSION document in the root folder.
 
 #### *kSilentMode*
-If this is *true*, all applications of Simulator Controller adopt accordingly and woll not use any splash screens or other visual or audio feedback.
+If this is *true*, most applications of Simulator Controller will adopt accordingly and will not use any splash screens or other visual or audio feedback.
 
 #### *kTrue, kFalse, kActivate, kDeactivate, kIncrease, kDecrease*
-Miscellaneous constants, which define string representations for typical code elements.
+Miscellaneous constants, which define string representations for often used code constants.

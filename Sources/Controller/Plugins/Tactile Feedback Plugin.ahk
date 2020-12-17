@@ -214,7 +214,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		
 		controller.registerPlugin(this)
 		
-		SetTimer updateVibrationState, 1000
+		SetTimer updateVibrationState, 50
 	}
 
 	createPluginToggleAction(label, command, descriptor, initialState) {
@@ -302,13 +302,13 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 				this.activate()
 		
 				isRunning := !isRunning
-				
-				setTimer updateVibrationState, % isRunning ? 5000 : 1000
 			}
 			finally {
 				protectionOff()
 			}
 		}
+				
+		setTimer updateVibrationState, % isRunning ? 5000 : 1000
 	}
 }
 
@@ -318,7 +318,12 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 ;;;-------------------------------------------------------------------------;;;
 
 updateVibrationState() {
-	SimulatorController.Instance.findPlugin(kTactileFeedbackPlugin).updateVibrationState()
+	static plugin := false
+	
+	if !plugin
+		plugin := SimulatorController.Instance.findPlugin(kTactileFeedbackPlugin)
+		
+	plugin.updateVibrationState()
 }
 
 callSimHub(command) {

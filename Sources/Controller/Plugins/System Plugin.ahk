@@ -429,10 +429,15 @@ unmuteSimulator() {
 }
 
 updateApplicationStates() {
+	static plugin := false
+	
+	if !plugin
+		plugin := SimulatorController.Instance.findPlugin(kSystemPlugin)
+		
 	protectionOn()
 
 	try {
-		for ignore, runnable in SimulatorController.Instance.findPlugin(kSystemPlugin).RunnableApplications
+		for ignore, runnable in plugin.RunnableApplications
 			runnable.updateRunningState()
 	}
 	finally {
@@ -444,10 +449,12 @@ updateModeSelector() {
 	local function
 	
 	static lastMode := false
-	static countdown := 10
+	static countDown := 10
 	static modeSelectorMode := false
+	static controller := false
 	
-	controller := SimulatorController.Instance
+	if !controller
+		controller := SimulatorController.Instance
 	
 	protectionOn()
 	

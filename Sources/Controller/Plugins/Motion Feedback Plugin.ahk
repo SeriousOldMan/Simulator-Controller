@@ -466,7 +466,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			MouseMove kEffectMuteToggleX, yCoordinate, 0
 			MouseGetPos posX, posY, window, muteToggle
 			
-			ControlGet isChecked, Checked, , %muteToggle%, % this.iMotionApplication.WindowTitle
+			ControlGet isChecked, Checked, , %muteToggle%, % this.Application.WindowTitle
 			*/
 			isChecked := this.kInitialEffectStates[effect]
 			
@@ -491,7 +491,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			isActive := false
 		
 			try {
-				ControlGetPos, posX, posY, , , Stop, % this.iMotionApplication.WindowTitle
+				ControlGetPos, posX, posY, , , Stop, % this.Application.WindowTitle
 				
 				if ((posX && (posX != "")) && (posY && (posY != "")))
 					isActive := true
@@ -511,8 +511,6 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	}
 	
 	loadFromSimFeedback() {
-		wasHidden := this.showMotionWindow()
-		
 		this.loadMotionStateFromSimFeedback()
 		this.loadMotionIntensityFromSimFeedback()
 		
@@ -520,9 +518,6 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			this.loadEffectStateFromSimFeedback(effect)
 			this.loadEffectIntensityFromSimFeedback(effect)
 		}
-			
-		if wasHidden
-			this.hideMotionWindow()
 			
 		mode := this.findMode(kMotionMode)
 	
@@ -598,7 +593,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	}
 	
 	toggleEffect(effect) {
-		if this.iMotionApplication.isRunning() {
+		if this.Application.isRunning() {
 			if kSimFeedbackConnector {
 				this.callSimFeedback("EffectToggle", effect)
 				
@@ -609,7 +604,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			
 				yCoordinate := kEffectMuteToggleY[effect]
 				
-				ControlClick X%kEffectMuteToggleX% Y%yCoordinate%, % this.iMotionApplication.WindowTitle
+				ControlClick X%kEffectMuteToggleX% Y%yCoordinate%, % this.Application.WindowTitle
 				Sleep 100
 
 				this.iCurrentEffectStates[effect] := !this.iCurrentEffectStates[effect]
@@ -618,7 +613,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	}
 
 	setEffectIntensity(effect, targetIntensity) {
-		if (this.iMotionApplication.isRunning() && (targetIntensity >= kEffectIntensityMin) && (targetIntensity <= kEffectIntensityMax)) {
+		if (this.Application.isRunning() && (targetIntensity >= kEffectIntensityMin) && (targetIntensity <= kEffectIntensityMax)) {
 			if kSimFeedbackConnector {
 				this.callSimFeedback("EffectIntensitySet", effect, Round(targetIntensity * 10))
 				
@@ -644,7 +639,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	}
 	
 	setMotionIntensity(targetIntensity) {
-		if this.iMotionApplication.isRunning() {
+		if this.Application.isRunning() {
 			if kSimFeedbackConnector {
 				this.callSimFeedback("SetOverallIntensity", targetIntensity)
 				
@@ -666,10 +661,10 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	requireSimFeedback() {
 		static needsInitialize := true
 		
-		if !this.iMotionApplication.isRunning()
-			startSimFeedback()
+		if !this.Application.isRunning()
+			startSimFeedback(needsInitialize)
 		else if !kSimFeedbackConnector {
-			windowTitle := this.iMotionApplication.WindowTitle
+			windowTitle := this.Application.WindowTitle
 			
 			WinWait %windowTitle%, , 20
 			WinActivate %windowTitle%
@@ -796,14 +791,14 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	}
 	
 	showMotionWindow() {
-		window := this.iMotionApplication.WindowTitle
+		window := this.Application.WindowTitle
 		
 		wasHidden := (WinActive(window) == 0)
 		
 		this.requireSimFeedback()
 	
-		if this.iMotionApplication.isRunning() {
-			window := this.iMotionApplication.WindowTitle
+		if this.Application.isRunning() {
+			window := this.Application.WindowTitle
 		
 			IfWinNotActive %window%, , WinActivate, %window%
 			WinWaitActive %window%, , 2
@@ -814,8 +809,8 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	}
 	
 	hideMotionWindow() {
-		if this.iMotionApplication.isRunning()
-			WinMinimize % this.iMotionApplication.WindowTitle
+		if this.Application.isRunning()
+			WinMinimize % this.Application.WindowTitle
 	}
 	
 	resetToInitialState() {
@@ -837,7 +832,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 				wasHidden := this.showMotionWindow()
 
 				if !this.MotionActive {
-					ControlClick Start, % this.iMotionApplication.WindowTitle
+					ControlClick Start, % this.Application.WindowTitle
 					Sleep 100
 			
 					this.iIsMotionActive := true
@@ -878,7 +873,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 				if this.MotionActive {
 					this.resetToInitialState()
 			
-					ControlClick Stop, % this.iMotionApplication.WindowTitle
+					ControlClick Stop, % this.Application.WindowTitle
 					Sleep 100
 			
 					this.iIsMotionActive := false
@@ -906,10 +901,10 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		if (isRunning == kUndefined)
 			isRunning := this.Application.isRunning()
 		
-		if (isRunning != this.Application.isRunning()) {
-			protectionOn()
+		protectionOn()
 			
-			try {
+		try {
+			if (isRunning != this.Application.isRunning()) {
 				isRunning := !isRunning
 				
 				if isRunning
@@ -921,13 +916,15 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 					this.deactivate()
 					this.activate()
 				}
-				
-				setTimer updateMotionState, % isRunning ? 5000 : 1000
 			}
-			finally {
-				protectionOff()
-			}
+			else if (isRunning && kSimFeedbackConnector)
+				this.loadFromSimFeedback()
 		}
+		finally {
+			protectionOff()
+		}
+				
+		SetTimer updateMotionState, % isRunning ? 5000 : 1000
 	}
 }
 
@@ -937,21 +934,31 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 ;;;-------------------------------------------------------------------------;;;
 
 updateMotionState() {
-	SimulatorController.Instance.findPlugin(kMotionFeedbackPlugin).updateMotionState()
+	static plugin := false
+	
+	if !plugin
+		plugin := SimulatorController.Instance.findPlugin(kMotionFeedbackPlugin)
+		
+	plugin.updateMotionState()
 }
 
 blinkEffectLabels() {
+	static mode := false
+	
+	if !mode
+		mode := SimulatorController.Instance.findMode(kMotionMode)
+		
 	protectionOn()
 	
 	try {
-		SimulatorController.Instance.findMode(kMotionMode).blinkEffectLabels()
+		mode.blinkEffectLabels()
 	}
 	finally {
 		protectionOff()
 	}
 }
 
-startSimFeedback() {
+startSimFeedback(stayOpen := false) {
 	simFeedback := new Application("Motion Feedback", SimulatorController.Instance.Configuration)
 	
 	windowTitle := simFeedback.WindowTitle
@@ -965,7 +972,8 @@ startSimFeedback() {
 	else
 		WinActivate %windowTitle%
 	
-	WinMinimize %windowTitle%
+	if !stayOpen
+		WinMinimize %windowTitle%
 }
 
 initializeMotionFeedbackPlugin() {

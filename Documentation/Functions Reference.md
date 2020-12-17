@@ -1,5 +1,5 @@
 ## Configurations ([Functions.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Functions.ahk))
-Configurations are used to store a definition or the state of an object to the file system. Configurations are organized as maps divided by sections or topics. Inside a section, you may have an unlimited number of values referenced by keys. Keys may have Configuration maps are typically stored in *.ini files, therefore the character "=" is not allowed in keys or values written to a configuration map. Keys themselves may have a complex, pathlike structure. See [ConfigurationItem.descriptor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Class-Reference#class-method-descriptorrest-values) for reference.
+Configurations are used to store a definition or the state of an object to the file system. Configurations are organized as maps divided by sections or topics. Inside a section, you may have an unlimited number of values referenced by keys. Configuration maps are typically stored in *.ini files, therefore the character "=" is not allowed in keys or values written to a configuration map. Keys themselves may have a complex, pathlike structure. See [ConfigurationItem.descriptor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Class-Reference#class-method-descriptorrest-values) for reference.
 
 #### *newConfiguration()* 
 Returns a new empty configuration map. The configuration map is not derived from a public class and may be accessed only through the functions given below. 
@@ -17,15 +17,15 @@ Stores the given value for the given key in the configuration map. The value mus
 Removes the given key and its value from the configuration map.
 
 #### *readConfiguration(configFile :: String)*
-Reads a configuration map from an *.ini file.
+Reads a configuration map from an *.ini file. The Strings "true" and "false" will he converted to the literal values *true* and *false* when encountered as values in the configuration file.
 
 #### *writeConfiguration(configFile :: String, configuration :: ConfigurationMap)*
-Stores a configuration map in the given file. All previous content of the file will be overwritten.
+Stores a configuration map in the given file. All previous content of the file will be overwritten. The literal values *true* and *false* will be converted to "true" and "false", before being written to the configuration file.
 
 ***
 
 ## Tray Messages ([Functions.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Functions.ahk))
-Tray messages or TrayTips are small popup windows in the lower right corner of the screen used by applications or the Windows operating system to inform a user about an important event. Tray messages are used by the Simulator Controller for almost every change in the controller state.
+Tray messages or TrayTips are small popup windows in the lower right corner of the main screen used by applications or the Windows operating system to inform the user about an important event. Tray messages can be displayed by the Simulator Controller for almost every change in the controller state.
 
 #### *trayMessage(title :: String, message :: String, duration :: Integer := false)*
 Popups a tray message. If *duration* is supplied, it must be an integer defining the number of milliseconds, the popup will be visible. If not given, a default period may apply (see below).
@@ -34,14 +34,14 @@ Popups a tray message. If *duration* is supplied, it must be an integer defining
 Diasables all tray messages from now on. Every following call to *trayMessage* will have no effect.
 
 #### *enableTrayMessages(duration :: Integer := 1500)*
-(Re-)enables tray messages, if previously been disabled by *disableTrayMessages*. A default for the number of milliseconds, the popups will be visible, may be supplied.
+(Re-)enables tray messages, if previously been disabled by *disableTrayMessages*. A default for the number of milliseconds the popups will be visible, may be supplied.
 
 ***
 
 ## Event Messages ([Functions.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Functions.ahk))
-Event messages may be used to communicate between different processes. In Simulator Controller, the startup application sends events to the controller applicatio to start all components used by the simulator, to play and stop a startup song and so on.
+Event messages may be used to communicate between different processes. In Simulator Controller, the startup application sends events to the controller application to start all components configured for the Simulator Controller, to play and stop a startup song and so on.
 
-#### *registerEventHandler(event :: String, handler :: Function Name)*
+#### *registerEventHandler(event :: String, handler :: TypeUnion(String, FuncObj))*
 Registers an event handler function for the given event type. An event handler is supplied the event and the transmitted message as arguments and typically looks like this:
 
 	handleStartupEvents(event, data) {
@@ -57,7 +57,7 @@ Registers an event handler function for the given event type. An event handler i
 			withProtection(data)
 	}
 
-#### *raiseEvent(target :: String or false, event :: String, data :: String)*
+#### *raiseEvent(target :: String, event :: String, data :: String)*
 Raises the event in the supplied target process. If *target* is *false*, the event is raised in the current process. Otherwise, *target* must use the [*winTitle*](https://www.autohotkey.com/docs/misc/WinTitle.htm) syntax of AutoHotkey to identify a target process through one of its windows or using its process id.
 
 ***
@@ -65,21 +65,21 @@ Raises the event in the supplied target process. If *target* is *false*, the eve
 ## Collection Helper Functions ([Functions.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Functions.ahk))
 
 #### *string2Values(delimiter :: String, string :: String, count :: Integer := false)*
-Splits *string* apart using the supplied delimiter and returns the parts as array. If *count* is supplied, only that much parts are splitted and all remaining ocurrencies of *delimiter* are ignored.
+Splits *string* apart using the supplied delimiter and returns the parts as an array. If *count* is supplied, only that much parts are splitted and all remaining ocurrencies of *delimiter* are ignored.
 
 #### *values2String(delimiter :: String, #rest values)*
-Joins the given values using *delimiter* into one string. *values* must have a string representation.
+Joins the given unlimited number of values using *delimiter* into one string. *values* must have a string representation.
 
 #### *inList(list, value)*
 Returns the position of *value* in the given list or array, or *false*, if not found.
 
 #### *bubbleSort(ByRef array :: Array, comparator :: Function Name)*
-Sorts the given array in place, using *comparator*. This function will receive to objects and must return *true*, if the first one is considered larger or the same than the other. Stable sorting rules apply.
+Sorts the given array in place, using *comparator* to define the order of the elements. This function will receive two objects and must return *true*, if the first one is considered larger or of the same order than the other. Stable sorting rules apply.
 
 ***
 
 ## Splash Screen Handling ([Functions.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Functions.ahk))
-Several applications of Simulator Controller uses a splash window to entertain the user while performing their operations. The splash screen shows different pictures or even an animation using a GIF. All resources are loacated in the *Resources/Splash Images* folder of the Simulator Controller distribution. The user can switch between rotating pictures or a GIF animation using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--configuration).
+Several applications of Simulator Controller uses a splash window to entertain the user while performing their operations. The splash screen shows different pictures or even an animation using a GIF. All required resources, that are part of the Simulator Controller distribution, are loacated in the *Resources/Splash Media* folder. An additional location for user supplied media exists in the *Simulator Controller\Splash Media* folder in the user *Documents* folder. The user can switch between rotating pictures or a GIF animation using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--configuration).
 
 #### *showSplash(image :: String, alwaysOnTop :: Boolean := true)*
 *showSplash* opens the splash screen showing a picture. *image* must either be a partial path for a JPG or GIF file relative to [kSplashMediaDirectory](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#ksplashmediadirectory-kbuttonboximagesdirectory-kiconsdirectory), for example "Simulator Splash Images\ACC Splash.jpg", or a partial path relative to the *Simulator Controller\Splash Media* folder, which is located in the *Documents* folder of the current user, or an absolute path. 
@@ -107,8 +107,8 @@ Starts a protected section of code. Calls to protectionOn() may be nested.
 #### *protectionOff()*
 Finishes a protected section of code. Only if the outermost section has been finished, the current thread becomes interruptable again.
 
-#### *withProtection(function :: Function Name, #rest params)*
-Convinience function to call a given function with supplied parameters using protected mode.
+#### *withProtection(function :: TypeUnion(String, FuncObj), #rest params)*
+Convinience function to call a given function with supplied parameters in a protected section.
 
 ***
 
@@ -122,10 +122,10 @@ Returns *true*, if debugging is currently enabled. The Simulator Controller uses
 Enables or disables debug mode.
 
 #### *getLogLevel()*
-Return the current log level. May be one of: *kLogInfo*, *kLogWarn*, *kLogCritical*, *kLogOff*
+Return the current log level. May be one of: *kLogInfo*, *kLogWarn*, *kLogCritical* or *kLogOff*.
 
 #### *setLogLevel(logLevel :: OneOf(kLogInfo, kLogWarn, kLogCritical, kLogOff))*
-Sets the current log level. If *logLevel* is *kLogOff*, no logging takes place.
+Sets the current log level. If *logLevel* is *kLogOff*, logging will normally fully supressed.
 
 #### *increaseLogLevel()*
 Increases the current log level.
@@ -134,4 +134,4 @@ Increases the current log level.
 Reduces the current log level.
 
 #### *logMessage(logLevel :: OneOf(kLogInfo, kLogWarn, kLogCritical, kLogOff), message :: String)*
-Sends the given message to the log file, if the supplied log level is at the same or a more critical level than the current log level.
+Sends the given message to the log file, if the supplied log level is at the same or a more critical level than the current log level. If *logLevel* is *kLogOff*, the message will be written to the log file, even if logging has been disabled completely by *setLogLevel(kLogOff)* previously.

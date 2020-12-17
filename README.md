@@ -99,6 +99,7 @@ A very [extensive documentation](https://github.com/SeriousOldMan/Simulator-Cont
 ### Known issues
 
 1. Sometimes, the ingame sound volume is not correctly resetted after playing the startup melody. In those situations, you can use the mixer utility of Windows to bring the volume back up.
+2. Connection between the "Motion Feedback" plugin and *SimFeedback* has stabilty issues. Looks like the root cause is located in the *SFX-100-Streamdeck* extension.
 
 ### Development
 

@@ -1,6 +1,6 @@
 # Simulator Controller
 
-Simulator Controller is a modular and extandable adminstration and controller application for complex Sim Racing Rigs. At the core is a comprehensive plugin capable automation framework, which can use almost any external controller hardware, such as button boxes, to control typical simulator components such as SimHub, SimFeedback and alike. But there are a lot more functionality and features available to make the life of all of us virtual racers even more fun and simple. You will find a [comprehensive overwiew](https://github.com/SeriousOldMan/Simulator-Controller#main-features) of all features later in this document, but first things first...
+Simulator Controller is a modular and extandable adminstration and controller application for complex Sim Racing Rigs. At the core is a comprehensive plugin capable automation framework, which can use almost any external controller hardware, such as Button Boxes, to control typical simulator components such as SimHub, SimFeedback and alike. But there are a lot more functionality and features available to make the life of all of us virtual racers even more fun and simple. You will find a [comprehensive overwiew](https://github.com/SeriousOldMan/Simulator-Controller#main-features) of all features later in this document, but first things first...
 
 ### Donation
 
@@ -31,14 +31,14 @@ Below you will find download links for the current development build and the two
 
 ### Main features
 
-  - Connect all your external controller, like button boxes, to one single center of control
+  - Connect all your external controller, like Button Boxes, to one single center of control
     - An unlimited number of layers of functions and actions, called modes, can be defined for your controller. Switch between modes simply by pushing a button or switch a toggle on your controller. Here is an example of several layers of functions and actions combined in five modes:
 	
 	![](./Documentation/Images/Button%20Box%20Layout.jpg)
 	
 	- Modes are defined and handled by [plugins](https://github.com/SeriousOldMan/Simulator-Controller#included-plugins), which can be implemented using an objecct oriented scripting language.
   - Configurable, visual feedback for your controller actions
-    - Define your own button box visual and integrate it with the Simulator Controller using the simple plugin support. Depending on configuration, this window will popup whenever an action is triggered from your controller, even during active simulation
+    - Define your own Button Box visual and integrate it with the Simulator Controller using the simple plugin support. Depending on configuration, this window will popup whenever an action is triggered from your controller, even during active simulation
     
     ![](./Documentation/Images/Button%20Box%202.JPG)
     
@@ -49,7 +49,7 @@ Below you will find download links for the current development build and the two
     - Fully support for sophisticated application automation - for example, start your favorite voice chat software like TeamSpeak and automatically switch to your standard channel 
   - Several plugins supplied out of the box:
     - Support for Assetto Corsa and Assetto Corsa Competizione already builtin
-    - Fully customizable plugins supplied for total control of SimHub and SimFeedback - change your settings while racing using the dials and switches on your favorite button box
+    - Fully customizable plugins supplied for total control of SimHub and SimFeedback - change your settings while racing using the dials and switches on your favorite Button Box
     - Send your predefined kudos and rants to the ingame chat without touching the keyboard
   - Additional support to trigger every function and action from external sources like a voice or gesture recognition software to always keep your hands on the wheel
   - Builtin support for visual head tracking to control ingame viewing angle - see [third party applications](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications) below
@@ -70,12 +70,12 @@ These plugins are part of the Simulator Controller distribution. Beside providin
 
 | Plugin | Description |
 | ------ | ------ |
-| System | Handles multiple button box layers and manages all applications configured for your simulation setup. |
+| System | Handles multiple Button Box layers and manages all applications configured for your simulation setup. |
 | Tactile Feedback | Fully configurable support for pedal and chassis vibration using [SimHub](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications). |
 | Motion Feedback | Fully configurable support for rig motion feedback using [SimFeedback](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications). |
 | ACC | Special support for starting and stopping Assetto Corsa Competizione from your hardware controller and supplies functions and actions for configurable, automated chat messages in a multiplayer game. Although quite small with little more than 100 lines of code, this plugin uses configuration based data and defines a simulator dependent mode. Therefore it supplies a good showcase when starting your own plugin development. |
 | AC | Special support for starting and stopping Assetto Corsa from your hardware controller. |
-| Button Box | Tools for building your own button box / controller visuals. An easy to understand example will help you building the screen representation of your own button boxes. |
+| Button Box | Tools for building your own Button Box / controller visuals. An easy to understand example will help you building the screen representation of your own Button Boxes. |
 
 ### Third party applications
 

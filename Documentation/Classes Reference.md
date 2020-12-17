@@ -196,7 +196,7 @@ Returns the values for the given argument as string, or the supplied *default* v
 All the following classes are part of the Simulator Controller core framework defined in the [Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk) script. In many cases they are based on one of the configuration classes above.
 
 ## [Singleton] SimulatorController extends [ConfigurationItem](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-classesahk) ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
-This class implements the core functionality of Simulator Controller. The single instance manages a set of plugins and the connection between hardware functions of a given controller or button box and the actions implemented by these plugins.
+This class implements the core functionality of Simulator Controller. The single instance manages a set of plugins and the connection between hardware functions of a given controller or Button Box and the actions implemented by these plugins.
 
 ### Public Properties
 
@@ -428,7 +428,7 @@ Controller modes represent a layer or group of functionality for the hardware co
 ### Public Properties
 
 #### [Abstract] *Mode[]*
-Returns the name of the mode, wich might be displayed in the visual representation of the hardware controller, for example a button box. This property must be implemented by all subclasses.
+Returns the name of the mode, wich might be displayed in the visual representation of the hardware controller, for example a Button Box. This property must be implemented by all subclasses.
 	
 #### *Plugin[]*
 Returns the plugin, which has defined this mode.
@@ -497,36 +497,36 @@ This class property returns the single instance of *ButtonBox*.
 Returns the corresponding controller.
 	
 #### *Num1WayToggles[]*
-The number of 1-way toggle switches of the button box. This is maintained by the [setup tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#setup).
+The number of 1-way toggle switches of the Button Box. This is maintained by the [setup tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#setup).
 
 #### *Num2WayToggles[]*
-The number of 2-way toggle switches of the button box. This is maintained by the [setup tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#setup).
+The number of 2-way toggle switches of the Button Box. This is maintained by the [setup tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#setup).
 
 #### *NumButtons[]*
-The number of simple push buttons of the button box. This is maintained by the [setup tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#setup).
+The number of simple push buttons of the Button Box. This is maintained by the [setup tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#setup).
 
 #### *NumDials[]*
-The number of rotary dials of the button box. This is maintained by the [setup tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#setup).
+The number of rotary dials of the Button Box. This is maintained by the [setup tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#setup).
 
 #### *VisibleDuration[]*
-The time in milliseconds, the button box may be visible after an action has been triggered. You can specify two different durations with the [setup tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#setup), depending being in a running simulation or not.
+The time in milliseconds, the Button Box may be visible after an action has been triggered. You can specify two different durations with the [setup tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#setup), depending being in a running simulation or not.
 
 ### Public Methods
 
 #### *__New(controller :: SimulatorController, configuration :: ConfigurationMap := false)*
-Constructs a button box. The single instance will be bound to the *Instance* property of the *ButtonBox* class. The button box is automatically registered for the given controller using [registerButtonBox](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#registerbuttonboxbuttonbox--buttonbox).
+Constructs a Button Box. The single instance will be bound to the *Instance* property of the *ButtonBox* class. The Button Box is automatically registered for the given controller using [registerButtonBox](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#registerbuttonboxbuttonbox--buttonbox).
 	
 #### [Abstract] *createWindow(ByRef window :: String, ByRef windowWidth :: Integer, ByRef windowHeight :: Integer)*
-This method must be implemented by a subclass of *ButtonBox*. The window with its Gui controls for the visual representation of the button box must be created and the Gui prefix for this window (see the [AutoHotkey documentation](https://www.autohotkey.com/docs/commands/Gui.htm) for an explanation), and its width and height must be returned through the reference parameters of the method call.
+This method must be implemented by a subclass of *ButtonBox*. The window with its Gui controls for the visual representation of the Button Box must be created and the Gui prefix for this window (see the [AutoHotkey documentation](https://www.autohotkey.com/docs/commands/Gui.htm) for an explanation), and its width and height must be returned through the reference parameters of the method call.
 
 #### [Abstract] *getControlHandle(descriptor :: String)*
 This method must be implememnted by subclasses. For each visual representation of a controller function, which will a have an associated label or text field, a [GuiControl handle](https://www.autohotkey.com/docs/commands/GuiControl.htm) must be returned, or *false*, if there is no such text control. The given descriptor will identify the function according to the standard descriptor format, like "Button.3".
 	
 #### *isVisible()*
-Returns *true*, if the button box window is currently visible.
+Returns *true*, if the Button Box window is currently visible.
 	
 #### *show()*
-Shows the button box window according to the visibility rules defined in the configuration. This method is called automatically by the framework after each potential visual change.
+Shows the Button Box window according to the visibility rules defined in the configuration. This method is called automatically by the framework after each potential visual change.
 
 #### *hide()*
-Hides the button box window again. This method is automatically called, after the visible duration defined in the configuration has elapsed with no hardware trigger event in between.
+Hides the Button Box window again. This method is automatically called, after the visible duration defined in the configuration has elapsed with no hardware trigger event in between.

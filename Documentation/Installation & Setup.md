@@ -54,7 +54,7 @@ Note: You can deactivate or delete all plugins except *System*. The *System* plu
 
 ### Tab *Applications*
 
-Simulator Controller can handle as many applications as you want. Beside the simulation games itself, you may want to launch your favorite telemetry or voice chat application with a push of a button. Or you want a voice recognition software to be started together with the Simulator Controller to be able to handle all activaties not only by the button box, but by voice commands as well. The possibilities are endless. To be able to do that, Simulator Controller needs needs knowledge about these applications, where to find them and how to handle them. This is the purpose of the *Applications* tab.
+Simulator Controller can handle as many applications as you want. Beside the simulation games itself, you may want to launch your favorite telemetry or voice chat application with a push of a button. Or you want a voice recognition software to be started together with the Simulator Controller to be able to handle all activaties not only by the Button Box, but by voice commands as well. The possibilities are endless. To be able to do that, Simulator Controller needs needs knowledge about these applications, where to find them and how to handle them. This is the purpose of the *Applications* tab.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Documentation/Images/Setup%20Tab%203.JPG)
 
@@ -68,7 +68,7 @@ For developers: Sometimes you want magic stuff to happen, when an application is
 
 ### Tab *Controller*
 
-This tab represents the most important, the most versatile and also the most difficult to understand part of the setup process. On this page, you describe your hardware controller, for example a button box, and all the functionality available on this controller.
+This tab represents the most important, the most versatile and also the most difficult to understand part of the setup process. On this page, you describe your hardware controller, for example a Button Box, and all the functionality available on this controller.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Documentation/Images/Setup%20Tab%204.JPG)
 

@@ -98,7 +98,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			
 			if (this.Controller.ActiveMode == this)
 				for index, effect in this.Plugin.kEffects
-					this.Plugin.EffectToggleAction.findAction(effect).updateLabel(!this.iEffectsAreHighlighted)
+					this.findAction(this.Plugin.EffectToggleAction.getLabel(effect)).updateLabel(!this.iEffectsAreHighlighted)
 			
 			this.iEffectsAreHighlighted := !this.iEffectsAreHighlighted
 		}
@@ -139,14 +139,18 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			
 			this.deselectEffect()
 			
-			for index, effect in this.Plugin.kEffects
-				this.Plugin.EffectToggleAction.findAction(effect).updateLabel(false)
+			this.updateActionStates()
 		}
 		
 		deactivate() {
 			this.deselectEffect()
 			
 			base.deactivate()
+		}
+		
+		updateActionStates() {
+			for index, effect in this.Plugin.kEffects
+				this.findAction(this.Plugin.EffectToggleAction.getLabel(effect)).updateLabel(false)
 		}
 	}
 
@@ -247,17 +251,9 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		}
 		
 		__New(function, motionMode, effect) {
-			this.iMotionMode := motionMode
+			this.iEffect := effect
 			
-			if !this.sLabelsDatabase
-				this.sLabelsDatabase := readConfiguration(kConfigDirectory . "Controller Plugin Labels.ini")
-			
-			label := getConfigurationValue(this.sLabelsDatabase, "Motion Feedback", effect, false)
-			
-			if (!label || (label == ""))
-				label := effect
-				
-			base.__New(function, motionMode, label)
+			base.__New(function, motionMode, this.getLabel(effect))
 		}
 		
 		fireAction(function, trigger) {
@@ -287,13 +283,16 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 				this.Function.setText(this.Label, "Gray")
 		}
 		
-		findAction(effect) {
+		getLabel(effect) {
+			if !this.sLabelsDatabase
+				this.sLabelsDatabase := readConfiguration(kConfigDirectory . "Controller Plugin Labels.ini")
+			
 			label := getConfigurationValue(this.sLabelsDatabase, "Motion Feedback", effect, false)
 			
 			if (!label || (label == ""))
 				label := effect
 				
-			return this.Mode.findAction(label)
+			return label
 		}
 	}
 			
@@ -521,10 +520,8 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			
 		mode := this.findMode(kMotionMode)
 	
-		if (this.Controller.ActiveMode == mode) {
-			mode.deactivate()
-			mode.activate()
-		}
+		if (this.Controller.ActiveMode == mode)
+			mode.updateActionStates()
 	
 		this.deactivate()
 		this.activate()

@@ -1,5 +1,5 @@
 [Version]
-Current=1.0.1-dev
-Target=1.0.2-stable
+Current=1.0.2-fix
+Target=1.1.0-stable
 Features=Bug Fixes & Maintenance, Support for user customization paths
-Date=12/15/2020
+Date=12/17/2020

@@ -5,8 +5,8 @@ Simulator Controller.ini=%kControllerConfigurationFile%
 Simulator Tools.ini=%kToolsConfigurationFile%
 *.bak Files=%kHomeDirectory%, *.ahk.bak, R
 [Build]
-Simulator Controller=%kBinariesDirectory%Simulator Controller.exe <- %kSourcesDirectory%Controller\Simulator Controller.ahk; %kIncludesDirectory%, %kSourcesDirectory%Controller\Plugins\
-Simulator Configuration=%kBinariesDirectory%Simulator Configuration.exe <- %kSourcesDirectory%Startup\Simulator Configuration.ahk; %kIncludesDirectory%, %kSourcesDirectory%Startup\Libraries\
-Simulator Startup=%kBinariesDirectory%Simulator Startup.exe <- %kSourcesDirectory%Startup\Simulator Startup.ahk; %kIncludesDirectory%, %kSourcesDirectory%Startup\Libraries\
-Simulator Setup=%kBinariesDirectory%Simulator Setup.exe <- %kSourcesDirectory%Tools\Simulator Setup.ahk; %kIncludesDirectory%
-Simulator Tools=%kBinariesDirectory%Simulator Tools.exe <- %kSourcesDirectory%Tools\Simulator Tools.ahk; %kIncludesDirectory%
+Simulator Controller=%kBinariesDirectory%Simulator Controller.exe <- %kSourcesDirectory%Controller\Simulator Controller.ahk; %kIncludesDirectory%, %kSourcesDirectory%Controller\Plugins\, %kHomeDirectory%VERSION
+Simulator Configuration=%kBinariesDirectory%Simulator Configuration.exe <- %kSourcesDirectory%Startup\Simulator Configuration.ahk; %kIncludesDirectory%, %kSourcesDirectory%Startup\Libraries\, %kHomeDirectory%VERSION
+Simulator Startup=%kBinariesDirectory%Simulator Startup.exe <- %kSourcesDirectory%Startup\Simulator Startup.ahk; %kIncludesDirectory%, %kSourcesDirectory%Startup\Libraries\, %kHomeDirectory%VERSION
+Simulator Setup=%kBinariesDirectory%Simulator Setup.exe <- %kSourcesDirectory%Tools\Simulator Setup.ahk; %kIncludesDirectory%, %kHomeDirectory%VERSION
+Simulator Tools=%kBinariesDirectory%Simulator Tools.exe <- %kSourcesDirectory%Tools\Simulator Tools.ahk; %kIncludesDirectory%, %kHomeDirectory%VERSION

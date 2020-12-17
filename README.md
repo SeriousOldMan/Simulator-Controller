@@ -27,6 +27,8 @@ Below you will find download links for the current development build and the two
 
 [1.0.0-stable](https://www.dropbox.com/s/wefwtszdqvhz28f/Simulator%20Controller%201.0.0-stable.zip?dl=1)
 
+[1.0.2-fix](https://www.dropbox.com/s/ylhj9g4xeksuj80/Simulator%20Controller%201.0.2-fix.zip?dl=1) (Maintenance release for 1.0.0)
+
 ### Main features
 
   - Connect all your external controller, like button boxes, to one single center of control

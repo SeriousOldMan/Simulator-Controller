@@ -1,4 +1,4 @@
-## Installation Pathes ([Constants.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Constants.ahk))
+## Installation Paths ([Constants.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Constants.ahk))
 The following constants may be used to refer to all the relevant locations of the Simulator Controller distribution.
 
 #### *kHomeDirectory, kResourcesDirectory, kSourcesDirectory, kIncludesDirectory, kBinariesDirectory, kConfigDirectory, kLogsDirectory*

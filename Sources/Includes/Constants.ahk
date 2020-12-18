@@ -19,7 +19,7 @@ global kSourcesDirectory = A_ScriptDir . (A_IsCompiled ? "\..\Sources\" : "\..\.
 global kIncludesDirectory = A_ScriptDir . (A_IsCompiled ? "\..\Sources\Includes\" : "\..\..\Sources\Includes\")
 global kBinariesDirectory = A_ScriptDir . (A_IsCompiled ? "\..\Binaries\" : "\..\..\Binaries\")
 
-global kLogsDirectory = A_MyDocuments . "\Simulator Controller\Logs\"
+global kLogsDirectory = kUserHomeDirectory . "Logs\"
 
 global kPluginsDirectory = A_ScriptDir . (A_IsCompiled ? "\..\Sources\Plugins\" : "\..\..\Sources\Plugins\")
 global kUserPluginsDirectory = kUserHomeDirectory . "Plugins\"

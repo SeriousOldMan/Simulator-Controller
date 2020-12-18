@@ -504,14 +504,8 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			this.loadEffectStateFromSimFeedback(effect)
 			this.loadEffectIntensityFromSimFeedback(effect)
 		}
-			
-		mode := this.findMode(kMotionMode)
-	
-		if (this.Controller.ActiveMode == mode)
-			mode.updateActionStates()
-	
-		this.deactivate()
-		this.activate()
+		
+		this.updatePluginState()
 	}
 		
 	createEffectToggleAction(controller, mode, functionDescriptor, effect) {
@@ -642,11 +636,16 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		}
 	}
 	
-	requireSimFeedback() {
+	requireSimFeedback(startup := true) {
 		static needsInitialize := true
 		
-		if !this.Application.isRunning()
+		isRunning := this.Application.isRunning()
+		
+		if (!isRunning && startup) {
 			startSimFeedback(needsInitialize)
+			
+			isRunning := true
+		}
 		else if !kSimFeedbackConnector {
 			windowTitle := this.Application.WindowTitle
 			
@@ -655,11 +654,13 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			WinMaximize %windowTitle%
 		}
 		
-		if needsInitialize {
+		if (isRunning && needsInitialize) {
 			needsInitialize := false
 			
 			this.loadFromSimFeedback()
 		}
+		
+		return isRunning
 	}
 	
 	increaseMotionIntensity() {
@@ -825,16 +826,8 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 				if wasHidden
 					this.hideMotionWindow()
 			}
-			
-			mode := this.findMode(kMotionMode)
 		
-			if (this.Controller.ActiveMode == mode) {
-				mode.deactivate()
-				mode.activate()
-			}
-		
-			this.deactivate()
-			this.activate()
+			this.updatePluginState()
 		}
 	}
 	
@@ -866,17 +859,22 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 				if wasHidden
 					this.hideMotionWindow()
 			}
-			
-			mode := this.findMode(kMotionMode)
 		
-			if (this.Controller.ActiveMode == mode) {
-				mode.deactivate()
-				mode.activate()
-			}
-		
-			this.deactivate()
-			this.activate()
+			this.updatePluginState()
 		}
+	}
+	
+	updatePluginState() {
+		mode := this.findMode(kMotionMode)
+	
+		if (this.Controller.ActiveMode == mode)
+			if this.Application.isRunning()
+				mode.updateActionStates()
+			else
+				this.Controller.rotateMode()
+	
+		this.deactivate()
+		this.activate()
 	}
 	
 	updateMotionState() {
@@ -893,13 +891,8 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 				
 				if isRunning
 					this.requireSimFeedback()
-				else {
-					if (this.Controller.ActiveMode == this.findMode(kMotionMode))
-						this.Controller.rotateMode()
-						
-					this.deactivate()
-					this.activate()
-				}
+				else
+					this.updatePluginState()
 			}
 			else if (isRunning && kSimFeedbackConnector)
 				this.loadFromSimFeedback()

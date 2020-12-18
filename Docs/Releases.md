@@ -6,6 +6,10 @@
   4. Created a *Templates* folder in the *Resources* folder for all the files, that will populate the *Simulator Controller* folder in the users *Documentation* folder.
   5. Several refactorings to support the new customization features.
 
+## 1.0.8-beta, 12/18/20
+
+  1. Second preview and possibly release candidate for the upcoming feature release 1.1.0...
+
 ## 1.0.5-beta, 12/17/20
 
   1. First preview and test release for the upcoming feature release 1.1.0...

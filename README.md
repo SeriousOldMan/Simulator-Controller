@@ -94,7 +94,9 @@ The following applications are not part of the distribution and are not strictly
 
 ### Documentation
 
-A very [extensive documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki) will guide you through the setup and configuration process and will help you to understand the inner concepts and all the functions & features of Simulator Controller. For developers, who want to create their own plugins a complete [devlopers guide & reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts) is available as well.
+A very [extensive documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki) will guide you through the setup and configuration process and will help you to understand the inner concepts and all the functions & features of Simulator Controller. For developers, who want to create their own plugins, a complete [devlopers guide & reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts) is available as well.
+
+The markdown files, the so to say source code of this Wiki can be found in the [Docs](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Docs) folder.
 
 ### Known issues
 

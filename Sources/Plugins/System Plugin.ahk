@@ -284,13 +284,10 @@ class SystemPlugin extends ControllerPlugin {
 	playStartupSong(songFile) {
 		if (!kSilentMode && !this.iStartupSongIsPlaying) {
 			try {
-				if FileExist(kSplashMediaDirectory . songFile) {
-					SoundPlay % kSplashMediaDirectory . songFile
-			
-					this.iStartupSongIsPlaying := true
-				}
-				else if FileExist(A_MyDocuments . "\Simulator Controller\Splash Media\" . songFile) {
-					SoundPlay % A_MyDocuments . "\Simulator Controller\Splash Media\" . songFile
+				songFile := getFileName(songFile, kUserSplashMediaDirectory, kSplashMediaDirectory)
+				
+				if FileExist(songFile) {
+					SoundPlay %songFile%
 			
 					this.iStartupSongIsPlaying := true
 				}

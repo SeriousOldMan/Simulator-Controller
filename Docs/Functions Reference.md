@@ -17,10 +17,10 @@ Stores the given value for the given key in the configuration map. The value mus
 Removes the given key and its value from the configuration map.
 
 #### *readConfiguration(configFile :: String)*
-Reads a configuration map from an *.ini file. The Strings "true" and "false" will he converted to the literal values *true* and *false* when encountered as values in the configuration file.
+Reads a configuration map from an *.ini file. The Strings "true" and "false" will he converted to the literal values *true* and *false* when encountered as values in the configuration file. If *configFile* denotes an absolute path, this path will be used. Otherwise, the file will be looked up in the *kUserConfigDirectory* and in *kConfigDirectory* (see the [constants documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#installation-paths-constantsahk) for reference), in that order.
 
 #### *writeConfiguration(configFile :: String, configuration :: ConfigurationMap)*
-Stores a configuration map in the given file. All previous content of the file will be overwritten. The literal values *true* and *false* will be converted to "true" and "false", before being written to the configuration file.
+Stores a configuration map in the given file. All previous content of the file will be overwritten. The literal values *true* and *false* will be converted to "true" and "false", before being written to the configuration file. If *configFile* denotes an absolute path, the configuration will be saved in this file. Otherwise it will be saved relative to *kUserConfigDirectory* (see the [constants documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#installation-paths-constantsahk) for reference).
 
 ***
 
@@ -62,7 +62,19 @@ Raises the event in the supplied target process. If *target* is *false*, the eve
 
 ***
 
+## File Handling ([Functions.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Functions.ahk))
+A small collection of functions to deal with files and directories. Note: All the directory names used with these functions must contain a trailing backslash "\", since this is standard in the Simulator Controller code.
+
+#### *getFileName*(fileName :: String, #rest directories :: String)*
+If *fileName* contains an absolute path, itself will be returned. Otherwise, all directories will be checked, if a file with the (partial) path can be found, and this file path will be returned. If not found, a path consisting of the first supplied directory and *fileName* will be returned.
+
+#### *getFileNames*(filePattern :: String, #rest directories :: String)*
+Returns a list of absolute paths for all files in the given directories satisfying *filePattern*.
+
+***
+
 ## Collection Helper Functions ([Functions.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Functions.ahk))
+Often used collection functions, that are not part of the AutoHotkey language.
 
 #### *string2Values(delimiter :: String, string :: String, count :: Integer := false)*
 Splits *string* apart using the supplied delimiter and returns the parts as an array. If *count* is supplied, only that much parts are splitted and all remaining ocurrencies of *delimiter* are ignored.
@@ -70,8 +82,11 @@ Splits *string* apart using the supplied delimiter and returns the parts as an a
 #### *values2String(delimiter :: String, #rest values)*
 Joins the given unlimited number of values using *delimiter* into one string. *values* must have a string representation.
 
-#### *inList(list, value)*
+#### *inList(list :: Array, value)*
 Returns the position of *value* in the given list or array, or *false*, if not found.
+
+#### *concatenate(#rest lists :: Array)*
+Returns a freshly allocated list containing all the elements contained in the supplied lists. The global order is preserved.
 
 #### *bubbleSort(ByRef array :: Array, comparator :: Function Name)*
 Sorts the given array in place, using *comparator* to define the order of the elements. This function will receive two objects and must return *true*, if the first one is considered larger or of the same order than the other. Stable sorting rules apply.
@@ -113,7 +128,7 @@ Convinience function to call a given function with supplied parameters in a prot
 ***
 
 ## Debugging and Logging ([Functions.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Functions.ahk))
-Essential support for tracking down coding errors. Since AutoHotkey is a weakly typed programming language, it is sometimes very difficult to get to the root cause of an error. Especially the tracing and logging capabilities may help here. All log files are located in the *Logs* folder of the Simulator Controller distribution.
+Essential support for tracking down coding errors. Since AutoHotkey is a weakly typed programming language, it is sometimes very difficult to get to the root cause of an error. Especially the tracing and logging capabilities may help here. All log files are located in the *Simulator Controller\Logs* folder found in your user *Documents* folder.
 
 #### *isDebug()*
 Returns *true*, if debugging is currently enabled. The Simulator Controller uses debug mode to handle things differently, for example all plugins and modes will be active, even if they declare to be not.

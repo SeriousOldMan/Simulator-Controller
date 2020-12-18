@@ -97,34 +97,12 @@ checkButtonBoxSimulationDuration() {
 ;;;-------------------------------------------------------------------------;;;
 
 computeStartupSongs() {
-	files := []
+	files := concatenate(getFileNames("*.wav", kUserSplashMediaDirectory, kSplashMediaDirectory), getFileNames("*.mp3", kUserSplashMediaDirectory, kSplashMediaDirectory))
 	
-	Loop Files, % kSplashMediaDirectory . "*.wav"
-	{
-		SplitPath A_LoopFilePath, soundFile
+	for index, fileName in files {
+		SplitPath fileName, soundFile
 		
-		files.Push(soundFile)
-	}
-	
-	Loop Files, % kSplashMediaDirectory . "*.mp3"
-	{
-		SplitPath A_LoopFilePath, soundFile
-		
-		files.Push(soundFile)
-	}
-	
-	Loop Files, % A_MyDocuments . "\Simulator Controller\Splash Media\*.wav"
-	{
-		SplitPath A_LoopFilePath, soundFile
-		
-		files.Push(soundFile)
-	}
-	
-	Loop Files, % A_MyDocuments . "\Simulator Controller\Splash Media\*.mp3"
-	{
-		SplitPath A_LoopFilePath, soundFile
-		
-		files.Push(soundFile)
+		files[index] := soundFile
 	}
 	
 	return files
@@ -350,10 +328,13 @@ restart:
 		
 		video := getConfigurationValue(configurationOrCommand, "Startup", "Video", false)
 		
-		videos := []
-		
-		Loop Files, % kSplashMediaDirectory . "*.gif"
-			videos.Push(A_LoopFileName)
+		videos := getFileNames("*.gif", kUserSplashMediaDirectory, kSplashMediaDirectory)
+	
+		for index, videoFilePath in videos {
+			SplitPath videoFilePath, videoFileName
+			
+			videos[index] := videoFileName
+		}	
 		
 		chosen := (video ? (inList(videos, video) + 1) : 1)
 		

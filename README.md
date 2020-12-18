@@ -34,13 +34,13 @@ Below you will find download links for the current development build and the two
   - Connect all your external controller, like Button Boxes, to one single center of control
     - An unlimited number of layers of functions and actions, called modes, can be defined for your controller. Switch between modes simply by pushing a button or switch a toggle on your controller. Here is an example of several layers of functions and actions combined in five modes:
 	
-	![](./Documentation/Images/Button%20Box%20Layout.jpg)
+	![](./Docs/Images/Button%20Box%20Layout.jpg)
 	
 	- Modes are defined and handled by [plugins](https://github.com/SeriousOldMan/Simulator-Controller#included-plugins), which can be implemented using an objecct oriented scripting language.
   - Configurable, visual feedback for your controller actions
     - Define your own Button Box visual and integrate it with the Simulator Controller using the simple plugin support. Depending on configuration, this window will popup whenever an action is triggered from your controller, even during active simulation
     
-    ![](./Documentation/Images/Button%20Box%202.JPG)
+    ![](./Docs/Images/Button%20Box%202.JPG)
     
     - Code your own functions to be called by the controller buttons and switches using the simple, object-oriented scripting language
   - Configure all additional [applications](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications) to your taste, including the simulation games used for your virtual races
@@ -62,7 +62,7 @@ Simulator Controller is fully implemented in AutoHotkey, a very sophisticated an
   - Sophisticated logging, tracing and debug support to track down any errors while developing your own plugins
   - Fully graphical setup and configuration utilities
   
-  ![](./Documentation/Images/Configuration%20Tool.JPG) ![](./Documentation/Images/Setup%20Tool.JPG)
+  ![](./Docs/Images/Configuration%20Tool.JPG) ![](./Docs/Images/Setup%20Tool.JPG)
 
 ### Included plugins
 

@@ -35,6 +35,8 @@ ListLines Off					; Disable execution history
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+global kPluginLabelsFile = "Controller Plugin Labels.ini"
+
 global kLogoBright = kResourcesDirectory . "Logo Bright.gif"
 global kLogoDark = kResourcesDirectory . "Logo Dark.gif"
 
@@ -473,7 +475,7 @@ class SimulatorController extends ConfigurationItem {
 		
 						songFile := getConfigurationValue(this.ControllerConfiguration, "Startup", "Song", false)
 				
-						if (songFile && FileExist(kSplashMediaDirectory . songFile))
+						if (songFile && FileExist(getFileName(songFile, kUserSplashMediaDirectory, kSplashMediaDirectory)))
 							raiseEvent(false, "Startup", "playStartupSong:" . songFile)
 						
 						posX := Round((A_ScreenWidth - 300) / 2)
@@ -855,6 +857,7 @@ class ControllerCustomFunction extends ControllerFunction {
 }
 
 class ControllerPlugin extends Plugin {
+	static sLabelsDatabase := false
 	iController := false
 	iModes := []
 	iActions := []
@@ -948,6 +951,18 @@ class ControllerPlugin extends Plugin {
 	}
 	
 	simulatorShutdown() {
+	}
+		
+	getLabel(descriptor, default := false) {
+		if !this.sLabelsDatabase
+			this.sLabelsDatabase := readConfiguration(kPluginLabelsFile)
+		
+		label := getConfigurationValue(this.sLabelsDatabase, this.Plugin, descriptor, false)
+		
+		if (!label || (label == ""))
+			label := default
+			
+		return label
 	}
 }
 
@@ -1315,5 +1330,5 @@ initializeSimulatorController()
 ;;;                          Plugin Include Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include Plugins\Plugins.ahk
+#Include ..\Plugins\Plugins.ahk
 #Include %A_MyDocuments%\Simulator Controller\Plugins\Plugins.ahk

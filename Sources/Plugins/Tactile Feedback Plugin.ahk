@@ -10,7 +10,6 @@
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-
 global kVibrationIntensityIncrement = 5
 
 global kSimHub
@@ -197,10 +196,8 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		
 		this.createPluginDialAction(pedalMode, "Pedal Vibration", "Pedal", pedalVibrationArguments[3])
 		
-		labelsDatabase := readConfiguration(kConfigDirectory . "Controller Plugin Labels.ini")
-		
 		for ignore, effect in string2Values(",", this.getArgumentValue("pedalEffects", ""))
-			this.createModeAction(labelsDatabase, controller, pedalMode, string2Values(A_Space, effect)*)
+			this.createModeAction(controller, pedalMode, string2Values(A_Space, effect)*)
 		
 		chassisMode := new this.ChassisVibrationMode(this)
 		
@@ -210,7 +207,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		this.createPluginDialAction(chassisMode, "Rear Vibration", "RearChassis", rearChassisVibrationArguments[3])
 	
 		for ignore, effect in string2Values(",", this.getArgumentValue("chassisEffects", ""))
-			this.createModeAction(labelsDatabase, controller, chassisMode, string2Values(A_Space, effect)*)
+			this.createModeAction(controller, chassisMode, string2Values(A_Space, effect)*)
 		
 		controller.registerPlugin(this)
 		
@@ -239,25 +236,25 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 			logMessage(kLogWarn, "Controller function " . descriptor . " not found in plugin " . this.Plugin . " - please check the setup")
 	}
 	
-	createModeAction(labelsDatabase, controller, mode, effect, increaseFunction, decreaseFunction := false) {
+	createModeAction(controller, mode, effect, increaseFunction, decreaseFunction := false) {
 		local function := this.Controller.findFunction(increaseFunction)
 		
 		if !decreaseFunction {
 			if (function != false)
-				mode.registerAction(new this.FXChangeAction(function, getConfigurationValue(labelsDatabase, "Tactile Feedback", effect . ".Push"), effect, kIncrease, kDecrease))
+				mode.registerAction(new this.FXChangeAction(function, this.getLabel(ConfigurationItem.descriptor(effect, "Push"), effect), effect, kIncrease, kDecrease))
 			else
 				logMessage(kLogWarn, "Controller function " . increaseFunction . " not found in plugin " . this.Plugin . " - please check the setup")
 		}
 		else {
 			if (function != false)
-				mode.registerAction(new this.FXChangeAction(function, getConfigurationValue(labelsDatabase, "Tactile Feedback", effect . ".Increase"), effect, kIncrease))
+				mode.registerAction(new this.FXChangeAction(function, this.getLabel(ConfigurationItem.descriptor(effect, "Increase"), effect), effect, kIncrease))
 			else
 				logMessage(kLogWarn, "Controller function " . increaseFunction . " not found in plugin " . this.Plugin . " - please check the setup")
 				
 			function := this.Controller.findFunction(decreaseFunction)
 			
 			if (function != false)
-				mode.registerAction(new this.FXChangeAction(function, getConfigurationValue(labelsDatabase, "Tactile Feedback", effect . ".Decrease"), effect, kDecrease))
+				mode.registerAction(new this.FXChangeAction(function, this.getLabel(ConfigurationItem.descriptor(effect, "Decrease"), effect), effect, kDecrease))
 			else
 				logMessage(kLogWarn, "Controller function " . decreaseFunction . " not found in plugin " . this.Plugin . " - please check the setup")
 		}

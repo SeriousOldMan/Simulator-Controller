@@ -34,8 +34,8 @@ ListLines Off					; Disable execution history
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kToolsConfigurationFile = kConfigDirectory . "Simulator Tools.ini"
-global kToolsTargetsFile = kConfigDirectory . "Simulator Tools.targets"
+global kToolsConfigurationFile = "Simulator Tools.ini"
+global kToolsTargetsFile = "Simulator Tools.targets"
 
 global kCompiler = kAHKDirectory . "Compiler\ahk2exe.exe"
 
@@ -299,9 +299,13 @@ runCleanTargets(ByRef buildProgress) {
 				SetWorkingDir %fileOrFolder%
 			
 				Loop Files, *.*
+				{
 					FileDelete %A_LoopFilePath%
 			
-				Progress %buildProgress%, % "Deleting " . A_LoopFileName . "..."
+					Progress %buildProgress%, % "Deleting " . A_LoopFileName . "..."
+					
+					Sleep 50
+				}
 			
 				SetWorkingDir %currentDirectory%
 			}
@@ -465,7 +469,7 @@ prepareTargets(ByRef buildProgress) {
 }
 
 runTargets() {
-	if (!FileExist(kToolsConfigurationFile) || GetKeyState("Ctrl")) {
+	if (!FileExist(getFileName(kToolsConfigurationFile, kUserConfigDirectory, kConfigDirectory)) || GetKeyState("Ctrl")) {
 		readToolsConfiguration(vCleanupSettings, vBuildSettings)
 	
 		if (!editTargets() && !isDebug())

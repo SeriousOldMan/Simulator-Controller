@@ -98,7 +98,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			
 			if (this.Controller.ActiveMode == this)
 				for index, effect in this.Plugin.kEffects
-					this.findAction(this.Plugin.EffectToggleAction.getLabel(effect)).updateLabel(!this.iEffectsAreHighlighted)
+					this.findAction(this.Plugin.getLabel(ConfigurationItem.descriptor(effect, "Push"), effect)).updateLabel(!this.iEffectsAreHighlighted)
 			
 			this.iEffectsAreHighlighted := !this.iEffectsAreHighlighted
 		}
@@ -150,7 +150,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		
 		updateActionStates() {
 			for index, effect in this.Plugin.kEffects
-				this.findAction(this.Plugin.EffectToggleAction.getLabel(effect)).updateLabel(false)
+				this.findAction(this.Plugin.getLabel(ConfigurationItem.descriptor(effect, "Push"), effect)).updateLabel(false)
 		}
 	}
 
@@ -235,7 +235,6 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	}
 
 	class EffectToggleAction extends MotionFeedbackPlugin.MotionModeAction {
-		static sLabelsDatabase := false
 		iEffect := false
 		
 		Effect[] {
@@ -253,7 +252,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		__New(function, motionMode, effect) {
 			this.iEffect := effect
 			
-			base.__New(function, motionMode, this.getLabel(effect))
+			base.__New(function, motionMode, motionMode.Plugin.getLabel(ConfigurationItem.descriptor(effect, "Push"), effect))
 		}
 		
 		fireAction(function, trigger) {
@@ -281,18 +280,6 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 				this.Function.setText(this.Label, "Green")
 			else
 				this.Function.setText(this.Label, "Gray")
-		}
-		
-		getLabel(effect) {
-			if !this.sLabelsDatabase
-				this.sLabelsDatabase := readConfiguration(kConfigDirectory . "Controller Plugin Labels.ini")
-			
-			label := getConfigurationValue(this.sLabelsDatabase, "Motion Feedback", effect, false)
-			
-			if (!label || (label == ""))
-				label := effect
-				
-			return label
 		}
 	}
 			

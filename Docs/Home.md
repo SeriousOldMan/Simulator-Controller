@@ -1,4 +1,4 @@
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Documentation/Images/Splash%20Screen.JPG)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Splash%20Screen.JPG)
 
 Thanks for your interest in Simulator Controller, a set of tools for a better user experience in modular simulation rigs. At the core of Simulator Controller is an extendable controller framwork, which can use any hardware controller (typically a Button Box in simulation rigs) to control almost all applications and simulation games used in your specific setup and that simultaneously. Before diving into this very extensive documentation, I recommend a first reading of the [README](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/README.md) document in the GitHub repository for a general introduction.
 

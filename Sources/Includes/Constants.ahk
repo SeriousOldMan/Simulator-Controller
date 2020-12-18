@@ -12,19 +12,29 @@
 global kAHKDirectory = "C:\Program Files\AutoHotkey\"
 
 global kHomeDirectory = A_ScriptDir . (A_IsCompiled ? "\..\" : "\..\..\")
+global kUserHomeDirectory = A_MyDocuments . "\Simulator Controller\"
+
 global kResourcesDirectory = A_ScriptDir . (A_IsCompiled ? "\..\Resources\" : "\..\..\Resources\")
 global kSourcesDirectory = A_ScriptDir . (A_IsCompiled ? "\..\Sources\" : "\..\..\Sources\")
 global kIncludesDirectory = A_ScriptDir . (A_IsCompiled ? "\..\Sources\Includes\" : "\..\..\Sources\Includes\")
 global kBinariesDirectory = A_ScriptDir . (A_IsCompiled ? "\..\Binaries\" : "\..\..\Binaries\")
+
+global kLogsDirectory = A_MyDocuments . "\Simulator Controller\Logs\"
+
+global kPluginsDirectory = A_ScriptDir . (A_IsCompiled ? "\..\Sources\Plugins\" : "\..\..\Sources\Plugins\")
+global kUserPluginsDirectory = kUserHomeDirectory . "Plugins\"
+
 global kConfigDirectory = A_ScriptDir . (A_IsCompiled ? "\..\Config\" : "\..\..\Config\")
-global kLogsDirectory = A_ScriptDir . (A_IsCompiled ? "\..\Logs\" : "\..\..\Logs\")
+global kUserConfigDirectory = kUserHomeDirectory . "Config\"
 
 global kSplashMediaDirectory = kResourcesDirectory . "Splash Media\"
+global kUserSplashMediaDirectory = kUserHomeDirectory . "Splash Media\"
+
 global kButtonBoxImagesDirectory = kResourcesDirectory . "Button Box Images\"
 global kIconsDirectory = kResourcesDirectory . "Icons\"
 
-global kSimulatorConfigurationFile = kConfigDirectory . "Simulator Configuration.ini"
-global kControllerConfigurationFile = kConfigDirectory . "Simulator Controller.ini"
+global kSimulatorConfigurationFile = "Simulator Configuration.ini"
+global kControllerConfigurationFile = "Simulator Controller.ini"
 
 global kUndefined = "__Undefined__"
 

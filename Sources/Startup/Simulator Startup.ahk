@@ -236,7 +236,7 @@ class SimulatorStartup extends ConfigurationItem {
 		if !kSilentMode {
 			songFile := getConfigurationValue(this.ControllerConfiguration, "Startup", "Song", false)
 			
-			if (songFile && FileExist(kSplashMediaDirectory . songFile)) {
+			if (songFile && FileExist(getFileName(songFile, kUserSplashMediaDirectory, kSplashMediaDirectory))) {
 				raiseEvent("ahk_pid " . this.iSimulatorControllerPID, "Startup", "playStartupSong:" . songFile)
 				
 				songIsPlaying := true
@@ -292,7 +292,7 @@ startSimulator() {
 	configuration := readConfiguration(kControllerConfigurationFile)
 	
 	video := getConfigurationValue(configuration, "Startup", "Video", false)
-	kSplashVideo := (video && FileExist(kSplashMediaDirectory . video)) ? video : false
+	kSplashVideo := (video && FileExist(getFileName(video, kUserSplashMediaDirectory, kSplashMediaDirectory))) ? video : false
 	
 	icon := kIconsDirectory . "Start.ico"
 		

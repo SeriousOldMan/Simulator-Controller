@@ -178,12 +178,6 @@ initializeTrayMessageQueue() {
 }
 
 loadSimulatorConfiguration() {
-	kVersion := getConfigurationValue(readConfiguration(kHomeDirectory . "VERSION"), "Version", "Current", "0.0.0")
-	
-	logMessage(kLogCritical, "---------------------------------------------------------------")
-	logMessage(kLogCritical, "           Running " . StrSplit(A_ScriptName, ".")[1] . " (" . kVersion . ")")
-	logMessage(kLogCritical, "---------------------------------------------------------------")
-		
 	kSimulatorConfiguration := readConfiguration(kSimulatorConfigurationFile)
 	
 	if (kSimulatorConfiguration.Count() == 0)
@@ -222,19 +216,33 @@ loadSimulatorConfiguration() {
 	kSilentMode := getConfigurationValue(kSimulatorConfiguration, "Configuration", "Silent Mode", false)
 }
 
+initializeEnvironment() {	
+	FileCreateDir %A_MyDocuments%\Simulator Controller
+	FileCreateDir %A_MyDocuments%\Simulator Controller\Config
+	FileCreateDir %A_MyDocuments%\Simulator Controller\Logs
+	FileCreateDir %A_MyDocuments%\Simulator Controller\Splash Media
+	FileCreateDir %A_MyDocuments%\Simulator Controller\Plugins
+	
+	if !FileExist(A_MyDocuments . "\Simulator Controller\Plugins\Plugins.ahk")
+		FileCopy %kResourcesDirectory%Templates\Plugins.ahk, %A_MyDocuments%\Simulator Controller\Plugins
+	
+	if !FileExist(kUserConfigDirectory . "Controller Plugin Labels.ini")
+		FileCopy %kResourcesDirectory%Templates\Controller Plugin Labels.ini, %kUserConfigDirectory%
+	
+	kVersion := getConfigurationValue(readConfiguration(kHomeDirectory . "VERSION"), "Version", "Current", "0.0.0")
+	
+	logMessage(kLogCritical, "---------------------------------------------------------------")
+	logMessage(kLogCritical, "           Running " . StrSplit(A_ScriptName, ".")[1] . " (" . kVersion . ")")
+	logMessage(kLogCritical, "---------------------------------------------------------------")
+}
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 showSplash(image, alwaysOnTop := true) {
-	SplitPath image, , , , , driveName
-
-	if (!driveName || (driveName == ""))
-		if FileExist(kSplashMediaDirectory . image)
-			image := kSplashMediaDirectory . image
-		else if FileExist(A_MyDocuments . "\Simulator Controller\Splash Media\" . image)
-			image := A_MyDocuments . "\Simulator Controller\Splash Media\" . image
+	image := getFileName(image, kUserSplashMediaDirectory, kSplashMediaDirectory)
 	
 	lastSplash := vSplashCounter
 	vSplashCounter += 1
@@ -269,13 +277,7 @@ rotateSplash(alwaysOnTop := true) {
 	static numPictures := 0
 	
 	if !pictures {
-		pictures := []
-		
-		Loop Files, % kSplashMediaDirectory . "*.jpg"
-			pictures.Push(A_LoopFileLongPath)
-		
-		Loop Files, % A_MyDocuments . "\Simulator Controller\Splash Media\*.jpg"
-			pictures.Push(A_LoopFileLongPath)
+		pictures := getFileNames("*.jpg", kUserSplashMediaDirectory, kSplashMediaDirectory)
 		
 		numPictures := pictures.Length()
 	}
@@ -287,17 +289,9 @@ rotateSplash(alwaysOnTop := true) {
 		showSplash(pictures[number++], alwaysOnTop)
 }
 
-showSplashAnimation(gif) {
-	video := gif
+showSplashAnimation(video) {
+	video := getFileName(video, kUserSplashMediaDirectory, kSplashMediaDirectory)
 	
-	SplitPath gif, , , , , driveName
-
-	if (!driveName || (driveName == ""))
-		if FileExist(kSplashMediaDirectory . gif)
-			video := kSplashMediaDirectory . gif
-		else if FileExist(A_MyDocuments . "\Simulator Controller\Splash Media\" . gif)
-			video := A_MyDocuments . "\Simulator Controller\Splash Media\" . gif
-
 	Gui VP:-Border -Caption ; borderless
 	Gui VP:Add, ActiveX, x0 y0 w780 h415 vvVideoPlayer, shell explorer
 
@@ -371,6 +365,33 @@ withProtection(function, params*) {
 	}
 }
 
+getFileName(fileName, directories*) {
+	SplitPath fileName, , , , , driveName
+
+	if (driveName && (driveName != ""))
+		return fileName
+	else {
+		for ignore, directory in directories
+			if FileExist(directory . fileName)
+				return (directory . fileName)
+		
+		if (directories.Length() > 0)
+			return (directories[1] . fileName)
+		else
+			return fileName
+	}
+}
+
+getFileNames(filePattern, directories*) {
+	files := []
+	
+	for ignore, directory in directories
+		Loop Files, % directory . filePattern
+			files.Push(A_LoopFileLongPath)
+	
+	return files
+}
+
 string2Values(delimiter, string, count := false) {
 	return (count ? StrSplit(string, delimiter, " `t", count) : StrSplit(string, delimiter, " `t"))
 }
@@ -394,6 +415,16 @@ inList(list, value) {
 			return index
 			
 	return false
+}
+
+concatenate(arrays*) {
+	result := []
+	
+	for ignore, array in arrays
+		for index, value in array
+			result.Push(value)
+			
+	return result
 }
 
 bubbleSort(ByRef array, comparator) {
@@ -521,6 +552,8 @@ translateMsgBoxButtons() {
 }
 
 readConfiguration(configFile) {
+	configFile := getFileName(configFile, kUserConfigDirectory, kConfigDirectory)
+	
 	configuration := Object()
 	
 	IniRead sections, %configFile%
@@ -548,6 +581,8 @@ readConfiguration(configFile) {
 }
 
 writeConfiguration(configFile, configuration) {
+	configFile := getFileName(configFile, kUserConfigDirectory)
+	
 	SplitPath configFile, , directory
 	FileCreateDir %directory%
 		
@@ -638,6 +673,7 @@ decreaseLogLevel() {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+initializeEnvironment()
 loadSimulatorConfiguration()
 initializeLoggingSystem()
 initializeEventSystem()

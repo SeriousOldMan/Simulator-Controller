@@ -70,7 +70,7 @@ Returns the directory, where the application will be executed.
 Returns the pattern used to identify an active window for the given application. Fully supports the AutoHotkey *winTitle* syntax. See the AutoHotkey [documentation](https://www.autohotkey.com/docs/misc/WinTitle.htm) for reference.
 	
 #### *SpecialStartup[]*
-Returns the name of a script function to be invoked as a special startup method, or *false*, if no special startup method is applicable. Special startup methods may be defined to perform some additional tasks, after an application has been started, or to provide a custom splash screen, for example. See the [ACC Plugin](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Plugins/ACC%20Plugin.ahk) for an example of a custom splash screen.
+Returns the name of a script function to be invoked as a special startup method, or *false*, if no special startup method is applicable. Special startup methods may be defined to perform some additional tasks, after an application has been started, or to provide a custom splash screen, for example. See the [ACC Plugin](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/ACC%20Plugin.ahk) for an example of a custom splash screen.
 
 #### *SpecialShutdown[]*
 Returns the name of a script function to be invoked as a special shutdown method, or *false*, if no special shutdown method is applicable. Ses the ACC Plugin mentioned above for an example as well.
@@ -207,7 +207,7 @@ This class property returns the single instance of *SimulatorController*.
 Returns the controller configuration map, not to be confused with the complete simulator configration map. This small configuration defines settings for controller notifications such as tray tips and buttonbox visuals and is maintained by the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--configuration).
 	
 #### *ButtonBox[]*
-Returns an instance of the singleton class [ButtonBox](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-singleton-buttonbox-extends-configurationitem-simulator-controllerahk). This instance must be created by a specialized plugin and registered in the controller by calling [registerButtonBox](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#registerbuttonboxbuttonbox--buttonbox). See [this simple example](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Plugins/ButtonBox%20Plugin.ahk) for reference.
+Returns an instance of the singleton class [ButtonBox](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-singleton-buttonbox-extends-configurationitem-simulator-controllerahk). This instance must be created by a specialized plugin and registered in the controller by calling [registerButtonBox](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#registerbuttonboxbuttonbox--buttonbox). See [this simple example](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/ButtonBox%20Plugin.ahk) for reference.
 	
 #### *Functions[]*
 Returns a list of all functions defined in the underlying configuration.
@@ -486,7 +486,7 @@ This method must be implemented by every subclass of *ControllerAction* and act 
 ***
 
 ## [Abstract Singleton] ButtonBox extends [ConfigurationItem](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-classesahk) ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
-The single instance of this class will implement a visual representation of your hardware controller. Althoug the Simulator Controller will provide complete functionality even without a visual representation, it is much more fun to see what happens. A subclass of *ButtonBox* must use the [Gui capabilities](https://www.autohotkey.com/docs/commands/Gui.htm) of the AutoHotkey language to implement the graphical representation. See [this simple example](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Plugins/ButtonBox%20Plugin.ahk) for reference.
+The single instance of this class will implement a visual representation of your hardware controller. Althoug the Simulator Controller will provide complete functionality even without a visual representation, it is much more fun to see what happens. A subclass of *ButtonBox* must use the [Gui capabilities](https://www.autohotkey.com/docs/commands/Gui.htm) of the AutoHotkey language to implement the graphical representation. See [this simple example](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/ButtonBox%20Plugin.ahk) for reference.
 
 ### Public Properties
 

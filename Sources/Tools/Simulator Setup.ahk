@@ -786,7 +786,7 @@ comparePlugins(p1, p2) {
 }
 
 openLabelsEditor() {
-	Run % "notepad.exe " . """" . kConfigDirectory . "Controller Plugin Labels.ini"""
+	Run % "notepad.exe " . """" . kUserConfigDirectory . "Controller Plugin Labels.ini"""
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -1718,12 +1718,6 @@ saveConfiguration(configurationFile, editor) {
 	}
 	else
 		FileDelete %startupLink%
-		
-	FileCreateDir %A_MyDocuments%\Simulator Controller
-	FileCreateDir %A_MyDocuments%\Simulator Controller\Splash Media
-	FileCreateDir %A_MyDocuments%\Simulator Controller\Plugins
-	
-	FileCopy %kSourcesDirectory%Tools\Setup Templates\Plugins.ahk, %A_MyDocuments%\Simulator Controller\Plugins
 }
 
 editSetup() {

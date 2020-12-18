@@ -2,11 +2,13 @@
 
   1. Documentation updates
   2. Renamed *Documentaion* folder to *Docs* folder.
-  2. Introduction of the *Simulator Controller* folder located in the *Documents* folder of the current user. This folder might contain local media files und plugin extensions, as well as log files and configuration files. See the [Installation & Setup](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#using-your-own-pictures-videos-and-sounds-for-all-the-splash-screens) guide for more information.
+  3. Introduction of the *Simulator Controller* folder located in the *Documents* folder of the current user. This folder might contain local media files und plugin extensions, as well as log files and configuration files. See the [Installation & Setup](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#using-your-own-pictures-videos-and-sounds-for-all-the-splash-screens) guide for more information.
+  4. Created a *Templates* folder in the *Resources* folder for all the files, that will populate the *Simulator Controller* folder in the users *Documentation* folder.
+  5. Several refactorings to support the new customization features.
 
 ## 1.0.5-beta, 12/17/20
 
-  1. Preview and test release for the upcoming feature release 1.1.0...
+  1. First preview and test release for the upcoming feature release 1.1.0...
 
 ## 1.0.2-fix, 12/17/20
 

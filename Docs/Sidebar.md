@@ -1,7 +1,7 @@
 [Overview](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Overview)
 ------
 
-[Release Infos](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Infos)
+[Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes)
 ------
 
 [Installation & Setup](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup)

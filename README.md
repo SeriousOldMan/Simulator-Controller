@@ -17,7 +17,7 @@ For further convinience, you can place links to **Simulator Startup** and **Simu
 
 See the complete documentation about [Installation & Setup](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#installation) for more information.
 
-Below you will find download links for the current development build and the two latest stable releases. For release information, even for a preview on upcoming features in the next stable build, please take a look at the [release information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Infos).
+Below you will find download links for the current development build and the two latest stable releases. For release information, even for a preview on upcoming features in the next stable build, please take a look at the [release notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes).
 
 #### Latest development build
 
@@ -103,7 +103,7 @@ A very [extensive documentation](https://github.com/SeriousOldMan/Simulator-Cont
 
 ### Development
 
-For new features coming in the next release, take a look at the [Release Infos](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Infos).
+For new features coming in the next release, take a look at the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes).
 
 Want to contribute? Great!
 
@@ -113,8 +113,7 @@ Want to contribute? Great!
 
 ### To Do
 
-  1. Fix some bugs
-  2. Create a folder in the User *Documents* folder for own media files and plugins
+  1. Final testing and release work for version 1.1.0
 
 ### License
 

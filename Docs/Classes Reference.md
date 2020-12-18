@@ -420,6 +420,9 @@ This is an event handler method called by the controller to notify the plugin, t
 #### *simulatorShutdown()*
 This is an event handler method called by the controller to notify the plugin, that a simulation just has been stopped.
 
+#### *getLabel(descriptor :: String, default :: String := false)*
+This method can be used to support localization or using different labels depending on the bound function in the visual representation of the controller hardware. The label texts are defined in a special configuration file named *Controller Plugin Labels.ini* located in the *Simulator Controller\Config* folder in the users *Documents* folder. The content of this file is accessible using the [setup tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#setup).
+
 ***
 
 ## ControllerMode ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))

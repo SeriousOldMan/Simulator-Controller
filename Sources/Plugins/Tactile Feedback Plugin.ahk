@@ -241,7 +241,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		
 		if !decreaseFunction {
 			if (function != false)
-				mode.registerAction(new this.FXChangeAction(function, this.getLabel(ConfigurationItem.descriptor(effect, "Push"), effect), effect, kIncrease, kDecrease))
+				mode.registerAction(new this.FXChangeAction(function, this.getLabel(ConfigurationItem.descriptor(effect, "Toggle"), effect), effect, kIncrease, kDecrease))
 			else
 				logMessage(kLogWarn, "Controller function " . increaseFunction . " not found in plugin " . this.Plugin . " - please check the setup")
 		}

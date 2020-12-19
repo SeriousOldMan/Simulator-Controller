@@ -1,3 +1,9 @@
+## 1.2.0-stable, upcoming...
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Theme Editor: A collection of media files (pictures, animation, sounds) can be grouped together using the setup tool. In the startup configuration, you can anable the group for splash screen and startup animation as whole. With this functionality, you can have a GT3 look and feel, a Rallye look and feel, an F1 look and feel, and so on.
+
 ## 1.1.0-stable, 12/19/20
 
   1. Documentation updates

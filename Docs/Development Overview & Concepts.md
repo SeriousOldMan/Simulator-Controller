@@ -171,9 +171,9 @@ The build rules are defined in the file *Simulator Tools.targets* in the *Config
 
 Note: You cannot normally format the rules like in this example, since due to technical restrictions, the complete rule must be kept on one line without CRs or LFs.
 
-This rule defines the *Simulator Controller.exe* application in the *Binaries* folder as the target. The main source file will be *Sources\Controller\Simulator Controller.ahk* and there are additional files in the *Includes* and in the *Plugins* folder, that will be checked for modification. Variables enclosed in "%" will be replaced with theirs current runtime values.
+This rule defines the *Simulator Controller.exe* application in the *Binaries* folder as the target. The main source file will be *Sources\Controller\Simulator Controller.ahk* and there are additional files in the *Includes* and in the *Plugins* folders, that will be checked for modification. Variables enclosed in "%" will be replaced with theirs current runtime values.
 
-Normally you will never need to change the build rules when developing your own plugins, as long as they will reside in the standard *Plugins* folders. But, if you decide to put them elsewhere, you might want to add an dependency to this place.
+Normally you will never need to change the build rules when developing your own plugins, as long as they will reside in the standard *Plugins* folders. But, if you decide to put them elsewhere, you might want to add an dependency to this place. To do this, copy *Simulator Tools.targets* to the *Simulator Ontroller\Config* folder, which is located in the *Documents* folder in your user home folder.
 
 You can decide which targets you want to include in your build run by holding down the Control key when starting the build tool. A small window will open where you can activate or deactivate all the targets. This settings will be saved for all consecutive runs of the build tool.
 

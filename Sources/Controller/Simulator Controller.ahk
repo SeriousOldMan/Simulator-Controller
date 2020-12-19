@@ -716,14 +716,14 @@ class ControllerFunction {
 	
 	disable(trigger := "__All Trigger__") {
 		if (trigger == kAllTrigger)
-			for ignore, trigger in this.Function.Trigger
+			for ignore, trigger in this.Trigger
 				setHotkeyEnabled(this, trigger, false)
 		else
 			setHotkeyEnabled(this, trigger, false)
 	}
 	
 	connectAction(action) {
-		for ignore, trigger in this.Function.Trigger {
+		for ignore, trigger in this.Trigger {
 			handler := this.Actions[trigger]
 			theHotkey := ""
 			

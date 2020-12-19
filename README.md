@@ -115,7 +115,9 @@ Want to contribute? Great!
 
 ### To Do
 
-  1. Final testing and release work for version 1.1.0
+  Nothing critical for the moment, just relaxing and preparing for the 12h of Bathurst.
+  
+  But there are a lot of ideas in the backlog for Simulator Controller. Stay tuned...
 
 ### License
 

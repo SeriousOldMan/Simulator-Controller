@@ -1,5 +1,5 @@
 [Version]
-Current=1.0.8-beta
+Current=1.1.1-dev
 Target=1.1.0-stable
-Features=Support for user customization paths, Moved Documentation Folder, Moved Tempplate Files
-Date=12/18/2020
+Changes=Support for user customization paths, Moved Documentation Folder, Moved Tempplate Files, Fix for deactivated plugins
+Date=12/19/2020

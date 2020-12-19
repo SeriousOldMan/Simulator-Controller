@@ -432,12 +432,12 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		
 		controller.registerPlugin(this)
 		
-		if ((motionArguments[1] = "On") && !this.MotionActive && !this.Application.isRunning())
-			this.startMotion(true)
-		else if ((motionArguments[1] = "Off") && this.Application.isRunning())
-			this.stopMotion(true)
-		
-		SetTimer updateMotionState, 50
+		if (this.isActive()) {
+			if ((motionArguments[1] = "On") && !this.MotionActive && !this.Application.isRunning())
+				this.startMotion(true)
+			else if ((motionArguments[1] = "Off") && this.Application.isRunning())
+				this.stopMotion(true)
+		}
 	}
 	
 	loadEffectStateFromSimFeedback(effect) {
@@ -525,6 +525,14 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		action := this.findAction("Motion")
 		
 		action.Function.setText(action.Label, isRunning ? (action.Active ? "Green" : "Black") : "Olive")
+			
+		SetTimer updateMotionState, 50
+	}
+	
+	deactivate() {
+		SetTimer updateMotionState, Off
+		
+		base.deactivate()
 	}
 	
 	callSimFeedback(arguments*) {

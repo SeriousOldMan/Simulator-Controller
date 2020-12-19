@@ -210,8 +210,6 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 			this.createModeAction(controller, chassisMode, string2Values(A_Space, effect)*)
 		
 		controller.registerPlugin(this)
-		
-		SetTimer updateVibrationState, 50
 	}
 
 	createPluginToggleAction(label, command, descriptor, initialState) {
@@ -267,6 +265,14 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		
 		for ignore, action in this.Actions
 			action.Function.setText(action.Label, isRunning ? (action.Active ? "Green" : "Black") : "Olive")
+		
+		SetTimer updateVibrationState, 50
+	}
+	
+	deactivate() {
+		SetTimer updateVibrationState, Off
+		
+		base.deactivate()
 	}
 	
 	requireSimHub() {

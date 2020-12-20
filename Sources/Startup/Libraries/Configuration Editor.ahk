@@ -131,10 +131,7 @@ editConfiguration(ByRef configurationOrCommand, withCancel := false) {
 	static startup
 	static startOption
 	
-	static visualsOption
-	
-	static playSong
-	static songOption
+	static splashTheme
 	
 	static coreSettings
 	static feedbackSettings
@@ -183,9 +180,7 @@ restart:
 		setConfigurationValue(newConfiguration, "Controller", "Button Box Simulation Duration", (buttonBoxSimulation ? buttonBoxSimulationDuration : false))
 		setConfigurationValue(newConfiguration, "Controller", "Button Box Position", buttonBoxPosition)
 		
-		setConfigurationValue(newConfiguration, "Startup", "Video", (visualsOption == "Pictures Carousel") ? false : visualsOption)
-		setConfigurationValue(newConfiguration, "Startup", "Song", (playSong ? songOption : false))
-		
+		setConfigurationValue(newConfiguration, "Startup", "Splash Theme", (splashTheme == "None") ? false : splashTheme)
 		setConfigurationValue(newConfiguration, "Startup", "Simulator", (startup ? startOption : false))
 		
 		Gui CE:Destroy
@@ -235,6 +230,8 @@ restart:
 		
 		if (feedbackSettings.Length() > 8)
 			Throw "Too many Feedback Components detected in editConfiguration..."
+			
+		splashTheme := 
 		
 		coreHeight := 20 + (coreSettings.Length() * 20)
 		
@@ -282,7 +279,7 @@ restart:
 		trayTipSimulationDuration := getConfigurationValue(configurationOrCommand, "Controller", "Tray Tip Simulation Duration", 1500)
 		buttonBoxDuration := getConfigurationValue(configurationOrCommand, "Controller", "Button Box Duration", 10000)
 		buttonBoxSimulationDuration := getConfigurationValue(configurationOrCommand, "Controller", "Button Box Simulation Duration", false)
-		buttonBoxPosition := getConfigurationValue(configurationOrCommand, "Controller", "Button Box Position", "Bottom Left")
+		buttonBoxPosition := getConfigurationValue(configurationOrCommand, "Controller", "Button Box Position", "Bottom Right")
 		
 		trayTip := (trayTipDuration != 0) ? true : false
 		trayTipSimulation := (trayTipSimulationDuration != 0) ? true : false
@@ -326,45 +323,19 @@ restart:
 			
 		Gui CE:Add, DropDownList, X120 YP-5 w100 Choose%chosen% vbuttonBoxPosition, % values2String("|", choices*)
 		
-		video := getConfigurationValue(configurationOrCommand, "Startup", "Video", false)
+		splashTheme := getConfigurationValue(configurationOrCommand, "Startup", "Splash Theme", false)	
+	 
+		themes := getAllThemes()
+		chosen := (splashTheme ? inList(themes, splashTheme) + 1 : 1)
+		themes := "None|" + values2String("|", themes*)
 		
-		videos := getFileNames("*.gif", kUserSplashMediaDirectory, kSplashMediaDirectory)
-	
-		for index, videoFilePath in videos {
-			SplitPath videoFilePath, videoFileName
-			
-			videos[index] := videoFileName
-		}	
-		
-		chosen := (video ? (inList(videos, video) + 1) : 1)
-		
-		visualsOption := ((chosen == 1) ? "Pictures Carousel" : videos[chosen - 1])
-		options := "Pictures Carousel"
-		
-		if (videos.Length() > 0)
-			options := (options . "|" . values2String("|", videos*))
-		
-		Gui CE:Add, Text, X10 Y+20, Splash Screen
-		Gui CE:Add, DropDownList, X90 YP-5 w140 Choose%chosen% vvisualsOption, %options%
-		
-		songOption := getConfigurationValue(configurationOrCommand, "Startup", "Song", false)
-		playSong := (songOption != false)
-		
-		Gui CE:Add, CheckBox, X10 Checked%playSong% vplaySong, Play song
-		
-		songs := computeStartupSongs()
-		
-		chosen := inList(songs, songOption)
-		
-		if (!chosen && (songs.Length() > 0))
-			chosen := 1
-			
-		Gui CE:Add, DropDownList, X90 YP-5 w140 Choose%chosen% vsongOption, % values2String("|", songs*)
+		Gui CE:Add, Text, X10 Y+20, Splash Theme
+		Gui CE:Add, DropDownList, X90 YP-5 w140 Choose%chosen% vsplashTheme, %themes%
 	
 		startupOption := getConfigurationValue(configurationOrCommand, "Startup", "Simulator", false)
 		startup := (startupOption != false)
 		
-		Gui CE:Add, CheckBox, Y+20 X10 Checked%startup% vstartup, Start
+		Gui CE:Add, CheckBox, X10 Checked%startup% vstartup, Start
 		
 		simulators := string2Values("|", getConfigurationValue(kSimulatorConfiguration, "Configuration", "Simulators", ""))
 		

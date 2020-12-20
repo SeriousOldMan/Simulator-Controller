@@ -254,7 +254,7 @@ showSplash(image, alwaysOnTop := true) {
 		
 	info := kVersion . " - 2020 by Oliver Juwig, Creative Commons - BY-NC-SA"
 	image :=  vSplashCounter . ":" . image
-	options := "B FS8 CWD0D0D0 w800 x" . Round((A_ScreenWidth - 800) / 2) . " y" . Round(A_ScreenHeight / 4) . " ZH-1 ZW780"
+	options := "B FS8 CWD0D0D0 w800 x" . Round((A_ScreenWidth - 800) / 2) . " y" . Round(A_ScreenHeight / 4) . " ZH439 ZW780"
 	
 	if !alwaysOnTop
 		options := "A " . options
@@ -331,24 +331,11 @@ showSplashTheme(theme := "__Undefined__", songHandler := false, alwaysOnTop := t
 		return
 	}
 	
-	type := getConfigurationValue(kSimulatorConfiguration, "Splash Themes", theme . ".Type", false)
 	song := false
+	duration := 3000
+	type := getConfigurationValue(kSimulatorConfiguration, "Splash Themes", theme . ".Type", false)
 	
-	if (type == "Picture Carousel") {
-		duration := getConfigurationValue(kSimulatorConfiguration, "Splash Themes", theme . ".Duration", 5000)
-		song := getConfigurationValue(kSimulatorConfiguration, "Splash Themes", theme . ".Song", false)
-		images := string2Values(",", getConfigurationValue(kSimulatorConfiguration, "Splash Themes", theme . ".Images", false))
-		numImages := images.Length()
-		onTop := alwaysOnTop
-		
-		showSplashTheme()
-		
-		SetTimer showSplashTheme, %duration%
-		
-		if (song && songHandler)
-			%songHandler%(song)
-	}
-	else if (type == "Video") {
+	if (type == "Video") {
 		song := getConfigurationValue(kSimulatorConfiguration, "Splash Themes", theme . ".Song", false)
 		video := getConfigurationValue(kSimulatorConfiguration, "Splash Themes", theme . ".Video")
 	
@@ -359,9 +346,29 @@ showSplashTheme(theme := "__Undefined__", songHandler := false, alwaysOnTop := t
 		
 		if (song && songHandler)
 			%songHandler%(song)
+		
+		return
 	}
-	else
+	else if (type == "Picture Carousel") {
+		duration := getConfigurationValue(kSimulatorConfiguration, "Splash Themes", theme . ".Duration", 5000)
+		song := getConfigurationValue(kSimulatorConfiguration, "Splash Themes", theme . ".Song", false)
+		images := string2Values(",", getConfigurationValue(kSimulatorConfiguration, "Splash Themes", theme . ".Images", false))
+	}
+	else {
 		logMessage(kLogCritical, "Theme """ . theme . """ not found - please run the setup tool...")
+		
+		images := getFileNames("*.jpg", kUserSplashMediaDirectory, kSplashMediaDirectory)
+	}
+	
+	numImages := images.Length()
+	onTop := alwaysOnTop
+	
+	showSplashTheme()
+	
+	SetTimer showSplashTheme, %duration%
+	
+	if (song && songHandler)
+		%songHandler%(song)
 }
 
 hideSplashTheme() {
@@ -371,6 +378,19 @@ hideSplashTheme() {
 		hideSplashAnimation()
 		
 	hideSplash()
+}
+
+getAllThemes() {
+	themes := []
+	
+	for descriptor, value in getConfigurationSectionValues(kSimulatorConfiguration, "Splash Themes", Object()) {
+		theme := StrSplit(descriptor, ".")[1]
+		
+		if !inList(themes, theme)
+			themes.Push(theme)
+	}
+	
+	return themes
 }
 
 isDebug() {

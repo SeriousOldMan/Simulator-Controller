@@ -50,6 +50,7 @@ global kCancel = "cancel"
 
 global vCleanupTargets = []
 global vBuildTargets = []
+global vSplashTheme = false
 
 global vCleanupSettings = Object()
 global vBuildSettings = Object()
@@ -107,7 +108,7 @@ checkDependencies(dependencies, modification) {
 	return false
 }
 
-readToolsConfiguration(ByRef cleanupSettings, ByRef buildSettings) {
+readToolsConfiguration(ByRef cleanupSettings, ByRef buildSettings, ByRef splashTheme) {
 	targets := readConfiguration(kToolsTargetsFile)
 	configuration := readConfiguration(kToolsConfigurationFile)
 	
@@ -120,11 +121,13 @@ readToolsConfiguration(ByRef cleanupSettings, ByRef buildSettings) {
 	for target, rule in getConfigurationSectionValues(targets, "Build", Object())
 		buildSettings[target] := getConfigurationValue(configuration, "Build", target, true)
 	
+	splashTheme := getConfigurationValue(configuration, "General", "Splash Theme", false)
+	
 	if A_IsCompiled
 		buildSettings["Simulator Tools"] := false
 }
 
-writeToolsConfiguration(cleanupSettings, buildSettings) {
+writeToolsConfiguration(cleanupSettings, buildSettings, splashTheme) {
 	configuration := newConfiguration()
 	
 	for target, setting in cleanupSettings
@@ -132,6 +135,8 @@ writeToolsConfiguration(cleanupSettings, buildSettings) {
 		
 	for target, setting in buildSettings
 		setConfigurationValue(configuration, "Build", target, setting)
+	
+	setConfigurationValue(configuration, "General", "Splash Theme", splashTheme)
 	
 	writeConfiguration(kToolsConfigurationFile, configuration)
 }
@@ -165,6 +170,8 @@ editTargets(command := "") {
 	static buildVariable7
 	static buildVariable8
 	
+	static splashTheme
+	
 	if (command == kSave) {
 		Gui TE:Submit
 		
@@ -180,7 +187,9 @@ editTargets(command := "") {
 			vBuildSettings[target] := %buildVariable%
 		}
 		
-		writeToolsConfiguration(vCleanupSettings, vBuildSettings)
+		vSplashTheme := (splashTheme == "None") ? false : splashTheme
+		
+		writeToolsConfiguration(vCleanupSettings, vBuildSettings, vSplashTheme)
 		
 		Gui TE:Destroy
 		
@@ -268,7 +277,14 @@ editTargets(command := "") {
 		else
 			Gui TE:Add, Text, YP+20 XP+10, No targets found...
 	 
-		Gui TE:Add, Button, Default X10 Y+20 w100 gsaveTargets, &Build
+		themes := getAllThemes()
+		chosen := (vSplashTheme ? inList(themes, vSplashTheme) + 1 : 1)
+		themes := "None|" + values2String("|", themes*)
+		
+		Gui TE:Add, Text, X10 Y+20, Splash Theme
+		Gui TE:Add, DropDownList, X90 YP-5 w140 Choose%chosen% vsplashTheme, %themes%
+		
+		Gui TE:Add, Button, Default X10 y+20 w100 gsaveTargets, &Build
 		Gui TE:Add, Button, X+20 w100 gcancelTargets, &Cancel
 	
 		Gui TE: Margin, 10, 10
@@ -286,7 +302,8 @@ runCleanTargets(ByRef buildProgress) {
 	for ignore, target in vCleanupTargets {
 		targetName := target[1]
 	
-		Progress %buildProgress%, % "Cleaning " . targetName . "..."
+		if !kSilentMode
+			Progress %buildProgress%, % "Cleaning " . targetName . "..."
 			
 		logMessage(kLogInfo, "Cleaning " . targetName)
 
@@ -302,7 +319,8 @@ runCleanTargets(ByRef buildProgress) {
 				{
 					FileDelete %A_LoopFilePath%
 			
-					Progress %buildProgress%, % "Deleting " . A_LoopFileName . "..."
+					if !kSilentMode
+						Progress %buildProgress%, % "Deleting " . A_LoopFileName . "..."
 					
 					Sleep 50
 				}
@@ -325,7 +343,8 @@ runCleanTargets(ByRef buildProgress) {
 			{
 				FileDelete %A_LoopFilePath%
 			
-				Progress %buildProgress%, % "Deleting " . A_LoopFileName . "..."
+				if !kSilentMode
+					Progress %buildProgress%, % "Deleting " . A_LoopFileName . "..."
 		
 				Sleep 100
 			}
@@ -337,7 +356,8 @@ runCleanTargets(ByRef buildProgress) {
 				
 		buildProgress += Round(100 / (vCleanupTargets.Length() + vBuildTargets.Length() + 1))
 			
-		Progress %buildProgress%
+		if !kSilentMode
+			Progress %buildProgress%
 	}
 }
 
@@ -345,7 +365,8 @@ runBuildTargets(ByRef buildProgress) {
 	for ignore, target in vBuildTargets {
 		targetName := target[1]
 	
-		Progress %buildProgress%, % "Compiling " . targetName . "..."
+		if !kSilentMode
+			Progress %buildProgress%, % "Compiling " . targetName . "..."
 			
 		logMessage(kLogInfo, "Building " . targetName)
 
@@ -365,8 +386,6 @@ runBuildTargets(ByRef buildProgress) {
 			build := true
 		
 		if build {
-			rotateSplash(false)
-			
 			logMessage(kLogInfo, targetName . " or dependent files out of date - needs recompile")
 			logMessage(kLogInfo, "Compiling " . targetSource)
 
@@ -396,7 +415,8 @@ runBuildTargets(ByRef buildProgress) {
 		
 		buildProgress += Round(100 / (vCleanupTargets.Length() + vBuildTargets.Length() + 1))
 			
-		Progress %buildProgress%
+		if !kSilentMode
+			Progress %buildProgress%
 	}
 }
 
@@ -433,7 +453,8 @@ prepareTargets(ByRef buildProgress) {
 		buildProgress +=1
 		build := vCleanupSettings[target]
 		
-		Progress, %buildProgress%, % target . ": " . (build ? "Yes" : "No")
+		if !kSilentMode
+			Progress, %buildProgress%, % target . ": " . (build ? "Yes" : "No")
 		
 		if build {
 			arguments := substituteVariables(arguments)
@@ -448,7 +469,8 @@ prepareTargets(ByRef buildProgress) {
 		buildProgress +=1
 		build := vBuildSettings[target]
 		
-		Progress, %buildProgress%, % target . ": " . (build ? "Yes" : "No")
+		if !kSilentMode
+			Progress, %buildProgress%, % target . ": " . (build ? "Yes" : "No")
 		
 		if build {
 			arguments := substituteVariables(arguments)
@@ -469,44 +491,48 @@ prepareTargets(ByRef buildProgress) {
 }
 
 runTargets() {
-	if (!FileExist(getFileName(kToolsConfigurationFile, kUserConfigDirectory, kConfigDirectory)) || GetKeyState("Ctrl")) {
-		readToolsConfiguration(vCleanupSettings, vBuildSettings)
+	readToolsConfiguration(vCleanupSettings, vBuildSettings, vSplashTheme)
 	
+	if (!FileExist(getFileName(kToolsConfigurationFile, kUserConfigDirectory, kConfigDirectory)) || GetKeyState("Ctrl"))
 		if (!editTargets() && !isDebug())
 			ExitApp 0
-	}
-	else
-		readToolsConfiguration(vCleanupSettings, vBuildSettings)
 	
 	icon := kIconsDirectory . "Tools.ico"
 	
 	Menu Tray, Icon, %icon%, , 1
 	
-	rotateSplash(false)
+	if (!kSilentMode && vSplashTheme)
+		showSplashTheme(vSplashTheme, false, false)
 	
 	Sleep 1000
 	
 	x := Round((A_ScreenWidth - 300) / 2)
 	y := A_ScreenHeight - 150
 	
-	Progress 1:B w300 x%x% y%y% FS8 CWD0D0D0 CBGreen, %A_Space%, Preparing Targets
+	if !kSilentMode
+		Progress 1:B w300 x%x% y%y% FS8 CWD0D0D0 CBGreen, %A_Space%, Preparing Targets
 
 	buildProgress := 0
 	
 	prepareTargets(buildProgress)
 	
-	rotateSplash(false)
-	
-	Progress, , %A_Space%, Running Targets
+	if !kSilentMode
+		Progress, , %A_Space%, Running Targets
 	
 	runCleanTargets(buildProgress)
 	runBuildTargets(buildProgress)
 		
-	Progress 100, Done
+	if !kSilentMode
+		Progress 100, Done
 	
 	Sleep 500
 	
-	Progress Off
+	if !kSilentMode {
+		Progress Off
+	
+		if vSplashTheme
+			hideSplashTheme()
+	}
 	
 	ExitApp 0
 }

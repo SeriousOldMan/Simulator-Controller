@@ -45,13 +45,6 @@ ListLines Off					; Disable execution history
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                        Private Constant Section                         ;;;
-;;;-------------------------------------------------------------------------;;;
-
-global kSplashVideo = false
-
-
-;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Variable Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -68,6 +61,7 @@ class SimulatorStartup extends ConfigurationItem {
 	iFeedbackComponents := []
 	iControllerConfiguration := false
 	iSimulators := false
+	iSplashTheme := false
 	iStartupOption := false
 	iSimulatorControllerPID := 0
 	
@@ -87,6 +81,7 @@ class SimulatorStartup extends ConfigurationItem {
 		base.loadFromConfiguration(configuration)
 		
 		this.iSimulators := string2Values("|", getConfigurationValue(configuration, "Configuration", "Simulators", ""))
+		this.iSplashTheme := getConfigurationValue(this.ControllerConfiguration, "Startup", "Splash Theme", false)
 		this.iStartupOption := getConfigurationValue(this.ControllerConfiguration, "Startup", "Simulator", false)
 		
 		this.iCoreComponents := []
@@ -153,12 +148,6 @@ class SimulatorStartup extends ConfigurationItem {
 		}
 	}
 	
-	rotateSplash() {
-		if (!kSilentMode && !kSplashVideo) {
-			rotateSplash()
-		}
-	}
-	
 	startComponent(component) {
 		logMessage(kLogInfo, "Starting component " . component)
 				
@@ -204,24 +193,18 @@ class SimulatorStartup extends ConfigurationItem {
 		this.prepareConfiguration()
 		
 		startSimulator := ((this.iStartupOption != false) || GetKeyState("Ctrl") || GetKeyState("MButton"))
-		songIsPlaying := false
 		
-		if !kSilentMode
-			if !kSplashVideo
-				this.rotateSplash()
-			else
-				showSplash(kSplashVideo)
+		this.iSimulatorControllerPID := this.startSimulatorController()
+		vSimulatorControllerPID := this.iSimulatorControllerPID
 		
-		Sleep 1000
-		
+		if (!kSilentMode && this.iSplashTheme)
+			showSplashTheme(this.iSplashTheme, "playSong")
+			
 		x := Round((A_ScreenWidth - 300) / 2)
 		y := A_ScreenHeight - 150
 		
 		if !kSilentMode
 			Progress B w300 x%x% y%y% FS8 CWD0D0D0 CBBlue, Start: Simulator Controller, Initialize Core System
-		
-		this.iSimulatorControllerPID := this.startSimulatorController()
-		vSimulatorControllerPID := this.iSimulatorControllerPID
 		
 		if (this.iSimulatorControllerPID == 0)
 			ExitApp 0
@@ -231,19 +214,6 @@ class SimulatorStartup extends ConfigurationItem {
 				Progress % A_Index * 2
 			
 			Sleep 5
-		}
-		
-		if !kSilentMode {
-			songFile := getConfigurationValue(this.ControllerConfiguration, "Startup", "Song", false)
-			
-			if (songFile && FileExist(getFileName(songFile, kUserSplashMediaDirectory, kSplashMediaDirectory))) {
-				raiseEvent("ahk_pid " . this.iSimulatorControllerPID, "Startup", "playStartupSong:" . songFile)
-				
-				songIsPlaying := true
-			}
-				
-			if kSplashVideo
-				showSplashAnimation(kSplashVideo)
 		}
 
 		if !kSilentMode
@@ -267,16 +237,8 @@ class SimulatorStartup extends ConfigurationItem {
 		else {
 			Progress Off
 		
-			if !kSplashVideo && !songIsPlaying
+			if !this.iSplashTheme
 				ExitApp 0
-			
-			vStartupFinished := true
-			
-			Loop {
-				this.rotateSplash()
-				
-				Sleep 3000
-			}
 		}
 			
 		vStartupFinished := true
@@ -291,9 +253,6 @@ class SimulatorStartup extends ConfigurationItem {
 startSimulator() {
 	configuration := readConfiguration(kControllerConfigurationFile)
 	
-	video := getConfigurationValue(configuration, "Startup", "Video", false)
-	kSplashVideo := (video && FileExist(getFileName(video, kUserSplashMediaDirectory, kSplashMediaDirectory))) ? video : false
-	
 	icon := kIconsDirectory . "Start.ico"
 		
 	Menu Tray, Icon, %icon%, , 1
@@ -301,6 +260,14 @@ startSimulator() {
 	registerEventHandler("Startup", "handleStartupEvents")
 	
 	new SimulatorStartup(kSimulatorConfiguration, configuration).startup()
+}
+
+playSong(songFile) {
+	if (songFile && FileExist(getFileName(songFile, kUserSplashMediaDirectory, kSplashMediaDirectory))) {
+		playSong := Func("raiseEvent").bind("ahk_pid " . vSimulatorControllerPID, "Startup", "playStartupSong:" . songFile)
+		
+		SetTimer %playSong%, -2000
+	}
 }
 
 

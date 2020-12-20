@@ -23,6 +23,7 @@ global vLogLevel = kLogWarn
 global vSplashCounter = 0
 global vLastImage
 global vVideoPlayer
+global vVideoIsPlaying = false
 
 global vEventHandlers = Object()
 global vWaitingEvents = []
@@ -181,7 +182,7 @@ loadSimulatorConfiguration() {
 	kSimulatorConfiguration := readConfiguration(kSimulatorConfigurationFile)
 	
 	if (kSimulatorConfiguration.Count() == 0)
-		logMessage(kLogCritical, "No configuration found - please run the Setup tool...")	
+		logMessage(kLogCritical, "No configuration found - please run the setup tool...")	
 	
 	path := getConfigurationValue(kSimulatorConfiguration, "Configuration", "Home Path")
 	if path {
@@ -273,20 +274,20 @@ hideSplash(splashCounter := false) {
 	
 rotateSplash(alwaysOnTop := true) {
 	static number := 1
-	static pictures := false
-	static numPictures := 0
+	static images := false
+	static numImages := 0
 	
-	if !pictures {
-		pictures := getFileNames("*.jpg", kUserSplashMediaDirectory, kSplashMediaDirectory)
+	if !images {
+		images := getFileNames("*.jpg", kUserSplashMediaDirectory, kSplashMediaDirectory)
 		
-		numPictures := pictures.Length()
+		numImages := images.Length()
 	}
 	
-	if (number > numPictures)
+	if (number > numImages)
 		number := 1
 	
-	if (number <= numPictures)
-		showSplash(pictures[number++], alwaysOnTop)
+	if (number <= numImages)
+		showSplash(images[number++], alwaysOnTop)
 }
 
 showSplashAnimation(video) {
@@ -310,6 +311,66 @@ showSplashAnimation(video) {
 
 hideSplashAnimation() {
 	Gui VP:Destroy
+}
+
+showSplashTheme(theme := "__Undefined__", songHandler := false, alwaysOnTop := true) {
+	static images := false
+	static number := 1
+	static numImages := 0
+	static onTop := false
+	
+	vVideoIsPlaying := false
+	
+	if (theme == kUndefined) {
+		if (number > numImages)
+			number := 1
+		
+		if (number <= numImages)
+			showSplash(images[number++], onTop)
+			
+		return
+	}
+	
+	type := getConfigurationValue(kSimulatorConfiguration, "Splash Themes", theme . ".Type", false)
+	song := false
+	
+	if (type == "Picture Carousel") {
+		duration := getConfigurationValue(kSimulatorConfiguration, "Splash Themes", theme . ".Duration", 5000)
+		song := getConfigurationValue(kSimulatorConfiguration, "Splash Themes", theme . ".Song", false)
+		images := string2Values(",", getConfigurationValue(kSimulatorConfiguration, "Splash Themes", theme . ".Images", false))
+		numImages := images.Length()
+		onTop := alwaysOnTop
+		
+		showSplashTheme()
+		
+		SetTimer showSplashTheme, %duration%
+		
+		if (song && songHandler)
+			%songHandler%(song)
+	}
+	else if (type == "Video") {
+		song := getConfigurationValue(kSimulatorConfiguration, "Splash Themes", theme . ".Song", false)
+		video := getConfigurationValue(kSimulatorConfiguration, "Splash Themes", theme . ".Video")
+	
+		showSplash(video)
+		showSplashAnimation(video)
+		
+		vVideoIsPlaying := true
+		
+		if (song && songHandler)
+			%songHandler%(song)
+	}
+	else
+		logMessage(kLogCritical, "Theme """ . theme . """ not found - please run the setup tool...")
+}
+
+hideSplashTheme() {
+	SetTimer showSplashTheme, Off
+	
+	if vVideoIsPlaying
+		hideSplashAnimation()
+		
+	hideSplash()
 }
 
 isDebug() {

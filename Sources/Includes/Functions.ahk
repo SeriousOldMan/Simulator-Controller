@@ -53,6 +53,13 @@ changeProtection(up) {
 		Throw "Nesting error in protection level in changeProtection..."
 }
 
+playThemeSong(songFile) {
+	songFile := getFileName(songFile, kUserSplashMediaDirectory, kSplashMediaDirectory)
+	
+	if FileExist(songFile)
+		SoundPlay %songFile%
+}
+
 eventMessageQueue() {
 	if (vWaitingEvents.Length() > 0) {
 		event := vWaitingEvents.RemoveAt(1)
@@ -252,14 +259,16 @@ showSplash(image, alwaysOnTop := true) {
 	if (vSplashCounter > 10)
 		vSplashCounter := 1
 		
-	info := kVersion . " - 2020 by Oliver Juwig, Creative Commons - BY-NC-SA"
 	image :=  vSplashCounter . ":" . image
 	options := "B FS8 CWD0D0D0 w800 x" . Round((A_ScreenWidth - 800) / 2) . " y" . Round(A_ScreenHeight / 4) . " ZH439 ZW780"
 	
 	if !alwaysOnTop
 		options := "A " . options
 	
-	SplashImage %image%, %options%, %info%, Modular Simulator Controller System
+	title := substituteVariables(getConfigurationValue(kSimulatorConfiguration, "Splash Window", "Title", ""))
+	subtitle := substituteVariables(getConfigurationValue(kSimulatorConfiguration, "Splash Window", "Subtitle", ""))
+	
+	SplashImage %image%, %options%, %subtitle%, %title%
 	
 	if (lastSplash > 0)
 		hideSplash(lastSplash)
@@ -321,6 +330,9 @@ showSplashTheme(theme := "__Undefined__", songHandler := false, alwaysOnTop := t
 	
 	vVideoIsPlaying := false
 	
+	if !songHandler
+		songHandler := "playThemeSong"
+		
 	if (theme == kUndefined) {
 		if (number > numImages)
 			number := 1
@@ -471,6 +483,32 @@ getFileNames(filePattern, directories*) {
 			files.Push(A_LoopFileLongPath)
 	
 	return files
+}
+
+substituteVariables(string) {
+	result := string
+	
+	Loop {
+		startPos := InStr(result, "%")
+		
+		if startPos {
+			startPos += 1
+			endPos := InStr(result, "%", false, startPos)
+			
+			if endPos {
+				variable := SubStr(result, startPos, endPos - startPos)
+				value := %variable%
+				
+				result := StrReplace(result, "%" . variable . "%", value)
+			}
+			else
+				Throw "Second % not found while scanning (" . string . ") for variables in substituteVariables..."
+		}
+		else
+			break
+	}
+		
+	return result
 }
 
 string2Values(delimiter, string, count := false) {
@@ -702,6 +740,16 @@ newConfiguration() {
 
 setConfigurationValue(configuration, section, key, value) {
 	configuration[section, key] := value
+}
+
+setConfigurationSectionValues(configuration, section, values) {
+	for key, value in values
+		setConfigurationValue(configuration, section, key, value)
+}
+
+setConfigurationValues(configuration, otherConfiguration) {
+	for section, values in otherConfiguration
+		setConfigurationSectionValues(configuration, section, values)
 }
 
 removeConfigurationValue(configuration, section, key) {

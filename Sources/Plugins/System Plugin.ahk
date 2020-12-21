@@ -151,7 +151,7 @@ class SystemPlugin extends ControllerPlugin {
 	}
 	
 	class LogoToggleAction extends ControllerAction {
-		iLogoIsVisible := true
+		iLogoIsVisible := false
 		
 		fireAction(function, trigger) {
 			this.Controller.showLogo(this.iLogoIsVisible := !this.iLogoIsVisible)

@@ -289,6 +289,8 @@ class SetupEditor extends ConfigurationItem {
 		
 		base.__New(configuration)
 		
+		SetupEditor.Instance := this
+		
 		this.createControls(configuration)
 	}
 	
@@ -396,6 +398,7 @@ global logLevelDropdown
 class GeneralTab extends ConfigurationItemTab {
 	iSimulatorsList := false
 	iDevelopment := false
+	iSplashThemesConfiguration := false
 	
 	__New(development, configuration) {
 		this.iDevelopment := development
@@ -431,6 +434,8 @@ class GeneralTab extends ConfigurationItemTab {
 		Gui SE:Add, CheckBox, x24 y176 w242 h23 Checked%startWithWindowsCheck% VstartWithWindowsCheck, Start with Windows
 		Gui SE:Add, CheckBox, x24 y200 w242 h23 Checked%silentModeCheck% VsilentModeCheck, Silent mode (no splash screen, no sound)
 		
+		Gui SE:Add, Button, x283 y176 w100 h23 GopenThemeEditor, Theme Editor...
+	
 		Gui SE:Font, Norm, Arial
 		Gui SE:Font, Italic, Arial
 		
@@ -464,7 +469,6 @@ class GeneralTab extends ConfigurationItemTab {
 				chosem := 2
 				
 			Gui SE:Add, DropDownList, x184 y475 w91 Choose%chosen% VlogLevelDropdown, % values2String("|", choices*)
-		
 		}
 	}
 	
@@ -499,6 +503,9 @@ class GeneralTab extends ConfigurationItemTab {
 		setConfigurationValue(configuration, "Configuration", "Start With Windows", startWithWindowsCheck)
 		setConfigurationValue(configuration, "Configuration", "Silent Mode", silentModeCheck)
 		
+		if this.iSplashThemesConfiguration
+			setConfigurationValues(configuration, this.iSplashThemesConfiguration)
+		
 		if this.iDevelopment {
 			GuiControlGet ahkPathEdit
 			GuiControlGet debugEnabledCheck
@@ -510,6 +517,14 @@ class GeneralTab extends ConfigurationItemTab {
 		}
 		
 		this.iSimulatorsList.saveToConfiguration(configuration)
+	}
+	
+	openThemeEditor() {
+		SetupEditor.Instance.hide()
+		
+		this.iSplashThemesConfiguration := (new ThemeEditor(this.iSplashThemesConfiguration ? this.iSplashThemesConfiguration : this.Configuration)).editThemes()
+		
+		SetupEditor.Instance.show()
 	}
 }
 
@@ -532,6 +547,10 @@ chooseAHKPath() {
 	
 	if (directory != "")
 		GuiControl Text, ahkPathEdit, %directory%
+}
+
+openThemeEditor() {
+	GeneralTab.Instance.openThemeEditor()
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -1131,7 +1150,7 @@ class FunctionsList extends ConfigurationItemList {
 		Gui SE:Add, ListView, x16 y158 w377 h192 -Multi -LV0x10 NoSort NoSortHdr HwndfunctionsListViewHandle VfunctionsListView glistEvent, Function|Number|Hotkey(s) & Action(s)
 	
 		Gui SE:Add, Text, x16 y360 w86 h23 +0x200, Function
-		Gui SE:Add, DropDownList, x104 y360 w91 AltSubmit Choose%functionTypeDropdown% VfunctionTypeDropdown gupdateEditorState, 1-way Toggle|2-way Toggle|Button|Dial|Custom
+		Gui SE:Add, DropDownList, x104 y360 w91 AltSubmit Choose%functionTypeDropdown% VfunctionTypeDropdown gupdateFunctionEditorState, 1-way Toggle|2-way Toggle|Button|Dial|Custom
 		Gui SE:Add, Edit, x200 y360 w40 h21 Number VfunctionNumberEdit, %functionNumberEdit%
 		Gui SE:Add, UpDown, x240 y360 w17 h21, 1
 		
@@ -1389,7 +1408,7 @@ class FunctionsList extends ConfigurationItemList {
 	}
 }
 
-updateEditorState() {
+updateFunctionEditorState() {
 	vItemLists["functionsListView"].updateState()
 }
 
@@ -1587,6 +1606,568 @@ class ChatMessagesTab extends ConfigurationItemList {
 		
 		return Array(chatMessageLabelEdit, chatMessageMessageEdit)
 	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; ThemeEditor                                                             ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+global windowTitleEdit = ""
+global windowSubtitleEdit = ""
+
+class ThemeEditor extends ConfigurationItem {
+	iClosed := false
+	iThemesList := false
+	
+	__New(configuration) {
+		base.__New(configuration)
+		
+		ThemeEditor.Instance := this
+		
+		this.createControls(configuration)
+	}
+	
+	createControls(configuration) {
+		Gui TE:Default
+	
+		Gui TE:-border -Caption
+		Gui TE:Color, D0D0D0
+
+		Gui TE:Font, Bold, Arial
+
+		Gui TE:Add, Text, w388 Center, Modular Simulator Controller System 
+		
+		Gui TE:Font, Norm, Arial
+		Gui TE:Font, Italic, Arial
+
+		Gui TE:Add, Text, YP+20 w388 Center, Themes
+
+		Gui TE:Font, Norm, Arial
+		
+		Gui TE:Add, Text, x16 y48 w160 h23 +0x200, Upper Title
+		Gui TE:Add, Edit, x110 y48 w284 h21 VwindowTitleEdit, %windowTitleEdit%
+		
+		Gui TE:Add, Text, x16 y72 w160 h23 +0x200, Lower Title
+		Gui TE:Add, Edit, x110 y72 w284 h21 VwindowSubtitleEdit, %windowSubtitleEdit%
+		
+		Gui, TE:Add, Text, x50 y106 w310 0x10
+		
+		this.iThemesList := new ThemesList(configuration)
+		
+		Gui, TE:Add, Text, x50 y+10 w310 0x10
+		
+		Gui TE:Add, Button, x126 yp+10 w80 h23 Default GsaveThemeEditor, Ok
+		Gui TE:Add, Button, x214 yp w80 h23 GcancelThemeEditor, Cancel
+	}
+	
+	loadFromConfiguration(configuration) {
+		base.loadFromConfiguration(configuration)
+		
+		windowTitleEdit := getConfigurationValue(configuration, "Splash Window", "Title", "")
+		windowSubtitleEdit := getConfigurationValue(configuration, "Splash Window", "Subtitle", "")
+	}
+	
+	saveToConfiguration(configuration) {
+		base.saveToConfiguration(configuration)
+		
+		setConfigurationValue(configuration, "Splash Window", "Title", windowTitleEdit)
+		setConfigurationValue(configuration, "Splash Window", "Subtitle", windowSubtitleEdit)
+		
+		this.iThemesList.saveToConfiguration(configuration)
+	}
+	
+	editThemes() {
+		Gui TE:Show, AutoSize Center
+		
+		Loop
+			Sleep 200
+		until this.iClosed
+		
+		try {
+			if (this.iClosed == kTrue) {
+				configuration := newConfiguration()
+				
+				this.saveToConfiguration(configuration)
+			
+				return configuration
+			}
+			else
+				return false
+		}
+		finally {
+			Gui TE:Destroy
+		}
+	}
+	
+	closeEditor(save) {
+		if save
+			Gui TE:Submit
+		
+		this.iThemesList.togglePlaySoundFile(true)
+		
+		this.iClosed := (save ? kTrue : kFalse)
+	}
+}
+
+saveThemeEditor() {
+	ThemeEditor.Instance.closeEditor(true)
+}
+
+cancelThemeEditor() {
+	ThemeEditor.Instance.closeEditor(false)
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; ThemesList                                                              ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+global themesListView = false
+global themeNameEdit = ""
+global themeTypeDropdown = 0
+
+global playSoundButtonHandle
+global soundFilePathEdit = ""
+
+global videoFilePathLabel
+global videoFilePathEdit = ""
+global videoFilePathButton
+
+global picturesListLabel
+global addPictureButton
+global picturesListView
+global picturesListViewHandle
+global picturesListViewImages
+global picturesDurationLabel
+global picturesDurationEdit = 3000
+global picturesDurationPostfix
+
+global themeUpButton
+global themeDownButton
+global themeAddButton
+global themeDeleteButton
+global themeUpdateButton
+		
+class ThemesList extends ConfigurationItemList {
+	iSoundIsPlaying := false
+	
+	__New(configuration) {
+		base.__New(configuration, this.createControls(configuration), "themesListView"
+				 , "themeAddButton", "themeDeleteButton", "themeUpdateButton", "themeUpButton", "themeDownButton")
+				 
+		ThemesList.Instance := this
+	}
+					
+	createControls(configuration) {
+		Gui TE:Add, ListView, x16 y120 w377 h140 -Multi -LV0x10 NoSort NoSortHdr HwndthemesListViewHandle VthemesListView glistEvent, Theme|Media|Sound File
+	
+		Gui TE:Add, Button, x316 y262 w38 h23 Disabled VthemeUpButton gupItem, Up
+		Gui TE:Add, Button, x356 y262 w38 h23 Disabled VthemeDownButton gdownItem, Down
+		
+		Gui TE:Add, Text, x16 y270 w86 h23 +0x200, Theme
+		Gui TE:Add, Edit, x110 y270 w140 h21 VthemeNameEdit, %themeNameEdit%
+		
+		Gui TE:Add, Text, x16 y294 w86 h23 +0x200, Type
+		Gui TE:Add, DropDownList, x110 y294 w140 AltSubmit VthemeTypeDropdown gupdateThemeEditorState, Picture Carousel|Video
+		
+		Gui TE:Add, Text, x16 y318 w160 h23 +0x200, Sound File
+		Gui TE:Add, Button, x85 y317 w23 h23 HwndplaySoundButtonHandle gtogglePlaySoundFile
+		setButtonIcon(playSoundButtonHandle, kIconsDirectory . "Start.ico", 1, "L2 T2 R2 B2")
+		Gui TE:Add, Edit, x110 y318 w259 h21 VsoundFilePathEdit, %soundFilePathEdit%
+		Gui TE:Add, Button, x371 y317 w23 h23 gchooseSoundFilePath, ...
+		
+		Gui TE:Add, Text, x16 y342 w80 h23 +0x200 VvideoFilePathLabel, Video
+		Gui TE:Add, Edit, x110 y342 w259 h21 VvideoFilePathEdit, %videoFilePathEdit%
+		Gui TE:Add, Button, x371 y341 w23 h23 VvideoFilePathButton gchooseVideoFilePath, ...
+		
+		Gui TE:Add, Text, x16 y342 w80 h23 +0x200 VpicturesListLabel, Pictures
+		Gui TE:Add, Button, x85 y342 w23 h23 HwndaddPictureButtonHandle VaddPictureButton gaddThemePicture
+		setButtonIcon(addPictureButtonHandle, kIconsDirectory . "Plus.ico", 1)
+		Gui TE:Add, ListView, x110 y342 w284 h112 -Multi -LV0x10 Checked -Hdr NoSort NoSortHdr HwndpicturesListViewHandle VpicturesListView, Picture
+		
+		Gui TE:Add, Text, x16 y456 w80 h23 +0x200 VpicturesDurationLabel, Display Duration
+		Gui TE:Add, Edit, x110 y456 w40 h21 Limit5 Number VpicturesDurationEdit, %picturesDurationEdit%
+		
+		Gui TE:Font, Norm, Arial
+		
+		Gui TE:Add, Text, x154 y459 w40 h23 VpicturesDurationPostfix, ms
+	
+		Gui TE:Add, Button, x184 y490 w46 h23 VthemeAddButton gaddItem, Add
+		Gui TE:Add, Button, x232 y490 w50 h23 Disabled VthemeDeleteButton gdeleteItem, Delete
+		Gui TE:Add, Button, x340 y490 w55 h23 Disabled VthemeUpdateButton gupdateItem, Update
+		
+		return themesListViewHandle
+	}
+	
+	loadFromConfiguration(configuration) {
+		base.loadFromConfiguration(configuration)
+		
+		splashThemes := getConfigurationSectionValues(configuration, "Splash Themes", Object())
+		themes := {}
+		
+		for descriptor, value in splashThemes {
+			theme := StrSplit(descriptor, ".")[1]
+			
+			if !themes.HasKey(theme) {
+				type := splashThemes[theme . ".Type"]
+				media := ((type == ("Picture Carousel")) ? splashThemes[theme . ".Images"] : splashThemes[theme . ".Video"])
+				duration := ((type == ("Picture Carousel")) ? splashThemes[theme . ".Duration"] : false)
+				songFile := (splashThemes.HasKey(theme . ".Song") ? splashThemes[theme . ".Song"] : false)
+				
+				if !songFile
+					songFile := ""
+					
+				themes[theme] := theme
+				
+				this.iItemsList.Push(Array(type, theme, media, songFile, duration))
+			}
+		}
+	}
+		
+	saveToConfiguration(configuration) {
+		for index, theme in this.iItemsList {
+			name := theme[2]
+			type := theme[1]
+			songFile := theme[4]
+			
+			setConfigurationValue(configuration, "Splash Themes", name . ".Type", type)
+			
+			if (songFile && (songFile != ""))
+				setConfigurationValue(configuration, "Splash Themes", name . ".Song", songFile)
+				
+			if (type == "Picture Carousel") {
+				setConfigurationValue(configuration, "Splash Themes", name . ".Images", theme[3])
+				setConfigurationValue(configuration, "Splash Themes", name . ".Duration", theme[5])
+			}
+			else
+				setConfigurationValue(configuration, "Splash Themes", name . ".Video", theme[3])
+		}
+	}
+	
+	loadList(items) {
+		Gui ListView, % this.ListHandle
+	
+		LV_Delete()
+		
+		for ignore, theme in items {
+			songFile := theme[4]
+			
+			if (songFile != "") {
+				SplitPath songFile, , , , nameNoExt
+
+				songFile := nameNoExt
+			}
+			
+			mediaFiles := []
+			
+			for ignore, mediaFile in string2Values(",", theme[3]) {
+				SplitPath mediaFile, , , , nameNoExt
+
+				mediaFiles.Push(nameNoExt)
+			}
+			
+			LV_Add("", theme[2], values2String(", ", mediaFiles*), songFile)
+		}
+		
+		LV_ModifyCol(1, 100)
+		LV_ModifyCol(2, 180)
+		LV_ModifyCol(3, 100)
+	}
+	
+	updateState() {
+		base.updateState()
+		
+		GuiControlGet themeTypeDropdown
+		
+		if (themeTypeDropdown == 1) {
+			GuiControl Show, picturesListLabel
+			GuiControl Show, addPictureButton
+			GuiControl Show, picturesListView
+			GuiControl Show, picturesDurationLabel
+			GuiControl Show, picturesDurationEdit
+			GuiControl Show, picturesDurationPostfix
+		}
+		else {
+			GuiControl Hide, picturesListLabel
+			GuiControl Hide, addPictureButton
+			GuiControl Hide, picturesListView
+			GuiControl Hide, picturesDurationLabel
+			GuiControl Hide, picturesDurationEdit
+			GuiControl Hide, picturesDurationPostfix
+		}
+		
+		if (themeTypeDropdown == 2) {
+			GuiControl Show, videoFilePathLabel
+			GuiControl Show, videoFilePathEdit
+			GuiControl Show, videoFilePathButton
+		}
+		else {
+			GuiControl Hide, videoFilePathLabel
+			GuiControl Hide, videoFilePathEdit
+			GuiControl Hide, videoFilePathButton
+		}
+	}
+	
+	loadEditor(item) {
+		themeTypeDropdown := (item[1] == "Picture Carousel") ? 1 : 2
+		themeNameEdit := item[2]
+		soundFilePathEdit := item[4]
+			
+		GuiControl Choose, themeTypeDropdown, %themeTypeDropdown%
+		GuiControl Text, themeNameEdit, %themeNameEdit%
+		GuiControl Text, soundFilePathEdit, %soundFilePathEdit%
+		
+		if (themeTypeDropdown == 2)
+			videoFilePathEdit := item[3]
+		else
+			videoFilePathEdit := ""
+			
+		GuiControl Text, videoFilePathEdit, %videoFilePathEdit%
+		
+		Gui ListView, % picturesListViewHandle
+			
+		LV_Delete()
+		
+		if (themeTypeDropdown == 1) {
+			mediaFiles := string2Values(",", item[3])
+			picturesListViewImages := IL_Create(mediaFiles.Length())
+				
+			for ignore, mediaFile in mediaFiles
+				IL_Add(picturesListViewImages, LoadPicture(getFileName(mediaFile, kUserSplashMediaDirectory, kSplashMediaDirectory), "W32 H32"), 0xFFFFFF, false)
+			
+			LV_SetImageList(picturesListViewImages)
+			
+			Loop % mediaFiles.Length()
+				LV_Add("Check Icon" . A_Index, mediaFiles[A_Index])
+				
+			picturesDurationEdit := item[5]
+			
+			GuiControl Text, picturesDurationEdit, %picturesDurationEdit%
+		}
+		
+		LV_ModifyCol()
+		
+		this.updateEditor()
+	}
+	
+	clearEditor() {
+		themeTypeDropdown := 0
+		themeNameEdit := ""
+		soundFilePathEdit := ""
+		videoFilePathEdit := ""
+		picturesDurationEdit := 3000
+			
+		GuiControl Choose, themeTypeDropdown, %themeTypeDropdown%
+		GuiControl Text, themeNameEdit, %themeNameEdit%
+		GuiControl Text, soundFilePathEdit, %soundFilePathEdit%
+		GuiControl Text, videoFilePathEdit, %videoFilePathEdit%
+		GuiControl Text, picturesDurationEdit, %picturesDurationEdit%
+		
+		this.updateEditor()
+	}
+	
+	buildItemFromEditor(isNew := false) {
+		GuiControlGet themeNameEdit
+		GuiControlGet themeTypeDropdown
+		GuiControlGet soundFilePathEdit
+		GuiControlGet picturesDurationEdit
+		
+		type := ""
+		media := ""
+		
+		if (themeTypeDropdown == 1) {
+			type := "Picture Carousel"
+			pictures := []
+			
+			Gui ListView, % picturesListViewHandle
+			
+			rowNumber := 0
+			
+			Loop {
+				rowNumber := LV_GetNext(rowNumber, "C")
+				
+				if !rowNumber
+					break
+					
+				LV_GetText(fileName, rowNumber)
+				
+				pictures.Push(StrReplace(StrReplace(fileName, kUserSplashMediaDirectory, ""), kSplashMediaDirectory, ""))
+			}
+			
+			media := values2String(", ", pictures*)
+		}
+		else if (themeTypeDropdown == 2) {
+			type := "Video"
+			
+			GuiControlGet videoFilePathEdit
+		
+			media := videoFilePathEdit
+		}
+		else
+			Goto error
+		
+		return Array(type, themeNameEdit, media, soundFilePathEdit, picturesDurationEdit)
+		
+error:
+		OnMessage(0x44, "translateMsgBoxButtons")
+		MsgBox 262160, Error, Invalid values detected - please correct...
+		OnMessage(0x44, "")
+		
+		return false
+	}
+	
+	togglePlaySoundFile(stop := false) {
+		if (stop || this.iSoundIsPlaying) {
+			try {
+				SoundPlay NonExistent.avi
+			}
+			catch ignore {
+				; Ignore
+			}
+			
+			setButtonIcon(playSoundButtonHandle, kIconsDirectory . "Start.ico", 1, "L2 T2 R2 B2")
+			
+			this.iSoundIsPlaying := false
+		}
+		else if !this.iSoundIsPlaying {
+			try {
+				songFile := getFileName(soundFilePathEdit, kUserSplashMediaDirectory, kSplashMediaDirectory)
+				
+				if FileExist(songFile) {
+					SoundPlay %songFile%
+				
+					setButtonIcon(playSoundButtonHandle, kIconsDirectory . "Pause.ico", 1, "L7 T2 R2 B2")
+					
+					this.iSoundIsPlaying := true
+				}
+			}
+			catch exception {
+				; Ignore
+			}
+		}
+	}
+}
+
+updateThemeEditorState() {
+	vItemLists["themesListView"].updateState()
+}
+
+togglePlaySoundFile() {
+	ThemesList.Instance.togglePlaySoundFile()
+}
+
+addThemePicture() {
+	FileSelectFile, pictureFile, 1, , Select Image..., Image (*.jpg; *.gif)
+	
+	if (pictureFile != "") {
+		Gui ListView, % picturesListViewHandle
+			
+		IL_Add(picturesListViewImages, LoadPicture(getFileName(pictureFile, kUserSplashMediaDirectory, kSplashMediaDirectory), "W32 H32"), 0xFFFFFF, false)
+			
+		LV_Add("Check Icon" . A_Index, pictureFile)
+		
+		LV_Modify(LV_GetCount(), "Vis")
+	}
+}
+
+chooseSoundFilePath() {
+	path := soundFilePathEdit
+	
+	if (path && (path != ""))
+		path := getFileName(path, kUserSplashMediaDirectory, kSplashMediaDirectory)
+	else
+		path := SubStr(kUserSplashMediaDirectory, 1, StrLen(kUserSplashMediaDirectory) - 1)
+		
+	FileSelectFile, soundFile, 1, *%path%, Select Sound File..., Audio (*.wav; *.mp3)
+	
+	if (soundFile != "") {
+		soundFilePathEdit := soundFile
+		
+		GuiControl Text, soundFilePathEdit, %soundFilePathEdit%
+	}
+}
+
+chooseVideoFilePath() {
+	path := videoFilePathEdit
+	
+	if (path && (path != ""))
+		path := getFileName(path, kUserSplashMediaDirectory, kSplashMediaDirectory)
+	else
+		path := SubStr(kUserSplashMediaDirectory, 1, StrLen(kUserSplashMediaDirectory) - 1)
+		
+	FileSelectFile, videoFile, 1, *%path%, Select Video (GIF) File..., Video (*.gif)
+	
+	if (videoFile != "") {
+		videoFilePathEdit := videoFile
+		
+		GuiControl Text, videoFilePathEdit, %videoFilePathEdit%
+	}
+}
+
+setButtonIcon(buttonHandle, file, index := 1, options := "") {
+;   Parameters:
+;   1) {Handle} 	HWND handle of Gui button
+;   2) {File} 		File containing icon image
+;   3) {Index} 		Index of icon in file
+;						Optional: Default = 1
+;   4) {Options}	Single letter flag followed by a number with multiple options delimited by a space
+;						W = Width of Icon (default = 16)
+;						H = Height of Icon (default = 16)
+;						S = Size of Icon, Makes Width and Height both equal to Size
+;						L = Left Margin
+;						T = Top Margin
+;						R = Right Margin
+;						B = Botton Margin
+;						A = Alignment (0 = left, 1 = right, 2 = top, 3 = bottom, 4 = center; default = 4)
+
+	RegExMatch(options, "i)w\K\d+", W), (W="") ? W := 16 :
+	RegExMatch(options, "i)h\K\d+", H), (H="") ? H := 16 :
+	RegExMatch(options, "i)s\K\d+", S), S ? W := H := S :
+	RegExMatch(options, "i)l\K\d+", L), (L="") ? L := 0 :
+	RegExMatch(options, "i)t\K\d+", T), (T="") ? T := 0 :
+	RegExMatch(options, "i)r\K\d+", R), (R="") ? R := 0 :
+	RegExMatch(options, "i)b\K\d+", B), (B="") ? B := 0 :
+	RegExMatch(options, "i)a\K\d+", A), (A="") ? A := 4 :
+
+	ptrSize := A_PtrSize = "" ? 4 : A_PtrSize, DW := "UInt", Ptr := A_PtrSize = "" ? DW : "Ptr"
+
+	VarSetCapacity(button_il, 20 + ptrSize, 0)
+
+	NumPut(normal_il := DllCall("ImageList_Create", DW, W, DW, H, DW, 0x21, DW, 1, DW, 1), button_il, 0, Ptr)	; Width & Height
+	NumPut(L, button_il, 0 + ptrSize, DW)		; Left Margin
+	NumPut(T, button_il, 4 + ptrSize, DW)		; Top Margin
+	NumPut(R, button_il, 8 + ptrSize, DW)		; Right Margin
+	NumPut(B, button_il, 12 + ptrSize, DW)		; Bottom Margin	
+	NumPut(A, button_il, 16 + ptrSize, DW)		; Alignment
+
+	SendMessage, BCM_SETIMAGELIST := 5634, 0, &button_il,, AHK_ID %buttonHandle%
+
+	return IL_Add(normal_il, file, index)
+}
+
+ListView_SetImageList( hwnd, hIml, iImageList=0) { 
+   SendMessage, 0x1000+3, iImageList, hIml, , ahk_id %hwnd% 
+   return ErrorLevel 
+} 
+
+ImageList_Create(cx,cy,flags,cInitial,cGrow){ 
+   return DllCall("comctl32.dll\ImageList_Create", "int", cx, "int", cy, "uint", flags, "int", cInitial, "int", cGrow) 
+} 
+
+ImageList_Add(hIml, hbmImage, hbmMask=""){ 
+   return DllCall("comctl32.dll\ImageList_Add", "uint", hIml, "uint",hbmImage, "uint", hbmMask) 
+} 
+
+ImageList_AddIcon(hIml, hIcon) { 
+   return DllCall("comctl32.dll\ImageList_ReplaceIcon", "uint", hIml, "int", -1, "uint", hIcon) 
+} 
+
+API_ExtractIcon(Icon, Idx=0){ 
+   return DllCall("shell32\ExtractIconA", "UInt", 0, "Str", Icon, "UInt",Idx) 
+} 
+
+
+API_LoadImage(pPath, uType, cxDesired, cyDesired, fuLoad) { 
+   return,  DllCall( "LoadImage", "uint", 0, "str", pPath, "uint", uType, "int", cxDesired, "int", cyDesired, "uint", fuLoad) 
 }
 
 ;;;-------------------------------------------------------------------------;;;

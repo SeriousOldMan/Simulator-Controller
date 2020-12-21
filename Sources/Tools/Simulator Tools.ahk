@@ -420,32 +420,6 @@ runBuildTargets(ByRef buildProgress) {
 	}
 }
 
-substituteVariables(string) {
-	result := string
-	
-	Loop {
-		startPos := InStr(result, "%")
-		
-		if startPos {
-			startPos += 1
-			endPos := InStr(result, "%", false, startPos)
-			
-			if endPos {
-				variable := SubStr(result, startPos, endPos - startPos)
-				path := %variable%
-				
-				result := StrReplace(result, "%" . variable . "%", path)
-			}
-			else
-				Throw "Second % not found while scanning (" . string . ") for variables in substituteVariables..."
-		}
-		else
-			break
-	}
-		
-	return result
-}
-
 prepareTargets(ByRef buildProgress) {
 	targets := readConfiguration(kToolsTargetsFile)
 	

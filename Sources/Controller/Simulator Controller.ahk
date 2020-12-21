@@ -264,7 +264,7 @@ class SimulatorController extends ConfigurationItem {
 	
 	iLastEvent := A_TickCount
 	
-	iShowLogo := true
+	iShowLogo := false
 	iLogoIsVisible := false
 	
 	ControllerConfiguration[] {
@@ -638,7 +638,7 @@ class SimulatorController extends ConfigurationItem {
 	initializeBackgroundTasks() {
 		SetTimer updateSimulatorState, 1000
 		
-		this.iShowLogo := !kSilentMode
+		this.iShowLogo := (this.iShowLogo && !kSilentMode)
 	}
 }
 

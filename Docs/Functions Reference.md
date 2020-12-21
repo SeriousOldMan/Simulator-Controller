@@ -7,11 +7,17 @@ Returns a new empty configuration map. The configuration map is not derived from
 #### *getConfigurationValue(configuration :: ConfigurationMap, section :: String, key :: String, default := false)
 Returns the value defined for the given key or the *default*, if no such key has been defined.
 
+#### *setConfigurationValue(configuration :: ConfigurationMap, section :: String, key :: String, value)*
+Stores the given value for the given key in the configuration map. The value must be convertible to a String representation.
+
 #### *getConfigurationSectionValues(configuration :: ConfigurationMap, section :: String, default := false)*
 Retrieves all key / value pairs for a given section as a map. Returns *default*, if the section does not exist.
 
-#### *setConfigurationValue(configuration :: ConfigurationMap, section :: String, key :: String, value)*
-Stores the given value for the given key in the configuration map. The value must be convertible to a String representation.
+#### *setConfigurationValues(configuration, otherConfiguration)*
+This function takes all key / value pairs from all sections in *otherConfiguration* and copies them to *configuration*.
+
+#### *setConfigurationSectionValues(configuration :: ConfigurationMap, section :: String, values :: Object)*
+Stores all the key / value pairs in the configuration map under the given section.
 
 #### *removeConfigurationValue(configuration :: ConfigurationMao, section :: String, key :: String)*
 Removes the given key and its value from the configuration map.
@@ -73,8 +79,11 @@ Returns a list of absolute paths for all files in the given directories satisfyi
 
 ***
 
-## Collection Helper Functions ([Functions.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Functions.ahk))
+## Collection & String Helper Functions ([Functions.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Functions.ahk))
 Often used collection functions, that are not part of the AutoHotkey language.
+
+#### *substituteVariables(string :: String)*
+Substitutes all variables enclosed by "%" with their values and returns the modified string.
 
 #### *string2Values(delimiter :: String, string :: String, count :: Integer := false)*
 Splits *string* apart using the supplied delimiter and returns the parts as an array. If *count* is supplied, only that much parts are splitted and all remaining ocurrencies of *delimiter* are ignored.

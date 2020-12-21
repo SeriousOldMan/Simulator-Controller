@@ -434,7 +434,7 @@ class GeneralTab extends ConfigurationItemTab {
 		Gui SE:Add, CheckBox, x24 y176 w242 h23 Checked%startWithWindowsCheck% VstartWithWindowsCheck, Start with Windows
 		Gui SE:Add, CheckBox, x24 y200 w242 h23 Checked%silentModeCheck% VsilentModeCheck, Silent mode (no splash screen, no sound)
 		
-		Gui SE:Add, Button, x283 y176 w100 h23 GopenThemeEditor, Theme Editor...
+		Gui SE:Add, Button, x283 y176 w100 h23 GopenThemeEditor, Themes Editor...
 	
 		Gui SE:Font, Norm, Arial
 		Gui SE:Font, Italic, Arial

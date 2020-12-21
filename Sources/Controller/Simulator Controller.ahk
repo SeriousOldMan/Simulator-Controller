@@ -473,7 +473,8 @@ class SimulatorController extends ConfigurationItem {
 					try {
 						showSplash(splashImage)
 		
-						songFile := getConfigurationValue(this.ControllerConfiguration, "Startup", "Song", false)
+						theme := getConfigurationValue(this.ControllerConfiguration, "Startup", "Splash Theme", false)
+						songFile := (theme ? getConfigurationValue(this.Configuration, "Splash Themes", theme . ".Song", false) : false)
 				
 						if (songFile && FileExist(getFileName(songFile, kUserSplashMediaDirectory, kSplashMediaDirectory)))
 							raiseEvent(false, "Startup", "playStartupSong:" . songFile)

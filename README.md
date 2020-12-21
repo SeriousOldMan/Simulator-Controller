@@ -21,7 +21,7 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-[1.1.9-beta](https://www.dropbox.com/s/1yoet693t5vm8nx/Simulator%20Controller%201.1.9-beta.zip?dl=0) (Preview version and release candidate for the upcoming 1.2.0 release)
+[1.1.9-beta](https://www.dropbox.com/s/1yoet693t5vm8nx/Simulator%20Controller%201.1.9-beta.zip?dl=1) (Preview version and release candidate for the upcoming 1.2.0 release)
 
 #### Latest stable builds
 

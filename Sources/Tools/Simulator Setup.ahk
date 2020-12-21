@@ -434,7 +434,7 @@ class GeneralTab extends ConfigurationItemTab {
 		Gui SE:Add, CheckBox, x24 y176 w242 h23 Checked%startWithWindowsCheck% VstartWithWindowsCheck, Start with Windows
 		Gui SE:Add, CheckBox, x24 y200 w242 h23 Checked%silentModeCheck% VsilentModeCheck, Silent mode (no splash screen, no sound)
 		
-		Gui SE:Add, Button, x283 y176 w100 h23 GopenThemeEditor, Themes Editor...
+		Gui SE:Add, Button, x283 y176 w100 h23 GopenThemesEditor, Themes Editor...
 	
 		Gui SE:Font, Norm, Arial
 		Gui SE:Font, Italic, Arial
@@ -505,6 +505,10 @@ class GeneralTab extends ConfigurationItemTab {
 		
 		if this.iSplashThemesConfiguration
 			setConfigurationValues(configuration, this.iSplashThemesConfiguration)
+		else {
+			setConfigurationSectionValues(configuration, "Splash Window", getConfigurationSectionValues(this.Configuration, "Splash Window", Object()))
+			setConfigurationSectionValues(configuration, "Splash Themes", getConfigurationSectionValues(this.Configuration, "Splash Themes", Object()))
+		}
 		
 		if this.iDevelopment {
 			GuiControlGet ahkPathEdit
@@ -519,10 +523,10 @@ class GeneralTab extends ConfigurationItemTab {
 		this.iSimulatorsList.saveToConfiguration(configuration)
 	}
 	
-	openThemeEditor() {
+	openThemesEditor() {
 		SetupEditor.Instance.hide()
 		
-		this.iSplashThemesConfiguration := (new ThemeEditor(this.iSplashThemesConfiguration ? this.iSplashThemesConfiguration : this.Configuration)).editThemes()
+		this.iSplashThemesConfiguration := (new ThemesEditor(this.iSplashThemesConfiguration ? this.iSplashThemesConfiguration : this.Configuration)).editThemes()
 		
 		SetupEditor.Instance.show()
 	}
@@ -549,8 +553,8 @@ chooseAHKPath() {
 		GuiControl Text, ahkPathEdit, %directory%
 }
 
-openThemeEditor() {
-	GeneralTab.Instance.openThemeEditor()
+openThemesEditor() {
+	GeneralTab.Instance.openThemesEditor()
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -1609,20 +1613,20 @@ class ChatMessagesTab extends ConfigurationItemList {
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; ThemeEditor                                                             ;;;
+;;; ThemesEditor                                                            ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 global windowTitleEdit = ""
 global windowSubtitleEdit = ""
 
-class ThemeEditor extends ConfigurationItem {
+class ThemesEditor extends ConfigurationItem {
 	iClosed := false
 	iThemesList := false
 	
 	__New(configuration) {
 		base.__New(configuration)
 		
-		ThemeEditor.Instance := this
+		ThemesEditor.Instance := this
 		
 		this.createControls(configuration)
 	}
@@ -1656,8 +1660,8 @@ class ThemeEditor extends ConfigurationItem {
 		
 		Gui, TE:Add, Text, x50 y+10 w310 0x10
 		
-		Gui TE:Add, Button, x126 yp+10 w80 h23 Default GsaveThemeEditor, Ok
-		Gui TE:Add, Button, x214 yp w80 h23 GcancelThemeEditor, Cancel
+		Gui TE:Add, Button, x126 yp+10 w80 h23 Default GsaveThemesEditor, Ok
+		Gui TE:Add, Button, x214 yp w80 h23 GcancelThemesEditor, Cancel
 	}
 	
 	loadFromConfiguration(configuration) {
@@ -1709,12 +1713,12 @@ class ThemeEditor extends ConfigurationItem {
 	}
 }
 
-saveThemeEditor() {
-	ThemeEditor.Instance.closeEditor(true)
+saveThemesEditor() {
+	ThemesEditor.Instance.closeEditor(true)
 }
 
-cancelThemeEditor() {
-	ThemeEditor.Instance.closeEditor(false)
+cancelThemesEditor() {
+	ThemesEditor.Instance.closeEditor(false)
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -1767,7 +1771,7 @@ class ThemesList extends ConfigurationItemList {
 		Gui TE:Add, Edit, x110 y270 w140 h21 VthemeNameEdit, %themeNameEdit%
 		
 		Gui TE:Add, Text, x16 y294 w86 h23 +0x200, Type
-		Gui TE:Add, DropDownList, x110 y294 w140 AltSubmit VthemeTypeDropdown gupdateThemeEditorState, Picture Carousel|Video
+		Gui TE:Add, DropDownList, x110 y294 w140 AltSubmit VthemeTypeDropdown gupdateThemesEditorState, Picture Carousel|Video
 		
 		Gui TE:Add, Text, x16 y318 w160 h23 +0x200, Sound File
 		Gui TE:Add, Button, x85 y317 w23 h23 HwndplaySoundButtonHandle gtogglePlaySoundFile
@@ -2047,7 +2051,7 @@ error:
 	}
 }
 
-updateThemeEditorState() {
+updateThemesEditorState() {
 	vItemLists["themesListView"].updateState()
 }
 

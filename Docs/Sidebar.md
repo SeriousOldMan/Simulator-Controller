@@ -14,6 +14,7 @@
     - [Controller](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#tab-controller)
     - [Launchpad](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#tab-launchpad)
     - [Chat](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#tab-chat)
+  - [Themes Editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#themes-editor)
 
 [Using Simulator Controller](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller)
 ------

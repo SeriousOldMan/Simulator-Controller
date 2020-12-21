@@ -21,7 +21,7 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-Currently none, use the latest stable build instead...
+[1.1.9-beta](https://www.dropbox.com/s/1yoet693t5vm8nx/Simulator%20Controller%201.1.9-beta.zip?dl=0) (Preview version and release candidate for the upcoming 1.2.0 release)
 
 #### Latest stable builds
 
@@ -45,7 +45,7 @@ Currently none, use the latest stable build instead...
     - Code your own functions to be called by the controller buttons and switches using the simple, object-oriented scripting language
   - Configure all additional [applications](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications) to your taste, including the simulation games used for your virtual races
     - Start and stop applications from your controller hardware or automatically upon configurable events
-    - Add splash screens and title melodies for a more emotional startup experience
+    - Add splash screens and title melodies using a themes editor for a more emotional startup experience
     - Fully support for sophisticated application automation - for example, start your favorite voice chat software like TeamSpeak and automatically switch to your standard channel 
   - Several plugins supplied out of the box:
     - Support for Assetto Corsa and Assetto Corsa Competizione already builtin

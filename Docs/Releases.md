@@ -2,9 +2,9 @@
 
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. Theme Editor: A collection of media files (pictures, animation, sounds) can be grouped together using the setup tool. In the startup configuration, you can enable this group for splash screen and startup animation as a whole. With this functionality, you can have a GT3 look and feel, a Rallye look and feel, an F1 look and feel, and so on.
-     Important: You either need to use the setup tool to configure your own splash themes or you need to copy the "[Splash Themes]" section from 
-*Resources\Templates\Simulator Configuration.ini* to your local configuration file found in *Simulator Controller\Config* in your user *Documents* folder.
+  3. Themes Editor: A collection of media files (pictures, animation, sounds) can be grouped together using the themes editor, a part of the setup tool. In the startup configuration, you can enable this group for splash screen and startup animation as a whole. With this functionality, you can have a GT3 look and feel, a Rallye look and feel, an F1 look and feel, and so on.
+     Important: You either need to use the setup tool to configure your own splash themes or you need to copy the "[Splash Themes]" and "[Splash Window]" sections from 
+*Resources\Templates\Simulator Configuration.ini* to your local configuration file found in *Simulator Controller\Config* in your user *Documents* folder. Also, be sure to update the runctime configuration of *Simulator Startup.exe* and *Simulator Tools.exe* by holding the Control key down while starting these applications.
 
 ## 1.1.0-stable, 12/19/20
 

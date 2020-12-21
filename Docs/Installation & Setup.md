@@ -38,7 +38,7 @@ As the name of this tab suggests, some very general configuration options are pr
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Setup%20Tab%201.JPG)
 
-The second group, *Startup*, allows you to choose whether the Simulator Controller will start together with Windows and whether it will run silently, i.e. without any splash animation or sound.
+The second group, *Startup*, allows you to choose whether the Simulator Controller will start together with Windows and whether it will run silently, i.e. without any splash animation or sound. With the button "Themes Editor..." you can jump to a special editor to customize the splash dialogs of various applications of Simulator Controller. See the chapter on the [themes editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#themes-editor) for a complete explanation of themes.
 
 You can add all the simulation games installed on your PC to the list in the third group *Simulators*. For each entry here, you also need to create a similar named application entry in the applications tab. The order of the entries in the *Simulators* list is important, at least the first one has a special role. More on that later. You can change the order with the "Up" and "Down" button, if an entry is selected. As with any list in the setup tool, an entry must be selected with a double click for editing.
 
@@ -146,3 +146,13 @@ Many simulation games provide an ingame multiplayer text based chat system. Sinc
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Setup%20Tab%206.JPG)
 
 You need to specify a small label text to display on the visual representation of your controller and you specifiy the long chat message, which will be send to the ingame chat system. You can use the "Up" and "Down" buttons to specifiy the position of these chat messages on the controller hardware.
+
+## Themes Editor
+
+This special editor, which can be opened from the *General* tab of the setup tool, allows you to define a combination of pictures or animation files together with a sound file. This combination is called a splash theme and will be used by the startup sequence. You may have a rallye theme for your favorite rallye session, or an F1 theme, or even some cinematic impressions from various airplanes in the sky, while waiting for your flight simulator to startup.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Themes%20Editor.JPG)
+
+Currently, two theme types are supported. The first uses a collection of pictures for a kind of round robin display. The second theme type let you choose a GIF file for a video like animation. Both support the additional selection of a sound file to play along, while the pictures or the animation will be shown. Despite that, you can overwrite the default title and subtitle of the splash screen window.
+
+After definition of a theme, you can choose it for the [startup sequence](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#other-settings) or even while the build tool is currently compiling your favorite plugin, if you are a developer.

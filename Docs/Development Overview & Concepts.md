@@ -179,4 +179,6 @@ You can decide which targets you want to include in your build run by holding do
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Build%20Tool.JPG)
 
+You can also choose a [splash theme](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#themes-editor) here for your entertainment, while waiting for the build tool to finish.
+
 Note: You can cancel a build run anytime by pressing the Escape key.

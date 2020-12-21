@@ -11,20 +11,20 @@
 
 global kAHKDirectory = "C:\Program Files\AutoHotkey\"
 
-global kHomeDirectory = A_ScriptDir . (A_IsCompiled ? "\..\" : "\..\..\")
+global kHomeDirectory = normalizeFilePath(A_ScriptDir . (A_IsCompiled ? "\..\" : "\..\..\"))
 global kUserHomeDirectory = A_MyDocuments . "\Simulator Controller\"
 
-global kResourcesDirectory = A_ScriptDir . (A_IsCompiled ? "\..\Resources\" : "\..\..\Resources\")
-global kSourcesDirectory = A_ScriptDir . (A_IsCompiled ? "\..\Sources\" : "\..\..\Sources\")
-global kIncludesDirectory = A_ScriptDir . (A_IsCompiled ? "\..\Sources\Includes\" : "\..\..\Sources\Includes\")
-global kBinariesDirectory = A_ScriptDir . (A_IsCompiled ? "\..\Binaries\" : "\..\..\Binaries\")
+global kResourcesDirectory = normalizeFilePath(A_ScriptDir . (A_IsCompiled ? "\..\Resources\" : "\..\..\Resources\"))
+global kSourcesDirectory = normalizeFilePath(A_ScriptDir . (A_IsCompiled ? "\..\Sources\" : "\..\..\Sources\"))
+global kIncludesDirectory = normalizeFilePath(A_ScriptDir . (A_IsCompiled ? "\..\Sources\Includes\" : "\..\..\Sources\Includes\"))
+global kBinariesDirectory = normalizeFilePath(A_ScriptDir . (A_IsCompiled ? "\..\Binaries\" : "\..\..\Binaries\"))
 
 global kLogsDirectory = kUserHomeDirectory . "Logs\"
 
-global kPluginsDirectory = A_ScriptDir . (A_IsCompiled ? "\..\Sources\Plugins\" : "\..\..\Sources\Plugins\")
+global kPluginsDirectory = normalizeFilePath(A_ScriptDir . (A_IsCompiled ? "\..\Sources\Plugins\" : "\..\..\Sources\Plugins\"))
 global kUserPluginsDirectory = kUserHomeDirectory . "Plugins\"
 
-global kConfigDirectory = A_ScriptDir . (A_IsCompiled ? "\..\Config\" : "\..\..\Config\")
+global kConfigDirectory = normalizeFilePath(A_ScriptDir . (A_IsCompiled ? "\..\Config\" : "\..\..\Config\"))
 global kUserConfigDirectory = kUserHomeDirectory . "Config\"
 
 global kSplashMediaDirectory = kResourcesDirectory . "Splash Media\"

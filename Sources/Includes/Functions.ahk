@@ -485,6 +485,30 @@ getFileNames(filePattern, directories*) {
 	return files
 }
 
+normalizeFilePath(filePath) {
+	Loop {
+		position := InStr(filePath, "\..")
+		
+		if position {
+			index := position - 1
+			
+			Loop {
+				if (index == 0)
+					return filePath
+				else if (SubStr(filePath, index, 1) == "\") {
+					filePath := StrReplace(filePath, SubStr(filePath, index, position + 3 - index), "")
+					
+					break
+				}
+				
+				index -= 1
+			}
+		}
+		else
+			return filePath
+	}
+}
+
 substituteVariables(string) {
 	result := string
 	

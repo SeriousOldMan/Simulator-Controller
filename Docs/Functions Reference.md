@@ -77,6 +77,9 @@ If *fileName* contains an absolute path, itself will be returned. Otherwise, all
 #### *getFileNames*(filePattern :: String, #rest directories :: String)*
 Returns a list of absolute paths for all files in the given directories satisfying *filePattern*.
 
+#### *normalizeFilePath(filePath)*
+Removes all "\\*directory*\\.." occurrencies from *filePath* and returns this simplified file path.
+
 ***
 
 ## Collection & String Helper Functions ([Functions.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Functions.ahk))

@@ -32,3 +32,31 @@ startAITrack() {
 	WinMinimize %windowTitle%
 	Sleep 100
 }
+
+startVoiceMacro() {
+	voiceMacro := new Application("Voice Recognition", SimulatorController.Instance.Configuration)
+	windowTitle := voiceMacro.WindowTitle
+	
+	voiceMacro.startup(false)
+	
+	curDetectHiddenWindows := A_DetectHiddenWindows
+		
+	DetectHiddenWindows On
+	
+	try {
+		IfWinNotActive %windowTitle%, , WinActivate, %windowTitle% 
+			
+		WinWait %windowTitle%, 
+		WinMove %windowTitle%, , 50, 50
+
+		MouseClick, left,  465,  45
+		Sleep, 100
+		MouseClick, left,  465,  45
+		Sleep, 100
+		MouseClick, left,  524,  13
+		Sleep, 100
+	}
+	finally {
+		DetectHiddenWindows % curDetectHiddenWindows
+	}
+}

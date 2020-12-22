@@ -521,7 +521,7 @@ startupApplication(application, silent := true) {
 }
 
 startupComponent(component) {
-	startupApplication(component)
+	startupApplication(component, false)
 }
 
 startupSimulator(simulator, silent := false) {

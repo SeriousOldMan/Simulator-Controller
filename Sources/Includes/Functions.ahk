@@ -24,6 +24,7 @@ global vSplashCounter = 0
 global vLastImage
 global vVideoPlayer
 global vVideoIsPlaying = false
+global vSongIsPlaying = false
 
 global vEventHandlers = Object()
 global vWaitingEvents = []
@@ -329,6 +330,7 @@ showSplashTheme(theme := "__Undefined__", songHandler := false, alwaysOnTop := t
 	static onTop := false
 	
 	vVideoIsPlaying := false
+	vSongIsPlaying := false
 	
 	if !songHandler
 		songHandler := "playThemeSong"
@@ -356,8 +358,11 @@ showSplashTheme(theme := "__Undefined__", songHandler := false, alwaysOnTop := t
 		
 		vVideoIsPlaying := true
 		
-		if (song && songHandler)
+		if song {
+			vSongIsPlaying := true
+			
 			%songHandler%(song)
+		}
 		
 		return
 	}
@@ -379,8 +384,11 @@ showSplashTheme(theme := "__Undefined__", songHandler := false, alwaysOnTop := t
 	
 	SetTimer showSplashTheme, %duration%
 	
-	if (song && songHandler)
+	if song {
+		vSongIsPlaying := true
+		
 		%songHandler%(song)
+	}
 }
 
 hideSplashTheme() {
@@ -388,7 +396,15 @@ hideSplashTheme() {
 	
 	if vVideoIsPlaying
 		hideSplashAnimation()
-		
+
+	if vSongIsPlaying
+		try {
+			SoundPlay NonExistent.avi
+		}
+		catch ignore {
+			; Ignore
+		}
+			
 	hideSplash()
 }
 

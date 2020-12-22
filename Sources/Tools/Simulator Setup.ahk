@@ -2065,9 +2065,9 @@ addThemePicture() {
 	if (pictureFile != "") {
 		Gui ListView, % picturesListViewHandle
 			
-		IL_Add(picturesListViewImages, LoadPicture(getFileName(pictureFile, kUserSplashMediaDirectory, kSplashMediaDirectory), "W32 H32"), 0xFFFFFF, false)
+		IL_Add(picturesListViewImages, LoadPicture(pictureFile, "W32 H32"), 0xFFFFFF, false)
 			
-		LV_Add("Check Icon" . A_Index, pictureFile)
+		LV_Add("Check Icon" . A_Index, StrReplace(StrReplace(pictureFile, kUserSplashMediaDirectory, ""), kSplashMediaDirectory, ""))
 		
 		LV_Modify(LV_GetCount(), "Vis")
 	}

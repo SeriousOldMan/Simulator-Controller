@@ -2148,32 +2148,6 @@ setButtonIcon(buttonHandle, file, index := 1, options := "") {
 	return IL_Add(normal_il, file, index)
 }
 
-ListView_SetImageList( hwnd, hIml, iImageList=0) { 
-   SendMessage, 0x1000+3, iImageList, hIml, , ahk_id %hwnd% 
-   return ErrorLevel 
-} 
-
-ImageList_Create(cx,cy,flags,cInitial,cGrow){ 
-   return DllCall("comctl32.dll\ImageList_Create", "int", cx, "int", cy, "uint", flags, "int", cInitial, "int", cGrow) 
-} 
-
-ImageList_Add(hIml, hbmImage, hbmMask=""){ 
-   return DllCall("comctl32.dll\ImageList_Add", "uint", hIml, "uint",hbmImage, "uint", hbmMask) 
-} 
-
-ImageList_AddIcon(hIml, hIcon) { 
-   return DllCall("comctl32.dll\ImageList_ReplaceIcon", "uint", hIml, "int", -1, "uint", hIcon) 
-} 
-
-API_ExtractIcon(Icon, Idx=0){ 
-   return DllCall("shell32\ExtractIconA", "UInt", 0, "Str", Icon, "UInt",Idx) 
-} 
-
-
-API_LoadImage(pPath, uType, cxDesired, cyDesired, fuLoad) { 
-   return,  DllCall( "LoadImage", "uint", 0, "str", pPath, "uint", uType, "int", cxDesired, "int", cyDesired, "uint", fuLoad) 
-}
-
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;

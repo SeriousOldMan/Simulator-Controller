@@ -46,15 +46,15 @@ Below you will find download links for the current development build and the two
   - Configure all additional [applications](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications) to your taste, including the simulation games used for your virtual races
     - Start and stop applications from your controller hardware or automatically upon configurable events
     - Add splash screens and title melodies using a themes editor for a more emotional startup experience
-    - Fully support for sophisticated application automation - for example, start your favorite voice chat software like TeamSpeak and automatically switch to your standard channel 
-  - Several plugins supplied out of the box:
+    - Full support for sophisticated application automation - for example, start your favorite voice chat software like TeamSpeak and automatically switch to your standard channel 
+  - Several plugins are supplied out of the box:
     - Support for Assetto Corsa and Assetto Corsa Competizione already builtin
     - Fully customizable plugins supplied for total control of SimHub and SimFeedback - change your settings while racing using the dials and switches on your favorite Button Box
     - Send your predefined kudos and rants to the ingame chat without touching the keyboard
   - Additional support to trigger every function and action from external sources like a voice or gesture recognition software to always keep your hands on the wheel
   - Builtin support for visual head tracking to control ingame viewing angle - see [third party applications](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications) below
 
-Simulator Controller is fully implemented in AutoHotkey, a very sophisticated and object-oriented Windows automation scripting language, which is capable to control keyboard and other input devices with a simple macro language. On the other hand, AutoHotkey also has a lot of robotics capabilities to automate software packages, which do not provide external APIs by simulating mouse clicks and keyboard input. You can write your own plugins using the AutoHotkey language. Full source code for all prebuilt plugins with different complexity from simple to advanced is provided to help you get started.
+Simulator Controller is fully implemented in AutoHotkey, a very sophisticated and object-oriented Windows automation scripting language, which is capable to control keyboard and other input devices with a simple macro language. On the other hand, AutoHotkey also has a lot of robotics capabilities to automate software packages, which do not provide external APIs, by simulating mouse clicks and keyboard input. You can write your own plugins using the AutoHotkey language. Full source code for all included plugins with different complexity from simple to advanced is provided to help you get started.
 
 ### Additional features
 

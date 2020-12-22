@@ -1,5 +1,5 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Simulator Configuration Tool    ;;;
+;;;   Modular Simulator Controller System - Simulator Setup Tool            ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2020) Creative Commons - BY-NC-SA                        ;;;
@@ -1688,7 +1688,7 @@ class ThemesEditor extends ConfigurationItem {
 		until this.iClosed
 		
 		try {
-			if (this.iClosed == kTrue) {
+			if (this.iClosed == kOk) {
 				configuration := newConfiguration()
 				
 				this.saveToConfiguration(configuration)
@@ -1709,7 +1709,7 @@ class ThemesEditor extends ConfigurationItem {
 		
 		this.iThemesList.togglePlaySoundFile(true)
 		
-		this.iClosed := (save ? kTrue : kFalse)
+		this.iClosed := (save ? kOk : kCancel)
 	}
 }
 

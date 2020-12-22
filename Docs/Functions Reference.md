@@ -131,6 +131,8 @@ Themes are a collection of pictures or a GIF animation possibly combined with a 
 #### *hideSplashTheme()*
 Closes the current theme based splash window.
 
+***
+
 ## Thread Protection ([Functions.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Functions.ahk))
 In AutoHotkey scripts, running threads may be interrupted by other events, such as keyboard events or timer functions. Using the functions below, it is possible to create protected sections of code, which may not be interrupted.
 
@@ -158,7 +160,7 @@ Enables or disables debug mode.
 Return the current log level. May be one of: *kLogInfo*, *kLogWarn*, *kLogCritical* or *kLogOff*.
 
 #### *setLogLevel(logLevel :: OneOf(kLogInfo, kLogWarn, kLogCritical, kLogOff))*
-Sets the current log level. If *logLevel* is *kLogOff*, logging will normally fully supressed.
+Sets the current log level. If *logLevel* is *kLogOff*, logging will normally be fully supressed.
 
 #### *increaseLogLevel()*
 Increases the current log level.

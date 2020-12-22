@@ -44,15 +44,17 @@ startVoiceMacro() {
 	DetectHiddenWindows On
 	
 	try {
-		IfWinNotActive %windowTitle%, , WinActivate, %windowTitle% 
-			
+		IfWinNotActive %windowTitle%, , WinMaximize, %windowTitle% 
+		Sleep 1000
+		
 		WinWait %windowTitle%, 
 		WinMove %windowTitle%, , 50, 50
-
+		Sleep 1000
+		
 		MouseClick, left,  465,  45
-		Sleep, 100
+		Sleep, 1000
 		MouseClick, left,  465,  45
-		Sleep, 100
+		Sleep, 1000
 		MouseClick, left,  524,  13
 		Sleep, 100
 	}

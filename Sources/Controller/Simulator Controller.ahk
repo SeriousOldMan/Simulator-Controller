@@ -1164,8 +1164,8 @@ updateSimulatorState() {
 	try {
 		updateTrayMessageState()
 	
-		stateChange := false
-	
+		btnBox := controller.ButtonBox
+			
 		if (isSimulatorRunning != (controller.ActiveSimulator != false)) {
 			isSimulatorRunning := !isSimulatorRunning
 		
@@ -1176,12 +1176,10 @@ updateSimulatorState() {
 			}
 			else
 				controller.simulatorShutdown()
-		}
 
-		btnBox := controller.ButtonBox
-		
-		if (btnBox != false)
-			btnBox.updateVisibility()
+			if (btnBox != false)
+				btnBox.updateVisibility()
+		}
 		
 		if isSimulatorRunning {
 			SetTimer updateSimulatorState, 5000

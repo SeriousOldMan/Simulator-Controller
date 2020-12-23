@@ -1745,8 +1745,6 @@ global picturesDurationLabel
 global picturesDurationEdit = 3000
 global picturesDurationPostfix
 
-global themeUpButton
-global themeDownButton
 global themeAddButton
 global themeDeleteButton
 global themeUpdateButton
@@ -1756,16 +1754,13 @@ class ThemesList extends ConfigurationItemList {
 	
 	__New(configuration) {
 		base.__New(configuration, this.createControls(configuration), "themesListView"
-				 , "themeAddButton", "themeDeleteButton", "themeUpdateButton", "themeUpButton", "themeDownButton")
+				 , "themeAddButton", "themeDeleteButton", "themeUpdateButton")
 				 
 		ThemesList.Instance := this
 	}
 					
 	createControls(configuration) {
 		Gui TE:Add, ListView, x16 y120 w377 h140 -Multi -LV0x10 NoSort NoSortHdr HwndthemesListViewHandle VthemesListView glistEvent, Theme|Media|Sound File
-	
-		Gui TE:Add, Button, x316 y262 w38 h23 Disabled VthemeUpButton gupItem, Up
-		Gui TE:Add, Button, x356 y262 w38 h23 Disabled VthemeDownButton gdownItem, Down
 		
 		Gui TE:Add, Text, x16 y270 w86 h23 +0x200, Theme
 		Gui TE:Add, Edit, x110 y270 w140 h21 VthemeNameEdit, %themeNameEdit%

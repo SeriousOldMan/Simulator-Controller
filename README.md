@@ -23,13 +23,13 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-[1.2.2-beta](https://www.dropbox.com/s/9lkb4qiuxv6uiiy/Simulator%20Controller%201.2.2-beta.zip?dl=1) (Preview version and release candidate for the upcoming 1.2.x release)
+None for the moment, please use the latest stable build...
 
 #### Latest stable builds
 
 [1.0.2-fix](https://www.dropbox.com/s/ylhj9g4xeksuj80/Simulator%20Controller%201.0.2-fix.zip?dl=1) (Maintenance release for 1.0.0)
 
-[1.1.0-stable](https://www.dropbox.com/s/vwgtyaygdtaxnmu/Simulator%20Controller%201.1.0-stable.zip?dl=1)
+[1.2.4-stable](https://www.dropbox.com/s/jwh6i6na73rfu9f/Simulator%20Controller%201.2.4-stable.zip?dl=0)
 
 ### Main features
 

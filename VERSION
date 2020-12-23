@@ -1,5 +1,5 @@
 [Version]
-Current=1.2.2-beta
-Target=1.2.x-stable
-Changes=Themes for splash screens
-Date=12/22/2020
+Current=1.2.4-stable
+Target=1.2.4-stable
+Changes=Themes for splash screens, new sound handling code
+Date=12/23/2020

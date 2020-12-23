@@ -114,16 +114,18 @@ Several applications of Simulator Controller uses a splash window to entertain t
 #### *rotateSplash(alwaysOnTop :: Boolean := true)*
 Uses all JPG files available in [kSplashMediaDirectory](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#ksplashmediadirectory-kbuttonboximagesdirectory-kiconsdirectory) and in the *Simulator Controller\Splash Media* folder, which is located in the *Documents* folder of the current user, as a kind of picture carousel. Every call to *rotateSplash* will show the next picture.
 
+Important: This function is deprecated and will be removed in a future version of Simulator Controller. Use *showPlashTheme* instead.
+
 #### *hideSplash()*
 Closes the current splash window. Note: If the splash window had been opened using *showSplashTheme*, use *hideSplashTheme* instead.
 
 #### *showSplashAnimation(gif :: String)*
 *gif* must be the name of a GIF file located in [kSplashMediaDirectory](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#ksplashmediadirectory-kbuttonboximagesdirectory-kiconsdirectory) or in the *Simulator Controller\Splash Media* folder, which is located in the *Documents* folder of the current user. *showSplashAnimation* will show this animated GIF in the currently open splash screen window.
-Note: This is a building block function for *showSplashTheme* and will normally not used on its own.
+Note: This is a building block function for *showSplashTheme* and will normally not be used on its own.
 
 #### *hideSplashAnimation()*
 Finishes the current animation, but the splash screen window stays open.
-Note: This is a building block function for *hideSplashTheme* and will normally not used on its own.
+Note: This is a building block function for *hideSplashTheme* and will normally not be used on its own.
 
 #### *showSplashTheme(theme :: String, songHandler :: TypeUnion(String, FuncObj) := false, alwaysOnTop :: Boolean := true)*
 Themes are a collection of pictures or a GIF animation possibly combined with a sound file. Themes are maintained by the [themes editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#themes-editor). *showSplashTheme* opens a splash window according to the themes definition. If *songHandler* is not provided, a default handler will be used, but the song will stop playing, if the current splash window is closed.

@@ -279,7 +279,7 @@ class Application extends ConfigurationItem {
 			DetectHiddenWindows % curDetectHiddenWindows
 		}
 		
-		return processID
+		return (this.iRunningPID := processID)
 	}
 	
 	run(application, exePath, workingDirectory, options := "", wait := false) {

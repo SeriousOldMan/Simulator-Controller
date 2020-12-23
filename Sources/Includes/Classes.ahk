@@ -130,6 +130,9 @@ class Application extends ConfigurationItem {
 	
 	CurrentPID[] {
 		Get {
+			if ((this.iRunningPID == 0) || (this.iRunningPID == -1))
+				this.iRunningPID := this.getProcessID()
+			
 			return this.iRunningPID
 		}
 	}
@@ -197,7 +200,7 @@ class Application extends ConfigurationItem {
 			if IsLabel(specialStartup) {
 				Gosub %specialStartup%
 				
-				return (this.iRunningPID := -1)
+				return this.CurrentPID
 			}
 			else
 				return (this.iRunningPID := %specialStartup%())
@@ -244,7 +247,11 @@ class Application extends ConfigurationItem {
 			if %specialIsRunning%()
 				return true
 		
-		result := false
+		return (this.getProcessID() != 0)
+	}
+	
+	getProcessID() {
+		processID := false
 		curDetectHiddenWindows := A_DetectHiddenWindows
 		
 		DetectHiddenWindows On
@@ -253,23 +260,26 @@ class Application extends ConfigurationItem {
 			if (this.iRunningPID > 0) {
 				Process Exist, % this.isRunningPID
 				
-				result := result || (ErrorLevel != 0) || WinExist("ahk_pid " . this.iRunningPID)
+				processID := ((ErrorLevel != 0) || WinExist("ahk_pid " . this.iRunningPID)) ? this.iRunningPID : 0
 			}
 			
-			if (!result && (this.WindowTitle != ""))
-				result := result || (WinExist(this.WindowTitle) != 0)
+			if (!processID && (this.WindowTitle != ""))
+				if WinExist(this.WindowTitle)
+					WinGet processID, PID, % this.WindowTitle
 				
-			if (!result && (this.iRunningPID > 0))
-				result := result || WinExist("ahk_pid " . this.iRunningPID)
+			if (!processID && (this.iRunningPID > 0))
+				if WinExist("ahk_pid " . this.iRunningPID)
+					WinGet processID, PID, % "ahk_pid " . this.iRunningPID
 			
-			if (!result && (this.ExePath != ""))
-				result := result || WinExist("ahk_exe " . this.ExePath)
+			if (!processID && (this.ExePath != ""))
+				if WinExist("ahk_exe " . this.ExePath)
+					WinGet processID, PID, % "ahk_exe " . this.ExePath
 		}
 		finally {
 			DetectHiddenWindows % curDetectHiddenWindows
 		}
 		
-		return result
+		return processID
 	}
 	
 	run(application, exePath, workingDirectory, options := "", wait := false) {

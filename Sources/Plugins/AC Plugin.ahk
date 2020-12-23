@@ -42,8 +42,8 @@ class ACPlugin extends ControllerPlugin {
 ;;;-------------------------------------------------------------------------;;;
 
 startAC() {
-	SimulatorController.Instance.startSimulator(SimulatorController.Instance.findPlugin(kACPlugin).ACApplication
-											  , "Simulator Splash Images\AC Splash.jpg")
+	return SimulatorController.Instance.startSimulator(SimulatorController.Instance.findPlugin(kACPlugin).ACApplication
+											         , "Simulator Splash Images\AC Splash.jpg")
 }
 
 

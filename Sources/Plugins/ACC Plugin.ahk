@@ -99,8 +99,8 @@ class ACCPlugin extends ControllerPlugin {
 ;;;-------------------------------------------------------------------------;;;
 
 startACC() {
-	SimulatorController.Instance.startSimulator(new Application("Assetto Corsa Competizione", SimulatorController.Instance.Configuration)
-											  , "Simulator Splash Images\ACC Splash.jpg")
+	return SimulatorController.Instance.startSimulator(new Application("Assetto Corsa Competizione", SimulatorController.Instance.Configuration)
+													 , "Simulator Splash Images\ACC Splash.jpg")
 }
 
 stopACC() {

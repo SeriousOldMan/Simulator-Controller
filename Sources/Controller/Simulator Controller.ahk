@@ -508,6 +508,8 @@ class SimulatorController extends ConfigurationItem {
 						hideSplash()
 					}
 				}
+				
+		return application.CurrentPID
 	}
 	
 	connectAction(function, action) {

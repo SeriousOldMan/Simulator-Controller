@@ -374,7 +374,13 @@ mouseClicked(clicked := true) {
 restoreSimulatorVolume() {
 	if kNirCmd
 		try {
-			Run %kNirCmd% setappvolume focused 1.0
+			simulator := SimulatorController.Instance.ActiveSimulator
+			
+			if (simulator != false) {
+				pid := (new Application(simulator, SimulatorController.Instance.Configuration)).CurrentPID
+				
+				Run %kNirCmd% setappvolume /%pid% 1.0
+			}
 		}
 		catch exception {
 			SplashTextOn 800, 60, Modular Simulator Controller System - Controller (Plugin: System), Cannot start NirCmd (%kNirCmd%): `n`nPlease run the setup tool...
@@ -386,14 +392,18 @@ restoreSimulatorVolume() {
 }
 
 muteSimulator() {
-	if (SimulatorController.Instance.ActiveSimulator != false) {
+	simulator := SimulatorController.Instance.ActiveSimulator
+	
+	if (simulator != false) {
 		SetTimer muteSimulator, Off
 		
 		Sleep 5000
 		
 		if kNirCmd
 			try {
-				Run %kNirCmd% setappvolume focused 0.0
+				pid := (new Application(simulator, SimulatorController.Instance.Configuration)).CurrentPID
+				
+				Run %kNirCmd% setappvolume /%pid% 0.0
 			}
 			catch exception {
 				SplashTextOn 800, 60, Modular Simulator Controller System - Controller (Plugin: System), Cannot start NirCmd (%kNirCmd%): `n`nPlease run the setup tool...
@@ -515,7 +525,10 @@ startupApplication(application, silent := true) {
 	runnable := SimulatorController.Instance.findPlugin(kSystemPlugin).findRunnableApplication(application)
 	
 	if (runnable != false)
-		return (runnable.startup(!silent) != 0)
+		if runnable.isRunning()
+			return true
+		else
+			return (runnable.startup(!silent) != 0)
 	else
 		return false
 }

@@ -946,19 +946,26 @@ blinkEffectLabels() {
 startSimFeedback(stayOpen := false) {
 	simFeedback := new Application("Motion Feedback", SimulatorController.Instance.Configuration)
 	
-	windowTitle := simFeedback.WindowTitle
-		
-	simFeedback.startup(false)
-	
-	WinWait %windowTitle%, , 20
-	
-	if !kSimFeedbackConnector
-		WinMaximize %windowTitle%
+	if simFeedback.isRunning()
+		pid := simFeedback.CurrentPID
 	else
-		WinActivate %windowTitle%
+		pid := simFeedback.startup(false)
 	
-	if !stayOpen
-		WinMinimize %windowTitle%
+	if pid {
+		windowTitle := simFeedback.WindowTitle
+		
+		WinWait %windowTitle%, , 20
+		
+		if !kSimFeedbackConnector
+			WinMaximize %windowTitle%
+		else
+			WinActivate %windowTitle%
+		
+		if !stayOpen
+			WinMinimize %windowTitle%
+	}
+	
+	return pid
 }
 
 initializeMotionFeedbackPlugin() {

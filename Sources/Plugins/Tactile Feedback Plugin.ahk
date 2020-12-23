@@ -329,6 +329,12 @@ updateVibrationState() {
 	plugin.updateVibrationState()
 }
 
+startSimHub() {
+	simHub := new Application("Tactile Feedback", SimulatorController.Instance.Configuration)
+	
+	return (simHub.isRunning() ? simHub.CurrentPID : simHub.startup(false))
+}
+
 callSimHub(command) {
 	try {
 		logMessage(kLogInfo, "Sending command '" . command . "' to SimHub (" . kSimHub . ")")

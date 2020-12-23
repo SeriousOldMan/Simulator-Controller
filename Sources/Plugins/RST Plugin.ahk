@@ -15,7 +15,7 @@ startRST() {
 	if !rstApplication.isRunning() {
 		pid := rstApplication.startup(false)
 	
-		if (pid) {
+		if pid {
 			WinWait ahk_pid %pid%
 			IfWinNotActive ahk_pid %pid%, , WinActivate, ahk_pid %pid%, 
 			WinWaitActive ahk_pid %pid%, , 10
@@ -24,5 +24,9 @@ startRST() {
 			Sleep 2000
 			MouseClick left,  830,  115
 		}
+		
+		return pid
 	}
+	else
+		return.rstApplication.CurrentPID
 }

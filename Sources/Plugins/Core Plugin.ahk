@@ -11,54 +11,72 @@
 
 startAITrack() {
 	aiTrack := new Application("Face Recognition", SimulatorController.Instance.Configuration)
-	windowTitle := aiTrack.WindowTitle
 	
-	aiTrack.startup(false)
-	
-	WinWait %windowTitle%, 
-	WinMove %windowTitle%, , 50, 50
+	if !aiTrack.isRunning() {
+		pid := aiTrack.startup(false)
+		
+		if pid {
+			windowTitle := aiTrack.WindowTitle
+			
+			WinWait %windowTitle%, 
+			WinMove %windowTitle%, , 50, 50
 
-	active := false
+			active := false
 
-	while !active {
-		IfWinNotActive %windowTitle%, , WinActivate, %windowTitle% 
-		WinWaitActive %windowTitle%, , 1
-	
-		active := (ErrorLevel == 0)
+			while !active {
+				IfWinNotActive %windowTitle%, , WinActivate, %windowTitle% 
+				WinWaitActive %windowTitle%, , 1
+			
+				active := (ErrorLevel == 0)
+			}
+
+			MouseClick left,  201,  344
+			Sleep 5000
+			WinMinimize %windowTitle%
+			Sleep 100
+		}
+		
+		return pid
 	}
-
-	MouseClick left,  201,  344
-	Sleep 5000
-	WinMinimize %windowTitle%
-	Sleep 100
+	else
+		return aiTrack.CurrentPID
 }
 
 startVoiceMacro() {
 	voiceMacro := new Application("Voice Recognition", SimulatorController.Instance.Configuration)
-	windowTitle := voiceMacro.WindowTitle
 	
-	voiceMacro.startup(false)
-	
-	curDetectHiddenWindows := A_DetectHiddenWindows
+	if !voiceMacro.isRunning() {
+		pid := voiceMacro.startup(false)
 		
-	DetectHiddenWindows On
-	
-	try {
-		IfWinNotActive %windowTitle%, , WinMaximize, %windowTitle% 
-		Sleep 1000
+		if pid {
+			curDetectHiddenWindows := A_DetectHiddenWindows
+				
+			DetectHiddenWindows On
+			
+			try {
+				windowTitle := voiceMacro.WindowTitle
+				
+				IfWinNotActive %windowTitle%, , WinMaximize, %windowTitle% 
+				Sleep 1000
+				
+				WinWait %windowTitle%, 
+				WinMove %windowTitle%, , 50, 50
+				Sleep 1000
+				
+				MouseClick, left,  465,  45
+				Sleep, 1000
+				MouseClick, left,  465,  45
+				Sleep, 1000
+				MouseClick, left,  524,  13
+				Sleep, 100
+			}
+			finally {
+				DetectHiddenWindows % curDetectHiddenWindows
+			}
+		}
 		
-		WinWait %windowTitle%, 
-		WinMove %windowTitle%, , 50, 50
-		Sleep 1000
-		
-		MouseClick, left,  465,  45
-		Sleep, 1000
-		MouseClick, left,  465,  45
-		Sleep, 1000
-		MouseClick, left,  524,  13
-		Sleep, 100
+		return pid
 	}
-	finally {
-		DetectHiddenWindows % curDetectHiddenWindows
-	}
+	else
+		return voiceMarco.CurrentPID
 }

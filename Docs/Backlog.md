@@ -9,3 +9,4 @@
 #### Button Box Visual Feedback
   1. Photorealistic Button Box Visuals (=> v1.3)
   2. Show all the current settings alternating with the effect name on the button box
+  3. Allow button box window to be opened on a second screen, which might be a small 5 or 7 inch display mounted next to the button box.

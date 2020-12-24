@@ -196,19 +196,21 @@ class ButtonBox extends ConfigurationItem {
 					
 						position := getConfigurationValue(this.Controller.ControllerConfiguration, "Controller", "Button Box Position", "Bottom Right")
 						
+						SysGet mainScreen, MonitorWorkArea
+						
 						switch position {
 							case "Top Left":
-								x := 0
-								y := 0
+								x := mainScreenLeft
+								y := mainScreenTop
 							case "Top Right":
-								x := A_ScreenWidth - width
-								y := 0
+								x := mainScreenRight - width
+								y := mainScreenTop
 							case "Bottom Left":
-								x := 0
-								y := A_ScreenHeight - height
+								x := mainScreenLeft
+								y := mainScreenBottom - height
 							case "Bottom Right":
-								x := A_ScreenWidth - width
-								y := A_ScreenHeight - height
+								x := mainScreenRight - width
+								y := mainScreenBottom - height
 							default:
 								Throw "Unhandled position for Button Box (" . position . ") encountered in ButtonBox.show..."
 						}

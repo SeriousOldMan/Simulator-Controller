@@ -258,7 +258,7 @@ class Application extends ConfigurationItem {
 		
 		try {
 			if (this.iRunningPID > 0) {
-				Process Exist, % this.isRunningPID
+				Process Exist, % this.iRunningPID
 				
 				processID := ((ErrorLevel != 0) || WinExist("ahk_pid " . this.iRunningPID)) ? this.iRunningPID : 0
 			}
@@ -266,10 +266,6 @@ class Application extends ConfigurationItem {
 			if (!processID && (this.WindowTitle != ""))
 				if WinExist(this.WindowTitle)
 					WinGet processID, PID, % this.WindowTitle
-				
-			if (!processID && (this.iRunningPID > 0))
-				if WinExist("ahk_pid " . this.iRunningPID)
-					WinGet processID, PID, % "ahk_pid " . this.iRunningPID
 			
 			if (!processID && (this.ExePath != ""))
 				if WinExist("ahk_exe " . this.ExePath)

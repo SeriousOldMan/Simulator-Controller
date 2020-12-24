@@ -119,7 +119,7 @@ Want to contribute? Great!
 
   Nothing critical for the moment, just relaxing and preparing for the 12h of Bathurst.
   
-  But there are a lot of ideas in the backlog for Simulator Controller. Stay tuned...
+  But there are a lot of ideas in the [backlog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Backlog) for Simulator Controller. Stay tuned...
 
 ### License
 

@@ -2,6 +2,7 @@
 
   1. Bugfixes, as always
   2. Documentation updates, as always
+     - including a new Wiki page with the hottest backlog features.
   3. New photorealistic Button Box Visuals - you will love it.
   4. Better window handling of SimFeedback. The main window will stay closed whenever possible.
 

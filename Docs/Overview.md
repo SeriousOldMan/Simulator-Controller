@@ -17,5 +17,8 @@ Welcome to the Simulator Controller documentation. Here you will find everything
 	
   - [Development Guide](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts)  
     Complete set of information for developers, who want to create their own plugins or even contribute to the further development of Simulator Controller.
+	
+  - [Development Backlog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Backlog)  
+    You may alos want to take a look at the backlog of upcoming features.
   
 If you have any questions that have not been answered here, please feel free to contact me, but please be sure to have read anything related in the documentation in advance. If you want to report a bug, please open an issue. And last, but not least, if you want to contribute, feel free to contact me as well.

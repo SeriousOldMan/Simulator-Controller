@@ -2,7 +2,8 @@
 
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. New photorealistic Button Box Visuals
+  3. New photorealistic Button Box Visuals - you will love it.
+  4. Better window handling of SimFeedback. The main window will stay closed whenever possible.
 
 ## 1.2.4-stable, 12/23/20
 

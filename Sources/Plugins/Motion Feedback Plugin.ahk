@@ -650,7 +650,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		isRunning := this.Application.isRunning()
 		
 		if (!isRunning && startup) {
-			startSimFeedback(needsInitialize)
+			startSimFeedback(kSimFeedbackConnector == false)
 			
 			isRunning := true
 		}

@@ -38,11 +38,11 @@ class SimpleButtonBox extends ButtonBox {
 		Gui SBB:Add, Picture, x455 y195 w42 h42 BackgroundTrans, % kButtonBoxImagesDirectory . "Photorealistic\Rotary Dial 2.png"
 		Gui SBB:Add, Picture, x455 y283 w42 h42 BackgroundTrans, % kButtonBoxImagesDirectory . "Photorealistic\Rotary Dial 2.png"
 
-		Gui SBB:Add, Text, x32 y148 w56 h30 Hwndtoggle1 +Border -Background  +0x1000 +Center +0x1
-		Gui SBB:Add, Text, x136 y148 w56 h30 Hwndtoggle2 +Border -Background  +0x1000 +Center +0x1
-		Gui SBB:Add, Text, x240 y148 w56 h30 Hwndtoggle3 +Border -Background  +0x1000 +Center +0x1
-		Gui SBB:Add, Text, x344 y148 w56 h30 Hwndtoggle4 +Border -Background  +0x1000 +Center +0x1
-		Gui SBB:Add, Text, x448 y148 w56 h30 Hwndtoggle5 +Border -Background  +0x1000 +Center +0x1
+		Gui SBB:Add, Text, x32 y148 w56 h30 Hwndtoggle1 +Border -Background  +0x1000 +0x1
+		Gui SBB:Add, Text, x136 y148 w56 h30 Hwndtoggle2 +Border -Background  +0x1000 +0x1
+		Gui SBB:Add, Text, x240 y148 w56 h30 Hwndtoggle3 +Border -Background  +0x1000 +0x1
+		Gui SBB:Add, Text, x344 y148 w56 h30 Hwndtoggle4 +Border -Background  +0x1000 +0x1
+		Gui SBB:Add, Text, x448 y148 w56 h30 Hwndtoggle5 +Border -Background  +0x1000 +0x1
 
 		Gui SBB:Add, Text, x32 y239 w56 h30 Hwndbutton1 +Border -Background  +0x1000 +0x1
 		Gui SBB:Add, Text, x136 y239 w56 h30 Hwndbutton2 +Border -Background  +0x1000 +0x1

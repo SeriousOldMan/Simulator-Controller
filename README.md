@@ -23,7 +23,7 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-None for the moment, please use the latest stable build...
+[1.3.2-dev](https://www.dropbox.com/s/b6r021nenifc2zj/Simulator%20Controller%201.3.2-dev.zip?dl=1) (First preview on upcoming 1.3.x)
 
 #### Latest stable builds
 

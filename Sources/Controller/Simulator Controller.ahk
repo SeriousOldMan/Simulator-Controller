@@ -604,8 +604,10 @@ class SimulatorController extends ConfigurationItem {
 			logo := this.getLogo()
 			image := "1:" . logo
 
-			x := A_ScreenWidth - 229
-			y := A_ScreenHeight - 259
+			SysGet mainScreen, MonitorWorkArea
+			
+			x := mainScreenRight - 229
+			y := mainScreenBottom - 259
 		
 			SplashImage %image%, B FS8 CWD0D0D0 w229 x%x% y%y% ZH180 ZW209, %info%, Modular Simulator`nController System
 	

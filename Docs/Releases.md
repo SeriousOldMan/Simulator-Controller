@@ -1,3 +1,9 @@
+## 1.3.x-stable, upcoming...
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. New photorealistic Button Box Visuals
+
 ## 1.2.4-stable, 12/23/20
 
   1. Bugfixes, as always

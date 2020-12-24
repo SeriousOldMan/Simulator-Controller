@@ -22,11 +22,11 @@ class SimpleButtonBox extends ButtonBox {
 		Gui SBB:Font, s10 cSilver
 		Gui SBB:Add, Text, x40 y28 w457 h23 +0x200 +0x1 BackgroundTrans, Button Box Controller
 		Gui SBB:Color, 0x000000
-		Gui SBB:Add, Picture, x40 y60 w40 h85 BackgroundTrans, % kButtonBoxImagesDirectory . "Toggle Switch.png"
-		Gui SBB:Add, Picture, x144 y60 w40 h85 BackgroundTrans, % kButtonBoxImagesDirectory . "Toggle Switch.png"
-		Gui SBB:Add, Picture, x248 y60 w40 h85 BackgroundTrans, % kButtonBoxImagesDirectory . "Toggle Switch.png"
-		Gui SBB:Add, Picture, x352 y60 w40 h85 BackgroundTrans, % kButtonBoxImagesDirectory . "Toggle Switch.png"
-		Gui SBB:Add, Picture, x456 y60 w40 h85 BackgroundTrans, % kButtonBoxImagesDirectory . "Toggle Switch.png"
+		Gui SBB:Add, Picture, x40 y60 w40 h85 BackgroundTrans, % kButtonBoxImagesDirectory . "Toggle Switch.jpg"
+		Gui SBB:Add, Picture, x144 y60 w40 h85 BackgroundTrans, % kButtonBoxImagesDirectory . "Toggle Switch.jpg"
+		Gui SBB:Add, Picture, x248 y60 w40 h85 BackgroundTrans, % kButtonBoxImagesDirectory . "Toggle Switch.jpg"
+		Gui SBB:Add, Picture, x352 y60 w40 h85 BackgroundTrans, % kButtonBoxImagesDirectory . "Toggle Switch.jpg"
+		Gui SBB:Add, Picture, x456 y60 w40 h85 BackgroundTrans, % kButtonBoxImagesDirectory . "Toggle Switch.jpg"
 		Gui SBB:Add, Picture, x40 y196 w40 h40 BackgroundTrans, % kButtonBoxImagesDirectory . "Push Button.png"
 		Gui SBB:Add, Picture, x40 y284 w40 h40 BackgroundTrans, % kButtonBoxImagesDirectory . "Push Button.png"
 		Gui SBB:Add, Picture, x144 y196 w40 h40 BackgroundTrans, % kButtonBoxImagesDirectory . "Push Button.png"

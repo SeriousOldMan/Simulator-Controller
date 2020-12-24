@@ -1,5 +1,5 @@
 [Version]
-Current=1.2.4-stable
+Current=1.2.6-dev
 Target=1.2.4-stable
-Changes=Themes for splash screens, new sound handling code
-Date=12/23/2020
+Changes=New Button Box Visuals
+Date=12/24/2020

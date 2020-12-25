@@ -160,14 +160,7 @@ class SystemPlugin extends ControllerPlugin {
 	
 	class SystemShutdownAction extends ControllerAction {
 		fireAction(function, trigger) {			
-			SoundPlay *32
-	
-			OnMessage(0x44, "translateMsgBoxButtons")
-			MsgBox 262436, Shutdown, Shutdown Simulator?
-			OnMessage(0x44, "")
-
-			IfMsgBox Yes
-				Shutdown 1
+			shutdownSystem()
 		}
 	}
 	
@@ -603,6 +596,17 @@ stopSimulation() {
 	if (simulator != false) {
 		withProtection("shutdownSimulator", simulator)
 	}
+}
+
+shutdownSystem() {
+	SoundPlay *32
+	
+	OnMessage(0x44, "translateMsgBoxButtons")
+	MsgBox 262436, Shutdown, Shutdown Simulator?
+	OnMessage(0x44, "")
+
+	IfMsgBox Yes
+		Shutdown 1
 }
 
 

@@ -3,10 +3,6 @@
   <GUID>614615cd-65b7-420c-8fc7-5f969aaf3545</GUID>
   <ProfileName>Race Car Simulator</ProfileName>
   <TargetWindow>[Active window]</TargetWindow>
-  <TargetExecutable></TargetExecutable>
-  <AutoActivateMacro></AutoActivateMacro>
-  <AutoDeactivateMacro></AutoDeactivateMacro>
-  <Inactive>false</Inactive>
   <Commands>
     <Commands>
       <GUID>764b8493-3c52-45be-a55b-186e6fff85b0</GUID>
@@ -14,52 +10,20 @@
       <ShortCut>
         <Key>A</Key>
         <OnKeyAction>0</OnKeyAction>
-        <lShift>false</lShift>
-        <rShift>false</rShift>
         <Alt>true</Alt>
-        <rCTRL>false</rCTRL>
         <lCTRL>true</lCTRL>
         <LWin>true</LWin>
-        <RWin>false</RWin>
-        <ALTGR>false</ALTGR>
-        <lButton>false</lButton>
-        <rButton>false</rButton>
-        <mButton>false</mButton>
-        <xButton1>false</xButton1>
-        <xButton2>false</xButton2>
-        <ScrollUp>false</ScrollUp>
-        <ScrollDown>false</ScrollDown>
-        <ScrollLeft>false</ScrollLeft>
-        <ScrollRight>false</ScrollRight>
         <Clicks>1</Clicks>
-        <PassThrough>false</PassThrough>
-        <IgnoreModifiers>false</IgnoreModifiers>
       </ShortCut>
-      <Schedulers>
-      </Schedulers>
-      <UseRecognition>false</UseRecognition>
       <UseShortCut>true</UseShortCut>
-      <UseScheduler>false</UseScheduler>
-      <Repeat>false</Repeat>
-      <RepeatCount>0</RepeatCount>
-      <OnlyIfTargetWinActive>false</OnlyIfTargetWinActive>
-      <ActivateTargetWin>false</ActivateTargetWin>
-      <OnlyOneThread>false</OnlyOneThread>
-      <Inactive>false</Inactive>
       <MacroActions>
         <MacroAction>
           <MacroType>1</MacroType>
           <Keyboard>
             <Key>A</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
             <Alt>true</Alt>
-            <rCTRL>false</rCTRL>
             <lCTRL>true</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -71,52 +35,15 @@
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
-        <lShift>false</lShift>
-        <rShift>false</rShift>
-        <Alt>false</Alt>
-        <rCTRL>false</rCTRL>
-        <lCTRL>false</lCTRL>
-        <LWin>false</LWin>
-        <RWin>false</RWin>
-        <ALTGR>false</ALTGR>
-        <lButton>false</lButton>
-        <rButton>false</rButton>
-        <mButton>false</mButton>
-        <xButton1>false</xButton1>
-        <xButton2>false</xButton2>
-        <ScrollUp>false</ScrollUp>
-        <ScrollDown>false</ScrollDown>
-        <ScrollLeft>false</ScrollLeft>
-        <ScrollRight>false</ScrollRight>
         <Clicks>0</Clicks>
-        <PassThrough>false</PassThrough>
-        <IgnoreModifiers>false</IgnoreModifiers>
       </ShortCut>
-      <Schedulers>
-      </Schedulers>
       <UseRecognition>true</UseRecognition>
-      <UseShortCut>false</UseShortCut>
-      <UseScheduler>false</UseScheduler>
-      <Repeat>false</Repeat>
-      <RepeatCount>0</RepeatCount>
-      <OnlyIfTargetWinActive>false</OnlyIfTargetWinActive>
-      <ActivateTargetWin>false</ActivateTargetWin>
-      <OnlyOneThread>false</OnlyOneThread>
-      <Inactive>false</Inactive>
       <MacroActions>
         <MacroAction>
           <MacroType>1</MacroType>
           <Keyboard>
             <Key>Return</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -126,13 +53,6 @@
             <Key>W</Key>
             <ClickDownUp>0</ClickDownUp>
             <lShift>true</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -142,13 +62,6 @@
             <Key>T</Key>
             <ClickDownUp>0</ClickDownUp>
             <lShift>true</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -158,13 +71,6 @@
             <Key>F</Key>
             <ClickDownUp>0</ClickDownUp>
             <lShift>true</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -174,13 +80,6 @@
             <Key>D1</Key>
             <ClickDownUp>0</ClickDownUp>
             <lShift>true</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -189,14 +88,6 @@
           <Keyboard>
             <Key>Return</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -208,52 +99,15 @@
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
-        <lShift>false</lShift>
-        <rShift>false</rShift>
-        <Alt>false</Alt>
-        <rCTRL>false</rCTRL>
-        <lCTRL>false</lCTRL>
-        <LWin>false</LWin>
-        <RWin>false</RWin>
-        <ALTGR>false</ALTGR>
-        <lButton>false</lButton>
-        <rButton>false</rButton>
-        <mButton>false</mButton>
-        <xButton1>false</xButton1>
-        <xButton2>false</xButton2>
-        <ScrollUp>false</ScrollUp>
-        <ScrollDown>false</ScrollDown>
-        <ScrollLeft>false</ScrollLeft>
-        <ScrollRight>false</ScrollRight>
         <Clicks>0</Clicks>
-        <PassThrough>false</PassThrough>
-        <IgnoreModifiers>false</IgnoreModifiers>
       </ShortCut>
-      <Schedulers>
-      </Schedulers>
       <UseRecognition>true</UseRecognition>
-      <UseShortCut>false</UseShortCut>
-      <UseScheduler>false</UseScheduler>
-      <Repeat>false</Repeat>
-      <RepeatCount>0</RepeatCount>
-      <OnlyIfTargetWinActive>false</OnlyIfTargetWinActive>
-      <ActivateTargetWin>false</ActivateTargetWin>
-      <OnlyOneThread>false</OnlyOneThread>
-      <Inactive>false</Inactive>
       <MacroActions>
         <MacroAction>
           <MacroType>1</MacroType>
           <Keyboard>
             <Key>Return</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -263,13 +117,6 @@
             <Key>R</Key>
             <ClickDownUp>0</ClickDownUp>
             <lShift>true</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -278,14 +125,6 @@
           <Keyboard>
             <Key>E</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -294,14 +133,6 @@
           <Keyboard>
             <Key>A</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -310,14 +141,6 @@
           <Keyboard>
             <Key>L</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -326,14 +149,6 @@
           <Keyboard>
             <Key>L</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -342,14 +157,6 @@
           <Keyboard>
             <Key>Y</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -359,13 +166,6 @@
             <Key>OemOpenBrackets</Key>
             <ClickDownUp>0</ClickDownUp>
             <lShift>true</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -374,14 +174,6 @@
           <Keyboard>
             <Key>Return</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -393,52 +185,15 @@
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
-        <lShift>false</lShift>
-        <rShift>false</rShift>
-        <Alt>false</Alt>
-        <rCTRL>false</rCTRL>
-        <lCTRL>false</lCTRL>
-        <LWin>false</LWin>
-        <RWin>false</RWin>
-        <ALTGR>false</ALTGR>
-        <lButton>false</lButton>
-        <rButton>false</rButton>
-        <mButton>false</mButton>
-        <xButton1>false</xButton1>
-        <xButton2>false</xButton2>
-        <ScrollUp>false</ScrollUp>
-        <ScrollDown>false</ScrollDown>
-        <ScrollLeft>false</ScrollLeft>
-        <ScrollRight>false</ScrollRight>
         <Clicks>0</Clicks>
-        <PassThrough>false</PassThrough>
-        <IgnoreModifiers>false</IgnoreModifiers>
       </ShortCut>
-      <Schedulers>
-      </Schedulers>
       <UseRecognition>true</UseRecognition>
-      <UseShortCut>false</UseShortCut>
-      <UseScheduler>false</UseScheduler>
-      <Repeat>false</Repeat>
-      <RepeatCount>0</RepeatCount>
-      <OnlyIfTargetWinActive>false</OnlyIfTargetWinActive>
-      <ActivateTargetWin>false</ActivateTargetWin>
-      <OnlyOneThread>false</OnlyOneThread>
-      <Inactive>false</Inactive>
       <MacroActions>
         <MacroAction>
           <MacroType>1</MacroType>
           <Keyboard>
             <Key>Return</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -448,13 +203,6 @@
             <Key>I</Key>
             <ClickDownUp>0</ClickDownUp>
             <lShift>true</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -463,14 +211,6 @@
           <Keyboard>
             <Key>D</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -479,14 +219,6 @@
           <Keyboard>
             <Key>I</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -495,14 +227,6 @@
           <Keyboard>
             <Key>O</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -511,14 +235,6 @@
           <Keyboard>
             <Key>T</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -527,14 +243,6 @@
           <Keyboard>
             <Key>Return</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -546,52 +254,15 @@
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
-        <lShift>false</lShift>
-        <rShift>false</rShift>
-        <Alt>false</Alt>
-        <rCTRL>false</rCTRL>
-        <lCTRL>false</lCTRL>
-        <LWin>false</LWin>
-        <RWin>false</RWin>
-        <ALTGR>false</ALTGR>
-        <lButton>false</lButton>
-        <rButton>false</rButton>
-        <mButton>false</mButton>
-        <xButton1>false</xButton1>
-        <xButton2>false</xButton2>
-        <ScrollUp>false</ScrollUp>
-        <ScrollDown>false</ScrollDown>
-        <ScrollLeft>false</ScrollLeft>
-        <ScrollRight>false</ScrollRight>
         <Clicks>0</Clicks>
-        <PassThrough>false</PassThrough>
-        <IgnoreModifiers>false</IgnoreModifiers>
       </ShortCut>
-      <Schedulers>
-      </Schedulers>
       <UseRecognition>true</UseRecognition>
-      <UseShortCut>false</UseShortCut>
-      <UseScheduler>false</UseScheduler>
-      <Repeat>false</Repeat>
-      <RepeatCount>0</RepeatCount>
-      <OnlyIfTargetWinActive>false</OnlyIfTargetWinActive>
-      <ActivateTargetWin>false</ActivateTargetWin>
-      <OnlyOneThread>false</OnlyOneThread>
-      <Inactive>false</Inactive>
       <MacroActions>
         <MacroAction>
           <MacroType>1</MacroType>
           <Keyboard>
             <Key>Return</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -601,13 +272,6 @@
             <Key>L</Key>
             <ClickDownUp>0</ClickDownUp>
             <lShift>true</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -616,14 +280,6 @@
           <Keyboard>
             <Key>E</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -632,14 +288,6 @@
           <Keyboard>
             <Key>A</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -648,14 +296,6 @@
           <Keyboard>
             <Key>R</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -664,14 +304,6 @@
           <Keyboard>
             <Key>N</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -680,14 +312,6 @@
           <Keyboard>
             <Key>Space</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -696,14 +320,6 @@
           <Keyboard>
             <Key>U</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -712,14 +328,6 @@
           <Keyboard>
             <Key>R</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -728,14 +336,6 @@
           <Keyboard>
             <Key>Space</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -744,14 +344,6 @@
           <Keyboard>
             <Key>B</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -760,14 +352,6 @@
           <Keyboard>
             <Key>R</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -776,14 +360,6 @@
           <Keyboard>
             <Key>K</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -792,14 +368,6 @@
           <Keyboard>
             <Key>Space</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -808,14 +376,6 @@
           <Keyboard>
             <Key>P</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -824,14 +384,6 @@
           <Keyboard>
             <Key>T</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -840,14 +392,6 @@
           <Keyboard>
             <Key>S</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -856,14 +400,6 @@
           <Keyboard>
             <Key>Return</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -875,52 +411,15 @@
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
-        <lShift>false</lShift>
-        <rShift>false</rShift>
-        <Alt>false</Alt>
-        <rCTRL>false</rCTRL>
-        <lCTRL>false</lCTRL>
-        <LWin>false</LWin>
-        <RWin>false</RWin>
-        <ALTGR>false</ALTGR>
-        <lButton>false</lButton>
-        <rButton>false</rButton>
-        <mButton>false</mButton>
-        <xButton1>false</xButton1>
-        <xButton2>false</xButton2>
-        <ScrollUp>false</ScrollUp>
-        <ScrollDown>false</ScrollDown>
-        <ScrollLeft>false</ScrollLeft>
-        <ScrollRight>false</ScrollRight>
         <Clicks>0</Clicks>
-        <PassThrough>false</PassThrough>
-        <IgnoreModifiers>false</IgnoreModifiers>
       </ShortCut>
-      <Schedulers>
-      </Schedulers>
       <UseRecognition>true</UseRecognition>
-      <UseShortCut>false</UseShortCut>
-      <UseScheduler>false</UseScheduler>
-      <Repeat>false</Repeat>
-      <RepeatCount>0</RepeatCount>
-      <OnlyIfTargetWinActive>false</OnlyIfTargetWinActive>
-      <ActivateTargetWin>false</ActivateTargetWin>
-      <OnlyOneThread>false</OnlyOneThread>
-      <Inactive>false</Inactive>
       <MacroActions>
         <MacroAction>
           <MacroType>1</MacroType>
           <Keyboard>
             <Key>Return</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -930,13 +429,6 @@
             <Key>S</Key>
             <ClickDownUp>0</ClickDownUp>
             <lShift>true</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -945,14 +437,6 @@
           <Keyboard>
             <Key>O</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -961,14 +445,6 @@
           <Keyboard>
             <Key>R</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -977,14 +453,6 @@
           <Keyboard>
             <Key>R</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -993,14 +461,6 @@
           <Keyboard>
             <Key>Y</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1009,14 +469,6 @@
           <Keyboard>
             <Key>Return</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1028,52 +480,15 @@
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
-        <lShift>false</lShift>
-        <rShift>false</rShift>
-        <Alt>false</Alt>
-        <rCTRL>false</rCTRL>
-        <lCTRL>false</lCTRL>
-        <LWin>false</LWin>
-        <RWin>false</RWin>
-        <ALTGR>false</ALTGR>
-        <lButton>false</lButton>
-        <rButton>false</rButton>
-        <mButton>false</mButton>
-        <xButton1>false</xButton1>
-        <xButton2>false</xButton2>
-        <ScrollUp>false</ScrollUp>
-        <ScrollDown>false</ScrollDown>
-        <ScrollLeft>false</ScrollLeft>
-        <ScrollRight>false</ScrollRight>
         <Clicks>0</Clicks>
-        <PassThrough>false</PassThrough>
-        <IgnoreModifiers>false</IgnoreModifiers>
       </ShortCut>
-      <Schedulers>
-      </Schedulers>
       <UseRecognition>true</UseRecognition>
-      <UseShortCut>false</UseShortCut>
-      <UseScheduler>false</UseScheduler>
-      <Repeat>false</Repeat>
-      <RepeatCount>0</RepeatCount>
-      <OnlyIfTargetWinActive>false</OnlyIfTargetWinActive>
-      <ActivateTargetWin>false</ActivateTargetWin>
-      <OnlyOneThread>false</OnlyOneThread>
-      <Inactive>false</Inactive>
       <MacroActions>
         <MacroAction>
           <MacroType>1</MacroType>
           <Keyboard>
             <Key>Return</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1083,13 +498,6 @@
             <Key>T</Key>
             <ClickDownUp>0</ClickDownUp>
             <lShift>true</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1098,14 +506,6 @@
           <Keyboard>
             <Key>H</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1114,14 +514,6 @@
           <Keyboard>
             <Key>X</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1130,14 +522,6 @@
           <Keyboard>
             <Key>Return</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1149,52 +533,15 @@
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
-        <lShift>false</lShift>
-        <rShift>false</rShift>
-        <Alt>false</Alt>
-        <rCTRL>false</rCTRL>
-        <lCTRL>false</lCTRL>
-        <LWin>false</LWin>
-        <RWin>false</RWin>
-        <ALTGR>false</ALTGR>
-        <lButton>false</lButton>
-        <rButton>false</rButton>
-        <mButton>false</mButton>
-        <xButton1>false</xButton1>
-        <xButton2>false</xButton2>
-        <ScrollUp>false</ScrollUp>
-        <ScrollDown>false</ScrollDown>
-        <ScrollLeft>false</ScrollLeft>
-        <ScrollRight>false</ScrollRight>
         <Clicks>0</Clicks>
-        <PassThrough>false</PassThrough>
-        <IgnoreModifiers>false</IgnoreModifiers>
       </ShortCut>
-      <Schedulers>
-      </Schedulers>
       <UseRecognition>true</UseRecognition>
-      <UseShortCut>false</UseShortCut>
-      <UseScheduler>false</UseScheduler>
-      <Repeat>false</Repeat>
-      <RepeatCount>0</RepeatCount>
-      <OnlyIfTargetWinActive>false</OnlyIfTargetWinActive>
-      <ActivateTargetWin>false</ActivateTargetWin>
-      <OnlyOneThread>false</OnlyOneThread>
-      <Inactive>false</Inactive>
       <MacroActions>
         <MacroAction>
           <MacroType>1</MacroType>
           <Keyboard>
             <Key>Return</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1204,13 +551,6 @@
             <Key>G</Key>
             <ClickDownUp>0</ClickDownUp>
             <lShift>true</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1219,14 +559,6 @@
           <Keyboard>
             <Key>R</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1235,14 +567,6 @@
           <Keyboard>
             <Key>E</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1251,14 +575,6 @@
           <Keyboard>
             <Key>A</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1267,14 +583,6 @@
           <Keyboard>
             <Key>T</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1283,14 +591,6 @@
           <Keyboard>
             <Key>Space</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1299,14 +599,6 @@
           <Keyboard>
             <Key>J</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1315,14 +607,6 @@
           <Keyboard>
             <Key>O</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1331,14 +615,6 @@
           <Keyboard>
             <Key>B</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1347,14 +623,6 @@
           <Keyboard>
             <Key>Return</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1366,52 +634,15 @@
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
-        <lShift>false</lShift>
-        <rShift>false</rShift>
-        <Alt>false</Alt>
-        <rCTRL>false</rCTRL>
-        <lCTRL>false</lCTRL>
-        <LWin>false</LWin>
-        <RWin>false</RWin>
-        <ALTGR>false</ALTGR>
-        <lButton>false</lButton>
-        <rButton>false</rButton>
-        <mButton>false</mButton>
-        <xButton1>false</xButton1>
-        <xButton2>false</xButton2>
-        <ScrollUp>false</ScrollUp>
-        <ScrollDown>false</ScrollDown>
-        <ScrollLeft>false</ScrollLeft>
-        <ScrollRight>false</ScrollRight>
         <Clicks>0</Clicks>
-        <PassThrough>false</PassThrough>
-        <IgnoreModifiers>false</IgnoreModifiers>
       </ShortCut>
-      <Schedulers>
-      </Schedulers>
       <UseRecognition>true</UseRecognition>
-      <UseShortCut>false</UseShortCut>
-      <UseScheduler>false</UseScheduler>
-      <Repeat>false</Repeat>
-      <RepeatCount>0</RepeatCount>
-      <OnlyIfTargetWinActive>false</OnlyIfTargetWinActive>
-      <ActivateTargetWin>false</ActivateTargetWin>
-      <OnlyOneThread>false</OnlyOneThread>
-      <Inactive>false</Inactive>
       <MacroActions>
         <MacroAction>
           <MacroType>1</MacroType>
           <Keyboard>
             <Key>Return</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1421,13 +652,6 @@
             <Key>G</Key>
             <ClickDownUp>0</ClickDownUp>
             <lShift>true</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1436,14 +660,6 @@
           <Keyboard>
             <Key>O</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1452,14 +668,6 @@
           <Keyboard>
             <Key>O</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1468,14 +676,6 @@
           <Keyboard>
             <Key>D</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1484,14 +684,6 @@
           <Keyboard>
             <Key>Space</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1500,14 +692,6 @@
           <Keyboard>
             <Key>F</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1516,14 +700,6 @@
           <Keyboard>
             <Key>I</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1532,14 +708,6 @@
           <Keyboard>
             <Key>G</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1548,14 +716,6 @@
           <Keyboard>
             <Key>H</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1564,14 +724,6 @@
           <Keyboard>
             <Key>T</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1580,14 +732,6 @@
           <Keyboard>
             <Key>Return</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1599,52 +743,15 @@
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
-        <lShift>false</lShift>
-        <rShift>false</rShift>
-        <Alt>false</Alt>
-        <rCTRL>false</rCTRL>
-        <lCTRL>false</lCTRL>
-        <LWin>false</LWin>
-        <RWin>false</RWin>
-        <ALTGR>false</ALTGR>
-        <lButton>false</lButton>
-        <rButton>false</rButton>
-        <mButton>false</mButton>
-        <xButton1>false</xButton1>
-        <xButton2>false</xButton2>
-        <ScrollUp>false</ScrollUp>
-        <ScrollDown>false</ScrollDown>
-        <ScrollLeft>false</ScrollLeft>
-        <ScrollRight>false</ScrollRight>
         <Clicks>0</Clicks>
-        <PassThrough>false</PassThrough>
-        <IgnoreModifiers>false</IgnoreModifiers>
       </ShortCut>
-      <Schedulers>
-      </Schedulers>
       <UseRecognition>true</UseRecognition>
-      <UseShortCut>false</UseShortCut>
-      <UseScheduler>false</UseScheduler>
-      <Repeat>false</Repeat>
-      <RepeatCount>0</RepeatCount>
-      <OnlyIfTargetWinActive>false</OnlyIfTargetWinActive>
-      <ActivateTargetWin>false</ActivateTargetWin>
-      <OnlyOneThread>false</OnlyOneThread>
-      <Inactive>false</Inactive>
       <MacroActions>
         <MacroAction>
           <MacroType>1</MacroType>
           <Keyboard>
             <Key>Return</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1654,13 +761,6 @@
             <Key>W</Key>
             <ClickDownUp>0</ClickDownUp>
             <lShift>true</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1669,14 +769,6 @@
           <Keyboard>
             <Key>H</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1685,14 +777,6 @@
           <Keyboard>
             <Key>A</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1701,14 +785,6 @@
           <Keyboard>
             <Key>T</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1717,14 +793,6 @@
           <Keyboard>
             <Key>Space</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1733,14 +801,6 @@
           <Keyboard>
             <Key>A</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1749,14 +809,6 @@
           <Keyboard>
             <Key>Space</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1765,14 +817,6 @@
           <Keyboard>
             <Key>R</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1781,14 +825,6 @@
           <Keyboard>
             <Key>A</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1797,14 +833,6 @@
           <Keyboard>
             <Key>C</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1813,14 +841,6 @@
           <Keyboard>
             <Key>E</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1829,14 +849,6 @@
           <Keyboard>
             <Key>Return</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1848,52 +860,15 @@
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
-        <lShift>false</lShift>
-        <rShift>false</rShift>
-        <Alt>false</Alt>
-        <rCTRL>false</rCTRL>
-        <lCTRL>false</lCTRL>
-        <LWin>false</LWin>
-        <RWin>false</RWin>
-        <ALTGR>false</ALTGR>
-        <lButton>false</lButton>
-        <rButton>false</rButton>
-        <mButton>false</mButton>
-        <xButton1>false</xButton1>
-        <xButton2>false</xButton2>
-        <ScrollUp>false</ScrollUp>
-        <ScrollDown>false</ScrollDown>
-        <ScrollLeft>false</ScrollLeft>
-        <ScrollRight>false</ScrollRight>
         <Clicks>0</Clicks>
-        <PassThrough>false</PassThrough>
-        <IgnoreModifiers>false</IgnoreModifiers>
       </ShortCut>
-      <Schedulers>
-      </Schedulers>
       <UseRecognition>true</UseRecognition>
-      <UseShortCut>false</UseShortCut>
-      <UseScheduler>false</UseScheduler>
-      <Repeat>false</Repeat>
-      <RepeatCount>0</RepeatCount>
-      <OnlyIfTargetWinActive>false</OnlyIfTargetWinActive>
-      <ActivateTargetWin>false</ActivateTargetWin>
-      <OnlyOneThread>false</OnlyOneThread>
-      <Inactive>false</Inactive>
       <MacroActions>
         <MacroAction>
           <MacroType>1</MacroType>
           <Keyboard>
             <Key>Return</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1903,13 +878,6 @@
             <Key>C</Key>
             <ClickDownUp>0</ClickDownUp>
             <lShift>true</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1918,14 +886,6 @@
           <Keyboard>
             <Key>L</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1934,14 +894,6 @@
           <Keyboard>
             <Key>E</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1950,14 +902,6 @@
           <Keyboard>
             <Key>A</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1966,14 +910,6 @@
           <Keyboard>
             <Key>N</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1982,14 +918,6 @@
           <Keyboard>
             <Key>Space</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1998,14 +926,6 @@
           <Keyboard>
             <Key>R</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -2014,14 +934,6 @@
           <Keyboard>
             <Key>A</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -2030,14 +942,6 @@
           <Keyboard>
             <Key>C</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -2046,14 +950,6 @@
           <Keyboard>
             <Key>E</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -2062,14 +958,6 @@
           <Keyboard>
             <Key>Oemcomma</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -2078,14 +966,6 @@
           <Keyboard>
             <Key>Space</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -2094,14 +974,6 @@
           <Keyboard>
             <Key>P</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -2110,14 +982,6 @@
           <Keyboard>
             <Key>L</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -2126,14 +990,6 @@
           <Keyboard>
             <Key>S</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -2142,14 +998,6 @@
           <Keyboard>
             <Key>Return</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -2161,52 +1009,15 @@
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
-        <lShift>false</lShift>
-        <rShift>false</rShift>
-        <Alt>false</Alt>
-        <rCTRL>false</rCTRL>
-        <lCTRL>false</lCTRL>
-        <LWin>false</LWin>
-        <RWin>false</RWin>
-        <ALTGR>false</ALTGR>
-        <lButton>false</lButton>
-        <rButton>false</rButton>
-        <mButton>false</mButton>
-        <xButton1>false</xButton1>
-        <xButton2>false</xButton2>
-        <ScrollUp>false</ScrollUp>
-        <ScrollDown>false</ScrollDown>
-        <ScrollLeft>false</ScrollLeft>
-        <ScrollRight>false</ScrollRight>
         <Clicks>0</Clicks>
-        <PassThrough>false</PassThrough>
-        <IgnoreModifiers>false</IgnoreModifiers>
       </ShortCut>
-      <Schedulers>
-      </Schedulers>
       <UseRecognition>true</UseRecognition>
-      <UseShortCut>false</UseShortCut>
-      <UseScheduler>false</UseScheduler>
-      <Repeat>false</Repeat>
-      <RepeatCount>0</RepeatCount>
-      <OnlyIfTargetWinActive>false</OnlyIfTargetWinActive>
-      <ActivateTargetWin>false</ActivateTargetWin>
-      <OnlyOneThread>false</OnlyOneThread>
-      <Inactive>false</Inactive>
       <MacroActions>
         <MacroAction>
           <MacroType>1</MacroType>
           <Keyboard>
             <Key>Return</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -2216,13 +1027,6 @@
             <Key>H</Key>
             <ClickDownUp>0</ClickDownUp>
             <lShift>true</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -2231,14 +1035,6 @@
           <Keyboard>
             <Key>A</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -2247,14 +1043,6 @@
           <Keyboard>
             <Key>V</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -2263,14 +1051,6 @@
           <Keyboard>
             <Key>E</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -2279,14 +1059,6 @@
           <Keyboard>
             <Key>Space</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -2295,14 +1067,6 @@
           <Keyboard>
             <Key>F</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -2311,14 +1075,6 @@
           <Keyboard>
             <Key>U</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -2327,14 +1083,6 @@
           <Keyboard>
             <Key>N</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -2343,14 +1091,6 @@
           <Keyboard>
             <Key>Return</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
-            <Alt>false</Alt>
-            <rCTRL>false</rCTRL>
-            <lCTRL>false</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -2362,52 +1102,17 @@
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
-        <lShift>false</lShift>
-        <rShift>false</rShift>
-        <Alt>false</Alt>
-        <rCTRL>false</rCTRL>
-        <lCTRL>false</lCTRL>
-        <LWin>false</LWin>
-        <RWin>false</RWin>
-        <ALTGR>false</ALTGR>
-        <lButton>false</lButton>
-        <rButton>false</rButton>
-        <mButton>false</mButton>
-        <xButton1>false</xButton1>
-        <xButton2>false</xButton2>
-        <ScrollUp>false</ScrollUp>
-        <ScrollDown>false</ScrollDown>
-        <ScrollLeft>false</ScrollLeft>
-        <ScrollRight>false</ScrollRight>
         <Clicks>0</Clicks>
-        <PassThrough>false</PassThrough>
-        <IgnoreModifiers>false</IgnoreModifiers>
       </ShortCut>
-      <Schedulers>
-      </Schedulers>
       <UseRecognition>true</UseRecognition>
-      <UseShortCut>false</UseShortCut>
-      <UseScheduler>false</UseScheduler>
-      <Repeat>false</Repeat>
-      <RepeatCount>0</RepeatCount>
-      <OnlyIfTargetWinActive>false</OnlyIfTargetWinActive>
-      <ActivateTargetWin>false</ActivateTargetWin>
-      <OnlyOneThread>false</OnlyOneThread>
-      <Inactive>false</Inactive>
       <MacroActions>
         <MacroAction>
           <MacroType>1</MacroType>
           <Keyboard>
             <Key>B</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
             <Alt>true</Alt>
-            <rCTRL>false</rCTRL>
             <lCTRL>true</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -2419,38 +1124,9 @@
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
-        <lShift>false</lShift>
-        <rShift>false</rShift>
-        <Alt>false</Alt>
-        <rCTRL>false</rCTRL>
-        <lCTRL>false</lCTRL>
-        <LWin>false</LWin>
-        <RWin>false</RWin>
-        <ALTGR>false</ALTGR>
-        <lButton>false</lButton>
-        <rButton>false</rButton>
-        <mButton>false</mButton>
-        <xButton1>false</xButton1>
-        <xButton2>false</xButton2>
-        <ScrollUp>false</ScrollUp>
-        <ScrollDown>false</ScrollDown>
-        <ScrollLeft>false</ScrollLeft>
-        <ScrollRight>false</ScrollRight>
         <Clicks>0</Clicks>
-        <PassThrough>false</PassThrough>
-        <IgnoreModifiers>false</IgnoreModifiers>
       </ShortCut>
-      <Schedulers>
-      </Schedulers>
       <UseRecognition>true</UseRecognition>
-      <UseShortCut>false</UseShortCut>
-      <UseScheduler>false</UseScheduler>
-      <Repeat>false</Repeat>
-      <RepeatCount>0</RepeatCount>
-      <OnlyIfTargetWinActive>false</OnlyIfTargetWinActive>
-      <ActivateTargetWin>false</ActivateTargetWin>
-      <OnlyOneThread>false</OnlyOneThread>
-      <Inactive>false</Inactive>
       <MacroActions>
         <MacroAction>
           <MacroType>1</MacroType>
@@ -2458,13 +1134,8 @@
             <Key>B</Key>
             <ClickDownUp>0</ClickDownUp>
             <lShift>true</lShift>
-            <rShift>false</rShift>
             <Alt>true</Alt>
-            <rCTRL>false</rCTRL>
             <lCTRL>true</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -2476,52 +1147,17 @@
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
-        <lShift>false</lShift>
-        <rShift>false</rShift>
-        <Alt>false</Alt>
-        <rCTRL>false</rCTRL>
-        <lCTRL>false</lCTRL>
-        <LWin>false</LWin>
-        <RWin>false</RWin>
-        <ALTGR>false</ALTGR>
-        <lButton>false</lButton>
-        <rButton>false</rButton>
-        <mButton>false</mButton>
-        <xButton1>false</xButton1>
-        <xButton2>false</xButton2>
-        <ScrollUp>false</ScrollUp>
-        <ScrollDown>false</ScrollDown>
-        <ScrollLeft>false</ScrollLeft>
-        <ScrollRight>false</ScrollRight>
         <Clicks>0</Clicks>
-        <PassThrough>false</PassThrough>
-        <IgnoreModifiers>false</IgnoreModifiers>
       </ShortCut>
-      <Schedulers>
-      </Schedulers>
       <UseRecognition>true</UseRecognition>
-      <UseShortCut>false</UseShortCut>
-      <UseScheduler>false</UseScheduler>
-      <Repeat>false</Repeat>
-      <RepeatCount>0</RepeatCount>
-      <OnlyIfTargetWinActive>false</OnlyIfTargetWinActive>
-      <ActivateTargetWin>false</ActivateTargetWin>
-      <OnlyOneThread>false</OnlyOneThread>
-      <Inactive>false</Inactive>
       <MacroActions>
         <MacroAction>
           <MacroType>1</MacroType>
           <Keyboard>
             <Key>F1</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
             <Alt>true</Alt>
-            <rCTRL>false</rCTRL>
             <lCTRL>true</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -2533,52 +1169,17 @@
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
-        <lShift>false</lShift>
-        <rShift>false</rShift>
-        <Alt>false</Alt>
-        <rCTRL>false</rCTRL>
-        <lCTRL>false</lCTRL>
-        <LWin>false</LWin>
-        <RWin>false</RWin>
-        <ALTGR>false</ALTGR>
-        <lButton>false</lButton>
-        <rButton>false</rButton>
-        <mButton>false</mButton>
-        <xButton1>false</xButton1>
-        <xButton2>false</xButton2>
-        <ScrollUp>false</ScrollUp>
-        <ScrollDown>false</ScrollDown>
-        <ScrollLeft>false</ScrollLeft>
-        <ScrollRight>false</ScrollRight>
         <Clicks>0</Clicks>
-        <PassThrough>false</PassThrough>
-        <IgnoreModifiers>false</IgnoreModifiers>
       </ShortCut>
-      <Schedulers>
-      </Schedulers>
       <UseRecognition>true</UseRecognition>
-      <UseShortCut>false</UseShortCut>
-      <UseScheduler>false</UseScheduler>
-      <Repeat>false</Repeat>
-      <RepeatCount>0</RepeatCount>
-      <OnlyIfTargetWinActive>false</OnlyIfTargetWinActive>
-      <ActivateTargetWin>false</ActivateTargetWin>
-      <OnlyOneThread>false</OnlyOneThread>
-      <Inactive>false</Inactive>
       <MacroActions>
         <MacroAction>
           <MacroType>1</MacroType>
           <Keyboard>
             <Key>F2</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
             <Alt>true</Alt>
-            <rCTRL>false</rCTRL>
             <lCTRL>true</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -2590,52 +1191,17 @@
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
-        <lShift>false</lShift>
-        <rShift>false</rShift>
-        <Alt>false</Alt>
-        <rCTRL>false</rCTRL>
-        <lCTRL>false</lCTRL>
-        <LWin>false</LWin>
-        <RWin>false</RWin>
-        <ALTGR>false</ALTGR>
-        <lButton>false</lButton>
-        <rButton>false</rButton>
-        <mButton>false</mButton>
-        <xButton1>false</xButton1>
-        <xButton2>false</xButton2>
-        <ScrollUp>false</ScrollUp>
-        <ScrollDown>false</ScrollDown>
-        <ScrollLeft>false</ScrollLeft>
-        <ScrollRight>false</ScrollRight>
         <Clicks>0</Clicks>
-        <PassThrough>false</PassThrough>
-        <IgnoreModifiers>false</IgnoreModifiers>
       </ShortCut>
-      <Schedulers>
-      </Schedulers>
       <UseRecognition>true</UseRecognition>
-      <UseShortCut>false</UseShortCut>
-      <UseScheduler>false</UseScheduler>
-      <Repeat>false</Repeat>
-      <RepeatCount>0</RepeatCount>
-      <OnlyIfTargetWinActive>false</OnlyIfTargetWinActive>
-      <ActivateTargetWin>false</ActivateTargetWin>
-      <OnlyOneThread>false</OnlyOneThread>
-      <Inactive>false</Inactive>
       <MacroActions>
         <MacroAction>
           <MacroType>1</MacroType>
           <Keyboard>
             <Key>F2</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
             <Alt>true</Alt>
-            <rCTRL>false</rCTRL>
             <lCTRL>true</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -2647,52 +1213,17 @@
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
-        <lShift>false</lShift>
-        <rShift>false</rShift>
-        <Alt>false</Alt>
-        <rCTRL>false</rCTRL>
-        <lCTRL>false</lCTRL>
-        <LWin>false</LWin>
-        <RWin>false</RWin>
-        <ALTGR>false</ALTGR>
-        <lButton>false</lButton>
-        <rButton>false</rButton>
-        <mButton>false</mButton>
-        <xButton1>false</xButton1>
-        <xButton2>false</xButton2>
-        <ScrollUp>false</ScrollUp>
-        <ScrollDown>false</ScrollDown>
-        <ScrollLeft>false</ScrollLeft>
-        <ScrollRight>false</ScrollRight>
         <Clicks>0</Clicks>
-        <PassThrough>false</PassThrough>
-        <IgnoreModifiers>false</IgnoreModifiers>
       </ShortCut>
-      <Schedulers>
-      </Schedulers>
       <UseRecognition>true</UseRecognition>
-      <UseShortCut>false</UseShortCut>
-      <UseScheduler>false</UseScheduler>
-      <Repeat>false</Repeat>
-      <RepeatCount>0</RepeatCount>
-      <OnlyIfTargetWinActive>false</OnlyIfTargetWinActive>
-      <ActivateTargetWin>false</ActivateTargetWin>
-      <OnlyOneThread>false</OnlyOneThread>
-      <Inactive>false</Inactive>
       <MacroActions>
         <MacroAction>
           <MacroType>1</MacroType>
           <Keyboard>
             <Key>F3</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
             <Alt>true</Alt>
-            <rCTRL>false</rCTRL>
             <lCTRL>true</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -2704,52 +1235,17 @@
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
-        <lShift>false</lShift>
-        <rShift>false</rShift>
-        <Alt>false</Alt>
-        <rCTRL>false</rCTRL>
-        <lCTRL>false</lCTRL>
-        <LWin>false</LWin>
-        <RWin>false</RWin>
-        <ALTGR>false</ALTGR>
-        <lButton>false</lButton>
-        <rButton>false</rButton>
-        <mButton>false</mButton>
-        <xButton1>false</xButton1>
-        <xButton2>false</xButton2>
-        <ScrollUp>false</ScrollUp>
-        <ScrollDown>false</ScrollDown>
-        <ScrollLeft>false</ScrollLeft>
-        <ScrollRight>false</ScrollRight>
         <Clicks>0</Clicks>
-        <PassThrough>false</PassThrough>
-        <IgnoreModifiers>false</IgnoreModifiers>
       </ShortCut>
-      <Schedulers>
-      </Schedulers>
       <UseRecognition>true</UseRecognition>
-      <UseShortCut>false</UseShortCut>
-      <UseScheduler>false</UseScheduler>
-      <Repeat>false</Repeat>
-      <RepeatCount>0</RepeatCount>
-      <OnlyIfTargetWinActive>false</OnlyIfTargetWinActive>
-      <ActivateTargetWin>false</ActivateTargetWin>
-      <OnlyOneThread>false</OnlyOneThread>
-      <Inactive>false</Inactive>
       <MacroActions>
         <MacroAction>
           <MacroType>1</MacroType>
           <Keyboard>
             <Key>F4</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
             <Alt>true</Alt>
-            <rCTRL>false</rCTRL>
             <lCTRL>true</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -2761,52 +1257,17 @@
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
-        <lShift>false</lShift>
-        <rShift>false</rShift>
-        <Alt>false</Alt>
-        <rCTRL>false</rCTRL>
-        <lCTRL>false</lCTRL>
-        <LWin>false</LWin>
-        <RWin>false</RWin>
-        <ALTGR>false</ALTGR>
-        <lButton>false</lButton>
-        <rButton>false</rButton>
-        <mButton>false</mButton>
-        <xButton1>false</xButton1>
-        <xButton2>false</xButton2>
-        <ScrollUp>false</ScrollUp>
-        <ScrollDown>false</ScrollDown>
-        <ScrollLeft>false</ScrollLeft>
-        <ScrollRight>false</ScrollRight>
         <Clicks>0</Clicks>
-        <PassThrough>false</PassThrough>
-        <IgnoreModifiers>false</IgnoreModifiers>
       </ShortCut>
-      <Schedulers>
-      </Schedulers>
       <UseRecognition>true</UseRecognition>
-      <UseShortCut>false</UseShortCut>
-      <UseScheduler>false</UseScheduler>
-      <Repeat>false</Repeat>
-      <RepeatCount>0</RepeatCount>
-      <OnlyIfTargetWinActive>false</OnlyIfTargetWinActive>
-      <ActivateTargetWin>false</ActivateTargetWin>
-      <OnlyOneThread>false</OnlyOneThread>
-      <Inactive>false</Inactive>
       <MacroActions>
         <MacroAction>
           <MacroType>1</MacroType>
           <Keyboard>
             <Key>F5</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
             <Alt>true</Alt>
-            <rCTRL>false</rCTRL>
             <lCTRL>true</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -2818,52 +1279,17 @@
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
-        <lShift>false</lShift>
-        <rShift>false</rShift>
-        <Alt>false</Alt>
-        <rCTRL>false</rCTRL>
-        <lCTRL>false</lCTRL>
-        <LWin>false</LWin>
-        <RWin>false</RWin>
-        <ALTGR>false</ALTGR>
-        <lButton>false</lButton>
-        <rButton>false</rButton>
-        <mButton>false</mButton>
-        <xButton1>false</xButton1>
-        <xButton2>false</xButton2>
-        <ScrollUp>false</ScrollUp>
-        <ScrollDown>false</ScrollDown>
-        <ScrollLeft>false</ScrollLeft>
-        <ScrollRight>false</ScrollRight>
         <Clicks>0</Clicks>
-        <PassThrough>false</PassThrough>
-        <IgnoreModifiers>false</IgnoreModifiers>
       </ShortCut>
-      <Schedulers>
-      </Schedulers>
       <UseRecognition>true</UseRecognition>
-      <UseShortCut>false</UseShortCut>
-      <UseScheduler>false</UseScheduler>
-      <Repeat>false</Repeat>
-      <RepeatCount>0</RepeatCount>
-      <OnlyIfTargetWinActive>false</OnlyIfTargetWinActive>
-      <ActivateTargetWin>false</ActivateTargetWin>
-      <OnlyOneThread>false</OnlyOneThread>
-      <Inactive>false</Inactive>
       <MacroActions>
         <MacroAction>
           <MacroType>1</MacroType>
           <Keyboard>
             <Key>S</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
             <Alt>true</Alt>
-            <rCTRL>false</rCTRL>
             <lCTRL>true</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -2875,38 +1301,9 @@
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
-        <lShift>false</lShift>
-        <rShift>false</rShift>
-        <Alt>false</Alt>
-        <rCTRL>false</rCTRL>
-        <lCTRL>false</lCTRL>
-        <LWin>false</LWin>
-        <RWin>false</RWin>
-        <ALTGR>false</ALTGR>
-        <lButton>false</lButton>
-        <rButton>false</rButton>
-        <mButton>false</mButton>
-        <xButton1>false</xButton1>
-        <xButton2>false</xButton2>
-        <ScrollUp>false</ScrollUp>
-        <ScrollDown>false</ScrollDown>
-        <ScrollLeft>false</ScrollLeft>
-        <ScrollRight>false</ScrollRight>
         <Clicks>0</Clicks>
-        <PassThrough>false</PassThrough>
-        <IgnoreModifiers>false</IgnoreModifiers>
       </ShortCut>
-      <Schedulers>
-      </Schedulers>
       <UseRecognition>true</UseRecognition>
-      <UseShortCut>false</UseShortCut>
-      <UseScheduler>false</UseScheduler>
-      <Repeat>false</Repeat>
-      <RepeatCount>0</RepeatCount>
-      <OnlyIfTargetWinActive>false</OnlyIfTargetWinActive>
-      <ActivateTargetWin>false</ActivateTargetWin>
-      <OnlyOneThread>false</OnlyOneThread>
-      <Inactive>false</Inactive>
       <MacroActions>
         <MacroAction>
           <MacroType>1</MacroType>
@@ -2914,13 +1311,8 @@
             <Key>S</Key>
             <ClickDownUp>0</ClickDownUp>
             <lShift>true</lShift>
-            <rShift>false</rShift>
             <Alt>true</Alt>
-            <rCTRL>false</rCTRL>
             <lCTRL>true</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -2932,52 +1324,17 @@
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
-        <lShift>false</lShift>
-        <rShift>false</rShift>
-        <Alt>false</Alt>
-        <rCTRL>false</rCTRL>
-        <lCTRL>false</lCTRL>
-        <LWin>false</LWin>
-        <RWin>false</RWin>
-        <ALTGR>false</ALTGR>
-        <lButton>false</lButton>
-        <rButton>false</rButton>
-        <mButton>false</mButton>
-        <xButton1>false</xButton1>
-        <xButton2>false</xButton2>
-        <ScrollUp>false</ScrollUp>
-        <ScrollDown>false</ScrollDown>
-        <ScrollLeft>false</ScrollLeft>
-        <ScrollRight>false</ScrollRight>
         <Clicks>0</Clicks>
-        <PassThrough>false</PassThrough>
-        <IgnoreModifiers>false</IgnoreModifiers>
       </ShortCut>
-      <Schedulers>
-      </Schedulers>
       <UseRecognition>true</UseRecognition>
-      <UseShortCut>false</UseShortCut>
-      <UseScheduler>false</UseScheduler>
-      <Repeat>false</Repeat>
-      <RepeatCount>0</RepeatCount>
-      <OnlyIfTargetWinActive>false</OnlyIfTargetWinActive>
-      <ActivateTargetWin>false</ActivateTargetWin>
-      <OnlyOneThread>false</OnlyOneThread>
-      <Inactive>false</Inactive>
       <MacroActions>
         <MacroAction>
           <MacroType>1</MacroType>
           <Keyboard>
             <Key>M</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
             <Alt>true</Alt>
-            <rCTRL>false</rCTRL>
             <lCTRL>true</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -2989,38 +1346,9 @@
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
-        <lShift>false</lShift>
-        <rShift>false</rShift>
-        <Alt>false</Alt>
-        <rCTRL>false</rCTRL>
-        <lCTRL>false</lCTRL>
-        <LWin>false</LWin>
-        <RWin>false</RWin>
-        <ALTGR>false</ALTGR>
-        <lButton>false</lButton>
-        <rButton>false</rButton>
-        <mButton>false</mButton>
-        <xButton1>false</xButton1>
-        <xButton2>false</xButton2>
-        <ScrollUp>false</ScrollUp>
-        <ScrollDown>false</ScrollDown>
-        <ScrollLeft>false</ScrollLeft>
-        <ScrollRight>false</ScrollRight>
         <Clicks>0</Clicks>
-        <PassThrough>false</PassThrough>
-        <IgnoreModifiers>false</IgnoreModifiers>
       </ShortCut>
-      <Schedulers>
-      </Schedulers>
       <UseRecognition>true</UseRecognition>
-      <UseShortCut>false</UseShortCut>
-      <UseScheduler>false</UseScheduler>
-      <Repeat>false</Repeat>
-      <RepeatCount>0</RepeatCount>
-      <OnlyIfTargetWinActive>false</OnlyIfTargetWinActive>
-      <ActivateTargetWin>false</ActivateTargetWin>
-      <OnlyOneThread>false</OnlyOneThread>
-      <Inactive>false</Inactive>
       <MacroActions>
         <MacroAction>
           <MacroType>1</MacroType>
@@ -3028,13 +1356,8 @@
             <Key>M</Key>
             <ClickDownUp>0</ClickDownUp>
             <lShift>true</lShift>
-            <rShift>false</rShift>
             <Alt>true</Alt>
-            <rCTRL>false</rCTRL>
             <lCTRL>true</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -3046,52 +1369,17 @@
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
-        <lShift>false</lShift>
-        <rShift>false</rShift>
-        <Alt>false</Alt>
-        <rCTRL>false</rCTRL>
-        <lCTRL>false</lCTRL>
-        <LWin>false</LWin>
-        <RWin>false</RWin>
-        <ALTGR>false</ALTGR>
-        <lButton>false</lButton>
-        <rButton>false</rButton>
-        <mButton>false</mButton>
-        <xButton1>false</xButton1>
-        <xButton2>false</xButton2>
-        <ScrollUp>false</ScrollUp>
-        <ScrollDown>false</ScrollDown>
-        <ScrollLeft>false</ScrollLeft>
-        <ScrollRight>false</ScrollRight>
         <Clicks>0</Clicks>
-        <PassThrough>false</PassThrough>
-        <IgnoreModifiers>false</IgnoreModifiers>
       </ShortCut>
-      <Schedulers>
-      </Schedulers>
       <UseRecognition>true</UseRecognition>
-      <UseShortCut>false</UseShortCut>
-      <UseScheduler>false</UseScheduler>
-      <Repeat>false</Repeat>
-      <RepeatCount>0</RepeatCount>
-      <OnlyIfTargetWinActive>false</OnlyIfTargetWinActive>
-      <ActivateTargetWin>false</ActivateTargetWin>
-      <OnlyOneThread>false</OnlyOneThread>
-      <Inactive>false</Inactive>
       <MacroActions>
         <MacroAction>
           <MacroType>1</MacroType>
           <Keyboard>
             <Key>P</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
             <Alt>true</Alt>
-            <rCTRL>false</rCTRL>
             <lCTRL>true</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -3103,38 +1391,9 @@
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
-        <lShift>false</lShift>
-        <rShift>false</rShift>
-        <Alt>false</Alt>
-        <rCTRL>false</rCTRL>
-        <lCTRL>false</lCTRL>
-        <LWin>false</LWin>
-        <RWin>false</RWin>
-        <ALTGR>false</ALTGR>
-        <lButton>false</lButton>
-        <rButton>false</rButton>
-        <mButton>false</mButton>
-        <xButton1>false</xButton1>
-        <xButton2>false</xButton2>
-        <ScrollUp>false</ScrollUp>
-        <ScrollDown>false</ScrollDown>
-        <ScrollLeft>false</ScrollLeft>
-        <ScrollRight>false</ScrollRight>
         <Clicks>0</Clicks>
-        <PassThrough>false</PassThrough>
-        <IgnoreModifiers>false</IgnoreModifiers>
       </ShortCut>
-      <Schedulers>
-      </Schedulers>
       <UseRecognition>true</UseRecognition>
-      <UseShortCut>false</UseShortCut>
-      <UseScheduler>false</UseScheduler>
-      <Repeat>false</Repeat>
-      <RepeatCount>0</RepeatCount>
-      <OnlyIfTargetWinActive>false</OnlyIfTargetWinActive>
-      <ActivateTargetWin>false</ActivateTargetWin>
-      <OnlyOneThread>false</OnlyOneThread>
-      <Inactive>false</Inactive>
       <MacroActions>
         <MacroAction>
           <MacroType>1</MacroType>
@@ -3142,13 +1401,8 @@
             <Key>P</Key>
             <ClickDownUp>0</ClickDownUp>
             <lShift>true</lShift>
-            <rShift>false</rShift>
             <Alt>true</Alt>
-            <rCTRL>false</rCTRL>
             <lCTRL>true</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -3160,52 +1414,17 @@
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
-        <lShift>false</lShift>
-        <rShift>false</rShift>
-        <Alt>false</Alt>
-        <rCTRL>false</rCTRL>
-        <lCTRL>false</lCTRL>
-        <LWin>false</LWin>
-        <RWin>false</RWin>
-        <ALTGR>false</ALTGR>
-        <lButton>false</lButton>
-        <rButton>false</rButton>
-        <mButton>false</mButton>
-        <xButton1>false</xButton1>
-        <xButton2>false</xButton2>
-        <ScrollUp>false</ScrollUp>
-        <ScrollDown>false</ScrollDown>
-        <ScrollLeft>false</ScrollLeft>
-        <ScrollRight>false</ScrollRight>
         <Clicks>0</Clicks>
-        <PassThrough>false</PassThrough>
-        <IgnoreModifiers>false</IgnoreModifiers>
       </ShortCut>
-      <Schedulers>
-      </Schedulers>
       <UseRecognition>true</UseRecognition>
-      <UseShortCut>false</UseShortCut>
-      <UseScheduler>false</UseScheduler>
-      <Repeat>false</Repeat>
-      <RepeatCount>0</RepeatCount>
-      <OnlyIfTargetWinActive>false</OnlyIfTargetWinActive>
-      <ActivateTargetWin>false</ActivateTargetWin>
-      <OnlyOneThread>false</OnlyOneThread>
-      <Inactive>false</Inactive>
       <MacroActions>
         <MacroAction>
           <MacroType>1</MacroType>
           <Keyboard>
             <Key>F</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
             <Alt>true</Alt>
-            <rCTRL>false</rCTRL>
             <lCTRL>true</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -3217,38 +1436,9 @@
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
-        <lShift>false</lShift>
-        <rShift>false</rShift>
-        <Alt>false</Alt>
-        <rCTRL>false</rCTRL>
-        <lCTRL>false</lCTRL>
-        <LWin>false</LWin>
-        <RWin>false</RWin>
-        <ALTGR>false</ALTGR>
-        <lButton>false</lButton>
-        <rButton>false</rButton>
-        <mButton>false</mButton>
-        <xButton1>false</xButton1>
-        <xButton2>false</xButton2>
-        <ScrollUp>false</ScrollUp>
-        <ScrollDown>false</ScrollDown>
-        <ScrollLeft>false</ScrollLeft>
-        <ScrollRight>false</ScrollRight>
         <Clicks>0</Clicks>
-        <PassThrough>false</PassThrough>
-        <IgnoreModifiers>false</IgnoreModifiers>
       </ShortCut>
-      <Schedulers>
-      </Schedulers>
       <UseRecognition>true</UseRecognition>
-      <UseShortCut>false</UseShortCut>
-      <UseScheduler>false</UseScheduler>
-      <Repeat>false</Repeat>
-      <RepeatCount>0</RepeatCount>
-      <OnlyIfTargetWinActive>false</OnlyIfTargetWinActive>
-      <ActivateTargetWin>false</ActivateTargetWin>
-      <OnlyOneThread>false</OnlyOneThread>
-      <Inactive>false</Inactive>
       <MacroActions>
         <MacroAction>
           <MacroType>1</MacroType>
@@ -3256,13 +1446,8 @@
             <Key>F</Key>
             <ClickDownUp>0</ClickDownUp>
             <lShift>true</lShift>
-            <rShift>false</rShift>
             <Alt>true</Alt>
-            <rCTRL>false</rCTRL>
             <lCTRL>true</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -3274,52 +1459,17 @@
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
-        <lShift>false</lShift>
-        <rShift>false</rShift>
-        <Alt>false</Alt>
-        <rCTRL>false</rCTRL>
-        <lCTRL>false</lCTRL>
-        <LWin>false</LWin>
-        <RWin>false</RWin>
-        <ALTGR>false</ALTGR>
-        <lButton>false</lButton>
-        <rButton>false</rButton>
-        <mButton>false</mButton>
-        <xButton1>false</xButton1>
-        <xButton2>false</xButton2>
-        <ScrollUp>false</ScrollUp>
-        <ScrollDown>false</ScrollDown>
-        <ScrollLeft>false</ScrollLeft>
-        <ScrollRight>false</ScrollRight>
         <Clicks>0</Clicks>
-        <PassThrough>false</PassThrough>
-        <IgnoreModifiers>false</IgnoreModifiers>
       </ShortCut>
-      <Schedulers>
-      </Schedulers>
       <UseRecognition>true</UseRecognition>
-      <UseShortCut>false</UseShortCut>
-      <UseScheduler>false</UseScheduler>
-      <Repeat>false</Repeat>
-      <RepeatCount>0</RepeatCount>
-      <OnlyIfTargetWinActive>false</OnlyIfTargetWinActive>
-      <ActivateTargetWin>false</ActivateTargetWin>
-      <OnlyOneThread>false</OnlyOneThread>
-      <Inactive>false</Inactive>
       <MacroActions>
         <MacroAction>
           <MacroType>1</MacroType>
           <Keyboard>
             <Key>R</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
             <Alt>true</Alt>
-            <rCTRL>false</rCTRL>
             <lCTRL>true</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -3331,38 +1481,9 @@
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
-        <lShift>false</lShift>
-        <rShift>false</rShift>
-        <Alt>false</Alt>
-        <rCTRL>false</rCTRL>
-        <lCTRL>false</lCTRL>
-        <LWin>false</LWin>
-        <RWin>false</RWin>
-        <ALTGR>false</ALTGR>
-        <lButton>false</lButton>
-        <rButton>false</rButton>
-        <mButton>false</mButton>
-        <xButton1>false</xButton1>
-        <xButton2>false</xButton2>
-        <ScrollUp>false</ScrollUp>
-        <ScrollDown>false</ScrollDown>
-        <ScrollLeft>false</ScrollLeft>
-        <ScrollRight>false</ScrollRight>
         <Clicks>0</Clicks>
-        <PassThrough>false</PassThrough>
-        <IgnoreModifiers>false</IgnoreModifiers>
       </ShortCut>
-      <Schedulers>
-      </Schedulers>
       <UseRecognition>true</UseRecognition>
-      <UseShortCut>false</UseShortCut>
-      <UseScheduler>false</UseScheduler>
-      <Repeat>false</Repeat>
-      <RepeatCount>0</RepeatCount>
-      <OnlyIfTargetWinActive>false</OnlyIfTargetWinActive>
-      <ActivateTargetWin>false</ActivateTargetWin>
-      <OnlyOneThread>false</OnlyOneThread>
-      <Inactive>false</Inactive>
       <MacroActions>
         <MacroAction>
           <MacroType>1</MacroType>
@@ -3370,13 +1491,8 @@
             <Key>R</Key>
             <ClickDownUp>0</ClickDownUp>
             <lShift>true</lShift>
-            <rShift>false</rShift>
             <Alt>true</Alt>
-            <rCTRL>false</rCTRL>
             <lCTRL>true</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -3388,52 +1504,17 @@
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
-        <lShift>false</lShift>
-        <rShift>false</rShift>
-        <Alt>false</Alt>
-        <rCTRL>false</rCTRL>
-        <lCTRL>false</lCTRL>
-        <LWin>false</LWin>
-        <RWin>false</RWin>
-        <ALTGR>false</ALTGR>
-        <lButton>false</lButton>
-        <rButton>false</rButton>
-        <mButton>false</mButton>
-        <xButton1>false</xButton1>
-        <xButton2>false</xButton2>
-        <ScrollUp>false</ScrollUp>
-        <ScrollDown>false</ScrollDown>
-        <ScrollLeft>false</ScrollLeft>
-        <ScrollRight>false</ScrollRight>
         <Clicks>0</Clicks>
-        <PassThrough>false</PassThrough>
-        <IgnoreModifiers>false</IgnoreModifiers>
       </ShortCut>
-      <Schedulers>
-      </Schedulers>
       <UseRecognition>true</UseRecognition>
-      <UseShortCut>false</UseShortCut>
-      <UseScheduler>false</UseScheduler>
-      <Repeat>false</Repeat>
-      <RepeatCount>0</RepeatCount>
-      <OnlyIfTargetWinActive>false</OnlyIfTargetWinActive>
-      <ActivateTargetWin>false</ActivateTargetWin>
-      <OnlyOneThread>false</OnlyOneThread>
-      <Inactive>false</Inactive>
       <MacroActions>
         <MacroAction>
           <MacroType>1</MacroType>
           <Keyboard>
-            <Key>D8</Key>
+            <Key>NumPad9</Key>
             <ClickDownUp>0</ClickDownUp>
-            <lShift>false</lShift>
-            <rShift>false</rShift>
             <Alt>true</Alt>
-            <rCTRL>false</rCTRL>
             <lCTRL>true</lCTRL>
-            <LWin>false</LWin>
-            <RWin>false</RWin>
-            <ALTGR>false</ALTGR>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>

@@ -5,6 +5,7 @@
      - including a new Wiki page with the hottest backlog features.
   3. New photorealistic Button Box Visuals - you will love it.
   4. Better window handling of SimFeedback. The main window will stay closed whenever possible.
+  5. Introduced *shutdownSystem* controller action.
 
 ## 1.2.4-stable, 12/23/20
 

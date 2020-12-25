@@ -2154,7 +2154,7 @@ showKeyDetector() {
 
 	Loop 16 { ; Query each joystick number to find out which ones exist.
 		GetKeyState joyName, %A_Index%JoyName
-	
+		
 		if (joyName != "")
 			joystickNumbers.Push(A_Index)
 	}
@@ -2169,12 +2169,13 @@ showKeyDetector() {
 
 	if vShowKeyDetector {
 		found := false
-		joystickNumber := joystickNumbers[1]
-		
-		joystickNumbers.RemoveAt(1)
-		joystickNumbers.Push(joystickNumber)
 		
 		Loop {
+			joystickNumber := joystickNumbers[1]
+			
+			joystickNumbers.RemoveAt(1)
+			joystickNumbers.Push(joystickNumber)
+		
 			SetFormat Float, 03  ; Omit decimal point from axis position percentages.
 		
 			GetKeyState joy_buttons, %joystickNumber%JoyButtons
@@ -2245,10 +2246,10 @@ showKeyDetector() {
 			if found {
 				found := false
 				
-				Sleep 1000
+				Sleep 2000
 			}
 			else				
-				Sleep 100
+				Sleep 400
 			
 			if vResult
 				break

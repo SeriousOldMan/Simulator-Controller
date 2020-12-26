@@ -5,8 +5,9 @@
      - including a new Wiki page with the hottest backlog features.
   3. New photorealistic Button Box Visuals - you will love it.
   4. You can now interact with the visual representation of the Button Box using the mouse and everything is functional, even if you don't have a hardware controller. So you can put your old button boxes on eBay - not.
-  5. Better window handling of SimFeedback. The main window will stay closed whenever possible.
-  6. Introduced *shutdownSystem* controller action.
+  5. Button Box will be moveable by the mouse and the position might be saved according to configuration.
+  6. Better window handling of SimFeedback. The main window will stay closed whenever possible.
+  7. Introduced *shutdownSystem* controller action.
 
 ## 1.2.4-stable, 12/23/20
 

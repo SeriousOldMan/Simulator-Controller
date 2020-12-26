@@ -31,7 +31,7 @@ class SimpleButtonBox extends ButtonBox {
 		
 		Gui SBB:-Border -Caption +AlwaysOnTop
 
-		Gui SBB:Add, Picture, x-10 y-10, % kButtonBoxImagesDirectory . "Photorealistic\CF Background.png"
+		Gui SBB:Add, Picture, x-10 y-10 gmoveButtonBox, % kButtonBoxImagesDirectory . "Photorealistic\CF Background.png"
 		
 		Gui SBB:Font, s12 Bold cSilver
 		Gui SBB:Add, Text, x40 y8 w457 h23 +0x200 +0x1 BackgroundTrans, Modular Simulator Controller System
@@ -119,7 +119,7 @@ initializeButtonBoxPlugin() {
 ;;;-------------------------------------------------------------------------;;;
 
 functionClick() {
-	mousegetpos x, y
+	MouseGetPos x, y
 	
 	if InStr(A_GuiControl, "button")
 		pushButton(SubStr(A_GuiControl, 7, 1))
@@ -127,6 +127,29 @@ functionClick() {
 		switchToggle(k2WayToggleType, SubStr(A_GuiControl, 7, 1), (y > 105) ? "Off" : "On")
 	else
 		rotateDial(SubStr(A_GuiControl, 5, 1), (x > 475) ? "Increase" : "Decrease")
+}
+
+moveButtonBox() {
+	curCoordMode := A_CoordModeMouse
+	
+	CoordMode Mouse, Screen
+	
+	try {
+		MouseGetPos anchorX, anchorY
+		WinGetPos winX, winY, w, h, Simulator Controller
+		
+		while GetKeyState("LButton", "P") {
+			MouseGetPos x, y
+		
+			newX := winX + (x - anchorX)
+			newY := winY + (y - anchorY)
+			
+			Gui SBB:Show, X%newX% Y%newY%
+		}
+	}
+	finally {
+		CoordMode Mouse, curCoordMode
+	}
 }
 
 

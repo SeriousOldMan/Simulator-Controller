@@ -534,3 +534,6 @@ Shows the Button Box window according to the visibility rules defined in the con
 
 #### *hide()*
 Hides the Button Box window again. This method is automatically called, after the visible duration defined in the configuration has elapsed with no hardware trigger event in between.
+
+#### *moveByMouse(button :: String := "LButton")*
+Call this method from an event handler. It will move the Button Box window following the mouse, while the given button is down. The position will be remembered as the "Last Position" in the *Simulator Controller.ini* configuration file.

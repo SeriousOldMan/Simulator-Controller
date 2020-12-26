@@ -98,7 +98,7 @@ class ButtonBox extends ConfigurationItem {
 			if (controller != false) {
 				inSimulation := (controller.ActiveSimulator != false)
 	
-				return getConfigurationValue(this.Controller.ControllerConfiguration, "Controller"
+				return getConfigurationValue(this.Controller.ControllerConfiguration, "Button Box"
 										   , inSimulation ? "Button Box Simulation Duration" : "Button Box Duration"
 										   , inSimulation ? false : 10000)
 			}
@@ -194,7 +194,7 @@ class ButtonBox extends ConfigurationItem {
 						width := this.iWindowWidth
 						height := this.iWindowHeight
 					
-						position := getConfigurationValue(this.Controller.ControllerConfiguration, "Controller", "Button Box Position", "Bottom Right")
+						position := getConfigurationValue(this.Controller.ControllerConfiguration, "Button Box", "Button Box Position", "Bottom Right")
 						
 						SysGet mainScreen, MonitorWorkArea
 						
@@ -211,6 +211,9 @@ class ButtonBox extends ConfigurationItem {
 							case "Bottom Right":
 								x := mainScreenRight - width
 								y := mainScreenBottom - height
+							case "Last Position":
+								x := getConfigurationValue(this.Controller.ControllerConfiguration, "Button Box", "Button Box Position.X", 0)
+								y := getConfigurationValue(this.Controller.ControllerConfiguration, "Button Box", "Button Box Position.Y", 0)
 							default:
 								Throw "Unhandled position for Button Box (" . position . ") encountered in ButtonBox.show..."
 						}
@@ -248,6 +251,39 @@ class ButtonBox extends ConfigurationItem {
 		}
 		finally {
 			protectionOff()
+		}
+	}
+	
+	moveByMouse(button := "LButton") {
+		curCoordMode := A_CoordModeMouse
+		
+		CoordMode Mouse, Screen
+			
+		try {	
+			MouseGetPos anchorX, anchorY
+			WinGetPos winX, winY, w, h, Simulator Controller
+			
+			newX := winX
+			newY := winY
+			
+			while GetKeyState(button, "P") {
+				MouseGetPos x, y
+			
+				newX := winX + (x - anchorX)
+				newY := winY + (y - anchorY)
+				
+				Gui SBB:Show, X%newX% Y%newY%
+			}
+			
+			configuration := this.Controller.ControllerConfiguration
+			
+			setConfigurationValue(configuration, "Button Box", "Button Box Position.X", newX)
+			setConfigurationValue(configuration, "Button Box", "Button Box Position.Y", newY)
+			
+			writeConfiguration(kControllerConfigurationFile, configuration)
+		}
+		finally {
+			CoordMode Mouse, curCoordMode
 		}
 	}
 }

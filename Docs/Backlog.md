@@ -7,7 +7,7 @@
   1. [Tactile & Motion Feedback Plugin] Definition of feedback settings for different tracks and cars, selectable by the touch of a button
   
 #### Button Box Visual Feedback
-  1. Photorealistic Button Box Visuals (=> v1.3)
+  1. [Target: V1.3] Photorealistic Button Box Visuals
   2. Show all the current settings alternating with the effect name on the button box
   3. Allow button box window to be opened on a second screen, which might be a small 5 or 7 inch display mounted next to the button box.
-  4. Make Button Box moveable and store position.
+  4. [Target: V1.3] Make Button Box moveable and store position.

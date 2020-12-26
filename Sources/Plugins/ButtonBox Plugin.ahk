@@ -130,26 +130,7 @@ functionClick() {
 }
 
 moveButtonBox() {
-	curCoordMode := A_CoordModeMouse
-	
-	CoordMode Mouse, Screen
-	
-	try {
-		MouseGetPos anchorX, anchorY
-		WinGetPos winX, winY, w, h, Simulator Controller
-		
-		while GetKeyState("LButton", "P") {
-			MouseGetPos x, y
-		
-			newX := winX + (x - anchorX)
-			newY := winY + (y - anchorY)
-			
-			Gui SBB:Show, X%newX% Y%newY%
-		}
-	}
-	finally {
-		CoordMode Mouse, curCoordMode
-	}
+	ButtonBox.Instance.moveByMouse()
 }
 
 

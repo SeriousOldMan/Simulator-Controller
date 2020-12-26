@@ -176,9 +176,9 @@ restart:
 		
 		setConfigurationValue(newConfiguration, "Controller", "Tray Tip Duration", (trayTip ? trayTipDuration : false))
 		setConfigurationValue(newConfiguration, "Controller", "Tray Tip Simulation Duration", (trayTipSimulation ? trayTipSimulationDuration : false))
-		setConfigurationValue(newConfiguration, "Controller", "Button Box Duration", (buttonBox ? buttonBoxDuration : false))
-		setConfigurationValue(newConfiguration, "Controller", "Button Box Simulation Duration", (buttonBoxSimulation ? buttonBoxSimulationDuration : false))
-		setConfigurationValue(newConfiguration, "Controller", "Button Box Position", buttonBoxPosition)
+		setConfigurationValue(newConfiguration, "Button Box", "Button Box Duration", (buttonBox ? buttonBoxDuration : false))
+		setConfigurationValue(newConfiguration, "Button Box", "Button Box Simulation Duration", (buttonBoxSimulation ? buttonBoxSimulationDuration : false))
+		setConfigurationValue(newConfiguration, "Button Box", "Button Box Position", buttonBoxPosition)
 		
 		setConfigurationValue(newConfiguration, "Startup", "Splash Theme", (splashTheme == "None") ? false : splashTheme)
 		setConfigurationValue(newConfiguration, "Startup", "Simulator", (startup ? startOption : false))
@@ -277,9 +277,9 @@ restart:
 	
 		trayTipDuration := getConfigurationValue(configurationOrCommand, "Controller", "Tray Tip Duration", false)
 		trayTipSimulationDuration := getConfigurationValue(configurationOrCommand, "Controller", "Tray Tip Simulation Duration", 1500)
-		buttonBoxDuration := getConfigurationValue(configurationOrCommand, "Controller", "Button Box Duration", 10000)
-		buttonBoxSimulationDuration := getConfigurationValue(configurationOrCommand, "Controller", "Button Box Simulation Duration", false)
-		buttonBoxPosition := getConfigurationValue(configurationOrCommand, "Controller", "Button Box Position", "Bottom Right")
+		buttonBoxDuration := getConfigurationValue(configurationOrCommand, "Button Box", "Button Box Duration", 10000)
+		buttonBoxSimulationDuration := getConfigurationValue(configurationOrCommand, "Button Box", "Button Box Simulation Duration", false)
+		buttonBoxPosition := getConfigurationValue(configurationOrCommand, "Button Box", "Button Box Position", "Bottom Right")
 		
 		trayTip := (trayTipDuration != 0) ? true : false
 		trayTipSimulation := (trayTipSimulationDuration != 0) ? true : false
@@ -316,7 +316,7 @@ restart:
 		Gui CE:Add, Text, X205 YP+5, ms
 		Gui CE:Add, Text, X20 YP+30, Button Box Position
 		
-		choices := ["Top Left", "Top Right", "Bottom Left", "Bottom Right"]
+		choices := ["Top Left", "Top Right", "Bottom Left", "Bottom Right", "Last Position"]
 		chosen := inList(choices, buttonBoxPosition)
 		if !chosen
 			chosen := 4

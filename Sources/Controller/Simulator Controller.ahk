@@ -1250,7 +1250,7 @@ pushButton(buttonNumber) {
 	descriptor := ConfigurationItem.descriptor(kButtonType, buttonNumber)
 	function := SimulatorController.Instance.findFunction(descriptor)
 	
-	if (function != false)
+	if ((function != false) && SimulatorController.Instance.getAction(function, "Push"))
 		fireControllerAction(function, "Push")
 	else
 		logMessage(kLogWarn, "Controller function " . descriptor . " not found in custom controller action pushButton - please check the setup")
@@ -1272,7 +1272,7 @@ rotateDial(dialNumber, direction) {
 	descriptor := ConfigurationItem.descriptor(kDialType, dialNumber)
 	function := SimulatorController.Instance.findFunction(descriptor)
 	
-	if (function != false)
+	if ((function != false) && SimulatorController.Instance.getAction(function, direction))
 		fireControllerAction(function, direction)
 	else
 		logMessage(kLogWarn, "Controller function " . descriptor . " not found in custom controller action rotateDial - please check the setup")
@@ -1282,12 +1282,12 @@ switchToggle(toggleType, toggleNumber, mode := "activate") {
 	local function
 	
 	descriptor := ConfigurationItem.descriptor(toggleType, toggleNumber)
-	function := SimulatorController.Instance.findFunction(descriptor^)
+	function := SimulatorController.Instance.findFunction(descriptor)
 	
 	if (function != false) {
-		if ((mode = "activate") || (mode = "on"))
+		if (((mode = "activate") || (mode = "on")) && SimulatorController.Instance.getAction(function, "On"))
 			fireControllerAction(function, "On")
-		else if ((mode = "deactivate") || (mode = "off"))
+		else if (((mode = "deactivate") || (mode = "off")) && SimulatorController.Instance.getAction(function, "Off"))
 			fireControllerAction(function, "Off")
 		else {
 			logMessage(kLogWarn, "Unsupported argument (" . mode . ") detected in switchToggle - please check the setup")

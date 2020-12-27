@@ -467,7 +467,15 @@ translate(string) {
 			translations := readConfiguration("Translations." . vTargetLanguage)
 		}
 		
-		return getConfigurationValue(translations, "Translations", string, string)
+		for original, target in translations["Translations"] {
+			splashtexton 200, 100, , % original
+			sleep 100
+			splashtextoff
+			if (Trim(original) = Trim(string))
+				return target
+		}
+			
+		return string
 	}
 	else
 		return string

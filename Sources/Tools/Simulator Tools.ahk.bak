@@ -516,6 +516,7 @@ runTargets() {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+setLanguage("de")
 runTargets()
 
 

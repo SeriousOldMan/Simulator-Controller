@@ -156,7 +156,7 @@ Essential support for tracking down coding errors. Since AutoHotkey is a weakly 
 Returns *true*, if debugging is currently enabled. The Simulator Controller uses debug mode to handle things differently, for example all plugins and modes will be active, even if they declare to be not.
 
 #### *setDebug(debug :: Boolean)*
-Enables or disables debug mode.
+Enables or disables debug mode. The default value for non compiled scripts is *ture*, but you can also define debug mode for compiled scripts using the [setup tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#setup).
 
 #### *getLogLevel()*
 Return the current log level. May be one of: *kLogInfo*, *kLogWarn*, *kLogCritical* or *kLogOff*.

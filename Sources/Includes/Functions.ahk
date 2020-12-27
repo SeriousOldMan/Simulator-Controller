@@ -187,6 +187,7 @@ initializeTrayMessageQueue() {
 }
 
 loadSimulatorConfiguration() {
+	msgbox % A_isUnicode
 	kSimulatorConfiguration := readConfiguration(kSimulatorConfigurationFile)
 	
 	if (kSimulatorConfiguration.Count() == 0)
@@ -219,7 +220,7 @@ loadSimulatorConfiguration() {
 	else
 		logMessage(kLogWarn, "NirCmd executable not configured")
 		
-	vDebug := getConfigurationValue(kSimulatorConfiguration, "Configuration", "Debug", false)
+	vDebug := (!A_IsCompiled || getConfigurationValue(kSimulatorConfiguration, "Configuration", "Debug", false))
 	vLogLevel := inList(["Info", "Warn", "Critical", "Off"], getConfigurationValue(kSimulatorConfiguration, "Configuration", "Log Level", "Warn"))
 		
 	kSilentMode := getConfigurationValue(kSimulatorConfiguration, "Configuration", "Silent Mode", false)

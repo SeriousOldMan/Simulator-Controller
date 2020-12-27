@@ -12,3 +12,6 @@
   3. Allow button box window to be opened on a second screen, which might be a small 5 or 7 inch display mounted next to the button box.
   4. [Target: V1.3] Make Button Box moveable and store position.
   5. Allow for more than one visual reppresentation of controller hardware, if more than one controller is connected to the PC.
+  
+#### General
+  1. Full Unicode translation support

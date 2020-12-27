@@ -8,6 +8,7 @@
   5. Button Box will be moveable by the mouse and the position might be saved according to configuration.
   6. Better window handling of SimFeedback. The main window will stay closed whenever possible.
   7. Introduced *shutdownSystem* controller action.
+  8. Debug mode now defaults to *true* in non compiled scripts.
 
 ## 1.2.4-stable, 12/23/20
 

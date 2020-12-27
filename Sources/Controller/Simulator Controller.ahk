@@ -261,7 +261,7 @@ class ButtonBox extends ConfigurationItem {
 			
 		try {	
 			MouseGetPos anchorX, anchorY
-			WinGetPos winX, winY, w, h, Simulator Controller
+			WinGetPos winX, winY, w, h, %A_ScriptName%
 			
 			newX := winX
 			newY := winY

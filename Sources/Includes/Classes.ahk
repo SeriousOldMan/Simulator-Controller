@@ -298,7 +298,7 @@ class Application extends ConfigurationItem {
 			}
 		}
 		catch exception {
-			logMessage(kLogCritical, translate("Error while starting application ") . application . translate(" (") . exePath . translate("): ") . exception.Message . " - please check the setup...")
+			logMessage(kLogCritical, translate("Error while starting application ") . application . translate(" (") . exePath . translate("): ") . exception.Message . " - please check the setup")
 		
 			SplashTextOn 800, 60, Modular Simulator Controller System, % substituteVariables(translate("Cannot start %application% (%exePath%) - please check the setup..."), {application: application, exePath: exePath})
 					

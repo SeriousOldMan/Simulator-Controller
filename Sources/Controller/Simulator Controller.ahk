@@ -435,7 +435,7 @@ class SimulatorController extends ConfigurationItem {
 	
 	registerPlugin(plugin) {
 		if !inList(this.Plugins, plugin) {
-			logMessage(kLogInfo, translate("Plugin ") . getPluginForLogMessage(plugin) . (this.isActive(plugin) ? translate(" (Active)") : translate(" (Inactive)")) . " registered")
+			logMessage(kLogInfo, translate("Plugin ") . getPluginForLogMessage(plugin) . (this.isActive(plugin) ? translate(" (Active)") : translate(" (Inactive)")) . translate(" registered"))
 			
 			this.Plugins.Push(plugin)
 		}
@@ -778,9 +778,9 @@ class ControllerFunction {
 					Hotkey %hotkey%, On
 				}
 				catch exception {
-					logMessage(kLogCritical, translate("Error while registering hotkey ") . theHotkey . translate(" - please check the setup..."))
+					logMessage(kLogCritical, translate("Error while registering hotkey ") . theHotkey . translate(" - please check the setup"))
 		
-					SplashTextOn 800, 60, Modular Simulator Controller System, % substituteVariables(translate("Cannot register hotkey %theHotkey%`n`nPlease check the setup..."), {theHotKey: theHotKey})
+					SplashTextOn 800, 60, Modular Simulator Controller System, % substituteVariables(translate("Cannot register hotkey %theHotkey% - please check the setup..."), {theHotKey: theHotKey})
 							
 					Sleep 5000
 								
@@ -1289,7 +1289,7 @@ pushButton(buttonNumber) {
 	if ((function != false) && SimulatorController.Instance.getAction(function, "Push"))
 		fireControllerAction(function, "Push")
 	else
-		logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in custom controller action pushButton - please check the setup..."))
+		logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in custom controller action pushButton - please check the setup"))
 }
 
 rotateDial(dialNumber, direction) {
@@ -1300,7 +1300,7 @@ rotateDial(dialNumber, direction) {
 	else if (direction = "decrease")
 		direction := "Decrease"
 	else {
-		logMessage(kLogWarn, translate("Unsupported argument (") . direction . translate(") detected in rotateDial - please check the setup..."))
+		logMessage(kLogWarn, translate("Unsupported argument (") . direction . translate(") detected in rotateDial - please check the setup"))
 		
 		Throw "Unsupported argument (" . direction . ") detected in rotateDial..."
 	}
@@ -1311,7 +1311,7 @@ rotateDial(dialNumber, direction) {
 	if ((function != false) && SimulatorController.Instance.getAction(function, direction))
 		fireControllerAction(function, direction)
 	else
-		logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in custom controller action rotateDial - please check the setup..."))
+		logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in custom controller action rotateDial - please check the setup"))
 }
 
 switchToggle(toggleType, toggleNumber, mode := "activate") {
@@ -1326,13 +1326,13 @@ switchToggle(toggleType, toggleNumber, mode := "activate") {
 		else if (((mode = "deactivate") || (mode = "off")) && SimulatorController.Instance.getAction(function, "Off"))
 			fireControllerAction(function, "Off")
 		else {
-			logMessage(kLogWarn, translate("Unsupported argument (") . mode . translate(") detected in switchToggle - please check the setup..."))
+			logMessage(kLogWarn, translate("Unsupported argument (") . mode . translate(") detected in switchToggle - please check the setup"))
 		
 			Throw "Unsupported argument (" . mode . ") detected in switchToggle..."
 		}
 	}
 	else
-		logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in custom controller action switchToggle - please check the setup..."))
+		logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in custom controller action switchToggle - please check the setup"))
 }
 
 setMode(action) {
@@ -1351,7 +1351,7 @@ setMode(action) {
 			if ((mode != false) && controller.isActive(mode))
 				controller.setMode(mode)
 			else
-				trayMessage(translate("Control"), translate("Mode: ") . action . " is not available", 10000)
+				trayMessage(translate("Control"), translate("Mode: ") . action . translate(" is not available"), 10000)
 		}
 	}
 	finally {

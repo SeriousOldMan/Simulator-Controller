@@ -130,7 +130,7 @@ class SimulatorStartup extends ConfigurationItem {
 		local title
 		
 		try {
-			logMessage(kLogInfo, translate("Starting ") . "Simulator Controller")
+			logMessage(kLogInfo, translate("Starting ") . translate("Simulator Controller"))
 			
 			exePath := kBinariesDirectory . "Simulator Controller.exe"
 			

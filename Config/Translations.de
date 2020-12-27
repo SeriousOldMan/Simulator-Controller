@@ -1,15 +1,14 @@
-[Translations]
-Checking file =Überprüfe Datei 
- for modification= auf Modifikationen
-File =Datei 
- found more recent than = wurde verändert nach 
-Checking all files in =Überprüfe alle Dateien in 
-Cleaning =Bereinige 
-Deleting =Lösche 
-Compiling =Übersetze 
-Building =Erzeuge 
- or dependent files out of date - needs recompile= oder abhängige Datei wurde verändert - Neuübersetzung notwendig
-Cannot compile =Übersetzung für 
- - source file or AHK Compiler (= nicht möglich - Source Datei oder AHK Compiler (
-) not found=) nicht gefunden
+Checking file =>Überprüfe Datei 
+ for modification=> auf Modifikationen
+File =>Datei 
+ found more recent than => wurde verändert nach 
+Checking all files in =>Überprüfe alle Dateien in 
+Cleaning =>Bereinige 
+Deleting =>Lösche 
+Compiling =>Übersetze 
+Building =>Erzeuge 
+ or dependent files out of date - needs recompile=> oder abhängige Datei wurde verändert - Neuübersetzung notwendig
+Cannot compile =>Übersetzung für 
+ - source file or AHK Compiler (=> nicht möglich - Source Datei oder AHK Compiler (
+) not found=>) nicht gefunden
  

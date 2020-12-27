@@ -463,11 +463,18 @@ translate(string) {
 	
 	if (vTargetLanguage != "en") {
 		if (vTargetLanguage != currentLanguage) {
+			translations := {}
 			currentLanguage := vTargetLanguage
-			translations := readConfiguration("Translations." . vTargetLanguage)
+			
+			Loop Read, % getFileName("Translations." . vTargetLanguage, kUserConfigDirectory, kConfigDirectory)
+			{
+				translation := StrSplit(A_LoopReadLine, "=>")
+				
+				translations[translation[1]] := translation[2]
+			}
 		}
 		
-		return getConfigurationValue(translations, "Translations", string, string)
+		return (translations.HasKey(string) ? translations[string] : string)
 	}
 	else
 		return string

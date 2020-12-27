@@ -1,5 +1,5 @@
 [Version]
-Current=1.3.3-beta
-Target=1.3.x-stable
+Current=1.3.3-stable
+Target=1.3.3-stable
 Changes=New Button Box Visuals
-Date=12/25/2020
+Date=12/27/2020

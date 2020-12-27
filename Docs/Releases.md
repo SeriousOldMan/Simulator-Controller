@@ -1,4 +1,4 @@
-## 1.3.x-stable, upcoming...
+## 1.3.3-stable, 12/27/20
 
   1. Bugfixes, as always
   2. Documentation updates, as always

@@ -143,7 +143,7 @@ class SimulatorStartup extends ConfigurationItem {
 			
 			title := translate("Modular Simulator Controller System - Startup")
 			
-			SplashTextOn 800, 60, %title%, % substituteVariables(translate("Cannot start Simulator Controller (%kBinariesDirectory%Simulator Controller.exe): Please rebuild the applications..."))
+			SplashTextOn 800, 60, %title%, % substituteVariables(translate("Cannot start Simulator Controller (%kBinariesDirectory%Simulator Controller.exe) - please rebuild the applications..."))
 				
 			Sleep 5000
 				

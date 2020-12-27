@@ -131,7 +131,7 @@ class ButtonBox extends ConfigurationItem {
 		this.iNumButtons := getConfigurationValue(configuration, "Controller Layout", "Buttons", 0)
 		this.iNumDials := getConfigurationValue(configuration, "Controller Layout", "Dials", 0)
 		
-		logMessage(kLogInfo, "Controller layout initialized: # " . this.iNum1WayToggles . " 1-Way Toggles, # " . this.iNum2WayToggles . " 2-Way Toggles, # " . this.iNumButtons . " Buttons, # " . this.iNumDials . " Dials")
+		logMessage(kLogInfo, translate("Controller layout initialized:") . " # " . this.iNum1WayToggles . " 1-Way Toggles, # " . this.iNum2WayToggles . " 2-Way Toggles, # " . this.iNumButtons . " Buttons, # " . this.iNumDials . " Dials")
 	}
 	
 	createWindow(ByRef window, ByRef windowWidth, ByRef windowHeight) {
@@ -435,7 +435,7 @@ class SimulatorController extends ConfigurationItem {
 	
 	registerPlugin(plugin) {
 		if !inList(this.Plugins, plugin) {
-			logMessage(kLogInfo, "Plugin " . getPluginForLogMessage(plugin) . (this.isActive(plugin) ? " (Active)" : " (Inactive)") . " registered")
+			logMessage(kLogInfo, translate("Plugin ") . getPluginForLogMessage(plugin) . (this.isActive(plugin) ? translate(" (Active)") : translate(" (Inactive)")) . " registered")
 			
 			this.Plugins.Push(plugin)
 		}
@@ -446,7 +446,7 @@ class SimulatorController extends ConfigurationItem {
 	
 	registerMode(plugin, mode) {
 		if !inList(this.Modes, mode) {
-			logMessage(kLogInfo, "Mode " . getModeForLogMessage(mode) . " registered" . (plugin ? (" for plugin " . getPluginForLogMessage(plugin)) : ""))
+			logMessage(kLogInfo, translate("Mode ") . getModeForLogMessage(mode) . translate(" registered") . (plugin ? (translate(" for plugin ") . getPluginForLogMessage(plugin)) : ""))
 			
 			this.Modes.Push(mode)
 		}
@@ -522,7 +522,7 @@ class SimulatorController extends ConfigurationItem {
 		
 						name := application.Application
 						
-						Progress B w300 x%posX% y%posY% FS8 CWD0D0D0 CBGreen, %name%, Starting Simulator
+						Progress B w300 x%posX% y%posY% FS8 CWD0D0D0 CBGreen, %name%, % translate("Starting Simulator")
 
 						started := false
 
@@ -551,7 +551,7 @@ class SimulatorController extends ConfigurationItem {
 	}
 	
 	connectAction(function, action) {
-		logMessage(kLogInfo, "Connecting " . function.Descriptor . " to action " . getLabelForLogMessage(action))
+		logMessage(kLogInfo, translate("Connecting ") . function.Descriptor . translate(" to action ") . getLabelForLogMessage(action))
 		
 		function.connectAction(action)
 		
@@ -559,7 +559,7 @@ class SimulatorController extends ConfigurationItem {
 	}
 	
 	disconnectAction(function, action) {
-		logMessage(kLogInfo, "Disconnecting " . function.Descriptor . " from action " . getLabelForLogMessage(action))
+		logMessage(kLogInfo, translate("Disconnecting ") . function.Descriptor . translate(" from action ") . getLabelForLogMessage(action))
 		
 		function.disconnectAction(action)
 		
@@ -576,7 +576,7 @@ class SimulatorController extends ConfigurationItem {
 		if (action != false) {
 			this.updateLastEvent()
 			
-			logMessage(kLogInfo, "Firing action " . getLabelForLogMessage(action) . " for " . function.Descriptor)
+			logMessage(kLogInfo, translate("Firing action ") . getLabelForLogMessage(action) . translate(" for ") . function.Descriptor)
 			
 			action.fireAction(function, trigger)
 		}
@@ -596,13 +596,13 @@ class SimulatorController extends ConfigurationItem {
 		
 			this.iActiveMode := newMode
 			
-			logMessage(kLogInfo, "Setting controller mode to " . getModeForLogMessage(newMode))
+			logMessage(kLogInfo, translate("Setting controller mode to ") . getModeForLogMessage(newMode))
 			
 			if (newMode != false)
 				newMode.activate()
 		
 			if modeSwitched
-				trayMessage("Control", "Mode: " . newMode.Mode)
+				trayMessage(translate("Control"), translate("Mode: ") . newMode.Mode)
 		}
 	}
 	
@@ -636,7 +636,7 @@ class SimulatorController extends ConfigurationItem {
 		else if (this.iShowLogo && !this.iLogoIsVisible) {
 			static videoPlayer
 	
-			info := kVersion . " - 2020 by Oliver Juwig`nCreative Commons - BY-NC-SA"
+			info := kVersion . " - 2020, Oliver Juwig`nCreative Commons - BY-NC-SA"
 			logo := this.getLogo()
 			image := "1:" . logo
 
@@ -778,9 +778,9 @@ class ControllerFunction {
 					Hotkey %hotkey%, On
 				}
 				catch exception {
-					logMessage(kLogCritical, "Error while registering hotkey " . theHotkey . " - please check the setup")
+					logMessage(kLogCritical, translate("Error while registering hotkey ") . theHotkey . translate(" - please check the setup..."))
 		
-					SplashTextOn 800, 60, Modular Simulator Controller System, Cannot register hotkey %theHotkey%`n`nPlease run the setup tool...
+					SplashTextOn 800, 60, Modular Simulator Controller System, % substituteVariables(translate("Cannot register hotkey %theHotkey%`n`nPlease check the setup..."), {theHotKey: theHotKey})
 							
 					Sleep 5000
 								
@@ -967,7 +967,7 @@ class ControllerPlugin extends Plugin {
 	activate() {
 		controller := this.Controller
 		
-		logMessage(kLogInfo, "Activating plugin " . this.Plugin)
+		logMessage(kLogInfo, translate("Activating plugin ") . this.Plugin)
 		
 		for ignore, action in this.Actions {
 			controller.connectAction(action.Function, action)
@@ -980,7 +980,7 @@ class ControllerPlugin extends Plugin {
 	deactivate() {
 		controller := this.Controller
 		
-		logMessage(kLogInfo, "Deactivating plugin " . this.Plugin)
+		logMessage(kLogInfo, translate("Deactivating plugin ") . this.Plugin)
 		
 		for ignore, action in this.Actions
 			controller.disconnectAction(action.Function, action)
@@ -1075,7 +1075,7 @@ class ControllerMode {
 	activate() {
 		controller := this.Controller
 		
-		logMessage(kLogInfo, "Activating mode " . getModeForLogMessage(this))
+		logMessage(kLogInfo, translate("Activating mode ") . getModeForLogMessage(this))
 		
 		for ignore, action in this.Actions {
 			controller.connectAction(action.Function, action)
@@ -1088,7 +1088,7 @@ class ControllerMode {
 	deactivate() {
 		controller := this.Controller
 		
-		logMessage(kLogInfo, "Deactivating mode " . getModeForLogMessage(this))
+		logMessage(kLogInfo, translate("Deactivating mode ") . getModeForLogMessage(this))
 		
 		for ignore, action in this.Actions
 			controller.disconnectAction(action.Function, action)
@@ -1289,7 +1289,7 @@ pushButton(buttonNumber) {
 	if ((function != false) && SimulatorController.Instance.getAction(function, "Push"))
 		fireControllerAction(function, "Push")
 	else
-		logMessage(kLogWarn, "Controller function " . descriptor . " not found in custom controller action pushButton - please check the setup")
+		logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in custom controller action pushButton - please check the setup..."))
 }
 
 rotateDial(dialNumber, direction) {
@@ -1300,7 +1300,7 @@ rotateDial(dialNumber, direction) {
 	else if (direction = "decrease")
 		direction := "Decrease"
 	else {
-		logMessage(kLogWarn, "Unsupported argument (" . direction . ") detected in rotateDial - please check the setup")
+		logMessage(kLogWarn, translate("Unsupported argument (") . direction . translate(") detected in rotateDial - please check the setup..."))
 		
 		Throw "Unsupported argument (" . direction . ") detected in rotateDial..."
 	}
@@ -1311,7 +1311,7 @@ rotateDial(dialNumber, direction) {
 	if ((function != false) && SimulatorController.Instance.getAction(function, direction))
 		fireControllerAction(function, direction)
 	else
-		logMessage(kLogWarn, "Controller function " . descriptor . " not found in custom controller action rotateDial - please check the setup")
+		logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in custom controller action rotateDial - please check the setup..."))
 }
 
 switchToggle(toggleType, toggleNumber, mode := "activate") {
@@ -1326,13 +1326,13 @@ switchToggle(toggleType, toggleNumber, mode := "activate") {
 		else if (((mode = "deactivate") || (mode = "off")) && SimulatorController.Instance.getAction(function, "Off"))
 			fireControllerAction(function, "Off")
 		else {
-			logMessage(kLogWarn, "Unsupported argument (" . mode . ") detected in switchToggle - please check the setup")
+			logMessage(kLogWarn, translate("Unsupported argument (") . mode . translate(") detected in switchToggle - please check the setup..."))
 		
 			Throw "Unsupported argument (" . mode . ") detected in switchToggle..."
 		}
 	}
 	else
-		logMessage(kLogWarn, "Controller function " . descriptor . " not found in custom controller action switchToggle - please check the setup")
+		logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in custom controller action switchToggle - please check the setup..."))
 }
 
 setMode(action) {
@@ -1351,7 +1351,7 @@ setMode(action) {
 			if ((mode != false) && controller.isActive(mode))
 				controller.setMode(mode)
 			else
-				trayMessage("Control", "Mode: " . action . " is not available", 10000)
+				trayMessage(translate("Control"), translate("Mode: ") . action . " is not available", 10000)
 		}
 	}
 	finally {

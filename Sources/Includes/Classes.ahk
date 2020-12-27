@@ -285,22 +285,22 @@ class Application extends ConfigurationItem {
 				
 				result := ErrorLevel
 				
-				logMessage(kLogInfo, "Application " . application . " executed with result code " . result)
+				logMessage(kLogInfo, translate("Application ") . application . translate(" executed with result code ") . result)
 			
 				return result
 			}
 			else {
 				Run %exePath%, %workingDirectory%, %options%, pid
 				
-				logMessage(kLogInfo, "Application " . application . " started")
+				logMessage(kLogInfo, translate("Application ") . application . translate(" started"))
 			
 				return pid
 			}
 		}
 		catch exception {
-			logMessage(kLogCritical, "Error while starting application " . application . " (" . exePath . "): " . exception.Message . " - please check the setup")
+			logMessage(kLogCritical, translate("Error while starting application ") . application . translate(" (") . exePath . translate("): ") . exception.Message . " - please check the setup...")
 		
-			SplashTextOn 800, 60, Modular Simulator Controller System, Cannot start %application% (%exePath%) `n`nPlease run the setup tool...
+			SplashTextOn 800, 60, Modular Simulator Controller System, % substituteVariables(translate("Cannot start %application% (%exePath%) - please check the setup..."), {application: application, exePath: exePath})
 					
 			Sleep 5000
 						

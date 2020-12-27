@@ -122,7 +122,7 @@ initializeButtonBoxPlugin() {
 
 functionClick() {
 	MouseGetPos x, y
-	
+	msgbox % x . " " . y
 	if InStr(A_GuiControl, "button")
 		pushButton(SubStr(A_GuiControl, 7, 1))
 	else if InStr(A_GuiControl, "toggle")

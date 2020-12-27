@@ -85,8 +85,8 @@ Removes all "\\*directory*\\.." occurrencies from *filePath* and returns this si
 ## Collection & String Helper Functions ([Functions.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Functions.ahk))
 Often used collection functions, that are not part of the AutoHotkey language.
 
-#### *substituteVariables(string :: String)*
-Substitutes all variables enclosed by "%" with their values and returns the modified string.
+#### *substituteVariables(string :: String, values :: Map := {})*
+Substitutes all variables enclosed by "%" with their values and returns the modified string. The values are lookedup from the supplied values map. If not found there, the global name space is used.
 
 #### *string2Values(delimiter :: String, string :: String, count :: Integer := false)*
 Splits *string* apart using the supplied delimiter and returns the parts as an array. If *count* is supplied, only that much parts are splitted and all remaining ocurrencies of *delimiter* are ignored.

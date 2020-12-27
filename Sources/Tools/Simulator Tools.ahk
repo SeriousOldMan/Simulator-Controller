@@ -12,6 +12,7 @@
 #SingleInstance Force			; Ony one instance allowed
 #NoEnv							; Recommended for performance and compatibility with future AutoHotkey releases.
 #Warn							; Enable warnings to assist with detecting common errors.
+#Warn LocalSameAsGlobal, Off
 
 SendMode Input					; Recommended for new scripts due to its superior speed and reliability.
 SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
@@ -61,12 +62,12 @@ global vBuildSettings = Object()
 ;;;-------------------------------------------------------------------------;;;
 
 checkFileDependency(file, modification) {
-	logMessage(kLogInfo, "Checking file " . file . " for modification")
+	logMessage(kLogInfo, translate("Checking file ") . file . translate(" for modification"))
 	
 	FileGetTime lastModified, %file%, M
 	
 	if (lastModified > modification) {
-		logMessage(kLogInfo, "File " . file . " found more recent than " . modification)
+		logMessage(kLogInfo, translate("File ") . file . translate(" found more recent than ") . modification)
 	
 		return true
 	}
@@ -75,7 +76,7 @@ checkFileDependency(file, modification) {
 }
 
 checkDirectoryDependency(directory, modification) {
-	logMessage(kLogInfo, "Checking all files in " . directory)
+	logMessage(kLogInfo, translate("Checking all files in ") . directory)
 	
 	files := []
 	
@@ -224,7 +225,7 @@ editTargets(command := "") {
 		Gui TE:Font, Norm, Arial
 		Gui TE:Font, Italic, Arial
 	
-		Gui TE:Add, Text, YP+20 w220 Center, Build Targets
+		Gui TE:Add, Text, YP+20 w220 Center, % translate("Build Targets")
 	
 		Gui TE:Font, Norm, Arial
 		Gui TE:Font, Italic, Arial
@@ -234,7 +235,7 @@ editTargets(command := "") {
 		if (cleanupHeight == 20)
 			cleanupHeight := 40
 			
-		Gui TE:Add, GroupBox, YP+30 w220 h%cleanupHeight%, Cleanup
+		Gui TE:Add, GroupBox, YP+30 w220 h%cleanupHeight%, % translate("Cleanup")
 	
 		Gui TE:Font, Norm, Arial
 	
@@ -248,7 +249,7 @@ editTargets(command := "") {
 				Gui TE:Add, CheckBox, %option% Checked%setting% vcleanupVariable%A_Index%, %target%
 			}
 		else
-			Gui TE:Add, Text, YP+20 XP+10, No targets found...
+			Gui TE:Add, Text, YP+20 XP+10, % translate("No targets found...")
 	
 		Gui TE:Font, Norm, Arial
 		Gui TE:Font, Italic, Arial
@@ -258,7 +259,7 @@ editTargets(command := "") {
 		if (buildHeight == 20)
 			buildHeight := 40
 			
-		Gui TE:Add, GroupBox, XP-10 YP+30 w220 h%buildHeight%, Build
+		Gui TE:Add, GroupBox, XP-10 YP+30 w220 h%buildHeight%, % translate("Compile")
 	
 		Gui TE:Font, Norm, Arial
 	
@@ -275,17 +276,17 @@ editTargets(command := "") {
 				Gui TE:Add, CheckBox, %option% Checked%setting% vbuildVariable%A_Index%, %target%
 			}
 		else
-			Gui TE:Add, Text, YP+20 XP+10, No targets found...
+			Gui TE:Add, Text, YP+20 XP+10, % translate("No targets found...")
 	 
 		themes := getAllThemes()
 		chosen := (vSplashTheme ? inList(themes, vSplashTheme) + 1 : 1)
 		themes := "None|" + values2String("|", themes*)
 		
-		Gui TE:Add, Text, X10 Y+20, Splash Theme
+		Gui TE:Add, Text, X10 Y+20, % translate("Splash Theme")
 		Gui TE:Add, DropDownList, X90 YP-5 w140 Choose%chosen% vsplashTheme, %themes%
 		
-		Gui TE:Add, Button, Default X10 y+20 w100 gsaveTargets, &Build
-		Gui TE:Add, Button, X+20 w100 gcancelTargets, &Cancel
+		Gui TE:Add, Button, Default X10 y+20 w100 gsaveTargets, % translate("Build")
+		Gui TE:Add, Button, X+20 w100 gcancelTargets, % translate("&Cancel")
 	
 		Gui TE: Margin, 10, 10
 		Gui TE: show, AutoSize Center
@@ -303,9 +304,9 @@ runCleanTargets(ByRef buildProgress) {
 		targetName := target[1]
 	
 		if !kSilentMode
-			Progress %buildProgress%, % "Cleaning " . targetName . "..."
+			Progress %buildProgress%, % translate("Cleaning ") . targetName . translate("...")
 			
-		logMessage(kLogInfo, "Cleaning " . targetName)
+		logMessage(kLogInfo, translate("Cleaning ") . targetName)
 
 		if (target.Length() == 2) {
 			fileOrFolder := target[2]
@@ -320,7 +321,7 @@ runCleanTargets(ByRef buildProgress) {
 					FileDelete %A_LoopFilePath%
 			
 					if !kSilentMode
-						Progress %buildProgress%, % translate("Deleting ") . A_LoopFileName . "..."
+						Progress %buildProgress%, % translate("Deleting ") . A_LoopFileName . translate("...")
 					
 					Sleep 50
 				}
@@ -344,7 +345,7 @@ runCleanTargets(ByRef buildProgress) {
 				FileDelete %A_LoopFilePath%
 			
 				if !kSilentMode
-					Progress %buildProgress%, % translate("Deleting ") . A_LoopFileName . "..."
+					Progress %buildProgress%, % translate("Deleting ") . A_LoopFileName . translate("...")
 		
 				Sleep 100
 			}
@@ -362,13 +363,15 @@ runCleanTargets(ByRef buildProgress) {
 }
 
 runBuildTargets(ByRef buildProgress) {
+	local title
+	
 	for ignore, target in vBuildTargets {
 		targetName := target[1]
 	
 		if !kSilentMode
-			Progress %buildProgress%, % translate("Compiling ") . targetName . "..."
+			Progress %buildProgress%, % translate("Compiling ") . targetName . translate("...")
 			
-		logMessage(kLogInfo, translate("Compiling ") . targetName)
+		logMessage(kLogInfo, translate("Check ") . targetName)
 
 		build := false
 		
@@ -386,16 +389,18 @@ runBuildTargets(ByRef buildProgress) {
 			build := true
 		
 		if build {
-			logMessage(kLogInfo, targetName . " or dependent files out of date - needs recompile")
-			logMessage(kLogInfo, "Compiling " . targetSource)
+			logMessage(kLogInfo, targetName . translate(" or dependent files out of date - need recompile"))
+			logMessage(kLogInfo, translate("Compiling ") . targetSource)
 
 			try {
 				RunWait % kCompiler . " /in """ . targetSource . """"
 			}
 			catch exception {
-				logMessage(kLogCritical, "Cannot compile " . targetSource . " - source file or AHK Compiler (" . kCompiler . ") not found")
+				logMessage(kLogCritical, translate("Cannot compile ") . targetSource . translate(" - source file or AHK Compiler (") . kCompiler . translate(") not found"))
 			
-				SplashTextOn 800, 60, Modular Simulator Controller System - Compiler, Cannot compile %targetSource%: `n`nSource file or AHK Compiler (%kCompiler%) not found...
+				title := translate("Modular Simulator Controller System - Compiler")
+				
+				SplashTextOn 800, 60, %title%, % substituteVariables(translate("Cannot compile %targetSource%: Source file or AHK Compiler (%kCompiler%) not found..."), {targetSource: targetSource, kCompiler: kCompiler})
 				
 				Sleep 5000
 				
@@ -428,7 +433,7 @@ prepareTargets(ByRef buildProgress) {
 		build := vCleanupSettings[target]
 		
 		if !kSilentMode
-			Progress, %buildProgress%, % target . ": " . (build ? "Yes" : "No")
+			Progress, %buildProgress%, % target . ": " . (build ? translate("Yes") : translate("No"))
 		
 		if build {
 			arguments := substituteVariables(arguments)
@@ -444,7 +449,7 @@ prepareTargets(ByRef buildProgress) {
 		build := vBuildSettings[target]
 		
 		if !kSilentMode
-			Progress, %buildProgress%, % target . ": " . (build ? "Yes" : "No")
+			Progress, %buildProgress%, % target . ": " . (build ? translate("Yes") : translate("No"))
 		
 		if build {
 			arguments := substituteVariables(arguments)
@@ -468,7 +473,7 @@ runTargets() {
 	readToolsConfiguration(vCleanupSettings, vBuildSettings, vSplashTheme)
 	
 	if (!FileExist(getFileName(kToolsConfigurationFile, kUserConfigDirectory, kConfigDirectory)) || GetKeyState("Ctrl"))
-		if (!editTargets() && !isDebug())
+		if !editTargets()
 			ExitApp 0
 	
 	icon := kIconsDirectory . "Tools.ico"
@@ -484,20 +489,20 @@ runTargets() {
 	y := A_ScreenHeight - 150
 	
 	if !kSilentMode
-		Progress 1:B w300 x%x% y%y% FS8 CWD0D0D0 CBGreen, %A_Space%, Preparing Targets
+		Progress 1:B w300 x%x% y%y% FS8 CWD0D0D0 CBGreen, %A_Space%, % translate("Preparing Targets")
 
 	buildProgress := 0
 	
 	prepareTargets(buildProgress)
 	
 	if !kSilentMode
-		Progress, , %A_Space%, Running Targets
+		Progress, , %A_Space%, % translate("Running Targets")
 	
 	runCleanTargets(buildProgress)
 	runBuildTargets(buildProgress)
 		
 	if !kSilentMode
-		Progress 100, Done
+		Progress 100, % translate("Done")
 	
 	Sleep 500
 	
@@ -532,7 +537,10 @@ protectionOn()
 try {
 	SoundPlay *32
 	OnMessage(0x44, "translateMsgBoxButtons")
-	MsgBox 262180, Simulator Build, Cancel target processing?
+	
+	title := translate("Simulator Build")
+	
+	MsgBox 262180, %title%, % translate("Cancel target processing?")
 	OnMessage(0x44, "")
 	
 	IfMsgBox Yes

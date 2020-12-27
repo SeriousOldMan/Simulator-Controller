@@ -110,7 +110,8 @@ class SimulatorStartup extends ConfigurationItem {
 				ExitApp 0
 			else if (noSetup && (readConfiguration(kSimulatorConfigurationFile).Count() == 0)) {
 				OnMessage(0x44, "translateMsgBoxButtons")
-				MsgBox 262160, Error, Cannot initiate startup sequence, please complete the setup...
+				error := translate("Error")
+				MsgBox 262160, %error%, % translate("Cannot initiate startup sequence, please complete the setup...")
 				OnMessage(0x44, "")
 			
 				ExitApp 0
@@ -126,8 +127,10 @@ class SimulatorStartup extends ConfigurationItem {
 	}
 	
 	startSimulatorController() {
+		local title
+		
 		try {
-			logMessage(kLogInfo, "Starting Simulator Controller")
+			logMessage(kLogInfo, translate("Starting ") . "Simulator Controller")
 			
 			exePath := kBinariesDirectory . "Simulator Controller.exe"
 			
@@ -136,9 +139,11 @@ class SimulatorStartup extends ConfigurationItem {
 			return simulatorControllerPID
 		}
 		catch exception {
-			logMessage(kLogCritical, "Cannot start Simulator Controller (" . exePath . ") - please rebuild the applications in the binaries folder (" . kBinariesDirectory . ")")
+			logMessage(kLogCritical, translate("Cannot start Simulator Controller (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 			
-			SplashTextOn 800, 60, Modular Simulator Controller System - Startup, Cannot start Simulator Controller (kBinariesDirectory . "Simulator Controller.exe"): `n`nPlease rebuild the applications...
+			title := translate("Modular Simulator Controller System - Startup")
+			
+			SplashTextOn 800, 60, %title%, % substituteVariables(translate("Cannot start Simulator Controller (%kBinariesDirectory%Simulator Controller.exe): Please rebuild the applications..."))
 				
 			Sleep 5000
 				
@@ -149,7 +154,7 @@ class SimulatorStartup extends ConfigurationItem {
 	}
 	
 	startComponent(component) {
-		logMessage(kLogInfo, "Starting component " . component)
+		logMessage(kLogInfo, translate("Starting component ") . component)
 				
 		raiseEvent("ahk_pid " . this.iSimulatorControllerPID, "Startup", "startupComponent:" . component)
 	}
@@ -160,18 +165,16 @@ class SimulatorStartup extends ConfigurationItem {
 			
 			if getConfigurationValue(this.ControllerConfiguration, section, component, true) {
 				if !kSilentMode
-					Progress, , % "Start: " . component . "..."
+					Progress, , % translate("Start: ") . component . translate("...")
 				
-				logMessage(kLogInfo, "Component " . component . " is actived")
-				
-				this.rotateSplash()
+				logMessage(kLogInfo, translate("Component ") . component . translate(" is activated"))
 				
 				this.startComponent(component)
 				
 				Sleep 2000
 			}
 			else
-				logMessage(kLogInfo, "Component " . component . " is deactived")
+				logMessage(kLogInfo, translate("Component ") . component . translate(" is deactivated"))
 			
 			if !kSilentMode
 				Progress % Round((runningIndex++ / (this.iCoreComponents.Length() + this.iFeedbackComponents.Length())) * 90)
@@ -197,6 +200,9 @@ class SimulatorStartup extends ConfigurationItem {
 		this.iSimulatorControllerPID := this.startSimulatorController()
 		vSimulatorControllerPID := this.iSimulatorControllerPID
 		
+		if (this.iSimulatorControllerPID == 0)
+			ExitApp 0
+		
 		if (!kSilentMode && this.iSplashTheme)
 			showSplashTheme(this.iSplashTheme, "playSong")
 			
@@ -204,10 +210,8 @@ class SimulatorStartup extends ConfigurationItem {
 		y := A_ScreenHeight - 150
 		
 		if !kSilentMode
-			Progress B w300 x%x% y%y% FS8 CWD0D0D0 CBBlue, Start: Simulator Controller, Initialize Core System
-		
-		if (this.iSimulatorControllerPID == 0)
-			ExitApp 0
+			message := translate("Start: Simulator Controller")
+			Progress B w300 x%x% y%y% FS8 CWD0D0D0 CBBlue, %message%, % translate("Initialize Core System")
 					
 		Loop 50 {
 			if !kSilentMode
@@ -216,8 +220,10 @@ class SimulatorStartup extends ConfigurationItem {
 			Sleep 5
 		}
 
-		if !kSilentMode
-			Progress B w300 x%x% y%y% FS8 CWD0D0D0 CBGreen, ..., Starting System Components
+		if !kSilentMode {
+			message := translate("...")
+			Progress B w300 x%x% y%y% FS8 CWD0D0D0 CBGreen, %message%, % translate("Starting System Components")
+		}
 			
 		runningIndex := 1
 		
@@ -225,7 +231,7 @@ class SimulatorStartup extends ConfigurationItem {
 		this.startComponents("Feedback", this.iFeedbackComponents, startSimulator, runningIndex)
 		
 		if !kSilentMode
-			Progress 100, Done
+			Progress 100, % translate("Done")
 		
 		Sleep 500
 		
@@ -306,8 +312,6 @@ handleStartupEvents(event, data) {
 
 startSimulator()
 
-return
-
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Hotkey & Label Section                          ;;;
@@ -323,7 +327,10 @@ try {
 	if !vStartupFinished {
 		SoundPlay *32
 		OnMessage(0x44, "translateMsgBoxButtons")
-		MsgBox 262180, Simulator Startup, Cancel Startup?
+		
+		title := translate("Simulator Startup")
+		
+		MsgBox 262180, %title%, % translate("Cancel Startup?")
 		OnMessage(0x44, "")
 		
 		IfMsgBox Yes

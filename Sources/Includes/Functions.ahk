@@ -132,7 +132,7 @@ decodeDWORD(data) {
 }
 
 unknownEventHandler(event, data) {
-	logMessage(kLogCritical, "Unhandled event " . event . ": " . data . "received")
+	logMessage(kLogCritical, translate("Unhandled event ") . event . translate(": ") . data)
 }
 
 dispatchEvent(wParam, lParam) {
@@ -161,7 +161,7 @@ dispatchEvent(wParam, lParam) {
 	if (!eventHandler)
 		eventHandler := vEventHandlers["*"]
 	
-	logMessage(kLogInfo, "Dispatching event " . event . (data[2] ? ": " . data[2] : ""))
+	logMessage(kLogInfo, translate("Dispatching event """) . event . (data[2] ? translate(""": ") . data[2] : translate("""")))
 	
 	vWaitingEvents.Push(Func(eventHandler).Bind(event, data[2]))
 }
@@ -175,7 +175,7 @@ initializeEventSystem() {
 }
 
 logError(exception) {
-	logMessage(kLogCritical, "Unhandled exception encountered in " . exception.File . " at line " . exception.Line . ": " . exception.Message)
+	logMessage(kLogCritical, translate("Unhandled exception encountered in ") . exception.File . translate(" at line ") . exception.Line . translate(": ") . exception.Message)
 	
 	return (vDebug ? false : true)
 }
@@ -192,34 +192,34 @@ loadSimulatorConfiguration() {
 	kSimulatorConfiguration := readConfiguration(kSimulatorConfigurationFile)
 	
 	if (kSimulatorConfiguration.Count() == 0)
-		logMessage(kLogCritical, "No configuration found - please run the setup tool...")	
+		logMessage(kLogCritical, translate("No configuration found - please run the setup tool..."))
 	
 	path := getConfigurationValue(kSimulatorConfiguration, "Configuration", "Home Path")
 	if path {
 		kHomeDirectory := path . "\"
 		
-		logMessage(kLogInfo, "Home path set to " . path)
+		logMessage(kLogInfo, translate("Home path set to ") . path)
 	}
 	else
-		logMessage(kLogWarn, "Home path not set")
+		logMessage(kLogWarn, translate("Home path not set"))
 	
 	path := getConfigurationValue(kSimulatorConfiguration, "Configuration", "AHK Path")
 	if path {
 		kAHKDirectory := path . "\"
 		
-		logMessage(kLogInfo, "AutoHotkey path set to " . path)
+		logMessage(kLogInfo, translate("AutoHotkey path set to ") . path)
 	}
 	else
-		logMessage(kLogWarn, "AutoHotkey path not set")
+		logMessage(kLogWarn, translate("AutoHotkey path not set"))
 	
 	path := getConfigurationValue(kSimulatorConfiguration, "Configuration", "NirCmd Path")
 	if path {
 		kNirCmd := path . "\NirCmd.exe"
 		
-		logMessage(kLogInfo, "NirCmd executable set to " . kNirCmd)
+		logMessage(kLogInfo, translate("NirCmd executable set to ") . kNirCmd)
 	}
 	else
-		logMessage(kLogWarn, "NirCmd executable not configured")
+		logMessage(kLogWarn, translate("NirCmd executable not configured"))
 		
 	vDebug := (!A_IsCompiled || getConfigurationValue(kSimulatorConfiguration, "Configuration", "Debug", false))
 	vLogLevel := inList(["Info", "Warn", "Critical", "Off"], getConfigurationValue(kSimulatorConfiguration, "Configuration", "Log Level", "Warn"))
@@ -243,7 +243,7 @@ initializeEnvironment() {
 	kVersion := getConfigurationValue(readConfiguration(kHomeDirectory . "VERSION"), "Version", "Current", "0.0.0")
 	
 	logMessage(kLogCritical, "---------------------------------------------------------------")
-	logMessage(kLogCritical, "           Running " . StrSplit(A_ScriptName, ".")[1] . " (" . kVersion . ")")
+	logMessage(kLogCritical, translate("           Running ") . StrSplit(A_ScriptName, ".")[1] . " (" . kVersion . ")")
 	logMessage(kLogCritical, "---------------------------------------------------------------")
 }
 
@@ -374,7 +374,7 @@ showSplashTheme(theme := "__Undefined__", songHandler := false, alwaysOnTop := t
 		images := string2Values(",", getConfigurationValue(kSimulatorConfiguration, "Splash Themes", theme . ".Images", false))
 	}
 	else {
-		logMessage(kLogCritical, "Theme """ . theme . """ not found - please run the setup tool...")
+		logMessage(kLogCritical, translate("Theme """) . theme . """ not found - please run the setup tool...")
 		
 		images := getFileNames("*.jpg", kUserSplashMediaDirectory, kSplashMediaDirectory)
 	}
@@ -470,7 +470,8 @@ translate(string) {
 			{
 				translation := StrSplit(A_LoopReadLine, "=>")
 				
-				translations[translation[1]] := translation[2]
+				if (translation[1][1] != "[")
+					translations[translation[1]] := translation[2]
 			}
 		}
 		
@@ -554,7 +555,7 @@ normalizeFilePath(filePath) {
 	}
 }
 
-substituteVariables(string) {
+substituteVariables(string, values := false) {
 	result := string
 	
 	Loop {
@@ -566,7 +567,8 @@ substituteVariables(string) {
 			
 			if endPos {
 				variable := SubStr(result, startPos, endPos - startPos)
-				value := %variable%
+				
+				value := (values && values.HasKey(variable)) ? values[variable] : %variable%
 				
 				result := StrReplace(result, "%" . variable . "%", value)
 			}
@@ -643,21 +645,21 @@ registerEventHandler(event, handler) {
 
 raiseEvent(target, event, data) {
 	if !target {
-		logMessage(kLogInfo, "Raising event " . event . (data ? ": " . data : "") . " in current process")
+		logMessage(kLogInfo, translate("Raising event """) . event . (data ? translate(""": ") . data : translate("""")) . translate(" in current process"))
 		
 		eventHandler := vEventHandlers[event]
 	
 		if (!eventHandler)
 			eventHandler := vEventHandlers["*"]
 	
-		logMessage(kLogInfo, "Dispatching event " . event . (data ? ": " . data : ""))
+		logMessage(kLogInfo, translate("Dispatching event """) . event . (data ? translate(""": ") . data : translate("""")))
 		
 		vWaitingEvents.Push(Func(eventHandler).Bind(event, data))
 	
 		%eventHandler%(event, data)
 	}
 	else {
-		logMessage(kLogInfo, "Raising event " . event . (data ? ": " . data : "") . " in target " . target)
+		logMessage(kLogInfo, translate("Raising event """) . event . (data ? translate(""": ") . data : translate("""")) . translate(" in target ") . target)
 		
 		curDetectHiddenWindows := A_DetectHiddenWindows
 		curTitleMatchMode := A_TitleMatchMode
@@ -733,8 +735,8 @@ translateMsgBoxButtons() {
 		ControlGetText label, Button1
 		
 		if (label != "Ok") {
-			ControlSetText Button1, Yes
-			ControlSetText Button2, No
+			ControlSetText Button1, % translate("Yes")
+			ControlSetText Button2, % translate("No")
 		}
     }
 }
@@ -834,7 +836,7 @@ removeConfigurationValue(configuration, section, key) {
 setDebug(debug) {
 	vDebug := debug
 	
-	state := debug ? "Enabled" : "Disabled"
+	state := debug ? translate("Enabled") : translate("Disabled")
 	
 	TrayTip Modular Simulator Controller System, Debug: %state%
 }
@@ -842,20 +844,20 @@ setDebug(debug) {
 setLogLevel(level) {
 	vLogLevel := Min(kLogOff, Max(level, kLogInfo))
 	
-	state := "Unknown"
+	state := translate("Unknown")
 	
 	switch vLogLevel {
 		case kLogInfo:
-			state := "Info"
+			state := translate("Info")
 		case kLogWarn:
-			state := "Warn"
+			state := translate("Warn")
 		case kLogCritical:
-			state := "Critical"
+			state := translate("Critical")
 		case kLogOff:
-			state := "Off"
+			state := translate("Off")
 	}
 
-	TrayTip Modular Simulator Controller System, Log Level: %state%
+	TrayTip Modular Simulator Controller System, % translate("Log Level: ") . %state%
 }
 
 increaseLogLevel() {

@@ -1,5 +1,5 @@
 [Version]
-Current=1.3.3-stable
+Current=1.4.0-dev
 Target=1.3.3-stable
-Changes=New Button Box Visuals
+Changes=Unicode localization support
 Date=12/27/2020

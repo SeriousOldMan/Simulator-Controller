@@ -187,7 +187,6 @@ initializeTrayMessageQueue() {
 }
 
 loadSimulatorConfiguration() {
-	msgbox % A_isUnicode
 	kSimulatorConfiguration := readConfiguration(kSimulatorConfigurationFile)
 	
 	if (kSimulatorConfiguration.Count() == 0)

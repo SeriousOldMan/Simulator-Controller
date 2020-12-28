@@ -221,7 +221,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 			if (function != false)
 				this.registerAction(new this.FXToggleAction(function, label, command, initialState))
 			else
-				logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the setup"))
+				this.logFunctionNotFound(descriptor)
 		}
 	}
 
@@ -231,7 +231,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		if (function != false)
 			mode.registerAction(new this.FXChangeAction(function, label, effect, kIncrease, kDecrease))
 		else
-			logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the setup"))
+			this.logFunctionNotFound(descriptor)
 	}
 	
 	createModeAction(controller, mode, effect, increaseFunction, decreaseFunction := false) {
@@ -239,23 +239,29 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		
 		if !decreaseFunction {
 			if (function != false)
-				mode.registerAction(new this.FXChangeAction(function, translateLabel(this.getLabel(ConfigurationItem.descriptor(effect, "Toggle"), effect)), effect, kIncrease, kDecrease))
+				mode.registerAction(new this.FXChangeAction(function, this.getLabel(ConfigurationItem.descriptor(effect, "Toggle"), effect), effect, kIncrease, kDecrease))
 			else
-				logMessage(kLogWarn, translate("Controller function ") . increaseFunction . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the setup"))
+				this.logFunctionNotFound(increaseFunction)
 		}
 		else {
 			if (function != false)
-				mode.registerAction(new this.FXChangeAction(function, translateLabel(this.getLabel(ConfigurationItem.descriptor(effect, "Increase"), effect)), effect, kIncrease))
+				mode.registerAction(new this.FXChangeAction(function, this.getLabel(ConfigurationItem.descriptor(effect, "Increase"), effect), effect, kIncrease))
 			else
-				logMessage(kLogWarn, translate("Controller function ") . increaseFunction . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the setup"))
+				this.logFunctionNotFound(increaseFunction)
 				
 			function := this.Controller.findFunction(decreaseFunction)
 			
 			if (function != false)
-				mode.registerAction(new this.FXChangeAction(function, translateLabel(this.getLabel(ConfigurationItem.descriptor(effect, "Decrease"), effect)), effect, kDecrease))
+				mode.registerAction(new this.FXChangeAction(function, this.getLabel(ConfigurationItem.descriptor(effect, "Decrease"), effect), effect, kDecrease))
 			else
-				logMessage(kLogWarn, translate("Controller function ") . decreaseFunction . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the setup"))
+				this.logFunctionNotFound(decreaseFunction)
 		}
+	}
+	
+	getLabel(descriptor, default := false) {
+		label := translate(base.getLabel(descriptor, default))
+		
+		return StrReplace(StrReplace(label, "Increase", translate("Increase")), "Decrease", translate("Decrease"))
 	}
 	
 	activate() {
@@ -319,10 +325,6 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
-
-translateLabel(label) {
-	return StrReplace(StrReplace(label, "Increase", translate("Increase")), "Decrease", translate("Decrease"))
-}
 
 updateVibrationState() {
 	static plugin := false

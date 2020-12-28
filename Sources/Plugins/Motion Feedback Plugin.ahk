@@ -393,7 +393,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		if (function != false)
 			this.registerAction(new this.MotionToggleAction(function, "Motion"))
 		else
-			logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the setup"))
+			this.logFunctionNotFound(descriptor)
 		
 		motionMode := new this.MotionMode(this)
 		
@@ -405,7 +405,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		if (function != false)
 			motionMode.registerAction(new this.MotionIntensityAction(function, motionMode))
 		else
-			logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the setup"))
+			this.logFunctionNotFound(descriptor)
 		
 		for index, effect in this.kEffects
 			this.createEffectToggleAction(controller, motionMode, effectFunctions[index], effect)
@@ -416,7 +416,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		if (function != false)
 			motionMode.registerAction(new this.EffectSelectorAction(function, "Effect Intensity"))
 		else
-			logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the setup"))
+			this.logFunctionNotFound(descriptor)
 		
 		descriptor := motionEffectIntensityArguments[2]
 		function := this.Controller.findFunction(descriptor)
@@ -428,7 +428,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			motionMode.registerIntensityDialAction(intensityDialAction)
 		}
 		else
-			logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the setup"))
+			this.logFunctionNotFound(descriptor)
 		
 		controller.registerPlugin(this)
 		
@@ -514,7 +514,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		if (function != false)
 			mode.registerAction(new this.EffectToggleAction(function, mode, effect))
 		else
-			logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the setup"))
+			this.logFunctionNotFound(descriptor)
 	}
 	
 	activate() {

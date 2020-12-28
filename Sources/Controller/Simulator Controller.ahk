@@ -967,7 +967,7 @@ class ControllerPlugin extends Plugin {
 	activate() {
 		controller := this.Controller
 		
-		logMessage(kLogInfo, translate("Activating plugin ") . this.Plugin)
+		logMessage(kLogInfo, translate("Activating plugin ") . translate(this.Plugin))
 		
 		for ignore, action in this.Actions {
 			controller.connectAction(action.Function, action)
@@ -980,7 +980,7 @@ class ControllerPlugin extends Plugin {
 	deactivate() {
 		controller := this.Controller
 		
-		logMessage(kLogInfo, translate("Deactivating plugin ") . this.Plugin)
+		logMessage(kLogInfo, translate("Deactivating plugin ") . translate(this.Plugin))
 		
 		for ignore, action in this.Actions
 			controller.disconnectAction(action.Function, action)
@@ -1006,6 +1006,10 @@ class ControllerPlugin extends Plugin {
 			label := default
 			
 		return label
+	}
+	
+	logFunctionNotFound(functionDescriptor) {
+		logMessage(kLogWarn, translate("Controller function ") . functionDescriptor . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the setup"))
 	}
 }
 

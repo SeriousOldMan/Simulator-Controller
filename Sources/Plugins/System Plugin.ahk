@@ -214,7 +214,7 @@ class SystemPlugin extends ControllerPlugin {
 			if (function != false)
 				this.registerAction(this.iModeSelector := new this.ModeSelectorAction(function))
 			else
-				logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the setup"))
+				this.logFunctionNotFound(descriptor)
 		}
 		
 		for descriptor, name in getConfigurationSectionValues(configuration, "Applications", Object())
@@ -244,7 +244,7 @@ class SystemPlugin extends ControllerPlugin {
 					logMessage(kLogWarn, translate("Application ") . appDescriptor[2] . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the setup"))
 			}
 			else
-				logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the setup"))
+				this.logFunctionNotFound(descriptor)
 		}
 			
 		if ((btnBox != false) && !registeredButtons.HasKey(btnBox.NumButtons)) {
@@ -254,7 +254,7 @@ class SystemPlugin extends ControllerPlugin {
 			if (function != false)
 				this.iLaunchMode.registerAction(new this.SystemShutdownAction(function, "Shutdown"))
 			else
-				logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the setup"))
+				this.logFunctionNotFound(descriptor)
 		}
 			
 		if ((btnBox != false) && !registeredButtons.HasKey(btnBox.NumButtons - 1)) {
@@ -264,7 +264,7 @@ class SystemPlugin extends ControllerPlugin {
 			if (function != false)
 				this.iLaunchMode.registerAction(new this.LogoToggleAction(function, ""))
 			else
-				logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the setup"))
+				this.logFunctionNotFound(descriptor)
 		}
 	}
 	

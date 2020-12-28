@@ -50,7 +50,7 @@ class SystemPlugin extends ControllerPlugin {
 				
 				stateChange := true
 				
-				trayMessage(kSystemPlugin, (isRunning ? "Start: " : "Stop: ") . this.Application)
+				trayMessage(translate(kSystemPlugin), (isRunning ? translate("Start: ") : translate("Stop: ")) . this.Application)
 			}
 			
 			if (stateChange && this.LaunchpadFunction != false) {
@@ -100,7 +100,7 @@ class SystemPlugin extends ControllerPlugin {
 		fireAction(function, trigger) {
 			this.Controller.rotateMode(((trigger == "Off") || (trigger == "Decrease")) ? -1 : 1)
 
-			this.Function.setText(this.Label)
+			this.Function.setText(translate(this.Label))
 		}
 	}
 
@@ -211,7 +211,7 @@ class SystemPlugin extends ControllerPlugin {
 			if (function != false)
 				this.registerAction(this.iModeSelector := new this.ModeSelectorAction(function))
 			else
-				logMessage(kLogWarn, "Controller function " . descriptor . " not found in plugin " . this.Plugin . " - please check the setup")
+				logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in plugin ") . this.Plugin . translate(" - please check the setup"))
 		}
 		
 		for descriptor, name in getConfigurationSectionValues(configuration, "Applications", Object())
@@ -226,19 +226,22 @@ class SystemPlugin extends ControllerPlugin {
 			if (function != false) {
 				appDescriptor := string2Values("|", appDescriptor)
 			
-				registeredButtons[ConfigurationItem.splitDescriptor(descriptor)[2]] := true
-				
-				action := new this.LaunchAction(function, appDescriptor[1], appDescriptor[2])
-				
-				this.iLaunchMode.registerAction(action)
-				
 				runnable := this.findRunnableApplication(appDescriptor[2])
 				
-				if (runnable != false)
+				if (runnable != false) {
+					registeredButtons[ConfigurationItem.splitDescriptor(descriptor)[2]] := true
+					
+					action := new this.LaunchAction(function, appDescriptor[1], appDescriptor[2])
+					
+					this.iLaunchMode.registerAction(action)
+				
 					runnable.connectAction(function, action)
+				}
+				else
+					logMessage(kLogWarn, translate("Application ") . appDescriptor[2] . translate(" not found in plugin ") . this.Plugin . translate(" - please check the setup"))
 			}
 			else
-				logMessage(kLogWarn, "Controller function " . descriptor . " not found in plugin " . this.Plugin . " - please check the setup")
+				logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in plugin ") . this.Plugin . translate(" - please check the setup"))
 		}
 			
 		if ((btnBox != false) && !registeredButtons.HasKey(btnBox.NumButtons)) {
@@ -248,7 +251,7 @@ class SystemPlugin extends ControllerPlugin {
 			if (function != false)
 				this.iLaunchMode.registerAction(new this.SystemShutdownAction(function, "Shutdown"))
 			else
-				logMessage(kLogWarn, "Controller function " . descriptor . " not found in plugin " . this.Plugin . " - please check the setup")
+				logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in plugin ") . this.Plugin . translate(" - please check the setup"))
 		}
 			
 		if ((btnBox != false) && !registeredButtons.HasKey(btnBox.NumButtons - 1)) {
@@ -258,7 +261,7 @@ class SystemPlugin extends ControllerPlugin {
 			if (function != false)
 				this.iLaunchMode.registerAction(new this.LogoToggleAction(function, ""))
 			else
-				logMessage(kLogWarn, "Controller function " . descriptor . " not found in plugin " . this.Plugin . " - please check the setup")
+				logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in plugin ") . this.Plugin . translate(" - please check the setup"))
 		}
 	}
 	
@@ -376,7 +379,9 @@ restoreSimulatorVolume() {
 			}
 		}
 		catch exception {
-			SplashTextOn 800, 60, Modular Simulator Controller System - Controller (Plugin: System), Cannot start NirCmd (%kNirCmd%): `n`nPlease run the setup tool...
+			title := translate("Modular Simulator Controller System - Controller (Plugin: System)")
+			
+			SplashTextOn 800, 60, %title%, % substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the setup..."))
 					
 			Sleep 5000
 					
@@ -399,7 +404,9 @@ muteSimulator() {
 				Run %kNirCmd% setappvolume /%pid% 0.0
 			}
 			catch exception {
-				SplashTextOn 800, 60, Modular Simulator Controller System - Controller (Plugin: System), Cannot start NirCmd (%kNirCmd%): `n`nPlease run the setup tool...
+				title := translate("Modular Simulator Controller System - Controller (Plugin: System)")
+			
+				SplashTextOn 800, 60, %title%, % substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the setup..."))
 						
 				Sleep 5000
 						
@@ -472,7 +479,7 @@ updateModeSelector() {
 			else {
 				countDown := 5
 				
-				currentMode := "Mode Selector"
+				currentMode := translate("Mode Selector")
 			}
 			
 			modeSelectorMode := !modeSelectorMode
@@ -484,7 +491,7 @@ updateModeSelector() {
 			selector := controller.findPlugin(kSystemPlugin).ModeSelector
 			function := selector.Function
 			
-			function.setText(currentMode, (currentMode == "Mode Selector") ? "Gray" : "Black")
+			function.setText(currentMode, (currentMode == translate("Mode Selector")) ? "Gray" : "Black")
 			
 			if !modeSelectorMode
 				lastMode := currentMode

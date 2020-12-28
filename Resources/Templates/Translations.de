@@ -13,6 +13,7 @@ Error=>Fehler
 ...=>...
 Enabled=>Aktviert
 Disabled=>Deaktiviert
+On=>An
 Off=>Aus
 [Functions]
 Unhandled event =>Unbekanntes Ereignis 
@@ -84,6 +85,7 @@ Unsupported argument (=>Nicht unterstütztes Argument (
  not found in custom controller action switchToggle - please check the setup=> nicht gefunden in "switchToggle" - Bitte überprüfen Sie die Konfiguration
 [System Plugin]
 Application =>Anwendung 
+Shutdown=>Abschalten
 Controller function =>Funktion 
  not found in plugin => nicht gefunden für 
  - please check the setup=> - Bitte überprüfen Sie die Konfiguration
@@ -94,6 +96,33 @@ Stop: =>Stop:
 Mode Selector=>Modus Wahl
 Modular Simulator Controller System - Controller (Plugin: System)=>Modular Simulator Controller System - Steuerung (Erweiterung: System)
 Cannot start NirCmd (%kNirCmd%) - please check the setup...=>NirCmd (%kNirCmd%) kann nicht gestartet werden - Bitte überprüfen Sie die Konfiguration...
+[ACC Plugin]
+Controller function =>Funktion 
+ not found in plugin => nicht gefunden für 
+ - please check the setup=> - Bitte überprüfen Sie die Konfiguration
+[Motion Feedback Plugin]
+Motion Feedback=>Bewegung
+Motion=>Bewegung
+State: On=>Status: An
+State: Off=>Status: Aus
+Intensity: =>Intensität: 
+Motion Intensity=>Bewegung Intensität
+Intensity Adjustment: =>Intensität Einstellung: 
+Effect: =>Effekt: 
+State: =>Status: 
+Configured application path for SimFeedback connector (=>Der Konnektor (
+) not found - please check the setup=>) für SimFeedback kann nicht gefunden werden - Bitte überprüfen Sie die Konfiguration
+Controller function =>Funktion 
+ not found in plugin => nicht gefunden für 
+ - please check the setup=> - Bitte überprüfen Sie die Konfiguration
+Effect Intensity=>Effekt Intensität
+Invoking command SimFeedback connector with arguments: =>Sende Kommando an SimFeedback: 
+Error while connecting to SimFeedback (=>Fehler während der Kommunikation mit SimFeedback (
+): =>): 
+ - please check the setup=> - Bitte überprüfen Sie die Konfiguration
+Cannot connect to SimFeedback (%kSimFeedbackConnector%) - please check the setup...=>Kommunikation mit SimFeedback (%kSimFeedbackConnector%) fehlerhaft - Bitte überprüfen Sie die Konfiguration...
+Plugin Motion Feedback deactivated, because the configured application path (=>Die Erweiterung für Bewegung wurde nicht aktiviert, da der Anwendungspfad (
+) cannot be found - please check the setup=>) nicht gefunden werden kann - Bitte überprüfen Sie die Konfiguration
 [Simulator Tools]
 Checking file =>Überprüfe Datei 
  for modification=> auf Modifikationen

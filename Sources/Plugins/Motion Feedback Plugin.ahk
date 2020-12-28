@@ -177,14 +177,14 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 				this.Plugin.startMotion()
 				
 			if this.Active {				
-				trayMessage(this.Label, "State: On")
+				trayMessage(translate(this.Label), translate("State: On"))
 			
-				function.setText(this.Label, "Green")
+				function.setText(translate(this.Label), "Green")
 			}
 			else {
-				trayMessage(this.Label, "State: Off")
+				trayMessage(translate(this.Label), translate("State: Off"))
 			
-				function.setText(this.Label, "Gray")
+				function.setText(translate(this.Label), "Gray")
 			}
 		}
 	}
@@ -224,13 +224,13 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			
 			currentIntensity := this.Mode.Plugin.getMotionIntensity()
 			
-			trayMessage("Motion", "Intensity: " . currentIntensity)
+			trayMessage(translate("Motion"), translate("Intensity: ") . currentIntensity)
 				
 			function.setText(currentIntensity . "%")
 			
 			Sleep 500
 			
-			function.setText("Motion Intensity")
+			function.setText(translate("Motion Intensity"))
 		}
 	}
 
@@ -259,7 +259,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			if this.Mode.PendingEffect {
 				this.Mode.selectEffect(this.Effect)
 				
-				trayMessage("Motion", "Intensity Adjustment: " . this.Effect)
+				trayMessage(translate("Motion"), translate("Intensity Adjustment: ") . this.Effect)
 			}
 			else {
 				if (!this.Active && ((trigger = "On") || (trigger == "Push")))
@@ -267,7 +267,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 				else if (this.Active && ((trigger = "Off") || (trigger == "Push")))
 					this.Plugin.muteEffect(this.Effect)
 					
-				trayMessage("Motion", "Effect: " . this.Effect . ", State: " . (this.Active ? "On" : "Off"))
+				trayMessage(translate("Motion"), translate("Effect: ") . this.Effect . ", " . translate("State: ") . (this.Active ? translate("On") : translate("Off")))
 			
 				this.updateLabel(false)
 			}
@@ -275,11 +275,11 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		
 		updateLabel(highlighted) {
 			if highlighted
-				this.Function.setText(this.Label, "Blue")
+				this.Function.setText(translate(this.Label), "Blue")
 			else if this.Active
-				this.Function.setText(this.Label, "Green")
+				this.Function.setText(translate(this.Label), "Green")
 			else
-				this.Function.setText(this.Label, "Gray")
+				this.Function.setText(translate(this.Label), "Gray")
 		}
 	}
 			
@@ -301,7 +301,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			
 				currentIntensity := Format("{:.1f}", this.Mode.Plugin.getEffectIntensity(effect))
 				
-				trayMessage("Motion", "Effect: " . effect . ", Intensity: " . currentIntensity)
+				trayMessage(translate("Motion"), translate("Effect: ") . effect . ", " . translate("Intensity: ") . currentIntensity)
 				
 				function.setText(currentIntensity)
 				
@@ -357,7 +357,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		kSimFeedbackConnector := this.getArgumentValue("connector", false)
 		
 		if !FileExist(kSimFeedbackConnector) {
-			logMessage(kLogCritical, "Configured application path for SimFeedback connector (" . kSimFeedbackConnector . ") not found - please check the setup...")
+			logMessage(kLogCritical, translate("Configured application path for SimFeedback connector (") . kSimFeedbackConnector . translate(") not found - please check the setup"))
 			
 			kSimFeedbackConnector := false
 		}
@@ -393,7 +393,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		if (function != false)
 			this.registerAction(new this.MotionToggleAction(function, "Motion"))
 		else
-			logMessage(kLogWarn, "Controller function " . descriptor . " not found in plugin " . this.Plugin . " - please check the setup")
+			logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in plugin ") . this.Plugin . translate(" - please check the setup"))
 		
 		motionMode := new this.MotionMode(this)
 		
@@ -405,7 +405,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		if (function != false)
 			motionMode.registerAction(new this.MotionIntensityAction(function, motionMode))
 		else
-			logMessage(kLogWarn, "Controller function " . descriptor . " not found in plugin " . this.Plugin . " - please check the setup")
+			logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in plugin ") . this.Plugin . translate(" - please check the setup"))
 		
 		for index, effect in this.kEffects
 			this.createEffectToggleAction(controller, motionMode, effectFunctions[index], effect)
@@ -416,7 +416,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		if (function != false)
 			motionMode.registerAction(new this.EffectSelectorAction(function, "Effect Intensity"))
 		else
-			logMessage(kLogWarn, "Controller function " . descriptor . " not found in plugin " . this.Plugin . " - please check the setup")
+			logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in plugin ") . this.Plugin . translate(" - please check the setup"))
 		
 		descriptor := motionEffectIntensityArguments[2]
 		function := this.Controller.findFunction(descriptor)
@@ -428,7 +428,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			motionMode.registerIntensityDialAction(intensityDialAction)
 		}
 		else
-			logMessage(kLogWarn, "Controller function " . descriptor . " not found in plugin " . this.Plugin . " - please check the setup")
+			logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in plugin ") . this.Plugin . translate(" - please check the setup"))
 		
 		controller.registerPlugin(this)
 		
@@ -514,7 +514,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		if (function != false)
 			mode.registerAction(new this.EffectToggleAction(function, mode, effect))
 		else
-			logMessage(kLogWarn, "Controller function " . functionDescriptor . " not found in plugin " . this.Plugin . " - please check the setup")
+			logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in plugin ") . this.Plugin . translate(" - please check the setup"))
 	}
 	
 	activate() {
@@ -522,9 +522,9 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	
 		isRunning := this.Application.isRunning()
 		
-		action := this.findAction("Motion")
+		action := this.findAction(translate("Motion"))
 		
-		action.Function.setText(action.Label, isRunning ? (action.Active ? "Green" : "Black") : "Olive")
+		action.Function.setText(translate(action.Label), isRunning ? (action.Active ? "Green" : "Black") : "Olive")
 			
 		SetTimer updateMotionState, 50
 	}
@@ -556,7 +556,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		catch exception {
 			logMessage(kLogCritical, "Error while connecting to SimFeedback (" . kSimFeedbackConnector . "): " . exception.Message . " - please check the setup")
 			
-			SplashTextOn 800, 60, Modular Simulator Controller System, Cannot connect to SimFeedback (%kSimFeedbackConnector%) `n`nPlease run the setup tool...
+			SplashTextOn 800, 60, Modular Simulator Controller System, % substituteVariables(translate("Cannot connect to SimFeedback (%kSimFeedbackConnector%) - please check the setup..."))
 					
 			Sleep 5000
 						
@@ -974,7 +974,7 @@ initializeMotionFeedbackPlugin() {
 	kSimFeedback := getConfigurationValue(controller.Configuration, kMotionFeedbackPlugin, "Exe Path", false)
 	
 	if (!kSimFeedback || !FileExist(kSimFeedback)) {
-		logMessage(kLogCritical, "Plugin Motion Feedback deactivated, because the configured application path (" . kSimFeedback . ") cannot be found - please check the setup...")
+		logMessage(kLogCritical, translate("Plugin Motion Feedback deactivated, because the configured application path (") . kSimFeedback . translate(") cannot be found - please check the setup"))
 		
 		if !isDebug()
 			return
@@ -992,7 +992,7 @@ startMotion() {
 	protectionOn()
 	
 	try {
-		action := SimulatorController.Instance.findPlugin(kMotionFeedbackPlugin).findAction("Motion")
+		action := SimulatorController.Instance.findPlugin(kMotionFeedbackPlugin).findAction(translate("Motion"))
 	
 		action.fireAction(action.Function, "On")
 	}
@@ -1005,7 +1005,7 @@ stopMotion() {
 	protectionOn()
 	
 	try {
-		action := SimulatorController.Instance.findPlugin(kMotionFeedbackPlugin).findAction("Motion")
+		action := SimulatorController.Instance.findPlugin(kMotionFeedbackPlugin).findAction(translate("Motion"))
 	
 		action.fireAction(action.Function, "Off")
 	}

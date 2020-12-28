@@ -471,8 +471,6 @@ readTranslations(targetLanguage) {
 			else
 				translations[enString] := translation[2]
 	}
-	
-	return translations
 }
 
 translate(string) {

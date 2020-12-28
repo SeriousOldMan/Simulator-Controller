@@ -602,7 +602,7 @@ class SimulatorController extends ConfigurationItem {
 				newMode.activate()
 		
 			if modeSwitched
-				trayMessage(translate("Control"), translate("Mode: ") . newMode.Mode)
+				trayMessage(translate("Control"), translate("Mode: ") . translate(newMode.Mode))
 		}
 	}
 	
@@ -1351,7 +1351,7 @@ setMode(action) {
 			if ((mode != false) && controller.isActive(mode))
 				controller.setMode(mode)
 			else
-				trayMessage(translate("Control"), translate("Mode: ") . action . translate(" is not available"), 10000)
+				trayMessage(translate("Control"), translate("Mode: ") . translate(action) . translate(" is not available"), 10000)
 		}
 	}
 	finally {

@@ -1,9 +1,3 @@
-## 1.4, upcoming...
-
-  1. Bugfixes, as always
-  2. Documentation updates, as always
-  3. Unicode based translation support. German translation will be available - other languages can be easily added
-
 ## 1.3.3-stable, 12/27/20
 
   1. Bugfixes, as always

@@ -13,4 +13,3 @@
   
 #### General
   1. [Target: V1.4] Full Unicode translation support
-  2. Plugin support for the setup tool

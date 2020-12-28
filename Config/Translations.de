@@ -80,18 +80,6 @@ Unsupported argument (=>Nicht unterstütztes Argument (
  not found in custom controller action rotateDial - please check the setup=> nicht gefunden in "rotateDial" - Bitte überprüfen Sie die Konfiguration
 ) detected in switchToggle - please check the setup=>) übergeben an "switchToggle" - Bitte überprüfen Sie die Konfiguration
  not found in custom controller action switchToggle - please check the setup=> nicht gefunden in "switchToggle" - Bitte überprüfen Sie die Konfiguration
-[System Plugin]
-Application =>Anwendung 
-Controller function =>Funktion 
- not found in plugin => nicht gefunden für 
- - please check the setup=> - Bitte überprüfen Sie die Konfiguration
-System=>System
-Drive=>Fahren
-Start: =>Start: 
-Stop: =>Stop: 
-Mode Selector=>Modus Wahl
-Modular Simulator Controller System - Controller (Plugin: System)=>Modular Simulator Controller System - Steuerung (Erweiterung: System)
-Cannot start NirCmd (%kNirCmd%) - please check the setup...=>NirCmd (%kNirCmd%) kann nicht gestartet werden - Bitte überprüfen Sie die Konfiguration...
 [Simulator Tools]
 Checking file =>Überprüfe Datei 
  for modification=> auf Modifikationen

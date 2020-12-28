@@ -116,17 +116,17 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 				base.fireAction(function, trigger)
 				this.iIsActive := false
 				
-				trayMessage(this.Label, "State: Off")
+				trayMessage(translate(this.Label), translate("State: Off"))
 			
-				function.setText(this.Label, "Gray")
+				function.setText(translate(this.Label), "Gray")
 			}
 			else if (!this.iIsActive && ((trigger = "On") || (trigger == "Push"))) {
 				base.fireAction(function, trigger)
 				this.iIsActive := true
 				
-				trayMessage(this.Label, "State: On")
+				trayMessage(translate(this.Label), translate("State: On"))
 			
-				function.setText(this.Label, "Green")
+				function.setText(translate(this.Label), "Green")
 			}
 		}
 	}
@@ -161,13 +161,13 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 				
 			StringUpper change, change, T
 		
-			trayMessage(this.Label, change . " " . this.iEffect . " Vibration")
+			trayMessage(translate(this.iEffect), translate(change) . translate(" Vibration"))
 			
 			this.Function.setText(((change = kIncrease) ? "+ " : "- ") . kVibrationIntensityIncrement . "%")
 		
 			Sleep 500
 			
-			this.Function.setText(this.Label)
+			this.Function.setText(translate(this.Label))
 		}
 	}
 	
@@ -221,7 +221,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 			if (function != false)
 				this.registerAction(new this.FXToggleAction(function, label, command, initialState))
 			else
-				logMessage(kLogWarn, "Controller function " . descriptor . " not found in plugin " . this.Plugin . " - please check the setup")
+				logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the setup"))
 		}
 	}
 
@@ -231,7 +231,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		if (function != false)
 			mode.registerAction(new this.FXChangeAction(function, label, effect, kIncrease, kDecrease))
 		else
-			logMessage(kLogWarn, "Controller function " . descriptor . " not found in plugin " . this.Plugin . " - please check the setup")
+			logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the setup"))
 	}
 	
 	createModeAction(controller, mode, effect, increaseFunction, decreaseFunction := false) {
@@ -239,22 +239,22 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		
 		if !decreaseFunction {
 			if (function != false)
-				mode.registerAction(new this.FXChangeAction(function, this.getLabel(ConfigurationItem.descriptor(effect, "Toggle"), effect), effect, kIncrease, kDecrease))
+				mode.registerAction(new this.FXChangeAction(function, translateLabel(this.getLabel(ConfigurationItem.descriptor(effect, "Toggle"), effect)), effect, kIncrease, kDecrease))
 			else
-				logMessage(kLogWarn, "Controller function " . increaseFunction . " not found in plugin " . this.Plugin . " - please check the setup")
+				logMessage(kLogWarn, translate("Controller function ") . increaseFunction . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the setup"))
 		}
 		else {
 			if (function != false)
-				mode.registerAction(new this.FXChangeAction(function, this.getLabel(ConfigurationItem.descriptor(effect, "Increase"), effect), effect, kIncrease))
+				mode.registerAction(new this.FXChangeAction(function, translateLabel(this.getLabel(ConfigurationItem.descriptor(effect, "Increase"), effect)), effect, kIncrease))
 			else
-				logMessage(kLogWarn, "Controller function " . increaseFunction . " not found in plugin " . this.Plugin . " - please check the setup")
+				logMessage(kLogWarn, translate("Controller function ") . increaseFunction . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the setup"))
 				
 			function := this.Controller.findFunction(decreaseFunction)
 			
 			if (function != false)
-				mode.registerAction(new this.FXChangeAction(function, this.getLabel(ConfigurationItem.descriptor(effect, "Decrease"), effect), effect, kDecrease))
+				mode.registerAction(new this.FXChangeAction(function, translateLabel(this.getLabel(ConfigurationItem.descriptor(effect, "Decrease"), effect)), effect, kDecrease))
 			else
-				logMessage(kLogWarn, "Controller function " . decreaseFunction . " not found in plugin " . this.Plugin . " - please check the setup")
+				logMessage(kLogWarn, translate("Controller function ") . decreaseFunction . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the setup"))
 		}
 	}
 	
@@ -264,7 +264,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		isRunning := this.Application.isRunning()
 		
 		for ignore, action in this.Actions
-			action.Function.setText(action.Label, isRunning ? (action.Active ? "Green" : "Black") : "Olive")
+			action.Function.setText(translate(action.Label), isRunning ? (action.Active ? "Green" : "Black") : "Olive")
 		
 		SetTimer updateVibrationState, 50
 	}
@@ -320,6 +320,10 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+translateLabel(label) {
+	return StrReplace(StrReplace(label, "Increase", translate("Increase")), "Decrease", translate("Decrease"))
+}
+
 updateVibrationState() {
 	static plugin := false
 	
@@ -337,12 +341,12 @@ startSimHub() {
 
 callSimHub(command) {
 	try {
-		logMessage(kLogInfo, "Sending command '" . command . "' to SimHub (" . kSimHub . ")")
+		logMessage(kLogInfo, translate("Sending command '") . command . translate("' to SimHub (") . kSimHub . translate(")"))
 		
 		RunWait "%kSimHub%" -triggerinput %command%, , Hide
 	}
 	catch exception {
-		logMessage(kLogCritical, "Error while connecting to SimHub (" . kSimHub . "): " . exception.Message . " - please check the setup")
+		logMessage(kLogCritical, translate("Error while connecting to SimHub (") . kSimHub . translate("): ") . exception.Message . translate(" - please check the setup"))
 		
 		SplashTextOn 800, 60, Modular Simulator Controller System, Cannot connect to SimHub (%kSimHub%) `n`nPlease run the setup tool...
 				
@@ -396,7 +400,7 @@ initializeSimHubPlugin() {
 	kSimHub := getConfigurationValue(controller.Configuration, kTactileFeedbackPlugin, "Exe Path", false)
 	
 	if (!kSimHub || !FileExist(kSimHub)) {
-		logMessage(kLogCritical, "Plugin Tactile Feedback deactivated, because the configured application path (" . kSimHub . ") cannot be found - please check the setup...")
+		logMessage(kLogCritical, translate("Plugin Tactile Feedback deactivated, because the configured application path (") . kSimHub . translate(") cannot be found - please check the setup"))
 		
 		if !isDebug()
 			return

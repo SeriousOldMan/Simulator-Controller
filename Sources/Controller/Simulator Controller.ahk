@@ -435,7 +435,7 @@ class SimulatorController extends ConfigurationItem {
 	
 	registerPlugin(plugin) {
 		if !inList(this.Plugins, plugin) {
-			logMessage(kLogInfo, translate("Plugin ") . getPluginForLogMessage(plugin) . (this.isActive(plugin) ? translate(" (Active)") : translate(" (Inactive)")) . translate(" registered"))
+			logMessage(kLogInfo, translate("Plugin ") . translate(getPluginForLogMessage(plugin)) . (this.isActive(plugin) ? translate(" (Active)") : translate(" (Inactive)")) . translate(" registered"))
 			
 			this.Plugins.Push(plugin)
 		}
@@ -446,7 +446,7 @@ class SimulatorController extends ConfigurationItem {
 	
 	registerMode(plugin, mode) {
 		if !inList(this.Modes, mode) {
-			logMessage(kLogInfo, translate("Mode ") . getModeForLogMessage(mode) . translate(" registered") . (plugin ? (translate(" for plugin ") . getPluginForLogMessage(plugin)) : ""))
+			logMessage(kLogInfo, translate("Mode ") . translate(getModeForLogMessage(mode)) . translate(" registered") . (plugin ? (translate(" for plugin ") . translate(getPluginForLogMessage(plugin))) : ""))
 			
 			this.Modes.Push(mode)
 		}
@@ -551,7 +551,7 @@ class SimulatorController extends ConfigurationItem {
 	}
 	
 	connectAction(function, action) {
-		logMessage(kLogInfo, translate("Connecting ") . function.Descriptor . translate(" to action ") . getLabelForLogMessage(action))
+		logMessage(kLogInfo, translate("Connecting ") . function.Descriptor . translate(" to action ") . translate(getLabelForLogMessage(action)))
 		
 		function.connectAction(action)
 		
@@ -559,7 +559,7 @@ class SimulatorController extends ConfigurationItem {
 	}
 	
 	disconnectAction(function, action) {
-		logMessage(kLogInfo, translate("Disconnecting ") . function.Descriptor . translate(" from action ") . getLabelForLogMessage(action))
+		logMessage(kLogInfo, translate("Disconnecting ") . function.Descriptor . translate(" from action ") . translate(getLabelForLogMessage(action)))
 		
 		function.disconnectAction(action)
 		
@@ -576,7 +576,7 @@ class SimulatorController extends ConfigurationItem {
 		if (action != false) {
 			this.updateLastEvent()
 			
-			logMessage(kLogInfo, translate("Firing action ") . getLabelForLogMessage(action) . translate(" for ") . function.Descriptor)
+			logMessage(kLogInfo, translate("Firing action ") . translate(getLabelForLogMessage(action)) . translate(" for ") . function.Descriptor)
 			
 			action.fireAction(function, trigger)
 		}
@@ -596,7 +596,7 @@ class SimulatorController extends ConfigurationItem {
 		
 			this.iActiveMode := newMode
 			
-			logMessage(kLogInfo, translate("Setting controller mode to ") . getModeForLogMessage(newMode))
+			logMessage(kLogInfo, translate("Setting controller mode to ") . translate(getModeForLogMessage(newMode)))
 			
 			if (newMode != false)
 				newMode.activate()
@@ -1075,7 +1075,7 @@ class ControllerMode {
 	activate() {
 		controller := this.Controller
 		
-		logMessage(kLogInfo, translate("Activating mode ") . getModeForLogMessage(this))
+		logMessage(kLogInfo, translate("Activating mode ") . translate(getModeForLogMessage(this)))
 		
 		for ignore, action in this.Actions {
 			controller.connectAction(action.Function, action)
@@ -1088,7 +1088,7 @@ class ControllerMode {
 	deactivate() {
 		controller := this.Controller
 		
-		logMessage(kLogInfo, translate("Deactivating mode ") . getModeForLogMessage(this))
+		logMessage(kLogInfo, translate("Deactivating mode ") . translate(getModeForLogMessage(this)))
 		
 		for ignore, action in this.Actions
 			controller.disconnectAction(action.Function, action)
@@ -1363,7 +1363,7 @@ setMode(action) {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
-
+setLanguage("de")
 initializeSimulatorController()
 
 

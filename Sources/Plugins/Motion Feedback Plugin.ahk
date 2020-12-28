@@ -393,7 +393,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		if (function != false)
 			this.registerAction(new this.MotionToggleAction(function, "Motion"))
 		else
-			logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in plugin ") . this.Plugin . translate(" - please check the setup"))
+			logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the setup"))
 		
 		motionMode := new this.MotionMode(this)
 		
@@ -405,7 +405,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		if (function != false)
 			motionMode.registerAction(new this.MotionIntensityAction(function, motionMode))
 		else
-			logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in plugin ") . this.Plugin . translate(" - please check the setup"))
+			logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the setup"))
 		
 		for index, effect in this.kEffects
 			this.createEffectToggleAction(controller, motionMode, effectFunctions[index], effect)
@@ -416,7 +416,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		if (function != false)
 			motionMode.registerAction(new this.EffectSelectorAction(function, "Effect Intensity"))
 		else
-			logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in plugin ") . this.Plugin . translate(" - please check the setup"))
+			logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the setup"))
 		
 		descriptor := motionEffectIntensityArguments[2]
 		function := this.Controller.findFunction(descriptor)
@@ -428,7 +428,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			motionMode.registerIntensityDialAction(intensityDialAction)
 		}
 		else
-			logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in plugin ") . this.Plugin . translate(" - please check the setup"))
+			logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the setup"))
 		
 		controller.registerPlugin(this)
 		
@@ -514,7 +514,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		if (function != false)
 			mode.registerAction(new this.EffectToggleAction(function, mode, effect))
 		else
-			logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in plugin ") . this.Plugin . translate(" - please check the setup"))
+			logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the setup"))
 	}
 	
 	activate() {
@@ -549,7 +549,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			
 			result := ErrorLevel
 			
-			logMessage(kLogInfo, "Invoking command SimFeedback connector with arguments: " . arguments . " => " . result)
+			logMessage(kLogInfo, "Invoking SimFeedback connector with arguments: " . arguments . " => " . result)
 		
 			return result
 		}

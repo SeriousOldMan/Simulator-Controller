@@ -1,8 +1,9 @@
-## 1.4, upcoming...
+## 1.4-stable, upcoming...
 
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. Unicode based translation support. German translation will be available - other languages can be easily added
+  4. Updated photorealistic elements for Button Box
 
 ## 1.3.3-stable, 12/27/20
 

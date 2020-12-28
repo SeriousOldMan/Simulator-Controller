@@ -53,18 +53,21 @@ class SystemPlugin extends ControllerPlugin {
 				trayMessage(translate(kSystemPlugin), (isRunning ? translate("Start: ") : translate("Stop: ")) . this.Application)
 			}
 			
-			if (stateChange && this.LaunchpadFunction != false) {
+			transition := false
+			
+			if !stateChange {
+				transition := this.LaunchpadAction.Transition
+						
+				if (transition && ((A_TickCount - transition) > 10000)) {
+					transition := false
+					stateChange := true
+				}
+			}
+			
+			if (stateChange && (this.LaunchpadFunction != false)) {
 				controller := SimulatorController.Instance
 					
 				if (controller.ActiveMode == controller.findMode(kLaunchMode)) {
-					transition := this.LaunchpadAction.Transition
-					
-					if (transition && ((A_TickCount - transition) > 10000)) {
-						this.LaunchpadAction.endTransition()
-						
-						transition := false
-					}
-					
 					if transition
 						this.LaunchpadFunction.setText(translate(this.LaunchpadAction.Label), "Gray")
 					else {
@@ -142,11 +145,11 @@ class SystemPlugin extends ControllerPlugin {
 		}
 		
 		beginTransition() {
-			iTransition := A_TickCount
+			this.iTransition := A_TickCount
 		}
 		
 		endTransition() {
-			iTransition := false
+			this.iTransition := false
 		}
 	}
 	

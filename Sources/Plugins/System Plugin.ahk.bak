@@ -491,7 +491,7 @@ updateModeSelector() {
 			selector := controller.findPlugin(kSystemPlugin).ModeSelector
 			function := selector.Function
 			
-			function.setText(translate(currentMode), (currentMode == translate("Mode Selector")) ? "Gray" : "Black")
+			function.setText(currentMode, (currentMode == translate("Mode Selector")) ? "Gray" : "Black")
 			
 			if !modeSelectorMode
 				lastMode := currentMode

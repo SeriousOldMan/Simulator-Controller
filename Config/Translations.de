@@ -90,13 +90,14 @@ Controller function =>Funktion
  not found in plugin => nicht gefunden für 
  - please check the setup=> - Bitte überprüfen Sie die Konfiguration
 System=>System
-Drive=>Fahren
+Launch=>Start
 Start: =>Start: 
 Stop: =>Stop: 
 Mode Selector=>Modus Wahl
 Modular Simulator Controller System - Controller (Plugin: System)=>Modular Simulator Controller System - Steuerung (Erweiterung: System)
 Cannot start NirCmd (%kNirCmd%) - please check the setup...=>NirCmd (%kNirCmd%) kann nicht gestartet werden - Bitte überprüfen Sie die Konfiguration...
 [ACC Plugin]
+Drive=>Fahren
 Controller function =>Funktion 
  not found in plugin => nicht gefunden für 
  - please check the setup=> - Bitte überprüfen Sie die Konfiguration

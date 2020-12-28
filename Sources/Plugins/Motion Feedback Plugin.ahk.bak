@@ -259,7 +259,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			if this.Mode.PendingEffect {
 				this.Mode.selectEffect(this.Effect)
 				
-				trayMessage(translate("Motion"), translate("Intensity Adjustment: ") . translate(this.Effect))
+				trayMessage(translate("Motion"), translate("Intensity Adjustment: ") . this.Effect)
 			}
 			else {
 				if (!this.Active && ((trigger = "On") || (trigger == "Push")))
@@ -267,7 +267,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 				else if (this.Active && ((trigger = "Off") || (trigger == "Push")))
 					this.Plugin.muteEffect(this.Effect)
 					
-				trayMessage(translate("Motion"), translate("Effect: ") . translate(this.Effect) . ", " . translate("State: ") . (this.Active ? translate("On") : translate("Off")))
+				trayMessage(translate("Motion"), translate("Effect: ") . this.Effect . ", " . translate("State: ") . (this.Active ? translate("On") : translate("Off")))
 			
 				this.updateLabel(false)
 			}
@@ -301,7 +301,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			
 				currentIntensity := Format("{:.1f}", this.Mode.Plugin.getEffectIntensity(effect))
 				
-				trayMessage(translate("Motion"), translate("Effect: ") . translate(effect) . ", " . translate("Intensity: ") . currentIntensity)
+				trayMessage(translate("Motion"), translate("Effect: ") . effect . ", " . translate("Intensity: ") . currentIntensity)
 				
 				function.setText(currentIntensity)
 				

@@ -67,7 +67,8 @@ runSetup() {
 	}
 	catch exception {
 		OnMessage(0x44, "translateMsgBoxButtons")
-		MsgBox 262160, Error, Cannot start setup application - please check the installation...
+		error := translate("Error")
+		MsgBox 262160, %error%, % translate("Cannot start the setup application - please check the installation...")
 		OnMessage(0x44, "")
 	}
 	
@@ -108,7 +109,7 @@ computeStartupSongs() {
 	return files
 }
 
-editConfiguration(ByRef configurationOrCommand, withCancel := false) {
+editConfiguration(ByRef configurationOrCommand, withContinue := false) {
 	static result
 	static newConfiguration
 	
@@ -178,6 +179,11 @@ restart:
 		setConfigurationValue(newConfiguration, "Controller", "Tray Tip Simulation Duration", (trayTipSimulation ? trayTipSimulationDuration : false))
 		setConfigurationValue(newConfiguration, "Button Box", "Button Box Duration", (buttonBox ? buttonBoxDuration : false))
 		setConfigurationValue(newConfiguration, "Button Box", "Button Box Simulation Duration", (buttonBoxSimulation ? buttonBoxSimulationDuration : false))
+		
+		buttonBoxPosition := inList([translate("Top Left"), translate("Top Right")
+								   , translate("Bottom Left"), translate("Bottom Right"), translate("Last Position")], buttonBoxPosition)
+		buttonBoxPosition := ["Top Left", "Top Right", "Bottom Left", "Bottom Right", "Last Position"][buttonBoxPosition]
+		
 		setConfigurationValue(newConfiguration, "Button Box", "Button Box Position", buttonBoxPosition)
 		
 		setConfigurationValue(newConfiguration, "Startup", "Splash Theme", (splashTheme == "None") ? false : splashTheme)
@@ -210,7 +216,7 @@ restart:
 		Gui CE:Font, Norm, Arial
 		Gui CE:Font, Italic, Arial
 	
-		Gui CE:Add, Text, YP+20 w220 Center, Configuration
+		Gui CE:Add, Text, YP+20 w220 Center, % translate("Configuration")
 	
 		coreSettings := [["Simulator Controller", true, false]]
 		feedbackSettings := []		
@@ -231,14 +237,12 @@ restart:
 		if (feedbackSettings.Length() > 8)
 			Throw "Too many Feedback Components detected in editConfiguration..."
 			
-		splashTheme := 
-		
 		coreHeight := 20 + (coreSettings.Length() * 20)
 		
 		Gui CE:Font, Norm, Arial
 		Gui CE:Font, Italic, Arial
 	
-		Gui CE:Add, GroupBox, YP+30 w220 h%coreHeight%, Core System
+		Gui CE:Add, GroupBox, YP+30 w220 h%coreHeight%, % translate("Core System")
 	
 		Gui CE:Font, Norm, Arial
 	
@@ -259,7 +263,7 @@ restart:
 			Gui CE:Font, Norm, Arial
 			Gui CE:Font, Italic, Arial
 	
-			Gui CE:Add, GroupBox, XP-10 YP+30 w220 h%feedbackHeight%, Feedback System
+			Gui CE:Add, GroupBox, XP-10 YP+30 w220 h%feedbackHeight%, % translate("Feedback System")
 	
 			Gui CE:Font, Norm, Arial
 	
@@ -294,48 +298,50 @@ restart:
 		Gui CE:Font, Norm, Arial
 		Gui CE:Font, Italic, Arial
 	
-		Gui CE:Add, GroupBox, XP-10 YP+30 w220 h135, Controller Notifications
+		Gui CE:Add, GroupBox, XP-10 YP+30 w220 h135, % translate("Controller Notifications")
 	
 		Gui CE:Font, Norm, Arial
 	
-		Gui CE:Add, CheckBox, YP+20 XP+10 Checked%trayTip% vtrayTip gcheckTrayTipDuration, Tray Tips
+		Gui CE:Add, CheckBox, YP+20 XP+10 Checked%trayTip% vtrayTip gcheckTrayTipDuration, % translate("Tray Tips")
 		disabled := !trayTip ? "Disabled" : ""
 		Gui CE:Add, Edit, X160 YP-5 w40 h20 Limit5 Number %disabled% vtrayTipDuration HwndtrayTipDurationInput, %trayTipDuration%
-		Gui CE:Add, Text, X205 YP+5, ms
-		Gui CE:Add, CheckBox, X20 YP+20 Checked%trayTipSimulation% vtrayTipSimulation gcheckTrayTipSimulationDuration, Tray Tips (Simulation)
+		Gui CE:Add, Text, X205 YP+5, % translate("ms")
+		Gui CE:Add, CheckBox, X20 YP+20 Checked%trayTipSimulation% vtrayTipSimulation gcheckTrayTipSimulationDuration, % translate("Tray Tips (Simulation)")
 		disabled := !trayTipSimulation ? "Disabled" : ""
 		Gui CE:Add, Edit, X160 YP-5 w40 h20 Limit5 Number %disabled% vtrayTipSimulationDuration HwndtrayTipSimulationDurationInput, %trayTipSimulationDuration%
-		Gui CE:Add, Text, X205 YP+5, ms
-		Gui CE:Add, CheckBox, X20 YP+20 Checked%buttonBox% vbuttonBox gcheckButtonBoxDuration, Button Box
+		Gui CE:Add, Text, X205 YP+5, % translate("ms")
+		Gui CE:Add, CheckBox, X20 YP+20 Checked%buttonBox% vbuttonBox gcheckButtonBoxDuration, % translate("Button Box")
 		disabled := !buttonBox ? "Disabled" : ""
 		Gui CE:Add, Edit, X160 YP-5 w40 h20 Limit5 Number %disabled% vbuttonBoxDuration HwndbuttonBoxDurationInput, %buttonBoxDuration%
-		Gui CE:Add, Text, X205 YP+5, ms
-		Gui CE:Add, CheckBox, X20 YP+20 Checked%buttonBoxSimulation% vbuttonBoxSimulation gcheckButtonBoxSimulationDuration, Button Box (Simulation)
+		Gui CE:Add, Text, X205 YP+5, % translate("ms")
+		Gui CE:Add, CheckBox, X20 YP+20 Checked%buttonBoxSimulation% vbuttonBoxSimulation gcheckButtonBoxSimulationDuration, % translate("Button Box (Simulation)")
 		disabled := !buttonBoxSimulation ? "Disabled" : ""
 		Gui CE:Add, Edit, X160 YP-5 w40 h20 Limit5 Number %disabled% vbuttonBoxSimulationDuration HwndbuttonBoxSimulationDurationInput, %buttonBoxSimulationDuration%
-		Gui CE:Add, Text, X205 YP+5, ms
-		Gui CE:Add, Text, X20 YP+30, Button Box Position
+		Gui CE:Add, Text, X205 YP+5, % translate("ms")
+		Gui CE:Add, Text, X20 YP+30, % translate("Button Box Position")
 		
 		choices := ["Top Left", "Top Right", "Bottom Left", "Bottom Right", "Last Position"]
 		chosen := inList(choices, buttonBoxPosition)
 		if !chosen
 			chosen := 4
-			
+		
+		buttonBoxPosition := translate(buttonBoxPosition)
+		choices := [translate("Top Left"), translate("Top Right"), translate("Bottom Left"), translate("Bottom Right"), translate("Last Position")]
 		Gui CE:Add, DropDownList, X120 YP-5 w100 Choose%chosen% vbuttonBoxPosition, % values2String("|", choices*)
 		
 		splashTheme := getConfigurationValue(configurationOrCommand, "Startup", "Splash Theme", false)	
 	 
 		themes := getAllThemes()
 		chosen := (splashTheme ? inList(themes, splashTheme) + 1 : 1)
-		themes := "None|" + values2String("|", themes*)
+		themes := translate("None") "|" + values2String("|", themes*)
 		
-		Gui CE:Add, Text, X10 Y+20, Splash Theme
+		Gui CE:Add, Text, X10 Y+20, % translate("Theme")
 		Gui CE:Add, DropDownList, X90 YP-5 w140 Choose%chosen% vsplashTheme, %themes%
 	
 		startupOption := getConfigurationValue(configurationOrCommand, "Startup", "Simulator", false)
 		startup := (startupOption != false)
 		
-		Gui CE:Add, CheckBox, X10 Checked%startup% vstartup, Start
+		Gui CE:Add, CheckBox, X10 Checked%startup% vstartup, % translate("Start")
 		
 		simulators := string2Values("|", getConfigurationValue(kSimulatorConfiguration, "Configuration", "Simulators", ""))
 		
@@ -346,15 +352,15 @@ restart:
 		
 		Gui CE:Add, DropDownList, X90 YP-5 w140 Choose%chosen% vstartOption, % values2String("|", simulators*)
 	 
-		Gui CE:Add, Button, X10 Y+20 w220 grunSetup, Setup...
+		Gui CE:Add, Button, X10 Y+20 w220 grunSetup, % translate("Setup...")
 		
-		margin := (withCancel ? "Y+20" : "")
+		margin := (withContinue ? "Y+20" : "")
 		
-		Gui CE:Add, Button, Default X10 %margin% w100 gsaveConfiguration, &Save
-		Gui CE:Add, Button, X+20 w100 gcancelConfiguration, &Cancel
+		Gui CE:Add, Button, Default X10 %margin% w100 gsaveConfiguration, % translate("Save")
+		Gui CE:Add, Button, X+20 w100 gcancelConfiguration, % translate("&Cancel")
 		
-		if withCancel
-			Gui CE:Add, Button, X10 w220 gcontinueConfiguration, % withCancel ? "Co&ntinue" : "&Cancel"
+		if withContinue
+			Gui CE:Add, Button, X10 w220 gcontinueConfiguration, % translate("Co&ntinue w/o Save")
 	
 		Gui CE:Margin, 10, 10
 		Gui CE:Show, AutoSize Center

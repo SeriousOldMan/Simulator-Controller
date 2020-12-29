@@ -280,9 +280,9 @@ editTargets(command := "") {
 	 
 		themes := getAllThemes()
 		chosen := (vSplashTheme ? inList(themes, vSplashTheme) + 1 : 1)
-		themes := "None|" + values2String("|", themes*)
+		themes := translate("None") "|" + values2String("|", themes*)
 		
-		Gui TE:Add, Text, X10 Y+20, % translate("Splash Theme")
+		Gui TE:Add, Text, X10 Y+20, % translate("Theme")
 		Gui TE:Add, DropDownList, X90 YP-5 w140 Choose%chosen% vsplashTheme, %themes%
 		
 		Gui TE:Add, Button, Default X10 y+20 w100 gsaveTargets, % translate("Build")

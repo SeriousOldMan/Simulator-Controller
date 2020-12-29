@@ -111,7 +111,7 @@ class SimulatorStartup extends ConfigurationItem {
 			else if (noSetup && (readConfiguration(kSimulatorConfigurationFile).Count() == 0)) {
 				OnMessage(0x44, "translateMsgBoxButtons")
 				error := translate("Error")
-				MsgBox 262160, %error%, % translate("Cannot initiate startup sequence, please complete the setup...")
+				MsgBox 262160, %error%, % translate("Cannot initiate startup sequence, please check the setup...")
 				OnMessage(0x44, "")
 			
 				ExitApp 0

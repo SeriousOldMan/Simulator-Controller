@@ -1101,27 +1101,27 @@ class ControllerTab extends ConfigurationItemTab {
 		Gui SE:Font, Norm, Arial
 		Gui SE:Font, Italic, Arial
 		
-		Gui SE:Add, GroupBox, x16 y80 w377 h71, Functions
+		Gui SE:Add, GroupBox, x16 y80 w377 h71, % translate("Functions")
 		
 		Gui SE:Font, Norm, Arial
 		
-		Gui SE:Add, Text, x24 y96 w104 h23 +0x200, # 1-Way Toggles
+		Gui SE:Add, Text, x24 y96 w104 h23 +0x200, % translate("# 1-Way Toggles")
 		Gui SE:Add, Edit, x128 y96 w39 h21 Number VoneWayTogglesEdit, %oneWayTogglesEdit%
 		Gui SE:Add, UpDown, x168 y96 w18 h21, %oneWayTogglesEdit%
 		
-		Gui SE:Add, Text, x24 y120 w104 h23 +0x200, # 2-Way Toggles
+		Gui SE:Add, Text, x24 y120 w104 h23 +0x200, % translate("# 2-Way Toggles")
 		Gui SE:Add, Edit, x128 y120 w39 h21 Number VtwoWayTogglesEdit, %twoWayTogglesEdit%
 		Gui SE:Add, UpDown, x168 y120 w18 h21, %twoWayTogglesEdit%
 		
-		Gui SE:Add, Text, x208 y96 w104 h23 +0x200, # Buttons
+		Gui SE:Add, Text, x208 y96 w104 h23 +0x200, % translate("# Buttons")
 		Gui SE:Add, Edit, x312 y96 w39 h21 Number VbuttonsEdit, %buttonsEdit%
 		Gui SE:Add, UpDown, x352 y96 w18 h21, %buttonsEdit%
 		
-		Gui SE:Add, Text, x208 y120 w104 h23 +0x200, # Dials
+		Gui SE:Add, Text, x208 y120 w104 h23 +0x200, % translate("# Dials")
 		Gui SE:Add, Edit, x312 y120 w39 h21 Number VdialsEdit, %dialsEdit%
 		Gui SE:Add, UpDown, x352 y120 w18 h21, %dialsEdit%
 		
-		Gui SE:Add, Button, x16 y490 w100 h23 gtoggleKeyDetector, Key Detector...
+		Gui SE:Add, Button, x16 y490 w100 h23 gtoggleKeyDetector, % translate("Key Detector...")
 		
 		this.iFunctionsList := new FunctionsList(configuration)
 	}
@@ -1188,28 +1188,30 @@ class FunctionsList extends ConfigurationItemList {
 	}
 					
 	createControls(configuration) {
-		Gui SE:Add, ListView, x16 y158 w377 h192 -Multi -LV0x10 NoSort NoSortHdr HwndfunctionsListViewHandle VfunctionsListView glistEvent, Function|Number|Hotkey(s) & Action(s)
+		Gui SE:Add, ListView, x16 y158 w377 h192 -Multi -LV0x10 NoSort NoSortHdr HwndfunctionsListViewHandle VfunctionsListView glistEvent
+							, % values2String("|", map(["Function", "Number", "Hotkey(s) & Action(s)"], "translate")*)
 	
-		Gui SE:Add, Text, x16 y360 w86 h23 +0x200, Function
-		Gui SE:Add, DropDownList, x104 y360 w91 AltSubmit Choose%functionTypeDropdown% VfunctionTypeDropdown gupdateFunctionEditorState, 1-way Toggle|2-way Toggle|Button|Dial|Custom
+		Gui SE:Add, Text, x16 y360 w86 h23 +0x200, % translate("Function")
+		Gui SE:Add, DropDownList, x104 y360 w91 AltSubmit Choose%functionTypeDropdown% VfunctionTypeDropdown gupdateFunctionEditorState
+								, % values2String("|", map(["1-way Toggle", "2-way Toggle", "Button", "Dial", "Custom"], "translate")*)
 		Gui SE:Add, Edit, x200 y360 w40 h21 Number VfunctionNumberEdit, %functionNumberEdit%
 		Gui SE:Add, UpDown, x240 y360 w17 h21, 1
 		
 		Gui SE:Font, Norm, Arial
 		Gui SE:Font, Italic, Arial
 		
-		Gui SE:Add, GroupBox, x16 y392 w378 h91, Bindings
+		Gui SE:Add, GroupBox, x16 y392 w378 h91, % translate("Bindings")
 		
 		Gui SE:Font, Norm, Arial
 		
-		Gui SE:Add, Text, x104 y400 w135 h23 +0x200 +Center, On/Increase/Push/Call
-		Gui SE:Add, Text, x248 y400 w135 h23 +0x200 +Center, Off/Decrease
+		Gui SE:Add, Text, x104 y400 w135 h23 +0x200 +Center, % translate("On or Increase")
+		Gui SE:Add, Text, x248 y400 w135 h23 +0x200 +Center, % translate("Off or Decrease")
 		
-		Gui SE:Add, Text, x24 y424 w83 h23 +0x200, Hotkey(s)
+		Gui SE:Add, Text, x24 y424 w83 h23 +0x200, % translate("Hotkey(s)")
 		Gui SE:Add, Edit, x104 y424 w135 h21 VfunctionOnHotkeysEdit, %functionOnHotkeysEdit%
 		Gui SE:Add, Edit, x248 y424 w135 h21 VfunctionOffHotkeysEdit, %functionOffHotkeysEdit%
 		
-		Gui SE:Add, Text, x24 y448 w83 h23, Action (optional)
+		Gui SE:Add, Text, x24 y450 w83 h23, % translate("Action (optional)")
 		Gui SE:Add, Edit, x104 y448 w135 h21 VfunctionOnActionEdit, %functionOnActionEdit%
 		Gui SE:Add, Edit, x248 y448 w135 h21 VfunctionOffActionEdit, %functionOffActionEdit%
 		
@@ -1311,7 +1313,7 @@ class FunctionsList extends ConfigurationItemList {
 						hotkeysAndActions := hotkeysAndActions . nextHKA
 					}
 						
-					LV_Add("", this.computeFunctionType(function.Type), function.Number, hotkeysAndActions)
+					LV_Add("", translate(this.computeFunctionType(function.Type)), function.Number, hotkeysAndActions)
 					
 					this.iItemsList.Push(function)
 				}
@@ -1401,7 +1403,8 @@ class FunctionsList extends ConfigurationItemList {
 		}
 		else {
 			OnMessage(0x44, "translateMsgBoxButtons")
-			MsgBox 262160, Error, Invalid values detected - please correct...
+			title := translate("Error")
+			MsgBox 262160, %title%, % translate("Invalid values detected - please correct...")
 			OnMessage(0x44, "")
 			
 			return false
@@ -1414,7 +1417,8 @@ class FunctionsList extends ConfigurationItemList {
 		if function
 			if this.iFunctions.HasKey(function.Descriptor) {
 				OnMessage(0x44, "translateMsgBoxButtons")
-				MsgBox 262160, Error, This function already exists - please use different values...
+				title := translate("Error")
+				MsgBox 262160, %title%, % translate("This function already exists - please use different values...")
 				OnMessage(0x44, "")
 			}
 			else {
@@ -1438,7 +1442,8 @@ class FunctionsList extends ConfigurationItemList {
 		if function
 			if (function.Descriptor != this.iItemsList[this.iCurrentItemIndex].Descriptor) {
 				OnMessage(0x44, "translateMsgBoxButtons")
-				MsgBox 262160, Error, The type and number of an existing function may not be changed...
+				title := translate("Error")
+				MsgBox 262160, %title%, % translate("The type and number of an existing function may not be changed...")
 				OnMessage(0x44, "")
 			}
 			else {
@@ -2061,7 +2066,8 @@ class ThemesList extends ConfigurationItemList {
 		
 error:
 		OnMessage(0x44, "translateMsgBoxButtons")
-		MsgBox 262160, Error, Invalid values detected - please correct...
+		title := translate("Error")
+		MsgBox 262160, %title%, % translate("Invalid values detected - please correct...")
 		OnMessage(0x44, "")
 		
 		return false
@@ -2221,7 +2227,8 @@ showKeyDetector() {
 
 	if (joystickNumbers.Length() == 0) {
 		OnMessage(0x44, "translateMsgBoxButtons")
-		MsgBox 262192, Warning, No joysticks detected...
+		title := translate("Warning")
+		MsgBox 262192, %title%, % translate("No controller detected...")
 		OnMessage(0x44, "")
 		
 		vShowKeyDetector := false
@@ -2301,7 +2308,9 @@ showKeyDetector() {
 				axis_info = %axis_info%%A_Space%%A_Space%POV%joyp%
 			}
 			
-			ToolTip %joy_name% (#%joystickNumber%):`n%axis_info%`nButtons Down: %buttons_down%, , , 1
+			buttonsDown := translate("Buttons Down:")
+			
+			ToolTip %joy_name% (#%joystickNumber%):`n%axis_info%`n%buttonsDown% %buttons_down%, , , 1
 						
 			if found {
 				found := false

@@ -612,7 +612,8 @@ shutdownSystem() {
 	SoundPlay *32
 	
 	OnMessage(0x44, "translateMsgBoxButtons")
-	MsgBox 262436, Shutdown, Shutdown Simulator?
+	title := translate("Shutdown")
+	MsgBox 262436, %title%, % translate("Shutdown Simulator?")
 	OnMessage(0x44, "")
 
 	IfMsgBox Yes

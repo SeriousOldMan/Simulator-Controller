@@ -198,10 +198,10 @@ loadSimulatorConfiguration() {
 	if path {
 		kHomeDirectory := path . "\"
 		
-		logMessage(kLogInfo, translate("Home path set to ") . path)
+		logMessage(kLogInfo, translate("Installation path set to ") . path)
 	}
 	else
-		logMessage(kLogWarn, translate("Home path not set"))
+		logMessage(kLogWarn, translate("Installation path not set"))
 	
 	path := getConfigurationValue(kSimulatorConfiguration, "Configuration", "AHK Path")
 	if path {
@@ -222,10 +222,10 @@ loadSimulatorConfiguration() {
 		logMessage(kLogWarn, translate("NirCmd executable not configured"))
 	
 	vTargetLanguage := getConfigurationValue(kSimulatorConfiguration, "Configuration", "Language", "en")
+	kSilentMode := getConfigurationValue(kSimulatorConfiguration, "Configuration", "Silent Mode", false)
+	
 	vDebug := (!A_IsCompiled || getConfigurationValue(kSimulatorConfiguration, "Configuration", "Debug", false))
 	vLogLevel := inList(["Info", "Warn", "Critical", "Off"], getConfigurationValue(kSimulatorConfiguration, "Configuration", "Log Level", "Warn"))
-		
-	kSilentMode := getConfigurationValue(kSimulatorConfiguration, "Configuration", "Silent Mode", false)
 }
 
 initializeEnvironment() {	
@@ -642,6 +642,15 @@ concatenate(arrays*) {
 		for index, value in array
 			result.Push(value)
 			
+	return result
+}
+
+map(list, function) {
+	result := []
+	
+	for ignore, value in list
+		result.Push(%function%(value))
+	
 	return result
 }
 

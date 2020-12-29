@@ -180,11 +180,9 @@ restart:
 		setConfigurationValue(newConfiguration, "Button Box", "Button Box Duration", (buttonBox ? buttonBoxDuration : false))
 		setConfigurationValue(newConfiguration, "Button Box", "Button Box Simulation Duration", (buttonBoxSimulation ? buttonBoxSimulationDuration : false))
 		
-		buttonBoxPosition := inList([translate("Top Left"), translate("Top Right")
-								   , translate("Bottom Left"), translate("Bottom Right"), translate("Last Position")], buttonBoxPosition)
-		buttonBoxPosition := ["Top Left", "Top Right", "Bottom Left", "Bottom Right", "Last Position"][buttonBoxPosition]
+		positions := ["Top Left", "Top Right", "Bottom Left", "Bottom Right", "Last Position"]
 		
-		setConfigurationValue(newConfiguration, "Button Box", "Button Box Position", buttonBoxPosition)
+		setConfigurationValue(newConfiguration, "Button Box", "Button Box Position", positions[inList(map(positions, "translate"), buttonBoxPosition)])
 		
 		setConfigurationValue(newConfiguration, "Startup", "Splash Theme", (splashTheme == translate("None")) ? false : splashTheme)
 		setConfigurationValue(newConfiguration, "Startup", "Simulator", (startup ? startOption : false))
@@ -322,12 +320,11 @@ restart:
 		
 		choices := ["Top Left", "Top Right", "Bottom Left", "Bottom Right", "Last Position"]
 		chosen := inList(choices, buttonBoxPosition)
+		
 		if !chosen
 			chosen := 4
 		
-		buttonBoxPosition := translate(buttonBoxPosition)
-		choices := [translate("Top Left"), translate("Top Right"), translate("Bottom Left"), translate("Bottom Right"), translate("Last Position")]
-		Gui CE:Add, DropDownList, X120 YP-5 w100 Choose%chosen% vbuttonBoxPosition, % values2String("|", choices*)
+		Gui CE:Add, DropDownList, X120 YP-5 w100 Choose%chosen% vbuttonBoxPosition, % values2String("|", map(choices, "translate")*)
 		
 		splashTheme := getConfigurationValue(configurationOrCommand, "Startup", "Splash Theme", false)	
 	 

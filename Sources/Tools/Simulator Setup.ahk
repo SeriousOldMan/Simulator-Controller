@@ -307,15 +307,17 @@ class SetupEditor extends ConfigurationItem {
 		Gui SE:Font, Norm, Arial
 		Gui SE:Font, Italic, Arial
 
-		Gui SE:Add, Text, YP+20 w398 Center, Setup
+		Gui SE:Add, Text, YP+20 w398 Center, % translate("Setup")
 
 		Gui SE:Font, Norm, Arial
 		
-		Gui SE:Add, Button, x152 y528 w80 h23 Default gsaveAndExit, Ok
-		Gui SE:Add, Button, x240 y528 w80 h23 gcancelAndExit, Cancel
-		Gui SE:Add, Button, x328 y528 w77 h23 gsaveAndStay, Apply
+		Gui SE:Add, Button, x152 y528 w80 h23 Default gsaveAndExit, % translate("Ok")
+		Gui SE:Add, Button, x240 y528 w80 h23 gcancelAndExit, % translate("&Cancel")
+		Gui SE:Add, Button, x328 y528 w77 h23 gsaveAndStay, % translate("&Apply")
 
-		Gui SE:Add, Tab3, x8 y48 w398 h472, General|Plugins|Applications|Controller|Launchpad|Chat
+		tabs := map(["General", "Plugins", "Applications", "Controller", "Launchpad", "Chat"], "translate")
+			   
+		Gui SE:Add, Tab3, x8 y48 w398 h472, % values2String("|", tabs*)
 		
 		tab := 1
 		
@@ -413,22 +415,22 @@ class GeneralTab extends ConfigurationItemTab {
 		Gui SE:Font, Norm, Arial
 		Gui SE:Font, Italic, Arial
 		
-		Gui SE:Add, GroupBox, x16 y80 w377 h70, Installation Folders
+		Gui SE:Add, GroupBox, x16 y80 w377 h70, % translate("Installation")
 		
 		Gui SE:Font, Norm, Arial
 		
-		Gui SE:Add, Text, x24 y97 w160 h23 +0x200, Home (optional)
+		Gui SE:Add, Text, x24 y97 w160 h23 +0x200, % translate("Home Folder (optional)")
 		Gui SE:Add, Edit, x184 y97 w174 h21 VhomePathEdit, %homePathEdit%
-		Gui SE:Add, Button, x360 y96 w23 h23 gchooseHomePath, ...
+		Gui SE:Add, Button, x360 y96 w23 h23 gchooseHomePath, % translate("...")
 		
-		Gui SE:Add, Text, x24 y121 w160 h23 +0x200, NirCmd (optional)
+		Gui SE:Add, Text, x24 y121 w160 h23 +0x200, % translate("NirCmd Folder (optional)")
 		Gui SE:Add, Edit, x184 y121 w174 h21 VnirCmdPathEdit, %nirCmdPathEdit%
-		Gui SE:Add, Button, x360 y120 w23 h23 gchooseNirCmdPath, ...
+		Gui SE:Add, Button, x360 y120 w23 h23 gchooseNirCmdPath, % translate("...")
 		
 		Gui SE:Font, Norm, Arial
 		Gui SE:Font, Italic, Arial
 		
-		Gui SE:Add, GroupBox, x16 y160 w378 h95, Settings
+		Gui SE:Add, GroupBox, x16 y160 w378 h95, % translate("Settings")
 		
 		Gui SE:Font, Norm, Arial
 		
@@ -442,18 +444,18 @@ class GeneralTab extends ConfigurationItemTab {
 				chosen := A_Index
 		}
 			
-		Gui SE:Add, Text, x24 y176 w86 h23 +0x200, Language
+		Gui SE:Add, Text, x24 y176 w86 h23 +0x200, % translate("Language")
 		Gui SE:Add, DropDownList, x184 y176 w199 Choose%chosen% VlanguageDropdown, % values2String("|", choices*)
 		
-		Gui SE:Add, CheckBox, x24 y200 w242 h23 Checked%startWithWindowsCheck% VstartWithWindowsCheck, Start with Windows
-		Gui SE:Add, CheckBox, x24 y224 w242 h23 Checked%silentModeCheck% VsilentModeCheck, Silent mode (no splash screen, no sound)
+		Gui SE:Add, CheckBox, x24 y200 w242 h23 Checked%startWithWindowsCheck% VstartWithWindowsCheck, % translate("Start with Windows")
+		Gui SE:Add, CheckBox, x24 y224 w242 h23 Checked%silentModeCheck% VsilentModeCheck, % translate("Silent mode (no splash screen, no sound)")
 		
-		Gui SE:Add, Button, x283 y224 w100 h23 GopenThemesEditor, Themes Editor...
+		Gui SE:Add, Button, x283 y224 w100 h23 GopenThemesEditor, % translate("Themes Editor...")
 	
 		Gui SE:Font, Norm, Arial
 		Gui SE:Font, Italic, Arial
 		
-		Gui SE:Add, GroupBox, x16 y265 w378 h115, Simulators
+		Gui SE:Add, GroupBox, x16 y265 w378 h115, % translate("Simulators")
 		
 		Gui SE:Font, Norm, Arial
 		
@@ -463,26 +465,27 @@ class GeneralTab extends ConfigurationItemTab {
 			Gui SE:Font, Norm, Arial
 			Gui SE:Font, Italic, Arial
 			
-			Gui SE:Add, GroupBox, x16 y410 w377 h95, Development
+			Gui SE:Add, GroupBox, x16 y410 w377 h95, % translate("Development")
 			
 			Gui SE:Font, Norm, Arial
 			
-			Gui SE:Add, Text, x24 y427 w160 h23 +0x200, AutoHotkey
+			Gui SE:Add, Text, x24 y427 w160 h23 +0x200, % translate("AutoHotkey Folder")
 			Gui SE:Add, Edit, x184 y427 w174 h21 VahkPathEdit, %ahkPathEdit%
-			Gui SE:Add, Button, x360 y426 w23 h23 gchooseAHKPath, ...
+			Gui SE:Add, Button, x360 y426 w23 h23 gchooseAHKPath, % translate("...")
 			
-			Gui SE:Add, Text, x24 y451 w160 h23 +0x200, Debug
-			Gui SE:Add, CheckBox, x184 y451 w242 h23 Checked%debugEnabledCheck% VdebugEnabledCheck, Enabled?
+			Gui SE:Add, Text, x24 y451 w160 h23 +0x200, % translate("Debug")
+			Gui SE:Add, CheckBox, x184 y451 w242 h23 Checked%debugEnabledCheck% VdebugEnabledCheck, % translate("Enabled?")
 			
-			Gui SE:Add, Text, x24 y475 w160 h23 +0x200, Log Level
+			Gui SE:Add, Text, x24 y475 w160 h23 +0x200, % translate("Log Level")
 			
 			choices := ["Info", "Warn", "Critical", "Off"]
 			
 			chosen := inList(choices, logLevelDropdown)
+			
 			if !chosen
 				chosem := 2
 				
-			Gui SE:Add, DropDownList, x184 y475 w91 Choose%chosen% VlogLevelDropdown, % values2String("|", choices*)
+			Gui SE:Add, DropDownList, x184 y475 w91 Choose%chosen% VlogLevelDropdown, % values2String("|", map(choices, "translate")*)
 		}
 	}
 	
@@ -543,7 +546,10 @@ class GeneralTab extends ConfigurationItemTab {
 		
 			setConfigurationValue(configuration, "Configuration", "AHK Path", ahkPathEdit)
 			setConfigurationValue(configuration, "Configuration", "Debug", debugEnabledCheck)
-			setConfigurationValue(configuration, "Configuration", "Log Level", logLevelDropdown)
+			
+			choices := ["Info", "Warn", "Critical", "Off"]
+			
+			setConfigurationValue(configuration, "Configuration", "Log Level", choices[inList(map(choices, "translate"), logLevelDropdown)])
 		}
 		
 		this.iSimulatorsList.saveToConfiguration(configuration)
@@ -559,21 +565,21 @@ class GeneralTab extends ConfigurationItemTab {
 }
 
 chooseHomePath() {
-	FileSelectFolder, directory, *%homePathEdit%, 0, Select Simulator Controller folder...
+	FileSelectFolder, directory, *%homePathEdit%, 0, % translate("Select Installation folder...")
 	
 	if (directory != "")
 		GuiControl Text, homePathEdit, %directory%
 }
 
 chooseNirCmdPath() {
-	FileSelectFolder, directory, *%nirCmdPathEdit%, 0, Select NirCmd folder...
+	FileSelectFolder, directory, *%nirCmdPathEdit%, 0, % translate("Select NirCmd folder...")
 	
 	if (directory != "")
 		GuiControl Text, nirCmdPathEdit, %directory%
 }
 
 chooseAHKPath() {
-	FileSelectFolder, directory, *%ahkPathEdit%, 0, Select AutoHotkey folder...
+	FileSelectFolder, directory, *%ahkPathEdit%, 0, % translate("Select AutoHotkey folder...")
 	
 	if (directory != "")
 		GuiControl Text, ahkPathEdit, %directory%
@@ -611,12 +617,12 @@ class SimulatorsList extends ConfigurationItemList {
 		
 		Gui SE:Add, Edit, x184 y284 w199 h21 VsimulatorEdit, %simulatorEdit%
 		
-		Gui SE:Add, Button, x305 y309 w38 h23 Disabled VsimulatorUpButton gupItem, Up
-		Gui SE:Add, Button, x345 y309 w38 h23 Disabled VsimulatorDownButton gdownItem, Down
+		Gui SE:Add, Button, x305 y309 w38 h23 Disabled VsimulatorUpButton gupItem, % translate("Up")
+		Gui SE:Add, Button, x345 y309 w38 h23 Disabled VsimulatorDownButton gdownItem, % translate("Down")
 		
-		Gui SE:Add, Button, x184 y349 w46 h23 VsimulatorAddButton gaddItem, Add
-		Gui SE:Add, Button, x232 y349 w50 h23 Disabled VsimulatorDeleteButton gdeleteItem, Delete
-		Gui SE:Add, Button, x328 y349 w55 h23 Disabled VsimulatorUpdateButton gupdateItem, Update
+		Gui SE:Add, Button, x184 y349 w46 h23 VsimulatorAddButton gaddItem, % translate("Add")
+		Gui SE:Add, Button, x232 y349 w50 h23 Disabled VsimulatorDeleteButton gdeleteItem, % translate("Delete")
+		Gui SE:Add, Button, x328 y349 w55 h23 Disabled VsimulatorUpdateButton gupdateItem, % translate("Update")
 		
 		return simulatorsListBoxHandle
 	}
@@ -700,24 +706,25 @@ class PluginsTab extends ConfigurationItemList {
 	}
 					
 	createControls(configuration) {
-		Gui SE:Add, ListView, x16 y80 w377 h270 -Multi -LV0x10 NoSort NoSortHdr HwndpluginsListViewHandle VpluginsListView glistEvent, Active|Plugin|Simulator(s)|Arguments
+		Gui SE:Add, ListView, x16 y80 w377 h270 -Multi -LV0x10 NoSort NoSortHdr HwndpluginsListViewHandle VpluginsListView glistEvent
+							, % values2String("|", map(["Active?", "Plugin", "Simulator(s)", "Arguments"], "translate")*)
 		
-		Gui SE:Add, Text, x16 y360 w86 h23 +0x200, Plugin
+		Gui SE:Add, Text, x16 y360 w86 h23 +0x200, % translate("Plugin")
 		Gui SE:Add, Edit, x110 y360 w154 h21 VpluginEdit, %pluginEdit%
 		
-		Gui SE:Add, CheckBox, x110 y384 w120 h23 VpluginActivatedCheck HwndpluginActivatedCheckHandle, Activated?
+		Gui SE:Add, CheckBox, x110 y384 w120 h23 VpluginActivatedCheck HwndpluginActivatedCheckHandle, % translate("Activated?")
 		
-		Gui SE:Add, Text, x16 y408 w89 h23 +0x200, Simulator(s)
+		Gui SE:Add, Text, x16 y408 w89 h23 +0x200, % translate("Simulator(s)")
 		Gui SE:Add, Edit, x110 y408 w285 h21 VpluginSimulatorsEdit, %pluginSimulatorsEdit%
 		
-		Gui SE:Add, Text, x16 y432 w86 h23 +0x200, Arguments
+		Gui SE:Add, Text, x16 y432 w86 h23 +0x200, % translate("Arguments")
 		Gui SE:Add, Edit, x110 y432 w285 h48 VpluginArgumentsEdit, %pluginArgumentsEdit%
 		
-		Gui SE:Add, Button, x16 y490 w92 h23 gopenLabelsEditor, Edit Labels...
+		Gui SE:Add, Button, x16 y490 w92 h23 gopenLabelsEditor, % translate("Edit Labels...")
 		
-		Gui SE:Add, Button, x184 y490 w46 h23 VpluginAddButton gaddItem, Add
-		Gui SE:Add, Button, x232 y490 w50 h23 Disabled VpluginDeleteButton gdeleteItem, Delete
-		Gui SE:Add, Button, x340 y490 w55 h23 Disabled VpluginUpdateButton gupdateItem, Update
+		Gui SE:Add, Button, x184 y490 w46 h23 VpluginAddButton gaddItem, % translate("Add")
+		Gui SE:Add, Button, x232 y490 w50 h23 Disabled VpluginDeleteButton gdeleteItem, % translate("Delete")
+		Gui SE:Add, Button, x340 y490 w55 h23 Disabled VpluginUpdateButton gupdateItem, % translate("Update")
 		
 		return pluginsListViewHandle
 	}
@@ -777,13 +784,13 @@ class PluginsTab extends ConfigurationItemList {
 			name := plugin.Plugin
 			active := plugin.Active
 			
-			LV_Add("", plugin.Active ? ((name = "System") ? "Always" : "Yes") : "", name, values2String(", ", plugin.Simulators*), plugin.Arguments[true])
+			LV_Add("", plugin.Active ? ((name = translate("System")) ? translate("Always") : translate("Yes")) : translate("No")	, name, values2String(", ", plugin.Simulators*), plugin.Arguments[true])
 		}
 		
 		LV_ModifyCol()
 		LV_ModifyCol(1, "Center AutoHdr")
 		LV_ModifyCol(2, 100)
-		LV_ModifyCol(3, 100)
+		LV_ModifyCol(3, 120)
 	}
 	
 	loadEditor(item) {
@@ -826,9 +833,9 @@ class PluginsTab extends ConfigurationItemList {
 }
 
 comparePlugins(p1, p2) {
-	if (p1.Plugin = "System")
+	if (p1.Plugin = translate("System"))
 		return false
-	else if (p2.Plugin = "System")
+	else if (p2.Plugin = translate("System"))
 		return true
 	else
 		return (p1.Plugin >= p2.Plugin)
@@ -880,44 +887,45 @@ class ApplicationsTab extends ConfigurationItemList {
 	}
 					
 	createControls(configuration) {
-		Gui SE:Add, ListView, x16 y80 w377 h205 -Multi -LV0x10 NoSort NoSortHdr HwndapplicationsListViewHandle VapplicationsListView glistEvent, Type|Application|Executable|Window Title|Working Directoy
+		Gui SE:Add, ListView, x16 y80 w377 h205 -Multi -LV0x10 NoSort NoSortHdr HwndapplicationsListViewHandle VapplicationsListView glistEvent
+							, % values2String("|", map(["Type", "Name", "Executable", "Window Title", "Working Directory"], "translate")*)
 		
-		Gui SE:Add, Text, x16 y295 w141 h23 +0x200, Application
+		Gui SE:Add, Text, x16 y295 w141 h23 +0x200, % translate("Name")
 		Gui SE:Add, Edit, x160 y295 w208 h21 VapplicationNameEdit, %applicationNameEdit%
 		
-		Gui SE:Add, Text, x16 y319 w138 h23 +0x200, Executable
+		Gui SE:Add, Text, x16 y319 w138 h23 +0x200, % translate("Executable")
 		Gui SE:Add, Edit, x160 y319 w208 h21 VapplicationExePathEdit, %applicationExePathEdit%
-		Gui SE:Add, Button, x371 y318 w23 h23 gchooseApplicationExePath, ...
+		Gui SE:Add, Button, x371 y318 w23 h23 gchooseApplicationExePath, % translate("...")
 		
-		Gui SE:Add, Text, x16 y343 w138 h23 +0x200, Working Directory (optional)
+		Gui SE:Add, Text, x16 y343 w138 h23 +0x200, % translate("Working Directory (optional)")
 		Gui SE:Add, Edit, x160 y343 w208 h21 VapplicationWorkingDirectoryPathEdit, %applicationWorkingDirectoryPathEdit%
-		Gui SE:Add, Button, x371 y342 w23 h23 gchooseApplicationWorkingDirectoryPath, ...
+		Gui SE:Add, Button, x371 y342 w23 h23 gchooseApplicationWorkingDirectoryPath, % translate("...")
 		
-		Gui SE:Add, Text, x16 y367 w140 h23 +0x200, Window Title (optional)
+		Gui SE:Add, Text, x16 y367 w140 h23 +0x200, % translate("Window Title (optional)")
 		Gui SE:Font, cGray
-		Gui SE:Add, Text, x24 y385 w133 h23, (Use AHK WinTitle Syntax)
+		Gui SE:Add, Text, x24 y385 w133 h23, % translate("(Use AHK WinTitle Syntax)")
 		Gui SE:Font
 		Gui SE:Add, Edit, x160 y367 w208 h21 VapplicationWindowTitleEdit, %applicationWindowTitleEdit%
 		
 		Gui SE:Font, Norm, Arial
 		Gui SE:Font, Italic, Arial
 		
-		Gui SE:Add, GroupBox, x16 y411 w378 h71, Function Hooks (optional)
+		Gui SE:Add, GroupBox, x16 y411 w378 h71, % translate("Function Hooks (optional)")
 		
 		Gui SE:Font, Norm, Arial
 		
-		Gui SE:Add, Text, x20 y427 w116 h23 +0x200 +Center, Startup
+		Gui SE:Add, Text, x20 y427 w116 h23 +0x200 +Center, % translate("Startup")
 		Gui SE:Add, Edit, x20 y451 w116 h21 VapplicationStartupEdit, %applicationStartupEdit%
 		
-		Gui SE:Add, Text, x147 y427 w116 h23 +0x200 +Center, Shutdown
+		Gui SE:Add, Text, x147 y427 w116 h23 +0x200 +Center, % translate("Shutdown ")
 		Gui SE:Add, Edit, x147 y451 w116 h21 VapplicationShutdownEdit, %applicationShutdownEdit%
 		
-		Gui SE:Add, Text, x274 y427 w116 h23 +0x200 +Center, Running?
+		Gui SE:Add, Text, x274 y427 w116 h23 +0x200 +Center, % translate("Running?")
 		Gui SE:Add, Edit, x274 y451 w116 h21 VapplicationIsRunningEdit, %applicationIsRunningEdit%
 
-		Gui SE:Add, Button, x184 y490 w46 h23 VapplicationAddButton gaddItem, Add
-		Gui SE:Add, Button, x232 y490 w50 h23 Disabled VapplicationDeleteButton gdeleteItem, Delete
-		Gui SE:Add, Button, x340 y490 w55 h23 Disabled VapplicationUpdateButton gupdateItem, Update
+		Gui SE:Add, Button, x184 y490 w46 h23 VapplicationAddButton gaddItem, % translate("Add")
+		Gui SE:Add, Button, x232 y490 w50 h23 Disabled VapplicationDeleteButton gdeleteItem, % translate("Delete")
+		Gui SE:Add, Button, x340 y490 w55 h23 Disabled VapplicationUpdateButton gupdateItem, % translate("Update")
 		
 		return applicationsListViewHandle
 	}
@@ -926,7 +934,7 @@ class ApplicationsTab extends ConfigurationItemList {
 		base.loadFromConfiguration(configuration)
 	
 		for descriptor, name in getConfigurationSectionValues(configuration, "Applications", Object())
-			this.iItemsList.Push(Array(ConfigurationItem.splitDescriptor(descriptor)[1], new Application(name, configuration)))
+			this.iItemsList.Push(Array(translate(ConfigurationItem.splitDescriptor(descriptor)[1]), new Application(name, configuration)))
 	}
 		
 	saveToConfiguration(configuration) {
@@ -946,7 +954,10 @@ class ApplicationsTab extends ConfigurationItemList {
 			else
 				count += 1
 		
-			setConfigurationValue(configuration, "Applications", ConfigurationItem.descriptor(type, count), application.Application)
+			types := ["Core", "Feedback", "Other"]
+			
+			setConfigurationValue(configuration, "Applications"
+								, ConfigurationItem.descriptor(types[inList(map(types, "translate"), type)], count), application.Application)
 		
 			application.saveToConfiguration(configuration)
 		}
@@ -962,7 +973,7 @@ class ApplicationsTab extends ConfigurationItemList {
 			
 			type := application[1]
 			
-			if (type != "Other") {
+			if (type != translate("Other")) {
 				GuiControl Disable, applicationNameEdit
 				GuiControl Disable, applicationDeleteButton
 			}
@@ -1048,21 +1059,21 @@ class ApplicationsTab extends ConfigurationItemList {
 		GuiControlGet applicationShutdownEdit
 		GuiControlGet applicationIsRunningEdit
 		
-		return Array(isNew ? "Other" : this.iItemsList[this.iCurrentItemIndex][1]
+		return Array(isNew ? translate("Other") : this.iItemsList[this.iCurrentItemIndex][1]
 				   , new Application(applicationNameEdit, false, applicationExePathEdit, applicationWorkingDirectoryPathEdit, applicationWindowTitleEdit
 				   , applicationStartupEdit, applicationShutdownEdit, applicationIsRunningEdit))
 	}
 }
 
 chooseApplicationExePath() {
-	FileSelectFolder, directory, *%applicationExePathEdit%, 0, Select application executable...
+	FileSelectFolder, directory, *%applicationExePathEdit%, 0, % translate("Select application executable...")
 	
 	if (directory != "")
 		GuiControl Text, applicationExePathEdit, %directory%
 }
 
 chooseApplicationWorkingDirectoryPath() {
-	FileSelectFolder, directory, *%applicationWorkingDirectoryPathEdit%, 0, Select working directory...
+	FileSelectFolder, directory, *%applicationWorkingDirectoryPathEdit%, 0, % translate("Select working directory...")
 	
 	if (directory != "")
 		GuiControl Text, applicationWorkingDirectoryPathEdit, %directory%
@@ -1202,9 +1213,9 @@ class FunctionsList extends ConfigurationItemList {
 		Gui SE:Add, Edit, x104 y448 w135 h21 VfunctionOnActionEdit, %functionOnActionEdit%
 		Gui SE:Add, Edit, x248 y448 w135 h21 VfunctionOffActionEdit, %functionOffActionEdit%
 		
-		Gui SE:Add, Button, x184 y490 w46 h23 VfunctionAddButton gaddItem, Add
-		Gui SE:Add, Button, x232 y490 w50 h23 Disabled VfunctionDeleteButton gdeleteItem, Delete
-		Gui SE:Add, Button, x340 y490 w55 h23 Disabled VfunctionUpdateButton gupdateItem, Update
+		Gui SE:Add, Button, x184 y490 w46 h23 VfunctionAddButton gaddItem, % translate("Add")
+		Gui SE:Add, Button, x232 y490 w50 h23 Disabled VfunctionDeleteButton gdeleteItem, % translate("Delete")
+		Gui SE:Add, Button, x340 y490 w55 h23 Disabled VfunctionUpdateButton gupdateItem, % translate("Update")
 		
 		return functionsListViewHandle
 	}
@@ -1464,20 +1475,21 @@ class LaunchpadTab extends ConfigurationItemList {
 	}
 					
 	createControls(configuration) {
-		Gui SE:Add, ListView, x16 y80 w377 h190 -Multi -LV0x10 NoSort NoSortHdr HwndlaunchpadListViewHandle VlaunchpadListView glistEvent, #|Label|Application
+		Gui SE:Add, ListView, x16 y80 w377 h190 -Multi -LV0x10 NoSort NoSortHdr HwndlaunchpadListViewHandle VlaunchpadListView glistEvent
+							, % values2String("|", map(["#", "Label", "Application"], "translate")*)
 	
-		Gui SE:Add, Button, x316 y272 w38 h23 Disabled VlaunchpadUpButton gupItem, Up
-		Gui SE:Add, Button, x356 y272 w38 h23 Disabled VlaunchpadDownButton gdownItem, Down
+		Gui SE:Add, Button, x316 y272 w38 h23 Disabled VlaunchpadUpButton gupItem, % translate("Up")
+		Gui SE:Add, Button, x356 y272 w38 h23 Disabled VlaunchpadDownButton gdownItem, % translate("Down")
 		
-		Gui SE:Add, Text, x16 y280 w86 h23 +0x200, Label
+		Gui SE:Add, Text, x16 y280 w86 h23 +0x200, % translate("Label")
 		Gui SE:Add, Edit, x110 y280 w80 h21 VlaunchpadLabelEdit, %launchpadLabelEdit%
 		
-		Gui SE:Add, Text, x16 y304 w86 h23 +0x200, Application
+		Gui SE:Add, Text, x16 y304 w86 h23 +0x200, % translate("Application")
 		Gui SE:Add, DropDownList, x110 y304 w284 h21 R10 Choose%launchpadApplicationDropdown% VlaunchpadApplicationDropdown
 		
-		Gui SE:Add, Button, x184 y490 w46 h23 VlaunchpadAddButton gaddItem, Add
-		Gui SE:Add, Button, x232 y490 w50 h23 Disabled VlaunchpadDeleteButton gdeleteItem, Delete
-		Gui SE:Add, Button, x340 y490 w55 h23 Disabled VlaunchpadUpdateButton gupdateItem, Update
+		Gui SE:Add, Button, x184 y490 w46 h23 VlaunchpadAddButton gaddItem, % translate("Add")
+		Gui SE:Add, Button, x232 y490 w50 h23 Disabled VlaunchpadDeleteButton gdeleteItem, % translate("Delete")
+		Gui SE:Add, Button, x340 y490 w55 h23 Disabled VlaunchpadUpdateButton gupdateItem, % translate("Update")
 		
 		return launchpadListViewHandle
 	}
@@ -1509,6 +1521,7 @@ class LaunchpadTab extends ConfigurationItemList {
 		}
 		
 		LV_ModifyCol()
+		LV_ModifyCol(2, "AutoHdr")
 	}
 	
 	loadApplicationChoices(application := false) {
@@ -1569,20 +1582,21 @@ class ChatMessagesTab extends ConfigurationItemList {
 	}
 					
 	createControls(configuration) {
-		Gui SE:Add, ListView, x16 y80 w377 h190 -Multi -LV0x10 NoSort NoSortHdr HwndchatMessagesListViewHandle VchatMessagesListView glistEvent, #|Label|Message
+		Gui SE:Add, ListView, x16 y80 w377 h190 -Multi -LV0x10 NoSort NoSortHdr HwndchatMessagesListViewHandle VchatMessagesListView glistEvent
+							, % values2String("|", map(["#", "Label", "Text"], "translate")*)
 		
-		Gui SE:Add, Button, x316 y272 w38 h23 Disabled VchatMessageUpButton gupItem, Up
-		Gui SE:Add, Button, x356 y272 w38 h23 Disabled VchatMessageDownButton gdownItem, Down
+		Gui SE:Add, Button, x316 y272 w38 h23 Disabled VchatMessageUpButton gupItem, % translate("Up")
+		Gui SE:Add, Button, x356 y272 w38 h23 Disabled VchatMessageDownButton gdownItem, % translate("Down")
 		
-		Gui SE:Add, Text, x16 y280 w86 h23 +0x200, Label
+		Gui SE:Add, Text, x16 y280 w86 h23 +0x200, % translate("Label")
 		Gui SE:Add, Edit, x110 y280 w80 h21 VchatMessageLabelEdit, %chatMessageLabelEdit%
 		
-		Gui SE:Add, Text, x16 y304 w86 h23 +0x200, Message
+		Gui SE:Add, Text, x16 y304 w86 h23 +0x200, % translate("Message")
 		Gui SE:Add, Edit, x110 y304 w284 h21 VchatMessageMessageEdit, %chatMessageMessageEdit%
 		
-		Gui SE:Add, Button, x184 y490 w46 h23 VchatMessageAddButton gaddItem, Add
-		Gui SE:Add, Button, x232 y490 w50 h23 Disabled VchatMessageDeleteButton gdeleteItem, Delete
-		Gui SE:Add, Button, x340 y490 w55 h23 Disabled VchatMessageUpdateButton gupdateItem, Update
+		Gui SE:Add, Button, x184 y490 w46 h23 VchatMessageAddButton gaddItem, % translate("Add")
+		Gui SE:Add, Button, x232 y490 w50 h23 Disabled VchatMessageDeleteButton gdeleteItem, % translate("Delete")
+		Gui SE:Add, Button, x340 y490 w55 h23 Disabled VchatMessageUpdateButton gupdateItem, % translate("Update")
 		
 		return chatMessagesListViewHandle
 	}
@@ -1612,6 +1626,7 @@ class ChatMessagesTab extends ConfigurationItemList {
 		}
 		
 		LV_ModifyCol()
+		LV_ModifyCol(2, "AutoHdr")
 	}
 	
 	loadEditor(item) {
@@ -1798,11 +1813,11 @@ class ThemesList extends ConfigurationItemList {
 		Gui TE:Add, Button, x85 y317 w23 h23 HwndplaySoundButtonHandle gtogglePlaySoundFile
 		setButtonIcon(playSoundButtonHandle, kIconsDirectory . "Start.ico", 1, "L2 T2 R2 B2")
 		Gui TE:Add, Edit, x110 y318 w259 h21 VsoundFilePathEdit, %soundFilePathEdit%
-		Gui TE:Add, Button, x371 y317 w23 h23 gchooseSoundFilePath, ...
+		Gui TE:Add, Button, x371 y317 w23 h23 gchooseSoundFilePath, % translate("...")
 		
 		Gui TE:Add, Text, x16 y342 w80 h23 +0x200 VvideoFilePathLabel, Video
 		Gui TE:Add, Edit, x110 y342 w259 h21 VvideoFilePathEdit, %videoFilePathEdit%
-		Gui TE:Add, Button, x371 y341 w23 h23 VvideoFilePathButton gchooseVideoFilePath, ...
+		Gui TE:Add, Button, x371 y341 w23 h23 VvideoFilePathButton gchooseVideoFilePath, % translate("...")
 		
 		Gui TE:Add, Text, x16 y342 w80 h23 +0x200 VpicturesListLabel, Pictures
 		Gui TE:Add, Button, x85 y342 w23 h23 HwndaddPictureButtonHandle VaddPictureButton gaddThemePicture
@@ -1816,9 +1831,9 @@ class ThemesList extends ConfigurationItemList {
 		
 		Gui TE:Add, Text, x154 y459 w40 h23 VpicturesDurationPostfix, ms
 	
-		Gui TE:Add, Button, x184 y490 w46 h23 VthemeAddButton gaddItem, Add
-		Gui TE:Add, Button, x232 y490 w50 h23 Disabled VthemeDeleteButton gdeleteItem, Delete
-		Gui TE:Add, Button, x340 y490 w55 h23 Disabled VthemeUpdateButton gupdateItem, Update
+		Gui TE:Add, Button, x184 y490 w46 h23 VthemeAddButton gaddItem, % translate("Add")
+		Gui TE:Add, Button, x232 y490 w50 h23 Disabled VthemeDeleteButton gdeleteItem, % translate("Delete")
+		Gui TE:Add, Button, x340 y490 w55 h23 Disabled VthemeUpdateButton gupdateItem, % translate("Update")
 		
 		return themesListViewHandle
 	}

@@ -100,6 +100,9 @@ Returns the position of *value* in the given list or array, or *false*, if not f
 #### *concatenate(#rest lists :: Array)*
 Returns a freshly allocated list containing all the elements contained in the supplied lists. The global order is preserved.
 
+#### *map(list :: Array, function :: TypeUnion(String, FuncObj))*
+Returns a new list with the result of *function* applied to each element in *list*, while preserving the order of elements.
+
 #### *bubbleSort(ByRef array :: Array, comparator :: Function Name)*
 Sorts the given array in place, using *comparator* to define the order of the elements. This function will receive two objects and must return *true*, if the first one is considered larger or of the same order than the other. Stable sorting rules apply.
 

@@ -1527,7 +1527,7 @@ class LaunchpadTab extends ConfigurationItemList {
 	loadApplicationChoices(application := false) {
 		launchpadApplicationsList := []
 		
-		for ignore, launchpadApplication in ApplicationsTab.Instance.Applications[["Other"]]
+		for ignore, launchpadApplication in ApplicationsTab.Instance.Applications[[translate("Other")]]
 			launchpadApplicationsList.Push(launchpadApplication.Application)
 		
 		launchpadApplicationDropdown := (application ? inList(launchpadApplicationsList, application) : 0)
@@ -1685,14 +1685,14 @@ class ThemesEditor extends ConfigurationItem {
 		Gui TE:Font, Norm, Arial
 		Gui TE:Font, Italic, Arial
 
-		Gui TE:Add, Text, YP+20 w388 Center, Themes
+		Gui TE:Add, Text, YP+20 w388 Center, % translate("Themes")
 
 		Gui TE:Font, Norm, Arial
 		
-		Gui TE:Add, Text, x16 y48 w160 h23 +0x200, Upper Title
+		Gui TE:Add, Text, x16 y48 w160 h23 +0x200, % translate("Upper Title")
 		Gui TE:Add, Edit, x110 y48 w284 h21 VwindowTitleEdit, %windowTitleEdit%
 		
-		Gui TE:Add, Text, x16 y72 w160 h23 +0x200, Lower Title
+		Gui TE:Add, Text, x16 y72 w160 h23 +0x200, % translate("Lower Title")
 		Gui TE:Add, Edit, x110 y72 w284 h21 VwindowSubtitleEdit, %windowSubtitleEdit%
 		
 		Gui, TE:Add, Text, x50 y106 w310 0x10
@@ -1701,8 +1701,8 @@ class ThemesEditor extends ConfigurationItem {
 		
 		Gui, TE:Add, Text, x50 y+10 w310 0x10
 		
-		Gui TE:Add, Button, x126 yp+10 w80 h23 Default GsaveThemesEditor, Ok
-		Gui TE:Add, Button, x214 yp w80 h23 GcancelThemesEditor, Cancel
+		Gui TE:Add, Button, x126 yp+10 w80 h23 Default GsaveThemesEditor, % translate("Ok")
+		Gui TE:Add, Button, x214 yp w80 h23 GcancelThemesEditor, % translate("&Cancel")
 	}
 	
 	loadFromConfiguration(configuration) {
@@ -1722,6 +1722,8 @@ class ThemesEditor extends ConfigurationItem {
 	}
 	
 	editThemes() {
+		this.iThemesList.clearEditor()
+		
 		Gui TE:Show, AutoSize Center
 		
 		Loop
@@ -1801,35 +1803,36 @@ class ThemesList extends ConfigurationItemList {
 	}
 					
 	createControls(configuration) {
-		Gui TE:Add, ListView, x16 y120 w377 h140 -Multi -LV0x10 NoSort NoSortHdr HwndthemesListViewHandle VthemesListView glistEvent, Theme|Media|Sound File
+		Gui TE:Add, ListView, x16 y120 w377 h140 -Multi -LV0x10 NoSort NoSortHdr HwndthemesListViewHandle VthemesListView glistEvent
+							, % values2String("|", map(["Theme", "Media", "Sound File"], "translate")*)
 		
-		Gui TE:Add, Text, x16 y270 w86 h23 +0x200, Theme
+		Gui TE:Add, Text, x16 y270 w86 h23 +0x200, % translate("Theme")
 		Gui TE:Add, Edit, x110 y270 w140 h21 VthemeNameEdit, %themeNameEdit%
 		
-		Gui TE:Add, Text, x16 y294 w86 h23 +0x200, Type
-		Gui TE:Add, DropDownList, x110 y294 w140 AltSubmit VthemeTypeDropdown gupdateThemesEditorState, Picture Carousel|Video
+		Gui TE:Add, Text, x16 y294 w86 h23 +0x200, % translate("Type")
+		Gui TE:Add, DropDownList, x110 y294 w140 AltSubmit VthemeTypeDropdown gupdateThemesEditorState, % translate("Picture Carousel") . "|" . translate("Video")
 		
-		Gui TE:Add, Text, x16 y318 w160 h23 +0x200, Sound File
+		Gui TE:Add, Text, x16 y318 w160 h23 +0x200, % translate("Sound File")
 		Gui TE:Add, Button, x85 y317 w23 h23 HwndplaySoundButtonHandle gtogglePlaySoundFile
 		setButtonIcon(playSoundButtonHandle, kIconsDirectory . "Start.ico", 1, "L2 T2 R2 B2")
 		Gui TE:Add, Edit, x110 y318 w259 h21 VsoundFilePathEdit, %soundFilePathEdit%
 		Gui TE:Add, Button, x371 y317 w23 h23 gchooseSoundFilePath, % translate("...")
 		
-		Gui TE:Add, Text, x16 y342 w80 h23 +0x200 VvideoFilePathLabel, Video
+		Gui TE:Add, Text, x16 y342 w80 h23 +0x200 VvideoFilePathLabel, % translate("Video")
 		Gui TE:Add, Edit, x110 y342 w259 h21 VvideoFilePathEdit, %videoFilePathEdit%
 		Gui TE:Add, Button, x371 y341 w23 h23 VvideoFilePathButton gchooseVideoFilePath, % translate("...")
 		
-		Gui TE:Add, Text, x16 y342 w80 h23 +0x200 VpicturesListLabel, Pictures
+		Gui TE:Add, Text, x16 y342 w80 h23 +0x200 VpicturesListLabel, % translate("Pictures")
 		Gui TE:Add, Button, x85 y342 w23 h23 HwndaddPictureButtonHandle VaddPictureButton gaddThemePicture
 		setButtonIcon(addPictureButtonHandle, kIconsDirectory . "Plus.ico", 1)
-		Gui TE:Add, ListView, x110 y342 w284 h112 -Multi -LV0x10 Checked -Hdr NoSort NoSortHdr HwndpicturesListViewHandle VpicturesListView, Picture
+		Gui TE:Add, ListView, x110 y342 w284 h112 -Multi -LV0x10 Checked -Hdr NoSort NoSortHdr HwndpicturesListViewHandle VpicturesListView, % translate("Picture")	
 		
-		Gui TE:Add, Text, x16 y456 w80 h23 +0x200 VpicturesDurationLabel, Display Duration
+		Gui TE:Add, Text, x16 y456 w80 h23 +0x200 VpicturesDurationLabel, % translate("Display Duration")
 		Gui TE:Add, Edit, x110 y456 w40 h21 Limit5 Number VpicturesDurationEdit, %picturesDurationEdit%
 		
 		Gui TE:Font, Norm, Arial
 		
-		Gui TE:Add, Text, x154 y459 w40 h23 VpicturesDurationPostfix, ms
+		Gui TE:Add, Text, x154 y459 w40 h23 VpicturesDurationPostfix, % translate("ms")
 	
 		Gui TE:Add, Button, x184 y490 w46 h23 VthemeAddButton gaddItem, % translate("Add")
 		Gui TE:Add, Button, x232 y490 w50 h23 Disabled VthemeDeleteButton gdeleteItem, % translate("Delete")
@@ -1947,6 +1950,26 @@ class ThemesList extends ConfigurationItemList {
 		}
 	}
 	
+	initializePicturesList(pictures := "") {
+		Gui ListView, % picturesListViewHandle
+			
+		LV_Delete()
+		
+		pictures := string2Values(",", pictures)
+		
+		picturesListViewImages := IL_Create(pictures.Length())
+			
+		for ignore, picture in pictures
+			IL_Add(picturesListViewImages, LoadPicture(getFileName(picture, kUserSplashMediaDirectory, kSplashMediaDirectory), "W32 H32"), 0xFFFFFF, false)
+		
+		LV_SetImageList(picturesListViewImages)
+		
+		Loop % pictures.Length()
+			LV_Add("Check Icon" . A_Index, pictures[A_Index])
+			
+		LV_ModifyCol()
+	}
+	
 	loadEditor(item) {
 		themeTypeDropdown := (item[1] == "Picture Carousel") ? 1 : 2
 		themeNameEdit := item[2]
@@ -1963,28 +1986,15 @@ class ThemesList extends ConfigurationItemList {
 			
 		GuiControl Text, videoFilePathEdit, %videoFilePathEdit%
 		
-		Gui ListView, % picturesListViewHandle
-			
-		LV_Delete()
-		
 		if (themeTypeDropdown == 1) {
-			mediaFiles := string2Values(",", item[3])
-			picturesListViewImages := IL_Create(mediaFiles.Length())
-				
-			for ignore, mediaFile in mediaFiles
-				IL_Add(picturesListViewImages, LoadPicture(getFileName(mediaFile, kUserSplashMediaDirectory, kSplashMediaDirectory), "W32 H32"), 0xFFFFFF, false)
+			this.initializePicturesList(item[3])
 			
-			LV_SetImageList(picturesListViewImages)
-			
-			Loop % mediaFiles.Length()
-				LV_Add("Check Icon" . A_Index, mediaFiles[A_Index])
-				
 			picturesDurationEdit := item[5]
 			
 			GuiControl Text, picturesDurationEdit, %picturesDurationEdit%
 		}
-		
-		LV_ModifyCol()
+		else
+			this.initializePicturesList("")
 		
 		this.updateEditor()
 	}
@@ -2001,6 +2011,8 @@ class ThemesList extends ConfigurationItemList {
 		GuiControl Text, soundFilePathEdit, %soundFilePathEdit%
 		GuiControl Text, videoFilePathEdit, %videoFilePathEdit%
 		GuiControl Text, picturesDurationEdit, %picturesDurationEdit%
+		
+		this.initializePicturesList("")
 		
 		this.updateEditor()
 	}
@@ -2096,15 +2108,18 @@ togglePlaySoundFile() {
 }
 
 addThemePicture() {
-	FileSelectFile, pictureFile, 1, , Select Image..., Image (*.jpg; *.gif)
+	title := translate("Select Image...")
+	
+	FileSelectFile, pictureFile, 1, , %title%, Image (*.jpg; *.gif)
 	
 	if (pictureFile != "") {
 		Gui ListView, % picturesListViewHandle
-			
-		IL_Add(picturesListViewImages, LoadPicture(pictureFile, "W32 H32"), 0xFFFFFF, false)
-			
-		LV_Add("Check Icon" . A_Index, StrReplace(StrReplace(pictureFile, kUserSplashMediaDirectory, ""), kSplashMediaDirectory, ""))
 		
+		IL_Add(picturesListViewImages, LoadPicture(pictureFile, "W32 H32"), 0xFFFFFF, false)
+		
+		LV_Add("Check Icon" . (LV_GetCount() + 1), StrReplace(StrReplace(pictureFile, kUserSplashMediaDirectory, ""), kSplashMediaDirectory, ""))
+		
+		LV_ModifyCol()
 		LV_Modify(LV_GetCount(), "Vis")
 	}
 }
@@ -2116,8 +2131,10 @@ chooseSoundFilePath() {
 		path := getFileName(path, kUserSplashMediaDirectory, kSplashMediaDirectory)
 	else
 		path := SubStr(kUserSplashMediaDirectory, 1, StrLen(kUserSplashMediaDirectory) - 1)
-		
-	FileSelectFile, soundFile, 1, *%path%, Select Sound File..., Audio (*.wav; *.mp3)
+	
+	title := translate("Select Sound File...")
+	
+	FileSelectFile, soundFile, 1, *%path%, %title%, Audio (*.wav; *.mp3)
 	
 	if (soundFile != "") {
 		soundFilePathEdit := soundFile
@@ -2133,8 +2150,10 @@ chooseVideoFilePath() {
 		path := getFileName(path, kUserSplashMediaDirectory, kSplashMediaDirectory)
 	else
 		path := SubStr(kUserSplashMediaDirectory, 1, StrLen(kUserSplashMediaDirectory) - 1)
-		
-	FileSelectFile, videoFile, 1, *%path%, Select Video (GIF) File..., Video (*.gif)
+	
+	title := translate("Select Video (GIF) File...")
+	
+	FileSelectFile, videoFile, 1, *%path%, %title%, Video (*.gif)
 	
 	if (videoFile != "") {
 		videoFilePathEdit := videoFile

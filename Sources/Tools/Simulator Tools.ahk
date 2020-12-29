@@ -188,7 +188,7 @@ editTargets(command := "") {
 			vBuildSettings[target] := %buildVariable%
 		}
 		
-		vSplashTheme := (splashTheme == "None") ? false : splashTheme
+		vSplashTheme := (splashTheme == translate("None")) ? false : splashTheme
 		
 		writeToolsConfiguration(vCleanupSettings, vBuildSettings, vSplashTheme)
 		

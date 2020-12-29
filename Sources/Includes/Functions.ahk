@@ -220,7 +220,8 @@ loadSimulatorConfiguration() {
 	}
 	else
 		logMessage(kLogWarn, translate("NirCmd executable not configured"))
-		
+	
+	vTargetLanguage := getConfigurationValue(kSimulatorConfiguration, "Configuration", "Language", "en")
 	vDebug := (!A_IsCompiled || getConfigurationValue(kSimulatorConfiguration, "Configuration", "Debug", false))
 	vLogLevel := inList(["Info", "Warn", "Critical", "Off"], getConfigurationValue(kSimulatorConfiguration, "Configuration", "Log Level", "Warn"))
 		
@@ -457,6 +458,18 @@ logMessage(logLevel, message) {
 	}
 }
 
+availableLanguages() {
+	translations := {en: "English"}
+	
+	for ignore, fileName in getFileNames("Translations.*", kConfigDirectory, kUserConfigDirectory) {
+		SplitPath fileName, , , languageCode
+		
+		translations[languageCode] := readTranslations(languageCode)[languageCode]
+	}
+	
+	return translations
+}
+
 readTranslations(targetLanguage) {
 	translations := {}
 	
@@ -494,6 +507,10 @@ translate(string) {
 
 setLanguage(language) {
 	vTargetLanguage := language
+}
+
+getLanguage() {
+	return vTargetLanguage
 }
 
 protectionOn() {

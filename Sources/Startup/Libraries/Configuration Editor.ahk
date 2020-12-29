@@ -186,7 +186,7 @@ restart:
 		
 		setConfigurationValue(newConfiguration, "Button Box", "Button Box Position", buttonBoxPosition)
 		
-		setConfigurationValue(newConfiguration, "Startup", "Splash Theme", (splashTheme == "None") ? false : splashTheme)
+		setConfigurationValue(newConfiguration, "Startup", "Splash Theme", (splashTheme == translate("None")) ? false : splashTheme)
 		setConfigurationValue(newConfiguration, "Startup", "Simulator", (startup ? startOption : false))
 		
 		Gui CE:Destroy

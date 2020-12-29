@@ -388,6 +388,7 @@ saveAndStay() {
 global nirCmdPathEdit
 global homePathEdit
 
+global languageDropdown
 global startWithWindowsCheck
 global silentModeCheck
 
@@ -427,19 +428,32 @@ class GeneralTab extends ConfigurationItemTab {
 		Gui SE:Font, Norm, Arial
 		Gui SE:Font, Italic, Arial
 		
-		Gui SE:Add, GroupBox, x16 y160 w378 h70, Startup
+		Gui SE:Add, GroupBox, x16 y160 w378 h95, Settings
 		
 		Gui SE:Font, Norm, Arial
 		
-		Gui SE:Add, CheckBox, x24 y176 w242 h23 Checked%startWithWindowsCheck% VstartWithWindowsCheck, Start with Windows
-		Gui SE:Add, CheckBox, x24 y200 w242 h23 Checked%silentModeCheck% VsilentModeCheck, Silent mode (no splash screen, no sound)
+		choices := []
+		chosen := 0
 		
-		Gui SE:Add, Button, x283 y176 w100 h23 GopenThemesEditor, Themes Editor...
+		for ignore, language in availableLanguages() {
+			choices.Push(language)
+			
+			if (language == languageDropDown)
+				chosen := A_Index
+		}
+			
+		Gui SE:Add, Text, x24 y176 w86 h23 +0x200, Language
+		Gui SE:Add, DropDownList, x184 y176 w199 Choose%chosen% VlanguageDropdown, % values2String("|", choices*)
+		
+		Gui SE:Add, CheckBox, x24 y200 w242 h23 Checked%startWithWindowsCheck% VstartWithWindowsCheck, Start with Windows
+		Gui SE:Add, CheckBox, x24 y224 w242 h23 Checked%silentModeCheck% VsilentModeCheck, Silent mode (no splash screen, no sound)
+		
+		Gui SE:Add, Button, x283 y224 w100 h23 GopenThemesEditor, Themes Editor...
 	
 		Gui SE:Font, Norm, Arial
 		Gui SE:Font, Italic, Arial
 		
-		Gui SE:Add, GroupBox, x16 y240 w378 h120, Simulators
+		Gui SE:Add, GroupBox, x16 y265 w378 h115, Simulators
 		
 		Gui SE:Font, Norm, Arial
 		
@@ -478,6 +492,7 @@ class GeneralTab extends ConfigurationItemTab {
 		nirCmdPathEdit := getConfigurationValue(configuration, "Configuration", "NirCmd Path", "")
 		homePathEdit := getConfigurationValue(configuration, "Configuration", "Home Path", "")
 		
+		languageDropdown := availableLanguages()[getConfigurationValue(configuration, "Configuration", "Language", getLanguage())]
 		startWithWindowsCheck := getConfigurationValue(configuration, "Configuration", "Start With Windows", true)
 		silentModeCheck := getConfigurationValue(configuration, "Configuration", "Silent Mode", false)
 		
@@ -494,12 +509,23 @@ class GeneralTab extends ConfigurationItemTab {
 		GuiControlGet nirCmdPathEdit
 		GuiControlGet homePathEdit
 		
+		GuiControlGet languageDropdown
 		GuiControlGet startWithWindowsCheck
 		GuiControlGet silentModeCheck
 		
 		setConfigurationValue(configuration, "Configuration", "NirCmd Path", nirCmdPathEdit)
 		setConfigurationValue(configuration, "Configuration", "Home Path", homePathEdit)
 		
+		languageCode := "en"
+		
+		for code, language in availableLanguages()
+			if (language = languageDropdown) {
+				languageCode := code
+				
+				break
+			}
+			
+		setConfigurationValue(configuration, "Configuration", "Language", languageCode)
 		setConfigurationValue(configuration, "Configuration", "Start With Windows", startWithWindowsCheck)
 		setConfigurationValue(configuration, "Configuration", "Silent Mode", silentModeCheck)
 		
@@ -581,16 +607,16 @@ class SimulatorsList extends ConfigurationItemList {
 	}
 					
 	createControls(configuration) {
-		Gui SE:Add, ListBox, x24 y264 w154 h96 HwndsimulatorsListBoxHandle VsimulatorsListBox glistEvent, %simulatorsListBox%
+		Gui SE:Add, ListBox, x24 y284 w154 h96 HwndsimulatorsListBoxHandle VsimulatorsListBox glistEvent, %simulatorsListBox%
 		
-		Gui SE:Add, Edit, x184 y264 w199 h21 VsimulatorEdit, %simulatorEdit%
+		Gui SE:Add, Edit, x184 y284 w199 h21 VsimulatorEdit, %simulatorEdit%
 		
-		Gui SE:Add, Button, x305 y288 w38 h23 Disabled VsimulatorUpButton gupItem, Up
-		Gui SE:Add, Button, x345 y288 w38 h23 Disabled VsimulatorDownButton gdownItem, Down
+		Gui SE:Add, Button, x305 y309 w38 h23 Disabled VsimulatorUpButton gupItem, Up
+		Gui SE:Add, Button, x345 y309 w38 h23 Disabled VsimulatorDownButton gdownItem, Down
 		
-		Gui SE:Add, Button, x184 y329 w46 h23 VsimulatorAddButton gaddItem, Add
-		Gui SE:Add, Button, x232 y329 w50 h23 Disabled VsimulatorDeleteButton gdeleteItem, Delete
-		Gui SE:Add, Button, x328 y329 w55 h23 Disabled VsimulatorUpdateButton gupdateItem, Update
+		Gui SE:Add, Button, x184 y349 w46 h23 VsimulatorAddButton gaddItem, Add
+		Gui SE:Add, Button, x232 y349 w50 h23 Disabled VsimulatorDeleteButton gdeleteItem, Delete
+		Gui SE:Add, Button, x328 y349 w55 h23 Disabled VsimulatorUpdateButton gupdateItem, Update
 		
 		return simulatorsListBoxHandle
 	}

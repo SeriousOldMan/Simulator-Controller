@@ -189,6 +189,12 @@ initializeTrayMessageQueue() {
 }
 
 loadSimulatorConfiguration() {
+	kVersion := getConfigurationValue(readConfiguration(kHomeDirectory . "VERSION"), "Version", "Current", "0.0.0")
+	
+	logMessage(kLogCritical, "---------------------------------------------------------------")
+	logMessage(kLogCritical, translate("           Running ") . StrSplit(A_ScriptName, ".")[1] . " (" . kVersion . ")")
+	logMessage(kLogCritical, "---------------------------------------------------------------")
+	
 	kSimulatorConfiguration := readConfiguration(kSimulatorConfigurationFile)
 	
 	if (kSimulatorConfiguration.Count() == 0)
@@ -240,12 +246,6 @@ initializeEnvironment() {
 	
 	if !FileExist(kUserConfigDirectory . "Controller Plugin Labels.ini")
 		FileCopy %kResourcesDirectory%Templates\Controller Plugin Labels.ini, %kUserConfigDirectory%
-	
-	kVersion := getConfigurationValue(readConfiguration(kHomeDirectory . "VERSION"), "Version", "Current", "0.0.0")
-	
-	logMessage(kLogCritical, "---------------------------------------------------------------")
-	logMessage(kLogCritical, translate("           Running ") . StrSplit(A_ScriptName, ".")[1] . " (" . kVersion . ")")
-	logMessage(kLogCritical, "---------------------------------------------------------------")
 }
 
 

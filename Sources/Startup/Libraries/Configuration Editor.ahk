@@ -128,6 +128,8 @@ editConfiguration(ByRef configurationOrCommand, withContinue := false) {
 	static buttonBoxSimulation
 	static buttonBoxSimulationDuration
 	static buttonBoxPosition
+	static lastPositionX
+	static lastPositionY
 	
 	static startup
 	static startOption
@@ -183,6 +185,9 @@ restart:
 		positions := ["Top Left", "Top Right", "Bottom Left", "Bottom Right", "Last Position"]
 		
 		setConfigurationValue(newConfiguration, "Button Box", "Button Box Position", positions[inList(map(positions, "translate"), buttonBoxPosition)])
+		
+		setConfigurationValue(newConfiguration, "Button Box", "Button Box Position.X", lastPositionX)
+		setConfigurationValue(newConfiguration, "Button Box", "Button Box Position.Y", lastPositionY)
 		
 		setConfigurationValue(newConfiguration, "Startup", "Splash Theme", (splashTheme == translate("None")) ? false : splashTheme)
 		setConfigurationValue(newConfiguration, "Startup", "Simulator", (startup ? startOption : false))
@@ -282,6 +287,8 @@ restart:
 		buttonBoxDuration := getConfigurationValue(configurationOrCommand, "Button Box", "Button Box Duration", 10000)
 		buttonBoxSimulationDuration := getConfigurationValue(configurationOrCommand, "Button Box", "Button Box Simulation Duration", false)
 		buttonBoxPosition := getConfigurationValue(configurationOrCommand, "Button Box", "Button Box Position", "Bottom Right")
+		lastPositionX := getConfigurationValue(configurationOrCommand, "Button Box", "Button Box Position.X", 0)
+		lastPositionY := getConfigurationValue(configurationOrCommand, "Button Box", "Button Box Position.Y", 0)
 		
 		trayTip := (trayTipDuration != 0) ? true : false
 		trayTipSimulation := (trayTipSimulationDuration != 0) ? true : false

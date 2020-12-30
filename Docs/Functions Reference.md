@@ -155,6 +155,13 @@ Closes the current theme based splash window.
 
 ***
 
+## GUI Tools ([Functions.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Functions.ahk))
+Miscellaneous helper functions for GUI programming.
+
+#### *moveByMouse(guiPrefix :: String)*
+You can call this function from a click handler of a GUI element. It will move the underlying window by following the mouse cursor. *guiPrefix* must be the [prefix](https://www.autohotkey.com/docs/commands/Gui.htm#MultiWin) used, while creating the GUI elements using the AutoHotkey [*GUI Add, ...*](https://www.autohotkey.com/docs/commands/Gui.htm#Add) command.
+***
+
 ## Thread Protection ([Functions.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Functions.ahk))
 In AutoHotkey scripts, running threads may be interrupted by other events, such as keyboard events or timer functions. Using the functions below, it is possible to create protected sections of code, which may not be interrupted.
 

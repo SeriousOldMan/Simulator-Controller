@@ -64,7 +64,6 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	
 	class MotionMode extends ControllerMode {
 		iSelectedEffect := false
-		iEffectsAreHighlighted := false
 		iIntensityDialAction := false
 		
 		Mode[] {
@@ -95,38 +94,21 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		updateEffectLabels() {
 			static isInfo := false
 			
-			if (this.iSelectedEffect == kUndefined)
-				this.highlightEffectLabels()
-			else if (this.Controller.ActiveMode == this)
-				for index, effect in this.Plugin.kEffects
-					this.findAction(this.Plugin.getLabel(ConfigurationItem.descriptor(effect, "Toggle"), effect)).updateLabel(isInfo ? "Info" : "Normal")
+			if (this.Controller.ActiveMode == this) {
+				state := (isInfo ? ((this.iSelectedEffect == kUndefined) ? "Highlight" : "Info") : "Normal")
 				
-			this.findAction("Motion Intensity").updateLabel(isInfo ? "Info" : "Normal")
-			
-			isInfo := !isInfo
-		}
-		
-		highlightEffectLabels() {
-			if ((this.iSelectedEffect == false) && !this.iEffectsAreHighlighted)
-				return
-			
-			this.iEffectsAreHighlighted := !this.iEffectsAreHighlighted
-			
-			if (this.Controller.ActiveMode == this)
 				for index, effect in this.Plugin.kEffects
-					this.findAction(this.Plugin.getLabel(ConfigurationItem.descriptor(effect, "Toggle"), effect)).updateLabel(this.iEffectsAreHighlighted ? "Highlight" : "Normal")
-		}
-
-		unhighlightEffectLabels() {
-			if this.iEffectsAreHighlighted
-				this.highlightEffectLabels()
+					this.findAction(this.Plugin.getLabel(ConfigurationItem.descriptor(effect, "Toggle"), effect)).updateLabel(state)
+			
+				this.findAction("Motion Intensity").updateLabel(isInfo ? "Info" : "Normal")
+			
+				isInfo := !isInfo
+			}
 		}
 		
 		selectEffect(effect) {
 			this.iSelectedEffect := effect
-			
-			this.unhighlightEffectLabels()
-			
+
 			this.iIntensityDialAction.setEffect(effect)
 		}
 		

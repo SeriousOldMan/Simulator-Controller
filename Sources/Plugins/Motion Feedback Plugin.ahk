@@ -92,20 +92,21 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			this.iIntensityDialAction := intensityDialAction
 		}
 		
-		toggleEffectLabels() {
+		updateEffectLabels() {
 			static isInfo := false
-		
-			if (this.Controller.ActiveMode == this) {
+			
+			if (this.iSelectedEffect == kUndefined)
+				this.highlightEffectLabels()
+			else if (this.Controller.ActiveMode == this)
 				for index, effect in this.Plugin.kEffects
 					this.findAction(this.Plugin.getLabel(ConfigurationItem.descriptor(effect, "Toggle"), effect)).updateLabel(isInfo ? "Info" : "Normal")
-			
-				this.findAction("Motion Intensity").updateLabel(isInfo ? "Info" : "Normal")
-			}
+				
+			this.findAction("Motion Intensity").updateLabel(isInfo ? "Info" : "Normal")
 			
 			isInfo := !isInfo
 		}
 		
-		blinkEffectLabels() {
+		highlightEffectLabels() {
 			if ((this.iSelectedEffect == false) && !this.iEffectsAreHighlighted)
 				return
 			
@@ -116,25 +117,21 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 					this.findAction(this.Plugin.getLabel(ConfigurationItem.descriptor(effect, "Toggle"), effect)).updateLabel(this.iEffectsAreHighlighted ? "Highlight" : "Normal")
 		}
 
-		unblinkEffectLabels() {
+		unhighlightEffectLabels() {
 			if this.iEffectsAreHighlighted
-				this.blinkEffectLabels()
+				this.highlightEffectLabels()
 		}
 		
 		selectEffect(effect) {
 			this.iSelectedEffect := effect
-				
-			SetTimer blinkEffectLabels, Off
 			
-			this.unblinkEffectLabels()
+			this.unhighlightEffectLabels()
 			
 			this.iIntensityDialAction.setEffect(effect)
 		}
 		
 		chooseEffect() {
 			this.iSelectedEffect := kUndefined
-			
-			SetTimer blinkEffectLabels, 1500
 			
 			this.iIntensityDialAction.setEffect(false)
 		}
@@ -153,9 +150,13 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			this.deselectEffect()
 			
 			this.updateActionStates()
+			
+			SetTimer updateEffectLabels, 1500
 		}
 		
 		deactivate() {
+			SetTimer updateEffectLabels, Off
+			
 			this.deselectEffect()
 			
 			base.deactivate()
@@ -910,8 +911,6 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	updateMotionState() {
 		static isRunning := "__Undefined__"
 		
-		stateChange := (isRunning == kUndefined) ? true : false
-		
 		if (isRunning == kUndefined)
 			isRunning := this.Application.isRunning()
 		
@@ -920,7 +919,6 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		try {
 			if (isRunning != this.Application.isRunning()) {
 				isRunning := !isRunning
-				stateChange := true
 				
 				if isRunning
 					this.requireSimFeedback()
@@ -935,9 +933,6 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		}
 
 		SetTimer updateMotionState, % isRunning ? 5000 : 1000
-			
-		if stateChange
-			SetTimer toggleEffectLabels, % isRunning ? 1000 : "Off"
 	}
 }
 
@@ -955,7 +950,7 @@ updateMotionState() {
 	plugin.updateMotionState()
 }
 
-blinkEffectLabels() {
+updateEffectLabels() {
 	static mode := false
 	
 	if !mode
@@ -964,23 +959,7 @@ blinkEffectLabels() {
 	protectionOn()
 	
 	try {
-		mode.blinkEffectLabels()
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-toggleEffectLabels() {
-	static mode := false
-	
-	if !mode
-		mode := SimulatorController.Instance.findMode(kMotionMode)
-		
-	protectionOn()
-	
-	try {
-		mode.toggleEffectLabels()
+		mode.updateEffectLabels()
 	}
 	finally {
 		protectionOff()

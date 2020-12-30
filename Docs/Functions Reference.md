@@ -64,7 +64,7 @@ Registers an event handler function for the given event type. An event handler i
 	}
 
 #### *raiseEvent(target :: String, event :: String, data :: String)*
-Raises the event in the supplied target process. If *target* is *false*, the event is raised in the current process. Otherwise, *target* must use the [*winTitle*](https://www.autohotkey.com/docs/misc/WinTitle.htm) syntax of AutoHotkey to identify a target process through one of its windows or using its process id.
+Raises the event in the supplied target process. If *target* is *false*, the event is raised in the current process. Otherwise, *target* must use the [*winTitle*](https://www.autohotkey.com/docs/misc/WinTitle.htm) syntax of AutoHotkey to identify a target process through one of its windows or using its process id. Returns *true*, if the event has been successfully delivered.
 
 ***
 

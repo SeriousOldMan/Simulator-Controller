@@ -720,6 +720,8 @@ raiseEvent(target, event, data) {
 		vWaitingEvents.Push(Func(eventHandler).Bind(event, data))
 	
 		%eventHandler%(event, data)
+		
+		return true
 	}
 	else {
 		logMessage(kLogInfo, translate("Raising event """) . event . (data ? translate(""": ") . data : translate("""")) . translate(" in target ") . target)
@@ -757,12 +759,15 @@ raiseEvent(target, event, data) {
 		
 		try {
 			SendMessage %message%, %wParam%, %lParam%, %control%, %target%
+			
+			return (ErrorLevel != "Fail")
 		}
 		catch exception {
 		}
-		
-		DetectHiddenWindows %curDetectHiddenWindows%
-		SetTitleMatchMode %curTitleMatchMode%
+		finally {
+			DetectHiddenWindows %curDetectHiddenWindows%
+			SetTitleMatchMode %curTitleMatchMode%
+		}
 	}
 }
 

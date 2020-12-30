@@ -134,7 +134,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		chooseEffect() {
 			this.iSelectedEffect := kUndefined
 			
-			SetTimer blinkEffectLabels, 1000
+			SetTimer blinkEffectLabels, 1500
 			
 			this.iIntensityDialAction.setEffect(false)
 		}
@@ -544,7 +544,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	
 		isRunning := this.Application.isRunning()
 		
-		action := this.findAction(translate("Motion"))
+		action := this.findAction("Motion")
 		
 		action.Function.setText(translate(action.Label), isRunning ? (action.Active ? "Green" : "Black") : "Olive")
 			
@@ -910,10 +910,10 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	updateMotionState() {
 		static isRunning := "__Undefined__"
 		
+		stateChange := (isRunning == kUndefined) ? true : false
+		
 		if (isRunning == kUndefined)
 			isRunning := this.Application.isRunning()
-		
-		stateChange := false
 		
 		protectionOn()
 			
@@ -933,11 +933,11 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		finally {
 			protectionOff()
 		}
-				
-		if stateChange {
-			SetTimer updateMotionState, % isRunning ? 5000 : 1000
-			SetTimer toggleEffectLabels, % isRunning ? 1000 : Off
-		}
+
+		SetTimer updateMotionState, % isRunning ? 5000 : 1000
+			
+		if stateChange
+			SetTimer toggleEffectLabels, % isRunning ? 1000 : "Off"
 	}
 }
 
@@ -1036,7 +1036,7 @@ startMotion() {
 	protectionOn()
 	
 	try {
-		action := SimulatorController.Instance.findPlugin(kMotionFeedbackPlugin).findAction(translate("Motion"))
+		action := SimulatorController.Instance.findPlugin(kMotionFeedbackPlugin).findAction("Motion")
 	
 		action.fireAction(action.Function, "On")
 	}
@@ -1049,7 +1049,7 @@ stopMotion() {
 	protectionOn()
 	
 	try {
-		action := SimulatorController.Instance.findPlugin(kMotionFeedbackPlugin).findAction(translate("Motion"))
+		action := SimulatorController.Instance.findPlugin(kMotionFeedbackPlugin).findAction("Motion")
 	
 		action.fireAction(action.Function, "Off")
 	}

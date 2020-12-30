@@ -51,6 +51,8 @@ ListLines Off					; Disable execution history
 global vSimulatorControllerPID := 0
 global vStartupFinished = false
 
+global vSongFile = false
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
@@ -268,11 +270,19 @@ startSimulator() {
 	new SimulatorStartup(kSimulatorConfiguration, configuration).startup()
 }
 
+playSongRemote() {
+	if raiseEvent("ahk_pid " . vSimulatorControllerPID, "Startup", "playStartupSong:" . vSongFile) {
+		vSongFile := false
+		
+		SetTimer playSongRemote, Off
+	}
+}
+
 playSong(songFile) {
 	if (songFile && FileExist(getFileName(songFile, kUserSplashMediaDirectory, kSplashMediaDirectory))) {
-		playSong := Func("raiseEvent").bind("ahk_pid " . vSimulatorControllerPID, "Startup", "playStartupSong:" . songFile)
+		vSongFile := songFile
 		
-		SetTimer %playSong%, -2000
+		SetTimer playSongRemote, 50
 	}
 }
 

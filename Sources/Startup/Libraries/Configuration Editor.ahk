@@ -186,7 +186,7 @@ restart:
 		setConfigurationValue(newConfiguration, "Button Box", "Button Box Duration", (buttonBox ? buttonBoxDuration : false))
 		setConfigurationValue(newConfiguration, "Button Box", "Button Box Simulation Duration", (buttonBoxSimulation ? buttonBoxSimulationDuration : false))
 		
-		positions := ["Top Left", "Top Right", "Bottom Left", "Bottom Right", "Last Position"]
+		positions := ["Top Left", "Top Right", "Bottom Left", "Bottom Right", "Secondary Screen", "Last Position"]
 		
 		setConfigurationValue(newConfiguration, "Button Box", "Button Box Position", positions[inList(map(positions, "translate"), buttonBoxPosition)])
 		
@@ -329,7 +329,7 @@ restart:
 		Gui CE:Add, Text, X205 YP+5, % translate("ms")
 		Gui CE:Add, Text, X20 YP+30, % translate("Button Box Position")
 		
-		choices := ["Top Left", "Top Right", "Bottom Left", "Bottom Right", "Last Position"]
+		choices := ["Top Left", "Top Right", "Bottom Left", "Bottom Right", "Secondary Screen", "Last Position"]
 		chosen := inList(choices, buttonBoxPosition)
 		
 		if !chosen

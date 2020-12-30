@@ -197,7 +197,7 @@ class ButtonBox extends ConfigurationItem {
 						position := getConfigurationValue(this.Controller.ControllerConfiguration, "Button Box", "Button Box Position", "Bottom Right")
 						
 						SysGet mainScreen, MonitorWorkArea
-						
+
 						switch position {
 							case "Top Left":
 								x := mainScreenLeft
@@ -211,9 +211,21 @@ class ButtonBox extends ConfigurationItem {
 							case "Bottom Right":
 								x := mainScreenRight - width
 								y := mainScreenBottom - height
+							case "Secondary Screen":
+								SysGet count, MonitorCount
+								
+								if (count > 1) {
+									SysGet, secondScreen, Monitor, 2
+									
+									x := Round((secondScreenRight - width) / 2)
+									y := Round((secondScreenBottom - height) / 2)
+								}
+								else
+									Goto defaultCase
 							case "Last Position":
-								x := getConfigurationValue(this.Controller.ControllerConfiguration, "Button Box", "Button Box Position.X", 0)
-								y := getConfigurationValue(this.Controller.ControllerConfiguration, "Button Box", "Button Box Position.Y", 0)
+defaultCase:
+								x := getConfigurationValue(this.Controller.ControllerConfiguration, "Button Box", "Button Box Position.X", mainScreenRight - width)
+								y := getConfigurationValue(this.Controller.ControllerConfiguration, "Button Box", "Button Box Position.Y", mainScreenBottom - height)
 							default:
 								Throw "Unhandled position for Button Box (" . position . ") encountered in ButtonBox.show..."
 						}

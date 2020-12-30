@@ -302,7 +302,7 @@ class SetupEditor extends ConfigurationItem {
 
 		Gui SE:Font, Bold, Arial
 
-		Gui SE:Add, Text, w398 Center, Modular Simulator Controller System 
+		Gui SE:Add, Text, w398 Center gmoveSetupEditor, Modular Simulator Controller System 
 		
 		Gui SE:Font, Norm, Arial
 		Gui SE:Font, Italic, Arial
@@ -383,6 +383,10 @@ saveAndStay() {
 	vResult := kApply
 }
 
+moveSetupEditor() {
+	moveByMouse("SE")
+}
+
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; GeneralTab                                                              ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -419,7 +423,7 @@ class GeneralTab extends ConfigurationItemTab {
 		
 		Gui SE:Font, Norm, Arial
 		
-		Gui SE:Add, Text, x24 y97 w160 h23 +0x200, % translate("Home Folder (optional)")
+		Gui SE:Add, Text, x24 y97 w160 h23 +0x200, % translate("Installation Folder (optional)")
 		Gui SE:Add, Edit, x184 y97 w174 h21 VhomePathEdit, %homePathEdit%
 		Gui SE:Add, Button, x360 y96 w23 h23 gchooseHomePath, % translate("...")
 		
@@ -1685,7 +1689,7 @@ class ThemesEditor extends ConfigurationItem {
 
 		Gui TE:Font, Bold, Arial
 
-		Gui TE:Add, Text, w388 Center, Modular Simulator Controller System 
+		Gui TE:Add, Text, w388 Center gmoveThemesEditor, Modular Simulator Controller System 
 		
 		Gui TE:Font, Norm, Arial
 		Gui TE:Font, Italic, Arial
@@ -1767,6 +1771,10 @@ saveThemesEditor() {
 
 cancelThemesEditor() {
 	ThemesEditor.Instance.closeEditor(false)
+}
+
+moveThemesEditor() {
+	moveByMouse("TE")
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;

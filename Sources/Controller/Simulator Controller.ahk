@@ -131,7 +131,7 @@ class ButtonBox extends ConfigurationItem {
 		this.iNumButtons := getConfigurationValue(configuration, "Controller Layout", "Buttons", 0)
 		this.iNumDials := getConfigurationValue(configuration, "Controller Layout", "Dials", 0)
 		
-		logMessage(kLogInfo, translate("Controller layout initialized:") . " # " . this.iNum1WayToggles . " 1-Way Toggles, # " . this.iNum2WayToggles . " 2-Way Toggles, # " . this.iNumButtons . " Buttons, # " . this.iNumDials . " Dials")
+		logMessage(kLogInfo, translate("Controller layout initialized:") . " #" . this.iNum1WayToggles . " " . translate("1-Way Toggles") . ", #" . this.iNum2WayToggles . " " . translate("2-Way Toggles") . ", #" . this.iNumButtons . " " . translate("Buttons") . ", #" . this.iNumDials . " " . translate("Dials"))
 	}
 	
 	createWindow(ByRef window, ByRef windowWidth, ByRef windowHeight) {

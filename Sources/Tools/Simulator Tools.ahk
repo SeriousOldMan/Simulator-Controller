@@ -150,6 +150,10 @@ cancelTargets() {
 	editTargets(kCancel)
 }
 
+moveEditor() {
+	moveByMouse("TE")
+}
+
 editTargets(command := "") {
 	static result
 	
@@ -219,8 +223,8 @@ editTargets(command := "") {
 		Gui TE:Color, D0D0D0
 	
 		Gui TE:Font, Bold, Arial
-	
-		Gui TE:Add, Text, w220 Center, Modular Simulator Controller System 
+		
+		Gui TE:Add, Text, w220 Center gmoveEditor, Modular Simulator Controller System 
 		
 		Gui TE:Font, Norm, Arial
 		Gui TE:Font, Italic, Arial

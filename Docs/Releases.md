@@ -4,6 +4,7 @@
   2. Documentation updates, as always
   3. Unicode based translation support. German translation will be available - other languages can be easily added
   4. Updated photorealistic elements for Button Box
+  5. All dialogs may be moved around by clicking in the main title
 
 ## 1.3.3-stable, 12/27/20
 

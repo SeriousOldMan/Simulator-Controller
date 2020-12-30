@@ -109,6 +109,10 @@ computeStartupSongs() {
 	return files
 }
 
+moveEditor() {
+	moveByMouse("CE")
+}
+
 editConfiguration(ByRef configurationOrCommand, withContinue := false) {
 	static result
 	static newConfiguration
@@ -214,7 +218,7 @@ restart:
 	
 		Gui CE:Font, Bold, Arial
 	
-		Gui CE:Add, Text, w220 Center, Modular Simulator Controller System 
+		Gui CE:Add, Text, w220 Center gmoveEditor, Modular Simulator Controller System 
 		
 		Gui CE:Font, Norm, Arial
 		Gui CE:Font, Italic, Arial

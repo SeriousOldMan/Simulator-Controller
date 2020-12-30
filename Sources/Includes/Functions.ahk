@@ -189,13 +189,14 @@ initializeTrayMessageQueue() {
 }
 
 loadSimulatorConfiguration() {
+	kSimulatorConfiguration := readConfiguration(kSimulatorConfigurationFile)
+	vTargetLanguage := getConfigurationValue(kSimulatorConfiguration, "Configuration", "Language", "en")
+	
 	kVersion := getConfigurationValue(readConfiguration(kHomeDirectory . "VERSION"), "Version", "Current", "0.0.0")
 	
 	logMessage(kLogCritical, "---------------------------------------------------------------")
 	logMessage(kLogCritical, translate("           Running ") . StrSplit(A_ScriptName, ".")[1] . " (" . kVersion . ")")
 	logMessage(kLogCritical, "---------------------------------------------------------------")
-	
-	kSimulatorConfiguration := readConfiguration(kSimulatorConfigurationFile)
 	
 	if (kSimulatorConfiguration.Count() == 0)
 		logMessage(kLogCritical, translate("No configuration found - please run the setup tool"))
@@ -227,7 +228,6 @@ loadSimulatorConfiguration() {
 	else
 		logMessage(kLogWarn, translate("NirCmd executable not configured"))
 	
-	vTargetLanguage := getConfigurationValue(kSimulatorConfiguration, "Configuration", "Language", "en")
 	kSilentMode := getConfigurationValue(kSimulatorConfiguration, "Configuration", "Silent Mode", false)
 	
 	vDebug := (!A_IsCompiled || getConfigurationValue(kSimulatorConfiguration, "Configuration", "Debug", false))
@@ -422,6 +422,32 @@ getAllThemes() {
 	}
 	
 	return themes
+}
+
+moveByMouse(window) {
+	curCoordMode := A_CoordModeMouse
+	
+	CoordMode Mouse, Screen
+		
+	try {	
+		MouseGetPos anchorX, anchorY
+		WinGetPos winX, winY, w, h, %A_ScriptName%
+		
+		newX := winX
+		newY := winY
+		
+		while GetKeyState("LButton", "P") {
+			MouseGetPos x, y
+		
+			newX := winX + (x - anchorX)
+			newY := winY + (y - anchorY)
+			
+			Gui %window%:Show, X%newX% Y%newY%
+		}
+	}
+	finally {
+		CoordMode Mouse, curCoordMode
+	}
 }
 
 isDebug() {

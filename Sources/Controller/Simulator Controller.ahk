@@ -215,10 +215,10 @@ class ButtonBox extends ConfigurationItem {
 								SysGet count, MonitorCount
 								
 								if (count > 1) {
-									SysGet, secondScreen, Monitor, 2
+									SysGet, secondScreen, MonitorWorkArea, 2
 									
-									x := Round((secondScreenRight - width) / 2)
-									y := Round((secondScreenBottom - height) / 2)
+									x := Round(secondScreenLeft + ((secondScreenRight - secondScreenLeft - width) / 2))
+									y := Round(secondScreenTop + ((secondScreenBottom - secondScreenTop- height) / 2))
 								}
 								else
 									Goto defaultCase

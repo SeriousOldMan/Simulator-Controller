@@ -1,5 +1,5 @@
 [Version]
-Current=1.4.0-dev
-Target=1.3.3-stable
-Changes=Unicode localization support
-Date=12/27/2020
+Current=1.4.1-dev
+Target=1.4-stable
+Changes=Unicode localization support, Effect settings display
+Date=12/30/2020

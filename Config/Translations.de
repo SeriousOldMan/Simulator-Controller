@@ -119,6 +119,7 @@ Motion=>Bewegung
 State: On=>Status: An
 State: Off=>Status: Aus
 Intensity: =>Intensität: 
+%=>%
 Motion Intensity=>Bewegung Intensität
 Intensity Adjustment: =>Intensität Einstellung: 
 Effect: =>Effekt: 

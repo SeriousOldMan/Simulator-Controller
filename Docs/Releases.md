@@ -5,13 +5,15 @@
   3. Unicode based translation support. German translation will be available - other languages can be easily added
   4. Updated photorealistic elements for Button Box
   5. All dialogs may be moved around by clicking in the main title
+  6. All current effect settings will be displayed alternately with effect name in Button Box visual representation
+     - Only available for the Motion Feedback plugin. Unfortunately, this is currently not possible for Tactile Feedback, since SimHub does not provide an interface for querying the current effect settings at this time
 
 ## 1.3.3-stable, 12/27/20
 
   1. Bugfixes, as always
   2. Documentation updates, as always
-     - including a new Wiki page with the hottest backlog features.
-  3. New photorealistic Button Box Visuals - you will love it.
+     - including a new Wiki page with the hottest backlog features
+  3. New photorealistic Button Box Visuals - you will love it
   4. You can now interact with the visual representation of the Button Box using the mouse and everything is functional, even if you don't have a hardware controller. So you can put your old button boxes on eBay - not.
   5. Button Box will be moveable by the mouse and the position might be saved according to configuration.
   6. Better window handling of SimFeedback. The main window will stay closed whenever possible.

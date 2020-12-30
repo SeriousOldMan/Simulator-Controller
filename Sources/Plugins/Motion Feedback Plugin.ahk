@@ -91,16 +91,29 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		registerIntensityDialAction(intensityDialAction) {
 			this.iIntensityDialAction := intensityDialAction
 		}
-
+		
+		toggleEffectLabels() {
+			static isInfo := false
+		
+			if (this.Controller.ActiveMode == this) {
+				for index, effect in this.Plugin.kEffects
+					this.findAction(this.Plugin.getLabel(ConfigurationItem.descriptor(effect, "Toggle"), effect)).updateLabel(isInfo ? "Info" : "Normal")
+			
+				this.findAction("Motion Intensity").updateLabel(isInfo ? "Info" : "Normal")
+			}
+			
+			isInfo := !isInfo
+		}
+		
 		blinkEffectLabels() {
 			if ((this.iSelectedEffect == false) && !this.iEffectsAreHighlighted)
 				return
 			
+			this.iEffectsAreHighlighted := !this.iEffectsAreHighlighted
+			
 			if (this.Controller.ActiveMode == this)
 				for index, effect in this.Plugin.kEffects
-					this.findAction(this.Plugin.getLabel(ConfigurationItem.descriptor(effect, "Toggle"), effect)).updateLabel(!this.iEffectsAreHighlighted)
-			
-			this.iEffectsAreHighlighted := !this.iEffectsAreHighlighted
+					this.findAction(this.Plugin.getLabel(ConfigurationItem.descriptor(effect, "Toggle"), effect)).updateLabel(this.iEffectsAreHighlighted ? "Highlight" : "Normal")
 		}
 
 		unblinkEffectLabels() {
@@ -150,7 +163,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		
 		updateActionStates() {
 			for index, effect in this.Plugin.kEffects
-				this.findAction(this.Plugin.getLabel(ConfigurationItem.descriptor(effect, "Toggle"), effect)).updateLabel(false)
+				this.findAction(this.Plugin.getLabel(ConfigurationItem.descriptor(effect, "Toggle"), effect)).updateLabel("Normal")
 		}
 	}
 
@@ -226,11 +239,18 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			
 			trayMessage(translate("Motion"), translate("Intensity: ") . currentIntensity)
 				
-			function.setText(currentIntensity . "%")
+			function.setText(currentIntensity . translate("%"))
 			
 			Sleep 500
 			
 			function.setText(translate("Motion Intensity"))
+		}
+		
+		updateLabel(mode) {
+			if (mode == "Info")
+				this.Function.setText(this.Mode.Plugin.getMotionIntensity() . translate("%"), "Gray")
+			else
+				this.Function.setText(translate("Motion Intensity"))
 		}
 	}
 
@@ -269,13 +289,15 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 					
 				trayMessage(translate("Motion"), translate("Effect: ") . translate(this.Effect) . ", " . translate("State: ") . (this.Active ? translate("On") : translate("Off")))
 			
-				this.updateLabel(false)
+				this.updateLabel("Normal")
 			}
 		}
 		
-		updateLabel(highlighted) {
-			if highlighted
+		updateLabel(mode) {
+			if (mode == "Highlight")
 				this.Function.setText(translate(this.Label), "Blue")
+			else if (mode == "Info")
+				this.Function.setText(Format("{:.1f}", this.Mode.Plugin.getEffectIntensity(this.iEffect)), "Gray")
 			else if this.Active
 				this.Function.setText(translate(this.Label), "Green")
 			else
@@ -891,11 +913,14 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		if (isRunning == kUndefined)
 			isRunning := this.Application.isRunning()
 		
+		stateChange := false
+		
 		protectionOn()
 			
 		try {
 			if (isRunning != this.Application.isRunning()) {
 				isRunning := !isRunning
+				stateChange := true
 				
 				if isRunning
 					this.requireSimFeedback()
@@ -909,7 +934,10 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			protectionOff()
 		}
 				
-		SetTimer updateMotionState, % isRunning ? 5000 : 1000
+		if stateChange {
+			SetTimer updateMotionState, % isRunning ? 5000 : 1000
+			SetTimer toggleEffectLabels, % isRunning ? 1000 : Off
+		}
 	}
 }
 
@@ -937,6 +965,22 @@ blinkEffectLabels() {
 	
 	try {
 		mode.blinkEffectLabels()
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+toggleEffectLabels() {
+	static mode := false
+	
+	if !mode
+		mode := SimulatorController.Instance.findMode(kMotionMode)
+		
+	protectionOn()
+	
+	try {
+		mode.toggleEffectLabels()
 	}
 	finally {
 		protectionOff()

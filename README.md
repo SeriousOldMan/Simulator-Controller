@@ -23,7 +23,7 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-Currently none, use one of the latest stable build instead...
+[1.4.1-dev](https://www.dropbox.com/s/cz9n7glgrxvdwq2/Simulator%20Controller%201.4.1-dev.zip?dl=1) (First development build for the [upcoming 1.4 release](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes))
 
 #### Latest stable builds
 

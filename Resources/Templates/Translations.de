@@ -134,7 +134,7 @@ Invoking SimFeedback connector with arguments: =>Sende Kommando an SimFeedback:
 Error while connecting to SimFeedback (=>Fehler während der Kommunikation mit SimFeedback (
 ): =>): 
  - please check the setup=> - Bitte überprüfen Sie die Konfiguration
-Cannot connect to SimFeedback (%kSimFeedbackConnector%) - please check the setup...=>Kommunikation mit SimFeedback (%kSimFeedbackConnector%) fehlerhaft - Bitte überprüfen Sie die Konfiguration...
+Cannot connect to SimFeedback (%kSimFeedbackConnector%) - please check the setup...=>Kommunikation mit SimFeedback (%kSimFeedbackConnector%) ist fehlerhaft - Bitte überprüfen Sie die Konfiguration...
 Plugin Motion Feedback deactivated, because the configured application path (=>Die Erweiterung für Bewegung wurde nicht aktiviert, da das Anwendungsverzeichnis (
 ) cannot be found - please check the setup=>) nicht gefunden werden kann - Bitte überprüfen Sie die Konfiguration
 [Tactile Feedback Plugin]
@@ -157,6 +157,7 @@ Sending command '=>Sende Befehl '
 Error while connecting to SimHub (=>Fehler während der Kommunikation mit SimHub (
 ): =>): 
  - please check the setup=> - Bitte überprüfen Sie die Konfiguration
+Cannot connect to SimHub (%kSimHub%) - please check the setup...=>Kommunikation mit SimHub (%kSimHub%) ist fehlerhaft - Bitte überprüfen Sie die Konfiguration...
 Plugin Tactile Feedback deactivated, because the configured application path (=>Die Erweiterung für Vibration wurde nicht aktiviert, da das Anwendungsverzeichnis (
 ) cannot be found - please check the setup=>) nicht gefunden werden kann - Bitte überprüfen Sie die Konfiguration
 [Simulator Tools]

@@ -905,6 +905,17 @@ setDebug(debug) {
 }
 
 setLogLevel(level) {
+	switch level {
+		case "Info":
+			level := kLogInfo
+		case "Warn":
+			level := kLogWarn
+		case "Critical":
+			level := kLogCritical
+		case "Off":
+			level := kLogOff
+	}
+	
 	vLogLevel := Min(kLogOff, Max(level, kLogInfo))
 	
 	state := translate("Unknown")

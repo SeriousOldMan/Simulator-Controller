@@ -199,3 +199,68 @@ Reduces the current log level.
 
 #### *logMessage(logLevel :: OneOf(kLogInfo, kLogWarn, kLogCritical, kLogOff), message :: String)*
 Sends the given message to the log file, if the supplied log level is at the same or a more critical level than the current log level. If *logLevel* is *kLogOff*, the message will be written to the log file, even if logging has been disabled completely by *setLogLevel(kLogOff)* previously.
+
+***
+
+## Controller Actions
+The functions in this section are a little bit special. Although they can be called from your code as well, they are meant to be used as [actions for controller functions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#actions). Therefore, they will be configured for controller functions using the [setup tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#setup).
+
+#### *setDebug(debug :: Boolean)*
+Enables or disables debugging. *debug* must be either *true* or *false*. Note: This function is identical to the one described above in the [Debugging and Logging](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#debugging-and-logging-functionsahk) section.
+
+#### *setLogLevel(logLevel :: OneOf("Info", "Warn", "Critical", "Off"))*
+Sets the log level. *logLevel* must be one of "Info", "Warn", "Critical" or "Off", where "Info" is the most verbose one. Note: This function is identical to the one described above in the [Debugging and Logging](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#debugging-and-logging-functionsahk) section.
+
+#### *increaseLogLevel()*
+Increases the log level, i.e. makes the log information more verbose. Note: This function is identical to the one described above in the [Debugging and Logging](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#debugging-and-logging-functionsahk) section.
+
+#### *decreaseLogLevel()*
+Decreases the log level, i.e. makes the log information less verbose. Note: This function is identical to the one described above in the [Debugging and Logging](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#debugging-and-logging-functionsahk) section.
+
+#### *pushButton(number :: Integer)*
+Virtually pushes the button with the given number.
+
+#### *rotateDial(number :: Integer, direction :: OneOf("Increase", "Decrease"))*
+Virtually rotates the rotary dial with the given number. *direction* must be one of "Increase" or "Decrease".
+
+#### *switchToggle(type :: OneOf("1WayToggle", "2WayToggle"), number :: Integer, state :: OneOf("On", "Off"))*
+Virtually switches the toggle switch with the given number. *state* must be one of "On" or "Off" for 2-way toggle switches and "On" for 1-way toggle switches. The type of the toggle switch must be passed as *type*, one of "1WayToggle" and "2WayToggle".
+
+#### *setMode(mode :: String)*
+Switches the currently active mode for the hardware controller. See the [plugin reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes) for an in depth explanation of all available modes.
+
+#### *startSimulation(simulator :: String := false)*
+Starts a simulation game. If the simulator name is not provided, the first one in the list of configured simulators on the *General* tab in the [setup tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#setup) is used.
+
+#### *stopSimulation()*
+Stops the currently running simulation game.
+
+#### *shutdownSystem()*
+Displays a dialog and asks, whether the PC should be shutdown. Use with caution.
+
+#### *enablePedalVibration()*
+Enables the pedal vibration motors, that might be mounted to your pedals. This action function is provided by the "Tactile Feedback" plugin and is available depending on the concrete configuration.
+
+#### *disablePedalVibration()*
+Disables the pedal vibration motors, that might be mounted to your pedals. This action function is provided by the "Tactile Feedback" plugin and is available depending on the concrete configuration.
+
+#### *enableFrontChassisVibration()*
+Enables the chassis vibration bass shakers that might be mounted to the front of your simulation rig. This action function is provided by the "Tactile Feedback" plugin and is available depending on the concrete configuration.
+
+#### *disableFrontChassisVibration()*
+Disables the chassis vibration bass shakers that might be mounted to the front of your simulation rig. This action function is provided by the "Tactile Feedback" plugin and is available depending on the concrete configuration.
+
+#### *enableRearChassisVibration()*
+Enables the chassis vibration bass shakers that might be mounted to the rear of your simulation rig. AThis action function is provided by the "Tactile Feedback" plugin and is available depending on the concrete configuration.
+
+#### *disableRearChassisVibration()*
+Disables the chassis vibration bass shakers that might be mounted to the rear of your simulation rig. This action function is provided by the "Tactile Feedback" plugin and is available depending on the concrete configuration.
+
+#### *disableRearChassisVibration()*
+Disables the chassis vibration bass shakers that might be mounted to the rear of your simulation rig. This action function is provided by the "Tactile Feedback" plugin and is available depending on the concrete configuration.
+
+#### *startMotion()*
+Starts the motion feedback system of your simulation rig. This action function is provided by the "Motion Feedback" plugin and is available depending on the concrete configuration.
+
+#### *stopMotion()*
+Stops the motion feedback system of your simulation rig and brings the rig back to its resting position. This action function is provided by the "Motion Feedback" plugin and is available depending on the concrete configuration.

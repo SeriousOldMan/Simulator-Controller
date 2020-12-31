@@ -12,12 +12,12 @@ Thank you very much for your support!
 
 ### Download and Installation
 
-Download one of the builds below and unzip anywhere you like. Then run the setup tool available in the Binaries folder and configure your environment (you may want to delete all *.ini files the Config folder to start out with a really fresh setup, but be sure to make a backup copy elsewhere for later reference, especially for the *Simulator Configuration.ini* file. An installation of the underlying programming language [AutoHotkey](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications) is only necessary, if you want to create your own plugins, but you need a good understanding of the Hotkey syntax to bind your controller hardware to the plugin functions and actions using the setup tool.
-For further convinience, you can place links to **Simulator Startup** and **Simulator Configuration** in the Windows Start Menu. You can also configure the software to automatically start with Windows by checking the *Start with Windows* in the first tab of the setup tool.
+Download one of the builds below and unzip anywhere you like. Then run the configuration tool available in the Binaries folder and configure your environment (you may want to delete all *.ini files the Config folder to start out with a really fresh configuration, but be sure to make a backup copy elsewhere for later reference, especially for the *Simulator Configuration.ini* file. An installation of the underlying programming language [AutoHotkey](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications) is only necessary, if you want to create your own plugins, but you need a good understanding of the Hotkey syntax to bind your controller hardware to the plugin functions and actions using the configuration tool.
+For further convinience, you can place links to **Simulator Startup** and **Simulator Settings** in the Windows Start Menu. You can also configure the software to automatically start with Windows by checking the *Start with Windows* in the first tab of the configuration tool.
 
-See the complete documentation about [Installation & Setup](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#installation) for more information.
+See the complete documentation about [Installation & Configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation) for more information.
 
-A word about Antivirus warnings: The programming language used for building Simulator Controller uses some really nasty tricks to control Windows applications, tricks also used by malware. Therefore, depending on your concrete Antivirus program, you may get some warnings regarding the Simulator Controller applications. I can assure you, that there's nothing about it. But you can read about these issues in the forums of [AutoHotkey](https://www.autohotkey.com/) itself. If your Antivirus programm allows exception rules, please setup rules for the Simulator Controller applications, otherwise you need to have a beer and search for another Simulator Controller tool. Sorry...
+A word about Antivirus warnings: The programming language used for building Simulator Controller uses some really nasty tricks to control Windows applications, tricks also used by malware. Therefore, depending on your concrete Antivirus program, you may get some warnings regarding the Simulator Controller applications. I can assure you, that there's nothing about it. But you can read about these issues in the forums of [AutoHotkey](https://www.autohotkey.com/) itself. If your Antivirus programm allows exception rules, please define rules for the Simulator Controller applications, otherwise you need to have a beer and search for another Simulator Controller tool. Sorry...
 
 Below you will find download links for the current development build and the two latest stable releases. For release information, even for a preview on upcoming features in the next stable build, please take a look at the [release notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes).
 
@@ -62,7 +62,7 @@ Simulator Controller is fully implemented in AutoHotkey, a very sophisticated an
 
   - Configurable and automated build tool for developers
   - Sophisticated logging, tracing and debug support to track down any errors while developing your own plugins
-  - Fully graphical setup and configuration utilities
+  - Fully graphical configuration utilities
   
   ![](./Docs/Images/Settings%20Editor.JPG) ![](./Docs/Images/Configuration%20Editor.JPG)
 
@@ -72,7 +72,7 @@ These plugins are part of the Simulator Controller distribution. Beside providin
 
 | Plugin | Description |
 | ------ | ------ |
-| System | Handles multiple Button Box layers and manages all applications configured for your simulation setup. |
+| System | Handles multiple Button Box layers and manages all applications configured for your simulation configuration. |
 | Tactile Feedback | Fully configurable support for pedal and chassis vibration using [SimHub](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications). |
 | Motion Feedback | Fully configurable support for rig motion feedback using [SimFeedback](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications). |
 | ACC | Special support for starting and stopping Assetto Corsa Competizione from your hardware controller and supplies functions and actions for configurable, automated chat messages in a multiplayer game. Although quite small with little more than 100 lines of code, this plugin uses configuration based data and defines a simulator dependent mode. Therefore it supplies a good showcase when starting your own plugin development. |
@@ -96,7 +96,7 @@ The following applications are not part of the distribution and are not strictly
 
 ### Documentation
 
-A very [extensive documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki) will guide you through the setup and configuration process and will help you to understand the inner concepts and all the functions & features of Simulator Controller. For developers, who want to create their own plugins, a complete [devlopers guide & reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts) is available as well.
+A very [extensive documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki) will guide you through the configuration process and will help you to understand the inner concepts and all the functions & features of Simulator Controller. For developers, who want to create their own plugins, a complete [devlopers guide & reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts) is available as well.
 
 The markdown files, the so to say source code of this Wiki can be found in the [Docs](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Docs) folder.
 

@@ -126,7 +126,7 @@ Returns the language code for the active language.
 ***
 
 ## Splash Screen Handling ([Functions.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Functions.ahk))
-Several applications of Simulator Controller uses a splash window to entertain the user while performing their operations. The splash screen shows different pictures or even an animation using a GIF. All required resources, that are part of the Simulator Controller distribution, are normally loacated in the *Resources/Splash Media* folder. An additional location for user supplied media exists in the *Simulator Controller\Splash Media* folder in the user *Documents* folder. The user can define several themes with rotating pictures or a GIF animation with the help of the [themes editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#themes-editor).
+Several applications of Simulator Controller uses a splash window to entertain the user while performing their operations. The splash screen shows different pictures or even an animation using a GIF. All required resources, that are part of the Simulator Controller distribution, are normally loacated in the *Resources/Splash Media* folder. An additional location for user supplied media exists in the *Simulator Controller\Splash Media* folder in the user *Documents* folder. The user can define several themes with rotating pictures or a GIF animation with the help of the [themes editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#themes-editor).
 
 #### *showSplash(image :: String, alwaysOnTop :: Boolean := true)*
 *showSplash* opens the splash screen showing a picture. *image* must either be a partial path for a JPG or GIF file relative to [kSplashMediaDirectory](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#ksplashmediadirectory-kbuttonboximagesdirectory-kiconsdirectory), for example "Simulator Splash Images\ACC Splash.jpg", or a partial path relative to the *Simulator Controller\Splash Media* folder, which is located in the *Documents* folder of the current user, or an absolute path.
@@ -148,7 +148,7 @@ Finishes the current animation, but the splash screen window stays open.
 Note: This is a building block function for *hideSplashTheme* and will normally not be used on its own.
 
 #### *showSplashTheme(theme :: String, songHandler :: TypeUnion(String, FuncObj) := false, alwaysOnTop :: Boolean := true)*
-Themes are a collection of pictures or a GIF animation possibly combined with a sound file. Themes are maintained by the [themes editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#themes-editor). *showSplashTheme* opens a splash window according to the themes definition. If *songHandler* is not provided, a default handler will be used, but the song will stop playing, if the current splash window is closed.
+Themes are a collection of pictures or a GIF animation possibly combined with a sound file. Themes are maintained by the [themes editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#themes-editor). *showSplashTheme* opens a splash window according to the themes definition. If *songHandler* is not provided, a default handler will be used, but the song will stop playing, if the current splash window is closed.
 
 #### *hideSplashTheme()*
 Closes the current theme based splash window.
@@ -183,7 +183,7 @@ Essential support for tracking down coding errors. Since AutoHotkey is a weakly 
 Returns *true*, if debugging is currently enabled. The Simulator Controller uses debug mode to handle things differently, for example all plugins and modes will be active, even if they declare to be not.
 
 #### *setDebug(debug :: Boolean)*
-Enables or disables debug mode. The default value for non compiled scripts is *ture*, but you can also define debug mode for compiled scripts using the [setup tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#setup).
+Enables or disables debug mode. The default value for non compiled scripts is *ture*, but you can also define debug mode for compiled scripts using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration).
 
 #### *getLogLevel()*
 Return the current log level. May be one of: *kLogInfo*, *kLogWarn*, *kLogCritical* or *kLogOff*.
@@ -203,7 +203,7 @@ Sends the given message to the log file, if the supplied log level is at the sam
 ***
 
 ## Controller Actions
-The functions in this section are a little bit special. Although they can be called from your code as well, they are meant to be used as [actions for controller functions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#actions). Therefore, they will be configured for controller functions using the [setup tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#setup).
+The functions in this section are a little bit special. Although they can be called from your code as well, they are meant to be used as [actions for controller functions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions). Therefore, they will be configured for controller functions using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration).
 
 #### *setDebug(debug :: Boolean)*
 Enables or disables debugging. *debug* must be either *true* or *false*. Note: This function is identical to the one described above in the [Debugging and Logging](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#debugging-and-logging-functionsahk) section.
@@ -230,7 +230,7 @@ Virtually switches the toggle switch with the given number. *state* must be one 
 Switches the currently active mode for the hardware controller. See the [plugin reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes) for an in depth explanation of all available modes.
 
 #### *startSimulation(simulator :: String := false)*
-Starts a simulation game. If the simulator name is not provided, the first one in the list of configured simulators on the *General* tab in the [setup tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#setup) is used.
+Starts a simulation game. If the simulator name is not provided, the first one in the list of configured simulators on the *General* tab in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration) is used.
 
 #### *stopSimulation()*
 Stops the currently running simulation game.

@@ -1,4 +1,4 @@
-Welcome to the Simulator Controller documentation. Here you will find everything to understand, install, setup and use your complete solution for getting the best experience from your immersive simulationn games. The documentation is devided into the following sections:
+Welcome to the Simulator Controller documentation. Here you will find everything to understand, install, configure and use your complete solution for getting the best experience from your immersive simulationn games. The documentation is devided into the following sections:
 
   - [README](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/README.md)  
     Useful information about Simulator Controller project and its functions & features. 
@@ -6,8 +6,8 @@ Welcome to the Simulator Controller documentation. Here you will find everything
   - [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes)  
     Here you will find information about the current or previous releases. Even infos for the next upcoming stable release are included.
 	
-  - [Installation & Setup](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup)   
-    Maybe the most important part of the documentation, this part decribes how to install and setup Simulator Controller. Especially the second part gives you complete information how to configure all parts to be a perfect fit to your simulation equipment.  
+  - [Installation & Configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration)   
+    Maybe the most important part of the documentation, this part decribes how to install and configure Simulator Controller. Especially the second part gives you complete information how to configure all parts to be a perfect fit to your simulation equipment.  
 	
   - [Using Simulator Controller](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller)  
     General information how to start and use the Simulator Controller and how to use the available runtime options.	 

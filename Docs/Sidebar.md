@@ -4,17 +4,17 @@
 [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes)
 ------
 
-[Installation & Setup](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup)
+[Installation & Configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration)
 ------
-  - [Installation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#installation)
-  - [Setup](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#setup)
-    - [General](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#tab-general)
-    - [Plugins](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#tab-plugins)
-    - [Applications](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#tab-applications)
-    - [Controller](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#tab-controller)
-    - [Launchpad](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#tab-launchpad)
-    - [Chat](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#tab-chat)
-  - [Themes Editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#themes-editor)
+  - [Installation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation)
+  - [Configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration)
+    - [General](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-general)
+    - [Plugins](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins)
+    - [Applications](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-applications)
+    - [Controller](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller)
+    - [Launchpad](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-launchpad)
+    - [Chat](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-chat)
+  - [Themes Editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#themes-editor)
 
 [Using Simulator Controller](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller)
 ------

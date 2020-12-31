@@ -362,7 +362,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		kSimFeedbackConnector := this.getArgumentValue("connector", false)
 		
 		if !FileExist(kSimFeedbackConnector) {
-			logMessage(kLogCritical, translate("Configured application path for SimFeedback connector (") . kSimFeedbackConnector . translate(") not found - please check the setup"))
+			logMessage(kLogCritical, translate("Configured application path for SimFeedback connector (") . kSimFeedbackConnector . translate(") not found - please check the configuration"))
 			
 			kSimFeedbackConnector := false
 		}
@@ -559,9 +559,9 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			return result
 		}
 		catch exception {
-			logMessage(kLogCritical, "Error while connecting to SimFeedback (" . kSimFeedbackConnector . "): " . exception.Message . " - please check the setup")
+			logMessage(kLogCritical, "Error while connecting to SimFeedback (" . kSimFeedbackConnector . "): " . exception.Message . " - please check the configuration")
 			
-			SplashTextOn 800, 60, Modular Simulator Controller System, % substituteVariables(translate("Cannot connect to SimFeedback (%kSimFeedbackConnector%) - please check the setup..."))
+			SplashTextOn 800, 60, Modular Simulator Controller System, % substituteVariables(translate("Cannot connect to SimFeedback (%kSimFeedbackConnector%) - please check the configuration..."))
 					
 			Sleep 5000
 						
@@ -979,7 +979,7 @@ initializeMotionFeedbackPlugin() {
 	kSimFeedback := getConfigurationValue(controller.Configuration, kMotionFeedbackPlugin, "Exe Path", false)
 	
 	if (!kSimFeedback || !FileExist(kSimFeedback)) {
-		logMessage(kLogCritical, translate("Plugin Motion Feedback deactivated, because the configured application path (") . kSimFeedback . translate(") cannot be found - please check the setup"))
+		logMessage(kLogCritical, translate("Plugin Motion Feedback deactivated, because the configured application path (") . kSimFeedback . translate(") cannot be found - please check the configuration"))
 		
 		if !isDebug()
 			return

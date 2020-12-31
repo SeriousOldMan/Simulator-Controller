@@ -1,5 +1,5 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Simulator Setup Tool            ;;;
+;;;   Modular Simulator Controller System - Simulator Configuration Tool    ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2020) Creative Commons - BY-NC-SA                        ;;;
@@ -20,8 +20,8 @@ SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
 SetBatchLines -1				; Maximize CPU utilization
 ListLines Off					; Disable execution history
 
-;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Setup.ico
-;@Ahk2Exe-ExeName Simulator Setup.exe
+;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Configuration.ico
+;@Ahk2Exe-ExeName Simulator Configuration.exe
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -271,10 +271,10 @@ downItem() {
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; SetupEditor                                                             ;;;
+;;; ConfigurationEditor                                                     ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class SetupEditor extends ConfigurationItem {
+class ConfigurationEditor extends ConfigurationItem {
 	iGeneralTab := false
 	iPluginsTab := false
 	iApplicationsTab := false
@@ -289,7 +289,7 @@ class SetupEditor extends ConfigurationItem {
 		
 		base.__New(configuration)
 		
-		SetupEditor.Instance := this
+		ConfigurationEditor.Instance := this
 		
 		this.createControls(configuration)
 	}
@@ -302,12 +302,12 @@ class SetupEditor extends ConfigurationItem {
 
 		Gui SE:Font, Bold, Arial
 
-		Gui SE:Add, Text, w398 Center gmoveSetupEditor, Modular Simulator Controller System 
+		Gui SE:Add, Text, w398 Center gmoveConfigurationEditor, Modular Simulator Controller System 
 		
 		Gui SE:Font, Norm, Arial
 		Gui SE:Font, Italic, Arial
 
-		Gui SE:Add, Text, YP+20 w398 Center, % translate("Setup")
+		Gui SE:Add, Text, YP+20 w398 Center, % translate("Configuration")
 
 		Gui SE:Font, Norm, Arial
 		
@@ -383,7 +383,7 @@ saveAndStay() {
 	vResult := kApply
 }
 
-moveSetupEditor() {
+moveConfigurationEditor() {
 	moveByMouse("SE")
 }
 
@@ -560,11 +560,11 @@ class GeneralTab extends ConfigurationItemTab {
 	}
 	
 	openThemesEditor() {
-		SetupEditor.Instance.hide()
+		ConfigurationEditor.Instance.hide()
 		
 		this.iSplashThemesConfiguration := (new ThemesEditor(this.iSplashThemesConfiguration ? this.iSplashThemesConfiguration : this.Configuration)).editThemes()
 		
-		SetupEditor.Instance.show()
+		ConfigurationEditor.Instance.show()
 	}
 }
 
@@ -2352,8 +2352,8 @@ saveConfiguration(configurationFile, editor) {
 		FileDelete %startupLink%
 }
 
-editSetup() {
-	editor := new SetupEditor(FileExist("C:\Program Files\AutoHotkey") || GetKeyState("Shift"), GetKeyState("Ctrl") ? newConfiguration() : kSimulatorConfiguration)
+editConfiguration() {
+	editor := new ConfigurationEditor(FileExist("C:\Program Files\AutoHotkey") || GetKeyState("Shift"), GetKeyState("Ctrl") ? newConfiguration() : kSimulatorConfiguration)
 	
 	done := false
 	saved := false
@@ -2384,12 +2384,12 @@ editSetup() {
 	return saved
 }
 
-setupSimulator() {
-	icon := kIconsDirectory . "Setup.ico"
+configureSimulator() {
+	icon := kIconsDirectory . "Configuration.ico"
 	
 	Menu Tray, Icon, %icon%, , 1
 	
-	if editSetup()
+	if editConfiguration()
 		ExitApp 1
 	else
 		ExitApp 0
@@ -2400,4 +2400,4 @@ setupSimulator() {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-setupSimulator()
+configureSimulator()

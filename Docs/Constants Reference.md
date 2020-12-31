@@ -19,7 +19,7 @@ Paths for the most important configuration files used by Simulator Controller.
 One global configuration map exists for Simulator Controller, which define the capabilities, the controller mapping and the configuration of all active plugins.
 
 #### *kSimulatorConfiguration*
-The global configuration map, which is read from *kSimulatorConfigurationFile*. The content is fully maintained by the [setup tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#setup).
+The global configuration map, which is read from *kSimulatorConfigurationFile*. The content is fully maintained by the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration).
 
 ***
 

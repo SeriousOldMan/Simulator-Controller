@@ -88,7 +88,7 @@ class ACCPlugin extends ControllerPlugin {
 				this.iDriveMode.registerAction(new this.ChatAction(function, message[1], message[2]))
 			}
 			else
-				logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in plugin ") . this.Plugin . translate(" - please check the setup"))
+				logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in plugin ") . this.Plugin . translate(" - please check the configuration"))
 		}
 	}
 }

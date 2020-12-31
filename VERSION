@@ -1,5 +1,5 @@
 [Version]
-Current=1.4.1-dev
+Current=1.4.2-dev
 Target=1.4-stable
-Changes=Unicode localization support, Effect settings display, Multiple screen support
+Changes=Unicode localization support, Effect settings display, Multiple screen support, Renames & Refactorings
 Date=12/30/2020

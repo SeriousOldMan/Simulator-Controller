@@ -100,20 +100,20 @@ class SimulatorStartup extends ConfigurationItem {
 	}
 	
 	prepareConfiguration() {
-		noSetup := (this.Configuration.Count() == 0)
+		noConfiguration := (this.Configuration.Count() == 0)
 		editConfig := GetKeyState("Ctrl")
 		
 		settings := this.Settings
 		
-		if (editConfig || noSetup) {
+		if (editConfig || noConfiguration) {
 			result := editSettings(settings, true)
 			
 			if (result == kCancel)
 				ExitApp 0
-			else if (noSetup && (readConfiguration(kSimulatorConfigurationFile).Count() == 0)) {
+			else if (noConfiguration && (readConfiguration(kSimulatorConfigurationFile).Count() == 0)) {
 				OnMessage(0x44, "translateMsgBoxButtons")
 				error := translate("Error")
-				MsgBox 262160, %error%, % translate("Cannot initiate startup sequence, please check the setup...")
+				MsgBox 262160, %error%, % translate("Cannot initiate startup sequence, please check the configuration...")
 				OnMessage(0x44, "")
 			
 				ExitApp 0

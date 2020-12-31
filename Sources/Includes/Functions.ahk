@@ -199,7 +199,7 @@ loadSimulatorConfiguration() {
 	logMessage(kLogCritical, "---------------------------------------------------------------")
 	
 	if (kSimulatorConfiguration.Count() == 0)
-		logMessage(kLogCritical, translate("No configuration found - please run the setup tool"))
+		logMessage(kLogCritical, translate("No configuration found - please run the configuration tool"))
 	
 	path := getConfigurationValue(kSimulatorConfiguration, "Configuration", "Home Path")
 	if path {
@@ -375,7 +375,7 @@ showSplashTheme(theme := "__Undefined__", songHandler := false, alwaysOnTop := t
 		images := string2Values(",", getConfigurationValue(kSimulatorConfiguration, "Splash Themes", theme . ".Images", false))
 	}
 	else {
-		logMessage(kLogCritical, translate("Theme """) . theme . translate(""" not found - please check the setup"))
+		logMessage(kLogCritical, translate("Theme """) . theme . translate(""" not found - please check the configuration"))
 		
 		images := getFileNames("*.jpg", kUserSplashMediaDirectory, kSplashMediaDirectory)
 	}

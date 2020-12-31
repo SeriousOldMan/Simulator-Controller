@@ -790,9 +790,9 @@ class ControllerFunction {
 					Hotkey %hotkey%, On
 				}
 				catch exception {
-					logMessage(kLogCritical, translate("Error while registering hotkey ") . theHotkey . translate(" - please check the setup"))
+					logMessage(kLogCritical, translate("Error while registering hotkey ") . theHotkey . translate(" - please check the configuration"))
 		
-					SplashTextOn 800, 60, Modular Simulator Controller System, % substituteVariables(translate("Cannot register hotkey %theHotkey% - please check the setup..."), {theHotKey: theHotKey})
+					SplashTextOn 800, 60, Modular Simulator Controller System, % substituteVariables(translate("Cannot register hotkey %theHotkey% - please check the configuration..."), {theHotKey: theHotKey})
 							
 					Sleep 5000
 								
@@ -1021,7 +1021,7 @@ class ControllerPlugin extends Plugin {
 	}
 	
 	logFunctionNotFound(functionDescriptor) {
-		logMessage(kLogWarn, translate("Controller function ") . functionDescriptor . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the setup"))
+		logMessage(kLogWarn, translate("Controller function ") . functionDescriptor . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
 	}
 }
 
@@ -1305,7 +1305,7 @@ pushButton(buttonNumber) {
 	if ((function != false) && SimulatorController.Instance.getAction(function, "Push"))
 		fireControllerAction(function, "Push")
 	else
-		logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in custom controller action pushButton - please check the setup"))
+		logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in custom controller action pushButton - please check the configuration"))
 }
 
 rotateDial(dialNumber, direction) {
@@ -1316,7 +1316,7 @@ rotateDial(dialNumber, direction) {
 	else if (direction = "decrease")
 		direction := "Decrease"
 	else {
-		logMessage(kLogWarn, translate("Unsupported argument (") . direction . translate(") detected in rotateDial - please check the setup"))
+		logMessage(kLogWarn, translate("Unsupported argument (") . direction . translate(") detected in rotateDial - please check the configuration"))
 		
 		Throw "Unsupported argument (" . direction . ") detected in rotateDial..."
 	}
@@ -1327,7 +1327,7 @@ rotateDial(dialNumber, direction) {
 	if ((function != false) && SimulatorController.Instance.getAction(function, direction))
 		fireControllerAction(function, direction)
 	else
-		logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in custom controller action rotateDial - please check the setup"))
+		logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in custom controller action rotateDial - please check the configuration"))
 }
 
 switchToggle(toggleType, toggleNumber, mode := "activate") {
@@ -1342,13 +1342,13 @@ switchToggle(toggleType, toggleNumber, mode := "activate") {
 		else if (((mode = "deactivate") || (mode = "off")) && SimulatorController.Instance.getAction(function, "Off"))
 			fireControllerAction(function, "Off")
 		else {
-			logMessage(kLogWarn, translate("Unsupported argument (") . mode . translate(") detected in switchToggle - please check the setup"))
+			logMessage(kLogWarn, translate("Unsupported argument (") . mode . translate(") detected in switchToggle - please check the configuration"))
 		
 			Throw "Unsupported argument (" . mode . ") detected in switchToggle..."
 		}
 	}
 	else
-		logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in custom controller action switchToggle - please check the setup"))
+		logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in custom controller action switchToggle - please check the configuration"))
 }
 
 setMode(action) {

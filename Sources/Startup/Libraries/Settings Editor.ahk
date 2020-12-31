@@ -62,7 +62,7 @@ startConfiguration() {
 	catch exception {
 		OnMessage(0x44, "translateMsgBoxButtons")
 		error := translate("Error")
-		MsgBox 262160, %error%, % translate("Cannot start the configuration editor - please check the installation...")
+		MsgBox 262160, %error%, % translate("Cannot start the configuration tool - please check the installation...")
 		OnMessage(0x44, "")
 	}
 	
@@ -354,7 +354,7 @@ restart:
 		
 		Gui CE:Add, DropDownList, X90 YP-5 w140 Choose%chosen% vstartOption, % values2String("|", simulators*)
 	 
-		Gui CE:Add, Button, X10 Y+20 w220 gstartConfiguration, % translate("Setup...")
+		Gui CE:Add, Button, X10 Y+20 w220 gstartConfiguration, % translate("Configuration...")
 		
 		margin := (withContinue ? "Y+20" : "")
 		

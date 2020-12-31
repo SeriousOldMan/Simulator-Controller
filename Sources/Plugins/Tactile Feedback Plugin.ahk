@@ -348,9 +348,9 @@ callSimHub(command) {
 		RunWait "%kSimHub%" -triggerinput %command%, , Hide
 	}
 	catch exception {
-		logMessage(kLogCritical, translate("Error while connecting to SimHub (") . kSimHub . translate("): ") . exception.Message . translate(" - please check the setup"))
+		logMessage(kLogCritical, translate("Error while connecting to SimHub (") . kSimHub . translate("): ") . exception.Message . translate(" - please check the configuration"))
 		
-		SplashTextOn 800, 60, Modular Simulator Controller System, % translate("Cannot connect to SimHub (%kSimHub%) - please check the setup...")
+		SplashTextOn 800, 60, Modular Simulator Controller System, % translate("Cannot connect to SimHub (%kSimHub%) - please check the configuration...")
 				
 		Sleep 5000
 					
@@ -402,7 +402,7 @@ initializeSimHubPlugin() {
 	kSimHub := getConfigurationValue(controller.Configuration, kTactileFeedbackPlugin, "Exe Path", false)
 	
 	if (!kSimHub || !FileExist(kSimHub)) {
-		logMessage(kLogCritical, translate("Plugin Tactile Feedback deactivated, because the configured application path (") . kSimHub . translate(") cannot be found - please check the setup"))
+		logMessage(kLogCritical, translate("Plugin Tactile Feedback deactivated, because the configured application path (") . kSimHub . translate(") cannot be found - please check the configuration"))
 		
 		if !isDebug()
 			return

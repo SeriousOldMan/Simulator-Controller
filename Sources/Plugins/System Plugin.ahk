@@ -241,7 +241,7 @@ class SystemPlugin extends ControllerPlugin {
 					runnable.connectAction(function, action)
 				}
 				else
-					logMessage(kLogWarn, translate("Application ") . appDescriptor[2] . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the setup"))
+					logMessage(kLogWarn, translate("Application ") . appDescriptor[2] . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
 			}
 			else
 				this.logFunctionNotFound(descriptor)
@@ -384,7 +384,7 @@ restoreSimulatorVolume() {
 		catch exception {
 			title := translate("Modular Simulator Controller System - Controller (Plugin: System)")
 			
-			SplashTextOn 800, 60, %title%, % substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the setup..."))
+			SplashTextOn 800, 60, %title%, % substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
 					
 			Sleep 5000
 					
@@ -409,7 +409,7 @@ muteSimulator() {
 			catch exception {
 				title := translate("Modular Simulator Controller System - Controller (Plugin: System)")
 			
-				SplashTextOn 800, 60, %title%, % substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the setup..."))
+				SplashTextOn 800, 60, %title%, % substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
 						
 				Sleep 5000
 						

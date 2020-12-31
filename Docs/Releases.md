@@ -8,6 +8,10 @@
   6. All current effect settings will be displayed alternately with effect name in Button Box visual representation
      - Only available for the Motion Feedback plugin. Unfortunately, this is currently not possible for Tactile Feedback, since SimHub does not provide an interface for querying the current effect settings at this time
   7. A new option is available in the configuration dialog, which allows the Button Box window to be centered on a secondary screen. Helpful, when opening the visual representation on a small display located next to the button box
+  8. Several Refactorings and Renames
+     - Renamed "Simulator Configuration" => "Simulator Settings"
+     - Renamed "Simulator Setup" => "Simulator Configuration"
+	 - Several name changes in the source code to adopt to this new name scheme (Configuration => Settings, Setup => Configuration)
 
 ## 1.3.3-stable, 12/27/20
 

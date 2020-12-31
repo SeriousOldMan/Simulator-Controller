@@ -34,7 +34,7 @@ global kButtonBoxImagesDirectory = kResourcesDirectory . "Button Box Images\"
 global kIconsDirectory = kResourcesDirectory . "Icons\"
 
 global kSimulatorConfigurationFile = "Simulator Configuration.ini"
-global kControllerConfigurationFile = "Simulator Controller.ini"
+global kSimulatorSettingsFile = "Simulator Settings.ini"
 
 global kUndefined = "__Undefined__"
 

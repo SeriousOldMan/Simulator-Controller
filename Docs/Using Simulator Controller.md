@@ -2,13 +2,13 @@ Using Simulator Controller is quite easy. The most difficult part will be the se
 
 Once you have setup and configured everything for your simulation rig, there are two applications, which you will use while having fun with your simulations. Both applications are located in the *Binaries* folder. Normally, you will run *Simlator Startup.exe* to set the stage for everything and therefore it might be a good idea to place a link to this application in the Windows Start menu. Using the [setup tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#setup) you can also decide, whether this *Simulator Startup* will be run automatically whenever your PC is started. Depending on your concrete setup, *Simulator Startup* will then start all the configured component applications including *Simulator Controller.exe*, which will be responsible for the essential part, the control of all your simulation applications and simulator games using your hardware controller.
 
-## Startup Process & Configuration
+## Startup Process & Settings
 
-Before starting up, *Simulator Startup* checks the configuration information. If there is no valid configuration, a tool to edit the configuration and supply a valid setup will be launched automatically. You can trigger this anytime later for your convinience by holding down the Control key when running *Simulator Startup*. The following configuration dialog will show up:
+Before starting up, *Simulator Startup* checks the configuration information. If there is no valid configuration, a tool to edit the settings and supply a valid configuration will be launched automatically. You can trigger this anytime later by holding down the Control key when running *Simulator Startup*. The following settings dialog will show up:
 
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tool.JPG)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Settings%20Editor.jpg)
 
-With this configuration tool, which is also available as a separate application named *Simulator Configuration.exe*, you can change the runtime settings for Simulator Controller. In contrast to the general setup, which configures all required and optional components of your simulation rig, here you decide which of them you want to use for the next run and onward and how they should behave.
+With this editor, which is also available as a separate application named *Simulator Settings.exe*, you can change the runtime settings for Simulator Controller. In contrast to the general configuration, which configures all required and optional components of your simulation rig, here you decide which of them you want to use for the next run and onward and how they should behave.
 
 Beside maintaining this startup configuration, you can jump to the [setup tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Setup#setup) by clicking on the button "Setup...". This might be helpful, if you detect an error in your simulation rig configuration or if you want to add a new simulation game, you just installed on your PC.
 

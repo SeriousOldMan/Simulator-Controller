@@ -41,7 +41,7 @@ ListLines Off					; Disable execution history
 ;;;                        Libraries Include Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include Libraries\Configuration Editor.ahk
+#Include Libraries\Settings Editor.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -61,20 +61,20 @@ global vSongFile = false
 class SimulatorStartup extends ConfigurationItem {
 	iCoreComponents := []
 	iFeedbackComponents := []
-	iControllerConfiguration := false
+	iSettings := false
 	iSimulators := false
 	iSplashTheme := false
 	iStartupOption := false
 	iSimulatorControllerPID := 0
 	
-	ControllerConfiguration[] {
+	Settings[] {
 		Get {
-			return this.iControllerConfiguration
+			return this.iSettings
 		}
 	}
 	
-	__New(configuration, controllerConfiguration) {
-		this.iControllerConfiguration := controllerConfiguration
+	__New(configuration, settings) {
+		this.iSettings := settings
 		
 		base.__New(configuration)
 	}
@@ -83,8 +83,8 @@ class SimulatorStartup extends ConfigurationItem {
 		base.loadFromConfiguration(configuration)
 		
 		this.iSimulators := string2Values("|", getConfigurationValue(configuration, "Configuration", "Simulators", ""))
-		this.iSplashTheme := getConfigurationValue(this.ControllerConfiguration, "Startup", "Splash Theme", false)
-		this.iStartupOption := getConfigurationValue(this.ControllerConfiguration, "Startup", "Simulator", false)
+		this.iSplashTheme := getConfigurationValue(this.Settings, "Startup", "Splash Theme", false)
+		this.iStartupOption := getConfigurationValue(this.Settings, "Startup", "Simulator", false)
 		
 		this.iCoreComponents := []
 		this.iFeedbackComponents := []
@@ -103,10 +103,10 @@ class SimulatorStartup extends ConfigurationItem {
 		noSetup := (this.Configuration.Count() == 0)
 		editConfig := GetKeyState("Ctrl")
 		
-		configuration := this.iControllerConfiguration
+		settings := this.Settings
 		
 		if (editConfig || noSetup) {
-			result := editConfiguration(configuration, true)
+			result := editSettings(settings, true)
 			
 			if (result == kCancel)
 				ExitApp 0
@@ -119,9 +119,9 @@ class SimulatorStartup extends ConfigurationItem {
 				ExitApp 0
 			}
 			else if (result == kSave) {
-				writeConfiguration(kControllerConfigurationFile, configuration)
+				writeConfiguration(kSimulatorSettingsFile, settings)
 				
-				this.iControllerConfiguration := configuration
+				this.iSettings := settings
 			}
 		}
 		
@@ -165,7 +165,7 @@ class SimulatorStartup extends ConfigurationItem {
 		for ignore, component in components {
 			startSimulator := (startSimulator || (GetKeyState("Ctrl") || GetKeyState("MButton")))
 			
-			if getConfigurationValue(this.ControllerConfiguration, section, component, true) {
+			if getConfigurationValue(this.Settings, section, component, true) {
 				if !kSilentMode
 					Progress, , % translate("Start: ") . component . translate("...")
 				
@@ -259,7 +259,7 @@ class SimulatorStartup extends ConfigurationItem {
 ;;;-------------------------------------------------------------------------;;;
 
 startSimulator() {
-	configuration := readConfiguration(kControllerConfigurationFile)
+	settings := readConfiguration(kSimulatorSettingsFile)
 	
 	icon := kIconsDirectory . "Start.ico"
 		
@@ -267,7 +267,7 @@ startSimulator() {
 	
 	registerEventHandler("Startup", "handleStartupEvents")
 	
-	new SimulatorStartup(kSimulatorConfiguration, configuration).startup()
+	new SimulatorStartup(kSimulatorConfiguration, settings).startup()
 }
 
 playSongRemote() {

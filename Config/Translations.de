@@ -206,9 +206,9 @@ Initialize Core System=>Initialisiere Simulator Steuerung
 Starting System Components=>Starte System Komponenten
 Simulator Startup=>Simulator Startsequenz
 Cancel Startup?=>Startsequenz abbrechen?
-[Simulator Configuration]
-Cannot start the setup application - please check the installation...=>Die Konifgurationsanwendung kann nicht gestartet werden - Bitte überprüfen Sie die Installation...
-Configuration=>Einstellungen
+[Simulator Settings]
+Cannot start the configuration editor - please check the installation...=>Die Konifgurationsanwendung kann nicht gestartet werden - Bitte überprüfen Sie die Installation...
+Settings=>Einstellungen
 Core System=>Steuerung
 Feedback System=>Bewegung, etc.
 Controller Notifications=>Rückmeldungen

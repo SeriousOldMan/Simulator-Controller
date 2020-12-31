@@ -98,7 +98,7 @@ class ButtonBox extends ConfigurationItem {
 			if (controller != false) {
 				inSimulation := (controller.ActiveSimulator != false)
 	
-				return getConfigurationValue(this.Controller.ControllerConfiguration, "Button Box"
+				return getConfigurationValue(this.Controller.Settings, "Button Box"
 										   , inSimulation ? "Button Box Simulation Duration" : "Button Box Duration"
 										   , inSimulation ? false : 10000)
 			}
@@ -194,7 +194,7 @@ class ButtonBox extends ConfigurationItem {
 						width := this.iWindowWidth
 						height := this.iWindowHeight
 					
-						position := getConfigurationValue(this.Controller.ControllerConfiguration, "Button Box", "Button Box Position", "Bottom Right")
+						position := getConfigurationValue(this.Controller.Settings, "Button Box", "Button Box Position", "Bottom Right")
 						
 						SysGet mainScreen, MonitorWorkArea
 
@@ -224,8 +224,8 @@ class ButtonBox extends ConfigurationItem {
 									Goto defaultCase
 							case "Last Position":
 defaultCase:
-								x := getConfigurationValue(this.Controller.ControllerConfiguration, "Button Box", "Button Box Position.X", mainScreenRight - width)
-								y := getConfigurationValue(this.Controller.ControllerConfiguration, "Button Box", "Button Box Position.Y", mainScreenBottom - height)
+								x := getConfigurationValue(this.Controller.Settings, "Button Box", "Button Box Position.X", mainScreenRight - width)
+								y := getConfigurationValue(this.Controller.Settings, "Button Box", "Button Box Position.Y", mainScreenBottom - height)
 							default:
 								Throw "Unhandled position for Button Box (" . position . ") encountered in ButtonBox.show..."
 						}
@@ -287,12 +287,12 @@ defaultCase:
 				Gui SBB:Show, X%newX% Y%newY%
 			}
 			
-			configuration := this.Controller.ControllerConfiguration
+			settings := this.Controller.Settings
 			
-			setConfigurationValue(configuration, "Button Box", "Button Box Position.X", newX)
-			setConfigurationValue(configuration, "Button Box", "Button Box Position.Y", newY)
+			setConfigurationValue(settings, "Button Box", "Button Box Position.X", newX)
+			setConfigurationValue(settings, "Button Box", "Button Box Position.Y", newY)
 			
-			writeConfiguration(kControllerConfigurationFile, configuration)
+			writeConfiguration(kSimulatorSettingsFile, settings)
 		}
 		finally {
 			CoordMode Mouse, curCoordMode
@@ -301,7 +301,7 @@ defaultCase:
 }
 
 class SimulatorController extends ConfigurationItem {
-	iControllerConfiguration := false
+	iSettings := false
 	
 	iPlugins := []
 	iFunctions := {}
@@ -317,9 +317,9 @@ class SimulatorController extends ConfigurationItem {
 	iShowLogo := false
 	iLogoIsVisible := false
 	
-	ControllerConfiguration[] {
+	Settings[] {
 		Get {
-			return this.iControllerConfiguration
+			return this.iSettings
 		}
 	}
 	
@@ -365,14 +365,14 @@ class SimulatorController extends ConfigurationItem {
 		}
 	}
 	
-	__New(simulatorConfiguration, controllerConfiguration) {
+	__New(configuration, settings) {
 		SimulatorController.Controller := this
 		
-		this.iControllerConfiguration := controllerConfiguration
+		this.iSettings := settings
 		
 		SimulatorController.Instance := this
 		
-		base.__New(simulatorConfiguration)
+		base.__New(configuration)
 		
 		this.initializeBackgroundTasks()
 	}
@@ -523,7 +523,7 @@ class SimulatorController extends ConfigurationItem {
 					try {
 						showSplash(splashImage)
 		
-						theme := getConfigurationValue(this.ControllerConfiguration, "Startup", "Splash Theme", false)
+						theme := getConfigurationValue(this.Settings, "Startup", "Splash Theme", false)
 						songFile := (theme ? getConfigurationValue(this.Configuration, "Splash Themes", theme . ".Song", false) : false)
 				
 						if (songFile && FileExist(getFileName(songFile, kUserSplashMediaDirectory, kSplashMediaDirectory)))
@@ -1254,15 +1254,15 @@ updateSimulatorState() {
 	}
 }
 
-updateTrayMessageState(configuration := false) {
+updateTrayMessageState(settings := false) {
 	inSimulation := false
 	
-	if !configuration {
-		configuration := SimulatorController.Instance.ControllerConfiguration
+	if !settings {
+		settings := SimulatorController.Instance.Settings
 		inSimulation := SimulatorController.Instance.ActiveSimulator
 	}
 	
-	duration := getConfigurationValue(configuration, "Controller"
+	duration := getConfigurationValue(settings, "Controller"
 									, inSimulation ? "Tray Tip Simulation Duration" : "Tray Tip Duration"
 									, inSimulation ? 1500 : false)
 							   
@@ -1273,9 +1273,9 @@ updateTrayMessageState(configuration := false) {
 }
 
 initializeSimulatorController() {
-	controllerConfiguration := readConfiguration(kControllerConfigurationFile)
+	settings := readConfiguration(kSimulatorSettingsFile)
 	
-	updateTrayMessageState(controllerConfiguration)
+	updateTrayMessageState(settings)
 
 	icon := kIconsDirectory . "Gear.ico"
 	
@@ -1284,7 +1284,7 @@ initializeSimulatorController() {
 	protectionOn()
 	
 	try {
-		new SimulatorController(kSimulatorConfiguration, controllerConfiguration)
+		new SimulatorController(kSimulatorConfiguration, settings)
 	}
 	finally {
 		protectionOff()

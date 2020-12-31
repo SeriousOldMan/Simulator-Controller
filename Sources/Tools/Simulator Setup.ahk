@@ -317,7 +317,7 @@ class SetupEditor extends ConfigurationItem {
 
 		tabs := map(["General", "Plugins", "Applications", "Controller", "Launchpad", "Chat"], "translate")
 			   
-		Gui SE:Add, Tab3, x8 y48 w398 h472, % values2String("|", tabs*)
+		Gui SE:Add, Tab3, x8 y48 w398 h472 -Wrap, % values2String("|", tabs*)
 		
 		tab := 1
 		

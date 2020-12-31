@@ -1,5 +1,5 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Configuration Editor            ;;;
+;;;   Modular Simulator Controller System - Settings Editor                 ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2020) Creative Commons - BY-NC-SA                        ;;;
@@ -19,8 +19,8 @@ SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
 SetBatchLines -1				; Maximize CPU utilization
 ListLines Off					; Disable execution history
 
-;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Configuration.ico
-;@Ahk2Exe-ExeName Simulator Configuration.exe
+;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Settings.ico
+;@Ahk2Exe-ExeName Simulator Settings.exe
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -34,20 +34,20 @@ ListLines Off					; Disable execution history
 ;;;                        Libraries Include Secion                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include Libraries\Configuration Editor.ahk
+#Include Libraries\Settings Editor.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-showConfigurationEditor() {
-	Menu Tray, Icon, % kIconsDirectory . "Configuration.ico", , 1
+showSettingsEditor() {
+	Menu Tray, Icon, % kIconsDirectory . "Settings.ico", , 1
 	
-	configuration := readConfiguration(kControllerConfigurationFile)
+	settings := readConfiguration(kControllerSettingsFile)
 	
-	if (editConfiguration(configuration) == kSave)
-		writeConfiguration(kControllerConfigurationFile, configuration)
+	if (editSettings(settings) == kSave)
+		writeConfiguration(kSimulatorSettingsFile, settings)
 	
 	ExitApp 0
 }
@@ -57,4 +57,4 @@ showConfigurationEditor() {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-showConfigurationEditor()
+showSettingsEditor()

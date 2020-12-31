@@ -204,8 +204,8 @@ This class implements the core functionality of Simulator Controller. The single
 #### [Class] *Instance[]*
 This class property returns the single instance of *SimulatorController*.
 
-#### *ControllerConfiguration[]*
-Returns the controller configuration map, not to be confused with the complete simulator configration map. This small configuration defines settings for controller notifications such as tray tips and buttonbox visuals and is maintained by the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--configuration).
+#### *Settings[]*
+Returns the controller configuration map, not to be confused with the complete simulator configration map. This small configuration defines settings for controller notifications such as tray tips and buttonbox visuals and is maintained by the [settings editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--settings).
 	
 #### *ButtonBox[]*
 Returns an instance of the singleton class [ButtonBox](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-singleton-buttonbox-extends-configurationitem-simulator-controllerahk). This instance must be created by a specialized plugin and registered in the controller by calling [registerButtonBox](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#registerbuttonboxbuttonbox--buttonbox). See [this simple example](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/ButtonBox%20Plugin.ahk) for reference.
@@ -233,8 +233,8 @@ Returns the single instance of *SimulatorController*.
 
 ### Public Methods
 
-#### *__New(simulatorConfiguration :: ConfigurationMap, controllerConfiguration :: ConfigurationMap)*
-Constructs a new *SimulatorController* instance. Both configuration parameters are required. The first expects the general simulator configuration map (see [kSimulatorConfiguration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#global-configuration-map-constantsahk) for reference), the second is the small configuration map maintained by the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--configuration) and stored in a configuration file referenced by [kControllerConfigurationFile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#ksimulatorconfigurationfile-kcontrollerconfigurationfile).
+#### *__New(simulatorConfiguration :: ConfigurationMap, settings :: ConfigurationMap)*
+Constructs a new *SimulatorController* instance. Both configuration parameters are required. The first expects the general simulator configuration map (see [kSimulatorConfiguration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#global-configuration-map-constantsahk) for reference), the second is the small configuration map maintained by the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--configuration) and stored in a configuration file referenced by [kSimulatorSettingsFile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#ksimulatorconfigurationfile-ksimulatorsettingsfile).
 Since *SimulatorController* is a singleton class, the single instance might be accessed after construction by referencing *SimulatorController.Instance*.
 
 #### [Factory Method] *createControllerFunction(descriptor :: String, configuration :: ConfigurationMap)*

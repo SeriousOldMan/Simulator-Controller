@@ -1,15 +1,9 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Configuration Editor            ;;;
+;;;   Modular Simulator Controller System - Settings Editor                 ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2020) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;;;-------------------------------------------------------------------------;;;
-;;;                   Private Constant Declaration Section                  ;;;
-;;;-------------------------------------------------------------------------;;;
-
-
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Public Constant Declaration Section                   ;;;
@@ -40,16 +34,16 @@ global buttonBoxSimulationDurationInput
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-saveConfiguration() {
-	editConfiguration(kSave)
+saveSettings() {
+	editSettings(kSave)
 }
 
-continueConfiguration() {
-	editConfiguration(kContinue)
+continueSettings() {
+	editSettings(kContinue)
 }
 
-cancelConfiguration() {
-	editConfiguration(kCancel)
+cancelSettings() {
+	editSettings(kCancel)
 }
 
 setInputState(input, enabled) {
@@ -61,14 +55,14 @@ setInputState(input, enabled) {
 	}
 }
 
-runSetup() {
+startConfiguration() {
 	try {
-		RunWait % kBinariesDirectory . "Simulator Setup.exe"
+		RunWait % kBinariesDirectory . "Simulator Configuration.exe"
 	}
 	catch exception {
 		OnMessage(0x44, "translateMsgBoxButtons")
 		error := translate("Error")
-		MsgBox 262160, %error%, % translate("Cannot start the setup application - please check the installation...")
+		MsgBox 262160, %error%, % translate("Cannot start the configuration editor - please check the installation...")
 		OnMessage(0x44, "")
 	}
 	
@@ -113,9 +107,9 @@ moveEditor() {
 	moveByMouse("CE")
 }
 
-editConfiguration(ByRef configurationOrCommand, withContinue := false) {
+editSettings(ByRef settingsOrCommand, withContinue := false) {
 	static result
-	static newConfiguration
+	static newSettings
 	
 	static voiceRecognition
 	static faceRecognition
@@ -162,53 +156,53 @@ editConfiguration(ByRef configurationOrCommand, withContinue := false) {
 	static feedbackVariable8
 
 restart:
-	if (configurationOrCommand == kSave) {
+	if (settingsOrCommand == kSave) {
 		Gui CE:Submit
 		
-		newConfiguration := newConfiguration()
+		newSettings := newConfiguration()
 		
 		for index, coreDescriptor in coreSettings {
 			if (index > 1) {
 				coreVariable := "coreVariable" . index
 			
-				setConfigurationValue(newConfiguration, "Core", coreDescriptor[1], %coreVariable%)
+				setConfigurationValue(newSettings, "Core", coreDescriptor[1], %coreVariable%)
 			}
 		}
 		
 		for index, feedbackDescriptor in feedbackSettings {
 			feedbackVariable := "feedbackVariable" . index
 			
-			setConfigurationValue(newConfiguration, "Feedback", feedbackDescriptor[1], %feedbackVariable%)
+			setConfigurationValue(newSettings, "Feedback", feedbackDescriptor[1], %feedbackVariable%)
 		}
 		
-		setConfigurationValue(newConfiguration, "Controller", "Tray Tip Duration", (trayTip ? trayTipDuration : false))
-		setConfigurationValue(newConfiguration, "Controller", "Tray Tip Simulation Duration", (trayTipSimulation ? trayTipSimulationDuration : false))
-		setConfigurationValue(newConfiguration, "Button Box", "Button Box Duration", (buttonBox ? buttonBoxDuration : false))
-		setConfigurationValue(newConfiguration, "Button Box", "Button Box Simulation Duration", (buttonBoxSimulation ? buttonBoxSimulationDuration : false))
+		setConfigurationValue(newSettings, "Controller", "Tray Tip Duration", (trayTip ? trayTipDuration : false))
+		setConfigurationValue(newSettings, "Controller", "Tray Tip Simulation Duration", (trayTipSimulation ? trayTipSimulationDuration : false))
+		setConfigurationValue(newSettings, "Button Box", "Button Box Duration", (buttonBox ? buttonBoxDuration : false))
+		setConfigurationValue(newSettings, "Button Box", "Button Box Simulation Duration", (buttonBoxSimulation ? buttonBoxSimulationDuration : false))
 		
 		positions := ["Top Left", "Top Right", "Bottom Left", "Bottom Right", "Secondary Screen", "Last Position"]
 		
-		setConfigurationValue(newConfiguration, "Button Box", "Button Box Position", positions[inList(map(positions, "translate"), buttonBoxPosition)])
+		setConfigurationValue(newSettings, "Button Box", "Button Box Position", positions[inList(map(positions, "translate"), buttonBoxPosition)])
 		
-		setConfigurationValue(newConfiguration, "Button Box", "Button Box Position.X", lastPositionX)
-		setConfigurationValue(newConfiguration, "Button Box", "Button Box Position.Y", lastPositionY)
+		setConfigurationValue(newSettings, "Button Box", "Button Box Position.X", lastPositionX)
+		setConfigurationValue(newSettings, "Button Box", "Button Box Position.Y", lastPositionY)
 		
-		setConfigurationValue(newConfiguration, "Startup", "Splash Theme", (splashTheme == translate("None")) ? false : splashTheme)
-		setConfigurationValue(newConfiguration, "Startup", "Simulator", (startup ? startOption : false))
+		setConfigurationValue(newSettings, "Startup", "Splash Theme", (splashTheme == translate("None")) ? false : splashTheme)
+		setConfigurationValue(newSettings, "Startup", "Simulator", (startup ? startOption : false))
 		
 		Gui CE:Destroy
 		
-		result := configurationOrCommand
+		result := settingsOrCommand
 	}
-	else if (configurationOrCommand == kContinue) {
+	else if (settingsOrCommand == kContinue) {
 		Gui CE:Destroy
 		
-		result := configurationOrCommand
+		result := settingsOrCommand
 	}
-	else if (configurationOrCommand == kCancel) {
+	else if (settingsOrCommand == kCancel) {
 		Gui CE:Destroy
 		
-		result := configurationOrCommand
+		result := settingsOrCommand
 	}
 	else {
 		result := false
@@ -223,7 +217,7 @@ restart:
 		Gui CE:Font, Norm, Arial
 		Gui CE:Font, Italic, Arial
 	
-		Gui CE:Add, Text, YP+20 w220 Center, % translate("Configuration")
+		Gui CE:Add, Text, YP+20 w220 Center, % translate("Settings")
 	
 		coreSettings := [["Simulator Controller", true, false]]
 		feedbackSettings := []		
@@ -233,16 +227,16 @@ restart:
 			enabled := (getConfigurationValue(kSimulatorConfiguration, applicationName, "Exe Path", "") != "")
 			
 			if (descriptor[1] == "Core")
-				coreSettings.Push(Array(applicationName, getConfigurationValue(configurationOrCommand, "Core", applicationName, true), enabled))
+				coreSettings.Push(Array(applicationName, getConfigurationValue(settingsOrCommand, "Core", applicationName, true), enabled))
 			else if (descriptor[1] == "Feedback")
-				feedbackSettings.Push(Array(applicationName, getConfigurationValue(configurationOrCommand, "Feedback", applicationName, true), enabled))
+				feedbackSettings.Push(Array(applicationName, getConfigurationValue(settingsOrCommand, "Feedback", applicationName, true), enabled))
 		}
 		
 		if (coreSettings.Length() > 8)
-			Throw "Too many Core Components detected in editConfiguration..."
+			Throw "Too many Core Components detected in editSettings..."
 		
 		if (feedbackSettings.Length() > 8)
-			Throw "Too many Feedback Components detected in editConfiguration..."
+			Throw "Too many Feedback Components detected in editSettings..."
 			
 		coreHeight := 20 + (coreSettings.Length() * 20)
 		
@@ -286,13 +280,13 @@ restart:
 			}
 		}
 	
-		trayTipDuration := getConfigurationValue(configurationOrCommand, "Controller", "Tray Tip Duration", false)
-		trayTipSimulationDuration := getConfigurationValue(configurationOrCommand, "Controller", "Tray Tip Simulation Duration", 1500)
-		buttonBoxDuration := getConfigurationValue(configurationOrCommand, "Button Box", "Button Box Duration", 10000)
-		buttonBoxSimulationDuration := getConfigurationValue(configurationOrCommand, "Button Box", "Button Box Simulation Duration", false)
-		buttonBoxPosition := getConfigurationValue(configurationOrCommand, "Button Box", "Button Box Position", "Bottom Right")
-		lastPositionX := getConfigurationValue(configurationOrCommand, "Button Box", "Button Box Position.X", 0)
-		lastPositionY := getConfigurationValue(configurationOrCommand, "Button Box", "Button Box Position.Y", 0)
+		trayTipDuration := getConfigurationValue(settingsOrCommand, "Controller", "Tray Tip Duration", false)
+		trayTipSimulationDuration := getConfigurationValue(settingsOrCommand, "Controller", "Tray Tip Simulation Duration", 1500)
+		buttonBoxDuration := getConfigurationValue(settingsOrCommand, "Button Box", "Button Box Duration", 10000)
+		buttonBoxSimulationDuration := getConfigurationValue(settingsOrCommand, "Button Box", "Button Box Simulation Duration", false)
+		buttonBoxPosition := getConfigurationValue(settingsOrCommand, "Button Box", "Button Box Position", "Bottom Right")
+		lastPositionX := getConfigurationValue(settingsOrCommand, "Button Box", "Button Box Position.X", 0)
+		lastPositionY := getConfigurationValue(settingsOrCommand, "Button Box", "Button Box Position.Y", 0)
 		
 		trayTip := (trayTipDuration != 0) ? true : false
 		trayTipSimulation := (trayTipSimulationDuration != 0) ? true : false
@@ -337,7 +331,7 @@ restart:
 		
 		Gui CE:Add, DropDownList, X120 YP-5 w100 Choose%chosen% vbuttonBoxPosition, % values2String("|", map(choices, "translate")*)
 		
-		splashTheme := getConfigurationValue(configurationOrCommand, "Startup", "Splash Theme", false)	
+		splashTheme := getConfigurationValue(settingsOrCommand, "Startup", "Splash Theme", false)	
 	 
 		themes := getAllThemes()
 		chosen := (splashTheme ? inList(themes, splashTheme) + 1 : 1)
@@ -346,7 +340,7 @@ restart:
 		Gui CE:Add, Text, X10 Y+20, % translate("Theme")
 		Gui CE:Add, DropDownList, X90 YP-5 w140 Choose%chosen% vsplashTheme, %themes%
 	
-		startupOption := getConfigurationValue(configurationOrCommand, "Startup", "Simulator", false)
+		startupOption := getConfigurationValue(settingsOrCommand, "Startup", "Simulator", false)
 		startup := (startupOption != false)
 		
 		Gui CE:Add, CheckBox, X10 Checked%startup% vstartup, % translate("Start")
@@ -360,21 +354,21 @@ restart:
 		
 		Gui CE:Add, DropDownList, X90 YP-5 w140 Choose%chosen% vstartOption, % values2String("|", simulators*)
 	 
-		Gui CE:Add, Button, X10 Y+20 w220 grunSetup, % translate("Setup...")
+		Gui CE:Add, Button, X10 Y+20 w220 gstartConfiguration, % translate("Setup...")
 		
 		margin := (withContinue ? "Y+20" : "")
 		
-		Gui CE:Add, Button, Default X10 %margin% w100 gsaveConfiguration, % translate("Save")
-		Gui CE:Add, Button, X+20 w100 gcancelConfiguration, % translate("&Cancel")
+		Gui CE:Add, Button, Default X10 %margin% w100 gsaveSettings, % translate("Save")
+		Gui CE:Add, Button, X+20 w100 gcancelSettings, % translate("&Cancel")
 		
 		if withContinue
-			Gui CE:Add, Button, X10 w220 gcontinueConfiguration, % translate("Co&ntinue w/o Save")
+			Gui CE:Add, Button, X10 w220 gcontinueSettings, % translate("Co&ntinue w/o Save")
 	
 		Gui CE:Margin, 10, 10
 		Gui CE:Show, AutoSize Center
 		
 		if (readConfiguration(kSimulatorConfigurationFile).Count() == 0)
-			runSetup()
+			startConfiguration()
 			
 		Loop {
 			Sleep 1000
@@ -391,7 +385,7 @@ restart:
 		}
 		
 		if (result == kSave)
-			configurationOrCommand := newConfiguration
+			settingsOrCommand := newSettings
 		
 		return result
 	}

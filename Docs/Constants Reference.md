@@ -10,7 +10,7 @@ Paths for graphical and audio resources contained in the Simulator Controller di
 #### *kUserHomeDirectory, kUserConfigDirectory, kUserSplashMediaDirectory, kUserPluginsDirectory, kLogsDirectory*
 A special folder *Simulator Controller* will be created in the user *Documents* folder. It will contain various subfolders for adding user-specific extensions (media, plugins, ...), and for storing configuration and log files.
 
-#### *kSimulatorConfigurationFile, kControllerConfigurationFile*
+#### *kSimulatorConfigurationFile, kSimulatorSettingsFile*
 Paths for the most important configuration files used by Simulator Controller.
 
 ***

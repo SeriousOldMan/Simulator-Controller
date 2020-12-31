@@ -56,7 +56,7 @@ Error while starting application =>Fehler beim Versuch, die Anwendung
  (=> (
 ): =>): 
  - please check the configuration=> - Bitte überprüfen Sie die Konfiguration
- Cannot start %application% (%exePath%) - please check the configuration...=>Die Anwendung %application% (%exePath%) kann nicht gestartet werden - Bitte überprüfen Sie die Konfiguration...
+Cannot start %application% (%exePath%) - please check the configuration...=>Die Anwendung %application% (%exePath%) kann nicht gestartet werden - Bitte überprüfen Sie die Konfiguration...
 [Simulator Controller]
 Controller layout initialized:=>Steuerungs Funktionen initialisiert:
 1-Way Toggles=>1-Wege Schalter

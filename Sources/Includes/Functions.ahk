@@ -20,7 +20,7 @@
 global vDebug = false
 global vLogLevel = kLogWarn
 
-global vTargetLanguage = "en"
+global vTargetLanguageCode = "en"
 
 global vSplashCounter = 0
 global vLastImage
@@ -61,6 +61,20 @@ playThemeSong(songFile) {
 	
 	if FileExist(songFile)
 		SoundPlay %songFile%
+}
+
+readLanguage(targetLanguageCode) {
+	translations := {}
+	
+	Loop Read, % getFileName("Translations." . targetLanguageCode, kUserConfigDirectory, kConfigDirectory)
+	{
+		translation := StrSplit(A_LoopReadLine, "=>")
+		
+		if (translation[1] = targetLanguageCode)
+			return translation[2]
+	}
+	
+	Throw "Inconsistent translation encountered for """ . targetLanguageCode . """ in readLanguage..."
 }
 
 eventMessageQueue() {
@@ -190,7 +204,7 @@ initializeTrayMessageQueue() {
 
 loadSimulatorConfiguration() {
 	kSimulatorConfiguration := readConfiguration(kSimulatorConfigurationFile)
-	vTargetLanguage := getConfigurationValue(kSimulatorConfiguration, "Configuration", "Language", "en")
+	vTargetLanguageCode := getConfigurationValue(kSimulatorConfiguration, "Configuration", "Language", "en")
 	
 	kVersion := getConfigurationValue(readConfiguration(kHomeDirectory . "VERSION"), "Version", "Current", "0.0.0")
 	
@@ -490,21 +504,21 @@ availableLanguages() {
 	for ignore, fileName in getFileNames("Translations.*", kConfigDirectory, kUserConfigDirectory) {
 		SplitPath fileName, , , languageCode
 		
-		translations[languageCode] := readTranslations(languageCode)[languageCode]
+		translations[languageCode] := readLanguage(languageCode)
 	}
 	
 	return translations
 }
 
-readTranslations(targetLanguage) {
+readTranslations(targetLanguageCode) {
 	translations := {}
 	
-	Loop Read, % getFileName("Translations." . targetLanguage, kUserConfigDirectory, kConfigDirectory)
+	Loop Read, % getFileName("Translations." . targetLanguageCode, kUserConfigDirectory, kConfigDirectory)
 	{
 		translation := StrSplit(A_LoopReadLine, "=>")
 		enString := translation[1]
 		
-		if (enString[1] != "[")
+		if ((SubStr(enString, 1, 1) != "[") && (enString != targetLanguageCode))
 			if (translations.HasKey(enString) && (translations[enString] != translation[2]))
 				Throw "Inconsistent translation encountered for """ . enString . """ in readTranslations..."
 			else
@@ -514,15 +528,37 @@ readTranslations(targetLanguage) {
 	return translations
 }
 
+writeTranslations(languageCode, languageName, translations) {
+	fileName := kUserConfigDirectory . "Translations." . languageCode
+	
+	FileDelete fileName
+	
+	curEncoding := A_FileEncoding
+	
+	FileEncoding UTF-16
+	
+	try {
+		FileAppend [Locale]`n, %fileName%
+		FileAppend %languageCode%=>%languageName%`n, %fileName%
+		FileAppend [Translations], %fileName%
+		
+		for original, translation in translations
+			FileAppend `n%original%=>%translation%, %fileName%
+	}
+	finally {
+		FileEncoding %curEncoding%
+	}
+}
+
 translate(string) {
-	static currentLanguage := "en"
+	static currentLanguageCode := "en"
 	static translations := false
 	
-	if (vTargetLanguage != "en") {
-		if (vTargetLanguage != currentLanguage) {
-			currentLanguage := vTargetLanguage
+	if (vTargetLanguageCode != "en") {
+		if (vTargetLanguageCode != currentLanguageCode) {
+			currentLanguageCode := vTargetLanguageCode
 			
-			translations := readTranslations(currentLanguage)
+			translations := readTranslations(currentLanguageCode)
 		}
 		
 		return (translations.HasKey(string) ? translations[string] : string)
@@ -531,12 +567,12 @@ translate(string) {
 		return string
 }
 
-setLanguage(language) {
-	vTargetLanguage := language
+setLanguage(languageCode) {
+	vTargetLanguageCode := languageCode
 }
 
 getLanguage() {
-	return vTargetLanguage
+	return vTargetLanguageCode
 }
 
 protectionOn() {

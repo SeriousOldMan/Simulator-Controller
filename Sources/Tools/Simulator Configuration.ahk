@@ -83,7 +83,7 @@ class ConfigurationItemList extends ConfigurationItem {
 		}
 	}
 	
-	__New(configuration, listHandle, listVariable, addButton, deleteButton, updateButton, upButton := false, downButton := false) {
+	__New(configuration, listHandle, listVariable, addButton := false, deleteButton := false, updateButton := false, upButton := false, downButton := false) {
 		this.iListHandle := listHandle
 		this.iAddButton := addButton
 		this.iDeleteButton := deleteButton
@@ -93,9 +93,14 @@ class ConfigurationItemList extends ConfigurationItem {
 		
 		registerList(listVariable, this)
 		
-		registerList(addButton, this)
-		registerList(deleteButton, this)
-		registerList(updateButton, this)
+		if addButton
+			registerList(addButton, this)
+		
+		if deleteButton
+			registerList(deleteButton, this)
+		
+		if updateButton
+			registerList(updateButton, this)
 		
 		if upButton
 			registerList(upButton, this)
@@ -394,13 +399,13 @@ moveConfigurationEditor() {
 global nirCmdPathEdit
 global homePathEdit
 
-global languageDropdown
+global languageDropDown
 global startWithWindowsCheck
 global silentModeCheck
 
 global ahkPathEdit
 global debugEnabledCheck
-global logLevelDropdown
+global logLevelDropDown
 
 class GeneralTab extends ConfigurationItemTab {
 	iSimulatorsList := false
@@ -449,7 +454,8 @@ class GeneralTab extends ConfigurationItemTab {
 		}
 			
 		Gui SE:Add, Text, x24 y176 w86 h23 +0x200, % translate("Language")
-		Gui SE:Add, DropDownList, x184 y176 w199 Choose%chosen% VlanguageDropdown, % values2String("|", choices*)
+		Gui SE:Add, DropDownList, x184 y176 w174 Choose%chosen% VlanguageDropDown, % values2String("|", choices*)
+		Gui SE:Add, Button, x360 y175 w23 h23 gopenTranslationsEditor, % translate("...")
 		
 		Gui SE:Add, CheckBox, x24 y200 w242 h23 Checked%startWithWindowsCheck% VstartWithWindowsCheck, % translate("Start with Windows")
 		Gui SE:Add, CheckBox, x24 y224 w242 h23 Checked%silentModeCheck% VsilentModeCheck, % translate("Silent mode (no splash screen, no sound)")
@@ -484,12 +490,12 @@ class GeneralTab extends ConfigurationItemTab {
 			
 			choices := ["Info", "Warn", "Critical", "Off"]
 			
-			chosen := inList(choices, logLevelDropdown)
+			chosen := inList(choices, logLevelDropDown)
 			
 			if !chosen
 				chosem := 2
 				
-			Gui SE:Add, DropDownList, x184 y475 w91 Choose%chosen% VlogLevelDropdown, % values2String("|", map(choices, "translate")*)
+			Gui SE:Add, DropDownList, x184 y475 w91 Choose%chosen% VlogLevelDropDown, % values2String("|", map(choices, "translate")*)
 		}
 	}
 	
@@ -499,14 +505,14 @@ class GeneralTab extends ConfigurationItemTab {
 		nirCmdPathEdit := getConfigurationValue(configuration, "Configuration", "NirCmd Path", "")
 		homePathEdit := getConfigurationValue(configuration, "Configuration", "Home Path", "")
 		
-		languageDropdown := availableLanguages()[getConfigurationValue(configuration, "Configuration", "Language", getLanguage())]
+		languageDropDown := availableLanguages()[getConfigurationValue(configuration, "Configuration", "Language", getLanguage())]
 		startWithWindowsCheck := getConfigurationValue(configuration, "Configuration", "Start With Windows", true)
 		silentModeCheck := getConfigurationValue(configuration, "Configuration", "Silent Mode", false)
 		
 		if this.iDevelopment {
 			ahkPathEdit := getConfigurationValue(configuration, "Configuration", "AHK Path", "")
 			debugEnabledCheck := getConfigurationValue(configuration, "Configuration", "Debug", false)
-			logLevelDropdown := getConfigurationValue(configuration, "Configuration", "Log Level", "Warn")
+			logLevelDropDown := getConfigurationValue(configuration, "Configuration", "Log Level", "Warn")
 		}
 	}
 	
@@ -516,7 +522,7 @@ class GeneralTab extends ConfigurationItemTab {
 		GuiControlGet nirCmdPathEdit
 		GuiControlGet homePathEdit
 		
-		GuiControlGet languageDropdown
+		GuiControlGet languageDropDown
 		GuiControlGet startWithWindowsCheck
 		GuiControlGet silentModeCheck
 		
@@ -526,7 +532,7 @@ class GeneralTab extends ConfigurationItemTab {
 		languageCode := "en"
 		
 		for code, language in availableLanguages()
-			if (language = languageDropdown) {
+			if (language = languageDropDown) {
 				languageCode := code
 				
 				break
@@ -546,17 +552,40 @@ class GeneralTab extends ConfigurationItemTab {
 		if this.iDevelopment {
 			GuiControlGet ahkPathEdit
 			GuiControlGet debugEnabledCheck
-			GuiControlGet logLevelDropdown
+			GuiControlGet logLevelDropDown
 		
 			setConfigurationValue(configuration, "Configuration", "AHK Path", ahkPathEdit)
 			setConfigurationValue(configuration, "Configuration", "Debug", debugEnabledCheck)
 			
 			choices := ["Info", "Warn", "Critical", "Off"]
 			
-			setConfigurationValue(configuration, "Configuration", "Log Level", choices[inList(map(choices, "translate"), logLevelDropdown)])
+			setConfigurationValue(configuration, "Configuration", "Log Level", choices[inList(map(choices, "translate"), logLevelDropDown)])
 		}
 		
 		this.iSimulatorsList.saveToConfiguration(configuration)
+	}
+	
+	openTranslationsEditor() {
+		GuiControlGet languageDropDown
+		
+		ConfigurationEditor.Instance.hide()
+		
+		if (new TranslationsEditor(this.Configuration)).editTranslations() {
+			choices := []
+			chosen := 0
+			
+			for ignore, language in availableLanguages() {
+				choices.Push(language)
+				
+				if (language == languageDropDown)
+					chosen := A_Index
+			}
+				
+			GuiControl, , languageDropDown, % "|" . values2String("|", choices*)
+			GuiControl Choose, languageDropDown, %chosen%
+		}
+		
+		ConfigurationEditor.Instance.show()
 	}
 	
 	openThemesEditor() {
@@ -587,6 +616,10 @@ chooseAHKPath() {
 	
 	if (directory != "")
 		GuiControl Text, ahkPathEdit, %directory%
+}
+
+openTranslationsEditor() {
+	GeneralTab.Instance.openTranslationsEditor()
 }
 
 openThemesEditor() {
@@ -1171,7 +1204,7 @@ toggleKeyDetector() {
 
 global functionsListView
 
-global functionTypeDropdown = 0
+global functionTypeDropDown = 0
 global functionNumberEdit = ""
 global functionOnHotkeysEdit = ""
 global functionOnActionEdit = ""
@@ -1196,7 +1229,7 @@ class FunctionsList extends ConfigurationItemList {
 							, % values2String("|", map(["Function", "Number", "Hotkey(s) & Action(s)"], "translate")*)
 	
 		Gui SE:Add, Text, x16 y360 w86 h23 +0x200, % translate("Function")
-		Gui SE:Add, DropDownList, x104 y360 w91 AltSubmit Choose%functionTypeDropdown% VfunctionTypeDropdown gupdateFunctionEditorState
+		Gui SE:Add, DropDownList, x104 y360 w91 AltSubmit Choose%functionTypeDropDown% VfunctionTypeDropDown gupdateFunctionEditorState
 								, % values2String("|", map(["1-way Toggle", "2-way Toggle", "Button", "Dial", "Custom"], "translate")*)
 		Gui SE:Add, Edit, x200 y360 w40 h21 Number VfunctionNumberEdit, %functionNumberEdit%
 		Gui SE:Add, UpDown, x240 y360 w17 h21, 1
@@ -1252,7 +1285,7 @@ class FunctionsList extends ConfigurationItemList {
 	updateState() {
 		base.updateState()
 	
-		GuiControlGet functionType, , functionTypeDropdown
+		GuiControlGet functionType, , functionTypeDropDown
 	
 		if ((functionType == 2) || (functionType == 4)) {
 			GuiControl Enable, functionOffHotkeysEdit
@@ -1334,21 +1367,21 @@ class FunctionsList extends ConfigurationItemList {
 		
 		switch item.Type {
 			case k1WayToggleType:
-				functionTypeDropdown := 1
+				functionTypeDropDown := 1
 				onKey := "On"
 			case k2WayToggleType:
-				functionTypeDropdown := 2
+				functionTypeDropDown := 2
 				onKey := "On"
 				offKey := "Off"
 			case kButtonType:
-				functionTypeDropdown := 3
+				functionTypeDropDown := 3
 				onKey := "Push"
 			case kDialType:
-				functionTypeDropdown := 4
+				functionTypeDropDown := 4
 				onKey := "Increase"
 				offKey := "Decrease"
 			case kCustomType:
-				functionTypeDropdown := 5
+				functionTypeDropDown := 5
 				onKey := "Call"
 			default:
 				Throw "Unknown function type (" . functionType . ") detected in FunctionsList.loadEditor..."
@@ -1363,7 +1396,7 @@ class FunctionsList extends ConfigurationItemList {
 			functionOffActionEdit := item.Actions[offKey, true]
 		}
 		
-		GuiControl Choose, functionTypeDropdown, %functionTypeDropdown%
+		GuiControl Choose, functionTypeDropDown, %functionTypeDropDown%
 		GuiControl Text, functionNumberEdit, %functionNumberEdit%
 		GuiControl Text, functionOnHotkeysEdit, %functionOnHotkeysEdit%
 		GuiControl Text, functionOnActionEdit, %functionOnActionEdit%
@@ -1372,14 +1405,14 @@ class FunctionsList extends ConfigurationItemList {
 	}
 	
 	clearEditor() {
-		functionTypeDropdown := 0
+		functionTypeDropDown := 0
 		functionNumberEdit := 0
 		functionOnHotkeysEdit := ""
 		functionOnActionEdit := ""
 		functionOffHotkeysEdit := ""
 		functionOffActionEdit := ""
 		
-		GuiControl Choose, functionTypeDropdown, %functionTypeDropdown%
+		GuiControl Choose, functionTypeDropDown, %functionTypeDropDown%
 		GuiControl Text, functionNumberEdit, %functionNumberEdit%
 		GuiControl Text, functionOnHotkeysEdit, %functionOnHotkeysEdit%
 		GuiControl Text, functionOnActionEdit, %functionOnActionEdit%
@@ -1388,14 +1421,14 @@ class FunctionsList extends ConfigurationItemList {
 	}
 	
 	buildItemFromEditor(isNew := false) {
-		GuiControlGet functionTypeDropdown
+		GuiControlGet functionTypeDropDown
 		GuiControlGet functionNumberEdit
 		GuiControlGet functionOnHotkeysEdit
 		GuiControlGet functionOnActionEdit
 		GuiControlGet functionOffHotkeysEdit
 		GuiControlGet functionOffActionEdit
 		
-		functionType := [false, k1WayToggleType, k2WayToggleType, kButtonType, kDialType, kCustomType][functionTypeDropdown + 1]
+		functionType := [false, k1WayToggleType, k2WayToggleType, kButtonType, kDialType, kCustomType][functionTypeDropDown + 1]
 		
 		if (functionType && (functionNumberEdit >= 0)) {
 			if ((functionType != k2WayToggleType) && (functionType != kDialType)) {
@@ -1468,7 +1501,7 @@ updateFunctionEditorState() {
 
 global launchpadListView = false
 global launchpadLabelEdit = ""
-global launchpadApplicationDropdown = 0
+global launchpadApplicationDropDown = 0
 global launchpadUpButton
 global launchpadDownButton
 global launchpadAddButton
@@ -1494,7 +1527,7 @@ class LaunchpadTab extends ConfigurationItemList {
 		Gui SE:Add, Edit, x110 y280 w80 h21 VlaunchpadLabelEdit, %launchpadLabelEdit%
 		
 		Gui SE:Add, Text, x16 y304 w86 h23 +0x200, % translate("Application")
-		Gui SE:Add, DropDownList, x110 y304 w284 h21 R10 Choose%launchpadApplicationDropdown% VlaunchpadApplicationDropdown
+		Gui SE:Add, DropDownList, x110 y304 w284 h21 R10 Choose%launchpadApplicationDropDown% VlaunchpadApplicationDropDown
 		
 		Gui SE:Add, Button, x184 y490 w46 h23 VlaunchpadAddButton gaddItem, % translate("Add")
 		Gui SE:Add, Button, x232 y490 w50 h23 Disabled VlaunchpadDeleteButton gdeleteItem, % translate("Delete")
@@ -1539,10 +1572,10 @@ class LaunchpadTab extends ConfigurationItemList {
 		for ignore, launchpadApplication in ApplicationsTab.Instance.Applications[[translate("Other")]]
 			launchpadApplicationsList.Push(launchpadApplication.Application)
 		
-		launchpadApplicationDropdown := (application ? inList(launchpadApplicationsList, application) : 0)
+		launchpadApplicationDropDown := (application ? inList(launchpadApplicationsList, application) : 0)
 		
-		GuiControl Text, launchpadApplicationDropdown, % "|" . values2String("|", launchpadApplicationsList*)
-		GuiControl Choose, launchpadApplicationDropdown, % application ? application : ""
+		GuiControl Text, launchpadApplicationDropDown, % "|" . values2String("|", launchpadApplicationsList*)
+		GuiControl Choose, launchpadApplicationDropDown, % application ? application : ""
 	}
 	
 	loadEditor(item) {
@@ -1563,9 +1596,9 @@ class LaunchpadTab extends ConfigurationItemList {
 	
 	buildItemFromEditor(isNew := false) {
 		GuiControlGet launchpadLabelEdit
-		GuiControlGet launchpadApplicationDropdown
+		GuiControlGet launchpadApplicationDropDown
 		
-		return Array(launchpadLabelEdit, launchpadApplicationDropdown)
+		return Array(launchpadLabelEdit, launchpadApplicationDropDown)
 	}
 }
 
@@ -1783,7 +1816,7 @@ moveThemesEditor() {
 
 global themesListView = false
 global themeNameEdit = ""
-global themeTypeDropdown = 0
+global themeTypeDropDown = 0
 
 global playSoundButtonHandle
 global soundFilePathEdit = ""
@@ -1823,7 +1856,7 @@ class ThemesList extends ConfigurationItemList {
 		Gui TE:Add, Edit, x110 y270 w140 h21 VthemeNameEdit, %themeNameEdit%
 		
 		Gui TE:Add, Text, x16 y294 w86 h23 +0x200, % translate("Type")
-		Gui TE:Add, DropDownList, x110 y294 w140 AltSubmit VthemeTypeDropdown gupdateThemesEditorState, % translate("Picture Carousel") . "|" . translate("Video")
+		Gui TE:Add, DropDownList, x110 y294 w140 AltSubmit VthemeTypeDropDown gupdateThemesEditorState, % translate("Picture Carousel") . "|" . translate("Video")
 		
 		Gui TE:Add, Text, x16 y318 w160 h23 +0x200, % translate("Sound File")
 		Gui TE:Add, Button, x85 y317 w23 h23 HwndplaySoundButtonHandle gtogglePlaySoundFile
@@ -1932,9 +1965,9 @@ class ThemesList extends ConfigurationItemList {
 	updateState() {
 		base.updateState()
 		
-		GuiControlGet themeTypeDropdown
+		GuiControlGet themeTypeDropDown
 		
-		if (themeTypeDropdown == 1) {
+		if (themeTypeDropDown == 1) {
 			GuiControl Show, picturesListLabel
 			GuiControl Show, addPictureButton
 			GuiControl Show, picturesListView
@@ -1951,7 +1984,7 @@ class ThemesList extends ConfigurationItemList {
 			GuiControl Hide, picturesDurationPostfix
 		}
 		
-		if (themeTypeDropdown == 2) {
+		if (themeTypeDropDown == 2) {
 			GuiControl Show, videoFilePathLabel
 			GuiControl Show, videoFilePathEdit
 			GuiControl Show, videoFilePathButton
@@ -1984,22 +2017,22 @@ class ThemesList extends ConfigurationItemList {
 	}
 	
 	loadEditor(item) {
-		themeTypeDropdown := (item[1] == "Picture Carousel") ? 1 : 2
+		themeTypeDropDown := (item[1] == "Picture Carousel") ? 1 : 2
 		themeNameEdit := item[2]
 		soundFilePathEdit := item[4]
 			
-		GuiControl Choose, themeTypeDropdown, %themeTypeDropdown%
+		GuiControl Choose, themeTypeDropDown, %themeTypeDropDown%
 		GuiControl Text, themeNameEdit, %themeNameEdit%
 		GuiControl Text, soundFilePathEdit, %soundFilePathEdit%
 		
-		if (themeTypeDropdown == 2)
+		if (themeTypeDropDown == 2)
 			videoFilePathEdit := item[3]
 		else
 			videoFilePathEdit := ""
 			
 		GuiControl Text, videoFilePathEdit, %videoFilePathEdit%
 		
-		if (themeTypeDropdown == 1) {
+		if (themeTypeDropDown == 1) {
 			this.initializePicturesList(item[3])
 			
 			picturesDurationEdit := item[5]
@@ -2013,13 +2046,13 @@ class ThemesList extends ConfigurationItemList {
 	}
 	
 	clearEditor() {
-		themeTypeDropdown := 0
+		themeTypeDropDown := 0
 		themeNameEdit := ""
 		soundFilePathEdit := ""
 		videoFilePathEdit := ""
 		picturesDurationEdit := 3000
 			
-		GuiControl Choose, themeTypeDropdown, %themeTypeDropdown%
+		GuiControl Choose, themeTypeDropDown, %themeTypeDropDown%
 		GuiControl Text, themeNameEdit, %themeNameEdit%
 		GuiControl Text, soundFilePathEdit, %soundFilePathEdit%
 		GuiControl Text, videoFilePathEdit, %videoFilePathEdit%
@@ -2032,14 +2065,14 @@ class ThemesList extends ConfigurationItemList {
 	
 	buildItemFromEditor(isNew := false) {
 		GuiControlGet themeNameEdit
-		GuiControlGet themeTypeDropdown
+		GuiControlGet themeTypeDropDown
 		GuiControlGet soundFilePathEdit
 		GuiControlGet picturesDurationEdit
 		
 		type := ""
 		media := ""
 		
-		if (themeTypeDropdown == 1) {
+		if (themeTypeDropDown == 1) {
 			type := "Picture Carousel"
 			pictures := []
 			
@@ -2060,7 +2093,7 @@ class ThemesList extends ConfigurationItemList {
 			
 			media := values2String(", ", pictures*)
 		}
-		else if (themeTypeDropdown == 2) {
+		else if (themeTypeDropDown == 2) {
 			type := "Video"
 			
 			GuiControlGet videoFilePathEdit
@@ -2215,6 +2248,286 @@ setButtonIcon(buttonHandle, file, index := 1, options := "") {
 	SendMessage, BCM_SETIMAGELIST := 5634, 0, &button_il,, AHK_ID %buttonHandle%
 
 	return IL_Add(normal_il, file, index)
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; TranslationsEditor                                                      ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+global translationLanguageDropDown
+global addLanguageButton
+global deleteLanguageButton
+
+global isoCodeEdit = ""
+global languageNameEdit = ""
+
+class TranslationsEditor extends ConfigurationItem {
+	iLanguagesChanged := false
+	iTranslationsList := false
+	iClosed := false
+	
+	__New(configuration) {
+		base.__New(configuration)
+		
+		TranslationsEditor.Instance := this
+		
+		this.createControls(configuration)
+	}
+	
+	createControls(configuration) {
+		Gui TE:Default
+	
+		Gui TE:-border -Caption
+		Gui TE:Color, D0D0D0
+
+		Gui TE:Font, Bold, Arial
+
+		Gui TE:Add, Text, w388 Center gmoveTranslationsEditor, Modular Simulator Controller System 
+		
+		Gui TE:Font, Norm, Arial
+		Gui TE:Font, Italic, Arial
+
+		Gui TE:Add, Text, YP+20 w388 Center, % translate("Translations")
+
+		Gui TE:Font, Norm, Arial
+		
+		Gui, TE:Add, Text, x50 y+10 w310 0x10
+		
+		choices := []
+		chosen := 0
+		
+		for ignore, language in availableLanguages() {
+			choices.Push(language)
+			
+			if (language == languageDropDown)
+				chosen := A_Index
+		}
+			
+		Gui TE:Add, Text, x16 w86 h23 +0x200, % translate("Language")
+		Gui TE:Add, DropDownList, x184 yp w158 Choose%chosen% VtranslationLanguageDropDown, % values2String("|", choices*)
+		Gui TE:Add, Button, x343 yp-1 w23 h23 HwndaddLanguageButtonHandle VaddLanguageButton gaddLanguage
+		Gui TE:Add, Button, x368 yp w23 h23 HwnddeleteLanguageButtonHandle VdeleteLanguageButton gdeleteLanguage
+		setButtonIcon(addLanguageButtonHandle, kIconsDirectory . "Plus.ico", 1)
+		setButtonIcon(deleteLanguageButtonHandle, kIconsDirectory . "Minus.ico", 1)
+		
+		Gui TE:Add, Text, x16 w86 h23 +0x200, % translate("ISO Code / Name")
+		Gui TE:Add, Edit, x184 yp w40 h21 VisoCodeEdit, %isoCodeEdit%
+		Gui TE:Add, Edit, x236 yp w155 h21 VlanguageNameEdit, %languageNameEdit%
+	
+		this.iTranslationsList := new TranslationsList(configuration)
+		
+		Gui, TE:Add, Text, x50 y+10 w310 0x10
+		
+		Gui TE:Add, Button, x166 yp+10 w80 h23 Default GcloseTranslationsEditor, % translate("Close")
+	}
+	
+	editTranslations() {
+		Gui TE:Show, AutoSize Center
+		
+		GuiControlGet isoCodeEdit
+		
+		this.iTranslationsList.loadTranslations((isoCodeEdit != "") ? isoCodeEdit : "EN")
+		
+		Loop
+			Sleep 200
+		until this.iClosed
+		
+		try {
+			return this.iLanguagesChanged
+		}
+		finally {
+			Gui TE:Destroy
+		}
+	}
+	
+	closeEditor() {
+		this.iTranslationsList.saveTranslations()
+		
+		this.iClosed := true
+	}
+	
+	addLanguage() {
+		this.iLanguagesChanged := true
+		this.iTranslationsList.saveTranslations()
+		
+		choices := []
+		chosen := 0
+		
+		for ignore, language in availableLanguages() {
+			choices.Push(language)
+			
+			if (language == languageDropDown)
+				chosen := A_Index
+		}
+		
+		choices.Push(translate("New Language"))
+			
+		GuiControl, , translationLanguageDropDown, % "|" . values2String("|", choices*)
+		GuiControl Choose, translationLanguageDropDown, % choices.Length()
+		
+		this.iTranslationsList.newTranslations()
+	}
+	
+	deleteLanguage() {
+		GuiControlGet translationLanguageDropDown
+		
+		SoundPlay *32
+	
+		OnMessage(0x44, "translateMsgBoxButtons")
+		title := translate("Delete")
+		MsgBox 262436, %title%, % translate("Do you really want to delete this translation?")
+		OnMessage(0x44, "")
+
+		IfMsgBox Yes
+		{
+			this.iLanguagesChanged := true
+			
+			languageCode := kUndefined
+			
+			for code, language in availableLanguages()
+				if ((language = translationLanguageDropDown) && (code != "EN")) {
+					languageCode := code
+					
+					break
+				}
+			
+			if (languageCode != kUndefined)
+				for ignore, fileName in getFileNames("Translations." . languageCode, kUserConfigDirectory, kConfigDirectory)
+					FileDelete fileName
+		}
+	}
+}
+
+addLanguage(){
+	TranslationsEditor.Instance.addLanguage()
+}
+
+deleteLanguage() {
+	TranslationsEditor.Instance.deleteLanguage()
+}
+
+closeTranslationsEditor() {
+	TranslationsEditor.Instance.closeEditor()
+}
+
+moveTranslationsEditor() {
+	moveByMouse("TE")
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; TranslationsList                                                        ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+global translationsListView
+
+global originalTextEdit = ""
+global translationTextEdit = ""
+		
+class TranslationsList extends ConfigurationItemList {
+	iLanguageCode := ""
+	
+	__New(configuration) {
+		base.__New(configuration, this.createControls(configuration), "translationsListView")
+				 
+		TranslationsList.Instance := this
+	}
+					
+	createControls(configuration) {
+		Gui TE:Add, ListView, x16 y+10 w377 h140 -Multi -LV0x10 NoSort NoSortHdr HwndtranslationsListViewHandle VtranslationsListView glistEvent
+							, % values2String("|", map(["Original", "Translation"], "translate")*)
+		
+		Gui TE:Add, Text, x16 w86 h23 +0x200, % translate("Original")
+		Gui TE:Add, Edit, x110 yp w283 h80 Disabled VoriginalTextEdit, %originalTextEdit%
+	
+		Gui TE:Add, Text, x16 w86 h23 +0x200, % translate("Translation")
+		Gui TE:Add, Edit, x110 yp w283 h80 VtranslationTextEdit, %translationTextEdit%
+		
+		return translationsListViewHandle
+	}
+	
+	loadList(items) {
+		Gui ListView, % this.ListHandle
+	
+		LV_Delete()
+		
+		for ignore, translation in this.iItemsList
+			LV_Add("", translation[1], translation[2])
+		
+		LV_ModifyCol()
+		LV_ModifyCol(1, 150)
+		
+		if (this.iLanguageCode = "EN")
+			LV_ModifyCol(2, 300)
+	}
+	
+	updateState() {
+		base.updateState()
+	}
+	
+	loadEditor(item) {
+		originalTextEdit := item[1]
+		translationTextEdit := item[2]
+		
+		GuiControl Text, originalTextEdit, %originalTextEdit%
+		GuiControl Text, translationTextEdit, %translationTextEdit%
+	}
+	
+	clearEditor() {
+		originalTextEdit := ""
+		translationTextEdit := ""
+		
+		GuiControl Text, originalTextEdit, %originalTextEdit%
+		GuiControl Text, translationTextEdit, %translationTextEdit%
+	}
+	
+	buildItemFromEditor(isNew := false) {
+		GuiControlGet originalTextEdit
+		GuiControlGet translationTextEdit
+		
+		return Array(originalTextEdit, translationTextEdit)
+	}
+	
+	openEditor(itemIndex) {
+		if (this.iCurrentItemIndex != 0)
+			this.updateItem()
+			
+		this.selectItem(itemIndex)
+			
+		base.openEditor(itemIndex)
+	}
+	
+	newTranslations() {
+		this.loadTranslations("EN")
+	}
+	
+	loadTranslations(languageCode) {
+		this.iLanguageCode := languageCode
+		
+		this.iItemsList := []
+		
+		for original, translation in readTranslations(this.iLanguageCode)
+			this.iItemsList.Push(Array(original, translation))
+			
+		this.loadList(this.iItemsList)
+		this.clearEditor()
+	}
+	
+	saveTranslations() {
+		if (this.iCurrentItemIndex != 0)
+			this.updateItem()
+			
+		translations := {}
+		
+		GuiControlGet isoCodeEdit
+		GuiControlGet languageNameEdit
+		
+		this.iLanguageCode := isoCodeEdit
+		
+		for ignore, item in this.iItemsList
+			translations[item[1]] := item[2]
+		
+		writeTranslations(isoCodeEdit, languageNameEdit, translations)
+	}
 }
 
 ;;;-------------------------------------------------------------------------;;;

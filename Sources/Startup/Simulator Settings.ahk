@@ -44,7 +44,7 @@ ListLines Off					; Disable execution history
 showSettingsEditor() {
 	Menu Tray, Icon, % kIconsDirectory . "Settings.ico", , 1
 	
-	settings := readConfiguration(kControllerSettingsFile)
+	settings := readConfiguration(kSimulatorSettingsFile)
 	
 	if (editSettings(settings) == kSave)
 		writeConfiguration(kSimulatorSettingsFile, settings)

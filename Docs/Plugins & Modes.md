@@ -42,7 +42,7 @@ To get the most out of this plugin in the sample configuration presented below, 
 
 This mode, which is only available, when *SimHub* is runnning, will let you control the pedal vibration effects. In the default configuration, engaged traction control will vibrate the accelerator pedal and the brake pedal will vibrate, when ABS kicks in. This configuration may look like this:
 
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%203.JPG)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%202.JPG)
 
 You can increase or decrease the "TC" and "ABS" intensity using the buttons and control the overall vibration intensity using the dial knob. But it may have been configured completely differently. This concrete configuration is the result of the following plugin arguments, which will be described later:
 
@@ -55,7 +55,7 @@ Since this is completely controlled by the configuration and the profiles you ha
 
 The second mode, which is quite similar to the mode "Pedal Vibration" lets you control all the chassis vibration effects. Here are four effects part of the sample configuration, "RPMS", "GearShift", "WheelsLock" and "WheelsSlip". All these effect may be distributed to the front and the rear with different intensities and effect causes (for example "WheelsSlip" can differentiate between over- and understeer slip amount) according to the profile used in *SimHub*.
 
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%204.JPG)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%203.JPG)
 
 You will achieve this controller configuration with the following plugin arguments:
 
@@ -104,7 +104,7 @@ The details of the parameter "motion" will be described below, but as you can se
 
 The plugin defines a single mode to control all motion effects of your simulation rig. This mode is only available, when the motion actuators have been activated. You can enable or disable individual effects and control their intensities. Since there might be quite a lot of individual effects, many more than possibly available dial knobs on your controller this mode provides a selector, with which you can choose an effect to be controlled by the one and only dial.
 
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%205.JPG)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%204.JPG)
 
 Using the buttons, you can enable or disable the individual effects, but if you press the "Effect Selector" button, before pressing one of the effect buttons, you will chose this effect to be controlled by the dial in the lower right corner of the controller. All this will be achieved using the following plugin argument:
 
@@ -141,6 +141,8 @@ Note: To supply the labels, that will be displayed for all these effects and tri
 ## Plugin *ACC*
 
 This plugin handles the *Assetto Corsa Competizione* simulation game. It defines the mode "Drive", which binds all the configured chat messages to buttons on your controller hardware. This plugin needs an application with the name "Assetto Corsa Competizione" to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startACC", "stopACC" and "isACCRunning" as special function hooks in this configuration.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%205.JPG)
 
 ## Plugin *AC*
 

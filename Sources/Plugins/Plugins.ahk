@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Plugins Include Sequence        ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2020) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2021) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 #Include ..\Plugins\ButtonBox Plugin.ahk				; Optional, but must be always first, so that ..\Plugins can adopt to the button box layout

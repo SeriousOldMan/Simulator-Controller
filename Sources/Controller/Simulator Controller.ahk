@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Simulator  Controller           ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2020) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2021) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -648,7 +648,7 @@ class SimulatorController extends ConfigurationItem {
 		else if (this.iShowLogo && !this.iLogoIsVisible) {
 			static videoPlayer
 	
-			info := kVersion . " - 2020, Oliver Juwig`nCreative Commons - BY-NC-SA"
+			info := kVersion . " - 2021, Oliver Juwig`nCreative Commons - BY-NC-SA"
 			logo := this.getLogo()
 			image := "1:" . logo
 

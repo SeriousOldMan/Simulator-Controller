@@ -1,4 +1,4 @@
-## 1.4.4-release, 01/01/20...
+## 1.4.4-release, 01/01/21
 
   1. Bugfixes, as always
   2. Documentation updates, as always

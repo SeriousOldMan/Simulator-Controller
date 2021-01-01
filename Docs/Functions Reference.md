@@ -112,19 +112,19 @@ Sorts the given array in place, using *comparator* to define the order of the el
 A simple translation support is built into Simulator Controller. Every text, that appears in the different screens and system messages may translated to a different language than standard English. To support this, a single tranlation file (see the [translation file](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Templates/Translations.de) for German for an example) must exist for each target language in one of the *Config* folders.
 
 #### *availableLanguages()*
-Returns a map, where the key defines the ISO language code and the value the language name (example: *{en: English, de: Deutsch}*. The map is populated with all available translations.
+Returns a map, where the key defines the [ISO language code](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) and the value the language name (example: *{en: English, de: Deutsch}*. The map is populated with all available translations.
 
 #### *readTranslations(languageCode :: String)*
-Returns a translation map for the given ISO language code. Keys are the original texts in English with the translated texts as their values. Normally, it is much more convinient to use the *translate* function below.
+Returns a translation map for the given [ISO language code](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes). Keys are the original texts in English with the translated texts as their values. Normally, it is much more convinient to use the *translate* function below.
 
 #### *writeTranslations(languageCode :: String, languageName :: String, translations :: Map)*
-Saves a translation map for the given ISO language code and language name. The format of the *translations* map must be according to the description in *readTranslations*. The translation map is stored in a file named "Translations.LC", where LC is the given ISO language code, in the folder identified by *kUserConfigDirectory*.
+Saves a translation map for the given [ISO language code](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) and language name. The format of the *translations* map must be according to the description in *readTranslations*. The translation map is stored in the folder identified by *kUserConfigDirectory* in a file named "Translations.LC", where LC is the given ISO language code.
 
 #### *setLanguage(languageCode :: String)*
-The ISO language code for the target language, for example "de" for German.
+The [ISO language code](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) for the target language, for example "de" for German.
 
 #### *getLanguage()*
-Returns the ISO language code for the active language.
+Returns the [ISO language code](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) for the active language.
 
 #### *translate(string :: String)*
 *string* is a text in English. *translate* reads the translations for the current target language and returns the translated text, or *string* itself, if no translation can be found.

@@ -23,7 +23,7 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-[1.4.2-beta](https://www.dropbox.com/s/gq0zlvrcq70jm14/Simulator%20Controller%201.4.2-beta.zip?dl=1) (First release candidate for the [upcoming 1.4 release](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes))
+[1.4.3-rc](https://www.dropbox.com/s/rb648uc43yypwga/Simulator%20Controller%201.4.3-rc.zip?dl=1) (Final release candidate for the [upcoming 1.4 release](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes))
 
 #### Latest stable builds
 
@@ -104,6 +104,7 @@ The markdown files, the so to say source code of this Wiki can be found in the [
 
 1. [Fixed] Sometimes, the ingame sound volume is not correctly resetted after playing the startup melody. In those situations, you can use the mixer utility of Windows to bring the volume back up.
 2. [Gone] Connection between the "Motion Feedback" plugin and *SimFeedback* has stabilty issues. Looks like the root cause is located in the *SFX-100-Streamdeck* extension.
+3. The language drop down in the configuration tool does not adopt to changed languages, after the translation editor has been used.
 
 ### Development
 
@@ -117,12 +118,12 @@ Want to contribute? Great!
 
 ### To Do
 
-  Nothing critical for the moment, just relaxing and preparing for the 12h of Bathurst.
+Nothing critical for the moment, just relaxing and preparing for the 12h of Bathurst.
   
-  But there are a lot of ideas in the [backlog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Backlog) for Simulator Controller. Stay tuned...
+But the development of Simulator Controller still goes on with one release every week. There are a lot of ideas in the [backlog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Backlog)...
 
 ### License
 
 This software is provided as is. You are free to use it for any purpose and modify it to your needs, as long as you do not use it for any commercial purposes.
 
-(2020) Creative Commons - BY-NC-SA - by Oliver Juwig (TheBigO)
+(2021) Creative Commons - BY-NC-SA - by Oliver Juwig (TheBigO)

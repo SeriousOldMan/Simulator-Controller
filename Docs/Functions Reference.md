@@ -114,11 +114,17 @@ A simple translation support is built into Simulator Controller. Every text, tha
 #### *availableLanguages()*
 Returns a map, where the key defines the ISO language code and the value the language name (example: *{en: English, de: Deutsch}*. The map is populated with all available translations.
 
-#### *setLanguage(language :: String)*
+#### *readTranslations(languageCode :: String)*
+Returns a translation map for the given ISO language code. Keys are the original texts in English with the translated texts as their values. Normally, it is much more convinient to use the *translate* function below.
+
+#### *writeTranslations(languageCode :: String, languageName :: String, translations :: Map)*
+Saves a translation map for the given ISO language code and language name. The format of the *translations* map must be according to the description in *readTranslations*. The translation map is stored in a file named "Translations.LC", where LC is the given ISO language code, in the folder identified by *kUserConfigDirectory*.
+
+#### *setLanguage(languageCode :: String)*
 The ISO language code for the target language, for example "de" for German.
 
 #### *getLanguage()*
-Returns the language code for the active language.
+Returns the ISO language code for the active language.
 
 #### *translate(string :: String)*
 *string* is a text in English. *translate* reads the translations for the current target language and returns the translated text, or *string* itself, if no translation can be found.

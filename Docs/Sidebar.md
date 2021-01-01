@@ -15,6 +15,7 @@
     - [Launchpad](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-launchpad)
     - [Chat](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-chat)
   - [Themes Editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#themes-editor)
+  - [Translations Editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#translations-editor)
 
 [Using Simulator Controller](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller)
 ------

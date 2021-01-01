@@ -2318,14 +2318,14 @@ class TranslationsEditor extends ConfigurationItem {
 			}
 		}
 			
-		Gui TE:Add, Text, x16 w86 h23 +0x200, % translate("Language")
+		Gui TE:Add, Text, x16 w160 h23 +0x200, % translate("Language")
 		Gui TE:Add, DropDownList, x184 yp w158 Choose%chosen% VtranslationLanguageDropDown gchooseTranslationLanguage, % values2String("|", choices*)
 		Gui TE:Add, Button, x343 yp-1 w23 h23 HwndaddLanguageButtonHandle VaddLanguageButton gaddLanguage
 		Gui TE:Add, Button, x368 yp w23 h23 HwnddeleteLanguageButtonHandle VdeleteLanguageButton gdeleteLanguage
 		setButtonIcon(addLanguageButtonHandle, kIconsDirectory . "Plus.ico", 1)
 		setButtonIcon(deleteLanguageButtonHandle, kIconsDirectory . "Minus.ico", 1)
 		
-		Gui TE:Add, Text, x16 w86 h23 +0x200, % translate("ISO Code / Name")
+		Gui TE:Add, Text, x16 w160 h23 +0x200, % translate("ISO Code / Identifier")
 		Gui TE:Add, Edit, x184 yp w40 h21 Disabled VisoCodeEdit, %isoCodeEdit%
 		Gui TE:Add, Edit, x236 yp w155 h21 Disabled VlanguageNameEdit, %languageNameEdit%
 	

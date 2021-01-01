@@ -571,21 +571,32 @@ class GeneralTab extends ConfigurationItemTab {
 		ConfigurationEditor.Instance.hide()
 		
 		if (new TranslationsEditor(this.Configuration)).editTranslations() {
+			ConfigurationEditor.Instance.show()
+			
 			choices := []
 			chosen := 0
+			enIndex := 1
 			
-			for ignore, language in availableLanguages() {
+			for code, language in availableLanguages() {
 				choices.Push(language)
 				
 				if (language == languageDropDown)
 					chosen := A_Index
-			}
 				
+				if (code = "EN")
+					enIndex := A_Index
+			}
+			
+			if (chosen == 0) {
+				chosen := enIndex
+				languageDropDown := "English"
+			}
+			
 			GuiControl, , languageDropDown, % "|" . values2String("|", choices*)
 			GuiControl Choose, languageDropDown, %chosen%
 		}
-		
-		ConfigurationEditor.Instance.show()
+		else
+			ConfigurationEditor.Instance.show()
 	}
 	
 	openThemesEditor() {
@@ -2296,23 +2307,27 @@ class TranslationsEditor extends ConfigurationItem {
 		choices := []
 		chosen := 0
 		
-		for ignore, language in availableLanguages() {
+		for code, language in availableLanguages() {
 			choices.Push(language)
 			
-			if (language == languageDropDown)
+			if (language == languageDropDown) {
 				chosen := A_Index
+				
+				isoCodeEdit := code
+				languageNameEdit := language
+			}
 		}
 			
 		Gui TE:Add, Text, x16 w86 h23 +0x200, % translate("Language")
-		Gui TE:Add, DropDownList, x184 yp w158 Choose%chosen% VtranslationLanguageDropDown, % values2String("|", choices*)
+		Gui TE:Add, DropDownList, x184 yp w158 Choose%chosen% VtranslationLanguageDropDown gchooseTranslationLanguage, % values2String("|", choices*)
 		Gui TE:Add, Button, x343 yp-1 w23 h23 HwndaddLanguageButtonHandle VaddLanguageButton gaddLanguage
 		Gui TE:Add, Button, x368 yp w23 h23 HwnddeleteLanguageButtonHandle VdeleteLanguageButton gdeleteLanguage
 		setButtonIcon(addLanguageButtonHandle, kIconsDirectory . "Plus.ico", 1)
 		setButtonIcon(deleteLanguageButtonHandle, kIconsDirectory . "Minus.ico", 1)
 		
 		Gui TE:Add, Text, x16 w86 h23 +0x200, % translate("ISO Code / Name")
-		Gui TE:Add, Edit, x184 yp w40 h21 VisoCodeEdit, %isoCodeEdit%
-		Gui TE:Add, Edit, x236 yp w155 h21 VlanguageNameEdit, %languageNameEdit%
+		Gui TE:Add, Edit, x184 yp w40 h21 Disabled VisoCodeEdit, %isoCodeEdit%
+		Gui TE:Add, Edit, x236 yp w155 h21 Disabled VlanguageNameEdit, %languageNameEdit%
 	
 		this.iTranslationsList := new TranslationsList(configuration)
 		
@@ -2340,30 +2355,62 @@ class TranslationsEditor extends ConfigurationItem {
 		}
 	}
 	
+	saveTranslations() {
+		if this.iTranslationsList.saveTranslations() {
+			GuiControlGet isoCodeEdit
+			GuiControlGet languageNameEdit
+			
+			choices := []
+			chosen := 0
+			found := false
+			
+			for code, language in availableLanguages() {
+				choices.Push(language)
+				
+				if (code = isoCodeEdit) {
+					chosen := A_Index
+					found := true
+				}
+			}
+			
+			if !found {
+				choices.Push(languageNameEdit)
+				chosen := choices.Length()
+			}
+			
+			GuiControl, , translationLanguageDropDown, % "|" . values2String("|", choices*)
+			GuiControl Choose, translationLanguageDropDown, % chosen
+		}
+	}
+	
 	closeEditor() {
-		this.iTranslationsList.saveTranslations()
+		this.saveTranslations()
 		
 		this.iClosed := true
 	}
 	
 	addLanguage() {
 		this.iLanguagesChanged := true
-		this.iTranslationsList.saveTranslations()
+		this.saveTranslations()
 		
 		choices := []
-		chosen := 0
 		
-		for ignore, language in availableLanguages() {
+		for ignore, language in availableLanguages()
 			choices.Push(language)
-			
-			if (language == languageDropDown)
-				chosen := A_Index
-		}
 		
-		choices.Push(translate("New Language"))
+		isoCodeEdit := "XX"
+		languageNameEdit := translate("New Language")
+		
+		choices.Push(languageNameEdit)
 			
 		GuiControl, , translationLanguageDropDown, % "|" . values2String("|", choices*)
 		GuiControl Choose, translationLanguageDropDown, % choices.Length()
+		
+		GuiControl Text, isoCodeEdit, %isoCodeEdit%
+		GuiControl Text, languageNameEdit, %languageNameEdit%
+		
+		GuiControl Enable, isoCodeEdit
+		GuiControl Enable, languageNameEdit
 		
 		this.iTranslationsList.newTranslations()
 	}
@@ -2383,18 +2430,58 @@ class TranslationsEditor extends ConfigurationItem {
 			this.iLanguagesChanged := true
 			
 			languageCode := kUndefined
-			
+
 			for code, language in availableLanguages()
-				if ((language = translationLanguageDropDown) && (code != "EN")) {
+				if ((language = translationLanguageDropDown) && (code != "EN"))
+					languageCode := code
+			
+			if (languageCode != kUndefined)
+				for ignore, fileName in getFileNames("Translations." . languageCode, kUserConfigDirectory, kConfigDirectory)
+					FileDelete %fileName%
+			
+			this.chooseLanguage("EN")
+		}
+	}
+	
+	chooseLanguage(languageCode := false) {
+		this.iTranslationsList.saveTranslations()
+		
+		availableLanguages := availableLanguages()
+		
+		if !languageCode {
+			GuiControlGet translationLanguageDropDown
+			
+			for code, language in availableLanguages
+				if (language = translationLanguageDropDown) {
 					languageCode := code
 					
 					break
 				}
-			
-			if (languageCode != kUndefined)
-				for ignore, fileName in getFileNames("Translations." . languageCode, kUserConfigDirectory, kConfigDirectory)
-					FileDelete fileName
 		}
+	
+		choices := []
+		
+		for code, language in availableLanguages {
+			choices.Push(language)
+		
+			if (code = languageCode) {
+				isoCodeEdit := code
+				languageNameEdit := language
+		
+				chosen := A_Index
+			}
+		}
+				
+		GuiControl, , translationLanguageDropDown, % "|" . values2String("|", choices*)
+		GuiControl Choose, translationLanguageDropDown, %chosen%
+		
+		GuiControl Text, isoCodeEdit, %isoCodeEdit%
+		GuiControl Text, languageNameEdit, %languageNameEdit%
+		
+		GuiControl Disable, isoCodeEdit
+		GuiControl Disable, languageNameEdit
+		
+		this.iTranslationsList.loadTranslations(isoCodeEdit)
 	}
 }
 
@@ -2414,6 +2501,10 @@ moveTranslationsEditor() {
 	moveByMouse("TE")
 }
 
+chooseTranslationLanguage() {
+	TranslationsEditor.Instance.chooseLanguage()
+}
+
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; TranslationsList                                                        ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -2424,6 +2515,7 @@ global originalTextEdit = ""
 global translationTextEdit = ""
 		
 class TranslationsList extends ConfigurationItemList {
+	iChanged := false
 	iLanguageCode := ""
 	
 	__New(configuration) {
@@ -2484,6 +2576,11 @@ class TranslationsList extends ConfigurationItemList {
 		GuiControlGet originalTextEdit
 		GuiControlGet translationTextEdit
 		
+		if isNew
+			this.iChanged := true
+		else
+			this.iChanged := this.iChanged || (this.iItemsList[this.iCurrentItemIndex][2] != translationTextEdit)
+		
 		return Array(originalTextEdit, translationTextEdit)
 	}
 	
@@ -2498,6 +2595,8 @@ class TranslationsList extends ConfigurationItemList {
 	
 	newTranslations() {
 		this.loadTranslations("EN")
+		
+		this.iChanged := true
 	}
 	
 	loadTranslations(languageCode) {
@@ -2510,23 +2609,44 @@ class TranslationsList extends ConfigurationItemList {
 			
 		this.loadList(this.iItemsList)
 		this.clearEditor()
+		
+		this.iCurrentItemIndex := 0
+		this.iChanged := false
 	}
 	
 	saveTranslations() {
 		if (this.iCurrentItemIndex != 0)
 			this.updateItem()
-			
-		translations := {}
+
+		if (this.iChanged) {
+			SoundPlay *32
 		
-		GuiControlGet isoCodeEdit
-		GuiControlGet languageNameEdit
+			OnMessage(0x44, "translateMsgBoxButtons")
+			title := translate("Save")
+			MsgBox 262436, %title%, % translate("Do you want to save your changes? Any existing translations will be overwritten.")
+			OnMessage(0x44, "")
+
+			IfMsgBox Yes
+			{
+				this.iChanged := false
+				
+				translations := {}
+				
+				GuiControlGet isoCodeEdit
+				GuiControlGet languageNameEdit
+				
+				this.iLanguageCode := isoCodeEdit
+				
+				for ignore, item in this.iItemsList
+					translations[item[1]] := item[2]
+				
+				writeTranslations(isoCodeEdit, languageNameEdit, translations)
+				
+				return true
+			}
+		}
 		
-		this.iLanguageCode := isoCodeEdit
-		
-		for ignore, item in this.iItemsList
-			translations[item[1]] := item[2]
-		
-		writeTranslations(isoCodeEdit, languageNameEdit, translations)
+		return false
 	}
 }
 

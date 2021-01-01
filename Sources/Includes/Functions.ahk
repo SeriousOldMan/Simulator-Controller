@@ -531,7 +531,7 @@ readTranslations(targetLanguageCode) {
 writeTranslations(languageCode, languageName, translations) {
 	fileName := kUserConfigDirectory . "Translations." . languageCode
 	
-	FileDelete fileName
+	FileDelete %fileName%
 	
 	curEncoding := A_FileEncoding
 	

@@ -14,4 +14,5 @@
 #### General
   1. [Target: V1.4] Full Unicode translation support
   2. Plugin support for the configuration tool
-  3. Visual translation tool
+  3. [Target: V1.4] Visual translation tool
+  4. Better UX flow in all lists in the configuration tool

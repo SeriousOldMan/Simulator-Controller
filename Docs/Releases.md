@@ -3,7 +3,7 @@
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. Unicode based translation support. German translation will be bundled - other languages can be easily added
-     - including a graphical tool for tranlation editing
+     - including a graphical tool for translation editing
   4. Updated photorealistic elements for Button Box
   5. All settings dialogs may be moved around by clicking in the main title
   6. All current effect settings will be displayed alternately with effect name in Button Box visual representation

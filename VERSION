@@ -1,5 +1,5 @@
 [Version]
 Current=1.4.3-rc
 Target=1.4-stable
-Changes=Unicode localization support, Translation Editor, Effect settings display, Multiple screen support, Renames & Refactorings
+Changes=Unicode localization support, Translation Editor, Effect settings display on the Button Box, Multiple screen support, Renames & Refactorings
 Date=01/01/2021

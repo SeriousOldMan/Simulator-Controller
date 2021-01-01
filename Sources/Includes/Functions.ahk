@@ -561,7 +561,13 @@ translate(string) {
 			translations := readTranslations(currentLanguageCode)
 		}
 		
-		return (translations.HasKey(string) ? translations[string] : string)
+		if translations.HasKey(string) {
+			translation := translations[string]
+			
+			return ((translation != "") ? translation : string)
+		}
+		else
+			return string
 	}
 	else
 		return string

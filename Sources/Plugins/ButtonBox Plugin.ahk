@@ -34,7 +34,7 @@ class SimpleButtonBox extends ButtonBox {
 		Gui SBB:Add, Picture, x-10 y-10, % kButtonBoxImagesDirectory . "Photorealistic\CF Background.png"
 		
 		Gui SBB:Font, s12 Bold cSilver
-		Gui SBB:Add, Text, x40 y8 w457 h23 +0x200 +0x1 BackgroundTrans, Modular Simulator Controller System
+		Gui SBB:Add, Text, x40 y8 w457 h23 +0x200 +0x1 BackgroundTrans, % translate("Modular Simulator Controller System")
 		Gui SBB:Font, s10 cSilver
 		Gui SBB:Add, Text, x40 y28 w457 h23 +0x200 +0x1 BackgroundTrans, Button Box
 		Gui SBB:Color, 0x000000

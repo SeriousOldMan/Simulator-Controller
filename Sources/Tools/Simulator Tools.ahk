@@ -224,7 +224,7 @@ editTargets(command := "") {
 	
 		Gui TE:Font, Bold, Arial
 		
-		Gui TE:Add, Text, w220 Center gmoveEditor, Modular Simulator Controller System 
+		Gui TE:Add, Text, w220 Center gmoveEditor, % translate("Modular Simulator Controller System") 
 		
 		Gui TE:Font, Norm, Arial
 		Gui TE:Font, Italic, Arial

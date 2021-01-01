@@ -657,9 +657,11 @@ class SimulatorController extends ConfigurationItem {
 			x := mainScreenRight - 229
 			y := mainScreenBottom - 259
 		
-			SplashImage %image%, B FS8 CWD0D0D0 w229 x%x% y%y% ZH180 ZW209, %info%, Modular Simulator`nController System
+			title1 := translate("Modular Simulator")
+			title2 := translate("Controller System")
+			SplashImage %image%, B FS8 CWD0D0D0 w229 x%x% y%y% ZH180 ZW209, %info%, %title1%`n%title2%
 	
-			WinSet Transparent, 192, , Creative Commons - BY-NC-SA
+			WinSet Transparent, 192, , % translate("Creative Commons - BY-NC-SA")
 		
 			Gui Logo:-Border -Caption 
 			Gui Logo:Add, ActiveX, x0 y0 w209 h180 VvideoPlayer, shell explorer
@@ -792,7 +794,9 @@ class ControllerFunction {
 				catch exception {
 					logMessage(kLogCritical, translate("Error while registering hotkey ") . theHotkey . translate(" - please check the configuration"))
 		
-					SplashTextOn 800, 60, Modular Simulator Controller System, % substituteVariables(translate("Cannot register hotkey %theHotkey% - please check the configuration..."), {theHotKey: theHotKey})
+					title := translate("Modular Simulator Controller System")
+					
+					SplashTextOn 800, 60, %title%, % substituteVariables(translate("Cannot register hotkey %theHotkey% - please check the configuration..."), {theHotKey: theHotKey})
 							
 					Sleep 5000
 								

@@ -1,6 +1,8 @@
 [Locale]
 DE=>Deutsch
 [General]
+Modular Simulator Controller System=>Modulare Simulator Steuerung
+%kVersion% - 2021, Oliver Juwig, Creative Commons - BY-NC-SA=>%kVersion% - 2021, Oliver Juwig, Creative Commons - BY-NC-SA
 Yes=>Ja
 No=>Nein
 Always=>Immer
@@ -59,6 +61,9 @@ Error while starting application =>Fehler beim Versuch, die Anwendung
  - please check the configuration=> - Bitte überprüfen Sie die Konfiguration
 Cannot start %application% (%exePath%) - please check the configuration...=>Die Anwendung %application% (%exePath%) kann nicht gestartet werden - Bitte überprüfen Sie die Konfiguration...
 [Simulator Controller]
+Modular Simulator=>Modulare Simulator
+Controller System=>Steuerung
+Creative Commons - BY-NC-SA=>Creative Commons - BY-NC-SA
 Controller layout initialized:=>Steuerungs Funktionen initialisiert:
 1-Way Toggles=>1-Wege Schalter
 2-Way Toggles=>2-Wege Schalter
@@ -107,7 +112,7 @@ Launch=>Start
 Start: =>Start: 
 Stop: =>Stop: 
 Mode Selector=>Modus Wahl
-Modular Simulator Controller System - Controller (Plugin: System)=>Modular Simulator Controller System - Steuerung (Erweiterung: System)
+Modular Simulator Controller System - Controller (Plugin: System)=>Modulare Simulator Steuerung - Steuerung (Erweiterung: System)
 Cannot start NirCmd (%kNirCmd%) - please check the configuration...=>NirCmd (%kNirCmd%) kann nicht gestartet werden - Bitte überprüfen Sie die Konfiguration...
 [ACC Plugin]
 Drive=>Fahren
@@ -176,7 +181,7 @@ Building =>Erzeuge
 Cannot compile =>Übersetzung von 
  - source file or AHK Compiler (=> nicht möglich - Source Datei oder AHK Compiler (
 ) not found=>) nicht gefunden
-Modular Simulator Controller System - Compiler=>Modular Simulator Controller System - Übersetzer
+Modular Simulator Controller System - Compiler=>Modulare Simulator Steuerung - Übersetzer
 Cannot compile %targetSource%: Source file or AHK Compiler (%kCompiler%) not found...=>%targetSource% kann nicht übersetzt werden: Datei oder AHK Compiler (%kCompiler%) nicht gefunden...
 Build Targets=>Ziele
 Preparing Targets=>Bestimme Ziele
@@ -195,7 +200,7 @@ Simulator Controller=>Simulator Steuerung
 Cannot start Simulator Controller (=>Die Simulator Steuerung (
 ) - please rebuild the applications in the binaries folder (=>) kann nicht gestartet werden - Bitte überprüfen Sie die Programme im Binaries Verzeichnis (
 )=>)
-Modular Simulator Controller System - Startup=>Modular Simulator Controller System - Startsequenz
+Modular Simulator Controller System - Startup=>Modulare Simulator Steuerung - Startsequenz
 Cannot start Simulator Controller (%kBinariesDirectory%Simulator Controller.exe) - please rebuild the applications...=>Die Simulator Steuerung (%kBinariesDirectory%Simulator Controller.exe)kann nicht gestartet werden - Bitte überprüfen Sie die Programme im Binaries Verzeichnis...
 Starting component =>Starte Komponente 
 Start: =>Start: 

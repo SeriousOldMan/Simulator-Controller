@@ -561,7 +561,9 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		catch exception {
 			logMessage(kLogCritical, "Error while connecting to SimFeedback (" . kSimFeedbackConnector . "): " . exception.Message . " - please check the configuration")
 			
-			SplashTextOn 800, 60, Modular Simulator Controller System, % substituteVariables(translate("Cannot connect to SimFeedback (%kSimFeedbackConnector%) - please check the configuration..."))
+			title := translate("Modular Simulator Controller System")
+			
+			SplashTextOn 800, 60, %title%, % substituteVariables(translate("Cannot connect to SimFeedback (%kSimFeedbackConnector%) - please check the configuration..."))
 					
 			Sleep 5000
 						

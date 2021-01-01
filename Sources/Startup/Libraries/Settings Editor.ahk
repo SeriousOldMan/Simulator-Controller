@@ -212,7 +212,7 @@ restart:
 	
 		Gui CE:Font, Bold, Arial
 	
-		Gui CE:Add, Text, w220 Center gmoveEditor, Modular Simulator Controller System 
+		Gui CE:Add, Text, w220 Center gmoveEditor, % translate("Modular Simulator Controller System") 
 		
 		Gui CE:Font, Norm, Arial
 		Gui CE:Font, Italic, Arial

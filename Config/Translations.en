@@ -1,6 +1,8 @@
 [Locale]
 EN=>English
 [General]
+Modular Simulator Controller System=>
+%kVersion% - 2021, Oliver Juwig, Creative Commons - BY-NC-SA=>
 Yes=>
 No=>
 Always=>
@@ -59,6 +61,9 @@ Error while starting application =>
  - please check the configuration=>
 Cannot start %application% (%exePath%) - please check the configuration...=>
 [Simulator Controller]
+Modular Simulator=>
+Controller System=>
+Creative Commons - BY-NC-SA=>
 Controller layout initialized:=>
 1-Way Toggles=>
 2-Way Toggles=>

@@ -307,7 +307,7 @@ class ConfigurationEditor extends ConfigurationItem {
 
 		Gui SE:Font, Bold, Arial
 
-		Gui SE:Add, Text, w398 Center gmoveConfigurationEditor, Modular Simulator Controller System 
+		Gui SE:Add, Text, w398 Center gmoveConfigurationEditor, % translate("Modular Simulator Controller System") 
 		
 		Gui SE:Font, Norm, Arial
 		Gui SE:Font, Italic, Arial
@@ -445,13 +445,20 @@ class GeneralTab extends ConfigurationItemTab {
 		
 		choices := []
 		chosen := 0
+		enIndex := 0
 		
-		for ignore, language in availableLanguages() {
+		for code, language in availableLanguages() {
 			choices.Push(language)
 			
 			if (language == languageDropDown)
 				chosen := A_Index
+				
+			if (code = "EN")
+				enIndex := A_Index
 		}
+		
+		if (chosen == 0)
+			chosen := enIndex
 			
 		Gui SE:Add, Text, x24 y176 w86 h23 +0x200, % translate("Language")
 		Gui SE:Add, DropDownList, x184 y176 w174 Choose%chosen% VlanguageDropDown, % values2String("|", choices*)
@@ -1733,7 +1740,7 @@ class ThemesEditor extends ConfigurationItem {
 
 		Gui TE:Font, Bold, Arial
 
-		Gui TE:Add, Text, w388 Center gmoveThemesEditor, Modular Simulator Controller System 
+		Gui TE:Add, Text, w388 Center gmoveThemesEditor, % translate("Modular Simulator Controller System") 
 		
 		Gui TE:Font, Norm, Arial
 		Gui TE:Font, Italic, Arial
@@ -2293,7 +2300,7 @@ class TranslationsEditor extends ConfigurationItem {
 
 		Gui TE:Font, Bold, Arial
 
-		Gui TE:Add, Text, w388 Center gmoveTranslationsEditor, Modular Simulator Controller System 
+		Gui TE:Add, Text, w388 Center gmoveTranslationsEditor, % translate("Modular Simulator Controller System") 
 		
 		Gui TE:Font, Norm, Arial
 		Gui TE:Font, Italic, Arial

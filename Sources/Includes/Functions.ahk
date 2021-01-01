@@ -283,8 +283,8 @@ showSplash(image, alwaysOnTop := true) {
 	if !alwaysOnTop
 		options := "A " . options
 	
-	title := substituteVariables(getConfigurationValue(kSimulatorConfiguration, "Splash Window", "Title", ""))
-	subtitle := substituteVariables(getConfigurationValue(kSimulatorConfiguration, "Splash Window", "Subtitle", ""))
+	title := substituteVariables(translate(getConfigurationValue(kSimulatorConfiguration, "Splash Window", "Title", "")))
+	subtitle := substituteVariables(translate(getConfigurationValue(kSimulatorConfiguration, "Splash Window", "Subtitle", "")))
 	
 	SplashImage %image%, %options%, %subtitle%, %title%
 	
@@ -946,9 +946,10 @@ removeConfigurationValue(configuration, section, key) {
 setDebug(debug) {
 	vDebug := debug
 	
-	state := debug ? translate("Enabled") : translate("Disabled")
+	title := translate("Modular Simulator Controller System")
+	state := (debug ? translate("Enabled") : translate("Disabled"))
 	
-	TrayTip Modular Simulator Controller System, Debug: %state%
+	TrayTip %title%, Debug: %state%
 }
 
 setLogLevel(level) {
@@ -978,7 +979,9 @@ setLogLevel(level) {
 			state := translate("Off")
 	}
 
-	TrayTip Modular Simulator Controller System, % translate("Log Level: ") . %state%
+	title := translate("Modular Simulator Controller System")
+	
+	TrayTip %title%, % translate("Log Level: ") . %state%
 }
 
 increaseLogLevel() {

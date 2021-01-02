@@ -2567,6 +2567,9 @@ class TranslationsList extends ConfigurationItemList {
 		originalTextEdit := item[1]
 		translationTextEdit := item[2]
 		
+		if (translationTextEdit == "")
+			translationTextEdit := originalTextEdit
+		
 		GuiControl Text, originalTextEdit, %originalTextEdit%
 		GuiControl Text, translationTextEdit, %translationTextEdit%
 	}

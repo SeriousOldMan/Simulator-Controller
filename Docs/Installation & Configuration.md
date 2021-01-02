@@ -170,4 +170,6 @@ Another special editor is used for maintaining different language translations. 
 
 With the drop down menu at the top of the window you can choose any of the available languages and edit the defined translations, or you create a new language by pressing the '+' button next to the language drop down. Last but not least, you can delete a given language and all its translations, but be aware, that this cannot be undone.
 
+Note: The original text sometimes has leading and/or trailing spaces. Be sure to include them in the translated text as well, since they are important for formatting.
+
 Important: The ISO language code and the language name itself cannot be changed, once a new language has been initially saved. So choose them wisely.

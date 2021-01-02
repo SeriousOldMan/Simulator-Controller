@@ -18,7 +18,64 @@ global kDriveMode = "Drive"
 ;;;-------------------------------------------------------------------------;;;
 
 class ACCPlugin extends ControllerPlugin {
+	iACCManager := false
 	iDriveMode := false
+	
+	class ACCManager {
+		iChangeTires := false
+		iChangeBreaks := false
+		
+		__New(plugin) {
+			this.iPlugin := plugin
+			
+			base.__New()
+		}
+		
+		openPitStop() {
+		}
+		
+		closePitStop() {
+		}
+		
+		toggleActivity(activity) {
+			switch activity {
+				case "Refuel":
+				case "Tires":
+				case "Brakes":
+				case "Bodywork":
+				case "Suspension":
+				default:
+					Throw "Unsupported activity """ . activity . """ detected in PitStopManager.toggleActivity..."
+			}
+		}
+
+		changeStrategy(direction, steps := 1) {
+		}
+
+		changeFuelAmount(direction, liters := 5) {
+		}
+
+		changeTirePressure(tire, direction, increments := 1) {
+			switch tire {
+				case "Front Left":
+				case "Front Right":
+				case "Rear Left":
+				case "Rear Right":
+				default:
+					Throw "Unsupported tire position """ . tire . """ detected in PitStopManager.changeTirePressure..."
+			}
+			
+			switch direction {
+				case "Increase":
+				case "Decrease":
+				default:
+					Throw "Unsupported pressure change """ . direction . """ detected in PitStopManager.changeTirePressure..."
+			}
+		}
+
+		changeBrakeType(direction) {
+		}
+	}
 	
 	class DriveMode extends ControllerMode {
 		Mode[] {
@@ -51,6 +108,12 @@ class ACCPlugin extends ControllerPlugin {
 			Send %message%
 			Sleep 100
 			Send {Enter}
+		}
+	}
+	
+	Manager[] {
+		Get {
+			return this.getACCManager()
 		}
 	}
 	
@@ -91,6 +154,10 @@ class ACCPlugin extends ControllerPlugin {
 				logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in plugin ") . this.Plugin . translate(" - please check the configuration"))
 		}
 	}
+	
+	getACCManager() {
+		return (this.iACCManager ? this.iACCManager : (this.iACCManager := new this.ACCManager(this)))
+	}
 }
 
 
@@ -120,6 +187,52 @@ isACCRunning() {
 	Process Exist, acc.exe
 	
 	return (ErrorLevel != 0)
+}
+
+openPitStop() {
+	SimulatorController.Instance.findPlugin(kACCPlugin).Manager.openPitStop()
+}
+
+closePitStop() {
+	SimulatorController.Instance.findPlugin(kACCPlugin).Manager.closePitStop()
+}
+
+toggleActivity(activity) {
+	if !inList(["Refuel", "Tires", "Brakes", "Bodywork" "Suspension"], activity)
+		logMessage(kLogWarn, translate("Unsupported pit stop activity """) . activity . translate(""" detected in toggleActivity - please check the configuration"))
+	
+	SimulatorController.Instance.findPlugin(kACCPlugin).Manager.toggleActivity(activity)
+}
+
+changeStrategy(direction, steps := 1) {
+	if !inList(["Next", "Previous"], direction)
+		logMessage(kLogWarn, translate("Unsupported strategy selection """) . direction . translate(""" detected in changeStrategy - please check the configuration"))
+	
+	SimulatorController.Instance.findPlugin(kACCPlugin).Manager.changeStrategy(direction, steps)
+}
+
+changeFuelAmount(direction, liters := 5) {
+	if !inList(["Increase", "Decrease"], direction)
+		logMessage(kLogWarn, translate("Unsupported refuel change """) . direction . translate(""" detected in changeFuelAmount - please check the configuration"))
+	
+	SimulatorController.Instance.findPlugin(kACCPlugin).Manager.changeFuelAmount(direction, liters)
+}
+
+changeTirePressure(tire, direction, increments := 1) {
+	if !inList(["Front Left", "Front Right" "Rear Left", "Rear Right"], tire)
+		logMessage(kLogWarn, translate("Unsupported tire position """) . tire . translate(""" detected in changeTirePressure - please check the configuration"))
+		
+	if !inList(["Increase", "Decrease"], direction)
+		logMessage(kLogWarn, translate("Unsupported pressure change """) . direction . translate(""" detected in changeTirePressure - please check the configuration"))
+	
+	SimulatorController.Instance.findPlugin(kACCPlugin).Manager.changeTirePressure(tire, direction, increments)
+}
+
+changeBrakeType(direction) {
+	if !inList(["Next", "Previous"], direction)
+		logMessage(kLogWarn, translate("Unsupported brake selection """) . direction . translate(""" detected in changeBrakeType - please check the configuration"))
+	
+	SimulatorController.Instance.findPlugin(kACCPlugin).Manager.changeBrakeType(direction)
 }
 
 

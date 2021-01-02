@@ -30,6 +30,9 @@ global kUserConfigDirectory = kUserHomeDirectory . "Config\"
 global kSplashMediaDirectory = kResourcesDirectory . "Splash Media\"
 global kUserSplashMediaDirectory = kUserHomeDirectory . "Splash Media\"
 
+global kScreenImagesDirectoty = kResourcesDirectory . "Screen Images\"
+global kUserScreenImagesDirectoty = kUserHomeDirectory . "Screen Images\"
+
 global kButtonBoxImagesDirectory = kResourcesDirectory . "Button Box Images\"
 global kIconsDirectory = kResourcesDirectory . "Icons\"
 

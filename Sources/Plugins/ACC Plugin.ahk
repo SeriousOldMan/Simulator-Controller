@@ -28,17 +28,17 @@ class ACCPlugin extends ControllerPlugin {
 		iPlugin := false
 		
 		kPSOptions := ["Pit Limiter", "Strategy", "Refuel"
-					 , "Change Tires", "Tire Set", "Tire Compound", "Around", "Front Left", "Front Right", "Rear Left", "Rear Right"
+					 , "Change Tyres", "Tyre Set", "Tyre Compound", "Around", "Front Left", "Front Right", "Rear Left", "Rear Right"
 					 , "Change Brakes", "Front Brake", "Rear Brake", "Repair Bodywork", "Repair Suspension"]
 		
-		kPSTireOptionPosition := inList(this.kPSOptions, "Change Tires")
-		kPSTireOptions := 7
+		kPSTyreOptionPosition := inList(this.kPSOptions, "Change Tyres")
+		kPSTyreOptions := 7
 		kPSBrakeOptionPosition := inList(this.kPSOptions, "Change Brakes")
 		kPSBrakeOptions := 2
 		
 		iPSIsOpen := false
 		iPSSelectedOption := 1
-		iPSChangeTires := false
+		iPSChangeTyres := false
 		iPSChangeBrakes := false
 		
 		iPSImageSearchArea := false
@@ -59,20 +59,20 @@ class ACCPlugin extends ControllerPlugin {
 			SendEvent % this.Plugin.OpenPitstopAppHotkey
 			Sleep 500
 			
-			tireSetLabel := getFileName("ACC\Tyre Set.jpg", kUserScreenImagesDirectory, kScreenImagesDirectory)
+			tyreSetLabel := getFileName("ACC\Tyre Set.jpg", kUserScreenImagesDirectory, kScreenImagesDirectory)
 			
-			ImageSearch x, y, this.iPSImageSearchArea[1], this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *50 %tireSetLabel%
+			ImageSearch x, y, this.iPSImageSearchArea[1], this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *50 %tyreSetLabel%
 			
 			if x is Integer
 			{
-				this.iPSChangeTires := true
+				this.iPSChangeTyres := true
 				
-				logMessage(kLogInfo, "Assetto Corsa Competizione - Pitstop: Tires are selected for change")
+				logMessage(kLogInfo, "Assetto Corsa Competizione - Pitstop: Tyres are selected for change")
 			}
 			else {
-				this.iPSChangeTires := false
+				this.iPSChangeTyres := false
 				
-				logMessage(kLogInfo, "Assetto Corsa Competizione - Pitstop: Tires are not selected for change")
+				logMessage(kLogInfo, "Assetto Corsa Competizione - Pitstop: Tyres are not selected for change")
 			}
 			
 			frontBrakeLabel := getFileName("ACC\Front Brake.jpg", kUserScreenImagesDirectory, kScreenImagesDirectory)
@@ -110,14 +110,14 @@ class ACCPlugin extends ControllerPlugin {
 			targetSelectedOption := inList(this.kPSOptions, option)
 			delta := 0
 			
-			if (targetSelectedOption > this.kPSTireOptionPosition) {
-				if (targetSelectedOption <= (this.kPSTireOptionPosition + this.kPSTireOptions)) {
-					if !this.iPSChangeTires
-						this.toggleActivity("Change Tires")
+			if (targetSelectedOption > this.kPSTyreOptionPosition) {
+				if (targetSelectedOption <= (this.kPSTyreOptionPosition + this.kPSTyreOptions)) {
+					if !this.iPSChangeTyres
+						this.toggleActivity("Change Tyres")
 				}
 				else
-					if !this.iPSChangeTires
-						delta -= this.kPSTireOptions
+					if !this.iPSChangeTyres
+						delta -= this.kPSTyreOptions
 			}
 			
 			if (targetSelectedOption > this.kPSBrakeOptionPosition) {
@@ -169,7 +169,7 @@ class ACCPlugin extends ControllerPlugin {
 			this.requirePitstopApp()
 				
 			switch activity {
-				case "Change Tires", "Change Brakes", "Repair Bodywork", "Repair Suspension":
+				case "Change Tyres", "Change Brakes", "Repair Bodywork", "Repair Suspension":
 					this.selectPitstopOption(activity)
 					
 					SendEvent {Right}
@@ -177,26 +177,26 @@ class ACCPlugin extends ControllerPlugin {
 					Throw "Unsupported activity """ . activity . """ detected in ACCManager.toggleActivity..."
 			}
 			
-			if (activity = "Change Tires")
-				this.iPSChangeTires := !this.iPSChangeTires
+			if (activity = "Change Tyres")
+				this.iPSChangeTyres := !this.iPSChangeTyres
 			else if (activity = "Change Brakes")
 				this.iPSChangeBrakes := !this.iPSChangeBrakes
 			
 			Sleep 100
 		}
 
-		changeStrategy(direction, steps := 1) {
+		changeStrategy(selection, steps := 1) {
 			this.requirePitstopApp()
 				
 			this.selectPitstopOption("Strategy")
 			
-			switch direction {
+			switch selection {
 				case "Next":
 					this.changePitstopOption("Increase")
 				case "Previous":
 					this.changePitstopOption("Decrease")
 				default:
-					Throw "Unsupported operation """ . direction . """ detected in ACCManager.changeStrategy..."
+					Throw "Unsupported operation """ . selection . """ detected in ACCManager.changeStrategy..."
 			}
 			
 			this.updatePitstopState(false)
@@ -210,20 +210,20 @@ class ACCPlugin extends ControllerPlugin {
 			this.changePitstopOption(direction, liters)
 		}
 
-		changeTirePressure(tire, direction, increments := 1) {
+		changeTyrePressure(tyre, direction, increments := 1) {
 			this.requirePitstopApp()
 				
-			switch tire {
+			switch tyre {
 				case "Around", "Front Left", "Front Right", "Rear Left", "Rear Right":
-					this.selectPitstopOption(tire)
+					this.selectPitstopOption(tyre)
 				default:
-					Throw "Unsupported tire position """ . tire . """ detected in ACCManager.changeTirePressure..."
+					Throw "Unsupported tyre position """ . tyre . """ detected in ACCManager.changeTyrePressure..."
 			}
 			
 			this.changePitstopOption(direction, increments)
 		}
 
-		changeBrakeType(brake, direction) {
+		changeBrakeType(brake, selection) {
 			this.requirePitstopApp()
 				
 			switch brake {
@@ -233,13 +233,13 @@ class ACCPlugin extends ControllerPlugin {
 					Throw "Unsupported brake """ . brake . """ detected in ACCManager.changeBrakeType..."
 			}
 				
-			switch direction {
+			switch selection {
 				case "Next":
 					this.changePitstopOption("Increase")
 				case "Previous":
 					this.changePitstopOption("Decrease")
 				default:
-					Throw "Unsupported operation """ . direction . """ detected in ACCManager.changeBrakeType..."
+					Throw "Unsupported operation """ . selection . """ detected in ACCManager.changeBrakeType..."
 			}
 		}
 		
@@ -261,20 +261,20 @@ class ACCPlugin extends ControllerPlugin {
 						this.iPSIsOpen := false
 				}
 				
-				tireSetLabel := getFileName("ACC\Tyre Set.jpg", kUserScreenImagesDirectory, kScreenImagesDirectory)
+				tyreSetLabel := getFileName("ACC\Tyre Set.jpg", kUserScreenImagesDirectory, kScreenImagesDirectory)
 			
-				ImageSearch x, y, this.iPSImageSearchArea[1], this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *50 %tireSetLabel%
+				ImageSearch x, y, this.iPSImageSearchArea[1], this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *50 %tyreSetLabel%
 			
 				if x is Integer
 				{
-					this.iPSChangeTires := true
+					this.iPSChangeTyres := true
 					
-					logMessage(kLogInfo, "Assetto Corsa Competizione - Pitstop: Tires are selected for change")
+					logMessage(kLogInfo, "Assetto Corsa Competizione - Pitstop: Tyres are selected for change")
 				}
 				else {
-					this.iPSChangeTires := false
+					this.iPSChangeTyres := false
 					
-					logMessage(kLogInfo, "Assetto Corsa Competizione - Pitstop: Tires are not selected for change")
+					logMessage(kLogInfo, "Assetto Corsa Competizione - Pitstop: Tyres are not selected for change")
 				}
 				
 				frontBrakeLabel := getFileName("ACC\Front Brake.jpg", kUserScreenImagesDirectory, kScreenImagesDirectory)
@@ -446,7 +446,7 @@ closePitstopApp() {
 }
 
 togglePitstopActivity(activity) {
-	if !inList(["Change Tires", "Change Brakes", "Repair Bodywork" "Repair Suspension"], activity)
+	if !inList(["Change Tyres", "Change Brakes", "Repair Bodywork" "Repair Suspension"], activity)
 		logMessage(kLogWarn, translate("Unsupported pit stop activity """) . activity . translate(""" detected in togglePitstopActivity - please check the configuration"))
 	
 	protectionOn()
@@ -459,14 +459,14 @@ togglePitstopActivity(activity) {
 	}
 }
 
-changePitstopStrategy(direction, steps := 1) {
-	if !inList(["Next", "Previous"], direction)
-		logMessage(kLogWarn, translate("Unsupported strategy selection """) . direction . translate(""" detected in changePitstopStrategy - please check the configuration"))
+changePitstopStrategy(selection, steps := 1) {
+	if !inList(["Next", "Previous"], selection)
+		logMessage(kLogWarn, translate("Unsupported strategy selection """) . selection . translate(""" detected in changePitstopStrategy - please check the configuration"))
 	
 	protectionOn()
 	
 	try {
-		SimulatorController.Instance.findPlugin(kACCPlugin).Manager.changeStrategy(direction, steps)
+		SimulatorController.Instance.findPlugin(kACCPlugin).Manager.changeStrategy(selection, steps)
 	}
 	finally {
 		protectionOff()
@@ -487,35 +487,62 @@ changePitstopFuelAmount(direction, liters := 5) {
 	}
 }
 
-changePitstopTirePressure(tire, direction, increments := 1) {
-	msgbox here
-	if !inList(["Around", "Front Left", "Front Right" "Rear Left", "Rear Right"], tire)
-		logMessage(kLogWarn, translate("Unsupported tire position """) . tire . translate(""" detected in changePitstopTirePressure - please check the configuration"))
-		
-	if !inList(["Increase", "Decrease"], direction)
-		logMessage(kLogWarn, translate("Unsupported pressure change """) . direction . translate(""" detected in changePitstopTirePressure - please check the configuration"))
+changePitstopTyreSet(selection) {
+	if !inList(["Next", "Previous"], selection)
+		logMessage(kLogWarn, translate("Unsupported tyre set selection """) . selection . translate(""" detected in changePitstopTyreSet - please check the configuration"))
 	
 	protectionOn()
 	
 	try {
-		SimulatorController.Instance.findPlugin(kACCPlugin).Manager.changeTirePressure(tire, direction, increments)
+		SimulatorController.Instance.findPlugin(kACCPlugin).Manager.changeTyreSet(selection)
 	}
 	finally {
 		protectionOff()
 	}
 }
 
-changePitstopBrakeType(brake, direction) {
-	if !inList(["Front Brake", "Rear Brake"], direction)
-		logMessage(kLogWarn, translate("Unsupported brake unit """) . brake . translate(""" detected in changePitstopBrakeType - please check the configuration"))
-	
-	if !inList(["Next", "Previous"], direction)
-		logMessage(kLogWarn, translate("Unsupported brake selection """) . direction . translate(""" detected in changePitstopBrakeType - please check the configuration"))
+changePitstopTyreCompound(compound) {
+	if !inList(["Wet", "Dry"], compound)
+		logMessage(kLogWarn, translate("Unsupported tyre compound """) . compound . translate(""" detected in changePitstopTyreCompound - please check the configuration"))
 	
 	protectionOn()
 	
 	try {
-		SimulatorController.Instance.findPlugin(kACCPlugin).Manager.changeBrakeType(brake, direction)
+		SimulatorController.Instance.findPlugin(kACCPlugin).Manager.changeTyreCompound(compound)
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+changePitstopTyrePressure(tyre, direction, increments := 1) {
+	if !inList(["Around", "Front Left", "Front Right" "Rear Left", "Rear Right"], tyre)
+		logMessage(kLogWarn, translate("Unsupported tyre position """) . tyre . translate(""" detected in changePitstopTyrePressure - please check the configuration"))
+		
+	if !inList(["Increase", "Decrease"], direction)
+		logMessage(kLogWarn, translate("Unsupported pressure change """) . direction . translate(""" detected in changePitstopTyrePressure - please check the configuration"))
+	
+	protectionOn()
+	
+	try {
+		SimulatorController.Instance.findPlugin(kACCPlugin).Manager.changeTyrePressure(tyre, direction, increments)
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+changePitstopBrakeType(brake, selection) {
+	if !inList(["Front Brake", "Rear Brake"], selection)
+		logMessage(kLogWarn, translate("Unsupported brake unit """) . brake . translate(""" detected in changePitstopBrakeType - please check the configuration"))
+	
+	if !inList(["Next", "Previous"], selection)
+		logMessage(kLogWarn, translate("Unsupported brake selection """) . selection . translate(""" detected in changePitstopBrakeType - please check the configuration"))
+	
+	protectionOn()
+	
+	try {
+		SimulatorController.Instance.findPlugin(kACCPlugin).Manager.changeBrakeType(brake, selection)
 	}
 	finally {
 		protectionOff()

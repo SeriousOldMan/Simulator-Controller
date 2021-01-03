@@ -496,21 +496,23 @@ class Function extends ConfigurationItem {
 	
 	computeAction(trigger, action) {
 		action := Trim(action)
-		
+			
 		if (action == "")
 			return false
 		else {
 			action := StrSplit(action, "(", " `t", 2)
 		
-			arguments := StrSplit(SubStr(action[2], 1, StrLen(action[2]) - 1), "," " `t")
+			arguments := string2Values(",", SubStr(action[2], 1, StrLen(action[2]) - 1))
+			action := action[1]
 			
-			for index, argument in arguments
+			for index, argument in arguments {
 				if (argument = "true")
 					arguments[index] := true
 				else if (argument = "false")
 					arguments[index] := false
+			}
 			
-			return Array(action[1], arguments)
+			return Array(action, arguments)
 		}
 	}
 	

@@ -12,3 +12,7 @@
 #### General
   1. Plugin support for the configuration tool
   2. [Target: V1.5]Better UI flow in all lists in the configuration tool
+  3. [Target: V1.5]Integrate update tasks in Simulator Tools
+	 - Run Simulator Tools automatically after each VERSION change
+     - Update User Simulator Configuration.ini
+	 - Update User Translations.LC

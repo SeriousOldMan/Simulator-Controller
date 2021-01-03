@@ -177,7 +177,7 @@ class ACCPlugin extends ControllerPlugin {
 			
 			if (activity = "Change Tires")
 				this.iPSChangeTires := !this.iPSChangeTires
-			else if (activity = "Change Brakes")
+			else if activity = "Change Brakes")
 				this.iPSChangeBrakes := !this.iPSChangeBrakes
 			
 			Sleep 100

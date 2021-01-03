@@ -217,7 +217,7 @@ class ACCPlugin extends ControllerPlugin {
 			static kSearchAreaLeft := 250
 			static kSearchAreaRight := 150
 			
-			if true || isACCRunning() {
+			if isACCRunning() {
 				lastY := false
 				
 				if checkPitstopApp {
@@ -248,7 +248,7 @@ class ACCPlugin extends ControllerPlugin {
 						this.iPSIsOpen := false
 				}
 				
-				if this.iPSIsOpen {
+				if (!checkPitstopApp || this.iPSIsOpen) {
 					tyreSetLabel := getFileName("ACC\Tyre Set.jpg", kUserScreenImagesDirectory, kScreenImagesDirectory)
 					curTickCount := A_TickCount
 					
@@ -269,12 +269,12 @@ class ACCPlugin extends ControllerPlugin {
 						
 						lastY := y
 						
-						logMessage(kLogInfo, "Assetto Corsa Competizione - Pitstop: Tyres are selected for change")
+						logMessage(kLogInfo, translate("Assetto Corsa Competizione - Pitstop: Tyres are selected for change"))
 					}
 					else {
 						this.iPSChangeTyres := false
 						
-						logMessage(kLogInfo, "Assetto Corsa Competizione - Pitstop: Tyres are not selected for change")
+						logMessage(kLogInfo, translate("Assetto Corsa Competizione - Pitstop: Tyres are not selected for change"))
 					}
 					
 					frontBrakeLabel := getFileName("ACC\Front Brake.jpg", kUserScreenImagesDirectory, kScreenImagesDirectory)
@@ -295,12 +295,12 @@ class ACCPlugin extends ControllerPlugin {
 					{
 						this.iPSChangeBrakes := true
 						
-						logMessage(kLogInfo, "Assetto Corsa Competizione - Pitstop: Brakes are selected for change")
+						logMessage(kLogInfo, translate("Assetto Corsa Competizione - Pitstop: Brakes are selected for change"))
 					}
 					else {
 						this.iPSChangeBrakes := false
 						
-						logMessage(kLogInfo, "Assetto Corsa Competizione - Pitstop: Brakes are not selected for change")
+						logMessage(kLogInfo, translate("Assetto Corsa Competizione - Pitstop: Brakes are not selected for change"))
 					}
 					
 					selectDriverLabel := getFileName("ACC\Select Driver.jpg", kUserScreenImagesDirectory, kScreenImagesDirectory)

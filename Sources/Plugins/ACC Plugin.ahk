@@ -29,7 +29,7 @@ class ACCPlugin extends ControllerPlugin {
 		
 		kPSOptions := ["Pit Limiter", "Strategy", "Refuel"
 					 , "Change Tyres", "Tyre Set", "Tyre Compound", "Around", "Front Left", "Front Right", "Rear Left", "Rear Right"
-					 , "Change Brakes", "Front Brake", "Rear Brake", "Repair Bodywork", "Repair Suspension"]
+					 , "Change Brakes", "Front Brake", "Rear Brake", "Repair Suspension", "Repair Bodywork"]
 		
 		kPSTyreOptionPosition := inList(this.kPSOptions, "Change Tyres")
 		kPSTyreOptions := 7
@@ -59,37 +59,7 @@ class ACCPlugin extends ControllerPlugin {
 			SendEvent % this.Plugin.OpenPitstopAppHotkey
 			Sleep 500
 			
-			tyreSetLabel := getFileName("ACC\Tyre Set.jpg", kUserScreenImagesDirectory, kScreenImagesDirectory)
-			
-			ImageSearch x, y, this.iPSImageSearchArea[1], this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *50 %tyreSetLabel%
-			
-			if x is Integer
-			{
-				this.iPSChangeTyres := true
-				
-				logMessage(kLogInfo, "Assetto Corsa Competizione - Pitstop: Tyres are selected for change")
-			}
-			else {
-				this.iPSChangeTyres := false
-				
-				logMessage(kLogInfo, "Assetto Corsa Competizione - Pitstop: Tyres are not selected for change")
-			}
-			
-			frontBrakeLabel := getFileName("ACC\Front Brake.jpg", kUserScreenImagesDirectory, kScreenImagesDirectory)
-			
-			ImageSearch x, y, this.iPSImageSearchArea[1], this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *50 %frontBrakeLabel%
-			
-			if x is Integer
-			{
-				this.iPSChangeBrakes := true
-				
-				logMessage(kLogInfo, "Assetto Corsa Competizione - Pitstop: Brakes are selected for change")
-			}
-			else {
-				this.iPSChangeBrakes := false
-				
-				logMessage(kLogInfo, "Assetto Corsa Competizione - Pitstop: Brakes are not selected for change")
-			}
+			this.updatePitStopState(false)
 				
 			this.iPSIsOpen := true
 			this.iPSSelectedOption := 1
@@ -244,56 +214,88 @@ class ACCPlugin extends ControllerPlugin {
 		}
 		
 		updatePitstopState(checkPitstopApp := true) {
+			static kLeftArea := 250
+			static kRightArea := 100
+			
 			if isACCRunning() {
 				if checkPitstopApp {
 					pitstopLabel := getFileName("ACC\PITSTOP.jpg", kUserScreenImagesDirectory, kScreenImagesDirectory)
+					curTickCount := A_TickCount
 					
-					if !this.iPSImageSearchArea
+					if !this.iPSImageSearchArea {
 						ImageSearch x, y, 0, 0, Round(A_ScreenWidth / 2), A_ScreenHeight, *50 %pitstopLabel%
-					else
-						ImageSearch x, y, this.iPSImageSearchArea[1], this.iPSImageSearchArea[2], this.iPSImageSearchArea[3] + 100, this.iPSImageSearchArea[4], *50 %pitstopLabel%
+			
+						logMessage(kLogInfo, translate("Full search for 'PITSTOP' took ") . A_TickCount - curTickCount . translate(" ms"))
+					}
+					else {
+						ImageSearch x, y, this.iPSImageSearchArea[1] + kLeftArea - 50, this.iPSImageSearchArea[2], this.iPSImageSearchArea[3] + kRightArea, this.iPSImageSearchArea[4], *50 %pitstopLabel%
+			
+						logMessage(kLogInfo, translate("Optimized search for 'PITSTOP' took ") . A_TickCount - curTickCount . translate(" ms"))
+					}
 					
 					if x is Integer
 					{
 						this.iPSIsOpen := true
 				
 						if !this.iPSImageSearchArea
-							this.iPSImageSearchArea := [Max(0, x - 250), 0, x, A_ScreenHeight]
+							this.iPSImageSearchArea := [Max(0, x - kLeftArea), 0, x, A_ScreenHeight]
 					}
 					else
 						this.iPSIsOpen := false
 				}
 				
-				tyreSetLabel := getFileName("ACC\Tyre Set.jpg", kUserScreenImagesDirectory, kScreenImagesDirectory)
-			
-				ImageSearch x, y, this.iPSImageSearchArea[1], this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *50 %tyreSetLabel%
-			
-				if x is Integer
-				{
-					this.iPSChangeTyres := true
+				if this.iPSIsOpen {
+					tyreSetLabel := getFileName("ACC\Tyre Set.jpg", kUserScreenImagesDirectory, kScreenImagesDirectory)
+					curTickCount := A_TickCount
 					
-					logMessage(kLogInfo, "Assetto Corsa Competizione - Pitstop: Tyres are selected for change")
-				}
-				else {
-					this.iPSChangeTyres := false
+					if !this.iPSImageSearchArea {
+						ImageSearch x, y, 0, 0, Round(A_ScreenWidth / 2), A_ScreenHeight, *50 %tyreSetLabel%
 					
-					logMessage(kLogInfo, "Assetto Corsa Competizione - Pitstop: Tyres are not selected for change")
-				}
-				
-				frontBrakeLabel := getFileName("ACC\Front Brake.jpg", kUserScreenImagesDirectory, kScreenImagesDirectory)
-				
-				ImageSearch x, y, this.iPSImageSearchArea[1], this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *50 %frontBrakeLabel%
-				
-				if x is Integer
-				{
-					this.iPSChangeBrakes := true
+						logMessage(kLogInfo, translate("Full search for 'Tyre set' took ") . A_TickCount - curTickCount . translate(" ms"))
+					}
+					else {
+						ImageSearch x, y, this.iPSImageSearchArea[1], this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *50 %tyreSetLabel%
 					
-					logMessage(kLogInfo, "Assetto Corsa Competizione - Pitstop: Brakes are selected for change")
-				}
-				else {
-					this.iPSChangeBrakes := false
+						logMessage(kLogInfo, translate("Optimized search for 'Tyre set' took ") . A_TickCount - curTickCount . translate(" ms"))
+					}
 					
-					logMessage(kLogInfo, "Assetto Corsa Competizione - Pitstop: Brakes are not selected for change")
+					if x is Integer
+					{
+						this.iPSChangeTyres := true
+						
+						logMessage(kLogInfo, "Assetto Corsa Competizione - Pitstop: Tyres are selected for change")
+					}
+					else {
+						this.iPSChangeTyres := false
+						
+						logMessage(kLogInfo, "Assetto Corsa Competizione - Pitstop: Tyres are not selected for change")
+					}
+					
+					frontBrakeLabel := getFileName("ACC\Front Brake.jpg", kUserScreenImagesDirectory, kScreenImagesDirectory)
+					curTickCount := A_TickCount
+					
+					if !this.iPSImageSearchArea {
+						ImageSearch x, y, 0, 0, Round(A_ScreenWidth / 2), A_ScreenHeight, *50 %frontBrakeLabel%
+					
+						logMessage(kLogInfo, translate("Full search for 'Front Brake' took ") . A_TickCount - curTickCount . translate(" ms"))
+					}
+					else {
+						ImageSearch x, y, this.iPSImageSearchArea[1], this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *50 %frontBrakeLabel%
+					
+						logMessage(kLogInfo, translate("Optimized search for 'Front Brake' took ") . A_TickCount - curTickCount . translate(" ms"))
+					}
+					
+					if x is Integer
+					{
+						this.iPSChangeBrakes := true
+						
+						logMessage(kLogInfo, "Assetto Corsa Competizione - Pitstop: Brakes are selected for change")
+					}
+					else {
+						this.iPSChangeBrakes := false
+						
+						logMessage(kLogInfo, "Assetto Corsa Competizione - Pitstop: Brakes are not selected for change")
+					}
 				}
 			}
 		}
@@ -360,6 +362,8 @@ class ACCPlugin extends ControllerPlugin {
 		
 		this.kOpenPitstopAppHotkey := this.getArgumentValue("openPitstopApp", false)
 		this.kClosePitstopAppHotkey := this.getArgumentValue("closePitstopApp", false)
+		
+		this.getACCManager()
 	}
 	
 	runningSimulator() {

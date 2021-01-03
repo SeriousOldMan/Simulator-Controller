@@ -1161,7 +1161,7 @@
     </Commands>
     <Commands>
       <GUID>22a1b638-0cad-42d0-90c3-397410dcdc45</GUID>
-      <RecocnitionText>Pitstop Change Tires</RecocnitionText>
+      <RecocnitionText>Pitstop Change Tyres</RecocnitionText>
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>

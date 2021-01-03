@@ -248,7 +248,6 @@ class ACCPlugin extends ControllerPlugin {
 				if checkPitstopApp {
 					pitstopLabel := getFileName("ACC\PITSTOP.jpg", kUserScreenImagesDirectory, kScreenImagesDirectory)
 					
-					
 					if !this.iPSImageSearchArea
 						ImageSearch x, y, 0, 0, Round(A_ScreenWidth / 2), A_ScreenHeight, *50 %pitstopLabel%
 					else

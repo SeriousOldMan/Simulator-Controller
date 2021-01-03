@@ -214,10 +214,12 @@ class ACCPlugin extends ControllerPlugin {
 		}
 		
 		updatePitstopState(checkPitstopApp := true) {
-			static kLeftArea := 250
-			static kRightArea := 100
+			static kSearchAreaLeft := 250
+			static kSearchAreaRight := 150
 			
-			if isACCRunning() {
+			if true || isACCRunning() {
+				lastY := false
+				
 				if checkPitstopApp {
 					pitstopLabel := getFileName("ACC\PITSTOP.jpg", kUserScreenImagesDirectory, kScreenImagesDirectory)
 					curTickCount := A_TickCount
@@ -228,7 +230,7 @@ class ACCPlugin extends ControllerPlugin {
 						logMessage(kLogInfo, translate("Full search for 'PITSTOP' took ") . A_TickCount - curTickCount . translate(" ms"))
 					}
 					else {
-						ImageSearch x, y, this.iPSImageSearchArea[1] + kLeftArea - 50, this.iPSImageSearchArea[2], this.iPSImageSearchArea[3] + kRightArea, this.iPSImageSearchArea[4], *50 %pitstopLabel%
+						ImageSearch x, y, this.iPSImageSearchArea[1], this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *50 %pitstopLabel%
 			
 						logMessage(kLogInfo, translate("Optimized search for 'PITSTOP' took ") . A_TickCount - curTickCount . translate(" ms"))
 					}
@@ -236,9 +238,11 @@ class ACCPlugin extends ControllerPlugin {
 					if x is Integer
 					{
 						this.iPSIsOpen := true
+						
+						lastY := y
 				
 						if !this.iPSImageSearchArea
-							this.iPSImageSearchArea := [Max(0, x - kLeftArea), 0, x, A_ScreenHeight]
+							this.iPSImageSearchArea := [Max(0, x - kSearchAreaLeft), 0, Min(x + kSearchAreaRight, A_ScreenWidth), A_ScreenHeight]
 					}
 					else
 						this.iPSIsOpen := false
@@ -249,12 +253,12 @@ class ACCPlugin extends ControllerPlugin {
 					curTickCount := A_TickCount
 					
 					if !this.iPSImageSearchArea {
-						ImageSearch x, y, 0, 0, Round(A_ScreenWidth / 2), A_ScreenHeight, *50 %tyreSetLabel%
+						ImageSearch x, y, 0, lastY ? lastY : 0, Round(A_ScreenWidth / 2), A_ScreenHeight, *50 %tyreSetLabel%
 					
 						logMessage(kLogInfo, translate("Full search for 'Tyre set' took ") . A_TickCount - curTickCount . translate(" ms"))
 					}
 					else {
-						ImageSearch x, y, this.iPSImageSearchArea[1], this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *50 %tyreSetLabel%
+						ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *50 %tyreSetLabel%
 					
 						logMessage(kLogInfo, translate("Optimized search for 'Tyre set' took ") . A_TickCount - curTickCount . translate(" ms"))
 					}
@@ -262,6 +266,8 @@ class ACCPlugin extends ControllerPlugin {
 					if x is Integer
 					{
 						this.iPSChangeTyres := true
+						
+						lastY := y
 						
 						logMessage(kLogInfo, "Assetto Corsa Competizione - Pitstop: Tyres are selected for change")
 					}
@@ -275,12 +281,12 @@ class ACCPlugin extends ControllerPlugin {
 					curTickCount := A_TickCount
 					
 					if !this.iPSImageSearchArea {
-						ImageSearch x, y, 0, 0, Round(A_ScreenWidth / 2), A_ScreenHeight, *50 %frontBrakeLabel%
+						ImageSearch x, y, 0, lastY ? lastY : 0, Round(A_ScreenWidth / 2), A_ScreenHeight, *50 %frontBrakeLabel%
 					
 						logMessage(kLogInfo, translate("Full search for 'Front Brake' took ") . A_TickCount - curTickCount . translate(" ms"))
 					}
 					else {
-						ImageSearch x, y, this.iPSImageSearchArea[1], this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *50 %frontBrakeLabel%
+						ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *50 %frontBrakeLabel%
 					
 						logMessage(kLogInfo, translate("Optimized search for 'Front Brake' took ") . A_TickCount - curTickCount . translate(" ms"))
 					}
@@ -295,6 +301,32 @@ class ACCPlugin extends ControllerPlugin {
 						this.iPSChangeBrakes := false
 						
 						logMessage(kLogInfo, "Assetto Corsa Competizione - Pitstop: Brakes are not selected for change")
+					}
+					
+					selectDriverLabel := getFileName("ACC\Select Driver.jpg", kUserScreenImagesDirectory, kScreenImagesDirectory)
+					curTickCount := A_TickCount
+					
+					if !this.iPSImageSearchArea {
+						ImageSearch x, y, 0, lastY ? lastY : 0, Round(A_ScreenWidth / 2), A_ScreenHeight, *50 %selectDriverLabel%
+					
+						logMessage(kLogInfo, translate("Full search for 'Select Driver' took ") . A_TickCount - curTickCount . translate(" ms"))
+					}
+					else {
+						ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *50 %selectDriverLabel%
+					
+						logMessage(kLogInfo, translate("Optimized search for 'Select Driver' took ") . A_TickCount - curTickCount . translate(" ms"))
+					}
+					
+					if x is Integer
+					{
+						if !inList(this.kPSOptions, "Select Driver")
+							this.kPSOptions.InsertAt(inList(this.kPSOptions, "Repair Suspension"), "Select Driver")
+					}
+					else {
+						position := inList(this.kPSOptions, "Select Driver")
+						
+						if position
+							this.kPSOptions.RemoveAt(position)
 					}
 				}
 			}

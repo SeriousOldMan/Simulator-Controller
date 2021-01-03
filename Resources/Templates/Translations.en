@@ -129,8 +129,14 @@ Unsupported tire position "=>
 " detected in changeTirePressure - please check the configuration=>
 Unsupported pressure change "=>
 " detected in changeTirePressure - please check the configuration=>
+Unsupported brake unit "=>
+" detected in changeBrakeType - please check the configuration=>
 Unsupported brake selection "=>
 " detected in changeBrakeType - please check the configuration=>
+Assetto Corsa Competizione - Pitstop: Tires are selected for change=>
+Assetto Corsa Competizione - Pitstop: Tires are not selected for change=>
+Assetto Corsa Competizione - Pitstop: Brakes are selected for change=>
+Assetto Corsa Competizione - Pitstop: Brakes are not selected for change=>
 [Motion Feedback Plugin]
 Motion Feedback=>
 Motion=>

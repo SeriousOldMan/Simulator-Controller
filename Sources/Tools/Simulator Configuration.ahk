@@ -127,8 +127,10 @@ class ConfigurationItemList extends ConfigurationItem {
 	
 	updateState() {
 		if (this.iCurrentItemIndex != 0) {
-			GuiControl Enable, % this.iDeleteButton
-			GuiControl Enable, % this.iUpdateButton
+			if (this.iDeleteButton != false)
+				GuiControl Enable, % this.iDeleteButton
+			if (this.iUpdateButton != false)
+				GuiControl Enable, % this.iUpdateButton
 			
 			if (this.iUpButton != false)
 				if (this.iCurrentItemIndex > 1)
@@ -149,8 +151,10 @@ class ConfigurationItemList extends ConfigurationItem {
 			if (this.iDownButton != false)
 				GuiControl Disable, % this.iDownButton
 			
-			GuiControl Disable, % this.iDeleteButton
-			GuiControl Disable, % this.iUpdateButton
+			if (this.iDeleteButton != false)
+				GuiControl Disable, % this.iDeleteButton
+			if (this.iUpdateButton != false)
+				GuiControl Disable, % this.iUpdateButton
 		}
 	}
 	
@@ -251,28 +255,70 @@ registerList(listVariable, itemList) {
 }
 
 listEvent() {
-	if (A_GuiEvent == "DoubleClick")
-		vItemLists[A_GuiControl].openEditor(A_EventInfo)	
+	protectionOn()
+	
+	try{
+		if (A_GuiEvent == "DoubleClick")
+			vItemLists[A_GuiControl].openEditor(A_EventInfo)
+	}
+	finally {
+		protectionOff()
+	}
 }
 
 addItem() {
-	vItemLists[A_GuiControl].addItem()
+	protectionOn()
+	
+	try{
+		vItemLists[A_GuiControl].addItem()
+	}
+	finally {
+		protectionOff()
+	}
 }
 
 deleteItem() {
-	vItemLists[A_GuiControl].deleteItem()
+	protectionOn()
+	
+	try{
+		vItemLists[A_GuiControl].deleteItem()
+	}
+	finally {
+		protectionOff()
+	}
 }
 
 updateItem() {
-	vItemLists[A_GuiControl].updateItem()
+	protectionOn()
+	
+	try{
+		vItemLists[A_GuiControl].updateItem()
+	}
+	finally {
+		protectionOff()
+	}
 }
 
 upItem() {
-	vItemLists[A_GuiControl].upItem()
+	protectionOn()
+	
+	try{
+		vItemLists[A_GuiControl].upItem()
+	}
+	finally {
+		protectionOff()
+	}
 }
 
 downItem() {
-	vItemLists[A_GuiControl].downItem()
+	protectionOn()
+	
+	try{
+		vItemLists[A_GuiControl].downItem()
+	}
+	finally {
+		protectionOff()
+	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -616,24 +662,45 @@ class GeneralTab extends ConfigurationItemTab {
 }
 
 chooseHomePath() {
-	FileSelectFolder, directory, *%homePathEdit%, 0, % translate("Select Installation folder...")
+	protectionOn()
 	
-	if (directory != "")
-		GuiControl Text, homePathEdit, %directory%
+	try{
+		FileSelectFolder, directory, *%homePathEdit%, 0, % translate("Select Installation folder...")
+	
+		if (directory != "")
+			GuiControl Text, homePathEdit, %directory%
+	}
+	finally {
+		protectionOff()
+	}
 }
 
 chooseNirCmdPath() {
-	FileSelectFolder, directory, *%nirCmdPathEdit%, 0, % translate("Select NirCmd folder...")
+	protectionOn()
 	
-	if (directory != "")
-		GuiControl Text, nirCmdPathEdit, %directory%
+	try{
+		FileSelectFolder, directory, *%nirCmdPathEdit%, 0, % translate("Select NirCmd folder...")
+	
+		if (directory != "")
+			GuiControl Text, nirCmdPathEdit, %directory%
+	}
+	finally {
+		protectionOff()
+	}
 }
 
 chooseAHKPath() {
-	FileSelectFolder, directory, *%ahkPathEdit%, 0, % translate("Select AutoHotkey folder...")
+	protectionOn()
 	
-	if (directory != "")
-		GuiControl Text, ahkPathEdit, %directory%
+	try{
+		FileSelectFolder, directory, *%ahkPathEdit%, 0, % translate("Select AutoHotkey folder...")
+	
+		if (directory != "")
+			GuiControl Text, ahkPathEdit, %directory%
+	}
+	finally {
+		protectionOff()
+	}
 }
 
 openTranslationsEditor() {
@@ -1121,17 +1188,31 @@ class ApplicationsTab extends ConfigurationItemList {
 }
 
 chooseApplicationExePath() {
-	FileSelectFolder, directory, *%applicationExePathEdit%, 0, % translate("Select application executable...")
+	protectionOn()
 	
-	if (directory != "")
-		GuiControl Text, applicationExePathEdit, %directory%
+	try {
+		FileSelectFolder, directory, *%applicationExePathEdit%, 0, % translate("Select application executable...")
+		
+		if (directory != "")
+			GuiControl Text, applicationExePathEdit, %directory%
+	}
+	finally {
+		protectionOff()
+	}
 }
 
 chooseApplicationWorkingDirectoryPath() {
-	FileSelectFolder, directory, *%applicationWorkingDirectoryPathEdit%, 0, % translate("Select working directory...")
+	protectionOn()
 	
-	if (directory != "")
-		GuiControl Text, applicationWorkingDirectoryPathEdit, %directory%
+	try {
+		FileSelectFolder, directory, *%applicationWorkingDirectoryPathEdit%, 0, % translate("Select working directory...")
+	
+		if (directory != "")
+			GuiControl Text, applicationWorkingDirectoryPathEdit, %directory%
+	}
+	finally {
+		protectionOff()
+	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -1510,7 +1591,14 @@ class FunctionsList extends ConfigurationItemList {
 }
 
 updateFunctionEditorState() {
-	vItemLists["functionsListView"].updateState()
+	protectionOn()
+	
+	try {
+		vItemLists["functionsListView"].updateState()
+	}
+	finally {
+		protectionOff()
+	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -1817,11 +1905,25 @@ class ThemesEditor extends ConfigurationItem {
 }
 
 saveThemesEditor() {
-	ThemesEditor.Instance.closeEditor(true)
+	protectionOn()
+	
+	try {
+		ThemesEditor.Instance.closeEditor(true)
+	}
+	finally {
+		protectionOff()
+	}
 }
 
 cancelThemesEditor() {
-	ThemesEditor.Instance.closeEditor(false)
+	protectionOn()
+	
+	try {
+		ThemesEditor.Instance.closeEditor(false)
+	}
+	finally {
+		protectionOff()
+	}
 }
 
 moveThemesEditor() {
@@ -2165,65 +2267,100 @@ error:
 }
 
 updateThemesEditorState() {
-	vItemLists["themesListView"].updateState()
+	protectionOn()
+	
+	try {
+		vItemLists["themesListView"].updateState()
+	}
+	finally {
+		protectionOff()
+	}
 }
 
 togglePlaySoundFile() {
-	ThemesList.Instance.togglePlaySoundFile()
+	protectionOn()
+	
+	try {
+		ThemesList.Instance.togglePlaySoundFile()
+	}
+	finally {
+		protectionOff()
+	}
 }
 
 addThemePicture() {
-	title := translate("Select Image...")
+	protectionOn()
 	
-	FileSelectFile, pictureFile, 1, , %title%, Image (*.jpg; *.gif)
+	try {
+		title := translate("Select Image...")
 	
-	if (pictureFile != "") {
-		Gui ListView, % picturesListViewHandle
+		FileSelectFile, pictureFile, 1, , %title%, Image (*.jpg; *.gif)
 		
-		IL_Add(picturesListViewImages, LoadPicture(pictureFile, "W32 H32"), 0xFFFFFF, false)
-		
-		LV_Add("Check Icon" . (LV_GetCount() + 1), StrReplace(StrReplace(pictureFile, kUserSplashMediaDirectory, ""), kSplashMediaDirectory, ""))
-		
-		LV_ModifyCol()
-		LV_Modify(LV_GetCount(), "Vis")
+		if (pictureFile != "") {
+			Gui ListView, % picturesListViewHandle
+			
+			IL_Add(picturesListViewImages, LoadPicture(pictureFile, "W32 H32"), 0xFFFFFF, false)
+			
+			LV_Add("Check Icon" . (LV_GetCount() + 1), StrReplace(StrReplace(pictureFile, kUserSplashMediaDirectory, ""), kSplashMediaDirectory, ""))
+			
+			LV_ModifyCol()
+			LV_Modify(LV_GetCount(), "Vis")
+		}
+	}
+	finally {
+		protectionOff()
 	}
 }
 
 chooseSoundFilePath() {
-	path := soundFilePathEdit
+	protectionOn()
 	
-	if (path && (path != ""))
-		path := getFileName(path, kUserSplashMediaDirectory, kSplashMediaDirectory)
-	else
-		path := SubStr(kUserSplashMediaDirectory, 1, StrLen(kUserSplashMediaDirectory) - 1)
+	try {
+		path := soundFilePathEdit
 	
-	title := translate("Select Sound File...")
-	
-	FileSelectFile, soundFile, 1, *%path%, %title%, Audio (*.wav; *.mp3)
-	
-	if (soundFile != "") {
-		soundFilePathEdit := soundFile
+		if (path && (path != ""))
+			path := getFileName(path, kUserSplashMediaDirectory, kSplashMediaDirectory)
+		else
+			path := SubStr(kUserSplashMediaDirectory, 1, StrLen(kUserSplashMediaDirectory) - 1)
 		
-		GuiControl Text, soundFilePathEdit, %soundFilePathEdit%
+		title := translate("Select Sound File...")
+		
+		FileSelectFile, soundFile, 1, *%path%, %title%, Audio (*.wav; *.mp3)
+		
+		if (soundFile != "") {
+			soundFilePathEdit := soundFile
+			
+			GuiControl Text, soundFilePathEdit, %soundFilePathEdit%
+		}
+	}
+	finally {
+		protectionOff()
 	}
 }
 
 chooseVideoFilePath() {
-	path := videoFilePathEdit
+	protectionOn()
 	
-	if (path && (path != ""))
-		path := getFileName(path, kUserSplashMediaDirectory, kSplashMediaDirectory)
-	else
-		path := SubStr(kUserSplashMediaDirectory, 1, StrLen(kUserSplashMediaDirectory) - 1)
+	try {
+		path := videoFilePathEdit
 	
-	title := translate("Select Video (GIF) File...")
-	
-	FileSelectFile, videoFile, 1, *%path%, %title%, Video (*.gif)
-	
-	if (videoFile != "") {
-		videoFilePathEdit := videoFile
+		if (path && (path != ""))
+			path := getFileName(path, kUserSplashMediaDirectory, kSplashMediaDirectory)
+		else
+			path := SubStr(kUserSplashMediaDirectory, 1, StrLen(kUserSplashMediaDirectory) - 1)
 		
-		GuiControl Text, videoFilePathEdit, %videoFilePathEdit%
+		title := translate("Select Video (GIF) File...")
+		
+		FileSelectFile, videoFile, 1, *%path%, %title%, Video (*.gif)
+		
+		if (videoFile != "") {
+			videoFilePathEdit := videoFile
+			
+			GuiControl Text, videoFilePathEdit, %videoFilePathEdit%
+		}
+	}
+	finally {
+		protectionOff()
 	}
 }
 
@@ -2493,15 +2630,36 @@ class TranslationsEditor extends ConfigurationItem {
 }
 
 addLanguage(){
-	TranslationsEditor.Instance.addLanguage()
+	protectionOn()
+	
+	try {
+		TranslationsEditor.Instance.addLanguage()
+	}
+	finally {
+		protectionOff()
+	}
 }
 
 deleteLanguage() {
-	TranslationsEditor.Instance.deleteLanguage()
+	protectionOn()
+	
+	try {
+		TranslationsEditor.Instance.deleteLanguage()
+	}
+	finally {
+		protectionOff()
+	}
 }
 
 closeTranslationsEditor() {
-	TranslationsEditor.Instance.closeEditor()
+	protectionOn()
+	
+	try {
+		TranslationsEditor.Instance.closeEditor()
+	}
+	finally {
+		protectionOff()
+	}
 }
 
 moveTranslationsEditor() {
@@ -2509,7 +2667,14 @@ moveTranslationsEditor() {
 }
 
 chooseTranslationLanguage() {
-	TranslationsEditor.Instance.chooseLanguage()
+	protectionOn()
+	
+	try {
+		TranslationsEditor.Instance.chooseLanguage()
+	}
+	finally {
+		protectionOff()
+	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;

@@ -129,8 +129,14 @@ Unsupported tire position "=>Die Reifenposition "
 " detected in changeTirePressure - please check the configuration=>" wird nicht unterstützt in changeTirePressure - Bitte überprüfen Sie die Konfiguration
 Unsupported pressure change "=>Die Druckveränderung "
 " detected in changeTirePressure - please check the configuration=>" wird nicht unterstützt in changeTirePressure - Bitte überprüfen Sie die Konfiguration
-Unsupported brake selection "=>Die Bremsenauswahl "
+Unsupported brake unit "=>Die Bremseneinheit "
 " detected in changeBrakeType - please check the configuration=>" wird nicht unterstützt in changeBrakeType - Bitte überprüfen Sie die Konfiguration
+Unsupported brake selection "=>Der Bremsenauswahl "
+" detected in changeBrakeType - please check the configuration=>" wird nicht unterstützt in changeBrakeType - Bitte überprüfen Sie die Konfiguration
+Assetto Corsa Competizione - Pitstop: Tires are selected for change=>Assetto Corsa Competizione - Reifenwechsel ist gewählt
+Assetto Corsa Competizione - Pitstop: Tires are not selected for change=>Assetto Corsa Competizione - Reifenwechsel ist nicht gewählt
+Assetto Corsa Competizione - Pitstop: Brakes are selected for change=>Assetto Corsa Competizione - Bremsenwechsel ist gewählt
+Assetto Corsa Competizione - Pitstop: Brakes are not selected for change=>Assetto Corsa Competizione - Bremsenwechsel ist nicht gewählt
 [Motion Feedback Plugin]
 Motion Feedback=>Bewegung
 Motion=>Bewegung

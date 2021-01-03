@@ -3,7 +3,36 @@
   <GUID>614615cd-65b7-420c-8fc7-5f969aaf3545</GUID>
   <ProfileName>Race Car Simulator</ProfileName>
   <TargetWindow>[Active window]</TargetWindow>
+  <AutoActivateMacro>32dc2324-d19e-4d4b-a50a-6bf4d17ea535</AutoActivateMacro>
   <Commands>
+    <Commands>
+      <GUID>32dc2324-d19e-4d4b-a50a-6bf4d17ea535</GUID>
+      <RecocnitionText>Startup</RecocnitionText>
+      <ShortCut>
+        <Key>None</Key>
+        <OnKeyAction>0</OnKeyAction>
+        <Clicks>0</Clicks>
+      </ShortCut>
+      <UseScheduler>true</UseScheduler>
+      <MacroActions>
+        <MacroAction>
+          <MacroType>14</MacroType>
+          <StartStopIgnoreCommands>0</StartStopIgnoreCommands>
+        </MacroAction>
+        <MacroAction>
+          <MacroType>12</MacroType>
+          <WaitForWindow>
+            <WindowName>Not Existing Window.exe</WindowName>
+            <AbortTimeOut>true</AbortTimeOut>
+            <Timeout>500</Timeout>
+          </WaitForWindow>
+        </MacroAction>
+        <MacroAction>
+          <MacroType>14</MacroType>
+          <StartStopIgnoreCommands>1</StartStopIgnoreCommands>
+        </MacroAction>
+      </MacroActions>
+    </Commands>
     <Commands>
       <GUID>764b8493-3c52-45be-a55b-186e6fff85b0</GUID>
       <RecocnitionText>Start ACC</RecocnitionText>
@@ -31,7 +60,7 @@
     </Commands>
     <Commands>
       <GUID>44fdf90b-c795-4a4d-92aa-746237794b3c</GUID>
-      <RecocnitionText>Say Fuck</RecocnitionText>
+      <RecocnitionText>Chat Say Fuck</RecocnitionText>
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
@@ -95,7 +124,7 @@
     </Commands>
     <Commands>
       <GUID>f00b1030-948f-4af6-a6fc-78916a839835</GUID>
-      <RecocnitionText>Say Really</RecocnitionText>
+      <RecocnitionText>Chat Say Really</RecocnitionText>
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
@@ -163,15 +192,6 @@
         <MacroAction>
           <MacroType>1</MacroType>
           <Keyboard>
-            <Key>OemOpenBrackets</Key>
-            <ClickDownUp>0</ClickDownUp>
-            <lShift>true</lShift>
-            <ClickDuration>20</ClickDuration>
-          </Keyboard>
-        </MacroAction>
-        <MacroAction>
-          <MacroType>1</MacroType>
-          <Keyboard>
             <Key>Return</Key>
             <ClickDownUp>0</ClickDownUp>
             <ClickDuration>20</ClickDuration>
@@ -181,7 +201,7 @@
     </Commands>
     <Commands>
       <GUID>b13203e8-5e75-432b-9957-956220dff714</GUID>
-      <RecocnitionText>Say Idiot</RecocnitionText>
+      <RecocnitionText>Chat Say Idiot</RecocnitionText>
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
@@ -250,7 +270,7 @@
     </Commands>
     <Commands>
       <GUID>92a66902-522b-42c5-8387-007620673cff</GUID>
-      <RecocnitionText>Say Break</RecocnitionText>
+      <RecocnitionText>Chat Say Break</RecocnitionText>
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
@@ -407,7 +427,7 @@
     </Commands>
     <Commands>
       <GUID>89df6313-10c5-4d6a-84c7-23a0547d36f7</GUID>
-      <RecocnitionText>Say Sorry</RecocnitionText>
+      <RecocnitionText>Chat Say Sorry</RecocnitionText>
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
@@ -476,7 +496,7 @@
     </Commands>
     <Commands>
       <GUID>0a59c55a-ada2-4651-8611-c5258ec5336e</GUID>
-      <RecocnitionText>Say Thanks</RecocnitionText>
+      <RecocnitionText>Chat Say Thanks</RecocnitionText>
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
@@ -529,7 +549,7 @@
     </Commands>
     <Commands>
       <GUID>14808e50-582c-4e3b-ae3b-21cf2e5ab8a6</GUID>
-      <RecocnitionText>Say Job</RecocnitionText>
+      <RecocnitionText>Chat Say Job</RecocnitionText>
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
@@ -630,7 +650,7 @@
     </Commands>
     <Commands>
       <GUID>1620c1fd-8458-412b-b604-ebb83bca1e77</GUID>
-      <RecocnitionText>Say Fight</RecocnitionText>
+      <RecocnitionText>Chat Say Fight</RecocnitionText>
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
@@ -739,7 +759,7 @@
     </Commands>
     <Commands>
       <GUID>3f3bac09-daff-4f7b-b421-b3dab52f429a</GUID>
-      <RecocnitionText>Say Race</RecocnitionText>
+      <RecocnitionText>Chat Say Race</RecocnitionText>
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
@@ -856,7 +876,7 @@
     </Commands>
     <Commands>
       <GUID>e625fa2d-5793-42b8-84b5-d939c32e17f1</GUID>
-      <RecocnitionText>Say Clean</RecocnitionText>
+      <RecocnitionText>Chat Say Clean</RecocnitionText>
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
@@ -1005,7 +1025,7 @@
     </Commands>
     <Commands>
       <GUID>4ecbae2d-c783-455b-954a-25d7e8ae843d</GUID>
-      <RecocnitionText>Say Fun</RecocnitionText>
+      <RecocnitionText>Chat Say Fun</RecocnitionText>
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
@@ -1091,6 +1111,436 @@
           <Keyboard>
             <Key>Return</Key>
             <ClickDownUp>0</ClickDownUp>
+            <ClickDuration>20</ClickDuration>
+          </Keyboard>
+        </MacroAction>
+      </MacroActions>
+    </Commands>
+    <Commands>
+      <GUID>470c82c7-2249-4d10-9559-f448b24d17d7</GUID>
+      <RecocnitionText>Pitstop Open</RecocnitionText>
+      <ShortCut>
+        <Key>None</Key>
+        <OnKeyAction>0</OnKeyAction>
+        <Clicks>0</Clicks>
+      </ShortCut>
+      <UseRecognition>true</UseRecognition>
+      <MacroActions>
+        <MacroAction>
+          <MacroType>1</MacroType>
+          <Keyboard>
+            <Key>NumPad1</Key>
+            <ClickDownUp>0</ClickDownUp>
+            <lCTRL>true</lCTRL>
+            <ClickDuration>20</ClickDuration>
+          </Keyboard>
+        </MacroAction>
+      </MacroActions>
+    </Commands>
+    <Commands>
+      <GUID>d11e2a2c-7abf-408d-bda4-954cfe7e83e6</GUID>
+      <RecocnitionText>Pitstop Close</RecocnitionText>
+      <ShortCut>
+        <Key>None</Key>
+        <OnKeyAction>0</OnKeyAction>
+        <Clicks>0</Clicks>
+      </ShortCut>
+      <UseRecognition>true</UseRecognition>
+      <MacroActions>
+        <MacroAction>
+          <MacroType>1</MacroType>
+          <Keyboard>
+            <Key>NumPad1</Key>
+            <ClickDownUp>0</ClickDownUp>
+            <Alt>true</Alt>
+            <lCTRL>true</lCTRL>
+            <ClickDuration>20</ClickDuration>
+          </Keyboard>
+        </MacroAction>
+      </MacroActions>
+    </Commands>
+    <Commands>
+      <GUID>22a1b638-0cad-42d0-90c3-397410dcdc45</GUID>
+      <RecocnitionText>Pitstop Change Tires</RecocnitionText>
+      <ShortCut>
+        <Key>None</Key>
+        <OnKeyAction>0</OnKeyAction>
+        <Clicks>0</Clicks>
+      </ShortCut>
+      <UseRecognition>true</UseRecognition>
+      <MacroActions>
+        <MacroAction>
+          <MacroType>1</MacroType>
+          <Keyboard>
+            <Key>NumPad2</Key>
+            <ClickDownUp>0</ClickDownUp>
+            <lCTRL>true</lCTRL>
+            <ClickDuration>20</ClickDuration>
+          </Keyboard>
+        </MacroAction>
+      </MacroActions>
+    </Commands>
+    <Commands>
+      <GUID>558f3e31-e0a4-4ba9-a59b-794b441f54e9</GUID>
+      <RecocnitionText>Pitstop Change Brakes</RecocnitionText>
+      <ShortCut>
+        <Key>None</Key>
+        <OnKeyAction>0</OnKeyAction>
+        <Clicks>0</Clicks>
+      </ShortCut>
+      <UseRecognition>true</UseRecognition>
+      <MacroActions>
+        <MacroAction>
+          <MacroType>1</MacroType>
+          <Keyboard>
+            <Key>NumPad2</Key>
+            <ClickDownUp>0</ClickDownUp>
+            <Alt>true</Alt>
+            <lCTRL>true</lCTRL>
+            <ClickDuration>20</ClickDuration>
+          </Keyboard>
+        </MacroAction>
+      </MacroActions>
+    </Commands>
+    <Commands>
+      <GUID>12356650-f540-457a-a4d3-7e4bd68061a1</GUID>
+      <RecocnitionText>Pitstop Repair Bodywork</RecocnitionText>
+      <ShortCut>
+        <Key>None</Key>
+        <OnKeyAction>0</OnKeyAction>
+        <Clicks>0</Clicks>
+      </ShortCut>
+      <UseRecognition>true</UseRecognition>
+      <MacroActions>
+        <MacroAction>
+          <MacroType>1</MacroType>
+          <Keyboard>
+            <Key>NumPad3</Key>
+            <ClickDownUp>0</ClickDownUp>
+            <lCTRL>true</lCTRL>
+            <ClickDuration>20</ClickDuration>
+          </Keyboard>
+        </MacroAction>
+      </MacroActions>
+    </Commands>
+    <Commands>
+      <GUID>78c31541-6d8c-428b-96ac-b5e37550208c</GUID>
+      <RecocnitionText>Pitstop Repair Suspension</RecocnitionText>
+      <ShortCut>
+        <Key>None</Key>
+        <OnKeyAction>0</OnKeyAction>
+        <Clicks>0</Clicks>
+      </ShortCut>
+      <UseRecognition>true</UseRecognition>
+      <MacroActions>
+        <MacroAction>
+          <MacroType>1</MacroType>
+          <Keyboard>
+            <Key>NumPad3</Key>
+            <ClickDownUp>0</ClickDownUp>
+            <Alt>true</Alt>
+            <lCTRL>true</lCTRL>
+            <ClickDuration>20</ClickDuration>
+          </Keyboard>
+        </MacroAction>
+      </MacroActions>
+    </Commands>
+    <Commands>
+      <GUID>d7bb8f61-1c33-46ef-ad65-825c011916ed</GUID>
+      <RecocnitionText>Pitstop Next Strategy</RecocnitionText>
+      <ShortCut>
+        <Key>None</Key>
+        <OnKeyAction>0</OnKeyAction>
+        <Clicks>0</Clicks>
+      </ShortCut>
+      <UseRecognition>true</UseRecognition>
+      <MacroActions>
+        <MacroAction>
+          <MacroType>1</MacroType>
+          <Keyboard>
+            <Key>NumPad4</Key>
+            <ClickDownUp>0</ClickDownUp>
+            <lCTRL>true</lCTRL>
+            <ClickDuration>20</ClickDuration>
+          </Keyboard>
+        </MacroAction>
+      </MacroActions>
+    </Commands>
+    <Commands>
+      <GUID>053a0d71-7fd3-4ee3-b0aa-2519b22dc741</GUID>
+      <RecocnitionText>Pitstop Previous Strategy</RecocnitionText>
+      <ShortCut>
+        <Key>None</Key>
+        <OnKeyAction>0</OnKeyAction>
+        <Clicks>0</Clicks>
+      </ShortCut>
+      <UseRecognition>true</UseRecognition>
+      <MacroActions>
+        <MacroAction>
+          <MacroType>1</MacroType>
+          <Keyboard>
+            <Key>NumPad4</Key>
+            <ClickDownUp>0</ClickDownUp>
+            <Alt>true</Alt>
+            <lCTRL>true</lCTRL>
+            <ClickDuration>20</ClickDuration>
+          </Keyboard>
+        </MacroAction>
+      </MacroActions>
+    </Commands>
+    <Commands>
+      <GUID>6b05df02-a25d-46f7-821c-b5b605161129</GUID>
+      <RecocnitionText>Pitstop More Fuel</RecocnitionText>
+      <ShortCut>
+        <Key>None</Key>
+        <OnKeyAction>0</OnKeyAction>
+        <Clicks>0</Clicks>
+      </ShortCut>
+      <UseRecognition>true</UseRecognition>
+      <MacroActions>
+        <MacroAction>
+          <MacroType>1</MacroType>
+          <Keyboard>
+            <Key>NumPad5</Key>
+            <ClickDownUp>0</ClickDownUp>
+            <lCTRL>true</lCTRL>
+            <ClickDuration>20</ClickDuration>
+          </Keyboard>
+        </MacroAction>
+      </MacroActions>
+    </Commands>
+    <Commands>
+      <GUID>4b779513-389c-465f-9e26-6023e08fdbbd</GUID>
+      <RecocnitionText>Pitstop Less Fuel</RecocnitionText>
+      <ShortCut>
+        <Key>None</Key>
+        <OnKeyAction>0</OnKeyAction>
+        <Clicks>0</Clicks>
+      </ShortCut>
+      <UseRecognition>true</UseRecognition>
+      <MacroActions>
+        <MacroAction>
+          <MacroType>1</MacroType>
+          <Keyboard>
+            <Key>NumPad5</Key>
+            <ClickDownUp>0</ClickDownUp>
+            <Alt>true</Alt>
+            <lCTRL>true</lCTRL>
+            <ClickDuration>20</ClickDuration>
+          </Keyboard>
+        </MacroAction>
+      </MacroActions>
+    </Commands>
+    <Commands>
+      <GUID>4c753ad0-ae40-44fc-b087-4337da84330a</GUID>
+      <RecocnitionText>Pitstop Around More Pressure</RecocnitionText>
+      <ShortCut>
+        <Key>None</Key>
+        <OnKeyAction>0</OnKeyAction>
+        <Clicks>0</Clicks>
+      </ShortCut>
+      <UseRecognition>true</UseRecognition>
+      <MacroActions>
+        <MacroAction>
+          <MacroType>1</MacroType>
+          <Keyboard>
+            <Key>NumPad6</Key>
+            <ClickDownUp>0</ClickDownUp>
+            <lCTRL>true</lCTRL>
+            <ClickDuration>20</ClickDuration>
+          </Keyboard>
+        </MacroAction>
+      </MacroActions>
+    </Commands>
+    <Commands>
+      <GUID>5ee0b831-8db2-4be7-b98c-ad6576560d91</GUID>
+      <RecocnitionText>Pitstop Around Less Pressure</RecocnitionText>
+      <ShortCut>
+        <Key>None</Key>
+        <OnKeyAction>0</OnKeyAction>
+        <Clicks>0</Clicks>
+      </ShortCut>
+      <UseRecognition>true</UseRecognition>
+      <MacroActions>
+        <MacroAction>
+          <MacroType>1</MacroType>
+          <Keyboard>
+            <Key>NumPad6</Key>
+            <ClickDownUp>0</ClickDownUp>
+            <Alt>true</Alt>
+            <lCTRL>true</lCTRL>
+            <ClickDuration>20</ClickDuration>
+          </Keyboard>
+        </MacroAction>
+      </MacroActions>
+    </Commands>
+    <Commands>
+      <GUID>05f5d9a2-2507-47a5-bace-6cda7109908c</GUID>
+      <RecocnitionText>Pitstop Front Left More Pressure</RecocnitionText>
+      <ShortCut>
+        <Key>None</Key>
+        <OnKeyAction>0</OnKeyAction>
+        <Clicks>0</Clicks>
+      </ShortCut>
+      <UseRecognition>true</UseRecognition>
+      <MacroActions>
+        <MacroAction>
+          <MacroType>1</MacroType>
+          <Keyboard>
+            <Key>NumPad7</Key>
+            <ClickDownUp>0</ClickDownUp>
+            <lCTRL>true</lCTRL>
+            <ClickDuration>20</ClickDuration>
+          </Keyboard>
+        </MacroAction>
+      </MacroActions>
+    </Commands>
+    <Commands>
+      <GUID>c55c3752-cc65-4273-8efc-234675fbb3f1</GUID>
+      <RecocnitionText>Pitstop Front Left Less Pressure</RecocnitionText>
+      <ShortCut>
+        <Key>None</Key>
+        <OnKeyAction>0</OnKeyAction>
+        <Clicks>0</Clicks>
+      </ShortCut>
+      <UseRecognition>true</UseRecognition>
+      <MacroActions>
+        <MacroAction>
+          <MacroType>1</MacroType>
+          <Keyboard>
+            <Key>NumPad7</Key>
+            <ClickDownUp>0</ClickDownUp>
+            <Alt>true</Alt>
+            <lCTRL>true</lCTRL>
+            <ClickDuration>20</ClickDuration>
+          </Keyboard>
+        </MacroAction>
+      </MacroActions>
+    </Commands>
+    <Commands>
+      <GUID>587ab368-f405-4239-a2d5-08111f28ce51</GUID>
+      <RecocnitionText>Pitstop Front Right More Pressure</RecocnitionText>
+      <ShortCut>
+        <Key>None</Key>
+        <OnKeyAction>0</OnKeyAction>
+        <Clicks>0</Clicks>
+      </ShortCut>
+      <UseRecognition>true</UseRecognition>
+      <MacroActions>
+        <MacroAction>
+          <MacroType>1</MacroType>
+          <Keyboard>
+            <Key>NumPad8</Key>
+            <ClickDownUp>0</ClickDownUp>
+            <lCTRL>true</lCTRL>
+            <ClickDuration>20</ClickDuration>
+          </Keyboard>
+        </MacroAction>
+      </MacroActions>
+    </Commands>
+    <Commands>
+      <GUID>fc188496-9a21-41d8-b7b5-86fe0b1b53be</GUID>
+      <RecocnitionText>Pitstop Front Right Less Pressure</RecocnitionText>
+      <ShortCut>
+        <Key>None</Key>
+        <OnKeyAction>0</OnKeyAction>
+        <Clicks>0</Clicks>
+      </ShortCut>
+      <UseRecognition>true</UseRecognition>
+      <MacroActions>
+        <MacroAction>
+          <MacroType>1</MacroType>
+          <Keyboard>
+            <Key>NumPad8</Key>
+            <ClickDownUp>0</ClickDownUp>
+            <Alt>true</Alt>
+            <lCTRL>true</lCTRL>
+            <ClickDuration>20</ClickDuration>
+          </Keyboard>
+        </MacroAction>
+      </MacroActions>
+    </Commands>
+    <Commands>
+      <GUID>44856546-69d3-4850-b1e1-8875432cb2bb</GUID>
+      <RecocnitionText>Pitstop Rear Left More Pressure</RecocnitionText>
+      <ShortCut>
+        <Key>None</Key>
+        <OnKeyAction>0</OnKeyAction>
+        <Clicks>0</Clicks>
+      </ShortCut>
+      <UseRecognition>true</UseRecognition>
+      <MacroActions>
+        <MacroAction>
+          <MacroType>1</MacroType>
+          <Keyboard>
+            <Key>NumPad9</Key>
+            <ClickDownUp>0</ClickDownUp>
+            <lCTRL>true</lCTRL>
+            <ClickDuration>20</ClickDuration>
+          </Keyboard>
+        </MacroAction>
+      </MacroActions>
+    </Commands>
+    <Commands>
+      <GUID>1411ee74-6bd2-4ee4-a5b8-edf10b45c628</GUID>
+      <RecocnitionText>Pitstop Rear Left Less Pressure</RecocnitionText>
+      <ShortCut>
+        <Key>None</Key>
+        <OnKeyAction>0</OnKeyAction>
+        <Clicks>0</Clicks>
+      </ShortCut>
+      <UseRecognition>true</UseRecognition>
+      <MacroActions>
+        <MacroAction>
+          <MacroType>1</MacroType>
+          <Keyboard>
+            <Key>NumPad9</Key>
+            <ClickDownUp>0</ClickDownUp>
+            <Alt>true</Alt>
+            <lCTRL>true</lCTRL>
+            <ClickDuration>20</ClickDuration>
+          </Keyboard>
+        </MacroAction>
+      </MacroActions>
+    </Commands>
+    <Commands>
+      <GUID>82309cd3-7893-4a6c-bca6-d8059ec7b95c</GUID>
+      <RecocnitionText>Pitstop Rear Right More Pressure</RecocnitionText>
+      <ShortCut>
+        <Key>None</Key>
+        <OnKeyAction>0</OnKeyAction>
+        <Clicks>0</Clicks>
+      </ShortCut>
+      <UseRecognition>true</UseRecognition>
+      <MacroActions>
+        <MacroAction>
+          <MacroType>1</MacroType>
+          <Keyboard>
+            <Key>NumPad0</Key>
+            <ClickDownUp>0</ClickDownUp>
+            <lCTRL>true</lCTRL>
+            <ClickDuration>20</ClickDuration>
+          </Keyboard>
+        </MacroAction>
+      </MacroActions>
+    </Commands>
+    <Commands>
+      <GUID>aa34f002-36ce-4961-bbbc-2eb2a0646b19</GUID>
+      <RecocnitionText>Pitstop Rear Right Less Pressure</RecocnitionText>
+      <ShortCut>
+        <Key>None</Key>
+        <OnKeyAction>0</OnKeyAction>
+        <Clicks>0</Clicks>
+      </ShortCut>
+      <UseRecognition>true</UseRecognition>
+      <MacroActions>
+        <MacroAction>
+          <MacroType>1</MacroType>
+          <Keyboard>
+            <Key>NumPad0</Key>
+            <ClickDownUp>0</ClickDownUp>
+            <Alt>true</Alt>
+            <lCTRL>true</lCTRL>
             <ClickDuration>20</ClickDuration>
           </Keyboard>
         </MacroAction>
@@ -1511,7 +1961,7 @@
         <MacroAction>
           <MacroType>1</MacroType>
           <Keyboard>
-            <Key>NumPad9</Key>
+            <Key>F12</Key>
             <ClickDownUp>0</ClickDownUp>
             <Alt>true</Alt>
             <lCTRL>true</lCTRL>

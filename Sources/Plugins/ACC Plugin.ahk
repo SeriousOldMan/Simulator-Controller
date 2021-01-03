@@ -59,7 +59,7 @@ class ACCPlugin extends ControllerPlugin {
 			
 			tireSetLabel := getFileName("ACC\Tyre Set.jpg", kUserScreenImagesDirectory, kScreenImagesDirectory)
 			
-			ImageSearch x, y, 0, 0, A_ScreenWidth, A_ScreenHeight, *50 %tireSetLabel%
+			ImageSearch x, y, 0, 0, Round(A_ScreenWidth / 2), A_ScreenHeight, *50 %tireSetLabel%
 			
 			if x is Integer
 			{
@@ -75,7 +75,7 @@ class ACCPlugin extends ControllerPlugin {
 			
 			frontBrakeLabel := getFileName("ACC\Front Brake.jpg", kUserScreenImagesDirectory, kScreenImagesDirectory)
 			
-			ImageSearch x, y, 0, 0, A_ScreenWidth, A_ScreenHeight, *50 %frontBrakeLabel%
+			ImageSearch x, y, 0, 0, Round(A_ScreenWidth / 2), A_ScreenHeight, *50 %frontBrakeLabel%
 			
 			if x is Integer
 			{
@@ -243,7 +243,7 @@ class ACCPlugin extends ControllerPlugin {
 			if isACCRunning() {
 				pitstopLabel := getFileName("ACC\PITSTOP.jpg", kUserScreenImagesDirectory, kScreenImagesDirectory)
 				
-				ImageSearch x, y, 0, 0, A_ScreenWidth, A_ScreenHeight, *50 %pitstopLabel%
+				ImageSearch x, y, 0, 0, Round(A_ScreenWidth / 2), A_ScreenHeight, *50 %pitstopLabel%
 				
 				if x is Integer
 					this.iPSIsOpen := true

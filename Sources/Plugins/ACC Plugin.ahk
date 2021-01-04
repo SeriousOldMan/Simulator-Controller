@@ -59,6 +59,7 @@ class ACCPlugin extends ControllerPlugin {
 	
 	class PitstopAction extends ControllerAction {
 		iPitstopOption := false
+		iSteps := 1
 		
 		Option[] {
 			Get {
@@ -66,8 +67,18 @@ class ACCPlugin extends ControllerPlugin {
 			}
 		}
 		
-		__New(function, label, pitstopOption) {
+		Steps[] {
+			Get {
+				return this.iSteps
+			}
+		}
+		
+		__New(function, label, pitstopOption, steps := 1, moreArguments*) {
 			this.iPitstopOption := pitstopOption
+			this.iSteps := steps
+			
+			if (moreArguments.Length() > 0)
+				Throw "Unsupported arguments (" . values2String(", ", moreArguments*) . ") detected in PitstopAction.__New"
 			
 			base.__New(function, label)
 		}
@@ -84,21 +95,21 @@ class ACCPlugin extends ControllerPlugin {
 	class PitstopChangeAction extends ACCPlugin.PitstopAction {
 		iDirection := false
 		
-		__New(function, label, pitstopOption, direction) {
+		__New(function, label, pitstopOption, direction, moreArguments*) {
 			this.iDirection := direction
 			
-			base.__New(function, label, pitstopOption)
+			base.__New(function, label, pitstopOption, moreArguments*)
 		}
 		
 		fireAction(function, trigger) {
 			if base.fireAction(function, trigger)
-				this.Controller.findPlugin(kACCPlugin).changePitstopOption(this.Option, this.iDirection)
+				this.Controller.findPlugin(kACCPlugin).changePitstopOption(this.Option, this.iDirection, this.Steps)
 		}
 	}
 	
 	class PitstopSelectAction extends ACCPlugin.PitstopChangeAction {
-		__New(function, label, pitstopOption) {
-			base.__New(function, label, pitstopOption, "Increase")
+		__New(function, label, pitstopOption, moreArguments*) {
+			base.__New(function, label, pitstopOption, "Increase", moreArguments*)
 		}
 	}
 
@@ -106,9 +117,9 @@ class ACCPlugin extends ControllerPlugin {
 		fireAction(function, trigger) {
 			if base.fireAction(function, trigger)
 				if ((trigger == "On") || (trigger == "Increase") || (trigger == "Push") || (trigger == "Call"))
-					this.Controller.findPlugin(kACCPlugin).changePitstopOption(this.Option, "Increase")
+					this.Controller.findPlugin(kACCPlugin).changePitstopOption(this.Option, "Increase", this.Steps)
 				else
-					this.Controller.findPlugin(kACCPlugin).changePitstopOption(this.Option, "Decrease")
+					this.Controller.findPlugin(kACCPlugin).changePitstopOption(this.Option, "Decrease", this.Steps)
 		}
 	}
 
@@ -198,7 +209,7 @@ class ACCPlugin extends ControllerPlugin {
 		}
 	}
 	
-	createPitstopAction(controller, action, increaseFunction, decreaseFunction := false) {
+	createPitstopAction(controller, action, increaseFunction, moreArguments*) {
 		static kActions := {Strategy: "Strategy", Refuel: "Refuel"
 						  , TyreChange: "Change Tyres", TyreSet: "Tyre Set", TyreCompound: "Compound", TyreAllAround: "All Around"
 						  , TyreFrontLeft: "Front Left", TyreFrontRight: "Front Right", TyreRearLeft: "Rear Left", TyreRearRight: "Rear Right"
@@ -209,30 +220,41 @@ class ACCPlugin extends ControllerPlugin {
 		local function
 		
 		if kActions.HasKey(action) {
+			decreaseFunction := false
+			
+			if (moreArguments.Length() > 0) {
+				decreaseFunction := moreArguments[1]
+				
+				if (this.Controller.findFunction(decreaseFunction) != false)
+					moreArguments.RemoveAt(1)
+				else
+					decreaseFunction := false
+			}
+			
 			function := this.Controller.findFunction(increaseFunction)
 			
 			if (mode == false)
 				mode := new this.PitstopMode(this)
-				
+			
 			if !decreaseFunction {
 				if (function != false)
 					if (inList(kSelectActions, action))
-						mode.registerAction(new this.PitstopSelectAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Toggle"), action), kActions[action]))
+						mode.registerAction(new this.PitstopSelectAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Toggle"), action), kActions[action]), moreArguments*)
 					else
-						mode.registerAction(new this.PitstopToggleAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Toggle"), action), kActions[action]))
+						mode.registerAction(new this.PitstopToggleAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Toggle"), action), kActions[action]), moreArguments*)
 				else
 					this.logFunctionNotFound(increaseFunction)
 			}
 			else {
 				if (function != false)
-					mode.registerAction(new this.PitstopChangeAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Increase"), action), kActions[action], "Increase"))
+					mode.registerAction(new this.PitstopChangeAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Increase"), action), kActions[action], "Increase", moreArguments*))
 				else
 					this.logFunctionNotFound(increaseFunction)
 					
 				function := this.Controller.findFunction(decreaseFunction)
 				
 				if (function != false)
-					mode.registerAction(new this.PitstopChangeAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Decrease"), action), kActions[action], "Decrease"))
+					mode.registerAction(new this.PitstopChangeAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Decrease"), action), kActions[action], "Decrease", moreArguments*))
 				else
 					this.logFunctionNotFound(decreaseFunction)
 			}

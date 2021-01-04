@@ -47,14 +47,8 @@ changeProtection(up) {
 	if (level == 1) {
         Critical On
 		BlockInput On
-		BlockInput SendAndMouse
-		Thread NoTimers, true
-		Thread Priority, 2147483647
 	}
 	else if (level == 0) {
-		Thread Priority, 0
-		Thread NoTimers, false
-		BlockInput Default
 		BlockInput Off
         Critical Off
 	}

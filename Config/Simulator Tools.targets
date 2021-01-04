@@ -1,3 +1,5 @@
+[Update]
+Release 2.0=updateToV20
 [Cleanup]
 Binaries Folder=%kBinariesDirectory%
 Logs Folder=%kLogsDirectory%

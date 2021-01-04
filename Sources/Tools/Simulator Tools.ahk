@@ -49,10 +49,12 @@ global kCancel = "cancel"
 ;;;                        Private Variable Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+global vUpdateTargets = []
 global vCleanupTargets = []
 global vBuildTargets = []
 global vSplashTheme = false
 
+global vUpdateSettings = Object()
 global vCleanupSettings = Object()
 global vBuildSettings = Object()
 
@@ -61,60 +63,16 @@ global vBuildSettings = Object()
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-checkFileDependency(file, modification) {
-	logMessage(kLogInfo, translate("Checking file ") . file . translate(" for modification"))
-	
-	FileGetTime lastModified, %file%, M
-	
-	if (lastModified > modification) {
-		logMessage(kLogInfo, translate("File ") . file . translate(" found more recent than ") . modification)
-	
-		return true
-	}
-	else
-		return false
-}
-
-checkDirectoryDependency(directory, modification) {
-	logMessage(kLogInfo, translate("Checking all files in ") . directory)
-	
-	files := []
-	
-	Loop Files, % directory . "*.ahk", R
-	{
-		files.Push(A_LoopFilePath)
-	}
-	
-	for ignore, file in files
-		if checkFileDependency(file, modification)
-			return true
-	
-	return false
-}
-
-checkDependencies(dependencies, modification) {
-	for ignore, fileOrFolder in dependencies {
-		attributes := FileExist(fileOrFolder)
-	
-		if InStr(attributes, "D") {
-			if checkDirectoryDependency(fileOrFolder, modification)
-				return true
-		}
-		else if attributes {
-			if checkFileDependency(fileOrFolder, modification)
-				return true
-		}
-	}
-	
-	return false
-}
-
-readToolsConfiguration(ByRef cleanupSettings, ByRef buildSettings, ByRef splashTheme) {
+readToolsConfiguration(ByRef updateSettings, ByRef cleanupSettings, ByRef buildSettings, ByRef splashTheme) {
 	targets := readConfiguration(kToolsTargetsFile)
 	configuration := readConfiguration(kToolsConfigurationFile)
 	
+	updateSettings := Object()
 	cleanupSettings := Object()
 	buildSettings := Object()
+	
+	for target, rule in getConfigurationSectionValues(targets, "Update", Object())
+		updateSettings[target] := getConfigurationValue(configuration, "Update", target, true)
 	
 	for target, rule in getConfigurationSectionValues(targets, "Cleanup", Object())
 		cleanupSettings[target] := getConfigurationValue(configuration, "Cleanup", target, InStr(target, "*.ahk") ? true : false)
@@ -128,8 +86,11 @@ readToolsConfiguration(ByRef cleanupSettings, ByRef buildSettings, ByRef splashT
 		buildSettings["Simulator Tools"] := false
 }
 
-writeToolsConfiguration(cleanupSettings, buildSettings, splashTheme) {
+writeToolsConfiguration(updateSettings, cleanupSettings, buildSettings, splashTheme) {
 	configuration := newConfiguration()
+	
+	for target, setting in updateSettings
+		setConfigurationValue(configuration, "Update", target, setting)
 	
 	for target, setting in cleanupSettings
 		setConfigurationValue(configuration, "Cleanup", target, setting)
@@ -157,6 +118,15 @@ moveEditor() {
 editTargets(command := "") {
 	static result
 	
+	static updateVariable1
+	static updateVariable2
+	static updateVariable3
+	static updateVariable4
+	static updateVariable5
+	static updateVariable6
+	static updateVariable7
+	static updateVariable8
+	
 	static cleanupVariable1
 	static cleanupVariable2
 	static cleanupVariable3
@@ -180,6 +150,12 @@ editTargets(command := "") {
 	if (command == kSave) {
 		Gui TE:Submit
 		
+		for target, setting in vUpdateSettings {
+			updateVariable := "updateVariable" . A_Index
+			
+			vUpdateSettings[target] := %updateVariable%
+		}
+		
 		for target, setting in vCleanupSettings {
 			cleanupVariable := "cleanupVariable" . A_Index
 			
@@ -194,7 +170,7 @@ editTargets(command := "") {
 		
 		vSplashTheme := (splashTheme == translate("None")) ? false : splashTheme
 		
-		writeToolsConfiguration(vCleanupSettings, vBuildSettings, vSplashTheme)
+		writeToolsConfiguration(vUpdateSettings, vCleanupSettings, vBuildSettings, vSplashTheme)
 		
 		Gui TE:Destroy
 		
@@ -213,6 +189,9 @@ editTargets(command := "") {
 	else {
 		result := false
 		
+		if (vUpdateSettings.Length() > 8)
+			Throw "Too many update targets detected in editTargets..."
+		
 		if (vCleanupSettings.Length() > 8)
 			Throw "Too many cleanup targets detected in editTargets..."
 		
@@ -229,7 +208,31 @@ editTargets(command := "") {
 		Gui TE:Font, Norm, Arial
 		Gui TE:Font, Italic, Arial
 	
-		Gui TE:Add, Text, YP+20 w220 Center, % translate("Build Targets")
+		Gui TE:Add, Text, YP+20 w220 Center, % translate("Targets")
+	
+		Gui TE:Font, Norm, Arial
+		Gui TE:Font, Italic, Arial
+		
+		updateHeight := 20 + (vupdateSettings.Count() * 20)
+		
+		if (updateHeight == 20)
+			updateHeight := 40
+			
+		Gui TE:Add, GroupBox, YP+30 w220 h%updateHeight%, % translate("Update")
+	
+		Gui TE:Font, Norm, Arial
+	
+		if (vUpdateSettings.Count() > 0)
+			for target, setting in vUpdateSettings {
+				option := ""
+				
+				if (A_Index == 1)
+					option := option . " YP+20 XP+10"
+					
+				Gui TE:Add, CheckBox, %option% Disabled Checked%setting% vupdateVariable%A_Index%, %target%
+			}
+		else
+			Gui TE:Add, Text, YP+20 XP+10, % translate("No targets found...")
 	
 		Gui TE:Font, Norm, Arial
 		Gui TE:Font, Italic, Arial
@@ -239,7 +242,7 @@ editTargets(command := "") {
 		if (cleanupHeight == 20)
 			cleanupHeight := 40
 			
-		Gui TE:Add, GroupBox, YP+30 w220 h%cleanupHeight%, % translate("Cleanup")
+		Gui TE:Add, GroupBox, XP-10 YP+30 w220 h%cleanupHeight%, % translate("Cleanup")
 	
 		Gui TE:Font, Norm, Arial
 	
@@ -289,7 +292,7 @@ editTargets(command := "") {
 		Gui TE:Add, Text, X10 Y+20, % translate("Theme")
 		Gui TE:Add, DropDownList, X90 YP-5 w140 Choose%chosen% vsplashTheme, %themes%
 		
-		Gui TE:Add, Button, Default X10 y+20 w100 gsaveTargets, % translate("Build")
+		Gui TE:Add, Button, Default X10 y+20 w100 gsaveTargets, % translate("Run")
 		Gui TE:Add, Button, X+20 w100 gcancelTargets, % translate("&Cancel")
 	
 		Gui TE: Margin, 10, 10
@@ -300,6 +303,72 @@ editTargets(command := "") {
 		until result
 	
 		return ((result == 1) || (result == 2))
+	}
+}
+
+updateToV20() {
+}
+
+checkFileDependency(file, modification) {
+	logMessage(kLogInfo, translate("Checking file ") . file . translate(" for modification"))
+	
+	FileGetTime lastModified, %file%, M
+	
+	if (lastModified > modification) {
+		logMessage(kLogInfo, translate("File ") . file . translate(" found more recent than ") . modification)
+	
+		return true
+	}
+	else
+		return false
+}
+
+checkDirectoryDependency(directory, modification) {
+	logMessage(kLogInfo, translate("Checking all files in ") . directory)
+	
+	files := []
+	
+	Loop Files, % directory . "*.ahk", R
+	{
+		files.Push(A_LoopFilePath)
+	}
+	
+	for ignore, file in files
+		if checkFileDependency(file, modification)
+			return true
+	
+	return false
+}
+
+checkDependencies(dependencies, modification) {
+	for ignore, fileOrFolder in dependencies {
+		attributes := FileExist(fileOrFolder)
+	
+		if InStr(attributes, "D") {
+			if checkDirectoryDependency(fileOrFolder, modification)
+				return true
+		}
+		else if attributes {
+			if checkFileDependency(fileOrFolder, modification)
+				return true
+		}
+	}
+	
+	return false
+}
+
+runUpdateTargets(ByRef buildProgress) {
+	for ignore, target in vUpdateTargets {
+		targetName := target[1]
+	
+		if !kSilentMode
+			Progress %buildProgress%, % translate("Updating to ") . targetName . translate("...")
+			
+		logMessage(kLogInfo, translate("Cleaning ") . targetName)
+		
+		updateFunction := target[2]
+		
+		%updateFunction%()
 	}
 }
 
@@ -429,17 +498,44 @@ runBuildTargets(ByRef buildProgress) {
 	}
 }
 
+compareUpdateTargets(t1, t2) {
+	if inList(t2[3], t1[1])
+		return false
+	else if inList(t1[3], t2[1])
+		return true
+	else
+		return (t1[1] >= t2[1])
+}
+
 prepareTargets(ByRef buildProgress) {
 	targets := readConfiguration(kToolsTargetsFile)
 	
-	for target, arguments in getConfigurationSectionValues(targets, "Cleanup", Object()) {
+	for target, arguments in getConfigurationSectionValues(targets, "Update", Object()) {
 		buildProgress +=1
-		build := vCleanupSettings[target]
+		update := vUpdateSettings[target]
 		
 		if !kSilentMode
-			Progress, %buildProgress%, % target . ": " . (build ? translate("Yes") : translate("No"))
+			Progress, %buildProgress%, % target . ": " . (update ? translate("Yes") : translate("No"))
 		
-		if build {
+		if update {
+			arguments := string2Values("<-", substituteVariables(arguments))
+			
+			vUpdateTargets.Push(Array(target, arguments[1], string2Values(",", arguments[2])))
+		}
+	
+		Sleep 200
+	}
+	
+	bubbleSort(vUpdateTargets, "compareUpdateTargets")
+	
+	for target, arguments in getConfigurationSectionValues(targets, "Cleanup", Object()) {
+		buildProgress +=1
+		cleanup := vCleanupSettings[target]
+		
+		if !kSilentMode
+			Progress, %buildProgress%, % target . ": " . (cleanup ? translate("Yes") : translate("No"))
+		
+		if cleanup {
 			arguments := substituteVariables(arguments)
 			
 			vCleanupTargets.Push(Array(target, string2Values(",", arguments)*))
@@ -456,17 +552,11 @@ prepareTargets(ByRef buildProgress) {
 			Progress, %buildProgress%, % target . ": " . (build ? translate("Yes") : translate("No"))
 		
 		if build {
-			arguments := substituteVariables(arguments)
-			
-			rule := string2Values("<-", arguments)
-			binary := rule[1]
+			rule := string2Values("<-", substituteVariables(arguments))
 			
 			arguments := string2Values(";", rule[2])
-			
-			source := arguments[1]
-			dependencies := string2Values(",", arguments[2])
 		
-			vBuildTargets.Push(Array(target, source, binary, dependencies))
+			vBuildTargets.Push(Array(target, arguments[1], rule[1], string2Values(",", arguments[2])))
 		}
 	
 		Sleep 200
@@ -474,7 +564,7 @@ prepareTargets(ByRef buildProgress) {
 }
 
 runTargets() {
-	readToolsConfiguration(vCleanupSettings, vBuildSettings, vSplashTheme)
+	readToolsConfiguration(vUpdateSettings, vCleanupSettings, vBuildSettings, vSplashTheme)
 	
 	if (!FileExist(getFileName(kToolsConfigurationFile, kUserConfigDirectory, kConfigDirectory)) || GetKeyState("Ctrl"))
 		if !editTargets()

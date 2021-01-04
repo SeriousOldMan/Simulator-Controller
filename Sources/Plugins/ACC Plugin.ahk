@@ -464,6 +464,7 @@ class ACCPlugin extends ControllerPlugin {
 		static kSearchAreaRight := 150
 		
 		if isACCRunning() {
+			beginTickCount := A_TickCount
 			lastY := false
 			
 			if fullSearch {
@@ -674,6 +675,8 @@ class ACCPlugin extends ControllerPlugin {
 				
 					logMessage(kLogInfo, translate("'Select Driver' not detected, adjusting pit stop options: " . values2String(", ", this.kPSOptions*)))
 				}
+				
+				logMessage(kLogInfo, translate("Complete update of pitstop state took ") . A_TickCount - beginTickCount . translate(" ms"))
 				
 				if reload
 					this.openPitstopApp()

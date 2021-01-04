@@ -249,6 +249,36 @@ class ACCPlugin extends ControllerPlugin {
 				}
 				
 				if (!checkPitstopApp || this.iPSIsOpen) {
+					pitStrategyLabel := getFileName("ACC\Pit Strategy.jpg", kUserScreenImagesDirectory, kScreenImagesDirectory)
+					curTickCount := A_TickCount
+					
+					if !this.iPSImageSearchArea {
+						ImageSearch x, y, 0, lastY ? lastY : 0, Round(A_ScreenWidth / 2), A_ScreenHeight, *50 %pitStrategyLabel%
+					
+						logMessage(kLogInfo, translate("Full search for 'Pit Strategy' took ") . A_TickCount - curTickCount . translate(" ms"))
+					}
+					else {
+						ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *50 %pitStrategyLabel%
+					
+						logMessage(kLogInfo, translate("Optimized search for 'Pit Strategy' took ") . A_TickCount - curTickCount . translate(" ms"))
+					}
+					
+					if x is Integer
+					{
+						if !inList(this.kPSOptions, "Strategy")
+							this.kPSOptions.InsertAt(inList(this.kPSOptions, "Refuel"), "Strategy")
+					
+						logMessage(kLogInfo, translate("'Pit Strategy' detected, adjusting pit stop options: " . values2String(", ", this.kPSOptions*)))
+					}
+					else {
+						position := inList(this.kPSOptions, "Strategy")
+						
+						if position
+							this.kPSOptions.RemoveAt(position)
+					
+						logMessage(kLogInfo, translate("'Pit Strategy' not detected, adjusting pit stop options: " . values2String(", ", this.kPSOptions*)))
+					}
+					
 					tyreSetLabel := getFileName("ACC\Tyre Set.jpg", kUserScreenImagesDirectory, kScreenImagesDirectory)
 					curTickCount := A_TickCount
 					
@@ -321,12 +351,16 @@ class ACCPlugin extends ControllerPlugin {
 					{
 						if !inList(this.kPSOptions, "Select Driver")
 							this.kPSOptions.InsertAt(inList(this.kPSOptions, "Repair Suspension"), "Select Driver")
+					
+						logMessage(kLogInfo, translate("'Select Driver' detected, adjusting pit stop options: " . values2String(", ", this.kPSOptions*)))
 					}
 					else {
 						position := inList(this.kPSOptions, "Select Driver")
 						
 						if position
 							this.kPSOptions.RemoveAt(position)
+					
+						logMessage(kLogInfo, translate("'Select Driver' not detected, adjusting pit stop options: " . values2String(", ", this.kPSOptions*)))
 					}
 				}
 			}

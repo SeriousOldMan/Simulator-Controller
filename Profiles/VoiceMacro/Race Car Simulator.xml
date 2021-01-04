@@ -1161,7 +1161,7 @@
     </Commands>
     <Commands>
       <GUID>22a1b638-0cad-42d0-90c3-397410dcdc45</GUID>
-      <RecocnitionText>Pitstop Change Tyres</RecocnitionText>
+      <RecocnitionText>Pitstop Tyre Change</RecocnitionText>
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
@@ -1182,7 +1182,7 @@
     </Commands>
     <Commands>
       <GUID>558f3e31-e0a4-4ba9-a59b-794b441f54e9</GUID>
-      <RecocnitionText>Pitstop Change Brakes</RecocnitionText>
+      <RecocnitionText>Pitstop Brake Change</RecocnitionText>
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
@@ -1204,7 +1204,7 @@
     </Commands>
     <Commands>
       <GUID>12356650-f540-457a-a4d3-7e4bd68061a1</GUID>
-      <RecocnitionText>Pitstop Repair Bodywork</RecocnitionText>
+      <RecocnitionText>Pitstop Bodywork Repair</RecocnitionText>
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
@@ -1225,7 +1225,7 @@
     </Commands>
     <Commands>
       <GUID>78c31541-6d8c-428b-96ac-b5e37550208c</GUID>
-      <RecocnitionText>Pitstop Repair Suspension</RecocnitionText>
+      <RecocnitionText>Pitstop Suspension Repair</RecocnitionText>
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
@@ -1247,7 +1247,7 @@
     </Commands>
     <Commands>
       <GUID>d7bb8f61-1c33-46ef-ad65-825c011916ed</GUID>
-      <RecocnitionText>Pitstop Next Strategy</RecocnitionText>
+      <RecocnitionText>Pitstop Strategy Next</RecocnitionText>
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
@@ -1268,7 +1268,7 @@
     </Commands>
     <Commands>
       <GUID>053a0d71-7fd3-4ee3-b0aa-2519b22dc741</GUID>
-      <RecocnitionText>Pitstop Previous Strategy</RecocnitionText>
+      <RecocnitionText>Pitstop Strategy Previous</RecocnitionText>
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
@@ -1290,7 +1290,7 @@
     </Commands>
     <Commands>
       <GUID>6b05df02-a25d-46f7-821c-b5b605161129</GUID>
-      <RecocnitionText>Pitstop More Fuel</RecocnitionText>
+      <RecocnitionText>Pitstop Fuel More</RecocnitionText>
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
@@ -1311,7 +1311,7 @@
     </Commands>
     <Commands>
       <GUID>4b779513-389c-465f-9e26-6023e08fdbbd</GUID>
-      <RecocnitionText>Pitstop Less Fuel</RecocnitionText>
+      <RecocnitionText>Pitstop Fuel Less</RecocnitionText>
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
@@ -1333,7 +1333,7 @@
     </Commands>
     <Commands>
       <GUID>4c753ad0-ae40-44fc-b087-4337da84330a</GUID>
-      <RecocnitionText>Pitstop Around More Pressure</RecocnitionText>
+      <RecocnitionText>Pitstop Pressure Around More</RecocnitionText>
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
@@ -1354,7 +1354,7 @@
     </Commands>
     <Commands>
       <GUID>5ee0b831-8db2-4be7-b98c-ad6576560d91</GUID>
-      <RecocnitionText>Pitstop Around Less Pressure</RecocnitionText>
+      <RecocnitionText>Pitstop Pressure Around Less</RecocnitionText>
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
@@ -1376,7 +1376,7 @@
     </Commands>
     <Commands>
       <GUID>05f5d9a2-2507-47a5-bace-6cda7109908c</GUID>
-      <RecocnitionText>Pitstop Front Left More Pressure</RecocnitionText>
+      <RecocnitionText>Pitstop Pressure Front Left More</RecocnitionText>
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
@@ -1397,7 +1397,7 @@
     </Commands>
     <Commands>
       <GUID>c55c3752-cc65-4273-8efc-234675fbb3f1</GUID>
-      <RecocnitionText>Pitstop Front Left Less Pressure</RecocnitionText>
+      <RecocnitionText>Pitstop Pressure Front Left Less</RecocnitionText>
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
@@ -1419,7 +1419,7 @@
     </Commands>
     <Commands>
       <GUID>587ab368-f405-4239-a2d5-08111f28ce51</GUID>
-      <RecocnitionText>Pitstop Front Right More Pressure</RecocnitionText>
+      <RecocnitionText>Pitstop Pressure Front Right More</RecocnitionText>
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
@@ -1440,7 +1440,7 @@
     </Commands>
     <Commands>
       <GUID>fc188496-9a21-41d8-b7b5-86fe0b1b53be</GUID>
-      <RecocnitionText>Pitstop Front Right Less Pressure</RecocnitionText>
+      <RecocnitionText>Pitstop Pressure Front Right Less</RecocnitionText>
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
@@ -1462,7 +1462,7 @@
     </Commands>
     <Commands>
       <GUID>44856546-69d3-4850-b1e1-8875432cb2bb</GUID>
-      <RecocnitionText>Pitstop Rear Left More Pressure</RecocnitionText>
+      <RecocnitionText>Pitstop Pressure Rear Left More</RecocnitionText>
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
@@ -1483,7 +1483,7 @@
     </Commands>
     <Commands>
       <GUID>1411ee74-6bd2-4ee4-a5b8-edf10b45c628</GUID>
-      <RecocnitionText>Pitstop Rear Left Less Pressure</RecocnitionText>
+      <RecocnitionText>Pitstop Pressure Rear Left Less</RecocnitionText>
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
@@ -1505,7 +1505,7 @@
     </Commands>
     <Commands>
       <GUID>82309cd3-7893-4a6c-bca6-d8059ec7b95c</GUID>
-      <RecocnitionText>Pitstop Rear Right More Pressure</RecocnitionText>
+      <RecocnitionText>Pitstop Pressure Rear Right More</RecocnitionText>
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
@@ -1526,7 +1526,7 @@
     </Commands>
     <Commands>
       <GUID>aa34f002-36ce-4961-bbbc-2eb2a0646b19</GUID>
-      <RecocnitionText>Pitstop Rear Right Less Pressure</RecocnitionText>
+      <RecocnitionText>Pitstop Pressure Rear Right Less</RecocnitionText>
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>

@@ -67,6 +67,7 @@
         <Clicks>0</Clicks>
       </ShortCut>
       <UseRecognition>true</UseRecognition>
+      <Inactive>true</Inactive>
       <MacroActions>
         <MacroAction>
           <MacroType>1</MacroType>
@@ -131,6 +132,7 @@
         <Clicks>0</Clicks>
       </ShortCut>
       <UseRecognition>true</UseRecognition>
+      <Inactive>true</Inactive>
       <MacroActions>
         <MacroAction>
           <MacroType>1</MacroType>
@@ -208,6 +210,7 @@
         <Clicks>0</Clicks>
       </ShortCut>
       <UseRecognition>true</UseRecognition>
+      <Inactive>true</Inactive>
       <MacroActions>
         <MacroAction>
           <MacroType>1</MacroType>
@@ -277,6 +280,7 @@
         <Clicks>0</Clicks>
       </ShortCut>
       <UseRecognition>true</UseRecognition>
+      <Inactive>true</Inactive>
       <MacroActions>
         <MacroAction>
           <MacroType>1</MacroType>
@@ -434,6 +438,7 @@
         <Clicks>0</Clicks>
       </ShortCut>
       <UseRecognition>true</UseRecognition>
+      <Inactive>true</Inactive>
       <MacroActions>
         <MacroAction>
           <MacroType>1</MacroType>
@@ -503,6 +508,7 @@
         <Clicks>0</Clicks>
       </ShortCut>
       <UseRecognition>true</UseRecognition>
+      <Inactive>true</Inactive>
       <MacroActions>
         <MacroAction>
           <MacroType>1</MacroType>
@@ -556,6 +562,7 @@
         <Clicks>0</Clicks>
       </ShortCut>
       <UseRecognition>true</UseRecognition>
+      <Inactive>true</Inactive>
       <MacroActions>
         <MacroAction>
           <MacroType>1</MacroType>
@@ -657,6 +664,7 @@
         <Clicks>0</Clicks>
       </ShortCut>
       <UseRecognition>true</UseRecognition>
+      <Inactive>true</Inactive>
       <MacroActions>
         <MacroAction>
           <MacroType>1</MacroType>
@@ -766,6 +774,7 @@
         <Clicks>0</Clicks>
       </ShortCut>
       <UseRecognition>true</UseRecognition>
+      <Inactive>true</Inactive>
       <MacroActions>
         <MacroAction>
           <MacroType>1</MacroType>
@@ -883,6 +892,7 @@
         <Clicks>0</Clicks>
       </ShortCut>
       <UseRecognition>true</UseRecognition>
+      <Inactive>true</Inactive>
       <MacroActions>
         <MacroAction>
           <MacroType>1</MacroType>
@@ -1032,6 +1042,7 @@
         <Clicks>0</Clicks>
       </ShortCut>
       <UseRecognition>true</UseRecognition>
+      <Inactive>true</Inactive>
       <MacroActions>
         <MacroAction>
           <MacroType>1</MacroType>
@@ -1333,7 +1344,7 @@
     </Commands>
     <Commands>
       <GUID>4c753ad0-ae40-44fc-b087-4337da84330a</GUID>
-      <RecocnitionText>Pitstop Pressure Around More</RecocnitionText>
+      <RecocnitionText>Pitstop Pressure All Around More</RecocnitionText>
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
@@ -1354,7 +1365,7 @@
     </Commands>
     <Commands>
       <GUID>5ee0b831-8db2-4be7-b98c-ad6576560d91</GUID>
-      <RecocnitionText>Pitstop Pressure Around Less</RecocnitionText>
+      <RecocnitionText>Pitstop Pressure All Around Less</RecocnitionText>
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>

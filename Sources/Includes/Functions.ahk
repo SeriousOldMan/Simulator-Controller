@@ -42,13 +42,19 @@ global vTrayMessageDuration = 1500
 changeProtection(up) {
 	static level := 0
 	
-	level := (up ? level + 1 : level - 1)
+	level += (up ? 1 : -1)
 	
 	if (level == 1) {
         Critical On
 		BlockInput On
+		BlockInput SendAndMouse
+		Thread NoTimers, true
+		Thread Priority, 2147483647
 	}
 	else if (level == 0) {
+		Thread Priority, 0
+		Thread NoTimers, false
+		BlockInput Default
 		BlockInput Off
         Critical Off
 	}

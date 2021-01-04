@@ -24,6 +24,7 @@ class ACCPlugin extends ControllerPlugin {
 	kPSOptions := ["Pit Limiter", "Strategy", "Refuel"
 				 , "Change Tyres", "Tyre Set", "Compound", "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right"
 				 , "Change Brakes", "Front Brake", "Rear Brake", "Repair Suspension", "Repair Bodywork"]
+	kPSMutatingOptions := ["Strategy", "Change Tyres", "Compound", "Change Brakes"]
 	
 	kPSTyreOptionPosition := inList(this.kPSOptions, "Change Tyres")
 	kPSTyreOptions := 7
@@ -59,6 +60,12 @@ class ACCPlugin extends ControllerPlugin {
 	class PitstopAction extends ControllerAction {
 		iPitstopOption := false
 		
+		Option[] {
+			Get {
+				return this.iPitstopOption
+			}
+		}
+		
 		__New(function, label, pitstopOption) {
 			this.iPitstopOption := pitstopOption
 			
@@ -66,7 +73,11 @@ class ACCPlugin extends ControllerPlugin {
 		}
 		
 		fireAction(function, trigger) {
-			this.Controller.findPlugin(kACCPlugin).selectPitstopOption(this.iPitstopOption)
+			local plugin := this.Controller.findPlugin(kACCPlugin)
+			
+			plugin.requirePitstopApp()
+			
+			return plugin.selectPitstopOption(this.iPitstopOption)
 		}
 	}
 
@@ -80,9 +91,8 @@ class ACCPlugin extends ControllerPlugin {
 		}
 		
 		fireAction(function, trigger) {
-			base.fireAction(function, trigger)
-			
-			this.Controller.findPlugin(kACCPlugin).changePitstopOption(this.iDirection)
+			if base.fireAction(function, trigger)
+				this.Controller.findPlugin(kACCPlugin).changePitstopOption(this.Option, this.iDirection)
 		}
 	}
 	
@@ -94,12 +104,11 @@ class ACCPlugin extends ControllerPlugin {
 
 	class PitstopToggleAction extends ACCPlugin.PitstopAction {		
 		fireAction(function, trigger) {
-			base.fireAction(function, trigger)
-			
-			if ((trigger == "On") || (trigger == "Increase") || (trigger == "Push") || (trigger == "Call"))
-				this.Controller.findPlugin(kACCPlugin).changePitstopOption("Increase")
-			else
-				this.Controller.findPlugin(kACCPlugin).changePitstopOption("Decrease")
+			if base.fireAction(function, trigger)
+				if ((trigger == "On") || (trigger == "Increase") || (trigger == "Push") || (trigger == "Call"))
+					this.Controller.findPlugin(kACCPlugin).changePitstopOption(this.Option, "Increase")
+				else
+					this.Controller.findPlugin(kACCPlugin).changePitstopOption(this.Option, "Decrease")
 		}
 	}
 
@@ -208,22 +217,22 @@ class ACCPlugin extends ControllerPlugin {
 			if !decreaseFunction {
 				if (function != false)
 					if (inList(kSelectActions, action))
-						mode.registerAction(new this.PitstopSelectAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Toggle"), action), this.kActions[action]))
+						mode.registerAction(new this.PitstopSelectAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Toggle"), action), kActions[action]))
 					else
-						mode.registerAction(new this.PitstopToggleAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Toggle"), action), this.kActions[action]))
+						mode.registerAction(new this.PitstopToggleAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Toggle"), action), kActions[action]))
 				else
 					this.logFunctionNotFound(increaseFunction)
 			}
 			else {
 				if (function != false)
-					mode.registerAction(new this.PitstopChangeAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Increase"), action), this.kActions[action], "Increase"))
+					mode.registerAction(new this.PitstopChangeAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Increase"), action), kActions[action], "Increase"))
 				else
 					this.logFunctionNotFound(increaseFunction)
 					
 				function := this.Controller.findFunction(decreaseFunction)
 				
 				if (function != false)
-					mode.registerAction(new this.PitstopChangeAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Decrease"), action), this.kActions[action], "Decrease"))
+					mode.registerAction(new this.PitstopChangeAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Decrease"), action), kActions[action], "Decrease"))
 				else
 					this.logFunctionNotFound(decreaseFunction)
 			}
@@ -232,18 +241,19 @@ class ACCPlugin extends ControllerPlugin {
 			logMessage(kLogWarn, translate("Pitstop action ") . action . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
 	}
 		
-	openPitstopApp() {
-		SendEvent % this.Plugin.OpenPitstopAppHotkey
-		Sleep 500
+	openPitstopApp(update := true) {
+		SendEvent % this.OpenPitstopAppHotkey
 		
-		this.updatePitStopState(false)
-			
 		this.iPSIsOpen := true
 		this.iPSSelectedOption := 1
+		
+		if update
+			this.updatePitStopState()
+			
 	}
 	
 	closePitstopApp() {
-		SendEvent % this.Plugin.ClosePitstopAppHotkey
+		SendEvent % this.ClosePitstopAppHotkey
 		
 		this.iPSIsOpen := false
 	}
@@ -255,47 +265,60 @@ class ACCPlugin extends ControllerPlugin {
 	
 	selectPitstopOption(option) {
 		targetSelectedOption := inList(this.kPSOptions, option)
-		delta := 0
 		
-		if (targetSelectedOption > this.kPSTyreOptionPosition) {
-			if (targetSelectedOption <= (this.kPSTyreOptionPosition + this.kPSTyreOptions)) {
-				if !this.iPSChangeTyres
-					this.toggleActivity("Change Tyres")
+		if targetSelectedOption {
+			delta := 0
+			
+			if (targetSelectedOption > this.kPSTyreOptionPosition) {
+				if (targetSelectedOption <= (this.kPSTyreOptionPosition + this.kPSTyreOptions)) {
+					if !this.iPSChangeTyres {
+						this.toggleActivity("Change Tyres")
+						
+						return this.selectPitstopOption(option)
+					}
+				}
+				else
+					if !this.iPSChangeTyres
+						delta -= this.kPSTyreOptions
 			}
+			
+			if (targetSelectedOption > this.kPSBrakeOptionPosition) {
+				if (targetSelectedOption <= (this.kPSBrakeOptionPosition + this.kPSBrakeOptions)) {
+					if !this.iPSChangeBrakes {
+						this.toggleActivity("Change Brakes")
+						
+						return this.selectPitstopOption(option)
+					}
+				}
+				else
+					if !this.iPSChangeBrakes
+						delta -= this.kPSBrakeOptions
+			}
+			
+			targetSelectedOption += delta
+			
+			if (targetSelectedOption > this.iPSSelectedOption)
+				Loop % targetSelectedOption - this.iPSSelectedOption
+				{
+					SendEvent {Down}
+					Sleep 50
+				}
 			else
-				if !this.iPSChangeTyres
-					delta -= this.kPSTyreOptions
+				Loop % this.iPSSelectedOption - targetSelectedOption
+				{
+					SendEvent {Up}
+					Sleep 50
+				}
+			
+			this.iPSSelectedOption := targetSelectedOption
+		
+			return true
 		}
-		
-		if (targetSelectedOption > this.kPSBrakeOptionPosition) {
-			if (targetSelectedOption <= (this.kPSBrakeOptionPosition + this.kPSBrakeOptions)) {
-				if !this.iPSChangeBrakes
-					this.toggleActivity("Change Brakes")
-			}
-			else
-				if !this.iPSChangeBrakes
-					delta -= this.kPSBrakeOptions
-		}
-		
-		targetSelectedOption += delta
-		
-		if (targetSelectedOption > this.iPSSelectedOption)
-			Loop % targetSelectedOption - this.iPSSelectedOption
-			{
-				SendEvent {Down}
-				Sleep 50
-			}
 		else
-			Loop % this.iPSSelectedOption - targetSelectedOption
-			{
-				SendEvent {Up}
-				Sleep 50
-			}
-		
-		this.iPSSelectedOption := targetSelectedOption
+			return false
 	}
 	
-	changePitstopOption(direction, steps := 1) {
+	changePitstopOption(option, direction, steps := 1) {
 		switch direction {
 			case "Increase":
 				Loop % steps {
@@ -310,6 +333,8 @@ class ACCPlugin extends ControllerPlugin {
 			default:
 				Throw "Unsupported change operation """ . direction . """ detected in ACCManager.changePitstopOption..."
 		}
+		
+		this.resetPitstopState(inList(this.kPSMutatingOptions, option))
 	}
 	
 	toggleActivity(activity) {
@@ -317,117 +342,109 @@ class ACCPlugin extends ControllerPlugin {
 			
 		switch activity {
 			case "Change Tyres", "Change Brakes", "Repair Bodywork", "Repair Suspension":
-				this.selectPitstopOption(activity)
-				
-				SendEvent {Right}
+				if this.selectPitstopOption(activity)
+					this.changePitstopOption(activity, "Increase")
 			default:
 				Throw "Unsupported activity """ . activity . """ detected in ACCManager.toggleActivity..."
 		}
-		
-		if (activity = "Change Tyres")
-			this.iPSChangeTyres := !this.iPSChangeTyres
-		else if (activity = "Change Brakes")
-			this.iPSChangeBrakes := !this.iPSChangeBrakes
-		
-		Sleep 100
 	}
 
 	changeStrategy(selection, steps := 1) {
 		this.requirePitstopApp()
 			
-		this.selectPitstopOption("Strategy")
-		
-		switch selection {
-			case "Next":
-				this.changePitstopOption("Increase")
-			case "Previous":
-				this.changePitstopOption("Decrease")
-			default:
-				Throw "Unsupported selection """ . selection . """ detected in ACCManager.changeStrategy..."
-		}
-		
-		this.updatePitstopState(false)
+		if this.selectPitstopOption("Strategy")
+			switch selection {
+				case "Next":
+					this.changePitstopOption("Strategy", "Increase")
+				case "Previous":
+					this.changePitstopOption("Strategy", "Decrease")
+				default:
+					Throw "Unsupported selection """ . selection . """ detected in ACCManager.changeStrategy..."
+			}
 	}
 
 	changeFuelAmount(direction, liters := 5) {
 		this.requirePitstopApp()
 			
-		this.selectPitstopOption("Refuel")
-		
-		this.changePitstopOption(direction, liters)
+		if this.selectPitstopOption("Refuel")
+			this.changePitstopOption("Refuel", direction, liters)
 	}
 	
 	changeTyreSet(selection) {
 		this.requirePitstopApp()
 			
-		this.selectPitstopOption("Tyre set")
-		
-		switch selection {
-			case "Next":
-				this.changePitstopOption("Increase")
-			case "Previous":
-				this.changePitstopOption("Decrease")
-			default:
-				Throw "Unsupported selection """ . selection . """ detected in ACCManager.changeTyreSet..."
-		}
+		if this.selectPitstopOption("Tyre set")
+			switch selection {
+				case "Next":
+					this.changePitstopOption("Tyre set", "Increase")
+				case "Previous":
+					this.changePitstopOption("Tyre set", "Decrease")
+				default:
+					Throw "Unsupported selection """ . selection . """ detected in ACCManager.changeTyreSet..."
+			}
 	}
 	
 	changeTyreCompound(type) {
 		this.requirePitstopApp()
 			
-		this.selectPitstopOption("Compound")
-		
-		switch selection {
-			case "Wet":
-				this.changePitstopOption("Increase")
-			case "Dry":
-				this.changePitstopOption("Decrease")
-			default:
-				Throw "Unsupported selection """ . selection . """ detected in ACCManager.changeTyreCompound..."
-		}
+		if this.selectPitstopOption("Compound")
+			switch selection {
+				case "Wet":
+					this.changePitstopOption("Compound", "Increase")
+				case "Dry":
+					this.changePitstopOption("Compound", "Decrease")
+				default:
+					Throw "Unsupported selection """ . selection . """ detected in ACCManager.changeTyreCompound..."
+			}
 	}
 	
 	changeTyrePressure(tyre, direction, increments := 1) {
 		this.requirePitstopApp()
-			
+		
+		found := false
+		
 		switch tyre {
 			case "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right":
-				this.selectPitstopOption(tyre)
+				found := this.selectPitstopOption(tyre)
 			default:
 				Throw "Unsupported tyre position """ . tyre . """ detected in ACCManager.changeTyrePressure..."
 		}
 		
-		this.changePitstopOption(direction, increments)
+		if found
+			this.changePitstopOption(tyre, direction, increments)
 	}
 
 	changeBrakeType(brake, selection) {
 		this.requirePitstopApp()
-			
+		
+		found := false
+		
 		switch brake {
 			case "Front Brake", "Rear Brake":
-				this.selectPitstopOption(brake)
+				found := this.selectPitstopOption(brake)
 			default:
 				Throw "Unsupported brake """ . brake . """ detected in ACCManager.changeBrakeType..."
 		}
 			
-		switch selection {
-			case "Next":
-				this.changePitstopOption("Increase")
-			case "Previous":
-				this.changePitstopOption("Decrease")
-			default:
-				Throw "Unsupported selection """ . selection . """ detected in ACCManager.changeBrakeType..."
-		}
+		if found
+			switch selection {
+				case "Next":
+					this.changePitstopOption(brake, "Increase")
+				case "Previous":
+					this.changePitstopOption(brake, "Decrease")
+				default:
+					Throw "Unsupported selection """ . selection . """ detected in ACCManager.changeBrakeType..."
+			}
 	}
 	
-	updatePitstopState(checkPitstopApp := true) {
+	updatePitstopState(fullSearch := false) {
 		static kSearchAreaLeft := 250
 		static kSearchAreaRight := 150
 		
 		if isACCRunning() {
 			lastY := false
 			
-			if checkPitstopApp {
+			if fullSearch {
 				pitstopLabel := getFileName("ACC\PITSTOP.jpg", kUserScreenImagesDirectory, kScreenImagesDirectory)
 				curTickCount := A_TickCount
 				
@@ -455,51 +472,101 @@ class ACCPlugin extends ControllerPlugin {
 					this.iPSIsOpen := false
 			}
 			
-			if (!checkPitstopApp || this.iPSIsOpen) {
-				pitStrategyLabel := getFileName("ACC\Pit Strategy.jpg", kUserScreenImagesDirectory, kScreenImagesDirectory)
+			if this.iPSIsOpen {
+				reload := false
+				
 				curTickCount := A_TickCount
 				
-				if !this.iPSImageSearchArea {
-					ImageSearch x, y, 0, lastY ? lastY : 0, Round(A_ScreenWidth / 2), A_ScreenHeight, *50 %pitStrategyLabel%
-				
+				Loop 2 {
+					pitStrategyLabel := getFileName("ACC\Pit Strategy " . A_Index . ".jpg", kUserScreenImagesDirectory, kScreenImagesDirectory)
+					
+					if !this.iPSImageSearchArea
+						ImageSearch x, y, 0, lastY ? lastY : 0, Round(A_ScreenWidth / 2), A_ScreenHeight, *50 %pitStrategyLabel%
+					else
+						ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *50 %pitStrategyLabel%
+
+					if x is Integer
+						break
+				}
+
+				if !this.iPSImageSearchArea
 					logMessage(kLogInfo, translate("Full search for 'Pit Strategy' took ") . A_TickCount - curTickCount . translate(" ms"))
-				}
-				else {
-					ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *50 %pitStrategyLabel%
-				
+				else
 					logMessage(kLogInfo, translate("Optimized search for 'Pit Strategy' took ") . A_TickCount - curTickCount . translate(" ms"))
-				}
 				
 				if x is Integer
 				{
-					if !inList(this.kPSOptions, "Strategy")
+					if !inList(this.kPSOptions, "Strategy") {
 						this.kPSOptions.InsertAt(inList(this.kPSOptions, "Refuel"), "Strategy")
+						
+						reload := true
+					}
 				
 					logMessage(kLogInfo, translate("'Pit Strategy' detected, adjusting pit stop options: " . values2String(", ", this.kPSOptions*)))
 				}
 				else {
 					position := inList(this.kPSOptions, "Strategy")
 					
-					if position
+					if position {
 						this.kPSOptions.RemoveAt(position)
+						
+						reload := true
+					}
 				
 					logMessage(kLogInfo, translate("'Pit Strategy' not detected, adjusting pit stop options: " . values2String(", ", this.kPSOptions*)))
 				}
 				
-				tyreSetLabel := getFileName("ACC\Tyre Set.jpg", kUserScreenImagesDirectory, kScreenImagesDirectory)
 				curTickCount := A_TickCount
 				
-				if !this.iPSImageSearchArea {
-					ImageSearch x, y, 0, lastY ? lastY : 0, Round(A_ScreenWidth / 2), A_ScreenHeight, *50 %tyreSetLabel%
+				Loop 2 {
+					wetLabel := getFileName("ACC\Wet " . A_index . ".jpg", kUserScreenImagesDirectory, kScreenImagesDirectory)
+						
+					if !this.iPSImageSearchArea
+						ImageSearch x, y, 0, lastY ? lastY : 0, Round(A_ScreenWidth / 2), A_ScreenHeight, *50 %wetLabel%
+					else
+						ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *50 %wetLabel%
+
+					if x is Integer
+						break
+				}
 				
-					logMessage(kLogInfo, translate("Full search for 'Tyre set' took ") . A_TickCount - curTickCount . translate(" ms"))
+				if x is Integer
+				{
+					position := inList(this.kPSOptions, "Tyre Set")
+					
+					if position {
+						this.kPSOptions.RemoveAt(position)
+						this.kPSTyreOptions := 6
+						
+						reload := true
+					}
 				}
 				else {
-					ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *50 %tyreSetLabel%
-				
-					logMessage(kLogInfo, translate("Optimized search for 'Tyre set' took ") . A_TickCount - curTickCount . translate(" ms"))
+					if !inList(this.kPSOptions, "Tyre Set") {
+						this.kPSOptions.InsertAt(inList(this.kPSOptions, "Compound"), "Tyre Set")
+						this.kPSTyreOptions := 7
+						
+						reload := true
+					}
 				}
 				
+				Loop 2 {
+					compoundLabel := getFileName("ACC\Compound " . A_Index . ".jpg", kUserScreenImagesDirectory, kScreenImagesDirectory)
+					
+					if !this.iPSImageSearchArea
+						ImageSearch x, y, 0, lastY ? lastY : 0, Round(A_ScreenWidth / 2), A_ScreenHeight, *50 %compoundLabel%
+					else
+						ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *50 %compoundLabel%
+					
+					if x is Integer
+						break
+				}
+					
+				if !this.iPSImageSearchArea
+					logMessage(kLogInfo, translate("Full search for 'Tyre set' took ") . A_TickCount - curTickCount . translate(" ms"))
+				else
+					logMessage(kLogInfo, translate("Optimized search for 'Tyre set' took ") . A_TickCount - curTickCount . translate(" ms"))
+			
 				if x is Integer
 				{
 					this.iPSChangeTyres := true
@@ -513,21 +580,26 @@ class ACCPlugin extends ControllerPlugin {
 					
 					logMessage(kLogInfo, translate("Assetto Corsa Competizione - Pitstop: Tyres are not selected for change"))
 				}
-				
-				frontBrakeLabel := getFileName("ACC\Front Brake.jpg", kUserScreenImagesDirectory, kScreenImagesDirectory)
+
 				curTickCount := A_TickCount
 				
-				if !this.iPSImageSearchArea {
-					ImageSearch x, y, 0, lastY ? lastY : 0, Round(A_ScreenWidth / 2), A_ScreenHeight, *50 %frontBrakeLabel%
+				Loop 2 {
+					frontBrakeLabel := getFileName("ACC\Front Brake " . A_Index . ".jpg", kUserScreenImagesDirectory, kScreenImagesDirectory)
+					
+					if !this.iPSImageSearchArea
+						ImageSearch x, y, 0, lastY ? lastY : 0, Round(A_ScreenWidth / 2), A_ScreenHeight, *50 %frontBrakeLabel%
+					else
+						ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *50 %frontBrakeLabel%
+					
+					if x is Integer
+						break
+				}
 				
+				if !this.iPSImageSearchArea
 					logMessage(kLogInfo, translate("Full search for 'Front Brake' took ") . A_TickCount - curTickCount . translate(" ms"))
-				}
-				else {
-					ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *50 %frontBrakeLabel%
-				
+				else 
 					logMessage(kLogInfo, translate("Optimized search for 'Front Brake' took ") . A_TickCount - curTickCount . translate(" ms"))
-				}
-				
+					
 				if x is Integer
 				{
 					this.iPSChangeBrakes := true
@@ -540,37 +612,55 @@ class ACCPlugin extends ControllerPlugin {
 					logMessage(kLogInfo, translate("Assetto Corsa Competizione - Pitstop: Brakes are not selected for change"))
 				}
 				
-				selectDriverLabel := getFileName("ACC\Select Driver.jpg", kUserScreenImagesDirectory, kScreenImagesDirectory)
 				curTickCount := A_TickCount
 				
-				if !this.iPSImageSearchArea {
-					ImageSearch x, y, 0, lastY ? lastY : 0, Round(A_ScreenWidth / 2), A_ScreenHeight, *50 %selectDriverLabel%
+				Loop 2 {
+					selectDriverLabel := getFileName("ACC\Select Driver " . A_Index . ".jpg", kUserScreenImagesDirectory, kScreenImagesDirectory)
+					
+					if !this.iPSImageSearchArea
+						ImageSearch x, y, 0, lastY ? lastY : 0, Round(A_ScreenWidth / 2), A_ScreenHeight, *50 %selectDriverLabel%
+					else
+						ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *50 %selectDriverLabel%
 				
+					if x is Integer
+						break
+				}
+				
+				if !this.iPSImageSearchArea
 					logMessage(kLogInfo, translate("Full search for 'Select Driver' took ") . A_TickCount - curTickCount . translate(" ms"))
-				}
-				else {
-					ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *50 %selectDriverLabel%
-				
+				else
 					logMessage(kLogInfo, translate("Optimized search for 'Select Driver' took ") . A_TickCount - curTickCount . translate(" ms"))
-				}
 				
 				if x is Integer
 				{
-					if !inList(this.kPSOptions, "Select Driver")
+					if !inList(this.kPSOptions, "Select Driver") {
 						this.kPSOptions.InsertAt(inList(this.kPSOptions, "Repair Suspension"), "Select Driver")
+						
+						reload := true
+					}
 				
 					logMessage(kLogInfo, translate("'Select Driver' detected, adjusting pit stop options: " . values2String(", ", this.kPSOptions*)))
 				}
 				else {
 					position := inList(this.kPSOptions, "Select Driver")
 					
-					if position
+					if position {
 						this.kPSOptions.RemoveAt(position)
+						
+						reload := true
+					}
 				
 					logMessage(kLogInfo, translate("'Select Driver' not detected, adjusting pit stop options: " . values2String(", ", this.kPSOptions*)))
 				}
+				
+				if reload
+					this.openPitstopApp()
 			}
 		}
+	}
+	
+	resetPitstopState(update := false) {
+		this.openPitstopApp(update)
 	}
 }
 
@@ -743,7 +833,7 @@ updatePitstopState() {
 	protectionOn()
 	
 	try {
-		plugin.updatePitstopState()
+		plugin.updatePitstopState(true)
 	}
 	finally {
 		protectionOff()

@@ -16,20 +16,23 @@
       <UseScheduler>true</UseScheduler>
       <MacroActions>
         <MacroAction>
-          <MacroType>14</MacroType>
-          <StartStopIgnoreCommands>0</StartStopIgnoreCommands>
+          <MacroType>5</MacroType>
+          <StartStopListen>0</StartStopListen>
         </MacroAction>
         <MacroAction>
-          <MacroType>12</MacroType>
-          <WaitForWindow>
-            <WindowName>Not Existing Window.exe</WindowName>
-            <AbortTimeOut>true</AbortTimeOut>
-            <Timeout>500</Timeout>
-          </WaitForWindow>
+          <MacroType>54</MacroType>
+          <SpeakText>
+            <Text>Start listening for commands&#13;&#10;&#13;&#10;For example, say Control Startup to start a simulation</Text>
+            <SoundDevice></SoundDevice>
+            <Volume>70</Volume>
+            <Speed>0</Speed>
+            <Voice>Microsoft David Desktop</Voice>
+            <Sync>false</Sync>
+          </SpeakText>
         </MacroAction>
         <MacroAction>
-          <MacroType>14</MacroType>
-          <StartStopIgnoreCommands>1</StartStopIgnoreCommands>
+          <MacroType>5</MacroType>
+          <StartStopListen>1</StartStopListen>
         </MacroAction>
       </MacroActions>
     </Commands>
@@ -1781,7 +1784,7 @@
     </Commands>
     <Commands>
       <GUID>7c712055-08dc-4044-b593-5b4b381b9bac</GUID>
-      <RecocnitionText>Motion On</RecocnitionText>
+      <RecocnitionText>Control Motion On</RecocnitionText>
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
@@ -1803,7 +1806,7 @@
     </Commands>
     <Commands>
       <GUID>cf740e41-27dd-4131-a64d-56745128a050</GUID>
-      <RecocnitionText>Motion Off</RecocnitionText>
+      <RecocnitionText>Control Motion Off</RecocnitionText>
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
@@ -1826,7 +1829,7 @@
     </Commands>
     <Commands>
       <GUID>5ff97ac5-ac73-461e-b745-4fd655fe6b06</GUID>
-      <RecocnitionText>Pedal Vibration On</RecocnitionText>
+      <RecocnitionText>Control Pedal Vibration On</RecocnitionText>
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
@@ -1848,7 +1851,7 @@
     </Commands>
     <Commands>
       <GUID>318aa5a8-3309-40c7-afe9-1b12c3e95b85</GUID>
-      <RecocnitionText>Pedal Vibration Off</RecocnitionText>
+      <RecocnitionText>Control Pedal Vibration Off</RecocnitionText>
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
@@ -1871,7 +1874,7 @@
     </Commands>
     <Commands>
       <GUID>a2e0bdb2-8d26-4aca-8baa-8fd8fa55e028</GUID>
-      <RecocnitionText>Front Chassis Vibration On</RecocnitionText>
+      <RecocnitionText>Control Front Chassis Vibration On</RecocnitionText>
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
@@ -1893,7 +1896,7 @@
     </Commands>
     <Commands>
       <GUID>c2993ef1-4f2e-4d1d-b595-a578a1e4bd52</GUID>
-      <RecocnitionText>Front Chassis Vibration Off</RecocnitionText>
+      <RecocnitionText>Control Front Chassis Vibration Off</RecocnitionText>
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
@@ -1916,7 +1919,7 @@
     </Commands>
     <Commands>
       <GUID>cda6a45e-d4c2-4db5-8bad-35523be11464</GUID>
-      <RecocnitionText>Rear Chassis Vibration On</RecocnitionText>
+      <RecocnitionText>Control Rear Chassis Vibration On</RecocnitionText>
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>
@@ -1938,7 +1941,7 @@
     </Commands>
     <Commands>
       <GUID>d068bae1-c543-4705-ac62-c274b5a88c07</GUID>
-      <RecocnitionText>Rear Chassis Vibration Off</RecocnitionText>
+      <RecocnitionText>Control Rear Chassis Vibration Off</RecocnitionText>
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>

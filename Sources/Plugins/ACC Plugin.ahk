@@ -239,9 +239,9 @@ class ACCPlugin extends ControllerPlugin {
 			if !decreaseFunction {
 				if (function != false)
 					if (inList(kSelectActions, action))
-						mode.registerAction(new this.PitstopSelectAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Toggle"), action), kActions[action]), moreArguments*)
+						mode.registerAction(new this.PitstopSelectAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Toggle"), action), kActions[action], moreArguments*))
 					else
-						mode.registerAction(new this.PitstopToggleAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Toggle"), action), kActions[action]), moreArguments*)
+						mode.registerAction(new this.PitstopToggleAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Toggle"), action), kActions[action], moreArguments*))
 				else
 					this.logFunctionNotFound(increaseFunction)
 			}

@@ -44,7 +44,7 @@ changeProtection(up) {
 	
 	level += (up ? 1 : -1)
 	
-	if (level == 1) {
+	if (level > 0) {
         Critical On
 		BlockInput On
 	}

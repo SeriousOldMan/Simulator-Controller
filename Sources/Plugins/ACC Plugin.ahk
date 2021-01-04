@@ -239,9 +239,9 @@ class ACCPlugin extends ControllerPlugin {
 			if !decreaseFunction {
 				if (function != false)
 					if (inList(kSelectActions, action))
-						mode.registerAction(new this.PitstopSelectAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Toggle"), action), kActions[action]), moreArguments*)
+						mode.registerAction(new this.PitstopSelectAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Toggle"), action), kActions[action], moreArguments*))
 					else
-						mode.registerAction(new this.PitstopToggleAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Toggle"), action), kActions[action]), moreArguments*)
+						mode.registerAction(new this.PitstopToggleAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Toggle"), action), kActions[action], moreArguments*))
 				else
 					this.logFunctionNotFound(increaseFunction)
 			}
@@ -464,6 +464,7 @@ class ACCPlugin extends ControllerPlugin {
 		static kSearchAreaRight := 150
 		
 		if isACCRunning() {
+			beginTickCount := A_TickCount
 			lastY := false
 			
 			if fullSearch {
@@ -674,6 +675,8 @@ class ACCPlugin extends ControllerPlugin {
 				
 					logMessage(kLogInfo, translate("'Select Driver' not detected, adjusting pit stop options: " . values2String(", ", this.kPSOptions*)))
 				}
+				
+				logMessage(kLogInfo, translate("Complete update of pitstop state took ") . A_TickCount - beginTickCount . translate(" ms"))
 				
 				if reload
 					this.openPitstopApp()

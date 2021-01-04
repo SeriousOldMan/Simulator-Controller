@@ -2,7 +2,7 @@
 
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. The ACC Plugin has been greatly extended to support complete hands-free control over all the pitstop settings. New controller actions can be connected to an external event source like VoiceMarco to control the pitstop settings by voice. What the driving instructor always said - keep your hands on the steering wheel.
+  3. The ACC Plugin has been greatly extended to support complete hands-free control over all the pitstop settings. New controller actions can be connected to an external event source like VoiceMarco to control the pitstop settings by voice. What the driving instructor always said - keep your hands on the steering wheel. But for the button box lovers, a new plugin mode "Pitstop" supplies control of all pitstop settings from the hardware controller as well.
 
 ## 1.4.4-release, 01/01/21
 

@@ -270,7 +270,7 @@ listEvent() {
 			}
 			else
 				vItemLists[A_GuiControl].openEditor(A_EventInfo)
-		else if (A_GuiEvent == "I")
+		else if ((A_GuiEvent == "I") && (A_GuiControl != "translationsListView"))
 			if InStr(ErrorLevel, "S", true)
 				vItemLists[A_GuiControl].openEditor(A_EventInfo)
 	}

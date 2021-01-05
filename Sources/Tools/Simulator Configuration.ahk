@@ -255,11 +255,24 @@ registerList(listVariable, itemList) {
 }
 
 listEvent() {
+	Critical
+	
 	protectionOn()
 	
 	try{
 		if (A_GuiEvent == "DoubleClick")
 			vItemLists[A_GuiControl].openEditor(A_EventInfo)
+		else if (A_GuiEvent == "Normal")
+			if (A_GuiControl == "simulatorsListBox") {
+				GuiControlGet simulatorsListBox
+				
+				vItemLists[A_GuiControl].openEditor(inList(SimulatorsList.Instance.iItemsList, simulatorsListBox))
+			}
+			else
+				vItemLists[A_GuiControl].openEditor(A_EventInfo)
+		else if (A_GuiEvent == "I")
+			if InStr(ErrorLevel, "S", true)
+				vItemLists[A_GuiControl].openEditor(A_EventInfo)
 	}
 	finally {
 		protectionOff()
@@ -744,7 +757,7 @@ class SimulatorsList extends ConfigurationItemList {
 		
 		Gui SE:Add, Button, x184 y349 w46 h23 VsimulatorAddButton gaddItem, % translate("Add")
 		Gui SE:Add, Button, x232 y349 w50 h23 Disabled VsimulatorDeleteButton gdeleteItem, % translate("Delete")
-		Gui SE:Add, Button, x328 y349 w55 h23 Disabled VsimulatorUpdateButton gupdateItem, % translate("Save")
+		Gui SE:Add, Button, x328 y349 w55 h23 Disabled VsimulatorUpdateButton gupdateItem, % translate("&Save")
 		
 		return simulatorsListBoxHandle
 	}
@@ -828,7 +841,7 @@ class PluginsTab extends ConfigurationItemList {
 	}
 					
 	createControls(configuration) {
-		Gui SE:Add, ListView, x16 y80 w377 h270 -Multi -LV0x10 NoSort NoSortHdr HwndpluginsListViewHandle VpluginsListView glistEvent
+		Gui SE:Add, ListView, x16 y80 w377 h270 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndpluginsListViewHandle VpluginsListView glistEvent
 							, % values2String("|", map(["Active?", "Plugin", "Simulator(s)", "Arguments"], "translate")*)
 		
 		Gui SE:Add, Text, x16 y360 w86 h23 +0x200, % translate("Plugin")
@@ -846,7 +859,7 @@ class PluginsTab extends ConfigurationItemList {
 		
 		Gui SE:Add, Button, x184 y490 w46 h23 VpluginAddButton gaddItem, % translate("Add")
 		Gui SE:Add, Button, x232 y490 w50 h23 Disabled VpluginDeleteButton gdeleteItem, % translate("Delete")
-		Gui SE:Add, Button, x340 y490 w55 h23 Disabled VpluginUpdateButton gupdateItem, % translate("Save")
+		Gui SE:Add, Button, x340 y490 w55 h23 Disabled VpluginUpdateButton gupdateItem, % translate("&Save")
 		
 		return pluginsListViewHandle
 	}
@@ -1009,7 +1022,7 @@ class ApplicationsTab extends ConfigurationItemList {
 	}
 					
 	createControls(configuration) {
-		Gui SE:Add, ListView, x16 y80 w377 h205 -Multi -LV0x10 NoSort NoSortHdr HwndapplicationsListViewHandle VapplicationsListView glistEvent
+		Gui SE:Add, ListView, x16 y80 w377 h205 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndapplicationsListViewHandle VapplicationsListView glistEvent
 							, % values2String("|", map(["Type", "Name", "Executable", "Window Title", "Working Directory"], "translate")*)
 		
 		Gui SE:Add, Text, x16 y295 w141 h23 +0x200, % translate("Name")
@@ -1047,7 +1060,7 @@ class ApplicationsTab extends ConfigurationItemList {
 
 		Gui SE:Add, Button, x184 y490 w46 h23 VapplicationAddButton gaddItem, % translate("Add")
 		Gui SE:Add, Button, x232 y490 w50 h23 Disabled VapplicationDeleteButton gdeleteItem, % translate("Delete")
-		Gui SE:Add, Button, x340 y490 w55 h23 Disabled VapplicationUpdateButton gupdateItem, % translate("Save")
+		Gui SE:Add, Button, x340 y490 w55 h23 Disabled VapplicationUpdateButton gupdateItem, % translate("&Save")
 		
 		return applicationsListViewHandle
 	}
@@ -1324,7 +1337,7 @@ class FunctionsList extends ConfigurationItemList {
 	}
 					
 	createControls(configuration) {
-		Gui SE:Add, ListView, x16 y158 w377 h192 -Multi -LV0x10 NoSort NoSortHdr HwndfunctionsListViewHandle VfunctionsListView glistEvent
+		Gui SE:Add, ListView, x16 y158 w377 h192 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndfunctionsListViewHandle VfunctionsListView glistEvent
 							, % values2String("|", map(["Function", "Number", "Hotkey(s) & Action(s)"], "translate")*)
 	
 		Gui SE:Add, Text, x16 y360 w86 h23 +0x200, % translate("Function")
@@ -1353,7 +1366,7 @@ class FunctionsList extends ConfigurationItemList {
 		
 		Gui SE:Add, Button, x184 y490 w46 h23 VfunctionAddButton gaddItem, % translate("Add")
 		Gui SE:Add, Button, x232 y490 w50 h23 Disabled VfunctionDeleteButton gdeleteItem, % translate("Delete")
-		Gui SE:Add, Button, x340 y490 w55 h23 Disabled VfunctionUpdateButton gupdateItem, % translate("Save")
+		Gui SE:Add, Button, x340 y490 w55 h23 Disabled VfunctionUpdateButton gupdateItem, % translate("&Save")
 		
 		return functionsListViewHandle
 	}
@@ -1623,7 +1636,7 @@ class LaunchpadTab extends ConfigurationItemList {
 	}
 					
 	createControls(configuration) {
-		Gui SE:Add, ListView, x16 y80 w377 h190 -Multi -LV0x10 NoSort NoSortHdr HwndlaunchpadListViewHandle VlaunchpadListView glistEvent
+		Gui SE:Add, ListView, x16 y80 w377 h190 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndlaunchpadListViewHandle VlaunchpadListView glistEvent
 							, % values2String("|", map(["#", "Label", "Application"], "translate")*)
 	
 		Gui SE:Add, Button, x316 y272 w38 h23 Disabled VlaunchpadUpButton gupItem, % translate("Up")
@@ -1637,7 +1650,7 @@ class LaunchpadTab extends ConfigurationItemList {
 		
 		Gui SE:Add, Button, x184 y490 w46 h23 VlaunchpadAddButton gaddItem, % translate("Add")
 		Gui SE:Add, Button, x232 y490 w50 h23 Disabled VlaunchpadDeleteButton gdeleteItem, % translate("Delete")
-		Gui SE:Add, Button, x340 y490 w55 h23 Disabled VlaunchpadUpdateButton gupdateItem, % translate("Save")
+		Gui SE:Add, Button, x340 y490 w55 h23 Disabled VlaunchpadUpdateButton gupdateItem, % translate("&Save")
 		
 		return launchpadListViewHandle
 	}
@@ -1730,7 +1743,7 @@ class ChatMessagesTab extends ConfigurationItemList {
 	}
 					
 	createControls(configuration) {
-		Gui SE:Add, ListView, x16 y80 w377 h190 -Multi -LV0x10 NoSort NoSortHdr HwndchatMessagesListViewHandle VchatMessagesListView glistEvent
+		Gui SE:Add, ListView, x16 y80 w377 h190 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndchatMessagesListViewHandle VchatMessagesListView glistEvent
 							, % values2String("|", map(["#", "Label", "Text"], "translate")*)
 		
 		Gui SE:Add, Button, x316 y272 w38 h23 Disabled VchatMessageUpButton gupItem, % translate("Up")
@@ -1744,7 +1757,7 @@ class ChatMessagesTab extends ConfigurationItemList {
 		
 		Gui SE:Add, Button, x184 y490 w46 h23 VchatMessageAddButton gaddItem, % translate("Add")
 		Gui SE:Add, Button, x232 y490 w50 h23 Disabled VchatMessageDeleteButton gdeleteItem, % translate("Delete")
-		Gui SE:Add, Button, x340 y490 w55 h23 Disabled VchatMessageUpdateButton gupdateItem, % translate("Save")
+		Gui SE:Add, Button, x340 y490 w55 h23 Disabled VchatMessageUpdateButton gupdateItem, % translate("&Save")
 		
 		return chatMessagesListViewHandle
 	}
@@ -1969,7 +1982,7 @@ class ThemesList extends ConfigurationItemList {
 	}
 					
 	createControls(configuration) {
-		Gui TE:Add, ListView, x16 y120 w377 h140 -Multi -LV0x10 NoSort NoSortHdr HwndthemesListViewHandle VthemesListView glistEvent
+		Gui TE:Add, ListView, x16 y120 w377 h140 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndthemesListViewHandle VthemesListView glistEvent
 							, % values2String("|", map(["Theme", "Media", "Sound File"], "translate")*)
 		
 		Gui TE:Add, Text, x16 y270 w86 h23 +0x200, % translate("Theme")
@@ -2002,7 +2015,7 @@ class ThemesList extends ConfigurationItemList {
 	
 		Gui TE:Add, Button, x184 y490 w46 h23 VthemeAddButton gaddItem, % translate("Add")
 		Gui TE:Add, Button, x232 y490 w50 h23 Disabled VthemeDeleteButton gdeleteItem, % translate("Delete")
-		Gui TE:Add, Button, x340 y490 w55 h23 Disabled VthemeUpdateButton gupdateItem, % translate("Save")
+		Gui TE:Add, Button, x340 y490 w55 h23 Disabled VthemeUpdateButton gupdateItem, % translate("&Save")
 		
 		return themesListViewHandle
 	}
@@ -2697,7 +2710,7 @@ class TranslationsList extends ConfigurationItemList {
 	}
 					
 	createControls(configuration) {
-		Gui TE:Add, ListView, x16 y+10 w377 h140 -Multi -LV0x10 NoSort NoSortHdr HwndtranslationsListViewHandle VtranslationsListView glistEvent
+		Gui TE:Add, ListView, x16 y+10 w377 h140 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndtranslationsListViewHandle VtranslationsListView glistEvent
 							, % values2String("|", map(["Original", "Translation"], "translate")*)
 		
 		Gui TE:Add, Text, x16 w86 h23 +0x200, % translate("Original")

@@ -4,8 +4,8 @@ Release 2.0=updateToV20 <- Release 1.5
 [Cleanup]
 Binaries Folder=%kBinariesDirectory%
 Logs Folder=%kLogsDirectory%
-Simulator Controller.ini=%kControllerConfigurationFile%
-Simulator Tools.ini=%kToolsConfigurationFile%
+Simulator Settings.ini=%kUserConfigDirectory%Simulator Settings.ini
+Simulator Tools.ini=%kUserConfigDirectory%Simulator Tools.ini
 *.bak Files=%kHomeDirectory%, *.ahk.bak, R
 [Build]
 Simulator Controller=%kBinariesDirectory%Simulator Controller.exe <- %kSourcesDirectory%Controller\Simulator Controller.ahk; %kIncludesDirectory%, %kPluginsDirectory%, %kUserPluginsDirectory%, %kHomeDirectory%VERSION

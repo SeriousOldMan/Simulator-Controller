@@ -91,9 +91,6 @@ readToolsConfiguration(ByRef updateSettings, ByRef cleanupSettings, ByRef buildS
 writeToolsConfiguration(updateSettings, cleanupSettings, buildSettings, splashTheme) {
 	configuration := newConfiguration()
 	
-	for target, setting in updateSettings
-		setConfigurationValue(configuration, "Update", target, setting)
-	
 	for target, setting in cleanupSettings
 		setConfigurationValue(configuration, "Cleanup", target, setting)
 		

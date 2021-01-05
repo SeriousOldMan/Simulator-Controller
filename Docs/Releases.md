@@ -4,6 +4,7 @@
   2. Documentation updates, as always
   3. The ACC Plugin has been greatly extended to support complete hands-free control over all the pitstop settings. New controller actions can be connected to an external event source like VoiceMarco to control the pitstop settings by voice. What the driving instructor always said - keep your hands on the steering wheel. But for the button box lovers, a new plugin mode "Pitstop" supplies control of all pitstop settings from the hardware controller as well.
   4. A full automatic update system for all user configurations has been implemented. When a new distribution has been installed, the applications check, whether the user configurations needs to be adopted to the new version and perform the necessary changes as automatic, as possible. A full update information will acompany every release from now on in the documentation Wiki for all possible additional steps to be performed by the user.
+  5. Much better user experience in all list elements of the configuration editor. Single click selection is supported in every list and you can move around using the cursor keys. Alt-S as a shortcut to save the current edited element has also been implemented everywhere.
 
 ## 1.4.4-release, 01/01/21
 

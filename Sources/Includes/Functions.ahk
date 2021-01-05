@@ -547,10 +547,11 @@ availableLanguages() {
 	return translations
 }
 
-readTranslations(targetLanguageCode) {
+readTranslations(targetLanguageCode, withUserTranslations := true) {
+	directories := withUserTranslations ? [kUserConfigDirectory, kConfigDirectory] : [kConfigDirectory]
 	translations := {}
 	
-	Loop Read, % getFileName("Translations." . targetLanguageCode, kUserConfigDirectory, kConfigDirectory)
+	Loop Read, % getFileName("Translations." . targetLanguageCode, directories*)
 	{
 		translation := StrSplit(A_LoopReadLine, "=>")
 		enString := translation[1]

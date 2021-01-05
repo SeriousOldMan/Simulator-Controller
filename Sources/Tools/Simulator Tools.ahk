@@ -317,12 +317,17 @@ editTargets(command := "") {
 updateTranslations() {
 	languages := availableLanguages()
 	
-	for ignore, translationFileName in getFileNames("Translation.*", kUserConfigDirectory) {
+	for ignore, translationFileName in getFileNames("Translations.*", kUserConfigDirectory) {
 		SplitPath translationFileName, , , languageCode
 		
 		translations := readTranslations(languageCode)
 		
-		for original, translation in readTranslations((languageCode = "DE") ? "DE" : "EN")
+		if FileExist(getFileName(kConfigDirectory . "Translations." . languageCode))
+			originalLanguageCode := languageCode
+		else
+			originalLanguageCode := "EN"
+			
+		for original, translation in readTranslations(originalLanguageCode, false)
 			if !translations.HasKey(original)
 				translations[original] := translation
 				

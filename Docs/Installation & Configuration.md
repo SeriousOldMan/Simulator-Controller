@@ -172,4 +172,4 @@ With the drop down menu at the top of the window you can choose any of the avail
 
 Note: The original text sometimes has leading and/or trailing spaces. Be sure to include them in the translated text as well, since they are important for formatting.
 
-Important: The ISO language code and the language name itself cannot be changed, once a new language has been initially saved. So choose them wisely.
+Important: The ISO language code and the language name itself cannot be changed, once a new language has been initially saved. So choose them wisely. And last but not least be careful, if you ever want to edit the translation files directly using a text editor. This editor must be able to handle multiibyte files, since the tranlation files are stored in an UTF-16 format.

@@ -259,11 +259,11 @@ class SimulatorStartup extends ConfigurationItem {
 ;;;-------------------------------------------------------------------------;;;
 
 startSimulator() {
-	settings := readConfiguration(kSimulatorSettingsFile)
-	
 	icon := kIconsDirectory . "Start.ico"
 		
 	Menu Tray, Icon, %icon%, , 1
+	
+	settings := readConfiguration(kSimulatorSettingsFile)
 	
 	registerEventHandler("Startup", "handleStartupEvents")
 	

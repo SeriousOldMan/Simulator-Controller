@@ -1288,14 +1288,13 @@ updateTrayMessageState(settings := false) {
 }
 
 initializeSimulatorController() {
-	settings := readConfiguration(kSimulatorSettingsFile)
-	
-	updateTrayMessageState(settings)
-
 	icon := kIconsDirectory . "Gear.ico"
 	
 	Menu Tray, Icon, %icon%, , 1
 	
+	settings := readConfiguration(kSimulatorSettingsFile)
+	
+	updateTrayMessageState(settings)
 	protectionOn()
 	
 	try {

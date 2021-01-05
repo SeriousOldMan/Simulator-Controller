@@ -202,6 +202,42 @@ initializeTrayMessageQueue() {
 	SetTimer trayMessageQueue, 500
 }
 
+checkForUpdates() {
+	toolTargets := readConfiguration(getFileName("Simulator Tools.targets", kConfigDirectory))
+	
+	userToolTargetsFile := getFileName("Simulator Tools.targets", kUserConfigDirectory)
+	userToolTargets := readConfiguration(userToolTargetsFile)
+	
+	if (userToolTargets.Count() > 0) {
+		setConfigurationSectionValues(userToolTargets, "Update", getConfigurationSectionValues(toolTargets, "Update", Object()))
+		
+		writeConfiguration(userToolTargetsFile, userToolTargets)
+	}
+	
+	if (StrSplit(A_ScriptName, ".")[1] != "Simulator Tools") {
+		updates := readConfiguration(getFileName("UPDATES", kUserConfigDirectory))
+		
+		for target, arguments in getConfigurationSectionValues(toolTargets, "Update", Object())
+			if !getConfigurationValue(updates, "Processed", target, false) {
+				SoundPlay *32
+		
+				OnMessage(0x44, "translateMsgBoxButtons")
+				title := translate("Modular Simulator Controller System")
+				MsgBox 262180, %title%, % translate("The local configuration database needs an update. Do you want to run the update now?")
+				OnMessage(0x44, "")
+				
+				IfMsgBox Yes
+				{
+					RunWait % kBinariesDirectory . "Simulator Tools.exe -Update"
+					
+					loadSimulatorConfiguration()
+					
+					break
+				}
+			}
+	}
+}
+
 loadSimulatorConfiguration() {
 	kSimulatorConfiguration := readConfiguration(kSimulatorConfigurationFile)
 	vTargetLanguageCode := getConfigurationValue(kSimulatorConfiguration, "Configuration", "Language", "en")
@@ -848,6 +884,13 @@ translateMsgBoxButtons() {
 		if (label != "Ok") {
 			ControlSetText Button1, % translate("Yes")
 			ControlSetText Button2, % translate("No")
+			
+			try {
+				ControlSetText Button3, % translate("Cancel")
+			}
+			catch exception {
+				; ignore
+			}
 		}
     }
 }
@@ -1000,6 +1043,7 @@ decreaseLogLevel() {
 
 initializeEnvironment()
 loadSimulatorConfiguration()
+checkForUpdates()
 initializeLoggingSystem()
 initializeEventSystem()
 initializeTrayMessageQueue()

@@ -744,7 +744,7 @@ class SimulatorsList extends ConfigurationItemList {
 		
 		Gui SE:Add, Button, x184 y349 w46 h23 VsimulatorAddButton gaddItem, % translate("Add")
 		Gui SE:Add, Button, x232 y349 w50 h23 Disabled VsimulatorDeleteButton gdeleteItem, % translate("Delete")
-		Gui SE:Add, Button, x328 y349 w55 h23 Disabled VsimulatorUpdateButton gupdateItem, % translate("Update")
+		Gui SE:Add, Button, x328 y349 w55 h23 Disabled VsimulatorUpdateButton gupdateItem, % translate("Save")
 		
 		return simulatorsListBoxHandle
 	}
@@ -846,7 +846,7 @@ class PluginsTab extends ConfigurationItemList {
 		
 		Gui SE:Add, Button, x184 y490 w46 h23 VpluginAddButton gaddItem, % translate("Add")
 		Gui SE:Add, Button, x232 y490 w50 h23 Disabled VpluginDeleteButton gdeleteItem, % translate("Delete")
-		Gui SE:Add, Button, x340 y490 w55 h23 Disabled VpluginUpdateButton gupdateItem, % translate("Update")
+		Gui SE:Add, Button, x340 y490 w55 h23 Disabled VpluginUpdateButton gupdateItem, % translate("Save")
 		
 		return pluginsListViewHandle
 	}
@@ -1047,7 +1047,7 @@ class ApplicationsTab extends ConfigurationItemList {
 
 		Gui SE:Add, Button, x184 y490 w46 h23 VapplicationAddButton gaddItem, % translate("Add")
 		Gui SE:Add, Button, x232 y490 w50 h23 Disabled VapplicationDeleteButton gdeleteItem, % translate("Delete")
-		Gui SE:Add, Button, x340 y490 w55 h23 Disabled VapplicationUpdateButton gupdateItem, % translate("Update")
+		Gui SE:Add, Button, x340 y490 w55 h23 Disabled VapplicationUpdateButton gupdateItem, % translate("Save")
 		
 		return applicationsListViewHandle
 	}
@@ -1353,7 +1353,7 @@ class FunctionsList extends ConfigurationItemList {
 		
 		Gui SE:Add, Button, x184 y490 w46 h23 VfunctionAddButton gaddItem, % translate("Add")
 		Gui SE:Add, Button, x232 y490 w50 h23 Disabled VfunctionDeleteButton gdeleteItem, % translate("Delete")
-		Gui SE:Add, Button, x340 y490 w55 h23 Disabled VfunctionUpdateButton gupdateItem, % translate("Update")
+		Gui SE:Add, Button, x340 y490 w55 h23 Disabled VfunctionUpdateButton gupdateItem, % translate("Save")
 		
 		return functionsListViewHandle
 	}
@@ -1637,7 +1637,7 @@ class LaunchpadTab extends ConfigurationItemList {
 		
 		Gui SE:Add, Button, x184 y490 w46 h23 VlaunchpadAddButton gaddItem, % translate("Add")
 		Gui SE:Add, Button, x232 y490 w50 h23 Disabled VlaunchpadDeleteButton gdeleteItem, % translate("Delete")
-		Gui SE:Add, Button, x340 y490 w55 h23 Disabled VlaunchpadUpdateButton gupdateItem, % translate("Update")
+		Gui SE:Add, Button, x340 y490 w55 h23 Disabled VlaunchpadUpdateButton gupdateItem, % translate("Save")
 		
 		return launchpadListViewHandle
 	}
@@ -1744,7 +1744,7 @@ class ChatMessagesTab extends ConfigurationItemList {
 		
 		Gui SE:Add, Button, x184 y490 w46 h23 VchatMessageAddButton gaddItem, % translate("Add")
 		Gui SE:Add, Button, x232 y490 w50 h23 Disabled VchatMessageDeleteButton gdeleteItem, % translate("Delete")
-		Gui SE:Add, Button, x340 y490 w55 h23 Disabled VchatMessageUpdateButton gupdateItem, % translate("Update")
+		Gui SE:Add, Button, x340 y490 w55 h23 Disabled VchatMessageUpdateButton gupdateItem, % translate("Save")
 		
 		return chatMessagesListViewHandle
 	}
@@ -2002,7 +2002,7 @@ class ThemesList extends ConfigurationItemList {
 	
 		Gui TE:Add, Button, x184 y490 w46 h23 VthemeAddButton gaddItem, % translate("Add")
 		Gui TE:Add, Button, x232 y490 w50 h23 Disabled VthemeDeleteButton gdeleteItem, % translate("Delete")
-		Gui TE:Add, Button, x340 y490 w55 h23 Disabled VthemeUpdateButton gupdateItem, % translate("Update")
+		Gui TE:Add, Button, x340 y490 w55 h23 Disabled VthemeUpdateButton gupdateItem, % translate("Save")
 		
 		return themesListViewHandle
 	}

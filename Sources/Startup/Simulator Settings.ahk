@@ -42,7 +42,9 @@ ListLines Off					; Disable execution history
 ;;;-------------------------------------------------------------------------;;;
 
 showSettingsEditor() {
-	Menu Tray, Icon, % kIconsDirectory . "Settings.ico", , 1
+	icon := kIconsDirectory . "Settings.ico"
+	
+	Menu Tray, Icon, %icon%, , 1
 	
 	settings := readConfiguration(kSimulatorSettingsFile)
 	

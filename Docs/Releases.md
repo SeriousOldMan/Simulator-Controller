@@ -1,8 +1,9 @@
-## 1.5.x-release upcoming...
+## 2.0.x-release upcoming...
 
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. The ACC Plugin has been greatly extended to support complete hands-free control over all the pitstop settings. New controller actions can be connected to an external event source like VoiceMarco to control the pitstop settings by voice. What the driving instructor always said - keep your hands on the steering wheel. But for the button box lovers, a new plugin mode "Pitstop" supplies control of all pitstop settings from the hardware controller as well.
+  4. A full automatic update system for all user configurations has been implemented. When a new distribution has been installed, the applications check, whether the user configurations needs to be adopted to the new version and perform the necessary changes as automatic, as possible. A full update information will acompany every release from now on in the documentation Wiki for all possible additional steps to be performed by the user.
 
 ## 1.4.4-release, 01/01/21
 
@@ -12,7 +13,7 @@
      - including a graphical tool for translation editing
   4. Updated photorealistic elements for Button Box
   5. All settings dialogs may be moved around by clicking in the main title
-  6. All current effect settings will be displayed alternately with effect name in Button Box visual representation
+  6. All current effect settings will be displayed alternating with the corresponding effect name in the Button Box visual representation
      - Only available for the Motion Feedback plugin. Unfortunately, this is currently not possible for Tactile Feedback, since SimHub does not provide an interface for querying the current effect settings at this time
   7. A new option is available in the configuration dialog, which allows the Button Box window to be centered on a secondary screen. Helpful, when opening the visual representation on a small display located next to the button box
   8. Several Refactorings and Renames

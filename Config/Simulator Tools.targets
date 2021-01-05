@@ -1,5 +1,6 @@
 [Update]
-Release 2.0=updateToV20
+Release 1.5=updateToV15
+Release 2.0=updateToV20 <- Release 1.5
 [Cleanup]
 Binaries Folder=%kBinariesDirectory%
 Logs Folder=%kLogsDirectory%

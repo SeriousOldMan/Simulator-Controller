@@ -66,13 +66,15 @@ global vBuildSettings = Object()
 readToolsConfiguration(ByRef updateSettings, ByRef cleanupSettings, ByRef buildSettings, ByRef splashTheme) {
 	targets := readConfiguration(kToolsTargetsFile)
 	configuration := readConfiguration(kToolsConfigurationFile)
+	updateConfiguration := readConfiguration(getFileName("UPDATES", kUserConfigDirectory))
 	
 	updateSettings := Object()
 	cleanupSettings := Object()
 	buildSettings := Object()
 	
 	for target, rule in getConfigurationSectionValues(targets, "Update", Object())
-		updateSettings[target] := getConfigurationValue(configuration, "Update", target, true)
+		if !getConfigurationValue(updateConfiguration, "Processed", target, false)
+			updateSettings[target] := true
 	
 	for target, rule in getConfigurationSectionValues(targets, "Cleanup", Object())
 		cleanupSettings[target] := getConfigurationValue(configuration, "Cleanup", target, InStr(target, "*.ahk") ? true : false)
@@ -213,36 +215,42 @@ editTargets(command := "") {
 		Gui TE:Font, Norm, Arial
 		Gui TE:Font, Italic, Arial
 		
-		updateHeight := 20 + (vupdateSettings.Count() * 20)
-		
-		if (updateHeight == 20)
-			updateHeight := 40
+		if (vupdateSettings.Count() > 0) {
+			updateHeight := 20 + (vupdateSettings.Count() * 20)
 			
-		Gui TE:Add, GroupBox, YP+30 w220 h%updateHeight%, % translate("Update")
-	
-		Gui TE:Font, Norm, Arial
-	
-		if (vUpdateSettings.Count() > 0)
-			for target, setting in vUpdateSettings {
-				option := ""
+			if (updateHeight == 20)
+				updateHeight := 40
 				
-				if (A_Index == 1)
-					option := option . " YP+20 XP+10"
+			Gui TE:Add, GroupBox, YP+30 w220 h%updateHeight%, % translate("Update")
+		
+			Gui TE:Font, Norm, Arial
+		
+			if (vUpdateSettings.Count() > 0)
+				for target, setting in vUpdateSettings {
+					option := ""
 					
-				Gui TE:Add, CheckBox, %option% Disabled Checked%setting% vupdateVariable%A_Index%, %target%
-			}
+					if (A_Index == 1)
+						option := option . " YP+20 XP+10"
+						
+					Gui TE:Add, CheckBox, %option% Disabled Checked%setting% vupdateVariable%A_Index%, %target%
+				}
+			else
+				Gui TE:Add, Text, YP+20 XP+10, % translate("No updates required...")
+		
+			Gui TE:Font, Norm, Arial
+			Gui TE:Font, Italic, Arial
+			
+			cleanupPosOption := "XP-10"
+		}
 		else
-			Gui TE:Add, Text, YP+20 XP+10, % translate("No targets found...")
-	
-		Gui TE:Font, Norm, Arial
-		Gui TE:Font, Italic, Arial
+			cleanupPosOption := ""
 		
 		cleanupHeight := 20 + (vCleanupSettings.Count() * 20)
 		
 		if (cleanupHeight == 20)
 			cleanupHeight := 40
 			
-		Gui TE:Add, GroupBox, XP-10 YP+30 w220 h%cleanupHeight%, % translate("Cleanup")
+		Gui TE:Add, GroupBox, %cleanupPosOption% YP+30 w220 h%cleanupHeight%, % translate("Cleanup")
 	
 		Gui TE:Font, Norm, Arial
 	
@@ -306,7 +314,106 @@ editTargets(command := "") {
 	}
 }
 
-updateToV20() {
+updateTranslations() {
+	languages := availableLanguages()
+	
+	for ignore, translationFileName in getFileNames("Translation.*", kUserConfigDirectory) {
+		SplitPath translationFileName, , , languageCode
+		
+		translations := readTranslations(languageCode)
+		
+		for original, translation in readTranslations((languageCode = "DE") ? "DE" : "EN")
+			if !translations.HasKey(original)
+				translations[original] := translation
+				
+		writeTranslations(languageCode, languages[languageCode], translations)
+	}
+}
+
+updatePluginLabels() {
+	userPluginLabelsFile := getFileName("Controller Plugin Labels.ini", kUserConfigDirectory)
+	userPluginLabels := readConfiguration(userPluginLabelsFile)
+	bundledPluginLabels := readConfiguration(getFileName("Controller Plugin Labels.ini", kConfigDirectory))
+	
+	for section, keyValues in bundledPluginLabels
+		for key, value in keyValues
+			if !getConfigurationValue(userPluginLabels, section, key, false)
+				setConfigurationValue(userPluginLabels, section, key, value)
+	
+	writeConfiguration(userPluginLabelsFile, userPluginLabels)
+}
+
+updateConfigurationForV20() {
+	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	userConfiguration := readConfiguration(userConfigurationFile)
+	
+	if (userConfiguration.Count() > 0) {
+		bundledConfiguration := readConfiguration(getFileName(kSimulatorConfigurationFile, kConfigDirectory))
+	
+		customCallIndex := 13
+		
+		Loop {
+			key := "Custom." . customCallIndex . ".Call"
+			
+			if !getConfigurationValue(userConfiguration, "Controller Functions", key, false) {
+				setConfigurationValue(userConfiguration, "Controller Functions", key, getConfigurationValue(bundledConfiguration, "Controller Functions", key))
+				
+				key .= " Action"
+				
+				setConfigurationValue(userConfiguration, "Controller Functions", key, getConfigurationValue(bundledConfiguration, "Controller Functions", key))
+			}
+			
+			customCallIndex += 1
+		} until (customCallIndex >= 32)
+	}
+	
+	writeConfiguration(userConfigurationFile, userConfiguration)
+}
+
+updateACCPluginForV20() {
+	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	userConfiguration := readConfiguration(userConfigurationFile)
+	
+	if (userConfiguration.Count() > 0) {
+		bundledACCPlugin := getConfigurationValue(readConfiguration(getFileName(kSimulatorConfigurationFile, kConfigDirectory)), "Plugins", "ACC")
+		userACCPlugin := getConfigurationValue(userConfiguration, "Plugins", "ACC", false)
+		
+		if userACCPlugin {
+			userACCPlugin := string2Values("|", userACCPlugin)
+			
+			if (userACCPlugin[3] == "") {
+				userACCPlugin[3] := string2Values("|", bundledACCPlugin)[3]
+				
+				setConfigurationValue(userConfiguration, "Plugins", "ACC", values2String("|", userACCPlugin*))
+				
+				writeConfiguration(userConfigurationFile, userConfiguration)
+			}
+		}
+	}
+}
+
+updateStep(targetName, updateFunction, logText, ByRef buildProgress, progressStep) {
+	if !kSilentMode
+		Progress %buildProgress%, % translate(logText) . targetName . translate("...")
+			
+	%updateFunction%()
+	
+	Sleep 1000
+	
+	buildProgress += progressStep
+
+}
+
+updateToV15(targetName, ByRef buildProgress) {
+}
+
+updateToV20(targetName, ByRef buildProgress) {
+	progressStep := Round((100 / (vUpdateTargets.Length() + vCleanupTargets.Length() + vBuildTargets.Length() + 1)) / 4)
+	
+	updateStep(targetName, "updateConfigurationForV20", "Updating configuration to ", buildProgress, progressStep)
+	updateStep(targetName, "updateTranslations", "Updating translations to ", buildProgress, progressStep)
+	updateStep(targetName, "updatePluginLabels", "Updating plugin labels to ", buildProgress, progressStep)
+	updateStep(targetName, "updateACCPluginForV20", "Updating ACC plugin to ", buildProgress, progressStep)
 }
 
 checkFileDependency(file, modification) {
@@ -364,12 +471,28 @@ runUpdateTargets(ByRef buildProgress) {
 		if !kSilentMode
 			Progress %buildProgress%, % translate("Updating to ") . targetName . translate("...")
 			
-		logMessage(kLogInfo, translate("Cleaning ") . targetName)
+		logMessage(kLogInfo, translate("Updating to ") . targetName)
 		
 		updateFunction := target[2]
 		
-		%updateFunction%()
+		%updateFunction%(targetName, buildProgress)
+			
+		Sleep 1000
+				
+		buildProgress += Round(100 / (vUpdateTargets.Length() + vCleanupTargets.Length() + vBuildTargets.Length() + 1))
+			
+		if !kSilentMode
+			Progress %buildProgress%
 	}
+	
+	updatesFileName := getFileName("UPDATES", kUserConfigDirectory)
+	
+	updates := readConfiguration(updatesFileName)
+	
+	for target, ignore in vUpdateSettings
+		setConfigurationValue(updates, "Processed", target, true)
+		
+	writeConfiguration(updatesFileName, updates)
 }
 
 runCleanTargets(ByRef buildProgress) {
@@ -428,7 +551,7 @@ runCleanTargets(ByRef buildProgress) {
 			
 		Sleep 1000
 				
-		buildProgress += Round(100 / (vCleanupTargets.Length() + vBuildTargets.Length() + 1))
+		buildProgress += Round(100 / (vUpdateTargets.Length() + vCleanupTargets.Length() + vBuildTargets.Length() + 1))
 			
 		if !kSilentMode
 			Progress %buildProgress%
@@ -491,7 +614,7 @@ runBuildTargets(ByRef buildProgress) {
 			
 		Sleep 1000
 		
-		buildProgress += Round(100 / (vCleanupTargets.Length() + vBuildTargets.Length() + 1))
+		buildProgress += Round(100 / (vUpdateTargets.Length() + vCleanupTargets.Length() + vBuildTargets.Length() + 1))
 			
 		if !kSilentMode
 			Progress %buildProgress%
@@ -507,7 +630,7 @@ compareUpdateTargets(t1, t2) {
 		return (t1[1] >= t2[1])
 }
 
-prepareTargets(ByRef buildProgress) {
+prepareTargets(ByRef buildProgress, updateOnly) {
 	targets := readConfiguration(kToolsTargetsFile)
 	
 	for target, arguments in getConfigurationSectionValues(targets, "Update", Object()) {
@@ -528,51 +651,63 @@ prepareTargets(ByRef buildProgress) {
 	
 	bubbleSort(vUpdateTargets, "compareUpdateTargets")
 	
-	for target, arguments in getConfigurationSectionValues(targets, "Cleanup", Object()) {
-		buildProgress +=1
-		cleanup := vCleanupSettings[target]
-		
-		if !kSilentMode
-			Progress, %buildProgress%, % target . ": " . (cleanup ? translate("Yes") : translate("No"))
-		
-		if cleanup {
-			arguments := substituteVariables(arguments)
+	if !updateOnly {
+		for target, arguments in getConfigurationSectionValues(targets, "Cleanup", Object()) {
+			buildProgress +=1
+			cleanup := vCleanupSettings[target]
 			
-			vCleanupTargets.Push(Array(target, string2Values(",", arguments)*))
-		}
-	
-		Sleep 200
-	}
-	
-	for target, arguments in getConfigurationSectionValues(targets, "Build", Object()) {
-		buildProgress +=1
-		build := vBuildSettings[target]
-		
-		if !kSilentMode
-			Progress, %buildProgress%, % target . ": " . (build ? translate("Yes") : translate("No"))
-		
-		if build {
-			rule := string2Values("<-", substituteVariables(arguments))
+			if !kSilentMode
+				Progress, %buildProgress%, % target . ": " . (cleanup ? translate("Yes") : translate("No"))
 			
-			arguments := string2Values(";", rule[2])
+			if cleanup {
+				arguments := substituteVariables(arguments)
+				
+				vCleanupTargets.Push(Array(target, string2Values(",", arguments)*))
+			}
 		
-			vBuildTargets.Push(Array(target, arguments[1], rule[1], string2Values(",", arguments[2])))
+			Sleep 200
 		}
-	
-		Sleep 200
+		
+		for target, arguments in getConfigurationSectionValues(targets, "Build", Object()) {
+			buildProgress +=1
+			build := vBuildSettings[target]
+			
+			if !kSilentMode
+				Progress, %buildProgress%, % target . ": " . (build ? translate("Yes") : translate("No"))
+			
+			if build {
+				rule := string2Values("<-", substituteVariables(arguments))
+				
+				arguments := string2Values(";", rule[2])
+			
+				vBuildTargets.Push(Array(target, arguments[1], rule[1], string2Values(",", arguments[2])))
+			}
+		
+			Sleep 200
+		}
 	}
 }
 
 runTargets() {
-	readToolsConfiguration(vUpdateSettings, vCleanupSettings, vBuildSettings, vSplashTheme)
-	
-	if (!FileExist(getFileName(kToolsConfigurationFile, kUserConfigDirectory, kConfigDirectory)) || GetKeyState("Ctrl"))
-		if !editTargets()
-			ExitApp 0
+	updateOnly := false
 	
 	icon := kIconsDirectory . "Tools.ico"
 	
 	Menu Tray, Icon, %icon%, , 1
+	
+	readToolsConfiguration(vUpdateSettings, vCleanupSettings, vBuildSettings, vSplashTheme)
+	
+	if (A_Args.Length() > 0)
+		if (A_Args[1] = "-Update")
+			updateOnly := true
+	
+	if updateOnly {
+		vCleanupSettings := {}
+		vBuildSettings := {}
+	}
+	else if (!FileExist(getFileName(kToolsConfigurationFile, kUserConfigDirectory, kConfigDirectory)) || GetKeyState("Ctrl"))
+		if !editTargets()
+			ExitApp 0
 	
 	if (!kSilentMode && vSplashTheme)
 		showSplashTheme(vSplashTheme, false, false)
@@ -587,13 +722,17 @@ runTargets() {
 
 	buildProgress := 0
 	
-	prepareTargets(buildProgress)
+	prepareTargets(buildProgress, updateOnly)
 	
 	if !kSilentMode
 		Progress, , %A_Space%, % translate("Running Targets")
 	
-	runCleanTargets(buildProgress)
-	runBuildTargets(buildProgress)
+	runUpdateTargets(buildProgress)
+	
+	if !updateOnly {
+		runCleanTargets(buildProgress)
+		runBuildTargets(buildProgress)
+	}
 		
 	if !kSilentMode
 		Progress 100, % translate("Done")

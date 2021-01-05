@@ -17,3 +17,4 @@
      - Run Simulator Tools automatically after each VERSION change
      - Update User Simulator Configuration.ini
      - Update User Translations.LC
+	 - Update Controller Plugin Labels.ini

@@ -42,6 +42,7 @@ class SystemPlugin extends ControllerPlugin {
 		}
 		
 		updateRunningState() {
+			static round := 0
 			isRunning := this.isRunning()
 			stateChange := false
 			
@@ -63,6 +64,9 @@ class SystemPlugin extends ControllerPlugin {
 					stateChange := true
 				}
 			}
+			
+			if (round++ > 10)
+				stateChange := true
 			
 			if (stateChange && (this.LaunchpadFunction != false)) {
 				controller := SimulatorController.Instance

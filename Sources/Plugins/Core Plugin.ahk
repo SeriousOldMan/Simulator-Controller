@@ -61,7 +61,15 @@ startVoiceMacro() {
 				
 				WinWait %windowTitle%, 
 				WinMove %windowTitle%, , 50, 50
-				Sleep 1000
+
+				active := false
+
+				while !active {
+					IfWinNotActive %windowTitle%, , WinActivate, %windowTitle% 
+					WinWaitActive %windowTitle%, , 1
+				
+					active := (ErrorLevel == 0)
+				}
 				
 				MouseClick, left,  465,  45
 				Sleep, 1000

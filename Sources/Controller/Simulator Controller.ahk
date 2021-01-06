@@ -1170,21 +1170,12 @@ functionActionCallable(function, trigger, action) {
 }
 
 fireControllerAction(function, trigger) {
-	static active := false
-	
 	protectionOn()
-	
-	while active
-		Sleep 100
-	
-	active := true
 	
 	try {
 		function.Controller.fireAction(function, trigger)
 	}
 	finally {
-		active := false
-		
 		protectionOff()
 	}
 }

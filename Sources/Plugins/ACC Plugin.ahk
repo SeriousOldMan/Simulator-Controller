@@ -171,7 +171,7 @@ class ACCPlugin extends ControllerPlugin {
 		this.kOpenPitstopAppHotkey := this.getArgumentValue("openPitstopApp", false)
 		this.kClosePitstopAppHotkey := this.getArgumentValue("closePitstopApp", false)
 		
-		for ignore, action in string2Values(",", this.getArgumentValue("pitstopActions", ""))
+		for ignore, action in string2Values(",", this.getArgumentValue("pitstopSettings", ""))
 			this.createPitstopAction(controller, string2Values(A_Space, action)*)
 		
 		controller.registerPlugin(this)
@@ -741,7 +741,7 @@ closePitstopApp() {
 }
 
 togglePitstopActivity(activity) {
-	if !inList(["Change Tyres", "Change Brakes", "Repair Bodywork" "Repair Suspension"], activity)
+	if !inList(["Change Tyres", "Change Brakes", "Repair Bodywork", "Repair Suspension"], activity)
 		logMessage(kLogWarn, translate("Unsupported pit stop activity """) . activity . translate(""" detected in togglePitstopActivity - please check the configuration"))
 	
 	protectionOn()
@@ -811,7 +811,7 @@ changePitstopTyreCompound(compound) {
 }
 
 changePitstopTyrePressure(tyre, direction, increments := 1) {
-	if !inList(["All Around", "Front Left", "Front Right" "Rear Left", "Rear Right"], tyre)
+	if !inList(["All Around", "Front Left", "Front Right", "Rear Left", "Rear Right"], tyre)
 		logMessage(kLogWarn, translate("Unsupported tyre position """) . tyre . translate(""" detected in changePitstopTyrePressure - please check the configuration"))
 		
 	if !inList(["Increase", "Decrease"], direction)
@@ -850,15 +850,10 @@ changePitstopBrakeType(brake, selection) {
 ;;;-------------------------------------------------------------------------;;;
 
 updatePitstopState() {
-	local plugin := false
-	
-	if !plugin
-		plugin := SimulatorController.Instance.findPlugin(kACCPlugin)
-		
 	protectionOn()
 	
 	try {
-		plugin.updatePitstopState(true)
+		SimulatorController.Instance.findPlugin(kACCPlugin).updatePitstopState(true)
 	}
 	finally {
 		protectionOff()

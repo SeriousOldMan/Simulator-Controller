@@ -35,6 +35,7 @@ Unhandled exception encountered in =>
  at line =>
 No configuration found - please run the configuration tool=>
 The local configuration database needs an update. Do you want to run the update now?=>
+Are you really sure, you want to skip the automated update procedure?=>
 Installation path set to =>
 Installation path not set=>
 AutoHotkey path set to =>

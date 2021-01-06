@@ -38,6 +38,10 @@ ListLines Off					; Disable execution history
 global kToolsConfigurationFile = "Simulator Tools.ini"
 global kToolsTargetsFile = "Simulator Tools.targets"
 
+global kUpdateMessages = {updateToV15: "Updating configuration to "
+						, updateConfigurationForV20: "Updating configuration to ", updateTranslations: "Updating translations to "
+						, updatePluginLabels: "Updating plugin labels to ", updateACCPluginForV20: "Updating ACC plugin to "}
+
 global kCompiler = kAHKDirectory . "Compiler\ahk2exe.exe"
 
 global kSave = "save"
@@ -394,28 +398,7 @@ updateACCPluginForV20() {
 	}
 }
 
-updateStep(targetName, updateFunction, logText, ByRef buildProgress, progressStep) {
-	if !kSilentMode
-		Progress %buildProgress%, % translate(logText) . targetName . translate("...")
-			
-	%updateFunction%()
-	
-	Sleep 1000
-	
-	buildProgress += progressStep
-
-}
-
 updateToV15(targetName, ByRef buildProgress) {
-}
-
-updateToV20(targetName, ByRef buildProgress) {
-	progressStep := Round((100 / (vUpdateTargets.Length() + vCleanupTargets.Length() + vBuildTargets.Length() + 1)) / 4)
-	
-	updateStep(targetName, "updateConfigurationForV20", "Updating configuration to ", buildProgress, progressStep)
-	updateStep(targetName, "updateTranslations", "Updating translations to ", buildProgress, progressStep)
-	updateStep(targetName, "updatePluginLabels", "Updating plugin labels to ", buildProgress, progressStep)
-	updateStep(targetName, "updateACCPluginForV20", "Updating ACC plugin to ", buildProgress, progressStep)
 }
 
 checkFileDependency(file, modification) {
@@ -475,11 +458,20 @@ runUpdateTargets(ByRef buildProgress) {
 			
 		logMessage(kLogInfo, translate("Updating to ") . targetName)
 		
-		updateFunction := target[2]
-		
-		%updateFunction%(targetName, buildProgress)
-			
 		Sleep 1000
+		
+		progressStep := Round((100 / (vUpdateTargets.Length() + vCleanupTargets.Length() + vBuildTargets.Length() + 1)) / target[2].Length())
+		
+		for ignore, updateFunction in target[2] {
+			if !kSilentMode
+				Progress %buildProgress%, % translate(kUpdateMessages[updateFunction]) . targetName . translate("...")
+					
+			%updateFunction%()
+			
+			Sleep 1000
+			
+			buildProgress += progressStep
+		}
 				
 		buildProgress += Round(100 / (vUpdateTargets.Length() + vCleanupTargets.Length() + vBuildTargets.Length() + 1))
 			
@@ -643,9 +635,12 @@ prepareTargets(ByRef buildProgress, updateOnly) {
 			Progress, %buildProgress%, % target . ": " . (update ? translate("Yes") : translate("No"))
 		
 		if update {
-			arguments := string2Values("<-", substituteVariables(arguments))
+			arguments := string2Values("->", substituteVariables(arguments))
 			
-			vUpdateTargets.Push(Array(target, arguments[1], string2Values(",", arguments[2])))
+			if (arguments.Length() == 1)
+				vUpdateTargets.Push(Array(target, string2Values(",", arguments[1]), []))
+			else
+				vUpdateTargets.Push(Array(target, string2Values(",", arguments[2]), string2Values(",", arguments[1])))
 		}
 	
 		Sleep 200
@@ -771,7 +766,7 @@ protectionOn()
 
 try {
 	SoundPlay *32
-	OnMessage(0x44, "translateMsgBoxButtons")
+	OnMessage(0x44, Func("translateMsgBoxButtons").bind(["Yes", "No"]))
 	
 	title := translate("Simulator Build")
 	

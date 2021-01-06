@@ -216,15 +216,35 @@ checkForUpdates() {
 	
 	if (StrSplit(A_ScriptName, ".")[1] != "Simulator Tools") {
 		updates := readConfiguration(getFileName("UPDATES", kUserConfigDirectory))
-		
+restartUpdate:		
 		for target, arguments in getConfigurationSectionValues(toolTargets, "Update", Object())
 			if !getConfigurationValue(updates, "Processed", target, false) {
 				SoundPlay *32
 		
-				OnMessage(0x44, "translateMsgBoxButtons")
+				OnMessage(0x44, Func("translateMsgBoxButtons").bind(["Yes", "No", "Never"]))
 				title := translate("Modular Simulator Controller System")
-				MsgBox 262180, %title%, % translate("The local configuration database needs an update. Do you want to run the update now?")
+				MsgBox 262179, %title%, % translate("The local configuration database needs an update. Do you want to run the update now?")
 				OnMessage(0x44, "")
+				
+				IfMsgBox Cancel
+				{
+					OnMessage(0x44, Func("translateMsgBoxButtons").bind(["Yes", "No"]))
+					title := translate("Modular Simulator Controller System")
+					MsgBox 262436, %title%, % translate("Are you really sure, you want to skip the automated update procedure?")
+					OnMessage(0x44, "")
+
+					IfMsgBox Yes
+					{
+						for target, arguments in getConfigurationSectionValues(toolTargets, "Update", Object())
+							setConfigurationValue(updates, "Processed", target, true)
+						
+						writeConfiguration(getFileName("UPDATES", kUserConfigDirectory), updates)
+						
+						break
+					}
+					
+					Goto restartUpdate
+				}
 				
 				IfMsgBox Yes
 				{
@@ -232,6 +252,11 @@ checkForUpdates() {
 					
 					loadSimulatorConfiguration()
 					
+					break
+				}
+				
+				IfMsgBox No
+				{
 					break
 				}
 			}
@@ -875,25 +900,27 @@ enableTrayMessages(duration := 1500) {
 	vTrayMessageDuration := duration
 }
 
-translateMsgBoxButtons() {
+translateMsgBoxButtons(buttonLabels) {
+	curDetectHiddenWindows := A_DetectHiddenWindows
+	
     DetectHiddenWindows, On
-    Process, Exist
     
-	If (WinExist("ahk_class #32770 ahk_pid " . ErrorLevel)) {
-		ControlGetText label, Button1
+	try {
+		Process, Exist
 		
-		if (label != "Ok") {
-			ControlSetText Button1, % translate("Yes")
-			ControlSetText Button2, % translate("No")
-			
-			try {
-				ControlSetText Button3, % translate("Cancel")
-			}
-			catch exception {
-				; ignore
-			}
+		If (WinExist("ahk_class #32770 ahk_pid " . ErrorLevel)) {
+			for index, label in buttonLabels
+				try {
+					ControlSetText Button%index%, % translate(label)
+				}
+				catch exception {
+					; ignore
+				}
 		}
-    }
+	}
+	finally {
+		DetectHiddenWindows %curDetectHiddenWindows%
+	}
 }
 
 readConfiguration(configFile) {

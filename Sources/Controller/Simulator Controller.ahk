@@ -1154,18 +1154,8 @@ class ControllerAction {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-showButtonBox() {
-	btnBox := ButtonBox.Instance
-	
-	if (btnBox != false)
-		btnBox.show()
-}
-
 hideButtonBox() {
-	btnBox := ButtonBox.Instance
-	
-	if (btnBox != false)
-		btnBox.hide()
+	ButtonBox.Instance.hide()
 }
 
 setHotkeyEnabled(function, trigger, enabled) {

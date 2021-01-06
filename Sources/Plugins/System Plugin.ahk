@@ -611,7 +611,7 @@ stopSimulation() {
 shutdownSystem() {
 	SoundPlay *32
 	
-	OnMessage(0x44, "translateMsgBoxButtons")
+	OnMessage(0x44, Func("translateMsgBoxButtons").bind(["Yes", "No"]))
 	title := translate("Shutdown")
 	MsgBox 262436, %title%, % translate("Shutdown Simulator?")
 	OnMessage(0x44, "")

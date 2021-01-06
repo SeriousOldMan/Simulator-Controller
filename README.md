@@ -23,7 +23,7 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-[2.0.0-beta](https://www.dropbox.com/s/i09wors37o231xc/Simulator%20Controller%202.0.0-beta.zip?dl=1) (First stable build for the upcoming [2.0 release](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes))
+[2.0.0-rc](https://www.dropbox.com/s/g99d2j73sryog11/Simulator%20Controller%202.0.0-rc.zip?dl=1) (Release candidate for the upcoming [2.0 release](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes))
 
 IMPORTANT: Please be careful, since an automatic update mechanism for configurations has been included. At least, make a full backup of the *Simulator Controller* folder in your user *Documents* folder. For more information regarding the **required** updates for this release take a look at the [update notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-20).
 

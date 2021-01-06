@@ -193,6 +193,13 @@ See the following table for the supported settings.
 | BodyworkRepair | Toggles the repair of all the bodywork. |
 
 Beside controlling the pitstop settings from the button box, all settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) for more information.
+
+Important: To *understand* the pitstop app state of *Assetto Corsa Competizione*, Simulator Controller searches for small picture elements in the graphics of the game window. 
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Screen%20Images/ACC/Pit%20Strategy%201.JPG)     ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Screen%20Images/ACC/Compound%201.JPG)     ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Screen%20Images/ACC/Select%20Driver%202.jpg)
+
+The algorithm needs to lear the position of the pitstop app, otherwise it will search the whole screen every 10 seconds, while *Assetto Corsa Competizione* is running. Depending on your screen size and resolution this will consume quite some CPU cycles. Therefore I advice, to open the pitstop app once you are driving for at least 10 seconds. Simulator Controller will learn the position and will only search this screen area from now one and the CPU load will be 10 times less than before.
+
 ## Plugin *AC*
 
 This plugin handles the *Assetto Corsa* simulation game. An application with the name "Assetto Corsa" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startAC" as a special function hook in this configuration.

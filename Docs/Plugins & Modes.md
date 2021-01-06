@@ -5,7 +5,7 @@ The distribution of Simulator Controller includes a set of predefined plugins, w
 | System | Handles multiple Button Box layers and manages all applications configured for your simulation configuration. This plugin defines the "Launch" mode, where applications my be started and stopped from the controller hardware. These applications can be configured using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). |
 | Tactile Feedback | Fully configurable support for pedal and chassis vibration using [SimHub](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications). Simulator Controller comes with a set of predefined SimHub profiles, which may help you to connect and manage your vibration motors and chassis shakers. The plugin provides many initialization parameters to adopt to these profiles. Two modes, "Pedal Vibration" and "Chassis Vibration", are defined, which let you control the different vibration effects and intensities directly from your controller. |
 | Motion Feedback | Fully configurable support for rig motion feedback using [SimFeedback](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications). The plugin supports two different methods to control SimFeedback. The first uses mouse automation, which is needed, if you don't have the commercial, so called expert license of *SimFeedback*. The second method programmatically connects to SimFeedback with the help of the [SFX-100-Streamdeck](https://github.com/ashupp/SFX-100-Streamdeck) extension. The mode "Motion", which is available for both methods, allows you to enable individal motion effects like "Roll" and "Pitch" and dial in their intensities. |
-| ACC | Provides special support for starting and stopping *Assetto Corsa Competizione* from your hardware controller. The mode "Drive", which is normally only available when "Assetto Corsa Competizione" is currently running, handle automated chat messages for the multiplayer ingame chat system, where the chat messages can be configured by the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). |
+| ACC | Provides special support for starting and stopping *Assetto Corsa Competizione* from your hardware controller. The mode "Drive", which is normally only available when "Assetto Corsa Competizione" is currently running, handle automated chat messages for the multiplayer ingame chat system, where the chat messages can be configured by the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Additionally, beginning with Release 2.0, this plugin provides sophisticated support for the pitstop settings app of *Assetto Corsa Competizione*. All settings may be tweaked using the controller hardware, but it is also possible to control the settings using voice control to keep your hands on the steering wheel. |
 | AC | The smallest plugin in this list only supplies a special splash screem, when Assetto Corsa is started. No special controller mode is defined for the moment. |
 
 All plugins can be configured in the [Plugins tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) of the configuration tool.
@@ -140,10 +140,59 @@ Note: To supply the labels, that will be displayed for all these effects and tri
 
 ## Plugin *ACC*
 
-This plugin handles the *Assetto Corsa Competizione* simulation game. It defines the mode "Drive", which binds all the configured chat messages to buttons on your controller hardware. This plugin needs an application with the name "Assetto Corsa Competizione" to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startACC", "stopACC" and "isACCRunning" as special function hooks in this configuration.
+This plugin handles the *Assetto Corsa Competizione* simulation game. This plugin needs an application with the name "Assetto Corsa Competizione" to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startACC", "stopACC" and "isACCRunning" as special function hooks in this configuration.
+
+### Mode *Drive*
+
+The mode "Drive" binds all the configured chat messages to buttons on your controller hardware. The chat messages can be defined in the [Chat tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-chat). The messages will be only availabe in a multiuser race scenario, since "Assetto Corsa Competizione" activates the chat system only there.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%205.JPG)
 
+In addition to trigger a chat message from your controller hardware, you can trigger them using *VoiceMacro* by voice commands as well. Please see the *VoiceMacro* profile, which is supplied in the *Profiles* folder in the installation folder of Simulator Controller.
+
+### Mode *Pitstop*
+
+Starting with Release 2.0, all pitstop settings of *Assetto Corsa Competizione* can be controlled by this plugin. The simulator dependent mode *Pitstop* may configure all or a subset of the pitstop settings on your hardware controller, which might be more ergonomic than typing on the keyboard during driving. 
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%206.JPG)
+
+Using the buttons and dials you may change the pitstop settings in the same way as using the keyboard. All this will be achieved using the following plugin argument:
+
+	closePitstopApp: {Insert}; openPitstopApp: P;
+	pitstopSettings: Strategy Dial.1, Refuel Dial.2 5, TyreSet Button.1 Button.5, TyreCompound Button.2 Button.6,
+					TyreAllAround Button.3 Button.7, SuspensionRepair Button.4, BodyworkRepair Button.8
+
+### Configuration
+
+First, you need to define, how to open and close the pitstop settings app in *Assetto Corsa Competizione*. If the standard keyboard mapping is used, this will be the "P" and the "Insert" keys on the keyboard.
+
+	closePitstopApp: *closeHotkey*; openPitstopApp: *openHotkey*;
+	
+With the plugin parameter *pitstopSettings:* you can supply a list of the settings, you want to tweak from your hardware controller. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For all *stepped* settings (tyre pressure, fuel amount, and so on) you can supply an additional argument to define the number of increments you want change in one step.
+
+	pitstopSettings: *setting1* *settingFunction1* [*settingSteps1*],
+					 *setting2* *settingFunction2* [*settingSteps2*], ...;
+					 
+See the following table for the supported settings.
+
+| Setting | Description |
+| ------ | ------ |
+| Strategy | Choose one of the predefined pitstop strategies. |
+| Refuel | Increment or decrement the refuel amount. Supports the additional increments argument. |
+| TyreChange | Enables or disables the tyre management. |
+| TyreCompound | Selects either the Wet or Dry tyre compound. |
+| TyreAllAround | Change the pressure for all tyres at once. Supports the additional increments argument. |
+| TyreFrontLeft | Change the pressure for the front left tyre. Supports the additional increments argument. |
+| TyreFrontRight | Change the pressure for the front right tyre. Supports the additional increments argument. |
+| TyreRearLeft | Change the pressure for the rear left tyre. Supports the additional increments argument. |
+| TyreRearRight | Change the pressure for the rear right tyre. Supports the additional increments argument. |
+| BrakeChange | Enables or disables the brake management. |
+| FrontBrake | Selects the compound for the front brake pads. |
+| RearBrake | Selects the compound for the rear brake pads. |
+| SuspensionRepair | Toggles the repair of the suspension components. |
+| BodyworkRepair | Toggles the repair of all the bodywork. |
+
+Beside controlling the pitstop settings from the button box, all settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) for more information.
 ## Plugin *AC*
 
 This plugin handles the *Assetto Corsa* simulation game. An application with the name "Assetto Corsa" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startAC" as a special function hook in this configuration.

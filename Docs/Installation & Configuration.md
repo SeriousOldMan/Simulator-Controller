@@ -127,6 +127,15 @@ Although you may call any globally defined function, you should use only the fol
 | disableRearChassisVibration | - | Tactile Feedback | Disables the chassis vibration bass shakers that might be mounted to the rear of your simulation rig. Available depending on the concrete configuration. |
 | startMotion | - | Motion Feedback | Starts the motion feedback system of your simulation rig. Available depending on the concrete configuration. |
 | stopMotion | - | Motion Feedback | Stops the motion feedback system of your simulation rig and brings the rig back to its resting position. Available depending on the concrete configuration. |
+| openPitstopApp | - | ACC | Opens the pitstop settings dialog of *Assetto Corsa Competizione*. |
+| closePitstopApp | - | ACC | Closes the pitstop settings dialog of *Assetto Corsa Competizione*. |
+| togglePitstopActivity | activity | ACC | Enables or disables one of the activities performed by your pitstop crew. The supported activities are "Change Tyres", "Change Brakes", "Repair Bodywork" and "Repair Suspension". |
+| changePitstopStrategy | selection | ACC | Selects one of the pitstop strategies. *selection* must be either "Next" or "Previous". |
+| changePitstopFuelAmount | direction, liters | ACC | Changes the amount of fuel to add during the next pitstop. *direction* must be either "Increase" or "Decrease" and *liters* may define the amount of fuel to be changed in one step. This parameter has a default of 5. |
+| changePitstopTyreSet | selection | ACC | Selects the tyre sez to change to during  the next pitstop. *selection* must be either "Next" or "Previous". |
+| changePitstopTyreCompound | compound | ACC | Selects the tyre compound to change to during  the next pitstop. *compound* must be either "Wet" or "Dry". |
+| changePitstopTyrePressure | tyre, direction, increments | ACC | Changes the tyre pressure during the next pitstop. *tyre* must be one of "All Around", "Front Left", "Front Right", "Rear Left" and "Rear Right", and *direction* must be either "Increase" or "Decrease". *increments* with a default of 1 define the change in 0.1 psi increments. |
+| changePitstopBrakeType | brake, selection | ACC | Selects the brake pad compound to change to during the next pitstop. *brake* must be "Front Brake" or "Rear Brake" and *selection* must be "Next" or "Previous".  |
 
 #### Key Detector Tool
 

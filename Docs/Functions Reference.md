@@ -129,6 +129,16 @@ Returns the [ISO language code](https://en.wikipedia.org/wiki/List_of_ISO_639-1_
 #### *translate(string :: String)*
 *string* is a text in English. *translate* reads the translations for the current target language and returns the translated text, or *string* itself, if no translation can be found.
 
+#### *translateMsgBoxButtons(buttonLabels :: List)*
+This function helps you to translate the button labels for standard dialogs like those of the AutoHotkey *MsgBox* command: A typical usage looks like this:
+
+	OnMessage(0x44, Func("translateMsgBoxButtons").bind(["Yes", "No", "Never"]))
+	title := translate("Modular Simulator Controller System")
+	MsgBox 262179, %title%, % translate("The local configuration database needs an update. Do you want to run the update now?")
+	OnMessage(0x44, "")
+
+As you can see, this dialog will show three buttons which will be labeled "Yes", "No" and "Never" in the English language setting. *translateMsgBoxButtons* will call the *translate* function automatically for these labels, before they will be set as labels for the different buttons.
+ 
 ***
 
 ## Splash Screen Handling ([Functions.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Functions.ahk))
@@ -257,7 +267,7 @@ Enables the chassis vibration bass shakers that might be mounted to the front of
 Disables the chassis vibration bass shakers that might be mounted to the front of your simulation rig. This action function is provided by the "Tactile Feedback" plugin and is available depending on the concrete configuration.
 
 #### *enableRearChassisVibration()*
-Enables the chassis vibration bass shakers that might be mounted to the rear of your simulation rig. AThis action function is provided by the "Tactile Feedback" plugin and is available depending on the concrete configuration.
+Enables the chassis vibration bass shakers that might be mounted to the rear of your simulation rig. This action function is provided by the "Tactile Feedback" plugin and is available depending on the concrete configuration.
 
 #### *disableRearChassisVibration()*
 Disables the chassis vibration bass shakers that might be mounted to the rear of your simulation rig. This action function is provided by the "Tactile Feedback" plugin and is available depending on the concrete configuration.
@@ -270,3 +280,31 @@ Starts the motion feedback system of your simulation rig. This action function i
 
 #### *stopMotion()*
 Stops the motion feedback system of your simulation rig and brings the rig back to its resting position. This action function is provided by the "Motion Feedback" plugin and is available depending on the concrete configuration.
+
+#### *openPitstopApp()*
+Opens the pitstop settings dialog of *Assetto Corsa Competizione*. This action function is provided by the "ACC" plugin and is available depending on the concrete configuration.
+
+#### *closePitstopApp()*
+Closes the pitstop settings dialog of *Assetto Corsa Competizione*. This action function is provided by the "ACC" plugin and is available depending on the concrete configuration.
+
+#### *togglePitstopActivity(activity :: String)*
+Enables or disables one of the activities performed by your pitstop crew. The supported activities are "Change Tyres", "Change Brakes", "Repair Bodywork" and "Repair Suspension". This action function is provided by the "ACC" plugin and is available depending on the concrete configuration.
+
+#### *changePitstopStrategy(selection :: String)*
+Selects one of the pitstop strategies. *selection* must be either "Next" or "Previous". This action function is provided by the "ACC" plugin and is available depending on the concrete configuration.
+
+#### *changePitstopFuelAmount(direction :: String, liters :: Integer := 5)*
+Changes the amount of fuel to add during the next pitstop. *direction* must be either "Increase" or "Decrease" and *liters* may define the amount of fuel to be changed in one step. This parameter has a default of 5. This action function is provided by the "ACC" plugin and is available depending on the concrete configuration.
+
+#### *changePitstopTyreSet(selection :: String)*
+Selects the tyre sez to change to during  the next pitstop. *selection* must be either "Next" or "Previous". This action function is provided by the "ACC" plugin and is available depending on the concrete configuration.
+
+#### *changePitstopTyreCompound(compound :: String)*
+Selects the tyre compound to change to during  the next pitstop. *compound* must be either "Wet" or "Dry". This action function is provided by the "ACC" plugin and is available depending on the concrete configuration.
+
+#### *changePitstopTyrePressure(tyre :: String, direction :: String, increments :: Integer := 1)*
+Changes the tyre pressure during the next pitstop. *tyre* must be one of "All Around", "Front Left", "Front Right", "Rear Left" and "Rear Right", and *direction* must be either "Increase" or "Decrease". *increments* with a default of 1 define the change in 0.1 psi increments. This action function is provided by the "ACC" plugin and is available depending on the concrete configuration.
+
+#### *changePitstopBrakeType(brake :: String, selection :: String)*
+Selects the brake pad compound to change to during the next pitstop. *brake* must be "Front Brake" or "Rear Brake" and *selection* must be "Next" or "Previous". This action function is provided by the "ACC" plugin and is available depending on the concrete configuration.
+

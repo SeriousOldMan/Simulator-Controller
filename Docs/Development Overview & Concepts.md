@@ -51,7 +51,7 @@ The visual representation for the controller hardware will usually be build with
 
 ## Example
 
-The following example shows some of the concepts introduced above. The code shown here represents the major part the ACC Plugin, which comes with the Simulator Controller distribution.
+The following example shows some of the concepts introduced above. The code shown here represents a stripped down part the *ACC* Plugin, which comes with the Simulator Controller distribution.
 
 Let's start with the plugin class definition:
 
@@ -150,6 +150,8 @@ As you can see, the only important part of the *ChatAction* class is the *fireAc
 In the implementation of *loadFromConfiguration* all chat messages are retrieved from the configuration map, the corresponding controller functions are looked up and actions for each chat message are created and associated with these functions. The actions are registered for the "Drive" mode, thereby assuring, that chat messages will only be available when this mode is active.
 
 The *ACCPlugin* is aware of "Assetto Corsa Competizione", as you can see by the implementation of the *runningSimulator* method above. Since "Assetto Corsa Competizione" might also be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration) as a required simulator for this plugin, the "Drive" mode will only be active, i.e. available, when Assetto Corsa Competizione is running. As a convinience function, the implmentation of the *simulatorStartup* method  will automatically switch to "Drive" mode, when ACC has been started, thereby making the chat messages available on the hardware controller buttons.
+
+Note: With the introduction of Release 2.0, the *ACC* plugin is much more capable. The above example shows only a fraction of the functionality of this plugin for didactical reasons.
 
 ## Debugging
 

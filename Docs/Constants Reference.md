@@ -4,11 +4,11 @@ The following constants may be used to refer to all the relevant locations of th
 #### *kHomeDirectory, kResourcesDirectory, kSourcesDirectory, kIncludesDirectory, kPluginsDirectory, kBinariesDirectory, kConfigDirectory*
 All these constants define paths pointing to a specific folder in the Simulator Controller distribution. In deviation to Windows standards, the paths contain a trailing backslash, since in allmost all cases, a filename will be concatenated to one of these constants in order to access this file.
 
-#### *kSplashMediaDirectory, kButtonBoxImagesDirectory, kIconsDirectory*
+#### *kSplashMediaDirectory, kScreenImagesDirectory, kButtonBoxImagesDirectory, kIconsDirectory*
 Paths for graphical and audio resources contained in the Simulator Controller distribution.
 
-#### *kUserHomeDirectory, kUserConfigDirectory, kUserSplashMediaDirectory, kUserPluginsDirectory, kLogsDirectory*
-A special folder *Simulator Controller* will be created in the user *Documents* folder. It will contain various subfolders for adding user-specific extensions (media, plugins, ...), and for storing configuration and log files.
+#### *kUserHomeDirectory, kUserConfigDirectory, kUserSplashMediaDirectory, kUserScreenImagesDirectory, kUserPluginsDirectory, kLogsDirectory*
+A special folder *Simulator Controller* will be created in the user *Documents* folder. It will contain various subfolders for adding user-specific extensions or substitutions (media, plugins, ...), and for storing configuration and log files.
 
 #### *kSimulatorConfigurationFile, kSimulatorSettingsFile*
 Paths for the most important configuration files used by Simulator Controller.

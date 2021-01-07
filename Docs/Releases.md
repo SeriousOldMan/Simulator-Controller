@@ -1,4 +1,4 @@
-## 2.0.x-release upcoming...
+## 2.0.0-release 01/07/21
 
   1. Bugfixes, as always
   2. Documentation updates, as always

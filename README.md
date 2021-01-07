@@ -34,8 +34,6 @@ IMPORTANT: Please be careful, since an automatic update mechanism for configurat
 [2.0.0-release](https://www.dropbox.com/s/glxr8fly77jf6ms/Simulator%20Controller%202.0.0-release.zip?dl=1)
 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
----
-
 Release 2.0 introduces a new automated update mechanism for local configuration databases. Please read the [update notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-20) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side.
 
 ### Main features

@@ -198,7 +198,7 @@ Important: To *understand* the pitstop app state of *Assetto Corsa Competizione*
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Screen%20Images/ACC/Pit%20Strategy%201.JPG)     ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Screen%20Images/ACC/Compound%201.JPG)     ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Screen%20Images/ACC/Select%20Driver%202.jpg)
 
-The algorithm needs to lear the position of the pitstop app, otherwise it will search the whole screen every 10 seconds, while *Assetto Corsa Competizione* is running. Depending on your screen size and resolution this will consume quite some CPU cycles. Therefore I advice, to open the pitstop app once you are driving for at least 10 seconds. Simulator Controller will learn the position and will only search this screen area from now one and the CPU load will be 10 times less than before.
+This will initially take some time, but the algorithm learns the position of the pitstop app during the initial run. Depending on your screen size and resolution the initial search will consume quite some CPU cycles. Therefore I advice to open the pitstop app using one of the mode actions above once you are driving in a safe situation, to avoid lags later on. Simulator Controller will learn the position and will only search the much reduced screen area from now on and the CPU load will be 10 times less than before.
 
 ## Plugin *AC*
 

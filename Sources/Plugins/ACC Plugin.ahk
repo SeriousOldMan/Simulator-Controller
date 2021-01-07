@@ -175,8 +175,6 @@ class ACCPlugin extends ControllerPlugin {
 			this.createPitstopAction(controller, string2Values(A_Space, action)*)
 		
 		controller.registerPlugin(this)
-			
-		SetTimer updatePitstopState, 10000
 	}
 	
 	loadFromConfiguration(configuration) {
@@ -269,20 +267,23 @@ class ACCPlugin extends ControllerPlugin {
 		this.iPSIsOpen := true
 		this.iPSSelectedOption := 1
 		
-		if update
+		if update {
 			this.updatePitStopState()
 			
+			SetTimer updatePitstopState, 5000
+		}
 	}
 	
 	closePitstopApp() {
 		SendEvent % this.ClosePitstopAppHotkey
 		
 		this.iPSIsOpen := false
+			
+		SetTimer updatePitstopState, Off
 	}
 	
 	requirePitstopApp() {
-		if !this.iPSIsOpen
-			this.openPitstopApp()
+		this.openPitstopApp(!this.iPSIsOpen)
 	}
 	
 	selectPitstopOption(option) {
@@ -459,7 +460,7 @@ class ACCPlugin extends ControllerPlugin {
 			}
 	}
 	
-	updatePitstopState(fullSearch := false) {
+	updatePitstopState(fromTimer := false) {
 		static kSearchAreaLeft := 250
 		static kSearchAreaRight := 150
 		
@@ -467,7 +468,7 @@ class ACCPlugin extends ControllerPlugin {
 			beginTickCount := A_TickCount
 			lastY := false
 			
-			if fullSearch {
+			if (fromTimer || !this.iPSImageSearchArea) {
 				pitstopLabel := getFileName("ACC\PITSTOP.jpg", kUserScreenImagesDirectory, kScreenImagesDirectory)
 				curTickCount := A_TickCount
 				
@@ -484,18 +485,19 @@ class ACCPlugin extends ControllerPlugin {
 				
 				if x is Integer
 				{
-					this.iPSIsOpen := true
-					
 					lastY := y
 			
 					if !this.iPSImageSearchArea
 						this.iPSImageSearchArea := [Max(0, x - kSearchAreaLeft), 0, Min(x + kSearchAreaRight, A_ScreenWidth), A_ScreenHeight]
 				}
-				else
+				else {
 					this.iPSIsOpen := false
+			
+					SetTimer updatePitstopState, Off
+				}
 			}
 			
-			if this.iPSIsOpen {
+			if (!fromTimer && this.iPSIsOpen) {
 				reload := false
 				
 				curTickCount := A_TickCount

@@ -29,9 +29,14 @@ IMPORTANT: Please be careful, since an automatic update mechanism for configurat
 
 #### Latest release builds
 
-[1.3.3-stable](https://www.dropbox.com/s/2yd3s8d591cm27l/Simulator%20Controller%201.3.3-stable.zip?dl=1)
-
 [1.4.4-release](https://www.dropbox.com/s/a5qhbls72zm46xz/Simulator%20Controller%201.4.4-release.zip?dl=1)
+
+[2.0.0-release](https://www.dropbox.com/s/glxr8fly77jf6ms/Simulator%20Controller%202.0.0-release.zip?dl=1)
+
+VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
+---
+
+Release 2.0 introduces a new automated update mechanism for local configuration databases. Please read the [update notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-20) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side.
 
 ### Main features
 
@@ -77,7 +82,7 @@ These plugins are part of the Simulator Controller distribution. Beside providin
 | System | Handles multiple Button Box layers and manages all applications configured for your simulation configuration. |
 | Tactile Feedback | Fully configurable support for pedal and chassis vibration using [SimHub](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications). |
 | Motion Feedback | Fully configurable support for rig motion feedback using [SimFeedback](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications). |
-| ACC | Special support for starting and stopping Assetto Corsa Competizione from your hardware controller and supplies functions and actions for configurable, automated chat messages in a multiplayer game. Additionally, beginning with Release 2.0, this plugin provides sophisticated support for the pitstop settings app of *Assetto Corsa Competizione*. All settings may be tweaked using the controller hardware, but it is also possible to control the settings using voice control to keep your hands on the steering wheel. This plugin uses configuration based data, defines two simulator dependent modes and shows how to automate your simulation game. Therefore it supplies a good showcase when starting your own plugin development. |
+| ACC | Special support for starting and stopping Assetto Corsa Competizione from your hardware controller and supplies functions and actions for configurable, automated chat messages in a multiplayer game. Additionally, beginning with Release 2.0, this plugin provides sophisticated support for the Pitstop MFD of *Assetto Corsa Competizione*. All settings may be tweaked using the controller hardware, but it is also possible to control the settings using voice control to keep your hands on the steering wheel. This plugin uses configuration based data, defines two simulator dependent modes and shows how to automate your simulation game. Therefore it supplies a good showcase when starting your own plugin development. |
 | AC | Special support for starting and stopping Assetto Corsa from your hardware controller. |
 | Button Box | Tools for building your own Button Box / controller visuals. An easy to understand example will help you building the screen representation of your own Button Boxes. |
 

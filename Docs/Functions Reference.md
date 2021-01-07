@@ -281,10 +281,10 @@ Starts the motion feedback system of your simulation rig. This action function i
 #### *stopMotion()*
 Stops the motion feedback system of your simulation rig and brings the rig back to its resting position. This action function is provided by the "Motion Feedback" plugin and is available depending on the concrete configuration.
 
-#### *openPitstopApp()*
+#### *openPitstopMFD()*
 Opens the pitstop settings dialog of *Assetto Corsa Competizione*. This action function is provided by the "ACC" plugin and is available depending on the concrete configuration.
 
-#### *closePitstopApp()*
+#### *closePitstopMFD()*
 Closes the pitstop settings dialog of *Assetto Corsa Competizione*. This action function is provided by the "ACC" plugin and is available depending on the concrete configuration.
 
 #### *togglePitstopActivity(activity :: String)*
@@ -307,4 +307,3 @@ Changes the tyre pressure during the next pitstop. *tyre* must be one of "All Ar
 
 #### *changePitstopBrakeType(brake :: String, selection :: String)*
 Selects the brake pad compound to change to during the next pitstop. *brake* must be "Front Brake" or "Rear Brake" and *selection* must be "Next" or "Previous". This action function is provided by the "ACC" plugin and is available depending on the concrete configuration.
-

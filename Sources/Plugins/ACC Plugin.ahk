@@ -19,8 +19,8 @@ global kPitstopMode = "Pitstop"
 ;;;-------------------------------------------------------------------------;;;
 
 class ACCPlugin extends ControllerPlugin {
-	kOpenPitstopAppHotkey := false
-	kClosePitstopAppHotkey := false
+	kOpenPitstopMFDHotkey := false
+	kClosePitstopMFDHotkey := false
 	kPSOptions := ["Pit Limiter", "Strategy", "Refuel"
 				 , "Change Tyres", "Tyre Set", "Compound", "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right"
 				 , "Change Brakes", "Front Brake", "Rear Brake", "Repair Suspension", "Repair Bodywork"]
@@ -86,7 +86,7 @@ class ACCPlugin extends ControllerPlugin {
 		fireAction(function, trigger) {
 			local plugin := this.Controller.findPlugin(kACCPlugin)
 			
-			plugin.requirePitstopApp()
+			plugin.requirePitstopMFD()
 			
 			return plugin.selectPitstopOption(this.iPitstopOption)
 		}
@@ -149,15 +149,15 @@ class ACCPlugin extends ControllerPlugin {
 		}
 	}
 	
-	OpenPitstopAppHotkey[] {
+	OpenPitstopMFDHotkey[] {
 		Get {
-			return this.kOpenPitstopAppHotkey
+			return this.kOpenPitstopMFDHotkey
 		}
 	}
 	
-	ClosePitstopAppHotkey[] {
+	ClosePitstopMFDHotkey[] {
 		Get {
-			return this.kClosePitstopAppHotkey
+			return this.kClosePitstopMFDHotkey
 		}
 	}
 	
@@ -168,8 +168,8 @@ class ACCPlugin extends ControllerPlugin {
 		
 		this.registerMode(this.iDriveMode)
 		
-		this.kOpenPitstopAppHotkey := this.getArgumentValue("openPitstopApp", false)
-		this.kClosePitstopAppHotkey := this.getArgumentValue("closePitstopApp", false)
+		this.kOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", false)
+		this.kClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
 		
 		for ignore, action in string2Values(",", this.getArgumentValue("pitstopSettings", ""))
 			this.createPitstopAction(controller, string2Values(A_Space, action)*)
@@ -261,8 +261,8 @@ class ACCPlugin extends ControllerPlugin {
 			logMessage(kLogWarn, translate("Pitstop action ") . action . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
 	}
 		
-	openPitstopApp(update := true) {
-		SendEvent % this.OpenPitstopAppHotkey
+	openPitstopMFD(update := true) {
+		SendEvent % this.OpenPitstopMFDHotkey
 		
 		this.iPSIsOpen := true
 		this.iPSSelectedOption := 1
@@ -274,16 +274,16 @@ class ACCPlugin extends ControllerPlugin {
 		}
 	}
 	
-	closePitstopApp() {
-		SendEvent % this.ClosePitstopAppHotkey
+	closePitstopMFD() {
+		SendEvent % this.ClosePitstopMFDHotkey
 		
 		this.iPSIsOpen := false
 			
 		SetTimer updatePitstopState, Off
 	}
 	
-	requirePitstopApp() {
-		this.openPitstopApp(!this.iPSIsOpen)
+	requirePitstopMFD() {
+		this.openPitstopMFD(!this.iPSIsOpen)
 	}
 	
 	selectPitstopOption(option) {
@@ -361,7 +361,7 @@ class ACCPlugin extends ControllerPlugin {
 	}
 	
 	toggleActivity(activity) {
-		this.requirePitstopApp()
+		this.requirePitstopMFD()
 			
 		switch activity {
 			case "Change Tyres", "Change Brakes", "Repair Bodywork", "Repair Suspension":
@@ -373,7 +373,7 @@ class ACCPlugin extends ControllerPlugin {
 	}
 
 	changeStrategy(selection, steps := 1) {
-		this.requirePitstopApp()
+		this.requirePitstopMFD()
 			
 		if this.selectPitstopOption("Strategy")
 			switch selection {
@@ -387,14 +387,14 @@ class ACCPlugin extends ControllerPlugin {
 	}
 
 	changeFuelAmount(direction, liters := 5) {
-		this.requirePitstopApp()
+		this.requirePitstopMFD()
 			
 		if this.selectPitstopOption("Refuel")
 			this.changePitstopOption("Refuel", direction, liters)
 	}
 	
 	changeTyreSet(selection) {
-		this.requirePitstopApp()
+		this.requirePitstopMFD()
 			
 		if this.selectPitstopOption("Tyre set")
 			switch selection {
@@ -408,7 +408,7 @@ class ACCPlugin extends ControllerPlugin {
 	}
 	
 	changeTyreCompound(type) {
-		this.requirePitstopApp()
+		this.requirePitstopMFD()
 			
 		if this.selectPitstopOption("Compound")
 			switch selection {
@@ -422,7 +422,7 @@ class ACCPlugin extends ControllerPlugin {
 	}
 	
 	changeTyrePressure(tyre, direction, increments := 1) {
-		this.requirePitstopApp()
+		this.requirePitstopMFD()
 		
 		found := false
 		
@@ -438,7 +438,7 @@ class ACCPlugin extends ControllerPlugin {
 	}
 
 	changeBrakeType(brake, selection) {
-		this.requirePitstopApp()
+		this.requirePitstopMFD()
 		
 		found := false
 		
@@ -681,13 +681,13 @@ class ACCPlugin extends ControllerPlugin {
 				logMessage(kLogInfo, translate("Complete update of pitstop state took ") . A_TickCount - beginTickCount . translate(" ms"))
 				
 				if reload
-					this.openPitstopApp()
+					this.openPitstopMFD()
 			}
 		}
 	}
 	
 	resetPitstopState(update := false) {
-		this.openPitstopApp(update)
+		this.openPitstopMFD(update)
 	}
 }
 
@@ -720,22 +720,22 @@ isACCRunning() {
 	return (ErrorLevel != 0)
 }
 
-openPitstopApp() {
+openPitstopMFD() {
 	protectionOn()
 	
 	try {
-		SimulatorController.Instance.findPlugin(kACCPlugin).openPitstopApp()
+		SimulatorController.Instance.findPlugin(kACCPlugin).openPitstopMFD()
 	}
 	finally {
 		protectionOff()
 	}
 }
 
-closePitstopApp() {
+closePitstopMFD() {
 	protectionOn()
 	
 	try {
-		SimulatorController.Instance.findPlugin(kACCPlugin).closePitstopApp()
+		SimulatorController.Instance.findPlugin(kACCPlugin).closePitstopMFD()
 	}
 	finally {
 		protectionOff()

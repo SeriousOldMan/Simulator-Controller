@@ -17,3 +17,4 @@
 #### General
   1. [Target: V3.0]Plugin support for the configuration tool
   2. [Target: V2.1]Choosing a specific theme depending on the selected simulation game
+  3. Again, better UI flow in the configuration tool and larger window size.

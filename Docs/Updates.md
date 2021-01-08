@@ -1,4 +1,6 @@
-Before we start, an important information for *First Time Users*: If you install Simulator Controller for the first time, you can skip the information below for the moment. This is only important for users, that already configured theier local installation and will want to keep this configuration information, but also want to integrate all the new features as well.
+Before we start, an important information for *First Time Users*: If you install Simulator Controller for the first time, you can skip the information below for the moment, as long, as you don't want to use voice control. Most of the stuff below is only important for users, that already configured their local installation and will want to keep this configuration information, but also want to integrate all the new features as well.
+
+Regarding special steps, that might be necessary for using voice control for the *Assetto Corsa Competizione* Pitstop MFD, please read the update information for [Release 2.0](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-20) carefully.
 
 ***
 
@@ -51,5 +53,7 @@ All these pictures are located in the *Resources\Screen Images\ACC* folder in th
 Hint: The "<Select Driver>" option might only be available in special multiuser server setups, whereas the "Strategy" option is available in every *Race* situation.
 
 Last but not least, you need to configure *VoiceMacro*, if you want to use voice control to manage the pitstop settings in *Assetto Corsa Competizione*. This little donationware tool is not part of the Simulator Controller distribution, but it is a part of the [third party application](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications), which are tightely integrated into Simulator Controller. Even the first release already had voice control support, for example to start or stop a simulation game or fire up your motion feedback system, if there is one. Now, with the introduction of the pitstop management system, voice control might become an integral part of your ingame experience. You will find a *VoiceMarco* profile to start with in the *Profiles* folder of the Simulator Controller installation folder. Beside loading this profile, it is very important to tweak the voice recognition settings up to perfection to have the best possible experience while hunting for the lap of the gods. This might be easy, if you use a headset, but if you have a setup similar to mine (Open Webcam micro and 5.1 surround system), you will have a hard time to suppress false positives in voice recognition. I finally found a setting, which I can share here:
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Voice%20Macro%20Settings.JPG)ystem), you will have a hard time to suppress false positives in voice recognition. I finally found a setting, which I can share here:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Voice%20Macro%20Settings.JPG)

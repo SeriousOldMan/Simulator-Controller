@@ -16,3 +16,4 @@
   
 #### General
   1. Plugin support for the configuration tool
+  2. Choosing a specific theme depending on the selected simulation game

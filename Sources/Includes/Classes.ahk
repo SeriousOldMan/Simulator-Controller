@@ -324,7 +324,7 @@ class Function extends ConfigurationItem {
 	
 	Type[] {
 		Get {
-			Throw "Virtual property Function.Type must be overriden in a subclass..."
+			Throw "Virtual property Function.Type must be implemented in a subclass..."
 		}
 	}
 	
@@ -342,7 +342,7 @@ class Function extends ConfigurationItem {
 	
 	Trigger[] {
 		Get {
-			Throw "Virtual property Function.Trigger must be overriden in a subclass..."
+			Throw "Virtual property Function.Trigger must be implemented in a subclass..."
 		}
 	}
 	

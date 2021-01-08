@@ -135,11 +135,11 @@ class ButtonBox extends ConfigurationItem {
 	}
 	
 	createWindow(ByRef window, ByRef windowWidth, ByRef windowHeight) {
-		Throw "Virtual method ButtonBox.createWindow must be overriden in a subclass..."
+		Throw "Virtual method ButtonBox.createWindow must be implemented in a subclass..."
 	}
 	
 	getControlHandle(descriptor) {
-		Throw "Virtual method ButtonBox.getControlHandle must be overriden in a subclass..."
+		Throw "Virtual method ButtonBox.getControlHandle must be implemented in a subclass..."
 	}
 	
 	setControlText(function, text, color := "Black") {
@@ -1037,7 +1037,7 @@ class ControllerMode {
 	
 	Mode[] {
 		Get {
-			Throw "Virtual property ControllerMode.Mode must be overriden in a subclass..."
+			Throw "Virtual property ControllerMode.Mode must be implemented in a subclass..."
 		}
 	}
 	
@@ -1145,7 +1145,7 @@ class ControllerAction {
 	}
 	
 	fireAction(function, trigger) {
-		Throw "Virtual method ControllerAction.fireAction must be overriden in a subclass..."
+		Throw "Virtual method ControllerAction.fireAction must be implemented in a subclass..."
 	}
 }
 

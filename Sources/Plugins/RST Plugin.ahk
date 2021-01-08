@@ -19,10 +19,18 @@ startRST() {
 			WinWait ahk_pid %pid%
 			IfWinNotActive ahk_pid %pid%, , WinActivate, ahk_pid %pid%, 
 			WinWaitActive ahk_pid %pid%, , 10
-			Sleep 5000
-			MouseClick left,  860,  21
-			Sleep 2000
-			MouseClick left,  830,  115
+			
+			protectionOn()
+			
+			try {
+				Sleep 2000
+				MouseClick left,  860,  21
+				Sleep 2000
+				MouseClick left,  830,  115
+			}
+			finally {
+				protectionOff()
+			}
 		}
 		
 		return pid

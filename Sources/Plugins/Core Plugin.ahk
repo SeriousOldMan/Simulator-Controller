@@ -30,10 +30,17 @@ startAITrack() {
 				active := (ErrorLevel == 0)
 			}
 
-			MouseClick left,  201,  344
-			Sleep 5000
-			WinMinimize %windowTitle%
-			Sleep 100
+			protectionOn()
+			
+			try {
+				MouseClick left,  201,  344
+				Sleep 5000
+				WinMinimize %windowTitle%
+				Sleep 100
+			}
+			finally {
+				protectionOff()
+			}
 		}
 		
 		return pid
@@ -71,12 +78,19 @@ startVoiceMacro() {
 					active := (ErrorLevel == 0)
 				}
 				
-				MouseClick, left,  465,  45
-				Sleep, 1000
-				MouseClick, left,  465,  45
-				Sleep, 1000
-				MouseClick, left,  524,  13
-				Sleep, 100
+				protectionOn()
+			
+				try {
+					MouseClick, left,  465,  45
+					Sleep, 1000
+					MouseClick, left,  465,  45
+					Sleep, 1000
+					MouseClick, left,  524,  13
+					Sleep, 100
+				}
+				finally {
+					protectionOff()
+				}
 			}
 			finally {
 				DetectHiddenWindows % curDetectHiddenWindows

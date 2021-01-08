@@ -121,9 +121,7 @@ Want to contribute? Great!
 
 ### To Do
 
-Nothing critical for the moment, just relaxing and preparing for the 12h of Bathurst.
-  
-But the development of Simulator Controller still goes on with one release every week. There are a lot of ideas in the [backlog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Backlog)...
+After firing out one release per week during the last few weeks, the project will slow down a little bit from now on. But the development of Simulator Controller still goes on, and I am sure that we will end up in a two weeks cycle for the next few months. The list of ideas in the [backlog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Backlog) is still long enough for at least three more releases and if you want to propose a feature to be included in the backlog, you can open an enhancement issue on GitHub...
 
 ### License
 

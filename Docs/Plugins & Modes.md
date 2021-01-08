@@ -148,7 +148,7 @@ The mode "Drive" binds all the configured chat messages to buttons on your contr
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%205.JPG)
 
-In addition to trigger a chat message from your controller hardware, you can trigger them using *VoiceMacro* by voice commands as well. Please see the *VoiceMacro* profile, which is supplied in the *Profiles* folder in the installation folder of Simulator Controller.
+In addition to trigger a chat message from your controller hardware, you can trigger them using *VoiceMacro* by voice commands as well. Please see the *VoiceMacro* profile, which is supplied in the *Profiles* folder in the installation folder of Simulator Controller. And also take a look at the [Release 2.0](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-20) update documentation on how to setup *VoiceMacro* to get the best best possible voice recognition results.
 
 ### Mode *Pitstop*
 

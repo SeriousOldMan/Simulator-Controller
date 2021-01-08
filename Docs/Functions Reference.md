@@ -4,7 +4,7 @@ Configurations are used to store a definition or the state of an object to the f
 #### *newConfiguration()* 
 Returns a new empty configuration map. The configuration map is not derived from a public class and may be accessed only through the functions given below. 
 
-#### *getConfigurationValue(configuration :: ConfigurationMap, section :: String, key :: String, default := false)
+#### *getConfigurationValue(configuration :: ConfigurationMap, section :: String, key :: String, default := false)*
 Returns the value defined for the given key or the *default*, if no such key has been defined.
 
 #### *setConfigurationValue(configuration :: ConfigurationMap, section :: String, key :: String, value)*

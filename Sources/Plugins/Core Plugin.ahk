@@ -81,12 +81,10 @@ startVoiceMacro() {
 				protectionOn()
 			
 				try {
-					MouseClick, left,  465,  45
-					Sleep, 1000
-					MouseClick, left,  465,  45
-					Sleep, 1000
-					MouseClick, left,  524,  13
-					Sleep, 100
+					; MouseClick, left,  465,  45
+					; MouseClick, left,  465,  45
+					WinMinimize %windowTitle%
+					Sleep 100
 				}
 				finally {
 					protectionOff()

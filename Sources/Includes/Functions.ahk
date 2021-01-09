@@ -53,7 +53,7 @@ changeProtection(up) {
         Critical Off
 	}
 	else if (level <= 0)
-		Throw "Nesting error in protection level in changeProtection..."
+		Throw "Nesting error detected in changeProtection..."
 }
 
 playThemeSong(songFile) {

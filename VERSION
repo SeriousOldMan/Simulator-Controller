@@ -1,5 +1,5 @@
 [Version]
-Current=2.0.0-release
-Target=2.0-release
-Changes=Voice control for ACC Pitstop Settings, New plugin mode "Pitstop" to handle all pitstop settings from the hardware controller, New mechanism to update and migrate all user settings after a release 
-Date=01/07/2021
+Current=2.0.1-release
+Target=2.0.1-release
+Changes=Bugfixes and small enhancements
+Date=01/09/2021

@@ -171,6 +171,13 @@ class ConfigurationItemList extends ConfigurationItem {
 	}
 	
 	openEditor(itemNumber) {
+		if ConfigurationEditor.Instance.AutoSave {
+			if (this.iCurrentItemIndex != 0)
+				this.updateItem()
+				
+			this.selectItem(itemNumber)
+		}
+		
 		this.iCurrentItemIndex := itemNumber
 		
 		this.loadEditor(this.iItemsList[this.iCurrentItemIndex])
@@ -338,6 +345,8 @@ downItem() {
 ;;; ConfigurationEditor                                                     ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
+global saveModeDropDown
+
 class ConfigurationEditor extends ConfigurationItem {
 	iGeneralTab := false
 	iPluginsTab := false
@@ -347,6 +356,14 @@ class ConfigurationEditor extends ConfigurationItem {
 	iChatMessagesTab := false
 	
 	iDevelopment := false
+	
+	AutoSave[] {
+		Get {
+			GuiControlGet saveModeDropDown
+			
+			return (saveModeDropDown == 1)
+		}
+	}
 	
 	__New(development, configuration) {
 		this.iDevelopment := development
@@ -378,6 +395,12 @@ class ConfigurationEditor extends ConfigurationItem {
 		Gui SE:Add, Button, x152 y528 w80 h23 Default gsaveAndExit, % translate("Ok")
 		Gui SE:Add, Button, x240 y528 w80 h23 gcancelAndExit, % translate("&Cancel")
 		Gui SE:Add, Button, x328 y528 w77 h23 gsaveAndStay, % translate("&Apply")
+		
+		choices := ["Auto", "Manual"]
+		chosen := inList(choices, saveModeDropDown)
+		
+		Gui SE:Add, Text, x8 y528 w55 h23 +0x200, % translate("Save")
+		Gui SE:Add, DropDownList, x63 y528 w75 AltSubmit Choose%chosen% VsaveModeDropDown, % values2String("|", map(choices, "translate")*)
 
 		tabs := map(["General", "Plugins", "Applications", "Controller", "Launchpad", "Chat"], "translate")
 			   
@@ -410,8 +433,18 @@ class ConfigurationEditor extends ConfigurationItem {
 		this.iChatMessagesTab := new ChatMessagesTab(configuration)
 	}
 	
+	loadFromConfiguration(configuration) {
+		base.loadFromConfiguration(configuration)
+		
+		saveModeDropDown := getConfigurationValue(configuration, "General", "Save", "Manual")
+	}
+	
 	saveToConfiguration(configuration) {
 		base.saveToConfiguration(configuration)
+		
+		GuiControlGet saveModeDropDown
+		
+		setConfigurationValue(configuration, "General", "Save", ["Auto", "Manual"][saveModeDropDown])
 		
 		this.iGeneralTab.saveToConfiguration(configuration)
 		
@@ -432,7 +465,6 @@ class ConfigurationEditor extends ConfigurationItem {
 	hide() {
 		Gui SE:Hide
 	}
-	
 }
 
 saveAndExit() {
@@ -907,6 +939,7 @@ class PluginsTab extends ConfigurationItemList {
 	}
 	
 	loadList(items) {
+		static first := true
 		local plugin
 		
 		Gui ListView, % this.ListHandle
@@ -922,10 +955,14 @@ class PluginsTab extends ConfigurationItemList {
 			LV_Add("", plugin.Active ? ((name = translate("System")) ? translate("Always") : translate("Yes")) : translate("No")	, name, values2String(", ", plugin.Simulators*), plugin.Arguments[true])
 		}
 		
-		LV_ModifyCol()
-		LV_ModifyCol(1, "Center AutoHdr")
-		LV_ModifyCol(2, 100)
-		LV_ModifyCol(3, 120)
+		if first {
+			LV_ModifyCol()
+			LV_ModifyCol(1, "Center AutoHdr")
+			LV_ModifyCol(2, 100)
+			LV_ModifyCol(3, 120)
+			
+			first := false
+		}
 	}
 	
 	loadEditor(item) {
@@ -1127,6 +1164,7 @@ class ApplicationsTab extends ConfigurationItemList {
 	}
 	
 	loadList(items) {
+		static first := true
 		local application
 		
 		Gui ListView, % this.ListHandle
@@ -1140,11 +1178,15 @@ class ApplicationsTab extends ConfigurationItemList {
 			LV_Add("", type, application.Application, application.ExePath, application.WindowTitle, application.WorkingDirectory)
 		}
 		
-		LV_ModifyCol()
-		LV_ModifyCol(1, "Center AutoHdr")
-		LV_ModifyCol(2, 120)
-		LV_ModifyCol(3, 80)
-		LV_ModifyCol(4, 80)
+		if first {
+			LV_ModifyCol()
+			LV_ModifyCol(1, "Center AutoHdr")
+			LV_ModifyCol(2, 120)
+			LV_ModifyCol(3, 80)
+			LV_ModifyCol(4, 80)
+			
+			first := false
+		}
 	}
 	
 	loadEditor(item) {
@@ -1432,6 +1474,7 @@ class FunctionsList extends ConfigurationItemList {
 	}
 	
 	loadList(items) {
+		static first := true
 		local function
 		
 		Gui ListView, % this.ListHandle
@@ -1468,8 +1511,12 @@ class FunctionsList extends ConfigurationItemList {
 				}
 		}
 		
-		LV_ModifyCol()
-		LV_ModifyCol(2, "Center AutoHdr")
+		if first {
+			LV_ModifyCol()
+			LV_ModifyCol(2, "Center AutoHdr")
+			
+			first := false
+		}
 	}
 	
 	loadEditor(item) {
@@ -1673,6 +1720,8 @@ class LaunchpadTab extends ConfigurationItemList {
 	}
 	
 	loadList(items) {
+		static first := true
+		
 		Gui ListView, % this.ListHandle
 	
 		LV_Delete()
@@ -1681,8 +1730,12 @@ class LaunchpadTab extends ConfigurationItemList {
 			LV_Add("", index, launchpadApplication[1], launchpadApplication[2])
 		}
 		
-		LV_ModifyCol()
-		LV_ModifyCol(2, "AutoHdr")
+		if first {
+			LV_ModifyCol()
+			LV_ModifyCol(2, "AutoHdr")
+			
+			first := false
+		}
 	}
 	
 	loadApplicationChoices(application := false) {
@@ -1778,6 +1831,8 @@ class ChatMessagesTab extends ConfigurationItemList {
 	}
 	
 	loadList(items) {
+		static first := true
+		
 		Gui ListView, % this.ListHandle
 	
 		LV_Delete()
@@ -1786,8 +1841,12 @@ class ChatMessagesTab extends ConfigurationItemList {
 			LV_Add("", index, chatMessage[1], chatMessage[2])
 		}
 		
-		LV_ModifyCol()
-		LV_ModifyCol(2, "AutoHdr")
+		if first {
+			LV_ModifyCol()
+			LV_ModifyCol(2, "AutoHdr")
+			
+			first := false
+		}
 	}
 	
 	loadEditor(item) {
@@ -2066,6 +2125,8 @@ class ThemesList extends ConfigurationItemList {
 	}
 	
 	loadList(items) {
+		static first := true
+		
 		Gui ListView, % this.ListHandle
 	
 		LV_Delete()
@@ -2090,9 +2151,13 @@ class ThemesList extends ConfigurationItemList {
 			LV_Add("", theme[2], values2String(", ", mediaFiles*), songFile)
 		}
 		
-		LV_ModifyCol(1, 100)
-		LV_ModifyCol(2, 180)
-		LV_ModifyCol(3, 100)
+		if first {
+			LV_ModifyCol(1, 100)
+			LV_ModifyCol(2, 180)
+			LV_ModifyCol(3, 100)
+			
+			first := false
+		}
 	}
 	
 	updateState() {
@@ -2723,6 +2788,8 @@ class TranslationsList extends ConfigurationItemList {
 	}
 	
 	loadList(items) {
+		static first := true
+		
 		Gui ListView, % this.ListHandle
 	
 		LV_Delete()
@@ -2730,11 +2797,15 @@ class TranslationsList extends ConfigurationItemList {
 		for ignore, translation in this.iItemsList
 			LV_Add("", translation[1], translation[2])
 		
-		LV_ModifyCol()
-		LV_ModifyCol(1, 150)
-		
-		if (this.iLanguageCode = "EN")
-			LV_ModifyCol(2, 300)
+		if (first || (this.iLanguageCode = "EN")) {
+			LV_ModifyCol()
+			LV_ModifyCol(1, 150)
+			
+			if (this.iLanguageCode = "EN")
+				LV_ModifyCol(2, 300)
+			
+			first := false
+		}
 	}
 	
 	updateState() {

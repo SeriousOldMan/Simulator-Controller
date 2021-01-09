@@ -1,3 +1,9 @@
+## 2.0.1-release 01/09/21
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. You can enable an auto save mode in the configuration tool for changed list elements
+
 ## 2.0.0-release 01/07/21
 
   1. Bugfixes, as always

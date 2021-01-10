@@ -354,7 +354,7 @@ class ACCPlugin extends ControllerPlugin {
 					Sleep 50
 				}
 			default:
-				Throw "Unsupported change operation """ . direction . """ detected in ACCManager.changePitstopOption..."
+				Throw "Unsupported change operation """ . direction . """ detected in ACCPlugin.changePitstopOption..."
 		}
 		
 		this.resetPitstopState(inList(this.kPSMutatingOptions, option))
@@ -368,7 +368,7 @@ class ACCPlugin extends ControllerPlugin {
 				if this.selectPitstopOption(activity)
 					this.changePitstopOption(activity, "Increase")
 			default:
-				Throw "Unsupported activity """ . activity . """ detected in ACCManager.toggleActivity..."
+				Throw "Unsupported activity """ . activity . """ detected in ACCPlugin.toggleActivity..."
 		}
 	}
 
@@ -382,7 +382,7 @@ class ACCPlugin extends ControllerPlugin {
 				case "Previous":
 					this.changePitstopOption("Strategy", "Decrease")
 				default:
-					Throw "Unsupported selection """ . selection . """ detected in ACCManager.changeStrategy..."
+					Throw "Unsupported selection """ . selection . """ detected in ACCPlugin.changeStrategy..."
 			}
 	}
 
@@ -403,7 +403,7 @@ class ACCPlugin extends ControllerPlugin {
 				case "Previous":
 					this.changePitstopOption("Tyre set", "Decrease")
 				default:
-					Throw "Unsupported selection """ . selection . """ detected in ACCManager.changeTyreSet..."
+					Throw "Unsupported selection """ . selection . """ detected in ACCPlugin.changeTyreSet..."
 			}
 	}
 	
@@ -417,7 +417,7 @@ class ACCPlugin extends ControllerPlugin {
 				case "Dry":
 					this.changePitstopOption("Compound", "Decrease")
 				default:
-					Throw "Unsupported selection """ . selection . """ detected in ACCManager.changeTyreCompound..."
+					Throw "Unsupported selection """ . selection . """ detected in ACCPlugin.changeTyreCompound..."
 			}
 	}
 	
@@ -430,7 +430,7 @@ class ACCPlugin extends ControllerPlugin {
 			case "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right":
 				found := this.selectPitstopOption(tyre)
 			default:
-				Throw "Unsupported tyre position """ . tyre . """ detected in ACCManager.changeTyrePressure..."
+				Throw "Unsupported tyre position """ . tyre . """ detected in ACCPlugin.changeTyrePressure..."
 		}
 		
 		if found
@@ -446,7 +446,7 @@ class ACCPlugin extends ControllerPlugin {
 			case "Front Brake", "Rear Brake":
 				found := this.selectPitstopOption(brake)
 			default:
-				Throw "Unsupported brake """ . brake . """ detected in ACCManager.changeBrakeType..."
+				Throw "Unsupported brake """ . brake . """ detected in ACCPlugin.changeBrakeType..."
 		}
 			
 		if found
@@ -456,7 +456,21 @@ class ACCPlugin extends ControllerPlugin {
 				case "Previous":
 					this.changePitstopOption(brake, "Decrease")
 				default:
-					Throw "Unsupported selection """ . selection . """ detected in ACCManager.changeBrakeType..."
+					Throw "Unsupported selection """ . selection . """ detected in ACCPlugin.changeBrakeType..."
+			}
+	}
+
+	changeDriver(selection) {
+		this.requirePitstopMFD()
+			
+		if this.selectPitstopOption("Select Driver")
+			switch selection {
+				case "Next":
+					this.changePitstopOption("Strategy", "Increase")
+				case "Previous":
+					this.changePitstopOption("Strategy", "Decrease")
+				default:
+					Throw "Unsupported selection """ . selection . """ detected in ACCPlugin.changeDriver..."
 			}
 	}
 	
@@ -840,6 +854,20 @@ changePitstopBrakeType(brake, selection) {
 	
 	try {
 		SimulatorController.Instance.findPlugin(kACCPlugin).changeBrakeType(brake, selection)
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+changePitstopDriver(selection) {
+	if !inList(["Next", "Previous"], selection)
+		logMessage(kLogWarn, translate("Unsupported driver selection """) . selection . translate(""" detected in changePitstopDriver - please check the configuration"))
+	
+	protectionOn()
+	
+	try {
+		SimulatorController.Instance.findPlugin(kACCPlugin).changeDriver(selection)
 	}
 	finally {
 		protectionOff()

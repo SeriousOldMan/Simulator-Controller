@@ -136,7 +136,8 @@ Although you may call any globally defined function, you should use only the fol
 | changePitstopTyreCompound | compound | ACC | Selects the tyre compound to change to during  the next pitstop. *compound* must be either "Wet" or "Dry". |
 | changePitstopTyrePressure | tyre, direction, [Optional] increments | ACC | Changes the tyre pressure during the next pitstop. *tyre* must be one of "All Around", "Front Left", "Front Right", "Rear Left" and "Rear Right", and *direction* must be either "Increase" or "Decrease". *increments* with a default of 1 define the change in 0.1 psi increments. |
 | changePitstopBrakeType | brake, selection | ACC | Selects the brake pad compound to change to during the next pitstop. *brake* must be "Front Brake" or "Rear Brake" and *selection* must be "Next" or "Previous".  |
-
+| changePitstopDriver | selection | ACC | Selects the driver to take the car during the next pitstop. *selection* must be either "Next" or "Previous". |
+ 
 #### Key Detector Tool
 
 This little tool will help you identifying the button numbers of your hardware controller. If you push the "Key Detector" button, a flying tool tip will apear next to your mouse cursor, which provide some information about your connected controller devices and the buttons or other triggers, that are currently beeing pushed there. To disable the tool tip, press the "Key Detector" button again.

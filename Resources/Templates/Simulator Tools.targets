@@ -2,6 +2,7 @@
 Release 1.5=updateToV15
 Release 2.0=Release 1.5 -> updateConfigurationForV20, updateTranslations, updatePluginLabels, updateACCPluginForV20
 Release 2.0.1=Release 2.0 -> updateTranslations
+Release 2.0.2=Release 2.0.1 -> updateTranslations
 [Cleanup]
 Binaries Folder=%kBinariesDirectory%
 Logs Folder=%kLogsDirectory%

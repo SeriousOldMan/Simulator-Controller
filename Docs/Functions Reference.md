@@ -307,3 +307,6 @@ Changes the tyre pressure during the next pitstop. *tyre* must be one of "All Ar
 
 #### *changePitstopBrakeType(brake :: String, selection :: String)*
 Selects the brake pad compound to change to during the next pitstop. *brake* must be "Front Brake" or "Rear Brake" and *selection* must be "Next" or "Previous". This action function is provided by the "ACC" plugin and is available depending on the concrete configuration.
+
+#### *changePitstopDriver(selection :: String)*
+Selects the driver to take the car during the next pitstop. *selection* must be either "Next" or "Previous". This action function is provided by the "ACC" plugin and is available depending on the concrete configuration.

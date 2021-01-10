@@ -1,3 +1,9 @@
+## 2.0.2-release 01/10/21
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Support for select driver in pitstop settings
+
 ## 2.0.1-release 01/09/21
 
   1. Bugfixes, as always

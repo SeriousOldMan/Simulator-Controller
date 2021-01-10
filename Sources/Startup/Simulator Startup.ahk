@@ -292,7 +292,10 @@ playSong(songFile) {
 ;;;-------------------------------------------------------------------------;;;
 
 exitStartup() {
-	ExitApp 0
+	if !vStartupFinished
+		SetTimer exitStartup, -200
+	else
+		ExitApp 0
 }
 
 handleStartupEvents(event, data) {

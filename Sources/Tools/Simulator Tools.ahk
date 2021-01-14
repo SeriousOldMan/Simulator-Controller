@@ -40,7 +40,8 @@ global kToolsTargetsFile = "Simulator Tools.targets"
 
 global kUpdateMessages = {updateToV15: "Updating configuration to "
 						, updateConfigurationForV20: "Updating configuration to ", updateTranslations: "Updating translations to "
-						, updatePluginLabels: "Updating plugin labels to ", updateACCPluginForV20: "Updating ACC plugin to "}
+						, updatePluginLabels: "Updating plugin labels to ", updateACCPluginForV20: "Updating ACC plugin to "
+						, updateConfigurationForV203: "Updating configuration to "}
 
 global kCompiler = kAHKDirectory . "Compiler\ahk2exe.exe"
 
@@ -349,14 +350,14 @@ updatePluginLabels() {
 	writeConfiguration(userPluginLabelsFile, userPluginLabels)
 }
 
-updateConfigurationForV20() {
+updateCustomCalls(startNumber, endNumber) {
 	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
 	userConfiguration := readConfiguration(userConfigurationFile)
 	
 	if (userConfiguration.Count() > 0) {
 		bundledConfiguration := readConfiguration(getFileName(kSimulatorConfigurationFile, kConfigDirectory))
 	
-		customCallIndex := 13
+		customCallIndex := startNumber
 		
 		Loop {
 			key := "Custom." . customCallIndex . ".Call"
@@ -370,10 +371,18 @@ updateConfigurationForV20() {
 			}
 			
 			customCallIndex += 1
-		} until (customCallIndex >= 32)
+		} until (customCallIndex > endNumber)
 	}
 	
 	writeConfiguration(userConfigurationFile, userConfiguration)
+}
+
+updateConfigurationForV20() {
+	updateCustomCalls(13, 32)
+}
+
+updateConfigurationForV203() {
+	updateCustomCalls(32, 34)
 }
 
 updateACCPluginForV20() {

@@ -1,5 +1,5 @@
 [Version]
-Current=2.0.2-release
-Target=2.0.2-release
-Changes=Bugfixes and small enhancements, Support for Select Driver in Pitstop Handling
-Date=01/09/2021
+Current=2.0.3-release
+Target=2.1-release
+Changes=Bugfixes and small enhancements, Support for Select Driver in Pitstop Handling also for Voice Control
+Date=01/14/2021

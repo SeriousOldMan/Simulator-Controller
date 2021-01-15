@@ -112,7 +112,7 @@ class CompositeCondition extends Condition {
 
 class Quantor extends CompositeCondition {
 	toString(facts := "__NotInitialized__") {
-		return "{" . this.Type . ": " . base.toString(facts) . "}"
+		return "{" . this.Type . " " . base.toString(facts) . "}"
 	}
 }
 
@@ -306,8 +306,15 @@ class Primary extends Term {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class Variable extends Primary {
+	iRootVariable := false
 	iVariable := kNotInitialized
 	iProperty := false
+	
+	RootVariable[] {
+		Get {
+			return this.iRootVariable
+		}
+	}
 	
 	Variable[] {
 		Get {
@@ -321,33 +328,26 @@ class Variable extends Primary {
 		}
 	}
 	
-	__New(name, property := false) {
+	__New(name, property := false, rootVariable := false) {
 		this.iVariable := name
-		this.iProperty := (property ? string2Values(".", property) : false)
+		this.iProperty := ((property && (property != "")) ? string2Values(".", property) : false)
+		this.iRootVariable := (rootVariable ? rootVariable : this)
+		
+		if ((!property && rootVariable) || (property && !rootVariable))
+			Throw "Inconsistent argument combination detected in Variable.__New..."
 		
 		if (this.base != Variable)
 			Throw "Subclassing of Variable is not allowed..."
 	}
 	
 	getValue(factsOrResultSet, default := "__NotInitialized__") {
-		value := factsOrResultSet.getValue(this)
+		value := factsOrResultSet.getValue((factsOrResultSet.base == Facts) ? this : this.iRootVariable)
 	
 		if (IsObject(value) && ((value.base == Variable) || (value.base == Literal)))
 			value := value.getValue(factsOrResultSet)
 					
-		if (value != kNotInitialized) {
-		/*
-			property := this.Property[false]
-			
-			if property
-				for ignore, field in property
-					value := value[field]
-					
-			if (IsObject(value) && ((value.base == Variable) || (value.base == Literal)))
-				value := value.getValue(factsOrResultSet)
-		*/	
+		if (value != kNotInitialized)
 			return value
-		}
 		else
 			return default
 	}
@@ -356,13 +356,23 @@ class Variable extends Primary {
 		return this.toString(resultSet)
 	}
 	
+	hasVariables() {
+		return true
+	}
+	
 	substituteVariables(variables) {
-		var := this.Variable
+		property := this.Property
+		var := ((property = "") ? this.Variable : (this.Variable . "." . property))
 		
 		if variables.HasKey(var)
 			return variables[var]	
 		else {
-			newVariable := new Variable(var, this.Property)
+			if (property != "")
+				rootVariable := this.RootVariable.substituteVariables(variables)
+			else
+				rootVariable := false
+			
+			newVariable := ((property = "") ? new Variable(var) : new Variable(this.Variable, property, rootVariable))
 			
 			variables[var] := newVariable
 
@@ -380,7 +390,7 @@ class Variable extends Primary {
 		if (factsOrResultSet == kNotInitialized)
 			return ("?" . name . ((property != "") ? ("." . property) : ""))
 		else {
-			value := this.getValue(factsOrResultSet)
+			value := this.RootVariable.getValue(factsOrResultSet)
 			
 			if (value == kNotInitialized)
 				return "?" . name . ((property != "") ? ("." . property) : "")
@@ -390,7 +400,7 @@ class Variable extends Primary {
 	}
 	
 	occurs(resultSet, var) {
-		return (this.getValue(resultSet, this) == var)
+		return (this.RootVariable.getValue(resultSet, this.RootVariable) == var)	
 	}
 }
 
@@ -649,7 +659,7 @@ class SetFactAction extends Action {
 		if (this.Value == this.Fact)
 			return ("(Set: " . this.Fact.toString(facts) . ")")
 		else
-			return ("(Set: " . this.Fact.toString(facts) . " " . this.Value.toString(facts) . ")")
+			return ("(Set: " . this.Fact.toString(facts) . ", " . this.Value.toString(facts) . ")")
 	}
 }
 
@@ -698,6 +708,10 @@ class Term {
 		return this
 	}
 	
+	hasVariables() {
+		return false
+	}
+	
 	substituteVariables(variables) {
 		return this
 	}
@@ -718,6 +732,7 @@ class Term {
 class Compound extends Term {
 	iFunctor := ""
 	iArguments := []
+	iHasVariables := false
 	
 	Functor[] {
 		Get {
@@ -743,6 +758,7 @@ class Compound extends Term {
 	__New(functor, arguments) {
 		this.iFunctor := functor
 		this.iArguments := arguments
+		this.iHasVariables := this.hasVariables()
 		
 		if ((this.base != Compound) && (this.base != Cut) && (this.base != Fail))
 			Throw "Subclassing of Compound is not allowed..."
@@ -775,16 +791,25 @@ class Compound extends Term {
 			return new Compound(this.Functor, arguments)
 	}
 	
-	substituteVariables(variables) {
-		arguments := []
-		
+	hasVariables() {
 		for ignore, argument in this.Arguments
-			arguments.Push(argument.substituteVariables(variables))
-		
-		if (arguments.Length() == 0)
-			return this
-		else
+			if argument.hasVariables()
+				return true
+				
+		return false
+	}
+	
+	substituteVariables(variables) {
+		if this.iHasVariables {
+			arguments := []
+			
+			for ignore, argument in this.Arguments
+				arguments.Push(argument.substituteVariables(variables))
+			
 			return new Compound(this.Functor, arguments)
+		}
+		else
+			return this
 	}
 	
 	unify(choicePoint, term) {
@@ -851,6 +876,7 @@ class Fail extends Compound {
 class Pair extends Term {
 	iLeftTerm := false
 	iRightTerm := false
+	iHasVariables := false
 	
 	LeftTerm[] {
 		Get {
@@ -867,6 +893,7 @@ class Pair extends Term {
 	__New(leftTerm, rightTerm) {
 		this.iLeftTerm := leftTerm
 		this.iRightTerm := rightTerm
+		this.iHasVariables := this.hasVariables()
 		
 		if (this.base != Pair)
 			Throw "Subclassing of Pair is not allowed..."
@@ -902,8 +929,15 @@ class Pair extends Term {
 		return new Pair(this.LeftTerm.injectValues(resultSet), this.RightTerm.injectValues(resultSet))
 	}
 	
+	hasVariables() {
+		return (this.LeftTerm.hasVariables() || this.iRightTerm.hasVariables())
+	}
+	
 	substituteVariables(variables) {
-		return new Pair(this.LeftTerm.substituteVariables(variables), this.RightTerm.substituteVariables(variables))
+		if this.iHasVariables
+			return new Pair(this.LeftTerm.substituteVariables(variables), this.RightTerm.substituteVariables(variables))
+		else
+			return this
 	}
 	
 	unify(choicePoint, term) {
@@ -1047,6 +1081,7 @@ class ProductionRule extends Rule {
 class ReductionRule extends Rule {
 	iHead := false
 	iTail := []
+	iHasVariables := false
 	
 	Type[] {
         Get {
@@ -1069,6 +1104,7 @@ class ReductionRule extends Rule {
 	__New(head, tail) {
 		this.iHead := head
 		this.Tail := tail
+		this.iHasVariables := this.hasVariables()
 	}
 	
 	toString(resultSet := "__NotInitialized__") {
@@ -1086,14 +1122,26 @@ class ReductionRule extends Rule {
 			return this.Head.toString(resultSet)
 	}
 	
-	substituteVariables() {
-		variables := {}
-		terms := []
-		
+	hasVariables() {
 		for ignore, term in this.Tail
-			terms.Push(term.substituteVariables(variables))
+			if term.hasVariables()
+				return true
+				
+		return this.Head.hasVariables()
+	}
+	
+	substituteVariables() {
+		if this.iHasVariables {
+			variables := {}
+			terms := []
 			
-		return new ReductionRule(this.Head.substituteVariables(variables), terms)
+			for ignore, term in this.Tail
+				terms.Push(term.substituteVariables(variables))
+				
+			return new ReductionRule(this.Head.substituteVariables(variables), terms)
+		}
+		else
+			return this
 	}
 }
 
@@ -1104,6 +1152,7 @@ class ReductionRule extends Rule {
 class ResultSet {
 	iKnowledgeBase := false
 	iChoicePoint := false
+	iExhausted := false
 	
 	iBindings := {}
 	
@@ -1153,9 +1202,10 @@ class ResultSet {
 	}
 	
 	setVariable(choicePoint, var, value) {
+		var := var.RootVariable
 		bindings := this.iBindings
 		
-		choicePoint.saveVariable(var, (bindings.HasKey(var) ? bindings[va] : kNotInitialized))
+		choicePoint.saveVariable(var, (bindings.HasKey(var) ? bindings[var] : kNotInitialized))
 		
 		bindings[var] := value
 	}
@@ -1171,6 +1221,12 @@ class ResultSet {
 	}
 	
 	unify(choicePoint, termA, termB) {
+		if (termA.base == Variable)
+			termA := termA.RootVariable
+		
+		if (termB.base == Variable)
+			termB := termB.RootVariable
+			
 		termA := termA.getValue(this, termA)
 		termB := termB.getValue(this, termB)
 		
@@ -1202,8 +1258,13 @@ class ResultSet {
 	}
 	
 	nextResult() {
-		local choicePoint := this.ChoicePoint[true]
-		
+		local choicePoint
+
+		if this.iExhausted
+			return false
+			
+		choicePoint := this.ChoicePoint[true]
+			
 		Loop {
 			if choicePoint.nextChoice() {
 				choicePoint := choicePoint.next()
@@ -1218,8 +1279,11 @@ class ResultSet {
 			else {
 				choicePoint := choicePoint.previous()
 				
-				if !choicePoint
+				if !choicePoint {
+					this.iExhausted := true
+					
 					return false
+				}
 			}
 		}
 	}
@@ -1228,6 +1292,8 @@ class ResultSet {
 		bindings := this.iBindings
 		
 		Loop {
+			var := var.RootVariable
+			
 			if bindings.HasKey(var) {
 				value := bindings[var]
 				
@@ -1367,6 +1433,7 @@ class ChoicePoint {
 
 class RulesChoicePoint extends ChoicePoint {
 	iReductions := []
+	iSubstitutedReductions := {}
 	iNextRuleIndex := 1
 	
 	iSubChoicePoints := []
@@ -1408,7 +1475,13 @@ class RulesChoicePoint extends ChoicePoint {
 			}
 			else {
 				resultSet := this.ResultSet
-				rule := reductions[index].substituteVariables()
+				
+				rule := reductions[index]
+				
+				if !this.iSubstitutedReductions.HasKey(rule)
+					this.iSubstitutedReductions[rule] := rule.substituteVariables()
+					
+				rule := this.iSubstitutedReductions[rule]
 			
 				if (resultSet.RuleEngine.TraceLevel <= kTraceLight)
 					resultSet.RuleEngine.trace(kTraceLight, "Trying rule " . rule.toString())
@@ -1798,7 +1871,7 @@ class Facts {
 			property := fact.Property
 			
 			if (property != "")
-				fact := (fact.Variable . "." . fact.Property)
+				fact := (fact.Variable . "." . property)
 			else
 				fact := fact.Variable
 		}
@@ -2015,10 +2088,10 @@ class RuleEngine {
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; Class                    Compiler                                       ;;;
+;;; Class                    RuleCompiler                                   ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class Compiler {
+class RuleCompiler {
 	compileRules(text, ByRef productions, ByRef reductions) {
 		productions := []
 		reductions := []
@@ -2027,18 +2100,38 @@ class Compiler {
 		{
 			line := Trim(A_LoopField)
 			
-			if (line != "")
-				if InStr(line, "=>") {
-					production := this.readProduction(line)
-					
-					productions.Push(this.createProductionRuleParser(production).parse(production))
-				}
-				else {
-					reduction := this.readReduction(line)
-					
-					reductions.Push(this.createReductionRuleParser(reduction).parse(reduction))
-				}
+			if (line != "") {
+				compiledRule := this.compileRule(line)
+				
+				if (compiledRule.Type == kProduction)
+					productions.Push(compiledRule)
+				else
+					reductions.Push(compiledRule)
+			}
 		}
+	}
+	
+	compileRule(text) {
+		if InStr(text, "=>")
+			return this.compileProduction(text)
+		else
+			return this.compileReduction(text)
+	}
+	
+	compileProduction(text) {
+		production := this.readProduction(text)
+					
+		return this.createProductionRuleParser(production).parse(production)
+	}
+	
+	compileReduction(text) {
+		reduction := this.readReduction(text)
+					
+		return this.createReductionRuleParser(reduction).parse(reduction)
+	}
+	
+	compileGoal(text) {
+		return this.createCompoundParser(reduction).parse(this.readHead(text, 1))
 	}
 	
 	readReduction(text) {
@@ -2059,7 +2152,7 @@ class Compiler {
 		conditions := this.readConditions(text, nextCharIndex, priority)
 				
 		if (this.readLiteral(text, nextCharIndex) != "=>")
-			Throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in Compiler.readProduction..."
+			Throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in RuleCompiler.readProduction..."
 			
 		actions := this.readActions(text, nextCharIndex)
 		
@@ -2073,7 +2166,7 @@ class Compiler {
 		head := this.readCompound(text, nextCharIndex)
 		
 		if !head
-			Throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in Compiler.readHead..."
+			Throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in RuleCompiler.readHead..."
 		else
 			return head
 	}
@@ -2092,13 +2185,13 @@ class Compiler {
 					if term
 						terms.Push(term)
 					else if (!this.isEmpty(text, nextCharIndex) || (A_index == 1))
-						Throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in Compiler.readTail..."
+						Throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in RuleCompiler.readTail..."
 					else
 						return terms
 				}
 			}
 			else
-				Throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in Compiler.readTail..."
+				Throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in RuleCompiler.readTail..."
 		}
 		else
 			return false
@@ -2147,7 +2240,7 @@ class Compiler {
 			else if (A_Index == 1)
 				return arguments
 			else
-				Throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in Compiler.readCompoundArguments..."
+				Throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in RuleCompiler.readCompoundArguments..."
 			
 			if !this.skipDelimiter(",", text, nextCharIndex, false)
 				return arguments
@@ -2193,7 +2286,7 @@ class Compiler {
 				if argument
 					return concatenate(["["], arguments, ["|"], Array(argument), ["]"])
 				else
-					Throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in Compiler.readList..."
+					Throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in RuleCompiler.readList..."
 			}
 			else {
 				this.skipDelimiter("]", text, nextCharIndex)
@@ -2235,7 +2328,7 @@ class Compiler {
 				if (this.readLiteral(text, nextCharIndex) = "priority:")
 					priority := this.readLiteral(text, nextCharIndex)
 				else
-					Throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in Compiler.readConditions..."
+					Throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in RuleCompiler.readConditions..."
 				
 			if !this.skipDelimiter(",", text, nextCharIndex, false)
 				return conditions
@@ -2295,12 +2388,12 @@ class Compiler {
 			return true
 		}
 		else if throwError
-			Throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in Compiler.skipDelimiter..."
+			Throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in RuleCompiler.skipDelimiter..."
 		else
 			return false
 	}
 	
-	readLiteral(ByRef text, ByRef nextCharIndex, delimiters := "{[()]}|, `t") {
+	readLiteral(ByRef text, ByRef nextCharIndex, delimiters := "{[()]}|`, `t") {
 		local literal
 		
 		length := StrLen(text)
@@ -2312,7 +2405,7 @@ class Compiler {
 		Loop {
 			character := SubStr(text, nextCharIndex, 1)
 			
-			if (InStr(delimiters, character) || (nextCharIndex >= length)) {
+			if (InStr(delimiters, character) || (nextCharIndex > length)) {
 				literal := SubStr(text, beginCharIndex, nextCharIndex - beginCharIndex)
 				
 				if (literal = "true")
@@ -2395,7 +2488,7 @@ class Compiler {
 		else if IsObject(term)
 			return this.createCompoundParser(this, variables)
 			
-		Throw "Unexpected terms detected in Compiler.createTermParser..."
+		Throw "Unexpected terms detected in RuleCompiler.createTermParser..."
 	}
 	
 	createCompoundParser(term, variables := "__NotInitialized__") {
@@ -2454,8 +2547,17 @@ class Parser {
 			return variables[key]
 		else {
 			name := StrSplit(name, ".", " `t", 2)
+			rootName := name[1]
 			
-			name := ((name.Length() == 1) ? new Variable(name[1]) : new Variable(name[1], name[2]))
+			if variables.HasKey(rootName)
+				rootVariable := variables[rootName]
+			else {
+				rootVariable := new Variable(rootName)
+				
+				variables[rootName] := rootVariable
+			}
+			
+			name := ((name.Length() == 1) ? rootVariable : new Variable(rootName, name[2], rootVariable))
 		
 			variables[key] := name
 			
@@ -2726,148 +2828,3 @@ class NilParser extends Parser {
 		return new Nil()
 	}
 }
-
-;;; ----------------------------------------------------------------------- ;;;
-
-theCompiler := new Compiler()
-
-theRules =
-(
-persist(?A.Enkel, ?B) <= Call(showIt, ?A.Enkel, ?B), !, Set(?A.Enkel, true), Set(?B, Grossvater), Produce()
-reverse([1,2,3,4], ?L)
-reverse([ ?H |?T ], ?REV )<= reverse(?T,?RT), concat(?RT,[?H],?REV)
-
-Priority: 5, {Any: [?Peter.Enkel], [Predicate: ?Peter.Sohn = true]} => (Set: Peter, Gluecklich), (Call: showIt, 1, 2), (Prove: vater, maria, willy), (Call: showIt, 2, 1)
-)
-
-productions := false
-reductions := false
-
-start := A_TickCount
-
-theCompiler.compileRules(theRules, productions, reductions)
-
-MsgBox % A_TickCount - start . " ms"
-
-for ignore, rule in concatenate(productions, reductions)
-	MsgBox % rule.toString()
-	
-	
-	
-	
-rRule1 := [["reverse", "[]", "[]"]]
-rRule2 := [["reverse", ["[", "?H", "|", "?T", "]"], "?REV"], "<=", ["reverse", "?T", "?RT"], ["concat", "?RT", ["[", "?H", "]"], "?REV"]]
-rRule3 := [["concat", "[]", "?L", "?L"]]
-rRule4 := [["concat", ["[", "?H" , "|", "?T", "]"], "?L", ["[", "?H", "|", "?R", "]"]], "<=", ["concat", "?T", "?L", "?R"]]
-
-rRule5 := [["persist", "?A.Enkel", "?B"], "<=", ["Call", "showIt", "?A.Enkel", "?B"], "!", ["Set", "?A.Enkel", true], ["Set", "?B", "Grossvater"], ["Produce"]]
-rRule6 := [["vater", "peter", "frank"], "<=", ["Set", "Peter.Sohn", true], ["Produce"]]
-rRule7 := [["vater", "frank", "paul"]]
-rRule8 := [["mutter", "peter", "mara"]]
-rRule9 := [["grossvater", "?A", "?B"], "<=", ["vater", "?A", "?C"], ["vater", "?C", "?B"], ["persist", "?A", "?B"]]
-rRule10 := [["grossvater", "?A", "?B"], "<=", ["mutter", "?A", "?C"], ["vater", "?C", "?B"], ["persist", "?A", "?B"]]
-rRule11 := [["mutter", "frank", "barbara"]]
-rRule12 := [["vater", "mara", "willy"]]
-rRule13 := [["gluecklich", "peter"], "<=", ["stimmung", "!peter"]]
-rRule14 := [["ungluecklich", "peter"], "<=", ["stimmung", "!peter"], "!", "fail"]
-rRule15 := [["stimmung", "gluecklich"]]
-
-; pRule1 := [["One:", ["?Peter", "=", "Sohn"], ["?Peter", "=", "Enkel"]], "=>", ["Set:", "Peter.Stimmung", "Gluecklich"], ["Call:", "showIt", "1", "2"], ["Prove:", "vater", "maria", "willy"], ["Call:", "showIt", "2", "1"]]
-
-; pRule1 := [["Any:", ["?Peter.Enkel"], ["?Peter.Sohn"]], "=>", ["Set:", "Peter", "Gluecklich"], ["Call:", "showIt", "1", "2"], ["Prove:", "vater", "maria", "willy"], ["Call:", "showIt", "2", "1"]]
-pRule1 := [["Any:", ["?Peter.Enkel"], ["?Peter.Sohn"]], "=>", ["Set:", "Peter", "Gluecklich"]]
-pRule2 := [["?Peter", "=", "Gluecklich"], "=>", ["Call:", "feiern"]]
-
-showIt(knowledgeBase, enkel, grossvater) {
-	; MsgBox %enkel% ist der Enkel von %grossvater%
-
-	return true
-}
-
-feiern(knowledgeBase) {
-	/*
-	MsgBox Chaka!!!!!
-	
-	message := []
-
-	for key, value in knowledgeBase.Facts.Facts
-		message.Push(key . " = " . value)
-		
-	MsgBox % "Fakten`n`n" . values2String("`n", message*)
-	*/
-}
-
-
-
-
-engine := new RuleEngine(theCompiler.parseProductions([pRule1, pRule2])
-					   , theCompiler.parseReductions([rRule1, rRule2, rRule3, rRule4, rRule5, rRule6, rRule7, rRule8, rRule9, rRule10, rRule11, rRule12, rRule13, rRule14, rRule15]), {})
-
-; goal := ["reverse", ["[", 1, 2, 3, 4, "]"], "?REV"]
-; goal := ["reverse", "[]", "[]"]
-; goal := ["reverse", ["[", 1, "]"], "?REV"]
-; goal := ["concat", ["[", 1, "]"], "[]", ["[", 1, "]"]]
-; goal := ["concat", ["[", 1, 2, "]"], ["[", 3, 4, 5, "]"], "?L"]
-; goal := theCompiler.parseGoal(goal)
-
-goal := ["grossvater", "?A", "?B"]
-goal := theCompiler.parseGoal(goal)
-
-engine.iTraceLevel := kTraceOff
-
-start := A_TickCount
-
-resultSet := engine.prove(goal)
-
-MsgBox % A_TickCount - start . " ms"
-
-if resultSet {
-	Loop {
-		MsgBox % "Result: " . goal.toString(resultSet)
-	} until !resultSet.nextResult()
-	
-	Msgbox Query exhausted
-}
-else
-	Msgbox Query failed
-	
-	
-message := []
-
-for key, value in resultSet.KnowledgeBase.Facts.Facts
-	message.Push(key . " = " . value)
-	
-MsgBox % "Fakten`n`n" . values2String("`n", message*)
-
-
-engine.iTraceLevel := kTraceOff
-
-goal := ["gluecklich", "peter"]
-goal := theCompiler.parseGoal(goal)
-
-resultSet := resultSet.KnowledgeBase.prove(goal)
-
-if resultSet {
-	Loop {
-		MsgBox % "Result: " . goal.toString(resultSet)
-	} until !resultSet.nextResult()
-	
-	Msgbox Query exhausted
-}
-else
-	Msgbox Query failed
-	
-goal := ["reverse", "?A", "?B"]
-goal := theCompiler.parseGoal(goal)
-
-resultSet := resultSet.KnowledgeBase.prove(goal)
-
-if resultSet {
-	Loop {
-		MsgBox % "Result: " . goal.toString(resultSet)
-	} until !resultSet.nextResult()
-	
-	Msgbox Query exhausted
-}
-else
-	Msgbox Query failed

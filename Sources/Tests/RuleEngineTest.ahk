@@ -65,7 +65,7 @@ global kExecutionTestRules = kRules
 ;;;                              Test Section                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class RuleEngineTestClass extends Assert {	
+class CompilerTestClass extends Assert {	
 	removeWhiteSpace(text) {
 		text := StrReplace(text, A_Space, "")
 		text := StrReplace(text, A_Tab, "")
@@ -117,7 +117,9 @@ class RuleEngineTestClass extends Assert {
 			this.AssertEqual(newCompiledRule.toString(), compiledRule.toString())
 		}
 	}
-	
+}
+
+class ListTestClass extends Assert {
 	executeTests(tests) {
 		compiler := new RuleCompiler()
 		
@@ -159,6 +161,41 @@ class RuleEngineTestClass extends Assert {
 		
 		this.executeTests(tests)
 	}
+}
+
+class FamilyTestClass extends Assert {
+	executeTests(tests) {
+		compiler := new RuleCompiler()
+		
+		productions := false
+		reductions := false
+		
+		compiler.compileRules(kExecutionTestRules, productions, reductions)
+		
+		engine := new RuleEngine(productions, reductions, {})
+		
+		for ignore, test in tests {
+			goal := compiler.compileGoal(test[1])
+			
+			resultSet := engine.prove(goal)
+			
+			this.AssertEqual(true, (resultSet != false))
+			
+			if (test[2].Length() > 0) {
+				this.AssertEqual(true, (resultSet != false))
+			
+				for index, result in test[2] {
+					this.AssertEqual(result, goal.toString(resultSet))
+					
+					this.AssertEqual(index < test[2].Length(), resultSet.nextResult())
+				}
+			}
+			else
+				this.AssertEqual(false, (resultSet != false))
+		}
+		
+		return resultSet
+	}
 	
 	Execute_Father_Test() {
 		tests := [["father(?A, ?B)", ["father(Peter, Frank)", "father(Frank, Paul)", "father(Mara, Willy)"]]]
@@ -169,7 +206,6 @@ class RuleEngineTestClass extends Assert {
 		this.AssertEqual(true, resultSet.KnowledgeBase.Facts.getValue("Celebrated", false))
 	}
 	
-	/*
 	Execute_GrandFather_Test() {
 		tests := [["grandfather(?A, ?B)", ["grandfather(Peter, Paul)", "grandfather(Peter, Willy)"]]]
 		
@@ -185,34 +221,48 @@ class RuleEngineTestClass extends Assert {
 		this.AssertEqual("Peter", resultSet.KnowledgeBase.Facts.getValue("Willy.grandchild", false))
 		this.AssertEqual(true, resultSet.KnowledgeBase.Facts.getValue("Paul.grandfather", false))
 		this.AssertEqual(true, resultSet.KnowledgeBase.Facts.getValue("Willy.grandfather", false))
-		
-		return resultSet
 	}
 	
 	Execute_Happiness_Test() {
 		compiler := new RuleCompiler()
 		
-		resultSet := this.Execute_GrandFather_Test()
-		
-		tests := [["happy(Peter)", ["happy(Peter)"]]
+		tests := [["grandfather(?A, ?B)", ["grandfather(Peter, Paul)", "grandfather(Peter, Willy)"]],
+				, ["happy(Peter)", ["happy(Peter)"]]
 				, ["unhappy(Peter)", []]]
 		
-		engine := resultSet.KnowledgeBase.RuleEngine
+		productions := false
+		reductions := false
+		
+		compiler.compileRules(kExecutionTestRules, productions, reductions)
+		
+		engine := new RuleEngine(productions, reductions, {})
+		kb := engine.createKnowledgeBase(engine.createFacts(), engine.createRules())
 		
 		for ignore, test in tests {
 			goal := compiler.compileGoal(test[1])
 			
-			resultSet := engine.prove(goal)
+			resultSet := kb.prove(goal)
 			
-			for index, result in test[2] {
-				msgbox % goal.toString(resultSet)
-				this.AssertEqual(result, goal.toString(resultSet))
-				
-				this.AssertEqual(index < test[2].Length(), resultSet.nextResult())
+			if (test[2].Length() > 0) {
+				message := []
+
+				for key, value in kb.Facts.Facts
+					message.Push(key . " = " . value)
+					
+				MsgBox % "Fakten`n`n" . values2String("`n", message*)
+		
+				this.AssertEqual(true, (resultSet != false))
+			
+				for index, result in test[2] {
+					this.AssertEqual(result, goal.toString(resultSet))
+					
+					this.AssertEqual(index < test[2].Length(), resultSet.nextResult())
+				}
 			}
+			else
+				this.AssertEqual(false, (resultSet != false))
 		}
 	}
-	*/
 }
 
 celebrate(knowledgeBase) {
@@ -229,6 +279,8 @@ celebrate(knowledgeBase) {
 }
 
 showIt(knowledgeBase, grandchild, grandfather) {
+	local fact
+	
 	SplashTextOn 300, 100, , %grandchild% is grandchild of %grandfather%
 	Sleep 1000
 	SplashTextOff
@@ -241,8 +293,9 @@ showIt(knowledgeBase, grandchild, grandfather) {
 	return true
 }
 
-
-AHKUnit.AddTestClass(RuleEngineTestClass)
+AHKUnit.AddTestClass(CompilerTestClass)
+AHKUnit.AddTestClass(ListTestClass)
+AHKUnit.AddTestClass(FamilyTestClass)
 AHKUnit.Run()
 exit
 	

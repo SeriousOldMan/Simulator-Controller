@@ -49,6 +49,9 @@ kRules =
 
 				grandfather(?A, ?B) <= father(?A, ?C), father(?C, ?B), persist(?A, ?B)
 				grandfather(?A, ?B) <= mother(?A, ?C), father(?C, ?B), persist(?A, ?B)
+				
+				oc(?Y) <= eq(?Y, f(?Y))
+				eq(?A, ?A)
 
 				happy(Peter) <= mood(!Peter)
 				unhappy(Peter) <= mood(!Peter), !, fail
@@ -129,14 +132,17 @@ class ListTestClass extends Assert {
 		compiler.compileRules(kExecutionTestRules, productions, reductions)
 		
 		engine := new RuleEngine(productions, reductions, {})
+		kb := engine.createKnowledgeBase(engine.createFacts(), engine.createRules())
+			
+		kb.enableOccurCheck()
 		
 		for ignore, test in tests {
 			goal := compiler.compileGoal(test[1])
 			
-			resultSet := engine.prove(goal)
+			resultSet := kb.prove(goal)
 			
-			resultSet.KnowledgeBase.enableOccurCheck()
-			
+			if (goal.toString() = "oc(?B)")
+				MsgBox % goal.toString(resultSet)
 			if (test[2].Length() > 0) {
 				this.AssertEqual(true, (resultSet != false))
 			
@@ -164,7 +170,7 @@ class ListTestClass extends Assert {
 		tests := [["reverse([1, 2, 3, 4], ?R)", ["reverse([1, 2, 3, 4], [4, 3, 2, 1])"]]
 				, ["reverse([], [])", ["reverse([], [])"]]
 				, ["reverse([1], ?R)", ["reverse([1], [1])"]]
-				, ["reverse(?R, [3, 2, 1])", ["reverse([1, 2, 3], [3, 2, 1])"]]]
+				, ["oc(?B)", []]]
 		
 		this.executeTests(tests)
 	}

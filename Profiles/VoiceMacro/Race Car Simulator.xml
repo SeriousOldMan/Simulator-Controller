@@ -1561,6 +1561,49 @@
       </MacroActions>
     </Commands>
     <Commands>
+      <GUID>86ff2519-9c23-46e7-8c5c-c69486c3d5e7</GUID>
+      <RecocnitionText>Pitstop Driver Next</RecocnitionText>
+      <ShortCut>
+        <Key>None</Key>
+        <OnKeyAction>0</OnKeyAction>
+        <Clicks>0</Clicks>
+      </ShortCut>
+      <UseRecognition>true</UseRecognition>
+      <MacroActions>
+        <MacroAction>
+          <MacroType>1</MacroType>
+          <Keyboard>
+            <Key>F6</Key>
+            <ClickDownUp>0</ClickDownUp>
+            <lCTRL>true</lCTRL>
+            <ClickDuration>20</ClickDuration>
+          </Keyboard>
+        </MacroAction>
+      </MacroActions>
+    </Commands>
+    <Commands>
+      <GUID>f9368bcc-0e67-4e27-af3d-b7b8e6dd893a</GUID>
+      <RecocnitionText>Pitstop Driver Previous</RecocnitionText>
+      <ShortCut>
+        <Key>None</Key>
+        <OnKeyAction>0</OnKeyAction>
+        <Clicks>0</Clicks>
+      </ShortCut>
+      <UseRecognition>true</UseRecognition>
+      <MacroActions>
+        <MacroAction>
+          <MacroType>1</MacroType>
+          <Keyboard>
+            <Key>F6</Key>
+            <ClickDownUp>0</ClickDownUp>
+            <Alt>true</Alt>
+            <lCTRL>true</lCTRL>
+            <ClickDuration>20</ClickDuration>
+          </Keyboard>
+        </MacroAction>
+      </MacroActions>
+    </Commands>
+    <Commands>
       <GUID>302ce1ac-4cbb-4117-ac34-7f66f55a8622</GUID>
       <RecocnitionText>Control Next</RecocnitionText>
       <ShortCut>

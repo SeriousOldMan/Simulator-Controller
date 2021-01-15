@@ -244,13 +244,6 @@ class FamilyTestClass extends Assert {
 			resultSet := kb.prove(goal)
 			
 			if (test[2].Length() > 0) {
-				message := []
-
-				for key, value in kb.Facts.Facts
-					message.Push(key . " = " . value)
-					
-				MsgBox % "Fakten`n`n" . values2String("`n", message*)
-		
 				this.AssertEqual(true, (resultSet != false))
 			
 				for index, result in test[2] {
@@ -309,7 +302,6 @@ Assertion Messages einbauen
 
 
 
-*/
 compiler := new RuleCompiler()
 		
 productions := false
@@ -415,3 +407,6 @@ else
 			message.Push(key . " = " . value)
 			
 		MsgBox % "Fakten`n`n" . values2String("`n", message*)
+		
+		
+*/

@@ -400,7 +400,7 @@ class Variable extends Primary {
 	}
 	
 	occurs(resultSet, var) {
-		return (this.RootVariable.getValue(resultSet, this.RootVariable) == var.RootVariable)	
+		return (this.RootVariable.getValue(resultSet, this.RootVariable) == var)	
 	}
 }
 

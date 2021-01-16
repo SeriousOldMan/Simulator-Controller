@@ -135,7 +135,7 @@ class CompilerTestClass extends Assert {
 			try {
 				compiler.compileRule(text)
 		
-				this.AssertEqual(false, true, "Syntax error not found for rule """ . theRule . """...")
+				this.AssertEqual(false, true, "Syntax error not reported for rule """ . theRule . """...")
 			}
 			catch exception {
 				this.AssertEqual(true, true)
@@ -338,13 +338,15 @@ class HybridEngineTestClass extends Assert {
 		this.AssertEqual(true, resultSet.KnowledgeBase.Facts.getValue("Celebrated", false), "Fact Celebrated is missing...")
 	}
 	
-	Script_Reasoning_Test() {
+	Script_Integration_Test() {
 		local resultSet
 		
 		tests := [["grandfather(?A, ?B)", ["grandfather(Peter, Paul)", "grandfather(Peter, Willy)"]]]
 		
 		resultSet := this.executeTests(tests)
 
+		showFacts(resultSet.KnowledgeBase)
+		
 		this.AssertEqual(true, resultSet.KnowledgeBase.Facts.getValue("Peter.son", false), "Fact Peter.son is missing...")
 		this.AssertEqual(true, resultSet.KnowledgeBase.Facts.getValue("Celebrated", false), "Fact Celebrated is missing...")
 		this.AssertEqual("happy", resultSet.KnowledgeBase.Facts.getValue("Peter", false), "Fact Peter is not happy...")
@@ -396,7 +398,7 @@ class HybridEngineTestClass extends Assert {
 
 celebrate(knowledgeBase) {
 	if !knowledgeBase.Facts.getValue("Celebrated", false) {
-		SplashTextOn 300, 100, , Chaka!!!!
+		SplashTextOn 200, 60, Message, Chaka!!!!
 		Sleep 1000
 		SplashTextOff
 		
@@ -410,7 +412,7 @@ celebrate(knowledgeBase) {
 showRelationship(knowledgeBase, grandchild, grandfather) {
 	local fact := "Related." . grandchild . "." . grandfather
 	
-	SplashTextOn 300, 100, , %grandchild% is grandchild of %grandfather%
+	SplashTextOn 200, 60, Message, %grandchild% is grandchild of %grandfather%
 	Sleep 1000
 	SplashTextOff
 	
@@ -423,10 +425,12 @@ showRelationship(knowledgeBase, grandchild, grandfather) {
 showFacts(knowledgeBase) {
 	message := []
 
-	for key, value in resultSet.KnowledgeBase.Facts.Facts
+	for key, value in knowledgeBase.Facts.Facts
 		message.Push(key . " = " . value)
-		
-	MsgBox % "Facts`n`n" . values2String("`n", message*)
+	
+	SplashTextOn 200, 250, Facts, % values2String("`n", message*)
+	Sleep 5000
+	SplashTextOff
 }
 
 setOccurCheck(knowledgeBase, enable) {

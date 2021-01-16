@@ -33,11 +33,19 @@ SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
 ;;;                         Private Constant Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kCompilerTestRules
+global kCompilerCompliantTestRules
 				= ["persist(?A.grandchild, ?B) <= Call(showRelationship, ?A.grandchild, ?B), !, Set(?A.grandchild, true), Set(?B, grandfather), Produce()"
 				 , "reverse([1,2,3,4], ?L)"
+				 , "foo(?A, bar(?B, [?C])) <= baz(?, foo(?A, ?)), !, fail"
 				 , "reverse([ ?H |?T ], ?REV )<= reverse(?T,?RT), concat(?RT,[?H],?REV)"
 				 , "Priority: 5, {Any: [?Peter.grandchild], [Predicate: ?Peter.son = true]} => (Set: Peter, happy), (Call: showRelationship, 1, 2), (Prove: father, maria, willy), (Call: showRelationship, 2, 1)"]
+
+global kCompilerNonCompliantTestRules
+				= ["persist(?A.grandchild  ?B) <= Call(showRelationship, ?A.grandchild, ?B, !, Set(?A.grandchild, true), Set(?B, grandfather), Produce()"
+				 , "reverse([1,2,3,4]], ?L)"
+				 , "foo(?A, bar(?B)) => baz(?, foo([?A], !), !, fail"
+				 , "reverse([ ?H | ], ?REV )<= reverse(?T,,?RT), concat ?RT,[?H],?REV)"
+				 , "Priority: 5, [Any: [?Peter.grandchild], [Preddicate: ?Peter.son = true]} => [Set: Peter, happy), (Call: showRelationship, 1, 2), (Prove: father, maria, willy), (Call: showRelationship, 2, 1)"]
 
 kRules =
 (
@@ -102,25 +110,43 @@ class CompilerTestClass extends Assert {
 		return text
 	}
 	
-	Compiler_Compile_Test() {
+	Compiler_Compliance_Test() {
 		compiler := new RuleCompiler()
 		productions := false
 		reductions := false
 		text := ""
 		
-		for ignore, theRule in kCompilerTestRules
+		for ignore, theRule in kCompilerCompliantTestRules
 			text := (text . theRule . "`n")
 		
 		compiler.compileRules(text, productions, reductions)
 		
 		this.AssertEqual(1, productions.Length(), "Not all production rules compiled...")
-		this.AssertEqual(3, reductions.Length(), "Not all reduction rules compiled...")
+		this.AssertEqual(4, reductions.Length(), "Not all reduction rules compiled...")
+	}
+	
+	Compiler_NonCompliance_Test() {
+		compiler := new RuleCompiler()
+		productions := false
+		reductions := false
+		text := ""
+		
+		for ignore, theRule in kCompilerNonCompliantTestRules {
+			try {
+				compiler.compileRule(text)
+		
+				this.AssertEqual(false, true, "Syntax error not found for rule """ . theRule . """...")
+			}
+			catch exception {
+				this.AssertEqual(true, true)
+			}
+		}
 	}
 	
 	Compiler_Identity_Test() {
 		compiler := new RuleCompiler()
 		
-		for ignore, theRule in kCompilerTestRules {
+		for ignore, theRule in kCompilerCompliantTestRules {
 			compiledRule := compiler.compileRule(theRule)
 			
 			this.AssertEqual(this.removeWhiteSpace(compiledRule.toString())
@@ -134,7 +160,7 @@ class CompilerTestClass extends Assert {
 }
 
 class EngineTestClass extends Assert {
-	Execute_OccurCheck_Test() {
+	OccurCheck_Test() {
 		local resultSet
 		
 		compiler := new RuleCompiler()
@@ -179,7 +205,7 @@ class EngineTestClass extends Assert {
 		}
 	}
 	
-	Execute_Deterministic_Test() {
+	Deterministic_Test() {
 		local resultSet
 		
 		compiler := new RuleCompiler()
@@ -214,7 +240,7 @@ class EngineTestClass extends Assert {
 	}
 }
 
-class ListTestClass extends Assert {
+class UnificationTestClass extends Assert {
 	executeTests(tests) {
 		local resultSet
 		
@@ -250,14 +276,14 @@ class ListTestClass extends Assert {
 		}
 	}
 	
-	Execute_Concat_Test() {
+	Concat_Test() {
 		tests := [["concat([1], [], [1])", ["concat([1], [], [1])"]]
 				, ["concat([1, 2], [3, 4, 5], ?L)", ["concat([1, 2], [3, 4, 5], [1, 2, 3, 4, 5])"]]]
 		
 		this.executeTests(tests)
 	}
 	
-	Execute_Reverse_Test() {
+	Reverse_Test() {
 		tests := [["reverse([1, 2, 3, 4], ?R)", ["reverse([1, 2, 3, 4], [4, 3, 2, 1])"]]
 				, ["reverse([], [])", ["reverse([], [])"]]
 				, ["reverse([1], ?R)", ["reverse([1], [1])"]]
@@ -267,7 +293,7 @@ class ListTestClass extends Assert {
 	}
 }
 
-class FamilyTestClass extends Assert {
+class HybridEngineTestClass extends Assert {
 	executeTests(tests) {
 		local resultSet
 		
@@ -301,7 +327,7 @@ class FamilyTestClass extends Assert {
 		return resultSet
 	}
 	
-	Execute_Father_Test() {
+	Hybrid_Reasoning_Test() {
 		local resultSet
 		
 		tests := [["father(?A, ?B)", ["father(Peter, Frank)", "father(Frank, Paul)", "father(Mara, Willy)"]]]
@@ -312,7 +338,7 @@ class FamilyTestClass extends Assert {
 		this.AssertEqual(true, resultSet.KnowledgeBase.Facts.getValue("Celebrated", false), "Fact Celebrated is missing...")
 	}
 	
-	Execute_GrandFather_Test() {
+	Script_Reasoning_Test() {
 		local resultSet
 		
 		tests := [["grandfather(?A, ?B)", ["grandfather(Peter, Paul)", "grandfather(Peter, Willy)"]]]
@@ -331,7 +357,7 @@ class FamilyTestClass extends Assert {
 		this.AssertEqual(true, resultSet.KnowledgeBase.Facts.getValue("Willy.grandfather", false), "Fact Willy.grandfather is missing...")
 	}
 	
-	Execute_Happiness_Test() {
+	Fact_Unification_Test() {
 		local resultSet
 		
 		compiler := new RuleCompiler()
@@ -403,45 +429,23 @@ showFacts(knowledgeBase) {
 	MsgBox % "Facts`n`n" . values2String("`n", message*)
 }
 
+setOccurCheck(knowledgeBase, enable) {
+	if enable
+		knowledgeBase.enableOccurCheck()
+	else
+		knowledgeBase.disableOccurCheck()
+}
+
+setDeterministicFacts(knowledgeBase, enable) {
+	if enable
+		knowledgeBase.enableDeterministicFacts()
+	else
+		knowledgeBase.disableDeterministicFacts()
+}
+
 AHKUnit.AddTestClass(CompilerTestClass)
 AHKUnit.AddTestClass(EngineTestClass)
-AHKUnit.AddTestClass(ListTestClass)
-AHKUnit.AddTestClass(FamilyTestClass)
+AHKUnit.AddTestClass(UnificationTestClass)
+AHKUnit.AddTestClass(HybridEngineTestClass)
+
 AHKUnit.Run()
-Exit
-
-
-/*
-CompilerTestClass.Compiler_Compile_Test()
-CompilerTestClass.Compiler_Identity_Test()
-exit
-*/
-
-/*
-**************************
-
-compiler := new RuleCompiler()
-		
-productions := false
-reductions := false
-
-compiler.compileRules(kExecutionTestRules, productions, reductions)
-
-engine := new RuleEngine(productions, reductions, {})
-
-engine.setTraceLevel(kTraceFull)
-
-goal := compiler.compileGoal("reverse(?R, [3, 2, 1])")
-
-rs := engine.prove(goal)
-
-if rs {
-	Loop {
-		MsgBox % "Result: " . goal.toString(rs)
-	} until !rs.nextResult()
-	
-	Msgbox Query exhausted
-}
-else
-	Msgbox Query failed
-*/

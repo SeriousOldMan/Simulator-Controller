@@ -34,10 +34,10 @@ SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
 ;;;-------------------------------------------------------------------------;;;
 
 global kCompilerTestRules
-				= ["persist(?A.grandchild, ?B) <= Call(showIt, ?A.grandchild, ?B), !, Set(?A.grandchild, true), Set(?B, grandfather), Produce()"
+				= ["persist(?A.grandchild, ?B) <= Call(showRelationship, ?A.grandchild, ?B), !, Set(?A.grandchild, true), Set(?B, grandfather), Produce()"
 				 , "reverse([1,2,3,4], ?L)"
 				 , "reverse([ ?H |?T ], ?REV )<= reverse(?T,?RT), concat(?RT,[?H],?REV)"
-				 , "Priority: 5, {Any: [?Peter.grandchild], [Predicate: ?Peter.son = true]} => (Set: Peter, happy), (Call: showIt, 1, 2), (Prove: father, maria, willy), (Call: showIt, 2, 1)"]
+				 , "Priority: 5, {Any: [?Peter.grandchild], [Predicate: ?Peter.son = true]} => (Set: Peter, happy), (Call: showRelationship, 1, 2), (Prove: father, maria, willy), (Call: showRelationship, 2, 1)"]
 
 kRules =
 (
@@ -52,7 +52,7 @@ kRules =
 				concat([], ?L, ?L)
 				concat([?H | ?T], ?L, [?H | ?R]) <= concat(?T, ?L, ?R)
 
-				persist(?A, ?B) <= Call(showIt, ?A, ?B), !, Set(?B.grandchild, ?A), Set(?B.grandfather, true), Set(?A.grandchild, true), Produce()
+				persist(?A, ?B) <= Call(showRelationship, ?A, ?B), !, Set(?B.grandchild, ?A), Set(?B.grandfather, true), Set(?A.grandchild, true), Produce()
 
 				father(Peter, Frank) <= Set(Peter.son, true), Produce()
 				father(Frank, Paul)
@@ -239,6 +239,9 @@ class ListTestClass extends Assert {
 				for index, result in test[2] {
 					this.AssertEqual(result, goal.toString(resultSet), "Unexpected result " . goal.toString(resultSet))
 					
+					if ((index == (test[2].Length() - 1)) && (test[2][index + 1] == "..."))
+						break
+					
 					this.AssertEqual(index < test[2].Length(), resultSet.nextResult(), "Unexpected remaining results...")
 				}
 			}
@@ -257,8 +260,8 @@ class ListTestClass extends Assert {
 	Execute_Reverse_Test() {
 		tests := [["reverse([1, 2, 3, 4], ?R)", ["reverse([1, 2, 3, 4], [4, 3, 2, 1])"]]
 				, ["reverse([], [])", ["reverse([], [])"]]
-				, ["reverse([1], ?R)", ["reverse([1], [1])"]]]
-;				, ["reverse(?R, [3, 2, 1])", ["reverse([1, 2, 3], [3, 2, 1])"]]]
+				, ["reverse([1], ?R)", ["reverse([1], [1])"]]
+				, ["reverse(?R, [3, 2, 1])", ["reverse([1, 2, 3], [3, 2, 1])", "..."]]]
 		
 		this.executeTests(tests)
 	}
@@ -378,7 +381,7 @@ celebrate(knowledgeBase) {
 	}
 }
 
-showIt(knowledgeBase, grandchild, grandfather) {
+showRelationship(knowledgeBase, grandchild, grandfather) {
 	local fact := "Related." . grandchild . "." . grandfather
 	
 	SplashTextOn 300, 100, , %grandchild% is grandchild of %grandfather%
@@ -389,6 +392,15 @@ showIt(knowledgeBase, grandchild, grandfather) {
 		knowledgeBase.Facts.addFact(fact , true)
 
 	return true
+}
+
+showFacts(knowledgeBase) {
+	message := []
+
+	for key, value in resultSet.KnowledgeBase.Facts.Facts
+		message.Push(key . " = " . value)
+		
+	MsgBox % "Facts`n`n" . values2String("`n", message*)
 }
 
 AHKUnit.AddTestClass(CompilerTestClass)
@@ -407,14 +419,6 @@ exit
 
 /*
 **************************
-Assertion Messages einbauen
-**************************
-
-
-				, ["reverse(?R, [3, 2, 1])", ["reverse([1, 2, 3], [3, 2, 1])"]]
-
-
-********************************************************
 
 compiler := new RuleCompiler()
 		
@@ -425,102 +429,19 @@ compiler.compileRules(kExecutionTestRules, productions, reductions)
 
 engine := new RuleEngine(productions, reductions, {})
 
-tests := [["concat([1], [], [1])", ["concat([1], [], [1])"]]
-				, ["concat([1, 2], [3, 4, 5], ?L)", ["concat([1, 2], [3, 4, 5], [1, 2, 3, 4, 5])"]]]
-		
+engine.setTraceLevel(kTraceFull)
 
-for ignore, test in tests {
-	goal := compiler.compileGoal(test[1])
-	
-	resultSet := engine.prove(goal)
-	hasValues := false
-	
-	for index, result in test[2] {
-		MsgBox % goal.toString(resultSet)
-		
-		hasValues := resultSet.nextResult()
-	}
-			
-	if hasValues
-		MsgBox % "OOps: " . goal.toString(resultSet)
-}
-msgbox here
-message := []
+goal := compiler.compileGoal("reverse(?R, [3, 2, 1])")
 
-for key, value in resultSet.KnowledgeBase.Facts.Facts
-	message.Push(key . " = " . value)
-	
-MsgBox % "Fakten`n`n" . values2String("`n", message*)
+rs := engine.prove(goal)
 
-exit
-
-engine.iTraceLevel := kTraceOff
-
-start := A_TickCount
-Loop 100 {
-resultSet := engine.prove(goal)
-}
-MsgBox % A_TickCount - start . " ms"
-
-if resultSet {
+if rs {
 	Loop {
-		MsgBox % "Result: " . goal.toString(resultSet)
-	} until !resultSet.nextResult()
+		MsgBox % "Result: " . goal.toString(rs)
+	} until !rs.nextResult()
 	
 	Msgbox Query exhausted
 }
 else
 	Msgbox Query failed
-	
-	
-message := []
-
-for key, value in resultSet.KnowledgeBase.Facts.Facts
-	message.Push(key . " = " . value)
-	
-MsgBox % "Fakten`n`n" . values2String("`n", message*)
-
-
-engine.iTraceLevel := kTraceOff
-
-goal := ["happy", "peter"]
-goal := theCompiler.parseGoal(goal)
-
-resultSet := resultSet.KnowledgeBase.prove(goal)
-
-if resultSet {
-	Loop {
-		MsgBox % "Result: " . goal.toString(resultSet)
-	} until !resultSet.nextResult()
-	
-	Msgbox Query exhausted
-}
-else
-	Msgbox Query failed
-	
-goal := ["reverse", "?A", "?B"]
-goal := theCompiler.parseGoal(goal)
-
-resultSet := resultSet.KnowledgeBase.prove(goal)
-
-if resultSet {
-	Loop {
-		MsgBox % "Result: " . goal.toString(resultSet)
-	} until !resultSet.nextResult()
-	
-	Msgbox Query exhausted
-}
-else
-	Msgbox Query failed
-
-
-		
-		message := []
-
-		for key, value in resultSet.KnowledgeBase.Facts.Facts
-			message.Push(key . " = " . value)
-			
-		MsgBox % "Fakten`n`n" . values2String("`n", message*)
-		
-		
 */

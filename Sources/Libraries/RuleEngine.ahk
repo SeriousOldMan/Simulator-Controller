@@ -1282,6 +1282,7 @@ class ResultSet {
 	}
 	
 	nextResult() {
+		local ruleEngine := this.RuleEngine
 		local choicePoint
 
 		if this.iExhausted
@@ -1294,16 +1295,23 @@ class ResultSet {
 				choicePoint := choicePoint.next()
 				
 				if choicePoint {
-					if (this.RuleEngine.TraceLevel <= kTraceMedium)
-						this.RuleEngine.trace(kTraceMedium, "Targeting " . choicePoint.Goal.toString(this))
+					if (ruleEngine.TraceLevel <= kTraceMedium)
+						ruleEngine.trace(kTraceMedium, "Targeting " . choicePoint.Goal.toString(this))
 				}
-				else
+				else {
+					if (ruleEngine.TraceLevel <= kTraceMedium)
+						ruleEngine.trace(kTraceMedium, "Query yields " . this.ChoicePoint.Goal.toString(this))
+					
 					return true
+				}
 			}
 			else {
 				choicePoint := choicePoint.previous()
 				
 				if !choicePoint {
+					if (ruleEngine.TraceLevel <= kTraceMedium)
+						ruleEngine.trace(kTraceMedium, "Query is exhausted")
+					
 					this.iExhausted := true
 					
 					return false

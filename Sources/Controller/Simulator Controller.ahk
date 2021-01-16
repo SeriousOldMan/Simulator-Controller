@@ -469,11 +469,9 @@ class SimulatorController extends ConfigurationItem {
 	}
 	
 	runningSimulator() {
-		local plugin
-		
-		for ignore, plugin in this.Plugins
-			if this.isActive(plugin) {
-				simulator := plugin.runningSimulator()
+		for ignore, thePlugin in this.Plugins
+			if this.isActive(thePlugin) {
+				simulator := thePlugin.runningSimulator()
 				
 				if (simulator != false)
 					return simulator
@@ -483,14 +481,11 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	simulatorStartup(simulator) {
-		local plugin
-		local buttonBox
+		local buttonBox := this.ButtonBox
 	
-		for ignore, plugin in this.Plugins
-			if this.isActive(plugin)
-				plugin.simulatorStartup(simulator)
-		
-		buttonBox := this.ButtonBox
+		for ignore, thePlugin in this.Plugins
+			if this.isActive(thePlugin)
+				thePlugin.simulatorStartup(simulator)
 		
 		if (buttonBox != false) {
 			buttonBox.hide()
@@ -499,14 +494,11 @@ class SimulatorController extends ConfigurationItem {
 	}
 	
 	simulatorShutdown() {
-		local plugin
-		local buttonBox
+		local buttonBox := this.ButtonBox
 		
-		for ignore, plugin in this.Plugins
-			if this.isActive(plugin) 
-				plugin.simulatorShutdown()
-		
-		buttonBox := this.ButtonBox
+		for ignore, thePlugin in this.Plugins
+			if this.isActive(thePlugin) 
+				thePlugin.simulatorShutdown()
 		
 		if (buttonBox != false) {
 			buttonBox.hide()

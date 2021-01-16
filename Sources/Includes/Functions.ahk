@@ -715,6 +715,8 @@ normalizeFilePath(filePath) {
 }
 
 substituteVariables(string, values := false) {
+	local variable
+	
 	result := string
 	
 	Loop {

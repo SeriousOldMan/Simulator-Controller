@@ -9,7 +9,16 @@
 ;;;                       Global Declaration Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-; #Warn ClassOverwrite, Off
+#SingleInstance Force			; Ony one instance allowed
+#NoEnv							; Recommended for performance and compatibility with future AutoHotkey releases.
+#Warn							; Enable warnings to assist with detecting common errors.
+#Warn LocalSameAsGlobal, Off
+
+SendMode Input					; Recommended for new scripts due to its superior speed and reliability.
+SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
+
+; SetBatchLines -1				; Maximize CPU utilization
+; ListLines Off					; Disable execution history
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -32,6 +41,9 @@ global kCompilerTestRules
 
 kRules =
 (
+				oc(?Y) <= eq(?Y, f(?Y))
+				eq(?A, ?A)
+				
 				reverse([], [])
 				reverse([?H | ?T], ?REV) <= reverse(?T, ?RT), concat(?RT, [?H], ?REV)
 
@@ -49,9 +61,6 @@ kRules =
 
 				grandfather(?A, ?B) <= father(?A, ?C), father(?C, ?B), persist(?A, ?B)
 				grandfather(?A, ?B) <= mother(?A, ?C), father(?C, ?B), persist(?A, ?B)
-				
-				oc(?Y) <= eq(?Y, f(?Y))
-				eq(?A, ?A)
 
 				happy(Peter) <= mood(!Peter)
 				unhappy(Peter) <= mood(!Peter), !, fail
@@ -97,8 +106,8 @@ class CompilerTestClass extends Assert {
 		reductions := false
 		text := ""
 		
-		for ignore, rule in kCompilerTestRules
-			text := (text . rule . "`n")
+		for ignore, theRule in kCompilerTestRules
+			text := (text . theRule . "`n")
 		
 		compiler.compileRules(text, productions, reductions)
 		
@@ -109,11 +118,11 @@ class CompilerTestClass extends Assert {
 	Compiler_Identity_Test() {
 		compiler := new RuleCompiler()
 		
-		for ignore, rule in kCompilerTestRules {
-			compiledRule := compiler.compileRule(rule)
+		for ignore, theRule in kCompilerTestRules {
+			compiledRule := compiler.compileRule(theRule)
 			
 			this.AssertEqual(this.removeWhiteSpace(compiledRule.toString()
-						   , this.substitutePredicate(this.substituteBoolean(this.removeWhiteSpace(rule)))))
+						   , this.substitutePredicate(this.substituteBoolean(this.removeWhiteSpace(theRule)))))
 			
 			newCompiledRule := compiler.compileRule(compiledRule.toString())
 			
@@ -122,8 +131,57 @@ class CompilerTestClass extends Assert {
 	}
 }
 
+class EngineTestClass extends Assert {
+	Execute_OccurCheck_Test() {
+		local resultSet
+		
+		compiler := new RuleCompiler()
+		
+		productions := false
+		reductions := false
+		
+		compiler.compileRules(kExecutionTestRules, productions, reductions)
+		
+		engine := new RuleEngine(productions, reductions, {})
+		kb := engine.createKnowledgeBase(engine.createFacts(), engine.createRules())
+		
+		Loop 1 {
+			if (A_Index == 1) {
+				tests := [["oc(?R)", []]]
+				
+				kb.enableOccurCheck()
+			}
+			else {
+				tests := [["oc(?R)", ["oc(f(?R))"]]]
+				
+				kb.disableOccurCheck()
+			}
+			
+			for ignore, test in tests {
+				goal := compiler.compileGoal(test[1])
+				
+				resultSet := kb.prove(goal)
+				
+				if (test[2].Length() > 0) {
+					this.AssertEqual(true, (resultSet != (A_Index == 2)))
+				
+					for index, result in test[2] {
+						this.AssertEqual(result, goal.toString(resultSet))
+						
+						this.AssertEqual(true, resultSet.nextResult())
+					}
+				}
+				else
+					this.AssertEqual(true, (resultSet == false))
+			}
+		}
+	}
+}
+
 class ListTestClass extends Assert {
 	executeTests(tests) {
+		local resultSet
+		
 		compiler := new RuleCompiler()
 		
 		productions := false
@@ -134,15 +192,11 @@ class ListTestClass extends Assert {
 		engine := new RuleEngine(productions, reductions, {})
 		kb := engine.createKnowledgeBase(engine.createFacts(), engine.createRules())
 			
-		kb.enableOccurCheck()
-		
 		for ignore, test in tests {
 			goal := compiler.compileGoal(test[1])
 			
 			resultSet := kb.prove(goal)
 			
-			if (goal.toString() = "oc(?B)")
-				MsgBox % goal.toString(resultSet)
 			if (test[2].Length() > 0) {
 				this.AssertEqual(true, (resultSet != false))
 			
@@ -155,8 +209,6 @@ class ListTestClass extends Assert {
 			else
 				this.AssertEqual(false, (resultSet != false))
 		}
-		
-		return resultSet
 	}
 	
 	Execute_Concat_Test() {
@@ -169,8 +221,8 @@ class ListTestClass extends Assert {
 	Execute_Reverse_Test() {
 		tests := [["reverse([1, 2, 3, 4], ?R)", ["reverse([1, 2, 3, 4], [4, 3, 2, 1])"]]
 				, ["reverse([], [])", ["reverse([], [])"]]
-				, ["reverse([1], ?R)", ["reverse([1], [1])"]]
-				, ["oc(?B)", []]]
+				, ["reverse([1], ?R)", ["reverse([1], [1])"]]]
+;				, ["reverse(?R, [3, 2, 1])", ["reverse([1, 2, 3], [3, 2, 1])"]]]
 		
 		this.executeTests(tests)
 	}
@@ -178,6 +230,8 @@ class ListTestClass extends Assert {
 
 class FamilyTestClass extends Assert {
 	executeTests(tests) {
+		local resultSet
+		
 		compiler := new RuleCompiler()
 		
 		productions := false
@@ -209,6 +263,8 @@ class FamilyTestClass extends Assert {
 	}
 	
 	Execute_Father_Test() {
+		local resultSet
+		
 		tests := [["father(?A, ?B)", ["father(Peter, Frank)", "father(Frank, Paul)", "father(Mara, Willy)"]]]
 		
 		resultSet := this.executeTests(tests)
@@ -218,6 +274,8 @@ class FamilyTestClass extends Assert {
 	}
 	
 	Execute_GrandFather_Test() {
+		local resultSet
+		
 		tests := [["grandfather(?A, ?B)", ["grandfather(Peter, Paul)", "grandfather(Peter, Willy)"]]]
 		
 		resultSet := this.executeTests(tests)
@@ -235,6 +293,8 @@ class FamilyTestClass extends Assert {
 	}
 	
 	Execute_Happiness_Test() {
+		local resultSet
+		
 		compiler := new RuleCompiler()
 		
 		tests := [["grandfather(?A, ?B)", ["grandfather(Peter, Paul)", "grandfather(Peter, Willy)"]],
@@ -283,13 +343,11 @@ celebrate(knowledgeBase) {
 }
 
 showIt(knowledgeBase, grandchild, grandfather) {
-	local fact
+	local fact := "Related." . grandchild . "." . grandfather
 	
 	SplashTextOn 300, 100, , %grandchild% is grandchild of %grandfather%
 	Sleep 1000
 	SplashTextOff
-	
-	fact := "Related." . grandchild . "." . grandfather
 	
 	if !knowledgeBase.Facts.hasFact(fact)
 		knowledgeBase.Facts.addFact(fact , true)
@@ -298,20 +356,30 @@ showIt(knowledgeBase, grandchild, grandfather) {
 }
 
 AHKUnit.AddTestClass(CompilerTestClass)
+AHKUnit.AddTestClass(EngineTestClass)
 AHKUnit.AddTestClass(ListTestClass)
 AHKUnit.AddTestClass(FamilyTestClass)
 AHKUnit.Run()
+Exit
+
+
+/*
+CompilerTestClass.Compiler_Compile_Test()
+CompilerTestClass.Compiler_Identity_Test()
 exit
-	
+*/
+
 /*
 **************************
 Assertion Messages einbauen
 **************************
 
+deterministic checks testen
 
 				, ["reverse(?R, [3, 2, 1])", ["reverse([1, 2, 3], [3, 2, 1])"]]
 
 
+********************************************************
 
 compiler := new RuleCompiler()
 		

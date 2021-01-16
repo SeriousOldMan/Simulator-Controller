@@ -855,12 +855,10 @@ global pluginUpdateButton
 class PluginsTab extends ConfigurationItemList {
 	Plugins[] {
 		Get {
-			local plugin
-			
 			result := []
 			
-			for index, plugin in this.iItemsList
-				result.Push(plugin[2])
+			for index, thePlugin in this.iItemsList
+				result.Push(thePlugin[2])
 				
 			return result
 		}
@@ -904,15 +902,11 @@ class PluginsTab extends ConfigurationItemList {
 	}
 		
 	saveToConfiguration(configuration) {
-		local plugin
-		
-		for ignore, plugin in this.iItemsList
-			plugin.saveToConfiguration(configuration)
+		for ignore, thePlugin in this.iItemsList
+			thePlugin.saveToConfiguration(configuration)
 	}
 	
 	updateState() {
-		local plugin
-		
 		base.updateState()
 		
 		if (this.iCurrentItemIndex != 0) {
@@ -940,7 +934,6 @@ class PluginsTab extends ConfigurationItemList {
 	
 	loadList(items) {
 		static first := true
-		local plugin
 		
 		Gui ListView, % this.ListHandle
 	
@@ -948,11 +941,11 @@ class PluginsTab extends ConfigurationItemList {
 		
 		bubbleSort(items, "comparePlugins")
 	
-		for ignore, plugin in items {
-			name := plugin.Plugin
-			active := plugin.Active
+		for ignore, thePlugin in items {
+			name := thePlugin.Plugin
+			active := thePlugin.Active
 			
-			LV_Add("", plugin.Active ? ((name = translate("System")) ? translate("Always") : translate("Yes")) : translate("No")	, name, values2String(", ", plugin.Simulators*), plugin.Arguments[true])
+			LV_Add("", thePlugin.Active ? ((name = translate("System")) ? translate("Always") : translate("Yes")) : translate("No")	, name, values2String(", ", thePlugin.Simulators*), thePlugin.Arguments[true])
 		}
 		
 		if first {
@@ -1038,15 +1031,13 @@ global applicationUpdateButton
 class ApplicationsTab extends ConfigurationItemList {
 	Applications[types := false] {
 		Get {
-			local application
-			
 			result := []
 			
-			for index, application in this.iItemsList
+			for index, theApplication in this.iItemsList
 				if !types
-					result.Push(application[2])
-				else if inList(types, application[1])
-					result.Push(application[2])
+					result.Push(theApplication[2])
+				else if inList(types, theApplication[1])
+					result.Push(theApplication[2])
 				
 			return result
 		}
@@ -1110,14 +1101,12 @@ class ApplicationsTab extends ConfigurationItemList {
 	}
 		
 	saveToConfiguration(configuration) {
-		local application
-	
 		count := 0
 		lastType := ""
 		
-		for index, application in this.iItemsList {
-			type := application[1]
-			application := application[2]
+		for index, theApplication in this.iItemsList {
+			type := theApplication[1]
+			theApplication := theApplication[2]
 			
 			if (type != lastType) {
 				count := 1
@@ -1129,21 +1118,19 @@ class ApplicationsTab extends ConfigurationItemList {
 			types := ["Core", "Feedback", "Other"]
 			
 			setConfigurationValue(configuration, "Applications"
-								, ConfigurationItem.descriptor(types[inList(map(types, "translate"), type)], count), application.Application)
+								, ConfigurationItem.descriptor(types[inList(map(types, "translate"), type)], count), theApplication.Application)
 		
-			application.saveToConfiguration(configuration)
+			theApplication.saveToConfiguration(configuration)
 		}
 	}
 	
 	updateState() {
-		local application
-		
 		base.updateState()
 		
 		if (this.iCurrentItemIndex != 0) {
-			application := this.iItemsList[this.iCurrentItemIndex]
+			theApplication := this.iItemsList[this.iCurrentItemIndex]
 			
-			type := application[1]
+			type := theApplication[1]
 			
 			if (type != translate("Other")) {
 				GuiControl Disable, applicationNameEdit
@@ -1165,17 +1152,16 @@ class ApplicationsTab extends ConfigurationItemList {
 	
 	loadList(items) {
 		static first := true
-		local application
 		
 		Gui ListView, % this.ListHandle
 	
 		LV_Delete()
 		
-		for index, application in items {
-			type := application[1]
-			application := application[2]
+		for index, theApplication in items {
+			type := theApplication[1]
+			theApplication := theApplication[2]
 			
-			LV_Add("", type, application.Application, application.ExePath, application.WindowTitle, application.WorkingDirectory)
+			LV_Add("", type, theApplication.Application, theApplication.ExePath, theApplication.WindowTitle, theApplication.WorkingDirectory)
 		}
 		
 		if first {
@@ -1190,15 +1176,15 @@ class ApplicationsTab extends ConfigurationItemList {
 	}
 	
 	loadEditor(item) {
-		local application := item[2]
+		theApplication := item[2]
 		
-		applicationNameEdit := application.Application
-		applicationExePathEdit := application.ExePath
-		applicationWorkingDirectoryPathEdit := application.WorkingDirectory
-		applicationWindowTitleEdit := application.WindowTitle
-		applicationStartupEdit := (application.SpecialStartup ? application.SpecialStartup : "")
-		applicationShutdownEdit := (application.SpecialShutdown ? application.SpecialShutdown : "")
-		applicationIsRunningEdit := (application.SpecialIsRunning ? application.SpecialIsRunning : "")
+		applicationNameEdit := theApplication.Application
+		applicationExePathEdit := theApplication.ExePath
+		applicationWorkingDirectoryPathEdit := theApplication.WorkingDirectory
+		applicationWindowTitleEdit := theApplication.WindowTitle
+		applicationStartupEdit := (theApplication.SpecialStartup ? theApplication.SpecialStartup : "")
+		applicationShutdownEdit := (theApplication.SpecialShutdown ? theApplication.SpecialShutdown : "")
+		applicationIsRunningEdit := (theApplication.SpecialIsRunning ? theApplication.SpecialIsRunning : "")
 		
 		GuiControl Text, applicationNameEdit, %applicationNameEdit%
 		GuiControl Text, applicationExePathEdit, %applicationExePathEdit%
@@ -1430,10 +1416,8 @@ class FunctionsList extends ConfigurationItemList {
 	}
 		
 	saveToConfiguration(configuration) {
-		local function
-		
-		for ignore, function in this.iItemsList
-			function.saveToConfiguration(configuration)
+		for ignore, theFunction in this.iItemsList
+			theFunction.saveToConfiguration(configuration)
 	}
 	
 	updateState() {
@@ -1475,7 +1459,6 @@ class FunctionsList extends ConfigurationItemList {
 	
 	loadList(items) {
 		static first := true
-		local function
 		
 		Gui ListView, % this.ListHandle
 	
@@ -1489,13 +1472,13 @@ class FunctionsList extends ConfigurationItemList {
 			if (++round > 2)
 				break
 				
-			for qualifier, function in this.iFunctions 
-				if (((round == 1) && (function.Type != kCustomType)) || ((round == 2) && (function.Type == kCustomType))) {
+			for qualifier, theFunction in this.iFunctions 
+				if (((round == 1) && (theFunction.Type != kCustomType)) || ((round == 2) && (theFunction.Type == kCustomType))) {
 					hotkeysAndActions := ""
 
-					for index, trigger in function.Trigger {
-						hotkeys := function.Hotkeys[trigger, true]
-						action := function.Actions[trigger, true]
+					for index, trigger in theFunction.Trigger {
+						hotkeys := theFunction.Hotkeys[trigger, true]
+						action := theFunction.Actions[trigger, true]
 						
 						nextHKA := this.computeHotkeysAndActionText(hotkeys, action)
 						
@@ -1505,9 +1488,9 @@ class FunctionsList extends ConfigurationItemList {
 						hotkeysAndActions := hotkeysAndActions . nextHKA
 					}
 						
-					LV_Add("", translate(this.computeFunctionType(function.Type)), function.Number, hotkeysAndActions)
+					LV_Add("", translate(this.computeFunctionType(theFunction.Type)), theFunction.Number, hotkeysAndActions)
 					
-					this.iItemsList.Push(function)
+					this.iItemsList.Push(theFunction)
 				}
 		}
 		

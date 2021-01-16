@@ -6,13 +6,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                       Global Declaration Section                        ;;;
-;;;-------------------------------------------------------------------------;;;
-
-; #Warn ClassOverwrite, Off
-
-
-;;;-------------------------------------------------------------------------;;;
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -99,8 +92,8 @@ class CompositeCondition extends Condition {
 	toString(facts := "__NotInitialized__") {
 		conditions := []
 		
-		for ignore, condition in this.Conditions
-			conditions.Push(condition.toString(facts))
+		for ignore, theCondition in this.Conditions
+			conditions.Push(theCondition.toString(facts))
 			
 		return values2String(", ", conditions*)
 	}
@@ -128,8 +121,8 @@ class ExistQuantor extends Quantor {
     }
 	
 	match(facts) {
-		for ignore, condition in this.Conditions
-			if condition.match(facts)
+		for ignore, theCondition in this.Conditions
+			if theCondition.match(facts)
 				return true
 				
 		return false
@@ -148,8 +141,8 @@ class NotExistQuantor extends Quantor {
     }
 	
 	match(facts) {
-		for ignore, condition in this.Conditions
-			if condition.match(facts)
+		for ignore, theCondition in this.Conditions
+			if theCondition.match(facts)
 				return false
 				
 		return true
@@ -170,8 +163,8 @@ class OneQuantor extends Quantor {
 	match(facts) {
 		matched := 0
 		
-		for ignore, condition in this.Conditions
-			if condition.match(facts)
+		for ignore, theCondition in this.Conditions
+			if theCondition.match(facts)
 				matched += 1
 				
 		return (matched == 1)
@@ -192,8 +185,8 @@ class AllQuantor extends Quantor {
 	match(facts) {
 		matched := 0
 		
-		for ignore, condition in this.Conditions
-			if condition.match(facts)
+		for ignore, theCondition in this.Conditions
+			if theCondition.match(facts)
 				matched += 1
 				
 		return (matched == this.Conditions.Length())
@@ -343,8 +336,8 @@ class Variable extends Primary {
 	getValue(factsOrResultSet, default := "__NotInitialized__") {
 		value := factsOrResultSet.getValue((factsOrResultSet.base == Facts) ? this : this.iRootVariable)
 	
-		if (IsObject(value) && ((value.base == Variable) || (value.base == Literal)))
-			value := value.getValue(factsOrResultSet)
+		if (IsObject(value) && ((value.base == Variable) || (value.base == Literal) || (value.base == Fact)))
+			value := value.getValue(factsOrResultSet, value)
 					
 		if (value != kNotInitialized)
 			return value
@@ -367,12 +360,10 @@ class Variable extends Primary {
 		if variables.HasKey(var)
 			return variables[var]	
 		else {
-			if (property != "")
-				rootVariable := this.RootVariable.substituteVariables(variables)
+			if (property == "")
+				newVariable := new Variable(var)
 			else
-				rootVariable := false
-			
-			newVariable := ((property = "") ? new Variable(var) : new Variable(this.Variable, property, rootVariable))
+				newVariable := new Variable(this.Variable, property, this.RootVariable.substituteVariables(variables))
 			
 			variables[var] := newVariable
 
@@ -390,17 +381,28 @@ class Variable extends Primary {
 		if (factsOrResultSet == kNotInitialized)
 			return ("?" . name . ((property != "") ? ("." . property) : ""))
 		else {
-			value := this.RootVariable.getValue(factsOrResultSet)
+			root := this.RootVariable
+			value := root.getValue(factsOrResultSet)
 			
 			if (value == kNotInitialized)
-				return "?" . name . ((property != "") ? ("." . property) : "")
+				return "?" . name . ((property != "") ? ("." . property) : "") ; . " (" . &root . ")"
 			else
 				return value.toString(factsOrResultSet) . ((property != "") ? ("." . property) : "")
 		}
 	}
 	
 	occurs(resultSet, var) {
-		return (this.RootVariable.getValue(resultSet, this.RootVariable) == var.RootVariable)	
+		local ruleEngine := resultSet.KnowledgeBase.RuleEngine
+		
+		if (ruleEngine.TraceLevel <= kTraceFull)
+			ruleEngine.trace(kTraceMedium, "Check whether " . var.toString() . " occurs in " . this.toString(resultSet))
+		
+		v1 := this.RootVariable.getValue(resultSet, this.RootVariable)
+		
+		if (ruleEngine.TraceLevel <= kTraceFull)
+			ruleEngine.trace(kTraceMedium, "Occur " . v1.toString() . " " . var.toString())
+			
+		return (v1 == var)	
 	}
 }
 
@@ -561,7 +563,7 @@ class CallAction extends Action {
 		values := []
 		
 		for ignore, argument in this.Arguments
-			values.Push(argument.getValue(facts))
+			values.Push(argument.getValue(facts, argument))
 		
 		return values
 	}
@@ -700,8 +702,12 @@ class ClearFactAction extends Action {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class Term {
-	getValue(resultSet, default := "__NotInitialized__") {
+	getValue(factsOrResultSet, default := "__NotInitialized__") {
 		return this
+	}
+	
+	toString(factsOrResultSet := "__NotInitialized__") {
+		Throw "Virtual method Term.toString must be implemented in a subclass..."
 	}
 	
 	injectValues(resultSet) {
@@ -721,6 +727,11 @@ class Term {
 	}
 	
 	occurs(resultSet, var) {
+		local ruleEngine := resultSet.KnowledgeBase.RuleEngine
+		
+		if (ruleEngine.TraceLevel <= kTraceFull)
+			ruleEngine.trace(kTraceMedium, "Check whether " . var.toString() . " occurs in " . this.toString(resultSet))
+			
 		return false
 	}
 }
@@ -766,7 +777,7 @@ class Compound extends Term {
 	
 	toString(resultSet := "__NotInitialized__") {
 		arguments := []
-		
+			
 		for ignore, argument in this.Arguments
 			arguments.Push(argument.toString(resultSet))
 			
@@ -777,7 +788,7 @@ class Compound extends Term {
 		values := []
 		
 		for ignore, argument in this.Arguments
-			values.Push(argument.getValue(resultSet))
+			values.Push(argument.getValue(resultSet, argument))
 			
 		return values
 	}
@@ -795,7 +806,7 @@ class Compound extends Term {
 		for ignore, argument in this.Arguments
 			if argument.hasVariables()
 				return true
-				
+
 		return false
 	}
 	
@@ -827,8 +838,13 @@ class Compound extends Term {
 	}
 	
 	occurs(resultSet, var) {
+		local ruleEngine := resultSet.KnowledgeBase.RuleEngine
+		
+		if (ruleEngine.TraceLevel <= kTraceFull)
+			ruleEngine.trace(kTraceMedium, "Check whether " . var.toString() . " occurs in " . this.toString(resultSet))
+			
 		for ignore, argument in this.Arguments
-			if argument.getValue(resultSet, argument).occurs(var)
+			if argument.getValue(resultSet, argument).occurs(resultSet, var)
 				return true
 				
 		return false
@@ -953,10 +969,15 @@ class Pair extends Term {
 	}
 	
 	occurs(resultSet, var) {
+		local ruleEngine := resultSet.KnowledgeBase.RuleEngine
+		
+		if (ruleEngine.TraceLevel <= kTraceFull)
+			ruleEngine.trace(kTraceMedium, "Check whether " . var.toString() . " occurs in " . this.toString(resultSet))
+			
 		leftTerm := this.LeftTerm
 		rightTerm := this.RightTerm
 		
-		return (leftTerm.getValue(resultSet, leftTerm).occurs(var) || rightTerm.getValue(resultSet, rightTerm).occurs(var))
+		return (leftTerm.getValue(resultSet, leftTerm).occurs(resultSet, var) || rightTerm.getValue(resultSet, rightTerm).occurs(resultSet, var))
 	}
 }
 
@@ -1031,8 +1052,8 @@ class ProductionRule extends Rule {
 	}
 	
 	match(facts) {
-		for ignore, condition in this.Conditions
-			if !condition.match(facts)
+		for ignore, theCondition in this.Conditions
+			if !theCondition.match(facts)
 				return false
 				
 		return true
@@ -1042,8 +1063,8 @@ class ProductionRule extends Rule {
 		if (knowledgeBase.RuleEngine.TraceLevel <= kTraceLight)
 			knowledgeBase.RuleEngine.trace(kTraceLight, "Firing rule " . this.toString())
 		
-		for ignore, action in this.Actions
-			action.execute(knowledgeBase)
+		for ignore, theAction in this.Actions
+			theAction.execute(knowledgeBase)
 	}
 	
 	produce(knowledgeBase) {
@@ -1064,11 +1085,11 @@ class ProductionRule extends Rule {
 		conditions := ((priority != 0) ? ["Priority: " . priority] : [])
 		actions := []
 		
-		for ignore, condition in this.Conditions
-			conditions.Push(condition.toString(facts))
+		for ignore, theCondition in this.Conditions
+			conditions.Push(theCondition.toString(facts))
 		
-		for ignore, action in this.Actions
-			actions.Push(action.toString(facts))
+		for ignore, theAction in this.Actions
+			actions.Push(theAction.toString(facts))
 			
 		return values2String(", ", conditions*) . " => " . values2String(", ", actions*)
 	}
@@ -1103,7 +1124,7 @@ class ReductionRule extends Rule {
 	
 	__New(head, tail) {
 		this.iHead := head
-		this.Tail := tail
+		this.iTail := tail
 		this.iHasVariables := this.hasVariables()
 	}
 	
@@ -1113,8 +1134,8 @@ class ReductionRule extends Rule {
 		if (tail && (tail.Length() > 0)) {
 			terms := []
 			
-			for ignore, term in tail
-				terms.Push(term.toString(resultSet))
+			for ignore, theTerm in tail
+				terms.Push(theTerm.toString(resultSet))
 				
 			return (this.Head.toString(resultSet) . " <= " . values2String(", ", terms*))
 		}
@@ -1123,11 +1144,14 @@ class ReductionRule extends Rule {
 	}
 	
 	hasVariables() {
-		for ignore, term in this.Tail
-			if term.hasVariables()
+		if this.Head.hasVariables()
+			return true
+			
+		for ignore, theTerm in this.Tail
+			if theTerm.hasVariables()
 				return true
 				
-		return this.Head.hasVariables()
+		return false
 	}
 	
 	substituteVariables() {
@@ -1135,8 +1159,8 @@ class ReductionRule extends Rule {
 			variables := {}
 			terms := []
 			
-			for ignore, term in this.Tail
-				terms.Push(term.substituteVariables(variables))
+			for ignore, theTerm in this.Tail
+				terms.Push(theTerm.substituteVariables(variables))
 				
 			return new ReductionRule(this.Head.substituteVariables(variables), terms)
 		}
@@ -1170,6 +1194,7 @@ class ResultSet {
 	
 	RuleEngine[] {
 		Get {
+			ListLines
 			return this.KnowledgeBase.RuleEngine
 		}
 	}
@@ -1238,7 +1263,7 @@ class ResultSet {
 				return false
 			
 			if (this.RuleEngine.TraceLevel <= kTraceFull)
-				this.RuleEngine.trace(kTraceFull, "Binding " . termA.toString() . " to " . termB.toString())
+				this.RuleEngine.trace(kTraceFull, "Binding " . termA.toString(this) . " to " . termB.toString(this))
 			
 			this.setVariable(choicePoint, termA, termB)
 		}
@@ -1289,21 +1314,42 @@ class ResultSet {
 	}
 	
 	getValue(var, default := "__NotInitialized__") {
+		local ruleEngine := this.RuleEngine
 		bindings := this.iBindings
+		
+		last := default
 		
 		Loop {
 			var := var.RootVariable
 			
+			if (ruleEngine.TraceLevel <= kTraceFull)
+				ruleEngine.trace(kTraceFull, "Look for value of " . var.toString()) ; . "(" . &var . ")")
+			
 			if bindings.HasKey(var) {
 				value := bindings[var]
 				
-				if (value.base == Variable)
+				if (value.base == Variable) {
+					root := value.RootVariable
+					
+					if (ruleEngine.TraceLevel <= kTraceFull)
+						ruleEngine.trace(kTraceFull, "Found variable " . value.toString()) ; . "(" . &root . ")")
+						
+					last := value
 					var := value
-				else
+				}
+				else {
+					if (ruleEngine.TraceLevel <= kTraceFull)
+						ruleEngine.trace(kTraceFull, "Found term " . value.toString()) ; . "(" . &value . ")")
+					
 					return value
+				}
 			}
-			else
-				return default
+			else {
+				if (ruleEngine.TraceLevel <= kTraceFull)
+					ruleEngine.trace(kTraceFull, "Unbound - return " . (IsObject(last) ? last.toString() : last))
+				
+				return last
+			}
 		}
 	}
 	
@@ -1458,6 +1504,7 @@ class RulesChoicePoint extends ChoicePoint {
 	}
 	
 	nextChoice() {
+		local rule
 		local resultSet
 		
 		reductions := this.Reductions[this.iNextRuleIndex == 1]
@@ -1497,17 +1544,16 @@ class RulesChoicePoint extends ChoicePoint {
 	
 	addSubChoicePoints(goals) {
 		local choicePoint
-		local goal
 		
 		this.iSubChoicePoints := []
 
 		previous := this
 		
-		for ignore, goal in goals {
-			choicePoint := this.ResultSet.createChoicePoint(goal, this)
+		for ignore, theGoal in goals {
+			choicePoint := this.ResultSet.createChoicePoint(theGoal, this)
 		
 			if (this.RuleEngine.TraceLevel <= kTraceMedium)
-				this.RuleEngine.trace(kTraceMedium, "Pushing subgoal " . goal.toString(this.ResultSet))
+				this.RuleEngine.trace(kTraceMedium, "Pushing subgoal " . theGoal.toString(this.ResultSet))
 			
 			this.iSubChoicePoints.Push(choicePoint)
 			
@@ -1518,8 +1564,8 @@ class RulesChoicePoint extends ChoicePoint {
 	}
 	
 	removeSubChoicePoints() {
-		for ignore, choicePoint in this.iSubChoicePoints
-			choicePoint.remove()
+		for ignore, theChoicePoint in this.iSubChoicePoints
+			theChoicePoint.remove()
 	}
 	
 	reset() {
@@ -1634,11 +1680,11 @@ class CallChoicePoint extends ChoicePoint {
 			values := []
 			function := false
 			
-			for index, term in this.Goal.Arguments
+			for index, theTerm in this.Goal.Arguments
 				if (index == 1)
-					function := term.getValue(resultSet).toString(resultSet)
+					function := theTerm.getValue(resultSet).toString(resultSet)
 				else
-					values.Push(term.getValue(resultSet).toString(resultSet))
+					values.Push(theTerm.getValue(resultSet).toString(resultSet))
 			
 			if (resultSet.RuleEngine.TraceLevel <= kTraceMedium)
 				resultSet.KnowledgeBase.RuleEngine.trace(kTraceMedium, "Call " . function . "(" . values2String(", ", values*) . ")")
@@ -1775,8 +1821,8 @@ class KnowledgeBase {
 			generation := this.Facts.Generation
 			produced := false
 			
-			for ignore, rule in this.Rules.Productions
-				if rule.produce(this) {
+			for ignore, theRule in this.Rules.Productions
+				if theRule.produce(this) {
 					if (generation != this.Facts.Generation) {
 						produced := true
 							
@@ -1969,12 +2015,14 @@ class Rules {
 	}
 	
 	addRule(rule) {
+		local rules
+		
 		if (rule.Type == kProduction) {
 			priority := rule.Priority
 			rules := this.Productions
 			
-			for index, rule in rules
-				if (priority > rule.Priority) {
+			for index, candidate in rules
+				if (priority > candidate.Priority) {
 					rules.InsertAt(index, rule)
 					this.iGeneration += 1
 					
@@ -1990,6 +2038,8 @@ class Rules {
 	}
 	
 	removeRule(rule) {
+		local rules
+		
 		if (rule.Type == kProduction)
 			rules := this.Productions
 		else
@@ -2081,9 +2131,13 @@ class RuleEngine {
 		return new ResultSet(knowledgeBase, goal)
 	}
 	
+	setTraceLevel(traceLevel) {
+		this.iTraceLevel := traceLevel
+	}
+	
 	trace(traceLevel, message) {
 		if (this.iTraceLevel <= traceLevel)
-			logMessage(traceLevel, message)
+			logMessage(traceLevel, "RuleEngine: " . message)
 	}
 }
 
@@ -2131,7 +2185,9 @@ class RuleCompiler {
 	}
 	
 	compileGoal(text) {
-		return this.createCompoundParser(reduction).parse(this.readHead(text, 1))
+		goal := this.readHead(text, 1)
+		
+		return this.createCompoundParser(goal).parse(goal)
 	}
 	
 	readReduction(text) {
@@ -2423,8 +2479,8 @@ class RuleCompiler {
 	parseProductions(rules) {
 		result := []
 		
-		for ignore, rule in rules
-			result.Push(this.parseProduction(rule))
+		for ignore, theRule in rules
+			result.Push(this.parseProduction(theRule))
 			
 		return result
 	}
@@ -2436,8 +2492,8 @@ class RuleCompiler {
 	parseReductions(rules) {
 		result := []
 		
-		for ignore, rule in rules
-			result.Push(this.parseReduction(rule))
+		for ignore, theRule in rules
+			result.Push(this.parseReduction(theRule))
 			
 		return result
 	}
@@ -2584,6 +2640,7 @@ class RuleParser extends Parser {
 class ProductionRuleParser extends RuleParser {
 	parse(rule) {
 		parseActions := false
+		parsePriority := false
 		conditions := []
 		actions := []
 		priority := 0
@@ -2622,26 +2679,25 @@ class ReductionRuleParser extends RuleParser {
 		if (rule.Length() > 1) {
 			if (rule[2] != "<=")
 				Throw "Syntax error detected in reduction rule """ . rule.toString() . """ in ReductionRuleParser.parse..."
-			else
-				;try {
+			else {
+				try {
 					tail := this.parseTail(rule, 3)
-				/*
 				}
 				catch exception {
 					Throw "Syntax error detected in reduction rule """ . rule.toString() . """ in ReductionRuleParser.parse..."
 				}
-				*/
+			}
 		}
 		
 		return new ReductionRule(head, tail)
 	}
 	
 	parseTail(terms, start) {
-		result := []
+		result := []	
 		
-		for index, term in terms
+		for index, theTerm in terms
 			if (index >= start)
-				result.Push(this.Compiler.createTermParser(term, this.Variables, false).parse(term))
+				result.Push(this.Compiler.createTermParser(theTerm, this.Variables, false).parse(theTerm))
 				
 		return result
 	}
@@ -2670,9 +2726,9 @@ class ConditionParser extends Parser {
 	parseArguments(conditions, start) {
 		result := []
 		
-		for index, condition in conditions
+		for index, theCondition in conditions
 			if (index >= start)
-				result.Push(this.Compiler.createConditionParser(condition, this.Variables).parse(condition))
+				result.Push(this.Compiler.createConditionParser(theCondition, this.Variables).parse(theCondition))
 				
 		return result
 	}
@@ -2714,7 +2770,8 @@ class PrimaryParser extends Parser {
 
 class ActionParser extends Parser {
 	parse(expressions) {
-		action := expressions[1]
+		local action := expressions[1]
+		
 		argument := this.Compiler.createPrimaryParser(expressions[2], this.Variables).parse(expressions[2])
 		
 		switch action {
@@ -2754,9 +2811,9 @@ class CompoundParser extends Parser {
 	parseArguments(terms, start) {
 		result := []
 		
-		for index, term in terms
+		for index, theTerm in terms
 			if (index >= start)
-				result.Push(this.Compiler.createTermParser(term, this.Variables).parse(term))
+				result.Push(this.Compiler.createTermParser(theTerm, this.Variables).parse(theTerm))
 				
 		return result
 	}
@@ -2792,18 +2849,18 @@ class ListParser extends Parser {
 		subTerms := []
 		lastTerm := false
 		
-		for index, term in terms {
-			if (((term = "[") && (index != 1)) || ((term = "]") && (index != length))
-											   || ((term = "|") && (index != (length - 2))))
-				Throw "Unknown list structure """ . values2String(", ", terms*) . """ detected in ListParser.parse..."
+		for index, theTerm in terms {
+			if (((theTerm = "[") && (index != 1)) || ((theTerm = "]") && (index != length))
+												  || ((theTerm = "|") && (index != (length - 2))))
+				Throw "Unexpected list structure """ . values2String(", ", terms*) . """ detected in ListParser.parse..."
 			
 			if ((index > 1) && (index < length))
-				if (term == "|")
+				if (theTerm == "|")
 					lastTerm := true
 				else if (lastTerm == true)
-					lastTerm := this.Compiler.createTermParser(term, this.Variables).parse(term)
+					lastTerm := this.Compiler.createTermParser(theTerm, this.Variables).parse(theTerm)
 				else
-					subTerms.Push(this.Compiler.createTermParser(term, this.Variables).parse(term))
+					subTerms.Push(this.Compiler.createTermParser(theTerm, this.Variables).parse(theTerm))
 		}
 		
 		if !lastTerm

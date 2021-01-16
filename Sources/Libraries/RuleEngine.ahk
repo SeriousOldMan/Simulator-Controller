@@ -1194,7 +1194,6 @@ class ResultSet {
 	
 	RuleEngine[] {
 		Get {
-			ListLines
 			return this.KnowledgeBase.RuleEngine
 		}
 	}

@@ -41,8 +41,10 @@ global kCompilerTestRules
 
 kRules =
 (
-				oc(?Y) <= eq(?Y, f(?Y))
-				eq(?A, ?A)
+				oc(?O) <= eq(?O, f(?O))
+				eq(?X, ?X)
+				
+				sf(?F) <= Set(?F, true), !, fail
 				
 				reverse([], [])
 				reverse([?H | ?T], ?REV) <= reverse(?T, ?RT), concat(?RT, [?H], ?REV)
@@ -111,8 +113,8 @@ class CompilerTestClass extends Assert {
 		
 		compiler.compileRules(text, productions, reductions)
 		
-		this.AssertEqual(1, productions.Length())
-		this.AssertEqual(3, reductions.Length())
+		this.AssertEqual(1, productions.Length(), "Not all production rules compiled...")
+		this.AssertEqual(3, reductions.Length(), "Not all reduction rules compiled...")
 	}
 	
 	Compiler_Identity_Test() {
@@ -121,12 +123,12 @@ class CompilerTestClass extends Assert {
 		for ignore, theRule in kCompilerTestRules {
 			compiledRule := compiler.compileRule(theRule)
 			
-			this.AssertEqual(this.removeWhiteSpace(compiledRule.toString()
-						   , this.substitutePredicate(this.substituteBoolean(this.removeWhiteSpace(theRule)))))
+			this.AssertEqual(this.removeWhiteSpace(compiledRule.toString())
+						   , this.substitutePredicate(this.substituteBoolean(this.removeWhiteSpace(theRule))), "Error in compiled rule " . compiledRule.toString())
 			
 			newCompiledRule := compiler.compileRule(compiledRule.toString())
 			
-			this.AssertEqual(newCompiledRule.toString(), compiledRule.toString())
+			this.AssertEqual(newCompiledRule.toString(), compiledRule.toString(), "Error in compiled rule " . newCompiledRule.toString())
 		}
 	}
 }
@@ -163,18 +165,52 @@ class EngineTestClass extends Assert {
 				resultSet := kb.prove(goal)
 				
 				if (test[2].Length() > 0) {
-					this.AssertEqual(true, (resultSet != (A_Index == 2)))
+					this.AssertEqual(true, (resultSet != (A_Index == 2)), "Unexpected remaining results...")
 				
 					for index, result in test[2] {
-						this.AssertEqual(result, goal.toString(resultSet))
+						this.AssertEqual(result, goal.toString(resultSet), "Unexpected result " . goal.toString(resultSet))
 						
-						this.AssertEqual(true, resultSet.nextResult())
+						this.AssertEqual(true, resultSet.nextResult(), "Unexpected remaining results...")
 					}
 				}
 				else
-					this.AssertEqual(true, (resultSet == false))
+					this.AssertEqual(true, (resultSet == false), "Unexpected remaining results...")
 			}
 		}
+	}
+	
+	Execute_Deterministic_Test() {
+		local resultSet
+		
+		compiler := new RuleCompiler()
+		
+		productions := false
+		reductions := false
+		
+		compiler.compileRules(kExecutionTestRules, productions, reductions)
+		
+		engine := new RuleEngine(productions, reductions, {})
+		kb := engine.createKnowledgeBase(engine.createFacts(), engine.createRules())
+		
+		kb.enableDeterministicFacts()
+		
+		goal := compiler.compileGoal("sf(Fact)")
+				
+		resultSet := kb.prove(goal)
+		
+		this.AssertEqual(true, (resultSet == false), "Unexpected remaining results...")
+		this.AssertEqual(true, kb.Facts.getValue("Fact", false), "Fact is missing...")
+		
+		kb := engine.createKnowledgeBase(engine.createFacts(), engine.createRules())
+		
+		kb.disableDeterministicFacts()
+		
+		goal := compiler.compileGoal("sf(Fact)")
+				
+		resultSet := kb.prove(goal)
+		
+		this.AssertEqual(true, (resultSet == false), "Unexpected remaining results...")
+		this.AssertEqual(false, kb.Facts.getValue("Fact", false), "Fact should be missing...")
 	}
 }
 
@@ -198,16 +234,16 @@ class ListTestClass extends Assert {
 			resultSet := kb.prove(goal)
 			
 			if (test[2].Length() > 0) {
-				this.AssertEqual(true, (resultSet != false))
+				this.AssertEqual(true, (resultSet != false), "Unexpected remaining results...")
 			
 				for index, result in test[2] {
-					this.AssertEqual(result, goal.toString(resultSet))
+					this.AssertEqual(result, goal.toString(resultSet), "Unexpected result " . goal.toString(resultSet))
 					
-					this.AssertEqual(index < test[2].Length(), resultSet.nextResult())
+					this.AssertEqual(index < test[2].Length(), resultSet.nextResult(), "Unexpected remaining results...")
 				}
 			}
 			else
-				this.AssertEqual(false, (resultSet != false))
+				this.AssertEqual(false, (resultSet != false), "Unexpected remaining results...")
 		}
 	}
 	
@@ -247,16 +283,16 @@ class FamilyTestClass extends Assert {
 			resultSet := engine.prove(goal)
 			
 			if (test[2].Length() > 0) {
-				this.AssertEqual(true, (resultSet != false))
+				this.AssertEqual(true, (resultSet != false), "Unexpected remaining results...")
 			
 				for index, result in test[2] {
-					this.AssertEqual(result, goal.toString(resultSet))
+					this.AssertEqual(result, goal.toString(resultSet), "Unexpected result " . goal.toString(resultSet))
 					
-					this.AssertEqual(index < test[2].Length(), resultSet.nextResult())
+					this.AssertEqual(index < test[2].Length(), resultSet.nextResult(), "Unexpected remaining results...")
 				}
 			}
 			else
-				this.AssertEqual(false, (resultSet != false))
+				this.AssertEqual(false, (resultSet != false), "Unexpected remaining results...")
 		}
 		
 		return resultSet
@@ -269,8 +305,8 @@ class FamilyTestClass extends Assert {
 		
 		resultSet := this.executeTests(tests)
 		
-		this.AssertEqual(true, resultSet.KnowledgeBase.Facts.getValue("Peter.son", false))
-		this.AssertEqual(true, resultSet.KnowledgeBase.Facts.getValue("Celebrated", false))
+		this.AssertEqual(true, resultSet.KnowledgeBase.Facts.getValue("Peter.son", false), "Fact Peter.son is missing...")
+		this.AssertEqual(true, resultSet.KnowledgeBase.Facts.getValue("Celebrated", false), "Fact Celebrated is missing...")
 	}
 	
 	Execute_GrandFather_Test() {
@@ -280,16 +316,16 @@ class FamilyTestClass extends Assert {
 		
 		resultSet := this.executeTests(tests)
 
-		this.AssertEqual(true, resultSet.KnowledgeBase.Facts.getValue("Peter.son", false))
-		this.AssertEqual(true, resultSet.KnowledgeBase.Facts.getValue("Celebrated", false))
-		this.AssertEqual("happy", resultSet.KnowledgeBase.Facts.getValue("Peter", false))
-		this.AssertEqual(true, resultSet.KnowledgeBase.Facts.getValue("Peter.grandchild", false))
-		this.AssertEqual(true, resultSet.KnowledgeBase.Facts.getValue("Related.Peter.Paul", false))
-		this.AssertEqual(true, resultSet.KnowledgeBase.Facts.getValue("Related.Peter.Willy", false))
-		this.AssertEqual("Peter", resultSet.KnowledgeBase.Facts.getValue("Paul.grandchild", false))
-		this.AssertEqual("Peter", resultSet.KnowledgeBase.Facts.getValue("Willy.grandchild", false))
-		this.AssertEqual(true, resultSet.KnowledgeBase.Facts.getValue("Paul.grandfather", false))
-		this.AssertEqual(true, resultSet.KnowledgeBase.Facts.getValue("Willy.grandfather", false))
+		this.AssertEqual(true, resultSet.KnowledgeBase.Facts.getValue("Peter.son", false), "Fact Peter.son is missing...")
+		this.AssertEqual(true, resultSet.KnowledgeBase.Facts.getValue("Celebrated", false), "Fact Celebrated is missing...")
+		this.AssertEqual("happy", resultSet.KnowledgeBase.Facts.getValue("Peter", false), "Fact Peter is not happy...")
+		this.AssertEqual(true, resultSet.KnowledgeBase.Facts.getValue("Peter.grandchild", false), "Fact Peter.grandchild is missing...")
+		this.AssertEqual(true, resultSet.KnowledgeBase.Facts.getValue("Related.Peter.Paul", false), "Fact Related.Peter.Paul is missing...")
+		this.AssertEqual(true, resultSet.KnowledgeBase.Facts.getValue("Related.Peter.Willy", false), "Fact Related.Peter.Willy is missing...")
+		this.AssertEqual("Peter", resultSet.KnowledgeBase.Facts.getValue("Paul.grandchild", false), "Fact Paul.grandchild is not Peter...")
+		this.AssertEqual("Peter", resultSet.KnowledgeBase.Facts.getValue("Willy.grandchild", false), "Fact Willy.grandchild is not Peter...")
+		this.AssertEqual(true, resultSet.KnowledgeBase.Facts.getValue("Paul.grandfather", false), "Fact Paul.grandfather is missing...")
+		this.AssertEqual(true, resultSet.KnowledgeBase.Facts.getValue("Willy.grandfather", false), "Fact Willy.grandfather is missing...")
 	}
 	
 	Execute_Happiness_Test() {
@@ -315,16 +351,16 @@ class FamilyTestClass extends Assert {
 			resultSet := kb.prove(goal)
 			
 			if (test[2].Length() > 0) {
-				this.AssertEqual(true, (resultSet != false))
+				this.AssertEqual(true, (resultSet != false), "Unexpected remaining results...")
 			
 				for index, result in test[2] {
-					this.AssertEqual(result, goal.toString(resultSet))
+					this.AssertEqual(result, goal.toString(resultSet), "Unexpected result " . goal.toString(resultSet))
 					
-					this.AssertEqual(index < test[2].Length(), resultSet.nextResult())
+					this.AssertEqual(index < test[2].Length(), resultSet.nextResult(), "Unexpected remaining results...")
 				}
 			}
 			else
-				this.AssertEqual(false, (resultSet != false))
+				this.AssertEqual(false, (resultSet != false), "Unexpected remaining results...")
 		}
 	}
 }
@@ -374,7 +410,6 @@ exit
 Assertion Messages einbauen
 **************************
 
-deterministic checks testen
 
 				, ["reverse(?R, [3, 2, 1])", ["reverse([1, 2, 3], [3, 2, 1])"]]
 

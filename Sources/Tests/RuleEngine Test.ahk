@@ -305,7 +305,7 @@ class HybridEngineTestClass extends Assert {
 		compiler.compileRules(kExecutionTestRules, productions, reductions)
 		
 		engine := new RuleEngine(productions, reductions, {})
-		engine.setTraceLevel(kTraceFull)
+		; engine.setTraceLevel(kTraceFull)
 		
 		kb := engine.createKnowledgeBase(engine.createFacts(), engine.createRules())
 		
@@ -349,6 +349,7 @@ class HybridEngineTestClass extends Assert {
 		local resultSet
 		
 		tests := [["grandfather(?A, ?B)", ["grandfather(Peter, Paul)", "grandfather(Peter, Willy)"]]]
+		curTickCount := A_TickCount
 		
 		resultSet := this.executeTests(tests)
 
@@ -405,9 +406,11 @@ class HybridEngineTestClass extends Assert {
 
 celebrate(knowledgeBase) {
 	if !knowledgeBase.Facts.getValue("Celebrated", false) {
-		SplashTextOn 200, 60, Message, Party, Party...
-		Sleep 1000
-		SplashTextOff
+		if (knowledgeBase.RuleEngine.TraceLevel < kTraceOff) {
+			SplashTextOn 200, 60, Message, Party, Party...
+			Sleep 1000
+			SplashTextOff
+		}
 		
 		if !knowledgeBase.Facts.hasFact("Celebrated")
 			knowledgeBase.Facts.addFact("Celebrated", true)
@@ -419,9 +422,11 @@ celebrate(knowledgeBase) {
 showRelationship(knowledgeBase, grandchild, grandfather) {
 	local fact := "Related." . grandchild . "." . grandfather
 	
-	SplashTextOn 200, 60, Message, %grandchild% is grandchild of %grandfather%
-	Sleep 1000
-	SplashTextOff
+	if (knowledgeBase.RuleEngine.TraceLevel < kTraceOff) {
+		SplashTextOn 200, 60, Message, %grandchild% is grandchild of %grandfather%
+		Sleep 1000
+		SplashTextOff
+	}
 	
 	if !knowledgeBase.Facts.hasFact(fact)
 		knowledgeBase.Facts.addFact(fact , true)
@@ -430,14 +435,16 @@ showRelationship(knowledgeBase, grandchild, grandfather) {
 }
 
 showFacts(knowledgeBase) {
-	message := []
+	if (knowledgeBase.RuleEngine.TraceLevel < kTraceOff) {
+		message := []
 
-	for key, value in knowledgeBase.Facts.Facts
-		message.Push(key . " = " . value)
-	
-	SplashTextOn 200, 250, Facts, % values2String("`n", message*)
-	Sleep 5000
-	SplashTextOff
+		for key, value in knowledgeBase.Facts.Facts
+			message.Push(key . " = " . value)
+		
+		SplashTextOn 200, 250, Facts, % values2String("`n", message*)
+		Sleep 5000
+		SplashTextOff
+	}
 }
 
 setOccurCheck(knowledgeBase, enable) {

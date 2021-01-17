@@ -2450,7 +2450,7 @@ class RuleEngine {
 	iInitialFacts := {}
 	iInitialProductions := []
 	iInitialReductions := []
-	iTraceLevel := kTraceLight
+	iTraceLevel := kTraceOff
 	
 	InitialFacts[] {
 		Get {
@@ -2516,7 +2516,7 @@ class RuleEngine {
 	
 	trace(traceLevel, message) {
 		if (this.iTraceLevel <= traceLevel)
-			logMessage(traceLevel, "RuleEngine: " . message)
+			logMessage(kLogOff, "RuleEngine: " . message)
 	}
 }
 

@@ -157,6 +157,18 @@ class CompilerTestClass extends Assert {
 			this.AssertEqual(newCompiledRule.toString(), compiledRule.toString(), "Error in compiled rule " . newCompiledRule.toString())
 		}
 	}
+	
+	Compiler_FullScript_Test() {
+		compiler := new RuleCompiler()
+		
+		productions := false
+		reductions := false
+		
+		compiler.compileRules(kExecutionTestRules, productions, reductions)
+		
+		this.AssertEqual(2, productions.Length(), "Not all production rules compiled...")
+		this.AssertEqual(18, reductions.Length(), "Not all reduction rules compiled...")
+	}
 }
 
 class EngineTestClass extends Assert {

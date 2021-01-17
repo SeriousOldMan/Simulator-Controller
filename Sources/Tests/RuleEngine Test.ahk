@@ -305,11 +305,18 @@ class HybridEngineTestClass extends Assert {
 		compiler.compileRules(kExecutionTestRules, productions, reductions)
 		
 		engine := new RuleEngine(productions, reductions, {})
+		engine.setTraceLevel(kTraceFull)
+		
+		kb := engine.createKnowledgeBase(engine.createFacts(), engine.createRules())
+		
+		kb.produce()
+		
+		this.AssertEqual(0, kb.Facts.Facts.Count(), "Unexpected facts materialized...")
 		
 		for ignore, test in tests {
 			goal := compiler.compileGoal(test[1])
 			
-			resultSet := engine.prove(goal)
+			resultSet := kb.prove(goal)
 			
 			if (test[2].Length() > 0) {
 				this.AssertEqual(true, (resultSet != false), "Unexpected remaining results...")
@@ -398,7 +405,7 @@ class HybridEngineTestClass extends Assert {
 
 celebrate(knowledgeBase) {
 	if !knowledgeBase.Facts.getValue("Celebrated", false) {
-		SplashTextOn 200, 60, Message, Chaka!!!!
+		SplashTextOn 200, 60, Message, Party, Party...
 		Sleep 1000
 		SplashTextOff
 		

@@ -63,6 +63,9 @@ class Condition {
         }
     }
 	
+	getFacts(ByRef facts) {
+	}
+	
 	match(facts) {
 		Throw "Virtual method Condition.match must be implemented in a subclass..."
 	}
@@ -87,6 +90,11 @@ class CompositeCondition extends Condition {
 	
 	__New(conditions) {
 		this.iConditions := conditions
+	}
+	
+	getFacts(ByRef facts) {
+		for ignore, theCondition in this.Conditions
+			theCondition.getFacts(facts)
 	}
 	
 	toString(facts := "__NotInitialized__") {
@@ -241,6 +249,18 @@ class Predicate extends Condition {
 			Throw "Inconsistent argument combination detected in Predicate.__New..."
 	}
 	
+	getFacts(ByRef facts) {
+		left := this.iLeftPrimary
+		
+		if (left.base == Variable)
+			facts.Push(left.Variable[true])
+		
+		right := this.iRightPrimary
+		
+		if ((right != false) && (right.base == Variable))
+			facts.Push(right.Variable[true])
+	}
+	
 	match(facts) {
 		leftPrimary := this.LeftPrimary[facts]
 		
@@ -309,9 +329,13 @@ class Variable extends Primary {
 		}
 	}
 	
-	Variable[] {
+	Variable[fullPath := false] {
 		Get {
-			return this.iVariable
+			if (fullPath && this.Property) {
+				return (this.Variable . "." . this.Property)
+			}
+			else
+				return this.iVariable
 		}
 	}
 	
@@ -354,16 +378,15 @@ class Variable extends Primary {
 	}
 	
 	substituteVariables(variables) {
-		property := this.Property
-		var := ((property = "") ? this.Variable : (this.Variable . "." . property))
+		var := this.Variable[true]
 		
 		if variables.HasKey(var)
 			return variables[var]	
 		else {
-			if (property == "")
+			if !this.iProperty
 				newVariable := new Variable(var)
 			else
-				newVariable := new Variable(this.Variable, property, this.RootVariable.substituteVariables(variables))
+				newVariable := new Variable(this.Variable, this.Property, this.RootVariable.substituteVariables(variables))
 			
 			variables[var] := newVariable
 
@@ -395,12 +418,12 @@ class Variable extends Primary {
 		local ruleEngine := resultSet.KnowledgeBase.RuleEngine
 		
 		if (ruleEngine.TraceLevel <= kTraceFull)
-			ruleEngine.trace(kTraceMedium, "Check whether " . var.toString() . " occurs in " . this.toString(resultSet))
+			ruleEngine.trace(kTraceFull, "Check whether " . var.toString() . " occurs in " . this.toString(resultSet))
 		
 		v1 := this.RootVariable.getValue(resultSet, this.RootVariable)
 		
 		if (ruleEngine.TraceLevel <= kTraceFull)
-			ruleEngine.trace(kTraceMedium, "Occur " . v1.toString() . " " . var.toString())
+			ruleEngine.trace(kTraceFull, "Occur " . v1.toString() . " " . var.toString())
 			
 		return (v1 == var)	
 	}
@@ -730,7 +753,7 @@ class Term {
 		local ruleEngine := resultSet.KnowledgeBase.RuleEngine
 		
 		if (ruleEngine.TraceLevel <= kTraceFull)
-			ruleEngine.trace(kTraceMedium, "Check whether " . var.toString() . " occurs in " . this.toString(resultSet))
+			ruleEngine.trace(kTraceFull, "Check whether " . var.toString() . " occurs in " . this.toString(resultSet))
 			
 		return false
 	}
@@ -841,7 +864,7 @@ class Compound extends Term {
 		local ruleEngine := resultSet.KnowledgeBase.RuleEngine
 		
 		if (ruleEngine.TraceLevel <= kTraceFull)
-			ruleEngine.trace(kTraceMedium, "Check whether " . var.toString() . " occurs in " . this.toString(resultSet))
+			ruleEngine.trace(kTraceFull, "Check whether " . var.toString() . " occurs in " . this.toString(resultSet))
 			
 		for ignore, argument in this.Arguments
 			if argument.getValue(resultSet, argument).occurs(resultSet, var)
@@ -972,7 +995,7 @@ class Pair extends Term {
 		local ruleEngine := resultSet.KnowledgeBase.RuleEngine
 		
 		if (ruleEngine.TraceLevel <= kTraceFull)
-			ruleEngine.trace(kTraceMedium, "Check whether " . var.toString() . " occurs in " . this.toString(resultSet))
+			ruleEngine.trace(kTraceFull, "Check whether " . var.toString() . " occurs in " . this.toString(resultSet))
 			
 		leftTerm := this.LeftTerm
 		rightTerm := this.RightTerm
@@ -1049,6 +1072,15 @@ class ProductionRule extends Rule {
 		this.iConditions := conditions
 		this.iActions := actions
 		this.iPriority := priority
+	}
+	
+	getFacts() {
+		local facts := []
+		
+		for ignore, theCondition in this.Conditions
+			theCondition.getFacts(facts)
+				
+		return facts		
 	}
 	
 	match(facts) {
@@ -1694,7 +1726,7 @@ class CallChoicePoint extends ChoicePoint {
 					values.Push(theTerm.getValue(resultSet).toString(resultSet))
 			
 			if (resultSet.RuleEngine.TraceLevel <= kTraceMedium)
-				resultSet.KnowledgeBase.RuleEngine.trace(kTraceMedium, "Call " . function . "(" . values2String(", ", values*) . ")")
+				resultSet.RuleEngine.trace(kTraceMedium, "Call " . function . "(" . values2String(", ", values*) . ")")
 			
 			return %function%(resultSet.KnowledgeBase, values*)
 		}
@@ -1821,25 +1853,104 @@ class KnowledgeBase {
 		this.iRuleEngine := ruleEngine
 		this.iFacts := facts
 		this.iRules := rules
+		
+		production := rules.Productions[false]
+		
+		while production {
+			this.registerRuleFacts(production.Rule)
+			
+			production := production.Next[false]
+		}
+	}
+	
+	registerRuleFacts(rule) {
+		local facts := this.Facts
+		
+		for ignore, theFact in rule.getFacts() {
+			fRules := facts.getObserver(theFact)
+			
+			if !fRules {
+				fRules := new FactRules(this, theFact)
+				
+				facts.registerObserver(theFact, fRules)
+			}
+			
+			fRules.addRule(rule)
+		}
+	}
+	
+	deregisterRuleFacts(rule) {
+		local facts := this.Facts
+		
+		for ignore, theFact in rule.getFacts() {
+			fRules := facts.getObserver(theFact)
+			
+			if fRules {
+				fRules.removeRule(rule)
+				
+				if (fRules.Rules.Length() == 0)
+					facts.deregisterObserver(theFact, fRules)
+			}
+			else
+				Throw "Inconsistency detected in KnowledgeBase.deregisterRuleFacts..."
+		}
+	}
+	
+	factChanged(fact, rules) {
+		if (this.RuleEngine.TraceLevel <= kTraceMedium)
+			this.RuleEngine.trace(kTraceMedium, "Fact """ . fact . """ changed - reactivating " . rules.Length() . " rules")
+					
+		this.Rules.activateRules(rules)
 	}
 	
 	produce() {
+		local facts := this.Facts
+		local rules := this.Rules
+		
 		Loop {
-			generation := this.Facts.Generation
+			generation := facts.Generation
 			produced := false
 			
-			for ignore, theRule in this.Rules.Productions
-				if theRule.produce(this) {
-					if (generation != this.Facts.Generation) {
+			ruleEntry := rules.Productions
+			
+			Loop {
+				if !ruleEntry
+					break
+				
+				if ruleEntry.Rule.produce(this) {
+					if (generation != facts.Generation) {
 						produced := true
 							
 						break
 					}
 				}
+				else {
+					if (this.RuleEngine.TraceLevel <= kTraceMedium)
+						this.RuleEngine.trace(kTraceMedium, "Deactivating rule " . ruleEntry.Rule.toString())
+						
+					ruleEntry.deactivate()
+				}
+					
+				ruleEntry := ruleEntry.Next
+			}
 			
 			if !produced
 				break
 		}
+	}
+	
+	addRule(rule) {
+		this.Rules.addRule(rule)
+		
+		if (rule.Type == kProduction)
+			this.registerRuleFacts(rule)
+	}
+	
+	removeRule(rule) {
+		this.Rules.removeRule(rule)
+		
+		if (rule.Type == kProduction)
+			this.deregisterRuleFacts(rule)
 	}
 	
 	prove(goal) {
@@ -1875,6 +1986,7 @@ class KnowledgeBase {
 class Facts {
 	iRuleEngine := false
 	iFacts := {}
+	iObservers := {}
 	iGeneration := 0
 	
 	RuleEngine[] {
@@ -1912,6 +2024,9 @@ class Facts {
 				this.iGeneration += 1
 				
 			this.iFacts[fact] := value
+			
+			if this.hasObserver(fact)
+				this.getObserver(fact).factChanged()
 		}
 		else	
 			Throw "Unknown fact """ . fact . """ encountered in Facts.setValue..."
@@ -1920,14 +2035,8 @@ class Facts {
 	getValue(fact, default := "__NotInitialized__") {
 		local facts := this.Facts
 		
-		if (fact.base == Variable) {
-			property := fact.Property
-			
-			if (property != "")
-				fact := (fact.Variable . "." . property)
-			else
-				fact := fact.Variable
-		}
+		if (fact.base == Variable)
+			fact := fact.Variable[true]
 		else if (fact.base == Literal)
 			fact := fact.Literal
 		
@@ -1950,6 +2059,9 @@ class Facts {
 			facts[fact] := value
 			
 			this.iGeneration += 1
+			
+			if this.hasObserver(fact)
+				this.getObserver(fact).factAdded()
 		}
 	}
 	
@@ -1961,7 +2073,99 @@ class Facts {
 			this.Facts.Delete(fact)
 			
 			this.iGeneration += 1
+			
+			if this.hasObserver(fact)
+				this.getObserver(fact).factRemoved()
 		}
+	}
+	
+	registerObserver(fact, observer) {
+		if this.iObservers.HasKey(fact)
+			Throw "Observer already registered for fact """ . fact . """"
+			
+		this.iObservers[fact] := observer
+	}
+	
+	deregisterObservers(fact, observer) {
+		this.iObservers.Delete(fact)
+	}
+	
+	hasObserver(fact) {
+		return this.iObservers.HasKey(fact)
+	}
+	
+	getObserver(fact) {
+		observers := this.iObservers
+		
+		return (observers.HasKey(fact) ? observers[fact] : false)
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; Class                    FactRules                                      ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class FactRules {
+	iKnowledgeBase := false
+	iFacts := false
+	iFact := ""
+	iRules := []
+	
+	KnowledgeBase[] {
+		Get {
+			return this.iKnowledgeBase
+		}
+	}
+	
+	Facts[] {
+		Get {
+			return this.KnowledgeBase.Facts
+		}
+	}
+	
+	Fact[] {
+		Get {
+			return this.iFact
+		}
+	}
+	
+	Rules[] {
+		Get {
+			return this.iRules
+		}
+	}
+	
+	__New(knowledgeBase, fact) {
+		this.iKnowledgeBase := knowledgeBase
+		this.iFact := fact
+	}
+	
+	addRule(rule) {
+		local rules := this.Rules
+		
+		if !inList(rules, rule)
+			rules.Push(rule)
+	}
+	
+	removeRule(rule) {
+		local rules := this.Rules
+		
+		index := inList(rules, rule)
+		
+		if index
+			rules.RemoveAt(index)
+	}
+	
+	factAdded() {
+		this.factChanged()
+	}
+	
+	factRemoved() {
+		this.factChanged()
+	}
+	
+	factChanged() {
+		this.KnowledgeBase.factChanged(this.Fact, this.Rules)
 	}
 }
 
@@ -1970,13 +2174,120 @@ class Facts {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class Rules {
-	iProductions := []
+	iRuleEngine := false
+	iProductions := false
 	iReductions := {}
 	iGeneration := 1
 	
-	Productions[] {
+	class Production {
+		iNext := false
+		iPrevious := false
+		
+		iRule := false
+		iActive := true
+		
+		Next[active := true] {
+			Get {
+				candidate := this.iNext
+				
+				while candidate
+					if (active && (candidate.Active == false))
+						candidate := candidate.iNext
+					else
+						return candidate
+						
+				return candidate
+			}
+		}
+		
+		Previous[active := true] {
+			Get {
+				candidate := this.iPrevious
+				
+				while candidate
+					if (active && (candidate.Active == false))
+						candidate := candidate.iPrevious
+					else
+						return candidate
+						
+				return candidate
+			}
+		}
+		
+		Rule[] {
+			Get {
+				return this.iRule
+			}
+		}
+		
+		Active[] {
+			Get {
+				return this.iActive
+			}
+		}
+		
+		__New(rule, after := false) {
+			this.iRule := rule
+			
+			if after
+				this.insertAfter(after)
+		}
+		
+		activate() {
+			this.iActive := true
+		}
+		
+		deactivate() {
+			this.iActive := false
+		}
+	
+		insertBefore(before) {
+			this.iPrevious := before.iPrevious
+			this.iNext := before
+			
+			before.iPrevious := this
+				
+			if this.iPrevious
+				this.iPrevious.iNext := this
+		}
+	
+		insertAfter(after) {
+			this.iNext := after.iNext
+			this.iPrevious := after
+			
+			after.iNext := this
+				
+			if this.iNext
+				this.iNext.iPrevious := this
+		}
+		
+		remove() {
+			next := this.iNext
+			previous := this.iPrevious
+			
+			if next
+				next.iPrevious := previous
+				
+			if previous
+				previous.iNext := next
+		}
+	}
+	
+	RuleEngine[] {
 		Get {
-			return this.iProductions
+			return this.iRuleEngine
+		}
+	}
+	
+	Productions[active := true] {
+		Get {
+			if active {
+				candidate := this.iProductions
+				
+				return (candidate.Active ? candidate : candidate.Next)
+			}
+			else
+				return this.iProductions
 		}
 	}
 	
@@ -2007,9 +2318,18 @@ class Rules {
 	
 	__New(ruleEngine, productions, reductions) {
 		this.iRuleEngine := ruleEngine
-		this.iProductions := productions.Clone()
 		
-		this.sortProductions()
+		productions := productions.Clone()
+		
+		last := false
+		
+		for index, production in this.sortProductions(productions) {
+			entry := new this.Production(production, last)
+			last := entry
+			
+			if (index == 1)
+				this.iProductions := entry
+		}
 		
 		for ignore, reduction in reductions {
 			key := (reduction.Head.Functor . "." . reduction.Head.Arity)
@@ -2022,21 +2342,39 @@ class Rules {
 	}
 	
 	addRule(rule) {
-		local rules
-		
 		if (rule.Type == kProduction) {
 			priority := rule.Priority
-			rules := this.Productions
+			last := false
+			candidate := this.Productions[false]
 			
-			for index, candidate in rules
-				if (priority > candidate.Priority) {
-					rules.InsertAt(index, rule)
+			Loop {
+				if !candidate {
+					if last
+						new Production(rule).insertAfter(last)
+					else
+						this.iProductions := new Production(rule)
+					
 					this.iGeneration += 1
 					
-					return
+					break
 				}
+				else if (priority > candidate.Rule.Priority) {
+					production := new Production(rule, last)
 					
-			rules.Push(rule)
+					if !last
+						this.iProductions := production
+						
+					this.iGeneration += 1
+					
+					break
+				}
+				else {
+					last := candidate
+					candidate := candidate.Next[false]
+				}
+			}
+			
+			this.iGeneration += 1
 		}
 		else
 			this.Reductions[rule.Head.Functor, rule.Head.Arity, true].Push(rule)
@@ -2047,22 +2385,56 @@ class Rules {
 	removeRule(rule) {
 		local rules
 		
-		if (rule.Type == kProduction)
-			rules := this.Productions
-		else
+		if (rule.Type == kProduction) {
+			production := this.Productions[false]
+			
+			while production {
+				if (production.Rule == rule) {
+					production.remove()
+					
+					this.iGeneration += 1
+					
+					break
+				}
+				
+				production := production.Next[false]
+			}
+		}			
+		else {
 			rules := this.Reductions[rule.Head.Functor, rule.Head.Arity]
 			
-		for index, candidate in rules
-			if (rule == candidate) {
-				rules.RemoveAt(index)
-				this.iGeneration += 1
-				
-				return
-			}
+			for index, candidate in rules
+				if (rule == candidate) {
+					rules.RemoveAt(index)
+					
+					this.iGeneration += 1
+					
+					break
+				}
+		}
 	}
 	
-	sortProductions() {
-		bubbleSort(this.Productions, ObjBindMethod(this, "compareProductions"))
+	activateRules(rules) {
+		local rule := this.Productions[false]
+		
+		while rule {
+			if inlist(rules, rule.Rule) {
+				if (this.RuleEngine.TraceLevel <= kTraceMedium)
+					this.RuleEngine.trace(kTraceMedium, "Reactivating rule " . rule.Rule.toString())
+					
+				rule.activate()
+			}
+				
+			rule := rule.Next[false]
+		}
+	}
+	
+	sortProductions(productions) {
+		productions := productions.Clone()
+		
+		bubbleSort(productions, ObjBindMethod(this, "compareProductions"))
+		
+		return productions
 	}
 	
 	compareProductions(r1, r2) {

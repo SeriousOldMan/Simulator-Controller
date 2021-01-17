@@ -461,6 +461,11 @@ setDeterministicFacts(knowledgeBase, enable) {
 		knowledgeBase.disableDeterministicFacts()
 }
 
+
+;;;-------------------------------------------------------------------------;;;
+;;;                         Initialization Section                          ;;;
+;;;-------------------------------------------------------------------------;;;
+
 AHKUnit.AddTestClass(CompilerTestClass)
 AHKUnit.AddTestClass(EngineTestClass)
 AHKUnit.AddTestClass(UnificationTestClass)

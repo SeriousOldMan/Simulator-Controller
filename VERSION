@@ -1,4 +1,5 @@
+[Version]
 Current=2.0.5-dev
-Target=2.1-release
-Changes=Rule set for AI based race engineer
+Target=2.0.5-release
+Changes=Rule set for AI based race engineer, Bugfix
 Date=01/18/2021

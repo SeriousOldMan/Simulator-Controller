@@ -23,13 +23,13 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-None for the moment - please use on of the release build below
+None for the moment - please use one of the release build below
 
 #### Latest release builds
 
-[2.0.2-release](https://www.dropbox.com/s/6cxkh4zbotycoga/Simulator%20Controller%202.0.2-release.zip?dl=1)
-
 [2.0.4-release](https://www.dropbox.com/s/som2gkv3pcu2y46/Simulator%20Controller%202.0.4-release.zip?dl=1) (Includes the first version of the hybrid forward and backward chaining rule engine, which will be used to implement the AI based race engineer)
+
+[2.0.5-fix](https://www.dropbox.com/s/p5vs1enowvnr8d4/Simulator%20Controller%202.0.5-fix.zip?dl=1) (Critical fix for 2.0.4)
 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 Release 2.0 introduces a new automated update mechanism for local configuration databases. Please read the [update notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-20) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side.

@@ -3,8 +3,6 @@ desktop.ini
 Releases/*.*
 Build.lnk
 Setup.lnk
-**/.vs/
-Sources/Foreign/ACC SHM Reader/Debug/
-Sources/Foreign/ACC SHM Reader/Release/
-Sources/Foreign/ACC SHM Reader/ACC SHM Reader/Debug/
-Sources/Foreign/ACC SHM Reader/ACC SHM Reader/Release/
+Sources/Foreign/**/.vs/
+Sources/Foreign/**/Debug/
+Sources/Foreign/**/Release/

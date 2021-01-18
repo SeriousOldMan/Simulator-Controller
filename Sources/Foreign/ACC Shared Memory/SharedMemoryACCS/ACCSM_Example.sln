@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.779
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SharedMemoryExample", "ConsoleApplication1\ConsoleApplication1.vcxproj", "{4C578737-EFC1-4A5A-B7F3-DB897360051D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4C578737-EFC1-4A5A-B7F3-DB897360051D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4C578737-EFC1-4A5A-B7F3-DB897360051D}.Debug|Win32.Build.0 = Debug|Win32
+		{4C578737-EFC1-4A5A-B7F3-DB897360051D}.Release|Win32.ActiveCfg = Release|Win32
+		{4C578737-EFC1-4A5A-B7F3-DB897360051D}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CDD22112-AA97-46A7-A67F-5B208620DBF6}
+	EndGlobalSection
+EndGlobal

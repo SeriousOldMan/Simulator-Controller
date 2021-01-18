@@ -212,6 +212,7 @@ class ACCPlugin extends ControllerPlugin {
 						  , TyreChange: "Change Tyres", TyreSet: "Tyre Set", TyreCompound: "Compound", TyreAllAround: "All Around"
 						  , TyreFrontLeft: "Front Left", TyreFrontRight: "Front Right", TyreRearLeft: "Rear Left", TyreRearRight: "Rear Right"
 						  , BrakeChange: "Change Brakes", FrontBrake: "Front Brake", RearBrake: "Rear Brake"
+						  , DriverSelect: "Select Driver"
 						  , SuspensionRepair: "Repair Suspension", BodyworkRepair: "Repair Bodywork"}
 		static kSelectActions := ["TyreChange", "BrakeChange", "SuspensionRepair", "BodyworkRepair"]
 		static mode := false

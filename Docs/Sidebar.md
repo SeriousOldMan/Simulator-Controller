@@ -35,8 +35,8 @@
   - [Motion Feedback](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-motion-feedback)
     - [Motion](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-motion)
   - [ACC - Assetto Corsa Competizione](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-acc)
-    - [Drive](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#mode-drive)
-    - [Pitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#mode-pitstop)
+    - [Drive](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-drive)
+    - [Pitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-pitstop)
   - [AC - Assetto Corsa](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-ac)
 
 [Development Guide](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts)

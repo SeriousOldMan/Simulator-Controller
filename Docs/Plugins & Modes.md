@@ -189,6 +189,7 @@ See the following table for the supported settings.
 | BrakeChange | Enables or disables the brake management. |
 | FrontBrake | Selects the compound for the front brake pads. |
 | RearBrake | Selects the compound for the rear brake pads. |
+| DriverSelect | Selects the driver for the next stint in a multiplayer team race. |
 | SuspensionRepair | Toggles the repair of the suspension components. |
 | BodyworkRepair | Toggles the repair of all the bodywork. |
 

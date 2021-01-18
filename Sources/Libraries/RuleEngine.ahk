@@ -420,12 +420,12 @@ class Variable extends Primary {
 		if (ruleEngine.TraceLevel <= kTraceFull)
 			ruleEngine.trace(kTraceFull, "Check whether " . var.toString() . " occurs in " . this.toString(resultSet))
 		
-		v1 := this.RootVariable.getValue(resultSet, this.RootVariable)
+		cyclic := (this.RootVariable.getValue(resultSet, this.RootVariable) == var)
 		
-		if (ruleEngine.TraceLevel <= kTraceFull)
-			ruleEngine.trace(kTraceFull, "Occur " . v1.toString() . " " . var.toString())
+		if (cyclic && (ruleEngine.TraceLevel <= kTraceFull))
+			ruleEngine.trace(kTraceFull, "Cyclic reference detected for " . var.toString())
 			
-		return (v1 == var)	
+		return cyclic	
 	}
 }
 

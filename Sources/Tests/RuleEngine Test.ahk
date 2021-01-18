@@ -149,12 +149,12 @@ class CompilerTestClass extends Assert {
 		for ignore, theRule in kCompilerCompliantTestRules {
 			compiledRule := compiler.compileRule(theRule)
 			
-			this.AssertEqual(this.removeWhiteSpace(compiledRule.toString())
-						   , this.substitutePredicate(this.substituteBoolean(this.removeWhiteSpace(theRule))), "Error in compiled rule " . compiledRule.toString())
+			this.AssertEqual(this.substitutePredicate(this.substituteBoolean(this.removeWhiteSpace(theRule))),
+						   , this.removeWhiteSpace(compiledRule.toString()), "Error in compiled rule " . compiledRule.toString())
 			
 			newCompiledRule := compiler.compileRule(compiledRule.toString())
 			
-			this.AssertEqual(newCompiledRule.toString(), compiledRule.toString(), "Error in compiled rule " . newCompiledRule.toString())
+			this.AssertEqual(compiledRule.toString(), newCompiledRule.toString(), "Error in compiled rule " . newCompiledRule.toString())
 		}
 	}
 	

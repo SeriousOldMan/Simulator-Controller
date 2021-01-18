@@ -316,6 +316,7 @@ initializeEnvironment() {
 	FileCreateDir %A_MyDocuments%\Simulator Controller\Splash Media
 	FileCreateDir %A_MyDocuments%\Simulator Controller\Screen Images
 	FileCreateDir %A_MyDocuments%\Simulator Controller\Plugins
+	FileCreateDir %A_MyDocuments%\Simulator Controller\Temp
 	
 	if !FileExist(A_MyDocuments . "\Simulator Controller\Plugins\Plugins.ahk")
 		FileCopy %kResourcesDirectory%Templates\Plugins.ahk, %A_MyDocuments%\Simulator Controller\Plugins

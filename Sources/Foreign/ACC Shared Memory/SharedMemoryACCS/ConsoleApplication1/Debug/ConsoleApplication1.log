@@ -1,23 +1,23 @@
 ﻿  stdafx.cpp
   ACCSM_Example.cpp
-D:\Controller\Sources\Foreign\ACC Shared Memory\SharedMemoryACCS\ConsoleApplication1\ACCSM_Example.cpp(148,24): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-D:\Controller\Sources\Foreign\ACC Shared Memory\SharedMemoryACCS\ConsoleApplication1\ACCSM_Example.cpp(149,39): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-D:\Controller\Sources\Foreign\ACC Shared Memory\SharedMemoryACCS\ConsoleApplication1\ACCSM_Example.cpp(150,29): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-D:\Controller\Sources\Foreign\ACC Shared Memory\SharedMemoryACCS\ConsoleApplication1\ACCSM_Example.cpp(154,24): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-D:\Controller\Sources\Foreign\ACC Shared Memory\SharedMemoryACCS\ConsoleApplication1\ACCSM_Example.cpp(175,29): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-D:\Controller\Sources\Foreign\ACC Shared Memory\SharedMemoryACCS\ConsoleApplication1\ACCSM_Example.cpp(176,27): warning C4244: 'argument': conversion from 'AC_STATUS' to 'float', possible loss of data
-D:\Controller\Sources\Foreign\ACC Shared Memory\SharedMemoryACCS\ConsoleApplication1\ACCSM_Example.cpp(177,27): warning C4244: 'argument': conversion from 'AC_SESSION_TYPE' to 'float', possible loss of data
-D:\Controller\Sources\Foreign\ACC Shared Memory\SharedMemoryACCS\ConsoleApplication1\ACCSM_Example.cpp(178,34): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-D:\Controller\Sources\Foreign\ACC Shared Memory\SharedMemoryACCS\ConsoleApplication1\ACCSM_Example.cpp(179,28): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-D:\Controller\Sources\Foreign\ACC Shared Memory\SharedMemoryACCS\ConsoleApplication1\ACCSM_Example.cpp(181,32): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-D:\Controller\Sources\Foreign\ACC Shared Memory\SharedMemoryACCS\ConsoleApplication1\ACCSM_Example.cpp(183,39): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-D:\Controller\Sources\Foreign\ACC Shared Memory\SharedMemoryACCS\ConsoleApplication1\ACCSM_Example.cpp(185,29): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-D:\Controller\Sources\Foreign\ACC Shared Memory\SharedMemoryACCS\ConsoleApplication1\ACCSM_Example.cpp(188,27): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-D:\Controller\Sources\Foreign\ACC Shared Memory\SharedMemoryACCS\ConsoleApplication1\ACCSM_Example.cpp(189,38): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-D:\Controller\Sources\Foreign\ACC Shared Memory\SharedMemoryACCS\ConsoleApplication1\ACCSM_Example.cpp(190,34): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-D:\Controller\Sources\Foreign\ACC Shared Memory\SharedMemoryACCS\ConsoleApplication1\ACCSM_Example.cpp(191,32): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-D:\Controller\Sources\Foreign\ACC Shared Memory\SharedMemoryACCS\ConsoleApplication1\ACCSM_Example.cpp(206,39): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-D:\Controller\Sources\Foreign\ACC Shared Memory\SharedMemoryACCS\ConsoleApplication1\ACCSM_Example.cpp(207,27): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-D:\Controller\Sources\Foreign\ACC Shared Memory\SharedMemoryACCS\ConsoleApplication1\ACCSM_Example.cpp(211,31): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-D:\Controller\Sources\Foreign\ACC Shared Memory\SharedMemoryACCS\ConsoleApplication1\ACCSM_Example.cpp(215,26): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+D:\Controller\Sources\Foreign\ACC Shared Memory\SharedMemoryACCS\ConsoleApplication1\ACCSM_Example.cpp(148,24): warning C4244: "Argument": Konvertierung von "int" in "float", möglicher Datenverlust
+D:\Controller\Sources\Foreign\ACC Shared Memory\SharedMemoryACCS\ConsoleApplication1\ACCSM_Example.cpp(149,39): warning C4244: "Argument": Konvertierung von "int" in "float", möglicher Datenverlust
+D:\Controller\Sources\Foreign\ACC Shared Memory\SharedMemoryACCS\ConsoleApplication1\ACCSM_Example.cpp(150,29): warning C4244: "Argument": Konvertierung von "int" in "float", möglicher Datenverlust
+D:\Controller\Sources\Foreign\ACC Shared Memory\SharedMemoryACCS\ConsoleApplication1\ACCSM_Example.cpp(154,24): warning C4244: "Argument": Konvertierung von "int" in "float", möglicher Datenverlust
+D:\Controller\Sources\Foreign\ACC Shared Memory\SharedMemoryACCS\ConsoleApplication1\ACCSM_Example.cpp(175,29): warning C4244: "Argument": Konvertierung von "int" in "float", möglicher Datenverlust
+D:\Controller\Sources\Foreign\ACC Shared Memory\SharedMemoryACCS\ConsoleApplication1\ACCSM_Example.cpp(176,27): warning C4244: "Argument": Konvertierung von "AC_STATUS" in "float", möglicher Datenverlust
+D:\Controller\Sources\Foreign\ACC Shared Memory\SharedMemoryACCS\ConsoleApplication1\ACCSM_Example.cpp(177,27): warning C4244: "Argument": Konvertierung von "AC_SESSION_TYPE" in "float", möglicher Datenverlust
+D:\Controller\Sources\Foreign\ACC Shared Memory\SharedMemoryACCS\ConsoleApplication1\ACCSM_Example.cpp(178,34): warning C4244: "Argument": Konvertierung von "int" in "float", möglicher Datenverlust
+D:\Controller\Sources\Foreign\ACC Shared Memory\SharedMemoryACCS\ConsoleApplication1\ACCSM_Example.cpp(179,28): warning C4244: "Argument": Konvertierung von "int" in "float", möglicher Datenverlust
+D:\Controller\Sources\Foreign\ACC Shared Memory\SharedMemoryACCS\ConsoleApplication1\ACCSM_Example.cpp(181,32): warning C4244: "Argument": Konvertierung von "int" in "float", möglicher Datenverlust
+D:\Controller\Sources\Foreign\ACC Shared Memory\SharedMemoryACCS\ConsoleApplication1\ACCSM_Example.cpp(183,39): warning C4244: "Argument": Konvertierung von "int" in "float", möglicher Datenverlust
+D:\Controller\Sources\Foreign\ACC Shared Memory\SharedMemoryACCS\ConsoleApplication1\ACCSM_Example.cpp(185,29): warning C4244: "Argument": Konvertierung von "int" in "float", möglicher Datenverlust
+D:\Controller\Sources\Foreign\ACC Shared Memory\SharedMemoryACCS\ConsoleApplication1\ACCSM_Example.cpp(188,27): warning C4244: "Argument": Konvertierung von "int" in "float", möglicher Datenverlust
+D:\Controller\Sources\Foreign\ACC Shared Memory\SharedMemoryACCS\ConsoleApplication1\ACCSM_Example.cpp(189,38): warning C4244: "Argument": Konvertierung von "int" in "float", möglicher Datenverlust
+D:\Controller\Sources\Foreign\ACC Shared Memory\SharedMemoryACCS\ConsoleApplication1\ACCSM_Example.cpp(190,34): warning C4244: "Argument": Konvertierung von "int" in "float", möglicher Datenverlust
+D:\Controller\Sources\Foreign\ACC Shared Memory\SharedMemoryACCS\ConsoleApplication1\ACCSM_Example.cpp(191,32): warning C4244: "Argument": Konvertierung von "int" in "float", möglicher Datenverlust
+D:\Controller\Sources\Foreign\ACC Shared Memory\SharedMemoryACCS\ConsoleApplication1\ACCSM_Example.cpp(206,39): warning C4244: "Argument": Konvertierung von "int" in "float", möglicher Datenverlust
+D:\Controller\Sources\Foreign\ACC Shared Memory\SharedMemoryACCS\ConsoleApplication1\ACCSM_Example.cpp(207,27): warning C4244: "Argument": Konvertierung von "int" in "float", möglicher Datenverlust
+D:\Controller\Sources\Foreign\ACC Shared Memory\SharedMemoryACCS\ConsoleApplication1\ACCSM_Example.cpp(211,31): warning C4244: "Argument": Konvertierung von "int" in "float", möglicher Datenverlust
+D:\Controller\Sources\Foreign\ACC Shared Memory\SharedMemoryACCS\ConsoleApplication1\ACCSM_Example.cpp(215,26): warning C4244: "Argument": Konvertierung von "int" in "float", möglicher Datenverlust
   ConsoleApplication1.vcxproj -> D:\Controller\Sources\Foreign\ACC Shared Memory\SharedMemoryACCS\Debug\SharedMemoryExample.exe

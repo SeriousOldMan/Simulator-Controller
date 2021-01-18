@@ -1,5 +1,4 @@
-[Version]
-Current=2.0.4-release
-Target=2.0.4-release
-Changes=Bugfixes and small enhancements, Support for Select Driver in Pitstop Handling and also for Voice Control, First version of rule engine
+Current=2.0.5-dev
+Target=2.1-release
+Changes=Rule set for AI based race engineer
 Date=01/18/2021

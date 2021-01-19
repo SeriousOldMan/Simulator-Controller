@@ -158,7 +158,7 @@ int main(int argc, char* argv[])
 		SPageFileGraphic* pf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 		
 		printData("Active", (pf->status == AC_LIVE) ? "true" : "false");
-		printData("Laps", pf->numberOfLaps);
+		printData("Laps", pf->completedLaps);
         printData("LapLastTime", pf->iLastTime);
 		printData("LapBestTime", pf->iBestTime);
 		printData("TimeLeft", pf->sessionTimeLeft);
@@ -172,7 +172,7 @@ int main(int argc, char* argv[])
 
 		SPageFileStatic* pf = (SPageFileStatic*)m_static.mapFileBuffer;
 
-		wcout << "DriverName=" << pf->playerName << endl;
+		wcout << "DriverName=" << pf->playerSurname << endl;
 		printData("FuelAmount", pf->maxFuel);
 
 	}

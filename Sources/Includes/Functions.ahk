@@ -311,12 +311,12 @@ loadSimulatorConfiguration() {
 
 initializeEnvironment() {	
 	FileCreateDir %A_MyDocuments%\Simulator Controller
-	FileCreateDir %A_MyDocuments%\Simulator Controller\Config
-	FileCreateDir %A_MyDocuments%\Simulator Controller\Logs
-	FileCreateDir %A_MyDocuments%\Simulator Controller\Splash Media
-	FileCreateDir %A_MyDocuments%\Simulator Controller\Screen Images
-	FileCreateDir %A_MyDocuments%\Simulator Controller\Plugins
-	FileCreateDir %A_MyDocuments%\Simulator Controller\Temp
+	FileCreateDir %kUserHomeDirectory%Config
+	FileCreateDir %kUserHomeDirectory%Logs
+	FileCreateDir %kUserHomeDirectory%Splash Media
+	FileCreateDir %kUserHomeDirectory%Screen Images
+	FileCreateDir %kUserHomeDirectory%Plugins
+	FileCreateDir %kUserHomeDirectory%Temp
 	
 	if !FileExist(A_MyDocuments . "\Simulator Controller\Plugins\Plugins.ahk")
 		FileCopy %kResourcesDirectory%Templates\Plugins.ahk, %A_MyDocuments%\Simulator Controller\Plugins

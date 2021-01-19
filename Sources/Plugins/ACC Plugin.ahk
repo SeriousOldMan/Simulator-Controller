@@ -735,6 +735,11 @@ isACCRunning() {
 	return (ErrorLevel != 0)
 }
 
+
+;;;-------------------------------------------------------------------------;;;
+;;;                         Controller Action Section                       ;;;
+;;;-------------------------------------------------------------------------;;;
+
 openPitstopMFD() {
 	protectionOn()
 	
@@ -880,6 +885,56 @@ changePitstopDriver(selection) {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+collectACCData() {
+	static lastLap := 0
+	
+	if !isACCRunning() {
+		currentDirectory := A_WorkingDir
+		exePath := kBinariesDirectory . "ACC SHM Reader.exe"
+		
+		;SetWorkingDir %kUserHomeDirectory%Temp\ACC Data
+		
+		;try {
+			try {
+				Run %ComSpec% /c ""%exePath%" > "%kUserHomeDirectory%Temp\ACC Data\ACC SHM.data"", , Hide
+			}
+			catch exception {
+				logMessage(kLogCritical, translate("Cannot start ACC SHM Reader (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
+				
+				title := translate("Modular Simulator Controller System - Controller (Plugin: ACC)")
+			
+				SplashTextOn 800, 60, %title%, % substituteVariables(translate("Cannot start ACC SHM Reader (%exePath%) - please check the configuration..."))
+						
+				Sleep 5000
+						
+				SplashTextOff
+			}
+		/*
+		}
+		finally {
+			SetWorkingDir %currentDirectory%
+		}
+		*/
+		
+		data := readConfiguration(kUserHomeDirectory . "Temp\ACC Data\ACC SHM.data")
+		
+		if getConfigurationValue(data, "Stint State", "Active", false) {
+			dataLastLap := getConfigurationValue(data, "Stint State", "Laps", 0)
+			
+			if (dataLastLap > lastLap) {
+				lastLap := dataLastLap
+				
+				writeConfiguration(kUserHomeDirectory . "Temp\ACC Data\Lap " . lastLap . ".data", data)
+			}
+		}
+		else
+			lastLap := 0
+	}
+	else {
+		lastLap := 0
+	}
+}
+
 updatePitstopState() {
 	protectionOn()
 	
@@ -893,6 +948,13 @@ updatePitstopState() {
 
 initializeACCPlugin() {
 	local controller := SimulatorController.Instance
+	
+	FileCreateDir %kUserHomeDirectory%Temp\ACC Data
+	
+	Loop Files, %kUserHomeDirectory%Temp\ACC Data\*.*
+		FileDelete %A_LoopFilePath%
+	
+	; SetTimer collectACCData, 10000
 	
 	new ACCPlugin(controller, kACCPLugin, controller.Configuration)
 }

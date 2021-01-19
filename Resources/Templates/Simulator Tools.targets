@@ -10,6 +10,8 @@ Logs Folder=%kLogsDirectory%
 Simulator Settings.ini=%kUserConfigDirectory%Simulator Settings.ini
 Simulator Tools.ini=%kUserConfigDirectory%Simulator Tools.ini
 *.bak Files=%kHomeDirectory%, *.ahk.bak, R
+[Copy]
+ACC SHM Reader=%kBinariesDirectory%ACC SHM Reader.exe <- %kSourcesDirectory%Foreign\ACC SHM Reader\Release\ACC SHM Reader.exe
 [Build]
 Simulator Controller=%kBinariesDirectory%Simulator Controller.exe <- %kSourcesDirectory%Controller\Simulator Controller.ahk; %kIncludesDirectory%, %kPluginsDirectory%, %kUserPluginsDirectory%, %kHomeDirectory%VERSION
 Simulator Settings=%kBinariesDirectory%Simulator Settings.exe <- %kSourcesDirectory%Startup\Simulator Settings.ahk; %kIncludesDirectory%, %kSourcesDirectory%Startup\Libraries\, %kHomeDirectory%VERSION

@@ -56,11 +56,15 @@ global kCancel = "cancel"
 
 global vUpdateTargets = []
 global vCleanupTargets = []
+global vCopyTargets = []
 global vBuildTargets = []
 global vSplashTheme = false
 
+global vTargetCounts = 0
+
 global vUpdateSettings = Object()
 global vCleanupSettings = Object()
+global vCopySettings = Object()
 global vBuildSettings = Object()
 
 
@@ -68,13 +72,14 @@ global vBuildSettings = Object()
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-readToolsConfiguration(ByRef updateSettings, ByRef cleanupSettings, ByRef buildSettings, ByRef splashTheme) {
+readToolsConfiguration(ByRef updateSettings, ByRef cleanupSettings, ByRef copySettings, ByRef buildSettings, ByRef splashTheme) {
 	targets := readConfiguration(kToolsTargetsFile)
 	configuration := readConfiguration(kToolsConfigurationFile)
 	updateConfiguration := readConfiguration(getFileName("UPDATES", kUserConfigDirectory))
 	
 	updateSettings := Object()
 	cleanupSettings := Object()
+	copySettings := Object()
 	buildSettings := Object()
 	
 	for target, rule in getConfigurationSectionValues(targets, "Update", Object())
@@ -83,6 +88,9 @@ readToolsConfiguration(ByRef updateSettings, ByRef cleanupSettings, ByRef buildS
 	
 	for target, rule in getConfigurationSectionValues(targets, "Cleanup", Object())
 		cleanupSettings[target] := getConfigurationValue(configuration, "Cleanup", target, InStr(target, "*.ahk") ? true : false)
+	
+	for target, rule in getConfigurationSectionValues(targets, "Copy", Object())
+		copySettings[target] := getConfigurationValue(configuration, "Copy", target, true)
 	
 	for target, rule in getConfigurationSectionValues(targets, "Build", Object())
 		buildSettings[target] := getConfigurationValue(configuration, "Build", target, true)
@@ -93,11 +101,14 @@ readToolsConfiguration(ByRef updateSettings, ByRef cleanupSettings, ByRef buildS
 		buildSettings["Simulator Tools"] := false
 }
 
-writeToolsConfiguration(updateSettings, cleanupSettings, buildSettings, splashTheme) {
+writeToolsConfiguration(updateSettings, cleanupSettings, copySettings, buildSettings, splashTheme) {
 	configuration := newConfiguration()
 	
 	for target, setting in cleanupSettings
 		setConfigurationValue(configuration, "Cleanup", target, setting)
+		
+	for target, setting in copySettings
+		setConfigurationValue(configuration, "Copy", target, setting)
 		
 	for target, setting in buildSettings
 		setConfigurationValue(configuration, "Build", target, setting)
@@ -140,6 +151,15 @@ editTargets(command := "") {
 	static cleanupVariable7
 	static cleanupVariable8
 	
+	static copyVariable1
+	static copyVariable2
+	static copyVariable3
+	static copyVariable4
+	static copyVariable5
+	static copyVariable6
+	static copyVariable7
+	static copyVariable8
+	
 	static buildVariable1
 	static buildVariable2
 	static buildVariable3
@@ -166,15 +186,27 @@ editTargets(command := "") {
 			vCleanupSettings[target] := %cleanupVariable%
 		}
 		
+		for target, setting in vCopySettings {
+			copyVariable := "copyVariable" . A_Index
+			
+			vCopySettings[target] := %copyVariable%
+		}
+		
 		for target, setting in vBuildSettings {
 			buildVariable := "buildVariable" . A_Index
 			
 			vBuildSettings[target] := %buildVariable%
 		}
 		
+		for target, setting in vCopySettings {
+			copyVariable := "copyVariable" . A_Index
+			
+			vCopySettings[target] := %copyVariable%
+		}
+		
 		vSplashTheme := (splashTheme == translate("None")) ? false : splashTheme
 		
-		writeToolsConfiguration(vUpdateSettings, vCleanupSettings, vBuildSettings, vSplashTheme)
+		writeToolsConfiguration(vUpdateSettings, vCleanupSettings, vCopySettings, vBuildSettings, vSplashTheme)
 		
 		Gui TE:Destroy
 		
@@ -198,6 +230,9 @@ editTargets(command := "") {
 		
 		if (vCleanupSettings.Length() > 8)
 			Throw "Too many cleanup targets detected in editTargets..."
+		
+		if (vCopySettings.Length() > 8)
+			Throw "Too many copy targets detected in editTargets..."
 		
 		if (vBuildSettings.Length() > 8)
 			Throw "Too many build targets detected in editTargets..."
@@ -268,6 +303,30 @@ editTargets(command := "") {
 		else
 			Gui TE:Add, Text, YP+20 XP+10, % translate("No targets found...")
 	
+		Gui TE:Font, Norm, Arial
+		Gui TE:Font, Italic, Arial
+	
+		copyHeight := 20 + (vCopySettings.Count() * 20)
+		
+		if (copyHeight == 20)
+			copydHeight := 40
+			
+		Gui TE:Add, GroupBox, XP-10 YP+30 w220 h%copyHeight%, % translate("Copy")
+	
+		Gui TE:Font, Norm, Arial
+	
+		if (vCopySettings.Count() > 0)
+			for target, setting in vCopySettings {
+				option := ""
+				
+				if (A_Index == 1)
+					option := option . " YP+20 XP+10"
+					
+				Gui TE:Add, CheckBox, %option% Checked%setting% vcopyVariable%A_Index%, %target%
+			}
+		else
+			Gui TE:Add, Text, YP+20 XP+10, % translate("No targets found...")
+		
 		Gui TE:Font, Norm, Arial
 		Gui TE:Font, Italic, Arial
 	
@@ -469,7 +528,7 @@ runUpdateTargets(ByRef buildProgress) {
 		
 		Sleep 1000
 		
-		progressStep := Round((100 / (vUpdateTargets.Length() + vCleanupTargets.Length() + vBuildTargets.Length() + 1)) / target[2].Length())
+		progressStep := Round((100 / (vTargetsCount + 1)) / target[2].Length())
 		
 		for ignore, updateFunction in target[2] {
 			if !kSilentMode
@@ -482,7 +541,7 @@ runUpdateTargets(ByRef buildProgress) {
 			buildProgress += progressStep
 		}
 				
-		buildProgress += Round(100 / (vUpdateTargets.Length() + vCleanupTargets.Length() + vBuildTargets.Length() + 1))
+		buildProgress += Round(100 / (vTargetsCount + 1))
 			
 		if !kSilentMode
 			Progress %buildProgress%
@@ -515,17 +574,20 @@ runCleanTargets(ByRef buildProgress) {
 		
 				SetWorkingDir %fileOrFolder%
 			
-				Loop Files, *.*
-				{
-					FileDelete %A_LoopFilePath%
-			
-					if !kSilentMode
-						Progress %buildProgress%, % translate("Deleting ") . A_LoopFileName . translate("...")
-					
-					Sleep 50
+				try {
+					Loop Files, *.*
+					{
+						FileDelete %A_LoopFilePath%
+				
+						if !kSilentMode
+							Progress %buildProgress%, % translate("Deleting ") . A_LoopFileName . translate("...")
+						
+						Sleep 50
+					}
 				}
-			
-				SetWorkingDir %currentDirectory%
+				finally {
+					SetWorkingDir %currentDirectory%
+				}
 			}
 			else if (FileExist(fileOrFolder) != "") {
 				FileDelete %fileOrFolder%
@@ -539,22 +601,72 @@ runCleanTargets(ByRef buildProgress) {
 			
 			SetWorkingDir %directory%
 			
-			Loop Files, %pattern%, %options%
-			{
-				FileDelete %A_LoopFilePath%
+			try {
+				Loop Files, %pattern%, %options%
+				{
+					FileDelete %A_LoopFilePath%
+				
+					if !kSilentMode
+						Progress %buildProgress%, % translate("Deleting ") . A_LoopFileName . translate("...")
 			
-				if !kSilentMode
-					Progress %buildProgress%, % translate("Deleting ") . A_LoopFileName . translate("...")
-		
-				Sleep 100
+					Sleep 100
+				}
 			}
-			
-			SetWorkingDir %currentDirectory%
+			finally {
+				SetWorkingDir %currentDirectory%
+			}
 		}
 			
 		Sleep 1000
 				
-		buildProgress += Round(100 / (vUpdateTargets.Length() + vCleanupTargets.Length() + vBuildTargets.Length() + 1))
+		buildProgress += Round(100 / (vTargetCounts + 1))
+			
+		if !kSilentMode
+			Progress %buildProgress%
+	}
+}
+
+runCopyTargets(ByRef buildProgress) {
+	local title
+	
+	for ignore, target in vCopyTargets {
+		targetName := target[1]
+	
+		if !kSilentMode
+			Progress %buildProgress%, % translate("Copying ") . targetName . translate("...")
+			
+		logMessage(kLogInfo, translate("Check ") . targetName)
+
+		copy := false
+		
+		targetSource := target[2]
+		targetDestination := target[3]
+		
+		FileGetTime srcLastModified, %targetSource%, M
+		FileGetTime dstLastModified, %targetDestination%, M
+		
+		if srcLastModified
+			if dstLastModified
+				copy := (srcLastModified > dstLastModified)
+			else
+				copy := true
+		
+		if copy {
+			logMessage(kLogInfo, targetName . translate(" out of date - update needed"))
+			logMessage(kLogInfo, translate("Copying ") . targetSource)
+			
+			SplitPath targetDestination, copiedFile, targetDirectory
+			SplitPath targetSource, , sourceDirectory 
+			
+			copiedFile := sourceDirectory . "\" . copiedFile
+			
+			FileCreateDir %targetDirectory%
+			FileMove %copiedFile%, %targetDirectory%, 1
+		}
+			
+		Sleep 1000
+		
+		buildProgress += Round(100 / (vTargetCounts + 1))
 			
 		if !kSilentMode
 			Progress %buildProgress%
@@ -588,7 +700,7 @@ runBuildTargets(ByRef buildProgress) {
 			build := true
 		
 		if build {
-			logMessage(kLogInfo, targetName . translate(" or dependent files out of date - need recompile"))
+			logMessage(kLogInfo, targetName . translate(" or dependent files out of date - recompile triggered"))
 			logMessage(kLogInfo, translate("Compiling ") . targetSource)
 
 			try {
@@ -617,7 +729,7 @@ runBuildTargets(ByRef buildProgress) {
 			
 		Sleep 1000
 		
-		buildProgress += Round(100 / (vUpdateTargets.Length() + vCleanupTargets.Length() + vBuildTargets.Length() + 1))
+		buildProgress += Round(100 / (vTargetCounts + 1))
 			
 		if !kSilentMode
 			Progress %buildProgress%
@@ -637,7 +749,7 @@ prepareTargets(ByRef buildProgress, updateOnly) {
 	targets := readConfiguration(kToolsTargetsFile)
 	
 	for target, arguments in getConfigurationSectionValues(targets, "Update", Object()) {
-		buildProgress +=1
+		buildProgress += 1
 		update := vUpdateSettings[target]
 		
 		if !kSilentMode
@@ -659,7 +771,7 @@ prepareTargets(ByRef buildProgress, updateOnly) {
 	
 	if !updateOnly {
 		for target, arguments in getConfigurationSectionValues(targets, "Cleanup", Object()) {
-			buildProgress +=1
+			buildProgress += 1
 			cleanup := vCleanupSettings[target]
 			
 			if !kSilentMode
@@ -674,8 +786,24 @@ prepareTargets(ByRef buildProgress, updateOnly) {
 			Sleep 200
 		}
 		
+		for target, arguments in getConfigurationSectionValues(targets, "Copy", Object()) {
+			buildProgress += 1
+			copy := vCopySettings[target]
+			
+			if !kSilentMode
+				Progress, %buildProgress%, % target . ": " . (copy ? translate("Yes") : translate("No"))
+			
+			if copy {
+				rule := string2Values("<-", substituteVariables(arguments))
+			
+				vCopyTargets.Push(Array(target, rule[2], rule[1]))
+			}
+		
+			Sleep 200
+		}
+		
 		for target, arguments in getConfigurationSectionValues(targets, "Build", Object()) {
-			buildProgress +=1
+			buildProgress += 1
 			build := vBuildSettings[target]
 			
 			if !kSilentMode
@@ -701,7 +829,7 @@ runTargets() {
 	
 	Menu Tray, Icon, %icon%, , 1
 	
-	readToolsConfiguration(vUpdateSettings, vCleanupSettings, vBuildSettings, vSplashTheme)
+	readToolsConfiguration(vUpdateSettings, vCleanupSettings, vCopySettings, vBuildSettings, vSplashTheme)
 	
 	if (A_Args.Length() > 0)
 		if (A_Args[1] = "-Update")
@@ -709,6 +837,7 @@ runTargets() {
 	
 	if updateOnly {
 		vCleanupSettings := {}
+		vCopySettings := {}
 		vBuildSettings := {}
 	}
 	else if (!FileExist(getFileName(kToolsConfigurationFile, kUserConfigDirectory, kConfigDirectory)) || GetKeyState("Ctrl"))
@@ -730,6 +859,8 @@ runTargets() {
 	
 	prepareTargets(buildProgress, updateOnly)
 	
+	vTargetCounts := (vUpdateTargets.Length() + vCleanupTargets.Length() + vCopyTargets.Length() + vBuildTargets.Length())
+	
 	if !kSilentMode
 		Progress, , %A_Space%, % translate("Running Targets")
 	
@@ -737,6 +868,7 @@ runTargets() {
 	
 	if !updateOnly {
 		runCleanTargets(buildProgress)
+		runCopyTargets(buildProgress)
 		runBuildTargets(buildProgress)
 	}
 		

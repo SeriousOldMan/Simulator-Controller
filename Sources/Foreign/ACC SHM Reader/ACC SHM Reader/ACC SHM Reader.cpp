@@ -2,6 +2,8 @@
 //
 
 #include "stdafx.h"
+#include <stdio.h>
+#include <string.h>
 #include <windows.h>
 #include <tchar.h>
 #include <iostream>
@@ -80,138 +82,98 @@ void dismiss(SMElement element)
 
 void printData(string name, float value)
 {
-	wcout << name.c_str() << " : " << value << endl;
+	wcout << name.c_str() << "=" << value << endl;
+}
+
+void printData(string name, string value)
+{
+	wcout << name.c_str() << "=" << value.c_str() << endl;
 }
 
 template <typename T, unsigned S>
 inline void printData(const string name, const T(&v)[S])
 {
-	wcout << name.c_str() << " : ";
+	wcout << name.c_str() << "=";
     
     for (int i = 0; i < S; i++)
     {
         wcout << v[i];
-        if (i < S - 1)
-        {
-            wcout << " , ";
-        }
 
+        if (i < S - 1)
+			wcout << ", ";
     }
+
 	wcout << endl;
 }
 
 template <typename T, unsigned S, unsigned S2>
 inline void printData2(const string name, const T(&v)[S][S2])
 {
-    wcout << name.c_str() << " : ";
+    wcout << name.c_str() << "=";
 
     for (int i = 0; i < S; i++)
     {
-        wcout << i << " : ";
-        for (int j = 0; j < S2; j++) {
+        wcout << i << ": ";
+    
+		for (int j = 0; j < S2; j++) {
             wcout << v[i][j];
-            if (j < S2 - 1)
-            {
-                wcout << " , ";
-            }
+        
+			if (j < S2 - 1)
+                wcout << ", ";
         }
 
-        wcout << ";" << endl;
+		if (i < (S - 1))
+			wcout << "; ";
        
     }
 
+	wcout << endl;
+
 }
 
-int _tmain(int argc, _TCHAR* argv[])
+int main(int argc, char* argv[])
 {
 	initPhysics();
 	initGraphics();
 	initStatic();
 
- 	if (argv[1][0] == 'P')
+ 	if ((argc == 1) || strchr(argv[1], 'C'))
 	{
-		wcout << "---------------PHYSICS INFO---------------" << endl;
+		wcout << "[Car State]" << endl;
+
 		SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
-		printData("acc G", pf->accG);
-		printData("brake", pf->brake);
-		printData("camber rad", pf->camberRAD);
-		printData("damage", pf->carDamage);
-		printData("car height", pf->cgHeight);
-		printData("drs", pf->drs);
-		printData("tc", pf->tc);
-		printData("fuel", pf->fuel);
-		printData("gas", pf->gas);
-		printData("gear", pf->gear);
-		printData("number of tyres out", pf->numberOfTyresOut);
-		printData("packet id", pf->packetId);
-		printData("heading", pf->heading);
-		printData("pitch", pf->pitch);
-		printData("roll", pf->roll);
-		printData("rpms", pf->rpms);
-		printData("speed kmh", pf->speedKmh);
-        printData2("contact point", pf->tyreContactPoint);
-        printData2("contact normal", pf->tyreContactNormal);
-        printData2("contact heading", pf->tyreContactHeading);
-		printData("steer ", pf->steerAngle);
-		printData("suspension travel", pf->suspensionTravel);
-		printData("tyre core temp", pf->tyreCoreTemperature);
-		printData("tyre dirty level", pf->tyreDirtyLevel);
-		printData("tyre wear", pf->tyreWear);
-		printData("velocity", pf->velocity);
-		printData("wheel angular speed", pf->wheelAngularSpeed);
-		printData("wheel load", pf->wheelLoad);
-		printData("wheel slip", pf->wheelSlip);
-		printData("wheel pressure", pf->wheelsPressure);
+
+		printData("BodyWorkDamage", pf->carDamage);
+		printData("SuspensionDamage", pf->suspensionDamage);
+		printData("FuelRemaining", pf->fuel);
+		printData("TyreTemperature", pf->tyreCoreTemperature);
+		printData("TyrePressure", pf->wheelsPressure);
+		printData("TyreWear", pf->tyreWear);
 	}
 
-	if (argv[1][0] == 'G')
+	if ((argc == 1) || strchr(argv[1], 'S'))
 	{
-		wcout << "---------------GRAPHICS INFO---------------" << endl;
+		wcout << "[Stint State]" << endl;
+
 		SPageFileGraphic* pf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
-		printData("packetID ", pf->packetId);
-		printData("STATUS ", pf->status);
-		printData("session", pf->session);
-		printData("completed laps", pf->completedLaps);
-		printData("position", pf->position);
-		printData("current time s", pf->currentTime);
-		printData("current time", pf->iCurrentTime);
-        printData("last time s", pf->lastTime);
-        printData("last time ", pf->iLastTime);
-		printData("best time s", pf->bestTime);
-		printData("best time", pf->iBestTime);
-		printData("sessionTimeLeft", pf->sessionTimeLeft);
-		printData("distanceTraveled", pf->distanceTraveled);
-		printData("isInPit", pf->isInPit);
-		printData("currentSectorIndex", pf->currentSectorIndex);
-		printData("lastSectorTime", pf->lastSectorTime);
-		printData("numberOfLaps", pf->numberOfLaps);
-		wcout << "TYRE COMPOUND : " << pf->tyreCompound << endl;
-		printData("replayMult", pf->replayTimeMultiplier);
-		printData("normalizedCarPosition", pf->normalizedCarPosition);
-		printData2("carCoordinates", pf->carCoordinates);
+		
+		printData("Active", (pf->status == AC_LIVE) ? "true" : "false");
+		printData("Laps", pf->numberOfLaps);
+        printData("LapLastTime", pf->iLastTime);
+		printData("LapBestTime", pf->iBestTime);
+		printData("TimeLeft", pf->sessionTimeLeft);
+		printData("InPit", pf->isInPit ? "true" : "false");
+		wcout << "TyreCompound=" << pf->tyreCompound << endl;
 	}
 
-
-	if (argv[1][0] == 'S')
+	if ((argc == 1) || strchr(argv[1], 'I'))
 	{
-		wcout << "---------------STATIC INFO---------------" << endl;
+		wcout << "[Car Data]" << endl;
+
 		SPageFileStatic* pf = (SPageFileStatic*)m_static.mapFileBuffer;
-		wcout << "SM VERSION " << pf->smVersion << endl;
-		wcout << "AC VERSION " << pf->acVersion << endl;
 
-		printData("number of sessions ", pf->numberOfSessions);
-		printData("numCars", pf->numCars);
-		wcout << "Car model " << pf->carModel << endl;
-		wcout << "Car track " << pf->track << endl;
-		wcout << "Player Name " << pf->playerName << endl;
-		printData("sectorCount", pf->sectorCount);
-
-		printData("maxTorque", pf->maxTorque);
-		printData("maxPower", pf->maxPower);
-		printData("maxRpm", pf->maxRpm);
-		printData("maxFuel", pf->maxFuel);
-		printData("suspensionMaxTravel", pf->suspensionMaxTravel);
-		printData("tyreRadius", pf->tyreRadius);
+		wcout << "DriverName=" << pf->playerName << endl;
+		printData("FuelAmount", pf->maxFuel);
 
 	}
 

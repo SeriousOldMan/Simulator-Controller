@@ -1,5 +1,5 @@
 [Version]
-Current=2.0.5-dev
-Target=2.0.5-release
-Changes=Rule set for AI based race engineer, Bugfix
+Current=2.0.6-dev
+Target=2.1-release
+Changes=Copy targets in Simulator Tools, ACC Shared Memory Reader
 Date=01/18/2021

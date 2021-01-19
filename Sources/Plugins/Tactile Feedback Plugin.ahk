@@ -265,6 +265,8 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 	}
 	
 	activate() {
+		local action
+		
 		base.activate()
 	
 		isRunning := this.Application.isRunning()
@@ -363,37 +365,37 @@ callSimHub(command) {
 }
 
 activatePedalVibration() {
-	action := SimulatorController.Instance.findPlugin(kTactileFeedbackPlugin).findAction("Pedal Vibration")
+	local action := SimulatorController.Instance.findPlugin(kTactileFeedbackPlugin).findAction("Pedal Vibration")
 	
 	action.fireAction(action.Function, "On")
 }
 
 deactivatePedalVibration() {
-	action := SimulatorController.Instance.findPlugin(kTactileFeedbackPlugin).findAction("Pedal Vibration")
+	local action := SimulatorController.Instance.findPlugin(kTactileFeedbackPlugin).findAction("Pedal Vibration")
 	
 	action.fireAction(action.Function, "Off")
 }
 
 activateFrontChassisVibration() {
-	action := SimulatorController.Instance.findPlugin(kTactileFeedbackPlugin).findAction("Front Vibration")
+	local action := SimulatorController.Instance.findPlugin(kTactileFeedbackPlugin).findAction("Front Vibration")
 	
 	action.fireAction(action.Function, "On")
 }
 
 deactivateFrontChassisVibration() {
-	action := SimulatorController.Instance.findPlugin(kTactileFeedbackPlugin).findAction("Front Vibration")
+	local action := SimulatorController.Instance.findPlugin(kTactileFeedbackPlugin).findAction("Front Vibration")
 	
 	action.fireAction(action.Function, "Off")
 }
 
 activateRearChassisVibration() {
-	action := SimulatorController.Instance.findPlugin(kTactileFeedbackPlugin).findAction("Rear Vibration")
+	local action := SimulatorController.Instance.findPlugin(kTactileFeedbackPlugin).findAction("Rear Vibration")
 	
 	action.fireAction(action.Function, "On")
 }
 
 deactivateRearChassisVibration() {
-	action := SimulatorController.Instance.findPlugin(kTactileFeedbackPlugin).findAction("Rear Vibration")
+	local action := SimulatorController.Instance.findPlugin(kTactileFeedbackPlugin).findAction("Rear Vibration")
 	
 	action.fireAction(action.Function, "Off")
 }

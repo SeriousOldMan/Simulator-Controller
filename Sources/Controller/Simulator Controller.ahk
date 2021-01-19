@@ -575,7 +575,7 @@ class SimulatorController extends ConfigurationItem {
 	}
 	
 	fireAction(function, trigger) {
-		action := this.getAction(function, trigger)
+		local action := this.getAction(function, trigger)
 		
 		if (action != false) {
 			this.updateLastEvent()
@@ -979,11 +979,11 @@ class ControllerPlugin extends Plugin {
 		
 		logMessage(kLogInfo, translate("Activating plugin ") . translate(this.Plugin))
 		
-		for ignore, action in this.Actions {
-			controller.connectAction(action.Function, action)
+		for ignore, theAction in this.Actions {
+			controller.connectAction(theAction.Function, theAction)
 			
-			action.Function.enable(kAllTrigger)
-			action.Function.setText(translate(action.Label))
+			theAction.Function.enable(kAllTrigger)
+			theAction.Function.setText(translate(theAction.Label))
 		}
 	}
 	
@@ -992,8 +992,8 @@ class ControllerPlugin extends Plugin {
 		
 		logMessage(kLogInfo, translate("Deactivating plugin ") . translate(this.Plugin))
 		
-		for ignore, action in this.Actions
-			controller.disconnectAction(action.Function, action)
+		for ignore, theAction in this.Actions
+			controller.disconnectAction(theAction.Function, theAction)
 	}
 	
 	runningSimulator() {
@@ -1091,11 +1091,11 @@ class ControllerMode {
 		
 		logMessage(kLogInfo, translate("Activating mode ") . translate(getModeForLogMessage(this)))
 		
-		for ignore, action in this.Actions {
-			controller.connectAction(action.Function, action)
+		for ignore, theAction in this.Actions {
+			controller.connectAction(theAction.Function, theAction)
 			
-			action.Function.enable(kAllTrigger)
-			action.Function.setText(translate(action.Label))
+			theAction.Function.enable(kAllTrigger)
+			theAction.Function.setText(translate(theAction.Label))
 		}
 	}
 	
@@ -1104,8 +1104,8 @@ class ControllerMode {
 		
 		logMessage(kLogInfo, translate("Deactivating mode ") . translate(getModeForLogMessage(this)))
 		
-		for ignore, action in this.Actions
-			controller.disconnectAction(action.Function, action)
+		for ignore, theAction in this.Actions
+			controller.disconnectAction(theAction.Function, theAction)
 	}
 }
 

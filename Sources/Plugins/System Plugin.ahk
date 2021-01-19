@@ -206,6 +206,7 @@ class SystemPlugin extends ControllerPlugin {
 	}
 	
 	loadFromConfiguration(configuration) {
+		local action
 		local function
 		
 		base.loadFromConfiguration(configuration)

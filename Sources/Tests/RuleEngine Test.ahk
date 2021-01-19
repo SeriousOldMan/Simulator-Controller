@@ -431,8 +431,9 @@ celebrate(knowledgeBase) {
 	}
 }
 
-showRelationship(knowledgeBase, grandchild, grandfather) {
+showRelationship(resultSet, grandchild, grandfather) {
 	local fact := "Related." . grandchild . "." . grandfather
+	local knowledgeBase := resultSet.KnowledgeBase
 	
 	if (knowledgeBase.RuleEngine.TraceLevel < kTraceOff) {
 		SplashTextOn 200, 60, Message, %grandchild% is grandchild of %grandfather%

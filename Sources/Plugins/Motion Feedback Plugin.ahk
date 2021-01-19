@@ -523,6 +523,8 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	}
 	
 	activate() {
+		local action
+		
 		base.activate()
 	
 		isRunning := this.Application.isRunning()
@@ -996,6 +998,8 @@ initializeMotionFeedbackPlugin() {
 ;;;-------------------------------------------------------------------------;;;
 
 startMotion() {
+	local action
+	
 	protectionOn()
 	
 	try {
@@ -1009,6 +1013,8 @@ startMotion() {
 }
 
 stopMotion() {
+	local action
+	
 	protectionOn()
 	
 	try {

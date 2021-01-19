@@ -6,12 +6,27 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                         Local Include Section                           ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include ..\Libraries\RuleEngine.ahk
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 global kACCPlugin = "ACC"
 global kDriveMode = "Drive"
 global kPitstopMode = "Pitstop"
+
+global kAlways = "Always"
+
+global kFront = 0
+global kRear = 1
+global kLeft = 2
+global kRight = 3
+global kCenter = 4
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -171,8 +186,8 @@ class ACCPlugin extends ControllerPlugin {
 		this.kOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", false)
 		this.kClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
 		
-		for ignore, action in string2Values(",", this.getArgumentValue("pitstopSettings", ""))
-			this.createPitstopAction(controller, string2Values(A_Space, action)*)
+		for ignore, theAction in string2Values(",", this.getArgumentValue("pitstopSettings", ""))
+			this.createPitstopAction(controller, string2Values(A_Space, theAction)*)
 		
 		controller.registerPlugin(this)
 	}
@@ -706,6 +721,175 @@ class ACCPlugin extends ControllerPlugin {
 	}
 }
 
+class RaceEngineer extends ConfigurationItem {
+	iKnowledgeBase := false
+	iOverallTime := 0
+	iLastLap := 0
+	iLastFuelAmount := 0
+	iInitialFuelAmount := 0
+	
+	KnowledgeBase[] {
+		Get {
+			return this.iKnowledgeBase
+		}
+	}
+	
+	OverallTime[] {
+		Get {
+			return this.iOverallTime
+		}
+	}
+	
+	LastLap[] {
+		Get {
+			return this.iLastLap
+		}
+	}
+	
+	InitialFuelAmount[] {
+		Get {
+			return this.iInitialFuelAmount
+		}
+	}
+	
+	LastFuelAmount[] {
+		Get {
+			return this.iLastFuelAmount
+		}
+	}
+	
+	__New(plugin, configuration := false) {
+		base.__New(configuration)
+		
+		RaceEngineer.Instance := this
+	}
+	
+	createRace(initialData) {
+		local facts
+		
+		duration := Round((getConfigurationValue(initialData, "Stint Data", "TimeRemaining", 0) + getConfigurationValue(initialData, "Stint Data", "LapLastTime", 0)) / 1000)
+		
+		facts := {"Race.Car": getConfigurationValue(initialData, "Static Data", "Car", "")
+				, "Race.Track": getConfigurationValue(initialData, "Static Data", "Track", "")
+				, "Race.Duration": duration
+				, "Race.Outlap": true
+				, "Race.Inlap": true
+				, "Race.AvgLapTime": 0
+				, "Race.AvgFuelPerLap": 0
+				, "Race.FreshTyreSet": 1
+				, "Race.Damage.Repair": kAlways
+				, "Race.Tyre.Pressures.FL": 0
+				, "Race.Tyre.Pressures.FR": 0
+				, "Race.Tyre.Pressures.RL": 0
+				, "Race.Tyre.Pressures.RR": 0}
+				
+		return facts
+	}
+	
+	startRace(facts) {
+		engine := new RuleEngine([], [], facts)
+		
+		this.iKnowledgeBase := engine.createKnowledgeBase(engine.createFacts(), engine.createRules())
+		this.iLastLap := 0
+		this.iOverallTime := 0
+		this.iInitialFuel := 0
+	}
+	
+	finishRace() {
+		fileName := (kUserHomeDirectory . "Temp\ACC Data\Race.data")
+	
+		FileDelete %fileName%
+		
+		curEncoding := A_FileEncoding
+		
+		FileEncoding UTF-16
+		
+		try {
+			for theFact, theValue in this.KnowledgeBase.Facts.Facts {
+				line := theFact . "=" . theValue . "`n"
+				
+				FileAppend %line%, %fileName%
+			}
+		}
+		finally {
+			FileEncoding %curEncoding%
+		}
+	}
+	
+	addLap(lapNumber, data) {
+		local knowledgeBase
+		
+		if !this.KnowledgeBase
+			this.startRace(this.createRace(data))
+		
+		knowledgeBase := this.KnowledgeBase
+		
+		if (lapNumber == 1)
+			knowledgeBase.addFact("Lap", 2)
+		else
+			knowledgeBase.setValue("Lap", lapNumber + 1)
+			
+		knowledgeBase.addFact("Lap." . lapNumber . ".Driver", getConfigurationValue(data, "Race Data", "DriverName", ""))
+		
+		lapTime := getConfigurationValue(initialData, "Stint Data", "LapLastTime", 0)
+		
+		knowledgeBase.addFact("Lap." . lapNumber . ".Time", lapTime)
+		knowledgeBase.addFact("Lap." . lapNumber . ".Time.Start", this.OverallTime)
+		this.iOverallTime := this.OverallTime + lapTime
+		knowledgeBase.addFact("Lap." . lapNumber . ".Time.End", this.OverallTime)
+		
+		fuelRemaining := getConfigurationValue(data, "Car Data", "FuelRemaining", 0)
+		
+		knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.Remaining", fuelRemaining)
+		
+		if (lapNumber == 1) {
+			this.iInitialFuelAmount := fuelRemaining
+			this.iLastFuelAmount := fuelRemaining
+			
+			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.Consumption", 0)
+		}
+		else {
+			this.iLastFuelAmount := fuelRemaining
+			
+			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.Consumption", Round((this.InitialFuelAmount - this.LastFuelAmount) / (lapNumber - 1), 2))
+		}
+		
+		tyrePressures := string2Values(",", getConfigurationValue(data, "Car Data", "TyrePressure", ""))
+		
+		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Pressure.FL", Round(tyrePressures[1] * 10))
+		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Pressure.FR", Round(tyrePressures[2] * 10))		
+		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Pressure.RL", Round(tyrePressures[3] * 10))
+		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Pressure.RR", Round(tyrePressures[4] * 10))
+		
+		tyreTemperatures := string2Values(",", getConfigurationValue(data, "Car Data", "TyreTemperature", ""))
+		
+		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Temperature.FL", Round(tyreTemperatures[1]))
+		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Temperature.FR", Round(tyreTemperatures[2]))		
+		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Temperature.RL", Round(tyreTemperatures[3]))
+		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Temperature.RR", Round(tyreTemperatures[4]))
+			
+		knowledgeBase.addFact("Lap." . lapNumber . ".Weather", 0)
+		knowledgeBase.addFact("Lap." . lapNumber . ".Temperature.Air", getConfigurationValue(data, "Car Data", "AirTemperature", 0))
+		knowledgeBase.addFact("Lap." . lapNumber . ".Temperature.Track", getConfigurationValue(data, "Car Data", "TrackTemperature", 0))
+		
+		bodyWorkDamage := string2Values(",", getConfigurationValue(data, "Car Data", "BodyWorkDamage", ""))
+		
+		knowledgeBase.addFact("Lap." . lapNumber . ".Damage.BodyWork.Front", bodyWorkDamage[1])
+		knowledgeBase.addFact("Lap." . lapNumber . ".Damage.BodyWork.Rear", bodyWorkDamage[2])
+		knowledgeBase.addFact("Lap." . lapNumber . ".Damage.BodyWork.Left", bodyWorkDamage[3])
+		knowledgeBase.addFact("Lap." . lapNumber . ".Damage.BodyWork.Right", bodyWorkDamage[4])
+		knowledgeBase.addFact("Lap." . lapNumber . ".Damage.BodyWork.Center", bodyWorkDamage[5])
+		
+		suspensionDamage := string2Values(",", getConfigurationValue(data, "Car Data", "SuspensionDamage", ""))
+		
+		knowledgeBase.addFact("Lap." . lapNumber . ".Damage.Suspension.FL", suspensionDamage[1])
+		knowledgeBase.addFact("Lap." . lapNumber . ".Damage.Suspension.FR", suspensionDamage[2])
+		knowledgeBase.addFact("Lap." . lapNumber . ".Damage.Suspension.RL", suspensionDamage[3])
+		knowledgeBase.addFact("Lap." . lapNumber . ".Damage.Suspension.RR", suspensionDamage[4])
+		
+		knowledgeBase.produce()
+	}
+}
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                     Function Hook Declaration Section                   ;;;
@@ -886,13 +1070,14 @@ changePitstopDriver(selection) {
 ;;;-------------------------------------------------------------------------;;;
 
 collectACCData() {
+	local raceEngineer
 	static lastLap := 0
 	
 	if isACCRunning() {
 		exePath := kBinariesDirectory . "ACC SHM Reader.exe"
 		
 		try {
-			Run %ComSpec% /c ""%exePath%" > "%kUserHomeDirectory%Temp\ACC Data\ACC SHM.data"", , Hide
+			Run %ComSpec% /c ""%exePath%" > "%kUserHomeDirectory%Temp\ACC Data\SHM.data"", , Hide
 		}
 		catch exception {
 			logMessage(kLogCritical, translate("Cannot start ACC SHM Reader (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
@@ -906,19 +1091,28 @@ collectACCData() {
 			SplashTextOff
 		}
 		
-		data := readConfiguration(kUserHomeDirectory . "Temp\ACC Data\ACC SHM.data")
+		data := readConfiguration(kUserHomeDirectory . "Temp\ACC Data\SHM.data")
 		
-		if getConfigurationValue(data, "Stint State", "Active", false) {
-			dataLastLap := getConfigurationValue(data, "Stint State", "Laps", 0)
+		if getConfigurationValue(data, "Stint Data", "Active", false) {
+			raceEngineer := RaceEngineer.Instance
+			dataLastLap := getConfigurationValue(data, "Stint Data", "Laps", 0)
 			
 			if (dataLastLap > lastLap) {
-				lastLap := dataLastLap
+				if (lastLap == 0)
+					raceEngineer.startRace(raceEngineer.createRace(data))
+				
+				lastLap += 1
+				
+				raceEngineer.addLap(dataLastLap)
 				
 				writeConfiguration(kUserHomeDirectory . "Temp\ACC Data\Lap " . lastLap . ".data", data)
 			}
 		}
-		else
+		else {
+			raceEngineer.finishRace()
+			
 			lastLap := 0
+		}
 	}
 	else {
 		lastLap := 0
@@ -946,7 +1140,9 @@ initializeACCPlugin() {
 	
 	SetTimer collectACCData, 10000
 	
-	new ACCPlugin(controller, kACCPLugin, controller.Configuration)
+	thePlugin := new ACCPlugin(controller, kACCPLugin, controller.Configuration)
+	
+	new RaceEngineer(thePlugin, controller.Configuration)
 }
 
 

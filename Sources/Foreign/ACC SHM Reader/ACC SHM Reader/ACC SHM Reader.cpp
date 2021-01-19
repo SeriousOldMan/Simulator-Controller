@@ -6,6 +6,7 @@
 #include <string.h>
 #include <windows.h>
 #include <tchar.h>
+#include <comdef.h>
 #include <iostream>
 #include "SharedFileOut.h"
 #pragma optimize("",off)
@@ -139,13 +140,20 @@ int main(int argc, char* argv[])
 
  	if ((argc == 1) || strchr(argv[1], 'C'))
 	{
-		wcout << "[Car State]" << endl;
+		wcout << "[Car Data]" << endl;
 
 		SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
+		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
+
+		_bstr_t tc(gf->tyreCompound);
+		const char* tyreCompound = tc;
 
 		printData("BodyWorkDamage", pf->carDamage);
 		printData("SuspensionDamage", pf->suspensionDamage);
 		printData("FuelRemaining", pf->fuel);
+		printData("AirTemperature", pf->airTemp);
+		printData("RoadTemperature", pf->roadTemp);
+		wcout << "TyreCompound=" << ((tyreCompound == "dry_compound") ? "Dry" : "Wet") << endl;
 		printData("TyreTemperature", pf->tyreCoreTemperature);
 		printData("TyrePressure", pf->wheelsPressure);
 		printData("TyreWear", pf->tyreWear);
@@ -153,26 +161,28 @@ int main(int argc, char* argv[])
 
 	if ((argc == 1) || strchr(argv[1], 'S'))
 	{
-		wcout << "[Stint State]" << endl;
+		wcout << "[Stint Data]" << endl;
 
 		SPageFileGraphic* pf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 		
-		printData("Active", (pf->status == AC_LIVE) ? "true" : "false");
+		printData("Active", ((pf->status == AC_LIVE) || (pf->status == AC_PAUSE)) ? "true" : "false");
 		printData("Laps", pf->completedLaps);
         printData("LapLastTime", pf->iLastTime);
 		printData("LapBestTime", pf->iBestTime);
-		printData("TimeLeft", pf->sessionTimeLeft);
+		printData("TimeRemaining", pf->sessionTimeLeft);
 		printData("InPit", pf->isInPit ? "true" : "false");
-		wcout << "TyreCompound=" << pf->tyreCompound << endl;
 	}
 
 	if ((argc == 1) || strchr(argv[1], 'I'))
 	{
-		wcout << "[Car Data]" << endl;
+		wcout << "[Race Data]" << endl;
 
 		SPageFileStatic* pf = (SPageFileStatic*)m_static.mapFileBuffer;
 
 		wcout << "DriverName=" << pf->playerSurname << endl;
+		wcout << "DriverNick=" << pf->playerNick << endl;
+		wcout << "CarModel=" << pf->carModel << endl;
+		wcout << "Track=" << pf->track << endl;
 		printData("FuelAmount", pf->maxFuel);
 
 	}

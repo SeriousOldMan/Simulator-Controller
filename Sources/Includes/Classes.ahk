@@ -371,6 +371,8 @@ class Function extends ConfigurationItem {
 	
 	Actions[trigger := false, asText := false] {
 		Get {
+			local action
+			
 			if trigger {
 				action := this.iActions[trigger]
 
@@ -397,12 +399,12 @@ class Function extends ConfigurationItem {
 			else {
 				result := {}
 			
-				for trigger, action in this.iActions
+				for trigger, theAction in this.iActions
 					if asText {
 						arguments := []
 						
-						if (action && (action.Length() == 2)) {
-							arguments := action[2].Clone()
+						if (theAction && (theAction.Length() == 2)) {
+							arguments := theAction[2].Clone()
 							
 							for index, argument in arguments
 								if (argument == true)
@@ -411,7 +413,7 @@ class Function extends ConfigurationItem {
 									arguments[index] := "false"
 						}
 						
-						result[trigger] := ((action && (action.Length() == 2)) ? (action[1] . "(" . values2String(", ", arguments*) . ")") : "")
+						result[trigger] := ((theAction && (theAction.Length() == 2)) ? (theAction[1] . "(" . values2String(", ", arguments*) . ")") : "")
 					}
 					else
 						result[trigger] := this.actionCallable(trigger, action)
@@ -521,7 +523,7 @@ class Function extends ConfigurationItem {
 	}
 	
 	fireAction(trigger) {
-		action := this.Actions[trigger]
+		local action := this.Actions[trigger]
 		
 		if action
 			%action%()

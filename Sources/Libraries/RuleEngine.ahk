@@ -567,6 +567,7 @@ class CallAction extends Action {
 	}
 	
 	execute(knowledgeBase) {
+		local function
 		local facts := knowledgeBase.Facts
 		
 		function := this.Function[facts]
@@ -1710,6 +1711,7 @@ class CallChoicePoint extends ChoicePoint {
 	iFirst := true
 	
 	nextChoice() {
+		local function
 		local resultSet
 		
 		if this.iFirst {
@@ -1728,7 +1730,7 @@ class CallChoicePoint extends ChoicePoint {
 			if (resultSet.RuleEngine.TraceLevel <= kTraceMedium)
 				resultSet.RuleEngine.trace(kTraceMedium, "Call " . function . "(" . values2String(", ", values*) . ")")
 			
-			return %function%(resultSet.KnowledgeBase, values*)
+			return %function%(resultSet, values*)
 		}
 		else
 			return false

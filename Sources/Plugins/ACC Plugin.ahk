@@ -764,13 +764,13 @@ class RaceEngineer extends ConfigurationItem {
 		RaceEngineer.Instance := this
 	}
 	
-	createRace(initialData) {
+	createRace(data) {
 		local facts
 		
-		duration := Round((getConfigurationValue(initialData, "Stint Data", "TimeRemaining", 0) + getConfigurationValue(initialData, "Stint Data", "LapLastTime", 0)) / 1000)
+		duration := Round((getConfigurationValue(data, "Stint Data", "TimeRemaining", 0) + getConfigurationValue(data, "Stint Data", "LapLastTime", 0)) / 1000)
 		
-		facts := {"Race.Car": getConfigurationValue(initialData, "Static Data", "Car", "")
-				, "Race.Track": getConfigurationValue(initialData, "Static Data", "Track", "")
+		facts := {"Race.Car": getConfigurationValue(data, "Race Data", "Car", "")
+				, "Race.Track": getConfigurationValue(data, "Race Data", "Track", "")
 				, "Race.Duration": duration
 				, "Race.Outlap": true
 				, "Race.Inlap": true
@@ -818,74 +818,78 @@ class RaceEngineer extends ConfigurationItem {
 	
 	addLap(lapNumber, data) {
 		local knowledgeBase
+		local facts
 		
 		if !this.KnowledgeBase
 			this.startRace(this.createRace(data))
 		
 		knowledgeBase := this.KnowledgeBase
+		facts := knowledgeBase.Facts
 		
 		if (lapNumber == 1)
-			knowledgeBase.addFact("Lap", 2)
+			facts.addFact("Lap", 2)
 		else
-			knowledgeBase.setValue("Lap", lapNumber + 1)
+			facts.setValue("Lap", lapNumber + 1)
 			
-		knowledgeBase.addFact("Lap." . lapNumber . ".Driver", getConfigurationValue(data, "Race Data", "DriverName", ""))
+		facts.addFact("Lap." . lapNumber . ".Driver", getConfigurationValue(data, "Race Data", "DriverName", ""))
 		
-		lapTime := getConfigurationValue(initialData, "Stint Data", "LapLastTime", 0)
+		lapTime := getConfigurationValue(data, "Stint Data", "LapLastTime", 0)
 		
-		knowledgeBase.addFact("Lap." . lapNumber . ".Time", lapTime)
-		knowledgeBase.addFact("Lap." . lapNumber . ".Time.Start", this.OverallTime)
+		facts.addFact("Lap." . lapNumber . ".Time", lapTime)
+		facts.addFact("Lap." . lapNumber . ".Time.Start", this.OverallTime)
 		this.iOverallTime := this.OverallTime + lapTime
-		knowledgeBase.addFact("Lap." . lapNumber . ".Time.End", this.OverallTime)
+		facts.addFact("Lap." . lapNumber . ".Time.End", this.OverallTime)
 		
 		fuelRemaining := getConfigurationValue(data, "Car Data", "FuelRemaining", 0)
 		
-		knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.Remaining", fuelRemaining)
+		facts.addFact("Lap." . lapNumber . ".Fuel.Remaining", fuelRemaining)
 		
 		if (lapNumber == 1) {
 			this.iInitialFuelAmount := fuelRemaining
 			this.iLastFuelAmount := fuelRemaining
 			
-			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.Consumption", 0)
+			facts.addFact("Lap." . lapNumber . ".Fuel.AvgConsumption", 0)
+			facts.addFact("Lap." . lapNumber . ".Fuel.Consumption", 0)
 		}
 		else {
-			this.iLastFuelAmount := fuelRemaining
+			facts.addFact("Lap." . lapNumber . ".Fuel.Consumption", this.iLastFuelAmount - fuelRemaining)
+			facts.addFact("Lap." . lapNumber . ".Fuel.AvgConsumption", Round((this.InitialFuelAmount - fuelRemaining) / (lapNumber - 1), 2))
 			
-			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.Consumption", Round((this.InitialFuelAmount - this.LastFuelAmount) / (lapNumber - 1), 2))
+			this.iLastFuelAmount := fuelRemaining
 		}
 		
 		tyrePressures := string2Values(",", getConfigurationValue(data, "Car Data", "TyrePressure", ""))
 		
-		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Pressure.FL", Round(tyrePressures[1] * 10))
-		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Pressure.FR", Round(tyrePressures[2] * 10))		
-		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Pressure.RL", Round(tyrePressures[3] * 10))
-		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Pressure.RR", Round(tyrePressures[4] * 10))
+		facts.addFact("Lap." . lapNumber . ".Tyre.Pressure.FL", Round(tyrePressures[1] * 10))
+		facts.addFact("Lap." . lapNumber . ".Tyre.Pressure.FR", Round(tyrePressures[2] * 10))		
+		facts.addFact("Lap." . lapNumber . ".Tyre.Pressure.RL", Round(tyrePressures[3] * 10))
+		facts.addFact("Lap." . lapNumber . ".Tyre.Pressure.RR", Round(tyrePressures[4] * 10))
 		
 		tyreTemperatures := string2Values(",", getConfigurationValue(data, "Car Data", "TyreTemperature", ""))
 		
-		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Temperature.FL", Round(tyreTemperatures[1]))
-		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Temperature.FR", Round(tyreTemperatures[2]))		
-		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Temperature.RL", Round(tyreTemperatures[3]))
-		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Temperature.RR", Round(tyreTemperatures[4]))
+		facts.addFact("Lap." . lapNumber . ".Tyre.Temperature.FL", Round(tyreTemperatures[1]))
+		facts.addFact("Lap." . lapNumber . ".Tyre.Temperature.FR", Round(tyreTemperatures[2]))		
+		facts.addFact("Lap." . lapNumber . ".Tyre.Temperature.RL", Round(tyreTemperatures[3]))
+		facts.addFact("Lap." . lapNumber . ".Tyre.Temperature.RR", Round(tyreTemperatures[4]))
 			
-		knowledgeBase.addFact("Lap." . lapNumber . ".Weather", 0)
-		knowledgeBase.addFact("Lap." . lapNumber . ".Temperature.Air", getConfigurationValue(data, "Car Data", "AirTemperature", 0))
-		knowledgeBase.addFact("Lap." . lapNumber . ".Temperature.Track", getConfigurationValue(data, "Car Data", "TrackTemperature", 0))
+		facts.addFact("Lap." . lapNumber . ".Weather", 0)
+		facts.addFact("Lap." . lapNumber . ".Temperature.Air", getConfigurationValue(data, "Car Data", "AirTemperature", 0))
+		facts.addFact("Lap." . lapNumber . ".Temperature.Track", getConfigurationValue(data, "Car Data", "TrackTemperature", 0))
 		
 		bodyWorkDamage := string2Values(",", getConfigurationValue(data, "Car Data", "BodyWorkDamage", ""))
 		
-		knowledgeBase.addFact("Lap." . lapNumber . ".Damage.BodyWork.Front", bodyWorkDamage[1])
-		knowledgeBase.addFact("Lap." . lapNumber . ".Damage.BodyWork.Rear", bodyWorkDamage[2])
-		knowledgeBase.addFact("Lap." . lapNumber . ".Damage.BodyWork.Left", bodyWorkDamage[3])
-		knowledgeBase.addFact("Lap." . lapNumber . ".Damage.BodyWork.Right", bodyWorkDamage[4])
-		knowledgeBase.addFact("Lap." . lapNumber . ".Damage.BodyWork.Center", bodyWorkDamage[5])
+		facts.addFact("Lap." . lapNumber . ".Damage.BodyWork.Front", bodyWorkDamage[1])
+		facts.addFact("Lap." . lapNumber . ".Damage.BodyWork.Rear", bodyWorkDamage[2])
+		facts.addFact("Lap." . lapNumber . ".Damage.BodyWork.Left", bodyWorkDamage[3])
+		facts.addFact("Lap." . lapNumber . ".Damage.BodyWork.Right", bodyWorkDamage[4])
+		facts.addFact("Lap." . lapNumber . ".Damage.BodyWork.Center", bodyWorkDamage[5])
 		
 		suspensionDamage := string2Values(",", getConfigurationValue(data, "Car Data", "SuspensionDamage", ""))
 		
-		knowledgeBase.addFact("Lap." . lapNumber . ".Damage.Suspension.FL", suspensionDamage[1])
-		knowledgeBase.addFact("Lap." . lapNumber . ".Damage.Suspension.FR", suspensionDamage[2])
-		knowledgeBase.addFact("Lap." . lapNumber . ".Damage.Suspension.RL", suspensionDamage[3])
-		knowledgeBase.addFact("Lap." . lapNumber . ".Damage.Suspension.RR", suspensionDamage[4])
+		facts.addFact("Lap." . lapNumber . ".Damage.Suspension.FL", suspensionDamage[1])
+		facts.addFact("Lap." . lapNumber . ".Damage.Suspension.FR", suspensionDamage[2])
+		facts.addFact("Lap." . lapNumber . ".Damage.Suspension.RL", suspensionDamage[3])
+		facts.addFact("Lap." . lapNumber . ".Damage.Suspension.RR", suspensionDamage[4])
 		
 		knowledgeBase.produce()
 	}
@@ -1070,7 +1074,6 @@ changePitstopDriver(selection) {
 ;;;-------------------------------------------------------------------------;;;
 
 collectACCData() {
-	local raceEngineer
 	static lastLap := 0
 	
 	if isACCRunning() {
@@ -1091,25 +1094,24 @@ collectACCData() {
 			SplashTextOff
 		}
 		
+		engineer := RaceEngineer.Instance
 		data := readConfiguration(kUserHomeDirectory . "Temp\ACC Data\SHM.data")
+		dataLastLap := getConfigurationValue(data, "Stint Data", "Laps", 0)
 		
-		if getConfigurationValue(data, "Stint Data", "Active", false) {
-			raceEngineer := RaceEngineer.Instance
-			dataLastLap := getConfigurationValue(data, "Stint Data", "Laps", 0)
+		if (dataLastLap > lastLap) {
+			if (lastLap == 0)
+				engineer.startRace(engineer.createRace(data))
 			
-			if (dataLastLap > lastLap) {
-				if (lastLap == 0)
-					raceEngineer.startRace(raceEngineer.createRace(data))
-				
-				lastLap += 1
-				
-				raceEngineer.addLap(dataLastLap)
-				
-				writeConfiguration(kUserHomeDirectory . "Temp\ACC Data\Lap " . lastLap . ".data", data)
-			}
+			lastLap += 1
+			
+			engineer.addLap(dataLastLap, data)
+			
+			writeConfiguration(kUserHomeDirectory . "Temp\ACC Data\Lap " . lastLap . ".data", data)
 		}
-		else {
-			raceEngineer.finishRace()
+		
+		if !getConfigurationValue(data, "Stint Data", "Active", false) {
+			if (lastLap > 0)
+				engineer.finishRace()
 			
 			lastLap := 0
 		}

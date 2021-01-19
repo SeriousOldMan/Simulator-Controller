@@ -156,7 +156,6 @@ int main(int argc, char* argv[])
 		wcout << "TyreCompound=" << ((tyreCompound == "dry_compound") ? "Dry" : "Wet") << endl;
 		printData("TyreTemperature", pf->tyreCoreTemperature);
 		printData("TyrePressure", pf->wheelsPressure);
-		printData("TyreWear", pf->tyreWear);
 	}
 
 	if ((argc == 1) || strchr(argv[1], 'S'))

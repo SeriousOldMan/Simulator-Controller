@@ -37,6 +37,8 @@ global kProve = "Prove:"
 global kSet = "Set:"
 global kClear = "Clear:"
 
+global kBuiltinFunctions = ["option", "plus", "minus", "multiply", "divide", "greater", "less", "append"]
+
 global kProduction = "Production"
 global kReduction = "Reduction"
 
@@ -1386,7 +1388,7 @@ class ResultSet {
 			}
 			else {
 				if (ruleEngine.TraceLevel <= kTraceFull)
-					ruleEngine.trace(kTraceFull, "Unbound - return " . (IsObject(last) ? last.toString() : last))
+					ruleEngine.trace(kTraceFull, var.toString() . " is unbound - return " . (IsObject(last) ? last.toString() : last))
 				
 				return last
 			}
@@ -1394,7 +1396,9 @@ class ResultSet {
 	}
 	
 	createChoicePoint(goal, environment := false) {
-		switch goal.Functor {
+		functor := goal.Functor
+		
+		switch functor {
 			case "produce":
 				return new ProduceChoicePoint(this, goal, environment)
 			case "call":
@@ -1408,7 +1412,10 @@ class ResultSet {
 			case "fail":
 				return new FailChoicePoint(this, goal, environment)
 			default:
-				return new RulesChoicePoint(this, goal, environment)
+				if inList(kBuiltinFunctions, functor)
+					return new CallChoicePoint(this, goal, environment)
+				else
+					return new RulesChoicePoint(this, goal, environment)
 		}
 	}
 }
@@ -1708,32 +1715,93 @@ class ClearFactChoicePoint extends ChoicePoint {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class CallChoicePoint extends ChoicePoint {
+	iBuiltin := false
 	iFirst := true
 	
-	nextChoice() {
-		local function
-		local resultSet
+	__New(ruleSet, goal, environment) {
+		base.__New(ruleSet, goal, environment)
 		
+		this.iBuiltin := (goal.Functor != "call")
+	}
+	
+	nextChoice() {
 		if this.iFirst {
 			this.iFirst := false
 		
-			resultSet := this.ResultSet
-			values := []
-			function := false
+			if this.iBuiltin
+				result := this.builtinCall()
+			else
+				result := this.foreignCall()
 			
-			for index, theTerm in this.Goal.Arguments
-				if (index == 1)
-					function := theTerm.getValue(resultSet).toString(resultSet)
-				else
-					values.Push(theTerm.getValue(resultSet).toString(resultSet))
+			if !result
+				this.reset()
 			
-			if (resultSet.RuleEngine.TraceLevel <= kTraceMedium)
-				resultSet.RuleEngine.trace(kTraceMedium, "Call " . function . "(" . values2String(", ", values*) . ")")
-			
-			return %function%(resultSet, values*)
+			return result
 		}
-		else
+		else {
+			this.reset()
+		
 			return false
+		}
+	}
+	
+	foreignCall() {
+		local resultSet := this.ResultSet
+		local function
+		
+		values := []
+		builtin := false
+		
+		for index, theTerm in this.Goal.Arguments
+			if (index == 1) {
+				function := theTerm.getValue(resultSet, theTerm).toString(resultSet)
+				
+				builtin := inList(kBuiltinFunctions, function)
+			}
+			else {
+				value := theTerm.getValue(resultSet, theTerm)
+				
+				if !builtin
+					value := value.toString(resultSet)
+					
+				values.Push(value)
+			}
+		
+		if (resultSet.RuleEngine.TraceLevel <= kTraceMedium) {
+			if builtin {
+				newValues := []
+			
+				for index, value in values
+					newValues.Push(value.toString(resultSet))
+			
+				resultSet.RuleEngine.trace(kTraceMedium, "Call " . function . "(" . values2String(", ", newValues*) . ")")
+			}
+			else
+				resultSet.RuleEngine.trace(kTraceMedium, "Call " . function . "(" . values2String(", ", values*) . ")")
+		}
+		
+		return %function%(this, values*)
+	}
+	
+	builtinCall() {
+		local resultSet := this.ResultSet
+		local function := this.Goal.Functor
+		
+		values := []
+		
+		for index, theTerm in this.Goal.Arguments
+			values.Push(theTerm.getValue(resultSet, theTerm))
+		
+		if (resultSet.RuleEngine.TraceLevel <= kTraceMedium) {
+			newValues := []
+			
+			for index, value in values
+				newValues.Push(value.toString(resultSet))
+					
+			resultSet.RuleEngine.trace(kTraceMedium, "Call " . function . "(" . values2String(", ", newValues*) . ")")
+		}
+		
+		return %function%(this, values*)
 	}
 }
 
@@ -1905,6 +1973,20 @@ class KnowledgeBase {
 		this.Rules.activateRules(rules)
 	}
 	
+	addRule(rule) {
+		this.Rules.addRule(rule)
+		
+		if (rule.Type == kProduction)
+			this.registerRuleFacts(rule)
+	}
+	
+	removeRule(rule) {
+		this.Rules.removeRule(rule)
+		
+		if (rule.Type == kProduction)
+			this.deregisterRuleFacts(rule)
+	}
+	
 	produce() {
 		local facts := this.Facts
 		local rules := this.Rules
@@ -1939,20 +2021,6 @@ class KnowledgeBase {
 			if !produced
 				break
 		}
-	}
-	
-	addRule(rule) {
-		this.Rules.addRule(rule)
-		
-		if (rule.Type == kProduction)
-			this.registerRuleFacts(rule)
-	}
-	
-	removeRule(rule) {
-		this.Rules.removeRule(rule)
-		
-		if (rule.Type == kProduction)
-			this.deregisterRuleFacts(rule)
 	}
 	
 	prove(goal) {
@@ -2672,7 +2740,7 @@ class RuleCompiler {
 		Loop {
 			argument := this.readCompoundArgument(text, nextCharIndex)
 			
-			if argument
+			if (argument || (argument == "0"))
 				arguments.Push(argument)
 			else if (A_Index == 1)
 				return arguments
@@ -3265,4 +3333,215 @@ class NilParser extends Parser {
 	parse(terms) {
 		return new Nil()
 	}
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                   Private Function Declaration Section                  ;;;
+;;;-------------------------------------------------------------------------;;;
+
+option(choicePoint, option, enable) {
+	if isInstance(option, Term)
+		option := option.toSTring(resultSet)
+	
+	if isInstance(enable, Term)
+		enable := enable.toSTring(resultSet)
+	
+	if (option = "occurCheck") {
+		if ((enable = false) || (enable = "false"))
+			choicePoint.ResultSet.KnowledgeBase.disableOccurCheck()
+		else if ((enable = true) || (enable = "true"))
+			choicePoint.ResultSet.KnowledgeBase.enableOccurCheck()
+		else
+			return false
+	}
+	else if (option = "deterministicFacts") {
+		if ((enable = false) || (enable = "false"))
+			choicePoint.ResultSet.KnowledgeBase.disableDeterministicFacts()
+		else if ((enable = true) || (enable = "true"))
+			choicePoint.ResultSet.KnowledgeBase.enableDeterministicFacts()
+		else
+			return false
+	}
+	
+	return true
+}
+
+plus(choicePoint, operand1, operand2, operand3) {
+	local resultSet := choicePoint.ResultSet
+	
+	operand1 := operand1.getValue(resultSet, operand1)
+	operand2 := operand2.getValue(resultSet, operand2)
+	operand3 := operand3.getValue(resultSet, operand3)
+	
+	if isInstance(operand1, Variable) {
+		if (isInstance(operand2, Variable) || isInstance(operand3, Variable))
+			return false
+		else
+			return resultSet.unify(choicePoint, operand1, new Literal(operand2.toString(resultSet) + operand3.toString(resultSet)))
+	}
+	else if isInstance(operand2, Variable) {
+		if (isInstance(operand1, Variable) || isInstance(operand3, Variable))
+			return false
+		else
+			return resultSet.unify(choicePoint, operand2, new Literal(operand1.toString(resultSet) - operand3.toString(resultSet)))
+	}
+	else if isInstance(operand3, Variable) {
+		if (isInstance(operand1, Variable) || isInstance(operand2, Variable))
+			return false
+		else
+			return resultSet.unify(choicePoint, operand3, new Literal(operand1.toString(resultSet) - operand2.toString(resultSet)))
+	}
+	else
+		return (operand1.toString(resultSet) = (operand2.toString(resultSet) + operand3.toString(resultSet)))
+}
+
+minus(choicePoint, operand1, operand2, operand3) {
+	local resultSet := choicePoint.ResultSet
+	
+	operand1 := operand1.getValue(resultSet, operand1)
+	operand2 := operand2.getValue(resultSet, operand2)
+	operand3 := operand3.getValue(resultSet, operand3)
+	
+	if isInstance(operand1, Variable) {
+		if (isInstance(operand2, Variable) || isInstance(operand3, Variable))
+			return false
+		else
+			return resultSet.unify(choicePoint, operand1, new Literal(operand2.toString(resultSet) - operand3.toString(resultSet)))
+	}
+	else if isInstance(operand2, Variable) {
+		if (isInstance(operand1, Variable) || isInstance(operand3, Variable))
+			return false
+		else
+			return resultSet.unify(choicePoint, operand2, new Literal(operand1.toString(resultSet) + operand3.toString(resultSet)))
+	}
+	else if isInstance(operand3, Variable) {
+		if (isInstance(operand1, Variable) || isInstance(operand2, Variable))
+			return false
+		else
+			return resultSet.unify(choicePoint, operand3, new Literal(operand1.toString(resultSet) + operand2.toString(resultSet)))
+	}
+	else
+		return (operand1.toString(resultSet) = (operand2.toString(resultSet) - operand3.toString(resultSet)))
+}
+
+multiply(choicePoint, operand1, operand2, operand3) {
+	local resultSet := choicePoint.ResultSet
+	
+	operand1 := operand1.getValue(resultSet, operand1)
+	operand2 := operand2.getValue(resultSet, operand2)
+	operand3 := operand3.getValue(resultSet, operand3)
+	
+	if isInstance(operand1, Variable) {
+		if (isInstance(operand2, Variable) || isInstance(operand3, Variable))
+			return false
+		else
+			return resultSet.unify(choicePoint, operand1, new Literal(operand2.toString(resultSet) * operand3.toString(resultSet)))
+	}
+	else if isInstance(operand2, Variable) {
+		if (isInstance(operand1, Variable) || isInstance(operand3, Variable))
+			return false
+		else
+			return resultSet.unify(choicePoint, operand2, new Literal(operand1.toString(resultSet) / operand3.toString(resultSet)))
+	}
+	else if isInstance(operand3, Variable) {
+		if (isInstance(operand1, Variable) || isInstance(operand2, Variable))
+			return false
+		else
+			return resultSet.unify(choicePoint, operand3, new Literal(operand1.toString(resultSet) / operand2.toString(resultSet)))
+	}
+	else
+		return (operand1.toString(resultSet) = (operand2.toString(resultSet) * operand3.toString(resultSet)))
+}
+
+divide(choicePoint, operand1, operand2, operand3) {
+	local resultSet := choicePoint.ResultSet
+	
+	operand1 := operand1.getValue(resultSet, operand1)
+	operand2 := operand2.getValue(resultSet, operand2)
+	operand3 := operand3.getValue(resultSet, operand3)
+	
+	if isInstance(operand1, Variable) {
+		if (isInstance(operand2, Variable) || isInstance(operand3, Variable))
+			return false
+		else
+			return resultSet.unify(choicePoint, operand1, new Literal(operand2.toString(resultSet) / operand3.toString(resultSet)))
+	}
+	else if isInstance(operand2, Variable) {
+		if (isInstance(operand1, Variable) || isInstance(operand3, Variable))
+			return false
+		else
+			return resultSet.unify(choicePoint, operand2, new Literal(operand1.toString(resultSet) * operand3.toString(resultSet)))
+	}
+	else if isInstance(operand3, Variable) {
+		if (isInstance(operand1, Variable) || isInstance(operand2, Variable))
+			return false
+		else
+			return resultSet.unify(choicePoint, operand3, new Literal(operand1.toString(resultSet) * operand2.toString(resultSet)))
+	}
+	else
+		return (operand1.toString(resultSet) = (operand2.toString(resultSet) / operand3.toString(resultSet)))
+}
+
+greater(choicePoint, operand1, operand2) {
+	local resultSet := choicePoint.ResultSet
+	
+	operand1 := operand1.getValue(resultSet, operand1)
+	operand2 := operand2.getValue(resultSet, operand2)
+	
+	if (isInstance(operand1, Variable) || isInstance(operand2, Variable))
+		return false
+	else
+		return (operand1.toString(resultSet) > operand2.toString(resultSet))
+}
+
+less(choicePoint, operand1, operand2) {
+	local resultSet := choicePoint.ResultSet
+	
+	operand1 := operand1.getValue(resultSet, operand1)
+	operand2 := operand2.getValue(resultSet, operand2)
+	
+	if (isInstance(operand1, Variable) || isInstance(operand2, Variable))
+		return false
+	else
+		return (operand1.toString(resultSet) < operand2.toString(resultSet))
+}
+
+append(choicePoint, operand1, arguments*) {
+	local resultSet := choicePoint.ResultSet
+	
+	operand1 := operand1.getValue(resultSet, operand1)
+	
+	string := ""
+	
+	for ignore, argument in arguments
+		string .= argument.getValue(resultSet, argument).toString(resultSet)
+	
+	if isInstance(operand1, Variable)
+		return resultSet.unify(choicePoint, operand1, new Literal(string))
+	else
+		return (operand1.toString(resultSet) = string)
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                   Public Function Declaration Section                   ;;;
+;;;-------------------------------------------------------------------------;;;
+
+isInstance(object, root) {
+	candidate := object.base
+	
+	while IsObject(candidate)
+		if (candidate == root)
+			return true
+		else {
+			classVar := candidate.base.__Class
+		
+			if (classVar && (classVar != ""))
+				candidate := %classVar%
+			else
+				return false
+		}
+		
+	return false
 }

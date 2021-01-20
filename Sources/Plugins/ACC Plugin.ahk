@@ -669,7 +669,7 @@ class ACCPlugin extends ControllerPlugin {
 				
 				curTickCount := A_TickCount
 				
-				Loop 2 {
+				Loop 3 {
 					selectDriverLabel := getFileName("ACC\Select Driver " . A_Index . ".jpg", kUserScreenImagesDirectory, kScreenImagesDirectory)
 					
 					if !this.iPSImageSearchArea
@@ -778,10 +778,14 @@ class RaceEngineer extends ConfigurationItem {
 				, "Race.AvgFuelPerLap": 0
 				, "Race.FreshTyreSet": 1
 				, "Race.Damage.Repair": kAlways
-				, "Race.Tyre.Pressures.FL": 0
-				, "Race.Tyre.Pressures.FR": 0
-				, "Race.Tyre.Pressures.RL": 0
-				, "Race.Tyre.Pressures.RR": 0}
+				, "Race.Tyre.Pressure.Target.FL": 27.6
+				, "Race.Tyre.Pressure.Target.FR": 27.6
+				, "Race.Tyre.Pressure.Target.RL": 27.6
+				, "Race.Tyre.Pressure.Target.RR": 27.6
+				, "Race.Tyre.Pressure.Setup.FL": 0
+				, "Race.Tyre.Pressure.Setup.FR": 0
+				, "Race.Tyre.Pressure.Setup.RL": 0
+				, "Race.Tyre.Pressure.Setup.RR": 0}
 				
 		return facts
 	}

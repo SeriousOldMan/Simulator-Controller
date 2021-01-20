@@ -60,6 +60,11 @@ kRules =
 				concat([], ?L, ?L)
 				concat([?H | ?T], ?L, [?H | ?R]) <= concat(?T, ?L, ?R)
 
+				fac(0, 1)
+				fac(?X, ?R) <= greater(?X, 0), minus(?N, ?X, 1), fac(?N, ?T), multiply(?R, ?T, ?X)
+				
+				construct(?A, ?B) <= append(?A, Foo., ?B, .Bar)
+
 				persist(?A, ?B) <= Call(showRelationship, ?A, ?B), !, Set(?B.grandchild, ?A), Set(?B.grandfather, true), Set(?A.grandchild, true), Produce()
 
 				father(Peter, Frank) <= Set(Peter.son, true), Produce()
@@ -75,7 +80,7 @@ kRules =
 				happy(Peter) <= mood(!Peter)
 				unhappy(Peter) <= mood(!Peter), !, fail
 				mood(happy)
-
+				
 				{Any: [?Peter.grandchild], [?Peter.son]} => (Set: Peter, happy)
 				[?Peter = happy] => (Call: celebrate)
 )
@@ -167,7 +172,7 @@ class CompilerTestClass extends Assert {
 		compiler.compileRules(kExecutionTestRules, productions, reductions)
 		
 		this.AssertEqual(2, productions.Length(), "Not all production rules compiled...")
-		this.AssertEqual(18, reductions.Length(), "Not all reduction rules compiled...")
+		this.AssertEqual(21, reductions.Length(), "Not all reduction rules compiled...")
 	}
 }
 
@@ -253,7 +258,7 @@ class EngineTestClass extends Assert {
 }
 
 class UnificationTestClass extends Assert {
-	executeTests(tests) {
+	executeTests(tests, trace := false) {
 		local resultSet
 		
 		compiler := new RuleCompiler()
@@ -265,6 +270,9 @@ class UnificationTestClass extends Assert {
 		
 		engine := new RuleEngine(productions, reductions, {})
 		kb := engine.createKnowledgeBase(engine.createFacts(), engine.createRules())
+		
+		if trace
+			kb.RuleEngine.setTraceLevel(trace)
 			
 		for ignore, test in tests {
 			goal := compiler.compileGoal(test[1])
@@ -303,10 +311,22 @@ class UnificationTestClass extends Assert {
 		
 		this.executeTests(tests)
 	}
+	
+	Builtin_Test() {
+		tests := [["fac(0, ?R)", ["fac(0, 1)"]]
+				, ["fac(1, ?R)", ["fac(1, 1)"]]
+				, ["construct(?A, 42)", ["construct(Foo.42.Bar, 42)"]]]
+		
+		try {
+		this.executeTests(tests)
+		}
+		catch e
+			ListLines
+	}
 }
 
 class HybridEngineTestClass extends Assert {
-	executeTests(tests) {
+	executeTests(tests, trace := false) {
 		local resultSet
 		
 		compiler := new RuleCompiler()
@@ -317,7 +337,9 @@ class HybridEngineTestClass extends Assert {
 		compiler.compileRules(kExecutionTestRules, productions, reductions)
 		
 		engine := new RuleEngine(productions, reductions, {})
-		; engine.setTraceLevel(kTraceFull)
+		
+		if trace
+			engine.setTraceLevel(trace)
 		
 		kb := engine.createKnowledgeBase(engine.createFacts(), engine.createRules())
 		
@@ -431,9 +453,9 @@ celebrate(knowledgeBase) {
 	}
 }
 
-showRelationship(resultSet, grandchild, grandfather) {
+showRelationship(choicePoint, grandchild, grandfather) {
 	local fact := "Related." . grandchild . "." . grandfather
-	local knowledgeBase := resultSet.KnowledgeBase
+	local knowledgeBase := choicePoint.ResultSet.KnowledgeBase
 	
 	if (knowledgeBase.RuleEngine.TraceLevel < kTraceOff) {
 		SplashTextOn 200, 60, Message, %grandchild% is grandchild of %grandfather%
@@ -458,20 +480,6 @@ showFacts(knowledgeBase) {
 		Sleep 5000
 		SplashTextOff
 	}
-}
-
-setOccurCheck(knowledgeBase, enable) {
-	if enable
-		knowledgeBase.enableOccurCheck()
-	else
-		knowledgeBase.disableOccurCheck()
-}
-
-setDeterministicFacts(knowledgeBase, enable) {
-	if enable
-		knowledgeBase.enableDeterministicFacts()
-	else
-		knowledgeBase.disableDeterministicFacts()
 }
 
 

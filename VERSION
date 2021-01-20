@@ -1,5 +1,5 @@
 [Version]
-Current=2.0.6-dev
+Current=2.0.7-dev
 Target=2.1-release
 Changes=Copy targets in Simulator Tools, ACC Shared Memory Reader
 Date=01/18/2021

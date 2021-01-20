@@ -210,18 +210,6 @@ class ACCPlugin extends ControllerPlugin {
 		}
 	}
 	
-	runningSimulator() {
-		return (isACCRunning() ? "Assetto Corsa Competizione" : false)
-	}
-	
-	simulatorStartup(simulator) {
-		base.simulatorStartup(simulator)
-		
-		if (inList(this.Simulators, simulator)) {
-			this.Controller.setMode(this.iDriveMode)
-		}
-	}
-	
 	createPitstopAction(controller, action, increaseFunction, moreArguments*) {
 		static kActions := {Strategy: "Strategy", Refuel: "Refuel"
 						  , TyreChange: "Change Tyres", TyreSet: "Tyre Set", TyreCompound: "Compound", TyreAllAround: "All Around"
@@ -275,6 +263,18 @@ class ACCPlugin extends ControllerPlugin {
 		}
 		else
 			logMessage(kLogWarn, translate("Pitstop action ") . action . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
+	}
+	
+	runningSimulator() {
+		return (isACCRunning() ? "Assetto Corsa Competizione" : false)
+	}
+	
+	simulatorStartup(simulator) {
+		base.simulatorStartup(simulator)
+		
+		if (inList(this.Simulators, simulator)) {
+			this.Controller.setMode(this.iDriveMode)
+		}
 	}
 		
 	openPitstopMFD(update := true) {
@@ -778,10 +778,11 @@ class RaceEngineer extends ConfigurationItem {
 				, "Race.AvgFuelPerLap": 0
 				, "Race.FreshTyreSet": 1
 				, "Race.Damage.Repair": kAlways
-				, "Race.Tyre.Pressure.Target.FL": 27.6
-				, "Race.Tyre.Pressure.Target.FR": 27.6
-				, "Race.Tyre.Pressure.Target.RL": 27.6
-				, "Race.Tyre.Pressure.Target.RR": 27.6
+				, "Race.Tyre.Pressure.Target.FL": 27.7
+				, "Race.Tyre.Pressure.Target.FR": 27.7
+				, "Race.Tyre.Pressure.Target.RL": 27.7
+				, "Race.Tyre.Pressure.Target.RR": 27.7
+				, "Race.Tyre.Pressure.Target.Deviation": 0.2
 				, "Race.Tyre.Pressure.Setup.FL": 0
 				, "Race.Tyre.Pressure.Setup.FR": 0
 				, "Race.Tyre.Pressure.Setup.RL": 0
@@ -846,7 +847,7 @@ class RaceEngineer extends ConfigurationItem {
 		
 		fuelRemaining := getConfigurationValue(data, "Car Data", "FuelRemaining", 0)
 		
-		facts.addFact("Lap." . lapNumber . ".Fuel.Remaining", fuelRemaining)
+		facts.addFact("Lap." . lapNumber . ".Fuel.Remaining", Round(fuelRemaining, 2))
 		
 		if (lapNumber == 1) {
 			this.iInitialFuelAmount := fuelRemaining
@@ -856,7 +857,7 @@ class RaceEngineer extends ConfigurationItem {
 			facts.addFact("Lap." . lapNumber . ".Fuel.Consumption", 0)
 		}
 		else {
-			facts.addFact("Lap." . lapNumber . ".Fuel.Consumption", this.iLastFuelAmount - fuelRemaining)
+			facts.addFact("Lap." . lapNumber . ".Fuel.Consumption", Round(this.iLastFuelAmount - fuelRemaining, 2))
 			facts.addFact("Lap." . lapNumber . ".Fuel.AvgConsumption", Round((this.InitialFuelAmount - fuelRemaining) / (lapNumber - 1), 2))
 			
 			this.iLastFuelAmount := fuelRemaining
@@ -864,36 +865,36 @@ class RaceEngineer extends ConfigurationItem {
 		
 		tyrePressures := string2Values(",", getConfigurationValue(data, "Car Data", "TyrePressure", ""))
 		
-		facts.addFact("Lap." . lapNumber . ".Tyre.Pressure.FL", Round(tyrePressures[1] * 10))
-		facts.addFact("Lap." . lapNumber . ".Tyre.Pressure.FR", Round(tyrePressures[2] * 10))		
-		facts.addFact("Lap." . lapNumber . ".Tyre.Pressure.RL", Round(tyrePressures[3] * 10))
-		facts.addFact("Lap." . lapNumber . ".Tyre.Pressure.RR", Round(tyrePressures[4] * 10))
+		facts.addFact("Lap." . lapNumber . ".Tyre.Pressure.FL", Round(tyrePressures[1], 2))
+		facts.addFact("Lap." . lapNumber . ".Tyre.Pressure.FR", Round(tyrePressures[2], 2))		
+		facts.addFact("Lap." . lapNumber . ".Tyre.Pressure.RL", Round(tyrePressures[3], 2))
+		facts.addFact("Lap." . lapNumber . ".Tyre.Pressure.RR", Round(tyrePressures[4], 2))
 		
 		tyreTemperatures := string2Values(",", getConfigurationValue(data, "Car Data", "TyreTemperature", ""))
 		
-		facts.addFact("Lap." . lapNumber . ".Tyre.Temperature.FL", Round(tyreTemperatures[1]))
-		facts.addFact("Lap." . lapNumber . ".Tyre.Temperature.FR", Round(tyreTemperatures[2]))		
-		facts.addFact("Lap." . lapNumber . ".Tyre.Temperature.RL", Round(tyreTemperatures[3]))
-		facts.addFact("Lap." . lapNumber . ".Tyre.Temperature.RR", Round(tyreTemperatures[4]))
+		facts.addFact("Lap." . lapNumber . ".Tyre.Temperature.FL", Round(tyreTemperatures[1], 1))
+		facts.addFact("Lap." . lapNumber . ".Tyre.Temperature.FR", Round(tyreTemperatures[2], 1))		
+		facts.addFact("Lap." . lapNumber . ".Tyre.Temperature.RL", Round(tyreTemperatures[3], 1))
+		facts.addFact("Lap." . lapNumber . ".Tyre.Temperature.RR", Round(tyreTemperatures[4], 1))
 			
 		facts.addFact("Lap." . lapNumber . ".Weather", 0)
 		facts.addFact("Lap." . lapNumber . ".Temperature.Air", getConfigurationValue(data, "Car Data", "AirTemperature", 0))
-		facts.addFact("Lap." . lapNumber . ".Temperature.Track", getConfigurationValue(data, "Car Data", "TrackTemperature", 0))
+		facts.addFact("Lap." . lapNumber . ".Temperature.Track", getConfigurationValue(data, "Car Data", "RoadTemperature", 0))
 		
 		bodyWorkDamage := string2Values(",", getConfigurationValue(data, "Car Data", "BodyWorkDamage", ""))
 		
-		facts.addFact("Lap." . lapNumber . ".Damage.BodyWork.Front", bodyWorkDamage[1])
-		facts.addFact("Lap." . lapNumber . ".Damage.BodyWork.Rear", bodyWorkDamage[2])
-		facts.addFact("Lap." . lapNumber . ".Damage.BodyWork.Left", bodyWorkDamage[3])
-		facts.addFact("Lap." . lapNumber . ".Damage.BodyWork.Right", bodyWorkDamage[4])
-		facts.addFact("Lap." . lapNumber . ".Damage.BodyWork.Center", bodyWorkDamage[5])
+		facts.addFact("Lap." . lapNumber . ".Damage.BodyWork.Front", Round(bodyWorkDamage[1], 2))
+		facts.addFact("Lap." . lapNumber . ".Damage.BodyWork.Rear", Round(bodyWorkDamage[2], 2))
+		facts.addFact("Lap." . lapNumber . ".Damage.BodyWork.Left", Round(bodyWorkDamage[3], 2))
+		facts.addFact("Lap." . lapNumber . ".Damage.BodyWork.Right", Round(bodyWorkDamage[4], 2))
+		facts.addFact("Lap." . lapNumber . ".Damage.BodyWork.Center", Round(bodyWorkDamage[5], 2))
 		
 		suspensionDamage := string2Values(",", getConfigurationValue(data, "Car Data", "SuspensionDamage", ""))
 		
-		facts.addFact("Lap." . lapNumber . ".Damage.Suspension.FL", suspensionDamage[1])
-		facts.addFact("Lap." . lapNumber . ".Damage.Suspension.FR", suspensionDamage[2])
-		facts.addFact("Lap." . lapNumber . ".Damage.Suspension.RL", suspensionDamage[3])
-		facts.addFact("Lap." . lapNumber . ".Damage.Suspension.RR", suspensionDamage[4])
+		facts.addFact("Lap." . lapNumber . ".Damage.Suspension.FL", Round(suspensionDamage[1], 2))
+		facts.addFact("Lap." . lapNumber . ".Damage.Suspension.FR", Round(suspensionDamage[2], 2))
+		facts.addFact("Lap." . lapNumber . ".Damage.Suspension.RL", Round(suspensionDamage[3], 2))
+		facts.addFact("Lap." . lapNumber . ".Damage.Suspension.RR", Round(suspensionDamage[4], 2))
 		
 		knowledgeBase.produce()
 	}

@@ -1232,10 +1232,10 @@ chooseApplicationExePath() {
 	protectionOn()
 	
 	try {
-		FileSelectFolder, directory, *%applicationExePathEdit%, 0, % translate("Select application executable...")
+		FileSelectFile, file, *%applicationExePathEdit%, 0, % translate("Select application executable...")
 		
-		if (directory != "")
-			GuiControl Text, applicationExePathEdit, %directory%
+		if (file != "")
+			GuiControl Text, applicationExePathEdit, %file%
 	}
 	finally {
 		protectionOff()

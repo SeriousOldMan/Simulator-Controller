@@ -878,8 +878,8 @@ class RaceEngineer extends ConfigurationItem {
 		facts.addFact("Lap." . lapNumber . ".Tyre.Temperature.RR", Round(tyreTemperatures[4], 1))
 			
 		facts.addFact("Lap." . lapNumber . ".Weather", 0)
-		facts.addFact("Lap." . lapNumber . ".Temperature.Air", getConfigurationValue(data, "Car Data", "AirTemperature", 0))
-		facts.addFact("Lap." . lapNumber . ".Temperature.Track", getConfigurationValue(data, "Car Data", "RoadTemperature", 0))
+		facts.addFact("Lap." . lapNumber . ".Temperature.Air", Round(getConfigurationValue(data, "Car Data", "AirTemperature", 0)))
+		facts.addFact("Lap." . lapNumber . ".Temperature.Track", Round(getConfigurationValue(data, "Car Data", "RoadTemperature", 0)))
 		
 		bodyWorkDamage := string2Values(",", getConfigurationValue(data, "Car Data", "BodyWorkDamage", ""))
 		

@@ -3,7 +3,7 @@
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. Additional voice support for select driver in pitstop settings
-  4. First version of the hybrid rule engine, which will be used to implement the AI based race enginieer
+  4. First version of the hybrid rule engine, which will be used to implement the AI based race engineer
 
 ## 2.0.2-release 01/10/21
 

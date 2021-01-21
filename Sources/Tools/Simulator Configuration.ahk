@@ -115,7 +115,11 @@ class ConfigurationItemList extends ConfigurationItem {
 	}
 	
 	saveToConfiguration(configuration) {
-		Throw "Virtual method ConfigurationItemList.saveToConfiguration must be implemented in a subclass..."
+		if ConfigurationEditor.Instance.AutoSave {
+			if (this.iCurrentItemIndex != 0) {
+				this.updateItem()
+			}
+		}
 	}
 	
 	createControls(configuration) {
@@ -801,6 +805,8 @@ class SimulatorsList extends ConfigurationItemList {
 	}
 		
 	saveToConfiguration(configuration) {
+		base.saveToConfiguration(configuration)
+		
 		setConfigurationValue(configuration, "Configuration", "Simulators", values2String("|", this.iItemsList*))	
 	}
 	
@@ -902,6 +908,8 @@ class PluginsTab extends ConfigurationItemList {
 	}
 		
 	saveToConfiguration(configuration) {
+		base.saveToConfiguration(configuration)
+		
 		for ignore, thePlugin in this.iItemsList
 			thePlugin.saveToConfiguration(configuration)
 	}
@@ -1101,6 +1109,8 @@ class ApplicationsTab extends ConfigurationItemList {
 	}
 		
 	saveToConfiguration(configuration) {
+		base.saveToConfiguration(configuration)
+		
 		count := 0
 		lastType := ""
 		
@@ -1416,6 +1426,8 @@ class FunctionsList extends ConfigurationItemList {
 	}
 		
 	saveToConfiguration(configuration) {
+		base.saveToConfiguration(configuration)
+		
 		for ignore, theFunction in this.iItemsList
 			theFunction.saveToConfiguration(configuration)
 	}
@@ -1698,6 +1710,8 @@ class LaunchpadTab extends ConfigurationItemList {
 	}
 		
 	saveToConfiguration(configuration) {
+		base.saveToConfiguration(configuration)
+		
 		for index, launchpadApplication in this.iItemsList
 			setConfigurationValue(configuration, "Launchpad", ConfigurationItem.descriptor("Button", index), values2String("|", launchpadApplication[1], launchpadApplication[2]))	
 	}
@@ -1809,6 +1823,8 @@ class ChatMessagesTab extends ConfigurationItemList {
 	}
 		
 	saveToConfiguration(configuration) {
+		base.saveToConfiguration(configuration)
+		
 		for index, chatMessagesApplication in this.iItemsList
 			setConfigurationValue(configuration, "Chat Messages", ConfigurationItem.descriptor("Button", index), values2String("|", chatMessagesApplication[1], chatMessagesApplication[2]))	
 	}
@@ -2088,6 +2104,8 @@ class ThemesList extends ConfigurationItemList {
 	}
 		
 	saveToConfiguration(configuration) {
+		base.saveToConfiguration(configuration)
+		
 		for index, theme in this.iItemsList {
 			name := theme[2]
 			type := theme[1]

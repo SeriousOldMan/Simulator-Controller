@@ -3328,7 +3328,12 @@ class ActionParser extends Parser {
 			case kProve:
 				return new ProveAction(argument, this.parseArguments(expressions, 3))
 			case kSet:
-				return new SetFactAction(argument, this.parseArguments(expressions, 3)[1])
+				arguments := this.parseArguments(expressions, 3)
+				
+				if (arguments.Length() > 0)
+					return new SetFactAction(argument, arguments[1])
+				else
+					return new SetFactAction(argument)
 			case kClear:
 				return new ClearFactAction(argument)
 			default:

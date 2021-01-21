@@ -121,7 +121,7 @@ engine := new RuleEngine(productions, reductions, initialFacts)
 kb := engine.createKnowledgeBase(engine.createFacts(), engine.createRules())
 ; kb.RuleEngine.setTraceLevel(kTraceMedium)
 
-Loop {
+Loop 1 {
 	section := "Lap " . A_Index
 	
 	lapData := getConfigurationSectionValues(data, section, {}).Clone()
@@ -148,6 +148,13 @@ MsgBox % "Done"
 kb.addFact("Pitstop.Prepare", true)
 
 kb.produce()
+kb.RuleEngine.setTraceLevel(kTraceMedium)
+
+;r := kb.prove(compiler.compileGoal("nextTyreCompound()"))
+
+;if r 
+;	Msgbox here
+	
 		
 dumpFacts(kb)
 

@@ -107,8 +107,8 @@ lastPressure(?tyreType, ?pressure) <= setupPressure(?tyreType, ?pressure)
 ;;;                        Setup Information Handling                       ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-setupTyreCompound(?compound) <= Get(?compound, !Race.Tyre.Compound.Setup)
-setupTyreSet(?set) <= Get(?set, !Race.Tyre.Set.Fresh)
+setupTyreCompound(?compound) <= Get(?compound, Race.Tyre.Compound.Setup)
+setupTyreSet(?set) <= Get(?set, Race.Tyre.Set.Fresh)
 setupPressure(?tyreType, ?pressure) <= Append(?fact, Race.Tyre.Pressure.Setup., ?tyreType), Get(?pressure, ?fact)
 
 

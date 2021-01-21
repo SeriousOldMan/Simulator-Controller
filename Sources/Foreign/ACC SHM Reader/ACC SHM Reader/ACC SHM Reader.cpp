@@ -180,7 +180,7 @@ int main(int argc, char* argv[])
 
 		wcout << "DriverName=" << pf->playerSurname << endl;
 		wcout << "DriverNick=" << pf->playerNick << endl;
-		wcout << "CarModel=" << pf->carModel << endl;
+		wcout << "Car=" << pf->carModel << endl;
 		wcout << "Track=" << pf->track << endl;
 		printData("FuelAmount", pf->maxFuel);
 

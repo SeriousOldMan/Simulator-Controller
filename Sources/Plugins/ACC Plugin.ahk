@@ -776,8 +776,9 @@ class RaceEngineer extends ConfigurationItem {
 				, "Race.Inlap": true
 				, "Race.AvgLapTime": 0
 				, "Race.AvgFuelPerLap": 0
-				, "Race.FreshTyreSet": 1
 				, "Race.Damage.Repair": kAlways
+				, "Race.Tyre.Set.Setup": 1
+				, "Race.Tyre.Set.Fresh": 2
 				, "Race.Tyre.Pressure.Target.FL": 27.7
 				, "Race.Tyre.Pressure.Target.FR": 27.7
 				, "Race.Tyre.Pressure.Target.RL": 27.7

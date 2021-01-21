@@ -38,7 +38,8 @@ global kCompilerCompliantTestRules
 				 , "reverse([1,2,3,4], ?L)"
 				 , "foo(?A, bar(?B, [?C])) <= baz(?, foo(?A, ?)), !, fail"
 				 , "reverse([ ?H |?T ], ?REV )<= reverse(?T,?RT), concat(?RT,[?H],?REV)"
-				 , "Priority: 5, {Any: [?Peter.grandchild], [Predicate: ?Peter.son = true]} => (Set: Peter, happy), (Call: showRelationship, 1, 2), (Prove: father, maria, willy), (Call: showRelationship, 2, 1)"]
+				 , "Priority: 5, {Any: [?Peter.grandchild], [Predicate: ?Peter.son = true]} => (Set: Peter, happy), (Call: showRelationship, 1, 2), (Prove: father, maria, willy), (Call: showRelationship, 2, 1)"
+				 , "fac(?X, ?R) <= greater(?X, 0), minus(?N, ?X, 1), fac(?N, ?T), multiply(?R, ?T, ?X)"]
 
 global kCompilerNonCompliantTestRules
 				= ["persist(?A.grandchild  ?B) <= Call(showRelationship, ?A.grandchild, ?B, !, Set(?A.grandchild, true), Set(?B, grandfather), Produce()"
@@ -81,8 +82,11 @@ kRules =
 				unhappy(Peter) <= mood(!Peter), !, fail
 				mood(happy)
 				
+				empty() <= father(Mara, Willy)
+				
 				{Any: [?Peter.grandchild], [?Peter.son]} => (Set: Peter, happy)
 				[?Peter = happy] => (Call: celebrate)
+				[?Paul.grandchild] => (Set: Bound, ?Paul.grandchild), (Set: NotBound, ?Peter.son), (Set: ForcedBound, !Willy.grandchild)
 )
 
 global kExecutionTestRules = kRules
@@ -92,7 +96,7 @@ global kExecutionTestRules = kRules
 ;;;                              Test Section                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class CompilerTestClass extends Assert {	
+class Compiler extends Assert {	
 	removeWhiteSpace(text) {
 		text := StrReplace(text, A_Space, "")
 		text := StrReplace(text, A_Tab, "")
@@ -116,22 +120,25 @@ class CompilerTestClass extends Assert {
 	}
 	
 	Compiler_Compliance_Test() {
-		compiler := new RuleCompiler()
+		local compiler := new RuleCompiler()
 		productions := false
 		reductions := false
 		text := ""
 		
 		for ignore, theRule in kCompilerCompliantTestRules
 			text := (text . theRule . "`n")
-		
+		try {
 		compiler.compileRules(text, productions, reductions)
+		}
+		catch e
+			ListLines
 		
 		this.AssertEqual(1, productions.Length(), "Not all production rules compiled...")
-		this.AssertEqual(4, reductions.Length(), "Not all reduction rules compiled...")
+		this.AssertEqual(5, reductions.Length(), "Not all reduction rules compiled...")
 	}
 	
 	Compiler_NonCompliance_Test() {
-		compiler := new RuleCompiler()
+		local compiler := new RuleCompiler()
 		productions := false
 		reductions := false
 		text := ""
@@ -149,7 +156,7 @@ class CompilerTestClass extends Assert {
 	}
 	
 	Compiler_Identity_Test() {
-		compiler := new RuleCompiler()
+		local compiler := new RuleCompiler()
 		
 		for ignore, theRule in kCompilerCompliantTestRules {
 			compiledRule := compiler.compileRule(theRule)
@@ -164,23 +171,22 @@ class CompilerTestClass extends Assert {
 	}
 	
 	Compiler_FullScript_Test() {
-		compiler := new RuleCompiler()
+		local compiler := new RuleCompiler()
 		
 		productions := false
 		reductions := false
 		
 		compiler.compileRules(kExecutionTestRules, productions, reductions)
 		
-		this.AssertEqual(2, productions.Length(), "Not all production rules compiled...")
-		this.AssertEqual(21, reductions.Length(), "Not all reduction rules compiled...")
+		this.AssertEqual(3, productions.Length(), "Not all production rules compiled...")
+		this.AssertEqual(22, reductions.Length(), "Not all reduction rules compiled...")
 	}
 }
 
-class EngineTestClass extends Assert {
+class CoreEngine extends Assert {
 	OccurCheck_Test() {
+		local compiler := new RuleCompiler()
 		local resultSet
-		
-		compiler := new RuleCompiler()
 		
 		productions := false
 		reductions := false
@@ -223,10 +229,9 @@ class EngineTestClass extends Assert {
 	}
 	
 	Deterministic_Test() {
+		local compiler := new RuleCompiler()
 		local resultSet
-		
-		compiler := new RuleCompiler()
-		
+				
 		productions := false
 		reductions := false
 		
@@ -242,7 +247,7 @@ class EngineTestClass extends Assert {
 		resultSet := kb.prove(goal)
 		
 		this.AssertEqual(true, (resultSet == false), "Unexpected remaining results...")
-		this.AssertEqual(true, kb.Facts.getValue("Fact", false), "Fact is missing...")
+		this.AssertEqual(true, kb.getValue("Fact", false), "Fact is missing...")
 		
 		kb := engine.createKnowledgeBase(engine.createFacts(), engine.createRules())
 		
@@ -253,16 +258,15 @@ class EngineTestClass extends Assert {
 		resultSet := kb.prove(goal)
 		
 		this.AssertEqual(true, (resultSet == false), "Unexpected remaining results...")
-		this.AssertEqual(false, kb.Facts.getValue("Fact", false), "Fact should be missing...")
+		this.AssertEqual(false, kb.getValue("Fact", false), "Fact should be missing...")
 	}
 }
 
-class UnificationTestClass extends Assert {
+class Unification extends Assert {
 	executeTests(tests, trace := false) {
+		local compiler := new RuleCompiler()
 		local resultSet
-		
-		compiler := new RuleCompiler()
-		
+				
 		productions := false
 		reductions := false
 		
@@ -296,6 +300,12 @@ class UnificationTestClass extends Assert {
 		}
 	}
 	
+	Simple_Test() {
+		tests := [["empty()", ["empty()"]]]
+		
+		this.executeTests(tests, kTraceFull)
+	}
+	
 	Concat_Test() {
 		tests := [["concat([1], [], [1])", ["concat([1], [], [1])"]]
 				, ["concat([1, 2], [3, 4, 5], ?L)", ["concat([1, 2], [3, 4, 5], [1, 2, 3, 4, 5])"]]]
@@ -317,19 +327,14 @@ class UnificationTestClass extends Assert {
 				, ["fac(1, ?R)", ["fac(1, 1)"]]
 				, ["construct(?A, 42)", ["construct(Foo.42.Bar, 42)"]]]
 		
-		try {
 		this.executeTests(tests)
-		}
-		catch e
-			ListLines
 	}
 }
 
-class HybridEngineTestClass extends Assert {
+class HybridEngine extends Assert {
 	executeTests(tests, trace := false) {
+		local compiler := new RuleCompiler()
 		local resultSet
-		
-		compiler := new RuleCompiler()
 		
 		productions := false
 		reductions := false
@@ -375,8 +380,8 @@ class HybridEngineTestClass extends Assert {
 		
 		resultSet := this.executeTests(tests)
 		
-		this.AssertEqual(true, resultSet.KnowledgeBase.Facts.getValue("Peter.son", false), "Fact Peter.son is missing...")
-		this.AssertEqual(true, resultSet.KnowledgeBase.Facts.getValue("Celebrated", false), "Fact Celebrated is missing...")
+		this.AssertEqual(true, resultSet.KnowledgeBase.getValue("Peter.son", false), "Fact Peter.son is missing...")
+		this.AssertEqual(true, resultSet.KnowledgeBase.getValue("Celebrated", false), "Fact Celebrated is missing...")
 	}
 	
 	Script_Integration_Test() {
@@ -389,22 +394,24 @@ class HybridEngineTestClass extends Assert {
 
 		showFacts(resultSet.KnowledgeBase)
 		
-		this.AssertEqual(true, resultSet.KnowledgeBase.Facts.getValue("Peter.son", false), "Fact Peter.son is missing...")
-		this.AssertEqual(true, resultSet.KnowledgeBase.Facts.getValue("Celebrated", false), "Fact Celebrated is missing...")
-		this.AssertEqual("happy", resultSet.KnowledgeBase.Facts.getValue("Peter", false), "Fact Peter is not happy...")
-		this.AssertEqual(true, resultSet.KnowledgeBase.Facts.getValue("Peter.grandchild", false), "Fact Peter.grandchild is missing...")
-		this.AssertEqual(true, resultSet.KnowledgeBase.Facts.getValue("Related.Peter.Paul", false), "Fact Related.Peter.Paul is missing...")
-		this.AssertEqual(true, resultSet.KnowledgeBase.Facts.getValue("Related.Peter.Willy", false), "Fact Related.Peter.Willy is missing...")
-		this.AssertEqual("Peter", resultSet.KnowledgeBase.Facts.getValue("Paul.grandchild", false), "Fact Paul.grandchild is not Peter...")
-		this.AssertEqual("Peter", resultSet.KnowledgeBase.Facts.getValue("Willy.grandchild", false), "Fact Willy.grandchild is not Peter...")
-		this.AssertEqual(true, resultSet.KnowledgeBase.Facts.getValue("Paul.grandfather", false), "Fact Paul.grandfather is missing...")
-		this.AssertEqual(true, resultSet.KnowledgeBase.Facts.getValue("Willy.grandfather", false), "Fact Willy.grandfather is missing...")
+		this.AssertEqual("Peter", resultSet.KnowledgeBase.getValue("Bound", false), "Fact Bound is missing...")
+		this.AssertEqual("Peter", resultSet.KnowledgeBase.getValue("ForcedBound", false), "Fact ForcedBound is missing...")
+		this.AssertEqual(kNotInitialized, resultSet.KnowledgeBase.getValue("NotBound", kNotInitialized), "Fact NotBound should not be bound...")
+		
+		this.AssertEqual(true, resultSet.KnowledgeBase.getValue("Celebrated", false), "Fact Celebrated is missing...")
+		this.AssertEqual("happy", resultSet.KnowledgeBase.getValue("Peter", false), "Fact Peter is not happy...")
+		this.AssertEqual(true, resultSet.KnowledgeBase.getValue("Peter.grandchild", false), "Fact Peter.grandchild is missing...")
+		this.AssertEqual(true, resultSet.KnowledgeBase.getValue("Related.Peter.Paul", false), "Fact Related.Peter.Paul is missing...")
+		this.AssertEqual(true, resultSet.KnowledgeBase.getValue("Related.Peter.Willy", false), "Fact Related.Peter.Willy is missing...")
+		this.AssertEqual("Peter", resultSet.KnowledgeBase.getValue("Paul.grandchild", false), "Fact Paul.grandchild is not Peter...")
+		this.AssertEqual("Peter", resultSet.KnowledgeBase.getValue("Willy.grandchild", false), "Fact Willy.grandchild is not Peter...")
+		this.AssertEqual(true, resultSet.KnowledgeBase.getValue("Paul.grandfather", false), "Fact Paul.grandfather is missing...")
+		this.AssertEqual(true, resultSet.KnowledgeBase.getValue("Willy.grandfather", false), "Fact Willy.grandfather is missing...")
 	}
 	
 	Fact_Unification_Test() {
+		local compiler := new RuleCompiler()
 		local resultSet
-		
-		compiler := new RuleCompiler()
 		
 		tests := [["grandfather(?A, ?B)", ["grandfather(Peter, Paul)", "grandfather(Peter, Willy)"]],
 				, ["happy(Peter)", ["happy(Peter)"]]
@@ -439,17 +446,17 @@ class HybridEngineTestClass extends Assert {
 }
 
 celebrate(knowledgeBase) {
-	if !knowledgeBase.Facts.getValue("Celebrated", false) {
+	if !knowledgeBase.getValue("Celebrated", false) {
 		if (knowledgeBase.RuleEngine.TraceLevel < kTraceOff) {
 			SplashTextOn 200, 60, Message, Party, Party...
 			Sleep 1000
 			SplashTextOff
 		}
 		
-		if !knowledgeBase.Facts.hasFact("Celebrated")
-			knowledgeBase.Facts.addFact("Celebrated", true)
+		if !knowledgeBase.hasFact("Celebrated")
+			knowledgeBase.addFact("Celebrated", true)
 		else
-			knowledgeBase.Facts.setValue("Celebrated", true)
+			knowledgeBase.setValue("Celebrated", true)
 	}
 }
 
@@ -463,8 +470,8 @@ showRelationship(choicePoint, grandchild, grandfather) {
 		SplashTextOff
 	}
 	
-	if !knowledgeBase.Facts.hasFact(fact)
-		knowledgeBase.Facts.addFact(fact , true)
+	if !knowledgeBase.hasFact(fact)
+		knowledgeBase.addFact(fact , true)
 
 	return true
 }
@@ -487,9 +494,9 @@ showFacts(knowledgeBase) {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-AHKUnit.AddTestClass(CompilerTestClass)
-AHKUnit.AddTestClass(EngineTestClass)
-AHKUnit.AddTestClass(UnificationTestClass)
-AHKUnit.AddTestClass(HybridEngineTestClass)
+AHKUnit.AddTestClass(Compiler)
+AHKUnit.AddTestClass(CoreEngine)
+AHKUnit.AddTestClass(Unification)
+AHKUnit.AddTestClass(HybridEngine)
 
 AHKUnit.Run()

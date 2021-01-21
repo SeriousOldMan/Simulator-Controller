@@ -28,8 +28,8 @@ global kEqual = "="
 global kIdentical = "=="
 global kLess = "<"
 global kLessOrEqual = "<="
-global kMore = ">"
-global kMoreOrEqual = ">="
+global kGreater = ">"
+global kGreaterOrEqual = ">="
 global kContains = "contains"
 
 global kCall = "Call:"
@@ -37,12 +37,13 @@ global kProve = "Prove:"
 global kSet = "Set:"
 global kClear = "Clear:"
 
-global kBuiltinFunctions = ["option", "plus", "minus", "multiply", "divide", "greater", "less", "append"]
+global kBuiltinFunctions = ["option", "plus", "minus", "multiply", "divide", "greater", "less", "append", "get"]
 
 global kProduction = "Production"
 global kReduction = "Reduction"
 
 global kNotInitialized = "__NotInitialized__"
+global kNotFound = "__NotFound__"
 
 global kTraceFull = 1
 global kTraceMedium = 2
@@ -68,7 +69,7 @@ class Condition {
 	getFacts(ByRef facts) {
 	}
 	
-	match(facts) {
+	match(facts, variables) {
 		Throw "Virtual method Condition.match must be implemented in a subclass..."
 	}
 	
@@ -130,9 +131,9 @@ class ExistQuantor extends Quantor {
         }
     }
 	
-	match(facts) {
+	match(facts, variables) {
 		for ignore, theCondition in this.Conditions
-			if theCondition.match(facts)
+			if theCondition.match(facts, variables)
 				return true
 				
 		return false
@@ -150,9 +151,9 @@ class NotExistQuantor extends Quantor {
         }
     }
 	
-	match(facts) {
+	match(facts, variables) {
 		for ignore, theCondition in this.Conditions
-			if theCondition.match(facts)
+			if theCondition.match(facts, variables)
 				return false
 				
 		return true
@@ -170,11 +171,11 @@ class OneQuantor extends Quantor {
         }
     }
 	
-	match(facts) {
+	match(facts, variables) {
 		matched := 0
 		
 		for ignore, theCondition in this.Conditions
-			if theCondition.match(facts)
+			if theCondition.match(facts, variables)
 				matched += 1
 				
 		return (matched == 1)
@@ -188,15 +189,15 @@ class OneQuantor extends Quantor {
 class AllQuantor extends Quantor {
 	Type[] {
         Get {
-            return kAllm
+            return kAll
         }
     }
 	
-	match(facts) {
+	match(facts, variables) {
 		matched := 0
 		
 		for ignore, theCondition in this.Conditions
-			if theCondition.match(facts)
+			if theCondition.match(facts, variables)
 				matched += 1
 				
 		return (matched == this.Conditions.Length())
@@ -263,7 +264,7 @@ class Predicate extends Condition {
 			facts.Push(right.Variable[true])
 	}
 	
-	match(facts) {
+	match(facts, variables) {
 		leftPrimary := this.LeftPrimary[facts]
 		
 		if (leftPrimary == kNotInitialized)
@@ -271,26 +272,38 @@ class Predicate extends Condition {
 		else {
 			rightPrimary := this.RightPrimary[facts]
 			
+			result := false
+			
 			switch this.Operator {
 				case kNotInitialized:
-					return true
+					result = true
 				case kEqual:
-					return (leftPrimary = rightPrimary)
+					result := (leftPrimary = rightPrimary)
 				case kIdentical:
-					return (leftPrimary == rightPrimary)
+					result := (leftPrimary == rightPrimary)
 				case kLess:
-					return (leftPrimary < rightPrimary)
+					result := (leftPrimary < rightPrimary)
 				case kLessOrEqual:
-					return (leftPrimary <= rightPrimary)
-				case kMore:
-					return (leftPrimary > rightPrimary)
-				case kMoreOrEqual:
-					return (leftPrimary >= rightPrimary)
+					result := (leftPrimary <= rightPrimary)
+				case kGreater:
+					result := (leftPrimary > rightPrimary)
+				case kGreaterOrEqual:
+					result := (leftPrimary >= rightPrimary)
 				case kContains:
-					return inList(leftPrimary, rightPrimary)
+					result := inList(leftPrimary, rightPrimary)
 				default:
 					Throw "Unsupported comparison operator """ . this.Operator . """ detected in Predicate.match..."
 			}
+					
+			if result {
+				if isInstance(this.LeftPrimary, Variable)
+					variables.setValue(this.LeftPrimary, leftPrimary)
+					
+				if isInstance(this.RightPrimary, Variable)
+					variables.setValue(this.RightPrimary, rightPrimary)
+			}
+			
+			return result
 		}
 	}
 	
@@ -359,11 +372,11 @@ class Variable extends Primary {
 			Throw "Subclassing of Variable is not allowed..."
 	}
 	
-	getValue(factsOrResultSet, default := "__NotInitialized__") {
-		value := factsOrResultSet.getValue((factsOrResultSet.base == Facts) ? this : this.iRootVariable)
+	getValue(variablesFactsOrResultSet, default := "__NotInitialized__") {
+		value := variablesFactsOrResultSet.getValue(((variablesFactsOrResultSet.base == Facts) || ((variablesFactsOrResultSet.base == ProductionRule.Variables))) ? this : this.iRootVariable)
 	
 		if (IsObject(value) && ((value.base == Variable) || (value.base == Literal) || (value.base == Fact)))
-			value := value.getValue(factsOrResultSet, value)
+			value := value.getValue(variablesFactsOrResultSet, value)
 					
 		if (value != kNotInitialized)
 			return value
@@ -396,23 +409,25 @@ class Variable extends Primary {
 		}
 	}
 	
-	toString(factsOrResultSet := "__NotInitialized__") {
+	toString(variablesFactsOrResultSet := "__NotInitialized__") {
 		property := this.Property
 		name := this.Variable
 		
 		if InStr(name, "__Unnamed")
 			name := ""
 			
-		if (factsOrResultSet == kNotInitialized)
+		if (variablesFactsOrResultSet == kNotInitialized)
 			return ("?" . name . ((property != "") ? ("." . property) : ""))
 		else {
 			root := this.RootVariable
-			value := root.getValue(factsOrResultSet)
+			value := ((variablesFactsOrResultSet.base == ProductionRule.Variables) ? this.getValue(variablesFactsOrResultSet) : root.getValue(variablesFactsOrResultSet))
 			
 			if (value == kNotInitialized)
 				return "?" . name . ((property != "") ? ("." . property) : "") ; . " (" . &root . ")"
+			else if isInstance(value, Term)
+				return value.toString((variablesFactsOrResultSet.base == ProductionRule.Variables) ? kNotInitialized : variablesFactsOrResultSet) . ((property != "") ? ("." . property) : "")
 			else
-				return value.toString(factsOrResultSet) . ((property != "") ? ("." . property) : "")
+				return value
 		}
 	}
 	
@@ -509,6 +524,10 @@ class Literal extends Primary {
 			return this
 	}
 	
+	isUnbound(resultSetOrFacts) {
+		return (this.iLiteral == kNotInitialized)
+	}
+	
 	toString(factsOrResultSet := "__NotInitialized__") {
 		return this.Literal
 	}
@@ -528,7 +547,7 @@ class Literal extends Primary {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class Action {
-	execute(knowledgeBase) {
+	execute(knowledgeBase, variables) {
 		Throw "Virtual method Action.execute must be implemented in a subclass..."
 	}
 	
@@ -545,21 +564,21 @@ class CallAction extends Action {
 	iFunction := kNotInitialized
 	iArguments := []
 	
-	Function[facts := "__NotInitialized__"] {
+	Function[variablesOrFacts := "__NotInitialized__"] {
 		Get {
-			if (facts == kNotInitialized)
+			if (variablesOrFacts == kNotInitialized)
 				return this.iFunction
 			else
-				return this.iFunction.getValue(facts)
+				return this.iFunction.getValue(variablesOrFacts)
 		}
 	}
 	
-	Arguments[facts := "__NotInitialized__"] {
+	Arguments[variablesOrFacts := "__NotInitialized__"] {
 		Get {
-			if (facts == kNotInitialized)
+			if (variablesOrFacts == kNotInitialized)
 				return this.iArguments
 			else
-				this.getValues(facts)
+				this.getValues(variablesOrFacts)
 		}
 	}
 	
@@ -568,16 +587,22 @@ class CallAction extends Action {
 		this.iArguments := arguments
 	}
 	
-	execute(knowledgeBase) {
+	execute(knowledgeBase, variables) {
 		local function
 		local facts := knowledgeBase.Facts
 		
-		function := this.Function[facts]
+		if isInstance(this.Function, Variable)
+			function := this.Function[variables]
+		else
+			function := this.Function[facts]
 		
 		arguments := []
 		
 		for ignore, argument in this.Arguments
-			arguments.Push(argument.toString(facts))
+			if isInstance(this.Function, Variable)
+				arguments.Push(argument.toString(variables))
+			else
+				arguments.Push(argument.toString(facts))
 		
 		if (knowledgeBase.RuleEngine.TraceLevel <= kTraceMedium)
 			knowledgeBase.RuleEngine.trace(kTraceMedium, "Call " . function . "(" . values2String(", ", arguments*) . ")")
@@ -609,21 +634,24 @@ class CallAction extends Action {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class ProveAction extends CallAction {
-	Functor[facts := "__NotInitialized__"] {
+	Functor[variablesOrFacts := "__NotInitialized__"] {
 		Get {
-			return this.Function[facts]
+			return this.Function[variablesOrFacts]
 		}
 	}
 	
-	execute(knowledgeBase) {
+	execute(knowledgeBase, variables) {
 		local facts := knowledgeBase.Facts
 		
 		arguments := []
 		
 		for ignore, argument in this.Arguments
-			arguments.Push(new Literal(argument.toString(facts)))
+			if isInstance(argument, Variable)
+				arguments.Push(new Literal(argument.toString(variables)))
+			else
+				arguments.Push(new Literal(argument.toString(facts)))
 		
-		goal := new Compound(this.Functor[facts], arguments)
+		goal := new Compound(isInstance(this.Functor, Variable) ? this.Functor[variables] : this.Functor[facts], arguments)
 		
 		if (knowledgeBase.RuleEngine.TraceLevel <= kTraceMedium)
 			knowledgeBase.RuleEngine.trace(kTraceMedium, "Activate reduction rules with goal " . goal.toString())
@@ -649,33 +677,33 @@ class SetFactAction extends Action {
 	iFact := kNotInitialized
 	iValue := kNotInitialized
 	
-	Fact[facts := "__NotInitialized__"] {
+	Fact[variablesOrFacts := "__NotInitialized__"] {
 		Get {
-			if (facts == kNotInitialized)
+			if (variablesOrFacts == kNotInitialized)
 				return this.iFact
 			else
-				return this.iFact.getValue(facts)
+				return this.iFact.getValue(variablesOrFacts)
 		}
 	}
 	
-	Value[facts := "__NotInitialized__"] {
+	Value[variablesOrFacts := "__NotInitialized__"] {
 		Get {
-			if (facts == kNotInitialized)
+			if (variablesOrFacts == kNotInitialized)
 				return this.iValue
 			else
-				return this.iValue.getValue(facts)
+				return this.iValue.getValue(variablesOrFacts)
 		}
 	}
 	
 	__New(fact, value := "__NotInitialized__") {
 		this.iFact := fact
-		this.iValue := ((value == kNotInitialized) ? fact : value)
+		this.iValue := ((value == kNotInitialized) ? new Literal(true) : value)
 	}
 	
-	execute(knowledgeBase) {
+	execute(knowledgeBase, variables) {
 		local facts := knowledgeBase.Facts
-		local fact := this.Fact[facts]
-		value := this.Value[facts]
+		local fact := (isInstance(this.Fact, Variable) ? this.Fact[variables] : this.Fact[facts])
+		value := (isInstance(this.Value, Variable) ? this.Value[variables] : this.Value[facts])
 		
 		if facts.hasFact(fact)
 			facts.setValue(fact, value)
@@ -698,12 +726,12 @@ class SetFactAction extends Action {
 class ClearFactAction extends Action {
 	iFact := kNotInitialized
 	
-	Fact[facts := "__NotInitialized__"] {
+	Fact[variablesOrFacts := "__NotInitialized__"] {
 		Get {
-			if (facts == kNotInitialized)
+			if (variablesOrFacts == kNotInitialized)
 				return this.iFact
 			else
-				return this.iFact.getValue(facts)
+				return this.iFact.getValue(variablesOrFacts)
 		}
 	}
 	
@@ -711,9 +739,9 @@ class ClearFactAction extends Action {
 		this.iFact := fact
 	}
 	
-	execute(knowledgeBase) {
+	execute(knowledgeBase, variables) {
 		local facts := knowledgeBase.Facts
-		local fact := this.Fact[facts]
+		local fact := (isInstance(this.Fact, Variable) ? this.Fact[variables] : this.Fact[facts])
 		
 		facts.removeFact(fact)
 	}
@@ -738,6 +766,10 @@ class Term {
 	
 	injectValues(resultSet) {
 		return this
+	}
+	
+	isUnbound(resultSetOrFacts) {
+		return (this.getValue(resultSetOrFacts) == kNotInitialized)
 	}
 	
 	hasVariables() {
@@ -803,10 +835,10 @@ class Compound extends Term {
 	
 	toString(resultSet := "__NotInitialized__") {
 		arguments := []
-			
+		
 		for ignore, argument in this.Arguments
 			arguments.Push(argument.toString(resultSet))
-			
+		
 		return (this.Functor . "(" . values2String(", ", arguments*) . ")")
 	}
 	
@@ -1047,6 +1079,21 @@ class ProductionRule extends Rule {
 	iConditions := false
 	iActions := []
 	
+	class Variables {
+		iVariables := {}
+		
+		setValue(variable, value) {
+			this.iVariables[variable] := value
+		}
+		
+		getValue(variable, default := "__NotInitialized__") {
+			if this.iVariables.HasKey(variable)
+				return this.iVariables[variable]
+			else
+				return default
+		}
+	}
+	
 	Type[] {
         Get {
             return kProduction
@@ -1087,27 +1134,31 @@ class ProductionRule extends Rule {
 	}
 	
 	match(facts) {
+		variables := new this.Variables()
+		
 		for ignore, theCondition in this.Conditions
-			if !theCondition.match(facts)
+			if !theCondition.match(facts, variables)
 				return false
 				
-		return true
+		return variables
 	}
 	
-	fire(knowledgeBase) {
+	fire(knowledgeBase, variables) {
 		if (knowledgeBase.RuleEngine.TraceLevel <= kTraceLight)
 			knowledgeBase.RuleEngine.trace(kTraceLight, "Firing rule " . this.toString())
 		
 		for ignore, theAction in this.Actions
-			theAction.execute(knowledgeBase)
+			theAction.execute(knowledgeBase, variables)
 	}
 	
 	produce(knowledgeBase) {
 		if (knowledgeBase.RuleEngine.TraceLevel <= kTraceLight)
 			knowledgeBase.RuleEngine.trace(kTraceLight, "Trying rule " . this.toString())
 		
-		if this.match(knowledgeBase.Facts) {
-			this.fire(knowledgeBase)
+		variables := this.match(knowledgeBase.Facts)
+		
+		if variables {
+			this.fire(knowledgeBase, variables)
 			
 			return true
 		}
@@ -1987,6 +2038,26 @@ class KnowledgeBase {
 			this.deregisterRuleFacts(rule)
 	}
 	
+	setValue(fact, value) {
+		this.Facts.setValue(fact, value)
+	}
+
+	getValue(fact, default := "__NotInitialized__") {
+		return this.Facts.getValue(fact, default)
+	}
+	
+	hasFact(fact) {
+		return this.Facts.hasFact(fact)
+	}
+	
+	addFact(fact, value) {
+		this.Facts.addFact(fact, value)
+	}
+	
+	removeFact(fact) {
+		this.Facts.removeFact(fact)
+	}
+	
 	produce() {
 		local facts := this.Facts
 		local rules := this.Rules
@@ -2086,20 +2157,23 @@ class Facts {
 	}
 	
 	setValue(fact, value) {
-		if this.hasFact(fact) {
-			if (this.RuleEngine.TraceLevel <= kTraceMedium)
-				this.RuleEngine.trace(kTraceMedium, "Setting fact " . fact . " to " . value)
-			
-			if (this.iFacts[fact] != value)
-				this.iGeneration += 1
+		if (value == kNotInitialized)
+			this.removeFact(fact)
+		else
+			if this.hasFact(fact) {
+				if (this.RuleEngine.TraceLevel <= kTraceMedium)
+					this.RuleEngine.trace(kTraceMedium, "Setting fact " . fact . " to " . value)
 				
-			this.iFacts[fact] := value
-			
-			if this.hasObserver(fact)
-				this.getObserver(fact).factChanged()
-		}
-		else	
-			Throw "Unknown fact """ . fact . """ encountered in Facts.setValue..."
+				if (this.iFacts[fact] != value)
+					this.iGeneration += 1
+					
+				this.iFacts[fact] := value
+				
+				if this.hasObserver(fact)
+					this.getObserver(fact).factChanged()
+			}
+			else	
+				Throw "Unknown fact """ . fact . """ encountered in Facts.setValue..."
 	}
 	
 	getValue(fact, default := "__NotInitialized__") {
@@ -2122,7 +2196,7 @@ class Facts {
 		
 		if facts.HasKey(fact)
 			Throw "Duplicate fact """ . fact . """ encountered in Facts.addFact..."
-		else {
+		else if (value != kNotInitialized) {
 			if (this.RuleEngine.TraceLevel <= kTraceMedium)
 				this.RuleEngine.trace(kTraceMedium, "Adding fact " . fact . " as " . value)
 			
@@ -2599,11 +2673,24 @@ class RuleCompiler {
 		productions := []
 		reductions := []
 		
+		incompleteLine := false
+		
 		Loop Parse, text, `n, `r
 		{
 			line := Trim(A_LoopField)
 			
-			if (line != "") {
+			if ((line != "") && this.skipDelimiter(";", line, 1, false))
+				line := ""
+		
+			if (incompleteLine && (line != "")) {
+				line := incompleteLine . line
+				incompleteLine := false
+			}
+			
+			if ((line != "") && (SubStr(line, StrLen(line), 1) == "\"))
+				incompleteLine := SubStr(line, 1, StrLen(line) - 1)
+				
+			if (!incompleteLine && (line != "")) {
 				compiledRule := this.compileRule(line)
 				
 				if (compiledRule.Type == kProduction)
@@ -2644,7 +2731,7 @@ class RuleCompiler {
 		local head := this.readHead(text, nextCharIndex)
 		local tail := this.readTail(text, nextCharIndex)
 		
-		if tail
+		if (tail != kNotFound)
 			return Array(head, "<=", tail*)
 		else
 			return Array(head)
@@ -2670,7 +2757,7 @@ class RuleCompiler {
 	readHead(ByRef text, ByRef nextCharIndex) {
 		head := this.readCompound(text, nextCharIndex)
 		
-		if !head
+		if (head == kNotFound)
 			Throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in RuleCompiler.readHead..."
 		else
 			return head
@@ -2680,14 +2767,14 @@ class RuleCompiler {
 		local term
 		local literal := this.readLiteral(text, nextCharIndex)
 		
-		if literal {
+		if (literal != "") {
 			if (literal == "<=") {
 				terms := []
 				
 				Loop {
 					term := this.readTailTerm(text, nextCharIndex, (A_Index == 1) ? false : ",")
 					
-					if term
+					if (term != kNotFound)
 						terms.Push(term)
 					else if (!this.isEmpty(text, nextCharIndex) || (A_index == 1))
 						Throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in RuleCompiler.readTail..."
@@ -2699,22 +2786,29 @@ class RuleCompiler {
 				Throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in RuleCompiler.readTail..."
 		}
 		else
-			return false
+			return kNotFound
 	}
 	
 	readTailTerm(ByRef text, ByRef nextCharIndex, skip := false) {
 		local literal
+		local compound
 		
 		if skip
 			if !this.skipDelimiter(skip, text, nextCharIndex, false)
-				return false
+				return kNotFound
 			
 		literal := this.readLiteral(text, nextCharIndex)
 		
 		if ((literal == "!") || (literal = "fail"))
 			return literal
-		else
-			return this.readCompound(text, nextCharIndex, literal)
+		else {
+			compound := this.readCompound(text, nextCharIndex, literal)
+		
+			if (compound == kNotFound)
+				Throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in RuleCompiler.readTailTerm..."
+			
+			return compound
+		}
 	}
 	
 	readCompound(ByRef text, ByRef nextCharIndex, functor := false) {
@@ -2731,7 +2825,7 @@ class RuleCompiler {
 			return Array(functor, arguments*)
 		}
 		else
-			return false
+			return kNotFound
 	}
 	
 	readCompoundArguments(ByRef text, ByRef nextCharIndex) {
@@ -2740,7 +2834,7 @@ class RuleCompiler {
 		Loop {
 			argument := this.readCompoundArgument(text, nextCharIndex)
 			
-			if (argument || (argument == "0"))
+			if ((argument != kNotFound) || (argument == "0"))
 				arguments.Push(argument)
 			else if (A_Index == 1)
 				return arguments
@@ -2760,8 +2854,8 @@ class RuleCompiler {
 		else {
 			literal := this.readLiteral(text, nextCharIndex)
 
-			if (literal == "")
-				return false
+			if ((literal == "") || (literal == kNotFound))
+				return kNotFound
 			else if this.skipDelimiter("(", text, nextCharIndex, false) {
 				compoundArguments := this.readCompoundArguments(text, nextCharIndex)
 				
@@ -2776,7 +2870,7 @@ class RuleCompiler {
 	
 	readList(ByRef text, ByRef nextCharIndex, skip := true) {
 		if (skip && !this.skipDelimiter("[", text, nextCharIndex, false))
-			return false
+			return kNotFound
 		
 		if this.skipDelimiter("]", text, nextCharIndex, false)
 			return "[]"
@@ -2788,7 +2882,7 @@ class RuleCompiler {
 				
 				this.skipDelimiter("]", text, nextCharIndex)
 				
-				if argument
+				if (argument != kNotFound)
 					return concatenate(["["], arguments, ["|"], Array(argument), ["]"])
 				else
 					Throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in RuleCompiler.readList..."
@@ -2865,7 +2959,12 @@ class RuleCompiler {
 	}
 	
 	isEmpty(ByRef text, ByRef nextCharIndex) {
-		return (Trim(SubStr(text, nextCharIndex)) == "")
+		remainingText := Trim(SubStr(text, nextCharIndex))
+		
+		if ((remainingText != "") && this.skipDelimiter(";", remainingText, 1, false))
+			remainingText := ""
+		
+		return (remainingText == "")
 	}
 	
 	skipWhiteSpace(ByRef text, ByRef nextCharIndex) {
@@ -3375,23 +3474,25 @@ plus(choicePoint, operand1, operand2, operand3) {
 	operand3 := operand3.getValue(resultSet, operand3)
 	
 	if isInstance(operand1, Variable) {
-		if (isInstance(operand2, Variable) || isInstance(operand3, Variable))
+		if (isInstance(operand2, Variable) || isInstance(operand3, Variable) || (operand2.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
 			return false
 		else
 			return resultSet.unify(choicePoint, operand1, new Literal(operand2.toString(resultSet) + operand3.toString(resultSet)))
 	}
 	else if isInstance(operand2, Variable) {
-		if (isInstance(operand1, Variable) || isInstance(operand3, Variable))
+		if (isInstance(operand1, Variable) || isInstance(operand3, Variable) || (operand1.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
 			return false
 		else
 			return resultSet.unify(choicePoint, operand2, new Literal(operand1.toString(resultSet) - operand3.toString(resultSet)))
 	}
 	else if isInstance(operand3, Variable) {
-		if (isInstance(operand1, Variable) || isInstance(operand2, Variable))
+		if (isInstance(operand1, Variable) || isInstance(operand2, Variable) || (operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)))
 			return false
 		else
 			return resultSet.unify(choicePoint, operand3, new Literal(operand1.toString(resultSet) - operand2.toString(resultSet)))
 	}
+	else if ((operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
+		return false
 	else
 		return (operand1.toString(resultSet) = (operand2.toString(resultSet) + operand3.toString(resultSet)))
 }
@@ -3404,23 +3505,25 @@ minus(choicePoint, operand1, operand2, operand3) {
 	operand3 := operand3.getValue(resultSet, operand3)
 	
 	if isInstance(operand1, Variable) {
-		if (isInstance(operand2, Variable) || isInstance(operand3, Variable))
+		if (isInstance(operand2, Variable) || isInstance(operand3, Variable) || (operand2.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
 			return false
 		else
 			return resultSet.unify(choicePoint, operand1, new Literal(operand2.toString(resultSet) - operand3.toString(resultSet)))
 	}
 	else if isInstance(operand2, Variable) {
-		if (isInstance(operand1, Variable) || isInstance(operand3, Variable))
+		if (isInstance(operand1, Variable) || isInstance(operand3, Variable) || (operand1.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
 			return false
 		else
 			return resultSet.unify(choicePoint, operand2, new Literal(operand1.toString(resultSet) + operand3.toString(resultSet)))
 	}
 	else if isInstance(operand3, Variable) {
-		if (isInstance(operand1, Variable) || isInstance(operand2, Variable))
+		if (isInstance(operand1, Variable) || isInstance(operand2, Variable) || (operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)))
 			return false
 		else
 			return resultSet.unify(choicePoint, operand3, new Literal(operand1.toString(resultSet) + operand2.toString(resultSet)))
 	}
+	else if ((operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
+		return false
 	else
 		return (operand1.toString(resultSet) = (operand2.toString(resultSet) - operand3.toString(resultSet)))
 }
@@ -3433,23 +3536,25 @@ multiply(choicePoint, operand1, operand2, operand3) {
 	operand3 := operand3.getValue(resultSet, operand3)
 	
 	if isInstance(operand1, Variable) {
-		if (isInstance(operand2, Variable) || isInstance(operand3, Variable))
+		if (isInstance(operand2, Variable) || isInstance(operand3, Variable) || (operand2.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
 			return false
 		else
 			return resultSet.unify(choicePoint, operand1, new Literal(operand2.toString(resultSet) * operand3.toString(resultSet)))
 	}
 	else if isInstance(operand2, Variable) {
-		if (isInstance(operand1, Variable) || isInstance(operand3, Variable))
+		if (isInstance(operand1, Variable) || isInstance(operand3, Variable) || (operand1.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
 			return false
 		else
 			return resultSet.unify(choicePoint, operand2, new Literal(operand1.toString(resultSet) / operand3.toString(resultSet)))
 	}
 	else if isInstance(operand3, Variable) {
-		if (isInstance(operand1, Variable) || isInstance(operand2, Variable))
+		if (isInstance(operand1, Variable) || isInstance(operand2, Variable) || (operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)))
 			return false
 		else
 			return resultSet.unify(choicePoint, operand3, new Literal(operand1.toString(resultSet) / operand2.toString(resultSet)))
 	}
+	else if ((operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
+		return false
 	else
 		return (operand1.toString(resultSet) = (operand2.toString(resultSet) * operand3.toString(resultSet)))
 }
@@ -3462,23 +3567,25 @@ divide(choicePoint, operand1, operand2, operand3) {
 	operand3 := operand3.getValue(resultSet, operand3)
 	
 	if isInstance(operand1, Variable) {
-		if (isInstance(operand2, Variable) || isInstance(operand3, Variable))
+		if (isInstance(operand2, Variable) || isInstance(operand3, Variable) || (operand2.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
 			return false
 		else
 			return resultSet.unify(choicePoint, operand1, new Literal(operand2.toString(resultSet) / operand3.toString(resultSet)))
 	}
 	else if isInstance(operand2, Variable) {
-		if (isInstance(operand1, Variable) || isInstance(operand3, Variable))
+		if (isInstance(operand1, Variable) || isInstance(operand3, Variable) || (operand1.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
 			return false
 		else
 			return resultSet.unify(choicePoint, operand2, new Literal(operand1.toString(resultSet) * operand3.toString(resultSet)))
 	}
 	else if isInstance(operand3, Variable) {
-		if (isInstance(operand1, Variable) || isInstance(operand2, Variable))
+		if (isInstance(operand1, Variable) || isInstance(operand2, Variable) || (operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)))
 			return false
 		else
 			return resultSet.unify(choicePoint, operand3, new Literal(operand1.toString(resultSet) * operand2.toString(resultSet)))
 	}
+	else if ((operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
+		return false
 	else
 		return (operand1.toString(resultSet) = (operand2.toString(resultSet) / operand3.toString(resultSet)))
 }
@@ -3489,7 +3596,7 @@ greater(choicePoint, operand1, operand2) {
 	operand1 := operand1.getValue(resultSet, operand1)
 	operand2 := operand2.getValue(resultSet, operand2)
 	
-	if (isInstance(operand1, Variable) || isInstance(operand2, Variable))
+	if (isInstance(operand1, Variable) || isInstance(operand2, Variable) || (operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)))
 		return false
 	else
 		return (operand1.toString(resultSet) > operand2.toString(resultSet))
@@ -3501,7 +3608,7 @@ less(choicePoint, operand1, operand2) {
 	operand1 := operand1.getValue(resultSet, operand1)
 	operand2 := operand2.getValue(resultSet, operand2)
 	
-	if (isInstance(operand1, Variable) || isInstance(operand2, Variable))
+	if (isInstance(operand1, Variable) || isInstance(operand2, Variable) || (operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)))
 		return false
 	else
 		return (operand1.toString(resultSet) < operand2.toString(resultSet))
@@ -3521,6 +3628,20 @@ append(choicePoint, operand1, arguments*) {
 		return resultSet.unify(choicePoint, operand1, new Literal(string))
 	else
 		return (operand1.toString(resultSet) = string)
+}
+
+get(choicePoint, operand1, operand2) {
+	local resultSet := choicePoint.ResultSet
+	
+	operand1 := operand1.getValue(resultSet, operand1)
+	operand2 := new Literal(resultSet.KnowledgeBase.Facts.getValue(operand2.getValue(resultSet, operand2).toString(resultSet)))
+	
+	if isInstance(operand1, Variable)
+		return resultSet.unify(choicePoint, operand1, operand2)
+	else if ((operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)))
+		return false
+	else
+		return (operand1.toString(resultSet) = operand2.toString(resultSet))
 }
 
 

@@ -220,6 +220,7 @@ updateRepairSettings() <= Call(updatePitstopRepairSettings, !Pitstop.Planned.Rep
 
 [?Pitstop.Lap] => (ProveAll: pitstopPerformed, ?Pitstop.Lap)
 priority: -10, [?Pitstop.Lap] => (Set: Pitstop.Last, !Pitstop.Planned.Nr), (Clear: Pitstop.Planned.Nr), (Clear: Pitstop.Planned.Lap),			\
+								 (Clear: Pitstop.Planned.Fuel),																					\
 								 (Clear: Pitstop.Planned.Tyre.Compound), (Clear: Pitstop.Planned.Tyre.Set), 									\
 								 (Clear: Pitstop.Planned.Tyre.Pressure.FL), (Clear: Pitstop.Planned.Tyre.Pressure.FR), 							\
 								 (Clear: Pitstop.Planned.Tyre.Pressure.RL), (Clear: Pitstop.Planned.Tyre.Pressure.RR), 							\
@@ -273,8 +274,8 @@ lapTimes(?lap, ?offset, [?time | ?times]) <= Minus(?tLap, ?lap, ?offset), lapTim
 											 Plus(?nOffset, ?offset, 1), lapTimes(?lap, ?nOffset, ?times)
 
 lapTime(?lap, ?time) <= Append(?fact, Lap., ?lap, .Time), Get(?time, ?fact), bound(?time)
-											 
-											 
+
+
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Setup & Settings Information Retrieval                ;;;
 ;;;-------------------------------------------------------------------------;;;

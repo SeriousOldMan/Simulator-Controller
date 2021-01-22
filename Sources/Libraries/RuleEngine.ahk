@@ -34,6 +34,7 @@ global kContains = "contains"
 
 global kCall = "Call:"
 global kProve = "Prove:"
+global kProveAll = "ProveAll:"
 global kSet = "Set:"
 global kClear = "Clear:"
 
@@ -56,7 +57,7 @@ global kTraceOff = 4
 ;;;-------------------------------------------------------------------------;;;
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; Abstract Class:          Condition                                      ;;;
+;;; Abstract Class           Condition                                      ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class Condition {
@@ -79,7 +80,7 @@ class Condition {
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; Abstract Class:          CompositeCondition                             ;;;
+;;; Abstract Class           CompositeCondition                             ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class CompositeCondition extends Condition {
@@ -634,14 +635,23 @@ class CallAction extends Action {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class ProveAction extends CallAction {
+	iProveAll := false
+	
 	Functor[variablesOrFacts := "__NotInitialized__"] {
 		Get {
 			return this.Function[variablesOrFacts]
 		}
 	}
 	
+	__New(function, arguments, proveAll := false) {
+		this.iProveAll := proveAll
+		
+		base.__New(function, arguments)
+	}
+	
 	execute(knowledgeBase, variables) {
 		local facts := knowledgeBase.Facts
+		local resultSet
 		
 		arguments := []
 		
@@ -656,7 +666,12 @@ class ProveAction extends CallAction {
 		if (knowledgeBase.RuleEngine.TraceLevel <= kTraceMedium)
 			knowledgeBase.RuleEngine.trace(kTraceMedium, "Activate reduction rules with goal " . goal.toString())
 		
-		knowledgeBase.prove(goal)
+		resultSet := knowledgeBase.prove(goal)
+		
+		if (resultSet && this.iProveAll)
+			Loop
+				if !resultSet.nextResult()
+					break
 	}
 	
 	toString(facts := "__NotInitialized__") {
@@ -1584,6 +1599,7 @@ class RulesChoicePoint extends ChoicePoint {
 		
 	Reductions[reset := false] {
 		Get {
+			local ruleEngine
 			local goal
 			local resultSet
 			
@@ -1593,8 +1609,12 @@ class RulesChoicePoint extends ChoicePoint {
 				
 				this.iReductions := this.ResultSet.Rules.Reductions[goal.Functor, goal.Arity]
 				
-				if (resultSet.RuleEngine.TraceLevel <= kTraceLight)
-					resultSet.RuleEngine.trace(kTraceLight, this.iReductions.Length() . " rules selected for " . goal.toString(resultSet))
+				ruleEngine := resultSet.RuleEngine
+				
+				if (ruleEngine.TraceLevel <= kTraceLight) {
+					ruleEngine.trace("Trying to prove " . goal.toString(resultSet))
+					ruleEngine.trace(kTraceLight, this.iReductions.Length() . " rules selected for " . goal.toString(resultSet))
+				}
 			}
 				
 			return this.iReductions
@@ -1758,7 +1778,7 @@ class SetFactChoicePoint extends FactChoicePoint {
 ;;; Class                    ClearFactChoicePoint                           ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class ClearFactChoicePoint extends ChoicePoint {
+class ClearFactChoicePoint extends FactChoicePoint {
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -1874,9 +1894,7 @@ class ProduceChoicePoint extends ChoicePoint {
 			if (knowledgeBase.RuleEngine.TraceLevel <= kTraceMedium)
 				knowledgeBase.RuleEngine.trace(kTraceMedium, "Activate production rules")
 			
-			knowledgeBase.produce()
-			
-			return true
+			return knowledgeBase.produce()
 		}
 		else
 			return false
@@ -2061,6 +2079,7 @@ class KnowledgeBase {
 	produce() {
 		local facts := this.Facts
 		local rules := this.Rules
+		local result := false
 		
 		Loop {
 			generation := facts.Generation
@@ -2073,6 +2092,10 @@ class KnowledgeBase {
 					break
 				
 				if ruleEntry.Rule.produce(this) {
+					ruleEntry.deactivate()
+					
+					result := true
+					
 					if (generation != facts.Generation) {
 						produced := true
 							
@@ -2092,6 +2115,8 @@ class KnowledgeBase {
 			if !produced
 				break
 		}
+		
+		return result
 	}
 	
 	prove(goal) {
@@ -2629,9 +2654,10 @@ class RuleEngine {
 	produce() {
 		local knowledgeBase := this.createKnowledgeBase(this.createFacts(), this.createRules())
 
-		knowledgeBase.produce()
-		
-		return knowledgeBase.Facts
+		if knowledgeBase.produce()
+			return knowledgeBase.Facts
+		else
+			return false
 	}
 	
 	prove(goal) {
@@ -3327,6 +3353,8 @@ class ActionParser extends Parser {
 				return new CallAction(argument, this.parseArguments(expressions, 3))
 			case kProve:
 				return new ProveAction(argument, this.parseArguments(expressions, 3))
+			case kProveAll:
+				return new ProveAction(argument, this.parseArguments(expressions, 3), true)
 			case kSet:
 				arguments := this.parseArguments(expressions, 3)
 				

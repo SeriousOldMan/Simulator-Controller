@@ -772,22 +772,29 @@ class RaceEngineer extends ConfigurationItem {
 		facts := {"Race.Car": getConfigurationValue(data, "Race Data", "Car", "")
 				, "Race.Track": getConfigurationValue(data, "Race Data", "Track", "")
 				, "Race.Duration": duration
-				, "Race.Outlap": true
-				, "Race.Inlap": true
-				, "Race.AvgLapTime": 0
-				, "Race.AvgFuelPerLap": 0
-				, "Race.Damage.Repair": kAlways
-				, "Race.Tyre.Set.Setup": 1
-				, "Race.Tyre.Set.Fresh": 2
-				, "Race.Tyre.Pressure.Target.FL": 27.7
-				, "Race.Tyre.Pressure.Target.FR": 27.7
-				, "Race.Tyre.Pressure.Target.RL": 27.7
-				, "Race.Tyre.Pressure.Target.RR": 27.7
-				, "Race.Tyre.Pressure.Target.Deviation": 0.2
-				, "Race.Tyre.Pressure.Setup.FL": 0
-				, "Race.Tyre.Pressure.Setup.FR": 0
-				, "Race.Tyre.Pressure.Setup.RL": 0
-				, "Race.Tyre.Pressure.Setup.RR": 0}
+				, "Race.Settings.Outlap": true
+				, "Race.Settings.Inlap": true
+				, "Race.Settings.Fuel.AvgConsumption": 0
+				, "Race.Settings.Fuel.SafetyMargin": 5
+				, "Race.Settings.Lap.AvgTime": 0
+				, "Race.Settings.Lap.Considered": 4
+				, "Race.Settings.Damage.Repair": kAlways
+				, "Race.Settings.Tyre.Dry.Pressure.Target.FL": 27.7
+				, "Race.Settings.Tyre.Dry.Pressure.Target.FR": 27.7
+				, "Race.Settings.Tyre.Dry.Pressure.Target.RL": 27.7
+				, "Race.Settings.Tyre.Dry.Pressure.Target.RR": 27.7
+				, "Race.Settings.Tyre.Wet.Pressure.Target.FL": 30.0
+				, "Race.Settings.Tyre.Wet.Pressure.Target.FR": 30.0
+				, "Race.Settings.Tyre.Wet.Pressure.Target.RL": 30.0
+				, "Race.Settings.Tyre.Wet.Pressure.Target.RR": 30.0
+				, "Race.Settings.Tyre.Pressure.Deviation": 0.2
+				, "Race.Settings.Tyre.Set.Fresh": 2
+				, "Race.Setup.Tyre.Compound": "Dry"
+				, "Race.Setup.Tyre.Set": 1
+				, "Race.Setup.Tyre.Pressure.FL": 0
+				, "Race.Setup.Tyre.Pressure.FR": 0
+				, "Race.Setup.Tyre.Pressure.RL": 0
+				, "Race.Setup.Tyre.Pressure.RR": 0}
 				
 		return facts
 	}

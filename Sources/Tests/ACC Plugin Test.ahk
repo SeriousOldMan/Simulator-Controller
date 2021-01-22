@@ -27,6 +27,7 @@ SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Libraries\RuleEngine.ahk
+#Include ..\Libraries\SpeechGenerator.ahk
 #Include AHKUnit\AHKUnit.ahk
 
 
@@ -121,7 +122,7 @@ engine := new RuleEngine(productions, reductions, initialFacts)
 kb := engine.createKnowledgeBase(engine.createFacts(), engine.createRules())
 ; kb.RuleEngine.setTraceLevel(kTraceMedium)
 
-Loop 1 {
+Loop {
 	section := "Lap " . A_Index
 	
 	lapData := getConfigurationSectionValues(data, section, {}).Clone()
@@ -140,24 +141,58 @@ Loop 1 {
 		kb.produce()
 		
 		dumpFacts(kb)
-	}	
+	}
+	
+	if (A_Index == 3)
+		pitstop(kb)
+	
+	if (A_Index == 5)
+		pitstop(kb)
 }
 
-MsgBox % "Done"
+pitstop(kb) {
+	kb.addFact("Pitstop.Prepare", true)
 
-kb.addFact("Pitstop.Prepare", true)
+	kb.produce()
+	;kb.RuleEngine.setTraceLevel(kTraceMedium)
 
-kb.produce()
-kb.RuleEngine.setTraceLevel(kTraceMedium)
+	s := new SpeechGenerator()
 
-;r := kb.prove(compiler.compileGoal("nextTyreCompound()"))
+	s.speak("Ok, ich empfehle die folgenden Einstellungen für Boxenstopp " . kb.getValue("Pitstop.Planned.Nr"), true)
+	Sleep 100
 
-;if r 
-;	Msgbox here
+	fuel := kb.getValue("Pitstop.Planned.Fuel", 0)
+	if (fuel == 0)
+		s.speak("Es muss nicht nachgetankt werden", true)
+	else
+		s.speak("Es müssen " . Round(fuel) . " Liter nachgetankt werden", true)
 	
+	s.speak("Reifenmischung " . ((kb.getValue("Pitstop.Planned.Tyre.Compound") == "Dry") ? "Trocken" : "Regen"), true)
+	s.speak("Reifensatz " . kb.getValue("Pitstop.Planned.Tyre.Set"), true)
+	s.speak("Luftdruck vorne links " . Round(kb.getValue("Pitstop.Planned.Tyre.Pressure.FL"), 1), true)
+	s.speak("Luftdruck vorne rechts " . Round(kb.getValue("Pitstop.Planned.Tyre.Pressure.FR"), 1), true)
+	s.speak("Luftdruck hinten links " . Round(kb.getValue("Pitstop.Planned.Tyre.Pressure.RL"), 1), true)
+	s.speak("Luftdruck hinten rechts " . Round(kb.getValue("Pitstop.Planned.Tyre.Pressure.RR"), 1), true)
+
+	if kb.getValue("Pitstop.Planned.Repair.Suspension", false)
+		s.speak("Die Federung wird repariert", true)
+	else
+		s.speak("Die Federung muss nicht repariert werden", true)
+
+	if kb.getValue("Pitstop.Planned.Repair.BodyWork", false)
+		s.speak("Die Verkleidung und die aerodynamischen Elemente werden repariert", true)
+	else
+		s.speak("Die Verkleidung und die aerodynamischen Elemente müssen nicht repariert werden", true)
+
+	Sleep 100
+	s.speak("Einverstanden?", true)
+		
+			
+	kb.addFact("Pitstop.Lap", kb.getValue("Lap") + 1)
+}
 		
 dumpFacts(kb)
 
-MsgBox % "Pistop"
+MsgBox % "Done - Race On"
 
 exitapp

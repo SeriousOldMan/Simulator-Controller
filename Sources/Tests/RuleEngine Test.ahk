@@ -64,6 +64,9 @@ kRules =
 				fac(0, 1)
 				fac(?X, ?R) <= greater(?X, 0), minus(?N, ?X, 1), fac(?N, ?T), multiply(?R, ?T, ?X)
 				
+				sum([], 0)
+				sum([?h | ?t], ?sum) <= sum(?t, ?tSum), Plus(?sum, ?h, ?tSum)
+				
 				construct(?A, ?B) <= append(?A, Foo., ?B, .Bar)
 
 				persist(?A, ?B) <= Call(showRelationship, ?A, ?B), !, Set(?B.grandchild, ?A), Set(?B.grandfather, true), Set(?A.grandchild, true), Produce()
@@ -86,7 +89,7 @@ kRules =
 				
 				{Any: [?Peter.grandchild], [?Peter.son]} => (Set: Peter, happy)
 				[?Peter = happy] => (Call: celebrate)
-				[?Paul.grandchild] => (Set: Bound, ?Paul.grandchild), (Set: NotBound, ?Peter.son), (Set: ForcedBound, !Willy.grandchild)
+				{Any: [?Paul.grandchild], [?Willy.grandChild]} => (Set: Bound, ?Paul.grandchild), (Set: NotBound, ?Peter.son), (Set: ForcedBound, !Willy.grandchild)
 )
 
 global kExecutionTestRules = kRules
@@ -179,7 +182,7 @@ class Compiler extends Assert {
 		compiler.compileRules(kExecutionTestRules, productions, reductions)
 		
 		this.AssertEqual(3, productions.Length(), "Not all production rules compiled...")
-		this.AssertEqual(22, reductions.Length(), "Not all reduction rules compiled...")
+		this.AssertEqual(24, reductions.Length(), "Not all reduction rules compiled...")
 	}
 }
 
@@ -322,6 +325,14 @@ class Unification extends Assert {
 		this.executeTests(tests)
 	}
 	
+	Recursion_Test() {
+		tests := [["sum([], ?R)", ["sum([], 0)"]]
+				, ["sum([1], ?R)", ["sum([1], 1)"]]
+				, ["sum([1, 2, 3], ?R)", ["sum([1, 2, 3], 6)"]]]
+		
+		this.executeTests(tests)
+	}
+	
 	Builtin_Test() {
 		tests := [["fac(0, ?R)", ["fac(0, 1)"]]
 				, ["fac(1, ?R)", ["fac(1, 1)"]]
@@ -392,6 +403,8 @@ class HybridEngine extends Assert {
 		
 		resultSet := this.executeTests(tests)
 
+		resultSet.KnowledgeBase.produce()
+		
 		showFacts(resultSet.KnowledgeBase)
 		
 		this.AssertEqual("Peter", resultSet.KnowledgeBase.getValue("Bound", false), "Fact Bound is missing...")

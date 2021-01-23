@@ -7,6 +7,7 @@
 	 - Automated tyre pressure changes for falling or rising temperatures during long race events
      - Atomated evaluation, whether a repair of suspension and/or bodywork damages will have a positive overall impact on the race result depending on an evalution of all last lap times 
   3. [Target: V2.1][Heusinkveld Plugin (new)] Switching between pedal characteristic curves for Heusinkveld pedals while driving
+  4. [Target: V4.0][ACC Plugin] Big Data Collection based on race engineer data for alle tracks, cars and conditions. This data collection will be used to propose a setup for the current session.
   
 #### Feedback Handling
   1. [Tactile & Motion Feedback Plugin] Definition of feedback settings for different tracks and cars, selectable by the touch of a button

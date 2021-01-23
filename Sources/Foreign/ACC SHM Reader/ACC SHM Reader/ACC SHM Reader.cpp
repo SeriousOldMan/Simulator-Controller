@@ -148,7 +148,7 @@ int main(int argc, char* argv[])
 		_bstr_t tc(gf->tyreCompound);
 		const char* tyreCompound = tc;
 
-		printData("BodyWorkDamage", pf->carDamage);
+		printData("BodyworkDamage", pf->carDamage);
 		printData("SuspensionDamage", pf->suspensionDamage);
 		printData("FuelRemaining", pf->fuel);
 		printData("AirTemperature", pf->airTemp);

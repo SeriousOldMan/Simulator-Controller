@@ -103,7 +103,7 @@ showHere(kb, args*) {
 	return true
 }
 
-FileRead engineerRules, %kSourcesDirectory%Plugins\ACC Race Engineer.rules
+FileRead engineerRules, %kConfigDirectory%\Race Engineer.rules
 		
 compiler := new RuleCompiler()
 
@@ -151,41 +151,40 @@ Loop {
 }
 
 pitstop(kb) {
-	kb.addFact("Pitstop.Prepare", true)
+	kb.addFact("Pitstop.Plan", true)
 
 	kb.produce()
 	;kb.RuleEngine.setTraceLevel(kTraceMedium)
 
-	s := new SpeechGenerator()
+	s := new SpeechGenerator("Microsoft Zira Desktop")
 
-	s.speak("Ok, ich empfehle die folgenden Einstellungen für Boxenstopp " . kb.getValue("Pitstop.Planned.Nr"), true)
+	s.speak("Ok, we have the following for Pitstop number " . kb.getValue("Pitstop.Planned.Nr"), true)
 	Sleep 100
 
 	fuel := kb.getValue("Pitstop.Planned.Fuel", 0)
 	if (fuel == 0)
-		s.speak("Es muss nicht nachgetankt werden", true)
+		s.speak("Refueling is not necessary", true)
 	else
-		s.speak("Es müssen " . Round(fuel) . " Liter nachgetankt werden", true)
+		s.speak("We have to refuel " . Round(fuel) . " litres", true)
 	
-	s.speak("Reifenmischung " . ((kb.getValue("Pitstop.Planned.Tyre.Compound") == "Dry") ? "Trocken" : "Regen"), true)
-	s.speak("Reifensatz " . kb.getValue("Pitstop.Planned.Tyre.Set"), true)
-	s.speak("Luftdruck vorne links " . Round(kb.getValue("Pitstop.Planned.Tyre.Pressure.FL"), 1), true)
-	s.speak("Luftdruck vorne rechts " . Round(kb.getValue("Pitstop.Planned.Tyre.Pressure.FR"), 1), true)
-	s.speak("Luftdruck hinten links " . Round(kb.getValue("Pitstop.Planned.Tyre.Pressure.RL"), 1), true)
-	s.speak("Luftdruck hinten rechts " . Round(kb.getValue("Pitstop.Planned.Tyre.Pressure.RR"), 1), true)
+	s.speak("We will use " . kb.getValue("Pitstop.Planned.Tyre.Compound") . " tyre compound and tyre set number " . kb.getValue("Pitstop.Planned.Tyre.Set"), true)
+	s.speak("Pressure front left " . Round(kb.getValue("Pitstop.Planned.Tyre.Pressure.FL"), 1), true)
+	s.speak("Pressure front right " . Round(kb.getValue("Pitstop.Planned.Tyre.Pressure.FR"), 1), true)
+	s.speak("Pressure rear left" . Round(kb.getValue("Pitstop.Planned.Tyre.Pressure.RL"), 1), true)
+	s.speak("Pressure rear right " . Round(kb.getValue("Pitstop.Planned.Tyre.Pressure.RR"), 1), true)
 
 	if kb.getValue("Pitstop.Planned.Repair.Suspension", false)
-		s.speak("Die Federung wird repariert", true)
+		s.speak("The suspension must be repaired", true)
 	else
-		s.speak("Die Federung muss nicht repariert werden", true)
+		s.speak("The suspension looks fine", true)
 
-	if kb.getValue("Pitstop.Planned.Repair.BodyWork", false)
-		s.speak("Die Verkleidung und die aerodynamischen Elemente werden repariert", true)
+	if kb.getValue("Pitstop.Planned.Repair.Bodywork", false)
+		s.speak("Bodywork and aerodynamic elements must be repaired", true)
 	else
-		s.speak("Die Verkleidung und die aerodynamischen Elemente müssen nicht repariert werden", true)
+		s.speak("Bodywork and aerodynamic elements should be good", true)
 
 	Sleep 100
-	s.speak("Einverstanden?", true)
+	s.speak("Do you agree?", true)
 		
 			
 	kb.addFact("Pitstop.Lap", kb.getValue("Lap") + 1)

@@ -44,15 +44,19 @@ class SpeechGenerator {
 		}
 	}
 	
-	__New(){
+	__New(voice := false) {
 		this.iSpeechGenerator := ComObjCreate("SAPI.SpVoice")
 		
 		Loop, % this.iSpeechGenerator.GetVoices.Count
 			this.Voices.Push(this.iSpeechGenerator.GetVoices.Item(A_Index-1).GetAttribute("Name"))
 	
-		voices := this.Voices
+		if !voice {
+			voices := this.Voices
+			
+			voice := voices[1]
+		}
 		
-		this.setVoice(voices[1])
+		this.setVoice(voice)
 	}
 
 	speak(text, wait := false) {

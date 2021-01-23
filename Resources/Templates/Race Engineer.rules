@@ -1,0 +1,345 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;   Modular Simulator Controller System - Race Engineer Rules             ;;;
+;;;                                                                         ;;;
+;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
+;;;   License:    (2021) Creative Commons - BY-NC-SA                        ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;-------------------------------------------------------------------------;;;
+;;;                             Global Trigger                              ;;;
+;;;                                                                         ;;;
+;;; Entry points for the surrounding script code. Typacilly, the rule       ;;;
+;;; will triggered by setting a target fact and call "produce()" on the     ;;;
+;;; KnowledgeBase instance.                                                 ;;;
+;;;-------------------------------------------------------------------------;;;
+
+;;;-------------------------------------------------------------------------;;;
+;;; Each lap, after all the lap data has been copied to the knowledge base, ;;;
+;;; all target data for tyres, fuel, and repair settings will be recomputed ;;;
+;;; upon the data of the last laps, the current weather and track           ;;;
+;;; temperature trend, and so on.                                           ;;;
+;;;-------------------------------------------------------------------------;;;
+
+; [?Lap] => ...
+
+;;;-------------------------------------------------------------------------;;;
+;;; If "Pitstop.Plan" is set, the current data will be used to compute      ;;;
+;;; the settings for the next pitstop. The settings might be changed        ;;;
+;;; afterwards, for example by driver intervention, before they will be     ;;;
+;;; locked in with "Pitstop.Prepare".                                       ;;;
+;;;-------------------------------------------------------------------------;;;
+
+; [?Pitstop.Plan] => ...
+
+;;;-------------------------------------------------------------------------;;;
+;;; "Pitstop.Prepare" opens the Pitstop MFD and adjusts the settings        ;;;
+;;; according to the calculated and negotiated data.                        ;;;
+;;;-------------------------------------------------------------------------;;;
+
+; [?Pitstop.Prepare] => ...
+
+;;;-------------------------------------------------------------------------;;;
+;;; "Pitstop.Lap" must be set to the lap number, where the pitstop has been ;;;
+;;; done. It copies all the data into history memory to be used by the next ;;;
+;;; pitstop preparation.                                                    ;;;
+;;;-------------------------------------------------------------------------;;;
+
+; [?Pitstop.Lap] => ...
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                        Tyre Set Target Calculation                      ;;;
+;;;                                                                         ;;;
+;;; Calculate next dry tire set after performed pitstop.                    ;;;
+;;;-------------------------------------------------------------------------;;;
+
+{Any: [?Lap], {None: [?Tyre.Set.Target]}} => (Prove: nextTyreSet)
+
+nextTyreSet() <= pitstopTyreSet(?nr), Plus(?set, ?nr, 1), Set(Tyre.Set.Target, ?set), !
+nextTyreSet() <= Set(Tyre.Set.Target, !Race.Settings.Tyre.Set.Fresh)
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                         Fuel Target Calculation                         ;;;
+;;;                                                                         ;;;
+;;; Update target fuel amount for the next pit stop after each lap.         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+{Any: [?Lap], {None: [?Fuel.Amount.Target]}} => (Prove: updateFuelTarget, ?Lap)
+{Any: [?Lap], {None: [?Lap.Remaining]}} => (Prove: updateRemainingLaps, ?Lap)
+
+updateFuelTarget(?lap) <= lapAvgFuel(?lap, ?avgFuel), lapRemainingFuel(?lap, ?remainingFuel), remainingRaceLaps(?lap, ?remainingLaps),			\
+						  Multiply(?raceFuel, ?avgFuel, ?remainingLaps), safetyFuel(?avgFuel, ?safetyFuel),										\
+						  Plus(?neededFuel, ?raceFuel, ?safetyFuel), Greater(?neededFuel, ?remainingFuel), 										\
+						  Minus(?refillAmount, ?neededFuel, ?remainingFuel), Set(Fuel.Amount.Target, ?refillAmount), !
+updateFuelTarget(?lap) <= Clear(Fuel.Amount.Target)
+
+safetyFuel(?avgFuel, ?safetyFuel) <= eq(!Race.Settings.InLap, true), Plus(?safetyFuel, ?avgFuel, !Race.Settings.Fuel.SafetyMargin), !
+safetyFuel(?, !Race.Settings.Fuel.SafetyMargin)
+
+updateRemainingLaps(?lap) <= remainingStintLaps(?lap, ?remainingLaps), Set(Stint.Fuel.RemainingLaps, ?remainingLaps)
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                     Tyre Compound Target Calculation                    ;;;
+;;;                                                                         ;;;
+;;; Update target tyre set each lap to allow for weather trend influence.   ;;;
+;;;-------------------------------------------------------------------------;;;
+
+{Any: [?Lap], {None: [?Tyre.Compound.Target]}} => (Prove: nextTyreCompound)
+
+nextTyreCompound() <= pitstopTyreCompound(?compound), Set(Tyre.Compound.Target, ?compound), !
+nextTyreCompound() <= setupTyreCompound(?compound), Set(Tyre.Compound.Target, ?compound)
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                     Tyre Pressure Target Calculation                    ;;;
+;;;                                                                         ;;;
+;;; Check, whether the actual tyre pressures are out of target range and    ;;;
+;;; adjust for the next pitstop accordingly. The last laps according to     ;;;
+;;; "Race.Settings.Lap.Considered" are considered with linear falling       ;;;
+;;; influence on the deviation factor.                                      ;;;
+;;;-------------------------------------------------------------------------;;;
+
+{Any: [?Lap], {None: [?Tyre.Set.Target]}} => (Prove: updateTyrePressureDeviation, ?Lap)
+
+updateTyrePressureDeviation(?lap) <= tyrePressureDeviation(?lap, [FL, FR, RL, RR], ?deviations), 												\
+									 updateTargetPressures([FL, FR, RL, RR], ?deviations)
+
+tyrePressureDeviation(?lap, [], [])
+tyrePressureDeviation(?lap, [?tyreType | ?tyreTypes], [?deviation | ?deviations]) <= 															\
+		weightedDeviation(?lap, 0, ?tyreType, ?deviation), tyrePressureDeviation(?lap, ?tyreTypes, ?deviations)
+
+weightedDeviation(?, !Race.Settings.Lap.Considered, ?, 0) <= !
+weightedDeviation(?lap, ?offset, ?tyreType, ?deviation) <= Minus(?tLap, ?lap, ?offset),	currentTyreCompound(?compound),							\
+														   Append(?lapTP, Lap., ?tLap, .Tyre.Pressure., ?tyreType), Get(?lPressure, ?lapTP),	\
+														   Append(?targetTP, Race.Settings.Tyre., ?compound, .Pressure.Target., ?tyreType),		\
+														   Get(?tPressure, ?targetTP), Minus(?lDeviation, ?lPressure, ?tPressure),				\
+														   lapWeight(?tLap, ?weight), Multiply(?tDeviation, ?lDeviation, ?weight),				\
+														   Plus(?nOffset, ?offset, 1),															\
+														   weightedDeviation(?lap, ?nOffset, ?tyreType, ?nDeviation),							\
+														   Plus(?rDeviation, ?tDeviation, ?nDeviation),	Divide(?deviation, ?rDeviation, 2)
+
+updateTargetPressures([], [])
+updateTargetPressures([?tyreType | ?tyreTypes], [?deviation | ?deviations]) <=																	\
+		Append(?fact, Tyre.Pressure.Deviation., ?tyreType),	Set(?fact, ?deviation), 															\
+		Append(?absfact, Tyre.Pressure.Deviation.Abs., ?tyreType), abs(?deviation, ?absDeviation), Set(?absfact, ?absDeviation), 				\
+		updateTargetPressures(?tyreTypes, ?deviations)
+
+[?Tyre.Pressure.Deviation.Abs.FL > ?Race.Settings.Tyre.Pressure.Deviation] => (Prove: updateTargetPressure, FL, !Tyre.Pressure.Deviation.FL)
+[?Tyre.Pressure.Deviation.Abs.FR > ?Race.Settings.Tyre.Pressure.Deviation] => (Prove: updateTargetPressure, FR, !Tyre.Pressure.Deviation.FR)
+[?Tyre.Pressure.Deviation.Abs.RL > ?Race.Settings.Tyre.Pressure.Deviation] => (Prove: updateTargetPressure, RL, !Tyre.Pressure.Deviation.RL)
+[?Tyre.Pressure.Deviation.Abs.RR > ?Race.Settings.Tyre.Pressure.Deviation] => (Prove: updateTargetPressure, RR, !Tyre.Pressure.Deviation.RR)
+
+updateTargetPressure(?tyreType, ?deviation) <= lastPressure(?tyreType, ?pressure), !, Minus(?targetPressure, ?pressure, ?deviation), 			\
+											   Append(?fact, Tyre.Pressure.Target., ?tyreType), Set(?fact, ?targetPressure)
+
+lastPressure(?tyreType, ?pressure) <= pitstopPressure(?tyreType, ?pressure)
+lastPressure(?tyreType, ?pressure) <= setupPressure(?tyreType, ?pressure)
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                     Danage Repair Target Calculation                    ;;;
+;;;                                                                         ;;;
+;;; These rules check for current damage and suggest repairing based on     ;;;
+;;; general settings (see "Race.Settings.Damage.Repair") or perceived       ;;;
+;;; significant lap time reduction.                                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+{Any: [?Lap], {None: [?Damage.Repair.Suspension.Target]}} => (Prove: updateSuspensionRepair, ?Lap)
+{Any: [?Lap], {None: [?Damage.Repair.Bodywork.Target]}} => (Prove: updateBodyworkRepair, ?Lap)
+
+updateSuspensionRepair(?lap) <= lapDamage(?lap, Suspension, ?damage), repairDamage(Suspension, ?damage),										\
+								Set(Damage.Repair.Suspension.Target, true), !
+updateSuspensionRepair(?) <= Clear(Damage.Repair.Suspension.Target)
+
+updateBodyworkRepair(?lap) <= lapDamage(?lap, Bodywork, ?damage), repairDamage(Bodywork, ?damage),												\
+							  Set(Damage.Repair.Bodywork.Target, true), !
+updateBodyworkRepair(?) <= Clear(Damage.Repair.Bodywork.Target)
+
+lapDamage(?lap, Suspension, ?damage) <= lapDamage(?lap, Suspension, FL, ?fld), lapDamage(?lap, Suspension, FR, ?frd),							\
+										lapDamage(?lap, Suspension, RL, ?rld), lapDamage(?lap, Suspension, RR, ?rrd),							\
+										sum([?fld, ?frd, ?rld, ?rrd], ?damage)
+lapDamage(?lap, Bodywork, ?damage) <= lapDamage(?lap, Bodywork, Front, ?frontDmg), lapDamage(?lap, Bodywork, Rear, ?rearDmg),					\
+									  lapDamage(?lap, Bodywork, Left, ?leftDmg), lapDamage(?lap, Bodywork, Right, ?rightDmg),					\
+									  lapDamage(?lap, Bodywork, Center, ?centerDmg), 															\
+									  sum([?frontDmg, ?rearDmg, ?leftDmg, ?rightDmg, ?centerDmg], ?damage)
+
+repairDamage(?type, 0) <= !, fail
+repairDamage(?type, ?damage) <= Append(?fact, Race.Settings.Damage., ?type, .Repair),															\
+								Get(?setting, ?fact), repairDamage(?type, ?setting, ?damage)
+
+repairDamage(?, Never, ?) <= !, fail
+repairDamage(?, Always, ?)
+repairDamage(?type, Threshold, ?damage) <= Append(?fact, Race.Settings.Damage., ?type, .Repair.Threshold),										\
+										   Get(?threshold, ?fact), Greater(?damage, ?threshold)
+repairDamage(?, Impact, ?) <= notYetImplemented()
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                             Pitstop Planning                            ;;;
+;;;-------------------------------------------------------------------------;;;
+
+[?Stint.Fuel.RemainingLaps <= ?Race.Settings.Lap.PitstopWarning] => (Call: upcomingPitstopWarning, ?Stint.Fuel.RemainingLaps)
+
+priority: 10, [?Pitstop.Plan] => (Prove: planPitstopLap)
+{All: [?Pitstop.Plan], [?Fuel.Amount.Target]} => (Set: Pitstop.Planned.Fuel, ?Fuel.Amount.Target)
+{All: [?Pitstop.Plan], [?Tyre.Pressure.Target.FL]} => (Set: Pitstop.Planned.Tyre.Pressure.FL, ?Tyre.Pressure.Target.FL)
+{All: [?Pitstop.Plan], [?Tyre.Pressure.Target.FR]} => (Set: Pitstop.Planned.Tyre.Pressure.FR, ?Tyre.Pressure.Target.FR)
+{All: [?Pitstop.Plan], [?Tyre.Pressure.Target.RL]} => (Set: Pitstop.Planned.Tyre.Pressure.RL, ?Tyre.Pressure.Target.RL)
+{All: [?Pitstop.Plan], [?Tyre.Pressure.Target.RR]} => (Set: Pitstop.Planned.Tyre.Pressure.RR, ?Tyre.Pressure.Target.RR)
+{All: [?Pitstop.Plan], [?Damage.Repair.Suspension.Target]} => (Set: Pitstop.Planned.Repair.Suspension, ?Damage.Repair.Suspension.Target)
+{All: [?Pitstop.Plan], [?Damage.Repair.Bodywork.Target]} => (Set: Pitstop.Planned.Repair.Bodywork, ?Damage.Repair.Bodywork.Target)
+{All: [?Pitstop.Plan], {None: [?Fuel.Amount.Target]}} => (Set: Pitstop.Planned.Fuel, 0)
+{All: [?Pitstop.Plan], {None: [?Tyre.Pressure.Target.FL]}} => (Set: Pitstop.Planned.Tyre.Pressure.FL, !Race.Setup.Tyre.Pressure.FL)
+{All: [?Pitstop.Plan], {None: [?Tyre.Pressure.Target.FR]}} => (Set: Pitstop.Planned.Tyre.Pressure.FR, !Race.Setup.Tyre.Pressure.FR)
+{All: [?Pitstop.Plan], {None: [?Tyre.Pressure.Target.RL]}} => (Set: Pitstop.Planned.Tyre.Pressure.RL, !Race.Setup.Tyre.Pressure.RL)
+{All: [?Pitstop.Plan], {None: [?Tyre.Pressure.Target.RR]}} => (Set: Pitstop.Planned.Tyre.Pressure.RR, !Race.Setup.Tyre.Pressure.RR)
+{All: [?Pitstop.Plan], {None: [?Damage.Repair.Suspension.Target]}} => (Set: Pitstop.Planned.Repair.Suspension, false)
+{All: [?Pitstop.Plan], {None: [?Damage.Repair.Bodywork.Target]}} => (Set: Pitstop.Planned.Repair.Bodywork, false)
+{All: [?Pitstop.Plan], [?Tyre.Compound.Target]} => (Set: Pitstop.Planned.Tyre.Compound, ?Tyre.Compound.Target)
+{All: [?Pitstop.Plan], [?Tyre.Set.Target]} => (Set: Pitstop.Planned.Tyre.Set, ?Tyre.Set.Target)
+priority: -10, [?Pitstop.Plan] => (Set: Pitstop.Planned), (Clear: Pitstop.Plan)
+
+planPitstopLap() <= bound(!Pitstop.Planned.Lap), !
+planPitstopLap() <= lastPitstop(?last), Plus(?nr, ?last, 1), Plus(?lap, !Lap, 1), Set(Pitstop.Planned.Nr, ?nr), Set(Pitstop.Planned.Lap, ?lap)
+planPitstopLap() <= Plus(?lap, !Lap, 1), Set(Pitstop.Planned.Nr, 1), Set(Pitstop.Planned.Lap, ?lap)
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                            Pitstop Preparation                          ;;;
+;;;-------------------------------------------------------------------------;;;
+
+{All: [?Pitstop.Planned], {Any: [?Pitstop.Prepare], [?Pitstop.Planned.Lap <= ?Lap]}} => (Prove: setupPitstop), (Clear: Pitstop.Planned),		\
+																						(Set: Pitstop.Prepared)
+
+setupPitstop() <= Call(beginPitstopSettings), updateTyreSettings(), updateRepairSettings(), Call(endPitstopSettings), Clear(Pitstop.Prepare)
+
+updateFuelSettings() <= Call(updatePitstopFuelSettings, !Pitstop.Planned.Fuel)
+
+updateTyreSettings() <= Call(updatePitstopTyreSettings, !Pitstop.Planned.Tyre.Compound, !Pitstop.Planned.Tyre.Set,								\
+														!Pitstop.Planned.Tyre.Pressure.FL, !Pitstop.Planned.Tyre.Pressure.FR,					\
+														!Pitstop.Planned.Tyre.Pressure.RL, !Pitstop.Planned.Tyre.Pressure.RR)
+
+updateRepairSettings() <= Call(updatePitstopRepairSettings, !Pitstop.Planned.Repair.Suspension, !Pitstop.Planned.Repair.Bodywork)
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                             Pitstop Performed                           ;;;
+;;;-------------------------------------------------------------------------;;;
+
+[?Pitstop.Lap] => (ProveAll: pitstopPerformed, ?Pitstop.Lap)
+priority: -10, [?Pitstop.Lap] => (Set: Pitstop.Last, !Pitstop.Planned.Nr), (Clear: Pitstop.Planned.Nr), (Clear: Pitstop.Planned.Lap),			\
+								 (Clear: Pitstop.Planned.Fuel),																					\
+								 (Clear: Pitstop.Planned.Tyre.Compound), (Clear: Pitstop.Planned.Tyre.Set), 									\
+								 (Clear: Pitstop.Planned.Tyre.Pressure.FL), (Clear: Pitstop.Planned.Tyre.Pressure.FR), 							\
+								 (Clear: Pitstop.Planned.Tyre.Pressure.RL), (Clear: Pitstop.Planned.Tyre.Pressure.RR), 							\
+								 (Clear: Pitstop.Planned.Repair.Suspension), (Clear: Pitstop.Planned.Repair.Bodywork),							\
+								 (Clear: Pitstop.Lap), (Clear: Pistop.Prepared)
+
+pitstopPerformed(?lap) <= unbound(!Pitstop.Prepared), !, fail
+pitstopPerformed(?lap) <= Append(?pFact, Pitstop., !Pitstop.Planned.Nr, .Lap), Set(?pFact, ?lap)
+pitstopPerformed(?lap) <= Append(?lfact, Lap., ?lap, .Time.End), Get(?time, ?lfact),															\
+						  Append(?pFact, Pitstop., !Pitstop.Planned.Nr, .Time), Set(?pFact, ?time)
+pitstopPerformed(?lap) <= Append(?lfact, Lap., ?lap, .Temperature.Air), Get(?temp, ?lfact),														\
+						  Append(?pFact, Pitstop., !Pitstop.Planned.Nr, .Temperature.Air), Set(?pFact, ?temp)
+pitstopPerformed(?lap) <= Append(?lfact, Lap., ?lap, .Temperature.Track), Get(?temp, ?lfact),													\
+						  Append(?pFact, Pitstop., !Pitstop.Planned.Nr, .Temperature.Track), Set(?pFact, ?temp)
+pitstopPerformed(?lap) <= Append(?pFact, Pitstop., !Pitstop.Planned.Nr, .Fuel), Set(?pFact, !Pitstop.Planned.Fuel)
+pitstopPerformed(?lap) <= Append(?pFact, Pitstop., !Pitstop.Planned.Nr, .Tyre.Compound), Set(?pFact, !Pitstop.Planned.Tyre.Compound)
+pitstopPerformed(?lap) <= Append(?pFact, Pitstop., !Pitstop.Planned.Nr, .Tyre.Set), Set(?pFact, !Pitstop.Planned.Tyre.Set)
+pitstopPerformed(?lap) <= Append(?pFact, Pitstop., !Pitstop.Planned.Nr, .Tyre.Pressure.FL), Set(?pFact, !Pitstop.Planned.Tyre.Pressure.FL)
+pitstopPerformed(?lap) <= Append(?pFact, Pitstop., !Pitstop.Planned.Nr, .Tyre.Pressure.FR), Set(?pFact, !Pitstop.Planned.Tyre.Pressure.FR)
+pitstopPerformed(?lap) <= Append(?pFact, Pitstop., !Pitstop.Planned.Nr, .Tyre.Pressure.RL), Set(?pFact, !Pitstop.Planned.Tyre.Pressure.RL)
+pitstopPerformed(?lap) <= Append(?pFact, Pitstop., !Pitstop.Planned.Nr, .Tyre.Pressure.RR), Set(?pFact, !Pitstop.Planned.Tyre.Pressure.RR)
+pitstopPerformed(?lap) <= Append(?pFact, Pitstop., !Pitstop.Planned.Nr, .Repair.Suspension), Set(?pFact, !Pitstop.Planned.Repair.Suspension)
+pitstopPerformed(?lap) <= Append(?pFact, Pitstop., !Pitstop.Planned.Nr, .Repair.Bodywork), Set(?pFact, !Pitstop.Planned.Repair.Bodywork)
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                        State Information Retrieval                      ;;;
+;;;-------------------------------------------------------------------------;;;
+
+currentTyreCompound(?compound) <= pitstopTyreCompound(?compound), !
+currentTyreCompound(?compound) <= setupTyreCompound(?compound)
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                         Lap Information Retrieval                       ;;;
+;;;-------------------------------------------------------------------------;;;
+
+lapDamage(?lap, ?type, ?position, ?damage) <= Append(?fact, Lap., ?lap, .Damage., ?type, ., ?position), Get(?damage, ?fact)
+
+lapAvgFuel(?lap, ?avgFuel) <= Append(?fact, Lap., ?lap, .Fuel.AvgConsumption), Get(?avgFuel, ?fact)
+
+lapRemainingFuel(?lap, ?remainingFuel) <= Append(?fact, Lap., ?lap, .Fuel.Remaining), Get(?remainingFuel, ?fact)
+
+remainingRaceLaps(?lap, ?remainingLaps) <= Append(?rfact, Lap., ?lap, .Time.End), Get(?raceTime, ?rfact),										\
+										   Multiply(?raceLength, !Race.Duration, 1000), Minus(?remainingTime, ?raceLength, ?raceTime),			\
+										   lapAvgTime(?lap, ?avgTime), Divide(?remainingLaps, ?remainingTime, ?avgTime)
+
+remainingStintLaps(?lap, ?remainingLaps) <= lapRemainingFuel(?lap, ?fuelLeft), lapAvgFuel(?lap, ?fuelPerLap),									\
+											Divide(?remainingLaps, ?fuelLeft, ?fuelPerLap)
+										
+lapAvgTime(?lap, ?avgTime) <= lapTimes(?lap, 0, ?lapTimes), sum(?lapTimes, ?sTimes), Divide(?avgTime, ?sTimes, !Race.Settings.Lap.Considered)
+
+lapTimes(?lap, !Race.Settings.Lap.Considered, []) <= !
+lapTimes(?lap, ?offset, [?time | ?times]) <= Minus(?tLap, ?lap, ?offset), lapTime(?tlap, ?time), 												\
+											 Plus(?nOffset, ?offset, 1), lapTimes(?lap, ?nOffset, ?times)
+
+lapTime(?lap, ?time) <= Append(?fact, Lap., ?lap, .Time), Get(?time, ?fact), bound(?time)
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                   Setup & Settings Information Retrieval                ;;;
+;;;-------------------------------------------------------------------------;;;
+
+setupTyreCompound(?compound) <= Get(?compound, Race.Setup.Tyre.Compound)
+
+setupPressure(?tyreType, ?pressure) <= Append(?fact, Race.Setup.Tyre.Pressure., ?tyreType), Get(?pressure, ?fact)
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                       Pitstop Information Retrieval                     ;;;
+;;;-------------------------------------------------------------------------;;;
+
+lastPitstop(?nr) <= unbound(!Pitstop.Last), !, fail
+lastPitstop(?nr) <= eq(?nr, !Pitstop.Last)
+
+pitstopTyreSet(?tyreSet) <= lastPitstop(?nr), Append(?fact, Pitstop., ?nr, .Tyre.Set), Get(?tyreSet, ?fact)
+pitstopTyreCompound(?tyreCompound) <= lastPitstop(?nr), Append(?fact, Pitstop., ?nr, .Tyre.Compound), Get(?tyreCompound, ?fact)
+pitstopPressure(?tyreType, ?pressure) <= lastPitstop(?nr), Append(?fact, Pitstop., ?nr, .Tyre.Pressure., ?tyreType), Get(?pressure, ?fact)
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                         Statistical Computations                        ;;;
+;;;-------------------------------------------------------------------------;;;
+
+lapWeight(?lap, ?weight) <= Minus(?distance, !Lap, ?lap), Less(?distance, !Race.Settings.Lap.Considered), 										\
+							Minus(?temp, !Race.Settings.Lap.Considered, ?distance), Divide(?weight, ?temp, !Race.Settings.Lap.Considered)
+lapWeight(?, 0)
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                             Utility Rules                               ;;;
+;;;-------------------------------------------------------------------------;;;
+
+eq(?X, ?X)
+
+bound(?x) <= eq(?x, __NotInitialized__), !, fail
+bound(?x)
+
+unbound(?x) <= eq(?x, __NotInitialized__)
+
+sum([], 0)
+sum([?h | ?t], ?sum) <= sum(?t, ?tSum), Plus(?sum, ?h, ?tSum)
+
+max(?x, ?y, ?x) <= Greater(?x, ?y), !, fail
+max(?x, ?y, ?y)
+
+min(?x, ?y, ?x) <= Less(?x, ?y), !, fail
+min(?x, ?y, ?y)
+
+abs(?x, ?r) <= Less(?x, 0), Multiply(?r, ?x, -1), !
+abs(?x, ?x)
+

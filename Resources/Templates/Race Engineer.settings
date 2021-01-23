@@ -1,0 +1,29 @@
+[Race Settings]
+OutLap=true
+InLap=true
+Fuel.AvgConsumption=2.7
+Fuel.SafetyMargin=3
+Fuel.Warning=3
+Lap.AvgTime=106
+Lap.Considered=5
+Lap.PitstopWarning=3
+Damage.Suspension.Repair=Always
+Damage.Bodywork.Repair=Threshold
+Damage.Bodywork.Repair.Threshold=20
+Tyre.Dry.Pressure.Target.FL=27.7
+Tyre.Dry.Pressure.Target.FR=27.7
+Tyre.Dry.Pressure.Target.RL=27.7
+Tyre.Dry.Pressure.Target.RR=27.7
+Tyre.Wet.Pressure.Target.FL=30.0
+Tyre.Wet.Pressure.Target.FR=30.0
+Tyre.Wet.Pressure.Target.RL=30.0
+Tyre.Wet.Pressure.Target.RR=30.0
+Tyre.Pressure.Deviation=0.2
+Tyre.Set.Fresh=8
+[Race Setup]
+Tyre.Compound=Dry
+Tyre.Set=7
+Tyre.Pressure.FL=26.1
+Tyre.Pressure.FR=26.1
+Tyre.Pressure.RL=26.1
+Tyre.Pressure.RR=26.1

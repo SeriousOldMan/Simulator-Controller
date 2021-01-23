@@ -10,6 +10,8 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Libraries\RuleEngine.ahk
+#Include ..\Libraries\RaceEngineer.ahk
+#Include ..\Libraries\SpeechGenerator.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -55,6 +57,17 @@ class ACCPlugin extends ControllerPlugin {
 	
 	iDriveMode := false
 	iPitstopMode := false
+	
+	iRaceEngineer := false
+	
+	iPitstopPending := false
+	
+	iRaceEngineerVoice := false
+	iRaceEngineerConfirmation := false
+	iPitstopContinuation := false
+	
+	iRepairSuspensionChosen := true
+	iRepairBodyworkChosen := true
 	
 	class DriveMode extends ControllerMode {
 		Mode[] {
@@ -138,6 +151,48 @@ class ACCPlugin extends ControllerPlugin {
 		}
 	}
 
+	class RaceEngineerAction extends ControllerAction {
+		iAction := false
+		
+		Action[] {
+			Get {
+				return this.iAction
+			}
+		}
+		
+		__New(function, label, action) {
+			this.iAction := action
+			
+			base.__New(function, label)
+		}
+		
+		fireAction(function, trigger) {
+			local plugin := this.Controller.findPlugin(kACCPlugin)
+			
+			if plugin.ActiveRace
+				switch this.Action {
+					case "PitstopPlan":
+						plugin.planPitstop()
+					case "PitstopPrepare":
+						plugin.preparePitstop()
+					case "PitstopConfirm":
+						continuation := plugin.iPitstopContinuation
+						
+						if continuation {
+							plugin.iPitstopContinuation := false
+							
+							%continuation%()
+							
+							generator := new SpeechGenerator(plugin.RaceEngineerVoice)
+				
+							generator.speak(translate("Roger, I come back to you as soon as possible."), true)
+						}
+					default:
+						Throw "Invalid action """ . this.Action . """ detected in RaceEngineerAction.fireAction...."
+				}
+		}
+	}
+	
 	class ChatAction extends ControllerAction {
 		iMessage := ""
 		
@@ -176,7 +231,39 @@ class ACCPlugin extends ControllerPlugin {
 		}
 	}
 	
+	RaceEngineer[] {
+		Get {
+			return this.iRaceEngineer
+		}
+	}
+	
+	RaceEngineerVoice[] {
+		Get {
+			return this.iRaceEngineerVoice
+		}
+	}
+	
+	RaceEngineerConfirmation[] {
+		Get {
+			return this.iRaceEngineerConfirmation
+		}
+	}
+	
+	ActiveRace[] {
+		Get {
+			return (this.iRaceEngineer != false)
+		}
+	}
+	
+	PitstopPending[] {
+		Get {
+			return this.iPitstopPending
+		}
+	}
+	
 	__New(controller, name, configuration := false) {
+		useRaceEngineer := false
+		
 		this.iDriveMode := new this.DriveMode(this)
 		
 		base.__New(controller, name, configuration)
@@ -189,7 +276,23 @@ class ACCPlugin extends ControllerPlugin {
 		for ignore, theAction in string2Values(",", this.getArgumentValue("pitstopSettings", ""))
 			this.createPitstopAction(controller, string2Values(A_Space, theAction)*)
 		
+		for ignore, theAction in string2Values(",", this.getArgumentValue("raceEngineerCommands", "")) {
+			useRaceEngineer := true
+		
+			this.createRaceEngineerAction(controller, string2Values(A_Space, theAction)*)
+		}
+		
+		voice := this.getArgumentValue("raceEngineerVoice", false)
+		
+		if ((voice == true) || (voice = "true"))
+			this.iRaceEngineerVoice := ((getLanguage() = "DE") ? "Microsoft Hedda Desktop" : "Microsoft Zira Desktop")
+		else if voice
+			this.iRaceEngineerVoice := voice
+		
 		controller.registerPlugin(this)
+	
+		if useRaceEngineer
+			SetTimer collectRaceData, 10000
 	}
 	
 	loadFromConfiguration(configuration) {
@@ -210,6 +313,19 @@ class ACCPlugin extends ControllerPlugin {
 		}
 	}
 	
+	createRaceEngineerAction(mode, controller, action, actionFunction) {
+		local function := controller.findFunction(actionFunction)
+		
+		if (function != false) {
+			this.registerAction(new this.RaceEngineerAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Activate"), action), action))
+			
+			if (action = "PitstopConfirm")
+				this.iRaceEngineerConfirmation := true
+		}
+		else
+			this.logFunctionNotFound(actionFunction)
+	}
+	
 	createPitstopAction(controller, action, increaseFunction, moreArguments*) {
 		static kActions := {Strategy: "Strategy", Refuel: "Refuel"
 						  , TyreChange: "Change Tyres", TyreSet: "Tyre Set", TyreCompound: "Compound", TyreAllAround: "All Around"
@@ -227,16 +343,23 @@ class ACCPlugin extends ControllerPlugin {
 			if (moreArguments.Length() > 0) {
 				decreaseFunction := moreArguments[1]
 				
-				if (this.Controller.findFunction(decreaseFunction) != false)
+				if (controller.findFunction(decreaseFunction) != false)
 					moreArguments.RemoveAt(1)
 				else
 					decreaseFunction := false
 			}
 			
-			function := this.Controller.findFunction(increaseFunction)
+			function := controller.findFunction(increaseFunction)
 			
-			if (mode == false)
-				mode := new this.PitstopMode(this)
+			if (mode == false) {
+				mode := this.iPitstopMode
+			
+				if (mode == false) {
+					mode := new this.PitstopMode(this)
+					
+					this.iPitstopMode := mode
+				}
+			}
 			
 			if !decreaseFunction {
 				if (function != false)
@@ -253,7 +376,7 @@ class ACCPlugin extends ControllerPlugin {
 				else
 					this.logFunctionNotFound(increaseFunction)
 					
-				function := this.Controller.findFunction(decreaseFunction)
+				function := controller.findFunction(decreaseFunction)
 				
 				if (function != false)
 					mode.registerAction(new this.PitstopChangeAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Decrease"), action), kActions[action], "Decrease", moreArguments*))
@@ -263,6 +386,22 @@ class ACCPlugin extends ControllerPlugin {
 		}
 		else
 			logMessage(kLogWarn, translate("Pitstop action ") . action . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
+	}
+	
+	activate() {
+		base.activate()
+		
+		this.enableRaceEngineerActions(this.ActiveRace)
+	}
+	
+	enableRaceEngineerActions(enabled) {
+		for ignore, theAction in this.Actions {
+			if isInstance(theAction, RaceEngineerAction)
+				if enabled
+					theAction.Function.enable(kAllTrigger)
+				else
+					theAction.Function.disable(kAllTrigger)
+		}
 	}
 	
 	runningSimulator() {
@@ -409,15 +548,15 @@ class ACCPlugin extends ControllerPlugin {
 			this.changePitstopOption("Refuel", direction, liters)
 	}
 	
-	changeTyreSet(selection) {
+	changeTyreSet(selection, steps := 1) {
 		this.requirePitstopMFD()
 			
 		if this.selectPitstopOption("Tyre set")
 			switch selection {
 				case "Next":
-					this.changePitstopOption("Tyre set", "Increase")
+					this.changePitstopOption("Tyre set", "Increase", steps)
 				case "Previous":
-					this.changePitstopOption("Tyre set", "Decrease")
+					this.changePitstopOption("Tyre set", "Decrease", steps)
 				default:
 					Throw "Unsupported selection """ . selection . """ detected in ACCPlugin.changeTyreSet..."
 			}
@@ -719,192 +858,177 @@ class ACCPlugin extends ControllerPlugin {
 	resetPitstopState(update := false) {
 		this.openPitstopMFD(update)
 	}
-}
-
-class RaceEngineer extends ConfigurationItem {
-	iKnowledgeBase := false
-	iOverallTime := 0
-	iLastLap := 0
-	iLastFuelAmount := 0
-	iInitialFuelAmount := 0
 	
-	KnowledgeBase[] {
-		Get {
-			return this.iKnowledgeBase
-		}
-	}
-	
-	OverallTime[] {
-		Get {
-			return this.iOverallTime
-		}
-	}
-	
-	LastLap[] {
-		Get {
-			return this.iLastLap
-		}
-	}
-	
-	InitialFuelAmount[] {
-		Get {
-			return this.iInitialFuelAmount
-		}
-	}
-	
-	LastFuelAmount[] {
-		Get {
-			return this.iLastFuelAmount
-		}
-	}
-	
-	__New(plugin, configuration := false) {
-		base.__New(configuration)
+	startRace(data) {
+		local raceEngineer
 		
-		RaceEngineer.Instance := this
-	}
-	
-	createRace(data) {
-		local facts
+		if !this.ActiveRace {
+			raceEngineer := new RaceEngineer(this, this.Configuration, , readConfiguration(getFileName("Race Engineer.settings", kUserConfigDirectory, kConfigDirectory)))
 		
-		duration := Round((getConfigurationValue(data, "Stint Data", "TimeRemaining", 0) + getConfigurationValue(data, "Stint Data", "LapLastTime", 0)) / 1000)
-		
-		facts := {"Race.Car": getConfigurationValue(data, "Race Data", "Car", "")
-				, "Race.Track": getConfigurationValue(data, "Race Data", "Track", "")
-				, "Race.Duration": duration
-				, "Race.Settings.Outlap": true
-				, "Race.Settings.Inlap": true
-				, "Race.Settings.Fuel.AvgConsumption": 0
-				, "Race.Settings.Fuel.SafetyMargin": 5
-				, "Race.Settings.Lap.AvgTime": 0
-				, "Race.Settings.Lap.Considered": 4
-				, "Race.Settings.Damage.Repair": kAlways
-				, "Race.Settings.Tyre.Dry.Pressure.Target.FL": 27.7
-				, "Race.Settings.Tyre.Dry.Pressure.Target.FR": 27.7
-				, "Race.Settings.Tyre.Dry.Pressure.Target.RL": 27.7
-				, "Race.Settings.Tyre.Dry.Pressure.Target.RR": 27.7
-				, "Race.Settings.Tyre.Wet.Pressure.Target.FL": 30.0
-				, "Race.Settings.Tyre.Wet.Pressure.Target.FR": 30.0
-				, "Race.Settings.Tyre.Wet.Pressure.Target.RL": 30.0
-				, "Race.Settings.Tyre.Wet.Pressure.Target.RR": 30.0
-				, "Race.Settings.Tyre.Pressure.Deviation": 0.2
-				, "Race.Settings.Tyre.Set.Fresh": 2
-				, "Race.Setup.Tyre.Compound": "Dry"
-				, "Race.Setup.Tyre.Set": 1
-				, "Race.Setup.Tyre.Pressure.FL": 0
-				, "Race.Setup.Tyre.Pressure.FR": 0
-				, "Race.Setup.Tyre.Pressure.RL": 0
-				, "Race.Setup.Tyre.Pressure.RR": 0}
-				
-		return facts
-	}
-	
-	startRace(facts) {
-		engine := new RuleEngine([], [], facts)
-		
-		this.iKnowledgeBase := engine.createKnowledgeBase(engine.createFacts(), engine.createRules())
-		this.iLastLap := 0
-		this.iOverallTime := 0
-		this.iInitialFuel := 0
+			this.iRaceEngineer := raceEngineer
+			
+			raceEngineer.startRace(data)
+			
+			this.enableRaceEngineerActions(true)
+		}
+		else
+			Throw "The active race must be finished before a new race can be started..."
 	}
 	
 	finishRace() {
-		fileName := (kUserHomeDirectory . "Temp\ACC Data\Race.data")
-	
-		FileDelete %fileName%
-		
-		curEncoding := A_FileEncoding
-		
-		FileEncoding UTF-16
-		
-		try {
-			for theFact, theValue in this.KnowledgeBase.Facts.Facts {
-				line := theFact . "=" . theValue . "`n"
-				
-				FileAppend %line%, %fileName%
-			}
+		if this.ActiveRace {
+			this.RaceEngineer.finishRace()
+			
+			this.iRaceEngineer := false
+			this.iPitstopContinuation := false
+			this.iPitstopPending := false
+			
+			this.enableRaceEngineerActions(false)
 		}
-		finally {
-			FileEncoding %curEncoding%
+		else
+			Throw "No active race to be finished..."
+	}
+	
+	addLap(data) {
+		if this.ActiveRace
+			this.RaceEngineer.addLap(data)
+		else
+			Throw "Lap data can only be added during an active race..."
+	}
+	
+	upcomingPitstopWarning(remainingLaps) {
+		if (this.ActiveRace && this.RaceEngineerVoice) {
+			generator := new SpeechGenerator(this.RaceEngineerVoice)
+				
+			generator.speak(translate("Pitstop comming up in ") . remainingLaps . translate("."), true)
+			
+			if this.RaceEngineerConfirmation {
+				Sleep 100
+				
+				generator.speak(translate("Should I update the pitstop strategy now?"), true)
+				
+				this.iPitstopContinuation := ObjBindMethod(this, "planPitstop")
+			}
 		}
 	}
 	
-	addLap(lapNumber, data) {
+	planPitstop() {
 		local knowledgeBase
-		local facts
 		
-		if !this.KnowledgeBase
-			this.startRace(this.createRace(data))
-		
-		knowledgeBase := this.KnowledgeBase
-		facts := knowledgeBase.Facts
-		
-		if (lapNumber == 1)
-			facts.addFact("Lap", 2)
+		if this.ActiveRace {
+			plan := this.RaceEngineer.planPitstop(this.RaceEngineerVoice != false)
+			
+			if this.RaceEngineerVoice {
+				generator := new SpeechGenerator(this.RaceEngineerVoice)
+				
+				generator.speak(plan, true)
+				
+				if this.RaceEngineerConfirmation {
+					Sleep 100
+					
+					generator.speak(translate("Do you agree?"), true)
+					
+					this.iPitstopContinuation := ObjBindMethod(this, "preparePitstop")
+				}
+			}
+		}
 		else
-			facts.setValue("Lap", lapNumber + 1)
+			Throw "Pitstops may only be planned during an active race..."
+	}
+	
+	preparePitstop(lap := false) {
+		if this.ActiveRace {
+			planned := this.RaceEngineer.hasPlannedPitstop()
 			
-		facts.addFact("Lap." . lapNumber . ".Driver", getConfigurationValue(data, "Race Data", "DriverName", ""))
-		
-		lapTime := getConfigurationValue(data, "Stint Data", "LapLastTime", 0)
-		
-		facts.addFact("Lap." . lapNumber . ".Time", lapTime)
-		facts.addFact("Lap." . lapNumber . ".Time.Start", this.OverallTime)
-		this.iOverallTime := this.OverallTime + lapTime
-		facts.addFact("Lap." . lapNumber . ".Time.End", this.OverallTime)
-		
-		fuelRemaining := getConfigurationValue(data, "Car Data", "FuelRemaining", 0)
-		
-		facts.addFact("Lap." . lapNumber . ".Fuel.Remaining", Round(fuelRemaining, 2))
-		
-		if (lapNumber == 1) {
-			this.iInitialFuelAmount := fuelRemaining
-			this.iLastFuelAmount := fuelRemaining
+			if this.RaceEngineerVoice {
+				generator := new SpeechGenerator(this.RaceEngineerVoice)
+
+				if !planned {
+					if this.RaceEngineerConfirmation {
+						generator.speak(translate("I have not planned a pitstop yet. Should I update the pitstop strategy now?"), true)
+						
+						his.iPitstopContinuation := ObjBindMethod(this, "planPitstop")
+					}
+					else
+						generator.speak(translate("I have not planned a pitstop yet."), true)
+				}
+				else if lap
+					generator.speak(translate("Ok, we will prepare the pitstop for lap ") . lap . translate("."), true)
+				else
+					generator.speak(translate("Ok, we will prepare the pitstop immediately. Come in whenever you want."), true)
+			}
 			
-			facts.addFact("Lap." . lapNumber . ".Fuel.AvgConsumption", 0)
-			facts.addFact("Lap." . lapNumber . ".Fuel.Consumption", 0)
+			if planned {
+				this.iRaceEngineer.preparePitstop(lap)
+				
+				this.iPitstopPending := true
+				
+				SetTimer collectRaceData, 5000
+			}
 		}
-		else {
-			facts.addFact("Lap." . lapNumber . ".Fuel.Consumption", Round(this.iLastFuelAmount - fuelRemaining, 2))
-			facts.addFact("Lap." . lapNumber . ".Fuel.AvgConsumption", Round((this.InitialFuelAmount - fuelRemaining) / (lapNumber - 1), 2))
+		else
+			Throw "Pitstops may only be prepared during an active race..."
+	}
+	
+	performPitstop() {
+		if this.ActiveRace {
+			this.RaceEngineer.performPitstop()
 			
-			this.iLastFuelAmount := fuelRemaining
+			this.iPitstopPending := false
+			
+			SetTimer collectRaceData, 10000
+			
+			if this.RaceEngineerVoice {
+				generator := new SpeechGenerator(this.RaceEngineerVoice)
+
+				generator.speak(translate("Ok, pitstop will be performed as planned. Check ignition and prepare for restart the engine."), true)
+			}
 		}
+		else
+			Throw "Pitstops may only be performed during an active race..."
+	}
+	
+	beginPitstopSettings() {
+		openPitstopMFD()
 		
-		tyrePressures := string2Values(",", getConfigurationValue(data, "Car Data", "TyrePressure", ""))
+		changePitstopStrategy("Previous", 5)
+	}
+
+	endPitstopSettings() {
+		closePitstopMFD()
 		
-		facts.addFact("Lap." . lapNumber . ".Tyre.Pressure.FL", Round(tyrePressures[1], 2))
-		facts.addFact("Lap." . lapNumber . ".Tyre.Pressure.FR", Round(tyrePressures[2], 2))		
-		facts.addFact("Lap." . lapNumber . ".Tyre.Pressure.RL", Round(tyrePressures[3], 2))
-		facts.addFact("Lap." . lapNumber . ".Tyre.Pressure.RR", Round(tyrePressures[4], 2))
+		if this.RaceEngineerVoice {
+			generator := new SpeechGenerator(this.RaceEngineerVoice)
+
+			generator.speak(translate("We are ready for the pitstop. You can come in."), true)
+		}
+	}
+
+	updatePitstopFuelSettings(fuel) {
+		changePitstopFuelAmount("Increase", Round(fuel))
+	}
+
+	updatePitstopTyreSettings(compound, set, pressureFLIncrement, pressureFRIncrement, pressureRLIncrement, pressureRRIncrement) {
+		changePitstopTyreCompound(compound)
 		
-		tyreTemperatures := string2Values(",", getConfigurationValue(data, "Car Data", "TyreTemperature", ""))
+		if (compound = "Dry")
+			changePitstopTyreSet("Next", set - 1)
 		
-		facts.addFact("Lap." . lapNumber . ".Tyre.Temperature.FL", Round(tyreTemperatures[1], 1))
-		facts.addFact("Lap." . lapNumber . ".Tyre.Temperature.FR", Round(tyreTemperatures[2], 1))		
-		facts.addFact("Lap." . lapNumber . ".Tyre.Temperature.RL", Round(tyreTemperatures[3], 1))
-		facts.addFact("Lap." . lapNumber . ".Tyre.Temperature.RR", Round(tyreTemperatures[4], 1))
-			
-		facts.addFact("Lap." . lapNumber . ".Weather", 0)
-		facts.addFact("Lap." . lapNumber . ".Temperature.Air", Round(getConfigurationValue(data, "Car Data", "AirTemperature", 0)))
-		facts.addFact("Lap." . lapNumber . ".Temperature.Track", Round(getConfigurationValue(data, "Car Data", "RoadTemperature", 0)))
+		if (pressureFLIncrement != 0)
+			changePitstopTyrePressure("Front Left", (pressureFLIncrement > 0) ? "Increase" : "Decrease", pressureFLIncrement)
+		if (pressureFRIncrement != 0)
+			changePitstopTyrePressure("Front Right", (pressureFRIncrement > 0) ? "Increase" : "Decrease", pressureFRIncrement)
+		if (pressureRLIncrement != 0)
+			changePitstopTyrePressure("Rear Left", (pressureRLIncrement > 0) ? "Increase" : "Decrease", pressureRLIncrement)
+		if (pressureRRIncrement != 0)
+			changePitstopTyrePressure("Rear Right", (pressureRRIncrement > 0) ? "Increase" : "Decrease", pressureRRIncrement)
+	}
+
+	updatePitstopRepairSettings(repairSuspension, repairBodywork) {
 		
-		bodyWorkDamage := string2Values(",", getConfigurationValue(data, "Car Data", "BodyWorkDamage", ""))
 		
-		facts.addFact("Lap." . lapNumber . ".Damage.BodyWork.Front", Round(bodyWorkDamage[1], 2))
-		facts.addFact("Lap." . lapNumber . ".Damage.BodyWork.Rear", Round(bodyWorkDamage[2], 2))
-		facts.addFact("Lap." . lapNumber . ".Damage.BodyWork.Left", Round(bodyWorkDamage[3], 2))
-		facts.addFact("Lap." . lapNumber . ".Damage.BodyWork.Right", Round(bodyWorkDamage[4], 2))
-		facts.addFact("Lap." . lapNumber . ".Damage.BodyWork.Center", Round(bodyWorkDamage[5], 2))
-		
-		suspensionDamage := string2Values(",", getConfigurationValue(data, "Car Data", "SuspensionDamage", ""))
-		
-		facts.addFact("Lap." . lapNumber . ".Damage.Suspension.FL", Round(suspensionDamage[1], 2))
-		facts.addFact("Lap." . lapNumber . ".Damage.Suspension.FR", Round(suspensionDamage[2], 2))
-		facts.addFact("Lap." . lapNumber . ".Damage.Suspension.RL", Round(suspensionDamage[3], 2))
-		facts.addFact("Lap." . lapNumber . ".Damage.Suspension.RR", Round(suspensionDamage[4], 2))
-		
-		knowledgeBase.produce()
+		this.iRepairSuspensionChosen := repairSuspension
+		this.iRepairBodyworkChosen := repairBodywork
 	}
 }
 
@@ -1005,14 +1129,14 @@ changePitstopFuelAmount(direction, liters := 5) {
 	}
 }
 
-changePitstopTyreSet(selection) {
+changePitstopTyreSet(selection, steps := 1) {
 	if !inList(["Next", "Previous"], selection)
 		logMessage(kLogWarn, translate("Unsupported tyre set selection """) . selection . translate(""" detected in changePitstopTyreSet - please check the configuration"))
 	
 	protectionOn()
 	
 	try {
-		SimulatorController.Instance.findPlugin(kACCPlugin).changeTyreSet(selection)
+		SimulatorController.Instance.findPlugin(kACCPlugin).changeTyreSet(selection, steps)
 	}
 	finally {
 		protectionOff()
@@ -1086,8 +1210,12 @@ changePitstopDriver(selection) {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-collectACCData() {
+collectRaceData() {
 	static lastLap := 0
+	static plugin := false
+	
+	if !plugin
+		plugin := SimulatorController.Instance.findPlugin(kACCPlugin)
 	
 	if isACCRunning() {
 		exePath := kBinariesDirectory . "ACC SHM Reader.exe"
@@ -1107,30 +1235,65 @@ collectACCData() {
 			SplashTextOff
 		}
 		
-		engineer := RaceEngineer.Instance
 		data := readConfiguration(kUserHomeDirectory . "Temp\ACC Data\SHM.data")
 		dataLastLap := getConfigurationValue(data, "Stint Data", "Laps", 0)
 		
-		if (dataLastLap > lastLap) {
-			if (lastLap == 0)
-				engineer.startRace(engineer.createRace(data))
-			
-			lastLap += 1
-			
-			engineer.addLap(dataLastLap, data)
-			
-			writeConfiguration(kUserHomeDirectory . "Temp\ACC Data\Lap " . lastLap . ".data", data)
-		}
+		protectionOn()
 		
-		if !getConfigurationValue(data, "Stint Data", "Active", false) {
-			if (lastLap > 0)
-				engineer.finishRace()
+		try {
+			if (dataLastLap > lastLap) {
+				if (lastLap == 0)
+					plugin.startRace(data)
+				
+				lastLap += 1
+				
+				plugin.addLap(dataLastLap, data)
+				
+				if isDebug()
+					writeConfiguration(kUserHomeDirectory . "Temp\ACC Data\Lap " . lastLap . ".data", data)
+			}
 			
-			lastLap := 0
+			if (this.PendingPitstop && getConfigurationValue(data, "Stint Data", "InPit", false))
+				plugin.performPitstop()
+			
+			if !getConfigurationValue(data, "Stint Data", "Active", false) {
+				if (lastLap > 0) {
+					if isDebug() {
+						fileName := (kUserHomeDirectory . "Temp\ACC Data\Race.data")
+			
+						FileDelete %fileName%
+						
+						curEncoding := A_FileEncoding
+						
+						FileEncoding UTF-16
+						
+						try {
+							for theFact, theValue in this.KnowledgeBase.Facts.Facts {
+								line := theFact . "=" . theValue . "`n"
+								
+								FileAppend %line%, %fileName%
+							}
+						}
+						finally {
+							FileEncoding %curEncoding%
+						}
+					}
+			
+					engineer.finishRace()
+				}
+				
+				lastLap := 0
+			}
+		}
+		finally {
+			protectionOff()
 		}
 	}
 	else {
 		lastLap := 0
+	
+		if plugin.ActiveRace
+			plugin.finishRace()
 	}
 }
 
@@ -1153,11 +1316,7 @@ initializeACCPlugin() {
 	Loop Files, %kUserHomeDirectory%Temp\ACC Data\*.*
 		FileDelete %A_LoopFilePath%
 	
-	SetTimer collectACCData, 10000
-	
 	thePlugin := new ACCPlugin(controller, kACCPLugin, controller.Configuration)
-	
-	new RaceEngineer(thePlugin, controller.Configuration)
 }
 
 

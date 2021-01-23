@@ -270,7 +270,7 @@ currentTyreCompound(?compound) <= setupTyreCompound(?compound)
 
 lapDamage(?lap, ?type, ?position, ?damage) <= Append(?fact, Lap., ?lap, .Damage., ?type, ., ?position), Get(?damage, ?fact)
 
-lapAvgFuel(?lap, ?avgFuel) <= Append(?fact, Lap., ?lap, .Fuel.AvgConsumption), Get(?avgFuel, ?fact)
+lapAvgFuel(?lap, ?avgFuel) <= Append(?fact, Lap., ?lap, .Fuel.AvgConsumption), Get(?avgFuel, ?fact), Greater(?avgFuel, 0)
 
 lapRemainingFuel(?lap, ?remainingFuel) <= Append(?fact, Lap., ?lap, .Fuel.Remaining), Get(?remainingFuel, ?fact)
 

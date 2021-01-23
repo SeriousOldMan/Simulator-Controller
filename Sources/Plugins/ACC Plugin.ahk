@@ -59,6 +59,7 @@ class ACCPlugin extends ControllerPlugin {
 	iPitstopMode := false
 	
 	iRaceEngineer := false
+	iRaceEngineerReady := false
 	
 	iPitstopPending := false
 	
@@ -172,6 +173,14 @@ class ACCPlugin extends ControllerPlugin {
 			if plugin.ActiveRace
 				switch this.Action {
 					case "PitstopPlan":
+						if plugin.RaceEngineerVoice {
+							generator := new SpeechGenerator(plugin.RaceEngineerVoice)
+				
+							generator.speak(translate("Ok, give me a second."), true)
+							
+							Sleep 5000
+						}
+						
 						plugin.planPitstop()
 					case "PitstopPrepare":
 						plugin.preparePitstop()
@@ -181,11 +190,13 @@ class ACCPlugin extends ControllerPlugin {
 						if continuation {
 							plugin.iPitstopContinuation := false
 							
-							%continuation%()
-							
 							generator := new SpeechGenerator(plugin.RaceEngineerVoice)
 				
 							generator.speak(translate("Roger, I come back to you as soon as possible."), true)
+							
+							Sleep 5000
+							
+							%continuation%()
 						}
 					default:
 						Throw "Invalid action """ . this.Action . """ detected in RaceEngineerAction.fireAction...."
@@ -237,6 +248,12 @@ class ACCPlugin extends ControllerPlugin {
 		}
 	}
 	
+	RaceEngineerReady[] {
+		Get {
+			return this.iRaceEngineerReady
+		}
+	}
+	
 	RaceEngineerVoice[] {
 		Get {
 			return this.iRaceEngineerVoice
@@ -251,7 +268,7 @@ class ACCPlugin extends ControllerPlugin {
 	
 	ActiveRace[] {
 		Get {
-			return (this.iRaceEngineer != false)
+			return (this.RaceEngineer != false)
 		}
 	}
 	
@@ -313,7 +330,7 @@ class ACCPlugin extends ControllerPlugin {
 		}
 	}
 	
-	createRaceEngineerAction(mode, controller, action, actionFunction) {
+	createRaceEngineerAction(controller, action, actionFunction) {
 		local function := controller.findFunction(actionFunction)
 		
 		if (function != false) {
@@ -396,7 +413,7 @@ class ACCPlugin extends ControllerPlugin {
 	
 	enableRaceEngineerActions(enabled) {
 		for ignore, theAction in this.Actions {
-			if isInstance(theAction, RaceEngineerAction)
+			if isInstance(theAction, this.RaceEngineerAction)
 				if enabled
 					theAction.Function.enable(kAllTrigger)
 				else
@@ -860,16 +877,20 @@ class ACCPlugin extends ControllerPlugin {
 	}
 	
 	startRace(data) {
-		local raceEngineer
-		
 		if !this.ActiveRace {
-			raceEngineer := new RaceEngineer(this, this.Configuration, , readConfiguration(getFileName("Race Engineer.settings", kUserConfigDirectory, kConfigDirectory)))
+			engineer := new RaceEngineer(this, this.Configuration, readConfiguration(getFileName("Race Engineer.settings", kUserConfigDirectory, kConfigDirectory)))
 		
-			this.iRaceEngineer := raceEngineer
+			this.iRaceEngineer := engineer
 			
-			raceEngineer.startRace(data)
+			engineer.startRace(data)
 			
 			this.enableRaceEngineerActions(true)
+			
+			if (this.RaceEngineerVoice) {
+				generator := new SpeechGenerator(this.RaceEngineerVoice)
+				
+				generator.speak(translate("Ok, here is your race engineer. Good luck."), true)
+			}
 		}
 		else
 			Throw "The active race must be finished before a new race can be started..."
@@ -880,27 +901,38 @@ class ACCPlugin extends ControllerPlugin {
 			this.RaceEngineer.finishRace()
 			
 			this.iRaceEngineer := false
+			this.iRaceEngineerReady := false
 			this.iPitstopContinuation := false
 			this.iPitstopPending := false
 			
 			this.enableRaceEngineerActions(false)
+			
+			if (this.RaceEngineerVoice) {
+				generator := new SpeechGenerator(this.RaceEngineerVoice)
+				
+				generator.speak(translate("Ok, thanks for the excellent job."), true)
+			}
 		}
 		else
 			Throw "No active race to be finished..."
 	}
 	
-	addLap(data) {
-		if this.ActiveRace
-			this.RaceEngineer.addLap(data)
+	addLap(lapNumber, data) {
+		if this.ActiveRace {
+			this.RaceEngineer.addLap(lapNumber, data)
+			
+			if (lapNumber >= 2)
+				this.iRaceEngineerReady := true
+		}
 		else
 			Throw "Lap data can only be added during an active race..."
 	}
 	
 	upcomingPitstopWarning(remainingLaps) {
-		if (this.ActiveRace && this.RaceEngineerVoice) {
+		if (this.ActiveRace && this.RaceEngineerVoice && this.RaceEngineerReady) {
 			generator := new SpeechGenerator(this.RaceEngineerVoice)
 				
-			generator.speak(translate("Pitstop comming up in ") . remainingLaps . translate("."), true)
+			generator.speak(translate("Pitstop comming up in ") . remainingLaps . translate(" laps."), true)
 			
 			if this.RaceEngineerConfirmation {
 				Sleep 100
@@ -912,10 +944,27 @@ class ACCPlugin extends ControllerPlugin {
 		}
 	}
 	
+	isRaceEngineerReady() {
+		if this.RaceEngineerReady
+			return true
+		else {
+			if this.RaceEngineerVoice {
+				generator := new SpeechGenerator(this.RaceEngineerVoice)
+				
+				generator.speak(translate("I do not have enough data yet. Please wait or two more laps."), true)
+			}
+			
+			return false
+		}
+	}
+	
 	planPitstop() {
 		local knowledgeBase
 		
 		if this.ActiveRace {
+			if !this.isRaceEngineerReady()
+				return
+			
 			plan := this.RaceEngineer.planPitstop(this.RaceEngineerVoice != false)
 			
 			if this.RaceEngineerVoice {
@@ -947,7 +996,7 @@ class ACCPlugin extends ControllerPlugin {
 					if this.RaceEngineerConfirmation {
 						generator.speak(translate("I have not planned a pitstop yet. Should I update the pitstop strategy now?"), true)
 						
-						his.iPitstopContinuation := ObjBindMethod(this, "planPitstop")
+						this.iPitstopContinuation := ObjBindMethod(this, "planPitstop")
 					}
 					else
 						generator.speak(translate("I have not planned a pitstop yet."), true)
@@ -1253,22 +1302,27 @@ collectRaceData() {
 					writeConfiguration(kUserHomeDirectory . "Temp\ACC Data\Lap " . lastLap . ".data", data)
 			}
 			
-			if (this.PendingPitstop && getConfigurationValue(data, "Stint Data", "InPit", false))
+			if (plugin.PendingPitstop && getConfigurationValue(data, "Stint Data", "InPit", false))
 				plugin.performPitstop()
 			
 			if !getConfigurationValue(data, "Stint Data", "Active", false) {
 				if (lastLap > 0) {
 					if isDebug() {
 						fileName := (kUserHomeDirectory . "Temp\ACC Data\Race.data")
-			
-						FileDelete %fileName%
+						
+						try {
+							FileDelete %fileName%
+						}
+						catch exception {
+							; ignore
+						}
 						
 						curEncoding := A_FileEncoding
 						
 						FileEncoding UTF-16
 						
 						try {
-							for theFact, theValue in this.KnowledgeBase.Facts.Facts {
+							for theFact, theValue in plugin.RaceEngineer.KnowledgeBase.Facts.Facts {
 								line := theFact . "=" . theValue . "`n"
 								
 								FileAppend %line%, %fileName%
@@ -1279,7 +1333,7 @@ collectRaceData() {
 						}
 					}
 			
-					engineer.finishRace()
+					plugin.finishRace()
 				}
 				
 				lastLap := 0

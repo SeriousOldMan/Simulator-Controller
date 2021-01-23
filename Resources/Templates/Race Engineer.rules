@@ -182,7 +182,7 @@ repairDamage(?, Impact, ?) <= notYetImplemented()
 
 [?Stint.Fuel.RemainingLaps <= ?Race.Settings.Lap.PitstopWarning] => (Call: upcomingPitstopWarning, ?Stint.Fuel.RemainingLaps)
 
-priority: 10, [?Pitstop.Plan] => (Prove: planPitstopLap)
+priority: 10, [?Pitstop.Plan] => (Prove: planPitstop)
 {All: [?Pitstop.Plan], [?Fuel.Amount.Target]} => (Set: Pitstop.Planned.Fuel, ?Fuel.Amount.Target)
 {All: [?Pitstop.Plan], [?Tyre.Pressure.Target.FL]} => (Set: Pitstop.Planned.Tyre.Pressure.FL, ?Tyre.Pressure.Target.FL)
 {All: [?Pitstop.Plan], [?Tyre.Pressure.Target.FR]} => (Set: Pitstop.Planned.Tyre.Pressure.FR, ?Tyre.Pressure.Target.FR)
@@ -199,21 +199,21 @@ priority: 10, [?Pitstop.Plan] => (Prove: planPitstopLap)
 {All: [?Pitstop.Plan], {None: [?Damage.Repair.Bodywork.Target]}} => (Set: Pitstop.Planned.Repair.Bodywork, false)
 {All: [?Pitstop.Plan], [?Tyre.Compound.Target]} => (Set: Pitstop.Planned.Tyre.Compound, ?Tyre.Compound.Target)
 {All: [?Pitstop.Plan], [?Tyre.Set.Target]} => (Set: Pitstop.Planned.Tyre.Set, ?Tyre.Set.Target)
-priority: -10, [?Pitstop.Plan] => (Set: Pitstop.Planned), (Clear: Pitstop.Plan)
+priority: -10, [?Pitstop.Plan] => (Set: Pitstop.Planned, true), (Clear: Pitstop.Plan)
 
-planPitstopLap() <= bound(!Pitstop.Planned.Lap), !
-planPitstopLap() <= lastPitstop(?last), Plus(?nr, ?last, 1), Plus(?lap, !Lap, 1), Set(Pitstop.Planned.Nr, ?nr), Set(Pitstop.Planned.Lap, ?lap)
-planPitstopLap() <= Plus(?lap, !Lap, 1), Set(Pitstop.Planned.Nr, 1), Set(Pitstop.Planned.Lap, ?lap)
+planPitstop() <= lastPitstop(?last), Plus(?nr, ?last, 1), Set(Pitstop.Planned.Nr, ?nr)
+planPitstop() <= Set(Pitstop.Planned.Nr, 1)
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                            Pitstop Preparation                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-{All: [?Pitstop.Planned], {Any: [?Pitstop.Prepare], [?Pitstop.Planned.Lap <= ?Lap]}} => (Prove: setupPitstop), (Clear: Pitstop.Planned),		\
-																						(Set: Pitstop.Prepared)
+{All: [?Pitstop.Planned], {Any: [?Pitstop.Prepare], [?Pitstop.Planned.Lap <= ?Lap]}} => (Prove: setupPitstop)
+priority: -10, {All: [?Pitstop.Planned], {Any: [?Pitstop.Prepare], [?Pitstop.Planned.Lap <= ?Lap]}} =>											\
+		(Clear: Pitstop.Planned), (Clear: Pitstop.Prepare), (Set: Pitstop.Prepared, true)
 
-setupPitstop() <= Call(beginPitstopSettings), updateTyreSettings(), updateRepairSettings(), Call(endPitstopSettings), Clear(Pitstop.Prepare)
+setupPitstop() <= Call(beginPitstopSettings), updateTyreSettings(), updateRepairSettings(), Call(endPitstopSettings)
 
 updateFuelSettings() <= Call(updatePitstopFuelSettings, !Pitstop.Planned.Fuel)
 
@@ -235,7 +235,7 @@ priority: -10, [?Pitstop.Lap] => (Set: Pitstop.Last, !Pitstop.Planned.Nr), (Clea
 								 (Clear: Pitstop.Planned.Tyre.Pressure.FL), (Clear: Pitstop.Planned.Tyre.Pressure.FR), 							\
 								 (Clear: Pitstop.Planned.Tyre.Pressure.RL), (Clear: Pitstop.Planned.Tyre.Pressure.RR), 							\
 								 (Clear: Pitstop.Planned.Repair.Suspension), (Clear: Pitstop.Planned.Repair.Bodywork),							\
-								 (Clear: Pitstop.Lap), (Clear: Pistop.Prepared)
+								 (Clear: Pitstop.Lap), (Clear: Pitstop.Prepared)
 
 pitstopPerformed(?lap) <= unbound(!Pitstop.Prepared), !, fail
 pitstopPerformed(?lap) <= Append(?pFact, Pitstop., !Pitstop.Planned.Nr, .Lap), Set(?pFact, ?lap)

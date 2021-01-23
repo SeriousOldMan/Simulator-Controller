@@ -900,6 +900,10 @@ class ControllerCustomFunction extends ControllerFunction {
 			
 			base.__New(functionNumber, configuration)
 		}
+		
+		actionCallable(trigger, action) {
+			return functionActionCallable(this.iOuterFunction, trigger, base.actionCallable(trigger, action))
+		}
 	}
 	
 	__New(controller, number, configuration := false) {
@@ -1153,8 +1157,8 @@ hideButtonBox() {
 setHotkeyEnabled(function, trigger, enabled) {
 	state := enabled ? "On" : "Off"
 	
-	for ignore, hotkey in function.Hotkeys[trigger]
-		Hotkey %hotkey%, %state%
+	for ignore, theHotkey in function.Hotkeys[trigger]
+		Hotkey %theHotkey%, %state%
 }
 
 functionActionCallable(function, trigger, action) {

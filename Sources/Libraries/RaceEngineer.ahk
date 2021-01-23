@@ -162,7 +162,12 @@ class RaceEngineer extends ConfigurationItem {
 		this.iLastFuelAmount := 0
 		this.iInitialFuelAmount := 0
 		
-		this.KnowledgeBase.produce()
+		result := this.KnowledgeBase.produce()
+		
+		if isDebug()
+			dumpFacts(this.KnowledgeBase)
+		
+		return result
 	}
 	
 	finishRace() {
@@ -181,74 +186,80 @@ class RaceEngineer extends ConfigurationItem {
 			this.startRace(this.createRace(data))
 		
 		knowledgeBase := this.KnowledgeBase
-		facts := knowledgeBase.Facts
 		
 		if (lapNumber == 1)
-			facts.addFact("Lap", 2)
+			knowledgeBase.addFact("Lap", 1)
 		else
-			facts.setValue("Lap", lapNumber + 1)
+			knowledgeBase.setValue("Lap", lapNumber)
 			
-		facts.addFact("Lap." . lapNumber . ".Driver", getConfigurationValue(data, "Race Data", "DriverName", ""))
+		knowledgeBase.addFact("Lap." . lapNumber . ".Driver", getConfigurationValue(data, "Race Data", "DriverName", ""))
 		
 		lapTime := getConfigurationValue(data, "Stint Data", "LapLastTime", 0)
 		
-		facts.addFact("Lap." . lapNumber . ".Time", lapTime)
-		facts.addFact("Lap." . lapNumber . ".Time.Start", this.OverallTime)
+		knowledgeBase.addFact("Lap." . lapNumber . ".Time", lapTime)
+		knowledgeBase.addFact("Lap." . lapNumber . ".Time.Start", this.OverallTime)
+		
 		this.iOverallTime := this.OverallTime + lapTime
-		facts.addFact("Lap." . lapNumber . ".Time.End", this.OverallTime)
+		
+		knowledgeBase.addFact("Lap." . lapNumber . ".Time.End", this.OverallTime)
 		
 		fuelRemaining := getConfigurationValue(data, "Car Data", "FuelRemaining", 0)
 		
-		facts.addFact("Lap." . lapNumber . ".Fuel.Remaining", Round(fuelRemaining, 2))
+		knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.Remaining", Round(fuelRemaining, 2))
 		
 		if (lapNumber == 1) {
 			this.iInitialFuelAmount := fuelRemaining
 			this.iLastFuelAmount := fuelRemaining
 			
-			facts.addFact("Lap." . lapNumber . ".Fuel.AvgConsumption", 0)
-			facts.addFact("Lap." . lapNumber . ".Fuel.Consumption", 0)
+			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.AvgConsumption", 0)
+			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.Consumption", 0)
 		}
 		else {
-			facts.addFact("Lap." . lapNumber . ".Fuel.AvgConsumption", Round((this.InitialFuelAmount - fuelRemaining) / (lapNumber - 1), 2))
-			facts.addFact("Lap." . lapNumber . ".Fuel.Consumption", Round(this.iLastFuelAmount - fuelRemaining, 2))
+			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.AvgConsumption", Round((this.InitialFuelAmount - fuelRemaining) / (lapNumber - 1), 2))
+			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.Consumption", Round(this.iLastFuelAmount - fuelRemaining, 2))
 			
 			this.iLastFuelAmount := fuelRemaining
 		}
 		
 		tyrePressures := string2Values(",", getConfigurationValue(data, "Car Data", "TyrePressure", ""))
 		
-		facts.addFact("Lap." . lapNumber . ".Tyre.Pressure.FL", Round(tyrePressures[1], 2))
-		facts.addFact("Lap." . lapNumber . ".Tyre.Pressure.FR", Round(tyrePressures[2], 2))		
-		facts.addFact("Lap." . lapNumber . ".Tyre.Pressure.RL", Round(tyrePressures[3], 2))
-		facts.addFact("Lap." . lapNumber . ".Tyre.Pressure.RR", Round(tyrePressures[4], 2))
+		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Pressure.FL", Round(tyrePressures[1], 2))
+		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Pressure.FR", Round(tyrePressures[2], 2))		
+		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Pressure.RL", Round(tyrePressures[3], 2))
+		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Pressure.RR", Round(tyrePressures[4], 2))
 		
 		tyreTemperatures := string2Values(",", getConfigurationValue(data, "Car Data", "TyreTemperature", ""))
 		
-		facts.addFact("Lap." . lapNumber . ".Tyre.Temperature.FL", Round(tyreTemperatures[1], 1))
-		facts.addFact("Lap." . lapNumber . ".Tyre.Temperature.FR", Round(tyreTemperatures[2], 1))		
-		facts.addFact("Lap." . lapNumber . ".Tyre.Temperature.RL", Round(tyreTemperatures[3], 1))
-		facts.addFact("Lap." . lapNumber . ".Tyre.Temperature.RR", Round(tyreTemperatures[4], 1))
+		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Temperature.FL", Round(tyreTemperatures[1], 1))
+		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Temperature.FR", Round(tyreTemperatures[2], 1))		
+		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Temperature.RL", Round(tyreTemperatures[3], 1))
+		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Temperature.RR", Round(tyreTemperatures[4], 1))
 			
-		facts.addFact("Lap." . lapNumber . ".Weather", 0)
-		facts.addFact("Lap." . lapNumber . ".Temperature.Air", Round(getConfigurationValue(data, "Car Data", "AirTemperature", 0)))
-		facts.addFact("Lap." . lapNumber . ".Temperature.Track", Round(getConfigurationValue(data, "Car Data", "RoadTemperature", 0)))
+		knowledgeBase.addFact("Lap." . lapNumber . ".Weather", 0)
+		knowledgeBase.addFact("Lap." . lapNumber . ".Temperature.Air", Round(getConfigurationValue(data, "Car Data", "AirTemperature", 0)))
+		knowledgeBase.addFact("Lap." . lapNumber . ".Temperature.Track", Round(getConfigurationValue(data, "Car Data", "RoadTemperature", 0)))
 		
 		bodyworkDamage := string2Values(",", getConfigurationValue(data, "Car Data", "BodyworkDamage", ""))
 		
-		facts.addFact("Lap." . lapNumber . ".Damage.Bodywork.Front", Round(bodyworkDamage[1], 2))
-		facts.addFact("Lap." . lapNumber . ".Damage.Bodywork.Rear", Round(bodyworkDamage[2], 2))
-		facts.addFact("Lap." . lapNumber . ".Damage.Bodywork.Left", Round(bodyworkDamage[3], 2))
-		facts.addFact("Lap." . lapNumber . ".Damage.Bodywork.Right", Round(bodyworkDamage[4], 2))
-		facts.addFact("Lap." . lapNumber . ".Damage.Bodywork.Center", Round(bodyworkDamage[5], 2))
+		knowledgeBase.addFact("Lap." . lapNumber . ".Damage.Bodywork.Front", Round(bodyworkDamage[1], 2))
+		knowledgeBase.addFact("Lap." . lapNumber . ".Damage.Bodywork.Rear", Round(bodyworkDamage[2], 2))
+		knowledgeBase.addFact("Lap." . lapNumber . ".Damage.Bodywork.Left", Round(bodyworkDamage[3], 2))
+		knowledgeBase.addFact("Lap." . lapNumber . ".Damage.Bodywork.Right", Round(bodyworkDamage[4], 2))
+		knowledgeBase.addFact("Lap." . lapNumber . ".Damage.Bodywork.Center", Round(bodyworkDamage[5], 2))
 		
 		suspensionDamage := string2Values(",", getConfigurationValue(data, "Car Data", "SuspensionDamage", ""))
 		
-		facts.addFact("Lap." . lapNumber . ".Damage.Suspension.FL", Round(suspensionDamage[1], 2))
-		facts.addFact("Lap." . lapNumber . ".Damage.Suspension.FR", Round(suspensionDamage[2], 2))
-		facts.addFact("Lap." . lapNumber . ".Damage.Suspension.RL", Round(suspensionDamage[3], 2))
-		facts.addFact("Lap." . lapNumber . ".Damage.Suspension.RR", Round(suspensionDamage[4], 2))
+		knowledgeBase.addFact("Lap." . lapNumber . ".Damage.Suspension.FL", Round(suspensionDamage[1], 2))
+		knowledgeBase.addFact("Lap." . lapNumber . ".Damage.Suspension.FR", Round(suspensionDamage[2], 2))
+		knowledgeBase.addFact("Lap." . lapNumber . ".Damage.Suspension.RL", Round(suspensionDamage[3], 2))
+		knowledgeBase.addFact("Lap." . lapNumber . ".Damage.Suspension.RR", Round(suspensionDamage[4], 2))
 		
-		knowledgeBase.produce()
+		result := knowledgeBase.produce()
+		
+		if isDebug()
+			dumpFacts(this.KnowledgeBase)
+		
+		return result
 	}
 	
 	hasPlannedPitstop() {
@@ -266,8 +277,11 @@ class RaceEngineer extends ConfigurationItem {
 		
 		result := knowledgeBase.produce()
 		
+		if isDebug()
+			dumpFacts(this.KnowledgeBase)
+		
 		if createDescription {
-			description := translate("Ok, we have the following for Pitstop number ") . kb.getValue("Pitstop.Planned.Nr") . translate(".")
+			description := translate("Ok, we have the following for Pitstop number ") . knowledgeBase.getValue("Pitstop.Planned.Nr") . translate(".")
 				
 			fuel := knowledgeBase.getValue("Pitstop.Planned.Fuel", 0)
 			if (fuel == 0)
@@ -275,20 +289,20 @@ class RaceEngineer extends ConfigurationItem {
 			else
 				description .= "`n" . translate("We have to refuel ") . Round(fuel) . translate(" litres.")
 			
-			description .= "`n" . translate("We will use ") . kb.getValue("Pitstop.Planned.Tyre.Compound")
-			description .= translate(" tyre compound and tyre set number ") . kb.getValue("Pitstop.Planned.Tyre.Set") . translate(".")
+			description .= "`n" . translate("We will use ") . knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound")
+			description .= translate(" tyre compound and tyre set number ") . knowledgeBase.getValue("Pitstop.Planned.Tyre.Set") . translate(".")
 			
-			description .= "`n" . translate("Pressure front left ") . Round(kb.getValue("Pitstop.Planned.Tyre.Pressure.FL"), 1) . translate(".")
-			description .= "`n" . translate("Pressure front right ") . Round(kb.getValue("Pitstop.Planned.Tyre.Pressure.FR"), 1) . translate(".")
-			description .= "`n" . translate("Pressure rear left ") . Round(kb.getValue("Pitstop.Planned.Tyre.Pressure.RL"), 1) . translate(".")
-			description .= "`n" . translate("Pressure rear right ") . Round(kb.getValue("Pitstop.Planned.Tyre.Pressure.RR"), 1) . translate(".")
+			description .= "`n" . translate("Pressure front left ") . Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL"), 1) . translate(".")
+			description .= "`n" . translate("Pressure front right ") . Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR"), 1) . translate(".")
+			description .= "`n" . translate("Pressure rear left ") . Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL"), 1) . translate(".")
+			description .= "`n" . translate("Pressure rear right ") . Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR"), 1) . translate(".")
 
 			if knowledgeBase.getValue("Pitstop.Planned.Repair.Suspension", false)
 				description .= "`n" . translate("We will repair the suspension.")
 			else
 				description .= "`n" . translate("The suspension looks fine.")
 
-			if kb.getValue("Pitstop.Planned.Repair.Bodywork", false)
+			if knowledgeBase.getValue("Pitstop.Planned.Repair.Bodywork", false)
 				description .= "`n" . translate("Bodywork and aerodynamic elements should be repaired.")
 			else
 				description .= "`n" . translate("Bodywork and aerodynamic elements should be good.")
@@ -300,18 +314,28 @@ class RaceEngineer extends ConfigurationItem {
 	}
 	
 	preparePitstop(lap := false) {
-		if lap
+		if !lap
 			this.KnowledgeBase.addFact("Pitstop.Prepare", true)
 		else
 			this.KnowledgeBase.addFact("Pitstop.Planned.Lap", lap - 1)
 		
-		return this.KnowledgeBase.produce()
+		result := this.KnowledgeBase.produce()
+		
+		if isDebug()
+			dumpFacts(this.KnowledgeBase)
+		
+		return result
 	}
 	
 	performPitstop() {
 		this.KnowledgeBase.addFact("Pitstop.Lap", this.KnowledgeBase.getValue("Lap") - 1)
 		
-		return this.KnowledgeBase.produce()
+		result := this.KnowledgeBase.produce()
+		
+		if isDebug()
+			dumpFacts(this.KnowledgeBase)
+		
+		return result
 	}
 	
 	upcomingPitstopWarning(remainingLaps) {
@@ -345,25 +369,40 @@ class RaceEngineer extends ConfigurationItem {
 ;;;-------------------------------------------------------------------------;;;
 
 upcomingPitstopWarning(knowledgeBase, remainingLaps) {
-	knowledgeBase.RaceEngineer.upcomingPitstopWarning(remainingLaps)
+	msgbox % remainingLaps
+	knowledgeBase.RaceEngineer.upcomingPitstopWarning(Round(remainingLaps))
 }
 
-beginPitstopSettings(resultSet) {
-	resultSet.KnowledgeBase.RaceEngineer.beginPitstopSettings()
+beginPitstopSettings(choicePoint) {
+	choicePoint.ResultSet.KnowledgeBase.RaceEngineer.beginPitstopSettings()
 }
 
-endPitstopSettings(resultSet) {
-	resultSet.KnowledgeBase.RaceEngineer.endPitstopSettings()
+endPitstopSettings(choicePoint) {
+	choicePoint.ResultSet.KnowledgeBase.RaceEngineer.endPitstopSettings()
 }
 
-updatePitstopFuelSettings(resultSet, fuel) {
-	resultSet.KnowledgeBase.RaceEngineer.updatePitstopFuelSettings(fuel)
+updatePitstopFuelSettings(choicePoint, fuel) {
+	choicePoint.ResultSet.KnowledgeBase.RaceEngineer.updatePitstopFuelSettings(fuel)
 }
 
-updatePitstopTyreSettings(resultSet, compound, set, pressureFL, pressureFR, pressureRL, pressureRR) {
-	resultSet.KnowledgeBase.RaceEngineer.updatePitstopTyreSettings(compound, set, pressureFL, pressureFR, pressureRL, pressureRR)
+updatePitstopTyreSettings(choicePoint, compound, set, pressureFL, pressureFR, pressureRL, pressureRR) {
+	choicePoint.ResultSet.KnowledgeBase.RaceEngineer.updatePitstopTyreSettings(compound, set, pressureFL, pressureFR, pressureRL, pressureRR)
 }
 
-updatePitstopRepairSettings(resultSet, repairSuspension, repairBodywork) {
-	resultSet.KnowledgeBase.RaceEngineer.updatePitstopRepairSettings(repairSuspension, repairBodywork)
+updatePitstopRepairSettings(choicePoint, repairSuspension, repairBodywork) {
+	choicePoint.ResultSet.KnowledgeBase.RaceEngineer.updatePitstopRepairSettings(repairSuspension, repairBodywork)
+}
+
+dumpFacts(knowledgeBase) {
+	try {
+		FileDelete %kUserHomeDirectory%Temp\Race.facts
+	}
+	catch exception {
+		; ignore
+	}
+
+	for key, value in knowledgeBase.Facts.Facts {
+		text := key . " = " . value . "`n"
+		FileAppend %text%, %kUserHomeDirectory%Temp\Race.facts
+	}
 }

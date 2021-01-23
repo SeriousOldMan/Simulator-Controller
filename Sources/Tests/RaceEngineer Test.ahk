@@ -156,7 +156,7 @@ pitstop(kb) {
 	kb.produce()
 	;kb.RuleEngine.setTraceLevel(kTraceMedium)
 
-	s := new SpeechGenerator("Microsoft Zira Desktop")
+	s := new SpeechGenerator("Microsoft David Desktop")
 
 	s.speak("Ok, we have the following for Pitstop number " . kb.getValue("Pitstop.Planned.Nr"), true)
 	Sleep 100
@@ -185,9 +185,13 @@ pitstop(kb) {
 
 	Sleep 100
 	s.speak("Do you agree?", true)
-		
-			
+	
+kb.addFact("Pitstop.Prepare", true)	
+			kb.produce()
 	kb.addFact("Pitstop.Lap", kb.getValue("Lap") + 1)
+	kb.produce()
+dumpFacts(kb)
+		msgbox here
 }
 		
 dumpFacts(kb)

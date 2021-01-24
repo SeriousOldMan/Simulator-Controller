@@ -378,7 +378,6 @@ class RaceEngineer extends ConfigurationItem {
 		
 		result := this.KnowledgeBase.produce()
 			
-
 		if this.Speaker
 			this.getSpeaker().speak(translate("Hi, I am " . this.Name . ", your race engineer today. You can call me anytime if you have questions. Good luck."), true)
 		

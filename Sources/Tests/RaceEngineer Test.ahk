@@ -1,5 +1,5 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - ACC Plugin Test                 ;;;
+;;;   Modular Simulator Controller System - RaceEngineer Test               ;;;
 ;;;                                         (Race Engineer Rules)           ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -95,19 +95,16 @@ showHere(kb, args*) {
 }
 
 engineer := new RaceEngineer(false, readConfiguration(getFileName("Race Engineer.settings", kUserConfigDirectory, kConfigDirectory))
-						   , false, "Jona", "Microsoft Zira Desktop", "Microsoft Server Speech Recognition Language - Kinect (en-AU)") ; "Microsoft Server Speech Recognition Language - TELE (en-US)"
+						   , false, "Jona", "Microsoft Zira Desktop", "Microsoft Server Speech Recognition Language - TELE (en-US)") ; "Microsoft Server Speech Recognition Language - Kinect (en-AU)"
 
-data := readConfiguration(kSourcesDirectory . "Tests\Race.data")
 
 Loop {
-	section := "Lap " . A_Index
+	data := readConfiguration(kSourcesDirectory . "Tests\Lap " . A_Index . ".data")
 	
-	lapData := getConfigurationSectionValues(data, section, {}).Clone()
-	
-	if (lapData.Count() == 0)
+	if (data.Count() == 0)
 		break
 	else {
-		engineer.addLap(A_Index, lapData)
+		engineer.addLap(A_Index, data)
 	
 		MsgBox % "Lap " . A_Index . " loaded - Continue?"
 	}

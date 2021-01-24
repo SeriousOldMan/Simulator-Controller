@@ -6,14 +6,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                         Local Include Section                           ;;;
-;;;-------------------------------------------------------------------------;;;
-
-#Include ..\Libraries\RuleEngine.ahk
-#Include ..\Libraries\RaceEngineer.ahk
-
-
-;;;-------------------------------------------------------------------------;;;
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -66,6 +58,27 @@ class ACCPlugin extends ControllerPlugin {
 	
 	iRepairSuspensionChosen := true
 	iRepairBodyworkChosen := true
+	
+	class RemoteRaceEngineer {
+		iRemotePID := false
+		
+		RemotePID[] {
+			Get {
+				return this.iRemotePID
+			}
+		}
+		
+		__New(remotePID) {
+			this.iRemotePID := remotePID
+		}
+		
+		callRemote(function, arguments*) {
+			raiseEvent("ahk_pid " . this.RemotePID, "Race", function . ":" . values2String(";", arguments*))
+		}
+		
+		
+		functions ??????
+	}
 	
 	class DriveMode extends ControllerMode {
 		Mode[] {
@@ -279,17 +292,12 @@ class ACCPlugin extends ControllerPlugin {
 		engineersSpeaker := this.getArgumentValue("raceEngineerSpeaker", false)
 		
 		if (engineersSpeaker != false) {
-			if ((engineersSpeaker == true) || (engineersSpeaker = "true"))
-				this.iRaceEngineerSpeaker := ((getLanguage() = "DE") ? "Microsoft Hedda Desktop" : "Microsoft Zira Desktop")
-			else
-				this.iRaceEngineerSpeaker := engineersSpeaker
+			this.iRaceEngineerSpeaker := ((engineersSpeaker = "true") ? true : engineersSpeaker)
 		
 			engineersListener := this.getArgumentValue("raceEngineerListener", false)
 			
-			if ((engineersListener == true) || (engineersListener = "true"))
-				this.iRaceEngineerListener := ((getLanguage() = "DE") ? "Microsoft Server Speech Recognition Language - TELE (de-DE)" : "Microsoft Server Speech Recognition Language - TELE (en-US)")
-			else if (engineersListener != false)
-				this.iRaceEngineerListener := engineersListener
+			if (engineersListener != false)
+				this.iRaceEngineerListener := ((engineersListener = "true") ? true : engineersListener)
 		}
 		
 		controller.registerPlugin(this)
@@ -950,8 +958,8 @@ class ACCPlugin extends ControllerPlugin {
 		}
 	}
 
-	setPitstopRefuelAmount(fuel) {
-		changePitstopFuelAmount("Increase", Round(fuel))
+	setPitstopRefuelAmount(litres) {
+		changePitstopFuelAmount("Increase", Round(litres))
 	}
 	
 	setPitstopTyreSet(compound, set := false) {
@@ -1167,9 +1175,9 @@ collectRaceData() {
 	if !plugin
 		plugin := SimulatorController.Instance.findPlugin(kACCPlugin)
 	
-	if isACCRunning() {
+	if true || isACCRunning() {
 		exePath := kBinariesDirectory . "ACC SHM Reader.exe"
-		
+		/*
 		try {
 			Run %ComSpec% /c ""%exePath%" > "%kUserHomeDirectory%Temp\ACC Data\SHM.data"", , Hide
 		}
@@ -1186,6 +1194,12 @@ collectRaceData() {
 		}
 		
 		data := readConfiguration(kUserHomeDirectory . "Temp\ACC Data\SHM.data")
+		*/
+		data := readConfiguration(kSourcesDirectory . "Tests\Lap " . (lastLap + 1) . ".data")
+		
+		if (data.Count() == 0)
+			data := readConfiguration(kSourcesDirectory . "Tests\Lap " . lastLap . ".data")
+		
 		dataLastLap := getConfigurationValue(data, "Stint Data", "Laps", 0)
 		
 		protectionOn()
@@ -1195,7 +1209,7 @@ collectRaceData() {
 				if (lastLap == 0)
 					plugin.startRace(data)
 				
-				lastLap += 1
+				lastLap := dataLastLap
 				
 				plugin.addLap(dataLastLap, data)
 				
@@ -1271,9 +1285,30 @@ initializeACCPlugin() {
 	Loop Files, %kUserHomeDirectory%Temp\ACC Data\*.*
 		FileDelete %A_LoopFilePath%
 	
-	thePlugin := new ACCPlugin(controller, kACCPLugin, controller.Configuration)
+	registerEventHandler("Pitstop", "handleEvents")
+	
+	new ACCPlugin(controller, kACCPLugin, controller.Configuration)
 }
 
+
+;;;-------------------------------------------------------------------------;;;
+;;;                          Event Handler Section                          ;;;
+;;;-------------------------------------------------------------------------;;;
+???? events
+handleEvents(event, data) {
+	local function
+	
+	if InStr(data, ":") {
+		data := StrSplit(data, ":")
+		
+		function := data[1]
+		arguments := string2Values(";", data[2])
+			
+		withProtection(function, arguments*)
+	}
+	else	
+		withProtection(data)
+}
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Initialization Section                          ;;;

@@ -17,6 +17,7 @@ global kUserHomeDirectory = A_MyDocuments . "\Simulator Controller\"
 global kResourcesDirectory = normalizeFilePath(A_ScriptDir . (A_IsCompiled ? "\..\Resources\" : "\..\..\Resources\"))
 global kSourcesDirectory = normalizeFilePath(A_ScriptDir . (A_IsCompiled ? "\..\Sources\" : "\..\..\Sources\"))
 global kIncludesDirectory = normalizeFilePath(A_ScriptDir . (A_IsCompiled ? "\..\Sources\Includes\" : "\..\..\Sources\Includes\"))
+global kLibrariesDirectory = normalizeFilePath(A_ScriptDir . (A_IsCompiled ? "\..\Sources\Libraries\" : "\..\..\Sources\Libraries\"))
 global kBinariesDirectory = normalizeFilePath(A_ScriptDir . (A_IsCompiled ? "\..\Binaries\" : "\..\..\Binaries\"))
 
 global kLogsDirectory = kUserHomeDirectory . "Logs\"

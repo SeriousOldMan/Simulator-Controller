@@ -6,10 +6,16 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                         Local Include Section                           ;;;
+;;;                        Global Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Includes\Includes.ahk
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                         Local Include Section                           ;;;
+;;;-------------------------------------------------------------------------;;;
+
 #Include ..\Libraries\RuleEngine.ahk
 #Include ..\Libraries\SpeechGenerator.ahk
 #Include ..\Libraries\SpeechRecognizer.ahk
@@ -59,16 +65,19 @@ class RaceEngineer extends ConfigurationItem {
 		__New(engineer, speaker) {
 			this.iEngineer := engineer
 			
-			base.__New(speaker)
+			if (speaker == true)
+				base.__New()
+			else
+				base.__New(speaker)
 		}
 		
-		speak(text, wait := false) {
-			listener := this.iEngineer.getListener()
+		speak(text) {
+			listener := false ; this.iEngineer.getListener()
 			
 			if listener
 				listener.stopRecognizer()
 			
-			base.speak(text, wait)
+			base.speak(text)
 			
 			if listener
 				listener.startRecognizer()
@@ -226,12 +235,15 @@ class RaceEngineer extends ConfigurationItem {
 	
 	getListener() {
 		if (this.Listener && !this.iSpeechRecognizer) {
-			recognizer := new SpeechRecognizer(this.Listener)
-			
+			if (this.Listener != true)
+				recognizer := new SpeechRecognizer(this.Listener)
+			else
+				recognizer := new SpeechRecognizer()
+			msgbox after create
 			this.buildGrammars(recognizer)
 			
 			recognizer.startRecognizer()
-			
+			msgbox after start
 			this.iSpeechRecognizer := recognizer
 		}
 		
@@ -380,10 +392,10 @@ class RaceEngineer extends ConfigurationItem {
 			
 		if this.Speaker
 			this.getSpeaker().speak(translate("Hi, I am " . this.Name . ", your race engineer today. You can call me anytime if you have questions. Good luck."), true)
-		
+		msgbox after speech
 		if isDebug()
 			dumpFacts(this.KnowledgeBase)
-		
+		msgbox after dumpfacts
 		return result
 	}
 	
@@ -404,7 +416,7 @@ class RaceEngineer extends ConfigurationItem {
 		local facts
 		
 		if !this.KnowledgeBase
-			this.startRace(this.createRace(data))
+			this.startRace(data)
 		
 		knowledgeBase := this.KnowledgeBase
 		
@@ -477,12 +489,12 @@ class RaceEngineer extends ConfigurationItem {
 		knowledgeBase.addFact("Lap." . lapNumber . ".Damage.Suspension.FR", Round(suspensionDamage[2], 2))
 		knowledgeBase.addFact("Lap." . lapNumber . ".Damage.Suspension.RL", Round(suspensionDamage[3], 2))
 		knowledgeBase.addFact("Lap." . lapNumber . ".Damage.Suspension.RR", Round(suspensionDamage[4], 2))
-		
+		msgbox before produce
 		result := knowledgeBase.produce()
-		
+		msgbox before dumpfacts
 		if isDebug()
 			dumpFacts(this.KnowledgeBase)
-		
+		msgbox ready
 		return result
 	}
 	
@@ -610,7 +622,7 @@ class RaceEngineer extends ConfigurationItem {
 		if this.Speaker
 			this.getSpeaker().speak(translate("Ok, let the crew do their job. Check ignition, relax and prepare for engine restart."), true)
 				
-		this.KnowledgeBase.addFact("Pitstop.Lap", this.KnowledgeBase.getValue("Lap") - 1)
+		this.KnowledgeBase.addFact("Pitstop.Lap", this.KnowledgeBase.getValue("Lap"))
 		
 		result := this.KnowledgeBase.produce()
 		
@@ -688,8 +700,8 @@ finishPitstopSetup(context) {
 	context.KnowledgeBase.RaceEngineer.finishPitstopSetup()
 }
 
-setPitstopRefuelAmount(context, fuel) {
-	context.KnowledgeBase.RaceEngineer.setPitstopRefuelAmount(fuel)
+setPitstopRefuelAmount(context, litres) {
+	context.KnowledgeBase.RaceEngineer.setPitstopRefuelAmount(litres)
 }
 
 setPitstopTyreSet(context, compound, set) {

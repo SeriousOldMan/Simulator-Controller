@@ -51,11 +51,9 @@ class SpeechRecognizer {
 
 			title := translate("Modular Simulator Controller System")
 			
-			SplashTextOn 800, 60, %title%, % substituteVariables(translate("Error while initializing speech recognition system - please check the configuration") . translate("..."))
+			SplashTextOn 800, 60, %title%, % translate("Error while initializing speech recognition system - please check the configuration") . translate("...")
 					
 			Sleep 5000
-						
-			ExitApp
 		}
 		
 		this.RecognizerList := this.createRecognizerList()
@@ -65,11 +63,9 @@ class SpeechRecognizer {
 
 			title := translate("Modular Simulator Controller System")
 			
-			SplashTextOn 800, 60, %title%, % substituteVariables(translate("No languages while initializing speech recognition system - please check the configuration") . translate("..."))
+			SplashTextOn 800, 60, %title%, % translate("No languages while initializing speech recognition system - please check the configuration") . translate("...")
 					
 			Sleep 5000
-			
-			ExitApp
 		}
 		
 		if recognizer
@@ -98,12 +94,10 @@ class SpeechRecognizer {
 	}
 	
 	initialize(id) {
-		if (id > this.Instance.getRecognizerCount() - 1) {
-			MsgBox % "No Such ID " id
-			ExitApp
-		}
-		
-		return this.Instance.Initialize(id)
+		if (id > this.Instance.getRecognizerCount() - 1)
+			Throw "Invalid recognizer ID (" . id . ")detected in SpeechRecognizer.initialize..."
+		else
+			return this.Instance.Initialize(id)
 	}
 	
 	startRecognizer(){

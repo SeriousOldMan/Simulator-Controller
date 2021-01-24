@@ -53,7 +53,7 @@ class SpeechGenerator {
 		this.setVoice(voice)
 	}
 
-	speak(text, wait := false) {
+	speak(text, wait := true) {
 		this.stop()
 		
 		this.iSpeechGenerator.Speak(text, (wait ? 0x0 : 0x1))

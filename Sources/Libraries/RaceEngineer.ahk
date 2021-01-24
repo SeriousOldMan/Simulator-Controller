@@ -53,6 +53,28 @@ class RaceEngineer extends ConfigurationItem {
 	iLastFuelAmount := 0
 	iInitialFuelAmount := 0
 	
+	class RaceEngineerSpeaker extends SpeechGenerator {
+		iEngineer := false
+		
+		__New(engineer, speaker) {
+			this.iEngineer := engineer
+			
+			base.__New(speaker)
+		}
+		
+		speak(text, wait := false) {
+			listener := this.iEngineer.getListener()
+			
+			if listener
+				listener.stopRecognizer()
+			
+			base.speak(text, wait)
+			
+			if listener
+				listener.startRecognizer()
+		}
+	}
+	
 	class RaceKnowledgeBase extends KnowledgeBase {
 		iEngineer := false
 		
@@ -194,7 +216,7 @@ class RaceEngineer extends ConfigurationItem {
 	
 	getSpeaker() {
 		if (this.Speaker && !this.iSpeechGenerator) {
-			this.iSpeechGenerator := new SpeechGenerator(this.Speaker)
+			this.iSpeechGenerator := new this.RaceEngineerSpeaker(this, this.Speaker)
 			
 			this.getListener()
 		}
@@ -260,8 +282,7 @@ class RaceEngineer extends ConfigurationItem {
 	}
 	
 	phraseRecognized(grammar, words) {
-		continuation := false
-		msgbox % values2String(", ", words*)
+		msgbox % grammar . ": " . values2String(", ", words*)
 		switch grammar {
 			case "Yes":
 				continuation := this.iContinuation
@@ -357,8 +378,9 @@ class RaceEngineer extends ConfigurationItem {
 		
 		result := this.KnowledgeBase.produce()
 			
+
 		if this.Speaker
-			this.getSpeaker().speak(translate("Hi, I am " . this.Name . ", your race engineer today. You can call me anytime if you have any questions. Good luck."), true)
+			this.getSpeaker().speak(translate("Hi, I am " . this.Name . ", your race engineer today. You can call me anytime if you have questions. Good luck."), true)
 		
 		if isDebug()
 			dumpFacts(this.KnowledgeBase)

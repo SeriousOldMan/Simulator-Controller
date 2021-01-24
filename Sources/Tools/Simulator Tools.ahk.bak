@@ -661,7 +661,7 @@ runCopyTargets(ByRef buildProgress) {
 			copiedFile := sourceDirectory . "\" . copiedFile
 			
 			FileCreateDir %targetDirectory%
-			FileCopy %copiedFile%, %targetDirectory%, 1
+			FileMove %copiedFile%, %targetDirectory%, 1
 		}
 			
 		Sleep 1000

@@ -95,7 +95,7 @@ showHere(kb, args*) {
 }
 
 engineer := new RaceEngineer(false, readConfiguration(getFileName("Race Engineer.settings", kUserConfigDirectory, kConfigDirectory))
-						   , false, "Jona", "Microsoft Zira Desktop", "Microsoft Server Speech Recognition Language - TELE (en-US)")
+						   , false, "Jona", "Microsoft Zira Desktop", "Microsoft Server Speech Recognition Language - Kinect (en-AU)") ; "Microsoft Server Speech Recognition Language - TELE (en-US)"
 
 data := readConfiguration(kSourcesDirectory . "Tests\Race.data")
 

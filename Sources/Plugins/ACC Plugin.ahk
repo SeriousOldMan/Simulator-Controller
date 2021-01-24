@@ -223,6 +223,12 @@ class ACCPlugin extends ControllerPlugin {
 		}
 	}
 	
+	RaceEngineerName[] {
+		Get {
+			return this.iRaceEngineerName
+		}
+	}
+	
 	RaceEngineerSpeaker[] {
 		Get {
 			return this.iRaceEngineerSpeaker
@@ -865,7 +871,7 @@ class ACCPlugin extends ControllerPlugin {
 		if this.ActiveRace
 			this.finishRace()
 		
-		this.iRaceEngineer := createRaceEngineer()
+		this.iRaceEngineer := this.createRaceEngineer()
 	
 		this.RaceEngineer.startRace(data)
 		
@@ -956,7 +962,7 @@ class ACCPlugin extends ControllerPlugin {
 	}
 
 	setPitstopTyrePressures(pressureFLIncrement, pressureFRIncrement, pressureRLIncrement, pressureRRIncrement) {
-		???? increments in race engineer
+		msgbox ???? increments in race engineer
 		
 		if (pressureFLIncrement != 0)
 			changePitstopTyrePressure("Front Left", (pressureFLIncrement > 0) ? "Increase" : "Decrease", pressureFLIncrement)
@@ -969,7 +975,7 @@ class ACCPlugin extends ControllerPlugin {
 	}
 
 	requestPitstopRepairs(repairSuspension, repairBodywork) {
-		???? implement
+		msgbox ???? implement
 		
 		this.iRepairSuspensionChosen := repairSuspension
 		this.iRepairBodyworkChosen := repairBodywork

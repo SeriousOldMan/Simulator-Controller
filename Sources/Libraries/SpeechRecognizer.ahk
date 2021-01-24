@@ -80,7 +80,7 @@ class SpeechRecognizer {
 					break
 				}
 		
-		this.initialize(recognizer)
+		this.initialize(recognizer ? recognizer : 0)
 	}
 
 	createRecognizerList() {

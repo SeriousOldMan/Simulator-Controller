@@ -27,7 +27,7 @@ SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Libraries\RuleEngine.ahk
-#Include ..\Libraries\SpeechGenerator.ahk
+#Include ..\Libraries\RaceEngineer.ahk
 #Include AHKUnit\AHKUnit.ahk
 
 
@@ -74,15 +74,6 @@ dumpRules(productions, reductions) {
 	}
 }
 
-dumpFacts(knowledgeBase) {
-	FileDelete %kUserHomeDirectory%Temp\facts.out
-
-	for key, value in knowledgeBase.Facts.Facts {
-		text := key . " = " . value . "`n"
-		FileAppend %text%, %kUserHomeDirectory%Temp\facts.out
-	}
-}
-
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
@@ -103,6 +94,32 @@ showHere(kb, args*) {
 	return true
 }
 
+engineer := new RaceEngineer(false, readConfiguration(getFileName("Race Engineer.settings", kUserConfigDirectory, kConfigDirectory))
+						   , false, "Jona", "Microsoft Zira Desktop", "Microsoft Server Speech Recognition Language - TELE (en-US)")
+
+data := readConfiguration(kSourcesDirectory . "Tests\Race.data")
+
+Loop {
+	section := "Lap " . A_Index
+	
+	lapData := getConfigurationSectionValues(data, section, {}).Clone()
+	
+	if (lapData.Count() == 0)
+		break
+	else {
+		engineer.addLap(A_Index, lapData)
+	
+		MsgBox % "Lap " . A_Index . " loaded - Continue?"
+	}
+}
+
+MsgBox Done - Race on
+
+ExitApp
+
+
+
+/*
 FileRead engineerRules, %kConfigDirectory%\Race Engineer.rules
 		
 compiler := new RuleCompiler()
@@ -156,7 +173,7 @@ pitstop(kb) {
 	kb.produce()
 	;kb.RuleEngine.setTraceLevel(kTraceMedium)
 
-	s := new SpeechGenerator("Microsoft David Desktop")
+	s := new SpeechGenerator("Microsoft Zira Desktop")
 
 	s.speak("Ok, we have the following for Pitstop number " . kb.getValue("Pitstop.Planned.Nr"), true)
 	Sleep 100
@@ -199,3 +216,4 @@ dumpFacts(kb)
 MsgBox % "Done - Race On"
 
 exitapp
+*/

@@ -1506,6 +1506,12 @@ class ChoicePoint {
 		}
 	}
 	
+	KnowledgeBase[] {
+		Get {
+			return this.ResultSet.KnowledgeBase
+		}
+	}
+	
 	Goal[] {
 		Get {
 			return this.iGoal
@@ -1961,6 +1967,12 @@ class KnowledgeBase {
 	RuleEngine[] {
 		Get {
 			return this.iRuleEngine
+		}
+	}
+	
+	KnowledgeBase[] {
+		Get {
+			return this
 		}
 	}
 	

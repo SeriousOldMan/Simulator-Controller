@@ -11,7 +11,6 @@
 
 #Include ..\Libraries\RuleEngine.ahk
 #Include ..\Libraries\RaceEngineer.ahk
-#Include ..\Libraries\SpeechGenerator.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -58,14 +57,12 @@ class ACCPlugin extends ControllerPlugin {
 	iDriveMode := false
 	iPitstopMode := false
 	
+	iRaceEngineerName := false
+	iRaceEngineerSpeaker := false
+	iRaceEngineerListener := false
+	
 	iRaceEngineer := false
-	iRaceEngineerReady := false
-	
 	iPitstopPending := false
-	
-	iRaceEngineerVoice := false
-	iRaceEngineerConfirmation := false
-	iPitstopContinuation := false
 	
 	iRepairSuspensionChosen := true
 	iRepairBodyworkChosen := true
@@ -173,31 +170,9 @@ class ACCPlugin extends ControllerPlugin {
 			if plugin.ActiveRace
 				switch this.Action {
 					case "PitstopPlan":
-						if plugin.RaceEngineerVoice {
-							generator := new SpeechGenerator(plugin.RaceEngineerVoice)
-				
-							generator.speak(translate("Ok, give me a second."), true)
-							
-							Sleep 5000
-						}
-						
 						plugin.planPitstop()
 					case "PitstopPrepare":
 						plugin.preparePitstop()
-					case "PitstopConfirm":
-						continuation := plugin.iPitstopContinuation
-						
-						if continuation {
-							plugin.iPitstopContinuation := false
-							
-							generator := new SpeechGenerator(plugin.RaceEngineerVoice)
-				
-							generator.speak(translate("Roger, I come back to you as soon as possible."), true)
-							
-							Sleep 5000
-							
-							%continuation%()
-						}
 					default:
 						Throw "Invalid action """ . this.Action . """ detected in RaceEngineerAction.fireAction...."
 				}
@@ -248,21 +223,15 @@ class ACCPlugin extends ControllerPlugin {
 		}
 	}
 	
-	RaceEngineerReady[] {
+	RaceEngineerSpeaker[] {
 		Get {
-			return this.iRaceEngineerReady
+			return this.iRaceEngineerSpeaker
 		}
 	}
 	
-	RaceEngineerVoice[] {
+	RaceEngineerListener[] {
 		Get {
-			return this.iRaceEngineerVoice
-		}
-	}
-	
-	RaceEngineerConfirmation[] {
-		Get {
-			return this.iRaceEngineerConfirmation
+			return this.iRaceEngineerListener
 		}
 	}
 	
@@ -293,22 +262,33 @@ class ACCPlugin extends ControllerPlugin {
 		for ignore, theAction in string2Values(",", this.getArgumentValue("pitstopSettings", ""))
 			this.createPitstopAction(controller, string2Values(A_Space, theAction)*)
 		
+		this.iRaceEngineerName := this.getArgumentValue("raceEngineerName", false)
+		
 		for ignore, theAction in string2Values(",", this.getArgumentValue("raceEngineerCommands", "")) {
 			useRaceEngineer := true
 		
 			this.createRaceEngineerAction(controller, string2Values(A_Space, theAction)*)
 		}
 		
-		voice := this.getArgumentValue("raceEngineerVoice", false)
+		engineersSpeaker := this.getArgumentValue("raceEngineerSpeaker", false)
 		
-		if ((voice == true) || (voice = "true"))
-			this.iRaceEngineerVoice := ((getLanguage() = "DE") ? "Microsoft Hedda Desktop" : "Microsoft Zira Desktop")
-		else if voice
-			this.iRaceEngineerVoice := voice
+		if (engineersSpeaker != false) {
+			if ((engineersSpeaker == true) || (engineersSpeaker = "true"))
+				this.iRaceEngineerSpeaker := ((getLanguage() = "DE") ? "Microsoft Hedda Desktop" : "Microsoft Zira Desktop")
+			else
+				this.iRaceEngineerSpeaker := engineersSpeaker
+		
+			engineersListener := this.getArgumentValue("raceEngineerListener", false)
+			
+			if ((engineersListener == true) || (engineersListener = "true"))
+				this.iRaceEngineerListener := ((getLanguage() = "DE") ? "Microsoft Server Speech Recognition Language - TELE (de-DE)" : "Microsoft Server Speech Recognition Language - TELE (en-US)")
+			else if (engineersListener != false)
+				this.iRaceEngineerListener := engineersListener
+		}
 		
 		controller.registerPlugin(this)
 	
-		if useRaceEngineer
+		if (useRaceEngineer || (engineersSpeaker != false))
 			SetTimer collectRaceData, 10000
 	}
 	
@@ -876,24 +856,20 @@ class ACCPlugin extends ControllerPlugin {
 		this.openPitstopMFD(update)
 	}
 	
+	createRaceEngineer() {
+		return new RaceEngineer(this.Configuration, readConfiguration(getFileName("Race Engineer.settings", kUserConfigDirectory, kConfigDirectory))
+							  , this, this.RaceEngineerName, this.RaceEngineerSpeaker, this.RaceEngineerListener)
+	}
+	
 	startRace(data) {
-		if !this.ActiveRace {
-			engineer := new RaceEngineer(this, this.Configuration, readConfiguration(getFileName("Race Engineer.settings", kUserConfigDirectory, kConfigDirectory)))
+		if this.ActiveRace
+			this.finishRace()
 		
-			this.iRaceEngineer := engineer
-			
-			engineer.startRace(data)
-			
-			this.enableRaceEngineerActions(true)
-			
-			if (this.RaceEngineerVoice) {
-				generator := new SpeechGenerator(this.RaceEngineerVoice)
-				
-				generator.speak(translate("Ok, here is your race engineer. Good luck."), true)
-			}
-		}
-		else
-			Throw "The active race must be finished before a new race can be started..."
+		this.iRaceEngineer := createRaceEngineer()
+	
+		this.RaceEngineer.startRace(data)
+		
+		this.enableRaceEngineerActions(true)
 	}
 	
 	finishRace() {
@@ -901,149 +877,64 @@ class ACCPlugin extends ControllerPlugin {
 			this.RaceEngineer.finishRace()
 			
 			this.iRaceEngineer := false
-			this.iRaceEngineerReady := false
-			this.iPitstopContinuation := false
 			this.iPitstopPending := false
 			
 			this.enableRaceEngineerActions(false)
-			
-			if (this.RaceEngineerVoice) {
-				generator := new SpeechGenerator(this.RaceEngineerVoice)
-				
-				generator.speak(translate("Ok, thanks for the excellent job."), true)
-			}
 		}
 		else
 			Throw "No active race to be finished..."
 	}
 	
 	addLap(lapNumber, data) {
-		if this.ActiveRace {
+		if this.ActiveRace
 			this.RaceEngineer.addLap(lapNumber, data)
-			
-			if (lapNumber >= 2)
-				this.iRaceEngineerReady := true
-		}
 		else
 			Throw "Lap data can only be added during an active race..."
 	}
 	
-	upcomingPitstopWarning(remainingLaps) {
-		if (this.ActiveRace && this.RaceEngineerVoice && this.RaceEngineerReady) {
-			generator := new SpeechGenerator(this.RaceEngineerVoice)
-				
-			generator.speak(translate("Pitstop comming up in ") . remainingLaps . translate(" laps."), true)
-			
-			if this.RaceEngineerConfirmation {
-				Sleep 100
-				
-				generator.speak(translate("Should I update the pitstop strategy now?"), true)
-				
-				this.iPitstopContinuation := ObjBindMethod(this, "planPitstop")
-			}
-		}
-	}
-	
-	isRaceEngineerReady() {
-		if this.RaceEngineerReady
-			return true
-		else {
-			if this.RaceEngineerVoice {
-				generator := new SpeechGenerator(this.RaceEngineerVoice)
-				
-				generator.speak(translate("I do not have enough data yet. Please wait or two more laps."), true)
-			}
-			
-			return false
-		}
-	}
-	
 	planPitstop() {
-		local knowledgeBase
-		
-		if this.ActiveRace {
-			if !this.isRaceEngineerReady()
-				return
-			
-			plan := this.RaceEngineer.planPitstop(this.RaceEngineerVoice != false)
-			
-			if this.RaceEngineerVoice {
-				generator := new SpeechGenerator(this.RaceEngineerVoice)
-				
-				generator.speak(plan, true)
-				
-				if this.RaceEngineerConfirmation {
-					Sleep 100
-					
-					generator.speak(translate("Do you agree?"), true)
-					
-					this.iPitstopContinuation := ObjBindMethod(this, "preparePitstop")
-				}
-			}
-		}
+		if this.ActiveRace
+			this.RaceEngineer.planPitstop()
 		else
 			Throw "Pitstops may only be planned during an active race..."
 	}
 	
 	preparePitstop(lap := false) {
-		if this.ActiveRace {
-			planned := this.RaceEngineer.hasPlannedPitstop()
-			
-			if this.RaceEngineerVoice {
-				generator := new SpeechGenerator(this.RaceEngineerVoice)
-
-				if !planned {
-					if this.RaceEngineerConfirmation {
-						generator.speak(translate("I have not planned a pitstop yet. Should I update the pitstop strategy now?"), true)
-						
-						this.iPitstopContinuation := ObjBindMethod(this, "planPitstop")
-					}
-					else
-						generator.speak(translate("I have not planned a pitstop yet."), true)
-				}
-				else if lap
-					generator.speak(translate("Ok, we will prepare the pitstop for lap ") . lap . translate("."), true)
-				else
-					generator.speak(translate("Ok, we will prepare the pitstop immediately. Come in whenever you want."), true)
-			}
-			
-			if planned {
-				this.iRaceEngineer.preparePitstop(lap)
-				
-				this.iPitstopPending := true
-				
-				SetTimer collectRaceData, 5000
-			}
-		}
+		if this.ActiveRace
+			this.RaceEngineer.preparePitstop(lap)
 		else
 			Throw "Pitstops may only be prepared during an active race..."
 	}
 	
 	performPitstop() {
-		if this.ActiveRace {
+		if this.ActiveRace
 			this.RaceEngineer.performPitstop()
-			
-			this.iPitstopPending := false
-			
-			SetTimer collectRaceData, 10000
-			
-			if this.RaceEngineerVoice {
-				generator := new SpeechGenerator(this.RaceEngineerVoice)
-
-				generator.speak(translate("Ok, pitstop will be performed as planned. Check ignition and prepare for restart the engine."), true)
-			}
-		}
 		else
 			Throw "Pitstops may only be performed during an active race..."
 	}
 	
-	beginPitstopSettings() {
+	pitstopPlanned() {
+	}
+	
+	pitstopPrepared() {
+		this.iPitstopPending := true
+				
+		SetTimer collectRaceData, 5000
+	}
+	
+	pitstopFinished() {
+		this.iPitstopPending := false
+				
+		SetTimer collectRaceData, 10000
+	}
+	
+	startPitstopSetup() {
 		openPitstopMFD()
 		
 		changePitstopStrategy("Previous", 5)
 	}
 
-	endPitstopSettings() {
+	finishPitstopSetup() {
 		closePitstopMFD()
 		
 		if this.RaceEngineerVoice {
@@ -1053,15 +944,19 @@ class ACCPlugin extends ControllerPlugin {
 		}
 	}
 
-	updatePitstopFuelSettings(fuel) {
+	setPitstopRefuelAmount(fuel) {
 		changePitstopFuelAmount("Increase", Round(fuel))
 	}
-
-	updatePitstopTyreSettings(compound, set, pressureFLIncrement, pressureFRIncrement, pressureRLIncrement, pressureRRIncrement) {
+	
+	setPitstopTyreSet(compound, set := false) {
 		changePitstopTyreCompound(compound)
 		
 		if (compound = "Dry")
 			changePitstopTyreSet("Next", set - 1)
+	}
+
+	setPitstopTyrePressures(pressureFLIncrement, pressureFRIncrement, pressureRLIncrement, pressureRRIncrement) {
+		???? increments in race engineer
 		
 		if (pressureFLIncrement != 0)
 			changePitstopTyrePressure("Front Left", (pressureFLIncrement > 0) ? "Increase" : "Decrease", pressureFLIncrement)
@@ -1073,8 +968,8 @@ class ACCPlugin extends ControllerPlugin {
 			changePitstopTyrePressure("Rear Right", (pressureRRIncrement > 0) ? "Increase" : "Decrease", pressureRRIncrement)
 	}
 
-	updatePitstopRepairSettings(repairSuspension, repairBodywork) {
-		
+	requestPitstopRepairs(repairSuspension, repairBodywork) {
+		???? implement
 		
 		this.iRepairSuspensionChosen := repairSuspension
 		this.iRepairBodyworkChosen := repairBodywork

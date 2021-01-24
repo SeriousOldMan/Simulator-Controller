@@ -48,25 +48,12 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                        Tyre Set Target Calculation                      ;;;
-;;;                                                                         ;;;
-;;; Calculate next dry tire set after performed pitstop.                    ;;;
-;;;-------------------------------------------------------------------------;;;
-
-{Any: [?Lap], {None: [?Tyre.Set.Target]}} => (Prove: nextTyreSet)
-
-nextTyreSet() <= pitstopTyreSet(?nr), Plus(?set, ?nr, 1), Set(Tyre.Set.Target, ?set), !
-nextTyreSet() <= Set(Tyre.Set.Target, !Race.Settings.Tyre.Set.Fresh)
-
-
-;;;-------------------------------------------------------------------------;;;
 ;;;                         Fuel Target Calculation                         ;;;
 ;;;                                                                         ;;;
 ;;; Update target fuel amount for the next pit stop after each lap.         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 {Any: [?Lap], {None: [?Fuel.Amount.Target]}} => (Prove: updateFuelTarget, ?Lap)
-{Any: [?Lap], {None: [?Lap.Remaining]}} => (Prove: updateRemainingLaps, ?Lap)
 
 updateFuelTarget(?lap) <= lapAvgFuel(?lap, ?avgFuel), lapRemainingFuel(?lap, ?remainingFuel), remainingRaceLaps(?lap, ?remainingLaps),			\
 						  Multiply(?raceFuel, ?avgFuel, ?remainingLaps), safetyFuel(?avgFuel, ?safetyFuel),										\
@@ -76,8 +63,6 @@ updateFuelTarget(?lap) <= Clear(Fuel.Amount.Target)
 
 safetyFuel(?avgFuel, ?safetyFuel) <= eq(!Race.Settings.InLap, true), Plus(?safetyFuel, ?avgFuel, !Race.Settings.Fuel.SafetyMargin), !
 safetyFuel(?, !Race.Settings.Fuel.SafetyMargin)
-
-updateRemainingLaps(?lap) <= remainingStintLaps(?lap, ?remainingLaps), Set(Stint.Fuel.RemainingLaps, ?remainingLaps)
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -90,6 +75,18 @@ updateRemainingLaps(?lap) <= remainingStintLaps(?lap, ?remainingLaps), Set(Stint
 
 nextTyreCompound() <= pitstopTyreCompound(?compound), Set(Tyre.Compound.Target, ?compound), !
 nextTyreCompound() <= setupTyreCompound(?compound), Set(Tyre.Compound.Target, ?compound)
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                        Tyre Set Target Calculation                      ;;;
+;;;                                                                         ;;;
+;;; Calculate next dry tire set after performed pitstop.                    ;;;
+;;;-------------------------------------------------------------------------;;;
+
+{Any: [?Lap], {None: [?Tyre.Set.Target]}} => (Prove: nextTyreSet)
+
+nextTyreSet() <= pitstopTyreSet(?nr), Plus(?set, ?nr, 1), Set(Tyre.Set.Target, ?set), !
+nextTyreSet() <= Set(Tyre.Set.Target, !Race.Settings.Tyre.Set.Fresh)
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -177,10 +174,21 @@ repairDamage(?, Impact, ?) <= notYetImplemented()
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                             Pitstop Planning                            ;;;
+;;;                    Stint Lap Countdown & Fuel Warning                   ;;;
+;;;                                                                         ;;;
+;;; Update the laps possible with the remaining fuel and issue a warning    ;;;
+;;; when falling below a given threshold.                                   ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Stint.Fuel.RemainingLaps <= ?Race.Settings.Lap.PitstopWarning] => (Call: upcomingPitstopWarning, ?Stint.Fuel.RemainingLaps)
+{Any: [?Lap], {None: [?Lap.Remaining]}} => (Prove: updateRemainingLaps, ?Lap)
+[?Lap.Remaining <= ?Race.Settings.Lap.PitstopWarning] => (Call: upcomingPitstopWarning, ?Lap.Remaining)
+
+updateRemainingLaps(?lap) <= remainingStintLaps(?lap, ?remainingLaps), Set(Lap.Remaining, ?remainingLaps)
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                             Pitstop Planning                            ;;;
+;;;-------------------------------------------------------------------------;;;
 
 priority: 10, [?Pitstop.Plan] => (Prove: planPitstop)
 {All: [?Pitstop.Plan], [?Fuel.Amount.Target]} => (Set: Pitstop.Planned.Fuel, ?Fuel.Amount.Target)
@@ -209,19 +217,23 @@ planPitstop() <= Set(Pitstop.Planned.Nr, 1)
 ;;;                            Pitstop Preparation                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-{All: [?Pitstop.Planned], {Any: [?Pitstop.Prepare], [?Pitstop.Planned.Lap <= ?Lap]}} => (Prove: setupPitstop)
-priority: -10, {All: [?Pitstop.Planned], {Any: [?Pitstop.Prepare], [?Pitstop.Planned.Lap <= ?Lap]}} =>											\
-		(Clear: Pitstop.Planned), (Clear: Pitstop.Prepare), (Set: Pitstop.Prepared, true)
+{All: [?Pitstop.Planned], [?Pitstop.Planned.Lap <= ?Lap]} => (Set: Pitstop.Prepare, true)
 
-setupPitstop() <= Call(beginPitstopSettings), updateTyreSettings(), updateRepairSettings(), Call(endPitstopSettings)
+{All: [?Pitstop.Planned], [?Pitstop.Prepare]} => (ProveAll: preparePitstop)
+priority: -10, {All: [?Pitstop.Planned], [?Pitstop.Prepare]} => (Clear: Pitstop.Planned), (Clear: Pitstop.Prepare),								\
+																(Set: Pitstop.Prepared, true)
 
-updateFuelSettings() <= Call(updatePitstopFuelSettings, !Pitstop.Planned.Fuel)
+preparePitstop() <= Call(startPitstopSetup)
+preparePitstop() <= setRefuelAmount(), setTyreSet(), setTyrePressures(), requestRepairs()
+preparePitstop() <= Call(finishPitstopSetup)
 
-updateTyreSettings() <= Call(updatePitstopTyreSettings, !Pitstop.Planned.Tyre.Compound, !Pitstop.Planned.Tyre.Set,								\
-														!Pitstop.Planned.Tyre.Pressure.FL, !Pitstop.Planned.Tyre.Pressure.FR,					\
-														!Pitstop.Planned.Tyre.Pressure.RL, !Pitstop.Planned.Tyre.Pressure.RR)
+setRefuelAmount() <= Call(setPitstopRefuelAmount, !Pitstop.Planned.Fuel)
 
-updateRepairSettings() <= Call(updatePitstopRepairSettings, !Pitstop.Planned.Repair.Suspension, !Pitstop.Planned.Repair.Bodywork)
+setTyreSet() <= Call(setPitstopTyreSet, !Pitstop.Planned.Tyre.Compound, !Pitstop.Planned.Tyre.Set)
+setTyrePressures() <= Call(setPitstopTyrePressures, !Pitstop.Planned.Tyre.Pressure.FL, !Pitstop.Planned.Tyre.Pressure.FR,						\
+													!Pitstop.Planned.Tyre.Pressure.RL, !Pitstop.Planned.Tyre.Pressure.RR)
+
+requestRepairs() <= Call(requestPitstopRepairs, !Pitstop.Planned.Repair.Suspension, !Pitstop.Planned.Repair.Bodywork)
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -257,7 +269,7 @@ pitstopPerformed(?lap) <= Append(?pFact, Pitstop., !Pitstop.Planned.Nr, .Repair.
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                        State Information Retrieval                      ;;;
+;;;                        Tyre Information Retrieval                       ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 currentTyreCompound(?compound) <= pitstopTyreCompound(?compound), !
@@ -307,7 +319,9 @@ lastPitstop(?nr) <= unbound(!Pitstop.Last), !, fail
 lastPitstop(?nr) <= eq(?nr, !Pitstop.Last)
 
 pitstopTyreSet(?tyreSet) <= lastPitstop(?nr), Append(?fact, Pitstop., ?nr, .Tyre.Set), Get(?tyreSet, ?fact)
+
 pitstopTyreCompound(?tyreCompound) <= lastPitstop(?nr), Append(?fact, Pitstop., ?nr, .Tyre.Compound), Get(?tyreCompound, ?fact)
+
 pitstopPressure(?tyreType, ?pressure) <= lastPitstop(?nr), Append(?fact, Pitstop., ?nr, .Tyre.Pressure., ?tyreType), Get(?pressure, ?fact)
 
 

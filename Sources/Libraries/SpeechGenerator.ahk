@@ -15,18 +15,12 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Includes\Constants.ahk
-#Include ..\Includes\Variables.ahk
-#Include ..\Includes\Functions.ahk
+#Include ..\Includes\Includes.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Class Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
-
-;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; Class                    SpeechGenerator                                ;;;
-;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class SpeechGenerator {
 	iVoices := []

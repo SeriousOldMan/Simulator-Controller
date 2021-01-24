@@ -12,7 +12,8 @@ Simulator Tools.ini=%kUserConfigDirectory%Simulator Tools.ini
 *.bak Files=%kHomeDirectory%, *.ahk.bak, R
 [Copy]
 ACC SHM Reader=%kBinariesDirectory%ACC SHM Reader.exe <- %kSourcesDirectory%Foreign\ACC SHM Reader\Release\ACC SHM Reader.exe
-ACC Race Engineer Rules=%kConfigDirectory%ACC Race Engineer.rules <- %kSourcesDirectory%\Plugins\ACC Race Engineer.rules
+Microsoft Speech Library=%kBinariesDirectory%Microsoft.Speech.dll <- %kSourcesDirectory%\Libraries\Microsoft.Speech.dll
+Speech Recognizer Library=%kBinariesDirectory%Speech.Recognizer.dll <- %kSourcesDirectory%\Libraries\Speech.Recognizer.dll
 [Build]
 Simulator Controller=%kBinariesDirectory%Simulator Controller.exe <- %kSourcesDirectory%Controller\Simulator Controller.ahk; %kIncludesDirectory%, %kPluginsDirectory%, %kUserPluginsDirectory%, %kHomeDirectory%VERSION
 Simulator Settings=%kBinariesDirectory%Simulator Settings.exe <- %kSourcesDirectory%Startup\Simulator Settings.ahk; %kIncludesDirectory%, %kSourcesDirectory%Startup\Libraries\, %kHomeDirectory%VERSION

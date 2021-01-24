@@ -9,7 +9,10 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Includes\Includes.ahk
 #Include ..\Libraries\RuleEngine.ahk
+#Include ..\Libraries\SpeechGenerator.ahk
+#Include ..\Libraries\SpeechRecognizer.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -30,8 +33,20 @@ global kCenter = 4
 ;;;-------------------------------------------------------------------------;;;
 
 class RaceEngineer extends ConfigurationItem {
-	iPlugin := false
-	iSettings := false
+	iPitstopHandler := false
+	iRaceSettings := false
+	
+	iName := false	
+	iSpeaker := false
+	iListener := false
+	
+	iSpeechGenerator := false
+	iSpeechRecognizer := false
+	
+	iContinuation := false
+	
+	iEnoughData := false
+	
 	iKnowledgeBase := false
 	iOverallTime := 0
 	iLastLap := 0
@@ -54,21 +69,51 @@ class RaceEngineer extends ConfigurationItem {
 		}
 	}
 	
-	Plugin[] {
-		Get {
-			return this.iPlugin
-		}
-	}
-	
-	Settings[] {
-		Get {
-			return this.iSettings
-		}
-	}
-	
 	KnowledgeBase[] {
 		Get {
 			return this.iKnowledgeBase
+		}
+	}
+	
+	RaceSettings[] {
+		Get {
+			return this.iRaceSettings
+		}
+	}
+	
+	PitstopHandler[] {
+		Get {
+			return this.iPitstopHandler
+		}
+	}
+	
+	Name[] {
+		Get {
+			return this.iName
+		}
+	}
+	
+	Speaker[] {
+		Get {
+			return this.iSpeaker
+		}
+	}
+	
+	Listener[] {
+		Get {
+			return this.iListener
+		}
+	}
+	
+	Continuation[] {
+		Get {
+			return this.iContinuation
+		}
+	}
+	
+	EnoughData[] {
+		Get {
+			return this.iEnoughData
 		}
 	}
 	
@@ -96,9 +141,12 @@ class RaceEngineer extends ConfigurationItem {
 		}
 	}
 	
-	__New(plugin, configuration, settings) {
-		this.iPlugin := plugin
-		this.iSettings := settings
+	__New(configuration, raceSettings, pitstopHandler := false, name := false, speaker := false, listener := false) {
+		this.iRaceSettings := raceSettings
+		this.iPitstopHandler := pitstopHandler
+		this.iName := name
+		this.iSpeaker := speaker
+		this.iListener := ((speaker != false) ? listener : false)
 		
 		base.__New(configuration)
 	}
@@ -106,7 +154,7 @@ class RaceEngineer extends ConfigurationItem {
 	createRace(data) {
 		local facts
 		
-		settings := this.Settings
+		settings := this.RaceSettings
 		
 		duration := Round((getConfigurationValue(data, "Stint Data", "TimeRemaining", 0) + getConfigurationValue(data, "Stint Data", "LapLastTime", 0)) / 1000)
 		
@@ -144,6 +192,150 @@ class RaceEngineer extends ConfigurationItem {
 		return facts
 	}
 	
+	getSpeaker() {
+		if (this.Speaker && !this.iSpeechGenerator) {
+			this.iSpeechGenerator := new SpeechGenerator(this.Speaker)
+			
+			this.getListener()
+		}
+		
+		return this.iSpeechGenerator
+	}
+	
+	getListener() {
+		if (this.Listener && !this.iSpeechRecognizer) {
+			recognizer := new SpeechRecognizer(this.Listener)
+			
+			this.buildGrammars(recognizer)
+			
+			recognizer.startRecognizer()
+			
+			this.iSpeechRecognizer := recognizer
+		}
+		
+		return this.iSpeechRecognizer
+	}
+	
+	buildGrammars(speechRecognizer) {
+		canYouGrammar := speechRecognizer.NewGrammar()
+		canYouGrammar.AppendString(translate("Can you"))
+
+		tellMeGrammar := speechRecognizer.NewGrammar()
+		tellMeGrammar.AppendString(translate("Tell me"))
+
+		giveMeGrammar := speechRecognizer.NewGrammar()
+		giveMeGrammar.AppendString(translate("Give me"))
+
+		whatAreGrammar := speechRecognizer.NewGrammar()
+		whatAreGrammar.AppendString(translate("What are"))
+
+		grammar := speechRecognizer.NewGrammar()
+		grammar.AppendChoices(speechRecognizer.newChoices(translate("Hi"), translate("Hey")))
+		grammar.AppendString("Jona")
+		speechRecognizer.LoadGrammar(grammar, "Jona", ObjBindMethod(this, "phraseRecognized"))
+
+		grammar := speechRecognizer.NewGrammar()
+		grammar.AppendChoices(speechRecognizer.newChoices(translate("Yes go on"), translate("Perfect go on"), translate("Go on please"), translate("Head on please")))
+		speechRecognizer.LoadGrammar(grammar, "Yes", ObjBindMethod(this, "phraseRecognized"))
+
+		grammar := speechRecognizer.NewGrammar()
+		grammar.AppendString(translate("No thank you"))
+		speechRecognizer.LoadGrammar(grammar, "No", ObjBindMethod(this, "phraseRecognized"))
+
+		grammar := speechRecognizer.NewGrammar()
+		grammar.AppendGrammars(tellMeGrammar, giveMeGrammar, whatAreGrammar)
+		grammar.AppendChoices(speechRecognizer.newChoices(translate("the tyre temperatures"), translate("the tyre pressures")))
+		speechRecognizer.LoadGrammar(grammar, "Tyre", ObjBindMethod(this, "phraseRecognized"))
+
+		grammar1 := speechRecognizer.NewGrammar()
+		grammar1.AppendGrammars(tellMeGrammar, giveMeGrammar)
+		grammar1.AppendString(translate("the remaining laps"))
+		grammar2 := speechRecognizer.NewGrammar()
+		grammar2.AppendString(translate("how many laps are remaining"))
+		grammar3 := speechRecognizer.NewGrammar()
+		grammar3.AppendString(translate("how many laps are left"))
+		grammar := speechRecognizer.NewGrammar()
+		grammar.AppendGrammars(grammar1, grammar2, grammar3)
+		speechRecognizer.LoadGrammar(grammar, "Laps", ObjBindMethod(this, "phraseRecognized"))
+	}
+	
+	phraseRecognized(grammar, words) {
+		continuation := false
+		msgbox % values2String(", ", words*)
+		switch grammar {
+			case "Yes":
+				continuation := this.iContinuation
+				
+				this.iContinuation := false
+				
+				if continuation {
+					this.getSpeaker().speak(translate("Roger, I come back to you as soon as possible."), true)
+								
+					Sleep 5000
+
+					%continuation%()
+				}
+			case "No":
+				this.iContinuation := false
+			case this.Name:
+				this.nameRecognized(words)
+			case "Laps":
+				this.lapInfoRecognized(words)
+			case "Tyre":
+				this.tyreInfoRecognized(words)
+			default:
+				Throw "Unknown grammar """ . grammar . """ detected in RaceEngineer.phraseRecognized...."
+		}
+	}
+	
+	nameRecognized(words) {
+		this.getSpeaker().speak(translate("I am here. What can I do for you?"), true)
+	}
+	
+	lapInfoRecognized(words) {
+		local knowledgeBase := this.KnowledgeBase
+		
+		if !this.hasEnoughData()
+			return
+		
+		this.getSpeaker().speak(translate("You still have " . Round(knowledgeBase.getValue("Lap.Remaining")) . " laps to go."), true)
+	}
+	
+	tyreInfoRecognized(words) {
+		local knowledgeBase := this.KnowledgeBase
+		
+		if !this.hasEnoughData()
+			return
+		
+		speaker := this.getSpeaker()
+		
+		temperatures := translate("temperatures")
+		pressures := translate("pressures")
+		
+		if inList(words, temperatures)
+			value := "Temperature"
+		else if inList(words, pressures)
+			value := "Pressure"
+		else {
+			speaker.speak(translate("Sorry, I did not understand. Can you repeat?"), true)
+		
+			return
+		}
+		
+		lap := knowledgeBase.getValue("Lap")
+		
+		speaker.speak(translate("Ok, the " ((value == "Pressure") ? pressures : temperatures) . " are:"), true)
+		
+		speaker.speak(translate("Front Left " . Round(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".FL"), 1)), true)
+		speaker.speak(translate("Front Right " . Round(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".FR"), 1)), true)
+		speaker.speak(translate("Rear Left " . Round(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".RL"), 1)), true)
+		speaker.speak(translate("Rear Right " . Round(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".RR"), 1)), true)
+	}
+	
+	setContinuation(continuation) {
+		this.iContinuation := continuation
+	}
+	
 	startRace(data) {
 		local facts := this.createRace(data)
 		
@@ -161,8 +353,12 @@ class RaceEngineer extends ConfigurationItem {
 		this.iOverallTime := 0
 		this.iLastFuelAmount := 0
 		this.iInitialFuelAmount := 0
+		this.iEnoughData := false
 		
 		result := this.KnowledgeBase.produce()
+			
+		if this.Speaker
+			this.getSpeaker().speak(translate("Hi, I am " . this.Name . ", your race engineer today. You can call me anytime if you have any questions. Good luck."), true)
 		
 		if isDebug()
 			dumpFacts(this.KnowledgeBase)
@@ -176,6 +372,10 @@ class RaceEngineer extends ConfigurationItem {
 		this.iOverallTime := 0
 		this.iLastFuelAmount := 0
 		this.iInitialFuelAmount := 0
+		this.iEnoughData := false
+			
+		if this.Speaker
+			this.getSpeaker().speak(translate("Yeah, what a race. Thanks for the excellent job."), true)
 	}
 	
 	addLap(lapNumber, data) {
@@ -189,8 +389,11 @@ class RaceEngineer extends ConfigurationItem {
 		
 		if (lapNumber == 1)
 			knowledgeBase.addFact("Lap", 1)
-		else
+		else {
 			knowledgeBase.setValue("Lap", lapNumber)
+			
+			this.iEnoughData := true
+		}
 			
 		knowledgeBase.addFact("Lap." . lapNumber . ".Driver", getConfigurationValue(data, "Race Data", "DriverName", ""))
 		
@@ -262,6 +465,16 @@ class RaceEngineer extends ConfigurationItem {
 		return result
 	}
 	
+	hasEnoughData() {
+		if this.EnoughData
+			return true
+		else if this.Speaker {
+			this.getSpeaker().speak(translate("Sorry, I do not have enough data yet. Please come back in one or two laps."), true)
+			
+			return false
+		}
+	}
+	
 	hasPlannedPitstop() {
 		return this.KnowledgeBase.getValue("Pitstop.Planned", false)
 	}
@@ -270,9 +483,12 @@ class RaceEngineer extends ConfigurationItem {
 		return this.KnowledgeBase.getValue("Pitstop.Prepared", false)
 	}
 	
-	planPitstop(createDescription := false) {
+	planPitstop() {
 		local knowledgeBase := this.KnowledgeBase
 		
+		if !this.hasEnoughData()
+			return
+				
 		knowledgeBase.addFact("Pitstop.Plan", true)
 		
 		result := knowledgeBase.produce()
@@ -280,54 +496,99 @@ class RaceEngineer extends ConfigurationItem {
 		if isDebug()
 			dumpFacts(this.KnowledgeBase)
 		
-		if createDescription {
-			description := translate("Ok, we have the following for Pitstop number ") . knowledgeBase.getValue("Pitstop.Planned.Nr") . translate(".")
+		if this.Speaker {
+			pitstopPlan := translate("Ok, we have the following for Pitstop number ") . knowledgeBase.getValue("Pitstop.Planned.Nr") . translate(".")
 				
 			fuel := knowledgeBase.getValue("Pitstop.Planned.Fuel", 0)
 			if (fuel == 0)
-				description .= "`n" . translate("Refueling is not necessary.")
+				pitstopPlan .= "`n" . translate("Refueling is not necessary.")
 			else
-				description .= "`n" . translate("We have to refuel ") . Round(fuel) . translate(" litres.")
+				pitstopPlan .= "`n" . translate("We have to refuel ") . Round(fuel) . translate(" litres.")
 			
-			description .= "`n" . translate("We will use ") . knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound")
-			description .= translate(" tyre compound and tyre set number ") . knowledgeBase.getValue("Pitstop.Planned.Tyre.Set") . translate(".")
+			pitstopPlan .= "`n" . translate("We will use ") . knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound")
+			pitstopPlan .= translate(" tyre compound and tyre set number ") . knowledgeBase.getValue("Pitstop.Planned.Tyre.Set") . translate(".")
 			
-			description .= "`n" . translate("Pressure front left ") . Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL"), 1) . translate(".")
-			description .= "`n" . translate("Pressure front right ") . Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR"), 1) . translate(".")
-			description .= "`n" . translate("Pressure rear left ") . Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL"), 1) . translate(".")
-			description .= "`n" . translate("Pressure rear right ") . Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR"), 1) . translate(".")
+			pitstopPlan .= "`n" . translate("Pressure front left ") . Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL"), 1) . translate(".")
+			pitstopPlan .= "`n" . translate("Pressure front right ") . Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR"), 1) . translate(".")
+			pitstopPlan .= "`n" . translate("Pressure rear left ") . Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL"), 1) . translate(".")
+			pitstopPlan .= "`n" . translate("Pressure rear right ") . Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR"), 1) . translate(".")
 
 			if knowledgeBase.getValue("Pitstop.Planned.Repair.Suspension", false)
-				description .= "`n" . translate("We will repair the suspension.")
+				pitstopPlan .= "`n" . translate("We will repair the suspension.")
 			else
-				description .= "`n" . translate("The suspension looks fine.")
+				pitstopPlan .= "`n" . translate("The suspension looks fine.")
 
 			if knowledgeBase.getValue("Pitstop.Planned.Repair.Bodywork", false)
-				description .= "`n" . translate("Bodywork and aerodynamic elements should be repaired.")
+				pitstopPlan .= "`n" . translate("Bodywork and aerodynamic elements should be repaired.")
 			else
-				description .= "`n" . translate("Bodywork and aerodynamic elements should be good.")
+				pitstopPlan .= "`n" . translate("Bodywork and aerodynamic elements should be good.")
 			
-			return description
+			speaker := this.getSpeaker()
+			
+			speaker.speak(pitstopPlan, true)
+				
+			if this.Listener {
+				speaker.speak(translate("Should I instruct the pit crew?"), true)
+				
+				this.setContinuation(ObjBindMethod(this, "preparePitstop"))
+			}
 		}
-		else
-			return result
-	}
-	
-	preparePitstop(lap := false) {
-		if !lap
-			this.KnowledgeBase.addFact("Pitstop.Prepare", true)
-		else
-			this.KnowledgeBase.addFact("Pitstop.Planned.Lap", lap - 1)
 		
-		result := this.KnowledgeBase.produce()
-		
-		if isDebug()
-			dumpFacts(this.KnowledgeBase)
+		if (result && this.PitstopHandler) {
+			this.PitstopHandler.pitstopPlanned()
+		}
 		
 		return result
 	}
 	
+	preparePitstop(lap := false) {
+		if !this.hasPlannedPitstop() {
+			if this.Speaker {
+				speaker := this.getSpeaker()
+
+				if this.Listener {
+					speaker.speak(translate("I have not planned a pitstop yet. Should I update the pitstop strategy now?"), true)
+				
+					this.setContinuation(ObjBindMethod(this, "planPitstop"))
+				}
+				else
+					speaker.speak(translate("Sorry, I have not planned a pitstop yet."), true)
+			}
+			
+			return false
+		}
+		else {
+			if this.Speaker {
+				speaker := this.getSpeaker()
+
+				if lap
+					speaker.speak(translate("Ok, I will let the crew prepare the pitstop for lap ") . lap . translate("."), true)
+				else
+					speaker.speak(translate("Ok, I will let the crew prepare the pitstop immediately. Come in whenever you want."), true)
+			}
+				
+			if !lap
+				this.KnowledgeBase.addFact("Pitstop.Prepare", true)
+			else
+				this.KnowledgeBase.addFact("Pitstop.Planned.Lap", lap - 1)
+		
+			result := this.KnowledgeBase.produce()
+			
+			if isDebug()
+				dumpFacts(this.KnowledgeBase)
+		
+			if (result && this.PitstopHandler) {
+				this.PitstopHandler.pitstopPrepared()
+			}
+					
+			return result
+		}
+	}
+	
 	performPitstop() {
+		if this.Speaker
+			this.getSpeaker().speak(translate("Ok, let the crew do their job. Check ignition, relax and prepare for engine restart."), true)
+				
 		this.KnowledgeBase.addFact("Pitstop.Lap", this.KnowledgeBase.getValue("Lap") - 1)
 		
 		result := this.KnowledgeBase.produce()
@@ -335,31 +596,57 @@ class RaceEngineer extends ConfigurationItem {
 		if isDebug()
 			dumpFacts(this.KnowledgeBase)
 		
+		if (result && this.PitstopHandler)
+			this.PitstopHandler.pitstopFinished()
+		
 		return result
 	}
 	
 	upcomingPitstopWarning(remainingLaps) {
-		this.Plugin.upcomingPitstopWarning(remainingLaps)
+		if this.Speaker {
+			speaker := this.getSpeaker()
+			
+			speaker.speak(translate("Hi, here is " . this.Name . ". You have fuel left for ") . Round(remainingLaps) . translate(" laps."), true)
+		
+			if this.Listener {
+				speaker.speak(translate("Should I update the pitstop strategy now?"), true)
+				
+				this.setContinuation(ObjBindMethod(this, "planPitstop"))
+			}
+		}
 	}
 	
-	beginPitstopSettings() {
-		this.Plugin.beginPitstopSettings()
+	startPitstopSetup() {
+		if this.PitstopHandler
+			this.PitstopHandler.startPitstopSetup()
 	}
 
-	endPitstopSettings() {
-		this.Plugin.KnowledgeBase.endPitstopSettings()
+	finishPitstopSetup() {
+		if this.PitstopHandler {
+			this.PitstopHandler.finishPitstopSetup()
+			
+			this.PitstopHandler.pitstopPrepared()
+		}
 	}
 
-	updatePitstopFuelSettings(fuel) {
-		this.Plugin.KnowledgeBase.updatePitstopFuelSettings(fuel)
+	setPitstopRefuelAmount(litres) {
+		if this.PitstopHandler
+			this.PitstopHandler.setPitstopRefuelAmount(litres)
 	}
 
-	updatePitstopTyreSettings(compound, set, pressureFL, pressureFR, pressureRL, pressureRR) {
-		this.Plugin.KnowledgeBase.updatePitstopTyreSettings(compound, set, pressureFL, pressureFR, pressureRL, pressureRR)
+	setPitstopTyreSet(compound, set) {
+		if this.PitstopHandler
+			this.PitstopHandler.setPitstopTyreSet(compound, set)
 	}
 
-	updatePitstopRepairSettings(repairSuspension, repairBodywork) {
-		this.Plugin.KnowledgeBase.updatePitstopRepairSettings(repairSuspension, repairBodywork)
+	setPitstopTyrePressures(pressureFL, pressureFR, pressureRL, pressureRR) {
+		if this.PitstopHandler
+			this.PitstopHandler.setPitstopTyrePressures(pressureFL, pressureFR, pressureRL, pressureRR)
+	}
+
+	requestPitstopRepairs(repairSuspension, repairBodywork) {
+		if this.PitstopHandler
+			this.PitstopHandler.requestPitstopRepairs(repairSuspension, repairBodywork)
 	}
 }
 
@@ -368,29 +655,32 @@ class RaceEngineer extends ConfigurationItem {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-upcomingPitstopWarning(knowledgeBase, remainingLaps) {
-	msgbox % remainingLaps
-	knowledgeBase.RaceEngineer.upcomingPitstopWarning(Round(remainingLaps))
+upcomingPitstopWarning(context, remainingLaps) {
+	context.KnowledgeBase.RaceEngineer.upcomingPitstopWarning(Round(remainingLaps))
 }
 
-beginPitstopSettings(choicePoint) {
-	choicePoint.ResultSet.KnowledgeBase.RaceEngineer.beginPitstopSettings()
+startPitstopSetup(context) {
+	context.KnowledgeBase.RaceEngineer.startPitstopSetup()
 }
 
-endPitstopSettings(choicePoint) {
-	choicePoint.ResultSet.KnowledgeBase.RaceEngineer.endPitstopSettings()
+finishPitstopSetup(context) {
+	context.KnowledgeBase.RaceEngineer.finishPitstopSetup()
 }
 
-updatePitstopFuelSettings(choicePoint, fuel) {
-	choicePoint.ResultSet.KnowledgeBase.RaceEngineer.updatePitstopFuelSettings(fuel)
+setPitstopRefuelAmount(context, fuel) {
+	context.KnowledgeBase.RaceEngineer.setPitstopRefuelAmount(fuel)
 }
 
-updatePitstopTyreSettings(choicePoint, compound, set, pressureFL, pressureFR, pressureRL, pressureRR) {
-	choicePoint.ResultSet.KnowledgeBase.RaceEngineer.updatePitstopTyreSettings(compound, set, pressureFL, pressureFR, pressureRL, pressureRR)
+setPitstopTyreSet(context, compound, set) {
+	context.KnowledgeBase.RaceEngineer.setPitstopTyreSet(compound, set)
 }
 
-updatePitstopRepairSettings(choicePoint, repairSuspension, repairBodywork) {
-	choicePoint.ResultSet.KnowledgeBase.RaceEngineer.updatePitstopRepairSettings(repairSuspension, repairBodywork)
+setPitstopTyrePressures(context, pressureFL, pressureFR, pressureRL, pressureRR) {
+	context.KnowledgeBase.RaceEngineer.setPitstopTyrePressures(pressureFL, pressureFR, pressureRL, pressureRR)
+}
+
+requestPitstopRepairs(context, repairSuspension, repairBodywork) {
+	context.KnowledgeBase.RaceEngineer.requestPitstopRepairs(repairSuspension, repairBodywork)
 }
 
 dumpFacts(knowledgeBase) {

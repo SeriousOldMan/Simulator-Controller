@@ -311,6 +311,10 @@ class RaceEngineer extends ConfigurationItem {
 	}
 	
 	phraseRecognized(grammar, words) {
+		SplashTextOn 400, 100, , % "Phrase " . grammar . ": " . values2String(" ", words*)
+		Sleep 1000
+		SplashTextOff
+		
 		switch grammar {
 			case "Yes":
 				continuation := this.iContinuation

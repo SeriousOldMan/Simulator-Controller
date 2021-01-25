@@ -582,7 +582,7 @@ runCleanTargets(ByRef buildProgress) {
 						if !kSilentMode
 							Progress %buildProgress%, % translate("Deleting ") . A_LoopFileName . translate("...")
 						
-						Sleep 50
+						Sleep 100
 					}
 				}
 				finally {
@@ -629,11 +629,11 @@ runCleanTargets(ByRef buildProgress) {
 runCopyTargets(ByRef buildProgress) {
 	local title
 	
+	if !kSilentMode
+		Progress %buildProgress%, % translate("...")
+	
 	for ignore, target in vCopyTargets {
 		targetName := target[1]
-	
-		if !kSilentMode
-			Progress %buildProgress%, % translate("Copying ") . targetName . translate("...")
 			
 		logMessage(kLogInfo, translate("Check ") . targetName)
 
@@ -652,6 +652,9 @@ runCopyTargets(ByRef buildProgress) {
 				copy := true
 		
 		if copy {
+			if !kSilentMode
+				Progress %buildProgress%, % translate("Copying ") . targetName . translate("...")
+		
 			logMessage(kLogInfo, targetName . translate(" out of date - update needed"))
 			logMessage(kLogInfo, translate("Copying ") . targetSource)
 			
@@ -662,9 +665,9 @@ runCopyTargets(ByRef buildProgress) {
 			
 			FileCreateDir %targetDirectory%
 			FileCopy %copiedFile%, %targetDirectory%, 1
-		}
 			
-		Sleep 1000
+			Sleep 1000
+		}
 		
 		buildProgress += Round(100 / (vTargetCounts + 1))
 			
@@ -676,11 +679,11 @@ runCopyTargets(ByRef buildProgress) {
 runBuildTargets(ByRef buildProgress) {
 	local title
 	
+	if !kSilentMode
+		Progress %buildProgress%, % translate("...")
+	
 	for ignore, target in vBuildTargets {
 		targetName := target[1]
-	
-		if !kSilentMode
-			Progress %buildProgress%, % translate("Compiling ") . targetName . translate("...")
 			
 		logMessage(kLogInfo, translate("Check ") . targetName)
 
@@ -699,7 +702,10 @@ runBuildTargets(ByRef buildProgress) {
 		else
 			build := true
 		
-		if build {
+		if build {	
+			if !kSilentMode
+				Progress %buildProgress%, % translate("Compiling ") . targetName . translate("...")
+		
 			logMessage(kLogInfo, targetName . translate(" or dependent files out of date - recompile triggered"))
 			logMessage(kLogInfo, translate("Compiling ") . targetSource)
 
@@ -726,8 +732,6 @@ runBuildTargets(ByRef buildProgress) {
 			FileCreateDir %targetDirectory%
 			FileMove %compiledFile%, %targetDirectory%, 1
 		}
-			
-		Sleep 1000
 		
 		buildProgress += Round(100 / (vTargetCounts + 1))
 			

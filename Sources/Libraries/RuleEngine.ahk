@@ -600,7 +600,7 @@ class CallAction extends Action {
 		arguments := []
 		
 		for ignore, argument in this.Arguments
-			if isInstance(this.Function, Variable)
+			if isInstance(argument, Variable)
 				arguments.Push(argument.toString(variables))
 			else
 				arguments.Push(argument.toString(facts))
@@ -1098,12 +1098,12 @@ class ProductionRule extends Rule {
 		iVariables := {}
 		
 		setValue(variable, value) {
-			this.iVariables[variable] := value
+			this.iVariables[variable.Variable] := value
 		}
 		
 		getValue(variable, default := "__NotInitialized__") {
-			if this.iVariables.HasKey(variable)
-				return this.iVariables[variable]
+			if this.iVariables.HasKey(variable.Variable)
+				return this.iVariables[variable.Variable]
 			else
 				return default
 		}
@@ -3687,27 +3687,4 @@ get(choicePoint, operand1, operand2) {
 		return false
 	else
 		return (operand1.toString(resultSet) = operand2.toString(resultSet))
-}
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                   Public Function Declaration Section                   ;;;
-;;;-------------------------------------------------------------------------;;;
-
-isInstance(object, root) {
-	candidate := object.base
-	
-	while IsObject(candidate)
-		if (candidate == root)
-			return true
-		else {
-			classVar := candidate.base.__Class
-		
-			if (classVar && (classVar != ""))
-				candidate := %classVar%
-			else
-				return false
-		}
-		
-	return false
 }

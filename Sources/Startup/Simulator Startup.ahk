@@ -158,7 +158,7 @@ class SimulatorStartup extends ConfigurationItem {
 	startComponent(component) {
 		logMessage(kLogInfo, translate("Starting component ") . component)
 				
-		raiseEvent("ahk_pid " . this.iSimulatorControllerPID, "Startup", "startupComponent:" . component)
+		raiseEvent("Startup", "startupComponent:" . component)
 	}
 	
 	startComponents(section, components, ByRef startSimulator, ByRef runningIndex) {
@@ -188,7 +188,7 @@ class SimulatorStartup extends ConfigurationItem {
 			this.iStartupOption := this.iSimulators[1]
 			
 		if this.iStartupOption {
-			raiseEvent("ahk_pid " . this.iSimulatorControllerPID, "Startup", "startupSimulator:" . this.iStartupOption)
+			raiseEvent("Startup", "startupSimulator:" . this.iStartupOption)
 			
 			ExitApp 0
 		} 
@@ -265,13 +265,13 @@ startSimulator() {
 	
 	settings := readConfiguration(kSimulatorSettingsFile)
 	
-	registerEventHandler("Startup", "handleStartupEvents")
+	registerEventHandler("Shutdown", "handleShutdownEvents")
 	
 	new SimulatorStartup(kSimulatorConfiguration, settings).startup()
 }
 
 playSongRemote() {
-	if raiseEvent("ahk_pid " . vSimulatorControllerPID, "Startup", "playStartupSong:" . vSongFile) {
+	if raiseEvent("Startup", "playStartupSong:" . vSongFile) {
 		vSongFile := false
 		
 		SetTimer playSongRemote, Off
@@ -298,19 +298,14 @@ exitStartup() {
 		ExitApp 0
 }
 
-handleStartupEvents(event, data) {
+handleShutdownEvents(event, data) {
 	local function
 	
 	if InStr(data, ":") {
 		data := StrSplit(data, ":")
 		
 		function := data[1]
-		arguments := StrSplit(data[2], ",")
-		
-		numArguments := arguments.Length()
-		
-		Loop %numArguments%
-			arguments[A_index] := Trim(arguments[A_Index], A_Space)
+		arguments := arguments := string2Values(",", data[2])
 			
 		withProtection(function, arguments*)
 	}
@@ -349,14 +344,14 @@ try {
 		IfMsgBox Yes
 		{
 			if (vSimulatorControllerPID != 0)
-				raiseEvent("ahk_pid " . vSimulatorControllerPID, "Startup", "stopStartupSong")
+				raiseEvent("Startup", "stopStartupSong")
 		
 			ExitApp 0
 		}
 	}
 	else {
 		if (vSimulatorControllerPID != 0)
-			raiseEvent("ahk_pid " . vSimulatorControllerPID, "Startup", "stopStartupSong")
+			raiseEvent("Startup", "stopStartupSong")
 		
 		ExitApp 0
 	}

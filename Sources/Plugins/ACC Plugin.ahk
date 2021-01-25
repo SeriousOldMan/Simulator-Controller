@@ -73,11 +73,36 @@ class ACCPlugin extends ControllerPlugin {
 		}
 		
 		callRemote(function, arguments*) {
-			raiseEvent("ahk_pid " . this.RemotePID, "Race", function . ":" . values2String(";", arguments*))
+			raiseEvent("Race", function . ":" . values2String(";", arguments*))
 		}
 		
+		shutdown() {
+			return this.callRemote("shutdown")
+		}
 		
-		functions ??????
+		startRace(dataFile) {
+			return this.callRemote("startRace", dataFile)
+		}
+		
+		finishRace() {
+			return this.callRemote("finishRace")
+		}
+		
+		addLap(lapNumber, dataFile) {
+			return this.callRemote("addLap", lapNumber, dataFile)
+		}
+		
+		planPitstop() {
+			return this.callRemote("planPitstop")
+		}
+		
+		preparePitstop(lap := false) {
+			return this.callRemote("preparePitstop", lap)
+		}
+		
+		performPitstop() {
+			return this.callRemote("performPitstop")
+		}
 	}
 	
 	class DriveMode extends ControllerMode {
@@ -870,18 +895,62 @@ class ACCPlugin extends ControllerPlugin {
 		this.openPitstopMFD(update)
 	}
 	
-	createRaceEngineer() {
-		return new RaceEngineer(this.Configuration, readConfiguration(getFileName("Race Engineer.settings", kUserConfigDirectory, kConfigDirectory))
-							  , this, this.RaceEngineerName, this.RaceEngineerSpeaker, this.RaceEngineerListener)
+	startupRaceEngineer() {
+		Process Exist
+		
+		controllerPID := ErrorLevel
+		raceEngineerPID := 0
+							
+		try {
+			logMessage(kLogInfo, translate("Starting ") . translate("Race Engineer"))
+			
+			options := " -Remote " . controllerPID . " -Settings """ . getFileName("Race Engineer.settings", kUserConfigDirectory, kConfigDirectory) . """"
+			
+			if this.RaceEngineerName
+				options .= " -Name """ . this.RaceEngineerName . """"
+			
+			if this.RaceEngineerSpeaker
+				options .= " -Speaker """ . this.RaceEngineerSpeaker . """"
+			
+			if this.RaceEngineerListener
+				options .= " -Listener """ . this.RaceEngineerListener . """"
+			
+			exePath := kBinariesDirectory . "Race Engineer.exe" . options 
+			
+			Run %exePath%, %kBinariesDirectory%, , raceEngineerPID
+			
+			Sleep 5000
+		}
+		catch exception {
+			logMessage(kLogCritical, translate("Cannot start Race Engineer (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
+			
+			title := translate("Modular Simulator Controller System - Controller (Plugin: ACC)")
+			
+			SplashTextOn 800, 60, %title%, % substituteVariables(translate("Cannot start Race Engineer (%kBinariesDirectory%Race Engineer.exe) - please rebuild the applications..."))
+				
+			Sleep 5000
+				
+			SplashTextOff
+			
+			return false
+		}
+		
+		this.iRaceEngineer := new this.RemoteRaceEngineer(raceEngineerPID)
 	}
 	
-	startRace(data) {
+	shutdownRaceEngineer() {
+		this.RaceEngineer.shutdown()
+		
+		this.iRaceEngineer := false
+	}
+	
+	startRace(dataFile) {
 		if this.ActiveRace
 			this.finishRace()
 		
-		this.iRaceEngineer := this.createRaceEngineer()
+		this.startupRaceEngineer()
 	
-		this.RaceEngineer.startRace(data)
+		this.RaceEngineer.startRace(dataFile)
 		
 		this.enableRaceEngineerActions(true)
 	}
@@ -890,7 +959,8 @@ class ACCPlugin extends ControllerPlugin {
 		if this.ActiveRace {
 			this.RaceEngineer.finishRace()
 			
-			this.iRaceEngineer := false
+			this.shutdownRaceEngineer()
+			
 			this.iPitstopPending := false
 			
 			this.enableRaceEngineerActions(false)
@@ -899,9 +969,9 @@ class ACCPlugin extends ControllerPlugin {
 			Throw "No active race to be finished..."
 	}
 	
-	addLap(lapNumber, data) {
+	addLap(lapNumber, dataFile) {
 		if this.ActiveRace
-			this.RaceEngineer.addLap(lapNumber, data)
+			this.RaceEngineer.addLap(lapNumber, dataFile)
 		else
 			Throw "Lap data can only be added during an active race..."
 	}
@@ -1177,7 +1247,7 @@ collectRaceData() {
 	
 	if true || isACCRunning() {
 		exePath := kBinariesDirectory . "ACC SHM Reader.exe"
-		/*
+		
 		try {
 			Run %ComSpec% /c ""%exePath%" > "%kUserHomeDirectory%Temp\ACC Data\SHM.data"", , Hide
 		}
@@ -1193,12 +1263,8 @@ collectRaceData() {
 			SplashTextOff
 		}
 		
-		data := readConfiguration(kUserHomeDirectory . "Temp\ACC Data\SHM.data")
-		*/
-		data := readConfiguration(kSourcesDirectory . "Tests\Lap " . (lastLap + 1) . ".data")
-		
-		if (data.Count() == 0)
-			data := readConfiguration(kSourcesDirectory . "Tests\Lap " . lastLap . ".data")
+		dataFile := kUserHomeDirectory . "Temp\ACC Data\SHM.data"
+		data := readConfiguration(dataFile)
 		
 		dataLastLap := getConfigurationValue(data, "Stint Data", "Laps", 0)
 		
@@ -1207,11 +1273,11 @@ collectRaceData() {
 		try {
 			if (dataLastLap > lastLap) {
 				if (lastLap == 0)
-					plugin.startRace(data)
+					plugin.startRace(dataFile)
 				
 				lastLap := dataLastLap
-				
-				plugin.addLap(dataLastLap, data)
+
+				plugin.addLap(dataLastLap, dataFile)
 				
 				if isDebug()
 					writeConfiguration(kUserHomeDirectory . "Temp\ACC Data\Lap " . lastLap . ".data", data)
@@ -1285,7 +1351,7 @@ initializeACCPlugin() {
 	Loop Files, %kUserHomeDirectory%Temp\ACC Data\*.*
 		FileDelete %A_LoopFilePath%
 	
-	registerEventHandler("Pitstop", "handleEvents")
+	registerEventHandler("Pitstop", "handleRemoteCalls")
 	
 	new ACCPlugin(controller, kACCPLugin, controller.Configuration)
 }
@@ -1294,12 +1360,12 @@ initializeACCPlugin() {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Event Handler Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
-???? events
-handleEvents(event, data) {
+
+handleRemoteCalls(event, data) {
 	local function
 	
 	if InStr(data, ":") {
-		data := StrSplit(data, ":")
+		data := StrSplit(data, ":", , 2)
 		
 		function := data[1]
 		arguments := string2Values(";", data[2])

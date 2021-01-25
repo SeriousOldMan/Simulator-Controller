@@ -181,7 +181,7 @@ repairDamage(?, Impact, ?) <= notYetImplemented()
 ;;;-------------------------------------------------------------------------;;;
 
 {Any: [?Lap], {None: [?Lap.Remaining]}} => (Prove: updateRemainingLaps, ?Lap)
-[?Lap.Remaining <= ?Race.Settings.Lap.PitstopWarning] => (Call: upcomingPitstopWarning, ?Lap.Remaining)
+[?Lap.Remaining <= ?Race.Settings.Lap.PitstopWarning] => (Call: lowFuelWarning, ?Lap.Remaining)
 
 updateRemainingLaps(?lap) <= remainingStintLaps(?lap, ?remainingLaps), Set(Lap.Remaining, ?remainingLaps)
 

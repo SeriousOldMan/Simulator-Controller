@@ -30,7 +30,7 @@ class SpeechRecognizer {
 		dllName := "Speech.Recognizer.dll"
 		dllFile := kBinariesDirectory . dllName
 		
-		try {
+		;try {
 			if (!FileExist(dllFile)) {
 				logMessage(kLogCritical, translate("Speech.Recognizer.dll not found in " . kBinariesDirectory))
 				
@@ -45,6 +45,7 @@ class SpeechRecognizer {
 				
 				Throw "Could not communicate with speech recognizer library (" . dllName . ")..."
 			}
+		/*
 		}
 		catch exception {
 			logMessage(kLogCritical, translate("Error while initializing speech recognition system - please check the configuration"))
@@ -55,6 +56,7 @@ class SpeechRecognizer {
 					
 			Sleep 5000
 		}
+		*/
 		
 		this.RecognizerList := this.createRecognizerList()
 		

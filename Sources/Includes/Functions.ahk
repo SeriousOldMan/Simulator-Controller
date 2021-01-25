@@ -77,6 +77,28 @@ readLanguage(targetLanguageCode) {
 	Throw "Inconsistent translation encountered for """ . targetLanguageCode . """ in readLanguage..."
 }
 
+eventMessageDispatcher() {
+	for event, handler in vEventHandlers {
+		pipeName := "\\.\pipe\SCE" . event
+	
+		if DllCall("WaitNamedPipe", "Str", pipeName, "UInt", 0xffffffff)
+			Loop Read, %pipeName%
+			{
+				data := StrSplit(A_LoopReadLine, ":", , 2)
+				event := data[1]
+				
+				eventHandler := vEventHandlers[event]
+				
+				if (!eventHandler)
+					eventHandler := vEventHandlers["*"]
+				
+				logMessage(kLogInfo, translate("Dispatching event """) . event . (data[2] ? translate(""": ") . data[2] : translate("""")))
+				
+				vWaitingEvents.Push(Func(eventHandler).Bind(event, data[2]))
+			}
+	}
+}
+
 eventMessageQueue() {
 	if (vWaitingEvents.Length() > 0) {
 		event := vWaitingEvents.RemoveAt(1)
@@ -163,7 +185,7 @@ dispatchEvent(wParam, lParam) {
     request := decodeDWORD(dwData)              ; 4-char decoded request
     length  := (cbData - 1) / (A_IsUnicode + 1) ; length of DATA string (excl ZERO)
     data    := StrGet(lpData, length)           ; DATA string from pointer
-	
+	msgbox event
 	if (request != "EVNT")
 		Throw % "Unhandled message received: " . request . " in dispatchEvent..."
 
@@ -181,10 +203,11 @@ dispatchEvent(wParam, lParam) {
 }
 
 initializeEventSystem() {
-	OnMessage(0x4a, "dispatchEvent") 
+	; OnMessage(0x4a, "dispatchEvent") 
 	
 	registerEventHandler("*", "unknownEventHandler")
 	
+	SetTimer eventMessageDispatcher, 500
 	SetTimer eventMessageQueue, 200
 }
 
@@ -660,11 +683,31 @@ withProtection(function, params*) {
 	protectionOn()
 	
 	try {
-		%function%(params*)
+		result := %function%(params*)
 	}
 	finally {
 		protectionOff()
 	}
+	
+	return result
+}
+
+isInstance(object, root) {
+	candidate := object.base
+	
+	while IsObject(candidate)
+		if (candidate == root)
+			return true
+		else {
+			classVar := candidate.base.__Class
+		
+			if (classVar && (classVar != ""))
+				candidate := %classVar%
+			else
+				return false
+		}
+		
+	return false
 }
 
 getFileName(fileName, directories*) {
@@ -817,8 +860,10 @@ registerEventHandler(event, handler) {
 	vEventHandlers[event] := handler
 }
 
-raiseEvent(target, event, data) {
-	if !target {
+raiseEvent(event, data, localProcess := false) {
+	static ptr
+	
+	if localProcess {
 		logMessage(kLogInfo, translate("Raising event """) . event . (data ? translate(""": ") . data : translate("""")) . translate(" in current process"))
 		
 		eventHandler := vEventHandlers[event]
@@ -835,51 +880,22 @@ raiseEvent(target, event, data) {
 		return true
 	}
 	else {
-		logMessage(kLogInfo, translate("Raising event """) . event . (data ? translate(""": ") . data : translate("""")) . translate(" in target ") . target)
+		logMessage(kLogInfo, translate("Raising event """) . event . (data ? translate(""": ") . data : translate("""")))
 		
-		curDetectHiddenWindows := A_DetectHiddenWindows
-		curTitleMatchMode := A_TitleMatchMode
-		
-		event := event . ":" . data
-		
-		;---------------------------------------------------------------------------
-		; construct the message to send
-		;---------------------------------------------------------------------------
-		dwData := encodeDWORD("EVNT")
-		cbData := StrLen(event) * (A_IsUnicode + 1) + 1 ; length of DATA string (incl. ZERO)
-		lpData := &event                                ; pointer to DATA string
-
-		;---------------------------------------------------------------------------
-		; put the message in a COPYDATASTRUCT
-		;---------------------------------------------------------------------------
-		VarSetCapacity(struct, A_PtrSize * 3, 0)        ; initialize COPYDATASTRUCT
-		NumPut(dwData, struct, A_PtrSize * 0, "UInt")   ; DWORD
-		NumPut(cbData, struct, A_PtrSize * 1, "UInt")   ; DWORD
-		NumPut(lpData, struct, A_PtrSize * 2, "UInt")   ; 32bit pointer
-
-		;---------------------------------------------------------------------------
-		; parameters for SendMessage command
-		;---------------------------------------------------------------------------
-		message := 0x4a     ; WM_COPYDATA
-		wParam  := ""       ; not used
-		lParam  := &struct  ; COPYDATASTRUCT
-		control := ""       ; not needed
-
-		SetTitleMatchMode 2 ; match part of the title
-		DetectHiddenWindows On ; needed for sending messages
-		
-		try {
-			SendMessage %message%, %wParam%, %lParam%, %control%, %target%
+		pipe := DllCall("CreateNamedPipe", "str", "\\.\pipe\SCE" . event, "uint", 3, "uint", 0, "uint", 255, "uint", 0, "uint", 0, "uint", 0, ptr, 0, ptr)
 			
-			return (ErrorLevel != "Fail")
-		}
-		catch exception {
-		}
-		finally {
-			DetectHiddenWindows %curDetectHiddenWindows%
-			SetTitleMatchMode %curTitleMatchMode%
-		}
+		DllCall("ConnectNamedPipe", ptr, pipe, ptr, 0)
+		
+		message := (A_IsUnicode ? chr(0xfeff) : chr(239) chr(187) chr(191)) . (event := event . ":" . data)
+		
+		DllCall("WriteFile", ptr, pipe, "str", message, "uint", (StrLen(message) + 1) * (A_IsUnicode ? 2 : 1), "uint*", 0, ptr, 0)
+		
+		DllCall("CloseHandle", ptr, pipe)
 	}
+}
+
+CreateNamedPipe(Name, OpenMode=3, PipeMode=0, MaxInstances=255) {
+	return 
 }
 
 trayMessage(title, message, duration := false) {

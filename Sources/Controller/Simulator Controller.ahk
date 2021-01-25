@@ -519,7 +519,7 @@ class SimulatorController extends ConfigurationItem {
 						songFile := (theme ? getConfigurationValue(this.Configuration, "Splash Themes", theme . ".Song", false) : false)
 				
 						if (songFile && FileExist(getFileName(songFile, kUserSplashMediaDirectory, kSplashMediaDirectory)))
-							raiseEvent(false, "Startup", "playStartupSong:" . songFile)
+							raiseEvent("Startup", "playStartupSong:" . songFile, true)
 						
 						posX := Round((A_ScreenWidth - 300) / 2)
 						posY := A_ScreenHeight - 150
@@ -1218,7 +1218,7 @@ updateSimulatorState() {
 			isSimulatorRunning := !isSimulatorRunning
 		
 			if isSimulatorRunning {
-				raiseEvent("ahk_exe Simulator Startup.exe", "Startup", "exitStartup")
+				raiseEvent("Shutdown", "exitStartup")
 				
 				controller.simulatorStartup(controller.ActiveSimulator)
 			}

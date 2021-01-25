@@ -40,6 +40,13 @@ ListLines Off					; Disable execution history
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                        Private Variable Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global vRemotePID = 0
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                         Private Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -57,49 +64,56 @@ class RemotePitstopHandler {
 	}
 		
 	callRemote(function, arguments*) {
-		raiseEvent("ahk_pid " . this.RemotePID, "Pitstop", function . ":" . values2String(";", arguments*))
+		return raiseEvent("Pitstop", function . ":" . values2String(";", arguments*))
 	}
 	
 	pitstopPlanned() {
-		this.callRemote("pitstopPlanned")
+		return this.callRemote("pitstopPlanned")
 	}
 	
 	pitstopPrepared() {
-		this.callRemote("pitstopPrepared")
+		return his.callRemote("pitstopPrepared")
 	}
 	
 	pitstopFinished() {
-		this.callRemote("pitstopFinished")
+		return this.callRemote("pitstopFinished")
 	}
 	
 	startPitstopSetup() {
-		this.callRemote("startPitstopSetup")
+		return this.callRemote("startPitstopSetup")
 	}
 
 	finishPitstopSetup() {
-		this.callRemote("finishPitstopSetup")
+		return this.callRemote("finishPitstopSetup")
 	}
 
 	setPitstopRefuelAmount(litres) {
-		this.callRemote("setPitstopRefuelAmount", litres)
+		return this.callRemote("setPitstopRefuelAmount", litres)
 	}
 	
 	setPitstopTyreSet(compound, set := false) {
-		this.callRemote("setPitstopTyreSet", compound, set)
+		return this.callRemote("setPitstopTyreSet", compound, set)
 	}
 
 	setPitstopTyrePressures(pressureFLIncrement, pressureFRIncrement, pressureRLIncrement, pressureRRIncrement) {
-		this.callRemote("setPitstopTyrePressures", pressureFLIncrement, pressureFRIncrement, pressureRLIncrement, pressureRRIncrement)
+		return this.callRemote("setPitstopTyrePressures", pressureFLIncrement, pressureFRIncrement, pressureRLIncrement, pressureRRIncrement)
 	}
 
 	requestPitstopRepairs(repairSuspension, repairBodywork) {
-		this.callRemote("requestPitstopRepairs", repairSuspension, repairBodywork)
+		return this.callRemote("requestPitstopRepairs", repairSuspension, repairBodywork)
 	}
 }
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+checkRemoteProcessAlive() {
+	Process Exist, %vRemotePID%
+	
+	if !ErrorLevel
+		ExitApp 0
+}
 
 startRaceEngineer() {
 	icon := kIconsDirectory . "Artificial Intelligence.ico"
@@ -134,9 +148,15 @@ startRaceEngineer() {
 		}
 	}
 	
-	registerEventHandler("Race", "handleEvents")
+	registerEventHandler("Race", "handleRemoteCalls")
 	
 	RaceEngineer.Instance := new RaceEngineer(false, readConfiguration(raceSettingsFile), remotePID ? new RemotePitstopHandler(remotePID) : false, engineerName, engineerSpeaker, engineerListener)
+	
+	if (remotePID != 0) {
+		vRemotePID := remotePID
+		
+		SetTimer checkRemoteProcessAlive, 10000
+	}
 }
 
 
@@ -144,43 +164,30 @@ startRaceEngineer() {
 ;;;                          Event Handler Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-startRace(dataFileName) {
-	RaceEngineer.Instance.startRace(readConfiguration(dataFileName))
-}
-
-finishRace() {
-	RaceEngineer.Instance.finishRace()
-}
-
-addLap(lapNumber, dataFileName) {
-	RaceEngineer.Instance.addLap(readConfiguration(dataFileName))
-}
-
-planPitstop() {
-	RaceEngineer.Instance.planPitstop()
-}
-
-preparePitstop(lap := false) {
-	RaceEngineer.Instance.planPitstop()
-}
-
-performPitstop() {
-	RaceEngineer.Instance.performPitstop()
-}
-
-handleEvents(event, data) {
+handleRemoteCalls(event, data) {
 	local function
 	
 	if InStr(data, ":") {
-		data := StrSplit(data, ":")
+		data := StrSplit(data, ":", , 2)
 		
-		function := data[1]
-		arguments := string2Values(";", data[2])
+		if (data[1] = "Shutdown") {
+			Sleep 30000
 			
-		withProtection(function, arguments*)
+			ExitApp 0
+		}
+	
+		function := ObjBindMethod(RaceEngineer.Instance, data[1])
+		arguments := string2Values(";", data[2])
+		
+		return withProtection(function, arguments*)
 	}
-	else	
-		withProtection(data)
+	else if (data = "Shutdown") {
+		Sleep 30000
+		
+		ExitApp 0
+	}
+	else
+		return withProtection(ObjBindMethod(RaceEngineer.Instance, data))
 }
 
 

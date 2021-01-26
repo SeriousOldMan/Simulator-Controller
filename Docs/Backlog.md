@@ -24,3 +24,4 @@
   1. [Target: V3.0]Plugin support for the configuration tool
   2. Choosing a specific theme depending on the selected simulation game
   3. Again, better UI flow in the configuration tool and larger window size.
+  4. Using speech recognition grammars directly as hotkeys for controller functions, thereby eliminating the need for VoiceMacro.

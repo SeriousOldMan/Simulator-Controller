@@ -79,9 +79,12 @@ readLanguage(targetLanguageCode) {
 
 eventMessageDispatcher() {
 	for event, handler in vEventHandlers {
+		if (event = "*")
+			continue
+		
 		pipeName := "\\.\pipe\SCE" . event
 	
-		if DllCall("WaitNamedPipe", "Str", pipeName, "UInt", 0xFF)
+		if DllCall("WaitNamedPipe", "Str", pipeName, "UInt", 0xF)
 			Loop Read, %pipeName%
 			{
 				data := StrSplit(A_LoopReadLine, ":", , 2)
@@ -882,7 +885,7 @@ raiseEvent(event, data, localProcess := false) {
 	else {
 		logMessage(kLogInfo, translate("Raising event """) . event . (data ? translate(""": ") . data : translate("""")))
 		
-		pipe := DllCall("CreateNamedPipe", "str", "\\.\pipe\SCE" . event, "uint", 2, "uint", 0, "uint", 255, "uint", 0, "uint", 0, "uint", 0, ptr, 0, ptr)
+		pipe := DllCall("CreateNamedPipe", "str", "\\.\pipe\SCE" . event, "uint", 3, "uint", 0, "uint", 255, "uint", 0, "uint", 0, "uint", 0, ptr, 0, ptr)
 			
 		DllCall("ConnectNamedPipe", ptr, pipe, ptr, 0)
 		

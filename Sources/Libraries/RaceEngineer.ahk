@@ -42,6 +42,8 @@ class RaceEngineer extends ConfigurationItem {
 	iPitstopHandler := false
 	iRaceSettings := false
 	
+	iLanguage := "en"
+	
 	iName := false	
 	iSpeaker := false
 	iListener := false
@@ -62,6 +64,7 @@ class RaceEngineer extends ConfigurationItem {
 	
 	class RaceEngineerSpeaker extends SpeechGenerator {
 		iEngineer := false
+		iPhrases := {}
 		
 		Engineer[] {
 			Get {
@@ -69,8 +72,15 @@ class RaceEngineer extends ConfigurationItem {
 			}
 		}
 		
-		__New(engineer, speaker) {
+		Phrases[] {
+			Get {
+				return this.iPhrases
+			}
+		}
+		
+		__New(engineer, speaker, phrases) {
 			this.iEngineer := engineer
+			this.iPhrases := phrases
 			
 			if (speaker == true)
 				base.__New()
@@ -78,11 +88,24 @@ class RaceEngineer extends ConfigurationItem {
 				base.__New(speaker)
 		}
 		
-		speak(text) {
+		speak(text, values := false) {
+			phrases := this.Phrases
+			
 			this.Engineer.stopListening()
 			
+			if phrases.HasKey(text) {
+				phrases := phrases[text]
+				
+				Random index, 1, % phrases.Length()
+				
+				text := phrases[Round(index)]
+				
+				if values
+					text := substituteVariables(text, values)
+			}
+				
 			base.speak(text, true)
-			
+				
 			this.Engineer.startListening()
 		}
 	}
@@ -118,6 +141,12 @@ class RaceEngineer extends ConfigurationItem {
 	PitstopHandler[] {
 		Get {
 			return this.iPitstopHandler
+		}
+	}
+	
+	Language[] {
+		Get {
+			return this.iLanguage
 		}
 	}
 	
@@ -179,8 +208,25 @@ class RaceEngineer extends ConfigurationItem {
 		this.iRaceSettings := raceSettings
 		this.iPitstopHandler := pitstopHandler
 		this.iName := name
+		
+		listener := ((speaker != false) ? listener : false)
+		language := getLanguage()
+		
+		if (speaker == true)
+			if (language = "de")
+				speaker := "Microsoft Hedda Desktop"
+			else
+				speaker := "Microsoft Zira Desktop"
+		
+		if (listener == true)
+			if (language = "de")
+				speaker := "Microsoft Server Speech Recognition Language - TELE (de-DE)"
+			else
+				speaker := "Microsoft Server Speech Recognition Language - TELE (en-US)"
+		
+		this.iLanguage := language
 		this.iSpeaker := speaker
-		this.iListener := ((speaker != false) ? listener : false)
+		this.iListener := listener
 		
 		base.__New(configuration)
 	}
@@ -228,7 +274,7 @@ class RaceEngineer extends ConfigurationItem {
 	
 	getSpeaker() {
 		if (this.Speaker && !this.iSpeechGenerator) {
-			this.iSpeechGenerator := new this.RaceEngineerSpeaker(this, this.Speaker)
+			this.iSpeechGenerator := new this.RaceEngineerSpeaker(this, this.Speaker, this.buildPhrases(this.Language))
 			
 			this.getListener()
 		}
@@ -243,7 +289,9 @@ class RaceEngineer extends ConfigurationItem {
 			else
 				recognizer := new SpeechRecognizer()
 			
-			this.buildGrammars(recognizer)
+			this.buildGrammars(recognizer, this.Language)
+			
+			recognizer.startRecognizer()
 			
 			this.iSpeechRecognizer := recognizer
 		}
@@ -252,69 +300,65 @@ class RaceEngineer extends ConfigurationItem {
 	}
 	
 	startListening() {
+		/*
 		if this.iSpeechRecognizer && !this.iIsListening {
 			this.iSpeechRecognizer.startRecognizer()
 			
 			this.iIsListening := true
 		}
+		*/
 	}
 	
 	stopListening() {
+		/*
 		if this.iSpeechRecognizer && this.iIsListening {
 			this.iSpeechRecognizer.stopRecognizer()
 			
 			this.iIsListening := false
 		}
+		*/
 	}
 	
-	buildGrammars(speechRecognizer) {
-		canYouGrammar := speechRecognizer.NewGrammar()
-		canYouGrammar.AppendString(translate("Can you"))
-
-		tellMeGrammar := speechRecognizer.NewGrammar()
-		tellMeGrammar.AppendString(translate("Tell me"))
-
-		giveMeGrammar := speechRecognizer.NewGrammar()
-		giveMeGrammar.AppendString(translate("Give me"))
-
-		whatAreGrammar := speechRecognizer.NewGrammar()
-		whatAreGrammar.AppendString(translate("What are"))
-
-		grammar := speechRecognizer.NewGrammar()
-		grammar.AppendChoices(speechRecognizer.newChoices(translate("Hi"), translate("Hey")))
-		grammar.AppendString("Jona")
-		speechRecognizer.LoadGrammar(grammar, "Jona", ObjBindMethod(this, "phraseRecognized"))
-
-		grammar := speechRecognizer.NewGrammar()
-		grammar.AppendChoices(speechRecognizer.newChoices(translate("Yes go on"), translate("Perfect go on"), translate("Go on please"), translate("Head on please")))
-		speechRecognizer.LoadGrammar(grammar, "Yes", ObjBindMethod(this, "phraseRecognized"))
-
-		grammar := speechRecognizer.NewGrammar()
-		grammar.AppendString(translate("No thank you"))
-		speechRecognizer.LoadGrammar(grammar, "No", ObjBindMethod(this, "phraseRecognized"))
-
-		grammar := speechRecognizer.NewGrammar()
-		grammar.AppendGrammars(tellMeGrammar, giveMeGrammar, whatAreGrammar)
-		grammar.AppendChoices(speechRecognizer.newChoices(translate("the tyre temperatures"), translate("the tyre pressures")))
-		speechRecognizer.LoadGrammar(grammar, "Tyre", ObjBindMethod(this, "phraseRecognized"))
-
-		grammar1 := speechRecognizer.NewGrammar()
-		grammar1.AppendGrammars(tellMeGrammar, giveMeGrammar)
-		grammar1.AppendString(translate("the remaining laps"))
-		grammar2 := speechRecognizer.NewGrammar()
-		grammar2.AppendString(translate("how many laps are remaining"))
-		grammar3 := speechRecognizer.NewGrammar()
-		grammar3.AppendString(translate("how many laps are left"))
-		grammar := speechRecognizer.NewGrammar()
-		grammar.AppendGrammars(grammar1, grammar2, grammar3)
-		speechRecognizer.LoadGrammar(grammar, "Laps", ObjBindMethod(this, "phraseRecognized"))
+	buildPhrases(language) {
+		phrases := {}
+		visited := {}
+		
+		settings := readConfiguration(getFileName("Race Engineer.phrases." . language, kUserConfigDirectory, kConfigDirectory))
+		
+		if (settings.Count() == 0)
+			settings := readConfiguration(getFileName("Race Engineer.phrases.en", kUserConfigDirectory, kConfigDirectory))
+		
+		for ignore, section in ["Conversation", "Information", "Pitstop"]
+			for key, value in getConfigurationSectionValues(settings, section, {}) {
+				key := ConfigurationItem.splitDescriptor(key)[1]
+			
+				if phrases.HasKey(key)
+					phrases[key].Push(value)
+				else
+					phrases[key] := Array(value)
+		}
+		
+		return phrases
+	}
+	
+	buildGrammars(speechRecognizer, language) {
+		settings := readConfiguration(getFileName("Race Engineer.grammars." . language, kUserConfigDirectory, kConfigDirectory))
+		
+		if (settings.Count() == 0)
+			settings := readConfiguration(getFileName("Race Engineer.grammars.en", kUserConfigDirectory, kConfigDirectory))
+		
+		for ignore, section in ["Conversation", "Information", "Pitstop"]
+			for grammar, definition in getConfigurationSectionValues(settings, section, {}) {
+				definition := substituteVariables(definition, {name: this.Name})
+				
+				speechRecognizer.loadGrammar(grammar, speechRecognizer.compileGrammar(definition), ObjBindMethod(this, "phraseRecognized"))
+			}
 	}
 	
 	phraseRecognized(grammar, words) {
 		SplashTextOn 400, 100, , % "Phrase " . grammar . ": " . values2String(" ", words*)
 		Sleep 1000
 		SplashTextOff
-		
 		switch grammar {
 			case "Yes":
 				continuation := this.iContinuation
@@ -322,7 +366,7 @@ class RaceEngineer extends ConfigurationItem {
 				this.iContinuation := false
 				
 				if continuation {
-					this.getSpeaker().speak(translate("Roger, I come back to you as soon as possible."), true)
+					this.getSpeaker().speak("Confirm")
 								
 					Sleep 5000
 
@@ -330,19 +374,45 @@ class RaceEngineer extends ConfigurationItem {
 				}
 			case "No":
 				this.iContinuation := false
-			case this.Name:
+				
+				this.getSpeaker().speak("Okay")
+			case "Call":
+				this.iContinuation := false
+				
 				this.nameRecognized(words)
-			case "Laps":
+			case "LapsRemaining":
 				this.lapInfoRecognized(words)
-			case "Tyre":
+			case "TyreTemperatures":
+				this.iContinuation := false
+				
 				this.tyreInfoRecognized(words)
+			case "TyrePressures":
+				this.iContinuation := false
+				
+				this.tyreInfoRecognized(words)
+			case "PitstopPlan":
+				this.iContinuation := false
+				
+				this.getSpeaker().speak("Confirm")
+		
+				Sleep 5000
+				
+				this.planPitstopRecognized(words)
+			case "PitstopPrepare":
+				this.iContinuation := false
+				
+				this.getSpeaker().speak("Confirm")
+		
+				Sleep 5000
+				
+				this.preparePitstopRecognized(words)
 			default:
 				Throw "Unknown grammar """ . grammar . """ detected in RaceEngineer.phraseRecognized...."
 		}
 	}
 	
 	nameRecognized(words) {
-		this.getSpeaker().speak(translate("I am here. What can I do for you?"), true)
+		this.getSpeaker().speak("IHearYou")
 	}
 	
 	lapInfoRecognized(words) {
@@ -351,10 +421,16 @@ class RaceEngineer extends ConfigurationItem {
 		if !this.hasEnoughData()
 			return
 		
-		this.getSpeaker().speak(translate("You still have " . Round(knowledgeBase.getValue("Lap.Remaining")) . " laps to go."), true)
+		laps := Round(knowledgeBase.getValue("Lap.Remaining"))
+		
+		if (laps == 0)
+			this.getSpeaker().speak("Later")
+		else
+			this.getSpeaker().speak("Laps", {laps: laps})
 	}
 	
 	tyreInfoRecognized(words) {
+		local value
 		local knowledgeBase := this.KnowledgeBase
 		
 		if !this.hasEnoughData()
@@ -370,19 +446,34 @@ class RaceEngineer extends ConfigurationItem {
 		else if inList(words, pressures)
 			value := "Pressure"
 		else {
-			speaker.speak(translate("Sorry, I did not understand. Can you repeat?"), true)
+			speaker.speak("Repeat")
 		
 			return
 		}
 		
 		lap := knowledgeBase.getValue("Lap")
 		
-		speaker.speak(translate("Ok, the " ((value == "Pressure") ? pressures : temperatures) . " are:"), true)
+		speaker.speak((value == "Pressure") ? "Pressures" : "Temperatures")
 		
-		speaker.speak(translate("Front Left " . Round(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".FL"), 1)), true)
-		speaker.speak(translate("Front Right " . Round(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".FR"), 1)), true)
-		speaker.speak(translate("Rear Left " . Round(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".RL"), 1)), true)
-		speaker.speak(translate("Rear Right " . Round(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".RR"), 1)), true)
+		speaker.speak("TyreFL", {value: Round(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".FL"), 1)
+							   , unit: (value == "Pressure") ? translate("PSI") : translate("Degrees")})
+		
+		speaker.speak("TyreFR", {value: Round(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".FR"), 1)
+							   , unit: (value == "Pressure") ? translate("PSI") : translate("Degrees")})
+		
+		speaker.speak("TyreRL", {value: Round(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".RL"), 1)
+							   , unit: (value == "Pressure") ? translate("PSI") : translate("Degrees")})
+		
+		speaker.speak("TyreRR", {value: Round(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".RR"), 1)
+							   , unit: (value == "Pressure") ? translate("PSI") : translate("Degrees")})
+	}
+	
+	planPitstopRecognized(words) {
+		this.planPitstop()
+	}
+	
+	preparePitstopRecognized(words) {
+		this.preparePitstop()
 	}
 	
 	setContinuation(continuation) {
@@ -416,7 +507,7 @@ class RaceEngineer extends ConfigurationItem {
 		result := this.KnowledgeBase.produce()
 			
 		if this.Speaker
-			this.getSpeaker().speak(translate("Hi, I am " . this.Name . ", your race engineer today. You can call me anytime if you have questions. Good luck."), true)
+			this.getSpeaker().speak("Greeting", {name: this.Name})
 		
 		if isDebug()
 			dumpKnowledge(this.KnowledgeBase)
@@ -433,7 +524,7 @@ class RaceEngineer extends ConfigurationItem {
 		this.iEnoughData := false
 			
 		if this.Speaker {
-			this.getSpeaker().speak(translate("Yeah, what a race. Thanks for the excellent job."), true)
+			this.getSpeaker().speak("Bye")
 			
 			this.stopListening()
 		}
@@ -533,7 +624,7 @@ class RaceEngineer extends ConfigurationItem {
 		if this.EnoughData
 			return true
 		else if this.Speaker {
-			this.getSpeaker().speak(translate("Sorry, I do not have enough data yet. Please come back in one or two laps."))
+			this.getSpeaker().speak("Later")
 			
 			return false
 		}
@@ -549,6 +640,7 @@ class RaceEngineer extends ConfigurationItem {
 	
 	planPitstop() {
 		local knowledgeBase := this.KnowledgeBase
+		local compound
 		
 		if !this.hasEnoughData()
 			return
@@ -561,38 +653,41 @@ class RaceEngineer extends ConfigurationItem {
 			dumpKnowledge(this.KnowledgeBase)
 		
 		if this.Speaker {
-			pitstopPlan := translate("Ok, we have the following for Pitstop number ") . knowledgeBase.getValue("Pitstop.Planned.Nr") . translate(".")
+			speaker := this.getSpeaker()
+			
+			speaker.speak("Pitstop", {number: knowledgeBase.getValue("Pitstop.Planned.Nr")})
 				
 			fuel := knowledgeBase.getValue("Pitstop.Planned.Fuel", 0)
 			if (fuel == 0)
-				pitstopPlan .= "`n" . translate("Refueling is not necessary.")
+				speaker.speak("NoRefuel")
 			else
-				pitstopPlan .= "`n" . translate("We have to refuel ") . Round(fuel) . translate(" litres.")
+				speaker.speak("Refuel", {litres: Round(fuel)})
 			
-			pitstopPlan .= "`n" . translate("We will use ") . knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound")
-			pitstopPlan .= translate(" tyre compound and tyre set number ") . knowledgeBase.getValue("Pitstop.Planned.Tyre.Set") . translate(".")
+			compound := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound")
+			if (compound = "Dry")
+				speaker.speak((compound = "Dry") ? "DryTyres" : "WetTyres", {compound: compound, set: knowledgeBase.getValue("Pitstop.Planned.Tyre.Set")})
+			else
+				speaker.speak("WetTyres", {compound: compound, set: knowledgeBase.getValue("Pitstop.Planned.Tyre.Set")})
 			
-			pitstopPlan .= "`n" . translate("Pressure front left ") . Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL"), 1) . translate(".")
-			pitstopPlan .= "`n" . translate("Pressure front right ") . Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR"), 1) . translate(".")
-			pitstopPlan .= "`n" . translate("Pressure rear left ") . Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL"), 1) . translate(".")
-			pitstopPlan .= "`n" . translate("Pressure rear right ") . Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR"), 1) . translate(".")
+			speaker.speak("NewPressures")
+			
+			speaker.speak("TyreFL", {value: Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL"), 1), unit: translate("PSI")})
+			speaker.speak("TyreFR", {value: Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR"), 1), unit: translate("PSI")})
+			speaker.speak("TyreRL", {value: Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL"), 1), unit: translate("PSI")})
+			speaker.speak("TyreRR", {value: Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR"), 1), unit: translate("PSI")})
 
 			if knowledgeBase.getValue("Pitstop.Planned.Repair.Suspension", false)
-				pitstopPlan .= "`n" . translate("We will repair the suspension.")
+				speaker.speak("RepairSuspension")
 			else
-				pitstopPlan .= "`n" . translate("The suspension looks fine.")
+				speaker.speak("NoRepairSuspension")
 
 			if knowledgeBase.getValue("Pitstop.Planned.Repair.Bodywork", false)
-				pitstopPlan .= "`n" . translate("Bodywork and aerodynamic elements should be repaired.")
+				speaker.speak("RepairBodywork")
 			else
-				pitstopPlan .= "`n" . translate("Bodywork and aerodynamic elements should be good.")
-			
-			speaker := this.getSpeaker()
-			
-			speaker.speak(pitstopPlan)
+				speaker.speak("NoRepairBodywork")
 				
 			if this.Listener {
-				speaker.speak(translate("Should I instruct the pit crew?"))
+				speaker.speak("ConfirmPrepare")
 				
 				this.setContinuation(ObjBindMethod(this, "preparePitstop"))
 			}
@@ -610,13 +705,13 @@ class RaceEngineer extends ConfigurationItem {
 			if this.Speaker {
 				speaker := this.getSpeaker()
 
+				speaker.speak("MissingPlan")
+				
 				if this.Listener {
-					speaker.speak(translate("I have not planned a pitstop yet. Should I update the pitstop strategy now?"))
+					speaker.speak("ConfirmPlan")
 				
 					this.setContinuation(ObjBindMethod(this, "planPitstop"))
 				}
-				else
-					speaker.speak(translate("Sorry, I have not planned a pitstop yet."))
 			}
 			
 			return false
@@ -626,9 +721,9 @@ class RaceEngineer extends ConfigurationItem {
 				speaker := this.getSpeaker()
 
 				if lap
-					speaker.speak(translate("Ok, I will let the crew prepare the pitstop for lap ") . lap . translate("."))
+					speaker.speak("PrepareLap", {lap: lap})
 				else
-					speaker.speak(translate("Ok, I will let the crew prepare the pitstop immediately. Come in whenever you want."))
+					speaker.speak("PrepareNow")
 			}
 				
 			if !lap
@@ -651,7 +746,7 @@ class RaceEngineer extends ConfigurationItem {
 	
 	performPitstop() {
 		if this.Speaker
-			this.getSpeaker().speak(translate("Ok, let the crew do their job. Check ignition, relax and prepare for engine restart."))
+			this.getSpeaker().speak("Perform")
 				
 		this.KnowledgeBase.addFact("Pitstop.Lap", this.KnowledgeBase.getValue("Lap"))
 		
@@ -670,21 +765,21 @@ class RaceEngineer extends ConfigurationItem {
 		if this.Speaker {
 			speaker := this.getSpeaker()
 			
-			speaker.speak(translate("Here is " . this.Name . ". You have fuel left for ") . remainingLaps . translate(" laps."))
+			speaker.speak((remainingLaps <= 2) ? "VeryLowFuel" : "LowFuel", {name: this.Name, laps: remainingLaps})
 		
 			if this.Listener {
 				if !this.hasPlannedPitstop() {
-					speaker.speak(translate("Should I update the pitstop strategy now?"))
+					speaker.speak("ConfirmPlan")
 					
 					this.setContinuation(ObjBindMethod(this, "planPitstop"))
 				}
 				else if !this.hasPreparedPitstop() {
-					speaker.speak(translate("Should I instruct the crew for the pitstop?"))
+					speaker.speak("ConfirmPrepare")
 					
 					this.setContinuation(ObjBindMethod(this, "preparePitstop"))
 				}
 				else
-					speaker.speak(translate("You should come in as soon as possible."))
+					speaker.speak((remainingLaps <= 2) ? "LowComeIn" : "ComeIn")
 			}
 		}
 	}
@@ -768,4 +863,10 @@ dumpKnowledge(knowledgeBase) {
 	
 		FileAppend %text%, %kUserHomeDirectory%Temp\Race Engineer.knowledge
 	}
+}
+
+debugShow(ignore, args*) {
+	MsgBox % "Debug: " . values2String(", ", args*)
+	
+	return true
 }

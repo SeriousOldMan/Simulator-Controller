@@ -1218,7 +1218,12 @@ updateSimulatorState() {
 			isSimulatorRunning := !isSimulatorRunning
 		
 			if isSimulatorRunning {
-				raiseEvent("Shutdown", "exitStartup")
+				try {
+					Send {Escape}
+				}
+				catch excepton {
+					; ignore
+				}
 				
 				controller.simulatorStartup(controller.ActiveSimulator)
 			}

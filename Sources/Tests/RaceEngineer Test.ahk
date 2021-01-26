@@ -88,11 +88,7 @@ AHKUnit.Run()
 */
 
 
-showHere(kb, args*) {
-	MsgBox % "Here: " . values2String(", ", args*)
-	
-	return true
-}
+
 
 engineer := new RaceEngineer(false, readConfiguration(getFileName("Race Engineer.settings", kUserConfigDirectory, kConfigDirectory))
 						   , false, "Jona", "Microsoft Zira Desktop", "Microsoft Server Speech Recognition Language - TELE (en-US)") ; "Microsoft Server Speech Recognition Language - Kinect (en-AU)"
@@ -106,6 +102,8 @@ Loop {
 	else {
 		engineer.addLap(A_Index, data)
 	
+		dumpKnowledge(engineer.KnowledgeBase)
+		
 		MsgBox % "Lap " . A_Index . " loaded - Continue?"
 	}
 }

@@ -386,7 +386,7 @@ updateTranslations() {
 		if FileExist(getFileName(kConfigDirectory . "Translations." . languageCode))
 			originalLanguageCode := languageCode
 		else
-			originalLanguageCode := "EN"
+			originalLanguageCode := "en"
 			
 		for original, translation in readTranslations(originalLanguageCode, false)
 			if !translations.HasKey(original)

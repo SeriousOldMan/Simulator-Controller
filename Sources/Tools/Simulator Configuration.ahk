@@ -548,7 +548,7 @@ class GeneralTab extends ConfigurationItemTab {
 			if (language == languageDropDown)
 				chosen := A_Index
 				
-			if (code = "EN")
+			if (code = "en")
 				enIndex := A_Index
 		}
 		
@@ -685,7 +685,7 @@ class GeneralTab extends ConfigurationItemTab {
 				if (language == languageDropDown)
 					chosen := A_Index
 				
-				if (code = "EN")
+				if (code = "en")
 					enIndex := A_Index
 			}
 			
@@ -2564,7 +2564,7 @@ class TranslationsEditor extends ConfigurationItem {
 		
 		GuiControlGet isoCodeEdit
 		
-		this.iTranslationsList.loadTranslations((isoCodeEdit != "") ? isoCodeEdit : "EN")
+		this.iTranslationsList.loadTranslations((isoCodeEdit != "") ? isoCodeEdit : "en")
 		
 		Loop
 			Sleep 200
@@ -2655,14 +2655,14 @@ class TranslationsEditor extends ConfigurationItem {
 			languageCode := kUndefined
 
 			for code, language in availableLanguages()
-				if ((language = translationLanguageDropDown) && (code != "EN"))
+				if ((language = translationLanguageDropDown) && (code != "en"))
 					languageCode := code
 			
 			if (languageCode != kUndefined)
 				for ignore, fileName in getFileNames("Translations." . languageCode, kUserConfigDirectory, kConfigDirectory)
 					FileDelete %fileName%
 			
-			this.chooseLanguage("EN")
+			this.chooseLanguage("en")
 		}
 	}
 	
@@ -2798,11 +2798,11 @@ class TranslationsList extends ConfigurationItemList {
 		for ignore, translation in this.iItemsList
 			LV_Add("", translation[1], translation[2])
 		
-		if (first || (this.iLanguageCode = "EN")) {
+		if (first || (this.iLanguageCode = "en")) {
 			LV_ModifyCol()
 			LV_ModifyCol(1, 150)
 			
-			if (this.iLanguageCode = "EN")
+			if (this.iLanguageCode = "en")
 				LV_ModifyCol(2, 300)
 			
 			first := false
@@ -2854,7 +2854,7 @@ class TranslationsList extends ConfigurationItemList {
 	}
 	
 	newTranslations() {
-		this.loadTranslations("EN")
+		this.loadTranslations("en")
 		
 		this.iChanged := true
 	}

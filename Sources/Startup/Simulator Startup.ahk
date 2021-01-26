@@ -265,8 +265,6 @@ startSimulator() {
 	
 	settings := readConfiguration(kSimulatorSettingsFile)
 	
-	registerEventHandler("Shutdown", "handleShutdownEvents")
-	
 	new SimulatorStartup(kSimulatorConfiguration, settings).startup()
 }
 
@@ -284,33 +282,6 @@ playSong(songFile) {
 		
 		SetTimer playSongRemote, 50
 	}
-}
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                          Event Handler Section                          ;;;
-;;;-------------------------------------------------------------------------;;;
-
-exitStartup() {
-	if !vStartupFinished
-		SetTimer exitStartup, -200
-	else
-		ExitApp 0
-}
-
-handleShutdownEvents(event, data) {
-	local function
-	
-	if InStr(data, ":") {
-		data := StrSplit(data, ":")
-		
-		function := data[1]
-		arguments := arguments := string2Values(",", data[2])
-			
-		withProtection(function, arguments*)
-	}
-	else	
-		withProtection(data)
 }
 
 

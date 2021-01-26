@@ -44,13 +44,15 @@ class SpeechGenerator {
 		Loop, % this.iSpeechGenerator.GetVoices.Count
 			this.Voices.Push(this.iSpeechGenerator.GetVoices.Item(A_Index-1).GetAttribute("Name"))
 	
-		if !voice {
-			voices := this.Voices
-			
-			voice := voices[1]
-		}
+		voices := this.Voices
 		
-		this.setVoice(voice)
+		if (voice && (voice != true))
+			voice := inList(voices, voice)
+		
+		if !voice
+			voice := 1
+		
+		this.setVoice(voices[voice])
 	}
 
 	speak(text, wait := true) {

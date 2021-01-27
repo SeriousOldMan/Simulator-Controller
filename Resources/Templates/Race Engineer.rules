@@ -129,7 +129,7 @@ updateTargetPressures([?tyreType | ?tyreTypes], [?deviation | ?deviations]) <=		
 [?Tyre.Pressure.Deviation.Abs.RL > ?Race.Settings.Tyre.Pressure.Deviation] => (Prove: updateTargetPressure, RL, !Tyre.Pressure.Deviation.RL)
 [?Tyre.Pressure.Deviation.Abs.RR > ?Race.Settings.Tyre.Pressure.Deviation] => (Prove: updateTargetPressure, RR, !Tyre.Pressure.Deviation.RR)
 
-updateTargetPressure(?tyreType, ?deviation) <= lastPressure(?tyreType, ?pressure), Minus(?targetPressure, ?pressure, ?deviation), 			\
+updateTargetPressure(?tyreType, ?deviation) <= lastPressure(?tyreType, ?pressure), Minus(?targetPressure, ?pressure, ?deviation), 				\
 											   Append(?fact, Tyre.Pressure.Target., ?tyreType), Set(?fact, ?targetPressure)
 
 lastPressure(?tyreType, ?pressure) <= pitstopPressure(?tyreType, ?pressure), !

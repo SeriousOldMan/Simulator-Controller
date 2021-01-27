@@ -1604,50 +1604,6 @@
       </MacroActions>
     </Commands>
     <Commands>
-      <GUID>159a9e0f-048c-46e6-94b1-2ac50ec02416</GUID>
-      <RecocnitionText>Race Engineer Pitstop Plan</RecocnitionText>
-      <ShortCut>
-        <Key>None</Key>
-        <OnKeyAction>0</OnKeyAction>
-        <Clicks>0</Clicks>
-      </ShortCut>
-      <UseRecognition>true</UseRecognition>
-      <MacroActions>
-        <MacroAction>
-          <MacroType>1</MacroType>
-          <Keyboard>
-            <Key>F7</Key>
-            <ClickDownUp>0</ClickDownUp>
-            <Alt>true</Alt>
-            <lCTRL>true</lCTRL>
-            <ClickDuration>20</ClickDuration>
-          </Keyboard>
-        </MacroAction>
-      </MacroActions>
-    </Commands>
-    <Commands>
-      <GUID>17e104ac-d5a9-4227-9662-2d195fdb0393</GUID>
-      <RecocnitionText>Race Engineer Pitstop Prepare</RecocnitionText>
-      <ShortCut>
-        <Key>None</Key>
-        <OnKeyAction>0</OnKeyAction>
-        <Clicks>0</Clicks>
-      </ShortCut>
-      <UseRecognition>true</UseRecognition>
-      <MacroActions>
-        <MacroAction>
-          <MacroType>1</MacroType>
-          <Keyboard>
-            <Key>F8</Key>
-            <ClickDownUp>0</ClickDownUp>
-            <Alt>true</Alt>
-            <lCTRL>true</lCTRL>
-            <ClickDuration>20</ClickDuration>
-          </Keyboard>
-        </MacroAction>
-      </MacroActions>
-    </Commands>
-    <Commands>
       <GUID>302ce1ac-4cbb-4117-ac34-7f66f55a8622</GUID>
       <RecocnitionText>Control Next</RecocnitionText>
       <ShortCut>

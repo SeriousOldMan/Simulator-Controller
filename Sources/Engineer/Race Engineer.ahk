@@ -72,7 +72,7 @@ class RemotePitstopHandler {
 	}
 	
 	pitstopPrepared() {
-		return his.callRemote("pitstopPrepared")
+		return this.callRemote("pitstopPrepared")
 	}
 	
 	pitstopFinished() {

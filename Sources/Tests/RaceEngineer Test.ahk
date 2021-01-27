@@ -91,11 +91,12 @@ AHKUnit.Run()
 
 
 engineer := new RaceEngineer(false, readConfiguration(getFileName("Race Engineer.settings", kUserConfigDirectory, kConfigDirectory))
-						   , false, "Jona", "Microsoft Zira Desktop", "Microsoft Server Speech Recognition Language - TELE (en-US)") ; "Microsoft Server Speech Recognition Language - Kinect (en-AU)"
+;						   , false, "Jona", "Microsoft Zira Desktop", "Microsoft Server Speech Recognition Language - TELE (en-US)")
+						   , false, "Jona", "Microsoft David Desktop", "Microsoft Server Speech Recognition Language - Kinect (en-AU)")
 
 
 Loop {
-	data := readConfiguration(kSourcesDirectory . "Tests\Lap " . A_Index . ".data")
+	data := readConfiguration(kSourcesDirectory . "Tests\Race Data\Lap " . A_Index . ".data")
 	
 	if (data.Count() == 0)
 		break

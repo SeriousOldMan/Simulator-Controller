@@ -300,23 +300,61 @@ class RaceEngineer extends ConfigurationItem {
 	}
 	
 	startListening() {
-		/*
-		if this.iSpeechRecognizer && !this.iIsListening {
-			this.iSpeechRecognizer.startRecognizer()
+		if this.iSpeechRecognizer && !this.iIsListening
+			try {
+				this.iSpeechRecognizer.startRecognizer()
 			
-			this.iIsListening := true
-		}
-		*/
+				this.iIsListening := true
+			}
+			catch exception {
+				; might still be listening - see stopListening
+				
+				Loop 10
+					try {
+						this.iSpeechRecognizer.startRecognizer()
+			
+						this.iIsListening := true
+						
+						break
+					}
+					catch {
+						; ignore
+						
+						Sleep 200
+					}
+				
+				if !this.iIsListening && isDebug()
+					Throw exception
+			}
 	}
 	
 	stopListening() {
-		/*
-		if this.iSpeechRecognizer && this.iIsListening {
-			this.iSpeechRecognizer.stopRecognizer()
+		if this.iSpeechRecognizer && this.iIsListening
+			try {
+				this.iSpeechRecognizer.stopRecognizer()
 			
-			this.iIsListening := false
-		}
-		*/
+				this.iIsListening := false
+			}
+			catch {
+				; if the recognizer is currently recognizing, it can't be stopped
+				
+				Loop 10
+					try {
+						this.iSpeechRecognizer.stopRecognizer()
+			
+						this.iIsListening := false
+						
+						break
+					}
+					catch {
+						; ignore
+						
+						Sleep 200
+					}
+				
+				if this.iIsListening && isDebug()
+					Throw exception
+			}
 	}
 	
 	buildPhrases(language) {

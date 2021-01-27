@@ -38,7 +38,8 @@ global kProveAll = "ProveAll:"
 global kSet = "Set:"
 global kClear = "Clear:"
 
-global kBuiltinFunctions = ["option", "plus", "minus", "multiply", "divide", "greater", "less", "append", "get"]
+global kBuiltinFunctors = ["option", "plus", "minus", "multiply", "divide", "greater", "less", "append", "get"]
+global kBuiltinAritys = [2, 3, 3, 3, 3, 2, 2, -1, 2]
 
 global kProduction = "Production"
 global kReduction = "Reduction"
@@ -1478,7 +1479,9 @@ class ResultSet {
 			case "fail":
 				return new FailChoicePoint(this, goal, environment)
 			default:
-				if inList(kBuiltinFunctions, functor)
+				builtin := inList(kBuiltinFunctors, functor)
+				
+				if (builtin && ((kBuiltinAritys[builtin] == goal.Arity) || (kBuiltinAritys[builtin] == -1)))
 					return new CallChoicePoint(this, goal, environment)
 				else
 					return new RulesChoicePoint(this, goal, environment)
@@ -1833,7 +1836,7 @@ class CallChoicePoint extends ChoicePoint {
 			if (index == 1) {
 				function := theTerm.getValue(resultSet, theTerm).toString(resultSet)
 				
-				builtin := inList(kBuiltinFunctions, function)
+				builtin := inList(kBuiltinFunctors, function)
 			}
 			else {
 				value := theTerm.getValue(resultSet, theTerm)

@@ -146,7 +146,7 @@ lastPressure(?tyreType, ?pressure) <= setupPressure(?tyreType, ?pressure)
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                     Danage Repair Target Calculation                    ;;;
+;;;                Damage Warning & Repair Target Calculation               ;;;
 ;;;                                                                         ;;;
 ;;; These rules check for current damage and suggest repairing based on     ;;;
 ;;; general settings (see "Race.Settings.Damage.Repair") or perceived       ;;;
@@ -181,6 +181,15 @@ repairDamage(?, Always, ?)
 repairDamage(?type, Threshold, ?damage) <= Append(?fact, Race.Settings.Damage., ?type, .Repair.Threshold),										\
 										   Get(?threshold, ?fact), Greater(?damage, ?threshold)
 repairDamage(?, Impact, ?) <= notYetImplemented()
+
+[?Lap] => (Prove: reportNewDamage, ?Lap)
+
+reportNewDamage(1) <= !, lapDamage(?lap, Suspension, ?lSDamage), lapDamage(?lap, Bodywork, ?lBDamage),											\
+						 greater(0, ?lSDamage, ?sGreater), greater(0, ?lBDamage, ?bGreater), Call(damageWarning, ?sGreater, ?bGreater)
+reportNewDamage(?lap) <= lapDamage(?lap, Suspension, ?lSDamage), lapDamage(?lap, Bodywork, ?lBDamage),											\
+						 Minus(?pLap, ?lap, 1), lapDamage(?pLap, Suspension, ?pSDamage), lapDamage(?lap, Bodywork, ?pBDamage),					\
+						 greater(?pSDamage, ?lSDamage, ?sGreater), greater(?pBDamage, ?lBDamage, ?bGreater),									\
+						 Call(damageWarning, ?sGreater, ?bGreater)
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -397,4 +406,7 @@ min(?x, ?y, ?y)
 
 abs(?x, ?r) <= Less(?x, 0), Multiply(?r, ?x, -1), !
 abs(?x, ?x)
+
+greater(?x, ?y, true) <= Greater(?x, ?y), !
+greater(?x, ?y, false)
 

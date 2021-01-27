@@ -357,7 +357,7 @@ class RaceEngineer extends ConfigurationItem {
 		if (settings.Count() == 0)
 			settings := readConfiguration(getFileName("Race Engineer.phrases.en", kUserConfigDirectory, kConfigDirectory))
 		
-		for ignore, section in ["Conversation", "Information", "Pitstop"]
+		for ignore, section in ["Conversation", "Information", "Warning", "Pitstop"]
 			for key, value in getConfigurationSectionValues(settings, section, {}) {
 				key := ConfigurationItem.splitDescriptor(key)[1]
 			
@@ -715,7 +715,7 @@ class RaceEngineer extends ConfigurationItem {
 		if this.Speaker {
 			speaker := this.getSpeaker()
 			
-			speaker.speakPhrase("Pitstop", {number: pitstopNumber})
+			speaker.speakPhrase("Pitstop", {name: this.Name, number: pitstopNumber})
 				
 			fuel := knowledgeBase.getValue("Pitstop.Planned.Fuel", 0)
 			if (fuel == 0)
@@ -840,6 +840,24 @@ class RaceEngineer extends ConfigurationItem {
 		}
 	}
 	
+	damageWarning(newSuspensionDamage, newBodyworkDamage) {
+		if this.Speaker {
+			speaker := this.getSpeaker()
+			phrase := false
+			
+			if (newSuspensionDamage && newBodyworkDamage)
+				phrase := "BothDamage"
+			else if newSuspensionDamage
+				phrase := "SuspensionDamage"
+			else if newBodyworkDamage
+				phrase := "BodyworkDamage"
+			
+			speaker.speakPhrase(phrase, {name: this.Name})
+		
+			speaker.speakPhrase("DamageAnalysis")
+		}
+	}
+	
 	startPitstopSetup(pitstopNumber) {
 		if this.PitstopHandler
 			this.PitstopHandler.startPitstopSetup(pitstopNumber)
@@ -884,6 +902,12 @@ class RaceEngineer extends ConfigurationItem {
 
 lowFuelWarning(context, remainingLaps) {
 	context.KnowledgeBase.RaceEngineer.lowFuelWarning(Round(remainingLaps))
+	
+	return true
+}
+
+damageWarning(context, newSuspensionDamage, newBodyworkDamage) {
+	context.KnowledgeBase.RaceEngineer.damageWarning(newSuspensionDamage, newBodyworkDamage)
 	
 	return true
 }

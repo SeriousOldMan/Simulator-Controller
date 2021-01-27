@@ -89,52 +89,52 @@ AHKUnit.Run()
 
 class TestPitstopHandler {
 	showAction(action, arguments*) {
-		SplashTextOn 400, 100, , % "Invoking pitstop action " . action . " with " . values2String(", ", arguments*)
+		SplashTextOn 400, 100, , % "Invoking pitstop action " . action . ((arguments.Length() > 0) ? (" with " . values2String(", ", arguments*)) : "")
 		Sleep 5000
 		SplashTextOff
 	}
 
-	pitstopPlanned() {
-		this.showAction("pitstopPlanned")
+	pitstopPlanned(arguments*) {
+		this.showAction("pitstopPlanned", arguments*)
 	}
 	
-	pitstopPrepared() {
-		this.showAction("pitstopPrepared")
+	pitstopPrepared(arguments*) {
+		this.showAction("pitstopPrepared", arguments*)
 	}
 	
-	pitstopFinished() {
-		this.showAction("pitstopFinished")
+	pitstopFinished(arguments*) {
+		this.showAction("pitstopFinished", arguments*)
 	}
 	
-	startPitstopSetup() {
-		this.showAction("startPitstopSetup")
+	startPitstopSetup(arguments*) {
+		this.showAction("startPitstopSetup", arguments*)
 	}
 
-	finishPitstopSetup() {
-		this.showAction("finishPitstopSetup")
+	finishPitstopSetup(arguments*) {
+		this.showAction("finishPitstopSetup", arguments*)
 	}
 
-	setPitstopRefuelAmount(litres) {
-		this.showAction("setPitstopRefuelAmount", litres)
+	setPitstopRefuelAmount(arguments*) {
+		this.showAction("setPitstopRefuelAmount", arguments*)
 	}
 	
-	setPitstopTyreSet(compound, set := false) {
-		this.showAction("setPitstopTyreSet", compound, set)
+	setPitstopTyreSet(arguments*) {
+		this.showAction("setPitstopTyreSet", arguments*)
 	}
 
-	setPitstopTyrePressures(pressureFLIncrement, pressureFRIncrement, pressureRLIncrement, pressureRRIncrement) {
-		this.showAction("setPitstopTyrePressures", pressureFLIncrement, pressureFRIncrement, pressureRLIncrement, pressureRRIncrement)
+	setPitstopTyrePressures(arguments*) {
+		this.showAction("setPitstopTyrePressures", arguments*)
 	}
 
-	requestPitstopRepairs(repairSuspension, repairBodywork) {
-		this.showAction("requestPitstopRepairs", repairSuspension, repairBodywork)
+	requestPitstopRepairs(arguments*) {
+		this.showAction("requestPitstopRepairs", arguments*)
 	}
 }
 
 
 engineer := new RaceEngineer(false, readConfiguration(getFileName("Race Engineer.settings", kUserConfigDirectory, kConfigDirectory))
-						   , new TestPitStopHandler(), "Jona", "Microsoft Zira Desktop", "Microsoft Server Speech Recognition Language - TELE (en-US)")
-;						   , new TestPitStopHandler(), "Jona", "Microsoft David Desktop", "Microsoft Server Speech Recognition Language - Kinect (en-AU)")
+;						   , new TestPitStopHandler(), "Jona", "Microsoft Zira Desktop", "Microsoft Server Speech Recognition Language - TELE (en-US)")
+						   , new TestPitStopHandler(), "Jona", "Microsoft David Desktop", "Microsoft Server Speech Recognition Language - Kinect (en-AU)")
 
 
 Loop {

@@ -238,21 +238,26 @@ planPitstop() <= Set(Pitstop.Planned.Nr, 1)
 
 {All: [?Pitstop.Planned], [?Pitstop.Planned.Lap <= ?Lap]} => (Set: Pitstop.Prepare, true)
 
-{All: [?Pitstop.Planned], [?Pitstop.Prepare]} => (ProveAll: preparePitstop)
+{All: [?Pitstop.Planned], [?Pitstop.Prepare]} => (ProveAll: preparePitstop, !Pitstop.Planned.Nr)
 priority: -10, {All: [?Pitstop.Planned], [?Pitstop.Prepare]} => (Clear: Pitstop.Planned), (Clear: Pitstop.Prepare),								\
 																(Set: Pitstop.Prepared, true)
 
-preparePitstop() <= Call(startPitstopSetup)
-preparePitstop() <= setRefuelAmount(), setTyreSet(), setTyrePressures(), requestRepairs()
-preparePitstop() <= Call(finishPitstopSetup)
+preparePitstop(?pitstopNumber) <= Call(startPitstopSetup, ?pitstopNumber)
+preparePitstop(?pitstopNumber) <= setRefuelAmount(?pitstopNumber),																				\
+								  setTyreSet(?pitstopNumber), setTyrePressures(?pitstopNumber),													\
+								  requestRepairs(?pitstopNumber)
+preparePitstop(?pitstopNumber) <= Call(finishPitstopSetup, ?pitstopNumber)
 
-setRefuelAmount() <= Call(setPitstopRefuelAmount, !Pitstop.Planned.Fuel)
+setRefuelAmount(?pitstopNumber) <= Call(setPitstopRefuelAmount, ?pitstopNumber, !Pitstop.Planned.Fuel)
 
-setTyreSet() <= Call(setPitstopTyreSet, !Pitstop.Planned.Tyre.Compound, !Pitstop.Planned.Tyre.Set)
-setTyrePressures() <= Call(setPitstopTyrePressures, !Pitstop.Planned.Tyre.Pressure.FL.Increment, !Pitstop.Planned.Tyre.Pressure.FR.Increment,	\
-													!Pitstop.Planned.Tyre.Pressure.RL.Increment, !Pitstop.Planned.Tyre.Pressure.RR.Increment)
+setTyreSet(?pitstopNumber) <= Call(setPitstopTyreSet, ?pitstopNumber, !Pitstop.Planned.Tyre.Compound, !Pitstop.Planned.Tyre.Set)
+setTyrePressures(?pitstopNumber) <=																												\
+		Call(setPitstopTyrePressures, ?pitstopNumber,																							\
+									  !Pitstop.Planned.Tyre.Pressure.FL.Increment, !Pitstop.Planned.Tyre.Pressure.FR.Increment,					\
+									  !Pitstop.Planned.Tyre.Pressure.RL.Increment, !Pitstop.Planned.Tyre.Pressure.RR.Increment)
 
-requestRepairs() <= Call(requestPitstopRepairs, !Pitstop.Planned.Repair.Suspension, !Pitstop.Planned.Repair.Bodywork)
+requestRepairs(?pitstopNumber) <= Call(requestPitstopRepairs, ?pitstopNumber,																	\
+															  !Pitstop.Planned.Repair.Suspension, !Pitstop.Planned.Repair.Bodywork)
 
 
 ;;;-------------------------------------------------------------------------;;;

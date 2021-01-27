@@ -76,32 +76,32 @@ class ACCPlugin extends ControllerPlugin {
 			raiseEvent("Race", function . ":" . values2String(";", arguments*))
 		}
 		
-		shutdown() {
-			return this.callRemote("shutdown")
+		shutdown(arguments*) {
+			return this.callRemote("shutdown", arguments*)
 		}
 		
-		startRace(dataFile) {
-			return this.callRemote("startRace", dataFile)
+		startRace(arguments*) {
+			return this.callRemote("startRace", arguments*)
 		}
 		
-		finishRace() {
-			return this.callRemote("finishRace")
+		finishRace(arguments*) {
+			return this.callRemote("finishRace", arguments*)
 		}
 		
-		addLap(lapNumber, dataFile) {
-			return this.callRemote("addLap", lapNumber, dataFile)
+		addLap(arguments*) {
+			return this.callRemote("addLap", arguments*)
 		}
 		
-		planPitstop() {
-			return this.callRemote("planPitstop")
+		planPitstop(arguments*) {
+			return this.callRemote("planPitstop", arguments*)
 		}
 		
-		preparePitstop(lap := false) {
-			return this.callRemote("preparePitstop", lap)
+		preparePitstop(arguments*) {
+			return this.callRemote("preparePitstop", arguments*)
 		}
 		
-		performPitstop() {
-			return this.callRemote("performPitstop")
+		performPitstop(arguments*) {
+			return this.callRemote("performPitstop", arguments*)
 		}
 	}
 	
@@ -602,7 +602,7 @@ class ACCPlugin extends ControllerPlugin {
 		this.requirePitstopMFD()
 			
 		if this.selectPitstopOption("Compound")
-			switch selection {
+			switch type {
 				case "Wet":
 					this.changePitstopOption("Compound", "Increase")
 				case "Dry":
@@ -1012,13 +1012,13 @@ class ACCPlugin extends ControllerPlugin {
 		SetTimer collectRaceData, 10000
 	}
 	
-	startPitstopSetup() {
+	startPitstopSetup(pitstopNumber) {
 		openPitstopMFD()
 		
 		changePitstopStrategy("Previous", 5)
 	}
 
-	finishPitstopSetup() {
+	finishPitstopSetup(pitstopNumber) {
 		closePitstopMFD()
 		
 		if this.RaceEngineerVoice {
@@ -1028,18 +1028,18 @@ class ACCPlugin extends ControllerPlugin {
 		}
 	}
 
-	setPitstopRefuelAmount(litres) {
+	setPitstopRefuelAmount(pitstopNumber, litres) {
 		changePitstopFuelAmount("Increase", Round(litres))
 	}
 	
-	setPitstopTyreSet(compound, set := false) {
+	setPitstopTyreSet(pitstopNumber, compound, set := false) {
 		changePitstopTyreCompound(compound)
 		
 		if (compound = "Dry")
 			changePitstopTyreSet("Next", set - 1)
 	}
 
-	setPitstopTyrePressures(pressureFLIncrement, pressureFRIncrement, pressureRLIncrement, pressureRRIncrement) {
+	setPitstopTyrePressures(pitstopNumber, pressureFLIncrement, pressureFRIncrement, pressureRLIncrement, pressureRRIncrement) {
 		if (pressureFLIncrement != 0)
 			changePitstopTyrePressure("Front Left", (pressureFLIncrement > 0) ? "Increase" : "Decrease", Round(pressureFLIncrement * 10))
 		if (pressureFRIncrement != 0)
@@ -1050,7 +1050,7 @@ class ACCPlugin extends ControllerPlugin {
 			changePitstopTyrePressure("Rear Right", (pressureRRIncrement > 0) ? "Increase" : "Decrease", Round(pressureRRIncrement * 10))
 	}
 
-	requestPitstopRepairs(repairSuspension, repairBodywork) {
+	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork) {
 		msgbox ???? implement
 		
 		this.iRepairSuspensionChosen := repairSuspension

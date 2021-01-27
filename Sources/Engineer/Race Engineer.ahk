@@ -67,40 +67,40 @@ class RemotePitstopHandler {
 		return raiseEvent("Pitstop", function . ":" . values2String(";", arguments*))
 	}
 	
-	pitstopPlanned() {
-		return this.callRemote("pitstopPlanned")
+	pitstopPlanned(arguments*) {
+		return this.callRemote("pitstopPlanned", arguments*)
 	}
 	
-	pitstopPrepared() {
-		return this.callRemote("pitstopPrepared")
+	pitstopPrepared(arguments*) {
+		return this.callRemote("pitstopPrepared", arguments*)
 	}
 	
-	pitstopFinished() {
-		return this.callRemote("pitstopFinished")
+	pitstopFinished(arguments*) {
+		return this.callRemote("pitstopFinished", arguments*)
 	}
 	
-	startPitstopSetup() {
-		return this.callRemote("startPitstopSetup")
+	startPitstopSetup(arguments*) {
+		return this.callRemote("startPitstopSetup", arguments*)
 	}
 
-	finishPitstopSetup() {
-		return this.callRemote("finishPitstopSetup")
+	finishPitstopSetup(arguments*) {
+		return this.callRemote("finishPitstopSetup", arguments*)
 	}
 
-	setPitstopRefuelAmount(litres) {
-		return this.callRemote("setPitstopRefuelAmount", litres)
+	setPitstopRefuelAmount(arguments*) {
+		return this.callRemote("setPitstopRefuelAmount", arguments*)
 	}
 	
-	setPitstopTyreSet(compound, set := false) {
-		return this.callRemote("setPitstopTyreSet", compound, set)
+	setPitstopTyreSet(arguments*) {
+		return this.callRemote("setPitstopTyreSet", arguments*)
 	}
 
-	setPitstopTyrePressures(pressureFLIncrement, pressureFRIncrement, pressureRLIncrement, pressureRRIncrement) {
-		return this.callRemote("setPitstopTyrePressures", pressureFLIncrement, pressureFRIncrement, pressureRLIncrement, pressureRRIncrement)
+	setPitstopTyrePressures(arguments*) {
+		return this.callRemote("setPitstopTyrePressures", arguments*)
 	}
 
-	requestPitstopRepairs(repairSuspension, repairBodywork) {
-		return this.callRemote("requestPitstopRepairs", repairSuspension, repairBodywork)
+	requestPitstopRepairs(arguments*) {
+		return this.callRemote("requestPitstopRepairs", arguments*)
 	}
 }
 

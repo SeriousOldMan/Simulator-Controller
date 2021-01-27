@@ -710,10 +710,12 @@ class RaceEngineer extends ConfigurationItem {
 		if isDebug()
 			dumpKnowledge(this.KnowledgeBase)
 		
+		pitstopNumber := knowledgeBase.getValue("Pitstop.Planned.Nr")
+		
 		if this.Speaker {
 			speaker := this.getSpeaker()
 			
-			speaker.speakPhrase("Pitstop", {number: knowledgeBase.getValue("Pitstop.Planned.Nr")})
+			speaker.speakPhrase("Pitstop", {number: pitstopNumber})
 				
 			fuel := knowledgeBase.getValue("Pitstop.Planned.Fuel", 0)
 			if (fuel == 0)
@@ -752,7 +754,7 @@ class RaceEngineer extends ConfigurationItem {
 		}
 		
 		if (result && this.PitstopHandler) {
-			this.PitstopHandler.pitstopPlanned()
+			this.PitstopHandler.pitstopPlanned(pitstopNumber)
 		}
 		
 		return result
@@ -838,41 +840,41 @@ class RaceEngineer extends ConfigurationItem {
 		}
 	}
 	
-	startPitstopSetup() {
+	startPitstopSetup(pitstopNumber) {
 		if this.PitstopHandler
-			this.PitstopHandler.startPitstopSetup()
+			this.PitstopHandler.startPitstopSetup(pitstopNumber)
 	}
 
-	finishPitstopSetup() {
+	finishPitstopSetup(pitstopNumber) {
 		if this.PitstopHandler {
-			this.PitstopHandler.finishPitstopSetup()
+			this.PitstopHandler.finishPitstopSetup(pitstopNumber)
 			
-			this.PitstopHandler.pitstopPrepared()
+			this.PitstopHandler.pitstopPrepared(pitstopNumber)
 			
 			if this.Speaker
 				this.getSpeaker().speakPhrase("CallToPit")
 		}
 	}
 
-	setPitstopRefuelAmount(litres) {
+	setPitstopRefuelAmount(pitstopNumber, litres) {
 		if this.PitstopHandler
-			this.PitstopHandler.setPitstopRefuelAmount(Round(litres))
+			this.PitstopHandler.setPitstopRefuelAmount(pitstopNumber, Round(litres))
 	}
 
-	setPitstopTyreSet(compound, set) {
+	setPitstopTyreSet(pitstopNumber, compound, set) {
 		if this.PitstopHandler
-			this.PitstopHandler.setPitstopTyreSet(compound, set)
+			this.PitstopHandler.setPitstopTyreSet(pitstopNumber, compound, set)
 	}
 
-	setPitstopTyrePressures(pressureFLIncrement, pressureFRIncrement, pressureRLIncrement, pressureRRIncrement) {
+	setPitstopTyrePressures(pitstopNumber, pressureFLIncrement, pressureFRIncrement, pressureRLIncrement, pressureRRIncrement) {
 		if this.PitstopHandler
-			this.PitstopHandler.setPitstopTyrePressures(Round(pressureFLIncrement, 1), Round(pressureFRIncrement, 1)
-													  , Round(pressureRLIncrement, 1), Round(pressureRRIncrement, 1))
+			this.PitstopHandler.setPitstopTyrePressures(pitstopNumber, Round(pressureFLIncrement, 1), Round(pressureFRIncrement, 1)
+																	 , Round(pressureRLIncrement, 1), Round(pressureRRIncrement, 1))
 	}
 
-	requestPitstopRepairs(repairSuspension, repairBodywork) {
+	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork) {
 		if this.PitstopHandler
-			this.PitstopHandler.requestPitstopRepairs(repairSuspension, repairBodywork)
+			this.PitstopHandler.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork)
 	}
 }
 

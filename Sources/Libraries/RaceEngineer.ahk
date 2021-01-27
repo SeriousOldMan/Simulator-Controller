@@ -347,18 +347,31 @@ class RaceEngineer extends ConfigurationItem {
 		if (settings.Count() == 0)
 			settings := readConfiguration(getFileName("Race Engineer.grammars.en", kUserConfigDirectory, kConfigDirectory))
 		
+		for name, choices in getConfigurationSectionValues(settings, "Choices", {})
+			speechRecognizer.setChoices(name, speechRecognizer.newChoices(string2Values(",", choices)*))
+		
 		for ignore, section in ["Conversation", "Information", "Pitstop"]
 			for grammar, definition in getConfigurationSectionValues(settings, section, {}) {
 				definition := substituteVariables(definition, {name: this.Name})
-				
+			
+				if isDebug() {
+					nextCharIndex := 1
+					SplashTextOn 400, 100, , % "Register phrase grammar " . new GrammarCompiler(speechRecognizer).readGrammar(definition, nextCharIndex).toString()
+					Sleep 1000
+					SplashTextOff
+				}
+
 				speechRecognizer.loadGrammar(grammar, speechRecognizer.compileGrammar(definition), ObjBindMethod(this, "phraseRecognized"))
 			}
 	}
 	
 	phraseRecognized(grammar, words) {
-		SplashTextOn 400, 100, , % "Phrase " . grammar . ": " . values2String(" ", words*)
-		Sleep 1000
-		SplashTextOff
+		if isDebug() {
+			SplashTextOn 400, 100, , % "Phrase " . grammar . " recognized: " . values2String(" ", words*)
+			Sleep 1000
+			SplashTextOff
+		}
+		
 		switch grammar {
 			case "Yes":
 				continuation := this.iContinuation
@@ -380,6 +393,10 @@ class RaceEngineer extends ConfigurationItem {
 				this.iContinuation := false
 				
 				this.nameRecognized(words)
+			case "Fuck":
+				this.iContinuation := false
+				
+				this.getSpeaker().speak("Repeat")
 			case "LapsRemaining":
 				this.lapInfoRecognized(words)
 			case "TyreTemperatures":
@@ -406,6 +423,10 @@ class RaceEngineer extends ConfigurationItem {
 				Sleep 5000
 				
 				this.preparePitstopRecognized(words)
+			case "PitstopAdjustTyre":
+				this.iContinuation := false
+				
+				this.pitstopAdjustTyreRecognized(words)
 			default:
 				Throw "Unknown grammar """ . grammar . """ detected in RaceEngineer.phraseRecognized...."
 		}
@@ -474,6 +495,18 @@ class RaceEngineer extends ConfigurationItem {
 	
 	preparePitstopRecognized(words) {
 		this.preparePitstop()
+	}
+	
+	pitstopAdjustTyreRecognized(words) {
+		if !this.hasPlannedPitstop() {
+			this.getSpeaker().speak("NotPossible")
+			this.getSpeaker().speak("ConfirmPlan")
+			
+			this.setContinuation(ObjBindMethod(this, "planPitstop"))
+		}
+		else {
+			msgbox ??? adjust tyre
+		}
 	}
 	
 	setContinuation(continuation) {

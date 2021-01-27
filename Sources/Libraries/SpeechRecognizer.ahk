@@ -128,6 +128,10 @@ class SpeechRecognizer {
 		return this.Instance.GetChoices(name)
 	}
 	
+	setChoices(name, choices) {
+		return this.Instance.SetChoices(name, choices)
+	}
+	
 	newGrammar() {
 		return this.Instance.NewGrammar()
 	}
@@ -253,6 +257,8 @@ class GrammarCompiler {
 		
 			if (SubStr(text, nextCharIndex, 1) = "{")
 				grammars.Push(this.readChoices(text, nextCharIndex))
+			else if (SubStr(text, nextCharIndex, 1) = "(")
+				grammars.Push(this.readBuiltinChoices(text, nextCharIndex))
 			else {
 				literalValue := this.readLiteral(text, nextCharIndex)
 			
@@ -288,7 +294,24 @@ class GrammarCompiler {
 		return new GrammarChoices(grammars)
 	}
 	
-	readLiteral(ByRef text, ByRef nextCharIndex, delimiters := "{}[]`,") {
+	readBuiltinChoices(ByRef text, ByRef nextCharIndex) {
+		builtin := false
+		
+		this.skipDelimiter("(", text, nextCharIndex)
+		
+		literalValue := this.readLiteral(text, nextCharIndex)
+		
+		if literalValue
+			builtin := literalValue.Value
+		else
+			Throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in GrammarCompiler.readBuiltinChoices..."
+			
+		this.skipDelimiter(")", text, nextCharIndex)
+		
+		return new GrammarBuiltinChoices(builtin)
+	}
+	
+	readLiteral(ByRef text, ByRef nextCharIndex, delimiters := "{}[]()`,") {
 		local literal
 		
 		length := StrLen(text)
@@ -398,7 +421,7 @@ class GrammarParser {
 		for ignore, grammar in grammarList.List
 			if isInstance(grammar, GrammarLiteral)
 				newGrammar.AppendString(grammar.Value)
-			else if isInstance(grammar, GrammarChoices)
+			else if (isInstance(grammar, GrammarChoices) || isInstance(grammar, GrammarBuiltinChoices))
 				newGrammar.AppendChoices(grammar.parse(this))
 			else
 				Throw "Grammar lists may only contain literals or choices in GrammarParser.parseList..."
@@ -492,6 +515,32 @@ class GrammarChoices {
 		}
 		
 		return parser.Compiler.SpeechRecognizer.newChoices(choices*)
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; Class                    GrammarBuiltinChoices                          ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class GrammarBuiltinChoices {
+	iBuiltin := false
+	
+	Builtin[] {
+		Get {
+			return this.iBuiltin
+		}
+	}
+	
+	__New(builtin) {
+		this.iBuiltin := builtin
+	}
+	
+	toString() {
+		return "(" . this.Builtin . ")"
+	}
+	
+	parse(parser) {
+		return parser.Compiler.SpeechRecognizer.getChoices(this.Builtin)
 	}
 }
 

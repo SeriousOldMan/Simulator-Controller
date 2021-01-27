@@ -159,6 +159,14 @@ editTargets(command := "") {
 	static copyVariable6
 	static copyVariable7
 	static copyVariable8
+	static copyVariable9
+	static copyVariable10
+	static copyVariable11
+	static copyVariable12
+	static copyVariable13
+	static copyVariable14
+	static copyVariable15
+	static copyVariable16
 	
 	static buildVariable1
 	static buildVariable2
@@ -168,6 +176,14 @@ editTargets(command := "") {
 	static buildVariable6
 	static buildVariable7
 	static buildVariable8
+	static buildVariable9
+	static buildVariable10
+	static buildVariable11
+	static buildVariable12
+	static buildVariable13
+	static buildVariable14
+	static buildVariable15
+	static buildVariable16
 	
 	static splashTheme
 	
@@ -526,7 +542,7 @@ runUpdateTargets(ByRef buildProgress) {
 			
 		logMessage(kLogInfo, translate("Updating to ") . targetName)
 		
-		Sleep 1000
+		Sleep 50
 		
 		progressStep := Round((100 / (vTargetsCount + 1)) / target[2].Length())
 		
@@ -536,7 +552,7 @@ runUpdateTargets(ByRef buildProgress) {
 					
 			%updateFunction%()
 			
-			Sleep 1000
+			Sleep 50
 			
 			buildProgress += progressStep
 		}
@@ -582,7 +598,7 @@ runCleanTargets(ByRef buildProgress) {
 						if !kSilentMode
 							Progress %buildProgress%, % translate("Deleting ") . A_LoopFileName . translate("...")
 						
-						Sleep 100
+						Sleep 50
 					}
 				}
 				finally {
@@ -609,7 +625,7 @@ runCleanTargets(ByRef buildProgress) {
 					if !kSilentMode
 						Progress %buildProgress%, % translate("Deleting ") . A_LoopFileName . translate("...")
 			
-					Sleep 100
+					Sleep 50
 				}
 			}
 			finally {
@@ -617,7 +633,7 @@ runCleanTargets(ByRef buildProgress) {
 			}
 		}
 			
-		Sleep 1000
+		Sleep 50
 				
 		buildProgress += Round(100 / (vTargetCounts + 1))
 			
@@ -658,15 +674,12 @@ runCopyTargets(ByRef buildProgress) {
 			logMessage(kLogInfo, targetName . translate(" out of date - update needed"))
 			logMessage(kLogInfo, translate("Copying ") . targetSource)
 			
-			SplitPath targetDestination, copiedFile, targetDirectory
-			SplitPath targetSource, , sourceDirectory 
-			
-			copiedFile := sourceDirectory . "\" . copiedFile
+			SplitPath targetDestination, , targetDirectory
 			
 			FileCreateDir %targetDirectory%
-			FileCopy %copiedFile%, %targetDirectory%, 1
+			FileCopy %targetSource%, %targetDestination%, 1
 			
-			Sleep 1000
+			Sleep 50
 		}
 		
 		buildProgress += Round(100 / (vTargetCounts + 1))
@@ -750,10 +763,11 @@ compareUpdateTargets(t1, t2) {
 }
 
 prepareTargets(ByRef buildProgress, updateOnly) {
+	counter := 0
 	targets := readConfiguration(kToolsTargetsFile)
 	
 	for target, arguments in getConfigurationSectionValues(targets, "Update", Object()) {
-		buildProgress += 1
+		buildProgress += Floor(A_Index / 4)
 		update := vUpdateSettings[target]
 		
 		if !kSilentMode
@@ -768,14 +782,14 @@ prepareTargets(ByRef buildProgress, updateOnly) {
 				vUpdateTargets.Push(Array(target, string2Values(",", arguments[2]), string2Values(",", arguments[1])))
 		}
 	
-		Sleep 200
+		Sleep 50
 	}
 	
 	bubbleSort(vUpdateTargets, "compareUpdateTargets")
 	
 	if !updateOnly {
 		for target, arguments in getConfigurationSectionValues(targets, "Cleanup", Object()) {
-			buildProgress += 1
+			buildProgress += Floor(++counter / 20)
 			cleanup := vCleanupSettings[target]
 			
 			if !kSilentMode
@@ -787,11 +801,11 @@ prepareTargets(ByRef buildProgress, updateOnly) {
 				vCleanupTargets.Push(Array(target, string2Values(",", arguments)*))
 			}
 		
-			Sleep 200
+			Sleep 50
 		}
 		
 		for target, arguments in getConfigurationSectionValues(targets, "Copy", Object()) {
-			buildProgress += 1
+			buildProgress += Floor(++counter / 20)
 			copy := vCopySettings[target]
 			
 			if !kSilentMode
@@ -803,11 +817,11 @@ prepareTargets(ByRef buildProgress, updateOnly) {
 				vCopyTargets.Push(Array(target, rule[2], rule[1]))
 			}
 		
-			Sleep 200
+			Sleep 50
 		}
 		
 		for target, arguments in getConfigurationSectionValues(targets, "Build", Object()) {
-			buildProgress += 1
+			buildProgress += Floor(++counter / 20)
 			build := vBuildSettings[target]
 			
 			if !kSilentMode
@@ -821,7 +835,7 @@ prepareTargets(ByRef buildProgress, updateOnly) {
 				vBuildTargets.Push(Array(target, arguments[1], rule[1], string2Values(",", arguments[2])))
 			}
 		
-			Sleep 200
+			Sleep 50
 		}
 	}
 }
@@ -851,7 +865,7 @@ runTargets() {
 	if (!kSilentMode && vSplashTheme)
 		showSplashTheme(vSplashTheme, false, false)
 	
-	Sleep 1000
+	Sleep 500
 	
 	x := Round((A_ScreenWidth - 300) / 2)
 	y := A_ScreenHeight - 150

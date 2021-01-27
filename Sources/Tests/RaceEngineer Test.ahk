@@ -87,12 +87,54 @@ AHKUnit.AddTestClass(PitstopHandling)
 AHKUnit.Run()
 */
 
+class TestPitstopHandler {
+	showAction(action, arguments*) {
+		SplashTextOn 400, 100, , % "Invoking pitstop action " . action . " with " . values2String(", ", arguments*)
+		Sleep 5000
+		SplashTextOff
+	}
 
+	pitstopPlanned() {
+		this.showAction("pitstopPlanned")
+	}
+	
+	pitstopPrepared() {
+		this.showAction("pitstopPrepared")
+	}
+	
+	pitstopFinished() {
+		this.showAction("pitstopFinished")
+	}
+	
+	startPitstopSetup() {
+		this.showAction("startPitstopSetup")
+	}
+
+	finishPitstopSetup() {
+		this.showAction("finishPitstopSetup")
+	}
+
+	setPitstopRefuelAmount(litres) {
+		this.showAction("setPitstopRefuelAmount", litres)
+	}
+	
+	setPitstopTyreSet(compound, set := false) {
+		this.showAction("setPitstopTyreSet", compound, set)
+	}
+
+	setPitstopTyrePressures(pressureFLIncrement, pressureFRIncrement, pressureRLIncrement, pressureRRIncrement) {
+		this.showAction("setPitstopTyrePressures", pressureFLIncrement, pressureFRIncrement, pressureRLIncrement, pressureRRIncrement)
+	}
+
+	requestPitstopRepairs(repairSuspension, repairBodywork) {
+		this.showAction("requestPitstopRepairs", repairSuspension, repairBodywork)
+	}
+}
 
 
 engineer := new RaceEngineer(false, readConfiguration(getFileName("Race Engineer.settings", kUserConfigDirectory, kConfigDirectory))
-;						   , false, "Jona", "Microsoft Zira Desktop", "Microsoft Server Speech Recognition Language - TELE (en-US)")
-						   , false, "Jona", "Microsoft David Desktop", "Microsoft Server Speech Recognition Language - Kinect (en-AU)")
+						   , new TestPitStopHandler(), "Jona", "Microsoft Zira Desktop", "Microsoft Server Speech Recognition Language - TELE (en-US)")
+;						   , new TestPitStopHandler(), "Jona", "Microsoft David Desktop", "Microsoft Server Speech Recognition Language - Kinect (en-AU)")
 
 
 Loop {

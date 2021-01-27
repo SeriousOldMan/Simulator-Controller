@@ -4,10 +4,10 @@ change=increase, decrease
 [Conversation]
 Call={Hi, Hey} %name%
 Yes={Yes go on, Perfect go on, Go on please, Head on please}
-No={No thank you, Not yet, I will call you later}
+No=No {thank you, not now, I will call you later}
 Fuck=Fuck
 [Information]
-TyrePressures={Tell me, Give me, What are} {the tyre pressures, the current tyre pressures, the pressures of the tyres}
+TyrePressures=[{Tell me, Give me, What are} {the tyre pressures, the current tyre pressures, the pressures of the tyres}, Tell me the pressures of the tyres]
 TyreTemperatures={Tell me, Give me, What are} {the tyre temperatures, the temperatures at the moment}
 LapsRemaining=[{Tell me, Give me} the remaining laps, How many laps are remaining, How many laps are left]
 [Pitstop]

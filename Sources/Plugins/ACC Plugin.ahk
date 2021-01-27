@@ -1040,16 +1040,14 @@ class ACCPlugin extends ControllerPlugin {
 	}
 
 	setPitstopTyrePressures(pressureFLIncrement, pressureFRIncrement, pressureRLIncrement, pressureRRIncrement) {
-		msgbox ???? increments in race engineer
-		
 		if (pressureFLIncrement != 0)
-			changePitstopTyrePressure("Front Left", (pressureFLIncrement > 0) ? "Increase" : "Decrease", pressureFLIncrement)
+			changePitstopTyrePressure("Front Left", (pressureFLIncrement > 0) ? "Increase" : "Decrease", Round(pressureFLIncrement * 10))
 		if (pressureFRIncrement != 0)
-			changePitstopTyrePressure("Front Right", (pressureFRIncrement > 0) ? "Increase" : "Decrease", pressureFRIncrement)
+			changePitstopTyrePressure("Front Right", (pressureFRIncrement > 0) ? "Increase" : "Decrease", Round(pressureFRIncrement * 10))
 		if (pressureRLIncrement != 0)
-			changePitstopTyrePressure("Rear Left", (pressureRLIncrement > 0) ? "Increase" : "Decrease", pressureRLIncrement)
+			changePitstopTyrePressure("Rear Left", (pressureRLIncrement > 0) ? "Increase" : "Decrease", Round(pressureRLIncrement * 10))
 		if (pressureRRIncrement != 0)
-			changePitstopTyrePressure("Rear Right", (pressureRRIncrement > 0) ? "Increase" : "Decrease", pressureRRIncrement)
+			changePitstopTyrePressure("Rear Right", (pressureRRIncrement > 0) ? "Increase" : "Decrease", Round(pressureRRIncrement * 10))
 	}
 
 	requestPitstopRepairs(repairSuspension, repairBodywork) {
@@ -1351,7 +1349,7 @@ initializeACCPlugin() {
 	Loop Files, %kUserHomeDirectory%Temp\ACC Data\*.*
 		FileDelete %A_LoopFilePath%
 	
-	registerEventHandler("Pitstop", "handleRemoteCalls")
+	registerEventHandler("Pitstop", "handleRaceEngineerCalls")
 	
 	new ACCPlugin(controller, kACCPLugin, controller.Configuration)
 }
@@ -1361,19 +1359,18 @@ initializeACCPlugin() {
 ;;;                          Event Handler Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-handleRemoteCalls(event, data) {
+handleRaceEngineerCalls(event, data) {
 	local function
 	
 	if InStr(data, ":") {
 		data := StrSplit(data, ":", , 2)
 		
-		function := data[1]
-		arguments := string2Values(";", data[2])
-			
-		withProtection(function, arguments*)
+		function := ObjBindMethod(SimulatorController.Instance.findPlugin(kACCPlugin), data[1], string2Values(";", data[2])*)
 	}
-	else	
-		withProtection(data)
+	else
+		function := ObjBindMethod(SimulatorController.Instance.findPlugin(kACCPlugin), data)
+	
+	withProtection(function)
 }
 
 ;;;-------------------------------------------------------------------------;;;

@@ -88,25 +88,34 @@ class RaceEngineer extends ConfigurationItem {
 				base.__New(speaker)
 		}
 		
-		speak(text, values := false) {
+		speak(text) {
+			stopped := this.Engineer.stopListening()
+			
+			try {
+				base.speak(text, true)
+			}
+			finally {
+				if stopped
+					this.Engineer.startListening()
+			}
+		}
+		
+		speakPhrase(phrase, values := false) {
 			phrases := this.Phrases
 			
-			this.Engineer.stopListening()
-			
-			if phrases.HasKey(text) {
-				phrases := phrases[text]
+			if phrases.HasKey(phrase) {
+				phrases := phrases[phrase]
 				
 				Random index, 1, % phrases.Length()
 				
-				text := phrases[Round(index)]
+				phrase := phrases[Round(index)]
 				
 				if values
-					text := substituteVariables(text, values)
+					phrase := substituteVariables(phrase, values)
 			}
-				
-			base.speak(text, true)
-				
-			this.Engineer.startListening()
+			
+			if phrase
+				this.speak(phrase)
 		}
 	}
 	
@@ -299,61 +308,43 @@ class RaceEngineer extends ConfigurationItem {
 		return this.iSpeechRecognizer
 	}
 	
-	startListening() {
+	startListening(retry := true) {
+		local function
+		
 		if this.iSpeechRecognizer && !this.iIsListening
-			try {
-				this.iSpeechRecognizer.startRecognizer()
-			
-				this.iIsListening := true
+			if !this.iSpeechRecognizer.startRecognizer() {
+				if retry {
+					function := ObjBindMethod(this, "startListening", true)
+					
+					SetTimer %function%, -200
+				}
+				
+				return false
 			}
-			catch exception {
-				; might still be listening - see stopListening
-				
-				Loop 10
-					try {
-						this.iSpeechRecognizer.startRecognizer()
+			else {
+				this.iIsListening := true
 			
-						this.iIsListening := true
-						
-						break
-					}
-					catch {
-						; ignore
-						
-						Sleep 200
-					}
-				
-				if !this.iIsListening && isDebug()
-					Throw exception
+				return true
 			}
 	}
 	
-	stopListening() {
+	stopListening(retry := false) {
+		local function
+		
 		if this.iSpeechRecognizer && this.iIsListening
-			try {
-				this.iSpeechRecognizer.stopRecognizer()
-			
-				this.iIsListening := false
+			if !this.iSpeechRecognizer.stopRecognizer() {
+				if retry {
+					function := ObjBindMethod(this, "stopListening", true)
+					
+					SetTimer %function%, -200
+				}
+				
+				return false
 			}
-			catch {
-				; if the recognizer is currently recognizing, it can't be stopped
-				
-				Loop 10
-					try {
-						this.iSpeechRecognizer.stopRecognizer()
+			else {
+				this.iIsListening := false
 			
-						this.iIsListening := false
-						
-						break
-					}
-					catch {
-						; ignore
-						
-						Sleep 200
-					}
-				
-				if this.iIsListening && isDebug()
-					Throw exception
+				return true
 			}
 	}
 	
@@ -417,7 +408,7 @@ class RaceEngineer extends ConfigurationItem {
 				this.iContinuation := false
 				
 				if continuation {
-					this.getSpeaker().speak("Confirm")
+					this.getSpeaker().speakPhrase("Confirm")
 								
 					Sleep 5000
 
@@ -426,15 +417,11 @@ class RaceEngineer extends ConfigurationItem {
 			case "No":
 				this.iContinuation := false
 				
-				this.getSpeaker().speak("Okay")
+				this.getSpeaker().speakPhrase("Okay")
 			case "Call":
-				this.iContinuation := false
-				
 				this.nameRecognized(words)
 			case "Fuck":
-				this.iContinuation := false
-				
-				this.getSpeaker().speak("Repeat")
+				this.getSpeaker().speakPhrase("Repeat")
 			case "LapsRemaining":
 				this.lapInfoRecognized(words)
 			case "TyreTemperatures":
@@ -448,7 +435,7 @@ class RaceEngineer extends ConfigurationItem {
 			case "PitstopPlan":
 				this.iContinuation := false
 				
-				this.getSpeaker().speak("Confirm")
+				this.getSpeaker().speakPhrase("Confirm")
 		
 				Sleep 5000
 				
@@ -456,7 +443,7 @@ class RaceEngineer extends ConfigurationItem {
 			case "PitstopPrepare":
 				this.iContinuation := false
 				
-				this.getSpeaker().speak("Confirm")
+				this.getSpeaker().speakPhrase("Confirm")
 		
 				Sleep 5000
 				
@@ -471,7 +458,7 @@ class RaceEngineer extends ConfigurationItem {
 	}
 	
 	nameRecognized(words) {
-		this.getSpeaker().speak("IHearYou")
+		this.getSpeaker().speakPhrase("IHearYou")
 	}
 	
 	lapInfoRecognized(words) {
@@ -483,9 +470,9 @@ class RaceEngineer extends ConfigurationItem {
 		laps := Round(knowledgeBase.getValue("Lap.Remaining"))
 		
 		if (laps == 0)
-			this.getSpeaker().speak("Later")
+			this.getSpeaker().speakPhrase("Later")
 		else
-			this.getSpeaker().speak("Laps", {laps: laps})
+			this.getSpeaker().speakPhrase("Laps", {laps: laps})
 	}
 	
 	tyreInfoRecognized(words) {
@@ -505,26 +492,26 @@ class RaceEngineer extends ConfigurationItem {
 		else if inList(words, pressures)
 			value := "Pressure"
 		else {
-			speaker.speak("Repeat")
+			speaker.speakPhrase("Repeat")
 		
 			return
 		}
 		
 		lap := knowledgeBase.getValue("Lap")
 		
-		speaker.speak((value == "Pressure") ? "Pressures" : "Temperatures")
+		speaker.speakPhrase((value == "Pressure") ? "Pressures" : "Temperatures")
 		
-		speaker.speak("TyreFL", {value: Round(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".FL"), 1)
-							   , unit: (value == "Pressure") ? translate("PSI") : translate("Degrees")})
+		speaker.speakPhrase("TyreFL", {value: Round(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".FL"), 1)
+						  , unit: (value == "Pressure") ? translate("PSI") : translate("Degrees")})
 		
-		speaker.speak("TyreFR", {value: Round(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".FR"), 1)
-							   , unit: (value == "Pressure") ? translate("PSI") : translate("Degrees")})
+		speaker.speakPhrase("TyreFR", {value: Round(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".FR"), 1)
+						  , unit: (value == "Pressure") ? translate("PSI") : translate("Degrees")})
 		
-		speaker.speak("TyreRL", {value: Round(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".RL"), 1)
-							   , unit: (value == "Pressure") ? translate("PSI") : translate("Degrees")})
+		speaker.speakPhrase("TyreRL", {value: Round(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".RL"), 1)
+						  , unit: (value == "Pressure") ? translate("PSI") : translate("Degrees")})
 		
-		speaker.speak("TyreRR", {value: Round(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".RR"), 1)
-							   , unit: (value == "Pressure") ? translate("PSI") : translate("Degrees")})
+		speaker.speakPhrase("TyreRR", {value: Round(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".RR"), 1)
+						  , unit: (value == "Pressure") ? translate("PSI") : translate("Degrees")})
 	}
 	
 	planPitstopRecognized(words) {
@@ -537,8 +524,8 @@ class RaceEngineer extends ConfigurationItem {
 	
 	pitstopAdjustTyreRecognized(words) {
 		if !this.hasPlannedPitstop() {
-			this.getSpeaker().speak("NotPossible")
-			this.getSpeaker().speak("ConfirmPlan")
+			this.getSpeaker().speakPhrase("NotPossible")
+			this.getSpeaker().speakPhrase("ConfirmPlan")
 			
 			this.setContinuation(ObjBindMethod(this, "planPitstop"))
 		}
@@ -578,7 +565,7 @@ class RaceEngineer extends ConfigurationItem {
 		result := this.KnowledgeBase.produce()
 			
 		if this.Speaker
-			this.getSpeaker().speak("Greeting", {name: this.Name})
+			this.getSpeaker().speakPhrase("Greeting", {name: this.Name})
 		
 		if isDebug()
 			dumpKnowledge(this.KnowledgeBase)
@@ -595,9 +582,9 @@ class RaceEngineer extends ConfigurationItem {
 		this.iEnoughData := false
 			
 		if this.Speaker {
-			this.getSpeaker().speak("Bye")
+			this.getSpeaker().speakPhrase("Bye")
 			
-			this.stopListening()
+			this.stopListening(true)
 		}
 	}
 	
@@ -695,7 +682,7 @@ class RaceEngineer extends ConfigurationItem {
 		if this.EnoughData
 			return true
 		else if this.Speaker {
-			this.getSpeaker().speak("Later")
+			this.getSpeaker().speakPhrase("Later")
 			
 			return false
 		}
@@ -726,39 +713,39 @@ class RaceEngineer extends ConfigurationItem {
 		if this.Speaker {
 			speaker := this.getSpeaker()
 			
-			speaker.speak("Pitstop", {number: knowledgeBase.getValue("Pitstop.Planned.Nr")})
+			speaker.speakPhrase("Pitstop", {number: knowledgeBase.getValue("Pitstop.Planned.Nr")})
 				
 			fuel := knowledgeBase.getValue("Pitstop.Planned.Fuel", 0)
 			if (fuel == 0)
-				speaker.speak("NoRefuel")
+				speaker.speakPhrase("NoRefuel")
 			else
-				speaker.speak("Refuel", {litres: Round(fuel)})
+				speaker.speakPhrase("Refuel", {litres: Round(fuel)})
 			
 			compound := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound")
 			if (compound = "Dry")
-				speaker.speak((compound = "Dry") ? "DryTyres" : "WetTyres", {compound: compound, set: knowledgeBase.getValue("Pitstop.Planned.Tyre.Set")})
+				speaker.speakPhrase((compound = "Dry") ? "DryTyres" : "WetTyres", {compound: compound, set: knowledgeBase.getValue("Pitstop.Planned.Tyre.Set")})
 			else
-				speaker.speak("WetTyres", {compound: compound, set: knowledgeBase.getValue("Pitstop.Planned.Tyre.Set")})
+				speaker.speakPhrase("WetTyres", {compound: compound, set: knowledgeBase.getValue("Pitstop.Planned.Tyre.Set")})
 			
-			speaker.speak("NewPressures")
+			speaker.speakPhrase("NewPressures")
 			
-			speaker.speak("TyreFL", {value: Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL"), 1), unit: translate("PSI")})
-			speaker.speak("TyreFR", {value: Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR"), 1), unit: translate("PSI")})
-			speaker.speak("TyreRL", {value: Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL"), 1), unit: translate("PSI")})
-			speaker.speak("TyreRR", {value: Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR"), 1), unit: translate("PSI")})
+			speaker.speakPhrase("TyreFL", {value: Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL"), 1), unit: translate("PSI")})
+			speaker.speakPhrase("TyreFR", {value: Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR"), 1), unit: translate("PSI")})
+			speaker.speakPhrase("TyreRL", {value: Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL"), 1), unit: translate("PSI")})
+			speaker.speakPhrase("TyreRR", {value: Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR"), 1), unit: translate("PSI")})
 
 			if knowledgeBase.getValue("Pitstop.Planned.Repair.Suspension", false)
-				speaker.speak("RepairSuspension")
+				speaker.speakPhrase("RepairSuspension")
 			else
-				speaker.speak("NoRepairSuspension")
+				speaker.speakPhrase("NoRepairSuspension")
 
 			if knowledgeBase.getValue("Pitstop.Planned.Repair.Bodywork", false)
-				speaker.speak("RepairBodywork")
+				speaker.speakPhrase("RepairBodywork")
 			else
-				speaker.speak("NoRepairBodywork")
+				speaker.speakPhrase("NoRepairBodywork")
 				
 			if this.Listener {
-				speaker.speak("ConfirmPrepare")
+				speaker.speakPhrase("ConfirmPrepare")
 				
 				this.setContinuation(ObjBindMethod(this, "preparePitstop"))
 			}
@@ -776,10 +763,10 @@ class RaceEngineer extends ConfigurationItem {
 			if this.Speaker {
 				speaker := this.getSpeaker()
 
-				speaker.speak("MissingPlan")
+				speaker.speakPhrase("MissingPlan")
 				
 				if this.Listener {
-					speaker.speak("ConfirmPlan")
+					speaker.speakPhrase("ConfirmPlan")
 				
 					this.setContinuation(ObjBindMethod(this, "planPitstop"))
 				}
@@ -792,9 +779,9 @@ class RaceEngineer extends ConfigurationItem {
 				speaker := this.getSpeaker()
 
 				if lap
-					speaker.speak("PrepareLap", {lap: lap})
+					speaker.speakPhrase("PrepareLap", {lap: lap})
 				else
-					speaker.speak("PrepareNow")
+					speaker.speakPhrase("PrepareNow")
 			}
 				
 			if !lap
@@ -806,10 +793,6 @@ class RaceEngineer extends ConfigurationItem {
 			
 			if isDebug()
 				dumpKnowledge(this.KnowledgeBase)
-		
-			if (result && this.PitstopHandler) {
-				this.PitstopHandler.pitstopPrepared()
-			}
 					
 			return result
 		}
@@ -817,7 +800,7 @@ class RaceEngineer extends ConfigurationItem {
 	
 	performPitstop() {
 		if this.Speaker
-			this.getSpeaker().speak("Perform")
+			this.getSpeaker().speakPhrase("Perform")
 				
 		this.KnowledgeBase.addFact("Pitstop.Lap", this.KnowledgeBase.getValue("Lap"))
 		
@@ -836,21 +819,21 @@ class RaceEngineer extends ConfigurationItem {
 		if this.Speaker {
 			speaker := this.getSpeaker()
 			
-			speaker.speak((remainingLaps <= 2) ? "VeryLowFuel" : "LowFuel", {name: this.Name, laps: remainingLaps})
+			speaker.speakPhrase((remainingLaps <= 2) ? "VeryLowFuel" : "LowFuel", {name: this.Name, laps: remainingLaps})
 		
 			if this.Listener {
 				if !this.hasPlannedPitstop() {
-					speaker.speak("ConfirmPlan")
+					speaker.speakPhrase("ConfirmPlan")
 					
 					this.setContinuation(ObjBindMethod(this, "planPitstop"))
 				}
 				else if !this.hasPreparedPitstop() {
-					speaker.speak("ConfirmPrepare")
+					speaker.speakPhrase("ConfirmPrepare")
 					
 					this.setContinuation(ObjBindMethod(this, "preparePitstop"))
 				}
 				else
-					speaker.speak((remainingLaps <= 2) ? "LowComeIn" : "ComeIn")
+					speaker.speakPhrase((remainingLaps <= 2) ? "LowComeIn" : "ComeIn")
 			}
 		}
 	}
@@ -865,12 +848,15 @@ class RaceEngineer extends ConfigurationItem {
 			this.PitstopHandler.finishPitstopSetup()
 			
 			this.PitstopHandler.pitstopPrepared()
+			
+			if this.Speaker
+				this.getSpeaker().speakPhrase("CallToPit")
 		}
 	}
 
 	setPitstopRefuelAmount(litres) {
 		if this.PitstopHandler
-			this.PitstopHandler.setPitstopRefuelAmount(litres)
+			this.PitstopHandler.setPitstopRefuelAmount(Round(litres))
 	}
 
 	setPitstopTyreSet(compound, set) {
@@ -878,9 +864,10 @@ class RaceEngineer extends ConfigurationItem {
 			this.PitstopHandler.setPitstopTyreSet(compound, set)
 	}
 
-	setPitstopTyrePressures(pressureFL, pressureFR, pressureRL, pressureRR) {
+	setPitstopTyrePressures(pressureFLIncrement, pressureFRIncrement, pressureRLIncrement, pressureRRIncrement) {
 		if this.PitstopHandler
-			this.PitstopHandler.setPitstopTyrePressures(pressureFL, pressureFR, pressureRL, pressureRR)
+			this.PitstopHandler.setPitstopTyrePressures(Round(pressureFLIncrement, 1), Round(pressureFRIncrement, 1)
+													  , Round(pressureRLIncrement, 1), Round(pressureRRIncrement, 1))
 	}
 
 	requestPitstopRepairs(repairSuspension, repairBodywork) {
@@ -895,30 +882,44 @@ class RaceEngineer extends ConfigurationItem {
 
 lowFuelWarning(context, remainingLaps) {
 	context.KnowledgeBase.RaceEngineer.lowFuelWarning(Round(remainingLaps))
+	
+	return true
 }
 
 startPitstopSetup(context) {
 	context.KnowledgeBase.RaceEngineer.startPitstopSetup()
+	
+	return true
 }
 
 finishPitstopSetup(context) {
 	context.KnowledgeBase.RaceEngineer.finishPitstopSetup()
+	
+	return true
 }
 
 setPitstopRefuelAmount(context, litres) {
 	context.KnowledgeBase.RaceEngineer.setPitstopRefuelAmount(litres)
+	
+	return true
 }
 
 setPitstopTyreSet(context, compound, set) {
 	context.KnowledgeBase.RaceEngineer.setPitstopTyreSet(compound, set)
+	
+	return true
 }
 
 setPitstopTyrePressures(context, pressureFL, pressureFR, pressureRL, pressureRR) {
 	context.KnowledgeBase.RaceEngineer.setPitstopTyrePressures(pressureFL, pressureFR, pressureRL, pressureRR)
+	
+	return true
 }
 
 requestPitstopRepairs(context, repairSuspension, repairBodywork) {
 	context.KnowledgeBase.RaceEngineer.requestPitstopRepairs(repairSuspension, repairBodywork)
+	
+	return true
 }
 
 dumpKnowledge(knowledgeBase) {

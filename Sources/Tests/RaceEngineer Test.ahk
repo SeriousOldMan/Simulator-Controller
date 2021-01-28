@@ -160,7 +160,7 @@ class TestPitstopHandler {
 ;;;                              Test Section                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class OutOfFuelReporting extends Assert {
+class FuelReporting extends Assert {
 	FuelWarningTest() {
 		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race Engineer.settings"), false, false, false)
 
@@ -488,7 +488,7 @@ class PitstopHandling extends Assert {
 ;;;-------------------------------------------------------------------------;;;
 
 
-AHKUnit.AddTestClass(OutOfFuelReporting)
+AHKUnit.AddTestClass(FuelReporting)
 AHKUnit.AddTestClass(DamageReporting)
 AHKUnit.AddTestClass(PitstopHandling)
 

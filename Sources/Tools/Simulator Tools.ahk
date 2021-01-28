@@ -646,7 +646,7 @@ runCopyTargets(ByRef buildProgress) {
 	local title
 	
 	if !kSilentMode
-		Progress %buildProgress%, % translate("...")
+		Progress %buildProgress%, % " " ; translate("...")
 	
 	for ignore, target in vCopyTargets {
 		targetName := target[1]
@@ -693,7 +693,7 @@ runBuildTargets(ByRef buildProgress) {
 	local title
 	
 	if !kSilentMode
-		Progress %buildProgress%, % translate("...")
+		Progress %buildProgress%, % " " ; translate("...")
 	
 	for ignore, target in vBuildTargets {
 		targetName := target[1]

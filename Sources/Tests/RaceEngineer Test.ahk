@@ -90,7 +90,7 @@ AHKUnit.Run()
 class TestPitstopHandler {
 	showAction(action, arguments*) {
 		SplashTextOn 400, 100, , % "Invoking pitstop action " . action . ((arguments.Length() > 0) ? (" with " . values2String(", ", arguments*)) : "")
-		Sleep 5000
+		Sleep 500
 		SplashTextOff
 	}
 
@@ -133,8 +133,8 @@ class TestPitstopHandler {
 
 
 engineer := new RaceEngineer(false, readConfiguration(getFileName("Race Engineer.settings", kUserConfigDirectory, kConfigDirectory))
-;						   , new TestPitStopHandler(), "Jona", "Microsoft Zira Desktop", "Microsoft Server Speech Recognition Language - TELE (en-US)")
-						   , new TestPitStopHandler(), "Jona", "Microsoft David Desktop", "Microsoft Server Speech Recognition Language - Kinect (en-AU)")
+						   , new TestPitStopHandler(), "Jona", "Microsoft Zira Desktop", "Microsoft Server Speech Recognition Language - TELE (en-US)")
+;						   , new TestPitStopHandler(), "Jona", "Microsoft David Desktop", "Microsoft Server Speech Recognition Language - Kinect (en-AU)")
 
 
 Loop {
@@ -145,6 +145,11 @@ Loop {
 	else {
 		engineer.addLap(A_Index, data)
 	
+		if (A_Index = 3) {
+			engineer.planPitstop()
+			engineer.preparePitstop()
+		}
+		
 		dumpKnowledge(engineer.KnowledgeBase)
 		
 		MsgBox % "Lap " . A_Index . " loaded - Continue?"

@@ -38,8 +38,12 @@ global kProveAll = "ProveAll:"
 global kSet = "Set:"
 global kClear = "Clear:"
 
-global kBuiltinFunctors = ["option", "plus", "minus", "multiply", "divide", "greater", "less", "append", "get"]
-global kBuiltinAritys = [2, 3, 3, 3, 3, 2, 2, -1, 2]
+global kBuiltinFunctors = ["option", "+", "-", "*", "/", ">", "<", "=", "append", "get"]
+global kBuiltinFunctions = ["option", "plus", "minus", "multiply", "divide", "greater", "less", "equal", "append", "get"]
+global kBuiltinAritys = [2, 3, 3, 3, 3, 2, 2, 2, -1, 2]
+
+global kPrefixNotation = "Prefix"
+global kInfixNotation = "Infix"
 
 global kProduction = "Production"
 global kReduction = "Reduction"
@@ -1860,6 +1864,9 @@ class CallChoicePoint extends ChoicePoint {
 				resultSet.RuleEngine.trace(kTraceMedium, "Call " . function . "(" . values2String(", ", values*) . ")")
 		}
 		
+		if builtin
+			function := kBuiltinFunctions[inList(kBuiltinFunctors, function)]
+		
 		return %function%(this, values*)
 	}
 	
@@ -1880,6 +1887,8 @@ class CallChoicePoint extends ChoicePoint {
 					
 			resultSet.RuleEngine.trace(kTraceMedium, "Call " . function . "(" . values2String(", ", newValues*) . ")")
 		}
+		
+		function := kBuiltinFunctions[inList(kBuiltinFunctors, function)]
 		
 		return %function%(this, values*)
 	}
@@ -2635,6 +2644,7 @@ class RuleEngine {
 	iInitialProductions := []
 	iInitialReductions := []
 	iTraceLevel := kTraceOff
+	iExpressionNotation := kPrefixNotation
 	
 	InitialFacts[] {
 		Get {
@@ -2856,6 +2866,41 @@ class RuleCompiler {
 		if !this.isEmpty(text, nextCharIndex) {
 			if !functor
 				functor := this.readLiteral(text, nextCharIndex)
+			else {
+				this.skipWhiteSpace(text, nextCharIndex)
+				
+				if (SubStr(text, nextCharIndex, 1) = "=") {
+					; r = x op y OR x = y
+					nextCharIndex += 1
+					 
+					xOperand := this.readLiteral(text, nextCharIndex, "+-*/`, `t")
+				
+					this.skipWhiteSpace(text, nextCharIndex)
+					
+					operation := SubStr(text, nextCharIndex, 1)
+					
+					if InStr("+-*/", operation) {
+						nextCharIndex += 1
+						
+						yOperand := this.readLiteral(text, nextCharIndex)
+						
+						return Array(operation, functor, xOperand, yOperand)
+					}
+					else
+						return Array("=", functor, xOperand)
+				}
+				else if InStr("<>", SubStr(text, nextCharIndex, 1)) {
+					 ; x op y
+					
+					operation := SubStr(text, nextCharIndex, 1)
+					
+					nextCharIndex += 1
+					
+					yOperand := this.readLiteral(text, nextCharIndex)
+					
+					return Array(operation, functor, yOperand)
+				}
+			}
 			
 			this.skipDelimiter("(", text, nextCharIndex)
 			
@@ -3487,25 +3532,33 @@ class NilParser extends Parser {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-option(choicePoint, option, enable) {
+option(choicePoint, option, value) {
 	if isInstance(option, Term)
 		option := option.toSTring(resultSet)
 	
-	if isInstance(enable, Term)
-		enable := enable.toSTring(resultSet)
+	if isInstance(value, Term)
+		value := value.toSTring(resultSet)
 	
-	if (option = "occurCheck") {
-		if ((enable = false) || (enable = "false"))
+	if (option = "Trace") {
+		value := inList(["Full", "Medium", "Light", "Off"], value)
+		
+		if value
+			choicePoint.ResultSet.KnowledgeBase.RuleEngine.setTraceLevel(value)
+		else
+			return false
+	}
+	else if (option = "OccurCheck") {
+		if ((value = false) || (value = "false"))
 			choicePoint.ResultSet.KnowledgeBase.disableOccurCheck()
-		else if ((enable = true) || (enable = "true"))
+		else if ((value = true) || (value = "true"))
 			choicePoint.ResultSet.KnowledgeBase.enableOccurCheck()
 		else
 			return false
 	}
-	else if (option = "deterministicFacts") {
-		if ((enable = false) || (enable = "false"))
+	else if (option = "DeterministicFacts") {
+		if ((value = false) || (value = "false"))
 			choicePoint.ResultSet.KnowledgeBase.disableDeterministicFacts()
-		else if ((enable = true) || (enable = "true"))
+		else if ((value = true) || (value = "true"))
 			choicePoint.ResultSet.KnowledgeBase.enableDeterministicFacts()
 		else
 			return false
@@ -3660,6 +3713,10 @@ less(choicePoint, operand1, operand2) {
 		return false
 	else
 		return (operand1.toString(resultSet) < operand2.toString(resultSet))
+}
+
+equal(choicePoint, operand1, operand2) {
+	return choicePoint.ResultSet.unify(choicePoint, operand1, operand2)
 }
 
 append(choicePoint, operand1, arguments*) {

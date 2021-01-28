@@ -39,7 +39,7 @@ global kCompilerCompliantTestRules
 				 , "foo(?A, bar(?B, [?C])) <= baz(?, foo(?A, ?)), !, fail"
 				 , "reverse([ ?H |?T ], ?REV )<= reverse(?T,?RT), concat(?RT,[?H],?REV)"
 				 , "Priority: 5, {Any: [?Peter.grandchild], [Predicate: ?Peter.son = true]} => (Set: Peter, happy), (Call: showRelationship, 1, 2), (Prove: father, maria, willy), (Call: showRelationship, 2, 1)"
-				 , "fac(?X, ?R) <= greater(?X, 0), minus(?N, ?X, 1), fac(?N, ?T), multiply(?R, ?T, ?X)"]
+				 , "fac(?X, ?R) <= >(?X, 0), -(?N, ?X, 1), fac(?N, ?T), *(?R, ?T, ?X)"]
 
 global kCompilerNonCompliantTestRules
 				= ["persist(?A.grandchild  ?B) <= Call(showRelationship, ?A.grandchild, ?B, !, Set(?A.grandchild, true), Set(?B, grandfather), Produce()"
@@ -62,10 +62,10 @@ kRules =
 				concat([?H | ?T], ?L, [?H | ?R]) <= concat(?T, ?L, ?R)
 
 				fac(0, 1)
-				fac(?X, ?R) <= greater(?X, 0), minus(?N, ?X, 1), fac(?N, ?T), multiply(?R, ?T, ?X)
+				fac(?X, ?R) <= >(?X, 0), -(?N, ?X, 1), fac(?N, ?T), *(?R, ?T, ?X)
 				
 				sum([], 0)
-				sum([?h | ?t], ?sum) <= sum(?t, ?tSum), Plus(?sum, ?h, ?tSum)
+				sum([?h | ?t], ?sum) <= sum(?t, ?tSum), +(?sum, ?h, ?tSum)
 				
 				construct(?A, ?B) <= append(?A, Foo., ?B, .Bar)
 
@@ -130,11 +130,8 @@ class Compiler extends Assert {
 		
 		for ignore, theRule in kCompilerCompliantTestRules
 			text := (text . theRule . "`n")
-		try {
+		
 		compiler.compileRules(text, productions, reductions)
-		}
-		catch e
-			ListLines
 		
 		this.AssertEqual(1, productions.Length(), "Not all production rules compiled...")
 		this.AssertEqual(5, reductions.Length(), "Not all reduction rules compiled...")
@@ -163,7 +160,7 @@ class Compiler extends Assert {
 		
 		for ignore, theRule in kCompilerCompliantTestRules {
 			compiledRule := compiler.compileRule(theRule)
-			
+		
 			this.AssertEqual(this.substitutePredicate(this.substituteBoolean(this.removeWhiteSpace(theRule))),
 						   , this.removeWhiteSpace(compiledRule.toString()), "Error in compiled rule " . compiledRule.toString())
 			

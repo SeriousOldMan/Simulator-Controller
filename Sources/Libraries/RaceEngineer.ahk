@@ -386,7 +386,7 @@ class RaceEngineer extends ConfigurationItem {
 				if isDebug() {
 					nextCharIndex := 1
 					SplashTextOn 400, 100, , % "Register phrase grammar " . new GrammarCompiler(speechRecognizer).readGrammar(definition, nextCharIndex).toString()
-					Sleep 1000
+					Sleep 100
 					SplashTextOff
 				}
 
@@ -397,7 +397,7 @@ class RaceEngineer extends ConfigurationItem {
 	phraseRecognized(grammar, words) {
 		if isDebug() {
 			SplashTextOn 400, 100, , % "Phrase " . grammar . " recognized: " . values2String(" ", words*)
-			Sleep 1000
+			Sleep 300
 			SplashTextOff
 		}
 		
@@ -853,7 +853,7 @@ class RaceEngineer extends ConfigurationItem {
 				phrase := "BodyworkDamage"
 			
 			speaker.speakPhrase(phrase, {name: this.Name})
-		
+	
 			speaker.speakPhrase("DamageAnalysis")
 		}
 	}
@@ -912,38 +912,38 @@ damageWarning(context, newSuspensionDamage, newBodyworkDamage) {
 	return true
 }
 
-startPitstopSetup(context) {
-	context.KnowledgeBase.RaceEngineer.startPitstopSetup()
+startPitstopSetup(context, pitstopNumber) {
+	context.KnowledgeBase.RaceEngineer.startPitstopSetup(pitstopNumber)
 	
 	return true
 }
 
-finishPitstopSetup(context) {
-	context.KnowledgeBase.RaceEngineer.finishPitstopSetup()
+finishPitstopSetup(context, pitstopNumber) {
+	context.KnowledgeBase.RaceEngineer.finishPitstopSetup(pitstopNumber)
 	
 	return true
 }
 
-setPitstopRefuelAmount(context, litres) {
-	context.KnowledgeBase.RaceEngineer.setPitstopRefuelAmount(litres)
+setPitstopRefuelAmount(context, pitstopNumber, litres) {
+	context.KnowledgeBase.RaceEngineer.setPitstopRefuelAmount(pitstopNumber, litres)
 	
 	return true
 }
 
-setPitstopTyreSet(context, compound, set) {
-	context.KnowledgeBase.RaceEngineer.setPitstopTyreSet(compound, set)
+setPitstopTyreSet(context, pitstopNumber, compound, set) {
+	context.KnowledgeBase.RaceEngineer.setPitstopTyreSet(pitstopNumber, compound, set)
 	
 	return true
 }
 
-setPitstopTyrePressures(context, pressureFL, pressureFR, pressureRL, pressureRR) {
-	context.KnowledgeBase.RaceEngineer.setPitstopTyrePressures(pressureFL, pressureFR, pressureRL, pressureRR)
+setPitstopTyrePressures(context, pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
+	context.KnowledgeBase.RaceEngineer.setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR)
 	
 	return true
 }
 
-requestPitstopRepairs(context, repairSuspension, repairBodywork) {
-	context.KnowledgeBase.RaceEngineer.requestPitstopRepairs(repairSuspension, repairBodywork)
+requestPitstopRepairs(context, pitstopNumber, repairSuspension, repairBodywork) {
+	context.KnowledgeBase.RaceEngineer.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork)
 	
 	return true
 }

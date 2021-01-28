@@ -46,7 +46,7 @@ TyreRR.1=Rear Right %value%.
 TyreRR.2=%value% %unit% in the Rear Right tyre.
 TyreRR.3=%value% %unit% Rear Right.
 [Warning]
-LowFuel.1=Here is %name%. You have fuel left for %laps% laps only.
+LowFuel.1=Here is %name%. You have fuel left for %laps% laps. Take an eye on that.
 LowFuel.2=%name% here. Fuel is getting low, only %laps% laps left.
 VeryLowFuel.1=Warning. Only %laps% laps before you will run out of fuel.
 VeryLowFuel.2=What are you doing? You are running out of fuel.
@@ -60,7 +60,7 @@ BodyworkDamage.3=Here is %name%. I can see from the data that the bodywork has b
 BothDamage.1=%name% here. You collected severe damage in the last accident. The data shows problems with the suspension and the bodywork.
 BothDamage.2=In your last accident both the aerodynamic elements and the suspension were impacted.
 BothDamage.3=Here is %name%. Our data shows damage on the bodywork and also on the suspension.
-DamageAnalysis.1=I will look into the data and check how big is the impact on your lap times.
+DamageAnalysis.1=I will look into the data and check how big is the impact on your lap time.
 DamageAnalysis.2=This might have an impact on the lap times. I will come up with an analysis after the next few laps.
 DamageAnalysis.3=Maybe we need an early pitstop for repairs. Let me collect some data on your lap times.
 [Pitstop]

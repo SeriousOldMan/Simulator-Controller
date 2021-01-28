@@ -56,12 +56,12 @@
 {Any: [?Lap], {None: [?Fuel.Amount.Target]}} => (Prove: updateFuelTarget, ?Lap)
 
 updateFuelTarget(?lap) <= lapAvgFuel(?lap, ?avgFuel), lapRemainingFuel(?lap, ?remainingFuel), remainingRaceLaps(?lap, ?remainingLaps),			\
-						  Multiply(?raceFuel, ?avgFuel, ?remainingLaps), safetyFuel(?avgFuel, ?safetyFuel),										\
-						  Plus(?neededFuel, ?raceFuel, ?safetyFuel), Greater(?neededFuel, ?remainingFuel), 										\
-						  Minus(?refillAmount, ?neededFuel, ?remainingFuel), Set(Fuel.Amount.Target, ?refillAmount), !
+						  ?raceFuel = ?avgFuel * ?remainingLaps, safetyFuel(?avgFuel, ?safetyFuel),												\
+						  ?neededFuel = ?raceFuel + ?safetyFuel, ?neededFuel > ?remainingFuel, ?refillAmount = ?neededFuel - ?remainingFuel, 	\
+						  Set(Fuel.Amount.Target, ?refillAmount), !
 updateFuelTarget(?lap) <= Clear(Fuel.Amount.Target)
 
-safetyFuel(?avgFuel, ?safetyFuel) <= eq(!Race.Settings.InLap, true), Plus(?safetyFuel, ?avgFuel, !Race.Settings.Fuel.SafetyMargin), !
+safetyFuel(?avgFuel, ?safetyFuel) <= !Race.Settings.InLap = true, ?safetyFuel = ?avgFuel + !Race.Settings.Fuel.SafetyMargin, !
 safetyFuel(?, !Race.Settings.Fuel.SafetyMargin)
 
 
@@ -85,7 +85,7 @@ nextTyreCompound() <= setupTyreCompound(?compound), Set(Tyre.Compound.Target, ?c
 
 {Any: [?Lap], {None: [?Tyre.Set.Target]}} => (Prove: nextTyreSet)
 
-nextTyreSet() <= pitstopTyreSet(?nr), Plus(?set, ?nr, 1), Set(Tyre.Set.Target, ?set), !
+nextTyreSet() <= pitstopTyreSet(?nr), ?set = ?nr + 1, Set(Tyre.Set.Target, ?set), !
 nextTyreSet() <= Set(Tyre.Set.Target, !Race.Settings.Tyre.Set.Fresh)
 
 
@@ -109,14 +109,13 @@ tyrePressureDeviation(?lap, [?tyreType | ?tyreTypes], [?deviation | ?deviations]
 
 weightedDeviation(?, !Race.Settings.Lap.Considered, ?, 0) <= !
 weightedDeviation(?lap, ?lap, ?, 0) <= !
-weightedDeviation(?lap, ?offset, ?tyreType, ?deviation) <= Minus(?tLap, ?lap, ?offset),	currentTyreCompound(?compound),							\
+weightedDeviation(?lap, ?offset, ?tyreType, ?deviation) <= ?tLap = ?lap - ?offset,	currentTyreCompound(?compound),								\
 														   Append(?lapTP, Lap., ?tLap, .Tyre.Pressure., ?tyreType), Get(?lPressure, ?lapTP),	\
 														   Append(?targetTP, Race.Settings.Tyre., ?compound, .Pressure.Target., ?tyreType),		\
-														   Get(?tPressure, ?targetTP), Minus(?lDeviation, ?lPressure, ?tPressure),				\
-														   lapWeight(?tLap, ?weight), Multiply(?tDeviation, ?lDeviation, ?weight),				\
-														   Plus(?nOffset, ?offset, 1),															\
-														   weightedDeviation(?lap, ?nOffset, ?tyreType, ?nDeviation),							\
-														   Plus(?rDeviation, ?tDeviation, ?nDeviation),	Divide(?deviation, ?rDeviation, 2)
+														   Get(?tPressure, ?targetTP), ?lDeviation = ?lPressure - ?tPressure,					\
+														   lapWeight(?tLap, ?weight), ?tDeviation = ?lDeviation * ?weight,						\
+														   ?nOffset = ?offset + 1, weightedDeviation(?lap, ?nOffset, ?tyreType, ?nDeviation),	\
+														   ?rDeviation = ?tDeviation + ?nDeviation,	?deviation = ?rDeviation / 2
 
 updateTargetPressures([], [])
 updateTargetPressures([?tyreType | ?tyreTypes], [?deviation | ?deviations]) <=																	\
@@ -129,7 +128,7 @@ updateTargetPressures([?tyreType | ?tyreTypes], [?deviation | ?deviations]) <=		
 [?Tyre.Pressure.Deviation.Abs.RL > ?Race.Settings.Tyre.Pressure.Deviation] => (Prove: updateTargetPressure, RL, !Tyre.Pressure.Deviation.RL)
 [?Tyre.Pressure.Deviation.Abs.RR > ?Race.Settings.Tyre.Pressure.Deviation] => (Prove: updateTargetPressure, RR, !Tyre.Pressure.Deviation.RR)
 
-updateTargetPressure(?tyreType, ?deviation) <= lastPressure(?tyreType, ?pressure), Minus(?targetPressure, ?pressure, ?deviation), 				\
+updateTargetPressure(?tyreType, ?deviation) <= lastPressure(?tyreType, ?pressure), ?targetPressure = ?pressure - ?deviation, 					\
 											   Append(?fact, Tyre.Pressure.Target., ?tyreType), Set(?fact, ?targetPressure)
 
 [?Tyre.Pressure.Target.FL] => (Prove: updateTargetPressureIncrement, FL)
@@ -138,7 +137,7 @@ updateTargetPressure(?tyreType, ?deviation) <= lastPressure(?tyreType, ?pressure
 [?Tyre.Pressure.Target.RR] => (Prove: updateTargetPressureIncrement, RR)
 
 updateTargetPressureIncrement(?tyreType) <= setupPressure(?tyreType, ?basePressure), Append(?targetFact, Tyre.Pressure.Target., ?tyreType),		\
-											Get(?targetPressure, ?targetFact), Minus(?increment, ?targetPressure, ?basePressure),				\
+											Get(?targetPressure, ?targetFact), ?increment = ?targetPressure - ?basePressure,					\
 											Append(?incrementFact, Tyre.Pressure.Target., ?tyreType, .Increment), Set(?incrementFact, ?increment)
 
 lastPressure(?tyreType, ?pressure) <= pitstopPressure(?tyreType, ?pressure), !
@@ -179,17 +178,18 @@ repairDamage(?type, ?damage) <= Append(?fact, Race.Settings.Damage., ?type, .Rep
 repairDamage(?, Never, ?) <= !, fail
 repairDamage(?, Always, ?)
 repairDamage(?type, Threshold, ?damage) <= Append(?fact, Race.Settings.Damage., ?type, .Repair.Threshold),										\
-										   Get(?threshold, ?fact), Greater(?damage, ?threshold)
+										   Get(?threshold, ?fact), ?damage > ?threshold
 repairDamage(?, Impact, ?) <= notYetImplemented()
 
 [?Lap] => (Prove: reportNewDamage, ?Lap)
 
 reportNewDamage(1) <= !, lapDamage(?lap, Suspension, ?lSDamage), lapDamage(?lap, Bodywork, ?lBDamage),											\
-						 greater(0, ?lSDamage, ?sGreater), greater(0, ?lBDamage, ?bGreater), Call(damageWarning, ?sGreater, ?bGreater)
-reportNewDamage(?lap) <= lapDamage(?lap, Suspension, ?lSDamage), lapDamage(?lap, Bodywork, ?lBDamage),											\
-						 Minus(?pLap, ?lap, 1), lapDamage(?pLap, Suspension, ?pSDamage), lapDamage(?lap, Bodywork, ?pBDamage),					\
-						 greater(?pSDamage, ?lSDamage, ?sGreater), greater(?pBDamage, ?lBDamage, ?bGreater),									\
+						 >(0, ?lSDamage, ?sGreater), >(0, ?lBDamage, ?bGreater), any?(true, [?sGreater, ?bGreater]),							\
 						 Call(damageWarning, ?sGreater, ?bGreater)
+reportNewDamage(?lap) <= lapDamage(?lap, Suspension, ?lSDamage), lapDamage(?lap, Bodywork, ?lBDamage),											\
+						 ?pLap = ?lap - 1, lapDamage(?pLap, Suspension, ?pSDamage), lapDamage(?pLap, Bodywork, ?pBDamage),						\
+						 >(?lSDamage, ?pSDamage, ?sGreater), >(?lBDamage, ?pBDamage, ?bGreater), 												\
+						 any?(true, [?sGreater, ?bGreater]), Call(damageWarning, ?sGreater, ?bGreater)
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -203,7 +203,7 @@ reportNewDamage(?lap) <= lapDamage(?lap, Suspension, ?lSDamage), lapDamage(?lap,
 [?Lap.Remaining <= ?Race.Settings.Lap.PitstopWarning] => (Call: lowFuelWarning, ?Lap.Remaining)
 
 updateRemainingLaps(?lap) <= remainingStintLaps(?lap, ?stintLaps), remainingRaceLaps(?lap, ?raceLaps),											\
- 							 Less(?stintLaps, ?raceLaps), Set(Lap.Remaining, ?stintLaps)
+ 							 ?stintLaps < ?raceLaps, Set(Lap.Remaining, ?stintLaps)
 							 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -237,7 +237,7 @@ priority: 10, [?Pitstop.Plan] => (Prove: planPitstop)
 {All: [?Pitstop.Plan], [?Tyre.Set.Target]} => (Set: Pitstop.Planned.Tyre.Set, ?Tyre.Set.Target)
 priority: -10, [?Pitstop.Plan] => (Set: Pitstop.Planned, true), (Clear: Pitstop.Plan)
 
-planPitstop() <= lastPitstop(?last), Plus(?nr, ?last, 1), Set(Pitstop.Planned.Nr, ?nr)
+planPitstop() <= lastPitstop(?last), ?nr = ?last + 1, Set(Pitstop.Planned.Nr, ?nr)
 planPitstop() <= Set(Pitstop.Planned.Nr, 1)
 
 
@@ -284,7 +284,7 @@ priority: -10, [?Pitstop.Lap] => (Set: Pitstop.Last, !Pitstop.Planned.Nr), (Clea
 								 (Clear: Pitstop.Planned.Repair.Suspension), (Clear: Pitstop.Planned.Repair.Bodywork),							\
 								 (Clear: Pitstop.Lap), (Clear: Pitstop.Prepared)
 
-pitstopPerformed(?lap) <= unbound(!Pitstop.Prepared), !, fail
+pitstopPerformed(?lap) <= unbound?(!Pitstop.Prepared), !, fail
 pitstopPerformed(?lap) <= Append(?pFact, Pitstop., !Pitstop.Planned.Nr, .Lap), Set(?pFact, ?lap)
 pitstopPerformed(?lap) <= Append(?lfact, Lap., ?lap, .Time.End), Get(?time, ?lfact),															\
 						  Append(?pFact, Pitstop., !Pitstop.Planned.Nr, .Time), Set(?pFact, ?time)
@@ -317,36 +317,34 @@ currentTyreCompound(?compound) <= setupTyreCompound(?compound)
 
 lapDamage(?lap, ?type, ?position, ?damage) <= Append(?fact, Lap., ?lap, .Damage., ?type, ., ?position), Get(?damage, ?fact)
 
-lapAvgFuel(?lap, ?avgFuel) <= Append(?fact, Lap., ?lap, .Fuel.AvgConsumption), Get(?avgFuel, ?fact), Greater(?avgFuel, 0)
+lapAvgFuel(?lap, ?avgFuel) <= Append(?fact, Lap., ?lap, .Fuel.AvgConsumption), Get(?avgFuel, ?fact), ?avgFuel > 0
 
 lapAvgTime(?lap, ?avgTime) <= weightedLapTimes(?lap, 0, ?lapTimes), sum(?lapTimes, ?sTimes), length(?lapTimes, ?sLength), 						\
-							  Divide(?avgTime, ?sTimes, ?sLength)
+							  ?avgTime = ?sTimes / ?sLength
 
 lapRemainingFuel(?lap, ?remainingFuel) <= Append(?fact, Lap., ?lap, .Fuel.Remaining), Get(?remainingFuel, ?fact)
 
 remainingRaceLaps(?lap, ?remainingLaps) <= Append(?rfact, Lap., ?lap, .Time.End), Get(?raceTime, ?rfact),										\
-										   Multiply(?raceLength, !Race.Duration, 1000), Minus(?remainingTime, ?raceLength, ?raceTime),			\
-										   lapAvgTime(?lap, ?avgTime), Divide(?remainingLaps, ?remainingTime, ?avgTime)
+										   ?raceLength = !Race.Duration * 1000, ?remainingTime = ?raceLength - ?raceTime,						\
+										   lapAvgTime(?lap, ?avgTime), ?remainingLaps = ?remainingTime / ?avgTime
 
 remainingStintLaps(?lap, ?remainingLaps) <= lapRemainingFuel(?lap, ?fuelLeft), lapAvgFuel(?lap, ?fuelPerLap),									\
-											Divide(?remainingLaps, ?fuelLeft, ?fuelPerLap)
+											?remainingLaps = ?fuelLeft / ?fuelPerLap
 										
 lapTimes(?lap, ?lap, []) <= !
 lapTimes(?, !Race.Settings.Lap.Considered, []) <= !
-lapTimes(?lap, ?offset, [?time | ?times]) <= Minus(?tLap, ?lap, ?offset), lapTime(?tlap, ?time),												\
-											 Plus(?nOffset, ?offset, 1), lapTimes(?lap, ?nOffset, ?times)
-											 lapTimes(?lap, ?lap, []) <= !
+lapTimes(?lap, ?offset, [?time | ?times]) <= ?tLap = ?lap - ?offset, lapTime(?tlap, ?time),													\
+											 ?nOffset = ?offset + 1, lapTimes(?lap, ?nOffset, ?times)
 											 
 weightedLapTimes(?lap, ?lap, []) <= !
 weightedLapTimes(?, !Race.Settings.Lap.Considered, []) <= !
-weightedLapTimes(?lap, ?offset, [?time | ?times]) <= Minus(?tLap, ?lap, ?offset), weightedLapTime(?lap, ?tlap, ?time),							\
-													 Plus(?nOffset, ?offset, 1), weightedLapTimes(?lap, ?nOffset, ?times)
+weightedLapTimes(?lap, ?offset, [?time | ?times]) <= ?tLap = ?lap - ?offset, weightedLapTime(?lap, ?tlap, ?time),								\
+													 ?nOffset = ?offset + 1, weightedLapTimes(?lap, ?nOffset, ?times)
 
-lapTime(?lap, ?time) <= Append(?fact, Lap., ?lap, .Time), Get(?time, ?fact), bound(?time)
+lapTime(?lap, ?time) <= Append(?fact, Lap., ?lap, .Time), Get(?time, ?fact), bound?(?time)
 
-weightedLapTime(?lastLap, ?lap, ?time) <= lapTime(?lastLap, ?lastTime), lapTime(?lap, ?lapTime), lapWeight(?lap, ?weight),						\
-										  Minus(?delta, ?lastTime, ?lapTime), Multiply(?weightedDelta, ?delta, ?weight), 						\
-										  Minus(?time, ?lastTime, ?weightedDelta)
+weightedLapTime(?lastLap, ?lap, ?time) <= lapTime(?lastLap, ?lastTime), lapTime(?lap, ?lapTime), lapWeight(?lap, ?weight),	 					\
+										  ?delta = ?lastTime - ?lapTime, ?weightedDelta = ?delta * ?weight, ?time = ?lastTime - ?weightedDelta
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -362,8 +360,8 @@ setupPressure(?tyreType, ?pressure) <= Append(?fact, Race.Setup.Tyre.Pressure., 
 ;;;                       Pitstop Information Retrieval                     ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-lastPitstop(?nr) <= unbound(!Pitstop.Last), !, fail
-lastPitstop(?nr) <= eq(?nr, !Pitstop.Last)
+lastPitstop(?nr) <= unbound?(!Pitstop.Last), !, fail
+lastPitstop(?nr) <= ?nr = !Pitstop.Last
 
 pitstopTyreSet(?tyreSet) <= lastPitstop(?nr), Append(?fact, Pitstop., ?nr, .Tyre.Set), Get(?tyreSet, ?fact)
 
@@ -376,8 +374,8 @@ pitstopPressure(?tyreType, ?pressure) <= lastPitstop(?nr), Append(?fact, Pitstop
 ;;;                         Statistical Computations                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-lapWeight(?lap, ?weight) <= Minus(?distance, !Lap, ?lap), Less(?distance, !Race.Settings.Lap.Considered), 										\
-							Minus(?temp, !Race.Settings.Lap.Considered, ?distance), Divide(?weight, ?temp, !Race.Settings.Lap.Considered)
+lapWeight(?lap, ?weight) <= ?distance = !Lap - ?lap, ?distance < !Race.Settings.Lap.Considered, 												\
+							?temp = !Race.Settings.Lap.Considered - ?distance, ?weight = ?temp / !Race.Settings.Lap.Considered
 lapWeight(?, 0)
 
 
@@ -385,28 +383,38 @@ lapWeight(?, 0)
 ;;;                             Utility Rules                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-eq(?X, ?X)
+=<(?x, ?y) <= ?x = ?y
+=<(?x, ?y) <= ?x < ?y
 
-bound(?x) <= eq(?x, __NotInitialized__), !, fail
-bound(?x)
+>=(?x, ?y) <= ?x = ?y
+>=(?x, ?y) <= ?x > ?y
 
-unbound(?x) <= eq(?x, __NotInitialized__)
+>(?x, ?y, true) <= ?x > ?y, !
+>(?x, ?y, false)
+
+bound?(?x) <= unbound?(?x), !, fail
+bound?(?x)
+
+unbound?(?x) <= ?x = __NotInitialized__
+
+any?(?value, [?value])
+any?(?value, [?value | ?])
+any?(?value, [? | ?tail]) <= any?(?value, ?tail)
+
+all?(?value, [?value])
+all?(?value, [?value | ?tail]) <= all?(?value, ?tail)
 
 length([], 0)
-length([?h | ?t], ?length) <= length(?t, ?tLength), Plus(?length, ?tLength, 1)
+length([?h | ?t], ?length) <= length(?t, ?tLength), ?length = ?tLength + 1
 
 sum([], 0)
-sum([?h | ?t], ?sum) <= sum(?t, ?tSum), Plus(?sum, ?h, ?tSum)
+sum([?h | ?t], ?sum) <= sum(?t, ?tSum), ?sum = ?h + ?tSum
 
-max(?x, ?y, ?x) <= Greater(?x, ?y), !, fail
+max(?x, ?y, ?x) <= ?x > ?y, !, fail
 max(?x, ?y, ?y)
 
-min(?x, ?y, ?x) <= Less(?x, ?y), !, fail
+min(?x, ?y, ?x) <= ?x < ?y, !, fail
 min(?x, ?y, ?y)
 
-abs(?x, ?r) <= Less(?x, 0), Multiply(?r, ?x, -1), !
+abs(?x, ?r) <= ?x < 0, ?r = ?x * -1, !
 abs(?x, ?x)
-
-greater(?x, ?y, true) <= Greater(?x, ?y), !
-greater(?x, ?y, false)
-

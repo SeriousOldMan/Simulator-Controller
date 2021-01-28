@@ -64,6 +64,7 @@ class RaceEngineer extends ConfigurationItem {
 	
 	class RaceEngineerSpeaker extends SpeechGenerator {
 		iEngineer := false
+		iFragments := {}
 		iPhrases := {}
 		
 		Engineer[] {
@@ -78,8 +79,15 @@ class RaceEngineer extends ConfigurationItem {
 			}
 		}
 		
-		__New(engineer, speaker, phrases) {
+		Fragments[] {
+			Get {
+				return this.iFragments
+			}
+		}
+		
+		__New(engineer, speaker, fragments, phrases) {
 			this.iEngineer := engineer
+			this.iFragments := fragments
 			this.iPhrases := phrases
 			
 			if (speaker == true)
@@ -100,7 +108,7 @@ class RaceEngineer extends ConfigurationItem {
 			}
 		}
 		
-		speakPhrase(phrase, values := false) {
+		speakPhrase(phrase, variables := false) {
 			phrases := this.Phrases
 			
 			if phrases.HasKey(phrase) {
@@ -110,8 +118,8 @@ class RaceEngineer extends ConfigurationItem {
 				
 				phrase := phrases[Round(index)]
 				
-				if values
-					phrase := substituteVariables(phrase, values)
+				if variables
+					phrase := substituteVariables(phrase, variables)
 			}
 			
 			if phrase
@@ -252,6 +260,7 @@ class RaceEngineer extends ConfigurationItem {
 				, "Race.Duration": duration
 				, "Race.Settings.OutLap": getConfigurationValue(settings, "Race Settings", "OutLap", true)
 				, "Race.Settings.InLap": getConfigurationValue(settings, "Race Settings", "InLap", true)
+				, "Race.Settings.Fuel.Max": getConfigurationValue(data, "Race Data", "FuelAmount", 0)
 				, "Race.Settings.Fuel.AvgConsumption": getConfigurationValue(settings, "Race Settings", "Fuel.AvgConsumption", 0)
 				, "Race.Settings.Fuel.SafetyMargin": getConfigurationValue(settings, "Race Settings", "Fuel.SafetyMargin", 5)
 				, "Race.Settings.Lap.PitstopWarning": getConfigurationValue(settings, "Race Settings", "Lap.PitstopWarning", 5)
@@ -285,7 +294,7 @@ class RaceEngineer extends ConfigurationItem {
 	
 	getSpeaker() {
 		if (this.Speaker && !this.iSpeechGenerator) {
-			this.iSpeechGenerator := new this.RaceEngineerSpeaker(this, this.Speaker, this.buildPhrases(this.Language))
+			this.iSpeechGenerator := new this.RaceEngineerSpeaker(this, this.Speaker, this.buildFragments(this.Language), this.buildPhrases(this.Language))
 			
 			this.getListener()
 		}
@@ -350,6 +359,20 @@ class RaceEngineer extends ConfigurationItem {
 			}
 	}
 	
+	buildFragments(language) {
+		fragments := {}
+		
+		settings := readConfiguration(getFileName("Race Engineer.phrases." . language, kUserConfigDirectory, kConfigDirectory))
+		
+		if (settings.Count() == 0)
+			settings := readConfiguration(getFileName("Race Engineer.phrases.en", kUserConfigDirectory, kConfigDirectory))
+		
+		for fragment, word in getConfigurationSectionValues(settings, "Fragments", {})
+			fragments[fragment] := word
+		
+		return fragments
+	}
+	
 	buildPhrases(language) {
 		phrases := {}
 		visited := {}
@@ -385,10 +408,10 @@ class RaceEngineer extends ConfigurationItem {
 			for grammar, definition in getConfigurationSectionValues(settings, section, {}) {
 				definition := substituteVariables(definition, {name: this.Name})
 			
-				if isDebug() {
+				if false && isDebug() {
 					nextCharIndex := 1
 					SplashTextOn 400, 100, , % "Register phrase grammar " . new GrammarCompiler(speechRecognizer).readGrammar(definition, nextCharIndex).toString()
-					Sleep 100
+					Sleep 1000
 					SplashTextOff
 				}
 
@@ -397,65 +420,86 @@ class RaceEngineer extends ConfigurationItem {
 	}
 	
 	phraseRecognized(grammar, words) {
-		if isDebug() {
+		if true && isDebug() {
 			SplashTextOn 400, 100, , % "Phrase " . grammar . " recognized: " . values2String(" ", words*)
-			Sleep 300
+			Sleep 1000
 			SplashTextOff
 		}
 		
-		switch grammar {
-			case "Yes":
-				continuation := this.iContinuation
-				
-				this.iContinuation := false
-				
-				if continuation {
-					this.getSpeaker().speakPhrase("Confirm")
-								
-					Sleep 5000
+		protectionOn()
+		
+		try {
+			switch grammar {
+				case "Yes":
+					continuation := this.iContinuation
+					
+					this.iContinuation := false
+					
+					if continuation {
+						this.getSpeaker().speakPhrase("Confirm")
+									
+						Sleep 5000
 
-					%continuation%()
-				}
-			case "No":
-				this.iContinuation := false
-				
-				this.getSpeaker().speakPhrase("Okay")
-			case "Call":
-				this.nameRecognized(words)
-			case "Fuck":
-				this.getSpeaker().speakPhrase("Repeat")
-			case "LapsRemaining":
-				this.lapInfoRecognized(words)
-			case "TyreTemperatures":
-				this.iContinuation := false
-				
-				this.tyreInfoRecognized(words)
-			case "TyrePressures":
-				this.iContinuation := false
-				
-				this.tyreInfoRecognized(words)
-			case "PitstopPlan":
-				this.iContinuation := false
-				
-				this.getSpeaker().speakPhrase("Confirm")
-		
-				Sleep 5000
-				
-				this.planPitstopRecognized(words)
-			case "PitstopPrepare":
-				this.iContinuation := false
-				
-				this.getSpeaker().speakPhrase("Confirm")
-		
-				Sleep 5000
-				
-				this.preparePitstopRecognized(words)
-			case "PitstopAdjustTyre":
-				this.iContinuation := false
-				
-				this.pitstopAdjustTyreRecognized(words)
-			default:
-				Throw "Unknown grammar """ . grammar . """ detected in RaceEngineer.phraseRecognized...."
+						%continuation%()
+					}
+				case "No":
+					this.iContinuation := false
+					
+					this.getSpeaker().speakPhrase("Okay")
+				case "Call":
+					this.nameRecognized(words)
+				case "Harsh":
+					this.nameRecognized(words)
+				case "Catch":
+					this.getSpeaker().speakPhrase("Repeat")
+				case "LapsRemaining":
+					this.lapInfoRecognized(words)
+				case "TyreTemperatures":
+					this.iContinuation := false
+					
+					this.tyreInfoRecognized(words)
+				case "TyrePressures":
+					this.iContinuation := false
+					
+					this.tyreInfoRecognized(words)
+				case "PitstopPlan":
+					this.iContinuation := false
+					
+					this.getSpeaker().speakPhrase("Confirm")
+			
+					Sleep 5000
+					
+					this.planPitstopRecognized(words)
+				case "PitstopPrepare":
+					this.iContinuation := false
+					
+					this.getSpeaker().speakPhrase("Confirm")
+			
+					Sleep 5000
+					
+					this.preparePitstopRecognized(words)
+				case "PitstopAdjustCompound":
+					this.iContinuation := false
+					
+					this.pitstopAdjustCompoundRecognized(words)
+				case "PitstopAdjustPressure":
+					this.iContinuation := false
+					
+					this.pitstopAdjustPressureRecognized(words)
+				case "PitstopAdjustRepairSuspension":
+					this.iContinuation := false
+					
+					this.pitstopAdjustRepairRecognized("Suspension", words)
+				case "PitstopAdjustRepairBodywork":
+					this.iContinuation := false
+					
+					this.pitstopAdjustRepairRecognized("Bodywork", words)
+				default:
+					Throw "Unknown grammar """ . grammar . """ detected in RaceEngineer.phraseRecognized...."
+			}
+		}
+		finally {
+			protectionOff()
 		}
 	}
 	
@@ -524,18 +568,192 @@ class RaceEngineer extends ConfigurationItem {
 		this.preparePitstop()
 	}
 	
-	pitstopAdjustTyreRecognized(words) {
+	pitstopAdjustCompoundRecognized(words) {
+		local action
+		local compound
+		
+		speaker := this.getSpeaker()
+		fragments := speaker.Fragments
+		
 		if !this.hasPlannedPitstop() {
-			this.getSpeaker().speakPhrase("NotPossible")
-			this.getSpeaker().speakPhrase("ConfirmPlan")
+			speaker.speakPhrase("NotPossible")
+			speaker.speakPhrase("ConfirmPlan")
 			
 			this.setContinuation(ObjBindMethod(this, "planPitstop"))
 		}
 		else {
-			msgbox ??? adjust tyre
+			compound := false
+		
+			if inList(words, fragments["Wet"])
+				compound := "Wet"
+			else if inList(words, fragments["Dry"])
+				compound := "Dry"
+			
+			if compound {
+				speaker.speakPhrase("ConfirmCompoundChange", {compound: compound})
+					
+				this.setContinuation(ObjBindMethod(this, "updatePitstopTyreCompound", compound))
+			}
+			else
+				speaker.speakPhrase("Repeat")
+		}
+	}
+				
+	pitstopAdjustPressureRecognized(words) {
+		local action
+		
+		static tyreTypeFragments := false
+		static numberFragmentsLookup := false
+		
+		speaker := this.getSpeaker()
+		fragments := speaker.Fragments
+		
+		if !tyreTypeFragments {
+			tyreTypeFragments := {FL: fragments["FrontLeft"], FR: fragments["FrontRight"], RL: fragments["RearLeft"], RR: fragments["RearRight"]}
+			numberFragmentsLookup := {}
+			
+			for index, fragment in ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"]
+				numberFragmentsLookup[fragments[fragment]] := index - 1
+		}
+		
+		if !this.hasPlannedPitstop() {
+			speaker.speakPhrase("NotPossible")
+			speaker.speakPhrase("ConfirmPlan")
+			
+			this.setContinuation(ObjBindMethod(this, "planPitstop"))
+		}
+		else {
+			tyreType := false
+			
+			if inList(words, fragments["Front"])
+				if inList(words, fragments["Left"])
+					tyreType := "FL"
+				else if inList(words, fragments["Right"])
+					tyreType := "FR"
+			else if inList(words, fragments["Rear"])
+				if inList(words, fragments["Left"])
+					tyreType := "RL"
+				else if inList(words, fragments["Right"])
+					tyreType := "RR"
+			
+			if tyreType {
+				action := false
+				
+				if inList(words, fragments["Increase"])
+					action := kIncrease
+				else if inList(words, fragments["Decrease"])
+					action := kDecrease
+				
+				pointPosition := inList(words, fragments["Point"])
+				
+				if pointPosition {
+					psiValue := numberFragmentsLookup[words[pointPosition - 1]]
+					tenthPsiValue := numberFragmentsLookup[words[pointPosition + 1]]
+					
+					tyre := tyreTypeFragments[tyreType]
+					action := fragments[action]
+					
+					delta := Round(psiValue + (tenthPsiValue / 10), 1)
+					
+					speaker.speakPhrase("ConfirmPsiChange", {action: action, tyre: tyre, delta: delta})
+					
+					this.setContinuation(ObjBindMethod(this, "updatePitstopTyrePressure", tyreType, (action == kIncrease) ? delta : (delta * -1)))
+					
+					return
+				}
+			}
+			
+			speaker.speakPhrase("Repeat")
 		}
 	}
 	
+	pitstopAdjustRepairRecognized(repairType, words) {
+		local action
+		
+		speaker := this.getSpeaker()
+		fragments := speaker.Fragments
+		
+		if !this.hasPlannedPitstop() {
+			speaker.speakPhrase("NotPossible")
+			speaker.speakPhrase("ConfirmPlan")
+			
+			this.setContinuation(ObjBindMethod(this, "planPitstop"))
+		}
+		else {
+			negation := ""
+		
+			if inList(words, fragments["Not"])
+				negation := fragments["Not"]
+			
+			speaker.speakPhrase("ConfirmRepairChange", {damage: repairType, negation: negation})
+					
+			this.setContinuation(ObjBindMethod(this, "updatePitstopRepair", repairType, negation = ""))
+		}
+	}
+	
+	updatePitstopTyreCompound(compound) {
+		speaker := this.getSpeaker()
+		
+		if !this.hasPlannedPitstop() {
+			speaker.speakPhrase("NotPossible")
+			speaker.speakPhrase("ConfirmPlan")
+			
+			this.setContinuation(ObjBindMethod(this, "planPitstop"))
+		}
+		else {
+			this.KnowledgeBase.setValue("Pitstop.Planned.Tyre.Compound", compound)
+			
+			if isDebug()
+				dumpKnowledge(this.KnowledgeBase)
+
+			speaker.speakPhrase("ConfirmPlanUpdate")
+		}
+	}
+	
+	updatePitstopTyrePressure(tyreType, delta) {
+		local knowledgeBase := this.KnowledgeBase
+		
+		speaker := this.getSpeaker()
+		
+		if !this.hasPlannedPitstop() {
+			speaker.speakPhrase("NotPossible")
+			speaker.speakPhrase("ConfirmPlan")
+			
+			this.setContinuation(ObjBindMethod(this, "planPitstop"))
+		}
+		else {
+			targetValue := knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure." . tyreType)
+			targetIncrement := knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure." . tyreType . ".Increment")
+			
+			knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure." . tyreType, targetValue + delta)
+			knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure." . tyreType . ".Increment", targetValue + delta)
+			
+			if isDebug()
+				dumpKnowledge(this.KnowledgeBase)
+
+			speaker.speakPhrase("ConfirmPlanUpdate")
+		}
+	}
+	
+	updatePitstopRepair(repairType, repair) {
+		speaker := this.getSpeaker()
+		
+		if !this.hasPlannedPitstop() {
+			speaker.speakPhrase("NotPossible")
+			speaker.speakPhrase("ConfirmPlan")
+			
+			this.setContinuation(ObjBindMethod(this, "planPitstop"))
+		}
+		else {
+			this.KnowledgeBase.setValue("Pitstop.Planned.Repair." . repairType, repair)
+			
+			if isDebug()
+				dumpKnowledge(this.KnowledgeBase)
+
+			speaker.speakPhrase("ConfirmPlanUpdate")
+		}
+	}
+			
 	setContinuation(continuation) {
 		this.iContinuation := continuation
 	}

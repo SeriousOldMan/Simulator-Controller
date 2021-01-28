@@ -58,7 +58,7 @@
 updateFuelTarget(?lap) <= lapAvgFuel(?lap, ?avgFuel), lapRemainingFuel(?lap, ?remainingFuel), remainingRaceLaps(?lap, ?remainingLaps),			\
 						  ?raceFuel = ?avgFuel * ?remainingLaps, safetyFuel(?avgFuel, ?safetyFuel),												\
 						  ?neededFuel = ?raceFuel + ?safetyFuel, ?neededFuel > ?remainingFuel, ?refillAmount = ?neededFuel - ?remainingFuel, 	\
-						  Set(Fuel.Amount.Target, ?refillAmount), !
+						  min(?refillAmount, !Race.Settings.Fuel.Max, ?adjustedRefillAmount), Set(Fuel.Amount.Target, ?adjustedRefillAmount), !
 updateFuelTarget(?lap) <= Clear(Fuel.Amount.Target)
 
 safetyFuel(?avgFuel, ?safetyFuel) <= !Race.Settings.InLap = true, ?safetyFuel = ?avgFuel + !Race.Settings.Fuel.SafetyMargin, !
@@ -411,10 +411,10 @@ length([?h | ?t], ?length) <= length(?t, ?tLength), ?length = ?tLength + 1
 sum([], 0)
 sum([?h | ?t], ?sum) <= sum(?t, ?tSum), ?sum = ?h + ?tSum
 
-max(?x, ?y, ?x) <= ?x > ?y, !, fail
+max(?x, ?y, ?x) <= ?x > ?y, !
 max(?x, ?y, ?y)
 
-min(?x, ?y, ?x) <= ?x < ?y, !, fail
+min(?x, ?y, ?x) <= ?x < ?y, !
 min(?x, ?y, ?y)
 
 abs(?x, ?r) <= ?x < 0, ?r = ?x * -1, !

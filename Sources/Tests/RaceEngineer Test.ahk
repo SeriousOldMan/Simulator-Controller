@@ -487,9 +487,36 @@ class PitstopHandling extends Assert {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+if !GetKeyState("Ctrl") {
+	AHKUnit.AddTestClass(FuelReporting)
+	AHKUnit.AddTestClass(DamageReporting)
+	AHKUnit.AddTestClass(PitstopHandling)
 
-AHKUnit.AddTestClass(FuelReporting)
-AHKUnit.AddTestClass(DamageReporting)
-AHKUnit.AddTestClass(PitstopHandling)
+	AHKUnit.Run()
+}
+else {
+	engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race Engineer.settings")
+								   , new TestPitStopHandler(), "Jona", "Microsoft Zira Desktop", "Microsoft Server Speech Recognition Language - TELE (en-US)")
+								;  , new TestPitStopHandler(), "Jona", "Microsoft David Desktop", "Microsoft Server Speech Recognition Language - Kinect (en-AU)")
 
-AHKUnit.Run()
+	Loop {
+		data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Lap " . A_Index . ".data")
+		
+		if (data.Count() == 0)
+			break
+		else {
+			engineer.addLap(A_Index, data)
+	
+			if (A_Index = 3) {
+				engineer.planPitstop()
+				engineer.preparePitstop()
+			}
+			
+			dumpKnowledge(engineer.KnowledgeBase)
+			
+			MsgBox % "Lap " . A_Index . " loaded - Continue?"
+		}
+	}
+	
+	MsgBox Done...
+}

@@ -556,8 +556,14 @@ class ACCPlugin extends ControllerPlugin {
 			
 		switch activity {
 			case "Change Tyres", "Change Brakes", "Repair Bodywork", "Repair Suspension":
-				if this.selectPitstopOption(activity)
+				if this.selectPitstopOption(activity) {
 					this.changePitstopOption(activity, "Increase")
+					
+					if (activity = "Repair Suspension")
+						this.iRepairSuspensionChosen := !this.iRepairSuspensionChosen
+					else if (activity = "Repair Bodywork")
+						this.iRepairBodyworkChosen := !this.iRepairBodyworkChosen
+				}
 			default:
 				Throw "Unsupported activity """ . activity . """ detected in ACCPlugin.toggleActivity..."
 		}
@@ -1014,18 +1020,10 @@ class ACCPlugin extends ControllerPlugin {
 	
 	startPitstopSetup(pitstopNumber) {
 		openPitstopMFD()
-		
-		changePitstopStrategy("Previous", 5)
 	}
 
 	finishPitstopSetup(pitstopNumber) {
 		closePitstopMFD()
-		
-		if this.RaceEngineerVoice {
-			generator := new SpeechGenerator(this.RaceEngineerVoice)
-
-			generator.speak(translate("We are ready for the pitstop. You can come in."), true)
-		}
 	}
 
 	setPitstopRefuelAmount(pitstopNumber, litres) {
@@ -1034,9 +1032,6 @@ class ACCPlugin extends ControllerPlugin {
 	
 	setPitstopTyreSet(pitstopNumber, compound, set := false) {
 		changePitstopTyreCompound(compound)
-		
-		if (compound = "Dry")
-			changePitstopTyreSet("Next", set - 1)
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFLIncrement, pressureFRIncrement, pressureRLIncrement, pressureRRIncrement) {
@@ -1051,10 +1046,17 @@ class ACCPlugin extends ControllerPlugin {
 	}
 
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork) {
-		msgbox ???? implement
-		
-		this.iRepairSuspensionChosen := repairSuspension
-		this.iRepairBodyworkChosen := repairBodywork
+		if (repairSuspension != this.iRepairSuspensionChosen) {
+			togglePitstopActivity("Repair Suspension")
+			
+			this.iRepairSuspensionChosen := !this.iRepairSuspensionChosen
+		}
+			
+		if (repairBodywork != this.iRepairBodyworkChosen) {
+			togglePitstopActivity("Repair Bodywork")
+			
+			this.iRepairBodyworkChosen := !this.iRepairBodyworkChosen
+		}
 	}
 }
 

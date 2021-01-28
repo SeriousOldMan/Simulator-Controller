@@ -1,11 +1,11 @@
 [Choices]
 number=zero, one, two, three, four, five, six, seven, eight, nine
-change=increase, decrease
 [Conversation]
 Call={Hi, Hey} %name%
+Harsh={Fuck do you hear me, %name% I need you, Hey %name% where are you}
 Yes={Yes go on, Perfect go on, Go on please, Head on please}
 No=No {thank you, not now, I will call you later}
-Fuck=Fuck
+Catch={sadasd, sdasdsj, dasjds} {sdas, fdf, fdifg, kofkld} {dkasdie, slaps, kllldj} {qwwee, dsad, pyxj, ppds}
 [Information]
 TyrePressures=[{Tell me, Give me, What are} {the tyre pressures, the current tyre pressures, the pressures of the tyres}, Tell me the pressures of the tyres]
 TyreTemperatures={Tell me, Give me, What are} {the tyre temperatures, the temperatures at the moment}
@@ -13,4 +13,7 @@ LapsRemaining=[{Tell me, Give me} the remaining laps, How many laps are remainin
 [Pitstop]
 PitstopPlan=Can you {plan the pitstop, create a plan for the pitstop, create a pitstop plan, come up with a pitstop plan}
 PitstopPrepare=Can you {prepare the pitstop, let the crew prepare the pitstop, setup everything for the pitstop}
-PitstopAdjustTyre={Can you, Please} (change) {front left, front right, rear left, rear right} by (number) point (number)
+PitstopAdjustCompound=[{Can we, Please} {use, switch to} wet tyres, {Can we, Please} {use, switch to} dry tyres]
+PitstopAdjustPressure=[{Can you, Please} increase {front left, front right, rear left, rear right} by (number) point (number), {Can you, Please} decrease {front left, front right, rear left, rear right} by (number) point (number)]
+PitstopAdjustRepairSuspension=[Please repair the suspension, Please do not repair the suspension]
+PitstopAdjustRepairBodyWork=[Please repair the bodywork, Please do not repair the bodywork]

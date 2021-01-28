@@ -377,7 +377,6 @@ pitstopPressure(?tyreType, ?pressure) <= lastPitstop(?nr), Append(?fact, Pitstop
 
 lapWeight(?lap, ?weight) <= ?distance = !Lap - ?lap, ?distance < !Race.Settings.Lap.History.Considered, 												\
 							?temp = ?distance * !Race.Settings.Lap.History.Damping, ?weight = 1 - ?temp
-							; ?temp = !Race.Settings.Lap.History.Considered - ?distance, ?weight = ?temp / !Race.Settings.Lap.History.Considered
 lapWeight(?, 0)
 
 

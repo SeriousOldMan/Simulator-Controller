@@ -59,7 +59,7 @@ class TestRaceEngineer extends RaceEngineer {
 		base.lowFuelWarning(remainingLaps)
 		
 		if isDebug() {
-			SplashTextOn 400, 100, , % "Low fuel warning - " . remainingLaps . " left"
+			SplashTextOn 400, 100, , % "Low fuel warning - " . remainingLaps . " lap left"
 			Sleep 1000
 			SplashTextOff
 		}

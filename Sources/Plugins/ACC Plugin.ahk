@@ -997,16 +997,16 @@ class ACCPlugin extends ControllerPlugin {
 			Throw "Pitstops may only be performed during an active race..."
 	}
 	
-	pitstopPlanned() {
+	pitstopPlanned(pitstopNumber) {
 	}
 	
-	pitstopPrepared() {
+	pitstopPrepared(pitstopNumber) {
 		this.iPitstopPending := true
 				
 		SetTimer collectRaceData, 5000
 	}
 	
-	pitstopFinished() {
+	pitstopFinished(pitstopNumber) {
 		this.iPitstopPending := false
 				
 		SetTimer collectRaceData, 10000

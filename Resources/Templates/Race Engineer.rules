@@ -94,8 +94,9 @@ nextTyreSet() <= Set(Tyre.Set.Target, !Race.Settings.Tyre.Set.Fresh)
 ;;;                                                                         ;;;
 ;;; Check, whether the actual tyre pressures are out of target range and    ;;;
 ;;; adjust for the next pitstop accordingly. The last laps according to     ;;;
-;;; "Race.Settings.Lap.Considered" are considered with linear falling       ;;;
-;;; influence on the deviation factor.                                      ;;;
+;;; "Race.Settings.Lap.History.Considered" are considered with linear		;;;
+;;; falling influence on the deviation factor according to					;;;
+;;; "Race.Settings.Lap.History.Weight".                                     ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 {Any: [?Lap], {None: [?Tyre.Set.Target]}} => (Prove: updateTyrePressureDeviation, ?Lap)
@@ -107,7 +108,7 @@ tyrePressureDeviation(?lap, [], [])
 tyrePressureDeviation(?lap, [?tyreType | ?tyreTypes], [?deviation | ?deviations]) <= 															\
 		weightedDeviation(?lap, 0, ?tyreType, ?deviation), tyrePressureDeviation(?lap, ?tyreTypes, ?deviations)
 
-weightedDeviation(?, !Race.Settings.Lap.Considered, ?, 0) <= !
+weightedDeviation(?, !Race.Settings.Lap.History.Considered, ?, 0) <= !
 weightedDeviation(?lap, ?lap, ?, 0) <= !
 weightedDeviation(?lap, ?offset, ?tyreType, ?deviation) <= ?tLap = ?lap - ?offset,	currentTyreCompound(?compound),								\
 														   Append(?lapTP, Lap., ?tLap, .Tyre.Pressure., ?tyreType), Get(?lPressure, ?lapTP),	\
@@ -332,12 +333,12 @@ remainingStintLaps(?lap, ?remainingLaps) <= lapRemainingFuel(?lap, ?fuelLeft), l
 											?remainingLaps = ?fuelLeft / ?fuelPerLap
 										
 lapTimes(?lap, ?lap, []) <= !
-lapTimes(?, !Race.Settings.Lap.Considered, []) <= !
+lapTimes(?, !Race.Settings.Lap.History.Considered, []) <= !
 lapTimes(?lap, ?offset, [?time | ?times]) <= ?tLap = ?lap - ?offset, lapTime(?tlap, ?time),													\
 											 ?nOffset = ?offset + 1, lapTimes(?lap, ?nOffset, ?times)
 											 
 weightedLapTimes(?lap, ?lap, []) <= !
-weightedLapTimes(?, !Race.Settings.Lap.Considered, []) <= !
+weightedLapTimes(?, !Race.Settings.Lap.History.Considered, []) <= !
 weightedLapTimes(?lap, ?offset, [?time | ?times]) <= ?tLap = ?lap - ?offset, weightedLapTime(?lap, ?tlap, ?time),								\
 													 ?nOffset = ?offset + 1, weightedLapTimes(?lap, ?nOffset, ?times)
 
@@ -374,8 +375,9 @@ pitstopPressure(?tyreType, ?pressure) <= lastPitstop(?nr), Append(?fact, Pitstop
 ;;;                         Statistical Computations                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-lapWeight(?lap, ?weight) <= ?distance = !Lap - ?lap, ?distance < !Race.Settings.Lap.Considered, 												\
-							?temp = !Race.Settings.Lap.Considered - ?distance, ?weight = ?temp / !Race.Settings.Lap.Considered
+lapWeight(?lap, ?weight) <= ?distance = !Lap - ?lap, ?distance < !Race.Settings.Lap.History.Considered, 												\
+							?temp = ?distance * !Race.Settings.Lap.History.Damping, ?weight = 1 - ?temp
+							; ?temp = !Race.Settings.Lap.History.Considered - ?distance, ?weight = ?temp / !Race.Settings.Lap.History.Considered
 lapWeight(?, 0)
 
 

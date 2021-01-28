@@ -32,231 +32,464 @@ SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                        Private Variable Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global vFuelWarnings = {}
+
+global vSuspensionDamage = kNotInitialized
+global vBodyworkDamage = kNotInitialized
+
+global vCompletedActions = {}
+
+global vPitstopFuel = kNotInitialized
+global vPitstopTyreCompound = kNotInitialized
+global vPitstopTyreSet = kNotInitialized
+global vPitstopTyrePressureIncrements = kNotInitialized
+global vPitstopRepairSuspension = kNotInitialized
+global vPitstopRepairBodywork = kNotInitialized
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                         Private Classes Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+class TestRaceEngineer extends RaceEngineer {
+	lowFuelWarning(remainingLaps) {
+		base.lowFuelWarning(remainingLaps)
+		
+		if isDebug() {
+			SplashTextOn 400, 100, , % "Low fuel warning - " . remainingLaps . " left"
+			Sleep 1000
+			SplashTextOff
+		}
+		
+		vFuelWarnings[this.KnowledgeBase.getValue("Lap")] := remainingLaps
+	}
+	
+	damageWarning(newSuspensionDamage, newBodyworkDamage) {
+		base.damageWarning(newSuspensionDamage, newBodyworkDamage)
+		
+		if isDebug() {
+			SplashTextOn 400, 100, , % "Damage warning for " . (newSuspensionDamage ? "Suspension " : "") . (newBodyworkDamage ? "Bodywork" : "")
+			Sleep 1000
+			SplashTextOff
+		}
+		
+		vSuspensionDamage := newSuspensionDamage
+		vBodyworkDamage := newBodyworkDamage
+	}
+}
+
+class TestPitstopHandler {
+	showAction(action, arguments*) {
+		if isDebug() {
+			SplashTextOn 400, 100, , % "Invoking pitstop action " . action . ((arguments.Length() > 0) ? (" with " . values2String(", ", arguments*)) : "")
+			Sleep 1000
+			SplashTextOff
+		}
+	}
+
+	pitstopPlanned(pitstopNumber) {
+		this.showAction("pitstopPlanned", pitstopNumber)
+		
+		vCompletedActions["pitstopPlanned"] := pitstopNumber
+	}
+	
+	pitstopPrepared(pitstopNumber) {
+		this.showAction("pitstopPrepared", pitstopNumber)
+		
+		vCompletedActions["pitstopPrepared"] := pitstopNumber
+	}
+	
+	pitstopFinished(pitstopNumber) {
+		this.showAction("pitstopFinished", pitstopNumber)
+		
+		vCompletedActions["pitstopFinished"] := pitstopNumber
+	}
+	
+	startPitstopSetup(pitstopNumber) {
+		this.showAction("startPitstopSetup", pitstopNumber)
+		
+		vCompletedActions["startPitstopSetup"] := pitstopNumber
+	}
+
+	finishPitstopSetup(pitstopNumber) {
+		this.showAction("finishPitstopSetup", pitstopNumber)
+		
+		vCompletedActions["finishPitstopSetup"] := pitstopNumber
+	}
+
+	setPitstopRefuelAmount(pitstopNumber, litres) {
+		this.showAction("setPitstopRefuelAmount", pitstopNumber, litres)
+		
+		vCompletedActions["setPitstopRefuelAmount"] := pitstopNumber
+		
+		vPitstopFuel := Round(litres)
+	}
+	
+	setPitstopTyreSet(pitstopNumber, compound, set := false) {
+		this.showAction("setPitstopTyreSet", pitstopNumber, compound, set)
+		
+		vCompletedActions["setPitstopTyreSet"] := pitstopNumber
+		
+		vPitstopTyreCompound := compound
+		vPitstopTyreSet := set
+	}
+
+	setPitstopTyrePressures(pitstopNumber, pressureFLIncrement, pressureFRIncrement, pressureRLIncrement, pressureRRIncrement) {
+		this.showAction("setPitstopTyrePressures", pitstopNumber, pressureFLIncrement, pressureFRIncrement, pressureRLIncrement, pressureRRIncrement)
+		
+		vCompletedActions["setPitstopTyrePressures"] := pitstopNumber
+		
+		vPitstopTyrePressureIncrements := [pressureFLIncrement, pressureFRIncrement, pressureRLIncrement, pressureRRIncrement]
+	}
+
+	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork) {
+		this.showAction("requestPitstopRepairs", pitstopNumber, repairSuspension, repairBodywork)
+		
+		vCompletedActions["requestPitstopRepairs"] := pitstopNumber
+		
+		vPitstopRepairSuspension := repairSuspension
+		vPitstopRepairBodywork := repairBodywork
+	}
+}
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                              Test Section                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class RuleSetValidation extends Assert {
-	RuleSetValidation_Test() {
-		FileRead engineerRules, %kConfigDirectory%ACC Race Engineer.rules
+class OutOfFuelReporting extends Assert {
+	FuelWarningTest() {
+		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race Engineer.settings"), false, false, false)
+
+		vFuelWarnings := {}
 		
-		compiler := new RuleCompiler()
+		Loop {
+			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Lap " . A_Index . ".data")
+			
+			if (data.Count() == 0)
+				break
+			else
+				engineer.addLap(A_Index, data)
+			
+			dumpKnowledge(engineer.KnowledgeBase)
+		}
 		
-		productions := false
-		reductions := false
+		this.AssertEqual(false, vFuelWarnings.HasKey(1), "Unexpected fuel warning in lap 1...")
+		this.AssertEqual(false, vFuelWarnings.HasKey(2), "Unexpected fuel warning in lap 2...")
+		this.AssertEqual(true, vFuelWarnings.HasKey(3), "No fuel warning in lap 3...")
+		this.AssertEqual(true, vFuelWarnings.HasKey(4), "No fuel warning in lap 4...")
+		this.AssertEqual(true, vFuelWarnings.HasKey(5), "No fuel warning in lap 5...")
+	}
+
+	RemainingFuelTest() {
+		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race Engineer.settings"), false, false, false)
+
+		vFuelWarnings := {}
 		
-		compiler.compileRules(engineerRules, productions, reductions)
+		Loop {
+			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Lap " . A_Index . ".data")
+			
+			if (data.Count() == 0)
+				break
+			else
+				engineer.addLap(A_Index, data)
+			
+			dumpKnowledge(engineer.KnowledgeBase)
+		}
 		
-		this.AssertEqual(3, productions.Length(), "Not all production rules compiled...")
-		this.AssertEqual(21, reductions.Length(), "Not all reduction rules compiled...")
+		this.AssertEqual(3, vFuelWarnings[3], "Unexpected remaining fuel reported in lap 3...")
+		this.AssertEqual(1, vFuelWarnings[4], "Unexpected remaining fuel reported in lap 4...")
+		this.AssertEqual(1, vFuelWarnings[5], "Unexpected remaining fuel reported in lap 5...")
 	}
 }
 
-class LapUpdate extends Assert {
-}
-
-class TrendProjection extends Assert {
+class DamageReporting extends Assert {
+	DamageReportingTest() {
+		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race Engineer.settings"), new TestPitStopHandler(), false, false)
+		
+		Loop {
+			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Lap " . A_Index . ".data")
+			
+			vSuspensionDamage := kNotInitialized
+			vBodyworkDamage := kNotInitialized
+				
+			if (data.Count() == 0)
+				break
+			else
+				engineer.addLap(A_Index, data)
+			
+			if (A_Index = 4) {
+				this.AssertEqual(true, vSuspensionDamage, "Expected suspension damage to be reported...")
+				this.AssertEqual(false, vBodyworkDamage, "Expected no bodywork damage to be reported...")
+			}
+			else if (A_Index = 5) {
+				this.AssertEqual(true, vSuspensionDamage, "Expected suspension damage to be reported...")
+				this.AssertEqual(true, vBodyworkDamage, "Expected bodywork damage to be reported...")
+			}
+			else {
+				this.AssertEqual(kNotInitialized, vSuspensionDamage, "Expected no suspension damage to be reported...")
+				this.AssertEqual(kNotInitialized, vBodyworkDamage, "Expected no bodywork damage to be reported...")
+			}
+			
+			dumpKnowledge(engineer.KnowledgeBase)
+		}
+	}
 }
 
 class PitstopHandling extends Assert {
+	equalLists(listA, listB) {
+		if (listA.Length() != listB.Length())
+			return false
+		else
+			for index, value in listA
+				if (listB[index] != value)
+					return false
+				
+		return true
+	}
+	
+	PitstopPlanLap3Test() {
+		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race Engineer.settings"), new TestPitStopHandler(), false, false)
+		
+		vCompletedActions := {}
+		
+		Loop {
+			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Lap " . A_Index . ".data")
+			
+			if (data.Count() == 0)
+				break
+			else {
+				engineer.addLap(A_Index, data)
+			
+				if (A_Index = 3)
+					engineer.planPitstop()
+			}
+			
+			dumpKnowledge(engineer.KnowledgeBase)
+		}
+		
+		this.AssertEqual(true, vCompletedActions.HasKey("pitstopPlanned"), "No pitstop planned...")
+		this.AssertEqual(1, vCompletedActions["pitstopPlanned"], "Pitstop not planned as number 1...")
+		
+		this.AssertEqual(true, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned")), "Pitstop not flagged as Planned...")
+		this.AssertEqual(54, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned.Fuel")), "Expected 54 litres for refueling...")
+		this.AssertEqual("Dry", engineer.KnowledgeBase.getValue("Pitstop.Planned.Tyre.Compound"), "Expected Dry tyre compound...")
+		this.AssertEqual(8, engineer.KnowledgeBase.getValue("Pitstop.Planned.Tyre.Set"), "Expected tyre set 8...")
+		this.AssertEqual(false, engineer.KnowledgeBase.getValue("Pitstop.Planned.Repair.Suspension"), "Expected no suspension repair...")
+		this.AssertEqual(false, engineer.KnowledgeBase.getValue("Pitstop.Planned.Repair.Bodywork"), "Expected no bodywork repair...")
+		this.AssertEqual(26.4, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL"), 1), "Unexpected tyre pressure target for FL...")
+		this.AssertEqual(26.4, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR"), 1), "Unexpected tyre pressure target for FR...")
+		this.AssertEqual(26.4, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL"), 1), "Unexpected tyre pressure target for RL...")
+		this.AssertEqual(26.4, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR"), 1), "Unexpected tyre pressure target for RR...")
+		
+		this.AssertEqual(false, vCompletedActions.HasKey("pitstopPrepared"), "Unexpected pitstop action pitstopPrepared reported...")
+		this.AssertEqual(false, vCompletedActions.HasKey("pitstopFinished"), "Unexpected pitstop action pitstopFinished reported...")
+		this.AssertEqual(false, vCompletedActions.HasKey("startPitstopSetup"), "Unexpected pitstop action startPitstopSetup reported...")
+		this.AssertEqual(false, vCompletedActions.HasKey("finishPitstopSetup"), "Unexpected pitstop action finishPitstopSetup reported...")
+		this.AssertEqual(false, vCompletedActions.HasKey("setPitstopRefuelAmount"), "Unexpected pitstop action setPitstopRefuelAmount reported...")
+		this.AssertEqual(false, vCompletedActions.HasKey("setPitstopTyreSet"), "Unexpected pitstop action setPitstopTyreSet reported...")
+		this.AssertEqual(false, vCompletedActions.HasKey("setPitstopTyrePressures"), "Unexpected pitstop action setPitstopTyrePressures reported...")
+		this.AssertEqual(false, vCompletedActions.HasKey("requestPitstopRepairs"), "Unexpected pitstop action requestPitstopRepairs reported...")
+	}
+	
+	PitstopPlanLap4Test() {
+		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race Engineer.settings"), new TestPitStopHandler(), false, false)
+		
+		vCompletedActions := {}
+		
+		Loop {
+			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Lap " . A_Index . ".data")
+			
+			if (data.Count() == 0)
+				break
+			else {
+				engineer.addLap(A_Index, data)
+			
+				if (A_Index = 4)
+					engineer.planPitstop()
+			}
+			
+			dumpKnowledge(engineer.KnowledgeBase)
+		}
+		
+		this.AssertEqual(true, vCompletedActions.HasKey("pitstopPlanned"), "No pitstop planned...")
+		this.AssertEqual(1, vCompletedActions["pitstopPlanned"], "Pitstop not planned as number 1...")
+		
+		this.AssertEqual(true, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned")), "Pitstop not flagged as Planned...")
+		this.AssertEqual(55, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned.Fuel")), "Expected 54 litres for refueling...")
+		this.AssertEqual("Dry", engineer.KnowledgeBase.getValue("Pitstop.Planned.Tyre.Compound"), "Expected Dry tyre compound...")
+		this.AssertEqual(8, engineer.KnowledgeBase.getValue("Pitstop.Planned.Tyre.Set"), "Expected tyre set 8...")
+		this.AssertEqual(true, engineer.KnowledgeBase.getValue("Pitstop.Planned.Repair.Suspension"), "Expected suspension repair...")
+		this.AssertEqual(false, engineer.KnowledgeBase.getValue("Pitstop.Planned.Repair.Bodywork"), "Expected no bodywork repair...")
+		this.AssertEqual(26.5, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL"), 1), "Unexpected tyre pressure target for FL...")
+		this.AssertEqual(26.3, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR"), 1), "Unexpected tyre pressure target for FR...")
+		this.AssertEqual(26.4, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL"), 1), "Unexpected tyre pressure target for RL...")
+		this.AssertEqual(26.4, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR"), 1), "Unexpected tyre pressure target for RR...")
+		
+		this.AssertEqual(false, vCompletedActions.HasKey("pitstopPrepared"), "Unexpected pitstop action pitstopPrepared reported...")
+		this.AssertEqual(false, vCompletedActions.HasKey("pitstopFinished"), "Unexpected pitstop action pitstopFinished reported...")
+		this.AssertEqual(false, vCompletedActions.HasKey("startPitstopSetup"), "Unexpected pitstop action startPitstopSetup reported...")
+		this.AssertEqual(false, vCompletedActions.HasKey("finishPitstopSetup"), "Unexpected pitstop action finishPitstopSetup reported...")
+		this.AssertEqual(false, vCompletedActions.HasKey("setPitstopRefuelAmount"), "Unexpected pitstop action setPitstopRefuelAmount reported...")
+		this.AssertEqual(false, vCompletedActions.HasKey("setPitstopTyreSet"), "Unexpected pitstop action setPitstopTyreSet reported...")
+		this.AssertEqual(false, vCompletedActions.HasKey("setPitstopTyrePressures"), "Unexpected pitstop action setPitstopTyrePressures reported...")
+		this.AssertEqual(false, vCompletedActions.HasKey("requestPitstopRepairs"), "Unexpected pitstop action requestPitstopRepairs reported...")
+	}
+	
+	PitstopPlanLap5Test() {
+		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race Engineer.settings"), new TestPitStopHandler(), false, false)
+		
+		vCompletedActions := {}
+		
+		Loop {
+			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Lap " . A_Index . ".data")
+			
+			if (data.Count() == 0)
+				break
+			else {
+				engineer.addLap(A_Index, data)
+			
+				if (A_Index = 5)
+					engineer.planPitstop()
+			}
+			
+			dumpKnowledge(engineer.KnowledgeBase)
+		}
+		
+		this.AssertEqual(true, vCompletedActions.HasKey("pitstopPlanned"), "No pitstop planned...")
+		this.AssertEqual(1, vCompletedActions["pitstopPlanned"], "Pitstop not planned as number 1...")
+		
+		this.AssertEqual(true, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned")), "Pitstop not flagged as Planned...")
+		this.AssertEqual(55, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned.Fuel")), "Expected 55 litres for refueling...")
+		this.AssertEqual("Dry", engineer.KnowledgeBase.getValue("Pitstop.Planned.Tyre.Compound"), "Expected Dry tyre compound...")
+		this.AssertEqual(8, engineer.KnowledgeBase.getValue("Pitstop.Planned.Tyre.Set"), "Expected tyre set 8...")
+		this.AssertEqual(true, engineer.KnowledgeBase.getValue("Pitstop.Planned.Repair.Suspension"), "Expected suspension repair...")
+		this.AssertEqual(true, engineer.KnowledgeBase.getValue("Pitstop.Planned.Repair.Bodywork"), "Expected bodywork repair...")
+		this.AssertEqual(26.4, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL"), 1), "Unexpected tyre pressure target for FL...")
+		this.AssertEqual(26.3, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR"), 1), "Unexpected tyre pressure target for FR...")
+		this.AssertEqual(26.4, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL"), 1), "Unexpected tyre pressure target for RL...")
+		this.AssertEqual(26.4, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR"), 1), "Unexpected tyre pressure target for RR...")
+		
+		this.AssertEqual(false, vCompletedActions.HasKey("pitstopPrepared"), "Unexpected pitstop action pitstopPrepared reported...")
+		this.AssertEqual(false, vCompletedActions.HasKey("pitstopFinished"), "Unexpected pitstop action pitstopFinished reported...")
+		this.AssertEqual(false, vCompletedActions.HasKey("startPitstopSetup"), "Unexpected pitstop action startPitstopSetup reported...")
+		this.AssertEqual(false, vCompletedActions.HasKey("finishPitstopSetup"), "Unexpected pitstop action finishPitstopSetup reported...")
+		this.AssertEqual(false, vCompletedActions.HasKey("setPitstopRefuelAmount"), "Unexpected pitstop action setPitstopRefuelAmount reported...")
+		this.AssertEqual(false, vCompletedActions.HasKey("setPitstopTyreSet"), "Unexpected pitstop action setPitstopTyreSet reported...")
+		this.AssertEqual(false, vCompletedActions.HasKey("setPitstopTyrePressures"), "Unexpected pitstop action setPitstopTyrePressures reported...")
+		this.AssertEqual(false, vCompletedActions.HasKey("requestPitstopRepairs"), "Unexpected pitstop action requestPitstopRepairs reported...")
+	}
+	
+	PitstopPrepare3Test() {
+		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race Engineer.settings"), new TestPitStopHandler(), false, false)
+		
+		vCompletedActions := {}
+		
+		vPitstopFuel = kNotInitialized
+		vPitstopTyreCompound = kNotInitialized
+		vPitstopTyreSet = kNotInitialized
+		vPitstopTyrePressureIncrements = kNotInitialized
+		vPitstopRepairSuspension = kNotInitialized
+		vPitstopRepairBodywork = kNotInitialized
+		
+		Loop {
+			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Lap " . A_Index . ".data")
+			
+			if (data.Count() == 0)
+				break
+			else {
+				engineer.addLap(A_Index, data)
+			
+				if (A_Index = 3) {
+					engineer.planPitstop()
+					engineer.preparePitstop()
+				}
+			}
+			
+			dumpKnowledge(engineer.KnowledgeBase)
+		}
+		
+		this.AssertEqual(1, vCompletedActions["pitstopPlanned"], "Pitstop not planned as number 1...")
+		this.AssertEqual(1, vCompletedActions["pitstopPrepared"], "Pitstop not prepared as number 1...")
+		
+		this.AssertEqual(false, vCompletedActions.HasKey("pitstopFinished"), "Pitstop action pitstopFinished should not be reported...")
+		
+		this.AssertEqual(true, vCompletedActions.HasKey("startPitstopSetup"), "Pitstop action startPitstopSetup not reported...")
+		this.AssertEqual(true, vCompletedActions.HasKey("finishPitstopSetup"), "Pitstop action finishPitstopSetup not reported...")
+		this.AssertEqual(true, vCompletedActions.HasKey("setPitstopRefuelAmount"), "Pitstop action setPitstopRefuelAmount not reported...")
+		this.AssertEqual(true, vCompletedActions.HasKey("setPitstopTyreSet"), "Pitstop action setPitstopTyreSet not reported...")
+		this.AssertEqual(true, vCompletedActions.HasKey("setPitstopTyrePressures"), "Pitstop action setPitstopTyrePressures not reported...")
+		this.AssertEqual(true, vCompletedActions.HasKey("requestPitstopRepairs"), "Pitstop action requestPitstopRepairs not reported...")
+		
+		this.AssertEqual(54, vPitstopFuel, "Expected 54 litres for refueling...")
+		this.AssertEqual("Dry", vPitstopTyreCompound, "Expected Dry tyre compound...")
+		this.AssertEqual(8, vPitstopTyreSet, "Expected tyre set 8...")
+		this.AssertEqual(false, vPitstopRepairSuspension, "Expected no suspension repair...")
+		this.AssertEqual(false, vPitstopRepairBodywork, "Expected no bodywork repair...")
+		this.AssertEqual(true, this.equalLists(vPitstopTyrePressureIncrements, [0.3, 0.3, 0.3, 0.3]), "Unexpected tyre pressure increments...")
+	}
+	
+	PitstopPrepare5Test() {
+		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race Engineer.settings"), new TestPitStopHandler(), false, false)
+		
+		vCompletedActions := {}
+		
+		vPitstopFuel = kNotInitialized
+		vPitstopTyreCompound = kNotInitialized
+		vPitstopTyreSet = kNotInitialized
+		vPitstopTyrePressureIncrements = kNotInitialized
+		vPitstopRepairSuspension = kNotInitialized
+		vPitstopRepairBodywork = kNotInitialized
+		
+		Loop {
+			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Lap " . A_Index . ".data")
+			
+			if (data.Count() == 0)
+				break
+			else {
+				engineer.addLap(A_Index, data)
+			
+				if (A_Index = 5) {
+					engineer.planPitstop()
+					engineer.preparePitstop()
+				}
+			}
+			
+			dumpKnowledge(engineer.KnowledgeBase)
+		}
+		
+		this.AssertEqual(1, vCompletedActions["pitstopPlanned"], "Pitstop not planned as number 1...")
+		this.AssertEqual(1, vCompletedActions["pitstopPrepared"], "Pitstop not prepared as number 1...")
+		
+		this.AssertEqual(false, vCompletedActions.HasKey("pitstopFinished"), "Pitstop action pitstopFinished should not be reported...")
+		
+		this.AssertEqual(true, vCompletedActions.HasKey("startPitstopSetup"), "Pitstop action startPitstopSetup not reported...")
+		this.AssertEqual(true, vCompletedActions.HasKey("finishPitstopSetup"), "Pitstop action finishPitstopSetup not reported...")
+		this.AssertEqual(true, vCompletedActions.HasKey("setPitstopRefuelAmount"), "Pitstop action setPitstopRefuelAmount not reported...")
+		this.AssertEqual(true, vCompletedActions.HasKey("setPitstopTyreSet"), "Pitstop action setPitstopTyreSet not reported...")
+		this.AssertEqual(true, vCompletedActions.HasKey("setPitstopTyrePressures"), "Pitstop action setPitstopTyrePressures not reported...")
+		this.AssertEqual(true, vCompletedActions.HasKey("requestPitstopRepairs"), "Pitstop action requestPitstopRepairs not reported...")
+		
+		this.AssertEqual(55, vPitstopFuel, "Expected 54 litres for refueling...")
+		this.AssertEqual("Dry", vPitstopTyreCompound, "Expected Dry tyre compound...")
+		this.AssertEqual(8, vPitstopTyreSet, "Expected tyre set 8...")
+		this.AssertEqual(true, vPitstopRepairSuspension, "Expected suspension repair...")
+		this.AssertEqual(true, vPitstopRepairBodywork, "Expected bodywork repair...")
+		this.AssertEqual(true, this.equalLists(vPitstopTyrePressureIncrements, [0.3, 0.2, 0.3, 0.3]), "Unexpected tyre pressure increments...")
+	}
 }
 
-dumpRules(productions, reductions) {
-	FileDelete %kUserHomeDirectory%Temp\rules.out
-
-	for ignore, production in productions {
-		text := production.toString() . "`n"
-		FileAppend %text%, %kUserHomeDirectory%Temp\rules.out
-	}
-
-	for ignore, reduction in reductions {
-		text := reduction.toString() . "`n"
-		FileAppend %text%, %kUserHomeDirectory%Temp\rules.out
-	}
-}
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-/*
-AHKUnit.AddTestClass(RuleSetValidation)
-AHKUnit.AddTestClass(LapUpdate)
-AHKUnit.AddTestClass(TrendProjection)
+
+AHKUnit.AddTestClass(OutOfFuelReporting)
+AHKUnit.AddTestClass(DamageReporting)
 AHKUnit.AddTestClass(PitstopHandling)
 
 AHKUnit.Run()
-*/
-
-class TestPitstopHandler {
-	showAction(action, arguments*) {
-		SplashTextOn 400, 100, , % "Invoking pitstop action " . action . ((arguments.Length() > 0) ? (" with " . values2String(", ", arguments*)) : "")
-		Sleep 500
-		SplashTextOff
-	}
-
-	pitstopPlanned(arguments*) {
-		this.showAction("pitstopPlanned", arguments*)
-	}
-	
-	pitstopPrepared(arguments*) {
-		this.showAction("pitstopPrepared", arguments*)
-	}
-	
-	pitstopFinished(arguments*) {
-		this.showAction("pitstopFinished", arguments*)
-	}
-	
-	startPitstopSetup(arguments*) {
-		this.showAction("startPitstopSetup", arguments*)
-	}
-
-	finishPitstopSetup(arguments*) {
-		this.showAction("finishPitstopSetup", arguments*)
-	}
-
-	setPitstopRefuelAmount(arguments*) {
-		this.showAction("setPitstopRefuelAmount", arguments*)
-	}
-	
-	setPitstopTyreSet(arguments*) {
-		this.showAction("setPitstopTyreSet", arguments*)
-	}
-
-	setPitstopTyrePressures(arguments*) {
-		this.showAction("setPitstopTyrePressures", arguments*)
-	}
-
-	requestPitstopRepairs(arguments*) {
-		this.showAction("requestPitstopRepairs", arguments*)
-	}
-}
-
-
-engineer := new RaceEngineer(false, readConfiguration(getFileName("Race Engineer.settings", kUserConfigDirectory, kConfigDirectory))
-						   , new TestPitStopHandler(), "Jona", "Microsoft Zira Desktop", "Microsoft Server Speech Recognition Language - TELE (en-US)")
-;						   , new TestPitStopHandler(), "Jona", "Microsoft David Desktop", "Microsoft Server Speech Recognition Language - Kinect (en-AU)")
-
-
-Loop {
-	data := readConfiguration(kSourcesDirectory . "Tests\Race Data\Lap " . A_Index . ".data")
-	
-	if (data.Count() == 0)
-		break
-	else {
-		engineer.addLap(A_Index, data)
-	
-		if (A_Index = 3) {
-			engineer.planPitstop()
-			engineer.preparePitstop()
-		}
-		
-		dumpKnowledge(engineer.KnowledgeBase)
-		
-		MsgBox % "Lap " . A_Index . " loaded - Continue?"
-	}
-}
-
-MsgBox Done - Race on
-
-ExitApp
-
-
-
-/*
-FileRead engineerRules, %kConfigDirectory%\Race Engineer.rules
-		
-compiler := new RuleCompiler()
-
-productions := false
-reductions := false
-
-compiler.compileRules(engineerRules, productions, reductions)
-
-dumpRules(productions, reductions)
-
-data := readConfiguration(kSourcesDirectory . "Tests\Race.data")
-
-initialFacts := getConfigurationSectionValues(data, "Race", {}).Clone()
-
-engine := new RuleEngine(productions, reductions, initialFacts)
-kb := engine.createKnowledgeBase(engine.createFacts(), engine.createRules())
-; kb.RuleEngine.setTraceLevel(kTraceMedium)
-
-Loop {
-	section := "Lap " . A_Index
-	
-	lapData := getConfigurationSectionValues(data, section, {}).Clone()
-	
-	if (lapData.Count() == 0)
-		break
-	else {
-		for theFact, value in lapData
-			kb.addFact(theFact, value)
-		
-		if (A_Index == 1)
-			kb.addFact("Lap", A_Index)
-		else
-			kb.setValue("Lap", A_Index)
-		
-		kb.produce()
-		
-		dumpFacts(kb)
-	}
-	
-	if (A_Index == 3)
-		pitstop(kb)
-	
-	if (A_Index == 5)
-		pitstop(kb)
-}
-
-pitstop(kb) {
-	kb.addFact("Pitstop.Plan", true)
-
-	kb.produce()
-	;kb.RuleEngine.setTraceLevel(kTraceMedium)
-
-	s := new SpeechGenerator("Microsoft Zira Desktop")
-
-	s.speak("Ok, we have the following for Pitstop number " . kb.getValue("Pitstop.Planned.Nr"), true)
-	Sleep 100
-
-	fuel := kb.getValue("Pitstop.Planned.Fuel", 0)
-	if (fuel == 0)
-		s.speak("Refueling is not necessary", true)
-	else
-		s.speak("We have to refuel " . Round(fuel) . " litres", true)
-	
-	s.speak("We will use " . kb.getValue("Pitstop.Planned.Tyre.Compound") . " tyre compound and tyre set number " . kb.getValue("Pitstop.Planned.Tyre.Set"), true)
-	s.speak("Pressure front left " . Round(kb.getValue("Pitstop.Planned.Tyre.Pressure.FL"), 1), true)
-	s.speak("Pressure front right " . Round(kb.getValue("Pitstop.Planned.Tyre.Pressure.FR"), 1), true)
-	s.speak("Pressure rear left" . Round(kb.getValue("Pitstop.Planned.Tyre.Pressure.RL"), 1), true)
-	s.speak("Pressure rear right " . Round(kb.getValue("Pitstop.Planned.Tyre.Pressure.RR"), 1), true)
-
-	if kb.getValue("Pitstop.Planned.Repair.Suspension", false)
-		s.speak("The suspension must be repaired", true)
-	else
-		s.speak("The suspension looks fine", true)
-
-	if kb.getValue("Pitstop.Planned.Repair.Bodywork", false)
-		s.speak("Bodywork and aerodynamic elements must be repaired", true)
-	else
-		s.speak("Bodywork and aerodynamic elements should be good", true)
-
-	Sleep 100
-	s.speak("Do you agree?", true)
-	
-kb.addFact("Pitstop.Prepare", true)	
-			kb.produce()
-	kb.addFact("Pitstop.Lap", kb.getValue("Lap") + 1)
-	kb.produce()
-dumpFacts(kb)
-		msgbox here
-}
-		
-dumpFacts(kb)
-
-MsgBox % "Done - Race On"
-
-exitapp
-*/

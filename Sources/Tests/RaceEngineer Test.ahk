@@ -480,6 +480,50 @@ class PitstopHandling extends Assert {
 		this.AssertEqual(true, vPitstopRepairBodywork, "Expected bodywork repair...")
 		this.AssertEqual(true, this.equalLists(vPitstopTyrePressureIncrements, [0.3, 0.2, 0.3, 0.3]), "Unexpected tyre pressure increments...")
 	}
+	
+	PitstopPerformedTest() {
+		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race Engineer.settings"), new TestPitStopHandler(), false, false)
+		
+		vCompletedActions := {}
+		
+		Loop {
+			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Lap " . A_Index . ".data")
+			
+			if (data.Count() == 0)
+				break
+			else {
+				engineer.addLap(A_Index, data)
+			
+				if (A_Index = 4) {
+					engineer.planPitstop()
+					engineer.preparePitstop()
+				}
+			
+				if (A_Index = 5) {
+					engineer.performPitstop()
+				}
+			}
+			
+			dumpKnowledge(engineer.KnowledgeBase)
+		}
+		
+		this.AssertEqual(1, vCompletedActions["pitstopFinished"], "Pitstop not prepared as number 1...")
+		
+		this.AssertEqual(1, engineer.KnowledgeBase.getValue("Pitstop.Last"), "Last pitstop not set...")
+		this.AssertEqual(5, engineer.KnowledgeBase.getValue("Pitstop.1.Lap"), "Pitstop lap not in history memory...")
+		this.AssertEqual(true, engineer.KnowledgeBase.getValue("Pitstop.1.Repair.Suspension"), "Pitstop suspension repair info not in history memory...")
+		this.AssertEqual(false, engineer.KnowledgeBase.getValue("Pitstop.1.Repair.Bodywork"), "Pitstop bodywork repair info not in history memory...")
+		this.AssertEqual(25, engineer.KnowledgeBase.getValue("Pitstop.1.Temperature.Air"), "Pitstop air temperature not in history memory...")
+		this.AssertEqual(32, engineer.KnowledgeBase.getValue("Pitstop.1.Temperature.Track"), "Pitstop track temperature not in history memory...")
+		this.AssertEqual(626905, engineer.KnowledgeBase.getValue("Pitstop.1.Time"), "Pitstop timestamp not in history memory...")
+		
+		this.AssertEqual("Dry", engineer.KnowledgeBase.getValue("Pitstop.1.Tyre.Compound"), "Pitstop tyre compound not in history memory...")
+		this.AssertEqual(8, engineer.KnowledgeBase.getValue("Pitstop.1.Tyre.Set"), "Pitstop tyre set not in history memory...")
+		this.AssertEqual(26.5, Round(engineer.KnowledgeBase.getValue("Pitstop.1.Tyre.Pressure.FL"), 1), "Pitstop tyre pressure FL not in history memory...")
+		this.AssertEqual(26.3, Round(engineer.KnowledgeBase.getValue("Pitstop.1.Tyre.Pressure.FR"), 1), "Pitstop tyre pressure FR not in history memory...")
+		this.AssertEqual(26.4, Round(engineer.KnowledgeBase.getValue("Pitstop.1.Tyre.Pressure.RL"), 1), "Pitstop tyre pressure RL not in history memory...")
+		this.AssertEqual(26.4, Round(engineer.KnowledgeBase.getValue("Pitstop.1.Tyre.Pressure.RR"), 1), "Pitstop tyre pressure RR not in history memory...")
+	}
 }
 
 
@@ -498,6 +542,8 @@ else {
 	engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race Engineer.settings")
 								   , new TestPitStopHandler(), "Jona", getLanguage(), true, true)
 
+	engineer.setDebug(kDebugPhrases, false)
+	
 	Loop {
 		data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Lap " . A_Index . ".data")
 		
@@ -509,6 +555,10 @@ else {
 			if (A_Index = 3) {
 				engineer.planPitstop()
 				engineer.preparePitstop()
+			}
+	
+			if (A_Index = 4) {
+				engineer.performPitstop()
 			}
 			
 			dumpKnowledge(engineer.KnowledgeBase)

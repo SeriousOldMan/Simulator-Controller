@@ -33,13 +33,20 @@ global kLeft = 2
 global kRight = 3
 global kCenter = 4
 
+global kDebugOff := 0
+global kDebugGrammars := 1
+global kDebugPhrases := 2
+global kDebugRecognitions := 4
+global kDebugKnowledgeBase := 8
+global kDebugAll = (kDebugGrammars + + kDebugPhrases + kDebugRecognitions + kDebugKnowledgeBase)
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 class RaceEngineer extends ConfigurationItem {
-	iDebug := false
+	iDebug := kDebugOff
 
 	iPitstopHandler := false
 	iRaceSettings := false
@@ -142,9 +149,9 @@ class RaceEngineer extends ConfigurationItem {
 		}
 	}
 	
-	Debug[] {
+	Debug[option] {
 		Get {
-			return this.iDebug
+			return (this.iDebug & option)
 		}
 	}
 	
@@ -227,7 +234,7 @@ class RaceEngineer extends ConfigurationItem {
 	}
 	
 	__New(configuration, raceSettings, pitstopHandler := false, name := false, language := false, speaker := false, listener := false) {
-		this.iDebug := isDebug()
+		this.iDebug := (isDebug() ? kDebugAll : kDebugOff)
 		this.iRaceSettings := raceSettings
 		this.iPitstopHandler := pitstopHandler
 		this.iName := name
@@ -244,8 +251,13 @@ class RaceEngineer extends ConfigurationItem {
 		base.__New(configuration)
 	}
 	
-	setDebug(enabled) {
-		this.iDebug := enabled
+	setDebug(option, enabled) {
+		if (option == kDebugAll)
+			this.iDebug := (enabled ? option : kDebugOff)
+		else if enabled
+			this.iDebug := (this.iDebug | option)
+		else if (this.Debug[option] == option)
+			this.iDebug := (this.iDebug - option)
 	}
 	
 	getSpeaker() {
@@ -361,7 +373,7 @@ class RaceEngineer extends ConfigurationItem {
 		for grammar, definition in getConfigurationSectionValues(settings, "Listener Grammars", {}) {
 			definition := substituteVariables(definition, {name: this.Name})
 		
-			if this.Debug {
+			if this.Debug[kDebugGrammars] {
 				nextCharIndex := 1
 				SplashTextOn 400, 100, , % "Register phrase grammar " . new GrammarCompiler(speechRecognizer).readGrammar(definition, nextCharIndex).toString()
 				Sleep 1000
@@ -373,7 +385,7 @@ class RaceEngineer extends ConfigurationItem {
 	}
 	
 	phraseRecognized(grammar, words) {
-		if this.Debug {
+		if this.Debug[kDebugRecognitions] {
 			SplashTextOn 400, 100, , % "Phrase " . grammar . " recognized: " . values2String(" ", words*)
 			Sleep 1000
 			SplashTextOff
@@ -698,7 +710,7 @@ class RaceEngineer extends ConfigurationItem {
 		else {
 			this.KnowledgeBase.setValue("Pitstop.Planned.Fuel", litres)
 			
-			if this.Debug
+			if this.Debug[kDebugKnowledgeBase]
 				dumpKnowledge(this.KnowledgeBase)
 
 			speaker.speakPhrase("ConfirmPlanUpdate")
@@ -717,7 +729,7 @@ class RaceEngineer extends ConfigurationItem {
 		else {
 			this.KnowledgeBase.setValue("Pitstop.Planned.Tyre.Compound", compound)
 			
-			if this.Debug
+			if this.Debug[kDebugKnowledgeBase]
 				dumpKnowledge(this.KnowledgeBase)
 
 			speaker.speakPhrase("ConfirmPlanUpdate")
@@ -742,7 +754,7 @@ class RaceEngineer extends ConfigurationItem {
 			knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure." . tyreType, targetValue + delta)
 			knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure." . tyreType . ".Increment", targetIncrement + delta)
 			
-			if this.Debug
+			if this.Debug[kDebugKnowledgeBase]
 				dumpKnowledge(this.KnowledgeBase)
 
 			speaker.speakPhrase("ConfirmPlanUpdate")
@@ -761,7 +773,7 @@ class RaceEngineer extends ConfigurationItem {
 		else {
 			this.KnowledgeBase.setValue("Pitstop.Planned.Repair." . repairType, repair)
 			
-			if this.Debug
+			if this.Debug[kDebugKnowledgeBase]
 				dumpKnowledge(this.KnowledgeBase)
 
 			speaker.speakPhrase("ConfirmPlanUpdate")
@@ -845,7 +857,7 @@ class RaceEngineer extends ConfigurationItem {
 		if this.Speaker
 			this.getSpeaker().speakPhrase("Greeting", {name: this.Name})
 		
-		if this.Debug
+		if this.Debug[kDebugKnowledgeBase]
 			dumpKnowledge(this.KnowledgeBase)
 		
 		return result
@@ -950,7 +962,7 @@ class RaceEngineer extends ConfigurationItem {
 		
 		result := knowledgeBase.produce()
 		
-		if this.Debug
+		if this.Debug[kDebugKnowledgeBase]
 			dumpKnowledge(this.KnowledgeBase)
 		
 		return result
@@ -985,7 +997,7 @@ class RaceEngineer extends ConfigurationItem {
 		
 		result := knowledgeBase.produce()
 		
-		if this.Debug
+		if this.Debug[kDebugKnowledgeBase]
 			dumpKnowledge(this.KnowledgeBase)
 		
 		pitstopNumber := knowledgeBase.getValue("Pitstop.Planned.Nr")
@@ -1008,21 +1020,36 @@ class RaceEngineer extends ConfigurationItem {
 			else
 				speaker.speakPhrase("WetTyres", {compound: fragments[compound], set: knowledgeBase.getValue("Pitstop.Planned.Tyre.Set")})
 			
-			speaker.speakPhrase("NewPressures")
+			incrementFL := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL.Increment"), 1)
+			incrementFR := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR.Increment"), 1)
+			incrementRL := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL.Increment"), 1)
+			incrementRR := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR.Increment"), 1)
 			
-			speaker.speakPhrase("TyreFL", {value: Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL"), 1), unit: fragments["PSI"]})
-			speaker.speakPhrase("TyreFR", {value: Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR"), 1), unit: fragments["PSI"]})
-			speaker.speakPhrase("TyreRL", {value: Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL"), 1), unit: fragments["PSI"]})
-			speaker.speakPhrase("TyreRR", {value: Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR"), 1), unit: fragments["PSI"]})
+			debug := this.Debug[kDebugPhrases]
+			msgbox % debug
+			if (debug || (incrementFL != 0) || (incrementFR != 0) || (incrementRL != 0) || (incrementRR != 0))
+				speaker.speakPhrase("NewPressures")
+			
+			if (debug || (incrementFL != 0))
+				speaker.speakPhrase("TyreFL", {value: Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL"), 1), unit: fragments["PSI"]})
+			
+			if (debug || (incrementFR != 0))
+				speaker.speakPhrase("TyreFR", {value: Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR"), 1), unit: fragments["PSI"]})
+			
+			if (debug || (incrementRL != 0))
+				speaker.speakPhrase("TyreRL", {value: Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL"), 1), unit: fragments["PSI"]})
+			
+			if (debug || (incrementRR != 0))
+				speaker.speakPhrase("TyreRR", {value: Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR"), 1), unit: fragments["PSI"]})
 
 			if knowledgeBase.getValue("Pitstop.Planned.Repair.Suspension", false)
 				speaker.speakPhrase("RepairSuspension")
-			else
+			else if debug
 				speaker.speakPhrase("NoRepairSuspension")
 
 			if knowledgeBase.getValue("Pitstop.Planned.Repair.Bodywork", false)
 				speaker.speakPhrase("RepairBodywork")
-			else
+			else if debug
 				speaker.speakPhrase("NoRepairBodywork")
 				
 			if this.Listener {
@@ -1072,7 +1099,7 @@ class RaceEngineer extends ConfigurationItem {
 		
 			result := this.KnowledgeBase.produce()
 			
-			if this.Debug
+			if this.Debug[kDebugKnowledgeBase]
 				dumpKnowledge(this.KnowledgeBase)
 					
 			return result
@@ -1087,7 +1114,7 @@ class RaceEngineer extends ConfigurationItem {
 		
 		result := this.KnowledgeBase.produce()
 		
-		if this.Debug
+		if this.Debug[kDebugKnowledgeBase]
 			dumpKnowledge(this.KnowledgeBase)
 		
 		if (result && this.PitstopHandler)

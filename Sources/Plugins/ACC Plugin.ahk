@@ -1296,7 +1296,6 @@ collectRaceData() {
 		protectionOn()
 		
 		try {
-			
 			if (plugin.PitstopPending && getConfigurationValue(data, "Stint Data", "InPit", false))
 				plugin.performPitstop()
 			else if (dataLastLap > lastLap) {

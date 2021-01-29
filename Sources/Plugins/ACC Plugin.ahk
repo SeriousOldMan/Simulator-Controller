@@ -235,6 +235,9 @@ class ACCPlugin extends ControllerPlugin {
 		fireAction(function, trigger) {
 			message := this.Message
 			
+			IfWinNotActive AC2  , , WinActivate, AC2  , 
+			WinWaitActive AC2  , , 2
+			
 			Send {Enter}
 			Sleep 100
 			Send %message%
@@ -453,6 +456,9 @@ class ACCPlugin extends ControllerPlugin {
 	}
 		
 	openPitstopMFD(update := true) {
+		IfWinNotActive AC2  , , WinActivate, AC2  , 
+		WinWaitActive AC2  , , 2
+
 		SendEvent % this.OpenPitstopMFDHotkey
 		
 		this.iPSIsOpen := true
@@ -466,6 +472,9 @@ class ACCPlugin extends ControllerPlugin {
 	}
 	
 	closePitstopMFD() {
+		IfWinNotActive AC2  , , WinActivate, AC2  , 
+		WinWaitActive AC2  , , 2
+
 		SendEvent % this.ClosePitstopMFDHotkey
 		
 		this.iPSIsOpen := false
@@ -514,13 +523,21 @@ class ACCPlugin extends ControllerPlugin {
 			if (targetSelectedOption > this.iPSSelectedOption)
 				Loop % targetSelectedOption - this.iPSSelectedOption
 				{
+					IfWinNotActive AC2  , , WinActivate, AC2  , 
+					WinWaitActive AC2  , , 2
+
 					SendEvent {Down}
+					
 					Sleep 50
 				}
 			else
 				Loop % this.iPSSelectedOption - targetSelectedOption
 				{
+					IfWinNotActive AC2  , , WinActivate, AC2  , 
+					WinWaitActive AC2  , , 2
+
 					SendEvent {Up}
+					
 					Sleep 50
 				}
 			
@@ -536,12 +553,20 @@ class ACCPlugin extends ControllerPlugin {
 		switch direction {
 			case "Increase":
 				Loop % steps {
+					IfWinNotActive AC2  , , WinActivate, AC2  , 
+					WinWaitActive AC2  , , 2
+
 					SendEvent {Right}
+
 					Sleep 50
 				}
 			case "Decrease":
 				Loop % steps {
+					IfWinNotActive AC2  , , WinActivate, AC2  , 
+					WinWaitActive AC2  , , 2
+
 					SendEvent {Left}
+					
 					Sleep 50
 				}
 			default:
@@ -1245,7 +1270,7 @@ collectRaceData() {
 	if !plugin
 		plugin := SimulatorController.Instance.findPlugin(kACCPlugin)
 	
-	if true || isACCRunning() {
+	if isACCRunning() {
 		exePath := kBinariesDirectory . "ACC SHM Reader.exe"
 		
 		try {

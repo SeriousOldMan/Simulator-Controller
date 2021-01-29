@@ -39,6 +39,8 @@ global kCenter = 4
 ;;;-------------------------------------------------------------------------;;;
 
 class RaceEngineer extends ConfigurationItem {
+	iDebug := false
+
 	iPitstopHandler := false
 	iRaceSettings := false
 	
@@ -140,6 +142,12 @@ class RaceEngineer extends ConfigurationItem {
 		}
 	}
 	
+	Debug[] {
+		Get {
+			return this.iDebug
+		}
+	}
+	
 	KnowledgeBase[] {
 		Get {
 			return this.iKnowledgeBase
@@ -219,6 +227,7 @@ class RaceEngineer extends ConfigurationItem {
 	}
 	
 	__New(configuration, raceSettings, pitstopHandler := false, name := false, language := false, speaker := false, listener := false) {
+		this.iDebug := isDebug()
 		this.iRaceSettings := raceSettings
 		this.iPitstopHandler := pitstopHandler
 		this.iName := name
@@ -233,6 +242,10 @@ class RaceEngineer extends ConfigurationItem {
 		this.iListener := listener
 		
 		base.__New(configuration)
+	}
+	
+	setDebug(enabled) {
+		this.iDebug := enabled
 	}
 	
 	getSpeaker() {
@@ -348,7 +361,7 @@ class RaceEngineer extends ConfigurationItem {
 		for grammar, definition in getConfigurationSectionValues(settings, "Listener Grammars", {}) {
 			definition := substituteVariables(definition, {name: this.Name})
 		
-			if isDebug() {
+			if this.Debug {
 				nextCharIndex := 1
 				SplashTextOn 400, 100, , % "Register phrase grammar " . new GrammarCompiler(speechRecognizer).readGrammar(definition, nextCharIndex).toString()
 				Sleep 1000
@@ -360,7 +373,7 @@ class RaceEngineer extends ConfigurationItem {
 	}
 	
 	phraseRecognized(grammar, words) {
-		if true && isDebug() {
+		if this.Debug {
 			SplashTextOn 400, 100, , % "Phrase " . grammar . " recognized: " . values2String(" ", words*)
 			Sleep 1000
 			SplashTextOff
@@ -685,7 +698,7 @@ class RaceEngineer extends ConfigurationItem {
 		else {
 			this.KnowledgeBase.setValue("Pitstop.Planned.Fuel", litres)
 			
-			if isDebug()
+			if this.Debug
 				dumpKnowledge(this.KnowledgeBase)
 
 			speaker.speakPhrase("ConfirmPlanUpdate")
@@ -704,7 +717,7 @@ class RaceEngineer extends ConfigurationItem {
 		else {
 			this.KnowledgeBase.setValue("Pitstop.Planned.Tyre.Compound", compound)
 			
-			if isDebug()
+			if this.Debug
 				dumpKnowledge(this.KnowledgeBase)
 
 			speaker.speakPhrase("ConfirmPlanUpdate")
@@ -729,7 +742,7 @@ class RaceEngineer extends ConfigurationItem {
 			knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure." . tyreType, targetValue + delta)
 			knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure." . tyreType . ".Increment", targetIncrement + delta)
 			
-			if isDebug()
+			if this.Debug
 				dumpKnowledge(this.KnowledgeBase)
 
 			speaker.speakPhrase("ConfirmPlanUpdate")
@@ -748,7 +761,7 @@ class RaceEngineer extends ConfigurationItem {
 		else {
 			this.KnowledgeBase.setValue("Pitstop.Planned.Repair." . repairType, repair)
 			
-			if isDebug()
+			if this.Debug
 				dumpKnowledge(this.KnowledgeBase)
 
 			speaker.speakPhrase("ConfirmPlanUpdate")
@@ -832,7 +845,7 @@ class RaceEngineer extends ConfigurationItem {
 		if this.Speaker
 			this.getSpeaker().speakPhrase("Greeting", {name: this.Name})
 		
-		if isDebug()
+		if this.Debug
 			dumpKnowledge(this.KnowledgeBase)
 		
 		return result
@@ -937,7 +950,7 @@ class RaceEngineer extends ConfigurationItem {
 		
 		result := knowledgeBase.produce()
 		
-		if isDebug()
+		if this.Debug
 			dumpKnowledge(this.KnowledgeBase)
 		
 		return result
@@ -972,7 +985,7 @@ class RaceEngineer extends ConfigurationItem {
 		
 		result := knowledgeBase.produce()
 		
-		if isDebug()
+		if this.Debug
 			dumpKnowledge(this.KnowledgeBase)
 		
 		pitstopNumber := knowledgeBase.getValue("Pitstop.Planned.Nr")
@@ -1059,7 +1072,7 @@ class RaceEngineer extends ConfigurationItem {
 		
 			result := this.KnowledgeBase.produce()
 			
-			if isDebug()
+			if this.Debug
 				dumpKnowledge(this.KnowledgeBase)
 					
 			return result
@@ -1074,7 +1087,7 @@ class RaceEngineer extends ConfigurationItem {
 		
 		result := this.KnowledgeBase.produce()
 		
-		if isDebug()
+		if this.Debug
 			dumpKnowledge(this.KnowledgeBase)
 		
 		if (result && this.PitstopHandler)

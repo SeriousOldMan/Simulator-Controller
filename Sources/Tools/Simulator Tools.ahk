@@ -794,7 +794,7 @@ prepareTargets(ByRef buildProgress, updateOnly) {
 	if !updateOnly {
 		for target, arguments in getConfigurationSectionValues(targets, "Cleanup", Object()) {
 			buildProgress += Floor(++counter / 20)
-			cleanup := vCleanupSettings[ConfigurationItem.splitDescriptor(target)[1]]
+			cleanup := (InStr(target, "*.bak") ? vCleanupSettings[target] : vCleanupSettings[ConfigurationItem.splitDescriptor(target)[1]])
 			
 			if !kSilentMode
 				Progress, %buildProgress%, % target . ": " . (cleanup ? translate("Yes") : translate("No"))

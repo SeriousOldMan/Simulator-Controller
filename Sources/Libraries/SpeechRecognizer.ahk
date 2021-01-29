@@ -26,7 +26,7 @@
 class SpeechRecognizer {
 	_grammarCallbacks := {}
 	
-	__New(recognizer := false) {
+	__New(recognizer := false, language := false) {
 		dllName := "Speech.Recognizer.dll"
 		dllFile := kBinariesDirectory . dllName
 		
@@ -58,7 +58,7 @@ class SpeechRecognizer {
 		
 		this.RecognizerList := this.createRecognizerList()
 		
-		if (!(this.RecognizerList.Length() >= 0)) {
+		if (this.RecognizerList.Length() == 0) {
 			logMessage(kLogCritical, translate("No languages found while initializing speech recognition system - please check the configuration"))
 
 			title := translate("Modular Simulator Controller System")
@@ -68,7 +68,15 @@ class SpeechRecognizer {
 			Sleep 5000
 		}
 		
-		if (recognizer && (recognizer != true))
+		if ((recognizer == true) && language) {
+			for ignore, recognizerDescriptor in this.getRecognizerList()
+				if (recognizerDescriptor["TwoLetterISOLanguageName"] = language) {
+					recognizer := recognizerDescriptor["ID"]
+					
+					break
+				}
+		}
+		else if (recognizer && (recognizer != true))
 			for ignore, recognizerDescriptor in this.getRecognizerList()
 				if (recognizerDescriptor["Name"] = recognizer) {
 					recognizer := recognizerDescriptor["ID"]
@@ -540,6 +548,11 @@ class GrammarBuiltinChoices {
 	}
 	
 	parse(parser) {
+		choices := this.Builtin
+		
+		if (choices = "number")
+			choices := "percent"
+		
 		return parser.Compiler.SpeechRecognizer.getChoices(this.Builtin)
 	}
 }

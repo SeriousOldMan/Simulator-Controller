@@ -19,6 +19,15 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                        Private Constant Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global kLanguageVoices = {de: ["Microsoft Hedda Desktop", "Microsoft Katja Desktop", "Microsoft Stefan Desktop"]
+						, en: ["Microsoft David Desktop", "Microsoft Mark Desktop", "Microsoft Zira Desktop"]
+						, fr: ["Microsoft Hortence Desktop", "Microsoft Julie Desktop", "Microsoft Paul Desktop"]}
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Class Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -38,13 +47,31 @@ class SpeechGenerator {
 		}
 	}
 	
-	__New(voice := false) {
+	__New(voice := false, language := false) {
 		this.iSpeechGenerator := ComObjCreate("SAPI.SpVoice")
 		
 		Loop, % this.iSpeechGenerator.GetVoices.Count
 			this.Voices.Push(this.iSpeechGenerator.GetVoices.Item(A_Index-1).GetAttribute("Name"))
 	
 		voices := this.Voices
+		
+		if ((voice == true) && language && kLanguageVoices.HasKey(language)) {
+			availableVoices := []
+			
+			for ignore, voice in kLanguageVoices[language]
+				if inList(voices, voice)
+					availableVoices.Push(voice)
+			
+			count := availableVoices.Length()
+			
+			if (count == 0)
+				voice := false
+			else {
+				Random index, 1, count
+			
+				voice := availableVoices[Round(index)]
+			}
+		}
 		
 		if (voice && (voice != true))
 			voice := inList(voices, voice)

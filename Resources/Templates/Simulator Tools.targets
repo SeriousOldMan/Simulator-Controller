@@ -12,16 +12,16 @@ Simulator Tools.ini=%kUserConfigDirectory%Simulator Tools.ini
 *.bak Files=%kHomeDirectory%, *.ahk.bak, R
 [Copy]
 ACC SHM Reader=%kBinariesDirectory%ACC SHM Reader.exe <- %kSourcesDirectory%Foreign\ACC SHM Reader\Release\ACC SHM Reader.exe
-Speech Recognizer Library=%kBinariesDirectory%Speech.Recognizer.dll <- %kSourcesDirectory%Foreign\Speech Recognizer\HotVoice\bin\Release\HotVoice.dll
-Microsoft Speech Library=%kBinariesDirectory%Microsoft.Speech.dll <- %kSourcesDirectory%Foreign\Speech Recognizer\HotVoice\bin\Release\Microsoft.Speech.dll
+Speech Recognizer.1=%kBinariesDirectory%Speech.Recognizer.dll <- %kSourcesDirectory%Foreign\Speech Recognizer\HotVoice\bin\Release\HotVoice.dll
+Speech Recognizer.2=%kBinariesDirectory%Microsoft.Speech.dll <- %kSourcesDirectory%Foreign\Speech Recognizer\HotVoice\bin\Release\Microsoft.Speech.dll
 Simulator Tools Targets.1=%kConfigDirectory%Simulator Tools.targets <- %kSourcesDirectory%Tools\Simulator Tools.targets
 Simulator Tools Targets.2=%kResourcesDirectory%Templates\Simulator Tools.targets <- %kSourcesDirectory%Tools\Simulator Tools.targets
 Race Engineer Rules.1=%kConfigDirectory%Race Engineer.rules <- %kSourcesDirectory%Engineer\Race Engineer.rules
 Race Engineer Rules.2=%kResourcesDirectory%Templates\Race Engineer.rules <- %kSourcesDirectory%Engineer\Race Engineer.rules
-English Race Engineer Phrases.1=%kConfigDirectory%Race Engineer.phrases.en <- %kSourcesDirectory%Engineer\Race Engineer.phrases.en
-English Race Engineer Phrases.2=%kResourcesDirectory%Templates\Race Engineer.phrases.en <- %kSourcesDirectory%Engineer\Race Engineer.phrases.en
 English Race Engineer Grammars.1=%kConfigDirectory%Race Engineer.grammars.en <- %kSourcesDirectory%Engineer\Race Engineer.grammars.en
 English Race Engineer Grammars.2=%kResourcesDirectory%Templates\Race Engineer.grammars.en <- %kSourcesDirectory%Engineer\Race Engineer.grammars.en
+German Race Engineer Grammars.1=%kConfigDirectory%Race Engineer.grammars.de <- %kSourcesDirectory%Engineer\Race Engineer.grammars.de
+German Race Engineer Grammars.2=%kResourcesDirectory%Templates\Race Engineer.grammars.de <- %kSourcesDirectory%Engineer\Race Engineer.grammars.de
 [Build]
 Simulator Controller=%kBinariesDirectory%Simulator Controller.exe <- %kSourcesDirectory%Controller\Simulator Controller.ahk; %kIncludesDirectory%, %kLibrariesDirectory%, %kPluginsDirectory%, %kUserPluginsDirectory%, %kHomeDirectory%VERSION
 Simulator Settings=%kBinariesDirectory%Simulator Settings.exe <- %kSourcesDirectory%Startup\Simulator Settings.ahk; %kIncludesDirectory%, %kLibrariesDirectory%, %kSourcesDirectory%Startup\Libraries\, %kHomeDirectory%VERSION

@@ -86,14 +86,24 @@ readToolsConfiguration(ByRef updateSettings, ByRef cleanupSettings, ByRef copySe
 		if !getConfigurationValue(updateConfiguration, "Processed", target, false)
 			updateSettings[target] := true
 	
-	for target, rule in getConfigurationSectionValues(targets, "Cleanup", Object())
+	for target, rule in getConfigurationSectionValues(targets, "Cleanup", Object()) {
+		if !InStr(target, "*.bak")
+			target := ConfigurationItem.splitDescriptor(target)[1]
+	
 		cleanupSettings[target] := getConfigurationValue(configuration, "Cleanup", target, InStr(target, "*.ahk") ? true : false)
+	}
 	
-	for target, rule in getConfigurationSectionValues(targets, "Copy", Object())
+	for target, rule in getConfigurationSectionValues(targets, "Copy", Object()) {
+		target := ConfigurationItem.splitDescriptor(target)[1]
+	
 		copySettings[target] := getConfigurationValue(configuration, "Copy", target, true)
+	}
 	
-	for target, rule in getConfigurationSectionValues(targets, "Build", Object())
+	for target, rule in getConfigurationSectionValues(targets, "Build", Object()) {
+		target := ConfigurationItem.splitDescriptor(target)[1]
+	
 		buildSettings[target] := getConfigurationValue(configuration, "Build", target, true)
+	}
 	
 	splashTheme := getConfigurationValue(configuration, "General", "Splash Theme", false)
 	
@@ -212,12 +222,6 @@ editTargets(command := "") {
 			buildVariable := "buildVariable" . A_Index
 			
 			vBuildSettings[target] := %buildVariable%
-		}
-		
-		for target, setting in vCopySettings {
-			copyVariable := "copyVariable" . A_Index
-			
-			vCopySettings[target] := %copyVariable%
 		}
 		
 		vSplashTheme := (splashTheme == translate("None")) ? false : splashTheme
@@ -768,7 +772,7 @@ prepareTargets(ByRef buildProgress, updateOnly) {
 	
 	for target, arguments in getConfigurationSectionValues(targets, "Update", Object()) {
 		buildProgress += Floor(A_Index / 4)
-		update := vUpdateSettings[target]
+		update := vUpdateSettings[ConfigurationItem.splitDescriptor(target)[1]]
 		
 		if !kSilentMode
 			Progress, %buildProgress%, % target . ": " . (update ? translate("Yes") : translate("No"))
@@ -790,7 +794,7 @@ prepareTargets(ByRef buildProgress, updateOnly) {
 	if !updateOnly {
 		for target, arguments in getConfigurationSectionValues(targets, "Cleanup", Object()) {
 			buildProgress += Floor(++counter / 20)
-			cleanup := vCleanupSettings[target]
+			cleanup := vCleanupSettings[ConfigurationItem.splitDescriptor(target)[1]]
 			
 			if !kSilentMode
 				Progress, %buildProgress%, % target . ": " . (cleanup ? translate("Yes") : translate("No"))
@@ -806,7 +810,7 @@ prepareTargets(ByRef buildProgress, updateOnly) {
 		
 		for target, arguments in getConfigurationSectionValues(targets, "Copy", Object()) {
 			buildProgress += Floor(++counter / 20)
-			copy := vCopySettings[target]
+			copy := vCopySettings[ConfigurationItem.splitDescriptor(target)[1]]
 			
 			if !kSilentMode
 				Progress, %buildProgress%, % target . ": " . (copy ? translate("Yes") : translate("No"))
@@ -822,7 +826,7 @@ prepareTargets(ByRef buildProgress, updateOnly) {
 		
 		for target, arguments in getConfigurationSectionValues(targets, "Build", Object()) {
 			buildProgress += Floor(++counter / 20)
-			build := vBuildSettings[target]
+			build := vBuildSettings[ConfigurationItem.splitDescriptor(target)[1]]
 			
 			if !kSilentMode
 				Progress, %buildProgress%, % target . ": " . (build ? translate("Yes") : translate("No"))

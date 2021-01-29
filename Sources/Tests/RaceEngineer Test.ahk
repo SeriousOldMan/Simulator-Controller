@@ -496,8 +496,7 @@ if !GetKeyState("Ctrl") {
 }
 else {
 	engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race Engineer.settings")
-								   , new TestPitStopHandler(), "Jona", "Microsoft Zira Desktop", "Microsoft Server Speech Recognition Language - TELE (en-US)")
-								;  , new TestPitStopHandler(), "Jona", "Microsoft David Desktop", "Microsoft Server Speech Recognition Language - Kinect (en-AU)")
+								   , new TestPitStopHandler(), "Jona", getLanguage(), true, true)
 
 	Loop {
 		data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Lap " . A_Index . ".data")
@@ -519,4 +518,6 @@ else {
 	}
 	
 	MsgBox Done...
+	
+	ExitApp
 }

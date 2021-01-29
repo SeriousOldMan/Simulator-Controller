@@ -964,11 +964,13 @@ readConfiguration(configFile) {
 		sectionValues := Object()
 		
 		for j, keyValue in keyValues {
-			keyValue := StrSplit(keyValue, "=")
-			
-			value := keyValue[2]
-			
-			sectionValues[keyValue[1]] := ((value == kTrue) ? true : ((value == kFalse) ? false : value))
+			if (SubStr(keyValue, 1, 2) != "//") {
+				keyValue := StrSplit(keyValue, "=")
+				
+				value := keyValue[2]
+				
+				sectionValues[keyValue[1]] := ((value == kTrue) ? true : ((value == kFalse) ? false : value))
+			}
 		}
 		
 		configuration[section] := sectionValues

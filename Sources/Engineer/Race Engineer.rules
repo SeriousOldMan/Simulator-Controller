@@ -200,8 +200,8 @@ reportNewDamage(?lap) <= lapDamage(?lap, Suspension, ?lSDamage), lapDamage(?lap,
 ;;; when falling below a given threshold.                                   ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-{Any: [?Lap], {None: [?Lap.Remaining]}} => (Prove: updateRemainingLaps, ?Lap)
-[?Lap.Remaining <= ?Race.Settings.Lap.PitstopWarning] => (Call: lowFuelWarning, ?Lap.Remaining)
+priority: 20, {Any: [?Lap], {None: [?Lap.Remaining]}} => (Prove: updateRemainingLaps, ?Lap)
+priority: 20, [?Lap.Remaining <= ?Race.Settings.Lap.PitstopWarning] => (Call: lowFuelWarning, ?Lap.Remaining)
 
 updateRemainingLaps(?lap) <= remainingStintLaps(?lap, ?stintLaps), remainingRaceLaps(?lap, ?raceLaps),											\
  							 ?stintLaps < ?raceLaps, Set(Lap.Remaining, ?stintLaps)
@@ -320,8 +320,8 @@ lapDamage(?lap, ?type, ?position, ?damage) <= Append(?fact, Lap., ?lap, .Damage.
 
 lapAvgFuel(?lap, ?avgFuel) <= Append(?fact, Lap., ?lap, .Fuel.AvgConsumption), Get(?avgFuel, ?fact), ?avgFuel > 0
 
-lapAvgTime(?lap, ?avgTime) <= weightedLapTimes(?lap, 0, ?lapTimes), sum(?lapTimes, ?sTimes), length(?lapTimes, ?sLength), 						\
-							  ?avgTime = ?sTimes / ?sLength
+lapAvgTime(?lap, ?avgTime) <= weightedLapTimes(?lap, 0, ?lapTimes),																				\
+							  sum(?lapTimes, ?sTimes), length(?lapTimes, ?sLength), ?avgTime = ?sTimes / ?sLength
 
 lapRemainingFuel(?lap, ?remainingFuel) <= Append(?fact, Lap., ?lap, .Fuel.Remaining), Get(?remainingFuel, ?fact)
 
@@ -334,7 +334,7 @@ remainingStintLaps(?lap, ?remainingLaps) <= lapRemainingFuel(?lap, ?fuelLeft), l
 										
 lapTimes(?lap, ?lap, []) <= !
 lapTimes(?, !Race.Settings.Lap.History.Considered, []) <= !
-lapTimes(?lap, ?offset, [?time | ?times]) <= ?tLap = ?lap - ?offset, lapTime(?tlap, ?time),													\
+lapTimes(?lap, ?offset, [?time | ?times]) <= ?tLap = ?lap - ?offset, lapTime(?tlap, ?time),														\
 											 ?nOffset = ?offset + 1, lapTimes(?lap, ?nOffset, ?times)
 											 
 weightedLapTimes(?lap, ?lap, []) <= !
@@ -346,6 +346,9 @@ lapTime(?lap, ?time) <= Append(?fact, Lap., ?lap, .Time), Get(?time, ?fact), bou
 
 weightedLapTime(?lastLap, ?lap, ?time) <= lapTime(?lastLap, ?lastTime), lapTime(?lap, ?lapTime), lapWeight(?lap, ?weight),	 					\
 										  ?delta = ?lastTime - ?lapTime, ?weightedDelta = ?delta * ?weight, ?time = ?lastTime - ?weightedDelta
+
+lapWeight(?lap, ?weight) <= ?distance = !Lap - ?lap,																							\
+							dampingFactor(?distance, !Race.Settings.Lap.History.Considered, !Race.Settings.Lap.History.Damping, ?weight)
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -375,9 +378,8 @@ pitstopPressure(?tyreType, ?pressure) <= lastPitstop(?nr), Append(?fact, Pitstop
 ;;;                         Statistical Computations                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-lapWeight(?lap, ?weight) <= ?distance = !Lap - ?lap, ?distance < !Race.Settings.Lap.History.Considered, 												\
-							?temp = ?distance * !Race.Settings.Lap.History.Damping, ?weight = 1 - ?temp
-lapWeight(?, 0)
+dampingFactor(?distance, ?maxDistance, ?damping, ?factor) <= ?distance < ?maxDistance, ?temp = ?distance * ?damping, ?factor = 1 - ?temp, !
+dampingFactor(?, ?, ?, 0)
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -393,24 +395,6 @@ lapWeight(?, 0)
 >(?x, ?y, true) <= ?x > ?y, !
 >(?x, ?y, false)
 
-bound?(?x) <= unbound?(?x), !, fail
-bound?(?x)
-
-unbound?(?x) <= ?x = __NotInitialized__
-
-any?(?value, [?value])
-any?(?value, [?value | ?])
-any?(?value, [? | ?tail]) <= any?(?value, ?tail)
-
-all?(?value, [?value])
-all?(?value, [?value | ?tail]) <= all?(?value, ?tail)
-
-length([], 0)
-length([?h | ?t], ?length) <= length(?t, ?tLength), ?length = ?tLength + 1
-
-sum([], 0)
-sum([?h | ?t], ?sum) <= sum(?t, ?tSum), ?sum = ?h + ?tSum
-
 max(?x, ?y, ?x) <= ?x > ?y, !
 max(?x, ?y, ?y)
 
@@ -419,3 +403,27 @@ min(?x, ?y, ?y)
 
 abs(?x, ?r) <= ?x < 0, ?r = ?x * -1, !
 abs(?x, ?x)
+
+bound?(?x) <= unbound?(?x), !, fail
+bound?(?x)
+
+unbound?(?x) <= ?x = __NotInitialized__
+
+any?(?value, [?value | ?]) <= !
+any?(?value, [? | ?tail]) <= any?(?value, ?tail)
+
+all?(?value, [?value])
+all?(?value, [?value | ?tail]) <= all?(?value, ?tail)
+
+none?(?value, [])
+none?(?value, [?value | ?]) <= !, fail
+none?(?value, [? | ?tail]) <= none?(?value, ?tail)
+
+one?(?value, []) <= fail
+one?(?value, [?value | ?tail]) <= none?(?value, ?tail)
+
+length([], 0)
+length([?h | ?t], ?length) <= length(?t, ?tLength), ?length = ?tLength + 1
+
+sum([], 0)
+sum([?h | ?t], ?sum) <= sum(?t, ?tSum), ?sum = ?h + ?tSum

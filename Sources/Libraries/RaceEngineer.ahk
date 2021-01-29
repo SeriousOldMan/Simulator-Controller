@@ -85,15 +85,12 @@ class RaceEngineer extends ConfigurationItem {
 			}
 		}
 		
-		__New(engineer, speaker, fragments, phrases) {
+		__New(engineer, speaker, language, fragments, phrases) {
 			this.iEngineer := engineer
 			this.iFragments := fragments
 			this.iPhrases := phrases
 			
-			if (speaker == true)
-				base.__New()
-			else
-				base.__New(speaker)
+			base.__New(speaker, language)
 		}
 		
 		speak(text) {
@@ -221,25 +218,15 @@ class RaceEngineer extends ConfigurationItem {
 		}
 	}
 	
-	__New(configuration, raceSettings, pitstopHandler := false, name := false, speaker := false, listener := false) {
+	__New(configuration, raceSettings, pitstopHandler := false, name := false, language := false, speaker := false, listener := false) {
 		this.iRaceSettings := raceSettings
 		this.iPitstopHandler := pitstopHandler
 		this.iName := name
 		
 		listener := ((speaker != false) ? listener : false)
-		language := getLanguage()
 		
-		if (speaker == true)
-			if (language = "de")
-				speaker := "Microsoft Hedda Desktop"
-			else
-				speaker := "Microsoft Zira Desktop"
-		
-		if (listener == true)
-			if (language = "de")
-				speaker := "Microsoft Server Speech Recognition Language - TELE (de-DE)"
-			else
-				speaker := "Microsoft Server Speech Recognition Language - TELE (en-US)"
+		if !language
+			language := getLanguage()
 		
 		this.iLanguage := language
 		this.iSpeaker := speaker
@@ -248,53 +235,9 @@ class RaceEngineer extends ConfigurationItem {
 		base.__New(configuration)
 	}
 	
-	createRace(data) {
-		local facts
-		
-		settings := this.RaceSettings
-		
-		duration := Round((getConfigurationValue(data, "Stint Data", "TimeRemaining", 0) + getConfigurationValue(data, "Stint Data", "LapLastTime", 0)) / 1000)
-		
-		facts := {"Race.Car": getConfigurationValue(data, "Race Data", "Car", "")
-				, "Race.Track": getConfigurationValue(data, "Race Data", "Track", "")
-				, "Race.Duration": duration
-				, "Race.Settings.OutLap": getConfigurationValue(settings, "Race Settings", "OutLap", true)
-				, "Race.Settings.InLap": getConfigurationValue(settings, "Race Settings", "InLap", true)
-				, "Race.Settings.Fuel.Max": getConfigurationValue(data, "Race Data", "FuelAmount", 0)
-				, "Race.Settings.Fuel.AvgConsumption": getConfigurationValue(settings, "Race Settings", "Fuel.AvgConsumption", 0)
-				, "Race.Settings.Fuel.SafetyMargin": getConfigurationValue(settings, "Race Settings", "Fuel.SafetyMargin", 5)
-				, "Race.Settings.Lap.PitstopWarning": getConfigurationValue(settings, "Race Settings", "Lap.PitstopWarning", 5)
-				, "Race.Settings.Lap.AvgTime": getConfigurationValue(settings, "Race Settings", "Lap.AvgTime", 0)
-				, "Race.Settings.Lap.Considered": getConfigurationValue(settings, "Race Settings", "Lap.Considered", 5)
-				, "Race.Settings.Lap.History.Considered": getConfigurationValue(settings, "Race Settings", "Lap.History.Considered", 5)
-				, "Race.Settings.Lap.History.Damping": getConfigurationValue(settings, "Race Settings", "Lap.History.Damping", 0.2)
-				, "Race.Settings.Damage.Suspension.Repair": getConfigurationValue(settings, "Race Settings", "Damage.Suspension.Repair", "Always")
-				, "Race.Settings.Damage.Suspension.Repair.Threshold": getConfigurationValue(settings, "Race Settings", "Damage.Suspension.Repair.Threshold", 0)
-				, "Race.Settings.Damage.Bodywork.Repair": getConfigurationValue(settings, "Race Settings", "Damage.Bodywork.Repair", "Threshold")
-				, "Race.Settings.Damage.Bodywork.Repair.Threshold": getConfigurationValue(settings, "Race Settings", "Damage.Bodywork.Repair.Threshold", 20)
-				, "Race.Settings.Tyre.Dry.Pressure.Target.FL": getConfigurationValue(settings, "Race Settings", "Tyre.Dry.Pressure.Target.FL", 27.7)
-				, "Race.Settings.Tyre.Dry.Pressure.Target.FR": getConfigurationValue(settings, "Race Settings", "Tyre.Dry.Pressure.Target.FR", 27.7)
-				, "Race.Settings.Tyre.Dry.Pressure.Target.RL": getConfigurationValue(settings, "Race Settings", "Tyre.Dry.Pressure.Target.RL", 27.7)
-				, "Race.Settings.Tyre.Dry.Pressure.Target.RR": getConfigurationValue(settings, "Race Settings", "Tyre.Dry.Pressure.Target.RR", 27.7)
-				, "Race.Settings.Tyre.Wet.Pressure.Target.FL": getConfigurationValue(settings, "Race Settings", "Tyre.Wet.Pressure.Target.FL", 30.0)
-				, "Race.Settings.Tyre.Wet.Pressure.Target.FR": getConfigurationValue(settings, "Race Settings", "Tyre.Wet.Pressure.Target.FR", 30.0)
-				, "Race.Settings.Tyre.Wet.Pressure.Target.RL": getConfigurationValue(settings, "Race Settings", "Tyre.Wet.Pressure.Target.RL", 30.0)
-				, "Race.Settings.Tyre.Wet.Pressure.Target.RR": getConfigurationValue(settings, "Race Settings", "Tyre.Wet.Pressure.Target.RR", 30.0)
-				, "Race.Settings.Tyre.Pressure.Deviation": getConfigurationValue(settings, "Race Settings", "Tyre.Pressure.Deviation", 0.2)
-				, "Race.Settings.Tyre.Set.Fresh": getConfigurationValue(settings, "Race Settings", "Tyre.Set.Fresh", 8)
-				, "Race.Setup.Tyre.Compound": getConfigurationValue(settings, "Race Setup", "Tyre.Compound", "Dry")
-				, "Race.Setup.Tyre.Set": getConfigurationValue(settings, "Race Setup", "Tyre.Set", 7)
-				, "Race.Setup.Tyre.Pressure.FL": getConfigurationValue(settings, "Race Setup", "Tyre.Pressure.FL", 26.1)
-				, "Race.Setup.Tyre.Pressure.FR": getConfigurationValue(settings, "Race Setup", "Tyre.Pressure.FR", 26.1)
-				, "Race.Setup.Tyre.Pressure.RL": getConfigurationValue(settings, "Race Setup", "Tyre.Pressure.RL", 26.1)
-				, "Race.Setup.Tyre.Pressure.RR": getConfigurationValue(settings, "Race Setup", "Tyre.Pressure.RR", 26.1)}
-				
-		return facts
-	}
-	
 	getSpeaker() {
 		if (this.Speaker && !this.iSpeechGenerator) {
-			this.iSpeechGenerator := new this.RaceEngineerSpeaker(this, this.Speaker, this.buildFragments(this.Language), this.buildPhrases(this.Language))
+			this.iSpeechGenerator := new this.RaceEngineerSpeaker(this, this.Speaker, this.Language, this.buildFragments(this.Language), this.buildPhrases(this.Language))
 			
 			this.getListener()
 		}
@@ -305,7 +248,7 @@ class RaceEngineer extends ConfigurationItem {
 	getListener() {
 		if (this.Listener && !this.iSpeechRecognizer) {
 			if (this.Listener != true)
-				recognizer := new SpeechRecognizer(this.Listener)
+				recognizer := new SpeechRecognizer(this.Listener, this.Language)
 			else
 				recognizer := new SpeechRecognizer()
 			
@@ -362,10 +305,10 @@ class RaceEngineer extends ConfigurationItem {
 	buildFragments(language) {
 		fragments := {}
 		
-		settings := readConfiguration(getFileName("Race Engineer.phrases." . language, kUserConfigDirectory, kConfigDirectory))
+		settings := readConfiguration(getFileName("Race Engineer.grammars." . language, kUserConfigDirectory, kConfigDirectory))
 		
 		if (settings.Count() == 0)
-			settings := readConfiguration(getFileName("Race Engineer.phrases.en", kUserConfigDirectory, kConfigDirectory))
+			settings := readConfiguration(getFileName("Race Engineer.grammars.en", kUserConfigDirectory, kConfigDirectory))
 		
 		for fragment, word in getConfigurationSectionValues(settings, "Fragments", {})
 			fragments[fragment] := word
@@ -375,21 +318,19 @@ class RaceEngineer extends ConfigurationItem {
 	
 	buildPhrases(language) {
 		phrases := {}
-		visited := {}
 		
-		settings := readConfiguration(getFileName("Race Engineer.phrases." . language, kUserConfigDirectory, kConfigDirectory))
+		settings := readConfiguration(getFileName("Race Engineer.grammars." . language, kUserConfigDirectory, kConfigDirectory))
 		
 		if (settings.Count() == 0)
-			settings := readConfiguration(getFileName("Race Engineer.phrases.en", kUserConfigDirectory, kConfigDirectory))
+			settings := readConfiguration(getFileName("Race Engineer.grammars.en", kUserConfigDirectory, kConfigDirectory))
 		
-		for ignore, section in ["Conversation", "Information", "Warning", "Pitstop"]
-			for key, value in getConfigurationSectionValues(settings, section, {}) {
-				key := ConfigurationItem.splitDescriptor(key)[1]
-			
-				if phrases.HasKey(key)
-					phrases[key].Push(value)
-				else
-					phrases[key] := Array(value)
+		for key, value in getConfigurationSectionValues(settings, "Speaker Phrases", {}) {
+			key := ConfigurationItem.splitDescriptor(key)[1]
+		
+			if phrases.HasKey(key)
+				phrases[key].Push(value)
+			else
+				phrases[key] := Array(value)
 		}
 		
 		return phrases
@@ -404,19 +345,18 @@ class RaceEngineer extends ConfigurationItem {
 		for name, choices in getConfigurationSectionValues(settings, "Choices", {})
 			speechRecognizer.setChoices(name, speechRecognizer.newChoices(string2Values(",", choices)*))
 		
-		for ignore, section in ["Conversation", "Information", "Pitstop"]
-			for grammar, definition in getConfigurationSectionValues(settings, section, {}) {
-				definition := substituteVariables(definition, {name: this.Name})
-			
-				if false && isDebug() {
-					nextCharIndex := 1
-					SplashTextOn 400, 100, , % "Register phrase grammar " . new GrammarCompiler(speechRecognizer).readGrammar(definition, nextCharIndex).toString()
-					Sleep 1000
-					SplashTextOff
-				}
-
-				speechRecognizer.loadGrammar(grammar, speechRecognizer.compileGrammar(definition), ObjBindMethod(this, "phraseRecognized"))
+		for grammar, definition in getConfigurationSectionValues(settings, "Listener Grammars", {}) {
+			definition := substituteVariables(definition, {name: this.Name})
+		
+			if isDebug() {
+				nextCharIndex := 1
+				SplashTextOn 400, 100, , % "Register phrase grammar " . new GrammarCompiler(speechRecognizer).readGrammar(definition, nextCharIndex).toString()
+				Sleep 1000
+				SplashTextOff
 			}
+
+			speechRecognizer.loadGrammar(grammar, speechRecognizer.compileGrammar(definition), ObjBindMethod(this, "phraseRecognized"))
+		}
 	}
 	
 	phraseRecognized(grammar, words) {
@@ -446,22 +386,18 @@ class RaceEngineer extends ConfigurationItem {
 					this.iContinuation := false
 					
 					this.getSpeaker().speakPhrase("Okay")
-				case "Call":
-					this.nameRecognized(words)
-				case "Harsh":
+				case "Call", "Harsh":
 					this.nameRecognized(words)
 				case "Catch":
 					this.getSpeaker().speakPhrase("Repeat")
 				case "LapsRemaining":
 					this.lapInfoRecognized(words)
 				case "TyreTemperatures":
-					this.iContinuation := false
-					
 					this.tyreInfoRecognized(words)
 				case "TyrePressures":
-					this.iContinuation := false
-					
 					this.tyreInfoRecognized(words)
+				case "Weather":
+					this.weatherRecognized(words)
 				case "PitstopPlan":
 					this.iContinuation := false
 					
@@ -482,7 +418,7 @@ class RaceEngineer extends ConfigurationItem {
 					this.iContinuation := false
 					
 					this.pitstopAdjustCompoundRecognized(words)
-				case "PitstopAdjustPressure":
+				case "PitstopAdjustPressureUp", "PitstopAdjustPressureDown":
 					this.iContinuation := false
 					
 					this.pitstopAdjustPressureRecognized(words)
@@ -529,13 +465,11 @@ class RaceEngineer extends ConfigurationItem {
 			return
 		
 		speaker := this.getSpeaker()
+		fragments := speaker.Fragments
 		
-		temperatures := translate("temperatures")
-		pressures := translate("pressures")
-		
-		if inList(words, temperatures)
+		if inList(words, fragments["temperatures"])
 			value := "Temperature"
-		else if inList(words, pressures)
+		else if inList(words, fragments["pressures"])
 			value := "Pressure"
 		else {
 			speaker.speakPhrase("Repeat")
@@ -548,16 +482,20 @@ class RaceEngineer extends ConfigurationItem {
 		speaker.speakPhrase((value == "Pressure") ? "Pressures" : "Temperatures")
 		
 		speaker.speakPhrase("TyreFL", {value: Round(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".FL"), 1)
-						  , unit: (value == "Pressure") ? translate("PSI") : translate("Degrees")})
+						  , unit: (value == "Pressure") ? fragments["PSI"] : fragments["Degrees"]})
 		
 		speaker.speakPhrase("TyreFR", {value: Round(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".FR"), 1)
-						  , unit: (value == "Pressure") ? translate("PSI") : translate("Degrees")})
+						  , unit: (value == "Pressure") ? fragments["PSI"] : fragments["Degrees"]})
 		
 		speaker.speakPhrase("TyreRL", {value: Round(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".RL"), 1)
-						  , unit: (value == "Pressure") ? translate("PSI") : translate("Degrees")})
+						  , unit: (value == "Pressure") ? fragments["PSI"] : fragments["Degrees"]})
 		
 		speaker.speakPhrase("TyreRR", {value: Round(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".RR"), 1)
-						  , unit: (value == "Pressure") ? translate("PSI") : translate("Degrees")})
+						  , unit: (value == "Pressure") ? fragments["PSI"] : fragments["Degrees"]})
+	}
+	
+	weatherRecognized(words) {
+		this.getSpeaker().speakPhrase("Weather")
 	}
 	
 	planPitstopRecognized(words) {
@@ -655,7 +593,7 @@ class RaceEngineer extends ConfigurationItem {
 					
 					delta := Round(psiValue + (tenthPsiValue / 10), 1)
 					
-					speaker.speakPhrase("ConfirmPsiChange", {action: action, tyre: tyre, delta: delta})
+					speaker.speakPhrase("ConfirmPsiChange", {action: action, tyre: tyre, unit: fragments["PSI"], delta: delta})
 					
 					this.setContinuation(ObjBindMethod(this, "updatePitstopTyrePressure", tyreType, (action == kIncrease) ? delta : (delta * -1)))
 					
@@ -756,6 +694,50 @@ class RaceEngineer extends ConfigurationItem {
 			
 	setContinuation(continuation) {
 		this.iContinuation := continuation
+	}
+	
+	createRace(data) {
+		local facts
+		
+		settings := this.RaceSettings
+		
+		duration := Round((getConfigurationValue(data, "Stint Data", "TimeRemaining", 0) + getConfigurationValue(data, "Stint Data", "LapLastTime", 0)) / 1000)
+		
+		facts := {"Race.Car": getConfigurationValue(data, "Race Data", "Car", "")
+				, "Race.Track": getConfigurationValue(data, "Race Data", "Track", "")
+				, "Race.Duration": duration
+				, "Race.Settings.OutLap": getConfigurationValue(settings, "Race Settings", "OutLap", true)
+				, "Race.Settings.InLap": getConfigurationValue(settings, "Race Settings", "InLap", true)
+				, "Race.Settings.Fuel.Max": getConfigurationValue(data, "Race Data", "FuelAmount", 0)
+				, "Race.Settings.Fuel.AvgConsumption": getConfigurationValue(settings, "Race Settings", "Fuel.AvgConsumption", 0)
+				, "Race.Settings.Fuel.SafetyMargin": getConfigurationValue(settings, "Race Settings", "Fuel.SafetyMargin", 5)
+				, "Race.Settings.Lap.PitstopWarning": getConfigurationValue(settings, "Race Settings", "Lap.PitstopWarning", 5)
+				, "Race.Settings.Lap.AvgTime": getConfigurationValue(settings, "Race Settings", "Lap.AvgTime", 0)
+				, "Race.Settings.Lap.Considered": getConfigurationValue(settings, "Race Settings", "Lap.Considered", 5)
+				, "Race.Settings.Lap.History.Considered": getConfigurationValue(settings, "Race Settings", "Lap.History.Considered", 5)
+				, "Race.Settings.Lap.History.Damping": getConfigurationValue(settings, "Race Settings", "Lap.History.Damping", 0.2)
+				, "Race.Settings.Damage.Suspension.Repair": getConfigurationValue(settings, "Race Settings", "Damage.Suspension.Repair", "Always")
+				, "Race.Settings.Damage.Suspension.Repair.Threshold": getConfigurationValue(settings, "Race Settings", "Damage.Suspension.Repair.Threshold", 0)
+				, "Race.Settings.Damage.Bodywork.Repair": getConfigurationValue(settings, "Race Settings", "Damage.Bodywork.Repair", "Threshold")
+				, "Race.Settings.Damage.Bodywork.Repair.Threshold": getConfigurationValue(settings, "Race Settings", "Damage.Bodywork.Repair.Threshold", 20)
+				, "Race.Settings.Tyre.Dry.Pressure.Target.FL": getConfigurationValue(settings, "Race Settings", "Tyre.Dry.Pressure.Target.FL", 27.7)
+				, "Race.Settings.Tyre.Dry.Pressure.Target.FR": getConfigurationValue(settings, "Race Settings", "Tyre.Dry.Pressure.Target.FR", 27.7)
+				, "Race.Settings.Tyre.Dry.Pressure.Target.RL": getConfigurationValue(settings, "Race Settings", "Tyre.Dry.Pressure.Target.RL", 27.7)
+				, "Race.Settings.Tyre.Dry.Pressure.Target.RR": getConfigurationValue(settings, "Race Settings", "Tyre.Dry.Pressure.Target.RR", 27.7)
+				, "Race.Settings.Tyre.Wet.Pressure.Target.FL": getConfigurationValue(settings, "Race Settings", "Tyre.Wet.Pressure.Target.FL", 30.0)
+				, "Race.Settings.Tyre.Wet.Pressure.Target.FR": getConfigurationValue(settings, "Race Settings", "Tyre.Wet.Pressure.Target.FR", 30.0)
+				, "Race.Settings.Tyre.Wet.Pressure.Target.RL": getConfigurationValue(settings, "Race Settings", "Tyre.Wet.Pressure.Target.RL", 30.0)
+				, "Race.Settings.Tyre.Wet.Pressure.Target.RR": getConfigurationValue(settings, "Race Settings", "Tyre.Wet.Pressure.Target.RR", 30.0)
+				, "Race.Settings.Tyre.Pressure.Deviation": getConfigurationValue(settings, "Race Settings", "Tyre.Pressure.Deviation", 0.2)
+				, "Race.Settings.Tyre.Set.Fresh": getConfigurationValue(settings, "Race Settings", "Tyre.Set.Fresh", 8)
+				, "Race.Setup.Tyre.Compound": getConfigurationValue(settings, "Race Setup", "Tyre.Compound", "Dry")
+				, "Race.Setup.Tyre.Set": getConfigurationValue(settings, "Race Setup", "Tyre.Set", 7)
+				, "Race.Setup.Tyre.Pressure.FL": getConfigurationValue(settings, "Race Setup", "Tyre.Pressure.FL", 26.1)
+				, "Race.Setup.Tyre.Pressure.FR": getConfigurationValue(settings, "Race Setup", "Tyre.Pressure.FR", 26.1)
+				, "Race.Setup.Tyre.Pressure.RL": getConfigurationValue(settings, "Race Setup", "Tyre.Pressure.RL", 26.1)
+				, "Race.Setup.Tyre.Pressure.RR": getConfigurationValue(settings, "Race Setup", "Tyre.Pressure.RR", 26.1)}
+				
+		return facts
 	}
 	
 	startRace(data) {
@@ -934,6 +916,7 @@ class RaceEngineer extends ConfigurationItem {
 		
 		if this.Speaker {
 			speaker := this.getSpeaker()
+			fragments := speaker.Fragments
 			
 			speaker.speakPhrase("Pitstop", {name: this.Name, number: pitstopNumber})
 				
@@ -945,16 +928,16 @@ class RaceEngineer extends ConfigurationItem {
 			
 			compound := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound")
 			if (compound = "Dry")
-				speaker.speakPhrase((compound = "Dry") ? "DryTyres" : "WetTyres", {compound: compound, set: knowledgeBase.getValue("Pitstop.Planned.Tyre.Set")})
+				speaker.speakPhrase("DryTyres", {compound: fragments[compound], set: knowledgeBase.getValue("Pitstop.Planned.Tyre.Set")})
 			else
-				speaker.speakPhrase("WetTyres", {compound: compound, set: knowledgeBase.getValue("Pitstop.Planned.Tyre.Set")})
+				speaker.speakPhrase("WetTyres", {compound: fragments[compound], set: knowledgeBase.getValue("Pitstop.Planned.Tyre.Set")})
 			
 			speaker.speakPhrase("NewPressures")
 			
-			speaker.speakPhrase("TyreFL", {value: Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL"), 1), unit: translate("PSI")})
-			speaker.speakPhrase("TyreFR", {value: Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR"), 1), unit: translate("PSI")})
-			speaker.speakPhrase("TyreRL", {value: Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL"), 1), unit: translate("PSI")})
-			speaker.speakPhrase("TyreRR", {value: Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR"), 1), unit: translate("PSI")})
+			speaker.speakPhrase("TyreFL", {value: Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL"), 1), unit: fragments["PSI"]})
+			speaker.speakPhrase("TyreFR", {value: Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR"), 1), unit: fragments["PSI"]})
+			speaker.speakPhrase("TyreRL", {value: Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL"), 1), unit: fragments["PSI"]})
+			speaker.speakPhrase("TyreRR", {value: Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR"), 1), unit: fragments["PSI"]})
 
 			if knowledgeBase.getValue("Pitstop.Planned.Repair.Suspension", false)
 				speaker.speakPhrase("RepairSuspension")

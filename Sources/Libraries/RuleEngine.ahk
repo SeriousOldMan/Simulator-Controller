@@ -1740,16 +1740,15 @@ class FactChoicePoint extends ChoicePoint {
 	
 			fact := this.iFact
 			
-			if (arguments.Length() == 2) {
+			if (arguments.Length() < 2)
+				value := true
+			else
 				value := arguments[2].toString(resultSet)
 				
-				if facts.hasFact(fact)
-					facts.setValue(fact, value)
-				else
-					facts.addFact(fact, value)
-			}
+			if facts.hasFact(fact)
+				facts.setValue(fact, value)
 			else
-				facts.removeFact(fact)
+				facts.addFact(fact, value)
 			
 			return true
 		}

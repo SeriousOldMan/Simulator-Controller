@@ -166,13 +166,13 @@ updateBodyworkRepair(?) <= Clear(Damage.Repair.Bodywork.Target)
 
 lapDamage(?lap, Suspension, ?damage) <= lapDamage(?lap, Suspension, FL, ?fld), lapDamage(?lap, Suspension, FR, ?frd),							\
 										lapDamage(?lap, Suspension, RL, ?rld), lapDamage(?lap, Suspension, RR, ?rrd),							\
-										sum([?fld, ?frd, ?rld, ?rrd], ?damage)
+										sum([?fld, ?frd, ?rld, ?rrd], ?damage) 
 lapDamage(?lap, Bodywork, ?damage) <= lapDamage(?lap, Bodywork, Front, ?frontDmg), lapDamage(?lap, Bodywork, Rear, ?rearDmg),					\
 									  lapDamage(?lap, Bodywork, Left, ?leftDmg), lapDamage(?lap, Bodywork, Right, ?rightDmg),					\
 									  lapDamage(?lap, Bodywork, Center, ?centerDmg), 															\
 									  sum([?frontDmg, ?rearDmg, ?leftDmg, ?rightDmg, ?centerDmg], ?damage)
 
-repairDamage(?type, 0) <= !, fail
+repairDamage(?, 0) <= !, fail
 repairDamage(?type, ?damage) <= Append(?fact, Race.Settings.Damage., ?type, .Repair),															\
 								Get(?setting, ?fact), repairDamage(?type, ?setting, ?damage)
 

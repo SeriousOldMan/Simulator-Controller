@@ -1720,6 +1720,13 @@ class FactChoicePoint extends ChoicePoint {
 	iFact := false
 	iOldValue := kNotInitialized
 	iFirst := true
+	iClear := false
+	
+	__New(resultSet, goal, environment, clear := false) {
+		this.iClear := clear
+		
+		base.__New(resultSet, goal, environment, true)
+	}
 	
 	nextChoice() {
 		local resultSet
@@ -1740,15 +1747,19 @@ class FactChoicePoint extends ChoicePoint {
 	
 			fact := this.iFact
 			
-			if (arguments.Length() < 2)
-				value := true
-			else
-				value := arguments[2].toString(resultSet)
-				
-			if facts.hasFact(fact)
-				facts.setValue(fact, value)
-			else
-				facts.addFact(fact, value)
+			if this.iClear
+				facts.removeFact(fact)
+			else {
+				if (arguments.Length() < 2)
+					value := true
+				else
+					value := arguments[2].toString(resultSet)
+					
+				if facts.hasFact(fact)
+					facts.setValue(fact, value)
+				else
+					facts.addFact(fact, value)
+			}
 			
 			return true
 		}
@@ -1791,6 +1802,9 @@ class SetFactChoicePoint extends FactChoicePoint {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class ClearFactChoicePoint extends FactChoicePoint {
+	__New(resultSet, goal, environment) {
+		base.__New(resultSet, goal, environment, true)
+	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;

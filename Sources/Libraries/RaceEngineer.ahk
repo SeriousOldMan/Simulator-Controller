@@ -414,6 +414,10 @@ class RaceEngineer extends ConfigurationItem {
 					Sleep 5000
 					
 					this.preparePitstopRecognized(words)
+				case "PitstopAdjustFuel":
+					this.iContinuation := false
+					
+					this.pitstopAdjustFuelRecognized(words)
 				case "PitstopAdjustCompound":
 					this.iContinuation := false
 					
@@ -506,6 +510,38 @@ class RaceEngineer extends ConfigurationItem {
 		this.preparePitstop()
 	}
 	
+	pitstopAdjustFuelRecognized(words) {
+		local action
+		
+		speaker := this.getSpeaker()
+		fragments := speaker.Fragments
+		
+		if !this.hasPlannedPitstop() {
+			speaker.speakPhrase("NotPossible")
+			speaker.speakPhrase("ConfirmPlan")
+			
+			this.setContinuation(ObjBindMethod(this, "planPitstop"))
+		}
+		else {
+			litresPosition := inList(words, fragments["Litres"])
+				
+			if litresPosition {
+				litres := words[litresPosition - 1]
+				
+				if litres is number
+				{
+					speaker.speakPhrase("ConfirmFuelChange", {litres: litres})
+					
+					this.setContinuation(ObjBindMethod(this, "updatePitstopFuel", litres))
+					
+					return
+				}
+			}
+			
+			speaker.speakPhrase("Repeat")
+		}
+	}
+	
 	pitstopAdjustCompoundRecognized(words) {
 		local action
 		local compound
@@ -563,16 +599,18 @@ class RaceEngineer extends ConfigurationItem {
 		else {
 			tyreType := false
 			
-			if inList(words, fragments["Front"])
+			if inList(words, fragments["Front"]) {
 				if inList(words, fragments["Left"])
 					tyreType := "FL"
 				else if inList(words, fragments["Right"])
 					tyreType := "FR"
-			else if inList(words, fragments["Rear"])
+			}
+			else if inList(words, fragments["Rear"]) {
 				if inList(words, fragments["Left"])
 					tyreType := "RL"
 				else if inList(words, fragments["Right"])
 					tyreType := "RR"
+			}
 			
 			if tyreType {
 				action := false
@@ -585,8 +623,14 @@ class RaceEngineer extends ConfigurationItem {
 				pointPosition := inList(words, fragments["Point"])
 				
 				if pointPosition {
-					psiValue := numberFragmentsLookup[words[pointPosition - 1]]
-					tenthPsiValue := numberFragmentsLookup[words[pointPosition + 1]]
+					psiValue := words[pointPosition - 1]
+					tenthPsiValue := words[pointPosition + 1]
+					
+					if psiValue is not number
+					{
+						psiValue := numberFragmentsLookup[psiValue]
+						tenthPsiValue := numberFragmentsLookup[tenthPsiValue]
+					}
 					
 					tyre := tyreTypeFragments[tyreType]
 					action := fragments[action]
@@ -623,9 +667,28 @@ class RaceEngineer extends ConfigurationItem {
 			if inList(words, fragments["Not"])
 				negation := fragments["Not"]
 			
-			speaker.speakPhrase("ConfirmRepairChange", {damage: repairType, negation: negation})
+			speaker.speakPhrase("ConfirmRepairChange", {damage: fragments[repairType], negation: negation})
 					
 			this.setContinuation(ObjBindMethod(this, "updatePitstopRepair", repairType, negation = ""))
+		}
+	}
+	
+	updatePitstopFuel(litres) {
+		speaker := this.getSpeaker()
+		
+		if !this.hasPlannedPitstop() {
+			speaker.speakPhrase("NotPossible")
+			speaker.speakPhrase("ConfirmPlan")
+			
+			this.setContinuation(ObjBindMethod(this, "planPitstop"))
+		}
+		else {
+			this.KnowledgeBase.setValue("Pitstop.Planned.Fuel", litres)
+			
+			if isDebug()
+				dumpKnowledge(this.KnowledgeBase)
+
+			speaker.speakPhrase("ConfirmPlanUpdate")
 		}
 	}
 	
@@ -664,7 +727,7 @@ class RaceEngineer extends ConfigurationItem {
 			targetIncrement := knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure." . tyreType . ".Increment")
 			
 			knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure." . tyreType, targetValue + delta)
-			knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure." . tyreType . ".Increment", targetValue + delta)
+			knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure." . tyreType . ".Increment", targetIncrement + delta)
 			
 			if isDebug()
 				dumpKnowledge(this.KnowledgeBase)

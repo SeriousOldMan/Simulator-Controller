@@ -553,7 +553,7 @@ class GrammarBuiltinChoices {
 		if (choices = "number")
 			choices := "percent"
 		
-		return parser.Compiler.SpeechRecognizer.getChoices(this.Builtin)
+		return parser.Compiler.SpeechRecognizer.getChoices(choices)
 	}
 }
 

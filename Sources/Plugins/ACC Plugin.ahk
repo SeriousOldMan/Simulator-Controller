@@ -1296,21 +1296,21 @@ collectRaceData() {
 		protectionOn()
 		
 		try {
-			if (dataLastLap > lastLap) {
-				if (lastLap == 0)
-					plugin.startRace(dataFile)
-				
-				lastLap := dataLastLap
-
-				plugin.addLap(dataLastLap, dataFile)
-				
-				if isDebug()
-					writeConfiguration(kUserHomeDirectory . "Temp\ACC Data\Lap " . lastLap . ".data", data)
-			}
 			
-			if (plugin.PendingPitstop && getConfigurationValue(data, "Stint Data", "InPit", false))
+			if (plugin.PitstopPending && getConfigurationValue(data, "Stint Data", "InPit", false))
 				plugin.performPitstop()
-			
+			else if (dataLastLap > lastLap) {
+					if (lastLap == 0)
+						plugin.startRace(dataFile)
+					
+					lastLap := dataLastLap
+
+					plugin.addLap(dataLastLap, dataFile)
+					
+					if isDebug()
+						writeConfiguration(kUserHomeDirectory . "Temp\ACC Data\Lap " . lastLap . ".data", data)
+				}
+				
 			if !getConfigurationValue(data, "Stint Data", "Active", false) {
 				if (lastLap > 0) {
 					if isDebug() {

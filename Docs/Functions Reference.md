@@ -63,8 +63,8 @@ Registers an event handler function for the given event type. An event handler i
 			withProtection(data)
 	}
 
-#### *raiseEvent(target :: String, event :: String, data :: String)*
-Raises the event in the supplied target process. If *target* is *false*, the event is raised in the current process. Otherwise, *target* must use the [*winTitle*](https://www.autohotkey.com/docs/misc/WinTitle.htm) syntax of AutoHotkey to identify a target process through one of its windows or using its process id. Returns *true*, if the event has been successfully delivered.
+#### *raiseEvent(event :: String, data :: String, local := false)*
+Raises the given event. If *local* is *true*, the event is raised in the current process. Otherwise, the event is delivered to any process, which had registered an event handler for the given event. Only one process will receive the message, even, if more processes are registered for the given event.
 
 ***
 

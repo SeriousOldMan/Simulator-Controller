@@ -41,17 +41,17 @@ class SpeechRecognizer {
 
 			if (this.Instance.OkCheck() != "OK") {
 				logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
-				logMessage(kLogCritical, translate("Try running the powershell command ""Get-ChildItem -Path '.' -Recurse | Unblock-File"" in the Binaries folder."))
+				logMessage(kLogCritical, translate("Try running the Powershell command ""Get-ChildItem -Path '.' -Recurse | Unblock-File"" in the Binaries folder"))
 				
 				Throw "Could not communicate with speech recognizer library (" . dllName . ")..."
 			}
 		}
 		catch exception {
-			logMessage(kLogCritical, translate("Error while initializing speech recognition system - please check the configuration"))
+			logMessage(kLogCritical, translate("Error while initializing speech recognition module - please check the configuration"))
 
 			title := translate("Modular Simulator Controller System")
 			
-			SplashTextOn 800, 60, %title%, % translate("Error while initializing speech recognition system - please check the configuration") . translate("...")
+			SplashTextOn 800, 60, %title%, % translate("Error while initializing speech recognition module - please check the configuration") . translate("...")
 					
 			Sleep 5000
 		}
@@ -63,7 +63,7 @@ class SpeechRecognizer {
 
 			title := translate("Modular Simulator Controller System")
 			
-			SplashTextOn 800, 60, %title%, % translate("No languages while initializing speech recognition system - please check the configuration") . translate("...")
+			SplashTextOn 800, 60, %title%, % translate("No languages found while initializing speech recognition system - please check the configuration") . translate("...")
 					
 			Sleep 5000
 		}

@@ -1017,9 +1017,9 @@ class ACCPlugin extends ControllerPlugin {
 			Throw "Pitstops may only be prepared during an active race..."
 	}
 	
-	performPitstop() {
+	performPitstop(lapNumber) {
 		if this.ActiveRace
-			this.RaceEngineer.performPitstop()
+			this.RaceEngineer.performPitstop(lapNumber)
 		else
 			Throw "Pitstops may only be performed during an active race..."
 	}
@@ -1309,7 +1309,7 @@ collectRaceData() {
 		
 		try {
 			if (plugin.PitstopPending && getConfigurationValue(data, "Stint Data", "InPit", false) && !inPit) {
-				plugin.performPitstop()
+				plugin.performPitstop(dataLastLap)
 				
 				inPit := true
 			}

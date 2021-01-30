@@ -882,6 +882,8 @@ class RaceEngineer extends ConfigurationItem {
 		local knowledgeBase
 		local facts
 		
+		static baseLap := false
+		
 		if !IsObject(data)
 			data := readConfiguration(data)
 		
@@ -892,11 +894,14 @@ class RaceEngineer extends ConfigurationItem {
 		
 		if (lapNumber == 1)
 			knowledgeBase.addFact("Lap", 1)
-		else {
+		else
 			knowledgeBase.setValue("Lap", lapNumber)
 			
+		if !this.iInitialFuelAmount
+			baseLap := lapNumber
+		
+		if (lapNumber > baseLap)
 			this.iEnoughData := true
-		}
 			
 		knowledgeBase.addFact("Lap." . lapNumber . ".Driver", getConfigurationValue(data, "Race Data", "DriverName", ""))
 		
@@ -920,8 +925,16 @@ class RaceEngineer extends ConfigurationItem {
 			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.AvgConsumption", 0)
 			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.Consumption", 0)
 		}
+		else if !this.iInitialFuelAmount {
+			; This is the case after a pitstop
+			this.iInitialFuelAmount := fuelRemaining
+			this.iLastFuelAmount := fuelRemaining
+			
+			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.AvgConsumption", knowledgeBase.getValue("Lap." . (lapNumber - 1) . ".Fuel.AvgConsumption", 0))
+			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.Consumption", knowledgeBase.getValue("Lap." . (lapNumber - 1) . ".Fuel.Consumption", 0))
+		}
 		else {
-			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.AvgConsumption", Round((this.InitialFuelAmount - fuelRemaining) / (lapNumber - 1), 2))
+			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.AvgConsumption", Round((this.InitialFuelAmount - fuelRemaining) / (lapNumber - baseLap), 2))
 			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.Consumption", Round(this.iLastFuelAmount - fuelRemaining, 2))
 			
 			this.iLastFuelAmount := fuelRemaining
@@ -992,9 +1005,9 @@ class RaceEngineer extends ConfigurationItem {
 		
 		if !this.hasEnoughData()
 			return
-				
+	
 		knowledgeBase.addFact("Pitstop.Plan", true)
-		
+	
 		result := knowledgeBase.produce()
 		
 		if this.Debug[kDebugKnowledgeBase]
@@ -1094,6 +1107,8 @@ class RaceEngineer extends ConfigurationItem {
 				
 			if !lap
 				this.KnowledgeBase.addFact("Pitstop.Prepare", true)
+			else if this.KnowledgeBase.hasFact("Pitstop.Planned.Lap")
+				this.KnowledgeBase.setValue("Pitstop.Planned.Lap", lap - 1)
 			else
 				this.KnowledgeBase.addFact("Pitstop.Planned.Lap", lap - 1)
 		
@@ -1106,13 +1121,17 @@ class RaceEngineer extends ConfigurationItem {
 		}
 	}
 	
-	performPitstop() {
+	performPitstop(lapNumber := false) {
 		if this.Speaker
 			this.getSpeaker().speakPhrase("Perform")
-				
-		this.KnowledgeBase.addFact("Pitstop.Lap", this.KnowledgeBase.getValue("Lap"))
+		
+		this.KnowledgeBase.addFact("Pitstop.Lap", lapNumber ? lapNumber : this.KnowledgeBase.getValue("Lap"))
 		
 		result := this.KnowledgeBase.produce()
+		
+		this.iEnoughData := false
+		this.iLastFuelAmount := 0
+		this.iInitialFuelAmount := 0
 		
 		if this.Debug[kDebugKnowledgeBase]
 			dumpKnowledge(this.KnowledgeBase)

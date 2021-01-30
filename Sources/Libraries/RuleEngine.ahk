@@ -2226,13 +2226,14 @@ class Facts {
 				if (this.RuleEngine.TraceLevel <= kTraceMedium)
 					this.RuleEngine.trace(kTraceMedium, "Setting fact " . fact . " to " . value)
 				
-				if (this.iFacts[fact] != value)
+				if (this.iFacts[fact] != value) {
 					this.iGeneration += 1
 					
-				this.iFacts[fact] := value
-				
-				if this.hasObserver(fact)
-					this.getObserver(fact).factChanged()
+					this.iFacts[fact] := value
+					
+					if this.hasObserver(fact)
+						this.getObserver(fact).factChanged()
+				}
 			}
 			else	
 				Throw "Unknown fact """ . fact . """ encountered in Facts.setValue..."

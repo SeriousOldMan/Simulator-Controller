@@ -64,6 +64,13 @@ Error while starting application =>Fehler beim Versuch, die Anwendung
 ): =>): 
  - please check the configuration=> - Bitte überprüfen Sie die Konfiguration
 Cannot start %application% (%exePath%) - please check the configuration...=>Die Anwendung %application% (%exePath%) kann nicht gestartet werden - Bitte überprüfen Sie die Konfiguration...
+[Speech Recognizer]
+Speech.Recognizer.dll not found in =>Speech.Recognizer.dll konnte nicht gefunden werden im Verzeichnis  
+Could not communicate with speech recognizer library (=>Fehler bei der Kommunikation mit dem Spracherkennungsmodul (
+)=>)
+Try running the Powershell command "Get-ChildItem -Path '.' -Recurse | Unblock-File" in the Binaries folder=>Versuche das Powershell Kommando "Get-ChildItem -Path '.' -Recurse | Unblock-File" im Binaries Verzeichnis auszuführen
+Error while initializing speech recognition module - please check the configuration=>Fehler bei der Initialisierung des Spracherkennungsmoduls - Bitte überprüfen Sie die Konfiguration
+No languages found while initializing speech recognition system - please check the configuration=>Keine Sprachbibliotheken gefunden während der Initialisierung des Spracherkennungsmoduls - Bitte überprüfen Sie die Konfiguration
 [Simulator Controller]
 Modular Simulator=>Modulare Simulator
 Controller System=>Steuerung

@@ -352,8 +352,11 @@ class PitstopHandling extends Assert {
 			else {
 				engineer.addLap(A_Index, data)
 			
-				if (A_Index = 5)
+				if (A_Index = 5) {
 					engineer.planPitstop()
+					
+					break
+				}
 			}
 			
 			dumpKnowledge(engineer.KnowledgeBase)
@@ -520,7 +523,13 @@ class PitstopHandling extends Assert {
 					this.AssertEqual(26.3, Round(engineer.KnowledgeBase.getValue("Pitstop.1.Tyre.Pressure.FR"), 1), "Pitstop tyre pressure FR not in history memory...")
 					this.AssertEqual(26.4, Round(engineer.KnowledgeBase.getValue("Pitstop.1.Tyre.Pressure.RL"), 1), "Pitstop tyre pressure RL not in history memory...")
 					this.AssertEqual(26.4, Round(engineer.KnowledgeBase.getValue("Pitstop.1.Tyre.Pressure.RR"), 1), "Pitstop tyre pressure RR not in history memory...")
-										
+					
+					engineer.planPitstop()
+				
+					this.AssertEqual(kNotInitialized, engineer.KnowledgeBase.getValue("Pitstop.Planned.Nr"), "Planning of pitstop should not be possible in the same lap with a performed pitstop...")
+				}
+				
+				if (A_Index = 7) {
 					vFuelWarnings := {}
 
 					vSuspensionDamage := kNotInitialized
@@ -529,13 +538,74 @@ class PitstopHandling extends Assert {
 					engineer.planPitstop()
 					
 					dumpKnowledge(engineer.KnowledgeBase)
-					
+				
 					this.AssertEqual(2, engineer.KnowledgeBase.getValue("Pitstop.Planned.Nr"), "Pitstop number increment failed...")
-					this.AssertEqual(0, vFuelWarnings.Count(), "Warning suspression not working...")
-					this.AssertEqual(kNotInitialized, vSuspensionDamage, "Warning suspression not working...")
-					this.AssertEqual(kNotInitialized, vBodyworkDamage, "Warning suspression not working...")
+					this.AssertEqual(false, engineer.KnowledgeBase.getValue("Pitstop.Planned.Repair.Suspension"), "Expected no suspension repair...")
+					this.AssertEqual(true, engineer.KnowledgeBase.getValue("Pitstop.Planned.Repair.Bodywork"), "Expected bodywork repair...")
+					this.AssertEqual(0, vFuelWarnings.Count(), "Warning suppression not working...")
+					this.AssertEqual(kNotInitialized, vSuspensionDamage, "Warning suppression not working...")
+					this.AssertEqual(kNotInitialized, vBodyworkDamage, "Warning suppression not working...")
 				}
 			}
+		}
+	}
+	
+	PitstopMultipleTest() {
+		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race Engineer.settings"), new TestPitStopHandler(), false, false)
+		
+		Loop {
+			vSuspensionDamage := kNotInitialized
+			vBodyworkDamage := kNotInitialized
+
+			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Lap " . A_Index . ".data")
+			; msgbox round %A_Index%
+			if (data.Count() == 0)
+				break
+			else {
+				engineer.addLap(A_Index, data)
+			
+				if (A_Index = 3) {
+					engineer.planPitstop()
+					engineer.preparePitstop()
+				}
+			
+				if (A_Index = 4) {
+					engineer.performPitstop()
+					
+					this.AssertEqual(1, engineer.KnowledgeBase.getValue("Pitstop.Last", 0), "Last Pitstop not in history memory...")
+					this.AssertEqual(true, vSuspensionDamage, "Expected suspension damage to be reported...")
+					this.AssertEqual(false, vBodyworkDamage, "Expected no bodywork damage to be reported...")
+				}
+			
+				if (A_Index = 5) {
+					this.AssertEqual(true, vSuspensionDamage, "Expected suspension damage to be reported...")
+					this.AssertEqual(true, vBodyworkDamage, "Expected bodywork damage to be reported...")
+				}
+			
+				if (A_Index = 7) {
+					engineer.planPitstop()
+					
+					this.AssertEqual(2, engineer.KnowledgeBase.getValue("Pitstop.Planned.Nr", 0), "Pitstop number increment failed...")
+					this.AssertEqual(false, engineer.KnowledgeBase.getValue("Pitstop.Planned.Repair.Suspension"), "Expected no suspension repair...")
+					this.AssertEqual(true, engineer.KnowledgeBase.getValue("Pitstop.Planned.Repair.Bodywork"), "Expected bodywork repair...")
+					
+					engineer.preparePitstop()
+					engineer.performPitstop()
+					
+					this.AssertEqual(kNotInitialized, vSuspensionDamage, "Expected no suspension damage to be reported...")
+					this.AssertEqual(kNotInitialized, vBodyworkDamage, "Expected no bodywork damage to be reported...")
+					
+					this.AssertEqual(-1, engineer.KnowledgeBase.getValue("Pitstop.Planned.Nr", -1), "Pitstop number increment failed...")
+					this.AssertEqual(2, engineer.KnowledgeBase.getValue("Pitstop.Last", 0), "Last Pitstop not in history memory...")
+					this.AssertEqual(7, engineer.KnowledgeBase.getValue("Pitstop.2.Lap", 0), "Wrong lap recorded Pitstop...")
+					this.AssertEqual(false, engineer.KnowledgeBase.getValue("Pitstop.2.Repair.Suspension"), "Expected no suspension repair...")
+					this.AssertEqual(true, engineer.KnowledgeBase.getValue("Pitstop.2.Repair.Bodywork"), "Expected bodywork repair...")
+					this.AssertEqual(9, engineer.KnowledgeBase.getValue("Pitstop.2.Tyre.Set"), "Expected new tyres...")
+					
+				}
+			}
+			
+			dumpKnowledge(engineer.KnowledgeBase)
 		}
 	}
 }

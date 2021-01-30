@@ -29,7 +29,8 @@ global vVideoIsPlaying = false
 global vSongIsPlaying = false
 
 global vEventHandlers = Object()
-global vWaitingEvents = []
+global vIncomingEvents = []
+global vOutgoingEvents = []
 
 global vPendingTrayMessages = []
 global vTrayMessageDuration = 1500
@@ -77,7 +78,7 @@ readLanguage(targetLanguageCode) {
 	Throw "Inconsistent translation encountered for """ . targetLanguageCode . """ in readLanguage..."
 }
 
-eventMessageDispatcher() {
+readMessages() {
 	for event, handler in vEventHandlers {
 		if (event = "*")
 			continue
@@ -97,17 +98,53 @@ eventMessageDispatcher() {
 				
 				logMessage(kLogInfo, translate("Dispatching event """) . event . (data[2] ? translate(""": ") . data[2] : translate("""")))
 				
-				vWaitingEvents.Push(Func(eventHandler).Bind(event, data[2]))
+				vIncomingEvents.Push(Func(eventHandler).Bind(event, data[2]))
+				
+				return true
 			}
+	}
+	
+	return false
+}
+
+writeMessages() {
+	static ERROR_PIPE_CONNECTED := 535
+	static ERROR_PIPE_LISTENING := 536
+	static ptr
+
+	if (vOutgoingEvents.Length() > 0) {
+		event := vOutgoingEvents[1][1]
+		data := vOutgoingEvents[1][2]
+		
+		pipeName := "\\.\pipe\SCE" . event
+
+		pipe := DllCall("CreateNamedPipe", "str", "\\.\pipe\SCE" . event, "uint", 3, "uint", 0, "uint", 255, "uint", 1024, "uint", 1024, "uint", 0, ptr, 0, ptr)
+		
+		DllCall("ConnectNamedPipe", ptr, pipe, ptr, 0)
+		
+		if (true || (A_LastError = ERROR_PIPE_CONNECTED)) {
+			message := (A_IsUnicode ? chr(0xfeff) : chr(239) chr(187) chr(191)) . (event := event . ":" . data)
+		
+			DllCall("WriteFile", ptr, pipe, "str", message, "uint", (StrLen(message) + 1) * (A_IsUnicode ? 2 : 1), "uint*", 0, ptr, 0)
+			
+			DllCall("CloseHandle", ptr, pipe)
+			
+			vOutgoingEvents.RemoveAt(1)
+		}
 	}
 }
 
-eventMessageQueue() {
-	if (vWaitingEvents.Length() > 0) {
-		event := vWaitingEvents.RemoveAt(1)
+messageDispatcher() {
+	if (vIncomingEvents.Length() > 0) {
+		event := vIncomingEvents.RemoveAt(1)
 	
 		%event%()
 	}
+}
+
+messageQueue() {
+	if !readMessages()
+		writeMessages()
 }
 
 trayMessageQueue() {
@@ -188,7 +225,7 @@ dispatchEvent(wParam, lParam) {
     request := decodeDWORD(dwData)              ; 4-char decoded request
     length  := (cbData - 1) / (A_IsUnicode + 1) ; length of DATA string (excl ZERO)
     data    := StrGet(lpData, length)           ; DATA string from pointer
-	msgbox event
+	
 	if (request != "EVNT")
 		Throw % "Unhandled message received: " . request . " in dispatchEvent..."
 
@@ -202,29 +239,29 @@ dispatchEvent(wParam, lParam) {
 	
 	logMessage(kLogInfo, translate("Dispatching event """) . event . (data[2] ? translate(""": ") . data[2] : translate("""")))
 	
-	vWaitingEvents.Push(Func(eventHandler).Bind(event, data[2]))
+	vIncomingEvents.Push(Func(eventHandler).Bind(event, data[2]))
 }
 
-initializeEventSystem() {
+startMessageManager() {
 	; OnMessage(0x4a, "dispatchEvent") 
 	
 	registerEventHandler("*", "unknownEventHandler")
 	
-	SetTimer eventMessageDispatcher, 500
-	SetTimer eventMessageQueue, 200
+	SetTimer messageQueue, 400
+	SetTimer messageDispatcher, 200
 }
 
 logError(exception) {
 	logMessage(kLogCritical, translate("Unhandled exception encountered in ") . exception.File . translate(" at line ") . exception.Line . translate(": ") . exception.Message)
 	
-	return (vDebug ? false : true)
+	return (isDebug() ? false : true)
 }
 
 initializeLoggingSystem() {
 	OnError("logError")
 }
 
-initializeTrayMessageQueue() {
+startTrayMessageManager() {
 	SetTimer trayMessageQueue, 500
 }
 
@@ -864,8 +901,6 @@ registerEventHandler(event, handler) {
 }
 
 raiseEvent(event, data, localProcess := false) {
-	static ptr
-	
 	if localProcess {
 		logMessage(kLogInfo, translate("Raising event """) . event . (data ? translate(""": ") . data : translate("""")) . translate(" in current process"))
 		
@@ -876,7 +911,7 @@ raiseEvent(event, data, localProcess := false) {
 	
 		logMessage(kLogInfo, translate("Dispatching event """) . event . (data ? translate(""": ") . data : translate("""")))
 		
-		vWaitingEvents.Push(Func(eventHandler).Bind(event, data))
+		vIncomingEvents.Push(Func(eventHandler).Bind(event, data))
 	
 		%eventHandler%(event, data)
 		
@@ -884,21 +919,9 @@ raiseEvent(event, data, localProcess := false) {
 	}
 	else {
 		logMessage(kLogInfo, translate("Raising event """) . event . (data ? translate(""": ") . data : translate("""")))
-		
-		pipe := DllCall("CreateNamedPipe", "str", "\\.\pipe\SCE" . event, "uint", 3, "uint", 0, "uint", 255, "uint", 0, "uint", 0, "uint", 0, ptr, 0, ptr)
-			
-		DllCall("ConnectNamedPipe", ptr, pipe, ptr, 0)
-		
-		message := (A_IsUnicode ? chr(0xfeff) : chr(239) chr(187) chr(191)) . (event := event . ":" . data)
-		
-		DllCall("WriteFile", ptr, pipe, "str", message, "uint", (StrLen(message) + 1) * (A_IsUnicode ? 2 : 1), "uint*", 0, ptr, 0)
-		
-		DllCall("CloseHandle", ptr, pipe)
+	
+		vOutgoingEvents.Push(Array(event, data))
 	}
-}
-
-CreateNamedPipe(Name, OpenMode=3, PipeMode=0, MaxInstances=255) {
-	return 
 }
 
 trayMessage(title, message, duration := false) {
@@ -1100,5 +1123,5 @@ initializeEnvironment()
 loadSimulatorConfiguration()
 checkForUpdates()
 initializeLoggingSystem()
-initializeEventSystem()
-initializeTrayMessageQueue()
+startMessageManager()
+startTrayMessageManager()

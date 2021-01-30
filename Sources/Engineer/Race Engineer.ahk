@@ -174,11 +174,8 @@ handleRemoteCalls(event, data) {
 	if InStr(data, ":") {
 		data := StrSplit(data, ":", , 2)
 		
-		if (data[1] = "Shutdown") {
-			Sleep 30000
-			
+		if (data[1] = "Shutdown")
 			ExitApp 0
-		}
 	
 		function := ObjBindMethod(RaceEngineer.Instance, data[1])
 		arguments := string2Values(";", data[2])

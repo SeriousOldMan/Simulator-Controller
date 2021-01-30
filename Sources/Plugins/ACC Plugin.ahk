@@ -331,7 +331,7 @@ class ACCPlugin extends ControllerPlugin {
 		controller.registerPlugin(this)
 	
 		if (useRaceEngineer || (engineersSpeaker != false))
-			SetTimer collectRaceData, 10000
+			SetTimer collectRaceData, 1000
 	}
 	
 	loadFromConfiguration(configuration) {
@@ -355,12 +355,8 @@ class ACCPlugin extends ControllerPlugin {
 	createRaceEngineerAction(controller, action, actionFunction) {
 		local function := controller.findFunction(actionFunction)
 		
-		if (function != false) {
+		if (function != false)
 			this.registerAction(new this.RaceEngineerAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Activate"), action), action))
-			
-			if (action = "PitstopConfirm")
-				this.iRaceEngineerConfirmation := true
-		}
 		else
 			this.logFunctionNotFound(actionFunction)
 	}
@@ -1270,7 +1266,7 @@ collectRaceData() {
 	if !plugin
 		plugin := SimulatorController.Instance.findPlugin(kACCPlugin)
 	
-	if isACCRunning() {
+	if true || isACCRunning() {
 		exePath := kBinariesDirectory . "ACC SHM Reader.exe"
 		
 		try {
@@ -1292,6 +1288,21 @@ collectRaceData() {
 		data := readConfiguration(dataFile)
 		
 		dataLastLap := getConfigurationValue(data, "Stint Data", "Laps", 0)
+		
+		/* Used for full setup offrace debugging...
+		dataFile := kSourcesDirectory . "Tests\Test Data\Lap " . (lastLap + 1) . ".data"
+		data := readConfiguration(dataFile)
+		
+		if (data.Count() == 0) {
+			plugin.finishRace()
+		
+			msgbox Done...
+			
+			ExitApp
+		}
+		
+		dataLastLap := getConfigurationValue(data, "Stint Data", "Laps", 0)
+		*/
 		
 		protectionOn()
 		

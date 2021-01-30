@@ -234,7 +234,7 @@ class RaceEngineer extends ConfigurationItem {
 	}
 	
 	__New(configuration, raceSettings, pitstopHandler := false, name := false, language := false, speaker := false, listener := false) {
-		this.iDebug := (isDebug() ? kDebugAll : kDebugOff)
+		this.iDebug := (isDebug() ? kDebugKnowledgeBase : kDebugOff)
 		this.iRaceSettings := raceSettings
 		this.iPitstopHandler := pitstopHandler
 		this.iName := name
@@ -294,7 +294,7 @@ class RaceEngineer extends ConfigurationItem {
 			if !this.iSpeechRecognizer.startRecognizer() {
 				if retry {
 					function := ObjBindMethod(this, "startListening", true)
-					
+					???? => prüfen, wie oft das passiert
 					SetTimer %function%, -200
 				}
 				

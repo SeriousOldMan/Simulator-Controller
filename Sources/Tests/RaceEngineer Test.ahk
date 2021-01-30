@@ -501,39 +501,52 @@ class PitstopHandling extends Assert {
 			
 				if (A_Index = 5) {
 					engineer.performPitstop()
+			
+					dumpKnowledge(engineer.KnowledgeBase)
+					
+					this.AssertEqual(1, vCompletedActions["pitstopFinished"], "Pitstop not prepared as number 1...")
+					
+					this.AssertEqual(1, engineer.KnowledgeBase.getValue("Pitstop.Last"), "Last pitstop not set...")
+					this.AssertEqual(5, engineer.KnowledgeBase.getValue("Pitstop.1.Lap"), "Pitstop lap not in history memory...")
+					this.AssertEqual(true, engineer.KnowledgeBase.getValue("Pitstop.1.Repair.Suspension"), "Pitstop suspension repair info not in history memory...")
+					this.AssertEqual(false, engineer.KnowledgeBase.getValue("Pitstop.1.Repair.Bodywork"), "Pitstop bodywork repair info not in history memory...")
+					this.AssertEqual(25, engineer.KnowledgeBase.getValue("Pitstop.1.Temperature.Air"), "Pitstop air temperature not in history memory...")
+					this.AssertEqual(32, engineer.KnowledgeBase.getValue("Pitstop.1.Temperature.Track"), "Pitstop track temperature not in history memory...")
+					this.AssertEqual(626905, engineer.KnowledgeBase.getValue("Pitstop.1.Time"), "Pitstop timestamp not in history memory...")
+					
+					this.AssertEqual("Dry", engineer.KnowledgeBase.getValue("Pitstop.1.Tyre.Compound"), "Pitstop tyre compound not in history memory...")
+					this.AssertEqual(8, engineer.KnowledgeBase.getValue("Pitstop.1.Tyre.Set"), "Pitstop tyre set not in history memory...")
+					this.AssertEqual(26.5, Round(engineer.KnowledgeBase.getValue("Pitstop.1.Tyre.Pressure.FL"), 1), "Pitstop tyre pressure FL not in history memory...")
+					this.AssertEqual(26.3, Round(engineer.KnowledgeBase.getValue("Pitstop.1.Tyre.Pressure.FR"), 1), "Pitstop tyre pressure FR not in history memory...")
+					this.AssertEqual(26.4, Round(engineer.KnowledgeBase.getValue("Pitstop.1.Tyre.Pressure.RL"), 1), "Pitstop tyre pressure RL not in history memory...")
+					this.AssertEqual(26.4, Round(engineer.KnowledgeBase.getValue("Pitstop.1.Tyre.Pressure.RR"), 1), "Pitstop tyre pressure RR not in history memory...")
+										
+					vFuelWarnings := {}
+
+					vSuspensionDamage := kNotInitialized
+					vBodyworkDamage := kNotInitialized
+
+					engineer.planPitstop()
+					
+					dumpKnowledge(engineer.KnowledgeBase)
+					
+					this.AssertEqual(2, engineer.KnowledgeBase.getValue("Pitstop.Planned.Nr"), "Pitstop number increment failed...")
+					this.AssertEqual(0, vFuelWarnings.Count(), "Warning suspression not working...")
+					this.AssertEqual(kNotInitialized, vSuspensionDamage, "Warning suspression not working...")
+					this.AssertEqual(kNotInitialized, vBodyworkDamage, "Warning suspression not working...")
 				}
 			}
-			
-			dumpKnowledge(engineer.KnowledgeBase)
 		}
-		
-		this.AssertEqual(1, vCompletedActions["pitstopFinished"], "Pitstop not prepared as number 1...")
-		
-		this.AssertEqual(1, engineer.KnowledgeBase.getValue("Pitstop.Last"), "Last pitstop not set...")
-		this.AssertEqual(5, engineer.KnowledgeBase.getValue("Pitstop.1.Lap"), "Pitstop lap not in history memory...")
-		this.AssertEqual(true, engineer.KnowledgeBase.getValue("Pitstop.1.Repair.Suspension"), "Pitstop suspension repair info not in history memory...")
-		this.AssertEqual(false, engineer.KnowledgeBase.getValue("Pitstop.1.Repair.Bodywork"), "Pitstop bodywork repair info not in history memory...")
-		this.AssertEqual(25, engineer.KnowledgeBase.getValue("Pitstop.1.Temperature.Air"), "Pitstop air temperature not in history memory...")
-		this.AssertEqual(32, engineer.KnowledgeBase.getValue("Pitstop.1.Temperature.Track"), "Pitstop track temperature not in history memory...")
-		this.AssertEqual(626905, engineer.KnowledgeBase.getValue("Pitstop.1.Time"), "Pitstop timestamp not in history memory...")
-		
-		this.AssertEqual("Dry", engineer.KnowledgeBase.getValue("Pitstop.1.Tyre.Compound"), "Pitstop tyre compound not in history memory...")
-		this.AssertEqual(8, engineer.KnowledgeBase.getValue("Pitstop.1.Tyre.Set"), "Pitstop tyre set not in history memory...")
-		this.AssertEqual(26.5, Round(engineer.KnowledgeBase.getValue("Pitstop.1.Tyre.Pressure.FL"), 1), "Pitstop tyre pressure FL not in history memory...")
-		this.AssertEqual(26.3, Round(engineer.KnowledgeBase.getValue("Pitstop.1.Tyre.Pressure.FR"), 1), "Pitstop tyre pressure FR not in history memory...")
-		this.AssertEqual(26.4, Round(engineer.KnowledgeBase.getValue("Pitstop.1.Tyre.Pressure.RL"), 1), "Pitstop tyre pressure RL not in history memory...")
-		this.AssertEqual(26.4, Round(engineer.KnowledgeBase.getValue("Pitstop.1.Tyre.Pressure.RR"), 1), "Pitstop tyre pressure RR not in history memory...")
 	}
 }
-
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 if !GetKeyState("Ctrl") {
-	AHKUnit.AddTestClass(FuelReporting)
-	AHKUnit.AddTestClass(DamageReporting)
+	; AHKUnit.AddTestClass(FuelReporting)
+	; AHKUnit.AddTestClass(DamageReporting)
 	AHKUnit.AddTestClass(PitstopHandling)
 
 	AHKUnit.Run()

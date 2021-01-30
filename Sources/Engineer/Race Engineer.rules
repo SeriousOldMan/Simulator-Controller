@@ -184,6 +184,7 @@ repairDamage(?, Impact, ?) <= notYetImplemented()
 
 [?Lap] => (Prove: reportNewDamage, ?Lap)
 
+reportNewDamage(?lap) <= lastPitstopLap(?lap), !, fail
 reportNewDamage(1) <= !, lapDamage(?lap, Suspension, ?lSDamage), lapDamage(?lap, Bodywork, ?lBDamage),											\
 						 >(0, ?lSDamage, ?sGreater), >(0, ?lBDamage, ?bGreater), any?(true, [?sGreater, ?bGreater]),							\
 						 Call(damageWarning, ?sGreater, ?bGreater)
@@ -201,10 +202,13 @@ reportNewDamage(?lap) <= lapDamage(?lap, Suspension, ?lSDamage), lapDamage(?lap,
 ;;;-------------------------------------------------------------------------;;;
 
 priority: 20, {Any: [?Lap], {None: [?Lap.Remaining]}} => (Prove: updateRemainingLaps, ?Lap)
-priority: 20, [?Lap.Remaining <= ?Race.Settings.Lap.PitstopWarning] => (Call: lowFuelWarning, ?Lap.Remaining)
+priority: 20, [?Lap.Remaining <= ?Race.Settings.Lap.PitstopWarning]  => (Prove: lowFuelWarning, ?Lap, ?Lap.Remaining)
 
 updateRemainingLaps(?lap) <= remainingStintLaps(?lap, ?stintLaps), remainingRaceLaps(?lap, ?raceLaps),											\
  							 ?stintLaps < ?raceLaps, Set(Lap.Remaining, ?stintLaps)
+
+lowFuelWarning(?lap, ?remainingLaps) <= lastPitstopLap(?lap), !, fail
+lowFuelWarning(?lap, ?remainingLaps) <= Call(lowFuelWarning, ?remainingLaps)
 							 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -275,14 +279,15 @@ requestRepairs(?pitstopNumber) <= Call(requestPitstopRepairs, ?pitstopNumber,			
 ;;;-------------------------------------------------------------------------;;;
 
 [?Pitstop.Lap] => (ProveAll: pitstopPerformed, ?Pitstop.Lap)
-priority: -10, [?Pitstop.Lap] => (Set: Pitstop.Last, !Pitstop.Planned.Nr), (Clear: Pitstop.Planned.Nr), (Clear: Pitstop.Planned.Lap),			\
+priority: -10, [?Pitstop.Lap] => (Clear: Pitstop.Planned.Lap),																					\
 								 (Clear: Pitstop.Planned.Fuel),																					\
 								 (Clear: Pitstop.Planned.Tyre.Compound), (Clear: Pitstop.Planned.Tyre.Set), 									\
 								 (Clear: Pitstop.Planned.Tyre.Pressure.FL), (Clear: Pitstop.Planned.Tyre.Pressure.FR), 							\
 								 (Clear: Pitstop.Planned.Tyre.Pressure.RL), (Clear: Pitstop.Planned.Tyre.Pressure.RR), 							\
 								 (Clear: Pitstop.Planned.Tyre.Pressure.FL.Increment), (Clear: Pitstop.Planned.Tyre.Pressure.FR.Increment), 		\
 								 (Clear: Pitstop.Planned.Tyre.Pressure.RL.Increment), (Clear: Pitstop.Planned.Tyre.Pressure.RR.Increment), 		\
-								 (Clear: Pitstop.Planned.Repair.Suspension), (Clear: Pitstop.Planned.Repair.Bodywork),							\
+								 (Clear: Pitstop.Planned.Repair.Suspension), (Clear: Pitstop.Planned.Repair.Bodywork)
+priority: -20, [?Pitstop.Lap] => (Set: Pitstop.Last, !Pitstop.Planned.Nr), (Clear: Pitstop.Planned.Nr),											\
 								 (Clear: Pitstop.Lap), (Clear: Pitstop.Prepared)
 
 pitstopPerformed(?lap) <= unbound?(!Pitstop.Prepared), !, fail
@@ -364,8 +369,9 @@ setupPressure(?tyreType, ?pressure) <= Append(?fact, Race.Setup.Tyre.Pressure., 
 ;;;                       Pitstop Information Retrieval                     ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-lastPitstop(?nr) <= unbound?(!Pitstop.Last), !, fail
-lastPitstop(?nr) <= ?nr = !Pitstop.Last
+lastPitstop(?nr) <= bound?(!Pitstop.Last), ?nr = !Pitstop.Last
+
+lastPitstopLap(?lap) <= lastPitstop(?nr), Append(?fact, Pitstop., ?nr, .Lap), Get(?lap, ?fact)
 
 pitstopTyreSet(?tyreSet) <= lastPitstop(?nr), Append(?fact, Pitstop., ?nr, .Tyre.Set), Get(?tyreSet, ?fact)
 
@@ -405,9 +411,7 @@ abs(?x, ?r) <= ?x < 0, ?r = ?x * -1, !
 abs(?x, ?x)
 
 bound?(?x) <= unbound?(?x), !, fail
-bound?(?x)
-
-unbound?(?x) <= ?x = __NotInitialized__
+bound?(?)
 
 any?(?value, [?value | ?]) <= !
 any?(?value, [? | ?tail]) <= any?(?value, ?tail)

@@ -211,7 +211,51 @@ unknownEventHandler(event, data) {
 	logMessage(kLogCritical, translate("Unhandled event ") . event . translate(": ") . data)
 }
 
-dispatchEvent(wParam, lParam) {
+deliverEvent(target, event, data) {
+	logMessage(kLogInfo, "Raising event " . event . (data ? ": " . data : "") . " in target " . target)
+	
+	curDetectHiddenWindows := A_DetectHiddenWindows
+	curTitleMatchMode := A_TitleMatchMode
+	
+	event := event . ":" . data
+	
+	;---------------------------------------------------------------------------
+	; construct the message to send
+	;---------------------------------------------------------------------------
+	dwData := encodeDWORD("EVNT")
+	cbData := StrLen(event) * (A_IsUnicode + 1) + 1 ; length of DATA string (incl. ZERO)
+	lpData := &event                                ; pointer to DATA string
+
+	;---------------------------------------------------------------------------
+	; put the message in a COPYDATASTRUCT
+	;---------------------------------------------------------------------------
+	VarSetCapacity(struct, A_PtrSize * 3, 0)        ; initialize COPYDATASTRUCT
+	NumPut(dwData, struct, A_PtrSize * 0, "UInt")   ; DWORD
+	NumPut(cbData, struct, A_PtrSize * 1, "UInt")   ; DWORD
+	NumPut(lpData, struct, A_PtrSize * 2, "UInt")   ; 32bit pointer
+
+	;---------------------------------------------------------------------------
+	; parameters for SendMessage command
+	;---------------------------------------------------------------------------
+	message := 0x4a     ; WM_COPYDATA
+	wParam  := ""       ; not used
+	lParam  := &struct  ; COPYDATASTRUCT
+	control := ""       ; not needed
+
+	SetTitleMatchMode 2 ; match part of the title
+	DetectHiddenWindows On ; needed for sending messages
+	
+	try {
+		SendMessage %message%, %wParam%, %lParam%, %control%, %target%
+	}
+	catch exception {
+	}
+	
+	DetectHiddenWindows %curDetectHiddenWindows%
+	SetTitleMatchMode %curTitleMatchMode%
+}
+
+receiveEvent(wParam, lParam) {
 	;---------------------------------------------------------------------------
     ; retrieve info from COPYDATASTRUCT
     ;---------------------------------------------------------------------------
@@ -243,7 +287,7 @@ dispatchEvent(wParam, lParam) {
 }
 
 startMessageManager() {
-	; OnMessage(0x4a, "dispatchEvent") 
+	OnMessage(0x4a, "receiveEvent") 
 	
 	registerEventHandler("*", "unknownEventHandler")
 	

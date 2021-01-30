@@ -38,9 +38,9 @@ global kProveAll = "ProveAll:"
 global kSet = "Set:"
 global kClear = "Clear:"
 
-global kBuiltinFunctors = ["option", "+", "-", "*", "/", ">", "<", "=", "append", "get"]
-global kBuiltinFunctions = ["option", "plus", "minus", "multiply", "divide", "greater", "less", "equal", "append", "get"]
-global kBuiltinAritys = [2, 3, 3, 3, 3, 2, 2, 2, -1, 2]
+global kBuiltinFunctors = ["option", "+", "-", "*", "/", ">", "<", "=", "unbound?", "append", "get"]
+global kBuiltinFunctions = ["option", "plus", "minus", "multiply", "divide", "greater", "less", "equal", "unbound", "append", "get"]
+global kBuiltinAritys = [2, 3, 3, 3, 3, 2, 2, 2, 1, -1, 2]
 
 global kPrefixNotation = "Prefix"
 global kInfixNotation = "Infix"
@@ -2890,14 +2890,18 @@ class RuleCompiler {
 				
 					this.skipWhiteSpace(text, nextCharIndex)
 					
-					operation := SubStr(text, nextCharIndex, 1)
-					
-					if InStr("+-*/", operation) {
-						nextCharIndex += 1
+					if !this.isEmpty(text, nextCharIndex) {
+						operation := SubStr(text, nextCharIndex, 1)
 						
-						yOperand := this.readLiteral(text, nextCharIndex)
-						
-						return Array(operation, functor, xOperand, yOperand)
+						if InStr("+-*/", operation) {
+							nextCharIndex += 1
+							
+							yOperand := this.readLiteral(text, nextCharIndex)
+							
+							return Array(operation, functor, xOperand, yOperand)
+						}
+						else
+							return Array("=", functor, xOperand)
 					}
 					else
 						return Array("=", functor, xOperand)
@@ -3545,6 +3549,12 @@ class NilParser extends Parser {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+debugShow(ignore, args*) {
+	MsgBox % "Debug: " . values2String(", ", args*)
+	
+	return true
+}
+
 option(choicePoint, option, value) {
 	if isInstance(option, Term)
 		option := option.toSTring(resultSet)
@@ -3730,6 +3740,13 @@ less(choicePoint, operand1, operand2) {
 
 equal(choicePoint, operand1, operand2) {
 	return choicePoint.ResultSet.unify(choicePoint, operand1, operand2)
+}
+
+unbound(choicePoint, operand1) {
+	if isInstance(operand1, Variable)
+		return (operand1.getValue(choicePoint.ResultSet, operand1) == operand1)
+	else
+		return (operand1.toString(choicePoint.ResultSet) = kNotInitialized)
 }
 
 append(choicePoint, operand1, arguments*) {

@@ -1026,7 +1026,7 @@ class RaceEngineer extends ConfigurationItem {
 			incrementRR := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR.Increment"), 1)
 			
 			debug := this.Debug[kDebugPhrases]
-			msgbox % debug
+			
 			if (debug || (incrementFL != 0) || (incrementFR != 0) || (incrementRL != 0) || (incrementRR != 0))
 				speaker.speakPhrase("NewPressures")
 			
@@ -1267,10 +1267,4 @@ dumpKnowledge(knowledgeBase) {
 	
 		FileAppend %text%, %kUserHomeDirectory%Temp\Race Engineer.knowledge
 	}
-}
-
-debugShow(ignore, args*) {
-	MsgBox % "Debug: " . values2String(", ", args*)
-	
-	return true
 }

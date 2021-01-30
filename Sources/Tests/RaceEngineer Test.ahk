@@ -545,8 +545,8 @@ class PitstopHandling extends Assert {
 ;;;-------------------------------------------------------------------------;;;
 
 if !GetKeyState("Ctrl") {
-	; AHKUnit.AddTestClass(FuelReporting)
-	; AHKUnit.AddTestClass(DamageReporting)
+	AHKUnit.AddTestClass(FuelReporting)
+	AHKUnit.AddTestClass(DamageReporting)
 	AHKUnit.AddTestClass(PitstopHandling)
 
 	AHKUnit.Run()

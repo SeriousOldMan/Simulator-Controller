@@ -176,7 +176,7 @@
             "GammaValue": 1.2000000000000002,
             "InputGain": 100.0,
             "MinimumForce": 0,
-            "Threshold": 10,
+            "Threshold": 20,
             "FilterType": "GammaFilter"
           },
           "MuteWhenLockEffectIsActive": true,
@@ -417,7 +417,7 @@
             "GammaValue": 1.3000000000000003,
             "InputGain": 100.0,
             "MinimumForce": 0,
-            "Threshold": 10,
+            "Threshold": 15,
             "FilterType": "GammaFilter"
           },
           "MuteWhenLockEffectIsActive": true,

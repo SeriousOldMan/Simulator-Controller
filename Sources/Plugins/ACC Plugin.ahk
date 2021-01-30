@@ -1261,6 +1261,7 @@ changePitstopDriver(selection) {
 
 collectRaceData() {
 	static lastLap := 0
+	static inPit := false
 	static plugin := false
 	
 	if !plugin
@@ -1307,20 +1308,25 @@ collectRaceData() {
 		protectionOn()
 		
 		try {
-			if (plugin.PitstopPending && getConfigurationValue(data, "Stint Data", "InPit", false))
+			if (plugin.PitstopPending && getConfigurationValue(data, "Stint Data", "InPit", false) && !inPit) {
 				plugin.performPitstop()
-			else if (dataLastLap > lastLap) {
-					if (lastLap == 0)
-						plugin.startRace(dataFile)
-					
-					lastLap := dataLastLap
-
-					plugin.addLap(dataLastLap, dataFile)
-					
-					if isDebug()
-						writeConfiguration(kUserHomeDirectory . "Temp\ACC Data\Lap " . lastLap . ".data", data)
-				}
 				
+				inPit := true
+			}
+			else if (dataLastLap > lastLap) {
+				if (lastLap == 0)
+					plugin.startRace(dataFile)
+				
+				lastLap := dataLastLap
+
+				plugin.addLap(dataLastLap, dataFile)
+				
+				if isDebug()
+					writeConfiguration(kUserHomeDirectory . "Temp\ACC Data\Lap " . lastLap . ".data", data)
+				
+				inPit := false
+			}
+			
 			if !getConfigurationValue(data, "Stint Data", "Active", false) {
 				if (lastLap > 0) {
 					if isDebug() {

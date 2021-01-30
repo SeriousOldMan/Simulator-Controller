@@ -187,11 +187,8 @@ class SimulatorStartup extends ConfigurationItem {
 		if (!this.iStartupOption && (this.iSimulators.Length() > 0))
 			this.iStartupOption := this.iSimulators[1]
 			
-		if this.iStartupOption {
+		if this.iStartupOption
 			raiseEvent("Startup", "startupSimulator:" . this.iStartupOption)
-			
-			ExitApp 0
-		} 
 	}
 	
 	startup() {
@@ -263,6 +260,8 @@ startSimulator() {
 		
 	Menu Tray, Icon, %icon%, , 1
 	
+	registerEventHandler("Startup", "handleStartupEvents")
+	
 	settings := readConfiguration(kSimulatorSettingsFile)
 	
 	new SimulatorStartup(kSimulatorConfiguration, settings).startup()
@@ -282,6 +281,35 @@ playSong(songFile) {
 		
 		SetTimer playSongRemote, 50
 	}
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                          Event Handler Section                          ;;;
+;;;-------------------------------------------------------------------------;;;
+
+exitStartup() {
+	ExitApp 0
+}
+
+handleStartupEvents(event, data) {
+	local function
+	
+	if InStr(data, ":") {
+		data := StrSplit(data, ":")
+		
+		function := data[1]
+		arguments := StrSplit(data[2], ",")
+		
+		numArguments := arguments.Length()
+		
+		Loop %numArguments%
+			arguments[A_index] := Trim(arguments[A_Index], A_Space)
+			
+		withProtection(function, arguments*)
+	}
+	else	
+		withProtection(data)
 }
 
 

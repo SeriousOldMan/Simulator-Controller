@@ -292,7 +292,7 @@ playSong(songFile) {
 ;;;-------------------------------------------------------------------------;;;
 
 exitStartup(sayGoodbye := false) {
-	if sayGoodbye {
+	if (sayGoodbye && (vSimulatorControllerPID != false)) {
 		raiseEvent("Startup", "startupExited")
 		
 		SetTimer exitStartup, -1000

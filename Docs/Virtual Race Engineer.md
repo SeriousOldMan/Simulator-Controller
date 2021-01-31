@@ -2,7 +2,7 @@
 
 Welcome to Jona, the world first fully interactive virtual race engineer for race car simulations.
 
-Ok, enough marketing bullshit. Jona is a chat bot with a special knowledge about racing. It uses the telemtry data provided by a simulation game and a large domain specific rule set to derive its knowledge from there. Using this knowledge, Jona can give you information about the current state of your car (temperatures, pressures, remaining laps, upcoming pitstops, and so on), and is capable to recommend settings for the next pitstop. Using the Pitstop MFD handling for *Assetto Corsa Competizione* introduced with Release 2.0, Jona is capable to setup a pitstop without user interaction completely on its own.
+Ok, enough marketing bullshit. Jona is a chat bot with a special knowledge about racing. It uses the telemetry data provided by a simulation game and a large domain specific rule set to derive its knowledge from there. Using this knowledge, Jona can give you information about the current state of your car (temperatures, pressures, remaining laps, upcoming pitstops, and so on), and is capable to recommend settings for the next pitstop. Using the Pitstop MFD handling for *Assetto Corsa Competizione* introduced with Release 2.0, Jona is capable to setup a pitstop without user interaction completely on its own.
 
 As said, Jona is a voice chat bot and therefore you can control Jona completely by voice. Before we dig deeper into the inner mechanics of Jona, we will start with a typical dialog with Jona, to give you an understanding of the capabilities.
 
@@ -280,7 +280,7 @@ You can take a look at the knowledge base by enabling "Debug" mode in the config
 
 ### Telemetry Integration
 
-The most important part of the knowledge of Jona comes from the telemtry information of the simulation game. As said, a data provider for *Assetto Corsa Competizione* exists and is used by the ACC plugin to load the data and hand it over to Jona. A small spplication "ACC SHM Reader.exe", which is located in the *Binaries* folder, is used to acquire the data. This reader ist run periodically and outputs the following data:
+The most important part of the knowledge of Jona comes from the telemetry information of the simulation game. As said, a data provider for *Assetto Corsa Competizione* exists and is used by the ACC plugin to load the data and hand it over to Jona. A small spplication "ACC SHM Reader.exe", which is located in the *Binaries* folder, is used to acquire the data. This reader ist run periodically and outputs the following data:
 
 	[Car Data]
 	AirTemperature=24.9965

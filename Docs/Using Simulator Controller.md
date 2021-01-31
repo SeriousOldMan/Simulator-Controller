@@ -44,7 +44,7 @@ Normally, it is not necessary to close *Simulator Controller.exe*, since it is v
 
 ## Using Jona, the Virtual Race Engineer
 
-Release 2.1 introduced Jona, an artificial race engineer as an optional component of the Simulator Controller package. Since Jona is quite a complex piece of software with it natural language interface, it is fully covered in a seperate [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer).
+Release 2.1 introduced Jona, an artificial race engineer as an optional component of the Simulator Controller package. Since Jona is quite a complex piece of software with it natural language interface, it is fully covered in a separate [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer).
 
 ## And now it's time
 

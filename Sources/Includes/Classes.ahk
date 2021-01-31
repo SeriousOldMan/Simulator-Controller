@@ -721,4 +721,8 @@ class Plugin extends ConfigurationItem {
 		else
 			return default
 	}
+	
+	setArgumentValue(argument, value) {
+		this.iArguments[argument] := value
+	}
 } 

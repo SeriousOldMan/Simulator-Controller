@@ -40,7 +40,8 @@ global kToolsTargetsFile = "Simulator Tools.targets"
 
 global kUpdateMessages = {updateToV15: "Updating configuration to "
 						, updateConfigurationForV20: "Updating configuration to ", updateTranslations: "Updating translations to "
-						, updatePluginLabels: "Updating plugin labels to ", updateACCPluginForV20: "Updating ACC plugin to "
+						, updatePluginLabels: "Updating plugin labels to "
+						, updateACCPluginForV20: "Updating ACC plugin to ", updateACCPluginForV21: "Updating ACC plugin to "
 						, updateConfigurationForV203: "Updating configuration to "}
 
 global kCompiler = kAHKDirectory . "Compiler\ahk2exe.exe"
@@ -60,7 +61,7 @@ global vCopyTargets = []
 global vBuildTargets = []
 global vSplashTheme = false
 
-global vTargetCounts = 0
+global vTargetsCount = 0
 
 global vUpdateSettings = Object()
 global vCleanupSettings = Object()
@@ -272,7 +273,7 @@ editTargets(command := "") {
 		Gui TE:Font, Norm, Arial
 		Gui TE:Font, Italic, Arial
 		
-		if (vupdateSettings.Count() > 0) {
+		if (vUpdateSettings.Count() > 0) {
 			updateHeight := 20 + (vupdateSettings.Count() * 20)
 			
 			if (updateHeight == 20)
@@ -486,6 +487,24 @@ updateACCPluginForV20() {
 	}
 }
 
+updateACCPluginForV21() {
+	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	userConfiguration := readConfiguration(userConfigurationFile)
+	
+	if (userConfiguration.Count() > 0) {
+		accPlugin := new Plugin("ACC", userConfiguration)
+		
+		if !accPlugin.hasArgument("raceEngineerName") {
+			accPlugin.setArgumentValue("raceEngineerName", "Jona")
+			accPlugin.setArgumentValue("raceEngineerSpeaker", "true")
+			
+			accPlugin.saveToConfiguration(userConfiguration)
+		}
+		
+		writeConfiguration(userConfigurationFile, userConfiguration)
+	}
+}
+
 updateToV15(targetName, ByRef buildProgress) {
 }
 
@@ -639,7 +658,7 @@ runCleanTargets(ByRef buildProgress) {
 			
 		Sleep 50
 				
-		buildProgress += Round(100 / (vTargetCounts + 1))
+		buildProgress += Round(100 / (vTargetsCount + 1))
 			
 		if !kSilentMode
 			Progress %buildProgress%
@@ -686,7 +705,7 @@ runCopyTargets(ByRef buildProgress) {
 			Sleep 50
 		}
 		
-		buildProgress += Round(100 / (vTargetCounts + 1))
+		buildProgress += Round(100 / (vTargetsCount + 1))
 			
 		if !kSilentMode
 			Progress %buildProgress%
@@ -750,7 +769,7 @@ runBuildTargets(ByRef buildProgress) {
 			FileMove %compiledFile%, %targetDirectory%, 1
 		}
 		
-		buildProgress += Round(100 / (vTargetCounts + 1))
+		buildProgress += Round(100 / (vTargetsCount + 1))
 			
 		if !kSilentMode
 			Progress %buildProgress%
@@ -772,7 +791,7 @@ prepareTargets(ByRef buildProgress, updateOnly) {
 	
 	for target, arguments in getConfigurationSectionValues(targets, "Update", Object()) {
 		buildProgress += Floor(A_Index / 4)
-		update := vUpdateSettings[ConfigurationItem.splitDescriptor(target)[1]]
+		update := vUpdateSettings[target]
 		
 		if !kSilentMode
 			Progress, %buildProgress%, % target . ": " . (update ? translate("Yes") : translate("No"))
@@ -881,7 +900,7 @@ runTargets() {
 	
 	prepareTargets(buildProgress, updateOnly)
 	
-	vTargetCounts := (vUpdateTargets.Length() + vCleanupTargets.Length() + vCopyTargets.Length() + vBuildTargets.Length())
+	vTargetsCount := (vUpdateTargets.Length() + vCleanupTargets.Length() + vCopyTargets.Length() + vBuildTargets.Length())
 	
 	if !kSilentMode
 		Progress, , %A_Space%, % translate("Running Targets")

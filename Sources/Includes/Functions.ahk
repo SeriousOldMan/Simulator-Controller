@@ -416,7 +416,9 @@ loadSimulatorConfiguration() {
 	vLogLevel := inList(["Info", "Warn", "Critical", "Off"], getConfigurationValue(kSimulatorConfiguration, "Configuration", "Log Level", "Warn"))
 }
 
-initializeEnvironment() {	
+initializeEnvironment() {
+	virgin := !FileExist(A_MyDocuments . "\Simulator Controller")
+	
 	FileCreateDir %A_MyDocuments%\Simulator Controller
 	FileCreateDir %kUserHomeDirectory%Config
 	FileCreateDir %kUserHomeDirectory%Logs
@@ -433,6 +435,9 @@ initializeEnvironment() {
 	
 	if !FileExist(kUserConfigDirectory . "Race Engineer.settings")
 		FileCopy %kResourcesDirectory%Templates\Race Engineer.settings, %kUserConfigDirectory%
+	
+	if virgin
+		FileCopy %kResourcesDirectory%Templates\UPDATES, %kUserConfigDirectory%
 }
 
 

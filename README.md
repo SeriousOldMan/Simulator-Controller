@@ -23,7 +23,7 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-[2.0.11-dev](https://www.dropbox.com/s/s9w8wy58o877n8t/Simulator%20Controller%202.0.11-dev.zip?dl=1) (First alpha version of AI based Race Engineer, Full test case, Support for English and German phrase grammars, but no documentation yet)
+[2.1.0-alpha](https://www.dropbox.com/s/nzb737ry4buuabd/Simulator%20Controller%202.1.0-alpha.zip?dl=0) (First preview for the upcoming 2.1 release including alpha version of AI based Race Engineer, full test cases, support for English and German phrase grammars)
 
 ATTENTION: In this version, no support to update the configuration database is included yet. Use with care and make a backup copy of your configuration.
 

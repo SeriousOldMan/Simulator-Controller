@@ -42,6 +42,10 @@ Normally, the active mode on your hardware controller will be the "Launch" mode,
 
 Normally, it is not necessary to close *Simulator Controller.exe*, since it is very efficient and does not use many system resources. But if necessary, you can locate its icon, a small silverish gear, in the System Tray (at the lower right side of the Windows taskbar), right click the icon and choose Exit.
 
+## Using Jona, the Virtual Race Engineer
+
+Release 2.1 introduced Jona, an artificial race engineer as an optional component of the Simulator Controller package. Since Jona is quite a complex piece of software with it natural language interface, it is fully covered in a seperate [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer).
+
 ## And now it's time
 
 ...to have some fun. If you like Simulator Controller and find it useful, I would be very happy about a small donation, which will help in further development of this software. Please see the [README](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/README.md) for the donation link. Thanks and see you on the track...

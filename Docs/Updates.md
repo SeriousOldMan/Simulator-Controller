@@ -2,6 +2,8 @@ Before we start, an important information for *First Time Users*: If you install
 
 Regarding special steps, that might be necessary for using voice control for the *Assetto Corsa Competizione* Pitstop MFD, please read the update information for [Release 2.0](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-20) carefully.
 
+If you want to integrate Jona, the Virtual Race Engineer,  you should read the informmation about [Release 2.1](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-21) and, much more important, the [documentation on Jona](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer) itself, before heading on to the track.
+
 ***
 
 Beginning with Version 2.0 an automatic update procedure is available to bring a local configuaration database up to the new specs. After you installed the new realse package, the system will check, whether an update to the configuration database is necessary for this release (and possibly for releases, you left out) and will greet you with the following dialog:
@@ -34,7 +36,23 @@ When the automated update procedure runs, there are some standard task, that are
 The update procedure itself is handled by the application *Simulator Tools*. It is autmatically started and the other application, which detected the need for the update will wait, until the update finished successfully. You might want to start *Simulator Tools* manually, but in this case, it will also try to perform other maintenance tasks as well, which might result in warning messages, if your distribution is not configured for development. But you can safely ignore those warnings about missing compiler and so on, nothing harmful will happen.
 Although the code, that handles all the update tasks, is integrated into *Simulator Tools*, the activation and, much more important, the dependencies are defined in the *Simulator Tools.targets* file. I do not recommend to change the contents of this file, but it might be helpful to take a look into the update rules, to get a better understanding of the things behind the curtain.
 
-Note: Some of you might want to have more control. No problem. All the files in the *Simulator Controller\Config* folder are humand readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does, on your own. But be sure to make a backup copy of all the files, just for peace of mind.
+Note: Some of you might want to have more control. No problem. All the files in the *Simulator Controller\Config* folder are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does, on your own. But be sure to make a backup copy of all the files, just for peace of mind.
+
+***
+
+## Release 2.1
+
+Although only a small step in the minor version number, Release 2.1 is by far the biggest release since the initial launch. It introduces the *Virtual Race Engineer*, an Artificial Intelligence, which supports you during a race. The Virtual Race Engineer, which I will name Jona from now on, uses the telemetry data supplied by a simulation game as a knowledge base for a hybrid rule engine. The rule engine can calculate the settings for the next pitstop, can recomend necessary tyre changes because of changing weather conditions, and it will take an eye on your lap times after you collected some damage. You can interact with Jona by natural voice, but the most import actions, like "Plan the next pitstop", can also be triggered by your controller hardware. For now, Jona is integrated with the ACC plugin for *Assetto Corsa Competizione*, but adopting it to a different simulation game is an easy task for an experienced developer.
+
+Using the handling of the Pitstop MFD introduced with Release 2.0 (see below), the setup of a pitstop in *Assetto Corsa Competizione* was never as easy as now. Just say: "Can you prepare the pitstop?" and Jona will take care of everything.
+
+The installation and configuration of Jona is described in its [own chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer). The most important part of the initial setup of Jona is to add the [necessary speech recognition libraries](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#installation-of-speech-recognition-libraries) from Microsoft to your Windows installation. After that, you might want to take a look on the new [plugin arguments](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-acc) of the ACC Plugin, which must be provided to start Jona during a race.
+
+Important: Jona will handle the ACC Pitstop MFD by using the functionality introduced in Release 2.0. You should read the information below about the necessary steps you need to take, to get the image recognition up and running, which is used to understand and control the Pitstop MFD of ACC. When you are using Jona with its interactive voice dialog feature, there is no more need for Voice Macro as described in the section on Release 2.0 below. Therefore, you might skip the corresponding steps.
+
+If you are updating to Release 2.1 from an earlier version, Jona will be activated for the ACC Plugin, but without voice recognition support, since you might have to install the [required Windows libraries](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#installation-of-speech-recognition-libraries) beforehand. You can activate voice recognition anytiem later by adding the correspnding argument to the [ACC plugin in the configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-acc).
+
+Beside that, all other changes for Release 2.1, for example for the translation files, should be handled by the automated update procedure as described above. As always, it might be a good idea to make a backup copy of your local files, just to be on the safe side.
 
 ***
 

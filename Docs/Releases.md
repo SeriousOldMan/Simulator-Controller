@@ -1,3 +1,14 @@
+## 2.1-upcoming...
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Introduction of the alpha version of Jona, the AI based virtual race engineer. See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer) for a comprehensive introduction to Jona.
+  4. A lot of new stuff for developers:
+     - A hybrid rule engine, which supports production rules like OPS5 and reduction rules like in Prolog. The rules are fully integrated with the AutoHotkey scripting language, thereby creating a rich, hybrid programming environment
+	 - A unit testing framework
+	 - A speech generator class library
+	 - A speech recognition class library
+
 ## 2.0.4-release 01/18/21
 
   1. Bugfixes, as always

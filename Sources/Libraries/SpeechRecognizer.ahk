@@ -24,6 +24,7 @@
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class SpeechRecognizer {
+	iChoices := {}
 	_grammarCallbacks := {}
 	
 	__New(recognizer := false, language := false) {
@@ -133,11 +134,14 @@ class SpeechRecognizer {
 	}
 	
 	getChoices(name) {
-		return this.Instance.GetChoices(name)
+		if this.iChoices.HasKey(name)
+			return this.iChoices[name]
+		else
+			return this.Instance.GetChoices(name)
 	}
 	
-	setChoices(name, choices) {
-		return this.Instance.SetChoices(name, choices)
+	setChoices(name, choiceList) {
+		this.iChoices[name] := this.newChoices(choiceList)
 	}
 	
 	newGrammar() {
@@ -522,7 +526,7 @@ class GrammarChoices {
 			choices.Push(choice.Value)
 		}
 		
-		return parser.Compiler.SpeechRecognizer.newChoices(choices*)
+		return parser.Compiler.SpeechRecognizer.newChoices(values2String(", ", choices*))
 	}
 }
 

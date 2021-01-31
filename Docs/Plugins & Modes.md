@@ -203,6 +203,24 @@ These pictures are located in the *Resources\Screen Images\ACC folder in the ins
 
 Note: The picture search will initially take some time, but the algorithm will learn the position of the Pitstop MFD during the initial run. Depending on your screen size and resolution the initial search will consume quite some CPU cycles. Therefore I advice to open the Pitstop MFD using one of the mode actions above once you are driving in a safe situation, to avoid lags later on. Simulator Controller will learn the position and will only search the much reduced screen area from now on and the CPU load will be 10 times less than before.
 
+#### Vitual Race Engineer Integration
+ 
+The ACC plugin can automatically start Jona, the [Virtual Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer) to support you during an *Assetto Corsa Competizione* race event. The following configuration parameters allow you to customize Jona to your preferences:
+
+	raceEngineerName: *name*;
+	raceEngineerSpeaker: false, true or *Microsoft Speech Generation Language*;
+	raceEngineerListener: false, true or *Microsoft Speech Recognition Language*;
+	
+Jona will be activated, when you supply an argument for the *raceEngineerName* parameter. With *raceEngineerSpeaker* and *raceEngineerListener* you can customize the natural language interface (or the personality) of Jona. If you simply supply *true* as arguments, a voice and the corresponding recognition engine will be choosen based on the currently configured language. If you prefer a spefic voice and / or a specific language, you can supply the name for this voice and language instead (Example: "Microsoft David Desktop" is a male US-English voice and "Microsoft Server Speech Recognition - TELE (de-DE)" provide german spoken language recognition. The phrase grammars of Jona can be localized for any language, with English and German already supplied by the standard distribution of Simulator Controller, but you will also need the corresponding Windows libraries for TTS (text-to-speech) and STT (speech-to-text). For more information about Jona, see the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer).
+
+It is possible, but not much fun, to use Jona without its natural language interface. Although only the pitstop planning and setup capabilities are available in this cconfiguration, it is still very useful, especially in combination with the *Pitstop* mode described above. You can use the following parameters to connect these plugin actions to your controller hardware:
+
+	pitstopPlan: *function*; pitstopPrepare: *function*
+	
+Only unary functions are supported. An interesting combination you might try, is, to use voice output for Jona, but no voice control. You will get all the information of Jona, but use an oldschool interface to control their actions.
+
+
+
 ## Plugin *AC*
 
 This plugin handles the *Assetto Corsa* simulation game. An application with the name "Assetto Corsa" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startAC" as a special function hook in this configuration.

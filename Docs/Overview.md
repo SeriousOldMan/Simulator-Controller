@@ -19,6 +19,9 @@ Welcome to the Simulator Controller documentation. Here you will find everything
   - [Plugin & Modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes)  
     Reference information for all the builtin plugins and modes.  
 	
+  - [Virtual Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer)  
+    You don't want to miss out Jona, the world first full voice dialog capable virtual race engineer based on artificial intelligence algorithms.
+	
   - [Development Guide](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts)  
     Complete set of information for developers, who want to create their own plugins or even contribute to the further development of Simulator Controller.
 	

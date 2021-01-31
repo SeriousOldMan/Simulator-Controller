@@ -368,7 +368,7 @@ class RaceEngineer extends ConfigurationItem {
 			settings := readConfiguration(getFileName("Race Engineer.grammars.en", kUserConfigDirectory, kConfigDirectory))
 		
 		for name, choices in getConfigurationSectionValues(settings, "Choices", {})
-			speechRecognizer.setChoices(name, speechRecognizer.newChoices(string2Values(",", choices)*))
+			speechRecognizer.setChoices(name, choices)
 		
 		for grammar, definition in getConfigurationSectionValues(settings, "Listener Grammars", {}) {
 			definition := substituteVariables(definition, {name: this.Name})
@@ -589,7 +589,7 @@ class RaceEngineer extends ConfigurationItem {
 				compound := "Dry"
 			
 			if compound {
-				speaker.speakPhrase("ConfirmCompoundChange", {compound: compound})
+				speaker.speakPhrase("ConfirmCompoundChange", {compound: fragments[compound]})
 					
 				this.setContinuation(ObjBindMethod(this, "updatePitstopTyreCompound", compound))
 			}
@@ -817,13 +817,17 @@ class RaceEngineer extends ConfigurationItem {
 				, "Race.Settings.Tyre.Wet.Pressure.Target.RL": getConfigurationValue(settings, "Race Settings", "Tyre.Wet.Pressure.Target.RL", 30.0)
 				, "Race.Settings.Tyre.Wet.Pressure.Target.RR": getConfigurationValue(settings, "Race Settings", "Tyre.Wet.Pressure.Target.RR", 30.0)
 				, "Race.Settings.Tyre.Pressure.Deviation": getConfigurationValue(settings, "Race Settings", "Tyre.Pressure.Deviation", 0.2)
-				, "Race.Settings.Tyre.Set.Fresh": getConfigurationValue(settings, "Race Settings", "Tyre.Set.Fresh", 8)
+				, "Race.Setup.Tyre.Set.Fresh": getConfigurationValue(settings, "Race Setup", "Tyre.Set.Fresh", 8)
 				, "Race.Setup.Tyre.Compound": getConfigurationValue(settings, "Race Setup", "Tyre.Compound", "Dry")
 				, "Race.Setup.Tyre.Set": getConfigurationValue(settings, "Race Setup", "Tyre.Set", 7)
-				, "Race.Setup.Tyre.Pressure.FL": getConfigurationValue(settings, "Race Setup", "Tyre.Pressure.FL", 26.1)
-				, "Race.Setup.Tyre.Pressure.FR": getConfigurationValue(settings, "Race Setup", "Tyre.Pressure.FR", 26.1)
-				, "Race.Setup.Tyre.Pressure.RL": getConfigurationValue(settings, "Race Setup", "Tyre.Pressure.RL", 26.1)
-				, "Race.Setup.Tyre.Pressure.RR": getConfigurationValue(settings, "Race Setup", "Tyre.Pressure.RR", 26.1)}
+				, "Race.Setup.Tyre.Dry.Pressure.FL": getConfigurationValue(settings, "Race Setup", "Tyre.Dry.Pressure.FL", 26.1)
+				, "Race.Setup.Tyre.Dry.Pressure.FR": getConfigurationValue(settings, "Race Setup", "Tyre.Dry.Pressure.FR", 26.1)
+				, "Race.Setup.Tyre.Dry.Pressure.RL": getConfigurationValue(settings, "Race Setup", "Tyre.Dry.Pressure.RL", 26.1)
+				, "Race.Setup.Tyre.Dry.Pressure.RR": getConfigurationValue(settings, "Race Setup", "Tyre.Dry.Pressure.RR", 26.1)
+				, "Race.Setup.Tyre.Wet.Pressure.FL": getConfigurationValue(settings, "Race Setup", "Tyre.Wet.Pressure.FL", 28.2)
+				, "Race.Setup.Tyre.Wet.Pressure.FR": getConfigurationValue(settings, "Race Setup", "Tyre.Wet.Pressure.FR", 28.2)
+				, "Race.Setup.Tyre.Wet.Pressure.RL": getConfigurationValue(settings, "Race Setup", "Tyre.Wet.Pressure.RL", 28.2)
+				, "Race.Setup.Tyre.Wet.Pressure.RR": getConfigurationValue(settings, "Race Setup", "Tyre.Wet.Pressure.RR", 28.2)}
 				
 		return facts
 	}

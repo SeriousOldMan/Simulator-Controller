@@ -105,18 +105,21 @@ class SimulatorStartup extends ConfigurationItem {
 		
 		settings := this.Settings
 		
+		if (settings.Count() = 0)
+			editConfig := true
+		
 		if (editConfig || noConfiguration) {
 			result := editSettings(settings, true)
 			
 			if (result == kCancel)
-				ExitApp 0
+				exitStartup(true)
 			else if (noConfiguration && (readConfiguration(kSimulatorConfigurationFile).Count() == 0)) {
 				OnMessage(0x44, Func("translateMsgBoxButtons").bind(["Ok"]))
 				error := translate("Error")
 				MsgBox 262160, %error%, % translate("Cannot initiate startup sequence, please check the configuration...")
 				OnMessage(0x44, "")
 			
-				ExitApp 0
+				exitStartup(true)
 			}
 			else if (result == kSave) {
 				writeConfiguration(kSimulatorSettingsFile, settings)
@@ -134,7 +137,7 @@ class SimulatorStartup extends ConfigurationItem {
 		try {
 			logMessage(kLogInfo, translate("Starting ") . translate("Simulator Controller"))
 			
-			exePath := kBinariesDirectory . "Simulator Controller.exe"
+			exePath := kBinariesDirectory . "Simulator Controller.exe -Startup"
 			
 			Run %exePath%, %kBinariesDirectory%, , simulatorControllerPID
 			
@@ -200,7 +203,7 @@ class SimulatorStartup extends ConfigurationItem {
 		vSimulatorControllerPID := this.iSimulatorControllerPID
 		
 		if (this.iSimulatorControllerPID == 0)
-			ExitApp 0
+			exitStartup(true)
 		
 		if (!kSilentMode && this.iSplashTheme)
 			showSplashTheme(this.iSplashTheme, "playSong")
@@ -238,12 +241,12 @@ class SimulatorStartup extends ConfigurationItem {
 			this.startSimulator()
 
 		if kSilentMode
-			ExitApp 0
+			exitStartup(true)
 		else {
 			Progress Off
 		
 			if !this.iSplashTheme
-				ExitApp 0
+				exitStartup(true)
 		}
 			
 		vStartupFinished := true
@@ -288,8 +291,16 @@ playSong(songFile) {
 ;;;                          Event Handler Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-exitStartup() {
-	ExitApp 0
+exitStartup(sayGoodbye := false) {
+	if sayGoodbye {
+		raiseEvent("Startup", "startupExited")
+		
+		SetTimer exitStartup, -1000
+		
+		Exit
+	}
+	else
+		ExitApp 0
 }
 
 handleStartupEvents(event, data) {
@@ -345,14 +356,14 @@ try {
 			if (vSimulatorControllerPID != 0)
 				raiseEvent("Startup", "stopStartupSong")
 		
-			ExitApp 0
+			exitStartup(true)
 		}
 	}
 	else {
 		if (vSimulatorControllerPID != 0)
 			raiseEvent("Startup", "stopStartupSong")
 		
-		ExitApp 0
+		exitStartup(true)
 	}
 }
 finally {

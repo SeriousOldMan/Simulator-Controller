@@ -154,7 +154,8 @@ startRaceEngineer() {
 	
 	registerEventHandler("Race", "handleRemoteCalls")
 	
-	RaceEngineer.Instance := new RaceEngineer(false, readConfiguration(raceSettingsFile), remotePID ? new RemotePitstopHandler(remotePID) : false, engineerName, engineerLanguage, engineerSpeaker, engineerListener)
+	RaceEngineer.Instance := new RaceEngineer(kSimulatorConfiguration, readConfiguration(raceSettingsFile)
+											, remotePID ? new RemotePitstopHandler(remotePID) : false, engineerName, engineerLanguage, engineerSpeaker, engineerListener)
 	
 	if (remotePID != 0) {
 		vRemotePID := remotePID

@@ -317,20 +317,20 @@ class ACCPlugin extends ControllerPlugin {
 			this.createRaceEngineerAction(controller, string2Values(A_Space, theAction)*)
 		}
 		
-		engineersSpeaker := this.getArgumentValue("raceEngineerSpeaker", false)
+		engineerSpeaker := this.getArgumentValue("raceEngineerSpeaker", false)
 		
-		if (engineersSpeaker != false) {
-			this.iRaceEngineerSpeaker := ((engineersSpeaker = "true") ? true : engineersSpeaker)
+		if ((engineerSpeaker != false) && (engineerSpeaker != "false")) {
+			this.iRaceEngineerSpeaker := ((engineerSpeaker = "true") ? true : engineerSpeaker)
 		
-			engineersListener := this.getArgumentValue("raceEngineerListener", false)
+			engineerListener := this.getArgumentValue("raceEngineerListener", false)
 			
-			if (engineersListener != false)
-				this.iRaceEngineerListener := ((engineersListener = "true") ? true : engineersListener)
+			if ((engineerListener != false) && (engineerListener != "false"))
+				this.iRaceEngineerListener := ((engineerListener = "true") ? true : engineerListener)
 		}
 		
 		controller.registerPlugin(this)
 	
-		if (useRaceEngineer || (engineersSpeaker != false))
+		if (useRaceEngineer || (engineerSpeaker != false))
 			SetTimer collectRaceData, 1000
 	}
 	

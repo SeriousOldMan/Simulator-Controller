@@ -18,6 +18,7 @@ global kLaunchMode = "Launch"
 ;;;-------------------------------------------------------------------------;;;
 
 class SystemPlugin extends ControllerPlugin {
+	iChildProcess := false
 	iLaunchMode := false
 	iMouseClicked := false
 	iStartupSongIsPlaying := false
@@ -171,6 +172,12 @@ class SystemPlugin extends ControllerPlugin {
 		}
 	}
 	
+	ChildProcess[] {
+		Get {
+			return this.iChildProcess
+		}
+	}
+	
 	ModeSelector[] {
 		Get {
 			return this.iModeSelector
@@ -192,11 +199,21 @@ class SystemPlugin extends ControllerPlugin {
 	__New(controller, name, configuration := false) {
 		this.iLaunchMode := new this.LaunchMode(this)
 		
+		if ((A_Args.Length() > 0) && (A_Args[1] = "-Startup"))
+			this.iChildProcess := true
+		
 		base.__New(controller, name, configuration)
 		
 		this.registerMode(this.iLaunchMode)
 		
 		this.initializeBackgroundTasks()
+	}
+	
+	simulatorStartup(simulator) {
+		if this.ChildProcess
+			raiseEvent("Startup", "exitStartup")
+	
+		base.simulatorStartup(simulator)
 	}
 	
 	simulatorShutdown() {
@@ -568,6 +585,10 @@ stopStartupSong() {
 	SimulatorController.Instance.findPlugin(kSystemPlugin).stopStartupSong()
 		
 	SetTimer muteSimulator, Off
+}
+	
+startupExited() {
+	SimulatorController.Instance.findPlugin(kSystemPlugin).iChildProcess := false
 }
 
 handleStartupEvents(event, data) {

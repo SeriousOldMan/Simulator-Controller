@@ -1217,11 +1217,8 @@ updateSimulatorState() {
 		if (isSimulatorRunning != (controller.ActiveSimulator != false)) {
 			isSimulatorRunning := !isSimulatorRunning
 		
-			if isSimulatorRunning {
-				raiseEvent("Startup", "exitStartup")
-				
+			if isSimulatorRunning
 				controller.simulatorStartup(controller.ActiveSimulator)
-			}
 			else
 				controller.simulatorShutdown()
 

@@ -224,13 +224,59 @@ Beside that, the check boxes for repair of Suspension and Bodywork must be both 
 
 ## Technical information
 
+This section will give you some background information about the inner workings of Jona. The most of it need some background knowledge about programming, so, if you never have coded just a tiny bit, you can safely skip this section.
+
+The most important part of Jona, Beside the natural language interface, which has been described above, is the rule engine and the knowledgebase, the rules work with. Part of the knowledgebase is a history of past events, which is used by the rules to give Jona a memory and allows the bot to interact in a context-sensitive manner. The history is also used by the rules to infere future trends, for example, a projection of target tyre pressures for long stints in an evening session, when the track temperatures are falling. Past and future weather trend information (when available) can alos be integrated as well. Jona is able to recommend, whether a repair of a damage be worth of for the next pitstop, by calculating the historic impact of the damage on your lap time, and so on. Not all of this has been implemented already in the alpha version of Jona, but the genetics are already there.
+
+Bewlor you will find some information, although not a complete documentation about all this.
+
 ### The Rule Engine
+
+The rule engine used for Jona is a so called hybrid rule engine, which means, that rules can derive new knowledge from given knowledge, called forward chaining, or rules can be used to prove a hypothesis by reducing it to more and more simple questions until all those question has been answered or no more possibilities are available, which means, that the prove fails. This is called backward chaining and the most prominent representative of this kind is the logical language Prolog.
+
+Forward chaining rules in Jona look like this:
+
+	{All: [?Pitstop.Plan], [?Tyre.Pressure.Target.FL]} =>
+		(Set: Pitstop.Planned.Tyre.Pressure.FL, ?Tyre.Pressure.Target.FL),
+		(Set: Pitstop.Planned.Tyre.Pressure.FL.Increment, !Tyre.Pressure.Target.FL.Increment)
+
+This rule for example, is triggered, when a new pitstop plan had been requested (*[?Pitstop.Plan]*) and when at the same time a target pressure for the front left tyre had been derived (by another rule). The rule the *fires* and thereby copies this information to the pitstop plan.
+
+A backword chaining rule is typically used to calculate and looks like this:
+
+	updateRemainingLaps(?lap) <=
+		remainingStintLaps(?lap, ?stintLaps), remainingRaceLaps(?lap, ?raceLaps),											\
+		?stintLaps < ?raceLaps, Set(Lap.Remaining, ?stintLaps)
+
+	lowFuelWarning(?lap, ?remainingLaps) <= pitstopLap(?lap), !, fail
+	lowFuelWarning(?lap, ?remainingLaps) <= Call(lowFuelWarning, ?remainingLaps)
+	
+In this example, the rule *updateRemainingLaps* calculates the number of laps, which remains with the current amount of fuel. The result is updated in the memory as the *Lap.Remaining* fact, which might trigger other rules. One of these rules might then call *lowFuelWarning*, the second part of the example above. This rule calls the external function *lowFuelWarning*, which in the end might trigger Jona to call you and tell you, that you are running out of fuel. But this call is only issued, when the current lap (*?lap*) is not a lap, where a pitstop has been performed.
+
+You can find the rules of Jona in the file *Race Engineer.rules* which resides in the *Config* folder in the installation folder of Simulator Controller. As always, you are able to overwrite this file by placing a (modified) copy in the *Simulator Controller\Config* folder in your user documents folder. This might be or might not be a good idead depending on your programming skills in logical languages.
 
 ### Interaction States
 
+At this time, Jona can handle three import states in its knowledge base.
+
+  - A pitstop has been planned
+  - A pitstop has been prepared, which means that all the settings had been setup in the Pitstop MFD of *Assetto Corsa Competizione*
+  - The car is in the pit and a pitstop takes place
+  
+You can trigger the first two states, as long as logical for the given situation, by setting the facts *Pitstop.Plan* or *Pitstop.Prepare* to *true* in the knowledge base. The rule network will do th rest. An undertaken pitstop must be triggered by setting *Pitstop.Lap* to the lap number, where the driver pitted. All this is handled by the *RaceEngineer* class already, so there is no need to do this at the knowledgebase level, but it is important to understand, that these states exist to undertstand Jonas reactions to your requests. For example, Jona first wants to plan a pitstop before you enter the pit, which is quite logical, right?
+
 ### Jonas Memory
 
-### Interprocess Communication
+The content of the knowledgbase of Jona or the facts, as these are called in the world of rule engines, can be divided into three categories:
+
+  - Historic information. Here all recent laps and pitstops are memorized to build a base of historic data for trend anlysis.
+  - Derived future information. In this category fall the state information described above, for example the values for the next pitstop.
+  - Real working memory. Jona constantly calculates future trends and events, like low fuel in a few laps. These projected values are stored in the memory as well.
+  
+For historic information, the format is quite simple. All facts for a past lap start with *Lap.X* where X is the lap number. The same is true for pitstops, *Pitstop.X*, where X is the pitstop number here. Normally you will have many more laps than pitstops, except you are me in a reverse grid league race, hey?
+The derived future information is typically categorized by the first part of the fact name, for example *Tyre* for all knowledge about the current tyre state.
+
+You can take a look at the knowledge base by enabling "Debug" mode in the configuration, as described in the [Troubleshooting}(https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#troubleshooting) section. By doing this, you will pay a performance penalty, which might or might not be noticeable depending on your hardware.
 
 ### Telemetry Integration
 

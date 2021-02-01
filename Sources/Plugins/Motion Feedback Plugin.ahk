@@ -355,9 +355,18 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	__New(controller, name, configuration := false) {
 		local function
 		
-		this.iMotionApplication := new Application(kMotionFeedbackPlugin, configuration)
+		base.__New(controller, name, configuration, false)
 		
-		base.__New(controller, name, configuration)
+		this.iMotionApplication := new Application(this.getArgumentValue("controlApplication", kMotionFeedbackPlugin), configuration)
+		
+		kSimFeedback := this.iMotionApplication.ExePath
+	
+		if (!kSimFeedback || !FileExist(kSimFeedback)) {
+			logMessage(kLogCritical, translate("Plugin Motion Feedback deactivated, because the configured application path (") . kSimFeedback . translate(") cannot be found - please check the configuration"))
+			
+			if !isDebug()
+				return
+		}
 		
 		kSimFeedbackConnector := this.getArgumentValue("connector", false)
 		
@@ -979,15 +988,6 @@ startSimFeedback(stayOpen := false) {
 
 initializeMotionFeedbackPlugin() {
 	controller := SimulatorController.Instance
-	
-	kSimFeedback := getConfigurationValue(controller.Configuration, kMotionFeedbackPlugin, "Exe Path", false)
-	
-	if (!kSimFeedback || !FileExist(kSimFeedback)) {
-		logMessage(kLogCritical, translate("Plugin Motion Feedback deactivated, because the configured application path (") . kSimFeedback . translate(") cannot be found - please check the configuration"))
-		
-		if !isDebug()
-			return
-	}
 
 	new MotionFeedbackPlugin(controller, kMotionFeedbackPlugin, controller.Configuration)
 }

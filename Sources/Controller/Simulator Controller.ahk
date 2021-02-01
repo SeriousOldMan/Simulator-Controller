@@ -937,12 +937,13 @@ class ControllerPlugin extends Plugin {
 		}
 	}
 	
-	__New(controller, name, configuration := false) {
+	__New(controller, name, configuration := false, register := true) {
 		this.iController := controller
 		
 		base.__New(name, configuration)
 		
-		this.Controller.registerPlugin(this)
+		if register
+			this.Controller.registerPlugin(this)
 	}
 	
 	findMode(name) {

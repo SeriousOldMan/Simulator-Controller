@@ -112,7 +112,7 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 				Sleep 2000
 				
 				Sleep 10000
-				; MouseClick Left, %kSaveToPedalX%, %kSaveToPedalY%
+				MouseClick Left, %kSaveToPedalX%, %kSaveToPedalY%
 				
 				trayMessage(translate(this.Pedal), translate("Calibration: ") . this.Shape)
 			}
@@ -132,11 +132,9 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 	}
 	
 	__New(controller, name, configuration := false) {
-		this.iPedalProfileMode := new this.PedalProfileMode(this)
+		base.__New(controller, name, configuration, false)
 		
-		base.__New(controller, name, configuration)
-		
-		this.iSmartCtrlApplication := new Application(this.getArgumentValue("controlApplication", ""), configuration)
+		this.iSmartCtrlApplication := new Application(this.getArgumentValue("controlApplication", kPedalCalibrationPlugin), configuration)
 	
 		smartCtrl := this.iSmartCtrlApplication.ExePath
 		
@@ -146,6 +144,8 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 			if !isDebug()
 				return
 		}
+		
+		this.iPedalProfileMode := new this.PedalProfileMode(this)
 		
 		this.registerMode(this.iPedalProfileMode)
 		

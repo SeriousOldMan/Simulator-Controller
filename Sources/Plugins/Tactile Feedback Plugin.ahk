@@ -178,7 +178,18 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 	}
 	
 	__New(controller, name, configuration := false) {
-		base.__New(controller, name, configuration)
+		base.__New(controller, name, configuration, false)
+	
+		simFeedbackApplication := new Application(this.getArgumentValue("controlApplication", kTactileFeedbackPlugin), configuration)
+		
+		kSimHub := simFeedbackApplication.ExePath
+	
+		if (!kSimHub || !FileExist(kSimHub)) {
+			logMessage(kLogCritical, translate("Plugin Tactile Feedback deactivated, because the configured application path (") . kSimHub . translate(") cannot be found - please check the configuration"))
+			
+			if !isDebug()
+				return
+		}
 		
 		this.iVibrationApplication := new Application(kTactileFeedbackPlugin, configuration)
 		
@@ -402,15 +413,6 @@ deactivateRearChassisVibration() {
 
 initializeSimHubPlugin() {
 	controller := SimulatorController.Instance
-	
-	kSimHub := getConfigurationValue(controller.Configuration, kTactileFeedbackPlugin, "Exe Path", false)
-	
-	if (!kSimHub || !FileExist(kSimHub)) {
-		logMessage(kLogCritical, translate("Plugin Tactile Feedback deactivated, because the configured application path (") . kSimHub . translate(") cannot be found - please check the configuration"))
-		
-		if !isDebug()
-			return
-	}
 
 	new TactileFeedbackPlugin(controller, kTactileFeedbackPlugin, controller.Configuration)
 }

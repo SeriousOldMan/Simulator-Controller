@@ -386,8 +386,8 @@ A list of all actions defined by this plugin. Only the actions defined directly 
 
 ### Public Methods
 
-#### *__New(controller :: SimulatorController, name :: String, configuration :: ConfigurationMap)*
-Constructs an instance of *ControllerPlugin*. All parameters are required.
+#### *__New(controller :: SimulatorController, name :: String, configuration :: ConfigurationMap, register :: Boolean := true)*
+Constructs an instance of *ControllerPlugin*. The first three parameters are required. If the optional parameter *register* is supplied and *false*, the plugin is not registered automatically in the *controller*. This might be necessary in complex initialization scenarios. You can register the plugin anytime later by calling *registerPlugin* manually.
 
 #### *findMode(name :: String)*
 Searches for a mode defined by this plugin with the given name. Returns *false*, if not found.

@@ -50,6 +50,7 @@ ListLines Off					; Disable execution history
 
 global vSimulatorControllerPID := 0
 global vStartupFinished = false
+global vStartupCanceled = false
 
 global vSongFile = false
 
@@ -160,12 +161,15 @@ class SimulatorStartup extends ConfigurationItem {
 	
 	startComponent(component) {
 		logMessage(kLogInfo, translate("Starting component ") . component)
-				
+					
 		raiseEvent("Startup", "startupComponent:" . component)
 	}
 	
 	startComponents(section, components, ByRef startSimulator, ByRef runningIndex) {
 		for ignore, component in components {
+			if vStartupCanceled
+				break
+			
 			startSimulator := (startSimulator || (GetKeyState("Ctrl") || GetKeyState("MButton")))
 			
 			if getConfigurationValue(this.Settings, section, component, true) {
@@ -187,6 +191,9 @@ class SimulatorStartup extends ConfigurationItem {
 	}
 	
 	startSimulator() {
+		if vStartupCanceled
+			return
+			
 		if (!this.iStartupOption && (this.iSimulators.Length() > 0))
 			this.iStartupOption := this.iSimulators[1]
 			
@@ -236,20 +243,24 @@ class SimulatorStartup extends ConfigurationItem {
 			Progress 100, % translate("Done")
 		
 		Sleep 500
+			
+		vStartupFinished := true
 		
 		if (startSimulator || (GetKeyState("Ctrl") || GetKeyState("MButton")))
 			this.startSimulator()
 
-		if kSilentMode
+		if (kSilentMode || vStartupCanceled) {
+			if (!kSilentMode && this.iSplashTheme)
+				hideSplashTheme()
+			
 			exitStartup(true)
+		}
 		else {
 			Progress Off
 		
 			if !this.iSplashTheme
 				exitStartup(true)
 		}
-			
-		vStartupFinished := true
 	}
 }
 
@@ -356,7 +367,7 @@ try {
 			if (vSimulatorControllerPID != 0)
 				raiseEvent("Startup", "stopStartupSong")
 		
-			exitStartup(true)
+			vStartupCanceled := true
 		}
 	}
 	else {

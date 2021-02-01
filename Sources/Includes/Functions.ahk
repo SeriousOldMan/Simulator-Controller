@@ -970,6 +970,8 @@ raiseEvent(event, data, localProcess := false) {
 		logMessage(kLogInfo, translate("Raising event """) . event . (data ? translate(""": ") . data : translate("""")))
 	
 		vOutgoingEvents.Push(Array(event, data))
+		
+		return true
 	}
 }
 

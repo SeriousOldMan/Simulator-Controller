@@ -320,23 +320,24 @@ class SystemPlugin extends ControllerPlugin {
 	}
 	
 	stopStartupSong(callback := false) {
-		if (this.iStartupSongIsPlaying) {
+		if this.iStartupSongIsPlaying
 			masterVolume := fadeOut()
-
-			try {
-				SoundPlay NonExistent.avi
-			}
-			catch ignore {
-				; Ignore
-			}
-		
-			this.iStartupSongIsPlaying := false
 			
+		try {
+			SoundPlay NonExistent.avi
+		}
+		catch ignore {
+			; Ignore
+		}
+		
+		if this.iStartupSongIsPlaying {
 			if callback
 				%callback%()
 				
 			fadeIn(masterVolume)
 		}
+
+		this.iStartupSongIsPlaying := false
 	}
 
 	initializeBackgroundTasks() {

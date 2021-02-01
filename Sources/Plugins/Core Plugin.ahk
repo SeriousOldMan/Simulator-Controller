@@ -33,7 +33,7 @@ startAITrack() {
 			protectionOn()
 			
 			try {
-				MouseClick left,  201,  344
+				MouseClick Left,  201,  344
 				Sleep 5000
 				WinMinimize %windowTitle%
 				Sleep 100
@@ -81,8 +81,8 @@ startVoiceMacro() {
 				protectionOn()
 			
 				try {
-					; MouseClick, left,  465,  45
-					; MouseClick, left,  465,  45
+					; MouseClick, Left,  465,  45
+					; MouseClick, Left,  465,  45
 					WinMinimize %windowTitle%
 					Sleep 100
 				}

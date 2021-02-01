@@ -24,9 +24,9 @@ startRST() {
 			
 			try {
 				Sleep 2000
-				MouseClick left,  860,  21
+				MouseClick Left,  860,  21
 				Sleep 2000
-				MouseClick left,  830,  115
+				MouseClick Left,  830,  115
 			}
 			finally {
 				protectionOff()

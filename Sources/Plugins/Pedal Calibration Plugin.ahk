@@ -66,6 +66,7 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 		
 		__New(function, label, pedal, shape) {
 			this.iPedal := pedal
+			this.iShape := shape
 			this.iSelectionIndex := inList(kCurveShapes, shape)
 			
 			if !this.iSelectionIndex
@@ -94,31 +95,32 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 				application.startup()
 			
 			try {
-				WinWait %windowTitle%, , 20
+				WinWait %windowTitle%, , 5
 			
-				; WinActivate %windowTitle%
-				; WinWaitActive %windowTitle%, , 2
+				WinActivate %windowTitle%
+				WinWaitActive %windowTitle%, , 2
 				
 				xPosition := this.iSelectionXPosition
 				yPosition := kShapeYPosition
 				
-				ControlClick X%xPosition% Y%yPosition%, %windowTitle%, , , , NA
-				Sleep 100
+				MouseClick Left, %xPosition%, %yPosition%
+				Sleep 2000
 				
 				yPosition += (this.iSelectionIndex * kShapeYDelta)
 				
-				ControlClick X%xPosition% Y%yPosition%, %windowTitle%, , , , NA
-				Sleep 500
+				MouseClick Left, %xPosition%, %yPosition%
+				Sleep 2000
 				
-				ControlClick X%kSaveToPedalX% Y%kSaveToPedalY%, %windowTitle%, , , , NA
+				Sleep 10000
+				; MouseClick Left, %kSaveToPedalX%, %kSaveToPedalY%
 				
 				trayMessage(translate(this.Pedal), translate("Calibration: ") . this.Shape)
 			}
 			finally {
 				if !wasRunning
 					application.shutdown()
-				;else
-				;	WinMinimize %windowTitle%
+				else
+					WinMinimize %windowTitle%
 			}
 		}
 	}
@@ -134,9 +136,18 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 		
 		base.__New(controller, name, configuration)
 		
-		this.registerMode(this.iPedalProfileMode)
-		
 		this.iSmartCtrlApplication := new Application(this.getArgumentValue("controlApplication", ""), configuration)
+	
+		smartCtrl := this.iSmartCtrlApplication.ExePath
+		
+		if (!smartCtrl || !FileExist(smartCtrl)) {
+			logMessage(kLogCritical, translate("Plugin Pedal Calibration deactivated, because the configured application path (") . smartCtrl . translate(") cannot be found - please check the configuration"))
+			
+			if !isDebug()
+				return
+		}
+		
+		this.registerMode(this.iPedalProfileMode)
 		
 		for ignore, theAction in string2Values(",", this.getArgumentValue("pedalCalibrations", ""))
 			this.createPedalCalibrationAction(controller, string2Values(A_Space, theAction)*)
@@ -167,15 +178,6 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 
 initializePedalCalibrationPlugin() {
 	local controller := SimulatorController.Instance
-	
-	smartCtrl := getConfigurationValue(controller.Configuration, kPedalCalibrationPlugin, "Exe Path", false)
-	
-	if (!smartCtrl || !FileExist(smartCtrl)) {
-		logMessage(kLogCritical, translate("Plugin Pedal Calibration deactivated, because the configured application path (") . smartCtrl . translate(") cannot be found - please check the configuration"))
-		
-		if !isDebug()
-			return
-	}
 	
 	new PedalCalibrationPlugin(controller, kPedalCalibrationPlugin, controller.Configuration)
 }

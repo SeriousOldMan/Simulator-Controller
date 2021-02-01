@@ -1094,11 +1094,11 @@ stopACC() {
 	if isACCRunning() {
 		IfWinNotActive AC2, , WinActivate, AC2
 		WinWaitActive AC2, , 2
-		MouseClick left,  2093,  1052
+		MouseClick Left,  2093,  1052
 		Sleep 500
-		MouseClick left,  2614,  643
+		MouseClick Left,  2614,  643
 		Sleep 500
-		MouseClick left,  2625,  619
+		MouseClick Left,  2625,  619
 		Sleep 500
 	}
 }

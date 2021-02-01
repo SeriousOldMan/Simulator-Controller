@@ -19,6 +19,7 @@ global kPedalCalibrationMode = "Pedal Calibration"
 
 global kCurveShapes := ["Linear", "Sense+1", "Sense+2", "Sense-1", "Sense-2", "S-Shape", "S on Side", "Slow Start", "Slow End"]
 
+/* For SmartControl Version 1.3+ - but not working at the moment, due to an error in SmartControl...
 global kClutchXPosition = 235
 global kBrakeXPosition = 555
 global kThrottleXPosition = 875
@@ -28,6 +29,19 @@ global kShapeYDelta := 20
 
 global kSaveToPedalX := 940
 global kSaveToPedalY := 785
+*/
+
+global kClutchXPosition = 205
+global kBrakeXPosition = 530
+global kThrottleXPosition = 845
+
+global kShapeYPosition := 245
+global kShapeYDelta := 20
+
+global kSaveToPedalX := 865
+global kSaveToPedalY := 710
+
+global kNeedsActivation := true
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -97,24 +111,41 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 			try {
 				WinWait %windowTitle%, , 5
 			
-				WinActivate %windowTitle%
-				WinWaitActive %windowTitle%, , 2
-				
-				xPosition := this.iSelectionXPosition
-				yPosition := kShapeYPosition
-				
-				MouseClick Left, %xPosition%, %yPosition%
-				Sleep 2000
-				
-				yPosition += (this.iSelectionIndex * kShapeYDelta)
-				
-				MouseClick Left, %xPosition%, %yPosition%
-				Sleep 2000
-				
-				Sleep 10000
-				MouseClick Left, %kSaveToPedalX%, %kSaveToPedalY%
+				if kNeedsActivation {
+					WinActivate %windowTitle%
+					WinWaitActive %windowTitle%, , 2
+					
+					xPosition := this.iSelectionXPosition
+					yPosition := kShapeYPosition
+					
+					MouseClick Left, %xPosition%, %yPosition%
+					Sleep 500
+					
+					yPosition += (this.iSelectionIndex * kShapeYDelta)
+					
+					MouseClick Left, %xPosition%, %yPosition%
+					Sleep 500
+					
+					MouseClick Left, %kSaveToPedalX%, %kSaveToPedalY%
+				}
+				else {
+					xPosition := this.iSelectionXPosition
+					yPosition := kShapeYPosition
+					
+					ControlClick X%xPosition% Y%yPosition%, %windowTitle%, , , , NA
+					Sleep 500
+					
+					yPosition += (this.iSelectionIndex * kShapeYDelta)
+					
+					ControlClick X%xPosition% Y%yPosition%, %windowTitle%, , , , NA
+					Sleep 500
+					
+					ControlClick X%kSaveToPedalX% Y%yPosition%, %kSaveToPedalY%, , , , NA
+				}
 				
 				trayMessage(translate(this.Pedal), translate("Calibration: ") . this.Shape)
+				
+				Sleep 500
 			}
 			finally {
 				if !wasRunning

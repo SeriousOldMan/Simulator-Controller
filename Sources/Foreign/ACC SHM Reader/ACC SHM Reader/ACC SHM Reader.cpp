@@ -162,27 +162,29 @@ int main(int argc, char* argv[])
 	{
 		wcout << "[Stint Data]" << endl;
 
-		SPageFileGraphic* pf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
+		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
+		SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;
 		
-		printData("Active", ((pf->status == AC_LIVE) || (pf->status == AC_PAUSE)) ? "true" : "false");
-		printData("Laps", pf->completedLaps);
-        printData("LapLastTime", pf->iLastTime);
-		printData("LapBestTime", pf->iBestTime);
-		printData("TimeRemaining", pf->sessionTimeLeft);
-		printData("InPit", pf->isInPit ? "true" : "false");
+		printData("Active", ((gf->status == AC_LIVE) || (gf->status == AC_PAUSE)) ? "true" : "false");
+		wcout << "DriverForname=" << sf->playerName << endl;
+		wcout << "DriverSurname=" << sf->playerSurname << endl;
+		wcout << "DriverNickname=" << sf->playerNick << endl;
+		printData("Laps", gf->completedLaps);
+        printData("LapLastTime", gf->iLastTime);
+		printData("LapBestTime", gf->iBestTime);
+		printData("TimeRemaining", gf->sessionTimeLeft);
+		printData("InPit", gf->isInPit ? "true" : "false");
 	}
 
 	if ((argc == 1) || strchr(argv[1], 'I'))
 	{
 		wcout << "[Race Data]" << endl;
 
-		SPageFileStatic* pf = (SPageFileStatic*)m_static.mapFileBuffer;
+		SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;
 
-		wcout << "DriverName=" << pf->playerSurname << endl;
-		wcout << "DriverNick=" << pf->playerNick << endl;
-		wcout << "Car=" << pf->carModel << endl;
-		wcout << "Track=" << pf->track << endl;
-		printData("FuelAmount", pf->maxFuel);
+		wcout << "Car=" << sf->carModel << endl;
+		wcout << "Track=" << sf->track << endl;
+		printData("FuelAmount", sf->maxFuel);
 
 	}
 

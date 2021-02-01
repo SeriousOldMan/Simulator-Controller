@@ -6,7 +6,7 @@
      - Configurable evaluation, whether a repair of suspension and/or bodywork damages will be performed
 	 - Automated setup of Pitstop MFD settings
 	 - Interactive dialog between driver and virtual race engineer using voice synthesis and recognition
-  2. [Target: V2.2][Heusinkveld Plugin (new)] Switching between pedal characteristic curves for Heusinkveld pedals while driving
+  2. [Target: V2.2][Pedal Calibration Plugin (new)] Switching between pedal characteristic curves for Heusinkveld pedals while driving
   3. [Target: V2.5][ACC Plugin] Hot switching between different sets of ABS and TC settings using voice commands
   4. [Target: V3.0][ACC Plugin] Further enhancements AI based race engineer
 	 - Graphical user interface for initial race settings
@@ -23,7 +23,7 @@
   1. [Target: V2.5]Allow for more than one visual representation of controller hardware, if more than one controller is connected to the PC.
   
 #### General
-  1. [Target: V2.2]Plugin support for the configuration tool
-  2. Choosing a specific theme depending on the selected simulation game
+  1. [Target: V2.2]Using speech recognition grammars directly as hotkeys for controller functions, thereby eliminating the need for VoiceMacro.
+  2. [Target: V2.5]Plugin support for the configuration tool
+  3. Choosing a specific theme depending on the selected simulation game
   3. Again, better UI flow in the configuration tool and larger window size.
-  4. [Target: V2.5]Using speech recognition grammars directly as hotkeys for controller functions, thereby eliminating the need for VoiceMacro.

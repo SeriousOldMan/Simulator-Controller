@@ -234,6 +234,15 @@ Error while connecting to SimHub (=>Fehler während der Kommunikation mit SimHub 
 Cannot connect to SimHub (%kSimHub%) - please check the configuration...=>Kommunikation mit SimHub (%kSimHub%) ist fehlerhaft - Bitte überprüfen Sie die Konfiguration...
 Plugin Tactile Feedback deactivated, because the configured application path (=>Die Erweiterung für Vibration wurde nicht aktiviert, da das Anwendungsverzeichnis (
 ) cannot be found - please check the configuration=>) nicht gefunden werden kann - Bitte überprüfen Sie die Konfiguration
+[Pedal Calibration Plugin]
+Pedal Calibration=>Pedal Kalibrierung
+Pedal Profile=>Pedal Profile
+Clutch=>Kupplung
+Brake=>Bremse
+Throttle=>Gas
+Calibration: =>Kalibrierung: 
+Plugin Pedal Calibration deactivated, because the configured application path (=>Die Erweiterung für die Pedale Kalibrierung wurde nicht aktiviert, da das Anwendungsverzeichnis (
+) cannot be found - please check the configuration=>) nicht gefunden werden kann - Bitte überprüfen Sie die Konfiguration
 [Simulator Tools]
 Checking file =>Überprüfe Datei 
  for modification=> auf Modifikationen

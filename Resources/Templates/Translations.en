@@ -232,6 +232,15 @@ Error while connecting to SimHub (=>
 Cannot connect to SimHub (%kSimHub%) - please check the configuration...=>
 Plugin Tactile Feedback deactivated, because the configured application path (=>
 ) cannot be found - please check the configuration=>
+[Pedal Calibration Plugin]
+Pedal Calibration=>
+Pedal Profile=>
+Clutch=>
+Brake=>
+Throttle=>
+Calibration: =>
+Plugin Pedal Calibration deactivated, because the configured application path (=>
+) cannot be found - please check the configuration=>
 [Simulator Tools]
 Checking file =>
  for modification=>

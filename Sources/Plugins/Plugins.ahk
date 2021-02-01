@@ -11,7 +11,7 @@
 
 #Include ..\Plugins\Motion Feedback Plugin.ahk
 #Include ..\Plugins\Tactile Feedback Plugin.ahk
-#Include ..\Plugins\Pedal Control Plugin.ahk
+#Include ..\Plugins\Pedal Calibration Plugin.ahk
 #Include ..\Plugins\AC Plugin.ahk
 #Include ..\Plugins\ACC Plugin.ahk
 #Include ..\Plugins\RST Plugin.ahk

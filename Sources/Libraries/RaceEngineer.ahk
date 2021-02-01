@@ -63,6 +63,8 @@ class RaceEngineer extends ConfigurationItem {
 	
 	iContinuation := false
 	
+	iDriverName := "Oliver"
+	
 	iEnoughData := false
 	
 	iKnowledgeBase := false
@@ -124,8 +126,15 @@ class RaceEngineer extends ConfigurationItem {
 				
 				phrase := phrases[Round(index)]
 				
-				if variables
-					phrase := substituteVariables(phrase, variables)
+				if variables {
+					variables := variables.Clone()
+					
+					variables["driver"] := this.Engineer.DriverName
+				}
+				else
+					variables := {driver: this.Engineer.DriverName}
+				
+				phrase := substituteVariables(phrase, variables)
 			}
 			
 			if phrase
@@ -194,6 +203,12 @@ class RaceEngineer extends ConfigurationItem {
 	Listener[] {
 		Get {
 			return this.iListener
+		}
+	}
+	
+	DriverName[] {
+		Get {
+			return this.iDriverName
 		}
 	}
 	
@@ -906,8 +921,27 @@ class RaceEngineer extends ConfigurationItem {
 		
 		if (lapNumber > baseLap)
 			this.iEnoughData := true
+		
+		driverForname := getConfigurationValue(data, "Stint Data", "DriverForname", "Oliver")
+		driverSurname := getConfigurationValue(data, "Stint Data", "DriverSurname", "Juwig")
+		driverNickname := getConfigurationValue(data, "Stint Data", "DriverNickname", "TBO")
+		
+		this.iDriverName := driverForname
 			
-		knowledgeBase.addFact("Lap." . lapNumber . ".Driver", getConfigurationValue(data, "Race Data", "DriverName", ""))
+		knowledgeBase.addFact("Lap." . lapNumber . ".Driver.Forname", driverForname)
+		knowledgeBase.addFact("Lap." . lapNumber . ".Driver.Surname", driverSurname)
+		knowledgeBase.addFact("Lap." . lapNumber . ".Driver.Nickname", driverNickname)
+		
+		if (lapNumber = 1) {
+			knowledgeBase.addFact("Driver.Forname", driverForname)
+			knowledgeBase.addFact("Driver.Surname", driverSurname)
+			knowledgeBase.addFact("Driver.Nickname", driverNickname)
+		}
+		else {
+			knowledgeBase.setValue("Driver.Forname", driverForname)
+			knowledgeBase.setValue("Driver.Surname", driverSurname)
+			knowledgeBase.setValue("Driver.Nickname", driverNickname)
+		}
 		
 		lapTime := getConfigurationValue(data, "Stint Data", "LapLastTime", 0)
 		

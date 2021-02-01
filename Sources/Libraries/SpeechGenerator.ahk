@@ -103,7 +103,7 @@ class SpeechGenerator {
 		if (status = 0)
 			this.iSpeechGenerator.Resume
 		
-		this.iSpeechGenerator.Speak("",0x1 | 0x2)
+		this.iSpeechGenerator.Speak("", 0x1 | 0x2)
 	}
 	
 	setRate(rate) {

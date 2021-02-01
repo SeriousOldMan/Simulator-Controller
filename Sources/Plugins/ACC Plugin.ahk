@@ -235,8 +235,8 @@ class ACCPlugin extends ControllerPlugin {
 		fireAction(function, trigger) {
 			message := this.Message
 			
-			IfWinNotActive AC2  , , WinActivate, AC2  , 
-			WinWaitActive AC2  , , 2
+			IfWinNotActive AC2, , WinActivate, AC2
+			WinWaitActive AC2, , 2
 			
 			Send {Enter}
 			Sleep 100
@@ -452,8 +452,8 @@ class ACCPlugin extends ControllerPlugin {
 	}
 		
 	openPitstopMFD(update := true) {
-		IfWinNotActive AC2  , , WinActivate, AC2  , 
-		WinWaitActive AC2  , , 2
+		IfWinNotActive AC2, , WinActivate, AC2 
+		WinWaitActive AC2, , 2
 
 		SendEvent % this.OpenPitstopMFDHotkey
 		
@@ -468,8 +468,8 @@ class ACCPlugin extends ControllerPlugin {
 	}
 	
 	closePitstopMFD() {
-		IfWinNotActive AC2  , , WinActivate, AC2  , 
-		WinWaitActive AC2  , , 2
+		IfWinNotActive AC2, , WinActivate, AC2
+		WinWaitActive AC2, , 2
 
 		SendEvent % this.ClosePitstopMFDHotkey
 		
@@ -519,8 +519,8 @@ class ACCPlugin extends ControllerPlugin {
 			if (targetSelectedOption > this.iPSSelectedOption)
 				Loop % targetSelectedOption - this.iPSSelectedOption
 				{
-					IfWinNotActive AC2  , , WinActivate, AC2  , 
-					WinWaitActive AC2  , , 2
+					IfWinNotActive AC2, , WinActivate, AC2
+					WinWaitActive AC2, , 2
 
 					SendEvent {Down}
 					
@@ -529,8 +529,8 @@ class ACCPlugin extends ControllerPlugin {
 			else
 				Loop % this.iPSSelectedOption - targetSelectedOption
 				{
-					IfWinNotActive AC2  , , WinActivate, AC2  , 
-					WinWaitActive AC2  , , 2
+					IfWinNotActive AC2, , WinActivate, AC2
+					WinWaitActive AC2, , 2
 
 					SendEvent {Up}
 					
@@ -549,8 +549,8 @@ class ACCPlugin extends ControllerPlugin {
 		switch direction {
 			case "Increase":
 				Loop % steps {
-					IfWinNotActive AC2  , , WinActivate, AC2  , 
-					WinWaitActive AC2  , , 2
+					IfWinNotActive AC2, , WinActivate, AC2
+					WinWaitActive AC2, , 2
 
 					SendEvent {Right}
 
@@ -558,8 +558,8 @@ class ACCPlugin extends ControllerPlugin {
 				}
 			case "Decrease":
 				Loop % steps {
-					IfWinNotActive AC2  , , WinActivate, AC2  , 
-					WinWaitActive AC2  , , 2
+					IfWinNotActive AC2, , WinActivate, AC2
+					WinWaitActive AC2, , 2
 
 					SendEvent {Left}
 					
@@ -1092,8 +1092,8 @@ startACC() {
 
 stopACC() {
 	if isACCRunning() {
-		IfWinNotActive AC2  , , WinActivate, AC2  , 
-		WinWaitActive AC2  , , 2
+		IfWinNotActive AC2, , WinActivate, AC2
+		WinWaitActive AC2, , 2
 		MouseClick left,  2093,  1052
 		Sleep 500
 		MouseClick left,  2614,  643

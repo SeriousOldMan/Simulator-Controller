@@ -2,21 +2,21 @@
 
 Welcome to Jona, the world first fully interactive virtual race engineer for race car simulations.
 
-Ok, enough marketing bullshit. Jona is a chat bot with a special knowledge about racing. It uses the telemetry data provided by a simulation game and a large domain specific rule set to derive its knowledge from there. Using this knowledge, Jona can give you information about the current state of your car (temperatures, pressures, remaining laps, upcoming pitstops, and so on), and is capable to recommend settings for the next pitstop. Using the Pitstop MFD handling for *Assetto Corsa Competizione* introduced with Release 2.0, Jona is capable to setup a pitstop without user interaction completely on its own.
+Ok, enough marketing bullshit. Jona is a chat bot with a special knowledge about racing. It uses the telemetry data provided by a simulation game and a large domain specific rule set to derive its knowledge from there. Using this knowledge, Jona can give you information about the current state of your car (temperatures, pressures, remaining laps, upcoming pitstops, and so on), and can recommend settings for the next pitstop. Using the Pitstop MFD handling for *Assetto Corsa Competizione* introduced with Release 2.0, Jona is capable to setup a pitstop without user interaction completely on its own.
 
-As said, Jona is a voice chat bot and therefore you can control Jona completely by voice. Before we dig deeper into the inner mechanics of Jona, we will start with a typical dialog with Jona, to give you an understanding of the capabilities.
+As said, Jona is a voice chat bot and therefore you can control Jona completely by voice. Before we dig deeper into the inner workings of Jona, we will start with a typical dialog with Jona to give you an understanding of the capabilities.
 
 ### A typical dialog
 
 **Jona: "Hi, here is Jona, your race engineer today. You can call me anytime if you have questions. Good luck."**
 
-(You hear this or a similar phrase, whenever Jona is ready to interact with you. Typically this is at the beginning of the second lap in a race. From now on Jona might call you, when important information are available, or you can call her/him anytime using one of the key phrases - see the section about [phrase grammars](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#phrase-grammars) on that.)
+(You hear this or a similar phrase, whenever Jona is ready to interact with you. Typically this is at the beginning of the second lap in a race. From now on Jona might call you, when important information is available, or you can call her/him anytime using one of the key phrases - see the section about [phrase grammars](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#phrase-grammars) on that.)
 
 **Driver: "Tell me the tyre temperatures."**
 
 **Jona: "We have a blue screen here. Windows XP is crap. Give me a minute."**
 
-(This answer, or a similar one, means, that Jona does not have enough data at the moment to answer your question. Typically, Jona needs to laps at the beginning of the race or after a pitstop, to be completely up and running)
+(This answer, or a similar one, means, that Jona does not have enough data at the moment to answer your question. Typically, Jona needs two laps at the beginning of the race or after a pitstop, to be completely up and running)
 
 (A lap later...)
 
@@ -30,15 +30,15 @@ As said, Jona is a voice chat bot and therefore you can control Jona completely 
 
 **Jona: "Warning. Only 3 laps before you will run out of fuel. Should I update the pitstop strategy now?"**
 
-(With this question, Jona asks, if you want to start the preparation process for the upcoming pitstop.)
+(With this question Jona asks, if you want to start the preparation process for the upcoming pitstop.)
 
 **Driver: "No thank you."**
 
-(We are brave and will take another lap.)
+(We are brave and go on to another lap.)
 
 **Jona: "Okay. Call me when you are ready."**
 
-(As you can see, Jona always acjknowledges what you said. This helps you to check, whether Jona did understood you correctly.)
+(As you can see, Jona always acknowledges what you have said. This helps you to check, whether Jona understood you correctly.)
 
 (A lap later...)
 
@@ -52,7 +52,7 @@ As said, Jona is a voice chat bot and therefore you can control Jona completely 
 
 **Jona: "Jona here. I recommend this for pitstop number one: ..."**
 
-(Jona gives you a complete overview over all the settings, that were derived for the upcoming pitstop, refueling, tyre compound, pressures, repairs, and so on.)
+(Jona gives you a complete overview of all the settings, that were derived for the upcoming pitstop (refueling, tyre compound, pressures, repairs, and so on.)
 
 (Maybe you have some corrections...)
 
@@ -70,11 +70,11 @@ As said, Jona is a voice chat bot and therefore you can control Jona completely 
 
 **Jona: "Understood. I am here."**
 
-(The pitstop is now planned, but still not locked in. We are brave and stay out for the last lap...)
+(The pitstop is now planned, but still not locked in. We are very brave and stay out for the last lap...)
 
 **Jona: "Warning. You will run out of fuel in one lap. You should come in immediately. Shall I instruct the pit crew?"**
 
-(With the last question, Jona aks, whether the pitstop plan shall be locked in.)
+(With the last question, Jona asks, whether the pitstop plan shall be locked in.)
 
 **Driver: "Ok, let's go on."**
 
@@ -92,7 +92,7 @@ As said, Jona is a voice chat bot and therefore you can control Jona completely 
 
 (And now you are ready for your next stint...)
 
-To have a perfect session like this one, you must have a perfect setup for voice recognition. I strngly recommend using a headset, since alien noises might lead to false positives in Jonas voice recognition. Please see the section on [troubleshooting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#troubleshooting), if you need some tips.
+To have an error free session like this one, you must have a perfect setup for voice recognition. I strngly recommend using a headset, since alien noises might lead to false positives in Jonas voice recognition. Please see the section on [troubleshooting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#troubleshooting), if you need some hints.
 
 ## Installation
 
@@ -100,19 +100,19 @@ Not much to do here, since Jona is a fully integrated component of the Simulator
 
 ### Installation of additional Voices
 
-Almost every Windows installation already has builtin support for voice generation (called TTS, aka text-to-speech). If you want to install different libraries (and Jona will use all of them according to the configured language), you might want to install some additional packages. Depending on your Windows license you can do this on the windows settings dialog as described in the [Microsoft documentation](https://support.microsoft.com/en-us/office/how-to-download-text-to-speech-languages-for-windows-10-d5a6b612-b3ae-423f-afa5-4f6caf1ec5d3) ([German version](https://support.microsoft.com/de-de/office/herunterladen-von-text-zu-sprache-sprachen-f%C3%BCr-windows-10-d5a6b612-b3ae-423f-afa5-4f6caf1ec5d3)). The current version of Jona comes with translations for English and German, as these are the languages supported by Simulator Controller out of the box. Therefore I recommend to install voices for these languages at least.
+Almost every Windows installation already has builtin support for voice generation (called TTS, aka text-to-speech). If you want to install more voices (and Jona will use all of them according to the configured language), you might want to install some additional packages. Depending on your Windows license you can do this on the windows settings dialog as described in the [Microsoft documentation](https://support.microsoft.com/en-us/office/how-to-download-text-to-speech-languages-for-windows-10-d5a6b612-b3ae-423f-afa5-4f6caf1ec5d3) ([German version](https://support.microsoft.com/de-de/office/herunterladen-von-text-zu-sprache-sprachen-f%C3%BCr-windows-10-d5a6b612-b3ae-423f-afa5-4f6caf1ec5d3)). The current version of Jona comes with translations for English and German, as these are the languages supported by Simulator Controller out of the box. Therefore I recommend to install voices for these languages at least.
 
 ### Installation of Speech Recognition Libraries
 
-The installation of the voice recognition engine sometimes needs a little bit more effort. Jona relies on the speech recognition runtime from Microsoft, which is not necessarily part of a Windows standard distribution. You can check this in your Settings dialog as well. If you do not have any voice recognition capabilities available, you can use the installer provided for your convinience in the *Utilities\3rd party* folder, as long you have a 64-bit Windows installation. Please install the runtime first and the two provided language packs for English and German afterwards.
+The installation of the voice recognition engine sometimes needs a little bit more effort. Jona relies on the speech recognition runtime from Microsoft, which is not necessarily part of a Windows standard distribution. You can check this in your Settings dialog as well. If you do not have any voice recognition capabilities available, you can use the installer provided for your convinience in the *Utilities\3rd party* folder, as long you have a 64-bit Windows installation. Please install the runtime first and the two provided language packs for English and German afterwards. Otherwise search the web for "Windows Speech Recognition Runtime".
 
-After installing the language packs, it might be necessary to unblock the recognizer DLLs of Jona, which are provided in the Binaries folder. Windows might block these DLLs for security reasons, because you downloaded it from a non-trusted location. You will find a little Powershell script in the *Utilities* folder, which you can copy to the *Binaries* folder and execute it there with Administrator privileges.
+After installing the language packs, it might be necessary to unblock the recognizer DLLs of Jona, which are provided in the Binaries folder. Windows might have blocked these DLLs for security reasons, because you downloaded it from a non-trusted location. You will find a little Powershell script in the *Utilities* folder, which you can copy to the *Binaries* folder and execute it there with Administrator privileges.
 
 Note: Since the time for offline voice recognition is almost over, a future version of Jona will use Google, Amazon or Azure services for voice recognition. But this might be a pay per use kind of service.
 
 ## Interacting with Jona
 
-Although it is possible, to [use Jona without voice interaction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#vitual-race-engineer-integration), it is not much fun. But to have fun with Jona, you must understand, how the interaction is structured, since in the end, Jona is stupid as bread and only reacts to strong standard patterns. For each language you want to use to interact with Jona, a so called grammar file must exist. As said, support for English and German is already there. The grammar files are named "Race Engineer.grammars.XX", where XX is the two letter ISO language code. These files reside in the *Config* directory, either in the installation folder of Simulator Controller or in the *Simulator Controller\Config* folder in your user documents folder. The later means, that you are able to provide your own grammar files or *overwrite* the existing ones. But be careful with overwriting, since this will introduce apain in the a..., when updating to upcoming versions.
+Although it is possible, to [use Jona without voice interaction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#vitual-race-engineer-integration), it is not much fun. But to have fun with Jona, you must understand, how the interaction is structured, since in the end, Jona is stupid as bread and only reacts to strong standard patterns. For each language you want to use to interact with Jona, a so called grammar file must exist. As said, grammars for English and German are already there. The grammar files are named "Race Engineer.grammars.XX", where XX is the two letter ISO language code. These files reside in the *Config* directory, either in the installation folder of Simulator Controller or in the *Simulator Controller\Config* folder in your user documents folder. The later means, that you are able to provide your own grammar files or *overwrite* the existing ones. But be careful with overwriting, since this will introduce a pain in the a..., when updating to new versions.
 
 Tha grammar files define the input patterns which Jona uses to understand you and also all reactions of Jona as predefined phrases. For each reaction, an unlimited number of phrases may exist (typically 2-4 different ones in the predefined grammar files) to provide for an entertaining variety of answers.
 
@@ -136,7 +136,9 @@ As you can see, a typical recognition phrase looks like this:
 
 	[(TellMe) {the tyre pressures, the current tyre pressures, the pressures in the tyres}, (TellMe) the current pressures]
 	
-(TellMe) is a variable for a set of predfined optional fill phrases (in the example above TellMe stands for "Tell me, Give me, What are"). The input phrase above consists of three different independent phrases, which lead to the same reaction of Jona. This is denoted by the "[..., ...]" parenthesis construct. For the first phrase the "{..., ..., ...}" defines inner alternatives for this phrase. By using "[" and "{" constructs, you can create a variety of pattern alternatives. But in the end, Jona reacts only to the core words of a phrase, for example "the current pressures" in the above example.
+(TellMe) is a variable for a set of predfined optional filler phrases (in the example above TellMe stands for "Tell me, Give me, What are"). The definition above consists of two different independent phrases, which lead to the same reaction of Jona. This is denoted by the "[..., ...]" bracket construct. For the first phrase the "{..., ..., ...}" defines inner alternatives for this phrase. By using "[" and "{" constructs, you can create a variety of pattern alternatives. But in the end, Jona reacts only to the core words of a phrase, for example "the current pressures" in the above example.
+
+Important: The words of the recognized phrase are reported to the Jona control program and may be analyzed there for further processing. For example, when asking for tyre pressures or temperaturs, the words "front", "left", ... are very important. Therefore be careful, if you change some of the predefined phrases.
 
 Some phrases (input and output) may have additional variables enclosed in "%", as in *%name%* above. These variables are provided by the runtime to customize the questions and answers.
 
@@ -161,20 +163,19 @@ As you can see here, each phrase provides different alternative sentences. Varia
 
 ## Racing with Jona
 
-Racing with Jona is easy, just begin your race and wait until Jona will contact you. To achieve this, the ACC plugin will start *Race Engineer.exe*, which is located in the *Binaries* folder, as a subprocess, as long as you are on track. (Note for developers: The communication between those two processes uses named pipes. See the [technical information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#technical-information) for more information on that).
+Racing with Jona is easy, just begin your race and wait until Jona will contact you. To achieve this, the ACC plugin will start *Race Engineer.exe*, which is located in the *Binaries* folder, as a subprocess, for the time when you are on track. (Note for developers: The communication between those two processes uses named pipes. For more technical information, see the [technical information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#technical-information) section below).
 
 But Jona needs a little help from your side to understand the given race situation and the corresponding data.
 
 ### Race Settings
 
-Now we come to a dirty part of the game, at least for the moment. As you already might suspect, Jona needs some knowledge, which is not necessarily provided by the telemetry data of the simulation game. For this a *Race Engineer.settings* file exist in the *Simulator Controller\Config* folder in your user documents folder, which you have to edit for each race. The next version of Simulator Controller will provide a graphical user interface for this task at least and I am still looking to gather parts of this information from the simulation game itself.
+Now we come to a dirty part of the game, at least for the moment. As you already might suspect, Jona needs some knowledge, which is not necessarily provided by the telemetry data of the simulation game. For this a *Race Engineer.settings* file exist in the *Simulator Controller\Config* folder in your user documents folder, which you have to edit for each race. The next version of Simulator Controller will provide a graphical user interface for this task at least and I am still looking to gather at least the setup part of this information from the simulation game itself.
 
 	[Race Settings]
 	OutLap=true
 	InLap=true
 	Fuel.AvgConsumption=2.7
 	Fuel.SafetyMargin=3
-	Fuel.Warning=3
 	Lap.AvgTime=106
 	Lap.History.Considered=5
 	Lap.History.Damping=0.2
@@ -204,16 +205,16 @@ Now we come to a dirty part of the game, at least for the moment. As you already
 	Tyre.Wet.Pressure.RL=28.2
 	Tyre.Wet.Pressure.RR=28.2
 
-Most options above define general settings which will be applicable to any race event. But the options from the *[Race Setup]* section need to be adjusted for a given race event.
+Most options above define general settings which will be applicable to any race event. But the options from the *[Race Setup]* section need to be adjusted for each individual race event, as long, as you want Jona to come to correct recommendations.
 
-  - The first fresh tyre set (*Tyre.Set.Fresh*), which can be used for a pitstop and the tyres and pressures (*Tyre.XXX.Pressure.YY*) dialed in for the frist stint. Jona needs this information to calculate the target pressures for the first pitstop.
+  - The first fresh tyre set (*Tyre.Set.Fresh*), which is available for a pitstop and the tyres and pressures (*Tyre.XXX.Pressure.YY*) used in for the first stint. Jona needs this information to calculate the target pressures for the first pitstop.
   - The *Lap.AvgTime* and *Fuel.AvgConsumption* are more informational, but might lead to more accurate estimations for the fuel calulations in the first few laps, where you typically have much slower lap times.
 
 As said, you must use a text editor to edit the contents for each individual race for the moment. A future non-alpha version will provide a graphical user interface for this and a big data collection of all past races is on the wish list in the backlog as well.
 
 ### The pitstop
 
-To enable Jona to handle the pitstop settings in *Assetto Corsa Competizione* fully automatically, you need to do two things. First you have to follow the instructions in the [update information for Release 2.0](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-20), so that the ACC plugin is able to control the Pitstop MFD of *Assetto Corsa Competizione*. Second, you need to setup your ACC pitstop strategy in a special way for as many pitstops you expect in the given race (plus some more for a safety margin):
+To enable Jona to handle the pitstop settings in *Assetto Corsa Competizione* fully on izs own, you need to prepare two things beforehand. First you have to follow the instructions in the [update information for Release 2.0](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-20), so that the ACC plugin is able to control the Pitstop MFD of *Assetto Corsa Competizione*. Second, you need to setup your ACC pitstop strategy in a special way for as many pitstops you expect in the given race (plus some more for a safety margin):
 
   - Refueling must be set to zero litres for each strategy
   - Each strategy has to use the Dry tyre compound
@@ -224,63 +225,63 @@ Beside that, the check boxes for repair of Suspension and Bodywork must be both 
 
 ## Technical information
 
-This section will give you some background information about the inner workings of Jona. The most of it need some background knowledge about programming, so, if you never have coded just a tiny bit, you can safely skip this section.
+This section will give you some background information about the inner workings of Jona. To understand the most of it, you need some background knowledge about programming. Therefore, if you never have coded just a tiny bit, you can safely skip this section.
 
-The most important part of Jona, Beside the natural language interface, which has been described above, is the rule engine and the knowledgebase, the rules work with. Part of the knowledgebase is a history of past events, which is used by the rules to give Jona a memory and allows the bot to interact in a context-sensitive manner. The history is also used by the rules to infere future trends, for example, a projection of target tyre pressures for long stints in an evening session, when the track temperatures are falling. Past and future weather trend information (when available) can alos be integrated as well. Jona is able to recommend, whether a repair of a damage be worth of for the next pitstop, by calculating the historic impact of the damage on your lap time, and so on. Not all of this has been implemented already in the alpha version of Jona, but the genetics are already there.
+The most important part of Jona, beside the natural language interface, which has been described above, is the rule engine and the knowledgebase, the rules work with. The major part of the knowledgebase consists of a history of past events, which is used by the rules to give Jona a kind of memory and allows the bot to interact in a context-sensitive manner. The history is also used by the rules to infere future trends, for example, a projection of target tyre pressures for long stints in an evening session, when the air and track temperatures are falling. Past and future weather trend information will be integrated as well, when they are available. Jona is able to recommend whether a repair of a damage be worth of for the next pitstop by calculating the historic impact of the damage on your lap time, and so on. Not all of this has been implemented completely in the alpha version of Jona, but the genetics are all there.
 
-Bewlor you will find some information, although not a complete documentation about all this.
+Below you will find some information about the rule engine and the knowledge base, although this is not a complete documentation at all for the moment.
 
 ### The Rule Engine
 
-The rule engine used for Jona is a so called hybrid rule engine, which means, that rules can derive new knowledge from given knowledge, called forward chaining, or rules can be used to prove a hypothesis by reducing it to more and more simple questions until all those question has been answered or no more possibilities are available, which means, that the prove fails. This is called backward chaining and the most prominent representative of this kind is the logical language Prolog.
+The rule engine used for Jona is a so called hybrid rule engine, which means, that rules can derive new knowledge from given knowledge, called forward chaining, or rules can be used to prove a hypothesis by reducing it to more and more simple questions until all those question has been answered or no more possibilities are available, which means, that the hypothesis is considered to be false. This is called backward chaining and the most prominent representative for this kind of logical computation is the programming language Prolog.
 
-Forward chaining rules in Jona look like this:
+Jonas forward chaining rules look like this:
 
 	{All: [?Pitstop.Plan], [?Tyre.Pressure.Target.FL]} =>
 		(Set: Pitstop.Planned.Tyre.Pressure.FL, ?Tyre.Pressure.Target.FL),
 		(Set: Pitstop.Planned.Tyre.Pressure.FL.Increment, !Tyre.Pressure.Target.FL.Increment)
 
-This rule for example, is triggered, when a new pitstop plan had been requested (*[?Pitstop.Plan]*) and when at the same time a target pressure for the front left tyre had been derived (by another rule). The rule the *fires* and thereby copies this information to the pitstop plan.
+This rule, for example, is triggered, when a new pitstop plan had been requested (*[?Pitstop.Plan]*) and when at the same time a target pressure for the front left tyre had been derived (typically by another rule). The rule above then *fires* and thereby copies this information to the pitstop plan.
 
-A backword chaining rule is typically used to calculate and looks like this:
+A backword chaining rule is typically used for calculations and looks like this:
 
 	updateRemainingLaps(?lap) <=
-		remainingStintLaps(?lap, ?stintLaps), remainingRaceLaps(?lap, ?raceLaps),											\
+		remainingStintLaps(?lap, ?stintLaps), remainingRaceLaps(?lap, ?raceLaps),
 		?stintLaps < ?raceLaps, Set(Lap.Remaining, ?stintLaps)
 
 	lowFuelWarning(?lap, ?remainingLaps) <= pitstopLap(?lap), !, fail
 	lowFuelWarning(?lap, ?remainingLaps) <= Call(lowFuelWarning, ?remainingLaps)
 	
-In this example, the rule *updateRemainingLaps* calculates the number of laps, which remains with the current amount of fuel. The result is updated in the memory as the *Lap.Remaining* fact, which might trigger other rules. One of these rules might then call *lowFuelWarning*, the second part of the example above. This rule calls the external function *lowFuelWarning*, which in the end might trigger Jona to call you and tell you, that you are running out of fuel. But this call is only issued, when the current lap (*?lap*) is not a lap, where a pitstop has been performed.
+In this example, the rule *updateRemainingLaps* calculates the number of laps, which remains with the current amount of fuel. Or, as an alternative route, it might consider the remaining stint time of the current driver. The result is then updated in the memory as the *Lap.Remaining* fact, which might trigger other rules. One of these rules might then call *lowFuelWarning*, the second part of the example above. This rule calls the external function *lowFuelWarning*, which in the end let Jona call you and tell you, that you are running out of fuel. As you can see by the first instance of the rule *lowFuelWarning*, this call is only issued, when the current lap (*?lap*) is not a lap, where the driver has pitted.
 
-You can find the rules of Jona in the file *Race Engineer.rules* which resides in the *Config* folder in the installation folder of Simulator Controller. As always, you are able to overwrite this file by placing a (modified) copy in the *Simulator Controller\Config* folder in your user documents folder. This might be or might not be a good idead depending on your programming skills in logical languages.
+You can find the rules of Jona in the file *Race Engineer.rules* which resides in the *Config* folder in the installation folder of Simulator Controller. As always, you are able to overwrite this file by placing a (modified) copy in the *Simulator Controller\Config* folder in your user documents folder. This might be or might not be a good idea, depending on your programming skills in logical languages.
 
 ### Interaction States
 
-At this time, Jona can handle three import states in its knowledge base.
+At this time, Jona can handle three important states in its knowledge base.
 
   - A pitstop has been planned
-  - A pitstop has been prepared, which means that all the settings had been setup in the Pitstop MFD of *Assetto Corsa Competizione*
-  - The car is in the pit and a pitstop takes place
+  - A pitstop has been prepared, which means that all the settings had been transferred to the Pitstop MFD of *Assetto Corsa Competizione*
+  - The car is in the pit and the crew is working on the car
   
-You can trigger the first two states, as long as logical for the given situation, by setting the facts *Pitstop.Plan* or *Pitstop.Prepare* to *true* in the knowledge base. The rule network will do th rest. An undertaken pitstop must be triggered by setting *Pitstop.Lap* to the lap number, where the driver pitted. All this is handled by the *RaceEngineer* class already, so there is no need to do this at the knowledgebase level, but it is important to understand, that these states exist to undertstand Jonas reactions to your requests. For example, Jona first wants to plan a pitstop before you enter the pit, which is quite logical, right?
+You can trigger the first two states, as long as logical for the given situation, by setting the facts *Pitstop.Plan* or *Pitstop.Prepare* to *true* in the knowledge base. The rule network will do the rest. An undertaken pitstop must be triggered by setting *Pitstop.Lap* to the lap number, where the driver pitted. All this is handled by the *RaceEngineer* class already, so there is no need to do this at the knowledge base level. But it is important to know, that these states exist, in order to undertstand Jonas reactions to your requests. For example, Jona first wants to plan a pitstop before you enter the pit, which is quite logical, right?
 
 ### Jonas Memory
 
 The content of the knowledgbase of Jona or the facts, as these are called in the world of rule engines, can be divided into three categories:
 
-  - Historic information. Here all recent laps and pitstops are memorized to build a base of historic data for trend anlysis.
-  - Derived future information. In this category fall the state information described above, for example the values for the next pitstop.
-  - Real working memory. Jona constantly calculates future trends and events, like low fuel in a few laps. These projected values are stored in the memory as well.
+  - *Historical information:* Here, all recent laps and pitstops are memorized to build a base of historic data for trend anlysis.
+  - *Derived future information:* In this category fall the state information described above, for example the projected settings for the next pitstop.
+  - *Real working memory:* Jona constantly calculates future trends and events, like low fuel in a few laps. These projected values are stored in the memory as well.
   
-For historic information, the format is quite simple. All facts for a past lap start with *Lap.X* where X is the lap number. The same is true for pitstops, *Pitstop.X*, where X is the pitstop number here. Normally you will have many more laps than pitstops, except you are me in a reverse grid league race, hey?
-The derived future information is typically categorized by the first part of the fact name, for example *Tyre* for all knowledge about the current tyre state.
+For historical information, the format is quite simple. All facts for a past lap start with *Lap.X* where X is the lap number. A similar format is used for pitstops, *Pitstop.X*, where X is the pitstop number here. Normally you will have more laps than pitstops in the memory, except you are me in a reverse grid league race, hey?
+The derived future information is typically categorized by the first part of the fact name, for example *Tyre* for all knowledge about the current and projected tyre state.
 
 You can take a look at the knowledge base by enabling "Debug" mode in the configuration, as described in the [Troubleshooting}(https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#troubleshooting) section. By doing this, you will pay a performance penalty, which might or might not be noticeable depending on your hardware.
 
 ### Telemetry Integration
 
-The most important part of the knowledge of Jona comes from the telemetry information of the simulation game. As said, a data provider for *Assetto Corsa Competizione* exists and is used by the ACC plugin to load the data and hand it over to Jona. A small spplication "ACC SHM Reader.exe", which is located in the *Binaries* folder, is used to acquire the data. This reader ist run periodically and outputs the following data:
+A considerable part of the knowledge of Jona comes from the telemetry information of the simulation game. As said, a data provider for *Assetto Corsa Competizione* is already builtin and is used by the ACC plugin to load the data and hand it over to Jona. A small spplication "ACC SHM Reader.exe", which is located in the *Binaries* folder, is used to acquire the data. This reader ist run periodically and outputs the following data:
 
 	[Car Data]
 	AirTemperature=24.9965
@@ -293,11 +294,12 @@ The most important part of the knowledge of Jona comes from the telemetry inform
 	TyreTemperature=82.8184, 71.4197, 86.3127, 77.3212
 	[Race Data]
 	Car=mclaren_720s_gt3
-	DriverName=BigO
-	DriverNick=TBO
 	FuelAmount=125
 	Track=Barcelona
 	[Stint Data]
+	DriverForname=The
+	DriverSurname=BigO
+	DriverNickname=TBO
 	Active=true
 	InPit=false
 	LapBestTime=110091
@@ -305,22 +307,22 @@ The most important part of the knowledge of Jona comes from the telemetry inform
 	Laps=2
 	TimeRemaining=2.47009e+06
 		
-The shared memory of *Assetto Corsa Competizione* provides a lot more information, but this is all that is needed for Jona at the momemnt. Future versions of Jona will incorporate more data, as Jona gets smarter. Unfortunately, the shared memory interface of *Assetto Corsa Competizione* does not provide any weather information, car setup information at the moment, but time will tell.
+The shared memory of *Assetto Corsa Competizione* provides a lot more information, but this is all that is needed for Jona at the momemnt. Future versions of Jona will incorporate more data, as Jona gets smarter. Unfortunately, the shared memory interface of *Assetto Corsa Competizione* does not provide any weather or car setup information at the moment, but time will tell.
 
-The ACC plugin writes this information to a temporary file and hands it over to Jona for each new lap. A special case is the flag *InPit*. If this is found to be *true*, the driver is currently in the pit. In this case, the ACC plugin informs Jona, that a pitstop is currently been undertaken, by raising the corresponding event. Another special case is the flag *Active* which is used to detect, whether you are in a simulation (race, training, whatever) right now.
+The ACC plugin writes this information to a temporary file and hands it over to Jona for each new lap. A special case is the flag *InPit*. If this is found to be *true*, the driver is currently in the pit. In this case, the ACC plugin informs Jona about this by raising the corresponding event. Another special case is the flag *Active* which is used to detect, whether you are in a simulation (race, training, whatever) right now.
 
 Note: If you are a developer and want to take the challenge to adopt Jona to a different simulation game, you are welcome. You can use the ACC plugin code and the above file format as a blueprint. Please feel free to contact me, if you have questions. I would be happy to integrate plugins for other simulation games into Simulator Controller in the future.
 
 ## Troubleshooting
 
-The biggest hurdle to overcome, when using Jona, is to find a satisfying setting for voice recognition. Here are some tipps:
+The biggest hurdle to overcome when using Jona, is to find a satisfying setting for voice recognition. Here are some hints:
 
-  - I strongly recommend to use a head set. Although it is possible, and I have tested it myself, to talk to Jona using a desktop or webcam microfone, while the V12 sound from the Aston Martin is hammering from the speakers, you will get a couple of false positives in this scenario. You have been warned...
-  - Even when using headset, you might get false positives. The reason for that typically is a too sensitive microphone level. Reduce the input level of the microphone as low as possible in the Windows audio devices settings.
+  - I strongly recommend to use a head set. Although it is possible, and I have tested it myself, to talk to Jona using a desktop or webcam microphone, it is hard to find a satisfying setup. Typically, you will get a couple of false positives in this scenario, while the V12 sound from the Aston Martin is hammering from the speakers. You have been warned...
+  - Even when using headset, you might get false positives. The reason for that, normally is a too sensitive microphone level. Reduce the input level of the microphone as low as possible in the Windows audio devices settings, so that Jona still recognizes your spoken words, but does not interpret your sighs and breath noises as valid input.
   - If voice recognition is not working at all, you might need to unblock the DLLs. Follow the instructions in the [installation section](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#installation-of-speech-recognition-libraries) above.
-  - Most import: Learn the phrases, which are defined as input for Jona. Sometimes, only a somewhat different pronounciation is needed and everything is fine. As a last line of defence, define your own input grammar as described above in the section about [phrase grammars](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#phrase-grammars). But doing this makes your upgrade path for future versions much more complicated. 
+  - Most import: Learn the phrases, which are defined as input for Jona. Sometimes, only a somewhat different pronounciation is needed, and everything is fine. As a last line of defence, define your own input grammar as described above in the section about [phrase grammars](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#phrase-grammars). But doing this will make your upgrade path for future versions much more complicated. 
 
-Beside that, when you encounter false recommendations from Jona, you might take a look into the brain of Jona, to see, why Jona arrived at those conclusions. You can do this by eenabling "Debug" mode in the configuration. When you are then usign Jona again, it will periodically dump its knowledge to the file "Race Engineer.knowledge" in the folder *Simulator Controller\Temp* that resides in your user documents folder.
+Beside that, when you encounter false recommendations from Jona, you might take a look into the brain of Jona to see, why Jona arrived at those conclusions. You can do this by enabling "Debug" mode in the configuration. In the next run, Jona will periodically dump its knowledge to the file "Race Engineer.knowledge" in the folder *Simulator Controller\Temp* that resides in your user documents folder. If you think, that you found a bug, it  would be very helpful for me, when you attach this file to any reported issue.
 
-And last, but not least, you might have a problem with the Shared Memory Reader for *Assetto Corsa Competizione*. Please check, if a file "SHM.data" exists in the *Simulator Controller\Temp\ACC Data* folder, which is located in your user documents folder. If this file does not exist, you might try a complete reinstall.
+And, last but not least, you might have a problem with the Shared Memory Reader for *Assetto Corsa Competizione*. Please check, if a file "SHM.data" exists in the *Simulator Controller\Temp\ACC Data* folder, which is located in your user documents folder. If this file does not exist, you might try a complete reinstall.
   

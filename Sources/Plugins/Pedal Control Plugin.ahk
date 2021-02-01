@@ -14,6 +14,23 @@ global kPedalProfileMode = "Pedal Profile"
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                        Private Constant Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global kCurveShapes := ["Linear", "Sense+1", "Sense+2", "Sense-1", "Sense-2", "S-Shape", "S on Side", "Slow Start", "Slow End"]
+
+global kClutchXPosition = 235
+global kBrakeXPosition = 555
+global kThrottleXPosition = 875
+global kAllYPosition := 315
+
+global kOptionYDelta := 20
+
+global kSaveToPedalX := 940
+global kSaveToPedalY := 785
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -27,6 +44,20 @@ class PedalControlPlugin extends ControllerPlugin {
 				return kPedalProfileMode
 			}
 		}
+	}
+	
+	class CurveShapeAction extends ControllerAction {
+		iSelectionIndex := false
+		iSelectionXPosition := false
+	}
+	
+	class BrakeCurveShapeAction extends PedalControlPlugin.CurveShapeAction {
+		
+	
+	}
+	
+	class ThrottleCurveShapeAction extends PedalControlPlugin.CurveShapeAction {
+	
 	}
 	
 	__New(controller, name, configuration := false) {

@@ -295,7 +295,7 @@ exitStartup(sayGoodbye := false) {
 	if (sayGoodbye && (vSimulatorControllerPID != false)) {
 		raiseEvent("Startup", "startupExited")
 		
-		SetTimer exitStartup, -1000
+		SetTimer exitStartup, -2000
 		
 		Exit
 	}

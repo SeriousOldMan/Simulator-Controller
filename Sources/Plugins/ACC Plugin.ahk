@@ -335,7 +335,7 @@ class ACCPlugin extends ControllerPlugin {
 		controller.registerPlugin(this)
 	
 		if (useRaceEngineer || (engineerSpeaker != false))
-			SetTimer collectRaceData, 1000
+			SetTimer collectRaceData, 10000
 	}
 	
 	loadFromConfiguration(configuration) {

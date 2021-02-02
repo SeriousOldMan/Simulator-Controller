@@ -159,10 +159,13 @@ lastPressure(?compound, ?tyreType, ?pressure) <= setupPressure(?compound, ?tyreT
 ;;; significant lap time reduction.                                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-{Any: [?Lap], {None: [?Damage.Repair.Suspension.Target]}, [?Damage.Update.Suspension]} =>														\
-		(Prove: updateSuspensionRepair, ?Lap), (Clear: Damage.Update.Suspension)
-{Any: [?Lap], {None: [?Damage.Repair.Bodywork.Target]}, [?Damage.Update.Bodywork]} =>															\
-		(Prove: updateBodyworkRepair, ?Lap), (Clear: Damage.Update.Bodywork)
+priority: 10, {Any: [?Lap], {None: [?Damage.Repair.Suspension.Target]}, [?Damage.Update.Suspension]} => (Prove: updateSuspensionRepair, ?Lap)
+priority: 10, {Any: [?Lap], {None: [?Damage.Repair.Bodywork.Target]}, [?Damage.Update.Bodywork]} => (Prove: updateBodyworkRepair, ?Lap)
+
+{Any: [?Lap], {Any: [?Damage.Update.Suspension], [?Damage.Update.Bodywork]}} => (Prove: reportNewDamage, ?Lap)
+
+priority: -10, {Any: [?Damage.Update.Suspension], [?Damage.Update.Bodywork]} => (Clear: Damage.Update.Suspension),								\
+																				(Clear: Damage.Update.Bodywork)
 
 updateSuspensionRepair(?lap) <= lapDamage(?lap, Suspension, ?damage), repairDamage(Suspension, ?damage),										\
 								Set(Damage.Repair.Suspension.Target, true), !
@@ -189,8 +192,6 @@ repairDamage(?, Always, ?)
 repairDamage(?type, Threshold, ?damage) <= Append(?fact, Race.Settings.Damage., ?type, .Repair.Threshold),										\
 										   Get(?threshold, ?fact), ?damage > ?threshold
 repairDamage(?, Impact, ?) <= notYetImplemented()
-
-[?Lap] => (Prove: reportNewDamage, ?Lap)
 
 reportNewDamage(?lap) <= pitstopLap(?lap), !, fail
 reportNewDamage(1) <= !, lapDamage(?lap, Suspension, ?lSDamage), lapDamage(?lap, Bodywork, ?lBDamage),											\

@@ -1035,16 +1035,18 @@ class RaceEngineer extends ConfigurationItem {
 			newValue := Round(tyrePressures[index], 2)
 			fact := ("Lap." . lapNumber . ".Tyre.Pressure." . tyreType)
 		
-			if (Abs(knowledgeBase.getValue(fact) - newValue) > threshold)
+			if (Abs(knowledgeBase.getValue(fact) - newValue) > threshold) {
+				knowledgeBase.setValue(fact, newValue)
+				
 				changed := true
-			
-			knowledgeBase.setValue(fact, newValue)
+			}
 		}
 		
-		if changed
+		if changed {
 			knowledgeBase.addValue("Tyre.Update.Pressure", true)
 		
-		needProduce := (needProduce || changed)
+			needProduce := true
+		}
 		
 		tyreTemperatures := string2Values(",", getConfigurationValue(data, "Car Data", "TyreTemperature", ""))
 		
@@ -1058,16 +1060,18 @@ class RaceEngineer extends ConfigurationItem {
 			newValue := Round(bodyworkDamage[index], 2)
 			fact := ("Lap." . lapNumber . ".Damage.Bodywork." . position)
 		
-			if (Round(knowledgeBase.getValue(fact, 0), 2) != newValue)
+			if (Round(knowledgeBase.getValue(fact, 0), 2) != newValue) {
+				knowledgeBase.setValue(fact, newValue)
+				
 				changed := true
-			
-			knowledgeBase.setValue(fact, newValue)
+			}
 		}
 		
-		if changed
+		if changed {
 			knowledgeBase.addValue("Damage.Update.Bodywork", true)
 		
-		needProduce := (needProduce || changed)
+			needProduce := true
+		}
 		
 		suspensionDamage := string2Values(",", getConfigurationValue(data, "Car Data", "SuspensionDamage", ""))
 		changed := false
@@ -1076,16 +1080,18 @@ class RaceEngineer extends ConfigurationItem {
 			newValue := Round(suspensionDamage[index], 2)
 			fact := ("Lap." . lapNumber . ".Damage.Suspension." . position)
 		
-			if (Round(knowledgeBase.getValue(fact, 0), 2) != newValue)
+			if (Round(knowledgeBase.getValue(fact, 0), 2) != newValue) {
+				knowledgeBase.setValue(fact, newValue)
+				
 				changed := true
-			
-			knowledgeBase.setValue(fact, newValue)
+			}
 		}
 		
-		if changed
+		if changed {
 			knowledgeBase.addValue("Damage.Update.Suspension", true)
 		
-		needProduce := (needProduce || changed)
+			needProduce := true
+		}
 		
 		if needProduce {
 			result := knowledgeBase.produce()

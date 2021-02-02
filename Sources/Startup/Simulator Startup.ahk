@@ -269,16 +269,30 @@ class SimulatorStartup extends ConfigurationItem {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+watchStartupSemaphore() {
+	if !FileExist(kUserHomeDirectory . "Temp\Startup.semaphore")
+		exitStartup()
+}
+
 startSimulator() {
 	icon := kIconsDirectory . "Start.ico"
 		
 	Menu Tray, Icon, %icon%, , 1
 	
-	registerEventHandler("Startup", "handleStartupEvents")
+	; Looks like we have recurring deadlock situations with bidirectional pipes in case of process exit situations...
+	;
+	; registerEventHandler("Startup", "handleStartupEvents")
+	;
+	; Using a sempahore file instead...
 	
-	settings := readConfiguration(kSimulatorSettingsFile)
+	fileName := (kUserHomeDirectory . "Temp\Startup.semaphore")
 	
-	new SimulatorStartup(kSimulatorConfiguration, settings).startup()
+	if !FileExist(fileName)
+		FileAppend Startup, %fileName%
+	
+	SetTimer watchStartupSemaphore, 2000
+						
+	new SimulatorStartup(kSimulatorConfiguration, readConfiguration(kSimulatorSettingsFile)).startup()
 }
 
 playSongRemote() {
@@ -310,8 +324,18 @@ exitStartup(sayGoodbye := false) {
 		
 		Exit
 	}
-	else
+	else {
+		fileName := (kUserHomeDirectory . "Temp\Startup.semaphore")
+						
+		try {
+			FileDelete %fileName%
+		}
+		catch exception {
+			; ignore
+		}
+
 		ExitApp 0
+	}
 }
 
 handleStartupEvents(event, data) {

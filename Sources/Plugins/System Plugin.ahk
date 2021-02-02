@@ -210,8 +210,22 @@ class SystemPlugin extends ControllerPlugin {
 	}
 	
 	simulatorStartup(simulator) {
-		if this.ChildProcess
-			raiseEvent("Startup", "exitStartup")
+		if this.ChildProcess {
+			; Looks like we have recurring deadlock situations with bidirectional pipes in case of process exit situations...
+			;
+			; raiseEvent("Startup", "exitStartup")
+			;
+			; Using a sempahore file instead...
+			
+			fileName := (kUserHomeDirectory . "Temp\Startup.semaphore")
+						
+			try {
+				FileDelete %fileName%
+			}
+			catch exception {
+				; ignore
+			}
+		}
 	
 		base.simulatorStartup(simulator)
 	}

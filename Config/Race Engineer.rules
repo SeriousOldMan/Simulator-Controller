@@ -99,7 +99,7 @@ nextTyreSet() <= Set(Tyre.Set.Target, !Race.Setup.Tyre.Set.Fresh)
 ;;; "Race.Settings.Lap.History.Weight".                                     ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-{Any: [?Lap], {None: [?Tyre.Set.Target]}} => (Prove: updateTyrePressureDeviation, ?Lap)
+{Any: [?Lap], {None: [?Tyre.Set.Target]}, [?Tyre.Update.Pressure]} => (Prove: updateTyrePressureDeviation, ?Lap), (Clear: Tyre.Update.Pressure)
 
 updateTyrePressureDeviation(?lap) <= tyrePressureDeviation(?lap, [FL, FR, RL, RR], ?deviations), 												\
 									 updateTargetPressures([FL, FR, RL, RR], ?deviations)
@@ -142,7 +142,7 @@ updateTargetPressure(?compound, ?tyreType, ?deviation) <= lastPressure(?compound
 [?Tyre.Pressure.Target.RL] => (Prove: updateTargetPressureIncrement, !Tyre.Compound.Target, RL)
 [?Tyre.Pressure.Target.RR] => (Prove: updateTargetPressureIncrement, !Tyre.Compound.Target, RR)
 
-updateTargetPressureIncrement(?compound, ?tyreType) <=																						\
+updateTargetPressureIncrement(?compound, ?tyreType) <=																							\
 		setupPressure(?compound, ?tyreType, ?basePressure), Append(?targetFact, Tyre.Pressure.Target., ?tyreType),								\
 		Get(?targetPressure, ?targetFact), ?increment = ?targetPressure - ?basePressure,														\
 		Append(?incrementFact, Tyre.Pressure.Target., ?tyreType, .Increment), Set(?incrementFact, ?increment)
@@ -159,8 +159,10 @@ lastPressure(?compound, ?tyreType, ?pressure) <= setupPressure(?compound, ?tyreT
 ;;; significant lap time reduction.                                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-{Any: [?Lap], {None: [?Damage.Repair.Suspension.Target]}} => (Prove: updateSuspensionRepair, ?Lap)
-{Any: [?Lap], {None: [?Damage.Repair.Bodywork.Target]}} => (Prove: updateBodyworkRepair, ?Lap)
+{Any: [?Lap], {None: [?Damage.Repair.Suspension.Target]}, [?Damage.Update.Suspension]} =>														\
+		(Prove: updateSuspensionRepair, ?Lap), (Clear: Damage.Update.Suspension)
+{Any: [?Lap], {None: [?Damage.Repair.Bodywork.Target]}, [?Damage.Update.Bodywork]} =>															\
+		(Prove: updateBodyworkRepair, ?Lap), (Clear: Damage.Update.Bodywork)
 
 updateSuspensionRepair(?lap) <= lapDamage(?lap, Suspension, ?damage), repairDamage(Suspension, ?damage),										\
 								Set(Damage.Repair.Suspension.Target, true), !

@@ -92,6 +92,10 @@ class ACCPlugin extends ControllerPlugin {
 			return this.callRemote("addLap", arguments*)
 		}
 		
+		updateLap(arguments*) {
+			return this.callRemote("addLap", arguments*)
+		}
+		
 		planPitstop(arguments*) {
 			return this.callRemote("planPitstop", arguments*)
 		}
@@ -1003,6 +1007,13 @@ class ACCPlugin extends ControllerPlugin {
 			Throw "Lap data can only be added during an active race..."
 	}
 	
+	updateLap(lapNumber, dataFile) {
+		if this.ActiveRace
+			this.RaceEngineer.updateLap(lapNumber, dataFile)
+		else
+			Throw "Lap data can only be updated during an active race..."
+	}
+	
 	planPitstop() {
 		if this.ActiveRace
 			this.RaceEngineer.planPitstop()
@@ -1261,6 +1272,7 @@ changePitstopDriver(selection) {
 
 collectRaceData() {
 	static lastLap := 0
+	static lastLapCounter := 0
 	static inPit := false
 	static plugin := false
 	
@@ -1318,12 +1330,21 @@ collectRaceData() {
 					plugin.startRace(dataFile)
 				
 				lastLap := dataLastLap
+				lastLapCounter := 1
 
 				plugin.addLap(dataLastLap, dataFile)
 				
 				if isDebug()
-					writeConfiguration(kUserHomeDirectory . "Temp\ACC Data\Lap " . lastLap . ".data", data)
+					writeConfiguration(kUserHomeDirectory . "Temp\ACC Data\Lap " . lastLap . ".1.data", data)
 				
+				inPit := false
+			}
+			else {
+				plugin.updateLap(dataLastLap, dataFile)
+				
+				if isDebug()
+					writeConfiguration(kUserHomeDirectory . "Temp\ACC Data\Lap " . lastLap . "." . ++lastLapCounter . ".data", data)
+			
 				inPit := false
 			}
 			

@@ -899,7 +899,6 @@ class RaceEngineer extends ConfigurationItem {
 	
 	addLap(lapNumber, data) {
 		local knowledgeBase
-		local facts
 		
 		static baseLap := false
 		
@@ -1017,6 +1016,87 @@ class RaceEngineer extends ConfigurationItem {
 			dumpKnowledge(this.KnowledgeBase)
 		
 		return result
+	}
+	
+	updateLap(lapNumber, data) {
+		local knowledgeBase := this.KnowledgeBase
+		local fact
+		
+		if !IsObject(data)
+			data := readConfiguration(data)
+		
+		needProduce := false
+		
+		tyrePressures := string2Values(",", getConfigurationValue(data, "Car Data", "TyrePressure", ""))
+		threshold := knowledgeBase.getValue("Race.Settings.Tyre.Pressure.Deviation")
+		changed := false
+		
+		for index, tyreType in ["FL", "FR", "RL", "RR"] {
+			newValue := Round(tyrePressures[index], 2)
+			fact := ("Lap." . lapNumber . ".Tyre.Pressure." . tyreType)
+		
+			if (Abs(knowledgeBase.getValue(fact) - newValue) > threshold)
+				changed := true
+			
+			knowledgeBase.setValue(fact, newValue)
+		}
+		
+		if changed
+			knowledgeBase.addValue("Tyre.Update.Pressure", true)
+		
+		needProduce := (needProduce || changed)
+		
+		tyreTemperatures := string2Values(",", getConfigurationValue(data, "Car Data", "TyreTemperature", ""))
+		
+		for index, tyreType in ["FL", "FR", "RL", "RR"]
+			knowledgeBase.setValue("Lap." . lapNumber . ".Tyre.Temperature." . tyreType, Round(tyreTemperatures[index], 2))´
+		
+		bodyworkDamage := string2Values(",", getConfigurationValue(data, "Car Data", "BodyworkDamage", ""))
+		changed := false
+		
+		for index, position in ["Front", "Rear", "Left", "Right", "Center"] {
+			newValue := Round(bodyworkDamage[index], 2)
+			fact := ("Lap." . lapNumber . ".Damage.Bodywork." . position)
+		
+			if (Round(knowledgeBase.getValue(fact, 0), 2) != newValue)
+				changed := true
+			
+			knowledgeBase.setValue(fact, newValue)
+		}
+		
+		if changed
+			knowledgeBase.addValue("Damage.Update.Bodywork", true)
+		
+		needProduce := (needProduce || changed)
+		
+		suspensionDamage := string2Values(",", getConfigurationValue(data, "Car Data", "SuspensionDamage", ""))
+		changed := false
+		
+		for index, position in ["FL", "FR", "RL", "RR"] {
+			newValue := Round(suspensionDamage[index], 2)
+			fact := ("Lap." . lapNumber . ".Damage.Suspension." . position)
+		
+			if (Round(knowledgeBase.getValue(fact, 0), 2) != newValue)
+				changed := true
+			
+			knowledgeBase.setValue(fact, newValue)
+		}
+		
+		if changed
+			knowledgeBase.addValue("Damage.Update.Suspension", true)
+		
+		needProduce := (needProduce || changed)
+		
+		if needProduce {
+			result := knowledgeBase.produce()
+			
+			if this.Debug[kDebugKnowledgeBase]
+				dumpKnowledge(this.KnowledgeBase)
+			
+			return result
+		}
+		else
+			return true
 	}
 	
 	hasEnoughData() {

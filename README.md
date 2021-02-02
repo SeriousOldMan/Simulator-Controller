@@ -57,6 +57,7 @@ Release 2.0 introduced a new automated update mechanism for local configuration 
   - Several plugins are supplied out of the box:
     - Support for Assetto Corsa and Assetto Corsa Competizione already builtin
     - Fully customizable plugins supplied for total control of SimHub and SimFeedback - change your settings while racing using the dials and switches on your favorite Button Box
+	- Control the calibration curves of your high end pedals by a simple button press with the plugin for the Heusinkveld pedal family
     - Send your predefined kudos and rants to the ingame chat without touching the keyboard
   - Additional support to trigger every function and action from external sources like a voice or gesture recognition software to always keep your hands on the wheel
   - Builtin support for visual head tracking to control ingame viewing angle - see [third party applications](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications) below
@@ -81,6 +82,7 @@ These plugins are part of the Simulator Controller distribution. Beside providin
 | System | Handles multiple Button Box layers and manages all applications configured for your simulation configuration. |
 | Tactile Feedback | Fully configurable support for pedal and chassis vibration using [SimHub](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications). |
 | Motion Feedback | Fully configurable support for rig motion feedback using [SimFeedback](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications). |
+| Pedal Calibration | Allows to choose between the different calibration curves of your high end pedals directly from the hardware controller. |
 | ACC | Special support for starting and stopping Assetto Corsa Competizione from your hardware controller and supplies functions and actions for configurable, automated chat messages in a multiplayer game. Additionally, beginning with Release 2.0, this plugin provides sophisticated support for the Pitstop MFD of *Assetto Corsa Competizione*. All settings may be tweaked using the controller hardware, but it is also possible to control the settings using voice control to keep your hands on the steering wheel. This plugin uses configuration based data, defines two simulator dependent modes and shows how to automate your simulation game. Therefore it supplies a good showcase when starting your own plugin development. |
 | AC | Special support for starting and stopping Assetto Corsa from your hardware controller. |
 | Button Box | Tools for building your own Button Box / controller visuals. An easy to understand example will help you building the screen representation of your own Button Boxes. |

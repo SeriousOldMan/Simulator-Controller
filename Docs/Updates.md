@@ -20,6 +20,8 @@ You have three possibilities here:
 
 Let's start with some low level information, to give you an understanding, what happens in the background, when an automated update is processed. A new file has been created in the *Simulator Controller\Config* folder. It is named *UPDATES* and keeps track of already performed updates. If it is missing or does not contain information for the current release (or releases you missed out), the update procedure will start. After the update finished sucessfully, this will be noted in the *UPDATES* file. And here is the trick, if you have chosen "Never" in the dialog above: Just open this file with a text editor and delete the lines for the releases in question and you will be fine.
 
+IMPORTANT: When you already installed and used an alpha or beta release for one of the releases described below, it might be necessary to rerun the update procedure for the final release to be sure to include all necessary updates. The procedure is the same as described above, just delete the corresponding line from the *UPDATES* file, and the update procedure will take care of the rest.
+
 When the automated update procedure runs, there are some standard task, that are performed for each release and there are release specific tasks. You will will find the release specific information for each release below. Typical standard tasks might be:
 
   * Update of all translation files
@@ -52,7 +54,9 @@ Important: Jona will handle the ACC Pitstop MFD by using the functionality intro
 
 If you are updating to Release 2.1 from an earlier version, Jona will be activated for the ACC Plugin, but without voice recognition support, since you might have to install the [required Windows libraries](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#installation-of-speech-recognition-libraries) beforehand. You can activate voice recognition anytiem later by adding the correspnding argument to the [ACC plugin in the configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-acc).
 
-Beside that, all other changes for Release 2.1, for example for the translation files, should be handled by the automated update procedure as described above. As always, it might be a good idea to make a backup copy of your local files, just to be on the safe side.
+Another new feature of Release 2.1 introduces the all new [plugin "Pedal Calibration"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-pedal-calibration) for the Button Box controller. This plugin allows you to control the different calibration curves of your high end pedals directly from the Button Box. The plugin "Pedal Calibration" plugin will be added to your local configuration by the automated update procedure described above, but it will be deactivated. Activate as needed...
+
+Beside that, all other changes for Release 2.1, for example for the translation files, should be handled by the automated update procedure as well. As always, it might be a good idea to make a backup copy of your local files before you start the first application of Simulator Controller after updating the files, just to be on the safe side.
 
 ***
 

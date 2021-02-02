@@ -6,7 +6,7 @@
      - Configurable evaluation, whether a repair of suspension and/or bodywork damages will be performed
 	 - Automated setup of Pitstop MFD settings
 	 - Interactive dialog between driver and virtual race engineer using voice synthesis and recognition
-  2. [Target: V2.2][Pedal Calibration Plugin (new)] Switching between pedal characteristic curves for Heusinkveld pedals while driving
+  2. [Target: V2.1][Pedal Calibration Plugin (new)] Switching between pedal characteristic curves for Heusinkveld pedals while driving
   3. [Target: V2.5][ACC Plugin] Hot switching between different sets of ABS and TC settings using voice commands
   4. [Target: V3.0][ACC Plugin] Further enhancements AI based race engineer
 	 - Graphical user interface for initial race settings

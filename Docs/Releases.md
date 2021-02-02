@@ -3,7 +3,8 @@
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. Introduction of the alpha version of Jona, the AI based virtual race engineer. See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer) for a comprehensive overview of Jona.
-  4. A lot of new stuff for developers:
+  4. A new plugin "Pedal Calibration" allows you to dial in different calibration curves for your high end pedals (Heusinkveld) directly from the Button Box. An adoption to a different pedal vendor is without much effort possible.
+  5. A lot of new stuff for developers:
      - A hybrid rule engine, which supports production rules like OPS5 and reduction rules like in Prolog. The rules are fully integrated with the AutoHotkey scripting language, thereby creating a rich, hybrid programming environment
 	 - A unit testing framework
 	 - A speech generator class library
@@ -32,7 +33,7 @@
 
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. The ACC Plugin has been greatly extended to support complete hands-free control over all the pitstop settings. New controller actions can be connected to an external event source like VoiceMarco to control the pitstop settings by voice. What the driving instructor always said - keep your hands on the steering wheel. But for the button box lovers, a new plugin mode "Pitstop" supplies control of all pitstop settings from the hardware controller as well. Please be sure, to read the updated documentation on the [ACC Plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-acc) to get an understanding of all the new features.
+  3. The ACC Plugin has been greatly extended to support complete hands-free control over all the pitstop settings. New controller actions can be connected to an external event source like VoiceMarco to control the pitstop settings by voice. What the driving instructor always said - keep your hands on the steering wheel. But for the Button Box lovers, a new plugin mode "Pitstop" supplies control of all pitstop settings from the hardware controller as well. Please be sure, to read the updated documentation on the [ACC Plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-acc) to get an understanding of all the new features.
   4. A mostly [automatic update procedure](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#automated-update-procedure) for all user configurations has been implemented. When a new release package has been installed, the applications check, whether the user configurations needs to be adopted to the new version and perform the necessary changes as automatic as possible. A full [update information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) will acompany every release from now on for all possible additional steps to be performed by the user.
   5. Much better user experience in all list elements of the configuration editor. Single click selection is supported in every list and you can move around using the cursor keys. *Alt-S* as a shortcut to save the current edited element has also been implemented everywhere.
 
@@ -49,7 +50,7 @@
   5. All settings dialogs may be moved around by clicking in the main title
   6. All current effect settings will be displayed alternating with the corresponding effect name in the Button Box visual representation
      - Only available for the Motion Feedback plugin. Unfortunately, this is currently not possible for Tactile Feedback, since SimHub does not provide an interface for querying the current effect settings at this time
-  7. A new option is available in the configuration dialog, which allows the Button Box window to be centered on a secondary screen. Helpful, when opening the visual representation on a small display located next to the button box
+  7. A new option is available in the configuration dialog, which allows the Button Box window to be centered on a secondary screen. Helpful, when opening the visual representation on a small display located next to the Button Box
   8. Several Refactorings and Renames
      - Renamed "Simulator Configuration" => "Simulator Settings"
      - Renamed "Simulator Setup" => "Simulator Configuration"
@@ -61,7 +62,7 @@
   2. Documentation updates, as always
      - including a new Wiki page with the hottest backlog features
   3. New photorealistic Button Box Visuals - you will love it
-  4. You can now interact with the visual representation of the Button Box using the mouse and everything is functional, even if you don't have a hardware controller. So you can put your old button boxes on eBay - not.
+  4. You can now interact with the visual representation of the Button Box using the mouse and everything is functional, even if you don't have a hardware controller. So you can put your old Button Boxes on eBay - not.
   5. Button Box will be moveable by the mouse and the position might be saved according to configuration.
   6. Better window handling of SimFeedback. The main window will stay closed whenever possible.
   7. Introduced *shutdownSystem* controller action.

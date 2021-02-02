@@ -42,6 +42,7 @@ global kUpdateMessages = {updateToV15: "Updating configuration to "
 						, updateConfigurationForV20: "Updating configuration to ", updateTranslations: "Updating translations to "
 						, updatePluginLabels: "Updating plugin labels to "
 						, updateACCPluginForV20: "Updating ACC plugin to ", updateACCPluginForV21: "Updating ACC plugin to "
+						, updatePedalCalibrationPluginForV21: "Updating Pedal Calibration plugin to "
 						, updateConfigurationForV203: "Updating configuration to "}
 
 global kCompiler = kAHKDirectory . "Compiler\ahk2exe.exe"
@@ -500,6 +501,21 @@ updateACCPluginForV21() {
 			
 			accPlugin.saveToConfiguration(userConfiguration)
 		}
+		
+		writeConfiguration(userConfigurationFile, userConfiguration)
+	}
+}
+
+updatePedalCalibrationPluginForV21() {
+	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	userConfiguration := readConfiguration(userConfigurationFile)
+	
+	if (userConfiguration.Count() > 0) {
+		pedalPlugin := new Plugin("Pedal Calibration", readConfiguration(getFileName(kSimulatorConfigurationFile, kConfigDirectory)))
+		
+		pedalPlugin.iIsActive := false
+			
+		pedalPlugin.saveToConfiguration(userConfiguration)
 		
 		writeConfiguration(userConfigurationFile, userConfiguration)
 	}

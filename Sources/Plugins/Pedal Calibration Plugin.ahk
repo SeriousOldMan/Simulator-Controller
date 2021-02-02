@@ -17,7 +17,7 @@ global kPedalCalibrationMode = "Pedal Calibration"
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kCurveShapes := ["Linear", "Sense+1", "Sense+2", "Sense-1", "Sense-2", "S-Shape", "S on Side", "Slow Start", "Slow End"]
+global kCurveShapes := ["Linear", "Sense+1", "Sense+2", "Sense-1", "Sense-2", "S-Shape", "S on Side", "Slow Start", "Slow End", "Custom"]
 
 /* For SmartControl Version 1.3+ - but not working at the moment, due to an error in SmartControl...
 global kClutchXPosition = 235

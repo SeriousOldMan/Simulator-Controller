@@ -309,7 +309,7 @@ class RaceEngineer extends ConfigurationItem {
 			if !this.iSpeechRecognizer.startRecognizer() {
 				if retry {
 					function := ObjBindMethod(this, "startListening", true)
-					???? => prüfen, wie oft das passiert
+					
 					SetTimer %function%, -200
 				}
 				

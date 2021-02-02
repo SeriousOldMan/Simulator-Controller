@@ -162,7 +162,7 @@ lastPressure(?compound, ?tyreType, ?pressure) <= setupPressure(?compound, ?tyreT
 priority: 10, {Any: [?Lap], {None: [?Damage.Repair.Suspension.Target]}, [?Damage.Update.Suspension]} => (Prove: updateSuspensionRepair, ?Lap)
 priority: 10, {Any: [?Lap], {None: [?Damage.Repair.Bodywork.Target]}, [?Damage.Update.Bodywork]} => (Prove: updateBodyworkRepair, ?Lap)
 
-{Any: [?Lap], {Any: [?Damage.Update.Suspension], [?Damage.Update.Bodywork]}} => (Prove: reportNewDamage, ?Lap)
+{Any: [?Lap], [?Damage.Update.Suspension], [?Damage.Update.Bodywork]} => (Prove: reportNewDamage, ?Lap)
 
 priority: -10, {Any: [?Damage.Update.Suspension], [?Damage.Update.Bodywork]} => (Clear: Damage.Update.Suspension),								\
 																				(Clear: Damage.Update.Bodywork)
@@ -194,11 +194,9 @@ repairDamage(?type, Threshold, ?damage) <= Append(?fact, Race.Settings.Damage., 
 repairDamage(?, Impact, ?) <= notYetImplemented()
 
 reportNewDamage(?lap) <= pitstopLap(?lap), !, fail
+reportNewDamage(?lap) <= pitstopLap(?pitstopLap), ?pitstopLap = ?lap - 1, !, fail
 reportNewDamage(1) <= !, lapDamage(?lap, Suspension, ?lSDamage), lapDamage(?lap, Bodywork, ?lBDamage),											\
 						 reportNewDamage(0, ?lSDamage, 0, ?lBDamage)
-reportNewDamage(?lap) <= lapDamage(?lap, Suspension, ?lSDamage), lapDamage(?lap, Bodywork, ?lBDamage),											\
-						 ?pLap = ?lap - 1, lapDamage(?pLap, Suspension, ?pSDamage), lapDamage(?pLap, Bodywork, ?pBDamage),						\
-						 reportNewDamage(?pSDamage, ?lSDamage, ?pBDamage, ?lBDamage)
 reportNewDamage(?lap) <= pitstopLap(?pitstopLap), ?pitstopLap = ?lap - 1,																		\
 						 pitstopRepairDamage(Suspension, ?suspensionRepaired), pitstopRepairDamage(Bodywork, ?bodyworkRepaired),				\
 						 lapDamage(?lap, Suspension, ?lSDamage), lapDamage(?lap, Bodywork, ?lBDamage),											\
@@ -208,6 +206,9 @@ reportNewDamage(?lap) <= pitstopLap(?pitstopLap), ?pitstopLap = ?lap - 1,							
 reportNewDamage(?lap) <= pitstopLap(?pitstopLap), ?pitstopLap = ?lap - 1,																		\
 						 lapDamage(?lap, Suspension, ?lSDamage), lapDamage(?lap, Bodywork, ?lBDamage),											\
 						 ?pLap = ?lap - 2, lapDamage(?pLap, Suspension, ?pSDamage), lapDamage(?pLap, Bodywork, ?pBDamage),						\
+						 reportNewDamage(?pSDamage, ?lSDamage, ?pBDamage, ?lBDamage)
+reportNewDamage(?lap) <= lapDamage(?lap, Suspension, ?lSDamage), lapDamage(?lap, Bodywork, ?lBDamage),											\
+						 ?pLap = ?lap - 1, lapDamage(?pLap, Suspension, ?pSDamage), lapDamage(?pLap, Bodywork, ?pBDamage),						\
 						 reportNewDamage(?pSDamage, ?lSDamage, ?pBDamage, ?lBDamage)
 						 
 reportNewDamage(?oldSDamage, ?newSDamage, ?oldBDamage, ?newBDamage) <=																			\

@@ -558,7 +558,7 @@ class PitstopHandling extends Assert {
 			vBodyworkDamage := kNotInitialized
 
 			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Lap " . A_Index . ".data")
-			; msgbox round %A_Index%
+			
 			if (data.Count() == 0)
 				break
 			else {

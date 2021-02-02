@@ -61,9 +61,10 @@ Release 2.0 introduced a new automated update mechanism for local configuration 
     - Send your predefined kudos and rants to the ingame chat without touching the keyboard
   - Additional support to trigger every function and action from external sources like a voice or gesture recognition software to always keep your hands on the wheel
   - Builtin support for visual head tracking to control ingame viewing angle - see [third party applications](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications) below
-  - And, last but not least, an AI based Race Engineer with fully dialog capable voice control will guide you through your race, warn you about critical issues and will help you with the pitstop. This smart chat bot is an independent application, but is integreated with the ACC plugin using interprocess communication right now. An integration for a different simulation games requires some effort, especially for the necessary data acquisition from the simulation game, but a knowledged programmer can manage it in about three to for hours.
 
-Simulator Controller is fully implemented in AutoHotkey, a very sophisticated and object-oriented Windows automation scripting language, which is capable to control keyboard and other input devices with a simple macro language. On the other hand, AutoHotkey also has a lot of robotics capabilities to automate software packages, which do not provide external APIs, by simulating mouse clicks and keyboard input. You can write your own plugins using the AutoHotkey language. Full source code for all included plugins with different complexity from simple to advanced is provided to help you get started.
+#### Virtual Race Engineer
+
+And, last but not least, an AI based Race Engineer with fully dialog capable voice control will guide you through your race, warn you about critical issues and will help you with the pitstop. This smart chat bot is an independent application, but is integreated with the ACC plugin using interprocess communication right now. An integration for a different simulation games requires some effort, especially for the necessary data acquisition from the simulation game, but a knowledged programmer can manage it in about three to four hours.
 
 ### Additional features
 
@@ -72,6 +73,8 @@ Simulator Controller is fully implemented in AutoHotkey, a very sophisticated an
   - Fully graphical configuration utilities
   
   ![](./Docs/Images/Settings%20Editor.JPG) ![](./Docs/Images/Configuration%20Editor.JPG)
+
+Simulator Controller has been implemented in AutoHotkey, a very sophisticated and object-oriented Windows automation scripting language, which is capable to control keyboard and other input devices with a simple macro language. On the other hand, AutoHotkey also has a lot of robotics capabilities to automate software packages, which do not provide external APIs, by simulating mouse clicks and keyboard input. You can write your own plugins using the AutoHotkey language. Full source code for all included plugins with different complexity from simple to advanced is provided to help you get started.
 
 ### Included plugins
 

@@ -1,5 +1,5 @@
 [Version]
-Current=2.1-alpha
+Current=2.1-beta
 Target=2.1-release
 Changes=Copy targets in Simulator Tools, ACC Shared Memory Reader, Alpha Version of AI Race Engineer, Support for German phrase grammars
-Date=01/31/2021
+Date=02/02/2021

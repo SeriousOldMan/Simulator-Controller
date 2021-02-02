@@ -23,7 +23,7 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-[2.1.0-alpha](https://www.dropbox.com/s/nzb737ry4buuabd/Simulator%20Controller%202.1.0-alpha.zip?dl=1) (First preview for the upcoming 2.1 release including alpha version of AI based Race Engineer, full test cases, support for English and German phrase grammars)
+[2.1.0-beta](https://www.dropbox.com/s/8j0horm83csb20g/Simulator%20Controller%202.1.0-beta.zip?dl=1) (First release candidate for the upcoming 2.1 release including alpha version of [AI based Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer), full [test cases](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Sources/Tests), support for English and German [phrase grammars](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#interacting-with-jona))
 
 ATTENTION: In this version, no support to update the configuration database is included yet. Use with care and make a backup copy of your configuration.
 

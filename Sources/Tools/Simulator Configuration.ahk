@@ -2849,12 +2849,14 @@ class TranslationsList extends ConfigurationItemList {
 		GuiControlGet originalTextEdit
 		GuiControlGet translationTextEdit
 		
+		translationTextEdit := (translationTextEdit == originalTextEdit) ? "" : translationTextEdit
+		
 		if isNew
 			this.iChanged := true
 		else
 			this.iChanged := this.iChanged || (this.iItemsList[this.iCurrentItemIndex][2] != translationTextEdit)
 		
-		return Array(originalTextEdit, (translationTextEdit == originalTextEdit) ? "" : translationTextEdit)
+		return Array(originalTextEdit, translationTextEdit)
 	}
 	
 	openEditor(itemIndex) {

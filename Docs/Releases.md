@@ -9,6 +9,8 @@
 	 - A unit testing framework
 	 - A speech generator class library
 	 - A speech recognition class library
+	 
+  As with all releases since Release 2.0, automated update procedures take care of your local configuration database. But there might be additional installation steps or preparations required, which are described in the documentation about the [Release 2.1 update requirements](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-21).
 
 ## 2.0.4-release 01/18/21
 

@@ -129,6 +129,7 @@ startRaceEngineer() {
 	raceSettingsFile := getFileName("Race Engineer.settings", kUserConfigDirectory, kConfigDirectory)
 	
 	index := 1
+	
 	while (index < A_Args.Length()) {
 		switch A_Args[index] {
 			case "-Remote":

@@ -38,12 +38,10 @@ ListLines Off					; Disable execution history
 global kToolsConfigurationFile = "Simulator Tools.ini"
 global kToolsTargetsFile = "Simulator Tools.targets"
 
-global kUpdateMessages = {updateToV15: "Updating configuration to "
-						, updateConfigurationForV20: "Updating configuration to ", updateTranslations: "Updating translations to "
+global kUpdateMessages = {updateTranslations: "Updating translations to "
 						, updatePluginLabels: "Updating plugin labels to "
 						, updateACCPluginForV20: "Updating ACC plugin to ", updateACCPluginForV21: "Updating ACC plugin to "
-						, updatePedalCalibrationPluginForV21: "Updating Pedal Calibration plugin to "
-						, updateConfigurationForV203: "Updating configuration to "}
+						, updatePedalCalibrationPluginForV21: "Updating Pedal Calibration plugin to "}
 
 global kCompiler = kAHKDirectory . "Compiler\ahk2exe.exe"
 
@@ -521,7 +519,7 @@ updatePedalCalibrationPluginForV21() {
 	}
 }
 
-updateToV15(targetName, ByRef buildProgress) {
+updateToV15() {
 }
 
 checkFileDependency(file, modification) {
@@ -586,8 +584,14 @@ runUpdateTargets(ByRef buildProgress) {
 		progressStep := Round((100 / (vTargetsCount + 1)) / target[2].Length())
 		
 		for ignore, updateFunction in target[2] {
-			if !kSilentMode
-				Progress %buildProgress%, % translate(kUpdateMessages[updateFunction]) . targetName . translate("...")
+			if !kSilentMode {
+				if kUpdateMessages.HasKey(updateFunction)
+					message := translate(kUpdateMessages[updateFunction]) . targetName . translate("...")
+				else
+					message := translate("Updating configuration to ") . targetName . translate("...")
+				
+				Progress %buildProgress%, %message%
+			}
 					
 			%updateFunction%()
 			

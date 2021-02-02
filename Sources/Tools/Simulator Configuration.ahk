@@ -273,7 +273,7 @@ listEvent() {
 	try{
 		if (A_GuiEvent == "DoubleClick")
 			vItemLists[A_GuiControl].openEditor(A_EventInfo)
-		else if (A_GuiEvent == "Normal")
+		else if (A_GuiEvent == "Normal") {
 			if (A_GuiControl == "simulatorsListBox") {
 				GuiControlGet simulatorsListBox
 				
@@ -281,6 +281,7 @@ listEvent() {
 			}
 			else
 				vItemLists[A_GuiControl].openEditor(A_EventInfo)
+		}
 		else if ((A_GuiEvent == "I") && (A_GuiControl != "translationsListView"))
 			if InStr(ErrorLevel, "S", true)
 				vItemLists[A_GuiControl].openEditor(A_EventInfo)
@@ -360,12 +361,20 @@ class ConfigurationEditor extends ConfigurationItem {
 	iChatMessagesTab := false
 	
 	iDevelopment := false
+	iSaveMode := false
 	
 	AutoSave[] {
 		Get {
-			GuiControlGet saveModeDropDown
+			try {
+				GuiControlGet saveModeDropDown
 			
-			return (saveModeDropDown == 1)
+				this.iSaveMode := (saveModeDropDown == 1)
+				
+				return this.iSaveMode
+			}
+			catch exception {
+				return this.iSaveMode
+			}
 		}
 	}
 	
@@ -440,13 +449,17 @@ class ConfigurationEditor extends ConfigurationItem {
 	loadFromConfiguration(configuration) {
 		base.loadFromConfiguration(configuration)
 		
-		saveModeDropDown := getConfigurationValue(configuration, "General", "Save", "Manual")
+		this.iSaveMode := getConfigurationValue(configuration, "General", "Save", "Manual")
+		
+		saveModeDropDown := this.iSaveMode
 	}
 	
 	saveToConfiguration(configuration) {
 		base.saveToConfiguration(configuration)
 		
 		GuiControlGet saveModeDropDown
+		
+		this.iSaveMode := saveModeDropDown
 		
 		setConfigurationValue(configuration, "General", "Save", ["Auto", "Manual"][saveModeDropDown])
 		
@@ -2841,14 +2854,12 @@ class TranslationsList extends ConfigurationItemList {
 		else
 			this.iChanged := this.iChanged || (this.iItemsList[this.iCurrentItemIndex][2] != translationTextEdit)
 		
-		return Array(originalTextEdit, translationTextEdit)
+		return Array(originalTextEdit, (translationTextEdit == originalTextEdit) ? "" : translationTextEdit)
 	}
 	
 	openEditor(itemIndex) {
 		if (this.iCurrentItemIndex != 0)
 			this.updateItem()
-			
-		this.selectItem(itemIndex)
 			
 		base.openEditor(itemIndex)
 	}

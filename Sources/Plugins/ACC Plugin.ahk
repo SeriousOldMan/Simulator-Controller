@@ -93,7 +93,7 @@ class ACCPlugin extends ControllerPlugin {
 		}
 		
 		updateLap(arguments*) {
-			return this.callRemote("addLap", arguments*)
+			return this.callRemote("updateLap", arguments*)
 		}
 		
 		planPitstop(arguments*) {

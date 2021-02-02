@@ -113,20 +113,27 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 			
 				if kNeedsActivation {
 					WinActivate %windowTitle%
-					WinWaitActive %windowTitle%, , 2
 					
-					xPosition := this.iSelectionXPosition
-					yPosition := kShapeYPosition
+					if (!WinActive(windowTitle) && SimulatorController.Instance.ActiveSimulator) {
+						Send !{Tab}
 					
-					MouseClick Left, %xPosition%, %yPosition%
-					Sleep 500
+						WinActivate %windowTitle%
+					}
 					
-					yPosition += (this.iSelectionIndex * kShapeYDelta)
-					
-					MouseClick Left, %xPosition%, %yPosition%
-					Sleep 500
-					
-					MouseClick Left, %kSaveToPedalX%, %kSaveToPedalY%
+					if WinActive(windowTitle) {
+						xPosition := this.iSelectionXPosition
+						yPosition := kShapeYPosition
+						
+						MouseClick Left, %xPosition%, %yPosition%
+						Sleep 500
+						
+						yPosition += (this.iSelectionIndex * kShapeYDelta)
+						
+						MouseClick Left, %xPosition%, %yPosition%
+						Sleep 500
+						
+						MouseClick Left, %kSaveToPedalX%, %kSaveToPedalY%
+					}
 				}
 				else {
 					xPosition := this.iSelectionXPosition

@@ -1970,6 +1970,10 @@ class CutChoicePoint extends ChoicePoint {
 	}
 }
 
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; Class                    FailChoicePoint                                ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
 class FailChoicePoint extends ChoicePoint {
 	nextChoice() {
 		return false

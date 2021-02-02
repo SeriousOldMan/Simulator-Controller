@@ -109,13 +109,14 @@ The following applications are not part of the distribution and are not strictly
 
 A very [extensive documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki) will guide you through the configuration process and will help you to understand the inner concepts and all the functions & features of Simulator Controller. For developers, who want to create their own plugins, a complete [devlopers guide & reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts) is available as well.
 
-The markdown files, the so to say source code of this Wiki can be found in the [Docs](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Docs) folder.
+The markdown files, the so to say source code of this documentation Wiki, can be found in the [Docs](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Docs) folder.
 
 ### Known issues
 
 1. [Fixed] Sometimes, the ingame sound volume is not correctly resetted after playing the startup melody. In those situations, you can use the mixer utility of Windows to bring the volume back up.
 2. [Gone] Connection between the "Motion Feedback" plugin and *SimFeedback* has stabilty issues. Looks like the root cause is located in the *SFX-100-Streamdeck* extension.
 3. The language drop down in the configuration tool does not adopt to changed languages, after the translation editor has been used.
+4. In vary rare situations, the Simulator Controller applications can lock up due to deadlocks in the interprocess communication.
 
 ### Development
 

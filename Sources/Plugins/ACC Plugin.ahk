@@ -1279,7 +1279,7 @@ collectRaceData() {
 	if !plugin
 		plugin := SimulatorController.Instance.findPlugin(kACCPlugin)
 	
-	if true || isACCRunning() {
+	if isACCRunning() {
 		exePath := kBinariesDirectory . "ACC SHM Reader.exe"
 		
 		try {
@@ -1320,35 +1320,36 @@ collectRaceData() {
 		protectionOn()
 		
 		try {
-			if (plugin.PitstopPending && getConfigurationValue(data, "Stint Data", "InPit", false) && !inPit) {
-				plugin.performPitstop(dataLastLap)
-				
-				inPit := true
-			}
-			else if (dataLastLap > lastLap) {
-				if (lastLap == 0)
-					plugin.startRace(dataFile)
-				
-				lastLap := dataLastLap
-				lastLapCounter := 1
+			if getConfigurationValue(data, "Stint Data", "Active", false) {
+				if (plugin.PitstopPending && getConfigurationValue(data, "Stint Data", "InPit", false) && !inPit) {
+					plugin.performPitstop(dataLastLap)
+					
+					inPit := true
+				}
+				else if (dataLastLap > lastLap) {
+					if (lastLap == 0)
+						plugin.startRace(dataFile)
+					
+					lastLap := dataLastLap
+					lastLapCounter := 1
 
-				plugin.addLap(dataLastLap, dataFile)
+					plugin.addLap(dataLastLap, dataFile)
+					
+					if isDebug()
+						writeConfiguration(kUserHomeDirectory . "Temp\ACC Data\Lap " . lastLap . ".1.data", data)
+					
+					inPit := false
+				}
+				else {
+					plugin.updateLap(dataLastLap, dataFile)
+					
+					if isDebug()
+						writeConfiguration(kUserHomeDirectory . "Temp\ACC Data\Lap " . lastLap . "." . ++lastLapCounter . ".data", data)
 				
-				if isDebug()
-					writeConfiguration(kUserHomeDirectory . "Temp\ACC Data\Lap " . lastLap . ".1.data", data)
-				
-				inPit := false
+					inPit := false
+				}
 			}
 			else {
-				plugin.updateLap(dataLastLap, dataFile)
-				
-				if isDebug()
-					writeConfiguration(kUserHomeDirectory . "Temp\ACC Data\Lap " . lastLap . "." . ++lastLapCounter . ".data", data)
-			
-				inPit := false
-			}
-			
-			if !getConfigurationValue(data, "Stint Data", "Active", false) {
 				if (lastLap > 0) {
 					if isDebug() {
 						fileName := (kUserHomeDirectory . "Temp\ACC Data\Race.data")

@@ -4,7 +4,15 @@ Welcome to Jona, the world first fully interactive virtual race engineer for rac
 
 Ok, enough marketing bullshit. Jona is a chat bot with a special knowledge about racing. It uses the telemetry data provided by a simulation game and a large domain specific rule set to derive its knowledge from there. Using this knowledge, Jona can give you information about the current state of your car (temperatures, pressures, remaining laps, upcoming pitstops, and so on), and can recommend settings for the next pitstop. Using the Pitstop MFD handling for *Assetto Corsa Competizione* introduced with Release 2.0, Jona is capable to setup a pitstop without user interaction completely on its own.
 
-As said, Jona is a voice chat bot and therefore you can control Jona completely by voice. Before we dig deeper into the inner workings of Jona, we will start with a typical dialog with Jona to give you an understanding of the capabilities.
+***
+
+Before we head on, an important note: The first version of Jona as part of Release 2.1 is still quite restricted. Please consider this version more as an alpha version or a technology showcase. Over the course of the next releases, Jona will get smarter and smarter, as the AI kernel grows and I have found ways to incorporate further data, like weather information into the knowledge base. Also, there will be the option to use a cloud based voice recognition integration insteaad of the Windows local offline speech recognition runtime, which is not state of the art anymore. Although a cloud based solution might impose a pay wall depending on your usage, this will be quite negliable. And, last but not least, I have concepts for a server based solution in the drawer, which will allow Jona to act as a race engineer for a complete team multiplayer endurance race. But this will be quite a huge undertaking and will take a while, depending on my available time to invest in this project.
+
+***
+
+As said above, Jona is a voice chat bot and therefore you can control Jona completely by voice. If you don't want to use voice control, there are other possibilities as well. More on that later in this documentation.
+
+Before we dig deeper into the inner workings, here is a typical dialog based interaction, to give you an understanding of the current capabilities of Jona.
 
 ### A typical dialog
 

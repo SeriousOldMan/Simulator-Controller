@@ -255,7 +255,7 @@ It is possible, but not much fun, to use Jona without its natural language inter
 
 	pitstopPlan: *function*; pitstopPrepare: *function*
 	
-Only unary functions are supported. An interesting combination you might try, is to use voice output for Jona, but no voice control. You will get all the information of Jona, but use an *oldschool* interface to control their actions.
+Only unary functions are supported here. An interesting combination you might try, is to use voice output for Jona, but no voice control. You will get all the information of Jona, but use an *oldschool* interface to control their actions.
 
 
 

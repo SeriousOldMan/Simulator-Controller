@@ -977,20 +977,21 @@ class ACCPlugin extends ControllerPlugin {
 	
 	startRace(dataFile) {
 		if this.ActiveRace
-			this.finishRace()
-		
-		this.startupRaceEngineer()
+			this.finishRace(false)
+		else
+			this.startupRaceEngineer()
 	
 		this.RaceEngineer.startRace(dataFile)
 		
 		this.enableRaceEngineerActions(true)
 	}
 	
-	finishRace() {
+	finishRace(shutdown := true) {
 		if this.ActiveRace {
 			this.RaceEngineer.finishRace()
 			
-			this.shutdownRaceEngineer()
+			if shutdown
+				this.shutdownRaceEngineer()
 			
 			this.iPitstopPending := false
 			
@@ -1320,7 +1321,7 @@ collectRaceData() {
 		protectionOn()
 		
 		try {
-			if getConfigurationValue(data, "Stint Data", "Active", false) {
+			if (getConfigurationValue(data, "Stint Data", "Active", false) && (dataLastLap >= lastLap)) {
 				if (plugin.PitstopPending && getConfigurationValue(data, "Stint Data", "InPit", false) && !inPit) {
 					plugin.performPitstop(dataLastLap)
 					
@@ -1349,36 +1350,34 @@ collectRaceData() {
 					inPit := false
 				}
 			}
-			else {
-				if (lastLap > 0) {
-					if isDebug() {
-						fileName := (kUserHomeDirectory . "Temp\ACC Data\Race.data")
-						
-						try {
-							FileDelete %fileName%
-						}
-						catch exception {
-							; ignore
-						}
-						
-						curEncoding := A_FileEncoding
-						
-						FileEncoding UTF-16
-						
-						try {
-							for theFact, theValue in plugin.RaceEngineer.KnowledgeBase.Facts.Facts {
-								line := theFact . "=" . theValue . "`n"
-								
-								FileAppend %line%, %fileName%
-							}
-						}
-						finally {
-							FileEncoding %curEncoding%
+			else if (lastLap > 0) {
+				if isDebug() {
+					fileName := (kUserHomeDirectory . "Temp\ACC Data\Race.data")
+					
+					try {
+						FileDelete %fileName%
+					}
+					catch exception {
+						; ignore
+					}
+					
+					curEncoding := A_FileEncoding
+					
+					FileEncoding UTF-16
+					
+					try {
+						for theFact, theValue in plugin.RaceEngineer.KnowledgeBase.Facts.Facts {
+							line := theFact . "=" . theValue . "`n"
+							
+							FileAppend %line%, %fileName%
 						}
 					}
-			
-					plugin.finishRace()
+					finally {
+						FileEncoding %curEncoding%
+					}
 				}
+		
+				plugin.finishRace()
 				
 				lastLap := 0
 			}

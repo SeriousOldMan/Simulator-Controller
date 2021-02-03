@@ -213,7 +213,7 @@ Plugin Motion Feedback deactivated, because the configured application path (=>D
 ) cannot be found - please check the configuration=>) nicht gefunden werden kann - Bitte überprüfen Sie die Konfiguration
 [Tactile Feedback Plugin]
 Tactile Feedback=>Vibration
-Pedal Vibration=>Pedale Vibration
+Pedal Vibration=>Pedal Vibration
 Chassis Vibration=>Rahmen Vibration
 Front Vibration=>Front Vibration
 Rear Vibration=>Heck Vibration
@@ -241,7 +241,7 @@ Clutch=>Kupplung
 Brake=>Bremse
 Throttle=>Gas
 Calibration: =>Kalibrierung: 
-Plugin Pedal Calibration deactivated, because the configured application path (=>Die Erweiterung für die Pedale Kalibrierung wurde nicht aktiviert, da das Anwendungsverzeichnis (
+Plugin Pedal Calibration deactivated, because the configured application path (=>Die Erweiterung für die Pedal Kalibrierung wurde nicht aktiviert, da das Anwendungsverzeichnis (
 ) cannot be found - please check the configuration=>) nicht gefunden werden kann - Bitte überprüfen Sie die Konfiguration
 [Simulator Tools]
 Checking file =>Überprüfe Datei 

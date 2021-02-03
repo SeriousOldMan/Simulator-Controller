@@ -99,7 +99,8 @@ nextTyreSet() <= Set(Tyre.Set.Target, !Race.Setup.Tyre.Set.Fresh)
 ;;; "Race.Settings.Lap.History.Weight".                                     ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-{Any: [?Lap], {None: [?Tyre.Set.Target]}, [?Tyre.Update.Pressure]} => (Prove: updateTyrePressureDeviation, ?Lap), (Clear: Tyre.Update.Pressure)
+{Any: [?Lap], {None: [?Tyre.Set.Target]}} => (Prove: updateTyrePressureDeviation, ?Lap)
+[?Tyre.Update.Pressure = true] => (Prove: updateTyrePressureDeviation, ?Lap), (Clear: Tyre.Update.Pressure)
 
 updateTyrePressureDeviation(?lap) <= tyrePressureDeviation(?lap, [FL, FR, RL, RR], ?deviations), 												\
 									 updateTargetPressures([FL, FR, RL, RR], ?deviations)
@@ -159,13 +160,16 @@ lastPressure(?compound, ?tyreType, ?pressure) <= setupPressure(?compound, ?tyreT
 ;;; significant lap time reduction.                                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-priority: 10, {Any: [?Lap], {None: [?Damage.Repair.Suspension.Target]}, [?Damage.Update.Suspension]} => (Prove: updateSuspensionRepair, ?Lap)
-priority: 10, {Any: [?Lap], {None: [?Damage.Repair.Bodywork.Target]}, [?Damage.Update.Bodywork]} => (Prove: updateBodyworkRepair, ?Lap)
+priority: 10, {Any: [?Lap], {None: [?Damage.Repair.Suspension.Target]}, [?Damage.Update.Suspension = true]} =>									\
+		(Prove: updateSuspensionRepair, ?Lap)
+priority: 10, {Any: [?Lap], {None: [?Damage.Repair.Bodywork.Target]}, [?Damage.Update.Bodywork = true]} =>										\
+		(Prove: updateBodyworkRepair, ?Lap)
 
-{Any: [?Lap], [?Damage.Update.Suspension], [?Damage.Update.Bodywork]} => (Prove: reportNewDamage, ?Lap)
+[?Lap] => (Prove: reportNewDamage, ?Lap)
+{Any: [?Damage.Update.Suspension = true], [?Damage.Update.Bodywork = true]} => (Prove: reportNewDamage, !Lap)
 
-priority: -10, {Any: [?Damage.Update.Suspension], [?Damage.Update.Bodywork]} => (Clear: Damage.Update.Suspension),								\
-																				(Clear: Damage.Update.Bodywork)
+priority: -10, {Any: [?Damage.Update.Suspension = true], [?Damage.Update.Bodywork = true]} =>													\
+		(Clear: Damage.Update.Suspension), (Clear: Damage.Update.Bodywork)
 
 updateSuspensionRepair(?lap) <= lapDamage(?lap, Suspension, ?damage), repairDamage(Suspension, ?damage),										\
 								Set(Damage.Repair.Suspension.Target, true), !
@@ -177,7 +181,7 @@ updateBodyworkRepair(?) <= Clear(Damage.Repair.Bodywork.Target)
 
 lapDamage(?lap, Suspension, ?damage) <= lapDamage(?lap, Suspension, FL, ?fld), lapDamage(?lap, Suspension, FR, ?frd),							\
 										lapDamage(?lap, Suspension, RL, ?rld), lapDamage(?lap, Suspension, RR, ?rrd),							\
-										sum([?fld, ?frd, ?rld, ?rrd], ?damage) 
+										sum([?fld, ?frd, ?rld, ?rrd], ?damage)
 lapDamage(?lap, Bodywork, ?damage) <= lapDamage(?lap, Bodywork, Front, ?frontDmg), lapDamage(?lap, Bodywork, Rear, ?rearDmg),					\
 									  lapDamage(?lap, Bodywork, Left, ?leftDmg), lapDamage(?lap, Bodywork, Right, ?rightDmg),					\
 									  lapDamage(?lap, Bodywork, Center, ?centerDmg), 															\
@@ -194,8 +198,7 @@ repairDamage(?type, Threshold, ?damage) <= Append(?fact, Race.Settings.Damage., 
 repairDamage(?, Impact, ?) <= notYetImplemented()
 
 reportNewDamage(?lap) <= pitstopLap(?lap), !, fail
-reportNewDamage(1) <= !, lapDamage(?lap, Suspension, ?lSDamage), lapDamage(?lap, Bodywork, ?lBDamage),											\
-						 reportNewDamage(0, ?lSDamage, 0, ?lBDamage)
+reportNewDamage(1) <= !, lapDamage(1, Suspension, ?lSDamage), lapDamage(1, Bodywork, ?lBDamage), reportNewDamage(0, ?lSDamage, 0, ?lBDamage)
 reportNewDamage(?lap) <= pitstopLap(?pitstopLap), ?pitstopLap = ?lap - 1,																		\
 						 pitstopRepairDamage(Suspension, ?suspensionRepaired), pitstopRepairDamage(Bodywork, ?bodyworkRepaired),				\
 						 lapDamage(?lap, Suspension, ?lSDamage), lapDamage(?lap, Bodywork, ?lBDamage),											\

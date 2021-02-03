@@ -1,0 +1,23 @@
+[Car Data]
+AirTemperature=24.9978
+BodyworkDamage=16.9951, 0, 0, 0, 16.9951
+FuelRemaining=56.853
+RoadTemperature=31.821
+SuspensionDamage=0, 0, 0, 0
+TyreCompound=Wet
+TyrePressure=26.0883, 26.4876, 26.5388, 26.9797
+TyreTemperature=74.3227, 79.4524, 77.9603, 82.9027
+[Race Data]
+Car=mclaren_720s_gt3
+FuelAmount=125
+Track=Imola
+[Stint Data]
+Active=true
+DriverForname=The
+DriverNickname=TBO
+DriverSurname=BigO
+InPit=false
+LapBestTime=198847
+LapLastTime=198847
+Laps=true
+TimeRemaining=2.51986e+06

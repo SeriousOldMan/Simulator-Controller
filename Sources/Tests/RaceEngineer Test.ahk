@@ -162,12 +162,12 @@ class TestPitstopHandler {
 
 class FuelReporting extends Assert {
 	FuelWarningTest() {
-		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race Engineer.settings"), false, false, false)
+		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), false, false, false)
 
 		vFuelWarnings := {}
 		
 		Loop {
-			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Lap " . A_Index . ".data")
+			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
 			
 			if (data.Count() == 0)
 				break
@@ -185,12 +185,12 @@ class FuelReporting extends Assert {
 	}
 
 	RemainingFuelTest() {
-		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race Engineer.settings"), false, false, false)
+		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), false, false, false)
 
 		vFuelWarnings := {}
 		
 		Loop {
-			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Lap " . A_Index . ".data")
+			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
 			
 			if (data.Count() == 0)
 				break
@@ -208,10 +208,10 @@ class FuelReporting extends Assert {
 
 class DamageReporting extends Assert {
 	DamageReportingTest() {
-		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race Engineer.settings"), new TestPitStopHandler(), false, false)
+		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), new TestPitStopHandler(), false, false)
 		
 		Loop {
-			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Lap " . A_Index . ".data")
+			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
 			
 			vSuspensionDamage := kNotInitialized
 			vBodyworkDamage := kNotInitialized
@@ -252,12 +252,12 @@ class PitstopHandling extends Assert {
 	}
 	
 	PitstopPlanLap3Test() {
-		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race Engineer.settings"), new TestPitStopHandler(), false, false)
+		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), new TestPitStopHandler(), false, false)
 		
 		vCompletedActions := {}
 		
 		Loop {
-			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Lap " . A_Index . ".data")
+			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
 			
 			if (data.Count() == 0)
 				break
@@ -296,12 +296,12 @@ class PitstopHandling extends Assert {
 	}
 	
 	PitstopPlanLap4Test() {
-		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race Engineer.settings"), new TestPitStopHandler(), false, false)
+		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), new TestPitStopHandler(), false, false)
 		
 		vCompletedActions := {}
 		
 		Loop {
-			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Lap " . A_Index . ".data")
+			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
 			
 			if (data.Count() == 0)
 				break
@@ -340,12 +340,12 @@ class PitstopHandling extends Assert {
 	}
 	
 	PitstopPlanLap5Test() {
-		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race Engineer.settings"), new TestPitStopHandler(), false, false)
+		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), new TestPitStopHandler(), false, false)
 		
 		vCompletedActions := {}
 		
 		Loop {
-			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Lap " . A_Index . ".data")
+			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
 			
 			if (data.Count() == 0)
 				break
@@ -387,7 +387,7 @@ class PitstopHandling extends Assert {
 	}
 	
 	PitstopPrepare3Test() {
-		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race Engineer.settings"), new TestPitStopHandler(), false, false)
+		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), new TestPitStopHandler(), false, false)
 		
 		vCompletedActions := {}
 		
@@ -399,7 +399,7 @@ class PitstopHandling extends Assert {
 		vPitstopRepairBodywork = kNotInitialized
 		
 		Loop {
-			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Lap " . A_Index . ".data")
+			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
 			
 			if (data.Count() == 0)
 				break
@@ -436,7 +436,7 @@ class PitstopHandling extends Assert {
 	}
 	
 	PitstopPrepare5Test() {
-		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race Engineer.settings"), new TestPitStopHandler(), false, false)
+		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), new TestPitStopHandler(), false, false)
 		
 		vCompletedActions := {}
 		
@@ -448,7 +448,7 @@ class PitstopHandling extends Assert {
 		vPitstopRepairBodywork = kNotInitialized
 		
 		Loop {
-			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Lap " . A_Index . ".data")
+			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
 			
 			if (data.Count() == 0)
 				break
@@ -485,12 +485,12 @@ class PitstopHandling extends Assert {
 	}
 	
 	PitstopPerformedTest() {
-		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race Engineer.settings"), new TestPitStopHandler(), false, false)
+		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), new TestPitStopHandler(), false, false)
 		
 		vCompletedActions := {}
 		
 		Loop {
-			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Lap " . A_Index . ".data")
+			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
 			
 			if (data.Count() == 0)
 				break
@@ -551,13 +551,13 @@ class PitstopHandling extends Assert {
 	}
 	
 	PitstopMultipleTest() {
-		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race Engineer.settings"), new TestPitStopHandler(), false, false)
+		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), new TestPitStopHandler(), false, false)
 		
 		Loop {
 			vSuspensionDamage := kNotInitialized
 			vBodyworkDamage := kNotInitialized
 
-			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Lap " . A_Index . ".data")
+			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
 			
 			if (data.Count() == 0)
 				break
@@ -622,32 +622,64 @@ if !GetKeyState("Ctrl") {
 	AHKUnit.Run()
 }
 else {
-	engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race Engineer.settings")
+	raceNr := (GetKeyState("Shift") ? 2 : 1)
+	engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Engineer.settings")
 								   , new TestPitStopHandler(), "Jona", "de", true, true)
 
 	engineer.setDebug(kDebugPhrases, false)
 	
-	Loop {
-		data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Lap " . A_Index . ".data")
+	if (raceNr == 1)
+		Loop {
+			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
+			
+			if (data.Count() == 0)
+				break
+			else {
+				engineer.addLap(A_Index, data)
 		
-		if (data.Count() == 0)
-			break
-		else {
-			engineer.addLap(A_Index, data)
-	
-			if (A_Index = 3) {
-				engineer.planPitstop()
-				engineer.preparePitstop()
+				if (A_Index = 3) {
+					engineer.planPitstop()
+					engineer.preparePitstop()
+				}
+		
+				if (A_Index = 4) {
+					engineer.performPitstop()
+				}
+				
+				dumpKnowledge(engineer.KnowledgeBase)
+				
+				MsgBox % "Lap " . A_Index . " loaded - Continue?"
 			}
-	
-			if (A_Index = 4) {
-				engineer.performPitstop()
-			}
-			
-			dumpKnowledge(engineer.KnowledgeBase)
-			
-			MsgBox % "Lap " . A_Index . " loaded - Continue?"
 		}
+	else {
+		done := false
+	
+		Loop {
+			lap := A_Index
+		
+			Loop {
+				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 2\Lap " . lap . "." . A_Index . ".data")
+			
+				if (data.Count() == 0) {
+					if (A_Index == 1)
+						done := true
+						
+					break
+				}
+				else {
+					if (A_Index == 1)
+						engineer.addLap(lap, data)
+					else
+						engineer.updateLap(lap, data)
+					
+					dumpKnowledge(engineer.KnowledgeBase)
+					
+					SplashTextOn 400, 100, , % "Data " lap . "." . A_Index . " loaded..."
+					Sleep 500
+					SplashTextOff
+				}
+			}
+		} until done
 	}
 	
 	MsgBox Done...

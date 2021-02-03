@@ -871,15 +871,11 @@ class RaceEngineer extends ConfigurationItem {
 		this.iInitialFuelAmount := 0
 		this.iEnoughData := false
 		
-		result := this.KnowledgeBase.produce()
-			
 		if this.Speaker
 			this.getSpeaker().speakPhrase("Greeting", {name: this.Name})
 		
 		if this.Debug[kDebugKnowledgeBase]
 			dumpKnowledge(this.KnowledgeBase)
-		
-		return result
 	}
 	
 	finishRace() {
@@ -1010,6 +1006,7 @@ class RaceEngineer extends ConfigurationItem {
 		knowledgeBase.addFact("Lap." . lapNumber . ".Damage.Suspension.RL", Round(suspensionDamage[3], 2))
 		knowledgeBase.addFact("Lap." . lapNumber . ".Damage.Suspension.RR", Round(suspensionDamage[4], 2))
 		
+		
 		result := knowledgeBase.produce()
 		
 		if this.Debug[kDebugKnowledgeBase]
@@ -1043,7 +1040,7 @@ class RaceEngineer extends ConfigurationItem {
 		}
 		
 		if changed {
-			knowledgeBase.addValue("Tyre.Update.Pressure", true)
+			knowledgeBase.addFact("Tyre.Update.Pressure", true)
 		
 			needProduce := true
 		}
@@ -1068,7 +1065,7 @@ class RaceEngineer extends ConfigurationItem {
 		}
 		
 		if changed {
-			knowledgeBase.addValue("Damage.Update.Bodywork", true)
+			knowledgeBase.addFact("Damage.Update.Bodywork", true)
 		
 			needProduce := true
 		}
@@ -1088,11 +1085,11 @@ class RaceEngineer extends ConfigurationItem {
 		}
 		
 		if changed {
-			knowledgeBase.addValue("Damage.Update.Suspension", true)
+			knowledgeBase.addFact("Damage.Update.Suspension", true)
 		
 			needProduce := true
 		}
-		
+				
 		if needProduce {
 			result := knowledgeBase.produce()
 			

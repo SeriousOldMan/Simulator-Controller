@@ -153,7 +153,7 @@ lastPressure(?compound, ?tyreType, ?pressure) <= setupPressure(?compound, ?tyreT
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                Damage Warning & Repair Target Calculation               ;;;
+;;;                        Repair Target Calculation                        ;;;
 ;;;                                                                         ;;;
 ;;; These rules check for current damage and suggest repairing based on     ;;;
 ;;; general settings (see "Race.Settings.Damage.Repair") or perceived       ;;;
@@ -189,6 +189,13 @@ repairDamage(?type, Threshold, ?damage) <= Append(?fact, Race.Settings.Damage., 
 										   Get(?threshold, ?fact), ?damage > ?threshold
 repairDamage(?, Impact, ?) <= notYetImplemented()
 
+
+;;;-------------------------------------------------------------------------;;;
+;;;                              Damage Warning                             ;;;
+;;;                                                                         ;;;
+;;; These rules actively check for new damage and informs the driver.       ;;;
+;;;-------------------------------------------------------------------------;;;
+
 [?Lap] => (Prove: reportNewDamage, ?Lap)
 {Any: [?Damage.Update.Suspension = true], [?Damage.Update.Bodywork = true]} => (Prove: reportNewDamage, !Lap)
 priority: -10, {Any: [?Damage.Update.Suspension = true], [?Damage.Update.Bodywork = true]} =>													\
@@ -220,10 +227,10 @@ newDamageAfterRepair(?damage, false, false) <= ?damage > 0
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                    Stint Lap Countdown & Fuel Warning                   ;;;
+;;;                              Fuel Warning                               ;;;
 ;;;                                                                         ;;;
-;;; Update the laps possible with the remaining fuel and issue a warning    ;;;
-;;; when falling below a given threshold.                                   ;;;
+;;; Updates the laps remaining with the current amount of fuel and issues   ;;;
+;;; a warning when falling below a given threshold.                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 priority: 20, {Any: [?Lap], {None: [?Lap.Remaining]}} => (Prove: updateRemainingLaps, ?Lap)

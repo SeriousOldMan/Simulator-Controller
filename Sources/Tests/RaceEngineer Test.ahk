@@ -623,7 +623,7 @@ if !GetKeyState("Ctrl") {
 }
 else {
 	engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race Engineer.settings")
-								   , new TestPitStopHandler(), "Jona", getLanguage(), true, true)
+								   , new TestPitStopHandler(), "Jona", "de", true, true)
 
 	engineer.setDebug(kDebugPhrases, false)
 	

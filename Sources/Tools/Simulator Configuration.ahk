@@ -2673,7 +2673,12 @@ class TranslationsEditor extends ConfigurationItem {
 			
 			if (languageCode != kUndefined)
 				for ignore, fileName in getFileNames("Translations." . languageCode, kUserConfigDirectory, kConfigDirectory)
-					FileDelete %fileName%
+					try {
+						FileDelete %fileName%
+					}
+					catch exception {
+						; ignore
+					}
 			
 			this.chooseLanguage("en")
 		}
@@ -3055,7 +3060,12 @@ saveConfiguration(configurationFile, editor) {
 		FileCreateShortCut %startupExe%, %startupLink%, %kBinariesDirectory%
 	}
 	else
-		FileDelete %startupLink%
+		try {
+			FileDelete %startupLink%
+		}
+		catch exception {
+			; ignore
+		}
 }
 
 editConfiguration() {

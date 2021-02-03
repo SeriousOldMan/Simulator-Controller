@@ -194,7 +194,6 @@ repairDamage(?type, Threshold, ?damage) <= Append(?fact, Race.Settings.Damage., 
 repairDamage(?, Impact, ?) <= notYetImplemented()
 
 reportNewDamage(?lap) <= pitstopLap(?lap), !, fail
-reportNewDamage(?lap) <= pitstopLap(?pitstopLap), ?pitstopLap = ?lap - 1, !, fail
 reportNewDamage(1) <= !, lapDamage(?lap, Suspension, ?lSDamage), lapDamage(?lap, Bodywork, ?lBDamage),											\
 						 reportNewDamage(0, ?lSDamage, 0, ?lBDamage)
 reportNewDamage(?lap) <= pitstopLap(?pitstopLap), ?pitstopLap = ?lap - 1,																		\
@@ -234,6 +233,7 @@ updateRemainingLaps(?lap) <= remainingStintLaps(?lap, ?stintLaps), remainingRace
  							 ?stintLaps < ?raceLaps, Set(Lap.Remaining, ?stintLaps)
 
 lowFuelWarning(?lap, ?remainingLaps) <= pitstopLap(?lap), !, fail
+lowFuelWarning(?lap, ?remainingLaps) <= pitstopLap(?pitstopLap), ?pitstopLap = ?lap - 1, !, fail
 lowFuelWarning(?lap, ?remainingLaps) <= Call(lowFuelWarning, ?remainingLaps)
 
 

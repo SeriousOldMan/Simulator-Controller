@@ -1340,7 +1340,7 @@ collectRaceData() {
 					
 					inPit := false
 				}
-				else if (lastLap > 0) {
+				else if ((lastLap > 0) && (dataLastLap == lastLap)) {
 					plugin.updateLap(dataLastLap, dataFile)
 					
 					if isDebug()

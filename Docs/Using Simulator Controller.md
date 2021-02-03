@@ -1,12 +1,12 @@
 Using Simulator Controller is quite easy. The most difficult part will be the configuration, but fortunately, this has to be done only once. Please see the extensive [Installation & Configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration) guide on more information about this task.
 
-Once you have configured everything for your simulation rig, there are two applications, which you will use while having fun with your simulations. Both applications are located in the *Binaries* folder. Normally, you will run *Simlator Startup.exe* to set the stage for everything and therefore it might be a good idea to place a link to this application in the Windows Start menu. Using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration) you can also decide, whether this *Simulator Startup* will be run automatically whenever your PC is started. Depending on your concrete configuration, *Simulator Startup* will then start all the configured component applications including *Simulator Controller.exe*, which will be responsible for the essential part, the control of all your simulation applications and simulator games using your hardware controller.
+Once you have configured everything for your simulation rig, there are two applications, which you will use while having fun with your simulations. Both applications are located in the *Binaries* folder. Normally, you will run *Simlator Startup.exe* to set the stage for everything and therefore it might be a good idea to place a link to this application in the Windows Start Menu. Using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration) you can also decide, whether this *Simulator Startup* will be run automatically whenever your PC is started. Depending on your concrete configuration, *Simulator Startup* will then start all the configured component applications including *Simulator Controller.exe*, which will be responsible for the essential part, the control of all your simulation applications and simulator games using your hardware controller.
 
 ## Startup Process & Settings
 
 Before starting up, *Simulator Startup* checks the configuration information. If there is no valid configuration, a tool to edit the settings and supply a valid configuration will be launched automatically. You can trigger this anytime later by holding down the Control key when running *Simulator Startup*. The following settings dialog will show up:
 
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Settings%20Editor.jpg)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Settings%20Editor.JPG)
 
 With this editor, which is also available as a separate application named *Simulator Settings.exe*, you can change the runtime settings for Simulator Controller. In contrast to the general configuration, which configures all required and optional components of your simulation rig, here you decide which of them you want to use for the next run and onward and how they should behave.
 
@@ -44,7 +44,7 @@ Normally, it is not necessary to close *Simulator Controller.exe*, since it is v
 
 ## Using Jona, the Virtual Race Engineer
 
-Release 2.1 introduced Jona, an artificial race engineer as an optional component of the Simulator Controller package. Since Jona is quite a complex piece of software with it natural language interface, it is fully covered in a separate [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer).
+Release 2.1 introduced Jona, an artificial race engineer as an optional component of the Simulator Controller package. Since Jona is quite a complex piece of software with its natural language interface, it is fully covered in a separate [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer).
 
 ## And now it's time
 

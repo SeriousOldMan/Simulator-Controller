@@ -652,6 +652,11 @@ else {
 			}
 		}
 	else {
+		; 0.0	->	1.1		Report
+		; 2.4	->	2.5		Report
+		; 2.10	->	2.11	Report
+		; 3.4	->	3.5		Report
+		
 		done := false
 	
 		Loop {

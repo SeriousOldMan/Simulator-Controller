@@ -144,12 +144,12 @@ updateTargetPressure(?compound, ?tyreType, ?deviation) <= lastPressure(?compound
 [?Tyre.Pressure.Target.RR] => (Prove: updateTargetPressureIncrement, !Tyre.Compound.Target, RR)
 
 updateTargetPressureIncrement(?compound, ?tyreType) <=																							\
-		setupPressure(?compound, ?tyreType, ?basePressure), Append(?targetFact, Tyre.Pressure.Target., ?tyreType),								\
+		setupTyrePressure(?compound, ?tyreType, ?basePressure), Append(?targetFact, Tyre.Pressure.Target., ?tyreType),							\
 		Get(?targetPressure, ?targetFact), ?increment = ?targetPressure - ?basePressure,														\
 		Append(?incrementFact, Tyre.Pressure.Target., ?tyreType, .Increment), Set(?incrementFact, ?increment)
 
-lastPressure(?compound, ?tyreType, ?pressure) <= pitstopPressure(?compound, ?tyreType, ?pressure), !
-lastPressure(?compound, ?tyreType, ?pressure) <= setupPressure(?compound, ?tyreType, ?pressure)
+lastPressure(?compound, ?tyreType, ?pressure) <= pitstopTyrePressure(?compound, ?tyreType, ?pressure), !
+lastPressure(?compound, ?tyreType, ?pressure) <= setupTyrePressure(?compound, ?tyreType, ?pressure)
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -204,7 +204,7 @@ priority: -10, {Any: [?Damage.Update.Suspension = true], [?Damage.Update.Bodywor
 reportNewDamage(?lap) <= pitstopLap(?lap), !, fail
 reportNewDamage(1) <= !, lapDamage(1, Suspension, ?lSDamage), lapDamage(1, Bodywork, ?lBDamage), reportNewDamage(0, ?lSDamage, 0, ?lBDamage)
 reportNewDamage(?lap) <= pitstopLap(?pitstopLap), ?pitstopLap = ?lap - 1,																		\
-						 pitstopRepairDamage(Suspension, ?suspensionRepaired), pitstopRepairDamage(Bodywork, ?bodyworkRepaired),				\
+						 pitstopDamageRepair(Suspension, ?suspensionRepaired), pitstopDamageRepair(Bodywork, ?bodyworkRepaired),				\
 						 lapDamage(?lap, Suspension, ?lSDamage), lapDamage(?lap, Bodywork, ?lBDamage),											\
 						 newDamageAfterRepair(?lsDamage, ?suspensionRepaired, ?newSDamage),														\
 						 newDamageAfterRepair(?lBDamage, ?bodyworkRepaired, ?newBDamage),														\
@@ -395,7 +395,7 @@ lapWeight(?lap, ?weight) <= ?distance = !Lap - ?lap,																							\
 
 setupTyreCompound(?compound) <= Get(?compound, Race.Setup.Tyre.Compound)
 
-setupPressure(?compound, ?tyreType, ?pressure) <= Append(?fact, Race.Setup.Tyre., ?compound, .Pressure., ?tyreType), Get(?pressure, ?fact)
+setupTyrePressure(?compound, ?tyreType, ?pressure) <= Append(?fact, Race.Setup.Tyre., ?compound, .Pressure., ?tyreType), Get(?pressure, ?fact)
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -413,9 +413,10 @@ pitstopTyreSet(?tyreSet) <= lastPitstop(?nr), Append(?fact, Pitstop., ?nr, .Tyre
 
 pitstopTyreCompound(?tyreCompound) <= lastPitstop(?nr), Append(?fact, Pitstop., ?nr, .Tyre.Compound), Get(?tyreCompound, ?fact)
 
-pitstopPressure(?compound, ?tyreType, ?pressure) <= pitstopTyreCompound(?compound), lastPitstop(?nr), Append(?fact, Pitstop., ?nr, .Tyre.Pressure., ?tyreType), Get(?pressure, ?fact)
+pitstopTyrePressure(?compound, ?tyreType, ?pressure) <= pitstopTyreCompound(?compound), lastPitstop(?nr),										\
+														Append(?fact, Pitstop., ?nr, .Tyre.Pressure., ?tyreType), Get(?pressure, ?fact)
 
-pitstopRepairDamage(?damage, ?repair) <= lastPitstop(?nr), Append(?rFact, Pitstop., ?nr, .Repair.Suspension), Get(?repair, ?rFact)
+pitstopDamageRepair(?damage, ?repair) <= lastPitstop(?nr), Append(?rFact, Pitstop., ?nr, .Repair.Suspension), Get(?repair, ?rFact)
 
 
 ;;;-------------------------------------------------------------------------;;;

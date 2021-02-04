@@ -96,7 +96,7 @@ nextTyreSet() <= Set(Tyre.Set.Target, !Race.Setup.Tyre.Set.Fresh)
 ;;; adjust for the next pitstop accordingly. The last laps according to     ;;;
 ;;; "Race.Settings.Lap.History.Considered" are considered with linear		;;;
 ;;; falling influence on the deviation factor according to					;;;
-;;; "Race.Settings.Lap.History.Weight".                                     ;;;
+;;; "Race.Settings.Lap.History.Damping".                                    ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 {Any: [?Lap], {None: [?Tyre.Set.Target]}} => (Prove: updateTyrePressureDeviation, ?Lap)

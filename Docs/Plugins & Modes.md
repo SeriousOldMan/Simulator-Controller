@@ -48,7 +48,7 @@ This mode, which is only available, when *SimHub* is runnning, will let you cont
 You can increase or decrease the "TC" and "ABS" intensity using the buttons and control the overall vibration intensity using the dial knob. But it may have been configured completely differently. This concrete configuration is the result of the following plugin arguments, which will be described later:
 
 	pedalVibration: On 2WayToggle.3 Dial.1;
-	pedalEffects: TC Button.1 Button.5, ABS Button.2 Button.6;
+	pedalEffects: TC Button.1 Button.5, ABS Button.2 Button.6
 	
 Since this is completely controlled by the configuration and the profiles you have set up in *SimHub*, you may use different effects or none at all depending on your needs and your available hardware.
   
@@ -62,7 +62,7 @@ You will achieve this controller configuration with the following plugin argumen
 
 	frontChassisVibration: On 2WayToggle.4 Dial.1;
 	rearChassisVibration: On 2WayToggle.5 Dial.2;
-	chassisEffects: RPMS Button.1 Button.5, GearShift Button.2 Button.6, WheelsLock Button.3 Button.7, WheelsSlip Button.4 Button.8;
+	chassisEffects: RPMS Button.1 Button.5, GearShift Button.2 Button.6, WheelsLock Button.3 Button.7, WheelsSlip Button.4 Button.8
 	
 ### Configuration
 
@@ -71,7 +71,7 @@ As you have seen, "Tactile Feedback" is quite flexible and therefore provides ma
 	controlApplication: *Name of the SimHub application configuration*;
 	pedalVibration: *initialState* *onOffFunction* *intensityFunction*;
 	frontChassisVibration: *initialState* *onOffFunction* *intensityFunction*;
-	rearChassisVibration: *initialState* *onOffFunction* *intensityFunction*;
+	rearChassisVibration: *initialState* *onOffFunction* *intensityFunction*
 	
 The optional parameter *controlApplication* let you provide the name of the configured application object for *SimHub*, if it is not named "Tactile Feedback".
 The other three parameters follow the same format and let you control the respective group of vibration effects.
@@ -82,7 +82,7 @@ Last, *intensityFunction*, which is part of the respective mode, will let you co
 In the next step, you may describe all the individual effects for your vibration settings:
 
 	pedalEffects: *effect1* *increaseFunction1* [*decreaseFunction1*], *effect2* *increaseFunction2* [*decreaseFunction2*], ...; 
-	chassisEffects: *effect1* *increaseFunction1* [*decreaseFunction1*], *effect2* *increaseFunction2* [*decreaseFunction2*], ...;
+	chassisEffects: *effect1* *increaseFunction1* [*decreaseFunction1*], *effect2* *increaseFunction2* [*decreaseFunction2*], ...
 	
 With these parameters, you define the effects that are part of the "Pedal Vibration" or "Chassis Vibration" mode. *effectX* is the name of the effect, for example "TC". This name must be identical to that used, when defining the external trigger in *SimHub* according to the pattern "increase[*Effect*]Vibration" or "decrease[*Effect*]Vibration". For the function bindings, you can use one binary functions, i.e. a rotary dial, for a given effect, or two unary functions, for example push buttons. If you only supply one unary function, you may only increase the effect intensity. Example: "chassisEffects: RPMS Dial.2, GearShift Button.2 Button.6"
 
@@ -100,7 +100,7 @@ To get the most out of this plugin in the sample configuration presented below, 
 
 To globally start or stop the motion actuators of your rig, a plugin action must be bound to a controller function. You can do this with a plugin argument:
 
-	motion: Off 2WayToggle.2 Dial.1 30;
+	motion: Off 2WayToggle.2 Dial.1 30
 
 The details of the parameter "motion" will be described below, but as you can see, the initial state for *Motion* is "Off" and this state is controlled by the 2-way toggle switch # **2**.
 
@@ -135,7 +135,7 @@ With the following parameters you can configure the available effects for the "M
 
 	motionEffectIntensity: *effectSelectorFunction* *effectIntensityFunction*;
 	motionEffects: *effect1* *initialState1* *intialIntensity1* *effectToggleFunction1*,
-				   *effect2* *initialState2* *intialIntensity2* *effectToggleFunction2*, ...;
+				   *effect2* *initialState2* *intialIntensity2* *effectToggleFunction2*, ...
 
 *effectX* is the name of the effect, for example "Heave". With *initialStateX* and *intialIntensityX* you supply "On" or "Off" and a value between 0.0 and 2.0 respectively. These values will only be used, when mouse automation is used to control *SimFeedback*. Last, you need to supply a controller function with *effectToggleFunctionX* to enable or disable the effect or choose it for intensity manipulation after pressing the "Effect Selector" button, which must have been configured by supplying values for the "motionEffectIntensity" parameter. Example: "Heave On 1.0 Button.1"
 
@@ -172,7 +172,7 @@ As you can see, it looks like that my rig does not have a clutch pedal.
 All the arguments for the plugin parameters of the "Pedal Calibration" plugin must be supplied in the [Plugins tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) of the configuration tool. For the plugin itself the following arguments are relvant:
 
 	controlApplication: *Name of the SmartControl application configuration*;
-	pedalCalibrations: *pedal*.*calibration* *selectorFunction*, ...;
+	pedalCalibrations: *pedal*.*calibration* *selectorFunction*, ...
 
 The optional parameter *controlApplication* let you provide the name of the configured application object for *SmartControl*, as long as it is not named "Pedal Calibration". With the *pedalCalibrations* parameter, you can provide all calibration selections, you want to have on your Button Box. *pedal* can be either "Clutch", "Brake" or "Trottle" and *calibration* must be one of "Linear", "Sense+1", "Sense+2", "Sense-1", "Sense-2", "S-Shape", "S_on_Side", "Slow_Start", "Slow_End" or "Custom" for the Heusinkveld Pedals. "Example: "pedalCalibrations: Clutch.Linear Button.1, Brake.Linear Button.2, ..."
 
@@ -209,7 +209,7 @@ First, you need to define, how to open and close the Pitstop MFD in *Assetto Cor
 With the plugin parameter *pitstopSettings:* you can supply a list of the settings, you want to tweak from your hardware controller. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example tyre pressure and fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
 
 	pitstopSettings: *setting1* *settingFunction1* [*settingSteps1*],
-					 *setting2* *settingFunction2* [*settingSteps2*], ...;
+					 *setting2* *settingFunction2* [*settingSteps2*], ...
 					 
 See the following table for the supported settings.
 
@@ -247,17 +247,15 @@ The ACC plugin can automatically start Jona, the [Virtual Race Engineer](https:/
 
 	raceEngineerName: *name*;
 	raceEngineerSpeaker: false, true or *Microsoft Speech Generation Language*;
-	raceEngineerListener: false, true or *Microsoft Speech Recognition Language*;
+	raceEngineerListener: false, true or *Microsoft Speech Recognition Language*
 	
-Jona will be activated, when you supply an argument for the *raceEngineerName* parameter. With *raceEngineerSpeaker* and *raceEngineerListener* you can customize the natural language interface (or the personality) of Jona. If you simply supply *true* as arguments, a voice and the corresponding recognition engine will be choosen based on the currently configured language. If you prefer a spefic voice and / or a specific language, you can supply the name for this voice and language instead (Example: "Microsoft David Desktop" is a male US-English voice and "Microsoft Server Speech Recognition - TELE (de-DE)" provide german spoken language recognition. The phrase grammars of Jona can be localized for any language, with English and German already supplied by the standard distribution of Simulator Controller, but you will also need the corresponding Windows libraries for TTS (text-to-speech) and STT (speech-to-text). For more information about Jona, see the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer).
+Jona will be activated, when you supply an argument for the *raceEngineerName* parameter. With *raceEngineerSpeaker* and *raceEngineerListener* you can customize the natural language interface (or the personality) of Jona. If you simply supply *true* as arguments, a voice and the corresponding recognition engine will be choosen based on the currently configured language. If you prefer a specific voice and / or a specific language, you can supply the name for this voice and language instead (Example: "Microsoft David Desktop" is a male US-English voice and "Microsoft Server Speech Recognition - TELE (de-DE)" provide german spoken language recognition. The phrase grammars of Jona can be localized for any language, with English and German already supplied by the standard distribution of Simulator Controller, but you will also need the corresponding Windows libraries for TTS (text-to-speech) and STT (speech-to-text). For more information about Jona, see the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer).
 
-It is possible, but not much fun, to use Jona without its natural language interface. Although only the pitstop planning and setup capabilities are available in this cconfiguration, it is still very useful, especially in combination with the *Pitstop* mode described above. You can use the following parameters to connect these plugin actions to your controller hardware:
+It is possible, but not much fun, to use Jona without its natural language interface. Although only the pitstop planning and setup capabilities are available in this cconfiguration, it is still very useful, especially in combination with the other actions of the *Pitstop* mode described above. You can use the following parameters to connect these actions to your controller hardware:
 
-	pitstopPlan: *function*; pitstopPrepare: *function*
+	raceEngineerCommands: PitstopPlan *function*; PitstopPrepare *function*
 	
-Only unary functions are supported here. An interesting combination you might try, is to use voice output for Jona, but no voice control. You will get all the information of Jona, but use an *oldschool* interface to control their actions.
-
-
+Both actions will be bound to the *Pitstop* mode and only unary functions are supported here. An interesting combination you might try, is to use voice output for Jona, but no voice control. You will get all the information of Jona, but use an *oldschool* interface to control their actions.
 
 ## Plugin *AC*
 

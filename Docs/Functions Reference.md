@@ -310,3 +310,9 @@ Selects the brake pad compound to change to during the next pitstop. *brake* mus
 
 #### *changePitstopDriver(selection :: String)*
 Selects the driver to take the car during the next pitstop. *selection* must be either "Next" or "Previous". This action function is provided by the "ACC" plugin and is available depending on the concrete configuration.
+
+#### *planPitstop()*
+*planPitstop* triggers Jona, the virtual race engineer, to plan a pitstop. This action function is provided by the "ACC" plugin and is available depending on the concrete configuration.
+
+#### *preparePitstop()*
+*preparePitstop* triggers Jona, the virtual race engineer, to prepare a previously planned pitstop. This action function is provided by the "ACC" plugin and is available depending on the concrete configuration.

@@ -141,6 +141,8 @@ Although you may call any globally defined function, you should use only the fol
 | changePitstopTyrePressure | tyre, direction, [Optional] increments | ACC | Changes the tyre pressure during the next pitstop. *tyre* must be one of "All Around", "Front Left", "Front Right", "Rear Left" and "Rear Right", and *direction* must be either "Increase" or "Decrease". *increments* with a default of 1 define the change in 0.1 psi increments. |
 | changePitstopBrakeType | brake, selection | ACC | Selects the brake pad compound to change to during the next pitstop. *brake* must be "Front Brake" or "Rear Brake" and *selection* must be "Next" or "Previous".  |
 | changePitstopDriver | selection | ACC | Selects the driver to take the car during the next pitstop. *selection* must be either "Next" or "Previous". |
+| planPitstop | - | ACC | *planPitstop* triggers Jona, the virtual race engineer, to plan a pitstop. |
+| preparePitstop | - | ACC | *preparePitstop* triggers Jona, the virtual race engineer, to prepare a previously planned pitstop. |
  
 #### Key Detector Tool
 

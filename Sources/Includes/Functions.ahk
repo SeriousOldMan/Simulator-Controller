@@ -795,8 +795,16 @@ isInstance(object, root) {
 		else {
 			classVar := candidate.base.__Class
 		
-			if (classVar && (classVar != ""))
-				candidate := %classVar%
+			if (classVar && (classVar != "")) {
+				if InStr(classVar, ".") {
+					classVar := StrSplit(classVar, ".")
+					outerClassVar := classVar[1]
+					
+					candidate := %outerClassVar%[classVar[2]]
+				}
+				else
+					candidate := %classVar%
+			}
 			else
 				return false
 		}

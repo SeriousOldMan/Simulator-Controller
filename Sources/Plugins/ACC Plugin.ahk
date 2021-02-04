@@ -123,6 +123,28 @@ class ACCPlugin extends ControllerPlugin {
 				return kPitstopMode
 			}
 		}
+	
+		activate() {
+			base.activate()
+			
+			this.enableRaceEngineerActions(this.Plugin.ActiveRace)
+		}
+		
+		enableRaceEngineerActions(enabled) {
+			for ignore, theAction in this.Actions {
+				
+				if isInstance(theAction, ACCPlugin.RaceEngineerAction) {
+					if enabled {
+						theAction.Function.enable(kAllTrigger)
+						theAction.Function.setText(translate(theAction.Label))
+					}
+					else {
+						theAction.Function.disable(kAllTrigger)
+						theAction.Function.setText(translate(theAction.Label), "Gray")
+					}
+				}
+			}
+		}
 	}
 	
 	class PitstopAction extends ControllerAction {
@@ -299,8 +321,6 @@ class ACCPlugin extends ControllerPlugin {
 	}
 	
 	__New(controller, name, configuration := false) {
-		useRaceEngineer := false
-		
 		this.iDriveMode := new this.DriveMode(this)
 		
 		base.__New(controller, name, configuration)
@@ -315,11 +335,8 @@ class ACCPlugin extends ControllerPlugin {
 		
 		this.iRaceEngineerName := this.getArgumentValue("raceEngineerName", false)
 		
-		for ignore, theAction in string2Values(",", this.getArgumentValue("raceEngineerCommands", "")) {
-			useRaceEngineer := true
-		
+		for ignore, theAction in string2Values(",", this.getArgumentValue("raceEngineerCommands", ""))
 			this.createRaceEngineerAction(controller, string2Values(A_Space, theAction)*)
-		}
 		
 		engineerSpeaker := this.getArgumentValue("raceEngineerSpeaker", false)
 		
@@ -334,7 +351,7 @@ class ACCPlugin extends ControllerPlugin {
 		
 		controller.registerPlugin(this)
 	
-		if (useRaceEngineer || (engineerSpeaker != false))
+		if (this.iRaceEngineerName)
 			SetTimer collectRaceData, 10000
 	}
 	
@@ -358,11 +375,26 @@ class ACCPlugin extends ControllerPlugin {
 	
 	createRaceEngineerAction(controller, action, actionFunction) {
 		local function := controller.findFunction(actionFunction)
+		static mode := false
+			
+		if (mode == false) {
+			mode := this.iPitstopMode
 		
-		if (function != false)
-			this.registerAction(new this.RaceEngineerAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Activate"), action), action))
+			if (mode == false) {
+				mode := new this.PitstopMode(this)
+				
+				this.iPitstopMode := mode
+			}
+		}
+		
+		if ((action = "PitstopPlan") || (action = "PitstopPrepare")) {
+			if (function != false)
+				mode.registerAction(new this.RaceEngineerAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Activate"), action), action))
+			else
+				this.logFunctionNotFound(actionFunction)
+		}
 		else
-			this.logFunctionNotFound(actionFunction)
+			logMessage(kLogWarn, translate("Pitstop action ") . action . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
 	}
 	
 	createPitstopAction(controller, action, increaseFunction, moreArguments*) {
@@ -425,22 +457,6 @@ class ACCPlugin extends ControllerPlugin {
 		}
 		else
 			logMessage(kLogWarn, translate("Pitstop action ") . action . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
-	}
-	
-	activate() {
-		base.activate()
-		
-		this.enableRaceEngineerActions(this.ActiveRace)
-	}
-	
-	enableRaceEngineerActions(enabled) {
-		for ignore, theAction in this.Actions {
-			if isInstance(theAction, this.RaceEngineerAction)
-				if enabled
-					theAction.Function.enable(kAllTrigger)
-				else
-					theAction.Function.disable(kAllTrigger)
-		}
 	}
 	
 	runningSimulator() {
@@ -970,9 +986,11 @@ class ACCPlugin extends ControllerPlugin {
 	}
 	
 	shutdownRaceEngineer() {
-		this.RaceEngineer.shutdown()
+		local raceEngineer := this.RaceEngineer
 		
 		this.iRaceEngineer := false
+		
+		raceEngineer.shutdown()
 	}
 	
 	startRace(dataFile) {
@@ -983,7 +1001,11 @@ class ACCPlugin extends ControllerPlugin {
 	
 		this.RaceEngineer.startRace(dataFile)
 		
-		this.enableRaceEngineerActions(true)
+		controller := SimulatorController.Instance
+		mode := controller.findMode(kPitstopMode)
+		
+		if (controller.ActiveMode == mode)
+			mode.enableRaceEngineerActions(true)
 	}
 	
 	finishRace(shutdown := true) {
@@ -995,7 +1017,11 @@ class ACCPlugin extends ControllerPlugin {
 			
 			this.iPitstopPending := false
 			
-			this.enableRaceEngineerActions(false)
+			controller := SimulatorController.Instance
+			mode := controller.findMode(kPitstopMode)
+			
+			if (controller.ActiveMode == mode)
+				mode.enableRaceEngineerActions(false)
 		}
 		else
 			Throw "No active race to be finished..."
@@ -1266,6 +1292,28 @@ changePitstopDriver(selection) {
 	}
 }
 
+planPitstop() {
+	protectionOn()
+	
+	try {
+		SimulatorController.Instance.findPlugin(kACCPlugin).planPitstop()
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+preparePitstop() {
+	protectionOn()
+	
+	try {
+		SimulatorController.Instance.findPlugin(kACCPlugin).preparePitstop()
+	}
+	finally {
+		protectionOff()
+	}
+}
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
@@ -1376,10 +1424,11 @@ collectRaceData() {
 						FileEncoding %curEncoding%
 					}
 				}
-		
-				plugin.finishRace()
 				
 				lastLap := 0
+		
+				if plugin.ActiveRace
+					plugin.finishRace()
 			}
 		}
 		finally {

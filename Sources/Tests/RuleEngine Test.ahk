@@ -507,3 +507,71 @@ AHKUnit.AddTestClass(Unification)
 AHKUnit.AddTestClass(HybridEngine)
 
 AHKUnit.Run()
+
+/*
+theRules =
+(
+	=<(?x, ?y) <= ?x = ?y
+	=<(?x, ?y) <= ?x < ?y
+
+	>=(?x, ?y) <= ?x = ?y
+	>=(?x, ?y) <= ?x > ?y
+
+	>(?x, ?y, true) <= ?x > ?y, !
+	>(?x, ?y, false)
+
+	max(?x, ?y, ?x) <= ?x > ?y, !
+	max(?x, ?y, ?y)
+
+	min(?x, ?y, ?x) <= ?x < ?y, !
+	min(?x, ?y, ?y)
+
+	abs(?x, ?r) <= ?x < 0, ?r = ?x * -1, !
+	abs(?x, ?x)
+
+	bound?(?x) <= unbound?(?x), !, fail
+	bound?(?)
+
+	any?(?value, [?value | ?]) <= !
+	any?(?value, [? | ?tail]) <= any?(?value, ?tail)
+
+	all?(?value, [?value])
+	all?(?value, [?value | ?tail]) <= all?(?value, ?tail)
+
+	none?(?value, [])
+	none?(?value, [?value | ?]) <= !, fail
+	none?(?value, [? | ?tail]) <= none?(?value, ?tail)
+
+	one?(?value, []) <= fail
+	one?(?value, [?value | ?tail]) <= none?(?value, ?tail)
+	one?(?value, [? | ?tail]) <= one?(?value, ?tail)
+
+	length([], 0)
+	length([?h | ?t], ?length) <= length(?t, ?tLength), ?length = ?tLength + 1
+
+	sum([], 0)
+	sum([?h | ?t], ?sum) <= sum(?t, ?tSum), ?sum = ?h + ?tSum
+)
+
+productions := false
+reductions := false
+
+rc := new RuleCompiler()
+
+rc.compileRules(theRules, productions, reductions)
+
+kb := new RuleEngine(productions, reductions, {}).createKnowledgeBase(engine.createFacts(), engine.createRules())
+
+g := rc.compileGoal("one?(?a, [1,2,3])")
+
+rs := kb.prove(g)
+
+while (rs != false) {
+	MsgBox % g.toString(rs)
+
+	if !rs.nextResult()
+		rs := false
+}
+
+msgbox Done
+*/

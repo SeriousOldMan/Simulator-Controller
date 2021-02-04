@@ -543,7 +543,7 @@ theRules =
 	none?(?value, [? | ?tail]) <= none?(?value, ?tail)
 
 	one?(?value, []) <= fail
-	one?(?value, [?value | ?tail]) <= none?(?value, ?tail)
+	one?(?value, [?value | ?tail]) <= !, none?(?value, ?tail)
 	one?(?value, [? | ?tail]) <= one?(?value, ?tail)
 
 	length([], 0)
@@ -560,9 +560,11 @@ rc := new RuleCompiler()
 
 rc.compileRules(theRules, productions, reductions)
 
-kb := new RuleEngine(productions, reductions, {}).createKnowledgeBase(engine.createFacts(), engine.createRules())
+eng := new RuleEngine(productions, reductions, {})
 
-g := rc.compileGoal("one?(?a, [1,2,3])")
+kb := eng.createKnowledgeBase(eng.createFacts(), eng.createRules())
+
+g := rc.compileGoal("one?(2, [1,2,3])")
 
 rs := kb.prove(g)
 

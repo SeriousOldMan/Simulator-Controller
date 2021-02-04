@@ -171,13 +171,13 @@ As you can see here, each phrase provides different alternative sentences. Varia
 
 ## Racing with Jona
 
-Racing with Jona is easy, just begin your race and wait until Jona will contact you. To achieve this, the ACC plugin will start *Race Engineer.exe*, which is located in the *Binaries* folder, as a subprocess, for the time when you are on track. (Note for developers: The communication between those two processes uses named pipes. For more technical information, see the [technical information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#technical-information) section below).
+Racing with Jona is easy, just begin your race and wait until Jona will contact you. This will be a few seconds after you crossed the start finish line after your first complete lap. To achieve this, the ACC plugin will start *Race Engineer.exe*, which is located in the *Binaries* folder, as a subprocess, as long as you are out on a track. (Note for developers: The communication between those two processes uses named pipes. For more technical information, see the [technical information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#technical-information) section below).
 
-But Jona needs a little help from your side to understand the given race situation and the corresponding data.
+Most of the information, that Jona needs, will be collected from the telemetry information of the simulation game. But because this data does not contain every required information, additional data is required to understand the given race situation and the corresponding telemetry information, and to precisely predict tyre pressures, fuel requirements, and so on.
 
 ### Race Settings
 
-Now we come to a dirty part of the game, at least for the moment. As you already might suspect, Jona needs some knowledge, which is not necessarily provided by the telemetry data of the simulation game. For this a *Race Engineer.settings* file exist in the *Simulator Controller\Config* folder in your user *Documents* folder, which you have to edit for each race. The next version of Simulator Controller will provide a graphical user interface for this task at least and I am still looking to gather at least the setup part of this information from the simulation game itself.
+Because of this, we now come to an unpleasant part of the game, at least for the moment. As I already said, Jona needs additional knowledge, which is not provided by the telemetry data of the simulation game. To provide this information, a *Race Engineer.settings* file exist in the *Simulator Controller\Config* folder in your user *Documents* folder, which you have to edit for each race. The next version of Simulator Controller will provide a graphical user interface for this task at least and I am still trying to gather at least the setup part of this information from the simulation game itself.
 
 	[Race Settings]
 	OutLap=true

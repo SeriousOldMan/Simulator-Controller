@@ -463,10 +463,7 @@ celebrate(knowledgeBase) {
 			SplashTextOff
 		}
 		
-		if !knowledgeBase.hasFact("Celebrated")
-			knowledgeBase.addFact("Celebrated", true)
-		else
-			knowledgeBase.setValue("Celebrated", true)
+		knowledgeBase.setFact("Celebrated", true)
 	}
 }
 

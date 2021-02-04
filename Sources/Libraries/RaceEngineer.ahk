@@ -927,16 +927,9 @@ class RaceEngineer extends ConfigurationItem {
 		knowledgeBase.addFact("Lap." . lapNumber . ".Driver.Surname", driverSurname)
 		knowledgeBase.addFact("Lap." . lapNumber . ".Driver.Nickname", driverNickname)
 		
-		if (lapNumber = 1) {
-			knowledgeBase.addFact("Driver.Forname", driverForname)
-			knowledgeBase.addFact("Driver.Surname", driverSurname)
-			knowledgeBase.addFact("Driver.Nickname", driverNickname)
-		}
-		else {
-			knowledgeBase.setValue("Driver.Forname", driverForname)
-			knowledgeBase.setValue("Driver.Surname", driverSurname)
-			knowledgeBase.setValue("Driver.Nickname", driverNickname)
-		}
+		knowledgeBase.setFact("Driver.Forname", driverForname)
+		knowledgeBase.setFact("Driver.Surname", driverSurname)
+		knowledgeBase.setFact("Driver.Nickname", driverNickname)
 		
 		lapTime := getConfigurationValue(data, "Stint Data", "LapLastTime", 0)
 		
@@ -1228,10 +1221,8 @@ class RaceEngineer extends ConfigurationItem {
 				
 			if !lap
 				this.KnowledgeBase.addFact("Pitstop.Prepare", true)
-			else if this.KnowledgeBase.hasFact("Pitstop.Planned.Lap")
-				this.KnowledgeBase.setValue("Pitstop.Planned.Lap", lap - 1)
 			else
-				this.KnowledgeBase.addFact("Pitstop.Planned.Lap", lap - 1)
+				this.KnowledgeBase.setFact("Pitstop.Planned.Lap", lap - 1)
 		
 			result := this.KnowledgeBase.produce()
 			

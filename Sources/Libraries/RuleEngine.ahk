@@ -725,10 +725,7 @@ class SetFactAction extends Action {
 		local fact := (isInstance(this.Fact, Variable) ? this.Fact[variables] : this.Fact[facts])
 		value := (isInstance(this.Value, Variable) ? this.Value[variables] : this.Value[facts])
 		
-		if facts.hasFact(fact)
-			facts.setValue(fact, value)
-		else
-			facts.addFact(fact, value)
+		facts.setFact(fact, value)
 	}
 	
 	toString(facts := "__NotInitialized__") {
@@ -763,7 +760,7 @@ class ClearFactAction extends Action {
 		local facts := knowledgeBase.Facts
 		local fact := (isInstance(this.Fact, Variable) ? this.Fact[variables] : this.Fact[facts])
 		
-		facts.removeFact(fact)
+		facts.clearFact(fact)
 	}
 	
 	toString(facts := "__NotInitialized__") {
@@ -1060,7 +1057,7 @@ class Pair extends Term {
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; Class                    Nil                                            ;;;
+;;; Sealed Class             Nil                                            ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class Nil extends Term {
@@ -1748,17 +1745,14 @@ class FactChoicePoint extends ChoicePoint {
 			fact := this.iFact
 			
 			if this.iClear
-				facts.removeFact(fact)
+				facts.clearFact(fact)
 			else {
 				if (arguments.Length() < 2)
 					value := true
 				else
 					value := arguments[2].toString(resultSet)
-					
-				if facts.hasFact(fact)
-					facts.setValue(fact, value)
-				else
-					facts.addFact(fact, value)
+				
+				facts.setFact(fact, value)
 			}
 			
 			return true
@@ -1778,14 +1772,10 @@ class FactChoicePoint extends ChoicePoint {
 		if !this.ResultSet.KnowledgeBase.DeterministicFacts {
 			facts := this.ResultSet.KnowledgeBase.Facts
 			
-			if (this.iOldValue != kNotInitialized) {
-				if facts.hasFact(this.iFact)
-					facts.setValue(this.iFact, this.iOldValue)
-				else
-					facts.addFact(this.iFact, this.iOldValue)
-			}
+			if (this.iOldValue != kNotInitialized)
+				facts.setFact(this.iFact, this.iOldValue)
 			else
-				facts.removeFact(this.iFact)
+				facts.clearFact(this.iFact)
 		}
 	}
 }
@@ -2105,6 +2095,14 @@ class KnowledgeBase {
 		return this.Facts.getValue(fact, default)
 	}
 	
+	setFact(fact, value) {
+		this.Facts.setFact(fact, value)
+	}
+	
+	clearFact(fact) {
+		this.Facts.clearFact(fact)
+	}
+	
 	hasFact(fact) {
 		return this.Facts.hasFact(fact)
 	}
@@ -2115,6 +2113,8 @@ class KnowledgeBase {
 	
 	removeFact(fact) {
 		this.Facts.removeFact(fact)
+		
+		this.removeFact := this.clearFact
 	}
 	
 	produce() {
@@ -2224,7 +2224,7 @@ class Facts {
 	
 	setValue(fact, value) {
 		if (value == kNotInitialized)
-			this.removeFact(fact)
+			this.clearFact(fact)
 		else
 			if this.hasFact(fact) {
 				if (this.RuleEngine.TraceLevel <= kTraceMedium)
@@ -2254,6 +2254,27 @@ class Facts {
 		return (facts.HasKey(fact) ? facts[fact] : default)
 	}
 	
+	setFact(fact, value) {
+		if this.hasFact(fact)
+			this.setValue(fact, value)
+		else
+			this.addFact(fact, value)
+	}
+	
+	clearFact(fact) {
+		if this.Facts.HasKey(fact) {
+			if (this.RuleEngine.TraceLevel <= kTraceMedium)
+				this.RuleEngine.trace(kTraceMedium, "Deleting fact " . fact)
+				
+			this.Facts.Delete(fact)
+			
+			this.iGeneration += 1
+			
+			if this.hasObserver(fact)
+				this.getObserver(fact).factRemoved()
+		}
+	}
+	
 	hasFact(fact) {
 		return this.Facts.HasKey(fact)
 	}
@@ -2277,17 +2298,9 @@ class Facts {
 	}
 	
 	removeFact(fact) {
-		if this.Facts.HasKey(fact) {
-			if (this.RuleEngine.TraceLevel <= kTraceMedium)
-				this.RuleEngine.trace(kTraceMedium, "Deleting fact " . fact)
-				
-			this.Facts.Delete(fact)
-			
-			this.iGeneration += 1
-			
-			if this.hasObserver(fact)
-				this.getObserver(fact).factRemoved()
-		}
+		this.clearFact(fact)
+		
+		this.removeFact := this.clearFact
 	}
 	
 	registerObserver(fact, observer) {
@@ -2698,7 +2711,7 @@ class RuleEngine {
 		local knowledgeBase := this.createKnowledgeBase(this.createFacts(), this.createRules())
 
 		if knowledgeBase.produce()
-			return knowledgeBase.Facts
+			return knowledgeBase
 		else
 			return false
 	}

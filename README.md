@@ -12,7 +12,7 @@ Thank you very much for your support!
 
 ### Download and Installation
 
-Download one of the builds below and unzip anywhere you like. Then run the configuration tool available in the Binaries folder and configure your environment (you may want to delete the *Simulator Configuration.ini* file in the Config folder, if you want to start out with a really fresh, almost empty configuration, but be sure to make a backup copy elsewhere for later reference). If you leave the *Simulator Configuration.ini* file in place, which is fine, you will see a preconfigured setup, which may you use as reference and change to your preferences, but which will not be usable out of the box for your simulation setup.
+Download one of the builds below and unzip anywhere you like. Then run the configuration tool available in the *Binaries* folder and configure your environment (you may want to delete the *Simulator Configuration.ini* file in the Config folder, if you want to start out with a really fresh, almost empty configuration, but be sure to make a backup copy elsewhere for later reference). If you leave the *Simulator Configuration.ini* file in place, which is fine, you will see a preconfigured setup, which may you use as reference and change to your preferences, but which will not be usable out of the box for your simulation setup.
 
 See the complete documentation about [Installation & Configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation) for more information.
 

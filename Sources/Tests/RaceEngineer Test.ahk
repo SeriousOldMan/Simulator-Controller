@@ -250,7 +250,7 @@ class PitstopHandling extends Assert {
 				
 		return true
 	}
-	
+
 	PitstopPlanLap3Test() {
 		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), new TestPitStopHandler(), false, false)
 		
@@ -352,11 +352,11 @@ class PitstopHandling extends Assert {
 			else {
 				engineer.addLap(A_Index, data)
 			
-				if (A_Index = 5) {
+				if (A_Index = 5)
 					engineer.planPitstop()
-					
-					break
-				}
+				
+				if (A_Index = 6) 
+					Break
 			}
 			
 			dumpKnowledge(engineer.KnowledgeBase)

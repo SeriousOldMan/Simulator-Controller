@@ -1010,9 +1010,6 @@ class ACCPlugin extends ControllerPlugin {
 	
 	finishRace(shutdown := true) {
 		if this.ActiveRace {
-			ListLines
-			MsgBox Finish Race
-			
 			this.RaceEngineer.finishRace()
 			
 			if shutdown
@@ -1355,7 +1352,7 @@ collectRaceData() {
 		dataLastLap := getConfigurationValue(data, "Stint Data", "Laps", 0)
 		
 		/* Used for full setup offrace debugging...
-		dataFile := kSourcesDirectory . "Tests\Test Data\Lap " . (lastLap + 1) . ".data"
+		dataFile := kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . (lastLap + 1) . ".data"
 		data := readConfiguration(dataFile)
 		
 		if (data.Count() == 0) {
@@ -1365,6 +1362,8 @@ collectRaceData() {
 			
 			ExitApp
 		}
+		else
+			MsgBox % "Lap " . getConfigurationValue(data, "Stint Data", "Laps", 0)
 		
 		dataLastLap := getConfigurationValue(data, "Stint Data", "Laps", 0)
 		*/
@@ -1410,7 +1409,7 @@ collectRaceData() {
 				
 				newDataFile := kUserHomeDirectory . "Temp\ACC Data\Lap " . lastLap . "." . ++lastLapCounter . ".data"
 				
-				FileMove %dataFile%, %newDataFile%, 1
+				FileCopy %dataFile%, %newDataFile%, 1
 				
 				if firstLap
 					plugin.startRace(newDataFile)

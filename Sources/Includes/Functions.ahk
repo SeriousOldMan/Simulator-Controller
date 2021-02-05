@@ -246,7 +246,7 @@ deliverEvent(target, event, data) {
 	DetectHiddenWindows On ; needed for sending messages
 	
 	try {
-		SendMessage %message%, %wParam%, %lParam%, %control%, %target%
+		PostMessage %message%, %wParam%, %lParam%, %control%, %target%
 	}
 	catch exception {
 	}

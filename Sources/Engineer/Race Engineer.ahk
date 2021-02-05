@@ -64,7 +64,7 @@ class RemotePitstopHandler {
 	}
 		
 	callRemote(function, arguments*) {
-		return raiseEvent("Pitstop", function . ":" . values2String(";", arguments*))
+		return deliverEvent("ahk_pid " . this.RemotePID, "Pitstop", function . ":" . values2String(";", arguments*))
 	}
 	
 	pitstopPlanned(arguments*) {

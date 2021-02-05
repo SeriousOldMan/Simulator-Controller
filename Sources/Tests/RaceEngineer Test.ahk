@@ -663,7 +663,7 @@ else {
 			lap := A_Index
 		
 			Loop {
-				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 2\Lap " . lap . "." . A_Index . ".data")
+				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 3\Lap " . lap . "." . A_Index . ".data")
 			
 				if (data.Count() == 0) {
 					if (A_Index == 1)

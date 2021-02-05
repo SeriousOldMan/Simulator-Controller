@@ -1331,7 +1331,7 @@ collectRaceData() {
 	if !plugin
 		plugin := SimulatorController.Instance.findPlugin(kACCPlugin)
 	
-	if isACCRunning() {
+	if true || isACCRunning() {
 		exePath := kBinariesDirectory . "ACC SHM Reader.exe"
 		
 		try {
@@ -1355,18 +1355,29 @@ collectRaceData() {
 		dataLastLap := getConfigurationValue(data, "Stint Data", "Laps", 0)
 		
 		/* Used for full setup offrace debugging...
-		dataFile := kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . (lastLap + 1) . ".data"
+		dataFile := kSourcesDirectory . "Tests\Test Data\Race 3\Lap " . lap . "." . counter . ".data"
 		data := readConfiguration(dataFile)
 		
 		if (data.Count() == 0) {
-			plugin.finishRace()
-		
-			msgbox Done...
+			if (counter == 1) {	
+				plugin.finishRace()
 			
-			ExitApp
+				msgbox Done...
+				
+				ExitApp
+			}
+			else {
+				counter := 1
+				lap += 1
+				
+				goto restart
+			}
 		}
-		else
-			MsgBox % "Lap " . getConfigurationValue(data, "Stint Data", "Laps", 0)
+		else {
+			SplashTextOn 400, 100, , % "Data " lap . "." . counter . " loaded..."
+			Sleep 500
+			SplashTextOff
+		}
 		
 		dataLastLap := getConfigurationValue(data, "Stint Data", "Laps", 0)
 		*/
@@ -1415,7 +1426,7 @@ collectRaceData() {
 				}
 				
 				newDataFile := kUserHomeDirectory . "Temp\ACC Data\Lap " . lastLap . "." . ++lastLapCounter . ".data"
-				
+					
 				FileCopy %dataFile%, %newDataFile%, 1
 				
 				if firstLap

@@ -1606,7 +1606,7 @@ class FunctionsList extends ConfigurationItemList {
 			return Function.createFunction(ConfigurationItem.descriptor(functionType, functionNumberEdit), false, functionOnHotkeysEdit, functionOnActionEdit, functionOffHotkeysEdit, functionOffActionEdit)
 		}
 		else {
-			OnMessage(0x44, Func("translateMsgBoxButtons").bind(["Ok"]))
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 			title := translate("Error")
 			MsgBox 262160, %title%, % translate("Invalid values detected - please correct...")
 			OnMessage(0x44, "")
@@ -1620,7 +1620,7 @@ class FunctionsList extends ConfigurationItemList {
 	
 		if function
 			if this.iFunctions.HasKey(function.Descriptor) {
-				OnMessage(0x44, Func("translateMsgBoxButtons").bind(["Ok"]))
+				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 				title := translate("Error")
 				MsgBox 262160, %title%, % translate("This function already exists - please use different values...")
 				OnMessage(0x44, "")
@@ -1645,7 +1645,7 @@ class FunctionsList extends ConfigurationItemList {
 	
 		if function
 			if (function.Descriptor != this.iItemsList[this.iCurrentItemIndex].Descriptor) {
-				OnMessage(0x44, Func("translateMsgBoxButtons").bind(["Ok"]))
+				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 				title := translate("Error")
 				MsgBox 262160, %title%, % translate("The type and number of an existing function may not be changed...")
 				OnMessage(0x44, "")
@@ -2318,7 +2318,7 @@ class ThemesList extends ConfigurationItemList {
 		return Array(type, themeNameEdit, media, soundFilePathEdit, picturesDurationEdit)
 		
 error:
-		OnMessage(0x44, Func("translateMsgBoxButtons").bind(["Ok"]))
+		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 		title := translate("Error")
 		MsgBox 262160, %title%, % translate("Invalid values detected - please correct...")
 		OnMessage(0x44, "")
@@ -2656,7 +2656,7 @@ class TranslationsEditor extends ConfigurationItem {
 		
 		SoundPlay *32
 	
-		OnMessage(0x44, Func("translateMsgBoxButtons").bind(["Yes", "No"]))
+		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
 		title := translate("Delete")
 		MsgBox 262436, %title%, % translate("Do you really want to delete this translation?")
 		OnMessage(0x44, "")
@@ -2899,7 +2899,7 @@ class TranslationsList extends ConfigurationItemList {
 		if (this.iChanged) {
 			SoundPlay *32
 		
-			OnMessage(0x44, Func("translateMsgBoxButtons").bind(["Yes", "No"]))
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
 			title := translate("Save")
 			MsgBox 262436, %title%, % translate("Do you want to save your changes? Any existing translations will be overwritten.")
 			OnMessage(0x44, "")
@@ -2945,7 +2945,7 @@ showKeyDetector() {
 	}
 
 	if (joystickNumbers.Length() == 0) {
-		OnMessage(0x44, Func("translateMsgBoxButtons").bind(["Ok"]))
+		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 		title := translate("Warning")
 		MsgBox 262192, %title%, % translate("No controller detected...")
 		OnMessage(0x44, "")

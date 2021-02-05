@@ -968,7 +968,7 @@ protectionOn()
 
 try {
 	SoundPlay *32
-	OnMessage(0x44, Func("translateMsgBoxButtons").bind(["Yes", "No"]))
+	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
 	
 	title := translate("Simulator Build")
 	

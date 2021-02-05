@@ -1163,7 +1163,7 @@ setHotkeyEnabled(function, trigger, enabled) {
 }
 
 functionActionCallable(function, trigger, action) {
-	return (action ? action : Func("fireControllerAction").bind(function, trigger))
+	return (action ? action : Func("fireControllerAction").Bind(function, trigger))
 }
 
 fireControllerAction(function, trigger) {

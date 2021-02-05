@@ -60,7 +60,7 @@ startConfiguration() {
 		RunWait % kBinariesDirectory . "Simulator Configuration.exe"
 	}
 	catch exception {
-		OnMessage(0x44, Func("translateMsgBoxButtons").bind(["Ok"]))
+		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 		error := translate("Error")
 		MsgBox 262160, %error%, % translate("Cannot start the configuration tool - please check the installation...")
 		OnMessage(0x44, "")

@@ -107,30 +107,73 @@ readMessage() {
 	return false
 }
 
-writeMessage() {
+writePipeMessage(event, data) {
 	static ERROR_PIPE_CONNECTED := 535
 	static ERROR_PIPE_LISTENING := 536
 	static ptr
+	
+	pipeName := "\\.\pipe\SCE" . event
 
-	if (vOutgoingEvents.Length() > 0) {
-		event := vOutgoingEvents[1][1]
-		data := vOutgoingEvents[1][2]
+	pipe := DllCall("CreateNamedPipe", "str", "\\.\pipe\SCE" . event, "uint", 3, "uint", 0, "uint", 255, "uint", 1024, "uint", 1024, "uint", 0, ptr, 0, ptr)
+	
+	DllCall("ConnectNamedPipe", ptr, pipe, ptr, 0)
+	
+	if (true || (A_LastError = ERROR_PIPE_CONNECTED)) {
+		message := (A_IsUnicode ? chr(0xfeff) : chr(239) chr(187) chr(191)) . (event := event . ":" . data)
+	
+		DllCall("WriteFile", ptr, pipe, "str", message, "uint", (StrLen(message) + 1) * (A_IsUnicode ? 2 : 1), "uint*", 0, ptr, 0)
 		
-		pipeName := "\\.\pipe\SCE" . event
+		DllCall("CloseHandle", ptr, pipe)
+		
+		return true
+	}
+	else
+		return false
+}
 
-		pipe := DllCall("CreateNamedPipe", "str", "\\.\pipe\SCE" . event, "uint", 3, "uint", 0, "uint", 255, "uint", 1024, "uint", 1024, "uint", 0, ptr, 0, ptr)
+writeEventMessage(target, event, data) {
+	curDetectHiddenWindows := A_DetectHiddenWindows
+	curTitleMatchMode := A_TitleMatchMode
+	
+	event := event . ":" . data
+	
+	;---------------------------------------------------------------------------
+	; construct the message to send
+	;---------------------------------------------------------------------------
+	dwData := encodeDWORD("EVNT")
+	cbData := StrLen(event) * (A_IsUnicode + 1) + 1 ; length of DATA string (incl. ZERO)
+	lpData := &event                                ; pointer to DATA string
+
+	;---------------------------------------------------------------------------
+	; put the message in a COPYDATASTRUCT
+	;---------------------------------------------------------------------------
+	VarSetCapacity(struct, A_PtrSize * 3, 0)        ; initialize COPYDATASTRUCT
+	NumPut(dwData, struct, A_PtrSize * 0, "UInt")   ; DWORD
+	NumPut(cbData, struct, A_PtrSize * 1, "UInt")   ; DWORD
+	NumPut(lpData, struct, A_PtrSize * 2, "UInt")   ; 32bit pointer
+
+	;---------------------------------------------------------------------------
+	; parameters for SendMessage command
+	;---------------------------------------------------------------------------
+	message := 0x4a     ; WM_COPYDATA
+	wParam  := ""       ; not used
+	lParam  := &struct  ; COPYDATASTRUCT
+	control := ""       ; not needed
+
+	SetTitleMatchMode 2 ; match part of the title
+	DetectHiddenWindows On ; needed for sending messages
+	
+	try {
+		SendMessage %message%, %wParam%, %lParam%, %control%, %target%
 		
-		DllCall("ConnectNamedPipe", ptr, pipe, ptr, 0)
-		
-		if (true || (A_LastError = ERROR_PIPE_CONNECTED)) {
-			message := (A_IsUnicode ? chr(0xfeff) : chr(239) chr(187) chr(191)) . (event := event . ":" . data)
-		
-			DllCall("WriteFile", ptr, pipe, "str", message, "uint", (StrLen(message) + 1) * (A_IsUnicode ? 2 : 1), "uint*", 0, ptr, 0)
-			
-			DllCall("CloseHandle", ptr, pipe)
-			
-			vOutgoingEvents.RemoveAt(1)
-		}
+		return (ErrorLevel != "FAIL")
+	}
+	catch exception {
+		return false
+	}
+	finally {
+		DetectHiddenWindows %curDetectHiddenWindows%
+		SetTitleMatchMode %curTitleMatchMode%
 	}
 }
 
@@ -139,6 +182,15 @@ messageDispatcher() {
 		event := vIncomingEvents.RemoveAt(1)
 	
 		%event%()
+	}
+}
+
+writeMessage() {
+	if (vOutgoingEvents.Length() > 0) {
+		handler := vOutgoingEvents[1]
+		
+		if %handler%()
+			vOutgoingEvents.RemoveAt(1)
 	}
 }
 
@@ -214,45 +266,7 @@ unknownEventHandler(event, data) {
 deliverEvent(target, event, data) {
 	logMessage(kLogInfo, "Raising event " . event . (data ? ": " . data : "") . " in target " . target)
 	
-	curDetectHiddenWindows := A_DetectHiddenWindows
-	curTitleMatchMode := A_TitleMatchMode
-	
-	event := event . ":" . data
-	
-	;---------------------------------------------------------------------------
-	; construct the message to send
-	;---------------------------------------------------------------------------
-	dwData := encodeDWORD("EVNT")
-	cbData := StrLen(event) * (A_IsUnicode + 1) + 1 ; length of DATA string (incl. ZERO)
-	lpData := &event                                ; pointer to DATA string
-
-	;---------------------------------------------------------------------------
-	; put the message in a COPYDATASTRUCT
-	;---------------------------------------------------------------------------
-	VarSetCapacity(struct, A_PtrSize * 3, 0)        ; initialize COPYDATASTRUCT
-	NumPut(dwData, struct, A_PtrSize * 0, "UInt")   ; DWORD
-	NumPut(cbData, struct, A_PtrSize * 1, "UInt")   ; DWORD
-	NumPut(lpData, struct, A_PtrSize * 2, "UInt")   ; 32bit pointer
-
-	;---------------------------------------------------------------------------
-	; parameters for SendMessage command
-	;---------------------------------------------------------------------------
-	message := 0x4a     ; WM_COPYDATA
-	wParam  := ""       ; not used
-	lParam  := &struct  ; COPYDATASTRUCT
-	control := ""       ; not needed
-
-	SetTitleMatchMode 2 ; match part of the title
-	DetectHiddenWindows On ; needed for sending messages
-	
-	try {
-		PostMessage %message%, %wParam%, %lParam%, %control%, %target%
-	}
-	catch exception {
-	}
-	
-	DetectHiddenWindows %curDetectHiddenWindows%
-	SetTitleMatchMode %curTitleMatchMode%
+	vOutgoingEvents.Push(Func("writeEventMessage").Bind(target, event, data))
 }
 
 receiveEvent(wParam, lParam) {
@@ -328,14 +342,14 @@ restartUpdate:
 			if !getConfigurationValue(updates, "Processed", target, false) {
 				SoundPlay *32
 		
-				OnMessage(0x44, Func("translateMsgBoxButtons").bind(["Yes", "No", "Never"]))
+				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No", "Never"]))
 				title := translate("Modular Simulator Controller System")
 				MsgBox 262179, %title%, % translate("The local configuration database needs an update. Do you want to run the update now?")
 				OnMessage(0x44, "")
 				
 				IfMsgBox Cancel
 				{
-					OnMessage(0x44, Func("translateMsgBoxButtons").bind(["Yes", "No"]))
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
 					title := translate("Modular Simulator Controller System")
 					MsgBox 262436, %title%, % translate("Are you really sure, you want to skip the automated update procedure?")
 					OnMessage(0x44, "")
@@ -376,8 +390,12 @@ loadSimulatorConfiguration() {
 	
 	kVersion := getConfigurationValue(readConfiguration(kHomeDirectory . "VERSION"), "Version", "Current", "0.0.0")
 	
+	Process Exist
+	
+	pid := ErrorLevel
+	
 	logMessage(kLogCritical, "---------------------------------------------------------------")
-	logMessage(kLogCritical, translate("           Running ") . StrSplit(A_ScriptName, ".")[1] . " (" . kVersion . ")")
+	logMessage(kLogCritical, translate("      Running ") . StrSplit(A_ScriptName, ".")[1] . " (" . kVersion . ") [" . pid . "]")
 	logMessage(kLogCritical, "---------------------------------------------------------------")
 	
 	if (kSimulatorConfiguration.Count() == 0)
@@ -982,7 +1000,7 @@ raiseEvent(event, data, localProcess := false) {
 	else {
 		logMessage(kLogInfo, translate("Raising event """) . event . (data ? translate(""": ") . data : translate("""")))
 	
-		vOutgoingEvents.Push(Array(event, data))
+		vOutgoingEvents.Push(Func("writePipeMessage").Bind(event, data))
 		
 		return true
 	}

@@ -115,7 +115,7 @@ class SimulatorStartup extends ConfigurationItem {
 			if (result == kCancel)
 				exitStartup(true)
 			else if (noConfiguration && (readConfiguration(kSimulatorConfigurationFile).Count() == 0)) {
-				OnMessage(0x44, Func("translateMsgBoxButtons").bind(["Ok"]))
+				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 				error := translate("Error")
 				MsgBox 262160, %error%, % translate("Cannot initiate startup sequence, please check the configuration...")
 				OnMessage(0x44, "")
@@ -379,7 +379,7 @@ protectionOn()
 try {
 	if !vStartupFinished {
 		SoundPlay *32
-		OnMessage(0x44, Func("translateMsgBoxButtons").bind(["Yes", "No"]))
+		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
 		
 		title := translate("Simulator Startup")
 		

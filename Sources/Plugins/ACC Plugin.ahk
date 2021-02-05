@@ -1063,9 +1063,6 @@ class ACCPlugin extends ControllerPlugin {
 	}
 	
 	pitstopPlanned(pitstopNumber) {
-		SplashTextOn 400, 100, , PLANNED
-		Sleep 1000
-		SplashTextOff
 	}
 	
 	pitstopPrepared(pitstopNumber) {

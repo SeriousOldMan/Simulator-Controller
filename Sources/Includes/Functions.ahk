@@ -266,7 +266,8 @@ unknownEventHandler(event, data) {
 deliverEvent(target, event, data) {
 	logMessage(kLogInfo, "Raising event " . event . (data ? ": " . data : "") . " in target " . target)
 	
-	vOutgoingEvents.Push(Func("writeEventMessage").Bind(target, event, data))
+	; vOutgoingEvents.Push(Func("writeEventMessage").Bind(target, event, data))
+	vOutgoingEvents.Push(Func("writePipeMessage").Bind(event, data))
 }
 
 receiveEvent(wParam, lParam) {

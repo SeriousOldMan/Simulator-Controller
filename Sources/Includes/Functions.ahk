@@ -78,7 +78,7 @@ readLanguage(targetLanguageCode) {
 	Throw "Inconsistent translation encountered for """ . targetLanguageCode . """ in readLanguage..."
 }
 
-readMessages() {
+readMessage() {
 	for event, handler in vEventHandlers {
 		if (event = "*")
 			continue
@@ -107,7 +107,7 @@ readMessages() {
 	return false
 }
 
-writeMessages() {
+writeMessage() {
 	static ERROR_PIPE_CONNECTED := 535
 	static ERROR_PIPE_LISTENING := 536
 	static ptr
@@ -143,8 +143,8 @@ messageDispatcher() {
 }
 
 messageQueue() {
-	if !readMessages()
-		writeMessages()
+	if !readMessage()
+		writeMessage()
 }
 
 trayMessageQueue() {

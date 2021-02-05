@@ -472,9 +472,9 @@ class Fact extends Primary {
 			Throw "Subclassing of Fact is not allowed..."
 	}
 	
-	getValue(factsOrResultSet := "__NotInitialized__") {
+	getValue(factsOrResultSet, default := "__NotInitialized__") {
 		if (factsOrResultSet.base == Facts)
-			return factsOrResultSet.getValue(this.Fact)
+			return factsOrResultSet.getValue(this.Fact, default)
 		else
 			return this
 	}
@@ -3763,33 +3763,42 @@ equal(choicePoint, operand1, operand2) {
 unbound(choicePoint, operand1) {
 	if isInstance(operand1, Variable)
 		return (operand1.getValue(choicePoint.ResultSet, operand1) == operand1)
+	else if isInstance(operand1, Fact)
+		return (operand1.getValue(choicePoint.ResultSet.KnowledgeBase.Facts) = kNotInitialized)
 	else
 		return (operand1.toString(choicePoint.ResultSet) = kNotInitialized)
 }
 
-append(choicePoint, operand1, arguments*) {
-	local resultSet := choicePoint.ResultSet
+append(choicePoint, arguments*) {
+	local resultSet
 	
-	operand1 := operand1.getValue(resultSet, operand1)
-	
-	string := ""
-	
-	for ignore, argument in arguments
-		string .= argument.getValue(resultSet, argument).toString(resultSet)
-	
-	if isInstance(operand1, Variable)
-		return resultSet.unify(choicePoint, operand1, new Literal(string))
-	else
-		return (operand1.toString(resultSet) = string)
+	if (arguments.Length() == 0)
+		return false
+	else {
+		resultSet := choicePoint.ResultSet
+		
+		operand1 := arguments.Pop()
+		operand1 := operand1.getValue(resultSet, operand1)
+		
+		string := ""
+		
+		for ignore, argument in arguments
+			string .= argument.getValue(resultSet, argument).toString(resultSet)
+		
+		if isInstance(operand1, Variable)
+			return resultSet.unify(choicePoint, operand1, new Literal(string))
+		else
+			return (operand1.toString(resultSet) = string)
+	}
 }
 
 get(choicePoint, operand1, operand2) {
 	local resultSet := choicePoint.ResultSet
 	
-	operand1 := operand1.getValue(resultSet, operand1)
-	operand2 := new Literal(resultSet.KnowledgeBase.Facts.getValue(operand2.getValue(resultSet, operand2).toString(resultSet)))
+	operand1 := new Literal(resultSet.KnowledgeBase.Facts.getValue(operand1.getValue(resultSet, operand1).toString(resultSet)))
+	operand2 := operand2.getValue(resultSet, operand2)
 	
-	if isInstance(operand1, Variable)
+	if isInstance(operand2, Variable)
 		return resultSet.unify(choicePoint, operand1, operand2)
 	else if ((operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)))
 		return false

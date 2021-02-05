@@ -681,12 +681,16 @@ class Plugin extends ConfigurationItem {
 	loadFromConfiguration(configuration) {
 		base.loadFromConfiguration(configuration)
 		
-		descriptor := string2Values("|", getConfigurationValue(configuration, "Plugins", this.Plugin, ""))
+		descriptor := getConfigurationValue(configuration, "Plugins", this.Plugin, "")
 		
-		if (descriptor.Length() > 0) {
-			this.iIsActive := (descriptor[1] = "true") ? true : false
-			this.iSimulators := StrSplit(descriptor[2], [",", ";"], " `t")
-			this.iArguments := this.computeArgments(descriptor[3])
+		if (StrLen(descriptor) > 0) {
+			descriptor := string2Values("|", descriptor)
+			
+			if (descriptor.Length() > 0) {
+				this.iIsActive := (descriptor[1] = "true") ? true : false
+				this.iSimulators := StrSplit(descriptor[2], [",", ";"], " `t")
+				this.iArguments := this.computeArgments(descriptor[3])
+			}
 		}
 	}
 	

@@ -67,7 +67,7 @@ kRules =
 				sum([], 0)
 				sum([?h | ?t], ?sum) <= sum(?t, ?tSum), +(?sum, ?h, ?tSum)
 				
-				construct(?A, ?B) <= append(?A, Foo., ?B, .Bar)
+				construct(?A, ?B) <= Append(Foo., ?B, .Bar, ?A)
 
 				persist(?A, ?B) <= Call(showRelationship, ?A, ?B), !, Set(?B.grandchild, ?A), Set(?B.grandfather, true), Set(?A.grandchild, true), Produce()
 

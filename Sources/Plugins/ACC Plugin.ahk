@@ -1375,27 +1375,28 @@ collectRaceData() {
 					
 					inPit := true
 				}
-				else if (dataLastLap > lastLap) {
-					if (lastLap == 0)
-						plugin.startRace(dataFile)
-					
-					lastLap := dataLastLap
-					lastLapCounter := 1
-
-					plugin.addLap(dataLastLap, dataFile)
-					
-					if isDebug()
-						writeConfiguration(kUserHomeDirectory . "Temp\ACC Data\Lap " . lastLap . ".1.data", data)
-					
-					inPit := false
-				}
-				else if ((lastLap > 0) && (dataLastLap == lastLap)) {
-					plugin.updateLap(dataLastLap, dataFile)
-					
-					if isDebug()
-						writeConfiguration(kUserHomeDirectory . "Temp\ACC Data\Lap " . lastLap . "." . ++lastLapCounter . ".data", data)
+				else if (dataLastLap > 0) {
+					firstLap := (lastLap == 0)
+					newLap := (dataLastLap > lastLap)
 				
 					inPit := false
+					
+					if newLap {
+						lastLap := dataLastLap
+						lastLapCounter := 0
+					}
+					
+					newDataFile := kUserHomeDirectory . "Temp\ACC Data\Lap " . lastLap . "." . ++lastLapCounter . ".data"
+					
+					FileMove %dataFile%, %newDataFile%, 1
+					
+					if firstLap
+						plugin.startRace(newDataFile)
+					
+					if newLap
+						plugin.addLap(dataLastLap, newDataFile)
+					else	
+						plugin.updateLap(dataLastLap, newDataFile)
 				}
 			}
 			else if (lastLap > 0) {

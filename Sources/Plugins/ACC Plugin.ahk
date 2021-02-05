@@ -1063,6 +1063,9 @@ class ACCPlugin extends ControllerPlugin {
 	}
 	
 	pitstopPlanned(pitstopNumber) {
+		SplashTextOn 400, 100, , PLANNED
+		Sleep 1000
+		SplashTextOff
 	}
 	
 	pitstopPrepared(pitstopNumber) {
@@ -1378,8 +1381,11 @@ collectRaceData() {
 		
 				if plugin.ActiveRace
 					plugin.finishRace()
+				
+				return
 			}
-			else if (dataLastLap < lastLap) {
+			
+			if ((dataLastLap == 1) && (dataLastLap < lastLap)) {
 				; Start of new race without finishing previous race first
 			
 				lastLap := 0
@@ -1387,7 +1393,8 @@ collectRaceData() {
 				if plugin.ActiveRace
 					plugin.finishRace()
 			}
-			else if (plugin.PitstopPending && getConfigurationValue(data, "Stint Data", "InPit", false) && !inPit) {
+			
+			if (plugin.PitstopPending && getConfigurationValue(data, "Stint Data", "InPit", false) && !inPit) {
 				; Car is in the Pit
 				
 				plugin.performPitstop(dataLastLap)

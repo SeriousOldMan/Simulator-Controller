@@ -1010,6 +1010,9 @@ class ACCPlugin extends ControllerPlugin {
 	
 	finishRace(shutdown := true) {
 		if this.ActiveRace {
+			ListLines
+			MsgBox Finish Race
+			
 			this.RaceEngineer.finishRace()
 			
 			if shutdown
@@ -1369,67 +1372,53 @@ collectRaceData() {
 		protectionOn()
 		
 		try {
-			if (getConfigurationValue(data, "Stint Data", "Active", false) && (dataLastLap >= lastLap)) {
-				if (plugin.PitstopPending && getConfigurationValue(data, "Stint Data", "InPit", false) && !inPit) {
-					plugin.performPitstop(dataLastLap)
-					
-					inPit := true
-				}
-				else if (dataLastLap > 0) {
-					firstLap := (lastLap == 0)
-					newLap := (dataLastLap > lastLap)
-				
-					inPit := false
-					
-					if newLap {
-						lastLap := dataLastLap
-						lastLapCounter := 0
-					}
-					
-					newDataFile := kUserHomeDirectory . "Temp\ACC Data\Lap " . lastLap . "." . ++lastLapCounter . ".data"
-					
-					FileMove %dataFile%, %newDataFile%, 1
-					
-					if firstLap
-						plugin.startRace(newDataFile)
-					
-					if newLap
-						plugin.addLap(dataLastLap, newDataFile)
-					else	
-						plugin.updateLap(dataLastLap, newDataFile)
-				}
-			}
-			else if (lastLap > 0) {
-				if isDebug() {
-					fileName := (kUserHomeDirectory . "Temp\ACC Data\Race.data")
-					
-					try {
-						FileDelete %fileName%
-					}
-					catch exception {
-						; ignore
-					}
-					
-					curEncoding := A_FileEncoding
-					
-					FileEncoding UTF-16
-					
-					try {
-						for theFact, theValue in plugin.RaceEngineer.KnowledgeBase.Facts.Facts {
-							line := theFact . "=" . theValue . "`n"
-							
-							FileAppend %line%, %fileName%
-						}
-					}
-					finally {
-						FileEncoding %curEncoding%
-					}
-				}
+			if !getConfigurationValue(data, "Stint Data", "Active", false) {
+				; Not on track
 				
 				lastLap := 0
 		
 				if plugin.ActiveRace
 					plugin.finishRace()
+			}
+			else if (dataLastLap < lastLap) {
+				; Start of new race without finishing previous race first
+			
+				lastLap := 0
+		
+				if plugin.ActiveRace
+					plugin.finishRace()
+			}
+			else if (plugin.PitstopPending && getConfigurationValue(data, "Stint Data", "InPit", false) && !inPit) {
+				; Car is in the Pit
+				
+				plugin.performPitstop(dataLastLap)
+				
+				inPit := true
+			}
+			else if (dataLastLap > 0) {
+				; Car is on the track
+			
+				firstLap := (lastLap == 0)
+				newLap := (dataLastLap > lastLap)
+			
+				inPit := false
+				
+				if newLap {
+					lastLap := dataLastLap
+					lastLapCounter := 0
+				}
+				
+				newDataFile := kUserHomeDirectory . "Temp\ACC Data\Lap " . lastLap . "." . ++lastLapCounter . ".data"
+				
+				FileMove %dataFile%, %newDataFile%, 1
+				
+				if firstLap
+					plugin.startRace(newDataFile)
+				
+				if newLap
+					plugin.addLap(dataLastLap, newDataFile)
+				else	
+					plugin.updateLap(dataLastLap, newDataFile)
 			}
 		}
 		finally {

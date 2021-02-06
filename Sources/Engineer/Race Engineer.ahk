@@ -64,7 +64,7 @@ class RemotePitstopHandler {
 	}
 		
 	callRemote(function, arguments*) {
-		raiseEvent(kPipeMessage, "Pitstop", function . ":" . values2String(";", arguments*), this.RemotePID)
+		raiseEvent(kFileMessage, "Pitstop", function . ":" . values2String(";", arguments*), this.RemotePID)
 	}
 	
 	pitstopPlanned(arguments*) {

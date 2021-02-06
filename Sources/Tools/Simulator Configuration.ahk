@@ -191,7 +191,7 @@ class ConfigurationItemList extends ConfigurationItem {
 	
 	selectItem(itemNumber) {
 		this.iCurrentItemIndex := itemNumber
-		
+			
 		if itemNumber
 			LV_Modify(itemNumber, "Vis +Select +Focus")
 		
@@ -958,8 +958,6 @@ class PluginsTab extends ConfigurationItemList {
 		
 		Gui ListView, % this.ListHandle
 	
-		; LV_Delete()
-		
 		bubbleSort(items, "comparePlugins")
 	
 		count := LV_GetCount()
@@ -990,6 +988,15 @@ class PluginsTab extends ConfigurationItemList {
 		}
 	}
 	
+	selectItem(itemNumber) {
+		if (itemNumber && (itemNumber != this.iCurrentItemIndex))
+			LV_Modify(itemNumber, "Vis +Select +Focus")
+		
+		this.iCurrentItemIndex := itemNumber
+			
+		this.updateState()
+	}
+	
 	loadEditor(item) {
 		pluginEdit := item.Plugin
 		pluginSimulatorsEdit := values2String(", ", item.Simulators*)
@@ -1002,6 +1009,8 @@ class PluginsTab extends ConfigurationItemList {
 			Control Check, , , ahk_id %pluginActivatedCheckHandle%
 		else
 			Control Uncheck, , , ahk_id %pluginActivatedCheckHandle%
+		
+		GuiControl, , pluginActivatedCheck, %pluginActivatedCheck%
 			
 		GuiControl Text, pluginSimulatorsEdit, %pluginSimulatorsEdit%
 		GuiControl Text, pluginArgumentsEdit, %pluginArgumentsEdit%

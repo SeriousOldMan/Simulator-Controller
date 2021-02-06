@@ -384,9 +384,9 @@ class Function extends ConfigurationItem {
 						
 						for index, argument in arguments
 							if (argument == true)
-								arguments[index] := "true"
+								arguments[index] := kTrue
 							else if (argument == false)
-								arguments[index] := "false"
+								arguments[index] := kFalse
 					}
 						
 					action := ((action && (action.Length() == 2)) ? (action[1] . "(" . values2String(", ", arguments*) . ")") : "")
@@ -408,9 +408,9 @@ class Function extends ConfigurationItem {
 							
 							for index, argument in arguments
 								if (argument == true)
-									arguments[index] := "true"
+									arguments[index] := kTrue
 								else if (argument == false)
-									arguments[index] := "false"
+									arguments[index] := kFalse
 						}
 						
 						result[trigger] := ((theAction && (theAction.Length() == 2)) ? (theAction[1] . "(" . values2String(", ", arguments*) . ")") : "")
@@ -508,9 +508,9 @@ class Function extends ConfigurationItem {
 			action := action[1]
 			
 			for index, argument in arguments {
-				if (argument = "true")
+				if (argument = kTrue)
 					arguments[index] := true
-				else if (argument = "false")
+				else if (argument = kFalse)
 					arguments[index] := false
 			}
 			
@@ -687,7 +687,7 @@ class Plugin extends ConfigurationItem {
 			descriptor := string2Values("|", descriptor)
 			
 			if (descriptor.Length() > 0) {
-				this.iIsActive := (descriptor[1] = "true") ? true : false
+				this.iIsActive := (descriptor[1] = kTrue) ? true : false
 				this.iSimulators := StrSplit(descriptor[2], [",", ";"], " `t")
 				this.iArguments := this.computeArgments(descriptor[3])
 			}
@@ -697,7 +697,7 @@ class Plugin extends ConfigurationItem {
 	saveToConfiguration(configuration) {
 		base.saveToConfiguration(configuration)
 		
-		setConfigurationValue(configuration, "Plugins", this.Plugin, (this.Active ? "true" : "false") . "|" . values2String(", ", this.Simulators*) . "|" . this.Arguments[true])
+		setConfigurationValue(configuration, "Plugins", this.Plugin, (this.Active ? kTrue : kFalse) . "|" . values2String(", ", this.Simulators*) . "|" . this.Arguments[true])
 	}
 	
 	computeArgments(arguments) {

@@ -110,8 +110,8 @@ class Compiler extends Assert {
 	}
 	
 	substituteBoolean(text) {
-		text := StrReplace(text, "true", "1")
-		text := StrReplace(text, "false", "0")
+		text := StrReplace(text, kTrue, "1")
+		text := StrReplace(text, kFalse, "0")
 		
 		return text
 	}

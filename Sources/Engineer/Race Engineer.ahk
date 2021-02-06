@@ -63,66 +63,50 @@ class RemotePitstopHandler {
 		this.iRemotePID := remotePID
 	}
 		
-	callRemote(function, synchronous, arguments*) {
-		if synchronous
-			return raiseEvent("Pitstop", function . ":" . values2String(";", arguments*))
-		else
-			return deliverMessage("ahk_pid " . this.RemotePID, "Pitstop", function . ":" . values2String(";", arguments*))
+	callRemote(function, arguments*) {
+		raiseEvent(kPipeMessage, "Pitstop", function . ":" . values2String(";", arguments*), this.RemotePID)
 	}
 	
 	pitstopPlanned(arguments*) {
-		return this.callRemote("pitstopPlanned", false, arguments*)
+		this.callRemote("pitstopPlanned", arguments*)
 	}
 	
 	pitstopPrepared(arguments*) {
-		return this.callRemote("pitstopPrepared", true, arguments*)
+		this.callRemote("pitstopPrepared", arguments*)
 	}
 	
 	pitstopFinished(arguments*) {
-		return this.callRemote("pitstopFinished", false, arguments*)
+		this.callRemote("pitstopFinished", arguments*)
 	}
 	
 	startPitstopSetup(arguments*) {
-		return this.callRemote("startPitstopSetup", true, arguments*)
+		this.callRemote("startPitstopSetup", arguments*)
 	}
 
 	finishPitstopSetup(arguments*) {
-		return this.callRemote("finishPitstopSetup", true, arguments*)
+		this.callRemote("finishPitstopSetup", arguments*)
 	}
 
 	setPitstopRefuelAmount(arguments*) {
-		return this.callRemote("setPitstopRefuelAmount", true, arguments*)
+		this.callRemote("setPitstopRefuelAmount", arguments*)
 	}
 	
 	setPitstopTyreSet(arguments*) {
-		return this.callRemote("setPitstopTyreSet", true, arguments*)
+		this.callRemote("setPitstopTyreSet", arguments*)
 	}
 
 	setPitstopTyrePressures(arguments*) {
-		return this.callRemote("setPitstopTyrePressures", true, arguments*)
+		this.callRemote("setPitstopTyrePressures", arguments*)
 	}
 
 	requestPitstopRepairs(arguments*) {
-		return this.callRemote("requestPitstopRepairs", true, arguments*)
+		this.callRemote("requestPitstopRepairs", arguments*)
 	}
 }
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
-
-showMessageReceiver() {
-	title1 := translate("Modular Simulator Controller System")
-	title2 := translate("Jona - The Virtual Race Engineer")
-	
-	Gui RE:-border -Caption
-	Gui RE:Color, D0D0D0
-	Gui RE:Add, Text, X10 Y10, % title1
-	Gui RE:Add, Text, , % title2
-	
-	Gui RE:Margin, 10, 10
-	Gui RE:Show, Hide AutoSize X0 Y0
-}
 
 showLogo() {
 	static videoPlayer
@@ -194,7 +178,7 @@ startRaceEngineer() {
 				engineerName := A_Args[index + 1]
 				index += 2
 			case "-Logo":
-				engineerLogo := (A_Args[index + 1] = "true") ? true : false
+				engineerLogo := (A_Args[index + 1] = kTrue) ? true : false
 				index += 2
 			case "-Language":
 				engineerLanguage := A_Args[index + 1]
@@ -215,8 +199,6 @@ startRaceEngineer() {
 	
 	RaceEngineer.Instance := new RaceEngineer(kSimulatorConfiguration, readConfiguration(raceSettingsFile)
 											, remotePID ? new RemotePitstopHandler(remotePID) : false, engineerName, engineerLanguage, engineerSpeaker, engineerListener)
-	
-	showMessageReceiver()
 	
 	if engineerLogo
 		showLogo()

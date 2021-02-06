@@ -3133,9 +3133,9 @@ class RuleCompiler {
 			if (InStr(delimiters, character) || (nextCharIndex > length)) {
 				literal := SubStr(text, beginCharIndex, nextCharIndex - beginCharIndex)
 				
-				if (literal = "true")
+				if (literal = kTrue)
 					return true
-				else if (literal = "false")
+				else if (literal = kFalse)
 					return false
 				else
 					return literal
@@ -3589,17 +3589,17 @@ option(choicePoint, option, value) {
 			return false
 	}
 	else if (option = "OccurCheck") {
-		if ((value = false) || (value = "false"))
+		if ((value = false) || (value = kFalse))
 			choicePoint.ResultSet.KnowledgeBase.disableOccurCheck()
-		else if ((value = true) || (value = "true"))
+		else if ((value = true) || (value = kTrue))
 			choicePoint.ResultSet.KnowledgeBase.enableOccurCheck()
 		else
 			return false
 	}
 	else if (option = "DeterministicFacts") {
-		if ((value = false) || (value = "false"))
+		if ((value = false) || (value = kFalse))
 			choicePoint.ResultSet.KnowledgeBase.disableDeterministicFacts()
-		else if ((value = true) || (value = "true"))
+		else if ((value = true) || (value = kTrue))
 			choicePoint.ResultSet.KnowledgeBase.enableDeterministicFacts()
 		else
 			return false

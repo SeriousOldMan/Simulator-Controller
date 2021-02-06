@@ -519,7 +519,7 @@ class SimulatorController extends ConfigurationItem {
 						songFile := (theme ? getConfigurationValue(this.Configuration, "Splash Themes", theme . ".Song", false) : false)
 				
 						if (songFile && FileExist(getFileName(songFile, kUserSplashMediaDirectory, kSplashMediaDirectory)))
-							raiseEvent("Startup", "playStartupSong:" . songFile, true)
+							raiseEvent(kLocalMessage, "Startup", "playStartupSong:" . songFile)
 						
 						posX := Round((A_ScreenWidth - 300) / 2)
 						posY := A_ScreenHeight - 150
@@ -1151,7 +1151,7 @@ class ControllerAction {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-showMessageReceiver() {
+createMessageReceiver() {
 	title1 := translate("Modular Simulator Controller System")
 	title2 := translate("Jona - The Virtual Race Engineer")
 	
@@ -1284,7 +1284,7 @@ initializeSimulatorController() {
 	
 	updateTrayMessageState(settings)
 	
-	showMessageReceiver()
+	createMessageReceiver()
 	
 	protectionOn()
 	

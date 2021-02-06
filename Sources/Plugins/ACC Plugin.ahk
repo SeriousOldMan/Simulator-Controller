@@ -74,39 +74,39 @@ class ACCPlugin extends ControllerPlugin {
 		}
 		
 		callRemote(function, arguments*) {
-			raiseEvent("Race", function . ":" . values2String(";", arguments*))
+			raiseEvent(kFileMessage, "Race", function . ":" . values2String(";", arguments*), this.RemotePID)
 		}
 		
 		shutdown(arguments*) {
-			return this.callRemote("shutdown", arguments*)
+			this.callRemote("shutdown", arguments*)
 		}
 		
 		startRace(arguments*) {
-			return this.callRemote("startRace", arguments*)
+			this.callRemote("startRace", arguments*)
 		}
 		
 		finishRace(arguments*) {
-			return this.callRemote("finishRace", arguments*)
+			this.callRemote("finishRace", arguments*)
 		}
 		
 		addLap(arguments*) {
-			return this.callRemote("addLap", arguments*)
+			this.callRemote("addLap", arguments*)
 		}
 		
 		updateLap(arguments*) {
-			return this.callRemote("updateLap", arguments*)
+			this.callRemote("updateLap", arguments*)
 		}
 		
 		planPitstop(arguments*) {
-			return this.callRemote("planPitstop", arguments*)
+			this.callRemote("planPitstop", arguments*)
 		}
 		
 		preparePitstop(arguments*) {
-			return this.callRemote("preparePitstop", arguments*)
+			this.callRemote("preparePitstop", arguments*)
 		}
 		
 		performPitstop(arguments*) {
-			return this.callRemote("performPitstop", arguments*)
+			this.callRemote("performPitstop", arguments*)
 		}
 	}
 	
@@ -348,13 +348,13 @@ class ACCPlugin extends ControllerPlugin {
 		
 		engineerSpeaker := this.getArgumentValue("raceEngineerSpeaker", false)
 		
-		if ((engineerSpeaker != false) && (engineerSpeaker != "false")) {
-			this.iRaceEngineerSpeaker := ((engineerSpeaker = "true") ? true : engineerSpeaker)
+		if ((engineerSpeaker != false) && (engineerSpeaker != kFalse)) {
+			this.iRaceEngineerSpeaker := ((engineerSpeaker = kTrue) ? true : engineerSpeaker)
 		
 			engineerListener := this.getArgumentValue("raceEngineerListener", false)
 			
-			if ((engineerListener != false) && (engineerListener != "false"))
-				this.iRaceEngineerListener := ((engineerListener = "true") ? true : engineerListener)
+			if ((engineerListener != false) && (engineerListener != kFalse))
+				this.iRaceEngineerListener := ((engineerListener = kTrue) ? true : engineerListener)
 		}
 		
 		controller.registerPlugin(this)
@@ -1490,7 +1490,7 @@ initializeACCPlugin() {
 	Loop Files, %kUserHomeDirectory%Temp\ACC Data\*.*
 		FileDelete %A_LoopFilePath%
 	
-	registerEventHandler("Pitstop", "handleRaceEngineerCalls")
+	registerEventHandler("Pitstop", "handleRaceEngineerEvents")
 	
 	new ACCPlugin(controller, kACCPLugin, controller.Configuration)
 }
@@ -1500,7 +1500,7 @@ initializeACCPlugin() {
 ;;;                          Event Handler Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-handleRaceEngineerCalls(event, data) {
+handleRaceEngineerEvents(event, data) {
 	local function
 	
 	if InStr(data, ":") {

@@ -162,7 +162,7 @@ class SimulatorStartup extends ConfigurationItem {
 	startComponent(component) {
 		logMessage(kLogInfo, translate("Starting component ") . component)
 					
-		raiseEvent("Startup", "startupComponent:" . component)
+		raiseEvent(kFileMessage, "Startup", "startupComponent:" . component, vSimulatorControllerPID)
 	}
 	
 	startComponents(section, components, ByRef startSimulator, ByRef runningIndex) {
@@ -198,7 +198,7 @@ class SimulatorStartup extends ConfigurationItem {
 			this.iStartupOption := this.iSimulators[1]
 			
 		if this.iStartupOption
-			raiseEvent("Startup", "startupSimulator:" . this.iStartupOption)
+			raiseEvent(kPipeMessage, "Startup", "startupSimulator:" . this.iStartupOption)
 	}
 	
 	startup() {
@@ -296,7 +296,7 @@ startSimulator() {
 }
 
 playSongRemote() {
-	if raiseEvent("Startup", "playStartupSong:" . vSongFile) {
+	if raiseEvent(kPipeMessage, "Startup", "playStartupSong:" . vSongFile) {
 		vSongFile := false
 		
 		SetTimer playSongRemote, Off
@@ -318,7 +318,7 @@ playSong(songFile) {
 
 exitStartup(sayGoodbye := false) {
 	if (sayGoodbye && (vSimulatorControllerPID != false)) {
-		raiseEvent("Startup", "startupExited")
+		raiseEvent(kPipeMessage, "Startup", "startupExited")
 		
 		SetTimer exitStartup, -2000
 		
@@ -389,14 +389,14 @@ try {
 		IfMsgBox Yes
 		{
 			if (vSimulatorControllerPID != 0)
-				raiseEvent("Startup", "stopStartupSong")
+				raiseEvent(kPipeMessage, "Startup", "stopStartupSong")
 		
 			vStartupCanceled := true
 		}
 	}
 	else {
 		if (vSimulatorControllerPID != 0)
-			raiseEvent("Startup", "stopStartupSong")
+			raiseEvent(kPipeMessage, "Startup", "stopStartupSong")
 		
 		exitStartup(true)
 	}

@@ -29,8 +29,8 @@ global vVideoIsPlaying = false
 global vSongIsPlaying = false
 
 global vEventHandlers = Object()
-global vIncomingEvents = []
-global vOutgoingEvents = []
+global vIncomingMessages = []
+global vOutgoingMessages = []
 
 global vPendingTrayMessages = []
 global vTrayMessageDuration = 1500
@@ -78,7 +78,7 @@ readLanguage(targetLanguageCode) {
 	Throw "Inconsistent translation encountered for """ . targetLanguageCode . """ in readLanguage..."
 }
 
-readMessage() {
+receivePipeMessage() {
 	for event, handler in vEventHandlers {
 		if (event = "*")
 			continue
@@ -98,16 +98,16 @@ readMessage() {
 				
 				logMessage(kLogInfo, translate("Dispatching event """) . event . (data[2] ? translate(""": ") . data[2] : translate("""")))
 				
-				vIncomingEvents.Push(Func(eventHandler).Bind(event, data[2]))
+				vIncomingMessages.Push(Func(eventHandler).Bind(event, data[2]))
 				
 				return true
 			}
 	}
-	
+		
 	return false
 }
 
-writePipeMessage(event, data) {
+sendPipeMessage(event, data) {
 	static ERROR_PIPE_CONNECTED := 535
 	static ERROR_PIPE_LISTENING := 536
 	static ptr
@@ -131,7 +131,38 @@ writePipeMessage(event, data) {
 		return false
 }
 
-writeEventMessage(target, event, data) {
+receiveWindowMessage(wParam, lParam) {
+	;---------------------------------------------------------------------------
+    ; retrieve info from COPYDATASTRUCT
+    ;---------------------------------------------------------------------------
+    dwData := NumGet(lParam + A_PtrSize * 0)    ; DWORD encoded request
+    cbData := NumGet(lParam + A_PtrSize * 1)    ; length of DATA string (incl ZERO)
+    lpData := NumGet(lParam + A_PtrSize * 2)    ; pointer to DATA string
+
+	;---------------------------------------------------------------------------
+    ; interpret available info
+    ;---------------------------------------------------------------------------
+    request := decodeDWORD(dwData)              ; 4-char decoded request
+    length  := (cbData - 1) / (A_IsUnicode + 1) ; length of DATA string (excl ZERO)
+    data    := StrGet(lpData, length)           ; DATA string from pointer
+	
+	if (request != "EVNT")
+		Throw % "Unhandled message received: " . request . " in dispatchEvent..."
+
+    data := StrSplit(data, ":", , 2)
+	event := data[1]
+	
+	eventHandler := vEventHandlers[event]
+	
+	if (!eventHandler)
+		eventHandler := vEventHandlers["*"]
+	
+	logMessage(kLogInfo, translate("Dispatching event """) . event . (data[2] ? translate(""": ") . data[2] : translate("""")))
+	
+	vIncomingMessages.Push(Func(eventHandler).Bind(event, data[2]))
+}
+
+sendWindowMessage(target, event, data) {
 	curDetectHiddenWindows := A_DetectHiddenWindows
 	curTitleMatchMode := A_TitleMatchMode
 	
@@ -177,26 +208,76 @@ writeEventMessage(target, event, data) {
 	}
 }
 
+receiveFileMessage() {
+	result := false
+	
+	Process Exist
+	
+	pid := ErrorLevel
+	
+	fileName := kUserHomeDirectory . "Temp\Messages\" . pid . ".msg"
+	
+	if FileExist(fileName) {
+		file := FileOpen(fileName, "rw-rwd")
+		
+		while !file.AtEOF {
+			data := StrSplit(Trim(file.ReadLine(), "`n`r"), ":", , 2)
+			event := data[1]
+			
+			eventHandler := vEventHandlers[event]
+			
+			if (!eventHandler)
+				eventHandler := vEventHandlers["*"]
+				
+			logMessage(kLogInfo, translate("Dispatching event """) . event . (data[2] ? translate(""": ") . data[2] : translate("""")))
+			
+			vIncomingMessages.Push(Func(eventHandler).Bind(event, data[2]))
+			
+			result := true
+		}
+		
+		file.Length := 0
+		
+		file.Close()
+	}
+	
+	return result
+}
+
+sendFileMessage(pid, event, data) {
+	file := FileOpen(kUserHomeDirectory . "Temp\Messages\" . pid . ".msg", "a-rwd")
+	
+	file.WriteLine(event . ":" . data)
+	
+	file.Close()
+	
+	return true
+}
+
+receiveMessage() {
+	return (receivePipeMessage() || receiveFileMessage())
+}
+
+sendMassage() {
+	if (vOutgoingMessages.Length() > 0) {
+		handler := vOutgoingMessages[1]
+		
+		if %handler%()
+			vOutgoingMessages.RemoveAt(1)
+	}
+}
+
 messageDispatcher() {
-	if (vIncomingEvents.Length() > 0) {
-		event := vIncomingEvents.RemoveAt(1)
+	if (vIncomingMessages.Length() > 0) {
+		event := vIncomingMessages.RemoveAt(1)
 	
 		%event%()
 	}
 }
 
-writeMessage() {
-	if (vOutgoingEvents.Length() > 0) {
-		handler := vOutgoingEvents[1]
-		
-		if %handler%()
-			vOutgoingEvents.RemoveAt(1)
-	}
-}
-
 messageQueue() {
-	if !readMessage()
-		writeMessage()
+	if !receiveMessage()
+		sendMassage()
 }
 
 trayMessageQueue() {
@@ -263,47 +344,34 @@ unknownEventHandler(event, data) {
 	logMessage(kLogCritical, translate("Unhandled event ") . event . translate(": ") . data)
 }
 
-deliverMessage(target, event, data) {
+deliverMessage(messageType, target, event, data) {
 	logMessage(kLogInfo, "Raising event " . event . (data ? ": " . data : "") . " in target " . target)
 	
-	vOutgoingEvents.Push(Func("writeEventMessage").Bind(target, event, data))
+	vOutgoingMessages.Push(Func("writeEventMessage").Bind(target, event, data))
 }
 
-receiveMessage(wParam, lParam) {
-	;---------------------------------------------------------------------------
-    ; retrieve info from COPYDATASTRUCT
-    ;---------------------------------------------------------------------------
-    dwData := NumGet(lParam + A_PtrSize * 0)    ; DWORD encoded request
-    cbData := NumGet(lParam + A_PtrSize * 1)    ; length of DATA string (incl ZERO)
-    lpData := NumGet(lParam + A_PtrSize * 2)    ; pointer to DATA string
-
-	;---------------------------------------------------------------------------
-    ; interpret available info
-    ;---------------------------------------------------------------------------
-    request := decodeDWORD(dwData)              ; 4-char decoded request
-    length  := (cbData - 1) / (A_IsUnicode + 1) ; length of DATA string (excl ZERO)
-    data    := StrGet(lpData, length)           ; DATA string from pointer
+stopMessageManager() {
+	Process Exist
 	
-	if (request != "EVNT")
-		Throw % "Unhandled message received: " . request . " in dispatchEvent..."
-
-    data := StrSplit(data, ":", , 2)
-	event := data[1]
+	pid := ErrorLevel
 	
-	eventHandler := vEventHandlers[event]
-	
-	if (!eventHandler)
-		eventHandler := vEventHandlers["*"]
-	
-	logMessage(kLogInfo, translate("Dispatching event """) . event . (data[2] ? translate(""": ") . data[2] : translate("""")))
-	
-	vIncomingEvents.Push(Func(eventHandler).Bind(event, data[2]))
+	if FileExist(kUserHomeDirectory . "Temp\Messages\" . pid . ".msg")
+		FileDelete %kUserHomeDirectory%Temp\Messages\%pid%.msg
 }
 
 startMessageManager() {
-	OnMessage(0x4a, "receiveMessage") 
+	OnMessage(0x4a, "receiveWindowMessage") 
 	
 	registerEventHandler("*", "unknownEventHandler")
+	
+	Process Exist
+	
+	pid := ErrorLevel
+	
+	if FileExist(kUserHomeDirectory . "Temp\Messages\" . pid . ".msg")
+		FileDelete %kUserHomeDirectory%Temp\Messages\%pid%.msg
+	
+	OnExit("stopMessageManager")
 	
 	SetTimer messageQueue, 400
 	SetTimer messageDispatcher, 200
@@ -444,6 +512,7 @@ initializeEnvironment() {
 	FileCreateDir %kUserHomeDirectory%Screen Images
 	FileCreateDir %kUserHomeDirectory%Plugins
 	FileCreateDir %kUserHomeDirectory%Temp
+	FileCreateDir %kUserHomeDirectory%Temp\Messages
 	
 	if !FileExist(A_MyDocuments . "\Simulator Controller\Plugins\Plugins.ahk")
 		FileCopy %kResourcesDirectory%Templates\Plugins.ahk, %A_MyDocuments%\Simulator Controller\Plugins
@@ -980,29 +1049,33 @@ registerEventHandler(event, handler) {
 	vEventHandlers[event] := handler
 }
 
-raiseEvent(event, data, localProcess := false) {
-	if localProcess {
-		logMessage(kLogInfo, translate("Raising event """) . event . (data ? translate(""": ") . data : translate("""")) . translate(" in current process"))
+raiseEvent(messageType, event, data, target := false) {
+	switch messageType {
+		case kLocalMessage:
+			logMessage(kLogInfo, translate("Raising event """) . event . (data ? translate(""": ") . data : translate("""")) . translate(" in current process"))
+			
+			eventHandler := vEventHandlers[event]
 		
-		eventHandler := vEventHandlers[event]
-	
-		if (!eventHandler)
-			eventHandler := vEventHandlers["*"]
-	
-		logMessage(kLogInfo, translate("Dispatching event """) . event . (data ? translate(""": ") . data : translate("""")))
+			if (!eventHandler)
+				eventHandler := vEventHandlers["*"]
 		
-		vIncomingEvents.Push(Func(eventHandler).Bind(event, data))
+			logMessage(kLogInfo, translate("Dispatching event """) . event . (data ? translate(""": ") . data : translate("""")))
+			
+			vIncomingMessages.Push(Func(eventHandler).Bind(event, data))
+		case kWindowMessage:
+			logMessage(kLogInfo, translate("Raising event """) . event . (data ? translate(""": ") . data : translate("""")) . translate(" in target ") . target)
+			
+			vOutgoingMessages.Push(Func("sendWindowMessage").Bind(target, event, data))
+		case kPipeMessage:
+			logMessage(kLogInfo, translate("Raising event """) . event . (data ? translate(""": ") . data : translate("""")))
 	
-		%eventHandler%(event, data)
-		
-		return true
-	}
-	else {
-		logMessage(kLogInfo, translate("Raising event """) . event . (data ? translate(""": ") . data : translate("""")))
-	
-		vOutgoingEvents.Push(Func("writePipeMessage").Bind(event, data))
-		
-		return true
+			vOutgoingMessages.Push(Func("sendPipeMessage").Bind(event, data))
+		case kFileMessage:
+			logMessage(kLogInfo, translate("Raising event """) . event . (data ? translate(""": ") . data : translate("""")) . translate(" in target ") . target)
+			
+			vOutgoingMessages.Push(Func("sendFileMessage").Bind(target, event, data))
+		default:
+			Throw "Unknown message type (" . messageType . ") detected in raiseEvent..."
 	}
 }
 

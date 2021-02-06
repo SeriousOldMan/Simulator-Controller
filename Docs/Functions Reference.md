@@ -63,8 +63,8 @@ Registers an event handler function for the given event type. An event handler i
 			withProtection(data)
 	}
 
-#### *raiseEvent(event :: String, data :: String, local := false)*
-Raises the given event. If *local* is *true*, the event is raised in the current process. Otherwise, the event is delivered to any process, which had registered an event handler for the given event. Only one process will receive the message, even, if more processes are registered for the given event.
+#### *raiseEvent(messageType :: OneOf(kLocalMessage, kWindowMessage, kPipeMessage, kFileMessage), event :: String, data :: String, target := false)*
+Raises the given event. The first parameter defines the delivery method, where *kFileMessage* is the most reliable, but also the slowest one. If the argument for *messageType* is *kLocalMessage*, the event is raised in the current process. Otherwise, the event is delivered to the process defined by target, which must have registered an event handler for the given event. For *kWindowMessage*, the target must be defined according to the [window title pattern](https://www.autohotkey.com/docs/misc/WinTitle.htm) of *AutoHotkey* and for *kFileMessage*, you must provide the process id of the target process. Last but not least, if message type is *kPipeMessage*, not target must be specified and multiple processes may register an event handler for the given event, but only one process will receive the message.
 
 ***
 

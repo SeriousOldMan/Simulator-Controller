@@ -495,7 +495,7 @@ updateACCPluginForV21() {
 		
 		if !accPlugin.hasArgument("raceEngineerName") {
 			accPlugin.setArgumentValue("raceEngineerName", "Jona")
-			accPlugin.setArgumentValue("raceEngineerSpeaker", "true")
+			accPlugin.setArgumentValue("raceEngineerSpeaker", kTrue)
 			
 			accPlugin.saveToConfiguration(userConfiguration)
 		}

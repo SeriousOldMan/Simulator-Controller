@@ -1071,7 +1071,7 @@ class ACCPlugin extends ControllerPlugin {
 			this.RaceEngineer.performPitstop(lapNumber)
 		
 			this.iPitstopPending := false
-				
+					
 			SetTimer collectRaceData, 10000
 		}
 		else

@@ -52,8 +52,6 @@ global vSimulatorControllerPID := 0
 global vStartupFinished = false
 global vStartupCanceled = false
 
-global vSongFile = false
-
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
@@ -295,20 +293,9 @@ startSimulator() {
 	new SimulatorStartup(kSimulatorConfiguration, readConfiguration(kSimulatorSettingsFile)).startup()
 }
 
-playSongRemote() {
-	if raiseEvent(kPipeMessage, "Startup", "playStartupSong:" . vSongFile) {
-		vSongFile := false
-		
-		SetTimer playSongRemote, Off
-	}
-}
-
 playSong(songFile) {
-	if (songFile && FileExist(getFileName(songFile, kUserSplashMediaDirectory, kSplashMediaDirectory))) {
-		vSongFile := songFile
-		
-		SetTimer playSongRemote, 50
-	}
+	if (songFile && FileExist(getFileName(songFile, kUserSplashMediaDirectory, kSplashMediaDirectory)))
+		raiseEvent(kPipeMessage, "Startup", "playStartupSong:" . songFile)
 }
 
 

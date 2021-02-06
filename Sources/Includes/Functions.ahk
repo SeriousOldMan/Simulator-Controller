@@ -79,6 +79,8 @@ readLanguage(targetLanguageCode) {
 }
 
 receivePipeMessage() {
+	result := false
+	
 	for event, handler in vEventHandlers {
 		if (event = "*")
 			continue
@@ -100,11 +102,11 @@ receivePipeMessage() {
 				
 				vIncomingMessages.Push(Func(eventHandler).Bind(event, data[2]))
 				
-				return true
+				result := true
 			}
 	}
 		
-	return false
+	return result
 }
 
 sendPipeMessage(event, data) {
@@ -258,7 +260,7 @@ receiveMessage() {
 	return (receivePipeMessage() || receiveFileMessage())
 }
 
-sendMassage() {
+sendMessage() {
 	if (vOutgoingMessages.Length() > 0) {
 		handler := vOutgoingMessages[1]
 		
@@ -277,7 +279,7 @@ messageDispatcher() {
 
 messageQueue() {
 	if !receiveMessage()
-		sendMassage()
+		sendMessage()
 }
 
 trayMessageQueue() {
@@ -342,12 +344,6 @@ decodeDWORD(data) {
 
 unknownEventHandler(event, data) {
 	logMessage(kLogCritical, translate("Unhandled event ") . event . translate(": ") . data)
-}
-
-deliverMessage(messageType, target, event, data) {
-	logMessage(kLogInfo, "Raising event " . event . (data ? ": " . data : "") . " in target " . target)
-	
-	vOutgoingMessages.Push(Func("writeEventMessage").Bind(target, event, data))
 }
 
 stopMessageManager() {

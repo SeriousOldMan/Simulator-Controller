@@ -958,16 +958,27 @@ class PluginsTab extends ConfigurationItemList {
 		
 		Gui ListView, % this.ListHandle
 	
-		LV_Delete()
+		; LV_Delete()
 		
 		bubbleSort(items, "comparePlugins")
 	
-		for ignore, thePlugin in items {
+		count := LV_GetCount()
+		
+		for index, thePlugin in items {
 			name := thePlugin.Plugin
 			active := thePlugin.Active
-			
-			LV_Add("", thePlugin.Active ? ((name = translate("System")) ? translate("Always") : translate("Yes")) : translate("No")	, name, values2String(", ", thePlugin.Simulators*), thePlugin.Arguments[true])
+		
+			if (index <= count)
+				LV_Modify(index, "", thePlugin.Active ? ((name = translate("System")) ? translate("Always") : translate("Yes")) : translate("No")
+						, name, values2String(", ", thePlugin.Simulators*), thePlugin.Arguments[true])
+			else
+				LV_Add("", thePlugin.Active ? ((name = translate("System")) ? translate("Always") : translate("Yes")) : translate("No")
+					 , name, values2String(", ", thePlugin.Simulators*), thePlugin.Arguments[true])
 		}
+		
+		if (items.Length() < count)
+			Loop % count - items.Length()
+				LV_Delete(count - A_Index - 1)
 		
 		if first {
 			LV_ModifyCol()

@@ -50,6 +50,7 @@ class ACCPlugin extends ControllerPlugin {
 	iPitstopMode := false
 	
 	iRaceEngineerName := false
+	iRaceEngineerLogo := false
 	iRaceEngineerSpeaker := false
 	iRaceEngineerListener := false
 	
@@ -296,6 +297,12 @@ class ACCPlugin extends ControllerPlugin {
 		}
 	}
 	
+	RaceEngineerLogo[] {
+		Get {
+			return this.iRaceEngineerLogo
+		}
+	}
+	
 	RaceEngineerSpeaker[] {
 		Get {
 			return this.iRaceEngineerSpeaker
@@ -334,6 +341,7 @@ class ACCPlugin extends ControllerPlugin {
 			this.createPitstopAction(controller, string2Values(A_Space, theAction)*)
 		
 		this.iRaceEngineerName := this.getArgumentValue("raceEngineerName", false)
+		this.iRaceEngineerLogo := this.getArgumentValue("raceEngineerLogo", false)
 		
 		for ignore, theAction in string2Values(",", this.getArgumentValue("raceEngineerCommands", ""))
 			this.createRaceEngineerAction(controller, string2Values(A_Space, theAction)*)
@@ -956,6 +964,9 @@ class ACCPlugin extends ControllerPlugin {
 			if this.RaceEngineerName
 				options .= " -Name """ . this.RaceEngineerName . """"
 			
+			if this.RaceEngineerLogo
+				options .= " -Logo """ . this.RaceEngineerLogo . """"
+			
 			if this.RaceEngineerSpeaker
 				options .= " -Speaker """ . this.RaceEngineerSpeaker . """"
 			
@@ -1056,14 +1067,18 @@ class ACCPlugin extends ControllerPlugin {
 	}
 	
 	performPitstop(lapNumber) {
-		if this.ActiveRace
+		if this.ActiveRace {
 			this.RaceEngineer.performPitstop(lapNumber)
+		
+			this.iPitstopPending := false
+				
+			SetTimer collectRaceData, 10000
+		}
 		else
 			Throw "Pitstops may only be performed during an active race..."
 	}
 	
 	pitstopPlanned(pitstopNumber) {
-		SoundPlay C:\Windows\Media\Alarm06.wav
 	}
 	
 	pitstopPrepared(pitstopNumber) {
@@ -1441,6 +1456,14 @@ collectRaceData() {
 		}
 	}
 	else {
+		if plugin.ActiveRace
+			Loop 10 {
+				if isACCRunning()
+					return
+				
+				Sleep 500
+			}
+		
 		lastLap := 0
 	
 		if plugin.ActiveRace

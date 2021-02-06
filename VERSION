@@ -1,5 +1,5 @@
 [Version]
-Current=2.1-beta
+Current=2.1.0-release
 Target=2.1-release
-Changes=Copy targets in Simulator Tools, ACC Shared Memory Reader, Alpha Version of AI Race Engineer, Support for German phrase grammars
-Date=02/02/2021
+Changes=Copy targets in Simulator Tools, ACC Shared Memory Reader, Alpha Version of AI Race Engineer, Plugin for Heusinkveld Pedals Calibration
+Date=02/06/2021

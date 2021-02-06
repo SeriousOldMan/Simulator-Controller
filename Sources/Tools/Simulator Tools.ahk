@@ -384,8 +384,8 @@ editTargets(command := "") {
 		Gui TE:Add, Button, Default X10 y+20 w100 gsaveTargets, % translate("Run")
 		Gui TE:Add, Button, X+20 w100 gcancelTargets, % translate("&Cancel")
 	
-		Gui TE: Margin, 10, 10
-		Gui TE: show, AutoSize Center
+		Gui TE:Margin, 10, 10
+		Gui TE:Show, AutoSize Center
 		
 		Loop
 			Sleep 1000

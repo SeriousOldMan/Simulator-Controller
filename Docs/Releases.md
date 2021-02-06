@@ -1,4 +1,4 @@
-## 2.1-upcoming...
+## 2.1.0-release 02/06/21
 
   1. Bugfixes, as always
   2. Documentation updates, as always

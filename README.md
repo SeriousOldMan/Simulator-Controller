@@ -26,16 +26,18 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-[2.1.0-beta](https://www.dropbox.com/s/8j0horm83csb20g/Simulator%20Controller%202.1.0-beta.zip?dl=1) (Third release candidate for the upcoming 2.1 release. The major part of the release is the alpha version of the AI based Race Engineer, incl. full [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer), [test cases](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Sources/Tests) and support for English and German [voice recognition](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#interacting-with-jona).)
+None for the moment, but working on a maintenance release for Jona...
 
 #### Latest release builds
 
-[2.0.4-release](https://www.dropbox.com/s/som2gkv3pcu2y46/Simulator%20Controller%202.0.4-release.zip?dl=1) (Includes the first version of the hybrid forward and backward chaining rule engine, which will be used to implement the AI based race engineer)
-
 [2.0.5-fix](https://www.dropbox.com/s/p5vs1enowvnr8d4/Simulator%20Controller%202.0.5-fix.zip?dl=1) (Critical fix for 2.0.4)
 
+[2.1.0-beta](https://www.dropbox.com/s/alkf8i535mw7l31/Simulator%20Controller%202.1.0-release.zip?dl=1) (Major part of this release is the alpha version of the AI based Race Engineer, incl. full [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer), [test cases](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Sources/Tests) and support for English and German [voice recognition](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#interacting-with-jona). For additional new features, see the [release notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes).)
+
+IMPORTANT: Jona is considered an alpha version in Release 2.1. There are a lot of planned features still missing and there is also a list of known problems. The biggest issue is a potential deadlock situation in the multidirectional communication between Simulator Controller, *Assetto Corsa Competizione* and Jona itself, when the Pitstop MFD is open. Therefore, I do not recommend to use Jona during an important race, at least for the moment. If you have trouble using it or don't want to use it at all, simply disable it by eliminating the corresponding ACC plugin arguments as described in the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-acc) for the ACC plugin.
+
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
-Release 2.0 introduced a new automated update mechanism for local configuration databases. Please read the [update notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-20) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side.
+An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [update notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-20) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
 ### Main features
 

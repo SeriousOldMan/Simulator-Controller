@@ -196,7 +196,7 @@ class SimulatorStartup extends ConfigurationItem {
 			this.iStartupOption := this.iSimulators[1]
 			
 		if this.iStartupOption
-			raiseEvent(kPipeMessage, "Startup", "startupSimulator:" . this.iStartupOption)
+			raiseEvent(kFileMessage, "Startup", "startupSimulator:" . this.iStartupOption, vSimulatorControllerPID)
 	}
 	
 	startup() {
@@ -295,7 +295,7 @@ startSimulator() {
 
 playSong(songFile) {
 	if (songFile && FileExist(getFileName(songFile, kUserSplashMediaDirectory, kSplashMediaDirectory)))
-		raiseEvent(kPipeMessage, "Startup", "playStartupSong:" . songFile)
+		raiseEvent(kFileMessage, "Startup", "playStartupSong:" . songFile, vSimulatorControllerPID)
 }
 
 
@@ -305,7 +305,7 @@ playSong(songFile) {
 
 exitStartup(sayGoodbye := false) {
 	if (sayGoodbye && (vSimulatorControllerPID != false)) {
-		raiseEvent(kPipeMessage, "Startup", "startupExited")
+		raiseEvent(kFileMessage, "Startup", "startupExited", vSimulatorControllerPID)
 		
 		SetTimer exitStartup, -2000
 		
@@ -376,14 +376,14 @@ try {
 		IfMsgBox Yes
 		{
 			if (vSimulatorControllerPID != 0)
-				raiseEvent(kPipeMessage, "Startup", "stopStartupSong")
+				raiseEvent(kFileMessage, "Startup", "stopStartupSong", vSimulatorControllerPID)
 		
 			vStartupCanceled := true
 		}
 	}
 	else {
 		if (vSimulatorControllerPID != 0)
-			raiseEvent(kPipeMessage, "Startup", "stopStartupSong")
+			raiseEvent(kFileMessage, "Startup", "stopStartupSong", vSimulatorControllerPID)
 		
 		exitStartup(true)
 	}

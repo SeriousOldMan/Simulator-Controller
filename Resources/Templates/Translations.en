@@ -185,6 +185,9 @@ Cannot start ACC SHM Reader (=>
 ) - please rebuild the applications in the binaries folder (=>
 Modular Simulator Controller System - Controller (Plugin: ACC)=>
 Cannot start ACC SHM Reader (%exePath%) - please check the configuration...=>
+[Race Engineer]
+Modular Simulator Controller System=>
+Jona - The Virtual Race Engineer=>
 [Motion Feedback Plugin]
 Motion Feedback=>
 Motion=>

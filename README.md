@@ -16,7 +16,7 @@ Download one of the builds below and unzip anywhere you like. Then run the confi
 
 See the complete documentation about [Installation & Configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation) for more information.
 
-An installation of the underlying programming language [AutoHotkey](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications) is only necessary, if you want to create your own plugins, but you need a good understanding of the Hotkey syntax to bind your controller hardware to the plugin functions and actions using the configuration tool.
+An installation of the underlying programming language [AutoHotkey](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications) is only necessary, if you want to create your own plugins, but you need a good understanding of the Hotkey syntax to bind your controller hardware to the plugin functions and actions using the configuration tool. Beginning with Release 2.1, an installation of [VisualStudio Community Edition](https://visualstudio.microsoft.com/de/vs/community/) is required for development, if you want do dig into the heavylifting part of telemetry data acquisition or voice recognition. But you can stick with the precompiled binaries from the distribution, if that is not your domain.
 
 For further convinience, you can place links to **Simulator Startup** and **Simulator Settings** in the Windows Start Menu. You can also configure the software to automatically start with Windows by checking the *Start with Windows* in the first tab of the configuration tool.
 
@@ -26,7 +26,7 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-[2.1.0-beta](https://www.dropbox.com/s/8j0horm83csb20g/Simulator%20Controller%202.1.0-beta.zip?dl=1) (Second release candidate for the upcoming 2.1 release. The major part of the release is the alpha version of the AI based Race Engineer, incl. full [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer), [test cases](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Sources/Tests) and support for English and German [voice recognition](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#interacting-with-jona).)
+[2.1.0-beta](https://www.dropbox.com/s/8j0horm83csb20g/Simulator%20Controller%202.1.0-beta.zip?dl=1) (Third release candidate for the upcoming 2.1 release. The major part of the release is the alpha version of the AI based Race Engineer, incl. full [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer), [test cases](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Sources/Tests) and support for English and German [voice recognition](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#interacting-with-jona).)
 
 #### Latest release builds
 

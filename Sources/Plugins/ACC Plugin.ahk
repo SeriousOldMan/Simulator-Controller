@@ -1063,6 +1063,7 @@ class ACCPlugin extends ControllerPlugin {
 	}
 	
 	pitstopPlanned(pitstopNumber) {
+		SoundPlay C:\Windows\Media\Alarm06.wav
 	}
 	
 	pitstopPrepared(pitstopNumber) {
@@ -1328,7 +1329,7 @@ collectRaceData() {
 	if !plugin
 		plugin := SimulatorController.Instance.findPlugin(kACCPlugin)
 	
-	if true || isACCRunning() {
+	if isACCRunning() {
 		exePath := kBinariesDirectory . "ACC SHM Reader.exe"
 		
 		try {
@@ -1367,11 +1368,11 @@ collectRaceData() {
 				counter := 1
 				lap += 1
 				
-				goto restart
+				return
 			}
 		}
 		else {
-			SplashTextOn 400, 100, , % "Data " lap . "." . counter . " loaded..."
+			SplashTextOn 400, 100, , % "Data " lap . "." . counter++ . " loaded..."
 			Sleep 500
 			SplashTextOff
 		}

@@ -263,14 +263,13 @@ unknownEventHandler(event, data) {
 	logMessage(kLogCritical, translate("Unhandled event ") . event . translate(": ") . data)
 }
 
-deliverEvent(target, event, data) {
+deliverMessage(target, event, data) {
 	logMessage(kLogInfo, "Raising event " . event . (data ? ": " . data : "") . " in target " . target)
 	
-	; vOutgoingEvents.Push(Func("writeEventMessage").Bind(target, event, data))
-	vOutgoingEvents.Push(Func("writePipeMessage").Bind(event, data))
+	vOutgoingEvents.Push(Func("writeEventMessage").Bind(target, event, data))
 }
 
-receiveEvent(wParam, lParam) {
+receiveMessage(wParam, lParam) {
 	;---------------------------------------------------------------------------
     ; retrieve info from COPYDATASTRUCT
     ;---------------------------------------------------------------------------
@@ -302,7 +301,7 @@ receiveEvent(wParam, lParam) {
 }
 
 startMessageManager() {
-	OnMessage(0x4a, "receiveEvent") 
+	OnMessage(0x4a, "receiveMessage") 
 	
 	registerEventHandler("*", "unknownEventHandler")
 	

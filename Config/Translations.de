@@ -188,6 +188,9 @@ Cannot start ACC SHM Reader (=>Die Datenverbindung zu Assetto Corsa Competizione
 ) - please rebuild the applications in the binaries folder (=>) kann nicht gestartet werden - Bitte überprüfen Sie die Programme im Binaries Verzeichnis (
 Modular Simulator Controller System - Controller (Plugin: ACC)=>Modulare Simulator Steuerung - Steuerung (Erweiterung: ACC)
 Cannot start ACC SHM Reader (%exePath%) - please check the configuration...=>ACC SHM Reader (%exePath%) kann nicht gestartet werden - Bitte überprüfen Sie die Konfiguration...
+[Race Engineer]
+Modular Simulator Controller System=>Modulare Simulator Steuerung
+Jona - The Virtual Race Engineer=>Jona - Virtueller Renningenieur
 [Motion Feedback Plugin]
 Motion Feedback=>Bewegung
 Motion=>Bewegung

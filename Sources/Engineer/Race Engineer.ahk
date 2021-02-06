@@ -64,7 +64,7 @@ class RemotePitstopHandler {
 	}
 		
 	callRemote(function, arguments*) {
-		return deliverEvent("ahk_pid " . this.RemotePID, "Pitstop", function . ":" . values2String(";", arguments*))
+		return raiseEvent("Pitstop", function . ":" . values2String(";", arguments*))
 	}
 	
 	pitstopPlanned(arguments*) {
@@ -108,6 +108,44 @@ class RemotePitstopHandler {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+showLogo() {
+	static videoPlayer
+
+	info := kVersion . " - 2021, Oliver Juwig`nCreative Commons - BY-NC-SA"
+	logo := kResourcesDirectory . "Rotating Brain.gif"
+	image := "1:" . logo
+
+	SysGet mainScreen, MonitorWorkArea
+	
+	x := mainScreenRight - 299
+	y := mainScreenBottom - 234
+
+	title1 := translate("Modular Simulator Controller System")
+	title2 := translate("Jona - The Virtual Race Engineer")
+	SplashImage %image%, B FS8 CWD0D0D0 w299 x%x% y%y% ZH155 ZW279, %info%, %title1%`n%title2%
+
+	Gui Logo:-Border -Caption 
+	Gui Logo:Add, ActiveX, x0 y0 w279 h155 VvideoPlayer, shell explorer
+
+	videoPlayer.Navigate("about:blank")
+
+	html := "<html><body style='background-color: transparent' style='overflow:hidden' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><img src='" . logo . "' width=279 height=155 border=0 padding=0></body></html>"
+
+	videoPlayer.document.write(html)
+
+	x += 10
+	y += 40
+
+	Gui Logo:Margin, 0, 0
+	Gui Logo:+AlwaysOnTop
+	Gui Logo:Show, AutoSize x%x% y%y%
+}
+
+hideLogo() {
+	Gui Logo:Destroy
+	SplashImage 1:Off
+}
+	
 checkRemoteProcessAlive() {
 	Process Exist, %vRemotePID%
 	
@@ -119,6 +157,8 @@ startRaceEngineer() {
 	icon := kIconsDirectory . "Artificial Intelligence.ico"
 	
 	Menu Tray, Icon, %icon%, , 1
+	
+	showLogo()
 	
 	remotePID := 0
 	remoteHandle := false

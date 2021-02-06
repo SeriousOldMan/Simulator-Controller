@@ -223,7 +223,12 @@ receiveFileMessage() {
 		file := FileOpen(fileName, "rw-rwd")
 		
 		while !file.AtEOF {
-			data := StrSplit(Trim(file.ReadLine(), "`n`r"), ":", , 2)
+			line := Trim(file.ReadLine(), " `t`n`r")
+		
+			if (StrLen(line) == 0)
+				break
+			
+			data := StrSplit(line, ":", , 2)
 			event := data[1]
 			
 			eventHandler := vEventHandlers[event]
@@ -247,11 +252,9 @@ receiveFileMessage() {
 }
 
 sendFileMessage(pid, event, data) {
-	file := FileOpen(kUserHomeDirectory . "Temp\Messages\" . pid . ".msg", "a-rwd")
+	text := event . ":" . data . "`n"
 	
-	file.WriteLine(event . ":" . data)
-	
-	file.Close()
+	FileAppend %text%, % kUserHomeDirectory . "Temp\Messages\" . pid . ".msg"
 	
 	return true
 }

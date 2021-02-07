@@ -1,3 +1,12 @@
+## 2.1.1-release upcoming...
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. New plugin action for the ACC plugin to enable or disable Jona from the hardware controller
+  4. Minor updates in the phrase grammars of Jona
+  5. Once again, improved handling of list boxes in the configuration tool
+  6. Stability improvements for the inter process communication - no more circular deadlocks
+  
 ## 2.1.0-release 02/06/21
 
   1. Bugfixes, as always

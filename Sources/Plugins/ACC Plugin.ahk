@@ -395,7 +395,7 @@ class ACCPlugin extends ControllerPlugin {
 		raceEngineerToggle := this.getArgumentValue("raceEngineer", false)
 		
 		if raceEngineerToggle {
-			arguments := string2Values(A_Space, theAction)
+			arguments := string2Values(A_Space, raceEngineerToggle)
 			
 			this.iRaceEngineerEnabled := (arguments[1] = "On")
 			
@@ -1532,7 +1532,7 @@ collectRaceData() {
 					plugin.finishRace()
 			}
 			
-			if plugin.RaceEngineerEnabled
+			if plugin.RaceEngineerEnabled {
 				if (plugin.PitstopPending && getConfigurationValue(data, "Stint Data", "InPit", false) && !inPit) {
 					; Car is in the Pit
 					
@@ -1568,6 +1568,11 @@ collectRaceData() {
 					else	
 						plugin.updateLap(dataLastLap, newDataFile)
 				}
+			}
+			else {
+				lastLap := 0
+				inPit := false
+			}
 		}
 		finally {
 			protectionOff()

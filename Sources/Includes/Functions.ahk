@@ -526,8 +526,8 @@ initializeEnvironment() {
 	if !FileExist(A_MyDocuments . "\Simulator Controller\Plugins\Plugins.ahk")
 		FileCopy %kResourcesDirectory%Templates\Plugins.ahk, %A_MyDocuments%\Simulator Controller\Plugins
 	
-	if !FileExist(kUserConfigDirectory . "Controller Plugin Labels.ini")
-		FileCopy %kResourcesDirectory%Templates\Controller Plugin Labels.ini, %kUserConfigDirectory%
+	; if !FileExist(kUserConfigDirectory . "Controller Plugin Labels.ini")
+	;	FileCopy %kResourcesDirectory%Templates\Controller Plugin Labels.ini, %kUserConfigDirectory%
 	
 	if !FileExist(kUserConfigDirectory . "Race Engineer.settings")
 		FileCopy %kResourcesDirectory%Templates\Race Engineer.settings, %kUserConfigDirectory%

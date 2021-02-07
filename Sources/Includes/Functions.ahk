@@ -283,16 +283,26 @@ sendMessage() {
 }
 
 messageDispatcher() {
-	if (vIncomingMessages.Length() > 0) {
-		event := vIncomingMessages.RemoveAt(1)
-	
-		%event%()
+	try {
+		if (vIncomingMessages.Length() > 0) {
+			event := vIncomingMessages.RemoveAt(1)
+		
+			withProtection(event)
+		}
+	}
+	finally {
+		SetTimer messageDispatcher, -200
 	}
 }
 
 messageQueue() {
-	if !receiveMessage()
-		sendMessage()
+	try {
+		if !receiveMessage()
+			sendMessage()
+	}
+	finally {
+		SetTimer messageQueue, -400
+	}
 }
 
 trayMessageQueue() {
@@ -304,8 +314,6 @@ trayMessageQueue() {
 				return
 			else {
 				message := vPendingTrayMessages.RemoveAt(1)
-	
-				SetTimer trayMessageQueue, Off
 		
 				protectionOff()
 		
@@ -322,15 +330,17 @@ trayMessageQueue() {
 				}
 				finally {
 					protectionOn()
-		
-					SetTimer trayMessageQueue, On
 				}
 			}
 		}
 		finally {
 			protectionOff()
+			
+			SetTimer trayMessageQueue, -500
 		}
 	}
+	else
+		SetTimer trayMessageQueue, -500
 }
 
 encodeDWORD(string) {
@@ -382,8 +392,8 @@ startMessageManager() {
 	
 	OnExit("stopMessageManager")
 	
-	SetTimer messageQueue, 400
-	SetTimer messageDispatcher, 200
+	SetTimer messageQueue, -400
+	SetTimer messageDispatcher, -200
 }
 
 logError(exception) {
@@ -397,7 +407,7 @@ initializeLoggingSystem() {
 }
 
 startTrayMessageManager() {
-	SetTimer trayMessageQueue, 500
+	SetTimer trayMessageQueue, -500
 }
 
 checkForUpdates() {

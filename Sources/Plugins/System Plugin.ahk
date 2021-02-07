@@ -355,8 +355,8 @@ class SystemPlugin extends ControllerPlugin {
 	}
 
 	initializeBackgroundTasks() {
-		SetTimer updateApplicationStates, 1000
-		SetTimer updateModeSelector, 200
+		SetTimer updateApplicationStates, 2000
+		SetTimer updateModeSelector, 500
 	}
 }
 
@@ -496,7 +496,7 @@ updateModeSelector() {
 	local function
 	
 	static lastMode := false
-	static countDown := 10
+	static countDown := 3
 	static modeSelectorMode := false
 	static controller := false
 	
@@ -512,12 +512,12 @@ updateModeSelector() {
 			lastMode := false
 				
 			if modeSelectorMode {
-				countDown := 10
+				countDown := 3
 				
 				currentMode := controller.ActiveMode.Mode
 			}
 			else {
-				countDown := 5
+				countDown := 2
 				
 				currentMode := translate("Mode Selector")
 			}

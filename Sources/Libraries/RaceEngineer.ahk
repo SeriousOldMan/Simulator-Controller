@@ -1190,11 +1190,7 @@ class RaceEngineer extends ConfigurationItem {
 		}
 		
 		if (result && this.PitstopHandler) {
-			callback := ObjBindMethod(this.PitstopHandler, "pitstopPlanned", pitstopNumber)
-			
-			SetTimer %callback%, -1000
-			
-			; this.PitstopHandler.pitstopPlanned(pitstopNumber)
+			this.PitstopHandler.pitstopPlanned(pitstopNumber)
 		}
 		
 		return result
@@ -1311,11 +1307,7 @@ class RaceEngineer extends ConfigurationItem {
 		if this.PitstopHandler {
 			this.PitstopHandler.finishPitstopSetup(pitstopNumber)
 			
-			callback := ObjBindMethod(this.PitstopHandler, "pitstopPrepared", pitstopNumber)
-			
-			SetTimer %callback%, -1000
-			
-			; this.PitstopHandler.pitstopPrepared(pitstopNumber)
+			this.PitstopHandler.pitstopPrepared(pitstopNumber)
 			
 			if this.Speaker
 				this.getSpeaker().speakPhrase("CallToPit")

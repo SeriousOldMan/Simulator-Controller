@@ -283,7 +283,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		for ignore, theAction in this.Actions
 			theAction.Function.setText(translate(theAction.Label), isRunning ? (theAction.Active ? "Green" : "Black") : "Olive")
 		
-		SetTimer updateVibrationState, 50
+		SetTimer updateVibrationState, -50
 	}
 	
 	deactivate() {

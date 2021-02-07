@@ -163,13 +163,8 @@ lastPressure(?compound, ?tyreType, ?pressure) <= setupTyrePressure(?compound, ?t
 {Any: [?Lap], {None: [?Damage.Repair.Suspension.Target]}, [?Damage.Update.Suspension = true]} => (Prove: updateSuspensionRepair, ?Lap)
 {Any: [?Lap], {None: [?Damage.Repair.Bodywork.Target]}, [?Damage.Update.Bodywork = true]} => (Prove: updateBodyworkRepair, ?Lap)
 
-updateSuspensionRepair(?lap) <= lapDamage(?lap, Suspension, ?damage), repairDamage(Suspension, ?damage),										\
-								Set(Damage.Repair.Suspension.Target, true), !
-updateSuspensionRepair(?) <= Clear(Damage.Repair.Suspension.Target)
-
-updateBodyworkRepair(?lap) <= lapDamage(?lap, Bodywork, ?damage), repairDamage(Bodywork, ?damage),												\
-							  Set(Damage.Repair.Bodywork.Target, true), !
-updateBodyworkRepair(?) <= Clear(Damage.Repair.Bodywork.Target)
+updateSuspensionRepair(?lap) <= lapDamage(?lap, Suspension, ?damage), Set(Damage.Suspension, ?damage)
+updateBodyworkRepair(?lap) <= lapDamage(?lap, Bodywork, ?damage), Set(Damage.Bodywork, ?damage)
 
 lapDamage(?lap, Suspension, ?damage) <= lapDamage(?lap, Suspension, FL, ?fld), lapDamage(?lap, Suspension, FR, ?frd),							\
 										lapDamage(?lap, Suspension, RL, ?rld), lapDamage(?lap, Suspension, RR, ?rrd),							\
@@ -179,15 +174,21 @@ lapDamage(?lap, Bodywork, ?damage) <= lapDamage(?lap, Bodywork, Front, ?frontDmg
 									  lapDamage(?lap, Bodywork, Center, ?centerDmg), 															\
 									  sum([?frontDmg, ?rearDmg, ?leftDmg, ?rightDmg, ?centerDmg], ?damage)
 
-repairDamage(?, 0) <= !, fail
-repairDamage(?type, ?damage) <= Append(Race.Settings.Damage., ?type, .Repair, ?fact),															\
-								Get(?fact, ?setting), repairDamage(?type, ?setting, ?damage)
+{Any: [?Race.Settings.Damage.Suspension.Repair = Never], [?Damage.Suspension = 0]} => (Clear: Damage.Repair.Suspension.Target)
+{All: [?Race.Settings.Damage.Suspension.Repair = Always], [?Damage.Suspension > 0]} => (Set: Damage.Repair.Suspension.Target, true)
+{All: [?Race.Settings.Damage.Suspension.Repair = Threshold],																					\
+	  [?Damage.Suspension >= ?Race.Settings.Damage.Suspension.Repair.Threshold]} => (Set: Damage.Repair.Suspension.Target, true)
+{All: [?Race.Settings.Damage.Suspension.Repair = Threshold],																					\
+	  [?Damage.Suspension < ?Race.Settings.Damage.Suspension.Repair.Threshold]} => (Clear: Damage.Repair.Suspension.Target)
+{All: [?Race.Settings.Damage.Suspension.Repair = Impact], [?Damage.Suspension > 0]} => (Prove: notYetImplemented)
 
-repairDamage(?, Never, ?) <= !, fail
-repairDamage(?, Always, ?)
-repairDamage(?type, Threshold, ?damage) <= Append(Race.Settings.Damage., ?type, .Repair.Threshold, ?fact),										\
-										   Get(?fact, ?threshold), ?damage > ?threshold
-repairDamage(?, Impact, ?) <= notYetImplemented()
+{Any: [?Race.Settings.Damage.Bodywork.Repair = Never], [?Damage.Bodywork = 0]} => (Clear: Damage.Repair.Bodywork.Target)
+{All: [?Race.Settings.Damage.Bodywork.Repair = Always], [?Damage.Bodywork > 0]} => (Set: Damage.Repair.Bodywork.Target, true)
+{All: [?Race.Settings.Damage.Bodywork.Repair = Threshold],																						\
+	  [?Damage.Bodywork >= ?Race.Settings.Damage.Bodywork.Repair.Threshold]} => (Set: Damage.Repair.Bodywork.Target, true)
+{All: [?Race.Settings.Damage.Bodywork.Repair = Threshold],																						\
+	  [?Damage.Bodywork < ?Race.Settings.Damage.Bodywork.Repair.Threshold]} => (Clear: Damage.Repair.Bodywork.Target)
+{All: [?Race.Settings.Damage.Bodywork.Repair = Impact], [?Damage.Bodywork > 0]} => (Prove: notYetImplemented)
 
 
 ;;;-------------------------------------------------------------------------;;;

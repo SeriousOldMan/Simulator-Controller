@@ -129,7 +129,10 @@ Modular Simulator Controller System - Controller (Plugin: System)=>Modulare Simu
 Cannot start NirCmd (%kNirCmd%) - please check the configuration...=>NirCmd (%kNirCmd%) kann nicht gestartet werden - Bitte überprüfen Sie die Konfiguration...
 [ACC Plugin]
 Drive=>Fahren
+Chat=>Chat
 Pitstop=>Boxenstopp
+State: On=>Status: An
+State: Off=>Status: Aus
 Pitstop action =>Boxenstoppaktion 
  not found in plugin => nicht gefunden für 
  - please check the configuration=> - Bitte überprüfen Sie die Konfiguration

@@ -118,7 +118,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 				
 				trayMessage(translate(this.Label), translate("State: Off"))
 			
-				function.setText(translate(this.Label), "Gray")
+				function.setText(translate(this.Label), "Black")
 			}
 			else if (!this.iIsActive && ((trigger = "On") || (trigger == "Push"))) {
 				base.fireAction(function, trigger)
@@ -276,14 +276,12 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 	}
 	
 	activate() {
-		local action
-		
 		base.activate()
 	
 		isRunning := this.Application.isRunning()
 		
-		for ignore, action in this.Actions
-			action.Function.setText(translate(action.Label), isRunning ? (action.Active ? "Green" : "Black") : "Olive")
+		for ignore, theAction in this.Actions
+			theAction.Function.setText(translate(theAction.Label), isRunning ? (theAction.Active ? "Green" : "Black") : "Olive")
 		
 		SetTimer updateVibrationState, 50
 	}

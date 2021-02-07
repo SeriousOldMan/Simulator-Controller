@@ -418,14 +418,17 @@ class RaceEngineer extends ConfigurationItem {
 					if continuation {
 						this.getSpeaker().speakPhrase("Confirm")
 									
-						Sleep 5000
+						Sleep 3000
 
 						%continuation%()
 					}
 				case "No":
+					continuation := this.iContinuation
+					
 					this.iContinuation := false
 					
-					this.getSpeaker().speakPhrase("Okay")
+					if continuation
+						this.getSpeaker().speakPhrase("Okay")
 				case "Call", "Harsh":
 					this.nameRecognized(words)
 				case "Catch":

@@ -1,5 +1,6 @@
 [Version]
-Current=2.1.0-release
-Target=2.1-release
-Changes=Copy targets in Simulator Tools, ACC Shared Memory Reader, Alpha Version of AI Race Engineer, Plugin for Heusinkveld Pedals Calibration
-Date=02/06/2021
+Current=2.1.1-dev
+Target=2.1.1-release
+Release=2.1.0-release
+Changes=Maintenance and Bugfixes 
+Date=02/07/2021

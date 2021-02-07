@@ -37,7 +37,7 @@
   - [Pedal Calibration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-pedal-calibration)
     - [Pedal Calibration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-pedal-calibration)
   - [ACC - Assetto Corsa Competizione](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-acc)
-    - [Drive](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-drive)
+    - [Chat](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-chat)
     - [Pitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-pitstop)
     - [Virtual Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#vitual-race-engineer-integration)
   - [AC - Assetto Corsa](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-ac)

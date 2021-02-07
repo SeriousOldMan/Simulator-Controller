@@ -129,7 +129,10 @@ Modular Simulator Controller System - Controller (Plugin: System)=>
 Cannot start NirCmd (%kNirCmd%) - please check the configuration...=>
 [ACC Plugin]
 Drive=>
+Chat=>
 Pitstop=>
+State: On=>
+State: Off=>
 Pitstop action =>
  not found in plugin =>
  - please check the configuration=>

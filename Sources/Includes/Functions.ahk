@@ -40,6 +40,16 @@ global vTrayMessageDuration = 1500
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+createMessageReceiver() {
+	Gui MR:-border -Caption
+	Gui MR:Color, D0D0D0
+	Gui MR:Add, Text, X10 Y10, % translate("Modular Simulator Controller System")
+	Gui MR:Add, Text, , % A_ScriptName
+	
+	Gui MR:Margin, 10, 10
+	Gui MR:Show, Hide AutoSize X0 Y0
+}
+
 changeProtection(up) {
 	static level := 0
 	
@@ -1279,3 +1289,4 @@ checkForUpdates()
 initializeLoggingSystem()
 startMessageManager()
 startTrayMessageManager()
+createMessageReceiver()

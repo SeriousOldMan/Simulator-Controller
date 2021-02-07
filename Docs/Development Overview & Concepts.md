@@ -56,7 +56,7 @@ The following example shows some of the concepts introduced above. The code show
 Let's start with the plugin class definition:
 
 	class ACCPlugin extends ControllerPlugin {
-		iDriveMode := false
+		iChatMode := false
 		
 		Plugin[] {
 			Get {
@@ -64,17 +64,17 @@ Let's start with the plugin class definition:
 			}
 		}
 
-		class DriveMode extends ControllerMode {
+		class ChatMode extends ControllerMode {
 			Mode[] {
 				Get {
-					return kDriveMode
+					return kChatMode
 				}
 			}
 		}
 		
 		...
 		
-The class *ACCPlugin* defines one mode class named *DriveMode*. To keep the global namespace as clean as possible, we use an innerclass defintion style. Second the action class, which handles the ingame chat messages, will be defined also as an inner subclass of *ControllerAction*:
+The class *ACCPlugin* defines one mode class named *ChatMode*. To keep the global namespace as clean as possible, we use an innerclass defintion style. Second the action class, which handles the ingame chat messages, will be defined also as an inner subclass of *ControllerAction*:
 
 		...
 		
@@ -111,11 +111,11 @@ As you can see, the only important part of the *ChatAction* class is the *fireAc
 		...
 		
 		__New(controller, name, configuration := false) {
-			this.iDriveMode := new this.DriveMode(this)
+			this.iChatMode := new this.ChatMode(this)
 			
 			base.__New(controller, name, configuration)
 			
-			this.registerMode(this.DriveMode)
+			this.registerMode(this.ChatMode)
 		}
 		
 		runningSimulator() {
@@ -126,7 +126,7 @@ As you can see, the only important part of the *ChatAction* class is the *fireAc
 			base.simulatorStartup(simulator)
 			
 			if (inList(this.Simulators, simulator)) {
-				this.Controller.setMode(this.iDriveMode)
+				this.Controller.setMode(this.iChatMode)
 			}
 		}
 		
@@ -139,7 +139,7 @@ As you can see, the only important part of the *ChatAction* class is the *fireAc
 				if (function != false) {
 					message := string2Values("|", message)
 				
-					this.iDriveMode.registerAction(new this.ChatAction(function, message[1], message[2]))
+					this.iChatMode.registerAction(new this.ChatAction(function, message[1], message[2]))
 				}
 				else
 					logMessage(kLogWarn, "Controller function " . descriptor . " not found in plugin " . this.Plugin . " - please check the configuration")
@@ -147,9 +147,9 @@ As you can see, the only important part of the *ChatAction* class is the *fireAc
 		}
 	}
 	
-In the implementation of *loadFromConfiguration* all chat messages are retrieved from the configuration map, the corresponding controller functions are looked up and actions for each chat message are created and associated with these functions. The actions are registered for the "Drive" mode, thereby assuring, that chat messages will only be available when this mode is active.
+In the implementation of *loadFromConfiguration* all chat messages are retrieved from the configuration map, the corresponding controller functions are looked up and actions for each chat message are created and associated with these functions. The actions are registered for the "Chat" mode, thereby assuring, that chat messages will only be available when this mode is active.
 
-The *ACCPlugin* is aware of "Assetto Corsa Competizione", as you can see by the implementation of the *runningSimulator* method above. Since "Assetto Corsa Competizione" might also be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration) as a required simulator for this plugin, the "Drive" mode will only be active, i.e. available, when Assetto Corsa Competizione is running. As a convinience function, the implmentation of the *simulatorStartup* method  will automatically switch to "Drive" mode, when ACC has been started, thereby making the chat messages available on the hardware controller buttons.
+The *ACCPlugin* is aware of "Assetto Corsa Competizione", as you can see by the implementation of the *runningSimulator* method above. Since "Assetto Corsa Competizione" might also be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration) as a required simulator for this plugin, the "Chat" mode will only be active, i.e. available, when Assetto Corsa Competizione is running. As a convinience function, the implmentation of the *simulatorStartup* method  will automatically switch to "Chat" mode, when ACC has been started, thereby making the chat messages available on the hardware controller buttons.
 
 Note: With the introduction of Release 2.0, the *ACC* plugin is much more capable. The above example shows only a fraction of the functionality of this plugin for didactical reasons.
 

@@ -10,7 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 global kACCPlugin = "ACC"
-global kDriveMode = "Drive"
+global kChatMode = "Chat"
 global kPitstopMode = "Pitstop"
 
 global kAlways = "Always"
@@ -46,9 +46,12 @@ class ACCPlugin extends ControllerPlugin {
 	
 	iPSImageSearchArea := false
 	
-	iDriveMode := false
+	iChatMode := false
 	iPitstopMode := false
 	
+	iOnTrack := false
+	
+	iRaceEngineerEnabled := false
 	iRaceEngineerName := false
 	iRaceEngineerLogo := false
 	iRaceEngineerSpeaker := false
@@ -110,11 +113,14 @@ class ACCPlugin extends ControllerPlugin {
 		}
 	}
 	
-	class DriveMode extends ControllerMode {
+	class ChatMode extends ControllerMode {
 		Mode[] {
 			Get {
-				return kDriveMode
+				return kChatMode
 			}
+		}
+		
+		updateActions(onTrack) {
 		}
 	}
 	
@@ -128,14 +134,18 @@ class ACCPlugin extends ControllerPlugin {
 		activate() {
 			base.activate()
 			
-			this.enableRaceEngineerActions(this.Plugin.ActiveRace)
+			this.updateActions(this.Plugin.OnTrack)
 		}
 		
-		enableRaceEngineerActions(enabled) {
-			for ignore, theAction in this.Actions {
-				
-				if isInstance(theAction, ACCPlugin.RaceEngineerAction) {
-					if enabled {
+		updateActions(onTrack) {
+			this.updatePitstopActions(onTrack)
+			this.updateRaceEngineerActions(onTrack && (this.Plugin.RaceEngineer != false))
+		}			
+			
+		updatePitstopActions(onTrack) {	
+			for ignore, theAction in this.Actions
+				if isInstance(theAction, ACCPlugin.PitstopAction)
+					if onTrack {
 						theAction.Function.enable(kAllTrigger)
 						theAction.Function.setText(translate(theAction.Label))
 					}
@@ -143,8 +153,19 @@ class ACCPlugin extends ControllerPlugin {
 						theAction.Function.disable(kAllTrigger)
 						theAction.Function.setText(translate(theAction.Label), "Gray")
 					}
-				}
-			}
+		}
+		
+		updateRaceEngineerActions(activeRace) {
+			for ignore, theAction in this.Actions
+				if isInstance(theAction, ACCPlugin.RaceEngineerAction)
+					if activeRace {
+						theAction.Function.enable(kAllTrigger)
+						theAction.Function.setText(translate(theAction.Label))
+					}
+					else {
+						theAction.Function.disable(kAllTrigger)
+						theAction.Function.setText(translate(theAction.Label), "Gray")
+					}
 		}
 	}
 	
@@ -232,7 +253,7 @@ class ACCPlugin extends ControllerPlugin {
 		fireAction(function, trigger) {
 			local plugin := this.Controller.findPlugin(kACCPlugin)
 			
-			if plugin.ActiveRace
+			if plugin.RaceEngineer
 				switch this.Action {
 					case "PitstopPlan":
 						plugin.planPitstop()
@@ -240,6 +261,28 @@ class ACCPlugin extends ControllerPlugin {
 						plugin.preparePitstop()
 					default:
 						Throw "Invalid action """ . this.Action . """ detected in RaceEngineerAction.fireAction...."
+				}
+		}
+	}
+	
+	class RaceEngineerToggleAction extends ControllerAction {
+		fireAction(function, trigger) {
+			local plugin := this.Controller.findPlugin(kACCPlugin)
+			
+			if plugin.RaceEngineerName
+				if (plugin.RaceEngineerEnabled && ((trigger = "Off") || (trigger == "Push"))) {
+					plugin.disableRaceEngineer()
+				
+					trayMessage(translate(this.Label), translate("State: Off"))
+				
+					function.setText(translate(this.Label), "Black")
+				}
+				else if (!plugin.RaceEngineerEnabled && ((trigger = "On") || (trigger == "Push"))) {
+					plugin.enableRaceEngineer()
+				
+					trayMessage(translate(this.Label), translate("State: On"))
+				
+					function.setText(translate(this.Label), "Green")
 				}
 		}
 	}
@@ -291,6 +334,12 @@ class ACCPlugin extends ControllerPlugin {
 		}
 	}
 	
+	RaceEngineerEnabled[] {
+		Get {
+			return this.iRaceEngineerEnabled
+		}
+	}
+	
 	RaceEngineerName[] {
 		Get {
 			return this.iRaceEngineerName
@@ -315,9 +364,9 @@ class ACCPlugin extends ControllerPlugin {
 		}
 	}
 	
-	ActiveRace[] {
+	OnTrack[] {
 		Get {
-			return (this.RaceEngineer != false)
+			return this.iOnTrack
 		}
 	}
 	
@@ -328,11 +377,11 @@ class ACCPlugin extends ControllerPlugin {
 	}
 	
 	__New(controller, name, configuration := false) {
-		this.iDriveMode := new this.DriveMode(this)
+		this.iChatMode := new this.ChatMode(this)
 		
 		base.__New(controller, name, configuration)
 		
-		this.registerMode(this.iDriveMode)
+		this.registerMode(this.iChatMode)
 		
 		this.kOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", false)
 		this.kClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
@@ -342,6 +391,18 @@ class ACCPlugin extends ControllerPlugin {
 		
 		this.iRaceEngineerName := this.getArgumentValue("raceEngineerName", false)
 		this.iRaceEngineerLogo := this.getArgumentValue("raceEngineerLogo", false)
+		
+		raceEngineerToggle := this.getArgumentValue("raceEngineerName", false)
+		
+		if raceEngineerToggle {
+			arguments := string2Values(A_Space, theAction)
+			
+			this.iRaceEngineerEnabled := (arguments[1] = "On")
+			
+			this.createRaceEngineerAction(controller, "RaceEngineer", arguments[2])
+		}
+		else
+			this.iRaceEngineerEnabled := (this.iRaceEngineerName != false)
 		
 		for ignore, theAction in string2Values(",", this.getArgumentValue("raceEngineerCommands", ""))
 			this.createRaceEngineerAction(controller, string2Values(A_Space, theAction)*)
@@ -359,8 +420,10 @@ class ACCPlugin extends ControllerPlugin {
 		
 		controller.registerPlugin(this)
 	
-		if (this.iRaceEngineerName)
+		if (this.RaceEngineerName)
 			SetTimer collectRaceData, 10000
+		else
+			SetTimer updateOnTrackState, 5000
 	}
 	
 	loadFromConfiguration(configuration) {
@@ -374,7 +437,7 @@ class ACCPlugin extends ControllerPlugin {
 			if (function != false) {
 				message := string2Values("|", message)
 			
-				this.iDriveMode.registerAction(new this.ChatAction(function, message[1], message[2]))
+				this.iChatMode.registerAction(new this.ChatAction(function, message[1], message[2]))
 			}
 			else
 				this.logFunctionNotFound(descriptor)
@@ -401,6 +464,8 @@ class ACCPlugin extends ControllerPlugin {
 			else
 				this.logFunctionNotFound(actionFunction)
 		}
+		else if (action = "RaceEngineer")
+			this.registerAction(new this.RaceEngineerToggleAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Toggle"), action)))
 		else
 			logMessage(kLogWarn, translate("Pitstop action ") . action . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
 	}
@@ -467,6 +532,18 @@ class ACCPlugin extends ControllerPlugin {
 			logMessage(kLogWarn, translate("Pitstop action ") . action . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
 	}
 	
+	activate() {
+		base.activate()
+		
+		for ignore, theAction in this.Actions
+			if isInstance(theAction, ACCPlugin.RaceEngineerToggleAction) {
+				theAction.Function.setText(translate(theAction.Label), this.RaceEngineerName ? (this.RaceEngineerEnabled ? "Green" : "Black") : "Gray")
+				
+				if !this.RaceEngineerName
+					theAction.Function.disable()
+			}
+	}
+	
 	runningSimulator() {
 		return (isACCRunning() ? "Assetto Corsa Competizione" : false)
 	}
@@ -475,8 +552,18 @@ class ACCPlugin extends ControllerPlugin {
 		base.simulatorStartup(simulator)
 		
 		if (inList(this.Simulators, simulator)) {
-			this.Controller.setMode(this.iDriveMode)
+			this.Controller.setMode(this.iChatMode)
 		}
+	}
+	
+	updateOnTrackState(onTrack) {
+		this.iOnTrack := onTrack
+		
+		if (this.Controller.ActiveMode == this.iChatMode)
+			this.iChatMode.updateActions(onTrack)
+		
+		if (this.Controller.ActiveMode == this.iPitstopMode)
+			this.iPitstopMode.updateActions(onTrack)
 	}
 		
 	openPitstopMFD(update := true) {
@@ -950,50 +1037,63 @@ class ACCPlugin extends ControllerPlugin {
 		this.openPitstopMFD(update)
 	}
 	
+	enableRaceEngineer() {
+		this.iRaceEngineerEnabled := this.iRaceEngineerName
+	}
+	
+	disableRaceEngineer() {
+		this.iRaceEngineerEnabled := false
+		
+		if this.RaceEngineer
+			this.finishRace()
+	}
+	
 	startupRaceEngineer() {
-		Process Exist
-		
-		controllerPID := ErrorLevel
-		raceEngineerPID := 0
-							
-		try {
-			logMessage(kLogInfo, translate("Starting ") . translate("Race Engineer"))
+		if (this.RaceEngineerEnabled) {
+			Process Exist
 			
-			options := " -Remote " . controllerPID . " -Settings """ . getFileName("Race Engineer.settings", kUserConfigDirectory, kConfigDirectory) . """"
-			
-			if this.RaceEngineerName
-				options .= " -Name """ . this.RaceEngineerName . """"
-			
-			if this.RaceEngineerLogo
-				options .= " -Logo """ . this.RaceEngineerLogo . """"
-			
-			if this.RaceEngineerSpeaker
-				options .= " -Speaker """ . this.RaceEngineerSpeaker . """"
-			
-			if this.RaceEngineerListener
-				options .= " -Listener """ . this.RaceEngineerListener . """"
-			
-			exePath := kBinariesDirectory . "Race Engineer.exe" . options 
-			
-			Run %exePath%, %kBinariesDirectory%, , raceEngineerPID
-			
-			Sleep 5000
-		}
-		catch exception {
-			logMessage(kLogCritical, translate("Cannot start Race Engineer (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
-			
-			title := translate("Modular Simulator Controller System - Controller (Plugin: ACC)")
-			
-			SplashTextOn 800, 60, %title%, % substituteVariables(translate("Cannot start Race Engineer (%kBinariesDirectory%Race Engineer.exe) - please rebuild the applications..."))
+			controllerPID := ErrorLevel
+			raceEngineerPID := 0
+								
+			try {
+				logMessage(kLogInfo, translate("Starting ") . translate("Race Engineer"))
 				
-			Sleep 5000
+				options := " -Remote " . controllerPID . " -Settings """ . getFileName("Race Engineer.settings", kUserConfigDirectory, kConfigDirectory) . """"
 				
-			SplashTextOff
+				if this.RaceEngineerName
+					options .= " -Name """ . this.RaceEngineerName . """"
+				
+				if this.RaceEngineerLogo
+					options .= " -Logo """ . this.RaceEngineerLogo . """"
+				
+				if this.RaceEngineerSpeaker
+					options .= " -Speaker """ . this.RaceEngineerSpeaker . """"
+				
+				if this.RaceEngineerListener
+					options .= " -Listener """ . this.RaceEngineerListener . """"
+				
+				exePath := kBinariesDirectory . "Race Engineer.exe" . options 
+				
+				Run %exePath%, %kBinariesDirectory%, , raceEngineerPID
+				
+				Sleep 5000
+			}
+			catch exception {
+				logMessage(kLogCritical, translate("Cannot start Race Engineer (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
+				
+				title := translate("Modular Simulator Controller System - Controller (Plugin: ACC)")
+				
+				SplashTextOn 800, 60, %title%, % substituteVariables(translate("Cannot start Race Engineer (%kBinariesDirectory%Race Engineer.exe) - please rebuild the applications..."))
+					
+				Sleep 5000
+					
+				SplashTextOff
+				
+				return false
+			}
 			
-			return false
+			this.iRaceEngineer := new this.RemoteRaceEngineer(raceEngineerPID)
 		}
-		
-		this.iRaceEngineer := new this.RemoteRaceEngineer(raceEngineerPID)
 	}
 	
 	shutdownRaceEngineer() {
@@ -1001,26 +1101,29 @@ class ACCPlugin extends ControllerPlugin {
 		
 		this.iRaceEngineer := false
 		
-		raceEngineer.shutdown()
+		if raceEngineer
+			raceEngineer.shutdown()
 	}
 	
 	startRace(dataFile) {
-		if this.ActiveRace
+		if this.RaceEngineer
 			this.finishRace(false)
 		else
 			this.startupRaceEngineer()
 	
-		this.RaceEngineer.startRace(dataFile)
+		if this.RaceEngineer {
+			this.RaceEngineer.startRace(dataFile)
+			
+			controller := SimulatorController.Instance
+			mode := controller.findMode(kPitstopMode)
 		
-		controller := SimulatorController.Instance
-		mode := controller.findMode(kPitstopMode)
-		
-		if (controller.ActiveMode == mode)
-			mode.enableRaceEngineerActions(true)
+			if (controller.ActiveMode == mode)
+				mode.updateRaceEngineerActions(true)
+		}
 	}
 	
 	finishRace(shutdown := true) {
-		if this.ActiveRace {
+		if this.RaceEngineer {
 			this.RaceEngineer.finishRace()
 			
 			if shutdown
@@ -1032,50 +1135,38 @@ class ACCPlugin extends ControllerPlugin {
 			mode := controller.findMode(kPitstopMode)
 			
 			if (controller.ActiveMode == mode)
-				mode.enableRaceEngineerActions(false)
+				mode.updateRaceEngineerActions(false)
 		}
-		else
-			Throw "No active race to be finished..."
 	}
 	
 	addLap(lapNumber, dataFile) {
-		if this.ActiveRace
+		if this.RaceEngineer
 			this.RaceEngineer.addLap(lapNumber, dataFile)
-		else
-			Throw "Lap data can only be added during an active race..."
 	}
 	
 	updateLap(lapNumber, dataFile) {
-		if this.ActiveRace
+		if this.RaceEngineer
 			this.RaceEngineer.updateLap(lapNumber, dataFile)
-		else
-			Throw "Lap data can only be updated during an active race..."
 	}
 	
 	planPitstop() {
-		if this.ActiveRace
+		if this.RaceEngineer
 			this.RaceEngineer.planPitstop()
-		else
-			Throw "Pitstops may only be planned during an active race..."
 	}
 	
 	preparePitstop(lap := false) {
-		if this.ActiveRace
+		if this.RaceEngineer
 			this.RaceEngineer.preparePitstop(lap)
-		else
-			Throw "Pitstops may only be prepared during an active race..."
 	}
 	
 	performPitstop(lapNumber) {
-		if this.ActiveRace {
+		if this.RaceEngineer {
 			this.RaceEngineer.performPitstop(lapNumber)
 		
 			this.iPitstopPending := false
 					
 			SetTimer collectRaceData, 10000
 		}
-		else
-			Throw "Pitstops may only be performed during an active race..."
 	}
 	
 	pitstopPlanned(pitstopNumber) {
@@ -1335,6 +1426,40 @@ preparePitstop() {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+readSharedMemory() {
+	exePath := kBinariesDirectory . "ACC SHM Reader.exe"
+		
+	try {
+		Run %ComSpec% /c ""%exePath%" > "%kUserHomeDirectory%Temp\ACC Data\SHM.data"", , Hide
+	}
+	catch exception {
+		logMessage(kLogCritical, translate("Cannot start ACC SHM Reader (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
+		
+		title := translate("Modular Simulator Controller System - Controller (Plugin: ACC)")
+	
+		SplashTextOn 800, 60, %title%, % substituteVariables(translate("Cannot start ACC SHM Reader (%exePath%) - please check the configuration..."), {exePath: exePath})
+				
+		Sleep 5000
+				
+		SplashTextOff
+	}
+}
+
+updateOnTrackState() {
+	static plugin := false
+	
+	if !plugin
+		plugin := SimulatorController.Instance.findPlugin(kACCPlugin)
+	
+	if isACCRunning() {
+		readSharedMemory()
+		
+		plugin.updateOnTrackState(getConfigurationValue(readConfiguration(kUserHomeDirectory . "Temp\ACC Data\SHM.data"), "Stint Data", "Active", false))
+	}
+	else
+		plugin.updateOnTrackState(false)
+}
+
 collectRaceData() {
 	static lastLap := 0
 	static lastLapCounter := 0
@@ -1345,22 +1470,7 @@ collectRaceData() {
 		plugin := SimulatorController.Instance.findPlugin(kACCPlugin)
 	
 	if isACCRunning() {
-		exePath := kBinariesDirectory . "ACC SHM Reader.exe"
-		
-		try {
-			Run %ComSpec% /c ""%exePath%" > "%kUserHomeDirectory%Temp\ACC Data\SHM.data"", , Hide
-		}
-		catch exception {
-			logMessage(kLogCritical, translate("Cannot start ACC SHM Reader (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
-			
-			title := translate("Modular Simulator Controller System - Controller (Plugin: ACC)")
-		
-			SplashTextOn 800, 60, %title%, % substituteVariables(translate("Cannot start ACC SHM Reader (%exePath%) - please check the configuration..."))
-					
-			Sleep 5000
-					
-			SplashTextOff
-		}
+		readSharedMemory()
 		
 		dataFile := kUserHomeDirectory . "Temp\ACC Data\SHM.data"
 		data := readConfiguration(dataFile)
@@ -1401,62 +1511,70 @@ collectRaceData() {
 			if !getConfigurationValue(data, "Stint Data", "Active", false) {
 				; Not on track
 				
+				plugin.updateOnTrackState(false)
+				
 				lastLap := 0
 		
-				if plugin.ActiveRace
+				if plugin.RaceEngineer
 					plugin.finishRace()
 				
 				return
 			}
+			else
+				plugin.updateOnTrackState(true)
 			
 			if ((dataLastLap == 1) && (dataLastLap < lastLap)) {
 				; Start of new race without finishing previous race first
 			
 				lastLap := 0
 		
-				if plugin.ActiveRace
+				if plugin.RaceEngineer
 					plugin.finishRace()
 			}
 			
-			if (plugin.PitstopPending && getConfigurationValue(data, "Stint Data", "InPit", false) && !inPit) {
-				; Car is in the Pit
-				
-				plugin.performPitstop(dataLastLap)
-				
-				inPit := true
-			}
-			else if (dataLastLap > 0) {
-				; Car is on the track
-			
-				firstLap := (lastLap == 0)
-				newLap := (dataLastLap > lastLap)
-			
-				inPit := false
-				
-				if newLap {
-					lastLap := dataLastLap
-					lastLapCounter := 0
-				}
-				
-				newDataFile := kUserHomeDirectory . "Temp\ACC Data\Lap " . lastLap . "." . ++lastLapCounter . ".data"
+			if plugin.RaceEngineerEnabled
+				if (plugin.PitstopPending && getConfigurationValue(data, "Stint Data", "InPit", false) && !inPit) {
+					; Car is in the Pit
 					
-				FileCopy %dataFile%, %newDataFile%, 1
+					plugin.performPitstop(dataLastLap)
+					
+					inPit := true
+				}
+				else if (dataLastLap > 0) {
+					; Car is on the track
 				
-				if firstLap
-					plugin.startRace(newDataFile)
+					if ((dataLastLap > 1) && (lastLap == 0))
+						return
+					
+					firstLap := (lastLap == 0)
+					newLap := (dataLastLap > lastLap)
 				
-				if newLap
-					plugin.addLap(dataLastLap, newDataFile)
-				else	
-					plugin.updateLap(dataLastLap, newDataFile)
-			}
+					inPit := false
+					
+					if newLap {
+						lastLap := dataLastLap
+						lastLapCounter := 0
+					}
+					
+					newDataFile := kUserHomeDirectory . "Temp\ACC Data\Lap " . lastLap . "." . ++lastLapCounter . ".data"
+						
+					FileCopy %dataFile%, %newDataFile%, 1
+					
+					if firstLap
+						plugin.startRace(newDataFile)
+					
+					if newLap
+						plugin.addLap(dataLastLap, newDataFile)
+					else	
+						plugin.updateLap(dataLastLap, newDataFile)
+				}
 		}
 		finally {
 			protectionOff()
 		}
 	}
 	else {
-		if plugin.ActiveRace
+		if plugin.RaceEngineer
 			Loop 10 {
 				if isACCRunning()
 					return
@@ -1466,7 +1584,7 @@ collectRaceData() {
 		
 		lastLap := 0
 	
-		if plugin.ActiveRace
+		if plugin.RaceEngineer
 			plugin.finishRace()
 	}
 }

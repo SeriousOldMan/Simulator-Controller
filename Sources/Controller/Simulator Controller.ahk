@@ -1151,19 +1151,6 @@ class ControllerAction {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-createMessageReceiver() {
-	title1 := translate("Modular Simulator Controller System")
-	title2 := translate("Jona - The Virtual Race Engineer")
-	
-	Gui SC:-border -Caption
-	Gui SC:Color, D0D0D0
-	Gui SC:Add, Text, X10 Y10, % title1
-	Gui SC:Add, Text, , % title2
-	
-	Gui SC:Margin, 10, 10
-	Gui SC:Show, Hide AutoSize X0 Y0
-}
-
 hideButtonBox() {
 	ButtonBox.Instance.hide()
 }
@@ -1283,8 +1270,6 @@ initializeSimulatorController() {
 	settings := readConfiguration(kSimulatorSettingsFile)
 	
 	updateTrayMessageState(settings)
-	
-	createMessageReceiver()
 	
 	protectionOn()
 	

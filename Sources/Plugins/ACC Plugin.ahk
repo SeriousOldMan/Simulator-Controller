@@ -392,7 +392,7 @@ class ACCPlugin extends ControllerPlugin {
 		this.iRaceEngineerName := this.getArgumentValue("raceEngineerName", false)
 		this.iRaceEngineerLogo := this.getArgumentValue("raceEngineerLogo", false)
 		
-		raceEngineerToggle := this.getArgumentValue("raceEngineerName", false)
+		raceEngineerToggle := this.getArgumentValue("raceEngineer", false)
 		
 		if raceEngineerToggle {
 			arguments := string2Values(A_Space, theAction)
@@ -458,16 +458,16 @@ class ACCPlugin extends ControllerPlugin {
 			}
 		}
 		
-		if ((action = "PitstopPlan") || (action = "PitstopPrepare")) {
-			if (function != false)
+		if (function != false) {
+			if ((action = "PitstopPlan") || (action = "PitstopPrepare"))
 				mode.registerAction(new this.RaceEngineerAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Activate"), action), action))
+			else if (action = "RaceEngineer")
+				this.registerAction(new this.RaceEngineerToggleAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Toggle"), action)))
 			else
-				this.logFunctionNotFound(actionFunction)
+				logMessage(kLogWarn, translate("Action """) . action . translate(""" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
 		}
-		else if (action = "RaceEngineer")
-			this.registerAction(new this.RaceEngineerToggleAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Toggle"), action)))
 		else
-			logMessage(kLogWarn, translate("Pitstop action ") . action . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
+			this.logFunctionNotFound(actionFunction)
 	}
 	
 	createPitstopAction(controller, action, increaseFunction, moreArguments*) {

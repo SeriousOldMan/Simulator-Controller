@@ -572,10 +572,12 @@ class ACCPlugin extends ControllerPlugin {
 
 		SendEvent % this.OpenPitstopMFDHotkey
 		
+		wasOpen := this.iPSIsOpen
+		
 		this.iPSIsOpen := true
 		this.iPSSelectedOption := 1
 		
-		if update {
+		if (true || update || !wasOpen) {
 			this.updatePitStopState()
 			
 			SetTimer updatePitstopState, 5000
@@ -594,7 +596,7 @@ class ACCPlugin extends ControllerPlugin {
 	}
 	
 	requirePitstopMFD() {
-		this.openPitstopMFD(!this.iPSIsOpen)
+		this.openPitstopMFD()
 	}
 	
 	selectPitstopOption(option) {
@@ -945,12 +947,12 @@ class ACCPlugin extends ControllerPlugin {
 					
 					lastY := y
 					
-					logMessage(kLogInfo, translate("Assetto Corsa Competizione - Pitstop: Tyres are selected for change"))
+					logMessage(kLogInfo, translate("Pitstop: Tyres are selected for change"))
 				}
 				else {
 					this.iPSChangeTyres := false
 					
-					logMessage(kLogInfo, translate("Assetto Corsa Competizione - Pitstop: Tyres are not selected for change"))
+					logMessage(kLogInfo, translate("Pitstop: Tyres are not selected for change"))
 				}
 
 				curTickCount := A_TickCount
@@ -976,12 +978,12 @@ class ACCPlugin extends ControllerPlugin {
 				{
 					this.iPSChangeBrakes := true
 					
-					logMessage(kLogInfo, translate("Assetto Corsa Competizione - Pitstop: Brakes are selected for change"))
+					logMessage(kLogInfo, translate("Pitstop: Brakes are selected for change"))
 				}
 				else {
 					this.iPSChangeBrakes := false
 					
-					logMessage(kLogInfo, translate("Assetto Corsa Competizione - Pitstop: Brakes are not selected for change"))
+					logMessage(kLogInfo, translate("Pitstop: Brakes are not selected for change"))
 				}
 				
 				curTickCount := A_TickCount

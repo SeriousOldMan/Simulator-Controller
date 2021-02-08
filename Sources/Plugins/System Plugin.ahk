@@ -195,7 +195,7 @@ class SystemPlugin extends ControllerPlugin {
 	__New(controller, name, configuration := false) {
 		this.iLaunchMode := new this.LaunchMode(this)
 		
-		if ((A_Args.Length() > 0) && (A_Args[1] = "-Startup"))
+		if inList(A_Args, "-Startup")
 			this.iChildProcess := true
 		
 		base.__New(controller, name, configuration)

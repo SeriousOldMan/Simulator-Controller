@@ -390,7 +390,7 @@ class RaceEngineer extends ConfigurationItem {
 		
 			if this.Debug[kDebugGrammars] {
 				nextCharIndex := 1
-				SplashTextOn 400, 100, , % "Register phrase grammar " . new GrammarCompiler(speechRecognizer).readGrammar(definition, nextCharIndex).toString()
+				SplashTextOn 400, 100, , % "Register phrase grammar: " . new GrammarCompiler(speechRecognizer).readGrammar(definition, nextCharIndex).toString()
 				Sleep 1000
 				SplashTextOff
 			}

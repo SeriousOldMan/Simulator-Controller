@@ -319,7 +319,7 @@ class SimulatorController extends ConfigurationItem {
 	
 	iFunctionActions := {}
 	
-	iSpeechRecognizer := false
+	iVoiceServer := false
 	iVoiceCommands := {}
 	
 	iLastEvent := A_TickCount
@@ -330,6 +330,12 @@ class SimulatorController extends ConfigurationItem {
 	Settings[] {
 		Get {
 			return this.iSettings
+		}
+	}
+	
+	VoiceServer[] {
+		Get {
+			return this.iVoiceServer
 		}
 	}
 	
@@ -375,10 +381,11 @@ class SimulatorController extends ConfigurationItem {
 		}
 	}
 	
-	__New(configuration, settings) {
+	__New(configuration, settings, voiceServer := false) {
 		SimulatorController.Controller := this
 		
 		this.iSettings := settings
+		this.iVoiceServer := voiceServer
 		
 		SimulatorController.Instance := this
 		
@@ -564,75 +571,32 @@ class SimulatorController extends ConfigurationItem {
 		return application.CurrentPID
 	}
 	
-	startSpeechRecognizer() {
-		this.iSpeechRecognizer := new SpeechRecognizer(true, getLanguage())
-	}
-	
-	startVoiceRecognition() {
-		if this.iSpeechRecognizer {
-			callable := ObjBindMethod(this.iSpeechRecognizer, "startRecognizer")
-			
-			SetTimer %callable%, -10000
-		}
-	}			
-	
-	buildVoiceCommand(commandPhrase, handler) {
-		static counter := 1
-		
-		if this.iVoiceCommands.HasKey(commandPhrase)
-			this.iVoiceCommands[commandPhrase][4] := handler
+	getVoiceCommandDescriptor(command) {
+		if this.iVoiceCommands.HasKey(command)
+			return this.iVoiceCommands[command]
 		else {
-			if !this.iSpeechRecognizer
-				this.startSpeechRecognizer()
+			descriptor := Array(command, false)
 			
-			recognizer := this.iSpeechRecognizer
+			this.iVoiceCommands[command] := descriptor
 			
-			grammar := ("VoiceCommand." . counter++)
-			
-			if isDebug() {
-				nextCharIndex := 1
-				SplashTextOn 400, 100, , % "Register voice command: " . new GrammarCompiler(recognizer).readGrammar(commandPhrase, nextCharIndex).toString()
-				Sleep 1000
-				SplashTextOff
-			}
-			
-			try {
-				recognizer.loadGrammar(grammar, recognizer.compileGrammar(commandPhrase), ObjBindMethod(this, "voiceCommandRecognized"))
-			}
-			catch exception {
-				logMessage(kLogCritical, translate("Error while registering voice command """) . commandPhrase . translate(""" - please check the configuration"))
-			
-				title := translate("Modular Simulator Controller System")
+			if this.VoiceServer {
+				Process Exist
 				
-				SplashTextOn 800, 60, %title%, % substituteVariables(translate("Cannot register voice command ""%command%"" - please check the configuration..."), {command: commandPhrase})
-						
-				Sleep 5000
-							
-				SplashTextOff
+				raiseEvent(kFileMessage, "Voice", "registerVoiceCommand:" . command . ";" . ErrorLevel . ";" . "voiceCommand", this.VoiceServer)
 			}
 			
-			descriptor := Array(grammar, commandPhrase, false, handler)
-			
-			this.iVoiceCommands[commandPhrase] := descriptor
-			this.iVoiceCommands[grammar] := descriptor
+			return descriptor
 		}
 	}
 	
-	voiceCommandRecognized(grammar, words) {
-		if isDebug() {
-			SplashTextOn 400, 100, , % "Voice command recognized: " . values2String(" ", words*)
-			Sleep 1000
-			SplashTextOff
-		}
+	voiceCommand(command, words*) {
+		descriptor := this.iVoiceCommands[command]
+		handler := descriptor[2]
 		
-		descriptor := this.iVoiceCommands[grammar]
-		
-		if descriptor[3] {
+		if handler {
 			protectionOn()
 			
 			try {
-				handler := descriptor[4]
-				
 				%handler%()
 			}
 			finally {
@@ -641,12 +605,12 @@ class SimulatorController extends ConfigurationItem {
 		}
 	}
 	
-	enableVoiceCommand(commandPhrase) {
-		this.iVoiceCommands[commandPhrase][3] := true
+	enableVoiceCommand(command, handler) {
+		this.getVoiceCommandDescriptor(command)[2] := handler
 	}
 	
-	disableVoiceCommand(commandPhrase) {
-		this.iVoiceCommands[commandPhrase][4] := false
+	disableVoiceCommand(command) {
+		this.getVoiceCommandDescriptor(command)[2] := false
 	}
 	
 	connectAction(function, action) {
@@ -876,9 +840,7 @@ class ControllerFunction {
 				if (SubStr(theHotkey, 1, 1) = "?") {
 					command := SubStr(theHotkey, 2)
 					
-					controller.buildVoiceCommand(command, handler)
-					
-					controller.enableVoiceCommand(command)
+					controller.enableVoiceCommand(command, handler)
 						
 					logMessage(kLogInfo, translate("Binding voice command ") . command . translate(" for trigger ") . trigger . translate(" to ") . (action ? (action.base.__Class . ".fireAction") : this.Function.Actions[trigger, true]))
 				}
@@ -1390,18 +1352,18 @@ initializeSimulatorController() {
 	
 	updateTrayMessageState(settings)
 	
+	argIndex := inList(A_Args, "-Voice")
+	
 	protectionOn()
 	
 	try {
-		new SimulatorController(kSimulatorConfiguration, settings)
+		new SimulatorController(kSimulatorConfiguration, settings, argIndex ? A_Args[argIndex + 1] : false)
 	}
 	finally {
 		protectionOff()
 	}
-}
-
-startSimulatorController() {
-	SimulatorController.Instance.startVoiceRecognition()
+	
+	registerEventHandler("Voice", "handleRemoteCalls")
 }
 
 
@@ -1490,7 +1452,27 @@ setMode(action) {
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                     Initialization Section (Part 1)                     ;;;
+;;;                          Event Handler Section                          ;;;
+;;;-------------------------------------------------------------------------;;;
+
+handleRemoteCalls(event, data) {
+	local function
+	
+	if InStr(data, ":") {
+		data := StrSplit(data, ":", , 2)
+	
+		function := ObjBindMethod(SimulatorController.Instance, data[1])
+		arguments := string2Values(";", data[2])
+		
+		return withProtection(function, arguments*)
+	}
+	else
+		return withProtection(ObjBindMethod(SimulatorController.Instance, data))
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                          Initialization Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 initializeSimulatorController()
@@ -1502,10 +1484,3 @@ initializeSimulatorController()
 
 #Include ..\Plugins\Plugins.ahk
 #Include %A_MyDocuments%\Simulator Controller\Plugins\Plugins.ahk
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                     Initialization Section (Part 2)                     ;;;
-;;;-------------------------------------------------------------------------;;;
-
-startSimulatorController()

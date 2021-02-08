@@ -70,6 +70,10 @@ Could not communicate with speech recognizer library (=>
 Try running the Powershell command "Get-ChildItem -Path '.' -Recurse | Unblock-File" in the Binaries folder=>
 Error while initializing speech recognition module - please check the configuration=>
 No languages found while initializing speech recognition system - please check the configuration=>
+[Voice Server]
+Error while registering voice command "=>
+" - please check the configuration=>
+Cannot register voice command %command% - please check the configuration...=>
 [Simulator Controller]
 Modular Simulator=>
 Controller System=>
@@ -100,11 +104,8 @@ Binding voice command =>
 Binding hotkey =>
  for trigger =>
  to =>
-Error while registering voice command "=>
-" - please check the configuration=>
 Error while registering hotkey =>
  - please check the configuration=>
-Cannot register voice command %command% - please check the configuration...=>
 Cannot register hotkey %hotkey% - please check the configuration...=>
 Activating plugin =>
 Deactivating plugin =>

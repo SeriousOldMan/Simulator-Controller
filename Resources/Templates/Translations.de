@@ -70,6 +70,10 @@ Could not communicate with speech recognizer library (=>Fehler bei der Kommunika
 Try running the Powershell command "Get-ChildItem -Path '.' -Recurse | Unblock-File" in the Binaries folder=>Versuche das Powershell Kommando "Get-ChildItem -Path '.' -Recurse | Unblock-File" im Binaries Verzeichnis auszuführen
 Error while initializing speech recognition module - please check the configuration=>Fehler bei der Initialisierung des Spracherkennungsmoduls - Bitte überprüfen Sie die Konfiguration
 No languages found while initializing speech recognition system - please check the configuration=>Keine Sprachbibliotheken gefunden während der Initialisierung des Spracherkennungsmoduls - Bitte überprüfen Sie die Konfiguration
+[Voice Server]
+Error while registering voice command "=>Fehler bei der Registrierung des Sprachbefehls "
+" - please check the configuration=>" - Bitte überprüfen Sie die Konfiguration
+Cannot register voice command %command% - please check the configuration...=>Der Sprachbefehl %command% kann nicht registriert werden - Bitte überprüfen Sie die Konfiguration...
 [Simulator Controller]
 Modular Simulator=>Modulare Simulator
 Controller System=>Steuerung
@@ -100,11 +104,8 @@ Binding voice command =>Binde den Sprachbefehl
 Binding hotkey =>Binde den Hotkey 
  for trigger => für den Auslöser 
  to => an 
-Error while registering voice command "=>Fehler bei der Registrierung des Sprachbefehls "
-" - please check the configuration=>" - Bitte überprüfen Sie die Konfiguration
 Error while registering hotkey =>Fehler bei der Registrierung des Hotkeys 
  - please check the configuration=> - Bitte überprüfen Sie die Konfiguration
-Cannot register voice command %command% - please check the configuration...=>Der Sprachbefehl %command% kann nicht registriert werden - Bitte überprüfen Sie die Konfiguration...
 Cannot register hotkey %hotkey% - please check the configuration...=>Der Hotkey %hotkey% kann nicht registriert werden - Bitte überprüfen Sie die Konfiguration...
 Activating plugin =>Aktiviere Erweiterung 
 Deactivating plugin =>Deaktiviere Erweiterung 

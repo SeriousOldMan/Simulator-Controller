@@ -1074,6 +1074,9 @@ class ACCPlugin extends ControllerPlugin {
 				if this.RaceEngineerListener
 					options .= " -Listener """ . this.RaceEngineerListener . """"
 				
+				if this.Controller.VoiceServer
+					options .= " -Voice """ . this.Controller.VoiceServer . """"
+				
 				exePath := kBinariesDirectory . "Race Engineer.exe" . options 
 				
 				Run %exePath%, %kBinariesDirectory%, , raceEngineerPID

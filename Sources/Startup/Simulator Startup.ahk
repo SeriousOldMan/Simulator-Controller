@@ -136,11 +136,15 @@ class SimulatorStartup extends ConfigurationItem {
 		try {
 			logMessage(kLogInfo, translate("Starting ") . translate("Simulator Controller"))
 			
-			exePath := kBinariesDirectory . "Simulator Controller.exe -Startup"
+			exePath := kBinariesDirectory . "Voice Server.exe"
 			
-			Run %exePath%, %kBinariesDirectory%, , simulatorControllerPID
+			Run %exePath%, %kBinariesDirectory%, , processID
 			
-			return simulatorControllerPID
+			exePath := kBinariesDirectory . "Simulator Controller.exe -Startup -Voice " . processID
+			
+			Run %exePath%, %kBinariesDirectory%, , processID
+			
+			return processID
 		}
 		catch exception {
 			logMessage(kLogCritical, translate("Cannot start Simulator Controller (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))

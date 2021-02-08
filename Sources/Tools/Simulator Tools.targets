@@ -29,4 +29,4 @@ Simulator Settings=%kBinariesDirectory%Simulator Settings.exe <- %kSourcesDirect
 Simulator Startup=%kBinariesDirectory%Simulator Startup.exe <- %kSourcesDirectory%Startup\Simulator Startup.ahk; %kIncludesDirectory%, %kSourcesDirectory%Startup\Libraries\, %kHomeDirectory%VERSION
 Simulator Configuration=%kBinariesDirectory%Simulator Configuration.exe <- %kSourcesDirectory%Tools\Simulator Configuration.ahk; %kIncludesDirectory%, %kHomeDirectory%VERSION
 Simulator Tools=%kBinariesDirectory%Simulator Tools.exe <- %kSourcesDirectory%Tools\Simulator Tools.ahk; %kIncludesDirectory%, %kHomeDirectory%VERSION
-Race Engineer=%kBinariesDirectory%Race Engineer.exe <- %kSourcesDirectory%Engineer\Race Engineer.ahk; %kIncludesDirectory%, %kLibrariesDirectory%, %kHomeDirectory%VERSION
+Race Engineer=%kBinariesDirectory%Race Engineer.exe <- %kSourcesDirectory%Engineer\Race Engineer.ahk; %kIncludesDirectory%, %kLibrariesDirectory%, %kSourcesDirectory%Engineer\Libraries\, %kHomeDirectory%VERSION

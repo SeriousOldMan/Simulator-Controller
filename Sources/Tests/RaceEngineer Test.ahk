@@ -27,7 +27,7 @@ SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Libraries\RuleEngine.ahk
-#Include ..\Libraries\RaceEngineer.ahk
+#Include ..\Engineer\Libraries\RaceEngineer.ahk
 #Include AHKUnit\AHKUnit.ahk
 
 

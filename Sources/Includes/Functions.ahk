@@ -230,7 +230,14 @@ receiveFileMessage() {
 	fileName := kUserHomeDirectory . "Temp\Messages\" . pid . ".msg"
 	
 	if FileExist(fileName) {
-		file := FileOpen(fileName, "rw-rwd")
+		file := false
+		
+		try {
+			file := FileOpen(fileName, "rw-rwd")
+		}
+		catch exception {
+			return false
+		}
 		
 		while !file.AtEOF {
 			line := Trim(file.ReadLine(), " `t`n`r")
@@ -264,7 +271,12 @@ receiveFileMessage() {
 sendFileMessage(pid, event, data) {
 	text := event . ":" . data . "`n"
 	
-	FileAppend %text%, % kUserHomeDirectory . "Temp\Messages\" . pid . ".msg"
+	try {
+		FileAppend %text%, % kUserHomeDirectory . "Temp\Messages\" . pid . ".msg"
+	}
+	catch exception {
+		return false
+	}
 	
 	return true
 }

@@ -32,6 +32,13 @@ ListLines Off					; Disable execution history
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                          Local Include Section                          ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include ..\Libraries\SpeechRecognizer.ahk
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -312,6 +319,9 @@ class SimulatorController extends ConfigurationItem {
 	
 	iFunctionActions := {}
 	
+	iSpeechRecognizer := false
+	iVoiceCommands := {}
+	
 	iLastEvent := A_TickCount
 	
 	iShowLogo := false
@@ -554,6 +564,91 @@ class SimulatorController extends ConfigurationItem {
 		return application.CurrentPID
 	}
 	
+	startSpeechRecognizer() {
+		this.iSpeechRecognizer := new SpeechRecognizer(true, getLanguage())
+	}
+	
+	startVoiceRecognition() {
+		if this.iSpeechRecognizer {
+			callable := ObjBindMethod(this.iSpeechRecognizer, "startRecognizer")
+			
+			SetTimer %callable%, -10000
+		}
+	}			
+	
+	buildVoiceCommand(commandPhrase, handler) {
+		static counter := 1
+		
+		if this.iVoiceCommands.HasKey(commandPhrase)
+			this.iVoiceCommands[commandPhrase][4] := handler
+		else {
+			if !this.iSpeechRecognizer
+				this.startSpeechRecognizer()
+			
+			recognizer := this.iSpeechRecognizer
+			
+			grammar := ("VoiceCommand." . counter++)
+			
+			if isDebug() {
+				nextCharIndex := 1
+				SplashTextOn 400, 100, , % "Register voice command: " . new GrammarCompiler(recognizer).readGrammar(commandPhrase, nextCharIndex).toString()
+				Sleep 1000
+				SplashTextOff
+			}
+			
+			try {
+				recognizer.loadGrammar(grammar, recognizer.compileGrammar(commandPhrase), ObjBindMethod(this, "voiceCommandRecognized"))
+			}
+			catch exception {
+				logMessage(kLogCritical, translate("Error while registering voice command """) . commandPhrase . translate(""" - please check the configuration"))
+			
+				title := translate("Modular Simulator Controller System")
+				
+				SplashTextOn 800, 60, %title%, % substituteVariables(translate("Cannot register voice command ""%command%"" - please check the configuration..."), {command: commandPhrase})
+						
+				Sleep 5000
+							
+				SplashTextOff
+			}
+			
+			descriptor := Array(grammar, commandPhrase, false, handler)
+			
+			this.iVoiceCommands[commandPhrase] := descriptor
+			this.iVoiceCommands[grammar] := descriptor
+		}
+	}
+	
+	voiceCommandRecognized(grammar, words) {
+		if isDebug() {
+			SplashTextOn 400, 100, , % "Voice command recognized: " . values2String(" ", words*)
+			Sleep 1000
+			SplashTextOff
+		}
+		
+		descriptor := this.iVoiceCommands[grammar]
+		
+		if descriptor[3] {
+			protectionOn()
+			
+			try {
+				handler := descriptor[4]
+				
+				%handler%()
+			}
+			finally {
+				protectionOff()
+			}
+		}
+	}
+	
+	enableVoiceCommand(commandPhrase) {
+		this.iVoiceCommands[commandPhrase][3] := true
+	}
+	
+	disableVoiceCommand(commandPhrase) {
+		this.iVoiceCommands[commandPhrase][4] := false
+	}
+	
 	connectAction(function, action) {
 		logMessage(kLogInfo, translate("Connecting ") . function.Descriptor . translate(" to action ") . translate(getLabelForLogMessage(action)))
 		
@@ -772,40 +867,55 @@ class ControllerFunction {
 	}
 	
 	connectAction(action) {
+		local controller := this.Controller
+		
 		for ignore, trigger in this.Trigger {
 			handler := this.Actions[trigger]
-			theHotkey := ""
 			
-			for ignore, hotkey in this.Hotkeys[trigger] {
-				try {
-					theHotkey := hotkey
+			for ignore, theHotkey in this.Hotkeys[trigger] {
+				if (SubStr(theHotkey, 1, 1) = "?") {
+					command := SubStr(theHotkey, 2)
 					
-					Hotkey %hotkey%, %handler%
-					Hotkey %hotkey%, On
+					controller.buildVoiceCommand(command, handler)
 					
-					logMessage(kLogInfo, translate("Binding hotkey ") . theHotkey . translate(" for trigger ") . trigger . translate(" to ") . (action ? (action.base.__Class . ".fireAction") : this.Function.Actions[trigger, true]))
+					controller.enableVoiceCommand(command)
+						
+					logMessage(kLogInfo, translate("Binding voice command ") . command . translate(" for trigger ") . trigger . translate(" to ") . (action ? (action.base.__Class . ".fireAction") : this.Function.Actions[trigger, true]))
 				}
-				catch exception {
-					logMessage(kLogCritical, translate("Error while registering hotkey ") . theHotkey . translate(" - please check the configuration"))
-		
-					title := translate("Modular Simulator Controller System")
-					
-					SplashTextOn 800, 60, %title%, % substituteVariables(translate("Cannot register hotkey %theHotkey% - please check the configuration..."), {theHotKey: theHotKey})
-							
-					Sleep 5000
+				else
+					try {
+						Hotkey %theHotkey%, %handler%
+						Hotkey %theHotkey%, On
+						
+						logMessage(kLogInfo, translate("Binding hotkey ") . theHotkey . translate(" for trigger ") . trigger . translate(" to ") . (action ? (action.base.__Class . ".fireAction") : this.Function.Actions[trigger, true]))
+					}
+					catch exception {
+						logMessage(kLogCritical, translate("Error while registering hotkey ") . theHotkey . translate(" - please check the configuration"))
+			
+						title := translate("Modular Simulator Controller System")
+						
+						SplashTextOn 800, 60, %title%, % substituteVariables(translate("Cannot register hotkey %hotkey% - please check the configuration..."), {hotKey: theHotKey})
 								
-					SplashTextOff
-				}
+						Sleep 5000
+									
+						SplashTextOff
+					}
 			}
 		}
 	}
 	
 	disconnectAction(action) {
+		local controller := this.Controller
+		
 		for ignore, trigger in this.Function.Trigger {
-			for ignore, hotkey in this.Hotkeys[trigger] {
-				this.setText("")
-				
-				Hotkey %hotkey%, Off
+			for ignore, theHotkey in this.Hotkeys[trigger] {
+				if (SubStr(theHotkey, 1, 1) = "?")
+					controller.disableVoiceCommand(SubStr(theHotkey, 2))
+				else {
+					this.setText("")
+					
+					Hotkey %theHotkey%, Off
+				}
 			}
 		}
 	}
@@ -1156,10 +1266,19 @@ hideButtonBox() {
 }
 
 setHotkeyEnabled(function, trigger, enabled) {
+	local controller := SimulatorController.Instance
+	
 	state := enabled ? "On" : "Off"
 	
 	for ignore, theHotkey in function.Hotkeys[trigger]
-		Hotkey %theHotkey%, %state%
+		if (SubStr(theHotkey, 1, 1) = "?") {
+			if enabled
+				controller.enableVoiceCommand(SubStr(theHotkey, 2))
+			else
+				controller.disableVoiceCommand(SubStr(theHotkey, 2))
+		}
+		else
+			Hotkey %theHotkey%, %state%
 }
 
 functionActionCallable(function, trigger, action) {
@@ -1281,6 +1400,10 @@ initializeSimulatorController() {
 	}
 }
 
+startSimulatorController() {
+	SimulatorController.Instance.startVoiceRecognition()
+}
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                        Controller Action Section                        ;;;
@@ -1367,7 +1490,7 @@ setMode(action) {
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                         Initialization Section                          ;;;
+;;;                     Initialization Section (Part 1)                     ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 initializeSimulatorController()
@@ -1379,3 +1502,10 @@ initializeSimulatorController()
 
 #Include ..\Plugins\Plugins.ahk
 #Include %A_MyDocuments%\Simulator Controller\Plugins\Plugins.ahk
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                     Initialization Section (Part 2)                     ;;;
+;;;-------------------------------------------------------------------------;;;
+
+startSimulatorController()

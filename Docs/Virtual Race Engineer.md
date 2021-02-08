@@ -333,4 +333,12 @@ The biggest hurdle to overcome when using Jona, is to find a satisfying setting 
 Beside that, when you encounter false recommendations from Jona, you might take a look into the brain of Jona to see, why Jona arrived at those conclusions. You can do this by enabling "Debug" mode in the configuration. In the next run, Jona will periodically dump its knowledge to the file "Race Engineer.knowledge" in the folder *Simulator Controller\Temp* that resides in your user *Documents* folder. If you think, that you found a bug, it  would be very helpful for me, when you attach this file to any reported issue.
 
 And, last but not least, you might have a problem with the Shared Memory Reader for *Assetto Corsa Competizione*. Please check, if a file "SHM.data" exists in the *Simulator Controller\Temp\ACC Data* folder, which is located in your user *Documents* folder. If this file does not exist, you might try a complete reinstall.
+
+If you still have problems with voice recognition, you might try this combination:
+
+  1. Disable voice recognition by supplying *raceEngineerListener: false* as argument for the [ACC plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#vitual-race-engineer-integration).
+  2. Also, define a toggle function to switch Jona On or Off using the *raceEngineer* parameter of the ACC plugin.
+  3. Configure all necessary options you want to use for the ["Pitstop" mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-pitstop) of the ACC plugin, especially the *raceEngineerCommands* *PitstopPlan* and *PitstopPrepare*.
+
+With this setup, Jona will be there and inform you about low fuel, damages and so on, but you have to use the Button Box to initiate pitstop planning and preparation. You will miss out all the eloquent conversations with Jona, but functionality wise, you are almost on par.
   

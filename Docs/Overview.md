@@ -8,7 +8,7 @@ Welcome to the Simulator Controller documentation. Here you will find everything
     Useful information about Simulator Controller project and its functions & features. 
 
   - [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes)  
-    Beginning with Version 2.0 Simulator Controller supports an update mechanism for your local configurations, which is mostly automated. Please read the information on this page carefully, if you update an already configured installation to a newer version, to be sure, that all the new features will be available in your configuration as well.
+    Beginning with Version 2.0, Simulator Controller supports an update mechanism for your local configurations, which is mostly automated. Please read the information on this page carefully, if you update an already configured installation to a newer version, to be sure, that all the new features will be available in your configuration as well. Here you will also find information for additional manual installation or configuration activities, that might be necessary for new features introduced by a given release.
 	
   - [Installation & Configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration)   
     Maybe the most important part of the documentation, this part decribes how to install and configure Simulator Controller. Especially the second part gives you complete information how to configure all parts to be a perfect fit to your simulation equipment.  

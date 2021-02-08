@@ -24,7 +24,7 @@ English Race Engineer Grammars.2=%kResourcesDirectory%Templates\Race Engineer.gr
 German Race Engineer Grammars.1=%kConfigDirectory%Race Engineer.grammars.de <- %kSourcesDirectory%Engineer\Race Engineer.grammars.de
 German Race Engineer Grammars.2=%kResourcesDirectory%Templates\Race Engineer.grammars.de <- %kSourcesDirectory%Engineer\Race Engineer.grammars.de
 [Build]
-Simulator Controller=%kBinariesDirectory%Simulator Controller.exe <- %kSourcesDirectory%Controller\Simulator Controller.ahk; %kIncludesDirectory%, %kPluginsDirectory%, %kUserPluginsDirectory%, %kHomeDirectory%VERSION
+Simulator Controller=%kBinariesDirectory%Simulator Controller.exe <- %kSourcesDirectory%Controller\Simulator Controller.ahk; %kIncludesDirectory%, %kLibrariesDirectory%SpeechRecognizer.ahk, %kPluginsDirectory%, %kUserPluginsDirectory%, %kHomeDirectory%VERSION
 Simulator Settings=%kBinariesDirectory%Simulator Settings.exe <- %kSourcesDirectory%Startup\Simulator Settings.ahk; %kIncludesDirectory%, %kSourcesDirectory%Startup\Libraries\, %kHomeDirectory%VERSION
 Simulator Startup=%kBinariesDirectory%Simulator Startup.exe <- %kSourcesDirectory%Startup\Simulator Startup.ahk; %kIncludesDirectory%, %kSourcesDirectory%Startup\Libraries\, %kHomeDirectory%VERSION
 Simulator Configuration=%kBinariesDirectory%Simulator Configuration.exe <- %kSourcesDirectory%Tools\Simulator Configuration.ahk; %kIncludesDirectory%, %kHomeDirectory%VERSION

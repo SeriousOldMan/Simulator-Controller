@@ -87,7 +87,7 @@ class SpeechRecognizer {
 		
 		if (recognizer == true)
 			recognizer := false
-		
+
 		this.initialize(recognizer ? recognizer : 0)
 	}
 

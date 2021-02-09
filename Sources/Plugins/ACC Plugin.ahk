@@ -1481,7 +1481,6 @@ collectRaceData() {
 		data := readConfiguration(dataFile)
 		
 		dataLastLap := getConfigurationValue(data, "Stint Data", "Laps", 0)
-		
 		/* Used for full setup offrace debugging...
 		dataFile := kSourcesDirectory . "Tests\Test Data\Race 3\Lap " . lap . "." . counter . ".data"
 		data := readConfiguration(dataFile)
@@ -1618,9 +1617,9 @@ initializeACCPlugin() {
 	Loop Files, %kUserHomeDirectory%Temp\ACC Data\*.*
 		FileDelete %A_LoopFilePath%
 	
-	registerEventHandler("Pitstop", "handleRaceEngineerEvents")
-	
 	new ACCPlugin(controller, kACCPLugin, controller.Configuration)
+	
+	registerEventHandler("Pitstop", "handlePitstopRemoteCalls")
 }
 
 
@@ -1628,18 +1627,14 @@ initializeACCPlugin() {
 ;;;                          Event Handler Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-handleRaceEngineerEvents(event, data) {
-	local function
-	
+handlePitstopRemoteCalls(event, data) {
 	if InStr(data, ":") {
 		data := StrSplit(data, ":", , 2)
 		
-		function := ObjBindMethod(SimulatorController.Instance.findPlugin(kACCPlugin), data[1], string2Values(";", data[2])*)
+		return withProtection(ObjBindMethod(SimulatorController.Instance.findPlugin(kACCPlugin), data[1]), string2Values(";", data[2])*)
 	}
 	else
-		function := ObjBindMethod(SimulatorController.Instance.findPlugin(kACCPlugin), data)
-	
-	withProtection(function)
+		return withProtection(ObjBindMethod(SimulatorController.Instance.findPlugin(kACCPlugin), data))
 }
 
 ;;;-------------------------------------------------------------------------;;;

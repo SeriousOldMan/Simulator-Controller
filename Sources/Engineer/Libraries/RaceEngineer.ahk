@@ -346,7 +346,7 @@ class RaceEngineer extends ConfigurationItem {
 		this.iSpeaker := speaker
 		this.iListener := listener
 		
-		this.iVoiceServer := false
+		this.iVoiceServer := voiceServer
 		
 		base.__New(configuration)
 	}

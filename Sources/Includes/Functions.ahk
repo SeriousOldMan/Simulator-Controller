@@ -308,11 +308,15 @@ messageDispatcher() {
 }
 
 messageQueue() {
+	protectionOn()
+	
 	try {
 		if !receiveMessage()
 			sendMessage()
 	}
 	finally {
+		protectionOff()
+		
 		SetTimer messageQueue, -400
 	}
 }

@@ -69,7 +69,7 @@ class SystemPlugin extends ControllerPlugin {
 			else
 				this.LaunchpadAction.endTransition()
 			
-			if (stateChange && (this.LaunchpadFunction != false)) {
+			if (true || (stateChange && (this.LaunchpadFunction != false))) {
 				controller := SimulatorController.Instance
 					
 				if (controller.ActiveMode == controller.findMode(kLaunchMode)) {

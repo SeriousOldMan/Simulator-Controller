@@ -735,7 +735,7 @@ class SimulatorController extends ConfigurationItem {
 	}
 	
 	initializeBackgroundTasks() {
-		SetTimer updateSimulatorState, 1000
+		SetTimer updateSimulatorState, -10000
 		
 		this.iShowLogo := (this.iShowLogo && !kSilentMode)
 	}
@@ -1300,12 +1300,12 @@ updateSimulatorState() {
 		}
 		
 		if isSimulatorRunning {
-			SetTimer updateSimulatorState, 5000
+			SetTimer updateSimulatorState, -5000
 			
 			controller.hideLogo()
 		}
 		else {
-			SetTimer updateSimulatorState, 1000
+			SetTimer updateSimulatorState, -1000
 
 			if ((btnBox != false) && !btnBox.isVisible())
 				controller.showLogo()

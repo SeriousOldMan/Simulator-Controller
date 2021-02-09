@@ -196,6 +196,8 @@ startRaceEngineer() {
 			case "-Voice":
 				voiceServer := A_Args[index + 1]
 				index += 2
+			default:
+				index += 1
 		}
 	}
 	

@@ -121,7 +121,7 @@ class RaceEngineer extends ConfigurationItem {
 		}
 		
 		speak(text) {
-			raiseEvent(kFileMessage, "Voice", "speakWith:" . this.iSpeaker . ";" . this.iLanguage . ";" . text, this.Enginer.VoiceServer)
+			raiseEvent(kFileMessage, "Voice", "speakWith:" . this.iSpeaker . ";" . this.iLanguage . ";" . text, this.Engineer.VoiceServer)
 		}
 		
 		speakPhrase(phrase, variables := false) {

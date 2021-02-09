@@ -8,6 +8,7 @@ Release 2.1=Release 2.0.3 -> updateTranslations, updatePluginLabels, updateACCPl
 [Cleanup]
 Binaries Folder=%kBinariesDirectory%
 Logs Folder=%kLogsDirectory%
+Temp Folder=%kUserHomeDirectory%Temp\
 Simulator Settings.ini=%kUserConfigDirectory%Simulator Settings.ini
 Simulator Tools.ini=%kUserConfigDirectory%Simulator Tools.ini
 *.bak Files=%kHomeDirectory%, *.ahk.bak, R

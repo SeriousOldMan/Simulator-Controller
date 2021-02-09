@@ -1,4 +1,4 @@
-## 2.1.1-release upcoming...
+## 2.1.3-release upcoming...
 
   1. Bugfixes, as always
   2. Documentation updates, as always
@@ -6,6 +6,8 @@
   4. Minor updates in the phrase grammars of Jona
   5. Once again, improved handling of list boxes in the configuration tool
   6. Stability improvements for the inter process communication - no more circular deadlocks
+  7. New server process, that handles all voice generation and recognition duties - a little bit slower, but much more stable
+  8. New target for the maintenance tool to clear the *Temp* folder
   
 ## 2.1.0-release 02/06/21
 

@@ -1481,6 +1481,7 @@ collectRaceData() {
 		data := readConfiguration(dataFile)
 		
 		dataLastLap := getConfigurationValue(data, "Stint Data", "Laps", 0)
+		
 		/* Used for full setup offrace debugging...
 		dataFile := kSourcesDirectory . "Tests\Test Data\Race 3\Lap " . lap . "." . counter . ".data"
 		data := readConfiguration(dataFile)

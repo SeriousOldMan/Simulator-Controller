@@ -634,7 +634,7 @@ runCleanTargets(ByRef buildProgress) {
 				SetWorkingDir %fileOrFolder%
 			
 				try {
-					Loop Files, *.*
+					Loop Files, *.*, R
 					{
 						FileDelete %A_LoopFilePath%
 				

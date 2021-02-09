@@ -62,8 +62,12 @@ class SystemPlugin extends ControllerPlugin {
 				if (transition && ((A_TickCount - transition) > 10000)) {
 					transition := false
 					stateChange := true
+					
+					this.LaunchpadAction.endTransition()
 				}
 			}
+			else
+				this.LaunchpadAction.endTransition()
 			
 			if (stateChange && (this.LaunchpadFunction != false)) {
 				controller := SimulatorController.Instance
@@ -71,13 +75,10 @@ class SystemPlugin extends ControllerPlugin {
 				if (controller.ActiveMode == controller.findMode(kLaunchMode)) {
 					if transition
 						this.LaunchpadFunction.setText(translate(this.LaunchpadAction.Label), "Gray")
-					else {
+					else
 						this.LaunchpadFunction.setText(translate(this.LaunchpadAction.Label), isRunning ? "Green" : "Black")
-					
-						this.LaunchpadAction.endTransition()
-					}
 				}
-			}
+			}	
 		}
 		
 		connectAction(function, action) {

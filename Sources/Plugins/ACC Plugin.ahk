@@ -577,7 +577,7 @@ class ACCPlugin extends ControllerPlugin {
 		this.iPSIsOpen := true
 		this.iPSSelectedOption := 1
 		
-		if (true || update || !wasOpen) {
+		if (update || !wasOpen) {
 			this.updatePitStopState()
 			
 			SetTimer updatePitstopState, 5000

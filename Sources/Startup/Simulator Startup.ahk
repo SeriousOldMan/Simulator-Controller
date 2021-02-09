@@ -336,7 +336,7 @@ handleStartupEvents(event, data) {
 		data := StrSplit(data, ":")
 		
 		function := data[1]
-		arguments := StrSplit(data[2], ",")
+		arguments := StrSplit(data[2], ";")
 		
 		numArguments := arguments.Length()
 		

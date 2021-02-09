@@ -609,7 +609,7 @@ handleStartupEvents(event, data) {
 		data := StrSplit(data, ":")
 		
 		function := data[1]
-		arguments := string2Values(",", data[2])
+		arguments := string2Values(";", data[2])
 			
 		withProtection(function, arguments*)
 	}

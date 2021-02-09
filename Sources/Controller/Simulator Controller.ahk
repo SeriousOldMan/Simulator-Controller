@@ -1354,7 +1354,7 @@ initializeSimulatorController() {
 		protectionOff()
 	}
 	
-	registerEventHandler("Voice", "handleRemoteCalls")
+	registerEventHandler("Voice", "handleControllerRemoteCalls")
 }
 
 
@@ -1446,7 +1446,7 @@ setMode(action) {
 ;;;                          Event Handler Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-handleRemoteCalls(event, data) {
+handleControllerRemoteCalls(event, data) {
 	local function
 	
 	if InStr(data, ":") {

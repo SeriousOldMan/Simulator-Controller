@@ -1385,18 +1385,18 @@ class RaceEngineer extends ConfigurationItem {
 			speaker.speakPhrase((remainingLaps <= 2) ? "VeryLowFuel" : "LowFuel", {name: this.Name, laps: remainingLaps})
 		
 			if this.Listener {
-				if !this.hasPlannedPitstop() {
+				if this.hasPreparedPitstop()
+					speaker.speakPhrase((remainingLaps <= 2) ? "LowComeIn" : "ComeIn")
+				else if !this.hasPlannedPitstop() {
 					speaker.speakPhrase("ConfirmPlan")
 					
 					this.setContinuation(ObjBindMethod(this, "planPitstop"))
 				}
-				else if !this.hasPreparedPitstop() {
+				else {
 					speaker.speakPhrase("ConfirmPrepare")
 					
 					this.setContinuation(ObjBindMethod(this, "preparePitstop"))
 				}
-				else
-					speaker.speakPhrase((remainingLaps <= 2) ? "LowComeIn" : "ComeIn")
 			}
 		}
 	}

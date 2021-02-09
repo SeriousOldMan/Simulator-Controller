@@ -53,33 +53,7 @@ class SpeechGenerator {
 		Loop, % this.iSpeechGenerator.GetVoices.Count
 			this.Voices.Push(this.iSpeechGenerator.GetVoices.Item(A_Index-1).GetAttribute("Name"))
 	
-		voices := this.Voices
-		
-		if ((voice == true) && language && kLanguageVoices.HasKey(language)) {
-			availableVoices := []
-			
-			for ignore, voice in kLanguageVoices[language]
-				if inList(voices, voice)
-					availableVoices.Push(voice)
-			
-			count := availableVoices.Length()
-			
-			if (count == 0)
-				voice := false
-			else {
-				Random index, 1, count
-			
-				voice := availableVoices[Round(index)]
-			}
-		}
-		
-		if (voice && (voice != true))
-			voice := inList(voices, voice)
-		
-		if !voice
-			voice := 1
-		
-		this.setVoice(voices[voice])
+		this.setVoice(this.computeVoice(voice, language))
 	}
 
 	speak(text, wait := true) {
@@ -118,6 +92,38 @@ class SpeechGenerator {
 		this.iSpeechGenerator.Speak("<pitch absmiddle = '" pitch "'/>", 0x20)
 	}
 
+	computeVoice(voice, language, randomize := true) {
+		voices := this.Voices
+		
+		if ((voice == true) && language && kLanguageVoices.HasKey(language)) {
+			availableVoices := []
+			
+			for ignore, voice in kLanguageVoices[language]
+				if inList(voices, voice)
+					availableVoices.Push(voice)
+			
+			count := availableVoices.Length()
+			
+			if (count == 0)
+				voice := false
+			else if randomize {
+				Random index, 1, count
+			
+				voice := availableVoices[Round(index)]
+			}
+			else
+				voice := availableVoices[1]
+		}
+		
+		if (voice && (voice != true))
+			voice := inList(voices, voice)
+		
+		if !voice
+			voice := 1
+		
+		return voices[voice]
+	}
+	
 	setVoice(name) {
 		if !inList(this.Voices, name)
 			return false

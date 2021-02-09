@@ -90,6 +90,20 @@ class VoiceServer extends ConfigurationItem {
 		}
 	}
 	
+	speakWith(speaker, language, text) {
+		generator := this.SpeechGenerator[true]
+		currentVoice := generator.ActiveVoice
+		
+		generator.setVoice(generator.computeVoice(speaker, language, false))
+		
+		try {
+			this.speak(text)
+		}
+		finally {
+			generator.setVoice(currentVoice)
+		}
+	}
+	
 	startListening(retry := true) {
 		local function
 		

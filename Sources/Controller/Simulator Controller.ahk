@@ -590,19 +590,10 @@ class SimulatorController extends ConfigurationItem {
 	}
 	
 	voiceCommand(command, words*) {
-		descriptor := this.iVoiceCommands[command]
-		handler := descriptor[2]
+		handler := this.iVoiceCommands[command][2]
 		
-		if handler {
-			protectionOn()
-			
-			try {
-				%handler%()
-			}
-			finally {
-				protectionOff()
-			}
-		}
+		if handler
+			%handler%()
 	}
 	
 	enableVoiceCommand(command, handler) {

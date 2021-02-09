@@ -57,6 +57,8 @@ class RaceEngineer extends ConfigurationItem {
 	iSpeaker := false
 	iListener := false
 	
+	iVoiceServer := false
+	
 	iSpeechGenerator := false
 	iSpeechRecognizer := false
 	iIsListening := false
@@ -73,7 +75,82 @@ class RaceEngineer extends ConfigurationItem {
 	iLastFuelAmount := 0
 	iInitialFuelAmount := 0
 	
-	class RaceEngineerSpeaker extends SpeechGenerator {
+	class RemoteEngineerListener {
+		iListener := false
+		iLanguage := false
+		
+		__New(listener, language) {			
+			this.iListener := listener
+			this.iLanguage := language
+		}
+	}
+	
+	class RemoteEngineerSpeaker {
+		iEngineer := false
+		iFragments := {}
+		iPhrases := {}
+		
+		iSpeaker := false
+		iLanguage := false
+		
+		Engineer[] {
+			Get {
+				return this.iEngineer
+			}
+		}
+		
+		Phrases[] {
+			Get {
+				return this.iPhrases
+			}
+		}
+		
+		Fragments[] {
+			Get {
+				return this.iFragments
+			}
+		}
+		
+		__New(engineer, speaker, language, fragments, phrases) {
+			this.iEngineer := engineer
+			this.iFragments := fragments
+			this.iPhrases := phrases
+			
+			this.iSpeaker := speaker
+			this.iLanguage := language
+		}
+		
+		speak(text) {
+			raiseEvent(kFileMessage, "Voice", "speakWith:" . this.iSpeaker . ";" . this.iLanguage . ";" . text, this.Enginer.VoiceServer)
+		}
+		
+		speakPhrase(phrase, variables := false) {
+			phrases := this.Phrases
+			
+			if phrases.HasKey(phrase) {
+				phrases := phrases[phrase]
+				
+				Random index, 1, % phrases.Length()
+				
+				phrase := phrases[Round(index)]
+				
+				if variables {
+					variables := variables.Clone()
+					
+					variables["driver"] := this.Engineer.DriverName
+				}
+				else
+					variables := {driver: this.Engineer.DriverName}
+				
+				phrase := substituteVariables(phrase, variables)
+			}
+			
+			if phrase
+				this.speak(phrase)
+		}
+	}
+	
+	class LocalEngineerSpeaker extends SpeechGenerator {
 		iEngineer := false
 		iFragments := {}
 		iPhrases := {}
@@ -182,6 +259,12 @@ class RaceEngineer extends ConfigurationItem {
 		}
 	}
 	
+	VoiceServer[] {
+		Get {
+			return this.iVoiceServer
+		}
+	}
+	
 	Language[] {
 		Get {
 			return this.iLanguage
@@ -248,7 +331,7 @@ class RaceEngineer extends ConfigurationItem {
 		}
 	}
 	
-	__New(configuration, raceSettings, pitstopHandler := false, name := false, language := false, speaker := false, listener := false) {
+	__New(configuration, raceSettings, pitstopHandler := false, name := false, language := false, speaker := false, listener := false, voiceServer := false) {
 		this.iDebug := (isDebug() ? kDebugKnowledgeBase : kDebugOff)
 		this.iRaceSettings := raceSettings
 		this.iPitstopHandler := pitstopHandler
@@ -262,6 +345,8 @@ class RaceEngineer extends ConfigurationItem {
 		this.iLanguage := language
 		this.iSpeaker := speaker
 		this.iListener := listener
+		
+		this.iVoiceServer := false
 		
 		base.__New(configuration)
 	}
@@ -277,7 +362,10 @@ class RaceEngineer extends ConfigurationItem {
 	
 	getSpeaker() {
 		if (this.Speaker && !this.iSpeechGenerator) {
-			this.iSpeechGenerator := new this.RaceEngineerSpeaker(this, this.Speaker, this.Language, this.buildFragments(this.Language), this.buildPhrases(this.Language))
+			if this.VoiceServer
+				this.iSpeechGenerator := new this.RemoteEngineerSpeaker(this, this.Speaker, this.Language, this.buildFragments(this.Language), this.buildPhrases(this.Language))
+			else
+				this.iSpeechGenerator := new this.LocalEngineerSpeaker(this, this.Speaker, this.Language, this.buildFragments(this.Language), this.buildPhrases(this.Language))
 			
 			this.getListener()
 		}

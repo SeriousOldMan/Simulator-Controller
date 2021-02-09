@@ -142,14 +142,21 @@ class VoiceServer extends ConfigurationItem {
 			
 				return true
 			}
-	}	
+	}
 	
-	registerVoiceCommand(command, pid, callback) {
+	registerChoices(name, choices*) {
+		recognizer := this.SpeechRecognizer[true]
+		
+		recognizer.setChoices(name, values2String(",", choices*))
+	}
+	
+	registerVoiceCommand(grammar, command, pid, callback) {
 		static counter := 1
 		
 		recognizer := this.SpeechRecognizer[true]
 
-		grammar := ("Command." . counter++)
+		if !grammar
+			grammar := ("__Grammar." . counter++)
 			
 		if isDebug() {
 			nextCharIndex := 1
@@ -173,9 +180,7 @@ class VoiceServer extends ConfigurationItem {
 			SplashTextOff
 		}
 		
-		descriptor := Array(command, pid, callback)
-		
-		this.iVoiceCommands[grammar] := descriptor
+		this.iVoiceCommands[grammar] := Array(command, pid, callback)
 	}
 	
 	voiceCommandRecognized(grammar, words) {
@@ -187,10 +192,9 @@ class VoiceServer extends ConfigurationItem {
 		
 		descriptor := this.iVoiceCommands[grammar]
 		
-		raiseEvent(kFileMessage, "Voice", descriptor[3] . ":" . descriptor[1] . ";" . values2String(";", words*), descriptor[2])
+		raiseEvent(kFileMessage, "Voice", descriptor[3] . ":" . values2String(";", grammar, descriptor[1], words*), descriptor[2])
 	}
 }
-
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
@@ -203,7 +207,7 @@ initializeVoiceServer() {
 	
 	new VoiceServer(kSimulatorConfiguration)
 	
-	registerEventHandler("Voice", "handleRemoteCalls")
+	registerEventHandler("Voice", "handleVoiceRemoteCalls")
 }
 
 
@@ -211,9 +215,7 @@ initializeVoiceServer() {
 ;;;                          Event Handler Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-handleRemoteCalls(event, data) {
-	local function
-	
+handleVoiceRemoteCalls(event, data) {
 	if InStr(data, ":") {
 		data := StrSplit(data, ":", , 2)
 		
@@ -223,10 +225,7 @@ handleRemoteCalls(event, data) {
 			ExitApp 0
 		}
 	
-		function := ObjBindMethod(VoiceServer.Instance, data[1])
-		arguments := string2Values(";", data[2])
-		
-		return withProtection(function, arguments*)
+		return withProtection(ObjBindMethod(VoiceServer.Instance, data[1]), string2Values(";", data[2])*)
 	}
 	else if (data = "Shutdown") {
 		Sleep 30000

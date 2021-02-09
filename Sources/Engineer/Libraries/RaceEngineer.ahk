@@ -121,7 +121,7 @@ class RaceEngineer extends ConfigurationItem {
 		}
 		
 		speak(text) {
-			raiseEvent(kFileMessage, "Voice", "speakWith:" . this.iSpeaker . ";" . this.iLanguage . ";" . text, this.Engineer.VoiceServer)
+			raiseEvent(kFileMessage, "Voice", "speakWith:" . values2String(";", this.iSpeaker, this.iLanguage, text), this.Engineer.VoiceServer)
 		}
 		
 		speakPhrase(phrase, variables := false) {
@@ -349,6 +349,9 @@ class RaceEngineer extends ConfigurationItem {
 		this.iVoiceServer := voiceServer
 		
 		base.__New(configuration)
+		
+		if voiceServer
+			registerEventHandler("Voice", ObjBindMethod(this, "handleVoiceRemoteCalls"))
 	}
 	
 	setDebug(option, enabled) {
@@ -367,27 +370,33 @@ class RaceEngineer extends ConfigurationItem {
 			else
 				this.iSpeechGenerator := new this.LocalEngineerSpeaker(this, this.Speaker, this.Language, this.buildFragments(this.Language), this.buildPhrases(this.Language))
 			
-			this.getListener()
+			this.startListener()
 		}
 		
 		return this.iSpeechGenerator
 	}
 	
-	getListener() {
-		if (this.Listener && !this.iSpeechRecognizer) {
-			if (this.Listener != true)
-				recognizer := new SpeechRecognizer(this.Listener, this.Language)
-			else
-				recognizer := new SpeechRecognizer()
-			
-			this.buildGrammars(recognizer, this.Language)
-			
-			recognizer.startRecognizer()
-			
-			this.iSpeechRecognizer := recognizer
-		}
+	startListener() {
+		static initialized := false
 		
-		return this.iSpeechRecognizer
+		if (!initialized && this.Listener && !this.iSpeechRecognizer) {
+			initialized := true
+			
+			if this.VoiceServer
+				this.buildGrammars(false, this.Language)
+			else {
+				if (this.Listener != true)
+					recognizer := new SpeechRecognizer(this.Listener, this.Language)
+				else
+					recognizer := new SpeechRecognizer()
+				
+				this.buildGrammars(recognizer, this.Language)
+				
+				recognizer.startRecognizer()
+				
+				this.iSpeechRecognizer := recognizer
+			}
+		}
 	}
 	
 	startListening(retry := true) {
@@ -471,7 +480,14 @@ class RaceEngineer extends ConfigurationItem {
 			settings := readConfiguration(getFileName("Race Engineer.grammars.en", kUserConfigDirectory, kConfigDirectory))
 		
 		for name, choices in getConfigurationSectionValues(settings, "Choices", {})
-			speechRecognizer.setChoices(name, choices)
+			if speechRecognizer
+				speechRecognizer.setChoices(name, choices)
+			else
+				raiseEvent(kFileMessage, "Voice", "registerChoices:" . values2String(";", name, string2Values(",", choices)*), this.VoiceServer)
+		
+		Process Exist
+		
+		processID := ErrorLevel
 		
 		for grammar, definition in getConfigurationSectionValues(settings, "Listener Grammars", {}) {
 			definition := substituteVariables(definition, {name: this.Name})
@@ -482,9 +498,26 @@ class RaceEngineer extends ConfigurationItem {
 				Sleep 1000
 				SplashTextOff
 			}
-
-			speechRecognizer.loadGrammar(grammar, speechRecognizer.compileGrammar(definition), ObjBindMethod(this, "phraseRecognized"))
+			
+			if speechRecognizer
+				speechRecognizer.loadGrammar(grammar, speechRecognizer.compileGrammar(definition), ObjBindMethod(this, "phraseRecognized"))
+			else
+				raiseEvent(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", grammar, definition, processID, "remotePhraseRecognized"), this.VoiceServer)
 		}
+	}
+	
+	handleVoiceRemoteCalls(event, data) {
+		if InStr(data, ":") {
+			data := StrSplit(data, ":", , 2)
+
+			return withProtection(ObjBindMethod(this, data[1]), string2Values(";", data[2])*)
+		}
+		else
+			return withProtection(ObjBindMethod(this, data))
+	}
+	
+	remotePhraseRecognized(grammar, command, words*) {
+		this.phraseRecognized(grammar, words)
 	}
 	
 	phraseRecognized(grammar, words) {

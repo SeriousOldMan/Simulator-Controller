@@ -27,8 +27,8 @@ On=>An
 Off=>Aus
 None=>Nichts
 [Functions]
-Unhandled event =>Unbekanntes Ereignis 
-: =>: 
+Unhandled event "=>Unbekanntes Ereignis "
+": =>": 
 Dispatching event "=>Verteile Ereignis "
 ": =>": 
 "=>"

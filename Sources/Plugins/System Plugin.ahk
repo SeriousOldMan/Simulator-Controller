@@ -352,7 +352,7 @@ class SystemPlugin extends ControllerPlugin {
 
 	initializeBackgroundTasks() {
 		SetTimer updateApplicationStates, 5000
-		SetTimer updateModeSelector, 500
+		SetTimer updateModeSelector, -500
 	}
 }
 
@@ -491,10 +491,10 @@ updateApplicationStates() {
 updateModeSelector() {
 	local function
 	
-	static lastMode := false
-	static countDown := 3
 	static modeSelectorMode := false
 	static controller := false
+	
+	nextUpdate := -500
 	
 	if !controller
 		controller := SimulatorController.Instance
@@ -502,54 +502,44 @@ updateModeSelector() {
 	protectionOn()
 	
 	try {
-		countDown -= 1
-		
-		if (countDown == 0) {
-			lastMode := false
-				
-			if modeSelectorMode {
-				countDown := 3
-				
-				currentMode := controller.ActiveMode.Mode
-			}
-			else {
-				countDown := 2
-				
-				currentMode := translate("Mode Selector")
-			}
-			
-			modeSelectorMode := !modeSelectorMode
-		}
-		else
+		if modeSelectorMode {
 			currentMode := controller.ActiveMode.Mode
 			
-		if (currentMode != lastMode) {
-			selector := controller.findPlugin(kSystemPlugin).ModeSelector
-			function := selector.Function
-			
-			function.setText(translate(currentMode), (currentMode == translate("Mode Selector")) ? "Gray" : "Black")
-			
-			if !modeSelectorMode
-				lastMode := currentMode
-			else
-				lastMode := controller.ActiveMode.Mode
+			nextUpdate := -2000
 		}
+		else {
+			currentMode := translate("Mode Selector")
+			
+			nextUpdate := -1000
+		}
+
+		modeSelectorMode := !modeSelectorMode
+			
+		selector := controller.findPlugin(kSystemPlugin).ModeSelector
+		function := selector.Function
+		
+		if modeSelectorMode
+			function.setText(currentMode, "Gray")
+		else
+			function.setText(translate(currentMode))
 	}
 	finally {
 		protectionOff()
+		
+		SetTimer updateModeSelector, %nextUpdate%
 	}
 }
 
 initializeSystemPlugin() {
 	local controller
 	
-	registerEventHandler("Startup", "handleStartupEvents")
-	
 	controller := SimulatorController.Instance
 	
 	new SystemPlugin(controller, kSystemPlugin, controller.Configuration)
 	
 	controller.setMode(controller.findMode(kLaunchMode))
+	
+	registerEventHandler("Startup", "functionEventHandler")
 }
 
 
@@ -600,21 +590,6 @@ stopStartupSong() {
 	
 startupExited() {
 	SimulatorController.Instance.findPlugin(kSystemPlugin).iChildProcess := false
-}
-
-handleStartupEvents(event, data) {
-	local function
-	
-	if InStr(data, ":") {
-		data := StrSplit(data, ":")
-		
-		function := data[1]
-		arguments := string2Values(";", data[2])
-			
-		withProtection(function, arguments*)
-	}
-	else	
-		withProtection(data)
 }
 
 

@@ -582,14 +582,14 @@ class SimulatorController extends ConfigurationItem {
 			if this.VoiceServer {
 				Process Exist
 				
-				raiseEvent(kFileMessage, "Voice", "registerVoiceCommand:" . command . ";" . ErrorLevel . ";" . "voiceCommand", this.VoiceServer)
+				raiseEvent(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", false, command, ErrorLevel, "voiceCommand"), this.VoiceServer)
 			}
 			
 			return descriptor
 		}
 	}
 	
-	voiceCommand(command, words*) {
+	voiceCommand(grammar, command, words*) {
 		handler := this.iVoiceCommands[command][2]
 		
 		if handler
@@ -1354,7 +1354,7 @@ initializeSimulatorController() {
 		protectionOff()
 	}
 	
-	registerEventHandler("Voice", "handleControllerRemoteCalls")
+	registerEventHandler("Voice", "handleVoiceRemoteCalls")
 }
 
 
@@ -1446,16 +1446,11 @@ setMode(action) {
 ;;;                          Event Handler Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-handleControllerRemoteCalls(event, data) {
-	local function
-	
+handleVoiceRemoteCalls(event, data) {
 	if InStr(data, ":") {
 		data := StrSplit(data, ":", , 2)
 	
-		function := ObjBindMethod(SimulatorController.Instance, data[1])
-		arguments := string2Values(";", data[2])
-		
-		return withProtection(function, arguments*)
+		return withProtection(ObjBindMethod(SimulatorController.Instance, data[1]), string2Values(";", data[2])*)
 	}
 	else
 		return withProtection(ObjBindMethod(SimulatorController.Instance, data))

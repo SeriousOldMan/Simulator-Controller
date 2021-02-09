@@ -280,10 +280,12 @@ startSimulator() {
 	icon := kIconsDirectory . "Start.ico"
 		
 	Menu Tray, Icon, %icon%, , 1
+						
+	new SimulatorStartup(kSimulatorConfiguration, readConfiguration(kSimulatorSettingsFile)).startup()
 	
 	; Looks like we have recurring deadlock situations with bidirectional pipes in case of process exit situations...
 	;
-	; registerEventHandler("Startup", "handleStartupEvents")
+	; registerEventHandler("Startup", "functionEventHandler")
 	;
 	; Using a sempahore file instead...
 	
@@ -293,8 +295,6 @@ startSimulator() {
 		FileAppend Startup, %fileName%
 	
 	SetTimer watchStartupSemaphore, 2000
-						
-	new SimulatorStartup(kSimulatorConfiguration, readConfiguration(kSimulatorSettingsFile)).startup()
 }
 
 playSong(songFile) {
@@ -327,26 +327,6 @@ exitStartup(sayGoodbye := false) {
 
 		ExitApp 0
 	}
-}
-
-handleStartupEvents(event, data) {
-	local function
-	
-	if InStr(data, ":") {
-		data := StrSplit(data, ":")
-		
-		function := data[1]
-		arguments := StrSplit(data[2], ";")
-		
-		numArguments := arguments.Length()
-		
-		Loop %numArguments%
-			arguments[A_index] := Trim(arguments[A_Index], A_Space)
-			
-		withProtection(function, arguments*)
-	}
-	else	
-		withProtection(data)
 }
 
 

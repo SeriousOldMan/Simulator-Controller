@@ -110,7 +110,7 @@ receivePipeMessage() {
 				
 				logMessage(kLogInfo, translate("Dispatching event """) . event . (data[2] ? translate(""": ") . data[2] : translate("""")))
 				
-				vIncomingMessages.Push(Func(eventHandler).Bind(event, data[2]))
+				vIncomingMessages.Push(Array(eventHandler, event, data[2]))
 				
 				result := true
 			}
@@ -171,7 +171,7 @@ receiveWindowMessage(wParam, lParam) {
 	
 	logMessage(kLogInfo, translate("Dispatching event """) . event . (data[2] ? translate(""": ") . data[2] : translate("""")))
 	
-	vIncomingMessages.Push(Func(eventHandler).Bind(event, data[2]))
+	vIncomingMessages.Push(Array(eventHandler, event, data[2]))
 }
 
 sendWindowMessage(target, event, data) {
@@ -255,7 +255,7 @@ receiveFileMessage() {
 				
 			logMessage(kLogInfo, translate("Dispatching event """) . event . (data[2] ? translate(""": ") . data[2] : translate("""")))
 			
-			vIncomingMessages.Push(Func(eventHandler).Bind(event, data[2]))
+			vIncomingMessages.Push(Array(eventHandler, event, data[2]))
 			
 			result := true
 		}
@@ -297,9 +297,9 @@ sendMessage() {
 messageDispatcher() {
 	try {
 		if (vIncomingMessages.Length() > 0) {
-			event := vIncomingMessages.RemoveAt(1)
+			descriptor := vIncomingMessages.RemoveAt(1)
 		
-			withProtection(event)
+			withProtection(descriptor[1], descriptor[2], descriptor[3])
 		}
 	}
 	finally {
@@ -378,7 +378,9 @@ decodeDWORD(data) {
 }
 
 unknownEventHandler(event, data) {
-	logMessage(kLogCritical, translate("Unhandled event ") . event . translate(": ") . data)
+	logMessage(kLogCritical, translate("Unhandled event """) . event . translate(""": ") . data)
+	
+	raiseEvent(kLocalMessage, event, data)
 }
 
 stopMessageManager() {
@@ -1076,6 +1078,16 @@ bubbleSort(ByRef array, comparator) {
 	}
 }
 
+functionEventHandler(event, data) {
+	if InStr(data, ":") {
+		data := StrSplit(data, ":", , 2)
+		
+		withProtection(data[1], string2Values(";", data[2])*)
+	}
+	else	
+		withProtection(data)
+}
+
 registerEventHandler(event, handler) {
 	vEventHandlers[event] := handler
 }
@@ -1092,7 +1104,7 @@ raiseEvent(messageType, event, data, target := false) {
 		
 			logMessage(kLogInfo, translate("Dispatching event """) . event . (data ? translate(""": ") . data : translate("""")))
 			
-			vIncomingMessages.Push(Func(eventHandler).Bind(event, data))
+			vIncomingMessages.Push(Array(eventHandler, event, data))
 		case kWindowMessage:
 			logMessage(kLogInfo, translate("Raising event """) . event . (data ? translate(""": ") . data : translate("""")) . translate(" in target ") . target)
 			

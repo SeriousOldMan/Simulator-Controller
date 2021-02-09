@@ -201,10 +201,16 @@ startRaceEngineer() {
 		}
 	}
 	
-	registerEventHandler("Race", "handleRemoteCalls")
+	if (engineerSpeaker && (engineerSpeaker != true))
+		voiceServer := false
+	
+	if (engineerListener && (engineerListener != true))
+		voiceServer := false
 	
 	RaceEngineer.Instance := new RaceEngineer(kSimulatorConfiguration, readConfiguration(raceSettingsFile)
 											, remotePID ? new RemotePitstopHandler(remotePID) : false, engineerName, engineerLanguage, engineerSpeaker, engineerListener, voiceServer)
+	
+	registerEventHandler("Race", "handleRaceRemoteCalls")
 	
 	if engineerLogo
 		showLogo()
@@ -221,9 +227,7 @@ startRaceEngineer() {
 ;;;                          Event Handler Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-handleRemoteCalls(event, data) {
-	local function
-	
+handleRaceRemoteCalls(event, data) {
 	if InStr(data, ":") {
 		data := StrSplit(data, ":", , 2)
 		
@@ -233,10 +237,7 @@ handleRemoteCalls(event, data) {
 			ExitApp 0
 		}
 	
-		function := ObjBindMethod(RaceEngineer.Instance, data[1])
-		arguments := string2Values(";", data[2])
-		
-		return withProtection(function, arguments*)
+		return withProtection(ObjBindMethod(RaceEngineer.Instance, data[1]), string2Values(";", data[2])*)
 	}
 	else if (data = "Shutdown") {
 		Sleep 30000

@@ -41,7 +41,7 @@ global vTrayMessageDuration = 1500
 ;;;-------------------------------------------------------------------------;;;
 
 createMessageReceiver() {
-	Gui MR:-border -Caption
+	Gui MR:-Border -Caption
 	Gui MR:Color, D0D0D0
 	Gui MR:Add, Text, X10 Y10, % translate("Modular Simulator Controller System")
 	Gui MR:Add, Text, , % A_ScriptName

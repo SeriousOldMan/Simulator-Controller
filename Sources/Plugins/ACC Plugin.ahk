@@ -1431,11 +1431,11 @@ preparePitstop() {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-readSharedMemory() {
+readSharedMemory(dataFile) {
 	exePath := kBinariesDirectory . "ACC SHM Reader.exe"
 		
 	try {
-		Run %ComSpec% /c ""%exePath%" > "%kUserHomeDirectory%Temp\ACC Data\SHM.data"", , Hide
+		Run %ComSpec% /c ""%exePath%" > "%dataFile%"", , Hide
 	}
 	catch exception {
 		logMessage(kLogCritical, translate("Cannot start ACC SHM Reader (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
@@ -1448,6 +1448,8 @@ readSharedMemory() {
 				
 		SplashTextOff
 	}
+	
+	return readConfiguration(dataFile)
 }
 
 updateOnTrackState() {
@@ -1457,9 +1459,13 @@ updateOnTrackState() {
 		plugin := SimulatorController.Instance.findPlugin(kACCPlugin)
 	
 	if isACCRunning() {
-		readSharedMemory()
+		data := readSharedMemory(kUserHomeDirectory . "Temp\ACC Data\SHM.data")
 		
-		plugin.updateOnTrackState(getConfigurationValue(readConfiguration(kUserHomeDirectory . "Temp\ACC Data\SHM.data"), "Stint Data", "Active", false))
+		inRace := (getConfigurationValue(data, "Stint Data", "Active", false)
+				&& (getConfigurationValue(data, "Stint Data", "Session", "OTHER") = "RACE")
+				&& !getConfigurationValue(data, "Stint Data", "Paused", false))
+				
+		plugin.updateOnTrackState(inRace)
 	}
 	else
 		plugin.updateOnTrackState(false)
@@ -1475,10 +1481,9 @@ collectRaceData() {
 		plugin := SimulatorController.Instance.findPlugin(kACCPlugin)
 	
 	if isACCRunning() {
-		readSharedMemory()
-		
 		dataFile := kUserHomeDirectory . "Temp\ACC Data\SHM.data"
-		data := readConfiguration(dataFile)
+		
+		data := readSharedMemory(dataFile)
 		
 		dataLastLap := getConfigurationValue(data, "Stint Data", "Laps", 0)
 		

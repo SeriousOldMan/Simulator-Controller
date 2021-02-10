@@ -391,7 +391,7 @@ class ConfigurationEditor extends ConfigurationItem {
 	createControls(configuration) {
 		Gui SE:Default
 	
-		Gui SE:-border -Caption
+		Gui SE:-Border -Caption
 		Gui SE:Color, D0D0D0
 
 		Gui SE:Font, Bold, Arial
@@ -1927,7 +1927,7 @@ class ThemesEditor extends ConfigurationItem {
 	createControls(configuration) {
 		Gui TE:Default
 	
-		Gui TE:-border -Caption
+		Gui TE:-Border -Caption
 		Gui TE:Color, D0D0D0
 
 		Gui TE:Font, Bold, Arial
@@ -1947,11 +1947,11 @@ class ThemesEditor extends ConfigurationItem {
 		Gui TE:Add, Text, x16 y72 w160 h23 +0x200, % translate("Lower Title")
 		Gui TE:Add, Edit, x110 y72 w284 h21 VwindowSubtitleEdit, %windowSubtitleEdit%
 		
-		Gui, TE:Add, Text, x50 y106 w310 0x10
+		Gui TE:Add, Text, x50 y106 w310 0x10
 		
 		this.iThemesList := new ThemesList(configuration)
 		
-		Gui, TE:Add, Text, x50 y+10 w310 0x10
+		Gui TE:Add, Text, x50 y+10 w310 0x10
 		
 		Gui TE:Add, Button, x126 yp+10 w80 h23 Default GsaveThemesEditor, % translate("Ok")
 		Gui TE:Add, Button, x214 yp w80 h23 GcancelThemesEditor, % translate("&Cancel")
@@ -2544,7 +2544,7 @@ class TranslationsEditor extends ConfigurationItem {
 	createControls(configuration) {
 		Gui TE:Default
 	
-		Gui TE:-border -Caption
+		Gui TE:-Border -Caption
 		Gui TE:Color, D0D0D0
 
 		Gui TE:Font, Bold, Arial
@@ -2558,7 +2558,7 @@ class TranslationsEditor extends ConfigurationItem {
 
 		Gui TE:Font, Norm, Arial
 		
-		Gui, TE:Add, Text, x50 y+10 w310 0x10
+		Gui TE:Add, Text, x50 y+10 w310 0x10
 		
 		choices := []
 		chosen := 0
@@ -2587,7 +2587,7 @@ class TranslationsEditor extends ConfigurationItem {
 	
 		this.iTranslationsList := new TranslationsList(configuration)
 		
-		Gui, TE:Add, Text, x50 y+10 w310 0x10
+		Gui TE:Add, Text, x50 y+10 w310 0x10
 		
 		Gui TE:Add, Button, x166 yp+10 w80 h23 Default GcloseTranslationsEditor, % translate("Close")
 	}

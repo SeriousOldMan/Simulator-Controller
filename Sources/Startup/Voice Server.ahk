@@ -155,10 +155,17 @@ class VoiceServer extends ConfigurationItem {
 		
 		recognizer := this.SpeechRecognizer[true]
 
-		if !grammar
+		if !grammar {
+			for key, descriptor in this.iVoiceCommands
+				if ((descriptor[1] = command) && (descriptor[3] = callback)) {
+					descriptor[2] := pid
+					
+					return
+				}
+				
 			grammar := ("__Grammar." . counter++)
-			
-		if this.iVoiceCommands.HasKey(grammar) {
+		}
+		else if this.iVoiceCommands.HasKey(grammar) {
 			descriptor := this.iVoiceCommands[grammar]
 			
 			if ((descriptor[1] = command) && (descriptor[3] = callback)) {

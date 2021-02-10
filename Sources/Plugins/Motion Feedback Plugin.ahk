@@ -552,36 +552,35 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	}
 	
 	callSimFeedback(arguments*) {
-		this.requireSimFeedback()
-		
-		try {
-			for index, argument in arguments
-				if InStr(argument, A_Space)
-					arguments[index] := """" . argument . """"
-			
-			arguments := values2String(A_Space, arguments*)
-			
-			RunWait "%kSimFeedbackConnector%" %arguments%, , Hide
-			
-			result := ErrorLevel
-			
-			logMessage(kLogInfo, "Invoking SimFeedback connector with arguments: " . arguments . " => " . result)
-		
-			return result
-		}
-		catch exception {
-			logMessage(kLogCritical, "Error while connecting to SimFeedback (" . kSimFeedbackConnector . "): " . exception.Message . " - please check the configuration")
-			
-			title := translate("Modular Simulator Controller System")
-			
-			SplashTextOn 800, 60, %title%, % substituteVariables(translate("Cannot connect to SimFeedback (%kSimFeedbackConnector%) - please check the configuration..."))
-					
-			Sleep 5000
-						
-			SplashTextOff
+		if this.requireSimFeedback()
+			try {
+				for index, argument in arguments
+					if InStr(argument, A_Space)
+						arguments[index] := """" . argument . """"
 				
-			return 0
-		}
+				arguments := values2String(A_Space, arguments*)
+				
+				RunWait "%kSimFeedbackConnector%" %arguments%, , Hide
+				
+				result := ErrorLevel
+				
+				logMessage(kLogInfo, "Invoking SimFeedback connector with arguments: " . arguments . " => " . result)
+			
+				return result
+			}
+			catch exception {
+				logMessage(kLogCritical, "Error while connecting to SimFeedback (" . kSimFeedbackConnector . "): " . exception.Message . " - please check the configuration")
+				
+				title := translate("Modular Simulator Controller System")
+				
+				SplashTextOn 800, 60, %title%, % substituteVariables(translate("Cannot connect to SimFeedback (%kSimFeedbackConnector%) - please check the configuration..."))
+						
+				Sleep 5000
+							
+				SplashTextOff
+					
+				return 0
+			}
 	}
 	
 	getMotionIntensity() {
@@ -685,8 +684,12 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			
 			this.loadFromSimFeedback()
 		}
+			
+		Loop 20 {
+			Sleep 500
+		} until this.Application.isRunning()
 		
-		return isRunning
+		return this.Application.isRunning()
 	}
 	
 	increaseMotionIntensity() {
@@ -806,15 +809,15 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		
 		wasHidden := (WinActive(window) == 0)
 		
-		this.requireSimFeedback()
-	
-		if this.Application.isRunning() {
+		if this.requireSimFeedback() {
 			window := this.Application.WindowTitle
 		
 			IfWinNotActive %window%, , WinActivate, %window%
 			WinWaitActive %window%, , 2
 			Sleep 100
 		}
+		else
+			Exit
 		
 		return wasHidden
 	}

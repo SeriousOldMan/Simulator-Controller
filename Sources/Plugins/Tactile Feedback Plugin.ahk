@@ -296,7 +296,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		if !this.Application.isRunning() {
 			this.Application.startup()
 			
-			Loop {
+			Loop 20 {
 				Sleep 500
 			} until this.Application.isRunning()
 			

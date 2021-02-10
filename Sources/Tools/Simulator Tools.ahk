@@ -634,10 +634,13 @@ runCleanTargets(ByRef buildProgress) {
 				SetWorkingDir %fileOrFolder%
 			
 				try {
-					Loop Files, *.*, R
+					Loop Files, *.*, FDR
 					{
-						FileDelete %A_LoopFilePath%
-				
+						if InStr(FileExist(A_LoopFilePath), "D")
+							FileRemoveDir %A_LoopFilePath%, 1
+						else
+							FileDelete %A_LoopFilePath%
+					
 						if !kSilentMode
 							Progress %buildProgress%, % translate("Deleting ") . A_LoopFileName . translate("...")
 						

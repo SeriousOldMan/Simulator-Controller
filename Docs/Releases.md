@@ -8,6 +8,7 @@
   6. Stability improvements for the inter process communication - no more circular deadlocks
   7. New server process, that handles all voice generation and recognition duties - a little bit slower, but much more stable
   8. New target for the maintenance tool to clear the *Temp* folder
+  9. From now on, Jona is only available in a race situation, either single- or multiplayer
   
 ## 2.1.0-release 02/06/21
 

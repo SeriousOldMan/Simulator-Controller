@@ -1513,7 +1513,8 @@ collectRaceData() {
 		protectionOn()
 		
 		try {
-			if !getConfigurationValue(data, "Stint Data", "Active", false) {
+			if (!getConfigurationValue(data, "Stint Data", "Active", false)
+			 || (getConfigurationValue(data, "Stint Data", "Session", "OTHER") != "RACE"))  {
 				; Not on track
 				
 				plugin.updateOnTrackState(false)
@@ -1523,6 +1524,11 @@ collectRaceData() {
 				if plugin.RaceEngineer
 					plugin.finishRace()
 				
+				return
+			}
+			else if getConfigurationValue(data, "Stint Data", "Paused", false) {
+				plugin.updateOnTrackState(false)
+			
 				return
 			}
 			else

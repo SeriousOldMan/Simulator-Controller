@@ -309,6 +309,8 @@ A considerable part of the knowledge of Jona comes from the telemetry informatio
 	DriverSurname=BigO
 	DriverNickname=TBO
 	Active=true
+	Paused=false
+	Session=RACE
 	InPit=false
 	LapBestTime=110091
 	LapLastTime=110091

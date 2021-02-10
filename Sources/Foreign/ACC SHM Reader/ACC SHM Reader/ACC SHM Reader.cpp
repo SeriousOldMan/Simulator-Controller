@@ -166,6 +166,8 @@ int main(int argc, char* argv[])
 		SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;
 		
 		printData("Active", ((gf->status == AC_LIVE) || (gf->status == AC_PAUSE)) ? "true" : "false");
+		printData("Paused", (gf->status == AC_PAUSE) ? "true" : "false");
+		printData("Session", (gf->session == AC_RACE) ? "RACE" : ((gf->session == AC_QUALIFY) ? "QUALIFY" : "OTHER"));
 		wcout << "DriverForname=" << sf->playerName << endl;
 		wcout << "DriverSurname=" << sf->playerSurname << endl;
 		wcout << "DriverNickname=" << sf->playerNick << endl;

@@ -1,4 +1,4 @@
-## 2.1.3-release upcoming...
+## 2.1.3-release 02/10/21
 
   1. Bugfixes, as always
   2. Documentation updates, as always
@@ -6,9 +6,10 @@
   4. Minor updates in the phrase grammars of Jona
   5. Once again, improved handling of list boxes in the configuration tool
   6. Stability improvements for the inter process communication - no more circular deadlocks
-  7. New server process, that handles all voice generation and recognition duties - a little bit slower, but much more stable
-  8. New target for the maintenance tool to clear the *Temp* folder
-  9. From now on, Jona is only available in a race situation, either single- or multiplayer
+  7. Lots of small improvements for Jona with regards to session and stint handling
+  8. New server process, that handles all voice generation and recognition duties - a little bit slower, but much more stable
+  9. New target for the maintenance tool to clear the *Temp* folder
+  10. From now on, Jona is only available in a race situation, either single- or multiplayer
   
 ## 2.1.0-release 02/06/21
 

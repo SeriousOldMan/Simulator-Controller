@@ -1534,7 +1534,7 @@ collectRaceData() {
 			else
 				plugin.updateOnTrackState(true)
 			
-			if ((dataLastLap == 1) && (dataLastLap < lastLap)) {
+			if ((dataLastLap <= 1) && (dataLastLap < lastLap)) {
 				; Start of new race without finishing previous race first
 			
 				lastLap := 0

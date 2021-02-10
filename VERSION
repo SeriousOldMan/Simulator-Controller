@@ -1,6 +1,6 @@
 [Version]
-Current=2.1.2-dev
-Target=2.1.2-release
-Release=2.1.0-release
+Current=2.1.3-release
+Target=2.1.3-release
+Release=2.1.3-release
 Changes=Maintenance and Bugfixes 
-Date=02/09/2021
+Date=02/10/2021

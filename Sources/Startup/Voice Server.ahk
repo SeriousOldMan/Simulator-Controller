@@ -158,6 +158,16 @@ class VoiceServer extends ConfigurationItem {
 		if !grammar
 			grammar := ("__Grammar." . counter++)
 			
+		if this.iVoiceCommands.HasKey(grammar) {
+			descriptor := this.iVoiceCommands[grammar]
+			
+			if ((descriptor[1] = command) && (descriptor[3] = callback)) {
+				descriptor[2] := pid
+				
+				return
+			}
+		}
+			
 		if isDebug() {
 			nextCharIndex := 1
 			SplashTextOn 400, 100, , % "Register voice command: " . new GrammarCompiler(recognizer).readGrammar(command, nextCharIndex).toString()

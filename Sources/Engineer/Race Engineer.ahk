@@ -224,26 +224,25 @@ startRaceEngineer() {
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;-------------------------------------------------------------------------;;;
 ;;;                          Event Handler Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+shutdownRaceEngineer() {
+	ExitApp 0
+}
 
 handleRaceRemoteCalls(event, data) {
 	if InStr(data, ":") {
 		data := StrSplit(data, ":", , 2)
 		
-		if (data[1] = "Shutdown") {
-			Sleep 30000
-			
-			ExitApp 0
-		}
+		if (data[1] = "Shutdown")
+			SetTimer shutdownRaceEngineer, -20000
 	
 		return withProtection(ObjBindMethod(RaceEngineer.Instance, data[1]), string2Values(";", data[2])*)
 	}
-	else if (data = "Shutdown") {
-		Sleep 30000
-		
-		ExitApp 0
-	}
+	else if (data = "Shutdown")
+		SetTimer shutdownRaceEngineer, -20000
 	else
 		return withProtection(ObjBindMethod(RaceEngineer.Instance, data))
 }

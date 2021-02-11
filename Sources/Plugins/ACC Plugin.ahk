@@ -1426,6 +1426,25 @@ preparePitstop() {
 	}
 }
 
+openRaceEngineerSettings() {
+	exePath := kBinariesDirectory . "Race Engineer Seettings.exe"
+	
+	try {
+		Run %exePath%, %kBinariesDirectory%
+	}
+	catch exception {
+		logMessage(kLogCritical, translate("Cannot start the Race Engineers Settings tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
+		
+		title := translate("Modular Simulator Controller System - Controller (Plugin: ACC)")
+	
+		SplashTextOn 800, 60, %title%, % substituteVariables(translate("Cannot start the Race Engineers Settings application (%exePath%) - please check the configuration..."), {exePath: exePath})
+				
+		Sleep 5000
+				
+		SplashTextOff
+	}
+}
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;

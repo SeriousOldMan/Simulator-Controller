@@ -727,7 +727,7 @@ chooseHomePath() {
 	protectionOn()
 	
 	try{
-		FileSelectFolder, directory, *%homePathEdit%, 0, % translate("Select Installation folder...")
+		FileSelectFolder directory, *%homePathEdit%, 0, % translate("Select Installation folder...")
 	
 		if (directory != "")
 			GuiControl Text, homePathEdit, %directory%
@@ -741,7 +741,7 @@ chooseNirCmdPath() {
 	protectionOn()
 	
 	try{
-		FileSelectFolder, directory, *%nirCmdPathEdit%, 0, % translate("Select NirCmd folder...")
+		FileSelectFolder directory, *%nirCmdPathEdit%, 0, % translate("Select NirCmd folder...")
 	
 		if (directory != "")
 			GuiControl Text, nirCmdPathEdit, %directory%
@@ -755,7 +755,7 @@ chooseAHKPath() {
 	protectionOn()
 	
 	try{
-		FileSelectFolder, directory, *%ahkPathEdit%, 0, % translate("Select AutoHotkey folder...")
+		FileSelectFolder directory, *%ahkPathEdit%, 0, % translate("Select AutoHotkey folder...")
 	
 		if (directory != "")
 			GuiControl Text, ahkPathEdit, %directory%
@@ -1275,7 +1275,7 @@ chooseApplicationExePath() {
 	protectionOn()
 	
 	try {
-		FileSelectFile, file, *%applicationExePathEdit%, 0, % translate("Select application executable...")
+		FileSelectFile file, *%applicationExePathEdit%, 0, % translate("Select application executable...")
 		
 		if (file != "")
 			GuiControl Text, applicationExePathEdit, %file%
@@ -1289,7 +1289,7 @@ chooseApplicationWorkingDirectoryPath() {
 	protectionOn()
 	
 	try {
-		FileSelectFolder, directory, *%applicationWorkingDirectoryPathEdit%, 0, % translate("Select working directory...")
+		FileSelectFolder directory, *%applicationWorkingDirectoryPathEdit%, 0, % translate("Select working directory...")
 	
 		if (directory != "")
 			GuiControl Text, applicationWorkingDirectoryPathEdit, %directory%
@@ -2406,7 +2406,7 @@ addThemePicture() {
 	try {
 		title := translate("Select Image...")
 	
-		FileSelectFile, pictureFile, 1, , %title%, Image (*.jpg; *.gif)
+		FileSelectFile pictureFile, 1, , %title%, Image (*.jpg; *.gif)
 		
 		if (pictureFile != "") {
 			Gui ListView, % picturesListViewHandle
@@ -2437,7 +2437,7 @@ chooseSoundFilePath() {
 		
 		title := translate("Select Sound File...")
 		
-		FileSelectFile, soundFile, 1, *%path%, %title%, Audio (*.wav; *.mp3)
+		FileSelectFile soundFile, 1, *%path%, %title%, Audio (*.wav; *.mp3)
 		
 		if (soundFile != "") {
 			soundFilePathEdit := soundFile
@@ -2463,7 +2463,7 @@ chooseVideoFilePath() {
 		
 		title := translate("Select Video (GIF) File...")
 		
-		FileSelectFile, videoFile, 1, *%path%, %title%, Video (*.gif)
+		FileSelectFile videoFile, 1, *%path%, %title%, Video (*.gif)
 		
 		if (videoFile != "") {
 			videoFilePathEdit := videoFile

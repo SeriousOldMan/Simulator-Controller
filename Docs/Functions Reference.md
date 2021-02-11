@@ -55,13 +55,18 @@ Registers an event handler function for the given event type. An event handler i
 			data := StrSplit(data, ":")
 			
 			function := data[1]
-			arguments := string2Values(",", data[2])
+			arguments := string2Values(";", data[2])
 				
 			withProtection(function, arguments*)
 		}
 		else	
 			withProtection(data)
 	}
+
+Since this is a very common implementation of an event handler, the predefined *functionEventHandler* may be used in those situations.
+
+#### *functionEventHandler(event data)*
+You can use this function as a generic event handler, when all events will be handled by global functions. *data* must be a ";"-delimited string list, where the first element is the function name and all remaining elements are the arguments for the function call. You can pass *functionEventHandler* to *registerEvenetHandler* when registering events, which adhere to these rules.
 
 #### *raiseEvent(messageType :: OneOf(kLocalMessage, kWindowMessage, kPipeMessage, kFileMessage), event :: String, data :: String, target := false)*
 Raises the given event. The first parameter defines the delivery method, where *kFileMessage* is the most reliable, but also the slowest one. If the argument for *messageType* is *kLocalMessage*, the event is raised in the current process. Otherwise, the event is delivered to the process defined by target, which must have registered an event handler for the given event. For *kWindowMessage*, the target must be defined according to the [window title pattern](https://www.autohotkey.com/docs/misc/WinTitle.htm) of *AutoHotkey* and for *kFileMessage*, you must provide the process id of the target process. Last but not least, if message type is *kPipeMessage*, not target must be specified and multiple processes may register an event handler for the given event, but only one process will receive the message.

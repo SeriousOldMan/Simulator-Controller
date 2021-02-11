@@ -285,7 +285,7 @@ The content of the knowledgbase of Jona or the facts, as these are called in the
 For historical information, the format is quite simple. All facts for a past lap start with *Lap.X* where X is the lap number. A similar format is used for pitstops, *Pitstop.X*, where X is the pitstop number here. Normally you will have more laps than pitstops in the memory, except you are me in a reverse grid league race, hey?
 The derived future information is typically categorized by the first part of the fact name, for example *Tyre* for all knowledge about the current and projected tyre state.
 
-You can take a look at the knowledge base by enabling "Debug" mode in the configuration, as described in the [Troubleshooting}(https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#troubleshooting) section. By doing this, you will pay a performance penalty, which might or might not be noticeable depending on your hardware.
+You can take a look at the knowledge base by enabling "Debug" mode in the configuration, as described in the [Troubleshooting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#troubleshooting) section. By doing this, you will pay a performance penalty, which might or might not be noticeable depending on your hardware.
 
 ### Telemetry Integration
 

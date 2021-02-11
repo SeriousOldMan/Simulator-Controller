@@ -1427,10 +1427,10 @@ preparePitstop() {
 }
 
 openRaceEngineerSettings() {
-	exePath := kBinariesDirectory . "Race Engineer Seettings.exe"
+	exePath := kBinariesDirectory . "Race Engineer Settings.exe"
 	
 	try {
-		Run %exePath%, %kBinariesDirectory%
+		Run "%exePath%", %kBinariesDirectory%
 	}
 	catch exception {
 		logMessage(kLogCritical, translate("Cannot start the Race Engineers Settings tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))

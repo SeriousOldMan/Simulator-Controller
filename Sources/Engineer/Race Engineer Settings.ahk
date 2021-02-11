@@ -322,14 +322,14 @@ restart:
 
 		Gui RES:Font, Norm, Arial
 				
-		Gui RES:Add, Button, x228 y420 w80 h23 Default gacceptSettings, % translate("Ok")
-		Gui RES:Add, Button, x316 y420 w80 h23 gcancelSettings, % translate("&Cancel")
-		Gui RES:Add, Button, x8 y420 w77 h23 gloadSettings, % translate("&Load...")
-		Gui RES:Add, Button, x90 y420 w77 h23 gsaveSettings, % translate("&Save...")
+		Gui RES:Add, Button, x228 y425 w80 h23 Default gacceptSettings, % translate("Ok")
+		Gui RES:Add, Button, x316 y425 w80 h23 gcancelSettings, % translate("&Cancel")
+		Gui RES:Add, Button, x8 y425 w77 h23 gloadSettings, % translate("&Load...")
+		Gui RES:Add, Button, x90 y425 w77 h23 gsaveSettings, % translate("&Save...")
 				
 		tabs := map(["Settings", "Race"], "translate")
 
-		Gui RES:Add, Tab3, x8 y48 w388 h365 -Wrap, % values2String("|", tabs*)
+		Gui RES:Add, Tab3, x8 y48 w388 h370 -Wrap, % values2String("|", tabs*)
 
 		Gui Tab, 1
 		
@@ -381,14 +381,14 @@ restart:
 
 		Gui RES:Font, Norm, Arial
 
-		Gui RES:Add, Text, x16 yp+24 w105 h20 Section, % translate("Deviation Threshold")
+		Gui RES:Add, Text, x16 yp+30 w105 h20 Section, % translate("Deviation Threshold")
 		Gui RES:Add, Edit, x126 yp-2 w50 h20 VtyrePressureDeviationEdit, %tyrePressureDeviationEdit%
 		Gui RES:Add, Text, x184 yp+2 w70 h20, % translate("PSI")
 
 		Gui RES:Font, Norm, Arial
 		Gui RES:Font, Italic, Arial
 
-		Gui RES:Add, GroupBox, x16 yp+24 w180 h120 Section, % translate("Dry Tyres")
+		Gui RES:Add, GroupBox, x16 yp+30 w180 h120 Section, % translate("Dry Tyres")
 				
 		Gui RES:Font, Norm, Arial
 
@@ -471,12 +471,12 @@ restart:
 		Gui RES:Font, Norm, Arial
 		Gui RES:Font, Bold Italic, Arial
 
-		Gui RES:Add, Text, x66 y165 w270 0x10
+		Gui RES:Add, Text, x66 yp+30 w270 0x10
 		Gui RES:Add, Text, x16 yp+10 w370 h20 Center BackgroundTrans, % translate("Initial Setup")
 
 		Gui RES:Font, Norm, Arial
 
-		Gui RES:Add, Text, x16 yp+24 w85 h23 +0x200, % translate("Tyre Compound")
+		Gui RES:Add, Text, x16 yp+30 w85 h23 +0x200, % translate("Tyre Compound")
 		
 		tabs := map(["Wet", "Dry"], "translate")
 		
@@ -495,7 +495,7 @@ restart:
 		Gui RES:Font, Norm, Arial
 		Gui RES:Font, Italic, Arial
 
-		Gui RES:Add, GroupBox, x16 yp+36 w180 h120 Section, % translate("Dry Tyres")
+		Gui RES:Add, GroupBox, x16 yp+30 w180 h120 Section, % translate("Dry Tyres")
 				
 		Gui RES:Font, Norm, Arial
 

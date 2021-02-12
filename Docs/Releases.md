@@ -6,6 +6,7 @@
   4. Phrase grammars can be used directly as controller function hotkeys. See the [updated documentation on configuring hotkeys](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller) for an introduction to voice triggers
   5. More stability improvements for Jona
   6. Update of the voice server process - this process will be started automatically by *Simulator Startup* and will stay open all the time. Normally you can ignore it, since it is controlled by the other Simulator Controller applications. But if you experience problems and want to disable voice completely, go to the Tray area of the Windows taskbar, right click on the *Voice Server.exe* icon and choose Exit.
+  7. Complete redesign of all application icons
   
 ## 2.1.3-release 02/10/21
 

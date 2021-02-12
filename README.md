@@ -26,7 +26,9 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-[2.1.4-dev](https://www.dropbox.com/s/4ml6umlm1wphjvy/Simulator%20Controller%202.1.4-dev.zip?dl=1) (First preview for the upcomming Release 2.2. Feature complete, but not documented yet. See the [release notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) for an overview.)
+[2.2.0-alpha](https://www.dropbox.com/s/21oxhsezhryvabk/Simulator%20Controller%202.2.0-alpha.zip?dl=1) (First alpha version for the upcomming Release 2.2. Feature complete and already quite stable. See the [release notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) for an overview including links to the updated documentation.)
+
+Note: The current alpha version does not include an automated update for the local configuration database already, so you might miss some translations for the moment.
 
 #### Latest release builds
 

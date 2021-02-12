@@ -53,14 +53,19 @@ global kRaceEngineerSettingsFile = getFileName("Race Engineer.settings", kUserCo
 ;;;-------------------------------------------------------------------------;;;
 
 global repairSuspensionDropDown
-global repairBodyworkDropDown
 global repairSuspensionThresholdEdit
-global repairBodyworkThresholdEdit
-
 global repairSuspensionGreaterLabel
 global repairSuspensionThresholdLabel
+
+global repairBodyworkDropDown
+global repairBodyworkThresholdEdit
 global repairBodyworkGreaterLabel
 global repairBodyworkThresholdLabel
+
+global changeTyreDropDown
+global changeTyreThresholdEdit
+global changeTyreGreaterLabel
+global changeTyreThresholdLabel
 	
 	
 ;;;-------------------------------------------------------------------------;;;
@@ -151,6 +156,34 @@ updateRepairBodyworkState() {
 	}
 }
 
+updateChangeTyreState() {
+	GuiControlGet changeTyreDropDown
+	
+	if ((changeTyreDropDown == 1) || (changeTyreDropDown == 3)) {
+		GuiControl Hide, changeTyreGreaterLabel
+		GuiControl Hide, changeTyreThresholdEdit
+		GuiControl Hide, changeTyreThresholdLabel
+		
+		changeTyreThresholdEdit := 0
+		
+		GuiControl, , changeTyreThresholdEdit, 0
+	}
+	else if (changeTyreDropDown == 2) {
+		GuiControl Show, changeTyreGreaterLabel
+		GuiControl Show, changeTyreThresholdEdit
+		GuiControl Show, changeTyreThresholdLabel
+		
+		GuiControl Text, changeTyreThresholdLabel, % translate("Degrees")
+	}
+	else if (changeTyreDropDown == 4) {
+		GuiControl Show, changeTyreGreaterLabel
+		GuiControl Show, changeTyreThresholdEdit
+		GuiControl Show, changeTyreThresholdLabel
+		
+		GuiControl Text, changeTyreThresholdLabel, % translate("Sec. p. Lap")
+	}
+}
+
 editSettings(ByRef settingsOrCommand) {
 	static result
 	static newSettings
@@ -175,6 +208,7 @@ editSettings(ByRef settingsOrCommand) {
 	static inLapCheck
 	static outLapCheck
 	static fuelConsumptionEdit
+	static pitstopDurationEdit
 	static safetyFuelEdit
 	
 	static spSetupTyreCompoundDropDown
@@ -218,11 +252,15 @@ restart:
 		
 		setConfigurationValue(newSettings, "Race Settings", "Damage.Suspension.Repair"
 							, ["Never", "Always", "Threshold", "Impact"][repairSuspensionDropDown])
+		setConfigurationValue(newSettings, "Race Settings", "Damage.Suspension.Repair.Threshold", Round(repairSuspensionThresholdEdit, 1))
+		
 		setConfigurationValue(newSettings, "Race Settings", "Damage.Bodywork.Repair"
 							, ["Never", "Always", "Threshold", "Impact"][repairBodyworkDropDown])
-		
-		setConfigurationValue(newSettings, "Race Settings", "Damage.Suspension.Repair.Threshold", Round(repairSuspensionThresholdEdit, 1))
 		setConfigurationValue(newSettings, "Race Settings", "Damage.Bodywork.Repair.Threshold", Round(repairBodyworkThresholdEdit, 1))
+		
+		setConfigurationValue(newSettings, "Race Settings", "Tyre.Compound.Change"
+							, ["Never", "Tyre Temperature", "Weather", "Laptime"][changeTyreDropDown])
+		setConfigurationValue(newSettings, "Race Settings", "Tyre.Compound.Change.Threshold", Round(changeTyreThresholdEdit, 1))
 		
 		setConfigurationValue(newSettings, "Race Settings", "Tyre.Pressure.Deviation", tyrePressureDeviationEdit)
 	
@@ -238,6 +276,7 @@ restart:
 		setConfigurationValue(newSettings, "Race Settings", "Duration", raceDurationEdit * 60)
 		setConfigurationValue(newSettings, "Race Settings", "Lap.AvgTime", avgLaptimeEdit)
 		setConfigurationValue(newSettings, "Race Settings", "Fuel.AvgConsumption", Round(fuelConsumptionEdit, 1))
+		setConfigurationValue(newSettings, "Race Settings", "Pitstop.Duration", pitstopDurationEdit)
 		setConfigurationValue(newSettings, "Race Settings", "Fuel.SafetyMargin", safetyFuelEdit)
 		
 		setConfigurationValue(newSettings, "Race Settings", "InLap", inLapCheck)
@@ -269,10 +308,13 @@ restart:
 		pitstopWarningEdit := getConfigurationValue(settingsOrCommand, "Race Settings", "Lap.PitstopWarning", 3)
 		
 		repairSuspensionDropDown := getConfigurationValue(settingsOrCommand, "Race Settings", "Damage.Suspension.Repair", "Always")
-		repairBodyworkDropDown := getConfigurationValue(settingsOrCommand, "Race Settings", "Damage.Bodywork.Repair", "Threshold")
-		
 		repairSuspensionThresholdEdit := getConfigurationValue(settingsOrCommand, "Race Settings", "Damage.Suspension.Repair.Threshold", 0)
+		
+		repairBodyworkDropDown := getConfigurationValue(settingsOrCommand, "Race Settings", "Damage.Bodywork.Repair", "Threshold")
 		repairBodyworkThresholdEdit := getConfigurationValue(settingsOrCommand, "Race Settings", "Damage.Bodywork.Repair.Threshold", 0)
+		
+		changeTyreDropDown := getConfigurationValue(settingsOrCommand, "Race Settings", "Tyre.Compound.Change", "Never")
+		changeTyreThresholdEdit := getConfigurationValue(settingsOrCommand, "Race Settings", "Tyre.Compound.Change.Threshold", 0)
 							
 		tyrePressureDeviationEdit := getConfigurationValue(settingsOrCommand, "Race Settings", "Tyre.Pressure.Deviation", 0.2)
 		
@@ -288,6 +330,7 @@ restart:
 		raceDurationEdit := Round(getConfigurationValue(settingsOrCommand, "Race Settings", "Duration", 0) / 60)
 		avgLaptimeEdit := getConfigurationValue(settingsOrCommand, "Race Settings", "Lap.AvgTime", 0)
 		fuelConsumptionEdit := getConfigurationValue(settingsOrCommand, "Race Settings", "Fuel.AvgConsumption", 0.0)
+		pitstopDurationEdit := getConfigurationValue(settingsOrCommand, "Race Settings", "Pitstop.Duration" 0)
 		safetyFuelEdit := getConfigurationValue(settingsOrCommand, "Race Settings", "Fuel.SafetyMargin", 4)
 		
 		inLapCheck := getConfigurationValue(settingsOrCommand, "Race Settings", "InLap", true)
@@ -322,14 +365,14 @@ restart:
 
 		Gui RES:Font, Norm, Arial
 				
-		Gui RES:Add, Button, x228 y425 w80 h23 Default gacceptSettings, % translate("Ok")
-		Gui RES:Add, Button, x316 y425 w80 h23 gcancelSettings, % translate("&Cancel")
-		Gui RES:Add, Button, x8 y425 w77 h23 gloadSettings, % translate("&Load...")
-		Gui RES:Add, Button, x90 y425 w77 h23 gsaveSettings, % translate("&Save...")
+		Gui RES:Add, Button, x228 y450 w80 h23 Default gacceptSettings, % translate("Ok")
+		Gui RES:Add, Button, x316 y450 w80 h23 gcancelSettings, % translate("&Cancel")
+		Gui RES:Add, Button, x8 y450 w77 h23 gloadSettings, % translate("&Load...")
+		Gui RES:Add, Button, x90 y450 w77 h23 gsaveSettings, % translate("&Save...")
 				
 		tabs := map(["Settings", "Race"], "translate")
 
-		Gui RES:Add, Tab3, x8 y48 w388 h370 -Wrap, % values2String("|", tabs*)
+		Gui RES:Add, Tab3, x8 y48 w388 h395 -Wrap, % values2String("|", tabs*)
 
 		Gui Tab, 1
 		
@@ -353,10 +396,10 @@ restart:
 
 		repairSuspensionDropDown := inList(["Never", "Always", "Threshold", "Impact"], repairSuspensionDropDown)
 	
-		Gui RES:Add, DropDownList, x126 yp w90 AltSubmit Choose%repairSuspensionDropDown% VrepairSuspensionDropDown gupdateRepairSuspensionState, % values2String("|", tabs*)
-		Gui RES:Add, Text, x225 yp+2 w20 h20 VrepairSuspensionGreaterLabel, % translate(">")
-		Gui RES:Add, Edit, x240 yp-2 w50 h20 VrepairSuspensionThresholdEdit, %repairSuspensionThresholdEdit%
-		Gui RES:Add, Text, x298 yp+2 w90 h20 VrepairSuspensionThresholdLabel, % translate("Sec. p. Lap")
+		Gui RES:Add, DropDownList, x126 yp w110 AltSubmit Choose%repairSuspensionDropDown% VrepairSuspensionDropDown gupdateRepairSuspensionState, % values2String("|", tabs*)
+		Gui RES:Add, Text, x245 yp+2 w20 h20 VrepairSuspensionGreaterLabel, % translate(">")
+		Gui RES:Add, Edit, x260 yp-2 w50 h20 VrepairSuspensionThresholdEdit, %repairSuspensionThresholdEdit%
+		Gui RES:Add, Text, x318 yp+2 w90 h20 VrepairSuspensionThresholdLabel, % translate("Sec. p. Lap")
 
 		updateRepairSuspensionState()
 		
@@ -366,12 +409,25 @@ restart:
 
 		repairBodyworkDropDown := inList(["Never", "Always", "Threshold", "Impact"], repairBodyworkDropDown)
 		
-		Gui RES:Add, DropDownList, x126 yp w90 AltSubmit Choose%repairBodyworkDropDown% VrepairBodyworkDropDown gupdateRepairBodyworkState, % values2String("|", tabs*)
-		Gui RES:Add, Text, x225 yp+2 w20 h20 VrepairBodyworkGreaterLabel, % translate(">")
-		Gui RES:Add, Edit, x240 yp-2 w50 h20 VrepairBodyworkThresholdEdit, %repairBodyworkThresholdEdit%
-		Gui RES:Add, Text, x298 yp+2 w90 h20 VrepairBodyworkThresholdLabel, % translate("Sec. p. Lap")
+		Gui RES:Add, DropDownList, x126 yp w110 AltSubmit Choose%repairBodyworkDropDown% VrepairBodyworkDropDown gupdateRepairBodyworkState, % values2String("|", tabs*)
+		Gui RES:Add, Text, x245 yp+2 w20 h20 VrepairBodyworkGreaterLabel, % translate(">")
+		Gui RES:Add, Edit, x260 yp-2 w50 h20 VrepairBodyworkThresholdEdit, %repairBodyworkThresholdEdit%
+		Gui RES:Add, Text, x318 yp+2 w90 h20 VrepairBodyworkThresholdLabel, % translate("Sec. p. Lap")
 
 		updateRepairBodyworkState()
+		
+		Gui RES:Add, Text, x16 yp+24 w105 h23 +0x200, % translate("Change Tyres")
+		
+		tabs := map(["Never", "Tyre Temperature", "Weather", "Impact"], "translate")
+
+		changeTyreDropDown := inList(["Never", "Tyre Temperature", "Weather", "Impact"], changeTyreDropDown)
+		
+		Gui RES:Add, DropDownList, x126 yp w110 AltSubmit Choose%changeTyreDropDown% VchangeTyreDropDown gupdateChangeTyreState, % values2String("|", tabs*)
+		Gui RES:Add, Text, x245 yp+2 w20 h20 VchangeTyreGreaterLabel, % translate(">")
+		Gui RES:Add, Edit, x260 yp-2 w50 h20 VchangeTyreThresholdEdit, %changeTyreThresholdEdit%
+		Gui RES:Add, Text, x318 yp+2 w90 h20 VchangeTyreThresholdLabel, % translate("Degrees")
+
+		updateChangeTyreState()
 		
 		Gui RES:Font, Norm, Arial
 		Gui RES:Font, Bold Italic, Arial
@@ -455,6 +511,11 @@ restart:
 		Gui RES:Add, Edit, x106 yp-2 w50 h20 VfuelConsumptionEdit, %fuelConsumptionEdit%
 		Gui RES:Add, Text, x164 yp+4 w90 h20, % translate("Ltr.")
 
+		Gui RES:Add, Text, x16 yp+22 w85 h20 +0x200, % translate("Pitstop Duration")
+		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit2 Number VpitstopDurationEdit, %pitstopDurationEdit%
+		Gui RES:Add, UpDown, x138 yp-2 w18 h20 0x80, %pitstopDurationEdit%
+		Gui RES:Add, Text, x164 yp+4 w90 h20, % translate("Sec.")
+
 		Gui RES:Add, Text, x212 ys-2 w85 h23 +0x200, % translate("Formation")
 		Gui RES:Add, CheckBox, x292 yp-2 w17 h23 Checked%inLapCheck% VinLapCheck, %inLapCheck%
 		Gui RES:Add, Text, x310 yp+4 w90 h20, % translate("Lap")
@@ -471,7 +532,7 @@ restart:
 		Gui RES:Font, Norm, Arial
 		Gui RES:Font, Bold Italic, Arial
 
-		Gui RES:Add, Text, x66 yp+30 w270 0x10
+		Gui RES:Add, Text, x66 yp+52 w270 0x10
 		Gui RES:Add, Text, x16 yp+10 w370 h20 Center BackgroundTrans, % translate("Initial Setup")
 
 		Gui RES:Font, Norm, Arial

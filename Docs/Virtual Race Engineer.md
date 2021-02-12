@@ -173,11 +173,13 @@ As you can see here, each phrase provides different alternative sentences. Varia
 
 Racing with Jona is easy, just begin your race and wait until Jona will contact you. This will be a few seconds after you crossed the start finish line after your first complete lap. To achieve this, the ACC plugin will start *Race Engineer.exe*, which is located in the *Binaries* folder, as a subprocess, as long as you are out on a track. (Note for developers: The communication between those two processes uses named pipes. For more technical information, see the [technical information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#technical-information) section below).
 
-Most of the information, that Jona needs, will be collected from the telemetry information of the simulation game. But because this data does not contain every required information, additional data is required to understand the given race situation and the corresponding telemetry information, and to precisely predict tyre pressures, fuel requirements, and so on.
+Most of the information, that Jona needs, will be collected from the telemetry information of the simulation game. Unfortunately, this data does not contain every required information, and also there are additional data and configuration information, which are required by Jona. For example, data is required to understand the given race situation and the corresponding telemetry information, and to precisely predict tyre pressures, fuel requirements, tyre compound recommendations, and so on. In the end, all that means, that some setup work is required, before you start your race. 
 
-### Race Settings
+### Race Engineer Settings
 
-Because of this, we now come to an unpleasant part of the game, at least for the moment. As I already said, Jona needs additional knowledge, which is not provided by the telemetry data of the simulation game. To provide this information, a *Race Engineer.settings* file exist in the *Simulator Controller\Config* folder in your user *Documents* folder, which you have to edit for each race. The next version of Simulator Controller will provide a graphical user interface for this task at least and I am still trying to gather at least the setup part of this information from the simulation game itself.
+That said, we now come to an unpleasant part of the game, at least for the moment. The additional knowledge Jona needs is stored in a special file, *Race Engineer.settings*, that exists in the *Simulator Controller\Config* folder in your user *Documents* folder, which you have to modify for each race. You can do this by editing this file using a text editor or you can use a graphical user interface by using the application *Race Engineer Settings.exe* from the *Binaries* folder. As a side note, I am still trying to gather at least the setup part of this information from the simulation game itself.
+
+The *Race Engineer.settings* looks like this:
 
 	[Race Settings]
 	OutLap=true
@@ -218,7 +220,21 @@ Most options above define general settings which will be applicable to any race 
   - The first fresh tyre set (*Tyre.Set.Fresh*), which is available for a pitstop and the tyres and pressures (*Tyre.XXX.Pressure.YY*) used in for the first stint. Jona needs this information to calculate the target pressures for the first pitstop.
   - The *Lap.AvgTime* and *Fuel.AvgConsumption* are more informational, but might lead to more accurate estimations for the fuel calulations in the first few laps, where you typically have much slower lap times.
 
-As said, you must use a text editor to edit the contents for each individual race for the moment. A future non-alpha version will provide a graphical user interface for this and a big data collection of all past races is on the wish list in the backlog as well.
+Let's have a look at the settings tool, which provides two sections. The first section, *Settings*, contains information that are independent of the current race situation.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Engineer%20Settings%201.JPG)
+
+In the upper area you find configuration information, that are used by Jona while *computing* the recommendations for the upcoming pitstop. Especially the first field, *Statistical Window*, is quite important. It defines the number of recent laps, which are used for each and every statistical calculation, for example the standard deviation of tyre pressures. The next field, *Damping Factor*, can be used to influence the calculation weight for each of thos laps. If you want all laps to be considered with equal weight, set this to *0*.
+
+In the lower area you can define the optimal tyre pressures. When there is a deviation larger than *Deviation Threshold* form these target pressures is detected by Jona, corresponding pressure adjustments will be applied for the next pitstop. Beside this very simple approach, there are rules in the AI kernel, which try to predict future incluences by falling ambient temperatures and upcoming weather changes. You can modify the bahaviour of these rules by using the controls in the upper area.
+
+The second section of the settings tool contains information about the actual race.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Engineer%20Settings%202.JPG)
+
+You must supply the tyre selection and pressure setup, that is used at the beginning of the race, in the lower area of the *Race* section, wherease the static information for the given track and race is located in the upper area. Worth mentioning is the field *Pitstop Duration*, with which you supply the difference time needed for a normal pitstop (time for pit in and pit out plus the time needed for a tyre change minus the time to pass the pit area on the track). This information is used by Jona to decide, whether an early pitstop for a tyre change or damage repair might be worthwhile.
+
+If you open the settings tool, it will load the *Race Engineer.settings* file located in the *Simulator Controller\Config* folder in your user *Documents* folder. If you close the tool with the "Ok" button, this file will be overwritten with the new information. Beside that, you can load a settings file from a different location with the "Load..." button and you can save the current settings with the "Save..." button. This may be used to create a settings database for all your cars and tracks in the various environmental conditions. By the way - a future version of Simulator Controller will create this database automatically.
 
 ### The pitstop
 

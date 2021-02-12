@@ -3,7 +3,7 @@
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. Graphical user interface for editing the contents of the *Race Engineer.settings* file. It supports loading and saving the settings outside the standard location, thereby allows building a setup database
-  4. Phrase grammars can be used directly as controller function hotkeys
+  4. Phrase grammars can be used directly as controller function hotkeys. See the [updated documentation on configuring hotkeys](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller) for an introduction to voice triggers
   5. More stability improvements for Jona
   
 ## 2.1.3-release 02/10/21

@@ -32,7 +32,7 @@ None at the moment...
 
 [2.1.3-release](https://www.dropbox.com/s/6fgaiz06j6f3ieh/Simulator%20Controller%202.1.3-release.zip?dl=1) (Maintenance for Release 2.1 with some new features, see [release notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes))
 
-[2.2.0-release](https://www.dropbox.com/s/51msb97666harbl/Simulator%20Controller%202.2.0-release.zip?dl=1) (New featurs: 1. UI for Virtual Race Engineer Configuration; 2. Voice recognition for controller functions. See the [release notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) for an overview including links to the updated documentation.)
+[2.2.0-release](https://www.dropbox.com/s/51msb97666harbl/Simulator%20Controller%202.2.0-release.zip?dl=1) (New features: 1. UI for Virtual Race Engineer Configuration; 2. Voice recognition for controller functions. See the [release notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) for an overview including links to the updated documentation.)
 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [update notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-20) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.

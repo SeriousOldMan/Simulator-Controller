@@ -1,6 +1,6 @@
 [Version]
-Current=2.2-alpha
-Target=2.2-release
-Release=2.1.3-release
+Current=2.2.0-release
+Target=2.2.0-release
+Release=2.2.0-release
 Changes=Maintenance and Bugfixes, New Voice Server, Voice Commands for Controller Functions, UI for Race Engineer Settings, New Icons
-Date=02/12/2021
+Date=02/13/2021

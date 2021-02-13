@@ -68,7 +68,7 @@
     - [Configurations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#configurations-functionsahk)
     - [Tray Messages](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#tray-messages-functionsahk)
     - [Event Messages](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#event-messages-functionsahk)
-    - [Collection Helper](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#collection-helper-functions-functionsahk)
+    - [Collection Helper](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#collection--string-helper-functions-functionsahk)
     - [File Handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#file-handling-functionsahk)
     - [Localization & Translation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#localization--translation-functionsahk)
     - [Splash Screens](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#splash-screen-handling-functionsahk)

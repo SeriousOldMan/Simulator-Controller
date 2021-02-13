@@ -118,10 +118,8 @@ The markdown files, the so to say source code of this documentation Wiki, can be
 
 ### Known issues
 
-1. [Fixed] Sometimes, the ingame sound volume is not correctly resetted after playing the startup melody. In those situations, you can use the mixer utility of Windows to bring the volume back up.
-2. [Gone] Connection between the "Motion Feedback" plugin and *SimFeedback* has stabilty issues. Looks like the root cause is located in the *SFX-100-Streamdeck* extension.
-3. The language drop down in the configuration tool does not adopt to changed languages, after the translation editor has been used.
-4. In vary rare situations, the Simulator Controller applications can lock up due to deadlocks in the interprocess communication.
+1. Connection between the "Motion Feedback" plugin and *SimFeedback* has some stabilty issues. Looks like the root cause is located in the *SFX-100-Streamdeck* extension. For a workaround click on "Reload Profile..." on the Extensions tab in SimFeedback, if you see strange numbers in the Button Box "Motion" mode page.
+2. The language drop down in the configuration tool does not adopt to changed languages, after the translation editor has been used.
 
 ### Development
 

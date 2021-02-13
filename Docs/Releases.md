@@ -1,4 +1,11 @@
-## 2.2-release upcoming...
+## 2.3-release upcoming...
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Lots of new stuff in the Jona AI kernel
+  4. Initial support for multiple controller hardware - more than one Button Box on the screen
+  
+## 2.2-release 02/13/21
 
   1. Bugfixes, as always
   2. Documentation updates, as always

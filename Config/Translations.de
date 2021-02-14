@@ -35,6 +35,7 @@ Dispatching event "=>Verteile Ereignis "
 Unhandled exception encountered in =>Unbehandelte Ausnahme aufgetreten in 
  at line => in der Zeile 
 No configuration found - please run the configuration tool=>Keine Konfiguration gefunden - Bitte starten Sie das Konfigurationswerkzeug
+A newer version of Simulator Controller is available. Do you want to download it now?=>Eine neuere Version von Simulator Controller ist verfügbar. Möchten Sie diese jetzt herunterladen?
 The local configuration database needs an update. Do you want to run the update now?=>Die lokale Konfigurationsdatenbank erfordert eine Aktualisierung. Wollen Sie die Aktualisierung jetzt durchführen?
 Are you really sure, you want to skip the automated update procedure?=>Sind Sie wirklich sicher, dass Sie die atomatisierte Aktualisierung niemals durchführen wollen?
 Installation path set to =>Installationsverzeichnis ist 

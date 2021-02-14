@@ -34,6 +34,7 @@ Dispatching event "=>
 Unhandled exception encountered in =>
  at line =>
 No configuration found - please run the configuration tool=>
+A newer version of Simulator Controller is available. Do you want to download it now?=>
 The local configuration database needs an update. Do you want to run the update now?=>
 Are you really sure, you want to skip the automated update procedure?=>
 Installation path set to =>

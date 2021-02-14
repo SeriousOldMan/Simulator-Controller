@@ -429,6 +429,31 @@ startTrayMessageManager() {
 }
 
 checkForUpdates() {
+	if inList(["Simulator Startup", "Simulator Configuration", "Simulator Settings"], StrSplit(A_ScriptName, ".")[1]) {
+		URLDownloadToFile https://www.dropbox.com/s/txa8muw9j3g66tl/VERSION?dl=1, %kUserHomeDirectory%Temp\VERSION
+		
+		version := getConfigurationValue(readConfiguration(kUserHomeDirectory . "Temp\VERSION"), "Version", "Release", false)
+		
+		if version {
+			version := string2Values(".", StrSplit(version, "-", , 2)[1])
+			current := string2Values(".", StrSplit(kVersion, "-", , 2)[1])
+			
+			if ((version[1] > current[1]) || (version[2] > current[2]) || (version[3] > current[3])) {
+				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+				title := translate("Modular Simulator Controller System")
+				MsgBox 262436, %title%, % translate("A newer version of Simulator Controller is available. Do you want to download it now?")
+				OnMessage(0x44, "")
+
+				IfMsgBox Yes
+				{
+					Run https://github.com/SeriousOldMan/Simulator-Controller#latest-release-builds
+					
+					ExitApp 0
+				}
+			}
+		}
+	}
+	
 	toolTargets := readConfiguration(getFileName("Simulator Tools.targets", kConfigDirectory))
 	
 	userToolTargetsFile := getFileName("Simulator Tools.targets", kUserConfigDirectory)

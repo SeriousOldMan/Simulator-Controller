@@ -16,7 +16,8 @@
   2. Graphical editor for controller layouts
   
 #### General
-  1. [Target: V2.5]Plugin support for the configuration tool
-  2. Choosing a specific theme depending on the selected simulation game
-  3. Again, better UI flow in the configuration tool and larger window size
-  4. Automated check for newer version on GitHub
+  1. Choosing a specific theme depending on the selected simulation game
+  2. Again, better UI flow in the configuration tool and larger window size
+  3. [Target: V2.3]Automated check for newer version on GitHub
+  4. [Target: V2.5]Plugin support for the configuration tool
+  5. [Target: V2.5]Better support in translation tool for missing translations

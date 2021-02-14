@@ -4,6 +4,7 @@
   2. Documentation updates, as always
   3. Lots of new stuff in the Jona AI kernel
   4. Initial support for multiple controller hardware - more than one Button Box on the screen
+  5. Automatic notification, when a new version is available
   
 ## 2.2-release 02/13/21
 

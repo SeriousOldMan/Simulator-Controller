@@ -395,6 +395,24 @@ editTargets(command := "") {
 	}
 }
 
+updatePhraseGrammars() {
+	languages := availableLanguages()
+	
+	for ignore, grammarFileName in getFileNames("Race Engineer.grammars.*", kUserConfigDirectory) {
+		SplitPath grammarFileName, , , languageCode
+		
+		userGrammars := readConfiguration(grammarFileName)
+		bundledGrammars := readConfiguration(getFileName("Race Engineer.grammars." . languageCode, kConfigDirectory))
+	
+		for section, keyValues in bundledGrammars
+			for key, value in keyValues
+				if (getConfigurationValue(userGrammars, section, key, kUndefined) == kUndefined)
+					setConfigurationValue(userGrammars, section, key, value)
+					
+		writeConfiguration(grammarFileName, userGrammars)
+	}
+}
+
 updateTranslations() {
 	languages := availableLanguages()
 	
@@ -423,7 +441,7 @@ updatePluginLabels() {
 	
 	for section, keyValues in bundledPluginLabels
 		for key, value in keyValues
-			if !getConfigurationValue(userPluginLabels, section, key, false)
+			if (getConfigurationValue(userPluginLabels, section, key, kUndefined) == kUndefined)
 				setConfigurationValue(userPluginLabels, section, key, value)
 	
 	writeConfiguration(userPluginLabelsFile, userPluginLabels)
@@ -441,7 +459,7 @@ updateCustomCalls(startNumber, endNumber) {
 		Loop {
 			key := "Custom." . customCallIndex . ".Call"
 			
-			if !getConfigurationValue(userConfiguration, "Controller Functions", key, false) {
+			if (getConfigurationValue(userConfiguration, "Controller Functions", key, kUndefined) == kUndefined) {
 				setConfigurationValue(userConfiguration, "Controller Functions", key, getConfigurationValue(bundledConfiguration, "Controller Functions", key))
 				
 				key .= " Action"

@@ -3,6 +3,8 @@
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. Lots of new stuff in the Jona AI kernel
+     - Full statistical laptime analysis after accidents
+     - Recommandation, whether an early pitstop strategy might be advantageous after an accident
   4. Initial support for multiple controller hardware - more than one Button Box on the screen
   5. Automatic notification, when a new version is available
   

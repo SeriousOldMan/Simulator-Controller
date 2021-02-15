@@ -1,6 +1,6 @@
 [Version]
-Current=2.2.0-release
-Target=2.2.0-release
+Current=2.2.1-dev
+Target=2.3.0-release
 Release=2.2.0-release
-Changes=Maintenance and Bugfixes, New Voice Server, Voice Commands for Controller Functions, UI for Race Engineer Settings, New Icons
-Date=02/13/2021
+Changes=Online Version Check, Active Repair Recommendation Rules
+Date=02/15/2021

@@ -416,7 +416,7 @@ restart:
 
 		updateRepairBodyworkState()
 		
-		Gui RES:Add, Text, x16 yp+24 w105 h23 +0x200, % translate("Change Tyres")
+		Gui RES:Add, Text, x16 yp+24 w105 h23 +0x200, % translate("Change Compound")
 		
 		tabs := map(["Never", "Tyre Temperature", "Weather", "Impact"], "translate")
 

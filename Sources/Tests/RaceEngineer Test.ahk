@@ -622,7 +622,7 @@ if !GetKeyState("Ctrl") {
 	AHKUnit.Run()
 }
 else {
-	raceNr := (GetKeyState("Shift") ? 2 : 1)
+	raceNr := (GetKeyState("Alt") ? 3 : ((GetKeyState("Shift") ? 2 : 1)))
 	engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Engineer.settings")
 								   , new TestPitStopHandler(), "Jona", "de", true, true)
 
@@ -651,12 +651,45 @@ else {
 				MsgBox % "Lap " . A_Index . " loaded - Continue?"
 			}
 		}
-	else {
-		; 0.0	->	1.1		Report
-		; 2.4	->	2.5		Report
-		; 2.10	->	2.11	Report
-		; 3.4	->	3.5		Report
+	else if (raceNr == 2) {
+		; 0.0	->	1.1		Report Bodywork
+		; 2.4	->	2.5		Report Bodywork
+		; 2.10	->	2.11	Report Suspension & Bodywork
+		; 3.4	->	3.5		Report Bodywork
 		
+		done := false
+	
+		Loop {
+			lap := A_Index
+		
+			Loop {
+				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 2\Lap " . lap . "." . A_Index . ".data")
+			
+				if (data.Count() == 0) {
+					if (A_Index == 1)
+						done := true
+						
+					break
+				}
+				else {
+					if (A_Index == 1)
+						engineer.addLap(lap, data)
+					else
+						engineer.updateLap(lap, data)
+					
+					dumpKnowledge(engineer.KnowledgeBase)
+					
+					SplashTextOn 400, 100, , % "Data " lap . "." . A_Index . " loaded..."
+					Sleep 500
+					SplashTextOff
+				}
+			}
+		} until done
+	}
+	else {
+		; 3.1	->	3.2		Report Bodywork
+		; 5.1				Recommend Pitstop
+	
 		done := false
 	
 		Loop {
@@ -678,6 +711,9 @@ else {
 						engineer.updateLap(lap, data)
 					
 					dumpKnowledge(engineer.KnowledgeBase)
+					
+					if ((lap == 5) && (A_Index == 1))
+						msgbox inspect
 					
 					SplashTextOn 400, 100, , % "Data " lap . "." . A_Index . " loaded..."
 					Sleep 500

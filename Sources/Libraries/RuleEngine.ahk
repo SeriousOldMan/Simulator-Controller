@@ -38,9 +38,9 @@ global kProveAll = "ProveAll:"
 global kSet = "Set:"
 global kClear = "Clear:"
 
-global kBuiltinFunctors = ["option", "+", "-", "*", "/", ">", "<", "=", "unbound?", "append", "get"]
-global kBuiltinFunctions = ["option", "plus", "minus", "multiply", "divide", "greater", "less", "equal", "unbound", "append", "get"]
-global kBuiltinAritys = [2, 3, 3, 3, 3, 2, 2, 2, 1, -1, 2]
+global kBuiltinFunctors = ["option", "sqrt", "+", "-", "*", "/", ">", "<", "=", "unbound?", "append", "get"]
+global kBuiltinFunctions = ["option", "squareRoot", "plus", "minus", "multiply", "divide", "greater", "less", "equal", "unbound", "append", "get"]
+global kBuiltinAritys = [2, 2, 3, 3, 3, 3, 2, 2, 2, 1, -1, -1]
 
 global kPrefixNotation = "Prefix"
 global kInfixNotation = "Infix"
@@ -737,6 +737,77 @@ class SetFactAction extends Action {
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; Class                    SetComposedFactAction                          ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class SetComposedFactAction extends Action {
+	iFact := kNotInitialized
+	iValue := kNotInitialized
+	
+	Fact[variablesOrFacts := "__NotInitialized__"] {
+		Get {
+			if (variablesOrFacts == kNotInitialized)
+				return this.iFact
+			else {
+				result := ""
+			
+				for index, component in this.iFact {
+					if (index > 1)
+						result .= "."
+					
+					result .= component.getValue(variablesOrFacts)
+				}
+				
+				return result
+			}
+		}
+	}
+	
+	Value[variablesOrFacts := "__NotInitialized__"] {
+		Get {
+			if (variablesOrFacts == kNotInitialized)
+				return this.iValue
+			else
+				return this.iValue.getValue(variablesOrFacts)
+		}
+	}
+	
+	__New(arguments*) {
+		this.iValue := arguments.Pop()
+		this.iFact := arguments
+	}
+	
+	execute(knowledgeBase, variables) {
+		local facts := knowledgeBase.Facts
+		local fact := ""
+		
+		for index, component in this.Fact {
+			if (index > 1)
+				fact .= "."
+		
+			fact .= (isInstance(component, Variable) ? component.getValue(variables) : component.getValue(facts))
+		}
+		
+		value := (isInstance(this.Value, Variable) ? this.Value[variables] : this.Value[facts])
+		
+		facts.setFact(fact, value)
+	}
+	
+	toString(facts := "__NotInitialized__") {
+		local fact := ""
+			
+		for index, component in this.Fact {
+			if (index > 1)
+				fact .= "."
+			
+			fact .= component.toString(facts)
+		}
+
+		return ("(Set: " . fact . ", " . this.Value.toString(facts) . ")")
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; Class                    ClearFactAction                                ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
@@ -765,6 +836,64 @@ class ClearFactAction extends Action {
 	
 	toString(facts := "__NotInitialized__") {
 		return ("(Clear: " . this.Fact.toString(facts) . ")")
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; Class                    ClearComposedFactAction                        ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class ClearComposedFactAction extends Action {
+	iFact := kNotInitialized
+	
+	Fact[variablesOrFacts := "__NotInitialized__"] {
+		Get {
+			if (variablesOrFacts == kNotInitialized)
+				return this.iFact
+			else {
+				result := ""
+			
+				for index, component in this.iFact {
+					if (index > 1)
+						result .= "."
+					
+					result .= component.getValue(variablesOrFacts)
+				}
+				
+				return result
+			}
+		}
+	}
+	
+	__New(arguments*) {
+		this.iFact := arguments
+	}
+	
+	execute(knowledgeBase, variables) {
+		local facts := knowledgeBase.Facts
+		local fact := ""
+		
+		for index, component in this.Fact {
+			if (index > 1)
+				fact .= "."
+		
+			fact .= (isInstance(component, Variable) ? component.getValue(variables) : component.getValue(facts))
+		}
+		
+		facts.clearFact(fact)
+	}
+	
+	toString(facts := "__NotInitialized__") {
+		local fact := ""
+			
+		for index, component in this.Fact {
+			if (index > 1)
+				fact .= "."
+			
+			fact .= component.toString(facts)
+		}
+		
+		return ("(Clear: " . fact . ")")
 	}
 }
 
@@ -1735,22 +1864,51 @@ class FactChoicePoint extends ChoicePoint {
 			this.iFirst := false
 		
 			resultSet := this.ResultSet
-			arguments := this.Goal.Arguments
 			knowledgeBase := resultSet.KnowledgeBase
 			facts := knowledgeBase.Facts
+			arguments := this.Goal.Arguments
+			length := arguments.Length()
 			
-			this.iFact := arguments[1].toString(resultSet)
-			this.iOldValue := facts.getValue(this.iFact)
-	
-			fact := this.iFact
-			
-			if this.iClear
+			if this.iClear {
+				if (length == 1)
+					fact := arguments[1].toString(resultSet)
+				else {			
+					fact := ""
+						
+					for index, argument in arguments {
+						if (index > 1)
+							fact .= "."
+						
+						fact .= argument.toString(resultSet)
+					}
+				}
+				
+				this.iFact := fact
+				this.iOldValue := facts.getValue(fact)
+				
 				facts.clearFact(fact)
+			}
 			else {
-				if (arguments.Length() < 2)
-					value := true
-				else
-					value := arguments[2].toString(resultSet)
+				if (length <= 2)
+					fact := arguments[1].toString(resultSet)
+				else {			
+					fact := ""
+						
+					for index, argument in arguments {
+						if (index == length)
+							break
+							
+						if (index > 1)
+							fact .= "."
+						
+						fact .= argument.toString(resultSet)
+					}
+				}
+				
+				value := ((length >= 2) ? arguments[length].toString(resultSet) : true)
+			
+				this.iFact := fact
+				this.iOldValue := facts.getValue(fact)
 				
 				facts.setFact(fact, value)
 			}
@@ -3453,12 +3611,19 @@ class ActionParser extends Parser {
 			case kSet:
 				arguments := this.parseArguments(expressions, 3)
 				
-				if (arguments.Length() > 0)
+				if (arguments.Length() = 1)
 					return new SetFactAction(argument, arguments[1])
+				else if (arguments.Length() > 1)
+					return new SetComposedFactAction(argument, arguments*)
 				else
 					return new SetFactAction(argument)
 			case kClear:
-				return new ClearFactAction(argument)
+				arguments := this.parseArguments(expressions, 3)
+				
+				if (arguments.Length() > 0)
+					return new ClearComposedFactAction(argument, arguments*)
+				else
+					return new ClearFactAction(argument)
 			default:
 				Throw "Unknown action type """ . action . """ detected in ActionParser.parse..."
 		}
@@ -3606,6 +3771,30 @@ option(choicePoint, option, value) {
 	}
 	
 	return true
+}
+
+squareRoot(choicePoint, operand1, operand2) {
+	local resultSet := choicePoint.ResultSet
+	
+	operand1 := operand1.getValue(resultSet, operand1)
+	operand2 := operand2.getValue(resultSet, operand2)
+	
+	if isInstance(operand1, Variable) {
+		if isInstance(operand2, Variable)
+			return false
+		else
+			return resultSet.unify(choicePoint, operand1, new Literal(operand2.toString(resultSet) * operand2.toString(resultSet)))
+	}
+	else if isInstance(operand2, Variable) {
+		if isInstance(operand1, Variable)
+			return false
+		else
+			return resultSet.unify(choicePoint, operand2, new Literal(Sqrt(operand1.toString(resultSet))))
+	}
+	else if ((operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)))
+		return false
+	else
+		return (Sqrt(operand1.toString(resultSet)) = operand2.toString(resultSet))
 }
 
 plus(choicePoint, operand1, operand2, operand3) {
@@ -3772,7 +3961,7 @@ unbound(choicePoint, operand1) {
 append(choicePoint, arguments*) {
 	local resultSet
 	
-	if (arguments.Length() == 0)
+	if (arguments.Length() <= 1)
 		return false
 	else {
 		resultSet := choicePoint.ResultSet
@@ -3792,16 +3981,42 @@ append(choicePoint, arguments*) {
 	}
 }
 
-get(choicePoint, operand1, operand2) {
-	local resultSet := choicePoint.ResultSet
+get(choicePoint, arguments*) {
+	local resultSet
 	
-	operand1 := new Literal(resultSet.KnowledgeBase.Facts.getValue(operand1.getValue(resultSet, operand1).toString(resultSet)))
-	operand2 := operand2.getValue(resultSet, operand2)
-	
-	if isInstance(operand2, Variable)
-		return resultSet.unify(choicePoint, operand1, operand2)
-	else if ((operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)))
+	if (arguments.Length() <= 1)
 		return false
-	else
-		return (operand1.toString(resultSet) = operand2.toString(resultSet))
+	else {
+		resultSet := choicePoint.ResultSet
+		
+		if (arguments.Length() = 2) {
+			operand1 := arguments[1]
+			operand2 := arguments[2]
+			
+			operand1 := new Literal(resultSet.KnowledgeBase.Facts.getValue(operand1.getValue(resultSet, operand1).toString(resultSet)))
+			operand2 := operand2.getValue(resultSet, operand2)
+		}
+		else {
+			operand2 := arguments.Pop()
+			operand2 := operand2.getValue(resultSet, operand2)
+			
+			result := ""
+				
+			for index, argument in arguments {
+				if (index > 1)
+					result .= "."
+				
+				result .= argument.getValue(resultSet, argument).toString(resultSet)
+			}
+			
+			operand1 := new Literal(resultSet.KnowledgeBase.Facts.getValue(result))
+		}
+	
+		if isInstance(operand2, Variable)
+			return resultSet.unify(choicePoint, operand1, operand2)
+		else if ((operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)))
+			return false
+		else
+			return (operand1.toString(resultSet) = operand2.toString(resultSet))
+	}
 }

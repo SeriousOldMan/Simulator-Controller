@@ -137,10 +137,11 @@ class RaceEngineer extends ConfigurationItem {
 				if variables {
 					variables := variables.Clone()
 					
+					variables["name"] := this.Name
 					variables["driver"] := this.Engineer.DriverName
 				}
 				else
-					variables := {driver: this.Engineer.DriverName}
+					variables := {name: this.Engineer.Name, driver: this.Engineer.DriverName}
 				
 				phrase := substituteVariables(phrase, variables)
 			}
@@ -206,10 +207,11 @@ class RaceEngineer extends ConfigurationItem {
 				if variables {
 					variables := variables.Clone()
 					
+					variables["name"] := this.Name
 					variables["driver"] := this.Engineer.DriverName
 				}
 				else
-					variables := {driver: this.Engineer.DriverName}
+					variables := {name: this.Engineer.Name, driver: this.Engineer.DriverName}
 				
 				phrase := substituteVariables(phrase, variables)
 			}
@@ -682,6 +684,7 @@ class RaceEngineer extends ConfigurationItem {
 		
 		if !this.hasPlannedPitstop() {
 			speaker.speakPhrase("NotPossible")
+			
 			speaker.speakPhrase("ConfirmPlan")
 			
 			this.setContinuation(ObjBindMethod(this, "planPitstop"))
@@ -998,7 +1001,7 @@ class RaceEngineer extends ConfigurationItem {
 		this.iEnoughData := false
 		
 		if this.Speaker
-			this.getSpeaker().speakPhrase("Greeting", {name: this.Name})
+			this.getSpeaker().speakPhrase("Greeting")
 		
 		if this.Debug[kDebugKnowledgeBase]
 			dumpKnowledge(this.KnowledgeBase)
@@ -1259,7 +1262,7 @@ class RaceEngineer extends ConfigurationItem {
 			speaker := this.getSpeaker()
 			fragments := speaker.Fragments
 			
-			speaker.speakPhrase("Pitstop", {name: this.Name, number: pitstopNumber})
+			speaker.speakPhrase("Pitstop", {number: pitstopNumber})
 				
 			fuel := knowledgeBase.getValue("Pitstop.Planned.Fuel", 0)
 			if (fuel == 0)
@@ -1384,7 +1387,7 @@ class RaceEngineer extends ConfigurationItem {
 		if this.Speaker {
 			speaker := this.getSpeaker()
 			
-			speaker.speakPhrase((remainingLaps <= 2) ? "VeryLowFuel" : "LowFuel", {name: this.Name, laps: remainingLaps})
+			speaker.speakPhrase((remainingLaps <= 2) ? "VeryLowFuel" : "LowFuel", {laps: remainingLaps})
 		
 			if this.Listener {
 				if this.hasPreparedPitstop()
@@ -1403,6 +1406,20 @@ class RaceEngineer extends ConfigurationItem {
 		}
 	}
 	
+	recommendPitstop(delta) {
+		if this.Speaker {
+			speaker := this.getSpeaker()
+			
+			speaker	.speakPhrase("RepairPitstop", {delta: Round(delta, 1)})
+		
+			if this.Listener {
+				speaker.speakPhrase("ConfirmPlan")
+			
+				this.setContinuation(ObjBindMethod(this, "planPitstop"))
+			}
+		}
+	}
+	
 	damageWarning(newSuspensionDamage, newBodyworkDamage) {
 		if this.Speaker {
 			speaker := this.getSpeaker()
@@ -1415,7 +1432,7 @@ class RaceEngineer extends ConfigurationItem {
 			else if newBodyworkDamage
 				phrase := "BodyworkDamage"
 			
-			speaker.speakPhrase(phrase, {name: this.Name})
+			speaker.speakPhrase(phrase)
 	
 			speaker.speakPhrase("DamageAnalysis")
 		}
@@ -1465,6 +1482,12 @@ class RaceEngineer extends ConfigurationItem {
 
 lowFuelWarning(context, remainingLaps) {
 	context.KnowledgeBase.RaceEngineer.lowFuelWarning(Round(remainingLaps))
+	
+	return true
+}
+
+recommendPitstop(context, delta) {
+	context.KnowledgeBase.RaceEngineer.recommendPitstop(delta)
 	
 	return true
 }

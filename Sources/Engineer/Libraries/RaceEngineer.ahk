@@ -940,7 +940,7 @@ class RaceEngineer extends ConfigurationItem {
 				, "Race.Settings.InLap": getConfigurationValue(settings, "Race Settings", "InLap", true)
 				, "Race.Settings.Fuel.Max": getConfigurationValue(data, "Race Data", "FuelAmount", 0)
 				, "Race.Settings.Fuel.AvgConsumption": getConfigurationValue(settings, "Race Settings", "Fuel.AvgConsumption", 0)
-				, "Race.Settings.Pitstop.Duration": getConfigurationValue(settings, "Race Settings", "Pitstop.Duration", 0)
+				, "Race.Settings.Pitstop.Duration": getConfigurationValue(settings, "Race Settings", "Pitstop.Duration", 30)
 				, "Race.Settings.Fuel.SafetyMargin": getConfigurationValue(settings, "Race Settings", "Fuel.SafetyMargin", 5)
 				, "Race.Settings.Lap.PitstopWarning": getConfigurationValue(settings, "Race Settings", "Lap.PitstopWarning", 5)
 				, "Race.Settings.Lap.AvgTime": getConfigurationValue(settings, "Race Settings", "Lap.AvgTime", 0)

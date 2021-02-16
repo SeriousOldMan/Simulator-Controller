@@ -137,7 +137,7 @@ class RaceEngineer extends ConfigurationItem {
 				if variables {
 					variables := variables.Clone()
 					
-					variables["name"] := this.Name
+					variables["name"] := this.Engineer.Name
 					variables["driver"] := this.Engineer.DriverName
 				}
 				else
@@ -207,7 +207,7 @@ class RaceEngineer extends ConfigurationItem {
 				if variables {
 					variables := variables.Clone()
 					
-					variables["name"] := this.Name
+					variables["name"] := this.Engineer.Name
 					variables["driver"] := this.Engineer.DriverName
 				}
 				else
@@ -1431,7 +1431,7 @@ class RaceEngineer extends ConfigurationItem {
 			stintLaps := Round(stintLaps)
 			delta := Round(delta, 1)
 			
-			if repair {
+			if (repair == true) {
 				speaker.speakPhrase("RepairPitstop", {laps: stintLaps, delta: delta})
 		
 				if this.Listener {
@@ -1440,7 +1440,7 @@ class RaceEngineer extends ConfigurationItem {
 					this.setContinuation(ObjBindMethod(this, "planPitstop"))
 				}
 			}
-			else
+			else if (repair == false)
 				speaker.speakPhrase("NoRepairPitstop", {laps: stintLaps, delta: delta})
 		}
 	}
@@ -1493,14 +1493,14 @@ lowFuelWarning(context, remainingLaps) {
 	return true
 }
 
-recommendPitstop(context, delta) {
-	context.KnowledgeBase.RaceEngineer.recommendPitstop(delta)
+damageWarning(context, newSuspensionDamage, newBodyworkDamage) {
+	context.KnowledgeBase.RaceEngineer.damageWarning(newSuspensionDamage, newBodyworkDamage)
 	
 	return true
 }
 
-damageWarning(context, newSuspensionDamage, newBodyworkDamage) {
-	context.KnowledgeBase.RaceEngineer.damageWarning(newSuspensionDamage, newBodyworkDamage)
+reportDamageAnalysis(context, repair, stintLaps, delta) {
+	context.KnowledgeBase.RaceEngineer.reportDamageAnalysis(repair, stintLaps, delta)
 	
 	return true
 }

@@ -712,9 +712,6 @@ else {
 					
 					dumpKnowledge(engineer.KnowledgeBase)
 					
-					if ((lap == 5) && (A_Index == 1))
-						msgbox inspect
-					
 					SplashTextOn 400, 100, , % "Data " lap . "." . A_Index . " loaded..."
 					Sleep 500
 					SplashTextOff

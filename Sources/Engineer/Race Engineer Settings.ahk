@@ -330,7 +330,7 @@ restart:
 		raceDurationEdit := Round(getConfigurationValue(settingsOrCommand, "Race Settings", "Duration", 0) / 60)
 		avgLaptimeEdit := getConfigurationValue(settingsOrCommand, "Race Settings", "Lap.AvgTime", 0)
 		fuelConsumptionEdit := getConfigurationValue(settingsOrCommand, "Race Settings", "Fuel.AvgConsumption", 0.0)
-		pitstopDurationEdit := getConfigurationValue(settingsOrCommand, "Race Settings", "Pitstop.Duration" 0)
+		pitstopDurationEdit := getConfigurationValue(settingsOrCommand, "Race Settings", "Pitstop.Duration", 0)
 		safetyFuelEdit := getConfigurationValue(settingsOrCommand, "Race Settings", "Fuel.SafetyMargin", 4)
 		
 		inLapCheck := getConfigurationValue(settingsOrCommand, "Race Settings", "InLap", true)

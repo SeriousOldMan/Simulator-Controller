@@ -222,6 +222,7 @@ lapTimeDamageImpact(?lap, ?damageType) <= lapAvgTime(?lap, ?lTime), preDamageLap
 preDamageLap(?damageType, ?lap) <= unbound?(?lap), !, preDamageLap(?damageType, !Lap, ?lap)
 preDamageLap(?, 0) <= !, fail
 preDamageLap(?, 1) <= !, fail
+preDamageLap(?damageType, ?lap) <= bound?(?lap), pitstopLap(?lap), !, fail
 preDamageLap(?damageType, ?lap) <= Get(Lap, ?lap, Damage, ?damageType, 0)
 
 preDamageLap(?, 0, ?) <= !, fail
@@ -251,12 +252,12 @@ priority: 5, {All: {Any: [?Damage.Suspension.Lap.Delta = 0], {None: [?Damage.Sus
 recommendPitstop(?sDelta, ?bDelta) <= unbound?(?sDelta), recommendPitstop(?bDelta), !
 recommendPitstop(?sDelta, ?bDelta) <= unbound?(?bDelta), recommendPitstop(?sDelta), !
 recommendPitstop(?sDelta, ?bDelta) <= max(?sDelta, ?bDelta, ?delta), remainingStintLaps(!Lap, ?stintLaps),										\
-									  ?lostTime = ?stintLaps * ?delta, reportAnalysis(?stintLaps, ?delta)
+									  ?lostTime = ?stintLaps * ?delta, reportAnalysis(?lostTime, ?stintLaps, ?delta)
 
-reportAnalysis(?stintLaps, ?delta) <= >=(?lostTime, !Race.Settings.Pitstop.Duration),															\
-									  Call(reportDamageAnalysis, true, ?stintLaps, ?delta), Set(Damage.Repair.Analysis.Reported)
-reportAnalysis(?stintLaps, ?delta) <= ?lostTime < !Race.Settings.Pitstop.Duration,																\
-									  Call(reportDamageAnalysis, false, ?stintLaps, ?delta), Set(Damage.Repair.Analysis.Reported)
+reportAnalysis(?lostTime, ?stintLaps, ?delta) <= >=(?lostTime, !Race.Settings.Pitstop.Duration), 												\
+												 Call(reportDamageAnalysis, true, ?stintLaps, ?delta), Set(Damage.Repair.Analysis.Reported)
+reportAnalysis(?lostTime, ?stintLaps, ?delta) <= ?lostTime < !Race.Settings.Pitstop.Duration, 													\
+												 Call(reportDamageAnalysis, false, ?stintLaps, ?delta), Set(Damage.Repair.Analysis.Reported)
 
 
 ;;;-------------------------------------------------------------------------;;;

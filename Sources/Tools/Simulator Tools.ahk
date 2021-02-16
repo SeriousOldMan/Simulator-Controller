@@ -40,6 +40,7 @@ global kToolsTargetsFile = "Simulator Tools.targets"
 
 global kUpdateMessages = {updateTranslations: "Updating translations to "
 						, updatePluginLabels: "Updating plugin labels to "
+						, updatePhraseGrammars: "Updating phrase grammars to "
 						, updateACCPluginForV20: "Updating ACC plugin to ", updateACCPluginForV21: "Updating ACC plugin to "
 						, updatePedalCalibrationPluginForV21: "Updating Pedal Calibration plugin to "}
 

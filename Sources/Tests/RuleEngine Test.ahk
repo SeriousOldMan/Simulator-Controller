@@ -551,6 +551,10 @@ theRules =
 
 	sum([], 0)
 	sum([?h | ?t], ?sum) <= sum(?t, ?tSum), ?sum = ?h + ?tSum
+
+	remove([], ?, [])
+	remove([?h | ?t], ?h, ?result) <= remove(?t, ?h, ?result), !
+	remove([?h | ?t], ?x, [?h | ?result]) <= remove(?t, ?x, ?result)
 )
 
 productions := false
@@ -564,7 +568,7 @@ eng := new RuleEngine(productions, reductions, {})
 
 kb := eng.createKnowledgeBase(eng.createFacts(), eng.createRules())
 
-g := rc.compileGoal("one?(2, [1,2,3])")
+g := rc.compileGoal("remove([1,2,3,4], 3, ?r)")
 
 rs := kb.prove(g)
 

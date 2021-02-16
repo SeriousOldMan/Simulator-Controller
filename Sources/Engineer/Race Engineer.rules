@@ -229,7 +229,7 @@ preDamageLap(?, 0, ?) <= !, fail
 preDamageLap(?damageType, ?lap, ?lap) <= preDamageLap(?damageType, ?lap)
 preDamageLap(?damageType, ?candidateLap, ?lap) <= ?nCandidateLap = ?candidateLap - 1, preDamageLap(?damageType, ?nCandidateLap, ?lap)
 
-lapTimeStdDeviation(?lap, ?deviation) <= weightedLapTimes(?lap, 0, ?lapTimes), stdDeviation(?lapTimes, ?deviation)
+lapTimeStdDeviation(?lap, ?deviation) <= weightedLapTimes(?lap, ?lapTimes), stdDeviation(?lapTimes, ?deviation)
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -244,20 +244,24 @@ priority: 5, {All: {Any: [?Damage.Suspension.Lap.Delta = 0], {None: [?Damage.Sus
 				   {Any: [?Damage.Bodywork.Lap.Delta = 0], {None: [?Damage.Bodywork.Lap.Delta]},												\
 						 [?Damage.Bodywork = 0], {None: [?Damage.Bodywork]}}} => (Clear: Damage.Repair.Analysis.Reported)
 				   
-{All: {None: [?Damage.Repair.Analysis.Reported]},																								\
+{All: [?Lap],																																	\
+	  {Any: {None: [?Damage.Repair.Analysis.Reported]}, {None: [?Damage.Reported]}, [?Damage.Repair.Analysis.Reported <= ?Damage.Reported]},	\
 	  {Any: [?Damage.Suspension.Lap.Delta > ?Race.Settings.Damage.Suspension.Repair.Threshold],													\
 			[?Damage.Bodywork.Lap.Delta > ?Race.Settings.Damage.Bodywork.Repair.Threshold]}} =>													\
 		(Prove: reportAnalysis, !Damage.Suspension.Lap.Delta, !Damage.Bodywork.Lap.Delta)
 
 reportAnalysis(?sDelta, ?bDelta) <= unbound?(?sDelta), reportAnalysis(?bDelta), !
 reportAnalysis(?sDelta, ?bDelta) <= unbound?(?bDelta), reportAnalysis(?sDelta), !
-reportAnalysis(?sDelta, ?bDelta) <= max(?sDelta, ?bDelta, ?delta), remainingStintLaps(!Lap, ?stintLaps),										\
+reportAnalysis(?sDelta, ?bDelta) <= ?temp = !Damage.Reported + 1, !Lap > ?temp,																	\
+									max(?sDelta, ?bDelta, ?delta), remainingStintLaps(!Lap, ?stintLaps),										\
 									?lostTime = ?stintLaps * ?delta, reportAnalysis(?lostTime, ?stintLaps, ?delta)
 
 reportAnalysis(?lostTime, ?stintLaps, ?delta) <= >=(?lostTime, !Race.Settings.Pitstop.Duration), 												\
-												 Call(reportDamageAnalysis, true, ?stintLaps, ?delta), Set(Damage.Repair.Analysis.Reported)
+												 Call(reportDamageAnalysis, true, ?stintLaps, ?delta),											\
+												 Set(Damage.Repair.Analysis.Reported, !Lap)
 reportAnalysis(?lostTime, ?stintLaps, ?delta) <= ?lostTime < !Race.Settings.Pitstop.Duration, 													\
-												 Call(reportDamageAnalysis, false, ?stintLaps, ?delta), Set(Damage.Repair.Analysis.Reported)
+												 Call(reportDamageAnalysis, false, ?stintLaps, ?delta),											\
+												 Set(Damage.Repair.Analysis.Reported, !Lap)
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -279,7 +283,7 @@ reportNewDamage(?lap) <= pitstopLap(?pitstopLap), ?pitstopLap = ?lap - 1,							
 						 newDamageAfterRepair(?lsDamage, ?suspensionRepaired, ?newSDamage),														\
 						 newDamageAfterRepair(?lBDamage, ?bodyworkRepaired, ?newBDamage),														\
 						 any?(true, [?newSDamage, ?newBDamage]), Call(damageWarning, ?newSDamage, ?newBDamage),									\
-						 Clear(Damage.Repair.Analysis.Reported)
+						 Set(Damage.Reported, !Lap)
 reportNewDamage(?lap) <= pitstopLap(?pitstopLap), ?pitstopLap = ?lap - 1,																		\
 						 lapDamage(?lap, Suspension, ?lSDamage), lapDamage(?lap, Bodywork, ?lBDamage),											\
 						 ?pLap = ?lap - 2, lapDamage(?pLap, Suspension, ?pSDamage), lapDamage(?pLap, Bodywork, ?pBDamage),						\
@@ -291,7 +295,7 @@ reportNewDamage(?lap) <= lapDamage(?lap, Suspension, ?lSDamage), lapDamage(?lap,
 reportNewDamage(?oldSDamage, ?newSDamage, ?oldBDamage, ?newBDamage) <=																			\
 						 >(?newSDamage, ?oldSDamage, ?sGreater), >(?newBDamage, ?oldBDamage, ?bGreater), 										\
 						 any?(true, [?sGreater, ?bGreater]), Call(damageWarning, ?sGreater, ?bGreater),											\
-						 Clear(Damage.Repair.Analysis.Reported)
+						 Set(Damage.Reported, !Lap)
 
 newDamageAfterRepair(0, ?, false)
 newDamageAfterRepair(?damage, true, true) <= ?damage > 0
@@ -434,9 +438,11 @@ currentTyreCompound(?compound) <= setupTyreCompound(?compound)
 
 lapDamage(?lap, ?type, ?position, ?damage) <= Get(Lap, ?lap, Damage, ?type, ?position, ?damage)
 
+lapTime(?lap, ?time) <= Get(Lap, ?lap, Time, ?time)
+
 lapAvgFuel(?lap, ?avgFuel) <= Get(Lap, ?lap, Fuel.AvgConsumption, ?avgFuel), ?avgFuel > 0
 
-lapAvgTime(?lap, ?avgTime) <= weightedLapTimes(?lap, 0, ?lapTimes),																				\
+lapAvgTime(?lap, ?avgTime) <= weightedLapTimes(?lap, ?lapTimes),																				\
 							  sum(?lapTimes, ?sTimes), length(?lapTimes, ?sLength), ?avgTime = ?sTimes / ?sLength
 
 lapRemainingFuel(?lap, ?remainingFuel) <= Get(Lap, ?lap, Fuel.Remaining, ?remainingFuel)
@@ -447,26 +453,37 @@ remainingRaceLaps(?lap, ?remainingLaps) <= Get(Lap, ?lap, Time.End, ?raceTime), 
 
 remainingStintLaps(?lap, ?remainingLaps) <= lapRemainingFuel(?lap, ?fuelLeft), lapAvgFuel(?lap, ?fuelPerLap),									\
 											?remainingLaps = ?fuelLeft / ?fuelPerLap
-										
+
+lapTimes(?lap, ?times) <= lapTimes(?lap, 0, ?temp), remove(?temp, 0, ?times)
+
 lapTimes(?lap, ?lap, []) <= !
 lapTimes(?, !Race.Settings.Lap.History.Considered, []) <= !
+lapTimes(?lap, ?offset, [?time | ?times]) <= ?tLap = ?lap - ?offset, pitstopLap(?tlap),															\
+											 ?nOffset = ?offset + 1, lapTimes(?lap, ?nOffset, ?times), average(?times, ?time), !
+lapTimes(?lap, ?offset, [?time]) <= ?tLap = ?lap - ?offset, ?tLap = 1, ?time = 0
 lapTimes(?lap, ?offset, [?time | ?times]) <= ?tLap = ?lap - ?offset, lapTime(?tlap, ?time),														\
 											 ?nOffset = ?offset + 1, lapTimes(?lap, ?nOffset, ?times)
-											 
+
+weightedLapTimes(?lap, ?times) <= weightedLapTimes(?lap, 0, ?temp), remove(?temp, 0, ?times)
+
 weightedLapTimes(?lap, ?lap, []) <= !
 weightedLapTimes(?, !Race.Settings.Lap.History.Considered, []) <= !
 weightedLapTimes(?lap, ?offset, [?time | ?times]) <= ?tLap = ?lap - ?offset, pitstopLap(?tlap),													\
 													 ?nOffset = ?offset + 1, weightedLapTimes(?lap, ?nOffset, ?times), average(?times, ?time), !
+weightedLapTimes(?lap, ?offset, [?time]) <= ?tLap = ?lap - ?offset, ?tLap = 1, ?time = 0
 weightedLapTimes(?lap, ?offset, [?time | ?times]) <= ?tLap = ?lap - ?offset, weightedLapTime(?lap, ?tlap, ?time),								\
 													 ?nOffset = ?offset + 1, weightedLapTimes(?lap, ?nOffset, ?times)
 
-lapTime(?lap, ?time) <= Get(Lap, ?lap, Time, ?time)
+weightedLapTime(?referenceLap, ?lap, ?time) <=																									\
+		lapTime(?referenceLap, ?lastTime), lapTime(?lap, ?lapTime),																				\
+		lapWeight(?referenceLap, ?lap, ?weight), ?delta = ?lastTime - ?lapTime, ?weightedDelta = ?delta * ?weight,								\
+		?time = ?lastTime - ?weightedDelta
 
-weightedLapTime(?lastLap, ?lap, ?time) <= lapTime(?lastLap, ?lastTime), lapTime(?lap, ?lapTime), lapWeight(?lap, ?weight),	 					\
-										  ?delta = ?lastTime - ?lapTime, ?weightedDelta = ?delta * ?weight, ?time = ?lastTime - ?weightedDelta
+lapWeight(?lap, ?weight) <= lapWeight(!Lap, ?lap, ?weight)
 
-lapWeight(?lap, ?weight) <= ?distance = !Lap - ?lap,																							\
-							dampingFactor(?distance, !Race.Settings.Lap.History.Considered, !Race.Settings.Lap.History.Damping, ?weight)
+lapWeight(?referenceLap, ?lap, ?weight) <= ?distance = ?referenceLap - ?lap,																	\
+										   dampingFactor(?distance, !Race.Settings.Lap.History.Considered,										\
+																	!Race.Settings.Lap.History.Damping, ?weight)
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -573,6 +590,10 @@ one?(?value, [? | ?tail]) <= one?(?value, ?tail)
 
 length([], 0)
 length([?h | ?t], ?length) <= length(?t, ?tLength), ?length = ?tLength + 1
+
+remove([], ?, [])
+remove([?h | ?t], ?h, ?result) <= remove(?t, ?h, ?result), !
+remove([?h | ?t], ?x, [?h | ?result]) <= remove(?t, ?x, ?result)
 
 sum([], 0)
 sum([?h | ?t], ?sum) <= sum(?t, ?tSum), ?sum = ?h + ?tSum

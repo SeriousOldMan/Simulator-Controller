@@ -689,9 +689,10 @@ else {
 	else {
 		; 3.1	->	3.2		Report Bodywork
 		; 5.1				Recommend Pitstop
-	
+		; 5.3	->	5.4		Report Bodywork
+		; 7.1				Recommend Pitstop
 		done := false
-	
+		
 		Loop {
 			lap := A_Index
 		

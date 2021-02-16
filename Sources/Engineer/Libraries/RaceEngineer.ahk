@@ -1406,17 +1406,23 @@ class RaceEngineer extends ConfigurationItem {
 		}
 	}
 	
-	recommendPitstop(delta) {
+	reportDamageAnalysis(repair, stintLaps, delta) {
 		if this.Speaker {
 			speaker := this.getSpeaker()
 			
-			speaker	.speakPhrase("RepairPitstop", {delta: Round(delta, 1)})
-		
-			if this.Listener {
-				speaker.speakPhrase("ConfirmPlan")
+			stintLaps := Round(stintLaps)
 			
-				this.setContinuation(ObjBindMethod(this, "planPitstop"))
+			if repair {
+				speaker.speakPhrase("RepairPitstop", {laps: stintLaps, delta: Round(delta, 1)})
+		
+				if this.Listener {
+					speaker.speakPhrase("ConfirmPlan")
+				
+					this.setContinuation(ObjBindMethod(this, "planPitstop"))
+				}
 			}
+			else
+				speaker.speakPhrase("NoRepairPitstop", {laps: stintLaps, delta: Round(delta, 1)})
 		}
 	}
 	

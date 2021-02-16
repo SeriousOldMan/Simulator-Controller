@@ -1,0 +1,24 @@
+General Release Actions
+=======================
+1. Update [Updates] section in "Simulator Tools.targets"
+2. Update [Processed] section in "UPDATES"
+3. Update "VERSION" file, especially *Current* setting
+4. Copy "VERSION" file to DropBox
+5. Copy *Release*.zip file to DropBox
+6. Update "README.md"
+7. Update "Releases.md"
+8. Update "Backlog.md"
+9. Check, whether update documentation for the release is required in "Updates.md"
+
+Release 2.3 Checklist
+=====================
+1. New plugin RF2 - Configuration update task needed
+2. Updated configuration files:
+   a. Translations
+   b. Phrase Grammars
+   c. Simulator Configuration.ini
+   d. Simulator Tools.targets
+   e. Race Engineer.settings
+3. Required update notes
+   a. ToDo for RF2 Plugin
+   b. ToDo for "Race Engineer.settings"

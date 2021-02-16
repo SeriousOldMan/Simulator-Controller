@@ -1406,26 +1406,6 @@ class RaceEngineer extends ConfigurationItem {
 		}
 	}
 	
-	reportDamageAnalysis(repair, stintLaps, delta) {
-		if this.Speaker {
-			speaker := this.getSpeaker()
-			
-			stintLaps := Round(stintLaps)
-			
-			if repair {
-				speaker.speakPhrase("RepairPitstop", {laps: stintLaps, delta: Round(delta, 1)})
-		
-				if this.Listener {
-					speaker.speakPhrase("ConfirmPlan")
-				
-					this.setContinuation(ObjBindMethod(this, "planPitstop"))
-				}
-			}
-			else
-				speaker.speakPhrase("NoRepairPitstop", {laps: stintLaps, delta: Round(delta, 1)})
-		}
-	}
-	
 	damageWarning(newSuspensionDamage, newBodyworkDamage) {
 		if this.Speaker {
 			speaker := this.getSpeaker()
@@ -1441,6 +1421,27 @@ class RaceEngineer extends ConfigurationItem {
 			speaker.speakPhrase(phrase)
 	
 			speaker.speakPhrase("DamageAnalysis")
+		}
+	}
+	
+	reportDamageAnalysis(repair, stintLaps, delta) {
+		if this.Speaker {
+			speaker := this.getSpeaker()
+			
+			stintLaps := Round(stintLaps)
+			delta := Round(delta, 1)
+			
+			if repair {
+				speaker.speakPhrase("RepairPitstop", {laps: stintLaps, delta: delta})
+		
+				if this.Listener {
+					speaker.speakPhrase("ConfirmPlan")
+				
+					this.setContinuation(ObjBindMethod(this, "planPitstop"))
+				}
+			}
+			else
+				speaker.speakPhrase("NoRepairPitstop", {laps: stintLaps, delta: delta})
 		}
 	}
 	

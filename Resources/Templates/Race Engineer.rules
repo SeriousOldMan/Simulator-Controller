@@ -243,7 +243,7 @@ priority: 5, {All: {Any: [?Damage.Suspension.Lap.Delta = 0], {None: [?Damage.Sus
 				   {Any: [?Damage.Bodywork.Lap.Delta = 0], {None: [?Damage.Bodywork.Lap.Delta]},												\
 						 [?Damage.Bodywork = 0], {None: [?Damage.Bodywork]}}} => (Clear: Damage.Repair.Analysis.Reported)
 				   
-{All: {None: [?Damage.Repair.Analysis.Reported]},																										\
+{All: {None: [?Damage.Repair.Analysis.Reported]},																								\
 	  {Any: [?Damage.Suspension.Lap.Delta > ?Race.Settings.Damage.Suspension.Repair.Threshold],													\
 			[?Damage.Bodywork.Lap.Delta > ?Race.Settings.Damage.Bodywork.Repair.Threshold]}} =>													\
 		(Prove: recommendPitstop, !Damage.Suspension.Lap.Delta, !Damage.Bodywork.Lap.Delta)

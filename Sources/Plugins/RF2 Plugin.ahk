@@ -1,5 +1,5 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - AC Plugin                       ;;;
+;;;   Modular Simulator Controller System - RF2 Plugin                      ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2021) Creative Commons - BY-NC-SA                        ;;;
@@ -9,30 +9,30 @@
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kACPlugin = "AC"
+global kRF2Plugin = "RF2"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class ACPlugin extends ControllerPlugin {
-	iACApplication := false
+class RF2Plugin extends ControllerPlugin {
+	iRF2Application := false
 	
-	ACApplication[] {
+	RF2Application[] {
 		Get {
-			return this.iACApplication
+			return this.iRF2Application
 		}
 	}
 	
 	__New(controller, name, configuration := false) {
-		this.iACApplication := new Application("Assetto Corsa", SimulatorController.Instance.Configuration)
+		this.iRF2Application := new Application("rFactor 2", SimulatorController.Instance.Configuration)
 		
 		base.__New(controller, name, configuration)
 	}
 	
 	runningSimulator() {
-		return (this.ACApplication.isRunning() ? "Assetto Corsa" : false)
+		return (this.RF2Application.isRunning() ? "rFactor 2" : false)
 	}
 }
 
@@ -41,9 +41,9 @@ class ACPlugin extends ControllerPlugin {
 ;;;                     Function Hook Declaration Section                   ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-startAC() {
-	return SimulatorController.Instance.startSimulator(SimulatorController.Instance.findPlugin(kACPlugin).ACApplication
-											         , "Simulator Splash Images\AC Splash.jpg")
+startRF2() {
+	return SimulatorController.Instance.startSimulator(SimulatorController.Instance.findPlugin(kRF2Plugin).RF2Application
+											         , "Simulator Splash Images\RF2 Splash.jpg")
 }
 
 
@@ -51,10 +51,10 @@ startAC() {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-initializeACPlugin() {
+initializeRF2Plugin() {
 	local controller := SimulatorController.Instance
 	
-	new ACPlugin(controller, kACPlugin, controller.Configuration)
+	new RF2Plugin(controller, kRF2Plugin, controller.Configuration)
 }
 
 
@@ -62,4 +62,4 @@ initializeACPlugin() {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-initializeACPlugin()
+initializeRF2Plugin()

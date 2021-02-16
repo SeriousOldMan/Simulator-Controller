@@ -14,4 +14,5 @@
 #Include ..\Plugins\Pedal Calibration Plugin.ahk
 #Include ..\Plugins\AC Plugin.ahk
 #Include ..\Plugins\ACC Plugin.ahk
+#Include ..\Plugins\RF2 Plugin.ahk
 #Include ..\Plugins\RST Plugin.ahk

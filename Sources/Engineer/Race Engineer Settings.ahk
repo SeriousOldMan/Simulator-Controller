@@ -205,8 +205,8 @@ editSettings(ByRef settingsOrCommand) {
 	
 	static raceDurationEdit
 	static avgLaptimeEdit
-	static inLapCheck
-	static outLapCheck
+	static formationLapCheck
+	static postRaceLapCheck
 	static fuelConsumptionEdit
 	static pitstopDurationEdit
 	static safetyFuelEdit
@@ -279,8 +279,8 @@ restart:
 		setConfigurationValue(newSettings, "Race Settings", "Pitstop.Duration", pitstopDurationEdit)
 		setConfigurationValue(newSettings, "Race Settings", "Fuel.SafetyMargin", safetyFuelEdit)
 		
-		setConfigurationValue(newSettings, "Race Settings", "InLap", inLapCheck)
-		setConfigurationValue(newSettings, "Race Settings", "OutLap", outLapCheck)
+		setConfigurationValue(newSettings, "Race Settings", "Lap.Formation", formationLapCheck)
+		setConfigurationValue(newSettings, "Race Settings", "Lap.PostRace", postRaceLapCheck)
 		
 		setConfigurationValue(newSettings, "Race Setup", "Tyre.Compound", ["Wet", "Dry"][spSetupTyreCompoundDropDown])
 		setConfigurationValue(newSettings, "Race Setup", "Tyre.Set", spSetupTyreSetEdit)
@@ -333,8 +333,8 @@ restart:
 		pitstopDurationEdit := getConfigurationValue(settingsOrCommand, "Race Settings", "Pitstop.Duration", 0)
 		safetyFuelEdit := getConfigurationValue(settingsOrCommand, "Race Settings", "Fuel.SafetyMargin", 4)
 		
-		inLapCheck := getConfigurationValue(settingsOrCommand, "Race Settings", "InLap", true)
-		outLapCheck := getConfigurationValue(settingsOrCommand, "Race Settings", "OutLap", true)
+		formationLapCheck := getConfigurationValue(settingsOrCommand, "Race Settings", "Lap.Formation", true)
+		postRaceLapCheck := getConfigurationValue(settingsOrCommand, "Race Settings", "Lap.PostRace", true)
 		
 		spSetupTyreCompoundDropDown := getConfigurationValue(settingsOrCommand, "Race Setup", "Tyre.Compound", "Dry")
 		spSetupTyreSetEdit := getConfigurationValue(settingsOrCommand, "Race Setup", "Tyre.Set", 1)
@@ -517,11 +517,11 @@ restart:
 		Gui RES:Add, Text, x164 yp+4 w90 h20, % translate("Sec.")
 
 		Gui RES:Add, Text, x212 ys-2 w85 h23 +0x200, % translate("Formation")
-		Gui RES:Add, CheckBox, x292 yp-2 w17 h23 Checked%inLapCheck% VinLapCheck, %inLapCheck%
+		Gui RES:Add, CheckBox, x292 yp-2 w17 h23 Checked%formationLapCheck% VformationLapCheck, %formationLapCheck%
 		Gui RES:Add, Text, x310 yp+4 w90 h20, % translate("Lap")
 				
 		Gui RES:Add, Text, x212 yp+22 w85 h23 +0x200, % translate("Post Race")
-		Gui RES:Add, CheckBox, x292 yp-2 w17 h23 Checked%outLapCheck% VoutLapCheck, %outLapCheck%
+		Gui RES:Add, CheckBox, x292 yp-2 w17 h23 Checked%postRaceLapCheck% VpostRaceLapCheck, %postRaceLapCheck%
 		Gui RES:Add, Text, x310 yp+4 w90 h20, % translate("Lap")
 				
 		Gui RES:Add, Text, x212 yp+22 w85 h23 +0x200, % translate("Safety Fuel")

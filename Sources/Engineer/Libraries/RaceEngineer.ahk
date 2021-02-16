@@ -936,8 +936,8 @@ class RaceEngineer extends ConfigurationItem {
 		facts := {"Race.Car": getConfigurationValue(data, "Race Data", "Car", "")
 				, "Race.Track": getConfigurationValue(data, "Race Data", "Track", "")
 				, "Race.Duration": duration
-				, "Race.Settings.OutLap": getConfigurationValue(settings, "Race Settings", "OutLap", true)
-				, "Race.Settings.InLap": getConfigurationValue(settings, "Race Settings", "InLap", true)
+				, "Race.Settings.Lap.Formation": getConfigurationValue(settings, "Race Settings", "Lap.Formation", true)
+				, "Race.Settings.Lap.PostRace": getConfigurationValue(settings, "Race Settings", "Lap.PostRace", true)
 				, "Race.Settings.Fuel.Max": getConfigurationValue(data, "Race Data", "FuelAmount", 0)
 				, "Race.Settings.Fuel.AvgConsumption": getConfigurationValue(settings, "Race Settings", "Fuel.AvgConsumption", 0)
 				, "Race.Settings.Pitstop.Duration": getConfigurationValue(settings, "Race Settings", "Pitstop.Duration", 30)

@@ -61,7 +61,7 @@ updateFuelTarget(?lap) <= lapAvgFuel(?lap, ?avgFuel), lapRemainingFuel(?lap, ?re
 						  min(?refillAmount, !Race.Settings.Fuel.Max, ?adjustedRefillAmount), Set(Fuel.Amount.Target, ?adjustedRefillAmount), !
 updateFuelTarget(?lap) <= Clear(Fuel.Amount.Target)
 
-safetyFuel(?avgFuel, ?safetyFuel) <= !Race.Settings.InLap = true, ?safetyFuel = ?avgFuel + !Race.Settings.Fuel.SafetyMargin, !
+safetyFuel(?avgFuel, ?safetyFuel) <= !Race.Settings.Lap.PostRace = true, ?safetyFuel = ?avgFuel + !Race.Settings.Fuel.SafetyMargin, !
 safetyFuel(?, !Race.Settings.Fuel.SafetyMargin)
 
 
@@ -247,12 +247,12 @@ priority: 5, {All: {Any: [?Damage.Suspension.Lap.Delta = 0], {None: [?Damage.Sus
 {All: {None: [?Damage.Repair.Analysis.Reported]},																								\
 	  {Any: [?Damage.Suspension.Lap.Delta > ?Race.Settings.Damage.Suspension.Repair.Threshold],													\
 			[?Damage.Bodywork.Lap.Delta > ?Race.Settings.Damage.Bodywork.Repair.Threshold]}} =>													\
-		(Prove: recommendPitstop, !Damage.Suspension.Lap.Delta, !Damage.Bodywork.Lap.Delta)
+		(Prove: reportAnalysis, !Damage.Suspension.Lap.Delta, !Damage.Bodywork.Lap.Delta)
 
-recommendPitstop(?sDelta, ?bDelta) <= unbound?(?sDelta), recommendPitstop(?bDelta), !
-recommendPitstop(?sDelta, ?bDelta) <= unbound?(?bDelta), recommendPitstop(?sDelta), !
-recommendPitstop(?sDelta, ?bDelta) <= max(?sDelta, ?bDelta, ?delta), remainingStintLaps(!Lap, ?stintLaps),										\
-									  ?lostTime = ?stintLaps * ?delta, reportAnalysis(?lostTime, ?stintLaps, ?delta)
+reportAnalysis(?sDelta, ?bDelta) <= unbound?(?sDelta), reportAnalysis(?bDelta), !
+reportAnalysis(?sDelta, ?bDelta) <= unbound?(?bDelta), reportAnalysis(?sDelta), !
+reportAnalysis(?sDelta, ?bDelta) <= max(?sDelta, ?bDelta, ?delta), remainingStintLaps(!Lap, ?stintLaps),										\
+									?lostTime = ?stintLaps * ?delta, reportAnalysis(?lostTime, ?stintLaps, ?delta)
 
 reportAnalysis(?lostTime, ?stintLaps, ?delta) <= >=(?lostTime, !Race.Settings.Pitstop.Duration), 												\
 												 Call(reportDamageAnalysis, true, ?stintLaps, ?delta), Set(Damage.Repair.Analysis.Reported)

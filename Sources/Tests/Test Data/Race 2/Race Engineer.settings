@@ -1,6 +1,6 @@
 [Race Settings]
-OutLap=true
-InLap=true
+Lap.Formation=true
+Lap.PostRace=true
 Fuel.AvgConsumption=2.7
 Fuel.SafetyMargin=3
 Fuel.Warning=3

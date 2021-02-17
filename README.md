@@ -26,7 +26,9 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-[2.2.2-dev](https://www.dropbox.com/s/4luzs1mktnfh0u2/Simulator%20Controller%202.2.2-dev.zip?dl=1) (Automated check for new version, New rules for damage impact analysis, rFactor 2 Skeleton Plugin. Attention: Do not use, if you created your own phrase grammars.)
+[2.3.0-alpha](https://www.dropbox.com/s/fwpjuvz7r12wvzu/Simulator%20Controller%202.3.0-alpha.zip?dl=1) (First preview on the upcoming Release 2.3. New features: Automated check for new version online on GitHub; New rules for damage impact analysis, reporting and pit strategy adjustments; rFactor 2 Skeleton Plugin. Feature complete including automated configuration update and documentation updates.)
+
+Important: Please read the [update notes on Release 2.3](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-23) carefully, since there is a manual step necessary, if you want to use the new rFactor 2 plugin.
 
 #### Latest release builds
 
@@ -87,7 +89,7 @@ These plugins are part of the Simulator Controller distribution. Beside providin
 | Tactile Feedback | Fully configurable support for pedal and chassis vibration using [SimHub](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications). |
 | Motion Feedback | Fully configurable support for rig motion feedback using [SimFeedback](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications). |
 | Pedal Calibration | Allows to choose between the different calibration curves of your high end pedals directly from the hardware controller. |
-| ACC | Special support for starting and stopping Assetto Corsa Competizione from your hardware controller and supplies functions and actions for configurable, automated chat messages in a multiplayer game. Additionally, beginning with Release 2.0, this plugin provides sophisticated support for the Pitstop MFD of *Assetto Corsa Competizione*. All settings may be tweaked using the controller hardware, but it is also possible to control the settings using voice control to keep your hands on the steering wheel. This plugin uses configuration based data, defines two simulator dependent modes and shows how to automate your simulation game. Therefore it supplies a good showcase when starting your own plugin development. |
+| ACC | Special support for starting and stopping Assetto Corsa Competizione from your hardware controller and supplies functions and actions for configurable, automated chat messages in a multiplayer game. Additionally, beginning with Release 2.0, this plugin provides sophisticated support for the Pitstop MFD of *Assetto Corsa Competizione*. All settings may be tweaked using the controller hardware, but it is also possible to control the settings using voice control to keep your hands on the steering wheel. This plugin uses configuration based data, defines two simulator dependent modes and shows how to automate your simulation game. Therefore it supplies a good showcase when starting your own plugin development. Since Release 2.1 Jona, the Virtual Race Engineer will be activated by the ACC plugin, when you start in a race. |
 | AC | Special support for starting and stopping Assetto Corsa from your hardware controller. |
 | RF2 | Special support for starting and stopping rFactor 2 from your hardware controller. |
 | Button Box | Tools for building your own Button Box / controller visuals. An easy to understand example will help you building the screen representation of your own Button Boxes. |

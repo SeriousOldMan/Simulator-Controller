@@ -8,6 +8,7 @@
      - Initial rule set for weather and tyre temperature trend analysis
   4. Initial support for rFactor 2 by a skeleton plugin
   5. Automatic notification, when a new version is available
+  6. Lots of refactoring and file location reorganization
   
 ## 2.2-release 02/13/21
 

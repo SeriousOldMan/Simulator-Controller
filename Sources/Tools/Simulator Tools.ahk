@@ -529,7 +529,9 @@ updatePedalCalibrationPluginForV21() {
 	userConfiguration := readConfiguration(userConfigurationFile)
 	
 	if (userConfiguration.Count() > 0) {
-		pedalPlugin := new Plugin("Pedal Calibration", readConfiguration(getFileName(kSimulatorConfigurationFile, kConfigDirectory)), false)
+		pedalPlugin := new Plugin("Pedal Calibration", readConfiguration(getFileName(kSimulatorConfigurationFile, kConfigDirectory)))
+		
+		pedalPlugin.iIsActive := false
 			
 		pedalPlugin.saveToConfiguration(userConfiguration)
 		
@@ -542,8 +544,10 @@ updateRF2PluginForV23() {
 	userConfiguration := readConfiguration(userConfigurationFile)
 	
 	if (userConfiguration.Count() > 0) {
-		rf2Plugin := new Plugin("RF2", readConfiguration(getFileName(kSimulatorConfigurationFile, kConfigDirectory)), false, "rFactor 2")
+		rf2Plugin := new Plugin("RF2", readConfiguration(getFileName(kSimulatorConfigurationFile, kConfigDirectory)))
 			
+		rf2Plugin.iIsActive := false
+		
 		rf2Plugin.saveToConfiguration(userConfiguration)
 		
 		writeConfiguration(userConfigurationFile, userConfiguration)

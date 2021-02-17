@@ -253,6 +253,32 @@ To enable Jona to handle the pitstop settings in *Assetto Corsa Competizione* fu
 
 Beside that, the check boxes for repair of Suspension and Bodywork must be both selected by the start of the race in the Pitstop MFD. After you have done all that, you can let Jona handle the pitstop setttings. Only be sure to not interfere with the artificial click and keyboard events, while Jona is managing the pitstop settings.
 
+### How it works
+
+Jona uses several statistical models to derive the data, on which the recommendations for the pitstop or other information is based. Therefore it will take some laps, before Jonas conclusion get more and more precise. So be careful, if you let Jona plan a pitstop after you have driven only three or four laps. You might end up with not enough fuel to reach the finish line.
+
+The following statsitical models are used at the moment:
+
+  1. Tyre pressure development
+  
+     The pressure development of the last laps and the deviation from the predefined target pressures are considered to derive pressure corrections for the next pitstop. The number of laps considered and the weighting of past laps can be configured using the settings tool.
+
+  2. Refuel amount
+  
+     Depending on the number of remaining laps and average fuel comsumption, Jona derives the exact amount of fuel required for the next stint. As for the tyre pressures, the lap weight of past laps may be configured for the fuel average calculation.
+	 
+  3. Damage induced lap time degration
+  
+     After Jona detects a new damage, Jona observes the devlopment of your lap times and suggests an adopted pitstop strategy, depending on remaining stint time and the time used for a pitstop. The underlying model is quite complex and recognizes and excludes special lap situations like pitstops, accidents, and so on, from the average laptime calculation.
+	 
+  4. Repair recommendations
+  
+     Based on the same model, Jona suggests repairs for the upcoming pitstop. You can configure various strategies using the settings tool.
+	 
+  5. Tyre compound selection and tyre pressure gambling
+  
+     Linear regression models are used here. Depending on the development of ambient and tyre temperatures, as well as weather changes (not yet implemented), Jona might suggest higher or lower pressures than currently perfect as a result of clear past trend, thereby giving you a good compromise for the upcoming sprint
+
 ## Technical information
 
 This section will give you some background information about the inner workings of Jona. To understand the most of it, you need some background knowledge about programming. Therefore, if you never have coded just a tiny bit, you can safely skip this section.

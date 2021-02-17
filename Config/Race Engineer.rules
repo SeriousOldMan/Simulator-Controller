@@ -211,8 +211,8 @@ lapDamage(?lap, Bodywork, ?damage) <= lapDamage(?lap, Bodywork, Front, ?frontDmg
 priority: 5, {Any: [?Damage.Suspension = 0], {None: [?Damage.Suspension]}} => (Clear: Damage.Suspension.Lap.Delta)
 priority: 5, {Any: [?Damage.Bodywork = 0], {None: [?Damage.Bodywork]}} => (Clear: Damage.Bodywork.Lap.Delta)
 
-{All: [?Lap], [?Race.Settings.Damage.Suspension.Repair = Impact], [?Damage.Suspension > 0]} => (Prove: lapTimeDamageImpact, ?Lap, Suspension)
-{All: [?Lap], [?Race.Settings.Damage.Bodywork.Repair = Impact], [?Damage.Bodywork > 0]} => (Prove: lapTimeDamageImpact, ?Lap, Bodywork)
+{All: [?Lap], [?Damage.Suspension > 0]} => (Prove: lapTimeDamageImpact, ?Lap, Suspension)
+{All: [?Lap], [?Damage.Bodywork > 0]} => (Prove: lapTimeDamageImpact, ?Lap, Bodywork)
 					
 lapTimeDamageImpact(?lap, ?damageType) <= lapAvgTime(?lap, ?lTime), preDamageLap(?damageType, ?pdLap), lapAvgTime(?pdLap, ?pdTime), 			\
 										  ?delta = ?pdTime - ?lTime, ?delta < 0, lapTimeStdDeviation(?pdLap, ?stdDeviation),					\
@@ -244,10 +244,9 @@ priority: 5, {All: {Any: [?Damage.Suspension.Lap.Delta = 0], {None: [?Damage.Sus
 				   {Any: [?Damage.Bodywork.Lap.Delta = 0], {None: [?Damage.Bodywork.Lap.Delta]},												\
 						 [?Damage.Bodywork = 0], {None: [?Damage.Bodywork]}}} => (Clear: Damage.Repair.Analysis.Reported)
 				   
-{All: [?Lap],																																	\
-	  {Any: {None: [?Damage.Repair.Analysis.Reported]}, {None: [?Damage.Reported]}, [?Damage.Repair.Analysis.Reported <= ?Damage.Reported]},	\
-	  {Any: [?Damage.Suspension.Lap.Delta > ?Race.Settings.Damage.Suspension.Repair.Threshold],													\
-			[?Damage.Bodywork.Lap.Delta > ?Race.Settings.Damage.Bodywork.Repair.Threshold]}} =>													\
+{All: [?Lap], [?Damage.Reported],																												\
+	  {Any: {None: [?Damage.Repair.Analysis.Reported]}, [?Damage.Repair.Analysis.Reported <= ?Damage.Reported]},								\
+	  {Any: [?Damage.Suspension.Lap.Delta > 0], [?Damage.Bodywork.Lap.Delta > 0]}} =>															\
 		(Prove: reportAnalysis, !Damage.Suspension.Lap.Delta, !Damage.Bodywork.Lap.Delta)
 
 reportAnalysis(?sDelta, ?bDelta) <= unbound?(?sDelta), reportAnalysis(?bDelta), !

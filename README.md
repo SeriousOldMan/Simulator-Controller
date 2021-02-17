@@ -89,6 +89,7 @@ These plugins are part of the Simulator Controller distribution. Beside providin
 | Pedal Calibration | Allows to choose between the different calibration curves of your high end pedals directly from the hardware controller. |
 | ACC | Special support for starting and stopping Assetto Corsa Competizione from your hardware controller and supplies functions and actions for configurable, automated chat messages in a multiplayer game. Additionally, beginning with Release 2.0, this plugin provides sophisticated support for the Pitstop MFD of *Assetto Corsa Competizione*. All settings may be tweaked using the controller hardware, but it is also possible to control the settings using voice control to keep your hands on the steering wheel. This plugin uses configuration based data, defines two simulator dependent modes and shows how to automate your simulation game. Therefore it supplies a good showcase when starting your own plugin development. |
 | AC | Special support for starting and stopping Assetto Corsa from your hardware controller. |
+| RF2 | Special support for starting and stopping rFactor 2 from your hardware controller. |
 | Button Box | Tools for building your own Button Box / controller visuals. An easy to understand example will help you building the screen representation of your own Button Boxes. |
 
 ### Third party applications

@@ -182,17 +182,23 @@ That said, we now come to an unpleasant part of the game, at least for the momen
 The *Race Engineer.settings* looks like this:
 
 	[Race Settings]
-	OutLap=true
-	InLap=true
+	Duration=60
+	Lap.AvgTime=106
+	Lap.Formation=true
+	Lap.PostRace=true
+	Lap.History.Considered=5
+	Lap.History.Damping=0.20
+	Lap.PitstopWarning=3
 	Fuel.AvgConsumption=2.7
 	Fuel.SafetyMargin=3
-	Lap.AvgTime=106
-	Lap.History.Considered=5
-	Lap.History.Damping=0.2
-	Lap.PitstopWarning=3
-	Damage.Suspension.Repair=Always
+	Pitstop.Duration=50
 	Damage.Bodywork.Repair=Threshold
-	Damage.Bodywork.Repair.Threshold=20
+	Damage.Bodywork.Repair.Threshold=20.0
+	Damage.Suspension.Repair=Always
+	Damage.Suspension.Repair.Threshold=false
+	Tyre.Compound.Change=Never
+	Tyre.Compound.Change.Threshold=false
+	Tyre.Pressure.Deviation=0.2
 	Tyre.Dry.Pressure.Target.FL=27.7
 	Tyre.Dry.Pressure.Target.FR=27.7
 	Tyre.Dry.Pressure.Target.RL=27.7
@@ -201,7 +207,6 @@ The *Race Engineer.settings* looks like this:
 	Tyre.Wet.Pressure.Target.FR=30.0
 	Tyre.Wet.Pressure.Target.RL=30.0
 	Tyre.Wet.Pressure.Target.RR=30.0
-	Tyre.Pressure.Deviation=0.2
 	[Race Setup]
 	Tyre.Compound=Dry
 	Tyre.Set=7
@@ -214,6 +219,7 @@ The *Race Engineer.settings* looks like this:
 	Tyre.Wet.Pressure.FR=28.2
 	Tyre.Wet.Pressure.RL=28.2
 	Tyre.Wet.Pressure.RR=28.2
+
 
 Most options above define general settings which will be applicable to any race event. But the options from the *[Race Setup]* section need to be adjusted for each individual race event, as long, as you want Jona to come to correct recommendations.
 

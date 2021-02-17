@@ -112,8 +112,8 @@ tyrePressureDeviation(?lap, [?tyreType | ?tyreTypes], [?deviation | ?deviations]
 weightedDeviation(?, !Race.Settings.Lap.History.Considered, ?, 0) <= !
 weightedDeviation(?lap, ?lap, ?, 0) <= !
 weightedDeviation(?lap, ?offset, ?tyreType, ?deviation) <= ?tLap = ?lap - ?offset,	currentTyreCompound(?compound),								\
-														   Get(Lap, ?tLap, Tyre.Pressure, ?tyreType, ?lPressure),								\
-														   Get(Race.Settings.Tyre, ?compound, Pressure.Target, ?tyreType, ?tPressure),			\
+														   lapTyrePressure(?tLap, ?tyreType, ?lPressure),										\
+														   tyrePressureTarget(?compound, ?tyreType, ?tPressure),								\
 														   ?lDeviation = ?lPressure - ?tPressure,												\
 														   lapWeight(?tLap, ?weight), ?tDeviation = ?lDeviation * ?weight,						\
 														   ?nOffset = ?offset + 1, weightedDeviation(?lap, ?nOffset, ?tyreType, ?nDeviation),	\
@@ -321,7 +321,7 @@ lowFuelWarning(?lap, ?remainingLaps) <= Call(lowFuelWarning, ?remainingLaps)
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                          Weather Trend Projection                       ;;;
+;;;                Weather & Tyre Temeperature Trend Projection             ;;;
 ;;;                                                                         ;;;
 ;;; The rules in this section try to derive future weather data on past     ;;;
 ;;; weather trends and weather forecast information (as far as available).  ;;;
@@ -329,6 +329,14 @@ lowFuelWarning(?lap, ?remainingLaps) <= Call(lowFuelWarning, ?remainingLaps)
 
 projectedWeather(?lap, ?weather) <= sequence(1, !Lap, ?indices), lapWeathers(!Lap, ?weathers), reverse(?weathers, ?rWeathers),					\
 									linRegression(?indices, ?rWeathers, ?a, ?b), ?temp = ?b * ?lap, ?weather = ?a + ?temp
+
+projectedTrackTemperature(?lap, ?temperature) <=																								\
+		sequence(1, !Lap, ?indices), lapTrackTemperatures(!Lap, ?temperatures), reverse(?temperatures, ?rTemperatures),							\
+		linRegression(?indices, ?rTemperatures, ?a, ?b), ?temp = ?b * ?lap, ?temperature = ?a + ?temp
+
+projectedTyreTemperature(?lap, ?temperature) <=																									\
+		sequence(1, !Lap, ?indices), lapTyreTemperatures(!Lap, ?temperatures), reverse(?temperatures, ?rTemperatures),							\
+		linRegression(?indices, ?rTemperatures, ?a, ?b), ?temp = ?b * ?lap, ?temperature = ?a + ?temp
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -436,16 +444,38 @@ pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Repair.Bodywork, !Pi
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                        Tyre Information Retrieval                       ;;;
+;;;                     Tyre Setup Information Retrieval                    ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 currentTyreCompound(?compound) <= pitstopTyreCompound(?compound), !
 currentTyreCompound(?compound) <= setupTyreCompound(?compound)
 
+setupTyreCompound(?compound) <= Get(Race.Setup.Tyre.Compound, ?compound)
+
+setupTyrePressure(?compound, ?tyreType, ?pressure) <= Get(Race.Setup.Tyre, ?compound, Pressure, ?tyreType, ?pressure)
+
+tyrePressureTarget(?compound, ?tyreType, ?pressure) <= Get(Race.Settings.Tyre, ?compound, Pressure.Target, ?tyreType, ?pressure)
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Lap Information Retrieval                       ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+lapTrackTemperature(?lap, ?temperature) <= Get(Lap, ?lap, Temperature.Track, ?temperature)
+								   
+lapWeather(?lap, ?weather) <= Get(Lap, ?lap, Weather, ?weather)
+
+lapTyrePressure(?lap, ?tyreType, ?pressure) <= Get(Lap, ?lap, Tyre.Pressure, ?tyreType, ?pressure)
+
+lapTyrePressure(?lap, ?pressure) <= lapTyrePressure(?lap, FL, ?flPrs), lapTyrePressure(?lap, FR, ?frPrs),										\
+									lapTyrePressure(?lap, RL, ?rlPrs), lapTyrePressure(?lap, RR, ?rrPrs),										\
+									average([?flPrs, ?frPrs, ?rlPrs, ?rrPrs], ?pressure)
+
+lapTyreTemperature(?lap, ?tyreType, ?temperature) <= Get(Lap, ?lap, Tyre.Temperature, ?tyreType, ?temperature)
+
+lapTyreTemperature(?lap, ?temperature) <= lapTyreTemperature(?lap, FL, ?flTemp), lapTyreTemperature(?lap, FR, ?frTemp),							\
+										  lapTyreTemperature(?lap, RL, ?rlTemp), lapTyreTemperature(?lap, RR, ?rrTemp),							\
+										  average([?flTemp, ?frTemp, ?rlTemp, ?rrTemp], ?temperature)
 
 lapDamage(?lap, ?type, ?position, ?damage) <= Get(Lap, ?lap, Damage, ?type, ?position, ?damage)
 
@@ -495,7 +525,25 @@ lapWeight(?referenceLap, ?lap, ?weight) <= ?distance = ?referenceLap - ?lap,				
 										   dampingFactor(?distance, !Race.Settings.Lap.History.Considered,										\
 																	!Race.Settings.Lap.History.Damping, ?weight)
 
-lapWeather(?lap, ?weather) <= Get(Lap, ?lap, Weather, ?weather)
+lapTrackTemperatures(1, [?temperature]) <= lapTrackTemperature(?lap, ?temperature), !
+lapTrackTemperatures(?lap, [?temperature | ?temperatures]) <= lapTrackTemperature(?lap, ?temperature),											\
+															  ?nLap = ?lap - 1, lapTrackTemperatures(?nlap, ?temperatures)
+
+lapTrackTemperatures(?lap, ?lap, []) <= !
+lapTrackTemperatures(?, !Race.Settings.Lap.History.Considered, []) <= !
+lapTrackTemperatures(?lap, ?offset, [?temperature | ?temperatures]) <=																			\
+		?tLap = ?lap - ?offset, lapTrackTemperature(?tLap, ?tTemperature), ?nOffset = ?offset + 1,												\
+		lapTrackTemperatures(?lap, ?nOffset, ?temperatures)
+
+lapTyreTemperatures(1, [?temperature]) <= lapTyreTemperature(?lap, ?temperature), !
+lapTyreTemperatures(?lap, [?temperature | ?temperatures]) <= lapTyreTemperature(?lap, ?temperature),											\
+															 ?nLap = ?lap - 1, lapTyreTemperatures(?nlap, ?temperatures)
+
+lapTyreTemperatures(?lap, ?lap, []) <= !
+lapTyreTemperatures(?, !Race.Settings.Lap.History.Considered, []) <= !
+lapTyreTemperatures(?lap, ?offset, [?temperature | ?temperatures]) <=																			\
+		?tLap = ?lap - ?offset, lapTyreTemperature(?tLap, ?tTemperature), ?nOffset = ?offset + 1,												\
+		lapTyreTemperatures(?lap, ?nOffset, ?temperatures)
 								   
 lapWeathers(1, [?weather]) <= lapWeather(?lap, ?weather), !
 lapWeathers(?lap, [?weather | ?weathers]) <= lapWeather(?lap, ?weather), ?nLap = ?lap - 1, lapWeathers(?nlap, ?weathers)
@@ -504,16 +552,7 @@ lapWeathers(?lap, ?lap, []) <= !
 lapWeathers(?, !Race.Settings.Lap.History.Considered, []) <= !
 lapWeathers(?lap, ?offset, [?weather | ?weathers]) <= ?tLap = ?lap - ?offset, lapWeather(?tLap, ?tWeather),										\
 													  ?nOffset = ?offset + 1, lapWeathers(?lap, ?nOffset, ?weathers)
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                   Setup & Settings Information Retrieval                ;;;
-;;;-------------------------------------------------------------------------;;;
-
-setupTyreCompound(?compound) <= Get(Race.Setup.Tyre.Compound, ?compound)
-
-setupTyrePressure(?compound, ?tyreType, ?pressure) <= Get(Race.Setup.Tyre, ?compound, Pressure, ?tyreType, ?pressure)
-
+													  
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                       Pitstop Information Retrieval                     ;;;

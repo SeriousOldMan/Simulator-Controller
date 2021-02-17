@@ -321,6 +321,17 @@ lowFuelWarning(?lap, ?remainingLaps) <= Call(lowFuelWarning, ?remainingLaps)
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                          Weather Trend Projection                       ;;;
+;;;                                                                         ;;;
+;;; The rules in this section try to derive future weather data on past     ;;;
+;;; weather trends and weather forecast information (as far as available).  ;;;
+;;;-------------------------------------------------------------------------;;;
+
+projectedWeather(?lap, ?weather) <= sequence(1, !Lap, ?indices), lapWeathers(!Lap, ?weathers), reverse(?weathers, ?rWeathers),					\
+									regression(?indices, ?rWeathers, ?a, ?b), ?temp = ?b * ?lap, ?weather = ?a + ?temp
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                             Pitstop Planning                            ;;;
 ;;;                                                                         ;;;
 ;;; Creates a plan for an upcoming pitstop. A copy of all current values    ;;;
@@ -484,6 +495,16 @@ lapWeight(?referenceLap, ?lap, ?weight) <= ?distance = ?referenceLap - ?lap,				
 										   dampingFactor(?distance, !Race.Settings.Lap.History.Considered,										\
 																	!Race.Settings.Lap.History.Damping, ?weight)
 
+lapWeather(?lap, ?weather) <= Get(Lap, ?lap, Weather, ?weather)
+								   
+lapWeathers(1, [?weather]) <= lapWeather(?lap, ?weather), !
+lapWeathers(?lap, [?weather | ?weathers]) <= lapWeather(?lap, ?weather), ?nLap = ?lap - 1, lapWeathers(?nlap, ?weathers)
+
+lapWeathers(?lap, ?lap, []) <= !
+lapWeathers(?, !Race.Settings.Lap.History.Considered, []) <= !
+lapWeathers(?lap, ?offset, [?weather | ?weathers]) <= ?tLap = ?lap - ?offset, lapWeather(?tLap, ?tWeather),										\
+													  ?nOffset = ?offset + 1, lapWeathers(?lap, ?nOffset, ?weathers)
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Setup & Settings Information Retrieval                ;;;
@@ -545,6 +566,15 @@ squaredDeviation([], ?, 0)
 squaredDeviation([?h | ?t], ?avg, ?squared) <= ?delta = ?h - ?avg, ?hSquared = ?delta * ?delta,													\
 											   squaredDeviation(?t, ?avg, ?tSquared), ?squared = ?hSquared + ?tSquared
 
+regression(?xValues, ?yValues, ?a, ?b) <= average(?xValues, ?xAverage), average(?yValues, ?yAverage),											\
+										  avgDeltaProductSums(?xValues, ?xAverage, ?yValues, ?yAverage, ?dividend, ?divisor),					\
+										  ?b = ?dividend / ?divisor, ?temp = ?b * ?xAverage, ?a = ?yAverage - ?temp
+										  
+avgDeltaProductSums([], ?, [], ?, 0, 0)
+avgDeltaProductSums([?h1 | ?t1], ?avg1, [?h2 | ?t2], ?avg2, ?sum1, ?sum2) <=																	\
+		?d1 = ?h1 - ?avg1, ?d2 = ?h2 - ?avg2, ?p1 = ?d1 * ?d2, ?p2 = ?d1 * ?d1,																	\
+		avgDeltaSums(?t1, ?avg1, ?t2, ?avg2, ?tSum1, ?tSum2), ?sum1 = ?p1 + ?tSum1, ?sum2 = ?p2 + ?tSum2
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                             General Rules                               ;;;
@@ -587,6 +617,15 @@ one?(?value, []) <= fail
 one?(?value, [?value | ?tail]) <= !, none?(?value, ?tail)
 one?(?value, [? | ?tail]) <= one?(?value, ?tail)
 
+reverse([], [])
+reverse([?h | ?t], ?rev) <= reverse(?t, ?rt), concat(?rt, [?h], ?rev)
+
+concat([], ?l, ?l)
+concat([?h | ?t], ?l, [?h | ?r]) <= concat(?t, ?l, ?r)
+
+sequence(?x, ?x, [?x]) <= !
+sequence(?from, ?to, [?from | ?more]) <= ?temp = ?from + 1, sequence(?temp, ?to, ?more)
+				
 length([], 0)
 length([?h | ?t], ?length) <= length(?t, ?tLength), ?length = ?tLength + 1
 
@@ -596,6 +635,9 @@ remove([?h | ?t], ?x, [?h | ?result]) <= remove(?t, ?x, ?result)
 
 sum([], 0)
 sum([?h | ?t], ?sum) <= sum(?t, ?tSum), ?sum = ?h + ?tSum
+
+productSum([], [], 0)
+productSum([?h1 | ?t1], [?h2 | ?t2], ?sum) <= ?p = ?h1 * ?h2, productSum(?t1, ?t2, ?tSum), ?sum = ?p + ?tSum
 
 min([?x], ?x)
 min([?h | ?t], ?min) <= min(?t, ?tMin), ?tMin < ?h, !, ?min = ?tMin

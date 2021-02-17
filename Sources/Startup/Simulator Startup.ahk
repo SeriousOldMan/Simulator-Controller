@@ -220,9 +220,10 @@ class SimulatorStartup extends ConfigurationItem {
 		x := Round((A_ScreenWidth - 300) / 2)
 		y := A_ScreenHeight - 150
 		
-		if !kSilentMode
+		if !kSilentMode {
 			message := translate("Start: Simulator Controller")
 			Progress B w300 x%x% y%y% FS8 CWD0D0D0 CBBlue, %message%, % translate("Initialize Core System")
+		}
 					
 		Loop 50 {
 			if !kSilentMode

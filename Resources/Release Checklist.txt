@@ -22,3 +22,4 @@ Release 2.3 Checklist
 3. Required update notes
    a. ToDo for RF2 Plugin
    b. ToDo for "Race Engineer.settings"
+4. Doku für RF2 Plugin

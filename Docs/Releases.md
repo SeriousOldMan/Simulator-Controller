@@ -5,8 +5,8 @@
   3. Lots of new stuff in the Jona AI kernel
      - Full statistical laptime analysis after accidents
      - Recommandation, whether an early pitstop strategy might be advantageous after an accident
-     - Initial rule set for weather trend analysis
-  4. Initial support for multiple controller hardware - more than one Button Box on the screen
+     - Initial rule set for weather and tyre temperature trend analysis
+  4. Initial support for rFactor 2 by a skeleton plugin
   5. Automatic notification, when a new version is available
   
 ## 2.2-release 02/13/21

@@ -492,8 +492,9 @@ remainingRaceLaps(?lap, ?remainingLaps) <= Get(Lap, ?lap, Time.End, ?raceTime), 
 										   ?remainingTime = ?raceLength - ?raceTime, lapAvgTime(?lap, ?avgTime),								\
 										   ?remainingLaps = ?remainingTime / ?avgTime
 
-remainingStintLaps(?lap, ?remainingLaps) <= lapRemainingFuel(?lap, ?fuelLeft), lapAvgFuel(?lap, ?fuelPerLap),									\
-											?remainingLaps = ?fuelLeft / ?fuelPerLap
+remainingStintLaps(?lap, ?remainingLaps) <= remainingRaceLaps(?lap, ?raceLaps),																	\
+											lapRemainingFuel(?lap, ?fuelLeft), lapAvgFuel(?lap, ?fuelPerLap),									\
+											?fuelLaps = ?fuelLeft / ?fuelPerLap, min(?raceLaps, ?fuelLaps, ?remainingLaps)
 
 lapTimes(?lap, ?times) <= lapTimes(?lap, 0, ?temp), remove(?temp, 0, ?times)
 

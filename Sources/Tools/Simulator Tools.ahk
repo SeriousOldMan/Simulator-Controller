@@ -42,7 +42,8 @@ global kUpdateMessages = {updateTranslations: "Updating translations to "
 						, updatePluginLabels: "Updating plugin labels to "
 						, updatePhraseGrammars: "Updating phrase grammars to "
 						, updateACCPluginForV20: "Updating ACC plugin to ", updateACCPluginForV21: "Updating ACC plugin to "
-						, updatePedalCalibrationPluginForV21: "Updating Pedal Calibration plugin to "}
+						, updatePedalCalibrationPluginForV21: "Updating Pedal Calibration plugin to "
+						, updateRF2PluginForV23: "Updating rFactor 2 plugin to "}
 
 global kCompiler = kAHKDirectory . "Compiler\ahk2exe.exe"
 
@@ -528,15 +529,27 @@ updatePedalCalibrationPluginForV21() {
 	userConfiguration := readConfiguration(userConfigurationFile)
 	
 	if (userConfiguration.Count() > 0) {
-		pedalPlugin := new Plugin("Pedal Calibration", readConfiguration(getFileName(kSimulatorConfigurationFile, kConfigDirectory)))
-		
-		pedalPlugin.iIsActive := false
+		pedalPlugin := new Plugin("Pedal Calibration", readConfiguration(getFileName(kSimulatorConfigurationFile, kConfigDirectory)), false)
 			
 		pedalPlugin.saveToConfiguration(userConfiguration)
 		
 		writeConfiguration(userConfigurationFile, userConfiguration)
 	}
 }
+
+updateRF2PluginForV23() {
+	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	userConfiguration := readConfiguration(userConfigurationFile)
+	
+	if (userConfiguration.Count() > 0) {
+		rf2Plugin := new Plugin("RF2", readConfiguration(getFileName(kSimulatorConfigurationFile, kConfigDirectory)), false, "rFactor 2")
+			
+		rf2Plugin.saveToConfiguration(userConfiguration)
+		
+		writeConfiguration(userConfigurationFile, userConfiguration)
+	}
+}
+
 
 updateToV15() {
 }

@@ -42,6 +42,18 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ***
 
+## Release 2.3
+
+Beside lots of new functionality for Jona, the Virtual Race Engineer, this release introduces the first version of the plugin for rFactor 2. If you are a fan of rFactor 2, you will see growing support for this simulation, including an integration with Jona, in the upcoming releases of Simulator Controller.
+
+The autoamated update procedure described above will add the plugin descriptor to your local configuration, but the plugin will be deactivated. You may want to activate it using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration), but to do so, you also have to add a new application on the [Applications tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-applications), which must be named "rFactor 2". Please set "startRF2" as the *Startup Function Hook*. And last but not least, you may want to add "rFactor 2" to the list of Simulators on the [General tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-general).
+
+A second step for the update requires the recreation of of the *Race Engineer.settings* file, since the format has changed substantially. Please start the *Race Engineer Settings* application, adjust all the settings and leave the dialog with the "Ok" button.
+
+The last step is only required by the developers amongst you: If you are using a local version of the *Simulator Tools.targets* file, you need to take a look witth you favorite Diff tool, since the original file changed substantially as well.
+
+***
+
 ## Release 2.1
 
 Although only a small step in the minor version number, Release 2.1 is by far the biggest release since the initial launch. It introduces the *Virtual Race Engineer*, an Artificial Intelligence, which supports you during a race. The Virtual Race Engineer, which I will name Jona from now on, uses the telemetry data supplied by a simulation game as a knowledge base for a hybrid rule engine. The rule engine can calculate the settings for the next pitstop, can recomend necessary tyre changes because of changing weather conditions, and it will take an eye on your lap times after you collected some damage. You can interact with Jona by natural voice, but the most import actions, like "Plan the next pitstop", can also be triggered by your controller hardware. For now, Jona is integrated with the ACC plugin for *Assetto Corsa Competizione*, but adopting it to a different simulation game is an easy task for an experienced developer.

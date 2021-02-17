@@ -458,9 +458,8 @@ lapTimes(?lap, ?times) <= lapTimes(?lap, 0, ?temp), remove(?temp, 0, ?times)
 
 lapTimes(?lap, ?lap, []) <= !
 lapTimes(?, !Race.Settings.Lap.History.Considered, []) <= !
-lapTimes(?lap, ?offset, [?time | ?times]) <= ?tLap = ?lap - ?offset, pitstopLap(?tlap),															\
-											 ?nOffset = ?offset + 1, lapTimes(?lap, ?nOffset, ?times), average(?times, ?time), !
-lapTimes(?lap, ?offset, [?time]) <= ?tLap = ?lap - ?offset, ?tLap = 1, ?time = 0
+lapTimes(?lap, ?offset, [0 | ?times]) <= ?tLap = ?lap - ?offset, pitstopLap(?tlap), !, ?nOffset = ?offset + 1, lapTimes(?lap, ?nOffset, ?times)
+lapTimes(?lap, ?offset, [0]) <= ?tLap = ?lap - ?offset, ?tLap = 1, !
 lapTimes(?lap, ?offset, [?time | ?times]) <= ?tLap = ?lap - ?offset, lapTime(?tlap, ?time),														\
 											 ?nOffset = ?offset + 1, lapTimes(?lap, ?nOffset, ?times)
 
@@ -468,9 +467,9 @@ weightedLapTimes(?lap, ?times) <= weightedLapTimes(?lap, 0, ?temp), remove(?temp
 
 weightedLapTimes(?lap, ?lap, []) <= !
 weightedLapTimes(?, !Race.Settings.Lap.History.Considered, []) <= !
-weightedLapTimes(?lap, ?offset, [?time | ?times]) <= ?tLap = ?lap - ?offset, pitstopLap(?tlap),													\
-													 ?nOffset = ?offset + 1, weightedLapTimes(?lap, ?nOffset, ?times), average(?times, ?time), !
-weightedLapTimes(?lap, ?offset, [?time]) <= ?tLap = ?lap - ?offset, ?tLap = 1, ?time = 0
+weightedLapTimes(?lap, ?offset, [0 | ?times]) <= ?tLap = ?lap - ?offset, pitstopLap(?tlap),	!,													\
+												 ?nOffset = ?offset + 1, weightedLapTimes(?lap, ?nOffset, ?times)
+weightedLapTimes(?lap, ?offset, [0]) <= ?tLap = ?lap - ?offset, ?tLap = 1, !
 weightedLapTimes(?lap, ?offset, [?time | ?times]) <= ?tLap = ?lap - ?offset, weightedLapTime(?lap, ?tlap, ?time),								\
 													 ?nOffset = ?offset + 1, weightedLapTimes(?lap, ?nOffset, ?times)
 

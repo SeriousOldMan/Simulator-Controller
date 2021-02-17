@@ -624,7 +624,7 @@ if !GetKeyState("Ctrl") {
 else {
 	raceNr := (GetKeyState("Alt") ? 3 : ((GetKeyState("Shift") ? 2 : 1)))
 	engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Engineer.settings")
-								   , new TestPitStopHandler(), "Jona", "en", true, true)
+								   , new TestPitStopHandler(), "Jona", "en", true, false)
 
 	engineer.setDebug(kDebugPhrases, false)
 	
@@ -648,7 +648,8 @@ else {
 				
 				dumpKnowledge(engineer.KnowledgeBase)
 				
-				MsgBox % "Lap " . A_Index . " loaded - Continue?"
+				if isDebug()
+					MsgBox % "Lap " . A_Index . " loaded - Continue?"
 			}
 		}
 	else if (raceNr == 2) {
@@ -679,9 +680,11 @@ else {
 					
 					dumpKnowledge(engineer.KnowledgeBase)
 					
-					SplashTextOn 400, 100, , % "Data " lap . "." . A_Index . " loaded..."
-					Sleep 500
-					SplashTextOff
+					if isDebug() {
+						SplashTextOn 400, 100, , % "Data " lap . "." . A_Index . " loaded..."
+						Sleep 500
+						SplashTextOff
+					}
 				}
 			}
 		} until done
@@ -713,15 +716,18 @@ else {
 					
 					dumpKnowledge(engineer.KnowledgeBase)
 					
-					SplashTextOn 400, 100, , % "Data " lap . "." . A_Index . " loaded..."
-					Sleep 500
-					SplashTextOff
+					if isDebug() {
+						SplashTextOn 400, 100, , % "Data " lap . "." . A_Index . " loaded..."
+						Sleep 500
+						SplashTextOff
+					}
 				}
 			}
 		} until done
 	}
 	
-	MsgBox Done...
+	if isDebug()
+		MsgBox Done...
 	
 	ExitApp
 }

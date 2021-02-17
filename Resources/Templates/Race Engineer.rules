@@ -328,7 +328,7 @@ lowFuelWarning(?lap, ?remainingLaps) <= Call(lowFuelWarning, ?remainingLaps)
 ;;;-------------------------------------------------------------------------;;;
 
 projectedWeather(?lap, ?weather) <= sequence(1, !Lap, ?indices), lapWeathers(!Lap, ?weathers), reverse(?weathers, ?rWeathers),					\
-									regression(?indices, ?rWeathers, ?a, ?b), ?temp = ?b * ?lap, ?weather = ?a + ?temp
+									linRegression(?indices, ?rWeathers, ?a, ?b), ?temp = ?b * ?lap, ?weather = ?a + ?temp
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -566,9 +566,9 @@ squaredDeviation([], ?, 0)
 squaredDeviation([?h | ?t], ?avg, ?squared) <= ?delta = ?h - ?avg, ?hSquared = ?delta * ?delta,													\
 											   squaredDeviation(?t, ?avg, ?tSquared), ?squared = ?hSquared + ?tSquared
 
-regression(?xValues, ?yValues, ?a, ?b) <= average(?xValues, ?xAverage), average(?yValues, ?yAverage),											\
-										  avgDeltaProductSums(?xValues, ?xAverage, ?yValues, ?yAverage, ?dividend, ?divisor),					\
-										  ?temp = ?b * ?xAverage, ?a = ?yAverage - ?temp
+linRegression(?xValues, ?yValues, ?a, ?b) <= average(?xValues, ?xAverage), average(?yValues, ?yAverage),										\
+											 avgDeltaProductSums(?xValues, ?xAverage, ?yValues, ?yAverage, ?dividend, ?divisor),				\
+											 ?b = ?dividend / ?divisor, ?temp = ?b * ?xAverage, ?a = ?yAverage - ?temp
 										  
 avgDeltaProductSums([], ?, [], ?, 0, 0)
 avgDeltaProductSums([?h1 | ?t1], ?avg1, [?h2 | ?t2], ?avg2, ?sum1, ?sum2) <=																	\

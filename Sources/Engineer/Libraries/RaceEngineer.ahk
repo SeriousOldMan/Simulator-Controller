@@ -352,8 +352,7 @@ class RaceEngineer extends ConfigurationItem {
 		
 		base.__New(configuration)
 		
-		if voiceServer
-			registerEventHandler("Voice", ObjBindMethod(this, "handleVoiceRemoteCalls"))
+		registerEventHandler("Voice", ObjBindMethod(this, "handleVoiceCalls"))
 	}
 	
 	setDebug(option, enabled) {
@@ -502,13 +501,13 @@ class RaceEngineer extends ConfigurationItem {
 			}
 			
 			if speechRecognizer
-				speechRecognizer.loadGrammar(grammar, speechRecognizer.compileGrammar(definition), ObjBindMethod(this, "phraseRecognized"))
+				speechRecognizer.loadGrammar(grammar, speechRecognizer.compileGrammar(definition), ObjBindMethod(this, "raisePhraseRecognized"))
 			else
 				raiseEvent(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", grammar, definition, processID, "remotePhraseRecognized"), this.VoiceServer)
 		}
 	}
-	
-	handleVoiceRemoteCalls(event, data) {
+
+	handleVoiceCalls(event, data) {
 		if InStr(data, ":") {
 			data := StrSplit(data, ":", , 2)
 
@@ -516,6 +515,14 @@ class RaceEngineer extends ConfigurationItem {
 		}
 		else
 			return withProtection(ObjBindMethod(this, data))
+	}
+	
+	raisePhraseRecognized(grammar, words) {
+		raiseEvent(kLocalMessage, "Voice", "localPhraseRecognized:" . values2String(";", grammar, words*))
+	}
+	
+	localPhraseRecognized(grammar, words*) {
+		this.phraseRecognized(grammar, words)
 	}
 	
 	remotePhraseRecognized(grammar, command, words*) {

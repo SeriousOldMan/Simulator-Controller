@@ -1,0 +1,25 @@
+[Car Data]
+BodyworkDamage=1.69773, 0, 0, 0, 1.69773
+SuspensionDamage=0, 0, 0, 0
+FuelRemaining=59.2369
+AirTemperature=20.7259
+RoadTemperature=20.7259
+TyreCompound=Wet
+TyreTemperature=85.1157, 74.317, 85.8941, 75.8253
+TyrePressure=27.1519, 27.5196, 27.2525, 27.5644
+[Stint Data]
+Active=true
+Paused=false
+Session=RACE
+DriverForname=The
+DriverSurname=BigO
+DriverNickname=TBO
+Laps=1
+LapLastTime=239608
+LapBestTime=239608
+TimeRemaining=1.58939e+06
+InPit=false
+[Race Data]
+Car=mclaren_720s_gt3
+Track=Zandvoort
+FuelAmount=125

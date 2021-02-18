@@ -159,19 +159,14 @@ lastPressure(?compound, ?tyreType, ?pressure) <= setupTyrePressure(?compound, ?t
 ;;; significant lap time reduction.                                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+priority: 5, [?Damage.Update.Suspension = true] => (Clear: Lap, !Lap, Damage.Suspension)
+priority: 5, [?Damage.Update.Bodywork = true] => (Clear: Lap, !Lap, Damage.Bodywork)
+
 {Any: [?Lap], {None: [?Damage.Repair.Suspension.Target]}, [?Damage.Update.Suspension = true]} => (Prove: updateSuspensionRepair, ?Lap)
 {Any: [?Lap], {None: [?Damage.Repair.Bodywork.Target]}, [?Damage.Update.Bodywork = true]} => (Prove: updateBodyworkRepair, ?Lap)
 
 updateSuspensionRepair(?lap) <= lapDamage(?lap, Suspension, ?damage), Set(Damage.Suspension, ?damage)
 updateBodyworkRepair(?lap) <= lapDamage(?lap, Bodywork, ?damage), Set(Damage.Bodywork, ?damage)
-
-lapDamage(?lap, Suspension, ?damage) <= lapDamage(?lap, Suspension, FL, ?fld), lapDamage(?lap, Suspension, FR, ?frd),							\
-										lapDamage(?lap, Suspension, RL, ?rld), lapDamage(?lap, Suspension, RR, ?rrd),							\
-										sum([?fld, ?frd, ?rld, ?rrd], ?damage)
-lapDamage(?lap, Bodywork, ?damage) <= lapDamage(?lap, Bodywork, Front, ?frontDmg), lapDamage(?lap, Bodywork, Rear, ?rearDmg),					\
-									  lapDamage(?lap, Bodywork, Left, ?leftDmg), lapDamage(?lap, Bodywork, Right, ?rightDmg),					\
-									  lapDamage(?lap, Bodywork, Center, ?centerDmg), 															\
-									  sum([?frontDmg, ?rearDmg, ?leftDmg, ?rightDmg, ?centerDmg], ?damage)
 
 {Any: {All: [?Race.Settings.Damage.Suspension.Repair = Always], [?Damage.Suspension > 0]},														\
 	  {All: [?Race.Settings.Damage.Suspension.Repair = Threshold],																				\
@@ -196,7 +191,7 @@ lapDamage(?lap, Bodywork, ?damage) <= lapDamage(?lap, Bodywork, Front, ?frontDmg
 			[?Damage.Bodywork < ?Race.Settings.Damage.Bodywork.Repair.Threshold]},																\
 	  {All: [?Race.Settings.Damage.Bodywork.Repair = Impact],																					\
 			[?Damage.Bodywork.Lap.Delta < ?Race.Settings.Damage.Bodywork.Repair.Threshold]}} => (Clear: Damage.Repair.Bodywork.Target)
-			
+
 {All: [?Lap], [?Damage.Suspension]} => (Set: Lap, ?Lap, Damage.Suspension, ?Damage.Suspension)
 {All: [?Lap], [?Damage.Bodywork]} => (Set: Lap, ?Lap, Damage.Bodywork, ?Damage.Bodywork)
 
@@ -211,23 +206,32 @@ lapDamage(?lap, Bodywork, ?damage) <= lapDamage(?lap, Bodywork, Front, ?frontDmg
 priority: 5, {Any: [?Damage.Suspension = 0], {None: [?Damage.Suspension]}} => (Clear: Damage.Suspension.Lap.Delta)
 priority: 5, {Any: [?Damage.Bodywork = 0], {None: [?Damage.Bodywork]}} => (Clear: Damage.Bodywork.Lap.Delta)
 
-{All: [?Lap], [?Damage.Suspension > 0]} => (Prove: lapTimeDamageImpact, ?Lap, Suspension)
-{All: [?Lap], [?Damage.Bodywork > 0]} => (Prove: lapTimeDamageImpact, ?Lap, Bodywork)
+{All: [?Lap], [?Damage.Suspension > 0]} => (Prove: lapTimeDamageImpact, ?Lap, Suspension, ?Damage.Supsension)
+{All: [?Lap], [?Damage.Bodywork > 0]} => (Prove: lapTimeDamageImpact, ?Lap, Bodywork, ?Damage.Bodywork)
 					
-lapTimeDamageImpact(?lap, ?damageType) <= lapAvgTime(?lap, ?lTime), preDamageLap(?damageType, ?pdLap), lapAvgTime(?pdLap, ?pdTime), 			\
-										  ?delta = ?pdTime - ?lTime, ?delta < 0, lapTimeStdDeviation(?pdLap, ?stdDeviation),					\
-										  abs(?delta, ?absDelta), ?damageDelta = ?absDelta - ?stdDeviation, ?damageDelta > 0,					\
-										  ?deltaSecs = ?absDelta / 1000, Set(Damage, ?damageType, Lap.Delta, ?deltaSecs)
+lapTimeDamageImpact(?lap, ?damageType, ?damage) <=																								\
+		lapAvgTime(?lap, ?lTime), preDamageLap(?damageType, ?damage, ?pdLap), lapAvgTime(?pdLap, ?pdTime),										\
+		?delta = ?pdTime - ?lTime, ?delta < 0, lapTimeStdDeviation(?pdLap, ?stdDeviation),														\
+		abs(?delta, ?absDelta), ?damageDelta = ?absDelta - ?stdDeviation, ?damageDelta > 0,														\
+		?deltaSecs = ?absDelta / 1000, Set(Damage, ?damageType, Lap.Delta, ?deltaSecs)
 
-preDamageLap(?damageType, ?lap) <= unbound?(?lap), !, preDamageLap(?damageType, !Lap, ?lap)
-preDamageLap(?, 0) <= !, fail
-preDamageLap(?, 1) <= !, fail
-preDamageLap(?damageType, ?lap) <= bound?(?lap), pitstopLap(?lap), !, fail
-preDamageLap(?damageType, ?lap) <= Get(Lap, ?lap, Damage, ?damageType, 0)
+preDamageLap(?damageType, ?, ?lap) <= Get(Lap, !Lap, Damage, ?damageType, Lap.Reference, ?lap)
+preDamageLap(?damageType, ?, ?lap) <= !Lap > 1, ?tLap = !Lap - 1, Get(Lap, ?tLap, Damage, ?damageType, Lap.Reference, ?lap),					\
+									  Set(Lap, !Lap, Damage, ?damageType, Lap.Reference, ?lap)
+preDamageLap(?damageType, ?, ?lap) <= unbound?(?lap), preDamageLap(?damageType, 0, !Lap, ?lap),													\
+									  Set(Lap, !Lap, Damage, ?damageType, Lap.Reference, ?lap)
+preDamageLap(?damageType, ?currentDamage, ?lap) <= unbound?(?lap), !, !Lap > 1, ?tLap = !Lap - 1,												\
+												   preDamageLap(?damageType, ?currentDamage, ?tLap, ?lap),										\
+												   Set(Lap, ?tLap, Damage, ?damageType, Lap.Reference, ?lap)
+preDamageLap(?, ?, 0) <= !, fail
+preDamageLap(?, ?, 1) <= !, fail
+preDamageLap(?damageType, ?, ?lap) <= bound?(?lap), pitstopLap(?lap), !, fail
+preDamageLap(?damageType, ?currentDamage, ?lap) <= Get(Lap, ?lap, Damage, ?damageType, ?prevDamage), =<(?prevDamage, ?currentDamage)
 
-preDamageLap(?, 0, ?) <= !, fail
-preDamageLap(?damageType, ?lap, ?lap) <= preDamageLap(?damageType, ?lap)
-preDamageLap(?damageType, ?candidateLap, ?lap) <= ?nCandidateLap = ?candidateLap - 1, preDamageLap(?damageType, ?nCandidateLap, ?lap)
+preDamageLap(?, ?, 0, ?) <= !, fail
+preDamageLap(?damageType, ?currentDamage, ?lap, ?lap) <= preDamageLap(?damageType, ?currentDamage, ?lap)
+preDamageLap(?damageType, ?currentDamage, ?candidateLap, ?lap) <= ?nCandidateLap = ?candidateLap - 1,											\
+																  preDamageLap(?damageType, ?currentDamage, ?nCandidateLap, ?lap)
 
 lapTimeStdDeviation(?lap, ?deviation) <= weightedLapTimes(?lap, ?lapTimes), stdDeviation(?lapTimes, ?deviation)
 
@@ -466,21 +470,34 @@ lapWeather(?lap, ?weather) <= Get(Lap, ?lap, Weather, ?weather)
 
 lapTyrePressure(?lap, ?tyreType, ?pressure) <= Get(Lap, ?lap, Tyre.Pressure, ?tyreType, ?pressure)
 
+lapTyrePressure(?lap, ?pressure) <= Get(Lap, ?lap, Tyre.Pressure, ?pressure), !
 lapTyrePressure(?lap, ?pressure) <= lapTyrePressure(?lap, FL, ?flPrs), lapTyrePressure(?lap, FR, ?frPrs),										\
 									lapTyrePressure(?lap, RL, ?rlPrs), lapTyrePressure(?lap, RR, ?rrPrs),										\
-									average([?flPrs, ?frPrs, ?rlPrs, ?rrPrs], ?pressure)
+									average([?flPrs, ?frPrs, ?rlPrs, ?rrPrs], ?pressure), Set(Lap, ?lap, Tyre.Pressure, ?pressure)
 
 lapTyreTemperature(?lap, ?tyreType, ?temperature) <= Get(Lap, ?lap, Tyre.Temperature, ?tyreType, ?temperature)
 
+lapTyreTemperature(?lap, ?temperature) <= Get(Lap, ?lap, Tyre.Temperature, ?temperature), !
 lapTyreTemperature(?lap, ?temperature) <= lapTyreTemperature(?lap, FL, ?flTemp), lapTyreTemperature(?lap, FR, ?frTemp),							\
 										  lapTyreTemperature(?lap, RL, ?rlTemp), lapTyreTemperature(?lap, RR, ?rrTemp),							\
-										  average([?flTemp, ?frTemp, ?rlTemp, ?rrTemp], ?temperature)
+										  average([?flTemp, ?frTemp, ?rlTemp, ?rrTemp], ?temperature),											\
+										  Set(Lap, ?lap, Tyre.Temperature, ?temperature)
 
 lapDamage(?lap, ?type, ?position, ?damage) <= Get(Lap, ?lap, Damage, ?type, ?position, ?damage)
 
-lapTime(?lap, ?time) <= Get(Lap, ?lap, Time, ?time)
-
+lapDamage(?lap, ?damageType, ?damage) <= Get(Lap, ?lap, Damage, ?damageType, ?damage), !
+lapDamage(?lap, Suspension, ?damage) <= lapDamage(?lap, Suspension, FL, ?fld), lapDamage(?lap, Suspension, FR, ?frd),							\
+										lapDamage(?lap, Suspension, RL, ?rld), lapDamage(?lap, Suspension, RR, ?rrd),							\
+										sum([?fld, ?frd, ?rld, ?rrd], ?damage), Set(Lap, ?lap, Damage.Suspension, ?damage)
+lapDamage(?lap, Bodywork, ?damage) <= lapDamage(?lap, Bodywork, Front, ?frontDmg), lapDamage(?lap, Bodywork, Rear, ?rearDmg),					\
+									  lapDamage(?lap, Bodywork, Left, ?leftDmg), lapDamage(?lap, Bodywork, Right, ?rightDmg),					\
+									  lapDamage(?lap, Bodywork, Center, ?centerDmg), 															\
+									  sum([?frontDmg, ?rearDmg, ?leftDmg, ?rightDmg, ?centerDmg], ?damage),										\
+									  Set(Lap, ?lap, Damage.Bodywork, ?damage)
+									  
 lapAvgFuel(?lap, ?avgFuel) <= Get(Lap, ?lap, Fuel.AvgConsumption, ?avgFuel), ?avgFuel > 0
+
+lapTime(?lap, ?time) <= Get(Lap, ?lap, Time, ?time)
 
 lapAvgTime(?lap, ?avgTime) <= weightedLapTimes(?lap, ?lapTimes),																				\
 							  sum(?lapTimes, ?sTimes), length(?lapTimes, ?sLength), ?avgTime = ?sTimes / ?sLength
@@ -656,17 +673,17 @@ one?(?value, []) <= fail
 one?(?value, [?value | ?tail]) <= !, none?(?value, ?tail)
 one?(?value, [? | ?tail]) <= one?(?value, ?tail)
 
-reverse([], [])
-reverse([?h | ?t], ?rev) <= reverse(?t, ?rt), concat(?rt, [?h], ?rev)
-
-concat([], ?l, ?l)
-concat([?h | ?t], ?l, [?h | ?r]) <= concat(?t, ?l, ?r)
-
 sequence(?x, ?x, [?x]) <= !
 sequence(?from, ?to, [?from | ?more]) <= ?temp = ?from + 1, sequence(?temp, ?to, ?more)
 				
 length([], 0)
 length([?h | ?t], ?length) <= length(?t, ?tLength), ?length = ?tLength + 1
+
+reverse([], [])
+reverse([?h | ?t], ?rev) <= reverse(?t, ?rt), concat(?rt, [?h], ?rev)
+
+concat([], ?l, ?l)
+concat([?h | ?t], ?l, [?h | ?r]) <= concat(?t, ?l, ?r)
 
 remove([], ?, [])
 remove([?h | ?t], ?h, ?result) <= remove(?t, ?h, ?result), !

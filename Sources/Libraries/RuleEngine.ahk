@@ -4012,7 +4012,7 @@ get(choicePoint, arguments*) {
 			operand1 := new Literal(resultSet.KnowledgeBase.Facts.getValue(result))
 		}
 	
-		if isInstance(operand2, Variable)
+		if (isInstance(operand2, Variable) && !operand1.isUnbound(resultSet))
 			return resultSet.unify(choicePoint, operand1, operand2)
 		else if ((operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)))
 			return false

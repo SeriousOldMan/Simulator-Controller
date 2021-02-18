@@ -689,7 +689,7 @@ else {
 			}
 		} until done
 	}
-	else {
+	else if (raceNr == 3) {
 		; 3.1	->	3.2		Report Bodywork
 		; 5.1				Recommend Pitstop
 		; 5.3	->	5.4		Report Bodywork
@@ -720,6 +720,43 @@ else {
 					if isDebug() {
 						SplashTextOn 400, 100, , % "Data " lap . "." . A_Index . " loaded..."
 						Sleep 500
+						SplashTextOff
+					}
+				}
+			}
+		} until done
+	}
+	else if (raceNr == 4) {
+		; 0.0	->	1.1		Report Bodywork
+		; 6.1	->	7.1		Recommend Strategy
+		; 11.7	->	11.8	Report Bodywork
+		; 12.10	->	13.1	Recommend Strategy
+	
+		done := false
+		
+		Loop {
+			lap := A_Index
+		
+			Loop {
+				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 4\Lap " . lap . "." . A_Index . ".data")
+			
+				if (data.Count() == 0) {
+					if (A_Index == 1)
+						done := true
+						
+					break
+				}
+				else {
+					if (A_Index == 1)
+						engineer.addLap(lap, data)
+					else
+						engineer.updateLap(lap, data)
+					
+					dumpKnowledge(engineer.KnowledgeBase)
+					
+					if isDebug() {
+						SplashTextOn 400, 100, , % "Data " lap . "." . A_Index . " loaded..."
+						Sleep 300
 						SplashTextOff
 					}
 				}

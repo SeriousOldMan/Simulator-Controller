@@ -49,7 +49,7 @@ Beside lots of new functionality for Jona, the Virtual Race Engineer, this relea
 
 The autoamated update procedure described above will add the plugin descriptor to your local configuration, but the plugin will be deactivated. You may want to activate it using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration), but to do so, you also have to add a new application on the [Applications tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-applications), which must be named "rFactor 2". Please set "startRF2" as the *Startup Function Hook*. And last but not least, you may want to add "rFactor 2" to the list of Simulators on the [General tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-general).
 
-A second step for the update requires the recreation of of the *Race Engineer.settings* file, since the format has changed substantially. Please start the *Race Engineer Settings* application, adjust all the settings and leave the dialog with the "Ok" button.
+A second step for the update requires the recreation of of the *Race Engineer.settings* file, since the format has changed substantially. Please start the *Race Engineer Settings* application, adjust all the settings and close the dialog with the "Ok" button.
 
 The last step is only required by the developers amongst you: If you are using a local version of the *Simulator Tools.targets* file, you need to take a look witth you favorite Diff tool, since the original file changed substantially as well.
 

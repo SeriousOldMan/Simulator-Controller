@@ -624,7 +624,7 @@ if !GetKeyState("Ctrl") {
 else {
 	raceNr := (GetKeyState("Alt") ? 3 : ((GetKeyState("Shift") ? 2 : 1)))
 	engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Engineer.settings")
-								   , new TestPitStopHandler(), "Jona", "en", true, true)
+								   , new TestPitStopHandler(), "Jona", "en", true, false)
 
 	engineer.setDebug(kDebugPhrases, false)
 	

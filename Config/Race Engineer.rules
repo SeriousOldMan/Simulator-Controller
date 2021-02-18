@@ -213,7 +213,8 @@ lapTimeDamageImpact(?lap, ?damageType, ?damage) <=																								\
 		lapAvgTime(?lap, ?lTime), preDamageLap(?damageType, ?damage, ?pdLap), lapAvgTime(?pdLap, ?pdTime),										\
 		?delta = ?pdTime - ?lTime, ?delta < 0, lapTimeStdDeviation(?pdLap, ?stdDeviation),														\
 		abs(?delta, ?absDelta), ?damageDelta = ?absDelta - ?stdDeviation, ?damageDelta > 0,														\
-		?deltaSecs = ?absDelta / 1000, Set(Damage, ?damageType, Lap.Delta, ?deltaSecs)
+		?deltaSecs = ?absDelta / 1000, Set(Damage, ?damageType, Lap.Delta, ?deltaSecs), !
+lapTimeDamageImpact(?lap, ?damageType, ?damage) <= Set(Damage, ?damageType, Lap.Delta, false)
 
 preDamageLap(?damageType, ?, ?lap) <= Get(Lap, !Lap, Damage, ?damageType, Lap.Reference, ?lap)
 preDamageLap(?damageType, ?, ?lap) <= !Lap > 1, ?tLap = !Lap - 1, Get(Lap, ?tLap, Damage, ?damageType, Lap.Reference, ?lap),					\
@@ -252,6 +253,11 @@ priority: 5, {All: {Any: [?Damage.Suspension.Lap.Delta = 0], {None: [?Damage.Sus
 	  {Any: {None: [?Damage.Repair.Analysis.Reported]}, [?Damage.Repair.Analysis.Reported <= ?Damage.Reported]},								\
 	  {Any: [?Damage.Suspension.Lap.Delta > 0], [?Damage.Bodywork.Lap.Delta > 0]}} =>															\
 		(Prove: reportAnalysis, !Damage.Suspension.Lap.Delta, !Damage.Bodywork.Lap.Delta)
+				   
+{All: [?Lap], [?Damage.Reported],																												\
+	  {Any: {None: [?Damage.Repair.Analysis.Reported]}, [?Damage.Repair.Analysis.Reported <= ?Damage.Reported]},								\
+	  {All: [?Damage.Suspension.Lap.Delta = false], [?Damage.Bodywork.Lap.Delta = false]}} =>															\
+		(Prove: reportAnalysis, 0, 0)
 
 reportAnalysis(?sDelta, ?bDelta) <= unbound?(?sDelta), reportAnalysis(?bDelta), !
 reportAnalysis(?sDelta, ?bDelta) <= unbound?(?bDelta), reportAnalysis(?sDelta), !

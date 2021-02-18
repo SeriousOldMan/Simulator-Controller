@@ -330,8 +330,9 @@ lowFuelWarning(?lap, ?remainingLaps) <= Call(lowFuelWarning, ?remainingLaps)
 ;;; weather trends and weather forecast information (as far as available).  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-projectedWeather(?lap, ?weather) <= sequence(1, !Lap, ?indices), lapWeathers(!Lap, ?weathers), reverse(?weathers, ?rWeathers),					\
-									linRegression(?indices, ?rWeathers, ?a, ?b), ?temp = ?b * ?lap, ?weather = ?a + ?temp
+projectedWeather(?lap, ?weather) <=																												\
+		sequence(1, !Lap, ?indices), lapWeathers(!Lap, ?weathers), reverse(?weathers, ?rWeathers),												\
+		linRegression(?indices, ?rWeathers, ?a, ?b), ?temp = ?b * ?lap, ?weather = ?a + ?temp
 
 projectedTrackTemperature(?lap, ?temperature) <=																								\
 		sequence(1, !Lap, ?indices), lapTrackTemperatures(!Lap, ?temperatures), reverse(?temperatures, ?rTemperatures),							\
@@ -633,7 +634,7 @@ avgDeltaProductSums([?h1 | ?t1], ?avg1, [?h2 | ?t2], ?avg2, ?sum1, ?sum2) <=				
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                             General Rules                               ;;;
+;;;                             Utility Rules                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 =<(?x, ?y) <= ?x = ?y

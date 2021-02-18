@@ -2533,6 +2533,12 @@ class TranslationsEditor extends ConfigurationItem {
 	iTranslationsList := false
 	iClosed := false
 	
+	TranslationsList[] {
+		Get {
+			return this.iTranslationsList
+		}
+	}
+	
 	__New(configuration) {
 		base.__New(configuration)
 		
@@ -2802,6 +2808,8 @@ global translationsListView
 
 global originalTextEdit = ""
 global translationTextEdit = ""
+
+global nextUntranslatedButtonHandle
 		
 class TranslationsList extends ConfigurationItemList {
 	iChanged := false
@@ -2821,7 +2829,10 @@ class TranslationsList extends ConfigurationItemList {
 		Gui TE:Add, Edit, x110 yp w283 h80 Disabled VoriginalTextEdit, %originalTextEdit%
 	
 		Gui TE:Add, Text, x16 w86 h23 +0x200, % translate("Translation")
+		; Gui TE:Add, Button, x85 yp w23 h23 Default HwndnextUntranslatedButtonHandle gnextUntranslated
+		; setButtonIcon(nextUntranslatedButtonHandle, kIconsDirectory . "Down Arrow.ico", 1)
 		Gui TE:Add, Edit, x110 yp w283 h80 VtranslationTextEdit, %translationTextEdit%
+		
 		
 		return translationsListViewHandle
 	}
@@ -2891,6 +2902,14 @@ class TranslationsList extends ConfigurationItemList {
 		base.openEditor(itemIndex)
 	}
 	
+	findNextUntranslated() {
+		for index, translation in this.iItemsList
+			if ((index > this.iCurrentItemIndex) && (translation[2] = ""))
+				return index
+			
+		return false
+	}
+	
 	newTranslations() {
 		this.loadTranslations("en")
 		
@@ -2947,6 +2966,22 @@ class TranslationsList extends ConfigurationItemList {
 		return false
 	}
 }
+
+nextUntranslated() {
+	protectionOn()
+	
+	try {
+		list := TranslationsEditor.Instance.TranslationsList
+		untranslated := list.findNextUntranslated()
+		
+		if untranslated
+			list.openEditor(untranslated)
+	}
+	finally {
+		protectionOff()
+	}
+}
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;

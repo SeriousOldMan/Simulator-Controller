@@ -462,6 +462,10 @@ class SimulatorController extends ConfigurationItem {
 		this.iButtonBox := buttonBox
 	}
 	
+	unregisterButtonBox(buttonBox) {
+		this.iButtonBox := false
+	}
+	
 	registerPlugin(plugin) {
 		if !inList(this.Plugins, plugin) {
 			logMessage(kLogInfo, translate("Plugin ") . translate(getPluginForLogMessage(plugin)) . (this.isActive(plugin) ? translate(" (Active)") : translate(" (Inactive)")) . translate(" registered"))

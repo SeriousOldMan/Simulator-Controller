@@ -728,7 +728,7 @@ else {
 	}
 	else if (raceNr == 4) {
 		; 0.0	->	1.1		Report Bodywork
-		; 6.1	->	7.1		Recommend Strategy
+		; 2.1	->	3.1		Recommend Strategy
 		; 11.7	->	11.8	Report Bodywork
 		; 12.10	->	13.1	Recommend Strategy
 	

@@ -1448,7 +1448,7 @@ class RaceEngineer extends ConfigurationItem {
 				}
 			}
 			else if (repair == false)
-				speaker.speakPhrase("NoRepairPitstop", {laps: stintLaps, delta: delta})
+				speaker.speakPhrase((delta == 0) ? "NoTimeLost" : "NoRepairPitstop", {laps: stintLaps, delta: delta})
 		}
 	}
 	

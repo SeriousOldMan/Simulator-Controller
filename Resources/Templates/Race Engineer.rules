@@ -246,16 +246,18 @@ lapTimeStdDeviation(?lap, ?deviation) <= weightedLapTimes(?lap, ?lapTimes), stdD
 priority: 5, {All: {Any: [?Damage.Suspension.Lap.Delta = 0], {None: [?Damage.Suspension.Lap.Delta]},											\
 						 [?Damage.Suspension = 0], {None: [?Damage.Suspension]}},																\
 				   {Any: [?Damage.Bodywork.Lap.Delta = 0], {None: [?Damage.Bodywork.Lap.Delta]},												\
-						 [?Damage.Bodywork = 0], {None: [?Damage.Bodywork]}}} => (Clear: Damage.Repair.Analysis.Reported)
+						 [?Damage.Bodywork = 0], {None: [?Damage.Bodywork]}}} => (Clear: Damage.Analysis.Reported)
 				   
 {All: [?Lap], [?Damage.Reported],																												\
-	  {Any: {None: [?Damage.Repair.Analysis.Reported]}, [?Damage.Repair.Analysis.Reported <= ?Damage.Reported]},								\
+	  {Any: {None: [?Damage.Analysis.Reported]},																								\
+			{All: [?Damage.Analysis.Reported <= ?Damage.Reported], [?Damage.Analysis.Reported < ?Lap]}},										\
 	  {Any: [?Damage.Suspension.Lap.Delta > 0], [?Damage.Bodywork.Lap.Delta > 0]}} =>															\
 		(Prove: reportAnalysis, !Damage.Suspension.Lap.Delta, !Damage.Bodywork.Lap.Delta)
 				   
 {All: [?Lap], [?Damage.Reported],																												\
-	  {Any: {None: [?Damage.Repair.Analysis.Reported]}, [?Damage.Repair.Analysis.Reported <= ?Damage.Reported]},								\
-	  {None: [?Damage.Suspension.Lap.Delta], [?Damage.Bodywork.Lap.Delta]}} =>															\
+	  {Any: {None: [?Damage.Analysis.Reported]},																								\
+			{All: [?Damage.Analysis.Reported <= ?Damage.Reported], [?Damage.Analysis.Reported < ?Lap]}},										\
+	  {None: [?Damage.Suspension.Lap.Delta], [?Damage.Bodywork.Lap.Delta]}} =>																	\
 		(Prove: reportAnalysis, 0, 0)
 
 reportAnalysis(?sDelta, ?bDelta) <= unbound?(?sDelta), reportAnalysis(?bDelta), !
@@ -266,10 +268,10 @@ reportAnalysis(?sDelta, ?bDelta) <= ?temp = !Damage.Reported + 1, !Lap > ?temp,	
 
 reportAnalysis(?lostTime, ?stintLaps, ?delta) <= >=(?lostTime, !Race.Settings.Pitstop.Duration), 												\
 												 Call(reportDamageAnalysis, true, ?stintLaps, ?delta),											\
-												 Set(Damage.Repair.Analysis.Reported, !Lap)
+												 Set(Damage.Analysis.Reported, !Lap)
 reportAnalysis(?lostTime, ?stintLaps, ?delta) <= ?lostTime < !Race.Settings.Pitstop.Duration, 													\
 												 Call(reportDamageAnalysis, false, ?stintLaps, ?delta),											\
-												 Set(Damage.Repair.Analysis.Reported, !Lap)
+												 Set(Damage.Analysis.Reported, !Lap)
 
 
 ;;;-------------------------------------------------------------------------;;;

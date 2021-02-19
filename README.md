@@ -26,15 +26,13 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-[2.3.0-alpha](https://www.dropbox.com/s/fwpjuvz7r12wvzu/Simulator%20Controller%202.3.0-alpha.zip?dl=1) (First preview on the upcoming Release 2.3. New features: Automated check for new version online on GitHub; New rules for damage impact analysis, reporting and pit strategy adjustments; rFactor 2 Skeleton Plugin. Feature complete including automated configuration update and documentation updates.)
-
-Important: Please read the [update notes on Release 2.3](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-23) carefully, since there is a manual step necessary, if you want to use the new rFactor 2 plugin.
+None at the moment...
 
 #### Latest release builds
 
-[2.1.3-release](https://www.dropbox.com/s/6fgaiz06j6f3ieh/Simulator%20Controller%202.1.3-release.zip?dl=1) (Maintenance for Release 2.1 with some new features, see [release notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes))
-
 [2.2.0-release](https://www.dropbox.com/s/51msb97666harbl/Simulator%20Controller%202.2.0-release.zip?dl=1) (New features: 1. UI for Virtual Race Engineer Configuration; 2. Voice recognition for controller functions. See the [release notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) for an overview including links to the updated documentation.)
+
+[2.3.0-release](https://www.dropbox.com/s/lsjs4dyl328qyqq/Simulator%20Controller%202.3.0-release.zip?dl=1) (New features: Automated check for new version online on GitHub; New rules for damage impact analysis, reporting and pit strategy adjustments; rFactor 2 Skeleton Plugin. Important: Please read the [update notes on Release 2.3](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-23) carefully, since there is a manual step involved, if you want to use the new rFactor 2 plugin and there might be some tweaks necessary for the *Race Engineer.settings* file.)
 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [update notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-20) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.

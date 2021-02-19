@@ -1,5 +1,4 @@
-## 2.3-release upcoming...
-
+## 2.3-release 02/19/21
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. Lots of new stuff in the Jona AI kernel

@@ -249,12 +249,14 @@ priority: 5, {All: {Any: [?Damage.Suspension.Lap.Delta = 0], {None: [?Damage.Sus
 						 [?Damage.Bodywork = 0], {None: [?Damage.Bodywork]}}} => (Clear: Damage.Analysis.Reported)
 				   
 {All: [?Lap], [?Damage.Reported],																												\
+	  {None: [?Damage.Analysis.Reported > ?Damage.Reported]},																					\
 	  {Any: {None: [?Damage.Analysis.Reported]},																								\
 			{All: [?Damage.Analysis.Reported <= ?Damage.Reported], [?Damage.Analysis.Reported < ?Lap]}},										\
 	  {Any: [?Damage.Suspension.Lap.Delta > 0], [?Damage.Bodywork.Lap.Delta > 0]}} =>															\
 		(Prove: reportAnalysis, !Damage.Suspension.Lap.Delta, !Damage.Bodywork.Lap.Delta)
 				   
 {All: [?Lap], [?Damage.Reported],																												\
+	  {None: [?Damage.Analysis.Reported > ?Damage.Reported]},																					\
 	  {Any: {None: [?Damage.Analysis.Reported]},																								\
 			{All: [?Damage.Analysis.Reported <= ?Damage.Reported], [?Damage.Analysis.Reported < ?Lap]}},										\
 	  {None: [?Damage.Suspension.Lap.Delta], [?Damage.Bodywork.Lap.Delta]}} =>																	\

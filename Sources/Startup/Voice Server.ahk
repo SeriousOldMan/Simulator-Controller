@@ -177,9 +177,8 @@ class VoiceServer extends ConfigurationItem {
 			
 		if isDebug() {
 			nextCharIndex := 1
-			SplashTextOn 400, 100, , % "Register voice command: " . new GrammarCompiler(recognizer).readGrammar(command, nextCharIndex).toString()
-			Sleep 1000
-			SplashTextOff
+			
+			showMessage("Register voice command: " . new GrammarCompiler(recognizer).readGrammar(command, nextCharIndex).toString())					  
 		}
 		
 		try {
@@ -188,24 +187,16 @@ class VoiceServer extends ConfigurationItem {
 		catch exception {
 			logMessage(kLogCritical, translate("Error while registering voice command """) . command . translate(""" - please check the configuration"))
 		
-			title := translate("Modular Simulator Controller System")
-			
-			SplashTextOn 800, 60, %title%, % substituteVariables(translate("Cannot register voice command ""%command%"" - please check the configuration..."), {command: command})
-					
-			Sleep 5000
-						
-			SplashTextOff
+			showMessage(substituteVariables(translate("Cannot register voice command ""%command%"" - please check the configuration..."), {command: command})
+					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 		}
 		
 		this.iVoiceCommands[grammar] := Array(command, pid, callback)
 	}
 	
 	voiceCommandRecognized(grammar, words) {
-		if isDebug() {
-			SplashTextOn 400, 100, , % "Voice command recognized: " . values2String(" ", words*)
-			Sleep 1000
-			SplashTextOff
-		}
+		if isDebug()
+			showMessage("Voice command recognized: " . values2String(" ", words*))
 		
 		descriptor := this.iVoiceCommands[grammar]
 		

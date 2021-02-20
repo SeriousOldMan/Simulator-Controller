@@ -361,13 +361,8 @@ callSimHub(command) {
 	catch exception {
 		logMessage(kLogCritical, translate("Error while connecting to SimHub (") . kSimHub . translate("): ") . exception.Message . translate(" - please check the configuration"))
 		
-		title := translate("Modular Simulator Controller System")
-		
-		SplashTextOn 800, 60, %title%, % translate("Cannot connect to SimHub (%kSimHub%) - please check the configuration...")
-				
-		Sleep 5000
-					
-		SplashTextOff
+		showMessage(translate("Cannot connect to SimHub (%kSimHub%) - please check the configuration...")
+				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			
 		return 0
 	}

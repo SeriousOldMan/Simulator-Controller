@@ -1085,14 +1085,9 @@ class ACCPlugin extends ControllerPlugin {
 			}
 			catch exception {
 				logMessage(kLogCritical, translate("Cannot start Race Engineer (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
-				
-				title := translate("Modular Simulator Controller System - Controller (Plugin: ACC)")
-				
-				SplashTextOn 800, 60, %title%, % substituteVariables(translate("Cannot start Race Engineer (%kBinariesDirectory%Race Engineer.exe) - please rebuild the applications..."))
-					
-				Sleep 5000
-					
-				SplashTextOff
+			
+				showMessage(substituteVariables(translate("Cannot start Race Engineer (%kBinariesDirectory%Race Engineer.exe) - please rebuild the applications..."))
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				
 				return false
 			}
@@ -1434,14 +1429,9 @@ openRaceEngineerSettings() {
 	}
 	catch exception {
 		logMessage(kLogCritical, translate("Cannot start the Race Engineers Settings tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
-		
-		title := translate("Modular Simulator Controller System - Controller (Plugin: ACC)")
-	
-		SplashTextOn 800, 60, %title%, % substituteVariables(translate("Cannot start the Race Engineers Settings application (%exePath%) - please check the configuration..."), {exePath: exePath})
-				
-		Sleep 5000
-				
-		SplashTextOff
+			
+		showMessage(substituteVariables(translate("Cannot start the Race Engineers Settings application (%exePath%) - please check the configuration..."), {exePath: exePath})
+				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 	}
 }
 
@@ -1458,14 +1448,9 @@ readSharedMemory(dataFile) {
 	}
 	catch exception {
 		logMessage(kLogCritical, translate("Cannot start ACC SHM Reader (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
-		
-		title := translate("Modular Simulator Controller System - Controller (Plugin: ACC)")
-	
-		SplashTextOn 800, 60, %title%, % substituteVariables(translate("Cannot start ACC SHM Reader (%exePath%) - please check the configuration..."), {exePath: exePath})
-				
-		Sleep 5000
-				
-		SplashTextOff
+			
+		showMessage(substituteVariables(translate("Cannot start ACC SHM Reader (%exePath%) - please check the configuration..."), {exePath: exePath})
+				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 	}
 	
 	return readConfiguration(dataFile)
@@ -1525,11 +1510,8 @@ collectRaceData() {
 				return
 			}
 		}
-		else {
-			SplashTextOn 400, 100, , % "Data " lap . "." . counter++ . " loaded..."
-			Sleep 500
-			SplashTextOff
-		}
+		else
+			showMessage("Data " lap . "." . counter++ . " loaded...")
 		
 		dataLastLap := getConfigurationValue(data, "Stint Data", "Laps", 0)
 		*/

@@ -117,8 +117,6 @@ class ButtonBox extends ConfigurationItem {
 	__New(controller, configuration := false) {
 		this.iController := controller
 		
-		ButtonBox.Instance := this
-		
 		base.__New(configuration)
 		
 		this.createWindow(window, width, height)
@@ -187,9 +185,9 @@ class ButtonBox extends ConfigurationItem {
 		
 		if (duration > 0) {
 			if this.iIsVisible
-				SetTimer hideButtonBox, %duration%
+				SetTimer hideButtonBoxes, %duration%
 			else {
-				SetTimer hideButtonBox, Off
+				SetTimer hideButtonBoxes, Off
 		
 				protectionOn()
 
@@ -242,8 +240,8 @@ defaultCase:
 						this.iIsVisible := true
 					}
 					
-					SetTimer hideButtonBox, On
-					SetTimer hideButtonBox, %duration%
+					SetTimer hideButtonBoxes, On
+					SetTimer hideButtonBoxes, %duration%
 				}
 				finally {
 					protectionOff()
@@ -266,14 +264,14 @@ defaultCase:
 	
 			this.iIsVisible := false
 	
-			SetTimer hideButtonBox, Off
+			SetTimer hideButtonBoxes, Off
 		}
 		finally {
 			protectionOff()
 		}
 	}
 	
-	moveByMouse(button := "LButton") {
+	moveByMouse(window, button := "LButton") {
 		curCoordMode := A_CoordModeMouse
 		
 		CoordMode Mouse, Screen
@@ -291,7 +289,7 @@ defaultCase:
 				newX := winX + (x - anchorX)
 				newY := winY + (y - anchorY)
 				
-				Gui SBB:Show, X%newX% Y%newY%
+				Gui %window%:Show, X%newX% Y%newY%
 			}
 			
 			settings := this.Controller.Settings
@@ -312,7 +310,7 @@ class SimulatorController extends ConfigurationItem {
 	
 	iPlugins := []
 	iFunctions := {}
-	iButtonBox := false
+	iButtonBoxes := []
 	
 	iModes := []
 	iActiveMode := false
@@ -339,9 +337,9 @@ class SimulatorController extends ConfigurationItem {
 		}
 	}
 	
-	ButtonBox[] {
+	ButtonBoxes[] {
 		Get {
-			return this.iButtonBox
+			return this.iButtonBoxes
 		}
 	}
 	
@@ -459,11 +457,15 @@ class SimulatorController extends ConfigurationItem {
 	}
 	
 	registerButtonBox(buttonBox) {
-		this.iButtonBox := buttonBox
+		if !inList(this.iButtonBoxes, buttonBox)
+			this.iButtonBoxes.Push(buttonBox)
 	}
 	
 	unregisterButtonBox(buttonBox) {
-		this.iButtonBox := false
+		index := inList(this.iButtonBoxes, buttonBox)
+		
+		if index
+			this.iButtonBoxes.RemoveAt(index)
 	}
 	
 	registerPlugin(plugin) {
@@ -502,26 +504,22 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	simulatorStartup(simulator) {
-		local buttonBox := this.ButtonBox
-	
 		for ignore, thePlugin in this.Plugins
 			if this.isActive(thePlugin)
 				thePlugin.simulatorStartup(simulator)
 		
-		if (buttonBox != false) {
+		for ignore, btnBox in this.ButtonBoxes {
 			buttonBox.hide()
 			buttonBox.show()
 		}
 	}
 	
 	simulatorShutdown() {
-		local buttonBox := this.ButtonBox
-		
 		for ignore, thePlugin in this.Plugins
 			if this.isActive(thePlugin) 
 				thePlugin.simulatorShutdown()
 		
-		if (buttonBox != false) {
+		for ignore, btnBox in this.ButtonBoxes {
 			buttonBox.hide()
 			buttonBox.show()
 		}
@@ -803,9 +801,7 @@ class ControllerFunction {
 	}
 	
 	setText(text, color := "Black") {
-		btnBox := this.Controller.ButtonBox
-		
-		if (btnBox != false)
+		for ignore, btnBox in this.Controller.ButtonBoxes
 			btnBox.setControlText(this, text, color)
 	}
 	
@@ -849,13 +845,9 @@ class ControllerFunction {
 					catch exception {
 						logMessage(kLogCritical, translate("Error while registering hotkey ") . theHotkey . translate(" - please check the configuration"))
 			
-						title := translate("Modular Simulator Controller System")
+						showMessage(substituteVariables(translate("Cannot register hotkey %hotkey% - please check the configuration..."), {hotKey: theHotKey})
+								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 						
-						SplashTextOn 800, 60, %title%, % substituteVariables(translate("Cannot register hotkey %hotkey% - please check the configuration..."), {hotKey: theHotKey})
-								
-						Sleep 5000
-									
-						SplashTextOff
 					}
 			}
 		}
@@ -1218,8 +1210,9 @@ class ControllerAction {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-hideButtonBox() {
-	ButtonBox.Instance.hide()
+hideButtonBoxes() {
+	for ignore, btnBox in SimulatorController.Instance.ButtonBoxes
+		btnBox.hide()
 }
 
 setHotkeyEnabled(function, trigger, enabled) {
@@ -1288,8 +1281,6 @@ updateSimulatorState() {
 
 	try {
 		updateTrayMessageState()
-	
-		btnBox := controller.ButtonBox
 			
 		if (isSimulatorRunning != (controller.ActiveSimulator != false)) {
 			isSimulatorRunning := !isSimulatorRunning
@@ -1299,7 +1290,7 @@ updateSimulatorState() {
 			else
 				controller.simulatorShutdown()
 
-			if (btnBox != false)
+			for ignore, btnBox in controller.ButtonBoxes
 				btnBox.updateVisibility()
 		}
 		
@@ -1311,7 +1302,12 @@ updateSimulatorState() {
 		else {
 			SetTimer updateSimulatorState, -1000
 
-			if ((btnBox != false) && !btnBox.isVisible())
+			show := true
+			
+			for ignore, btnBox in controller.ButtonBoxes
+				show := (show && !btnBox.isVisible())
+			
+			if show
 				controller.showLogo()
 		}
 	}

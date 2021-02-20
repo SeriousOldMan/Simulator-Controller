@@ -809,14 +809,9 @@ runBuildTargets(ByRef buildProgress) {
 			}
 			catch exception {
 				logMessage(kLogCritical, translate("Cannot compile ") . targetSource . translate(" - source file or AHK Compiler (") . kCompiler . translate(") not found"))
-			
-				title := translate("Modular Simulator Controller System - Compiler")
-				
-				SplashTextOn 800, 60, %title%, % substituteVariables(translate("Cannot compile %targetSource%: Source file or AHK Compiler (%kCompiler%) not found..."), {targetSource: targetSource, kCompiler: kCompiler})
-				
-				Sleep 5000
-				
-				SplashTextOff
+		
+				showMessage(substituteVariables(translate("Cannot compile %targetSource%: Source file or AHK Compiler (%kCompiler%) not found..."), {targetSource: targetSource, kCompiler: kCompiler})
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
 			
 			SplitPath targetBinary, compiledFile, targetDirectory

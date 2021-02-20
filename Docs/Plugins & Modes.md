@@ -142,7 +142,9 @@ With the following parameters you can configure the available effects for the "M
 
 Important: Please be aware, that any spaces in effect names must be substituted with an underscore, since spaces are allowed in *SimFeedback* effect names, but not in plugin arguments. The underscores will be replaced with spaces again, before being transmitted to *SimFeedback*.
 
-Note: To supply the labels, that will be displayed for all these effects and triggers on the visual representation of your controller hardware, use the *Labels Editor*, which is available at the [Plugins tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) of the configuration tool.
+Note: To change the labels, that are displayed for all these effects and triggers on the visual representation of your controller hardware, use the *Labels Editor*, which is available at the [Plugins tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) of the configuration tool.
+
+Last but not least, the connection between the "Motion Feedback" plugin and *SimFeedback* still has some stabilty issues. Looks like the root cause is located in the *SFX-100-Streamdeck* extension. For a workaround click on "Reload Profile..." button in the Extensions tab in SimFeedback, if you see strange numbers in the Button Box "Motion" mode page.
 
 ## Plugin *Pedal Calibration*
 

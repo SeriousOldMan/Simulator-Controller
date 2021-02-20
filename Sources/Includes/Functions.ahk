@@ -765,6 +765,59 @@ getAllThemes() {
 	return themes
 }
 
+showMessage(message, title := "Modular Simulator Controller System", icon := "Information.png", duration := 1000
+		  , x := "Center", y := "Bottom", width := 400, height := 100) {
+	innerWidth := width - 16
+	
+	if (!title || (title = ""))
+		title := "Modular Simulator Controller System"
+	
+	Gui SM:-Border -Caption
+	Gui SM:Color, D0D0D0
+	Gui SM:Font, s10 Bold
+	Gui SM:Add, Text, x8 y8 W%innerWidth% +0x200 +0x1 BackgroundTrans, % translate(title)
+	Gui SM:Font
+	
+	if icon {
+		Gui SM:Add, Picture, w50 h50, % kResourcesDirectory . "Icons\" . Icon
+		
+		innerWidth -= 66
+		
+		Gui SM:Add, Text, X74 YP+5 W%innerWidth% H%height%, % message
+	}
+	else
+		Gui SM:Add, Text, X8 YP+30 W%innerWidth% H%height%, % message
+	
+	SysGet mainScreen, MonitorWorkArea
+
+	if x is not integer
+		switch x {
+			case "Left":
+				x := 25
+			case "Right":
+				x := mainScreenRight - width - 25
+			default:
+				x := "Center"
+		}
+
+	if y is not integer
+		switch y {
+			case "Top":
+				y := 25
+			case "Bottom":
+				y := mainScreenBottom - height - 25
+			default:
+				y := "Center"
+		}
+	
+	Gui SM:+AlwaysOnTop
+	Gui SM:Show, X%x% Y%y% W%width% H%height%
+	
+	Sleep %duration%
+	
+	Gui SM:Destroy
+}
+
 moveByMouse(window) {
 	curCoordMode := A_CoordModeMouse
 	

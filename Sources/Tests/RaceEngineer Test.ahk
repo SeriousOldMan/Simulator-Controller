@@ -58,11 +58,8 @@ class TestRaceEngineer extends RaceEngineer {
 	lowFuelWarning(remainingLaps) {
 		base.lowFuelWarning(remainingLaps)
 		
-		if isDebug() {
-			SplashTextOn 400, 100, , % "Low fuel warning - " . remainingLaps . " lap left"
-			Sleep 1000
-			SplashTextOff
-		}
+		if isDebug()
+			showMessage("Low fuel warning - " . remainingLaps . " lap left")
 		
 		vFuelWarnings[this.KnowledgeBase.getValue("Lap")] := remainingLaps
 	}
@@ -70,11 +67,8 @@ class TestRaceEngineer extends RaceEngineer {
 	damageWarning(newSuspensionDamage, newBodyworkDamage) {
 		base.damageWarning(newSuspensionDamage, newBodyworkDamage)
 		
-		if isDebug() {
-			SplashTextOn 400, 100, , % "Damage warning for " . (newSuspensionDamage ? "Suspension " : "") . (newBodyworkDamage ? "Bodywork" : "")
-			Sleep 1000
-			SplashTextOff
-		}
+		if isDebug()
+			showMessage("Damage warning for " . (newSuspensionDamage ? "Suspension " : "") . (newBodyworkDamage ? "Bodywork" : ""))
 		
 		vSuspensionDamage := newSuspensionDamage
 		vBodyworkDamage := newBodyworkDamage
@@ -83,11 +77,8 @@ class TestRaceEngineer extends RaceEngineer {
 
 class TestPitstopHandler {
 	showAction(action, arguments*) {
-		if isDebug() {
-			SplashTextOn 400, 100, , % "Invoking pitstop action " . action . ((arguments.Length() > 0) ? (" with " . values2String(", ", arguments*)) : "")
-			Sleep 1000
-			SplashTextOff
-		}
+		if isDebug()
+			showMessage("Invoking pitstop action " . action . ((arguments.Length() > 0) ? (" with " . values2String(", ", arguments*)) : ""))
 	}
 
 	pitstopPlanned(pitstopNumber) {
@@ -624,7 +615,7 @@ if !GetKeyState("Ctrl") {
 else {
 	raceNr := (GetKeyState("Alt") ? 3 : ((GetKeyState("Shift") ? 2 : 1)))
 	engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Engineer.settings")
-								   , new TestPitStopHandler(), "Jona", "en", true, false)
+								   , new TestPitStopHandler(), "Jona", "en", true, true)
 
 	engineer.setDebug(kDebugPhrases, false)
 	
@@ -680,11 +671,8 @@ else {
 					
 					dumpKnowledge(engineer.KnowledgeBase)
 					
-					if isDebug() {
-						SplashTextOn 400, 100, , % "Data " lap . "." . A_Index . " loaded..."
-						Sleep 500
-						SplashTextOff
-					}
+					if isDebug()
+						showMessage("Data " lap . "." . A_Index . " loaded...")
 				}
 			}
 		} until done
@@ -717,11 +705,8 @@ else {
 					
 					dumpKnowledge(engineer.KnowledgeBase)
 					
-					if isDebug() {
-						SplashTextOn 400, 100, , % "Data " lap . "." . A_Index . " loaded..."
-						Sleep 500
-						SplashTextOff
-					}
+					if isDebug()
+						showMessage("Data " lap . "." . A_Index . " loaded...")
 				}
 			}
 		} until done
@@ -754,11 +739,8 @@ else {
 					
 					dumpKnowledge(engineer.KnowledgeBase)
 					
-					if isDebug() {
-						SplashTextOn 400, 100, , % "Data " lap . "." . A_Index . " loaded..."
-						Sleep 300
-						SplashTextOff
-					}
+					if isDebug()
+						showMessage("Data " lap . "." . A_Index . " loaded...")
 				}
 			}
 		} until done

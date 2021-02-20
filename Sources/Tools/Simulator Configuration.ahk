@@ -2829,8 +2829,8 @@ class TranslationsList extends ConfigurationItemList {
 		Gui TE:Add, Edit, x110 yp w283 h80 Disabled VoriginalTextEdit, %originalTextEdit%
 	
 		Gui TE:Add, Text, x16 w86 h23 +0x200, % translate("Translation")
-		; Gui TE:Add, Button, x85 yp w23 h23 Default HwndnextUntranslatedButtonHandle gnextUntranslated
-		; setButtonIcon(nextUntranslatedButtonHandle, kIconsDirectory . "Down Arrow.ico", 1)
+		Gui TE:Add, Button, x85 yp w23 h23 Default HwndnextUntranslatedButtonHandle gnextUntranslated
+		setButtonIcon(nextUntranslatedButtonHandle, kIconsDirectory . "Down Arrow.ico", 1)
 		Gui TE:Add, Edit, x110 yp w283 h80 VtranslationTextEdit, %translationTextEdit%
 		
 		
@@ -2843,7 +2843,7 @@ class TranslationsList extends ConfigurationItemList {
 		Gui ListView, % this.ListHandle
 	
 		LV_Delete()
-		
+			
 		for ignore, translation in this.iItemsList
 			LV_Add("", translation[1], translation[2])
 		
@@ -2906,7 +2906,12 @@ class TranslationsList extends ConfigurationItemList {
 		for index, translation in this.iItemsList
 			if ((index > this.iCurrentItemIndex) && (translation[2] = ""))
 				return index
-			
+		
+		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+		title := translate("Information")
+		MsgBox 262192, %title%, % translate("There is no missing translation...")
+		OnMessage(0x44, "")
+		
 		return false
 	}
 	

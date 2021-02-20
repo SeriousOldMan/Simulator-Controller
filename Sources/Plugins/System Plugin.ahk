@@ -416,13 +416,8 @@ restoreSimulatorVolume() {
 			}
 		}
 		catch exception {
-			title := translate("Modular Simulator Controller System - Controller (Plugin: System)")
-			
-			SplashTextOn 800, 60, %title%, % substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
-					
-			Sleep 5000
-					
-			SplashTextOff
+			showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
+					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 		}
 }
 
@@ -441,13 +436,8 @@ muteSimulator() {
 				Run %kNirCmd% setappvolume /%pid% 0.0
 			}
 			catch exception {
-				title := translate("Modular Simulator Controller System - Controller (Plugin: System)")
-			
-				SplashTextOn 800, 60, %title%, % substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
-						
-				Sleep 5000
-						
-				SplashTextOff
+				showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
 	
 		SetTimer unmuteSimulator, 500

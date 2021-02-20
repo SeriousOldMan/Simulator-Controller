@@ -10,6 +10,16 @@ General Release Actions
 8. Update "Backlog.md"
 9. Check, whether update documentation for the release is required in "Updates.md"
 
+Release 2.4 Checklist
+=====================
+1. New methods and functions
+   a. unregisterButtonBox
+   b. ButtonBoxes
+   c. showSplashMessage
+2. Documentation for nextUntranslated
+3. Documentation for multiple Button Boxes
+4. Documentation for new Jona functionality
+
 Release 2.3 Checklist
 =====================
 1. New plugin RF2 - Configuration update task needed

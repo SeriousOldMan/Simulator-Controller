@@ -148,14 +148,9 @@ class SimulatorStartup extends ConfigurationItem {
 		}
 		catch exception {
 			logMessage(kLogCritical, translate("Cannot start Simulator Controller (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
-			
-			title := translate("Modular Simulator Controller System - Startup")
-			
-			SplashTextOn 800, 60, %title%, % substituteVariables(translate("Cannot start Simulator Controller (%kBinariesDirectory%Simulator Controller.exe) - please rebuild the applications..."))
-				
-			Sleep 5000
-				
-			SplashTextOff
+		
+			showMessage(substituteVariables(translate("Cannot start Simulator Controller (%kBinariesDirectory%Simulator Controller.exe) - please rebuild the applications..."))
+					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			
 			return 0
 		}

@@ -17,4 +17,5 @@
   1. Choosing a specific theme depending on the selected simulation game
   2. Again, better UI flow in the configuration tool and larger window size
   3. [Target: V2.4]Better support in translation tool for missing translations
-  4. [Target: V2.7]Plugin support for the configuration tool
+  4. [Target: V2.4]Better presentation of error messages and position out of sight
+  5. [Target: V2.7]Plugin support for the configuration tool

@@ -495,9 +495,8 @@ class RaceEngineer extends ConfigurationItem {
 		
 			if this.Debug[kDebugGrammars] {
 				nextCharIndex := 1
-				SplashTextOn 400, 100, , % "Register phrase grammar: " . new GrammarCompiler(speechRecognizer).readGrammar(definition, nextCharIndex).toString()
-				Sleep 1000
-				SplashTextOff
+				
+				showMessage("Register phrase grammar: " . new GrammarCompiler(speechRecognizer).readGrammar(definition, nextCharIndex).toString())
 			}
 			
 			if speechRecognizer
@@ -530,11 +529,8 @@ class RaceEngineer extends ConfigurationItem {
 	}
 	
 	phraseRecognized(grammar, words) {
-		if this.Debug[kDebugRecognitions] {
-			SplashTextOn 400, 100, , % "Phrase " . grammar . " recognized: " . values2String(" ", words*)
-			Sleep 1000
-			SplashTextOff
-		}
+		if this.Debug[kDebugRecognitions]
+			showMessage("Phrase " . grammar . " recognized: " . values2String(" ", words*))
 		
 		protectionOn()
 		
@@ -1436,7 +1432,7 @@ class RaceEngineer extends ConfigurationItem {
 			speaker := this.getSpeaker()
 			
 			stintLaps := Round(stintLaps)
-			delta := Round(delta, 1)
+			delta := Round(delta, 2)
 			
 			if (repair == true) {
 				speaker.speakPhrase("RepairPitstop", {laps: stintLaps, delta: delta})

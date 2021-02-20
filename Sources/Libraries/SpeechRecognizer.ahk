@@ -49,24 +49,18 @@ class SpeechRecognizer {
 		}
 		catch exception {
 			logMessage(kLogCritical, translate("Error while initializing speech recognition module - please check the configuration"))
-
-			title := translate("Modular Simulator Controller System")
 			
-			SplashTextOn 800, 60, %title%, % translate("Error while initializing speech recognition module - please check the configuration") . translate("...")
-					
-			Sleep 5000
+			showMessage(translate("Error while initializing speech recognition module - please check the configuration") . translate("...")
+					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 		}
 		
 		this.RecognizerList := this.createRecognizerList()
 		
 		if (this.RecognizerList.Length() == 0) {
 			logMessage(kLogCritical, translate("No languages found while initializing speech recognition system - please check the configuration"))
-
-			title := translate("Modular Simulator Controller System")
 			
-			SplashTextOn 800, 60, %title%, % translate("No languages found while initializing speech recognition system - please check the configuration") . translate("...")
-					
-			Sleep 5000
+			showMessage(translate("No languages found while initializing speech recognition system - please check the configuration") . translate("...")
+					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 		}
 		
 		if ((recognizer == true) && language) {

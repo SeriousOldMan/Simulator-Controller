@@ -770,12 +770,12 @@ showMessage(message, title := "Modular Simulator Controller System", icon := "In
 	innerWidth := width - 16
 	
 	if (!title || (title = ""))
-		title := "Modular Simulator Controller System"
+		title := translate("Modular Simulator Controller System")
 	
 	Gui SM:-Border -Caption
 	Gui SM:Color, D0D0D0
 	Gui SM:Font, s10 Bold
-	Gui SM:Add, Text, x8 y8 W%innerWidth% +0x200 +0x1 BackgroundTrans, % translate(title)
+	Gui SM:Add, Text, x8 y8 W%innerWidth% +0x200 +0x1 BackgroundTrans, %title%
 	Gui SM:Font
 	
 	if icon {

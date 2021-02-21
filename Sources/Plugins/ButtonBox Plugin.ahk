@@ -45,6 +45,7 @@ class ButtonBox1 extends ButtonBox {
 		Gui BB1:Font, s10 cSilver
 		Gui BB1:Add, Text, x40 y28 w457 h23 +0x200 +0x1 BackgroundTrans, % translate("Button Box")
 		Gui BB1:Color, 0x000000
+		Gui BB1:Font, Norm, Arial
 		Gui BB1:Add, Picture, x33 y60 w54 h85 BackgroundTrans vtoggle1 gfunctionClick, % kButtonBoxImagesDirectory . "Photorealistic\Toggle Switch.png"
 		Gui BB1:Add, Picture, x137 y60 w54 h85 BackgroundTrans vtoggle2 gfunctionClick, % kButtonBoxImagesDirectory . "Photorealistic\Toggle Switch.png"
 		Gui BB1:Add, Picture, x241 y60 w54 h85 BackgroundTrans vtoggle3 gfunctionClick, % kButtonBoxImagesDirectory . "Photorealistic\Toggle Switch.png"
@@ -61,6 +62,8 @@ class ButtonBox1 extends ButtonBox {
 		Gui BB1:Add, Picture, x455 y195 w42 h42 BackgroundTrans vdial1 gfunctionClick, % kButtonBoxImagesDirectory . "Photorealistic\Rotary Dial 3.png"
 		Gui BB1:Add, Picture, x455 y283 w42 h42 BackgroundTrans vdial2 gfunctionClick, % kButtonBoxImagesDirectory . "Photorealistic\Rotary Dial 3.png"
 
+		Gui BB1:Font, Norm
+		
 		Gui BB1:Add, Text, x32 y148 w56 h30 Hwndtoggle1 +Border -Background  +0x1000 +0x1
 		Gui BB1:Add, Text, x136 y148 w56 h30 Hwndtoggle2 +Border -Background  +0x1000 +0x1
 		Gui BB1:Add, Text, x240 y148 w56 h30 Hwndtoggle3 +Border -Background  +0x1000 +0x1
@@ -146,6 +149,7 @@ class ButtonBox2 extends ButtonBox {
 		Gui BB2:Font, s10 cSilver
 		Gui BB2:Add, Text, x40 y28 w359 h23 +0x200 +0x1 BackgroundTrans, % translate("Button Box")
 		Gui BB2:Color, 0x000000
+		Gui BB1:Font, Norm, Arial
 		Gui BB2:Add, Picture, x40 y60 w40 h40 BackgroundTrans vbutton9 gfunctionClick, % kButtonBoxImagesDirectory . "Photorealistic\Push Button 3.png"
 		Gui BB2:Add, Picture, x145 y60 w40 h40 BackgroundTrans vbutton10 gfunctionClick, % kButtonBoxImagesDirectory . "Photorealistic\Push Button 3.png"
 		Gui BB2:Add, Picture, x248 y60 w40 h40 BackgroundTrans vbutton11 gfunctionClick, % kButtonBoxImagesDirectory . "Photorealistic\Push Button 3.png"
@@ -159,6 +163,8 @@ class ButtonBox2 extends ButtonBox {
 		Gui BB2:Add, Picture, x248 y239 w40 h40 BackgroundTrans vbutton19 gfunctionClick, % kButtonBoxImagesDirectory . "Photorealistic\Push Button 3.png"
 		Gui BB2:Add, Picture, x352 y239 w40 h40 BackgroundTrans vbutton20 gfunctionClick, % kButtonBoxImagesDirectory . "Photorealistic\Push Button 3.png"
 
+		Gui BB2:Font, Norm
+		
 		Gui BB2:Add, Text, x32 y103 w56 h30 Hwndbutton9 +Border -Background  +0x1000 +0x1
 		Gui BB2:Add, Text, x136 y103 w56 h30 Hwndbutton10 +Border -Background  +0x1000 +0x1
 		Gui BB2:Add, Text, x240 y103 w56 h30 Hwndbutton11 +Border -Background  +0x1000 +0x1

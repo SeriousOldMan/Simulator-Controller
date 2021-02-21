@@ -16,6 +16,8 @@ Release 2.4 Checklist
    a. unregisterButtonBox
    b. ButtonBoxes
    c. showSplashMessage
+   d. distanceFromTop/Bottom
+   e. ButtonBox Visible und isVisible weg
 2. Documentation for nextUntranslated
 3. Documentation for multiple Button Boxes
 4. Documentation for new Jona functionality

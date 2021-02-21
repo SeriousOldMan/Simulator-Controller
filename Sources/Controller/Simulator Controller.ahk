@@ -66,7 +66,7 @@ class ButtonBox extends ConfigurationItem {
 	iWindowWidth := 0
 	iWindowHeight := 0
 	
-	iIsVisble := false
+	iIsVisible := false
 	
 	Controller[] {
 		Get {
@@ -101,6 +101,12 @@ class ButtonBox extends ConfigurationItem {
 	NumDials[] {
 		Get {
 			return this.iNumDials
+		}
+	}
+	
+	Visible[] {
+		Get {
+			return this.iIsVisible
 		}
 	}
 	
@@ -170,14 +176,39 @@ class ButtonBox extends ConfigurationItem {
 		}
 	}
 	
-	isVisible() {
-		return this.iIsVisible
-	}
-	
 	updateVisibility() {
 		this.Controller.updateLastEvent()
 		
 		this.show(false)
+	}
+	
+	distanceFromTop() {
+		distance := 0
+		
+		for ignore, btnBox in this.Controller.ButtonBoxes
+			if (btnBox == this)
+				return distance
+			else
+				distance += btnBox.iWindowHeight
+		
+		Throw "Internal error detected in ButtonBox.distanceFromTop..."
+	}
+	
+	distanceFromBottom() {
+		distance := 0
+		buttonBoxes := this.Controller.ButtonBoxes
+		index := buttonBoxes.Length()
+		
+		Loop {
+			btnBox := buttonBoxes[index]
+		
+			distance += btnBox.iWindowHeight
+		
+			if (btnBox == this)
+				return distance
+		} until (--index = 0)
+		
+		Throw "Internal error detected in ButtonBox.distanceFromBottom..."
 	}
 	
 	show(makeVisible := true) {
@@ -190,7 +221,7 @@ class ButtonBox extends ConfigurationItem {
 			duration := 24 * 3600 * 1000 ; Show always - one day should be enough :-)
 		
 		if (duration > 0) {
-			if this.iIsVisible
+			if this.Visible
 				SetTimer hideButtonBoxes, %duration%
 			else {
 				SetTimer hideButtonBoxes, Off
@@ -212,16 +243,16 @@ class ButtonBox extends ConfigurationItem {
 						switch position {
 							case "Top Left":
 								x := mainScreenLeft
-								y := mainScreenTop
+								y := mainScreenTop + this.distanceFromTop()
 							case "Top Right":
 								x := mainScreenRight - width
-								y := mainScreenTop
+								y := mainScreenTop + this.distanceFromTop()
 							case "Bottom Left":
 								x := mainScreenLeft
-								y := mainScreenBottom - height
+								y := mainScreenBottom - this.distanceFromBottom()
 							case "Bottom Right":
 								x := mainScreenRight - width
-								y := mainScreenBottom - height
+								y := mainScreenBottom - this.distanceFromBottom()
 							case "Secondary Screen":
 								SysGet count, MonitorCount
 								
@@ -243,7 +274,7 @@ defaultCase:
 						
 						Gui %window%:Show, x%x% y%y% w%width% h%height% NoActivate
     
-						this.iIsVisible := true
+						this.Visible := true
 					}
 					
 					SetTimer hideButtonBoxes, On
@@ -262,13 +293,13 @@ defaultCase:
 		protectionOn()
 	
 		try {
-			if this.iIsVisible {
+			if this.Visible {
 				window := this.iWindow
 			
 				Gui %window%:Hide
 			}
 	
-			this.iIsVisible := false
+			this.Visible := false
 	
 			SetTimer hideButtonBoxes, Off
 		}
@@ -1311,7 +1342,7 @@ updateSimulatorState() {
 			show := true
 			
 			for ignore, btnBox in controller.ButtonBoxes
-				show := (show && !btnBox.isVisible())
+				show := (show && !btnBox.Visible)
 			
 			if show
 				controller.showLogo()

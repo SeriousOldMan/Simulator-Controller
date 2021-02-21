@@ -126,8 +126,7 @@ editSettings(ByRef settingsOrCommand, withContinue := false) {
 	static buttonBoxSimulation
 	static buttonBoxSimulationDuration
 	static buttonBoxPosition
-	static lastPositionX
-	static lastPositionY
+	static lastPositions
 	
 	static startup
 	static startOption
@@ -184,8 +183,8 @@ restart:
 		
 		setConfigurationValue(newSettings, "Button Box", "Button Box Position", positions[inList(map(positions, "translate"), buttonBoxPosition)])
 		
-		setConfigurationValue(newSettings, "Button Box", "Button Box Position.X", lastPositionX)
-		setConfigurationValue(newSettings, "Button Box", "Button Box Position.Y", lastPositionY)
+		for descriptor, value in lastPositions
+			setConfigurationValue(newSettings, "Button Box", descriptor, value)
 		
 		setConfigurationValue(newSettings, "Startup", "Splash Theme", (splashTheme == translate("None")) ? false : splashTheme)
 		setConfigurationValue(newSettings, "Startup", "Simulator", (startup ? startOption : false))
@@ -285,9 +284,13 @@ restart:
 		buttonBoxDuration := getConfigurationValue(settingsOrCommand, "Button Box", "Button Box Duration", 10000)
 		buttonBoxSimulationDuration := getConfigurationValue(settingsOrCommand, "Button Box", "Button Box Simulation Duration", false)
 		buttonBoxPosition := getConfigurationValue(settingsOrCommand, "Button Box", "Button Box Position", "Bottom Right")
-		lastPositionX := getConfigurationValue(settingsOrCommand, "Button Box", "Button Box Position.X", 0)
-		lastPositionY := getConfigurationValue(settingsOrCommand, "Button Box", "Button Box Position.Y", 0)
 		
+		lastPositions := {}
+		
+		for descriptor, value in getConfigurationSectionValues(settingsOrCommand, "Button Box", Object())
+			if InStr(descriptor, ".Position.")
+				lastPositions[descriptor] := value
+			
 		trayTip := (trayTipDuration != 0) ? true : false
 		trayTipSimulation := (trayTipSimulationDuration != 0) ? true : false
 		buttonBox := (buttonBoxDuration != 0) ? true : false

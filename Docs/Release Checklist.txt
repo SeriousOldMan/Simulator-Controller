@@ -19,7 +19,8 @@ Release 2.4 Checklist
 2. Documentation for nextUntranslated
 3. Documentation for multiple Button Boxes
 4. Documentation for new Jona functionality
-5. Neues Format Race Engineer Settings
+5. New Format Race Engineer Settings
+6. New Format Button Box Positions
 
 Release 2.3 Checklist
 =====================
@@ -33,4 +34,4 @@ Release 2.3 Checklist
 3. Required update notes
    a. ToDo for RF2 Plugin
    b. ToDo for "Race Engineer.settings"
-4. Doku für RF2 Plugin
+4. Documentation for RF2 Plugin

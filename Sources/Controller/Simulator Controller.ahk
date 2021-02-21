@@ -74,6 +74,12 @@ class ButtonBox extends ConfigurationItem {
 		}
 	}
 	
+	Descriptor[] {
+		Get {
+			return this.base.__Class
+		}
+	}
+	
 	Num1WayToggles[] {
 		Get {
 			return this.iNum1WayToggles
@@ -229,12 +235,12 @@ class ButtonBox extends ConfigurationItem {
 									Goto defaultCase
 							case "Last Position":
 defaultCase:
-								x := getConfigurationValue(this.Controller.Settings, "Button Box", "Button Box Position.X", mainScreenRight - width)
-								y := getConfigurationValue(this.Controller.Settings, "Button Box", "Button Box Position.Y", mainScreenBottom - height)
+								x := getConfigurationValue(this.Controller.Settings, "Button Box", this.Descriptor . ".Position.X", mainScreenRight - width)
+								y := getConfigurationValue(this.Controller.Settings, "Button Box", this.Descriptor . ".Position.Y", mainScreenBottom - height)
 							default:
 								Throw "Unhandled position for Button Box (" . position . ") encountered in ButtonBox.show..."
 						}
-					
+						
 						Gui %window%:Show, x%x% y%y% w%width% h%height% NoActivate
     
 						this.iIsVisible := true
@@ -294,8 +300,8 @@ defaultCase:
 			
 			settings := this.Controller.Settings
 			
-			setConfigurationValue(settings, "Button Box", "Button Box Position.X", newX)
-			setConfigurationValue(settings, "Button Box", "Button Box Position.Y", newY)
+			setConfigurationValue(settings, "Button Box", this.Descriptor . ".Position.X", newX)
+			setConfigurationValue(settings, "Button Box", this.Descriptor . ".Position.Y", newY)
 			
 			writeConfiguration(kSimulatorSettingsFile, settings)
 		}

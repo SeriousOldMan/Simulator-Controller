@@ -6,6 +6,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                        Private Variable Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global vButtonBoxes = {}
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -75,7 +82,7 @@ class ButtonBox1 extends ButtonBox {
 		Gui BB1:Add, Picture, x-10 y-10 gmoveButtonBox 0x4000000, % kButtonBoxImagesDirectory . "Photorealistic\CF Background.png"
 
 		Gui BB1:+AlwaysOnTop
-			
+
 		controlHandles := Object()
 		
 		Loop 5 {
@@ -101,6 +108,8 @@ class ButtonBox1 extends ButtonBox {
 		window := "BB1"
 		windowWidth := 543
 		windowHeight := 368
+		
+		vButtonBoxes["BB1"] := this
 	}
 	
 	getControlHandle(descriptor) {
@@ -180,6 +189,8 @@ class ButtonBox2 extends ButtonBox {
 		window := "BB2"
 		windowWidth := 432
 		windowHeight := 323
+		
+		vButtonBoxes["BB2"] := this
 	}
 	
 	getControlHandle(descriptor) {
@@ -213,8 +224,8 @@ functionClick() {
 		rotateDial(SubStr(A_GuiControl, 5), (x > 475) ? "Increase" : "Decrease")
 }
 
-moveButtonBox(window) {
-	ButtonBox.moveByMouse(A_Gui)
+moveButtonBox() {
+	vButtonBoxes[A_Gui].moveByMouse(A_Gui)
 }
 
 

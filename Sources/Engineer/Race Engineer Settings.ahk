@@ -208,7 +208,7 @@ editSettings(ByRef settingsOrCommand) {
 	static formationLapCheck
 	static postRaceLapCheck
 	static fuelConsumptionEdit
-	static pitstopDurationEdit
+	static pitstopDeltaEdit
 	static safetyFuelEdit
 	
 	static spSetupTyreCompoundDropDown
@@ -276,7 +276,7 @@ restart:
 		setConfigurationValue(newSettings, "Race Settings", "Duration", raceDurationEdit * 60)
 		setConfigurationValue(newSettings, "Race Settings", "Lap.AvgTime", avgLaptimeEdit)
 		setConfigurationValue(newSettings, "Race Settings", "Fuel.AvgConsumption", Round(fuelConsumptionEdit, 1))
-		setConfigurationValue(newSettings, "Race Settings", "Pitstop.Duration", pitstopDurationEdit)
+		setConfigurationValue(newSettings, "Race Settings", "Pitstop.Delta", pitstopDeltaEdit)
 		setConfigurationValue(newSettings, "Race Settings", "Fuel.SafetyMargin", safetyFuelEdit)
 		
 		setConfigurationValue(newSettings, "Race Settings", "Lap.Formation", formationLapCheck)
@@ -330,7 +330,7 @@ restart:
 		raceDurationEdit := Round(getConfigurationValue(settingsOrCommand, "Race Settings", "Duration", 0) / 60)
 		avgLaptimeEdit := getConfigurationValue(settingsOrCommand, "Race Settings", "Lap.AvgTime", 0)
 		fuelConsumptionEdit := getConfigurationValue(settingsOrCommand, "Race Settings", "Fuel.AvgConsumption", 0.0)
-		pitstopDurationEdit := getConfigurationValue(settingsOrCommand, "Race Settings", "Pitstop.Duration", 0)
+		pitstopDeltaEdit := getConfigurationValue(settingsOrCommand, "Race Settings", "Pitstop.Delta", 0)
 		safetyFuelEdit := getConfigurationValue(settingsOrCommand, "Race Settings", "Fuel.SafetyMargin", 4)
 		
 		formationLapCheck := getConfigurationValue(settingsOrCommand, "Race Settings", "Lap.Formation", true)
@@ -511,9 +511,9 @@ restart:
 		Gui RES:Add, Edit, x106 yp-2 w50 h20 VfuelConsumptionEdit, %fuelConsumptionEdit%
 		Gui RES:Add, Text, x164 yp+4 w90 h20, % translate("Ltr.")
 
-		Gui RES:Add, Text, x16 yp+22 w85 h20 +0x200, % translate("Pitstop Duration")
-		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit2 Number VpitstopDurationEdit, %pitstopDurationEdit%
-		Gui RES:Add, UpDown, x138 yp-2 w18 h20 0x80, %pitstopDurationEdit%
+		Gui RES:Add, Text, x16 yp+22 w85 h20 +0x200, % translate("Pitstop Delta")
+		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit2 Number VpitstopDeltaEdit, %pitstopDeltaEdit%
+		Gui RES:Add, UpDown, x138 yp-2 w18 h20 0x80, %pitstopDeltaEdit%
 		Gui RES:Add, Text, x164 yp+4 w90 h20, % translate("Sec.")
 
 		Gui RES:Add, Text, x212 ys-2 w85 h23 +0x200, % translate("Formation")

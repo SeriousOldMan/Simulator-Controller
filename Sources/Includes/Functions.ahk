@@ -779,7 +779,7 @@ showMessage(message, title := "Modular Simulator Controller System", icon := "In
 	Gui SM:Font
 	
 	if icon {
-		Gui SM:Add, Picture, w50 h50, % kResourcesDirectory . "Icons\" . Icon
+		Gui SM:Add, Picture, w50 h50, % kIconsDirectory . Icon
 		
 		innerWidth -= 66
 		

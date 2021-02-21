@@ -19,6 +19,7 @@ Release 2.4 Checklist
 2. Documentation for nextUntranslated
 3. Documentation for multiple Button Boxes
 4. Documentation for new Jona functionality
+5. Neues Format Race Engineer Settings
 
 Release 2.3 Checklist
 =====================

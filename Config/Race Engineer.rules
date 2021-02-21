@@ -268,10 +268,10 @@ reportAnalysis(?sDelta, ?bDelta) <= ?temp = !Damage.Reported + 1, !Lap > ?temp,	
 									max(?sDelta, ?bDelta, ?delta), remainingStintLaps(!Lap, ?stintLaps),										\
 									?lostTime = ?stintLaps * ?delta, reportAnalysis(?lostTime, ?stintLaps, ?delta)
 
-reportAnalysis(?lostTime, ?stintLaps, ?delta) <= >=(?lostTime, !Race.Settings.Pitstop.Duration), 												\
+reportAnalysis(?lostTime, ?stintLaps, ?delta) <= >=(?lostTime, !Race.Settings.Pitstop.Delta), 												\
 												 Call(reportDamageAnalysis, true, ?stintLaps, ?delta),											\
 												 Set(Damage.Analysis.Reported, !Lap)
-reportAnalysis(?lostTime, ?stintLaps, ?delta) <= ?lostTime < !Race.Settings.Pitstop.Duration, 													\
+reportAnalysis(?lostTime, ?stintLaps, ?delta) <= ?lostTime < !Race.Settings.Pitstop.Delta, 													\
 												 Call(reportDamageAnalysis, false, ?stintLaps, ?delta),											\
 												 Set(Damage.Analysis.Reported, !Lap)
 

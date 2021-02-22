@@ -212,77 +212,70 @@ class ButtonBox extends ConfigurationItem {
 	}
 	
 	show(makeVisible := true) {
-		if ((A_TickCount - this.Controller.LastEvent) > 1000)
-			return
-	
 		duration := this.VisibleDuration
 	
 		if (duration >= 9999)
 			duration := 24 * 3600 * 1000 ; Show always - one day should be enough :-)
 		
 		if (duration > 0) {
-			if this.Visible
-				SetTimer hideButtonBoxes, %duration%
-			else {
-				SetTimer hideButtonBoxes, Off
+			SetTimer hideButtonBoxes, %duration%
 		
-				protectionOn()
+			if ((A_TickCount - this.Controller.LastEvent) > duration)
+				return
+		
+			protectionOn()
 
-				try {
-					if makeVisible {
-						this.Controller.hideLogo()
+			try {
+				if makeVisible {
+					this.Controller.hideLogo()
+			
+					window := this.iWindow
+					width := this.iWindowWidth
+					height := this.iWindowHeight
 				
-						window := this.iWindow
-						width := this.iWindowWidth
-						height := this.iWindowHeight
+					position := getConfigurationValue(this.Controller.Settings, "Button Box", "Button Box Position", "Bottom Right")
 					
-						position := getConfigurationValue(this.Controller.Settings, "Button Box", "Button Box Position", "Bottom Right")
-						
-						SysGet mainScreen, MonitorWorkArea
+					SysGet mainScreen, MonitorWorkArea
 
-						switch position {
-							case "Top Left":
-								x := mainScreenLeft
-								y := mainScreenTop + this.distanceFromTop()
-							case "Top Right":
-								x := mainScreenRight - width
-								y := mainScreenTop + this.distanceFromTop()
-							case "Bottom Left":
-								x := mainScreenLeft
-								y := mainScreenBottom - this.distanceFromBottom()
-							case "Bottom Right":
-								x := mainScreenRight - width
-								y := mainScreenBottom - this.distanceFromBottom()
-							case "Secondary Screen":
-								SysGet count, MonitorCount
+					switch position {
+						case "Top Left":
+							x := mainScreenLeft
+							y := mainScreenTop + this.distanceFromTop()
+						case "Top Right":
+							x := mainScreenRight - width
+							y := mainScreenTop + this.distanceFromTop()
+						case "Bottom Left":
+							x := mainScreenLeft
+							y := mainScreenBottom - this.distanceFromBottom()
+						case "Bottom Right":
+							x := mainScreenRight - width
+							y := mainScreenBottom - this.distanceFromBottom()
+						case "Secondary Screen":
+							SysGet count, MonitorCount
+							
+							if (count > 1) {
+								SysGet, secondScreen, MonitorWorkArea, 2
 								
-								if (count > 1) {
-									SysGet, secondScreen, MonitorWorkArea, 2
-									
-									x := Round(secondScreenLeft + ((secondScreenRight - secondScreenLeft - width) / 2))
-									y := Round(secondScreenTop + ((secondScreenBottom - secondScreenTop- height) / 2))
-								}
-								else
-									Goto defaultCase
-							case "Last Position":
+								x := Round(secondScreenLeft + ((secondScreenRight - secondScreenLeft - width) / 2))
+								y := Round(secondScreenTop + ((secondScreenBottom - secondScreenTop- height) / 2))
+							}
+							else
+								Goto defaultCase
+						case "Last Position":
 defaultCase:
-								x := getConfigurationValue(this.Controller.Settings, "Button Box", this.Descriptor . ".Position.X", mainScreenRight - width)
-								y := getConfigurationValue(this.Controller.Settings, "Button Box", this.Descriptor . ".Position.Y", mainScreenBottom - height)
-							default:
-								Throw "Unhandled position for Button Box (" . position . ") encountered in ButtonBox.show..."
-						}
-						
-						Gui %window%:Show, x%x% y%y% w%width% h%height% NoActivate
-    
-						this.Visible := true
+							x := getConfigurationValue(this.Controller.Settings, "Button Box", this.Descriptor . ".Position.X", mainScreenRight - width)
+							y := getConfigurationValue(this.Controller.Settings, "Button Box", this.Descriptor . ".Position.Y", mainScreenBottom - height)
+						default:
+							Throw "Unhandled position for Button Box (" . position . ") encountered in ButtonBox.show..."
 					}
 					
-					SetTimer hideButtonBoxes, On
-					SetTimer hideButtonBoxes, %duration%
+					Gui %window%:Show, x%x% y%y% w%width% h%height% NoActivate
+
+					this.iIsVisible := true
 				}
-				finally {
-					protectionOff()
-				}
+			}
+			finally {
+				protectionOff()
 			}
 		}
 		else
@@ -299,9 +292,7 @@ defaultCase:
 				Gui %window%:Hide
 			}
 	
-			this.Visible := false
-	
-			SetTimer hideButtonBoxes, Off
+			this.iIsVisible := false
 		}
 		finally {
 			protectionOff()
@@ -501,8 +492,11 @@ class SimulatorController extends ConfigurationItem {
 	unregisterButtonBox(buttonBox) {
 		index := inList(this.iButtonBoxes, buttonBox)
 		
-		if index
+		if index {
+			buttonBox.hide()
+			
 			this.iButtonBoxes.RemoveAt(index)
+		}
 	}
 	
 	registerPlugin(plugin) {
@@ -1394,6 +1388,15 @@ initializeSimulatorController() {
 	registerEventHandler("Voice", "handleVoiceRemoteCalls")
 }
 
+startupSimulatorController() {
+	controller := SimulatorController.Instance
+	
+	controller.updateLastEvent()
+	
+	for ignore, btnBox in controller.ButtonBoxes
+		btnBox.show()
+}
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                        Controller Action Section                        ;;;
@@ -1495,7 +1498,7 @@ handleVoiceRemoteCalls(event, data) {
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                          Initialization Section                         ;;;
+;;;                       Initialization Section Part 1                     ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 initializeSimulatorController()
@@ -1507,3 +1510,10 @@ initializeSimulatorController()
 
 #Include ..\Plugins\Plugins.ahk
 #Include %A_MyDocuments%\Simulator Controller\Plugins\Plugins.ahk
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                       Initialization Section Part 2                     ;;;
+;;;-------------------------------------------------------------------------;;;
+
+startupSimulatorController()

@@ -55,6 +55,8 @@ global kAllTrigger = "__All Trigger__"
 ;;;-------------------------------------------------------------------------;;;
 
 class ButtonBox extends ConfigurationItem {
+	static iButtonBoxWindows = {}
+	
 	iController := false
 	
 	iNum1WayToggles := 0
@@ -65,6 +67,7 @@ class ButtonBox extends ConfigurationItem {
 	iWindow := false
 	iWindowWidth := 0
 	iWindowHeight := 0
+	iControlHandles := {}
 	
 	iIsVisible := false
 	
@@ -131,11 +134,7 @@ class ButtonBox extends ConfigurationItem {
 		
 		base.__New(configuration)
 		
-		this.createWindow(window, width, height)
-		
-		this.iWindow := window
-		this.iWindowWidth := width
-		this.iWindowHeight := height
+		this.createGui()
 		
 		controller.registerButtonBox(this)
 	}
@@ -151,12 +150,34 @@ class ButtonBox extends ConfigurationItem {
 		logMessage(kLogInfo, translate("Controller layout initialized:") . " #" . this.iNum1WayToggles . " " . translate("1-Way Toggles") . ", #" . this.iNum2WayToggles . " " . translate("2-Way Toggles") . ", #" . this.iNumButtons . " " . translate("Buttons") . ", #" . this.iNumDials . " " . translate("Dials"))
 	}
 	
-	createWindow(ByRef window, ByRef windowWidth, ByRef windowHeight) {
-		Throw "Virtual method ButtonBox.createWindow must be implemented in a subclass..."
+	createGui() {
+		Throw "Virtual method ButtonBox.createGui must be implemented in a subclass..."
+	}
+	
+	associateGui(window, width, height) {
+		this.iWindow := window
+		this.iWindowWidth := width
+		this.iWindowHeight := height
+		
+		this.iButtonBoxGuis[window] := this
+	}
+	
+	findButtonBox(window) {
+		if this.iButtonBoxGuis.HasKey(window)
+			return this.iButtonBoxGuis[window]
+		else
+			return false
+	}
+	
+	registerControlHandle(descriptor, handle) {
+		this.iControlHandles[descriptor] := handle
 	}
 	
 	getControlHandle(descriptor) {
-		Throw "Virtual method ButtonBox.getControlHandle must be implemented in a subclass..."
+		if this.iControlHandles.HasKey(descriptor)
+			return this.iControlHandles[descriptor]
+		else
+			return false
 	}
 	
 	setControlText(function, text, color := "Black") {

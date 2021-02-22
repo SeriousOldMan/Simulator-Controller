@@ -6,20 +6,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                        Private Variable Section                         ;;;
-;;;-------------------------------------------------------------------------;;;
-
-global vButtonBoxes = {}
-
-
-;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 class ButtonBox1 extends ButtonBox {
-	iControlHandles := {}
-	
-	createWindow(ByRef window, ByRef windowWidth, ByRef windowHeight) {
+	createGui() {
 		static toggle1
 		static toggle2
 		static toggle3
@@ -85,48 +76,31 @@ class ButtonBox1 extends ButtonBox {
 		Gui BB1:Add, Picture, x-10 y-10 gmoveButtonBox 0x4000000, % kButtonBoxImagesDirectory . "Photorealistic\CF Background.png"
 
 		Gui BB1:+AlwaysOnTop
-
-		controlHandles := Object()
 		
 		Loop 5 {
 			toggle := "toggle" . A_Index
 		
-			controlHandles[ConfigurationItem.descriptor(k2WayToggleType, A_Index)] := %toggle%
+			this.registerControlHandle(ConfigurationItem.descriptor(k2WayToggleType, A_Index), %toggle%)
 		}
 
 		Loop 8 {
 			button := "button" . A_Index
 		
-			controlHandles[ConfigurationItem.descriptor(kButtonType, A_Index)] := %button%
+			this.registerControlHandle(ConfigurationItem.descriptor(kButtonType, A_Index), %button%)
 		}
 
 		Loop 2 {
 			dial := "dial" . A_Index
 		
-			controlHandles[ConfigurationItem.descriptor(kDialType, A_Index)] := %dial%
+			this.registerControlHandle(ConfigurationItem.descriptor(kDialType, A_Index), %dial%)
 		}
 		
-		this.iControlHandles := controlHandles
-		
-		window := "BB1"
-		windowWidth := 543
-		windowHeight := 368
-		
-		vButtonBoxes["BB1"] := this
-	}
-	
-	getControlHandle(descriptor) {
-		if this.iControlHandles.HasKey(descriptor)
-			return this.iControlHandles[descriptor]
-		else
-			return false
+		this.associateGui("BB1", 543, 368)
 	}
 }
 
 class ButtonBox2 extends ButtonBox {
-	iControlHandles := {}
-	
-	createWindow(ByRef window, ByRef windowWidth, ByRef windowHeight) {
+	createGui() {
 		static button9
 		static button10
 		static button11
@@ -181,29 +155,14 @@ class ButtonBox2 extends ButtonBox {
 		Gui BB2:Add, Picture, x-10 y-10 gmoveButtonBox 0x4000000, % kButtonBoxImagesDirectory . "Photorealistic\CF Background.png"
 
 		Gui BB2:+AlwaysOnTop
-			
-		controlHandles := Object()
 		
 		Loop 12 {
 			button := "button" . (A_Index + 8)
 		
-			controlHandles[ConfigurationItem.descriptor(kButtonType, (A_Index + 8))] := %button%
+			this.registerControlHandle(ConfigurationItem.descriptor(kButtonType, A_Index + 8), %button%)
 		}
 		
-		this.iControlHandles := controlHandles
-		
-		window := "BB2"
-		windowWidth := 432
-		windowHeight := 323
-		
-		vButtonBoxes["BB2"] := this
-	}
-	
-	getControlHandle(descriptor) {
-		if this.iControlHandles.HasKey(descriptor)
-			return this.iControlHandles[descriptor]
-		else
-			return false
+		this.associateGui("BB2", 432, 323)
 	}
 }
 
@@ -231,7 +190,7 @@ functionClick() {
 }
 
 moveButtonBox() {
-	vButtonBoxes[A_Gui].moveByMouse(A_Gui)
+	ButtonBox.findButtonBox(A_Gui).moveByMouse(A_Gui)
 }
 
 

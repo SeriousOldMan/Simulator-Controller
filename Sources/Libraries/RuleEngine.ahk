@@ -278,6 +278,9 @@ class Predicate extends Condition {
 		else {
 			rightPrimary := this.RightPrimary[facts]
 			
+			if ((this.Operator != kNotInitialized) && (rightPrimary == kNotInitialized))
+				return false
+			
 			result := false
 			
 			switch this.Operator {

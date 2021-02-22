@@ -213,7 +213,7 @@ class SystemPlugin extends ControllerPlugin {
 			else
 				this.logFunctionNotFound(descriptor)
 		}
-		/*
+		
 		descriptor := this.getArgumentValue("logo", false)
 		
 		if (descriptor != false) {
@@ -235,7 +235,7 @@ class SystemPlugin extends ControllerPlugin {
 			else
 				this.logFunctionNotFound(descriptor)
 		}
-		*/
+		
 		this.registerMode(this.iLaunchMode)
 		controller.registerPlugin(this)
 		

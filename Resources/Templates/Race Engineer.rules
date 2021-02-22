@@ -283,7 +283,7 @@ reportAnalysis(?lostTime, ?stintLaps, ?delta) <= ?lostTime < !Race.Settings.Pits
 ;;;-------------------------------------------------------------------------;;;
 
 [?Lap] => (Prove: reportNewDamage, ?Lap)
-{Any: [?Damage.Update.Suspension = true], [?Damage.Update.Bodywork = true]} => (Prove: reportNewDamage, !Lap)
+priority: 5, {Any: [?Damage.Update.Suspension = true], [?Damage.Update.Bodywork = true]} => (Prove: reportNewDamage, !Lap)
 priority: -10, {Any: [?Damage.Update.Suspension = true], [?Damage.Update.Bodywork = true]} =>													\
 		(Clear: Damage.Update.Suspension), (Clear: Damage.Update.Bodywork)
 
@@ -295,7 +295,7 @@ reportNewDamage(?lap) <= pitstopLap(?pitstopLap), ?pitstopLap = ?lap - 1,							
 						 newDamageAfterRepair(?lsDamage, ?suspensionRepaired, ?newSDamage),														\
 						 newDamageAfterRepair(?lBDamage, ?bodyworkRepaired, ?newBDamage),														\
 						 any?(true, [?newSDamage, ?newBDamage]), Call(damageWarning, ?newSDamage, ?newBDamage),									\
-						 Set(Damage.Reported, !Lap), Clear(Damage.Analysis.Reported)
+						 Set(Damage.Reported, !Lap)
 reportNewDamage(?lap) <= pitstopLap(?pitstopLap), ?pitstopLap = ?lap - 1,																		\
 						 lapDamage(?lap, Suspension, ?lSDamage), lapDamage(?lap, Bodywork, ?lBDamage),											\
 						 ?pLap = ?lap - 2, lapDamage(?pLap, Suspension, ?pSDamage), lapDamage(?pLap, Bodywork, ?pBDamage),						\
@@ -307,7 +307,7 @@ reportNewDamage(?lap) <= lapDamage(?lap, Suspension, ?lSDamage), lapDamage(?lap,
 reportNewDamage(?oldSDamage, ?newSDamage, ?oldBDamage, ?newBDamage) <=																			\
 						 >(?newSDamage, ?oldSDamage, ?sGreater), >(?newBDamage, ?oldBDamage, ?bGreater), 										\
 						 any?(true, [?sGreater, ?bGreater]), Call(damageWarning, ?sGreater, ?bGreater),											\
-						 Set(Damage.Reported, !Lap), Clear(Damage.Analysis.Reported)
+						 Set(Damage.Reported, !Lap)
 
 newDamageAfterRepair(0, ?, false)
 newDamageAfterRepair(?damage, true, true) <= ?damage > 0

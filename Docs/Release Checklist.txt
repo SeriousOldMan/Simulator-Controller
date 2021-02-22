@@ -15,7 +15,7 @@ Release 2.4 Checklist
 1. New methods and functions
    a. unregisterButtonBox
    b. ButtonBoxes
-   c. createWindow, associateGui, et.al.
+   c. createGui, associateGui, registerControlHandle, et.al.
    c. showSplashMessage
    d. distanceFromTop/Bottom
    e. ButtonBox Visible und isVisible weg

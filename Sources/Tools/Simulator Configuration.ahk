@@ -1800,7 +1800,16 @@ class LaunchpadTab extends ConfigurationItemList {
 		GuiControlGet launchpadLabelEdit
 		GuiControlGet launchpadApplicationDropDown
 		
-		return Array(launchpadLabelEdit, launchpadApplicationDropDown)
+		if ((launchpadLabelEdit = "") || (launchpadApplicationDropDown = "")) {
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+			title := translate("Error")
+			MsgBox 262160, %title%, % translate("Invalid values detected - please correct...")
+			OnMessage(0x44, "")
+			
+			return false
+		}
+		else
+			return Array(launchpadLabelEdit, launchpadApplicationDropDown)
 	}
 }
 

@@ -146,20 +146,25 @@ class ButtonBox extends ConfigurationItem {
 		this.iNum2WayToggles := getConfigurationValue(configuration, "Controller Layout", "2WayToggles", 0)
 		this.iNumButtons := getConfigurationValue(configuration, "Controller Layout", "Buttons", 0)
 		this.iNumDials := getConfigurationValue(configuration, "Controller Layout", "Dials", 0)
-		
-		logMessage(kLogInfo, translate("Controller layout initialized:") . " #" . this.iNum1WayToggles . " " . translate("1-Way Toggles") . ", #" . this.iNum2WayToggles . " " . translate("2-Way Toggles") . ", #" . this.iNumButtons . " " . translate("Buttons") . ", #" . this.iNumDials . " " . translate("Dials"))
 	}
 	
 	createGui() {
 		Throw "Virtual method ButtonBox.createGui must be implemented in a subclass..."
 	}
 	
-	associateGui(window, width, height) {
+	associateGui(window, width, height, num1WayToggles, num2WayToggles, numButtons, numDials) {
 		this.iWindow := window
 		this.iWindowWidth := width
 		this.iWindowHeight := height
 		
+		this.iNum1WayToggles := num1WayToggles
+		this.iNum2WayToggles := num2WayToggles
+		this.iNumButtons := numButtons
+		this.iNumDials := numDials
+		
 		this.iButtonBoxGuis[window] := this
+		
+		logMessage(kLogInfo, translate("Controller layout initialized:") . " #" . num1WayToggles . " " . translate("1-Way Toggles") . ", #" . num2WayToggles . " " . translate("2-Way Toggles") . ", #" . numButtons . " " . translate("Buttons") . ", #" . numDials . " " . translate("Dials"))
 	}
 	
 	findButtonBox(window) {
@@ -239,10 +244,10 @@ class ButtonBox extends ConfigurationItem {
 			duration := 24 * 3600 * 1000 ; Show always - one day should be enough :-)
 		
 		if (duration > 0) {
-			SetTimer hideButtonBoxes, %duration%
-		
 			if ((A_TickCount - this.Controller.LastEvent) > duration)
 				return
+			else
+				SetTimer hideButtonBoxes, %duration%
 		
 			protectionOn()
 
@@ -311,9 +316,9 @@ defaultCase:
 				window := this.iWindow
 			
 				Gui %window%:Hide
-			}
 	
-			this.iIsVisible := false
+				this.iIsVisible := false
+			}
 		}
 		finally {
 			protectionOff()
@@ -757,7 +762,7 @@ class SimulatorController extends ConfigurationItem {
 			title2 := translate("Controller System")
 			SplashImage %image%, B FS8 CWD0D0D0 w229 x%x% y%y% ZH180 ZW209, %info%, %title1%`n%title2%
 	
-			WinSet Transparent, 192, , % translate("Creative Commons - BY-NC-SA")
+			WinSet Transparent, 255, , % translate("Creative Commons - BY-NC-SA")
 		
 			Gui Logo:-Border -Caption 
 			Gui Logo:Add, ActiveX, x0 y0 w209 h180 VvideoPlayer, shell explorer

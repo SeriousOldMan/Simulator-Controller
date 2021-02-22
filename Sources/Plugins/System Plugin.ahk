@@ -194,6 +194,8 @@ class SystemPlugin extends ControllerPlugin {
 	}
 	
 	__New(controller, name, configuration := false) {
+		local function
+		
 		this.iLaunchMode := new this.LaunchMode(this)
 		
 		if inList(A_Args, "-Startup")
@@ -201,9 +203,75 @@ class SystemPlugin extends ControllerPlugin {
 		
 		base.__New(controller, name, configuration)
 		
+		descriptor := this.getArgumentValue("modeSelector")
+		
+		if (descriptor != false) {
+			function := controller.findFunction(descriptor)
+			
+			if (function != false)
+				this.registerAction(this.iModeSelector := new this.ModeSelectorAction(function))
+			else
+				this.logFunctionNotFound(descriptor)
+		}
+		/*
+		descriptor := this.getArgumentValue("logo", false)
+		
+		if (descriptor != false) {
+			function := controller.findFunction(descriptor)
+		
+			if (function != false)
+				this.iLaunchMode.registerAction(new this.LogoToggleAction(function, ""))
+			else
+				this.logFunctionNotFound(descriptor)
+		}
+		
+		descriptor := this.getArgumentValue("shutdown", false)
+		
+		if (descriptor != false) {
+			function := controller.findFunction(descriptor)
+		
+			if (function != false)
+				this.iLaunchMode.registerAction(new this.SystemShutdownAction(function, "Shutdown"))
+			else
+				this.logFunctionNotFound(descriptor)
+		}
+		*/
 		this.registerMode(this.iLaunchMode)
+		controller.registerPlugin(this)
 		
 		this.initializeBackgroundTasks()
+	}
+	
+	loadFromConfiguration(configuration) {
+		local action
+		local function
+		
+		base.loadFromConfiguration(configuration)
+		
+		for descriptor, name in getConfigurationSectionValues(configuration, "Applications", Object())
+			this.RunnableApplications.Push(new this.RunnableApplication(name, configuration))
+	
+		for descriptor, appDescriptor in getConfigurationSectionValues(configuration, "Launchpad", Object()) {
+			function := this.Controller.findFunction(descriptor)
+			
+			if (function != false) {
+				appDescriptor := string2Values("|", appDescriptor)
+			
+				runnable := this.findRunnableApplication(appDescriptor[2])
+				
+				if (runnable != false) {
+					action := new this.LaunchAction(function, appDescriptor[1], appDescriptor[2])
+					
+					this.iLaunchMode.registerAction(action)
+				
+					runnable.connectAction(function, action)
+				}
+				else
+					logMessage(kLogWarn, translate("Application ") . appDescriptor[2] . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
+			}
+			else
+				this.logFunctionNotFound(descriptor)
+		}
 	}
 	
 	simulatorStartup(simulator) {
@@ -231,74 +299,6 @@ class SystemPlugin extends ControllerPlugin {
 		base.simulatorShutdown()
 		
 		this.Controller.setMode(this.iLaunchMode)
-	}
-	
-	loadFromConfiguration(configuration) {
-		local action
-		local function
-		
-		base.loadFromConfiguration(configuration)
-	
-		descriptor := this.getArgumentValue("modeSelector")
-		
-		if (descriptor != false) {
-			function := this.Controller.findFunction(descriptor)
-			
-			if (function != false)
-				this.registerAction(this.iModeSelector := new this.ModeSelectorAction(function))
-			else
-				this.logFunctionNotFound(descriptor)
-		}
-		
-		for descriptor, name in getConfigurationSectionValues(configuration, "Applications", Object())
-			this.RunnableApplications.Push(new this.RunnableApplication(name, configuration))
-	
-		registeredButtons := {}
-		btnBox := this.Controller.ButtonBox
-		
-		for descriptor, appDescriptor in getConfigurationSectionValues(configuration, "Launchpad", Object()) {
-			function := this.Controller.findFunction(descriptor)
-			
-			if (function != false) {
-				appDescriptor := string2Values("|", appDescriptor)
-			
-				runnable := this.findRunnableApplication(appDescriptor[2])
-				
-				if (runnable != false) {
-					registeredButtons[ConfigurationItem.splitDescriptor(descriptor)[2]] := true
-					
-					action := new this.LaunchAction(function, appDescriptor[1], appDescriptor[2])
-					
-					this.iLaunchMode.registerAction(action)
-				
-					runnable.connectAction(function, action)
-				}
-				else
-					logMessage(kLogWarn, translate("Application ") . appDescriptor[2] . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
-			}
-			else
-				this.logFunctionNotFound(descriptor)
-		}
-			
-		if ((btnBox != false) && !registeredButtons.HasKey(btnBox.NumButtons)) {
-			descriptor := ConfigurationItem.descriptor("Button", btnBox.NumButtons)
-			function := this.Controller.findFunction(descriptor)
-		
-			if (function != false)
-				this.iLaunchMode.registerAction(new this.SystemShutdownAction(function, "Shutdown"))
-			else
-				this.logFunctionNotFound(descriptor)
-		}
-			
-		if ((btnBox != false) && !registeredButtons.HasKey(btnBox.NumButtons - 1)) {
-			descriptor := ConfigurationItem.descriptor("Button", btnBox.NumButtons - 1)
-			function := this.Controller.findFunction(descriptor)
-		
-			if (function != false)
-				this.iLaunchMode.registerAction(new this.LogoToggleAction(function, ""))
-			else
-				this.logFunctionNotFound(descriptor)
-		}
 	}
 	
 	findRunnableApplication(name) {

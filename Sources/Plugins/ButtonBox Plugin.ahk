@@ -95,7 +95,7 @@ class ButtonBox1 extends ButtonBox {
 			this.registerControlHandle(ConfigurationItem.descriptor(kDialType, A_Index), %dial%)
 		}
 		
-		this.associateGui("BB1", 543, 368)
+		this.associateGui("BB1", 543, 368, 0, 5, 8, 2)
 	}
 }
 
@@ -162,7 +162,7 @@ class ButtonBox2 extends ButtonBox {
 			this.registerControlHandle(ConfigurationItem.descriptor(kButtonType, A_Index + 8), %button%)
 		}
 		
-		this.associateGui("BB2", 432, 323)
+		this.associateGui("BB2", 432, 323, 0, 0, 12, 0)
 	}
 }
 

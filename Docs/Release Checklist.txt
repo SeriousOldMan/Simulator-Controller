@@ -24,6 +24,7 @@ Release 2.4 Checklist
 4. Documentation for new Jona functionality
 5. New Format Race Engineer Settings
 6. New Format Button Box Positions
+7. logo und shutdown für System Plugin in Doku und updateFunction in "Simulator Tools"
 
 Release 2.3 Checklist
 =====================

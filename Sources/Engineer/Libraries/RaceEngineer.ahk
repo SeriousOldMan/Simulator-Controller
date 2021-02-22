@@ -654,17 +654,17 @@ class RaceEngineer extends ConfigurationItem {
 		
 		speaker.speakPhrase((value == "Pressure") ? "Pressures" : "Temperatures")
 		
-		speaker.speakPhrase("TyreFL", {value: Round(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".FL"), 1)
-						  , unit: (value == "Pressure") ? fragments["PSI"] : fragments["Degrees"]})
+		speaker.speakPhrase("TyreFL", {value: Format("{:.1f}", knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".FL"))
+									 , unit: (value == "Pressure") ? fragments["PSI"] : fragments["Degrees"]})
 		
-		speaker.speakPhrase("TyreFR", {value: Round(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".FR"), 1)
-						  , unit: (value == "Pressure") ? fragments["PSI"] : fragments["Degrees"]})
+		speaker.speakPhrase("TyreFR", {value: Format("{:.1f}", knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".FR"))
+									 , unit: (value == "Pressure") ? fragments["PSI"] : fragments["Degrees"]})
 		
-		speaker.speakPhrase("TyreRL", {value: Round(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".RL"), 1)
-						  , unit: (value == "Pressure") ? fragments["PSI"] : fragments["Degrees"]})
+		speaker.speakPhrase("TyreRL", {value: Format("{:.1f}", knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".RL"))
+									 , unit: (value == "Pressure") ? fragments["PSI"] : fragments["Degrees"]})
 		
-		speaker.speakPhrase("TyreRR", {value: Round(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".RR"), 1)
-						  , unit: (value == "Pressure") ? fragments["PSI"] : fragments["Degrees"]})
+		speaker.speakPhrase("TyreRR", {value: Format("{:.1f}", knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".RR"))
+									 , unit: (value == "Pressure") ? fragments["PSI"] : fragments["Degrees"]})
 	}
 	
 	weatherRecognized(words) {
@@ -807,7 +807,7 @@ class RaceEngineer extends ConfigurationItem {
 					
 					delta := Round(psiValue + (tenthPsiValue / 10), 1)
 					
-					speaker.speakPhrase("ConfirmPsiChange", {action: action, tyre: tyre, unit: fragments["PSI"], delta: delta})
+					speaker.speakPhrase("ConfirmPsiChange", {action: action, tyre: tyre, unit: fragments["PSI"], delta: Format("{:.1f}", delta)})
 					
 					this.setContinuation(ObjBindMethod(this, "updatePitstopTyrePressure", tyreType, (action == kIncrease) ? delta : (delta * -1)))
 					
@@ -1290,16 +1290,16 @@ class RaceEngineer extends ConfigurationItem {
 				speaker.speakPhrase("NewPressures")
 			
 			if (debug || (incrementFL != 0))
-				speaker.speakPhrase("TyreFL", {value: Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL"), 1), unit: fragments["PSI"]})
+				speaker.speakPhrase("TyreFL", {value: Format("{:.1f}", knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL")), unit: fragments["PSI"]})
 			
 			if (debug || (incrementFR != 0))
-				speaker.speakPhrase("TyreFR", {value: Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR"), 1), unit: fragments["PSI"]})
+				speaker.speakPhrase("TyreFR", {value: Format("{:.1f}", knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR")), unit: fragments["PSI"]})
 			
 			if (debug || (incrementRL != 0))
-				speaker.speakPhrase("TyreRL", {value: Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL"), 1), unit: fragments["PSI"]})
+				speaker.speakPhrase("TyreRL", {value: Format("{:.1f}", knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL")), unit: fragments["PSI"]})
 			
 			if (debug || (incrementRR != 0))
-				speaker.speakPhrase("TyreRR", {value: Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR"), 1), unit: fragments["PSI"]})
+				speaker.speakPhrase("TyreRR", {value: Format("{:.1f}", knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR")), unit: fragments["PSI"]})
 
 			if knowledgeBase.getValue("Pitstop.Planned.Repair.Suspension", false)
 				speaker.speakPhrase("RepairSuspension")
@@ -1432,7 +1432,7 @@ class RaceEngineer extends ConfigurationItem {
 			speaker := this.getSpeaker()
 			
 			stintLaps := Round(stintLaps)
-			delta := Round(delta, 2)
+			delta := Format("{:.2f}", delta)
 			
 			if (repair == true) {
 				speaker.speakPhrase("RepairPitstop", {laps: stintLaps, delta: delta})

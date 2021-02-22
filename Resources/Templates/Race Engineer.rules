@@ -248,18 +248,18 @@ priority: 5, {All: {Any: [?Damage.Suspension.Lap.Delta = 0], {None: [?Damage.Sus
 				   {Any: [?Damage.Bodywork.Lap.Delta = 0], {None: [?Damage.Bodywork.Lap.Delta]},												\
 						 [?Damage.Bodywork = 0], {None: [?Damage.Bodywork]}}} => (Clear: Damage.Analysis.Reported)
 				   
-{All: [?Lap], [?Damage.Reported],																												\
-	  {None: [?Damage.Analysis.Reported > ?Damage.Reported]},																					\
-	  {Any: {None: [?Damage.Analysis.Reported]},																								\
-			{All: [?Damage.Analysis.Reported <= ?Damage.Reported], [?Damage.Analysis.Reported < ?Lap]}},										\
-	  {Any: [?Damage.Suspension.Lap.Delta > 0], [?Damage.Bodywork.Lap.Delta > 0]}} =>															\
+priority: -5, {All: [?Lap], [?Damage.Reported],																									\
+					{None: [?Damage.Analysis.Reported > ?Damage.Reported]},																		\
+					{Any: {None: [?Damage.Analysis.Reported]},																					\
+						  {All: [?Damage.Analysis.Reported <= ?Damage.Reported], [?Damage.Analysis.Reported < ?Lap]}},							\
+					{Any: [?Damage.Suspension.Lap.Delta > 0], [?Damage.Bodywork.Lap.Delta > 0]}} =>												\
 		(Prove: reportAnalysis, !Damage.Suspension.Lap.Delta, !Damage.Bodywork.Lap.Delta)
 				   
-{All: [?Lap], [?Damage.Reported],																												\
-	  {None: [?Damage.Analysis.Reported > ?Damage.Reported]},																					\
-	  {Any: {None: [?Damage.Analysis.Reported]},																								\
-			{All: [?Damage.Analysis.Reported <= ?Damage.Reported], [?Damage.Analysis.Reported < ?Lap]}},										\
-	  {None: [?Damage.Suspension.Lap.Delta], [?Damage.Bodywork.Lap.Delta]}} =>																	\
+priority: -5, {All: [?Lap], [?Damage.Reported],																									\
+					{None: [?Damage.Analysis.Reported > ?Damage.Reported]},																		\
+					{Any: {None: [?Damage.Analysis.Reported]},																					\
+						  {All: [?Damage.Analysis.Reported <= ?Damage.Reported], [?Damage.Analysis.Reported < ?Lap]}},							\
+					{None: [?Damage.Suspension.Lap.Delta], [?Damage.Bodywork.Lap.Delta]}} =>													\
 		(Prove: reportAnalysis, 0, 0)
 
 reportAnalysis(?sDelta, ?bDelta) <= unbound?(?sDelta), reportAnalysis(0, ?bDelta), !
@@ -283,7 +283,7 @@ reportAnalysis(?lostTime, ?stintLaps, ?delta) <= ?lostTime < !Race.Settings.Pits
 ;;;-------------------------------------------------------------------------;;;
 
 [?Lap] => (Prove: reportNewDamage, ?Lap)
-priority: 5, {Any: [?Damage.Update.Suspension = true], [?Damage.Update.Bodywork = true]} => (Prove: reportNewDamage, !Lap)
+{Any: [?Damage.Update.Suspension = true], [?Damage.Update.Bodywork = true]} => (Prove: reportNewDamage, !Lap)
 priority: -10, {Any: [?Damage.Update.Suspension = true], [?Damage.Update.Bodywork = true]} =>													\
 		(Clear: Damage.Update.Suspension), (Clear: Damage.Update.Bodywork)
 

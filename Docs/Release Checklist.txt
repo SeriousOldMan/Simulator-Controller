@@ -26,6 +26,10 @@ Release 2.4 Checklist
 5. New Format Race Engineer Settings
 6. New Format Button Box Positions
 7. logo und shutdown für System Plugin in Doku und updateFunction in "Simulator Tools"
+8. Raceroom Experience Plugin
+   a. Update Routine
+   b. Documentation
+   c. Translations, Simulator Configuration, Plugin Docs, Simulators List
 
 Release 2.3 Checklist
 =====================

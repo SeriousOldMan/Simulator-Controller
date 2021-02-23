@@ -2,5 +2,5 @@
 Current=2.4.1-dev
 Target=2.4-release
 Release=2.3.0-release
-Changes=Support for multiple Button Boxes, Better translation support
+Changes=Support for multiple Button Boxes, Better translation support, Enhancement of pedal calibration handling
 Date=02/22/2021

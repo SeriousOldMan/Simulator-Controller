@@ -112,6 +112,7 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 				WinWait %windowTitle%, , 5
 			
 				if kNeedsActivation {
+					WinMove %windowTitle%, , 50, 50
 					WinSet AlwaysOnTop, On, %windowTitle%
 					WinSet Top, , %windowTitle%
 					

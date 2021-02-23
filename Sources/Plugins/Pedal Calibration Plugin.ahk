@@ -112,6 +112,9 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 				WinWait %windowTitle%, , 5
 			
 				if kNeedsActivation {
+					WinSet AlwaysOnTop, On, %windowTitle%
+					WinSet Top, , %windowTitle%
+					
 					WinActivate %windowTitle%
 					
 					if (!WinActive(windowTitle) && SimulatorController.Instance.ActiveSimulator) {
@@ -157,8 +160,11 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 			finally {
 				if !wasRunning
 					application.shutdown()
-				else
+				else {
+					WinSet AlwaysOnTop, Off, %windowTitle%
+				
 					WinMinimize %windowTitle%
+				}
 			}
 		}
 	}

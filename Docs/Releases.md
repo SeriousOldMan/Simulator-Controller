@@ -5,6 +5,7 @@
   4. Support for more than one Button Box visual representation, if you have more than one hardware controller connected. Initial version will span a single mode across all Button Boxes, but a future version will allow for more than one active mode
   5. Change of Pedal Calibration Curves now works also, when in a running simulation
   6. Initial support for Raceroom Racing Experience by a skeleton plugin
+  7. Jona now recommends tyre pressure correction for the next stint based on environmental temperature development
 
 ## 2.3-release 02/19/21
   1. Bugfixes, as always

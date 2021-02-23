@@ -1434,7 +1434,7 @@ class RaceEngineer extends ConfigurationItem {
 			stintLaps := Round(stintLaps)
 			delta := Format("{:.2f}", delta)
 			
-			if (repair == true) {
+			if repair {
 				speaker.speakPhrase("RepairPitstop", {laps: stintLaps, delta: delta})
 		
 				if this.Listener {

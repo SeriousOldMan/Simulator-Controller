@@ -340,16 +340,27 @@ lowFuelWarning(?lap, ?remainingLaps) <= Call(lowFuelWarning, ?remainingLaps)
 ;;;-------------------------------------------------------------------------;;;
 
 projectedWeather(?lap, ?weather) <=																												\
-		sequence(1, !Lap, ?indices), lapWeathers(!Lap, ?weathers), reverse(?weathers, ?rWeathers),												\
-		linRegression(?indices, ?rWeathers, ?a, ?b), ?temp = ?b * ?lap, ?weather = ?a + ?temp
+		firstStintLap(?firstlap), sequence(?firstlap, !Lap, ?indices), lapWeathers(?firstlap, !Lap, ?weathers),									\
+		linRegression(?indices, ?weathers, ?a, ?b), ?temp = ?b * ?lap, ?weather = ?a + ?temp
 
 projectedTrackTemperature(?lap, ?temperature) <=																								\
-		sequence(1, !Lap, ?indices), lapTrackTemperatures(!Lap, ?temperatures), reverse(?temperatures, ?rTemperatures),							\
-		linRegression(?indices, ?rTemperatures, ?a, ?b), ?temp = ?b * ?lap, ?temperature = ?a + ?temp
+		firstStintLap(?firstlap), sequence(?firstlap, !Lap, ?indices), lapTrackTemperatures(?firstlap, !Lap, ?temperatures),					\
+		linRegression(?indices, ?temperatures, ?a, ?b), ?temp = ?b * ?lap, ?temperature = ?a + ?temp
 
 projectedTyreTemperature(?lap, ?temperature) <=																									\
-		sequence(1, !Lap, ?indices), lapTyreTemperatures(!Lap, ?temperatures), reverse(?temperatures, ?rTemperatures),							\
-		linRegression(?indices, ?rTemperatures, ?a, ?b), ?temp = ?b * ?lap, ?temperature = ?a + ?temp
+		firstStintLap(?firstlap), sequence(?firstlap, !Lap, ?indices), lapTyreTemperatures(?firstlap, !Lap, ?temperatures),						\
+		linRegression(?indices, ?temperatures, ?a, ?b), ?temp = ?b * ?lap, ?temperature = ?a + ?temp
+
+; [?Lap > 1] => (Prove: pressureCorrection)
+
+; pressureCorrection() <= pressureCorrection(?pressure)
+
+pressureCorrection(?pressure) <=																												\
+		firstStintLap(?startlap), ?firstLap = ?startLap + 2, ?firstLap < !Lap,																	\
+		sequence(?firstlap, !Lap, ?indices), lapTyrePressures(?firstLap, !Lap, ?pressures),	linRegression(?indices, ?pressures, ?a, ?b),		\
+		nextStintLaps(?nextStintLaps), ?halfStintLaps = ?nextStintLaps / 2,																		\
+		average(?pressures, ?avgPressure), ?targetLap = !Lap + ?halfStintLaps, ?temp = ?b * ?targetLap,											\
+		?correctedPressure = ?a + ?temp, ?pressure = ?avgPressure - ?correctedPressure
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -514,6 +525,13 @@ lapAvgTime(?lap, ?avgTime) <= weightedLapTimes(?lap, ?lapTimes),																
 
 lapRemainingFuel(?lap, ?remainingFuel) <= Get(Lap, ?lap, Fuel.Remaining, ?remainingFuel)
 
+firstStintLap(?lap) <= pitstopLap(?lap), !
+firstStintLap(1)
+
+nextStintLaps(?laps) <= lapRemainingFuel(!Lap, ?remainingFuel), ?fuel = ?remainingFuel + !Fuel.Amount.Target, !,								\
+						lapAvgFuel(!Lap, ?fuelPerLap), ?laps = ?fuel / ?fuelPerLap
+nextStintLaps(?laps) <= remainingRaceLaps(!Lap, ?laps)
+
 remainingRaceLaps(?lap, ?remainingLaps) <= Get(Lap, ?lap, Time.End, ?raceTime), ?raceLength = !Race.Duration * 1000,							\
 										   ?remainingTime = ?raceLength - ?raceTime, lapAvgTime(?lap, ?avgTime),								\
 										   ?remainingLaps = ?remainingTime / ?avgTime
@@ -522,14 +540,15 @@ remainingStintLaps(?lap, ?remainingLaps) <= remainingRaceLaps(?lap, ?raceLaps),	
 											lapRemainingFuel(?lap, ?fuelLeft), lapAvgFuel(?lap, ?fuelPerLap),									\
 											?fuelLaps = ?fuelLeft / ?fuelPerLap, min(?raceLaps, ?fuelLaps, ?remainingLaps)
 
-lapTimes(?lap, ?times) <= lapTimes(?lap, 0, ?temp), remove(?temp, 0, ?times)
+recentLapTimes(?lap, ?times) <= recentLapTimes(?lap, 0, ?temp), remove(?temp, 0, ?times)
 
-lapTimes(?lap, ?lap, []) <= !
-lapTimes(?, !Race.Settings.Lap.History.Considered, []) <= !
-lapTimes(?lap, ?offset, [0 | ?times]) <= ?tLap = ?lap - ?offset, pitstopLap(?tlap), !, ?nOffset = ?offset + 1, lapTimes(?lap, ?nOffset, ?times)
-lapTimes(?lap, ?offset, [0]) <= ?tLap = ?lap - ?offset, ?tLap = 1, !
-lapTimes(?lap, ?offset, [?time | ?times]) <= ?tLap = ?lap - ?offset, lapTime(?tlap, ?time),														\
-											 ?nOffset = ?offset + 1, lapTimes(?lap, ?nOffset, ?times)
+recentLapTimes(?lap, ?lap, []) <= !
+recentLapTimes(?, !Race.Settings.Lap.History.Considered, []) <= !
+recentLapTimes(?lap, ?offset, [0 | ?times]) <= ?tLap = ?lap - ?offset, pitstopLap(?tlap), !, ?nOffset = ?offset + 1,							\
+											   recentLapTimes(?lap, ?nOffset, ?times)
+recentLapTimes(?lap, ?offset, [0]) <= ?tLap = ?lap - ?offset, ?tLap = 1, !
+recentLapTimes(?lap, ?offset, [?time | ?times]) <= ?tLap = ?lap - ?offset, lapTime(?tlap, ?time),												\
+												   ?nOffset = ?offset + 1, recentLapTimes(?lap, ?nOffset, ?times)
 
 weightedLapTimes(?lap, ?times) <= weightedLapTimes(?lap, 0, ?temp), remove(?temp, 0, ?times)
 
@@ -552,34 +571,44 @@ lapWeight(?referenceLap, ?lap, ?weight) <= ?distance = ?referenceLap - ?lap,				
 										   dampingFactor(?distance, !Race.Settings.Lap.History.Considered,										\
 																	!Race.Settings.Lap.History.Damping, ?weight)
 
-lapTrackTemperatures(1, [?temperature]) <= lapTrackTemperature(?lap, ?temperature), !
-lapTrackTemperatures(?lap, [?temperature | ?temperatures]) <= lapTrackTemperature(?lap, ?temperature),											\
-															  ?nLap = ?lap - 1, lapTrackTemperatures(?nlap, ?temperatures)
+lapTyreTemperatures(?lap, ?lap, [?temperature]) <= lapTyreTemperature(?lap, ?temperature), !
+lapTyreTemperatures(?fromLap, ?toLap, [?temperature | ?temperatures]) <= lapTyreTemperature(?fromLap, ?temperature),							\
+																		 ?nLap = ?fromLap + 1, lapTyreTemperatures(?nlap, ?temperatures)
 
-lapTrackTemperatures(?lap, ?lap, []) <= !
-lapTrackTemperatures(?, !Race.Settings.Lap.History.Considered, []) <= !
-lapTrackTemperatures(?lap, ?offset, [?temperature | ?temperatures]) <=																			\
-		?tLap = ?lap - ?offset, lapTrackTemperature(?tLap, ?tTemperature), ?nOffset = ?offset + 1,												\
-		lapTrackTemperatures(?lap, ?nOffset, ?temperatures)
+recentLapTyreTemperatures(?lap, ?lap, []) <= !
+recentLapTyreTemperatures(?, !Race.Settings.Lap.History.Considered, []) <= !
+recentLapTyreTemperatures(?lap, ?offset, [?temperature | ?temperatures]) <=																		\
+		?tLap = ?lap - ?offset, lapTyreTemperature(?tLap, ?temperature), ?nOffset = ?offset + 1,												\
+		recentLapTyreTemperatures(?lap, ?nOffset, ?temperatures)
 
-lapTyreTemperatures(1, [?temperature]) <= lapTyreTemperature(?lap, ?temperature), !
-lapTyreTemperatures(?lap, [?temperature | ?temperatures]) <= lapTyreTemperature(?lap, ?temperature),											\
-															 ?nLap = ?lap - 1, lapTyreTemperatures(?nlap, ?temperatures)
+lapTyrePressures(?lap, ?lap, [?pressure]) <= lapTyrePressure(?lap, ?pressure), !
+lapTyrePressures(?fromLap, ?toLap, [?pressure | ?pressures]) <= lapTyrePressure(?fromLap, ?pressure), 											\
+																?nLap = ?fromLap + 1, lapTyrePressures(?nlap, ?toLap, ?pressures)
 
-lapTyreTemperatures(?lap, ?lap, []) <= !
-lapTyreTemperatures(?, !Race.Settings.Lap.History.Considered, []) <= !
-lapTyreTemperatures(?lap, ?offset, [?temperature | ?temperatures]) <=																			\
-		?tLap = ?lap - ?offset, lapTyreTemperature(?tLap, ?tTemperature), ?nOffset = ?offset + 1,												\
-		lapTyreTemperatures(?lap, ?nOffset, ?temperatures)
-								   
-lapWeathers(1, [?weather]) <= lapWeather(?lap, ?weather), !
-lapWeathers(?lap, [?weather | ?weathers]) <= lapWeather(?lap, ?weather), ?nLap = ?lap - 1, lapWeathers(?nlap, ?weathers)
+recentLapTyrePressures(?lap, ?lap, []) <= !
+recentLapTyrePressures(?, !Race.Settings.Lap.History.Considered, []) <= !
+recentLapTyrePressures(?lap, ?offset, [?pressure | ?pressures]) <=																		\
+		?tLap = ?lap - ?offset, lapTyrePressure(?tLap, ?pressure), ?nOffset = ?offset + 1,												\
+		recentLapTyrePressures(?lap, ?nOffset, ?pressures)
 
-lapWeathers(?lap, ?lap, []) <= !
-lapWeathers(?, !Race.Settings.Lap.History.Considered, []) <= !
-lapWeathers(?lap, ?offset, [?weather | ?weathers]) <= ?tLap = ?lap - ?offset, lapWeather(?tLap, ?tWeather),										\
-													  ?nOffset = ?offset + 1, lapWeathers(?lap, ?nOffset, ?weathers)
-													  
+lapTrackTemperatures(?lap, ?lap, [?temperature]) <= lapTrackTemperature(?lap, ?temperature), !
+lapTrackTemperatures(?fromLap, ?toLap, [?temperature | ?temperatures]) <= lapTrackTemperature(?fromLap, ?temperature),							\
+																		  ?nLap = ?fromLap + 1, lapTrackTemperatures(?nlap, ?temperatures)
+
+recentLapTrackTemperatures(?lap, ?lap, []) <= !
+recentLapTrackTemperatures(?, !Race.Settings.Lap.History.Considered, []) <= !
+recentLapTrackTemperatures(?lap, ?offset, [?temperature | ?temperatures]) <=																	\
+		?tLap = ?lap - ?offset, lapTrackTemperature(?tLap, ?temperature), ?nOffset = ?offset + 1,												\
+		recentLapTrackTemperatures(?lap, ?nOffset, ?temperatures)
+																		  
+lapWeathers(?lap, ?lap, [?weather]) <= lapWeather(?lap, ?weather), !
+lapWeathers(?fromLap, ?toLap, [?weather | ?weathers]) <= lapWeather(?fromLap, ?weather), ?nLap = ?fromLap + 1, lapWeathers(?nlap, ?weathers)
+
+recentLapWeathers(?lap, ?lap, []) <= !
+recentLapWeathers(?, !Race.Settings.Lap.History.Considered, []) <= !
+recentLapWeathers(?lap, ?offset, [?weather | ?weathers]) <=																						\
+		?tLap = ?lap - ?offset, lapWeather(?tLap, ?tWeather), ?nOffset = ?offset + 1, recentLapWeathers(?lap, ?nOffset, ?weathers)
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                       Pitstop Information Retrieval                     ;;;
@@ -639,7 +668,7 @@ linRegression(?xValues, ?yValues, ?a, ?b) <= average(?xValues, ?xAverage), avera
 avgDeltaProductSums([], ?, [], ?, 0, 0)
 avgDeltaProductSums([?h1 | ?t1], ?avg1, [?h2 | ?t2], ?avg2, ?sum1, ?sum2) <=																	\
 		?d1 = ?h1 - ?avg1, ?d2 = ?h2 - ?avg2, ?p1 = ?d1 * ?d2, ?p2 = ?d1 * ?d1,																	\
-		avgDeltaSums(?t1, ?avg1, ?t2, ?avg2, ?tSum1, ?tSum2), ?sum1 = ?p1 + ?tSum1, ?sum2 = ?p2 + ?tSum2
+		avgDeltaProductSums(?t1, ?avg1, ?t2, ?avg2, ?tSum1, ?tSum2), ?sum1 = ?p1 + ?tSum1, ?sum2 = ?p2 + ?tSum2
 
 
 ;;;-------------------------------------------------------------------------;;;

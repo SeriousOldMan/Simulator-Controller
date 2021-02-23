@@ -16,12 +16,13 @@ Release 2.4 Checklist
    a. unregisterButtonBox
    b. ButtonBoxes
    c. createGui, associateGui, registerControlHandle, et.al.
-   c. showSplashMessage
+   c. showMessage
    d. distanceFromTop/Bottom
    e. ButtonBox Visible und isVisible weg
 2. Documentation for nextUntranslated
 3. Documentation for multiple Button Boxes
 4. Documentation for new Jona functionality
+   a. Extensive How it Works
 4. Update documentation for pedal calibration
 5. New Format Race Engineer Settings
 6. New Format Button Box Positions

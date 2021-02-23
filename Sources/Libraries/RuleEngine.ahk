@@ -478,8 +478,17 @@ class Fact extends Primary {
 	getValue(factsOrResultSet, default := "__NotInitialized__") {
 		if (factsOrResultSet.base == Facts)
 			return factsOrResultSet.getValue(this.Fact, default)
-		else
+		else 
 			return this
+	}
+	
+	isUnbound(factsOrResultSet) {
+		if (factsOrResultSet.base == Facts)
+			return (this.getValue(factsOrResultSet) = kNotInitialized)
+		else if (factsOrResultSet.base == ResultSet)
+			return (factsOrResultSet.KnowledgeBase.Facts.getValue(this.Fact, kNotInitialized) = kNotInitialized)
+		else
+			return false
 	}
 	
 	toString(factsOrResultSet := "__NotInitialized__") {
@@ -488,7 +497,7 @@ class Fact extends Primary {
 		else if (factsOrResultSet.base == ResultSet)
 			return factsOrResultSet.KnowledgeBase.Facts.getValue(this.Fact)
 		else
-			return ("!" . this.Fact)
+			return false
 	}
 	
 	unify(choicePoint, term) {

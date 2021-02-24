@@ -654,16 +654,16 @@ class RaceEngineer extends ConfigurationItem {
 		
 		speaker.speakPhrase((value == "Pressure") ? "Pressures" : "Temperatures")
 		
-		speaker.speakPhrase("TyreFL", {value: Format("{:.1f}", knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".FL"))
+		speaker.speakPhrase("TyreFL", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".FL"), 1))
 									 , unit: (value == "Pressure") ? fragments["PSI"] : fragments["Degrees"]})
 		
-		speaker.speakPhrase("TyreFR", {value: Format("{:.1f}", knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".FR"))
+		speaker.speakPhrase("TyreFR", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".FR"), 1))
 									 , unit: (value == "Pressure") ? fragments["PSI"] : fragments["Degrees"]})
 		
-		speaker.speakPhrase("TyreRL", {value: Format("{:.1f}", knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".RL"))
+		speaker.speakPhrase("TyreRL", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".RL"), 1))
 									 , unit: (value == "Pressure") ? fragments["PSI"] : fragments["Degrees"]})
 		
-		speaker.speakPhrase("TyreRR", {value: Format("{:.1f}", knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".RR"))
+		speaker.speakPhrase("TyreRR", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".RR"), 1))
 									 , unit: (value == "Pressure") ? fragments["PSI"] : fragments["Degrees"]})
 	}
 	
@@ -1279,10 +1279,10 @@ class RaceEngineer extends ConfigurationItem {
 			else
 				speaker.speakPhrase("WetTyres", {compound: fragments[compound], set: knowledgeBase.getValue("Pitstop.Planned.Tyre.Set")})
 			
-			incrementFL := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL.Increment"), 1)
-			incrementFR := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR.Increment"), 1)
-			incrementRL := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL.Increment"), 1)
-			incrementRR := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR.Increment"), 1)
+			incrementFL := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL.Increment", 0), 1)
+			incrementFR := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR.Increment", 0), 1)
+			incrementRL := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL.Increment", 0), 1)
+			incrementRR := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR.Increment", 0), 1)
 			
 			debug := this.Debug[kDebugPhrases]
 			
@@ -1290,25 +1290,28 @@ class RaceEngineer extends ConfigurationItem {
 				speaker.speakPhrase("NewPressures")
 			
 			if (debug || (incrementFL != 0))
-				speaker.speakPhrase("TyreFL", {value: Format("{:.1f}", knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL")), unit: fragments["PSI"]})
+				speaker.speakPhrase("TyreFL", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL"), 1)), unit: fragments["PSI"]})
 			
 			if (debug || (incrementFR != 0))
-				speaker.speakPhrase("TyreFR", {value: Format("{:.1f}", knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR")), unit: fragments["PSI"]})
+				speaker.speakPhrase("TyreFR", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR"), 1)), unit: fragments["PSI"]})
 			
 			if (debug || (incrementRL != 0))
-				speaker.speakPhrase("TyreRL", {value: Format("{:.1f}", knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL")), unit: fragments["PSI"]})
+				speaker.speakPhrase("TyreRL", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL"), 1)), unit: fragments["PSI"]})
 			
 			if (debug || (incrementRR != 0))
-				speaker.speakPhrase("TyreRR", {value: Format("{:.1f}", knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR")), unit: fragments["PSI"]})
+				speaker.speakPhrase("TyreRR", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR"), 1)), unit: fragments["PSI"]})
 		
-			correction := knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.Correction", 0)
+			pressureCorrection := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.Correction", 0), 1)
 			
-			if (correction != 0) {
-				temperatureTrend := knowledgeBase.getValue("Temperature.Track.Trend", 0)
+			if (Abs(pressureCorrection) > 0.05) {
+				temperatureDelta := knowledgeBase.getValue("Weather.Temperature.Track.Delta", 0)
+				msgbox % pressureCorrection . " " . temperatureDelta
+				if (temperatureDelta = 0)
+					temperatureDelta := ((pressureCorrection > 0) ? -1 : 1)
 				
-				speaker.speakPhrase("PressureCorrection", {value: Format("{:.1f}", Abs(correction)), unit: fragments["PSI"]
-														 , pressureDirection: (correction > 0) ? fragments["Increased"] : fragments["Decreased"]
-														 , temperatureDirection: (temperatureTrend > 0) ? fragments["Rising"] : fragments["Falling"]})
+				speaker.speakPhrase("PressureCorrection", {value: Format("{:.1f}", Abs(pressureCorrection)), unit: fragments["PSI"]
+														 , pressureDirection: (pressureCorrection > 0) ? fragments["Increase"] : fragments["Decrease"]
+														 , temperatureDirection: (temperatureDelta > 0) ? fragments["Rising"] : fragments["Falling"]})
 			}
 
 			if knowledgeBase.getValue("Pitstop.Planned.Repair.Suspension", false)
@@ -1442,7 +1445,7 @@ class RaceEngineer extends ConfigurationItem {
 			speaker := this.getSpeaker()
 			
 			stintLaps := Round(stintLaps)
-			delta := Format("{:.2f}", delta)
+			delta := Format("{:.2f}", Round(delta, 2))
 			
 			if repair {
 				speaker.speakPhrase("RepairPitstop", {laps: stintLaps, delta: delta})

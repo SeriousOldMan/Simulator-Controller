@@ -121,6 +121,10 @@ weightedDeviation(?lap, ?offset, ?tyreType, ?deviation) <= ?tLap = ?lap - ?offse
 
 updateTargetPressures([], [])
 updateTargetPressures([?tyreType | ?tyreTypes], [?deviation | ?deviations]) <=																	\
+		bound?(!Tyre.Pressure.Target.Correction), !, Set(Tyre.Pressure.Deviation, ?tyreType, ?deviation),										\
+		?sumDeviation = ?deviation - !Tyre.Pressure.Target.Correction, abs(?sumDeviation, ?absDeviation),										\
+		Set(Tyre.Pressure.Deviation.Abs, ?tyreType, ?absDeviation), updateTargetPressures(?tyreTypes, ?deviations)
+updateTargetPressures([?tyreType | ?tyreTypes], [?deviation | ?deviations]) <=																	\
 		Set(Tyre.Pressure.Deviation, ?tyreType, ?deviation),																					\
 		abs(?deviation, ?absDeviation), Set(Tyre.Pressure.Deviation.Abs, ?tyreType, ?absDeviation),												\
 		updateTargetPressures(?tyreTypes, ?deviations)
@@ -133,10 +137,22 @@ updateTargetPressures([?tyreType | ?tyreTypes], [?deviation | ?deviations]) <=		
 		(Prove: updateTargetPressure, !Tyre.Compound.Target, RL, !Tyre.Pressure.Deviation.RL)
 [?Tyre.Pressure.Deviation.Abs.RR > ?Race.Settings.Tyre.Pressure.Deviation] =>																	\
 		(Prove: updateTargetPressure, !Tyre.Compound.Target, RR, !Tyre.Pressure.Deviation.RR)
+		
+[?Tyre.Pressure.Deviation.Abs.FL <= ?Race.Settings.Tyre.Pressure.Deviation] => (Prove: updateTargetPressure, !Tyre.Compound.Target, FL, 0)
+[?Tyre.Pressure.Deviation.Abs.FR <= ?Race.Settings.Tyre.Pressure.Deviation] => (Prove: updateTargetPressure, !Tyre.Compound.Target, FR, 0)
+[?Tyre.Pressure.Deviation.Abs.RL <= ?Race.Settings.Tyre.Pressure.Deviation] => (Prove: updateTargetPressure, !Tyre.Compound.Target, RL, 0)
+[?Tyre.Pressure.Deviation.Abs.RR <= ?Race.Settings.Tyre.Pressure.Deviation] => (Prove: updateTargetPressure, !Tyre.Compound.Target, RR, 0)
 
-updateTargetPressure(?compound, ?tyreType, ?deviation) <= lastPressure(?compound, ?tyreType, ?pressure),										\
-														  ?targetPressure = ?pressure - ?deviation, 											\
-														  Set(Tyre.Pressure.Target, ?tyreType, ?targetPressure)
+updateTargetPressure(?compound, ?tyreType, ?deviation) <=																						\
+		bound?(!Tyre.Pressure.Target.Correction), !, updateTargetPressure(?compound, ?tyreType, ?deviation, !Tyre.Pressure.Target.Correction)
+updateTargetPressure(?compound, ?tyreType, ?deviation) <= updateTargetPressure(?compound, ?tyreType, ?deviation, 0)
+
+updateTargetPressure(?compound, ?tyreType, ?deviation, ?correction) <=																			\
+		lastPressure(?compound, ?tyreType, ?pressure), ?temp = ?pressure - ?deviation, ?targetPressure = ?temp + ?correction, 					\
+		Set(Tyre.Pressure.Target, ?tyreType, ?targetPressure) ; , Call(debugShow, ?tyreType, ?pressure, ?deviation, ?correction, ?targetPressure)
+
+lastPressure(?compound, ?tyreType, ?pressure) <= pitstopTyrePressure(?compound, ?tyreType, ?pressure), !
+lastPressure(?compound, ?tyreType, ?pressure) <= setupTyrePressure(?compound, ?tyreType, ?pressure)
 
 [?Tyre.Pressure.Target.FL] => (Prove: updateTargetPressureIncrement, !Tyre.Compound.Target, FL)
 [?Tyre.Pressure.Target.FR] => (Prove: updateTargetPressureIncrement, !Tyre.Compound.Target, FR)
@@ -146,9 +162,6 @@ updateTargetPressure(?compound, ?tyreType, ?deviation) <= lastPressure(?compound
 updateTargetPressureIncrement(?compound, ?tyreType) <=																							\
 		setupTyrePressure(?compound, ?tyreType, ?basePressure), Get(Tyre.Pressure.Target, ?tyreType, ?targetPressure),							\
 		?increment = ?targetPressure - ?basePressure, Set(Tyre.Pressure.Target, ?tyreType, Increment, ?increment)
-
-lastPressure(?compound, ?tyreType, ?pressure) <= pitstopTyrePressure(?compound, ?tyreType, ?pressure), !
-lastPressure(?compound, ?tyreType, ?pressure) <= setupTyrePressure(?compound, ?tyreType, ?pressure)
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -339,9 +352,31 @@ lowFuelWarning(?lap, ?remainingLaps) <= Call(lowFuelWarning, ?remainingLaps)
 ;;; weather trends and weather forecast information (as far as available).  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+priority: 5, [?Lap > 3] => (Prove: updateTyrePressureCorrection, ?Lap), (Prove: updateWeatherTrend, ?Lap)
+
+updateTyrePressureCorrection(?lap) <=																											\
+		firstStintLap(?startlap), ?firstLap = ?startLap + 1, ?numLaps = ?lap - ?firstLap, ?numLaps > 5,											\
+		sequence(?firstlap, ?lap, ?indices), lapTyrePressures(?firstLap, ?lap, ?pressures),	linRegression(?indices, ?pressures, ?a, ?b),		\
+		nextStintLaps(?nextStintLaps), ?halfStintLaps = ?nextStintLaps / 2,																		\
+		average(?pressures, ?averagePressure), ?middleStintLap = ?lap + ?halfStintLaps, ?temp = ?b * ?middleStintLap,							\
+		?projectedPressure = ?a + ?temp, ?pressureCorrection = ?averagePressure - ?projectedPressure,											\
+		Set(Tyre.Pressure.Target.Correction, ?pressureCorrection) ; , Call(debugShow, ?startlap, ?lap, ?pressures, ?a, ?b, ?middleStintLap, ?pressureCorrection)
+
+updateWeatherTrend(?lap) <= firstStintLap(?startlap), ?deltaLaps = ?lap - ?startlap,															\
+							lapAirTemperature(?startlap, ?startAirTemperature), projectedAirTemperature(?lap, ?curAirTemperature),				\
+							lapTrackTemperature(?startlap, ?startTrackTemperature), projectedTrackTemperature(?lap, ?curTrackTemperature),		\
+							?tempAir = ?curAirTemperature - ?startAirTemperature, ?tempTrack = ?curTrackTemperature - ?startTrackTemperature,	\
+							?deltaAirTemperature = ?tempAir / ?deltaLaps, ?deltaTrackTemperature = ?tempTrack / ?deltaLaps,						\
+							Set(Weather.Temperature.Air.Delta, ?deltaAirTemperature),															\
+							Set(Weather.Temperature.Track.Delta, ?deltaTrackTemperature)
+
 projectedWeather(?lap, ?weather) <=																												\
 		firstStintLap(?firstlap), sequence(?firstlap, !Lap, ?indices), lapWeathers(?firstlap, !Lap, ?weathers),									\
 		linRegression(?indices, ?weathers, ?a, ?b), ?temp = ?b * ?lap, ?weather = ?a + ?temp
+
+projectedAirTemperature(?lap, ?temperature) <=																									\
+		firstStintLap(?firstlap), sequence(?firstlap, !Lap, ?indices), lapAirTemperatures(?firstlap, !Lap, ?temperatures),						\
+		linRegression(?indices, ?temperatures, ?a, ?b), ?temp = ?b * ?lap, ?temperature = ?a + ?temp
 
 projectedTrackTemperature(?lap, ?temperature) <=																								\
 		firstStintLap(?firstlap), sequence(?firstlap, !Lap, ?indices), lapTrackTemperatures(?firstlap, !Lap, ?temperatures),					\
@@ -350,17 +385,6 @@ projectedTrackTemperature(?lap, ?temperature) <=																								\
 projectedTyreTemperature(?lap, ?temperature) <=																									\
 		firstStintLap(?firstlap), sequence(?firstlap, !Lap, ?indices), lapTyreTemperatures(?firstlap, !Lap, ?temperatures),						\
 		linRegression(?indices, ?temperatures, ?a, ?b), ?temp = ?b * ?lap, ?temperature = ?a + ?temp
-
-; [?Lap > 1] => (Prove: pressureCorrection)
-
-; pressureCorrection() <= pressureCorrection(?pressure, ?lap), projectedTrackTemperature(?lap, ?temperature)
-
-pressureCorrection(?pressureCorrection, ?lap) <=																								\
-		firstStintLap(?startlap), ?firstLap = ?startLap + 2, ?firstLap < !Lap,																	\
-		sequence(?firstlap, !Lap, ?indices), lapTyrePressures(?firstLap, !Lap, ?pressures),	linRegression(?indices, ?pressures, ?a, ?b),		\
-		nextStintLaps(?nextStintLaps), ?halfStintLaps = ?nextStintLaps / 2,																		\
-		average(?pressures, ?averagePressure), ?lap = !Lap + ?halfStintLaps, ?temp = ?b * ?lap,													\
-		?projectedPressure = ?a + ?temp, ?pressureCorrection = ?averagePressure - ?projectedPressure
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -382,6 +406,8 @@ priority: 10, [?Pitstop.Plan] => (Prove: planPitstop)
 													  (Set: Pitstop.Planned.Tyre.Pressure.RL.Increment, !Tyre.Pressure.Target.RL.Increment)
 {All: [?Pitstop.Plan], [?Tyre.Pressure.Target.RR]} => (Set: Pitstop.Planned.Tyre.Pressure.RR, ?Tyre.Pressure.Target.RR),						\
 													  (Set: Pitstop.Planned.Tyre.Pressure.RR.Increment, !Tyre.Pressure.Target.RR.Increment)
+{All: [?Pitstop.Plan], [?Tyre.Pressure.Target.Correction]} =>																					\
+		(Set: Pitstop.Planned.Tyre.Pressure.Correction, ?Tyre.Pressure.Target.Correction)
 {All: [?Pitstop.Plan], [?Damage.Repair.Suspension.Target]} => (Set: Pitstop.Planned.Repair.Suspension, ?Damage.Repair.Suspension.Target)
 {All: [?Pitstop.Plan], [?Damage.Repair.Bodywork.Target]} => (Set: Pitstop.Planned.Repair.Bodywork, ?Damage.Repair.Bodywork.Target)
 {All: [?Pitstop.Plan], {None: [?Fuel.Amount.Target]}} => (Set: Pitstop.Planned.Fuel, 0)
@@ -447,6 +473,7 @@ priority: -10, [?Pitstop.Lap] => (Clear: Pitstop.Planned.Lap),																		
 								 (Clear: Pitstop.Planned.Tyre.Pressure.RL), (Clear: Pitstop.Planned.Tyre.Pressure.RR), 							\
 								 (Clear: Pitstop.Planned.Tyre.Pressure.FL.Increment), (Clear: Pitstop.Planned.Tyre.Pressure.FR.Increment), 		\
 								 (Clear: Pitstop.Planned.Tyre.Pressure.RL.Increment), (Clear: Pitstop.Planned.Tyre.Pressure.RR.Increment), 		\
+								 (Clear: Pitstop.Planned.Tyre.Pressure.Correction),																\
 								 (Clear: Pitstop.Planned.Repair.Suspension), (Clear: Pitstop.Planned.Repair.Bodywork)
 priority: -20, [?Pitstop.Lap] => (Set: Pitstop.Last, !Pitstop.Planned.Nr), (Clear: Pitstop.Planned.Nr),											\
 								 (Clear: Pitstop.Lap), (Clear: Pitstop.Prepared)
@@ -463,6 +490,7 @@ pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Tyre.Pressure.FL, !P
 pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Tyre.Pressure.FR, !Pitstop.Planned.Tyre.Pressure.FR)
 pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Tyre.Pressure.RL, !Pitstop.Planned.Tyre.Pressure.RL)
 pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Tyre.Pressure.RR, !Pitstop.Planned.Tyre.Pressure.RR)
+pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Tyre.Pressure.Correction, !Pitstop.Planned.Tyre.Pressure.Correction)
 pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Repair.Suspension, !Pitstop.Planned.Repair.Suspension)
 pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Repair.Bodywork, !Pitstop.Planned.Repair.Bodywork)
 
@@ -484,6 +512,8 @@ tyrePressureTarget(?compound, ?tyreType, ?pressure) <= Get(Race.Settings.Tyre, ?
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Lap Information Retrieval                       ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+lapAirTemperature(?lap, ?temperature) <= Get(Lap, ?lap, Temperature.Air, ?temperature)
 
 lapTrackTemperature(?lap, ?temperature) <= Get(Lap, ?lap, Temperature.Track, ?temperature)
 								   
@@ -587,9 +617,19 @@ lapTyrePressures(?fromLap, ?toLap, [?pressure | ?pressures]) <= lapTyrePressure(
 
 recentLapTyrePressures(?lap, ?lap, []) <= !
 recentLapTyrePressures(?, !Race.Settings.Lap.History.Considered, []) <= !
-recentLapTyrePressures(?lap, ?offset, [?pressure | ?pressures]) <=																		\
-		?tLap = ?lap - ?offset, lapTyrePressure(?tLap, ?pressure), ?nOffset = ?offset + 1,												\
+recentLapTyrePressures(?lap, ?offset, [?pressure | ?pressures]) <=																				\
+		?tLap = ?lap - ?offset, lapTyrePressure(?tLap, ?pressure), ?nOffset = ?offset + 1,														\
 		recentLapTyrePressures(?lap, ?nOffset, ?pressures)
+
+lapAirTemperatures(?lap, ?lap, [?temperature]) <= lapAirTemperature(?lap, ?temperature), !
+lapAirTemperatures(?fromLap, ?toLap, [?temperature | ?temperatures]) <= lapAirTemperature(?fromLap, ?temperature),								\
+																		?nLap = ?fromLap + 1, lapAirTemperatures(?nlap, ?temperatures)
+
+recentLapAirTemperatures(?lap, ?lap, []) <= !
+recentLapAirTemperatures(?, !Race.Settings.Lap.History.Considered, []) <= !
+recentLapAirTemperatures(?lap, ?offset, [?temperature | ?temperatures]) <=																		\
+		?tLap = ?lap - ?offset, lapAirTemperature(?tLap, ?temperature), ?nOffset = ?offset + 1,													\
+		recentLapAirTemperatures(?lap, ?nOffset, ?temperatures)
 
 lapTrackTemperatures(?lap, ?lap, [?temperature]) <= lapTrackTemperature(?lap, ?temperature), !
 lapTrackTemperatures(?fromLap, ?toLap, [?temperature | ?temperatures]) <= lapTrackTemperature(?fromLap, ?temperature),							\

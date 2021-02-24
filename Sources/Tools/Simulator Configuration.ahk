@@ -1303,10 +1303,12 @@ chooseApplicationWorkingDirectoryPath() {
 ;;; ControllerTab                                                           ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
+/*
 global oneWayTogglesEdit
 global twoWayTogglesEdit
 global buttonsEdit
 global dialsEdit
+*/
 
 class ControllerTab extends ConfigurationItemTab {
 	iFunctionsist := false
@@ -1318,6 +1320,7 @@ class ControllerTab extends ConfigurationItemTab {
 	}
 	
 	createControls(configuration) {
+		/*
 		Gui SE:Font, Norm, Arial
 		Gui SE:Font, Italic, Arial
 		
@@ -1340,6 +1343,7 @@ class ControllerTab extends ConfigurationItemTab {
 		Gui SE:Add, Text, x208 y120 w104 h23 +0x200, % translate("# Dials")
 		Gui SE:Add, Edit, x312 y120 w39 h21 Number VdialsEdit, %dialsEdit%
 		Gui SE:Add, UpDown, x352 y120 w18 h21, %dialsEdit%
+		*/
 		
 		Gui SE:Add, Button, x16 y490 w100 h23 gtoggleKeyDetector, % translate("Key Detector...")
 		
@@ -1349,15 +1353,18 @@ class ControllerTab extends ConfigurationItemTab {
 	loadFromConfiguration(configuration) {
 		base.loadFromConfiguration(configuration)
 		
+		/*
 		oneWayTogglesEdit := getConfigurationValue(configuration, "Controller Layout", "1WayToggles", 0)
 		twoWayTogglesEdit := getConfigurationValue(configuration, "Controller Layout", "2WayToggles", 0)
 		buttonsEdit := getConfigurationValue(configuration, "Controller Layout", "Buttons", 0)
 		dialsEdit := getConfigurationValue(configuration, "Controller Layout", "Dials", 0)
+		*/
 	}
 	
 	saveToConfiguration(configuration) {
 		base.saveToConfiguration(configuration)
 		
+		/*
 		GuiControlGet oneWayTogglesEdit
 		GuiControlGet twoWayTogglesEdit
 		GuiControlGet buttonsEdit
@@ -1367,6 +1374,7 @@ class ControllerTab extends ConfigurationItemTab {
 		setConfigurationValue(configuration, "Controller Layout", "2WayToggles", twoWayTogglesEdit)
 		setConfigurationValue(configuration, "Controller Layout", "Buttons", buttonsEdit)
 		setConfigurationValue(configuration, "Controller Layout", "Dials", dialsEdit)
+		*/
 		
 		this.iFunctionsList.saveToConfiguration(configuration)
 	}
@@ -1408,7 +1416,7 @@ class FunctionsList extends ConfigurationItemList {
 	}
 					
 	createControls(configuration) {
-		Gui SE:Add, ListView, x16 y158 w377 h192 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndfunctionsListViewHandle VfunctionsListView glistEvent
+		Gui SE:Add, ListView, x16 y80 w377 h270 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndfunctionsListViewHandle VfunctionsListView glistEvent
 							, % values2String("|", map(["Function", "Number", "Hotkey(s) & Action(s)"], "translate")*)
 	
 		Gui SE:Add, Text, x16 y360 w86 h23 +0x200, % translate("Function")

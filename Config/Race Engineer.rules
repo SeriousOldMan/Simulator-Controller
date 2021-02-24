@@ -149,7 +149,7 @@ updateTargetPressure(?compound, ?tyreType, ?deviation) <= updateTargetPressure(?
 
 updateTargetPressure(?compound, ?tyreType, ?deviation, ?correction) <=																			\
 		lastPressure(?compound, ?tyreType, ?pressure), ?temp = ?pressure - ?deviation, ?targetPressure = ?temp + ?correction, 					\
-		Set(Tyre.Pressure.Target, ?tyreType, ?targetPressure) ; , Call(debugShow, ?tyreType, ?pressure, ?deviation, ?correction, ?targetPressure)
+		Set(Tyre.Pressure.Target, ?tyreType, ?targetPressure)
 
 lastPressure(?compound, ?tyreType, ?pressure) <= pitstopTyrePressure(?compound, ?tyreType, ?pressure), !
 lastPressure(?compound, ?tyreType, ?pressure) <= setupTyrePressure(?compound, ?tyreType, ?pressure)
@@ -360,7 +360,7 @@ updateTyrePressureCorrection(?lap) <=																											\
 		nextStintLaps(?nextStintLaps), ?halfStintLaps = ?nextStintLaps / 2,																		\
 		average(?pressures, ?averagePressure), ?middleStintLap = ?lap + ?halfStintLaps, ?temp = ?b * ?middleStintLap,							\
 		?projectedPressure = ?a + ?temp, ?pressureCorrection = ?averagePressure - ?projectedPressure,											\
-		Set(Tyre.Pressure.Target.Correction, ?pressureCorrection) ; , Call(debugShow, ?startlap, ?lap, ?pressures, ?a, ?b, ?middleStintLap, ?pressureCorrection)
+		Set(Tyre.Pressure.Target.Correction, ?pressureCorrection)
 
 updateWeatherTrend(?lap) <= firstStintLap(?startlap), ?deltaLaps = ?lap - ?startlap,															\
 							lapAirTemperature(?startlap, ?startAirTemperature), projectedAirTemperature(?lap, ?curAirTemperature),				\

@@ -277,7 +277,7 @@ The following statsitical models are used at the moment:
 	 
   5. Tyre compound selection and tyre pressure gambling
   
-     Linear regression models are used here. Depending on the development of ambient and tyre temperatures, as well as weather changes (not yet implemented), Jona might suggest higher or lower pressures than currently perfect as a result of clear past trend, thereby giving you a good compromise for the upcoming sprint
+     Linear regression models are used here. Depending on the development of ambient and tyre temperatures, as well as weather changes (not yet implemented), Jona might suggest higher or lower pressures than currently perfect as a result of clear past trend, thereby giving you a good compromise for the upcoming stint.
 
 ## Technical information
 

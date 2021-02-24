@@ -1,6 +1,6 @@
 #### Driving...
   1. [Target: V2.4 - V3.0][Race Engineer] Further enhancements AI based race engineer
-	 - Automated tyre pressure adjustments between sessions depending on temprature changes and upcoming weather conditions
+	 - Automated tyre pressure adjustments between stints depending on temprature changes and upcoming weather conditions
 	 - Automated tyre compound recommendation based on upcoming weather conditions
   2. [Target: V2.5][RF2 Plugin] Initial adoption of the rFactor 2 racing simulation
   3. [Target: V2.7][ACC Plugin] Hot switching between different sets of ABS and TC settings using voice commands

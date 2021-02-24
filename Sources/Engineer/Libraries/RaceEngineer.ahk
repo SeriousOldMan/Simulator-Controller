@@ -1300,6 +1300,16 @@ class RaceEngineer extends ConfigurationItem {
 			
 			if (debug || (incrementRR != 0))
 				speaker.speakPhrase("TyreRR", {value: Format("{:.1f}", knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR")), unit: fragments["PSI"]})
+		
+			correction := knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.Correction", 0)
+			
+			if (correction != 0) {
+				temperatureTrend := knowledgeBase.getValue("Temperature.Track.Trend", 0)
+				
+				speaker.speakPhrase("PressureCorrection", {value: Format("{:.1f}", Abs(correction)), unit: fragments["PSI"]
+														 , pressureDirection: (correction > 0) ? fragments["Increased"] : fragments["Decreased"]
+														 , temperatureDirection: (temperatureTrend > 0) ? fragments["Rising"] : fragments["Falling"]})
+			}
 
 			if knowledgeBase.getValue("Pitstop.Planned.Repair.Suspension", false)
 				speaker.speakPhrase("RepairSuspension")

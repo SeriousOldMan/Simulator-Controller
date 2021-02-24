@@ -353,14 +353,14 @@ projectedTyreTemperature(?lap, ?temperature) <=																									\
 
 ; [?Lap > 1] => (Prove: pressureCorrection)
 
-; pressureCorrection() <= pressureCorrection(?pressure)
+; pressureCorrection() <= pressureCorrection(?pressure, ?lap), projectedTrackTemperature(?lap, ?temperature)
 
-pressureCorrection(?pressure) <=																												\
+pressureCorrection(?pressureCorrection, ?lap) <=																								\
 		firstStintLap(?startlap), ?firstLap = ?startLap + 2, ?firstLap < !Lap,																	\
 		sequence(?firstlap, !Lap, ?indices), lapTyrePressures(?firstLap, !Lap, ?pressures),	linRegression(?indices, ?pressures, ?a, ?b),		\
 		nextStintLaps(?nextStintLaps), ?halfStintLaps = ?nextStintLaps / 2,																		\
-		average(?pressures, ?avgPressure), ?targetLap = !Lap + ?halfStintLaps, ?temp = ?b * ?targetLap,											\
-		?correctedPressure = ?a + ?temp, ?pressure = ?avgPressure - ?correctedPressure
+		average(?pressures, ?averagePressure), ?lap = !Lap + ?halfStintLaps, ?temp = ?b * ?lap,													\
+		?projectedPressure = ?a + ?temp, ?pressureCorrection = ?averagePressure - ?projectedPressure
 
 
 ;;;-------------------------------------------------------------------------;;;

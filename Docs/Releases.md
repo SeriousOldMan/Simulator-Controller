@@ -6,6 +6,7 @@
   5. Change of Pedal Calibration Curves now works also, when in a running simulation
   6. Initial support for Raceroom Racing Experience by a skeleton plugin
   7. Jona now recommends tyre pressure correction for the next stint based on environmental temperature development
+  8. Extended documentation on Jonas capabilities, see the documentation on [How it works](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#how-it-works)
 
 ## 2.3-release 02/19/21
   1. Bugfixes, as always

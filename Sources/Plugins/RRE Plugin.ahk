@@ -26,13 +26,13 @@ class RREPlugin extends ControllerPlugin {
 	}
 	
 	__New(controller, name, configuration := false) {
-		this.iRREApplication := new Application("Raceroom Racing Experience", SimulatorController.Instance.Configuration)
+		this.iRREApplication := new Application("RaceRoom Racing Experience", SimulatorController.Instance.Configuration)
 		
 		base.__New(controller, name, configuration)
 	}
 	
 	runningSimulator() {
-		return (this.RREApplication.isRunning() ? "Raceroom Racing Experience" : false)
+		return (this.RREApplication.isRunning() ? "RaceRoom Racing Experience" : false)
 	}
 }
 

@@ -1305,7 +1305,7 @@ class RaceEngineer extends ConfigurationItem {
 			
 			if (Abs(pressureCorrection) > 0.05) {
 				temperatureDelta := knowledgeBase.getValue("Weather.Temperature.Track.Delta", 0)
-				msgbox % pressureCorrection . " " . temperatureDelta
+				
 				if (temperatureDelta = 0)
 					temperatureDelta := ((pressureCorrection > 0) ? -1 : 1)
 				

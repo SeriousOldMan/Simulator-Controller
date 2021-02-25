@@ -100,60 +100,72 @@ nextTyreSet() <= Set(Tyre.Set.Target, !Race.Setup.Tyre.Set.Fresh)
 ;;;-------------------------------------------------------------------------;;;
 
 [?Lap] => (Prove: updateTyrePressureDeviation, ?Lap)
-[?Tyre.Update.Pressure = true] => (Prove: updateTyrePressureDeviation, ?Lap), (Clear: Tyre.Update.Pressure)
+[?Tyre.Update.Pressure = true] => (Prove: updateTyrePressureDeviation, !Lap), (Clear: Tyre.Update.Pressure)
 
 updateTyrePressureDeviation(?lap) <= tyrePressureDeviation(?lap, [FL, FR, RL, RR], ?deviations), 												\
 									 updateTargetPressures([FL, FR, RL, RR], ?deviations)
 
 tyrePressureDeviation(?lap, [], [])
 tyrePressureDeviation(?lap, [?tyreType | ?tyreTypes], [?deviation | ?deviations]) <= 															\
-		weightedDeviation(?lap, 0, ?tyreType, ?deviation), tyrePressureDeviation(?lap, ?tyreTypes, ?deviations)
+		weightedDeviation(?lap, ?tyreType, ?deviation), tyrePressureDeviation(?lap, ?tyreTypes, ?deviations)
+		
+weightedDeviation(?lap, ?tyreType, ?deviation) <= weightedDeviations(?lap, 0, !Tyre.Compound.Target, ?tyreType, ?deviations, ?weights),			\
+												  sum(?deviations, ?sumDeviations), sum(?weights, ?sumWeights),									\
+												  ?deviation = ?sumDeviations / ?sumWeights
 
-weightedDeviation(?, !Race.Settings.Lap.History.Considered, ?, 0) <= !
-weightedDeviation(?lap, ?lap, ?, 0) <= !
-weightedDeviation(?lap, ?offset, ?tyreType, ?deviation) <= ?tLap = ?lap - ?offset,	currentTyreCompound(?compound),								\
-														   lapTyrePressure(?tLap, ?tyreType, ?lPressure),										\
-														   tyrePressureTarget(?compound, ?tyreType, ?tPressure),								\
-														   ?lDeviation = ?lPressure - ?tPressure,												\
-														   lapWeight(?tLap, ?weight), ?tDeviation = ?lDeviation * ?weight,						\
-														   ?nOffset = ?offset + 1, weightedDeviation(?lap, ?nOffset, ?tyreType, ?nDeviation),	\
-														   ?rDeviation = ?tDeviation + ?nDeviation,	?deviation = ?rDeviation / 2
+weightedDeviations(?, !Race.Settings.Lap.History.Considered, ?, ?, [], []) <= !
+weightedDeviations(?lap, ?lap, ?, ?, [], []) <= !
+weightedDeviations(?lap, ?offset, ?compound, ?tyreType, [?deviation | ?deviations], [?weight | ?weights]) <=									\
+		?tLap = ?lap - ?offset, lapTyrePressure(?tLap, ?tyreType, ?lPressure), tyrePressureTarget(?compound, ?tyreType, ?tPressure),			\
+		?lDeviation = ?lPressure - ?tPressure, lapWeight(?tLap, ?weight), ?deviation = ?lDeviation * ?weight,									\
+		?nOffset = ?offset + 1, weightedDeviations(?lap, ?nOffset, ?compound, ?tyreType, ?deviations, ?weights)
 
 updateTargetPressures([], [])
 updateTargetPressures([?tyreType | ?tyreTypes], [?deviation | ?deviations]) <=																	\
-		bound?(!Tyre.Pressure.Target.Correction), !, Set(Tyre.Pressure.Deviation, ?tyreType, ?deviation),										\
-		?sumDeviation = ?deviation - !Tyre.Pressure.Target.Correction, abs(?sumDeviation, ?absDeviation),										\
-		Set(Tyre.Pressure.Deviation.Abs, ?tyreType, ?absDeviation), updateTargetPressures(?tyreTypes, ?deviations)
-updateTargetPressures([?tyreType | ?tyreTypes], [?deviation | ?deviations]) <=																	\
-		Set(Tyre.Pressure.Deviation, ?tyreType, ?deviation),																					\
-		abs(?deviation, ?absDeviation), Set(Tyre.Pressure.Deviation.Abs, ?tyreType, ?absDeviation),												\
-		updateTargetPressures(?tyreTypes, ?deviations)
+		Set(Tyre.Pressure.Deviation, ?tyreType, ?deviation), updateTargetPressures(?tyreTypes, ?deviations)
 
-[?Tyre.Pressure.Deviation.Abs.FL > ?Race.Settings.Tyre.Pressure.Deviation] =>																	\
-		(Prove: updateTargetPressure, !Tyre.Compound.Target, FL, !Tyre.Pressure.Deviation.FL)
-[?Tyre.Pressure.Deviation.Abs.FR > ?Race.Settings.Tyre.Pressure.Deviation] =>																	\
-		(Prove: updateTargetPressure, !Tyre.Compound.Target, FR, !Tyre.Pressure.Deviation.FR)
-[?Tyre.Pressure.Deviation.Abs.RL > ?Race.Settings.Tyre.Pressure.Deviation] =>																	\
-		(Prove: updateTargetPressure, !Tyre.Compound.Target, RL, !Tyre.Pressure.Deviation.RL)
-[?Tyre.Pressure.Deviation.Abs.RR > ?Race.Settings.Tyre.Pressure.Deviation] =>																	\
-		(Prove: updateTargetPressure, !Tyre.Compound.Target, RR, !Tyre.Pressure.Deviation.RR)
+{All: [?Tyre.Pressure.Deviation.FL], [?Tyre.Pressure.Target.Correction]}  =>																	\
+		(Prove: updatePressureDelta, !Tyre.Compound.Target, FL, !Tyre.Pressure.Deviation.FL, ?Tyre.Pressure.Target.Correction)
+{All: [?Tyre.Pressure.Deviation.FR], [?Tyre.Pressure.Target.Correction]}  =>																	\
+		(Prove: updatePressureDelta, !Tyre.Compound.Target, FR, !Tyre.Pressure.Deviation.FR, ?Tyre.Pressure.Target.Correction)
+{All: [?Tyre.Pressure.Deviation.RL], [?Tyre.Pressure.Target.Correction]}  =>																	\
+		(Prove: updatePressureDelta, !Tyre.Compound.Target, RL, !Tyre.Pressure.Deviation.RL, ?Tyre.Pressure.Target.Correction)
+{All: [?Tyre.Pressure.Deviation.RR], [?Tyre.Pressure.Target.Correction]}  =>																	\
+		(Prove: updatePressureDelta, !Tyre.Compound.Target, RR, !Tyre.Pressure.Deviation.RR, ?Tyre.Pressure.Target.Correction)
 		
-[?Tyre.Pressure.Deviation.Abs.FL <= ?Race.Settings.Tyre.Pressure.Deviation] => (Prove: updateTargetPressure, !Tyre.Compound.Target, FL, 0)
-[?Tyre.Pressure.Deviation.Abs.FR <= ?Race.Settings.Tyre.Pressure.Deviation] => (Prove: updateTargetPressure, !Tyre.Compound.Target, FR, 0)
-[?Tyre.Pressure.Deviation.Abs.RL <= ?Race.Settings.Tyre.Pressure.Deviation] => (Prove: updateTargetPressure, !Tyre.Compound.Target, RL, 0)
-[?Tyre.Pressure.Deviation.Abs.RR <= ?Race.Settings.Tyre.Pressure.Deviation] => (Prove: updateTargetPressure, !Tyre.Compound.Target, RR, 0)
+{All: [?Tyre.Pressure.Deviation.FL], {None: [?Tyre.Pressure.Target.Correction]}}  =>															\
+		(Prove: updatePressureDelta, !Tyre.Compound.Target, FL, !Tyre.Pressure.Deviation.FL, 0)
+{All: [?Tyre.Pressure.Deviation.FR], {None: [?Tyre.Pressure.Target.Correction]}}  =>															\
+		(Prove: updatePressureDelta, !Tyre.Compound.Target, FR, !Tyre.Pressure.Deviation.FR, 0)
+{All: [?Tyre.Pressure.Deviation.RL], {None: [?Tyre.Pressure.Target.Correction]}}  =>															\
+		(Prove: updatePressureDelta, !Tyre.Compound.Target, RL, !Tyre.Pressure.Deviation.RL, 0)
+{All: [?Tyre.Pressure.Deviation.RR], {None: [?Tyre.Pressure.Target.Correction]}}  =>															\
+		(Prove: updatePressureDelta, !Tyre.Compound.Target, RR, !Tyre.Pressure.Deviation.RR, 0)
 
-updateTargetPressure(?compound, ?tyreType, ?deviation) <=																						\
-		bound?(!Tyre.Pressure.Target.Correction), !, updateTargetPressure(?compound, ?tyreType, ?deviation, !Tyre.Pressure.Target.Correction)
-updateTargetPressure(?compound, ?tyreType, ?deviation) <= updateTargetPressure(?compound, ?tyreType, ?deviation, 0)
+updatePressureDelta(?compound, ?tyreType, ?deviation, ?correction) <=																			\
+		?delta = ?correction - ?deviation, abs(?delta, ?absDelta),																				\
+		Set(Tyre.Pressure.Delta, ?tyreType, ?delta), Set(Tyre.Pressure.Delta, ?tyreType, Abs, ?absDelta)
+		
+[?Tyre.Pressure.Delta.FL.Abs > ?Race.Settings.Tyre.Pressure.Deviation] =>																		\
+		(Prove: updateTargetPressure, !Tyre.Compound.Target, FL, !Tyre.Pressure.Delta.FL)
+[?Tyre.Pressure.Delta.FR.Abs > ?Race.Settings.Tyre.Pressure.Deviation] =>																		\
+		(Prove: updateTargetPressure, !Tyre.Compound.Target, FR, !Tyre.Pressure.Delta.FR)
+[?Tyre.Pressure.Delta.RL.Abs > ?Race.Settings.Tyre.Pressure.Deviation] =>																		\
+		(Prove: updateTargetPressure, !Tyre.Compound.Target, RL, !Tyre.Pressure.Delta.RL)
+[?Tyre.Pressure.Delta.RR.Abs > ?Race.Settings.Tyre.Pressure.Deviation] =>																		\
+		(Prove: updateTargetPressure, !Tyre.Compound.Target, RR, !Tyre.Pressure.Delta.RR)
+		
+[?Tyre.Pressure.Delta.FL.Abs <= ?Race.Settings.Tyre.Pressure.Deviation] => (Prove: updateTargetPressure, !Tyre.Compound.Target, FL, 0)
+[?Tyre.Pressure.Delta.FR.Abs <= ?Race.Settings.Tyre.Pressure.Deviation] => (Prove: updateTargetPressure, !Tyre.Compound.Target, FR, 0)
+[?Tyre.Pressure.Delta.RL.Abs <= ?Race.Settings.Tyre.Pressure.Deviation] => (Prove: updateTargetPressure, !Tyre.Compound.Target, RL, 0)
+[?Tyre.Pressure.Delta.RR.Abs <= ?Race.Settings.Tyre.Pressure.Deviation] => (Prove: updateTargetPressure, !Tyre.Compound.Target, RR, 0)
 
-updateTargetPressure(?compound, ?tyreType, ?deviation, ?correction) <=																			\
-		lastPressure(?compound, ?tyreType, ?pressure), ?temp = ?pressure - ?deviation, ?targetPressure = ?temp + ?correction, 					\
-		Set(Tyre.Pressure.Target, ?tyreType, ?targetPressure)
+updateTargetPressure(?compound, ?tyreType, ?delta) <= lastPressure(?compound, ?tyreType, ?pressure),											\
+													  ?targetPressure = ?pressure + ?delta, Set(Tyre.Pressure.Target, ?tyreType, ?targetPressure)
 
 lastPressure(?compound, ?tyreType, ?pressure) <= pitstopTyrePressure(?compound, ?tyreType, ?pressure), !
 lastPressure(?compound, ?tyreType, ?pressure) <= setupTyrePressure(?compound, ?tyreType, ?pressure)
-
+		
 [?Tyre.Pressure.Target.FL] => (Prove: updateTargetPressureIncrement, !Tyre.Compound.Target, FL)
 [?Tyre.Pressure.Target.FR] => (Prove: updateTargetPressureIncrement, !Tyre.Compound.Target, FR)
 [?Tyre.Pressure.Target.RL] => (Prove: updateTargetPressureIncrement, !Tyre.Compound.Target, RL)
@@ -300,6 +312,7 @@ reportAnalysis(?lostTime, ?stintLaps, ?delta) <= ?lostTime < !Race.Settings.Pits
 priority: -10, {Any: [?Damage.Update.Suspension = true], [?Damage.Update.Bodywork = true]} =>													\
 		(Clear: Damage.Update.Suspension), (Clear: Damage.Update.Bodywork)
 
+reportNewDamage(!Damage.Reported) <= !, fail
 reportNewDamage(?lap) <= pitstopLap(?lap), !, fail
 reportNewDamage(1) <= !, lapDamage(1, Suspension, ?lSDamage), lapDamage(1, Bodywork, ?lBDamage), reportNewDamage(0, ?lSDamage, 0, ?lBDamage)
 reportNewDamage(?lap) <= pitstopLap(?pitstopLap), ?pitstopLap = ?lap - 1,																		\

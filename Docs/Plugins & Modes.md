@@ -9,6 +9,7 @@ The distribution of Simulator Controller includes a set of predefined plugins, w
 | ACC | Provides special support for starting and stopping *Assetto Corsa Competizione* from your hardware controller. The mode "Chat", which is normally only available when "Assetto Corsa Competizione" is currently running, handle automated chat messages for the multiplayer ingame chat system, where the chat messages can be configured by the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Additionally, beginning with Release 2.0, this plugin provides sophisticated support for the Pitstop MFD of *Assetto Corsa Competizione*. All settings may be tweaked using the controller hardware, but it is also possible to control the settings using voice control to keep your hands on the steering wheel. Since Release 2.1, Jona, the Virtual Race Engineer, is integrated with the ACC plugin as well. |
 | AC | One of the smallest plugin in this list only supplies a special splash screem, when Assetto Corsa is started. No special controller mode is defined for the moment. |
 | RF2 | Similar to the AC plugin provides this plugin start and stop support for rFactor 2. No special controller mode is defined for the moment. |
+| RRE | Similar to the AC and RF2 plugins provides this plugin start and stop support for RaceRoom Racing Experience. No special controller mode is defined for the moment. |
 
 All plugins can be configured in the [Plugins tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) of the configuration tool.
 
@@ -26,9 +27,10 @@ The "System" plugin creates the controller mode "Launch", which serves as a laun
 
 The "System" plugin accepts one configuration argument in the [Plugins tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) of the configuration tool, which you almost always will provide:
 
-	modeSelector: *modeSelectorFunction*
+	modeSelector: *modeSelectorFunction*, shutdown: *shutdownFunction*
 	
-The *modeSelector* parameter allows you to define a controller function to switch between modes. The *modeSelectorFunction* must be in the descriptor format, i.e. *"functionType*.*number*". You can use binary functions, such as 2-way toggle switches or dials, to switch forward and backward between modes, but a simple push button can also be used. Example: "modeSelector: 2WayToggle.1"
+The *modeSelector* parameter allows you to define a controller function to switch between modes. The *modeSelectorFunction* must be in the descriptor format, i.e. *"functionType*.*number*". You can use binary functions, such as 2-way toggle switches or dials, to switch forward and backward between modes, but a simple push button can also be used. Example: "modeSelector: 2WayToggle.1".
+With the *shutdown* parameter, a unary function can be supplied to shutdown the complete simulator system. This function will be available in the "Launch" mode.
 
 ## Plugin *Tactile Feedback*
 
@@ -154,7 +156,7 @@ IMPORTANT: Currently, only version 1.0 of *SmartControl* is supported, since ver
 
 ### Mode *Pedal Calibration*
 
-The plugin provides one controller mode, which lets you bind an unlimted set of calibration selectors to the buttons of your Button Box. This mode is always available, but for the moment it is not usable during a simulation, since the games prevent the *SmartControl* application from becoming active. This will be fixed in a future version of Simulator Controller.
+The plugin provides one controller mode, which lets you bind an unlimted set of calibration selectors to the buttons of your Button Box. This mode is always available, and you can change the pedal calibration even while in a race.
 
 Here is an example for typical layout.
 
@@ -272,3 +274,7 @@ This plugin handles the *Assetto Corsa* simulation game. An application with the
 ## Plugin *RF2*
 
 This plugin handles the *rFactor 2* simulation game. An application with the name "rFactor 2" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startRF2" as a special function hook in this configuration.
+
+## Plugin *RRE*
+
+This plugin handles the *RaceRoom Racing Experience* simulation game. An application with the name "RaceRoom Racing Experience" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startRRE" as a special function hook in this configuration and define "ahk_exe RRRE64.exe" (yes, three "R"s) as the window title.

@@ -43,7 +43,8 @@ global kUpdateMessages = {updateTranslations: "Updating translations to "
 						, updatePhraseGrammars: "Updating phrase grammars to "
 						, updateACCPluginForV20: "Updating ACC plugin to ", updateACCPluginForV21: "Updating ACC plugin to "
 						, updatePedalCalibrationPluginForV21: "Updating Pedal Calibration plugin to "
-						, updateRF2PluginForV23: "Updating rFactor 2 plugin to "}
+						, updateRF2PluginForV23: "Updating rFactor 2 plugin to "
+						, updateRREPluginForV24: "Updating RaceRoom Racing Experience plugin to "}
 
 global kCompiler = kAHKDirectory . "Compiler\ahk2exe.exe"
 
@@ -534,6 +535,21 @@ updatePedalCalibrationPluginForV21() {
 		pedalPlugin.iIsActive := false
 			
 		pedalPlugin.saveToConfiguration(userConfiguration)
+		
+		writeConfiguration(userConfigurationFile, userConfiguration)
+	}
+}
+
+updateRREPluginForV24() {
+	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	userConfiguration := readConfiguration(userConfigurationFile)
+	
+	if (userConfiguration.Count() > 0) {
+		rrePlugin := new Plugin("RRE", readConfiguration(getFileName(kSimulatorConfigurationFile, kConfigDirectory)))
+			
+		rrePlugin.iIsActive := false
+		
+		rrePlugin.saveToConfiguration(userConfiguration)
 		
 		writeConfiguration(userConfigurationFile, userConfiguration)
 	}

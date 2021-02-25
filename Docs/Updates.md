@@ -43,6 +43,18 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ***
 
+## Release 2.4
+
+Release 2.4 introduces the first version of the plugin for RaceRoom Racing Experience. If you are a fan of rFactor 2, you will see growing support for this simulation, including an integration with Jona, in the upcoming releases of Simulator Controller.
+
+The autoamated update procedure described above will add the plugin descriptor to your local configuration, but the plugin will be deactivated. You may want to activate it using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration), but to do so, you also have to add a new application on the [Applications tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-applications), which must be named "RaceRoom Racing Experience". Please set "startRRE" as the *Startup Function Hook* and "ahk_exe RRRE64.exe" (yes, three "R"s) as the window title. And last but not least, you may want to add "RaceRoom Racing Experience" to the list of Simulators on the [General tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-general).
+
+Unfortunately, the format of some of the Settings files have changed again with this release and you have to recreate them:
+  1. The format of the *Race Engineer Settings* file has changed again. Please start the *Race Engineer Settings* application, adjust all the settings and close the dialog with the "Ok" button.
+  2. Hold the control button down, while starting "Simulator Startup" and adjust the Button Box position. This is necessary, since Simulator Controller now supports multiple Button Boxes.
+
+***
+
 ## Release 2.3
 
 Beside lots of new functionality for Jona, the Virtual Race Engineer, this release introduces the first version of the plugin for rFactor 2. If you are a fan of rFactor 2, you will see growing support for this simulation, including an integration with Jona, in the upcoming releases of Simulator Controller.

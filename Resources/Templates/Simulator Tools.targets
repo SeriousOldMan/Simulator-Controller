@@ -7,6 +7,7 @@ Release 2.0.3=Release 2.0.2 -> updateConfigurationForV203, updateTranslations
 Release 2.1=Release 2.0.3 -> updateTranslations, updatePluginLabels, updateACCPluginForV21, updatePedalCalibrationPluginForV21
 Release 2.2=Release 2.1 -> updateTranslations, updatePluginLabels
 Release 2.3=Release 2.2 -> updateTranslations, updatePluginLabels, updatePhraseGrammars, updateRF2PluginForV23
+; Release 2.4=Release 2.3 -> updateTranslations, updatePhraseGrammars, updateRREPluginForV24
 [Cleanup]
 Binaries Folder=%kBinariesDirectory%
 Logs Folder=%kLogsDirectory%

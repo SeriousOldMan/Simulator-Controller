@@ -765,7 +765,7 @@ getAllThemes() {
 	return themes
 }
 
-showMessage(message, title := "Modular Simulator Controller System", icon := "Information.png", duration := 1000
+showMessage(message, title := false, icon := "Information.png", duration := 1000
 		  , x := "Center", y := "Bottom", width := 400, height := 100) {
 	innerWidth := width - 16
 	

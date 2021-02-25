@@ -191,7 +191,7 @@ Another special editor is used for maintaining different language translations. 
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Translations%20Editor.JPG)
 
-With the drop down menu at the top of the window you can choose any of the available languages and edit the defined translations, or you create a new language by pressing the '+' button next to the language drop down. Last but not least, you can delete a given language and all its translations, but be aware, that this cannot be undone.
+With the drop down menu at the top of the window you can choose any of the available languages and edit the defined translations, or you create a new language by pressing the '+' button next to the language drop down. You can delete a given language and all its translations, but be aware, that this cannot be undone. For your convinience, the small down array on the left side of the translation field will select the next text waiting for translation.
 
 Note: The original text sometimes has leading and/or trailing spaces. Be sure to include them in the translated text as well, since they are important for formatting.
 

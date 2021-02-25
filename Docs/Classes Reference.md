@@ -207,8 +207,8 @@ This class property returns the single instance of *SimulatorController*.
 #### *Settings[]*
 Returns the controller configuration map, not to be confused with the complete simulator configration map. This small configuration defines settings for controller notifications such as tray tips and buttonbox visuals and is maintained by the [settings editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--settings).
 	
-#### *ButtonBox[]*
-Returns an instance of the singleton class [ButtonBox](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-singleton-buttonbox-extends-configurationitem-simulator-controllerahk). This instance must be created by a specialized plugin and registered in the controller by calling [registerButtonBox](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#registerbuttonboxbuttonbox--buttonbox). See [this simple example](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/ButtonBox%20Plugin.ahk) for reference.
+#### *ButtonBoxes[]*
+Returns a list all [ButtonBox](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-buttonbox-extends-configurationitem-simulator-controllerahk) instances registered for the controller. These must have been created by a specialized plugin and registered in the controller by calling [registerButtonBox](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#registerbuttonboxbuttonbox--buttonbox). See [this simple example](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/ButtonBox%20Plugin.ahk) for reference.
 	
 #### *Functions[]*
 Returns a list of all functions defined in the underlying configuration.
@@ -253,7 +253,10 @@ Searches for a controller function with the given descriptor. Returns *false*, i
 Returns the controller action for the given function / trigger combination. Only currently active actions, which are bound to a function by their mode or plugin, are considered. Returns *false*, if there is no action currently connected to the function.
 
 #### *registerButtonBox(buttonBox :: ButtonBox)*
-Registers a visual representation for the hardware controller. This method is automatically called by the constructor of [ButtonBox](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-singleton-buttonbox-extends-configurationitem-simulator-controllerahk).
+Registers a visual representation for the hardware controller. This method is automatically called by the constructor of [ButtonBox](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-buttonbox-extends-configurationitem-simulator-controllerahk).
+
+#### *unregisterButtonBox(buttonBox :: ButtonBox)*
+Removes a visual representation for the hardware controller from this controller. This method might be called from your own Button Box plugin to remove all predefined Button Box representations before registering your own ones.
 
 #### *registerPlugin(plugin :: ControllerPlugin)*
 Registers the given plugin for the controller. If the plugin is active, the *activate* method will be invoked, thereby allowing the plugin to register some actions for controller functions.
@@ -491,16 +494,19 @@ This method must be implemented by every subclass of *ControllerAction* and act 
 
 ***
 
-## [Abstract Singleton] ButtonBox extends [ConfigurationItem](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-classesahk) ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
-The single instance of this class will implement a visual representation of your hardware controller. Althoug the Simulator Controller will provide complete functionality even without a visual representation, it is much more fun to see what happens. A subclass of *ButtonBox* must use the [Gui capabilities](https://www.autohotkey.com/docs/commands/Gui.htm) of the AutoHotkey language to implement the graphical representation. See [this simple example](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/ButtonBox%20Plugin.ahk) for reference.
+## [Abstract] ButtonBox extends [ConfigurationItem](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-classesahk) ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
+Instances of this class will implement a visual representation of your hardware controller. Althoug the Simulator Controller will provide complete functionality even without a visual representation, it is much more fun to see what happens. Subclasses of *ButtonBox* must use the [Gui capabilities](https://www.autohotkey.com/docs/commands/Gui.htm) of the AutoHotkey language to implement the graphical representation. See [this simple example](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/ButtonBox%20Plugin.ahk) for reference.
 
 ### Public Properties
 
-#### [Class] *Instance[]*
-This class property returns the single instance of *ButtonBox*.
-
 #### *Controller[]*
 Returns the corresponding controller.
+
+#### *Descriptor[]*
+Returns a unique descriptor for this instance of *ButtonBox*. The default implementation returns the name of the class, which will be unique in most cases, unless you have more than one Button Box of the same type.
+	
+#### *Visible[]*
+Returns *true*, if the Button Box window is currently visible.
 	
 #### *Num1WayToggles[]*
 The number of 1-way toggle switches of the Button Box. This is maintained by the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration).
@@ -522,14 +528,17 @@ The time in milliseconds, the Button Box may be visible after an action has been
 #### *__New(controller :: SimulatorController, configuration :: ConfigurationMap := false)*
 Constructs a Button Box. The single instance will be bound to the *Instance* property of the *ButtonBox* class. The Button Box is automatically registered for the given controller using [registerButtonBox](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#registerbuttonboxbuttonbox--buttonbox).
 	
-#### [Abstract] *createWindow(ByRef window :: String, ByRef windowWidth :: Integer, ByRef windowHeight :: Integer)*
-This method must be implemented by a subclass of *ButtonBox*. The window with its Gui controls for the visual representation of the Button Box must be created and the Gui prefix for this window (see the [AutoHotkey documentation](https://www.autohotkey.com/docs/commands/Gui.htm) for an explanation), and its width and height must be returned through the reference parameters of the method call.
+#### [Abstract] *createGui()*
+This method must be implemented by a subclass of *ButtonBox*. The window with its Gui controls for the visual representation of the Button Box must be created. The implementation of *createGui* must call *associateGui* (see below) and supply the Gui prefix for this window (see the [AutoHotkey documentation](https://www.autohotkey.com/docs/commands/Gui.htm) for an explanation), and its width and height and other information to the framework. Furthermore, all label fields must be registered using *registerControlHandle*.
 
-#### [Abstract] *getControlHandle(descriptor :: String)*
-This method must be implememnted by subclasses. For each visual representation of a controller function, which will a have an associated label or text field, a [GuiControl handle](https://www.autohotkey.com/docs/commands/GuiControl.htm) must be returned, or *false*, if there is no such text control. The given descriptor will identify the function according to the standard descriptor format, like "Button.3".
-	
-#### *isVisible()*
-Returns *true*, if the Button Box window is currently visible.
+#### *associateGui(window :: String, width :: Integer, height :: Integer, num1WayToggles :: Integer, num2WayToggles :: Integer, numButtons :: Integer, numDials :: Integer)*
+This method must be called by *createGui* to describe the Button Box to the framework.
+
+#### *registerControlHandle(descriptor :: String, handle :: Control Handle)*
+This method must be called by *createGui* as well for each label field of the Button Box. *handle* must be a control handle as defined by the *Hwnd* argument of [AutoHotkey Gui elements](https://www.autohotkey.com/docs/commands/Gui.htm).
+
+#### *getControlHandle(descriptor :: String)*
+For each visual representation of a controller function, which will a have an associated label or text field, a [GuiControl handle](https://www.autohotkey.com/docs/commands/GuiControl.htm) will be returned, or *false*, if there is no such text control. The given descriptor will identify the function according to the standard descriptor format, like "Button.3".
 	
 #### *show()*
 Shows the Button Box window according to the visibility rules defined in the configuration. This method is called automatically by the framework after each potential visual change.

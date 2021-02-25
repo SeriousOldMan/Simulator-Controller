@@ -3,7 +3,7 @@
   2. Documentation updates, as always
   3. Better support in translation tool for missing translations
   4. Support for more than one Button Box visual representation, if you have more than one hardware controller connected. Initial version will span a single mode across all Button Boxes, but a future version will allow for more than one active mode
-  5. Change of Pedal Calibration Curves now works also, when in a running simulation
+  5. Change of Pedal Calibration Curves now works also in a running simulation (even in an active race situation)
   6. Initial support for RaceRoom Racing Experience by a skeleton plugin
   7. Jona now recommends tyre pressure correction for the next stint based on environmental temperature development
   8. Extended documentation on Jonas capabilities, see the documentation on [How it works](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#how-it-works)

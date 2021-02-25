@@ -1,5 +1,5 @@
 [Version]
-Current=2.4.0-dev
+Current=2.4.0-alpha
 Target=2.4-release
 Release=2.3.0-release
 Changes=Support for multiple Button Boxes, Better translation support, Enhancement of pedal calibration handling, Skeleton Plugin for RRE

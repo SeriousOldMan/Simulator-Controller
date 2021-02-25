@@ -76,11 +76,11 @@ For developers: Sometimes you want magic stuff to happen, when an application is
 
 ### Tab *Controller*
 
-This tab represents the most important, the most versatile and also the most difficult to understand part of the configuration process. On this page, you describe your hardware controller, for example a Button Box, and all the functionality available on this controller.
+This tab represents the most important, the most versatile and also the most difficult to understand part of the configuration process. On this page, you describe your hardware controllers, for example one or more Button Boxes, and all the functionality available on this controller.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%204.JPG)
 
-In the top section you define how many functional elements of each type are available on your hardware controller. Simulator Controller can handle as many 1-way and 2-way toggle switches, normal push buttons and 2-way rotary dials as you like. Beside that, a fith function type *Custom* is available to connect special controller elements or other external trigger (for example macro tools for voice recognition) to the Simulator Controller.
+Note: Beginning with Release 2.4, Simulator Controller supports multiple Button Boxes. For the moment, the functions defined on the *Controller tab* will span all Button Boxes. So, the first Button Box might define Button #1 to Button #8 and the second Button Box will define Button #9 onwards. Also, only one mode will be active for all Button Boxes at the same time. This might chnage in a future version.
 
 In the *Bindings* group, you define one or two hotkeys and corresponding actions, depending on whether you have defined a unary or binary function type. 2-way toggles and dials need two bindings for the "On" and "Off", respectivly the "Increase" and "Decrease" trigger. The binding of a function happens by defining [hotkeys](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#hotkeys), which might trigger the given function. You can define more than one hotkey descriptor, delimited by the vertical bar "|", for each trigger in the controller tab. This might be useful, if you have several sources, which can trigger a given function. For example you might have a function, which can be triggered by pushing a button on the controller, but also from the keyboard, which might be emulated by another tool, for example a voice recognition software.
 

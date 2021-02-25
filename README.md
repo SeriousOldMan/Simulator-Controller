@@ -26,7 +26,9 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-None at the moment...
+[2.4.0-alpha](https://www.dropbox.com/s/03sjcyegxquleky/Simulator%20Controller%202.4.0-alpha.zip?dl=1) (First preview for the upcoming Release 2.4. Feature complete, quite stable and fully documented already. Update routines for the local configuration database are also fully implemented. Important new features: Support for multiple Button Boxes, New plugin for RaceRoom Racing Experience, Pedal Calibration changes are now possible even when on the race track - quite useful when the track gets wet, Jona now can recommend adjusted tyre pressures for falling or rising temperatures during long races)
+
+Important: Please be sure, to read the [update notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-24) on Release 2.4, before using the release.
 
 #### Latest release builds
 

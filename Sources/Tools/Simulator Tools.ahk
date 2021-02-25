@@ -540,21 +540,6 @@ updatePedalCalibrationPluginForV21() {
 	}
 }
 
-updateRREPluginForV24() {
-	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
-	userConfiguration := readConfiguration(userConfigurationFile)
-	
-	if (userConfiguration.Count() > 0) {
-		rrePlugin := new Plugin("RRE", readConfiguration(getFileName(kSimulatorConfigurationFile, kConfigDirectory)))
-			
-		rrePlugin.iIsActive := false
-		
-		rrePlugin.saveToConfiguration(userConfiguration)
-		
-		writeConfiguration(userConfigurationFile, userConfiguration)
-	}
-}
-
 updateRF2PluginForV23() {
 	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
 	userConfiguration := readConfiguration(userConfigurationFile)
@@ -565,6 +550,21 @@ updateRF2PluginForV23() {
 		rf2Plugin.iIsActive := false
 		
 		rf2Plugin.saveToConfiguration(userConfiguration)
+		
+		writeConfiguration(userConfigurationFile, userConfiguration)
+	}
+}
+
+updateRREPluginForV24() {
+	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	userConfiguration := readConfiguration(userConfigurationFile)
+	
+	if (userConfiguration.Count() > 0) {
+		rrePlugin := new Plugin("RRE", readConfiguration(getFileName(kSimulatorConfigurationFile, kConfigDirectory)))
+			
+		rrePlugin.iIsActive := false
+		
+		rrePlugin.saveToConfiguration(userConfiguration)
 		
 		writeConfiguration(userConfigurationFile, userConfiguration)
 	}

@@ -181,7 +181,7 @@ Currently, two different types of splash themes are supported. The first uses a 
 Some words about using the editor:
   - You can prelisten the currently selected sound file by pressing the start button next to the entry field. It will keep playing until you press this button again, even if another theme had been selected in the meantime.
   - You can add any picture to the pictures list by pressing the "+" button left to it. The new picture will be added at the end of the list. However, if you save your changes, only those pictures will be stored for the theme, that have a checked checkmark in their list entry.
-  - Everey JPG and GIF file added to a theme must be of a precise 16:9 format, otherwise you will get distortion artefacts.
+  - Every JPG and GIF file added to a theme must be of a precise 16:9 format, otherwise you will get distortion artefacts.
   - Due to a restriction in AutoHotkey, only the GIF format is currently supported for animations. A future version of Simulator Controller will support YT videos, MP4 files and other as well. For now you can convert your favorite MP4 file to a GIF image by using one of the available online converters, for example [Convertio](https://convertio.co/de/mp4-gif/) .
 
 After definition of a theme, you can choose it for the [startup sequence](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#other-settings) or even while the build tool is currently compiling your favorite plugin, if you are a developer.

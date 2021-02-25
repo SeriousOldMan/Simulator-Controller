@@ -184,11 +184,11 @@ updateTargetPressureIncrement(?compound, ?tyreType) <=																							\
 ;;; significant lap time reduction.                                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-priority: 5, [?Damage.Update.Suspension = true] => (Clear: Lap, !Lap, Damage.Suspension)
-priority: 5, [?Damage.Update.Bodywork = true] => (Clear: Lap, !Lap, Damage.Bodywork)
+priority: 5, [?Damage.Update.Suspension] => (Clear: Lap, !Lap, Damage.Suspension)
+priority: 5, [?Damage.Update.Bodywork] => (Clear: Lap, !Lap, Damage.Bodywork)
 
-{Any: [?Lap], {None: [?Damage.Repair.Suspension.Target]}, [?Damage.Update.Suspension = true]} => (Prove: updateSuspensionRepair, ?Lap)
-{Any: [?Lap], {None: [?Damage.Repair.Bodywork.Target]}, [?Damage.Update.Bodywork = true]} => (Prove: updateBodyworkRepair, ?Lap)
+{Any: [?Lap], {None: [?Damage.Repair.Suspension.Target]}, [?Damage.Update.Suspension = ?Lap]} => (Prove: updateSuspensionRepair, ?Lap)
+{Any: [?Lap], {None: [?Damage.Repair.Bodywork.Target]}, [?Damage.Update.Bodywork = ?Lap]} => (Prove: updateBodyworkRepair, ?Lap)
 
 updateSuspensionRepair(?lap) <= lapDamage(?lap, Suspension, ?damage), Set(Damage.Suspension, ?damage)
 updateBodyworkRepair(?lap) <= lapDamage(?lap, Bodywork, ?damage), Set(Damage.Bodywork, ?damage)
@@ -308,12 +308,13 @@ reportAnalysis(?lostTime, ?stintLaps, ?delta) <= ?lostTime < !Race.Settings.Pits
 ;;;-------------------------------------------------------------------------;;;
 
 [?Lap] => (Prove: reportNewDamage, ?Lap)
-{Any: [?Damage.Update.Suspension = true], [?Damage.Update.Bodywork = true]} => (Prove: reportNewDamage, !Lap)
-priority: -10, {Any: [?Damage.Update.Suspension = true], [?Damage.Update.Bodywork = true]} =>													\
+{Any: {Any: {All: [?Damage.Update.Suspension], {None: [?Damage.Suspension.Reported]}},															\
+			[?Damage.Update.Suspension > ?Damage.Suspension.Reported]},																			\
+	  {Any: {All: [?Damage.Update.Bodywork], {None: [?Damage.Bodywork.Reported]}},																\
+			[?Damage.Update.Bodywork > ?Damage.Bodywork.Reported]}} => (Prove: reportNewDamage, !Lap)
+priority: -10, {Any: [?Damage.Update.Suspension], [?Damage.Update.Bodywork]} =>																	\
 		(Clear: Damage.Update.Suspension), (Clear: Damage.Update.Bodywork)
 
-reportNewDamage(!Damage.Reported) <= !, fail
-reportNewDamage(?lap) <= pitstopLap(?lap), !, fail
 reportNewDamage(1) <= !, lapDamage(1, Suspension, ?lSDamage), lapDamage(1, Bodywork, ?lBDamage), reportNewDamage(0, ?lSDamage, 0, ?lBDamage)
 reportNewDamage(?lap) <= pitstopLap(?pitstopLap), ?pitstopLap = ?lap - 1,																		\
 						 pitstopDamageRepair(Suspension, ?suspensionRepaired), pitstopDamageRepair(Bodywork, ?bodyworkRepaired),				\
@@ -321,7 +322,7 @@ reportNewDamage(?lap) <= pitstopLap(?pitstopLap), ?pitstopLap = ?lap - 1,							
 						 newDamageAfterRepair(?lsDamage, ?suspensionRepaired, ?newSDamage),														\
 						 newDamageAfterRepair(?lBDamage, ?bodyworkRepaired, ?newBDamage),														\
 						 any?(true, [?newSDamage, ?newBDamage]), Call(damageWarning, ?newSDamage, ?newBDamage),									\
-						 Set(Damage.Reported, !Lap)
+						 setDamageReported(Suspension, ?newSDamage), setDamageReported(Bodywork, ?newBDamage)
 reportNewDamage(?lap) <= pitstopLap(?pitstopLap), ?pitstopLap = ?lap - 1,																		\
 						 lapDamage(?lap, Suspension, ?lSDamage), lapDamage(?lap, Bodywork, ?lBDamage),											\
 						 ?pLap = ?lap - 2, lapDamage(?pLap, Suspension, ?pSDamage), lapDamage(?pLap, Bodywork, ?pBDamage),						\
@@ -333,11 +334,14 @@ reportNewDamage(?lap) <= lapDamage(?lap, Suspension, ?lSDamage), lapDamage(?lap,
 reportNewDamage(?oldSDamage, ?newSDamage, ?oldBDamage, ?newBDamage) <=																			\
 						 >(?newSDamage, ?oldSDamage, ?sGreater), >(?newBDamage, ?oldBDamage, ?bGreater), 										\
 						 any?(true, [?sGreater, ?bGreater]), Call(damageWarning, ?sGreater, ?bGreater),											\
-						 Set(Damage.Reported, !Lap)
+						 setDamageReported(Suspension, ?sGreater), setDamageReported(Bodywork, ?bGreater)
 
 newDamageAfterRepair(0, ?, false)
 newDamageAfterRepair(?damage, true, true) <= ?damage > 0
 newDamageAfterRepair(?damage, false, false) <= ?damage > 0
+
+setDamageReported(?, false)
+setDamageReported(?damageType, true) <= Set(Damage.Reported, !Lap), Set(Damage, ?damageType, Reported, !Lap)
 
 
 ;;;-------------------------------------------------------------------------;;;

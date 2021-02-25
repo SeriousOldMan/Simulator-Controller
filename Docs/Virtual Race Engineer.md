@@ -257,27 +257,27 @@ Beside that, the check boxes for repair of Suspension and Bodywork must be both 
 
 Jona uses several statistical models to derive the data, on which the recommendations for the pitstop or other information is based. Therefore it will take some laps, before Jonas conclusion get more and more precise. So be careful, if you let Jona plan a pitstop after you have driven only three or four laps. You might end up with not enough fuel to reach the finish line.
 
-The following statsitical models are used at the moment:
+The following statsitical models are currently implemented:
 
   1. Tyre pressure development
   
-     The pressure development of the last laps and the deviation from the predefined target pressures are considered to derive pressure corrections for the next pitstop. The number of laps considered and the weighting of past laps can be configured using the settings tool.
+     The pressure development of the last laps and the deviation from the predefined target pressures are considered to derive pressure corrections for the next pitstop. The number of laps considered and the weighting of past laps can be configured using the settings tool. To get the most precise recommendations, set the *Statistical Window* as large as possible and the *Damping Factor* as small as possible. For example, a statistical window of 10 and a damping factor of 0.1 will consider your last 10 laps, where your most recent lap counts fully and the lap five laps ago only with 50%. Depending on accidents, severe traffic or safety car phases, especially in the most recent laps, the algorithm will come up with unexpected results, so always double check Jonas recommendations here.
 
   2. Refuel amount
   
-     Depending on the number of remaining laps and average fuel comsumption, Jona derives the exact amount of fuel required for the next stint. As for the tyre pressures, the lap weight of past laps may be configured for the fuel average calculation.
+     Depending on the number of remaining laps and average fuel comsumption, Jona derives the exact amount of fuel required for the next stint. As for the tyre pressures, the lap weight of past laps may be configured for the fuel average calculation, so the remarks above on statistical window and damping factor are valid here as well.
 	 
-  3. Damage induced lap time degration
+  3. Damage related lap time degration
   
-     After Jona detects a new damage, Jona observes the devlopment of your lap times and suggests an adopted pitstop strategy, depending on remaining stint time and the time used for a pitstop. The underlying model is quite complex and recognizes and excludes special lap situations like pitstops, accidents, and so on, from the average laptime calculation.
+     After Jona detects a new damage, the devlopment of your lap times are observed and Jona might suggest an adopted pitstop strategy, depending on remaining stint time and the delta time necessary for a pitstop. The underlying model is quite complex and recognizes and excludes special lap situations like pitstops, accidents, and so on, from the average laptime calculation. All laps of the current stint (except a couple of laps at the beginning) are considered by the algorithm and the average lap time incl. the standard deviation before the accident will be taken as the reference lap time. This means, that the computation will fail, if you had an accident very early in your stint, since you never had the chance to set a good reference lap. 
 	 
   4. Repair recommendations
   
-     Based on the same model, Jona suggests repairs for the upcoming pitstop. You can configure various strategies using the settings tool.
+     Based on the same model, Jona suggests repairs for the upcoming pitstop. You can configure various strategies (Repair Always, Repair Never, Repair when damage is above a given threshold, ...) using the settings tool.
 	 
   5. Tyre compound selection and tyre pressure gambling
   
-     Linear regression models are used here. Depending on the development of ambient and tyre temperatures, as well as weather changes (not yet implemented), Jona might suggest higher or lower pressures than currently perfect as a result of clear past trend, thereby giving you a good compromise for the upcoming stint.
+     Linear regression models are used here. Depending on the development of ambient, track and tyre temperatures, as well as weather changes (not yet implemented), Jona might suggest higher or lower pressures than currently perfect as a result of clear past trend, thereby giving you a good compromise for the upcoming stint. A future version will also recommend a tyre compouund change here as well.
 
 ## Technical information
 

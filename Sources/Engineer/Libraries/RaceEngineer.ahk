@@ -1190,7 +1190,7 @@ class RaceEngineer extends ConfigurationItem {
 		}
 		
 		if changed {
-			knowledgeBase.addFact("Damage.Update.Bodywork", true)
+			knowledgeBase.addFact("Damage.Update.Bodywork", lapNumber)
 		
 			needProduce := true
 		}
@@ -1210,7 +1210,7 @@ class RaceEngineer extends ConfigurationItem {
 		}
 		
 		if changed {
-			knowledgeBase.addFact("Damage.Update.Suspension", true)
+			knowledgeBase.addFact("Damage.Update.Suspension", lapNumber)
 		
 			needProduce := true
 		}

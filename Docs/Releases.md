@@ -1,3 +1,9 @@
+## 2.5-release upcoming...
+  
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Push-To-Talk function for voice recognition - this will reduce false positives almost to zero
+  
 ## 2.4.1-release 02/26/21
   
   1. Critical bugfix for 2.4

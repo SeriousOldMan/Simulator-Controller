@@ -122,10 +122,10 @@ class VoiceServer extends ConfigurationItem {
 	}
 	
 	loadFromConfiguration(configuration) {
-		this.iLanguage := getConfigurationValue(kSimulatorConfiguration, "Voice", "Language", getLanguage())
-		this.iSpeaker := getConfigurationValue(kSimulatorConfiguration, "Voice", "Speaker", true)
-		this.iListener := getConfigurationValue(kSimulatorConfiguration, "Voice", "Listener", false)
-		this.iPushToTalk := getConfigurationValue(kSimulatorConfiguration, "Voice", "PushToTalk", false)
+		this.iLanguage := getConfigurationValue(configuration, "Voice", "Language", getLanguage())
+		this.iSpeaker := getConfigurationValue(configuration, "Voice", "Speaker", true)
+		this.iListener := getConfigurationValue(configuration, "Voice", "Listener", false)
+		this.iPushToTalk := getConfigurationValue(configuration, "Voice", "PushToTalk", false)
 		
 		if this.PushToTalk {
 			pushToTalk := ObjBindMethod(this, "checkPushToTalk")
@@ -169,14 +169,7 @@ class VoiceServer extends ConfigurationItem {
 		generator.setVoice(generator.computeVoice(speaker, language, false))
 		
 		try {
-			this.iIsSpeaking := true
-			
-			try {
-				this.speak(text)
-			}
-			finally {
-				this.iIsSpeaking := false
-			}
+			this.speak(text)
 		}
 		finally {
 			generator.setVoice(currentVoice)

@@ -59,8 +59,12 @@ class RaceEngineer extends ConfigurationItem {
 	
 	iVoiceServer := false
 	
+	iPushToTalk := false
+	iPushToTalkThread := false
+	
 	iSpeechGenerator := false
 	iSpeechRecognizer := false
+	iIsSpeaking := false
 	iIsListening := false
 	
 	iContinuation := false
@@ -186,10 +190,17 @@ class RaceEngineer extends ConfigurationItem {
 			stopped := this.Engineer.stopListening()
 			
 			try {
-				base.speak(text, true)
+				this.iIsSpeaking := true
+			
+				try {
+					base.speak(text, true)
+				}
+				finally {
+					this.iIsSpeaking := false
+				}
 			}
 			finally {
-				if stopped
+				if (stopped && !this.Engineer.PushToTalk)
 					this.Engineer.startListening()
 			}
 		}
@@ -285,9 +296,27 @@ class RaceEngineer extends ConfigurationItem {
 		}
 	}
 	
+	Speaking[] {
+		Get {
+			return this.iIsSpeaking
+		}
+	}
+	
 	Listener[] {
 		Get {
 			return this.iListener
+		}
+	}
+	
+	Listening[] {
+		Get {
+			return this.iIsListening
+		}
+	}
+	
+	PushToTalk[] {
+		Get {
+			return this.iPushToTalk
 		}
 	}
 	
@@ -333,26 +362,58 @@ class RaceEngineer extends ConfigurationItem {
 		}
 	}
 	
-	__New(configuration, raceSettings, pitstopHandler := false, name := false, language := false, speaker := false, listener := false, voiceServer := false) {
+	__New(configuration, raceSettings, pitstopHandler := false, name := false, language := "__Undefined__", speaker := false, listener := false, voiceServer := false) {
 		this.iDebug := (isDebug() ? kDebugKnowledgeBase : kDebugOff)
 		this.iRaceSettings := raceSettings
 		this.iPitstopHandler := pitstopHandler
 		this.iName := name
 		
-		listener := ((speaker != false) ? listener : false)
-		
-		if !language
-			language := getLanguage()
-		
-		this.iLanguage := language
-		this.iSpeaker := speaker
-		this.iListener := listener
-		
-		this.iVoiceServer := voiceServer
-		
 		base.__New(configuration)
 		
+		if (language != kUndefined) {
+			listener := ((speaker != false) ? listener : false)
+			
+			this.iLanguage := language
+			this.iSpeaker := speaker
+			this.iListener := listener
+			
+			this.iVoiceServer := voiceServer
+		}
+
 		registerEventHandler("Voice", ObjBindMethod(this, "handleVoiceCalls"))
+	}
+	
+	loadFromConfiguration(configuration) {
+		this.iLanguage := getConfigurationValue(configuration, "Voice", "Language", getLanguage())
+		this.iSpeaker := getConfigurationValue(configuration, "Voice", "Speaker", true)
+		this.iListener := getConfigurationValue(configuration, "Voice", "Listener", false)
+		this.iPushToTalk := getConfigurationValue(configuration, "Voice", "PushToTalk", false)
+		
+		if this.PushToTalk {
+			pushToTalk := ObjBindMethod(this, "checkPushToTalk")
+			this.iPushToTalkThread := pushToTalk
+			
+			SetTimer %pushToTalk%, 100
+		}
+	}
+	
+	checkPushToTalk() {
+		if this.VoiceServer {
+			this.iPushToTalk := false
+			
+			pushToTalk := this.iPushToTalkThread
+			
+			SetTimer %pushToTalk%, Off
+			
+			return
+		}
+		
+		theHotkey := this.PushToTalk
+			
+		if !this.Speaking && GetKeyState(theHotKey, "P")
+			this.startListening()
+		else if !GetKeyState(theHotKey, "P")
+			this.stopListening()
 	}
 	
 	setDebug(option, enabled) {
@@ -371,7 +432,8 @@ class RaceEngineer extends ConfigurationItem {
 			else
 				this.iSpeechGenerator := new this.LocalEngineerSpeaker(this, this.Speaker, this.Language, this.buildFragments(this.Language), this.buildPhrases(this.Language))
 			
-			this.startListener()
+			if !this.PushToTalk
+				this.startListening()
 		}
 		
 		return this.iSpeechGenerator
@@ -403,7 +465,7 @@ class RaceEngineer extends ConfigurationItem {
 	startListening(retry := true) {
 		local function
 		
-		if this.iSpeechRecognizer && !this.iIsListening
+		if this.iSpeechRecognizer && !this.Listening
 			if !this.iSpeechRecognizer.startRecognizer() {
 				if retry {
 					function := ObjBindMethod(this, "startListening", true)
@@ -423,7 +485,7 @@ class RaceEngineer extends ConfigurationItem {
 	stopListening(retry := false) {
 		local function
 		
-		if this.iSpeechRecognizer && this.iIsListening
+		if this.iSpeechRecognizer && this.Listening
 			if !this.iSpeechRecognizer.stopRecognizer() {
 				if retry {
 					function := ObjBindMethod(this, "stopListening", true)

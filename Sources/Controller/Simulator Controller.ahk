@@ -55,7 +55,7 @@ global kAllTrigger = "__All Trigger__"
 ;;;-------------------------------------------------------------------------;;;
 
 class ButtonBox extends ConfigurationItem {
-	static iButtonBoxWindows = {}
+	static iButtonBoxGuis := {}
 	
 	iController := false
 	
@@ -352,6 +352,8 @@ defaultCase:
 			setConfigurationValue(settings, "Button Box", this.Descriptor . ".Position.Y", newY)
 			
 			writeConfiguration(kSimulatorSettingsFile, settings)
+			
+			this.Controller.reloadSettings(settings)
 		}
 		finally {
 			CoordMode Mouse, curCoordMode
@@ -457,6 +459,10 @@ class SimulatorController extends ConfigurationItem {
 			if !functions.HasKey(descriptor)
 				functions[descriptor] := this.createControllerFunction(descriptor, configuration)
 		}
+	}
+	
+	reloadSettings(settings) {
+		this.iSettings := settings
 	}
 	
 	createControllerFunction(descriptor, configuration) {
@@ -1420,7 +1426,8 @@ startupSimulatorController() {
 	controller.updateLastEvent()
 	
 	for ignore, btnBox in controller.ButtonBoxes
-		btnBox.show()
+		if btnBox.VisibleDuration >= 9999
+			btnBox.show()
 }
 
 

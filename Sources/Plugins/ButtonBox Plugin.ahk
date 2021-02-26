@@ -32,9 +32,9 @@ class ButtonBox1 extends ButtonBox {
 		Gui BB1:Add, Picture, x-10 y-10, % kButtonBoxImagesDirectory . "Photorealistic\CF Background.png"
 		
 		Gui BB1:Font, s12 Bold cSilver
-		Gui BB1:Add, Text, x40 y8 w457 h23 +0x200 +0x1 BackgroundTrans, % translate("Modular Simulator Controller System")
+		Gui BB1:Add, Text, x40 y8 w457 h23 +0x200 +0x1 BackgroundTrans gmoveButtonBox, % translate("Modular Simulator Controller System")
 		Gui BB1:Font, s10 cSilver
-		Gui BB1:Add, Text, x40 y28 w457 h23 +0x200 +0x1 BackgroundTrans, % translate("Button Box")
+		Gui BB1:Add, Text, x40 y28 w457 h23 +0x200 +0x1 BackgroundTrans gmoveButtonBox, % translate("Button Box")
 		Gui BB1:Color, 0x000000
 		Gui BB1:Font, Norm, Arial
 		Gui BB1:Add, Picture, x33 y60 w54 h85 BackgroundTrans vtoggle1 gfunctionClick, % kButtonBoxImagesDirectory . "Photorealistic\Toggle Switch.png"
@@ -119,9 +119,9 @@ class ButtonBox2 extends ButtonBox {
 		Gui BB2:Add, Picture, x-10 y-10, % kButtonBoxImagesDirectory . "Photorealistic\CF Background.png"
 		
 		Gui BB2:Font, s12 Bold cSilver
-		Gui BB2:Add, Text, x40 y8 w359 h23 +0x200 +0x1 BackgroundTrans, % translate("Modular Simulator Controller System")
+		Gui BB2:Add, Text, x40 y8 w359 h23 +0x200 +0x1 BackgroundTrans gmoveButtonBox, % translate("Modular Simulator Controller System")
 		Gui BB2:Font, s10 cSilver
-		Gui BB2:Add, Text, x40 y28 w359 h23 +0x200 +0x1 BackgroundTrans, % translate("Button Box")
+		Gui BB2:Add, Text, x40 y28 w359 h23 +0x200 +0x1 BackgroundTrans gmoveButtonBox, % translate("Button Box")
 		Gui BB2:Color, 0x000000
 		Gui BB1:Font, Norm, Arial
 		Gui BB2:Add, Picture, x40 y60 w40 h40 BackgroundTrans vbutton9 gfunctionClick, % kButtonBoxImagesDirectory . "Photorealistic\Push Button 3.png"
@@ -170,7 +170,7 @@ initializeButtonBoxPlugin() {
 	controller := SimulatorController.Instance
 	
 	new ButtonBox1(controller, controller.Configuration)
-	new ButtonBox2(controller, controller.Configuration)
+	; new ButtonBox2(controller, controller.Configuration)
 }
 
 

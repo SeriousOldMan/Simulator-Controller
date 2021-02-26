@@ -2,7 +2,7 @@ General Release Actions
 =======================
 1. Update [Updates] section in "Simulator Tools.targets"
 2. Update [Processed] section in "UPDATES"
-3. Update "VERSION" file, especially *Current* setting
+3. Update "VERSION" file, especially *Release* setting
 4. Copy "VERSION" file to DropBox
 5. Copy *Release*.zip file to DropBox
 6. Update "README.md"

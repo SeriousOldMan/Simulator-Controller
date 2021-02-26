@@ -45,7 +45,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 2.4
 
-Release 2.4 introduces the first version of the plugin for RaceRoom Racing Experience. If you are a fan of rFactor 2, you will see growing support for this simulation, including an integration with Jona, in the upcoming releases of Simulator Controller.
+Release 2.4 introduces the first version of the plugin for RaceRoom Racing Experience. If you are a fan of RaceRoom Racing Experience, you will see growing support for this simulation, including an integration with Jona, in the upcoming releases of Simulator Controller.
 
 The autoamated update procedure described above will add the plugin descriptor to your local configuration, but the plugin will be deactivated. You may want to activate it using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration), but to do so, you also have to add a new application on the [Applications tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-applications), which must be named "RaceRoom Racing Experience". Please set "startRRE" as the *Startup Function Hook* and "ahk_exe RRRE64.exe" (yes, three "R"s) as the window title. And last but not least, you may want to add "RaceRoom Racing Experience" to the list of Simulators on the [General tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-general).
 

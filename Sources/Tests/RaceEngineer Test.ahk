@@ -49,6 +49,12 @@ global vPitstopTyrePressureIncrements = kNotInitialized
 global vPitstopRepairSuspension = kNotInitialized
 global vPitstopRepairBodywork = kNotInitialized
 
+global vSuspensionDamage
+global vBodyworkDamage
+global vDamageRepair
+global vDamageLapDelta
+global vDamageStintLaps
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Private Classes Section                         ;;;
@@ -72,6 +78,17 @@ class TestRaceEngineer extends RaceEngineer {
 		
 		vSuspensionDamage := newSuspensionDamage
 		vBodyworkDamage := newBodyworkDamage
+	}
+	
+	reportDamageAnalysis(repair, stintLaps, delta) {
+		base.reportDamageAnalysis(repair, stintLaps, delta)
+		
+		if isDebug()
+			showMessage("Damage analysis - Repair: " . (repair ? "Yes" : "No") . "; Lap Delta : " . delta . "; Remaining Laps: " . stintLaps)
+		
+		vDamageRepair := repair
+		vDamageLapDelta := delta
+		vDamageStintLaps := stintLaps
 	}
 }
 
@@ -227,6 +244,232 @@ class DamageReporting extends Assert {
 			
 			dumpKnowledge(engineer.KnowledgeBase)
 		}
+	}
+}
+
+global vSuspensionDamage
+global vBodyworkDamage
+global vDamageRepair
+global vDamageLapDelta
+global vDamageStintLaps
+
+
+class DamageAnalysis extends Assert {
+	DamageRace2ReportingTest() {
+		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 2\Race Engineer.settings"), new TestPitStopHandler(), false, false)
+		
+		done := false
+	
+		Loop {
+			lap := A_Index
+		
+			Loop {
+				vSuspensionDamage := kNotInitialized
+				vBodyworkDamage := kNotInitialized
+				vDamageRepair := kNotInitialized
+				vDamageLapDelta := kNotInitialized
+				vDamageStintLaps := kNotInitialized
+
+				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 2\Lap " . lap . "." . A_Index . ".data")
+			
+				if (data.Count() == 0) {
+					if (A_Index == 1)
+						done := true
+						
+					break
+				}
+				else {
+					if (A_Index == 1)
+						engineer.addLap(lap, data)
+					else
+						engineer.updateLap(lap, data)
+					
+					dumpKnowledge(engineer.KnowledgeBase)
+				}
+			
+				; 0.0	->	1.1		Report Bodywork
+				; 2.4	->	2.5		Report Bodywork
+				; 2.10	->	2.11	Report Suspension & Bodywork
+				; 3.4	->	3.5		Report Bodywork
+				
+				if ((lap == 1) && (A_Index == 1)) {
+					this.AssertEqual(false, vSuspensionDamage, "Expected suspension damage not to be reported...")
+					this.AssertEqual(true, vBodyworkDamage, "Expected bodywork damage to be reported...")
+				}
+				else if ((lap == 2) && (A_Index == 5)) {
+					this.AssertEqual(false, vSuspensionDamage, "Expected suspension damage not to be reported...")
+					this.AssertEqual(true, vBodyworkDamage, "Expected bodywork damage to be reported...")
+				}
+				else if ((lap == 2) && (A_Index == 11)) {
+					this.AssertEqual(true, vSuspensionDamage, "Expected suspension damage to be reported...")
+					this.AssertEqual(true, vBodyworkDamage, "Expected bodywork damage to be reported...")
+				}
+				else if ((lap == 3) && (A_Index == 5)) {
+					this.AssertEqual(false, vSuspensionDamage, "Expected suspension damage not to be reported...")
+					this.AssertEqual(true, vBodyworkDamage, "Expected bodywork damage to be reported...")
+				}
+				else {
+					this.AssertEqual(kNotInitialized, vSuspensionDamage, "Expected suspension damage not to be reported...")
+					this.AssertEqual(kNotInitialized, vBodyworkDamage, "Expected bodywork damage not to be reported...")
+				}
+				
+				this.AssertEqual(kNotInitialized, vDamageRepair, "Unexpected damage analysis reported...")
+				this.AssertEqual(kNotInitialized, vDamageLapDelta, "Unexpected damage analysis reported...")
+				this.AssertEqual(kNotInitialized, vDamageStintLaps, "Unexpected damage analysis reported...")
+			}
+		} until done
+	}
+	
+	DamageRace3ReportingTest() {
+		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 3\Race Engineer.settings"), new TestPitStopHandler(), false, false)
+		
+		done := false
+	
+		Loop {
+			lap := A_Index
+		
+			Loop {
+				vSuspensionDamage := kNotInitialized
+				vBodyworkDamage := kNotInitialized
+				vDamageRepair := kNotInitialized
+				vDamageLapDelta := kNotInitialized
+				vDamageStintLaps := kNotInitialized
+
+				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 3\Lap " . lap . "." . A_Index . ".data")
+			
+				if (data.Count() == 0) {
+					if (A_Index == 1)
+						done := true
+						
+					break
+				}
+				else {
+					if (A_Index == 1)
+						engineer.addLap(lap, data)
+					else
+						engineer.updateLap(lap, data)
+					
+					dumpKnowledge(engineer.KnowledgeBase)
+				}
+			
+				; 3.1	->	3.2		Report Bodywork
+				; 5.1				Recommend Pitstop
+				; 5.3	->	5.4		Report Bodywork
+				; 7.1				Recommend Pitstop
+				
+				if ((lap == 3) && (A_Index == 2)) {
+					this.AssertEqual(false, vSuspensionDamage, "Expected suspension damage not to be reported...")
+					this.AssertEqual(true, vBodyworkDamage, "Expected bodywork damage to be reported...")
+					this.AssertEqual(kNotInitialized, vDamageRepair, "Unexpected damage analysis reported...")
+					this.AssertEqual(kNotInitialized, vDamageLapDelta, "Unexpected damage analysis reported...")
+					this.AssertEqual(kNotInitialized, vDamageStintLaps, "Unexpected damage analysis reported...")
+				}
+				else if ((lap == 5) && (A_Index == 1)) {
+					this.AssertEqual(kNotInitialized, vSuspensionDamage, "Expected suspension damage not to be reported...")
+					this.AssertEqual(kNotInitialized, vBodyworkDamage, "Expected bodywork damage not to be reported...")
+					this.AssertEqual(true, vDamageRepair, "Expected pitstop to be recommended...")
+					this.AssertEqual(1.7, Round(vDamageLapDelta, 1), "Expected lap delta to be 1.7...")
+					this.AssertEqual(16, Round(vDamageStintLaps), "Expected remaining stints to be 16...")
+				}
+				else if ((lap == 5) && (A_Index == 4)) {
+					this.AssertEqual(false, vSuspensionDamage, "Expected suspension damage not to be reported...")
+					this.AssertEqual(true, vBodyworkDamage, "Expected bodywork damage to be reported...")
+					this.AssertEqual(kNotInitialized, vDamageRepair, "Unexpected damage analysis reported...")
+					this.AssertEqual(kNotInitialized, vDamageLapDelta, "Unexpected damage analysis reported...")
+					this.AssertEqual(kNotInitialized, vDamageStintLaps, "Unexpected damage analysis reported...")
+				}
+				else if ((lap == 7) && (A_Index == 1)) {
+					this.AssertEqual(kNotInitialized, vSuspensionDamage, "Expected suspension damage not to be reported...")
+					this.AssertEqual(kNotInitialized, vBodyworkDamage, "Expected bodywork damage not to be reported...")
+					this.AssertEqual(true, vDamageRepair, "Expected pitstop to be recommended...")
+					this.AssertEqual(1.7, Round(vDamageLapDelta, 1), "Expected lap delta to be 1.7...")
+					this.AssertEqual(18, Round(vDamageStintLaps), "Expected remaining stints to be 18...")
+				}
+				else {
+					this.AssertEqual(kNotInitialized, vSuspensionDamage, "Expected suspension damage not to be reported...")
+					this.AssertEqual(kNotInitialized, vBodyworkDamage, "Expected bodywork damage not to be reported...")
+					this.AssertEqual(kNotInitialized, vDamageRepair, "Unexpected damage analysis reported...")
+					this.AssertEqual(kNotInitialized, vDamageLapDelta, "Unexpected damage analysis reported...")
+					this.AssertEqual(kNotInitialized, vDamageStintLaps, "Unexpected damage analysis reported...")
+				}
+			}
+		} until done
+	}
+	
+	DamageRace4ReportingTest() {
+		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 4\Race Engineer.settings"), new TestPitStopHandler(), false, false)
+		
+		done := false
+	
+		Loop {
+			lap := A_Index
+		
+			Loop {
+				vSuspensionDamage := kNotInitialized
+				vBodyworkDamage := kNotInitialized
+				vDamageRepair := kNotInitialized
+				vDamageLapDelta := kNotInitialized
+				vDamageStintLaps := kNotInitialized
+
+				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 4\Lap " . lap . "." . A_Index . ".data")
+			
+				if (data.Count() == 0) {
+					if (A_Index == 1)
+						done := true
+						
+					break
+				}
+				else {
+					if (A_Index == 1)
+						engineer.addLap(lap, data)
+					else
+						engineer.updateLap(lap, data)
+					
+					dumpKnowledge(engineer.KnowledgeBase)
+				}
+			
+				; 0.0	->	1.1		Report Bodywork
+				; 2.1	->	3.1		Recommend Strategy
+				; 11.7	->	11.8	Report Bodywork
+				; 12.10	->	13.1	Recommend Strategy
+				
+				if ((lap == 1) && (A_Index == 1)) {
+					this.AssertEqual(false, vSuspensionDamage, "Expected suspension damage not to be reported...")
+					this.AssertEqual(true, vBodyworkDamage, "Expected bodywork damage to be reported...")
+					this.AssertEqual(kNotInitialized, vDamageRepair, "Unexpected damage analysis reported...")
+					this.AssertEqual(kNotInitialized, vDamageLapDelta, "Unexpected damage analysis reported...")
+					this.AssertEqual(kNotInitialized, vDamageStintLaps, "Unexpected damage analysis reported...")
+				}
+				else if ((lap == 3) && (A_Index == 1)) {
+					this.AssertEqual(kNotInitialized, vSuspensionDamage, "Expected suspension damage not to be reported...")
+					this.AssertEqual(kNotInitialized, vBodyworkDamage, "Expected bodywork damage not to be reported...")
+					this.AssertEqual(false, vDamageRepair, "Expected no pitstop to be recommended...")
+					this.AssertEqual(0, Round(vDamageLapDelta, 1), "Expected lap delta to be 0.0...")
+					this.AssertEqual(15, Round(vDamageStintLaps), "Expected remaining stints to be 15...")
+				}
+				else if ((lap == 11) && (A_Index == 8)) {
+					this.AssertEqual(false, vSuspensionDamage, "Expected suspension damage not to be reported...")
+					this.AssertEqual(true, vBodyworkDamage, "Expected bodywork damage to be reported...")
+					this.AssertEqual(kNotInitialized, vDamageRepair, "Unexpected damage analysis reported...")
+					this.AssertEqual(kNotInitialized, vDamageLapDelta, "Unexpected damage analysis reported...")
+					this.AssertEqual(kNotInitialized, vDamageStintLaps, "Unexpected damage analysis reported...")
+				}
+				else if ((lap == 13) && (A_Index == 1)) {
+					this.AssertEqual(kNotInitialized, vSuspensionDamage, "Expected suspension damage not to be reported...")
+					this.AssertEqual(kNotInitialized, vBodyworkDamage, "Expected bodywork damage not to be reported...")
+					this.AssertEqual(false, vDamageRepair, "Expected pitstop to be recommended...")
+					this.AssertEqual(1.1, Round(vDamageLapDelta, 1), "Expected lap delta to be 1.1...")
+					this.AssertEqual(5, Round(vDamageStintLaps), "Expected remaining stints to be 5...")
+				}
+				else {
+					this.AssertEqual(kNotInitialized, vSuspensionDamage, "Expected suspension damage not to be reported...")
+					this.AssertEqual(kNotInitialized, vBodyworkDamage, "Expected bodywork damage not to be reported...")
+					this.AssertEqual(kNotInitialized, vDamageRepair, "Unexpected damage analysis reported...")
+					this.AssertEqual(kNotInitialized, vDamageLapDelta, "Unexpected damage analysis reported...")
+					this.AssertEqual(kNotInitialized, vDamageStintLaps, "Unexpected damage analysis reported...")
+				}
+			}
+		} until done
 	}
 }
 
@@ -609,6 +852,7 @@ class PitstopHandling extends Assert {
 if !GetKeyState("Ctrl") {
 	AHKUnit.AddTestClass(FuelReporting)
 	AHKUnit.AddTestClass(DamageReporting)
+	AHKUnit.AddTestClass(DamageAnalysis)
 	AHKUnit.AddTestClass(PitstopHandling)
 
 	AHKUnit.Run()

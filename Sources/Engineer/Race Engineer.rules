@@ -287,6 +287,7 @@ priority: -5, {All: [?Lap], [?Damage.Reported],																									\
 					{None: [?Damage.Suspension.Lap.Delta], [?Damage.Bodywork.Lap.Delta]}} =>													\
 		(Prove: reportAnalysis, 0, 0)
 
+reportAnalysis(?, ?) <= recentPitstopLap(!Lap), !, fail
 reportAnalysis(?sDelta, ?bDelta) <= unbound?(?sDelta), reportAnalysis(0, ?bDelta), !
 reportAnalysis(?sDelta, ?bDelta) <= unbound?(?bDelta), reportAnalysis(?sDelta, 0), !
 reportAnalysis(?sDelta, ?bDelta) <= ?temp = !Damage.Reported + 1, !Lap > ?temp,																	\
@@ -357,8 +358,7 @@ priority: 20, [?Lap.Remaining <= ?Race.Settings.Lap.PitstopWarning]  => (Prove: 
 updateRemainingLaps(?lap) <= remainingStintLaps(?lap, ?stintLaps), remainingRaceLaps(?lap, ?raceLaps),											\
  							 ?stintLaps < ?raceLaps, Set(Lap.Remaining, ?stintLaps)
 
-lowFuelWarning(?lap, ?remainingLaps) <= pitstopLap(?lap), !, fail
-lowFuelWarning(?lap, ?remainingLaps) <= pitstopLap(?pitstopLap), ?pitstopLap = ?lap - 1, !, fail
+lowFuelWarning(?lap, ?remainingLaps) <= recentPitstopLap(?lap), !, fail
 lowFuelWarning(?lap, ?remainingLaps) <= Call(lowFuelWarning, ?remainingLaps)
 
 

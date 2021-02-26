@@ -44,17 +44,59 @@ ListLines Off					; Disable execution history
 ;;;-------------------------------------------------------------------------;;;
 
 class VoiceServer extends ConfigurationItem {
+	iLanguage := "en"
+	iSpeaker := true
+	iListener := false
+	iPushToTalk := false
+	
 	iSpeechGenerator := false
 	
 	iSpeechRecognizer := false
+	iIsSpeaking := false
 	iIsListening := false
 	
 	iVoiceCommands := {}
 	
+	Language[] {
+		Get {
+			return this.iLanguage
+		}
+	}
+	
+	Speaker[] {
+		Get {
+			return this.iSpeaker
+		}
+	}
+	
+	Speaking[] {
+		Get {
+			return this.iIsSpeaking
+		}
+	}
+	
+	Listener[] {
+		Get {
+			return this.iListener
+		}
+	}
+	
+	Listening[] {
+		Get {
+			return this.iIsListening
+		}
+	}
+	
+	PushToTalk[] {
+		Get {
+			return this.iPushToTalk
+		}
+	}
+	
 	SpeechGenerator[create := false] {
 		Get {
-			if (create && !this.iSpeechGenerator)
-				this.iSpeechGenerator := new SpeechGenerator(true, getLanguage())
+			if (create && this.Speaker && !this.iSpeechGenerator)
+				this.iSpeechGenerator := new SpeechGenerator(this.Speaker, this.Language)
 			
 			return this.iSpeechGenerator
 		}
@@ -62,10 +104,11 @@ class VoiceServer extends ConfigurationItem {
 	
 	SpeechRecognizer[create := false] {
 		Get {
-			if (create && !this.iSpeechRecognizer) {
-				this.iSpeechRecognizer := new SpeechRecognizer(true, getLanguage())
+			if (create && this.Listener && !this.iSpeechRecognizer) {
+				this.iSpeechRecognizer := new SpeechRecognizer(this.Listener, this.Language)
 				
-				this.startListening()
+				if !this.PushToTalk
+					this.startListening()
 			}
 			
 			return this.iSpeechRecognizer
@@ -78,14 +121,43 @@ class VoiceServer extends ConfigurationItem {
 		VoiceServer.Instance := this
 	}
 	
+	loadFromConfiguration(configuration) {
+		this.iLanguage := getConfigurationValue(kSimulatorConfiguration, "Voice", "Language", getLanguage())
+		this.iSpeaker := getConfigurationValue(kSimulatorConfiguration, "Voice", "Speaker", true)
+		this.iListener := getConfigurationValue(kSimulatorConfiguration, "Voice", "Listener", false)
+		this.iPushToTalk := getConfigurationValue(kSimulatorConfiguration, "Voice", "PushToTalk", false)
+		
+		if this.PushToTalk {
+			pushToTalk := ObjBindMethod(this, "checkPushToTalk")
+			
+			SetTimer %pushToTalk%, 100
+		}
+	}
+	
+	checkPushToTalk() {
+		theHotkey := this.PushToTalk
+		
+		if !this.Speaking && GetKeyState(theHotKey, "P")
+			this.startListening()
+		else if !GetKeyState(theHotKey, "P")
+			this.stopListening()
+	}
+	
 	speak(text) {
 		stopped := this.stopListening()
 			
 		try {
-			this.SpeechGenerator[true].speak(text, true)
+			this.iIsSpeaking := true
+			
+			try {
+				this.SpeechGenerator[true].speak(text, true)
+			}
+			finally {
+				this.iIsSpeaking := false
+			}
 		}
 		finally {
-			if stopped
+			if (stopped && !this.PushToTalk)
 				this.startListening()
 		}
 	}
@@ -97,7 +169,14 @@ class VoiceServer extends ConfigurationItem {
 		generator.setVoice(generator.computeVoice(speaker, language, false))
 		
 		try {
-			this.speak(text)
+			this.iIsSpeaking := true
+			
+			try {
+				this.speak(text)
+			}
+			finally {
+				this.iIsSpeaking := false
+			}
 		}
 		finally {
 			generator.setVoice(currentVoice)
@@ -107,7 +186,7 @@ class VoiceServer extends ConfigurationItem {
 	startListening(retry := true) {
 		local function
 		
-		if this.SpeechRecognizer && !this.iIsListening
+		if (this.SpeechRecognizer && !this.Listening)
 			if !this.SpeechRecognizer.startRecognizer() {
 				if retry {
 					function := ObjBindMethod(this, "startListening", true)
@@ -127,7 +206,7 @@ class VoiceServer extends ConfigurationItem {
 	stopListening(retry := false) {
 		local function
 		
-		if this.SpeechRecognizer && this.iIsListening
+		if (this.SpeechRecognizer && this.Listening)
 			if !this.SpeechRecognizer.stopRecognizer() {
 				if retry {
 					function := ObjBindMethod(this, "stopListening", true)

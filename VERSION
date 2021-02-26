@@ -1,6 +1,6 @@
 [Version]
-Current=2.4.0-release
-Target=2.4.0-release
+Current=2.5.0-dev
+Target=2.5-release
 Release=2.4.0-release
-Changes=Support for multiple Button Boxes, Better translation support, Enhancement of pedal calibration handling, Skeleton Plugin for RRE, Jona makes temperature predictions
+Changes=Push to Talk
 Date=02/26/2021

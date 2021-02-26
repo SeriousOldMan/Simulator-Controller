@@ -1,4 +1,9 @@
+## 2.4.1-release 02/26/21
+  
+  1. Critical bugfix for 2.4
+  
 ## 2.4-release 02/26/21
+  
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. Better support in translation tool for missing translations
@@ -9,6 +14,7 @@
   8. Extended documentation on Jonas capabilities, see the documentation on [How it works](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#how-it-works)
 
 ## 2.3-release 02/19/21
+  
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. Lots of new stuff in the Jona AI kernel

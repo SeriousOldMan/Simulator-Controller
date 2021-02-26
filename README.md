@@ -32,7 +32,7 @@ None at the moment...
 
 [2.3.0-release](https://www.dropbox.com/s/lsjs4dyl328qyqq/Simulator%20Controller%202.3.0-release.zip?dl=1) (New features: Automated check for new version online on GitHub; New rules for damage impact analysis, reporting and pit strategy adjustments; rFactor 2 Skeleton Plugin. Important: Please read the [update notes on Release 2.3](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-23) carefully, since there is a manual step involved, if you want to use the new rFactor 2 plugin and there might be some tweaks necessary for the *Race Engineer.settings* file.)
 
-[2.4.0](https://www.dropbox.com/s/6t9hndp0w93gwvl/Simulator%20Controller%202.4.0-release.zip?dl=1) (Important new features: 1. Support for multiple Button Boxes, 2. New plugin for RaceRoom Racing Experience, 3. Pedal Calibration changes are now possible even when on the race track - quite useful when the track gets wet, 4. Jona now can recommend adjusted tyre pressures for falling or rising temperatures during long races, 5. Some tweaks in the translations editor.)
+[2.4.0-release](https://www.dropbox.com/s/6t9hndp0w93gwvl/Simulator%20Controller%202.4.0-release.zip?dl=1) (Important new features: 1. Support for multiple Button Boxes, 2. New plugin for RaceRoom Racing Experience, 3. Pedal Calibration changes are now possible even when on the race track - quite useful when the track gets wet, 4. Jona now can recommend adjusted tyre pressures for falling or rising temperatures during long races, 5. Some tweaks in the translations editor.)
 
 Important: Please be sure to read the [update notes on Release 2.4](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-24), before using the Release 2.4 build.
 

@@ -60,7 +60,6 @@ class RaceEngineer extends ConfigurationItem {
 	iVoiceServer := false
 	
 	iPushTalk := false
-	iPushToTalkThread := false
 	
 	iSpeechGenerator := false
 	iSpeechRecognizer := false
@@ -379,37 +378,31 @@ class RaceEngineer extends ConfigurationItem {
 			this.iSpeaker := speaker
 			this.iListener := listener
 			
+			if (voiceServer && (this.Language != getConfigurationValue(configuration, "Voice Control", "Language", getLanguage())))
+				voiceServer := false
+			
 			this.iVoiceServer := voiceServer
 		}
 
 		registerEventHandler("Voice", ObjBindMethod(this, "handleVoiceCalls"))
-	}
-	
-	loadFromConfiguration(configuration) {
-		this.iLanguage := getConfigurationValue(configuration, "Voice Control", "Language", getLanguage())
-		this.iSpeaker := getConfigurationValue(configuration, "Voice Control", "Speaker", true)
-		this.iListener := getConfigurationValue(configuration, "Voice Control", "Listener", false)
-		this.iPushTalk := getConfigurationValue(configuration, "Voice Control", "PushToTalk", false)
 		
-		if this.PushTalk {
+		if (!this.VoiceServer && this.PushTalk) {
 			pushToTalk := ObjBindMethod(this, "pushToTalk")
-			this.iPushToTalkThread := pushToTalk
 			
 			SetTimer %pushToTalk%, 100
 		}
 	}
 	
-	pushToTalk() {
-		if this.VoiceServer {
-			this.iPushTalk := false
-			
-			pushToTalk := this.iPushTalkThread
-			
-			SetTimer %pushToTalk%, Off
-			
-			return
-		}
+	loadFromConfiguration(configuration) {
+		base.loadFromConfiguration(configuration)
 		
+		this.iLanguage := getConfigurationValue(configuration, "Voice Control", "Language", getLanguage())
+		this.iSpeaker := getConfigurationValue(configuration, "Voice Control", "Speaker", true)
+		this.iListener := getConfigurationValue(configuration, "Voice Control", "Listener", false)
+		this.iPushTalk := getConfigurationValue(configuration, "Voice Control", "PushToTalk", false)
+	}
+	
+	pushToTalk() {
 		theHotkey := this.PushTalk
 		
 		if !this.Speaking && GetKeyState(theHotKey, "P")

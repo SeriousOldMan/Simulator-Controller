@@ -122,6 +122,8 @@ class VoiceServer extends ConfigurationItem {
 	}
 	
 	loadFromConfiguration(configuration) {
+		base.loadFromConfiguration(configuration)
+		
 		this.iLanguage := getConfigurationValue(configuration, "Voice Control", "Language", getLanguage())
 		this.iSpeaker := getConfigurationValue(configuration, "Voice Control", "Speaker", true)
 		this.iListener := getConfigurationValue(configuration, "Voice Control", "Listener", false)

@@ -373,7 +373,9 @@ class RaceEngineer extends ConfigurationItem {
 		if (language != kUndefined) {
 			listener := ((speaker != false) ? listener : false)
 			
-			this.iLanguage := language
+			if (language != false)
+				this.iLanguage := language
+			
 			this.iSpeaker := speaker
 			this.iListener := listener
 			
@@ -449,10 +451,7 @@ class RaceEngineer extends ConfigurationItem {
 			if this.VoiceServer
 				this.buildGrammars(false, this.Language)
 			else {
-				if (this.Listener != true)
-					recognizer := new SpeechRecognizer(this.Listener, this.Language)
-				else
-					recognizer := new SpeechRecognizer()
+				recognizer := new SpeechRecognizer(this.Listener, this.Language)
 				
 				this.buildGrammars(recognizer, this.Language)
 				

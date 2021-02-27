@@ -3294,8 +3294,9 @@ saveConfiguration(configurationFile, editor) {
 }
 
 editConfiguration() {
-	editor := new ConfigurationEditor(FileExist("C:\Program Files\AutoHotkey") || GetKeyState("Shift") || (getConfigurationValue(kSimulatorConfiguration, "Configuration", "AHK Path", "") != "")
-									, GetKeyState("Ctrl") ? newConfiguration() : kSimulatorConfiguration)
+	editor := new ConfigurationEditor(FileExist("C:\Program Files\AutoHotkey") || GetKeyState("Shift")
+								   || (getConfigurationValue(kSimulatorConfiguration, "Configuration", "AHK Path", "") != "")
+								    , GetKeyState("Ctrl") ? newConfiguration() : kSimulatorConfiguration)
 	
 	done := false
 	saved := false

@@ -59,7 +59,7 @@ class RaceEngineer extends ConfigurationItem {
 	
 	iVoiceServer := false
 	
-	iPushToTalk := false
+	iPushTalk := false
 	iPushToTalkThread := false
 	
 	iSpeechGenerator := false
@@ -200,7 +200,7 @@ class RaceEngineer extends ConfigurationItem {
 				}
 			}
 			finally {
-				if (stopped && !this.Engineer.PushToTalk)
+				if (stopped && !this.Engineer.PushTalk)
 					this.Engineer.startListening()
 			}
 		}
@@ -314,9 +314,9 @@ class RaceEngineer extends ConfigurationItem {
 		}
 	}
 	
-	PushToTalk[] {
+	PushTalk[] {
 		Get {
-			return this.iPushToTalk
+			return this.iPushTalk
 		}
 	}
 	
@@ -384,32 +384,32 @@ class RaceEngineer extends ConfigurationItem {
 	}
 	
 	loadFromConfiguration(configuration) {
-		this.iLanguage := getConfigurationValue(configuration, "Voice", "Language", getLanguage())
-		this.iSpeaker := getConfigurationValue(configuration, "Voice", "Speaker", true)
-		this.iListener := getConfigurationValue(configuration, "Voice", "Listener", false)
-		this.iPushToTalk := getConfigurationValue(configuration, "Voice", "PushToTalk", false)
+		this.iLanguage := getConfigurationValue(configuration, "Voice Control", "Language", getLanguage())
+		this.iSpeaker := getConfigurationValue(configuration, "Voice Control", "Speaker", true)
+		this.iListener := getConfigurationValue(configuration, "Voice Control", "Listener", false)
+		this.iPushTalk := getConfigurationValue(configuration, "Voice Control", "PushToTalk", false)
 		
-		if this.PushToTalk {
-			pushToTalk := ObjBindMethod(this, "checkPushToTalk")
+		if this.PushTalk {
+			pushToTalk := ObjBindMethod(this, "pushToTalk")
 			this.iPushToTalkThread := pushToTalk
 			
 			SetTimer %pushToTalk%, 100
 		}
 	}
 	
-	checkPushToTalk() {
+	pushToTalk() {
 		if this.VoiceServer {
-			this.iPushToTalk := false
+			this.iPushTalk := false
 			
-			pushToTalk := this.iPushToTalkThread
+			pushToTalk := this.iPushTalkThread
 			
 			SetTimer %pushToTalk%, Off
 			
 			return
 		}
 		
-		theHotkey := this.PushToTalk
-			
+		theHotkey := this.PushTalk
+		
 		if !this.Speaking && GetKeyState(theHotKey, "P")
 			this.startListening()
 		else if !GetKeyState(theHotKey, "P")
@@ -428,12 +428,13 @@ class RaceEngineer extends ConfigurationItem {
 	getSpeaker() {
 		if (this.Speaker && !this.iSpeechGenerator) {
 			if this.VoiceServer
-				this.iSpeechGenerator := new this.RemoteEngineerSpeaker(this, this.Speaker, this.Language, this.buildFragments(this.Language), this.buildPhrases(this.Language))
+				this.iSpeechGenerator := new this.RemoteEngineerSpeaker(this, this.Speaker, this.Language
+																	  , this.buildFragments(this.Language), this.buildPhrases(this.Language))
 			else
-				this.iSpeechGenerator := new this.LocalEngineerSpeaker(this, this.Speaker, this.Language, this.buildFragments(this.Language), this.buildPhrases(this.Language))
+				this.iSpeechGenerator := new this.LocalEngineerSpeaker(this, this.Speaker, this.Language
+																	 , this.buildFragments(this.Language), this.buildPhrases(this.Language))
 			
-			if !this.PushToTalk
-				this.startListening()
+			this.startListener()
 		}
 		
 		return this.iSpeechGenerator
@@ -455,7 +456,8 @@ class RaceEngineer extends ConfigurationItem {
 				
 				this.buildGrammars(recognizer, this.Language)
 				
-				recognizer.startRecognizer()
+				if !this.PushTalk
+					recognizer.startRecognizer()
 				
 				this.iSpeechRecognizer := recognizer
 			}

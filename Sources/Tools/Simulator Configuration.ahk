@@ -32,6 +32,14 @@ ListLines Off					; Disable execution history
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                          Local Include Section                          ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include ..\Libraries\SpeechGenerator.ahk
+#Include ..\Libraries\SpeechRecognizer.ahk
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -354,6 +362,7 @@ global saveModeDropDown
 
 class ConfigurationEditor extends ConfigurationItem {
 	iGeneralTab := false
+	iVoiceControlTab := false
 	iPluginsTab := false
 	iApplicationsTab := false
 	iControllerTab := false
@@ -415,7 +424,7 @@ class ConfigurationEditor extends ConfigurationItem {
 		Gui SE:Add, Text, x8 y528 w55 h23 +0x200, % translate("Save")
 		Gui SE:Add, DropDownList, x63 y528 w75 AltSubmit Choose%chosen% VsaveModeDropDown, % values2String("|", map(choices, "translate")*)
 
-		tabs := map(["General", "Plugins", "Applications", "Controller", "Launchpad", "Chat"], "translate")
+		tabs := map(["General", "Voice Control", "Plugins", "Applications", "Controller", "Launchpad", "Chat"], "translate")
 			   
 		Gui SE:Add, Tab3, x8 y48 w398 h472 -Wrap, % values2String("|", tabs*)
 		
@@ -424,6 +433,10 @@ class ConfigurationEditor extends ConfigurationItem {
 		Gui SE:Tab, % tab++
 		
 		this.iGeneralTab := new GeneralTab(this.iDevelopment, configuration)
+		
+		Gui SE:Tab, % tab++
+		
+		this.iVoiceControlTab := new VoiceControlTab(configuration)
 		
 		Gui SE:Tab, % tab++
 		
@@ -468,6 +481,7 @@ class ConfigurationEditor extends ConfigurationItem {
 		if this.iDevelopment
 			this.iDevelopmentTab.saveToConfiguration(configuration)
 			
+		this.iVoiceControlTab.saveToConfiguration(configuration)
 		this.iPluginsTab.saveToConfiguration(configuration)
 		this.iApplicationsTab.saveToConfiguration(configuration)
 		this.iControllerTab.saveToConfiguration(configuration)
@@ -852,6 +866,136 @@ class SimulatorsList extends ConfigurationItemList {
 		GuiControlGet simulatorEdit
 		
 		return simulatorEdit
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; VoiceControlTab                                                         ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+global voiceLanguageDropDown
+global speakerDropDown
+global listenerDropDown
+global pushToTalkEdit = ""
+
+class VoiceControlTab extends ConfigurationItemTab {
+	__New(configuration) {
+		base.__New(configuration)
+		
+		VoiceControlTab.Instance := this
+	}
+	
+	createControls(configuration) {
+		Gui SE:Font, Norm, Arial
+		
+		choices := []
+		chosen := 0
+		enIndex := 0
+		
+		for code, language in availableLanguages() {
+			choices.Push(language)
+			
+			if (language == voiceLanguageDropDown)
+				chosen := A_Index
+				
+			if (code = "en")
+				enIndex := A_Index
+		}
+		
+		if (chosen == 0)
+			chosen := enIndex
+			
+		Gui SE:Add, Text, x16 y80 w100 h23 +0x200, % translate("Language")
+		Gui SE:Add, DropDownList, x114 y80 w135 Choose%chosen% VvoiceLanguageDropDown, % values2String("|", choices*)
+		
+		voices := new SpeechGenerator().Voices.Clone()
+		
+		voices.InsertAt(1, translate("Deactivated"))
+		voices.InsertAt(1, translate("Automatic"))
+		
+		chosen := inList(voices, speakerDropDown)
+		
+		if (chosen == 0)
+			chosen := 1
+		
+		Gui SE:Add, Text, x16 y104 w100 h23 +0x200, % translate("Speech Generator")
+		Gui SE:Add, DropDownList, x114 y104 w280 Choose%chosen% VspeakerDropDown, % values2String("|", voices*)
+		
+		recognizers := new SpeechRecognizer().getRecognizerList().Clone()
+		
+		Loop % recognizers.Length()
+			recognizers[A_Index] := recognizers[A_Index].Name
+		
+		recognizers.InsertAt(1, translate("Deactivated"))
+		recognizers.InsertAt(1, translate("Automatic"))
+		
+		chosen := inList(recognizers, listenerDropDown)
+		
+		if (chosen == 0)
+			chosen := 1
+		
+		Gui SE:Add, Text, x16 y128 w100 h23 +0x200, % translate("Speech Recognizer")
+		Gui SE:Add, DropDownList, x114 y128 w280 Choose%chosen% VlistenerDropDown, % values2String("|", recognizers*)
+		
+		Gui SE:Add, Text, x16 y152 w70 h23 +0x200, % translate("Push To Talk")
+		Gui SE:Add, Edit, x114 y152 w110 h21 VpushToTalkEdit, %pushToTalkEdit%
+		Gui SE:Add, Button, x226 y151 w23 h23 gtoggleKeyDetector HwnddetectPTTButtonHandle
+		setButtonIcon(detectPTTButtonHandle, kIconsDirectory . "Key.ico", 1)
+	}
+	
+	loadFromConfiguration(configuration) {
+		base.loadFromConfiguration(configuration)
+		
+		voiceLanguageDropDown := availableLanguages()[getConfigurationValue(configuration, "Voice Control", "Language", getLanguage())]
+		speakerDropDown := getConfigurationValue(configuration, "Voice Control", "Speaker", true)
+		listenerDropDown := getConfigurationValue(configuration, "Voice Control", "Listener", false)
+		pushToTalkEdit := getConfigurationValue(configuration, "Voice Control", "PushToTalk", false)
+		
+		if (pushToTalkEdit = false)
+			pushToTalkEdit := ""
+		
+		if (speakerDropDown == true)
+			speakerDropDown := translate("Automatic")
+		else if (speakerDropDown == false)
+			speakerDropDown := translate("Deactivated")
+		
+		if (listenerDropDown == true)
+			listenerDropDown := translate("Automatic")
+		else if (listenerDropDown == false)
+			listenerDropDown := translate("Deactivated")
+	}
+	
+	saveToConfiguration(configuration) {
+		base.saveToConfiguration(configuration)
+		
+		GuiControlGet voiceLanguageDropDown
+		GuiControlGet speakerDropDown
+		GuiControlGet listenerDropDown
+		GuiControlGet pushToTalkEdit
+		
+		languageCode := "en"
+		
+		for code, language in availableLanguages()
+			if (language = voiceLanguageDropDown) {
+				languageCode := code
+				
+				break
+			}
+		
+		if (speakerDropDown = translate("Automatic"))
+			speakerDropDown := true
+		else if ((speakerDropDown = translate("Deactivated")) || (speakerDropDown = " "))
+			speakerDropDown := false
+		
+		if (listenerDropDown = translate("Automatic"))
+			listenerDropDown := true
+		else if ((listenerDropDown = translate("Deactivated")) || (listenerDropDown = " "))
+			listenerDropDown := false
+		
+		setConfigurationValue(configuration, "Voice Control", "Language", languageCode)
+		setConfigurationValue(configuration, "Voice Control", "Speaker", speakerDropDown)
+		setConfigurationValue(configuration, "Voice Control", "Listener", listenerDropDown)
+		setConfigurationValue(configuration, "Voice Control", "PushToTalk", (pushToTalkEdit = "") ? false : pushToTalkEdit)
 	}
 }
 

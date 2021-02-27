@@ -47,7 +47,7 @@ class VoiceServer extends ConfigurationItem {
 	iLanguage := "en"
 	iSpeaker := true
 	iListener := false
-	iPushToTalk := false
+	iPushTalk := false
 	
 	iSpeechGenerator := false
 	
@@ -87,9 +87,9 @@ class VoiceServer extends ConfigurationItem {
 		}
 	}
 	
-	PushToTalk[] {
+	PushTalk[] {
 		Get {
-			return this.iPushToTalk
+			return this.iPushTalk
 		}
 	}
 	
@@ -107,7 +107,7 @@ class VoiceServer extends ConfigurationItem {
 			if (create && this.Listener && !this.iSpeechRecognizer) {
 				this.iSpeechRecognizer := new SpeechRecognizer(this.Listener, this.Language)
 				
-				if !this.PushToTalk
+				if !this.PushTalk
 					this.startListening()
 			}
 			
@@ -122,20 +122,20 @@ class VoiceServer extends ConfigurationItem {
 	}
 	
 	loadFromConfiguration(configuration) {
-		this.iLanguage := getConfigurationValue(configuration, "Voice", "Language", getLanguage())
-		this.iSpeaker := getConfigurationValue(configuration, "Voice", "Speaker", true)
-		this.iListener := getConfigurationValue(configuration, "Voice", "Listener", false)
-		this.iPushToTalk := getConfigurationValue(configuration, "Voice", "PushToTalk", false)
+		this.iLanguage := getConfigurationValue(configuration, "Voice Control", "Language", getLanguage())
+		this.iSpeaker := getConfigurationValue(configuration, "Voice Control", "Speaker", true)
+		this.iListener := getConfigurationValue(configuration, "Voice Control", "Listener", false)
+		this.iPushTalk := getConfigurationValue(configuration, "Voice Control", "PushToTalk", false)
 		
-		if this.PushToTalk {
-			pushToTalk := ObjBindMethod(this, "checkPushToTalk")
+		if this.PushTalk {
+			pushToTalk := ObjBindMethod(this, "pushToTalk")
 			
 			SetTimer %pushToTalk%, 100
 		}
 	}
 	
-	checkPushToTalk() {
-		theHotkey := this.PushToTalk
+	pushToTalk() {
+		theHotkey := this.PushTalk
 		
 		if !this.Speaking && GetKeyState(theHotKey, "P")
 			this.startListening()
@@ -157,7 +157,7 @@ class VoiceServer extends ConfigurationItem {
 			}
 		}
 		finally {
-			if (stopped && !this.PushToTalk)
+			if (stopped && !this.PushTalk)
 				this.startListening()
 		}
 	}

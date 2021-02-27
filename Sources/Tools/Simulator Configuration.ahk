@@ -496,6 +496,10 @@ class ConfigurationEditor extends ConfigurationItem {
 	hide() {
 		Gui SE:Hide
 	}
+	
+	close() {
+		Gui SE:Destroy
+	}
 }
 
 saveAndExit() {

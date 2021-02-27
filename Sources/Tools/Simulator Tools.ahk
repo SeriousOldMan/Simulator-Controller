@@ -970,7 +970,7 @@ runTargets() {
 	
 	prepareTargets(buildProgress, updateOnly)
 	
-	vTargetsCount := (vUpdateTargets.Length() + vCleanupTargets.Length() + vCopyTargets.Length() + vBuildTargets.Length())
+	vTargetsCount := (vUpdateTargets.Length() + vCleanupTargets.Length() + vCopyTargets.Length() + (vBuildTargets.Length() * 2))
 	
 	if !kSilentMode
 		Progress, , %A_Space%, % translate("Running Targets")

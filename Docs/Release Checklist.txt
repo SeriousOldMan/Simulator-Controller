@@ -10,6 +10,15 @@ General Release Actions
 8. Update "Backlog.md"
 9. Check, whether update documentation for the release is required in "Updates.md"
 
+Release 2.5 Checklist
+=====================
+1. Voice Control Tab
+   a. New Docs Images
+   b. Describe in Updates.md
+   c. Describe in Installation & Setup.md - incl. Link to AHK Doc
+2. Update Procedure
+   a. New Translations
+   
 Release 2.4 Checklist
 =====================
 1. New methods and functions

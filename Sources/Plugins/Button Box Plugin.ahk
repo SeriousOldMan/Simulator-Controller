@@ -60,23 +60,23 @@ global bbControl48
 global bbControl49
 global bbControl50
 
+global vWindowCounter := 1
+global vHandleCounter := 1
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 class GridButtonBox extends ButtonBox {
-	static kHeaderHeight := 60
+	static kHeaderHeight := 70
 	static kLabelMargin := 5
 	
 	static kRowMargin := 20
-	static kColumnMargin := 30
+	static kColumnMargin := 40
 	
-	static kBorderMargin := 30
-	static kBottomMargin := 20
-	
-	static sHandleCounter := 1
-	static sWindowCounter := 1
+	static kBorderMargin := 20
+	static kBottomMargin := 15
 	
 	iName := false
 	
@@ -86,6 +86,12 @@ class GridButtonBox extends ButtonBox {
 	
 	iRowDefinitions := []
 	iControls := {}
+	
+	Descriptor[] {
+		Get {
+			return this.iName
+		}
+	}
 	
 	Name[] {
 		Get {
@@ -149,7 +155,7 @@ class GridButtonBox extends ButtonBox {
 	createGui() {
 		local function
 		
-		window := "bbWindow" . this.windowCounter++
+		window := "bbWindow" . vWindowCounter++
 		
 		num1WayToggles := 0
 		num2WayToggles := 0
@@ -228,11 +234,11 @@ class GridButtonBox extends ButtonBox {
 				function := ConfigurationItem.descriptor(function, number)
 
 				x := horizontal + Round((columnWidth - imageWidth) / 2)
-				y := vertical + Round((rowHeight - (labelHeight + this.kLabelMargin) - imageWidth) / 2)
-				msgbox % x . " " . y
-				variable := "bbControl" + this.sHandleCounter++
+				y := vertical + Round((rowHeight - (labelHeight + this.kLabelMargin) - imageHeight) / 2)
 				
-				Gui %window%:Add, Picture, x%x% y%y% w%imageWidth% h%imageHeight% BackgroundTrans v%variable% gcontrolClick, %image%
+				variable := "bbControl" + vHandleCounter++
+				
+				Gui %window%:Add, Picture, x%x% y%y% w%imageWidth% h%imageHeight% BackgroundTrans v%variable% gcontrolEvent, %image%
 
 				this.registerControl(variable, function, x, y, imageWidth, imageHeight)
 				
@@ -243,17 +249,18 @@ class GridButtonBox extends ButtonBox {
 				
 				Gui %window%:Add, Text, x%x% y%y% w%labelWidth% h%labelHeight% Hwnd%variable% +Border -Background  +0x1000 +0x1
 				
-				this.registerControlHandle(function, variable)
+				this.registerControlHandle(function, %variable%)
 				
 				horizontal += (columnWidth + this.kColumnMargin)
 			}
 		
 			vertical += (rowHeight + this.kRowMargin)
 		}
+
+		Gui %window%:Add, Picture, x-10 y-10 gmoveButtonBox 0x4000000, % kButtonBoxImagesDirectory . "Photorealistic\CF Background.png"
+		Gui %window%:+AlwaysOnTop
 		
-		this.associateGui(window, width, height, num1WayToggles, num1WayToggles, numButtons, numDials)
-		
-		msgbox % "Create " . values2String(", ", this.Configuration.Count(), this.Rows, this.Columns, window, width, height, num1WayToggles, num1WayToggles, numButtons, numDials)
+		this.associateGui(window, width, height, num1WayToggles, num2WayToggles, numButtons, numDials)
 	}
 	
 	computeLayout(ByRef rowHeights, ByRef columnWidths) {
@@ -273,7 +280,8 @@ class GridButtonBox extends ButtonBox {
 			{
 				descriptor := string2Values(",", rowDefinition[A_Index])
 				
-				label := string2Values("x", getConfigurationValue(this.Configuration, "Labels", descriptor[2], ""))
+				label := getConfigurationValue(this.Configuration, "Labels", descriptor[2], "")
+				label := string2Values("x", label)
 				labelWidth := label[1]
 				labelHeight := label[2]
 				
@@ -289,8 +297,6 @@ class GridButtonBox extends ButtonBox {
 			}
 			
 			rowHeights.Push(rowHeight)
-			
-			showMessage(rowHeight)
 		}
 	}
 	
@@ -479,25 +485,27 @@ functionClick() {
 		rotateDial(SubStr(A_GuiControl, 5), (x > 475) ? "Increase" : "Decrease")
 }
 
-controlClick() {
+controlEvent() {
 	local function
 	
 	MouseGetPos x, y
 	
-	function := ButtonBox.findButtonBox(A_Gui).findFunction(A_GuiControl)
-	
+	function := ButtonBox.findButtonBox(A_Gui).findControl(A_GuiControl)
+
 	if function {
 		MouseGetPos x, y
-				
-		switch ConfigurationItem.splitDescriptor(function[1])[1] {
+	
+		descriptor := ConfigurationItem.splitDescriptor(function[1])
+		
+		switch descriptor[1] {
 			case kButtonType:
-				pushButton(function[1])
+				pushButton(descriptor[2])
 			case kDialType:
-				rotateDial(function[1], (x > (function[2] + Round(function[4] / 2))) ? "Increase" : "Descrease")
+				rotateDial(descriptor[2], (x > (function[2] + Round(function[4] / 2))) ? "Increase" : "Decrease")
 			case k1WayToggleType:
-				switchToggle(k1WayToggleType, (y > (function[3] + Round(function[5] / 2))) ? "Off" : "On")
+				switchToggle(k1WayToggleType, descriptor[2], (y > (function[3] + Round(function[5] / 2))) ? "Off" : "On")
 			case k2WayToggleType:
-				switchToggle(k2WayToggleType, (y > (function[3] + Round(function[5] / 2))) ? "Off" : "On")
+				switchToggle(k2WayToggleType, descriptor[2], (y > (function[3] + Round(function[5] / 2))) ? "Off" : "On")
 		}
 	}
 }
@@ -513,6 +521,7 @@ initializeButtonBoxPlugin() {
 	; new ButtonBox2(controller, controller.Configuration)
 	
 	new GridButtonBox("Master Controller", controller, readConfiguration(getFileName("Button Box Configuration.ini", kUserConfigDirectory, kConfigDirectory)))
+	; new GridButtonBox("Slave Controller", controller, readConfiguration(getFileName("Button Box Configuration.ini", kUserConfigDirectory, kConfigDirectory)))
 }
 
 

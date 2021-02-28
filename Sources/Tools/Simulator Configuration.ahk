@@ -278,7 +278,7 @@ listEvent() {
 	
 	protectionOn()
 	
-	try{
+	try {
 		if (A_GuiEvent == "DoubleClick")
 			vItemLists[A_GuiControl].openEditor(A_EventInfo)
 		else if (A_GuiEvent == "Normal") {

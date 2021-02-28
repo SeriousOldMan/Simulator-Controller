@@ -139,15 +139,6 @@ class ButtonBox extends ConfigurationItem {
 		controller.registerButtonBox(this)
 	}
 	
-	loadFromConfiguration(configuration) {
-		base.loadFromConfiguration(configuration)
-		
-		this.iNum1WayToggles := getConfigurationValue(configuration, "Controller Layout", "1WayToggles", 0)
-		this.iNum2WayToggles := getConfigurationValue(configuration, "Controller Layout", "2WayToggles", 0)
-		this.iNumButtons := getConfigurationValue(configuration, "Controller Layout", "Buttons", 0)
-		this.iNumDials := getConfigurationValue(configuration, "Controller Layout", "Dials", 0)
-	}
-	
 	createGui() {
 		Throw "Virtual method ButtonBox.createGui must be implemented in a subclass..."
 	}
@@ -1387,7 +1378,7 @@ updateTrayMessageState(settings := false) {
 		inSimulation := SimulatorController.Instance.ActiveSimulator
 	}
 	
-	duration := getConfigurationValue(settings, "Controller"
+	duration := getConfigurationValue(settings, "Tray Tip"
 									, inSimulation ? "Tray Tip Simulation Duration" : "Tray Tip Duration"
 									, inSimulation ? 1500 : false)
 							   

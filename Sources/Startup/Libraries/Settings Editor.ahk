@@ -174,8 +174,8 @@ restart:
 			setConfigurationValue(newSettings, "Feedback", feedbackDescriptor[1], %feedbackVariable%)
 		}
 		
-		setConfigurationValue(newSettings, "Controller", "Tray Tip Duration", (trayTip ? trayTipDuration : false))
-		setConfigurationValue(newSettings, "Controller", "Tray Tip Simulation Duration", (trayTipSimulation ? trayTipSimulationDuration : false))
+		setConfigurationValue(newSettings, "Tray Tip", "Tray Tip Duration", (trayTip ? trayTipDuration : false))
+		setConfigurationValue(newSettings, "Tray Tip", "Tray Tip Simulation Duration", (trayTipSimulation ? trayTipSimulationDuration : false))
 		setConfigurationValue(newSettings, "Button Box", "Button Box Duration", (buttonBox ? buttonBoxDuration : false))
 		setConfigurationValue(newSettings, "Button Box", "Button Box Simulation Duration", (buttonBoxSimulation ? buttonBoxSimulationDuration : false))
 		
@@ -279,8 +279,8 @@ restart:
 			}
 		}
 	
-		trayTipDuration := getConfigurationValue(settingsOrCommand, "Controller", "Tray Tip Duration", false)
-		trayTipSimulationDuration := getConfigurationValue(settingsOrCommand, "Controller", "Tray Tip Simulation Duration", 1500)
+		trayTipDuration := getConfigurationValue(settingsOrCommand, "Tray Tip", "Tray Tip Duration", false)
+		trayTipSimulationDuration := getConfigurationValue(settingsOrCommand, "Tray Tip", "Tray Tip Simulation Duration", 1500)
 		buttonBoxDuration := getConfigurationValue(settingsOrCommand, "Button Box", "Button Box Duration", 10000)
 		buttonBoxSimulationDuration := getConfigurationValue(settingsOrCommand, "Button Box", "Button Box Simulation Duration", false)
 		buttonBoxPosition := getConfigurationValue(settingsOrCommand, "Button Box", "Button Box Position", "Bottom Right")

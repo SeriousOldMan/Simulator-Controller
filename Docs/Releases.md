@@ -4,6 +4,7 @@
   2. Documentation updates, as always
   3. Push-To-Talk function for voice recognition - this will reduce false positives almost to zero
   4. Button Boxes can be created with a configuration file - no more programming knowledge needed
+  5. Extension of ACC Shared Memory Reader for weather information and track grip status
   
 ## 2.4.1-release 02/26/21
   

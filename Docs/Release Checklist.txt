@@ -22,6 +22,8 @@ Release 2.5 Checklist
    a. Documentation (incl. Installation & Setup)
    b. Update Notes for Simulator Tools.targets
    c. New Images for Configuration Tool
+4. Update Speech Runtime Documentation
+   a. New MS Download: https://www.microsoft.com/en-us/download/details.aspx?id=16789
    
 Release 2.4 Checklist
 =====================

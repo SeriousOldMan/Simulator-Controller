@@ -6,8 +6,305 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                        Private Variable Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global bbControl1
+global bbControl2
+global bbControl3
+global bbControl4
+global bbControl5
+global bbControl6
+global bbControl7
+global bbControl8
+global bbControl9
+global bbControl10
+global bbControl11
+global bbControl12
+global bbControl13
+global bbControl14
+global bbControl15
+global bbControl16
+global bbControl17
+global bbControl18
+global bbControl19
+global bbControl20
+global bbControl21
+global bbControl22
+global bbControl23
+global bbControl24
+global bbControl25
+global bbControl26
+global bbControl27
+global bbControl28
+global bbControl29
+global bbControl30
+global bbControl31
+global bbControl32
+global bbControl33
+global bbControl34
+global bbControl35
+global bbControl36
+global bbControl37
+global bbControl38
+global bbControl39
+global bbControl40
+global bbControl41
+global bbControl42
+global bbControl43
+global bbControl44
+global bbControl45
+global bbControl46
+global bbControl47
+global bbControl48
+global bbControl49
+global bbControl50
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+class GridButtonBox extends ButtonBox {
+	static kHeaderHeight := 60
+	static kLabelMargin := 5
+	
+	static kRowMargin := 20
+	static kColumnMargin := 30
+	
+	static kBorderMargin := 30
+	static kBottomMargin := 20
+	
+	static sHandleCounter := 1
+	static sWindowCounter := 1
+	
+	iName := false
+	
+	iRows := 0
+	iColumns := 0
+	iDirection := false
+	
+	iRowDefinitions := []
+	iControls := {}
+	
+	Name[] {
+		Get {
+			return this.iName
+		}
+	}
+	
+	Rows[] {
+		Get {
+			return this.iRows
+		}
+	}
+	
+	Columns[] {
+		Get {
+			return this.iColumns
+		}
+	}
+	
+	Direction[] {
+		Get {
+			return this.iDirection
+		}
+	}
+	
+	RowDefinitions[row := false] {
+		Get {
+			if row
+				return this.iRowDefinitions[row]
+			else
+				return this.iRowDefinitions
+		}
+	}
+	
+	__New(name, controller, configuration) {
+		this.iName := name
+		
+		base.__New(controller, configuration)
+	}
+	
+	loadFromConfiguration(configuration) {
+		base.loadFromConfiguration(configuration)
+		
+		layout := string2Values(";", getConfigurationValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Name, "Layout"), ""))
+		
+		this.iDirection := layout[2]
+		
+		layout := string2Values("x", layout[1])
+		
+		this.iRows := layout[1]
+		this.iColumns := layout[2]
+		
+		rows := []
+		
+		Loop % this.Rows
+			rows.Push(string2Values(";", getConfigurationValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Name, A_Index), "")))
+		
+		this.iRowDefinitions := rows
+	}
+	
+	createGui() {
+		local function
+		
+		window := "bbWindow" . this.windowCounter++
+		
+		num1WayToggles := 0
+		num2WayToggles := 0
+		numButtons := 0
+		numDials := 0
+		
+		rowHeights := false
+		columnWidths := false
+		
+		this.computeLayout(rowHeights, columnWidths)
+		
+		height := 0
+		Loop % rowHeights.Length()
+			height += rowHeights[A_Index]
+		
+		width := 0
+		Loop % columnWidths.Length()
+			width += columnWidths[A_Index]
+		
+		height += ((rowHeights.Length() - 1) * this.kRowMargin) + this.kHeaderHeight + this.kBottomMargin
+		width += ((columnWidths.Length() - 1) * this.kColumnMargin) + (2 * this.kBorderMargin)
+		
+		Gui %window%:-Border -Caption +AlwaysOnTop
+		
+		Gui %window%:Add, Picture, x-10 y-10, % kButtonBoxImagesDirectory . "Photorealistic\CF Background.png"
+		
+		Gui %window%:Font, s12 Bold cSilver
+		Gui %window%:Add, Text, x0 y8 w%width% h23 +0x200 +0x1 BackgroundTrans gmoveButtonBox, % translate("Modular Simulator Controller System")
+		Gui %window%:Font, s10 cSilver
+		Gui %window%:Add, Text, x0 y28 w%width% h23 +0x200 +0x1 BackgroundTrans gmoveButtonBox, % translate(this.Name)
+		Gui %window%:Color, 0x000000
+		Gui %window%:Font, Norm, Arial
+		
+		vertical := this.kHeaderHeight
+		
+		Loop % this.Rows
+		{
+			rowHeight := rowHeights[A_Index]
+			rowDefinition := this.RowDefinitions[A_Index]
+		
+			horizontal := this.kBorderMargin
+			
+			Loop % this.Columns
+			{
+				columnWidth := columnWidths[A_Index]
+			
+				descriptor := string2Values(",", rowDefinition[A_Index])
+				
+				label := string2Values("x", getConfigurationValue(this.Configuration, "Labels", descriptor[2], ""))
+				labelWidth := label[1]
+				labelHeight := label[2]
+				
+				descriptor := ConfigurationItem.splitDescriptor(descriptor[1])
+				number := descriptor[2]
+				
+				descriptor := string2Values(";", getConfigurationValue(this.Configuration, "Controls", descriptor[1], ""))
+				
+				function := descriptor[1]
+				image := substituteVariables(descriptor[2])
+				
+				descriptor := string2Values("x", descriptor[3])
+				imageWidth := descriptor[1]
+				imageHeight := descriptor[2]
+				
+				switch function {
+					case k1WayToggleType:
+						num1WayToggles += 1
+					case k2WayToggleType:
+						num2WayToggles += 1
+					case kButtonType:
+						numButtons += 1
+					case kDialType:
+						numDials += 1
+				}
+				
+				function := ConfigurationItem.descriptor(function, number)
+
+				x := horizontal + Round((columnWidth - imageWidth) / 2)
+				y := vertical + Round((rowHeight - (labelHeight + this.kLabelMargin) - imageWidth) / 2)
+				msgbox % x . " " . y
+				variable := "bbControl" + this.sHandleCounter++
+				
+				Gui %window%:Add, Picture, x%x% y%y% w%imageWidth% h%imageHeight% BackgroundTrans v%variable% gcontrolClick, %image%
+
+				this.registerControl(variable, function, x, y, imageWidth, imageHeight)
+				
+				Gui %window%:Font, Norm
+		
+				x := horizontal + Round((columnWidth - labelWidth) / 2)
+				y := vertical + rowHeight - labelHeight
+				
+				Gui %window%:Add, Text, x%x% y%y% w%labelWidth% h%labelHeight% Hwnd%variable% +Border -Background  +0x1000 +0x1
+				
+				this.registerControlHandle(function, variable)
+				
+				horizontal += (columnWidth + this.kColumnMargin)
+			}
+		
+			vertical += (rowHeight + this.kRowMargin)
+		}
+		
+		this.associateGui(window, width, height, num1WayToggles, num1WayToggles, numButtons, numDials)
+		
+		msgbox % "Create " . values2String(", ", this.Configuration.Count(), this.Rows, this.Columns, window, width, height, num1WayToggles, num1WayToggles, numButtons, numDials)
+	}
+	
+	computeLayout(ByRef rowHeights, ByRef columnWidths) {
+		columnWidths := []
+		rowHeights := []
+		
+		Loop % this.Columns
+			columnWidths.Push(0)
+		
+		Loop % this.Rows
+		{
+			rowHeight := 0
+		
+			rowDefinition := this.RowDefinitions[A_Index]
+			
+			Loop % this.Columns
+			{
+				descriptor := string2Values(",", rowDefinition[A_Index])
+				
+				label := string2Values("x", getConfigurationValue(this.Configuration, "Labels", descriptor[2], ""))
+				labelWidth := label[1]
+				labelHeight := label[2]
+				
+				descriptor := string2Values(";", getConfigurationValue(this.Configuration, "Controls", ConfigurationItem.splitDescriptor(descriptor[1])[1], ""))
+				descriptor := string2Values("x", descriptor[3])
+				
+				imageWidth := descriptor[1]
+				imageHeight := descriptor[2]
+				
+				rowHeight := Max(rowHeight, imageHeight + this.kLabelMargin + labelHeight)
+				
+				columnWidths[A_Index] := Max(columnWidths[A_Index], Max(imageWidth, labelWidth))
+			}
+			
+			rowHeights.Push(rowHeight)
+			
+			showMessage(rowHeight)
+		}
+	}
+	
+	registerControl(variable, function, x, y, width, height) {
+		this.iControls[variable] := Array(function, x, y, width, height)
+	}
+	
+	findControl(variable) {
+		if this.iControls.HasKey(variable)
+			return this.iControls[variable]
+		else
+			return false
+	}
+}
 
 class ButtonBox1 extends ButtonBox {
 	createGui() {
@@ -166,13 +463,6 @@ class ButtonBox2 extends ButtonBox {
 	}
 }
 
-initializeButtonBoxPlugin() {
-	controller := SimulatorController.Instance
-	
-	new ButtonBox1(controller, controller.Configuration)
-	; new ButtonBox2(controller, controller.Configuration)
-}
-
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
@@ -189,8 +479,40 @@ functionClick() {
 		rotateDial(SubStr(A_GuiControl, 5), (x > 475) ? "Increase" : "Decrease")
 }
 
+controlClick() {
+	local function
+	
+	MouseGetPos x, y
+	
+	function := ButtonBox.findButtonBox(A_Gui).findFunction(A_GuiControl)
+	
+	if function {
+		MouseGetPos x, y
+				
+		switch ConfigurationItem.splitDescriptor(function[1])[1] {
+			case kButtonType:
+				pushButton(function[1])
+			case kDialType:
+				rotateDial(function[1], (x > (function[2] + Round(function[4] / 2))) ? "Increase" : "Descrease")
+			case k1WayToggleType:
+				switchToggle(k1WayToggleType, (y > (function[3] + Round(function[5] / 2))) ? "Off" : "On")
+			case k2WayToggleType:
+				switchToggle(k2WayToggleType, (y > (function[3] + Round(function[5] / 2))) ? "Off" : "On")
+		}
+	}
+}
+
 moveButtonBox() {
 	ButtonBox.findButtonBox(A_Gui).moveByMouse(A_Gui)
+}
+
+initializeButtonBoxPlugin() {
+	controller := SimulatorController.Instance
+	
+	; new ButtonBox1(controller, controller.Configuration)
+	; new ButtonBox2(controller, controller.Configuration)
+	
+	new GridButtonBox("Master Controller", controller, readConfiguration(getFileName("Button Box Configuration.ini", kUserConfigDirectory, kConfigDirectory)))
 }
 
 

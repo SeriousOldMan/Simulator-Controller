@@ -10,8 +10,9 @@
   6. [Tactile & Motion Feedback Plugin] Definition of feedback settings for different tracks and cars, selectable by the touch of a button
   
 #### Button Box Visualization
-  1. [Target: V2.7] Allow for more than one active plugin mode, if more than one controller is connected to the PC
-  2. [Target: V2.7] Graphical editor for controller layouts
+  1. [Target: V2.5] Configuration file for controller layouts
+  2. [Target: V2.7] Allow for more than one active plugin mode, if more than one controller is connected to the PC
+  3. [Target: V2.7] Graphical editor for controller layouts
   
 #### General
   1. [Target: V2.5] Push to talk for all voice recognition stuff

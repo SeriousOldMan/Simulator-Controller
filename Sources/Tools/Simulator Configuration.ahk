@@ -287,6 +287,11 @@ listEvent() {
 				
 				vItemLists[A_GuiControl].openEditor(inList(SimulatorsList.Instance.iItemsList, simulatorsListBox))
 			}
+			else if (A_GuiControl == "buttonBoxesListBox") {
+				GuiControlGet buttonBoxesListBox
+				
+				vItemLists[A_GuiControl].openEditor(inList(ButtonBoxesList.Instance.iItemsList, buttonBoxesListBox))
+			}
 			else
 				vItemLists[A_GuiControl].openEditor(A_EventInfo)
 		}
@@ -1451,14 +1456,8 @@ chooseApplicationWorkingDirectoryPath() {
 ;;; ControllerTab                                                           ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-/*
-global oneWayTogglesEdit
-global twoWayTogglesEdit
-global buttonsEdit
-global dialsEdit
-*/
-
 class ControllerTab extends ConfigurationItemTab {
+	iButtonBoxesList := false
 	iFunctionsist := false
 	
 	__New(configuration) {
@@ -1468,62 +1467,17 @@ class ControllerTab extends ConfigurationItemTab {
 	}
 	
 	createControls(configuration) {
-		/*
-		Gui SE:Font, Norm, Arial
-		Gui SE:Font, Italic, Arial
-		
-		Gui SE:Add, GroupBox, x16 y80 w377 h71, % translate("Functions")
-		
-		Gui SE:Font, Norm, Arial
-		
-		Gui SE:Add, Text, x24 y96 w104 h23 +0x200, % translate("# 1-Way Toggles")
-		Gui SE:Add, Edit, x128 y96 w39 h21 Number VoneWayTogglesEdit, %oneWayTogglesEdit%
-		Gui SE:Add, UpDown, x168 y96 w18 h21, %oneWayTogglesEdit%
-		
-		Gui SE:Add, Text, x24 y120 w104 h23 +0x200, % translate("# 2-Way Toggles")
-		Gui SE:Add, Edit, x128 y120 w39 h21 Number VtwoWayTogglesEdit, %twoWayTogglesEdit%
-		Gui SE:Add, UpDown, x168 y120 w18 h21, %twoWayTogglesEdit%
-		
-		Gui SE:Add, Text, x208 y96 w104 h23 +0x200, % translate("# Buttons")
-		Gui SE:Add, Edit, x312 y96 w39 h21 Number VbuttonsEdit, %buttonsEdit%
-		Gui SE:Add, UpDown, x352 y96 w18 h21, %buttonsEdit%
-		
-		Gui SE:Add, Text, x208 y120 w104 h23 +0x200, % translate("# Dials")
-		Gui SE:Add, Edit, x312 y120 w39 h21 Number VdialsEdit, %dialsEdit%
-		Gui SE:Add, UpDown, x352 y120 w18 h21, %dialsEdit%
-		*/
-		
-		Gui SE:Add, Button, x16 y490 w100 h23 gtoggleKeyDetector, % translate("Key Detector...")
+		this.iButtonBoxesList := new ButtonBoxesList(configuration)
 		
 		this.iFunctionsList := new FunctionsList(configuration)
-	}
-	
-	loadFromConfiguration(configuration) {
-		base.loadFromConfiguration(configuration)
 		
-		/*
-		oneWayTogglesEdit := getConfigurationValue(configuration, "Controller Layout", "1WayToggles", 0)
-		twoWayTogglesEdit := getConfigurationValue(configuration, "Controller Layout", "2WayToggles", 0)
-		buttonsEdit := getConfigurationValue(configuration, "Controller Layout", "Buttons", 0)
-		dialsEdit := getConfigurationValue(configuration, "Controller Layout", "Dials", 0)
-		*/
+		Gui SE:Add, Button, x16 y490 w100 h23 gtoggleKeyDetector, % translate("Key Detector...")
 	}
 	
 	saveToConfiguration(configuration) {
 		base.saveToConfiguration(configuration)
 		
-		/*
-		GuiControlGet oneWayTogglesEdit
-		GuiControlGet twoWayTogglesEdit
-		GuiControlGet buttonsEdit
-		GuiControlGet dialsEdit
-		
-		setConfigurationValue(configuration, "Controller Layout", "1WayToggles", oneWayTogglesEdit)
-		setConfigurationValue(configuration, "Controller Layout", "2WayToggles", twoWayTogglesEdit)
-		setConfigurationValue(configuration, "Controller Layout", "Buttons", buttonsEdit)
-		setConfigurationValue(configuration, "Controller Layout", "Dials", dialsEdit)
-		*/
-		
+		this.iButtonBoxesList.saveToConfiguration(configuration)
 		this.iFunctionsList.saveToConfiguration(configuration)
 	}
 }
@@ -1535,6 +1489,94 @@ toggleKeyDetector() {
 		SetTimer showKeyDetector, 100
 	else
 		ToolTip, , , 1
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; ButtonBoxesList                                                          ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+global buttonBoxesListBox := "|"
+
+global buttonBoxEdit = ""
+
+global buttonBoxUpButton
+global buttonBoxDownButton
+
+global buttonBoxAddButton
+global buttonBoxDeleteButton
+global buttonBoxUpdateButton
+		
+class ButtonBoxesList extends ConfigurationItemList {
+	__New(configuration) {
+		base.__New(configuration, this.createControls(configuration), "buttonBoxesListBox"
+				 , "buttonBoxAddButton", "buttonBoxDeleteButton", "buttonBoxUpdateButton", "buttonBoxUpButton", "buttonBoxDownButton")
+				 
+		ButtonBoxesList.Instance := this
+	}
+					
+	createControls(configuration) {
+		Gui SE:Font, Norm, Arial
+		Gui SE:Font, Italic, Arial
+		
+		Gui SE:Add, GroupBox, x16 y80 w378 h115, % translate("Button Boxes")
+		
+		Gui SE:Font, Norm, Arial
+		Gui SE:Add, ListBox, x24 y99 w154 h96 HwndbuttonBoxesListBoxHandle VbuttonBoxesListBox glistEvent, %buttonBoxesListBox%
+		
+		Gui SE:Add, Edit, x184 y99 w199 h21 VbuttonBoxEdit, %buttonBoxEdit%
+		
+		Gui SE:Add, Button, x305 y124 w38 h23 Disabled VbuttonBoxUpButton gupItem, % translate("Up")
+		Gui SE:Add, Button, x345 y124 w38 h23 Disabled VbuttonBoxDownButton gdownItem, % translate("Down")
+		
+		Gui SE:Add, Button, x184 y164 w46 h23 VbuttonBoxAddButton gaddItem, % translate("Add")
+		Gui SE:Add, Button, x232 y164 w50 h23 Disabled VbuttonBoxDeleteButton gdeleteItem, % translate("Delete")
+		Gui SE:Add, Button, x328 y164 w55 h23 Disabled VbuttonBoxUpdateButton gupdateItem, % translate("&Save")
+		
+		return buttonBoxesListBoxHandle
+	}
+	
+	loadFromConfiguration(configuration) {
+		base.loadFromConfiguration(configuration)
+		
+		this.iItemsList := string2Values("|", getConfigurationValue(configuration, "Controller Layouts", "Button Boxes", ""))
+	}
+		
+	saveToConfiguration(configuration) {
+		base.saveToConfiguration(configuration)
+		
+		setConfigurationValue(configuration, "Controller Layouts", "Button Boxes", values2String("|", this.iItemsList*))	
+	}
+	
+	loadList(items) {
+		buttonBoxesListBox := values2String("|", this.iItemsList*)
+	
+		GuiControl, , buttonBoxesListBox, % "|" . buttonBoxesListBox
+	}
+	
+	selectItem(itemNumber) {
+		this.iCurrentItemIndex := itemNumber
+		
+		if itemNumber
+			GuiControl Choose, buttonBoxesListBox, %itemNumber%
+		
+		this.updateState()
+	}
+	
+	loadEditor(item) {
+		buttonBoxEdit := item
+			
+		GuiControl Text, buttonBoxEdit, %buttonBoxEdit%
+	}
+	
+	clearEditor() {
+		this.loadEditor("")
+	}
+	
+	buildItemFromEditor(isNew := false) {
+		GuiControlGet buttonBoxEdit
+		
+		return buttonBoxEdit
+	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -1564,7 +1606,7 @@ class FunctionsList extends ConfigurationItemList {
 	}
 					
 	createControls(configuration) {
-		Gui SE:Add, ListView, x16 y80 w377 h270 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndfunctionsListViewHandle VfunctionsListView glistEvent
+		Gui SE:Add, ListView, x16 y200 w377 h150 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndfunctionsListViewHandle VfunctionsListView glistEvent
 							, % values2String("|", map(["Function", "Number", "Hotkey(s) & Action(s)"], "translate")*)
 	
 		Gui SE:Add, Text, x16 y360 w86 h23 +0x200, % translate("Function")

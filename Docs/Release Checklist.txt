@@ -19,8 +19,9 @@ Release 2.5 Checklist
 2. Update Procedure
    a. New Translations, Simulator Tools.targets
 3. ButtonBox Configuration
-   a. Documentation
+   a. Documentation (incl. Installation & Setup)
    b. Update Notes for Simulator Tools.targets
+   c. New Images for Configuration Tool
    
 Release 2.4 Checklist
 =====================

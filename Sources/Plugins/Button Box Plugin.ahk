@@ -222,7 +222,7 @@ class GridButtonBox extends ButtonBox {
 					
 					descriptor := string2Values(";", getConfigurationValue(this.Configuration, "Controls", descriptor[1], ""))
 					
-					if (StrLen(descriptor) > 0) {
+					if (descriptor.Length() > 0) {
 						function := descriptor[1]
 						image := substituteVariables(descriptor[2])
 						
@@ -312,7 +312,7 @@ class GridButtonBox extends ButtonBox {
 					
 					descriptor := string2Values(";", getConfigurationValue(this.Configuration, "Controls", ConfigurationItem.splitDescriptor(descriptor[1])[1], ""))
 					
-					if (StrLen(descriptor) > 0) {
+					if (descriptor.Length() > 0) {
 						descriptor := string2Values("x", descriptor[3])
 						
 						imageWidth := descriptor[1]

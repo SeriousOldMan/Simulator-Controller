@@ -204,57 +204,67 @@ class GridButtonBox extends ButtonBox {
 			
 				descriptor := rowDefinition[A_Index]
 				
-				descriptor := string2Values(",", descriptor)
-				
-				label := string2Values("x", getConfigurationValue(this.Configuration, "Labels", descriptor[2], ""))
-				labelWidth := label[1]
-				labelHeight := label[2]
-				
-				descriptor := ConfigurationItem.splitDescriptor(descriptor[1])
-				number := descriptor[2]
-				
-				descriptor := string2Values(";", getConfigurationValue(this.Configuration, "Controls", descriptor[1], ""))
-				
 				if (StrLen(descriptor) > 0) {
-					function := descriptor[1]
-					image := substituteVariables(descriptor[2])
-					
-					descriptor := string2Values("x", descriptor[3])
-					imageWidth := descriptor[1]
-					imageHeight := descriptor[2]
-					
-					switch function {
-						case k1WayToggleType:
-							num1WayToggles += 1
-						case k2WayToggleType:
-							num2WayToggles += 1
-						case kButtonType:
-							numButtons += 1
-						case kDialType:
-							numDials += 1
-						default:
-							Throw "Unknown function type (" . function . ") detected in GrindButtonBox.createGui..."
+					descriptor := string2Values(",", descriptor)
+				
+					if (descriptor.Length() > 1) {
+						label := string2Values("x", getConfigurationValue(this.Configuration, "Labels", descriptor[2], ""))
+						labelWidth := label[1]
+						labelHeight := label[2]
+					}
+					else {
+						labelWidth := 0
+						labelHeight := 0
 					}
 					
-					function := ConfigurationItem.descriptor(function, number)
+					descriptor := ConfigurationItem.splitDescriptor(descriptor[1])
+					number := descriptor[2]
+					
+					descriptor := string2Values(";", getConfigurationValue(this.Configuration, "Controls", descriptor[1], ""))
+					
+					if (StrLen(descriptor) > 0) {
+						function := descriptor[1]
+						image := substituteVariables(descriptor[2])
+						
+						descriptor := string2Values("x", descriptor[3])
+						imageWidth := descriptor[1]
+						imageHeight := descriptor[2]
+						
+						switch function {
+							case k1WayToggleType:
+								num1WayToggles += 1
+							case k2WayToggleType:
+								num2WayToggles += 1
+							case kButtonType:
+								numButtons += 1
+							case kDialType:
+								numDials += 1
+							default:
+								Throw "Unknown function type (" . function . ") detected in GrindButtonBox.createGui..."
+						}
+						
+						function := ConfigurationItem.descriptor(function, number)
 
-					x := horizontal + Round((columnWidth - imageWidth) / 2)
-					y := vertical + Round((rowHeight - (labelHeight + this.kLabelMargin) - imageHeight) / 2)
-					
-					variable := "bbControl" + vHandleCounter++
-					
-					Gui %window%:Add, Picture, x%x% y%y% w%imageWidth% h%imageHeight% BackgroundTrans v%variable% gcontrolEvent, %image%
+						x := horizontal + Round((columnWidth - imageWidth) / 2)
+						y := vertical + Round((rowHeight - (labelHeight + this.kLabelMargin) - imageHeight) / 2)
+						
+						variable := "bbControl" + vHandleCounter++
+						
+						Gui %window%:Add, Picture, x%x% y%y% w%imageWidth% h%imageHeight% BackgroundTrans v%variable% gcontrolEvent, %image%
 
-					this.registerControl(variable, function, x, y, imageWidth, imageHeight)
+						this.registerControl(variable, function, x, y, imageWidth, imageHeight)
+						
+						if ((labelHeight > 0) && (labelHeight > 0)) {
+							Gui %window%:Font, Norm
 					
-					Gui %window%:Font, Norm
-			
-					x := horizontal + Round((columnWidth - labelWidth) / 2)
-					y := vertical + rowHeight - labelHeight
-					
-					Gui %window%:Add, Text, x%x% y%y% w%labelWidth% h%labelHeight% Hwnd%variable% +Border -Background  +0x1000 +0x1
-					
-					this.registerControlHandle(function, %variable%)
+							x := horizontal + Round((columnWidth - labelWidth) / 2)
+							y := vertical + rowHeight - labelHeight
+							
+							Gui %window%:Add, Text, x%x% y%y% w%labelWidth% h%labelHeight% Hwnd%variable% +Border -Background  +0x1000 +0x1
+							
+							this.registerControlHandle(function, %variable%)
+						}
+					}
 				}
 				
 				horizontal += (columnWidth + this.kColumnMargin)
@@ -289,18 +299,31 @@ class GridButtonBox extends ButtonBox {
 				if (StrLen(descriptor) > 0) {
 					descriptor := string2Values(",", descriptor)
 					
-					label := getConfigurationValue(this.Configuration, "Labels", descriptor[2], "")
-					label := string2Values("x", label)
-					labelWidth := label[1]
-					labelHeight := label[2]
+					if (descriptor.Length() > 1) {
+						label := getConfigurationValue(this.Configuration, "Labels", descriptor[2], "")
+						label := string2Values("x", label)
+						labelWidth := label[1]
+						labelHeight := label[2]
+					}
+					else {
+						labelWidth := 0
+						labelHeight := 0
+					}
 					
 					descriptor := string2Values(";", getConfigurationValue(this.Configuration, "Controls", ConfigurationItem.splitDescriptor(descriptor[1])[1], ""))
-					descriptor := string2Values("x", descriptor[3])
 					
-					imageWidth := descriptor[1]
-					imageHeight := descriptor[2]
+					if (StrLen(descriptor) > 0) {
+						descriptor := string2Values("x", descriptor[3])
+						
+						imageWidth := descriptor[1]
+						imageHeight := descriptor[2]
+					}
+					else {
+						imageWidth := 0
+						imageHeight := 0
+					}
 					
-					rowHeight := Max(rowHeight, imageHeight + this.kLabelMargin + labelHeight)
+					rowHeight := Max(rowHeight, imageHeight + ((labelHeight > 0) ? (this.kLabelMargin + labelHeight) : 0))
 					
 					columnWidths[A_Index] := Max(columnWidths[A_Index], Max(imageWidth, labelWidth))
 				}

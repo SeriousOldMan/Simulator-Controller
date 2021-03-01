@@ -1119,6 +1119,18 @@ class RaceEngineer extends ConfigurationItem {
 		knowledgeBase.setFact("Driver.Surname", driverSurname)
 		knowledgeBase.setFact("Driver.Nickname", driverNickname)
 		
+		airTemperature := Round(getConfigurationValue(data, "Weather Data", "Temperature", 0))
+		trackTemperature := Round(getConfigurationValue(data, "Track Data", "Temperature", 0))
+		weatherNow := getConfigurationValue(data, "Weather Data", "Weather", "Dry")
+		weather10Min := getConfigurationValue(data, "Weather Data", "Weather10Min", "Dry")
+		weather30Min := getConfigurationValue(data, "Weather Data", "Weather30Min", "Dry")
+		
+		knowledgeBase.addFact("Weather.Temperature.Air", airTemperature)
+		knowledgeBase.addFact("Weather.Temperature.Track", trackTemperature)
+		knowledgeBase.addFact("Weather.Weather.Now", weatherNow)
+		knowledgeBase.addFact("Weather.Weather.10Min", weather10Min)
+		knowledgeBase.addFact("Weather.Weather.30Min", weather30Min)
+		
 		lapTime := getConfigurationValue(data, "Stint Data", "LapLastTime", 0)
 		
 		knowledgeBase.addFact("Lap." . lapNumber . ".Time", lapTime)
@@ -1167,10 +1179,11 @@ class RaceEngineer extends ConfigurationItem {
 		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Temperature.FR", Round(tyreTemperatures[2], 1))		
 		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Temperature.RL", Round(tyreTemperatures[3], 1))
 		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Temperature.RR", Round(tyreTemperatures[4], 1))
-			
-		knowledgeBase.addFact("Lap." . lapNumber . ".Weather", 0)
-		knowledgeBase.addFact("Lap." . lapNumber . ".Temperature.Air", Round(getConfigurationValue(data, "Car Data", "AirTemperature", 0)))
-		knowledgeBase.addFact("Lap." . lapNumber . ".Temperature.Track", Round(getConfigurationValue(data, "Car Data", "RoadTemperature", 0)))
+		
+		knowledgeBase.addFact("Lap." . lapNumber . ".Weather", weatherNow)
+		knowledgeBase.addFact("Lap." . lapNumber . ".Grip", getConfigurationValue(data, "Track Data", "Grip", "Green"))
+		knowledgeBase.addFact("Lap." . lapNumber . ".Temperature.Air", airTemperature)
+		knowledgeBase.addFact("Lap." . lapNumber . ".Temperature.Track", trackTemperature)
 		
 		bodyworkDamage := string2Values(",", getConfigurationValue(data, "Car Data", "BodyworkDamage", ""))
 		
@@ -1187,6 +1200,12 @@ class RaceEngineer extends ConfigurationItem {
 		knowledgeBase.addFact("Lap." . lapNumber . ".Damage.Suspension.RL", Round(suspensionDamage[3], 2))
 		knowledgeBase.addFact("Lap." . lapNumber . ".Damage.Suspension.RR", Round(suspensionDamage[4], 2))
 		
+		knowledgeBase.addFact("Pitstop.Configured.Tyre.Set", getConfigurationValue(data, "Pitstop Data", "TyreSet", 0))
+		knowledgeBase.addFact("Pitstop.Configured.Fuel", getConfigurationValue(data, "Pitstop Data", "FuelAmount", 0))
+		knowledgeBase.addFact("Pitstop.Configured.Tyre.Pressure.FL", getConfigurationValue(data, "Pitstop Data", "TyrePressureFL", 26.1))
+		knowledgeBase.addFact("Pitstop.Configured.Tyre.Pressure.FR", getConfigurationValue(data, "Pitstop Data", "TyrePressureFR", 26.1))
+		knowledgeBase.addFact("Pitstop.Configured.Tyre.Pressure.RL", getConfigurationValue(data, "Pitstop Data", "TyrePressureRL", 26.1))
+		knowledgeBase.addFact("Pitstop.Configured.Tyre.Pressure.RR", getConfigurationValue(data, "Pitstop Data", "TyrePressureRR", 26.1))
 		
 		result := knowledgeBase.produce()
 		

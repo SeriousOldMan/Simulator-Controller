@@ -60,6 +60,26 @@ typedef int AC_FLAG_TYPE;
 #define AC_CHECKERED_FLAG 5
 #define AC_PENALTY_FLAG 6
 
+typedef int ACC_TRACK_GRIP_STATUS;
+
+#define ACC_GREEN 0
+#define ACC_FAST 1
+#define ACC_OPTIMUM 2
+#define ACC_GREASY 3
+#define ACC_DAMP 4
+#define ACC_WET 5
+#define ACC_FLOODED 6
+
+typedef int ACC_RAIN_INTENSITY;
+
+#define ACC_NO_RAIN 0
+#define ACC_DRIZZLE 1
+#define ACC_LIGHT_RAIN 2
+#define ACC_MEDIUM_RAIN 3
+#define ACC_HEAVY_RAIN 4
+#define ACC_THUNDERSTORM 5
+
+
 
 #pragma pack(push)
 #pragma pack(4)
@@ -153,6 +173,20 @@ struct SPageFilePhysics
     float suspensionDamage[4];
     float tyreTemp[4];
 
+    float waterTemp = 0;
+    float brakePressure[4];
+    int frontBrakeCompound = 0;
+    int rearBrakeCompound = 0;
+    float padLife[4];
+    float discLife[4];
+
+    int ignitionOn = 0;
+    int starterEngineOn = 0;
+    int isEngineRunning = 0;
+    float kerbVibration = 0;
+    float slipVibrations = 0;
+    float gVibrations = 0;
+    float absVibrations = 0;
 };
 
 
@@ -214,6 +248,43 @@ struct SPageFileGraphic
     int DriverStintTotalTimeLeft = 0;
     int DriverStintTimeLeft = 0;
     int rainTyres = 0;
+
+    int sessionIndex = 0;
+    float usedFuel = 0;
+    wchar_t deltaLapTime[15];
+    int iDeltaLapTime = 0;
+    wchar_t estimatedLapTime[15];
+    int iEstimatedLapTime = 0;
+    int isDeltaPositive = 0;
+    int iSplit = 0;
+    int isValidLap = 0;
+    float fuelEstimatedLaps = 0;
+    wchar_t trackStatus[33]; // Map this
+    int missingMandatoryPits = 0;
+    float Clock = 0;
+    int directionLightsLeft = 0;
+    int directionLightsRight = 0;
+
+    int GlobalYellow = 0;
+    int GlobalYellow1 = 0;
+    int GlobalYellow2 = 0;
+    int GlobalYellow3 = 0;
+    int GlobalWhite = 0;
+    int GlobalGreen = 0;
+    int GlobalChequered = 0;
+    int GlobalRed = 0;
+
+    int mfdTyreSet = 0; // Map this
+    float mfdFuelToAdd = 0; // Map this
+    float mfdTyrePressureFL = 0; // Map this
+    float mfdTyrePressureFR = 0; // Map this
+    float mfdTyrePressureRL = 0; // Map this
+    float mfdTyrePressureRR = 0; // Map this
+
+    ACC_TRACK_GRIP_STATUS trackGripStatus = 0; // Map this
+    ACC_RAIN_INTENSITY rainIntensity = 0; // Map this
+    ACC_RAIN_INTENSITY rainIntensityIn10min = 0; // Map this
+    ACC_RAIN_INTENSITY rainIntensityIn30min = 0; // Map this
 };
 
 
@@ -272,6 +343,9 @@ struct SPageFileStatic
     int PitWindowStart = 0;
     int PitWindowEnd = 0;
     int isOnline = 0;
+
+    wchar_t dryTyresName[33];
+    wchar_t wetTyresName[33];
 };
 
 

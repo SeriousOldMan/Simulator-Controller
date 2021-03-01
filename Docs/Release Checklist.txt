@@ -25,6 +25,8 @@ Release 2.5 Checklist
 4. Update Speech Runtime Documentation
    a. New MS Download: https://www.microsoft.com/en-us/download/details.aspx?id=16789
 5. Format Simulator Settings changed - open, edit and save
+6. Extensions and Changes in ACC SHM Reader
+   a. Documentation update
    
 Release 2.4 Checklist
 =====================

@@ -132,6 +132,29 @@ inline void printData2(const string name, const T(&v)[S][S2])
 
 }
 
+inline const string printWeather(ACC_RAIN_INTENSITY weather) {
+	switch (weather) {
+	case ACC_NO_RAIN:
+		return "Dry";
+		break;
+	case ACC_DRIZZLE:
+		return "Drizzle";
+		break;
+	case ACC_LIGHT_RAIN:
+		return "LightRain";
+		break;
+	case ACC_HEAVY_RAIN:
+		return "HeavyRain";
+		break;
+	case ACC_THUNDERSTORM:
+		return "Thunderstorm";
+		break;
+	default:
+		return "Unknown";
+		break;
+	}
+}
+
 int main(int argc, char* argv[])
 {
 	initPhysics();
@@ -151,8 +174,6 @@ int main(int argc, char* argv[])
 		printData("BodyworkDamage", pf->carDamage);
 		printData("SuspensionDamage", pf->suspensionDamage);
 		printData("FuelRemaining", pf->fuel);
-		printData("AirTemperature", pf->airTemp);
-		printData("RoadTemperature", pf->roadTemp);
 		wcout << "TyreCompound=" << ((tyreCompound == "dry_compound") ? "Dry" : "Wet") << endl;
 		printData("TyreTemperature", pf->tyreCoreTemperature);
 		printData("TyrePressure", pf->wheelsPressure);
@@ -162,9 +183,9 @@ int main(int argc, char* argv[])
 	{
 		wcout << "[Stint Data]" << endl;
 
-		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 		SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;
-		
+		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
+
 		printData("Active", ((gf->status == AC_LIVE) || (gf->status == AC_PAUSE)) ? "true" : "false");
 		printData("Paused", (gf->status == AC_PAUSE) ? "true" : "false");
 		printData("Session", (gf->session == AC_RACE) ? "RACE" : ((gf->session == AC_QUALIFY) ? "QUALIFY" : "OTHER"));
@@ -172,13 +193,52 @@ int main(int argc, char* argv[])
 		wcout << "DriverSurname=" << sf->playerSurname << endl;
 		wcout << "DriverNickname=" << sf->playerNick << endl;
 		printData("Laps", gf->completedLaps);
-        printData("LapLastTime", gf->iLastTime);
+		printData("LapLastTime", gf->iLastTime);
 		printData("LapBestTime", gf->iBestTime);
 		printData("TimeRemaining", gf->sessionTimeLeft);
 		printData("InPit", gf->isInPit ? "true" : "false");
+
 	}
 
-	if ((argc == 1) || strchr(argv[1], 'I'))
+	if ((argc == 1) || strchr(argv[1], '´T'))
+	{
+		wcout << "[Track Data]" << endl;
+
+		SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
+		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
+
+		printData("Temperature", pf->roadTemp);
+		printData("Grip", gf->trackStatus);
+	}
+
+	if ((argc == 1) || strchr(argv[1], '´P'))
+	{
+		wcout << "[Pitstop Data]" << endl;
+
+		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
+
+		printData("TyreSet", gf->mfdTyreSet);
+		printData("FuelAmount", gf->mfdFuelToAdd);
+		printData("TyrePressureFL", gf->mfdTyrePressureFL);
+		printData("TyrePressureFR", gf->mfdTyrePressureFR);
+		printData("TyrePressureRL", gf->mfdTyrePressureRL);
+		printData("TyrePressureRR", gf->mfdTyrePressureRR);
+	}
+	
+	if ((argc == 1) || strchr(argv[1], '´W'))
+	{
+		wcout << "[Weather Data]" << endl;
+
+		SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
+		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
+
+		printData("Temperature", pf->airTemp);
+		printData("Weather", printWeather(gf->rainIntensity));
+		printData("Weather10min", printWeather(gf->rainIntensityIn10min));
+		printData("Weather30min", printWeather(gf->rainIntensityIn30min));
+	}
+
+	if ((argc == 1) || strchr(argv[1], 'R'))
 	{
 		wcout << "[Race Data]" << endl;
 

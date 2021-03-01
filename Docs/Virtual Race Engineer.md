@@ -365,7 +365,7 @@ A considerable part of the knowledge of Jona comes from the telemetry informatio
 	Laps=2
 	TimeRemaining=2.47009e+06
 		
-The shared memory of *Assetto Corsa Competizione* provides a lot more information, but this is all that is needed for Jona at the momemnt. Future versions of Jona will incorporate more data, as Jona gets smarter. Unfortunately, the shared memory interface of *Assetto Corsa Competizione* does not provide any weather or car setup information at the moment, but time will tell.
+The shared memory of *Assetto Corsa Competizione* provides a lot more information, but this is all that is needed for Jona at the momment. Future versions of Jona will incorporate more data, as Jona gets smarter. For example, version 1.7 of *Assetto Corsa Competizione* introduced updated information for weather information and the current settings of the Pitstop MFD, which had been incorporated into the above telemetry file.
 
 The ACC plugin writes this information to a temporary file and hands it over to Jona for each new lap. A special case is the flag *InPit*. If this is found to be *true*, the driver is currently in the pit. In this case, the ACC plugin informs Jona about this by raising the corresponding event. Another special case is the flag *Active* which is used to detect, whether you are in a simulation (race, training, whatever) right now.
 

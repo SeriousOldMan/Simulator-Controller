@@ -62,7 +62,7 @@ Note: You can deactivate or delete all plugins except *System*. The *System* plu
 
 ### Tab *Applications*
 
-Simulator Controller can handle as many applications as you want. Beside the simulation games itself, you may want to launch your favorite telemetry or voice chat application with a push of a button. Or you want a voice recognition software to be started together with the Simulator Controller to be able to handle all activaties not only by the Button Box, but by voice commands as well. The possibilities are endless. To be able to do that, Simulator Controller needs needs knowledge about these applications, where to find them and how to handle them. This is the purpose of the *Applications* tab.
+Simulator Controller can handle as many applications as you want. Beside the simulation games itself, you may want to launch your favorite telemetry or voice chat application with a push of a button. Or you want a voice recognition software to be started together with the Simulator Controller to be able to handle all activaties not only by the Button Box, but by voice commands as well. The possibilities are endless. To be able to do that, Simulator Controller needs knowledge about these applications, where to find them and how to handle them. This is the purpose of the *Applications* tab.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%203.JPG)
 
@@ -80,7 +80,9 @@ This tab represents the most important, the most versatile and also the most dif
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%204.JPG)
 
-Note: Beginning with Release 2.4, Simulator Controller supports multiple Button Boxes. For the moment, the functions defined on the *Controller tab* will span all Button Boxes. So, the first Button Box might define Button #1 to Button #8 and the second Button Box will define Button #9 onwards. Also, only one mode will be active for all Button Boxes at the same time. This might chnage in a future version.
+Note: Beginning with Release 2.4, Simulator Controller supports multiple Button Boxes. For the moment, the functions defined on the *Controller tab* will span all Button Boxes. So, the first Button Box might define Button #1 to Button #8 and the second Button Box will define Button #9 onwards. Also, only one mode will be active for all Button Boxes at the same time. This might change in a future version.
+
+In the first step you have to define the Button Boxes, which will be activated by Simulator Controller, by entering them into the list. The name entered here must be identical to that used, when defining the corresponding Button Box layout and configuration, a task, which is described in a [dedicated documentation chapter](*) below. The order, in which the Button Boxes are entered in the list, establish the order these boxes initially appear on screen, but you can move them around using the mouse later.
 
 In the *Bindings* group, you define one or two hotkeys and corresponding actions, depending on whether you have defined a unary or binary function type. 2-way toggles and dials need two bindings for the "On" and "Off", respectivly the "Increase" and "Decrease" trigger. The binding of a function happens by defining [hotkeys](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#hotkeys), which might trigger the given function. You can define more than one hotkey descriptor, delimited by the vertical bar "|", for each trigger in the controller tab. This might be useful, if you have several sources, which can trigger a given function. For example you might have a function, which can be triggered by pushing a button on the controller, but also from the keyboard, which might be emulated by another tool, for example a voice recognition software.
 
@@ -196,3 +198,31 @@ With the drop down menu at the top of the window you can choose any of the avail
 Note: The original text sometimes has leading and/or trailing spaces. Be sure to include them in the translated text as well, since they are important for formatting.
 
 Important: The ISO language code and the language name itself cannot be changed, once a new language has been initially saved. So choose them wisely. And last but not least be careful, if you ever want to edit the translation files directly using a text editor. This editor must be able to handle multibyte files, since the tranlation files are stored in an UTF-16 format.
+
+# Button Box Layouts
+
+Beginning with Release 2.5 it is possible to define Button Box layouts using a structured configuration file. A future version will introduce a graphical editor to work on these configurations, but for now you have to create the configuration file using a text editor.
+
+	[Controls]
+	Switch=2WayToggle;%kButtonBoxImagesDirectory%Photorealistic\Toggle Switch.png;54 x 85
+	Push=Button;%kButtonBoxImagesDirectory%Photorealistic\Push Button 3.png;40 x 40
+	Rotary=Dial;%kButtonBoxImagesDirectory%Photorealistic\Rotary Dial 3.png;42 x 42
+	[Labels]
+	Label=56 x 30
+	[Layouts]
+	Master Controller.Layout=3 x 5
+	Master Controller.1=Switch.1,Label;Switch.2,Label;Switch.3,Label;Switch.4,Label;Switch.5,Label
+	Master Controller.2=Push.1,Label;Push.2,Label;Push.3,Label;Push.4,Label;Rotary.1,Label
+	Master Controller.3=Push.5,Label;Push.6,Label;Push.7,Label;Push.8,Label;Rotary.2,Label
+	Slave Controller.Layout=3 x 4
+	Slave Controller.1=Push.9,Label;Push.10,Label;Push.11,Label;Push.12,Label
+	Slave Controller.2=Push.13,Label;Push.14,Label;Push.15,Label;Push.16,Label
+	Slave Controller.3=Push.17,Label;Push.18,Label;Push.19,Label;Push.20,Label
+
+You can define as many Button Boxes as you whish, but only those Boxes will be activated by Simulator Controller, that also have been added to the list of active Button Boxes list at the top of the [*Controller* tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller).
+
+In the given configuration file, you first have to define the different *Control* types, you want to use on your Button Box layouts. In the example above, three different *Control* types are defined, each one consisting of the name of the corresponding class, the image for the visual representation and the size information for this image. Supported classes are "1WayToggle", "2WayToggle", "Button" and "Dial", which corresponds with the controller functions used on the [*Controller* tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller). The given name of the *Control* type definition will then be used in the configuration of the concrete layouts in the *[Layouts]* section.
+
+You may define different *Label* types, if you are using label fields of different sizes for your controls. The example only introduces one label with a fixed size for all controls.
+
+In the last section, the layouts of one or more Button Boxes are described using these components. For each Button Box you have to define the layout grid with *.Layout*" descriptor and then you enumerate the controls of each row seperately. It is possible to leave positions in the grid blank, when not every corresponding position on your Button Box is occupied with a control. It is also possible to create a control without a label field. The number of each control must correspond with the number of the corresponding controller function defined on the [*Controller* tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller).

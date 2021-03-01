@@ -27,6 +27,9 @@ Release 2.5 Checklist
 5. Format Simulator Settings changed - open, edit and save
 6. Extensions and Changes in ACC SHM Reader
    a. Documentation update
+7. Updated documentation
+   a. Installation & Configuration (Attention: Broken Links)
+   b. Virtual Race Engineer
    
 Release 2.4 Checklist
 =====================

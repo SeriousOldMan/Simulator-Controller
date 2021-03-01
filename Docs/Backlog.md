@@ -19,3 +19,4 @@
   2. [Target: V2.7] Again, better UI flow in the configuration tool and larger window size
   3. [Target: V2.7] Plugin support for the configuration tool
   4. Choosing a specific theme depending on the selected simulation game
+  5. [Target: V4.0] An interview based setup wizard, which guides through the configuration process

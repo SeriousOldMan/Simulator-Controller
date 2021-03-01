@@ -143,6 +143,9 @@ inline const string printWeather(ACC_RAIN_INTENSITY weather) {
 	case ACC_LIGHT_RAIN:
 		return "LightRain";
 		break;
+	case ACC_MEDIUM_RAIN:
+		return "MediumRain";
+		break;
 	case ACC_HEAVY_RAIN:
 		return "HeavyRain";
 		break;

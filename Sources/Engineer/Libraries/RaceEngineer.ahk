@@ -1536,6 +1536,27 @@ class RaceEngineer extends ConfigurationItem {
 		}
 	}
 	
+	weatherChangeWarning(rainAhead, minutes, recommendedCompound) {
+		if this.Speaker {
+			speaker := this.getSpeaker()
+			
+			Random rnd, 1, 10
+			
+			if Round(rnd / 10)
+				speaker.speakPhrase("WeatherChange", {minutes: minutes, compound: recommendedCompound})
+			else if rainAhead
+				speaker.speakPhrase("WeatherRainChange", {minutes: minutes, compound: recommendedCompound})
+			else
+				speaker.speakPhrase("WeatherDryChange", {minutes: minutes, compound: recommendedCompound})
+		
+			if this.Listener {
+				speaker.speakPhrase("ConfirmPlan")
+			
+				this.setContinuation(ObjBindMethod(this, "planPitstop"))
+			}
+		}
+	}
+	
 	startPitstopSetup(pitstopNumber) {
 		if this.PitstopHandler
 			this.PitstopHandler.startPitstopSetup(pitstopNumber)
@@ -1592,6 +1613,12 @@ damageWarning(context, newSuspensionDamage, newBodyworkDamage) {
 
 reportDamageAnalysis(context, repair, stintLaps, delta) {
 	context.KnowledgeBase.RaceEngineer.reportDamageAnalysis(repair, stintLaps, delta)
+	
+	return true
+}
+
+weatherChangeWarning(context, rainAhead, minutes, recommendedCompound) {
+	context.KnowledgeBase.RaceEngineer.weatherChangeWarning(rainAhead, minutes, recommendedCompound)
 	
 	return true
 }

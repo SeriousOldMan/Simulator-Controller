@@ -337,34 +337,47 @@ You can take a look at the knowledge base by enabling "Debug" mode in the config
 
 ### Telemetry Integration
 
-A considerable part of the knowledge of Jona comes from the telemetry information of the simulation game. As said, a data provider for *Assetto Corsa Competizione* is already builtin and is used by the ACC plugin to load the data and hand it over to Jona. A small spplication "ACC SHM Reader.exe", which is located in the *Binaries* folder, is used to acquire the data. This reader ist run periodically and outputs the following data:
+A considerable part of the knowledge of Jona comes from the telemetry information of the simulation game. As said, a data provider for *Assetto Corsa Competizione* is already builtin and is used by the ACC plugin to load the data and hand it over to Jona. A small spplication "ACC SHM Reader.exe", which is located in the *Binaries* folder, is used to acquire the data. This reader runs periodically and outputs the following data:
 
 	[Car Data]
-	AirTemperature=24.9965
 	BodyworkDamage=0, 0, 0, 0, 0
-	FuelRemaining=9.39671
-	RoadTemperature=31.8178
 	SuspensionDamage=0, 0, 0, 0
+	FuelRemaining=54.6047
 	TyreCompound=Wet
-	TyrePressure=27.1306, 27.3363, 27.166, 27.5029
-	TyreTemperature=82.8184, 71.4197, 86.3127, 77.3212
-	[Race Data]
-	Car=mclaren_720s_gt3
-	FuelAmount=125
-	Track=Barcelona
+	TyreTemperature=84.268, 74.6507, 85.6955, 77.2675
+	TyrePressure=27.6296, 27.6063, 27.6666, 27.5575
 	[Stint Data]
-	DriverForname=The
-	DriverSurname=BigO
-	DriverNickname=TBO
 	Active=true
 	Paused=false
 	Session=RACE
+	DriverForname=The
+	DriverSurname=BigO
+	DriverNickname=TBO
+	Laps=3
+	LapLastTime=116697
+	LapBestTime=116697
+	TimeRemaining=1.41874e+06
 	InPit=false
-	LapBestTime=110091
-	LapLastTime=110091
-	Laps=2
-	TimeRemaining=2.47009e+06
-		
+	[Track Data]
+	Temperature=25.5913
+	Grip=OPTIMUM
+	[Pitstop Data]
+	TyreSet=2
+	FuelAmount=0
+	TyrePressureFL=25.3
+	TyrePressureFR=26.6
+	TyrePressureRL=25
+	TyrePressureRR=26.2
+	[Weather Data]
+	Temperature=22.9353
+	Weather=Dry
+	Weather10min=Dry
+	Weather30min=Dry
+	[Race Data]
+	Car=mclaren_720s_gt3
+	Track=Paul_Ricard
+	FuelAmount=125
+
 The shared memory of *Assetto Corsa Competizione* provides a lot more information, but this is all that is needed for Jona at the momment. Future versions of Jona will incorporate more data, as Jona gets smarter. For example, version 1.7 of *Assetto Corsa Competizione* introduced updated information for weather information and the current settings of the Pitstop MFD, which had been incorporated into the above telemetry file.
 
 The ACC plugin writes this information to a temporary file and hands it over to Jona for each new lap. A special case is the flag *InPit*. If this is found to be *true*, the driver is currently in the pit. In this case, the ACC plugin informs Jona about this by raising the corresponding event. Another special case is the flag *Active* which is used to detect, whether you are in a simulation (race, training, whatever) right now.

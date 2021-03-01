@@ -1119,6 +1119,13 @@ class RaceEngineer extends ConfigurationItem {
 		knowledgeBase.setFact("Driver.Surname", driverSurname)
 		knowledgeBase.setFact("Driver.Nickname", driverNickname)
 		
+		knowledgeBase.addFact("Pitstop.Configured.Tyre.Set", getConfigurationValue(data, "Pitstop Data", "TyreSet", 0))
+		knowledgeBase.addFact("Pitstop.Configured.Fuel", getConfigurationValue(data, "Pitstop Data", "FuelAmount", 0))
+		knowledgeBase.addFact("Pitstop.Configured.Tyre.Pressure.FL", getConfigurationValue(data, "Pitstop Data", "TyrePressureFL", 26.1))
+		knowledgeBase.addFact("Pitstop.Configured.Tyre.Pressure.FR", getConfigurationValue(data, "Pitstop Data", "TyrePressureFR", 26.1))
+		knowledgeBase.addFact("Pitstop.Configured.Tyre.Pressure.RL", getConfigurationValue(data, "Pitstop Data", "TyrePressureRL", 26.1))
+		knowledgeBase.addFact("Pitstop.Configured.Tyre.Pressure.RR", getConfigurationValue(data, "Pitstop Data", "TyrePressureRR", 26.1))
+		
 		airTemperature := Round(getConfigurationValue(data, "Weather Data", "Temperature", 0))
 		trackTemperature := Round(getConfigurationValue(data, "Track Data", "Temperature", 0))
 		weatherNow := getConfigurationValue(data, "Weather Data", "Weather", "Dry")
@@ -1199,13 +1206,6 @@ class RaceEngineer extends ConfigurationItem {
 		knowledgeBase.addFact("Lap." . lapNumber . ".Damage.Suspension.FR", Round(suspensionDamage[2], 2))
 		knowledgeBase.addFact("Lap." . lapNumber . ".Damage.Suspension.RL", Round(suspensionDamage[3], 2))
 		knowledgeBase.addFact("Lap." . lapNumber . ".Damage.Suspension.RR", Round(suspensionDamage[4], 2))
-		
-		knowledgeBase.addFact("Pitstop.Configured.Tyre.Set", getConfigurationValue(data, "Pitstop Data", "TyreSet", 0))
-		knowledgeBase.addFact("Pitstop.Configured.Fuel", getConfigurationValue(data, "Pitstop Data", "FuelAmount", 0))
-		knowledgeBase.addFact("Pitstop.Configured.Tyre.Pressure.FL", getConfigurationValue(data, "Pitstop Data", "TyrePressureFL", 26.1))
-		knowledgeBase.addFact("Pitstop.Configured.Tyre.Pressure.FR", getConfigurationValue(data, "Pitstop Data", "TyrePressureFR", 26.1))
-		knowledgeBase.addFact("Pitstop.Configured.Tyre.Pressure.RL", getConfigurationValue(data, "Pitstop Data", "TyrePressureRL", 26.1))
-		knowledgeBase.addFact("Pitstop.Configured.Tyre.Pressure.RR", getConfigurationValue(data, "Pitstop Data", "TyrePressureRR", 26.1))
 		
 		result := knowledgeBase.produce()
 		

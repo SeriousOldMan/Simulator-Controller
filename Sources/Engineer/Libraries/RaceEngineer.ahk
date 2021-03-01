@@ -1119,12 +1119,12 @@ class RaceEngineer extends ConfigurationItem {
 		knowledgeBase.setFact("Driver.Surname", driverSurname)
 		knowledgeBase.setFact("Driver.Nickname", driverNickname)
 		
-		knowledgeBase.addFact("Pitstop.Configured.Tyre.Set", getConfigurationValue(data, "Pitstop Data", "TyreSet", 0))
-		knowledgeBase.addFact("Pitstop.Configured.Fuel", getConfigurationValue(data, "Pitstop Data", "FuelAmount", 0))
-		knowledgeBase.addFact("Pitstop.Configured.Tyre.Pressure.FL", getConfigurationValue(data, "Pitstop Data", "TyrePressureFL", 26.1))
-		knowledgeBase.addFact("Pitstop.Configured.Tyre.Pressure.FR", getConfigurationValue(data, "Pitstop Data", "TyrePressureFR", 26.1))
-		knowledgeBase.addFact("Pitstop.Configured.Tyre.Pressure.RL", getConfigurationValue(data, "Pitstop Data", "TyrePressureRL", 26.1))
-		knowledgeBase.addFact("Pitstop.Configured.Tyre.Pressure.RR", getConfigurationValue(data, "Pitstop Data", "TyrePressureRR", 26.1))
+		knowledgeBase.setFact("Pitstop.Configured.Tyre.Set", getConfigurationValue(data, "Pitstop Data", "TyreSet", 0))
+		knowledgeBase.setFact("Pitstop.Configured.Fuel", getConfigurationValue(data, "Pitstop Data", "FuelAmount", 0))
+		knowledgeBase.setFact("Pitstop.Configured.Tyre.Pressure.FL", getConfigurationValue(data, "Pitstop Data", "TyrePressureFL", 26.1))
+		knowledgeBase.setFact("Pitstop.Configured.Tyre.Pressure.FR", getConfigurationValue(data, "Pitstop Data", "TyrePressureFR", 26.1))
+		knowledgeBase.setFact("Pitstop.Configured.Tyre.Pressure.RL", getConfigurationValue(data, "Pitstop Data", "TyrePressureRL", 26.1))
+		knowledgeBase.setFact("Pitstop.Configured.Tyre.Pressure.RR", getConfigurationValue(data, "Pitstop Data", "TyrePressureRR", 26.1))
 		
 		airTemperature := Round(getConfigurationValue(data, "Weather Data", "Temperature", 0))
 		trackTemperature := Round(getConfigurationValue(data, "Track Data", "Temperature", 0))
@@ -1132,11 +1132,11 @@ class RaceEngineer extends ConfigurationItem {
 		weather10Min := getConfigurationValue(data, "Weather Data", "Weather10Min", "Dry")
 		weather30Min := getConfigurationValue(data, "Weather Data", "Weather30Min", "Dry")
 		
-		knowledgeBase.addFact("Weather.Temperature.Air", airTemperature)
-		knowledgeBase.addFact("Weather.Temperature.Track", trackTemperature)
-		knowledgeBase.addFact("Weather.Weather.Now", weatherNow)
-		knowledgeBase.addFact("Weather.Weather.10Min", weather10Min)
-		knowledgeBase.addFact("Weather.Weather.30Min", weather30Min)
+		knowledgeBase.setFact("Weather.Temperature.Air", airTemperature)
+		knowledgeBase.setFact("Weather.Temperature.Track", trackTemperature)
+		knowledgeBase.setFact("Weather.Weather.Now", weatherNow)
+		knowledgeBase.setFact("Weather.Weather.10Min", weather10Min)
+		knowledgeBase.setFact("Weather.Weather.30Min", weather30Min)
 		
 		lapTime := getConfigurationValue(data, "Stint Data", "LapLastTime", 0)
 		

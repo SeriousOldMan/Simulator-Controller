@@ -208,7 +208,11 @@ int main(int argc, char* argv[])
 		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
 		printData("Temperature", pf->roadTemp);
-		printData("Grip", gf->trackStatus);
+
+		_bstr_t ts(gf->trackStatus);
+		const char* trackStatus = ts;
+
+		printData("Grip", trackStatus);
 	}
 
 	if ((argc == 1) || strchr(argv[1], '´P'))

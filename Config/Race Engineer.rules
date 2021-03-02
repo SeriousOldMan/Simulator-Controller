@@ -383,10 +383,12 @@ updateTyrePressureCorrection(?lap) <=																											\
 updateWeatherTrend(?lap) <= firstStintLap(?startlap), ?deltaLaps = ?lap - ?startlap,															\
 							lapAirTemperature(?startlap, ?startAirTemperature), projectedAirTemperature(?lap, ?curAirTemperature),				\
 							lapTrackTemperature(?startlap, ?startTrackTemperature), projectedTrackTemperature(?lap, ?curTrackTemperature),		\
+							lapWeather(?startlap, ?startWeather), projectedWeather(?lap, ?curWeather),											\
 							?tempAir = ?curAirTemperature - ?startAirTemperature, ?tempTrack = ?curTrackTemperature - ?startTrackTemperature,	\
 							?deltaAirTemperature = ?tempAir / ?deltaLaps, ?deltaTrackTemperature = ?tempTrack / ?deltaLaps,						\
+							?tempWeather = ?curWeather - ?startWeather, ?deltaWeather = ?tempWeather / ?deltaLaps,								\
 							Set(Weather.Temperature.Air.Delta, ?deltaAirTemperature),															\
-							Set(Weather.Temperature.Track.Delta, ?deltaTrackTemperature)
+							Set(Weather.Temperature.Track.Delta, ?deltaTrackTemperature), Set(Weather.Weather.Delta, ?deltaWeather)
 
 projectedWeather(?lap, ?weather) <=																												\
 		firstStintLap(?firstlap), sequence(?firstlap, !Lap, ?indices), lapWeathers(?firstlap, !Lap, ?weathers),									\
@@ -567,7 +569,7 @@ lapAirTemperature(?lap, ?temperature) <= Get(Lap, ?lap, Temperature.Air, ?temper
 
 lapTrackTemperature(?lap, ?temperature) <= Get(Lap, ?lap, Temperature.Track, ?temperature)
 								   
-lapWeather(?lap, ?weather) <= Get(Lap, ?lap, Weather, ?weather)
+lapWeather(?lap, ?weather) <= Get(Lap, ?lap, Weather, ?weatherSymbol), weatherIndex(?weatherSymbol, ?weather)
 
 lapTyrePressure(?lap, ?tyreType, ?pressure) <= Get(Lap, ?lap, Tyre.Pressure, ?tyreType, ?pressure)
 
@@ -653,7 +655,8 @@ lapWeight(?referenceLap, ?lap, ?weight) <= ?distance = ?referenceLap - ?lap,				
 
 lapTyreTemperatures(?lap, ?lap, [?temperature]) <= lapTyreTemperature(?lap, ?temperature), !
 lapTyreTemperatures(?fromLap, ?toLap, [?temperature | ?temperatures]) <= lapTyreTemperature(?fromLap, ?temperature),							\
-																		 ?nLap = ?fromLap + 1, lapTyreTemperatures(?nlap, ?temperatures)
+																		 ?nLap = ?fromLap + 1,													\
+																		 lapTyreTemperatures(?nlap, ?toLap, ?temperatures)
 
 recentLapTyreTemperatures(?lap, ?lap, []) <= !
 recentLapTyreTemperatures(?, !Race.Settings.Lap.History.Considered, []) <= !
@@ -673,7 +676,7 @@ recentLapTyrePressures(?lap, ?offset, [?pressure | ?pressures]) <=														
 
 lapAirTemperatures(?lap, ?lap, [?temperature]) <= lapAirTemperature(?lap, ?temperature), !
 lapAirTemperatures(?fromLap, ?toLap, [?temperature | ?temperatures]) <= lapAirTemperature(?fromLap, ?temperature),								\
-																		?nLap = ?fromLap + 1, lapAirTemperatures(?nlap, ?temperatures)
+																		?nLap = ?fromLap + 1, lapAirTemperatures(?nlap, ?toLap, ?temperatures)
 
 recentLapAirTemperatures(?lap, ?lap, []) <= !
 recentLapAirTemperatures(?, !Race.Settings.Lap.History.Considered, []) <= !
@@ -682,8 +685,8 @@ recentLapAirTemperatures(?lap, ?offset, [?temperature | ?temperatures]) <=						
 		recentLapAirTemperatures(?lap, ?nOffset, ?temperatures)
 
 lapTrackTemperatures(?lap, ?lap, [?temperature]) <= lapTrackTemperature(?lap, ?temperature), !
-lapTrackTemperatures(?fromLap, ?toLap, [?temperature | ?temperatures]) <= lapTrackTemperature(?fromLap, ?temperature),							\
-																		  ?nLap = ?fromLap + 1, lapTrackTemperatures(?nlap, ?temperatures)
+lapTrackTemperatures(?fromLap, ?toLap, [?temperature | ?temperatures]) <= lapTrackTemperature(?fromLap, ?temperature), ?nLap = ?fromLap + 1,	\
+																		  lapTrackTemperatures(?nlap, ?toLap, ?temperatures)
 
 recentLapTrackTemperatures(?lap, ?lap, []) <= !
 recentLapTrackTemperatures(?, !Race.Settings.Lap.History.Considered, []) <= !
@@ -692,7 +695,8 @@ recentLapTrackTemperatures(?lap, ?offset, [?temperature | ?temperatures]) <=				
 		recentLapTrackTemperatures(?lap, ?nOffset, ?temperatures)
 																		  
 lapWeathers(?lap, ?lap, [?weather]) <= lapWeather(?lap, ?weather), !
-lapWeathers(?fromLap, ?toLap, [?weather | ?weathers]) <= lapWeather(?fromLap, ?weather), ?nLap = ?fromLap + 1, lapWeathers(?nlap, ?weathers)
+lapWeathers(?fromLap, ?toLap, [?weather | ?weathers]) <= lapWeather(?fromLap, ?weather), ?nLap = ?fromLap + 1,									\
+														 lapWeathers(?nlap, ?toLap, ?weathers)
 
 recentLapWeathers(?lap, ?lap, []) <= !
 recentLapWeathers(?, !Race.Settings.Lap.History.Considered, []) <= !
@@ -722,6 +726,13 @@ pitstopTyrePressure(?compound, ?tyreType, ?pressure) <= pitstopTyreCompound(?com
 
 pitstopDamageRepair(Suspension, ?repair) <= lastPitstop(?nr), Get(Pitstop, ?nr, Repair.Suspension, ?repair)
 pitstopDamageRepair(Bodywork, ?repair) <= lastPitstop(?nr), Get(Pitstop, ?nr, Repair.Bodywork, ?repair)
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                       Weather Information Retrieval                     ;;;
+;;;-------------------------------------------------------------------------;;;
+
+weatherIndex(?weather, ?index) <= index([Dry, Drizzle, LightRain, MediumRain, HeavyRain, Thunderstorm], ?weather, ?index)
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -817,6 +828,18 @@ concat([?h | ?t], ?l, [?h | ?r]) <= concat(?t, ?l, ?r)
 remove([], ?, [])
 remove([?h | ?t], ?h, ?result) <= remove(?t, ?h, ?result), !
 remove([?h | ?t], ?x, [?h | ?result]) <= remove(?t, ?x, ?result)
+
+index(?list, ?element, ?index) <= index(?list, ?element, 0, ?index)
+
+index([?element], ?element, ?index, ?index)
+index([?head | ?tail], ?head, ?index, ?index) <= !
+index([?head | ?tail], ?element, ?running, ?index) <= ?nRunning = ?running + 1, index(?tail, ?element, ?nRunning, ?index)
+
+element(?list, ?index, ?element) <= element(?list, 0, ?index, ?element)
+
+element([?element], ?index, ?index, ?element)
+element([?head | ?tail], ?index, ?index, ?head) <= !
+element([?head | ?tail], ?running, ?index, ?element) <= ?nRunning = ?running + 1, element(?tail, ?nRunning, ?index, ?element)
 
 sum([], 0)
 sum([?h | ?t], ?sum) <= sum(?t, ?tSum), ?sum = ?h + ?tSum

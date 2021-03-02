@@ -68,13 +68,14 @@ safetyFuel(?, !Race.Settings.Fuel.SafetyMargin)
 ;;;-------------------------------------------------------------------------;;;
 ;;;                     Tyre Compound Target Calculation                    ;;;
 ;;;                                                                         ;;;
-;;; Update target tyre set each lap to allow for weather trend influence.   ;;;
+;;; Update current and target tyre compound each lap to allow for weather   ;;;
+;;; trend influence.                                                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-priority: 5, {Any: [?Lap], {None: [?Tyre.Compound.Target]}} => (Prove: nextTyreCompound)
+priority: 5, {Any: [?Lap], [?Pitstop.Lap], {None: [?Tyre.Compound.Target]}} => (Prove: updateTyreCompound)
 
-nextTyreCompound() <= pitstopTyreCompound(?compound), Set(Tyre.Compound.Target, ?compound), !
-nextTyreCompound() <= setupTyreCompound(?compound), Set(Tyre.Compound.Target, ?compound)
+updateTyreCompound() <= pitstopTyreCompound(?compound), Set(Tyre.Compound, ?compound), Set(Tyre.Compound.Target, ?compound), !
+updateTyreCompound() <= setupTyreCompound(?compound), Set(Tyre.Compound, ?compound), Set(Tyre.Compound.Target, ?compound)
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -402,6 +403,38 @@ projectedTrackTemperature(?lap, ?temperature) <=																								\
 projectedTyreTemperature(?lap, ?temperature) <=																									\
 		firstStintLap(?firstlap), sequence(?firstlap, !Lap, ?indices), lapTyreTemperatures(?firstlap, !Lap, ?temperatures),						\
 		linRegression(?indices, ?temperatures, ?a, ?b), ?temp = ?b * ?lap, ?temperature = ?a + ?temp
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                    Upcoming Weather Change Notification                 ;;;
+;;;                                                                         ;;;
+;;; These rules will check wether a significant weather change is ahead and ;;;
+;;; will notify the driver accordingly. If the weather change is only a few ;;;
+;;; minutes ahead, a recommendation to use different tyre compound is		;;;
+;;; made.                                                                   ;;;
+;;;-------------------------------------------------------------------------;;;
+
+priority: 1,																																	\
+	{All: [?Lap], [?Tyre.Compound = Dry], {None: [?Weather.Tyre.Change.Recommended]},															\
+		  {Any: [?Weather.Weather.Now = Dry], [?Weather.Weather.Now = Drizzle], [?Weather.Weather.Now = LightRain]},							\
+		  {Any: [?Weather.Weather.10Min = MediumRain], [?Weather.Weather.10Min = HeavyRain], [?Weather.Weather.10Min = Thunderstorm]}} =>		\
+		(Call: weatherTyreChangeRecommendation, 10, Wet), (Set: Weather.Tyre.Change.Recommended, ?Lap), (Set: Weather.Change.Notified, ?Lap)		
+priority: 1,																																	\
+	{All: [?Lap], [?Tyre.Compound = Wet], {None: [?Weather.Change.Recommended]},																\
+		  {Any: [?Weather.Weather.10Min = MediumRain], [?Weather.Weather.10Min = HeavyRain], [?Weather.Weather.10Min = Thunderstorm]},			\
+		  {Any: [?Weather.Weather.Now = Dry], [?Weather.Weather.Now = Drizzle], [?Weather.Weather.Now = LightRain]}} =>							\
+		(Call: weatherTyreChangeRecommendation, 10, Dry), (Set: Weather.Tyre.Change.Recommended, ?Lap), (Set: Weather.Change.Notified, ?Lap)
+		
+{All: [?Lap], [?Tyre.Compound = Dry], {None: [?Weather.Change.Notified]},																		\
+	  {Any: [?Weather.Weather.Now = Dry], [?Weather.Weather.Now = Drizzle], [?Weather.Weather.Now = LightRain]},								\
+	  {Any: [?Weather.Weather.30Min = MediumRain], [?Weather.Weather.30Min = HeavyRain], [?Weather.Weather.30Min = Thunderstorm]}} =>			\
+		(Call: weatherChangeNotification, 30), (Set: Weather.Change.Notified, ?Lap)
+{All: [?Lap], [?Tyre.Compound = Wet], {None: [?Weather.Change.Notified]},																		\
+	  {Any: [?Weather.Weather.30Min = MediumRain], [?Weather.Weather.30Min = HeavyRain], [?Weather.Weather.30Min = Thunderstorm]},				\
+	  {Any: [?Weather.Weather.Now = Dry], [?Weather.Weather.Now = Drizzle], [?Weather.Weather.Now = LightRain]}} =>								\
+		(Call: weatherChangeNotification, 30), (Set: Weather.Change.Notified, ?Lap)
+
+priority: -20, [?Pitstop.Lap = ?Lap] => (Clear: Weather.Tyre.Change.Recommended), (Clear: Weather.Change.Notified)
 
 
 ;;;-------------------------------------------------------------------------;;;

@@ -50,6 +50,18 @@ You can add all the simulation games installed on your PC to the list in the thi
 
 The last group, which is only present in developer mode as mentioned above, lets you activate the debug mode, define the log level and enter the path to an AutoHotkey installation on your PC. Be careful with the log level *Info*, since the log files found in the *Simulator Controller\Logs* folder found in the users *Documents* folder may grow quite fast.
 
+### Tab *Voice Control*
+
+On this tab, you can configure the voice control support of Simulator Controller. Voice output is used by Jona, the [virtual race engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer), to give you crucial information during a race. But Simulator Controller also supports voice input to give you complete hands free control over all possible commands. These commands can be configured in the [*Controller* tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller) tab below. But Jona also supports voice recognition, thereby allowing you a full interactive dialog with your race engineer.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%207.JPG)
+
+You can define the language, you want to use for voice generation and recognition, with the first dropdown menu. Beside that, you can choose the concrete voice to be used for voice generation and also the voice recognizer language with the second and third dropdown menu. Be careful, a mismatch between chosen language and the selected voice and/or recognizer will give you very funny results. Generally, I recommend to use the "Automatic" setting for both and let Simulator Controller decide which is the best voice and the best recognizer for your current selected language.
+
+With the last option, you can configure a *Push To Talk* function for voice recognition, which will greatly enhance the voice recognition quality and will avoid almost all false positives, if you are not in a very quite environment. The argument to be entered in the field is a key code as defined in the AutoHotkey [key list](https://www.autohotkey.com/docs/KeyList.htm). For example, "LControl" defines the left control key on the keyboard, whereas "4Joy2" defines the second button on your 4th connected hardware controller.
+
+Note: You can use the [Key Detector Tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#key-detector-tool) to find out, which button codes your connected controller actually use, by clicking the small button on the right side of the *Push To Talk* entry field.
+
 ### Tab *Plugins*
 
 In this tab you can configure the plugins currently in use by the Simulator Controller.

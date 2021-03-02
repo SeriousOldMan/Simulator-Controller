@@ -1128,6 +1128,13 @@ class RaceEngineer extends ConfigurationItem {
 		
 		airTemperature := Round(getConfigurationValue(data, "Weather Data", "Temperature", 0))
 		trackTemperature := Round(getConfigurationValue(data, "Track Data", "Temperature", 0))
+		
+		if (airTemperature = 0)
+			airTemperature := Round(getConfigurationValue(data, "Car Data", "AirTemperature", 0))
+		
+		if (trackTemperature = 0)
+			trackTemperature := Round(getConfigurationValue(data, "Car Data", "RoadTemperature", 0))
+		
 		weatherNow := getConfigurationValue(data, "Weather Data", "Weather", "Dry")
 		weather10Min := getConfigurationValue(data, "Weather Data", "Weather10Min", "Dry")
 		weather30Min := getConfigurationValue(data, "Weather Data", "Weather30Min", "Dry")
@@ -1536,7 +1543,7 @@ class RaceEngineer extends ConfigurationItem {
 		}
 	}
 	
-	weatherWarning(minutes) {
+	weatherChangeNotification(minutes) {
 		if this.Speaker {
 			speaker := this.getSpeaker()
 			
@@ -1544,15 +1551,13 @@ class RaceEngineer extends ConfigurationItem {
 		}
 	}
 	
-	weatherTyreChange(rainAhead, minutes, recommendedCompound) {
+	weatherTyreChangeRecommendation(minutes, recommendedCompound) {
 		if this.Speaker {
 			speaker := this.getSpeaker()
 			
-			if rainAhead
-				speaker.speakPhrase("WeatherRainChange", {minutes: minutes, compound: recommendedCompound})
-			else
-				speaker.speakPhrase("WeatherDryChange", {minutes: minutes, compound: recommendedCompound})
-		
+			speaker.speakPhrase((recommendedCompound = "Wet") ? "WeatherRainChange" : "WeatherDryChange"
+							  , {minutes: minutes, compound: speaker.Fragments[recommendedCompound]})
+			
 			if this.Listener {
 				speaker.speakPhrase("ConfirmPlan")
 			
@@ -1621,14 +1626,14 @@ reportDamageAnalysis(context, repair, stintLaps, delta) {
 	return true
 }
 
-weatherWarning(context, minutes) {
-	context.KnowledgeBase.RaceEngineer.weatherWarning(rainAhead, minutes, recommendedCompound)
+weatherChangeNotification(context, minutes) {
+	context.KnowledgeBase.RaceEngineer.weatherChangeNotification(rainAhead, minutes)
 	
 	return true
 }
 
-weatherTyreChange(context, rainAhead, minutes, recommendedCompound) {
-	context.KnowledgeBase.RaceEngineer.weatherTyreChange(rainAhead, minutes, recommendedCompound)
+weatherTyreChangeRecommendation(context, minutes, recommendedCompound) {
+	context.KnowledgeBase.RaceEngineer.weatherTyreChangeRecommendation(minutes, recommendedCompound)
 	
 	return true
 }

@@ -1,9 +1,9 @@
 [Update]
 Release 1.5=updateToV15
-Release 2.0=Release 1.5 -> updateConfigurationForV20, updateTranslations, updatePluginLabels, updateACCPluginForV20
+Release 2.0=Release 1.5 -> updateTranslations, updatePluginLabels, updateConfigurationForV20, updateACCPluginForV20
 Release 2.0.1=Release 2.0 -> updateTranslations
 Release 2.0.2=Release 2.0.1 -> updateTranslations
-Release 2.0.3=Release 2.0.2 -> updateConfigurationForV203, updateTranslations
+Release 2.0.3=Release 2.0.2 -> updateTranslations, updateConfigurationForV203
 Release 2.1=Release 2.0.3 -> updateTranslations, updatePluginLabels, updateACCPluginForV21, updatePedalCalibrationPluginForV21
 Release 2.2=Release 2.1 -> updateTranslations, updatePluginLabels
 Release 2.3=Release 2.2 -> updateTranslations, updatePluginLabels, updatePhraseGrammars, updateRF2PluginForV23

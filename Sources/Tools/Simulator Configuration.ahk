@@ -901,13 +901,22 @@ class VoiceControlTab extends ConfigurationItemTab {
 		chosen := 0
 		enIndex := 0
 		
-		for code, language in availableLanguages() {
+		languages := availableLanguages()
+		
+		for ignore, grammarFile in getFileNames("Race Engineer.grammars.*", kUserConfigDirectory, kConfigDirectory) {
+			SplitPath grammarFile, , , languageCode
+		
+			if languages.HasKey(languageCode)
+				language := languages[languageCode]
+			else
+				language := languageCode
+			
 			choices.Push(language)
 			
 			if (language == voiceLanguageDropDown)
 				chosen := A_Index
 				
-			if (code = "en")
+			if (languageCode = "en")
 				enIndex := A_Index
 		}
 		
@@ -955,7 +964,14 @@ class VoiceControlTab extends ConfigurationItemTab {
 	loadFromConfiguration(configuration) {
 		base.loadFromConfiguration(configuration)
 		
-		voiceLanguageDropDown := availableLanguages()[getConfigurationValue(configuration, "Voice Control", "Language", getLanguage())]
+		languageCode := getConfigurationValue(configuration, "Voice Control", "Language", getLanguage())
+		languages := availableLanguages()
+		
+		if languages.HasKey(languageCode)
+			voiceLanguageDropDown := languages[languageCode]
+		else
+			voiceLanguageDropDown := languageCode
+		
 		speakerDropDown := getConfigurationValue(configuration, "Voice Control", "Speaker", true)
 		listenerDropDown := getConfigurationValue(configuration, "Voice Control", "Listener", false)
 		pushToTalkEdit := getConfigurationValue(configuration, "Voice Control", "PushToTalk", false)
@@ -983,13 +999,22 @@ class VoiceControlTab extends ConfigurationItemTab {
 		GuiControlGet pushToTalkEdit
 		
 		languageCode := "en"
+		languages := availableLanguages()
 		
-		for code, language in availableLanguages()
+		for ignore, grammarFile in getFileNames("Race Engineer.grammars.*", kUserConfigDirectory, kConfigDirectory) {
+			SplitPath grammarFile, , , grammarLanguageCode
+		
+			if languages.HasKey(grammarLanguageCode)
+				language := languages[grammarLanguageCode]
+			else
+				language := grammarLanguageCode
+			
 			if (language = voiceLanguageDropDown) {
-				languageCode := code
+				languageCode := grammarLanguageCode
 				
 				break
 			}
+		}
 		
 		if (speakerDropDown = translate("Automatic"))
 			speakerDropDown := true

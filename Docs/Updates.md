@@ -43,6 +43,16 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ***
 
+## Release 2.5
+
+A new tab in the configuration tool allows you to configure the language to be used for voice generation and recognition and also introduces a *Push To Talk* functionality for voice recognition. Please read the corresponding [documentation](*), if you want to use these new features.
+
+Another important change in this release is the introduction of a configuration based approach for Button Box layouts. The automatic update procedure will take care, that the predfiend Button Box visual representation will function as before, but you will want to have a look into the [documentation](*), if you had defined your own Button Box with the API based approach. Because of this new feature, Release 2.5 introduces changes in the format of the *Simulator Settings.ini* file, but the automated update procedure will take care of most of that. Nevertheless, you might have to reposition your Button Boxes, since the old saved positions will be lost after the update.
+
+Beside that, Jona learned a lot about upcoming weather changes and tyre compound recommendations with Release 2.5, but this will come for free with regards to the necessary update activities.
+
+***
+
 ## Release 2.4
 
 Release 2.4 introduces the first version of the plugin for RaceRoom Racing Experience. If you are a fan of RaceRoom Racing Experience, you will see growing support for this simulation, including an integration with Jona, in the upcoming releases of Simulator Controller.

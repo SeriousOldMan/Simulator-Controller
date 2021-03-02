@@ -30,6 +30,7 @@ Release 2.5 Checklist
 7. Updated documentation
    a. Installation & Configuration (Attention: Broken Links)
    b. Virtual Race Engineer
+   c. Updates (Attention: Broken Links)
    
 Release 2.4 Checklist
 =====================

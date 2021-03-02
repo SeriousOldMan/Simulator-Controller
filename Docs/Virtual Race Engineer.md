@@ -257,7 +257,7 @@ Beside that, the check boxes for repair of Suspension and Bodywork must be both 
 
 Jona uses several statistical models to derive the data, on which the recommendations for the pitstop or other information is based. Therefore it will take some laps, before Jonas conclusion get more and more precise. So be careful, if you let Jona plan a pitstop after you have driven only three or four laps. You might end up with not enough fuel to reach the finish line.
 
-The following statsitical models are currently implemented:
+The following statistical models are currently implemented:
 
   1. Tyre pressure development
   
@@ -275,9 +275,15 @@ The following statsitical models are currently implemented:
   
      Based on the same model, Jona suggests repairs for the upcoming pitstop. You can configure various strategies (Repair Always, Repair Never, Repair when damage is above a given threshold, ...) using the settings tool.
 	 
-  5. Tyre compound selection and tyre pressure gambling
+  5. Tyre pressure gambling
   
-     Linear regression models are used here. Depending on the development of ambient, track and tyre temperatures, as well as weather changes (not yet implemented), Jona might suggest higher or lower pressures than currently perfect as a result of clear past trend, thereby giving you a good compromise for the upcoming stint. A future version will also recommend a tyre compouund change here as well.
+     Linear regression models are used here. Depending on the development of ambient, track and tyre temperatures and the resulting tyre pressure development, Jona might suggest higher or lower pressures for the next pitstop than currently might be perfect as a result of a clear past trend, thereby giving you a good compromise for the upcoming stint.
+	 
+  6. Weather trend analysis and tyre compound recommendation
+  
+     Beginning with Release 2.5, a weather model has been integrated in the working memory. The raw data is acquired from the simulation. For example, *Assetto Corsa Competizione* supplies weather information ranging from "Dry" up to full "Thunderstorm" from now on up to 30 minnutes into the future. Based on this information and currently mounted tyres, Jona might recommend a tyre change.
+	 
+	 Plese note, that with Release 2.5 parts of the rule set are runnning in a so called shadow mode, which means that important functionalities are not yet active. Especially the tyre compouund recommendation will not yet be considered for an upcoming pitstop. This will be part of Release 2.6 or 2.7.
 
 ## Technical information
 

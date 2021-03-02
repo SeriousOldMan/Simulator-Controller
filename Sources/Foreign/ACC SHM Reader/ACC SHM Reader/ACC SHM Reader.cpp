@@ -177,7 +177,8 @@ int main(int argc, char* argv[])
 		printData("BodyworkDamage", pf->carDamage);
 		printData("SuspensionDamage", pf->suspensionDamage);
 		printData("FuelRemaining", pf->fuel);
-		wcout << "TyreCompound=" << ((tyreCompound == "dry_compound") ? "Dry" : "Wet") << endl;
+		// wcout << "TyreCompound=" << ((tyreCompound == "dry_compound") ? "Dry" : "Wet") << endl;
+		wcout << "TyreCompound=" << tyreCompound << endl;
 		printData("TyreTemperature", pf->tyreCoreTemperature);
 		printData("TyrePressure", pf->wheelsPressure);
 	}

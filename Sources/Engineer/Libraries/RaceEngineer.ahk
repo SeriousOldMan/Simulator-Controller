@@ -724,7 +724,16 @@ class RaceEngineer extends ConfigurationItem {
 	}
 	
 	weatherRecognized(words) {
-		this.getSpeaker().speakPhrase("Weather")
+		local knowledgeBase := this.KnowledgeBase
+		
+		weather10Min := knowledgeBase.getValue("Weather.Weather.10Min", false)
+		
+		if !weather10Min
+			this.getSpeaker().speakPhrase("Later")
+		else if (weather10Min = "Dry")
+			this.getSpeaker().speakPhrase("WeatherGood")
+		else
+			this.getSpeaker().speakPhrase("WeatherRain")
 	}
 	
 	planPitstopRecognized(words) {
@@ -994,7 +1003,7 @@ class RaceEngineer extends ConfigurationItem {
 		
 		facts := {"Race.Car": getConfigurationValue(data, "Race Data", "Car", "")
 				, "Race.Track": getConfigurationValue(data, "Race Data", "Track", "")
-				, "Race.Duration": duration
+				, "Race.Duration": getConfigurationValue(settings, "Race Settings", "Duration", duration)
 				, "Race.Settings.Lap.Formation": getConfigurationValue(settings, "Race Settings", "Lap.Formation", true)
 				, "Race.Settings.Lap.PostRace": getConfigurationValue(settings, "Race Settings", "Lap.PostRace", true)
 				, "Race.Settings.Fuel.Max": getConfigurationValue(data, "Race Data", "FuelAmount", 0)
@@ -1554,9 +1563,10 @@ class RaceEngineer extends ConfigurationItem {
 	weatherTyreChangeRecommendation(minutes, recommendedCompound) {
 		if this.Speaker {
 			speaker := this.getSpeaker()
+			fragments := speaker.Fragments
 			
 			speaker.speakPhrase((recommendedCompound = "Wet") ? "WeatherRainChange" : "WeatherDryChange"
-							  , {minutes: minutes, compound: speaker.Fragments[recommendedCompound]})
+							  , {minutes: minutes, compound: fragments[recommendedCompound]})
 			
 			if this.Listener {
 				speaker.speakPhrase("ConfirmPlan")
@@ -1627,7 +1637,7 @@ reportDamageAnalysis(context, repair, stintLaps, delta) {
 }
 
 weatherChangeNotification(context, minutes) {
-	context.KnowledgeBase.RaceEngineer.weatherChangeNotification(rainAhead, minutes)
+	context.KnowledgeBase.RaceEngineer.weatherChangeNotification(minutes)
 	
 	return true
 }

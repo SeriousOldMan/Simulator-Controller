@@ -182,7 +182,7 @@ That said, we now come to an unpleasant part of the game, at least for the momen
 The *Race Engineer.settings* looks like this:
 
 	[Race Settings]
-	Duration=60
+	Duration=3600
 	Lap.AvgTime=106
 	Lap.Formation=true
 	Lap.PostRace=true

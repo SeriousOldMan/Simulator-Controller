@@ -418,25 +418,32 @@ projectedTyreTemperature(?lap, ?temperature) <=																									\
 
 priority: 1,																																	\
 	{All: [?Lap], [?Tyre.Compound = Dry], {None: [?Weather.Tyre.Change.Recommended]},															\
-		  {Any: [?Weather.Weather.Now = Dry], [?Weather.Weather.Now = Drizzle], [?Weather.Weather.Now = LightRain]},							\
 		  {Any: [?Weather.Weather.10Min = MediumRain], [?Weather.Weather.10Min = HeavyRain], [?Weather.Weather.10Min = Thunderstorm]}} =>		\
-		(Call: weatherTyreChangeRecommendation, 10, Wet), (Set: Weather.Tyre.Change.Recommended, ?Lap), (Set: Weather.Change.Notified, ?Lap)		
+		(Prove: weatherTyreChangeRecommendation, ?Lap, 10, Wet),																				\
+		(Set: Weather.Tyre.Change.Recommended, ?Lap), (Set: Weather.Change.Notified, ?Lap)		
 priority: 1,																																	\
 	{All: [?Lap], [?Tyre.Compound = Wet], {None: [?Weather.Change.Recommended]},																\
-		  {Any: [?Weather.Weather.10Min = MediumRain], [?Weather.Weather.10Min = HeavyRain], [?Weather.Weather.10Min = Thunderstorm]},			\
-		  {Any: [?Weather.Weather.Now = Dry], [?Weather.Weather.Now = Drizzle], [?Weather.Weather.Now = LightRain]}} =>							\
-		(Call: weatherTyreChangeRecommendation, 10, Dry), (Set: Weather.Tyre.Change.Recommended, ?Lap), (Set: Weather.Change.Notified, ?Lap)
+		  {Any: [?Weather.Weather.Now = Dry], [?Weather.Weather.Now = Drizzle]}} =>																\
+		(Prove: weatherTyreChangeRecommendation, ?Lap, 10, Dry),																				\
+		(Set: Weather.Tyre.Change.Recommended, ?Lap), (Set: Weather.Change.Notified, ?Lap)
 		
-{All: [?Lap], [?Tyre.Compound = Dry], {None: [?Weather.Change.Notified]},																		\
+{All: [?Lap], {None: [?Weather.Change.Notified]},																		\
 	  {Any: [?Weather.Weather.Now = Dry], [?Weather.Weather.Now = Drizzle], [?Weather.Weather.Now = LightRain]},								\
 	  {Any: [?Weather.Weather.30Min = MediumRain], [?Weather.Weather.30Min = HeavyRain], [?Weather.Weather.30Min = Thunderstorm]}} =>			\
-		(Call: weatherChangeNotification, 30), (Set: Weather.Change.Notified, ?Lap)
-{All: [?Lap], [?Tyre.Compound = Wet], {None: [?Weather.Change.Notified]},																		\
+		(Prove: weatherChangeNotification, ?Lap, 30), (Set: Weather.Change.Notified, ?Lap)
+{All: [?Lap], {None: [?Weather.Change.Notified]},																		\
 	  {Any: [?Weather.Weather.30Min = MediumRain], [?Weather.Weather.30Min = HeavyRain], [?Weather.Weather.30Min = Thunderstorm]},				\
 	  {Any: [?Weather.Weather.Now = Dry], [?Weather.Weather.Now = Drizzle], [?Weather.Weather.Now = LightRain]}} =>								\
-		(Call: weatherChangeNotification, 30), (Set: Weather.Change.Notified, ?Lap)
+		(Prove: weatherChangeNotification, ?Lap, 30), (Set: Weather.Change.Notified, ?Lap)
 
 priority: -20, [?Pitstop.Lap = ?Lap] => (Clear: Weather.Tyre.Change.Recommended), (Clear: Weather.Change.Notified)
+
+weatherChangeNotification(?lap, ?minutes) <= remainingRaceTime(?lap, ?raceTime), ?remainingMinutes = ?raceTime / 60000,							\
+											 ?remainingMinutes > ?minutes, Call(weatherChangeNotification, ?minutes)
+											 
+weatherTyreChangeRecommendation(?lap, ?minutes, ?compound) <= remainingRaceTime(?lap, ?raceTime), ?remainingMinutes = ?raceTime / 60000,		\
+															  ?remainingMinutes > ?minutes,														\
+															  Call(weatherTyreChangeRecommendation, ?minutes, ?compound)
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -614,9 +621,11 @@ nextStintLaps(?laps) <= lapRemainingFuel(!Lap, ?remainingFuel), ?fuel = ?remaini
 						lapAvgFuel(!Lap, ?fuelPerLap), ?laps = ?fuel / ?fuelPerLap
 nextStintLaps(?laps) <= remainingRaceLaps(!Lap, ?laps)
 
-remainingRaceLaps(?lap, ?remainingLaps) <= Get(Lap, ?lap, Time.End, ?raceTime), ?raceLength = !Race.Duration * 1000,							\
-										   ?remainingTime = ?raceLength - ?raceTime, lapAvgTime(?lap, ?avgTime),								\
+remainingRaceLaps(?lap, ?remainingLaps) <= remainingRaceTime(?lap, ?remainingTime), lapAvgTime(?lap, ?avgTime),									\
 										   ?remainingLaps = ?remainingTime / ?avgTime
+
+remainingRaceTime(?lap, ?remainingTime) <= Get(Lap, ?lap, Time.End, ?raceTime), ?raceLength = !Race.Duration * 1000,							\
+										   ?remainingTime = ?raceLength - ?raceTime
 
 remainingStintLaps(?lap, ?remainingLaps) <= remainingRaceLaps(?lap, ?raceLaps),																	\
 											lapRemainingFuel(?lap, ?fuelLeft), lapAvgFuel(?lap, ?fuelPerLap),									\

@@ -1536,15 +1536,19 @@ class RaceEngineer extends ConfigurationItem {
 		}
 	}
 	
-	weatherChangeWarning(rainAhead, minutes, recommendedCompound) {
+	weatherWarning(minutes) {
 		if this.Speaker {
 			speaker := this.getSpeaker()
 			
-			Random rnd, 1, 10
+			speaker.speakPhrase("WeatherChange", {minutes: minutes})
+		}
+	}
+	
+	weatherTyreChange(rainAhead, minutes, recommendedCompound) {
+		if this.Speaker {
+			speaker := this.getSpeaker()
 			
-			if Round(rnd / 10)
-				speaker.speakPhrase("WeatherChange", {minutes: minutes, compound: recommendedCompound})
-			else if rainAhead
+			if rainAhead
 				speaker.speakPhrase("WeatherRainChange", {minutes: minutes, compound: recommendedCompound})
 			else
 				speaker.speakPhrase("WeatherDryChange", {minutes: minutes, compound: recommendedCompound})
@@ -1617,8 +1621,14 @@ reportDamageAnalysis(context, repair, stintLaps, delta) {
 	return true
 }
 
-weatherChangeWarning(context, rainAhead, minutes, recommendedCompound) {
-	context.KnowledgeBase.RaceEngineer.weatherChangeWarning(rainAhead, minutes, recommendedCompound)
+weatherWarning(context, minutes) {
+	context.KnowledgeBase.RaceEngineer.weatherWarning(rainAhead, minutes, recommendedCompound)
+	
+	return true
+}
+
+weatherTyreChange(context, rainAhead, minutes, recommendedCompound) {
+	context.KnowledgeBase.RaceEngineer.weatherTyreChange(rainAhead, minutes, recommendedCompound)
 	
 	return true
 }

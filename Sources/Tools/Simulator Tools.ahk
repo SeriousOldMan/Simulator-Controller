@@ -472,9 +472,37 @@ updateCustomCalls(startNumber, endNumber) {
 			
 			customCallIndex += 1
 		} until (customCallIndex > endNumber)
-	}
 	
-	writeConfiguration(userConfigurationFile, userConfiguration)
+		writeConfiguration(userConfigurationFile, userConfiguration)
+	}
+}
+
+updateConfigurationForV25() {
+	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	userConfiguration := readConfiguration(userConfigurationFile)
+	
+	if (userConfiguration.Count() > 0) {
+		bundledConfiguration := readConfiguration(getFileName(kSimulatorConfigurationFile, kConfigDirectory))
+	
+		config := getConfigurationSectionValues(bundledConfiguration, "Voice Control", Object())
+		
+		setConfigurationSectionValues(bundledConfiguration, "Voice Control", config)
+		
+		setConfigurationValue(userConfiguration, "Controller Layouts", "Button Boxes", "Master Controller")
+		
+		writeConfiguration(userConfigurationFile, userConfiguration)
+	}
+
+    userSettingsFile := getFileName(kSimulatorSettingsFile, kUserConfigDirectory)
+	userSettings := readConfiguration(userSettingsFile)
+	
+	if (userSettings.Count() > 0) {
+		settings := getConfigurationSectionValues(userSettings, "Controller", Object())
+		
+		setConfigurationSectionValues(userSettings, "Tray Tip", settings)
+		
+		writeConfiguration(userSettingsFile, userSettings)
+	}
 }
 
 updateConfigurationForV20() {

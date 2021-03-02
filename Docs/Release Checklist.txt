@@ -17,7 +17,7 @@ Release 2.5 Checklist
    b. Describe in Updates.md
    c. Describe in Installation & Setup.md - incl. Link to AHK Doc
 2. Update Procedure
-   a. New Translations, Simulator Tools.targets
+   a. New Translations, Simulator Tools.targets, New Phrase Grammars
 3. ButtonBox Configuration
    a. Documentation (incl. Installation & Setup)
    b. Update Notes for Simulator Tools.targets

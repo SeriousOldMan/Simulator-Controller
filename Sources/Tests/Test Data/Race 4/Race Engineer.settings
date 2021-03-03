@@ -3,7 +3,6 @@ Damage.Bodywork.Repair=Impact
 Damage.Bodywork.Repair.Threshold=0.5
 Damage.Suspension.Repair=Always
 Damage.Suspension.Repair.Threshold=false
-Duration=60
 Fuel.AvgConsumption=3.8
 Fuel.SafetyMargin=3
 InLap=true

@@ -253,7 +253,6 @@ global vDamageRepair
 global vDamageLapDelta
 global vDamageStintLaps
 
-
 class DamageAnalysis extends Assert {
 	DamageRace2ReportingTest() {
 		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 2\Race Engineer.settings"), new TestPitStopHandler(), false, false)

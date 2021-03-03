@@ -1,18 +1,18 @@
 [Race Settings]
-Damage.Bodywork.Repair=Threshold
-Damage.Bodywork.Repair.Threshold=20.0
+Damage.Bodywork.Repair=Impact
+Damage.Bodywork.Repair.Threshold=true
 Damage.Suspension.Repair=Always
 Damage.Suspension.Repair.Threshold=false
-Duration=60
+Duration=3600
 Fuel.AvgConsumption=2.7
 Fuel.SafetyMargin=3
-Lap.Formation=true
 Lap.AvgTime=106
+Lap.Formation=true
 Lap.History.Considered=5
 Lap.History.Damping=0.20
 Lap.PitstopWarning=3
 Lap.PostRace=true
-Pitstop.Duration=50
+Pitstop.Delta=60
 Tyre.Compound.Change=Never
 Tyre.Compound.Change.Threshold=false
 Tyre.Dry.Pressure.Target.FL=27.7

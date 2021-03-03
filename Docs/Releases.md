@@ -6,7 +6,7 @@
   4. Button Boxes can be created with a configuration file - no more programming knowledge needed
   5. Extension of ACC Shared Memory Reader for weather information and track grip status
   6. Jona now issues notifications about upcoming weather changes and recommends tyre changes
-     - Note: Pitstops do NOT consider weather informations, therefore be careful. This will be part of Release 2.6 or 2.7
+     - Note: Pitstops do NOT yet consider weather informations and tyre compound changes, therefore be careful. This will be part of Release 2.6 or 2.7
   
 ## 2.4.1-release 02/26/21
   

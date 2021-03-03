@@ -72,10 +72,19 @@ safetyFuel(?, !Race.Settings.Fuel.SafetyMargin)
 ;;; trend influence.                                                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-priority: 5, {Any: [?Lap], [?Pitstop.Lap], {None: [?Tyre.Compound.Target]}} => (Prove: updateTyreCompound)
+priority: 5, {None: [?Tyre.Compound]} => (Prove: currentTyreCompound)
 
-updateTyreCompound() <= pitstopTyreCompound(?compound), Set(Tyre.Compound, ?compound), Set(Tyre.Compound.Target, ?compound), !
-updateTyreCompound() <= setupTyreCompound(?compound), Set(Tyre.Compound, ?compound), Set(Tyre.Compound.Target, ?compound)
+priority: 5,																																	\
+	{All: {Any: [?Lap], [?Pitstop.Lap], {None: [?Tyre.Compound.Target]}},																		\
+		  [?Weather.Tyre.Compound.Target]} => (Set: Tyre.Compound.Target, ?Weather.Tyre.Compound.Target)
+priority: 5,																																	\
+	{All: {Any: [?Lap], [?Pitstop.Lap], {None: [?Tyre.Compound.Target]}},																		\
+		  {None: [?Weather.Tyre.Compound.Target]}} => (Prove: keepTyreCompound)
+
+currentTyreCompound() <= currentTyreCompound(?compound), Set(Tyre.Compound, ?compound)
+
+keepTyreCompound() <= pitstopTyreCompound(?compound), Set(Tyre.Compound.Target, ?compound), !
+keepTyreCompound() <= setupTyreCompound(?compound), Set(Tyre.Compound.Target, ?compound)
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -437,7 +446,8 @@ priority: 1,																																	\
 	  {Any: [?Weather.Weather.Now = Dry], [?Weather.Weather.Now = Drizzle]}} =>																	\
 		(Prove: weatherChangeNotification, ?Lap, 30)
 
-priority: -20, [?Pitstop.Lap = ?Lap] => (Clear: Weather.Tyre.Change.Recommended), (Clear: Weather.Change.Notified)
+priority: -20, [?Pitstop.Lap = ?Lap] => (Clear: Weather.Tyre.Change.Recommended), (Clear: Weather.Change.Notified),								\
+										(Clear: Weather.Tyre.Compound.Target)
 
 weatherChangeNotification(?lap, ?minutes) <= remainingRaceTime(?lap, ?raceTime), ?remainingMinutes = ?raceTime / 60000,							\
 											 ?remainingMinutes > ?minutes, Call(weatherChangeNotification, ?minutes),							\
@@ -446,7 +456,8 @@ weatherChangeNotification(?lap, ?minutes) <= remainingRaceTime(?lap, ?raceTime),
 weatherTyreChangeRecommendation(?lap, ?minutes, ?compound) <= remainingRaceTime(?lap, ?raceTime), ?remainingMinutes = ?raceTime / 60000,		\
 															  ?remainingMinutes > ?minutes,														\
 															  Call(weatherTyreChangeRecommendation, ?minutes, ?compound),						\
-															  Set(Weather.Tyre.Change.Recommended, ?lap), Set(Weather.Change.Notified, ?lap)
+															  Set(Weather.Tyre.Change.Recommended, ?lap), Set(Weather.Change.Notified, ?lap),	\
+															  Set(Weather.Tyre.Compound.Target, ?compound)
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -546,7 +557,8 @@ pitstopPerformed(?lap) <= Get(Lap, ?lap, Time.End, ?time), Set(Pitstop, !Pitstop
 pitstopPerformed(?lap) <= Get(Lap, ?lap, Temperature.Air, ?temp), Set(Pitstop, !Pitstop.Planned.Nr, Temperature.Air, ?temp)
 pitstopPerformed(?lap) <= Get(Lap, ?lap, Temperature.Track, ?temp), Set(Pitstop, !Pitstop.Planned.Nr, Temperature.Track, ?temp)
 pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Fuel, !Pitstop.Planned.Fuel)
-pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Tyre.Compound, !Pitstop.Planned.Tyre.Compound)
+pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Tyre.Compound, !Pitstop.Planned.Tyre.Compound),										\
+						  Set(Tyre.Compound, !Pitstop.Planned.Tyre.Compound)
 pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Tyre.Set, !Pitstop.Planned.Tyre.Set)
 pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Tyre.Pressure.FL, !Pitstop.Planned.Tyre.Pressure.FL)
 pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Tyre.Pressure.FR, !Pitstop.Planned.Tyre.Pressure.FR)

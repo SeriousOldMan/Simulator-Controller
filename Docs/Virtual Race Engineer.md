@@ -244,7 +244,7 @@ If you open the settings tool, it will load the *Race Engineer.settings* file lo
 
 ### The pitstop
 
-To enable Jona to handle the pitstop settings in *Assetto Corsa Competizione* fully on izs own, you need to prepare two things beforehand. First you have to follow the instructions in the [update information for Release 2.0](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-20), so that the ACC plugin is able to control the Pitstop MFD of *Assetto Corsa Competizione*. Second, you need to setup your ACC pitstop strategy in a special way for as many pitstops you expect in the given race (plus some more for a safety margin):
+To enable Jona to handle the pitstop settings in *Assetto Corsa Competizione* fully on its own, you need to prepare two things beforehand. First you have to follow the instructions in the [update information for Release 2.0](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-20), so that the ACC plugin is able to control the Pitstop MFD of *Assetto Corsa Competizione*. Second, you need to setup your ACC pitstop strategy in a special way for as many pitstops you expect in the given race (plus some more for a safety margin):
 
   - Refueling must be set to zero litres for each strategy
   - Each strategy has to use the Dry tyre compound

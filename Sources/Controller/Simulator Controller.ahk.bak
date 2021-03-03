@@ -70,7 +70,7 @@ class ButtonBox extends ConfigurationItem {
 	iControlHandles := {}
 	
 	iIsVisible := false
-	iIsPositioned := false
+	iShown := false
 	
 	Controller[] {
 		Get {
@@ -251,7 +251,7 @@ class ButtonBox extends ConfigurationItem {
 					width := this.iWindowWidth
 					height := this.iWindowHeight
 				
-					if this.iIsPositioned
+					if this.iShown
 						Gui %window%:Show
 					else {
 						position := getConfigurationValue(this.Controller.Settings, "Button Box", "Button Box Position", "Bottom Right")
@@ -292,7 +292,7 @@ class ButtonBox extends ConfigurationItem {
 						
 						Gui %window%:Show, x%x% y%y% w%width% h%height% NoActivate
 						
-						this.iIsPositioned := true
+						this.iShown := true
 					}
 
 					this.iIsVisible := true

@@ -172,13 +172,12 @@ int main(int argc, char* argv[])
 		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
 		_bstr_t tc(gf->tyreCompound);
-		const char* tyreCompound = tc;
+		std::string tyreCompound(tc);
 
 		printData("BodyworkDamage", pf->carDamage);
 		printData("SuspensionDamage", pf->suspensionDamage);
 		printData("FuelRemaining", pf->fuel);
-		// wcout << "TyreCompound=" << ((tyreCompound == "dry_compound") ? "Dry" : "Wet") << endl;
-		wcout << "TyreCompound=" << tyreCompound << endl;
+		wcout << "TyreCompound=" << ((tyreCompound.compare("dry_compound") == 0) ? "Dry" : "Wet") << endl;
 		printData("TyreTemperature", pf->tyreCoreTemperature);
 		printData("TyrePressure", pf->wheelsPressure);
 	}

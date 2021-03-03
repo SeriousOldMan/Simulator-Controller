@@ -243,12 +243,20 @@ class SimulatorStartup extends ConfigurationItem {
 		Sleep 500
 			
 		vStartupFinished := true
+		hidden := false
 		
-		if (startSimulator || (GetKeyState("Ctrl") || GetKeyState("MButton")))
+		if (startSimulator || (GetKeyState("Ctrl") || GetKeyState("MButton"))) {
+			if (!kSilentMode && this.iSplashTheme) {
+				hideSplashTheme()
+				
+				hidden := true
+			}
+			
 			this.startSimulator()
+		}
 
 		if (kSilentMode || vStartupCanceled) {
-			if (!kSilentMode && this.iSplashTheme)
+			if (!hidden && !kSilentMode && this.iSplashTheme)
 				hideSplashTheme()
 			
 			exitStartup(true)

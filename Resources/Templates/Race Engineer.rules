@@ -418,32 +418,35 @@ projectedTyreTemperature(?lap, ?temperature) <=																									\
 
 priority: 1,																																	\
 	{All: [?Lap], [?Tyre.Compound = Dry], {None: [?Weather.Tyre.Change.Recommended]},															\
-		  {Any: [?Weather.Weather.10Min = MediumRain], [?Weather.Weather.10Min = HeavyRain], [?Weather.Weather.10Min = Thunderstorm]}} =>		\
-		(Prove: weatherTyreChangeRecommendation, ?Lap, 10, Wet),																				\
-		(Set: Weather.Tyre.Change.Recommended, ?Lap), (Set: Weather.Change.Notified, ?Lap)		
+		  {Any: [?Weather.Weather.10Min = LightRain], [?Weather.Weather.10Min = MediumRain],													\
+				[?Weather.Weather.10Min = HeavyRain], [?Weather.Weather.10Min = Thunderstorm]}} =>												\
+		(Prove: weatherTyreChangeRecommendation, ?Lap, 10, Wet)
 priority: 1,																																	\
 	{All: [?Lap], [?Tyre.Compound = Wet], {None: [?Weather.Change.Recommended]},																\
 		  {Any: [?Weather.Weather.Now = Dry], [?Weather.Weather.Now = Drizzle]}} =>																\
-		(Prove: weatherTyreChangeRecommendation, ?Lap, 10, Dry),																				\
-		(Set: Weather.Tyre.Change.Recommended, ?Lap), (Set: Weather.Change.Notified, ?Lap)
+		(Prove: weatherTyreChangeRecommendation, ?Lap, 10, Dry)
 		
-{All: [?Lap], {None: [?Weather.Change.Notified]},																		\
-	  {Any: [?Weather.Weather.Now = Dry], [?Weather.Weather.Now = Drizzle], [?Weather.Weather.Now = LightRain]},								\
-	  {Any: [?Weather.Weather.30Min = MediumRain], [?Weather.Weather.30Min = HeavyRain], [?Weather.Weather.30Min = Thunderstorm]}} =>			\
-		(Prove: weatherChangeNotification, ?Lap, 30), (Set: Weather.Change.Notified, ?Lap)
-{All: [?Lap], {None: [?Weather.Change.Notified]},																		\
-	  {Any: [?Weather.Weather.30Min = MediumRain], [?Weather.Weather.30Min = HeavyRain], [?Weather.Weather.30Min = Thunderstorm]},				\
-	  {Any: [?Weather.Weather.Now = Dry], [?Weather.Weather.Now = Drizzle], [?Weather.Weather.Now = LightRain]}} =>								\
-		(Prove: weatherChangeNotification, ?Lap, 30), (Set: Weather.Change.Notified, ?Lap)
+{All: [?Lap], {None: [?Weather.Change.Notified]},																								\
+	  {Any: [?Weather.Weather.Now = Dry], [?Weather.Weather.Now = Drizzle]},																	\
+	  {Any: [?Weather.Weather.30Min = LightRain], [?Weather.Weather.30Min = MediumRain],														\
+			[?Weather.Weather.30Min = HeavyRain], [?Weather.Weather.30Min = Thunderstorm]}} =>													\
+		(Prove: weatherChangeNotification, ?Lap, 30)
+{All: [?Lap], {None: [?Weather.Change.Notified]},																								\
+	  {Any: [?Weather.Weather.30Min = LightRain], [?Weather.Weather.30Min = MediumRain],														\
+			[?Weather.Weather.30Min = HeavyRain], [?Weather.Weather.30Min = Thunderstorm]},														\
+	  {Any: [?Weather.Weather.Now = Dry], [?Weather.Weather.Now = Drizzle]}} =>																	\
+		(Prove: weatherChangeNotification, ?Lap, 30)
 
 priority: -20, [?Pitstop.Lap = ?Lap] => (Clear: Weather.Tyre.Change.Recommended), (Clear: Weather.Change.Notified)
 
 weatherChangeNotification(?lap, ?minutes) <= remainingRaceTime(?lap, ?raceTime), ?remainingMinutes = ?raceTime / 60000,							\
-											 ?remainingMinutes > ?minutes, Call(weatherChangeNotification, ?minutes)
+											 ?remainingMinutes > ?minutes, Call(weatherChangeNotification, ?minutes),							\
+											 Set(Weather.Change.Notified, ?lap)
 											 
 weatherTyreChangeRecommendation(?lap, ?minutes, ?compound) <= remainingRaceTime(?lap, ?raceTime), ?remainingMinutes = ?raceTime / 60000,		\
 															  ?remainingMinutes > ?minutes,														\
-															  Call(weatherTyreChangeRecommendation, ?minutes, ?compound)
+															  Call(weatherTyreChangeRecommendation, ?minutes, ?compound),						\
+															  Set(Weather.Tyre.Change.Recommended, ?lap), Set(Weather.Change.Notified, ?lap)
 
 
 ;;;-------------------------------------------------------------------------;;;

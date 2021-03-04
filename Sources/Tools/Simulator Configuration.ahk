@@ -55,6 +55,7 @@ global kCancel = "cancel"
 global vResult = false
 
 global vShowKeyDetector = false
+global vKeyDetectorReturnHotkey = false
 
 global vItemLists = Object()
 
@@ -1033,16 +1034,32 @@ class VoiceControlTab extends ConfigurationItemTab {
 	}
 }
 
-getPTTHotkey() {
-	vShowKeyDetector := true
-	
-	theHotkey := showKeyDetector(true)
-	
-	if theHotKey {
-		pushToTalkEdit := theHotkey
+setPTTHotkey() {
+	if vKeyDetectorReturnHotkey is not integer
+	{
+		SetTimer setPTTHotkey, Off
 		
+		pushToTalkEdit := vKeyDetectorReturnHotkey
+		
+		Gui SE:Default
 		GuiControl Text, pushToTalkEdit, %pushToTalkEdit%
+		
+		vShowKeyDetector := false
+		vKeyDetectorReturnHotkey := false
 	}
+	
+	if !vShowKeyDetector
+		SetTimer setPTTHotkey, Off
+}
+
+getPTTHotkey() {
+	if !vShowKeyDetector {
+		vKeyDetectorReturnHotkey := true
+	
+		SetTimer setPTTHotkey, 100
+	}
+	
+	toggleKeyDetector()
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -1523,9 +1540,7 @@ toggleKeyDetector() {
 	vShowKeyDetector := !vShowKeyDetector
 	
 	if vShowKeyDetector
-		SetTimer showKeyDetector, 100
-	else
-		ToolTip, , , 1
+		SetTimer showKeyDetector, -100
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -3236,10 +3251,11 @@ nextUntranslated() {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-showKeyDetector(returnHotkey := false) {
+showKeyDetector() {
+	returnHotKey := vKeyDetectorReturnHotkey
 	joystickNumbers := []
-
-	SetTimer showKeyDetector, Off
+	
+	vKeyDetectorReturnHotkey := false
 
 	Loop 16 { ; Query each joystick number to find out which ones exist.
 		GetKeyState joyName, %A_Index%JoyName
@@ -3272,8 +3288,11 @@ showKeyDetector(returnHotkey := false) {
 			GetKeyState joy_name, %joystickNumber%JoyName
 			GetKeyState joy_info, %joystickNumber%JoyInfo
 
-			if !vShowKeyDetector 
+			if !vShowKeyDetector {
+				ToolTip, , , 1
+				
 				break
+			}
 			
 			buttons_down := ""
 			
@@ -3336,16 +3355,12 @@ showKeyDetector(returnHotkey := false) {
 			ToolTip %joy_name% (#%joystickNumber%):`n%axis_info%`n%buttonsDown% %buttons_down%, , , 1
 						
 			if found {
-				if returnHotkey {
-					vShowKeyDetector := false
-					
-					return (joystickNumber . "Joy" . found)
-				}
-				else {
-					found := false
-				
+				if returnHotkey
+					vKeyDetectorReturnHotkey := (joystickNumber . "Joy" . found)
+				else
 					Sleep 2000
-				}
+				
+				found := false
 			}
 			else				
 				Sleep 400

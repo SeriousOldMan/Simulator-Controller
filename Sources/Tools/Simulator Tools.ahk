@@ -961,7 +961,7 @@ prepareTargets(ByRef buildProgress, updateOnly) {
 	}
 }
 
-runTargets() {
+startSimulatorTools() {
 	updateOnly := false
 	
 	icon := kIconsDirectory . "Tools.ico"
@@ -1031,7 +1031,7 @@ runTargets() {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-runTargets()
+startSimulatorTools()
 
 
 ;;;-------------------------------------------------------------------------;;;

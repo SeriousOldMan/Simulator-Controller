@@ -3428,7 +3428,7 @@ editConfiguration() {
 	return saved
 }
 
-configureSimulator() {
+startSimulatorConfiguration() {
 	icon := kIconsDirectory . "Configuration.ico"
 	
 	Menu Tray, Icon, %icon%, , 1
@@ -3444,4 +3444,4 @@ configureSimulator() {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-configureSimulator()
+startSimulatorConfiguration()

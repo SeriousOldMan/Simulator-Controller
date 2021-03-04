@@ -1000,7 +1000,7 @@ class RaceEngineer extends ConfigurationItem {
 		settings := this.RaceSettings
 		
 		dataDuration := Round((getConfigurationValue(data, "Stint Data", "TimeRemaining", 0) + getConfigurationValue(data, "Stint Data", "LapLastTime", 0)) / 1000)
-		settingsDuration := getConfigurationValue(settings, "Race Settings", "Duration", duration)
+		settingsDuration := getConfigurationValue(settings, "Race Settings", "Duration", dataDuration)
 		
 		if ((Abs(settingsDuration - dataDuration) / dataDuration) >  0.1)
 			settingsDuration := dataDuration

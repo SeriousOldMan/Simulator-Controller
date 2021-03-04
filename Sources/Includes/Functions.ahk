@@ -660,7 +660,7 @@ showSplashAnimation(video) {
 	
 	Gui VP:Margin, 0, 0
 	Gui VP:+AlwaysOnTop
-	Gui VP:Show, AutoSize xCenter y%y%
+	Gui VP:Show, AutoSize xCenter y%y% NoActivate
 }
 
 hideSplashAnimation() {
@@ -811,7 +811,7 @@ showMessage(message, title := false, icon := "Information.png", duration := 1000
 		}
 	
 	Gui SM:+AlwaysOnTop
-	Gui SM:Show, X%x% Y%y% W%width% H%height%
+	Gui SM:Show, X%x% Y%y% W%width% H%height% NoActivate
 	
 	Sleep %duration%
 	

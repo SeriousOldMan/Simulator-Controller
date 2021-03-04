@@ -62,7 +62,7 @@ With the last option, you can configure a *Push To Talk* function for voice reco
 
 Before you can use the voice capabilities of Simulator Controller, you must configure Windows for voice generation and recognition. Voice generation is normally preinstalled and preconfigured, but you can add additional voices using the Windows Settings dialog. The speech recognition runtime from Microsoft is not necessarily part of a Windows standard distribution. You can check this in your Settings dialog as well. If you do not have any voice recognition capabilities available, you can use the installer provided for your convinience in the *Utilities\3rd party* folder, as long you have a 64-bit Windows installation. Please install the runtime first and the two provided language packs for English and German afterwards. Alternatively you can download the necessary installation files from [this site at Microsoft](https://www.microsoft.com/en-us/download/details.aspx?id=16789).
 
-Note: You can use the [Key Detector Tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#key-detector-tool) to find out, which button codes your connected controller actually use, by clicking the small button on the right side of the *Push To Talk* entry field.
+Note: You can use the [Key Detector Tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#key-detector-tool) to find out, which button codes your connected controller actually use, by clicking the small button on the right side of the *Push To Talk* entry field. If you push a simple button on your external controller, the corresponding hotkey name will be inserted into the *Push To Talk* edit field.
 
 ### Tab *Plugins*
 

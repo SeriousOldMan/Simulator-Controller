@@ -55,6 +55,7 @@ global kCancel = "cancel"
 global vResult = false
 
 global vShowKeyDetector = false
+global vKeyDetectorReturnHotkey = false
 
 global vItemLists = Object()
 
@@ -957,7 +958,7 @@ class VoiceControlTab extends ConfigurationItemTab {
 		
 		Gui SE:Add, Text, x16 y152 w70 h23 +0x200, % translate("Push To Talk")
 		Gui SE:Add, Edit, x114 y152 w110 h21 VpushToTalkEdit, %pushToTalkEdit%
-		Gui SE:Add, Button, x226 y151 w23 h23 gtoggleKeyDetector HwnddetectPTTButtonHandle
+		Gui SE:Add, Button, x226 y151 w23 h23 ggetPTTHotkey HwnddetectPTTButtonHandle
 		setButtonIcon(detectPTTButtonHandle, kIconsDirectory . "Key.ico", 1)
 	}
 	
@@ -1029,8 +1030,36 @@ class VoiceControlTab extends ConfigurationItemTab {
 		setConfigurationValue(configuration, "Voice Control", "Language", languageCode)
 		setConfigurationValue(configuration, "Voice Control", "Speaker", speakerDropDown)
 		setConfigurationValue(configuration, "Voice Control", "Listener", listenerDropDown)
-		setConfigurationValue(configuration, "Voice Control", "PushToTalk", (pushToTalkEdit = "") ? false : pushToTalkEdit)
+		setConfigurationValue(configuration, "Voice Control", "PushToTalk", (Trim(pushToTalkEdit) = "") ? false : pushToTalkEdit)
 	}
+}
+
+setPTTHotkey() {
+	if vKeyDetectorReturnHotkey is not integer
+	{
+		SetTimer setPTTHotkey, Off
+		
+		pushToTalkEdit := vKeyDetectorReturnHotkey
+		
+		Gui SE:Default
+		GuiControl Text, pushToTalkEdit, %pushToTalkEdit%
+		
+		vShowKeyDetector := false
+		vKeyDetectorReturnHotkey := false
+	}
+	
+	if !vShowKeyDetector
+		SetTimer setPTTHotkey, Off
+}
+
+getPTTHotkey() {
+	if !vShowKeyDetector {
+		vKeyDetectorReturnHotkey := true
+	
+		SetTimer setPTTHotkey, 100
+	}
+	
+	toggleKeyDetector()
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -1511,9 +1540,7 @@ toggleKeyDetector() {
 	vShowKeyDetector := !vShowKeyDetector
 	
 	if vShowKeyDetector
-		SetTimer showKeyDetector, 100
-	else
-		ToolTip, , , 1
+		SetTimer showKeyDetector, -100
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -3225,9 +3252,10 @@ nextUntranslated() {
 ;;;-------------------------------------------------------------------------;;;
 
 showKeyDetector() {
+	returnHotKey := vKeyDetectorReturnHotkey
 	joystickNumbers := []
-
-	SetTimer showKeyDetector, Off
+	
+	vKeyDetectorReturnHotkey := false
 
 	Loop 16 { ; Query each joystick number to find out which ones exist.
 		GetKeyState joyName, %A_Index%JoyName
@@ -3260,8 +3288,11 @@ showKeyDetector() {
 			GetKeyState joy_name, %joystickNumber%JoyName
 			GetKeyState joy_info, %joystickNumber%JoyInfo
 
-			if !vShowKeyDetector 
+			if !vShowKeyDetector {
+				ToolTip, , , 1
+				
 				break
+			}
 			
 			buttons_down := ""
 			
@@ -3272,7 +3303,7 @@ showKeyDetector() {
 				if (joy%A_Index% = "D") {
 					buttons_down = %buttons_down%%A_Space%%A_Index%
 					
-					found := true
+					found := A_Index
 				}
 			}
 	
@@ -3324,9 +3355,12 @@ showKeyDetector() {
 			ToolTip %joy_name% (#%joystickNumber%):`n%axis_info%`n%buttonsDown% %buttons_down%, , , 1
 						
 			if found {
-				found := false
+				if returnHotkey
+					vKeyDetectorReturnHotkey := (joystickNumber . "Joy" . found)
+				else
+					Sleep 2000
 				
-				Sleep 2000
+				found := false
 			}
 			else				
 				Sleep 400
@@ -3394,7 +3428,7 @@ editConfiguration() {
 	return saved
 }
 
-configureSimulator() {
+startSimulatorConfiguration() {
 	icon := kIconsDirectory . "Configuration.ico"
 	
 	Menu Tray, Icon, %icon%, , 1
@@ -3410,4 +3444,4 @@ configureSimulator() {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-configureSimulator()
+startSimulatorConfiguration()

@@ -26,7 +26,7 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-[2.5.0-rc2](https://www.dropbox.com/s/rk0axw6kp7kgwqx/Simulator%20Controller%202.5.0-rc2.zip?dl=1) (Second release cndidate of the upcoming Release 2.5, feature complete and fully documented. New features: File based Button Box configuration, Push To Talk for voice recognition, Usage of weather information in the Virtual Race Engineer including tyre change recommendation. Please read the [update notes on Release 2.5](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-25) for more information and necessary update activities.)
+[2.5.0-rc2](https://www.dropbox.com/s/rk0axw6kp7kgwqx/Simulator%20Controller%202.5.0-rc2.zip?dl=1) (Second release candidate of the upcoming Release 2.5, feature complete and fully documented. New features: File based Button Box configuration, Push To Talk for voice recognition, Usage of weather information in the Virtual Race Engineer including tyre change recommendation. Please read the [update notes on Release 2.5](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-25) for more information and necessary update activities.)
 
 #### Latest release builds
 

@@ -1,6 +1,6 @@
 [Version]
-Current=2.5.0-rc1
-Target=2.5-release
-Release=2.4.1-release
-Changes=Push to Talk, Button Box Configuration, Weather data acquisiton from ACC Shared Memory, Weather Trend Calculation Rules
+Current=2.6.0-dev
+Target=2.6-release
+Release=2.5.0-release
+Changes=Tyre change recommendation depending on weather conditions incl. adjusted pressures depending on compound
 Date=03/04/2021

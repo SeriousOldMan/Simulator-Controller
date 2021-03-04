@@ -435,8 +435,8 @@ checkForUpdates() {
 		version := getConfigurationValue(readConfiguration(kUserHomeDirectory . "Temp\VERSION"), "Version", "Release", false)
 		
 		if version {
-			version := string2Values(".", StrSplit(version, "-", , 2)[1])
-			current := string2Values(".", StrSplit(kVersion, "-", , 2)[1])
+			version := values2String("", string2Values(".", StrSplit(version, "-", , 2)[1])*)
+			current := values2String("", string2Values(".", StrSplit(kVersion, "-", , 2)[1])*)
 			
 			if ((version[1] > current[1]) || (version[2] > current[2]) || (version[3] > current[3])) {
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))

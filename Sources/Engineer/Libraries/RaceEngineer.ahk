@@ -999,11 +999,15 @@ class RaceEngineer extends ConfigurationItem {
 		
 		settings := this.RaceSettings
 		
-		duration := Round((getConfigurationValue(data, "Stint Data", "TimeRemaining", 0) + getConfigurationValue(data, "Stint Data", "LapLastTime", 0)) / 1000)
+		dataDuration := Round((getConfigurationValue(data, "Stint Data", "TimeRemaining", 0) + getConfigurationValue(data, "Stint Data", "LapLastTime", 0)) / 1000)
+		settingsDuration := getConfigurationValue(settings, "Race Settings", "Duration", dataDuration)
+		
+		if ((Abs(settingsDuration - dataDuration) / dataDuration) >  0.1)
+			settingsDuration := dataDuration
 		
 		facts := {"Race.Car": getConfigurationValue(data, "Race Data", "Car", "")
 				, "Race.Track": getConfigurationValue(data, "Race Data", "Track", "")
-				, "Race.Duration": getConfigurationValue(settings, "Race Settings", "Duration", duration)
+				, "Race.Duration": settingsDuration
 				, "Race.Settings.Lap.Formation": getConfigurationValue(settings, "Race Settings", "Lap.Formation", true)
 				, "Race.Settings.Lap.PostRace": getConfigurationValue(settings, "Race Settings", "Lap.PostRace", true)
 				, "Race.Settings.Fuel.Max": getConfigurationValue(data, "Race Data", "FuelAmount", 0)

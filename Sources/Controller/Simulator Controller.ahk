@@ -252,7 +252,7 @@ class ButtonBox extends ConfigurationItem {
 					height := this.iWindowHeight
 				
 					if this.iIsPositioned
-						Gui %window%:Show
+						Gui %window%:Show, NoActivate
 					else {
 						position := getConfigurationValue(this.Controller.Settings, "Button Box", "Button Box Position", "Bottom Right")
 						

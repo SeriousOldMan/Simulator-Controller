@@ -284,6 +284,8 @@ The following statistical models are currently implemented:
      Beginning with Release 2.5, a weather model has been integrated in the working memory. The raw data is acquired from the simulation. For example, *Assetto Corsa Competizione* supplies weather information ranging from "Dry" up to full "Thunderstorm" from now on up to 30 minnutes into the future. Based on this information and currently mounted tyres, Jona might recommend a tyre change.
 	 
 	 Plese note, that with Release 2.5 parts of the rule set are runnning in a so called shadow mode, which means that important functionalities are not yet active. Especially the tyre compouund recommendation will not yet be considered for an upcoming pitstop. This will be part of Release 2.6 or 2.7.
+	 
+Note: Extrem changes in the conditions, for example an incoming thunderstorm on a previously dry and hot track, will result in extreme variances in the statistical models and thereby to strange recommendations in most cases. This is a drawback for the moment, so always doublecheck under those circumstances. This will get much better with the next major release, which will introduce a big data collection of recent races, which in the end will allow Jona to base or at least to secure the decisions on past experiences using neural networks.
 
 ## Technical information
 

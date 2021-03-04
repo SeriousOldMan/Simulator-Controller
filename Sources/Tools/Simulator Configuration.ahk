@@ -1030,7 +1030,7 @@ class VoiceControlTab extends ConfigurationItemTab {
 		setConfigurationValue(configuration, "Voice Control", "Language", languageCode)
 		setConfigurationValue(configuration, "Voice Control", "Speaker", speakerDropDown)
 		setConfigurationValue(configuration, "Voice Control", "Listener", listenerDropDown)
-		setConfigurationValue(configuration, "Voice Control", "PushToTalk", (pushToTalkEdit = "") ? false : pushToTalkEdit)
+		setConfigurationValue(configuration, "Voice Control", "PushToTalk", (Trim(pushToTalkEdit) = "") ? false : pushToTalkEdit)
 	}
 }
 

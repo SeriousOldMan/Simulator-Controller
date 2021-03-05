@@ -26,15 +26,15 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-[2.5.0-rc2](https://www.dropbox.com/s/rk0axw6kp7kgwqx/Simulator%20Controller%202.5.0-rc2.zip?dl=1) (Second release candidate of the upcoming Release 2.5, feature complete and fully documented. New features: File based Button Box configuration, Push To Talk for voice recognition, Usage of weather information in the Virtual Race Engineer including tyre change recommendation. Please read the [update notes on Release 2.5](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-25) for more information and necessary update activities.)
+None for the moment...
 
 #### Latest release builds
 
-[2.3.0-release](https://www.dropbox.com/s/lsjs4dyl328qyqq/Simulator%20Controller%202.3.0-release.zip?dl=1) (New features: Automated check for new version online on GitHub; New rules for damage impact analysis, reporting and pit strategy adjustments; rFactor 2 Skeleton Plugin. Important: Please read the [update notes on Release 2.3](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-23) carefully, since there is a manual step involved, if you want to use the new rFactor 2 plugin and there might be some tweaks necessary for the *Race Engineer.settings* file.)
-
 [2.4.1-release](https://www.dropbox.com/s/rolov374qh566wg/Simulator%20Controller%202.4.1-release.zip?dl=1) (Important new features: 1. Support for multiple Button Boxes, 2. New plugin for RaceRoom Racing Experience, 3. Pedal Calibration changes are now possible even when on the race track - quite useful when the track gets wet, 4. Jona now can recommend adjusted tyre pressures for falling or rising temperatures during long races, 5. Some tweaks in the translations editor.)
 
-Important: 2.4.1 contains a critical bugfix. If you already installed 2.4.0, I strongly recommend an update. Please be sure to read the [update notes on Release 2.4](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-24), before using the Release 2.4 build.
+Important: 2.4.1 contains a critical bugfix. If you have already installed 2.4.0, I strongly recommend an update. Please be sure to read the [update notes on Release 2.4](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-24), before using the Release 2.4 build.
+
+[2.5.0-release](https://www.dropbox.com/s/04le21b4obd5dpp/Simulator%20Controller%202.5.0-release.zip?dl=1) (New features: File based Button Box configuration, Push To Talk for voice recognition, Usage of weather information in the Virtual Race Engineer including tyre change recommendation. Please read the [update notes on Release 2.5](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-25) for more information and necessary update activities.)
 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [update notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-20) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.

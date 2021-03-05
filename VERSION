@@ -1,6 +1,6 @@
 [Version]
 Current=2.6.0-dev
-Target=2.6-release
+Target=2.6.0-release
 Release=2.5.0-release
 Changes=Tyre change recommendation depending on weather conditions incl. adjusted pressures depending on compound
-Date=03/04/2021
+Date=03/05/2021

@@ -1,6 +1,6 @@
 [Version]
-Current=2.5.0-rc2
-Target=2.5-release
-Release=2.4.1-release
+Current=2.5.0-release
+Target=2.5.0-release
+Release=2.5.0-release
 Changes=Push to Talk, Button Box Configuration, Weather data acquisiton from ACC Shared Memory, Weather Trend Calculation Rules
-Date=03/04/2021
+Date=03/05/2021

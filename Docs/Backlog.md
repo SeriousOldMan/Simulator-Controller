@@ -1,5 +1,5 @@
 #### Driving...
-  1. [Target: V2.5 - V3.0][Race Engineer] Further enhancements AI based race engineer
+  1. [Target: V2.6 - V3.0][Race Engineer] Further enhancements AI based race engineer
 	 - Automated tyre pressure adjustments between stints depending on upcoming weather conditions
 	 - Automated tyre compound recommendation based on upcoming weather conditions
   2. [Target: V2.8][RF2 Plugin] Extension of the rFactor 2 and RaceRoom Racing Experience racing simulations support
@@ -10,13 +10,11 @@
   6. [Tactile & Motion Feedback Plugin] Definition of feedback settings for different tracks and cars, selectable by the touch of a button
   
 #### Button Box Visualization
-  1. [Target: V2.5] Configuration file for controller layouts
-  2. [Target: V2.7] Allow for more than one active plugin mode, if more than one controller is connected to the PC
-  3. [Target: V2.7] Graphical editor for controller layouts
+  1. [Target: V2.7] Allow for more than one active plugin mode, if more than one controller is connected to the PC
+  2. [Target: V2.7] Graphical editor for controller layouts
   
 #### General
-  1. [Target: V2.5] Push to talk for all voice recognition stuff
-  2. [Target: V2.7] Again, better UI flow in the configuration tool and larger window size
-  3. [Target: V2.7] Plugin support for the configuration tool
-  4. Choosing a specific theme depending on the selected simulation game
-  5. [Target: V4.0] An interview based setup wizard, which guides through the configuration process
+  1. [Target: V2.7] Again, better UI flow in the configuration tool and larger window size
+  2. [Target: V2.7] Plugin support for the configuration tool
+  3. Choosing a specific theme depending on the selected simulation game
+  4. [Target: V4.0] An interview based setup wizard, which guides through the configuration process

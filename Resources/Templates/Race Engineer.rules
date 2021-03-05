@@ -393,11 +393,15 @@ updateWeatherTrend(?lap) <= firstStintLap(?startlap), ?deltaLaps = ?lap - ?start
 							lapAirTemperature(?startlap, ?startAirTemperature), projectedAirTemperature(?lap, ?curAirTemperature),				\
 							lapTrackTemperature(?startlap, ?startTrackTemperature), projectedTrackTemperature(?lap, ?curTrackTemperature),		\
 							lapWeather(?startlap, ?startWeather), projectedWeather(?lap, ?curWeather),											\
+							lapTyreTemperature(?startlap, ?startTyreTemperature), projectedTyreTemperature(?lap, ?curTyreTemperature),			\
 							?tempAir = ?curAirTemperature - ?startAirTemperature, ?tempTrack = ?curTrackTemperature - ?startTrackTemperature,	\
 							?deltaAirTemperature = ?tempAir / ?deltaLaps, ?deltaTrackTemperature = ?tempTrack / ?deltaLaps,						\
 							?tempWeather = ?curWeather - ?startWeather, ?deltaWeather = ?tempWeather / ?deltaLaps,								\
+							?tempTyreTemperature = ?curTyreTemperature - ?startTyreTemperature,													\
+							?deltaTyreTemperature = ?tempTyreTemperature / ?deltaLaps,															\
 							Set(Weather.Temperature.Air.Delta, ?deltaAirTemperature),															\
-							Set(Weather.Temperature.Track.Delta, ?deltaTrackTemperature), Set(Weather.Weather.Delta, ?deltaWeather)
+							Set(Weather.Temperature.Track.Delta, ?deltaTrackTemperature), Set(Weather.Weather.Delta, ?deltaWeather),			\
+							Set(Weather.Temperature.Tyre.Delta, ?deltaTyreTemperature)
 
 projectedWeather(?lap, ?weather) <=																												\
 		firstStintLap(?firstlap), sequence(?firstlap, !Lap, ?indices), lapWeathers(?firstlap, !Lap, ?weathers),									\

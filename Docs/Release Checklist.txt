@@ -10,6 +10,11 @@ General Release Actions
 8. Update "Backlog.md"
 9. Check, whether update documentation for the release is required in "Updates.md"
 
+Release 2.6 Checklist
+=====================
+1. Update Procedure
+   a. New Translations
+
 Release 2.5 Checklist
 =====================
 1. Voice Control Tab

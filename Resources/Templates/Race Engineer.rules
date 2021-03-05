@@ -76,10 +76,10 @@ priority: 5, {None: [?Tyre.Compound]} => (Prove: currentTyreCompound)
 
 priority: 5,																																	\
 	{All: {Any: [?Lap], [?Pitstop.Lap], {None: [?Tyre.Compound.Target]}},																		\
-		  [?Weather.Tyre.Compound.Target]} => (Set: Tyre.Compound.Target, ?Weather.Tyre.Compound.Target)
+		  [?Weather.Tyre.Compound.Target]} => (Set: Tyre.Compound.Target, ?Weather.Tyre.Compound.Target), (Clear: Tyre.Set.Target)
 priority: 5,																																	\
 	{All: {Any: [?Lap], [?Pitstop.Lap], {None: [?Tyre.Compound.Target]}},																		\
-		  {None: [?Weather.Tyre.Compound.Target]}} => (Prove: keepTyreCompound)
+		  {None: [?Weather.Tyre.Compound.Target]}} => (Prove: keepTyreCompound), (Clear: Tyre.Set.Target)
 
 currentTyreCompound() <= currentTyreCompound(?compound), Set(Tyre.Compound, ?compound)
 
@@ -93,9 +93,9 @@ keepTyreCompound() <= setupTyreCompound(?compound), Set(Tyre.Compound.Target, ?c
 ;;; Calculate next dry tire set after performed pitstop.                    ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-priority: 5, {Any: [?Lap], [?Tyre.Compound.Target = Dry], {None: [?Tyre.Set.Target]}} => (Prove: nextDryTyreSet)
+priority: 5, {All: [?Lap], [?Tyre.Compound.Target = Dry], {None: [?Tyre.Set.Target]}} => (Prove: nextDryTyreSet)
 
-priority: 5, {Any: [?Lap], [?Tyre.Compound.Target = Wet], {None: [?Tyre.Set.Target]}} => (Set: Tyre.Set.Target, 0)
+priority: 5, {All: [?Lap], [?Tyre.Compound.Target = Wet], {None: [?Tyre.Set.Target]}} => (Set: Tyre.Set.Target, 0)
 
 nextDryTyreSet() <= pitstopTyreSet(?nr), ?set = ?nr + 1, Set(Tyre.Set.Target, ?set), !
 nextDryTyreSet() <= Set(Tyre.Set.Target, !Race.Setup.Tyre.Set.Fresh)
@@ -111,8 +111,9 @@ nextDryTyreSet() <= Set(Tyre.Set.Target, !Race.Setup.Tyre.Set.Fresh)
 ;;; "Race.Settings.Lap.History.Damping".                                    ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Lap] => (Prove: updateTyrePressureDeviation, ?Lap)
-[?Tyre.Update.Pressure = true] => (Prove: updateTyrePressureDeviation, !Lap), (Clear: Tyre.Update.Pressure)
+{All: [?Lap], [?Tyre.Compound = ?Tyre.Compound.Target]} => (Prove: updateTyrePressureDeviation, ?Lap)
+{All: [?Tyre.Update.Pressure = true], [?Tyre.Compound = ?Tyre.Compound.Target]} =>																\
+		(Prove: updateTyrePressureDeviation, !Lap), (Clear: Tyre.Update.Pressure)
 
 updateTyrePressureDeviation(?lap) <= tyrePressureDeviation(?lap, [FL, FR, RL, RR], ?deviations), 												\
 									 updateTargetPressures([FL, FR, RL, RR], ?deviations)
@@ -135,6 +136,12 @@ weightedDeviations(?lap, ?offset, ?compound, ?tyreType, [?deviation | ?deviation
 updateTargetPressures([], [])
 updateTargetPressures([?tyreType | ?tyreTypes], [?deviation | ?deviations]) <=																	\
 		Set(Tyre.Pressure.Deviation, ?tyreType, ?deviation), updateTargetPressures(?tyreTypes, ?deviations)
+
+{All: [?Lap], [?Tyre.Compound], [?Tyre.Compound.Target], {None: [?Tyre.Compound = ?Tyre.Compound.Target]}} =>									\
+		(Prove: updateTyrePressureBaseDeviation, ?Lap, ?Tyre.Compound.Target)
+
+updateTyrePressureBaseDeviation(?lap, ?compound) <= Set(Tyre.Pressure.Deviation.FL, 0), Set(Tyre.Pressure.Deviation.FR, 0),						\
+													Set(Tyre.Pressure.Deviation.RL, 0), Set(Tyre.Pressure.Deviation.RR, 0)
 
 {All: [?Tyre.Pressure.Deviation.FL], [?Tyre.Pressure.Target.Correction]}  =>																	\
 		(Prove: updatePressureDelta, !Tyre.Compound.Target, FL, !Tyre.Pressure.Deviation.FL, ?Tyre.Pressure.Target.Correction)

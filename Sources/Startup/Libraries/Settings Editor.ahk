@@ -216,7 +216,7 @@ restart:
 		Gui CE:Font, Norm, Arial
 		Gui CE:Font, Italic, Arial
 	
-		Gui CE:Add, Text, YP+20 w220 Center, % translate("Settings")
+		Gui CE:Add, Text, YP+20 w220 Center, % translate("Startup Settings")
 	
 		coreSettings := [["Simulator Controller", true, false]]
 		feedbackSettings := []		

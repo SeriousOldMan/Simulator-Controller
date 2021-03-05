@@ -285,7 +285,7 @@ class Predicate extends Condition {
 			
 			switch this.Operator {
 				case kNotInitialized:
-					result = true
+					result := true
 				case kEqual:
 					result := (leftPrimary = rightPrimary)
 				case kIdentical:

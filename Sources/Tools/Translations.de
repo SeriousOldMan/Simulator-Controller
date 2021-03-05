@@ -375,7 +375,7 @@ Simulator Startup=>Simulator Startsequenz
 Cancel Startup?=>Startsequenz abbrechen?
 [Simulator Settings]
 Cannot start the configuration tool - please check the installation...=>Die Konifgurationswerkzeug kann nicht gestartet werden - Bitte überprüfen Sie die Installation...
-Settings=>Einstellungen
+Startup Settings=>Start Einstellungen
 Core System=>Steuerung
 Feedback System=>Bewegung, etc.
 Controller Notifications=>Rückmeldungen

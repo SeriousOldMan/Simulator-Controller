@@ -570,7 +570,8 @@ class ACCPlugin extends ControllerPlugin {
 		IfWinNotActive AC2, , WinActivate, AC2 
 		WinWaitActive AC2, , 2
 
-		SendEvent % this.OpenPitstopMFDHotkey
+		if this.OpenPitstopMFDHotkey
+			SendEvent % this.OpenPitstopMFDHotkey
 		
 		wasOpen := this.iPSIsOpen
 		
@@ -588,7 +589,8 @@ class ACCPlugin extends ControllerPlugin {
 		IfWinNotActive AC2, , WinActivate, AC2
 		WinWaitActive AC2, , 2
 
-		SendEvent % this.ClosePitstopMFDHotkey
+		if this.ClosePitstopMFDHotkey
+			SendEvent % this.ClosePitstopMFDHotkey
 		
 		this.iPSIsOpen := false
 			

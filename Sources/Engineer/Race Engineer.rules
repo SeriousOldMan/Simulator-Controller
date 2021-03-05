@@ -93,10 +93,12 @@ keepTyreCompound() <= setupTyreCompound(?compound), Set(Tyre.Compound.Target, ?c
 ;;; Calculate next dry tire set after performed pitstop.                    ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-priority: 5, {Any: [?Lap], {None: [?Tyre.Set.Target]}} => (Prove: nextTyreSet)
+priority: 5, {Any: [?Lap], [?Tyre.Compound.Target = Dry], {None: [?Tyre.Set.Target]}} => (Prove: nextDryTyreSet)
 
-nextTyreSet() <= pitstopTyreSet(?nr), ?set = ?nr + 1, Set(Tyre.Set.Target, ?set), !
-nextTyreSet() <= Set(Tyre.Set.Target, !Race.Setup.Tyre.Set.Fresh)
+priority: 5, {Any: [?Lap], [?Tyre.Compound.Target = Wet], {None: [?Tyre.Set.Target]}} => (Set: Tyre.Set.Target, 0)
+
+nextDryTyreSet() <= pitstopTyreSet(?nr), ?set = ?nr + 1, Set(Tyre.Set.Target, ?set), !
+nextDryTyreSet() <= Set(Tyre.Set.Target, !Race.Setup.Tyre.Set.Fresh)
 
 
 ;;;-------------------------------------------------------------------------;;;

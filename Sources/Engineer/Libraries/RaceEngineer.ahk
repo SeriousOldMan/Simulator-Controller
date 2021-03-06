@@ -1399,7 +1399,7 @@ class RaceEngineer extends ConfigurationItem {
 			pressureCorrection := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.Correction", 0), 1)
 			
 			if (Abs(pressureCorrection) > 0.05) {
-				temperatureDelta := knowledgeBase.getValue("Weather.Temperature.Track.Delta", 0)
+				temperatureDelta := knowledgeBase.getValue("Weather.Temperature.Air.Delta", 0)
 				
 				if (temperatureDelta = 0)
 					temperatureDelta := ((pressureCorrection > 0) ? -1 : 1)

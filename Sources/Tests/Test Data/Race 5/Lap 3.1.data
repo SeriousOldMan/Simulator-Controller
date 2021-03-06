@@ -18,7 +18,7 @@ LapBestTime=124008
 TimeRemaining=1.40303e+06
 InPit=false
 [Track Data]
-Temperature=23.6235
+Temperature=21.6235
 Grip=DAMP
 [Pitstop Data]
 TyreSet=2
@@ -28,7 +28,7 @@ TyrePressureFR=26.6
 TyrePressureRL=25
 TyrePressureRR=26.2
 [Weather Data]
-Temperature=21.3726
+Temperature=19.3726
 Weather=Drizzle
 Weather10min=Drizzle
 Weather30min=Drizzle

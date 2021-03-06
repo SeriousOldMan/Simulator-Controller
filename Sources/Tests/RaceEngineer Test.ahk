@@ -857,9 +857,9 @@ if !GetKeyState("Ctrl") {
 	AHKUnit.Run()
 }
 else {
-	raceNr := (GetKeyState("Alt") ? 3 : ((GetKeyState("Shift") ? 2 : 1)))
+	raceNr := (GetKeyState("Alt") ? 5 : ((GetKeyState("Shift") ? 2 : 1)))
 	engineer := new TestRaceEngineer(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Engineer.settings")
-								   , new TestPitStopHandler(), "Jona", "de", true, true)
+								   , new TestPitStopHandler(), "Jona", "de", true, false)
 
 	engineer.setDebug(kDebugPhrases, false)
 	
@@ -1008,8 +1008,6 @@ else {
 					if (A_Index == 1)
 						done := true
 					
-					Msgbox Lap
-					
 					break
 				}
 				else {
@@ -1018,7 +1016,13 @@ else {
 					else
 						engineer.updateLap(lap, data)
 				
+					if (lap = 8)
+						engineer.planPitstop()
+				
 					dumpKnowledge(engineer.KnowledgeBase)
+					
+					if (lap = 8)
+						MsgBox Pitstop
 					
 					if isDebug()
 						showMessage("Data " lap . "." . A_Index . " loaded...")

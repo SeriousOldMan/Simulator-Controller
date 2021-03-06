@@ -304,11 +304,13 @@ class Predicate extends Condition {
 					Throw "Unsupported comparison operator """ . this.Operator . """ detected in Predicate.match..."
 			}
 					
-			if isInstance(this.LeftPrimary, Variable)
-				variables.setValue(this.LeftPrimary, leftPrimary)
-				
-			if ((this.RightPrimary != kNotInitialized) && isInstance(this.RightPrimary, Variable))
-				variables.setValue(this.RightPrimary, rightPrimary)
+			if true {
+				if isInstance(this.LeftPrimary, Variable)
+					variables.setValue(this.LeftPrimary, leftPrimary)
+					
+				if isInstance(this.RightPrimary, Variable)
+					variables.setValue(this.RightPrimary, rightPrimary)
+			}
 			
 			return result
 		}

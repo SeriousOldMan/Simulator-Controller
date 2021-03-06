@@ -648,15 +648,15 @@ showSplashAnimation(video) {
 	video := getFileName(video, kUserSplashMediaDirectory, kSplashMediaDirectory)
 	
 	Gui VP:-Border -Caption ; borderless
-	Gui VP:Add, ActiveX, x0 y0 w780 h415 vvVideoPlayer, shell explorer
+	Gui VP:Add, ActiveX, x0 y0 w780 h438 vvVideoPlayer, shell explorer
 
 	vVideoPlayer.Navigate("about:blank")
 	
-	html := "<html><body style='background-color: #000000' style='overflow:hidden' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><img src='" video "' width=780 height=390 border=0 padding=0></body></html>"
+	html := "<html><body style='background-color: #000000' style='overflow:hidden' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><img src='" video "' width=780 height=438 border=0 padding=0></body></html>"
 
 	vVideoPlayer.document.write(html)
 	
-	y := Round(A_ScreenHeight / 4) + 50
+	y := Round(A_ScreenHeight / 4) + 25
 	
 	Gui VP:Margin, 0, 0
 	Gui VP:+AlwaysOnTop

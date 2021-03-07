@@ -77,14 +77,50 @@ safetyFuel(?, !Race.Settings.Fuel.SafetyMargin)
 
 priority: 5, {None: [?Tyre.Compound]} => (Prove: currentTyreCompound)
 
-priority: 5,																																	\
-	{All: {Any: [?Lap], [?Pitstop.Lap], {None: [?Tyre.Compound.Target]}},																		\
-		  [?Weather.Tyre.Compound.Target]} => (Set: Tyre.Compound.Target, ?Weather.Tyre.Compound.Target), (Clear: Tyre.Set.Target)
-priority: 5,																																	\
-	{All: {Any: [?Lap], [?Pitstop.Lap], {None: [?Tyre.Compound.Target]}},																		\
-		  {None: [?Weather.Tyre.Compound.Target]}} => (Prove: keepTyreCompound), (Clear: Tyre.Set.Target)
-
 currentTyreCompound() <= currentTyreCompound(?compound), Set(Tyre.Compound, ?compound)
+
+priority: 5, {All: [?Lap], [?Race.Settings.Tyre.Compound.Change = Temperature]} => (Prove: updateTyreTemperatureWindow, ?Lap, !Tyre.Compound)
+
+updateTyreTemperatureWindow(?lap, Dry) <= lapTyreTemperature(?lap, ?lapTemperature),															\
+										  Get(Race.Settings.Tyre.Compound.Change.Threshold, ?threshold),										\
+										  ?temperature = ?lapTemperature + ?threshold, ?temperature > 70,										\
+										  Set(Tyre.Temperature.Window, true)
+updateTyreTemperatureWindow(?lap, Wet) <= lapTyreTemperature(?lap, ?lapTemperature),															\
+										  Get(Race.Settings.Tyre.Compound.Change.Threshold, ?threshold),										\
+										  ?temperature = ?lapTemperature - ?threshold, ?temperature < 55,										\
+										  Set(Tyre.Temperature.Window, true)
+updateTyreTemperatureWindow(?, ?) <= Set(Tyre.Temperature.Window, false)
+		  
+priority: 5,																																	\
+	{All: [?Race.Settings.Tyre.Compound.Change = Weather], [?Weather.Tyre.Compound.Target],														\
+		  {Any: [?Lap], [?Pitstop.Lap], {None: [?Tyre.Compound.Target]}}} =>																	\
+		(Set: Tyre.Compound.Target, ?Weather.Tyre.Compound.Target), (Clear: Tyre.Set.Target)
+
+priority: 5,																																	\
+	{All: [?Race.Settings.Tyre.Compound.Change = Temperature], {Any: [?Lap], [?Pitstop.Lap]},													\
+		  [?Tyre.Temperature.Window = false], [?Tyre.Compound = Dry]} =>																		\
+		(Set: Tyre.Compound.Target, Wet), (Clear: Tyre.Set.Target)
+
+priority: 5,																																	\
+	{All: [?Race.Settings.Tyre.Compound.Change = Temperature], {Any: [?Lap], [?Pitstop.Lap]},													\
+		  [?Tyre.Temperature.Window = true], [?Tyre.Compound = Dry]} =>																			\
+		(Set: Tyre.Compound.Target, Dry), (Clear: Tyre.Set.Target)
+
+priority: 5,																																	\
+	{All: [?Race.Settings.Tyre.Compound.Change = Temperature], {Any: [?Lap], [?Pitstop.Lap]},													\
+		  [?Tyre.Temperature.Window = false], [?Tyre.Compound = Wet]} =>																		\
+		(Set: Tyre.Compound.Target, Dry), (Clear: Tyre.Set.Target)
+
+priority: 5,																																	\
+	{All: [?Race.Settings.Tyre.Compound.Change = Temperature], {Any: [?Lap], [?Pitstop.Lap]},													\
+		  [?Tyre.Temperature.Window = true], [?Tyre.Compound = Wet]} =>																			\
+		(Set: Tyre.Compound.Target, Wet), (Clear: Tyre.Set.Target)
+
+priority: 5,																																	\
+	{All: [?Race.Settings.Tyre.Compound.Change = Never],																						\
+		  {Any: [?Lap], [?Pitstop.Lap], {None: [?Tyre.Compound.Target]}}} => (Prove: keepTyreCompound), (Clear: Tyre.Set.Target)
+
+{All: {Any: [?Lap], [?Pitstop.Lap]}, {None: [?Tyre.Compound.Target]}} => (Prove: keepTyreCompound), (Clear: Tyre.Set.Target)
 
 keepTyreCompound() <= pitstopTyreCompound(?compound), Set(Tyre.Compound.Target, ?compound), !
 keepTyreCompound() <= setupTyreCompound(?compound), Set(Tyre.Compound.Target, ?compound)
@@ -208,8 +244,8 @@ priority: -5, {All: [?Lap], [?Tyre.Compound], [?Tyre.Compound.Target],										
 		(Clear: Tyre.Pressure.Delta.RL.Abs), (Clear: Tyre.Pressure.Delta.RR.Abs)
 
 updateTyrePressureDeviation(?lap, ?compound, ?correction) <=																					\
-		=(?deviations, [0, 0, 0, 0]), setupTyrePressures(?compound, [FL, FR, RL, RR], ?pressures),												\
-		updateTargetPressures([FL, FR, RL, RR], ?pressures, ?deviations, ?correction, ?targetPressures)
+		setupTyrePressures(?compound, [FL, FR, RL, RR], ?pressures),																			\
+		updateTargetPressures([FL, FR, RL, RR], ?pressures, [0, 0, 0, 0], ?correction, ?targetPressures)
 													
 updateTargetPressures([], [], [], ?, [])
 updateTargetPressures([?tyreType | ?tyreTypes], [?pressure | ?pressures],																		\

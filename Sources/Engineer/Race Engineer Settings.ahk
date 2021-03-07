@@ -259,7 +259,7 @@ restart:
 		setConfigurationValue(newSettings, "Race Settings", "Damage.Bodywork.Repair.Threshold", Round(repairBodyworkThresholdEdit, 1))
 		
 		setConfigurationValue(newSettings, "Race Settings", "Tyre.Compound.Change"
-							, ["Never", "Tyre Temperature", "Weather", "Laptime"][changeTyreDropDown])
+							, ["Never", "Temperature", "Weather"][changeTyreDropDown])
 		setConfigurationValue(newSettings, "Race Settings", "Tyre.Compound.Change.Threshold", Round(changeTyreThresholdEdit, 1))
 		
 		setConfigurationValue(newSettings, "Race Settings", "Tyre.Pressure.Deviation", tyrePressureDeviationEdit)
@@ -418,9 +418,9 @@ restart:
 		
 		Gui RES:Add, Text, x16 yp+24 w105 h23 +0x200, % translate("Change Compound")
 		
-		tabs := map(["Never", "Tyre Temperature", "Weather", "Impact"], "translate")
+		tabs := map(["Never", "Tyre Temperature", "Weather"], "translate")
 
-		changeTyreDropDown := inList(["Never", "Tyre Temperature", "Weather", "Impact"], changeTyreDropDown)
+		changeTyreDropDown := inList(["Never", "Temperature", "Weather"], changeTyreDropDown)
 		
 		Gui RES:Add, DropDownList, x126 yp w110 AltSubmit Choose%changeTyreDropDown% VchangeTyreDropDown gupdateChangeTyreState, % values2String("|", tabs*)
 		Gui RES:Add, Text, x245 yp+2 w20 h20 VchangeTyreGreaterLabel, % translate(">")

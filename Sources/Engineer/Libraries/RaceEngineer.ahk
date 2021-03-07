@@ -1385,16 +1385,20 @@ class RaceEngineer extends ConfigurationItem {
 				speaker.speakPhrase("NewPressures")
 			
 			if (debug || (incrementFL != 0))
-				speaker.speakPhrase("TyreFL", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL"), 1)), unit: fragments["PSI"]})
+				speaker.speakPhrase("TyreFL", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL"), 1))
+											 , unit: fragments["PSI"]})
 			
 			if (debug || (incrementFR != 0))
-				speaker.speakPhrase("TyreFR", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR"), 1)), unit: fragments["PSI"]})
+				speaker.speakPhrase("TyreFR", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR"), 1))
+											 , unit: fragments["PSI"]})
 			
 			if (debug || (incrementRL != 0))
-				speaker.speakPhrase("TyreRL", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL"), 1)), unit: fragments["PSI"]})
+				speaker.speakPhrase("TyreRL", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL"), 1))
+											 , unit: fragments["PSI"]})
 			
 			if (debug || (incrementRR != 0))
-				speaker.speakPhrase("TyreRR", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR"), 1)), unit: fragments["PSI"]})
+				speaker.speakPhrase("TyreRR", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR"), 1))
+											 , unit: fragments["PSI"]})
 		
 			pressureCorrection := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.Correction", 0), 1)
 			
@@ -1404,9 +1408,10 @@ class RaceEngineer extends ConfigurationItem {
 				if (temperatureDelta = 0)
 					temperatureDelta := ((pressureCorrection > 0) ? -1 : 1)
 				
-				speaker.speakPhrase("PressureCorrection", {value: Format("{:.1f}", Abs(pressureCorrection)), unit: fragments["PSI"]
-														 , pressureDirection: (pressureCorrection > 0) ? fragments["Increase"] : fragments["Decrease"]
-														 , temperatureDirection: (temperatureDelta > 0) ? fragments["Rising"] : fragments["Falling"]})
+				speaker.speakPhrase((pressureCorrection > 0) ? "PressureCorrectionUp" : "PressureCorrectionDown"
+								  , {value: Format("{:.1f}", Abs(pressureCorrection)), unit: fragments["PSI"]
+								   , pressureDirection: (pressureCorrection > 0) ? fragments["Increase"] : fragments["Decrease"]
+								   , temperatureDirection: (temperatureDelta > 0) ? fragments["Rising"] : fragments["Falling"]})
 			}
 
 			if knowledgeBase.getValue("Pitstop.Planned.Repair.Suspension", false)

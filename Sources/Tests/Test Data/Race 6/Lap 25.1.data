@@ -1,0 +1,38 @@
+[Car Data]
+BodyworkDamage=0, 0, 0, 0, 0
+SuspensionDamage=0, 0, 0, 0
+FuelRemaining=47.1435
+TyreCompound=Dry
+TyreTemperature=83.7851, 74.5298, 84.9493, 76.9067
+TyrePressure=27.518, 27.5295, 27.5298, 27.4577
+[Stint Data]
+Active=true
+Paused=false
+Session=RACE
+DriverForname=The
+DriverSurname=BigO
+DriverNickname=
+Laps=25
+LapLastTime=115287
+LapBestTime=115287
+TimeRemaining=1.20216e+06
+InPit=false
+[Track Data]
+Temperature=26.531
+Grip=OPTIMUM
+[Pitstop Data]
+TyreSet=2
+FuelAmount=0
+TyrePressureFL=25.1
+TyrePressureFR=26.4
+TyrePressureRL=25
+TyrePressureRR=26.1
+[Weather Data]
+Temperature=20.1019
+Weather=Dry
+Weather10min=Dry
+Weather30min=Dry
+[Race Data]
+Car=mclaren_720s_gt3
+Track=Paul_Ricard
+FuelAmount=125

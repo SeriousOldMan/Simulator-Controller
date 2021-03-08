@@ -87,6 +87,8 @@ kRules =
 				
 				empty() <= father(Mara, Willy)
 				
+				complexClause(?x, ?y) <= ?x = [1, 2, 3], ?y = complex(A, foo([1, 2]))
+				
 				{Any: [?Peter.grandchild], [?Peter.son]} => (Set: Peter, happy)
 				[?Peter = happy] => (Call: celebrate)
 				{Any: [?Paul.grandchild], [?Willy.grandChild]} => (Set: Bound, ?Paul.grandchild), (Set: NotBound, ?Peter.son), (Set: ForcedBound, !Willy.grandchild)
@@ -179,7 +181,7 @@ class Compiler extends Assert {
 		compiler.compileRules(kExecutionTestRules, productions, reductions)
 		
 		this.AssertEqual(3, productions.Length(), "Not all production rules compiled...")
-		this.AssertEqual(24, reductions.Length(), "Not all reduction rules compiled...")
+		this.AssertEqual(25, reductions.Length(), "Not all reduction rules compiled...")
 	}
 }
 
@@ -334,6 +336,12 @@ class Unification extends Assert {
 		tests := [["fac(0, ?R)", ["fac(0, 1)"]]
 				, ["fac(1, ?R)", ["fac(1, 1)"]]
 				, ["construct(?A, 42)", ["construct(Foo.42.Bar, 42)"]]]
+		
+		this.executeTests(tests)
+	}
+	
+	Complex_Clause_Test() {
+		tests := [["complexClause(?x, ?y)", ["complexClause([1, 2, 3], complex(A, foo([1, 2])))"]]]
 		
 		this.executeTests(tests)
 	}
@@ -555,6 +563,8 @@ theRules =
 	remove([], ?, [])
 	remove([?h | ?t], ?h, ?result) <= remove(?t, ?h, ?result), !
 	remove([?h | ?t], ?x, [?h | ?result]) <= remove(?t, ?x, ?result)
+	
+	complexClause(?x, ?y) <= ?x = [1, 2, 3], ?y = complex(A, foo([1, 2]))
 )
 
 productions := false

@@ -3072,7 +3072,7 @@ class RuleCompiler {
 					; r = x op y OR x = y
 					nextCharIndex += 1
 					 
-					xOperand := this.readLiteral(text, nextCharIndex, "+-*/`, `t")
+					xOperand := this.readCompoundArgument(text, nextCharIndex) 
 				
 					this.skipWhiteSpace(text, nextCharIndex)
 					
@@ -3082,7 +3082,7 @@ class RuleCompiler {
 						if InStr("+-*/", operation) {
 							nextCharIndex += 1
 							
-							yOperand := this.readLiteral(text, nextCharIndex)
+							yOperand := this.readCompoundArgument(text, nextCharIndex)
 							
 							return Array(operation, functor, xOperand, yOperand)
 						}

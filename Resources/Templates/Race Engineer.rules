@@ -244,8 +244,8 @@ priority: -5, {All: [?Lap], [?Tyre.Compound], [?Tyre.Compound.Target],										
 		(Clear: Tyre.Pressure.Delta.RL.Abs), (Clear: Tyre.Pressure.Delta.RR.Abs)
 
 updateTyrePressureDeviation(?lap, ?compound, ?correction) <=																					\
-		setupTyrePressures(?compound, [FL, FR, RL, RR], ?pressures),																			\
-		updateTargetPressures([FL, FR, RL, RR], ?pressures, [0, 0, 0, 0], ?correction, ?targetPressures)
+		?deviations = [0, 0, 0, 0], setupTyrePressures(?compound, [FL, FR, RL, RR], ?pressures),												\
+		updateTargetPressures([FL, FR, RL, RR], ?pressures, ?deviations, ?correction, ?targetPressures)
 													
 updateTargetPressures([], [], [], ?, [])
 updateTargetPressures([?tyreType | ?tyreTypes], [?pressure | ?pressures],																		\

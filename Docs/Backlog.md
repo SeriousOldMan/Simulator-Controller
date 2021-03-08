@@ -8,6 +8,14 @@
 	 - This data collection will be used to propose a setup for the current session
   5. [Race Engineer] Cloud-based client server setup for endurance & team races
   6. [Tactile & Motion Feedback Plugin] Definition of feedback settings for different tracks and cars, selectable by the touch of a button
+  7. More race information provided by Jona (mostly for VR-users):
+     - Current race position
+	 - Gap to car in front
+	 - Gap to car behind
+
+#### Strategy
+  1. Using the technology of Jona, implement a Race Strategy Expert
+     - Recommend the lap, where a pitstop will have the most positive effect on race position
   
 #### Button Box Visualization
   1. [Target: V2.7] Allow for more than one active plugin mode, if more than one controller is connected to the PC

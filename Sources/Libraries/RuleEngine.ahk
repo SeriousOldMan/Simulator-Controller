@@ -299,7 +299,10 @@ class Predicate extends Condition {
 				case kGreaterOrEqual:
 					result := (leftPrimary >= rightPrimary)
 				case kContains:
-					result := inList(leftPrimary, rightPrimary)
+					if rightPrimary in leftPrimary
+						result := true
+					else
+						result := inList(leftPrimary, rightPrimary)
 				default:
 					Throw "Unsupported comparison operator """ . this.Operator . """ detected in Predicate.match..."
 			}

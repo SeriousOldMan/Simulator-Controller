@@ -13,8 +13,6 @@ global kACCPlugin = "ACC"
 global kChatMode = "Chat"
 global kPitstopMode = "Pitstop"
 
-global kAlways = "Always"
-
 global kFront = 0
 global kRear = 1
 global kLeft = 2

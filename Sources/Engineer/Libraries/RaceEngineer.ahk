@@ -25,8 +25,6 @@
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kAlways = "Always"
-
 global kFront = 0
 global kRear = 1
 global kLeft = 2
@@ -38,7 +36,7 @@ global kDebugGrammars := 1
 global kDebugPhrases := 2
 global kDebugRecognitions := 4
 global kDebugKnowledgeBase := 8
-global kDebugAll = (kDebugGrammars + + kDebugPhrases + kDebugRecognitions + kDebugKnowledgeBase)
+global kDebugAll = (kDebugGrammars + kDebugPhrases + kDebugRecognitions + kDebugKnowledgeBase)
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -1613,9 +1611,10 @@ class RaceEngineer extends ConfigurationItem {
 
 	setPitstopTyrePressures(pitstopNumber, pressureFLIncrement, pressureFRIncrement, pressureRLIncrement, pressureRRIncrement) {
 		local compound
-		local knowledgeBase := this.KnowledgeBase
+		local knowledgeBase
 		
 		if this.PitstopHandler {
+			knowledgeBase := this.KnowledgeBase
 			compound := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound", "Dry")
 			
 			referencePressureFL := knowledgeBase.getValue("Race.Setup.Tyre." . compound . ".Pressure.FL")

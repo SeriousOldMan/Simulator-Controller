@@ -502,14 +502,6 @@ projectedTyreTemperature(?lap, ?temperature) <=																									\
 
 priority: 5, [?Lap > 5] => (Prove: updateTyrePressureCorrection, ?Lap)
 
-;updateTyrePressureCorrection(?lap) <=																											\
-;		firstStintLap(?startlap), ?firstLap = ?startLap + 1, ?numLaps = ?lap - ?firstLap, ?numLaps > 5,											\
-;		sequence(?firstlap, ?lap, ?indices), lapTyrePressures(?firstLap, ?lap, ?pressures),	linRegression(?indices, ?pressures, ?a, ?b),		\
-;		nextStintLaps(?nextStintLaps), ?halfStintLaps = ?nextStintLaps / 2,																		\
-;		average(?pressures, ?averagePressure), ?middleStintLap = ?lap + ?halfStintLaps, ?temp = ?b * ?middleStintLap,							\
-;		?projectedPressure = ?a + ?temp, ?pressureCorrection = ?averagePressure - ?projectedPressure,											\
-;		Set(Tyre.Pressure.Target.Correction, ?pressureCorrection)
-
 updateTyrePressureCorrection(?lap) <=																											\
 		firstStintLap(?startlap), ?firstLap = ?startLap + 1, ?numLaps = ?lap - ?firstLap, ?numLaps > 5,											\
 		sequence(?firstlap, ?lap, ?indices), lapAirTemperatures(?firstLap, ?lap, ?temperatures), linRegression(?indices, ?temperatures, ?a, ?b),\

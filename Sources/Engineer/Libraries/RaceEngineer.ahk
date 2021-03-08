@@ -1603,7 +1603,7 @@ class RaceEngineer extends ConfigurationItem {
 
 	setPitstopRefuelAmount(pitstopNumber, litres) {
 		if this.PitstopHandler
-			this.PitstopHandler.setPitstopRefuelAmount(pitstopNumber, Round(litres))
+			this.PitstopHandler.setPitstopRefuelAmount(pitstopNumber, Round(litres - this.KnowledgeBase.getValue("Pitstop.Configured.Fuel", 0)))
 	}
 
 	setPitstopTyreSet(pitstopNumber, compound, set) {
@@ -1612,9 +1612,30 @@ class RaceEngineer extends ConfigurationItem {
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFLIncrement, pressureFRIncrement, pressureRLIncrement, pressureRRIncrement) {
-		if this.PitstopHandler
+		local compound
+		local knowledgeBase := this.KnowledgeBase
+		
+		if this.PitstopHandler {
+			compound := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound", "Dry")
+			
+			referencePressureFL := knowledgeBase.getValue("Race.Setup.Tyre." . compound . ".Pressure.FL")
+			referencePressureFR := knowledgeBase.getValue("Race.Setup.Tyre." . compound . ".Pressure.FR")
+			referencePressureRL := knowledgeBase.getValue("Race.Setup.Tyre." . compound . ".Pressure.RL")
+			referencePressureRR := knowledgeBase.getValue("Race.Setup.Tyre." . compound . ".Pressure.RR")
+			
+			pitstopPressureFL := knowledgeBase.getValue("Pitstop.Configured.Tyre.Pressure.FL", referencePressureFL)
+			pitstopPressureFR := knowledgeBase.getValue("Pitstop.Configured.Tyre.Pressure.FR", referencePressureFR)
+			pitstopPressureRL := knowledgeBase.getValue("Pitstop.Configured.Tyre.Pressure.RL", referencePressureRL)
+			pitstopPressureRR := knowledgeBase.getValue("Pitstop.Configured.Tyre.Pressure.RR", referencePressureRR)
+			
+			pressureFLIncrement -= (pitstopPressureFL - referencePressureFL)
+			pressureFRIncrement -= (pitstopPressureFR - referencePressureFR)
+			pressureRLIncrement -= (pitstopPressureRL - referencePressureRL)
+			pressureRRIncrement -= (pitstopPressureRR - referencePressureRR)
+			
 			this.PitstopHandler.setPitstopTyrePressures(pitstopNumber, Round(pressureFLIncrement, 1), Round(pressureFRIncrement, 1)
 																	 , Round(pressureRLIncrement, 1), Round(pressureRRIncrement, 1))
+		}
 	}
 
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork) {

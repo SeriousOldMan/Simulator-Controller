@@ -1720,10 +1720,17 @@ class FunctionsList extends ConfigurationItemList {
 	
 		GuiControlGet functionType, , functionTypeDropDown
 	
-		if ((functionType == 2) || (functionType == 4)) {
-			GuiControl Enable, functionOffHotkeysEdit
+		if (functionType < 5) {
+			GuiControl Disable, functionOnActionEdit
+			GuiControl Disable, functionOffActionEdit
+		}
+		else {
+			GuiControl Enable, functionOnActionEdit
 			GuiControl Enable, functionOffActionEdit
 		}
+			
+		if ((functionType == 2) || (functionType == 4))
+			GuiControl Enable, functionOffHotkeysEdit
 		else {
 			functionOffHotkeysEdit := ""
 			functionOffActionEdit := ""

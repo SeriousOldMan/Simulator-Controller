@@ -1032,7 +1032,7 @@ class RaceEngineer extends ConfigurationItem {
 				, "Race.Settings.Tyre.Wet.Pressure.Target.RR": getConfigurationValue(settings, "Race Settings", "Tyre.Wet.Pressure.Target.RR", 30.0)
 				, "Race.Settings.Tyre.Pressure.Deviation": getConfigurationValue(settings, "Race Settings", "Tyre.Pressure.Deviation", 0.2)
 				, "Race.Setup.Tyre.Set.Fresh": getConfigurationValue(settings, "Race Setup", "Tyre.Set.Fresh", 8)
-				, "Race.Setup.Tyre.Compound": getConfigurationValue(settings, "Race Setup", "Tyre.Compound", "Dry")
+				, "Race.Setup.Tyre.Compound": getConfigurationValue(data, "Car Data", "TyreCompound", getConfigurationValue(settings, "Race Setup", "Tyre.Compound", "Dry"))
 				, "Race.Setup.Tyre.Set": getConfigurationValue(settings, "Race Setup", "Tyre.Set", 7)
 				, "Race.Setup.Tyre.Dry.Pressure.FL": getConfigurationValue(settings, "Race Setup", "Tyre.Dry.Pressure.FL", 26.1)
 				, "Race.Setup.Tyre.Dry.Pressure.FR": getConfigurationValue(settings, "Race Setup", "Tyre.Dry.Pressure.FR", 26.1)

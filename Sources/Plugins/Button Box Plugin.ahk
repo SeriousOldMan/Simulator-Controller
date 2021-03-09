@@ -187,7 +187,7 @@ class GridButtonBox extends ButtonBox {
 		Gui %window%:Font, s10 cSilver
 		Gui %window%:Add, Text, x0 y28 w%width% h23 +0x200 +0x1 BackgroundTrans gmoveButtonBox, % translate(this.Name)
 		Gui %window%:Color, 0x000000
-		Gui %window%:Font, Norm, Arial
+		Gui %window%:Font, s8 Norm, Arial
 		
 		vertical := this.kHeaderHeight
 		
@@ -255,7 +255,7 @@ class GridButtonBox extends ButtonBox {
 						this.registerControl(variable, function, x, y, imageWidth, imageHeight)
 						
 						if ((labelHeight > 0) && (labelHeight > 0)) {
-							Gui %window%:Font, Norm
+							Gui %window%:Font, s8 Norm
 					
 							x := horizontal + Round((columnWidth - labelWidth) / 2)
 							y := vertical + rowHeight - labelHeight

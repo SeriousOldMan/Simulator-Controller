@@ -42,9 +42,6 @@ global kBuiltinFunctors = ["option", "sqrt", "+", "-", "*", "/", ">", "<", "=", 
 global kBuiltinFunctions = ["option", "squareRoot", "plus", "minus", "multiply", "divide", "greater", "less", "equal", "unbound", "append", "get"]
 global kBuiltinAritys = [2, 2, 3, 3, 3, 3, 2, 2, 2, 1, -1, -1]
 
-global kPrefixNotation = "Prefix"
-global kInfixNotation = "Infix"
-
 global kProduction = "Production"
 global kReduction = "Reduction"
 
@@ -2843,7 +2840,6 @@ class RuleEngine {
 	iInitialProductions := []
 	iInitialReductions := []
 	iTraceLevel := kTraceOff
-	iExpressionNotation := kPrefixNotation
 	
 	InitialFacts[] {
 		Get {

@@ -262,6 +262,12 @@ class ACCPlugin extends ControllerPlugin {
 				}
 		}
 	}
+
+	class RaceEngineerSettingsAction extends ControllerAction {
+		fireAction(function, trigger) {
+			openRaceEngineerSettings()
+		}
+	}
 	
 	class RaceEngineerToggleAction extends ControllerAction {
 		fireAction(function, trigger) {
@@ -402,6 +408,11 @@ class ACCPlugin extends ControllerPlugin {
 		else
 			this.iRaceEngineerEnabled := (this.iRaceEngineerName != false)
 		
+		raceEngineerSettings := this.getArgumentValue("raceEngineerSettings", false)
+		
+		if raceEngineerSettings
+			this.createRaceEngineerAction(controller, "RaceEngineerSettings", raceEngineerSettings)
+		
 		for ignore, theAction in string2Values(",", this.getArgumentValue("raceEngineerCommands", ""))
 			this.createRaceEngineerAction(controller, string2Values(A_Space, theAction)*)
 		
@@ -461,6 +472,8 @@ class ACCPlugin extends ControllerPlugin {
 				mode.registerAction(new this.RaceEngineerAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Activate"), action), action))
 			else if (action = "RaceEngineer")
 				this.registerAction(new this.RaceEngineerToggleAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Toggle"), action)))
+			else if (action = "RaceEngineerSettings")
+				this.registerAction(new this.RaceEngineerSettingsAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Activate"))))
 			else
 				logMessage(kLogWarn, translate("Action """) . action . translate(""" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
 		}

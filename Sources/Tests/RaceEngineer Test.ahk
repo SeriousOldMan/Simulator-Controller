@@ -1051,13 +1051,13 @@ else {
 					else
 						engineer.updateLap(lap, data)
 				
-					if (lap = 17)
+					if (lap = 17) {
 						engineer.planPitstop()
 				
-					dumpKnowledge(engineer.KnowledgeBase)
+						dumpKnowledge(engineer.KnowledgeBase)
 					
-					if (lap = 17)
 						MsgBox Pitstop
+					}
 					
 					if isDebug()
 						showMessage("Data " lap . "." . A_Index . " loaded...")

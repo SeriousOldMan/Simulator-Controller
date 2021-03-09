@@ -1,6 +1,6 @@
 [Version]
-Current=2.5.1-dev
+Current=2.5.2-dev
 Target=2.5.1-release
 Release=2.5.0-release
-Changes=Tyre change recommendation depending on weather conditions incl. adjusted pressures depending on compound, Current ACC pitstop settings integrated
-Date=03/08/2021
+Changes=Tyre change recommendation depending on weather conditions incl. adjusted pressures depending on compound, Better weather change updates, Current ACC pitstop settings integrated
+Date=03/09/2021

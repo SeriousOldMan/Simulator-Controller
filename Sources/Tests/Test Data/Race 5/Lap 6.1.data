@@ -30,8 +30,8 @@ TyrePressureRR=26.2
 [Weather Data]
 Temperature=15.4645
 Weather=Drizzle
-Weather10min=Drizzle
-Weather30min=Drizzle
+Weather10min=MediumRain
+Weather30min=HeavyRain
 [Race Data]
 Car=mclaren_720s_gt3
 Track=Paul_Ricard

@@ -545,7 +545,10 @@ priority: -20, [?Pitstop.Lap = ?Lap] => (Clear: Weather.Tyre.Change.Recommended)
 										(Clear: Weather.Tyre.Compound.Target)
 
 weatherChangeNotification(?lap, ?minutes) <= remainingRaceTime(?lap, ?raceTime), ?remainingMinutes = ?raceTime / 60000,							\
-											 ?remainingMinutes > ?minutes, Call(weatherChangeNotification, ?minutes),							\
+											 ?remainingMinutes > ?minutes, Call(weatherChangeNotification, true, ?minutes),						\
+											 Set(Weather.Change.Notified, ?lap)
+weatherChangeNotification(?lap, ?minutes) <= remainingRaceTime(?lap, ?raceTime), ?remainingMinutes = ?raceTime / 60000,							\
+											 =<(?remainingMinutes, ?minutes), Call(weatherChangeNotification, false, ?minutes),					\
 											 Set(Weather.Change.Notified, ?lap)
 											 
 weatherTyreChangeRecommendation(?lap, ?minutes, ?compound) <= remainingRaceTime(?lap, ?raceTime), ?remainingMinutes = ?raceTime / 60000,		\
@@ -553,6 +556,10 @@ weatherTyreChangeRecommendation(?lap, ?minutes, ?compound) <= remainingRaceTime(
 															  Call(weatherTyreChangeRecommendation, ?minutes, ?compound),						\
 															  Set(Weather.Tyre.Change.Recommended, ?lap), Set(Weather.Change.Notified, ?lap),	\
 															  Set(Weather.Tyre.Compound.Target, ?compound)
+weatherTyreChangeRecommendation(?lap, ?minutes, ?compound) <= remainingRaceTime(?lap, ?raceTime), ?remainingMinutes = ?raceTime / 60000,		\
+															  =<(?remainingMinutes, ?minutes),													\
+															  Call(weatherChangeNotification, false, ?minutes),									\
+															  Set(Weather.Tyre.Change.Recommended, ?lap), Set(Weather.Change.Notified, ?lap)
 
 
 ;;;-------------------------------------------------------------------------;;;

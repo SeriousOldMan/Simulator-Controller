@@ -50,7 +50,7 @@ global kCompilerNonCompliantTestRules
 
 kRules =
 (
-				oc(?O) <= eq(?O, f(?O))
+				oc(?O) <= ?O = f(?O)
 				eq(?X, ?X)
 				
 				sf(?F) <= Set(?F, true), !, fail
@@ -62,10 +62,10 @@ kRules =
 				concat([?H | ?T], ?L, [?H | ?R]) <= concat(?T, ?L, ?R)
 
 				fac(0, 1)
-				fac(?X, ?R) <= >(?X, 0), -(?N, ?X, 1), fac(?N, ?T), *(?R, ?T, ?X)
+				fac(?X, ?R) <= ?X > 0, -(?N, ?X, 1), fac(?N, ?T), ?R = ?T * ?X
 				
 				sum([], 0)
-				sum([?h | ?t], ?sum) <= sum(?t, ?tSum), +(?sum, ?h, ?tSum)
+				sum([?h | ?t], ?sum) <= sum(?t, ?tSum), ?sum = ?h + ?tSum
 				
 				construct(?A, ?B) <= Append(Foo., ?B, .Bar, ?A)
 

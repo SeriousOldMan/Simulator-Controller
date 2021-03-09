@@ -1559,11 +1559,11 @@ class RaceEngineer extends ConfigurationItem {
 		}
 	}
 	
-	weatherChangeNotification(minutes) {
+	weatherChangeNotification(change, minutes) {
 		if this.Speaker {
 			speaker := this.getSpeaker()
 			
-			speaker.speakPhrase("WeatherChange", {minutes: minutes})
+			speaker.speakPhrase(change ? "WeatherChange" : "WeatherNoChange", {minutes: minutes})
 		}
 	}
 	
@@ -1665,8 +1665,8 @@ reportDamageAnalysis(context, repair, stintLaps, delta) {
 	return true
 }
 
-weatherChangeNotification(context, minutes) {
-	context.KnowledgeBase.RaceEngineer.weatherChangeNotification(minutes)
+weatherChangeNotification(context, change, minutes) {
+	context.KnowledgeBase.RaceEngineer.weatherChangeNotification(change, minutes)
 	
 	return true
 }

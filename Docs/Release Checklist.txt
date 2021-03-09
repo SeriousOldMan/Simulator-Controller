@@ -13,7 +13,7 @@ General Release Actions
 Release 2.6 Checklist
 =====================
 1. Update Procedure
-   a. New Translations, New Phrase Grammars
+   a. New Translations, New Phrase Grammars, Simulator Tools.targets
 2. Changed Documentation
    a. Virtual Race Engineer
 3. Race Engineer Settings format changed again

@@ -2304,8 +2304,6 @@ class KnowledgeBase {
 					break
 				
 				if ruleEntry.Rule.produce(this) {
-					ruleEntry.deactivate()
-					
 					result := true
 					
 					if (generation != facts.Generation) {
@@ -2314,12 +2312,11 @@ class KnowledgeBase {
 						break
 					}
 				}
-				else {
-					if (this.RuleEngine.TraceLevel <= kTraceMedium)
-						this.RuleEngine.trace(kTraceMedium, "Deactivating rule " . ruleEntry.Rule.toString())
-						
-					ruleEntry.deactivate()
-				}
+				
+				if (this.RuleEngine.TraceLevel <= kTraceMedium)
+					this.RuleEngine.trace(kTraceMedium, "Deactivating rule " . ruleEntry.Rule.toString())
+					
+				ruleEntry.deactivate()
 					
 				ruleEntry := ruleEntry.Next
 			}

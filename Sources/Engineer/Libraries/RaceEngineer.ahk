@@ -53,6 +53,9 @@ class RaceEngineer extends ConfigurationItem {
 	
 	iName := false	
 	iSpeaker := false
+	iSpeakerVolume := 100
+	iSpeakerPitch := 0
+	iSpeakerSpeed := 0
 	iListener := false
 	
 	iVoiceServer := false
@@ -396,6 +399,9 @@ class RaceEngineer extends ConfigurationItem {
 		
 		this.iLanguage := getConfigurationValue(configuration, "Voice Control", "Language", getLanguage())
 		this.iSpeaker := getConfigurationValue(configuration, "Voice Control", "Speaker", true)
+		this.iSpeakerVolume := getConfigurationValue(configuration, "Voice Control", "SpeakerVolume", 100)
+		this.iSpeakerPitch := getConfigurationValue(configuration, "Voice Control", "SpeakerPitch", 0)
+		this.iSpeakerSpeed := getConfigurationValue(configuration, "Voice Control", "SpeakerSpeed", 0)
 		this.iListener := getConfigurationValue(configuration, "Voice Control", "Listener", false)
 		this.iPushTalk := getConfigurationValue(configuration, "Voice Control", "PushToTalk", false)
 	}
@@ -423,10 +429,15 @@ class RaceEngineer extends ConfigurationItem {
 			if this.VoiceServer
 				this.iSpeechGenerator := new this.RemoteEngineerSpeaker(this, this.Speaker, this.Language
 																	  , this.buildFragments(this.Language), this.buildPhrases(this.Language))
-			else
+			else {
 				this.iSpeechGenerator := new this.LocalEngineerSpeaker(this, this.Speaker, this.Language
 																	 , this.buildFragments(this.Language), this.buildPhrases(this.Language))
 			
+				this.iSpeechGenerator.setVolume(this.iSpeakerVolume)
+				this.iSpeechGenerator.setPitch(this.iSpeakerPitch)
+				this.iSpeechGenerator.setRate(this.iSpeakerSpeed)
+			}
+				
 			this.startListener()
 		}
 		

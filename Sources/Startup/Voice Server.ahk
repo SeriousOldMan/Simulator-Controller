@@ -46,6 +46,9 @@ ListLines Off					; Disable execution history
 class VoiceServer extends ConfigurationItem {
 	iLanguage := "en"
 	iSpeaker := true
+	iSpeakerVolume := 100
+	iSpeakerPitch := 0
+	iSpeakerSpeed := 0
 	iListener := false
 	iPushTalk := false
 	
@@ -95,8 +98,13 @@ class VoiceServer extends ConfigurationItem {
 	
 	SpeechGenerator[create := false] {
 		Get {
-			if (create && this.Speaker && !this.iSpeechGenerator)
+			if (create && this.Speaker && !this.iSpeechGenerator) {
 				this.iSpeechGenerator := new SpeechGenerator(this.Speaker, this.Language)
+				
+				this.iSpeechGenerator.setVolume(this.iSpeakerVolume)
+				this.iSpeechGenerator.setPitch(this.iSpeakerPitch)
+				this.iSpeechGenerator.setRate(this.iSpeakerSpeed)
+			}
 			
 			return this.iSpeechGenerator
 		}
@@ -126,6 +134,9 @@ class VoiceServer extends ConfigurationItem {
 		
 		this.iLanguage := getConfigurationValue(configuration, "Voice Control", "Language", getLanguage())
 		this.iSpeaker := getConfigurationValue(configuration, "Voice Control", "Speaker", true)
+		this.iSpeakerVolume := getConfigurationValue(configuration, "Voice Control", "SpeakerVolume", 100)
+		this.iSpeakerPitch := getConfigurationValue(configuration, "Voice Control", "SpeakerPitch", 0)
+		this.iSpeakerSpeed := getConfigurationValue(configuration, "Voice Control", "SpeakerSpeed", 0)
 		this.iListener := getConfigurationValue(configuration, "Voice Control", "Listener", false)
 		this.iPushTalk := getConfigurationValue(configuration, "Voice Control", "PushToTalk", false)
 		

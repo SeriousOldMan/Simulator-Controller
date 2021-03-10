@@ -885,6 +885,9 @@ class SimulatorsList extends ConfigurationItemList {
 
 global voiceLanguageDropDown
 global speakerDropDown
+global speakerVolumeSlider
+global speakerPitchSlider
+global speakerSpeedSlider
 global listenerDropDown
 global pushToTalkEdit = ""
 
@@ -937,8 +940,17 @@ class VoiceControlTab extends ConfigurationItemTab {
 		if (chosen == 0)
 			chosen := 1
 		
-		Gui SE:Add, Text, x16 y104 w100 h23 +0x200, % translate("Speech Generator")
-		Gui SE:Add, DropDownList, x114 y104 w280 Choose%chosen% VspeakerDropDown, % values2String("|", voices*)
+		Gui SE:Add, Text, x16 y112 w100 h23 +0x200, % translate("Speech Generator")
+		Gui SE:Add, DropDownList, x114 y112 w280 Choose%chosen% VspeakerDropDown, % values2String("|", voices*)
+		
+		Gui SE:Add, Text, x16 y136w100 h23 +0x200, % translate("Volume")
+		Gui SE:Add, Slider, x114 y136 w135 Range0-100 ToolTip VspeakerVolumeSlider, % speakerVolumeSlider
+		
+		Gui SE:Add, Text, x16 y160w100 h23 +0x200, % translate("Pitch")
+		Gui SE:Add, Slider, x114 y160 w135 Range-10-10 ToolTip VspeakerPitchSlider, % speakerPitchSlider
+		
+		Gui SE:Add, Text, x16 y184 w100 h23 +0x200, % translate("Speed")
+		Gui SE:Add, Slider, x114 y184 w135 Range-10-10 ToolTip VspeakerSpeedSlider, % speakerSpeedSlider
 		
 		recognizers := new SpeechRecognizer().getRecognizerList().Clone()
 		
@@ -953,12 +965,12 @@ class VoiceControlTab extends ConfigurationItemTab {
 		if (chosen == 0)
 			chosen := 1
 		
-		Gui SE:Add, Text, x16 y128 w100 h23 +0x200, % translate("Speech Recognizer")
-		Gui SE:Add, DropDownList, x114 y128 w280 Choose%chosen% VlistenerDropDown, % values2String("|", recognizers*)
+		Gui SE:Add, Text, x16 y216 w100 h23 +0x200, % translate("Speech Recognizer")
+		Gui SE:Add, DropDownList, x114 y216 w280 Choose%chosen% VlistenerDropDown, % values2String("|", recognizers*)
 		
-		Gui SE:Add, Text, x16 y152 w70 h23 +0x200, % translate("Push To Talk")
-		Gui SE:Add, Edit, x114 y152 w110 h21 VpushToTalkEdit, %pushToTalkEdit%
-		Gui SE:Add, Button, x226 y151 w23 h23 ggetPTTHotkey HwnddetectPTTButtonHandle
+		Gui SE:Add, Text, x16 y240 w70 h23 +0x200, % translate("Push To Talk")
+		Gui SE:Add, Edit, x114 y240 w110 h21 VpushToTalkEdit, %pushToTalkEdit%
+		Gui SE:Add, Button, x226 y239 w23 h23 ggetPTTHotkey HwnddetectPTTButtonHandle
 		setButtonIcon(detectPTTButtonHandle, kIconsDirectory . "Key.ico", 1)
 	}
 	
@@ -974,6 +986,10 @@ class VoiceControlTab extends ConfigurationItemTab {
 			voiceLanguageDropDown := languageCode
 		
 		speakerDropDown := getConfigurationValue(configuration, "Voice Control", "Speaker", true)
+		speakerVolumeSlider := getConfigurationValue(configuration, "Voice Control", "SpeakerVolume", 100)
+		speakerPitchSlider := getConfigurationValue(configuration, "Voice Control", "SpeakerPitch", 0)
+		speakerSpeedSlider := getConfigurationValue(configuration, "Voice Control", "SpeakerSpeed", 0)
+		
 		listenerDropDown := getConfigurationValue(configuration, "Voice Control", "Listener", false)
 		pushToTalkEdit := getConfigurationValue(configuration, "Voice Control", "PushToTalk", false)
 		
@@ -996,6 +1012,9 @@ class VoiceControlTab extends ConfigurationItemTab {
 		
 		GuiControlGet voiceLanguageDropDown
 		GuiControlGet speakerDropDown
+		GuiControlGet speakerVolumeSlider
+		GuiControlGet speakerPitchSlider
+		GuiControlGet speakerSpeedSlider
 		GuiControlGet listenerDropDown
 		GuiControlGet pushToTalkEdit
 		
@@ -1029,6 +1048,9 @@ class VoiceControlTab extends ConfigurationItemTab {
 		
 		setConfigurationValue(configuration, "Voice Control", "Language", languageCode)
 		setConfigurationValue(configuration, "Voice Control", "Speaker", speakerDropDown)
+		setConfigurationValue(configuration, "Voice Control", "SpeakerVolume", speakerVolumeSlider)
+		setConfigurationValue(configuration, "Voice Control", "SpeakerPitch", speakerPitchSlider)
+		setConfigurationValue(configuration, "Voice Control", "SpeakerSpeed", speakerSpeedSlider)
 		setConfigurationValue(configuration, "Voice Control", "Listener", listenerDropDown)
 		setConfigurationValue(configuration, "Voice Control", "PushToTalk", (Trim(pushToTalkEdit) = "") ? false : pushToTalkEdit)
 	}

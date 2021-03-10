@@ -26,7 +26,7 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-[2.5.2-dev](https://www.dropbox.com/s/9p9gdmcgvhlo7n2/Simulator%20Controller%202.5.2-dev.zip?dl=2) (A lot of work under the hood - 1. Integrated ACC shared memory data on current pitstop setup to simplify the setup process, 2. Jona now knows to change compund incl. tyre pressure setup on an upcoming pitstop. No documentation or update procedures yet...)
+[2.5.3-dev](https://www.dropbox.com/s/j483tozyh2eskk4/Simulator%20Controller%202.5.3-dev.zip?dl=1) (A lot of work under the hood - 1. Integrated ACC shared memory data on current pitstop setup to simplify the setup process, 2. Jona now knows to change compund incl. tyre pressure setup on an upcoming pitstop. No documentation or update procedures yet...)
 
 #### Latest release builds
 

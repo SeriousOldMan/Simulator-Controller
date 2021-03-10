@@ -7,7 +7,7 @@
   5. The support for multiple Button Boxes has been extended
      - New capabilities in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration) for Launchpad applications and chat messages
 	 - The Button Box [configuration file](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#button-box-layouts) format has been extended to allow for the definition of several layout margin and filler options
-  6. Volume, pitch and speed settings has been added to the voice control configuration to customize the voice output to your taste
+  6. Volume, pitch and speed settings has been added to the [voice control configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) to customize the voice output to your taste
   
   As with all releases since Release 2.0, automated update procedures take care of your local configuration database. But there might be additional installation steps or preparations required, which are described in the documentation about the [Release 2.5.4 update requirements](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-254).
   

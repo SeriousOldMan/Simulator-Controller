@@ -917,16 +917,14 @@ class ControllerFunction {
 	disconnectAction(action) {
 		local controller := this.Controller
 		
+		this.setText("")
+		
 		for ignore, trigger in this.Function.Trigger {
-			for ignore, theHotkey in this.Hotkeys[trigger] {
+			for ignore, theHotkey in this.Hotkeys[trigger]
 				if (SubStr(theHotkey, 1, 1) = "?")
 					controller.disableVoiceCommand(SubStr(theHotkey, 2))
-				else {
-					this.setText("")
-					
+				else
 					Hotkey %theHotkey%, Off
-				}
-			}
 		}
 	}
 }

@@ -15,9 +15,12 @@ Release 2.6 Checklist
 1. Update Procedure
    a. New Translations, New Phrase Grammars, Simulator Tools.targets, Plugin Labels
 2. Changed Documentation
-   a. Virtual Race Engineer
+   a. Virtual Race Engineer, Updates, Backlog
 3. Race Engineer Settings format changed again
 4. New ACC plugin argument "raceEngineerSettings"
+5. Launchpad & Chat Tabs
+   a. Documentation Update
+   b. Screenshot Update
 
 Release 2.5 Checklist
 =====================

@@ -215,7 +215,7 @@ class ConfigurationItemList extends ConfigurationItem {
 		
 			this.loadList(this.iItemsList)
 			
-			this.selectItem(this.iItemsList.Length())
+			this.selectItem(inList(this.iItemsList, item))
 		}
 	}
 	
@@ -1166,6 +1166,8 @@ class PluginsTab extends ConfigurationItemList {
 		Gui ListView, % this.ListHandle
 	
 		bubbleSort(items, "comparePlugins")
+		
+		this.iItemsList := items
 	
 		count := LV_GetCount()
 		
@@ -1951,10 +1953,9 @@ updateFunctionEditorState() {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 global launchpadListView = false
+global launchpadNumberEdit = 1
 global launchpadLabelEdit = ""
 global launchpadApplicationDropDown = 0
-global launchpadUpButton
-global launchpadDownButton
 global launchpadAddButton
 global launchpadDeleteButton
 global launchpadUpdateButton
@@ -1962,7 +1963,7 @@ global launchpadUpdateButton
 class LaunchpadTab extends ConfigurationItemList {
 	__New(configuration) {
 		base.__New(configuration, this.createControls(configuration), "launchpadListView"
-				 , "launchpadAddButton", "launchpadDeleteButton", "launchpadUpdateButton", "launchpadUpButton", "launchpadDownButton")
+				 , "launchpadAddButton", "launchpadDeleteButton", "launchpadUpdateButton")
 				 
 		LaunchpadTab.Instance := this
 	}
@@ -1970,15 +1971,17 @@ class LaunchpadTab extends ConfigurationItemList {
 	createControls(configuration) {
 		Gui SE:Add, ListView, x16 y80 w377 h190 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndlaunchpadListViewHandle VlaunchpadListView glistEvent
 							, % values2String("|", map(["#", "Label", "Application"], "translate")*)
-	
-		Gui SE:Add, Button, x316 y272 w38 h23 Disabled VlaunchpadUpButton gupItem, % translate("Up")
-		Gui SE:Add, Button, x356 y272 w38 h23 Disabled VlaunchpadDownButton gdownItem, % translate("Down")
 		
-		Gui SE:Add, Text, x16 y280 w86 h23 +0x200, % translate("Label")
-		Gui SE:Add, Edit, x110 y280 w80 h21 VlaunchpadLabelEdit, %launchpadLabelEdit%
+		Gui SE:Add, Text, x16 y280 w86 h23 +0x200, % translate("Button")
+		Gui SE:Add, Text, x95 y280 w23 h23 +0x200, % translate("#")
+		Gui SE:Add, Edit, x110 y280 w40 h21 Number VlaunchpadNumberEdit, %launchpadNumberEdit%
+		Gui SE:Add, UpDown, x150 y280 w17 h21, 1
 		
-		Gui SE:Add, Text, x16 y304 w86 h23 +0x200, % translate("Application")
-		Gui SE:Add, DropDownList, x110 y304 w284 h21 R10 Choose%launchpadApplicationDropDown% VlaunchpadApplicationDropDown
+		Gui SE:Add, Text, x16 y304 w86 h23 +0x200, % translate("Label")
+		Gui SE:Add, Edit, x110 y304 w80 h21 VlaunchpadLabelEdit, %launchpadLabelEdit%
+		
+		Gui SE:Add, Text, x16 y328 w86 h23 +0x200, % translate("Application")
+		Gui SE:Add, DropDownList, x110 y328 w284 h21 R10 Choose%launchpadApplicationDropDown% VlaunchpadApplicationDropDown
 		
 		Gui SE:Add, Button, x184 y490 w46 h23 VlaunchpadAddButton gaddItem, % translate("Add")
 		Gui SE:Add, Button, x232 y490 w50 h23 Disabled VlaunchpadDeleteButton gdeleteItem, % translate("Delete")
@@ -1990,10 +1993,11 @@ class LaunchpadTab extends ConfigurationItemList {
 	loadFromConfiguration(configuration) {
 		base.loadFromConfiguration(configuration)
 		
-		for category, launchpad in getConfigurationSectionValues(configuration, "Launchpad", Object()) {
+		for descriptor, launchpad in getConfigurationSectionValues(configuration, "Launchpad", Object()) {
+			descriptor := ConfigurationItem.splitDescriptor(descriptor)
 			launchpad := string2Values("|", launchpad)
 
-			this.iItemsList.Push(Array(launchpad[1], launchpad[2]))
+			this.iItemsList.Push(Array(descriptor[2], launchpad[1], launchpad[2]))
 		}
 		
 		this.loadApplicationChoices()
@@ -2002,8 +2006,8 @@ class LaunchpadTab extends ConfigurationItemList {
 	saveToConfiguration(configuration) {
 		base.saveToConfiguration(configuration)
 		
-		for index, launchpadApplication in this.iItemsList
-			setConfigurationValue(configuration, "Launchpad", ConfigurationItem.descriptor("Button", index), values2String("|", launchpadApplication[1], launchpadApplication[2]))	
+		for ignore, launchpadApplication in this.iItemsList
+			setConfigurationValue(configuration, "Launchpad", ConfigurationItem.descriptor("Button", launchpadApplication[1]), values2String("|", launchpadApplication[2], launchpadApplication[3]))	
 	}
 	
 	loadList(items) {
@@ -2013,8 +2017,12 @@ class LaunchpadTab extends ConfigurationItemList {
 	
 		LV_Delete()
 		
-		for index, launchpadApplication in items {
-			LV_Add("", index, launchpadApplication[1], launchpadApplication[2])
+		bubbleSort(items, "compareLaunchApplications")
+		
+		this.iItemsList := items
+		
+		for ignore, launchpadApplication in items {
+			LV_Add("", launchpadApplication[1], launchpadApplication[2], launchpadApplication[3])
 		}
 		
 		if first {
@@ -2034,26 +2042,33 @@ class LaunchpadTab extends ConfigurationItemList {
 		launchpadApplicationDropDown := (application ? inList(launchpadApplicationsList, application) : 0)
 		
 		GuiControl Text, launchpadApplicationDropDown, % "|" . values2String("|", launchpadApplicationsList*)
-		GuiControl Choose, launchpadApplicationDropDown, % application ? application : ""
+		
+		if application
+			GuiControl Choose, launchpadApplicationDropDown, %application%
 	}
 	
 	loadEditor(item) {
-		launchpadLabelEdit := item[1]
+		launchpadNumberEdit := item[1]
+		launchpadLabelEdit := item[2]
 		
+		GuiControl Text, launchpadNumberEdit, %launchpadNumberEdit%
 		GuiControl Text, launchpadLabelEdit, %launchpadLabelEdit%
 		
-		this.loadApplicationChoices(item[2])
+		this.loadApplicationChoices(item[3])
 	}
 	
 	clearEditor() {
+		launchpadNumberEdit := 1
 		launchpadLabelEdit := ""
 		
+		GuiControl Text, launchpadNumberEdit, %launchpadNumberEdit%
 		GuiControl Text, launchpadLabelEdit, %launchpadLabelEdit%
 		
 		this.loadApplicationChoices()
 	}
 	
 	buildItemFromEditor(isNew := false) {
+		GuiControlGet launchpadNumberEdit
 		GuiControlGet launchpadLabelEdit
 		GuiControlGet launchpadApplicationDropDown
 		
@@ -2065,9 +2080,36 @@ class LaunchpadTab extends ConfigurationItemList {
 			
 			return false
 		}
-		else
-			return Array(launchpadLabelEdit, launchpadApplicationDropDown)
+		else if isNew
+			for ignore, item in this.iItemsList
+				if (item[1] = launchpadNumberEdit) {
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+					title := translate("Error")
+					MsgBox 262160, %title%, % translate("An application launcher for this button already exists - please use different values...")
+					OnMessage(0x44, "")
+			
+					return false
+				}
+		
+		return Array(launchpadNumberEdit, launchpadLabelEdit, launchpadApplicationDropDown)
 	}
+	
+	updateItem() {
+		launchApplication := this.buildItemFromEditor()
+	
+		if (launchApplication && (launchApplication[1] != this.iItemsList[this.iCurrentItemIndex][1])) {
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+			title := translate("Error")
+			MsgBox 262160, %title%, % translate("The button number of an existing application launcher may not be changed...")
+			OnMessage(0x44, "")
+		}
+		else
+			base.updateItem()
+	}
+}
+
+compareLaunchApplications(a1, a2) {
+	return (a1[1] >= a2[1])
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -2075,10 +2117,9 @@ class LaunchpadTab extends ConfigurationItemList {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 global chatMessagesListView = false
+global chatMessageNumberEdit = 1
 global chatMessageLabelEdit = ""
 global chatMessageMessageEdit = ""
-global chatMessageUpButton
-global chatMessageDownButton
 global chatMessageAddButton
 global chatMessageDeleteButton
 global chatMessageUpdateButton
@@ -2086,7 +2127,7 @@ global chatMessageUpdateButton
 class ChatMessagesTab extends ConfigurationItemList {
 	__New(configuration) {
 		base.__New(configuration, this.createControls(configuration), "chatMessagesListView"
-				 , "chatMessageAddButton", "chatMessageDeleteButton", "chatMessageUpdateButton", "chatMessageUpButton", "chatMessageDownButton")
+				 , "chatMessageAddButton", "chatMessageDeleteButton", "chatMessageUpdateButton")
 				 
 		ChatMessagesTab.Instance := this
 	}
@@ -2095,14 +2136,16 @@ class ChatMessagesTab extends ConfigurationItemList {
 		Gui SE:Add, ListView, x16 y80 w377 h190 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndchatMessagesListViewHandle VchatMessagesListView glistEvent
 							, % values2String("|", map(["#", "Label", "Text"], "translate")*)
 		
-		Gui SE:Add, Button, x316 y272 w38 h23 Disabled VchatMessageUpButton gupItem, % translate("Up")
-		Gui SE:Add, Button, x356 y272 w38 h23 Disabled VchatMessageDownButton gdownItem, % translate("Down")
+		Gui SE:Add, Text, x16 y280 w86 h23 +0x200, % translate("Button")
+		Gui SE:Add, Text, x95 y280 w23 h23 +0x200, % translate("#")
+		Gui SE:Add, Edit, x110 y280 w40 h21 Number VchatMessageNumberEdit, %chatMessageNumberEdit%
+		Gui SE:Add, UpDown, x150 y280 w17 h21, 1
 		
-		Gui SE:Add, Text, x16 y280 w86 h23 +0x200, % translate("Label")
-		Gui SE:Add, Edit, x110 y280 w80 h21 VchatMessageLabelEdit, %chatMessageLabelEdit%
+		Gui SE:Add, Text, x16 y304 w86 h23 +0x200, % translate("Label")
+		Gui SE:Add, Edit, x110 y304 w80 h21 VchatMessageLabelEdit, %chatMessageLabelEdit%
 		
-		Gui SE:Add, Text, x16 y304 w86 h23 +0x200, % translate("Message")
-		Gui SE:Add, Edit, x110 y304 w284 h21 VchatMessageMessageEdit, %chatMessageMessageEdit%
+		Gui SE:Add, Text, x16 y328 w86 h23 +0x200, % translate("Message")
+		Gui SE:Add, Edit, x110 y328 w284 h21 VchatMessageMessageEdit, %chatMessageMessageEdit%
 		
 		Gui SE:Add, Button, x184 y490 w46 h23 VchatMessageAddButton gaddItem, % translate("Add")
 		Gui SE:Add, Button, x232 y490 w50 h23 Disabled VchatMessageDeleteButton gdeleteItem, % translate("Delete")
@@ -2114,18 +2157,19 @@ class ChatMessagesTab extends ConfigurationItemList {
 	loadFromConfiguration(configuration) {
 		base.loadFromConfiguration(configuration)
 		
-		for category, chatMessage in getConfigurationSectionValues(configuration, "Chat Messages", Object()) {
+		for descriptor, chatMessage in getConfigurationSectionValues(configuration, "Chat Messages", Object()) {
+			descriptor := ConfigurationItem.splitDescriptor(descriptor)
 			chatMessage := string2Values("|", chatMessage)
 
-			this.iItemsList.Push(Array(chatMessage[1], chatMessage[2]))
+			this.iItemsList.Push(Array(descriptor[2], chatMessage[1], chatMessage[2]))
 		}
 	}
 		
 	saveToConfiguration(configuration) {
 		base.saveToConfiguration(configuration)
 		
-		for index, chatMessagesApplication in this.iItemsList
-			setConfigurationValue(configuration, "Chat Messages", ConfigurationItem.descriptor("Button", index), values2String("|", chatMessagesApplication[1], chatMessagesApplication[2]))	
+		for ignore, chatMessage in this.iItemsList
+			setConfigurationValue(configuration, "Chat Messages", ConfigurationItem.descriptor("Button", chatMessage[1]), values2String("|", chatMessage[2], chatMessage[3]))	
 	}
 	
 	loadList(items) {
@@ -2135,8 +2179,12 @@ class ChatMessagesTab extends ConfigurationItemList {
 	
 		LV_Delete()
 		
-		for index, chatMessage in items {
-			LV_Add("", index, chatMessage[1], chatMessage[2])
+		bubbleSort(items, "compareChatMessages")
+		
+		this.iItemsList := items
+		
+		for ignore, chatMessage in items {
+			LV_Add("", chatMessage[1], chatMessage[2], chatMessage[3])
 		}
 		
 		if first {
@@ -2148,27 +2196,68 @@ class ChatMessagesTab extends ConfigurationItemList {
 	}
 	
 	loadEditor(item) {
-		chatMessageLabelEdit := item[1]
-		chatMessageMessageEdit := item[2]
+		chatMessageNumberEdit := item[1]
+		chatMessageLabelEdit := item[2]
+		chatMessageMessageEdit := item[3]
 			
+		GuiControl Text, chatMessageNumberEdit, %chatMessageNumberEdit%
 		GuiControl Text, chatMessageLabelEdit, %chatMessageLabelEdit%
 		GuiControl Text, chatMessageMessageEdit, %chatMessageMessageEdit%
 	}
 	
 	clearEditor() {
+		chatMessageNumberEdit := 1
 		chatMessageLabelEdit := ""
 		chatMessageMessageEdit := ""
 		
+		GuiControl Text, chatMessageNumberEdit, %chatMessageNumberEdit%
 		GuiControl Text, chatMessageLabelEdit, %chatMessageLabelEdit%
 		GuiControl Text, chatMessageMessageEdit, %chatMessageMessageEdit%
 	}
 	
 	buildItemFromEditor(isNew := false) {
+		GuiControlGet chatMessageNumberEdit
 		GuiControlGet chatMessageLabelEdit
 		GuiControlGet chatMessageMessageEdit
 		
-		return Array(chatMessageLabelEdit, chatMessageMessageEdit)
+		if ((chatMessageLabelEdit = "") || (chatMessageMessageEdit = "")) {
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+			title := translate("Error")
+			MsgBox 262160, %title%, % translate("Invalid values detected - please correct...")
+			OnMessage(0x44, "")
+			
+			return false
+		}
+		else if isNew
+			for ignore, item in this.iItemsList
+				if (item[1] = chatMessageNumberEdit) {
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+					title := translate("Error")
+					MsgBox 262160, %title%, % translate("A chat message for this button already exists - please use different values...")
+					OnMessage(0x44, "")
+			
+					return false
+				}
+		
+		return Array(chatMessageNumberEdit, chatMessageLabelEdit, chatMessageMessageEdit)
 	}
+	
+	updateItem() {
+		chatMessage := this.buildItemFromEditor()
+	
+		if (chatMessage && (chatMessage[1] != this.iItemsList[this.iCurrentItemIndex][1])) {
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+			title := translate("Error")
+			MsgBox 262160, %title%, % translate("The button number of an existing chat message may not be changed...")
+			OnMessage(0x44, "")
+		}
+		else
+			base.updateItem()
+	}
+}
+
+compareChatMessages(c1, c2) {
+	return (c1[1] >= c2[1])
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;

@@ -203,7 +203,7 @@ Using the buttons and dials you may change the pitstop settings in the same way 
 
 	closePitstopMFD: {Insert}; openPitstopMFD: P;
 	pitstopSettings: Strategy Dial.1, Refuel Dial.2 5, TyreSet Button.1 Button.5, TyreCompound Button.2 Button.6,
-					TyreAllAround Button.3 Button.7, SuspensionRepair Button.4, BodyworkRepair Button.8
+					 TyreAllAround Button.3 Button.7, SuspensionRepair Button.4, BodyworkRepair Button.8
 
 ### Configuration
 
@@ -250,14 +250,14 @@ Note: The picture search will initially take some time, but the algorithm will l
  
 The ACC plugin can automatically start Jona, the [Virtual Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer) to support you during an *Assetto Corsa Competizione* race event. The following configuration parameters allow you to customize Jona to your preferences:
 
-	raceEngineer: *initialState* *onOffFunction*;
+	raceEngineer: *initialState* *onOffFunction*; raceEngineerSettings: *settingFunction1*;
 	raceEngineerName: *name*; raceEngineerLogo: true or false;
 	raceEngineerSpeaker: false, true or *Microsoft Speech Generation Language*;
 	raceEngineerListener: false, true or *Microsoft Speech Recognition Language*
 	
-For Jona to be generally available, you must supply an argument for the *raceEngineerName* parameter. You can define a function on your hardware controller with the parameter *raceEngineer*, to enable or disable the Virtual Race Engineer dynamically. *initialState* must be either "On" or "Off" and for *onOffFunction* unary and binary functions are supported. The function will be bound to a plugin action.
+For Jona to be generally available, you must supply an argument for the *raceEngineerName* parameter. You can define a function on your hardware controller with the parameter *raceEngineer*, to enable or disable the Virtual Race Engineer dynamically. *initialState* must be either "On" or "Off" and for *onOffFunction* unary and binary functions are supported. The function will be bound to a plugin action. Additionally, the parameter *raceEngineerSettings* allows you to bind a plugin action to your hardware controller, which opens the race engineer [settings dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-engineer-settings), which you must use before a race to give Jona the necessary information about your car setup and other stuff.
 
-Note: If you disable Jona during an active race, the race engineer will stop working immediately, but if you enable it during an active race after the initial lap, Jona will not be available until the next race. 
+Note: If you disable Jona during an active race, the race engineer will stop working immediately. You can also enable Jona at the beginning of a race, but only until you cross the start/finish line for the first time. If you enable Jona after the initial lap, Jona will not be available until the next race. 
 
 With *true* supplied for *raceEngineerLogo*, Jona will show a nice rotating AI brain in the lower right corner of the screen, while the AI kernel is working, but you will get a short lag in your simulation, when this window pops up. With *raceEngineerSpeaker* and *raceEngineerListener* you can customize the natural language interface (or the personality) of Jona. If you simply supply *true* as arguments, a voice and the corresponding recognition engine will be choosen based on the currently configured language. If you prefer a specific voice and / or a specific language, you can supply the name for this voice and language instead (Example: "Microsoft David Desktop" is a male US-English voice and "Microsoft Server Speech Recognition - TELE (de-DE)" provide german spoken language recognition. The phrase grammars of Jona can be localized for any language, with English and German already supplied by the standard distribution of Simulator Controller, but you will also need the corresponding Windows libraries for TTS (text-to-speech) and STT (speech-to-text). For more information about Jona, see the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer).
 

@@ -43,6 +43,18 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ***
 
+## Release 2.5.4
+
+With this release, Jona is feature complete and therefore no longer to be considered in alpha stage. There still might be situations, where Jonas recommendations are wrong, so always double check, especially during important races. See the documentation on the [virtual race engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer), especially the chapter on [How it works](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#how-it-works) for updated information.
+
+The format of the *Race Engineer.settings* file changed again and the [settings tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-engineer-settings) had been updated for the tyre compound selection rules. Please open the settings tool and check all values, especially for weather related tyre compound changes on upcoming pitstops, and leave the dialog by pressing "Ok".
+
+Beside tremendous changes under the hood for Jona, Release 2.5.5 delivers a new plugin argument for the *Assetto Corsa Competizione* plugin, which allows you to open the race engineer settings dialog from your hardware controller. Please consult the update [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-acc) for more information as well.
+
+And, last but not least, the support for multiple button boxes has been extended. You can now distribute the applications of the Lauchpad and also the chat messages across multiple Button Boxes using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration).
+
+***
+
 ## Release 2.5
 
 A new tab in the configuration tool allows you to configure the language to be used for voice generation and recognition and also introduces a *Push To Talk* functionality for voice recognition. Please read the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control), if you want to use the new features.

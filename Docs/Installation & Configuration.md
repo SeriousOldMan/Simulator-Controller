@@ -177,7 +177,7 @@ On the launchpad, you can define a list of type "Other" applications, that can b
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%205.JPG)
 
-You need to specify a small label text to display on the visual representation of your controller and you need to choose the application, which will be launched, when the corresponding button is pressed. You can use the "Up" and "Down" buttons to specifiy the position of these applications on the launchpad.
+In the first field, you define the push button function for the given application on one of your hardware controllers. You also need to specify a small label text to display on the visual representation of your controller and you need to choose the application, which will be launched, when the corresponding button is pressed.
 
 ### Tab *Chat*
 
@@ -185,7 +185,7 @@ Many simulation games provide an ingame multiplayer text based chat system. Sinc
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%206.JPG)
 
-You need to specify a small label text to display on the visual representation of your controller and you specifiy the long chat message, which will be send to the ingame chat system. You can use the "Up" and "Down" buttons to specifiy the position of these chat messages on the controller hardware.
+In the first field, you define the push button function for the given chat message on one of your hardware controllers. You also need to specify a small label text to display on the visual representation of your controller and you specifiy the long chat message, which will be send to the ingame chat system, when the corresponding button is pressed.
 
 ## Themes Editor
 

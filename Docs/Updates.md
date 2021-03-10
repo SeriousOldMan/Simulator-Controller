@@ -49,7 +49,7 @@ With this release, Jona is feature complete and therefore no longer to be consid
 
 The format of the *Race Engineer.settings* file changed again and the [settings tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-engineer-settings) had been updated for the tyre compound selection rules. Please open the settings tool and check all values, especially for weather related tyre compound changes on upcoming pitstops, and leave the dialog by pressing "Ok".
 
-Beside tremendous changes under the hood for Jona, Release 2.5.5 delivers a new plugin argument for the *Assetto Corsa Competizione* plugin, which allows you to open the race engineer settings dialog from your hardware controller. Please consult the update [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-acc) for more information as well.
+Beside tremendous changes under the hood for Jona, Release 2.5.4 delivers a new plugin argument for the *Assetto Corsa Competizione* plugin, which allows you to open the race engineer settings dialog from your hardware controller. Please consult the update [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-acc) for more information as well.
 
 And, last but not least, the support for multiple button boxes has been extended. You can now distribute the applications of the Lauchpad and also the chat messages across multiple Button Boxes using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration).
 

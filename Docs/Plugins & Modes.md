@@ -250,7 +250,7 @@ Note: The picture search will initially take some time, but the algorithm will l
  
 The ACC plugin can automatically start Jona, the [Virtual Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer) to support you during an *Assetto Corsa Competizione* race event. The following configuration parameters allow you to customize Jona to your preferences:
 
-	raceEngineer: *initialState* *onOffFunction*; raceEngineerSettings: *settingFunction1*;
+	raceEngineer: *initialState* *onOffFunction*; raceEngineerSettings: *settingsFunction*;
 	raceEngineerName: *name*; raceEngineerLogo: true or false;
 	raceEngineerSpeaker: false, true or *Microsoft Speech Generation Language*;
 	raceEngineerListener: false, true or *Microsoft Speech Recognition Language*

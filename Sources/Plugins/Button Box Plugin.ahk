@@ -82,7 +82,10 @@ class GridButtonBox extends ButtonBox {
 	
 	iRows := 0
 	iColumns := 0
-	iDirection := false
+	iRowMargin := this.kRowMargin
+	iColumnMargin := this.kColumnMargin
+	iBorderMargin := this.kBorderMargin
+	iBottomMargin := this.kBottomMargin
 	
 	iRowDefinitions := []
 	iControls := {}
@@ -111,9 +114,27 @@ class GridButtonBox extends ButtonBox {
 		}
 	}
 	
-	Direction[] {
+	RowMargin[] {
 		Get {
-			return this.iDirection
+			return this.iRowMargin
+		}
+	}
+	
+	ColumnMargin[] {
+		Get {
+			return this.iColumnMargin
+		}
+	}
+	
+	BorderMargin[] {
+		Get {
+			return this.iBorderMargin
+		}
+	}
+	
+	BottomMargin[] {
+		Get {
+			return this.iBottomMargin
 		}
 	}
 	
@@ -135,9 +156,19 @@ class GridButtonBox extends ButtonBox {
 	loadFromConfiguration(configuration) {
 		base.loadFromConfiguration(configuration)
 		
-		layout := string2Values(";", getConfigurationValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Name, "Layout"), ""))
+		layout := string2Values(",", getConfigurationValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Name, "Layout"), ""))
 		
-		this.iDirection := layout[2]
+		if (layout.Length() > 1)
+			this.iRowMargin := layout[2]
+		
+		if (layout.Length() > 2)
+			this.iColumnMargin := layout[3]
+		
+		if (layout.Length() > 3)
+			this.iBorderMargin := layout[4]
+		
+		if (layout.Length() > 4)
+			this.iBottomMargin := layout[5]
 		
 		layout := string2Values("x", layout[1])
 		
@@ -175,8 +206,8 @@ class GridButtonBox extends ButtonBox {
 		Loop % columnWidths.Length()
 			width += columnWidths[A_Index]
 		
-		height += ((rowHeights.Length() - 1) * this.kRowMargin) + this.kHeaderHeight + this.kBottomMargin
-		width += ((columnWidths.Length() - 1) * this.kColumnMargin) + (2 * this.kBorderMargin)
+		height += ((rowHeights.Length() - 1) * this.RowMargin) + this.kHeaderHeight + this.BottomMargin
+		width += ((columnWidths.Length() - 1) * this.ColumnMargin) + (2 * this.BorderMargin)
 		
 		Gui %window%:-Border -Caption +AlwaysOnTop
 		
@@ -196,7 +227,7 @@ class GridButtonBox extends ButtonBox {
 			rowHeight := rowHeights[A_Index]
 			rowDefinition := this.RowDefinitions[A_Index]
 		
-			horizontal := this.kBorderMargin
+			horizontal := this.BorderMargin
 			
 			Loop % this.Columns
 			{
@@ -267,10 +298,10 @@ class GridButtonBox extends ButtonBox {
 					}
 				}
 				
-				horizontal += (columnWidth + this.kColumnMargin)
+				horizontal += (columnWidth + this.ColumnMargin)
 			}
 		
-			vertical += (rowHeight + this.kRowMargin)
+			vertical += (rowHeight + this.RowMargin)
 		}
 
 		Gui %window%:Add, Picture, x-10 y-10 gmoveButtonBox 0x4000000, % kButtonBoxImagesDirectory . "Photorealistic\CF Background.png"

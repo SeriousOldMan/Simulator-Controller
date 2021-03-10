@@ -228,7 +228,7 @@ Beginning with Release 2.5 it is possible to define Button Box layouts using a s
 	Master Controller.1=Switch.1,Label;Switch.2,Label;Switch.3,Label;Switch.4,Label;Switch.5,Label
 	Master Controller.2=Push.1,Label;Push.2,Label;Push.3,Label;Push.4,Label;Rotary.1,Label
 	Master Controller.3=Push.5,Label;Push.6,Label;Push.7,Label;Push.8,Label;Rotary.2,Label
-	Slave Controller.Layout=3 x 4
+	Slave Controller.Layout=3 x 4, 20, 60, 20, 15
 	Slave Controller.1=Push.9,Label;Push.10,Label;Push.11,Label;Push.12,Label
 	Slave Controller.2=Push.13,Label;Push.14,Label;Push.15,Label;Push.16,Label
 	Slave Controller.3=Push.17,Label;Push.18,Label;Push.19,Label;Push.20,Label
@@ -239,4 +239,4 @@ In the given configuration file, you first have to define the different *Control
 
 You may define different *Label* types, if you are using label fields of different sizes for your controls. The example only introduces one label with a fixed size for all controls.
 
-In the last section, the layouts of one or more Button Boxes are described using these components. For each Button Box you have to define the layout grid with *.Layout*" descriptor and then you enumerate the controls of each row seperately. It is possible to leave positions in the grid blank, when not every corresponding position on your Button Box is occupied with a control. It is also possible to create a control without a label field. The number of each control must correspond with the number of the corresponding controller function defined on the [*Controller* tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller).
+In the last section, the layouts of one or more Button Boxes are described using these components. For each Button Box you have to define the layout grid with *.Layout*" descriptor. The grid argument is required, the other optional parts as in "Slave Controller.Layout=3 x 4, 20, 60, 20, 15" are the *Row Margin*, *Column Margin*, *Border Margin* and *Bottom Margin* with 20, 40, 20 and 15 as default. After defining the layout, you enumerate the controls of each row seperately. It is possible to leave positions in the grid blank, when not every corresponding position on your Button Box is occupied with a control. It is also possible to create a control without a label field. The number of each control must correspond with the number of the corresponding controller function defined on the [*Controller* tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller).

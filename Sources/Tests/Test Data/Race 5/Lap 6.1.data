@@ -2,7 +2,7 @@
 BodyworkDamage=2.4899, 0, 0, 0, 2.4899
 SuspensionDamage=0, 0, 0, 0
 FuelRemaining=45.6835
-TyreCompound=Wet
+TyreCompound=Dry
 TyreTemperature=51.1807, 48.7398, 50.4807, 49.0909
 TyrePressure=24.4063, 25.072, 24.2391, 24.8057
 [Stint Data]

@@ -2305,6 +2305,8 @@ class KnowledgeBase {
 					
 					if (generation != facts.Generation) {
 						produced := true
+					
+						ruleEntry.deactivate()
 							
 						break
 					}

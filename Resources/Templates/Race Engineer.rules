@@ -155,8 +155,8 @@ nextDryTyreSet() <= Set(Tyre.Set.Target, !Race.Setup.Tyre.Set.Fresh)
 ;;;-------------------------------------------------------------------------;;;
 
 {All: [?Lap], [?Tyre.Compound = ?Tyre.Compound.Target]} => (Prove: updateTyrePressureDeviation, ?Lap)
-{All: [?Tyre.Update.Pressure = true], [?Tyre.Compound = ?Tyre.Compound.Target]} =>																\
-		(Prove: updateTyrePressureDeviation, !Lap), (Clear: Tyre.Update.Pressure)
+{All: [?Tyre.Update.Pressure = true], [?Tyre.Compound = ?Tyre.Compound.Target]} => (Prove: updateTyrePressureDeviation, !Lap)
+priority: -5, [?Tyre.Update.Pressure = true] => (Clear: Tyre.Update.Pressure)
 
 updateTyrePressureDeviation(?lap) <= tyrePressureDeviation(?lap, [FL, FR, RL, RR], ?deviations), 												\
 									 updateTargetPressures([FL, FR, RL, RR], ?deviations)

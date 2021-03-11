@@ -4,7 +4,7 @@ BodyworkDamage=16.9951, 0, 0, 0, 16.9951
 FuelRemaining=55.8667
 RoadTemperature=31.8212
 SuspensionDamage=0, 0, 0, 0
-TyreCompound=Wet
+TyreCompound=Dry
 TyrePressure=26.4104, 26.6384, 26.663, 26.9138
 TyreTemperature=77.678, 81.0234, 79.2541, 82.2153
 [Race Data]

@@ -4,7 +4,7 @@ SuspensionDamage=0, 0, 0, 0
 FuelRemaining=61.4264
 AirTemperature=20.6981
 RoadTemperature=20.6981
-TyreCompound=Wet
+TyreCompound=Dry
 TyreTemperature=79.1345, 70.7651, 78.9214, 71.4042
 TyrePressure=26.5802, 27.1768, 26.6598, 27.1381
 [Stint Data]

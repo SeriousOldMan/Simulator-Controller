@@ -19,6 +19,7 @@ Release 2.6 Checklist
    a. Documentation update
 3. Documentation Update
    a. Virtual Race Engineer
+   b. Plugins & Modes
    
 Release 2.5.4 Checklist
 =====================

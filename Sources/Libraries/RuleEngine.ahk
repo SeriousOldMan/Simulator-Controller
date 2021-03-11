@@ -2299,23 +2299,23 @@ class KnowledgeBase {
 			Loop {
 				if !ruleEntry
 					break
+					
+				ruleEntry.deactivate()
 				
-				if ruleEntry.Rule.produce(this) {
+				matched := ruleEntry.Rule.produce(this)
+				
+				if (!ruleEntry.Active && (this.RuleEngine.TraceLevel <= kTraceMedium))
+					this.RuleEngine.trace(kTraceMedium, "Deactivating rule " . ruleEntry.Rule.toString())
+				
+				if matched {
 					result := true
 					
 					if (generation != facts.Generation) {
 						produced := true
-					
-						ruleEntry.deactivate()
 							
 						break
 					}
 				}
-				
-				if (this.RuleEngine.TraceLevel <= kTraceMedium)
-					this.RuleEngine.trace(kTraceMedium, "Deactivating rule " . ruleEntry.Rule.toString())
-					
-				ruleEntry.deactivate()
 					
 				ruleEntry := ruleEntry.Next
 			}

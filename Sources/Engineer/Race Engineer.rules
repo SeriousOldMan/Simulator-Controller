@@ -8,7 +8,7 @@
 ;;;-------------------------------------------------------------------------;;;
 ;;;                             Global Trigger                              ;;;
 ;;;                                                                         ;;;
-;;; Entry points for the surrounding script code. Typacilly, the rule       ;;;
+;;; Entry points for the surrounding script code. Typically, the rule       ;;;
 ;;; will be triggered by setting a target fact and call "produce()" on the  ;;;
 ;;; KnowledgeBase instance.                                                 ;;;
 ;;;-------------------------------------------------------------------------;;;

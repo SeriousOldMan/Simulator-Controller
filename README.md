@@ -26,7 +26,7 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-[2.5.4-rc1](https://www.dropbox.com/s/keta185iuwmwoy9/Simulator%20Controller%202.5.4-rc1.zip?dl=1) (First release candidate for the upcoming release 2.5.4. A lot of work under the hood - 1. Integrated ACC shared memory data on current pitstop setup to simplify the setup process, 2. Jona now knows to change tyre compounds incl. tyre pressure setup on an upcoming pitstop, 3. More improvements for Button Box configuration. Feature complete, including [update documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-254))
+[2.5.4-rc2](https://www.dropbox.com/s/tnzw02qjpgm75d5/Simulator%20Controller%202.5.4-rc2.zip?dl=1) (Second release candidate for the upcoming release 2.5.4. A lot of work under the hood - 1. Integrated ACC shared memory data on current pitstop setup to simplify the setup process, 2. Jona now knows to change tyre compounds incl. tyre pressure setup on an upcoming pitstop, 3. More improvements for Button Box configuration. Feature complete, including [update documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-254))
 
 #### Latest release builds
 

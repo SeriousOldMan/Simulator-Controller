@@ -1,5 +1,5 @@
 #### Driving...
-  1. [Target: V2.6] More race information provided by Jona (mostly for VR-users):
+  1. [Target: V2.7] More race information provided by Jona (mostly for VR-users):
      - Current race position
 	 - Gap to car in front
 	 - Gap to car behind
@@ -20,6 +20,6 @@
   
 #### General
   1. [Target: V2.6] Again, better UI flow in the configuration tool and larger window size
-  2. [Target: V2.7] Plugin support for the configuration tool
+  2. [Target: V2.6] Plugin support for the configuration tool
   3. Choosing a specific theme depending on the selected simulation game
   4. [Target: V4.0] An interview based setup wizard, which guides through the configuration process

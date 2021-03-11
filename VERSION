@@ -1,5 +1,5 @@
 [Version]
-Current=2.5.4-alpha
+Current=2.5.4-rc1
 Target=2.5.4-release
 Release=2.5.0-release
 Changes=Tyre change recommendation depending on weather conditions incl. adjusted pressures depending on compound, Better weather change updates, Current ACC pitstop settings integrated, Improvements on Button Box configuraton

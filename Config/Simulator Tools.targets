@@ -9,7 +9,7 @@ Release 2.2=Release 2.1 -> updateTranslations, updatePluginLabels
 Release 2.3=Release 2.2 -> updateTranslations, updatePluginLabels, updatePhraseGrammars, updateRF2PluginForV23
 Release 2.4=Release 2.3 -> updateTranslations, updatePhraseGrammars, updateRREPluginForV24
 Release 2.5=Release 2.4 -> updateTranslations, updatePhraseGrammars, updateConfigurationForV25
-; Release 2.5.4=Release 2.5 -> updateTranslations, updatePhraseGrammars, updatePluginLabels
+Release 2.5.4=Release 2.5 -> updateTranslations, updatePhraseGrammars, updatePluginLabels
 [Cleanup]
 Binaries Folder=%kBinariesDirectory%
 Logs Folder=%kLogsDirectory%

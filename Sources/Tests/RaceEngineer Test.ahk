@@ -343,18 +343,12 @@ class DamageAnalysis extends Assert {
 					break
 				}
 				else {
-					try {
-						if (A_Index == 1)
-							engineer.addLap(lap, data)
-						else
-							engineer.updateLap(lap, data)
-						
-						dumpKnowledge(engineer.KnowledgeBase)
-					}
-					catch e {
-						ListLines
-						msgbox % e
-					}
+					if (A_Index == 1)
+						engineer.addLap(lap, data)
+					else
+						engineer.updateLap(lap, data)
+					
+					dumpKnowledge(engineer.KnowledgeBase)
 				}
 			
 				; 3.1	->	3.2		Report Bodywork

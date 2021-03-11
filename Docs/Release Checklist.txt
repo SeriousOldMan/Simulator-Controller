@@ -10,6 +10,11 @@ General Release Actions
 8. Update "Backlog.md"
 9. Check, whether update documentation for the release is required in "Updates.md"
 
+Release 2.6 Checklist
+=====================
+1. New in SHM Data (DriverRemaining, StintRemaining)
+   a. Documentation update
+   
 Release 2.5.4 Checklist
 =====================
 1. Update Procedure

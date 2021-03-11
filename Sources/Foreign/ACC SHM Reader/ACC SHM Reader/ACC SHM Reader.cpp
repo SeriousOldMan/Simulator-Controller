@@ -199,6 +199,8 @@ int main(int argc, char* argv[])
 		printData("LapLastTime", gf->iLastTime);
 		printData("LapBestTime", gf->iBestTime);
 		printData("TimeRemaining", gf->sessionTimeLeft);
+		printData("StintRemaining", gf->DriverStintTimeLeft);
+		printData("DriverRemaining", gf->DriverStintTotalTimeLeft);
 		printData("InPit", gf->isInPit ? "true" : "false");
 
 	}

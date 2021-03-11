@@ -1127,9 +1127,9 @@ class RaceEngineer extends ConfigurationItem {
 		if (lapNumber > baseLap)
 			this.iEnoughData := true
 		
-		driverForname := getConfigurationValue(data, "Stint Data", "DriverForname", "Oliver")
-		driverSurname := getConfigurationValue(data, "Stint Data", "DriverSurname", "Juwig")
-		driverNickname := getConfigurationValue(data, "Stint Data", "DriverNickname", "TBO")
+		driverForname := getConfigurationValue(data, "Stint Data", "DriverForname", "John")
+		driverSurname := getConfigurationValue(data, "Stint Data", "DriverSurname", "Doe")
+		driverNickname := getConfigurationValue(data, "Stint Data", "DriverNickname", "JD")
 		
 		this.iDriverName := driverForname
 			
@@ -1140,6 +1140,11 @@ class RaceEngineer extends ConfigurationItem {
 		knowledgeBase.setFact("Driver.Forname", driverForname)
 		knowledgeBase.setFact("Driver.Surname", driverSurname)
 		knowledgeBase.setFact("Driver.Nickname", driverNickname)
+		
+		timeRemaining := getConfigurationValue(data, "Stint Data", "TimeRemaining", 0)
+		
+		knowledgeBase.setFact("Driver.Time.Remaining", getConfigurationValue(data, "Stint Data", "DriverRemaining", timeRemaining))
+		knowledgeBase.setFact("Driver.Time.Stint.Remaining", getConfigurationValue(data, "Stint Data", "StintRemaining", timeRemaining))
 		
 		knowledgeBase.setFact("Pitstop.Configured.Tyre.Set", getConfigurationValue(data, "Pitstop Data", "TyreSet", 0))
 		knowledgeBase.setFact("Pitstop.Configured.Fuel", getConfigurationValue(data, "Pitstop Data", "FuelAmount", 0))

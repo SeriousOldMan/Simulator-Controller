@@ -12,8 +12,13 @@ General Release Actions
 
 Release 2.6 Checklist
 =====================
-1. New in SHM Data (DriverRemaining, StintRemaining)
+1. New in SHM Data (DriverTimeRemaining, StintTimeRemaining)
    a. Documentation update
+   b. SHM Reader rebuild
+2. Renamed TimeRemaining => RaceTimeRemaining
+   a. Documentation update
+3. Documentation Update
+   a. Virtual Race Engineer
    
 Release 2.5.4 Checklist
 =====================

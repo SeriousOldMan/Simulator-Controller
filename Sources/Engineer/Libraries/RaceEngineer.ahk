@@ -1008,7 +1008,7 @@ class RaceEngineer extends ConfigurationItem {
 		
 		settings := this.RaceSettings
 		
-		dataDuration := Round((getConfigurationValue(data, "Stint Data", "TimeRemaining", 0) + getConfigurationValue(data, "Stint Data", "LapLastTime", 0)) / 1000)
+		dataDuration := Round((getConfigurationValue(data, "Stint Data", "RaceTimeRemaining", 0) + getConfigurationValue(data, "Stint Data", "LapLastTime", 0)) / 1000)
 		settingsDuration := getConfigurationValue(settings, "Race Settings", "Duration", dataDuration)
 		
 		if ((Abs(settingsDuration - dataDuration) / dataDuration) >  0.1)
@@ -1141,10 +1141,10 @@ class RaceEngineer extends ConfigurationItem {
 		knowledgeBase.setFact("Driver.Surname", driverSurname)
 		knowledgeBase.setFact("Driver.Nickname", driverNickname)
 		
-		timeRemaining := getConfigurationValue(data, "Stint Data", "TimeRemaining", 0)
+		timeRemaining := getConfigurationValue(data, "Stint Data", "RaceTimeRemaining", 0)
 		
-		knowledgeBase.setFact("Driver.Time.Remaining", getConfigurationValue(data, "Stint Data", "DriverRemaining", timeRemaining))
-		knowledgeBase.setFact("Driver.Time.Stint.Remaining", getConfigurationValue(data, "Stint Data", "StintRemaining", timeRemaining))
+		knowledgeBase.setFact("Driver.Time.Remaining", getConfigurationValue(data, "Stint Data", "DriverTimeRemaining", timeRemaining))
+		knowledgeBase.setFact("Driver.Time.Stint.Remaining", getConfigurationValue(data, "Stint Data", "StintTimeRemaining", timeRemaining))
 		
 		knowledgeBase.setFact("Pitstop.Configured.Tyre.Set", getConfigurationValue(data, "Pitstop Data", "TyreSet", 0))
 		knowledgeBase.setFact("Pitstop.Configured.Fuel", getConfigurationValue(data, "Pitstop Data", "FuelAmount", 0))

@@ -819,7 +819,7 @@ runBuildTargets(ByRef buildProgress) {
 	local title
 	
 	if !kSilentMode
-		showProgress({progress: buildProgress, message: A_Space})
+		showProgress({progress: buildProgress, message: ""})
 	
 	for ignore, target in vBuildTargets {
 		targetName := target[1]
@@ -992,7 +992,7 @@ startSimulatorTools() {
 	y := A_ScreenHeight - 150
 	
 	if !kSilentMode
-		showProgress({x: x, y: y, message: A_Space, title: translate("Preparing Targets")})
+		showProgress({x: x, y: y, message: "", title: translate("Preparing Targets")})
 
 	buildProgress := 0
 	
@@ -1001,7 +1001,7 @@ startSimulatorTools() {
 	vTargetsCount := (vUpdateTargets.Length() + vCleanupTargets.Length() + vCopyTargets.Length() + (vBuildTargets.Length() * 2))
 	
 	if !kSilentMode
-		showProgress({message: A_Space, title: translate("Running Targets")})
+		showProgress({message: "", title: translate("Running Targets")})
 	
 	runUpdateTargets(buildProgress)
 	

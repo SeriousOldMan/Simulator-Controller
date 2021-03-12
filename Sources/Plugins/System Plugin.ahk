@@ -412,7 +412,7 @@ restoreSimulatorVolume() {
 			if (simulator != false) {
 				pid := (new Application(simulator, SimulatorController.Instance.Configuration)).CurrentPID
 				
-				Run %kNirCmd% setappvolume /%pid% 1.0
+				Run "%kNirCmd%" setappvolume /%pid% 1.0
 			}
 		}
 		catch exception {
@@ -433,7 +433,7 @@ muteSimulator() {
 			try {
 				pid := (new Application(simulator, SimulatorController.Instance.Configuration)).CurrentPID
 				
-				Run %kNirCmd% setappvolume /%pid% 0.0
+				Run "%kNirCmd%" setappvolume /%pid% 0.0
 			}
 			catch exception {
 				showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))

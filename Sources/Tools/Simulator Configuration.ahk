@@ -1422,6 +1422,8 @@ class ApplicationsTab extends ConfigurationItemList {
 			GuiControl Disable, applicationDeleteButton
 			GuiControl Disable, applicationUpdateButton
 		}
+		
+		LaunchpadTab.Instance.loadApplicationChoices()
 	}
 	
 	loadList(items) {

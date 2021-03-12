@@ -2,8 +2,8 @@
   1. [Target: V2.6] Initial database setup for the Big Data Collection for the Race Engineer
   2. [Target: V2.7] More race information provided by Jona (mostly for VR-users):
      - Current race position
-	 - Gap to car in front
-	 - Gap to car behind
+     - Gap to car in front
+     - Gap to car behind
   3. [Target: V2.8][RF2 Plugin] Extension of the rFactor 2 and RaceRoom Racing Experience racing simulations support
   4. [Target: V2.8][ACC Plugin] Hot switching between different sets of ABS and TC settings using voice commands
   5. [Target: V3.0][ACC Plugin & Race Engineer] Big Data Collection based on race engineer data for all tracks, cars and conditions

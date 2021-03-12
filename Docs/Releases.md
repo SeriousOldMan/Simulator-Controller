@@ -1,4 +1,4 @@
-## 2.5.4-release upcoming...
+## 2.5.4-release 03/12/21
   
   1. Bugfixes, as always
   2. Documentation updates, as always

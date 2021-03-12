@@ -1,3 +1,12 @@
+## 2.6-release upcoming...
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Improved stint time management for Jona
+  4. Initial setup of database for Big Data race setup collection
+     - Opt In for community based data acquisition
+  5. Larger window size for configuration tool and support for configuration plugins
+  
 ## 2.5.4-release 03/12/21
   
   1. Bugfixes, as always

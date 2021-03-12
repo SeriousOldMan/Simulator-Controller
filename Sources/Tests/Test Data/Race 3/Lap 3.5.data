@@ -15,7 +15,7 @@ DriverNickname=TBO
 Laps=3
 LapLastTime=106389
 LapBestTime=106389
-TimeRemaining=2.31173e+06
+RaceTimeRemaining=2.31173e+06
 InPit=false
 [Race Data]
 Car=mclaren_720s_gt3

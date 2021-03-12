@@ -15,7 +15,7 @@ DriverNickname=TBO
 Laps=6
 LapLastTime=108432
 LapBestTime=108432
-TimeRemaining=1.11324e+06
+RaceTimeRemaining=1.11324e+06
 InPit=false
 [Track Data]
 Temperature=30.9827

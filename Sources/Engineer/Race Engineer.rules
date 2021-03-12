@@ -446,7 +446,7 @@ setDamageReported(?damageType, true) <= Set(Damage.Reported, !Lap), Set(Damage, 
 priority: 20, {Any: [?Lap], {None: [?Lap.Remaining]}} => (Prove: updateRemainingLaps, ?Lap)
 priority: 20, [?Lap.Remaining <= ?Race.Settings.Lap.PitstopWarning]  => (Prove: lowFuelWarning, ?Lap, ?Lap.Remaining)
 
-updateRemainingLaps(?lap) <= remainingStintLaps(?lap, ?stintLaps), remainingRaceLaps(?lap, ?raceLaps),											\
+updateRemainingLaps(?lap) <= remainingStintLaps(?lap, Fuel, ?stintLaps), remainingRaceLaps(?lap, ?raceLaps),									\
  							 ?stintLaps < ?raceLaps, Set(Lap.Remaining, ?stintLaps)
 
 lowFuelWarning(?lap, ?remainingLaps) <= recentPitstopLap(?lap), !, fail
@@ -752,23 +752,6 @@ lapAvgTime(?lap, ?avgTime) <= weightedLapTimes(?lap, ?lapTimes),																
 
 lapRemainingFuel(?lap, ?remainingFuel) <= Get(Lap, ?lap, Fuel.Remaining, ?remainingFuel)
 
-firstStintLap(?lap) <= pitstopLap(?lap), !
-firstStintLap(1)
-
-nextStintLaps(?laps) <= lapRemainingFuel(!Lap, ?remainingFuel), ?fuel = ?remainingFuel + !Fuel.Amount.Target, !,								\
-						lapAvgFuel(!Lap, ?fuelPerLap), ?laps = ?fuel / ?fuelPerLap
-nextStintLaps(?laps) <= remainingRaceLaps(!Lap, ?laps)
-
-remainingRaceLaps(?lap, ?remainingLaps) <= remainingRaceTime(?lap, ?remainingTime), lapAvgTime(?lap, ?avgTime),									\
-										   ?remainingLaps = ?remainingTime / ?avgTime
-
-remainingRaceTime(?lap, ?remainingTime) <= Get(Lap, ?lap, Time.End, ?raceTime), ?raceLength = !Race.Duration * 1000,							\
-										   ?remainingTime = ?raceLength - ?raceTime
-
-remainingStintLaps(?lap, ?remainingLaps) <= remainingRaceLaps(?lap, ?raceLaps),																	\
-											lapRemainingFuel(?lap, ?fuelLeft), lapAvgFuel(?lap, ?fuelPerLap),									\
-											?fuelLaps = ?fuelLeft / ?fuelPerLap, min(?raceLaps, ?fuelLaps, ?remainingLaps)
-
 recentLapTimes(?lap, ?times) <= recentLapTimes(?lap, 0, ?temp), remove(?temp, 0, ?times)
 
 recentLapTimes(?lap, ?lap, []) <= !
@@ -884,6 +867,38 @@ pitstopDamageRepair(Bodywork, ?repair) <= lastPitstop(?nr), Get(Pitstop, ?nr, Re
 ;;;-------------------------------------------------------------------------;;;
 
 weatherIndex(?weather, ?index) <= index([Dry, Drizzle, LightRain, MediumRain, HeavyRain, Thunderstorm], ?weather, ?index)
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                     Race & Stint Information Retrieval                  ;;;
+;;;-------------------------------------------------------------------------;;;
+
+firstStintLap(?lap) <= pitstopLap(?lap), !
+firstStintLap(1)
+
+nextStintLaps(?laps) <= lapRemainingFuel(!Lap, ?remainingFuel), ?fuel = ?remainingFuel + !Fuel.Amount.Target, !,								\
+						lapAvgFuel(!Lap, ?fuelPerLap), ?laps = ?fuel / ?fuelPerLap
+nextStintLaps(?laps) <= remainingRaceLaps(!Lap, ?laps)
+
+remainingRaceLaps(?lap, ?remainingLaps) <= remainingRaceTime(?lap, ?remainingTime), lapAvgTime(?lap, ?avgTime),									\
+										   ?remainingLaps = ?remainingTime / ?avgTime
+
+remainingRaceTime(?lap, ?remainingTime) <= Get(Lap, ?lap, Time.End, ?raceTime), ?raceLength = !Race.Duration * 1000,							\
+										   ?remainingTime = ?raceLength - ?raceTime
+
+remainingStintLaps(?lap, ?remainingLaps) <= remainingStintLaps(?lap, Fuel, ?fuelLaps), remainingStintLaps(?lap, Driver, ?driverLaps),			\
+											min(?fuelLaps, ?driverLaps, ?remainingLaps)
+
+remainingStintLaps(?lap, Fuel, ?remainingLaps) <= remainingRaceLaps(?lap, ?raceLaps),															\
+												  lapRemainingFuel(?lap, ?fuelLeft), lapAvgFuel(?lap, ?fuelPerLap),								\
+												  ?fuelLaps = ?fuelLeft / ?fuelPerLap, min(?raceLaps, ?fuelLaps, ?remainingLaps)
+remainingStintLaps(?lap, Driver, ?remainingLaps) <= remainingStintTime(?stintTime), lapAvgTime(?lap, ?avgTime),									\
+													?remainingLaps = ?stintTime / ?avgTime
+
+remainingStintTime(?lap, ?remainingTime) <= remainingStintLaps(?lap, Driver, ?remainingLaps), lapAvgTime(?lap, ?avgTime),						\
+											?remainingTime = ?remainingLaps * ?avgTime
+											
+remainingStintTime(?stintTime) <= Get(Driver.Time.Stint.Remaining, ?stintTime)
 
 
 ;;;-------------------------------------------------------------------------;;;

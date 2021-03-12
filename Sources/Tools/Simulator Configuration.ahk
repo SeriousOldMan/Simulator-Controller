@@ -1423,7 +1423,7 @@ class ApplicationsTab extends ConfigurationItemList {
 			GuiControl Disable, applicationUpdateButton
 		}
 		
-		LaunchpadTab.Instance.loadApplicationChoices()
+		LaunchpadTab.Instance.loadApplicationChoices(true)
 	}
 	
 	loadList(items) {
@@ -2059,6 +2059,10 @@ class LaunchpadTab extends ConfigurationItemList {
 	
 	loadApplicationChoices(application := false) {
 		launchpadApplicationsList := []
+		currentApplication := false
+	
+		if this.iCurrentItemIndex
+			currentApplication := this.iItemsList[this.iCurrentItemIndex][3]
 		
 		for ignore, launchpadApplication in ApplicationsTab.Instance.Applications[[translate("Other")]]
 			launchpadApplicationsList.Push(launchpadApplication.Application)
@@ -2067,8 +2071,10 @@ class LaunchpadTab extends ConfigurationItemList {
 		
 		GuiControl Text, launchpadApplicationDropDown, % "|" . values2String("|", launchpadApplicationsList*)
 		
-		if application
+		if (application && (application != true))
 			GuiControl Choose, launchpadApplicationDropDown, %application%
+		else if (currentApplication && (application == true))
+			GuiControl Choose, launchpadApplicationDropDown, %currentApplication%
 	}
 	
 	loadEditor(item) {

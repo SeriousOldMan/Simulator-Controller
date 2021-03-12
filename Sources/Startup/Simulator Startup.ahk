@@ -171,7 +171,7 @@ class SimulatorStartup extends ConfigurationItem {
 			
 			if getConfigurationValue(this.Settings, section, component, true) {
 				if !kSilentMode
-					Progress, , % translate("Start: ") . component . translate("...")
+					showProgress({message: translate("Start: ") . component . translate("...")})
 				
 				logMessage(kLogInfo, translate("Component ") . component . translate(" is activated"))
 				
@@ -183,7 +183,7 @@ class SimulatorStartup extends ConfigurationItem {
 				logMessage(kLogInfo, translate("Component ") . component . translate(" is deactivated"))
 			
 			if !kSilentMode
-				Progress % Round((runningIndex++ / (this.iCoreComponents.Length() + this.iFeedbackComponents.Length())) * 90)
+				showProgress({progress: Round((runningIndex++ / (this.iCoreComponents.Length() + this.iFeedbackComponents.Length())) * 90)})
 		}
 	}
 	
@@ -217,19 +217,21 @@ class SimulatorStartup extends ConfigurationItem {
 		
 		if !kSilentMode {
 			message := translate("Start: Simulator Controller")
-			Progress B w300 x%x% y%y% FS8 CWD0D0D0 CBBlue, %message%, % translate("Initialize Core System")
+			
+			showProgress({x: x, y: y, color: "Blue", message: message, title: translate("Initialize Core System")})
 		}
 					
 		Loop 50 {
 			if !kSilentMode
-				Progress % A_Index * 2
+				showProgress({progress: A_Index * 2})
 			
 			Sleep 5
 		}
 
 		if !kSilentMode {
 			message := translate("...")
-			Progress B w300 x%x% y%y% FS8 CWD0D0D0 CBGreen, %message%, % translate("Starting System Components")
+			
+			showProgress({progress: 0, color: "Green", message: message, title: translate("Starting System Components")})
 		}
 			
 		runningIndex := 1
@@ -238,7 +240,7 @@ class SimulatorStartup extends ConfigurationItem {
 		this.startComponents("Feedback", this.iFeedbackComponents, startSimulator, runningIndex)
 		
 		if !kSilentMode
-			Progress 100, % translate("Done")
+			showProgress({progress: 100, message: translate("Done")})
 		
 		Sleep 500
 			
@@ -262,7 +264,8 @@ class SimulatorStartup extends ConfigurationItem {
 			exitStartup(true)
 		}
 		else {
-			Progress Off
+			; Progress Off
+			hideProgress()
 		
 			if !this.iSplashTheme
 				exitStartup(true)

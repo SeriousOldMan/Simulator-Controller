@@ -655,7 +655,7 @@ runUpdateTargets(ByRef buildProgress) {
 		targetName := target[1]
 	
 		if !kSilentMode
-			Progress %buildProgress%, % translate("Updating to ") . targetName . translate("...")
+			showProgress({progress: buildProgress, message: translate("Updating to ") . targetName . translate("...")})
 			
 		logMessage(kLogInfo, translate("Updating to ") . targetName)
 		
@@ -670,7 +670,7 @@ runUpdateTargets(ByRef buildProgress) {
 				else
 					message := translate("Updating configuration to ") . targetName . translate("...")
 				
-				Progress %buildProgress%, %message%
+				showProgress({progress: buildProgress, message: message})
 			}
 					
 			%updateFunction%()
@@ -683,7 +683,7 @@ runUpdateTargets(ByRef buildProgress) {
 		buildProgress += Round(100 / (vTargetsCount + 1))
 			
 		if !kSilentMode
-			Progress %buildProgress%
+			showProgress({progress: buildProgress})
 	}
 	
 	updatesFileName := getFileName("UPDATES", kUserConfigDirectory)
@@ -701,7 +701,7 @@ runCleanTargets(ByRef buildProgress) {
 		targetName := target[1]
 	
 		if !kSilentMode
-			Progress %buildProgress%, % translate("Cleaning ") . targetName . translate("...")
+			showProgress({progress: buildProgress, message: translate("Cleaning ") . targetName . translate("...")})
 			
 		logMessage(kLogInfo, translate("Cleaning ") . targetName)
 
@@ -722,7 +722,7 @@ runCleanTargets(ByRef buildProgress) {
 							FileDelete %A_LoopFilePath%
 					
 						if !kSilentMode
-							Progress %buildProgress%, % translate("Deleting ") . A_LoopFileName . translate("...")
+							showProgress({progress: buildProgress, message: translate("Deleting ") . A_LoopFileName . translate("...")})
 						
 						Sleep 50
 					}
@@ -749,7 +749,7 @@ runCleanTargets(ByRef buildProgress) {
 					FileDelete %A_LoopFilePath%
 				
 					if !kSilentMode
-						Progress %buildProgress%, % translate("Deleting ") . A_LoopFileName . translate("...")
+						showProgress({progress: buildProgress, message: translate("Deleting ") . A_LoopFileName . translate("...")})
 			
 					Sleep 50
 				}
@@ -764,7 +764,7 @@ runCleanTargets(ByRef buildProgress) {
 		buildProgress += Round(100 / (vTargetsCount + 1))
 			
 		if !kSilentMode
-			Progress %buildProgress%
+			showProgress({progress: buildProgress})
 	}
 }
 
@@ -772,7 +772,7 @@ runCopyTargets(ByRef buildProgress) {
 	local title
 	
 	if !kSilentMode
-		Progress %buildProgress%, % " " ; translate("...")
+		showProgress({progress: buildProgress, message: translate("...")})
 	
 	for ignore, target in vCopyTargets {
 		targetName := target[1]
@@ -795,7 +795,7 @@ runCopyTargets(ByRef buildProgress) {
 		
 		if copy {
 			if !kSilentMode
-				Progress %buildProgress%, % translate("Copying ") . targetName . translate("...")
+				showProgress({progress: buildProgress, message: translate("Copying ") . targetName . translate("...")})
 		
 			logMessage(kLogInfo, targetName . translate(" out of date - update needed"))
 			logMessage(kLogInfo, translate("Copying ") . targetSource)
@@ -811,7 +811,7 @@ runCopyTargets(ByRef buildProgress) {
 		buildProgress += Round(100 / (vTargetsCount + 1))
 			
 		if !kSilentMode
-			Progress %buildProgress%
+			showProgress({progress: buildProgress})
 	}
 }
 
@@ -819,7 +819,7 @@ runBuildTargets(ByRef buildProgress) {
 	local title
 	
 	if !kSilentMode
-		Progress %buildProgress%, % " " ; translate("...")
+		showProgress({progress: buildProgress, message: A_Space})
 	
 	for ignore, target in vBuildTargets {
 		targetName := target[1]
@@ -843,7 +843,7 @@ runBuildTargets(ByRef buildProgress) {
 		
 		if build {	
 			if !kSilentMode
-				Progress %buildProgress%, % translate("Compiling ") . targetName . translate("...")
+				showProgress({progress: buildProgress, message: translate("Compiling ") . targetName . translate("...")})
 		
 			logMessage(kLogInfo, targetName . translate(" or dependent files out of date - recompile triggered"))
 			logMessage(kLogInfo, translate("Compiling ") . targetSource)
@@ -870,7 +870,7 @@ runBuildTargets(ByRef buildProgress) {
 		buildProgress += Round(100 / (vTargetsCount + 1))
 			
 		if !kSilentMode
-			Progress %buildProgress%
+			showProgress({progress: buildProgress})
 	}
 }
 
@@ -892,7 +892,7 @@ prepareTargets(ByRef buildProgress, updateOnly) {
 		update := vUpdateSettings[target]
 		
 		if !kSilentMode
-			Progress, %buildProgress%, % target . ": " . (update ? translate("Yes") : translate("No"))
+			showProgress({progress: buildProgress, message: target . ": " . (update ? translate("Yes") : translate("No"))})
 		
 		if update {
 			arguments := string2Values("->", substituteVariables(arguments))
@@ -914,7 +914,7 @@ prepareTargets(ByRef buildProgress, updateOnly) {
 			cleanup := (InStr(target, "*.bak") ? vCleanupSettings[target] : vCleanupSettings[ConfigurationItem.splitDescriptor(target)[1]])
 			
 			if !kSilentMode
-				Progress, %buildProgress%, % target . ": " . (cleanup ? translate("Yes") : translate("No"))
+				showProgress({progress: buildProgress, message: target . ": " . (cleanup ? translate("Yes") : translate("No"))})
 			
 			if cleanup {
 				arguments := substituteVariables(arguments)
@@ -930,7 +930,7 @@ prepareTargets(ByRef buildProgress, updateOnly) {
 			copy := vCopySettings[ConfigurationItem.splitDescriptor(target)[1]]
 			
 			if !kSilentMode
-				Progress, %buildProgress%, % target . ": " . (copy ? translate("Yes") : translate("No"))
+				showProgress({progress: buildProgress, message: target . ": " . (copy ? translate("Yes") : translate("No"))})
 			
 			if copy {
 				rule := string2Values("<-", substituteVariables(arguments))
@@ -946,7 +946,7 @@ prepareTargets(ByRef buildProgress, updateOnly) {
 			build := vBuildSettings[ConfigurationItem.splitDescriptor(target)[1]]
 			
 			if !kSilentMode
-				Progress, %buildProgress%, % target . ": " . (build ? translate("Yes") : translate("No"))
+				showProgress({progress: buildProgress, message: target . ": " . (build ? translate("Yes") : translate("No"))})
 			
 			if build {
 				rule := string2Values("<-", substituteVariables(arguments))
@@ -992,7 +992,7 @@ startSimulatorTools() {
 	y := A_ScreenHeight - 150
 	
 	if !kSilentMode
-		Progress 1:B w300 x%x% y%y% FS8 CWD0D0D0 CBGreen, %A_Space%, % translate("Preparing Targets")
+		showProgress({x: x, y: y, message: A_Space, title: translate("Preparing Targets")})
 
 	buildProgress := 0
 	
@@ -1001,7 +1001,7 @@ startSimulatorTools() {
 	vTargetsCount := (vUpdateTargets.Length() + vCleanupTargets.Length() + vCopyTargets.Length() + (vBuildTargets.Length() * 2))
 	
 	if !kSilentMode
-		Progress, , %A_Space%, % translate("Running Targets")
+		showProgress({message: A_Space, title: translate("Running Targets")})
 	
 	runUpdateTargets(buildProgress)
 	
@@ -1012,12 +1012,12 @@ startSimulatorTools() {
 	}
 		
 	if !kSilentMode
-		Progress 100, % translate("Done")
+		showProgress({progress: 100, message: translate("Done")})
 	
 	Sleep 500
 	
 	if !kSilentMode {
-		Progress Off
+		hideProgress()
 	
 		if vSplashTheme
 			hideSplashTheme()

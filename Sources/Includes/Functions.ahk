@@ -25,8 +25,12 @@ global vTargetLanguageCode = "en"
 global vSplashCounter = 0
 global vLastImage
 global vVideoPlayer
-global vVideoIsPlaying = false
 global vSongIsPlaying = false
+
+global vProgressIsOpen = false
+global vProgressBar
+global vProgressTitle
+global vProgressMessage
 
 global vEventHandlers = Object()
 global vIncomingMessages = []
@@ -594,7 +598,7 @@ initializeEnvironment() {
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-showSplash(image, alwaysOnTop := true) {
+showSplash(image, alwaysOnTop := true, video := false) {
 	image := getFileName(image, kUserSplashMediaDirectory, kSplashMediaDirectory)
 	
 	lastSplash := vSplashCounter
@@ -603,17 +607,39 @@ showSplash(image, alwaysOnTop := true) {
 	
 	if (vSplashCounter > 10)
 		vSplashCounter := 1
-		
-	image :=  vSplashCounter . ":" . image
-	options := "B FS8 CWD0D0D0 w800 x" . Round((A_ScreenWidth - 800) / 2) . " y" . Round(A_ScreenHeight / 4) . " ZH439 ZW780"
-	
-	if !alwaysOnTop
-		options := "A " . options
 	
 	title := substituteVariables(translate(getConfigurationValue(kSimulatorConfiguration, "Splash Window", "Title", "")))
 	subtitle := substituteVariables(translate(getConfigurationValue(kSimulatorConfiguration, "Splash Window", "Subtitle", "")))
 	
-	SplashImage %image%, %options%, %subtitle%, %title%
+	SplitPath image, , , extension
+	
+	Gui %vSplashCounter%:-Border -Caption
+	Gui %vSplashCounter%:Color, D0D0D0
+
+	Gui %vSplashCounter%:Font, s10 Bold, Arial
+	Gui %vSplashCounter%:Add, Text, x10 w780 Center, %title% 
+	
+	if (extension = "GIF") { 
+		Gui %vSplashCounter%:Add, ActiveX, x10 y30 w780 h439 vvVideoPlayer, shell explorer
+		
+		vVideoPlayer.Navigate("about:blank")
+		
+		html := "<html><body style='background-color: #000000' style='overflow:hidden' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><img src='" image "' width=780 height=438 border=0 padding=0></body></html>"
+
+		vVideoPlayer.document.write(html)
+	}
+	else
+		Gui %vSplashCounter%:Add, Picture, x10 y30 w780 h439, %image%
+	
+	Gui %vSplashCounter%:Font, s8 Norm, Arial
+	Gui %vSplashCounter%:Add, Text, x10 y474 w780 Center, %subtitle% 
+	
+	options := "x" . Round((A_ScreenWidth - 800) / 2) . " y" . Round(A_ScreenHeight / 4)
+	
+	if alwaysOnTop
+		Gui %vSplashCounter%:+AlwaysOnTop
+	
+	Gui %vSplashCounter%:Show, %options% AutoSize NoActivate
 	
 	if (lastSplash > 0)
 		hideSplash(lastSplash)
@@ -623,7 +649,7 @@ hideSplash(splashCounter := false) {
 	if !splashCounter
 		splashCounter := vSplashCounter
 		
-	SplashImage %splashCounter%:Off
+	Gui %splashCounter%:Destroy
 }
 	
 rotateSplash(alwaysOnTop := true) {
@@ -644,36 +670,12 @@ rotateSplash(alwaysOnTop := true) {
 		showSplash(images[number++], alwaysOnTop)
 }
 
-showSplashAnimation(video) {
-	video := getFileName(video, kUserSplashMediaDirectory, kSplashMediaDirectory)
-	
-	Gui VP:-Border -Caption ; borderless
-	Gui VP:Add, ActiveX, x0 y0 w780 h438 vvVideoPlayer, shell explorer
-
-	vVideoPlayer.Navigate("about:blank")
-	
-	html := "<html><body style='background-color: #000000' style='overflow:hidden' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><img src='" video "' width=780 height=438 border=0 padding=0></body></html>"
-
-	vVideoPlayer.document.write(html)
-	
-	y := Round(A_ScreenHeight / 4) + 25
-	
-	Gui VP:Margin, 0, 0
-	Gui VP:+AlwaysOnTop
-	Gui VP:Show, AutoSize xCenter y%y% NoActivate
-}
-
-hideSplashAnimation() {
-	Gui VP:Destroy
-}
-
 showSplashTheme(theme := "__Undefined__", songHandler := false, alwaysOnTop := true) {
 	static images := false
 	static number := 1
 	static numImages := 0
 	static onTop := false
 	
-	vVideoIsPlaying := false
 	vSongIsPlaying := false
 	
 	if !songHandler
@@ -697,10 +699,7 @@ showSplashTheme(theme := "__Undefined__", songHandler := false, alwaysOnTop := t
 		song := getConfigurationValue(kSimulatorConfiguration, "Splash Themes", theme . ".Song", false)
 		video := getConfigurationValue(kSimulatorConfiguration, "Splash Themes", theme . ".Video")
 	
-		showSplash(video)
-		showSplashAnimation(video)
-		
-		vVideoIsPlaying := true
+		showSplash(video, true)
 		
 		if song {
 			vSongIsPlaying := true
@@ -737,9 +736,6 @@ showSplashTheme(theme := "__Undefined__", songHandler := false, alwaysOnTop := t
 
 hideSplashTheme() {
 	SetTimer showSplashTheme, Off
-	
-	if vVideoIsPlaying
-		hideSplashAnimation()
 
 	if vSongIsPlaying
 		try {
@@ -750,6 +746,54 @@ hideSplashTheme() {
 		}
 			
 	hideSplash()
+}
+
+showProgress(options) {
+	if !vProgressIsOpen {
+		x := options.x
+		y := options.y
+		color := options.HasKey("color") ? options.color : "Green"
+	
+		Gui Progress:Default
+		Gui Progress:-Border -Caption
+		Gui Progress:Color, D0D0D0
+
+		Gui Progress:Font, s10 Bold, Arial
+		Gui Progress:Add, Text, x10 w280 Center vvProgressTitle, Foo
+		
+		Gui Progress:Add, Progress, x10 y30 w280 h20 c%color% BackgroundGray vvProgressBar, 50
+		
+		Gui Progress:Font, s8 Norm, Arial
+		Gui Progress:Add, Text, x10 y55 w280 Center vvProgressMessage, Bar
+		
+		Gui Progress:+AlwaysOnTop
+		Gui Progress:Show, x%x% y%y% AutoSize NoActivate
+		
+		vProgressIsOpen := true
+	}
+	
+	if options.HasKey("title")
+		GuiControl, , vProgressTitle, % options.title
+	
+	if options.HasKey("message")
+		GuiControl, , vProgressMessage, % options.message
+	
+	if options.HasKey("progress")
+		GuiControl, , vProgressBar, % options.progress
+	
+	if options.HasKey("color") {
+		color := options.color
+		
+		GuiControl +c%color%, vProgressBar
+	}
+}
+
+hideProgress() {
+	if vProgressIsOpen {
+		Gui Progress:Destroy
+		
+		vProgressIsOpen := false
+	}
 }
 
 getAllThemes() {

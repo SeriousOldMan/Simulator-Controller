@@ -606,7 +606,7 @@ class SimulatorController extends ConfigurationItem {
 		
 						name := application.Application
 						
-						Progress B w300 x%posX% y%posY% FS8 CWD0D0D0 CBGreen, %name%, % translate("Starting Simulator")
+						showProgress({x: posX, y: posY, message: name, title: translate("Starting Simulator")})
 
 						started := false
 
@@ -614,7 +614,7 @@ class SimulatorController extends ConfigurationItem {
 							if (A_Index >= 100)
 								break
 						
-							Progress %A_Index%
+							showProgress({progress: A_Index})
 
 							if (!started && application.isRunning())
 								started := true
@@ -622,7 +622,7 @@ class SimulatorController extends ConfigurationItem {
 							Sleep % started ? 10 : 100
 						}
 					
-						Progress Off
+						hideProgress()
 					}
 					finally {
 						protectionOn()

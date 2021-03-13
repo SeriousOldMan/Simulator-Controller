@@ -823,8 +823,8 @@ class ACCPlugin extends ControllerPlugin {
 	}
 	
 	updatePitstopState(fromTimer := false) {
-		static kSearchAreaLeft := 250
-		static kSearchAreaRight := 150
+		static kSearchAreaLeft := 350
+		static kSearchAreaRight := 250
 		
 		if isACCRunning() {
 			beginTickCount := A_TickCount
@@ -835,7 +835,7 @@ class ACCPlugin extends ControllerPlugin {
 				curTickCount := A_TickCount
 				
 				if !this.iPSImageSearchArea {
-					ImageSearch x, y, 0, 0, Round(A_ScreenWidth / 2), A_ScreenHeight, *50 %pitstopLabel%
+					ImageSearch x, y, 0, 0, A_ScreenWidth, A_ScreenHeight, *50 %pitstopLabel%
 		
 					logMessage(kLogInfo, translate("Full search for 'PITSTOP' took ") . A_TickCount - curTickCount . translate(" ms"))
 				}

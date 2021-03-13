@@ -194,6 +194,7 @@ Pitstop: Tyres are selected for change=>
 Pitstop: Tyres are not selected for change=>
 Pitstop: Brakes are selected for change=>
 Pitstop: Brakes are not selected for change=>
+Cannot locate the Pitstop MFD - please read the Update 2.0 documentation...=>
 Cannot start ACC SHM Reader (=>
 ) - please rebuild the applications in the binaries folder (=>
 Modular Simulator Controller System - Controller (Plugin: ACC)=>

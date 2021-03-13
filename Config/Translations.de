@@ -195,6 +195,7 @@ Pitstop: Tyres are selected for change=>Boxenstopp: Reifenwechsel ist gewählt
 Pitstop: Tyres are not selected for change=>Boxenstopp: Reifenwechsel ist nicht gewählt
 Pitstop: Brakes are selected for change=>Boxenstopp: Bremsenwechsel ist gewählt
 Pitstop: Brakes are not selected for change=>Boxenstopp: Bremsenwechsel ist nicht gewählt
+Cannot locate the Pitstop MFD - please read the Update 2.0 documentation...=>Der Boxenstopp Dialog wurde nicht gefunden - Bitte lesen Sie die Dokumentation zu Update 2.0...
 Cannot start ACC SHM Reader (=>Die Datenverbindung zu Assetto Corsa Competizione (
 ) - please rebuild the applications in the binaries folder (=>) kann nicht gestartet werden - Bitte überprüfen Sie die Programme im Binaries Verzeichnis (
 Modular Simulator Controller System - Controller (Plugin: ACC)=>Modulare Simulator Steuerung - Steuerung (Erweiterung: ACC)

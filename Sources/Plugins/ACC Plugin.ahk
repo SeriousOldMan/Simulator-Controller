@@ -589,7 +589,7 @@ class ACCPlugin extends ControllerPlugin {
 		this.iPSSelectedOption := 1
 		
 		if (update || !wasOpen) {
-			this.updatePitStopState()
+			if this.updatePitStopState()
 			
 			SetTimer updatePitstopState, 5000
 		}
@@ -608,8 +608,17 @@ class ACCPlugin extends ControllerPlugin {
 	}
 	
 	requirePitstopMFD() {
+		static reported := false
+		
 		this.openPitstopMFD()
 		
+		if (!this.iPSIsFound && !reported) {
+			reported := true
+			
+			showMessage(substituteVariables(translate("Cannot locate the Pitstop MFD - please read the Update 2.0 documentation..."))
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+		}
+						  
 		return this.iPSIsFound
 	}
 	

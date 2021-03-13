@@ -992,7 +992,7 @@ startSimulatorTools() {
 	y := A_ScreenHeight - 150
 	
 	if !kSilentMode
-		showProgress({x: x, y: y, message: "", title: translate("Preparing Targets")})
+		showProgress({x: x, y: y, color: "Blue", message: "", title: translate("Preparing Targets")})
 
 	buildProgress := 0
 	
@@ -1001,7 +1001,7 @@ startSimulatorTools() {
 	vTargetsCount := (vUpdateTargets.Length() + vCleanupTargets.Length() + vCopyTargets.Length() + (vBuildTargets.Length() * 2))
 	
 	if !kSilentMode
-		showProgress({message: "", title: translate("Running Targets")})
+		showProgress({message: "", color: "Green", title: translate("Running Targets")})
 	
 	runUpdateTargets(buildProgress)
 	

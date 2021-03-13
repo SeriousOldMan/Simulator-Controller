@@ -496,8 +496,9 @@ projectedTyreTemperature(?lap, ?temperature) <=																									\
 ;;;-------------------------------------------------------------------------;;;
 ;;;                 Temperature Based Tyre Pressure Correction              ;;;
 ;;;                                                                         ;;;
-;;; When the temperatures are changing n evening or morning sessions, a     ;;;
-;;; pressure correction factor is derived for the next stint.               ;;;
+;;; When the temperatures are changing in evening or morning sessions or    ;;;
+;;; due to incoming weather changes, a pressure correction factor is		;;;
+;;; derived for the next stint.                                             ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 priority: 5, [?Lap > 5] => (Prove: updateTyrePressureCorrection, ?Lap)
@@ -745,12 +746,12 @@ lapDamage(?lap, Bodywork, ?damage) <= lapDamage(?lap, Bodywork, Front, ?frontDmg
 									  
 lapAvgFuel(?lap, ?avgFuel) <= Get(Lap, ?lap, Fuel.AvgConsumption, ?avgFuel), ?avgFuel > 0
 
+lapRemainingFuel(?lap, ?remainingFuel) <= Get(Lap, ?lap, Fuel.Remaining, ?remainingFuel)
+
 lapTime(?lap, ?time) <= Get(Lap, ?lap, Time, ?time)
 
 lapAvgTime(?lap, ?avgTime) <= weightedLapTimes(?lap, ?lapTimes),																				\
 							  sum(?lapTimes, ?sTimes), length(?lapTimes, ?sLength), ?avgTime = ?sTimes / ?sLength
-
-lapRemainingFuel(?lap, ?remainingFuel) <= Get(Lap, ?lap, Fuel.Remaining, ?remainingFuel)
 
 recentLapTimes(?lap, ?times) <= recentLapTimes(?lap, 0, ?temp), remove(?temp, 0, ?times)
 

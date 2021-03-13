@@ -114,7 +114,10 @@ Almost every Windows installation already has builtin support for voice generati
 
 The installation of the voice recognition engine sometimes needs a little bit more effort. Jona relies on the speech recognition runtime from Microsoft, which is not necessarily part of a Windows standard distribution. You can check this in your settings dialog as well. If you do not have any voice recognition capabilities available, you can use the installer provided for your convinience in the *Utilities\3rd party* folder, as long you have a 64-bit Windows installation. Please install the runtime first and the two provided language packs for English and German afterwards. Alternatively you can download the necessary installation files from [this site at Microsoft](https://www.microsoft.com/en-us/download/details.aspx?id=16789).
 
-After installing the language packs, it might be necessary to unblock the recognizer DLLs of Jona, which are provided in the *Binaries* folder. Windows might have blocked these DLLs for security reasons, because you downloaded it from a non-trusted location. You will find a little Powershell script in the *Utilities* folder, which you can copy to the *Binaries* folder and execute it there with Administrator privileges.
+After installing the language packs, it might be necessary to unblock the recognizer DLLs of Jona, which are provided in the *Binaries* folder. Windows might have blocked these DLLs for security reasons, because you downloaded it from a non-trusted location. You will find a little Powershell script in the *Utilities* folder, which you can copy to the *Binaries* folder and execute it there with Administrator privileges. These are the commands, which need be executed:
+
+	takeown.exe /F . /R /D N
+	Get-ChildItem -Path '.' -Recurse | Unblock-File
 
 Note: Since the time for offline voice recognition is almost over, a future version of Jona will use Google, Amazon or Azure services for voice recognition. But this might be a pay per use kind of service.
 

@@ -826,7 +826,7 @@ class ACCPlugin extends ControllerPlugin {
 				}
 	}
 	
-	searchPitstopLabel() {
+	searchPitstopLabel(images) {
 		static kSearchAreaLeft := 350
 		static kSearchAreaRight := 250
 		
@@ -848,6 +848,8 @@ class ACCPlugin extends ControllerPlugin {
 		
 		if x is Integer
 		{
+			images.Push("PITSTOP")
+			
 			lastY := y
 	
 			this.iPSIsFound := true
@@ -864,7 +866,7 @@ class ACCPlugin extends ControllerPlugin {
 		return lastY
 	}
 	
-	searchStrategyLabel(ByRef lastY) {
+	searchStrategyLabel(ByRef lastY, images) {
 		curTickCount := A_TickCount
 		reload := false
 
@@ -877,7 +879,11 @@ class ACCPlugin extends ControllerPlugin {
 				ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *100 %pitStrategyLabel%
 
 			if x is Integer
+			{
+				images.Push("Pit Strategy " . A_Index)
+			
 				break
+			}
 		}
 
 		if !this.iPSImageSearchArea
@@ -912,7 +918,7 @@ class ACCPlugin extends ControllerPlugin {
 		return reload
 	}
 	
-	searchTyreSetLabel(ByRef lastY) {
+	searchTyreSetLabel(ByRef lastY, images) {
 		curTickCount := A_TickCount
 		reload := false
 		
@@ -925,7 +931,11 @@ class ACCPlugin extends ControllerPlugin {
 				ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *100 %wetLabel%
 
 			if x is Integer
+			{
+				images.Push("Wet " . A_Index)
+			
 				break
+			}
 		}
 		
 		if x is Integer
@@ -957,7 +967,11 @@ class ACCPlugin extends ControllerPlugin {
 				ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *100 %compoundLabel%
 			
 			if x is Integer
+			{
+				images.Push("Compound " . A_Index)
+			
 				break
+			}
 		}
 			
 		if !this.iPSImageSearchArea
@@ -982,7 +996,7 @@ class ACCPlugin extends ControllerPlugin {
 		return reload
 	}
 	
-	searchBrakeLabel(ByRef lastY) {
+	searchBrakeLabel(ByRef lastY, images) {
 		curTickCount := A_TickCount
 		reload := false
 		
@@ -995,7 +1009,11 @@ class ACCPlugin extends ControllerPlugin {
 				ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *100 %frontBrakeLabel%
 			
 			if x is Integer
+			{
+				images.Push("Front Brake " . A_Index)
+			
 				break
+			}
 		}
 		
 		if !this.iPSImageSearchArea
@@ -1018,7 +1036,7 @@ class ACCPlugin extends ControllerPlugin {
 		return reload
 	}
 	
-	searchDriverLabel(ByRef lastY) {
+	searchDriverLabel(ByRef lastY, images) {
 		curTickCount := A_TickCount
 		reload := false
 		
@@ -1031,7 +1049,11 @@ class ACCPlugin extends ControllerPlugin {
 				ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *100 %selectDriverLabel%
 		
 			if x is Integer
+			{
+				images.Push("Select Driver " . A_Index)
+			
 				break
+			}
 		}
 		
 		if !this.iPSImageSearchArea
@@ -1068,20 +1090,24 @@ class ACCPlugin extends ControllerPlugin {
 		if isACCRunning() {
 			beginTickCount := A_TickCount
 			lastY := false
+			images := []
 			
 			if (fromTimer || !this.iPSImageSearchArea)
-				lastY := this.searchPitstopLabel()
+				lastY := this.searchPitstopLabel(images)
 			
 			if (!fromTimer && this.iPSIsFound && this.iPSIsOpen) {
-				reload := this.searchStrategyLabel(lastY)
+				reload := this.searchStrategyLabel(lastY, images)
 				
-				reload := (this.searchTyreSetLabel(lastY) || reload)
+				reload := (this.searchTyreSetLabel(lastY, images) || reload)
 				
-				reload := (this.searchBrakeLabel(lastY) || reload)
+				reload := (this.searchBrakeLabel(lastY, images) || reload)
 	
-				reload := (this.searchDriverLabel(lastY) || reload)
+				reload := (this.searchDriverLabel(lastY, images) || reload)
 				
 				logMessage(kLogInfo, translate("Complete update of pitstop state took ") . A_TickCount - beginTickCount . translate(" ms"))
+				
+				if isDebug()
+					showMessage("Found images: " . values2String(", ", images*), "Pitstop MFD Image Search", "Information.png", 5000)
 				
 				return reload
 			}

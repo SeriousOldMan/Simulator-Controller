@@ -1173,6 +1173,16 @@ concatenate(arrays*) {
 	return result
 }
 
+reverse(list) {
+	newList := []
+	length := list.Length()
+	
+	Loop length
+		newList.Push(list[length - (A_Index - 1)])
+	
+	return newList
+}
+
 map(list, function) {
 	result := []
 	

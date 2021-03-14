@@ -38,7 +38,6 @@ class ACCPlugin extends ControllerPlugin {
 	kPSBrakeOptions := 2
 		
 	iPSIsOpen := false
-	iPSIsFound := false
 	iPSSelectedOption := 1
 	iPSChangeTyres := false
 	iPSChangeBrakes := false
@@ -589,7 +588,7 @@ class ACCPlugin extends ControllerPlugin {
 		this.iPSSelectedOption := 1
 		
 		if (update || !wasOpen) {
-			if this.updatePitStopState()
+			this.updatePitStopState()
 			
 			SetTimer updatePitstopState, 5000
 		}
@@ -612,14 +611,14 @@ class ACCPlugin extends ControllerPlugin {
 		
 		this.openPitstopMFD()
 		
-		if (!this.iPSIsFound && !reported) {
+		if (!this.iPSIsOpen && !reported) {
 			reported := true
 			
-			showMessage(substituteVariables(translate("Cannot locate the Pitstop MFD - please read the Update 2.0 documentation..."))
-						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			showMessage(translate("Cannot locate the Pitstop MFD - please read the Update 2.0 documentation...")
+					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 		}
 						  
-		return this.iPSIsFound
+		return this.iPSIsOpen
 	}
 	
 	selectPitstopOption(option, retry := true) {
@@ -826,20 +825,48 @@ class ACCPlugin extends ControllerPlugin {
 				}
 	}
 	
+	getLabelFileName(labelName) {
+		labelName := ("ACC\" . labelName)
+		fileName := getFileName(labelName . ".png", kUserScreenImagesDirectory)
+		
+		if FileExist(fileName)
+			return fileName
+		
+		fileName := getFileName(labelName . ".jpg", kUserScreenImagesDirectory)
+		
+		if FileExist(fileName)
+			return fileName
+		
+		fileName := getFileName(labelName . ".png", kScreenImagesDirectory)
+		
+		if FileExist(fileName)
+			return fileName
+		
+		fileName := getFileName(labelName . ".jpg", kScreenImagesDirectory)
+		
+		if FileExist(fileName)
+			return fileName
+		
+		Throw "Unknonw label '" . labelName . "' detected in ACCPlugin.getLabelFileName..."
+	}
+	
 	searchPitstopLabel(images) {
 		static kSearchAreaLeft := 350
 		static kSearchAreaRight := 250
+		static pitstopLabel := false
 		
-		pitstopLabel := getFileName("ACC\PITSTOP.jpg", kUserScreenImagesDirectory, kScreenImagesDirectory)
+		if !pitstopLabel
+			pitstopLabel := this.getLabelFileName("PITSTOP")
+		
 		curTickCount := A_TickCount
 		
 		if !this.iPSImageSearchArea {
-			ImageSearch x, y, 0, 0, A_ScreenWidth, A_ScreenHeight, *100 %pitstopLabel%
+			ImageSearch x, y, 0, 0, A_ScreenWidth, A_ScreenHeight, *50 %pitstopLabel%
 
 			logMessage(kLogInfo, translate("Full search for 'PITSTOP' took ") . A_TickCount - curTickCount . translate(" ms"))
 		}
 		else {
-			ImageSearch x, y, this.iPSImageSearchArea[1], this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *100 %pitstopLabel%
+			ImageSearch x, y, this.iPSImageSearchArea[1], this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *50 %pitstopLabel%
 
 			logMessage(kLogInfo, translate("Optimized search for 'PITSTOP' took ") . A_TickCount - curTickCount . translate(" ms"))
 		}
@@ -851,8 +878,6 @@ class ACCPlugin extends ControllerPlugin {
 			images.Push("PITSTOP")
 			
 			lastY := y
-	
-			this.iPSIsFound := true
 			
 			if !this.iPSImageSearchArea
 				this.iPSImageSearchArea := [Max(0, x - kSearchAreaLeft), Max(0, y - 20), Min(x + kSearchAreaRight, A_ScreenWidth), A_ScreenHeight]
@@ -867,16 +892,20 @@ class ACCPlugin extends ControllerPlugin {
 	}
 	
 	searchStrategyLabel(ByRef lastY, images) {
+		static pitStrategyLabels := false
 		curTickCount := A_TickCount
 		reload := false
+		
+		if !pitStrategyLabels
+			pitStrategyLabels := Array(this.getLabelFileName("Pit Strategy 1"), this.getLabelFileName("Pit Strategy 2"))
 
 		Loop 2 {
-			pitStrategyLabel := getFileName("ACC\Pit Strategy " . A_Index . ".jpg", kUserScreenImagesDirectory, kScreenImagesDirectory)
+			pitStrategyLabel := pitStrategyLabels[A_Index]
 			
 			if !this.iPSImageSearchArea
-				ImageSearch x, y, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, *100 %pitStrategyLabel%
+				ImageSearch x, y, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, *50 %pitStrategyLabel%
 			else
-				ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *100 %pitStrategyLabel%
+				ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *50 %pitStrategyLabel%
 
 			if x is Integer
 			{
@@ -919,16 +948,23 @@ class ACCPlugin extends ControllerPlugin {
 	}
 	
 	searchTyreSetLabel(ByRef lastY, images) {
+		static wetLabels := false
+		static compoundLabels := false
 		curTickCount := A_TickCount
 		reload := false
 		
+		if !wetLabels {
+			wetLabels := Array(this.getLabelFileName("Wet 1"), this.getLabelFileName("Wet 2"))
+			compoundLabels := Array(this.getLabelFileName("Compound 1"), this.getLabelFileName("Compound 2"))
+		}
+		
 		Loop 2 {
-			wetLabel := getFileName("ACC\Wet " . A_index . ".jpg", kUserScreenImagesDirectory, kScreenImagesDirectory)
+			wetLabel := wetLabels[A_Index]
 				
 			if !this.iPSImageSearchArea
-				ImageSearch x, y, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, *100 %wetLabel%
+				ImageSearch x, y, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, *50 %wetLabel%
 			else
-				ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *100 %wetLabel%
+				ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *50 %wetLabel%
 
 			if x is Integer
 			{
@@ -959,12 +995,12 @@ class ACCPlugin extends ControllerPlugin {
 		}
 		
 		Loop 2 {
-			compoundLabel := getFileName("ACC\Compound " . A_Index . ".jpg", kUserScreenImagesDirectory, kScreenImagesDirectory)
+			compoundLabel := compoundLabels[A_index]
 			
 			if !this.iPSImageSearchArea
-				ImageSearch x, y, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, *100 %compoundLabel%
+				ImageSearch x, y, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, *50 %compoundLabel%
 			else
-				ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *100 %compoundLabel%
+				ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *50 %compoundLabel%
 			
 			if x is Integer
 			{
@@ -997,16 +1033,20 @@ class ACCPlugin extends ControllerPlugin {
 	}
 	
 	searchBrakeLabel(ByRef lastY, images) {
+		static frontBrakeLabels := false
 		curTickCount := A_TickCount
 		reload := false
 		
+		if !frontBrakeLabels
+			frontBrakeLabels := Array(this.getLabelFileName("Front Brake 1"), this.getLabelFileName("Front Brake 2"))
+		
 		Loop 2 {
-			frontBrakeLabel := getFileName("ACC\Front Brake " . A_Index . ".jpg", kUserScreenImagesDirectory, kScreenImagesDirectory)
+			frontBrakeLabel := frontBrakeLabels[A_Index]
 			
 			if !this.iPSImageSearchArea
-				ImageSearch x, y, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, *100 %frontBrakeLabel%
+				ImageSearch x, y, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, *50 %frontBrakeLabel%
 			else
-				ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *100 %frontBrakeLabel%
+				ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *50 %frontBrakeLabel%
 			
 			if x is Integer
 			{
@@ -1037,16 +1077,20 @@ class ACCPlugin extends ControllerPlugin {
 	}
 	
 	searchDriverLabel(ByRef lastY, images) {
+		static selectDriverLabels := false
 		curTickCount := A_TickCount
 		reload := false
 		
+		if !selectDriverLabels
+			selectDriverLabels := Array(this.getLabelFileName("Select Driver 1"), this.getLabelFileName("Select Driver 2"), this.getLabelFileName("Select Driver 3"))
+		
 		Loop 3 {
-			selectDriverLabel := getFileName("ACC\Select Driver " . A_Index . ".jpg", kUserScreenImagesDirectory, kScreenImagesDirectory)
+			selectDriverLabel := selectDriverLabels[A_Index]
 			
 			if !this.iPSImageSearchArea
-				ImageSearch x, y, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, *100 %selectDriverLabel%
+				ImageSearch x, y, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, *50 %selectDriverLabel%
 			else
-				ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *100 %selectDriverLabel%
+				ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *50 %selectDriverLabel%
 		
 			if x is Integer
 			{
@@ -1095,7 +1139,7 @@ class ACCPlugin extends ControllerPlugin {
 			if (fromTimer || !this.iPSImageSearchArea)
 				lastY := this.searchPitstopLabel(images)
 			
-			if (!fromTimer && this.iPSIsFound && this.iPSIsOpen) {
+			if (!fromTimer && this.iPSIsOpen) {
 				reload := this.searchStrategyLabel(lastY, images)
 				
 				reload := (this.searchTyreSetLabel(lastY, images) || reload)

@@ -825,62 +825,87 @@ class ACCPlugin extends ControllerPlugin {
 				}
 	}
 	
-	getLabelFileName(labelName) {
-		labelName := ("ACC\" . labelName)
-		fileName := getFileName(labelName . ".png", kUserScreenImagesDirectory)
+	getLabelFileNames(labelNames*) {
+		fileNames := []
 		
-		if FileExist(fileName)
-			return fileName
+		for ignore, labelName in labelNames {
+			labelName := ("ACC\" . labelName)
+			fileName := getFileName(labelName . ".png", kUserScreenImagesDirectory)
+			
+			if FileExist(fileName)
+				fileNames.Push(fileName)
+			
+			fileName := getFileName(labelName . ".jpg", kUserScreenImagesDirectory)
+			
+			if FileExist(fileName)
+				fileNames.Push(fileName)
+			
+			fileName := getFileName(labelName . ".png", kScreenImagesDirectory)
+			
+			if FileExist(fileName)
+				fileNames.Push(fileName)
+			
+			fileName := getFileName(labelName . ".jpg", kScreenImagesDirectory)
+			
+			if FileExist(fileName)
+				fileNames.Push(fileName)
+		}
 		
-		fileName := getFileName(labelName . ".jpg", kUserScreenImagesDirectory)
-		
-		if FileExist(fileName)
-			return fileName
-		
-		fileName := getFileName(labelName . ".png", kScreenImagesDirectory)
-		
-		if FileExist(fileName)
-			return fileName
-		
-		fileName := getFileName(labelName . ".jpg", kScreenImagesDirectory)
-		
-		if FileExist(fileName)
-			return fileName
-		
-		Throw "Unknonw label '" . labelName . "' detected in ACCPlugin.getLabelFileName..."
+		if (fileNames.Length() == 0)
+			Throw "Unknonw label '" . labelName . "' detected in ACCPlugin.getLabelFileName..."
+		else {
+			if isDebug()
+				showMessage("Labels: " . values2String(", ", labelNames*) . "; Images: " . values2String(", ", fileNames*), "Pitstop MFD Image Search", "Information.png", 5000)
+			
+			return fileNames
+		}
 	}
 	
 	searchPitstopLabel(images) {
 		static kSearchAreaLeft := 350
 		static kSearchAreaRight := 250
-		static pitstopLabel := false
+		static pitstopLabels := false
 		
-		if !pitstopLabel
-			pitstopLabel := this.getLabelFileName("PITSTOP")
+		if !pitstopLabels
+			pitstopLabels := this.getLabelFileNames("PITSTOP")
 		
 		curTickCount := A_TickCount
 		
-		if !this.iPSImageSearchArea {
-			ImageSearch x, y, 0, 0, A_ScreenWidth, A_ScreenHeight, *50 %pitstopLabel%
+		x := kUndefined
+		y := kUndefined
+		
+		Loop % pitstopLabels.Length()
+		{
+			pitstopLabel := pitstopLabels[A_Index]
+			
+			if !this.iPSImageSearchArea {
+				ImageSearch x, y, 0, 0, A_ScreenWidth, A_ScreenHeight, *50 %pitstopLabel%
 
-			logMessage(kLogInfo, translate("Full search for 'PITSTOP' took ") . A_TickCount - curTickCount . translate(" ms"))
-		}
-		else {
-			ImageSearch x, y, this.iPSImageSearchArea[1], this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *50 %pitstopLabel%
+				logMessage(kLogInfo, translate("Full search for 'PITSTOP' took ") . A_TickCount - curTickCount . translate(" ms"))
+			}
+			else {
+				ImageSearch x, y, this.iPSImageSearchArea[1], this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *50 %pitstopLabel%
 
-			logMessage(kLogInfo, translate("Optimized search for 'PITSTOP' took ") . A_TickCount - curTickCount . translate(" ms"))
+				logMessage(kLogInfo, translate("Optimized search for 'PITSTOP' took ") . A_TickCount - curTickCount . translate(" ms"))
+			}
+			
+			if x is Integer
+			{
+				images.Push(pitstopLabel)
+			
+				break
+			}
+
 		}
 		
 		lastY := false
 		
 		if x is Integer
 		{
-			images.Push("PITSTOP")
-			
 			lastY := y
 			
 			if !this.iPSImageSearchArea
-				this.iPSImageSearchArea := [Max(0, x - kSearchAreaLeft), Max(0, y - 20), Min(x + kSearchAreaRight, A_ScreenWidth), A_ScreenHeight]
+				this.iPSImageSearchArea := [Max(0, x - kSearchAreaLeft), 0, Min(x + kSearchAreaRight, A_ScreenWidth), A_ScreenHeight]
 		}
 		else {
 			this.iPSIsOpen := false
@@ -897,9 +922,13 @@ class ACCPlugin extends ControllerPlugin {
 		reload := false
 		
 		if !pitStrategyLabels
-			pitStrategyLabels := Array(this.getLabelFileName("Pit Strategy 1"), this.getLabelFileName("Pit Strategy 2"))
+			pitStrategyLabels := this.getLabelFileNames("Pit Strategy 1", "Pit Strategy 2")
 
-		Loop 2 {
+		x := kUndefined
+		y := kUndefined
+		
+		Loop % pitStrategyLabels.Length()
+		{
 			pitStrategyLabel := pitStrategyLabels[A_Index]
 			
 			if !this.iPSImageSearchArea
@@ -909,7 +938,7 @@ class ACCPlugin extends ControllerPlugin {
 
 			if x is Integer
 			{
-				images.Push("Pit Strategy " . A_Index)
+				images.Push(pitStrategyLabel)
 			
 				break
 			}
@@ -925,6 +954,9 @@ class ACCPlugin extends ControllerPlugin {
 			if !inList(this.kPSOptions, "Strategy") {
 				this.kPSOptions.InsertAt(inList(this.kPSOptions, "Refuel"), "Strategy")
 				
+				this.kPSTyreOptionPosition += 1
+				this.kPSBrakeOptionPosition += 1
+				
 				reload := true
 			}
 			
@@ -938,6 +970,9 @@ class ACCPlugin extends ControllerPlugin {
 			if position {
 				this.kPSOptions.RemoveAt(position)
 				
+				this.kPSTyreOptionPosition -= 1
+				this.kPSBrakeOptionPosition -= 1
+				
 				reload := true
 			}
 		
@@ -947,18 +982,22 @@ class ACCPlugin extends ControllerPlugin {
 		return reload
 	}
 	
-	searchTyreSetLabel(ByRef lastY, images) {
+	searchTyreLabel(ByRef lastY, images) {
 		static wetLabels := false
 		static compoundLabels := false
 		curTickCount := A_TickCount
 		reload := false
 		
 		if !wetLabels {
-			wetLabels := Array(this.getLabelFileName("Wet 1"), this.getLabelFileName("Wet 2"))
-			compoundLabels := Array(this.getLabelFileName("Compound 1"), this.getLabelFileName("Compound 2"))
+			wetLabels := this.getLabelFileNames("Wet 1", "Wet 2")
+			compoundLabels := this.getLabelFileNames("Compound 1", "Compound 2")
 		}
 		
-		Loop 2 {
+		x := kUndefined
+		y := kUndefined
+		
+		Loop % wetLabels.Length()
+		{
 			wetLabel := wetLabels[A_Index]
 				
 			if !this.iPSImageSearchArea
@@ -968,7 +1007,7 @@ class ACCPlugin extends ControllerPlugin {
 
 			if x is Integer
 			{
-				images.Push("Wet " . A_Index)
+				images.Push(wetLabel)
 			
 				break
 			}
@@ -994,8 +1033,12 @@ class ACCPlugin extends ControllerPlugin {
 			}
 		}
 		
-		Loop 2 {
-			compoundLabel := compoundLabels[A_index]
+		x := kUndefined
+		y := kUndefined
+		
+		Loop % compoundLabels.Length()
+		{
+			compoundLabel := compoundLabels[A_Index]
 			
 			if !this.iPSImageSearchArea
 				ImageSearch x, y, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, *50 %compoundLabel%
@@ -1004,7 +1047,7 @@ class ACCPlugin extends ControllerPlugin {
 			
 			if x is Integer
 			{
-				images.Push("Compound " . A_Index)
+				images.Push(compoundLabel)
 			
 				break
 			}
@@ -1038,9 +1081,13 @@ class ACCPlugin extends ControllerPlugin {
 		reload := false
 		
 		if !frontBrakeLabels
-			frontBrakeLabels := Array(this.getLabelFileName("Front Brake 1"), this.getLabelFileName("Front Brake 2"))
+			frontBrakeLabels := this.getLabelFileNames("Front Brake 1", "Front Brake 2")
 		
-		Loop 2 {
+		x := kUndefined
+		y := kUndefined
+		
+		Loop % frontBrakeLabels.Length()
+		{
 			frontBrakeLabel := frontBrakeLabels[A_Index]
 			
 			if !this.iPSImageSearchArea
@@ -1050,7 +1097,7 @@ class ACCPlugin extends ControllerPlugin {
 			
 			if x is Integer
 			{
-				images.Push("Front Brake " . A_Index)
+				images.Push(frontBrakeLabel)
 			
 				break
 			}
@@ -1082,9 +1129,13 @@ class ACCPlugin extends ControllerPlugin {
 		reload := false
 		
 		if !selectDriverLabels
-			selectDriverLabels := Array(this.getLabelFileName("Select Driver 1"), this.getLabelFileName("Select Driver 2"), this.getLabelFileName("Select Driver 3"))
+			selectDriverLabels := this.getLabelFileNames("Select Driver 1", "Select Driver 2")
 		
-		Loop 3 {
+		x := kUndefined
+		y := kUndefined
+		
+		Loop % selectDriverLabels.Length()
+		{
 			selectDriverLabel := selectDriverLabels[A_Index]
 			
 			if !this.iPSImageSearchArea
@@ -1094,7 +1145,7 @@ class ACCPlugin extends ControllerPlugin {
 		
 			if x is Integer
 			{
-				images.Push("Select Driver " . A_Index)
+				images.Push(selectDriverLabel)
 			
 				break
 			}
@@ -1142,7 +1193,7 @@ class ACCPlugin extends ControllerPlugin {
 			if (!fromTimer && this.iPSIsOpen) {
 				reload := this.searchStrategyLabel(lastY, images)
 				
-				reload := (this.searchTyreSetLabel(lastY, images) || reload)
+				reload := (this.searchTyreLabel(lastY, images) || reload)
 				
 				reload := (this.searchBrakeLabel(lastY, images) || reload)
 	

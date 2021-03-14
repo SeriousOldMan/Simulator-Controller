@@ -21,6 +21,7 @@ Release 2.6 Checklist
    a. Virtual Race Engineer
    b. Plugins & Modes
    c. Functions
+   d. Installation & Setup
 4. Rework Splash Windows
    a. Functions.md
    b. Remove showSplashAnimation

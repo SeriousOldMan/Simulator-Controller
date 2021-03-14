@@ -1621,6 +1621,8 @@ readSharedMemory(dataFile) {
 		
 	try {
 		Run %ComSpec% /c ""%exePath%" > "%dataFile%"", , Hide
+		
+		IniWrite ACC, %dataFile%, Race Data, Simulator
 	}
 	catch exception {
 		logMessage(kLogCritical, translate("Cannot start ACC SHM Reader (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))

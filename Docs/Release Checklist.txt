@@ -28,6 +28,9 @@ Release 2.6 Checklist
 6. reverse
    a. Functions.md
 7. Unblocking must get better
+8. Update procedure
+   a. Translations
+   b. ACC SHM Reader neu bauen
    
 Release 2.5.4 Checklist
 =====================

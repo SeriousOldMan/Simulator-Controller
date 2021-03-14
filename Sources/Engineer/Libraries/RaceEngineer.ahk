@@ -1053,6 +1053,8 @@ class RaceEngineer extends ConfigurationItem {
 				, "Race.Setup.Tyre.Wet.Pressure.FR": getConfigurationValue(settings, "Race Setup", "Tyre.Wet.Pressure.FR", 28.2)
 				, "Race.Setup.Tyre.Wet.Pressure.RL": getConfigurationValue(settings, "Race Setup", "Tyre.Wet.Pressure.RL", 28.2)
 				, "Race.Setup.Tyre.Wet.Pressure.RR": getConfigurationValue(settings, "Race Setup", "Tyre.Wet.Pressure.RR", 28.2)}
+
+		facts["Race.Simulator"] := getConfigurationValue(data, "Race Data", "Simulator", "Unknown")
 				
 		return facts
 	}
@@ -1246,6 +1248,13 @@ class RaceEngineer extends ConfigurationItem {
 		if this.Debug[kDebugKnowledgeBase]
 			dumpKnowledge(this.KnowledgeBase)
 		
+		currentCompound := knowledgeBase.getValue("Tyre.Compound", false)
+		targetCompound := knowledgeBase.getValue("Tyre.Compound.Target", false)
+		
+		if (currentCompound && (currentCompound = targetCompound))
+			this.updateSetupDatabase(knowledgeBase.getValue("Race.Simulator"), knowledgeBase.getValue("Race.Track"), knowledgeBase.getValue("Race.Car")
+								   , currentCompound, airTemperature, trackTemperature, weatherNow)
+		
 		return result
 	}
 	
@@ -1334,6 +1343,99 @@ class RaceEngineer extends ConfigurationItem {
 		}
 		else
 			return true
+	}
+	
+	updateSetupDatabase(simulator, track, car, compound, airTemperature, trackTemperature, weather) {
+		local knowledgeBase := this.KnowledgeBase
+		static initialized := false
+		static lastCar := false
+		static lastTrack := false
+		static lastCompound := false
+		static lastWeather := false
+		static database := false
+		static databaseName := false
+		
+		if !initialized {
+			FileCreateDir %kUserHomeDirectory%Setup
+			FileCreateDir %kUserHomeDirectory%Setup\%simulator%
+			
+			if !FileExist(kUserHomeDirectory . "Setup\ID") {
+				Random major, 0, 10000
+				Random minor, 0, 10000
+				
+				id := ConfigurationItem.descriptor(A_TickCount, major, minor)
+				
+				FileAppend %id%, % kUserHomeDirectory . "Setup\ID"
+			}
+		}
+		
+		if (lastCar != car) {
+			FileCreateDir %kUserHomeDirectory%Setup\%simulator%\%car%
+		
+			lastCar := car
+			database := false
+		}
+		
+		if (lastTrack != track) {
+			FileCreateDir %kUserHomeDirectory%Setup\%simulator%\%car%\%track%
+		
+			lastTrack := track
+			database := false
+		}
+		
+		if ((lastCompound != compound) || (lastWeather != weather))
+			database := false
+		
+		lastCompound := compound
+		lastWeather := weather
+		
+		targetPressures := Array(Round(knowledgeBase.getValue("Tyre.Pressure.Target.FL"), 1)
+							   , Round(knowledgeBase.getValue("Tyre.Pressure.Target.FR"), 1)
+							   , Round(knowledgeBase.getValue("Tyre.Pressure.Target.RL"), 1)
+							   , Round(knowledgeBase.getValue("Tyre.Pressure.Target.RR"), 1))
+		targetIncrements := Array(Round(knowledgeBase.getValue("Tyre.Pressure.Target.FL.Increment"), 1)
+								, Round(knowledgeBase.getValue("Tyre.Pressure.Target.FR.Increment"), 1)
+								, Round(knowledgeBase.getValue("Tyre.Pressure.Target.RL.Increment"), 1)
+								, Round(knowledgeBase.getValue("Tyre.Pressure.Target.RR.Increment"), 1))
+		
+		key := ConfigurationItem.descriptor(airTemperature, trackTemperature)
+		
+		if !database {
+			databaseName := kUserHomeDirectory . "Setup\" . simulator . "\" . car . "\" . track . "\Setup " . compound . " " . weather . ".data"
+		
+			database := readConfiguration(databaseName)
+		}
+		
+		pressures := getConfigurationValue(database, "Pressures", key, "")
+		
+		if (true || (StrLen(pressures) = 0)) {
+			setConfigurationValue(database, "Pressures", key, values2String(", ", targetPressures*) . "; " . values2String(", ", targetIncrements*))
+			
+			writeConfiguration(databaseName, database)
+		}
+		else {
+			changed := false
+		
+			pressures := string2values(";", pressures)
+			increments := string2Values(",", pressures[2])
+			pressures := string2Values(",", pressures[1])
+			
+			Loop 4
+			{
+				if (increments[A_Index] > targetIncrements[A_Index]) {
+					changed := true
+					
+					pressures[A_Index] := targetPressures[A_Index]
+					increments[A_Index] := targetIncrements[A_Index]
+				}
+			}
+			
+			if changed {
+				setConfigurationValue(database, "Pressures", key, values2String(", ", pressures*) . "; " . values2String(", ", increments*))
+			
+				writeConfiguration(databaseName, database)
+			}
+		}
 	}
 	
 	hasEnoughData() {

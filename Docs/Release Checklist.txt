@@ -34,6 +34,9 @@ Release 2.6 Checklist
    b. ACC SHM Reader neu bauen
 9. Race Data Collection
    a. Documentation
+10. Import for RE Settings
+    a. Documentation
+	b. New Picture
    
 Release 2.5.4 Checklist
 =====================

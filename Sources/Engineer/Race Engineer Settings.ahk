@@ -67,6 +67,19 @@ global changeTyreThresholdEdit
 global changeTyreGreaterLabel
 global changeTyreThresholdLabel
 	
+global spSetupTyreCompoundDropDown
+global spSetupTyreSetEdit
+global spPitstopTyreSetEdit
+
+global spDryFrontLeftEdit
+global spDryFrontRightEdit
+global spDryRearLeftEdit
+global spDryRearRightEdit
+global spWetFrontLeftEdit
+global spWetFrontRightEdit
+global spWetRearLeftEdit
+global spWetRearRightEdit
+	
 	
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
@@ -210,19 +223,6 @@ editSettings(ByRef settingsOrCommand) {
 	static fuelConsumptionEdit
 	static pitstopDeltaEdit
 	static safetyFuelEdit
-	
-	static spSetupTyreCompoundDropDown
-	static spSetupTyreSetEdit
-	static spPitstopTyreSetEdit
-	
-	static spDryFrontLeftEdit
-	static spDryFrontRightEdit
-	static spDryRearLeftEdit
-	static spDryRearRightEdit
-	static spWetFrontLeftEdit
-	static spWetFrontRightEdit
-	static spWetRearLeftEdit
-	static spWetRearRightEdit
 
 restart:
 	if (settingsOrCommand == kLoad)
@@ -549,9 +549,11 @@ restart:
 		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit2 Number VspSetupTyreSetEdit, %spSetupTyreSetEdit%
 		Gui RES:Add, UpDown, x138 yp-2 w18 h20, %spSetupTyreSetEdit%
 
-		Gui RES:Add, Text, x16 yp+24 w90 h20, % translate("Pitstop Tyre Set")
+		Gui RES:Add, Text, x16 yp+24 w95 h20, % translate("Pitstop Tyre Set")
 		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit2 Number VspPitstopTyreSetEdit, %spPitstopTyreSetEdit%
 		Gui RES:Add, UpDown, x138 yp-2 w18 h20, %spPitstopTyreSetEdit%
+		
+		Gui RES:Add, Button, x292 yp w90 h23 gimportFromSimulation, % translate("Import")
 
 		Gui RES:Font, Norm, Arial
 		Gui RES:Font, Italic, Arial
@@ -649,6 +651,63 @@ restart:
 		}
 		
 		return result
+	}
+}
+
+readSharedMemory(dataFile) {
+	exePath := kBinariesDirectory . "ACC SHM Reader.exe"
+		
+	try {
+		Run %ComSpec% /c ""%exePath%" > "%dataFile%"", , Hide
+		
+		IniWrite ACC, %dataFile%, Race Data, Simulator
+	}
+	catch exception {
+		logMessage(kLogCritical, translate("Cannot start ACC SHM Reader (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
+			
+		showMessage(substituteVariables(translate("Cannot start ACC SHM Reader (%exePath%) - please check the configuration..."), {exePath: exePath})
+				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+	}
+	
+	return readConfiguration(dataFile)
+}
+
+importFromSimulation() {
+	accApplication := new Application("Assetto Corsa Competizione", kSimulatorConfiguration)
+	
+	if accApplication.isRunning() {
+		data := readSharedMemory(kUserHomeDirectory . "Temp\ACC Data\Settings.data")
+		
+		spPitstopTyreSetEdit := getConfigurationValue(data, "Pitstop Data", "TyreSet", 0)
+		
+		GuiControl Text, spPitstopTyreSetEdit, %spPitstopTyreSetEdit%
+			
+		if (getConfigurationValue(data, "Car Data", "TyreCompound", "Dry") = "Dry") {
+			spDryFrontLeftEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureFL", 26.1)
+			spDryFrontRightEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureFR", 26.1)
+			spDryRearLeftEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureRL", 26.1)
+			spDryRearRightEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureRR", 26.1)
+		
+			GuiControl Choose, spSetupTyreCompoundDropDown, 2
+			
+			GuiControl Text, spDryFrontLeftEdit, %spDryFrontLeftEdit%
+			GuiControl Text, spDryFrontRightEdit, %spDryFrontRightEdit%
+			GuiControl Text, spDryRearLeftEdit, %spDryRearLeftEdit%
+			GuiControl Text, spDryRearRightEdit, %spDryRearRightEdit%
+		}
+		else {
+			spWetFrontLeftEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureFL", 28.5)
+			spWetFrontRightEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureFR", 28.5)
+			spWetRearLeftEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureRL", 28.5)
+			spWetRearRightEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureRR", 28.5)
+			
+			GuiControl Choose, spSetupTyreCompoundDropDown, 1
+			
+			GuiControl Text, spWetFrontLeftEdit, %spWetFrontLeftEdit%
+			GuiControl Text, spWetFrontRightEdit, %spWetFrontRightEdit%
+			GuiControl Text, spWetRearLeftEdit, %spWetRearLeftEdit%
+			GuiControl Text, spWetRearRightEdit, %spWetRearRightEdit%
+		}
 	}
 }
 

@@ -105,6 +105,9 @@ Returns the position of *value* in the given list or array, or *false*, if not f
 #### *concatenate(#rest lists :: Array)*
 Returns a freshly allocated list containing all the elements contained in the supplied lists. The global order is preserved.
 
+#### *reverse(list :: Array)*
+Returns a freshly allocated list containing all the elements of the supplied list in reversed order.
+
 #### *map(list :: Array, function :: TypeUnion(String, FuncObj))*
 Returns a new list with the result of *function* applied to each element in *list*, while preserving the order of elements.
 

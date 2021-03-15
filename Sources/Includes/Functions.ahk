@@ -566,7 +566,7 @@ requestConsent() {
 			writeConfiguration(kUserConfigDirectory . "CONSENT", consent)
 		}
 		
-		if getConfigurationValue(consent, "Consent", "Share Database", false) {
+		if (getConfigurationValue(consent, "Consent", "Share Database", false) == true) {
 			uploadTimeStamp := kUserHomeDirectory . "Setup Database\Local\UPLOAD"
 			
 			if FileExist(uploadTimeStamp) {

@@ -3324,7 +3324,7 @@ class TranslationsList extends ConfigurationItemList {
 		if (this.iCurrentItemIndex != 0)
 			this.updateItem()
 
-		if (this.iChanged) {
+		if this.iChanged {
 			SoundPlay *32
 		
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))

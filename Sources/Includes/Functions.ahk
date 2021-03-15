@@ -44,6 +44,30 @@ global vTrayMessageDuration = 1500
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+ftpUpload(server, user, password, localFile, remoteFile)
+{
+    static a := "AHK-FTP-UL"
+	
+	m := DllCall("LoadLibrary", "str", "wininet.dll", "ptr")
+	h := DllCall("wininet\InternetOpen", "ptr", &a, "uint", 1, "ptr", 0, "ptr", 0, "uint", 0, "ptr")
+	
+    if (!m || !h)
+        return false
+	
+	f := DllCall("wininet\InternetConnect", "ptr", h, "ptr", &server, "ushort", 21, "ptr", &user, "ptr", &password, "uint", 1, "uint", 0x08000000, "uptr", 0, "ptr")
+	
+    if f {
+        if !(DllCall("wininet\FtpPutFile", "ptr", f, "ptr", &localFile, "ptr", &remoteFile, "uint", 0, "uptr", 0))
+            return false, (DllCall("wininet\InternetCloseHandle", "ptr", h) && DllCall("FreeLibrary", "ptr", m))
+		
+        DllCall("wininet\InternetCloseHandle", "ptr", f)
+    }
+    
+	DllCall("wininet\InternetCloseHandle", "ptr", h) && DllCall("FreeLibrary", "ptr", m)
+    
+	return true
+}
+
 createMessageReceiver() {
 	Gui MR:-Border -Caption
 	Gui MR:Color, D0D0D0
@@ -541,6 +565,44 @@ requestConsent() {
 			
 			writeConfiguration(kUserConfigDirectory . "CONSENT", consent)
 		}
+		
+		if getConfigurationValue(consent, "Consent", "Share Database", false) {
+			uploadTimeStamp := kUserHomeDirectory . "Setup Database\Local\UPLOAD"
+			
+			if FileExist(uploadTimeStamp) {
+				FileReadLine upload, %uploadTimeStamp%, 1
+				
+				now := A_Now
+				
+				EnvSub now, %upload%, days
+				
+				if (now <= 7)
+					return
+			}
+			
+			try {
+				RunWait PowerShell.exe -Command Compress-Archive -LiteralPath '%kUserHomeDirectory%Setup Database\Local' -CompressionLevel Optimal -DestinationPath '%kUserHomeDirectory%Temp\Setup Database.%id%.zip',, Hide
+				
+				ftpUpload("ftp.drivehq.com", "TheBigO", "29605343.9318.1940", kUserHomeDirectory . "Temp\Setup Database." . id . ".zip", "Simulator Controller\Setup Database Uploads\Setup Database." . id . ".zip")
+				
+				try {
+					FileDelete %kUserHomeDirectory%Setup Database\Local\UPLOAD
+				}
+				catch exception {
+					; ignore
+				}
+				
+				FileAppend %A_Now%, %kUserHomeDirectory%Setup Database\Local\UPLOAD
+				
+				logMessage(kLogInfo, translate("Setup database successfully uploaded"))
+			}
+			catch exception {
+				logMessage(kLogCritical, translate("Error while uploading setup database - please check your internet connection..."))
+			
+				showMessage(translate("Error while uploading setup database - please check your internet connection...")
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			}
+		}
 	}
 }
 
@@ -691,7 +753,8 @@ initializeEnvironment() {
 	FileCreateDir %kUserHomeDirectory%Plugins
 	FileCreateDir %kUserHomeDirectory%Temp
 	FileCreateDir %kUserHomeDirectory%Temp\Messages
-	FileCreateDir %kUserHomeDirectory%Setup Database
+	FileCreateDir %kUserHomeDirectory%Setup Database\Global
+	FileCreateDir %kUserHomeDirectory%Setup Database\Local
 	
 	if !FileExist(A_MyDocuments . "\Simulator Controller\Plugins\Plugins.ahk")
 		FileCopy %kResourcesDirectory%Templates\Plugins.ahk, %A_MyDocuments%\Simulator Controller\Plugins

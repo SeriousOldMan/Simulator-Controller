@@ -1355,7 +1355,7 @@ class RaceEngineer extends ConfigurationItem {
 		static database := false
 		static databaseName := false
 		
-		FileCreateDir %kUserHomeDirectory%Setup Database\%simulator%\%car%\%track%
+		FileCreateDir %kUserHomeDirectory%Setup Database\Local\%simulator%\%car%\%track%
 		
 		if ((lastSimulator != simulator) || (lastCar != car) || (lastTrack != track) || (lastCompound != compound) || (lastWeather != weather)) {
 			database := false
@@ -1379,7 +1379,7 @@ class RaceEngineer extends ConfigurationItem {
 		key := ConfigurationItem.descriptor(airTemperature, trackTemperature)
 		
 		if !database {
-			databaseName := kUserHomeDirectory . "Setup Database\" . simulator . "\" . car . "\" . track . "\Tyre Setup " . compound . " " . weather . ".data"
+			databaseName := kUserHomeDirectory . "Setup Database\Local\" . simulator . "\" . car . "\" . track . "\Tyre Setup " . compound . " " . weather . ".data"
 		
 			database := readConfiguration(databaseName)
 		}

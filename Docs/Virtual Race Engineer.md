@@ -369,7 +369,9 @@ A considerable part of the knowledge of Jona comes from the telemetry informatio
 	Laps=3
 	LapLastTime=116697
 	LapBestTime=116697
-	TimeRemaining=1.41874e+06
+	RaceTimeRemaining=1.41874e+06
+	StintTimeRemaining=1.41874e+06
+	DriverTimeRemaining=1.41874e+06
 	InPit=false
 	[Track Data]
 	Temperature=25.5913

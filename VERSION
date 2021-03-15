@@ -2,5 +2,5 @@
 Current=2.5.5-dev
 Target=2.6-release
 Release=2.5.4-release
-Changes=Improved stint time management, Setup for Big Data Collection, Rework of the configuration tool
+Changes=Improved stint time management, Initial setup for Big Data Collection, Rework of the configuration tool
 Date=03/12/2021

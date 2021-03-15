@@ -61,6 +61,8 @@ Declaration of consent=>Einwilligungserklärung
 Your database identification key is:=>Ihr Datenbankidentifikationsschlüssel lautet:
 Do you agree to the transfer of your local data to a central server?=>Stimmen Sie der Bereitstellung Ihrer Daten zu?
 Ask again later...=>Später erneut nachfragen...
+Setup database successfully uploaded=>Setup Datenbank erflogreich hochgeladen
+Error while uploading setup database - please check your internet connection...=>Fehler beim Hochladen der Setup Datenbank - bitte übeprüfen Sie Ihre Internetverbindung...
 [Classes]
 Application =>Anwendung 
  executed with result code => wurde ausgeführt mit Ergebnis 

@@ -57,12 +57,11 @@ Critical=>
 Log Level=>
 Log Level: =>
 Declaration of consent=>
-Starting with release 2.6, Jona, the virtual race engineer, collects several data from your races and saves them together with the associated setup, air and asphalt temperature and other environmental conditions in a local database. This information can then be used as a starting point for a setup in a future race under the same or similar conditions. In order to build up a comprehensive collection of data on vehicles, tracks and environmental conditions as quickly as possible, Jona can integrate your data with the data of all other drivers, and in return will make the consolidated database available to all contributors.`n`nWhen your data is transferred, no direct or indirect personal data is involved. It is not possible to draw any conclusions about the individual user or the computers from which the data originated. A randomly generated key is used for identification, which identifies the local database and the data supplied for further processing.=>
 Your database identification key is:=>
 Do you agree to the transfer of your local data to a central server?=>
 Ask again later...=>
-Please note, that your answer is saved in the ""CONSENT"" file in the ""Simulator Controller\Config"" directory which is located in your user Documents folder. If you want to change your mind in the future, delete this file and this dialog will appear again.=>
-Important: It is more than necessary, that you have supplied the correct setup information to Jona, before starting a race. Otherwise the recorded data will be corrupted and will lead to false information in the consolidated database as well. You will find comprehensive information about this in the <a href=""https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#racing-with-jona"">documentation</a>.=>
+Setup database successfully uploaded=>
+Error while uploading setup database - please check your internet connection...=>
 [Classes]
 Application =>
  executed with result code =>

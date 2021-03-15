@@ -1347,7 +1347,7 @@ class RaceEngineer extends ConfigurationItem {
 	
 	updateSetupDatabase(simulator, track, car, compound, airTemperature, trackTemperature, weather) {
 		local knowledgeBase := this.KnowledgeBase
-		static initialized := false
+		static lastSimulator := false
 		static lastCar := false
 		static lastTrack := false
 		static lastCompound := false
@@ -1355,39 +1355,17 @@ class RaceEngineer extends ConfigurationItem {
 		static database := false
 		static databaseName := false
 		
-		if !initialized {
-			FileCreateDir %kUserHomeDirectory%Setup
-			FileCreateDir %kUserHomeDirectory%Setup\%simulator%
-			
-			if !FileExist(kUserHomeDirectory . "Setup\ID") {
-				Random major, 0, 10000
-				Random minor, 0, 10000
-				
-				id := ConfigurationItem.descriptor(A_TickCount, major, minor)
-				
-				FileAppend %id%, % kUserHomeDirectory . "Setup\ID"
-			}
-		}
+		FileCreateDir %kUserHomeDirectory%Setup Database\%simulator%\%car%\%track%
 		
-		if (lastCar != car) {
-			FileCreateDir %kUserHomeDirectory%Setup\%simulator%\%car%
+		if ((lastSimulator != simulator) || (lastCar != car) || (lastTrack != track) || (lastCompound != compound) || (lastWeather != weather)) {
+			database := false
 		
+			lastSimulator := simulator
 			lastCar := car
-			database := false
-		}
-		
-		if (lastTrack != track) {
-			FileCreateDir %kUserHomeDirectory%Setup\%simulator%\%car%\%track%
-		
 			lastTrack := track
-			database := false
+			lastCompound := compound
+			lastWeather := weather
 		}
-		
-		if ((lastCompound != compound) || (lastWeather != weather))
-			database := false
-		
-		lastCompound := compound
-		lastWeather := weather
 		
 		targetPressures := Array(Round(knowledgeBase.getValue("Tyre.Pressure.Target.FL"), 1)
 							   , Round(knowledgeBase.getValue("Tyre.Pressure.Target.FR"), 1)
@@ -1401,7 +1379,7 @@ class RaceEngineer extends ConfigurationItem {
 		key := ConfigurationItem.descriptor(airTemperature, trackTemperature)
 		
 		if !database {
-			databaseName := kUserHomeDirectory . "Setup\" . simulator . "\" . car . "\" . track . "\Setup " . compound . " " . weather . ".data"
+			databaseName := kUserHomeDirectory . "Setup Database\" . simulator . "\" . car . "\" . track . "\Tyre Setup " . compound . " " . weather . ".data"
 		
 			database := readConfiguration(databaseName)
 		}

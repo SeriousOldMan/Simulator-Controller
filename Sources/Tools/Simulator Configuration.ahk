@@ -3218,7 +3218,6 @@ class TranslationsList extends ConfigurationItemList {
 		setButtonIcon(nextUntranslatedButtonHandle, kIconsDirectory . "Down Arrow.ico", 1)
 		Gui TE:Add, Edit, x110 yp w283 h80 VtranslationTextEdit, %translationTextEdit%
 		
-		
 		return translationsListViewHandle
 	}
 	

@@ -54,6 +54,71 @@ createMessageReceiver() {
 	Gui MR:Show, Hide AutoSize X0 Y0
 }
 
+consentDialog(id) {
+	static consentDropDown
+	static closed
+	
+	if (id = "Close") {
+		closed := true
+		
+		return
+	}
+	else
+		closed := false
+	
+	language := getLanguage()
+	
+	if ((language != "en") && (language != "de"))
+		language := "en"
+	
+	texts := readConfiguration(kConfigDirectory . "Consent.ini")
+	
+	Gui CNS:-Border -Caption
+	Gui CNS:Color, D0D0D0
+	Gui CNS:Font, s10 Bold
+	Gui CNS:Add, Text, x0 y8 w800 +0x200 +0x1 BackgroundTrans gmoveConsentDialog, % translate("Modular Simulator Controller System")
+	Gui CNS:Font, Norm, Arial
+	Gui CNS:Add, Text, x0 y32 w800 h23 +0x200 +0x1 BackgroundTrans, % translate("Declaration of consent")
+	
+	Gui CNS:Add, Text, x8 y70 w784 h180 -VScroll +Wrap ReadOnly, % StrReplace(StrReplace(getConfigurationValue(texts, language, "Introduction"), "``n", "`n"), "\<>", "=")
+	
+	Gui CNS:Add, Text, x8 y260 w450 h23 +0x200, % translate("Your database identification key is:")
+	Gui CNS:Add, Edit, x460 y260 w332 h23 -VScroll ReadOnly Center, % id
+	
+	Gui CNS:Add, Text, x8 y300 w450 h23 +0x200, % translate("Do you agree to the transfer of your local data to a central server?")
+
+	Gui CNS:Add, DropDownList, x460 y300 w332 AltSubmit Choose3 VconsentDropDown, % values2String("|", map(["Yes", "No", "Ask again later..."], "translate")*)
+		
+	Gui, CNS:Add, Text, x8 y340 w784 h60 -VScroll +Wrap ReadOnly, % StrReplace(StrReplace(getConfigurationValue(texts, language, "Information"), "``n", "`n"), "\<>", "=")
+	
+	Gui, CNS:Add, Link, x8 y410 w784 h60 cRed -VScroll +Wrap ReadOnly, % StrReplace(StrReplace(getConfigurationValue(texts, language, "Warning"), "``n", "`n"), "\<>", "=")
+		
+	Gui CNS:Add, Button, x368 y490 w80 h23 Default gcloseConsentDialog, % translate("Save")
+	
+	Gui CNS:+AlwaysOnTop
+	Gui CNS:Show, Center AutoSize
+	
+	Gui CNS:Default
+	
+	Loop
+		Sleep 100
+	until closed
+	
+	GuiControlGet consentDropDown
+	
+	Gui CNS:Destroy
+	
+	return ["Yes", "No", "Retry"][consentDropDown]
+}
+
+closeConsentDialog() {
+	consentDialog("Close")
+}
+
+moveConsentDialog() {
+	moveByMouse("CNS")
+}
+
 changeProtection(up) {
 	static level := 0
 	
@@ -432,6 +497,53 @@ startTrayMessageManager() {
 	SetTimer trayMessageQueue, -500
 }
 
+requestConsent() {
+	program := StrSplit(A_ScriptName, ".")[1]
+	
+	if ((program = "Simulator Startup") || (program = "Simulator Configuration")) {
+		idFileName := kUserConfigDirectory . "ID"
+		
+		FileReadLine id, %idFileName%, 1
+		
+		consent := readConfiguration(kUserConfigDirectory . "CONSENT")
+		
+		request := ((consent.Count() == 0) || (id != getConfigurationValue(consent, "General", "ID")))
+		
+		if !request {
+			countdown := getConfigurationValue(consent, "General", "Countdown", kUndefined)
+			
+			if (countdown != kUndefined) {
+				if (--countdown <= 0)
+					request := true
+				else {
+					setConfigurationValue(consent, "General", "Countdown", countdown)
+				
+					writeConfiguration(kUserConfigDirectory . "CONSENT", consent)
+				}
+			}
+		}
+		
+		if request {
+			consent := newConfiguration()
+			
+			setConfigurationValue(consent, "General", "ID", id)
+			setConfigurationValue(consent, "Consent", "Date", A_MM . "/" . A_DD . "/" . A_YYYY)
+			
+			switch consentDialog(id) {
+				case "Yes":
+					setConfigurationValue(consent, "Consent", "Share Database", true)
+				case "No":
+					setConfigurationValue(consent, "Consent", "Share Database", false)
+				case "Retry":
+					setConfigurationValue(consent, "Consent", "Share Database", "Undecided")
+					setConfigurationValue(consent, "General", "Countdown", 10)
+			}
+			
+			writeConfiguration(kUserConfigDirectory . "CONSENT", consent)
+		}
+	}
+}
+
 checkForUpdates() {
 	if inList(["Simulator Startup", "Simulator Configuration", "Simulator Settings"], StrSplit(A_ScriptName, ".")[1]) {
 		URLDownloadToFile https://www.dropbox.com/s/txa8muw9j3g66tl/VERSION?dl=1, %kUserHomeDirectory%Temp\VERSION
@@ -579,6 +691,7 @@ initializeEnvironment() {
 	FileCreateDir %kUserHomeDirectory%Plugins
 	FileCreateDir %kUserHomeDirectory%Temp
 	FileCreateDir %kUserHomeDirectory%Temp\Messages
+	FileCreateDir %kUserHomeDirectory%Setup Database
 	
 	if !FileExist(A_MyDocuments . "\Simulator Controller\Plugins\Plugins.ahk")
 		FileCopy %kResourcesDirectory%Templates\Plugins.ahk, %A_MyDocuments%\Simulator Controller\Plugins
@@ -588,6 +701,15 @@ initializeEnvironment() {
 	
 	if !FileExist(kUserConfigDirectory . "Race Engineer.settings")
 		FileCopy %kResourcesDirectory%Templates\Race Engineer.settings, %kUserConfigDirectory%
+			
+	if !FileExist(kUserConfigDirectory . "ID") {
+		Random major, 0, 10000
+		Random minor, 0, 10000
+		
+		id := values2String(".", A_TickCount, major, minor)
+		
+		FileAppend %id%, % kUserConfigDirectory . "ID"
+	}
 	
 	if virgin
 		FileCopy %kResourcesDirectory%Templates\UPDATES, %kUserConfigDirectory%
@@ -1456,6 +1578,7 @@ decreaseLogLevel() {
 initializeEnvironment()
 loadSimulatorConfiguration()
 checkForUpdates()
+requestConsent()
 initializeLoggingSystem()
 startMessageManager()
 startTrayMessageManager()

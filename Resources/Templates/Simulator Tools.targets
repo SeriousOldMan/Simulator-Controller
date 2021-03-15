@@ -31,6 +31,7 @@ Translations.1=%kConfigDirectory%Translations.en <- %kSourcesDirectory%Tools\Tra
 Translations.2=%kResourcesDirectory%Templates\Translations.en <- %kSourcesDirectory%Tools\Translations.en
 Translations.3=%kConfigDirectory%Translations.de <- %kSourcesDirectory%Tools\Translations.de
 Translations.4=%kResourcesDirectory%Templates\Translations.de <- %kSourcesDirectory%Tools\Translations.de
+Consent=%kConfigDirectory%Consent.ini <- %kSourcesDirectory%Startup\Consent.ini
 Plugin Labels.1=%kConfigDirectory%Controller Plugin Labels.ini <- %kSourcesDirectory%Plugins\Controller Plugin Labels.ini
 Plugin Labels.2=%kResourcesDirectory%Templates\Controller Plugin Labels.ini <- %kSourcesDirectory%Plugins\Controller Plugin Labels.ini
 Race Engineer Settings.1=%kConfigDirectory%Race Engineer.settings <- %kSourcesDirectory%Engineer\Race Engineer.settings

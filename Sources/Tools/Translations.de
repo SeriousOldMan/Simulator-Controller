@@ -57,6 +57,10 @@ Warn=>Warnungen
 Critical=>Fehler
 Log Level=>Protokoll
 Log Level: =>Protokoll: 
+Declaration of consent=>Einwilligungserklärung
+Your database identification key is:=>Ihr Datenbankidentifikationsschlüssel lautet:
+Do you agree to the transfer of your local data to a central server?=>Stimmen Sie der Bereitstellung Ihrer Daten zu?
+Ask again later...=>Später erneut nachfragen...
 [Classes]
 Application =>Anwendung 
  executed with result code => wurde ausgeführt mit Ergebnis 

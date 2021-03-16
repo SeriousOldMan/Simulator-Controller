@@ -1300,7 +1300,7 @@ class RaceEngineer extends ConfigurationItem {
 			newValue := Round(bodyworkDamage[index], 2)
 			fact := ("Lap." . lapNumber . ".Damage.Bodywork." . position)
 		
-			if (Round(knowledgeBase.getValue(fact, 0), 2) < newValue) {
+			if (Round(knowledgeBase.getValue(fact, 0)) < Round(newValue)) {
 				knowledgeBase.setValue(fact, newValue)
 				
 				changed := true
@@ -1320,7 +1320,7 @@ class RaceEngineer extends ConfigurationItem {
 			newValue := Round(suspensionDamage[index], 2)
 			fact := ("Lap." . lapNumber . ".Damage.Suspension." . position)
 		
-			if (Round(knowledgeBase.getValue(fact, 0), 2) < newValue) {
+			if (Round(knowledgeBase.getValue(fact, 0)) < Round(newValue)) {
 				knowledgeBase.setValue(fact, newValue)
 				
 				changed := true

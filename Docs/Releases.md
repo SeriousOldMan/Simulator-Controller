@@ -12,7 +12,8 @@
 	 - When driver decides for a different tyre compound than recommended, the target pressures will be fully recalculated
   5. Initial setup of database for Big Data race setup collection
      - Opt In for community based data acquisition
-  6. Larger window size for configuration tool and support for configuration plugins
+  6. Larger window size and better UI for configuration tool
+     - You can open related documentation directly from the configuration tool in several places
   
 ## 2.5.4-release 03/12/21
   

@@ -1292,7 +1292,22 @@ openLabelsEditor() {
 }
 
 openPluginsModesDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes
+	GuiControlGet pluginEdit
+	
+	switch pluginEdit {
+		case "System":
+			Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration
+		case "Tactile Feedback":
+			Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-1
+		case "Motion Feedback":
+			Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-2
+		case "Pedal Calibration":
+			Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-3
+		case "ACC":
+			Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-4
+		default:
+			Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes
+	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -1716,11 +1731,21 @@ class FunctionsList extends ConfigurationItemList {
 		Gui SE:Add, Text, x124 y400 w160 h23 +0x200 +Center, % translate("On or Increase")
 		Gui SE:Add, Text, x303 y400 w160 h23 +0x200 +Center, % translate("Off or Decrease")
 		
-		Gui SE:Add, Text, x24 y424 w83 h23 +0x200, % translate("Hotkey(s)")
+		Gui SE:Font, Underline, Arial
+		
+		Gui SE:Add, Text, x24 y424 w83 h23 +0x200 cBlue gopenHotkeysDocumentation, % translate("Hotkey(s)")
+		
+		Gui SE:Font, Norm, Arial
+		
 		Gui SE:Add, Edit, x124 y424 w160 h21 VfunctionOnHotkeysEdit, %functionOnHotkeysEdit%
 		Gui SE:Add, Edit, x303 y424 w160 h21 VfunctionOffHotkeysEdit, %functionOffHotkeysEdit%
 		
-		Gui SE:Add, Text, x24 y450 w83 h23, % translate("Action (optional)")
+		Gui SE:Font, Underline, Arial
+		
+		Gui SE:Add, Text, x24 y450 w83 h23 cBlue gopenActionsDocumentation, % translate("Action (optional)")
+		
+		Gui SE:Font, Norm, Arial
+		
 		Gui SE:Add, Edit, x124 y448 w160 h21 VfunctionOnActionEdit, %functionOnActionEdit%
 		Gui SE:Add, Edit, x303 y448 w160 h21 VfunctionOffActionEdit, %functionOffActionEdit%
 		
@@ -1983,6 +2008,14 @@ updateFunctionEditorState() {
 	finally {
 		protectionOff()
 	}
+}
+
+openHotkeysDocumentation() {
+	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#hotkeys
+}
+
+openActionsDocumentation() {
+	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;

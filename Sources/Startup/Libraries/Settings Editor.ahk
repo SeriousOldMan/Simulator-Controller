@@ -206,7 +206,7 @@ restart:
 	else {
 		result := false
 		
-		Gui CE:-Border -Caption
+		Gui CE:-Border ; -Caption
 		Gui CE:Color, D0D0D0
 	
 		Gui CE:Font, Bold, Arial

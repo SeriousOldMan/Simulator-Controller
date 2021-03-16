@@ -260,7 +260,7 @@ editTargets(command := "") {
 		if (vBuildSettings.Length() > 8)
 			Throw "Too many build targets detected in editTargets..."
 		
-		Gui TE:-Border -Caption
+		Gui TE:-Border ; -Caption
 		Gui TE:Color, D0D0D0
 	
 		Gui TE:Font, Bold, Arial

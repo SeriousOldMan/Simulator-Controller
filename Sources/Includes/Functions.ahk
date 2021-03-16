@@ -97,7 +97,7 @@ consentDialog(id) {
 	
 	texts := readConfiguration(kConfigDirectory . "Consent.ini")
 	
-	Gui CNS:-Border -Caption
+	Gui CNS:-Border ; -Caption
 	Gui CNS:Color, D0D0D0
 	Gui CNS:Font, s10 Bold
 	Gui CNS:Add, Text, x0 y8 w800 +0x200 +0x1 BackgroundTrans gmoveConsentDialog, % translate("Modular Simulator Controller System")

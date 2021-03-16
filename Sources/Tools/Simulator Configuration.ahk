@@ -406,7 +406,7 @@ class ConfigurationEditor extends ConfigurationItem {
 	createControls(configuration) {
 		Gui SE:Default
 	
-		Gui SE:-Border -Caption
+		Gui SE:-Border ; -Caption
 		Gui SE:Color, D0D0D0
 
 		Gui SE:Font, Bold, Arial
@@ -2312,7 +2312,7 @@ class ThemesEditor extends ConfigurationItem {
 	createControls(configuration) {
 		Gui TE:Default
 	
-		Gui TE:-Border -Caption
+		Gui TE:-Border ; -Caption
 		Gui TE:Color, D0D0D0
 
 		Gui TE:Font, Bold, Arial
@@ -2935,7 +2935,7 @@ class TranslationsEditor extends ConfigurationItem {
 	createControls(configuration) {
 		Gui TE:Default
 	
-		Gui TE:-Border -Caption
+		Gui TE:-Border ; -Caption
 		Gui TE:Color, D0D0D0
 
 		Gui TE:Font, Bold, Arial

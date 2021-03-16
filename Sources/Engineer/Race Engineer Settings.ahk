@@ -351,7 +351,7 @@ restart:
 		
 		Gui RES:Default
 			
-		Gui RES:-Border -Caption
+		Gui RES:-Border ; -Caption
 		Gui RES:Color, D0D0D0
 
 		Gui RES:Font, Bold, Arial
@@ -451,22 +451,22 @@ restart:
 		Gui RES:Add, Text, x26 yp+24 w75 h20, % translate("Front Left")
 		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VtpDryFrontLeftEdit, %tpDryFrontLeftEdit%
 		; Gui RES:Add, UpDown, x138 yp-2 w18 h20
-		Gui RES:Add, Text, x164 yp+2 w70 h20, % translate("PSI")
+		Gui RES:Add, Text, x164 yp+2 w30 h20, % translate("PSI")
 
 		Gui RES:Add, Text, x26 yp+24 w75 h20, % translate("Front Right")
 		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VtpDryFrontRightEdit, %tpDryFrontRightEdit%
 		; Gui RES:Add, UpDown, x138 yp-2 w18 h20
-		Gui RES:Add, Text, x164 yp+2 w70 h20, % translate("PSI")
+		Gui RES:Add, Text, x164 yp+2 w30 h20, % translate("PSI")
 
 		Gui RES:Add, Text, x26 yp+24 w75 h20, % translate("Rear Left")
 		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VtpDryRearLeftEdit, %tpDryRearLeftEdit%
 		; Gui RES:Add, UpDown, x138 yp-2 w18 h20
-		Gui RES:Add, Text, x164 yp+2 w70 h20, % translate("PSI")
+		Gui RES:Add, Text, x164 yp+2 w30 h20, % translate("PSI")
 
 		Gui RES:Add, Text, x26 yp+24 w75 h20, % translate("Rear Right")
 		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VtpDryRearRightEdit, %tpDryRearRightEdit%
 		; Gui RES:Add, UpDown, x138 yp-2 w18 h20
-		Gui RES:Add, Text, x164 yp+2 w70 h20, % translate("PSI")
+		Gui RES:Add, Text, x164 yp+2 w30 h20, % translate("PSI")
 
 		Gui RES:Font, Norm, Arial
 		Gui RES:Font, Italic, Arial
@@ -478,22 +478,22 @@ restart:
 		Gui RES:Add, Text, x212 yp+24 w75 h20, % translate("Front Left")
 		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VtpWetFrontLeftEdit, %tpWetFrontLeftEdit%
 		; Gui RES:Add, UpDown, x324 yp-2 w18 h20
-		Gui RES:Add, Text, x350 yp+2 w70 h20, % translate("PSI")
+		Gui RES:Add, Text, x350 yp+2 w30 h20, % translate("PSI")
 
 		Gui RES:Add, Text, x212 yp+24 w75 h20, % translate("Front Right")
 		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VtpWetFrontRightEdit, %tpWetFrontRightEdit%
 		; Gui RES:Add, UpDown, x324 yp-2 w18 h20
-		Gui RES:Add, Text, x350 yp+2 w70 h20, % translate("PSI")
+		Gui RES:Add, Text, x350 yp+2 w30 h20, % translate("PSI")
 
 		Gui RES:Add, Text, x212 yp+24 w75 h20, % translate("Rear Left")
 		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VtpWetRearLeftEdit, %tpWetRearLeftEdit%
 		; Gui RES:Add, UpDown, x324 yp-2 w18 h20
-		Gui RES:Add, Text, x350 yp+2 w70 h20, % translate("PSI")
+		Gui RES:Add, Text, x350 yp+2 w30 h20, % translate("PSI")
 
 		Gui RES:Add, Text, x212 yp+24 w75 h20, % translate("Rear Right")
 		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VtpWetRearRightEdit, %tpWetRearRightEdit%
 		; Gui RES:Add, UpDown, x324 yp-2 w18 h20
-		Gui RES:Add, Text, x350 yp+2 w70 h20, % translate("PSI")
+		Gui RES:Add, Text, x350 yp+2 w30 h20, % translate("PSI")
 
 		Gui Tab, 2		
 		
@@ -565,22 +565,22 @@ restart:
 		Gui RES:Add, Text, x26 yp+24 w75 h20, % translate("Front Left")
 		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VspDryFrontLeftEdit, %spDryFrontLeftEdit%
 		; Gui RES:Add, UpDown, x138 yp-2 w18 h20
-		Gui RES:Add, Text, x164 yp+2 w70 h20, % translate("PSI")
+		Gui RES:Add, Text, x164 yp+2 w30 h20, % translate("PSI")
 
 		Gui RES:Add, Text, x26 yp+24 w75 h20, % translate("Front Right")
 		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VspDryFrontRightEdit, %spDryFrontRightEdit%
 		; Gui RES:Add, UpDown, x138 yp-2 w18 h20
-		Gui RES:Add, Text, x164 yp+2 w70 h20, % translate("PSI")
+		Gui RES:Add, Text, x164 yp+2 w30 h20, % translate("PSI")
 
 		Gui RES:Add, Text, x26 yp+24 w75 h20 , % translate("Rear Left")
 		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VspDryRearLeftEdit, %spDryRearLeftEdit%
 		; Gui RES:Add, UpDown, x138 yp-2 w18 h20
-		Gui RES:Add, Text, x164 yp+2 w70 h20, % translate("PSI")
+		Gui RES:Add, Text, x164 yp+2 w30 h20, % translate("PSI")
 
 		Gui RES:Add, Text, x26 yp+24 w75 h20 , % translate("Rear Right")
 		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VspDryRearRightEdit, %spDryRearRightEdit%
 		; Gui RES:Add, UpDown, x138 yp-2 w18 h20
-		Gui RES:Add, Text, x164 yp+2 w70 h20, % translate("PSI")
+		Gui RES:Add, Text, x164 yp+2 w30 h20, % translate("PSI")
 
 		Gui RES:Font, Norm, Arial
 		Gui RES:Font, Italic, Arial
@@ -592,22 +592,22 @@ restart:
 		Gui RES:Add, Text, x212 yp+24 w75 h20, % translate("Front Left")
 		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VspWetFrontLeftEdit, %spWetFrontLeftEdit%
 		; Gui RES:Add, UpDown, x324 yp-2 w18 h20
-		Gui RES:Add, Text, x350 yp+2 w70 h20, % translate("PSI")
+		Gui RES:Add, Text, x350 yp+2 w30 h20, % translate("PSI")
 
 		Gui RES:Add, Text, x212 yp+24 w75 h20, % translate("Front Right")
 		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VspWetFrontRightEdit, %spWetFrontRightEdit%
 		; Gui RES:Add, UpDown, x324 yp-2 w18 h20
-		Gui RES:Add, Text, x350 yp+2 w70 h20, % translate("PSI")
+		Gui RES:Add, Text, x350 yp+2 w30 h20, % translate("PSI")
 
 		Gui RES:Add, Text, x212 yp+24 w75 h20, % translate("Rear Left")
 		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VspWetRearLeftEdit, %spWetFrontLeftEdit%
 		; Gui RES:Add, UpDown, x324 yp-2 w18 h20
-		Gui RES:Add, Text, x350 yp+2 w70 h20, % translate("PSI")
+		Gui RES:Add, Text, x350 yp+2 w30 h20, % translate("PSI")
 
 		Gui RES:Add, Text, x212 yp+24 w75 h20, % translate("Rear Right")
 		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VspWetRearRightEdit, %spWetFrontLeftEdit%
 		; Gui RES:Add, UpDown, x324 yp-2 w18 h20
-		Gui RES:Add, Text, x350 yp+2 w70 h20, % translate("PSI")
+		Gui RES:Add, Text, x350 yp+2 w30 h20, % translate("PSI")
 
 		Gui RES:Show, AutoSize Center
 		
@@ -677,10 +677,6 @@ importFromSimulation() {
 	
 	if accApplication.isRunning() {
 		data := readSharedMemory(kUserHomeDirectory . "Temp\ACC Data\Settings.data")
-		
-		spPitstopTyreSetEdit := getConfigurationValue(data, "Pitstop Data", "TyreSet", 0)
-		
-		GuiControl Text, spPitstopTyreSetEdit, %spPitstopTyreSetEdit%
 			
 		if (getConfigurationValue(data, "Car Data", "TyreCompound", "Dry") = "Dry") {
 			spDryFrontLeftEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureFL", 26.1)
@@ -694,6 +690,12 @@ importFromSimulation() {
 			GuiControl Text, spDryFrontRightEdit, %spDryFrontRightEdit%
 			GuiControl Text, spDryRearLeftEdit, %spDryRearLeftEdit%
 			GuiControl Text, spDryRearRightEdit, %spDryRearRightEdit%
+		
+			spPitstopTyreSetEdit := getConfigurationValue(data, "Pitstop Data", "TyreSet", 0)
+			spSetupTyreSetEdit := Max(0, spPitstopTyreSetEdit - 1)
+			
+			GuiControl Text, spSetupTyreSetEdit, %spSetupTyreSetEdit%
+			GuiControl Text, spPitstopTyreSetEdit, %spPitstopTyreSetEdit%
 		}
 		else {
 			spWetFrontLeftEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureFL", 28.5)

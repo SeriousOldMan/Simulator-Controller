@@ -933,6 +933,7 @@ class RaceEngineer extends ConfigurationItem {
 				dumpKnowledge(this.KnowledgeBase)
 
 			speaker.speakPhrase("ConfirmPlanUpdate")
+			speaker.speakPhrase("MoreChanges")
 		}
 	}
 	
@@ -946,12 +947,18 @@ class RaceEngineer extends ConfigurationItem {
 			this.setContinuation(ObjBindMethod(this, "planPitstop"))
 		}
 		else {
-			this.KnowledgeBase.setValue("Pitstop.Planned.Tyre.Compound", compound)
-			
-			if this.Debug[kDebugKnowledgeBase]
-				dumpKnowledge(this.KnowledgeBase)
-
-			speaker.speakPhrase("ConfirmPlanUpdate")
+			if (this.KnowledgeBase.getValue("Pitstop.Planned.Tyre.Compound") != compound) {
+				speaker.speakPhrase("ConfirmPlanUpdate")
+				
+				this.KnowledgeBase.setValue("Tyre.Compound.Target", compound)
+				this.planPitstop({Pressures: true}, false)
+				
+				speaker.speakPhrase("MoreChanges")
+			}
+			else {
+				speaker.speakPhrase("ConfirmPlanUpdate")
+				speaker.speakPhrase("MoreChanges")
+			}
 		}
 	}
 	
@@ -977,6 +984,7 @@ class RaceEngineer extends ConfigurationItem {
 				dumpKnowledge(this.KnowledgeBase)
 
 			speaker.speakPhrase("ConfirmPlanUpdate")
+			speaker.speakPhrase("MoreChanges")
 		}
 	}
 	
@@ -996,6 +1004,7 @@ class RaceEngineer extends ConfigurationItem {
 				dumpKnowledge(this.KnowledgeBase)
 
 			speaker.speakPhrase("ConfirmPlanUpdate")
+			speaker.speakPhrase("MoreChanges")
 		}
 	}
 			
@@ -1434,7 +1443,7 @@ class RaceEngineer extends ConfigurationItem {
 		return this.KnowledgeBase.getValue("Pitstop.Prepared", false)
 	}
 	
-	planPitstop() {
+	planPitstop(report := true, confirm := true) {
 		local knowledgeBase := this.KnowledgeBase
 		local compound
 		
@@ -1454,71 +1463,82 @@ class RaceEngineer extends ConfigurationItem {
 			speaker := this.getSpeaker()
 			fragments := speaker.Fragments
 			
-			speaker.speakPhrase("Pitstop", {number: pitstopNumber})
+			if ((report == true) || report.Intro)
+				speaker.speakPhrase("Pitstop", {number: pitstopNumber})
+			
+			if ((report == true) || report.Fuel) {
+				fuel := knowledgeBase.getValue("Pitstop.Planned.Fuel", 0)
 				
-			fuel := knowledgeBase.getValue("Pitstop.Planned.Fuel", 0)
-			if (fuel == 0)
-				speaker.speakPhrase("NoRefuel")
-			else
-				speaker.speakPhrase("Refuel", {litres: Round(fuel)})
+				if (fuel == 0)
+					speaker.speakPhrase("NoRefuel")
+				else
+					speaker.speakPhrase("Refuel", {litres: Round(fuel)})
+			}
 			
-			compound := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound")
-			if (compound = "Dry")
-				speaker.speakPhrase("DryTyres", {compound: fragments[compound], set: knowledgeBase.getValue("Pitstop.Planned.Tyre.Set")})
-			else
-				speaker.speakPhrase("WetTyres", {compound: fragments[compound], set: knowledgeBase.getValue("Pitstop.Planned.Tyre.Set")})
+			if ((report == true) || report.Compound) {
+				compound := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound")
+				
+				if (compound = "Dry")
+					speaker.speakPhrase("DryTyres", {compound: fragments[compound], set: knowledgeBase.getValue("Pitstop.Planned.Tyre.Set")})
+				else
+					speaker.speakPhrase("WetTyres", {compound: fragments[compound], set: knowledgeBase.getValue("Pitstop.Planned.Tyre.Set")})
+			}
 			
-			incrementFL := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL.Increment", 0), 1)
-			incrementFR := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR.Increment", 0), 1)
-			incrementRL := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL.Increment", 0), 1)
-			incrementRR := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR.Increment", 0), 1)
+			if ((report == true) || report.Pressures) {
+				incrementFL := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL.Increment", 0), 1)
+				incrementFR := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR.Increment", 0), 1)
+				incrementRL := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL.Increment", 0), 1)
+				incrementRR := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR.Increment", 0), 1)
 			
-			debug := this.Debug[kDebugPhrases]
+				debug := this.Debug[kDebugPhrases]
 			
-			if (debug || (incrementFL != 0) || (incrementFR != 0) || (incrementRL != 0) || (incrementRR != 0))
-				speaker.speakPhrase("NewPressures")
-			
-			if (debug || (incrementFL != 0))
-				speaker.speakPhrase("TyreFL", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL"), 1))
-											 , unit: fragments["PSI"]})
-			
-			if (debug || (incrementFR != 0))
-				speaker.speakPhrase("TyreFR", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR"), 1))
-											 , unit: fragments["PSI"]})
-			
-			if (debug || (incrementRL != 0))
-				speaker.speakPhrase("TyreRL", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL"), 1))
-											 , unit: fragments["PSI"]})
-			
-			if (debug || (incrementRR != 0))
-				speaker.speakPhrase("TyreRR", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR"), 1))
-											 , unit: fragments["PSI"]})
+				if (debug || (incrementFL != 0) || (incrementFR != 0) || (incrementRL != 0) || (incrementRR != 0))
+					speaker.speakPhrase("NewPressures")
+				
+				if (debug || (incrementFL != 0))
+					speaker.speakPhrase("TyreFL", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL"), 1))
+												 , unit: fragments["PSI"]})
+				
+				if (debug || (incrementFR != 0))
+					speaker.speakPhrase("TyreFR", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR"), 1))
+												 , unit: fragments["PSI"]})
+				
+				if (debug || (incrementRL != 0))
+					speaker.speakPhrase("TyreRL", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL"), 1))
+												 , unit: fragments["PSI"]})
+				
+				if (debug || (incrementRR != 0))
+					speaker.speakPhrase("TyreRR", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR"), 1))
+												 , unit: fragments["PSI"]})
 		
-			pressureCorrection := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.Correction", 0), 1)
-			
-			if (Abs(pressureCorrection) > 0.05) {
-				temperatureDelta := knowledgeBase.getValue("Weather.Temperature.Air.Delta", 0)
+				pressureCorrection := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.Correction", 0), 1)
 				
-				if (temperatureDelta = 0)
-					temperatureDelta := ((pressureCorrection > 0) ? -1 : 1)
-				
-				speaker.speakPhrase((pressureCorrection > 0) ? "PressureCorrectionUp" : "PressureCorrectionDown"
-								  , {value: Format("{:.1f}", Abs(pressureCorrection)), unit: fragments["PSI"]
-								   , pressureDirection: (pressureCorrection > 0) ? fragments["Increase"] : fragments["Decrease"]
-								   , temperatureDirection: (temperatureDelta > 0) ? fragments["Rising"] : fragments["Falling"]})
+				if (Abs(pressureCorrection) > 0.05) {
+					temperatureDelta := knowledgeBase.getValue("Weather.Temperature.Air.Delta", 0)
+					
+					if (temperatureDelta = 0)
+						temperatureDelta := ((pressureCorrection > 0) ? -1 : 1)
+					
+					speaker.speakPhrase((pressureCorrection > 0) ? "PressureCorrectionUp" : "PressureCorrectionDown"
+									  , {value: Format("{:.1f}", Abs(pressureCorrection)), unit: fragments["PSI"]
+									   , pressureDirection: (pressureCorrection > 0) ? fragments["Increase"] : fragments["Decrease"]
+									   , temperatureDirection: (temperatureDelta > 0) ? fragments["Rising"] : fragments["Falling"]})
+				}
 			}
 
-			if knowledgeBase.getValue("Pitstop.Planned.Repair.Suspension", false)
-				speaker.speakPhrase("RepairSuspension")
-			else if debug
-				speaker.speakPhrase("NoRepairSuspension")
+			if ((report == true) || report.Repairs) {
+				if knowledgeBase.getValue("Pitstop.Planned.Repair.Suspension", false)
+					speaker.speakPhrase("RepairSuspension")
+				else if debug
+					speaker.speakPhrase("NoRepairSuspension")
 
-			if knowledgeBase.getValue("Pitstop.Planned.Repair.Bodywork", false)
-				speaker.speakPhrase("RepairBodywork")
-			else if debug
-				speaker.speakPhrase("NoRepairBodywork")
-				
-			if this.Listener {
+				if knowledgeBase.getValue("Pitstop.Planned.Repair.Bodywork", false)
+					speaker.speakPhrase("RepairBodywork")
+				else if debug
+					speaker.speakPhrase("NoRepairBodywork")
+			}
+			
+			if (confirm && this.Listener) {
 				speaker.speakPhrase("ConfirmPrepare")
 				
 				this.setContinuation(ObjBindMethod(this, "preparePitstop"))

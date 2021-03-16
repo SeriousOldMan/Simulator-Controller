@@ -92,32 +92,32 @@ updateTyreTemperatureWindow(?lap, Wet) <= lapTyreTemperature(?lap, ?lapTemperatu
 updateTyreTemperatureWindow(?, ?) <= Set(Tyre.Temperature.Window, false)
 		  
 priority: 5,																																	\
-	{All: [?Race.Settings.Tyre.Compound.Change = Weather], [?Weather.Tyre.Compound.Target],														\
+	{All: {None: [?Pitstop.Plan]}, [?Race.Settings.Tyre.Compound.Change = Weather], [?Weather.Tyre.Compound.Target],							\
 		  {Any: [?Lap], [?Pitstop.Lap], {None: [?Tyre.Compound.Target]}}} =>																	\
 		(Set: Tyre.Compound.Target, ?Weather.Tyre.Compound.Target), (Clear: Tyre.Set.Target)
 
 priority: 5,																																	\
-	{All: [?Race.Settings.Tyre.Compound.Change = Temperature], {Any: [?Lap], [?Pitstop.Lap]},													\
+	{All: {None: [?Pitstop.Plan]}, [?Race.Settings.Tyre.Compound.Change = Temperature], {Any: [?Lap], [?Pitstop.Lap]},							\
 		  [?Tyre.Temperature.Window = false], [?Tyre.Compound = Dry]} =>																		\
 		(Set: Tyre.Compound.Target, Wet), (Clear: Tyre.Set.Target)
 
 priority: 5,																																	\
-	{All: [?Race.Settings.Tyre.Compound.Change = Temperature], {Any: [?Lap], [?Pitstop.Lap]},													\
+	{All: {None: [?Pitstop.Plan]}, [?Race.Settings.Tyre.Compound.Change = Temperature], {Any: [?Lap], [?Pitstop.Lap]},							\
 		  [?Tyre.Temperature.Window = true], [?Tyre.Compound = Dry]} =>																			\
 		(Set: Tyre.Compound.Target, Dry), (Clear: Tyre.Set.Target)
 
 priority: 5,																																	\
-	{All: [?Race.Settings.Tyre.Compound.Change = Temperature], {Any: [?Lap], [?Pitstop.Lap]},													\
+	{All: {None: [?Pitstop.Plan]}, [?Race.Settings.Tyre.Compound.Change = Temperature], {Any: [?Lap], [?Pitstop.Lap]},							\
 		  [?Tyre.Temperature.Window = false], [?Tyre.Compound = Wet]} =>																		\
 		(Set: Tyre.Compound.Target, Dry), (Clear: Tyre.Set.Target)
 
 priority: 5,																																	\
-	{All: [?Race.Settings.Tyre.Compound.Change = Temperature], {Any: [?Lap], [?Pitstop.Lap]},													\
+	{All: {None: [?Pitstop.Plan]}, [?Race.Settings.Tyre.Compound.Change = Temperature], {Any: [?Lap], [?Pitstop.Lap]},							\
 		  [?Tyre.Temperature.Window = true], [?Tyre.Compound = Wet]} =>																			\
 		(Set: Tyre.Compound.Target, Wet), (Clear: Tyre.Set.Target)
 
 priority: 5,																																	\
-	{All: [?Race.Settings.Tyre.Compound.Change = Never],																						\
+	{All: {None: [?Pitstop.Plan]}, [?Race.Settings.Tyre.Compound.Change = Never],																\
 		  {Any: [?Lap], [?Pitstop.Lap], {None: [?Tyre.Compound.Target]}}} => (Prove: keepTyreCompound), (Clear: Tyre.Set.Target)
 
 {All: {Any: [?Lap], [?Pitstop.Lap]}, {None: [?Tyre.Compound.Target]}} => (Prove: keepTyreCompound), (Clear: Tyre.Set.Target)

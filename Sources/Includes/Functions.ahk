@@ -113,9 +113,9 @@ consentDialog(id) {
 
 	Gui CNS:Add, DropDownList, x460 y300 w332 AltSubmit Choose3 VconsentDropDown, % values2String("|", map(["Yes", "No", "Ask again later..."], "translate")*)
 		
-	Gui, CNS:Add, Text, x8 y340 w784 h60 -VScroll +Wrap ReadOnly, % StrReplace(StrReplace(getConfigurationValue(texts, language, "Information"), "``n", "`n"), "\<>", "=")
+	Gui CNS:Add, Text, x8 y340 w784 h60 -VScroll +Wrap ReadOnly, % StrReplace(StrReplace(getConfigurationValue(texts, language, "Information"), "``n", "`n"), "\<>", "=")
 	
-	Gui, CNS:Add, Link, x8 y410 w784 h60 cRed -VScroll +Wrap ReadOnly, % StrReplace(StrReplace(getConfigurationValue(texts, language, "Warning"), "``n", "`n"), "\<>", "=")
+	Gui CNS:Add, Link, x8 y410 w784 h60 cRed -VScroll +Wrap ReadOnly, % StrReplace(StrReplace(getConfigurationValue(texts, language, "Warning"), "``n", "`n"), "\<>", "=")
 		
 	Gui CNS:Add, Button, x368 y490 w80 h23 Default gcloseConsentDialog, % translate("Save")
 	
@@ -766,7 +766,16 @@ initializeEnvironment() {
 		FileCopy %kResourcesDirectory%Templates\Race Engineer.settings, %kUserConfigDirectory%
 			
 	if !FileExist(kUserConfigDirectory . "ID") {
+		ticks := A_TickCount
+		
+		Random wait, 0, 100
+		
+		Random, , % Min(4294967295, A_TickCount)
 		Random major, 0, 10000
+		
+		Sleep %wait%
+		
+		Random, , % Min(4294967295, A_TickCount)
 		Random minor, 0, 10000
 		
 		id := values2String(".", A_TickCount, major, minor)

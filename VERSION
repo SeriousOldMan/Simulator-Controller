@@ -1,6 +1,6 @@
 [Version]
-Current=2.5.4-release
-Target=2.5.4-release
+Current=2.6.0-dev
+Target=2.6-release
 Release=2.5.4-release
-Changes=Tyre change recommendation depending on weather conditions incl. adjusted pressures depending on compound, Better weather change updates, Current ACC pitstop settings integrated, Improvements on Button Box configuraton, Voice pitch and speed settings
-Date=03/12/2021
+Changes=Improved stint time management, Initial setup for Big Data Collection, Rework of the configuration tool, Forced tyre compound change for Jona, Improved handling of ACC Pitstop MFD
+Date=03/16/2021

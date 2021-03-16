@@ -45,7 +45,7 @@ global vCompletedActions = {}
 global vPitstopFuel = kNotInitialized
 global vPitstopTyreCompound = kNotInitialized
 global vPitstopTyreSet = kNotInitialized
-global vPitstopTyrePressureIncrements = kNotInitialized
+global vPitstopTyrePressures = kNotInitialized
 global vPitstopRepairSuspension = kNotInitialized
 global vPitstopRepairBodywork = kNotInitialized
 
@@ -145,12 +145,12 @@ class TestPitstopHandler {
 		vPitstopTyreSet := set
 	}
 
-	setPitstopTyrePressures(pitstopNumber, pressureFLIncrement, pressureFRIncrement, pressureRLIncrement, pressureRRIncrement) {
-		this.showAction("setPitstopTyrePressures", pitstopNumber, pressureFLIncrement, pressureFRIncrement, pressureRLIncrement, pressureRRIncrement)
+	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
+		this.showAction("setPitstopTyrePressures", pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR)
 		
 		vCompletedActions["setPitstopTyrePressures"] := pitstopNumber
 		
-		vPitstopTyrePressureIncrements := [pressureFLIncrement, pressureFRIncrement, pressureRLIncrement, pressureRRIncrement]
+		vPitstopTyrePressures := [pressureFL, pressureFR, pressureRL, pressureRR]
 	}
 
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork) {
@@ -627,7 +627,7 @@ class PitstopHandling extends Assert {
 		vPitstopFuel = kNotInitialized
 		vPitstopTyreCompound = kNotInitialized
 		vPitstopTyreSet = kNotInitialized
-		vPitstopTyrePressureIncrements = kNotInitialized
+		vPitstopTyrePressures = kNotInitialized
 		vPitstopRepairSuspension = kNotInitialized
 		vPitstopRepairBodywork = kNotInitialized
 		
@@ -666,7 +666,7 @@ class PitstopHandling extends Assert {
 		this.AssertEqual(false, vPitstopRepairSuspension, "Expected no suspension repair...")
 		this.AssertEqual(false, vPitstopRepairBodywork, "Expected no bodywork repair...")
 		
-		this.AssertEqual(true, this.equalLists(vPitstopTyrePressureIncrements, [0.5, 0.3, 0.5, 0.0]), "Unexpected tyre pressure increments...")
+		this.AssertEqual(true, this.equalLists(vPitstopTyrePressures, [26.6, 26.4, 26.6, 26.1]), "Unexpected tyre pressures...")
 	}
 	
 	PitstopPrepare5Test() {
@@ -677,7 +677,7 @@ class PitstopHandling extends Assert {
 		vPitstopFuel = kNotInitialized
 		vPitstopTyreCompound = kNotInitialized
 		vPitstopTyreSet = kNotInitialized
-		vPitstopTyrePressureIncrements = kNotInitialized
+		vPitstopTyrePressures = kNotInitialized
 		vPitstopRepairSuspension = kNotInitialized
 		vPitstopRepairBodywork = kNotInitialized
 		
@@ -716,7 +716,7 @@ class PitstopHandling extends Assert {
 		this.AssertEqual(true, vPitstopRepairSuspension, "Expected suspension repair...")
 		this.AssertEqual(true, vPitstopRepairBodywork, "Expected bodywork repair...")
 		
-		this.AssertEqual(true, this.equalLists(vPitstopTyrePressureIncrements, [0.5, 0.2, 0.5, 0.0]), "Unexpected tyre pressure increments...")
+		this.AssertEqual(true, this.equalLists(vPitstopTyrePressures, [26.6, 26.3, 26.6, 26.1]), "Unexpected tyre pressures...")
 	}
 	
 	PitstopPerformedTest() {

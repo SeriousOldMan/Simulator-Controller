@@ -1369,22 +1369,33 @@ class ACCPlugin extends ControllerPlugin {
 	}
 
 	setPitstopRefuelAmount(pitstopNumber, litres) {
-		changePitstopFuelAmount("Increase", Round(litres))
+		data := readSharedMemory(kUserHomeDirectory . "Temp\ACC Data\Pitstop Setup.data")
+		
+		litresIncrement := Round(litres - getConfigurationValue(data, "Pitstop Data", "FuelAmount", 0))
+		
+		changePitstopFuelAmount((litresIncrement > 0) ? "Increase" : "Decrease", Abs(litresIncrement))
 	}
 	
 	setPitstopTyreSet(pitstopNumber, compound, set := false) {
 		changePitstopTyreCompound(compound)
 	}
 
-	setPitstopTyrePressures(pitstopNumber, pressureFLIncrement, pressureFRIncrement, pressureRLIncrement, pressureRRIncrement) {
+	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
+		data := readSharedMemory(kUserHomeDirectory . "Temp\ACC Data\Pitstop Setup.data")
+			
+		pressureFLIncrement := Round(pressureFL - getConfigurationValue(data, "Pitstop Data", "TyrePressureFL", 26.1), 1)
+		pressureFRIncrement := Round(pressureFR - getConfigurationValue(data, "Pitstop Data", "TyrePressureFR", 26.1), 1)
+		pressureRLIncrement := Round(pressureRL - getConfigurationValue(data, "Pitstop Data", "TyrePressureRL", 26.1), 1)
+		pressureRRIncrement := Round(pressureRR - getConfigurationValue(data, "Pitstop Data", "TyrePressureRR", 26.1), 1)
+		
 		if (pressureFLIncrement != 0)
-			changePitstopTyrePressure("Front Left", (pressureFLIncrement > 0) ? "Increase" : "Decrease", Round(pressureFLIncrement * 10))
+			changePitstopTyrePressure("Front Left", (pressureFLIncrement > 0) ? "Increase" : "Decrease", Abs(Round(pressureFLIncrement * 10)))
 		if (pressureFRIncrement != 0)
-			changePitstopTyrePressure("Front Right", (pressureFRIncrement > 0) ? "Increase" : "Decrease", Round(pressureFRIncrement * 10))
+			changePitstopTyrePressure("Front Right", (pressureFRIncrement > 0) ? "Increase" : "Decrease", Abs(Round(pressureFRIncrement * 10)))
 		if (pressureRLIncrement != 0)
-			changePitstopTyrePressure("Rear Left", (pressureRLIncrement > 0) ? "Increase" : "Decrease", Round(pressureRLIncrement * 10))
+			changePitstopTyrePressure("Rear Left", (pressureRLIncrement > 0) ? "Increase" : "Decrease", Abs(Round(pressureRLIncrement * 10)))
 		if (pressureRRIncrement != 0)
-			changePitstopTyrePressure("Rear Right", (pressureRRIncrement > 0) ? "Increase" : "Decrease", Round(pressureRRIncrement * 10))
+			changePitstopTyrePressure("Rear Right", (pressureRRIncrement > 0) ? "Increase" : "Decrease", Abs(Round(pressureRRIncrement * 10)))
 	}
 
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork) {

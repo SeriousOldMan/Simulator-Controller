@@ -644,8 +644,8 @@ setRefuelAmount(?pitstopNumber) <= Call(setPitstopRefuelAmount, ?pitstopNumber, 
 setTyreSet(?pitstopNumber) <= Call(setPitstopTyreSet, ?pitstopNumber, !Pitstop.Planned.Tyre.Compound, !Pitstop.Planned.Tyre.Set)
 setTyrePressures(?pitstopNumber) <=																												\
 		Call(setPitstopTyrePressures, ?pitstopNumber,																							\
-									  !Pitstop.Planned.Tyre.Pressure.FL.Increment, !Pitstop.Planned.Tyre.Pressure.FR.Increment,					\
-									  !Pitstop.Planned.Tyre.Pressure.RL.Increment, !Pitstop.Planned.Tyre.Pressure.RR.Increment)
+									  !Pitstop.Planned.Tyre.Pressure.FL, !Pitstop.Planned.Tyre.Pressure.FR,										\
+									  !Pitstop.Planned.Tyre.Pressure.RL, !Pitstop.Planned.Tyre.Pressure.RR)
 
 requestRepairs(?pitstopNumber) <= Call(requestPitstopRepairs, ?pitstopNumber,																	\
 															  !Pitstop.Planned.Repair.Suspension, !Pitstop.Planned.Repair.Bodywork)

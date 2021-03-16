@@ -411,18 +411,18 @@ class ConfigurationEditor extends ConfigurationItem {
 
 		Gui SE:Font, Bold, Arial
 
-		Gui SE:Add, Text, w398 Center gmoveConfigurationEditor, % translate("Modular Simulator Controller System") 
+		Gui SE:Add, Text, w478 Center gmoveConfigurationEditor, % translate("Modular Simulator Controller System") 
 		
 		Gui SE:Font, Norm, Arial
-		Gui SE:Font, Italic, Arial
+		Gui SE:Font, Italic Underline, Arial
 
-		Gui SE:Add, Text, YP+20 w398 Center, % translate("Configuration")
+		Gui SE:Add, Text, YP+20 w478 cBlue Center gopenConfigurationDocumentation, % translate("Configuration")
 
 		Gui SE:Font, Norm, Arial
 		
-		Gui SE:Add, Button, x152 y528 w80 h23 Default gsaveAndExit, % translate("Ok")
-		Gui SE:Add, Button, x240 y528 w80 h23 gcancelAndExit, % translate("&Cancel")
-		Gui SE:Add, Button, x328 y528 w77 h23 gsaveAndStay, % translate("&Apply")
+		Gui SE:Add, Button, x232 y528 w80 h23 Default gsaveAndExit, % translate("Ok")
+		Gui SE:Add, Button, x320 y528 w80 h23 gcancelAndExit, % translate("&Cancel")
+		Gui SE:Add, Button, x408 y528 w77 h23 gsaveAndStay, % translate("&Apply")
 		
 		choices := ["Auto", "Manual"]
 		chosen := inList(choices, saveModeDropDown)
@@ -432,7 +432,7 @@ class ConfigurationEditor extends ConfigurationItem {
 
 		tabs := map(["General", "Voice Control", "Plugins", "Applications", "Controller", "Launchpad", "Chat"], "translate")
 			   
-		Gui SE:Add, Tab3, x8 y48 w398 h472 -Wrap, % values2String("|", tabs*)
+		Gui SE:Add, Tab3, x8 y48 w478 h472 -Wrap, % values2String("|", tabs*)
 		
 		tab := 1
 		
@@ -524,6 +524,10 @@ moveConfigurationEditor() {
 	moveByMouse("SE")
 }
 
+openConfigurationDocumentation() {
+	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration
+}
+
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; GeneralTab                                                              ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -556,22 +560,22 @@ class GeneralTab extends ConfigurationItemTab {
 		Gui SE:Font, Norm, Arial
 		Gui SE:Font, Italic, Arial
 		
-		Gui SE:Add, GroupBox, x16 y80 w377 h70, % translate("Installation")
+		Gui SE:Add, GroupBox, x16 y80 w458 h70, % translate("Installation")
 		
 		Gui SE:Font, Norm, Arial
 		
 		Gui SE:Add, Text, x24 y97 w160 h23 +0x200, % translate("Installation Folder (optional)")
-		Gui SE:Add, Edit, x184 y97 w174 h21 VhomePathEdit, %homePathEdit%
-		Gui SE:Add, Button, x360 y96 w23 h23 gchooseHomePath, % translate("...")
+		Gui SE:Add, Edit, x224 y97 w214 h21 VhomePathEdit, %homePathEdit%
+		Gui SE:Add, Button, x440 y96 w23 h23 gchooseHomePath, % translate("...")
 		
 		Gui SE:Add, Text, x24 y121 w160 h23 +0x200, % translate("NirCmd Folder (optional)")
-		Gui SE:Add, Edit, x184 y121 w174 h21 VnirCmdPathEdit, %nirCmdPathEdit%
-		Gui SE:Add, Button, x360 y120 w23 h23 gchooseNirCmdPath, % translate("...")
+		Gui SE:Add, Edit, x224 y121 w214 h21 VnirCmdPathEdit, %nirCmdPathEdit%
+		Gui SE:Add, Button, x440 y120 w23 h23 gchooseNirCmdPath, % translate("...")
 		
 		Gui SE:Font, Norm, Arial
 		Gui SE:Font, Italic, Arial
 		
-		Gui SE:Add, GroupBox, x16 y160 w378 h95, % translate("Settings")
+		Gui SE:Add, GroupBox, x16 y160 w458 h95, % translate("Settings")
 		
 		Gui SE:Font, Norm, Arial
 		
@@ -593,18 +597,18 @@ class GeneralTab extends ConfigurationItemTab {
 			chosen := enIndex
 			
 		Gui SE:Add, Text, x24 y176 w86 h23 +0x200, % translate("Language")
-		Gui SE:Add, DropDownList, x184 y176 w174 Choose%chosen% VlanguageDropDown, % values2String("|", choices*)
-		Gui SE:Add, Button, x360 y175 w23 h23 gopenTranslationsEditor, % translate("...")
+		Gui SE:Add, DropDownList, x224 y176 w214 Choose%chosen% VlanguageDropDown, % values2String("|", choices*)
+		Gui SE:Add, Button, x440 y175 w23 h23 gopenTranslationsEditor, % translate("...")
 		
 		Gui SE:Add, CheckBox, x24 y200 w242 h23 Checked%startWithWindowsCheck% VstartWithWindowsCheck, % translate("Start with Windows")
 		Gui SE:Add, CheckBox, x24 y224 w242 h23 Checked%silentModeCheck% VsilentModeCheck, % translate("Silent mode (no splash screen, no sound)")
 		
-		Gui SE:Add, Button, x283 y224 w100 h23 GopenThemesEditor, % translate("Themes Editor...")
+		Gui SE:Add, Button, x363 y224 w100 h23 GopenThemesEditor, % translate("Themes Editor...")
 	
 		Gui SE:Font, Norm, Arial
 		Gui SE:Font, Italic, Arial
 		
-		Gui SE:Add, GroupBox, x16 y265 w378 h115, % translate("Simulators")
+		Gui SE:Add, GroupBox, x16 y265 w458 h115, % translate("Simulators")
 		
 		Gui SE:Font, Norm, Arial
 		
@@ -614,16 +618,16 @@ class GeneralTab extends ConfigurationItemTab {
 			Gui SE:Font, Norm, Arial
 			Gui SE:Font, Italic, Arial
 			
-			Gui SE:Add, GroupBox, x16 y410 w377 h95, % translate("Development")
+			Gui SE:Add, GroupBox, x16 y410 w458 h95, % translate("Development")
 			
 			Gui SE:Font, Norm, Arial
 			
 			Gui SE:Add, Text, x24 y427 w160 h23 +0x200, % translate("AutoHotkey Folder")
-			Gui SE:Add, Edit, x184 y427 w174 h21 VahkPathEdit, %ahkPathEdit%
-			Gui SE:Add, Button, x360 y426 w23 h23 gchooseAHKPath, % translate("...")
+			Gui SE:Add, Edit, x224 y427 w214 h21 VahkPathEdit, %ahkPathEdit%
+			Gui SE:Add, Button, x440 y426 w23 h23 gchooseAHKPath, % translate("...")
 			
 			Gui SE:Add, Text, x24 y451 w160 h23 +0x200, % translate("Debug")
-			Gui SE:Add, CheckBox, x184 y451 w242 h23 Checked%debugEnabledCheck% VdebugEnabledCheck, % translate("Enabled?")
+			Gui SE:Add, CheckBox, x224 y451 w242 h23 Checked%debugEnabledCheck% VdebugEnabledCheck, % translate("Enabled?")
 			
 			Gui SE:Add, Text, x24 y475 w160 h23 +0x200, % translate("Log Level")
 			
@@ -634,7 +638,7 @@ class GeneralTab extends ConfigurationItemTab {
 			if !chosen
 				chosem := 2
 				
-			Gui SE:Add, DropDownList, x184 y475 w91 Choose%chosen% VlogLevelDropDown, % values2String("|", map(choices, "translate")*)
+			Gui SE:Add, DropDownList, x224 y475 w91 Choose%chosen% VlogLevelDropDown, % values2String("|", map(choices, "translate")*)
 		}
 	}
 	
@@ -821,16 +825,16 @@ class SimulatorsList extends ConfigurationItemList {
 	}
 					
 	createControls(configuration) {
-		Gui SE:Add, ListBox, x24 y284 w154 h96 HwndsimulatorsListBoxHandle VsimulatorsListBox glistEvent, %simulatorsListBox%
+		Gui SE:Add, ListBox, x24 y284 w194 h96 HwndsimulatorsListBoxHandle VsimulatorsListBox glistEvent, %simulatorsListBox%
 		
-		Gui SE:Add, Edit, x184 y284 w199 h21 VsimulatorEdit, %simulatorEdit%
+		Gui SE:Add, Edit, x224 y284 w239 h21 VsimulatorEdit, %simulatorEdit%
 		
-		Gui SE:Add, Button, x305 y309 w38 h23 Disabled VsimulatorUpButton gupItem, % translate("Up")
-		Gui SE:Add, Button, x345 y309 w38 h23 Disabled VsimulatorDownButton gdownItem, % translate("Down")
+		Gui SE:Add, Button, x385 y309 w38 h23 Disabled VsimulatorUpButton gupItem, % translate("Up")
+		Gui SE:Add, Button, x425 y309 w38 h23 Disabled VsimulatorDownButton gdownItem, % translate("Down")
 		
-		Gui SE:Add, Button, x184 y349 w46 h23 VsimulatorAddButton gaddItem, % translate("Add")
-		Gui SE:Add, Button, x232 y349 w50 h23 Disabled VsimulatorDeleteButton gdeleteItem, % translate("Delete")
-		Gui SE:Add, Button, x328 y349 w55 h23 Disabled VsimulatorUpdateButton gupdateItem, % translate("&Save")
+		Gui SE:Add, Button, x264 y349 w46 h23 VsimulatorAddButton gaddItem, % translate("Add")
+		Gui SE:Add, Button, x312 y349 w50 h23 Disabled VsimulatorDeleteButton gdeleteItem, % translate("Delete")
+		Gui SE:Add, Button, x408 y349 w55 h23 Disabled VsimulatorUpdateButton gupdateItem, % translate("&Save")
 		
 		return simulatorsListBoxHandle
 	}
@@ -928,7 +932,7 @@ class VoiceControlTab extends ConfigurationItemTab {
 			chosen := enIndex
 			
 		Gui SE:Add, Text, x16 y80 w100 h23 +0x200, % translate("Language")
-		Gui SE:Add, DropDownList, x114 y80 w135 Choose%chosen% VvoiceLanguageDropDown, % values2String("|", choices*)
+		Gui SE:Add, DropDownList, x134 y80 w135 Choose%chosen% VvoiceLanguageDropDown, % values2String("|", choices*)
 		
 		voices := new SpeechGenerator().Voices.Clone()
 		
@@ -941,16 +945,16 @@ class VoiceControlTab extends ConfigurationItemTab {
 			chosen := 1
 		
 		Gui SE:Add, Text, x16 y112 w100 h23 +0x200, % translate("Speech Generator")
-		Gui SE:Add, DropDownList, x114 y112 w280 Choose%chosen% VspeakerDropDown, % values2String("|", voices*)
+		Gui SE:Add, DropDownList, x134 y112 w340 Choose%chosen% VspeakerDropDown, % values2String("|", voices*)
 		
-		Gui SE:Add, Text, x16 y136w100 h23 +0x200, % translate("Volume")
-		Gui SE:Add, Slider, x114 y136 w135 Range0-100 ToolTip VspeakerVolumeSlider, % speakerVolumeSlider
+		Gui SE:Add, Text, x16 y136 w100 h23 +0x200, % translate("Volume")
+		Gui SE:Add, Slider, x134 y136 w135 Range0-100 ToolTip VspeakerVolumeSlider, % speakerVolumeSlider
 		
-		Gui SE:Add, Text, x16 y160w100 h23 +0x200, % translate("Pitch")
-		Gui SE:Add, Slider, x114 y160 w135 Range-10-10 ToolTip VspeakerPitchSlider, % speakerPitchSlider
+		Gui SE:Add, Text, x16 y160 w100 h23 +0x200, % translate("Pitch")
+		Gui SE:Add, Slider, x134 y160 w135 Range-10-10 ToolTip VspeakerPitchSlider, % speakerPitchSlider
 		
 		Gui SE:Add, Text, x16 y184 w100 h23 +0x200, % translate("Speed")
-		Gui SE:Add, Slider, x114 y184 w135 Range-10-10 ToolTip VspeakerSpeedSlider, % speakerSpeedSlider
+		Gui SE:Add, Slider, x134 y184 w135 Range-10-10 ToolTip VspeakerSpeedSlider, % speakerSpeedSlider
 		
 		recognizers := new SpeechRecognizer().getRecognizerList().Clone()
 		
@@ -966,11 +970,11 @@ class VoiceControlTab extends ConfigurationItemTab {
 			chosen := 1
 		
 		Gui SE:Add, Text, x16 y216 w100 h23 +0x200, % translate("Speech Recognizer")
-		Gui SE:Add, DropDownList, x114 y216 w280 Choose%chosen% VlistenerDropDown, % values2String("|", recognizers*)
+		Gui SE:Add, DropDownList, x134 y216 w340 Choose%chosen% VlistenerDropDown, % values2String("|", recognizers*)
 		
 		Gui SE:Add, Text, x16 y240 w70 h23 +0x200, % translate("Push To Talk")
-		Gui SE:Add, Edit, x114 y240 w110 h21 VpushToTalkEdit, %pushToTalkEdit%
-		Gui SE:Add, Button, x226 y239 w23 h23 ggetPTTHotkey HwnddetectPTTButtonHandle
+		Gui SE:Add, Edit, x134 y240 w110 h21 VpushToTalkEdit, %pushToTalkEdit%
+		Gui SE:Add, Button, x246 y239 w23 h23 ggetPTTHotkey HwnddetectPTTButtonHandle
 		setButtonIcon(detectPTTButtonHandle, kIconsDirectory . "Key.ico", 1)
 	}
 	
@@ -1119,25 +1123,30 @@ class PluginsTab extends ConfigurationItemList {
 	}
 					
 	createControls(configuration) {
-		Gui SE:Add, ListView, x16 y80 w377 h270 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndpluginsListViewHandle VpluginsListView glistEvent
+		Gui SE:Add, ListView, x16 y80 w457 h205 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndpluginsListViewHandle VpluginsListView glistEvent
 							, % values2String("|", map(["Active?", "Plugin", "Simulator(s)", "Arguments"], "translate")*)
 		
-		Gui SE:Add, Text, x16 y360 w86 h23 +0x200, % translate("Plugin")
-		Gui SE:Add, Edit, x110 y360 w154 h21 VpluginEdit, %pluginEdit%
+		Gui SE:Add, Text, x16 y295 w86 h23 +0x200, % translate("Plugin")
+		Gui SE:Add, Edit, x110 y295 w154 h21 VpluginEdit, %pluginEdit%
 		
-		Gui SE:Add, CheckBox, x110 y384 w120 h23 VpluginActivatedCheck HwndpluginActivatedCheckHandle, % translate("Activated?")
+		Gui SE:Add, CheckBox, x110 y319 w120 h23 VpluginActivatedCheck HwndpluginActivatedCheckHandle, % translate("Activated?")
 		
-		Gui SE:Add, Text, x16 y408 w89 h23 +0x200, % translate("Simulator(s)")
-		Gui SE:Add, Edit, x110 y408 w285 h21 VpluginSimulatorsEdit, %pluginSimulatorsEdit%
+		Gui SE:Add, Text, x16 y343 w89 h23 +0x200, % translate("Simulator(s)")
+		Gui SE:Add, Edit, x110 y343 w363 h21 VpluginSimulatorsEdit, %pluginSimulatorsEdit%
 		
-		Gui SE:Add, Text, x16 y432 w86 h23 +0x200, % translate("Arguments")
-		Gui SE:Add, Edit, x110 y432 w285 h48 VpluginArgumentsEdit, %pluginArgumentsEdit%
+		Gui SE:Font, Underline, Arial
+		
+		Gui SE:Add, Text, x16 y368 w86 h23 +0x200 cBlue gopenPluginsModesDocumentation, % translate("Arguments")
+		
+		Gui SE:Font, Norm, Arial
+		
+		Gui SE:Add, Edit, x110 y368 w363 h113 VpluginArgumentsEdit, %pluginArgumentsEdit%
 		
 		Gui SE:Add, Button, x16 y490 w92 h23 gopenLabelsEditor, % translate("Edit Labels...")
 		
-		Gui SE:Add, Button, x184 y490 w46 h23 VpluginAddButton gaddItem, % translate("Add")
-		Gui SE:Add, Button, x232 y490 w50 h23 Disabled VpluginDeleteButton gdeleteItem, % translate("Delete")
-		Gui SE:Add, Button, x340 y490 w55 h23 Disabled VpluginUpdateButton gupdateItem, % translate("&Save")
+		Gui SE:Add, Button, x264 y490 w46 h23 VpluginAddButton gaddItem, % translate("Add")
+		Gui SE:Add, Button, x312 y490 w50 h23 Disabled VpluginDeleteButton gdeleteItem, % translate("Delete")
+		Gui SE:Add, Button, x418 y490 w55 h23 Disabled VpluginUpdateButton gupdateItem, % translate("&Save")
 		
 		return pluginsListViewHandle
 	}
@@ -1282,6 +1291,10 @@ openLabelsEditor() {
 	Run % "notepad.exe " . """" . kUserConfigDirectory . "Controller Plugin Labels.ini"""
 }
 
+openPluginsModesDocumentation() {
+	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes
+}
+
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; ApplicationsTab                                                         ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -1322,45 +1335,45 @@ class ApplicationsTab extends ConfigurationItemList {
 	}
 					
 	createControls(configuration) {
-		Gui SE:Add, ListView, x16 y80 w377 h205 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndapplicationsListViewHandle VapplicationsListView glistEvent
+		Gui SE:Add, ListView, x16 y80 w457 h205 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndapplicationsListViewHandle VapplicationsListView glistEvent
 							, % values2String("|", map(["Type", "Name", "Executable", "Window Title", "Working Directory"], "translate")*)
 		
 		Gui SE:Add, Text, x16 y295 w141 h23 +0x200, % translate("Name")
-		Gui SE:Add, Edit, x160 y295 w208 h21 VapplicationNameEdit, %applicationNameEdit%
+		Gui SE:Add, Edit, x180 y295 w268 h21 VapplicationNameEdit, %applicationNameEdit%
 		
 		Gui SE:Add, Text, x16 y319 w138 h23 +0x200, % translate("Executable")
-		Gui SE:Add, Edit, x160 y319 w208 h21 VapplicationExePathEdit, %applicationExePathEdit%
-		Gui SE:Add, Button, x371 y318 w23 h23 gchooseApplicationExePath, % translate("...")
+		Gui SE:Add, Edit, x180 y319 w268 h21 VapplicationExePathEdit, %applicationExePathEdit%
+		Gui SE:Add, Button, x451 y318 w23 h23 gchooseApplicationExePath, % translate("...")
 		
 		Gui SE:Add, Text, x16 y343 w138 h23 +0x200, % translate("Working Directory (optional)")
-		Gui SE:Add, Edit, x160 y343 w208 h21 VapplicationWorkingDirectoryPathEdit, %applicationWorkingDirectoryPathEdit%
-		Gui SE:Add, Button, x371 y342 w23 h23 gchooseApplicationWorkingDirectoryPath, % translate("...")
+		Gui SE:Add, Edit, x180 y343 w268 h21 VapplicationWorkingDirectoryPathEdit, %applicationWorkingDirectoryPathEdit%
+		Gui SE:Add, Button, x451 y342 w23 h23 gchooseApplicationWorkingDirectoryPath, % translate("...")
 		
 		Gui SE:Add, Text, x16 y367 w140 h23 +0x200, % translate("Window Title (optional)")
 		Gui SE:Font, cGray
 		Gui SE:Add, Text, x24 y385 w133 h23, % translate("(Use AHK WinTitle Syntax)")
 		Gui SE:Font
-		Gui SE:Add, Edit, x160 y367 w208 h21 VapplicationWindowTitleEdit, %applicationWindowTitleEdit%
+		Gui SE:Add, Edit, x180 y367 w268 h21 VapplicationWindowTitleEdit, %applicationWindowTitleEdit%
 		
 		Gui SE:Font, Norm, Arial
 		Gui SE:Font, Italic, Arial
 		
-		Gui SE:Add, GroupBox, x16 y411 w378 h71, % translate("Function Hooks (optional)")
+		Gui SE:Add, GroupBox, x16 y411 w458 h71, % translate("Function Hooks (optional)")
 		
 		Gui SE:Font, Norm, Arial
 		
-		Gui SE:Add, Text, x20 y427 w116 h23 +0x200 +Center, % translate("Startup")
-		Gui SE:Add, Edit, x20 y451 w116 h21 VapplicationStartupEdit, %applicationStartupEdit%
+		Gui SE:Add, Text, x20 y427 w136 h23 +0x200 +Center, % translate("Startup")
+		Gui SE:Add, Edit, x20 y451 w136 h21 VapplicationStartupEdit, %applicationStartupEdit%
 		
-		Gui SE:Add, Text, x147 y427 w116 h23 +0x200 +Center, % translate("Shutdown ")
-		Gui SE:Add, Edit, x147 y451 w116 h21 VapplicationShutdownEdit, %applicationShutdownEdit%
+		Gui SE:Add, Text, x177 y427 w136 h23 +0x200 +Center, % translate("Shutdown ")
+		Gui SE:Add, Edit, x177 y451 w136 h21 VapplicationShutdownEdit, %applicationShutdownEdit%
 		
-		Gui SE:Add, Text, x274 y427 w116 h23 +0x200 +Center, % translate("Running?")
-		Gui SE:Add, Edit, x274 y451 w116 h21 VapplicationIsRunningEdit, %applicationIsRunningEdit%
+		Gui SE:Add, Text, x334 y427 w136 h23 +0x200 +Center, % translate("Running?")
+		Gui SE:Add, Edit, x334 y451 w136 h21 VapplicationIsRunningEdit, %applicationIsRunningEdit%
 
-		Gui SE:Add, Button, x184 y490 w46 h23 VapplicationAddButton gaddItem, % translate("Add")
-		Gui SE:Add, Button, x232 y490 w50 h23 Disabled VapplicationDeleteButton gdeleteItem, % translate("Delete")
-		Gui SE:Add, Button, x340 y490 w55 h23 Disabled VapplicationUpdateButton gupdateItem, % translate("&Save")
+		Gui SE:Add, Button, x264 y490 w46 h23 VapplicationAddButton gaddItem, % translate("Add")
+		Gui SE:Add, Button, x312 y490 w50 h23 Disabled VapplicationDeleteButton gdeleteItem, % translate("Delete")
+		Gui SE:Add, Button, x418 y490 w55 h23 Disabled VapplicationUpdateButton gupdateItem, % translate("&Save")
 		
 		return applicationsListViewHandle
 	}
@@ -1596,19 +1609,19 @@ class ButtonBoxesList extends ConfigurationItemList {
 		Gui SE:Font, Norm, Arial
 		Gui SE:Font, Italic, Arial
 		
-		Gui SE:Add, GroupBox, x16 y80 w378 h115, % translate("Button Boxes")
+		Gui SE:Add, GroupBox, x16 y80 w457 h115, % translate("Button Boxes")
 		
 		Gui SE:Font, Norm, Arial
-		Gui SE:Add, ListBox, x24 y99 w154 h96 HwndbuttonBoxesListBoxHandle VbuttonBoxesListBox glistEvent, %buttonBoxesListBox%
+		Gui SE:Add, ListBox, x24 y99 w194 h96 HwndbuttonBoxesListBoxHandle VbuttonBoxesListBox glistEvent, %buttonBoxesListBox%
 		
-		Gui SE:Add, Edit, x184 y99 w199 h21 VbuttonBoxEdit, %buttonBoxEdit%
+		Gui SE:Add, Edit, x224 y99 w239 h21 VbuttonBoxEdit, %buttonBoxEdit%
 		
-		Gui SE:Add, Button, x305 y124 w38 h23 Disabled VbuttonBoxUpButton gupItem, % translate("Up")
-		Gui SE:Add, Button, x345 y124 w38 h23 Disabled VbuttonBoxDownButton gdownItem, % translate("Down")
+		Gui SE:Add, Button, x385 y124 w38 h23 Disabled VbuttonBoxUpButton gupItem, % translate("Up")
+		Gui SE:Add, Button, x425 y124 w38 h23 Disabled VbuttonBoxDownButton gdownItem, % translate("Down")
 		
-		Gui SE:Add, Button, x184 y164 w46 h23 VbuttonBoxAddButton gaddItem, % translate("Add")
-		Gui SE:Add, Button, x232 y164 w50 h23 Disabled VbuttonBoxDeleteButton gdeleteItem, % translate("Delete")
-		Gui SE:Add, Button, x328 y164 w55 h23 Disabled VbuttonBoxUpdateButton gupdateItem, % translate("&Save")
+		Gui SE:Add, Button, x264 y164 w46 h23 VbuttonBoxAddButton gaddItem, % translate("Add")
+		Gui SE:Add, Button, x312 y164 w50 h23 Disabled VbuttonBoxDeleteButton gdeleteItem, % translate("Delete")
+		Gui SE:Add, Button, x408 y164 w55 h23 Disabled VbuttonBoxUpdateButton gupdateItem, % translate("&Save")
 		
 		return buttonBoxesListBoxHandle
 	}
@@ -1684,36 +1697,36 @@ class FunctionsList extends ConfigurationItemList {
 	}
 					
 	createControls(configuration) {
-		Gui SE:Add, ListView, x16 y200 w377 h150 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndfunctionsListViewHandle VfunctionsListView glistEvent
+		Gui SE:Add, ListView, x16 y200 w457 h150 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndfunctionsListViewHandle VfunctionsListView glistEvent
 							, % values2String("|", map(["Function", "Number", "Hotkey(s) & Action(s)"], "translate")*)
 	
 		Gui SE:Add, Text, x16 y360 w86 h23 +0x200, % translate("Function")
-		Gui SE:Add, DropDownList, x104 y360 w91 AltSubmit Choose%functionTypeDropDown% VfunctionTypeDropDown gupdateFunctionEditorState
+		Gui SE:Add, DropDownList, x124 y360 w91 AltSubmit Choose%functionTypeDropDown% VfunctionTypeDropDown gupdateFunctionEditorState
 								, % values2String("|", map(["1-way Toggle", "2-way Toggle", "Button", "Dial", "Custom"], "translate")*)
-		Gui SE:Add, Edit, x200 y360 w40 h21 Number VfunctionNumberEdit, %functionNumberEdit%
-		Gui SE:Add, UpDown, x240 y360 w17 h21, 1
+		Gui SE:Add, Edit, x220 y360 w40 h21 Number VfunctionNumberEdit, %functionNumberEdit%
+		Gui SE:Add, UpDown, x260 y360 w17 h21, 1
 		
 		Gui SE:Font, Norm, Arial
 		Gui SE:Font, Italic, Arial
 		
-		Gui SE:Add, GroupBox, x16 y392 w378 h91, % translate("Bindings")
+		Gui SE:Add, GroupBox, x16 y392 w457 h91, % translate("Bindings")
 		
 		Gui SE:Font, Norm, Arial
 		
-		Gui SE:Add, Text, x104 y400 w135 h23 +0x200 +Center, % translate("On or Increase")
-		Gui SE:Add, Text, x248 y400 w135 h23 +0x200 +Center, % translate("Off or Decrease")
+		Gui SE:Add, Text, x124 y400 w160 h23 +0x200 +Center, % translate("On or Increase")
+		Gui SE:Add, Text, x303 y400 w160 h23 +0x200 +Center, % translate("Off or Decrease")
 		
 		Gui SE:Add, Text, x24 y424 w83 h23 +0x200, % translate("Hotkey(s)")
-		Gui SE:Add, Edit, x104 y424 w135 h21 VfunctionOnHotkeysEdit, %functionOnHotkeysEdit%
-		Gui SE:Add, Edit, x248 y424 w135 h21 VfunctionOffHotkeysEdit, %functionOffHotkeysEdit%
+		Gui SE:Add, Edit, x124 y424 w160 h21 VfunctionOnHotkeysEdit, %functionOnHotkeysEdit%
+		Gui SE:Add, Edit, x303 y424 w160 h21 VfunctionOffHotkeysEdit, %functionOffHotkeysEdit%
 		
 		Gui SE:Add, Text, x24 y450 w83 h23, % translate("Action (optional)")
-		Gui SE:Add, Edit, x104 y448 w135 h21 VfunctionOnActionEdit, %functionOnActionEdit%
-		Gui SE:Add, Edit, x248 y448 w135 h21 VfunctionOffActionEdit, %functionOffActionEdit%
+		Gui SE:Add, Edit, x124 y448 w160 h21 VfunctionOnActionEdit, %functionOnActionEdit%
+		Gui SE:Add, Edit, x303 y448 w160 h21 VfunctionOffActionEdit, %functionOffActionEdit%
 		
-		Gui SE:Add, Button, x184 y490 w46 h23 VfunctionAddButton gaddItem, % translate("Add")
-		Gui SE:Add, Button, x232 y490 w50 h23 Disabled VfunctionDeleteButton gdeleteItem, % translate("Delete")
-		Gui SE:Add, Button, x340 y490 w55 h23 Disabled VfunctionUpdateButton gupdateItem, % translate("&Save")
+		Gui SE:Add, Button, x264 y490 w46 h23 VfunctionAddButton gaddItem, % translate("Add")
+		Gui SE:Add, Button, x312 y490 w50 h23 Disabled VfunctionDeleteButton gdeleteItem, % translate("Delete")
+		Gui SE:Add, Button, x418 y490 w55 h23 Disabled VfunctionUpdateButton gupdateItem, % translate("&Save")
 		
 		return functionsListViewHandle
 	}
@@ -1993,23 +2006,23 @@ class LaunchpadTab extends ConfigurationItemList {
 	}
 					
 	createControls(configuration) {
-		Gui SE:Add, ListView, x16 y80 w377 h190 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndlaunchpadListViewHandle VlaunchpadListView glistEvent
+		Gui SE:Add, ListView, x16 y80 w457 h205 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndlaunchpadListViewHandle VlaunchpadListView glistEvent
 							, % values2String("|", map(["#", "Label", "Application"], "translate")*)
 		
-		Gui SE:Add, Text, x16 y280 w86 h23 +0x200, % translate("Button")
-		Gui SE:Add, Text, x95 y280 w23 h23 +0x200, % translate("#")
-		Gui SE:Add, Edit, x110 y280 w40 h21 Number VlaunchpadNumberEdit, %launchpadNumberEdit%
-		Gui SE:Add, UpDown, x150 y280 w17 h21, 1
+		Gui SE:Add, Text, x16 y295 w86 h23 +0x200, % translate("Button")
+		Gui SE:Add, Text, x95 y295 w23 h23 +0x200, % translate("#")
+		Gui SE:Add, Edit, x110 y295 w40 h21 Number VlaunchpadNumberEdit, %launchpadNumberEdit%
+		Gui SE:Add, UpDown, x150 y295 w17 h21, 1
 		
-		Gui SE:Add, Text, x16 y304 w86 h23 +0x200, % translate("Label")
-		Gui SE:Add, Edit, x110 y304 w80 h21 VlaunchpadLabelEdit, %launchpadLabelEdit%
+		Gui SE:Add, Text, x16 y319 w86 h23 +0x200, % translate("Label")
+		Gui SE:Add, Edit, x110 y319 w80 h21 VlaunchpadLabelEdit, %launchpadLabelEdit%
 		
-		Gui SE:Add, Text, x16 y328 w86 h23 +0x200, % translate("Application")
-		Gui SE:Add, DropDownList, x110 y328 w284 h21 R10 Choose%launchpadApplicationDropDown% VlaunchpadApplicationDropDown
+		Gui SE:Add, Text, x16 y343 w86 h23 +0x200, % translate("Application")
+		Gui SE:Add, DropDownList, x110 y343 w363 h21 R10 Choose%launchpadApplicationDropDown% VlaunchpadApplicationDropDown
 		
-		Gui SE:Add, Button, x184 y490 w46 h23 VlaunchpadAddButton gaddItem, % translate("Add")
-		Gui SE:Add, Button, x232 y490 w50 h23 Disabled VlaunchpadDeleteButton gdeleteItem, % translate("Delete")
-		Gui SE:Add, Button, x340 y490 w55 h23 Disabled VlaunchpadUpdateButton gupdateItem, % translate("&Save")
+		Gui SE:Add, Button, x264 y490 w46 h23 VlaunchpadAddButton gaddItem, % translate("Add")
+		Gui SE:Add, Button, x312 y490 w50 h23 Disabled VlaunchpadDeleteButton gdeleteItem, % translate("Delete")
+		Gui SE:Add, Button, x418 y490 w55 h23 Disabled VlaunchpadUpdateButton gupdateItem, % translate("&Save")
 		
 		return launchpadListViewHandle
 	}
@@ -2163,23 +2176,23 @@ class ChatMessagesTab extends ConfigurationItemList {
 	}
 					
 	createControls(configuration) {
-		Gui SE:Add, ListView, x16 y80 w377 h190 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndchatMessagesListViewHandle VchatMessagesListView glistEvent
+		Gui SE:Add, ListView, x16 y80 w457 h205 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndchatMessagesListViewHandle VchatMessagesListView glistEvent
 							, % values2String("|", map(["#", "Label", "Text"], "translate")*)
 		
-		Gui SE:Add, Text, x16 y280 w86 h23 +0x200, % translate("Button")
-		Gui SE:Add, Text, x95 y280 w23 h23 +0x200, % translate("#")
-		Gui SE:Add, Edit, x110 y280 w40 h21 Number VchatMessageNumberEdit, %chatMessageNumberEdit%
-		Gui SE:Add, UpDown, x150 y280 w17 h21, 1
+		Gui SE:Add, Text, x16 y295 w86 h23 +0x200, % translate("Button")
+		Gui SE:Add, Text, x95 y295 w23 h23 +0x200, % translate("#")
+		Gui SE:Add, Edit, x110 y295 w40 h21 Number VchatMessageNumberEdit, %chatMessageNumberEdit%
+		Gui SE:Add, UpDown, x150 y295 w17 h21, 1
 		
-		Gui SE:Add, Text, x16 y304 w86 h23 +0x200, % translate("Label")
-		Gui SE:Add, Edit, x110 y304 w80 h21 VchatMessageLabelEdit, %chatMessageLabelEdit%
+		Gui SE:Add, Text, x16 y319 w86 h23 +0x200, % translate("Label")
+		Gui SE:Add, Edit, x110 y319 w80 h21 VchatMessageLabelEdit, %chatMessageLabelEdit%
 		
-		Gui SE:Add, Text, x16 y328 w86 h23 +0x200, % translate("Message")
-		Gui SE:Add, Edit, x110 y328 w284 h21 VchatMessageMessageEdit, %chatMessageMessageEdit%
+		Gui SE:Add, Text, x16 y343 w86 h23 +0x200, % translate("Message")
+		Gui SE:Add, Edit, x110 y343 w363 h21 VchatMessageMessageEdit, %chatMessageMessageEdit%
 		
-		Gui SE:Add, Button, x184 y490 w46 h23 VchatMessageAddButton gaddItem, % translate("Add")
-		Gui SE:Add, Button, x232 y490 w50 h23 Disabled VchatMessageDeleteButton gdeleteItem, % translate("Delete")
-		Gui SE:Add, Button, x340 y490 w55 h23 Disabled VchatMessageUpdateButton gupdateItem, % translate("&Save")
+		Gui SE:Add, Button, x264 y490 w46 h23 VchatMessageAddButton gaddItem, % translate("Add")
+		Gui SE:Add, Button, x312 y490 w50 h23 Disabled VchatMessageDeleteButton gdeleteItem, % translate("Delete")
+		Gui SE:Add, Button, x418 y490 w55 h23 Disabled VchatMessageUpdateButton gupdateItem, % translate("&Save")
 		
 		return chatMessagesListViewHandle
 	}

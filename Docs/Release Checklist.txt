@@ -32,11 +32,15 @@ Release 2.6 Checklist
 8. Update procedure
    a. Translations
    b. ACC SHM Reader neu bauen
+   c. Grammars
 9. Race Data Collection
    a. Documentation
 10. Import for RE Settings
     a. Documentation
-	b. New Picture
+	b. New Pictures
+11. Rework Confihuration Editor
+    a. Documentation for Docs Links
+	b. New Pictures
    
 Release 2.5.4 Checklist
 =====================

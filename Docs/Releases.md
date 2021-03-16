@@ -3,9 +3,16 @@
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. Improved stint time management for Jona
-  4. Initial setup of database for Big Data race setup collection
+  4. Improvments for ACC Pitstop MFD handling
+     - Better support for Single Screen Setups
+	 - Several edge case optimizations
+	 - Full integration of shared memory information for refuel amount and tyre pressuresm, therefore simplified initial race setup
+  5. Improvements for Jona
+	 - *Race Engineer Settings* Dialog can now import the current settings from the Pitstop MFD 
+	 - When driver decides for a different tyre compound than recommended, the target pressures will be fully recalculated
+  5. Initial setup of database for Big Data race setup collection
      - Opt In for community based data acquisition
-  5. Larger window size for configuration tool and support for configuration plugins
+  6. Larger window size for configuration tool and support for configuration plugins
   
 ## 2.5.4-release 03/12/21
   

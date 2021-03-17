@@ -26,7 +26,7 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-[2.6.0-dev](https://www.dropbox.com/s/ivc0stl8u3i9rrt/Simulator%20Controller%202.6.0-dev.zip?dl=1) (The upcoming release 2.6 will be the start of the Big Data collection cycle. Features: Initial setup for Big Data Collection, Improved stint time management, Rework of the configuration tool, Forced tyre compound change for Jona, Improved handling of ACC Pitstop MFD. No documentation or automated update procedure yet...)
+[2.6.0-dev](https://www.dropbox.com/s/ivc0stl8u3i9rrt/Simulator%20Controller%202.6.0-dev.zip?dl=1) (The upcoming release 2.6 will be the start of the Big Data collection cycle. Features: Initial setup for Big Data Collection, Improved stint time management, Rework of the configuration tool, Forced tyre compound change for Jona, Improved handling of ACC Pitstop MFD. No documentation yet...)
 
 #### Latest release builds
 

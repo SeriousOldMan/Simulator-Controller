@@ -582,6 +582,13 @@ class ACCPlugin extends ControllerPlugin {
 
 		if this.OpenPitstopMFDHotkey
 			SendEvent % this.OpenPitstopMFDHotkey
+		else {
+			logMessage(kLogCritical, translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration"))
+		
+			showMessage(translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration...")
+					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+		}
+			
 		
 		wasOpen := this.iPSIsOpen
 		
@@ -1437,10 +1444,10 @@ isACCRunning() {
 	running := (ErrorLevel != 0)
 	
 	if !running {
-		accPlugin := SimulatorController.Instance.findPlugin(kACCPlugin)
+		thePlugin := SimulatorController.Instance.findPlugin(kACCPlugin)
 		
-		accPlugin.iRepairSuspensionChosen := true
-		accPlugin.iRepairBodyworkChosen := true
+		thePlugin.iRepairSuspensionChosen := true
+		thePlugin.iRepairBodyworkChosen := true
 	}
 		
 	return running

@@ -589,7 +589,8 @@ class ACCPlugin extends ControllerPlugin {
 		this.iPSSelectedOption := 1
 		
 		if (update || !wasOpen) {
-			this.updatePitStopState()
+			if this.updatePitStopState()
+				this.openPitstopMFD(false)
 			
 			SetTimer updatePitstopState, 5000
 		}
@@ -882,12 +883,12 @@ class ACCPlugin extends ControllerPlugin {
 			if !this.iPSImageSearchArea {
 				ImageSearch x, y, 0, 0, A_ScreenWidth, A_ScreenHeight, *100 %pitstopLabel%
 
-				logMessage(kLogInfo, translate("Full search for 'PITSTOP' took ") . A_TickCount - curTickCount . translate(" ms"))
+				logMessage(kLogInfo, translate("Full search for 'PITSTOP' took ") . (A_TickCount - curTickCount) . translate(" ms"))
 			}
 			else {
 				ImageSearch x, y, this.iPSImageSearchArea[1], this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *100 %pitstopLabel%
 
-				logMessage(kLogInfo, translate("Optimized search for 'PITSTOP' took ") . A_TickCount - curTickCount . translate(" ms"))
+				logMessage(kLogInfo, translate("Optimized search for 'PITSTOP' took ") . (A_TickCount - curTickCount) . translate(" ms"))
 			}
 			
 			if x is Integer
@@ -946,17 +947,17 @@ class ACCPlugin extends ControllerPlugin {
 		}
 
 		if !this.iPSImageSearchArea
-			logMessage(kLogInfo, translate("Full search for 'Pit Strategy' took ") . A_TickCount - curTickCount . translate(" ms"))
+			logMessage(kLogInfo, translate("Full search for 'Pit Strategy' took ") . (A_TickCount - curTickCount) . translate(" ms"))
 		else
-			logMessage(kLogInfo, translate("Optimized search for 'Pit Strategy' took ") . A_TickCount - curTickCount . translate(" ms"))
+			logMessage(kLogInfo, translate("Optimized search for 'Pit Strategy' took ") . (A_TickCount - curTickCount) . translate(" ms"))
 		
 		if x is Integer
 		{
 			if !inList(this.iPSOptions, "Strategy") {
 				this.iPSOptions.InsertAt(inList(this.iPSOptions, "Refuel"), "Strategy")
 				
-				this.iPSTyreOptionPosition += 1
-				this.iPSBrakeOptionPosition += 1
+				this.iPSTyreOptionPosition := inList(this.iPSOptions, "Change Tyres")
+				this.iPSBrakeOptionPosition := inList(this.iPSOptions, "Change Brakes")
 				
 				reload := true
 			}
@@ -971,8 +972,8 @@ class ACCPlugin extends ControllerPlugin {
 			if position {
 				this.iPSOptions.RemoveAt(position)
 				
-				this.iPSTyreOptionPosition -= 1
-				this.iPSBrakeOptionPosition -= 1
+				this.iPSTyreOptionPosition := inList(this.iPSOptions, "Change Tyres")
+				this.iPSBrakeOptionPosition := inList(this.iPSOptions, "Change Brakes")
 				
 				reload := true
 			}
@@ -1020,7 +1021,7 @@ class ACCPlugin extends ControllerPlugin {
 			
 			if position {
 				this.iPSOptions.RemoveAt(position)
-				this.iPSTyreOptions -= 1
+				this.iPSTyreOptions := 6
 				
 				reload := true
 			}
@@ -1028,36 +1029,36 @@ class ACCPlugin extends ControllerPlugin {
 		else {
 			if !inList(this.iPSOptions, "Tyre Set") {
 				this.iPSOptions.InsertAt(inList(this.iPSOptions, "Compound"), "Tyre Set")
-				this.iPSTyreOptions += 1
+				this.iPSTyreOptions := 7
 				
 				reload := true
 			}
-		}
-		
-		x := kUndefined
-		y := kUndefined
-		
-		Loop % compoundLabels.Length()
-		{
-			compoundLabel := compoundLabels[A_Index]
 			
-			if !this.iPSImageSearchArea
-				ImageSearch x, y, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, *100 %compoundLabel%
-			else
-				ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *100 %compoundLabel%
+			x := kUndefined
+			y := kUndefined
 			
-			if x is Integer
+			Loop % compoundLabels.Length()
 			{
-				images.Push(compoundLabel)
-			
-				break
+				compoundLabel := compoundLabels[A_Index]
+				
+				if !this.iPSImageSearchArea
+					ImageSearch x, y, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, *100 %compoundLabel%
+				else
+					ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *100 %compoundLabel%
+				
+				if x is Integer
+				{
+					images.Push(compoundLabel)
+				
+					break
+				}
 			}
 		}
-			
+		
 		if !this.iPSImageSearchArea
-			logMessage(kLogInfo, translate("Full search for 'Tyre set' took ") . A_TickCount - curTickCount . translate(" ms"))
+			logMessage(kLogInfo, translate("Full search for 'Tyre set' took ") . (A_TickCount - curTickCount) . translate(" ms"))
 		else
-			logMessage(kLogInfo, translate("Optimized search for 'Tyre set' took ") . A_TickCount - curTickCount . translate(" ms"))
+			logMessage(kLogInfo, translate("Optimized search for 'Tyre set' took ") . (A_TickCount - curTickCount) . translate(" ms"))
 	
 		if x is Integer
 		{
@@ -1105,9 +1106,9 @@ class ACCPlugin extends ControllerPlugin {
 		}
 		
 		if !this.iPSImageSearchArea
-			logMessage(kLogInfo, translate("Full search for 'Front Brake' took ") . A_TickCount - curTickCount . translate(" ms"))
+			logMessage(kLogInfo, translate("Full search for 'Front Brake' took ") . (A_TickCount - curTickCount) . translate(" ms"))
 		else 
-			logMessage(kLogInfo, translate("Optimized search for 'Front Brake' took ") . A_TickCount - curTickCount . translate(" ms"))
+			logMessage(kLogInfo, translate("Optimized search for 'Front Brake' took ") . (A_TickCount - curTickCount) . translate(" ms"))
 			
 		if x is Integer
 		{
@@ -1153,9 +1154,9 @@ class ACCPlugin extends ControllerPlugin {
 		}
 		
 		if !this.iPSImageSearchArea
-			logMessage(kLogInfo, translate("Full search for 'Select Driver' took ") . A_TickCount - curTickCount . translate(" ms"))
+			logMessage(kLogInfo, translate("Full search for 'Select Driver' took ") . (A_TickCount - curTickCount) . translate(" ms"))
 		else
-			logMessage(kLogInfo, translate("Optimized search for 'Select Driver' took ") . A_TickCount - curTickCount . translate(" ms"))
+			logMessage(kLogInfo, translate("Optimized search for 'Select Driver' took ") . (A_TickCount - curTickCount) . translate(" ms"))
 		
 		if x is Integer
 		{
@@ -1400,17 +1401,11 @@ class ACCPlugin extends ControllerPlugin {
 	}
 
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork) {
-		if (repairSuspension != this.iRepairSuspensionChosen) {
+		if (repairSuspension != this.iRepairSuspensionChosen)
 			togglePitstopActivity("Repair Suspension")
 			
-			this.iRepairSuspensionChosen := !this.iRepairSuspensionChosen
-		}
-			
-		if (repairBodywork != this.iRepairBodyworkChosen) {
+		if (repairBodywork != this.iRepairBodyworkChosen)
 			togglePitstopActivity("Repair Bodywork")
-			
-			this.iRepairBodyworkChosen := !this.iRepairBodyworkChosen
-		}
 	}
 }
 
@@ -1439,7 +1434,16 @@ stopACC() {
 isACCRunning() {
 	Process Exist, acc.exe
 	
-	return (ErrorLevel != 0)
+	running := (ErrorLevel != 0)
+	
+	if !running {
+		accPlugin := SimulatorController.Instance.findPlugin(kACCPlugin)
+		
+		accPlugin.iRepairSuspensionChosen := true
+		accPlugin.iRepairBodyworkChosen := true
+	}
+		
+	return running
 }
 
 

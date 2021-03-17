@@ -944,8 +944,14 @@ hideSplashTheme() {
 
 showProgress(options) {
 	if !vProgressIsOpen {
-		x := options.x
-		y := options.y
+		x := options.X
+		y := options.Y
+		
+		if options.HasKey("Width")
+			w := (options.Width - 20)
+		else
+			w := 280
+		
 		color := options.HasKey("color") ? options.color : "Green"
 	
 		Gui Progress:Default
@@ -953,12 +959,12 @@ showProgress(options) {
 		Gui Progress:Color, D0D0D0
 
 		Gui Progress:Font, s10 Bold, Arial
-		Gui Progress:Add, Text, x10 w280 Center vvProgressTitle, Foo
+		Gui Progress:Add, Text, x10 w%w% Center vvProgressTitle
 		
-		Gui Progress:Add, Progress, x10 y30 w280 h20 c%color% BackgroundGray vvProgressBar, 50
+		Gui Progress:Add, Progress, x10 y30 w%w% h20 c%color% BackgroundGray vvProgressBar, 50
 		
 		Gui Progress:Font, s8 Norm, Arial
-		Gui Progress:Add, Text, x10 y55 w280 Center vvProgressMessage, Bar
+		Gui Progress:Add, Text, x10 y55 w%w% Center vvProgressMessage
 		
 		Gui Progress:+AlwaysOnTop
 		Gui Progress:Show, x%x% y%y% AutoSize NoActivate

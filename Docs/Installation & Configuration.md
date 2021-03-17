@@ -30,13 +30,15 @@ The configuration tool is located in the *Binaries* folder and is named *Simulat
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Editor.JPG)
 
-The tool is divided in tabs for each aspect of the configuration process. You will find an explanation of each tab and its content below. Before you start experimenting with the configuration tool, be sure to make a backup copy of the current configuration file *Simulator Configuration.ini* in the *Config* folder, just to be safe. But you will always find a fresh copy in the *Resources\Templates* folder for your peace of mind.
+The tool is divided in tabs for each aspect of the configuration process. You will find an explanation of each tab and its content below. Before you start experimenting with the configuration tool, be sure to make a backup copy of the current configuration file *Simulator Configuration.ini* in the *Config* folder, just to be safe. But you will always find a fresh copy in the *Resources\Templates* folder for your peace of mind. Generally, all your changes to the configuration files will be saved to the *Simulator Controller\Config* folder in your user *Documents* folder.
 
 Hint: Beside simply running the configuration tool by double clicking it, there are two hidden modifiers. First, if you hold the Control key down while starting the configuration tool, any currently available configuration file in the *Config* folder will be ignored and you will start with a fresh, completely empty configuration. And if you hold the Shift key down, additional options for developers will be available. These will automatically appear, when an active AutoHotkey installation is detected (by checking, if the folder C:\Program Files\AutoHotkey is available).
 
 ## Using the configuration tool
 
 The configuration tool consists of several pages or tabs. Below you will find a description of each tab. Beside the pages, there are the well known buttons "Ok", "Cancel" and "Apply".
+
+Note: You will find field labels that look like well known hyperlinks at several places in the configuration tool. Yes, you can click on them and a context sensitive section of the this documentation will be opened in your browser. With the *Save* mode dropdown menu in the lower left corner of the configuration dialog you can choose between *manual* and *Automatic* save mode of all your changes to list items in the different editors.
 
 ### Tab *General*
 

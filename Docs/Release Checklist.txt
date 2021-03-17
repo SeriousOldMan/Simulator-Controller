@@ -38,7 +38,7 @@ Release 2.6 Checklist
 10. Import for RE Settings
     a. Documentation
 	b. New Pictures
-11. Rework Confihuration Editor
+11. Rework Configuration Editor
     a. Documentation for Docs Links
 	b. New Pictures
    

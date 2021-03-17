@@ -172,6 +172,12 @@ Closes the current theme based splash window.
 #### *showMessage(message :: String, title :: String := "Modular Simulator Controller System", icon :: String := "Information.png", duration :: Integer := 1000, x :: TypeUnion(String, Integer) := "Center", y :: TypeUnion(String, Integer) := "Bottom", width :: Integer := 400, height :: Integer := 100)*
 Displays a message box on the main screen. *duration* defines the number of milliseconds, the message box will be shown. Beside giving normal screen coordinates for *x* and *y*, you can supply "Left", "Center" or "Right" for the horizontal and "Top", "Center" or "Bottom" for the vertical position.
 
+#### *showProgress(options :: Map(X, Y, Width := 300, Title, Message, Color, Progress))*
+Opens or updates a progress bar window. For the initial call, when the progress window is opened, the parameters *X* and *Y* must and *Width* may be supplied. The arguments for *Title*, *Messsage*, *Color* and *Progress* will be used in every call and will update those aspects of the progress bar window accordingly. The argument for the *Color* of the progress bar must be a HTML color name as described in the [Autohotkey documentation](https://www.autohotkey.com/docs/commands/Progress.htm#colors) and *Progress* must be an integer between 0 and 100.
+
+#### *hideProgress()*
+Closes the currently open progress window.
+
 ***
 
 ## GUI Tools ([Functions.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Functions.ahk))

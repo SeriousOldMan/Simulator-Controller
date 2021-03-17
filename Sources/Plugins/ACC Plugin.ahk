@@ -577,42 +577,57 @@ class ACCPlugin extends ControllerPlugin {
 	}
 		
 	openPitstopMFD(update := true) {
+		static reported := false
+		
 		IfWinNotActive AC2, , WinActivate, AC2 
 		WinWaitActive AC2, , 2
 
-		if this.OpenPitstopMFDHotkey
+		if this.OpenPitstopMFDHotkey {
 			SendEvent % this.OpenPitstopMFDHotkey
-		else {
+					
+			wasOpen := this.iPSIsOpen
+			
+			this.iPSIsOpen := true
+			this.iPSSelectedOption := 1
+			
+			if (update || !wasOpen) {
+				if this.updatePitStopState()
+					this.openPitstopMFD(false)
+				
+				SetTimer updatePitstopState, 5000
+			}
+		}
+		else if !reported {
+			reported := true
+		
 			logMessage(kLogCritical, translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration"))
 		
 			showMessage(translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration...")
 					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 		}
-			
-		
-		wasOpen := this.iPSIsOpen
-		
-		this.iPSIsOpen := true
-		this.iPSSelectedOption := 1
-		
-		if (update || !wasOpen) {
-			if this.updatePitStopState()
-				this.openPitstopMFD(false)
-			
-			SetTimer updatePitstopState, 5000
-		}
 	}
 	
 	closePitstopMFD() {
+		static reported := false
+		
 		IfWinNotActive AC2, , WinActivate, AC2
 		WinWaitActive AC2, , 2
 
-		if this.ClosePitstopMFDHotkey
+		if this.ClosePitstopMFDHotkey {
 			SendEvent % this.ClosePitstopMFDHotkey
 		
-		this.iPSIsOpen := false
-			
-		SetTimer updatePitstopState, Off
+			this.iPSIsOpen := false
+				
+			SetTimer updatePitstopState, Off
+		}
+		else if !reported {
+			reported := true
+		
+			logMessage(kLogCritical, translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration"))
+		
+			showMessage(translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration...")
+					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+		}
 	}
 	
 	requirePitstopMFD() {
@@ -1030,6 +1045,8 @@ class ACCPlugin extends ControllerPlugin {
 				this.iPSOptions.RemoveAt(position)
 				this.iPSTyreOptions := 6
 				
+				this.iPSBrakeOptionPosition := inList(this.iPSOptions, "Change Brakes")
+				
 				reload := true
 			}
 		}
@@ -1037,6 +1054,8 @@ class ACCPlugin extends ControllerPlugin {
 			if !inList(this.iPSOptions, "Tyre Set") {
 				this.iPSOptions.InsertAt(inList(this.iPSOptions, "Compound"), "Tyre Set")
 				this.iPSTyreOptions := 7
+				
+				this.iPSBrakeOptionPosition := inList(this.iPSOptions, "Change Brakes")
 				
 				reload := true
 			}

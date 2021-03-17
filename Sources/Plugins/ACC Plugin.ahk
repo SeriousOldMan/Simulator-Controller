@@ -27,15 +27,16 @@ global kCenter = 4
 class ACCPlugin extends ControllerPlugin {
 	kOpenPitstopMFDHotkey := false
 	kClosePitstopMFDHotkey := false
-	kPSOptions := ["Pit Limiter", "Strategy", "Refuel"
-				 , "Change Tyres", "Tyre Set", "Compound", "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right"
-				 , "Change Brakes", "Front Brake", "Rear Brake", "Repair Suspension", "Repair Bodywork"]
 	kPSMutatingOptions := ["Strategy", "Change Tyres", "Compound", "Change Brakes"]
 	
-	kPSTyreOptionPosition := inList(this.kPSOptions, "Change Tyres")
-	kPSTyreOptions := 7
-	kPSBrakeOptionPosition := inList(this.kPSOptions, "Change Brakes")
-	kPSBrakeOptions := 2
+	iPSOptions := ["Pit Limiter", "Strategy", "Refuel"
+				 , "Change Tyres", "Tyre Set", "Compound", "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right"
+				 , "Change Brakes", "Front Brake", "Rear Brake", "Repair Suspension", "Repair Bodywork"]
+	
+	iPSTyreOptionPosition := inList(this.iPSOptions, "Change Tyres")
+	iPSTyreOptions := 7
+	iPSBrakeOptionPosition := inList(this.iPSOptions, "Change Brakes")
+	iPSBrakeOptions := 2
 		
 	iPSIsOpen := false
 	iPSSelectedOption := 1
@@ -622,13 +623,13 @@ class ACCPlugin extends ControllerPlugin {
 	}
 	
 	selectPitstopOption(option, retry := true) {
-		targetSelectedOption := inList(this.kPSOptions, option)
+		targetSelectedOption := inList(this.iPSOptions, option)
 		
 		if targetSelectedOption {
 			delta := 0
 			
-			if (targetSelectedOption > this.kPSTyreOptionPosition) {
-				if (targetSelectedOption <= (this.kPSTyreOptionPosition + this.kPSTyreOptions)) {
+			if (targetSelectedOption > this.iPSTyreOptionPosition) {
+				if (targetSelectedOption <= (this.iPSTyreOptionPosition + this.iPSTyreOptions)) {
 					if !this.iPSChangeTyres {
 						this.toggleActivity("Change Tyres")
 						
@@ -637,11 +638,11 @@ class ACCPlugin extends ControllerPlugin {
 				}
 				else
 					if !this.iPSChangeTyres
-						delta -= this.kPSTyreOptions
+						delta -= this.iPSTyreOptions
 			}
 			
-			if (targetSelectedOption > this.kPSBrakeOptionPosition) {
-				if (targetSelectedOption <= (this.kPSBrakeOptionPosition + this.kPSBrakeOptions)) {
+			if (targetSelectedOption > this.iPSBrakeOptionPosition) {
+				if (targetSelectedOption <= (this.iPSBrakeOptionPosition + this.iPSBrakeOptions)) {
 					if !this.iPSChangeBrakes {
 						this.toggleActivity("Change Brakes")
 						
@@ -650,7 +651,7 @@ class ACCPlugin extends ControllerPlugin {
 				}
 				else
 					if !this.iPSChangeBrakes
-						delta -= this.kPSBrakeOptions
+						delta -= this.iPSBrakeOptions
 			}
 			
 			targetSelectedOption += delta
@@ -879,12 +880,12 @@ class ACCPlugin extends ControllerPlugin {
 			pitstopLabel := pitstopLabels[A_Index]
 			
 			if !this.iPSImageSearchArea {
-				ImageSearch x, y, 0, 0, A_ScreenWidth, A_ScreenHeight, *50 %pitstopLabel%
+				ImageSearch x, y, 0, 0, A_ScreenWidth, A_ScreenHeight, *100 %pitstopLabel%
 
 				logMessage(kLogInfo, translate("Full search for 'PITSTOP' took ") . A_TickCount - curTickCount . translate(" ms"))
 			}
 			else {
-				ImageSearch x, y, this.iPSImageSearchArea[1], this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *50 %pitstopLabel%
+				ImageSearch x, y, this.iPSImageSearchArea[1], this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *100 %pitstopLabel%
 
 				logMessage(kLogInfo, translate("Optimized search for 'PITSTOP' took ") . A_TickCount - curTickCount . translate(" ms"))
 			}
@@ -932,9 +933,9 @@ class ACCPlugin extends ControllerPlugin {
 			pitStrategyLabel := pitStrategyLabels[A_Index]
 			
 			if !this.iPSImageSearchArea
-				ImageSearch x, y, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, *50 %pitStrategyLabel%
+				ImageSearch x, y, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, *100 %pitStrategyLabel%
 			else
-				ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *50 %pitStrategyLabel%
+				ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *100 %pitStrategyLabel%
 
 			if x is Integer
 			{
@@ -951,32 +952,32 @@ class ACCPlugin extends ControllerPlugin {
 		
 		if x is Integer
 		{
-			if !inList(this.kPSOptions, "Strategy") {
-				this.kPSOptions.InsertAt(inList(this.kPSOptions, "Refuel"), "Strategy")
+			if !inList(this.iPSOptions, "Strategy") {
+				this.iPSOptions.InsertAt(inList(this.iPSOptions, "Refuel"), "Strategy")
 				
-				this.kPSTyreOptionPosition += 1
-				this.kPSBrakeOptionPosition += 1
+				this.iPSTyreOptionPosition += 1
+				this.iPSBrakeOptionPosition += 1
 				
 				reload := true
 			}
 			
 			lastY := y
 		
-			logMessage(kLogInfo, translate("'Pit Strategy' detected, adjusting pit stop options: " . values2String(", ", this.kPSOptions*)))
+			logMessage(kLogInfo, translate("'Pit Strategy' detected, adjusting pit stop options: " . values2String(", ", this.iPSOptions*)))
 		}
 		else {
-			position := inList(this.kPSOptions, "Strategy")
+			position := inList(this.iPSOptions, "Strategy")
 			
 			if position {
-				this.kPSOptions.RemoveAt(position)
+				this.iPSOptions.RemoveAt(position)
 				
-				this.kPSTyreOptionPosition -= 1
-				this.kPSBrakeOptionPosition -= 1
+				this.iPSTyreOptionPosition -= 1
+				this.iPSBrakeOptionPosition -= 1
 				
 				reload := true
 			}
 		
-			logMessage(kLogInfo, translate("'Pit Strategy' not detected, adjusting pit stop options: " . values2String(", ", this.kPSOptions*)))
+			logMessage(kLogInfo, translate("'Pit Strategy' not detected, adjusting pit stop options: " . values2String(", ", this.iPSOptions*)))
 		}
 		
 		return reload
@@ -1001,9 +1002,9 @@ class ACCPlugin extends ControllerPlugin {
 			wetLabel := wetLabels[A_Index]
 				
 			if !this.iPSImageSearchArea
-				ImageSearch x, y, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, *50 %wetLabel%
+				ImageSearch x, y, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, *100 %wetLabel%
 			else
-				ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *50 %wetLabel%
+				ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *100 %wetLabel%
 
 			if x is Integer
 			{
@@ -1015,19 +1016,19 @@ class ACCPlugin extends ControllerPlugin {
 		
 		if x is Integer
 		{
-			position := inList(this.kPSOptions, "Tyre Set")
+			position := inList(this.iPSOptions, "Tyre Set")
 			
 			if position {
-				this.kPSOptions.RemoveAt(position)
-				this.kPSTyreOptions := 6
+				this.iPSOptions.RemoveAt(position)
+				this.iPSTyreOptions -= 1
 				
 				reload := true
 			}
 		}
 		else {
-			if !inList(this.kPSOptions, "Tyre Set") {
-				this.kPSOptions.InsertAt(inList(this.kPSOptions, "Compound"), "Tyre Set")
-				this.kPSTyreOptions := 7
+			if !inList(this.iPSOptions, "Tyre Set") {
+				this.iPSOptions.InsertAt(inList(this.iPSOptions, "Compound"), "Tyre Set")
+				this.iPSTyreOptions += 1
 				
 				reload := true
 			}
@@ -1041,9 +1042,9 @@ class ACCPlugin extends ControllerPlugin {
 			compoundLabel := compoundLabels[A_Index]
 			
 			if !this.iPSImageSearchArea
-				ImageSearch x, y, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, *50 %compoundLabel%
+				ImageSearch x, y, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, *100 %compoundLabel%
 			else
-				ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *50 %compoundLabel%
+				ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *100 %compoundLabel%
 			
 			if x is Integer
 			{
@@ -1091,9 +1092,9 @@ class ACCPlugin extends ControllerPlugin {
 			frontBrakeLabel := frontBrakeLabels[A_Index]
 			
 			if !this.iPSImageSearchArea
-				ImageSearch x, y, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, *50 %frontBrakeLabel%
+				ImageSearch x, y, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, *100 %frontBrakeLabel%
 			else
-				ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *50 %frontBrakeLabel%
+				ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *100 %frontBrakeLabel%
 			
 			if x is Integer
 			{
@@ -1139,9 +1140,9 @@ class ACCPlugin extends ControllerPlugin {
 			selectDriverLabel := selectDriverLabels[A_Index]
 			
 			if !this.iPSImageSearchArea
-				ImageSearch x, y, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, *50 %selectDriverLabel%
+				ImageSearch x, y, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, *100 %selectDriverLabel%
 			else
-				ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *50 %selectDriverLabel%
+				ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *100 %selectDriverLabel%
 		
 			if x is Integer
 			{
@@ -1158,24 +1159,24 @@ class ACCPlugin extends ControllerPlugin {
 		
 		if x is Integer
 		{
-			if !inList(this.kPSOptions, "Select Driver") {
-				this.kPSOptions.InsertAt(inList(this.kPSOptions, "Repair Suspension"), "Select Driver")
+			if !inList(this.iPSOptions, "Select Driver") {
+				this.iPSOptions.InsertAt(inList(this.iPSOptions, "Repair Suspension"), "Select Driver")
 				
 				reload := true
 			}
 		
-			logMessage(kLogInfo, translate("'Select Driver' detected, adjusting pit stop options: " . values2String(", ", this.kPSOptions*)))
+			logMessage(kLogInfo, translate("'Select Driver' detected, adjusting pit stop options: " . values2String(", ", this.iPSOptions*)))
 		}
 		else {
-			position := inList(this.kPSOptions, "Select Driver")
+			position := inList(this.iPSOptions, "Select Driver")
 			
 			if position {
-				this.kPSOptions.RemoveAt(position)
+				this.iPSOptions.RemoveAt(position)
 				
 				reload := true
 			}
 		
-			logMessage(kLogInfo, translate("'Select Driver' not detected, adjusting pit stop options: " . values2String(", ", this.kPSOptions*)))
+			logMessage(kLogInfo, translate("'Select Driver' not detected, adjusting pit stop options: " . values2String(", ", this.iPSOptions*)))
 		}
 		
 		return reload
@@ -1184,7 +1185,7 @@ class ACCPlugin extends ControllerPlugin {
 	updatePitstopState(fromTimer := false) {
 		if isACCRunning() {
 			beginTickCount := A_TickCount
-			lastY := false
+			lastY := 0
 			images := []
 			
 			if (fromTimer || !this.iPSImageSearchArea)
@@ -1631,7 +1632,7 @@ readSharedMemory(dataFile) {
 	exePath := kBinariesDirectory . "ACC SHM Reader.exe"
 		
 	try {
-		Run %ComSpec% /c ""%exePath%" > "%dataFile%"", , Hide
+		RunWait %ComSpec% /c ""%exePath%" > "%dataFile%"", , Hide
 		
 		IniWrite ACC, %dataFile%, Race Data, Simulator
 	}

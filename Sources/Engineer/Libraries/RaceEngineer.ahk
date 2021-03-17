@@ -636,16 +636,12 @@ class RaceEngineer extends ConfigurationItem {
 					this.iContinuation := false
 					
 					this.getSpeaker().speakPhrase("Confirm")
-			
-					Sleep 5000
 					
 					this.planPitstopRecognized(words)
 				case "PitstopPrepare":
 					this.iContinuation := false
 					
 					this.getSpeaker().speakPhrase("Confirm")
-			
-					Sleep 5000
 					
 					this.preparePitstopRecognized(words)
 				case "PitstopAdjustFuel":

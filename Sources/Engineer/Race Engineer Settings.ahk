@@ -658,7 +658,7 @@ readSharedMemory(dataFile) {
 	exePath := kBinariesDirectory . "ACC SHM Reader.exe"
 		
 	try {
-		Run %ComSpec% /c ""%exePath%" > "%dataFile%"", , Hide
+		RunWait %ComSpec% /c ""%exePath%" > "%dataFile%"", , Hide
 		
 		IniWrite ACC, %dataFile%, Race Data, Simulator
 	}

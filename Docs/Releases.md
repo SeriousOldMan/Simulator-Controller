@@ -6,14 +6,14 @@
   4. Improvments for ACC Pitstop MFD handling
      - Better support for Single Screen Setups
 	 - Several edge case optimizations
-	 - Full integration of shared memory information for refuel amount and tyre pressuresm, therefore simplified initial race setup
+	 - Full integration of shared memory information for refuel amount and tyre pressuresm, therefore simplified [initial race setup](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-engineer-settings)
   5. Improvements for Jona
-	 - *Race Engineer Settings* Dialog can now import the current settings from the Pitstop MFD 
+	 - *Race Engineer Settings* Dialog can now [import the current settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-engineer-settings) from the Pitstop MFD 
 	 - When driver decides for a different tyre compound than recommended, the target pressures will be fully recalculated
-  5. Initial setup of database for Big Data race setup collection
+  5. Initial setup of database for [Big Data race setup collection](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--setup-database)
      - Opt In for community based data acquisition
   6. Larger window size and better UI for configuration tool
-     - You can open related documentation directly from the configuration tool in several places
+     - You can [open related documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#using-the-configuration-tool) directly from the configuration tool in several places
   
 ## 2.5.4-release 03/12/21
   

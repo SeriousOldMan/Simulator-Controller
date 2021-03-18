@@ -26,6 +26,7 @@ Release 2.6 Checklist
    a. Functions.md
    b. Remove showSplashAnimation
 5. showProgress, hideProgress
+   a. Functions.md
 6. reverse
    a. Functions.md
 7. Unblocking must get better

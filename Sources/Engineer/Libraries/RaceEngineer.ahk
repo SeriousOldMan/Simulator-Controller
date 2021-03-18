@@ -1405,7 +1405,7 @@ class RaceEngineer extends ConfigurationItem {
 			
 			Loop 4
 			{
-				if (increments[A_Index] > targetIncrements[A_Index]) {
+				if (Abs(increments[A_Index]) > Abs(targetIncrements[A_Index])) {
 					changed := true
 					
 					pressures[A_Index] := targetPressures[A_Index]

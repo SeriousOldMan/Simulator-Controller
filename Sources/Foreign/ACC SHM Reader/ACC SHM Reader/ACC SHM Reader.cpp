@@ -226,7 +226,7 @@ int main(int argc, char* argv[])
 
 		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
-		printData("TyreSet", gf->mfdTyreSet);
+		printData("TyreSet", gf->mfdTyreSet + 1);
 		printData("FuelAmount", gf->mfdFuelToAdd);
 		printData("TyrePressureFL", gf->mfdTyrePressureFL);
 		printData("TyrePressureFR", gf->mfdTyrePressureFR);

@@ -585,7 +585,7 @@ restart:
 		Gui RES:Font, Norm, Arial
 		Gui RES:Font, Italic, Arial
 				
-		Gui RES:Add, GroupBox, x202 ys w180 h120 , Wet Tyres
+		Gui RES:Add, GroupBox, x202 ys w180 h120 , % translate("Wet Tyres")
 				
 		Gui RES:Font, Norm, Arial
 
@@ -692,7 +692,7 @@ importFromSimulation() {
 			GuiControl Text, spDryRearRightEdit, %spDryRearRightEdit%
 		
 			spPitstopTyreSetEdit := getConfigurationValue(data, "Pitstop Data", "TyreSet", 0)
-			spSetupTyreSetEdit := Max(0, spPitstopTyreSetEdit - 1)
+			spSetupTyreSetEdit := Max(1, spPitstopTyreSetEdit - 1)
 			
 			GuiControl Text, spSetupTyreSetEdit, %spSetupTyreSetEdit%
 			GuiControl Text, spPitstopTyreSetEdit, %spPitstopTyreSetEdit%

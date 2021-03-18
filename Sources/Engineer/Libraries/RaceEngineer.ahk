@@ -1376,10 +1376,6 @@ class RaceEngineer extends ConfigurationItem {
 							   , Round(knowledgeBase.getValue("Tyre.Pressure.Target.FR"), 1)
 							   , Round(knowledgeBase.getValue("Tyre.Pressure.Target.RL"), 1)
 							   , Round(knowledgeBase.getValue("Tyre.Pressure.Target.RR"), 1))
-		targetIncrements := Array(Round(knowledgeBase.getValue("Tyre.Pressure.Target.FL.Increment"), 1)
-								, Round(knowledgeBase.getValue("Tyre.Pressure.Target.FR.Increment"), 1)
-								, Round(knowledgeBase.getValue("Tyre.Pressure.Target.RL.Increment"), 1)
-								, Round(knowledgeBase.getValue("Tyre.Pressure.Target.RR.Increment"), 1))
 		
 		key := ConfigurationItem.descriptor(airTemperature, trackTemperature)
 		
@@ -1389,36 +1385,42 @@ class RaceEngineer extends ConfigurationItem {
 			database := readConfiguration(databaseName)
 		}
 		
-		pressures := getConfigurationValue(database, "Pressures", key, "")
+		pressures := getConfigurationValue(database, "Pressures", key, false)
 		
-		if (true || (StrLen(pressures) = 0)) {
-			setConfigurationValue(database, "Pressures", key, values2String(", ", targetPressures*) . "; " . values2String(", ", targetIncrements*))
-			
-			writeConfiguration(databaseName, database)
-		}
+		if !pressures
+			pressures := (targetPressures[1] . ":1; " . targetPressures[2] . ":1; " . targetPressures[3] . ":1; " . targetPressures[4] . ":1")
 		else {
-			changed := false
-		
-			pressures := string2values(";", pressures)
-			increments := string2Values(",", pressures[2])
-			pressures := string2Values(",", pressures[1])
+			pressures := string2Values(";", pressures)
 			
-			Loop 4
-			{
-				if (Abs(increments[A_Index]) > Abs(targetIncrements[A_Index])) {
-					changed := true
-					
-					pressures[A_Index] := targetPressures[A_Index]
-					increments[A_Index] := targetIncrements[A_Index]
+			Loop 4 {
+				targetPressure := targetPressures[A_Index]
+				found := false
+			
+				tyrePressures := string2Values(",", pressures[A_Index])
+				
+				for index, pressure in tyrePressures {
+					pressure := string2Values(":", pressure)
+				
+					if (pressure[1] = targetPressure) {
+						tyrePressures[index] := (pressure[1] . ":" . (pressure[2] + 1))
+						
+						found := true
+						break
+					}
 				}
+				
+				if !found
+					tyrePressures.Push(targetPressure . ":1")
+				
+				pressures[A_Index] := values2String(",", tyrePressures*)
 			}
 			
-			if changed {
-				setConfigurationValue(database, "Pressures", key, values2String(", ", pressures*) . "; " . values2String(", ", increments*))
-			
-				writeConfiguration(databaseName, database)
-			}
+			pressures := values2String("; ", pressures*)
 		}
+		
+		setConfigurationValue(database, "Pressures", key, pressures)
+		
+		writeConfiguration(databaseName, database)
 	}
 	
 	hasEnoughData() {

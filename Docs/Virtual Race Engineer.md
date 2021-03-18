@@ -229,6 +229,8 @@ Most options above define general settings which will be applicable to any race 
   - The first fresh tyre set (*Tyre.Set.Fresh*), which is available for a pitstop and the tyres and pressures (*Tyre.XXX.Pressure.YY*) used in for the first stint. Jona needs this information to calculate the target pressures for the first pitstop.
   - The *Lap.AvgTime* and *Fuel.AvgConsumption* are more informational, but might lead to more accurate estimations for the fuel calulations in the first few laps, where you typically have much slower lap times.
 
+#### Tab *Settings*
+
 Let's have a look at the settings tool, which provides a graphical user interface for the *Race Engineer.settings* file. The dialog provides two distinct areas as tabs. The first tab, *Settings*, contains information that are independent of the current race situation.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Engineer%20Settings%201.JPG)
@@ -240,6 +242,8 @@ The middle area with the three dropdown menus give you you control over several 
 For tyre compound changes, you can choose between the triggers "Never", "Tyre Temperature" and "Weather". If you choose "Weather", Jona will advise wet tyres for light rain or worse and dry tyres for a dry track or drizzle. "Tyre Temperature" will allow you to enter a temperature threshold, where Jona will plan a tyre change, if the tyre temeprature falls outside its optimal temperature window by this amount. For dry tyres, the optimal temperature is considered to be above 70 Degrees and for wet tyres below 55 Degrees.
 
 In the lower area you can define the optimal tyre pressures. When there is a deviation larger than *Deviation Threshold* form these target pressures is detected by Jona, corresponding pressure adjustments will be applied for the next pitstop. Beside this very simple approach, there are rules in the AI kernel, which try to predict future incluences by falling ambient temperatures and upcoming weather changes. You can modify the bahaviour of these rules by using the controls in the upper area.
+
+#### Tab *Race*
 
 The second tab of the settings tool contains information about the actual race.
 
@@ -255,14 +259,20 @@ If you open the settings tool, it will load the *Race Engineer.settings* file lo
 
 ### The pitstop
 
-To enable Jona to handle the pitstop settings in *Assetto Corsa Competizione* fully on its own, you need to prepare two things beforehand. First you have to follow the instructions in the [update information for Release 2.0](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-20), so that the ACC plugin is able to control the Pitstop MFD of *Assetto Corsa Competizione*. Second, you need to setup your ACC pitstop strategy in a special way for as many pitstops you expect in the given race (plus some more for a safety margin):
+To enable Jona to handle the pitstop settings in *Assetto Corsa Competizione* completely on its own, you have to prepare some things beforehand. First you have to follow the instructions in the [update information for Release 2.0](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-20), so that the ACC plugin is able to control the Pitstop MFD of *Assetto Corsa Competizione*.
+
+Before Release 2.6, you had to setup your ACC pitstop strategy in a special way for as many pitstops you expect in the given race (plus some more for a safety margin):
 
   - Refueling must be set to zero litres for each strategy
   - Each strategy has to use the Dry tyre compound
   - Each strategy has to use the next fresh tyre set after the previous strategy
   - For each strategy, the tyre pressures must be those as used for the first stint and documented in the *Race Engineer.settings* file as described above
 
-Beside that, the check boxes for repair of Suspension and Bodywork must be both selected by the start of the race in the Pitstop MFD. After you have done all that, you can let Jona handle the pitstop setttings. Only be sure to not interfere with the artificial click and keyboard events, while Jona is managing the pitstop settings.
+Beginning with Release 2.6 this is not necessary anymore, since Jona can acquire the curent settings directly from *Assetto Corsa Competizione* via APIs. Jona now uses the values already set in the Pitstop MFD and calculates the delta to the desired target values. Please note, that this requires the settings in the [*Race Engineer Settings*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tab-race) dialog must be valid, especially the value for the first fresh dry tyre set. Beside that, I still recommend to setup a reasonable pitstop strategy, since this will reduce the time needed to dial in all those numbers (going from 0 to 120 litres of refueling will take quite some time).
+
+Last but not least, the check boxes for repair of Suspension and Bodywork must be both selected at the start of the race in the Pitstop MFD. After you have done all that, you can let Jona handle the pitstop setttings. Only be sure to not interfere with the artificial click and keyboard events, while Jona is managing the pitstop settings.
+
+A final warning: If you ever perform a pitstop, which has not been planned and prepared by Jona, Jona will be very confused, say the least. You can do this, but please double check the recommendations of Jona for each subsequent pitstop, especially the chosen tyre set, if you don't want to end up with worn out tyres for your last stint.
 
 ### Race & Setup database
 

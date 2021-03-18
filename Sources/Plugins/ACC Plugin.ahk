@@ -1406,6 +1406,13 @@ class ACCPlugin extends ControllerPlugin {
 	
 	setPitstopTyreSet(pitstopNumber, compound, set := false) {
 		changePitstopTyreCompound(compound)
+		
+		data := readSharedMemory(kUserHomeDirectory . "Temp\ACC Data\Pitstop Setup.data")
+		
+		tyreSetIncrement := Round(set - getConfigurationValue(data, "Pitstop Data", "TyreSet", 0))
+		
+		if (compound = "Dry")
+			changePitstopTyreSet((tyreSetIncrement > 0) ? "Next" : "Previous", Abs(tyreSetIncrement))
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {

@@ -26,7 +26,7 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-[2.6.0-rc1](https://www.dropbox.com/s/4wfi9216at97yyv/Simulator%20Controller%202.6.0-rc1.zip?dl=1) (First release candidate for the upcoming release 2.6 will be the start of the Big Data collection cycle. Features: Initial setup for Big Data Collection, Improved stint time management, Rework of the configuration tool, Forced tyre compound change for Jona, Improved handling of ACC Pitstop MFD. As always, you want to consult the [update documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-26), which is quite short for this release.)
+[2.6.0-rc2](https://www.dropbox.com/s/2k5d7k5f8xqdd73/Simulator%20Controller%202.6.0-rc2.zip?dl=1) (Second release candidate for the upcoming release 2.6 will be the start of the Big Data collection cycle. Features: Initial setup for Big Data Collection, Improved stint time management, Rework of the configuration tool, Forced tyre compound change for Jona, Improved handling of ACC Pitstop MFD. As always, you want to consult the [update documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-26), which is quite short for this release.)
 
 #### Latest release builds
 

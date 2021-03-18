@@ -45,7 +45,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 2.6
 
-Nothing major for this release, everything will be handled by the automated update procedure. For political correctness (sorry for my previous choice of words), I renamed "Master Controller" to "Main Controller" and "Slave Controller" to "Support Controller" for the Button Box configurations. As said, this renaming will be handled by the automated update, but if you have configured your own Button Boxes based on the preconfigured ones of the previous release, you want to check in your configuration, whether everything is as expected after the update.
+Nothing major for this release, everything will be taken care of by the automated update procedure. For political correctness (sorry for my previous choice of words, but I am an IT guy and in the world of IT these terminology is of widespread use), I renamed "Master Controller" to "Main Controller" and "Slave Controller" to "Support Controller" for the Button Box configurations. As said, this renaming will be handled by the automated update, but if you have configured your own Button Boxes based on the preconfigured ones of the previous release, you might want to check in your configuration, whether everything is as expected after the update.
 
 ***
 

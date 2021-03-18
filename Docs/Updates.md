@@ -43,6 +43,12 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ***
 
+## Release 2.6
+
+Nothing major for this release, everything will be handled by the automated update procedure. For political correctness (sorry for my previous choice of words), I renamed "Master Controller" to "Main Controller" and "Slave Controller" to "Support Controller" for the Button Box configurations. As said, this renaming will be handled by the automated update, but if you have configured your own Button Boxes based on the preconfigured ones of the previous release, you want to check in your configuration, whether everything is as expected after the update.
+
+***
+
 ## Release 2.5.4
 
 With this release, Jona is feature complete and therefore no longer to be considered in alpha stage. There still might be situations, where Jonas recommendations are wrong, so always double check, especially during important races. See the documentation on the [virtual race engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer), especially the chapter on [How it works](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#how-it-works) for updated information.

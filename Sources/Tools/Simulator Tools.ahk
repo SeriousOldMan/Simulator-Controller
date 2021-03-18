@@ -477,6 +477,19 @@ updateCustomCalls(startNumber, endNumber) {
 	}
 }
 
+updateConfigurationForV26() {
+	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	userConfiguration := readConfiguration(userConfigurationFile)
+	
+	if (userConfiguration.Count() > 0) {
+		config := getConfigurationValue(userConfiguration, "Controller Layouts", "Button Boxes", "Master Controller")
+		
+		setConfigurationValue(userConfiguration, "Controller Layouts", "Button Boxes", StrReplace(StrReplace(config, "Master", "Main"), "Slave", "Support"))
+		
+		writeConfiguration(userConfigurationFile, userConfiguration)
+	}
+}
+
 updateConfigurationForV25() {
 	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
 	userConfiguration := readConfiguration(userConfigurationFile)
@@ -486,7 +499,7 @@ updateConfigurationForV25() {
 	
 		config := getConfigurationSectionValues(bundledConfiguration, "Voice Control", Object())
 		
-		setConfigurationSectionValues(bundledConfiguration, "Voice Control", config)
+		setConfigurationSectionValues(userConfiguration, "Voice Control", config)
 		
 		setConfigurationValue(userConfiguration, "Controller Layouts", "Button Boxes", "Master Controller")
 		

@@ -229,7 +229,7 @@ Most options above define general settings which will be applicable to any race 
   - The first fresh tyre set (*Tyre.Set.Fresh*), which is available for a pitstop and the tyres and pressures (*Tyre.XXX.Pressure.YY*) used in for the first stint. Jona needs this information to calculate the target pressures for the first pitstop.
   - The *Lap.AvgTime* and *Fuel.AvgConsumption* are more informational, but might lead to more accurate estimations for the fuel calulations in the first few laps, where you typically have much slower lap times.
 
-Let's have a look at the settings tool, which provides two sections. The first section, *Settings*, contains information that are independent of the current race situation.
+Let's have a look at the settings tool, which provides a graphical user interface for the *Race Engineer.settings* file. The dialog provides two distinct areas as tabs. The first tab, *Settings*, contains information that are independent of the current race situation.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Engineer%20Settings%201.JPG)
 
@@ -241,11 +241,11 @@ For tyre compound changes, you can choose between the triggers "Never", "Tyre Te
 
 In the lower area you can define the optimal tyre pressures. When there is a deviation larger than *Deviation Threshold* form these target pressures is detected by Jona, corresponding pressure adjustments will be applied for the next pitstop. Beside this very simple approach, there are rules in the AI kernel, which try to predict future incluences by falling ambient temperatures and upcoming weather changes. You can modify the bahaviour of these rules by using the controls in the upper area.
 
-The second section of the settings tool contains information about the actual race.
+The second tab of the settings tool contains information about the actual race.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Engineer%20Settings%202.JPG)
 
-You must supply the tyre selection and pressure setup, that is used at the beginning of the race, in the lower area of the *Race* section, wherease the static information for the given track and race is located in the upper area. You can use the "Import" button to retrieve the current tyre setup information from *Assetto Corsa Competizione*. Currently, *Assetto Corsa Competizione* only gives access to the tyre pressures that are currently configured in the Pitstop MFD. But you may use the "Use current pressures..." option in the *Assetto Corsa Competizione* "Fuel & Strategy" area to transfer your current tyre setup to the Pitstop MFD and "import" the settings from there. Depending on your currently mounted tyres, the values will be imported as "Dry" or "Wet" setup values.
+You must supply the tyre selection and pressure setup, that is used at the beginning of the race, in the lower area of the *Race* tab, wherease the static information for the given track and race is located in the upper area. You can use the "Import" button to retrieve the current tyre setup information from *Assetto Corsa Competizione*. Currently, *Assetto Corsa Competizione* only gives access to the tyre pressures that are currently configured in the Pitstop MFD. But you may use the "Use current pressures..." option in the *Assetto Corsa Competizione* "Fuel & Strategy" area to transfer your current tyre setup to the Pitstop MFD and "import" the settings from there. Depending on your currently mounted tyres, the values will be imported as "Dry" or "Wet" setup values.
 
 Note: We requested a more versatile access to setup informations from Kunos already. Hopefully, this will be available in a future version of *Assetto Corsa Competizione*, and the whole process will become much less cumbersome.
 

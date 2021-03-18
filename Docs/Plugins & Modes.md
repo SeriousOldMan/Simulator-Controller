@@ -127,7 +127,7 @@ All the arguments for the plugin parameters of the "Motion Feedback" plugin must
 
 	controlApplication: *Name of the SimFeedback application configuration*;
 	connector: *path to sfx-100-console-application*;
-	motion: *initialState* *onOffFunction* *intensityFunction* *initialIntensity*;
+	motion: *initialState* *onOffFunction* *intensityFunction* *initialIntensity*
 
 The optional parameter *controlApplication* let you provide the name of the configured application object for *SimFeedback*, if it is not named "Motion Feedback". The *connector* parameter may be used, when *SimFeedack* is running in expert mode and you have installed the extensions mentioned above. The path must be set to the location of the console executable, as in "D:\Programme\SimFeedback Connector\sfx-100-streamdeck-console.exe". For *motion*, you supply the *initialState* as one of "On" or "Off". 
 *onOffFunction* will define a controller function to start or stop the motion actuator motors. Both, unary and binary functions are supported. This function is connected to the plugin itself and is therefore always available. With *intensityFunction*, you supply a function to control the overall motion intensity starting with *initialIntensity*. You may have to supply a descriptor for binary function here, unless you only want to increase the intensity all the time. Example: "motion: Off 2WayToggle.2 Dial.1 30"
@@ -201,7 +201,7 @@ Starting with Release 2.0, all pitstop settings of *Assetto Corsa Competizione* 
 
 Using the buttons and dials you may change the pitstop settings in the same way as using the keyboard. All this will be achieved using the following plugin argument:
 
-	closePitstopMFD: {Insert}; openPitstopMFD: P;
+	openPitstopMFD: P; closePitstopMFD: {Insert};
 	pitstopSettings: Strategy Dial.1, Refuel Dial.2 5, TyreSet Button.1 Button.5, TyreCompound Button.2 Button.6,
 					 TyreAllAround Button.3 Button.7, SuspensionRepair Button.4, BodyworkRepair Button.8
 
@@ -209,7 +209,7 @@ Using the buttons and dials you may change the pitstop settings in the same way 
 
 First, you need to define, how to open and close the Pitstop MFD in *Assetto Corsa Competizione*. If the standard keyboard mapping is used, this will be the "P" and the "Insert" keys on the keyboard.
 
-	closePitstopMFD: *closeHotkey*; openPitstopMFD: *openHotkey*;
+	openPitstopMFD: *openHotkey*; closePitstopMFD: *closeHotkey*
 	
 With the plugin parameter *pitstopSettings:* you can supply a list of the settings, you want to tweak from your hardware controller. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example tyre pressure and fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
 

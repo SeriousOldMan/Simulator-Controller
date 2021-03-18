@@ -9,6 +9,7 @@ General Release Actions
 7. Update "Releases.md"
 8. Update "Backlog.md"
 9. Check, whether update documentation for the release is required in "Updates.md"
+10. Update Wiki using "update-documentation.bat"
 
 Release 2.6 Checklist
 =====================

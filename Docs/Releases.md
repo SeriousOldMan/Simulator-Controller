@@ -1,3 +1,12 @@
+## 2.7-release planned for 04/02/21 (2-week sprint)
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Support for seperate active plugin modes, when more than one hardware controller is connected and configured
+  4. Layout editor for Button Box layouts integrated into the configuration tool
+  5. Plugin support for configuration tool
+  6. First consolidated version of Setup Database as Excel Spreadsheet for Quality Assurance
+
 ## 2.6-release 03/19/21
 
   1. Bugfixes, as always

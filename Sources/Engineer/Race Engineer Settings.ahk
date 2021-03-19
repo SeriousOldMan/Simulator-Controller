@@ -600,12 +600,12 @@ restart:
 		Gui RES:Add, Text, x350 yp+2 w30 h20, % translate("PSI")
 
 		Gui RES:Add, Text, x212 yp+24 w75 h20, % translate("Rear Left")
-		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VspWetRearLeftEdit, %spWetFrontLeftEdit%
+		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VspWetRearLeftEdit, %spWetRearLeftEdit%
 		; Gui RES:Add, UpDown, x324 yp-2 w18 h20
 		Gui RES:Add, Text, x350 yp+2 w30 h20, % translate("PSI")
 
 		Gui RES:Add, Text, x212 yp+24 w75 h20, % translate("Rear Right")
-		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VspWetRearRightEdit, %spWetFrontLeftEdit%
+		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VspWetRearRightEdit, %spWetRearRightEdit%
 		; Gui RES:Add, UpDown, x324 yp-2 w18 h20
 		Gui RES:Add, Text, x350 yp+2 w30 h20, % translate("PSI")
 

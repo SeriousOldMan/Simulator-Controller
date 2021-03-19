@@ -417,8 +417,8 @@ class ACCPlugin extends ControllerPlugin {
 		
 		raceEngineerImportSettings := this.getArgumentValue("raceEngineerImportSettings", false)
 		
-		if raceEngineerImport
-			this.createRaceEngineerAction(controller, "RaceEngineerImport", raceEngineerImport)
+		if raceEngineerImportSettings
+			this.createRaceEngineerAction(controller, "RaceEngineerImportSettings", raceEngineerImportSettings)
 		
 		for ignore, theAction in string2Values(",", this.getArgumentValue("raceEngineerCommands", ""))
 			this.createRaceEngineerAction(controller, string2Values(A_Space, theAction)*)

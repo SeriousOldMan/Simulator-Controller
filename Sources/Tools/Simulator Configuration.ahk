@@ -716,6 +716,8 @@ class GeneralTab extends ConfigurationItemTab {
 		if (new TranslationsEditor(this.Configuration)).editTranslations() {
 			ConfigurationEditor.Instance.show()
 			
+			Gui SE:Default
+			
 			choices := []
 			chosen := 0
 			enIndex := 1

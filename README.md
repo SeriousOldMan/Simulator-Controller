@@ -117,7 +117,6 @@ The markdown files, the so to say source code of this documentation Wiki, can be
 ### Known issues
 
 1. Connection between the "Motion Feedback" plugin and *SimFeedback* has some stabilty issues. Looks like the root cause is located in the *SFX-100-Streamdeck* extension. For a workaround click on "Reload Profile..." on the Extensions tab in SimFeedback, if you see strange numbers in the Button Box "Motion" mode page.
-2. The language drop down in the configuration tool does not adopt to changed languages, after the translation editor has been used.
 
 ### Development
 

@@ -11,6 +11,11 @@ General Release Actions
 9. Check, whether update documentation for the release is required in "Updates.md"
 10. Update Wiki using "update-documentation.bat"
 
+Release 2.7 Checklist
+=====================
+
+1. Bugfix for Issue #2 - Language Dropdown List Update
+
 Release 2.6 Checklist
 =====================
 1. New in SHM Data (DriverTimeRemaining, StintTimeRemaining)

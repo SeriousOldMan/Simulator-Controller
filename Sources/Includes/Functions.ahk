@@ -44,8 +44,7 @@ global vTrayMessageDuration = 1500
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-ftpUpload(server, user, password, localFile, remoteFile)
-{
+ftpUpload(server, user, password, localFile, remoteFile) {
     static a := "AHK-FTP-UL"
 	
 	m := DllCall("LoadLibrary", "str", "wininet.dll", "ptr")
@@ -57,7 +56,7 @@ ftpUpload(server, user, password, localFile, remoteFile)
 	f := DllCall("wininet\InternetConnect", "ptr", h, "ptr", &server, "ushort", 21, "ptr", &user, "ptr", &password, "uint", 1, "uint", 0x08000000, "uptr", 0, "ptr")
 	
     if f {
-        if !(DllCall("wininet\FtpPutFile", "ptr", f, "ptr", &localFile, "ptr", &remoteFile, "uint", 0, "uptr", 0))
+        if !DllCall("wininet\FtpPutFile", "ptr", f, "ptr", &localFile, "ptr", &remoteFile, "uint", 0, "uptr", 0)
             return false, (DllCall("wininet\InternetCloseHandle", "ptr", h) && DllCall("FreeLibrary", "ptr", m))
 		
         DllCall("wininet\InternetCloseHandle", "ptr", f)
@@ -581,7 +580,7 @@ requestConsent() {
 			}
 			
 			try {
-				RunWait PowerShell.exe -Command Compress-Archive -LiteralPath '%kUserHomeDirectory%Setup Database\Local' -CompressionLevel Optimal -DestinationPath '%kUserHomeDirectory%Temp\Setup Database.%id%.zip',, Hide
+				RunWait PowerShell.exe -Command Compress-Archive -LiteralPath '%kUserHomeDirectory%Setup Database\Local' -CompressionLevel Optimal -DestinationPath '%kUserHomeDirectory%Temp\Setup Database.%id%.zip', , Hide
 				
 				ftpUpload("ftp.drivehq.com", "TheBigO", "29605343.9318.1940", kUserHomeDirectory . "Temp\Setup Database." . id . ".zip", "Simulator Controller\Setup Database Uploads\Setup Database." . id . ".zip")
 				

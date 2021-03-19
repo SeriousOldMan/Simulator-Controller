@@ -1,4 +1,4 @@
-## 2.6-release upcoming...
+## 2.6-release 03/19/21
 
   1. Bugfixes, as always
   2. Documentation updates, as always

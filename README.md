@@ -26,13 +26,13 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-[2.6.0-rc2](https://www.dropbox.com/s/2k5d7k5f8xqdd73/Simulator%20Controller%202.6.0-rc2.zip?dl=1) (Second release candidate for the upcoming release 2.6 will be the start of the Big Data collection cycle. Features: Initial setup for Big Data Collection, Improved stint time management, Rework of the configuration tool, Forced tyre compound change for Jona, Improved handling of ACC Pitstop MFD. As always, you want to consult the [update documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-26), which is quite short for this release.)
+None for the moment...
 
 #### Latest release builds
 
-[2.5.0-release](https://www.dropbox.com/s/04le21b4obd5dpp/Simulator%20Controller%202.5.0-release.zip?dl=1) (New features: File based Button Box configuration, Push To Talk for voice recognition, Usage of weather information in the Virtual Race Engineer including tyre change recommendation. Please read the [update notes on Release 2.5](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-25) for more information and necessary update activities.)
-
 [2.5.4-release](https://www.dropbox.com/s/q3njje783z5vusd/Simulator%20Controller%202.5.4-release.zip?dl=1) (A lot of work under the hood - 1. Integrated ACC shared memory data on current pitstop setup to simplify the setup process, 2. Jona now knows to change tyre compounds incl. tyre pressure setup on an upcoming pitstop, 3. More improvements for Button Box configuration, 4. Support for voice pitch and speed in configuration. Please consult the [update documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-254) for more information.)
+
+[2.6.1-release](https://www.dropbox.com/s/nqjz4wfq485ntzd/Simulator%20Controller%202.6.1-release.zip?dl=1) (Release 2.6 will be the start of the Big Data collection cycle. Features: Initial setup for Big Data Collection, Improved stint time management, Rework of the configuration tool, Forced tyre compound change for Jona, Improved handling of ACC Pitstop MFD. As always, you want to consult the [update documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-26), which is quite short for this release.)
 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [update notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-20) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.

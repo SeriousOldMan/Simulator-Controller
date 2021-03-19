@@ -263,7 +263,7 @@ With *true* supplied for *raceEngineerLogo*, Jona will show a nice rotating AI b
 
 It is possible, although not much fun, to use Jona without its natural language interface. Only the pitstop planning and setup capabilities are available in this cconfiguration, but it is still useful, especially in combination with the other actions of the *Pitstop* mode described above. You can use the following parameters to connect these actions to your controller hardware:
 
-	raceEngineerCommands: PitstopPlan *function*; PitstopPrepare *function*
+	raceEngineerCommands: PitstopPlan *function*, PitstopPrepare *function*
 	
 Both actions will be bound to the *Pitstop* mode and only unary functions are supported here. An interesting combination you might try, is to use voice output for Jona, but no voice control. You will get all the information of Jona, but use an *oldschool* interface to control their actions.
 

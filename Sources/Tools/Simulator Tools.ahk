@@ -477,7 +477,7 @@ updateCustomCalls(startNumber, endNumber) {
 	}
 }
 
-updateConfigurationForV26() {
+updateConfigurationForV261() {
 	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
 	userConfiguration := readConfiguration(userConfigurationFile)
 	
@@ -487,6 +487,13 @@ updateConfigurationForV26() {
 		setConfigurationValue(userConfiguration, "Controller Layouts", "Button Boxes", StrReplace(StrReplace(config, "Master", "Main"), "Slave", "Support"))
 		
 		writeConfiguration(userConfigurationFile, userConfiguration)
+	}
+	
+	try {
+		FileRemoveDir %kUserHomeDirectory%Setup Database, 1
+	}
+	catch exception {
+		; ignore
 	}
 }
 

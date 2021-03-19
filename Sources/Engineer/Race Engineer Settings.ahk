@@ -672,30 +672,46 @@ readSharedMemory(dataFile) {
 	return readConfiguration(dataFile)
 }
 
-importFromSimulation() {
+importFromSimulation(settings := false) {
 	accApplication := new Application("Assetto Corsa Competizione", kSimulatorConfiguration)
 	
 	if accApplication.isRunning() {
 		data := readSharedMemory(kUserHomeDirectory . "Temp\ACC Data\Settings.data")
 			
+		spPitstopTyreSetEdit := getConfigurationValue(data, "Pitstop Data", "TyreSet", 0)
+		spSetupTyreSetEdit := Max(1, spPitstopTyreSetEdit - 1)
+		
+		if settings {
+			setConfigurationValue(settings, "Race Setup", "Tyre.Set", spSetupTyreSetEdit)
+			setConfigurationValue(settings, "Race Setup", "Tyre.Set.Fresh", spPitstopTyreSetEdit)
+		}
+		else {
+			GuiControl Text, spSetupTyreSetEdit, %spSetupTyreSetEdit%
+			GuiControl Text, spPitstopTyreSetEdit, %spPitstopTyreSetEdit%
+		}
+		
 		if (getConfigurationValue(data, "Car Data", "TyreCompound", "Dry") = "Dry") {
 			spDryFrontLeftEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureFL", 26.1)
 			spDryFrontRightEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureFR", 26.1)
 			spDryRearLeftEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureRL", 26.1)
 			spDryRearRightEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureRR", 26.1)
 		
-			GuiControl Choose, spSetupTyreCompoundDropDown, 2
-			
-			GuiControl Text, spDryFrontLeftEdit, %spDryFrontLeftEdit%
-			GuiControl Text, spDryFrontRightEdit, %spDryFrontRightEdit%
-			GuiControl Text, spDryRearLeftEdit, %spDryRearLeftEdit%
-			GuiControl Text, spDryRearRightEdit, %spDryRearRightEdit%
-		
-			spPitstopTyreSetEdit := getConfigurationValue(data, "Pitstop Data", "TyreSet", 0)
-			spSetupTyreSetEdit := Max(1, spPitstopTyreSetEdit - 1)
-			
-			GuiControl Text, spSetupTyreSetEdit, %spSetupTyreSetEdit%
-			GuiControl Text, spPitstopTyreSetEdit, %spPitstopTyreSetEdit%
+			if settings {
+				setConfigurationValue(settings, "Race Setup", "Tyre.Compound", "Dry")
+				
+				setConfigurationValue(settings, "Race Setup", "Tyre.Dry.Pressure.FL", Round(spDryFrontLeftEdit, 1))
+				setConfigurationValue(settings, "Race Setup", "Tyre.Dry.Pressure.FR", Round(spDryFrontRightEdit, 1))
+				setConfigurationValue(settings, "Race Setup", "Tyre.Dry.Pressure.RL", Round(spDryRearLeftEdit, 1))
+				setConfigurationValue(settings, "Race Setup", "Tyre.Dry.Pressure.RR", Round(spDryRearRightEdit, 1))
+			}
+			else {
+				GuiControl Choose, spSetupTyreCompoundDropDown, 2
+				
+				GuiControl Text, spDryFrontLeftEdit, %spDryFrontLeftEdit%
+				GuiControl Text, spDryFrontRightEdit, %spDryFrontRightEdit%
+				GuiControl Text, spDryRearLeftEdit, %spDryRearLeftEdit%
+				GuiControl Text, spDryRearRightEdit, %spDryRearRightEdit%
+			}
 		}
 		else {
 			spWetFrontLeftEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureFL", 28.5)
@@ -703,12 +719,22 @@ importFromSimulation() {
 			spWetRearLeftEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureRL", 28.5)
 			spWetRearRightEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureRR", 28.5)
 			
-			GuiControl Choose, spSetupTyreCompoundDropDown, 1
-			
-			GuiControl Text, spWetFrontLeftEdit, %spWetFrontLeftEdit%
-			GuiControl Text, spWetFrontRightEdit, %spWetFrontRightEdit%
-			GuiControl Text, spWetRearLeftEdit, %spWetRearLeftEdit%
-			GuiControl Text, spWetRearRightEdit, %spWetRearRightEdit%
+			if settings {
+				setConfigurationValue(settings, "Race Setup", "Tyre.Compound", "Wet")
+				
+				setConfigurationValue(settings, "Race Setup", "Tyre.Wet.Pressure.FL", Round(spWetFrontLeftEdit, 1))
+				setConfigurationValue(settings, "Race Setup", "Tyre.Wet.Pressure.FR", Round(spWetFrontRightEdit, 1))
+				setConfigurationValue(settings, "Race Setup", "Tyre.Wet.Pressure.RL", Round(spWetRearLeftEdit, 1))
+				setConfigurationValue(settings, "Race Setup", "Tyre.Wet.Pressure.RR", Round(spWetRearRightEdit, 1))
+			}
+			else {
+				GuiControl Choose, spSetupTyreCompoundDropDown, 1
+				
+				GuiControl Text, spWetFrontLeftEdit, %spWetFrontLeftEdit%
+				GuiControl Text, spWetFrontRightEdit, %spWetFrontRightEdit%
+				GuiControl Text, spWetRearLeftEdit, %spWetRearLeftEdit%
+				GuiControl Text, spWetRearRightEdit, %spWetRearRightEdit%
+			}
 		}
 	}
 }
@@ -720,7 +746,12 @@ showRaceEngineerSettingsEditor() {
 	
 	settings := readConfiguration(kRaceEngineerSettingsFile)
 	
-	if (editSettings(settings) == kOk)
+	if ((A_Args.Length() > 0) && (A_Args[1] = "-Import")) {
+		importFromSimulation(settings)
+		
+		writeConfiguration(kRaceEngineerSettingsFile, settings)
+	}
+	else if (editSettings(settings) == kOk)
 		writeConfiguration(kRaceEngineerSettingsFile, settings)
 	
 	ExitApp 0

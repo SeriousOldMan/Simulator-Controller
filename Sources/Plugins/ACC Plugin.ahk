@@ -262,9 +262,12 @@ class ACCPlugin extends ControllerPlugin {
 		}
 	}
 
-	class RaceEngineerSettingsAction extends ControllerAction {
+	class RaceEngineerSettingsAction extends ACCPlugin.RaceEngineerAction {
 		fireAction(function, trigger) {
-			openRaceEngineerSettings()
+			if (this.Action = "RaceEngineerSettings")
+				openRaceEngineerSettings()
+			else if (this.Action = "RaceEngineerImportSettings")
+				openRaceEngineerSettings(true)
 		}
 	}
 	
@@ -412,6 +415,11 @@ class ACCPlugin extends ControllerPlugin {
 		if raceEngineerSettings
 			this.createRaceEngineerAction(controller, "RaceEngineerSettings", raceEngineerSettings)
 		
+		raceEngineerImportSettings := this.getArgumentValue("raceEngineerImportSettings", false)
+		
+		if raceEngineerImport
+			this.createRaceEngineerAction(controller, "RaceEngineerImport", raceEngineerImport)
+		
 		for ignore, theAction in string2Values(",", this.getArgumentValue("raceEngineerCommands", ""))
 			this.createRaceEngineerAction(controller, string2Values(A_Space, theAction)*)
 		
@@ -471,8 +479,8 @@ class ACCPlugin extends ControllerPlugin {
 				mode.registerAction(new this.RaceEngineerAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Activate"), action), action))
 			else if (action = "RaceEngineer")
 				this.registerAction(new this.RaceEngineerToggleAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Toggle"), action)))
-			else if (action = "RaceEngineerSettings")
-				this.registerAction(new this.RaceEngineerSettingsAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Activate"))))
+			else if ((action = "RaceEngineerSettings") || (action = "RaceEngineerImportSettings"))
+				this.registerAction(new this.RaceEngineerSettingsAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Activate")), action))
 			else
 				logMessage(kLogWarn, translate("Action """) . action . translate(""" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
 		}
@@ -1646,11 +1654,14 @@ preparePitstop() {
 	}
 }
 
-openRaceEngineerSettings() {
+openRaceEngineerSettings(import := false) {
 	exePath := kBinariesDirectory . "Race Engineer Settings.exe"
 	
 	try {
-		Run "%exePath%", %kBinariesDirectory%
+		if import
+			Run "%exePath%" -Import, %kBinariesDirectory%
+		else
+			Run "%exePath%", %kBinariesDirectory%
 	}
 	catch exception {
 		logMessage(kLogCritical, translate("Cannot start the Race Engineers Settings tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))

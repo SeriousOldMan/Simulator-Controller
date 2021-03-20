@@ -1,6 +1,15 @@
 # Installation
 
-Download one of the releases, preferably the latest stable build, and unzip it at any location you like. Then go to the *Binaries* folder, where you will find several applications. I recommend to add a Start menu shortcut to *Simulator Startup.exe* and *Simulator Configuration.exe*, since you will need those two applications the most. After that, you want to visit the *Config* folder. If you want to start with a clean, empty configuration, you may want to delete all *.ini files, but it will be a good idea to make a backup copies for later reference. Also, leave all other files, like the *Simulator Tools.targets* file in place.
+Download one of the releases, preferably the latest stable build, and unzip it at any location you like. Then go to the *Binaries* folder, where you will find several applications. Depending on your Windows security settings, you need to unblock these applications, since Windows might not trust them. You can do this by checking the checkbox in the standard properties dialog. Do this for the DLL files in the *Binaries* folder as well.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Unblock.JPG)
+
+You might still encounter execution errors later on, beacause of Windows security restrictions. This is nothing I can change at the moment, at least not without buying an expensive certificate, that secures the source of the binaries. Therefore, an additional step might be necessary: You will find a little Powershell script in the *Utilities* folder, which you can copy to the *Binaries* folder and execute it there with Administrator privileges. These are the commands, which need be executed:
+
+	takeown.exe /F . /R /D N
+	Get-ChildItem -Path '.' -Recurse | Unblock-File
+
+After you have done all that, I recommend to add a Start menu shortcut to *Simulator Startup.exe* and *Simulator Configuration.exe*, since you will need those two applications the most. After that, you want to visit the *Config* folder. If you want to start with a clean, empty configuration, you may want to delete all *.ini files, but it will be a good idea to make a backup copies for later reference. Also, leave all other files, like the *Simulator Tools.targets* file in place.
 
 As an alternative, which I would recommend, leave the configuration files in place and use the given configuration as a starting point to understand how everything fits together. Then create your own configuration by changing this configuration using *Simulator Configuration.exe*, as described in the chapters below. The files in the *Config* folder will never get overwritten, when you save your own configuration. Instead, your configuration files will be saved to the *Simulator Controller\Config* folder in your user *Documents* folder. This folder will be searched first, when a configuration file is looked up. You can always revert to the original configuration by deleting the *.ini files in the *Simulator Controller\Config* folder.
 

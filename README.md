@@ -30,9 +30,9 @@ None for the moment...
 
 #### Latest release builds
 
-[2.5.4-release](https://www.dropbox.com/s/q3njje783z5vusd/Simulator%20Controller%202.5.4-release.zip?dl=1) (A lot of work under the hood - 1. Integrated ACC shared memory data on current pitstop setup to simplify the setup process, 2. Jona now knows to change tyre compounds incl. tyre pressure setup on an upcoming pitstop, 3. More improvements for Button Box configuration, 4. Support for voice pitch and speed in configuration. Please consult the [update documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-254) for more information.)
-
 [2.6.1-release](https://www.dropbox.com/s/nqjz4wfq485ntzd/Simulator%20Controller%202.6.1-release.zip?dl=1) (Release 2.6 will be the start of the Big Data collection cycle. Features: Initial setup for Big Data Collection, Improved stint time management, Rework of the configuration tool, Forced tyre compound change for Jona, Improved handling of ACC Pitstop MFD. As always, you want to consult the [update documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-26), which is quite short for this release.)
+
+[2.6.2-release]() (Critical Bugfix for Release 2.6.1 - wrong calculation of refuel amount after using new ACC shared memory information could lead to zero refueling.)
 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [update notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-20) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.

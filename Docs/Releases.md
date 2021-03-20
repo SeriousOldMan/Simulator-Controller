@@ -1,6 +1,7 @@
-## 2.7-release planned for 04/02/21 (2-week sprint)
+## 2.7-release planned for 04/02/21 (2-week easter egg sprint)
 
   1. Bugfixes, as always
+     - Finally a fix for issue #2 - Language dropdown menu synhronization error in Configuration Dialog
   2. Documentation updates, as always
   3. Support for separate active plugin modes, when more than one hardware controller is connected and configured
   4. Layout editor for Button Box layouts integrated into the configuration tool

@@ -326,5 +326,5 @@ Selects the driver to take the car during the next pitstop. *selection* must be 
 #### *preparePitstop()*
 *preparePitstop* triggers Jona, the virtual race engineer, to prepare a previously planned pitstop. This action function is provided by the "ACC" plugin and is available depending on the concrete configuration.
 
-#### *openRaceEngineerSettings()*
-Opens the settings tool, with which you can edit all the race specific settings, Jona needs for a given race. This action function is provided by the "ACC" plugin and is available depending on the concrete configuration.
+#### *openRaceEngineerSettings(import :: Boolean := false)*
+Opens the settings tool, with which you can edit all the race specific settings, Jona needs for a given race. This action function is provided by the "ACC" plugin and is available depending on the concrete configuration. If you supply *true* for the *import* parameter, the setup data is imported directly from a running simulation and the dialog is not opened.

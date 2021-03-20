@@ -264,7 +264,7 @@ class ACCPlugin extends ControllerPlugin {
 
 	class RaceEngineerSettingsAction extends ACCPlugin.RaceEngineerAction {
 		fireAction(function, trigger) {
-			if (this.Action = "RaceEngineerSettings")
+			if (this.Action = "RaceEngineerOpenSettings")
 				openRaceEngineerSettings()
 			else if (this.Action = "RaceEngineerImportSettings")
 				openRaceEngineerSettings(true)
@@ -410,10 +410,10 @@ class ACCPlugin extends ControllerPlugin {
 		else
 			this.iRaceEngineerEnabled := (this.iRaceEngineerName != false)
 		
-		raceEngineerSettings := this.getArgumentValue("raceEngineerSettings", false)
+		raceEngineerOpenSettings := this.getArgumentValue("raceEngineerOpenSettings", this.getArgumentValue("raceEngineerSettings", false))
 		
-		if raceEngineerSettings
-			this.createRaceEngineerAction(controller, "RaceEngineerSettings", raceEngineerSettings)
+		if raceEngineerOpenSettings
+			this.createRaceEngineerAction(controller, "RaceEngineerOpenSettings", raceEngineerOpenSettings)
 		
 		raceEngineerImportSettings := this.getArgumentValue("raceEngineerImportSettings", false)
 		
@@ -479,7 +479,7 @@ class ACCPlugin extends ControllerPlugin {
 				mode.registerAction(new this.RaceEngineerAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Activate"), action), action))
 			else if (action = "RaceEngineer")
 				this.registerAction(new this.RaceEngineerToggleAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Toggle"), action)))
-			else if ((action = "RaceEngineerSettings") || (action = "RaceEngineerImportSettings"))
+			else if ((action = "RaceEngineerOpenSettings") || (action = "RaceEngineerImportSettings"))
 				this.registerAction(new this.RaceEngineerSettingsAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Activate")), action))
 			else
 				logMessage(kLogWarn, translate("Action """) . action . translate(""" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
@@ -577,10 +577,12 @@ class ACCPlugin extends ControllerPlugin {
 	updateOnTrackState(onTrack) {
 		this.iOnTrack := onTrack
 		
-		if (this.Controller.ActiveMode == this.iChatMode)
+		activeModes := this.Controller.ActiveModes
+		
+		if (inList(activeModes, this.iChatMode))
 			this.iChatMode.updateActions(onTrack)
 		
-		if (this.Controller.ActiveMode == this.iPitstopMode)
+		if (inList(activeModes, this.iPitstopMode))
 			this.iPitstopMode.updateActions(onTrack)
 	}
 		
@@ -1329,7 +1331,7 @@ class ACCPlugin extends ControllerPlugin {
 			controller := SimulatorController.Instance
 			mode := controller.findMode(kPitstopMode)
 		
-			if (controller.ActiveMode == mode)
+			if (inList(controller.ActiveModes, mode))
 				mode.updateRaceEngineerActions(true)
 		}
 	}
@@ -1346,7 +1348,7 @@ class ACCPlugin extends ControllerPlugin {
 			controller := SimulatorController.Instance
 			mode := controller.findMode(kPitstopMode)
 			
-			if (controller.ActiveMode == mode)
+			if (inList(controller.ActiveModes, mode))
 				mode.updateRaceEngineerActions(false)
 		}
 	}

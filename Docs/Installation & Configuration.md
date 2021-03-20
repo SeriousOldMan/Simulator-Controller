@@ -167,7 +167,7 @@ Although you may call any globally defined function, you should use only the fol
 | changePitstopDriver | selection | ACC | Selects the driver to take the car during the next pitstop. *selection* must be either "Next" or "Previous". |
 | planPitstop | - | ACC | *planPitstop* triggers Jona, the virtual race engineer, to plan a pitstop. |
 | preparePitstop | - | ACC | *preparePitstop* triggers Jona, the virtual race engineer, to prepare a previously planned pitstop. |
-| openRaceEngineerSettings | - | ACC | Opens the settings tool, with which you can edit all the race specific settings, Jona needs for a given race. |
+| openRaceEngineerSettings | import | ACC | Opens the settings tool, with which you can edit all the race specific settings, Jona needs for a given race. If you supply *true* for the optional *import* parameter, the setup data is imported directly from a running simulation and the dialog is not opened. |
  
 #### Key Detector Tool
 

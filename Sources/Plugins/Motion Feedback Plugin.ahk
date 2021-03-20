@@ -94,7 +94,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		updateEffectLabels() {
 			static isInfo := false
 			
-			if (this.Controller.ActiveMode == this) {
+			if (inList(this.Controller.ActiveModes, this)) {
 				state := (isInfo ? ((this.iSelectedEffect == kUndefined) ? "Highlight" : "Info") : "Normal")
 				
 				for index, effect in this.Plugin.kEffects
@@ -891,7 +891,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	updatePluginState() {
 		mode := this.findMode(kMotionMode)
 	
-		if (this.Controller.ActiveMode == mode)
+		if (inList(this.Controller.ActiveModes, mode))
 			if this.Application.isRunning()
 				mode.updateActionStates()
 			else

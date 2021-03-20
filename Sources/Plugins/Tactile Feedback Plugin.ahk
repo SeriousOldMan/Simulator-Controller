@@ -315,7 +315,9 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 			protectionOn()
 			
 			try {
-				if ((this.Controller.ActiveMode == this.findMode(kPedalVibrationMode)) || (this.Controller.ActiveMode == this.findMode(kChassisVibrationMode)))
+				activeModes := this.Controller.ActiveModes
+				
+				if ((inList(activeModes, this.findMode(kPedalVibrationMode))) || (inList(activeModes, this.findMode(kChassisVibrationMode))))
 					this.Controller.rotateMode()
 						
 				this.deactivate()

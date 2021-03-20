@@ -72,7 +72,7 @@ class SystemPlugin extends ControllerPlugin {
 			if (true || (stateChange && (this.LaunchpadFunction != false))) {
 				controller := SimulatorController.Instance
 					
-				if (controller.ActiveMode == controller.findMode(kLaunchMode)) {
+				if (inList(controller.ActiveModes, controller.findMode(kLaunchMode))) {
 					if transition
 						this.LaunchpadFunction.setText(translate(this.LaunchpadAction.Label), "Gray")
 					else
@@ -98,7 +98,7 @@ class SystemPlugin extends ControllerPlugin {
 	class ModeSelectorAction extends ControllerAction {	
 		Label[] {
 			Get {
-				return this.Controller.ActiveMode.Mode
+				return this.Controller.ActiveMode[this.Function].Mode
 			}
 		}
 	
@@ -133,7 +133,7 @@ class SystemPlugin extends ControllerPlugin {
 		
 		fireAction(function, trigger) {
 			if !this.Transition {
-				if (function.Controller.ActiveMode == function.Controller.findMode(kLaunchMode)) {
+				if (inList(function.Controller.ActiveModes, function.Controller.findMode(kLaunchMode))) {
 					this.beginTransition()
 				
 					function.setText(translate(this.Label), "Gray")
@@ -175,9 +175,18 @@ class SystemPlugin extends ControllerPlugin {
 		}
 	}
 	
-	ModeSelector[] {
+	ModeSelector[function] {
 		Get {
-			return this.iModeSelector
+			if this.Controller.MultiMode
+				Throw "Not yet implemented..."
+			else
+				return this.iModeSelector
+		}
+	}
+	
+	ModeSelectors[] {
+		Get {
+			return Array(this.iModeSelector)
 		}
 	}
 	
@@ -493,26 +502,27 @@ updateModeSelector() {
 	protectionOn()
 	
 	try {
-		if modeSelectorMode {
-			currentMode := controller.ActiveMode.Mode
+		for ignore, selector in controller.findPlugin(kSystemPlugin).ModeSelectors {
+			function := selector.Function
 			
-			nextUpdate := -2000
-		}
-		else {
-			currentMode := translate("Mode Selector")
-			
-			nextUpdate := -1000
-		}
+			if modeSelectorMode {
+				currentMode := controller.ActiveMode[function].Mode
+				
+				nextUpdate := -2000
+			}
+			else {
+				currentMode := translate("Mode Selector")
+				
+				nextUpdate := -1000
+			}
 
-		modeSelectorMode := !modeSelectorMode
+			modeSelectorMode := !modeSelectorMode
 			
-		selector := controller.findPlugin(kSystemPlugin).ModeSelector
-		function := selector.Function
-		
-		if modeSelectorMode
-			function.setText(currentMode, "Gray")
-		else
-			function.setText(translate(currentMode))
+			if modeSelectorMode
+				function.setText(currentMode, "Gray")
+			else
+				function.setText(translate(currentMode))
+		}
 	}
 	finally {
 		protectionOff()

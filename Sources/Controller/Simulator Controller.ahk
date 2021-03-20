@@ -367,6 +367,7 @@ class SimulatorController extends ConfigurationItem {
 	iButtonBoxes := []
 	
 	iModes := []
+	iMultiMode := false
 	iActiveMode := false
 	
 	iFunctionActions := {}
@@ -415,9 +416,24 @@ class SimulatorController extends ConfigurationItem {
 		}
 	}
 	
-	ActiveMode[] {
+	MultiMode[] {
 		Get {
-			return this.iActiveMode
+			return this.iMultiMode
+		}
+	}
+	
+	ActiveMode[function] {
+		Get {
+			if this.MultiMode
+				Throw "Not yet implemented..."
+			else
+				return this.iActiveMode
+		}
+	}
+	
+	ActiveModes[] {
+		Get {
+			return Array(this.iActiveMode)
 		}
 	}
 	

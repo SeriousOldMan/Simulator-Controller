@@ -1715,7 +1715,7 @@ class RaceEngineer extends ConfigurationItem {
 
 	setPitstopRefuelAmount(pitstopNumber, litres) {
 		if this.PitstopHandler
-			this.PitstopHandler.setPitstopRefuelAmount(pitstopNumber, Round(litres - this.KnowledgeBase.getValue("Pitstop.Configured.Fuel", 0)))
+			this.PitstopHandler.setPitstopRefuelAmount(pitstopNumber, litres)
 	}
 
 	setPitstopTyreSet(pitstopNumber, compound, set) {

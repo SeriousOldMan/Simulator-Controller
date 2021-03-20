@@ -23,7 +23,7 @@ class SystemPlugin extends ControllerPlugin {
 	iMouseClicked := false
 	iStartupSongIsPlaying := false
 	iRunnableApplications := []
-	iModeSelector := false
+	iModeSelectors := []
 	
 	class RunnableApplication extends Application {
 		iIsRunning := false
@@ -175,18 +175,9 @@ class SystemPlugin extends ControllerPlugin {
 		}
 	}
 	
-	ModeSelector[function] {
-		Get {
-			if this.Controller.MultiMode
-				Throw "Not yet implemented..."
-			else
-				return this.iModeSelector
-		}
-	}
-	
 	ModeSelectors[] {
 		Get {
-			return Array(this.iModeSelector)
+			return this.iModeSelectors
 		}
 	}
 	
@@ -204,6 +195,7 @@ class SystemPlugin extends ControllerPlugin {
 	
 	__New(controller, name, configuration := false) {
 		local function
+		local action
 		
 		this.iLaunchMode := new this.LaunchMode(this)
 		
@@ -212,16 +204,20 @@ class SystemPlugin extends ControllerPlugin {
 		
 		base.__New(controller, name, configuration)
 		
-		descriptor := this.getArgumentValue("modeSelector")
-		
-		if (descriptor != false) {
-			function := controller.findFunction(descriptor)
-			
-			if (function != false)
-				this.registerAction(this.iModeSelector := new this.ModeSelectorAction(function))
-			else
-				this.logFunctionNotFound(descriptor)
-		}
+		for ignore, descriptor in string2Values(A_Space, this.getArgumentValue("modeSelector", ""))
+			if (descriptor != false) {
+				function := controller.findFunction(descriptor)
+				
+				if (function != false) {
+					action := new this.ModeSelectorAction(function)
+					
+					this.iModeSelectors.Push(action)
+					
+					this.registerAction(action)
+				}
+				else
+					this.logFunctionNotFound(descriptor)
+			}
 		
 		descriptor := this.getArgumentValue("logo", false)
 		

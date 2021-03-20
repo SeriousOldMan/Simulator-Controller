@@ -369,6 +369,7 @@ class SimulatorController extends ConfigurationItem {
 	iModes := []
 	iMultiMode := false
 	iActiveMode := false
+	iActiveModes := []
 	
 	iFunctionActions := {}
 	
@@ -422,7 +423,7 @@ class SimulatorController extends ConfigurationItem {
 		}
 	}
 	
-	ActiveMode[function] {
+	ActiveMode[function := false] {
 		Get {
 			if this.MultiMode
 				Throw "Not yet implemented..."
@@ -433,7 +434,7 @@ class SimulatorController extends ConfigurationItem {
 	
 	ActiveModes[] {
 		Get {
-			return Array(this.iActiveMode)
+			return this.iActiveModes
 		}
 	}
 	
@@ -566,6 +567,18 @@ class SimulatorController extends ConfigurationItem {
 	
 	isActive(modeOrPlugin) {
 		return isDebug() ? true : modeOrPlugin.isActive()
+	}
+	
+	registerActiveMode(mode) {
+		if !inList(this.iActiveModes, mode)
+			this.iActiveModes.Push(mode)
+	}
+	
+	unregisterActiveMode(mode) {
+		position := inList(this.iActiveModes, mode)
+		
+		if position
+			this.iActiveModes.RemoveAt(position)
 	}
 	
 	runningSimulator() {
@@ -741,6 +754,7 @@ class SimulatorController extends ConfigurationItem {
 	
 	rotateMode(delta := 1) {
 		modes := this.Modes
+		
 		position := inList(modes, this.ActiveMode)
 	
 		targetMode := false
@@ -1236,6 +1250,8 @@ class ControllerMode {
 			theAction.Function.enable(kAllTrigger)
 			theAction.Function.setText(translate(theAction.Label))
 		}
+		
+		controller.registerActiveMode(this)
 	}
 	
 	deactivate() {
@@ -1245,6 +1261,8 @@ class ControllerMode {
 		
 		for ignore, theAction in this.Actions
 			controller.disconnectAction(theAction.Function, theAction)
+		
+		controller.unregisterActiveMode(this)
 	}
 }
 

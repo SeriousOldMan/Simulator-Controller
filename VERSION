@@ -1,6 +1,6 @@
 [Version]
-Current=2.6.1-release
-Target=2.6.1-release
+Current=2.7.0-dev
+Target=2.7.0-release
 Release=2.6.1-release
-Changes=Improved stint time management, Initial setup for Big Data Collection, Rework of the configuration tool, Forced tyre compound change for Jona, Improved handling of ACC Pitstop MFD
-Date=03/19/2021
+Changes=Multiple simulataneaously active plugin modes
+Date=03/20/2021

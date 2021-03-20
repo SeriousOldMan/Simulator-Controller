@@ -554,7 +554,7 @@ requestConsent() {
 			
 			switch consentDialog(id) {
 				case "Yes":
-					setConfigurationValue(consent, "Consent", "Share Database", true)
+					setConfigurationValue(consent, "Consent", "Share Database", "Tyre Pressures")
 				case "No":
 					setConfigurationValue(consent, "Consent", "Share Database", false)
 				case "Retry":
@@ -565,7 +565,7 @@ requestConsent() {
 			writeConfiguration(kUserConfigDirectory . "CONSENT", consent)
 		}
 		
-		if (getConfigurationValue(consent, "Consent", "Share Database", false) == true) {
+		if (getConfigurationValue(consent, "Consent", "Share Tyre Pressures", false) == true) {
 			uploadTimeStamp := kUserHomeDirectory . "Setup Database\Local\UPLOAD"
 			
 			if FileExist(uploadTimeStamp) {

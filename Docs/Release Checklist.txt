@@ -27,6 +27,8 @@ Release 2.7 Checklist
    - Update Functions.md
    a. ActiveMode => ActiveModes
    b. MultiMode
+5. CONSENT
+   a. "Yes" => "Tyre Pressures"
 
 Release 2.6 Checklist
 =====================

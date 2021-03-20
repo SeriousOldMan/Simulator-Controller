@@ -69,7 +69,7 @@ class RaceEngineer extends ConfigurationItem {
 	
 	iContinuation := false
 	
-	iDriverName := "Oliver"
+	iDriverName := "John"
 	
 	iEnoughData := false
 	

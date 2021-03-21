@@ -367,8 +367,6 @@ class SimulatorController extends ConfigurationItem {
 	iButtonBoxes := []
 	
 	iModes := []
-	iMultiMode := false
-	iActiveMode := false
 	iActiveModes := []
 	
 	iFunctionActions := {}
@@ -417,18 +415,19 @@ class SimulatorController extends ConfigurationItem {
 		}
 	}
 	
-	MultiMode[] {
+	ActiveMode[buttonBox := false] {
 		Get {
-			return this.iMultiMode
-		}
-	}
-	
-	ActiveMode[function := false] {
-		Get {
-			if this.MultiMode
-				Throw "Not yet implemented..."
+			activeModes := this.ActiveModes
+			
+			if buttonBox {
+				for ignore, mode in activeModes
+					if inList(mode.ButtonBoxes, buttonBox)
+						return mode
+					
+				return false
+			}
 			else
-				return this.iActiveMode
+				return ((activeModes.Length() > 0) ? activeModes[1] : false)
 		}
 	}
 	
@@ -546,6 +545,14 @@ class SimulatorController extends ConfigurationItem {
 		}
 	}
 	
+	findButtonBox(function) {
+		for ignore, btnBox in this.ButtonBoxes
+			if btnBox.getControlHandle(function.Descriptor)
+				return btnBox
+			
+		return false
+	}
+	
 	registerPlugin(plugin) {
 		if !inList(this.Plugins, plugin) {
 			logMessage(kLogInfo, translate("Plugin ") . translate(getPluginForLogMessage(plugin)) . (this.isActive(plugin) ? translate(" (Active)") : translate(" (Inactive)")) . translate(" registered"))
@@ -562,6 +569,24 @@ class SimulatorController extends ConfigurationItem {
 			logMessage(kLogInfo, translate("Mode ") . translate(getModeForLogMessage(mode)) . translate(" registered") . (plugin ? (translate(" for plugin ") . translate(getPluginForLogMessage(plugin))) : ""))
 			
 			this.Modes.Push(mode)
+		}
+	}
+	
+	computeControllerModes() {
+		local function
+		
+		for ignore, mode in this.Modes {
+			boxes := []
+		
+			for ignore, action in mode.Actions {
+				btnBox := this.findButtonBox(action.Function)
+			
+				if (btnBox && !inList(boxes, btnBox)) {
+					boxes.Push(btnBox)
+			
+					mode.registerButtonBox(btnBox)
+				}
+			}
 		}
 	}
 	
@@ -734,15 +759,20 @@ class SimulatorController extends ConfigurationItem {
 		if !this.isActive(newMode)
 			return
 			
-		modeSwitched := (this.ActiveMode != newMode)
+		modeSwitched := !inList(this.ActiveModes, newMode)
 	
 		if modeSwitched {
-			if (this.ActiveMode != false)
-				this.ActiveMode.deactivate()
-		
-			this.iActiveMode := newMode
+			buttonBoxes := (newMode ? newMode.ButtonBoxes : [])
 			
-			logMessage(kLogInfo, translate("Setting controller mode to ") . translate(getModeForLogMessage(newMode)))
+			deactivatedModes := []
+			
+			for ignore, mode in this.ActiveModes
+				for ignore, candidate in mode.ButtonBoxes
+					if (inList(buttonBoxes, candidate) && !inList(deactivatedModes, mode))
+						deactivatedModes.Push(mode)
+			
+			for ignore, mode in deactivatedModes
+				mode.deactivate()
 			
 			if (newMode != false)
 				newMode.activate()
@@ -752,10 +782,30 @@ class SimulatorController extends ConfigurationItem {
 		}
 	}
 	
-	rotateMode(delta := 1) {
+	rotateMode(delta := 1, buttonBoxes := false) {
+		startMode := false
 		modes := this.Modes
+		position := false
 		
-		position := inList(modes, this.ActiveMode)
+		if buttonBoxes
+			for ignore, mode in this.ActiveModes {
+				if position
+					break
+				
+				for ignore, btnBox in buttonBoxes
+					for ignore, candidate in mode.ButtonBoxes
+						if (btnBox == candidate) {
+							position := inList(modes, mode)
+							
+							if position
+								break
+						}
+			}
+		else
+			position := inList(modes, this.ActiveModes[1])
+		
+		if !position
+			position := 1
 	
 		targetMode := false
 		index := position + delta
@@ -768,9 +818,30 @@ class SimulatorController extends ConfigurationItem {
 		
 			targetMode := modes[index]
 		
+			if startMode {
+				if (startMode == targetMode)
+					return
+			}
+			else
+				startMode := targetMode
+				
 			if !this.isActive(targetMode) {
 				index += delta
 				targetMode := false
+			} else if buttonBoxes {
+				found := false
+			
+				for ignore, candidate in targetMode.ButtonBoxes
+					if inList(buttonBoxes, candidate) {
+						found := true
+						
+						break
+					}
+					
+				if !found {
+					index += delta
+					targetMode := false
+				}
 			}
 		} until targetMode
 		
@@ -1180,6 +1251,8 @@ class ControllerMode {
 	iPlugin := false
 	iActions := []
 	
+	iButtonBoxes := []
+	
 	Mode[] {
 		Get {
 			Throw "Virtual property ControllerMode.Mode must be implemented in a subclass..."
@@ -1204,6 +1277,12 @@ class ControllerMode {
 		}
 	}
 	
+	ButtonBoxes[] {
+		Get {
+			return this.iButtonBoxes
+		}
+	}
+	
 	__New(plugin) {
 		this.iPlugin := plugin
 		
@@ -1213,6 +1292,11 @@ class ControllerMode {
 	registerAction(action) {
 		if !inList(this.Actions, action)
 			this.Actions.Push(action)
+	}
+	
+	registerButtonBox(btnBox) {
+		if !inList(this.ButtonBoxes, btnBox)
+			this.ButtonBoxes.Push(btnBox)
 	}
 	
 	findAction(label) {
@@ -1452,6 +1536,8 @@ initializeSimulatorController() {
 
 startupSimulatorController() {
 	controller := SimulatorController.Instance
+	
+	controller.computeControllerModes()
 	
 	controller.updateLastEvent()
 	

@@ -315,10 +315,26 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 			protectionOn()
 			
 			try {
-				activeModes := this.Controller.ActiveModes
+				if isRunning {
+					controller := this.Controller
+					activeModes := this.Controller.ActiveModes
+					pedalMode := this.findMode(kPedalVibrationMode)
+					chassisMode := this.findMode(kChassisVibrationMode)
 				
-				if ((inList(activeModes, this.findMode(kPedalVibrationMode))) || (inList(activeModes, this.findMode(kChassisVibrationMode))))
-					this.Controller.rotateMode()
+					if inList(activeModes, pedalMode) {
+						controller.rotateMode(1, pedalMode.ButtonBoxes)
+				
+						if inList(controller.ActiveModes, pedalMode)
+							pedalMode.deactivate()
+					}
+				
+					if inList(activeModes, chassisMode) {
+						this.Controller.rotateMode(1, chassisMode.ButtonBoxes)
+				
+						if inList(controller.ActiveModes, chassisMode)
+							chassisMode.deactivate()
+					}
+				}
 						
 				this.deactivate()
 				this.activate()
@@ -363,7 +379,7 @@ callSimHub(command) {
 	catch exception {
 		logMessage(kLogCritical, translate("Error while connecting to SimHub (") . kSimHub . translate("): ") . exception.Message . translate(" - please check the configuration"))
 		
-		showMessage(translate("Cannot connect to SimHub (%kSimHub%) - please check the configuration...")
+		showMessage(substituteVariables(translate("Cannot connect to SimHub (%kSimHub%) - please check the configuration..."))
 				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			
 		return 0

@@ -25,8 +25,12 @@ Release 2.7 Checklist
    b. raceEngineerSettings => raceEngineerOpenSettings
 4. Rework Controller Modes
    - Update Functions.md
-   a. ActiveMode => ActiveModes
-   b. MultiMode
+   a. ActiveMode => ActiveModes and ActiveMode with parameter
+   b. ModeSelectors
+   c. Controller.findButtonBox
+   d. ControllerMode.ButtonBoxes and registerButtonBox
+   e. exclusive parameter for setMode
+   f. currentMode parameter for rotateMode
 5. CONSENT
    a. "Yes" => "Tyre Pressures"
 

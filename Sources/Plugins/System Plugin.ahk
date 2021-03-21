@@ -98,12 +98,21 @@ class SystemPlugin extends ControllerPlugin {
 	class ModeSelectorAction extends ControllerAction {	
 		Label[] {
 			Get {
-				return this.Controller.ActiveMode[this.Function].Mode
+				controller := this.Controller
+				
+				mode := controller.ActiveMode[controller.findButtonBox(this.Function)]
+				
+				if mode
+					return mode.Mode
+				else
+					return translate("Mode Selector")
 			}
 		}
 	
 		fireAction(function, trigger) {
-			this.Controller.rotateMode(((trigger == "Off") || (trigger == "Decrease")) ? -1 : 1)
+			controller := this.Controller
+			
+			controller.rotateMode(((trigger == "Off") || (trigger == "Decrease")) ? -1 : 1, Array(controller.findButtonBox(function)))
 
 			this.Function.setText(translate(this.Label))
 		}
@@ -489,11 +498,24 @@ updateModeSelector() {
 	
 	static modeSelectorMode := false
 	static controller := false
+	static reInitialize := false
 	
 	nextUpdate := -500
 	
 	if !controller
 		controller := SimulatorController.Instance
+	
+	if (controller.ActiveModes.Length() == 0) {
+		if reInitialize {
+			controller.setMode(controller.findMode(kLaunchMode))
+			
+			reInitialize := false
+		}
+		else
+			reInitialize := true
+	}
+	else
+		reInitialize := false
 	
 	protectionOn()
 	
@@ -502,23 +524,25 @@ updateModeSelector() {
 			function := selector.Function
 			
 			if modeSelectorMode {
-				currentMode := controller.ActiveMode[function].Mode
+				currentMode := controller.ActiveMode[controller.findButtonBox(function)]
 				
-				nextUpdate := -2000
+				if currentMode
+					currentMode := currentMode.Mode
+				else
+					currentMode := translate("Mode Selector")
 			}
-			else {
+			else
 				currentMode := translate("Mode Selector")
-				
-				nextUpdate := -1000
-			}
-
-			modeSelectorMode := !modeSelectorMode
 			
 			if modeSelectorMode
-				function.setText(currentMode, "Gray")
-			else
 				function.setText(translate(currentMode))
+			else
+				function.setText(currentMode, "Gray")
 		}
+		
+		nextUpdate := (modeSelectorMode ? -2000 : -1000)
+
+		modeSelectorMode := !modeSelectorMode
 	}
 	finally {
 		protectionOff()

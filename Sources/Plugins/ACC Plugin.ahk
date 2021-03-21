@@ -574,6 +574,17 @@ class ACCPlugin extends ControllerPlugin {
 		}
 	}
 	
+	simulatorShutdown() {
+		base.simulatorShutdown()
+		
+		activeModes := this.Controller.ActiveModes
+		
+		if inList(activeModes, this.iChatMode)
+			this.iChatMode.deactivate()
+		else if inList(activeModes, this.iPitstopMode)
+			this.iPitstopMode.deactivate()
+	}
+	
 	updateOnTrackState(onTrack) {
 		this.iOnTrack := onTrack
 		

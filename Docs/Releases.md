@@ -6,8 +6,13 @@
   4. Layout editor for Button Box layouts integrated into the configuration tool
   5. Plugin support for configuration tool
   6. First consolidated version of Setup Database as Excel Spreadsheet for Quality Assurance
+  
+## 2.6.2-release 03/21/21
+  
+  1. Critical bugfix for 2.6.1
+     - Fixed wrong calculation of refuel amount after using new ACC shared memory information, which could lead to zero refueling
 
-## 2.6-release 03/19/21
+## 2.6.1-release 03/19/21
 
   1. Bugfixes, as always
   2. Documentation updates, as always

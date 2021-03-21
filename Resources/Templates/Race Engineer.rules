@@ -589,23 +589,40 @@ weatherTyreChangeRecommendation(?lap, ?weather, ?minutes, ?compound) <=									
 ;;; crash.                                                                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+priority: 20, [?Pitstop.Plan = true] =>																											\
+		(Clear: Pitstop.Planned.Nr), (Clear: Pitstop.Planned.Lap),																				\
+		(Clear: Pitstop.Planned.Fuel),																											\
+		(Clear: Pitstop.Planned.Tyre.Compound), (Clear: Pitstop.Planned.Tyre.Set), 																\
+		(Clear: Pitstop.Planned.Tyre.Pressure.FL), (Clear: Pitstop.Planned.Tyre.Pressure.FR), 													\
+		(Clear: Pitstop.Planned.Tyre.Pressure.RL), (Clear: Pitstop.Planned.Tyre.Pressure.RR), 													\
+		(Clear: Pitstop.Planned.Tyre.Pressure.FL.Increment), (Clear: Pitstop.Planned.Tyre.Pressure.FR.Increment), 								\
+		(Clear: Pitstop.Planned.Tyre.Pressure.RL.Increment), (Clear: Pitstop.Planned.Tyre.Pressure.RR.Increment), 								\
+		(Clear: Pitstop.Planned.Tyre.Pressure.Correction),																						\
+		(Clear: Pitstop.Planned.Repair.Suspension), (Clear: Pitstop.Planned.Repair.Bodywork)
 priority: 10, [?Pitstop.Plan] => (Prove: planPitstop)
 
-{All: [?Pitstop.Plan], [?Fuel.Amount.Target]} => (Set: Pitstop.Planned.Fuel, ?Fuel.Amount.Target)
-{All: [?Pitstop.Plan], [?Tyre.Compound.Target]} => (Set: Pitstop.Planned.Tyre.Compound, ?Tyre.Compound.Target)
-{All: [?Pitstop.Plan], [?Tyre.Set.Target]} => (Set: Pitstop.Planned.Tyre.Set, ?Tyre.Set.Target)
-{All: [?Pitstop.Plan], [?Tyre.Pressure.Target.FL]} => (Set: Pitstop.Planned.Tyre.Pressure.FL, ?Tyre.Pressure.Target.FL),						\
-													  (Set: Pitstop.Planned.Tyre.Pressure.FL.Increment, !Tyre.Pressure.Target.FL.Increment)
-{All: [?Pitstop.Plan], [?Tyre.Pressure.Target.FR]} => (Set: Pitstop.Planned.Tyre.Pressure.FR, ?Tyre.Pressure.Target.FR),						\
-													  (Set: Pitstop.Planned.Tyre.Pressure.FR.Increment, !Tyre.Pressure.Target.FR.Increment)
-{All: [?Pitstop.Plan], [?Tyre.Pressure.Target.RL]} => (Set: Pitstop.Planned.Tyre.Pressure.RL, ?Tyre.Pressure.Target.RL),						\
-													  (Set: Pitstop.Planned.Tyre.Pressure.RL.Increment, !Tyre.Pressure.Target.RL.Increment)
-{All: [?Pitstop.Plan], [?Tyre.Pressure.Target.RR]} => (Set: Pitstop.Planned.Tyre.Pressure.RR, ?Tyre.Pressure.Target.RR),						\
-													  (Set: Pitstop.Planned.Tyre.Pressure.RR.Increment, !Tyre.Pressure.Target.RR.Increment)
-{All: [?Pitstop.Plan], [?Tyre.Pressure.Target.Correction]} =>																					\
+{All: [?Pitstop.Plan], [?Fuel.Amount.Target], {None: [?Pitstop.Planned.Fuel]}} => (Set: Pitstop.Planned.Fuel, ?Fuel.Amount.Target)
+{All: [?Pitstop.Plan], [?Tyre.Compound.Target],																									\
+	  {None: [?Pitstop.Planned.Tyre.Compound]}} => (Set: Pitstop.Planned.Tyre.Compound, ?Tyre.Compound.Target)
+{All: [?Pitstop.Plan], [?Tyre.Set.Target], {None: [?Pitstop.Planned.Tyre.Set]}} => (Set: Pitstop.Planned.Tyre.Set, ?Tyre.Set.Target)
+{All: [?Pitstop.Plan], [?Tyre.Pressure.Target.FL], {None: [?Pitstop.Planned.Tyre.Pressure.FL]}} =>												\
+		(Set: Pitstop.Planned.Tyre.Pressure.FL, ?Tyre.Pressure.Target.FL),																		\
+		(Set: Pitstop.Planned.Tyre.Pressure.FL.Increment, !Tyre.Pressure.Target.FL.Increment)
+{All: [?Pitstop.Plan], [?Tyre.Pressure.Target.FR], {None: [?Pitstop.Planned.Tyre.Pressure.FR]}} =>												\
+		(Set: Pitstop.Planned.Tyre.Pressure.FR, ?Tyre.Pressure.Target.FR),																		\
+		(Set: Pitstop.Planned.Tyre.Pressure.FR.Increment, !Tyre.Pressure.Target.FR.Increment)
+{All: [?Pitstop.Plan], [?Tyre.Pressure.Target.RL], {None: [?Pitstop.Planned.Tyre.Pressure.RL]}} =>												\
+		(Set: Pitstop.Planned.Tyre.Pressure.RL, ?Tyre.Pressure.Target.RL),																		\
+		(Set: Pitstop.Planned.Tyre.Pressure.RL.Increment, !Tyre.Pressure.Target.RL.Increment)
+{All: [?Pitstop.Plan], [?Tyre.Pressure.Target.RR], {None: [?Pitstop.Planned.Tyre.Pressure.RR]}} =>												\
+		(Set: Pitstop.Planned.Tyre.Pressure.RR, ?Tyre.Pressure.Target.RR),																		\
+		(Set: Pitstop.Planned.Tyre.Pressure.RR.Increment, !Tyre.Pressure.Target.RR.Increment)
+{All: [?Pitstop.Plan], [?Tyre.Pressure.Target.Correction], {None: [?Pitstop.Planned.Tyre.Pressure.Correction]}} =>								\
 		(Set: Pitstop.Planned.Tyre.Pressure.Correction, ?Tyre.Pressure.Target.Correction)
-{All: [?Pitstop.Plan], [?Damage.Repair.Suspension.Target]} => (Set: Pitstop.Planned.Repair.Suspension, ?Damage.Repair.Suspension.Target)
-{All: [?Pitstop.Plan], [?Damage.Repair.Bodywork.Target]} => (Set: Pitstop.Planned.Repair.Bodywork, ?Damage.Repair.Bodywork.Target)
+{All: [?Pitstop.Plan], [?Damage.Repair.Suspension.Target], {None: [?Pitstop.Planned.Repair.Suspension]}} =>										\
+		(Set: Pitstop.Planned.Repair.Suspension, ?Damage.Repair.Suspension.Target)
+{All: [?Pitstop.Plan], [?Damage.Repair.Bodywork.Target], {None: [?Pitstop.Planned.Repair.Bodywork]}} =>											\
+		(Set: Pitstop.Planned.Repair.Bodywork, ?Damage.Repair.Bodywork.Target)
 
 {All: [?Pitstop.Plan], {None: [?Tyre.Compound.Target]}} => (Set: Pitstop.Planned.Tyre.Compound, !Race.Setup.Tyre.Compound)
 {All: [?Pitstop.Plan], {None: [?Tyre.Set.Target]}} => (Set: Pitstop.Planned.Tyre.Set, !Race.Setup.Tyre.Set.Fresh)

@@ -957,6 +957,8 @@ class RaceEngineer extends ConfigurationItem {
 	}
 	
 	updatePitstopTyreCompound(compound) {
+		local knowledgeBase
+		
 		speaker := this.getSpeaker()
 		
 		if !this.hasPlannedPitstop() {
@@ -968,9 +970,19 @@ class RaceEngineer extends ConfigurationItem {
 		else {
 			if (this.KnowledgeBase.getValue("Pitstop.Planned.Tyre.Compound") != compound) {
 				speaker.speakPhrase("ConfirmPlanUpdate")
+		
+				knowleadgeBase := this.KnowledgeBase
 				
-				this.KnowledgeBase.setValue("Tyre.Compound.Target", compound)
-				this.planPitstop({Pressures: true}, false)
+				knowledgeBase.setValue("Tyre.Compound.Target", compound)
+				
+				for ignore, tyreType in ["FL", "FR", "RL", "RR"] {
+					knowledgeBase.clearFact("Pitstop.Planned.Tyre.Pressure." . tyreType)
+					knowledgeBase.clearFact("Pitstop.Planned.Tyre.Pressure." . tyreType . ".Increment")
+				}
+				
+				knowledgeBase.clearFact("Pitstop.Planned.Tyre.Pressure.Correction")
+				
+				this.planPitstop({Update: true, Pressures: true}, false)
 				
 				speaker.speakPhrase("MoreChanges")
 			}
@@ -1504,14 +1516,14 @@ class RaceEngineer extends ConfigurationItem {
 		return this.KnowledgeBase.getValue("Pitstop.Prepared", false)
 	}
 	
-	planPitstop(report := true, confirm := true) {
+	planPitstop(options := true, confirm := true) {
 		local knowledgeBase := this.KnowledgeBase
 		local compound
 		
 		if !this.hasEnoughData()
 			return
 	
-		knowledgeBase.addFact("Pitstop.Plan", true)
+		knowledgeBase.addFact("Pitstop.Plan", ((options == true) || !options.HasKey("Update") || !options.Update) ? true : false)
 	
 		result := knowledgeBase.produce()
 		
@@ -1524,10 +1536,10 @@ class RaceEngineer extends ConfigurationItem {
 			speaker := this.getSpeaker()
 			fragments := speaker.Fragments
 			
-			if ((report == true) || report.Intro)
+			if ((options == true) || options.Intro)
 				speaker.speakPhrase("Pitstop", {number: pitstopNumber})
 			
-			if ((report == true) || report.Fuel) {
+			if ((options == true) || options.Fuel) {
 				fuel := knowledgeBase.getValue("Pitstop.Planned.Fuel", 0)
 				
 				if (fuel == 0)
@@ -1536,7 +1548,7 @@ class RaceEngineer extends ConfigurationItem {
 					speaker.speakPhrase("Refuel", {litres: Round(fuel)})
 			}
 			
-			if ((report == true) || report.Compound) {
+			if ((options == true) || options.Compound) {
 				compound := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound")
 				
 				if (compound = "Dry")
@@ -1545,7 +1557,7 @@ class RaceEngineer extends ConfigurationItem {
 					speaker.speakPhrase("WetTyres", {compound: fragments[compound], set: knowledgeBase.getValue("Pitstop.Planned.Tyre.Set")})
 			}
 			
-			if ((report == true) || report.Pressures) {
+			if ((options == true) || options.Pressures) {
 				incrementFL := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL.Increment", 0), 1)
 				incrementFR := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR.Increment", 0), 1)
 				incrementRL := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL.Increment", 0), 1)
@@ -1587,7 +1599,7 @@ class RaceEngineer extends ConfigurationItem {
 				}
 			}
 
-			if ((report == true) || report.Repairs) {
+			if ((options == true) || options.Repairs) {
 				if knowledgeBase.getValue("Pitstop.Planned.Repair.Suspension", false)
 					speaker.speakPhrase("RepairSuspension")
 				else if debug

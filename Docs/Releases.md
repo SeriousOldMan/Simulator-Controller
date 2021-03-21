@@ -6,7 +6,8 @@
   3. Support for separate active plugin modes, when more than one hardware controller is connected and configured
   4. Layout editor for Button Box layouts integrated into the configuration tool
   5. Plugin support for configuration tool
-  6. First consolidated version of Setup Database as Excel Spreadsheet for Quality Assurance
+  6. Jona can be asked to not change the tyre pressures on an upcoming pitstop
+  7. First consolidated version of Setup Database as Excel Spreadsheet for Quality Assurance
   
 ## 2.6.2-release 03/21/21
   

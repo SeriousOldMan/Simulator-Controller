@@ -656,6 +656,10 @@ class RaceEngineer extends ConfigurationItem {
 					this.iContinuation := false
 					
 					this.pitstopAdjustPressureRecognized(words)
+				case "PitstopNoPressureChange":
+					this.iContinuation := false
+					
+					this.pitstopAdjustNoPressureRecognized(words)
 				case "PitstopAdjustRepairSuspension":
 					this.iContinuation := false
 					
@@ -889,6 +893,25 @@ class RaceEngineer extends ConfigurationItem {
 		}
 	}
 	
+	pitstopAdjustNoPressureRecognized(words) {
+		local action
+		
+		speaker := this.getSpeaker()
+		fragments := speaker.Fragments
+		
+		if !this.hasPlannedPitstop() {
+			speaker.speakPhrase("NotPossible")
+			speaker.speakPhrase("ConfirmPlan")
+			
+			this.setContinuation(ObjBindMethod(this, "planPitstop"))
+		}
+		else {
+			speaker.speakPhrase("ConfirmNoPressureChange")
+					
+			this.setContinuation(ObjBindMethod(this, "updatePitstopPressures"))
+		}
+	}
+	
 	pitstopAdjustRepairRecognized(repairType, words) {
 		local action
 		
@@ -978,6 +1001,46 @@ class RaceEngineer extends ConfigurationItem {
 			
 			if this.Debug[kDebugKnowledgeBase]
 				dumpKnowledge(this.KnowledgeBase)
+
+			speaker.speakPhrase("ConfirmPlanUpdate")
+			speaker.speakPhrase("MoreChanges")
+		}
+	}
+	
+	updatePitstopPressures() {
+		local knowledgeBase
+		
+		speaker := this.getSpeaker()
+		
+		if !this.hasPlannedPitstop() {
+			speaker.speakPhrase("NotPossible")
+			speaker.speakPhrase("ConfirmPlan")
+			
+			this.setContinuation(ObjBindMethod(this, "planPitstop"))
+		}
+		else {
+			knowledgeBase := this.KnowledgeBase
+		
+			if (knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound", "Dry") = "Dry") {
+				knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.FL", knowledgeBase.getValue("Race.Setup.Tyre.Dry.Pressure.FL", 26.1))
+				knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.FR", knowledgeBase.getValue("Race.Setup.Tyre.Dry.Pressure.FR", 26.1))
+				knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.RL", knowledgeBase.getValue("Race.Setup.Tyre.Dry.Pressure.RL", 26.1))
+				knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.RR", knowledgeBase.getValue("Race.Setup.Tyre.Dry.Pressure.RR", 26.1))
+			}
+			else {
+				knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.FL", knowledgeBase.getValue("Race.Setup.Tyre.Wet.Pressure.FL", 26.1))
+				knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.FR", knowledgeBase.getValue("Race.Setup.Tyre.Wet.Pressure.FR", 26.1))
+				knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.RL", knowledgeBase.getValue("Race.Setup.Tyre.Wet.Pressure.RL", 26.1))
+				knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.RR", knowledgeBase.getValue("Race.Setup.Tyre.Wet.Pressure.RR", 26.1))
+			}
+			
+			knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.FL.Increment", 0)
+			knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.FR.Increment", 0)
+			knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.RL.Increment", 0)
+			knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.RR.Increment", 0)
+			
+			if this.Debug[kDebugKnowledgeBase]
+				dumpKnowledge(knowledgeBase)
 
 			speaker.speakPhrase("ConfirmPlanUpdate")
 			speaker.speakPhrase("MoreChanges")

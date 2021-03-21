@@ -23,6 +23,8 @@ Release 2.7 Checklist
 3. Update Procedure
    a. Controller Plugin Labels
    b. raceEngineerSettings => raceEngineerOpenSettings
+   c. Phrase Grammars
+   d. Translations
 4. Rework Controller Modes
    - Update Functions.md
    a. ActiveMode => ActiveModes and ActiveMode with parameter
@@ -33,6 +35,8 @@ Release 2.7 Checklist
    f. currentMode parameter for rotateMode
 5. CONSENT
    a. "Yes" => "Tyre Pressures"
+6. No Pressure Change
+   b. Documentation
 
 Release 2.6 Checklist
 =====================

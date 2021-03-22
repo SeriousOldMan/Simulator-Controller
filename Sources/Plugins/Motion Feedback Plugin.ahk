@@ -679,10 +679,11 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			
 			this.loadFromSimFeedback()
 		}
-			
-		Loop 20 {
-			Sleep 500
-		} until this.Application.isRunning()
+		
+		if !isRunning
+			Loop 20 {
+				Sleep 500
+			} until this.Application.isRunning()
 		
 		return this.Application.isRunning()
 	}

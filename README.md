@@ -26,7 +26,7 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-None for the moment...
+[2.7.0-dev](https://www.dropbox.com/s/9pi9ctgjzzvuek4/Simulator%20Controller%202.7.0-dev.zip?dl=1) (Very early development build for Release 2.7. New features: Multiple simultaneously active Button Box mode, "Stick to strategy pressures" command for Jona. Quite stable but without any documentation or automated update procedures yet...)
 
 #### Latest release builds
 
@@ -117,7 +117,6 @@ The markdown files, the so to say source code of this documentation Wiki, can be
 ### Known issues
 
 1. Connection between the "Motion Feedback" plugin and *SimFeedback* has some stabilty issues. Looks like the root cause is located in the *SFX-100-Streamdeck* extension. For a workaround click on "Reload Profile..." on the Extensions tab in SimFeedback, if you see strange numbers in the Button Box "Motion" mode page.
-2. The language drop down in the configuration tool does not adopt to changed languages, after the translation editor has been used.
 
 ### Development
 

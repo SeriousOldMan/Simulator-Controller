@@ -1606,6 +1606,7 @@ toggleKeyDetector() {
 global buttonBoxesListBox := "|"
 
 global buttonBoxEdit = ""
+global openButtonBoxEditorButton
 
 global buttonBoxUpButton
 global buttonBoxDownButton
@@ -1631,14 +1632,15 @@ class ButtonBoxesList extends ConfigurationItemList {
 		Gui SE:Font, Norm, Arial
 		Gui SE:Add, ListBox, x24 y99 w194 h96 HwndbuttonBoxesListBoxHandle VbuttonBoxesListBox glistEvent, %buttonBoxesListBox%
 		
-		Gui SE:Add, Edit, x224 y99 w239 h21 VbuttonBoxEdit, %buttonBoxEdit%
+		Gui SE:Add, Edit, x224 y99 w214 h21 VbuttonBoxEdit, %buttonBoxEdit%
+		Gui SE:Add, Button, x440 y98 w23 h23 gopenButtonBoxEditor VopenButtonBoxEditorButton, % translate("...")
 		
 		Gui SE:Add, Button, x385 y124 w38 h23 Disabled VbuttonBoxUpButton gupItem, % translate("Up")
 		Gui SE:Add, Button, x425 y124 w38 h23 Disabled VbuttonBoxDownButton gdownItem, % translate("Down")
 		
-		Gui SE:Add, Button, x264 y164 w46 h23 VbuttonBoxAddButton gaddItem, % translate("Add")
-		Gui SE:Add, Button, x312 y164 w50 h23 Disabled VbuttonBoxDeleteButton gdeleteItem, % translate("Delete")
-		Gui SE:Add, Button, x408 y164 w55 h23 Disabled VbuttonBoxUpdateButton gupdateItem, % translate("&Save")
+		Gui SE:Add, Button, x265 y164 w46 h23 VbuttonBoxAddButton gaddItem, % translate("Add")
+		Gui SE:Add, Button, x313 y164 w50 h23 Disabled VbuttonBoxDeleteButton gdeleteItem, % translate("Delete")
+		Gui SE:Add, Button, x409 y164 w55 h23 Disabled VbuttonBoxUpdateButton gupdateItem, % translate("&Save")
 		
 		return buttonBoxesListBoxHandle
 	}
@@ -1659,6 +1661,17 @@ class ButtonBoxesList extends ConfigurationItemList {
 		buttonBoxesListBox := values2String("|", this.iItemsList*)
 	
 		GuiControl, , buttonBoxesListBox, % "|" . buttonBoxesListBox
+	}
+	
+	updateState() {
+		base.updateState()
+		
+		GuiControlGet buttonBoxEdit
+		
+		if ((this.iCurrentItemIndex != 0) && (buttonBoxEdit != ""))
+			GuiControl Enable, openButtonBoxEditorButton
+		else
+			GuiControl Disable, openButtonBoxEditorButton
 	}
 	
 	selectItem(itemNumber) {
@@ -1685,6 +1698,23 @@ class ButtonBoxesList extends ConfigurationItemList {
 		
 		return buttonBoxEdit
 	}
+	
+	openButtonBoxEditor() {
+		GuiControlGet buttonBoxEdit
+		
+		ConfigurationEditor.Instance.hide()
+		
+		result := (new ButtonBoxEditor(buttonBoxEdit, readConfiguration(getFileName("Button Box Configuration.ini", kUserConfigDirectory, kConfigDirectory)))).editButtonBox()
+		
+		if result
+			writeConfiguration(getFileName("Button Box Configuration.ini", kUserConfigDirectory), result)
+		
+		ConfigurationEditor.Instance.show()
+	}
+}
+
+openButtonBoxEditor() {
+	ButtonBoxesList.Instance.openButtonBoxEditor()
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -3417,6 +3447,524 @@ nextUntranslated() {
 	finally {
 		protectionOff()
 	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; ButtonBoxEditor                                                         ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+global rowsEdit = ""
+global columnsEdit = ""
+global rowMarginEdit = ""
+global columnMarginEdit = ""
+global borderMarginEdit = ""
+global bottomMarginEdit = ""
+
+class ButtonBoxEditor extends ConfigurationItem {
+	iName := ""
+	iClosed := false
+	
+	iButtonBoxPreview := false
+	iButtonBoxConfiguration := false
+	
+	iButtonBoxPreviewCenterX := 0
+	iButtonBoxPreviewCenterY := 0
+	
+	Name[] {
+		Get {
+			return this.iName
+		}
+	}
+	
+	ButtonBoxPreview[] {
+		Get {
+			return this.iButtonBoxPreview
+		}
+	}
+	
+	ButtonBoxConfiguration[] {
+		Get {
+			return this.iButtonBoxConfiguration
+		}
+	}
+	
+	ButtonBoxPreviewCenterX[] {
+		Get {
+			return this.iButtonBoxPreviewCenterX
+		}
+	}
+	
+	ButtonBoxPreviewCenterY[] {
+		Get {
+			return this.iButtonBoxPreviewCenterY
+		}
+	}
+	
+	__New(name, configuration) {
+		this.iName := name
+		
+		base.__New(configuration)
+		
+		ButtonBoxEditor.Instance := this
+		
+		this.iButtonBoxConfiguration := readConfiguration(getFileName("Button Box Configuration.ini", kUserConfigDirectory, kConfigDirectory))
+		
+		this.createControls(this.iButtonBoxConfiguration)
+		
+		this.iButtonBoxPreview := new ButtonBoxPreview(this, this.iButtonBoxConfiguration)
+	}
+	
+	createControls(configuration) {
+		Gui BBE:Default
+	
+		Gui BBE:-Border ; -Caption
+		
+		Gui BBE:Color, D0D0D0
+		Gui BBE:Font, Bold, Arial
+
+		Gui BBE:Add, Text, x0 w400 Center gmoveButtonBoxEditor, % translate("Modular Simulator Controller System") 
+		
+		Gui BBE:Font, Norm, Arial
+		Gui BBE:Font, Italic, Arial
+
+		Gui BBE:Add, Text, x0 YP+20 w400 Center, % translate("Button Box") . translate(": ") . this.Name
+		
+		Gui BBE:Font, Norm, Arial
+		Gui BBE:Font, Italic, Arial
+		
+		Gui BBE:Add, GroupBox, x8 y60 w392 h93, % translate("Grid")
+		
+		Gui BBE:Font, Norm, Arial
+		
+		layout := string2Values(",", getConfigurationValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Name, "Layout"), ""))
+		
+		rowMarginEdit := ((layout.Length() > 1) ? layout[2] : ButtonBoxPreview.kRowMargin)
+		columnMarginEdit := ((layout.Length() > 2) ? layout[3] : ButtonBoxPreview.kColumnMargin)
+		borderMarginEdit := ((layout.Length() > 3) ? layout[4] : ButtonBoxPreview.kBorderMargin)
+		bottomMarginEdit := ((layout.Length() > 4) ? layout[5] : ButtonBoxPreview.kBottomMargin)
+		
+		layout := string2Values("x", layout[1])
+		
+		rowsEdit := layout[1]
+		columnsEdit := layout[2]
+		
+		Gui BBE:Add, Text, x16 y77 w160 h23 +0x200, % translate("Rows x Columns")
+		Gui BBE:Add, Edit, x122 y77 w40 h21 Limit1 Number VrowsEdit, %rowsEdit%
+		Gui BBE:Add, Text, x167 y77 w20 h23 +0x200 Center, % translate("x")
+		Gui BBE:Add, Edit, x192 y77 w40 h21 Limit1 Number VcolumnsEdit, %columnsEdit%
+		
+		Gui BBE:Add, Text, x16 y121 w160 h23 +0x200, % translate("Margins")
+		Gui BBE:Add, Text, x122 y101 w40 h23 +0x200 Center, % translate("Row")
+		Gui BBE:Add, Text, x192 y101 w40 h23 +0x200 Center, % translate("Column")
+		Gui BBE:Add, Text, x262 y101 w40 h23 +0x200 Center, % translate("Border")
+		Gui BBE:Add, Text, x332 y101 w40 h23 +0x200 Center, % translate("Bottom")
+		Gui BBE:Add, Edit, x122 y121 w40 h21 Limit2 Number VrowMarginEdit, %rowMarginEdit%
+		Gui BBE:Add, Edit, x192 y121 w40 h21 Limit2 Number VcolumnMarginEdit, %columnMarginEdit%
+		Gui BBE:Add, Edit, x262 y121 w40 h21 Limit2 Number VborderMarginEdit, %borderMarginEdit%
+		Gui BBE:Add, Edit, x332 y121 w40 h21 Limit2 Number VbottomMarginEdit, %bottomMarginEdit%
+		
+		Gui BBE:Add, Button, x160 y275 w80 h23 GrefreshButtonBoxPreview, % translate("Refresh")
+		
+		Gui BBE:Add, Button, x160 y300 w80 h23 Default GcloseButtonBoxEditor, % translate("Close")
+	}
+	
+	refreshButtonBoxPreview() {
+		GuiControlGet rowsEdit
+		GuiControlGet columnsEdit
+		GuiControlGet rowMarginEdit
+		GuiControlGet columnMarginEdit
+		GuiControlGet borderMarginEdit
+		GuiControlGet bottomMarginEdit
+		
+		setConfigurationValue(this.ButtonBoxConfiguration, "Layouts", ConfigurationItem.descriptor(this.Name, "Layout")
+							, values2String(", ", rowsEdit . " x " . columnsEdit, rowMarginEdit, columnMarginEdit, borderMarginEdit, bottomMarginEdit))
+							
+		this.iButtonBoxPreview.hide()
+		
+		this.iButtonBoxPreview := new ButtonBoxPreview(this, this.ButtonBoxConfiguration)
+		
+		this.iButtonBoxPreview.show()
+	}
+	
+	setButtonBoxPreviewPosition(centerX, centerY) {
+		this.iButtonBoxPreviewCenterX := centerX
+		this.iButtonBoxPreviewCenterY := centerY
+	}
+	
+	editButtonBox() {
+		Gui BBE:Show, AutoSize Center
+		this.ButtonBoxPreview.show()
+		
+		Loop
+			Sleep 200
+		until this.iClosed
+		
+		this.ButtonBoxPreview.hide()
+		Gui BBE:Destroy
+	}
+	
+	saveButtonBox() {
+		
+	}
+	
+	closeEditor() {
+		this.saveButtonBox()
+		
+		this.iClosed := true
+	}
+}
+
+closeButtonBoxEditor() {
+	protectionOn()
+	
+	try {
+		ButtonBoxEditor.Instance.closeEditor()
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+refreshButtonBoxPreview() {
+	protectionOn()
+	
+	try {
+		ButtonBoxEditor.Instance.refreshButtonBoxPreview()
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+moveButtonBoxEditor() {
+	moveByMouse("BBE")
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; ButtonBoxPreview                                                        ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class ButtonBoxPreview extends ConfigurationItem {
+	static kHeaderHeight := 70
+	static kLabelMargin := 5
+	
+	static kRowMargin := 20
+	static kColumnMargin := 40
+	
+	static kBorderMargin := 20
+	static kBottomMargin := 15
+	
+	iEditor := false
+	
+	iWidth := 0
+	iHeight := 0
+	
+	iRows := 0
+	iColumns := 0
+	iRowMargin := this.kRowMargin
+	iColumnMargin := this.kColumnMargin
+	iBorderMargin := this.kBorderMargin
+	iBottomMargin := this.kBottomMargin
+	
+	iRowDefinitions := []
+	iControls := {}
+	
+	Editor[] {
+		Get {
+			return this.iEditor
+		}
+	}
+	
+	Name[] {
+		Get {
+			return this.Editor.Name
+		}
+	}
+	
+	Width[] {
+		Get {
+			return this.iWidth
+		}
+	}
+	
+	Height[] {
+		Get {
+			return this.iHeight
+		}
+	}
+	
+	Rows[] {
+		Get {
+			return this.iRows
+		}
+	}
+	
+	Columns[] {
+		Get {
+			return this.iColumns
+		}
+	}
+	
+	RowMargin[] {
+		Get {
+			return this.iRowMargin
+		}
+	}
+	
+	ColumnMargin[] {
+		Get {
+			return this.iColumnMargin
+		}
+	}
+	
+	BorderMargin[] {
+		Get {
+			return this.iBorderMargin
+		}
+	}
+	
+	BottomMargin[] {
+		Get {
+			return this.iBottomMargin
+		}
+	}
+	
+	RowDefinitions[row := false] {
+		Get {
+			if row
+				return this.iRowDefinitions[row]
+			else
+				return this.iRowDefinitions
+		}
+	}
+	
+	__New(editor, configuration) {
+		this.iEditor := editor
+		
+		base.__New(configuration)
+		
+		this.createControls(configuration)
+	}
+	
+	loadFromConfiguration(configuration) {
+		layout := string2Values(",", getConfigurationValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Name, "Layout"), ""))
+		
+		if (layout.Length() > 1)
+			this.iRowMargin := layout[2]
+		
+		if (layout.Length() > 2)
+			this.iColumnMargin := layout[3]
+		
+		if (layout.Length() > 3)
+			this.iBorderMargin := layout[4]
+		
+		if (layout.Length() > 4)
+			this.iBottomMargin := layout[5]
+		
+		layout := string2Values("x", layout[1])
+		
+		this.iRows := layout[1]
+		this.iColumns := layout[2]
+		
+		rows := []
+		
+		Loop % this.Rows
+			rows.Push(string2Values(";", getConfigurationValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Name, A_Index), "")))
+		
+		this.iRowDefinitions := rows
+	}
+	
+	createControls(configuration) {
+		local function
+		
+		rowHeights := false
+		columnWidths := false
+		
+		this.computeLayout(rowHeights, columnWidths)
+		
+		height := 0
+		Loop % rowHeights.Length()
+			height += rowHeights[A_Index]
+		
+		width := 0
+		Loop % columnWidths.Length()
+			width += columnWidths[A_Index]
+		
+		height += ((rowHeights.Length() - 1) * this.RowMargin) + this.kHeaderHeight + this.BottomMargin
+		width += ((columnWidths.Length() - 1) * this.ColumnMargin) + (2 * this.BorderMargin)
+		
+		Gui BBP:-Border -Caption
+		
+		Gui BBP:Add, Picture, x-10 y-10, % kButtonBoxImagesDirectory . "Photorealistic\CF Background.png"
+		
+		Gui BBP:Font, s12 Bold cSilver
+		Gui BBP:Add, Text, x0 y8 w%width% h23 +0x200 +0x1 BackgroundTrans gmoveButtonBoxPreview, % translate("Modular Simulator Controller System")
+		Gui BBP:Font, s10 cSilver
+		Gui BBP:Add, Text, x0 y28 w%width% h23 +0x200 +0x1 BackgroundTrans gmoveButtonBoxPreview, % translate(this.Name)
+		Gui BBP:Color, 0x000000
+		Gui BBP:Font, s8 Norm, Arial
+		
+		vertical := this.kHeaderHeight
+		
+		Loop % this.Rows
+		{
+			rowHeight := rowHeights[A_Index]
+			rowDefinition := this.RowDefinitions[A_Index]
+		
+			horizontal := this.BorderMargin
+			
+			Loop % this.Columns
+			{
+				columnWidth := columnWidths[A_Index]
+			
+				descriptor := rowDefinition[A_Index]
+				
+				if (StrLen(descriptor) > 0) {
+					descriptor := string2Values(",", descriptor)
+				
+					if (descriptor.Length() > 1) {
+						label := string2Values("x", getConfigurationValue(this.Configuration, "Labels", descriptor[2], ""))
+						labelWidth := label[1]
+						labelHeight := label[2]
+					}
+					else {
+						labelWidth := 0
+						labelHeight := 0
+					}
+					
+					descriptor := ConfigurationItem.splitDescriptor(descriptor[1])
+					number := descriptor[2]
+					
+					descriptor := string2Values(";", getConfigurationValue(this.Configuration, "Controls", descriptor[1], ""))
+					
+					if (descriptor.Length() > 0) {
+						function := descriptor[1]
+						image := substituteVariables(descriptor[2])
+						
+						descriptor := string2Values("x", descriptor[3])
+						imageWidth := descriptor[1]
+						imageHeight := descriptor[2]
+						
+						function := ConfigurationItem.descriptor(function, number)
+
+						x := horizontal + Round((columnWidth - imageWidth) / 2)
+						y := vertical + Round((rowHeight - (labelHeight + this.kLabelMargin) - imageHeight) / 2)
+						
+						; variable := "bbControl" + vHandleCounter++
+						
+						Gui BBP:Add, Picture, x%x% y%y% w%imageWidth% h%imageHeight% BackgroundTrans, %image% ; v%variable% gcontrolEvent
+
+						this.registerControl(variable, function, x, y, imageWidth, imageHeight)
+						
+						if ((labelHeight > 0) && (labelHeight > 0)) {
+							Gui BBP:Font, s8 Norm
+					
+							x := horizontal + Round((columnWidth - labelWidth) / 2)
+							y := vertical + rowHeight - labelHeight
+							
+							Gui BBP:Add, Text, x%x% y%y% w%labelWidth% h%labelHeight% +Border -Background  +0x1000 +0x1 ; Hwnd%variable% 
+						}
+					}
+				}
+				
+				horizontal += (columnWidth + this.ColumnMargin)
+			}
+		
+			vertical += (rowHeight + this.RowMargin)
+		}
+
+		Gui BBP:Add, Picture, x-10 y-10 gmoveButtonBoxPreview 0x4000000, % kButtonBoxImagesDirectory . "Photorealistic\CF Background.png"
+		
+		this.iWidth := width
+		this.iHeight := height
+	}
+	
+	computeLayout(ByRef rowHeights, ByRef columnWidths) {
+		columnWidths := []
+		rowHeights := []
+		
+		Loop % this.Columns
+			columnWidths.Push(0)
+		
+		Loop % this.Rows
+		{
+			rowHeight := 0
+		
+			rowDefinition := this.RowDefinitions[A_Index]
+			
+			Loop % this.Columns
+			{
+				descriptor := rowDefinition[A_Index]
+				
+				if (StrLen(descriptor) > 0) {
+					descriptor := string2Values(",", descriptor)
+					
+					if (descriptor.Length() > 1) {
+						label := getConfigurationValue(this.Configuration, "Labels", descriptor[2], "")
+						label := string2Values("x", label)
+						labelWidth := label[1]
+						labelHeight := label[2]
+					}
+					else {
+						labelWidth := 0
+						labelHeight := 0
+					}
+					
+					descriptor := string2Values(";", getConfigurationValue(this.Configuration, "Controls", ConfigurationItem.splitDescriptor(descriptor[1])[1], ""))
+					
+					if (descriptor.Length() > 0) {
+						descriptor := string2Values("x", descriptor[3])
+						
+						imageWidth := descriptor[1]
+						imageHeight := descriptor[2]
+					}
+					else {
+						imageWidth := 0
+						imageHeight := 0
+					}
+					
+					rowHeight := Max(rowHeight, imageHeight + ((labelHeight > 0) ? (this.kLabelMargin + labelHeight) : 0))
+					
+					columnWidths[A_Index] := Max(columnWidths[A_Index], Max(imageWidth, labelWidth))
+				}
+			}
+			
+			rowHeights.Push(rowHeight)
+		}
+	}
+	
+	show() {
+		width := this.Width
+		height := this.Height
+		
+		centerX := this.Editor.ButtonBoxPreviewCenterX
+		centerY := this.Editor.ButtonBoxPreviewCenterY
+		
+		if (centerX && centerY) {
+			x := centerX - Round(width / 2)
+			y := centerY - Round(height / 2)
+		}
+		else {
+			SysGet mainScreen, MonitorWorkArea
+
+			x := mainScreenRight - width
+			y := mainScreenBottom - height
+		}
+		
+		Gui BBP:Show, x%x% y%y% w%width% h%height% NoActivate
+	}
+	
+	hide() {
+		Gui BBP:Destroy
+	}
+}
+
+moveButtonBoxPreview() {
+	moveByMouse("BBP")
+	
+	WinGetPos x, y, width, height, A
+	
+	ButtonBoxEditor.Instance.setButtonBoxPreviewPosition(x + Round(width / 2), y + Round(height / 2))
 }
 
 

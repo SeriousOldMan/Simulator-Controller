@@ -542,7 +542,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		
 		action.Function.setText(translate(action.Label), isRunning ? (action.Active ? "Green" : "Black") : "Olive")
 			
-		SetTimer updateMotionState, 50
+		SetTimer updateMotionState, -100
 	}
 	
 	deactivate() {

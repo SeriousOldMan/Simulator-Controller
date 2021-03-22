@@ -36,7 +36,10 @@ Release 2.7 Checklist
 5. CONSENT
    a. "Yes" => "Tyre Pressures"
 6. No Pressure Change
-   b. Documentation
+   a. Documentation
+7. Button Box Editor
+   a. Documentation
+   b. Translations
 
 Release 2.6 Checklist
 =====================

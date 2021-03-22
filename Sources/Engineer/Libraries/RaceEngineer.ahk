@@ -1211,7 +1211,7 @@ class RaceEngineer extends ConfigurationItem {
 		if (lapNumber > baseLap)
 			this.iEnoughData := true
 		
-		driverForname := getConfigurationValue(data, "Stint Data", "DriverForname", "John")
+		driverForname := getConfigurationValue(data, "Stint Data", "DriverForname", this.DriverName)
 		driverSurname := getConfigurationValue(data, "Stint Data", "DriverSurname", "Doe")
 		driverNickname := getConfigurationValue(data, "Stint Data", "DriverNickname", "JD")
 		

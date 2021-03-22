@@ -1742,31 +1742,6 @@ collectRaceData() {
 		
 		dataLastLap := getConfigurationValue(data, "Stint Data", "Laps", 0)
 		
-		/* Used for full setup offrace debugging...
-		dataFile := kSourcesDirectory . "Tests\Test Data\Race 3\Lap " . lap . "." . counter . ".data"
-		data := readConfiguration(dataFile)
-		
-		if (data.Count() == 0) {
-			if (counter == 1) {	
-				plugin.finishRace()
-			
-				msgbox Done...
-				
-				ExitApp
-			}
-			else {
-				counter := 1
-				lap += 1
-				
-				return
-			}
-		}
-		else
-			showMessage("Data " lap . "." . counter++ . " loaded...")
-		
-		dataLastLap := getConfigurationValue(data, "Stint Data", "Laps", 0)
-		*/
-		
 		protectionOn()
 		
 		try {

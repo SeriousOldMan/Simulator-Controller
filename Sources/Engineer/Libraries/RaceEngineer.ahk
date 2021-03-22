@@ -1090,6 +1090,8 @@ class RaceEngineer extends ConfigurationItem {
 		
 		settings := this.RaceSettings
 		
+		this.iDriverName := getConfigurationValue(data, "Stint Data", "DriverForname", this.DriverName)
+		
 		dataDuration := Round((getConfigurationValue(data, "Stint Data", "RaceTimeRemaining", 0) + getConfigurationValue(data, "Stint Data", "LapLastTime", 0)) / 1000)
 		settingsDuration := getConfigurationValue(settings, "Race Settings", "Duration", dataDuration)
 		

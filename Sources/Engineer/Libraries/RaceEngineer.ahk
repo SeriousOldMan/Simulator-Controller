@@ -971,9 +971,11 @@ class RaceEngineer extends ConfigurationItem {
 			if (this.KnowledgeBase.getValue("Pitstop.Planned.Tyre.Compound") != compound) {
 				speaker.speakPhrase("ConfirmPlanUpdate")
 		
-				knowleadgeBase := this.KnowledgeBase
+				knowledgeBase := this.KnowledgeBase
 				
 				knowledgeBase.setValue("Tyre.Compound.Target", compound)
+				
+				knowledgeBase.clearFact("Pitstop.Planned.Tyre.Compound")
 				
 				for ignore, tyreType in ["FL", "FR", "RL", "RR"] {
 					knowledgeBase.clearFact("Pitstop.Planned.Tyre.Pressure." . tyreType)

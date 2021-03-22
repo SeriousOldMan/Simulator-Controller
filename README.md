@@ -26,7 +26,7 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-None for the moment...
+[2.7.0-dev](https://www.dropbox.com/s/9pi9ctgjzzvuek4/Simulator%20Controller%202.7.0-dev.zip?dl=1) (Very early development build for Release 2.7. New features: Multiple simultaneously active Button Box mode, "Stick to strategy pressures" command for Jona. Quite stable but without any documentation or automated update procedures yet...)
 
 #### Latest release builds
 

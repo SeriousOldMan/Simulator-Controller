@@ -2,5 +2,5 @@
 Current=2.7.0-dev
 Target=2.7.0-release
 Release=2.6.2-release
-Changes=Multiple simulataneaously active plugin modes
-Date=03/21/2021
+Changes=Multiple simulataneaously active plugin modes, Stick to strategy pressures command for Jona
+Date=03/22/2021

@@ -232,14 +232,27 @@ class ConfigurationItemList extends ConfigurationItem {
 	}
 
 	updateItem() {
-		item := this.buildItemFromEditor()
+		static recurse := false
 		
-		if item {
-			this.iItemsList[this.iCurrentItemIndex] := item
-			
-			this.loadList(this.iItemsList)
-			
-			this.selectItem(this.iCurrentItemIndex)
+		if recurse
+			return
+		else {
+			recurse := true
+		
+			try {
+				item := this.buildItemFromEditor()
+				
+				if item {
+					this.iItemsList[this.iCurrentItemIndex] := item
+					
+					this.loadList(this.iItemsList)
+					
+					this.selectItem(this.iCurrentItemIndex)
+				}
+			}
+			finally {
+				recurse := false
+			}
 		}
 	}
 
@@ -437,7 +450,7 @@ class ConfigurationEditor extends ConfigurationItem {
 		chosen := inList(choices, saveModeDropDown)
 		
 		Gui SE:Add, Text, x8 y528 w55 h23 +0x200, % translate("Save")
-		Gui SE:Add, DropDownList, x63 y528 w75 AltSubmit Choose%chosen% VsaveModeDropDown, % values2String("|", map(choices, "translate")*)
+		Gui SE:Add, DropDownList, x63 y528 w75 AltSubmit Choose%chosen% gupdateSaveMode VsaveModeDropDown, % values2String("|", map(choices, "translate")*)
 
 		tabs := map(["General", "Voice Control", "Plugins", "Applications", "Controller", "Launchpad", "Chat"], "translate")
 			   
@@ -531,6 +544,12 @@ saveAndStay() {
 
 moveConfigurationEditor() {
 	moveByMouse("SE")
+}
+
+updateSaveMode() {
+	GuiControlGet saveModeDropDown
+	
+	ConfigurationEditor.Instance.iSaveMode := (saveModeDropDown == 1)
 }
 
 openConfigurationDocumentation() {
@@ -3613,7 +3632,7 @@ class ButtonBoxesEditor extends ConfigurationItem {
 		Gui BBE:Add, Text, x50 y615 w332 0x10
 		
 		Gui BBE:Add, Button, x130 y630 w80 h23 Default GsaveButtonBoxesEditor, % translate("Save")
-		Gui BBE:Add, Button, x230 y630 w80 h23 GcancelButtonBoxesEditor, % translate("Close")
+		Gui BBE:Add, Button, x230 y630 w80 h23 GcancelButtonBoxesEditor, % translate("Cancel")
 	}
 	
 	setButtonBoxPreviewPosition(centerX, centerY) {
@@ -3811,8 +3830,8 @@ class ControlsList extends ConfigurationItemList {
 			
 			first := false
 		}
-		else
-			ButtonBoxesEditor.Instance.updateButtonBoxPreview(LayoutsList.Instance.CurrentButtonBox)
+		
+		ButtonBoxesEditor.Instance.updateButtonBoxPreview(LayoutsList.Instance.CurrentButtonBox)
 	}
 	
 	loadEditor(item) {
@@ -3872,7 +3891,7 @@ chooseImageFilePath() {
 		
 		title := translate("Select Image...")
 	
-		FileSelectFile pictureFile, 1, , %title%, Image (*.jpg; *.gif)
+		FileSelectFile pictureFile, 1, , %title%, Image (*.jpg; *.png; *.gif)
 		
 		if (pictureFile != "") {
 			imageFilePathEdit := pictureFile
@@ -3976,8 +3995,8 @@ class LabelsList extends ConfigurationItemList {
 			
 			first := false
 		}
-		else
-			ButtonBoxesEditor.Instance.updateButtonBoxPreview(LayoutsList.Instance.CurrentButtonBox)
+		
+		ButtonBoxesEditor.Instance.updateButtonBoxPreview(LayoutsList.Instance.CurrentButtonBox)
 	}
 	
 	loadEditor(item) {
@@ -4150,6 +4169,7 @@ class LayoutsList extends ConfigurationItemList {
 	
 	loadList(items) {
 		static first := true
+		static inCall := false
 		
 		Gui ListView, % this.ListHandle
 	
@@ -4182,8 +4202,8 @@ class LayoutsList extends ConfigurationItemList {
 			
 			first := false
 		}
-		else
-			ButtonBoxesEditor.Instance.updateButtonBoxPreview(LayoutsList.Instance.CurrentButtonBox)
+		
+		ButtonBoxesEditor.Instance.updateButtonBoxPreview(LayoutsList.Instance.CurrentButtonBox)
 	}
 	
 	loadEditor(item) {

@@ -293,6 +293,16 @@ listEvent() {
 				
 				vItemLists[A_GuiControl].openEditor(inList(ButtonBoxesList.Instance.iItemsList, buttonBoxesListBox))
 			}
+			else if (A_GuiControl == "controlsListBox") {
+				GuiControlGet controlsListBox
+				
+				vItemLists[A_GuiControl].openEditor(inList(ControlsList.Instance.iItemsList, controlsListBox))
+			}
+			else if (A_GuiControl == "labelsListBox") {
+				GuiControlGet labelsListBox
+				
+				vItemLists[A_GuiControl].openEditor(inList(LabelsList.Instance.iItemsList, labelsListBox))
+			}
 			else
 				vItemLists[A_GuiControl].openEditor(A_EventInfo)
 		}
@@ -1600,7 +1610,7 @@ toggleKeyDetector() {
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; ButtonBoxesList                                                          ;;;
+;;; ButtonBoxesList                                                         ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 global buttonBoxesListBox := "|"
@@ -1658,7 +1668,7 @@ class ButtonBoxesList extends ConfigurationItemList {
 	}
 	
 	loadList(items) {
-		buttonBoxesListBox := values2String("|", this.iItemsList*)
+		buttonBoxesListBox := values2String("|", items*)
 	
 		GuiControl, , buttonBoxesListBox, % "|" . buttonBoxesListBox
 	}
@@ -1704,7 +1714,7 @@ class ButtonBoxesList extends ConfigurationItemList {
 		
 		ConfigurationEditor.Instance.hide()
 		
-		result := (new ButtonBoxEditor(buttonBoxEdit, readConfiguration(getFileName("Button Box Configuration.ini", kUserConfigDirectory, kConfigDirectory)))).editButtonBox()
+		result := (new ButtonBoxesEditor(buttonBoxEdit, readConfiguration(getFileName("Button Box Configuration.ini", kUserConfigDirectory, kConfigDirectory)))).editButtonBox()
 		
 		if result
 			writeConfiguration(getFileName("Button Box Configuration.ini", kUserConfigDirectory), result)
@@ -2891,6 +2901,8 @@ chooseSoundFilePath() {
 	protectionOn()
 	
 	try {
+		GuiControlGet soundFilePathEdit
+		
 		path := soundFilePathEdit
 	
 		if (path && (path != ""))
@@ -2917,6 +2929,8 @@ chooseVideoFilePath() {
 	protectionOn()
 	
 	try {
+		GuiControlGet videoFilePathEdit
+		
 		path := videoFilePathEdit
 	
 		if (path && (path != ""))
@@ -3450,7 +3464,7 @@ nextUntranslated() {
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; ButtonBoxEditor                                                         ;;;
+;;; ButtonBoxesEditor                                                       ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 global rowsEdit = ""
@@ -3460,7 +3474,7 @@ global columnMarginEdit = ""
 global borderMarginEdit = ""
 global bottomMarginEdit = ""
 
-class ButtonBoxEditor extends ConfigurationItem {
+class ButtonBoxesEditor extends ConfigurationItem {
 	iName := ""
 	iClosed := false
 	
@@ -3505,7 +3519,7 @@ class ButtonBoxEditor extends ConfigurationItem {
 		
 		base.__New(configuration)
 		
-		ButtonBoxEditor.Instance := this
+		ButtonBoxesEditor.Instance := this
 		
 		this.iButtonBoxConfiguration := readConfiguration(getFileName("Button Box Configuration.ini", kUserConfigDirectory, kConfigDirectory))
 		
@@ -3618,7 +3632,7 @@ closeButtonBoxEditor() {
 	protectionOn()
 	
 	try {
-		ButtonBoxEditor.Instance.closeEditor()
+		ButtonBoxesEditor.Instance.closeEditor()
 	}
 	finally {
 		protectionOff()
@@ -3629,7 +3643,7 @@ refreshButtonBoxPreview() {
 	protectionOn()
 	
 	try {
-		ButtonBoxEditor.Instance.refreshButtonBoxPreview()
+		ButtonBoxesEditor.Instance.refreshButtonBoxPreview()
 	}
 	finally {
 		protectionOff()
@@ -3638,6 +3652,299 @@ refreshButtonBoxPreview() {
 
 moveButtonBoxEditor() {
 	moveByMouse("BBE")
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; ControlsList                                                            ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+global controlsListBox := "|"
+
+global controlNameEdit = ""
+global controlTypeDropDown = 0
+global imageFilePathEdit = ""
+global imageWidthEdit = 0
+global imageHeightEdit = 0
+
+global controlAddButton
+global controlDeleteButton
+global controlUpdateButton
+		
+class ControlsList extends ConfigurationItemList {
+	__New(configuration) {
+		base.__New(configuration, this.createControls(configuration), "controlsListBox"
+				 , "controlAddButton", "controlDeleteButton", "controlUpdateButton")
+				 
+		ControlsList.Instance := this
+	}
+					
+	createControls(configuration) {
+		Gui BBE:Font, Norm, Arial
+		Gui BBE:Font, Italic, Arial
+		
+		Gui BBE:Add, GroupBox, x8 y60 w384 h115, % translate("Controls")
+		
+		Gui BBE:Font, Norm, Arial
+		Gui BBE:Add, ListBox, x24 y99 w194 h96 HwndcontrolsListBoxHandle VcontrolsListBox glistEvent, %controlsListBox%
+		
+		Gui BBE:Add, Text, x16 y360 w86 h23 +0x200, % translate("Control")
+		Gui BBE:Add, Edit, x110 y342 w259 h21 VcontrolNameEdit, %controlNameEdit%
+		Gui BBE:Add, DropDownList, x124 y360 w91 AltSubmit Choose%controlTypeDropDown% VcontrolTypeDropDown, % values2String("|", map(["1-way Toggle", "2-way Toggle", "Button", "Dial"], "translate")*)
+		
+		Gui BBE:Add, Text, x16 y342 w80 h23 +0x200, % translate("Image")
+		Gui BBE:Add, Edit, x110 y342 w259 h21 VimageFilePathEdit, %imageFilePathEdit%
+		Gui BBE:Add, Button, x371 y341 w23 h23 gchooseImageFilePath, % translate("...")
+		
+		Gui BBE:Add, Text, x16 y342 w80 h23 +0x200, % translate("Width / Height")
+		Gui BBE:Add, Edit, x122 y77 w40 h21 Limit3 Number VimageWidthEdit, %imageWidthEdit%
+		Gui BBE:Add, Text, x167 y77 w20 h23 +0x200 Center, % translate("x")
+		Gui BBE:Add, Edit, x192 y77 w40 h21 Limit3 Number VimageHeightEdit, %imageHeightEdit%
+		
+		Gui BBE:Add, Button, x265 y164 w46 h23 VcontrolAddButton gaddItem, % translate("Add")
+		Gui BBE:Add, Button, x313 y164 w50 h23 Disabled VcontrolDeleteButton gdeleteItem, % translate("Delete")
+		Gui BBE:Add, Button, x409 y164 w55 h23 Disabled VcontrolUpdateButton gupdateItem, % translate("&Save")
+		
+		return controlsListBoxHandle
+	}
+	
+	loadFromConfiguration(configuration) {
+		base.loadFromConfiguration(configuration)
+		
+		controls := []
+		
+		for name, definition in getConfigurationSectionValues(configuration, "Controls", Object())
+			controls.Push(Array(name, string2Values(";", definition)*))
+		
+		this.iItemsList := controls
+	}
+		
+	saveToConfiguration(configuration) {
+		base.saveToConfiguration(configuration)
+		
+		controls := {}
+		
+		for ignore, control in this.iItemsList
+			controls[control[1]] := values2String(";", control[2], control[3], control[4])
+		
+		setConfigurationSectionValues(configuration, "Controls", controls)	
+	}
+	
+	loadList(items) {
+		controls := []
+		
+		for ignore, control in items
+			controls.Push(control[1] . " :: " . translate(control[2]))
+		
+		controlsListBox := values2String("|", controls*)
+	
+		GuiControl, , controlsListBox, % "|" . controlsListBox
+	}
+	
+	selectItem(itemNumber) {
+		this.iCurrentItemIndex := itemNumber
+		
+		if itemNumber
+			GuiControl Choose, controlsListBox, %itemNumber%
+		
+		this.updateState()
+	}
+	
+	loadEditor(item) {
+		controlNameEdit := item[1]
+		imageFilePathEdit := item[3]
+		
+		size := string2Values("x", item[4])
+		
+		imageWidthEdit := size[1]
+		imageHeightEdit := size[2]
+			
+		controlTypeDropDown := inList([k1WayToggleType, k2WayToggleType, kButtonType, kDialType], item[2])
+		
+		GuiControl Text, controlNameEdit, %controlNameEdit%
+		GuiControl Choose, controlTypeDropDown, %controlTypeDropDown%
+		GuiControl Text, imageFilePathEdit, %imageFilePathEdit%
+		GuiControl Text, imageWidthEdit, %imageWidthEdit%
+		GuiControl Text, imageHeightEdit, %imageHeightEdit%
+	}
+	
+	clearEditor() {
+		this.loadEditor(Array("", "", "", ""))
+	}
+	
+	buildItemFromEditor(isNew := false) {
+		GuiControlGet controlNameEdit
+		GuiControlGet controlTypeDropDown
+		GuiControlGet imageFilePathEdit
+		GuiControlGet imageWidthEdit
+		GuiControlGet imageHeightEdit
+		
+		if ((controlNameEdit = "") || (controlTypeDropDown = 0) || (imageFilePathEdit = "")  || (imageWidthEdit = 0) || (imageHeightEdit = 0)) {
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+			title := translate("Error")
+			MsgBox 262160, %title%, % translate("Invalid values detected - please correct...")
+			OnMessage(0x44, "")
+			
+			return false
+		}
+		else
+			return Array(controlNameEdit, [k1WayToggleType, k2WayToggleType, kButtonType, kDialType][controlTypeDropDown], imageFilePathEdit, imageWidthEdit . " x " . imageHeightEdit)
+	}
+}
+
+chooseImageFilePath() {
+	protectionOn()
+	
+	try {
+		GuiControlGet imageFilePathEdit
+		
+		path := imageFilePathEdit
+	
+		if (path && (path != ""))
+			path := getFileName(path, kButtonBoxImagesDirectory)
+		else
+			path := SubStr(kButtonBoxImagesDirectory, 1, StrLen(kButtonBoxImagesDirectory) - 1)
+		
+		title := translate("Select Image...")
+	
+		FileSelectFile pictureFile, 1, , %title%, Image (*.jpg; *.gif)
+		
+		if (pictureFile != "") {
+			imageFilePathEdit := pictureFile
+			
+			GuiControl Text, imageFilePathEdit, %imageFilePathEdit%
+		}
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; LabelsList                                                              ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+global labelsListBox := "|"
+
+global labelNameEdit = ""
+global labelWidthEdit = 0
+global labelHeightEdit = 0
+
+global labelAddButton
+global labelDeleteButton
+global labelUpdateButton
+		
+class LabelsList extends ConfigurationItemList {
+	__New(configuration) {
+		base.__New(configuration, this.createControls(configuration), "controlsListBox"
+				 , "controlAddButton", "controlDeleteButton", "controlUpdateButton")
+				 
+		LabelsList.Instance := this
+	}
+					
+	createControls(configuration) {
+		Gui BBE:Font, Norm, Arial
+		Gui BBE:Font, Italic, Arial
+		
+		Gui BBE:Add, GroupBox, x8 y60 w384 h115, % translate("Controls")
+		
+		Gui BBE:Font, Norm, Arial
+		Gui BBE:Add, ListBox, x24 y99 w194 h96 HwndcontrolsListBoxHandle VcontrolsListBox glistEvent, %controlsListBox%
+		
+		Gui BBE:Add, Text, x16 y360 w86 h23 +0x200, % translate("Control")
+		Gui BBE:Add, Edit, x110 y342 w259 h21 VcontrolNameEdit, %controlNameEdit%
+		Gui BBE:Add, DropDownList, x124 y360 w91 AltSubmit Choose%controlTypeDropDown% VcontrolTypeDropDown, % values2String("|", map(["1-way Toggle", "2-way Toggle", "Button", "Dial"], "translate")*)
+		
+		Gui BBE:Add, Text, x16 y342 w80 h23 +0x200, % translate("Image")
+		Gui BBE:Add, Edit, x110 y342 w259 h21 VimageFilePathEdit, %imageFilePathEdit%
+		Gui BBE:Add, Button, x371 y341 w23 h23 gchooseImageFilePath, % translate("...")
+		
+		Gui BBE:Add, Text, x16 y342 w80 h23 +0x200, % translate("Width / Height")
+		Gui BBE:Add, Edit, x122 y77 w40 h21 Limit3 Number VimageWidthEdit, %imageWidthEdit%
+		Gui BBE:Add, Text, x167 y77 w20 h23 +0x200 Center, % translate("x")
+		Gui BBE:Add, Edit, x192 y77 w40 h21 Limit3 Number VimageHeightEdit, %imageHeightEdit%
+		
+		Gui BBE:Add, Button, x265 y164 w46 h23 VcontrolAddButton gaddItem, % translate("Add")
+		Gui BBE:Add, Button, x313 y164 w50 h23 Disabled VcontrolDeleteButton gdeleteItem, % translate("Delete")
+		Gui BBE:Add, Button, x409 y164 w55 h23 Disabled VcontrolUpdateButton gupdateItem, % translate("&Save")
+		
+		return controlsListBoxHandle
+	}
+	
+	loadFromConfiguration(configuration) {
+		base.loadFromConfiguration(configuration)
+		
+		labels := []
+		
+		for name, definition in getConfigurationSectionValues(configuration, "Labels", Object())
+			labels.Push(Array(name, definition))
+		
+		this.iItemsList := labels
+	}
+		
+	saveToConfiguration(configuration) {
+		base.saveToConfiguration(configuration)
+		
+		labels := {}
+		
+		for ignore, label in this.iItemsList
+			labels[label[1]] := label[2]
+		
+		setConfigurationSectionValues(configuration, "Labels", labels)	
+	}
+	
+	loadList(items) {
+		labels := []
+		
+		for ignore, label in items
+			labels.Push(label[1] . " (" . label[2] . ")")
+		
+		labelsListBox := values2String("|", labels*)
+	
+		GuiControl, , labelsListBox, % "|" . labelsListBox
+	}
+	
+	selectItem(itemNumber) {
+		this.iCurrentItemIndex := itemNumber
+		
+		if itemNumber
+			GuiControl Choose, labelsListBox, %itemNumber%
+		
+		this.updateState()
+	}
+	
+	loadEditor(item) {
+		labelNameEdit := item[1]
+		
+		size := string2Values("x", item[2])
+		
+		labelWidthEdit := size[1]
+		labelHeightEdit := size[2]
+		
+		GuiControl Text, labelNameEdit, %labelNameEdit%
+		GuiControl Text, labelWidthEdit, %labelWidthEdit%
+		GuiControl Text, labelHeightEdit, %labelHeightEdit%
+	}
+	
+	clearEditor() {
+		this.loadEditor(Array("", ""))
+	}
+	
+	buildItemFromEditor(isNew := false) {
+		GuiControlGet labelNameEdit
+		GuiControlGet labelWidthEdit
+		GuiControlGet labelHeightEdit
+		
+		if ((labelNameEdit = "") || (labelWidthEdit = 0) || (labelHeightEdit = 0)) {
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+			title := translate("Error")
+			MsgBox 262160, %title%, % translate("Invalid values detected - please correct...")
+			OnMessage(0x44, "")
+			
+			return false
+		}
+		else
+			return Array(labelNameEdit, labelWidthEdit . " x " . labelHeightEdit)
+	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -3964,7 +4271,7 @@ moveButtonBoxPreview() {
 	
 	WinGetPos x, y, width, height, A
 	
-	ButtonBoxEditor.Instance.setButtonBoxPreviewPosition(x + Round(width / 2), y + Round(height / 2))
+	ButtonBoxesEditor.Instance.setButtonBoxPreviewPosition(x + Round(width / 2), y + Round(height / 2))
 }
 
 

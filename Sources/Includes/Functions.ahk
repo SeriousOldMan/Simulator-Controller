@@ -1068,7 +1068,7 @@ moveByMouse(window) {
 		
 	try {	
 		MouseGetPos anchorX, anchorY
-		WinGetPos winX, winY, w, h, %A_ScriptName%
+		WinGetPos winX, winY, w, h, A
 		
 		newX := winX
 		newY := winY

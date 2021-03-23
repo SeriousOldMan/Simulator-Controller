@@ -25,6 +25,7 @@ Release 2.7 Checklist
    b. raceEngineerSettings => raceEngineerOpenSettings
    c. Phrase Grammars
    d. Translations
+   e. Update [Button Boxes] Format
 4. Rework Controller Modes
    - Update Functions.md
    a. ActiveMode => ActiveModes and ActiveMode with parameter
@@ -40,6 +41,9 @@ Release 2.7 Checklist
 7. Button Box Editor
    a. Documentation
    b. Translations
+   c. Picture
+8. Documentation Links für Themes and Translations
+   a. New Pictures
 
 Release 2.6 Checklist
 =====================

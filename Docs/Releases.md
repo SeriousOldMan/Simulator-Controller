@@ -7,7 +7,8 @@
   4. Layout editor for Button Box layouts integrated into the configuration tool
   5. Plugin support for configuration tool
   6. Jona can be asked to not change the tyre pressures on an upcoming pitstop
-  7. First consolidated version of Setup Database as Excel Spreadsheet for Quality Assurance
+  7. Visual feedback for tyre setup import action
+  8. First consolidated version of Setup Database as Excel Spreadsheet for Quality Assurance
   
 ## 2.6.2-release 03/21/21
   

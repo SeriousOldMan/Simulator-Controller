@@ -291,17 +291,16 @@ listEvent() {
 			else if (A_GuiControl == "buttonBoxesListBox") {
 				GuiControlGet buttonBoxesListBox
 				
-				vItemLists[A_GuiControl].openEditor(inList(ButtonBoxesList.Instance.iItemsList, buttonBoxesListBox))
-			}
-			else if (A_GuiControl == "controlsListBox") {
-				GuiControlGet controlsListBox
+				index := false
 				
-				vItemLists[A_GuiControl].openEditor(inList(ControlsList.Instance.iItemsList, controlsListBox))
-			}
-			else if (A_GuiControl == "labelsListBox") {
-				GuiControlGet labelsListBox
+				for ignore, candidate in ButtonBoxesList.Instance.iItemsList
+					if (buttonBoxesListBox = candidate[1]) {
+						index := A_Index
+					
+						break
+					}
 				
-				vItemLists[A_GuiControl].openEditor(inList(LabelsList.Instance.iItemsList, labelsListBox))
+				vItemLists[A_GuiControl].openEditor(index)
 			}
 			else
 				vItemLists[A_GuiControl].openEditor(A_EventInfo)
@@ -430,7 +429,7 @@ class ConfigurationEditor extends ConfigurationItem {
 
 		Gui SE:Font, Norm, Arial
 		
-		Gui SE:Add, Button, x232 y528 w80 h23 Default gsaveAndExit, % translate("Ok")
+		Gui SE:Add, Button, x232 y528 w80 h23 Default gsaveAndExit, % translate("Save")
 		Gui SE:Add, Button, x320 y528 w80 h23 gcancelAndExit, % translate("&Cancel")
 		Gui SE:Add, Button, x408 y528 w77 h23 gsaveAndStay, % translate("&Apply")
 		
@@ -1377,7 +1376,7 @@ class ApplicationsTab extends ConfigurationItemList {
 		Gui SE:Add, Button, x451 y342 w23 h23 gchooseApplicationWorkingDirectoryPath, % translate("...")
 		
 		Gui SE:Add, Text, x16 y367 w140 h23 +0x200, % translate("Window Title (optional)")
-		Gui SE:Font, cGray
+		Gui SE:Font, cGray s8
 		Gui SE:Add, Text, x24 y385 w133 h23, % translate("(Use AHK WinTitle Syntax)")
 		Gui SE:Font
 		Gui SE:Add, Edit, x180 y367 w268 h21 VapplicationWindowTitleEdit, %applicationWindowTitleEdit%
@@ -1616,6 +1615,7 @@ toggleKeyDetector() {
 global buttonBoxesListBox := "|"
 
 global buttonBoxEdit = ""
+global buttonBoxLayoutDropDown = 0
 global openButtonBoxEditorButton
 
 global buttonBoxUpButton
@@ -1642,7 +1642,8 @@ class ButtonBoxesList extends ConfigurationItemList {
 		Gui SE:Font, Norm, Arial
 		Gui SE:Add, ListBox, x24 y99 w194 h96 HwndbuttonBoxesListBoxHandle VbuttonBoxesListBox glistEvent, %buttonBoxesListBox%
 		
-		Gui SE:Add, Edit, x224 y99 w214 h21 VbuttonBoxEdit, %buttonBoxEdit%
+		Gui SE:Add, Edit, x224 y99 w104 h21 VbuttonBoxEdit, %buttonBoxEdit%
+		Gui SE:Add, DropDownList, x330 y99 w108 Choose%buttonBoxLayoutDropDown% VbuttonBoxLayoutDropDown, % values2String("|", this.computeLayoutChoices()*)
 		Gui SE:Add, Button, x440 y98 w23 h23 gopenButtonBoxEditor VopenButtonBoxEditorButton, % translate("...")
 		
 		Gui SE:Add, Button, x385 y124 w38 h23 Disabled VbuttonBoxUpButton gupItem, % translate("Up")
@@ -1650,7 +1651,7 @@ class ButtonBoxesList extends ConfigurationItemList {
 		
 		Gui SE:Add, Button, x265 y164 w46 h23 VbuttonBoxAddButton gaddItem, % translate("Add")
 		Gui SE:Add, Button, x313 y164 w50 h23 Disabled VbuttonBoxDeleteButton gdeleteItem, % translate("Delete")
-		Gui SE:Add, Button, x409 y164 w55 h23 Disabled VbuttonBoxUpdateButton gupdateItem, % translate("&Save")
+		Gui SE:Add, Button, x409 y164 w55 h23 Disabled VbuttonBoxUpdateButton gupdateItem, % translate("Save")
 		
 		return buttonBoxesListBoxHandle
 	}
@@ -1658,30 +1659,34 @@ class ButtonBoxesList extends ConfigurationItemList {
 	loadFromConfiguration(configuration) {
 		base.loadFromConfiguration(configuration)
 		
-		this.iItemsList := string2Values("|", getConfigurationValue(configuration, "Controller Layouts", "Button Boxes", ""))
+		items := []
+		
+		for ignore, controller in string2Values("|", getConfigurationValue(configuration, "Controller Layouts", "Button Boxes", ""))
+			items.Push(string2Values(":", controller))
+			
+		this.iItemsList := items
 	}
 		
 	saveToConfiguration(configuration) {
 		base.saveToConfiguration(configuration)
 		
-		setConfigurationValue(configuration, "Controller Layouts", "Button Boxes", values2String("|", this.iItemsList*))	
+		controller := []
+		
+		for ignore, item in this.iItemsList
+			controller.Push(values2String(":", item*))
+		
+		setConfigurationValue(configuration, "Controller Layouts", "Button Boxes", values2String("|", controller*))	
 	}
 	
 	loadList(items) {
-		buttonBoxesListBox := values2String("|", items*)
+		controller := []
+		
+		for ignore, item in this.iItemsList
+			controller.Push(item[1])
+		
+		buttonBoxesListBox := values2String("|", controller*)
 	
 		GuiControl, , buttonBoxesListBox, % "|" . buttonBoxesListBox
-	}
-	
-	updateState() {
-		base.updateState()
-		
-		GuiControlGet buttonBoxEdit
-		
-		if ((this.iCurrentItemIndex != 0) && (buttonBoxEdit != ""))
-			GuiControl Enable, openButtonBoxEditorButton
-		else
-			GuiControl Disable, openButtonBoxEditorButton
 	}
 	
 	selectItem(itemNumber) {
@@ -1694,23 +1699,58 @@ class ButtonBoxesList extends ConfigurationItemList {
 	}
 	
 	loadEditor(item) {
-		buttonBoxEdit := item
+		buttonBoxEdit := item[1]
+		buttonBoxLayoutDropDown := item[2]
 			
 		GuiControl Text, buttonBoxEdit, %buttonBoxEdit%
+		
+		try {
+			GuiControl Choose, buttonBoxLayoutDropDown, %buttonBoxLayoutDropDown%
+		}
+		catch exception {
+			GuiControl Choose, buttonBoxLayoutDropDown, 0
+		}
 	}
 	
 	clearEditor() {
-		this.loadEditor("")
+		this.loadEditor(Array("", ""))
 	}
 	
 	buildItemFromEditor(isNew := false) {
 		GuiControlGet buttonBoxEdit
+		GuiControlGet buttonBoxLayoutDropDown
 		
-		return buttonBoxEdit
+		if ((buttonBoxEdit = "") || (buttonBoxLayoutDropDown = "") || !buttonBoxLayoutDropDown) {
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+			title := translate("Error")
+			MsgBox 262160, %title%, % translate("Invalid values detected - please correct...")
+			OnMessage(0x44, "")
+			
+			return false
+		}
+		else
+			return Array(buttonBoxEdit, buttonBoxLayoutDropDown)
+	}
+	
+	computeLayoutChoices(configuration := false) {
+		if !configuration
+			configuration := readConfiguration(getFileName("Button Box Configuration.ini", kUserConfigDirectory, kConfigDirectory))
+		
+		layouts := []
+		
+		for descriptor, definition in getConfigurationSectionValues(configuration, "Layouts", Object()) {
+			descriptor := ConfigurationItem.splitDescriptor(descriptor)
+			
+			if !inList(layouts, descriptor[1])
+				layouts.Push(descriptor[1])
+		}
+		
+		return layouts
 	}
 	
 	openButtonBoxEditor() {
 		GuiControlGet buttonBoxEdit
+		GuiControlGet buttonBoxLayoutDropDown
 		
 		ConfigurationEditor.Instance.hide()
 		
@@ -1718,6 +1758,17 @@ class ButtonBoxesList extends ConfigurationItemList {
 		
 		if result
 			writeConfiguration(getFileName("Button Box Configuration.ini", kUserConfigDirectory), result)
+		
+		Gui SE:Default
+		
+		choices := this.computeLayoutChoices(result)
+		
+		GuiControl Text, buttonBoxLayoutDropDown, % "|" . values2String("|", choices*)
+		
+		if inList(choices, buttonBoxLayoutDropDown)
+			GuiControl Choose, buttonBoxLayoutDropDown, %buttonBoxLayoutDropDown%
+		else
+			GuiControl Choose, buttonBoxLayoutDropDown, %A_Space%
 		
 		ConfigurationEditor.Instance.show()
 	}
@@ -2133,9 +2184,8 @@ class LaunchpadTab extends ConfigurationItemList {
 		
 		this.iItemsList := items
 		
-		for ignore, launchpadApplication in items {
+		for ignore, launchpadApplication in items
 			LV_Add("", launchpadApplication[1], launchpadApplication[2], launchpadApplication[3])
-		}
 		
 		if first {
 			LV_ModifyCol()
@@ -2301,9 +2351,8 @@ class ChatMessagesTab extends ConfigurationItemList {
 		
 		this.iItemsList := items
 		
-		for ignore, chatMessage in items {
+		for ignore, chatMessage in items
 			LV_Add("", chatMessage[1], chatMessage[2], chatMessage[3])
-		}
 		
 		if first {
 			LV_ModifyCol()
@@ -2408,9 +2457,9 @@ class ThemesEditor extends ConfigurationItem {
 		Gui TE:Add, Text, w388 Center gmoveThemesEditor, % translate("Modular Simulator Controller System") 
 		
 		Gui TE:Font, Norm, Arial
-		Gui TE:Font, Italic, Arial
+		Gui TE:Font, Italic Underline, Arial
 
-		Gui TE:Add, Text, YP+20 w388 Center, % translate("Themes")
+		Gui TE:Add, Text, YP+20 w388 cBlue Center gopenThemesDocumentation, % translate("Themes")
 
 		Gui TE:Font, Norm, Arial
 		
@@ -2426,7 +2475,7 @@ class ThemesEditor extends ConfigurationItem {
 		
 		Gui TE:Add, Text, x50 y+10 w310 0x10
 		
-		Gui TE:Add, Button, x126 yp+10 w80 h23 Default GsaveThemesEditor, % translate("Ok")
+		Gui TE:Add, Button, x126 yp+10 w80 h23 Default GsaveThemesEditor, % translate("Save")
 		Gui TE:Add, Button, x214 yp w80 h23 GcancelThemesEditor, % translate("&Cancel")
 	}
 	
@@ -2505,6 +2554,10 @@ cancelThemesEditor() {
 
 moveThemesEditor() {
 	moveByMouse("TE")
+}
+
+openThemesDocumentation() {
+	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#themes-editor
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -3035,9 +3088,9 @@ class TranslationsEditor extends ConfigurationItem {
 		Gui TE:Add, Text, w388 Center gmoveTranslationsEditor, % translate("Modular Simulator Controller System") 
 		
 		Gui TE:Font, Norm, Arial
-		Gui TE:Font, Italic, Arial
+		Gui TE:Font, Italic Underline, Arial
 
-		Gui TE:Add, Text, YP+20 w388 Center, % translate("Translations")
+		Gui TE:Add, Text, YP+20 w388 cBlue Center gopenTranslationsDocumentation, % translate("Translations")
 
 		Gui TE:Font, Norm, Arial
 		
@@ -3277,6 +3330,10 @@ chooseTranslationLanguage() {
 	}
 }
 
+openTranslationsDocumentation() {
+	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#translations-editor
+}
+
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; TranslationsList                                                        ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -3467,14 +3524,11 @@ nextUntranslated() {
 ;;; ButtonBoxesEditor                                                       ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-global rowsEdit = ""
-global columnsEdit = ""
-global rowMarginEdit = ""
-global columnMarginEdit = ""
-global borderMarginEdit = ""
-global bottomMarginEdit = ""
-
 class ButtonBoxesEditor extends ConfigurationItem {
+	iControlsList := false
+	iLabelsList := false
+	iLayoutsList := false
+	
 	iName := ""
 	iClosed := false
 	
@@ -3484,15 +3538,15 @@ class ButtonBoxesEditor extends ConfigurationItem {
 	iButtonBoxPreviewCenterX := 0
 	iButtonBoxPreviewCenterY := 0
 	
-	Name[] {
-		Get {
-			return this.iName
-		}
-	}
-	
 	ButtonBoxPreview[] {
 		Get {
 			return this.iButtonBoxPreview
+		}
+	}
+	
+	Name[] {
+		Get {
+			return this.iName
 		}
 	}
 	
@@ -3524,8 +3578,14 @@ class ButtonBoxesEditor extends ConfigurationItem {
 		this.iButtonBoxConfiguration := readConfiguration(getFileName("Button Box Configuration.ini", kUserConfigDirectory, kConfigDirectory))
 		
 		this.createControls(this.iButtonBoxConfiguration)
+	}
+	
+	saveToConfiguration(configuration) {
+		base.saveToConfiguration(configuration)
 		
-		this.iButtonBoxPreview := new ButtonBoxPreview(this, this.iButtonBoxConfiguration)
+		this.iControlsList.saveToConfiguration(configuration)
+		this.iLabelsList.saveToConfiguration(configuration)
+		this.iLayoutsList.saveToConfiguration(configuration)
 	}
 	
 	createControls(configuration) {
@@ -3536,68 +3596,24 @@ class ButtonBoxesEditor extends ConfigurationItem {
 		Gui BBE:Color, D0D0D0
 		Gui BBE:Font, Bold, Arial
 
-		Gui BBE:Add, Text, x0 w400 Center gmoveButtonBoxEditor, % translate("Modular Simulator Controller System") 
+		Gui BBE:Add, Text, x0 w432 Center gmoveButtonBoxesEditor, % translate("Modular Simulator Controller System") 
 		
 		Gui BBE:Font, Norm, Arial
-		Gui BBE:Font, Italic, Arial
+		Gui BBE:Font, Italic Underline, Arial
 
-		Gui BBE:Add, Text, x0 YP+20 w400 Center, % translate("Button Box") . translate(": ") . this.Name
+		Gui BBE:Add, Text, x0 YP+20 w432 cBlue Center gopenButtonBoxesDocumentation, % translate("Button Box Layouts")
 		
-		Gui BBE:Font, Norm, Arial
-		Gui BBE:Font, Italic, Arial
+		this.iControlsList := new ControlsList(configuration)
 		
-		Gui BBE:Add, GroupBox, x8 y60 w392 h93, % translate("Grid")
+		this.iLabelsList := new LabelsList(configuration)
 		
-		Gui BBE:Font, Norm, Arial
+		this.iLayoutsList := new LayoutsList(configuration)
 		
-		layout := string2Values(",", getConfigurationValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Name, "Layout"), ""))
 		
-		rowMarginEdit := ((layout.Length() > 1) ? layout[2] : ButtonBoxPreview.kRowMargin)
-		columnMarginEdit := ((layout.Length() > 2) ? layout[3] : ButtonBoxPreview.kColumnMargin)
-		borderMarginEdit := ((layout.Length() > 3) ? layout[4] : ButtonBoxPreview.kBorderMargin)
-		bottomMarginEdit := ((layout.Length() > 4) ? layout[5] : ButtonBoxPreview.kBottomMargin)
+		Gui BBE:Add, Text, x50 y615 w332 0x10
 		
-		layout := string2Values("x", layout[1])
-		
-		rowsEdit := layout[1]
-		columnsEdit := layout[2]
-		
-		Gui BBE:Add, Text, x16 y77 w160 h23 +0x200, % translate("Rows x Columns")
-		Gui BBE:Add, Edit, x122 y77 w40 h21 Limit1 Number VrowsEdit, %rowsEdit%
-		Gui BBE:Add, Text, x167 y77 w20 h23 +0x200 Center, % translate("x")
-		Gui BBE:Add, Edit, x192 y77 w40 h21 Limit1 Number VcolumnsEdit, %columnsEdit%
-		
-		Gui BBE:Add, Text, x16 y121 w160 h23 +0x200, % translate("Margins")
-		Gui BBE:Add, Text, x122 y101 w40 h23 +0x200 Center, % translate("Row")
-		Gui BBE:Add, Text, x192 y101 w40 h23 +0x200 Center, % translate("Column")
-		Gui BBE:Add, Text, x262 y101 w40 h23 +0x200 Center, % translate("Border")
-		Gui BBE:Add, Text, x332 y101 w40 h23 +0x200 Center, % translate("Bottom")
-		Gui BBE:Add, Edit, x122 y121 w40 h21 Limit2 Number VrowMarginEdit, %rowMarginEdit%
-		Gui BBE:Add, Edit, x192 y121 w40 h21 Limit2 Number VcolumnMarginEdit, %columnMarginEdit%
-		Gui BBE:Add, Edit, x262 y121 w40 h21 Limit2 Number VborderMarginEdit, %borderMarginEdit%
-		Gui BBE:Add, Edit, x332 y121 w40 h21 Limit2 Number VbottomMarginEdit, %bottomMarginEdit%
-		
-		Gui BBE:Add, Button, x160 y275 w80 h23 GrefreshButtonBoxPreview, % translate("Refresh")
-		
-		Gui BBE:Add, Button, x160 y300 w80 h23 Default GcloseButtonBoxEditor, % translate("Close")
-	}
-	
-	refreshButtonBoxPreview() {
-		GuiControlGet rowsEdit
-		GuiControlGet columnsEdit
-		GuiControlGet rowMarginEdit
-		GuiControlGet columnMarginEdit
-		GuiControlGet borderMarginEdit
-		GuiControlGet bottomMarginEdit
-		
-		setConfigurationValue(this.ButtonBoxConfiguration, "Layouts", ConfigurationItem.descriptor(this.Name, "Layout")
-							, values2String(", ", rowsEdit . " x " . columnsEdit, rowMarginEdit, columnMarginEdit, borderMarginEdit, bottomMarginEdit))
-							
-		this.iButtonBoxPreview.hide()
-		
-		this.iButtonBoxPreview := new ButtonBoxPreview(this, this.ButtonBoxConfiguration)
-		
-		this.iButtonBoxPreview.show()
+		Gui BBE:Add, Button, x130 y630 w80 h23 Default GsaveButtonBoxesEditor, % translate("Save")
+		Gui BBE:Add, Button, x230 y630 w80 h23 GcancelButtonBoxesEditor, % translate("Close")
 	}
 	
 	setButtonBoxPreviewPosition(centerX, centerY) {
@@ -3607,32 +3623,71 @@ class ButtonBoxesEditor extends ConfigurationItem {
 	
 	editButtonBox() {
 		Gui BBE:Show, AutoSize Center
-		this.ButtonBoxPreview.show()
 		
 		Loop
 			Sleep 200
 		until this.iClosed
 		
-		this.ButtonBoxPreview.hide()
 		Gui BBE:Destroy
 	}
 	
-	saveButtonBox() {
+	closeEditor(save) {
+		if save {
+			configuration := newConfiguration()
 		
-	}
-	
-	closeEditor() {
+			this.saveToConfiguration(configuration)
+			
+			writeConfiguration(getFileName("Button Box Configuration.ini", kUserConfigDirectory), configuration)
+		}
+			
 		this.saveButtonBox()
+		
+		if this.ButtonBoxPreview {
+			this.ButtonBoxPreview.hide()
+			
+			this.iButtonBoxPreview := false
+		}
 		
 		this.iClosed := true
 	}
+	
+	updateButtonBoxPreview(name) {
+		configuration := newConfiguration()
+		
+		this.saveToConfiguration(configuration)
+		
+		this.iButtonBoxConfiguration := configuration
+		
+		if this.ButtonBoxPreview {
+			this.ButtonBoxPreview.hide()
+			
+			this.iButtonBoxPreview := false
+		}
+		
+		if name {
+			this.iButtonBoxPreview := new ButtonBoxPreview(this, name, configuration)
+		
+			this.ButtonBoxPreview.show()
+		}
+	}
 }
 
-closeButtonBoxEditor() {
+saveButtonBoxesEditor() {
 	protectionOn()
 	
 	try {
-		ButtonBoxesEditor.Instance.closeEditor()
+		ButtonBoxesEditor.Instance.closeEditor(true)
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+cancelButtonBoxesEditor() {
+	protectionOn()
+	
+	try {
+		ButtonBoxesEditor.Instance.closeEditor(false)
 	}
 	finally {
 		protectionOff()
@@ -3650,15 +3705,19 @@ refreshButtonBoxPreview() {
 	}
 }
 
-moveButtonBoxEditor() {
+moveButtonBoxesEditor() {
 	moveByMouse("BBE")
+}
+
+openButtonBoxesDocumentation() {
+	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#button-box-layouts
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; ControlsList                                                            ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-global controlsListBox := "|"
+global controlsListView := "|"
 
 global controlNameEdit = ""
 global controlTypeDropDown = 0
@@ -3672,39 +3731,42 @@ global controlUpdateButton
 		
 class ControlsList extends ConfigurationItemList {
 	__New(configuration) {
-		base.__New(configuration, this.createControls(configuration), "controlsListBox"
+		base.__New(configuration, this.createControls(configuration), "controlsListView"
 				 , "controlAddButton", "controlDeleteButton", "controlUpdateButton")
 				 
 		ControlsList.Instance := this
+		
+		this.clearEditor()
 	}
 					
 	createControls(configuration) {
 		Gui BBE:Font, Norm, Arial
 		Gui BBE:Font, Italic, Arial
 		
-		Gui BBE:Add, GroupBox, x8 y60 w384 h115, % translate("Controls")
+		Gui BBE:Add, GroupBox, x8 y60 w424 h138, % translate("Controls")
 		
 		Gui BBE:Font, Norm, Arial
-		Gui BBE:Add, ListBox, x24 y99 w194 h96 HwndcontrolsListBoxHandle VcontrolsListBox glistEvent, %controlsListBox%
+		Gui BBE:Add, ListView, x16 y79 w134 h108 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndcontrolsListViewHandle VcontrolsListView glistEvent
+							, % values2String("|", map(["Control", "Type", "Size"], "translate")*)
+							
+		Gui BBE:Add, Text, x164 y79 w80 h23 +0x200, % translate("Control")
+		Gui BBE:Add, Edit, x214 y80 w79 h21 VcontrolNameEdit, %controlNameEdit%
+		Gui BBE:Add, DropDownList, x295 y79 w105 AltSubmit Choose%controlTypeDropDown% VcontrolTypeDropDown, % values2String("|", map(["1-way Toggle", "2-way Toggle", "Button", "Dial"], "translate")*)
 		
-		Gui BBE:Add, Text, x16 y360 w86 h23 +0x200, % translate("Control")
-		Gui BBE:Add, Edit, x110 y342 w259 h21 VcontrolNameEdit, %controlNameEdit%
-		Gui BBE:Add, DropDownList, x124 y360 w91 AltSubmit Choose%controlTypeDropDown% VcontrolTypeDropDown, % values2String("|", map(["1-way Toggle", "2-way Toggle", "Button", "Dial"], "translate")*)
+		Gui BBE:Add, Text, x164 y103 w80 h23 +0x200, % translate("Image")
+		Gui BBE:Add, Edit, x214 y103 w186 h21 VimageFilePathEdit, %imageFilePathEdit%
+		Gui BBE:Add, Button, x403 y103 w23 h23 gchooseImageFilePath, % translate("...")
 		
-		Gui BBE:Add, Text, x16 y342 w80 h23 +0x200, % translate("Image")
-		Gui BBE:Add, Edit, x110 y342 w259 h21 VimageFilePathEdit, %imageFilePathEdit%
-		Gui BBE:Add, Button, x371 y341 w23 h23 gchooseImageFilePath, % translate("...")
+		Gui BBE:Add, Text, x164 y127 w80 h23 +0x200, % translate("Size")
+		Gui BBE:Add, Edit, x214 y127 w40 h21 Limit3 Number VimageWidthEdit, %imageWidthEdit%
+		Gui BBE:Add, Text, x259 y127 w31 h23 +0x200 Center, % translate("x")
+		Gui BBE:Add, Edit, x295 y127 w40 h21 Limit3 Number VimageHeightEdit, %imageHeightEdit%
 		
-		Gui BBE:Add, Text, x16 y342 w80 h23 +0x200, % translate("Width / Height")
-		Gui BBE:Add, Edit, x122 y77 w40 h21 Limit3 Number VimageWidthEdit, %imageWidthEdit%
-		Gui BBE:Add, Text, x167 y77 w20 h23 +0x200 Center, % translate("x")
-		Gui BBE:Add, Edit, x192 y77 w40 h21 Limit3 Number VimageHeightEdit, %imageHeightEdit%
+		Gui BBE:Add, Button, x226 y164 w46 h23 VcontrolAddButton gaddItem, % translate("Add")
+		Gui BBE:Add, Button, x275 y164 w50 h23 Disabled VcontrolDeleteButton gdeleteItem, % translate("Delete")
+		Gui BBE:Add, Button, x371 y164 w55 h23 Disabled VcontrolUpdateButton gupdateItem, % translate("Save")
 		
-		Gui BBE:Add, Button, x265 y164 w46 h23 VcontrolAddButton gaddItem, % translate("Add")
-		Gui BBE:Add, Button, x313 y164 w50 h23 Disabled VcontrolDeleteButton gdeleteItem, % translate("Delete")
-		Gui BBE:Add, Button, x409 y164 w55 h23 Disabled VcontrolUpdateButton gupdateItem, % translate("&Save")
-		
-		return controlsListBoxHandle
+		return controlsListViewHandle
 	}
 	
 	loadFromConfiguration(configuration) {
@@ -3730,23 +3792,27 @@ class ControlsList extends ConfigurationItemList {
 	}
 	
 	loadList(items) {
-		controls := []
+		static first := true
+		
+		Gui ListView, % this.ListHandle
+	
+		LV_Delete()
+		
+		this.iItemsList := items
 		
 		for ignore, control in items
-			controls.Push(control[1] . " :: " . translate(control[2]))
+			LV_Add("", control[1], control[2], control[4])
 		
-		controlsListBox := values2String("|", controls*)
-	
-		GuiControl, , controlsListBox, % "|" . controlsListBox
-	}
-	
-	selectItem(itemNumber) {
-		this.iCurrentItemIndex := itemNumber
-		
-		if itemNumber
-			GuiControl Choose, controlsListBox, %itemNumber%
-		
-		this.updateState()
+		if first {
+			LV_ModifyCol()
+			LV_ModifyCol(1, "AutoHdr")
+			LV_ModifyCol(2, "AutoHdr")
+			LV_ModifyCol(3, "AutoHdr")
+			
+			first := false
+		}
+		else
+			ButtonBoxesEditor.Instance.updateButtonBoxPreview(LayoutsList.Instance.CurrentButtonBox)
 	}
 	
 	loadEditor(item) {
@@ -3778,7 +3844,7 @@ class ControlsList extends ConfigurationItemList {
 		GuiControlGet imageWidthEdit
 		GuiControlGet imageHeightEdit
 		
-		if ((controlNameEdit = "") || (controlTypeDropDown = 0) || (imageFilePathEdit = "")  || (imageWidthEdit = 0) || (imageHeightEdit = 0)) {
+		if ((controlNameEdit = "") || !inList([1, 2, 3, 4], controlTypeDropDown) || (imageFilePathEdit = "")  || (imageWidthEdit = 0) || (imageHeightEdit = 0)) {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 			title := translate("Error")
 			MsgBox 262160, %title%, % translate("Invalid values detected - please correct...")
@@ -3823,7 +3889,7 @@ chooseImageFilePath() {
 ;;; LabelsList                                                              ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-global labelsListBox := "|"
+global labelsListView := "|"
 
 global labelNameEdit = ""
 global labelWidthEdit = 0
@@ -3835,39 +3901,38 @@ global labelUpdateButton
 		
 class LabelsList extends ConfigurationItemList {
 	__New(configuration) {
-		base.__New(configuration, this.createControls(configuration), "controlsListBox"
-				 , "controlAddButton", "controlDeleteButton", "controlUpdateButton")
+		base.__New(configuration, this.createControls(configuration), "labelsListView"
+				 , "labelAddButton", "labelDeleteButton", "labelUpdateButton")
 				 
 		LabelsList.Instance := this
+		
+		this.clearEditor()
 	}
 					
 	createControls(configuration) {
 		Gui BBE:Font, Norm, Arial
 		Gui BBE:Font, Italic, Arial
 		
-		Gui BBE:Add, GroupBox, x8 y60 w384 h115, % translate("Controls")
+		Gui BBE:Add, GroupBox, x8 y205 w424 h115, % translate("Labels")
 		
 		Gui BBE:Font, Norm, Arial
-		Gui BBE:Add, ListBox, x24 y99 w194 h96 HwndcontrolsListBoxHandle VcontrolsListBox glistEvent, %controlsListBox%
+		Gui BBE:Add, ListView, x16 y224 w134 h84 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndlabelsListViewHandle VlabelsListView glistEvent
+							, % values2String("|", map(["Label", "Size"], "translate")*)
 		
-		Gui BBE:Add, Text, x16 y360 w86 h23 +0x200, % translate("Control")
-		Gui BBE:Add, Edit, x110 y342 w259 h21 VcontrolNameEdit, %controlNameEdit%
-		Gui BBE:Add, DropDownList, x124 y360 w91 AltSubmit Choose%controlTypeDropDown% VcontrolTypeDropDown, % values2String("|", map(["1-way Toggle", "2-way Toggle", "Button", "Dial"], "translate")*)
 		
-		Gui BBE:Add, Text, x16 y342 w80 h23 +0x200, % translate("Image")
-		Gui BBE:Add, Edit, x110 y342 w259 h21 VimageFilePathEdit, %imageFilePathEdit%
-		Gui BBE:Add, Button, x371 y341 w23 h23 gchooseImageFilePath, % translate("...")
+		Gui BBE:Add, Text, x164 y224 w80 h23 +0x200, % translate("Label")
+		Gui BBE:Add, Edit, x214 y225 w79 h21 VlabelNameEdit, %labelNameEdit%
 		
-		Gui BBE:Add, Text, x16 y342 w80 h23 +0x200, % translate("Width / Height")
-		Gui BBE:Add, Edit, x122 y77 w40 h21 Limit3 Number VimageWidthEdit, %imageWidthEdit%
-		Gui BBE:Add, Text, x167 y77 w20 h23 +0x200 Center, % translate("x")
-		Gui BBE:Add, Edit, x192 y77 w40 h21 Limit3 Number VimageHeightEdit, %imageHeightEdit%
+		Gui BBE:Add, Text, x164 y248 w80 h23 +0x200, % translate("Size")
+		Gui BBE:Add, Edit, x214 y248 w40 h21 Limit3 Number VlabelWidthEdit, %labelWidthEdit%
+		Gui BBE:Add, Text, x259 y248 w31 h23 +0x200 Center, % translate("x")
+		Gui BBE:Add, Edit, x295 y248 w40 h21 Limit3 Number VlabelHeightEdit, %labelHeightEdit%
 		
-		Gui BBE:Add, Button, x265 y164 w46 h23 VcontrolAddButton gaddItem, % translate("Add")
-		Gui BBE:Add, Button, x313 y164 w50 h23 Disabled VcontrolDeleteButton gdeleteItem, % translate("Delete")
-		Gui BBE:Add, Button, x409 y164 w55 h23 Disabled VcontrolUpdateButton gupdateItem, % translate("&Save")
+		Gui BBE:Add, Button, x226 y285 w46 h23 VlabelAddButton gaddItem, % translate("Add")
+		Gui BBE:Add, Button, x275 y285 w50 h23 Disabled VlabelDeleteButton gdeleteItem, % translate("Delete")
+		Gui BBE:Add, Button, x371 y285 w55 h23 Disabled VlabelUpdateButton gupdateItem, % translate("Save")
 		
-		return controlsListBoxHandle
+		return labelsListViewHandle
 	}
 	
 	loadFromConfiguration(configuration) {
@@ -3893,23 +3958,26 @@ class LabelsList extends ConfigurationItemList {
 	}
 	
 	loadList(items) {
-		labels := []
+		static first := true
+		
+		Gui ListView, % this.ListHandle
+	
+		LV_Delete()
+		
+		this.iItemsList := items
 		
 		for ignore, label in items
-			labels.Push(label[1] . " (" . label[2] . ")")
+			LV_Add("", label[1], label[2])
 		
-		labelsListBox := values2String("|", labels*)
-	
-		GuiControl, , labelsListBox, % "|" . labelsListBox
-	}
-	
-	selectItem(itemNumber) {
-		this.iCurrentItemIndex := itemNumber
-		
-		if itemNumber
-			GuiControl Choose, labelsListBox, %itemNumber%
-		
-		this.updateState()
+		if first {
+			LV_ModifyCol()
+			LV_ModifyCol(1, "AutoHdr")
+			LV_ModifyCol(2, "AutoHdr")
+			
+			first := false
+		}
+		else
+			ButtonBoxesEditor.Instance.updateButtonBoxPreview(LayoutsList.Instance.CurrentButtonBox)
 	}
 	
 	loadEditor(item) {
@@ -3948,6 +4016,349 @@ class LabelsList extends ConfigurationItemList {
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; LayoutsList                                                             ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+global layoutsListView := "|"
+
+global layoutNameEdit = ""
+
+global layoutRowsEdit = ""
+global layoutColumnsEdit = ""
+global layoutRowMarginEdit = ""
+global layoutColumnMarginEdit = ""
+global layoutBorderMarginEdit = ""
+global layoutBottomMarginEdit = ""
+
+global layoutRowDropDown = 0
+global layoutRowEdit = ""
+
+global layoutAddButton
+global layoutDeleteButton
+global layoutUpdateButton
+		
+class LayoutsList extends ConfigurationItemList {
+	iRowDefinitions := []
+	iSelectedRow := false
+	
+	CurrentButtonBox[] {
+		Get {
+			return ((this.iCurrentItemIndex != 0) ? this.iItemsList[this.iCurrentItemIndex][1] : false)
+		}
+	}
+	
+	__New(configuration) {
+		base.__New(configuration, this.createControls(configuration), "layoutsListView"
+				 , "layoutAddButton", "layoutDeleteButton", "layoutUpdateButton")
+				 
+		LayoutsList.Instance := this
+		
+		this.clearEditor()
+	}
+
+	createControls(configuration) {
+		Gui BBE:Add, ListView, x8 y330 w424 h90 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndlayoutsListViewHandle VlayoutsListView glistEvent
+							, % values2String("|", map(["Button Box", "Grid", "Margins", "Definition"], "translate")*)
+		
+		Gui BBE:Add, Text, x8 y430 w86 h23 +0x200, % translate("Button Box")
+		Gui BBE:Add, Edit, x102 y430 w110 h21 VlayoutNameEdit, %layoutNameEdit%
+		
+		Gui BBE:Add, Text, x8 y454 w86 h23 +0x200, % translate("Layout")
+		Gui BBE:Font, cGray s7
+		Gui BBE:Add, Text, x16 y475 w133 h21, % translate("(R x C, Margins)")
+		Gui BBE:Font
+		
+		Gui BBE:Add, Edit, x102 y454 w40 h21 Limit1 Number gupdateLayoutRowEditor VlayoutRowsEdit, %layoutRowsEdit%
+		Gui BBE:Add, UpDown, x125 y454 w17 h21, 1
+		Gui BBE:Add, Text, x147 y454 w20 h23 +0x200 Center, % translate("x")
+		Gui BBE:Add, Edit, x172 y454 w40 h21 Limit1 Number VlayoutColumnsEdit, %layoutColumnsEdit%
+		Gui BBE:Add, UpDown, x195 y454 w17 h21, 1
+		
+		Gui BBE:Font, s7
+		
+		Gui BBE:Add, Text, x242 y435 w40 h23 +0x200 Center, % translate("Row")
+		Gui BBE:Add, Text, x292 y435 w40 h23 +0x200 Center, % translate("Column")
+		Gui BBE:Add, Text, x342 y435 w40 h23 +0x200 Center, % translate("Border")
+		Gui BBE:Add, Text, x392 y435 w40 h23 +0x200 Center, % translate("Bottom")
+		
+		Gui BBE:Font
+		
+		Gui BBE:Add, Edit, x242 y454 w40 h21 Limit2 Number VlayoutRowMarginEdit, %layoutRowMarginEdit%
+		Gui BBE:Add, Edit, x292 y454 w40 h21 Limit2 Number VlayoutColumnMarginEdit, %layoutColumnMarginEdit%
+		Gui BBE:Add, Edit, x342 y454 w40 h21 Limit2 Number VlayoutBorderMarginEdit, %layoutBorderMarginEdit%
+		Gui BBE:Add, Edit, x392 y454 w40 h21 Limit2 Number VlayoutBottomMarginEdit, %layoutBottomMarginEdit%
+		
+		Gui BBE:Add, DropDownList, x8 y495 w86 AltSubmit Choose0 gupdateLayoutRowEditor VlayoutRowDropDown, |
+		
+		Gui BBE:Add, Edit, x102 y495 w330 h65 VlayoutRowEdit, %layoutRowEdit%
+		
+		Gui BBE:Add, Button, x223 y575 w46 h23 VlayoutAddButton gaddItem, % translate("Add")
+		Gui BBE:Add, Button, x271 y575 w50 h23 Disabled VlayoutDeleteButton gdeleteItem, % translate("Delete")
+		Gui BBE:Add, Button, x377 y575 w55 h23 Disabled VlayoutUpdateButton gupdateItem, % translate("&Save")
+		
+		return layoutsListViewHandle
+	}
+	
+	loadFromConfiguration(configuration) {
+		base.loadFromConfiguration(configuration)
+		
+		layouts := {}
+		
+		for descriptor, definition in getConfigurationSectionValues(configuration, "Layouts", Object()) {
+			descriptor := ConfigurationItem.splitDescriptor(descriptor)
+			name := descriptor[1]
+			
+			if !layouts.HasKey(name)
+				layouts[name] := Object()
+			
+			if (descriptor[2] = "Layout") {
+				definition := string2Values(",", definition)
+	
+				rowMargin := ((definition.Length() > 1) ? definition[2] : ButtonBoxPreview.kRowMargin)
+				columnMargin := ((definition.Length() > 2) ? definition[3] : ButtonBoxPreview.kColumnMargin)
+				borderMargin := ((definition.Length() > 3) ? definition[4] : ButtonBoxPreview.kBorderMargin)
+				bottomMargin := ((definition.Length() > 4) ? definition[5] : ButtonBoxPreview.kBottomMargin)
+				
+				layouts[name]["Grid"] := definition[1]
+				layouts[name]["Margins"] := Array(rowMargin, columnMargin, borderMargin, bottomMargin)
+			}
+			else
+				layouts[name][descriptor[2]] := definition
+		}
+		
+		items := []
+		
+		for name, definition in layouts
+			items.Push(Array(name, definition))
+		
+		this.iItemsList := items
+	}
+		
+	saveToConfiguration(configuration) {
+		base.saveToConfiguration(configuration)
+		
+		for ignore, layout in this.iItemsList {
+			grid := layout[2]["Grid"]
+			
+			setConfigurationValue(configuration, "Layouts", ConfigurationItem.descriptor(layout[1], "Layout")
+								, grid . ", " . values2String(", ", layout[2]["Margins"]*))
+								
+			Loop % string2Values("x", grid)[1]
+				setConfigurationValue(configuration, "Layouts", ConfigurationItem.descriptor(layout[1], A_Index), layout[2][A_Index])
+		}
+	}
+	
+	loadList(items) {
+		static first := true
+		
+		Gui ListView, % this.ListHandle
+	
+		LV_Delete()
+		
+		this.iItemsList := items
+		
+		for ignore, layout in items {
+			grid := layout[2]["Grid"]
+		
+			definition := ""
+			
+			Loop % string2Values("x", grid)[1]
+			{
+				if (A_Index > 1)
+					definition .= "; "
+				
+				definition .= (A_Index . ": " . layout[2][A_Index])
+			}
+			
+			LV_Add("", layout[1], grid, values2String(", ", layout[2]["Margins"]*), definition)
+		}
+		
+		if first {
+			LV_ModifyCol()
+			LV_ModifyCol(1, "AutoHdr")
+			LV_ModifyCol(2, "AutoHdr")
+			LV_ModifyCol(3, "AutoHdr")
+			LV_ModifyCol(4, "AutoHdr")
+			
+			first := false
+		}
+		else
+			ButtonBoxesEditor.Instance.updateButtonBoxPreview(LayoutsList.Instance.CurrentButtonBox)
+	}
+	
+	loadEditor(item) {
+		layoutNameEdit := item[1]
+		
+		size := string2Values("x", item[2]["Grid"])
+		
+		layoutRowsEdit := size[1]
+		layoutColumnsEdit := size[2]
+		
+		margins := item[2]["Margins"]
+		
+		layoutRowMarginEdit := margins[1]
+		layoutColumnMarginEdit := margins[2]
+		layoutBorderMarginEdit := margins[3]
+		layoutBottomMarginEdit := margins[4]
+		
+		GuiControl Text, layoutNameEdit, %layoutNameEdit%
+		GuiControl Text, layoutRowsEdit, %layoutRowsEdit%
+		GuiControl Text, layoutColumnsEdit, %layoutColumnsEdit%
+		GuiControl Text, layoutRowMarginEdit, %layoutRowMarginEdit%
+		GuiControl Text, layoutColumnMarginEdit, %layoutColumnMarginEdit%
+		GuiControl Text, layoutBorderMarginEdit, %layoutBorderMarginEdit%
+		GuiControl Text, layoutBottomMarginEdit, %layoutBottomMarginEdit%
+		
+		choices := []
+		rowDefinitions := []
+		
+		Loop %layoutRowsEdit% {
+			choices.Push(translate("Row ") . A_Index)
+		
+			rowDefinitions.Push(item[2][A_Index])
+		}
+		
+		this.iRowDefinitions := rowDefinitions
+		
+		GuiControl Text, layoutRowDropDown, % "|" . values2String("|", choices*)
+		
+		if (choices.Length() > 0) {
+			GuiControl Choose, layoutRowDropDown, 1
+			
+			layoutRowEdit := (rowDefinitions.HasKey(1) ? rowDefinitions[1] : "")
+			
+			this.iSelectedRow := 1
+		}
+		else {
+			GuiControl Choose, layoutRowDropDown, 0
+		
+			layoutRowEdit := ""
+			
+			this.iSelectedRow := false
+		}
+			
+		GuiControl Text, layoutRowEdit, %layoutRowEdit%
+		
+		preview := ButtonBoxesEditor.Instance.ButtonBoxPreview
+		
+		if ((this.CurrentButtonBox != layoutNameEdit) || (!preview && (layoutNameEdit != "")) || (preview && (preview.Name != layoutNameEdit)))
+			ButtonBoxesEditor.Instance.updateButtonBoxPreview(this.CurrentButtonBox)
+	}
+	
+	clearEditor() {
+		this.loadEditor(Array("", {Grid: "1x1", Margins: [0,0,0,0]}))
+	}
+	
+	buildItemFromEditor(isNew := false) {
+		GuiControlGet layoutNameEdit
+		GuiControlGet layoutRowsEdit
+		GuiControlGet layoutColumnsEdit
+		GuiControlGet layoutRowMarginEdit
+		GuiControlGet layoutColumnMarginEdit
+		GuiControlGet layoutBorderMarginEdit
+		GuiControlGet layoutBottomMarginEdit
+		
+		GuiControlGet layoutRowDropDown
+		GuiControlGet layoutRowEdit
+		
+		if ((layoutNameEdit = "") || (layoutRowsEdit = 0) || (layoutColumnsEdit = 0)) {
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+			title := translate("Error")
+			MsgBox 262160, %title%, % translate("Invalid values detected - please correct...")
+			OnMessage(0x44, "")
+			
+			return false
+		}
+		else {
+			if (layoutRowDropDown > 0)
+				this.iRowDefinitions[layoutRowDropDown] := layoutRowEdit
+			
+			layout := {Grid: layoutRowsEdit . " x " . layoutColumnsEdit
+					 , Margins: Array(layoutRowMarginEdit, layoutColumnMarginEdit, layoutBorderMarginEdit, layoutBottomMarginEdit)}
+			
+			Loop % this.iRowDefinitions.Length()
+				layout[A_Index] := this.iRowDefinitions[A_Index]
+				
+			return Array(layoutNameEdit, layout)
+		}
+	}
+	
+	updateLayoutRowEditor() {
+		GuiControlGet layoutRowsEdit
+		GuiControlGet layoutRowDropDown
+		GuiControlGet layoutRowEdit
+		
+		if (this.iSelectedRow > 0)
+			this.iRowDefinitions[this.iSelectedRow] := layoutRowEdit
+		
+		if (layoutRowDropDown > 0) {
+			layoutRowEdit := (this.iRowDefinitions.HasKey(layoutRowDropDown) ? this.iRowDefinitions[layoutRowDropDown] : "")
+			
+			this.iSelectedRow := layoutRowDropDown
+			
+			GuiControl Text, layoutRowEdit, %layoutRowEdit%
+		}
+			
+		rows := this.iRowDefinitions.Length()
+		changed := false
+		
+		if (layoutRowsEdit > rows) {
+			Loop % layoutRowsEdit - rows
+				this.iRowDefinitions.Push("")
+			
+			changed := true
+		}
+		else if (layoutRowsEdit < rows) {
+			this.iRowDefinitions.RemoveAt(layoutRowsEdit + A_Index - 1, rows - layoutRowsEdit)
+			
+			changed := true
+		}
+
+		if changed {
+			choices := []
+		
+			Loop %layoutRowsEdit%
+				choices.Push(translate("Row ") . A_Index)
+		
+			GuiControl Text, layoutRowDropDown, % "|" . values2String("|", choices*)
+			
+			if (layoutRowsEdit > 0) {
+				layoutRowDropDown := 1
+				
+				GuiControl Choose, layoutRowDropDown, 1
+				
+				layoutRowEdit := this.iRowDefinitions[1]
+			}
+			else {
+				layoutRowDropDown := 0
+				
+				GuiControl Choose, layoutRowDropDown, 0
+				
+				layoutRowEdit := ""
+			}
+
+			this.iSelectedRow := layoutRowDropDown
+			
+			GuiControl Text, layoutRowEdit, %layoutRowEdit%
+		}
+	}
+}
+
+updateLayoutRowEditor() {
+	protectionOn()
+	
+	try {
+		vItemLists["layoutsListView"].updateLayoutRowEditor()
+	}
+	catch exception {
+		; ignore
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; ButtonBoxPreview                                                        ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
@@ -3962,6 +4373,7 @@ class ButtonBoxPreview extends ConfigurationItem {
 	static kBottomMargin := 15
 	
 	iEditor := false
+	iName := ""
 	
 	iWidth := 0
 	iHeight := 0
@@ -3984,7 +4396,7 @@ class ButtonBoxPreview extends ConfigurationItem {
 	
 	Name[] {
 		Get {
-			return this.Editor.Name
+			return this.iName
 		}
 	}
 	
@@ -4045,8 +4457,9 @@ class ButtonBoxPreview extends ConfigurationItem {
 		}
 	}
 	
-	__New(editor, configuration) {
+	__New(editor, name, configuration) {
 		this.iEditor := editor
+		this.iName := name
 		
 		base.__New(configuration)
 		
@@ -4157,9 +4570,7 @@ class ButtonBoxPreview extends ConfigurationItem {
 						x := horizontal + Round((columnWidth - imageWidth) / 2)
 						y := vertical + Round((rowHeight - (labelHeight + this.kLabelMargin) - imageHeight) / 2)
 						
-						; variable := "bbControl" + vHandleCounter++
-						
-						Gui BBP:Add, Picture, x%x% y%y% w%imageWidth% h%imageHeight% BackgroundTrans, %image% ; v%variable% gcontrolEvent
+						Gui BBP:Add, Picture, x%x% y%y% w%imageWidth% h%imageHeight% BackgroundTrans, %image%
 
 						this.registerControl(variable, function, x, y, imageWidth, imageHeight)
 						
@@ -4169,7 +4580,7 @@ class ButtonBoxPreview extends ConfigurationItem {
 							x := horizontal + Round((columnWidth - labelWidth) / 2)
 							y := vertical + rowHeight - labelHeight
 							
-							Gui BBP:Add, Text, x%x% y%y% w%labelWidth% h%labelHeight% +Border -Background  +0x1000 +0x1 ; Hwnd%variable% 
+							Gui BBP:Add, Text, x%x% y%y% w%labelWidth% h%labelHeight% +Border -Background  +0x1000 +0x1
 						}
 					}
 				}
@@ -4217,7 +4628,8 @@ class ButtonBoxPreview extends ConfigurationItem {
 						labelHeight := 0
 					}
 					
-					descriptor := string2Values(";", getConfigurationValue(this.Configuration, "Controls", ConfigurationItem.splitDescriptor(descriptor[1])[1], ""))
+					descriptor := string2Values(";", getConfigurationValue(this.Configuration, "Controls"
+																		 , ConfigurationItem.splitDescriptor(descriptor[1])[1], ""))
 					
 					if (descriptor.Length() > 0) {
 						descriptor := string2Values("x", descriptor[3])

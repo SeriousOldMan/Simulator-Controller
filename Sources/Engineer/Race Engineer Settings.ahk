@@ -703,6 +703,10 @@ importFromSimulation(settings := false) {
 				setConfigurationValue(settings, "Race Setup", "Tyre.Dry.Pressure.FR", Round(spDryFrontRightEdit, 1))
 				setConfigurationValue(settings, "Race Setup", "Tyre.Dry.Pressure.RL", Round(spDryRearLeftEdit, 1))
 				setConfigurationValue(settings, "Race Setup", "Tyre.Dry.Pressure.RR", Round(spDryRearRightEdit, 1))
+				
+				showMessage("Tyre setup imported: Dry, Set " . spSetupTyreSetEdit . "; "
+						  . Round(spDryFrontLeftEdit, 1) . ", " . Round(spDryFrontRightEdit, 1) . ", "
+						  . Round(spDryRearLeftEdit, 1) . ", " . Round(spDryRearRightEdit, 1), false, "Information.png", 5000)
 			}
 			else {
 				GuiControl Choose, spSetupTyreCompoundDropDown, 2
@@ -726,6 +730,10 @@ importFromSimulation(settings := false) {
 				setConfigurationValue(settings, "Race Setup", "Tyre.Wet.Pressure.FR", Round(spWetFrontRightEdit, 1))
 				setConfigurationValue(settings, "Race Setup", "Tyre.Wet.Pressure.RL", Round(spWetRearLeftEdit, 1))
 				setConfigurationValue(settings, "Race Setup", "Tyre.Wet.Pressure.RR", Round(spWetRearRightEdit, 1))
+				
+				showMessage("Tyre setup imported: Wet; "
+						  . Round(spWetFrontLeftEdit, 1) . ", " . Round(spWetFrontRightEdit, 1) . ", "
+						  . Round(spWetRearLeftEdit, 1) . ", " . Round(spWetRearRightEdit, 1), false, "Information.png", 5000)
 			}
 			else {
 				GuiControl Choose, spSetupTyreCompoundDropDown, 1

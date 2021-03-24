@@ -79,6 +79,7 @@ class GridButtonBox extends ButtonBox {
 	static kBottomMargin := 15
 	
 	iName := false
+	iLayout := false
 	
 	iRows := 0
 	iColumns := 0
@@ -99,6 +100,12 @@ class GridButtonBox extends ButtonBox {
 	Name[] {
 		Get {
 			return this.iName
+		}
+	}
+	
+	Layout[] {
+		Get {
+			return this.iLayout
 		}
 	}
 	
@@ -147,8 +154,9 @@ class GridButtonBox extends ButtonBox {
 		}
 	}
 	
-	__New(name, controller, configuration) {
+	__New(name, layout, controller, configuration) {
 		this.iName := name
+		this.iLayout := layout
 		
 		base.__New(controller, configuration)
 	}
@@ -156,7 +164,7 @@ class GridButtonBox extends ButtonBox {
 	loadFromConfiguration(configuration) {
 		base.loadFromConfiguration(configuration)
 		
-		layout := string2Values(",", getConfigurationValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Name, "Layout"), ""))
+		layout := string2Values(",", getConfigurationValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Layout, "Layout"), ""))
 		
 		if (layout.Length() > 1)
 			this.iRowMargin := layout[2]
@@ -178,7 +186,7 @@ class GridButtonBox extends ButtonBox {
 		rows := []
 		
 		Loop % this.Rows
-			rows.Push(string2Values(";", getConfigurationValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Name, A_Index), "")))
+			rows.Push(string2Values(";", getConfigurationValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Layout, A_Index), "")))
 		
 		this.iRowDefinitions := rows
 	}
@@ -413,8 +421,11 @@ moveButtonBox() {
 initializeButtonBoxPlugin() {
 	controller := SimulatorController.Instance
 	
-	for ignore, buttonBoxName in string2Values("|", getConfigurationValue(controller.Configuration, "Controller Layouts", "Button Boxes", ""))
-		new GridButtonBox(buttonBoxName, controller, readConfiguration(getFileName("Button Box Configuration.ini", kUserConfigDirectory, kConfigDirectory)))
+	for ignore, btnBox in string2Values("|", getConfigurationValue(controller.Configuration, "Controller Layouts", "Button Boxes", "")) {
+		btnBox := string2Values(":", btnBox)
+	
+		new GridButtonBox(btnBox[1], btnBox[2], controller, readConfiguration(getFileName("Button Box Configuration.ini", kUserConfigDirectory, kConfigDirectory)))
+	}
 }
 
 

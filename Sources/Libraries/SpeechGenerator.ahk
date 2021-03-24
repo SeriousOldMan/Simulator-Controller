@@ -94,13 +94,13 @@ class SpeechGenerator {
 
 	computeVoice(voice, language, randomize := true) {
 		voices := this.Voices
-		
+	
 		if ((voice == true) && language && kLanguageVoices.HasKey(language)) {
 			availableVoices := []
 			
-			for ignore, voice in kLanguageVoices[language]
-				if inList(voices, voice)
-					availableVoices.Push(voice)
+			for ignore, candidate in kLanguageVoices[language]
+				if inList(voices, candidate)
+					availableVoices.Push(candidate)
 			
 			count := availableVoices.Length()
 			

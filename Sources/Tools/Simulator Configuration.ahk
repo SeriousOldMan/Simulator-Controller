@@ -3599,12 +3599,13 @@ class ButtonBoxesEditor extends ConfigurationItem {
 		this.createControls(this.iButtonBoxConfiguration)
 	}
 	
-	saveToConfiguration(configuration) {
-		base.saveToConfiguration(configuration)
+	saveToConfiguration(configuration, save := true) {
+		if save
+			base.saveToConfiguration(configuration)
 		
-		this.iControlsList.saveToConfiguration(configuration)
-		this.iLabelsList.saveToConfiguration(configuration)
-		this.iLayoutsList.saveToConfiguration(configuration)
+		this.iControlsList.saveToConfiguration(configuration, save)
+		this.iLabelsList.saveToConfiguration(configuration, save)
+		this.iLayoutsList.saveToConfiguration(configuration, save)
 	}
 	
 	createControls(configuration) {
@@ -3662,7 +3663,7 @@ class ButtonBoxesEditor extends ConfigurationItem {
 		this.saveButtonBox()
 		
 		if this.ButtonBoxPreview {
-			this.ButtonBoxPreview.hide()
+			this.ButtonBoxPreview.close()
 			
 			this.iButtonBoxPreview := false
 		}
@@ -3673,21 +3674,21 @@ class ButtonBoxesEditor extends ConfigurationItem {
 	updateButtonBoxPreview(name) {
 		configuration := newConfiguration()
 		
-		this.saveToConfiguration(configuration)
+		this.saveToConfiguration(configuration, false)
 		
 		this.iButtonBoxConfiguration := configuration
 		
-		if this.ButtonBoxPreview {
-			this.ButtonBoxPreview.hide()
-			
-			this.iButtonBoxPreview := false
-		}
+		oldPreview := this.ButtonBoxPreview
+		this.iButtonBoxPreview := false
 		
 		if name {
 			this.iButtonBoxPreview := new ButtonBoxPreview(this, name, configuration)
 		
-			this.ButtonBoxPreview.show()
+			this.ButtonBoxPreview.open()
 		}
+		
+		if oldPreview
+			oldPreview.close()
 	}
 }
 
@@ -3707,17 +3708,6 @@ cancelButtonBoxesEditor() {
 	
 	try {
 		ButtonBoxesEditor.Instance.closeEditor(false)
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-refreshButtonBoxPreview() {
-	protectionOn()
-	
-	try {
-		ButtonBoxesEditor.Instance.refreshButtonBoxPreview()
 	}
 	finally {
 		protectionOff()
@@ -3799,8 +3789,9 @@ class ControlsList extends ConfigurationItemList {
 		this.iItemsList := controls
 	}
 		
-	saveToConfiguration(configuration) {
-		base.saveToConfiguration(configuration)
+	saveToConfiguration(configuration, save := true) {
+		if save
+			base.saveToConfiguration(configuration)
 		
 		controls := {}
 		
@@ -3965,8 +3956,9 @@ class LabelsList extends ConfigurationItemList {
 		this.iItemsList := labels
 	}
 		
-	saveToConfiguration(configuration) {
-		base.saveToConfiguration(configuration)
+	saveToConfiguration(configuration, save := true) {
+		if save
+			base.saveToConfiguration(configuration)
 		
 		labels := {}
 		
@@ -4153,8 +4145,9 @@ class LayoutsList extends ConfigurationItemList {
 		this.iItemsList := items
 	}
 		
-	saveToConfiguration(configuration) {
-		base.saveToConfiguration(configuration)
+	saveToConfiguration(configuration, save := true) {
+		if save
+			base.saveToConfiguration(configuration)
 		
 		for ignore, layout in this.iItemsList {
 			grid := layout[2]["Grid"]
@@ -4172,7 +4165,7 @@ class LayoutsList extends ConfigurationItemList {
 		static inCall := false
 		
 		Gui ListView, % this.ListHandle
-	
+		
 		LV_Delete()
 		
 		this.iItemsList := items
@@ -4258,11 +4251,6 @@ class LayoutsList extends ConfigurationItemList {
 		}
 			
 		GuiControl Text, layoutRowEdit, %layoutRowEdit%
-		
-		preview := ButtonBoxesEditor.Instance.ButtonBoxPreview
-		
-		if ((this.CurrentButtonBox != layoutNameEdit) || (!preview && (layoutNameEdit != "")) || (preview && (preview.Name != layoutNameEdit)))
-			ButtonBoxesEditor.Instance.updateButtonBoxPreview(this.CurrentButtonBox)
 	}
 	
 	clearEditor() {
@@ -4312,7 +4300,7 @@ class LayoutsList extends ConfigurationItemList {
 			this.iRowDefinitions[this.iSelectedRow] := layoutRowEdit
 		
 		if (layoutRowDropDown > 0) {
-			layoutRowEdit := (this.iRowDefinitions.HasKey(layoutRowDropDown) ? this.iRowDefinitions[layoutRowDropDown] : "")
+			layoutRowEdit := ((this.iRowDefinitions.Length() >= layoutRowDropDown) ? this.iRowDefinitions[layoutRowDropDown] : "")
 			
 			this.iSelectedRow := layoutRowDropDown
 			
@@ -4392,8 +4380,12 @@ class ButtonBoxPreview extends ConfigurationItem {
 	static kBorderMargin := 20
 	static kBottomMargin := 15
 	
+	static sCurrentWindow := 0
+	
 	iEditor := false
 	iName := ""
+	
+	iWindow := false
 	
 	iWidth := 0
 	iHeight := 0
@@ -4417,6 +4409,18 @@ class ButtonBoxPreview extends ConfigurationItem {
 	Name[] {
 		Get {
 			return this.iName
+		}
+	}
+	
+	Window[] {
+		Get {
+			return this.iWindow
+		}
+	}
+	
+	CurrentWindow[] {
+		Get {
+			return ("BBP" . ButtonBoxPreview.sCurrentWindow)
 		}
 	}
 	
@@ -4481,6 +4485,10 @@ class ButtonBoxPreview extends ConfigurationItem {
 		this.iEditor := editor
 		this.iName := name
 		
+		ButtonBoxPreview.sCurrentWindow += 1
+		
+		this.iWindow := this.CurrentWindow
+		
 		base.__New(configuration)
 		
 		this.createControls(configuration)
@@ -4533,16 +4541,18 @@ class ButtonBoxPreview extends ConfigurationItem {
 		height += ((rowHeights.Length() - 1) * this.RowMargin) + this.kHeaderHeight + this.BottomMargin
 		width += ((columnWidths.Length() - 1) * this.ColumnMargin) + (2 * this.BorderMargin)
 		
-		Gui BBP:-Border -Caption
+		window := this.Window
 		
-		Gui BBP:Add, Picture, x-10 y-10, % kButtonBoxImagesDirectory . "Photorealistic\CF Background.png"
+		Gui %window%:-Border -Caption
 		
-		Gui BBP:Font, s12 Bold cSilver
-		Gui BBP:Add, Text, x0 y8 w%width% h23 +0x200 +0x1 BackgroundTrans gmoveButtonBoxPreview, % translate("Modular Simulator Controller System")
-		Gui BBP:Font, s10 cSilver
-		Gui BBP:Add, Text, x0 y28 w%width% h23 +0x200 +0x1 BackgroundTrans gmoveButtonBoxPreview, % translate(this.Name)
-		Gui BBP:Color, 0x000000
-		Gui BBP:Font, s8 Norm, Arial
+		Gui %window%:Add, Picture, x-10 y-10, % kButtonBoxImagesDirectory . "Photorealistic\CF Background.png"
+		
+		Gui %window%:Font, s12 Bold cSilver
+		Gui %window%:Add, Text, x0 y8 w%width% h23 +0x200 +0x1 BackgroundTrans gmoveButtonBoxPreview, % translate("Modular Simulator Controller System")
+		Gui %window%:Font, s10 cSilver
+		Gui %window%:Add, Text, x0 y28 w%width% h23 +0x200 +0x1 BackgroundTrans gmoveButtonBoxPreview, % translate(this.Name)
+		Gui %window%:Color, 0x000000
+		Gui %window%:Font, s8 Norm, Arial
 		
 		vertical := this.kHeaderHeight
 		
@@ -4590,17 +4600,17 @@ class ButtonBoxPreview extends ConfigurationItem {
 						x := horizontal + Round((columnWidth - imageWidth) / 2)
 						y := vertical + Round((rowHeight - (labelHeight + this.kLabelMargin) - imageHeight) / 2)
 						
-						Gui BBP:Add, Picture, x%x% y%y% w%imageWidth% h%imageHeight% BackgroundTrans, %image%
+						Gui %window%:Add, Picture, x%x% y%y% w%imageWidth% h%imageHeight% BackgroundTrans, %image%
 
 						this.registerControl(variable, function, x, y, imageWidth, imageHeight)
 						
 						if ((labelHeight > 0) && (labelHeight > 0)) {
-							Gui BBP:Font, s8 Norm
+							Gui %window%:Font, s8 Norm
 					
 							x := horizontal + Round((columnWidth - labelWidth) / 2)
 							y := vertical + rowHeight - labelHeight
 							
-							Gui BBP:Add, Text, x%x% y%y% w%labelWidth% h%labelHeight% +Border -Background  +0x1000 +0x1
+							Gui %window%:Add, Text, x%x% y%y% w%labelWidth% h%labelHeight% +Border -Background  +0x1000 +0x1
 						}
 					}
 				}
@@ -4611,7 +4621,7 @@ class ButtonBoxPreview extends ConfigurationItem {
 			vertical += (rowHeight + this.RowMargin)
 		}
 
-		Gui BBP:Add, Picture, x-10 y-10 gmoveButtonBoxPreview 0x4000000, % kButtonBoxImagesDirectory . "Photorealistic\CF Background.png"
+		Gui %window%:Add, Picture, x-10 y-10 gmoveButtonBoxPreview 0x4000000, % kButtonBoxImagesDirectory . "Photorealistic\CF Background.png"
 		
 		this.iWidth := width
 		this.iHeight := height
@@ -4672,7 +4682,7 @@ class ButtonBoxPreview extends ConfigurationItem {
 		}
 	}
 	
-	show() {
+	open() {
 		width := this.Width
 		height := this.Height
 		
@@ -4690,16 +4700,22 @@ class ButtonBoxPreview extends ConfigurationItem {
 			y := mainScreenBottom - height
 		}
 		
-		Gui BBP:Show, x%x% y%y% w%width% h%height% NoActivate
+		window := this.Window
+		
+		Gui %window%:Show, x%x% y%y% w%width% h%height% NoActivate
 	}
 	
-	hide() {
-		Gui BBP:Destroy
+	close() {
+		window := this.Window
+		
+		Gui %window%:Destroy
 	}
 }
 
 moveButtonBoxPreview() {
-	moveByMouse("BBP")
+	window := ButtonBoxPreview.CurrentWindow
+	
+	moveByMouse(window)
 	
 	WinGetPos x, y, width, height, A
 	

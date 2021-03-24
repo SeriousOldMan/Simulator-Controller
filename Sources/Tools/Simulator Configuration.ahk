@@ -4126,10 +4126,10 @@ class LayoutsList extends ConfigurationItemList {
 		
 		Gui BBE:Font
 		
-		Gui BBE:Add, Edit, x242 y469 w40 h21 Limit2 Number VlayoutRowMarginEdit, %layoutRowMarginEdit%
-		Gui BBE:Add, Edit, x292 y469 w40 h21 Limit2 Number VlayoutColumnMarginEdit, %layoutColumnMarginEdit%
-		Gui BBE:Add, Edit, x342 y469 w40 h21 Limit2 Number VlayoutBorderMarginEdit, %layoutBorderMarginEdit%
-		Gui BBE:Add, Edit, x392 y469 w40 h21 Limit2 Number VlayoutBottomMarginEdit, %layoutBottomMarginEdit%
+		Gui BBE:Add, Edit, x242 y469 w40 h21 Limit2 Number gupdateLayoutRowEditor VlayoutRowMarginEdit, %layoutRowMarginEdit%
+		Gui BBE:Add, Edit, x292 y469 w40 h21 Limit2 Number gupdateLayoutRowEditor VlayoutColumnMarginEdit, %layoutColumnMarginEdit%
+		Gui BBE:Add, Edit, x342 y469 w40 h21 Limit2 Number gupdateLayoutRowEditor VlayoutBorderMarginEdit, %layoutBorderMarginEdit%
+		Gui BBE:Add, Edit, x392 y469 w40 h21 Limit2 Number gupdateLayoutRowEditor VlayoutBottomMarginEdit, %layoutBottomMarginEdit%
 		
 		Gui BBE:Add, DropDownList, x8 y510 w86 AltSubmit Choose0 gupdateLayoutRowEditor VlayoutRowDropDown, |
 		
@@ -4402,6 +4402,12 @@ class LayoutsList extends ConfigurationItemList {
 			
 			GuiControl Text, layoutRowEdit, %layoutRowEdit%
 		}
+		
+		if (save && ConfigurationEditor.Instance.AutoSave) {
+			if (this.iCurrentItemIndex != 0) {
+				this.updateItem()
+			}
+		}
 	}
 	
 	getRowDefinition(row) {
@@ -4428,27 +4434,28 @@ class LayoutsList extends ConfigurationItemList {
 		ButtonBoxesEditor.Instance.updateButtonBoxPreview(this.CurrentButtonBox)
 	}
 	
-	changeControl(row, column, control) {
+	changeControl(row, column, control, number := false) {
 		rowDefinition := this.getRowDefinition(row)
 		
 		definition := string2Values(",", rowDefinition[column])
 		
-		if (control = true) {
-			title := translate("Control Number")
-			prompt := translate("Please enter a controller function number.")
-			number := ConfigurationItem.splitDescriptor(definition[1])[2]
-			locale := ((getLanguage() = "en") ? "" : "Locale")
+		if (control = "__Number__") {
+			if !number {
+				title := translate("Control Number")
+				prompt := translate("Please enter a controller function number.")
+				number := ConfigurationItem.splitDescriptor(definition[1])[2]
+				locale := ((getLanguage() = "en") ? "" : "Locale")
+				
+				InputBox number, %title%, %prompt%, , 200, 140, , , %locale%, , %number%
 			
-			InputBox number, %title%, %prompt%, , 200, 140, , , %locale%, , %number%
-			
-			if ErrorLevel
-				return
-			else {
-				if (definition.Length() = 1)
-					definition := ConfigurationItem.descriptor(ConfigurationItem.splitDescriptor(definition[1])[1], number)
-				else
-					definition := (ConfigurationItem.descriptor(ConfigurationItem.splitDescriptor(definition[1])[1], number) . "," . definition[2])
+				if ErrorLevel
+					return
 			}
+			
+			if (definition.Length() = 1)
+				definition := ConfigurationItem.descriptor(ConfigurationItem.splitDescriptor(definition[1])[1], number)
+			else
+				definition := (ConfigurationItem.descriptor(ConfigurationItem.splitDescriptor(definition[1])[1], number) . "," . definition[2])
 		}
 		else if control {
 			if (definition.Length() = 0)
@@ -4743,12 +4750,12 @@ class ButtonBoxPreview extends ConfigurationItem {
 					Gui %window%:Add, Picture, x%x% y%y% w%imageWidth% h%imageHeight% BackgroundTrans gopenControlMenu, %image%
 
 					if ((labelWidth > 0) && (labelHeight > 0)) {
-						Gui %window%:Font, s8 Norm
+						Gui %window%:Font, s8 Norm cBlack
 				
 						x := horizontal + Round((columnWidth - labelWidth) / 2)
 						y := vertical + rowHeight - labelHeight
 						
-						Gui %window%:Add, Text, x%x% y%y% w%labelWidth% h%labelHeight% +Border -Background  +0x1000 +0x1 gopenControlMenu
+						Gui %window%:Add, Text, x%x% y%y% w%labelWidth% h%labelHeight% +Border -Background  +0x1000 +0x1 gopenControlMenu, %number%
 					}
 				}
 				
@@ -5022,11 +5029,46 @@ openControlMenu() {
 			
 			if !isEmpty {
 				Menu ControlMenu, Add
+			
+				try {
+					Menu NumberMenu, DeleteAll
+				}
+				catch exception {
+					; ignore
+				}
 				
-				label := translate("Number...")
-				handler := ObjBindMethod(LayoutsList.Instance, "changeControl", row, column, true)
+				label := translate("Input...")
+				handler := ObjBindMethod(LayoutsList.Instance, "changeControl", row, column, "__Number__", false)
 				
-				Menu ControlMenu, Add, %label%, %handler%
+				Menu NumberMenu, Add, %label%, %handler%
+				Menu NumberMenu, Add
+				
+				count := 1
+				
+				Loop 4 {
+					label := (count . " - " . (count + 10))
+					
+					menu := ("NumSubMenu" . A_Index)
+				
+					try {
+						Menu %menu%, DeleteAll
+					}
+					catch exception {
+						; ignore
+					}
+					
+					Loop 10 {
+						handler := ObjBindMethod(LayoutsList.Instance, "changeControl", row, column, "__Number__", count)
+						Menu %menu%, Add, %count%, %handler%
+						
+						count += 1
+					}
+				
+					Menu NumberMenu, Add, %label%, :%menu%
+				}
+				
+				label := translate("Number")
+				Menu ControlMenu, Add, %label%, :NumberMenu
 			}
 			
 			label := translate("Control")

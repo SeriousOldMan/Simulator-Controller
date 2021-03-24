@@ -4359,7 +4359,7 @@ class LayoutsList extends ConfigurationItemList {
 			changed := true
 		}
 		else if (layoutRowsEdit < rows) {
-			this.iRowDefinitions.RemoveAt(layoutRowsEdit + A_Index - 1, rows - layoutRowsEdit)
+			this.iRowDefinitions.RemoveAt(layoutRowsEdit + 1, rows - layoutRowsEdit)
 			
 			changed := true
 		}

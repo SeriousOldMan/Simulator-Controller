@@ -4794,8 +4794,7 @@ class ButtonBoxPreview extends ConfigurationItem {
 				descriptor := string2Values(",", descriptor)
 				
 				if (descriptor.Length() > 1) {
-					label := getConfigurationValue(this.Configuration, "Labels", descriptor[2], "")
-					label := string2Values("x", label)
+					label := string2Values("x", getConfigurationValue(this.Configuration, "Labels", descriptor[2], ""))
 					labelWidth := label[1]
 					labelHeight := label[2]
 				}
@@ -5006,6 +5005,7 @@ openControlMenu() {
 			Gui BBE:Default
 			
 			Menu GridElement, Add, %menuItem%, menuIgnore
+			Menu GridElement, Disable, %menuItem%
 			Menu GridElement, Add
 			
 			try {
@@ -5046,7 +5046,7 @@ openControlMenu() {
 				count := 1
 				
 				Loop 4 {
-					label := (count . " - " . (count + 10))
+					label := (count . " - " . (count + 9))
 					
 					menu := ("NumSubMenu" . A_Index)
 				

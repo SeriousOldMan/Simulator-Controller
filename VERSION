@@ -3,4 +3,4 @@ Current=2.7.0-dev
 Target=2.7.0-release
 Release=2.6.2-release
 Changes=Improved stint time management, Initial setup for Big Data Collection, Rework of the configuration tool, Forced tyre compound change for Jona, Improved handling of ACC Pitstop MFD, Fix for Refuel Amount in Pitstop
-Date=03/22/2021
+Date=03/24/2021

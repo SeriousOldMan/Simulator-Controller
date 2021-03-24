@@ -318,7 +318,8 @@ listEvent() {
 			else
 				vItemLists[A_GuiControl].openEditor(A_EventInfo)
 		}
-		else if ((A_GuiEvent == "I") && (A_GuiControl != "translationsListView"))
+		else if ((A_GuiEvent == "I") && !inList(["translationsListView", "controlsListView"
+											   , "labelsListView", "layoutsListView"], A_GuiControl))
 			if InStr(ErrorLevel, "S", true)
 				vItemLists[A_GuiControl].openEditor(A_EventInfo)
 	}
@@ -3756,20 +3757,20 @@ class ControlsList extends ConfigurationItemList {
 		
 		Gui BBE:Font, Norm, Arial
 		Gui BBE:Add, ListView, x16 y79 w134 h108 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndcontrolsListViewHandle VcontrolsListView glistEvent
-							, % values2String("|", map(["Control", "Type", "Size"], "translate")*)
+							 , % values2String("|", map(["Control", "Type", "Size"], "translate")*)
 							
 		Gui BBE:Add, Text, x164 y79 w80 h23 +0x200, % translate("Control")
-		Gui BBE:Add, Edit, x214 y80 w79 h21 VcontrolNameEdit, %controlNameEdit%
-		Gui BBE:Add, DropDownList, x295 y79 w105 AltSubmit Choose%controlTypeDropDown% VcontrolTypeDropDown, % values2String("|", map(["1-way Toggle", "2-way Toggle", "Button", "Dial"], "translate")*)
-		
+		Gui BBE:Add, Edit, x214 y80 w101 h21 VcontrolNameEdit, %controlNameEdit%
+		Gui BBE:Add, DropDownList, x321 y79 w105 AltSubmit Choose%controlTypeDropDown% VcontrolTypeDropDown, % values2String("|", map(["1-way Toggle", "2-way Toggle", "Button", "Dial"], "translate")*)
+		;426 400 
 		Gui BBE:Add, Text, x164 y103 w80 h23 +0x200, % translate("Image")
 		Gui BBE:Add, Edit, x214 y103 w186 h21 VimageFilePathEdit, %imageFilePathEdit%
 		Gui BBE:Add, Button, x403 y103 w23 h23 gchooseImageFilePath, % translate("...")
 		
 		Gui BBE:Add, Text, x164 y127 w80 h23 +0x200, % translate("Size")
 		Gui BBE:Add, Edit, x214 y127 w40 h21 Limit3 Number VimageWidthEdit, %imageWidthEdit%
-		Gui BBE:Add, Text, x259 y127 w31 h23 +0x200 Center, % translate("x")
-		Gui BBE:Add, Edit, x295 y127 w40 h21 Limit3 Number VimageHeightEdit, %imageHeightEdit%
+		Gui BBE:Add, Text, x254 y127 w21 h23 +0x200 Center, % translate("x")
+		Gui BBE:Add, Edit, x275 y127 w40 h21 Limit3 Number VimageHeightEdit, %imageHeightEdit%
 		
 		Gui BBE:Add, Button, x226 y164 w46 h23 VcontrolAddButton gaddItem, % translate("Add")
 		Gui BBE:Add, Button, x275 y164 w50 h23 Disabled VcontrolDeleteButton gdeleteItem, % translate("Delete")
@@ -3865,6 +3866,21 @@ class ControlsList extends ConfigurationItemList {
 		else
 			return Array(controlNameEdit, [k1WayToggleType, k2WayToggleType, kButtonType, kDialType][controlTypeDropDown], imageFilePathEdit, imageWidthEdit . " x " . imageHeightEdit)
 	}
+	
+	getControls() {
+		if ConfigurationEditor.Instance.AutoSave {
+			if (this.iCurrentItemIndex != 0) {
+				this.updateItem()
+			}
+		}
+		
+		controls := {}
+		
+		for ignore, control in this.iItemsList
+			controls[control[1]] := values2String(";", control[2], control[3], control[4])
+		
+		return controls
+	}
 }
 
 chooseImageFilePath() {
@@ -3927,16 +3943,15 @@ class LabelsList extends ConfigurationItemList {
 		
 		Gui BBE:Font, Norm, Arial
 		Gui BBE:Add, ListView, x16 y224 w134 h84 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndlabelsListViewHandle VlabelsListView glistEvent
-							, % values2String("|", map(["Label", "Size"], "translate")*)
-		
-		
+							 , % values2String("|", map(["Label", "Size"], "translate")*)
+							
 		Gui BBE:Add, Text, x164 y224 w80 h23 +0x200, % translate("Label")
-		Gui BBE:Add, Edit, x214 y225 w79 h21 VlabelNameEdit, %labelNameEdit%
+		Gui BBE:Add, Edit, x214 y225 w101 h21 VlabelNameEdit, %labelNameEdit%
 		
 		Gui BBE:Add, Text, x164 y248 w80 h23 +0x200, % translate("Size")
 		Gui BBE:Add, Edit, x214 y248 w40 h21 Limit3 Number VlabelWidthEdit, %labelWidthEdit%
-		Gui BBE:Add, Text, x259 y248 w31 h23 +0x200 Center, % translate("x")
-		Gui BBE:Add, Edit, x295 y248 w40 h21 Limit3 Number VlabelHeightEdit, %labelHeightEdit%
+		Gui BBE:Add, Text, x254 y248 w21 h23 +0x200 Center, % translate("x")
+		Gui BBE:Add, Edit, x275 y248 w40 h21 Limit3 Number VlabelHeightEdit, %labelHeightEdit%
 		
 		Gui BBE:Add, Button, x226 y285 w46 h23 VlabelAddButton gaddItem, % translate("Add")
 		Gui BBE:Add, Button, x275 y285 w50 h23 Disabled VlabelDeleteButton gdeleteItem, % translate("Delete")
@@ -4024,6 +4039,21 @@ class LabelsList extends ConfigurationItemList {
 		else
 			return Array(labelNameEdit, labelWidthEdit . " x " . labelHeightEdit)
 	}
+	
+	getLabels() {
+		if ConfigurationEditor.Instance.AutoSave {
+			if (this.iCurrentItemIndex != 0) {
+				this.updateItem()
+			}
+		}
+		
+		labels := {}
+		
+		for ignore, label in this.iItemsList
+			labels[label[1]] := label[2]
+		
+		return labels
+	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -4069,7 +4099,7 @@ class LayoutsList extends ConfigurationItemList {
 
 	createControls(configuration) {
 		Gui BBE:Add, ListView, x8 y330 w424 h90 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndlayoutsListViewHandle VlayoutsListView glistEvent
-							, % values2String("|", map(["Button Box", "Grid", "Margins", "Definition"], "translate")*)
+							 , % values2String("|", map(["Button Box", "Grid", "Margins", "Definition"], "translate")*)
 		
 		Gui BBE:Add, Text, x8 y430 w86 h23 +0x200, % translate("Button Box")
 		Gui BBE:Add, Edit, x102 y430 w110 h21 VlayoutNameEdit, %layoutNameEdit%
@@ -4251,10 +4281,15 @@ class LayoutsList extends ConfigurationItemList {
 		}
 			
 		GuiControl Text, layoutRowEdit, %layoutRowEdit%
+		
+		preview := ButtonBoxesEditor.Instance.ButtonBoxPreview
+		
+		if ((this.CurrentButtonBox != layoutNameEdit) || (!preview && (layoutNameEdit != "")) || (preview && (preview.Name != layoutNameEdit)))
+			ButtonBoxesEditor.Instance.updateButtonBoxPreview(this.CurrentButtonBox)
 	}
 	
 	clearEditor() {
-		this.loadEditor(Array("", {Grid: "1x1", Margins: [0,0,0,0]}))
+		this.loadEditor(Array("", {Grid: "0x0", Margins: [0,0,0,0]}))
 	}
 	
 	buildItemFromEditor(isNew := false) {
@@ -4291,12 +4326,14 @@ class LayoutsList extends ConfigurationItemList {
 		}
 	}
 	
-	updateLayoutRowEditor() {
+	updateLayoutRowEditor(save := true) {
+		Gui BBE:Default
+		
 		GuiControlGet layoutRowsEdit
 		GuiControlGet layoutRowDropDown
 		GuiControlGet layoutRowEdit
 		
-		if (this.iSelectedRow > 0)
+		if (save && (this.iSelectedRow > 0))
 			this.iRowDefinitions[this.iSelectedRow] := layoutRowEdit
 		
 		if (layoutRowDropDown > 0) {
@@ -4349,6 +4386,66 @@ class LayoutsList extends ConfigurationItemList {
 			
 			GuiControl Text, layoutRowEdit, %layoutRowEdit%
 		}
+	}
+	
+	getRowDefinition(row) {
+		rowDefinition := string2Values(";", this.iRowDefinitions[row])
+		
+		GuiControlGet layoutColumnsEdit
+		
+		if (rowDefinition.Length() > layoutColumnsEdit)
+			rowDefinition.RemoveAt(layoutColumnsEdit + 1, rowDefinition.Length() - layoutColumnsEdit)
+		else
+			Loop % layoutColumnsEdit - rowDefinition.Length()
+				rowDefinition.Push("")
+		
+		return rowDefinition
+	}
+	
+	setRowDefinition(row, rowDefinition) {
+		this.iRowDefinitions[row] := values2String(";", rowDefinition*)
+		
+		this.updateLayoutRowEditor(false)
+		
+		this.updateItem()
+		
+		ButtonBoxesEditor.Instance.updateButtonBoxPreview(this.CurrentButtonBox)
+	}
+	
+	changeControl(row, column, control) {
+		rowDefinition := this.getRowDefinition(row)
+		
+		definition := string2Values(",", rowDefinition[column])
+		
+		if control {
+			if (definition.Length() = 0)
+				definition := ConfigurationItem.descriptor(control, 1)
+			else if (definition.Length() = 1)
+				definition := ConfigurationItem.descriptor(control, ConfigurationItem.splitDescriptor(definition[1])[2])
+			else
+				definition := (ConfigurationItem.descriptor(control, ConfigurationItem.splitDescriptor(definition[1])[2]) . "," . definition[2])
+		}
+		else
+			definition := ""
+		
+		rowDefinition[column] := definition
+		
+		this.setRowDefinition(row, rowDefinition)
+	}
+	
+	changeLabel(row, column, label) {
+		rowDefinition := this.getRowDefinition(row)
+		
+		definition := string2Values(",", rowDefinition[column])
+		
+		if (definition.Length() = 0)
+			definition := (label ? ("," . label) : "")
+		else if (definition.Length() >= 1)
+			definition := (definition[1] . (label ? ("," . label) : ""))
+		
+		rowDefinition[column] := definition
+		
+		this.setRowDefinition(row, rowDefinition)
 	}
 }
 
@@ -4600,17 +4697,15 @@ class ButtonBoxPreview extends ConfigurationItem {
 						x := horizontal + Round((columnWidth - imageWidth) / 2)
 						y := vertical + Round((rowHeight - (labelHeight + this.kLabelMargin) - imageHeight) / 2)
 						
-						Gui %window%:Add, Picture, x%x% y%y% w%imageWidth% h%imageHeight% BackgroundTrans, %image%
+						Gui %window%:Add, Picture, x%x% y%y% w%imageWidth% h%imageHeight% BackgroundTrans gopenControlMenu, %image%
 
-						this.registerControl(variable, function, x, y, imageWidth, imageHeight)
-						
-						if ((labelHeight > 0) && (labelHeight > 0)) {
+						if ((labelWidth > 0) && (labelHeight > 0)) {
 							Gui %window%:Font, s8 Norm
 					
 							x := horizontal + Round((columnWidth - labelWidth) / 2)
 							y := vertical + rowHeight - labelHeight
 							
-							Gui %window%:Add, Text, x%x% y%y% w%labelWidth% h%labelHeight% +Border -Background  +0x1000 +0x1
+							Gui %window%:Add, Text, x%x% y%y% w%labelWidth% h%labelHeight% +Border -Background  +0x1000 +0x1 gopenControlMenu
 						}
 					}
 				}
@@ -4682,6 +4777,100 @@ class ButtonBoxPreview extends ConfigurationItem {
 		}
 	}
 	
+	getControl(clickX, clickY, ByRef row, ByRef column) {
+		local function
+		
+		rowHeights := false
+		columnWidths := false
+		
+		this.computeLayout(rowHeights, columnWidths)
+		
+		height := 0
+		Loop % rowHeights.Length()
+			height += rowHeights[A_Index]
+		
+		width := 0
+		Loop % columnWidths.Length()
+			width += columnWidths[A_Index]
+		
+		height += ((rowHeights.Length() - 1) * this.RowMargin) + this.kHeaderHeight + this.BottomMargin
+		width += ((columnWidths.Length() - 1) * this.ColumnMargin) + (2 * this.BorderMargin)
+		
+		vertical := this.kHeaderHeight
+		
+		Loop % this.Rows
+		{
+			row := A_Index
+			
+			rowHeight := rowHeights[A_Index]
+			rowDefinition := this.RowDefinitions[A_Index]
+		
+			horizontal := this.BorderMargin
+			
+			Loop % this.Columns
+			{
+				column := A_Index
+				
+				columnWidth := columnWidths[A_Index]
+			
+				descriptor := rowDefinition[A_Index]
+				
+				if (StrLen(descriptor) > 0) {
+					descriptor := string2Values(",", descriptor)
+				
+					if (descriptor.Length() > 1) {
+						label := string2Values("x", getConfigurationValue(this.Configuration, "Labels", descriptor[2], ""))
+						labelWidth := label[1]
+						labelHeight := label[2]
+					}
+					else {
+						labelWidth := 0
+						labelHeight := 0
+					}
+					
+					descriptor := ConfigurationItem.splitDescriptor(descriptor[1])
+					name := descriptor[1]
+					number := descriptor[2]
+					
+					descriptor := string2Values(";", getConfigurationValue(this.Configuration, "Controls", descriptor[1], ""))
+					
+					if (descriptor.Length() > 0) {
+						function := descriptor[1]
+						image := substituteVariables(descriptor[2])
+						
+						descriptor := string2Values("x", descriptor[3])
+						imageWidth := descriptor[1]
+						imageHeight := descriptor[2]
+						
+						function := ConfigurationItem.descriptor(function, number)
+
+						x := horizontal + Round((columnWidth - imageWidth) / 2)
+						y := vertical + Round((rowHeight - (labelHeight + this.kLabelMargin) - imageHeight) / 2)
+						
+						if ((clickX >= x) && (clickX <= (x + imageWidth)) && (clickY >= y) && (clickY <= (y + imageHeight)))
+							return ["Control", ConfigurationItem.descriptor(name, number)]
+						
+						if ((labelWidth > 0) && (labelHeight > 0)) {
+							Gui %window%:Font, s8 Norm
+					
+							x := horizontal + Round((columnWidth - labelWidth) / 2)
+							y := vertical + rowHeight - labelHeight
+							
+							if ((clickX >= x) && (clickX <= (x + labelWidth)) && (clickY >= y) && (clickY <= (y + labelHeight)))
+								return ["Label", ConfigurationItem.descriptor(name, number)]
+						}
+					}
+				}
+				
+				horizontal += (columnWidth + this.ColumnMargin)
+			}
+		
+			vertical += (rowHeight + this.RowMargin)
+		}
+
+		return false
+	}
+	
 	open() {
 		width := this.Width
 		height := this.Height
@@ -4720,6 +4909,91 @@ moveButtonBoxPreview() {
 	WinGetPos x, y, width, height, A
 	
 	ButtonBoxesEditor.Instance.setButtonBoxPreviewPosition(x + Round(width / 2), y + Round(height / 2))
+}
+
+openControlMenu() {
+	curCoordMode := A_CoordModeMouse
+	
+	CoordMode Mouse, Window
+		
+	try {	
+		MouseGetPos clickX, clickY
+		
+		row := 0
+		column := 0
+		
+		control := ButtonBoxesEditor.Instance.ButtonBoxPreview.getControl(clickX, clickY, row, column)
+		
+		if control {
+			menuItem := (control[1] . ": " . control[2] . " (" . row . " x " . column . ")")
+			
+			try {
+				Menu GridElement, DeleteAll
+			}
+			catch exception {
+				; ignore
+			}
+			
+			Gui BBE:Default
+			
+			Menu GridElement, Add, %menuItem%, menuIgnore
+			Menu GridElement, Add
+			
+			try {
+				Menu ControlMenu, DeleteAll
+			}
+			catch exception {
+				; ignore
+			}
+			
+			label := translate("None")
+			handler := ObjBindMethod(LayoutsList.Instance, "changeControl", row, column, false)
+			
+			Menu ControlMenu, Add, %label%, %handler%
+			Menu ControlMenu, Add
+			
+			for control, definition in ControlsList.Instance.getControls() {
+				handler := ObjBindMethod(LayoutsList.Instance, "changeControl", row, column, control)
+			
+				Menu ControlMenu, Add, %control%, %handler%
+			}
+			
+			try {
+				Menu LabelMenu, DeleteAll
+			}
+			catch exception {
+				; ignore
+			}
+			
+			label := translate("None")
+			handler := ObjBindMethod(LayoutsList.Instance, "changeLabel", row, column, false)
+			
+			Menu LabelMenu, Add, %label%, %handler%
+			Menu LabelMenu, Add
+			
+			for label, definition in LabelsList.Instance.getLabels() {
+				handler := ObjBindMethod(LayoutsList.Instance, "changeLabel", row, column, label)
+			
+				Menu LabelMenu, Add, %label%, %handler%
+			}
+			
+			label := translate("Control")
+			
+			Menu GridElement, Add, %label%, :ControlMenu
+			
+			label := translate("Label")
+			
+			Menu GridElement, Add, %label%, :LabelMenu
+			
+			Menu GridElement, Show
+		}
+	}
+	finally {
+		CoordMode Mouse, curCoordMode
+	}
+}
+
+menuIgnore() {
 }
 
 

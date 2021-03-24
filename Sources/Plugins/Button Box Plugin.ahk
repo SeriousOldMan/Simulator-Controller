@@ -293,7 +293,7 @@ class GridButtonBox extends ButtonBox {
 
 						this.registerControl(variable, function, x, y, imageWidth, imageHeight)
 						
-						if ((labelHeight > 0) && (labelHeight > 0)) {
+						if ((labelWidth > 0) && (labelHeight > 0)) {
 							Gui %window%:Font, s8 Norm
 					
 							x := horizontal + Round((columnWidth - labelWidth) / 2)

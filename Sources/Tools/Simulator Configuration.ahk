@@ -47,6 +47,8 @@ global kApply = "apply"
 global kOk = "ok"
 global kCancel = "cancel"
 
+global kEmptySpaceDescriptor = "Button;" . kButtonBoxImagesDirectory . "Empty.png;52 x 52"
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Variable Section                         ;;;
@@ -4098,40 +4100,40 @@ class LayoutsList extends ConfigurationItemList {
 	}
 
 	createControls(configuration) {
-		Gui BBE:Add, ListView, x8 y330 w424 h90 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndlayoutsListViewHandle VlayoutsListView glistEvent
+		Gui BBE:Add, ListView, x8 y330 w424 h105 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndlayoutsListViewHandle VlayoutsListView glistEvent
 							 , % values2String("|", map(["Button Box", "Grid", "Margins", "Definition"], "translate")*)
 		
-		Gui BBE:Add, Text, x8 y430 w86 h23 +0x200, % translate("Button Box")
-		Gui BBE:Add, Edit, x102 y430 w110 h21 VlayoutNameEdit, %layoutNameEdit%
+		Gui BBE:Add, Text, x8 y445 w86 h23 +0x200, % translate("Button Box")
+		Gui BBE:Add, Edit, x102 y445 w110 h21 VlayoutNameEdit, %layoutNameEdit%
 		
-		Gui BBE:Add, Text, x8 y454 w86 h23 +0x200, % translate("Layout")
+		Gui BBE:Add, Text, x8 y469 w86 h23 +0x200, % translate("Layout")
 		Gui BBE:Font, cGray s7
-		Gui BBE:Add, Text, x16 y475 w133 h21, % translate("(R x C, Margins)")
+		Gui BBE:Add, Text, x16 y490 w133 h21, % translate("(R x C, Margins)")
 		Gui BBE:Font
 		
-		Gui BBE:Add, Edit, x102 y454 w40 h21 Limit1 Number gupdateLayoutRowEditor VlayoutRowsEdit, %layoutRowsEdit%
-		Gui BBE:Add, UpDown, x125 y454 w17 h21, 1
-		Gui BBE:Add, Text, x147 y454 w20 h23 +0x200 Center, % translate("x")
-		Gui BBE:Add, Edit, x172 y454 w40 h21 Limit1 Number VlayoutColumnsEdit, %layoutColumnsEdit%
-		Gui BBE:Add, UpDown, x195 y454 w17 h21, 1
+		Gui BBE:Add, Edit, x102 y469 w40 h21 Limit1 Number gupdateLayoutRowEditor VlayoutRowsEdit, %layoutRowsEdit%
+		Gui BBE:Add, UpDown, x125 y469 w17 h21, 1
+		Gui BBE:Add, Text, x147 y469 w20 h23 +0x200 Center, % translate("x")
+		Gui BBE:Add, Edit, x172 y469 w40 h21 Limit1 Number gupdateLayoutRowEditor VlayoutColumnsEdit, %layoutColumnsEdit%
+		Gui BBE:Add, UpDown, x195 y469 w17 h21, 1
 		
 		Gui BBE:Font, s7
 		
-		Gui BBE:Add, Text, x242 y435 w40 h23 +0x200 Center, % translate("Row")
-		Gui BBE:Add, Text, x292 y435 w40 h23 +0x200 Center, % translate("Column")
-		Gui BBE:Add, Text, x342 y435 w40 h23 +0x200 Center, % translate("Border")
-		Gui BBE:Add, Text, x392 y435 w40 h23 +0x200 Center, % translate("Bottom")
+		Gui BBE:Add, Text, x242 y450 w40 h23 +0x200 Center, % translate("Row")
+		Gui BBE:Add, Text, x292 y450 w40 h23 +0x200 Center, % translate("Column")
+		Gui BBE:Add, Text, x342 y450 w40 h23 +0x200 Center, % translate("Border")
+		Gui BBE:Add, Text, x392 y450 w40 h23 +0x200 Center, % translate("Bottom")
 		
 		Gui BBE:Font
 		
-		Gui BBE:Add, Edit, x242 y454 w40 h21 Limit2 Number VlayoutRowMarginEdit, %layoutRowMarginEdit%
-		Gui BBE:Add, Edit, x292 y454 w40 h21 Limit2 Number VlayoutColumnMarginEdit, %layoutColumnMarginEdit%
-		Gui BBE:Add, Edit, x342 y454 w40 h21 Limit2 Number VlayoutBorderMarginEdit, %layoutBorderMarginEdit%
-		Gui BBE:Add, Edit, x392 y454 w40 h21 Limit2 Number VlayoutBottomMarginEdit, %layoutBottomMarginEdit%
+		Gui BBE:Add, Edit, x242 y469 w40 h21 Limit2 Number VlayoutRowMarginEdit, %layoutRowMarginEdit%
+		Gui BBE:Add, Edit, x292 y469 w40 h21 Limit2 Number VlayoutColumnMarginEdit, %layoutColumnMarginEdit%
+		Gui BBE:Add, Edit, x342 y469 w40 h21 Limit2 Number VlayoutBorderMarginEdit, %layoutBorderMarginEdit%
+		Gui BBE:Add, Edit, x392 y469 w40 h21 Limit2 Number VlayoutBottomMarginEdit, %layoutBottomMarginEdit%
 		
-		Gui BBE:Add, DropDownList, x8 y495 w86 AltSubmit Choose0 gupdateLayoutRowEditor VlayoutRowDropDown, |
+		Gui BBE:Add, DropDownList, x8 y510 w86 AltSubmit Choose0 gupdateLayoutRowEditor VlayoutRowDropDown, |
 		
-		Gui BBE:Add, Edit, x102 y495 w330 h65 VlayoutRowEdit, %layoutRowEdit%
+		Gui BBE:Add, Edit, x102 y510 w330 h50 Disabled VlayoutRowEdit, %layoutRowEdit%
 		
 		Gui BBE:Add, Button, x223 y575 w46 h23 VlayoutAddButton gaddItem, % translate("Add")
 		Gui BBE:Add, Button, x271 y575 w50 h23 Disabled VlayoutDeleteButton gdeleteItem, % translate("Delete")
@@ -4288,6 +4290,17 @@ class LayoutsList extends ConfigurationItemList {
 			ButtonBoxesEditor.Instance.updateButtonBoxPreview(this.CurrentButtonBox)
 	}
 	
+	addItem() {
+		base.addItem()
+		
+		GuiControl Text, layoutRowEdit, %layoutRowEdit%
+		
+		preview := ButtonBoxesEditor.Instance.ButtonBoxPreview
+		
+		if ((this.CurrentButtonBox != layoutNameEdit) || (!preview && (layoutNameEdit != "")) || (preview && (preview.Name != layoutNameEdit)))
+			ButtonBoxesEditor.Instance.updateButtonBoxPreview(this.CurrentButtonBox)
+	}
+	
 	clearEditor() {
 		this.loadEditor(Array("", {Grid: "0x0", Margins: [0,0,0,0]}))
 	}
@@ -4335,14 +4348,6 @@ class LayoutsList extends ConfigurationItemList {
 		
 		if (save && (this.iSelectedRow > 0))
 			this.iRowDefinitions[this.iSelectedRow] := layoutRowEdit
-		
-		if (layoutRowDropDown > 0) {
-			layoutRowEdit := ((this.iRowDefinitions.Length() >= layoutRowDropDown) ? this.iRowDefinitions[layoutRowDropDown] : "")
-			
-			this.iSelectedRow := layoutRowDropDown
-			
-			GuiControl Text, layoutRowEdit, %layoutRowEdit%
-		}
 			
 		rows := this.iRowDefinitions.Length()
 		changed := false
@@ -4357,6 +4362,17 @@ class LayoutsList extends ConfigurationItemList {
 			this.iRowDefinitions.RemoveAt(layoutRowsEdit + A_Index - 1, rows - layoutRowsEdit)
 			
 			changed := true
+		}
+		
+		Loop %layoutRowsEdit%
+			this.iRowDefinitions[A_Index] := values2String(";", this.getRowDefinition(A_Index)*)
+		
+		if (layoutRowDropDown > 0) {
+			layoutRowEdit := ((this.iRowDefinitions.Length() >= layoutRowDropDown) ? this.iRowDefinitions[layoutRowDropDown] : "")
+			
+			this.iSelectedRow := layoutRowDropDown
+			
+			GuiControl Text, layoutRowEdit, %layoutRowEdit%
 		}
 
 		if changed {
@@ -4417,7 +4433,24 @@ class LayoutsList extends ConfigurationItemList {
 		
 		definition := string2Values(",", rowDefinition[column])
 		
-		if control {
+		if (control = true) {
+			title := translate("Control Number")
+			prompt := translate("Please enter a controller function number.")
+			number := ConfigurationItem.splitDescriptor(definition[1])[2]
+			locale := ((getLanguage() = "en") ? "" : "Locale")
+			
+			InputBox number, %title%, %prompt%, , 200, 140, , , %locale%, , %number%
+			
+			if ErrorLevel
+				return
+			else {
+				if (definition.Length() = 1)
+					definition := ConfigurationItem.descriptor(ConfigurationItem.splitDescriptor(definition[1])[1], number)
+				else
+					definition := (ConfigurationItem.descriptor(ConfigurationItem.splitDescriptor(definition[1])[1], number) . "," . definition[2])
+			}
+		}
+		else if control {
 			if (definition.Length() = 0)
 				definition := ConfigurationItem.descriptor(control, 1)
 			else if (definition.Length() = 1)
@@ -4666,47 +4699,56 @@ class ButtonBoxPreview extends ConfigurationItem {
 			
 				descriptor := rowDefinition[A_Index]
 				
-				if (StrLen(descriptor) > 0) {
-					descriptor := string2Values(",", descriptor)
+				if (StrLen(Trim(descriptor)) = 0)
+					descriptor := "Empty.0"
 				
-					if (descriptor.Length() > 1) {
-						label := string2Values("x", getConfigurationValue(this.Configuration, "Labels", descriptor[2], ""))
-						labelWidth := label[1]
-						labelHeight := label[2]
-					}
-					else {
-						labelWidth := 0
-						labelHeight := 0
-					}
-					
+				descriptor := string2Values(",", descriptor)
+			
+				if (descriptor.Length() > 1) {
+					label := string2Values("x", getConfigurationValue(this.Configuration, "Labels", descriptor[2], ""))
+					labelWidth := label[1]
+					labelHeight := label[2]
+				}
+				else {
+					labelWidth := 0
+					labelHeight := 0
+				}
+				
+				if (descriptor[1] = "Empty.0") {
+					descriptor := kEmptySpaceDescriptor
+					number := 0
+				}
+				else {
 					descriptor := ConfigurationItem.splitDescriptor(descriptor[1])
 					number := descriptor[2]
 					
-					descriptor := string2Values(";", getConfigurationValue(this.Configuration, "Controls", descriptor[1], ""))
+					descriptor := getConfigurationValue(this.Configuration, "Controls", descriptor[1], "")
+				}
+				
+				descriptor := string2Values(";", descriptor)
+				
+				if (descriptor.Length() > 0) {
+					function := descriptor[1]
+					image := substituteVariables(descriptor[2])
 					
-					if (descriptor.Length() > 0) {
-						function := descriptor[1]
-						image := substituteVariables(descriptor[2])
-						
-						descriptor := string2Values("x", descriptor[3])
-						imageWidth := descriptor[1]
-						imageHeight := descriptor[2]
-						
-						function := ConfigurationItem.descriptor(function, number)
-
-						x := horizontal + Round((columnWidth - imageWidth) / 2)
-						y := vertical + Round((rowHeight - (labelHeight + this.kLabelMargin) - imageHeight) / 2)
-						
-						Gui %window%:Add, Picture, x%x% y%y% w%imageWidth% h%imageHeight% BackgroundTrans gopenControlMenu, %image%
-
-						if ((labelWidth > 0) && (labelHeight > 0)) {
-							Gui %window%:Font, s8 Norm
+					descriptor := string2Values("x", descriptor[3])
+					imageWidth := descriptor[1]
+					imageHeight := descriptor[2]
 					
-							x := horizontal + Round((columnWidth - labelWidth) / 2)
-							y := vertical + rowHeight - labelHeight
-							
-							Gui %window%:Add, Text, x%x% y%y% w%labelWidth% h%labelHeight% +Border -Background  +0x1000 +0x1 gopenControlMenu
-						}
+					function := ConfigurationItem.descriptor(function, number)
+
+					x := horizontal + Round((columnWidth - imageWidth) / 2)
+					y := vertical + Round((rowHeight - (labelHeight + this.kLabelMargin) - imageHeight) / 2)
+					
+					Gui %window%:Add, Picture, x%x% y%y% w%imageWidth% h%imageHeight% BackgroundTrans gopenControlMenu, %image%
+
+					if ((labelWidth > 0) && (labelHeight > 0)) {
+						Gui %window%:Font, s8 Norm
+				
+						x := horizontal + Round((columnWidth - labelWidth) / 2)
+						y := vertical + rowHeight - labelHeight
+						
+						Gui %window%:Add, Text, x%x% y%y% w%labelWidth% h%labelHeight% +Border -Background  +0x1000 +0x1 gopenControlMenu
 					}
 				}
 				
@@ -4739,45 +4781,51 @@ class ButtonBoxPreview extends ConfigurationItem {
 			{
 				descriptor := rowDefinition[A_Index]
 				
-				if (StrLen(descriptor) > 0) {
-					descriptor := string2Values(",", descriptor)
-					
-					if (descriptor.Length() > 1) {
-						label := getConfigurationValue(this.Configuration, "Labels", descriptor[2], "")
-						label := string2Values("x", label)
-						labelWidth := label[1]
-						labelHeight := label[2]
-					}
-					else {
-						labelWidth := 0
-						labelHeight := 0
-					}
-					
-					descriptor := string2Values(";", getConfigurationValue(this.Configuration, "Controls"
-																		 , ConfigurationItem.splitDescriptor(descriptor[1])[1], ""))
-					
-					if (descriptor.Length() > 0) {
-						descriptor := string2Values("x", descriptor[3])
-						
-						imageWidth := descriptor[1]
-						imageHeight := descriptor[2]
-					}
-					else {
-						imageWidth := 0
-						imageHeight := 0
-					}
-					
-					rowHeight := Max(rowHeight, imageHeight + ((labelHeight > 0) ? (this.kLabelMargin + labelHeight) : 0))
-					
-					columnWidths[A_Index] := Max(columnWidths[A_Index], Max(imageWidth, labelWidth))
+				if (StrLen(Trim(descriptor)) = 0)
+					descriptor := "Empty.0"
+				
+				descriptor := string2Values(",", descriptor)
+				
+				if (descriptor.Length() > 1) {
+					label := getConfigurationValue(this.Configuration, "Labels", descriptor[2], "")
+					label := string2Values("x", label)
+					labelWidth := label[1]
+					labelHeight := label[2]
 				}
+				else {
+					labelWidth := 0
+					labelHeight := 0
+				}
+
+				if (descriptor[1] = "Empty.0")
+					descriptor := kEmptySpaceDescriptor
+				else
+					descriptor := getConfigurationValue(this.Configuration, "Controls"
+													  , ConfigurationItem.splitDescriptor(descriptor[1])[1], "")
+				
+				descriptor := string2Values(";", descriptor)
+				
+				if (descriptor.Length() > 0) {
+					descriptor := string2Values("x", descriptor[3])
+					
+					imageWidth := descriptor[1]
+					imageHeight := descriptor[2]
+				}
+				else {
+					imageWidth := 0
+					imageHeight := 0
+				}
+				
+				rowHeight := Max(rowHeight, imageHeight + ((labelHeight > 0) ? (this.kLabelMargin + labelHeight) : 0))
+				
+				columnWidths[A_Index] := Max(columnWidths[A_Index], Max(imageWidth, labelWidth))
 			}
 			
 			rowHeights.Push(rowHeight)
 		}
 	}
 	
-	getControl(clickX, clickY, ByRef row, ByRef column) {
+	getControl(clickX, clickY, ByRef row, ByRef column, ByRef isEmpty) {
 		local function
 		
 		rowHeights := false
@@ -4815,50 +4863,63 @@ class ButtonBoxPreview extends ConfigurationItem {
 			
 				descriptor := rowDefinition[A_Index]
 				
-				if (StrLen(descriptor) > 0) {
-					descriptor := string2Values(",", descriptor)
-				
-					if (descriptor.Length() > 1) {
-						label := string2Values("x", getConfigurationValue(this.Configuration, "Labels", descriptor[2], ""))
-						labelWidth := label[1]
-						labelHeight := label[2]
-					}
-					else {
-						labelWidth := 0
-						labelHeight := 0
-					}
+				if (StrLen(Trim(descriptor)) = 0) {
+					descriptor := "Empty.0"
 					
+					isEmpty := true
+				}
+				else
+					isEmpty := false
+				
+				descriptor := string2Values(",", descriptor)
+				
+				if (descriptor.Length() > 1) {
+					label := string2Values("x", getConfigurationValue(this.Configuration, "Labels", descriptor[2], ""))
+					labelWidth := label[1]
+					labelHeight := label[2]
+				}
+				else {
+					labelWidth := 0
+					labelHeight := 0
+				}
+				
+				if (descriptor[1] = "Empty.0") {
+					descriptor := kEmptySpaceDescriptor
+					name := "Empty"
+					number := 0
+				}
+				else {
 					descriptor := ConfigurationItem.splitDescriptor(descriptor[1])
 					name := descriptor[1]
 					number := descriptor[2]
+				
+					descriptor := getConfigurationValue(this.Configuration, "Controls", descriptor[1], "")
+				}
+				
+				descriptor := string2Values(";", descriptor)
+				
+				if (descriptor.Length() > 0) {
+					function := descriptor[1]
+					image := substituteVariables(descriptor[2])
 					
-					descriptor := string2Values(";", getConfigurationValue(this.Configuration, "Controls", descriptor[1], ""))
+					descriptor := string2Values("x", descriptor[3])
+					imageWidth := descriptor[1]
+					imageHeight := descriptor[2]
 					
-					if (descriptor.Length() > 0) {
-						function := descriptor[1]
-						image := substituteVariables(descriptor[2])
-						
-						descriptor := string2Values("x", descriptor[3])
-						imageWidth := descriptor[1]
-						imageHeight := descriptor[2]
-						
-						function := ConfigurationItem.descriptor(function, number)
-
-						x := horizontal + Round((columnWidth - imageWidth) / 2)
-						y := vertical + Round((rowHeight - (labelHeight + this.kLabelMargin) - imageHeight) / 2)
-						
-						if ((clickX >= x) && (clickX <= (x + imageWidth)) && (clickY >= y) && (clickY <= (y + imageHeight)))
-							return ["Control", ConfigurationItem.descriptor(name, number)]
-						
-						if ((labelWidth > 0) && (labelHeight > 0)) {
-							Gui %window%:Font, s8 Norm
+					x := horizontal + Round((columnWidth - imageWidth) / 2)
+					y := vertical + Round((rowHeight - (labelHeight + this.kLabelMargin) - imageHeight) / 2)
 					
-							x := horizontal + Round((columnWidth - labelWidth) / 2)
-							y := vertical + rowHeight - labelHeight
-							
-							if ((clickX >= x) && (clickX <= (x + labelWidth)) && (clickY >= y) && (clickY <= (y + labelHeight)))
-								return ["Label", ConfigurationItem.descriptor(name, number)]
-						}
+					if ((clickX >= x) && (clickX <= (x + imageWidth)) && (clickY >= y) && (clickY <= (y + imageHeight)))
+						return ["Control", ConfigurationItem.descriptor(name, number)]
+					
+					if ((labelWidth > 0) && (labelHeight > 0)) {
+						Gui %window%:Font, s8 Norm
+				
+						x := horizontal + Round((columnWidth - labelWidth) / 2)
+						y := vertical + rowHeight - labelHeight
+						
+						if ((clickX >= x) && (clickX <= (x + labelWidth)) && (clickY >= y) && (clickY <= (y + labelHeight)))
+							return ["Label", ConfigurationItem.descriptor(name, number)]
 					}
 				}
 				
@@ -4921,8 +4982,9 @@ openControlMenu() {
 		
 		row := 0
 		column := 0
+		isEmpty := false
 		
-		control := ButtonBoxesEditor.Instance.ButtonBoxPreview.getControl(clickX, clickY, row, column)
+		control := ButtonBoxesEditor.Instance.ButtonBoxPreview.getControl(clickX, clickY, row, column, isEmpty)
 		
 		if control {
 			menuItem := (control[1] . ": " . control[2] . " (" . row . " x " . column . ")")
@@ -4958,33 +5020,44 @@ openControlMenu() {
 				Menu ControlMenu, Add, %control%, %handler%
 			}
 			
-			try {
-				Menu LabelMenu, DeleteAll
-			}
-			catch exception {
-				; ignore
-			}
-			
-			label := translate("None")
-			handler := ObjBindMethod(LayoutsList.Instance, "changeLabel", row, column, false)
-			
-			Menu LabelMenu, Add, %label%, %handler%
-			Menu LabelMenu, Add
-			
-			for label, definition in LabelsList.Instance.getLabels() {
-				handler := ObjBindMethod(LayoutsList.Instance, "changeLabel", row, column, label)
-			
-				Menu LabelMenu, Add, %label%, %handler%
+			if !isEmpty {
+				Menu ControlMenu, Add
+				
+				label := translate("Number...")
+				handler := ObjBindMethod(LayoutsList.Instance, "changeControl", row, column, true)
+				
+				Menu ControlMenu, Add, %label%, %handler%
 			}
 			
 			label := translate("Control")
 			
 			Menu GridElement, Add, %label%, :ControlMenu
 			
-			label := translate("Label")
-			
-			Menu GridElement, Add, %label%, :LabelMenu
-			
+			if !isEmpty {
+				try {
+					Menu LabelMenu, DeleteAll
+				}
+				catch exception {
+					; ignore
+				}
+				
+				label := translate("None")
+				handler := ObjBindMethod(LayoutsList.Instance, "changeLabel", row, column, false)
+				
+				Menu LabelMenu, Add, %label%, %handler%
+				Menu LabelMenu, Add
+				
+				for label, definition in LabelsList.Instance.getLabels() {
+					handler := ObjBindMethod(LayoutsList.Instance, "changeLabel", row, column, label)
+				
+					Menu LabelMenu, Add, %label%, %handler%
+				}
+				
+				label := translate("Label")
+				
+				Menu GridElement, Add, %label%, :LabelMenu
+			}
+
 			Menu GridElement, Show
 		}
 	}

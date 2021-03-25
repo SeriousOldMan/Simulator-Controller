@@ -20,6 +20,7 @@ Release 2.7 Checklist
    b. Plugins & Modes
    c. Functions
    d. Installation & Setup
+   e. Constants.md
 3. Update Procedure
    a. Controller Plugin Labels
    b. raceEngineerSettings => raceEngineerOpenSettings
@@ -46,6 +47,8 @@ Release 2.7 Checklist
    a. New Pictures
 9. Confirm Update Setup Database
    a. Documentation
+10. New constant kSetupDatabaseDirectory
+   a. Constants.md
 
 Release 2.6 Checklist
 =====================

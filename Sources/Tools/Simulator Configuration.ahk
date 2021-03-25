@@ -292,13 +292,30 @@ registerList(listVariable, itemList) {
 }
 
 listEvent() {
+	local event
+	
+	info := ErrorLevel
+	editor := A_GuiControl . "." . A_EventInfo
+	
 	Critical
+	
+	static lastEvent := false
+	static lastEditor := false
+	
+	event := (A_GuiEvent . " " . A_GuiControl . " " . A_EventInfo)
+
+	if ((event = lastEvent) && (A_GuiControl != "simulatorsListBox") && (A_GuiControl != "buttonBoxesListBox"))
+		return
+	else
+		lastEvent := event
 	
 	protectionOn()
 	
 	try {
-		if (A_GuiEvent == "DoubleClick")
-			vItemLists[A_GuiControl].openEditor(A_EventInfo)
+		if (A_GuiEvent == "DoubleClick") {
+			if (editor != lastEditor)
+				vItemLists[A_GuiControl].openEditor(A_EventInfo)
+		}
 		else if (A_GuiEvent == "Normal") {
 			if (A_GuiControl == "simulatorsListBox") {
 				GuiControlGet simulatorsListBox
@@ -319,16 +336,19 @@ listEvent() {
 				
 				vItemLists[A_GuiControl].openEditor(index)
 			}
-			else
+			else if (editor != lastEditor)
 				vItemLists[A_GuiControl].openEditor(A_EventInfo)
 		}
-		else if ((A_GuiEvent == "I") && !inList(["translationsListView"], A_GuiControl))
-			if InStr(ErrorLevel, "S", true)
+		else if ((A_GuiEvent == "I") && !inList(["translationsListView", "controlsListView", "labelsListView", "layoutsListView"], A_GuiControl)) {
+			if (InStr(info, "S", true) && (editor != lastEditor))
 				vItemLists[A_GuiControl].openEditor(A_EventInfo)
+		}
 	}
 	finally {
 		protectionOff()
 	}
+	
+	lastEditor := editor
 }
 
 addItem() {
@@ -406,16 +426,7 @@ class ConfigurationEditor extends ConfigurationItem {
 	
 	AutoSave[] {
 		Get {
-			try {
-				GuiControlGet saveModeDropDown
-			
-				this.iSaveMode := (saveModeDropDown == 1)
-				
-				return this.iSaveMode
-			}
-			catch exception {
-				return this.iSaveMode
-			}
+			return (this.iSaveMode = "Auto")
 		}
 	}
 	
@@ -504,9 +515,9 @@ class ConfigurationEditor extends ConfigurationItem {
 		
 		GuiControlGet saveModeDropDown
 		
-		this.iSaveMode := saveModeDropDown
+		this.iSaveMode := ["Auto", "Manual"][saveModeDropDown]
 		
-		setConfigurationValue(configuration, "General", "Save", ["Auto", "Manual"][saveModeDropDown])
+		setConfigurationValue(configuration, "General", "Save", this.iSaveMode)
 		
 		this.iGeneralTab.saveToConfiguration(configuration)
 		
@@ -553,7 +564,7 @@ moveConfigurationEditor() {
 updateSaveMode() {
 	GuiControlGet saveModeDropDown
 	
-	ConfigurationEditor.Instance.iSaveMode := (saveModeDropDown == 1)
+	ConfigurationEditor.Instance.iSaveMode := ["Auto", "Manual"][saveModeDropDown]
 }
 
 openConfigurationDocumentation() {

@@ -202,6 +202,8 @@ class ConfigurationItemList extends ConfigurationItem {
 	
 	selectItem(itemNumber) {
 		this.iCurrentItemIndex := itemNumber
+		
+		Gui ListView, % this.ListHandle
 			
 		if itemNumber
 			LV_Modify(itemNumber, "Vis +Select +Focus")
@@ -320,8 +322,7 @@ listEvent() {
 			else
 				vItemLists[A_GuiControl].openEditor(A_EventInfo)
 		}
-		else if ((A_GuiEvent == "I") && !inList(["translationsListView", "controlsListView"
-											   , "labelsListView", "layoutsListView"], A_GuiControl))
+		else if ((A_GuiEvent == "I") && !inList(["translationsListView"], A_GuiControl))
 			if InStr(ErrorLevel, "S", true)
 				vItemLists[A_GuiControl].openEditor(A_EventInfo)
 	}
@@ -1262,6 +1263,8 @@ class PluginsTab extends ConfigurationItemList {
 	}
 	
 	selectItem(itemNumber) {
+		Gui ListView, % this.ListHandle
+		
 		if (itemNumber && (itemNumber != this.iCurrentItemIndex))
 			LV_Modify(itemNumber, "Vis +Select +Focus")
 		
@@ -5003,10 +5006,10 @@ openControlMenu() {
 		column := 0
 		isEmpty := false
 		
-		control := ButtonBoxesEditor.Instance.ButtonBoxPreview.getControl(clickX, clickY, row, column, isEmpty)
+		element := ButtonBoxesEditor.Instance.ButtonBoxPreview.getControl(clickX, clickY, row, column, isEmpty)
 		
-		if control {
-			menuItem := (control[1] . ": " . control[2] . " (" . row . " x " . column . ")")
+		if element {
+			menuItem := (translate(element[1] . ": ") . element[2] . " (" . row . " x " . column . ")")
 			
 			try {
 				Menu GridElement, DeleteAll

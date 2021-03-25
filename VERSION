@@ -2,5 +2,5 @@
 Current=2.7.0-dev
 Target=2.7.0-release
 Release=2.6.2-release
-Changes=Multiple simulataneaously active plugin modes, Stick to strategy pressures command for Jona, Layout editor for Button Box configurations
-Date=03/24/2021
+Changes=Multiple simulataneaously active plugin modes, Stick to strategy pressures command for Jona, Layout editor for Button Box configurations, Confirmation request for setup database update
+Date=03/25/2021

@@ -79,6 +79,9 @@ class RaceEngineer extends ConfigurationItem {
 	iLastFuelAmount := 0
 	iInitialFuelAmount := 0
 	
+	iSetupData := {}
+	iSetupDataActive := false
+	
 	class RemoteEngineerListener {
 		iListener := false
 		iLanguage := false
@@ -359,6 +362,18 @@ class RaceEngineer extends ConfigurationItem {
 	LastFuelAmount[] {
 		Get {
 			return this.iLastFuelAmount
+		}
+	}
+	
+	SetupData[] {
+		Get {
+			return this.iSetupData
+		}
+	}
+	
+	SetupDataActive[] {
+		Get {
+			return this.iSetupDataActive
 		}
 	}
 	
@@ -1166,6 +1181,7 @@ class RaceEngineer extends ConfigurationItem {
 		this.iLastFuelAmount := 0
 		this.iInitialFuelAmount := 0
 		this.iEnoughData := false
+		this.iSetupData := {}
 		
 		if this.Speaker
 			this.getSpeaker().speakPhrase("Greeting")
@@ -1175,18 +1191,42 @@ class RaceEngineer extends ConfigurationItem {
 	}
 	
 	finishRace() {
-		this.iKnowledgeBase := false
 		this.iLastLap := 0
 		this.iOverallTime := 0
 		this.iLastFuelAmount := 0
 		this.iInitialFuelAmount := 0
 		this.iEnoughData := false
 			
-		if this.Speaker {
-			this.getSpeaker().speakPhrase("Bye")
+		if this.KnowledgeBase
+			if this.Speaker {
+				this.getSpeaker().speakPhrase("Bye")
+				
+				if this.Listener {
+					this.getSpeaker().speakPhrase("ConfirmUpdateSetupDatabase")
+					
+					this.setContinuation(ObjBindMethod(this, "updateSetupDatabase", true))
+					
+					callback := ObjBindMethod(this, "forceFinishRace")
+					SetTimer %callback%, -60000
+				}
+				else {
+					this.updateSetupDatabase()
+				
+					this.iKnowledgeBase := false
+				}
+			}
+			else {
+				this.updateSetupDatabase()
 			
-			this.stopListening(true)
-		}
+				this.iKnowledgeBase := false
+			}
+	}
+	
+	forceFinishRace() {
+		if !this.SetupDataActive {
+			this.iKnowledgeBase := false
+			this.iSetupData := false
+		}	
 	}
 	
 	addLap(lapNumber, data) {
@@ -1336,8 +1376,8 @@ class RaceEngineer extends ConfigurationItem {
 		targetCompound := knowledgeBase.getValue("Tyre.Compound.Target", false)
 		
 		if (currentCompound && (currentCompound = targetCompound))
-			this.updateSetupDatabase(knowledgeBase.getValue("Race.Simulator"), knowledgeBase.getValue("Race.Track"), knowledgeBase.getValue("Race.Car")
-								   , currentCompound, airTemperature, trackTemperature, weatherNow)
+			this.updateSetupData(knowledgeBase.getValue("Race.Simulator"), knowledgeBase.getValue("Race.Track"), knowledgeBase.getValue("Race.Car")
+							   , currentCompound, airTemperature, trackTemperature, weatherNow)
 		
 		return result
 	}
@@ -1429,7 +1469,71 @@ class RaceEngineer extends ConfigurationItem {
 			return true
 	}
 	
-	updateSetupDatabase(simulator, track, car, compound, airTemperature, trackTemperature, weather) {
+	updateSetupData(simulator, track, car, compound, airTemperature, trackTemperature, weather) {
+		local knowledgeBase := this.KnowledgeBase
+		
+		this.iSetupDataActive := true
+		
+		try {
+			targetPressures := Array(Round(knowledgeBase.getValue("Tyre.Pressure.Target.FL"), 1)
+								   , Round(knowledgeBase.getValue("Tyre.Pressure.Target.FR"), 1)
+								   , Round(knowledgeBase.getValue("Tyre.Pressure.Target.RL"), 1)
+								   , Round(knowledgeBase.getValue("Tyre.Pressure.Target.RR"), 1))
+			
+			descriptor := ConfigurationItem.descriptor(simulator, track, car, compound, airTemperature, trackTemperature, weather)
+			
+			if this.SetupData.HasKey(descriptor)
+				setupData := this.SetupData[descriptor]
+			else {
+				setupData := Object()
+			
+				this.SetupData[descriptor] := setupData
+			}
+			
+			for ignore, tyre in ["FL", "FR", "RL", "RR"] {
+				pressure := (tyre . ":" . targetPressures[A_Index])
+				
+				setupData[pressure] := (setupData.HasKey(pressure) ? (setupData[pressure] + 1) : 1)
+			}
+		}
+		finally {
+			this.iSetupDataActive := false
+		}
+	}
+	
+	updateSetupDatabase(confirm := false) {
+		local compound
+		
+		this.iSetupDataActive := true
+		
+		try {
+			if this.KnowledgeBase {
+				for descriptor, pressures in this.SetupData {
+					descriptor := ConfigurationItem.splitDescriptor(descriptor)
+				
+					simulator := descriptor[1]
+					track := descriptor[2]
+					car := descriptor[3]
+					compound := descriptor[4]
+					airTemperature := descriptor[5]
+					trackTemperature := descriptor[6]
+					weather := descriptor[7]
+					
+					this.updateTyrePressures(simulator, track, car, compound, airTemperature, trackTemperature, weather, pressures)
+				}
+		
+				if (confirm && this.Speaker)
+					this.getSpeaker().speakPhrase("SetupDatabaseUpdated")
+			}
+		}
+		finally {
+			this.iSetupDataActive := false
+		}
+		
+		this.iSetupData := {}
+	}		
+	
+	updateTyrePressures(simulator, track, car, compound, airTemperature, trackTemperature, weather, targetPressures) {
 		local knowledgeBase := this.KnowledgeBase
 		static lastSimulator := false
 		static lastCar := false
@@ -1439,7 +1543,7 @@ class RaceEngineer extends ConfigurationItem {
 		static database := false
 		static databaseName := false
 		
-		FileCreateDir %kUserHomeDirectory%Setup Database\Local\%simulator%\%car%\%track%
+		FileCreateDir %kSetupDatabaseDirectory%Local\%simulator%\%car%\%track%
 		
 		if ((lastSimulator != simulator) || (lastCar != car) || (lastTrack != track) || (lastCompound != compound) || (lastWeather != weather)) {
 			database := false
@@ -1451,53 +1555,49 @@ class RaceEngineer extends ConfigurationItem {
 			lastWeather := weather
 		}
 		
-		targetPressures := Array(Round(knowledgeBase.getValue("Tyre.Pressure.Target.FL"), 1)
-							   , Round(knowledgeBase.getValue("Tyre.Pressure.Target.FR"), 1)
-							   , Round(knowledgeBase.getValue("Tyre.Pressure.Target.RL"), 1)
-							   , Round(knowledgeBase.getValue("Tyre.Pressure.Target.RR"), 1))
-		
 		key := ConfigurationItem.descriptor(airTemperature, trackTemperature)
 		
 		if !database {
-			databaseName := kUserHomeDirectory . "Setup Database\Local\" . simulator . "\" . car . "\" . track . "\Tyre Setup " . compound . " " . weather . ".data"
+			databaseName := kSetupDatabaseDirectory . "Local\" . simulator . "\" . car . "\" . track . "\Tyre Setup " . compound . " " . weather . ".data"
 		
 			database := readConfiguration(databaseName)
 		}
 		
-		pressures := getConfigurationValue(database, "Pressures", key, false)
+		pressureData := getConfigurationValue(database, "Pressures", key, false)
+		pressures := {FL: {}, FR: {}, RL: {}, RR: {}}
 		
-		if !pressures
-			pressures := (targetPressures[1] . ":1; " . targetPressures[2] . ":1; " . targetPressures[3] . ":1; " . targetPressures[4] . ":1")
-		else {
-			pressures := string2Values(";", pressures)
+		if pressureData {
+			pressureData := string2Values(";", pressureData)
 			
-			Loop 4 {
-				targetPressure := targetPressures[A_Index]
-				found := false
-			
-				tyrePressures := string2Values(",", pressures[A_Index])
-				
-				for index, pressure in tyrePressures {
+			for index, tyre in ["FL", "FR", "RL", "RR"]
+				for index, pressure in string2Values(",", pressureData[index]) {
 					pressure := string2Values(":", pressure)
 				
-					if (pressure[1] = targetPressure) {
-						tyrePressures[index] := (pressure[1] . ":" . (pressure[2] + 1))
-						
-						found := true
-						break
-					}
+					pressures[tyre][pressure[1]] := pressure[2]
 				}
-				
-				if !found
-					tyrePressures.Push(targetPressure . ":1")
-				
-				pressures[A_Index] := values2String(",", tyrePressures*)
-			}
-			
-			pressures := values2String("; ", pressures*)
 		}
 		
-		setConfigurationValue(database, "Pressures", key, pressures)
+		for tyrePressure, count in targetPressures {
+			tyrePressure := string2Values(":", tyrePressure)
+			pressure := tyrePressure[2]
+			
+			tyrePressures := pressures[tyrePressure[1]]
+			
+			tyrePressures[pressure] := (tyrePressures.HasKey(pressure) ? (tyrePressures[pressure] + count) : count)
+		}
+			
+		pressureData := []
+		
+		for ignore, tyrePressures in pressures {
+			data := []
+		
+			for pressure, count in tyrePressures
+				data.Push(pressure . ":" . count)
+			
+			pressureData.Push(values2String(",", data*))
+		}
+		
+		setConfigurationValue(database, "Pressures", key, values2String("; ", pressureData*))
 		
 		writeConfiguration(databaseName, database)
 	}

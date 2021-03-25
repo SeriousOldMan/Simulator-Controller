@@ -8,7 +8,8 @@
   5. Plugin support for configuration tool
   6. Jona can be asked to not change the tyre pressures on an upcoming pitstop
   7. Visual feedback for tyre setup import action
-  8. First consolidated version of Setup Database as Excel Spreadsheet for Quality Assurance
+  8. Setup Data will be stored at the end of the race only if confirmed by the driver
+  9. First consolidated version of Setup Database as Excel Spreadsheet for Quality Assurance
   
 ## 2.6.2-release 03/21/21
   

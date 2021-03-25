@@ -566,7 +566,7 @@ requestConsent() {
 		}
 		
 		if (getConfigurationValue(consent, "Consent", "Share Tyre Pressures", false) == true) {
-			uploadTimeStamp := kUserHomeDirectory . "Setup Database\Local\UPLOAD"
+			uploadTimeStamp := kSetupDatabaseDirectory . "Local\UPLOAD"
 			
 			if FileExist(uploadTimeStamp) {
 				FileReadLine upload, %uploadTimeStamp%, 1
@@ -580,18 +580,18 @@ requestConsent() {
 			}
 			
 			try {
-				RunWait PowerShell.exe -Command Compress-Archive -LiteralPath '%kUserHomeDirectory%Setup Database\Local' -CompressionLevel Optimal -DestinationPath '%kUserHomeDirectory%Temp\Setup Database.%id%.zip', , Hide
+				RunWait PowerShell.exe -Command Compress-Archive -LiteralPath '%kSetupDatabaseDirectory%Local' -CompressionLevel Optimal -DestinationPath '%kUserHomeDirectory%Temp\Setup Database.%id%.zip', , Hide
 				
 				ftpUpload("ftp.drivehq.com", "TheBigO", "29605343.9318.1940", kUserHomeDirectory . "Temp\Setup Database." . id . ".zip", "Simulator Controller\Setup Database Uploads\Setup Database." . id . ".zip")
 				
 				try {
-					FileDelete %kUserHomeDirectory%Setup Database\Local\UPLOAD
+					FileDelete %kSetupDatabaseDirectory%Local\UPLOAD
 				}
 				catch exception {
 					; ignore
 				}
 				
-				FileAppend %A_Now%, %kUserHomeDirectory%Setup Database\Local\UPLOAD
+				FileAppend %A_Now%, %kSetupDatabaseDirectory%Local\UPLOAD
 				
 				logMessage(kLogInfo, translate("Setup database successfully uploaded"))
 			}
@@ -752,8 +752,8 @@ initializeEnvironment() {
 	FileCreateDir %kUserHomeDirectory%Plugins
 	FileCreateDir %kUserHomeDirectory%Temp
 	FileCreateDir %kUserHomeDirectory%Temp\Messages
-	FileCreateDir %kUserHomeDirectory%Setup Database\Global
-	FileCreateDir %kUserHomeDirectory%Setup Database\Local
+	FileCreateDir %kSetupDatabaseDirectory%Global
+	FileCreateDir %kSetupDatabaseDirectory%Local
 	
 	if !FileExist(A_MyDocuments . "\Simulator Controller\Plugins\Plugins.ahk")
 		FileCopy %kResourcesDirectory%Templates\Plugins.ahk, %A_MyDocuments%\Simulator Controller\Plugins

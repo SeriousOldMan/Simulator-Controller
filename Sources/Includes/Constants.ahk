@@ -21,6 +21,7 @@ global kLibrariesDirectory = normalizeFilePath(A_ScriptDir . (A_IsCompiled ? "\.
 global kBinariesDirectory = normalizeFilePath(A_ScriptDir . (A_IsCompiled ? "\..\Binaries\" : "\..\..\Binaries\"))
 
 global kLogsDirectory = kUserHomeDirectory . "Logs\"
+global kSetupDatabaseDirectory = kUserHomeDirectory . "Setup Database\"
 
 global kPluginsDirectory = normalizeFilePath(A_ScriptDir . (A_IsCompiled ? "\..\Sources\Plugins\" : "\..\..\Sources\Plugins\"))
 global kUserPluginsDirectory = kUserHomeDirectory . "Plugins\"

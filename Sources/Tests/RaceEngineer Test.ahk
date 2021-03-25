@@ -863,7 +863,7 @@ else {
 
 	engineer.setDebug(kDebugPhrases, false)
 	
-	if (raceNr == 1)
+	if (raceNr == 1) {
 		Loop {
 			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
 			
@@ -887,6 +887,12 @@ else {
 					MsgBox % "Lap " . A_Index . " loaded - Continue?"
 			}
 		}
+		
+		engineer.finishRace()
+		
+		while engineer.KnowledgeBase
+			Sleep 1000
+	}
 	else if (raceNr == 2) {
 		; 0.0	->	1.1		Report Bodywork
 		; 2.4	->	2.5		Report Bodywork

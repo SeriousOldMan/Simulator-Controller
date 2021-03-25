@@ -490,7 +490,9 @@ updateConfigurationForV261() {
 	}
 	
 	try {
-		FileRemoveDir %kUserHomeDirectory%Setup Database, 1
+		directory := SubStr(kSetupDatabaseDirectory, 1, StrLen(kSetupDatabaseDirectory) - 1)
+		
+		FileRemoveDir %directory%, 1
 	}
 	catch exception {
 		; ignore

@@ -44,6 +44,8 @@ Release 2.7 Checklist
    c. Picture
 8. Documentation Links für Themes and Translations
    a. New Pictures
+9. Confirm Update Setup Database
+   a. Documentation
 
 Release 2.6 Checklist
 =====================

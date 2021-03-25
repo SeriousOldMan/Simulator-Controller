@@ -228,17 +228,25 @@ startRaceEngineer() {
 ;;;-------------------------------------------------------------------------;;;
 
 shutdownRaceEngineer() {
-	ExitApp 0
+	RaceEngineer.Instance.finishRace()
+	
+	if !RaceEngineer.Instance.KnowledgeBase
+		ExitApp 0
+	else
+		SetTimer shutdownRaceEngineer, -1000
 }
 
 handleRaceRemoteCalls(event, data) {
 	if InStr(data, ":") {
 		data := StrSplit(data, ":", , 2)
 		
-		if (data[1] = "Shutdown")
+		if (data[1] = "Shutdown") {
 			SetTimer shutdownRaceEngineer, -20000
-	
-		return withProtection(ObjBindMethod(RaceEngineer.Instance, data[1]), string2Values(";", data[2])*)
+			
+			return true
+		}
+		else
+			return withProtection(ObjBindMethod(RaceEngineer.Instance, data[1]), string2Values(";", data[2])*)
 	}
 	else if (data = "Shutdown")
 		SetTimer shutdownRaceEngineer, -20000

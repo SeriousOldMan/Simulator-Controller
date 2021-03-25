@@ -565,7 +565,7 @@ requestConsent() {
 			writeConfiguration(kUserConfigDirectory . "CONSENT", consent)
 		}
 		
-		if (getConfigurationValue(consent, "Consent", "Share Tyre Pressures", false) == true) {
+		if (getConfigurationValue(consent, "Consent", "Share Database", false) == "Tyre Pressures") {
 			uploadTimeStamp := kSetupDatabaseDirectory . "Local\UPLOAD"
 			
 			if FileExist(uploadTimeStamp) {

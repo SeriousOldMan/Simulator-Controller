@@ -3514,8 +3514,21 @@ class TranslationsList extends ConfigurationItemList {
 				
 				this.iLanguageCode := isoCodeEdit
 				
-				for ignore, item in this.iItemsList
-					translations[item[1]] := item[2]
+				for ignore, item in this.iItemsList {
+					original := item[1]
+					translated := item[2]
+				
+					if (translations.HasKey(original) && (translated != translations[original])) {
+						OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+						title := translate("Error")
+						MsgBox 262160, %title%, % translate("Inconsistent translations detected - please correct...")
+						OnMessage(0x44, "")
+						
+						return false
+					}
+						
+					translations[original] := translated
+				}
 				
 				writeTranslations(isoCodeEdit, languageNameEdit, translations)
 				
@@ -3759,9 +3772,9 @@ class ControlsList extends ConfigurationItemList {
 		
 		Gui BBE:Font, Norm, Arial
 		Gui BBE:Add, ListView, x16 y79 w134 h108 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndcontrolsListViewHandle VcontrolsListView glistEvent
-							 , % values2String("|", map(["Control", "Type", "Size"], "translate")*)
+							 , % values2String("|", map(["Name", "Function", "Size"], "translate")*)
 							
-		Gui BBE:Add, Text, x164 y79 w80 h23 +0x200, % translate("Control")
+		Gui BBE:Add, Text, x164 y79 w80 h23 +0x200, % translate("Name")
 		Gui BBE:Add, Edit, x214 y80 w101 h21 VcontrolNameEdit, %controlNameEdit%
 		Gui BBE:Add, DropDownList, x321 y79 w105 AltSubmit Choose%controlTypeDropDown% VcontrolTypeDropDown, % values2String("|", map(["1-way Toggle", "2-way Toggle", "Button", "Dial"], "translate")*)
 		;426 400 
@@ -3945,9 +3958,9 @@ class LabelsList extends ConfigurationItemList {
 		
 		Gui BBE:Font, Norm, Arial
 		Gui BBE:Add, ListView, x16 y224 w134 h84 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndlabelsListViewHandle VlabelsListView glistEvent
-							 , % values2String("|", map(["Label", "Size"], "translate")*)
+							 , % values2String("|", map(["Name", "Size"], "translate")*)
 							
-		Gui BBE:Add, Text, x164 y224 w80 h23 +0x200, % translate("Label")
+		Gui BBE:Add, Text, x164 y224 w80 h23 +0x200, % translate("Name")
 		Gui BBE:Add, Edit, x214 y225 w101 h21 VlabelNameEdit, %labelNameEdit%
 		
 		Gui BBE:Add, Text, x164 y248 w80 h23 +0x200, % translate("Size")
@@ -4101,9 +4114,9 @@ class LayoutsList extends ConfigurationItemList {
 
 	createControls(configuration) {
 		Gui BBE:Add, ListView, x8 y330 w424 h105 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndlayoutsListViewHandle VlayoutsListView glistEvent
-							 , % values2String("|", map(["Button Box", "Grid", "Margins", "Definition"], "translate")*)
+							 , % values2String("|", map(["Name", "Grid", "Margins", "Definition"], "translate")*)
 		
-		Gui BBE:Add, Text, x8 y445 w86 h23 +0x200, % translate("Button Box")
+		Gui BBE:Add, Text, x8 y445 w86 h23 +0x200, % translate("Name")
 		Gui BBE:Add, Edit, x102 y445 w110 h21 VlayoutNameEdit, %layoutNameEdit%
 		
 		Gui BBE:Add, Text, x8 y469 w86 h23 +0x200, % translate("Layout")
@@ -4441,7 +4454,7 @@ class LayoutsList extends ConfigurationItemList {
 		
 		if (control = "__Number__") {
 			if !number {
-				title := translate("Control Number")
+				title := translate("Function Number")
 				prompt := translate("Please enter a controller function number.")
 				number := ConfigurationItem.splitDescriptor(definition[1])[2]
 				locale := ((getLanguage() = "en") ? "" : "Locale")
@@ -5015,7 +5028,7 @@ openControlMenu() {
 				; ignore
 			}
 			
-			label := translate("None")
+			label := translate("Empty")
 			handler := ObjBindMethod(LayoutsList.Instance, "changeControl", row, column, false)
 			
 			Menu ControlMenu, Add, %label%, %handler%
@@ -5083,7 +5096,7 @@ openControlMenu() {
 					; ignore
 				}
 				
-				label := translate("None")
+				label := translate("Empty")
 				handler := ObjBindMethod(LayoutsList.Instance, "changeLabel", row, column, false)
 				
 				Menu LabelMenu, Add, %label%, %handler%

@@ -672,8 +672,11 @@ readSharedMemory(dataFile) {
 	return readConfiguration(dataFile)
 }
 
-importFromSimulation(settings := false) {
+importFromSimulation(message := false, settings := false) {
 	accApplication := new Application("Assetto Corsa Competizione", kSimulatorConfiguration)
+	
+	if (message != "Import")
+		settings := false
 	
 	if accApplication.isRunning() {
 		data := readSharedMemory(kUserHomeDirectory . "Temp\ACC Data\Settings.data")
@@ -755,7 +758,7 @@ showRaceEngineerSettingsEditor() {
 	settings := readConfiguration(kRaceEngineerSettingsFile)
 	
 	if ((A_Args.Length() > 0) && (A_Args[1] = "-Import")) {
-		importFromSimulation(settings)
+		importFromSimulation("Import", settings)
 		
 		writeConfiguration(kRaceEngineerSettingsFile, settings)
 	}

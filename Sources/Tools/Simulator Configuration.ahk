@@ -295,7 +295,7 @@ listEvent() {
 	local event
 	
 	info := ErrorLevel
-	editor := A_GuiControl . "." . A_EventInfo
+	editor := (A_GuiControl . "." . A_EventInfo)
 	
 	Critical
 	
@@ -304,7 +304,7 @@ listEvent() {
 	
 	event := (A_GuiEvent . " " . A_GuiControl . " " . A_EventInfo)
 
-	if ((event = lastEvent) && (A_GuiControl != "simulatorsListBox") && (A_GuiControl != "buttonBoxesListBox"))
+	if ((event = lastEvent) && (true || !inList(["controlsListView", "labelsListView", "layoutsListView"], A_GuiControl)))
 		return
 	else
 		lastEvent := event
@@ -339,7 +339,7 @@ listEvent() {
 			else if (editor != lastEditor)
 				vItemLists[A_GuiControl].openEditor(A_EventInfo)
 		}
-		else if ((A_GuiEvent == "I") && !inList(["translationsListView", "controlsListView", "labelsListView", "layoutsListView"], A_GuiControl)) {
+		else if ((A_GuiEvent == "I") && (true || !inList(["controlsListView", "labelsListView", "layoutsListView"], A_GuiControl))) {
 			if (InStr(info, "S", true) && (editor != lastEditor))
 				vItemLists[A_GuiControl].openEditor(A_EventInfo)
 		}
@@ -3410,18 +3410,23 @@ class TranslationsList extends ConfigurationItemList {
 		static first := true
 		
 		Gui ListView, % this.ListHandle
-	
-		LV_Delete()
-			
-		for ignore, translation in this.iItemsList
-			LV_Add("", translation[1], translation[2])
 		
+		count := LV_GetCount()
+		
+		for index, translation in this.iItemsList
+			if (index <= count)
+				LV_Modify(index, "", translation[1], translation[2])
+			else
+				LV_Add("", translation[1], translation[2])
+		
+		if (items.Length() < count)
+			Loop % count - items.Length()
+				LV_Delete(count - A_Index - 1)
+			
 		if (first || (this.iLanguageCode = "en")) {
 			LV_ModifyCol()
 			LV_ModifyCol(1, 150)
-			
-			if (this.iLanguageCode = "en")
-				LV_ModifyCol(2, 300)
+			LV_ModifyCol(2, 300)
 			
 			first := false
 		}
@@ -3465,8 +3470,12 @@ class TranslationsList extends ConfigurationItemList {
 	}
 	
 	openEditor(itemIndex) {
-		if (this.iCurrentItemIndex != 0)
-			this.updateItem()
+		if (this.iCurrentItemIndex != 0) {
+			GuiControlGet translationTextEdit
+			
+			if (this.iItemsList[this.iCurrentItemIndex][2] != translationTextEdit)
+				this.updateItem()
+		}
 			
 		base.openEditor(itemIndex)
 	}

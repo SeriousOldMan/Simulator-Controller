@@ -47,6 +47,7 @@ Release 2.7 Checklist
    a. New Pictures
 9. Confirm Update Setup Database
    a. Documentation
+   b. Clear all local data
 10. New constant kSetupDatabaseDirectory
    a. Constants.md
 

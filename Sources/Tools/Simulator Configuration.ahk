@@ -4478,11 +4478,11 @@ class LayoutsList extends ConfigurationItemList {
 		if (control = "__Number__") {
 			if !number {
 				title := translate("Function Number")
-				prompt := translate("Please enter a controller function number.")
+				prompt := translate("Please enter a controller function number:")
 				number := ConfigurationItem.splitDescriptor(definition[1])[2]
 				locale := ((getLanguage() = "en") ? "" : "Locale")
 				
-				InputBox number, %title%, %prompt%, , 200, 140, , , %locale%, , %number%
+				InputBox number, %title%, %prompt%, , 200, 150, , , %locale%, , %number%
 			
 				if ErrorLevel
 					return

@@ -10,6 +10,7 @@
   7. Visual feedback for tyre setup import action
   8. Setup Data will be stored at the end of the race only if confirmed by the driver
   9. First consolidated version of Setup Database as Excel Spreadsheet for Quality Assurance
+  10. An Easter Egg with a precious first prize is somewhere hidden in Simulator Controller. It will only be available for the four days of the upcoming Easter weekend.
   
 ## 2.6.2-release 03/21/21
   

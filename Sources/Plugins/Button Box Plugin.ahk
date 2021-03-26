@@ -75,7 +75,7 @@ class GridButtonBox extends ButtonBox {
 	static kRowMargin := 20
 	static kColumnMargin := 40
 	
-	static kBorderMargin := 20
+	static kSidesMargin := 20
 	static kBottomMargin := 15
 	
 	iName := false
@@ -85,7 +85,7 @@ class GridButtonBox extends ButtonBox {
 	iColumns := 0
 	iRowMargin := this.kRowMargin
 	iColumnMargin := this.kColumnMargin
-	iBorderMargin := this.kBorderMargin
+	iSidesMargin := this.kSidesMargin
 	iBottomMargin := this.kBottomMargin
 	
 	iRowDefinitions := []
@@ -133,9 +133,9 @@ class GridButtonBox extends ButtonBox {
 		}
 	}
 	
-	BorderMargin[] {
+	SidesMargin[] {
 		Get {
-			return this.iBorderMargin
+			return this.iSidesMargin
 		}
 	}
 	
@@ -173,7 +173,7 @@ class GridButtonBox extends ButtonBox {
 			this.iColumnMargin := layout[3]
 		
 		if (layout.Length() > 3)
-			this.iBorderMargin := layout[4]
+			this.iSidesMargin := layout[4]
 		
 		if (layout.Length() > 4)
 			this.iBottomMargin := layout[5]
@@ -215,7 +215,7 @@ class GridButtonBox extends ButtonBox {
 			width += columnWidths[A_Index]
 		
 		height += ((rowHeights.Length() - 1) * this.RowMargin) + this.kHeaderHeight + this.BottomMargin
-		width += ((columnWidths.Length() - 1) * this.ColumnMargin) + (2 * this.BorderMargin)
+		width += ((columnWidths.Length() - 1) * this.ColumnMargin) + (2 * this.SidesMargin)
 		
 		Gui %window%:-Border -Caption +AlwaysOnTop
 		
@@ -235,7 +235,7 @@ class GridButtonBox extends ButtonBox {
 			rowHeight := rowHeights[A_Index]
 			rowDefinition := this.RowDefinitions[A_Index]
 		
-			horizontal := this.BorderMargin
+			horizontal := this.SidesMargin
 			
 			Loop % this.Columns
 			{

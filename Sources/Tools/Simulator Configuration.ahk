@@ -4106,7 +4106,7 @@ global layoutRowsEdit = ""
 global layoutColumnsEdit = ""
 global layoutRowMarginEdit = ""
 global layoutColumnMarginEdit = ""
-global layoutBorderMarginEdit = ""
+global layoutSidesMarginEdit = ""
 global layoutBottomMarginEdit = ""
 
 global layoutRowDropDown = 0
@@ -4157,14 +4157,14 @@ class LayoutsList extends ConfigurationItemList {
 		
 		Gui BBE:Add, Text, x242 y450 w40 h23 +0x200 Center, % translate("Row")
 		Gui BBE:Add, Text, x292 y450 w40 h23 +0x200 Center, % translate("Column")
-		Gui BBE:Add, Text, x342 y450 w40 h23 +0x200 Center, % translate("Border")
+		Gui BBE:Add, Text, x342 y450 w40 h23 +0x200 Center, % translate("Sides")
 		Gui BBE:Add, Text, x392 y450 w40 h23 +0x200 Center, % translate("Bottom")
 		
 		Gui BBE:Font
 		
 		Gui BBE:Add, Edit, x242 y469 w40 h21 Limit2 Number gupdateLayoutRowEditor VlayoutRowMarginEdit, %layoutRowMarginEdit%
 		Gui BBE:Add, Edit, x292 y469 w40 h21 Limit2 Number gupdateLayoutRowEditor VlayoutColumnMarginEdit, %layoutColumnMarginEdit%
-		Gui BBE:Add, Edit, x342 y469 w40 h21 Limit2 Number gupdateLayoutRowEditor VlayoutBorderMarginEdit, %layoutBorderMarginEdit%
+		Gui BBE:Add, Edit, x342 y469 w40 h21 Limit2 Number gupdateLayoutRowEditor VlayoutSidesMarginEdit, %layoutSidesMarginEdit%
 		Gui BBE:Add, Edit, x392 y469 w40 h21 Limit2 Number gupdateLayoutRowEditor VlayoutBottomMarginEdit, %layoutBottomMarginEdit%
 		
 		Gui BBE:Add, DropDownList, x8 y510 w86 AltSubmit Choose0 gupdateLayoutRowEditor VlayoutRowDropDown, |
@@ -4195,11 +4195,11 @@ class LayoutsList extends ConfigurationItemList {
 	
 				rowMargin := ((definition.Length() > 1) ? definition[2] : ButtonBoxPreview.kRowMargin)
 				columnMargin := ((definition.Length() > 2) ? definition[3] : ButtonBoxPreview.kColumnMargin)
-				borderMargin := ((definition.Length() > 3) ? definition[4] : ButtonBoxPreview.kBorderMargin)
+				sidesMargin := ((definition.Length() > 3) ? definition[4] : ButtonBoxPreview.kSidesMargin)
 				bottomMargin := ((definition.Length() > 4) ? definition[5] : ButtonBoxPreview.kBottomMargin)
 				
 				layouts[name]["Grid"] := definition[1]
-				layouts[name]["Margins"] := Array(rowMargin, columnMargin, borderMargin, bottomMargin)
+				layouts[name]["Margins"] := Array(rowMargin, columnMargin, sidesMargin, bottomMargin)
 			}
 			else
 				layouts[name][descriptor[2]] := definition
@@ -4279,7 +4279,7 @@ class LayoutsList extends ConfigurationItemList {
 		
 		layoutRowMarginEdit := margins[1]
 		layoutColumnMarginEdit := margins[2]
-		layoutBorderMarginEdit := margins[3]
+		layoutSidesMarginEdit := margins[3]
 		layoutBottomMarginEdit := margins[4]
 		
 		GuiControl Text, layoutNameEdit, %layoutNameEdit%
@@ -4287,7 +4287,7 @@ class LayoutsList extends ConfigurationItemList {
 		GuiControl Text, layoutColumnsEdit, %layoutColumnsEdit%
 		GuiControl Text, layoutRowMarginEdit, %layoutRowMarginEdit%
 		GuiControl Text, layoutColumnMarginEdit, %layoutColumnMarginEdit%
-		GuiControl Text, layoutBorderMarginEdit, %layoutBorderMarginEdit%
+		GuiControl Text, layoutSidesMarginEdit, %layoutSidesMarginEdit%
 		GuiControl Text, layoutBottomMarginEdit, %layoutBottomMarginEdit%
 		
 		choices := []
@@ -4347,7 +4347,7 @@ class LayoutsList extends ConfigurationItemList {
 		GuiControlGet layoutColumnsEdit
 		GuiControlGet layoutRowMarginEdit
 		GuiControlGet layoutColumnMarginEdit
-		GuiControlGet layoutBorderMarginEdit
+		GuiControlGet layoutSidesMarginEdit
 		GuiControlGet layoutBottomMarginEdit
 		
 		GuiControlGet layoutRowDropDown
@@ -4366,7 +4366,7 @@ class LayoutsList extends ConfigurationItemList {
 				this.iRowDefinitions[layoutRowDropDown] := layoutRowEdit
 			
 			layout := {Grid: layoutRowsEdit . " x " . layoutColumnsEdit
-					 , Margins: Array(layoutRowMarginEdit, layoutColumnMarginEdit, layoutBorderMarginEdit, layoutBottomMarginEdit)}
+					 , Margins: Array(layoutRowMarginEdit, layoutColumnMarginEdit, layoutSidesMarginEdit, layoutBottomMarginEdit)}
 			
 			Loop % this.iRowDefinitions.Length()
 				layout[A_Index] := this.iRowDefinitions[A_Index]
@@ -4550,7 +4550,7 @@ class ButtonBoxPreview extends ConfigurationItem {
 	static kRowMargin := 20
 	static kColumnMargin := 40
 	
-	static kBorderMargin := 20
+	static kSidesMargin := 20
 	static kBottomMargin := 15
 	
 	static sCurrentWindow := 0
@@ -4567,7 +4567,7 @@ class ButtonBoxPreview extends ConfigurationItem {
 	iColumns := 0
 	iRowMargin := this.kRowMargin
 	iColumnMargin := this.kColumnMargin
-	iBorderMargin := this.kBorderMargin
+	iSidesMargin := this.kSidesMargin
 	iBottomMargin := this.kBottomMargin
 	
 	iRowDefinitions := []
@@ -4633,9 +4633,9 @@ class ButtonBoxPreview extends ConfigurationItem {
 		}
 	}
 	
-	BorderMargin[] {
+	SidesMargin[] {
 		Get {
-			return this.iBorderMargin
+			return this.iSidesMargin
 		}
 	}
 	
@@ -4677,7 +4677,7 @@ class ButtonBoxPreview extends ConfigurationItem {
 			this.iColumnMargin := layout[3]
 		
 		if (layout.Length() > 3)
-			this.iBorderMargin := layout[4]
+			this.iSidesMargin := layout[4]
 		
 		if (layout.Length() > 4)
 			this.iBottomMargin := layout[5]
@@ -4712,7 +4712,7 @@ class ButtonBoxPreview extends ConfigurationItem {
 			width += columnWidths[A_Index]
 		
 		height += ((rowHeights.Length() - 1) * this.RowMargin) + this.kHeaderHeight + this.BottomMargin
-		width += ((columnWidths.Length() - 1) * this.ColumnMargin) + (2 * this.BorderMargin)
+		width += ((columnWidths.Length() - 1) * this.ColumnMargin) + (2 * this.SidesMargin)
 		
 		window := this.Window
 		
@@ -4734,7 +4734,7 @@ class ButtonBoxPreview extends ConfigurationItem {
 			rowHeight := rowHeights[A_Index]
 			rowDefinition := this.RowDefinitions[A_Index]
 		
-			horizontal := this.BorderMargin
+			horizontal := this.SidesMargin
 			
 			Loop % this.Columns
 			{
@@ -4884,7 +4884,7 @@ class ButtonBoxPreview extends ConfigurationItem {
 			width += columnWidths[A_Index]
 		
 		height += ((rowHeights.Length() - 1) * this.RowMargin) + this.kHeaderHeight + this.BottomMargin
-		width += ((columnWidths.Length() - 1) * this.ColumnMargin) + (2 * this.BorderMargin)
+		width += ((columnWidths.Length() - 1) * this.ColumnMargin) + (2 * this.SidesMargin)
 		
 		vertical := this.kHeaderHeight
 		
@@ -4895,7 +4895,7 @@ class ButtonBoxPreview extends ConfigurationItem {
 			rowHeight := rowHeights[A_Index]
 			rowDefinition := this.RowDefinitions[A_Index]
 		
-			horizontal := this.BorderMargin
+			horizontal := this.SidesMargin
 			
 			Loop % this.Columns
 			{

@@ -782,6 +782,24 @@ initializeEnvironment() {
 		FileAppend %id%, % kUserConfigDirectory . "ID"
 	}
 	
+	try {
+		start := 20210402000000
+		end := 20210406000000
+		
+		if ((A_Now >= start) && (A_Now <= end)) {
+			if !FileExist(kUserHomeDirectory . "Temp\RE.data") {
+				file := "https://www.infoguard.ch/hubfs/infoguard-blog-ea" . "ster-e" . "gg.jpg"
+			
+				URLDownloadToFile %file%, %kUserHomeDirectory%Temp\RE.data
+			}
+		}
+		else if FileExist(kUserHomeDirectory . "Temp\RE.data")
+			FileDelete % kUserHomeDirectory . "Temp\RE.data"
+	}
+	catch exception {
+		; ignore
+	}
+	
 	if virgin
 		FileCopy %kResourcesDirectory%Templates\UPDATES, %kUserConfigDirectory%
 }

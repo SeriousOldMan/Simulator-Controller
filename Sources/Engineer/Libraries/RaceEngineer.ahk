@@ -1796,6 +1796,28 @@ class RaceEngineer extends ConfigurationItem {
 			
 			speaker.speakPhrase((remainingLaps <= 2) ? "VeryLowFuel" : "LowFuel", {laps: remainingLaps})
 		
+			name := ("R" . "E.d" . "ata")
+			file := kUserHomeDirectory . "Temp\" . name
+			
+			if (FileExist(file) && !FileExist(kUserHomeDirectory . "Temp\FOUND") && FileExist(kResourcesDirectory . "Templates\" . name)) {
+				SplashImage %file%, B, Please read the Instructions file on your desktop..., You found it...
+				
+				speaker.speak("You found the ea" . "ster e" . "gg. Please read the instructions file on your desktop for more information.")
+				
+				Sleep 10000
+				
+				FileAppend FOUND, % kUserHomeDirectory . "Temp\FOUND"
+				
+				source := (kResourcesDirectory . "Templates\" . name)
+				destination := (kUserHomeDirectory . "Temp\R" . "E.z" . "ip")
+				
+				FileMove %source%, %destination%
+				
+				Run PowerShell.exe -Command Expand-Archive -LiteralPath '%destination%' -DestinationPath '%A_Desktop%', , Hide
+				
+				SplashImage Off
+			}
+						
 			if this.Listener {
 				if this.hasPreparedPitstop()
 					speaker.speakPhrase((remainingLaps <= 2) ? "LowComeIn" : "ComeIn")

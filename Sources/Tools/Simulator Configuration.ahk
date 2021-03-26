@@ -4323,7 +4323,7 @@ class LayoutsList extends ConfigurationItemList {
 		preview := ButtonBoxesEditor.Instance.ButtonBoxPreview
 		
 		if ((this.CurrentButtonBox != layoutNameEdit) || (!preview && (layoutNameEdit != "")) || (preview && (preview.Name != layoutNameEdit)))
-			ButtonBoxesEditor.Instance.updateButtonBoxPreview(this.CurrentButtonBox)
+			ButtonBoxesEditor.Instance.updateButtonBoxPreview(layoutNameEdit)
 	}
 	
 	addItem() {

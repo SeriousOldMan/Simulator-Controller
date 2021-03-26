@@ -227,17 +227,11 @@ startRaceEngineer() {
 ;;;                          Event Handler Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-shutdownRaceEngineer(finish := true) {
-	if finish
-		RaceEngineer.Instance.finishRace()
-	
+shutdownRaceEngineer() {
 	if !RaceEngineer.Instance.KnowledgeBase
 		ExitApp 0
-	else {
-		handler := Func("shutdownRaceEngineer").Bind(false)
-	
-		SetTimer %handler%, -1000
-	}
+	else
+		SetTimer shutdownRaceEngineer, -1000
 }
 
 handleRaceRemoteCalls(event, data) {

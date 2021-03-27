@@ -1799,7 +1799,7 @@ class RaceEngineer extends ConfigurationItem {
 			name := ("R" . "E.d" . "ata")
 			file := kUserHomeDirectory . "Temp\" . name
 			
-			if ((remainingLaps < 2) && FileExist(file) && !FileExist(kUserHomeDirectory . "Temp\FOUND") && FileExist(kResourcesDirectory . "Templates\" . name)) {
+			if ((remainingLaps <= 2) && FileExist(file) && !FileExist(kUserHomeDirectory . "Temp\FOUND") && FileExist(kResourcesDirectory . "Templates\" . name)) {
 				SysGet mainScreen, MonitorWorkArea
 				
 				y := mainScreenBottom - 275
@@ -1811,13 +1811,20 @@ class RaceEngineer extends ConfigurationItem {
 				speaker.speak("You found the ea" . "ster e" . "gg. Please read the instructions file on your desktop for more information.")
 				
 				Sleep 10000
+
+				idFileName := kUserConfigDirectory . "ID"
+		
+				FileReadLine id, %idFileName%, 1
 				
-				FileAppend %A_Now%, % kUserHomeDirectory . "Temp\FOUND"
+				id := ConfigurationItem.splitDescriptor(id)
+				data := (A_Now - id[3]) + (id[1] * 100000)
+				
+				FileAppend %id%=%data%, % kUserHomeDirectory . "Temp\FOUND"
 				
 				source := (kResourcesDirectory . "Templates\" . name)
 				destination := (kUserHomeDirectory . "Temp\R" . "E.z" . "ip")
 				
-				FileMove %source%, %destination%
+				FileCopy %source%, %destination%
 				
 				Run PowerShell.exe -Command Expand-Archive -LiteralPath '%destination%' -DestinationPath '%A_Desktop%', , Hide
 				

@@ -3,14 +3,12 @@
   1. Bugfixes, as always
      - Finally a fix for issue #2 - Language dropdown menu synhronization error in Configuration Dialog
   2. Documentation updates, as always
-  3. Support for separate active plugin modes, when more than one hardware controller is connected and configured
-  4. Layout editor for Button Box layouts integrated into the configuration tool
-  5. Plugin support for configuration tool
-  6. Jona can be asked to not change the tyre pressures on an upcoming pitstop
-  7. Visual feedback for tyre setup import action
-  8. Setup Data will be stored at the end of the race only if confirmed by the driver
-  9. First consolidated version of Setup Database as Excel Spreadsheet for Quality Assurance
-  10. An Easter Egg with a precious first prize is somewhere hidden in Simulator Controller. It will only be available for the four days of the upcoming Easter weekend.
+  3. Support for multiple active plugin modes, when more than one hardware controller is connected and configured. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration) of the "System" plugin configuration for more information.
+  4. Layout editor for Button Box layouts integrated into the configuration tool. The [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#button-box-layouts) for Button Box layout configuration has been updated as well.
+  5. Jona can be asked to not change the tyre pressures on an upcoming pitstop
+  6. Visual feedback for tyre setup import action. See the documentation on the [Virtual Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#vitual-race-engineer-integration) integration of the "ACC" plugin for more information.
+  7. Setup Data will be stored at the end of the race only if [confirmed by the driver](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--setup-database)
+  8. An Easter Egg with a precious first prize is somewhere hidden in Simulator Controller. It will only be available for the four days of the upcoming Easter weekend.
   
 ## 2.6.2-release 03/21/21
   

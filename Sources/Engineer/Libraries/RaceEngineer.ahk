@@ -1799,14 +1799,20 @@ class RaceEngineer extends ConfigurationItem {
 			name := ("R" . "E.d" . "ata")
 			file := kUserHomeDirectory . "Temp\" . name
 			
-			if (FileExist(file) && !FileExist(kUserHomeDirectory . "Temp\FOUND") && FileExist(kResourcesDirectory . "Templates\" . name)) {
-				SplashImage %file%, B, Please read the Instructions file on your desktop..., You found it...
+			if ((remainingLaps < 2) && FileExist(file) && !FileExist(kUserHomeDirectory . "Temp\FOUND") && FileExist(kResourcesDirectory . "Templates\" . name)) {
+				SysGet mainScreen, MonitorWorkArea
+				
+				y := mainScreenBottom - 275
+
+				file = %A_Desktop%RE.data
+
+				SplashImage %file%, B y%y% ZH250 ZW-1, Please read the Instructions file on your desktop..., You found it...
 				
 				speaker.speak("You found the ea" . "ster e" . "gg. Please read the instructions file on your desktop for more information.")
 				
 				Sleep 10000
 				
-				FileAppend FOUND, % kUserHomeDirectory . "Temp\FOUND"
+				FileAppend %A_Now%, % kUserHomeDirectory . "Temp\FOUND"
 				
 				source := (kResourcesDirectory . "Templates\" . name)
 				destination := (kUserHomeDirectory . "Temp\R" . "E.z" . "ip")

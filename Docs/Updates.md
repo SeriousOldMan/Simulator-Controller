@@ -45,11 +45,11 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 2.7
 
-Most of the changes for release 2.7 will be handled automatically. You may want to check your Button Box configuration using the configuration tool and the [new Button Box layout editor](), if you have defined your own Button Box configuration file in the past.
+Most of the changes for release 2.7 will be handled automatically. You may want to check your Button Box configuration using the configuration tool and the [new Button Box layout editor](*), if you have defined your own Button Box configuration file in the past.
 
 The *raceEngineerSettings* parameter of the [ACC plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-acc) has been renamed to *raceEngineerOpenSettings*. The old parameter still works, but is deprecated, so want to rename the parameter, if you have used it in your configuration.
 
-Since many of you did not trust the setup database collection, the text of the consent changed to state specifically, that only tyre setup informations are collected. Therefore the consent dialog will appear again and you might rethink your decision. If more data will be collected in the future, I promise, that you can decide for each data category separately.
+Since many of you did not trust the setup database collection, the text of the consent changed to state specifically, that only tyre setup informations are collected. Therefore the consent dialog will appear again and you might rethink your decision. If more data will be collected in the future, I promise, that you can decide for each data category separately. Also, since there were some confusions about the required steps to create correct content in the setup database, I decided to delete all content for this release again. If you are really sure that your recorded tyre setups have been created with the correct initial setup data, move your *Setup Database* folder to a secure location, run the update procedure and restore the database afterwards. Jona [now asks at the end of a race](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tab-race), if you want to store your data in the database, so you can make sure, that only correct data will be stored.
 
 ## Release 2.6
 

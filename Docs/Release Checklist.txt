@@ -14,6 +14,7 @@ General Release Actions
 Release 2.7 Checklist
 =====================
 
+0. Important: Check for (*) in all MD files
 1. Bugfix for Issue #2 - Language Dropdown List Update
 2. Documentation Update
    a. Virtual Race Engineer

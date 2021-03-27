@@ -477,6 +477,24 @@ updateCustomCalls(startNumber, endNumber) {
 	}
 }
 
+updateConfigurationForV27() {
+	try {
+		FileDelete % kUserConfigDirectory . "CONSENT"
+	}
+	catch exception {
+		; ignore
+	}
+	
+	try {
+		directory := SubStr(kSetupDatabaseDirectory, 1, StrLen(kSetupDatabaseDirectory) - 1)
+		
+		FileRemoveDir %directory%, 1
+	}
+	catch exception {
+		; ignore
+	}
+}
+
 updateConfigurationForV261() {
 	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
 	userConfiguration := readConfiguration(userConfigurationFile)

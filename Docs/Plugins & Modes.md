@@ -27,9 +27,11 @@ The "System" plugin creates the controller mode "Launch", which serves as a laun
 
 The "System" plugin accepts one configuration argument in the [Plugins tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) of the configuration tool, which you almost always will provide:
 
-	modeSelector: *modeSelectorFunction*, shutdown: *shutdownFunction*
+	modeSelector: *modeSelectorFunction1* *modeSelectorFunction2* ...;
+	shutdown: *shutdownFunction*
 	
-The *modeSelector* parameter allows you to define a controller function to switch between modes. The *modeSelectorFunction* must be in the descriptor format, i.e. *"functionType*.*number*". You can use binary functions, such as 2-way toggle switches or dials, to switch forward and backward between modes, but a simple push button can also be used. Example: "modeSelector: 2WayToggle.1".
+The *modeSelector* parameter allows you to define controller functions that switch between modes on your Button Boxes. The *modeSelectorFunctionX* must be in the descriptor format, i.e. *"functionType*.*number*". You can use binary functions, such as 2-way toggle switches or dials, to switch forward and backward between modes, but a simple push button can also be used. Example: "modeSelector: 2WayToggle.1". If you have multiple Button Boxes, you may want to create a mode selector for each one, especially, if you defined modes, whose actions are exclusive for one of those Button Boxes. Doing this, you can have mutiple modes active on the same time on your Button Boxes and you can switch between those modes on each of those Button Boxes separately.
+
 With the *shutdown* parameter, a unary function can be supplied to shutdown the complete simulator system. This function will be available in the "Launch" mode.
 
 ## Plugin *Tactile Feedback*

@@ -219,8 +219,11 @@ Returns a list of all registered plugins. Some of these plugins might be inactiv
 #### *Modes[]*
 A list of all modes defined by all plugins. Here also, not all modes might be active in a given situation.
 	
-#### *ActiveMode[]*
-The currently active mode. This mode defines the currently active layer of controller functions and actions on your hardware controller.
+#### *ActiveModes[]*
+The currently active modes. These modes define the currently active layer of controller functions and actions on your hardware controllers.
+
+#### *ActiveMode[buttonBox :: ButtonBox}*
+Returns the mode, which is currently active for the given buttonBox argument. If more than one mode are active on this Button Box, only the first of these modes is returned.
 	
 #### *ActiveSimulator[]*
 If a simulation game is currently running, the name of this application is returned by this property.
@@ -239,6 +242,9 @@ Since *SimulatorController* is a singleton class, the single instance might be a
 
 #### [Factory Method] *createControllerFunction(descriptor :: String, configuration :: ConfigurationMap)*
 Returns an instance of [ControllerFunction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-controllerfunction-simulator-controllerahk) according to the givven descriptor.
+
+#### *findButtonBox(function :: ControllerFunction)*
+Return the *ButtonBox* instance, that defines the given function, or *false*, if the function is not associated with a hardware controller.
 
 #### *findPlugin(name :: String)*
 Searches for a plugin with the given name. Returns *false*, if not found.
@@ -445,6 +451,9 @@ Returns the plugin, which has defined this mode.
 #### *Controller[]*
 The controller, where the plugin of this mode has been registered.
 
+#### *ButtonBoxes[]*
+Returns a list all [ButtonBox](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-buttonbox-extends-configurationitem-simulator-controllerahk) instances, on which this mode has registered actions.
+
 #### *Actions[]*
 A list of all actions defined by this mode.
 
@@ -455,6 +464,9 @@ Constructs a new mode. [registerMode](https://github.com/SeriousOldMan/Simulator
 
 #### *registerAction(action :: ControllerAction)*
 Registers the given action for this mode. In deviation from some other *register...* methods, *registerAction* is not called automatically by the constructor of [ControllerAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controlleraction-simulator-controllerahk), since actions might be defined for plugins or for modes. Therefore you need to register a new action for the right owner object.
+
+#### *registerButtonBox(buttonBox :: ButtonBox)*
+Registers a visual representation for the hardware controller, for which this mode has defined one or more actions. This method is called automatically, so nothing to do on your side, but you may want to overwrite the method in situations, where you want to take special actions for one of these Button Boxes.
 
 #### *findAction(label :: String)*
 Searches for an action with the given label or name defined by this mode. Returns *false*, if not found.
@@ -533,6 +545,10 @@ This method must be implemented by a subclass of *ButtonBox*. The window with it
 
 #### *associateGui(window :: String, width :: Integer, height :: Integer, num1WayToggles :: Integer, num2WayToggles :: Integer, numButtons :: Integer, numDials :: Integer)*
 This method must be called by *createGui* to describe the Button Box to the framework.
+
+#### *findButtonBox(window :: String)*
+This class method return the *ButtonBox* instance, that defined the given window, or *false*, if there is no such instance.
+
 
 #### *registerControlHandle(descriptor :: String, handle :: Control Handle)*
 This method must be called by *createGui* as well for each label field of the Button Box. *handle* must be a control handle as defined by the *Hwnd* argument of [AutoHotkey Gui elements](https://www.autohotkey.com/docs/commands/Gui.htm).

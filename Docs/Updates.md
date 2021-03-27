@@ -43,6 +43,14 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ***
 
+## Release 2.7
+
+Most of the changes for release 2.7 will be handled automatically. You may want to check your Button Box configuration using the configuration tool and the [new Button Box layout editor](), if you have defined your own Button Box configuration file in the past.
+
+The *raceEngineerSettings* parameter of the [ACC plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-acc) has been renamed to *raceEngineerOpenSettings*. The old parameter still works, but is deprecated, so want to rename the parameter, if you have used it in your configuration.
+
+Since many of you did not trust the setup database collection, the text of the consent changed to state specifically, that only tyre setup informations are collected. Therefore the consent dialog will appear again and you might rethink your decision. If more data will be collected in the future, I promise, that you can decide for each data category separately.
+
 ## Release 2.6
 
 Nothing major for this release, everything will be taken care of by the automated update procedure. For political correctness (sorry for my previous choice of words, but I am an IT guy and in the world of IT these terminology is of widespread use), I renamed "Master Controller" to "Main Controller" and "Slave Controller" to "Support Controller" for the Button Box configurations. As said, this renaming will be handled by the automated update, but if you have configured your own Button Boxes based on the preconfigured ones of the previous release, you might want to check in your configuration, whether everything is as expected after the update.

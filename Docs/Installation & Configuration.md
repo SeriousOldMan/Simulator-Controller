@@ -4,7 +4,7 @@ Download one of the releases, preferably the latest stable build, and unzip it a
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Unblock.JPG)
 
-You might still encounter execution errors later on, beacause of Windows security restrictions. This is nothing I can change at the moment, at least not without buying an expensive certificate, that secures the source of the binaries. Therefore, an additional step might be necessary: You will find a little Powershell script in the *Utilities* folder, which you can copy to the *Binaries* folder and execute it there with Administrator privileges. These are the commands, which need be executed:
+You might still encounter execution errors later on because of Windows security restrictions. This is nothing I can change at the moment, at least not without buying an expensive certificate, that secures the source of the binaries. Therefore, an additional step might be necessary: You will find a little Powershell script in the *Utilities* folder, which you can copy to the *Binaries* folder and execute it there with Administrator privileges. These are the commands, which need be executed:
 
 	takeown.exe /F . /R /D N
 	Get-ChildItem -Path '.' -Recurse | Unblock-File
@@ -47,7 +47,7 @@ Hint: Beside simply running the configuration tool by double clicking it, there 
 
 The configuration tool consists of several pages or tabs. Below you will find a description of each tab. Beside the pages, there are the well known buttons "Ok", "Cancel" and "Apply".
 
-Note: You will find field labels that look like well known hyperlinks at several places in the configuration tool. Yes, you can click on them and a context sensitive section of the this documentation will be opened in your browser. With the *Save* mode dropdown menu in the lower left corner of the configuration dialog you can choose between *manual* and *Automatic* save mode of all your changes to list items in the different editors.
+Note: You will find field labels that look like well known hyperlinks at several places in the configuration tool. Yes, you can click on them and a context sensitive section of the this documentation will be opened in your browser. With the *Save* mode dropdown menu in the lower left corner of the configuration dialog you can choose between *Manual* and *Automatic* save mode of all your changes to list items in the different editors.
 
 ### Tab *General*
 
@@ -105,10 +105,13 @@ This tab represents the most important, the most versatile and also the most dif
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%204.JPG)
 
-Note: Beginning with Release 2.4, Simulator Controller supports multiple Button Boxes. For the moment, the functions defined on the *Controller tab* will span all Button Boxes. So, the first Button Box might define Button #1 to Button #8 and the second Button Box will define Button #9 onwards. Also, only one mode will be active for all Button Boxes at the same time. This might change in a future version.
+Note: Beginning with Release 2.4, Simulator Controller supports multiple Button Boxes. The functions defined on the *Controller tab* will span all Button Boxes. So, the first Button Box might define Button #1 to Button #8 and the second Button Box will define Button #9 onwards. A sngle mode can use controls from several Button Boxes, but you can also have multiple modes active at the same time, as long as these modes uses controls from distinct Button Boxes. See the documentation on the "System" plugin for more information on [how to control multiple simultaneous modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-system).
 
-In the first step you have to define the Button Boxes, which will be activated by Simulator Controller, by entering them into the list. The name entered here must be identical to that used, when defining the corresponding Button Box layout and configuration, a task, which is described in a [dedicated documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#button-box-layouts) below. The order, in which the Button Boxes are entered in the list, establish the order these boxes initially appear on screen, but you can move them around using the mouse later.
+In the first step you have to define the Button Boxes, which will be activated by Simulator Controller, by entering them into the list. Each Button Box must have a name, whihc might be displayed on the visual representation and you must chose a layout definition from the dropdown next to the name entry field. Button Box layouts can be configured using a separate tool, which is described in a [dedicated documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#button-box-layouts) below. This tool can be opened by pressing the small little button with the three dots next to the dropdown menu.
 
+Note: The order, in which the Button Boxes are entered in the given list, establish the order these boxes initially appear on screen, but you can move them around using the mouse later.
+
+After you have all your Button Boxes created, you must configure the controller actions, which will be associated with the controls on your hardware controller or which might be triggered by other software systems using hotkeys. For each action and its corrsponding binding, you have to create an entry in the *Functions* list.
 In the *Bindings* group, you define one or two hotkeys and corresponding actions, depending on whether you have defined a unary or binary function type. 2-way toggles and dials need two bindings for the "On" and "Off", respectivly the "Increase" and "Decrease" trigger. The binding of a function happens by defining [hotkeys](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#hotkeys), which might trigger the given function. You can define more than one hotkey descriptor, delimited by the vertical bar "|", for each trigger in the controller tab. This might be useful, if you have several sources, which can trigger a given function. For example you might have a function, which can be triggered by pushing a button on the controller, but also from the keyboard, which might be emulated by another tool, for example a voice recognition software.
 
 Additionally to definining hotkeys for keyboard or controller triggers, you can now use the voice recognition capabilities of Simulator Controller, which were introduced with Release 2.1 for the virtual race engineer (see [update notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-21) for specific installation information). A voice trigger must be preceeded by "?" and you can use the full [phrase grammar](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#phrase-grammars) capabilities of the voice recognition framework. But in most cases, you will use simple phrases like "?Next Page", which might be used as a voice trigger for the mode switch. Please be aware, that the recognition language uses the language setting, that is chosen in the configuration. As a result, you might have to change your phrases, if you decide to switch to a different language setting in the user interface.
@@ -226,7 +229,7 @@ Important: The ISO language code and the language name itself cannot be changed,
 
 # Button Box Layouts
 
-Beginning with Release 2.5 it is possible to define Button Box layouts using a structured configuration file. A future version will introduce a graphical editor to work on these configurations, but for now you have to create the configuration file using a text editor.
+Beginning with Release 2.5 it is possible to define Button Box layouts using a structured configuration file. Below you find a sample definition for information, but no worries, a graphical editor is available to handle this file.
 
 	[Controls]
 	Switch=2WayToggle;%kButtonBoxImagesDirectory%Photorealistic\Toggle Switch.png;54 x 85
@@ -235,19 +238,29 @@ Beginning with Release 2.5 it is possible to define Button Box layouts using a s
 	[Labels]
 	Label=56 x 30
 	[Layouts]
-	Main Controller.Layout=3 x 5
-	Main Controller.1=Switch.1,Label;Switch.2,Label;Switch.3,Label;Switch.4,Label;Switch.5,Label
-	Main Controller.2=Push.1,Label;Push.2,Label;Push.3,Label;Push.4,Label;Rotary.1,Label
-	Main Controller.3=Push.5,Label;Push.6,Label;Push.7,Label;Push.8,Label;Rotary.2,Label
-	Support Controller.Layout=3 x 4, 20, 60, 20, 15
-	Support Controller.1=Push.9,Label;Push.10,Label;Push.11,Label;Push.12,Label
-	Support Controller.2=Push.13,Label;Push.14,Label;Push.15,Label;Push.16,Label
-	Support Controller.3=Push.17,Label;Push.18,Label;Push.19,Label;Push.20,Label
+	Controller 1.Layout=3 x 5
+	Controller 1.1=Switch.1,Label;Switch.2,Label;Switch.3,Label;Switch.4,Label;Switch.5,Label
+	Controller 1.2=Push.1,Label;Push.2,Label;Push.3,Label;Push.4,Label;Rotary.1,Label
+	Controller 1.3=Push.5,Label;Push.6,Label;Push.7,Label;Push.8,Label;Rotary.2,Label
+	Controller 2.Layout=3 x 4, 20, 60, 20, 15
+	Controller 2.1=Push.9,Label;Push.10,Label;Push.11,Label;Push.12,Label
+	Controller 2.2=Push.13,Label;Push.14,Label;Push.15,Label;Push.16,Label
+	Controller 2.3=Push.17,Label;Push.18,Label;Push.19,Label;Push.20,Label
 
-You can define as many Button Boxes as you whish, but only those Boxes will be activated by Simulator Controller, that also have been added to the list of active Button Boxes list at the top of the [*Controller* tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller).
+You can define as many Button Box layouts as you want, but only those Boxes will be activated by Simulator Controller, that also have been added to the list of active Button Boxes list at the top of the [*Controller* tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller).
 
 In the given configuration file, you first have to define the different *Control* types, you want to use on your Button Box layouts. In the example above, three different *Control* types are defined, each one consisting of the name of the corresponding class, the image for the visual representation and the size information for this image. Supported classes are "1WayToggle", "2WayToggle", "Button" and "Dial", which corresponds with the controller functions used on the [*Controller* tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller). The given name of the *Control* type definition will then be used in the configuration of the concrete layouts in the *[Layouts]* section.
 
-You may define different *Label* types, if you are using label fields of different sizes for your controls. The example only introduces one label with a fixed size for all controls.
+You may define different *Label* types, if you are using label fields of different sizes for your controls. The example above only introduces one label with a fixed size for all controls.
 
-In the last section, the layouts of one or more Button Boxes are described using these components. For each Button Box you have to define the layout grid with *.Layout*" descriptor. The grid argument is required, the other optional parts as in "Support Controller.Layout=3 x 4, 20, 60, 20, 15" are the *Row Margin*, *Column Margin*, *Border Margin* and *Bottom Margin* with 20, 40, 20 and 15 as default. After defining the layout, you enumerate the controls of each row seperately. It is possible to leave positions in the grid blank, when not every corresponding position on your Button Box is occupied with a control. It is also possible to create a control without a label field. The number of each control must correspond with the number of the corresponding controller function defined on the [*Controller* tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller).
+In the last section, the layouts of one or more Button Boxes are described using these components. For each Button Box you have to define the layout grid with *.Layout*" descriptor. The grid argument ("R x C", where "R" define the number of rows and "C" the number of columns) is required, the other optional parts as in "Controller 2.Layout=3 x 4, 20, 60, 20, 15" are the *Row Margin*, *Column Margin*, *Sides Margin* and *Bottom Margin* with 20, 40, 20 and 15 as default. After defining the layout, you enumerate the controls of each row seperately. It is possible to leave positions in the grid blank, when not every corresponding position on your Button Box is occupied with a control, and it is also possible to create a control without a label field. The number of each control (as in "Push.17" must correspond with the number of the corresponding controller function defined on the [*Controller* tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller).
+
+After we now have an understanding of the Button Box layout definition format, let's have a look at the graphical editor, which handles this configuration file. As always, the file will be stored in the *Simulator Controller\Config* folder which resides in your user *Documents* folder.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%20Editor%201.JPG)
+
+As you can see, the structure of this editor is very similar to the structure of the configuration file above. You first have to enter your controls and labels in the first two sections of the editor and then you can define the Button Box layouts. If you select an existing layout definition or when you save a newly created definition, a preview window of this Button Box layout will be opened in the lower right corner of your screen.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%20Editor%202.JPG)
+
+This window will visualize the current layout and will change, whenever you change one of the definitions in the layout editor. Please note, that you have to save the definition changes using the *Save* buttons to update the preview window, as long as you do not have chosen the [*Automatic* save mode}(https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#using-the-configuration-tool). As you can see in the image above, freshly added rows and columns will show a free "Space", which you can fill up with *Controls*. Please note, that the "Space" marker will only be shown in the preview mode, so intentionally free space will look good on the final Button Box. You con click on each cell of the preview window and change the *Control* and the *Label*, which should occupy this cell, and you can choose the corresponding controller function number for the given control.

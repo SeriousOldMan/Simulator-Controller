@@ -20,20 +20,21 @@ Release 2.7 Checklist
    b. Plugins & Modes
    c. Functions
    d. Installation & Setup
-   e. Constants.md
+   e. Constants
+   f. Classes
 3. Update Procedure
    a. Controller Plugin Labels
    b. raceEngineerSettings => raceEngineerOpenSettings
    c. Phrase Grammars
    d. Translations
    e. Update [Button Boxes] Format
+   f. Clear local setup database
 4. Rework Controller Modes
    - Update Functions.md
    a. ActiveMode => ActiveModes and ActiveMode with parameter
    b. ModeSelectors
    c. Controller.findButtonBox
    d. ControllerMode.ButtonBoxes and registerButtonBox
-   e. exclusive parameter for setMode
    f. currentMode parameter for rotateMode
 5. CONSENT
    a. "Yes" => "Tyre Pressures"

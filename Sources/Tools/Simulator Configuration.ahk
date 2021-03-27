@@ -1412,7 +1412,7 @@ class ApplicationsTab extends ConfigurationItemList {
 		Gui SE:Add, Button, x451 y342 w23 h23 gchooseApplicationWorkingDirectoryPath, % translate("...")
 		
 		Gui SE:Add, Text, x16 y367 w140 h23 +0x200, % translate("Window Title (optional)")
-		Gui SE:Font, cGray s8
+		Gui SE:Font, c505050 s8
 		Gui SE:Add, Text, x24 y385 w133 h23, % translate("(Use AHK WinTitle Syntax)")
 		Gui SE:Font
 		Gui SE:Add, Edit, x180 y367 w268 h21 VapplicationWindowTitleEdit, %applicationWindowTitleEdit%
@@ -3718,13 +3718,14 @@ class ButtonBoxesEditor extends ConfigurationItem {
 		this.iButtonBoxConfiguration := configuration
 		
 		oldPreview := this.ButtonBoxPreview
-		this.iButtonBoxPreview := false
 		
 		if name {
 			this.iButtonBoxPreview := new ButtonBoxPreview(this, name, configuration)
 		
 			this.ButtonBoxPreview.open()
 		}
+		else
+			this.iButtonBoxPreview := false
 		
 		if oldPreview
 			oldPreview.close()
@@ -4143,7 +4144,7 @@ class LayoutsList extends ConfigurationItemList {
 		Gui BBE:Add, Edit, x102 y445 w110 h21 VlayoutNameEdit, %layoutNameEdit%
 		
 		Gui BBE:Add, Text, x8 y469 w86 h23 +0x200, % translate("Layout")
-		Gui BBE:Font, cGray s7
+		Gui BBE:Font, c505050 s7
 		Gui BBE:Add, Text, x16 y490 w133 h21, % translate("(R x C, Margins)")
 		Gui BBE:Font
 		
@@ -4153,7 +4154,7 @@ class LayoutsList extends ConfigurationItemList {
 		Gui BBE:Add, Edit, x172 y469 w40 h21 Limit1 Number gupdateLayoutRowEditor VlayoutColumnsEdit, %layoutColumnsEdit%
 		Gui BBE:Add, UpDown, x195 y469 w17 h21, 1
 		
-		Gui BBE:Font, s7
+		Gui BBE:Font, c505050 s7
 		
 		Gui BBE:Add, Text, x242 y450 w40 h23 +0x200 Center, % translate("Row")
 		Gui BBE:Add, Text, x292 y450 w40 h23 +0x200 Center, % translate("Column")

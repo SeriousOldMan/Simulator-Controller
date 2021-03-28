@@ -24,6 +24,7 @@ Release 2.7 Checklist
    d. Installation & Setup
    e. Constants
    f. Classes
+   g. Updates
 3. Update Procedure
    a. Controller Plugin Labels
    b. raceEngineerSettings => raceEngineerOpenSettings
@@ -54,6 +55,10 @@ Release 2.7 Checklist
 10. New constant kSetupDatabaseDirectory
    a. Constants.md
 11. Rename of Plugins.ahk and Configurators.ahk
+12. No Refuel Pictures
+    - Update Documentation
+	- Translations
+    
 
 Release 2.6 Checklist
 =====================

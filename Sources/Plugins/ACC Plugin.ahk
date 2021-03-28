@@ -997,7 +997,7 @@ class ACCPlugin extends ControllerPlugin {
 		if x is Integer
 		{
 			if !inList(this.iPSOptions, "Strategy") {
-				this.iPSOptions.InsertAt(inList(this.iPSOptions, "Refuel"), "Strategy")
+				this.iPSOptions.InsertAt(inList(this.iPSOptions, "Pit Limiter") + 1, "Strategy")
 				
 				this.iPSTyreOptionPosition := inList(this.iPSOptions, "Change Tyres")
 				this.iPSBrakeOptionPosition := inList(this.iPSOptions, "Change Brakes")
@@ -1049,21 +1049,21 @@ class ACCPlugin extends ControllerPlugin {
 
 			if x is Integer
 			{
-				images.Push(pitStrategyLabel)
+				images.Push(noRefuelLabel)
 			
 				break
 			}
 		}
 
 		if !this.iPSImageSearchArea
-			logMessage(kLogInfo, translate("Full search for 'Pit Strategy' took ") . (A_TickCount - curTickCount) . translate(" ms"))
+			logMessage(kLogInfo, translate("Full search for 'No Refuel' took ") . (A_TickCount - curTickCount) . translate(" ms"))
 		else
-			logMessage(kLogInfo, translate("Optimized search for 'Pit Strategy' took ") . (A_TickCount - curTickCount) . translate(" ms"))
+			logMessage(kLogInfo, translate("Optimized search for 'No Refuel' took ") . (A_TickCount - curTickCount) . translate(" ms"))
 		
 		if x is Integer
 		{
-			if !inList(this.iPSOptions, "Strategy") {
-				this.iPSOptions.InsertAt(inList(this.iPSOptions, "Refuel"), "Strategy")
+			if !inList(this.iPSOptions, "Refuel") {
+				this.iPSOptions.InsertAt(inList(this.iPSOptions, "Change Tyres"), "Refuel")
 				
 				this.iPSTyreOptionPosition := inList(this.iPSOptions, "Change Tyres")
 				this.iPSBrakeOptionPosition := inList(this.iPSOptions, "Change Brakes")
@@ -1073,10 +1073,10 @@ class ACCPlugin extends ControllerPlugin {
 			
 			lastY := y
 		
-			logMessage(kLogInfo, translate("'Pit Strategy' detected, adjusting pit stop options: " . values2String(", ", this.iPSOptions*)))
+			logMessage(kLogInfo, translate("'Refuel' detected, adjusting pit stop options: " . values2String(", ", this.iPSOptions*)))
 		}
 		else {
-			position := inList(this.iPSOptions, "Strategy")
+			position := inList(this.iPSOptions, "Refuel")
 			
 			if position {
 				this.iPSOptions.RemoveAt(position)
@@ -1087,7 +1087,7 @@ class ACCPlugin extends ControllerPlugin {
 				reload := true
 			}
 		
-			logMessage(kLogInfo, translate("'Pit Strategy' not detected, adjusting pit stop options: " . values2String(", ", this.iPSOptions*)))
+			logMessage(kLogInfo, translate("'Refuel' not detected, adjusting pit stop options: " . values2String(", ", this.iPSOptions*)))
 		}
 		
 		return reload
@@ -1307,6 +1307,8 @@ class ACCPlugin extends ControllerPlugin {
 			
 			if (!fromTimer && this.iPSIsOpen) {
 				reload := this.searchStrategyLabel(lastY, images)
+				
+				reload := (this.searchNoRefuelLabel(lastY, images) || reload)
 				
 				reload := (this.searchTyreLabel(lastY, images) || reload)
 				

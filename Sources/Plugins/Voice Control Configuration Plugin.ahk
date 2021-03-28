@@ -40,21 +40,28 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		
 		languages := availableLanguages()
 		
-		for ignore, grammarFile in getFileNames("Race Engineer.grammars.*", kUserConfigDirectory, kConfigDirectory) {
-			SplitPath grammarFile, , , languageCode
-		
-			if languages.HasKey(languageCode)
-				language := languages[languageCode]
-			else
-				language := languageCode
-			
+		for code, language in languages {
 			choices.Push(language)
 			
 			if (language == voiceLanguageDropDown)
 				chosen := A_Index
 				
-			if (languageCode = "en")
+			if (code = "en")
 				enIndex := A_Index
+		}
+			
+		for ignore, grammarFile in getFileNames("Race Engineer.grammars.*", kUserConfigDirectory, kConfigDirectory) {
+			SplitPath grammarFile, , , languageCode
+		
+			if !languages.HasKey(languageCode) {
+				choices.Push(languageCode)
+				
+				if (languageCode == voiceLanguageDropDown)
+					chosen := choices.Length()
+					
+				if (languageCode = "en")
+					enIndex := choices.Length()
+			}
 		}
 		
 		if (chosen == 0)
@@ -154,20 +161,30 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		languageCode := "en"
 		languages := availableLanguages()
 		
-		for ignore, grammarFile in getFileNames("Race Engineer.grammars.*", kUserConfigDirectory, kConfigDirectory) {
-			SplitPath grammarFile, , , grammarLanguageCode
-		
-			if languages.HasKey(grammarLanguageCode)
-				language := languages[grammarLanguageCode]
-			else
-				language := grammarLanguageCode
-			
+		found := false
+
+		for code, language in availableLanguages()
 			if (language = voiceLanguageDropDown) {
-				languageCode := grammarLanguageCode
+				found := true
 				
-				break
+				languageCode := code
 			}
-		}
+			
+		if !found
+			for ignore, grammarFile in getFileNames("Race Engineer.grammars.*", kUserConfigDirectory, kConfigDirectory) {
+				SplitPath grammarFile, , , grammarLanguageCode
+			
+				if languages.HasKey(grammarLanguageCode)
+					language := languages[grammarLanguageCode]
+				else
+					language := grammarLanguageCode
+				
+				if (language = voiceLanguageDropDown) {
+					languageCode := grammarLanguageCode
+					
+					break
+				}
+			}
 		
 		if (speakerDropDown = translate("Automatic"))
 			speakerDropDown := true

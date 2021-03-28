@@ -15,6 +15,7 @@ Release 2.7 Checklist
 =====================
 
 0. Important: Check for (*) in all MD files
+0. How to update Configurators.ahk?
 1. Bugfix for Issue #2 - Language Dropdown List Update
 2. Documentation Update
    a. Virtual Race Engineer

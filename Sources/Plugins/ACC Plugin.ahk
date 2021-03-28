@@ -1027,6 +1027,72 @@ class ACCPlugin extends ControllerPlugin {
 		return reload
 	}
 	
+	searchNoRefuelLabel(ByRef lastY, images) {
+		static noRefuelLabels := false
+		curTickCount := A_TickCount
+		reload := false
+		
+		if !noRefuelLabels
+			noRefuelLabels := this.getLabelFileNames("No Refuel")
+
+		x := kUndefined
+		y := kUndefined
+		
+		Loop % noRefuelLabels.Length()
+		{
+			noRefuelLabel := noRefuelLabels[A_Index]
+			
+			if !this.iPSImageSearchArea
+				ImageSearch x, y, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, *20 %noRefuelLabel%
+			else
+				ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *20 %noRefuelLabel%
+
+			if x is Integer
+			{
+				images.Push(pitStrategyLabel)
+			
+				break
+			}
+		}
+
+		if !this.iPSImageSearchArea
+			logMessage(kLogInfo, translate("Full search for 'Pit Strategy' took ") . (A_TickCount - curTickCount) . translate(" ms"))
+		else
+			logMessage(kLogInfo, translate("Optimized search for 'Pit Strategy' took ") . (A_TickCount - curTickCount) . translate(" ms"))
+		
+		if x is Integer
+		{
+			if !inList(this.iPSOptions, "Strategy") {
+				this.iPSOptions.InsertAt(inList(this.iPSOptions, "Refuel"), "Strategy")
+				
+				this.iPSTyreOptionPosition := inList(this.iPSOptions, "Change Tyres")
+				this.iPSBrakeOptionPosition := inList(this.iPSOptions, "Change Brakes")
+				
+				reload := true
+			}
+			
+			lastY := y
+		
+			logMessage(kLogInfo, translate("'Pit Strategy' detected, adjusting pit stop options: " . values2String(", ", this.iPSOptions*)))
+		}
+		else {
+			position := inList(this.iPSOptions, "Strategy")
+			
+			if position {
+				this.iPSOptions.RemoveAt(position)
+				
+				this.iPSTyreOptionPosition := inList(this.iPSOptions, "Change Tyres")
+				this.iPSBrakeOptionPosition := inList(this.iPSOptions, "Change Brakes")
+				
+				reload := true
+			}
+		
+			logMessage(kLogInfo, translate("'Pit Strategy' not detected, adjusting pit stop options: " . values2String(", ", this.iPSOptions*)))
+		}
+		
+		return reload
+	}
+	
 	searchTyreLabel(ByRef lastY, images) {
 		static wetLabels := false
 		static compoundLabels := false

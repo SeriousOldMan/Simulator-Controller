@@ -1,5 +1,5 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Controller Configurator         ;;;
+;;;   Modular Simulator Controller System - Controller Configuration Plugin ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2021) Creative Commons - BY-NC-SA                        ;;;
@@ -120,6 +120,25 @@ class ButtonBoxesList extends ConfigurationItemList {
 			controller.Push(values2String(":", item*))
 		
 		setConfigurationValue(configuration, "Controller Layouts", "Button Boxes", values2String("|", controller*))	
+	}
+	
+	clickEvent(line, count) {
+		GuiControlGet buttonBoxesListBox
+					
+		index := false
+		
+		for ignore, candidate in this.iItemsList
+			if (buttonBoxesListBox = candidate[1]) {
+				index := A_Index
+			
+				break
+			}
+		
+		this.openEditor(index)
+	}
+	
+	processListEvent() {
+		return true
 	}
 	
 	loadList(items) {
@@ -1894,6 +1913,17 @@ class ButtonBoxPreview extends ConfigurationItem {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+toggleKeyDetector(callback := false) {
+	protectionOn()
+	
+	try {
+		ConfigurationEditor.Instance.toggleKeyDetector()
+	}
+	finally {
+		protectionOff()
+	}
+}
+	
 openButtonBoxEditor() {
 	ButtonBoxesList.Instance.openButtonBoxEditor()
 }

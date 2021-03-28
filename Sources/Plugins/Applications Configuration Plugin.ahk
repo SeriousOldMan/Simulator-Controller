@@ -1,5 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Applications Configurator       ;;;
+;;;   Modular Simulator Controller System - Applications Configuration      ;;;
+;;;                                         Plugin                          ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2021) Creative Commons - BY-NC-SA                        ;;;
@@ -151,8 +152,9 @@ class ApplicationsConfigurator extends ConfigurationItemList {
 			GuiControl Disable, applicationDeleteButton
 			GuiControl Disable, applicationUpdateButton
 		}
-		
-		LaunchpadConfigurator.Instance.loadApplicationChoices(true)
+	
+		if LaunchpadConfigurator.Instance
+			LaunchpadConfigurator.Instance.loadApplicationChoices(true)
 	}
 	
 	loadList(items) {
@@ -177,6 +179,9 @@ class ApplicationsConfigurator extends ConfigurationItemList {
 			LV_ModifyCol(4, 80)
 			
 			first := false
+	
+			if LaunchpadConfigurator.Instance
+				LaunchpadConfigurator.Instance.loadApplicationChoices(true)
 		}
 	}
 	
@@ -241,7 +246,11 @@ chooseApplicationExePath() {
 	protectionOn()
 	
 	try {
-		FileSelectFile file, *%applicationExePathEdit%, 0, % translate("Select application executable...")
+		GuiControlGet applicationExePathEdit
+		
+		title := translate("Select application executable...")
+		
+		FileSelectFile file, 1, %applicationExePathEdit%, %title%, Executable (*.exe)
 		
 		if (file != "")
 			GuiControl Text, applicationExePathEdit, %file%

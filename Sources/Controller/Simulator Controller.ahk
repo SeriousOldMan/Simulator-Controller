@@ -1657,8 +1657,8 @@ initializeSimulatorController()
 ;;;                          Plugin Include Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Plugins\Plugins.ahk
-#Include %A_MyDocuments%\Simulator Controller\Plugins\Plugins.ahk
+#Include ..\Plugins\Controller Plugins.ahk
+#Include %A_MyDocuments%\Simulator Controller\Plugins\Controller Plugins.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;

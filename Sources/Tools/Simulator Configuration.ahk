@@ -39,13 +39,6 @@ global kApply = "apply"
 global kOk = "ok"
 global kCancel = "cancel"
 
-; ToDo:
-; 1. toggleKeyDetector, vShowKeyDetector...
-; 2. Applications List (both sides)
-; 3. kEmptySpaceDescriptor
-; 4. listEvent
-; 6. available voices choice
-; 7. Private Functions
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Variable Section                         ;;;
@@ -54,12 +47,16 @@ global kCancel = "cancel"
 global vResult = false
 
 global vShowKeyDetector = false
-global vKeyDetectorReturnHotkey = false
+global vKeyDetectorCallback = false
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; ConfigurationItemList                                                   ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class ConfigurationItemList extends ConfigurationItem {
 	static sListControls := {}
@@ -125,6 +122,56 @@ class ConfigurationItemList extends ConfigurationItem {
 		return ConfigurationItemList.sListControls[variable]
 	}
 	
+	clickEvent(line, count) {
+		this.openEditor(line)
+	}
+	
+	selectEvent(line) {
+		this.openEditor(line)
+	}
+	
+	processListEvent() {
+		local event
+		
+		static lastEvent := false
+		static lastEditor := false
+		
+		event := (A_GuiEvent . " " . A_GuiControl . " " . A_EventInfo)
+		
+		if (event = lastEvent)
+			return false
+		else {
+			lastEvent := event
+		
+			return true
+		}
+		
+		editor := (A_GuiControl . "." . A_EventInfo)
+		
+		if (editor = lastEditor)
+			return false
+		else {
+			lastEditor := editor
+		
+			return true
+		}
+	}
+	
+	listEvent() {
+		info := ErrorLevel
+		
+		if this.processListEvent() {
+			if (A_GuiEvent == "DoubleClick")
+				this.clickEvent(A_EventInfo, 2)
+			else if (A_GuiEvent == "Normal")
+				this.clickEvent(A_EventInfo, 1)
+			else if (A_GuiEvent == "I") {
+				if InStr(info, "S", true)
+					this.selectEvent(A_EventInfo)
+			}
+		}
+	}
+	
 	loadList(items) {
 		Throw "Virtual method ConfigurationItemList.loadList must be implemented in a subclass..."
 	}
@@ -175,18 +222,20 @@ class ConfigurationItemList extends ConfigurationItem {
 	}
 	
 	openEditor(itemNumber) {
-		if ConfigurationEditor.Instance.AutoSave {
-			if (this.iCurrentItemIndex != 0)
-				this.updateItem()
-				
-			this.selectItem(itemNumber)
+		if (itemNumber != this.iCurrentItemIndex){
+			if ConfigurationEditor.Instance.AutoSave {
+				if (this.iCurrentItemIndex != 0)
+					this.updateItem()
+					
+				this.selectItem(itemNumber)
+			}
+			
+			this.iCurrentItemIndex := itemNumber
+			
+			this.loadEditor(this.iItemsList[this.iCurrentItemIndex])
+			
+			this.updateState()
 		}
-		
-		this.iCurrentItemIndex := itemNumber
-		
-		this.loadEditor(this.iItemsList[this.iCurrentItemIndex])
-		
-		this.updateState()
 	}
 	
 	selectItem(itemNumber) {
@@ -273,121 +322,6 @@ class ConfigurationItemList extends ConfigurationItem {
 		this.selectItem(this.iCurrentItemIndex + 1)
 		
 		this.updateState()
-	}
-}
-
-listEvent() {
-	local event
-	
-	info := ErrorLevel
-	editor := (A_GuiControl . "." . A_EventInfo)
-	
-	Critical
-	
-	static lastEvent := false
-	static lastEditor := false
-	
-	event := (A_GuiEvent . " " . A_GuiControl . " " . A_EventInfo)
-
-	if ((event = lastEvent) && (true || !inList(["controlsListView", "labelsListView", "layoutsListView"], A_GuiControl)))
-		return
-	else
-		lastEvent := event
-	
-	protectionOn()
-	
-	try {
-		if (A_GuiEvent == "DoubleClick") {
-			if (editor != lastEditor)
-				ConfigurationItemList.getList(A_GuiControl).openEditor(A_EventInfo)
-		}
-		else if (A_GuiEvent == "Normal") {
-			if (A_GuiControl == "simulatorsListBox") {
-				GuiControlGet simulatorsListBox
-				
-				ConfigurationItemList.getList(A_GuiControl).openEditor(inList(SimulatorsList.Instance.iItemsList, simulatorsListBox))
-			}
-			else if (A_GuiControl == "buttonBoxesListBox") {
-				GuiControlGet buttonBoxesListBox
-				
-				index := false
-				
-				for ignore, candidate in ButtonBoxesList.Instance.iItemsList
-					if (buttonBoxesListBox = candidate[1]) {
-						index := A_Index
-					
-						break
-					}
-				
-				ConfigurationItemList.getList(A_GuiControl).openEditor(index)
-			}
-			else if (editor != lastEditor)
-				ConfigurationItemList.getList(A_GuiControl).openEditor(A_EventInfo)
-		}
-		else if ((A_GuiEvent == "I") && (true || !inList(["controlsListView", "labelsListView", "layoutsListView"], A_GuiControl))) {
-			if (InStr(info, "S", true) && (editor != lastEditor))
-				ConfigurationItemList.getList(A_GuiControl).openEditor(A_EventInfo)
-		}
-	}
-	finally {
-		protectionOff()
-	}
-	
-	lastEditor := editor
-}
-
-addItem() {
-	protectionOn()
-	
-	try{
-		ConfigurationItemList.getList(A_GuiControl).addItem()
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-deleteItem() {
-	protectionOn()
-	
-	try{
-		ConfigurationItemList.getList(A_GuiControl).deleteItem()
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-updateItem() {
-	protectionOn()
-	
-	try{
-		ConfigurationItemList.getList(A_GuiControl).updateItem()
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-upItem() {
-	protectionOn()
-	
-	try{
-		ConfigurationItemList.getList(A_GuiControl).upItem()
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-downItem() {
-	protectionOn()
-	
-	try{
-		ConfigurationItemList.getList(A_GuiControl).downItem()
-	}
-	finally {
-		protectionOff()
 	}
 }
 
@@ -523,32 +457,20 @@ class ConfigurationEditor extends ConfigurationItem {
 		
 		Gui %window%:Destroy
 	}
-}
-
-saveAndExit() {
-	vResult := kOk
-}
-
-cancelAndExit() {
-	vResult := kCancel
-}
-
-saveAndStay() {
-	vResult := kApply
-}
-
-moveConfigurationEditor() {
-	moveByMouse(ConfigurationEditor.Instance.Window)
-}
-
-updateSaveMode() {
-	GuiControlGet saveModeDropDown
 	
-	ConfigurationEditor.Instance.iSaveMode := ["Auto", "Manual"][saveModeDropDown]
-}
-
-openConfigurationDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration
+	toggleKeyDetector(callback := false) {
+		if callback {
+			if !vShowKeyDetector
+				vKeyDetectorCallback := callback
+		}
+		else
+			vKeyDetectorCallback := false
+	
+		vShowKeyDetector := !vShowKeyDetector
+		
+		if vShowKeyDetector
+			SetTimer showKeyDetector, -100
+	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -781,56 +703,6 @@ class GeneralTab extends ConfigurationItem {
 	}
 }
 
-chooseHomePath() {
-	protectionOn()
-	
-	try{
-		FileSelectFolder directory, *%homePathEdit%, 0, % translate("Select Installation folder...")
-	
-		if (directory != "")
-			GuiControl Text, homePathEdit, %directory%
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-chooseNirCmdPath() {
-	protectionOn()
-	
-	try{
-		FileSelectFolder directory, *%nirCmdPathEdit%, 0, % translate("Select NirCmd folder...")
-	
-		if (directory != "")
-			GuiControl Text, nirCmdPathEdit, %directory%
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-chooseAHKPath() {
-	protectionOn()
-	
-	try{
-		FileSelectFolder directory, *%ahkPathEdit%, 0, % translate("Select AutoHotkey folder...")
-	
-		if (directory != "")
-			GuiControl Text, ahkPathEdit, %directory%
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-openTranslationsEditor() {
-	GeneralTab.Instance.openTranslationsEditor()
-}
-
-openThemesEditor() {
-	GeneralTab.Instance.openThemesEditor()
-}
-
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; SimulatorsList                                                          ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -881,6 +753,16 @@ class SimulatorsList extends ConfigurationItemList {
 		base.saveToConfiguration(configuration)
 		
 		setConfigurationValue(configuration, "Configuration", "Simulators", values2String("|", this.iItemsList*))	
+	}
+	
+	clickEvent(line, count) {
+		GuiControlGet simulatorsListBox
+					
+		this.openEditor(inList(this.iItemsList, simulatorsListBox))
+	}
+	
+	processListEvent() {
+		return true
 	}
 	
 	loadList(items) {
@@ -1018,36 +900,6 @@ class ThemesEditor extends ConfigurationItem {
 		
 		this.iClosed := (save ? kOk : kCancel)
 	}
-}
-
-saveThemesEditor() {
-	protectionOn()
-	
-	try {
-		ThemesEditor.Instance.closeEditor(true)
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-cancelThemesEditor() {
-	protectionOn()
-	
-	try {
-		ThemesEditor.Instance.closeEditor(false)
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-moveThemesEditor() {
-	moveByMouse("TE")
-}
-
-openThemesDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#themes-editor
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -1393,149 +1245,6 @@ error:
 	}
 }
 
-updateThemesEditorState() {
-	protectionOn()
-	
-	try {
-		ConfigurationItemList.getList("themesListView").updateState()
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-togglePlaySoundFile() {
-	protectionOn()
-	
-	try {
-		ThemesList.Instance.togglePlaySoundFile()
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-addThemePicture() {
-	protectionOn()
-	
-	try {
-		title := translate("Select Image...")
-	
-		FileSelectFile pictureFile, 1, , %title%, Image (*.jpg; *.gif)
-		
-		if (pictureFile != "") {
-			Gui ListView, % picturesListViewHandle
-			
-			IL_Add(picturesListViewImages, LoadPicture(pictureFile, "W32 H32"), 0xFFFFFF, false)
-			
-			LV_Add("Check Icon" . (LV_GetCount() + 1), StrReplace(StrReplace(pictureFile, kUserSplashMediaDirectory, ""), kSplashMediaDirectory, ""))
-			
-			LV_ModifyCol()
-			LV_Modify(LV_GetCount(), "Vis")
-		}
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-chooseSoundFilePath() {
-	protectionOn()
-	
-	try {
-		GuiControlGet soundFilePathEdit
-		
-		path := soundFilePathEdit
-	
-		if (path && (path != ""))
-			path := getFileName(path, kUserSplashMediaDirectory, kSplashMediaDirectory)
-		else
-			path := SubStr(kUserSplashMediaDirectory, 1, StrLen(kUserSplashMediaDirectory) - 1)
-		
-		title := translate("Select Sound File...")
-		
-		FileSelectFile soundFile, 1, *%path%, %title%, Audio (*.wav; *.mp3)
-		
-		if (soundFile != "") {
-			soundFilePathEdit := soundFile
-			
-			GuiControl Text, soundFilePathEdit, %soundFilePathEdit%
-		}
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-chooseVideoFilePath() {
-	protectionOn()
-	
-	try {
-		GuiControlGet videoFilePathEdit
-		
-		path := videoFilePathEdit
-	
-		if (path && (path != ""))
-			path := getFileName(path, kUserSplashMediaDirectory, kSplashMediaDirectory)
-		else
-			path := SubStr(kUserSplashMediaDirectory, 1, StrLen(kUserSplashMediaDirectory) - 1)
-		
-		title := translate("Select Video (GIF) File...")
-		
-		FileSelectFile videoFile, 1, *%path%, %title%, Video (*.gif)
-		
-		if (videoFile != "") {
-			videoFilePathEdit := videoFile
-			
-			GuiControl Text, videoFilePathEdit, %videoFilePathEdit%
-		}
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-setButtonIcon(buttonHandle, file, index := 1, options := "") {
-;   Parameters:
-;   1) {Handle} 	HWND handle of Gui button
-;   2) {File} 		File containing icon image
-;   3) {Index} 		Index of icon in file
-;						Optional: Default = 1
-;   4) {Options}	Single letter flag followed by a number with multiple options delimited by a space
-;						W = Width of Icon (default = 16)
-;						H = Height of Icon (default = 16)
-;						S = Size of Icon, Makes Width and Height both equal to Size
-;						L = Left Margin
-;						T = Top Margin
-;						R = Right Margin
-;						B = Botton Margin
-;						A = Alignment (0 = left, 1 = right, 2 = top, 3 = bottom, 4 = center; default = 4)
-
-	RegExMatch(options, "i)w\K\d+", W), (W="") ? W := 16 :
-	RegExMatch(options, "i)h\K\d+", H), (H="") ? H := 16 :
-	RegExMatch(options, "i)s\K\d+", S), S ? W := H := S :
-	RegExMatch(options, "i)l\K\d+", L), (L="") ? L := 0 :
-	RegExMatch(options, "i)t\K\d+", T), (T="") ? T := 0 :
-	RegExMatch(options, "i)r\K\d+", R), (R="") ? R := 0 :
-	RegExMatch(options, "i)b\K\d+", B), (B="") ? B := 0 :
-	RegExMatch(options, "i)a\K\d+", A), (A="") ? A := 4 :
-
-	ptrSize := A_PtrSize = "" ? 4 : A_PtrSize, DW := "UInt", Ptr := A_PtrSize = "" ? DW : "Ptr"
-
-	VarSetCapacity(button_il, 20 + ptrSize, 0)
-
-	NumPut(normal_il := DllCall("ImageList_Create", DW, W, DW, H, DW, 0x21, DW, 1, DW, 1), button_il, 0, Ptr)	; Width & Height
-	NumPut(L, button_il, 0 + ptrSize, DW)		; Left Margin
-	NumPut(T, button_il, 4 + ptrSize, DW)		; Top Margin
-	NumPut(R, button_il, 8 + ptrSize, DW)		; Right Margin
-	NumPut(B, button_il, 12 + ptrSize, DW)		; Bottom Margin	
-	NumPut(A, button_il, 16 + ptrSize, DW)		; Alignment
-
-	SendMessage, BCM_SETIMAGELIST := 5634, 0, &button_il,, AHK_ID %buttonHandle%
-
-	return IL_Add(normal_il, file, index)
-}
-
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; TranslationsEditor                                                      ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -1773,58 +1482,6 @@ class TranslationsEditor extends ConfigurationItem {
 	}
 }
 
-addLanguage(){
-	protectionOn()
-	
-	try {
-		TranslationsEditor.Instance.addLanguage()
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-deleteLanguage() {
-	protectionOn()
-	
-	try {
-		TranslationsEditor.Instance.deleteLanguage()
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-closeTranslationsEditor() {
-	protectionOn()
-	
-	try {
-		TranslationsEditor.Instance.closeEditor()
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-moveTranslationsEditor() {
-	moveByMouse("TE")
-}
-
-chooseTranslationLanguage() {
-	protectionOn()
-	
-	try {
-		TranslationsEditor.Instance.chooseLanguage()
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-openTranslationsDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#translations-editor
-}
-
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; TranslationsList                                                        ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -2018,6 +1675,271 @@ class TranslationsList extends ConfigurationItemList {
 	}
 }
 
+
+;;;-------------------------------------------------------------------------;;;
+;;;                   Private Function Declaration Section                  ;;;
+;;;-------------------------------------------------------------------------;;;
+
+saveAndExit() {
+	vResult := kOk
+}
+
+cancelAndExit() {
+	vResult := kCancel
+}
+
+saveAndStay() {
+	vResult := kApply
+}
+
+moveConfigurationEditor() {
+	moveByMouse(ConfigurationEditor.Instance.Window)
+}
+
+updateSaveMode() {
+	GuiControlGet saveModeDropDown
+	
+	ConfigurationEditor.Instance.iSaveMode := ["Auto", "Manual"][saveModeDropDown]
+}
+
+openConfigurationDocumentation() {
+	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration
+}
+
+chooseHomePath() {
+	protectionOn()
+	
+	try{
+		FileSelectFolder directory, *%homePathEdit%, 0, % translate("Select Installation folder...")
+	
+		if (directory != "")
+			GuiControl Text, homePathEdit, %directory%
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+chooseNirCmdPath() {
+	protectionOn()
+	
+	try{
+		FileSelectFolder directory, *%nirCmdPathEdit%, 0, % translate("Select NirCmd folder...")
+	
+		if (directory != "")
+			GuiControl Text, nirCmdPathEdit, %directory%
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+chooseAHKPath() {
+	protectionOn()
+	
+	try{
+		FileSelectFolder directory, *%ahkPathEdit%, 0, % translate("Select AutoHotkey folder...")
+	
+		if (directory != "")
+			GuiControl Text, ahkPathEdit, %directory%
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+openTranslationsEditor() {
+	GeneralTab.Instance.openTranslationsEditor()
+}
+
+openThemesEditor() {
+	GeneralTab.Instance.openThemesEditor()
+}
+
+saveThemesEditor() {
+	protectionOn()
+	
+	try {
+		ThemesEditor.Instance.closeEditor(true)
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+cancelThemesEditor() {
+	protectionOn()
+	
+	try {
+		ThemesEditor.Instance.closeEditor(false)
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+moveThemesEditor() {
+	moveByMouse("TE")
+}
+
+openThemesDocumentation() {
+	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#themes-editor
+}
+
+updateThemesEditorState() {
+	protectionOn()
+	
+	try {
+		ConfigurationItemList.getList("themesListView").updateState()
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+togglePlaySoundFile() {
+	protectionOn()
+	
+	try {
+		ThemesList.Instance.togglePlaySoundFile()
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+addThemePicture() {
+	protectionOn()
+	
+	try {
+		title := translate("Select Image...")
+	
+		FileSelectFile pictureFile, 1, , %title%, Image (*.jpg; *.gif)
+		
+		if (pictureFile != "") {
+			Gui ListView, % picturesListViewHandle
+			
+			IL_Add(picturesListViewImages, LoadPicture(pictureFile, "W32 H32"), 0xFFFFFF, false)
+			
+			LV_Add("Check Icon" . (LV_GetCount() + 1), StrReplace(StrReplace(pictureFile, kUserSplashMediaDirectory, ""), kSplashMediaDirectory, ""))
+			
+			LV_ModifyCol()
+			LV_Modify(LV_GetCount(), "Vis")
+		}
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+chooseSoundFilePath() {
+	protectionOn()
+	
+	try {
+		GuiControlGet soundFilePathEdit
+		
+		path := soundFilePathEdit
+	
+		if (path && (path != ""))
+			path := getFileName(path, kUserSplashMediaDirectory, kSplashMediaDirectory)
+		else
+			path := SubStr(kUserSplashMediaDirectory, 1, StrLen(kUserSplashMediaDirectory) - 1)
+		
+		title := translate("Select Sound File...")
+		
+		FileSelectFile soundFile, 1, *%path%, %title%, Audio (*.wav; *.mp3)
+		
+		if (soundFile != "") {
+			soundFilePathEdit := soundFile
+			
+			GuiControl Text, soundFilePathEdit, %soundFilePathEdit%
+		}
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+chooseVideoFilePath() {
+	protectionOn()
+	
+	try {
+		GuiControlGet videoFilePathEdit
+		
+		path := videoFilePathEdit
+	
+		if (path && (path != ""))
+			path := getFileName(path, kUserSplashMediaDirectory, kSplashMediaDirectory)
+		else
+			path := SubStr(kUserSplashMediaDirectory, 1, StrLen(kUserSplashMediaDirectory) - 1)
+		
+		title := translate("Select Video (GIF) File...")
+		
+		FileSelectFile videoFile, 1, *%path%, %title%, Video (*.gif)
+		
+		if (videoFile != "") {
+			videoFilePathEdit := videoFile
+			
+			GuiControl Text, videoFilePathEdit, %videoFilePathEdit%
+		}
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+addLanguage(){
+	protectionOn()
+	
+	try {
+		TranslationsEditor.Instance.addLanguage()
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+deleteLanguage() {
+	protectionOn()
+	
+	try {
+		TranslationsEditor.Instance.deleteLanguage()
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+closeTranslationsEditor() {
+	protectionOn()
+	
+	try {
+		TranslationsEditor.Instance.closeEditor()
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+moveTranslationsEditor() {
+	moveByMouse("TE")
+}
+
+chooseTranslationLanguage() {
+	protectionOn()
+	
+	try {
+		TranslationsEditor.Instance.chooseLanguage()
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+openTranslationsDocumentation() {
+	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#translations-editor
+}
+
 nextUntranslated() {
 	protectionOn()
 	
@@ -2033,23 +1955,11 @@ nextUntranslated() {
 	}
 }
 
-
-;;;-------------------------------------------------------------------------;;;
-;;;                   Private Function Declaration Section                  ;;;
-;;;-------------------------------------------------------------------------;;;
-
-toggleKeyDetector() {
-	vShowKeyDetector := !vShowKeyDetector
-	
-	if vShowKeyDetector
-		SetTimer showKeyDetector, -100
-}
-
 showKeyDetector() {
-	returnHotKey := vKeyDetectorReturnHotkey
+	returnHotKey := vKeyDetectorCallback
 	joystickNumbers := []
 	
-	vKeyDetectorReturnHotkey := false
+	vKeyDetectorCallback := false
 
 	Loop 16 { ; Query each joystick number to find out which ones exist.
 		GetKeyState joyName, %A_Index%JoyName
@@ -2150,7 +2060,7 @@ showKeyDetector() {
 						
 			if found {
 				if returnHotkey
-					vKeyDetectorReturnHotkey := (joystickNumber . "Joy" . found)
+					%returnHotkey%(joystickNumber . "Joy" . found)
 				else
 					Sleep 2000
 				
@@ -2247,6 +2157,118 @@ startupSimulatorConfiguration() {
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                    Public Function Declaration Section                  ;;;
+;;;-------------------------------------------------------------------------;;;
+
+setButtonIcon(buttonHandle, file, index := 1, options := "") {
+;   Parameters:
+;   1) {Handle} 	HWND handle of Gui button
+;   2) {File} 		File containing icon image
+;   3) {Index} 		Index of icon in file
+;						Optional: Default = 1
+;   4) {Options}	Single letter flag followed by a number with multiple options delimited by a space
+;						W = Width of Icon (default = 16)
+;						H = Height of Icon (default = 16)
+;						S = Size of Icon, Makes Width and Height both equal to Size
+;						L = Left Margin
+;						T = Top Margin
+;						R = Right Margin
+;						B = Botton Margin
+;						A = Alignment (0 = left, 1 = right, 2 = top, 3 = bottom, 4 = center; default = 4)
+
+	RegExMatch(options, "i)w\K\d+", W), (W="") ? W := 16 :
+	RegExMatch(options, "i)h\K\d+", H), (H="") ? H := 16 :
+	RegExMatch(options, "i)s\K\d+", S), S ? W := H := S :
+	RegExMatch(options, "i)l\K\d+", L), (L="") ? L := 0 :
+	RegExMatch(options, "i)t\K\d+", T), (T="") ? T := 0 :
+	RegExMatch(options, "i)r\K\d+", R), (R="") ? R := 0 :
+	RegExMatch(options, "i)b\K\d+", B), (B="") ? B := 0 :
+	RegExMatch(options, "i)a\K\d+", A), (A="") ? A := 4 :
+
+	ptrSize := A_PtrSize = "" ? 4 : A_PtrSize, DW := "UInt", Ptr := A_PtrSize = "" ? DW : "Ptr"
+
+	VarSetCapacity(button_il, 20 + ptrSize, 0)
+
+	NumPut(normal_il := DllCall("ImageList_Create", DW, W, DW, H, DW, 0x21, DW, 1, DW, 1), button_il, 0, Ptr)	; Width & Height
+	NumPut(L, button_il, 0 + ptrSize, DW)		; Left Margin
+	NumPut(T, button_il, 4 + ptrSize, DW)		; Top Margin
+	NumPut(R, button_il, 8 + ptrSize, DW)		; Right Margin
+	NumPut(B, button_il, 12 + ptrSize, DW)		; Bottom Margin	
+	NumPut(A, button_il, 16 + ptrSize, DW)		; Alignment
+
+	SendMessage, BCM_SETIMAGELIST := 5634, 0, &button_il,, AHK_ID %buttonHandle%
+
+	return IL_Add(normal_il, file, index)
+}
+
+listEvent() {
+	protectionOn()
+	
+	try {
+		ConfigurationItemList.getList(A_GuiControl).listEvent()
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+addItem() {
+	protectionOn()
+	
+	try{
+		ConfigurationItemList.getList(A_GuiControl).addItem()
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+deleteItem() {
+	protectionOn()
+	
+	try{
+		ConfigurationItemList.getList(A_GuiControl).deleteItem()
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+updateItem() {
+	protectionOn()
+	
+	try{
+		ConfigurationItemList.getList(A_GuiControl).updateItem()
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+upItem() {
+	protectionOn()
+	
+	try{
+		ConfigurationItemList.getList(A_GuiControl).upItem()
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+downItem() {
+	protectionOn()
+	
+	try{
+		ConfigurationItemList.getList(A_GuiControl).downItem()
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -2257,8 +2279,8 @@ initializeSimulatorConfiguration()
 ;;;                          Plugin Include Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Plugins\Configurators.ahk
-#Include %A_MyDocuments%\Simulator Controller\Plugins\Configurators.ahk
+#Include ..\Plugins\Configuration Plugins.ahk
+#Include %A_MyDocuments%\Simulator Controller\Plugins\Configuration Plugins.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;

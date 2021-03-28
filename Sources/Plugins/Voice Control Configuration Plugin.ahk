@@ -1,5 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Voice Control Configurator      ;;;
+;;;   Modular Simulator Controller System - Voice Control Configuration     ;;;
+;;;                                         Plugin                          ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2021) Creative Commons - BY-NC-SA                        ;;;
@@ -193,34 +194,29 @@ class VoiceControlConfigurator extends ConfigurationItem {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-setPTTHotkey() {
-	if vKeyDetectorReturnHotkey is not integer
+setPTTHotkey(hotkey) {
+	if hotkey is not integer
 	{
-		SetTimer setPTTHotkey, Off
-		
-		pushToTalkEdit := vKeyDetectorReturnHotkey
+		pushToTalkEdit := hotkey
 		
 		window := ConfigurationEditor.Instance.Window
 		
 		Gui %window%:Default
 		GuiControl Text, pushToTalkEdit, %pushToTalkEdit%
 		
-		vShowKeyDetector := false
-		vKeyDetectorReturnHotkey := false
+		ConfigurationEditor.Instance.toggleKeyDetector()
 	}
-	
-	if !vShowKeyDetector
-		SetTimer setPTTHotkey, Off
 }
 
 getPTTHotkey() {
-	if !vShowKeyDetector {
-		vKeyDetectorReturnHotkey := true
+	protectionOn()
 	
-		SetTimer setPTTHotkey, 100
+	try {
+		ConfigurationEditor.Instance.toggleKeyDetector("setPTTHotkey")
 	}
-	
-	toggleKeyDetector()
+	finally {
+		protectionOff()
+	}
 }
 
 initializeVoiceControlConfigurator() {

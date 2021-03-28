@@ -1,9 +1,14 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Custom Configurator Plugins     ;;;
+;;;   Modular Simulator Controller System - Configuration Plugins           ;;;
 ;;;                                         Include Sequence                ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2021) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; #Include %A_MyDocuments%\Simulator Controller\Plugins\yourOwnConfiguratorPlugin.ahk	; You must use absolute paths here...
+#Include ..\Plugins\Voice Control Configuration Plugin.ahk
+#Include ..\Plugins\Plugins Configuration Plugin.ahk
+#Include ..\Plugins\Applications Configuration Plugin.ahk
+#Include ..\Plugins\Controller Configuration Plugin.ahk
+#Include ..\Plugins\Launchpad Configuration Plugin.ahk
+#Include ..\Plugins\Chat Messages Configuration Plugin.ahk

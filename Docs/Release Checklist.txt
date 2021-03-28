@@ -15,7 +15,7 @@ Release 2.7 Checklist
 =====================
 
 0. Important: Check for (*) in all MD files
-0. How to update Configurators.ahk?
+0. How to update Configurators.ahk? => Small special update program
 1. Bugfix for Issue #2 - Language Dropdown List Update
 2. Documentation Update
    a. Virtual Race Engineer
@@ -53,6 +53,7 @@ Release 2.7 Checklist
    b. Clear all local data
 10. New constant kSetupDatabaseDirectory
    a. Constants.md
+11. Rename of Plugins.ahk and Configurators.ahk
 
 Release 2.6 Checklist
 =====================

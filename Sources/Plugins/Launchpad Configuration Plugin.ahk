@@ -1,5 +1,5 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Launchpad Configurator          ;;;
+;;;   Modular Simulator Controller System - Launchpad Configuration Plugin  ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2021) Creative Commons - BY-NC-SA                        ;;;
@@ -51,6 +51,8 @@ class LaunchpadConfigurator extends ConfigurationItemList {
 		Gui %window%:Add, Button, x418 y490 w55 h23 Disabled VlaunchpadUpdateButton gupdateItem, % translate("&Save")
 		
 		this.initializeList(launchpadListViewHandle, "launchpadListView", "launchpadAddButton", "launchpadDeleteButton", "launchpadUpdateButton")
+		
+		this.loadApplicationChoices()
 	}
 	
 	loadFromConfiguration(configuration) {
@@ -62,8 +64,6 @@ class LaunchpadConfigurator extends ConfigurationItemList {
 
 			this.iItemsList.Push(Array(descriptor[2], launchpad[1], launchpad[2]))
 		}
-		
-		this.loadApplicationChoices()
 	}
 		
 	saveToConfiguration(configuration) {
@@ -102,8 +102,9 @@ class LaunchpadConfigurator extends ConfigurationItemList {
 		if this.iCurrentItemIndex
 			currentApplication := this.iItemsList[this.iCurrentItemIndex][3]
 		
-		for ignore, launchpadApplication in ApplicationsConfigurator.Instance.Applications[[translate("Other")]]
-			launchpadApplicationsList.Push(launchpadApplication.Application)
+		if ApplicationsConfigurator.Instance
+			for ignore, launchpadApplication in ApplicationsConfigurator.Instance.Applications[[translate("Other")]]
+				launchpadApplicationsList.Push(launchpadApplication.Application)
 		
 		launchpadApplicationDropDown := (application ? inList(launchpadApplicationsList, application) : 0)
 		

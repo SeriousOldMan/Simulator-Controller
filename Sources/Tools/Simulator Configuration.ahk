@@ -85,22 +85,22 @@ class ConfigurationItemList extends ConfigurationItem {
 		this.iUpButton := upButton
 		this.iDownButton := downButton
 		
-		ConfigurationItemList.registerList(listVariable, this)
+		ConfigurationItemList.associateList(listVariable, this)
 		
 		if addButton
-			ConfigurationItemList.registerList(addButton, this)
+			ConfigurationItemList.associateList(addButton, this)
 		
 		if deleteButton
-			ConfigurationItemList.registerList(deleteButton, this)
+			ConfigurationItemList.associateList(deleteButton, this)
 		
 		if updateButton
-			ConfigurationItemList.registerList(updateButton, this)
+			ConfigurationItemList.associateList(updateButton, this)
 		
 		if upButton
-			ConfigurationItemList.registerList(upButton, this)
+			ConfigurationItemList.associateList(upButton, this)
 		
 		if downButton
-			ConfigurationItemList.registerList(downButton, this)
+			ConfigurationItemList.associateList(downButton, this)
 		
 		this.loadList(this.iItemsList)
 		this.updateState()
@@ -114,7 +114,7 @@ class ConfigurationItemList extends ConfigurationItem {
 		}
 	}
 
-	registerList(variable, itemList) {
+	associateList(variable, itemList) {
 		ConfigurationItemList.sListControls[variable] := itemList
 	}
 	
@@ -340,6 +340,12 @@ class ConfigurationEditor extends ConfigurationItem {
 	iDevelopment := false
 	iSaveMode := false
 	
+	Configurators[] {
+		Get {
+			return this.iConfigurators
+		}
+	}
+	
 	AutoSave[] {
 		Get {
 			return (this.iSaveMode = "Auto")
@@ -362,7 +368,16 @@ class ConfigurationEditor extends ConfigurationItem {
 	}
 	
 	registerConfigurator(label, configurator) {
-		this.iConfigurators.Push(Array(label, configurator))
+		this.Configurators.Push(Array(label, configurator))
+	}
+	
+	unregisterConfigurator(labelOrConfigurator) {
+		for ignore, configurator in this.Configurators
+			if ((configurator[1] = labelOrConfigurator) || (configurator[2] = labelOrConfigurator)) {
+				this.Configurators.RemoveAt(A_Index)
+			
+				break
+			}
 	}
 	
 	createGui(configuration) {
@@ -396,7 +411,7 @@ class ConfigurationEditor extends ConfigurationItem {
 		
 		labels := []
 		
-		for ignore, configurator in this.iConfigurators
+		for ignore, configurator in this.Configurators
 			labels.Push(configurator[1])
 
 		Gui %window%:Add, Tab3, x8 y48 w478 h472 -Wrap, % values2String("|", concatenate(Array(translate("General")), labels)*)
@@ -407,7 +422,7 @@ class ConfigurationEditor extends ConfigurationItem {
 		
 		this.iGeneralTab.createGui(this, 16, 80, 458, 425)
 		
-		for ignore, configurator in this.iConfigurators {
+		for ignore, configurator in this.Configurators {
 			Gui %window%:Tab, % tab++
 		
 			configurator[2].createGui(this, 16, 80, 458, 425)
@@ -436,7 +451,7 @@ class ConfigurationEditor extends ConfigurationItem {
 		if this.iDevelopment
 			this.iDevelopmentTab.saveToConfiguration(configuration)
 		
-		for ignore, configurator in this.iConfigurators
+		for ignore, configurator in this.Configurators
 			configurator[2].saveToConfiguration(configuration)
 	}
 	

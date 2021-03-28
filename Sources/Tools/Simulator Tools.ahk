@@ -1019,9 +1019,14 @@ startSimulatorTools() {
 		vCopySettings := {}
 		vBuildSettings := {}
 	}
-	else if (!FileExist(getFileName(kToolsConfigurationFile, kUserConfigDirectory, kConfigDirectory)) || GetKeyState("Ctrl"))
-		if !editTargets()
-			ExitApp 0
+	else {
+		if !FileExist(kAHKDirectory)
+			vBuildSettings := {}
+	
+		if (!FileExist(getFileName(kToolsConfigurationFile, kUserConfigDirectory, kConfigDirectory)) || GetKeyState("Ctrl"))
+			if !editTargets()
+				ExitApp 0
+	}
 	
 	if (!kSilentMode && vSplashTheme)
 		showSplashTheme(vSplashTheme, false, false)

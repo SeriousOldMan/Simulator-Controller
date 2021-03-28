@@ -1056,9 +1056,9 @@ class ACCPlugin extends ControllerPlugin {
 		}
 
 		if !this.iPSImageSearchArea
-			logMessage(kLogInfo, translate("Full search for 'No Refuel' took ") . (A_TickCount - curTickCount) . translate(" ms"))
+			logMessage(kLogInfo, translate("Full search for 'Refuel' took ") . (A_TickCount - curTickCount) . translate(" ms"))
 		else
-			logMessage(kLogInfo, translate("Optimized search for 'No Refuel' took ") . (A_TickCount - curTickCount) . translate(" ms"))
+			logMessage(kLogInfo, translate("Optimized search for 'Refuel' took ") . (A_TickCount - curTickCount) . translate(" ms"))
 		
 		if x is Integer
 		{

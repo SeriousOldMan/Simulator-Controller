@@ -1043,9 +1043,9 @@ class ACCPlugin extends ControllerPlugin {
 			noRefuelLabel := noRefuelLabels[A_Index]
 			
 			if !this.iPSImageSearchArea
-				ImageSearch x, y, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, *20 %noRefuelLabel%
+				ImageSearch x, y, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, *50 %noRefuelLabel%
 			else
-				ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *20 %noRefuelLabel%
+				ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *50 %noRefuelLabel%
 
 			if x is Integer
 			{

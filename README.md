@@ -26,9 +26,9 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-[2.7.0-dev](https://www.dropbox.com/s/9pi9ctgjzzvuek4/Simulator%20Controller%202.7.0-dev.zip?dl=1) (Very early development build for Release 2.7. New features: Multiple simultaneously active Button Box mode, "Stick to strategy pressures" command for Jona, Graphical layout editor for Button Box configurations, Confirmation request from Jona for setup database update. Quite stable with documentation and automated update procedure...)
+[2.7.0-dev](https://www.dropbox.com/s/9pi9ctgjzzvuek4/Simulator%20Controller%202.7.0-dev.zip?dl=1) (Very early development build for Release 2.7. New features: Multiple simultaneously active Button Box mode, "Stick to strategy pressures" command for Jona, Graphical layout editor for Button Box configurations, Confirmation request from Jona for setup database update. Quite stable with documentation and automated update procedure. See the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) for more information and links to the updated documentation.)
 
-IMPORTANT: Please read the [update notes for Release 2.7](*), BEFORE you use the new distribution, since there is a mandatory manual update task necessary this time.
+IMPORTANT: Please read the [update notes for Release 2.7](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-27), BEFORE you use the new distribution, since there is a mandatory manual update task necessary this time.
 
 #### Latest release builds
 

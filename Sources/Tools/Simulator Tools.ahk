@@ -493,6 +493,16 @@ updateConfigurationForV27() {
 	catch exception {
 		; ignore
 	}
+	
+	try {
+		source := (kUserPluginsDirectory . "Plugins.ahk")
+		destination := (kUserPluginsDirectory . "Controller Plugins.ahk")
+		
+		FileMove %source%, %destination%, 1
+	}
+	catch exception {
+		; ignore
+	}
 }
 
 updateConfigurationForV261() {

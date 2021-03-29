@@ -8,8 +8,8 @@
   5. Jona can be asked to **not** change the tyre pressures on an upcoming pitstop
   6. Visual feedback for tyre setup import action. See the documentation on the [Virtual Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#vitual-race-engineer-integration) integration of the "ACC" plugin for more information.
   7. Setup Data will be stored at the end of the race only if [confirmed by the driver](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--setup-database)
-  8. Plugin Interface for the configuration tool (no documentation yet, will follow with the next release)
-  9. Added "No Refuel" to the set of handled pitstop configurations - please take a look at the [Update Notes](*) for more information
+  8. Plugin Interface for the configuration tool (no documentation yet...)
+  9. Added "No Refuel" to the set of handled pitstop configurations - please take a look at the [Update Notes for Release 2.7](*) for more information
   10. An Easter Egg with a precious first prize is somewhere hidden in Simulator Controller. It will only be available for the four days of the upcoming Easter weekend.
   
 ## 2.6.2-release 03/21/21

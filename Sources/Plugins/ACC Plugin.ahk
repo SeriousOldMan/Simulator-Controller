@@ -1062,20 +1062,6 @@ class ACCPlugin extends ControllerPlugin {
 		
 		if x is Integer
 		{
-			if !inList(this.iPSOptions, "Refuel") {
-				this.iPSOptions.InsertAt(inList(this.iPSOptions, "Change Tyres"), "Refuel")
-				
-				this.iPSTyreOptionPosition := inList(this.iPSOptions, "Change Tyres")
-				this.iPSBrakeOptionPosition := inList(this.iPSOptions, "Change Brakes")
-				
-				reload := true
-			}
-			
-			lastY := y
-		
-			logMessage(kLogInfo, translate("'Refuel' detected, adjusting pit stop options: " . values2String(", ", this.iPSOptions*)))
-		}
-		else {
 			position := inList(this.iPSOptions, "Refuel")
 			
 			if position {
@@ -1086,8 +1072,22 @@ class ACCPlugin extends ControllerPlugin {
 				
 				reload := true
 			}
+			
+			lastY := y
 		
 			logMessage(kLogInfo, translate("'Refuel' not detected, adjusting pit stop options: " . values2String(", ", this.iPSOptions*)))
+		}
+		else {
+			if !inList(this.iPSOptions, "Refuel") {
+				this.iPSOptions.InsertAt(inList(this.iPSOptions, "Change Tyres"), "Refuel")
+				
+				this.iPSTyreOptionPosition := inList(this.iPSOptions, "Change Tyres")
+				this.iPSBrakeOptionPosition := inList(this.iPSOptions, "Change Brakes")
+				
+				reload := true
+			}
+		
+			logMessage(kLogInfo, translate("'Refuel' detected, adjusting pit stop options: " . values2String(", ", this.iPSOptions*)))
 		}
 		
 		return reload

@@ -179,9 +179,6 @@ class ApplicationsConfigurator extends ConfigurationItemList {
 			LV_ModifyCol(4, 80)
 			
 			first := false
-	
-			if LaunchpadConfigurator.Instance
-				LaunchpadConfigurator.Instance.loadApplicationChoices(true)
 		}
 	}
 	

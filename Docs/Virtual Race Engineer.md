@@ -382,7 +382,7 @@ You can take a look at the knowledge base by enabling "Debug" mode in the config
 
 ### Telemetry Integration
 
-A considerable part of the knowledge of Jona comes from the telemetry information of the simulation game. As said, a data provider for *Assetto Corsa Competizione* is already builtin and is used by the ACC plugin to load the data and hand it over to Jona. A small spplication "ACC SHM Reader.exe", which is located in the *Binaries* folder, is used to acquire the data. This reader runs periodically and outputs the following data:
+A considerable part of the knowledge of Jona comes from the telemetry information of the simulation game. As said, a data provider for *Assetto Corsa Competizione* is already builtin and is used by the ACC plugin to load the data and hand it over to Jona. A small application "ACC SHM Reader.exe", which is located in the *Binaries* folder, is used to acquire the data. This reader runs periodically and outputs the following data:
 
 	[Car Data]
 	BodyworkDamage=0, 0, 0, 0, 0

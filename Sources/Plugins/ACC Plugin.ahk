@@ -48,69 +48,12 @@ class ACCPlugin extends ControllerPlugin {
 	iChatMode := false
 	iPitstopMode := false
 	
-	iOnTrack := false
-	
-	iRaceEngineerEnabled := false
-	iRaceEngineerName := false
-	iRaceEngineerLogo := false
-	iRaceEngineerSpeaker := false
-	iRaceEngineerListener := false
-	
-	iRaceEngineer := false
-	iPitstopPending := false
-	
 	iRepairSuspensionChosen := true
 	iRepairBodyworkChosen := true
 	
-	class RemoteRaceEngineer {
-		iRemotePID := false
-		
-		RemotePID[] {
-			Get {
-				return this.iRemotePID
-			}
-		}
-		
-		__New(remotePID) {
-			this.iRemotePID := remotePID
-		}
-		
-		callRemote(function, arguments*) {
-			raiseEvent(kFileMessage, "Race", function . ":" . values2String(";", arguments*), this.RemotePID)
-		}
-		
-		shutdown(arguments*) {
-			this.callRemote("shutdown", arguments*)
-		}
-		
-		startRace(arguments*) {
-			this.callRemote("startRace", arguments*)
-		}
-		
-		finishRace(arguments*) {
-			this.callRemote("finishRace", arguments*)
-		}
-		
-		addLap(arguments*) {
-			this.callRemote("addLap", arguments*)
-		}
-		
-		updateLap(arguments*) {
-			this.callRemote("updateLap", arguments*)
-		}
-		
-		planPitstop(arguments*) {
-			this.callRemote("planPitstop", arguments*)
-		}
-		
-		preparePitstop(arguments*) {
-			this.callRemote("preparePitstop", arguments*)
-		}
-		
-		performPitstop(arguments*) {
-			this.callRemote("performPitstop", arguments*)
-		}
-	}
+	iRaceEngineer := false
+	
+	iSessionState := kSessionFinished
 	
 	class ChatMode extends ControllerMode {
 		Mode[] {
@@ -119,7 +62,7 @@ class ACCPlugin extends ControllerPlugin {
 			}
 		}
 		
-		updateActions(onTrack) {
+		updateActions(sessionState) {
 		}
 	}
 	
@@ -133,18 +76,18 @@ class ACCPlugin extends ControllerPlugin {
 		activate() {
 			base.activate()
 			
-			this.updateActions(this.Plugin.OnTrack)
+			this.updateActions(this.Plugin.SessionState)
 		}
 		
-		updateActions(onTrack) {
-			this.updatePitstopActions(onTrack)
-			this.updateRaceEngineerActions(onTrack && (this.Plugin.RaceEngineer != false))
+		updateActions(sessionState) {
+			this.updatePitstopActions(sessionState)
+			this.updateRaceEngineerActions(sessionState)
 		}			
 			
-		updatePitstopActions(onTrack) {	
+		updatePitstopActions(sessionState) {	
 			for ignore, theAction in this.Actions
 				if isInstance(theAction, ACCPlugin.PitstopAction)
-					if onTrack {
+					if ((sessionState != kSessionFinished) && (sessionState != kSessionPaused)) {
 						theAction.Function.enable(kAllTrigger)
 						theAction.Function.setText(translate(theAction.Label))
 					}
@@ -154,10 +97,13 @@ class ACCPlugin extends ControllerPlugin {
 					}
 		}
 		
-		updateRaceEngineerActions(activeRace) {
+		updateRaceEngineerActions(sessionState) {
+			if !this.RaceEngineer
+				sessionState := kSessionFinished
+			
 			for ignore, theAction in this.Actions
 				if isInstance(theAction, ACCPlugin.RaceEngineerAction)
-					if activeRace {
+					if ((sessionState != kSessionFinished) && (sessionState != kSessionPaused)) {
 						theAction.Function.enable(kAllTrigger)
 						theAction.Function.setText(translate(theAction.Label))
 					}
@@ -261,37 +207,6 @@ class ACCPlugin extends ControllerPlugin {
 				}
 		}
 	}
-
-	class RaceEngineerSettingsAction extends ACCPlugin.RaceEngineerAction {
-		fireAction(function, trigger) {
-			if (this.Action = "RaceEngineerOpenSettings")
-				openRaceEngineerSettings()
-			else if (this.Action = "RaceEngineerImportSettings")
-				openRaceEngineerSettings(true)
-		}
-	}
-	
-	class RaceEngineerToggleAction extends ControllerAction {
-		fireAction(function, trigger) {
-			local plugin := this.Controller.findPlugin(kACCPlugin)
-			
-			if plugin.RaceEngineerName
-				if (plugin.RaceEngineerEnabled && ((trigger = "Off") || (trigger == "Push"))) {
-					plugin.disableRaceEngineer()
-				
-					trayMessage(translate(this.Label), translate("State: Off"))
-				
-					function.setText(translate(this.Label), "Black")
-				}
-				else if (!plugin.RaceEngineerEnabled && ((trigger = "On") || (trigger == "Push"))) {
-					plugin.enableRaceEngineer()
-				
-					trayMessage(translate(this.Label), translate("State: On"))
-				
-					function.setText(translate(this.Label), "Green")
-				}
-		}
-	}
 	
 	class ChatAction extends ControllerAction {
 		iMessage := ""
@@ -322,6 +237,12 @@ class ACCPlugin extends ControllerPlugin {
 		}
 	}
 	
+	Code[] {
+		Get {
+			return "ACC"
+		}
+	}
+	
 	OpenPitstopMFDHotkey[] {
 		Get {
 			return this.kOpenPitstopMFDHotkey
@@ -340,45 +261,9 @@ class ACCPlugin extends ControllerPlugin {
 		}
 	}
 	
-	RaceEngineerEnabled[] {
+	SessionState[] {
 		Get {
-			return this.iRaceEngineerEnabled
-		}
-	}
-	
-	RaceEngineerName[] {
-		Get {
-			return this.iRaceEngineerName
-		}
-	}
-	
-	RaceEngineerLogo[] {
-		Get {
-			return this.iRaceEngineerLogo
-		}
-	}
-	
-	RaceEngineerSpeaker[] {
-		Get {
-			return this.iRaceEngineerSpeaker
-		}
-	}
-	
-	RaceEngineerListener[] {
-		Get {
-			return this.iRaceEngineerListener
-		}
-	}
-	
-	OnTrack[] {
-		Get {
-			return this.iOnTrack
-		}
-	}
-	
-	PitstopPending[] {
-		Get {
-			return this.iPitstopPending
+			return this.iSessionState
 		}
 	}
 	
@@ -395,51 +280,10 @@ class ACCPlugin extends ControllerPlugin {
 		for ignore, theAction in string2Values(",", this.getArgumentValue("pitstopSettings", ""))
 			this.createPitstopAction(controller, string2Values(A_Space, theAction)*)
 		
-		this.iRaceEngineerName := this.getArgumentValue("raceEngineerName", false)
-		this.iRaceEngineerLogo := this.getArgumentValue("raceEngineerLogo", false)
-		
-		raceEngineerToggle := this.getArgumentValue("raceEngineer", false)
-		
-		if raceEngineerToggle {
-			arguments := string2Values(A_Space, raceEngineerToggle)
-			
-			this.iRaceEngineerEnabled := (arguments[1] = "On")
-			
-			this.createRaceEngineerAction(controller, "RaceEngineer", arguments[2])
-		}
-		else
-			this.iRaceEngineerEnabled := (this.iRaceEngineerName != false)
-		
-		raceEngineerOpenSettings := this.getArgumentValue("raceEngineerOpenSettings", this.getArgumentValue("raceEngineerSettings", false))
-		
-		if raceEngineerOpenSettings
-			this.createRaceEngineerAction(controller, "RaceEngineerOpenSettings", raceEngineerOpenSettings)
-		
-		raceEngineerImportSettings := this.getArgumentValue("raceEngineerImportSettings", false)
-		
-		if raceEngineerImportSettings
-			this.createRaceEngineerAction(controller, "RaceEngineerImportSettings", raceEngineerImportSettings)
-		
 		for ignore, theAction in string2Values(",", this.getArgumentValue("raceEngineerCommands", ""))
 			this.createRaceEngineerAction(controller, string2Values(A_Space, theAction)*)
 		
-		engineerSpeaker := this.getArgumentValue("raceEngineerSpeaker", false)
-		
-		if ((engineerSpeaker != false) && (engineerSpeaker != kFalse)) {
-			this.iRaceEngineerSpeaker := ((engineerSpeaker = kTrue) ? true : engineerSpeaker)
-		
-			engineerListener := this.getArgumentValue("raceEngineerListener", false)
-			
-			if ((engineerListener != false) && (engineerListener != kFalse))
-				this.iRaceEngineerListener := ((engineerListener = kTrue) ? true : engineerListener)
-		}
-		
 		controller.registerPlugin(this)
-	
-		if (this.RaceEngineerName)
-			SetTimer collectRaceData, 10000
-		else
-			SetTimer updateOnTrackState, 5000
 	}
 	
 	loadFromConfiguration(configuration) {
@@ -477,10 +321,6 @@ class ACCPlugin extends ControllerPlugin {
 		if (function != false) {
 			if ((action = "PitstopPlan") || (action = "PitstopPrepare"))
 				mode.registerAction(new this.RaceEngineerAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Activate"), action), action))
-			else if (action = "RaceEngineer")
-				this.registerAction(new this.RaceEngineerToggleAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Toggle"), action)))
-			else if ((action = "RaceEngineerOpenSettings") || (action = "RaceEngineerImportSettings"))
-				this.registerAction(new this.RaceEngineerSettingsAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Activate")), action))
 			else
 				logMessage(kLogWarn, translate("Action """) . action . translate(""" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
 		}
@@ -569,6 +409,11 @@ class ACCPlugin extends ControllerPlugin {
 	simulatorStartup(simulator) {
 		base.simulatorStartup(simulator)
 		
+		raceEngineer := SimulatorController.Instance.findPlugin(kRaceEngineerPlugin)
+		
+		if (raceEngineer && raceEngineer.isActive())
+			raceEngineer.simulatorStartup(this)
+		
 		if (inList(this.Simulators, simulator)) {
 			this.Controller.setMode(this.iChatMode)
 		}
@@ -576,6 +421,13 @@ class ACCPlugin extends ControllerPlugin {
 	
 	simulatorShutdown() {
 		base.simulatorShutdown()
+		
+		raceEngineer := SimulatorController.Instance.findPlugin(kRaceEngineerPlugin)
+		
+		if (raceEngineer && raceEngineer.isActive())
+			raceEngineer.simulatorShutdown(this)
+		
+		this.updateSessionState(kSessionFinished)
 		
 		activeModes := this.Controller.ActiveModes
 		
@@ -585,16 +437,16 @@ class ACCPlugin extends ControllerPlugin {
 			this.iPitstopMode.deactivate()
 	}
 	
-	updateOnTrackState(onTrack) {
-		this.iOnTrack := onTrack
+	updateSessionState(sessionState) {
+		this.iSessionState := sessionState
 		
 		activeModes := this.Controller.ActiveModes
 		
 		if (inList(activeModes, this.iChatMode))
-			this.iChatMode.updateActions(onTrack)
+			this.iChatMode.updateActions(sessionState)
 		
 		if (inList(activeModes, this.iPitstopMode))
-			this.iPitstopMode.updateActions(onTrack)
+			this.iPitstopMode.updateActions(sessionState)
 	}
 		
 	openPitstopMFD(update := true) {
@@ -1332,116 +1184,6 @@ class ACCPlugin extends ControllerPlugin {
 		this.openPitstopMFD(update)
 	}
 	
-	enableRaceEngineer() {
-		this.iRaceEngineerEnabled := this.iRaceEngineerName
-	}
-	
-	disableRaceEngineer() {
-		this.iRaceEngineerEnabled := false
-		
-		if this.RaceEngineer
-			this.finishRace()
-	}
-	
-	startupRaceEngineer() {
-		if (this.RaceEngineerEnabled) {
-			Process Exist
-			
-			controllerPID := ErrorLevel
-			raceEngineerPID := 0
-								
-			try {
-				logMessage(kLogInfo, translate("Starting ") . translate("Race Engineer"))
-				
-				options := " -Remote " . controllerPID . " -Settings """ . getFileName("Race Engineer.settings", kUserConfigDirectory, kConfigDirectory) . """"
-				
-				if this.RaceEngineerName
-					options .= " -Name """ . this.RaceEngineerName . """"
-				
-				if this.RaceEngineerLogo
-					options .= " -Logo """ . this.RaceEngineerLogo . """"
-				
-				if this.RaceEngineerSpeaker
-					options .= " -Speaker """ . this.RaceEngineerSpeaker . """"
-				
-				if this.RaceEngineerListener
-					options .= " -Listener """ . this.RaceEngineerListener . """"
-				
-				if this.Controller.VoiceServer
-					options .= " -Voice """ . this.Controller.VoiceServer . """"
-				
-				exePath := kBinariesDirectory . "Race Engineer.exe" . options 
-				
-				Run %exePath%, %kBinariesDirectory%, , raceEngineerPID
-				
-				Sleep 5000
-			}
-			catch exception {
-				logMessage(kLogCritical, translate("Cannot start Race Engineer (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
-			
-				showMessage(substituteVariables(translate("Cannot start Race Engineer (%kBinariesDirectory%Race Engineer.exe) - please rebuild the applications..."))
-						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-				
-				return false
-			}
-			
-			this.iRaceEngineer := new this.RemoteRaceEngineer(raceEngineerPID)
-		}
-	}
-	
-	shutdownRaceEngineer() {
-		local raceEngineer := this.RaceEngineer
-		
-		this.iRaceEngineer := false
-		
-		if raceEngineer
-			raceEngineer.shutdown()
-	}
-	
-	startRace(dataFile) {
-		if this.RaceEngineer
-			this.finishRace(false)
-		else
-			this.startupRaceEngineer()
-	
-		if this.RaceEngineer {
-			this.RaceEngineer.startRace(dataFile)
-			
-			controller := SimulatorController.Instance
-			mode := controller.findMode(kPitstopMode)
-		
-			if (inList(controller.ActiveModes, mode))
-				mode.updateRaceEngineerActions(true)
-		}
-	}
-	
-	finishRace(shutdown := true) {
-		if this.RaceEngineer {
-			this.RaceEngineer.finishRace()
-			
-			if shutdown
-				this.shutdownRaceEngineer()
-			
-			this.iPitstopPending := false
-			
-			controller := SimulatorController.Instance
-			mode := controller.findMode(kPitstopMode)
-			
-			if (inList(controller.ActiveModes, mode))
-				mode.updateRaceEngineerActions(false)
-		}
-	}
-	
-	addLap(lapNumber, dataFile) {
-		if this.RaceEngineer
-			this.RaceEngineer.addLap(lapNumber, dataFile)
-	}
-	
-	updateLap(lapNumber, dataFile) {
-		if this.RaceEngineer
-			this.RaceEngineer.updateLap(lapNumber, dataFile)
-	}
-	
 	planPitstop() {
 		if this.RaceEngineer
 			this.RaceEngineer.planPitstop()
@@ -1452,29 +1194,13 @@ class ACCPlugin extends ControllerPlugin {
 			this.RaceEngineer.preparePitstop(lap)
 	}
 	
-	performPitstop(lapNumber) {
-		if this.RaceEngineer {
-			this.RaceEngineer.performPitstop(lapNumber)
-		
-			this.iPitstopPending := false
-					
-			SetTimer collectRaceData, 10000
-		}
-	}
-	
 	pitstopPlanned(pitstopNumber) {
 	}
 	
 	pitstopPrepared(pitstopNumber) {
-		this.iPitstopPending := true
-				
-		SetTimer collectRaceData, 5000
 	}
 	
 	pitstopFinished(pitstopNumber) {
-		this.iPitstopPending := false
-				
-		SetTimer collectRaceData, 10000
 	}
 	
 	startPitstopSetup(pitstopNumber) {
@@ -1486,7 +1212,7 @@ class ACCPlugin extends ControllerPlugin {
 	}
 
 	setPitstopRefuelAmount(pitstopNumber, litres) {
-		data := readSharedMemory(kUserHomeDirectory . "Temp\ACC Data\Pitstop Setup.data")
+		data := readSharedMemory(this.Code, kUserHomeDirectory . "Temp\ACC Data\Pitstop Setup.data")
 		
 		litresIncrement := Round(litres - getConfigurationValue(data, "Pitstop Data", "FuelAmount", 0))
 		
@@ -1496,7 +1222,7 @@ class ACCPlugin extends ControllerPlugin {
 	setPitstopTyreSet(pitstopNumber, compound, set := false) {
 		changePitstopTyreCompound(compound)
 		
-		data := readSharedMemory(kUserHomeDirectory . "Temp\ACC Data\Pitstop Setup.data")
+		data := readSharedMemory(this.Code, kUserHomeDirectory . "Temp\ACC Data\Pitstop Setup.data")
 		
 		tyreSetIncrement := Round(set - getConfigurationValue(data, "Pitstop Data", "TyreSet", 0))
 		
@@ -1505,7 +1231,7 @@ class ACCPlugin extends ControllerPlugin {
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
-		data := readSharedMemory(kUserHomeDirectory . "Temp\ACC Data\Pitstop Setup.data")
+		data := readSharedMemory(this.Code, kUserHomeDirectory . "Temp\ACC Data\Pitstop Setup.data")
 			
 		pressureFLIncrement := Round(pressureFL - getConfigurationValue(data, "Pitstop Data", "TyrePressureFL", 26.1), 1)
 		pressureFRIncrement := Round(pressureFR - getConfigurationValue(data, "Pitstop Data", "TyrePressureFR", 26.1), 1)
@@ -1713,197 +1439,10 @@ changePitstopDriver(selection) {
 	}
 }
 
-planPitstop() {
-	protectionOn()
-	
-	try {
-		SimulatorController.Instance.findPlugin(kACCPlugin).planPitstop()
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-preparePitstop() {
-	protectionOn()
-	
-	try {
-		SimulatorController.Instance.findPlugin(kACCPlugin).preparePitstop()
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-openRaceEngineerSettings(import := false) {
-	exePath := kBinariesDirectory . "Race Engineer Settings.exe"
-	
-	try {
-		if import
-			Run "%exePath%" -Import, %kBinariesDirectory%
-		else
-			Run "%exePath%", %kBinariesDirectory%
-	}
-	catch exception {
-		logMessage(kLogCritical, translate("Cannot start the Race Engineers Settings tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
-			
-		showMessage(substituteVariables(translate("Cannot start the Race Engineers Settings application (%exePath%) - please check the configuration..."), {exePath: exePath})
-				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-	}
-}
-
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
-
-readSharedMemory(dataFile) {
-	exePath := kBinariesDirectory . "ACC SHM Reader.exe"
-		
-	try {
-		RunWait %ComSpec% /c ""%exePath%" > "%dataFile%"", , Hide
-		
-		IniWrite ACC, %dataFile%, Race Data, Simulator
-	}
-	catch exception {
-		logMessage(kLogCritical, translate("Cannot start ACC SHM Reader (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
-			
-		showMessage(substituteVariables(translate("Cannot start ACC SHM Reader (%exePath%) - please check the configuration..."), {exePath: exePath})
-				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-	}
-	
-	return readConfiguration(dataFile)
-}
-
-updateOnTrackState() {
-	static plugin := false
-	
-	if !plugin
-		plugin := SimulatorController.Instance.findPlugin(kACCPlugin)
-	
-	if isACCRunning() {
-		data := readSharedMemory(kUserHomeDirectory . "Temp\ACC Data\SHM.data")
-		
-		inRace := (getConfigurationValue(data, "Stint Data", "Active", false)
-				&& (getConfigurationValue(data, "Stint Data", "Session", "OTHER") = "RACE")
-				&& !getConfigurationValue(data, "Stint Data", "Paused", false))
-				
-		plugin.updateOnTrackState(inRace)
-	}
-	else
-		plugin.updateOnTrackState(false)
-}
-
-collectRaceData() {
-	static lastLap := 0
-	static lastLapCounter := 0
-	static inPit := false
-	static plugin := false
-	
-	if !plugin
-		plugin := SimulatorController.Instance.findPlugin(kACCPlugin)
-	
-	if isACCRunning() {
-		dataFile := kUserHomeDirectory . "Temp\ACC Data\SHM.data"
-		
-		data := readSharedMemory(dataFile)
-		
-		dataLastLap := getConfigurationValue(data, "Stint Data", "Laps", 0)
-		
-		protectionOn()
-		
-		try {
-			if (!getConfigurationValue(data, "Stint Data", "Active", false)
-			 || (getConfigurationValue(data, "Stint Data", "Session", "OTHER") != "RACE"))  {
-				; Not on track
-				
-				plugin.updateOnTrackState(false)
-				
-				lastLap := 0
-		
-				if plugin.RaceEngineer
-					plugin.finishRace()
-				
-				return
-			}
-			else if getConfigurationValue(data, "Stint Data", "Paused", false) {
-				plugin.updateOnTrackState(false)
-			
-				return
-			}
-			else
-				plugin.updateOnTrackState(true)
-			
-			if ((dataLastLap <= 1) && (dataLastLap < lastLap)) {
-				; Start of new race without finishing previous race first
-			
-				lastLap := 0
-		
-				if plugin.RaceEngineer
-					plugin.finishRace()
-			}
-			
-			if plugin.RaceEngineerEnabled {
-				if (plugin.PitstopPending && getConfigurationValue(data, "Stint Data", "InPit", false) && !inPit) {
-					; Car is in the Pit
-					
-					plugin.performPitstop(dataLastLap)
-					
-					inPit := true
-				}
-				else if (dataLastLap > 0) {
-					; Car is on the track
-				
-					if ((dataLastLap > 1) && (lastLap == 0))
-						return
-					
-					firstLap := (lastLap == 0)
-					newLap := (dataLastLap > lastLap)
-				
-					inPit := false
-					
-					if newLap {
-						lastLap := dataLastLap
-						lastLapCounter := 0
-					}
-					
-					newDataFile := kUserHomeDirectory . "Temp\ACC Data\Lap " . lastLap . "." . ++lastLapCounter . ".data"
-						
-					FileCopy %dataFile%, %newDataFile%, 1
-					
-					if firstLap
-						plugin.startRace(newDataFile)
-					
-					if newLap
-						plugin.addLap(dataLastLap, newDataFile)
-					else	
-						plugin.updateLap(dataLastLap, newDataFile)
-				}
-			}
-			else {
-				lastLap := 0
-				inPit := false
-			}
-		}
-		finally {
-			protectionOff()
-		}
-	}
-	else {
-		if plugin.RaceEngineer
-			Loop 10 {
-				if isACCRunning()
-					return
-				
-				Sleep 500
-			}
-		
-		lastLap := 0
-	
-		if plugin.RaceEngineer
-			plugin.finishRace()
-	}
-}
 
 updatePitstopState() {
 	protectionOn()
@@ -1919,30 +1458,9 @@ updatePitstopState() {
 initializeACCPlugin() {
 	local controller := SimulatorController.Instance
 	
-	FileCreateDir %kUserHomeDirectory%Temp\ACC Data
-	
-	Loop Files, %kUserHomeDirectory%Temp\ACC Data\*.*
-		FileDelete %A_LoopFilePath%
-	
 	new ACCPlugin(controller, kACCPLugin, controller.Configuration)
-	
-	registerEventHandler("Pitstop", "handlePitstopRemoteCalls")
 }
 
-
-;;;-------------------------------------------------------------------------;;;
-;;;                          Event Handler Section                          ;;;
-;;;-------------------------------------------------------------------------;;;
-
-handlePitstopRemoteCalls(event, data) {
-	if InStr(data, ":") {
-		data := StrSplit(data, ":", , 2)
-		
-		return withProtection(ObjBindMethod(SimulatorController.Instance.findPlugin(kACCPlugin), data[1]), string2Values(";", data[2])*)
-	}
-	else
-		return withProtection(ObjBindMethod(SimulatorController.Instance.findPlugin(kACCPlugin), data))
-}
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Initialization Section                          ;;;

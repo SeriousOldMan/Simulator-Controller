@@ -11,6 +11,16 @@ General Release Actions
 9. Check, whether update documentation for the release is required in "Updates.md"
 10. Update Wiki using "update-documentation.bat"
 
+Release 2.8 Checklist
+=====================
+
+1. New Plugin "Race Engineer Plugin"
+   a. Moved planPitstop, preparePitstop, openRaceEngineerSettings
+   b. Moved Translations
+   c. Simulator Configuration.ini
+   d. Documentation (Plugin & Modes)
+   e. Update Procedure for local Simulator Controller.ini
+
 Release 2.7 Checklist
 =====================
 

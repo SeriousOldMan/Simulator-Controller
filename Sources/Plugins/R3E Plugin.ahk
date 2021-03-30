@@ -1,5 +1,5 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - RRE Plugin                      ;;;
+;;;   Modular Simulator Controller System - R3E Plugin                      ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2021) Creative Commons - BY-NC-SA                        ;;;
@@ -9,30 +9,30 @@
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kRREPlugin = "RRE"
+global kR3EPlugin = "R3E"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class RREPlugin extends ControllerPlugin {
-	iRREApplication := false
+class R3EPlugin extends ControllerPlugin {
+	iR3EApplication := false
 	
-	RREApplication[] {
+	R3EApplication[] {
 		Get {
-			return this.iRREApplication
+			return this.iR3EApplication
 		}
 	}
 	
 	__New(controller, name, configuration := false) {
-		this.iRREApplication := new Application("RaceRoom Racing Experience", SimulatorController.Instance.Configuration)
+		this.iR3EApplication := new Application("RaceRoom Racing Experience", SimulatorController.Instance.Configuration)
 		
 		base.__New(controller, name, configuration)
 	}
 	
 	runningSimulator() {
-		return (this.RREApplication.isRunning() ? "RaceRoom Racing Experience" : false)
+		return (this.R3EApplication.isRunning() ? "RaceRoom Racing Experience" : false)
 	}
 }
 
@@ -41,9 +41,9 @@ class RREPlugin extends ControllerPlugin {
 ;;;                     Function Hook Declaration Section                   ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-startRRE() {
-	return SimulatorController.Instance.startSimulator(SimulatorController.Instance.findPlugin(kRREPlugin).RREApplication
-											         , "Simulator Splash Images\RRE Splash.jpg")
+startR3E() {
+	return SimulatorController.Instance.startSimulator(SimulatorController.Instance.findPlugin(kR3EPlugin).R3EApplication
+											         , "Simulator Splash Images\R3E Splash.jpg")
 }
 
 
@@ -51,10 +51,10 @@ startRRE() {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-initializeRREPlugin() {
+initializeR3EPlugin() {
 	local controller := SimulatorController.Instance
 	
-	new RREPlugin(controller, kRREPlugin, controller.Configuration)
+	new R3EPlugin(controller, kR3EPlugin, controller.Configuration)
 }
 
 
@@ -62,4 +62,4 @@ initializeRREPlugin() {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-initializeRREPlugin()
+initializeR3EPlugin()

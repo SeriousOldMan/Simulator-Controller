@@ -13,8 +13,9 @@
 #Include ..\Plugins\Motion Feedback Plugin.ahk
 #Include ..\Plugins\Tactile Feedback Plugin.ahk
 #Include ..\Plugins\Pedal Calibration Plugin.ahk
+#Include ..\Plugins\Race Engineer Plugin.ahk			; Must be loaded before any other Simulator Plugins
 #Include ..\Plugins\AC Plugin.ahk
 #Include ..\Plugins\ACC Plugin.ahk
 #Include ..\Plugins\RF2 Plugin.ahk
-#Include ..\Plugins\RRE Plugin.ahk
+#Include ..\Plugins\R3E Plugin.ahk
 #Include ..\Plugins\RST Plugin.ahk

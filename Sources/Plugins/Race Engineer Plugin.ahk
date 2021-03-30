@@ -38,6 +38,8 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 	iRaceEngineer := false
 	iPitstopPending := false
 	
+	iSimulator := false
+	
 	class RemoteRaceEngineer {
 		iRemotePID := false
 		
@@ -146,6 +148,12 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 				
 					function.setText(translate(this.Label), "Green")
 				}
+		}
+	}
+	
+	Simulator[] {
+		Get {
+			return this.iSimulator
 		}
 	}
 	
@@ -266,7 +274,13 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 		
 	updateActions(sessionState) {
 		for ignore, theAction in this.Actions
-			if isInstance(theAction, RaceEngineerPlugin.RaceEngineerAction)
+			if isInstance(theAction, RaceEngineerPlugin.RaceEngineerToggleAction) {
+				theAction.Function.setText(translate(theAction.Label), this.RaceEngineerName ? (this.RaceEngineerEnabled ? "Green" : "Black") : "Gray")
+				
+				if !this.RaceEngineerName
+					theAction.Function.disable()
+			}
+			else if isInstance(theAction, RaceEngineerPlugin.RaceEngineerAction)
 				if ((theAction.Action = "RaceEngineerOpenSettings") || (theAction.Action = "RaceEngineerImportSettings")) {
 					theAction.Function.enable(kAllTrigger)
 					theAction.Function.setText(translate(theAction.Label))
@@ -418,10 +432,10 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 		SetTimer collectSessionData, 10000
 	}
 	
-	simulatorStartup(simulator) {
-		if this.Simulator
+	startSimulation(simulator) {
+		if (this.Simulator && (this.Simulator != simulator))
 			Throw "Inconsistent state detected in RaceEngineerPlugin.simulatorStartup..."
-		else {
+		else if (this.Simulator != simulator) {
 			this.iSimulator := simulator
 		
 			code := simulator.Code
@@ -433,7 +447,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 		}		
 	}
 	
-	simulatorShutdown(simulator) {
+	stopSimulation(simulator) {
 		if (this.Simulator != simulator)
 			Throw "Inconsistent state detected in RaceEngineerPlugin.simulatorShutdown..."
 		else
@@ -461,7 +475,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 	}
 
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork) {
-		this.Simulator.setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR)
+		this.Simulator.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork)
 	}
 	
 	getSessionState(data := false) {
@@ -487,6 +501,8 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 		
 		if this.Simulator
 			this.Simulator.updateSessionState(sessionState)
+		else
+			sessionState := kSessionFinished
 		
 		this.updateActions(sessionState)
 	}
@@ -498,9 +514,10 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 		
 		if this.Simulator {
 			code := this.Simulator.Code
+			
 			dataFile := kUserHomeDirectory . "Temp\" . code . " Data\SHM.data"
 			
-			data := readSharedMemory(simulator, dataFile)
+			data := readSharedMemory(code, dataFile)
 			
 			dataLastLap := getConfigurationValue(data, "Stint Data", "Laps", 0)
 			
@@ -647,7 +664,7 @@ openRaceEngineerSettings(import := false) {
 
 readSharedMemory(simulator, dataFile) {
 	exePath := kBinariesDirectory . simulator . " SHM Reader.exe"
-		
+	
 	try {
 		RunWait %ComSpec% /c ""%exePath%" > "%dataFile%"", , Hide
 		

@@ -390,18 +390,6 @@ class ACCPlugin extends ControllerPlugin {
 			logMessage(kLogWarn, translate("Pitstop action ") . action . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
 	}
 	
-	activate() {
-		base.activate()
-		
-		for ignore, theAction in this.Actions
-			if isInstance(theAction, ACCPlugin.RaceEngineerToggleAction) {
-				theAction.Function.setText(translate(theAction.Label), this.RaceEngineerName ? (this.RaceEngineerEnabled ? "Green" : "Black") : "Gray")
-				
-				if !this.RaceEngineerName
-					theAction.Function.disable()
-			}
-	}
-	
 	runningSimulator() {
 		return (isACCRunning() ? "Assetto Corsa Competizione" : false)
 	}
@@ -412,7 +400,7 @@ class ACCPlugin extends ControllerPlugin {
 		raceEngineer := SimulatorController.Instance.findPlugin(kRaceEngineerPlugin)
 		
 		if (raceEngineer && raceEngineer.isActive())
-			raceEngineer.simulatorStartup(this)
+			raceEngineer.startSimulation(this)
 		
 		if (inList(this.Simulators, simulator)) {
 			this.Controller.setMode(this.iChatMode)
@@ -425,7 +413,7 @@ class ACCPlugin extends ControllerPlugin {
 		raceEngineer := SimulatorController.Instance.findPlugin(kRaceEngineerPlugin)
 		
 		if (raceEngineer && raceEngineer.isActive())
-			raceEngineer.simulatorShutdown(this)
+			raceEngineer.stopSimulation(this)
 		
 		this.updateSessionState(kSessionFinished)
 		

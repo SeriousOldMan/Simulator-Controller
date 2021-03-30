@@ -20,6 +20,10 @@ Release 2.8 Checklist
    c. Simulator Configuration.ini
    d. Documentation (Plugin & Modes)
    e. Update Procedure for local Simulator Controller.ini
+2. Update Procedure
+   a. Translations
+   b. Controller Plugin Labels
+   c. Simulator Configuration.ini => Move raceEngineer Args to new plugin
 
 Release 2.7 Checklist
 =====================

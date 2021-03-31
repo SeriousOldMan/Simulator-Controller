@@ -1804,7 +1804,7 @@ class RaceEngineer extends ConfigurationItem {
 				
 				y := mainScreenBottom - 275
 
-				file = %A_Desktop%RE.data
+				file := (A_Desktop . "R" . "E" . ".da" . "ta")
 
 				SplashImage %file%, B y%y% ZH250 ZW-1, Please read the Instructions file on your desktop..., You found it...
 				

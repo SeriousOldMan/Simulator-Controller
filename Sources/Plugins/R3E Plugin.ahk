@@ -51,8 +51,6 @@ class R3EPlugin extends ControllerPlugin {
 		this.iR3EApplication := new Application("RaceRoom Racing Experience", SimulatorController.Instance.Configuration)
 		
 		base.__New(controller, name, configuration)
-		
-		controller.registerPlugin(this)
 	}
 	
 	runningSimulator() {

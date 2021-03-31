@@ -1162,7 +1162,7 @@ class ControllerPlugin extends Plugin {
 		base.__New(name, configuration)
 		
 		if register
-			this.Controller.registerPlugin(this)
+			controller.registerPlugin(this)
 	}
 	
 	findMode(name) {

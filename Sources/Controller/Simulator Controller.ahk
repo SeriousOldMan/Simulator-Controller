@@ -629,10 +629,10 @@ class SimulatorController extends ConfigurationItem {
 		}
 	}
 	
-	simulatorShutdown() {
+	simulatorShutdown(simulator) {
 		for ignore, thePlugin in this.Plugins
 			if this.isActive(thePlugin) 
-				thePlugin.simulatorShutdown()
+				thePlugin.simulatorShutdown(simulator)
 		
 		for ignore, btnBox in this.ButtonBoxes {
 			buttonBox.hide()
@@ -1227,7 +1227,7 @@ class ControllerPlugin extends Plugin {
 	simulatorStartup(simulator) {
 	}
 	
-	simulatorShutdown() {
+	simulatorShutdown(simulator) {
 	}
 		
 	getLabel(descriptor, default := false) {
@@ -1452,6 +1452,8 @@ getModeForLogMessage(mode) {
 
 updateSimulatorState() {
 	static isSimulatorRunning := false
+	static lastSimulator := false
+	
 	controller := SimulatorController.Instance
 	
 	protectionOn()
@@ -1462,10 +1464,13 @@ updateSimulatorState() {
 		if (isSimulatorRunning != (controller.ActiveSimulator != false)) {
 			isSimulatorRunning := !isSimulatorRunning
 		
-			if isSimulatorRunning
-				controller.simulatorStartup(controller.ActiveSimulator)
+			if isSimulatorRunning {
+				lastSimulator := controller.ActiveSimulator
+				
+				controller.simulatorStartup(lastSimulator)
+			}
 			else
-				controller.simulatorShutdown()
+				controller.simulatorShutdown(lastSimulator)
 
 			for ignore, btnBox in controller.ButtonBoxes
 				btnBox.updateVisibility()

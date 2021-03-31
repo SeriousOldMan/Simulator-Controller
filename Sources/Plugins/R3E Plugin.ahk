@@ -51,6 +51,8 @@ class R3EPlugin extends ControllerPlugin {
 		this.iR3EApplication := new Application("RaceRoom Racing Experience", SimulatorController.Instance.Configuration)
 		
 		base.__New(controller, name, configuration)
+		
+		controller.registerPlugin(this)
 	}
 	
 	runningSimulator() {
@@ -60,21 +62,25 @@ class R3EPlugin extends ControllerPlugin {
 	simulatorStartup(simulator) {
 		base.simulatorStartup(simulator)
 		
-		raceEngineer := SimulatorController.Instance.findPlugin(kRaceEngineerPlugin)
-		
-		if (raceEngineer && raceEngineer.isActive())
-			raceEngineer.startSimulation(this)
+		if (simulator = "RaceRoom Racing Experience") {
+			raceEngineer := SimulatorController.Instance.findPlugin(kRaceEngineerPlugin)
+			
+			if (raceEngineer && raceEngineer.isActive())
+				raceEngineer.startSimulation(this)
+		}
 	}
 	
-	simulatorShutdown() {
-		base.simulatorShutdown()
+	simulatorShutdown(simulator) {
+		base.simulatorShutdown(simulator)
 		
-		raceEngineer := SimulatorController.Instance.findPlugin(kRaceEngineerPlugin)
+		if (simulator = "RaceRoom Racing Experience") {
+			raceEngineer := SimulatorController.Instance.findPlugin(kRaceEngineerPlugin)
+			
+			if (raceEngineer && raceEngineer.isActive())
+				raceEngineer.stopSimulation(this)
 		
-		if (raceEngineer && raceEngineer.isActive())
-			raceEngineer.stopSimulation(this)
-		
-		this.updateSessionState(kSessionFinished)
+			this.updateSessionState(kSessionFinished)
+		}
 	}
 	
 	updateSessionState(sessionState) {

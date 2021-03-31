@@ -92,7 +92,7 @@ int main()
     int err_code = 0;
     BOOL mapped_r3e = FALSE;
 
-    if (!mapped_r3e && is_r3e_running() && map_exists())
+    if (!mapped_r3e /* && is_r3e_running()*/ && map_exists())
     {
         err_code = map_init();
         
@@ -109,10 +109,10 @@ int main()
 
         _itoa_s(modelID, buffer, 32, 10);
 
-        wprintf_s(L"Car=Unknown-%S", buffer);
-        wprintf_s(L"Track=%S", map_buffer->track_name);
-        wprintf_s(L"FuelAmount=%d", (long)map_buffer->fuel_capacity);
-        wprintf_s(L"RaceFormat=%S", (map_buffer->session_length_format == R3E_SESSION_LENGTH_LAP_BASED) ? "Lap" : "Time");
+        wprintf_s(L"Car=Unknown-%S\n", buffer);
+        wprintf_s(L"Track=%S\n", map_buffer->track_name);
+        wprintf_s(L"FuelAmount=%d\n", (long)map_buffer->fuel_capacity);
+        wprintf_s(L"RaceFormat=%S\n", (map_buffer->session_length_format == R3E_SESSION_LENGTH_LAP_BASED) ? "Lap" : "Time");
     }
 
     wprintf_s(L"[Car Data]\n");
@@ -153,14 +153,14 @@ int main()
         wprintf_s(L"LapBestTime=%d\n", (long)map_buffer->lap_time_best_self * 1000);
         wprintf_s(L"Laps=%d\n", map_buffer->completed_laps);
 
-        wprintf_s(L"RaceLapsRemaining=%d", getRemainingLaps());
+        wprintf_s(L"RaceLapsRemaining=%d\n", getRemainingLaps());
 
         long timeRemaining = getRemainingTime() * 1000;
 
-        wprintf_s(L"RaceTimeRemaining=%d", timeRemaining);
-        wprintf_s(L"StintTimeRemaining=%d", timeRemaining);
-        wprintf_s(L"DriverTimeRemaining=%d", timeRemaining);
-        wprintf_s(L"InPit=%S", (map_buffer->pit_state == 3) ? "true" : "false");
+        wprintf_s(L"RaceTimeRemaining=%d\n", timeRemaining);
+        wprintf_s(L"StintTimeRemaining=%d\n", timeRemaining);
+        wprintf_s(L"DriverTimeRemaining=%d\n", timeRemaining);
+        wprintf_s(L"InPit=%S\n", (map_buffer->pit_state == 3) ? "true" : "false");
     }
 
     wprintf_s(L"[Track Data]\n");

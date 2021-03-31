@@ -397,32 +397,36 @@ class ACCPlugin extends ControllerPlugin {
 	simulatorStartup(simulator) {
 		base.simulatorStartup(simulator)
 		
-		raceEngineer := SimulatorController.Instance.findPlugin(kRaceEngineerPlugin)
+		if (simulator = "Assetto Corsa Competizione") {
+			raceEngineer := SimulatorController.Instance.findPlugin(kRaceEngineerPlugin)
 		
-		if (raceEngineer && raceEngineer.isActive())
-			raceEngineer.startSimulation(this)
-		
-		if (inList(this.Simulators, simulator)) {
-			this.Controller.setMode(this.iChatMode)
+			if (raceEngineer && raceEngineer.isActive())
+				raceEngineer.startSimulation(this)
+			
+			if (inList(this.Simulators, simulator)) {
+				this.Controller.setMode(this.iChatMode)
+			}
 		}
 	}
 	
-	simulatorShutdown() {
+	simulatorShutdown(simulator) {
 		base.simulatorShutdown()
 		
-		raceEngineer := SimulatorController.Instance.findPlugin(kRaceEngineerPlugin)
-		
-		if (raceEngineer && raceEngineer.isActive())
-			raceEngineer.stopSimulation(this)
-		
-		this.updateSessionState(kSessionFinished)
-		
-		activeModes := this.Controller.ActiveModes
-		
-		if inList(activeModes, this.iChatMode)
-			this.iChatMode.deactivate()
-		else if inList(activeModes, this.iPitstopMode)
-			this.iPitstopMode.deactivate()
+		if (simulator = "Assetto Corsa Competizione") {
+			raceEngineer := SimulatorController.Instance.findPlugin(kRaceEngineerPlugin)
+			
+			if (raceEngineer && raceEngineer.isActive() && (raceEngineer.Simulator == this))
+				raceEngineer.stopSimulation(this)
+			
+			this.updateSessionState(kSessionFinished)
+			
+			activeModes := this.Controller.ActiveModes
+			
+			if inList(activeModes, this.iChatMode)
+				this.iChatMode.deactivate()
+			else if inList(activeModes, this.iPitstopMode)
+				this.iPitstopMode.deactivate()
+		}
 	}
 	
 	updateSessionState(sessionState) {
@@ -1273,10 +1277,15 @@ isACCRunning() {
 	running := (ErrorLevel != 0)
 	
 	if !running {
-		thePlugin := SimulatorController.Instance.findPlugin(kACCPlugin)
-		
-		thePlugin.iRepairSuspensionChosen := true
-		thePlugin.iRepairBodyworkChosen := true
+		try {
+			thePlugin := SimulatorController.Instance.findPlugin("ACC")
+			
+			thePlugin.iRepairSuspensionChosen := true
+			thePlugin.iRepairBodyworkChosen := true
+		}
+		catch exception {
+			; ignore
+		}
 	}
 		
 	return running

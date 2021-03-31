@@ -309,8 +309,8 @@ class SystemPlugin extends ControllerPlugin {
 		base.simulatorStartup(simulator)
 	}
 	
-	simulatorShutdown() {
-		base.simulatorShutdown()
+	simulatorShutdown(simulator) {
+		base.simulatorShutdown(simulator)
 		
 		this.Controller.setMode(this.iLaunchMode)
 	}

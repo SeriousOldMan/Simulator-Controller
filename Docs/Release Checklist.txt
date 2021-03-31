@@ -23,12 +23,18 @@ Release 2.8 Checklist
 2. Update Procedure
    a. Translations
    b. Controller Plugin Labels
-   c. Simulator Configuration.ini => Move raceEngineer Args to new plugin
+   c. Simulator Configuration.ini => Move raceEngineer Args to new plugin, startRRE => startR3E, Plugin RRE => R3E
 3. Rework of Simulator Tools.targets
    a. Update procedure
 4. Shared Memory File Format => (Added RaceFormat, RaceLapsRemaining option)
    a. Virtual Race Engineer.md
    b. Rules adoption
+5. Rename startR3E
+   a. Simulator Configuration.ini
+6. New parameter for simulatorShutdown
+   a. Functions.md
+7. Rename plugin RRE => R3E
+   a. Simulator Configuration.ini
 
 Release 2.7 Checklist
 =====================

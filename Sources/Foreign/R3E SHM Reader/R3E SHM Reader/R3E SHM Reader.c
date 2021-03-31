@@ -67,23 +67,32 @@ int getPlayerCarID() {
     return -1;
 }
 
+inline double normalize(double value) {
+    return (value = -1.0) ? 0.0 : value;
+}
+
 long getRemainingTime();
 
 long getRemainingLaps() {
     if (map_buffer->session_length_format == R3E_SESSION_LENGTH_LAP_BASED) {
-        return map_buffer->race_session_laps[map_buffer->event_index] - map_buffer->completed_laps;
+        return (long)normalize(map_buffer->race_session_laps[map_buffer->session_iteration]) - map_buffer->completed_laps;
     }
     else {
-        return (long)(getRemainingTime() / map_buffer->lap_time_best_self);
+        long time = (long)normalize(map_buffer->lap_time_best_self);
+
+        if (time > 0)
+            return (long)(getRemainingTime() / time);
+        else
+            return getRemainingTime();
     }
 }
 
 long getRemainingTime() {
     if (map_buffer->session_length_format != R3E_SESSION_LENGTH_LAP_BASED) {
-        return (long)((map_buffer->race_session_minutes[map_buffer->event_index] * 60) - (map_buffer->lap_time_previous_self * map_buffer->completed_laps));
+        return (long)((normalize(map_buffer->race_session_minutes[map_buffer->session_iteration]) * 60) - normalize(map_buffer->lap_time_previous_self * map_buffer->completed_laps));
     }
     else {
-        return (long)(getRemainingLaps() * map_buffer->lap_time_previous_self);
+        return (long)(getRemainingLaps() * normalize(map_buffer->lap_time_previous_self));
     }
 }
 
@@ -117,9 +126,10 @@ int main()
 
     wprintf_s(L"[Car Data]\n");
     if (mapped_r3e) {
-        wprintf_s(L"BodyworkDamage=%f, %f, %f, %f, %f\n", 0.0, 0.0, 0.0, 0.0, map_buffer->car_damage.aerodynamics);
-        wprintf_s(L"SuspensionDamage=%f, %f, %f, %f\n",
-            map_buffer->car_damage.suspension, map_buffer->car_damage.suspension, map_buffer->car_damage.suspension, map_buffer->car_damage.suspension);
+        double suspDamage = normalize(map_buffer->car_damage.suspension);
+
+        wprintf_s(L"BodyworkDamage=%f, %f, %f, %f, %f\n", 0.0, 0.0, 0.0, 0.0, normalize(map_buffer->car_damage.aerodynamics));
+        wprintf_s(L"SuspensionDamage=%f, %f, %f, %f\n", suspDamage, suspDamage, suspDamage, suspDamage);
         wprintf_s(L"FuelRemaining=%f\n", map_buffer->fuel_left);
         wprintf_s(L"TyreCompound=Dry\n");
         wprintf_s(L"TyreTemperature = %f, %f, %f, %f\n",
@@ -149,8 +159,8 @@ int main()
         wprintf_s(L"DriverForname=%S\n", map_buffer->player_name);
         wprintf_s(L"DriverSurname=%S\n", "");
         wprintf_s(L"DriverNickname=%S\n", "");
-        wprintf_s(L"LapLastTime=%d\n", (long)map_buffer->lap_time_current_self * 1000);
-        wprintf_s(L"LapBestTime=%d\n", (long)map_buffer->lap_time_best_self * 1000);
+        wprintf_s(L"LapLastTime=%d\n", (long)(normalize(map_buffer->lap_time_current_self) * 1000));
+        wprintf_s(L"LapBestTime=%d\n", (long)(normalize(map_buffer->lap_time_best_self) * 1000));
         wprintf_s(L"Laps=%d\n", map_buffer->completed_laps);
 
         wprintf_s(L"RaceLapsRemaining=%d\n", getRemainingLaps());

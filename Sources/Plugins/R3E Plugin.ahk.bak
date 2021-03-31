@@ -77,10 +77,6 @@ class R3EPlugin extends ControllerPlugin {
 		this.updateSessionState(kSessionFinished)
 	}
 	
-	updateSessionState(sessionState) {
-		this.iSessionState := sessionState
-	}
-	
 	planPitstop() {
 		if this.RaceEngineer
 			this.RaceEngineer.planPitstop()

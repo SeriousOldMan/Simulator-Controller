@@ -57,6 +57,36 @@ void map_close()
     if (map_handle) CloseHandle(map_handle);
 }
 
+int getPlayerCarID() {
+    for (int i = 0; i < map_buffer->num_cars; i++) {
+        if (map_buffer->all_drivers_data_1[i].place == map_buffer->position) {
+            return i;
+         }
+    }
+
+    return -1;
+}
+
+long getRemainingTime();
+
+long getRemainingLaps() {
+    if (map_buffer->session_length_format == R3E_SESSION_LENGTH_LAP_BASED) {
+        return map_buffer->race_session_laps[map_buffer->event_index] - map_buffer->completed_laps;
+    }
+    else {
+        return (long)(getRemainingTime() / map_buffer->lap_time_best_self);
+    }
+}
+
+long getRemainingTime() {
+    if (map_buffer->session_length_format != R3E_SESSION_LENGTH_LAP_BASED) {
+        return (long)((map_buffer->race_session_minutes[map_buffer->event_index] * 60) - (map_buffer->lap_time_previous_self * map_buffer->completed_laps));
+    }
+    else {
+        return (long)(getRemainingLaps() * map_buffer->lap_time_previous_self);
+    }
+}
+
 int main()
 {
     int err_code = 0;
@@ -73,48 +103,79 @@ int main()
     }
 
     wprintf_s(L"[Race Data]\n");
-    
-    if (mapped_r3e)
-    {
-        /*
-        wprintf_s(L"Car=%s", L"Unknown");
-        wprintf_s(L"Track=%s", map_buffer->track_name);
-        wprintf_s(L"FuelAmount=%d", map_buffer->fuel_capacity);
-        */
+    if (mapped_r3e) {
+        int modelID = map_buffer->vehicle_info.model_id;
+        char buffer[33];
+
+        _itoa_s(modelID, buffer, 32, 10);
+
+        wprintf_s(L"Car=Unknown-%S", buffer);
+        wprintf_s(L"Track=%S", map_buffer->track_name);
+        wprintf_s(L"FuelAmount=%d", (long)map_buffer->fuel_capacity);
+        wprintf_s(L"RaceFormat=%S", (map_buffer->session_length_format == R3E_SESSION_LENGTH_LAP_BASED) ? "Lap" : "Time");
     }
 
     wprintf_s(L"[Car Data]\n");
+    if (mapped_r3e) {
+        wprintf_s(L"BodyworkDamage=%f, %f, %f, %f, %f\n", 0.0, 0.0, 0.0, 0.0, map_buffer->car_damage.aerodynamics);
+        wprintf_s(L"SuspensionDamage=%f, %f, %f, %f\n",
+            map_buffer->car_damage.suspension, map_buffer->car_damage.suspension, map_buffer->car_damage.suspension, map_buffer->car_damage.suspension);
+        wprintf_s(L"FuelRemaining=%f\n", map_buffer->fuel_left);
+        wprintf_s(L"TyreCompound=Dry\n");
+        wprintf_s(L"TyreTemperature = %f, %f, %f, %f\n",
+            map_buffer->tire_temp[R3E_TIRE_FRONT_LEFT].current_temp[R3E_TIRE_TEMP_CENTER],
+            map_buffer->tire_temp[R3E_TIRE_FRONT_RIGHT].current_temp[R3E_TIRE_TEMP_CENTER],
+            map_buffer->tire_temp[R3E_TIRE_REAR_LEFT].current_temp[R3E_TIRE_TEMP_CENTER],
+            map_buffer->tire_temp[R3E_TIRE_REAR_RIGHT].current_temp[R3E_TIRE_TEMP_CENTER]);
+        wprintf_s(L"TyrePressure = %f, %f, %f, %f\n",
+            map_buffer->tire_pressure[R3E_TIRE_FRONT_LEFT] / 6.895,
+            map_buffer->tire_pressure[R3E_TIRE_FRONT_RIGHT] / 6.895,
+            map_buffer->tire_pressure[R3E_TIRE_REAR_LEFT] / 6.895,
+            map_buffer->tire_pressure[R3E_TIRE_REAR_RIGHT] / 6.895);
+    }
 
     wprintf_s(L"[Stint Data]\n");
-    wprintf_s(L"Active=true\n");
-    wprintf_s(L"Paused=%s\n", map_buffer->game_paused ? L"true" : L"false");
-    if (map_buffer->session_type == R3E_SESSION_QUALIFY)
-        wprintf_s(L"Session=QUALIFY\n");
-    else if (map_buffer->session_type == R3E_SESSION_RACE)
-        wprintf_s(L"Session=RACE\n");
-    else if (map_buffer->session_type == R3E_SESSION_PRACTICE)
-        wprintf_s(L"Session=PRACTICE\n");
-    else
-        wprintf_s(L"Session=OTHER\n");
-    wprintf_s(L"DriverForname=%s\n", (unsigned short *)map_buffer->player_name);
-    wprintf_s(L"DriverSurname=%s\n", (unsigned short*)map_buffer->player_name);
-    wprintf_s(L"DriverNickname=XXX\n");
-    wprintf_s(L"LapLastTime=%d\n", (long)map_buffer->lap_time_current_self * 1000);
-    wprintf_s(L"LapBestTime=%d\n", (long)map_buffer->lap_time_best_self * 1000);
-    wprintf_s(L"Laps=%d\n", map_buffer->completed_laps);
-    /*
-        RaceTimeRemaining = 1.41874e+06
-        StintTimeRemaining = 1.41874e+06
-        DriverTimeRemaining = 1.41874e+06
-        InPit = false
-    */
+    wprintf_s(L"Active=%S\n", mapped_r3e ? "true" : "false");
+    if (mapped_r3e) {
+        wprintf_s(L"Paused=%S\n", map_buffer->game_paused ? "true" : "false");
+        if (map_buffer->session_type == R3E_SESSION_QUALIFY)
+            wprintf_s(L"Session=QUALIFY\n");
+        else if (map_buffer->session_type == R3E_SESSION_RACE)
+            wprintf_s(L"Session=RACE\n");
+        else if (map_buffer->session_type == R3E_SESSION_PRACTICE)
+            wprintf_s(L"Session=PRACTICE\n");
+        else
+            wprintf_s(L"Session=OTHER\n");
+        wprintf_s(L"DriverForname=%S\n", map_buffer->player_name);
+        wprintf_s(L"DriverSurname=%S\n", "");
+        wprintf_s(L"DriverNickname=%S\n", "");
+        wprintf_s(L"LapLastTime=%d\n", (long)map_buffer->lap_time_current_self * 1000);
+        wprintf_s(L"LapBestTime=%d\n", (long)map_buffer->lap_time_best_self * 1000);
+        wprintf_s(L"Laps=%d\n", map_buffer->completed_laps);
+
+        wprintf_s(L"RaceLapsRemaining=%d", getRemainingLaps());
+
+        long timeRemaining = getRemainingTime() * 1000;
+
+        wprintf_s(L"RaceTimeRemaining=%d", timeRemaining);
+        wprintf_s(L"StintTimeRemaining=%d", timeRemaining);
+        wprintf_s(L"DriverTimeRemaining=%d", timeRemaining);
+        wprintf_s(L"InPit=%S", map_buffer->in_pitlane ? "true" : "false");
+    }
 
     wprintf_s(L"[Track Data]\n");
     wprintf_s(L"Temperature=26\n");
     wprintf_s(L"Grip=OPTIMUM\n");
 
     wprintf_s(L"[Pitstop Data]\n");
-
+    /*
+    TyreSet = 1
+        FuelAmount = 0
+        TyrePressureFL = 0
+        TyrePressureFR = 0
+        TyrePressureRL = 0
+        TyrePressureRR = 0
+        */
     wprintf_s(L"[Weather Data]\n");
     wprintf_s(L"Temperature=24\n");
     wprintf_s(L"Weather=Dry\n");
@@ -123,7 +184,7 @@ int main()
 
     map_close();
 
-    system("PAUSE");
+    // system("PAUSE");
 
     return 0;
 }

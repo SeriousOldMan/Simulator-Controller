@@ -24,6 +24,11 @@ Release 2.8 Checklist
    a. Translations
    b. Controller Plugin Labels
    c. Simulator Configuration.ini => Move raceEngineer Args to new plugin
+3. Rework of Simulator Tools.targets
+   a. Update procedure
+4. Shared Memory File Format => (Added RaceFormat, RaceLapsRemaining option)
+   a. Virtual Race Engineer.md
+   b. Rules adoption
 
 Release 2.7 Checklist
 =====================

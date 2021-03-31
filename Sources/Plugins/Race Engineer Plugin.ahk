@@ -281,9 +281,19 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 					theAction.Function.disable()
 			}
 			else if isInstance(theAction, RaceEngineerPlugin.RaceEngineerAction)
-				if ((theAction.Action = "RaceEngineerOpenSettings") || (theAction.Action = "RaceEngineerImportSettings")) {
+				if (theAction.Action = "RaceEngineerOpenSettings") {
 					theAction.Function.enable(kAllTrigger)
 					theAction.Function.setText(translate(theAction.Label))
+				}
+				else if (theAction.Action = "RaceEngineerImportSettings") {
+					if this.Simulator {
+						theAction.Function.enable(kAllTrigger)
+						theAction.Function.setText(translate(theAction.Label))
+					}
+					else {
+						theAction.Function.disable(kAllTrigger)
+						theAction.Function.setText(translate(theAction.Label), "Gray")
+					}
 				}
 				else if ((sessionState != kSessionFinished) && (sessionState != kSessionPaused) && (this.RaceEngineer != false)) {
 					theAction.Function.enable(kAllTrigger)
@@ -482,11 +492,12 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 		if this.Simulator {
 			if !data
 				data := readSharedMemory(this.Simulator.Code, kUserHomeDirectory . "Temp\" . this.Simulator.Code . " Data\SHM.data")
-				
-			if getConfigurationValue(data, "Stint Data", "Paused", false)
+			
+			active := getConfigurationValue(data, "Stint Data", "Active", false)
+			
+			if (active && getConfigurationValue(data, "Stint Data", "Paused", false))
 				return kSessionPaused
-			else if (getConfigurationValue(data, "Stint Data", "Active", false)
-				  && (getConfigurationValue(data, "Stint Data", "Session", "OTHER") = "RACE"))
+			else if (active && (getConfigurationValue(data, "Stint Data", "Session", "OTHER") = "RACE"))
 				return kSessionRace
 			else
 				return kSessionFinished

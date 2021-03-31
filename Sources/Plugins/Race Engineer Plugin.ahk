@@ -506,7 +506,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 			return kSessionFinished
 	}
 
-	updateSessionState(sessionState := false) {
+	updateSessionState(sessionState := "__Undefined__") {
 		if (sessionState == kUndefined)
 			sessionState := this.getSessionState()
 		
@@ -620,6 +620,8 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 		
 			if this.RaceEngineer
 				this.finishRace()
+			
+			this.updateSessionState(kSessionFinished)
 		}
 	}
 }

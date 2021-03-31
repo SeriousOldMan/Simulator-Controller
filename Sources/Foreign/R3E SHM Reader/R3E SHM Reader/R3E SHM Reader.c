@@ -160,7 +160,7 @@ int main()
         wprintf_s(L"RaceTimeRemaining=%d", timeRemaining);
         wprintf_s(L"StintTimeRemaining=%d", timeRemaining);
         wprintf_s(L"DriverTimeRemaining=%d", timeRemaining);
-        wprintf_s(L"InPit=%S", map_buffer->in_pitlane ? "true" : "false");
+        wprintf_s(L"InPit=%S", (map_buffer->pit_state == 3) ? "true" : "false");
     }
 
     wprintf_s(L"[Track Data]\n");
@@ -168,14 +168,7 @@ int main()
     wprintf_s(L"Grip=OPTIMUM\n");
 
     wprintf_s(L"[Pitstop Data]\n");
-    /*
-    TyreSet = 1
-        FuelAmount = 0
-        TyrePressureFL = 0
-        TyrePressureFR = 0
-        TyrePressureRL = 0
-        TyrePressureRR = 0
-        */
+
     wprintf_s(L"[Weather Data]\n");
     wprintf_s(L"Temperature=24\n");
     wprintf_s(L"Weather=Dry\n");
@@ -183,8 +176,6 @@ int main()
     wprintf_s(L"Weather30Min=Dry\n");
 
     map_close();
-
-    // system("PAUSE");
 
     return 0;
 }

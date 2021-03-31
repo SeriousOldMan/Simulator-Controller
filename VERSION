@@ -1,6 +1,6 @@
 [Version]
-Current=2.7.0-beta
+Current=2.7.0-rc1
 Target=2.7.0-release
 Release=2.6.2-release
 Changes=Multiple simulataneaously active plugin modes, Stick to strategy pressures command for Jona, Layout editor for Button Box configurations, Confirmation request for setup database update, "No Refuel" awareness added to Pitstop MFD handling, Plugin interface for configuration tool
-Date=03/30/2021
+Date=03/31/2021

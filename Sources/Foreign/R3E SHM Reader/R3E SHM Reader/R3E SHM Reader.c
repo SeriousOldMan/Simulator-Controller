@@ -184,14 +184,16 @@ int main()
     wprintf_s(L"Weather30Min=Dry\n");
 
     wprintf_s(L"[Test Data]\n");
-    wprintf_s(L"Aero Damage=%f\n", map_buffer->car_damage.aerodynamics);
-    wprintf_s(L"Susp Damage=%f\n", map_buffer->car_damage.suspension);
-    wprintf_s(L"Lap Time=%f\n", map_buffer->lap_time_current_self);
-    wprintf_s(L"Best Lap Time=%f\n", map_buffer->lap_time_best_self);
-    wprintf_s(L"Prev Lap Time=%f\n", map_buffer->lap_time_previous_self);
-    wprintf_s(L"Session Index=%d\n", map_buffer->session_iteration);
-    wprintf_s(L"Session Minutes=%d\n", map_buffer->race_session_minutes[map_buffer->session_iteration]);
-    wprintf_s(L"Completed Laps=%d\n", map_buffer->completed_laps);
+    if (mapped_r3e) {
+        wprintf_s(L"Aero Damage=%f\n", map_buffer->car_damage.aerodynamics);
+        wprintf_s(L"Susp Damage=%f\n", map_buffer->car_damage.suspension);
+        wprintf_s(L"Lap Time=%f\n", map_buffer->lap_time_current_self);
+        wprintf_s(L"Best Lap Time=%f\n", map_buffer->lap_time_best_self);
+        wprintf_s(L"Prev Lap Time=%f\n", map_buffer->lap_time_previous_self);
+        wprintf_s(L"Session Index=%d\n", map_buffer->session_iteration);
+        wprintf_s(L"Session Minutes=%d\n", map_buffer->race_session_minutes[map_buffer->session_iteration]);
+        wprintf_s(L"Completed Laps=%d\n", map_buffer->completed_laps);
+    }
 
     map_close();
 

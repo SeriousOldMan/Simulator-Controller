@@ -534,7 +534,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 			
 			testData := getConfigurationSectionValues(data, "Test Data", Object())
 			
-			if (isDebug && (testData.Count() > 0)) {
+			if (isDebug() && (testData.Count() > 0)) {
 				message := "Raw Data`n`n"
 				
 				for key, value in testData

@@ -534,13 +534,13 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 			
 			testData := getConfigurationSectionValues(data, "Test Data", Object())
 			
-			if (testData.Count() > 0) {
-				message := ""
+			if (isDebug && (testData.Count() > 0)) {
+				message := "Raw Data`n`n"
 				
 				for key, value in testData
 					message := message . key . " = " . value . "`n"
 
-				showMessage(message, translate("Modular Simulator Controller System"), "Information.png", 5000, "Left", "Bottom", 400, 300)
+				showMessage(message, translate("Modular Simulator Controller System"), "Information.png", 5000, "Left", "Bottom", 400, 200)
 			}
 			
 			protectionOn()

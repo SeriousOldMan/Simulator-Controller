@@ -159,7 +159,7 @@ int main()
     }
 
     wprintf_s(L"[Stint Data]\n");
-    wprintf_s(L"Active=%S\n", mapped_r3e ? "true" : "false");
+    wprintf_s(L"Active=%S\n", mapped_r3e ? ((map_buffer->completed_laps >= 0) ? "true" : "false") : "false");
     if (mapped_r3e) {
         wprintf_s(L"Paused=%S\n", map_buffer->game_paused ? "true" : "false");
         if (map_buffer->session_type == R3E_SESSION_QUALIFY)

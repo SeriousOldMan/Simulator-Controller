@@ -1,6 +1,6 @@
 [Version]
 Current=2.8.0-dev
-Target=2.8.0-release
-Release=2.6.2-release
+Release=2.7.0-release
+Release=2.7.0-release
 Changes=Full Refactoring of Race Engineer Integration, Integrated Race Room Racing Experience with Jona
-Date=03/31/2021
+Date=04/1/2021

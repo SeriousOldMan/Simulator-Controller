@@ -1154,7 +1154,7 @@ class ACCPlugin extends ControllerPlugin {
 			if (!fromTimer && this.iPSIsOpen) {
 				reload := this.searchStrategyLabel(lastY, images)
 				
-				reload := (this.searchNoRefuelLabel(lastY, images) || reload)
+				; reload := (this.searchNoRefuelLabel(lastY, images) || reload)
 				
 				reload := (this.searchTyreLabel(lastY, images) || reload)
 				

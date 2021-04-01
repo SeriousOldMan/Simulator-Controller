@@ -1,4 +1,4 @@
-## 2.7-release planned for 04/02/21 (2-week easter egg sprint)
+## 2.7-release 04/01/21
 
   1. Bugfixes, as always
      - Finally a fix for issue #2 - Language dropdown menu synhronization error in Configuration Dialog
@@ -9,7 +9,7 @@
   6. Visual feedback for tyre setup import action. See the documentation on the [Virtual Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#vitual-race-engineer-integration) integration of the "ACC" plugin for more information.
   7. Setup Data will be stored at the end of the race only if [confirmed by the driver](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--setup-database)
   8. Added "No Refuel" to the set of handled pitstop configurations - please take a look at the [Update Notes for Release 2.7](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-27) for more information.
-  9. (Developer only): New plugin interface for the configuration tool (no documentation yet, for the moment you can take a look at one of the configuration plugins (for example the [Chat Messages Conifguration.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Chat%20Messages%20Configuration%20Plugin.ahk) for an introduction and a template).
+  9. (Developer only): New plugin interface for the configuration tool (no documentation yet, for the moment you can take a look at one of the configuration plugins, for example the [Chat Messages Conifguration.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Chat%20Messages%20Configuration%20Plugin.ahk) for an introduction and a template).
   10. An Easter Egg with a precious first prize is somewhere hidden in Simulator Controller. It will only be available for the four days of the upcoming Easter weekend.
   
 ## 2.6.2-release 03/21/21

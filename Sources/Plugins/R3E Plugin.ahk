@@ -9,6 +9,8 @@
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+global kR3EApplication = "RaceRoom Racing Experience"
+
 global kR3EPlugin = "R3E"
 
 
@@ -48,19 +50,19 @@ class R3EPlugin extends ControllerPlugin {
 	}
 	
 	__New(controller, name, configuration := false) {
-		this.iR3EApplication := new Application("RaceRoom Racing Experience", SimulatorController.Instance.Configuration)
+		this.iR3EApplication := new Application(kR3EApplication, SimulatorController.Instance.Configuration)
 		
 		base.__New(controller, name, configuration)
 	}
 	
 	runningSimulator() {
-		return (this.R3EApplication.isRunning() ? "RaceRoom Racing Experience" : false)
+		return (this.R3EApplication.isRunning() ? kR3EApplication : false)
 	}
 	
 	simulatorStartup(simulator) {
 		base.simulatorStartup(simulator)
 		
-		if (simulator = "RaceRoom Racing Experience") {
+		if (simulator = kR3EApplication) {
 			raceEngineer := SimulatorController.Instance.findPlugin(kRaceEngineerPlugin)
 			
 			if (raceEngineer && raceEngineer.isActive())
@@ -71,7 +73,7 @@ class R3EPlugin extends ControllerPlugin {
 	simulatorShutdown(simulator) {
 		base.simulatorShutdown(simulator)
 		
-		if (simulator = "RaceRoom Racing Experience") {
+		if (simulator = kR3EApplication) {
 			raceEngineer := SimulatorController.Instance.findPlugin(kRaceEngineerPlugin)
 			
 			if (raceEngineer && raceEngineer.isActive())

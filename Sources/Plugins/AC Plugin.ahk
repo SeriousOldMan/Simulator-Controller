@@ -9,6 +9,8 @@
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+global kACApplication = "Assetto Corsa"
+
 global kACPlugin = "AC"
 
 
@@ -26,13 +28,13 @@ class ACPlugin extends ControllerPlugin {
 	}
 	
 	__New(controller, name, configuration := false) {
-		this.iACApplication := new Application("Assetto Corsa", SimulatorController.Instance.Configuration)
+		this.iACApplication := new Application(kACApplication, SimulatorController.Instance.Configuration)
 		
 		base.__New(controller, name, configuration)
 	}
 	
 	runningSimulator() {
-		return (this.ACApplication.isRunning() ? "Assetto Corsa" : false)
+		return (this.ACApplication.isRunning() ? kACApplication : false)
 	}
 }
 

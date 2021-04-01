@@ -9,6 +9,8 @@
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+global kRF2Application = "rFactor 2"
+
 global kRF2Plugin = "RF2"
 
 
@@ -26,13 +28,13 @@ class RF2Plugin extends ControllerPlugin {
 	}
 	
 	__New(controller, name, configuration := false) {
-		this.iRF2Application := new Application("rFactor 2", SimulatorController.Instance.Configuration)
+		this.iRF2Application := new Application(kRF2Application, SimulatorController.Instance.Configuration)
 		
 		base.__New(controller, name, configuration)
 	}
 	
 	runningSimulator() {
-		return (this.RF2Application.isRunning() ? "rFactor 2" : false)
+		return (this.RF2Application.isRunning() ? kRF2Application : false)
 	}
 }
 

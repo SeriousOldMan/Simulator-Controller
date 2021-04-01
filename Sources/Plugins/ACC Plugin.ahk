@@ -9,6 +9,8 @@
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+global kACCApplication = "Assetto Corsa Competizione"
+
 global kACCPlugin = "ACC"
 global kChatMode = "Chat"
 global kPitstopMode = "Pitstop"
@@ -391,13 +393,13 @@ class ACCPlugin extends ControllerPlugin {
 	}
 	
 	runningSimulator() {
-		return (isACCRunning() ? "Assetto Corsa Competizione" : false)
+		return (isACCRunning() ? kACCApplication : false)
 	}
 	
 	simulatorStartup(simulator) {
 		base.simulatorStartup(simulator)
 		
-		if (simulator = "Assetto Corsa Competizione") {
+		if (simulator = kACCApplication) {
 			raceEngineer := SimulatorController.Instance.findPlugin(kRaceEngineerPlugin)
 		
 			if (raceEngineer && raceEngineer.isActive())
@@ -412,7 +414,7 @@ class ACCPlugin extends ControllerPlugin {
 	simulatorShutdown(simulator) {
 		base.simulatorShutdown()
 		
-		if (simulator = "Assetto Corsa Competizione") {
+		if (simulator = kACCApplication) {
 			raceEngineer := SimulatorController.Instance.findPlugin(kRaceEngineerPlugin)
 			
 			if (raceEngineer && raceEngineer.isActive() && (raceEngineer.Simulator == this))
@@ -1254,7 +1256,7 @@ class ACCPlugin extends ControllerPlugin {
 ;;;-------------------------------------------------------------------------;;;
 
 startACC() {
-	return SimulatorController.Instance.startSimulator(new Application("Assetto Corsa Competizione"
+	return SimulatorController.Instance.startSimulator(new Application(kACCApplication
 													 , SimulatorController.Instance.Configuration), "Simulator Splash Images\ACC Splash.jpg")
 }
 

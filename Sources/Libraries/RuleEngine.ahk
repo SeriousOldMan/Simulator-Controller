@@ -3740,8 +3740,8 @@ class NilParser extends Parser {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-debugShow(ignore, args*) {
-	MsgBox % "Debug: " . values2String(", ", args*)
+debugMsgBox(ignore, args*) {
+	MsgBox % "Debug: " . values2String(A_Space, args*)
 	
 	return true
 }

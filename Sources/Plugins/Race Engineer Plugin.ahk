@@ -532,15 +532,17 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 			
 			dataLastLap := getConfigurationValue(data, "Stint Data", "Laps", 0)
 			
-			testData := getConfigurationSectionValues(data, "Test Data", Object())
-			
-			if (isDebug() && (testData.Count() > 0)) {
-				message := "Raw Data`n`n"
+			if isDebug() {
+				testData := getConfigurationSectionValues(data, "Test Data", Object())
 				
-				for key, value in testData
-					message := message . key . " = " . value . "`n"
+				if (testData.Count() > 0) {
+					message := "Raw Data`n`n"
+					
+					for key, value in testData
+						message := message . key . " = " . value . "`n"
 
-				showMessage(message, translate("Modular Simulator Controller System"), "Information.png", 5000, "Left", "Bottom", 400, 200)
+					showMessage(message, translate("Modular Simulator Controller System"), "Information.png", 5000, "Left", "Bottom", 400, 200)
+				}
 			}
 			
 			protectionOn()

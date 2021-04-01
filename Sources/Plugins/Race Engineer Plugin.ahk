@@ -530,6 +530,8 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 			
 			data := readSharedMemory(code, dataFile)
 			
+			this.Simulator.updateSimulatorData(data)
+			
 			dataLastLap := getConfigurationValue(data, "Stint Data", "Laps", 0)
 			
 			if isDebug() {

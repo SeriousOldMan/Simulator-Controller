@@ -132,7 +132,7 @@ int main()
 
         _itoa_s(modelID, buffer, 32, 10);
 
-        wprintf_s(L"Car=Unknown-%S\n", buffer);
+        wprintf_s(L"Car=%S\n", buffer);
         wprintf_s(L"Track=%S-%S\n", map_buffer->track_name, map_buffer->layout_name);
         wprintf_s(L"FuelAmount=%d\n", (long)map_buffer->fuel_capacity);
         wprintf_s(L"RaceFormat=%S\n", (map_buffer->session_length_format == R3E_SESSION_LENGTH_LAP_BASED) ? "Lap" : "Time");

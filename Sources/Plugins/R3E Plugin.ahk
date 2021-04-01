@@ -6,6 +6,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                         Local Include Section                           ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include ..\Libraries\JSON.ahk
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -122,6 +129,26 @@ class R3EPlugin extends ControllerPlugin {
 	}
 
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork) {
+	}
+	
+	updateSimulatorData(data) {
+		static carDB := false
+		static lastCarID := false
+		static lastCarName := false
+		
+		if !carDB
+			carDB := JSON.parse(kResourcesDirectory . "Simulator Data\R3E\r3e-data.json")["cars"]
+		
+		carID := getConfigurationValue(data, "Race Data", "Car", "")
+		
+		if (carID = lastCarID)
+			return lastCarName
+		else {
+			lastCarID := carID
+			lastCarName := (carDB.HasKey(carID) ? carDB[carID]["Name"] : "Unknown")
+			
+			return lastCarName
+		}
 	}
 }
 

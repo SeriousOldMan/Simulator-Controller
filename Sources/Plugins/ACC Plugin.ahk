@@ -1249,6 +1249,9 @@ class ACCPlugin extends ControllerPlugin {
 		if (repairBodywork != this.iRepairBodyworkChosen)
 			togglePitstopActivity("Repair Bodywork")
 	}
+	
+	updateSimulatorData(data) {
+	}
 }
 
 ;;;-------------------------------------------------------------------------;;;

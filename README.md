@@ -26,15 +26,15 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-[2.7.0-rc1](https://www.dropbox.com/s/1vmv4pzrnqeklsc/Simulator%20Controller%202.7.0-rc1.zip?dl=1) (First release candidate for Release 2.7. New features: Multiple simultaneously active Button Box modes, "Stick to strategy pressures" command for Jona, Graphical layout editor for Button Box configurations, Confirmation request from Jona for setup database update, Plugin interface for configuration tool, "No Refuel" races correctly handled by Pitstop MFD automation, and an easter egg.... Quite stable with documentation and automated update procedure. See the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) for more information and links to the updated documentation.)
-
-IMPORTANT: Please read the [update notes for Release 2.7](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-27), BEFORE you use the new distribution, since there is a mandatory manual update task necessary this time.
+None for the moment...
 
 #### Latest release builds
 
-[2.6.1-release](https://www.dropbox.com/s/nqjz4wfq485ntzd/Simulator%20Controller%202.6.1-release.zip?dl=1) (Release 2.6 will be the start of the Big Data collection cycle. Features: Initial setup for Big Data Collection, Improved stint time management, Rework of the configuration tool, Forced tyre compound change for Jona, Improved handling of ACC Pitstop MFD. As always, you want to consult the [update documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-26), which is quite short for this release.)
+[2.6.2-release](https://www.dropbox.com/s/ekb5e1gheninlr9/Simulator%20Controller%202.6.2-release.zip?dl=1) (Release 2.6 will be the start of the Big Data collection cycle. Features: Initial setup for Big Data Collection, Improved stint time management, Rework of the configuration tool, Forced tyre compound change for Jona, Improved handling of ACC Pitstop MFD. As always, you want to consult the [update documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-26), which is quite short for this release.)
 
-[2.6.2-release](https://www.dropbox.com/s/ekb5e1gheninlr9/Simulator%20Controller%202.6.2-release.zip?dl=1) (Critical Bugfix for Release 2.6.1 - wrong calculation of refuel amount after using new ACC shared memory information could lead to zero refueling.)
+[2.7.0-release]() (First release candidate for Release 2.7. New features: Multiple simultaneously active Button Box modes, "Stick to strategy pressures" command for Jona, Graphical layout editor for Button Box configurations, Confirmation request from Jona for setup database update, Plugin interface for configuration tool, "No Refuel" races correctly handled by Pitstop MFD automation, and an easter egg.... Quite stable with documentation and automated update procedure. See the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) for more information and links to the updated documentation.)
+
+IMPORTANT: Please read the [update notes for Release 2.7](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-27), BEFORE you use the new distribution, since there is a mandatory manual update task necessary this time.
 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [update notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-20) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.

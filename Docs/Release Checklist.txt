@@ -35,6 +35,9 @@ Release 2.8 Checklist
    a. Functions.md
 7. Rename plugin RRE => R3E
    a. Simulator Configuration.ini
+8. Session = Practice, Qualify, Race, Other, Finished
+   a. Rules
+   b. Documentation
 
 Release 2.7 Checklist
 =====================

@@ -210,9 +210,12 @@ int main()
         wprintf_s(L"Best Lap Time=%f\n", map_buffer->lap_time_best_self);
         wprintf_s(L"Prev Lap Time=%f\n", map_buffer->lap_time_previous_self);
         wprintf_s(L"Session Index=%d\n", map_buffer->session_iteration);
-        wprintf_s(L"Session Minutes=%d\n", map_buffer->race_session_minutes[map_buffer->session_iteration]);
-        wprintf_s(L"Session Laps=%d\n", map_buffer->race_session_laps[map_buffer->session_iteration]);
+        if (map_buffer->session_iteration >= 0) {
+            wprintf_s(L"Session Minutes=%d\n", map_buffer->race_session_minutes[map_buffer->session_iteration - 1]);
+            wprintf_s(L"Session Laps=%d\n", map_buffer->race_session_laps[map_buffer->session_iteration - 1]);
+        }
         wprintf_s(L"Completed Laps=%d\n", map_buffer->completed_laps);
+        wprintf_s(L"Session Format=%d\n", map_buffer->session_length_format);
     }
 
     map_close();

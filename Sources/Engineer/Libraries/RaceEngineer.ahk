@@ -1272,13 +1272,6 @@ class RaceEngineer extends ConfigurationItem {
 		knowledgeBase.setFact("Driver.Time.Remaining", getConfigurationValue(data, "Stint Data", "DriverTimeRemaining", timeRemaining))
 		knowledgeBase.setFact("Driver.Time.Stint.Remaining", getConfigurationValue(data, "Stint Data", "StintTimeRemaining", timeRemaining))
 		
-		knowledgeBase.setFact("Pitstop.Configured.Tyre.Set", getConfigurationValue(data, "Pitstop Data", "TyreSet", 0))
-		knowledgeBase.setFact("Pitstop.Configured.Fuel", getConfigurationValue(data, "Pitstop Data", "FuelAmount", 0))
-		knowledgeBase.setFact("Pitstop.Configured.Tyre.Pressure.FL", getConfigurationValue(data, "Pitstop Data", "TyrePressureFL", 26.1))
-		knowledgeBase.setFact("Pitstop.Configured.Tyre.Pressure.FR", getConfigurationValue(data, "Pitstop Data", "TyrePressureFR", 26.1))
-		knowledgeBase.setFact("Pitstop.Configured.Tyre.Pressure.RL", getConfigurationValue(data, "Pitstop Data", "TyrePressureRL", 26.1))
-		knowledgeBase.setFact("Pitstop.Configured.Tyre.Pressure.RR", getConfigurationValue(data, "Pitstop Data", "TyrePressureRR", 26.1))
-		
 		airTemperature := Round(getConfigurationValue(data, "Weather Data", "Temperature", 0))
 		trackTemperature := Round(getConfigurationValue(data, "Track Data", "Temperature", 0))
 		

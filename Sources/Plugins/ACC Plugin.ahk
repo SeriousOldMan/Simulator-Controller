@@ -441,6 +441,9 @@ class ACCPlugin extends ControllerPlugin {
 		
 		if (inList(activeModes, this.iPitstopMode))
 			this.iPitstopMode.updateActions(sessionState)
+		
+		this.iRepairSuspensionChosen := true
+		this.iRepairBodyworkChosen := true
 	}
 		
 	openPitstopMFD(update := true) {

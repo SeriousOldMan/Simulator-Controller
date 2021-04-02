@@ -676,11 +676,11 @@ openRaceEngineerSettings(import := false) {
 	try {
 		if import {
 			options := "-Import"
-			
-			plugin := SimulatorController.Instance.findPlugin(kRaceEngineerPlugin)
+			controller := SimulatorController.Instance
+			plugin := controller.findPlugin(kRaceEngineerPlugin)
 			
 			if (plugin && plugin.Simulator)
-				options := (options . " -Code " . plugin.Simulator.Code)
+				options := (options . "'" . controller.ActiveSimulator . "'" . plugin.Simulator.Code)
 			
 			Run "%exePath%" %options%, %kBinariesDirectory%
 		}

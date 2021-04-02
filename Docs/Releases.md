@@ -3,7 +3,9 @@
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. New plugin "Race Engineer" to handle Jona for different simulation games
-  4. Integration with the virtual race engineer for RaceRoom Racing Experience
+  4. Integration of Jona, the virtual race engineer, for RaceRoom Racing Experience
+  5. Preparation for the rFactor 2 integretaion of Jona
+  6. Doumentation for the configuration tool plugin interface
   
 ## 2.7-release 04/01/21
 

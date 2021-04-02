@@ -197,6 +197,21 @@ updateChangeTyreState() {
 	}
 }
 
+readTyreSetup(settings) {
+	spSetupTyreCompoundDropDown := getConfigurationValue(settings, "Race Setup", "Tyre.Compound", "Dry")
+	spSetupTyreSetEdit := getConfigurationValue(settings, "Race Setup", "Tyre.Set", 1)
+	spPitstopTyreSetEdit := getConfigurationValue(settings, "Race Setup", "Tyre.Set.Fresh", 2)
+	
+	spDryFrontLeftEdit := getConfigurationValue(settings, "Race Setup", "Tyre.Dry.Pressure.FL", 26.1)
+	spDryFrontRightEdit:= getConfigurationValue(settings, "Race Setup", "Tyre.Dry.Pressure.FR", 26.1)
+	spDryRearLeftEdit := getConfigurationValue(settings, "Race Setup", "Tyre.Dry.Pressure.RL", 26.1)
+	spDryRearRightEdit := getConfigurationValue(settings, "Race Setup", "Tyre.Dry.Pressure.RR", 26.1)
+	spWetFrontLeftEdit := getConfigurationValue(settings, "Race Setup", "Tyre.Wet.Pressure.FL", 28.5)
+	spWetFrontRightEdit := getConfigurationValue(settings, "Race Setup", "Tyre.Wet.Pressure.FR", 28.5)
+	spWetRearLeftEdit := getConfigurationValue(settings, "Race Setup", "Tyre.Wet.Pressure.RL", 28.5)
+	spWetRearRightEdit := getConfigurationValue(settings, "Race Setup", "Tyre.Wet.Pressure.RR", 28.5)
+}
+
 editSettings(ByRef settingsOrCommand) {
 	static result
 	static newSettings
@@ -335,19 +350,8 @@ restart:
 		
 		formationLapCheck := getConfigurationValue(settingsOrCommand, "Race Settings", "Lap.Formation", true)
 		postRaceLapCheck := getConfigurationValue(settingsOrCommand, "Race Settings", "Lap.PostRace", true)
-		
-		spSetupTyreCompoundDropDown := getConfigurationValue(settingsOrCommand, "Race Setup", "Tyre.Compound", "Dry")
-		spSetupTyreSetEdit := getConfigurationValue(settingsOrCommand, "Race Setup", "Tyre.Set", 1)
-		spPitstopTyreSetEdit := getConfigurationValue(settingsOrCommand, "Race Setup", "Tyre.Set.Fresh", 2)
-		
-		spDryFrontLeftEdit := getConfigurationValue(settingsOrCommand, "Race Setup", "Tyre.Dry.Pressure.FL", 26.1)
-		spDryFrontRightEdit:= getConfigurationValue(settingsOrCommand, "Race Setup", "Tyre.Dry.Pressure.FR", 26.1)
-		spDryRearLeftEdit := getConfigurationValue(settingsOrCommand, "Race Setup", "Tyre.Dry.Pressure.RL", 26.1)
-		spDryRearRightEdit := getConfigurationValue(settingsOrCommand, "Race Setup", "Tyre.Dry.Pressure.RR", 26.1)
-		spWetFrontLeftEdit := getConfigurationValue(settingsOrCommand, "Race Setup", "Tyre.Wet.Pressure.FL", 28.5)
-		spWetFrontRightEdit := getConfigurationValue(settingsOrCommand, "Race Setup", "Tyre.Wet.Pressure.FR", 28.5)
-		spWetRearLeftEdit := getConfigurationValue(settingsOrCommand, "Race Setup", "Tyre.Wet.Pressure.RL", 28.5)
-		spWetRearRightEdit := getConfigurationValue(settingsOrCommand, "Race Setup", "Tyre.Wet.Pressure.RR", 28.5)
+
+		readTyreSetup(settingsOrCommand)
 		
 		Gui RES:Default
 			
@@ -672,16 +676,18 @@ readSharedMemory(dataFile) {
 	return readConfiguration(dataFile)
 }
 
-importFromSimulation(message := false, code := false, settings := false) {
-	accApplication := new Application("Assetto Corsa Competizione", kSimulatorConfiguration)
+importFromSimulation(message := false, simulator := false, code := false, settings := false) {
+	simulator := new Application(simulator, kSimulatorConfiguration)
 	
 	if (message != "Import")
 		settings := false
 	
-	if accApplication.isRunning() {
+	readTyreSetup(readConfiguration(kRaceEngineerSettingsFile))
+	
+	if simulator.isRunning() {
 		data := readSharedMemory(kUserHomeDirectory . "Temp\" . code . " Data\Settings.data")
 			
-		spPitstopTyreSetEdit := getConfigurationValue(data, "Pitstop Data", "TyreSet", 0)
+		spPitstopTyreSetEdit := getConfigurationValue(data, "Pitstop Data", "TyreSet", spPitstopTyreSetEdit)
 		spSetupTyreSetEdit := Max(1, spPitstopTyreSetEdit - 1)
 		
 		if settings {
@@ -693,11 +699,11 @@ importFromSimulation(message := false, code := false, settings := false) {
 			GuiControl Text, spPitstopTyreSetEdit, %spPitstopTyreSetEdit%
 		}
 		
-		if (getConfigurationValue(data, "Car Data", "TyreCompound", "Dry") = "Dry") {
-			spDryFrontLeftEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureFL", 26.1)
-			spDryFrontRightEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureFR", 26.1)
-			spDryRearLeftEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureRL", 26.1)
-			spDryRearRightEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureRR", 26.1)
+		if (getConfigurationValue(data, "Car Data", "TyreCompound", spSetupTyreCompoundDropDown) = "Dry") {
+			spDryFrontLeftEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureFL", spDryFrontLeftEdit)
+			spDryFrontRightEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureFR", spDryFrontRightEdit)
+			spDryRearLeftEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureRL", spDryRearLeftEdit)
+			spDryRearRightEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureRR", spDryRearRightEdit)
 		
 			if settings {
 				setConfigurationValue(settings, "Race Setup", "Tyre.Compound", "Dry")
@@ -721,10 +727,10 @@ importFromSimulation(message := false, code := false, settings := false) {
 			}
 		}
 		else {
-			spWetFrontLeftEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureFL", 28.5)
-			spWetFrontRightEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureFR", 28.5)
-			spWetRearLeftEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureRL", 28.5)
-			spWetRearRightEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureRR", 28.5)
+			spWetFrontLeftEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureFL", spWetFrontLeftEdit)
+			spWetFrontRightEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureFR", spWetFrontRightEdit)
+			spWetRearLeftEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureRL", spWetRearLeftEdit)
+			spWetRearRightEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureRR", spWetRearRightEdit)
 			
 			if settings {
 				setConfigurationValue(settings, "Race Setup", "Tyre.Compound", "Wet")
@@ -758,7 +764,7 @@ showRaceEngineerSettingsEditor() {
 	settings := readConfiguration(kRaceEngineerSettingsFile)
 	
 	if ((A_Args.Length() > 0) && (A_Args[1] = "-Import")) {
-		importFromSimulation("Import", A_Args[3], settings)
+		importFromSimulation("Import", A_Args[2], A_Args[3], settings)
 		
 		writeConfiguration(kRaceEngineerSettingsFile, settings)
 	}

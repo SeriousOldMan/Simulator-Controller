@@ -1809,8 +1809,8 @@ class RaceEngineer extends ConfigurationItem {
 		
 				FileReadLine id, %idFileName%, 1
 				
-				id := ConfigurationItem.splitDescriptor(id)
-				data := (A_Now - id[3]) + (id[1] * 100000)
+				temp := ConfigurationItem.splitDescriptor(id)
+				data := (A_Now - temp[3]) + (temp[1] * 100000)
 				
 				FileAppend %id%=%data%, % kUserHomeDirectory . "Temp\FOUND"
 				

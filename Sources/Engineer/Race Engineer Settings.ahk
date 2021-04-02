@@ -672,14 +672,14 @@ readSharedMemory(dataFile) {
 	return readConfiguration(dataFile)
 }
 
-importFromSimulation(message := false, settings := false) {
+importFromSimulation(message := false, code := false, settings := false) {
 	accApplication := new Application("Assetto Corsa Competizione", kSimulatorConfiguration)
 	
 	if (message != "Import")
 		settings := false
 	
 	if accApplication.isRunning() {
-		data := readSharedMemory(kUserHomeDirectory . "Temp\ACC Data\Settings.data")
+		data := readSharedMemory(kUserHomeDirectory . "Temp\" . code . " Data\Settings.data")
 			
 		spPitstopTyreSetEdit := getConfigurationValue(data, "Pitstop Data", "TyreSet", 0)
 		spSetupTyreSetEdit := Max(1, spPitstopTyreSetEdit - 1)
@@ -758,7 +758,7 @@ showRaceEngineerSettingsEditor() {
 	settings := readConfiguration(kRaceEngineerSettingsFile)
 	
 	if ((A_Args.Length() > 0) && (A_Args[1] = "-Import")) {
-		importFromSimulation("Import", settings)
+		importFromSimulation("Import", A_Args[3], settings)
 		
 		writeConfiguration(kRaceEngineerSettingsFile, settings)
 	}

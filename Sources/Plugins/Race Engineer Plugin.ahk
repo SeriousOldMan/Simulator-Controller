@@ -602,7 +602,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 						
 						newDataFile := kUserHomeDirectory . "Temp\" . code . " Data\Lap " . lastLap . "." . ++lastLapCounter . ".data"
 							
-						FileCopy %dataFile%, %newDataFile%, 1
+						writeConfiguration(newDataFile, data)		; FileCopy %dataFile%, %newDataFile%, 1
 						
 						if firstLap
 							this.startRace(newDataFile)
@@ -669,11 +669,21 @@ preparePitstop() {
 }
 
 openRaceEngineerSettings(import := false) {
+	local plugin
+	
 	exePath := kBinariesDirectory . "Race Engineer Settings.exe"
 	
 	try {
-		if import
-			Run "%exePath%" -Import, %kBinariesDirectory%
+		if import {
+			options := "-Import"
+			
+			plugin := SimulatorController.Instance.findPlugin(kRaceEngineerPlugin)
+			
+			if (plugin && plugin.Simulator)
+				options := (options . " -Code " . plugin.Simulator.Code)
+			
+			Run "%exePath%" %options%, %kBinariesDirectory%
+		}
 		else
 			Run "%exePath%", %kBinariesDirectory%
 	}
@@ -696,7 +706,7 @@ readSharedMemory(simulator, dataFile) {
 	try {
 		RunWait %ComSpec% /c ""%exePath%" > "%dataFile%"", , Hide
 		
-		IniWrite %simulator%, %dataFile%, Race Data, Simulator
+		; IniWrite %simulator%, %dataFile%, Race Data, Simulator
 	}
 	catch exception {
 		logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% SHM Reader ("), {simulator: simulator})
@@ -708,7 +718,11 @@ readSharedMemory(simulator, dataFile) {
 				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 	}
 	
-	return readConfiguration(dataFile)
+	data := readConfiguration(dataFile)
+	
+	setConfigurationValue(data, "Race Data", "Simulator", simulator)
+	
+	return data
 }
 
 

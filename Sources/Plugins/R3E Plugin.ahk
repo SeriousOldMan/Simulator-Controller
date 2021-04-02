@@ -34,7 +34,7 @@ class R3EPlugin extends ControllerPlugin {
 	
 	Code[] {
 		Get {
-			return "R3E"
+			return kR3EPlugin
 		}
 	}
 	

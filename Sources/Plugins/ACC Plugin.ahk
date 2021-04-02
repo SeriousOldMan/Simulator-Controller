@@ -241,7 +241,7 @@ class ACCPlugin extends ControllerPlugin {
 	
 	Code[] {
 		Get {
-			return "ACC"
+			return kACCPlugin
 		}
 	}
 	
@@ -442,8 +442,10 @@ class ACCPlugin extends ControllerPlugin {
 		if (inList(activeModes, this.iPitstopMode))
 			this.iPitstopMode.updateActions(sessionState)
 		
-		this.iRepairSuspensionChosen := true
-		this.iRepairBodyworkChosen := true
+		if (sessionState == kSessionFinished) {
+			this.iRepairSuspensionChosen := true
+			this.iRepairBodyworkChosen := true
+		}
 	}
 		
 	openPitstopMFD(update := true) {

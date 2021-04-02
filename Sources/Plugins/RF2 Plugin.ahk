@@ -21,9 +21,31 @@ global kRF2Plugin = "RF2"
 class RF2Plugin extends ControllerPlugin {
 	iRF2Application := false
 	
+	iRaceEngineer := false
+	
+	iSessionState := kSessionFinished
+	
+	Code[] {
+		Get {
+			return kRF2Plugin
+		}
+	}
+	
 	RF2Application[] {
 		Get {
 			return this.iRF2Application
+		}
+	}
+	
+	RaceEngineer[] {
+		Get {
+			return this.iRaceEngineer
+		}
+	}
+	
+	SessionState[] {
+		Get {
+			return this.iSessionState
 		}
 	}
 	
@@ -35,6 +57,74 @@ class RF2Plugin extends ControllerPlugin {
 	
 	runningSimulator() {
 		return (this.RF2Application.isRunning() ? kRF2Application : false)
+	}
+	
+	simulatorStartup(simulator) {
+		base.simulatorStartup(simulator)
+		
+		if (simulator = kRF2Application) {
+			raceEngineer := SimulatorController.Instance.findPlugin(kRaceEngineerPlugin)
+			
+			if (raceEngineer && raceEngineer.isActive())
+				raceEngineer.startSimulation(this)
+		}
+	}
+	
+	simulatorShutdown(simulator) {
+		base.simulatorShutdown(simulator)
+		
+		if (simulator = kRF2Application) {
+			raceEngineer := SimulatorController.Instance.findPlugin(kRaceEngineerPlugin)
+			
+			if (raceEngineer && raceEngineer.isActive())
+				raceEngineer.stopSimulation(this)
+		
+			this.updateSessionState(kSessionFinished)
+		}
+	}
+	
+	updateSessionState(sessionState) {
+		this.iSessionState := sessionState
+	}
+	
+	planPitstop() {
+		if this.RaceEngineer
+			this.RaceEngineer.planPitstop()
+	}
+	
+	preparePitstop(lap := false) {
+		if this.RaceEngineer
+			this.RaceEngineer.preparePitstop(lap)
+	}
+	
+	pitstopPlanned(pitstopNumber) {
+	}
+	
+	pitstopPrepared(pitstopNumber) {
+	}
+	
+	pitstopFinished(pitstopNumber) {
+	}
+	
+	startPitstopSetup(pitstopNumber) {
+	}
+
+	finishPitstopSetup(pitstopNumber) {
+	}
+
+	setPitstopRefuelAmount(pitstopNumber, litres) {
+	}
+	
+	setPitstopTyreSet(pitstopNumber, compound, set := false) {
+	}
+
+	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
+	}
+
+	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork) {
+	}
+	
+	updateSimulatorData(data) {
 	}
 }
 

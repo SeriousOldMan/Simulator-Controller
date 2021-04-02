@@ -4,7 +4,7 @@ The architecture of Simulator Controller has been designed with extensibility in
 
 ### Plugin Integration
 
-When the Simulator Controller starts up, in a first step a single file in the [Sources/Plugins](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Sources/Plugins) folder will be included using the AutoHotkey #Include directive: [Plugins.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Plugins.ahk). This will load all the plugins that are part of the standard distribution of Simulator Controller. To allow you to create and include your own plugins without needing to modify the above file, a second initially empty *Plugins.ahk* will be included from the special location *Simulator Controller\Plugins* folder, which is located in your *Documents* folder. This special location has been created by the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration) and will not be overwritten by future distributions of Simulator Controller. So feel free to include your own plugins from this second *Plugins.ahk* file.
+When the Simulator Controller starts up, in a first step a single file in the [Sources/Plugins](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Sources/Plugins) folder will be included using the AutoHotkey #Include directive: [Controller Plugins.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Controller%20Plugins.ahk). This will load all the plugins that are part of the standard distribution of Simulator Controller. To allow you to create and include your own plugins without needing to modify the above file, a second initially empty *Controller Plugins.ahk* will be included from the special location *Simulator Controller\Plugins* folder, which is located in your *Documents* folder. This special location has been created by the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration) and will not be overwritten by future distributions of Simulator Controller. So feel free to include your own plugins from this second *Controller Plugins.ahk* file.
 
 Although a plugin script may execute any kind of code written in the AutoHotkey language, *real* plugins must extend the [ControllerPlugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controllerplugin-extends-plugin-simulator-controllerahk) class and will provide additional functionality for your controller box. Furthermore, you will need to register the newly created plugin in the configuration tool, so that it will be activated by the Simulator Controller.
 
@@ -186,3 +186,29 @@ You can decide which targets you want to include in your build run by holding do
 You can also choose a [splash theme](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#themes-editor) here for your entertainment, while waiting for the build tool to finish.
 
 Note: You can cancel a build run anytime by pressing the Escape key.
+
+## Configuration Plugins
+
+Since Release 2.7, the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration) has been extended with a plugin mechanism as well, to allow developers to create specialized configuration editors, that are integrated in the configuration tool. Each plugin cam define one or more tabs to be integrated into the configuration tool tabbed editor view.
+
+When the configuration tool starts up, in a first step a single file in the [Sources/Plugins](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Sources/Plugins) folder will be included using the AutoHotkey #Include directive: [Configuration Plugins.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Configuration%20Plugins.ahk). This will load all the plugins for the configuration tool that are part of the standard distribution of Simulator Controller. To allow you to create and include your own plugins without needing to modify the above file, a second initially empty *Configuration Plugins.ahk* will be included from the special location *Simulator Controller\Plugins* folder, which is located in your *Documents* folder. This special location has been created by the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration) and will not be overwritten by future distributions of Simulator Controller. So feel free to include your own plugins from this second *Configuration Plugins.ahk* file.
+
+A plugin must create an object that implements the protocol shown below, and must register this object with the configuration tool by calling
+
+	editor := ConfigurationEditor.Instance
+	editor.registerConfigurator(translate("Chat"), new ChatMessagesConfigurator(editor.Configuration))
+	
+The first argument for *registorConfigurator* must supply a label for the editor tab used for the configuration plugin and the second argument represents the configurator object mentioned above. The simple protocol this object has to implement, is as follows:
+
+	class MyConfigurator extends ConfigurationItem {
+					
+		createGui(editor, x, y, width, height) { ... }
+
+		loadFromConfiguration(configuration) { ... }
+
+		saveToConfiguration(configuration) { ... }
+
+	}
+	
+The method *createGui* is called by the *editor* to create the widgets for the configuration plugin. All widgets must be created using the AutoHotkey *Gui* command in the window defined by *editor.Window* in the boundaries *x* <-> (*x* + *width*) and *y* <-> (*y* + *height*).
+*loadFromConfiguration* (inherited from [ConfigurationItem][https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-classesahk]) is called during the initialization process. It must load the initial state from the configuration. Please note, that the *createGui* method had not been called yet. The third method of the protocol, *saveToConfiguration*, will be called, whenever the user wants to save the current state of the configuration tool.

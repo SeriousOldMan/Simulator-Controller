@@ -136,18 +136,21 @@ class R3EPlugin extends ControllerPlugin {
 		static lastCarID := false
 		static lastCarName := false
 		
-		if !carDB
-			carDB := JSON.parse(kResourcesDirectory . "Simulator Data\R3E\r3e-data.json")["cars"]
+		if !carDB {
+			FileRead script, %kResourcesDirectory%Simulator Data\R3E\r3e-data.json
+			
+			carDB := JSON.parse(script)["cars"]
+		}
 		
 		carID := getConfigurationValue(data, "Race Data", "Car", "")
 		
 		if (carID = lastCarID)
-			return lastCarName
+			setConfigurationValue(data, "Race Data", "Car", lastCarName)
 		else {
 			lastCarID := carID
 			lastCarName := (carDB.HasKey(carID) ? carDB[carID]["Name"] : "Unknown")
 			
-			return lastCarName
+			setConfigurationValue(data, "Race Data", "Car", lastCarName)
 		}
 	}
 }

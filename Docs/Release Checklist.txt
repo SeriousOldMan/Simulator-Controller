@@ -18,7 +18,7 @@ Release 2.8 Checklist
    a. Moved planPitstop, preparePitstop, openRaceEngineerSettings
    b. Moved Translations
    c. Simulator Configuration.ini
-   d. Documentation (Plugin & Modes)
+   d. Documentation (Plugin & Modes, Readme)
    e. Update Procedure for local Simulator Controller.ini
 2. Update Procedure
    a. Translations
@@ -38,6 +38,13 @@ Release 2.8 Checklist
 8. Session = Practice, Qualify, Race, Other, Finished
    a. Rules
    b. Documentation
+9. Documentation of ConfigurationEditor & ConfigurationItemList
+   - Classes.md
+10. R3E & RF2 Overhaul
+   - Documentation in
+     1. Installation & Setup
+	 2. Readme
+	 3. Plugins & Modes
 
 Release 2.7 Checklist
 =====================

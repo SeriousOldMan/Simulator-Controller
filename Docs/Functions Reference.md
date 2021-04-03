@@ -321,10 +321,10 @@ Selects the brake pad compound to change to during the next pitstop. *brake* mus
 Selects the driver to take the car during the next pitstop. *selection* must be either "Next" or "Previous". This action function is provided by the "ACC" plugin and is available depending on the concrete configuration.
 
 #### *planPitstop()*
-*planPitstop* triggers Jona, the virtual race engineer, to plan a pitstop. This action function is provided by the "ACC" plugin and is available depending on the concrete configuration.
+*planPitstop* triggers Jona, the virtual race engineer, to plan a pitstop. This action function is provided by the "Race Engineer" plugin and is available depending on the concrete configuration.
 
 #### *preparePitstop()*
-*preparePitstop* triggers Jona, the virtual race engineer, to prepare a previously planned pitstop. This action function is provided by the "ACC" plugin and is available depending on the concrete configuration.
+*preparePitstop* triggers Jona, the virtual race engineer, to prepare a previously planned pitstop. This action function is provided by the "Race Engineer" plugin and is available depending on the concrete configuration.
 
 #### *openRaceEngineerSettings(import :: Boolean := false)*
-Opens the settings tool, with which you can edit all the race specific settings, Jona needs for a given race. This action function is provided by the "ACC" plugin and is available depending on the concrete configuration. If you supply *true* for the *import* parameter, the setup data is imported directly from a running simulation and the dialog is not opened.
+Opens the settings tool, with which you can edit all the race specific settings, Jona needs for a given race. This action function is provided by the "Race Engineer" plugin and is available depending on the concrete configuration. If you supply *true* for the *import* parameter, the setup data is imported directly from a running simulation and the dialog is not opened.

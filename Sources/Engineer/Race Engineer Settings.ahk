@@ -677,81 +677,98 @@ readSharedMemory(dataFile) {
 }
 
 importFromSimulation(message := false, simulator := false, code := false, settings := false) {
-	simulator := new Application(simulator, kSimulatorConfiguration)
-	
-	if (message != "Import")
+	if (message != "Import") {
 		settings := false
+		
+		simulator := false
+		
+		for ignore, candidate in string2Values("|", getConfigurationValue(kSimulatorConfiguration, "Configuration", "Simulators", ""))
+			if new Application(candidate, kSimulatorConfiguration).isRunning() {
+				simulator := candidate
+				
+				break
+			}
+		
+		switch simulator {
+			case "Assetto Corsa Competizione":
+				code := "ACC"
+			case "RaceRoom Racing Experience":
+				code := "R3E"
+			case "rFactor 2":
+				code := "RF2"
+			default:
+				return
+		}
+	}
 	
 	readTyreSetup(readConfiguration(kRaceEngineerSettingsFile))
 	
-	if simulator.isRunning() {
-		data := readSharedMemory(kUserHomeDirectory . "Temp\" . code . " Data\Settings.data")
+	data := readSharedMemory(kUserHomeDirectory . "Temp\" . code . " Data\Settings.data")
+		
+	spPitstopTyreSetEdit := getConfigurationValue(data, "Pitstop Data", "TyreSet", spPitstopTyreSetEdit)
+	spSetupTyreSetEdit := Max(1, spPitstopTyreSetEdit - 1)
+	
+	if settings {
+		setConfigurationValue(settings, "Race Setup", "Tyre.Set", spSetupTyreSetEdit)
+		setConfigurationValue(settings, "Race Setup", "Tyre.Set.Fresh", spPitstopTyreSetEdit)
+	}
+	else {
+		GuiControl Text, spSetupTyreSetEdit, %spSetupTyreSetEdit%
+		GuiControl Text, spPitstopTyreSetEdit, %spPitstopTyreSetEdit%
+	}
+	
+	if (getConfigurationValue(data, "Car Data", "TyreCompound", spSetupTyreCompoundDropDown) = "Dry") {
+		spDryFrontLeftEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureFL", spDryFrontLeftEdit)
+		spDryFrontRightEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureFR", spDryFrontRightEdit)
+		spDryRearLeftEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureRL", spDryRearLeftEdit)
+		spDryRearRightEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureRR", spDryRearRightEdit)
+	
+		if settings {
+			setConfigurationValue(settings, "Race Setup", "Tyre.Compound", "Dry")
 			
-		spPitstopTyreSetEdit := getConfigurationValue(data, "Pitstop Data", "TyreSet", spPitstopTyreSetEdit)
-		spSetupTyreSetEdit := Max(1, spPitstopTyreSetEdit - 1)
+			setConfigurationValue(settings, "Race Setup", "Tyre.Dry.Pressure.FL", Round(spDryFrontLeftEdit, 1))
+			setConfigurationValue(settings, "Race Setup", "Tyre.Dry.Pressure.FR", Round(spDryFrontRightEdit, 1))
+			setConfigurationValue(settings, "Race Setup", "Tyre.Dry.Pressure.RL", Round(spDryRearLeftEdit, 1))
+			setConfigurationValue(settings, "Race Setup", "Tyre.Dry.Pressure.RR", Round(spDryRearRightEdit, 1))
+			
+			showMessage("Tyre setup imported: Dry, Set " . spSetupTyreSetEdit . "; "
+					  . Round(spDryFrontLeftEdit, 1) . ", " . Round(spDryFrontRightEdit, 1) . ", "
+					  . Round(spDryRearLeftEdit, 1) . ", " . Round(spDryRearRightEdit, 1), false, "Information.png", 5000)
+		}
+		else {
+			GuiControl Choose, spSetupTyreCompoundDropDown, 2
+			
+			GuiControl Text, spDryFrontLeftEdit, %spDryFrontLeftEdit%
+			GuiControl Text, spDryFrontRightEdit, %spDryFrontRightEdit%
+			GuiControl Text, spDryRearLeftEdit, %spDryRearLeftEdit%
+			GuiControl Text, spDryRearRightEdit, %spDryRearRightEdit%
+		}
+	}
+	else {
+		spWetFrontLeftEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureFL", spWetFrontLeftEdit)
+		spWetFrontRightEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureFR", spWetFrontRightEdit)
+		spWetRearLeftEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureRL", spWetRearLeftEdit)
+		spWetRearRightEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureRR", spWetRearRightEdit)
 		
 		if settings {
-			setConfigurationValue(settings, "Race Setup", "Tyre.Set", spSetupTyreSetEdit)
-			setConfigurationValue(settings, "Race Setup", "Tyre.Set.Fresh", spPitstopTyreSetEdit)
-		}
-		else {
-			GuiControl Text, spSetupTyreSetEdit, %spSetupTyreSetEdit%
-			GuiControl Text, spPitstopTyreSetEdit, %spPitstopTyreSetEdit%
-		}
-		
-		if (getConfigurationValue(data, "Car Data", "TyreCompound", spSetupTyreCompoundDropDown) = "Dry") {
-			spDryFrontLeftEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureFL", spDryFrontLeftEdit)
-			spDryFrontRightEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureFR", spDryFrontRightEdit)
-			spDryRearLeftEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureRL", spDryRearLeftEdit)
-			spDryRearRightEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureRR", spDryRearRightEdit)
-		
-			if settings {
-				setConfigurationValue(settings, "Race Setup", "Tyre.Compound", "Dry")
-				
-				setConfigurationValue(settings, "Race Setup", "Tyre.Dry.Pressure.FL", Round(spDryFrontLeftEdit, 1))
-				setConfigurationValue(settings, "Race Setup", "Tyre.Dry.Pressure.FR", Round(spDryFrontRightEdit, 1))
-				setConfigurationValue(settings, "Race Setup", "Tyre.Dry.Pressure.RL", Round(spDryRearLeftEdit, 1))
-				setConfigurationValue(settings, "Race Setup", "Tyre.Dry.Pressure.RR", Round(spDryRearRightEdit, 1))
-				
-				showMessage("Tyre setup imported: Dry, Set " . spSetupTyreSetEdit . "; "
-						  . Round(spDryFrontLeftEdit, 1) . ", " . Round(spDryFrontRightEdit, 1) . ", "
-						  . Round(spDryRearLeftEdit, 1) . ", " . Round(spDryRearRightEdit, 1), false, "Information.png", 5000)
-			}
-			else {
-				GuiControl Choose, spSetupTyreCompoundDropDown, 2
-				
-				GuiControl Text, spDryFrontLeftEdit, %spDryFrontLeftEdit%
-				GuiControl Text, spDryFrontRightEdit, %spDryFrontRightEdit%
-				GuiControl Text, spDryRearLeftEdit, %spDryRearLeftEdit%
-				GuiControl Text, spDryRearRightEdit, %spDryRearRightEdit%
-			}
-		}
-		else {
-			spWetFrontLeftEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureFL", spWetFrontLeftEdit)
-			spWetFrontRightEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureFR", spWetFrontRightEdit)
-			spWetRearLeftEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureRL", spWetRearLeftEdit)
-			spWetRearRightEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureRR", spWetRearRightEdit)
+			setConfigurationValue(settings, "Race Setup", "Tyre.Compound", "Wet")
 			
-			if settings {
-				setConfigurationValue(settings, "Race Setup", "Tyre.Compound", "Wet")
-				
-				setConfigurationValue(settings, "Race Setup", "Tyre.Wet.Pressure.FL", Round(spWetFrontLeftEdit, 1))
-				setConfigurationValue(settings, "Race Setup", "Tyre.Wet.Pressure.FR", Round(spWetFrontRightEdit, 1))
-				setConfigurationValue(settings, "Race Setup", "Tyre.Wet.Pressure.RL", Round(spWetRearLeftEdit, 1))
-				setConfigurationValue(settings, "Race Setup", "Tyre.Wet.Pressure.RR", Round(spWetRearRightEdit, 1))
-				
-				showMessage("Tyre setup imported: Wet; "
-						  . Round(spWetFrontLeftEdit, 1) . ", " . Round(spWetFrontRightEdit, 1) . ", "
-						  . Round(spWetRearLeftEdit, 1) . ", " . Round(spWetRearRightEdit, 1), false, "Information.png", 5000)
-			}
-			else {
-				GuiControl Choose, spSetupTyreCompoundDropDown, 1
-				
-				GuiControl Text, spWetFrontLeftEdit, %spWetFrontLeftEdit%
-				GuiControl Text, spWetFrontRightEdit, %spWetFrontRightEdit%
-				GuiControl Text, spWetRearLeftEdit, %spWetRearLeftEdit%
-				GuiControl Text, spWetRearRightEdit, %spWetRearRightEdit%
-			}
+			setConfigurationValue(settings, "Race Setup", "Tyre.Wet.Pressure.FL", Round(spWetFrontLeftEdit, 1))
+			setConfigurationValue(settings, "Race Setup", "Tyre.Wet.Pressure.FR", Round(spWetFrontRightEdit, 1))
+			setConfigurationValue(settings, "Race Setup", "Tyre.Wet.Pressure.RL", Round(spWetRearLeftEdit, 1))
+			setConfigurationValue(settings, "Race Setup", "Tyre.Wet.Pressure.RR", Round(spWetRearRightEdit, 1))
+			
+			showMessage("Tyre setup imported: Wet; "
+					  . Round(spWetFrontLeftEdit, 1) . ", " . Round(spWetFrontRightEdit, 1) . ", "
+					  . Round(spWetRearLeftEdit, 1) . ", " . Round(spWetRearRightEdit, 1), false, "Information.png", 5000)
+		}
+		else {
+			GuiControl Choose, spSetupTyreCompoundDropDown, 1
+			
+			GuiControl Text, spWetFrontLeftEdit, %spWetFrontLeftEdit%
+			GuiControl Text, spWetFrontRightEdit, %spWetFrontRightEdit%
+			GuiControl Text, spWetRearLeftEdit, %spWetRearLeftEdit%
+			GuiControl Text, spWetRearRightEdit, %spWetRearRightEdit%
 		}
 	}
 }

@@ -680,8 +680,9 @@ openRaceEngineerSettings(import := false) {
 			plugin := controller.findPlugin(kRaceEngineerPlugin)
 			
 			if (plugin && plugin.Simulator)
-				options := (options . "'" . controller.ActiveSimulator . "'" . plugin.Simulator.Code)
+				options := (options . " """ . controller.ActiveSimulator . """ " . plugin.Simulator.Code)
 			
+			msgbox "%exePath%" %options%
 			Run "%exePath%" %options%, %kBinariesDirectory%
 		}
 		else

@@ -682,7 +682,6 @@ openRaceEngineerSettings(import := false) {
 			if (plugin && plugin.Simulator)
 				options := (options . " """ . controller.ActiveSimulator . """ " . plugin.Simulator.Code)
 			
-			msgbox "%exePath%" %options%
 			Run "%exePath%" %options%, %kBinariesDirectory%
 		}
 		else

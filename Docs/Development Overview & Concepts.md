@@ -46,10 +46,10 @@ Instances of [ControllerAction](https://github.com/SeriousOldMan/Simulator-Contr
 
 ### Button Box
 
-The Simulator Controller can give visual feedback for each interaction with the hardware controller. Normally, this feedback will provide some information about the state change, that has been performed by the last triggered action. For example, a text field below a rotary dial in the visual representation of a Button Box may show the current intensity value for a vibration motor.
-The visual representation for the controller hardware will usually be build with the [Gui capabilities](https://www.autohotkey.com/docs/commands/Gui.htm) of the AutoHotkey language. The abstract class [ButtonBox](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-buttonbox-extends-configurationitem-simulator-controllerahk) is used to create this visual representation and to interact with the controller and the provided functions and corresonding actions. Subclasses must implement the method [createGui](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-creategui) to implement the user interface for the Button Box. See [this example](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/ButtonBox%20Plugin.ahk) for a small and simple implementation of two Button Boxes. The first one with five toggle switches, eight push buttons and two rotary dials and the second one with twelve push buttons. For building your own visual representations, you can use the supplied images for typical Button Box functions provided in the folder [Resources/Button Box Images](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Resources/Button%20Box%20Images).
+The Simulator Controller can give visual feedback for each interaction with a hardware controller. Normally, this feedback will provide some information about the state change, that has been performed by the last triggered action. For example, a text field below a rotary dial in the visual representation of a Button Box may show the current intensity value for a vibration motor.
+The visual representation for the controller hardware will usually be build with the [Gui capabilities](https://www.autohotkey.com/docs/commands/Gui.htm) of the AutoHotkey language. The abstract class [ButtonBox](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-buttonbox-extends-configurationitem-simulator-controllerahk) is used to create this visual representation and to interact with the controller and the provided functions and corresonding actions. Subclasses must implement the method [createGui](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-creategui) to implement the user interface for the Button Box. See [this example](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Button%20Box%20Plugin.ahk) for a grid based implementation of Button Boxes, for which the layout can be configured using a [graphical editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#button-box-layouts). But if you want to create your own subclasses of *ButtonBox*, since your Box does not follow a grid like layout, you can use the supplied images for typical Button Box functions provided in the folder [Resources/Button Box Images](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Resources/Button%20Box%20Images) to define your visual elements.
 
-Note: If you define your own Button Boxes, you will first want to remove the default Button Boxes with the method [unregisterButtonBox](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#unregisterbuttonboxbuttonbox--buttonbox) of *SimulatorController*.
+Note: If you define your own Button Boxes, you will first want to remove the default Button Boxes using the configuration tool of *SimulatorController*.
 
 ## Example
 
@@ -187,7 +187,7 @@ You can also choose a [splash theme](https://github.com/SeriousOldMan/Simulator-
 
 Note: You can cancel a build run anytime by pressing the Escape key.
 
-## Configuration Plugins
+## Customizing the Configuration Tool
 
 Since Release 2.7, the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration) has been extended with a plugin mechanism as well, to allow developers to create specialized configuration editors, that are integrated in the configuration tool. Each plugin cam define one or more tabs to be integrated into the configuration tool tabbed editor view.
 
@@ -198,7 +198,14 @@ A plugin must create an object that implements the protocol shown below, and mus
 	editor := ConfigurationEditor.Instance
 	editor.registerConfigurator(translate("Chat"), new ChatMessagesConfigurator(editor.Configuration))
 	
-The first argument for *registorConfigurator* must supply a label for the editor tab used for the configuration plugin and the second argument represents the configurator object mentioned above. The simple protocol this object has to implement, is as follows:
+The first argument for *registorConfigurator* must supply a label for the editor tab used for the configuration plugin and the second argument represents the configurator object mentioned above. Before you register your own configurators, you can remove one or more of the predefined configurators using the method *unregisterConfigurator* of the editor:
+
+	editor := ConfigurationEditor.Instance
+	editor.unregisterConfigurator(translate("Chat"))
+
+This will remove the chat messages tab from the configuration tool. Instead of supplying a localized label, you can also supply the configurator object itself to the call. The editor provides a property, *editor.Configurators*, to get your hands on those objects.
+
+The protocol, a configurator object has to implement, is quite simple:
 
 	class MyConfigurator extends ConfigurationItem {
 					

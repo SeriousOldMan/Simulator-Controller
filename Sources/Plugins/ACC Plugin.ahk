@@ -490,6 +490,7 @@ class ACCPlugin extends ControllerPlugin {
 		
 			this.iPSIsOpen := false
 				
+			showMessage("Close")
 			SetTimer updatePitstopState, Off
 		}
 		else if !reported {
@@ -757,6 +758,22 @@ class ACCPlugin extends ControllerPlugin {
 		}
 	}
 	
+	markFoundLabel(image, x, y) {
+		if isDebug() {
+			SplitPath image, fileName
+			
+			Gui LABEL:-Border -Caption +AlwaysOnTop
+			Gui LABEL:Color, D0D0D0
+			Gui LABEL:Add, Text, x0 y0 w100 h23 +0x200 +0x1 BackgroundTrans, %fileName%
+			
+			Gui LABEL:Show, AutoSize x%x%, y%y%
+			
+			Sleep 1000
+			
+			Gui LABEL:Destroy
+		}
+	}
+	
 	searchPitstopLabel(images) {
 		static kSearchAreaLeft := 350
 		static kSearchAreaRight := 250
@@ -765,29 +782,36 @@ class ACCPlugin extends ControllerPlugin {
 		if !pitstopLabels
 			pitstopLabels := this.getLabelFileNames("PITSTOP")
 		
+		IfWinNotActive AC2, , WinActivate, AC2
+		WinWaitActive AC2, , 2
+		
 		curTickCount := A_TickCount
 		
-		x := kUndefined
-		y := kUndefined
+		imageX := kUndefined
+		imageY := kUndefined
 		
 		Loop % pitstopLabels.Length()
 		{
 			pitstopLabel := pitstopLabels[A_Index]
 			
 			if !this.iPSImageSearchArea {
-				ImageSearch x, y, 0, 0, A_ScreenWidth, A_ScreenHeight, *100 %pitstopLabel%
+				ImageSearch imageX, imageY, 0, 0, A_ScreenWidth, A_ScreenHeight, *100 %pitstopLabel%
 
 				logMessage(kLogInfo, translate("Full search for 'PITSTOP' took ") . (A_TickCount - curTickCount) . translate(" ms"))
 			}
 			else {
-				ImageSearch x, y, this.iPSImageSearchArea[1], this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *100 %pitstopLabel%
+				ImageSearch imageX, imageY, this.iPSImageSearchArea[1], this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *100 %pitstopLabel%
 
 				logMessage(kLogInfo, translate("Optimized search for 'PITSTOP' took ") . (A_TickCount - curTickCount) . translate(" ms"))
 			}
 			
-			if x is Integer
+			if imageX is Integer
 			{
-				images.Push(pitstopLabel)
+				if isDebug() {
+					images.Push(pitstopLabel)
+					
+					this.markFoundLabel(pitstopLabel, imageX, imageY)
+				}
 			
 				break
 			}
@@ -796,16 +820,16 @@ class ACCPlugin extends ControllerPlugin {
 		
 		lastY := false
 		
-		if x is Integer
+		if imageX is Integer
 		{
-			lastY := y
+			lastY := imageY
 			
 			if !this.iPSImageSearchArea
-				this.iPSImageSearchArea := [Max(0, x - kSearchAreaLeft), 0, Min(x + kSearchAreaRight, A_ScreenWidth), A_ScreenHeight]
+				this.iPSImageSearchArea := [Max(0, imageX - kSearchAreaLeft), 0, Min(imageX + kSearchAreaRight, A_ScreenWidth), A_ScreenHeight]
 		}
 		else {
 			this.iPSIsOpen := false
-	
+			
 			SetTimer updatePitstopState, Off
 		}
 		
@@ -819,22 +843,29 @@ class ACCPlugin extends ControllerPlugin {
 		
 		if !pitStrategyLabels
 			pitStrategyLabels := this.getLabelFileNames("Pit Strategy 1", "Pit Strategy 2")
+		
+		IfWinNotActive AC2, , WinActivate, AC2
+		WinWaitActive AC2, , 2
 
-		x := kUndefined
-		y := kUndefined
+		imageX := kUndefined
+		imageY := kUndefined
 		
 		Loop % pitStrategyLabels.Length()
 		{
 			pitStrategyLabel := pitStrategyLabels[A_Index]
 			
 			if !this.iPSImageSearchArea
-				ImageSearch x, y, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, *100 %pitStrategyLabel%
+				ImageSearch imageX, imageY, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, *100 %pitStrategyLabel%
 			else
-				ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *100 %pitStrategyLabel%
+				ImageSearch imageX, imageY, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *100 %pitStrategyLabel%
 
-			if x is Integer
+			if imageX is Integer
 			{
-				images.Push(pitStrategyLabel)
+				if isDebug() {
+					images.Push(pitStrategyLabel)
+					
+					this.markFoundLabel(pitStrategyLabel, imageX, imageY)
+				}
 			
 				break
 			}
@@ -845,7 +876,7 @@ class ACCPlugin extends ControllerPlugin {
 		else
 			logMessage(kLogInfo, translate("Optimized search for 'Pit Strategy' took ") . (A_TickCount - curTickCount) . translate(" ms"))
 		
-		if x is Integer
+		if imageX is Integer
 		{
 			if !inList(this.iPSOptions, "Strategy") {
 				this.iPSOptions.InsertAt(inList(this.iPSOptions, "Pit Limiter") + 1, "Strategy")
@@ -856,7 +887,7 @@ class ACCPlugin extends ControllerPlugin {
 				reload := true
 			}
 			
-			lastY := y
+			lastY := imageY
 		
 			logMessage(kLogInfo, translate("'Pit Strategy' detected, adjusting pit stop options: " . values2String(", ", this.iPSOptions*)))
 		}
@@ -885,22 +916,29 @@ class ACCPlugin extends ControllerPlugin {
 		
 		if !noRefuelLabels
 			noRefuelLabels := this.getLabelFileNames("No Refuel")
+		
+		IfWinNotActive AC2, , WinActivate, AC2
+		WinWaitActive AC2, , 2
 
-		x := kUndefined
-		y := kUndefined
+		imageX := kUndefined
+		imageY := kUndefined
 		
 		Loop % noRefuelLabels.Length()
 		{
 			noRefuelLabel := noRefuelLabels[A_Index]
 			
 			if !this.iPSImageSearchArea
-				ImageSearch x, y, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, *25 %noRefuelLabel%
+				ImageSearch imageX, imageY, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, *25 %noRefuelLabel%
 			else
-				ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *25 %noRefuelLabel%
+				ImageSearch imageX, imageY, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *25 %noRefuelLabel%
 
-			if x is Integer
+			if imageX is Integer
 			{
-				images.Push(noRefuelLabel)
+				if isDebug() {
+					images.Push(noRefuelLabel)
+					
+					this.markFoundLabel(noRefuelLabel, imageX, imageY)
+				}
 			
 				break
 			}
@@ -911,7 +949,7 @@ class ACCPlugin extends ControllerPlugin {
 		else
 			logMessage(kLogInfo, translate("Optimized search for 'Refuel' took ") . (A_TickCount - curTickCount) . translate(" ms"))
 		
-		if x is Integer
+		if imageX is Integer
 		{
 			position := inList(this.iPSOptions, "Refuel")
 			
@@ -924,7 +962,7 @@ class ACCPlugin extends ControllerPlugin {
 				reload := true
 			}
 			
-			lastY := y
+			lastY := imageY
 		
 			logMessage(kLogInfo, translate("'Refuel' not detected, adjusting pit stop options: " . values2String(", ", this.iPSOptions*)))
 		}
@@ -955,27 +993,34 @@ class ACCPlugin extends ControllerPlugin {
 			compoundLabels := this.getLabelFileNames("Compound 1", "Compound 2")
 		}
 		
-		x := kUndefined
-		y := kUndefined
+		IfWinNotActive AC2, , WinActivate, AC2
+		WinWaitActive AC2, , 2
+		
+		imageX := kUndefined
+		imageY := kUndefined
 		
 		Loop % wetLabels.Length()
 		{
 			wetLabel := wetLabels[A_Index]
 				
 			if !this.iPSImageSearchArea
-				ImageSearch x, y, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, *100 %wetLabel%
+				ImageSearch imageX, imageY, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, *100 %wetLabel%
 			else
-				ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *100 %wetLabel%
+				ImageSearch imageX, imageY, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *100 %wetLabel%
 
-			if x is Integer
+			if imageX is Integer
 			{
-				images.Push(wetLabel)
+				if isDebug() {
+					images.Push(wetLabel)
+					
+					this.markFoundLabel(wetLabel, imageX, imageY)
+				}
 			
 				break
 			}
 		}
 		
-		if x is Integer
+		if imageX is Integer
 		{
 			position := inList(this.iPSOptions, "Tyre Set")
 			
@@ -998,21 +1043,25 @@ class ACCPlugin extends ControllerPlugin {
 				reload := true
 			}
 			
-			x := kUndefined
-			y := kUndefined
+			imageX := kUndefined
+			imageY := kUndefined
 			
 			Loop % compoundLabels.Length()
 			{
 				compoundLabel := compoundLabels[A_Index]
 				
 				if !this.iPSImageSearchArea
-					ImageSearch x, y, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, *100 %compoundLabel%
+					ImageSearch imageX, imageY, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, *100 %compoundLabel%
 				else
-					ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *100 %compoundLabel%
+					ImageSearch imageX, imageY, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *100 %compoundLabel%
 				
-				if x is Integer
+				if imageX is Integer
 				{
-					images.Push(compoundLabel)
+					if isDebug() {
+						images.Push(compoundLabel)
+						
+						this.markFoundLabel(compoundLabel, imageX, imageY)
+					}
 				
 					break
 				}
@@ -1024,11 +1073,11 @@ class ACCPlugin extends ControllerPlugin {
 		else
 			logMessage(kLogInfo, translate("Optimized search for 'Tyre set' took ") . (A_TickCount - curTickCount) . translate(" ms"))
 	
-		if x is Integer
+		if imageX is Integer
 		{
 			this.iPSChangeTyres := true
 			
-			lastY := y
+			lastY := imageY
 			
 			logMessage(kLogInfo, translate("Pitstop: Tyres are selected for change"))
 		}
@@ -1049,21 +1098,28 @@ class ACCPlugin extends ControllerPlugin {
 		if !frontBrakeLabels
 			frontBrakeLabels := this.getLabelFileNames("Front Brake 1", "Front Brake 2")
 		
-		x := kUndefined
-		y := kUndefined
+		IfWinNotActive AC2, , WinActivate, AC2
+		WinWaitActive AC2, , 2
+		
+		imageX := kUndefined
+		imageY := kUndefined
 		
 		Loop % frontBrakeLabels.Length()
 		{
 			frontBrakeLabel := frontBrakeLabels[A_Index]
 			
 			if !this.iPSImageSearchArea
-				ImageSearch x, y, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, *100 %frontBrakeLabel%
+				ImageSearch imageX, imageY, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, *100 %frontBrakeLabel%
 			else
-				ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *100 %frontBrakeLabel%
+				ImageSearch imageX, imageY, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *100 %frontBrakeLabel%
 			
-			if x is Integer
+			if imageX is Integer
 			{
-				images.Push(frontBrakeLabel)
+				if isDebug() {
+					images.Push(frontBrakeLabel)
+					
+					this.markFoundLabel(frontBrakeLabel, imageX, imageY)
+				}
 			
 				break
 			}
@@ -1074,7 +1130,7 @@ class ACCPlugin extends ControllerPlugin {
 		else 
 			logMessage(kLogInfo, translate("Optimized search for 'Front Brake' took ") . (A_TickCount - curTickCount) . translate(" ms"))
 			
-		if x is Integer
+		if imageX is Integer
 		{
 			this.iPSChangeBrakes := true
 			
@@ -1097,21 +1153,28 @@ class ACCPlugin extends ControllerPlugin {
 		if !selectDriverLabels
 			selectDriverLabels := this.getLabelFileNames("Select Driver 1", "Select Driver 2")
 		
-		x := kUndefined
-		y := kUndefined
+		IfWinNotActive AC2, , WinActivate, AC2
+		WinWaitActive AC2, , 2
+		
+		imageX := kUndefined
+		imageY := kUndefined
 		
 		Loop % selectDriverLabels.Length()
 		{
 			selectDriverLabel := selectDriverLabels[A_Index]
 			
 			if !this.iPSImageSearchArea
-				ImageSearch x, y, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, *100 %selectDriverLabel%
+				ImageSearch imageX, imageY, 0, lastY ? lastY : 0, A_ScreenWidth, A_ScreenHeight, *100 %selectDriverLabel%
 			else
-				ImageSearch x, y, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *100 %selectDriverLabel%
+				ImageSearch imageX, imageY, this.iPSImageSearchArea[1], lastY ? lastY : this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *100 %selectDriverLabel%
 		
-			if x is Integer
+			if imageX is Integer
 			{
-				images.Push(selectDriverLabel)
+				if isDebug() {
+					images.Push(selectDriverLabel)
+					
+					this.markFoundLabel(selectDriverLabel, imageX, imageY)
+				}
 			
 				break
 			}
@@ -1122,7 +1185,7 @@ class ACCPlugin extends ControllerPlugin {
 		else
 			logMessage(kLogInfo, translate("Optimized search for 'Select Driver' took ") . (A_TickCount - curTickCount) . translate(" ms"))
 		
-		if x is Integer
+		if imageX is Integer
 		{
 			if !inList(this.iPSOptions, "Select Driver") {
 				this.iPSOptions.InsertAt(inList(this.iPSOptions, "Repair Suspension"), "Select Driver")

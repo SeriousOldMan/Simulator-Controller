@@ -151,20 +151,7 @@ namespace RF2SHMReader {
 			if (connected) {
 				Console.Write("Temperature="); Console.WriteLine(scoring.mScoringInfo.mAmbientTemp);
 
-				string theWeather;
-
-				if (scoring.mScoringInfo.mRaining == 0.0)
-					theWeather = "Dry";
-				else if (scoring.mScoringInfo.mRaining <= 0.2)
-					theWeather = "Drizzle";
-				else if (scoring.mScoringInfo.mRaining <= 0.4)
-					theWeather = "LightRain";
-				else if (scoring.mScoringInfo.mRaining <= 0.6)
-					theWeather = "MediumRain";
-				else if (scoring.mScoringInfo.mRaining <= 0.8)
-					theWeather = "HeavyRain";
-				else
-					theWeather = "Thunderstorm";
+				string theWeather = GetWeather(scoring.mScoringInfo.mDarkCloud, scoring.mScoringInfo.mRaining);
 
 				Console.Write("Weather="); Console.WriteLine(theWeather);
 				Console.Write("Weather10Min="); Console.WriteLine(theWeather);
@@ -172,7 +159,22 @@ namespace RF2SHMReader {
 			}
 		}
 
-		private static double GetCelcius(double kelvin) {
+		private static string GetWeather(double cloudLevel, double rainLevel) {
+			if (rainLevel == 0.0)
+				return "Dry";
+			else if (rainLevel <= 0.2)
+				return (cloudLevel < 0.5) ? "Drizzle" : "LightRain";
+			else if (rainLevel <= 0.4)
+				return (cloudLevel < 0.3) ? "Drizzle" : ((cloudLevel > 0.7) ? "MediumRain" : "LightRain");
+			else if (rainLevel <= 0.6)
+				return (cloudLevel < 0.2) ? "LightRain" : ((cloudLevel > 0.7) ? "HeavyRain" : "MediumRain");
+			else if (rainLevel <= 0.8)
+				return (cloudLevel < 0.2) ? "MediumRain" : ((cloudLevel > 0.7) ? "ThunderStorm" : "HeavyRain");
+			else
+				return (cloudLevel < 0.2) ? "HeavyRain" : "Thunderstorm";
+		}
+
+			private static double GetCelcius(double kelvin) {
 			return kelvin - 273.15;
 		}
 

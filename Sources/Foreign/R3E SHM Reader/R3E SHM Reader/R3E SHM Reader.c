@@ -114,7 +114,7 @@ void substring(char s[], char sub[], int p, int l) {
    int c = 0;
    
    while (c < l) {
-      sub[c] = s[p + c - 1];
+      sub[c] = s[p + c];
 
       c++;
    }
@@ -187,14 +187,16 @@ int main()
             char surName[100];
             char nickName[3];
 
-			int length = strchr((char *)map_buffer->player_name, ' ') - (char *)map_buffer->player_name;
-			
+            // int length = strchr((char*)map_buffer->player_name, ' ') - (char*)map_buffer->player_name;
+            size_t length = strcspn((char *)map_buffer->player_name, " ");
+
 			substring((char *)map_buffer->player_name, forName, 0, length);
             substring((char *)map_buffer->player_name, surName, length + 1, strlen((char *)map_buffer->player_name) - length - 1);
             nickName[0] = forName[0], nickName[1] = surName[0], nickName[2] = '\0';
 
 			wprintf_s(L"DriverForname=%S\n", forName);
 			wprintf_s(L"DriverSurname=%S\n", surName);
+            wprintf_s(L"DriverNickname=%S\n", nickName);
 		}
 		else {
 			wprintf_s(L"DriverForname=%S\n", map_buffer->player_name);

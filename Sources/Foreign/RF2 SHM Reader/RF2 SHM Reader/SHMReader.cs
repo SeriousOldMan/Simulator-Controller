@@ -2,6 +2,8 @@
 using System;
 using System.Text;
 using static RF2SHMReader.rFactor2Constants;
+using static RF2SHMReader.rFactor2Constants.rF2GamePhase;
+using static RF2SHMReader.rFactor2Constants.rF2PitState;
 
 namespace RF2SHMReader {
 	public class SHMReader {
@@ -66,14 +68,116 @@ namespace RF2SHMReader {
 			rF2VehicleTelemetry playerTelemetry = GetPlayerTelemetry(playerScoring.mID, ref telemetry);
 
 			Console.WriteLine("[Race Data]");
-			Console.Write("Track="); Console.WriteLine(GetStringFromBytes(playerScoring.mVehicleName));
-			Console.Write("Car="); Console.WriteLine(GetStringFromBytes(playerTelemetry.mTrackName));
+			if (connected) {
+				Console.Write("Track="); Console.WriteLine(GetStringFromBytes(playerScoring.mVehicleName));
+				Console.Write("Car="); Console.WriteLine(GetStringFromBytes(playerTelemetry.mTrackName));
+				Console.Write("RaceFormat="); Console.WriteLine("Time");
+				Console.Write("FuelAmount="); Console.WriteLine(Math.Round(playerTelemetry.mFuelCapacity));
+			}
 
 			Console.WriteLine("[Stint Data]");
 			Console.Write("Active="); Console.WriteLine(connected ? "true" : "false");
-			Console.WriteLine("Paused=false");
-			Console.WriteLine("Session=RACE");
-			Console.Write("Laps="); Console.WriteLine(playerScoring.mTotalLaps);
+			if (connected) {
+				Console.Write("Paused="); Console.WriteLine(scoring.mScoringInfo.mGamePhase == (byte)PausedOrHeartbeat ? "true" : "false");
+
+				string session;
+
+				if (scoring.mScoringInfo.mSession >= 10 && scoring.mScoringInfo.mSession <= 13)
+					session = "RACE";
+				else if (scoring.mScoringInfo.mSession >= 1 && scoring.mScoringInfo.mSession <= 4)
+					session = "PRACTICE";
+				else if (scoring.mScoringInfo.mSession >= 1 && scoring.mScoringInfo.mSession <= 4)
+					session = "QUALIFICATION";
+				else
+					session = "OTHER";
+
+				Console.Write("Session="); Console.WriteLine(session);
+
+				string forName = GetStringFromBytes(scoring.mScoringInfo.mPlayerName);
+
+				if (forName.Contains(" ")) {
+					string[] names = forName.Split(' ');
+
+					Console.Write("DriverForname="); Console.WriteLine(names[0]);
+					Console.Write("DriverSurname="); Console.WriteLine(names[1]);
+					Console.Write("DriverNickname="); Console.WriteLine(names[0].Substring(0, 1) + names[1].Substring(0, 1));
+				}
+				else {
+					Console.Write("DriverForname="); Console.WriteLine(forName);
+					Console.WriteLine("DriverSurname=");
+					Console.WriteLine("DriverNickname=");
+				}
+
+				Console.Write("LapLastTime="); Console.WriteLine(Math.Round((playerScoring.mLastLapTime * 1000)));
+				Console.Write("LapBestTime="); Console.WriteLine(Math.Round((playerScoring.mBestLapTime * 1000)));
+
+				Console.Write("Laps="); Console.WriteLine(playerScoring.mTotalLaps);
+
+				Console.Write("RaceTimeRemaining="); Console.WriteLine(scoring.mScoringInfo.mEndET);
+				Console.Write("StintTimeRemaining="); Console.WriteLine(scoring.mScoringInfo.mEndET);
+				Console.Write("DriverTimeRemaining="); Console.WriteLine(scoring.mScoringInfo.mEndET);
+
+				Console.Write("InPit="); Console.WriteLine(playerScoring.mPitState == (byte)Stopped ? "true" : "false");
+			}
+
+			Console.WriteLine("[Car Data]");
+			if (connected) {
+				Console.Write("FuelRemaining="); Console.WriteLine(playerTelemetry.mFuel);
+				Console.Write("TyreTemperature=");
+				Console.WriteLine(GetCelcius(playerTelemetry.mWheels[0].mTireCarcassTemperature) + "," +
+								  GetCelcius(playerTelemetry.mWheels[1].mTireCarcassTemperature) + "," +
+								  GetCelcius(playerTelemetry.mWheels[2].mTireCarcassTemperature) + "," +
+								  GetCelcius(playerTelemetry.mWheels[3].mTireCarcassTemperature));
+				Console.Write("TyrePressure=");
+				Console.WriteLine(GetPsi(playerTelemetry.mWheels[0].mPressure) + "," +
+								  GetPsi(playerTelemetry.mWheels[1].mPressure) + "," +
+								  GetPsi(playerTelemetry.mWheels[2].mPressure) + "," +
+								  GetPsi(playerTelemetry.mWheels[3].mPressure));
+
+				Console.Write("TyreCompound="); Console.WriteLine(playerTelemetry.mFrontTireCompoundName);
+				Console.Write("BodyworkDamage=0, 0, 0, 0, "); Console.WriteLine(extended.mTrackedDamages[playerTelemetry.mID].mAccumulatedImpactMagnitude);
+				Console.WriteLine("SuspensionDamage=0, 0, 0, 0");
+			}
+
+			Console.WriteLine("[Track Data]");
+
+			if (connected) {
+				Console.WriteLine("Grip=OPTIMUM");
+				Console.Write("Temperature="); Console.WriteLine(scoring.mScoringInfo.mTrackTemp);
+			}
+
+			Console.WriteLine("[Weather Data]");
+
+			if (connected) {
+				Console.Write("Temperature="); Console.WriteLine(scoring.mScoringInfo.mAmbientTemp);
+
+				string theWeather;
+
+				if (scoring.mScoringInfo.mRaining == 0.0)
+					theWeather = "Dry";
+				else if (scoring.mScoringInfo.mRaining <= 0.2)
+					theWeather = "Drizzle";
+				else if (scoring.mScoringInfo.mRaining <= 0.4)
+					theWeather = "LightRain";
+				else if (scoring.mScoringInfo.mRaining <= 0.6)
+					theWeather = "MediumRain";
+				else if (scoring.mScoringInfo.mRaining <= 0.8)
+					theWeather = "HeavyRain";
+				else
+					theWeather = "Thunderstorm";
+
+				Console.Write("Weather="); Console.WriteLine(theWeather);
+				Console.Write("Weather10Min="); Console.WriteLine(theWeather);
+				Console.Write("Weather30Min="); Console.WriteLine(theWeather);
+			}
+		}
+
+		private static double GetCelcius(double kelvin) {
+			return kelvin - 273.15;
+		}
+
+		private static double GetPsi(double kPa) {
+			return kPa / 6.895;
 		}
 
 		private static string GetStringFromBytes(byte[] bytes) {
@@ -85,16 +189,13 @@ namespace RF2SHMReader {
 			return nullIdx >= 0 ? Encoding.Default.GetString(bytes, 0, nullIdx) : Encoding.Default.GetString(bytes);
 		}
 
-		public static rF2VehicleScoring GetPlayerScoring(ref rF2Scoring scoring)
-		{
+		public static rF2VehicleScoring GetPlayerScoring(ref rF2Scoring scoring) {
 			var playerVehScoring = new rF2VehicleScoring();
 
-			for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
-			{
+			for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i) {
 				var vehicle = scoring.mVehicles[i];
 
-				switch ((rFactor2Constants.rF2Control)vehicle.mControl)
-				{
+				switch ((rFactor2Constants.rF2Control)vehicle.mControl) {
 					case rFactor2Constants.rF2Control.AI:
 					case rFactor2Constants.rF2Control.Player:
 					case rFactor2Constants.rF2Control.Remote:

@@ -110,6 +110,17 @@ long getRemainingTime() {
     }
 }
 
+void substring(char s[], char sub[], int p, int l) {
+   int c = 0;
+   
+   while (c < l) {
+      sub[c] = s[p + c - 1];
+
+      c++;
+   }
+   sub[c] = '\0';
+}
+
 int main()
 {
     int err_code = 0;
@@ -163,16 +174,34 @@ int main()
     if (mapped_r3e) {
         wprintf_s(L"Paused=%S\n", map_buffer->game_paused ? "true" : "false");
         if (map_buffer->session_type == R3E_SESSION_QUALIFY)
-            wprintf_s(L"Session=QUALIFY\n");
+            wprintf_s(L"Session=QUALIFICATION\n");
         else if (map_buffer->session_type == R3E_SESSION_RACE)
             wprintf_s(L"Session=RACE\n");
         else if (map_buffer->session_type == R3E_SESSION_PRACTICE)
             wprintf_s(L"Session=PRACTICE\n");
         else
             wprintf_s(L"Session=OTHER\n");
-        wprintf_s(L"DriverForname=%S\n", map_buffer->player_name);
-        wprintf_s(L"DriverSurname=%S\n", "");
-        wprintf_s(L"DriverNickname=%S\n", "");
+		
+		if (strchr((char *)map_buffer->player_name, ' ')) {		
+			char forName[100];
+            char surName[100];
+            char nickName[3];
+
+			int length = strchr((char *)map_buffer->player_name, ' ') - (char *)map_buffer->player_name;
+			
+			substring((char *)map_buffer->player_name, forName, 0, length);
+            substring((char *)map_buffer->player_name, surName, length + 1, strlen((char *)map_buffer->player_name) - length - 1);
+            nickName[0] = forName[0], nickName[1] = surName[0], nickName[2] = '\0';
+
+			wprintf_s(L"DriverForname=%S\n", forName);
+			wprintf_s(L"DriverSurname=%S\n", surName);
+		}
+		else {
+			wprintf_s(L"DriverForname=%S\n", map_buffer->player_name);
+			wprintf_s(L"DriverSurname=%S\n", "");
+            wprintf_s(L"DriverNickname=%S\n", "");
+        }
+		
         wprintf_s(L"LapLastTime=%d\n", (long)(normalize(map_buffer->lap_time_previous_self) * 1000));
 
         if (normalize(map_buffer->lap_time_best_self))

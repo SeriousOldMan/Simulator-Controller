@@ -1,13 +1,4 @@
-﻿/*
-rF2 internal state mapping structures.  Allows access to native C++ structs from C#.
-Must be kept in sync with Include\rF2State.h.
-
-See: MainForm.MainUpdate for sample on how to marshall from native in memory struct.
-
-Author: The Iron Wolf (vleonavicius@hotmail.com)
-Website: thecrewchief.org
-*/
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 
 namespace RF2SHMReader

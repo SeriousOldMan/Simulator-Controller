@@ -22,8 +22,9 @@ Simulator Tools.ini=%kUserConfigDirectory%Simulator Tools.ini
 [Copy]
 Shared Memory Interface.1=%kBinariesDirectory%ACC SHM Reader.exe <- %kSourcesDirectory%Foreign\ACC SHM Reader\Release\ACC SHM Reader.exe
 Shared Memory Interface.2=%kBinariesDirectory%R3E SHM Reader.exe <- %kSourcesDirectory%Foreign\R3E SHM Reader\Release\R3E SHM Reader.exe
-Speech Interface.1=%kBinariesDirectory%Speech.Recognizer.dll <- %kSourcesDirectory%Foreign\Speech Recognizer\HotVoice\bin\Release\HotVoice.dll
-Speech Interface.2=%kBinariesDirectory%Microsoft.Speech.dll <- %kSourcesDirectory%Foreign\Speech Recognizer\HotVoice\bin\Release\Microsoft.Speech.dll
+Shared Memory Interface.3=%kBinariesDirectory%RF2 SHM Reader.exe <- %kSourcesDirectory%Foreign\RF2 SHM Reader\Release\RF2 SHM Reader.exe
+Speech Interface.1=%kBinariesDirectory%Speech.Recognizer.dll <- %kSourcesDirectory%Foreign\Speech Recognizer\Release\HotVoice.dll
+Speech Interface.2=%kBinariesDirectory%Microsoft.Speech.dll <- %kSourcesDirectory%Foreign\Speech Recognizer\Release\Microsoft.Speech.dll
 Controller Configuration.1=%kConfigDirectory%Simulator Configuration.ini <- %kSourcesDirectory%Tools\Simulator Configuration.ini
 Controller Configuration.2=%kResourcesDirectory%Templates\Simulator Configuration.ini <- %kSourcesDirectory%Tools\Simulator Configuration.ini
 Controller Configuration.3=%kConfigDirectory%Button Box Configuration.ini <- %kSourcesDirectory%Plugins\Button Box Configuration.ini

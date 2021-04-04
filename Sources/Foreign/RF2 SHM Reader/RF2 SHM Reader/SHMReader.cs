@@ -7,8 +7,6 @@ using static RF2SHMReader.rFactor2Constants.rF2PitState;
 
 namespace RF2SHMReader {
 	public class SHMReader {
-		public static bool useStockCarRulesPlugin = false;
-
 		bool connected = false;
 
 		// Read buffers:
@@ -134,8 +132,8 @@ namespace RF2SHMReader {
 								  GetPsi(playerTelemetry.mWheels[2].mPressure) + "," +
 								  GetPsi(playerTelemetry.mWheels[3].mPressure));
 
-				Console.Write("TyreCompound="); Console.WriteLine(playerTelemetry.mFrontTireCompoundName);
-				Console.Write("BodyworkDamage=0, 0, 0, 0, "); Console.WriteLine(extended.mTrackedDamages[playerTelemetry.mID].mAccumulatedImpactMagnitude);
+				Console.Write("TyreCompound="); Console.WriteLine(GetStringFromBytes(playerTelemetry.mFrontTireCompoundName));
+				Console.Write("BodyworkDamage=0, 0, 0, 0, "); Console.WriteLine(extended.mTrackedDamages[playerTelemetry.mID].mAccumulatedImpactMagnitude / 1000);
 				Console.WriteLine("SuspensionDamage=0, 0, 0, 0");
 			}
 

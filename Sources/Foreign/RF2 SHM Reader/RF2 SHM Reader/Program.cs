@@ -15,11 +15,10 @@ using static RF2SHMReader.rFactor2Constants;
 
 namespace RF2SHMReader {
     static class Program {
-        /// <summary>
-        /// The main entry point for the application.
-        /// </summary>
         [STAThread]
-        static void Main() {   
+        static void Main() {
+            Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("en-US");
+
             SHMReader reader = new SHMReader();
 
             reader.Run();

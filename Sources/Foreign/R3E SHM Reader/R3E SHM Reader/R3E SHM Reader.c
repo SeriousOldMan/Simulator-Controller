@@ -187,7 +187,6 @@ int main()
             char surName[100];
             char nickName[3];
 
-            // int length = strchr((char*)map_buffer->player_name, ' ') - (char*)map_buffer->player_name;
             size_t length = strcspn((char *)map_buffer->player_name, " ");
 
 			substring((char *)map_buffer->player_name, forName, 0, length);

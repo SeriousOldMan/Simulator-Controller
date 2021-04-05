@@ -401,6 +401,7 @@ A considerable part of the knowledge of Jona comes from the telemetry informatio
 	Laps=3
 	LapLastTime=116697
 	LapBestTime=116697
+	RaceLapsRemaining=9
 	RaceTimeRemaining=1.41874e+06
 	StintTimeRemaining=1.41874e+06
 	DriverTimeRemaining=1.41874e+06
@@ -424,6 +425,7 @@ A considerable part of the knowledge of Jona comes from the telemetry informatio
 	Car=mclaren_720s_gt3
 	Track=Paul_Ricard
 	FuelAmount=125
+	RaceFormat=Time
 
 The shared memory of *Assetto Corsa Competizione* provides a lot more information, but this is all that is needed for Jona at the moment. Future versions of Jona will incorporate more data, as Jona gets smarter. For example, version 1.7 of *Assetto Corsa Competizione* introduced updated information for weather information and the current settings of the Pitstop MFD, which had been incorporated into the above telemetry file.
 

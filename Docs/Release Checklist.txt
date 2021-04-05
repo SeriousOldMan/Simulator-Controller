@@ -20,6 +20,7 @@ Release 2.8 Checklist
    c. Simulator Configuration.ini
    d. Documentation (Plugin & Modes, Readme)
    e. Update Procedure for local Simulator Controller.ini
+   f. Search and replace: https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#vitual-race-engineer-integration
 2. Update Procedure
    a. Translations
    b. Controller Plugin Labels

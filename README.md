@@ -26,7 +26,9 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-[2.8.0-dev() (Early version for Release 2.8. New features: New plugin "Race Engineer" for handling Jona for different simulations, Early integration of Jona for RaceRoom Racing Experience and rFactor 2. No documentation or update procedures yet...)
+[2.8.0-dev](https://www.dropbox.com/s/4sn68fjlu7t94rh/Simulator%20Controller%202.8.0-dev.zip?dl=1) (Early version for Release 2.8. New features: New plugin "Race Engineer" for handling Jona for different simulations, Early integration of Jona for RaceRoom Racing Experience and rFactor 2. No documentation or update procedures yet...)
+
+Note: Most of the "raceEngineer..." parameters have moved from the plugin "ACC" to the plugin "Race Engineer".
 
 #### Latest release builds
 

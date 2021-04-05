@@ -46,6 +46,7 @@ Release 2.8 Checklist
      1. Installation & Setup
 	 2. Readme
 	 3. Plugins & Modes
+11. Search for (*) broken links.
 
 Release 2.7 Checklist
 =====================

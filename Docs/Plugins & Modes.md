@@ -272,26 +272,11 @@ These pictures are located in the *Resources\Screen Images\ACC folder* in the in
 
 Note: The picture search will initially take some time, but the algorithm will learn the position of the Pitstop MFD during the initial run. Depending on your screen size and resolution the initial search will consume quite some CPU cycles. Therefore I advice to open the Pitstop MFD using one of the mode actions above once you are driving in a safe situation, to avoid lags later on. Simulator Controller will learn the position and will only search the much reduced screen area from now on and the CPU load will be 10 times less than before.
 
-#### Vitual Race Engineer Integration
- 
-The ACC plugin can automatically start Jona, the [Virtual Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer) to support you during an *Assetto Corsa Competizione* race event. The following configuration parameters allow you to customize Jona to your preferences:
-
-	raceEngineer: *initialState* *onOffFunction*; raceEngineerName: *name*; raceEngineerLogo: true or false;
-	raceEngineerOpenSettings: *settingsFunction*; raceEngineerImportSettings: *importFunction*;
-	raceEngineerSpeaker: false, true or *Microsoft Speech Generation Language*;
-	raceEngineerListener: false, true or *Microsoft Speech Recognition Language*
-	
-For Jona to be generally available, you must supply an argument for the *raceEngineerName* parameter. You can define a function on your hardware controller with the parameter *raceEngineer*, to enable or disable the Virtual Race Engineer dynamically. *initialState* must be either "On" or "Off" and for *onOffFunction* unary and binary functions are supported. The function will be bound to a plugin action. Additionally, the parameter *raceEngineerOpenSettings* allows you to bind a plugin action to your hardware controller, which opens the Race Engineer [settings dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-engineer-settings), which you must use before a race to give Jona the necessary information about your car setup and other stuff. As an alternative you can use the plugin action *raceEngineerImportSettings* to import the current setup data, without opening the settings dialog. Nevertheless, you will get a notification, when the setup has been imported successfully.
-
-Note: If you disable Jona during an active race, the Race Engineer will stop working immediately. You can also enable Jona at the beginning of a race, but only until you cross the start/finish line for the first time. If you enable Jona after the initial lap, Jona will not be available until the next race. 
-
-With *true* supplied for *raceEngineerLogo*, Jona will show a nice rotating AI brain in the lower right corner of the screen, while the AI kernel is working, but you will get a short lag in your simulation, when this window pops up. With *raceEngineerSpeaker* and *raceEngineerListener* you can customize the natural language interface (or the personality) of Jona. If you simply supply *true* as arguments, a voice and the corresponding recognition engine will be choosen based on the currently configured language. If you prefer a specific voice and / or a specific language, you can supply the name for this voice and language instead (Example: "Microsoft David Desktop" is a male US-English voice and "Microsoft Server Speech Recognition - TELE (de-DE)" provide german spoken language recognition. The phrase grammars of Jona can be localized for any language, with English and German already supplied by the standard distribution of Simulator Controller, but you will also need the corresponding Windows libraries for TTS (text-to-speech) and STT (speech-to-text). For more information about Jona, see the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer).
-
-It is possible, although not much fun, to use Jona without its natural language interface. Only the pitstop planning and setup capabilities are available in this cconfiguration, but it is still useful, especially in combination with the other actions of the *Pitstop* mode described above. You can use the following parameters to connect these actions to your controller hardware:
+Last, but not least, you can bind to actions from the Virtual Race Engineer to the "Pitstop" mode as well, therefore making these actions available together with the other actions, that handle the *Assetto Corsa Competizione* pitstop.
 
 	raceEngineerCommands: PitstopPlan *function*, PitstopPrepare *function*
-	
-Both actions will be bound to the *Pitstop* mode and only unary functions are supported here. An interesting combination you might try, is to use voice output for Jona, but no voice control. You will get all the information of Jona, but use an *oldschool* interface to control their actions.
+
+See the [documentation](*) on the "Race Engineer" plugin above for more information.
 
 ## Plugin *AC*
 
@@ -299,8 +284,8 @@ This plugin handles the *Assetto Corsa* simulation game. An application with the
 
 ## Plugin *RF2*
 
-This plugin handles the *rFactor 2* simulation game. An application with the name "rFactor 2" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startRF2" as a special function hook in this configuration.
+This plugin handles the *rFactor 2* simulation game. An application with the name "rFactor 2" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startRF2" as a special function hook in this configuration. No special mode is currently defined for *rFactor 2*, but an integration with Jona is available through the "Race Engineer" plugin.
 
 ## Plugin *R3E*
 
-This plugin handles the *RaceRoom Racing Experience* simulation game. An application with the name "RaceRoom Racing Experience" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startR3E" as a special function hook in this configuration and define "ahk_exe RRRE64.exe" (yes, three "R"s) as the window title.
+This plugin handles the *RaceRoom Racing Experience* simulation game. An application with the name "RaceRoom Racing Experience" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startR3E" as a special function hook in this configuration and define "ahk_exe RRRE64.exe" (yes, three "R"s) as the window title. No special mode is currently defined for *rFactor 2*, but an integration with Jona is available through the "Race Engineer" plugin.

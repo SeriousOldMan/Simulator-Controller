@@ -67,8 +67,8 @@ namespace RF2SHMReader {
 
 			Console.WriteLine("[Race Data]");
 			if (connected) {
-				Console.Write("Track="); Console.WriteLine(GetStringFromBytes(playerScoring.mVehicleName));
-				Console.Write("Car="); Console.WriteLine(GetStringFromBytes(playerTelemetry.mTrackName));
+				Console.Write("Car="); Console.WriteLine(GetStringFromBytes(playerScoring.mVehicleName));
+				Console.Write("Track="); Console.WriteLine(GetStringFromBytes(playerTelemetry.mTrackName));
 				Console.Write("RaceFormat="); Console.WriteLine((scoring.mScoringInfo.mEndET < 0.0) ? "Lap" : "Time");
 				Console.Write("FuelAmount="); Console.WriteLine(Math.Round(playerTelemetry.mFuelCapacity));
 			}

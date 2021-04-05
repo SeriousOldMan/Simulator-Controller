@@ -26,7 +26,7 @@ Release 2.8 Checklist
    c. Simulator Configuration.ini => Move raceEngineer Args to new plugin, startRRE => startR3E, Plugin RRE => R3E
 3. Rework of Simulator Tools.targets
    a. Update procedure
-4. Shared Memory File Format => (Added RaceFormat, RaceLapsRemaining option)
+4. Shared Memory File Format => (Added RaceFormat, RaceLapsRemaining option, Session with all options)
    a. Virtual Race Engineer.md
    b. Rules adoption
 5. Rename startR3E

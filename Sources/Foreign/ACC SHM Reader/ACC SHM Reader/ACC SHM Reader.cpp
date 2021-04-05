@@ -204,7 +204,7 @@ int main(int argc, char* argv[])
 
 	}
 
-	if ((argc == 1) || strchr(argv[1], '´T'))
+	if ((argc == 1) || strchr(argv[1], 'T'))
 	{
 		wcout << "[Track Data]" << endl;
 
@@ -219,7 +219,7 @@ int main(int argc, char* argv[])
 		printData("Grip", trackStatus);
 	}
 
-	if ((argc == 1) || strchr(argv[1], '´P'))
+	if ((argc == 1) || strchr(argv[1], 'P'))
 	{
 		wcout << "[Pitstop Data]" << endl;
 
@@ -233,7 +233,7 @@ int main(int argc, char* argv[])
 		printData("TyrePressureRR", gf->mfdTyrePressureRR);
 	}
 	
-	if ((argc == 1) || strchr(argv[1], '´W'))
+	if ((argc == 1) || strchr(argv[1], 'W'))
 	{
 		wcout << "[Weather Data]" << endl;
 

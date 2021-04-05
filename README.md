@@ -26,7 +26,9 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-None for the moment...
+[2.8.0-dev(https://www.dropbox.com/s/4sn68fjlu7t94rh/Simulator%20Controller%202.8.0-dev.zip?dl=1) (Early version for Release 2.8. New features: New plugin "Race Engineer" for handling Jona for different simulations, Early integration of Jona for RaceRoom Racing Experience and rFactor 2. No documentation or update procedures yet...)
+
+Note: Most of the "raceEngineer..." parameters have moved from the plugin "ACC" to the plugin "Race Engineer".
 
 #### Latest release builds
 
@@ -89,11 +91,11 @@ These plugins are part of the Simulator Controller distribution. Beside providin
 | Tactile Feedback | Fully configurable support for pedal and chassis vibration using [SimHub](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications). |
 | Motion Feedback | Fully configurable support for rig motion feedback using [SimFeedback](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications). |
 | Pedal Calibration | Allows to choose between the different calibration curves of your high end pedals directly from the hardware controller. |
-| ACC | Special support for starting and stopping Assetto Corsa Competizione from your hardware controller and supplies functions and actions for configurable, automated chat messages in a multiplayer game. Additionally, beginning with Release 2.0, this plugin provides sophisticated support for the Pitstop MFD of *Assetto Corsa Competizione*. All settings may be tweaked using the controller hardware, but it is also possible to control the settings using voice control to keep your hands on the steering wheel. This plugin uses configuration based data, defines two simulator dependent modes and shows how to automate your simulation game. Therefore it supplies a good showcase when starting your own plugin development. Since Release 2.1 Jona, the Virtual Race Engineer will be activated by the ACC plugin, when you start in a race. |
+| ACC | Special support for starting and stopping Assetto Corsa Competizione from your hardware controller and supplies functions and actions for configurable, automated chat messages in a multiplayer game. Additionally, beginning with Release 2.0, this plugin provides sophisticated support for the Pitstop MFD of *Assetto Corsa Competizione*. All settings may be tweaked using the controller hardware, but it is also possible to control the settings using voice control to keep your hands on the steering wheel. This plugin uses configuration based data, defines two simulator dependent modes and shows how to automate your simulation game. Due to its functional richness, this plugin provides a good showcase when starting your own development. Since Release 2.1 Jona, the Virtual Race Engineer, will be activated by the ACC plugin, when you start in a race. |
 | AC | Special support for starting and stopping Assetto Corsa from your hardware controller. |
-| RF2 | Special support for starting and stopping rFactor 2 from your hardware controller. |
-| RRE | Special support for starting and stopping RaceRoom Racing Experience from your hardware controller. |
-| Button Box | Tools for building your own Button Box / controller visuals. An easy to understand example will help you building the screen representation of your own Button Boxes. |
+| RF2 | Special support for starting and stopping rFactor 2 from your hardware controller. No special controller mode is defined for the moment, but an initial integration with Jona, the Virtual Race Engineer, is available. |
+| R3E | Special support for starting and stopping RaceRoom Racing Experience from your hardware controller. No special controller mode is defined for the moment, but an initial integration with Jona, the Virtual Race Engineer, is available. |
+| Button Box | Tools for building your own Button Box / Controller visuals. The default implementation of *ButtonBox* implements grid based Button Box layouts, which can be configured using a [graphical layout editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#button-box-layouts). |
 
 ### Third party applications
 

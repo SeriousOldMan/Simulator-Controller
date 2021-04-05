@@ -192,6 +192,53 @@ Returns the values for the given argument as string, or the supplied *default* v
 	
 ***
 
+# Configuration Editor Classes
+
+The two classes *ConfigurationEditor* and *ConfigurationItemList* implement the configuration tool framework. The conifguration tool can be extended by registering so called configurators, which, in the end, will add a tab in the dialog of the configuration tool. Please see the corresponding documentation on [Customizing the Configuration Tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts#customizing-the-configuration-tool) for more information.
+
+## [Singleton] ConfigurationEditor extends [ConfigurationItem](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-classesahk) ([Simulator Configuration.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Tools/Simulator%20Configuration.ahk))
+This is the main class of the configuration tool. It opens the editor window and creates a tabbed view for all the configurator plugins.
+
+### Public Properties
+
+#### [Class] *Instance[]*
+This class property returns the single instance of *ConfigurationEditor*.
+
+#### *Configurators[]*
+A list of all registered configurators, which tpically have been provided by configuration plugins by calling [registerConfigurator](*)-
+
+#### *AutoSave[]*
+Returns *true*, if the user wants each change to be updated automatically.
+	
+#### *Window[]*
+This property returns the short string, which is used by all AutoHotKey *Gui* commands to identify the window of the configuration editor.
+
+### Public Methods
+
+#### *__New(development :: Boolean, configuration :: ConfigurationMap)*
+Constructs a new *ConfigurationEditor* instance. If *true* is passed for the first parameter, additional configuration options suitable for development tasks will be available in the first tab of the configuration editor. The second parameter is the configuration, which should be modified.
+
+#### *registerConfigurator(label :: String, configurator :: Object)*
+Registers the given configurator and creates a tab with the given label for it in the tabbed view of the configuration editor window.
+
+#### *unregisterConfigurator(labelOrConfigurator :: TypeUnion(String, Object))
+Removes a configurator (either identified directly as argument or identified by the label, which had been supplied, when registering the configurator), from the configuration tool.
+
+#### *show()*
+After all configurators have been registered, *show* will open the editor window for interaction.
+
+#### *hide()*
+Makes the main editor window invisble, which might be useful, when a specialized or delegated editor will be opened by one of the plugins.
+
+#### *close()*
+Called at the end, after all modifications had been saved (by calling the inherited method [saveToConfiguration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#savetoconfigurationconfiguration--configurationmap)), to finally close and destroy the editor window.
+
+#### *toggleKeyDetector(callback :: TypeUnion(String, FuncObj) := false)*
+Calling *toggleKeyDetector* enables or disables a special tool to detect buttons and dials on connected hardware controlles. A small tooltip will follow the mouse and display information as long as these controls are activated. If you supply the *callback*, it will be called with the first pressed control in AutoHotkey [hotkey syntax](https://www.autohotkey.com/docs/KeyList.htm) and the key detector tool will be deactivated automatically.
+
+
+***
+
 # Controller Classes
 
 All the following classes are part of the Simulator Controller core framework defined in the [Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk) script. In many cases they are based on one of the configuration classes above.
@@ -283,7 +330,7 @@ Returns the name of the currently running simulation game or *false*, if no simu
 #### *simulatorStartup(simulator :: String)*
 This method is called when a simulation is starting up. The info is distributed to all registered plugins.
 
-#### *simulatorShutdown()*
+#### *simulatorShutdown(simulator :: String)*
 This method is called when a simulation has terminated. The info is distributed to all registered plugins.
 
 #### *startSimulator(application :: Application, splashImage :: String := false)*
@@ -427,7 +474,7 @@ Plugins, that have an understanding of simulation games and can detect their run
 #### *simulatorStartup(simulator :: String)*
 This is an event handler method called by the controller to notify the plugin, that a simulation just has been started. A plugin may, for example, switch to a specific mode specialized for the given simulator.
 
-#### *simulatorShutdown()*
+#### *simulatorShutdown(simulator :: String)*
 This is an event handler method called by the controller to notify the plugin, that a simulation just has been stopped.
 
 #### *getLabel(descriptor :: String, default :: String := false)*

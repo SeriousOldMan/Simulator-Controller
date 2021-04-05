@@ -69,7 +69,7 @@ namespace RF2SHMReader {
 			if (connected) {
 				Console.Write("Track="); Console.WriteLine(GetStringFromBytes(playerScoring.mVehicleName));
 				Console.Write("Car="); Console.WriteLine(GetStringFromBytes(playerTelemetry.mTrackName));
-				Console.Write("RaceFormat="); Console.WriteLine("Time");
+				Console.Write("RaceFormat="); Console.WriteLine((scoring.mScoringInfo.mEndET < 0.0) ? "Lap" : "Time");
 				Console.Write("FuelAmount="); Console.WriteLine(Math.Round(playerTelemetry.mFuelCapacity));
 			}
 
@@ -106,14 +106,18 @@ namespace RF2SHMReader {
 					Console.WriteLine("DriverNickname=");
 				}
 
-				Console.Write("LapLastTime="); Console.WriteLine(Math.Round((playerScoring.mLastLapTime * 1000)));
-				Console.Write("LapBestTime="); Console.WriteLine(Math.Round((playerScoring.mBestLapTime * 1000)));
+				Console.Write("LapLastTime="); Console.WriteLine(Math.Round(playerScoring.mLastLapTime * 1000));
+				Console.Write("LapBestTime="); Console.WriteLine(Math.Round(playerScoring.mBestLapTime * 1000));
 
 				Console.Write("Laps="); Console.WriteLine(playerScoring.mTotalLaps);
 
-				Console.Write("RaceTimeRemaining="); Console.WriteLine(scoring.mScoringInfo.mEndET);
-				Console.Write("StintTimeRemaining="); Console.WriteLine(scoring.mScoringInfo.mEndET);
-				Console.Write("DriverTimeRemaining="); Console.WriteLine(scoring.mScoringInfo.mEndET);
+				Console.Write("RaceLapsRemaining="); Console.WriteLine(GetRemainingLaps(ref playerScoring));
+
+				long time = GetRemainingTime(ref playerScoring);
+
+				Console.Write("RaceTimeRemaining="); Console.WriteLine(time);
+				Console.Write("StintTimeRemaining="); Console.WriteLine(time);
+				Console.Write("DriverTimeRemaining="); Console.WriteLine(time);
 
 				Console.Write("InPit="); Console.WriteLine(playerScoring.mPitState == (byte)Stopped ? "true" : "false");
 			}
@@ -132,7 +136,9 @@ namespace RF2SHMReader {
 								  GetPsi(playerTelemetry.mWheels[2].mPressure) + "," +
 								  GetPsi(playerTelemetry.mWheels[3].mPressure));
 
-				Console.Write("TyreCompound="); Console.WriteLine(GetStringFromBytes(playerTelemetry.mFrontTireCompoundName));
+				string compound = GetStringFromBytes(playerTelemetry.mFrontTireCompoundName);
+
+				Console.Write("TyreCompound="); Console.WriteLine(compound.Contains("Rain") ? "Wet" : "Dry");
 				Console.Write("BodyworkDamage=0, 0, 0, 0, "); Console.WriteLine(extended.mTrackedDamages[playerTelemetry.mID].mAccumulatedImpactMagnitude / 1000);
 				Console.WriteLine("SuspensionDamage=0, 0, 0, 0");
 			}
@@ -154,6 +160,33 @@ namespace RF2SHMReader {
 				Console.Write("Weather="); Console.WriteLine(theWeather);
 				Console.Write("Weather10Min="); Console.WriteLine(theWeather);
 				Console.Write("Weather30Min="); Console.WriteLine(theWeather);
+			}
+		}
+
+		private long GetRemainingLaps(ref rF2VehicleScoring playerScoring) {
+			if (playerScoring.mTotalLaps < 1)
+				return 0;
+
+			if (scoring.mScoringInfo.mEndET <= 0.0) {
+				return scoring.mScoringInfo.mMaxLaps - playerScoring.mTotalLaps;
+			}
+			else {
+				if (playerScoring.mLastLapTime > 0)
+					return (long)Math.Round(GetRemainingTime(ref playerScoring) / (playerScoring.mLastLapTime * 1000)) + 1;
+				else
+					return 0;
+			}
+		}
+
+		private long GetRemainingTime(ref rF2VehicleScoring playerScoring) {
+			if (playerScoring.mTotalLaps < 1)
+				return 0;
+
+			if (scoring.mScoringInfo.mEndET > 0.0) {
+				return (long)((scoring.mScoringInfo.mEndET - (playerScoring.mLastLapTime * playerScoring.mTotalLaps)) * 1000);
+			}
+			else {
+				return (long)(GetRemainingLaps(ref playerScoring) * playerScoring.mLastLapTime * 1000);
 			}
 		}
 

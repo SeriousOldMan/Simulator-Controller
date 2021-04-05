@@ -490,7 +490,6 @@ class ACCPlugin extends ControllerPlugin {
 		
 			this.iPSIsOpen := false
 				
-			showMessage("Close")
 			SetTimer updatePitstopState, Off
 		}
 		else if !reported {

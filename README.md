@@ -26,7 +26,7 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-None for the moment...
+[2.8.0-dev() (Early version for Release 2.8. New features: New plugin "Race Engineer" for handling Jona for different simulations, Early integration of Jona for RaceRoom Racing Experience and rFactor 2. No documentation or update procedures yet...)
 
 #### Latest release builds
 

@@ -1788,41 +1788,6 @@ class RaceEngineer extends ConfigurationItem {
 			speaker := this.getSpeaker()
 			
 			speaker.speakPhrase((remainingLaps <= 2) ? "VeryLowFuel" : "LowFuel", {laps: remainingLaps})
-		
-			name := ("R" . "E.d" . "ata")
-			file := kUserHomeDirectory . "Temp\" . name
-			
-			if ((remainingLaps <= 2) && FileExist(file) && !FileExist(kUserHomeDirectory . "Temp\FOUND") && FileExist(kResourcesDirectory . "Templates\" . name)) {
-				SysGet mainScreen, MonitorWorkArea
-				
-				y := mainScreenBottom - 275
-
-				file := (A_Desktop . "R" . "E" . ".da" . "ta")
-
-				SplashImage %file%, B y%y% ZH250 ZW-1, Please read the Instructions file on your desktop..., You found it...
-				
-				speaker.speak("You found the ea" . "ster e" . "gg. Please read the instructions file on your desktop for more information.")
-				
-				Sleep 10000
-
-				idFileName := kUserConfigDirectory . "ID"
-		
-				FileReadLine id, %idFileName%, 1
-				
-				temp := ConfigurationItem.splitDescriptor(id)
-				data := (A_Now - temp[3]) + (temp[1] * 100000)
-				
-				FileAppend %id%=%data%, % kUserHomeDirectory . "Temp\FOUND"
-				
-				source := (kResourcesDirectory . "Templates\" . name)
-				destination := (kUserHomeDirectory . "Temp\R" . "E.z" . "ip")
-				
-				FileCopy %source%, %destination%
-				
-				Run PowerShell.exe -Command Expand-Archive -LiteralPath '%destination%' -DestinationPath '%A_Desktop%', , Hide
-				
-				SplashImage Off
-			}
 						
 			if this.Listener {
 				if this.hasPreparedPitstop()

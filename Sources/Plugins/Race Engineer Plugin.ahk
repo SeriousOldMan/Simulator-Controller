@@ -13,9 +13,10 @@ global kRaceEngineerPlugin = "Race Engineer"
 
 global kSessionFinished = 0
 global kSessionPaused = -1
-global kSessionPractice = 1
-global kSessionQualification = 2
-global kSessionRace = 3
+global kSessionOther = 1
+global kSessionPractice = 2
+global kSessionQualification = 3
+global kSessionRace = 4
 
 global kFront = 0
 global kRear = 1
@@ -565,7 +566,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 				
 				if (sessionState == kSessionPaused)
 					return
-				else if (sessionState != kSessionRace) {
+				else if (sessionState < kSessionPractice) {
 					; Not on track
 				
 					lastLap := 0

@@ -137,7 +137,7 @@ Returns the [ISO language code](https://en.wikipedia.org/wiki/List_of_ISO_639-1_
 #### *translate(string :: String)*
 *string* is a text in English. *translate* reads the translations for the current target language and returns the translated text, or *string* itself, if no translation can be found.
 
-#### *translateMsgBoxButtons(buttonLabels :: List)*
+#### *translateMsgBoxButtons(buttonLabels :: Array)*
 This function helps you to translate the button labels for standard dialogs like those of the AutoHotkey *MsgBox* command: A typical usage looks like this:
 
 	OnMessage(0x44, Func("translateMsgBoxButtons").bind(["Yes", "No", "Never"]))

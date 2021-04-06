@@ -208,14 +208,14 @@ This will remove the chat messages tab from the configuration tool. Instead of s
 The protocol, a configurator object has to implement, is quite simple:
 
 	class MyConfigurator extends ConfigurationItem {
-					
-		createGui(editor, x, y, width, height) { ... }
+		createGui(editor :: ConfigurationEditor, x :: Integer, y :: Integer, width :: Integer, height :: Integer) { ... }
 
-		loadFromConfiguration(configuration) { ... }
+		loadFromConfiguration(configuration :: ConfigurationMap) { ... }
 
-		saveToConfiguration(configuration) { ... }
-
+		saveToConfiguration(configuration :: ConfigurationMap) { ... }
 	}
 	
-The method *createGui* is called by the *editor* to create the widgets for the configuration plugin. All widgets must be created using the AutoHotkey *Gui* command in the window defined by *editor.Window* in the boundaries *x* <-> (*x* + *width*) and *y* <-> (*y* + *height*).
+The method *createGui* is called by the *editor* to create the controls for the configuration plugin. All controls must be created using the AutoHotkey *Gui* command in the window defined by *editor.Window* in the boundaries *x* <-> (*x* + *width*) and *y* <-> (*y* + *height*).
 *loadFromConfiguration* (inherited from [ConfigurationItem][https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-classesahk]) is called during the initialization process. It must load the initial state from the configuration. Please note, that the *createGui* method had not been called yet. The third method of the protocol, *saveToConfiguration*, will be called, whenever the user wants to save the current state of the configuration tool.
+
+Please take a look at the documentation of [ConfigurationEditor](*) and [ConfigurationItemList](*) in the classes reference on [Configuration Editor Classes](*) for more information. Especially, if your configuration has multiple items or aspects and you want to present them using a list, the abstract class *ConfigurationItemList* will be very helpful as a building block.

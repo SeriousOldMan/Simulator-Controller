@@ -218,8 +218,19 @@ This property returns the short string, which is used by all AutoHotKey *Gui* co
 #### *__New(development :: Boolean, configuration :: ConfigurationMap)*
 Constructs a new *ConfigurationEditor* instance. If *true* is passed for the first parameter, additional configuration options suitable for development tasks will be available in the first tab of the configuration editor. The second parameter is the configuration, which should be modified.
 
-#### *registerConfigurator(label :: String, configurator :: Object)*
-Registers the given configurator and creates a tab with the given label for it in the tabbed view of the configuration editor window.
+#### *registerConfigurator(label :: String, configurator :: ConfigurationItem)*
+Registers the given configurator and creates a tab with the given label for it in the tabbed view of the configuration editor window. The registered *configurator* object will typically be an instance of a subclass of [ConfigurationItem](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-classesahk) and must implement a simple additional protocol, as described in the documentation on [Customizing the Configuration Tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts#customizing-the-configuration-tool):
+
+	class MyConfigurator extends ConfigurationItem {
+		createGui(editor :: ConfigurationEditor, x :: Integer, y :: Integer, width :: Integer, height :: Integer) { ... }
+
+		loadFromConfiguration(configuration) { ... }
+
+		saveToConfiguration(configuration) { ... }
+	}
+	
+The method *createGui* is called by the *editor* to create the controls for the configuration plugin. All controls must be created using the AutoHotkey *Gui* command in the window defined by *editor.Window* in the boundaries *x* <-> (*x* + *width*) and *y* <-> (*y* + *height*).
+*loadFromConfiguration* (inherited from [ConfigurationItem][https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-classesahk]) is called during the initialization process. It must load the initial state from the configuration. Please note, that the *createGui* method had not been called yet. The third method of the protocol, *saveToConfiguration* (also inherited from *ConfigurationItem*), will be called, whenever the user wants to save the current state of the configuration tool.
 
 #### *unregisterConfigurator(labelOrConfigurator :: TypeUnion(String, Object))
 Removes a configurator (either identified directly as argument or identified by the label, which had been supplied, when registering the configurator), from the configuration tool.
@@ -236,6 +247,60 @@ Called at the end, after all modifications had been saved (by calling the inheri
 #### *toggleKeyDetector(callback :: TypeUnion(String, FuncObj) := false)*
 Calling *toggleKeyDetector* enables or disables a special tool to detect buttons and dials on connected hardware controlles. A small tooltip will follow the mouse and display information as long as these controls are activated. If you supply the *callback*, it will be called with the first pressed control in AutoHotkey [hotkey syntax](https://www.autohotkey.com/docs/KeyList.htm) and the key detector tool will be deactivated automatically.
 
+***
+
+## [Abstract] ConfigurationItemList extends [ConfigurationItem](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-classesahk) ([Simulator Configuration.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Tools/Simulator%20Configuration.ahk))
+This abstract class implements a list of items, which might be edited with an associated editor. Basis control on item selection, openening and closing the editor area, loading and saving items to and from the editor is already builtin. Please see the [implementation for the "Chat Messages Configuration" plugin](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Chat%20Messages%20Configuration%20Plugin.ahk) for a simple example of a concrete implementation of *ConfigurationItemList*.
+
+#### *iItemsList :: Array := []*
+This variable holds all items of the list. This variable is typically initialized in the implementation of *loadFromConfiguration*.
+
+#### *iCurrentItemIndex :: Integer := 0*
+The currently selected line in the list.
+
+#### *ListHandle[]*
+Returns the AutoHotkey HNDL for the *ListView* or *ListBox* used for this list widget.
+
+### Public Methods
+
+#### *initializeList(listHandle :: AutoHotkey HNDL, listVariable :: String, addButton :: String := false, deleteButton :: String := false, updateButton :: String := false, upButton :: String := false, downButton :: String := false)*
+You call this method at the end of the *createGui* implementation to register your active controls of the list widget. The list widget supports optional "Add", "Delete" and "Save" buttons to control the associated editor area and also optional "Up" and "Down" buttons to control the position of an element in the list. The supplied arguments must be the names of the variables associated with the given control. Additionally, these buttons must have defined corrsponding *g-labels* for the AutoHotkey controls, that are named "addItem", "deleteItem", "updateItem", "upItem" and "downItem" correspondingly. See the documentation on the [AutoHotkey Gui coommand](https://www.autohotkey.com/docs/commands/Gui.htm) for more information. 
+
+#### *associateList(variable :: String, itemList :: ConfigurationItemList)*
+This method is called by *initializeList* for each of the supplied variables to register the item list with the given control. Later on, the list can be retrieved during a Gui event by calling *getList*.
+
+#### *getList(variable :: String)*
+Returns the instance of *ConfigurationItemList*, which had been associated with the given variable. Normally, there is no need to call this method from your code, since this is part of the event management protocol.
+
+#### *clickEvent(line :: Integer, count :: Integer)*
+This method is called, when an item is clicked more than once in the list. The default implementation calls method *openEditor*, which finally will call *loadEditor*.
+
+#### *selectEvent(line :: Integer)*
+This method is called, when an item is selected  in the list by using the cursor keys of the keyboard. The default implementation calls *openEditor*, which finally will call *loadEditor*.
+
+#### *openEditor(itemNumber :: Integer)*
+Opens and initializes the editor area for the selected item number. This method is part of the event protocol and there is no need to call it directly. *openEditor* finally calls *loadEditor*.
+
+#### *selectItem(itemNumber)*
+This method is also part of the event protocol and is called to select a new item in the list, for example after a nw item has been saved from the editor to the list and should be the newly selected item now.
+
+#### *addItem()*, *deleteItem()*, *updateItem()*, *upItem()*, *downItem()*
+These methods will be called, whenever one of the buttons, that had been initially registered by calling *initializeList*, are clicked by the user. No need to call them directly, as they are also part of the generic event protocol.
+
+#### *updateState()*
+This method is automatically called, whenever a state change occured. It must update all controls to reflect the current state. A state change is for example a new selecion in the list, an updated item in the editor, after the user saved the changes, and so on. The default implementation handles all controls, that had been registered by calling *initializeList*.
+
+#### [Abstract] *loadList(items :: Array)*
+This method must be implemented by the concrete subclass of *ConfigurationItemList* to load the given configuration items into the list view or list box.
+
+#### [Abstract] *loadEditor(item :: Object)*
+Is calle, whenever an item is selected in the list. The selected *item* is passed to this method and the implementation of this abstract method must initialize all controls from the given item object.
+
+#### [Abstract} *clearEditor()*
+Must be implemented by the concrete subclass of *ConfigurationItemList*. *clearEditor* will be called whenever there is no currently selected item in the list. All fields and controls in the editor area should be made empty or reset to their initial state.
+
+#### [Abstract] *buildItemFromEditor(isNew :: Boolean := false)*
+This method must also be implemented by the concrete subclass of *ConfigurationItemList*. It is called, whenever the current changes of the item in the editor area should be saved. The method must load the values from all controls and must construct an item of the required structure, which can be anything from a simple string up to a complex object, as long as the variable *iItemsList* and the methods *loadList*, *loadEditor* and *buildItemFromEditor* share the same understanding of this structure.
 
 ***
 

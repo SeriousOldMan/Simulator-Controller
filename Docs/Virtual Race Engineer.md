@@ -1,6 +1,6 @@
 ## Introduction
 
-Welcome to Jona, the world first fully interactive virtual race engineer for race car simulations.
+Welcome to Jona, the world first fully interactive Virtual Race Engineer for race car simulations.
 
 Ok, enough marketing bullshit. Jona is a voice chat bot with a special knowledge about racing. It uses the telemetry data provided by a simulation game and a large domain specific rule set to derive its knowledge from there. Using this knowledge, Jona can give you information about the current state of your car (temperatures, pressures, remaining laps, upcoming pitstops, and so on), and can recommend settings for the next pitstop. Currently, Jona supports the *Assetto Corsa Competizione*, *RaceRoom Racing Experience* and *rFactor 2* simulation games through their respective plugins. Using the Pitstop MFD handling for *Assetto Corsa Competizione* introduced with [Release 2.0](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-20), Jona is even capable to setup a pitstop without user interaction completely on its own, a capability, which will come to the other simulation games in the future as well.
 
@@ -174,7 +174,9 @@ As you can see here, each phrase provides different alternative sentences. Varia
 
 ## Racing with Jona
 
-Racing with Jona is easy, just begin your race and wait until Jona will contact you. This will be a few seconds after you crossed the start finish line after your first complete lap. To achieve this, the ACC plugin will start *Race Engineer.exe*, which is located in the *Binaries* folder, as a subprocess, as long as you are out on a track. (Note for developers: The communication between those two processes uses named pipes. For more technical information, see the [technical information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#technical-information) section below).
+Racing with Jona is easy, just begin your session and wait until Jona will contact you. This will be a few seconds after you crossed the start finish line after your first complete lap. Jona will be available in Practice, Qualification and Race sessions, but the amount of support you can expect from Jona will vary between those session types. Pitstops, for example, will only be handled during race sessions.
+
+The Virtual Race Engineer is handled by the "Race Engineer" plugin, which may be integrated by the different simulation game plugins, if they want to support Jona. This plugin will start *Race Engineer.exe*, which is located in the *Binaries* folder, as a subprocess, as long as you are out on a track. (Note for developers: The communication between those two processes uses named pipes. For more technical information, see the [technical information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#technical-information) section below).
 
 Most of the information, that Jona needs, will be collected from the telemetry information of the simulation game. Unfortunately, this data does not contain every required information, and also there are additional data and configuration information, which are required by Jona. For example, data is required to understand the given race situation and the corresponding telemetry information, and to precisely predict tyre pressures, fuel requirements, tyre compound recommendations, and so on. In the end, all that means, that some setup work is required, before you start your race. 
 
@@ -278,7 +280,7 @@ Note: Similar pitstop handling will be available for *rFactor 2* in the near fut
 
 ### Race & Setup database
 
-With the introduction of Release 2.6, Jona, the virtual race engineer, collects several data points from your races and saves them together with the associated tyre choice and start pressures, air and asphalt temperature and other environmental conditions in a local database. This information will then be used by future versions of Simulator Controller as a starting point for a setup in an upcoming race under the same or similar conditions. In order to build up a comprehensive collection of data on vehicles, tracks and environmental conditions as quickly as possible, Jona can integrate your data with the data of all other drivers, and in return will make the consolidated database available to all contributors.
+With the introduction of Release 2.6, Jona, the Virtual Race Engineer, collects several data points from your practice and race sessions (qualification sessions are not supported, since they often use special setups which will only be in the perfect window during the first few laps) and saves them together with the associated tyre choice and start pressures, air and asphalt temperature and other environmental conditions in a local database. This information will then be used by future versions of Simulator Controller as a starting point for a setup in an upcoming race under the same or similar conditions. In order to build up a comprehensive collection of data on vehicles, tracks and environmental conditions as quickly as possible, Jona can integrate your data with the data of all other drivers, and in return will make the consolidated database available to all contributors.
 
 Please note, that no information of your car setup (aero, dampers, geometry, and so on) is involved here, only tyre setup information is included. So you will not provide your crown jewels out to the public, thereby loosing your competetive advantage. A future version might allow this too, but only with your explicit consent.
 

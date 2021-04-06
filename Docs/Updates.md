@@ -82,7 +82,7 @@ Nothing major for this release, everything will be taken care of by the automate
 
 ## Release 2.5.4
 
-With this release, Jona is feature complete and therefore no longer to be considered in alpha stage. There still might be situations, where Jonas recommendations are wrong, so always double check, especially during important races. See the documentation on the [virtual race engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer), especially the chapter on [How it works](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#how-it-works) for updated information.
+With this release, Jona is feature complete and therefore no longer to be considered in alpha stage. There still might be situations, where Jonas recommendations are wrong, so always double check, especially during important races. See the documentation on the [Virtual Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer), especially the chapter on [How it works](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#how-it-works) for updated information.
 
 The format of the *Race Engineer.settings* file changed again and the [settings tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-engineer-settings) had been updated for the tyre compound selection rules. Please open the settings tool and check all values, especially for weather related tyre compound changes on upcoming pitstops, and leave the dialog by pressing "Ok".
 

@@ -4,7 +4,7 @@
   2. Documentation updates, as always
   3. New plugin "Race Engineer" to handle Jona for different simulation games
      - Some of the *raceEngineer...* plugin parameters of the "ACC" plugin has been moved to the new "Race Engineer" plugin. See the new new documentation on the ["Race Engineer" plugin](*) for more information.
-  4. Integration of Jona, the virtual race engineer, for *RaceRoom Racing Experience*. No support for actual pitstop handling yet, and actually, this might never come due to limitations in the UI and API design of *RaceRoom Racing Experience*.
+  4. Integration of Jona, the Virtual Race Engineer, for *RaceRoom Racing Experience*. No support for actual pitstop handling yet, and actually, this might never come due to limitations in the UI and API design of *RaceRoom Racing Experience*.
   5. Initial version of Jona for rFactor 2 too. Support for pitstop handling will be added in a future release.
   6. Jona is now also active in practice sessions but does not support pitstop planning and preparation there.
   7. (Developer only): Documentation for the configuration tool plugin interface has been added. Please take a look here: [Customizing the Configuration Tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts#customizing-the-configuration-tool) and also the [updated documentation](*) in the *Classes Reference* for more information.
@@ -122,7 +122,7 @@
 
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. Introduction of the **alpha** version of Jona, the AI based virtual race engineer. See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer) for a comprehensive overview of Jona.
+  3. Introduction of the **alpha** version of Jona, the AI based Virtual Race Engineer. See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer) for a comprehensive overview of Jona.
   4. A new plugin "Pedal Calibration" allows you to dial in different calibration curves for your high end pedals (Heusinkveld) directly from the Button Box. An adoption to a different pedal vendor is possible without much effort.
   5. A lot of new stuff for developers:
      - A hybrid rule engine, which supports production rules like OPS5 and reduction rules like in Prolog. The rules are fully integrated with the AutoHotkey scripting language, thereby creating a rich, hybrid programming environment

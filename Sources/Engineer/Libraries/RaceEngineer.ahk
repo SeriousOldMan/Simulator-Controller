@@ -25,6 +25,12 @@
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+global kSessionFinished = 0
+global kSessionPaused = -1
+global kSessionPractice = 1
+global kSessionQualification = 2
+global kSessionRace = 3
+
 global kFront = 0
 global kRear = 1
 global kLeft = 2
@@ -70,6 +76,9 @@ class RaceEngineer extends ConfigurationItem {
 	iContinuation := false
 	
 	iDriverName := "John"
+	
+	iSimulator := ""
+	iSession := kSessionFinished
 	
 	iEnoughData := false
 	
@@ -254,6 +263,18 @@ class RaceEngineer extends ConfigurationItem {
 	Debug[option] {
 		Get {
 			return (this.iDebug & option)
+		}
+	}
+	
+	Simulator[] {
+		Get {
+			return this.iSimulator
+		}
+	}
+	
+	Session[] {
+		Get {
+			return this.iSession
 		}
 	}
 	
@@ -650,27 +671,45 @@ class RaceEngineer extends ConfigurationItem {
 				case "PitstopPlan":
 					this.iContinuation := false
 					
-					this.getSpeaker().speakPhrase("Confirm")
-					
-					this.planPitstopRecognized(words)
+					if !this.supportsPitstop()
+						this.getSpeaker().speakPhrase("NoPitstop")
+					else {
+						this.getSpeaker().speakPhrase("Confirm")
+						
+						this.planPitstopRecognized(words)
+					}
 				case "PitstopPrepare":
 					this.iContinuation := false
 					
-					this.getSpeaker().speakPhrase("Confirm")
 					
-					this.preparePitstopRecognized(words)
+					if !this.supportsPitstop()
+						this.getSpeaker().speakPhrase("NoPitstop")
+					else {
+						this.getSpeaker().speakPhrase("Confirm")
+					
+						this.preparePitstopRecognized(words)
+					}
 				case "PitstopAdjustFuel":
 					this.iContinuation := false
 					
-					this.pitstopAdjustFuelRecognized(words)
+					if !this.supportsPitstop()
+						this.getSpeaker().speakPhrase("NoPitstop")
+					else
+						this.pitstopAdjustFuelRecognized(words)
 				case "PitstopAdjustCompound":
 					this.iContinuation := false
 					
-					this.pitstopAdjustCompoundRecognized(words)
+					if !this.supportsPitstop()
+						this.getSpeaker().speakPhrase("NoPitstop")
+					else
+						this.pitstopAdjustCompoundRecognized(words)
 				case "PitstopAdjustPressureUp", "PitstopAdjustPressureDown":
 					this.iContinuation := false
 					
-					this.pitstopAdjustPressureRecognized(words)
+					if !this.supportsPitstop()
+						this.getSpeaker().speakPhrase("NoPitstop")
+					else
+						this.pitstopAdjustPressureRecognized(words)
 				case "PitstopNoPressureChange":
 					this.iContinuation := false
 					
@@ -678,11 +717,17 @@ class RaceEngineer extends ConfigurationItem {
 				case "PitstopAdjustRepairSuspension":
 					this.iContinuation := false
 					
-					this.pitstopAdjustRepairRecognized("Suspension", words)
+					if !this.supportsPitstop()
+						this.getSpeaker().speakPhrase("NoPitstop")
+					else
+						this.pitstopAdjustRepairRecognized("Suspension", words)
 				case "PitstopAdjustRepairBodywork":
 					this.iContinuation := false
 					
-					this.pitstopAdjustRepairRecognized("Bodywork", words)
+					if !this.supportsPitstop()
+						this.getSpeaker().speakPhrase("NoPitstop")
+					else
+						this.pitstopAdjustRepairRecognized("Bodywork", words)
 				default:
 					Throw "Unknown grammar """ . grammar . """ detected in RaceEngineer.phraseRecognized...."
 			}
@@ -1100,12 +1145,14 @@ class RaceEngineer extends ConfigurationItem {
 		this.iContinuation := continuation
 	}
 	
-	createRace(data) {
+	createSession(data) {
 		local facts
 		
 		settings := this.RaceSettings
 		
 		this.iDriverName := getConfigurationValue(data, "Stint Data", "DriverForname", this.DriverName)
+		this.iSimulator := getConfigurationValue(data, "Race Data", "Simulator", "")
+		this.iSession := getConfigurationValue(data, "Stint Data", "Session", "Other")
 		
 		dataDuration := Round((getConfigurationValue(data, "Stint Data", "RaceTimeRemaining", 0) + getConfigurationValue(data, "Stint Data", "LapLastTime", 0)) / 1000)
 		settingsDuration := getConfigurationValue(settings, "Race Settings", "Duration", dataDuration)
@@ -1158,13 +1205,13 @@ class RaceEngineer extends ConfigurationItem {
 		return facts
 	}
 	
-	startRace(data) {
+	startSession(data) {
 		local facts
 		
 		if !IsObject(data)
 			data := readConfiguration(data)
 		
-		facts := this.createRace(data)
+		facts := this.createSession(data)
 		
 		FileRead engineerRules, % getFileName("Race Engineer.rules", kConfigDirectory, kUserConfigDirectory)
 		
@@ -1190,7 +1237,7 @@ class RaceEngineer extends ConfigurationItem {
 			dumpKnowledge(this.KnowledgeBase)
 	}
 	
-	finishRace() {
+	finishSession() {
 		this.iLastLap := 0
 		this.iOverallTime := 0
 		this.iLastFuelAmount := 0
@@ -1201,31 +1248,38 @@ class RaceEngineer extends ConfigurationItem {
 			if this.Speaker {
 				this.getSpeaker().speakPhrase("Bye")
 				
-				if this.Listener {
+				if (this.Listener && ((this.Session == kSessionPractice) || (this.Session == kSessionRace))) {
 					this.getSpeaker().speakPhrase("ConfirmUpdateSetupDatabase")
 					
 					this.setContinuation(ObjBindMethod(this, "updateSetupDatabase", true))
 					
-					callback := ObjBindMethod(this, "forceFinishRace")
+					callback := ObjBindMethod(this, "forceFinishSession")
 					SetTimer %callback%, -60000
 				}
 				else {
-					this.updateSetupDatabase()
+					if ((this.Session == kSessionPractice) || (this.Session == kSessionRace))
+						this.updateSetupDatabase()
 				
 					this.iKnowledgeBase := false
 				}
 			}
 			else {
-				this.updateSetupDatabase()
+				if ((this.Session == kSessionPractice) || (this.Session == kSessionRace))
+					this.updateSetupDatabase()
 			
 				this.iKnowledgeBase := false
 			}
+			
+		this.iSimulator := ""
+		this.iSession := kSessionFinished
 	}
 	
-	forceFinishRace() {
+	forceFinishSession() {
 		if !this.SetupDataActive {
 			this.iKnowledgeBase := false
 			this.iSetupData := false
+			this.iSimulator := ""
+			this.iSession := kSessionFinished
 		}	
 	}
 	
@@ -1238,7 +1292,7 @@ class RaceEngineer extends ConfigurationItem {
 			data := readConfiguration(data)
 		
 		if !this.KnowledgeBase
-			this.startRace(data)
+			this.startSession(data)
 		
 		knowledgeBase := this.KnowledgeBase
 		
@@ -1613,12 +1667,23 @@ class RaceEngineer extends ConfigurationItem {
 		return this.KnowledgeBase.getValue("Pitstop.Prepared", false)
 	}
 	
+	supportsPitstop() {
+		return ((this.Session == kSessionRace) && (this.Simulator = "ACC"))
+	}
+	
 	planPitstop(options := true, confirm := true) {
 		local knowledgeBase := this.KnowledgeBase
 		local compound
 		
 		if !this.hasEnoughData()
-			return
+			return false
+		
+		if !this.supportsPitstop() {
+			if this.Speaker
+				this.Speaker.speakPhrase("NoPitstop")
+			
+			return false
+		}
 	
 		knowledgeBase.addFact("Pitstop.Plan", ((options == true) || !options.HasKey("Update") || !options.Update) ? true : false)
 	
@@ -1723,13 +1788,20 @@ class RaceEngineer extends ConfigurationItem {
 	}
 	
 	preparePitstop(lap := false) {
+		if !this.supportsPitstop() {
+			if this.Speaker
+				this.Speaker.speakPhrase("NoPitstop")
+			
+			return false
+		}
+		
 		if !this.hasPlannedPitstop() {
 			if this.Speaker {
 				speaker := this.getSpeaker()
 
 				speaker.speakPhrase("MissingPlan")
 				
-				if this.Listener {
+				if (this.Listener && this.supportsPitstop()) {
 					speaker.speakPhrase("ConfirmPlan")
 				
 					this.setContinuation(ObjBindMethod(this, "planPitstop"))
@@ -1789,7 +1861,7 @@ class RaceEngineer extends ConfigurationItem {
 			
 			speaker.speakPhrase((remainingLaps <= 2) ? "VeryLowFuel" : "LowFuel", {laps: remainingLaps})
 						
-			if this.Listener {
+			if (this.Listener && this.supportsPitstop()) {
 				if this.hasPreparedPitstop()
 					speaker.speakPhrase((remainingLaps <= 2) ? "LowComeIn" : "ComeIn")
 				else if !this.hasPlannedPitstop() {
@@ -1834,7 +1906,7 @@ class RaceEngineer extends ConfigurationItem {
 			if repair {
 				speaker.speakPhrase("RepairPitstop", {laps: stintLaps, delta: delta})
 		
-				if this.Listener {
+				if (this.Listener && this.supportsPitstop()) {
 					speaker.speakPhrase("ConfirmPlan")
 				
 					this.setContinuation(ObjBindMethod(this, "planPitstop"))
@@ -1861,7 +1933,7 @@ class RaceEngineer extends ConfigurationItem {
 			speaker.speakPhrase((recommendedCompound = "Wet") ? "WeatherRainChange" : "WeatherDryChange"
 							  , {minutes: minutes, compound: fragments[recommendedCompound]})
 			
-			if this.Listener {
+			if (this.Listener && this.supportsPitstop()) {
 				speaker.speakPhrase("ConfirmPlan")
 			
 				this.setContinuation(ObjBindMethod(this, "planPitstop"))

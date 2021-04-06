@@ -129,7 +129,7 @@ inline void printData2(const string name, const T(&v)[S][S2])
 
 }
 
-inline const string printWeather(ACC_RAIN_INTENSITY weather) {
+inline const string getWeather(ACC_RAIN_INTENSITY weather) {
 	switch (weather) {
 	case ACC_NO_RAIN:
 		return "Dry";
@@ -151,6 +151,23 @@ inline const string printWeather(ACC_RAIN_INTENSITY weather) {
 		break;
 	default:
 		return "Unknown";
+		break;
+	}
+}
+
+inline const string getSession(AC_SESSION_TYPE session) {
+	switch (session) {
+	case AC_PRACTICE:
+		return "Practice";
+		break;
+	case AC_QUALIFY:
+		return "Qualification";
+		break;
+	case AC_RACE:
+		return "Race";
+		break;
+	default:
+		return "Other";
 		break;
 	}
 }
@@ -188,7 +205,7 @@ int main(int argc, char* argv[])
 
 		printData("Active", ((gf->status == AC_LIVE) || (gf->status == AC_PAUSE)) ? "true" : "false");
 		printData("Paused", (gf->status == AC_PAUSE) ? "true" : "false");
-		printData("Session", (gf->session == AC_RACE) ? "RACE" : ((gf->session == AC_QUALIFY) ? "QUALIFY" : "OTHER"));
+		printData("Session", getSession(gf->session));
 		wcout << "DriverForname=" << sf->playerName << endl;
 		wcout << "DriverSurname=" << sf->playerSurname << endl;
 		wcout << "DriverNickname=" << sf->playerNick << endl;
@@ -214,7 +231,11 @@ int main(int argc, char* argv[])
 		printData("Temperature", pf->roadTemp);
 
 		_bstr_t ts(gf->trackStatus);
-		const char* trackStatus = ts;
+		char* trackStatus = ts;
+		
+		trackStatus[0] = toupper(trackStatus[0]);
+		for (int i = 1; trackStatus[i] != '\0'; ++i)
+			trackStatus[i] = tolower(trackStatus[i]);
 
 		printData("Grip", trackStatus);
 	}
@@ -241,9 +262,9 @@ int main(int argc, char* argv[])
 		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
 		printData("Temperature", pf->airTemp);
-		printData("Weather", printWeather(gf->rainIntensity));
-		printData("Weather10min", printWeather(gf->rainIntensityIn10min));
-		printData("Weather30min", printWeather(gf->rainIntensityIn30min));
+		printData("Weather", getWeather(gf->rainIntensity));
+		printData("Weather10min", getWeather(gf->rainIntensityIn10min));
+		printData("Weather30min", getWeather(gf->rainIntensityIn30min));
 	}
 
 	if ((argc == 1) || strchr(argv[1], 'R'))

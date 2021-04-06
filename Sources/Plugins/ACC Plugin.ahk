@@ -105,7 +105,7 @@ class ACCPlugin extends ControllerPlugin {
 			
 			for ignore, theAction in this.Actions
 				if isInstance(theAction, ACCPlugin.RaceEngineerAction)
-					if ((sessionState != kSessionFinished) && (sessionState != kSessionPaused)) {
+					if (sessionState == kSessionRace) {
 						theAction.Function.enable(kAllTrigger)
 						theAction.Function.setText(translate(theAction.Label))
 					}

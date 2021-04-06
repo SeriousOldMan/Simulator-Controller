@@ -174,13 +174,13 @@ int main()
     if (mapped_r3e) {
         wprintf_s(L"Paused=%S\n", map_buffer->game_paused ? "true" : "false");
         if (map_buffer->session_type == R3E_SESSION_QUALIFY)
-            wprintf_s(L"Session=QUALIFICATION\n");
+            wprintf_s(L"Session=Qualification\n");
         else if (map_buffer->session_type == R3E_SESSION_RACE)
-            wprintf_s(L"Session=RACE\n");
+            wprintf_s(L"Session=Race\n");
         else if (map_buffer->session_type == R3E_SESSION_PRACTICE)
-            wprintf_s(L"Session=PRACTICE\n");
+            wprintf_s(L"Session=Practice\n");
         else
-            wprintf_s(L"Session=OTHER\n");
+            wprintf_s(L"Session=Other\n");
 		
 		if (strchr((char *)map_buffer->player_name, ' ')) {		
 			char forName[100];
@@ -224,7 +224,7 @@ int main()
 
     wprintf_s(L"[Track Data]\n");
     wprintf_s(L"Temperature=26\n");
-    wprintf_s(L"Grip=OPTIMUM\n");
+    wprintf_s(L"Grip=Optimum\n");
 
     wprintf_s(L"[Weather Data]\n");
     wprintf_s(L"Temperature=24\n");

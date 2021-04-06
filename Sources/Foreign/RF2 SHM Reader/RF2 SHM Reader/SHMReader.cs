@@ -81,13 +81,13 @@ namespace RF2SHMReader {
 				string session;
 
 				if (scoring.mScoringInfo.mSession >= 10 && scoring.mScoringInfo.mSession <= 13)
-					session = "RACE";
-				else if (scoring.mScoringInfo.mSession >= 1 && scoring.mScoringInfo.mSession <= 4)
-					session = "PRACTICE";
-				else if (scoring.mScoringInfo.mSession >= 1 && scoring.mScoringInfo.mSession <= 4)
-					session = "QUALIFICATION";
+					session = "Race";
+				else if (scoring.mScoringInfo.mSession >= 0 && scoring.mScoringInfo.mSession <= 4)
+					session = "Practice";
+				else if (scoring.mScoringInfo.mSession >= 5 && scoring.mScoringInfo.mSession <= 8)
+					session = "Qualification";
 				else
-					session = "OTHER";
+					session = "Other";
 
 				Console.Write("Session="); Console.WriteLine(session);
 
@@ -146,7 +146,7 @@ namespace RF2SHMReader {
 			Console.WriteLine("[Track Data]");
 
 			if (connected) {
-				Console.WriteLine("Grip=OPTIMUM");
+				Console.WriteLine("Grip=Optimum");
 				Console.Write("Temperature="); Console.WriteLine(scoring.mScoringInfo.mTrackTemp);
 			}
 

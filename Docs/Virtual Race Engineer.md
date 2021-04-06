@@ -396,7 +396,7 @@ A considerable part of the knowledge of Jona comes from the telemetry informatio
 	[Stint Data]
 	Active=true
 	Paused=false
-	Session=RACE
+	Session=Race
 	DriverForname=The
 	DriverSurname=BigO
 	DriverNickname=TBO
@@ -410,7 +410,7 @@ A considerable part of the knowledge of Jona comes from the telemetry informatio
 	InPit=false
 	[Track Data]
 	Temperature=25.5913
-	Grip=OPTIMUM
+	Grip=Optimum
 	[Pitstop Data]
 	TyreSet=2
 	FuelAmount=0

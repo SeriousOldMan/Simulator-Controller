@@ -14,7 +14,7 @@ global kRaceEngineerPlugin = "Race Engineer"
 global kSessionFinished = 0
 global kSessionPaused = -1
 global kSessionPractice = 1
-global kSessionQualifying = 2
+global kSessionQualification = 2
 global kSessionRace = 3
 
 global kFront = 0
@@ -61,12 +61,12 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 			this.callRemote("shutdown", arguments*)
 		}
 		
-		startRace(arguments*) {
-			this.callRemote("startRace", arguments*)
+		startSession(arguments*) {
+			this.callRemote("startSession", arguments*)
 		}
 		
-		finishRace(arguments*) {
-			this.callRemote("finishRace", arguments*)
+		finishSession(arguments*) {
+			this.callRemote("finishSession", arguments*)
 		}
 		
 		addLap(arguments*) {
@@ -295,7 +295,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 						theAction.Function.setText(translate(theAction.Label), "Gray")
 					}
 				}
-				else if ((sessionState != kSessionFinished) && (sessionState != kSessionPaused) && (this.RaceEngineer != false)) {
+				else if ((sessionState == kSessionRace) && (this.RaceEngineer != false)) {
 					theAction.Function.enable(kAllTrigger)
 					theAction.Function.setText(translate(theAction.Label))
 				}
@@ -313,7 +313,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 		this.iRaceEngineerEnabled := false
 		
 		if this.RaceEngineer
-			this.finishRace()
+			this.finishSession()
 	}
 	
 	startupRaceEngineer() {
@@ -371,19 +371,19 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 			raceEngineer.shutdown()
 	}
 	
-	startRace(dataFile) {
+	startSession(dataFile) {
 		if this.RaceEngineer
-			this.finishRace(false)
+			this.finishSession(false)
 		else
 			this.startupRaceEngineer()
 	
 		if this.RaceEngineer
-			this.RaceEngineer.startRace(dataFile)
+			this.RaceEngineer.startSession(dataFile)
 	}
 	
-	finishRace(shutdown := true) {
+	finishSession(shutdown := true) {
 		if this.RaceEngineer {
-			this.RaceEngineer.finishRace()
+			this.RaceEngineer.finishSession()
 			
 			if shutdown
 				this.shutdownRaceEngineer()
@@ -493,12 +493,21 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 			if !data
 				data := readSharedMemory(this.Simulator.Code, kUserHomeDirectory . "Temp\" . this.Simulator.Code . " Data\SHM.data")
 			
-			active := getConfigurationValue(data, "Stint Data", "Active", false)
-			
-			if (active && getConfigurationValue(data, "Stint Data", "Paused", false))
-				return kSessionPaused
-			else if (active && (getConfigurationValue(data, "Stint Data", "Session", "OTHER") = "RACE"))
-				return kSessionRace
+			if getConfigurationValue(data, "Stint Data", "Active", false) {
+				if getConfigurationValue(data, "Stint Data", "Paused", false)
+					return kSessionPaused
+				else
+					switch getConfigurationValue(data, "Stint Data", "Session", "Other") {
+						case "Race":
+							return kSessionRace
+						case "Practice":
+							return kSessionPractice
+						case "Qualification":
+							return kSessionQualification
+						default:
+							return kSessionOther
+					}
+			}
 			else
 				return kSessionFinished
 		}
@@ -562,7 +571,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 					lastLap := 0
 			
 					if this.RaceEngineer
-						this.finishRace()
+						this.finishSession()
 					
 					return
 				}
@@ -573,7 +582,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 					lastLap := 0
 			
 					if this.RaceEngineer
-						this.finishRace()
+						this.finishSession()
 				}
 				
 				if this.RaceEngineerEnabled {
@@ -605,7 +614,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 						writeConfiguration(newDataFile, data)		; FileCopy %dataFile%, %newDataFile%, 1
 						
 						if firstLap
-							this.startRace(newDataFile)
+							this.startSession(newDataFile)
 						
 						if newLap
 							this.addLap(dataLastLap, newDataFile)
@@ -634,7 +643,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 			lastLap := 0
 		
 			if this.RaceEngineer
-				this.finishRace()
+				this.finishSession()
 			
 			this.updateSessionState(kSessionFinished)
 		}
@@ -705,8 +714,6 @@ readSharedMemory(simulator, dataFile) {
 	
 	try {
 		RunWait %ComSpec% /c ""%exePath%" > "%dataFile%"", , Hide
-		
-		; IniWrite %simulator%, %dataFile%, Race Data, Simulator
 	}
 	catch exception {
 		logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% SHM Reader ("), {simulator: simulator})

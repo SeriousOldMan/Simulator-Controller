@@ -888,7 +888,7 @@ else {
 			}
 		}
 		
-		engineer.finishRace()
+		engineer.finishSession()
 		
 		while engineer.KnowledgeBase
 			Sleep 1000

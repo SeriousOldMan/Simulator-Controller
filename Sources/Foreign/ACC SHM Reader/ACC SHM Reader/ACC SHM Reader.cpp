@@ -213,10 +213,16 @@ int main(int argc, char* argv[])
 		printData("LapLastTime", gf->iLastTime);
 		printData("LapBestTime", gf->iBestTime);
 
-		printData("RaceLapsRemaining", gf->sessionTimeLeft / gf->iLastTime);
-		printData("RaceTimeRemaining", gf->sessionTimeLeft);
-		printData("StintTimeRemaining", gf->DriverStintTimeLeft < 0 ? gf->sessionTimeLeft : gf->DriverStintTimeLeft);
-		printData("DriverTimeRemaining", gf->DriverStintTotalTimeLeft < 0 ? gf->sessionTimeLeft : gf->DriverStintTotalTimeLeft);
+		double timeLeft = gf->sessionTimeLeft;
+
+		if (timeLeft < 0) {
+			timeLeft = 3600.0 * 1000;
+		}
+
+		printData("RaceLapsRemaining", timeLeft / gf->iLastTime);
+		printData("RaceTimeRemaining", timeLeft);
+		printData("StintTimeRemaining", gf->DriverStintTimeLeft < 0 ? timeLeft : gf->DriverStintTimeLeft);
+		printData("DriverTimeRemaining", gf->DriverStintTotalTimeLeft < 0 ? timeLeft : gf->DriverStintTotalTimeLeft);
 		printData("InPit", gf->isInPit ? "true" : "false");
 
 	}

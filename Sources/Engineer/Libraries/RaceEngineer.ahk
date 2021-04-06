@@ -1153,7 +1153,17 @@ class RaceEngineer extends ConfigurationItem {
 		
 		this.iDriverName := getConfigurationValue(data, "Stint Data", "DriverForname", this.DriverName)
 		this.iSimulator := getConfigurationValue(data, "Race Data", "Simulator", "")
-		this.iSession := getConfigurationValue(data, "Stint Data", "Session", "Other")
+		
+		switch getConfigurationValue(data, "Stint Data", "Session", "Other") {
+			case "Practice":
+				this.iSession := kSessionPractice
+			case "Qualification":
+				this.iSession := kSessionQualification
+			case "Race":
+				this.iSession := kSessionRace
+			case "Other":
+				this.iSession := kSessionOther
+		}
 		
 		dataDuration := Round((getConfigurationValue(data, "Stint Data", "RaceTimeRemaining", 0) + getConfigurationValue(data, "Stint Data", "LapLastTime", 0)) / 1000)
 		settingsDuration := getConfigurationValue(settings, "Race Settings", "Duration", dataDuration)

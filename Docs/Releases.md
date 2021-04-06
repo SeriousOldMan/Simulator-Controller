@@ -3,10 +3,10 @@
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. New plugin "Race Engineer" to handle Jona for different simulation games
-     - Some of the *raceEngineer...* plugin parameters of the "ACC" plugin has been moved to the new "Race Engineer" plugin
-  4. Integration of Jona, the virtual race engineer, for RaceRoom Racing Experience
-  5. Initial version of Jona for rFactor 2 too
-  6. Doumentation for the configuration tool plugin interface
+     - Some of the *raceEngineer...* plugin parameters of the "ACC" plugin has been moved to the new "Race Engineer" plugin. See the new new documentation on the ["Race Engineer" plugin](*) for more information.
+  4. Integration of Jona, the virtual race engineer, for *RaceRoom Racing Experience*. No support for actual pitstop handling yet, and actually, this might never come due to limitations in the UI and API design of *RaceRoom Racing Experience*.
+  5. Initial version of Jona for rFactor 2 too. Support for pitstop handling will be added in a future release.
+  6. (Developer only): Documentation for the configuration tool plugin interface has been added. Please take a look here: [Customizing the Configuration Tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts#customizing-the-configuration-tool) and also the [updated documentation](*) in the *Classes Reference* for more information.
   
 ## 2.7-release 04/01/21
 

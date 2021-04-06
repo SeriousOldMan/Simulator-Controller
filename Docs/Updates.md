@@ -50,6 +50,7 @@ As always, must of the update work in this release will be handled automatically
   1. The plugin "RRE" had been renamed to "R3E". The update to the configuration will handle this and will also update the start hook from "startRRE" to "startR3E" automatically. If you configured additional hooks for the *RaceRoom Racing Experience* plugin, you should rename them as well.
   2. This update introduces the integration of Jona with *rFactor 2* and *RaceRoom Racing Experience*. Therefore a lot of functionality, that had been private to the "ACC" plugin in the past, had been moved to a new plugin "Race Engineer", in order to make them available to other simulation plugins as well. Most of the initialization parameters of the "ACC" plugin for the Virtual Race Engineer have been moved to the new plugin as well. This is also handled by the update procedure, but you might want to have a look afterwards to check, if everything is correct. Please also take a look at the documentation for the new ["Race Engineer" plugin](*).
   3. There had been quite some changes for the internal data format of the telemtry information and also some changes in the AI kernel of Jona, but I don't think, that there is someone out there, who already worked on this stuff.
+  4. (Developer only): The *Simulator Tools.targets* file changed again, so you might have to mrge your local changes, if there are any.
 
 ***
 

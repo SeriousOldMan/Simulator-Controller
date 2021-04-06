@@ -477,6 +477,50 @@ updateCustomCalls(startNumber, endNumber) {
 	}
 }
 
+updateConfigurationForV28() {
+	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	userConfiguration := readConfiguration(userConfigurationFile)
+	
+	if (userConfiguration.Count() > 0) {
+		raceEngineerPlugin := new Plugin("Race Engineer", false, true)
+		
+		if getConfigurationValue(userConfiguration, "Plugins", "ACC", false) {
+			userPlugin := new Plugin("ACC", userConfiguration)
+		
+			for ignore, parameter in ["raceEngineer", "raceEngineerName", "raceEngineerLogo", "raceEngineerOpenSettings", "raceEngineerSettings"
+									, "raceEngineerImportSettings", "raceEngineerSpeaker", "raceEngineerListener"]
+				if userPlugin.hasArgument(parameter) {
+					value := userPlugin.getArgumentValue(parameter)
+
+					userPlugin.Arguments.Delete(parameter)
+					
+					if (parameter = "raceEngineerSettings")
+						parameter := "raceEngineerOpenSettings"
+					
+					raceEngineerPlugin.setArgumentValue(parameter, value)
+				}
+			
+			userPlugin.saveToConfiguration(userConfiguration)
+		}
+		
+		if getConfigurationValue(userConfiguration, "Plugins", "RRE", false) {
+			userPlugin := new Plugin("RRE", userConfiguration)
+			
+			userPlugin.iPlugin := "R3E"
+			
+			userPlugin.saveToConfiguration(userConfiguration)
+			removeConfigurationValue(userConfiguration, "Plugins", "RRE")
+		}
+		
+		if (getConfigurationValue(userConfiguration, "Application Hooks", "RaceRoom Racing Experience.Startup", false) = "startRRE")
+			setConfigurationValue(userConfiguration, "Application Hooks", "RaceRoom Racing Experience.Startup", "startR3E")
+			
+		raceEngineerPlugin.saveToConfiguration(userConfiguration)
+		
+		writeConfiguration(userConfigurationFile, userConfiguration)
+	}
+}
+
 updateConfigurationForV27() {
 	try {
 		FileDelete % kUserConfigDirectory . "CONSENT"

@@ -62,6 +62,10 @@ global vDamageStintLaps
 ;;;-------------------------------------------------------------------------;;;
 
 class TestRaceEngineer extends RaceEngineer {
+	supportsPitstop() {
+		return true
+	}
+	
 	lowFuelWarning(remainingLaps) {
 		base.lowFuelWarning(remainingLaps)
 		

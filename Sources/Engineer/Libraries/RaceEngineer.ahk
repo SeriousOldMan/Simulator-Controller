@@ -1156,7 +1156,7 @@ class RaceEngineer extends ConfigurationItem {
 		this.iDriverName := getConfigurationValue(data, "Stint Data", "DriverForname", this.DriverName)
 		this.iSimulator := getConfigurationValue(data, "Race Data", "Simulator", "")
 		
-		switch getConfigurationValue(data, "Stint Data", "Session", "Other") {
+		switch getConfigurationValue(data, "Stint Data", "Session", "Practice") {
 			case "Practice":
 				this.iSession := kSessionPractice
 			case "Qualification":
@@ -1714,7 +1714,7 @@ class RaceEngineer extends ConfigurationItem {
 		
 		if !this.supportsPitstop() {
 			if this.Speaker
-				this.Speaker.speakPhrase("NoPitstop")
+				this.getSpeaker().speakPhrase("NoPitstop")
 			
 			return false
 		}
@@ -1825,7 +1825,7 @@ class RaceEngineer extends ConfigurationItem {
 	preparePitstop(lap := false) {
 		if !this.supportsPitstop() {
 			if this.Speaker
-				this.Speaker.speakPhrase("NoPitstop")
+				this.getSpeaker().speakPhrase("NoPitstop")
 			
 			return false
 		}

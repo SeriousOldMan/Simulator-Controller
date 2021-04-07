@@ -604,7 +604,7 @@ priority: 10, [?Pitstop.Plan] => (Prove: planPitstop)
 {All: [?Pitstop.Plan], [?Fuel.Amount.Target], {None: [?Pitstop.Planned.Fuel]}} => (Set: Pitstop.Planned.Fuel, ?Fuel.Amount.Target)
 {All: [?Pitstop.Plan], [?Tyre.Compound.Target],																									\
 	  {None: [?Pitstop.Planned.Tyre.Compound]}} => (Set: Pitstop.Planned.Tyre.Compound, ?Tyre.Compound.Target),									\
-												   (Set: Pitstop.Planned.Tyre.Compound.Color, ?Tyre.Compound.Color.Target)
+												   (Set: Pitstop.Planned.Tyre.Compound.Color, !Tyre.Compound.Color.Target)
 {All: [?Pitstop.Plan], [?Tyre.Set.Target], {None: [?Pitstop.Planned.Tyre.Set]}} => (Set: Pitstop.Planned.Tyre.Set, ?Tyre.Set.Target)
 {All: [?Pitstop.Plan], [?Tyre.Pressure.Target.FL], {None: [?Pitstop.Planned.Tyre.Pressure.FL]}} =>												\
 		(Set: Pitstop.Planned.Tyre.Pressure.FL, ?Tyre.Pressure.Target.FL),																		\

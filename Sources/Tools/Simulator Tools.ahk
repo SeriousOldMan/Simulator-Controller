@@ -61,6 +61,8 @@ global vUpdateTargets = []
 global vCleanupTargets = []
 global vCopyTargets = []
 global vBuildTargets = []
+global vSpecialTargets = []
+
 global vSplashTheme = false
 
 global vTargetsCount = 0
@@ -149,10 +151,11 @@ viewFile(fileName, title := false, x := "Center", y := "Center", width := 800, h
 	Gui FV:-Border -Caption
 	Gui FV:Color, D0D0D0
 	Gui FV:Font, s10 Bold
-	Gui FV:Add, Text, x8 y8 W%innerWidth% +0x200 +0x1 BackgroundTrans gmoveFileViewer, %title%
+	Gui FV:Add, Text, x8 y8 W%innerWidth% +0x200 +0x1 BackgroundTrans gmoveFileViewer, % translate("Modular Simulator Controller System - Compiler")
 	Gui FV:Font
+	Gui FV:Add, Text, x8 yp+26 W%innerWidth% +0x200 +0x1 BackgroundTrans, %title%
 	
-	editHeight := height - 78
+	editHeight := height - 102
 	
 	Gui FV:Add, Edit, X8 YP+26 W%innerWidth% H%editHeight%, % text
 	
@@ -812,7 +815,7 @@ checkDependencies(dependencies, modification) {
 	return false
 }
 
-runExternalTargets(ByRef buildProgress) {
+runSpecialTargets(ByRef buildProgress) {
 	directories := getFileNames("*", kSourcesDirectory . "Foreign\")
 	count := directories.Length()
 	
@@ -825,17 +828,38 @@ runExternalTargets(ByRef buildProgress) {
 			SetWorkingDir %directory%
 			
 			for ignore, file in getFileNames("*.sln", directory . "\") {
-				SplitPath file, , , , targetName
+				success := true
+			
+				SplitPath file, , , , solution
 			
 				if !kSilentMode
-					showProgress({progress: ++buildProgress, message: translate("Compiling ") . targetName . translate("...")})
+					showProgress({progress: ++buildProgress, message: translate("Compiling ") . solution . translate("...")})
 				
-				RunWait %ComSpec% /c ""%msBuild%" "%file%" /p:BuildMode=Release /p:Configuration=Release > "%kUserHomeDirectory%Temp\build.out"", , Hide
+				try {
+					RunWait %ComSpec% /c ""%msBuild%" "%file%" /p:BuildMode=Release /p:Configuration=Release > "%kUserHomeDirectory%Temp\build.out"", , Hide
+					
+					if ErrorLevel {
+						success := false
+						
+						FileRead text, %kUserHomeDirectory%Temp\build.out
+						
+						if (StrLen(Trim(text)) == 0)
+							Throw "Error while compiling..."
+					}
+				}
+				catch exception {
+					logMessage(kLogCritical, translate("Cannot compile ") . solution . translate(" - Solution or MSBuild (") . msBuild . translate(") not found"))
+			
+					showMessage(substituteVariables(translate("Cannot compile %solution%: Solution or MSBuild (%msBuild%) not found..."), {solution: solution, msBuild: msBuild})
+							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+					
+					success := true
+				}
 				
-				if ErrorLevel {
+				if !success {
 					FileRead text, %kUserHomeDirectory%Temp\build.out
 					
-					viewFile(kUserHomeDirectory . "Temp\build.out", translate("Error while compiling ") . targetName, "Left", "Top", 800, 600)
+					viewFile(kUserHomeDirectory . "Temp\build.out", translate("Error while compiling ") . solution, "Left", "Top", 800, 600)
 				}
 			}
 		}
@@ -967,10 +991,10 @@ runCopyTargets(ByRef buildProgress) {
 	local title
 	
 	if !kSilentMode
-		showProgress({progress: buildProgress, message: translate("...")})
+		showProgress({progress: buildProgress, message: A_Space})
 	
 	for ignore, target in vCopyTargets {
-		targetName := target[1]
+		targetName := ConfigurationItem.splitDescriptor(target[1])[1]
 			
 		logMessage(kLogInfo, translate("Check ") . targetName)
 
@@ -1105,11 +1129,12 @@ prepareTargets(ByRef buildProgress, updateOnly) {
 	
 	if !updateOnly {
 		for target, arguments in getConfigurationSectionValues(targets, "Cleanup", Object()) {
+			targetName := ConfigurationItem.splitDescriptor(target)[1]
 			buildProgress += Floor(++counter / 20)
-			cleanup := (InStr(target, "*.bak") ? vCleanupSettings[target] : vCleanupSettings[ConfigurationItem.splitDescriptor(target)[1]])
+			cleanup := (InStr(target, "*.bak") ? vCleanupSettings[target] : vCleanupSettings[targetName])
 			
 			if !kSilentMode
-				showProgress({progress: buildProgress, message: target . ": " . (cleanup ? translate("Yes") : translate("No"))})
+				showProgress({progress: buildProgress, message: targetName . ": " . (cleanup ? translate("Yes") : translate("No"))})
 			
 			if cleanup {
 				arguments := substituteVariables(arguments)
@@ -1121,11 +1146,12 @@ prepareTargets(ByRef buildProgress, updateOnly) {
 		}
 		
 		for target, arguments in getConfigurationSectionValues(targets, "Copy", Object()) {
+			targetName := ConfigurationItem.splitDescriptor(target)[1]
 			buildProgress += Floor(++counter / 20)
-			copy := vCopySettings[ConfigurationItem.splitDescriptor(target)[1]]
+			copy := vCopySettings[targetName]
 			
 			if !kSilentMode
-				showProgress({progress: buildProgress, message: target . ": " . (copy ? translate("Yes") : translate("No"))})
+				showProgress({progress: buildProgress, message: targetName . ": " . (copy ? translate("Yes") : translate("No"))})
 			
 			if copy {
 				rule := string2Values("<-", substituteVariables(arguments))
@@ -1137,9 +1163,11 @@ prepareTargets(ByRef buildProgress, updateOnly) {
 		}
 		
 		for target, arguments in getConfigurationSectionValues(targets, "Build", Object()) {
-			if (arguments != "Special") {
+			if (arguments = "Special")
+				vSpecialTargets.Push(target)
+			else {
 				buildProgress += Floor(++counter / 20)
-				build := vBuildSettings[ConfigurationItem.splitDescriptor(target)[1]]
+				build := vBuildSettings[target]
 				
 				if !kSilentMode
 					showProgress({progress: buildProgress, message: target . ": " . (build ? translate("Yes") : translate("No"))})
@@ -1200,8 +1228,9 @@ startSimulatorTools() {
 	
 	prepareTargets(buildProgress, updateOnly)
 	
-	vTargetsCount := (vUpdateTargets.Length() + vCleanupTargets.Length() + vCopyTargets.Length() + (vBuildTargets.Length() * 2)
-											  + ((kMSBuildDirectory != "") ? getFileNames("*", kSourcesDirectory . "Foreign\").Length() : 0))
+	vTargetsCount := (vUpdateTargets.Length()
+					+ vCleanupTargets.Length() + vCopyTargets.Length() + (vBuildTargets.Length() * 2)
+					+ (((kMSBuildDirectory != "") && (vSpecialTargets.Length() > 0)) ? getFileNames("*", kSourcesDirectory . "Foreign\").Length() : 0))
 	
 	if !kSilentMode
 		showProgress({message: "", color: "Green", title: translate("Running Targets")})
@@ -1211,8 +1240,8 @@ startSimulatorTools() {
 	if !updateOnly {
 		runCleanTargets(buildProgress)
 		
-		if ((kMSBuildDirectory != "") && vBuildSettings["Foreign"])
-			runExternalTargets(buildProgress)
+		if ((kMSBuildDirectory != "") && (vSpecialTargets.Length() > 0))
+			runSpecialTargets(buildProgress)
 		
 		runCopyTargets(buildProgress)
 		runBuildTargets(buildProgress)

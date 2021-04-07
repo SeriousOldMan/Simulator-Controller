@@ -131,6 +131,74 @@ writeToolsConfiguration(updateSettings, cleanupSettings, copySettings, buildSett
 	writeConfiguration(kToolsConfigurationFile, configuration)
 }
 
+viewFile(fileName, title := false, x := "Center", y := "Center", width := 800, height := 400) {
+	static dismissed := false
+	
+	dismissed := false
+	
+	if !fileName {
+		dismissed := true
+	
+		return
+	}
+	
+	FileRead text, %fileName%
+	
+	innerWidth := width - 16
+	
+	Gui FV:-Border -Caption
+	Gui FV:Color, D0D0D0
+	Gui FV:Font, s10 Bold
+	Gui FV:Add, Text, x8 y8 W%innerWidth% +0x200 +0x1 BackgroundTrans gmoveFileViewer, %title%
+	Gui FV:Font
+	
+	editHeight := height - 78
+	
+	Gui FV:Add, Edit, X8 YP+26 W%innerWidth% H%editHeight%, % text
+	
+	SysGet mainScreen, MonitorWorkArea
+
+	if x is not integer
+		switch x {
+			case "Left":
+				x := 25
+			case "Right":
+				x := mainScreenRight - width - 25
+			default:
+				x := "Center"
+		}
+
+	if y is not integer
+		switch y {
+			case "Top":
+				y := 25
+			case "Bottom":
+				y := mainScreenBottom - height - 25
+			default:
+				y := "Center"
+		}
+	
+	buttonX := Round(width / 2) - 40
+	
+	Gui FV:Add, Button, Default X%buttonX% y+10 w80 gdismissFileViewer, % translate("Ok")
+	
+	Gui FV:+AlwaysOnTop
+	Gui FV:Show, X%x% Y%y% W%width% H%height% NoActivate
+	
+	while !dismissed
+		Sleep 100
+	
+	Gui FV:Destroy
+}
+
+moveFileViewer() {
+	moveByMouse("FV")
+}
+
+dismissFileViewer() {
+	viewFile(false)
+}
+
 saveTargets() {
 	editTargets(kSave)
 }
@@ -254,10 +322,10 @@ editTargets(command := "") {
 		if (vCleanupSettings.Length() > 8)
 			Throw "Too many cleanup targets detected in editTargets..."
 		
-		if (vCopySettings.Length() > 8)
+		if (vCopySettings.Length() > 16)
 			Throw "Too many copy targets detected in editTargets..."
 		
-		if (vBuildSettings.Length() > 8)
+		if (vBuildSettings.Length() > 16)
 			Throw "Too many build targets detected in editTargets..."
 		
 		Gui TE:-Border ; -Caption
@@ -744,6 +812,39 @@ checkDependencies(dependencies, modification) {
 	return false
 }
 
+runExternalTargets(ByRef buildProgress) {
+	directories := getFileNames("*", kSourcesDirectory . "Foreign\")
+	count := directories.Length()
+	
+	currentDirectory := A_WorkingDir
+
+	msBuild := kMSBuildDirectory . "MSBuild.exe"
+	
+	try {
+		for index, directory in directories {
+			SetWorkingDir %directory%
+			
+			for ignore, file in getFileNames("*.sln", directory . "\") {
+				SplitPath file, , , , targetName
+			
+				if !kSilentMode
+					showProgress({progress: ++buildProgress, message: translate("Compiling ") . targetName . translate("...")})
+				
+				RunWait %ComSpec% /c ""%msBuild%" "%file%" /p:BuildMode=Release /p:Configuration=Release > "%kUserHomeDirectory%Temp\build.out"", , Hide
+				
+				if ErrorLevel {
+					FileRead text, %kUserHomeDirectory%Temp\build.out
+					
+					viewFile(kUserHomeDirectory . "Temp\build.out", translate("Error while compiling ") . targetName, "Left", "Top", 800, 600)
+				}
+			}
+		}
+	}
+	finally {
+		SetWorkingDir %currentDirectory%
+	}
+}
+
 runUpdateTargets(ByRef buildProgress) {
 	for ignore, target in vUpdateTargets {
 		targetName := target[1]
@@ -1036,21 +1137,23 @@ prepareTargets(ByRef buildProgress, updateOnly) {
 		}
 		
 		for target, arguments in getConfigurationSectionValues(targets, "Build", Object()) {
-			buildProgress += Floor(++counter / 20)
-			build := vBuildSettings[ConfigurationItem.splitDescriptor(target)[1]]
-			
-			if !kSilentMode
-				showProgress({progress: buildProgress, message: target . ": " . (build ? translate("Yes") : translate("No"))})
-			
-			if build {
-				rule := string2Values("<-", substituteVariables(arguments))
+			if (arguments != "Special") {
+				buildProgress += Floor(++counter / 20)
+				build := vBuildSettings[ConfigurationItem.splitDescriptor(target)[1]]
 				
-				arguments := string2Values(";", rule[2])
+				if !kSilentMode
+					showProgress({progress: buildProgress, message: target . ": " . (build ? translate("Yes") : translate("No"))})
+				
+				if build {
+					rule := string2Values("<-", substituteVariables(arguments))
+					
+					arguments := string2Values(";", rule[2])
+				
+					vBuildTargets.Push(Array(target, arguments[1], rule[1], string2Values(",", arguments[2])))
+				}
 			
-				vBuildTargets.Push(Array(target, arguments[1], rule[1], string2Values(",", arguments[2])))
+				Sleep 50
 			}
-		
-			Sleep 50
 		}
 	}
 }
@@ -1097,7 +1200,8 @@ startSimulatorTools() {
 	
 	prepareTargets(buildProgress, updateOnly)
 	
-	vTargetsCount := (vUpdateTargets.Length() + vCleanupTargets.Length() + vCopyTargets.Length() + (vBuildTargets.Length() * 2))
+	vTargetsCount := (vUpdateTargets.Length() + vCleanupTargets.Length() + vCopyTargets.Length() + (vBuildTargets.Length() * 2)
+											  + ((kMSBuildDirectory != "") ? getFileNames("*", kSourcesDirectory . "Foreign\").Length() : 0))
 	
 	if !kSilentMode
 		showProgress({message: "", color: "Green", title: translate("Running Targets")})
@@ -1106,6 +1210,10 @@ startSimulatorTools() {
 	
 	if !updateOnly {
 		runCleanTargets(buildProgress)
+		
+		if ((kMSBuildDirectory != "") && vBuildSettings["Foreign"])
+			runExternalTargets(buildProgress)
+		
 		runCopyTargets(buildProgress)
 		runBuildTargets(buildProgress)
 	}

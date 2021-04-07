@@ -8,6 +8,7 @@
   5. Initial version of Jona for rFactor 2 too. Support for pitstop handling will be added in a future release.
   6. Jona is now also active in practice sessions but does not support pitstop planning and preparation there.
   7. (Developer only): Documentation for the configuration tool plugin interface has been added. Please take a look here: [Customizing the Configuration Tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts#customizing-the-configuration-tool) and also the [updated documentation](*) in the *Classes Reference* for more information.
+  8. (Developer only): The build pipeline of *Simulator Tools* now incorporates *VS MSBuild*, so that all external applications and DLLs will be automatically compiled too. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts#using-the-build-tool) on *Simulator Tools* for more information.
   
 ## 2.7-release 04/01/21
 

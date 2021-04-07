@@ -726,6 +726,15 @@ loadSimulatorConfiguration() {
 	else
 		logMessage(kLogWarn, translate("AutoHotkey path not set"))
 	
+	path := getConfigurationValue(kSimulatorConfiguration, "Configuration", "MSBuild Path")
+	if path {
+		kMSBuildDirectory := path . "\"
+		
+		logMessage(kLogInfo, translate("MSBuild path set to ") . path)
+	}
+	else
+		logMessage(kLogWarn, translate("MSBuild path not set"))
+	
 	path := getConfigurationValue(kSimulatorConfiguration, "Configuration", "NirCmd Path")
 	if path {
 		kNirCmd := path . "\NirCmd.exe"
@@ -1281,7 +1290,7 @@ getFileNames(filePattern, directories*) {
 	files := []
 	
 	for ignore, directory in directories
-		Loop Files, % directory . filePattern
+		Loop Files, % directory . filePattern, FD
 			files.Push(A_LoopFileLongPath)
 	
 	return files

@@ -500,6 +500,7 @@ global startWithWindowsCheck
 global silentModeCheck
 
 global ahkPathEdit
+global msBuildPathEdit
 global debugEnabledCheck
 global logLevelDropDown
 
@@ -581,18 +582,22 @@ class GeneralTab extends ConfigurationItem {
 			Gui %window%:Font, Norm, Arial
 			Gui %window%:Font, Italic, Arial
 			
-			Gui %window%:Add, GroupBox, x16 y410 w458 h95, % translate("Development")
+			Gui %window%:Add, GroupBox, x16 y388 w458 h119, % translate("Development")
 			
 			Gui %window%:Font, Norm, Arial
 			
-			Gui %window%:Add, Text, x24 y427 w160 h23 +0x200, % translate("AutoHotkey Folder")
-			Gui %window%:Add, Edit, x224 y427 w214 h21 VahkPathEdit, %ahkPathEdit%
-			Gui %window%:Add, Button, x440 y426 w23 h23 gchooseAHKPath, % translate("...")
+			Gui %window%:Add, Text, x24 y405 w160 h23 +0x200, % translate("AutoHotkey Folder")
+			Gui %window%:Add, Edit, x224 y406 w214 h21 VahkPathEdit, %ahkPathEdit%
+			Gui %window%:Add, Button, x440 y404 w23 h23 gchooseAHKPath, % translate("...")
 			
-			Gui %window%:Add, Text, x24 y451 w160 h23 +0x200, % translate("Debug")
-			Gui %window%:Add, CheckBox, x224 y451 w242 h23 Checked%debugEnabledCheck% VdebugEnabledCheck, % translate("Enabled?")
+			Gui %window%:Add, Text, x24 y429 w160 h23 +0x200, % translate("MSBuild Bin Folder")
+			Gui %window%:Add, Edit, x224 y429 w214 h21 VmsBuildPathEdit, %msBuildPathEdit%
+			Gui %window%:Add, Button, x440 y428 w23 h23 gchooseMSBuildPath, % translate("...")
 			
-			Gui %window%:Add, Text, x24 y475 w160 h23 +0x200, % translate("Log Level")
+			Gui %window%:Add, Text, x24 y453 w160 h23 +0x200, % translate("Debug")
+			Gui %window%:Add, CheckBox, x226 y451 w242 h23 Checked%debugEnabledCheck% VdebugEnabledCheck, % translate("Enabled?")
+			
+			Gui %window%:Add, Text, x24 y477 w160 h23 +0x200, % translate("Log Level")
 			
 			choices := ["Info", "Warn", "Critical", "Off"]
 			
@@ -601,7 +606,7 @@ class GeneralTab extends ConfigurationItem {
 			if !chosen
 				chosem := 2
 				
-			Gui %window%:Add, DropDownList, x224 y475 w91 Choose%chosen% VlogLevelDropDown, % values2String("|", map(choices, "translate")*)
+			Gui %window%:Add, DropDownList, x224 y477 w91 Choose%chosen% VlogLevelDropDown, % values2String("|", map(choices, "translate")*)
 		}
 	}
 	
@@ -617,6 +622,7 @@ class GeneralTab extends ConfigurationItem {
 		
 		if this.iDevelopment {
 			ahkPathEdit := getConfigurationValue(configuration, "Configuration", "AHK Path", "")
+			msBuildPathEdit := getConfigurationValue(configuration, "Configuration", "MSBuild Path", "")
 			debugEnabledCheck := getConfigurationValue(configuration, "Configuration", "Debug", false)
 			logLevelDropDown := getConfigurationValue(configuration, "Configuration", "Log Level", "Warn")
 		}
@@ -657,10 +663,12 @@ class GeneralTab extends ConfigurationItem {
 		
 		if this.iDevelopment {
 			GuiControlGet ahkPathEdit
+			GuiControlGet msBuildPathEdit
 			GuiControlGet debugEnabledCheck
 			GuiControlGet logLevelDropDown
 		
 			setConfigurationValue(configuration, "Configuration", "AHK Path", ahkPathEdit)
+			setConfigurationValue(configuration, "Configuration", "MSBuild Path", msBuildPathEdit)
 			setConfigurationValue(configuration, "Configuration", "Debug", debugEnabledCheck)
 			
 			choices := ["Info", "Warn", "Critical", "Off"]
@@ -1757,6 +1765,20 @@ chooseAHKPath() {
 	
 		if (directory != "")
 			GuiControl Text, ahkPathEdit, %directory%
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+chooseMSBuildPath() {
+	protectionOn()
+	
+	try{
+		FileSelectFolder directory, *%msBuildPathEdit%, 0, % translate("Select MSBuild Bin folder...")
+	
+		if (directory != "")
+			GuiControl Text, msBuildPathEdit, %directory%
 	}
 	finally {
 		protectionOff()

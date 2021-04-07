@@ -165,7 +165,7 @@ Therefore it can be very annoying to track down errors in AutoHotkey. But there 
 
 ## Using the Build Tool
 
-A simple build tool is part of the Simulator Controller distribution. It is rule based like the good old Unix make tool and will compile all the applications, that are part of Simulator Controller and put them in the *Binaries* folder. Additionaly, you can define cleanup tasks, for example to clear the *Logs* folder or removing backup files. You can find the build tool in the *Binaries* folder, it is named *Simulator Tools.exe*. Simply start it with a double click and it will scan all source files and will recreate all outdated executables..
+A simple build tool is part of the Simulator Controller distribution. It is rule based like the good old Unix make tool and will compile all the applications, that are part of Simulator Controller and put them in the *Binaries* folder. Additionaly, you can define cleanup tasks, for example to clear the *Logs* folder or removing backup files and copy tasks to move files around. You can find the build tool in the *Binaries* folder, it is named *Simulator Tools.exe*. Simply start it with a double click and it will scan all source files and will recreate all outdated executables..
 
 The build rules are defined in the file *Simulator Tools.targets* in the *Config* folder. A typical build rule will look like this:
 
@@ -176,6 +176,12 @@ The build rules are defined in the file *Simulator Tools.targets* in the *Config
 Note: You cannot normally format the rules like in this example, since due to technical restrictions, the complete rule must be kept on one line without CRs or LFs.
 
 This rule defines the *Simulator Controller.exe* application in the *Binaries* folder as the target. The main source file will be *Sources\Controller\Simulator Controller.ahk* and there are additional files in the *Includes* and in the *Plugins* folders, that will be checked for modification. Variables enclosed in "%" will be replaced with theirs current runtime values.
+
+Beside these customizable rules, a *special* rule exists, which integrates the *Visual Studio MSBuild* process. This rule looks like this:
+
+	dotNET Applications && DLLs=Special
+
+To use this, you must also set the path to the *MSBuild Bin* directory using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). If this path is set, *Simulator Tools* searches the *Sources\Foreign* folder for "*.sln" files and runs *MSBuild* on them.
 
 Normally you will never need to change the build rules when developing your own plugins, as long as they will reside in the standard *Plugins* folders. But, if you decide to put them elsewhere, you might want to add an dependency to this place. To do this, copy *Simulator Tools.targets* to the *Simulator Controller\Config* folder, which is located in the *Documents* folder in your user home folder.
 

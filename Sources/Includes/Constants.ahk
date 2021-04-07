@@ -10,6 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 global kAHKDirectory = "C:\Program Files\AutoHotkey\"
+global kMSBuildDirectory = ""
 
 global kHomeDirectory = normalizeFilePath(A_ScriptDir . (A_IsCompiled ? "\..\" : "\..\..\"))
 global kUserHomeDirectory = A_MyDocuments . "\Simulator Controller\"

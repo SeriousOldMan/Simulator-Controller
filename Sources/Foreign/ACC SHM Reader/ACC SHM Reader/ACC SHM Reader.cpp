@@ -16,7 +16,6 @@ inline unsigned arraysize(const T(&v)[S])
 	return S;
 }
 
-
 struct SMElement
 {
 	HANDLE hMapFile;

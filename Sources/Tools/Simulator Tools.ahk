@@ -816,15 +816,12 @@ checkDependencies(dependencies, modification) {
 }
 
 runSpecialTargets(ByRef buildProgress) {
-	directories := getFileNames("*", kSourcesDirectory . "Foreign\")
-	count := directories.Length()
-	
-	currentDirectory := A_WorkingDir
-
 	msBuild := kMSBuildDirectory . "MSBuild.exe"
 	
+	currentDirectory := A_WorkingDir
+	
 	try {
-		for index, directory in directories {
+		for index, directory in getFileNames("*", kSourcesDirectory . "Foreign\") {
 			SetWorkingDir %directory%
 			
 			for ignore, file in getFileNames("*.sln", directory . "\") {

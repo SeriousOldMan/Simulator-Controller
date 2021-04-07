@@ -277,7 +277,7 @@ Last, but not least, you can bind to actions from the Virtual Race Engineer to t
 
 	raceEngineerCommands: PitstopPlan *function*, PitstopPrepare *function*
 
-See the [documentation](*) on the "Race Engineer" plugin above for more information.
+See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information.
 
 ## Plugin *AC*
 

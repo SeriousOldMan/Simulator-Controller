@@ -205,7 +205,7 @@ This is the main class of the configuration tool. It opens the editor window and
 This class property returns the single instance of *ConfigurationEditor*.
 
 #### *Configurators[]*
-A list of all registered configurators, which tpically have been provided by configuration plugins by calling [registerConfigurator](*).
+A list of all registered configurators, which tpically have been provided by configuration plugins by calling [registerConfigurator](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#registerconfiguratorlabel--string-configurator--configurationitem).
 
 #### *AutoSave[]*
 Returns *true*, if the user wants each change to be updated automatically.

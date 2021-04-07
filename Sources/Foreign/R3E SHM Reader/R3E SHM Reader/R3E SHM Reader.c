@@ -157,6 +157,7 @@ int main()
         wprintf_s(L"SuspensionDamage=%f, %f, %f, %f\n", suspDamage, suspDamage, suspDamage, suspDamage);
         wprintf_s(L"FuelRemaining=%f\n", map_buffer->fuel_left);
         wprintf_s(L"TyreCompound=Dry\n");
+        wprintf_s(L"TyreCompoundColor=Black\n");
         wprintf_s(L"TyreTemperature = %f, %f, %f, %f\n",
             map_buffer->tire_temp[R3E_TIRE_FRONT_LEFT].current_temp[R3E_TIRE_TEMP_CENTER],
             map_buffer->tire_temp[R3E_TIRE_FRONT_RIGHT].current_temp[R3E_TIRE_TEMP_CENTER],

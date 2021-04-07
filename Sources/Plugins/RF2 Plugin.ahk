@@ -115,7 +115,7 @@ class RF2Plugin extends ControllerPlugin {
 	setPitstopRefuelAmount(pitstopNumber, litres) {
 	}
 	
-	setPitstopTyreSet(pitstopNumber, compound, set := false) {
+	setPitstopTyreSet(pitstopNumber, compound, compoundColor, set := false) {
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {

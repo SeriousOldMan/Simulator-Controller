@@ -199,6 +199,11 @@ updateChangeTyreState() {
 
 readTyreSetup(settings) {
 	spSetupTyreCompoundDropDown := getConfigurationValue(settings, "Race Setup", "Tyre.Compound", "Dry")
+	
+	color := getConfigurationValue(settings, "Race Setup", "Tyre.Compound.Color", "Black")
+	if (color != "Black")
+		spSetupTyreCompoundDropDown := spSetupTyreCompoundDropDown . " (" . color . ")"
+	
 	spSetupTyreSetEdit := getConfigurationValue(settings, "Race Setup", "Tyre.Set", 1)
 	spPitstopTyreSetEdit := getConfigurationValue(settings, "Race Setup", "Tyre.Set.Fresh", 2)
 	
@@ -297,7 +302,13 @@ restart:
 		setConfigurationValue(newSettings, "Race Settings", "Lap.Formation", formationLapCheck)
 		setConfigurationValue(newSettings, "Race Settings", "Lap.PostRace", postRaceLapCheck)
 		
-		setConfigurationValue(newSettings, "Race Setup", "Tyre.Compound", ["Wet", "Dry"][spSetupTyreCompoundDropDown])
+		if (spSetupTyreCompoundDropDown == 1)
+			setConfigurationValue(newSettings, "Race Setup", "Tyre.Compound", "Wet")
+		else {
+			setConfigurationValue(newSettings, "Race Setup", "Tyre.Compound", "Dry")
+			setConfigurationValue(newSettings, "Race Setup", "Tyre.Compound.Color", ["Black", "Red", "White", "Blue"][spSetupTyreCompoundDropDown - 1])
+		}
+		
 		setConfigurationValue(newSettings, "Race Setup", "Tyre.Set", spSetupTyreSetEdit)
 		setConfigurationValue(newSettings, "Race Setup", "Tyre.Set.Fresh", spPitstopTyreSetEdit)
 		
@@ -396,11 +407,11 @@ restart:
 
 		Gui RES:Add, Text, x16 yp+30 w105 h23 +0x200, % translate("Repair Suspension")
 		
-		tabs := map(["Never", "Always", "Threshold", "Impact"], "translate")
+		choices := map(["Never", "Always", "Threshold", "Impact"], "translate")
 
 		repairSuspensionDropDown := inList(["Never", "Always", "Threshold", "Impact"], repairSuspensionDropDown)
 	
-		Gui RES:Add, DropDownList, x126 yp w110 AltSubmit Choose%repairSuspensionDropDown% VrepairSuspensionDropDown gupdateRepairSuspensionState, % values2String("|", tabs*)
+		Gui RES:Add, DropDownList, x126 yp w110 AltSubmit Choose%repairSuspensionDropDown% VrepairSuspensionDropDown gupdateRepairSuspensionState, % values2String("|", choices*)
 		Gui RES:Add, Text, x245 yp+2 w20 h20 VrepairSuspensionGreaterLabel, % translate(">")
 		Gui RES:Add, Edit, x260 yp-2 w50 h20 VrepairSuspensionThresholdEdit, %repairSuspensionThresholdEdit%
 		Gui RES:Add, Text, x318 yp+2 w90 h20 VrepairSuspensionThresholdLabel, % translate("Sec. p. Lap")
@@ -409,11 +420,11 @@ restart:
 		
 		Gui RES:Add, Text, x16 yp+24 w105 h23 +0x200, % translate("Repair Bodywork")
 		
-		tabs := map(["Never", "Always", "Threshold", "Impact"], "translate")
+		choices := map(["Never", "Always", "Threshold", "Impact"], "translate")
 
 		repairBodyworkDropDown := inList(["Never", "Always", "Threshold", "Impact"], repairBodyworkDropDown)
 		
-		Gui RES:Add, DropDownList, x126 yp w110 AltSubmit Choose%repairBodyworkDropDown% VrepairBodyworkDropDown gupdateRepairBodyworkState, % values2String("|", tabs*)
+		Gui RES:Add, DropDownList, x126 yp w110 AltSubmit Choose%repairBodyworkDropDown% VrepairBodyworkDropDown gupdateRepairBodyworkState, % values2String("|", choices*)
 		Gui RES:Add, Text, x245 yp+2 w20 h20 VrepairBodyworkGreaterLabel, % translate(">")
 		Gui RES:Add, Edit, x260 yp-2 w50 h20 VrepairBodyworkThresholdEdit, %repairBodyworkThresholdEdit%
 		Gui RES:Add, Text, x318 yp+2 w90 h20 VrepairBodyworkThresholdLabel, % translate("Sec. p. Lap")
@@ -422,11 +433,11 @@ restart:
 		
 		Gui RES:Add, Text, x16 yp+24 w105 h23 +0x200, % translate("Change Compound")
 		
-		tabs := map(["Never", "Tyre Temperature", "Weather"], "translate")
+		choices := map(["Never", "Tyre Temperature", "Weather"], "translate")
 
 		changeTyreDropDown := inList(["Never", "Temperature", "Weather"], changeTyreDropDown)
 		
-		Gui RES:Add, DropDownList, x126 yp w110 AltSubmit Choose%changeTyreDropDown% VchangeTyreDropDown gupdateChangeTyreState, % values2String("|", tabs*)
+		Gui RES:Add, DropDownList, x126 yp w110 AltSubmit Choose%changeTyreDropDown% VchangeTyreDropDown gupdateChangeTyreState, % values2String("|", choices*)
 		Gui RES:Add, Text, x245 yp+2 w20 h20 VchangeTyreGreaterLabel, % translate(">")
 		Gui RES:Add, Edit, x260 yp-2 w50 h20 VchangeTyreThresholdEdit, %changeTyreThresholdEdit%
 		Gui RES:Add, Text, x318 yp+2 w90 h20 VchangeTyreThresholdLabel, % translate("Degrees")
@@ -543,11 +554,11 @@ restart:
 
 		Gui RES:Add, Text, x16 yp+30 w85 h23 +0x200, % translate("Tyre Compound")
 		
-		tabs := map(["Wet", "Dry"], "translate")
+		choices := map(["Wet", "Dry", "Dry (Red)", "Dry (White)", "Dry (Blue)"], "translate")
 		
-		spSetupTyreCompoundDropDown := inList(["Wet", "Dry"], spSetupTyreCompoundDropDown)
+		spSetupTyreCompoundDropDown := inList(["Wet", "Dry", "Dry (Red)", "Dry (White)", "Dry (Blue)"], spSetupTyreCompoundDropDown)
 		
-		Gui RES:Add, DropDownList, x106 yp w80 AltSubmit Choose%spSetupTyreCompoundDropDown% VspSetupTyreCompoundDropDown, % values2String("|", tabs*)
+		Gui RES:Add, DropDownList, x106 yp w140 AltSubmit Choose%spSetupTyreCompoundDropDown% VspSetupTyreCompoundDropDown, % values2String("|", choices*)
 
 		Gui RES:Add, Text, x16 yp+26 w90 h20, % translate("Start Tyre Set")
 		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit2 Number VspSetupTyreSetEdit, %spSetupTyreSetEdit%
@@ -717,7 +728,7 @@ importFromSimulation(message := false, simulator := false, code := false, settin
 		GuiControl Text, spPitstopTyreSetEdit, %spPitstopTyreSetEdit%
 	}
 	
-	if (getConfigurationValue(data, "Car Data", "TyreCompound", spSetupTyreCompoundDropDown) = "Dry") {
+	if (getConfigurationValue(data, "Car Data", "TyreCompound", spSetupTyreCompoundDropDown) != "Wet") {
 		spDryFrontLeftEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureFL", spDryFrontLeftEdit)
 		spDryFrontRightEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureFR", spDryFrontRightEdit)
 		spDryRearLeftEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureRL", spDryRearLeftEdit)
@@ -736,7 +747,20 @@ importFromSimulation(message := false, simulator := false, code := false, settin
 					  . Round(spDryRearLeftEdit, 1) . ", " . Round(spDryRearRightEdit, 1), false, "Information.png", 5000)
 		}
 		else {
-			GuiControl Choose, spSetupTyreCompoundDropDown, 2
+			choice := 2
+		
+			switch getConfigurationValue(data, "Car Data", "TyreCompoundColor", "Black") {
+				case "Black":
+					GuiControl Choose, spSetupTyreCompoundDropDown, 2
+				case "Red":
+					GuiControl Choose, spSetupTyreCompoundDropDown, 3
+				case "White":
+					GuiControl Choose, spSetupTyreCompoundDropDown, 4
+				case "Blue":
+					GuiControl Choose, spSetupTyreCompoundDropDown, 5
+				default:
+					Throw "Unknow tyre compound color detected in importFromSimulation..."
+			}
 			
 			GuiControl Text, spDryFrontLeftEdit, %spDryFrontLeftEdit%
 			GuiControl Text, spDryFrontRightEdit, %spDryFrontRightEdit%

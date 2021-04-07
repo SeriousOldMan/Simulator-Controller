@@ -190,7 +190,8 @@ int main(int argc, char* argv[])
 		printData("BodyworkDamage", pf->carDamage);
 		printData("SuspensionDamage", pf->suspensionDamage);
 		printData("FuelRemaining", pf->fuel);
-		wcout << "TyreCompound=" << ((tyreCompound.compare("dry_compound") == 0) ? "Dry" : "Wet") << endl;
+		wcout << "TyreCompound=" << ((tyreCompound.compare("dry_compound") == 0) ? "Dry (Medium)" : "Wet") << endl;
+		wcout << "TyreCompoundColor=Black" << endl;
 		printData("TyreTemperature", pf->tyreCoreTemperature);
 		printData("TyrePressure", pf->wheelsPressure);
 	}

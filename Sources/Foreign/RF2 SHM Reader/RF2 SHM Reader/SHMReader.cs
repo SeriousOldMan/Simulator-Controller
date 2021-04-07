@@ -139,6 +139,16 @@ namespace RF2SHMReader {
 				string compound = GetStringFromBytes(playerTelemetry.mFrontTireCompoundName);
 
 				Console.Write("TyreCompound="); Console.WriteLine(compound.Contains("Rain") ? "Wet" : "Dry");
+
+				if (compound.Contains("Soft"))
+					Console.WriteLine("TyreCompoundColor=Red");
+				else if (compound.Contains("Medium"))
+					Console.WriteLine("TyreCompoundColor=White");
+				else if (compound.Contains("Hard"))
+					Console.WriteLine("TyreCompoundColor=Blue");
+				else
+					Console.WriteLine("TyreCompoundColor=Black");
+
 				Console.Write("BodyworkDamage=0, 0, 0, 0, "); Console.WriteLine(extended.mTrackedDamages[playerTelemetry.mID].mAccumulatedImpactMagnitude / 1000);
 				Console.WriteLine("SuspensionDamage=0, 0, 0, 0");
 			}

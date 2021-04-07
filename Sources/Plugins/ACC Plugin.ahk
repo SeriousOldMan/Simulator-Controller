@@ -1280,7 +1280,7 @@ class ACCPlugin extends ControllerPlugin {
 		changePitstopFuelAmount((litresIncrement > 0) ? "Increase" : "Decrease", Abs(litresIncrement))
 	}
 	
-	setPitstopTyreSet(pitstopNumber, compound, set := false) {
+	setPitstopTyreSet(pitstopNumber, compound, compoundColor, set := false) {
 		changePitstopTyreCompound(compound)
 		
 		data := readSharedMemory(this.Code, kUserHomeDirectory . "Temp\ACC Data\Pitstop Setup.data")

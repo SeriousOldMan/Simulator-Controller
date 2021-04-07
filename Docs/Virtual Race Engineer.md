@@ -393,6 +393,7 @@ A considerable part of the knowledge of Jona comes from the telemetry informatio
 	SuspensionDamage=0, 0, 0, 0
 	FuelRemaining=54.6047
 	TyreCompound=Wet
+	TyreCompoundColor=Black
 	TyreTemperature=84.268, 74.6507, 85.6955, 77.2675
 	TyrePressure=27.6296, 27.6063, 27.6666, 27.5575
 	[Stint Data]

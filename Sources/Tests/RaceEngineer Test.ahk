@@ -44,6 +44,7 @@ global vCompletedActions = {}
 
 global vPitstopFuel = kNotInitialized
 global vPitstopTyreCompound = kNotInitialized
+global vPitstopTyreCompoundColor = kNotInitialized
 global vPitstopTyreSet = kNotInitialized
 global vPitstopTyrePressures = kNotInitialized
 global vPitstopRepairSuspension = kNotInitialized
@@ -136,12 +137,13 @@ class TestPitstopHandler {
 		vPitstopFuel := Round(litres)
 	}
 	
-	setPitstopTyreSet(pitstopNumber, compound, set := false) {
+	setPitstopTyreSet(pitstopNumber, compound, compoundColor, set := false) {
 		this.showAction("setPitstopTyreSet", pitstopNumber, compound, set)
 		
 		vCompletedActions["setPitstopTyreSet"] := pitstopNumber
 		
 		vPitstopTyreCompound := compound
+		vPitstopTyreCompoundColor := compoundColor
 		vPitstopTyreSet := set
 	}
 
@@ -624,12 +626,13 @@ class PitstopHandling extends Assert {
 		
 		vCompletedActions := {}
 		
-		vPitstopFuel = kNotInitialized
-		vPitstopTyreCompound = kNotInitialized
-		vPitstopTyreSet = kNotInitialized
-		vPitstopTyrePressures = kNotInitialized
-		vPitstopRepairSuspension = kNotInitialized
-		vPitstopRepairBodywork = kNotInitialized
+		vPitstopFuel := kNotInitialized
+		vPitstopTyreCompound := kNotInitialized
+		vPitstopTyreCompoundColor := kNotInitialized
+		vPitstopTyreSet := kNotInitialized
+		vPitstopTyrePressures := kNotInitialized
+		vPitstopRepairSuspension := kNotInitialized
+		vPitstopRepairBodywork := kNotInitialized
 		
 		Loop {
 			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
@@ -662,6 +665,7 @@ class PitstopHandling extends Assert {
 		
 		this.AssertEqual(54, vPitstopFuel, "Expected 54 litres for refueling...")
 		this.AssertEqual("Dry", vPitstopTyreCompound, "Expected Dry tyre compound...")
+		this.AssertEqual("Black", vPitstopTyreCompoundColor, "Expected Black tyre compound color...")
 		this.AssertEqual(8, vPitstopTyreSet, "Expected tyre set 8...")
 		this.AssertEqual(false, vPitstopRepairSuspension, "Expected no suspension repair...")
 		this.AssertEqual(false, vPitstopRepairBodywork, "Expected no bodywork repair...")
@@ -674,12 +678,13 @@ class PitstopHandling extends Assert {
 		
 		vCompletedActions := {}
 		
-		vPitstopFuel = kNotInitialized
-		vPitstopTyreCompound = kNotInitialized
-		vPitstopTyreSet = kNotInitialized
-		vPitstopTyrePressures = kNotInitialized
-		vPitstopRepairSuspension = kNotInitialized
-		vPitstopRepairBodywork = kNotInitialized
+		vPitstopFuel := kNotInitialized
+		vPitstopTyreCompound := kNotInitialized
+		vPitstopTyreCompoundColor := kNotInitialized
+		vPitstopTyreSet := kNotInitialized
+		vPitstopTyrePressures := kNotInitialized
+		vPitstopRepairSuspension := kNotInitialized
+		vPitstopRepairBodywork := kNotInitialized
 		
 		Loop {
 			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
@@ -712,6 +717,7 @@ class PitstopHandling extends Assert {
 		
 		this.AssertEqual(55, vPitstopFuel, "Expected 54 litres for refueling...")
 		this.AssertEqual("Dry", vPitstopTyreCompound, "Expected Dry tyre compound...")
+		this.AssertEqual("Black", vPitstopTyreCompoundColor, "Expected Black tyre compound color...")
 		this.AssertEqual(8, vPitstopTyreSet, "Expected tyre set 8...")
 		this.AssertEqual(true, vPitstopRepairSuspension, "Expected suspension repair...")
 		this.AssertEqual(true, vPitstopRepairBodywork, "Expected bodywork repair...")

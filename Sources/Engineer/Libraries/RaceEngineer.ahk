@@ -1257,7 +1257,7 @@ class RaceEngineer extends ConfigurationItem {
 		this.iEnoughData := false
 			
 		if this.KnowledgeBase
-			if this.Speaker {
+			if (this.Speaker && (this.SetupData.Count() > 0)) {
 				this.getSpeaker().speakPhrase("Bye")
 				
 				if (this.Listener && ((this.Session == kSessionPractice) || (this.Session == kSessionRace))) {
@@ -1276,7 +1276,7 @@ class RaceEngineer extends ConfigurationItem {
 				}
 			}
 			else {
-				if ((this.Session == kSessionPractice) || (this.Session == kSessionRace))
+				if (((this.Session == kSessionPractice) || (this.Session == kSessionRace)) && (this.SetupData.Count() > 0))
 					this.updateSetupDatabase()
 			
 				this.iKnowledgeBase := false
@@ -1289,7 +1289,7 @@ class RaceEngineer extends ConfigurationItem {
 	forceFinishSession() {
 		if !this.SetupDataActive {
 			this.iKnowledgeBase := false
-			this.iSetupData := false
+			this.iSetupData := {}
 			this.iSimulator := ""
 			this.iSession := kSessionFinished
 		}	

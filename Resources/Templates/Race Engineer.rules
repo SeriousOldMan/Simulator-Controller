@@ -100,22 +100,22 @@ priority: 5,																																	\
 priority: 5,																																	\
 	{All: {None: [?Pitstop.Plan]}, [?Race.Settings.Tyre.Compound.Change = Temperature], {Any: [?Lap], [?Pitstop.Lap]},							\
 		  [?Tyre.Temperature.Window = false], [?Tyre.Compound = Dry]} =>																		\
-		(Set: Tyre.Compound.Target, Wet), (Set: Tyre.Compound.Color.Target, Black), (Clear: Tyre.Set.Target)
+		(Set: Tyre.Compound.Target, Wet), (Prove: updateTargetCompoundColor, Wet), (Clear: Tyre.Set.Target)
 
 priority: 5,																																	\
 	{All: {None: [?Pitstop.Plan]}, [?Race.Settings.Tyre.Compound.Change = Temperature], {Any: [?Lap], [?Pitstop.Lap]},							\
 		  [?Tyre.Temperature.Window = true], [?Tyre.Compound = Dry]} =>																			\
-		(Set: Tyre.Compound.Target, Dry), (Set: Tyre.Compound.Color.Target, Black), (Clear: Tyre.Set.Target)
+		(Set: Tyre.Compound.Target, Dry), (Prove: updateTargetCompoundColor, Dry), (Clear: Tyre.Set.Target)
 
 priority: 5,																																	\
 	{All: {None: [?Pitstop.Plan]}, [?Race.Settings.Tyre.Compound.Change = Temperature], {Any: [?Lap], [?Pitstop.Lap]},							\
 		  [?Tyre.Temperature.Window = false], [?Tyre.Compound = Wet]} =>																		\
-		(Set: Tyre.Compound.Target, Dry), (Set: Tyre.Compound.Color.Target, Black), (Clear: Tyre.Set.Target)
+		(Set: Tyre.Compound.Target, Dry), (Prove: updateTargetCompoundColor, Dry), (Clear: Tyre.Set.Target)
 
 priority: 5,																																	\
 	{All: {None: [?Pitstop.Plan]}, [?Race.Settings.Tyre.Compound.Change = Temperature], {Any: [?Lap], [?Pitstop.Lap]},							\
 		  [?Tyre.Temperature.Window = true], [?Tyre.Compound = Wet]} =>																			\
-		(Set: Tyre.Compound.Target, Wet), (Set: Tyre.Compound.Color.Target, Black), (Clear: Tyre.Set.Target)
+		(Set: Tyre.Compound.Target, Wet), (Prove: updateTargetCompoundColor, Wet), (Clear: Tyre.Set.Target)
 
 priority: 5,																																	\
 	{All: {None: [?Pitstop.Plan]}, [?Race.Settings.Tyre.Compound.Change = Never],																\
@@ -123,8 +123,10 @@ priority: 5,																																	\
 
 {All: {Any: [?Lap], [?Pitstop.Lap]}, {None: [?Tyre.Compound.Target]}} => (Prove: keepTyreCompound), (Clear: Tyre.Set.Target)
 
-keepTyreCompound() <= pitstopTyreCompound(?compound, ?color), Set(Tyre.Compound.Target, ?compound), Set(Tyre.Compound.Color.Target, ?color), !
+keepTyreCompound() <= lastPitstopTyreCompound(?compound, ?color), Set(Tyre.Compound.Target, ?compound), Set(Tyre.Compound.Color.Target, ?color), !
 keepTyreCompound() <= setupTyreCompound(?compound, ?color), Set(Tyre.Compound.Target, ?compound), Set(Tyre.Compound.Color.Target, ?color)
+
+updateTargetCompoundColor(?compound) <= tyreCompoundColor(?compound, ?color), Set(Tyre.Compound.Color.Target, ?color)
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -137,7 +139,7 @@ priority: 5, {All: [?Lap], [?Tyre.Compound.Target = Dry], {None: [?Tyre.Set.Targ
 
 priority: 5, {All: [?Lap], [?Tyre.Compound.Target = Wet], {None: [?Tyre.Set.Target]}} => (Set: Tyre.Set.Target, 0)
 
-nextDryTyreSet() <= pitstopTyreSet(?nr), ?set = ?nr + 1, Set(Tyre.Set.Target, ?set), !
+nextDryTyreSet() <= lastPitstopTyreSet(?nr), ?set = ?nr + 1, Set(Tyre.Set.Target, ?set), !
 nextDryTyreSet() <= Set(Tyre.Set.Target, !Race.Setup.Tyre.Set.Fresh)
 
 
@@ -220,7 +222,7 @@ updatePressureDelta(?compound, ?tyreType, ?deviation, ?correction) <=											
 updateTargetPressure(?compound, ?tyreType, ?delta) <= lastPressure(?compound, ?tyreType, ?pressure),											\
 													  ?targetPressure = ?pressure + ?delta, Set(Tyre.Pressure.Target, ?tyreType, ?targetPressure)
 
-lastPressure(?compound, ?tyreType, ?pressure) <= pitstopTyrePressure(?compound, ?tyreType, ?pressure), !
+lastPressure(?compound, ?tyreType, ?pressure) <= lastPitstopTyrePressure(?compound, ?tyreType, ?pressure), !
 lastPressure(?compound, ?tyreType, ?pressure) <= setupTyrePressure(?compound, ?tyreType, ?pressure)
 
 ;;;-------------------------------------------------------------------------;;;
@@ -410,7 +412,7 @@ priority: -10, {Any: [?Damage.Update.Suspension], [?Damage.Update.Bodywork]} =>	
 
 reportNewDamage(1) <= !, lapDamage(1, Suspension, ?lSDamage), lapDamage(1, Bodywork, ?lBDamage), reportNewDamage(0, ?lSDamage, 0, ?lBDamage)
 reportNewDamage(?lap) <= pitstopLap(?pitstopLap), ?pitstopLap = ?lap - 1,																		\
-						 pitstopDamageRepair(Suspension, ?suspensionRepaired), pitstopDamageRepair(Bodywork, ?bodyworkRepaired),				\
+						 lastPitstopDamageRepair(Suspension, ?suspensionRepaired), lastPitstopDamageRepair(Bodywork, ?bodyworkRepaired),		\
 						 lapDamage(?lap, Suspension, ?lSDamage), lapDamage(?lap, Bodywork, ?lBDamage),											\
 						 newDamageAfterRepair(?lsDamage, ?suspensionRepaired, ?newSDamage),														\
 						 newDamageAfterRepair(?lBDamage, ?bodyworkRepaired, ?newBDamage),														\
@@ -729,8 +731,13 @@ pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Repair.Bodywork, !Pi
 ;;;                     Tyre Setup Information Retrieval                    ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-currentTyreCompound(?compound, ?color) <= pitstopTyreCompound(?compound, ?color), !
+currentTyreCompound(?compound, ?color) <= lastPitstopTyreCompound(?compound, ?color), !
 currentTyreCompound(?compound, ?color) <= setupTyreCompound(?compound, ?color)
+
+tyreCompoundColor(Wet, Black)
+tyreCompoundColor(Dry, ?color) <= pitstopTyreCompound(Dry, ?color)
+tyreCompoundColor(Dry, ?color) <= setupTyreCompound(Dry, ?color)
+tyreCompoundColor(Dry, Black)
 
 setupTyreCompound(?compound, ?color) <= Get(Race.Setup.Tyre.Compound, ?compound), Get(Race.Setup.Tyre.Compound.Color, ?color)
 
@@ -884,21 +891,27 @@ lastPitstopLap(?lap) <= lastPitstop(?nr), Get(Pitstop, ?nr, Lap, ?lap)
 recentPitstopLap(?lap) <= lastPitstopLap(?lap)
 recentPitstopLap(?lap) <= lastPitstopLap(?lastLap), ?lap = ?lastLap + 1
 
-pitstopTyreSet(?tyreSet) <= lastPitstop(?nr), Get(Pitstop, ?nr, Tyre.Set, ?tyreSet)
+lastPitstopTyreSet(?tyreSet) <= lastPitstop(?nr), Get(Pitstop, ?nr, Tyre.Set, ?tyreSet)
 
-pitstopTyreCompound(?tyreCompound) <= lastPitstop(?nr), Get(Pitstop, ?nr, Tyre.Compound, ?tyreCompound)
-pitstopTyreCompound(?tyreCompound, ?tyreCompoundColor) <= lastPitstop(?nr), Get(Pitstop, ?nr, Tyre.Compound, ?tyreCompound),					\
-														  Get(Pitstop, ?nr, Tyre.Compound.Color, ?tyreCompoundColor)
+lastPitstopTyreCompound(?tyreCompound) <= lastPitstop(?nr), Get(Pitstop, ?nr, Tyre.Compound, ?tyreCompound)
 
-pitstopTyrePressure(?compound, ?tyreType, ?pressure) <= pitstopTyreCompound(?compound), lastPitstop(?nr),										\
-														Get(Pitstop, ?nr, Tyre.Pressure, ?tyreType, ?pressure)
+lastPitstopTyreCompound(?tyreCompound, ?tyreCompoundColor) <= lastPitstop(?nr), Get(Pitstop, ?nr, Tyre.Compound, ?tyreCompound),				\
+															  Get(Pitstop, ?nr, Tyre.Compound.Color, ?tyreCompoundColor)
 
-pitstopTyrePressures(?compound, [], [])
-pitstopTyrePressures(?compound, [?tyreType | ?tyreTypes], [?pressure | ?pressures]) <=															\
-		pitstopTyrePressure(?compound, ?tyreType, ?pressure), setupTyrePressure(?compound, ?tyreTypes, ?pressures)
+lastPitstopTyrePressure(?compound, ?tyreType, ?pressure) <= lastPitstopTyreCompound(?compound), lastPitstop(?nr),								\
+															Get(Pitstop, ?nr, Tyre.Pressure, ?tyreType, ?pressure)
 
-pitstopDamageRepair(Suspension, ?repair) <= lastPitstop(?nr), Get(Pitstop, ?nr, Repair.Suspension, ?repair)
-pitstopDamageRepair(Bodywork, ?repair) <= lastPitstop(?nr), Get(Pitstop, ?nr, Repair.Bodywork, ?repair)
+lastPitstopTyrePressures(?compound, [], [])
+lastPitstopTyrePressures(?compound, [?tyreType | ?tyreTypes], [?pressure | ?pressures]) <=														\
+		lastPitstopTyrePressure(?compound, ?tyreType, ?pressure), setupTyrePressure(?compound, ?tyreTypes, ?pressures)
+
+lastPitstopDamageRepair(Suspension, ?repair) <= lastPitstop(?nr), Get(Pitstop, ?nr, Repair.Suspension, ?repair)
+lastPitstopDamageRepair(Bodywork, ?repair) <= lastPitstop(?nr), Get(Pitstop, ?nr, Repair.Bodywork, ?repair)
+
+pitstopTyreCompound(?compound, ?color) <= lastPitstop(?nr), pitstopTyreCompound(?nr, ?compound, ?color)
+pitstopTyreCompound(0, ?, ?) <= !, fail
+pitstopTyreCompound(?nr, ?compound, ?color) <= Get(Pitstop, ?nr, Tyre.Compound, ?compound), Get(Pitstop, ?nr, Tyre.Compound.Color, ?color)
+pitstopTyreCompound(?nr, ?compound, ?color) <= ?next = ?nr - 1, pitstopTyreCompound(?next, ?compound, ?color)
 
 
 ;;;-------------------------------------------------------------------------;;;

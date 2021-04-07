@@ -74,7 +74,7 @@ namespace RF2SHMReader {
 			}
 
 			Console.WriteLine("[Stint Data]");
-			Console.Write("Active="); Console.WriteLine(connected ? "true" : "false");
+			Console.Write("Active="); Console.WriteLine((connected && (extended.mSessionStarted != 0)) ? "true" : "false");
 			if (connected) {
 				Console.Write("Paused="); Console.WriteLine(scoring.mScoringInfo.mGamePhase == (byte)PausedOrHeartbeat ? "true" : "false");
 

@@ -1257,23 +1257,27 @@ class RaceEngineer extends ConfigurationItem {
 		this.iEnoughData := false
 			
 		if this.KnowledgeBase
-			if (this.Speaker && (this.SetupData.Count() > 0)) {
+			if this.Speaker {
 				this.getSpeaker().speakPhrase("Bye")
 				
-				if (this.Listener && ((this.Session == kSessionPractice) || (this.Session == kSessionRace))) {
-					this.getSpeaker().speakPhrase("ConfirmUpdateSetupDatabase")
+				if (this.SetupData.Count() > 0) {
+					if (this.Listener && ((this.Session == kSessionPractice) || (this.Session == kSessionRace))) {
+						this.getSpeaker().speakPhrase("ConfirmUpdateSetupDatabase")
+						
+						this.setContinuation(ObjBindMethod(this, "updateSetupDatabase", true))
+						
+						callback := ObjBindMethod(this, "forceFinishSession")
+						SetTimer %callback%, -60000
+					}
+					else {
+						if ((this.Session == kSessionPractice) || (this.Session == kSessionRace))
+							this.updateSetupDatabase()
 					
-					this.setContinuation(ObjBindMethod(this, "updateSetupDatabase", true))
-					
-					callback := ObjBindMethod(this, "forceFinishSession")
-					SetTimer %callback%, -60000
+						this.iKnowledgeBase := false
+					}
 				}
-				else {
-					if ((this.Session == kSessionPractice) || (this.Session == kSessionRace))
-						this.updateSetupDatabase()
-				
+				else
 					this.iKnowledgeBase := false
-				}
 			}
 			else {
 				if (((this.Session == kSessionPractice) || (this.Session == kSessionRace)) && (this.SetupData.Count() > 0))

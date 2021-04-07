@@ -260,7 +260,7 @@ class VoiceServer extends ConfigurationItem {
 			}
 		}
 			
-		if isDebug() {
+		if false && isDebug() {
 			nextCharIndex := 1
 			
 			showMessage("Register voice command: " . new GrammarCompiler(recognizer).readGrammar(command, nextCharIndex).toString())					  
@@ -280,7 +280,7 @@ class VoiceServer extends ConfigurationItem {
 	}
 	
 	voiceCommandRecognized(grammar, words) {
-		if isDebug()
+		if false && isDebug()
 			showMessage("Voice command recognized: " . values2String(" ", words*))
 		
 		descriptor := this.iVoiceCommands[grammar]

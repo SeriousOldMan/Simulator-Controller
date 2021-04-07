@@ -1,6 +1,6 @@
 ## Introduction
 
-Welcome to Jona, the world first fully interactive Virtual Race Engineer for race car simulations.
+Welcome to Jona, the world first fully interactive and AI-based Virtual Race Engineer for race car simulations.
 
 Ok, enough marketing bullshit. Jona is a voice chat bot with a special knowledge about racing. It uses the telemetry data provided by a simulation game and a large domain specific rule set to derive its knowledge from there. Using this knowledge, Jona can give you information about the current state of your car (temperatures, pressures, remaining laps, upcoming pitstops, and so on), and can recommend settings for the next pitstop. Currently, Jona supports the *Assetto Corsa Competizione*, *RaceRoom Racing Experience* and *rFactor 2* simulation games through their respective plugins. Using the Pitstop MFD handling for *Assetto Corsa Competizione* introduced with [Release 2.0](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-20), Jona is even capable to setup a pitstop without user interaction completely on its own, a capability, which will come to the other simulation games in the future as well.
 
@@ -214,6 +214,7 @@ The *Race Engineer.settings* looks like this:
 	Tyre.Wet.Pressure.Target.RR=30.0
 	[Race Setup]
 	Tyre.Compound=Dry
+	Tyre.Compound.Color=Black
 	Tyre.Set=7
 	Tyre.Set.Fresh=8
 	Tyre.Dry.Pressure.FL=26.1

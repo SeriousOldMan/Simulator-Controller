@@ -645,8 +645,6 @@ class RaceEngineer extends ConfigurationItem {
 					
 					if continuation {
 						this.getSpeaker().speakPhrase("Confirm")
-									
-						Sleep 3000
 
 						%continuation%()
 					}
@@ -687,7 +685,7 @@ class RaceEngineer extends ConfigurationItem {
 						this.getSpeaker().speakPhrase("NoPitstop")
 					else {
 						this.getSpeaker().speakPhrase("Confirm")
-					
+						
 						this.preparePitstopRecognized(words)
 					}
 				case "PitstopAdjustFuel":

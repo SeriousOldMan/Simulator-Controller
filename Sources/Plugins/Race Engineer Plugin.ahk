@@ -66,6 +66,10 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 			this.callRemote("startSession", arguments*)
 		}
 		
+		updateSession(arguments*) {
+			this.callRemote("updateSession", arguments*)
+		}
+		
 		finishSession(arguments*) {
 			this.callRemote("finishSession", arguments*)
 		}
@@ -370,6 +374,20 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 		
 		if raceEngineer
 			raceEngineer.shutdown()
+	}
+	
+	reloadSettings(pid, settingsFileName) {
+		if this.RaceEngineer {
+			Process Exist, %pid%
+			
+			if ErrorLevel {
+				callback := ObjBindMethod(this, "reloadSettings", pid, settingsFileName)
+			
+				SetTimer %callback%, -1000
+			}
+			else
+				this.RaceEngineer.updateSession(settingsFileName)
+		}
 	}
 	
 	startSession(dataFile) {
@@ -684,18 +702,25 @@ openRaceEngineerSettings(import := false) {
 	exePath := kBinariesDirectory . "Race Engineer Settings.exe"
 	
 	try {
+		controller := SimulatorController.Instance
+		plugin := controller.findPlugin(kRaceEngineerPlugin)
+		
 		if import {
 			options := "-Import"
-			controller := SimulatorController.Instance
-			plugin := controller.findPlugin(kRaceEngineerPlugin)
 			
 			if (plugin && plugin.Simulator)
 				options := (options . " """ . controller.ActiveSimulator . """ " . plugin.Simulator.Code)
 			
-			Run "%exePath%" %options%, %kBinariesDirectory%
+			Run "%exePath%" %options%, %kBinariesDirectory%, , pid
 		}
 		else
-			Run "%exePath%", %kBinariesDirectory%
+			Run "%exePath%", %kBinariesDirectory%, , pid
+		
+		if pid {
+			callback := ObjBindMethod(plugin, "reloadSettings", pid, getFileName("Race Engineer.settings", kUserConfigDirectory, kConfigDirectory))
+			
+			SetTimer %callback%, -1000
+		}
 	}
 	catch exception {
 		logMessage(kLogCritical, translate("Cannot start the Race Engineers Settings tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))

@@ -260,6 +260,8 @@ Additionally worth to be mentioned is the field *Pitstop.Delta*, with which you 
 
 If you open the settings tool, it will load the *Race Engineer.settings* file located in the *Simulator Controller\Config* folder in your user *Documents* folder. If you close the tool with the "Ok" button, this file will be overwritten with the new information. Beside that, you can load a settings file from a different location with the "Load..." button and you can save the current settings with the "Save..." button. This may be used to create preconfigured settings for all your cars and tracks in the various environmental conditions. By the way - this will be integrated in a future version of Simulator Controller with the setup database automatically.
 
+Good to know: When the *Race Engineer.settings* file is changed while Jona is already active, the updated settings will be imported into the active session. This is useful during Practice, Qualification or even Endurance Race sessions.
+
 ### The pitstop
 
 To enable Jona to handle the pitstop settings in *Assetto Corsa Competizione* completely on its own, you have to prepare some things beforehand. First you have to follow the instructions in the [update information for Release 2.0](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-20), so that the ACC plugin is able to control the Pitstop MFD of *Assetto Corsa Competizione*.

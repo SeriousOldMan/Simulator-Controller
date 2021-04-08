@@ -1217,6 +1217,56 @@ class RaceEngineer extends ConfigurationItem {
 		return facts
 	}
 	
+	updateSession(settings) {
+		local knowledgeBase := this.KnowledgeBase
+		local facts
+		
+		if knowledgeBase {
+			if !IsObject(settings)
+				settings := readConfiguration(settings)
+			
+			this.iRaceSettings := settings
+			
+			facts := {"Race.Settings.Lap.Formation": getConfigurationValue(settings, "Race Settings", "Lap.Formation", true)
+					, "Race.Settings.Lap.PostRace": getConfigurationValue(settings, "Race Settings", "Lap.PostRace", true)
+					, "Race.Settings.Fuel.AvgConsumption": getConfigurationValue(settings, "Race Settings", "Fuel.AvgConsumption", 0)
+					, "Race.Settings.Pitstop.Delta": getConfigurationValue(settings, "Race Settings", "Pitstop.Delta", 30)
+					, "Race.Settings.Fuel.SafetyMargin": getConfigurationValue(settings, "Race Settings", "Fuel.SafetyMargin", 5)
+					, "Race.Settings.Lap.PitstopWarning": getConfigurationValue(settings, "Race Settings", "Lap.PitstopWarning", 5)
+					, "Race.Settings.Lap.AvgTime": getConfigurationValue(settings, "Race Settings", "Lap.AvgTime", 0)
+					, "Race.Settings.Lap.History.Considered": getConfigurationValue(settings, "Race Settings", "Lap.History.Considered", 5)
+					, "Race.Settings.Lap.History.Damping": getConfigurationValue(settings, "Race Settings", "Lap.History.Damping", 0.2)
+					, "Race.Settings.Damage.Suspension.Repair": getConfigurationValue(settings, "Race Settings", "Damage.Suspension.Repair", "Always")
+					, "Race.Settings.Damage.Suspension.Repair.Threshold": getConfigurationValue(settings, "Race Settings", "Damage.Suspension.Repair.Threshold", 0)
+					, "Race.Settings.Damage.Bodywork.Repair": getConfigurationValue(settings, "Race Settings", "Damage.Bodywork.Repair", "Threshold")
+					, "Race.Settings.Damage.Bodywork.Repair.Threshold": getConfigurationValue(settings, "Race Settings", "Damage.Bodywork.Repair.Threshold", 20)
+					, "Race.Settings.Tyre.Compound.Change": getConfigurationValue(settings, "Race Settings", "Tyre.Compound.Change", "Never")
+					, "Race.Settings.Tyre.Compound.Change.Threshold": getConfigurationValue(settings, "Race Settings", "Tyre.Compound.Change.Threshold", 0)
+					, "Race.Settings.Tyre.Dry.Pressure.Target.FL": getConfigurationValue(settings, "Race Settings", "Tyre.Dry.Pressure.Target.FL", 27.7)
+					, "Race.Settings.Tyre.Dry.Pressure.Target.FR": getConfigurationValue(settings, "Race Settings", "Tyre.Dry.Pressure.Target.FR", 27.7)
+					, "Race.Settings.Tyre.Dry.Pressure.Target.RL": getConfigurationValue(settings, "Race Settings", "Tyre.Dry.Pressure.Target.RL", 27.7)
+					, "Race.Settings.Tyre.Dry.Pressure.Target.RR": getConfigurationValue(settings, "Race Settings", "Tyre.Dry.Pressure.Target.RR", 27.7)
+					, "Race.Settings.Tyre.Wet.Pressure.Target.FL": getConfigurationValue(settings, "Race Settings", "Tyre.Wet.Pressure.Target.FL", 30.0)
+					, "Race.Settings.Tyre.Wet.Pressure.Target.FR": getConfigurationValue(settings, "Race Settings", "Tyre.Wet.Pressure.Target.FR", 30.0)
+					, "Race.Settings.Tyre.Wet.Pressure.Target.RL": getConfigurationValue(settings, "Race Settings", "Tyre.Wet.Pressure.Target.RL", 30.0)
+					, "Race.Settings.Tyre.Wet.Pressure.Target.RR": getConfigurationValue(settings, "Race Settings", "Tyre.Wet.Pressure.Target.RR", 30.0)
+					, "Race.Settings.Tyre.Pressure.Deviation": getConfigurationValue(settings, "Race Settings", "Tyre.Pressure.Deviation", 0.2)
+					, "Race.Setup.Tyre.Set.Fresh": getConfigurationValue(settings, "Race Setup", "Tyre.Set.Fresh", 8)
+					, "Race.Setup.Tyre.Set": getConfigurationValue(settings, "Race Setup", "Tyre.Set", 7)
+					, "Race.Setup.Tyre.Dry.Pressure.FL": getConfigurationValue(settings, "Race Setup", "Tyre.Dry.Pressure.FL", 26.1)
+					, "Race.Setup.Tyre.Dry.Pressure.FR": getConfigurationValue(settings, "Race Setup", "Tyre.Dry.Pressure.FR", 26.1)
+					, "Race.Setup.Tyre.Dry.Pressure.RL": getConfigurationValue(settings, "Race Setup", "Tyre.Dry.Pressure.RL", 26.1)
+					, "Race.Setup.Tyre.Dry.Pressure.RR": getConfigurationValue(settings, "Race Setup", "Tyre.Dry.Pressure.RR", 26.1)
+					, "Race.Setup.Tyre.Wet.Pressure.FL": getConfigurationValue(settings, "Race Setup", "Tyre.Wet.Pressure.FL", 28.2)
+					, "Race.Setup.Tyre.Wet.Pressure.FR": getConfigurationValue(settings, "Race Setup", "Tyre.Wet.Pressure.FR", 28.2)
+					, "Race.Setup.Tyre.Wet.Pressure.RL": getConfigurationValue(settings, "Race Setup", "Tyre.Wet.Pressure.RL", 28.2)
+					, "Race.Setup.Tyre.Wet.Pressure.RR": getConfigurationValue(settings, "Race Setup", "Tyre.Wet.Pressure.RR", 28.2)}
+					
+			for key, value in facts
+				knowledgeBase.setValue(key, value)
+		}
+	}
+	
 	startSession(data) {
 		local facts
 		

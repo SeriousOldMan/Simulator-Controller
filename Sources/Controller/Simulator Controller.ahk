@@ -744,15 +744,16 @@ class SimulatorController extends ConfigurationItem {
 	fireAction(function, trigger) {
 		local action := this.getAction(function, trigger)
 		
-		if (action != false) {
-			this.updateLastEvent()
-			
-			logMessage(kLogInfo, translate("Firing action ") . translate(getLabelForLogMessage(action)) . translate(" for ") . function.Descriptor)
-			
-			action.fireAction(function, trigger)
-		}
-		else
-			Throw "Cannot find action for " . function.Descriptor . ".trigger " . " in SimulatorController.fireAction..."
+		if function.Enabled
+			if (action != false) {
+				this.updateLastEvent()
+				
+				logMessage(kLogInfo, translate("Firing action ") . translate(getLabelForLogMessage(action)) . translate(" for ") . function.Descriptor)
+				
+				action.fireAction(function, trigger)
+			}
+			else
+				Throw "Cannot find action for " . function.Descriptor . ".trigger " . " in SimulatorController.fireAction..."
 	}	
 
 	setMode(newMode) {
@@ -908,6 +909,7 @@ class SimulatorController extends ConfigurationItem {
 class ControllerFunction {
 	iController := false
 	iFunction := false
+	iEnabled := false
 	
 	Controller[] {
 		Get {
@@ -936,6 +938,12 @@ class ControllerFunction {
 	Descriptor[] {
 		Get {
 			return this.Function.Descriptor
+		}
+	}
+	
+	Enabled[] {
+		Get {
+			return this.iEnabled
 		}
 	}
 	
@@ -968,6 +976,8 @@ class ControllerFunction {
 	}
 	
 	enable(trigger := "__All Trigger__") {
+		this.iEnabled := true
+		
 		if (trigger == kAllTrigger)
 			for ignore, trigger in this.Trigger
 				setHotkeyEnabled(this, trigger, true)
@@ -976,6 +986,8 @@ class ControllerFunction {
 	}
 	
 	disable(trigger := "__All Trigger__") {
+		this.iEnabled := false
+		
 		if (trigger == kAllTrigger)
 			for ignore, trigger in this.Trigger
 				setHotkeyEnabled(this, trigger, false)
@@ -985,6 +997,8 @@ class ControllerFunction {
 	
 	connectAction(action) {
 		local controller := this.Controller
+		
+		this.iEnabled := true
 		
 		for ignore, trigger in this.Trigger {
 			handler := this.Actions[trigger]
@@ -1017,6 +1031,8 @@ class ControllerFunction {
 	
 	disconnectAction(action) {
 		local controller := this.Controller
+		
+		this.iEnabled := false
 		
 		this.setText("")
 		

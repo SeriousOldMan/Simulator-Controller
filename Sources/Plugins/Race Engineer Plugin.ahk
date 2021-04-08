@@ -377,17 +377,15 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 	}
 	
 	reloadSettings(pid, settingsFileName) {
-		if this.RaceEngineer {
-			Process Exist, %pid%
-			
-			if ErrorLevel {
-				callback := ObjBindMethod(this, "reloadSettings", pid, settingsFileName)
-			
-				SetTimer %callback%, -1000
-			}
-			else
-				this.RaceEngineer.updateSession(settingsFileName)
+		Process Exist, %pid%
+		
+		if ErrorLevel {
+			callback := ObjBindMethod(this, "reloadSettings", pid, settingsFileName)
+		
+			SetTimer %callback%, -1000
 		}
+		else if this.RaceEngineer
+			this.RaceEngineer.updateSession(settingsFileName)
 	}
 	
 	startSession(dataFile) {

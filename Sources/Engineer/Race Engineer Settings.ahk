@@ -736,6 +736,7 @@ importFromSimulation(message := false, simulator := false, code := false, settin
 	
 		if settings {
 			setConfigurationValue(settings, "Race Setup", "Tyre.Compound", "Dry")
+			setConfigurationValue(settings, "Race Setup", "Tyre.Compound.Color", getConfigurationValue(data, "Car Data", "TyreCompoundColor", "Black"))
 			
 			setConfigurationValue(settings, "Race Setup", "Tyre.Dry.Pressure.FL", Round(spDryFrontLeftEdit, 1))
 			setConfigurationValue(settings, "Race Setup", "Tyre.Dry.Pressure.FR", Round(spDryFrontRightEdit, 1))
@@ -776,6 +777,7 @@ importFromSimulation(message := false, simulator := false, code := false, settin
 		
 		if settings {
 			setConfigurationValue(settings, "Race Setup", "Tyre.Compound", "Wet")
+			setConfigurationValue(settings, "Race Setup", "Tyre.Compound.Color", getConfigurationValue(data, "Car Data", "TyreCompoundColor", "Black"))
 			
 			setConfigurationValue(settings, "Race Setup", "Tyre.Wet.Pressure.FL", Round(spWetFrontLeftEdit, 1))
 			setConfigurationValue(settings, "Race Setup", "Tyre.Wet.Pressure.FR", Round(spWetFrontRightEdit, 1))

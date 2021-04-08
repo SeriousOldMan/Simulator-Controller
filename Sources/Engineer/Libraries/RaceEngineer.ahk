@@ -1262,8 +1262,14 @@ class RaceEngineer extends ConfigurationItem {
 					, "Race.Setup.Tyre.Wet.Pressure.RL": getConfigurationValue(settings, "Race Setup", "Tyre.Wet.Pressure.RL", 28.2)
 					, "Race.Setup.Tyre.Wet.Pressure.RR": getConfigurationValue(settings, "Race Setup", "Tyre.Wet.Pressure.RR", 28.2)}
 					
+			facts["Race.Setup.Tyre.Compound"] := getConfigurationValue(settings, "Race Setup", "Tyre.Compound", "Dry")
+			facts["Race.Setup.Tyre.Compound.Color"] := getConfigurationValue(settings, "Race Setup", "Tyre.Compound.Color", "Black")
+					
 			for key, value in facts
 				knowledgeBase.setValue(key, value)
+			
+			if this.Debug[kDebugKnowledgeBase]
+				dumpKnowledge(knowledgeBase)
 		}
 	}
 	
@@ -1788,12 +1794,12 @@ class RaceEngineer extends ConfigurationItem {
 				speaker.speakPhrase("Pitstop", {number: pitstopNumber})
 			
 			if ((options == true) || options.Fuel) {
-				fuel := knowledgeBase.getValue("Pitstop.Planned.Fuel", 0)
+				fuel := Round(knowledgeBase.getValue("Pitstop.Planned.Fuel", 0))
 				
 				if (fuel == 0)
 					speaker.speakPhrase("NoRefuel")
 				else
-					speaker.speakPhrase("Refuel", {litres: Round(fuel)})
+					speaker.speakPhrase("Refuel", {litres: fuel})
 			}
 			
 			if ((options == true) || options.Compound) {

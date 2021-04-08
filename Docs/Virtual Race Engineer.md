@@ -18,13 +18,13 @@ Before we dig deeper into the inner workings, here is a typical dialog based int
 
 **Jona: "Hi, here is Jona, your race engineer today. You can call me anytime if you have questions. Good luck."**
 
-(You hear this or a similar phrase, whenever Jona is ready to interact with you. Typically this is at the beginning of the second lap in a race. From now on Jona might call you, when important information is available, or you can call her/him anytime using one of the key phrases - see the section about [phrase grammars](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#phrase-grammars) on that.)
+(You hear this or a similar phrase, whenever Jona is ready to interact with you. Typically this is at the beginning of the second lap in a session. From now on Jona might call you, when important information is available, or you can call her/him anytime using one of the key phrases - see the section about [phrase grammars](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#phrase-grammars) on that.)
 
 **Driver: "Tell me the tyre temperatures."**
 
 **Jona: "We have a blue screen here. Windows XP is crap. Give me a minute."**
 
-(This answer, or a similar one, means, that Jona does not have enough data at the moment to answer your question. Typically, Jona needs two laps at the beginning of the race or after a pitstop, to be completely up and running)
+(This answer, or a similar one, means, that Jona does not have enough data at the moment to answer your question. Typically, Jona needs two laps at the beginning of the session or after a pitstop, to be completely up and running)
 
 (A lap later...)
 
@@ -158,8 +158,8 @@ For the reactions of Jona, the format is much more simple. It looks like this:
 	[Speaker Phrases]
 	// Conversation //
 	Greeting.1=Hi, I am %name%, your race engineer today. You can call me anytime if you have questions. Good luck.
-	Greeting.2=Here is %name%. I am your race engineer for this race. Call me anytime.
-	Greeting.3=Here is %name%, your race engineer. Have a great race.
+	Greeting.2=Here is %name%. I am your race engineer for this session. Call me anytime.
+	Greeting.3=Here is %name%, your race engineer. Have a great session.
 	IHearYou.1=I am here. What can I do for you?
 	IHearYou.2=Yeah? Have you called me?
 	IHearYou.3=I hear you. Go on.
@@ -178,11 +178,11 @@ Racing with Jona is easy, just begin your session and wait until Jona will conta
 
 The Virtual Race Engineer is handled by the "Race Engineer" plugin, which may be integrated by the different simulation game plugins, if they want to support Jona. This plugin will start *Race Engineer.exe*, which is located in the *Binaries* folder, as a subprocess, as long as you are out on a track. (Note for developers: The communication between those two processes uses named pipes. For more technical information, see the [technical information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#technical-information) section below).
 
-Most of the information, that Jona needs, will be collected from the telemetry information of the simulation game. Unfortunately, this data does not contain every required information, and also there are additional data and configuration information, which are required by Jona. For example, data is required to understand the given race situation and the corresponding telemetry information, and to precisely predict tyre pressures, fuel requirements, tyre compound recommendations, and so on. In the end, all that means, that some setup work is required, before you start your race. 
+Most of the information, that Jona needs, will be collected from the telemetry information of the simulation game. Unfortunately, this data does not contain every required information, and also there are additional data and configuration information, which are required by Jona. For example, data is required to understand the given race situation and the corresponding telemetry information, and to precisely predict tyre pressures, fuel requirements, tyre compound recommendations, and so on. In the end, all that means, that some setup work is required, before you start your session. 
 
 ### Race Engineer Settings
 
-That said, we now come to an unpleasant part of the game, at least for the moment. The additional knowledge Jona needs is stored in a special file, *Race Engineer.settings*, that exists in the *Simulator Controller\Config* folder in your user *Documents* folder, which you have to modify for each race. You can do this by editing this file using a text editor or you can use a graphical user interface by using the application *Race Engineer Settings.exe* from the *Binaries* folder. As a side note, I am still trying to gather at least the setup part of this information from the simulation game itself.
+That said, we now come to an unpleasant part of the game, at least for the moment. The additional knowledge Jona needs is stored in a special file, *Race Engineer.settings*, that exists in the *Simulator Controller\Config* folder in your user *Documents* folder, which you have to modify for each session. You can do this by editing this file using a text editor or you can use a graphical user interface by using the application *Race Engineer Settings.exe* from the *Binaries* folder. As a side note, I am still trying to gather at least the setup part of this information from the simulation game itself.
 
 The *Race Engineer.settings* looks like this:
 
@@ -297,7 +297,7 @@ For the moment, the data collection consist of tyre setup information for the di
 
 Note: The database is stored in the *Simulator Controller\Setup Database* folder, which is located in your users *Documents* folder. Your own data files will be located in the *Local* subfolder, whereas the consolidated data will end up in the *Global* subfolder.
 
-*Very Important*: As long as we can't get the actual car setup information from the different simulation games via APIs, you **really** have to follow the guidelines from [above sections](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-engineer-settings), so that Jona has a correct understanding of your car and tyre setup. This has been important in the past to get a correct setup for an upcoming pitstop, but it is even more important when building the setup databse, so that we do not end up with compromised data. Jona will ask you at the end of the race, if you were happy with your setup and if you want to include the setup information in the database. Please only answer "Yes" here, if you are sure, that the setup information has been transferred correctly to Jona, as described above. Please note, that you still may have had a too low or too high hot tyre pressure during your race, because your initial setup was wrong in the first place. This is no problem, since Jona will store the corrected values in the database, as long as your initial setup values are known.
+*Very Important*: As long as we can't get the actual car setup information from the different simulation games via APIs, you **really** have to follow the guidelines from [above sections](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-engineer-settings), so that Jona has a correct understanding of your car and tyre setup. This has been important in the past to get a correct setup for an upcoming pitstop, but it is even more important when building the setup databse, so that we do not end up with compromised data. Jona will ask you at the end of the session, if you were happy with your setup and if you want to include the setup information in the database. Please only answer "Yes" here, if you are sure, that the setup information has been transferred correctly to Jona, as described above. Please note, that you still may have had a too low or too high hot tyre pressure during your session, because your initial setup was wrong in the first place. This is no problem, since Jona will store the corrected values in the database, as long as your initial setup values are known.
 
 ### How it works
 

@@ -252,11 +252,13 @@ Calling *toggleKeyDetector* enables or disables a special tool to detect buttons
 ## [Abstract] ConfigurationItemList extends [ConfigurationItem](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-classesahk) ([Simulator Configuration.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Tools/Simulator%20Configuration.ahk))
 This abstract class implements a list of items, which might be edited with an associated editor. Basis control on item selection, openening and closing the editor area, loading and saving items to and from the editor is already builtin. Please see the [implementation for the "Chat Messages Configuration" plugin](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Chat%20Messages%20Configuration%20Plugin.ahk) for a simple example of a concrete implementation of *ConfigurationItemList*.
 
+### Public Properties
+
 #### *ItemList[]*
-This variable holds all items of the list. This variable is typically initialized in the implementation of *loadFromConfiguration*. You can read and write to *ItemList*.
+This property holds all items of the list. It is typically initialized in the implementation of *loadFromConfiguration*. You can read from and write to *ItemList*.
 
 #### *CurrentItem[]*
-The currently selected line in the list. You can read and write to *CurrentItem*.
+The currently selected line in the list. You can read from and write to *CurrentItem*.
 
 #### *ListHandle[]*
 Returns the AutoHotkey HNDL for the *ListView* or *ListBox* used for this list widget.

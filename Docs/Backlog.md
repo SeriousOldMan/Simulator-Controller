@@ -1,5 +1,4 @@
 #### Driving...
-  0. [Target: V2.8][RF2 Plugin] Extension of the rFactor 2 and RaceRoom Racing Experience racing simulations support
   1. [Target: V2.9][RF2 Plugin] Pitstop handling for rFactor 2
   2. [Target: V3.0][iRC Plugin] New plugin for iRacing support
   3. [Target: V3.0] More race information provided by Jona (mostly for VR-users):
@@ -17,6 +16,5 @@
      - Recommend the lap, where a pitstop will have the most positive effect on race position
   
 #### General
-  0. [Target: V2.8] Documentation for plugin interface for the configuration tool
   1. [Target: V2.9] Choosing a specific theme depending on the selected simulation game
   2. [Target: V4.0] An interview based setup wizard, that guides through the configuration process

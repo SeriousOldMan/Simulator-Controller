@@ -50,7 +50,7 @@ An automated update mechanism for local configuration databases exists since Rel
 	
 	- Modes are defined and handled by [plugins](https://github.com/SeriousOldMan/Simulator-Controller#included-plugins), which can be implemented using an object oriented scripting language.
   - Configurable, visual feedback for your controller actions
-    - Define your own Button Box visual and integrate it with the Simulator Controller using the simple plugin support. Depending on configuration, this window will popup whenever an action is triggered from your controller, even during active simulation
+    - Define your own Button Box visual representation and integrate it with the Simulator Controller using the simple plugin support and a graphical layout editor. Depending on configuration, the Button Box window will popup whenever an action is triggered from your controller, even during active simulation, or it might stay open all the time, if you have anough screen space, for example a second monitor.
     
     ![](./Docs/Images/Button%20Box%202.JPG)
     

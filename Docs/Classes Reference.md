@@ -437,6 +437,9 @@ Returns the running number of the controller function. For example Button # **3*
 #### *Descriptor[]*
 The resource descriptor of the given function. Typically looks like "Button.3" or "Dial.2".
 
+#### *Enabled[]*
+*true*, if the function can currently be triggered.
+
 #### *Trigger[]*
 Returns a list of all triggers available for this controller function. A button class might return ["Push"], beacause only this single functionality is provided, whereas a dial function might return ["Increase", "Decrease"].
 	

@@ -33,7 +33,7 @@ class ApplicationsConfigurator extends ConfigurationItemList {
 		Get {
 			result := []
 			
-			for index, theApplication in this.iItemsList
+			for index, theApplication in this.ItemList
 				if !types
 					result.Push(theApplication[2])
 				else if inList(types, theApplication[1])
@@ -99,7 +99,7 @@ class ApplicationsConfigurator extends ConfigurationItemList {
 		base.loadFromConfiguration(configuration)
 	
 		for descriptor, name in getConfigurationSectionValues(configuration, "Applications", Object())
-			this.iItemsList.Push(Array(translate(ConfigurationItem.splitDescriptor(descriptor)[1]), new Application(name, configuration)))
+			this.ItemList.Push(Array(translate(ConfigurationItem.splitDescriptor(descriptor)[1]), new Application(name, configuration)))
 	}
 		
 	saveToConfiguration(configuration) {
@@ -108,7 +108,7 @@ class ApplicationsConfigurator extends ConfigurationItemList {
 		count := 0
 		lastType := ""
 		
-		for index, theApplication in this.iItemsList {
+		for index, theApplication in this.ItemList {
 			type := theApplication[1]
 			theApplication := theApplication[2]
 			
@@ -131,8 +131,8 @@ class ApplicationsConfigurator extends ConfigurationItemList {
 	updateState() {
 		base.updateState()
 		
-		if (this.iCurrentItemIndex != 0) {
-			theApplication := this.iItemsList[this.iCurrentItemIndex]
+		if (this.CurrentItem != 0) {
+			theApplication := this.ItemList[this.CurrentItem]
 			
 			type := theApplication[1]
 			
@@ -229,7 +229,7 @@ class ApplicationsConfigurator extends ConfigurationItemList {
 		GuiControlGet applicationShutdownEdit
 		GuiControlGet applicationIsRunningEdit
 		
-		return Array(isNew ? translate("Other") : this.iItemsList[this.iCurrentItemIndex][1]
+		return Array(isNew ? translate("Other") : this.ItemList[this.CurrentItem][1]
 				   , new Application(applicationNameEdit, false, applicationExePathEdit, applicationWorkingDirectoryPathEdit, applicationWindowTitleEdit
 				   , applicationStartupEdit, applicationShutdownEdit, applicationIsRunningEdit))
 	}

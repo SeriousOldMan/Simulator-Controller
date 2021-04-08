@@ -108,7 +108,7 @@ class ButtonBoxesList extends ConfigurationItemList {
 		for ignore, controller in string2Values("|", getConfigurationValue(configuration, "Controller Layouts", "Button Boxes", ""))
 			items.Push(string2Values(":", controller))
 			
-		this.iItemsList := items
+		this.ItemList := items
 	}
 		
 	saveToConfiguration(configuration) {
@@ -116,7 +116,7 @@ class ButtonBoxesList extends ConfigurationItemList {
 		
 		controller := []
 		
-		for ignore, item in this.iItemsList
+		for ignore, item in this.ItemList
 			controller.Push(values2String(":", item*))
 		
 		setConfigurationValue(configuration, "Controller Layouts", "Button Boxes", values2String("|", controller*))	
@@ -127,7 +127,7 @@ class ButtonBoxesList extends ConfigurationItemList {
 					
 		index := false
 		
-		for ignore, candidate in this.iItemsList
+		for ignore, candidate in this.ItemList
 			if (buttonBoxesListBox = candidate[1]) {
 				index := A_Index
 			
@@ -144,7 +144,7 @@ class ButtonBoxesList extends ConfigurationItemList {
 	loadList(items) {
 		controller := []
 		
-		for ignore, item in this.iItemsList
+		for ignore, item in this.ItemList
 			controller.Push(item[1])
 		
 		buttonBoxesListBox := values2String("|", controller*)
@@ -153,7 +153,7 @@ class ButtonBoxesList extends ConfigurationItemList {
 	}
 	
 	selectItem(itemNumber) {
-		this.iCurrentItemIndex := itemNumber
+		this.CurrentItem := itemNumber
 		
 		if itemNumber
 			GuiControl Choose, buttonBoxesListBox, %itemNumber%
@@ -323,7 +323,7 @@ class FunctionsList extends ConfigurationItemList {
 				func := Function.createFunction(descriptor, configuration)
 				
 				this.iFunctions[descriptor] := func
-				this.iItemsList.Push(func)
+				this.ItemList.Push(func)
 			}
 		}
 	}
@@ -331,7 +331,7 @@ class FunctionsList extends ConfigurationItemList {
 	saveToConfiguration(configuration) {
 		base.saveToConfiguration(configuration)
 		
-		for ignore, theFunction in this.iItemsList
+		for ignore, theFunction in this.ItemList
 			theFunction.saveToConfiguration(configuration)
 	}
 	
@@ -384,7 +384,7 @@ class FunctionsList extends ConfigurationItemList {
 		
 		Gui ListView, % this.ListHandle
 	
-		this.iItemsList := Array()
+		this.ItemList := Array()
 		
 		LV_Delete()
 		
@@ -412,7 +412,7 @@ class FunctionsList extends ConfigurationItemList {
 						
 					LV_Add("", translate(this.computeFunctionType(theFunction.Type)), theFunction.Number, hotkeysAndActions)
 					
-					this.iItemsList.Push(theFunction)
+					this.ItemList.Push(theFunction)
 				}
 		}
 		
@@ -527,12 +527,12 @@ class FunctionsList extends ConfigurationItemList {
 				
 				base.addItem()
 				
-				this.selectItem(inList(this.iItemsList, function))
+				this.selectItem(inList(this.ItemList, function))
 			}
 	}
 	
 	deleteItem() {
-		this.iFunctions.Delete(this.iItemsList[this.iCurrentItemIndex].Descriptor)
+		this.iFunctions.Delete(this.ItemList[this.CurrentItem].Descriptor)
 		
 		base.deleteItem()
 	}
@@ -541,7 +541,7 @@ class FunctionsList extends ConfigurationItemList {
 		local function := this.buildItemFromEditor()
 	
 		if function
-			if (function.Descriptor != this.iItemsList[this.iCurrentItemIndex].Descriptor) {
+			if (function.Descriptor != this.ItemList[this.CurrentItem].Descriptor) {
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 				title := translate("Error")
 				MsgBox 262160, %title%, % translate("The type and number of an existing function may not be changed...")
@@ -773,7 +773,7 @@ class ControlsList extends ConfigurationItemList {
 		for name, definition in getConfigurationSectionValues(configuration, "Controls", Object())
 			controls.Push(Array(name, string2Values(";", definition)*))
 		
-		this.iItemsList := controls
+		this.ItemList := controls
 	}
 		
 	saveToConfiguration(configuration, save := true) {
@@ -782,7 +782,7 @@ class ControlsList extends ConfigurationItemList {
 		
 		controls := {}
 		
-		for ignore, control in this.iItemsList
+		for ignore, control in this.ItemList
 			controls[control[1]] := values2String(";", control[2], control[3], control[4])
 		
 		setConfigurationSectionValues(configuration, "Controls", controls)	
@@ -795,7 +795,7 @@ class ControlsList extends ConfigurationItemList {
 	
 		LV_Delete()
 		
-		this.iItemsList := items
+		this.ItemList := items
 		
 		for ignore, control in items
 			LV_Add("", control[1], control[2], control[4])
@@ -855,14 +855,14 @@ class ControlsList extends ConfigurationItemList {
 	
 	getControls() {
 		if ConfigurationEditor.Instance.AutoSave {
-			if (this.iCurrentItemIndex != 0) {
+			if (this.CurrentItem != 0) {
 				this.updateItem()
 			}
 		}
 		
 		controls := {}
 		
-		for ignore, control in this.iItemsList
+		for ignore, control in this.ItemList
 			controls[control[1]] := values2String(";", control[2], control[3], control[4])
 		
 		return controls
@@ -925,7 +925,7 @@ class LabelsList extends ConfigurationItemList {
 		for name, definition in getConfigurationSectionValues(configuration, "Labels", Object())
 			labels.Push(Array(name, definition))
 		
-		this.iItemsList := labels
+		this.ItemList := labels
 	}
 		
 	saveToConfiguration(configuration, save := true) {
@@ -934,7 +934,7 @@ class LabelsList extends ConfigurationItemList {
 		
 		labels := {}
 		
-		for ignore, label in this.iItemsList
+		for ignore, label in this.ItemList
 			labels[label[1]] := label[2]
 		
 		setConfigurationSectionValues(configuration, "Labels", labels)	
@@ -947,7 +947,7 @@ class LabelsList extends ConfigurationItemList {
 	
 		LV_Delete()
 		
-		this.iItemsList := items
+		this.ItemList := items
 		
 		for ignore, label in items
 			LV_Add("", label[1], label[2])
@@ -999,14 +999,14 @@ class LabelsList extends ConfigurationItemList {
 	
 	getLabels() {
 		if ConfigurationEditor.Instance.AutoSave {
-			if (this.iCurrentItemIndex != 0) {
+			if (this.CurrentItem != 0) {
 				this.updateItem()
 			}
 		}
 		
 		labels := {}
 		
-		for ignore, label in this.iItemsList
+		for ignore, label in this.ItemList
 			labels[label[1]] := label[2]
 		
 		return labels
@@ -1041,7 +1041,7 @@ class LayoutsList extends ConfigurationItemList {
 	
 	CurrentButtonBox[] {
 		Get {
-			return ((this.iCurrentItemIndex != 0) ? this.iItemsList[this.iCurrentItemIndex][1] : false)
+			return ((this.CurrentItem != 0) ? this.ItemList[this.CurrentItem][1] : false)
 		}
 	}
 	
@@ -1128,14 +1128,14 @@ class LayoutsList extends ConfigurationItemList {
 		for name, definition in layouts
 			items.Push(Array(name, definition))
 		
-		this.iItemsList := items
+		this.ItemList := items
 	}
 		
 	saveToConfiguration(configuration, save := true) {
 		if save
 			base.saveToConfiguration(configuration)
 		
-		for ignore, layout in this.iItemsList {
+		for ignore, layout in this.ItemList {
 			grid := layout[2]["Grid"]
 			
 			setConfigurationValue(configuration, "Layouts", ConfigurationItem.descriptor(layout[1], "Layout")
@@ -1154,7 +1154,7 @@ class LayoutsList extends ConfigurationItemList {
 		
 		LV_Delete()
 		
-		this.iItemsList := items
+		this.ItemList := items
 		
 		for ignore, layout in items {
 			grid := layout[2]["Grid"]
@@ -1358,7 +1358,7 @@ class LayoutsList extends ConfigurationItemList {
 		}
 		
 		if (save && ConfigurationEditor.Instance.AutoSave) {
-			if (this.iCurrentItemIndex != 0) {
+			if (this.CurrentItem != 0) {
 				this.updateItem()
 			}
 		}

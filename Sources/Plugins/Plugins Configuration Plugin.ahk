@@ -30,7 +30,7 @@ class PluginsConfigurator extends ConfigurationItemList {
 		Get {
 			result := []
 			
-			for index, thePlugin in this.iItemsList
+			for index, thePlugin in this.ItemList
 				result.Push(thePlugin[2])
 				
 			return result
@@ -78,20 +78,20 @@ class PluginsConfigurator extends ConfigurationItemList {
 		base.loadFromConfiguration(configuration)
 	
 		for name, arguments in getConfigurationSectionValues(configuration, "Plugins", Object())
-			this.iItemsList.Push(new Plugin(name, configuration))
+			this.ItemList.Push(new Plugin(name, configuration))
 	}
 		
 	saveToConfiguration(configuration) {
 		base.saveToConfiguration(configuration)
 		
-		for ignore, thePlugin in this.iItemsList
+		for ignore, thePlugin in this.ItemList
 			thePlugin.saveToConfiguration(configuration)
 	}
 	
 	updateState() {
 		base.updateState()
 		
-		if (this.iCurrentItemIndex != 0) {
+		if (this.CurrentItem != 0) {
 			if (pluginEdit = "System") {
 				GuiControl Disable, pluginEdit
 				GuiControl Disable, pluginActivatedCheck
@@ -121,7 +121,7 @@ class PluginsConfigurator extends ConfigurationItemList {
 	
 		bubbleSort(items, "comparePlugins")
 		
-		this.iItemsList := items
+		this.ItemList := items
 	
 		count := LV_GetCount()
 		
@@ -154,10 +154,10 @@ class PluginsConfigurator extends ConfigurationItemList {
 	selectItem(itemNumber) {
 		Gui ListView, % this.ListHandle
 		
-		if (itemNumber && (itemNumber != this.iCurrentItemIndex))
+		if (itemNumber && (itemNumber != this.CurrentItem))
 			LV_Modify(itemNumber, "Vis +Select +Focus")
 		
-		this.iCurrentItemIndex := itemNumber
+		this.CurrentItem := itemNumber
 			
 		this.updateState()
 	}

@@ -62,14 +62,14 @@ class LaunchpadConfigurator extends ConfigurationItemList {
 			descriptor := ConfigurationItem.splitDescriptor(descriptor)
 			launchpad := string2Values("|", launchpad)
 
-			this.iItemsList.Push(Array(descriptor[2], launchpad[1], launchpad[2]))
+			this.ItemList.Push(Array(descriptor[2], launchpad[1], launchpad[2]))
 		}
 	}
 		
 	saveToConfiguration(configuration) {
 		base.saveToConfiguration(configuration)
 		
-		for ignore, launchpadApplication in this.iItemsList
+		for ignore, launchpadApplication in this.ItemList
 			setConfigurationValue(configuration, "Launchpad", ConfigurationItem.descriptor("Button", launchpadApplication[1]), values2String("|", launchpadApplication[2], launchpadApplication[3]))	
 	}
 	
@@ -82,7 +82,7 @@ class LaunchpadConfigurator extends ConfigurationItemList {
 		
 		bubbleSort(items, "compareLaunchApplications")
 		
-		this.iItemsList := items
+		this.ItemList := items
 		
 		for ignore, launchpadApplication in items
 			LV_Add("", launchpadApplication[1], launchpadApplication[2], launchpadApplication[3])
@@ -99,8 +99,8 @@ class LaunchpadConfigurator extends ConfigurationItemList {
 		launchpadApplicationsList := []
 		currentApplication := false
 	
-		if this.iCurrentItemIndex
-			currentApplication := this.iItemsList[this.iCurrentItemIndex][3]
+		if this.CurrentItem
+			currentApplication := this.ItemList[this.CurrentItem][3]
 		
 		if ApplicationsConfigurator.Instance
 			for ignore, launchpadApplication in ApplicationsConfigurator.Instance.Applications[[translate("Other")]]
@@ -150,7 +150,7 @@ class LaunchpadConfigurator extends ConfigurationItemList {
 			return false
 		}
 		else if isNew
-			for ignore, item in this.iItemsList
+			for ignore, item in this.ItemList
 				if (item[1] = launchpadNumberEdit) {
 					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 					title := translate("Error")
@@ -166,7 +166,7 @@ class LaunchpadConfigurator extends ConfigurationItemList {
 	updateItem() {
 		launchApplication := this.buildItemFromEditor()
 	
-		if (launchApplication && (launchApplication[1] != this.iItemsList[this.iCurrentItemIndex][1])) {
+		if (launchApplication && (launchApplication[1] != this.ItemList[this.CurrentItem][1])) {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 			title := translate("Error")
 			MsgBox 262160, %title%, % translate("The button number of an existing application launcher may not be changed...")

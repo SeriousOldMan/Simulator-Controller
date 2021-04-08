@@ -70,14 +70,14 @@ class ChatMessagesConfigurator extends ConfigurationItemList {
 			descriptor := ConfigurationItem.splitDescriptor(descriptor)
 			chatMessage := string2Values("|", chatMessage)
 
-			this.iItemsList.Push(Array(descriptor[2], chatMessage[1], chatMessage[2]))
+			this.ItemList.Push(Array(descriptor[2], chatMessage[1], chatMessage[2]))
 		}
 	}
 		
 	saveToConfiguration(configuration) {
 		base.saveToConfiguration(configuration)
 		
-		for ignore, chatMessage in this.iItemsList
+		for ignore, chatMessage in this.ItemList
 			setConfigurationValue(configuration, "Chat Messages", ConfigurationItem.descriptor("Button", chatMessage[1]), values2String("|", chatMessage[2], chatMessage[3]))	
 	}
 	
@@ -90,7 +90,7 @@ class ChatMessagesConfigurator extends ConfigurationItemList {
 		
 		bubbleSort(items, "compareChatMessages")
 		
-		this.iItemsList := items
+		this.ItemList := items
 		
 		for ignore, chatMessage in items
 			LV_Add("", chatMessage[1], chatMessage[2], chatMessage[3])
@@ -137,7 +137,7 @@ class ChatMessagesConfigurator extends ConfigurationItemList {
 			return false
 		}
 		else if isNew
-			for ignore, item in this.iItemsList
+			for ignore, item in this.ItemList
 				if (item[1] = chatMessageNumberEdit) {
 					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 					title := translate("Error")
@@ -153,7 +153,7 @@ class ChatMessagesConfigurator extends ConfigurationItemList {
 	updateItem() {
 		chatMessage := this.buildItemFromEditor()
 	
-		if (chatMessage && (chatMessage[1] != this.iItemsList[this.iCurrentItemIndex][1])) {
+		if (chatMessage && (chatMessage[1] != this.ItemList[this.CurrentItem][1])) {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 			title := translate("Error")
 			MsgBox 262160, %title%, % translate("The button number of an existing chat message may not be changed...")

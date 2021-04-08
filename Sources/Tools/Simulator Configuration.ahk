@@ -68,12 +68,39 @@ class ConfigurationItemList extends ConfigurationItem {
 	iUpButton := false
 	iDownButton := false
 	
-	iItemsList := []
-	iCurrentItemIndex := 0
+	iItemList := []
+	iCurrentItem := 0
 	
 	ListHandle[] {
 		Get {
 			return this.iListHandle
+		}
+			
+	}
+	
+	ItemList[index := "__Undefined__"] {
+		Get {
+			if (index != kUndefined)
+				return this.iItemList[index]
+			else
+				return this.iItemList
+		}
+		
+		Set {
+			if (index != kUndefined)
+				return this.iItemList[index] := value
+			else
+				return this.iItemList := value
+		}
+	}
+	
+	CurrentItem[] {
+		Get {
+			return this.iCurrentItem
+		}
+		
+		Set {
+			return this.iCurrentItem := value
 		}
 	}
 	
@@ -102,13 +129,13 @@ class ConfigurationItemList extends ConfigurationItem {
 		if downButton
 			ConfigurationItemList.associateList(downButton, this)
 		
-		this.loadList(this.iItemsList)
+		this.loadList(this.ItemList)
 		this.updateState()
 	}
 	
 	saveToConfiguration(configuration) {
 		if ConfigurationEditor.Instance.AutoSave {
-			if (this.iCurrentItemIndex != 0) {
+			if (this.CurrentItem != 0) {
 				this.updateItem()
 			}
 		}
@@ -177,20 +204,20 @@ class ConfigurationItemList extends ConfigurationItem {
 	}
 	
 	updateState() {
-		if (this.iCurrentItemIndex != 0) {
+		if (this.CurrentItem != 0) {
 			if (this.iDeleteButton != false)
 				GuiControl Enable, % this.iDeleteButton
 			if (this.iUpdateButton != false)
 				GuiControl Enable, % this.iUpdateButton
 			
 			if (this.iUpButton != false)
-				if (this.iCurrentItemIndex > 1)
+				if (this.CurrentItem > 1)
 					GuiControl Enable, % this.iUpButton
 				else
 					GuiControl Disable, % this.iUpButton
 			
 			if (this.iDownButton != false)
-				if (this.iCurrentItemIndex < this.iItemsList.Length())
+				if (this.CurrentItem < this.ItemList.Length())
 					GuiControl Enable, % this.iDownButton
 				else
 					GuiControl Disable, % this.iDownButton
@@ -222,24 +249,24 @@ class ConfigurationItemList extends ConfigurationItem {
 	}
 	
 	openEditor(itemNumber) {
-		if (itemNumber != this.iCurrentItemIndex){
+		if (itemNumber != this.CurrentItem){
 			if ConfigurationEditor.Instance.AutoSave {
-				if (this.iCurrentItemIndex != 0)
+				if (this.CurrentItem != 0)
 					this.updateItem()
 					
 				this.selectItem(itemNumber)
 			}
 			
-			this.iCurrentItemIndex := itemNumber
+			this.CurrentItem := itemNumber
 			
-			this.loadEditor(this.iItemsList[this.iCurrentItemIndex])
+			this.loadEditor(this.ItemList[this.CurrentItem])
 			
 			this.updateState()
 		}
 	}
 	
 	selectItem(itemNumber) {
-		this.iCurrentItemIndex := itemNumber
+		this.CurrentItem := itemNumber
 		
 		Gui ListView, % this.ListHandle
 			
@@ -253,22 +280,22 @@ class ConfigurationItemList extends ConfigurationItem {
 		item := this.buildItemFromEditor(true)
 		
 		if item {
-			this.iItemsList.Push(item)
+			this.ItemList.Push(item)
 		
-			this.loadList(this.iItemsList)
+			this.loadList(this.ItemList)
 			
-			this.selectItem(inList(this.iItemsList, item))
+			this.selectItem(inList(this.ItemList, item))
 		}
 	}
 	
 	deleteItem() {
-		this.iItemsList.RemoveAt(this.iCurrentItemIndex)
+		this.ItemList.RemoveAt(this.CurrentItem)
 		
-		this.loadList(this.iItemsList)
+		this.loadList(this.ItemList)
 		
 		this.clearEditor()
 		
-		this.iCurrentItemIndex := 0
+		this.CurrentItem := 0
 		
 		this.updateState()
 	}
@@ -285,11 +312,11 @@ class ConfigurationItemList extends ConfigurationItem {
 				item := this.buildItemFromEditor()
 				
 				if item {
-					this.iItemsList[this.iCurrentItemIndex] := item
+					this.ItemList[this.CurrentItem] := item
 					
-					this.loadList(this.iItemsList)
+					this.loadList(this.ItemList)
 					
-					this.selectItem(this.iCurrentItemIndex)
+					this.selectItem(this.CurrentItem)
 				}
 			}
 			finally {
@@ -299,27 +326,27 @@ class ConfigurationItemList extends ConfigurationItem {
 	}
 
 	upItem() {
-		item := this.iItemsList[this.iCurrentItemIndex]
+		item := this.ItemList[this.CurrentItem]
 		
-		this.iItemsList[this.iCurrentItemIndex] := this.iItemsList[this.iCurrentItemIndex - 1]
-		this.iItemsList[this.iCurrentItemIndex - 1] := item
+		this.ItemList[this.CurrentItem] := this.ItemList[this.CurrentItem - 1]
+		this.ItemList[this.CurrentItem - 1] := item
 		
-		this.loadList(this.iItemsList)
+		this.loadList(this.ItemList)
 			
-		this.selectItem(this.iCurrentItemIndex - 1)
+		this.selectItem(this.CurrentItem - 1)
 		
 		this.updateState()
 	}
 
 	downItem() {
-		item := this.iItemsList[this.iCurrentItemIndex]
+		item := this.ItemList[this.CurrentItem]
 		
-		this.iItemsList[this.iCurrentItemIndex] := this.iItemsList[this.iCurrentItemIndex + 1]
-		this.iItemsList[this.iCurrentItemIndex + 1] := item
+		this.ItemList[this.CurrentItem] := this.ItemList[this.CurrentItem + 1]
+		this.ItemList[this.CurrentItem + 1] := item
 		
-		this.loadList(this.iItemsList)
+		this.loadList(this.ItemList)
 			
-		this.selectItem(this.iCurrentItemIndex + 1)
+		this.selectItem(this.CurrentItem + 1)
 		
 		this.updateState()
 	}
@@ -604,7 +631,7 @@ class GeneralTab extends ConfigurationItem {
 			chosen := inList(choices, logLevelDropDown)
 			
 			if !chosen
-				chosem := 2
+				chosen := 2
 				
 			Gui %window%:Add, DropDownList, x224 y477 w91 Choose%chosen% VlogLevelDropDown, % values2String("|", map(choices, "translate")*)
 		}
@@ -769,19 +796,19 @@ class SimulatorsList extends ConfigurationItemList {
 	loadFromConfiguration(configuration) {
 		base.loadFromConfiguration(configuration)
 		
-		this.iItemsList := string2Values("|", getConfigurationValue(configuration, "Configuration", "Simulators", ""))
+		this.ItemList := string2Values("|", getConfigurationValue(configuration, "Configuration", "Simulators", ""))
 	}
 		
 	saveToConfiguration(configuration) {
 		base.saveToConfiguration(configuration)
 		
-		setConfigurationValue(configuration, "Configuration", "Simulators", values2String("|", this.iItemsList*))	
+		setConfigurationValue(configuration, "Configuration", "Simulators", values2String("|", this.ItemList*))	
 	}
 	
 	clickEvent(line, count) {
 		GuiControlGet simulatorsListBox
 					
-		this.openEditor(inList(this.iItemsList, simulatorsListBox))
+		this.openEditor(inList(this.ItemList, simulatorsListBox))
 	}
 	
 	processListEvent() {
@@ -789,13 +816,13 @@ class SimulatorsList extends ConfigurationItemList {
 	}
 	
 	loadList(items) {
-		simulatorsListBox := values2String("|", this.iItemsList*)
+		simulatorsListBox := values2String("|", this.ItemList*)
 	
 		GuiControl, , simulatorsListBox, % "|" . simulatorsListBox
 	}
 	
 	selectItem(itemNumber) {
-		this.iCurrentItemIndex := itemNumber
+		this.CurrentItem := itemNumber
 		
 		if itemNumber
 			GuiControl Choose, simulatorsListBox, %itemNumber%
@@ -1021,7 +1048,7 @@ class ThemesList extends ConfigurationItemList {
 					
 				themes[theme] := theme
 				
-				this.iItemsList.Push(Array(type, theme, media, songFile, duration))
+				this.ItemList.Push(Array(type, theme, media, songFile, duration))
 			}
 		}
 	}
@@ -1029,7 +1056,7 @@ class ThemesList extends ConfigurationItemList {
 	saveToConfiguration(configuration) {
 		base.saveToConfiguration(configuration)
 		
-		for index, theme in this.iItemsList {
+		for index, theme in this.ItemList {
 			name := theme[2]
 			type := theme[1]
 			songFile := theme[4]
@@ -1548,7 +1575,7 @@ class TranslationsList extends ConfigurationItemList {
 		
 		count := LV_GetCount()
 		
-		for index, translation in this.iItemsList
+		for index, translation in this.ItemList
 			if (index <= count)
 				LV_Modify(index, "", translation[1], translation[2])
 			else
@@ -1599,16 +1626,16 @@ class TranslationsList extends ConfigurationItemList {
 		if isNew
 			this.iChanged := true
 		else
-			this.iChanged := this.iChanged || (this.iItemsList[this.iCurrentItemIndex][2] != translationTextEdit)
+			this.iChanged := this.iChanged || (this.ItemList[this.CurrentItem][2] != translationTextEdit)
 		
 		return Array(originalTextEdit, translationTextEdit)
 	}
 	
 	openEditor(itemIndex) {
-		if (this.iCurrentItemIndex != 0) {
+		if (this.CurrentItem != 0) {
 			GuiControlGet translationTextEdit
 			
-			if (this.iItemsList[this.iCurrentItemIndex][2] != translationTextEdit)
+			if (this.ItemList[this.CurrentItem][2] != translationTextEdit)
 				this.updateItem()
 		}
 			
@@ -1616,8 +1643,8 @@ class TranslationsList extends ConfigurationItemList {
 	}
 	
 	findNextUntranslated() {
-		for index, translation in this.iItemsList
-			if ((index > this.iCurrentItemIndex) && (translation[2] = ""))
+		for index, translation in this.ItemList
+			if ((index > this.CurrentItem) && (translation[2] = ""))
 				return index
 		
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
@@ -1637,20 +1664,20 @@ class TranslationsList extends ConfigurationItemList {
 	loadTranslations(languageCode) {
 		this.iLanguageCode := languageCode
 		
-		this.iItemsList := []
+		this.ItemList := []
 		
 		for original, translation in readTranslations(this.iLanguageCode)
-			this.iItemsList.Push(Array(original, translation))
+			this.ItemList.Push(Array(original, translation))
 			
-		this.loadList(this.iItemsList)
+		this.loadList(this.ItemList)
 		this.clearEditor()
 		
-		this.iCurrentItemIndex := 0
+		this.CurrentItem := 0
 		this.iChanged := false
 	}
 	
 	saveTranslations() {
-		if (this.iCurrentItemIndex != 0)
+		if (this.CurrentItem != 0)
 			this.updateItem()
 
 		if this.iChanged {
@@ -1672,7 +1699,7 @@ class TranslationsList extends ConfigurationItemList {
 				
 				this.iLanguageCode := isoCodeEdit
 				
-				for ignore, item in this.iItemsList {
+				for ignore, item in this.ItemList {
 					original := item[1]
 					translated := item[2]
 				

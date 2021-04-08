@@ -26,9 +26,9 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-[2.8.0-beta](https://www.dropbox.com/s/zu43yybgeuquwlc/Simulator%20Controller%202.8.0-beta.zip?dl=1) (Preview for Release 2.8. New features: New plugin "Race Engineer" for handling Jona for different simulations, Early integration of Jona for RaceRoom Racing Experience and rFactor 2, Jona now supports Practice and Qualification Sessions, Introduced tyre compound color coding (red, white, blue, black), Documentation for Configuration Tool plugin support, Integrated MSBuild into the build pipeline. Automated update procedure is included, but no documentation yet...)
+[2.8.0-rc1](https://www.dropbox.com/s/h0kj7h0jlzczz81/Simulator%20Controller%202.8.0-rc1.zip?dl=1) (First release candidate for Release 2.8. New features: New plugin "Race Engineer" for handling Jona for different simulations, Early integration of Jona for RaceRoom Racing Experience and rFactor 2, Jona now supports Practice and Qualification Sessions, Introduced tyre compound color coding (red, white, blue, black), Documentation for Configuration Tool plugin support, Integrated MSBuild into the build pipeline. Feature complete, stable and automated update procedure included...)
 
-Note: Most of the "raceEngineer..." parameters have moved from the plugin "ACC" to the plugin "Race Engineer".
+As always, please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#28-release-040921) and - more important - the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-28) before installing and using this version.
 
 #### Latest release builds
 

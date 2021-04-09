@@ -275,7 +275,7 @@ int main(int argc, char* argv[])
 
 	if ((argc == 1) || strchr(argv[1], 'R'))
 	{
-		wcout << "[Race Data]" << endl;
+		wcout << "[Session Data]" << endl;
 
 		SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;
 

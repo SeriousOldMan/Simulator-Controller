@@ -32,7 +32,7 @@ Temperature=20.1019
 Weather=Dry
 Weather10min=Dry
 Weather30min=Dry
-[Race Data]
+[Session Data]
 Car=mclaren_720s_gt3
 Track=Paul_Ricard
 FuelAmount=125

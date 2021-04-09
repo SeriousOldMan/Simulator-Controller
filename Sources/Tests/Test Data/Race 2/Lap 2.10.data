@@ -7,7 +7,7 @@ SuspensionDamage=0, 0, 0, 0
 TyreCompound=Dry
 TyrePressure=26.263, 26.4172, 26.5404, 26.6965
 TyreTemperature=76.1428, 79.279, 77.9776, 81.2837
-[Race Data]
+[Session Data]
 Car=mclaren_720s_gt3
 FuelAmount=125
 Track=Imola

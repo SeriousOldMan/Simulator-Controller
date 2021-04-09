@@ -50,7 +50,7 @@
     <Compile Include="..\RF2 SHM Reader\Properties\AssemblyInfo.cs" />
     <Compile Include="..\RF2 SHM Reader\rF2Data.cs" />
     <Compile Include="..\RF2 SHM Reader\MappedBuffer.cs" />
-    <Compile Include="SHMReader.cs" />
+    <Compile Include="RF2 SHM Reader.cs" />
     <EmbeddedResource Include="..\RF2 SHM Reader\Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

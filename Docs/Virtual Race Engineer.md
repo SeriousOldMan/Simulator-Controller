@@ -186,7 +186,7 @@ That said, we now come to an unpleasant part of the game, at least for the momen
 
 The *Race Engineer.settings* looks like this:
 
-	[Race Settings]
+	[Session Settings]
 	Duration=3600
 	Lap.AvgTime=106
 	Lap.Formation=true
@@ -212,7 +212,7 @@ The *Race Engineer.settings* looks like this:
 	Tyre.Wet.Pressure.Target.FR=30.0
 	Tyre.Wet.Pressure.Target.RL=30.0
 	Tyre.Wet.Pressure.Target.RR=30.0
-	[Race Setup]
+	[Session Setup]
 	Tyre.Compound=Dry
 	Tyre.Compound.Color=Black
 	Tyre.Set=7
@@ -227,7 +227,7 @@ The *Race Engineer.settings* looks like this:
 	Tyre.Wet.Pressure.RR=28.2
 
 
-Most options above define general settings which will be applicable to any race event. But the options from the *[Race Setup]* section need to be adjusted for each individual race event, as long, as you want Jona to come to correct recommendations.
+Most options above define general settings which will be applicable to any race event. But the options from the *[Session Setup]* section need to be adjusted for each individual race event, as long, as you want Jona to come to correct recommendations.
 
   - The first fresh tyre set (*Tyre.Set.Fresh*), which is available for a pitstop and the tyres and pressures (*Tyre.XXX.Pressure.YY*) used for the first stint. Jona needs this information to calculate the target pressures for the first pitstop.
   - The *Lap.AvgTime* and *Fuel.AvgConsumption* are more informational, but might lead to more accurate estimations for the fuel calulations in the first few laps, where you typically have much slower lap times.
@@ -429,7 +429,7 @@ A considerable part of the knowledge of Jona comes from the telemetry informatio
 	Weather=Dry
 	Weather10min=Dry
 	Weather30min=Dry
-	[Race Data]
+	[Session Data]
 	Car=mclaren_720s_gt3
 	Track=Paul_Ricard
 	FuelAmount=125

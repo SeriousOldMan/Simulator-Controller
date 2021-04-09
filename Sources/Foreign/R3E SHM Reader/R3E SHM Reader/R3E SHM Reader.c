@@ -136,7 +136,7 @@ int main()
         mapped_r3e = TRUE;
     }
 
-    wprintf_s(L"[Race Data]\n");
+    wprintf_s(L"[Session Data]\n");
     if (mapped_r3e) {
         int modelID = map_buffer->vehicle_info.model_id;
         char buffer[33];

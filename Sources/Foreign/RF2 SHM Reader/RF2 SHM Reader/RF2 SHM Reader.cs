@@ -65,7 +65,7 @@ namespace RF2SHMReader {
 			rF2VehicleScoring playerScoring = GetPlayerScoring(ref scoring);
 			rF2VehicleTelemetry playerTelemetry = GetPlayerTelemetry(playerScoring.mID, ref telemetry);
 
-			Console.WriteLine("[Race Data]");
+			Console.WriteLine("[Session Data]");
 			if (connected) {
 				Console.Write("Car="); Console.WriteLine(GetStringFromBytes(playerScoring.mVehicleName));
 				Console.Write("Track="); Console.WriteLine(GetStringFromBytes(playerTelemetry.mTrackName));

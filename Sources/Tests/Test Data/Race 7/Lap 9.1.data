@@ -32,7 +32,7 @@ Temperature=24.4732
 Weather=Drizzle
 Weather10min=Drizzle
 Weather30min=LightRain
-[Race Data]
+[Session Data]
 Car=mclaren_720s_gt3
 Track=snetterton
 FuelAmount=125

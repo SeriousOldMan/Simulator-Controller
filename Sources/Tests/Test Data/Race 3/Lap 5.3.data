@@ -17,7 +17,7 @@ LapLastTime=108342
 LapBestTime=105342
 RaceTimeRemaining=2.10754e+06
 InPit=false
-[Race Data]
+[Session Data]
 Car=mclaren_720s_gt3
 Track=Imola
 FuelAmount=125

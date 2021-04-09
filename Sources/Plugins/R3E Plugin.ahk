@@ -142,15 +142,15 @@ class R3EPlugin extends ControllerPlugin {
 			carDB := JSON.parse(script)["cars"]
 		}
 		
-		carID := getConfigurationValue(data, "Race Data", "Car", "")
+		carID := getConfigurationValue(data, "Session Data", "Car", "")
 		
 		if (carID = lastCarID)
-			setConfigurationValue(data, "Race Data", "Car", lastCarName)
+			setConfigurationValue(data, "Session Data", "Car", lastCarName)
 		else {
 			lastCarID := carID
 			lastCarName := (carDB.HasKey(carID) ? carDB[carID]["Name"] : "Unknown")
 			
-			setConfigurationValue(data, "Race Data", "Car", lastCarName)
+			setConfigurationValue(data, "Session Data", "Car", lastCarName)
 		}
 	}
 }

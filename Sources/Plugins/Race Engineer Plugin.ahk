@@ -751,7 +751,7 @@ readSharedMemory(simulator, dataFile) {
 	
 	data := readConfiguration(dataFile)
 	
-	setConfigurationValue(data, "Race Data", "Simulator", simulator)
+	setConfigurationValue(data, "Session Data", "Simulator", simulator)
 	
 	return data
 }

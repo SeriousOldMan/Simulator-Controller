@@ -609,7 +609,8 @@ checkForUpdates() {
 	if inList(["Simulator Startup", "Simulator Configuration", "Simulator Settings"], StrSplit(A_ScriptName, ".")[1]) {
 		URLDownloadToFile https://www.dropbox.com/s/txa8muw9j3g66tl/VERSION?dl=1, %kUserHomeDirectory%Temp\VERSION
 		
-		version := getConfigurationValue(readConfiguration(kUserHomeDirectory . "Temp\VERSION"), "Version", "Release", false)
+		version := readConfiguration(kUserHomeDirectory . "Temp\VERSION")
+		version := getConfigurationValue(version, "Release", "Version", getConfigurationValue(version, "Version", "Release", false))
 		
 		if version {
 			version := values2String("", string2Values(".", StrSplit(version, "-", , 2)[1])*)
@@ -695,7 +696,13 @@ loadSimulatorConfiguration() {
 	kSimulatorConfiguration := readConfiguration(kSimulatorConfigurationFile)
 	vTargetLanguageCode := getConfigurationValue(kSimulatorConfiguration, "Configuration", "Language", "en")
 	
-	kVersion := getConfigurationValue(readConfiguration(kHomeDirectory . "VERSION"), "Version", "Current", "0.0.0")
+	version := readConfiguration(kHomeDirectory . "VERSION")
+	section := getConfigurationValue(version, "Current", "Type", false)
+	
+	if section
+		kVersion := getConfigurationValue(version, section, "Version", "0.0.0-dev")
+	else
+		kVersion := getConfigurationValue(version, "Current", "Version", getConfigurationValue(version, "Version", "Current", "0.0.0-dev"))
 	
 	Process Exist
 	

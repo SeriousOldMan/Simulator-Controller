@@ -11,6 +11,12 @@ General Release Actions
 9. Check, whether update documentation for the release is required in "Updates.md"
 10. Update Wiki using "update-documentation.bat"
 
+Release 2.8.5 Checklist
+======================
+
+1. Changed VERSION file format
+   a. Test against old distribution
+
 Release 2.8 Checklist
 =====================
 

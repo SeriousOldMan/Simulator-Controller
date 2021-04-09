@@ -51,24 +51,6 @@
     <Compile Include="..\RF2 SHM Reader\rF2Data.cs" />
     <Compile Include="..\RF2 SHM Reader\MappedBuffer.cs" />
     <Compile Include="RF2 SHM Reader.cs" />
-    <EmbeddedResource Include="..\RF2 SHM Reader\Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <Compile Include="..\RF2 SHM Reader\Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <None Include="..\RF2 SHM Reader\Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-    <Compile Include="..\RF2 SHM Reader\Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\RF2 SHM Reader\App.config" />

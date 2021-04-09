@@ -9,3 +9,5 @@ Date=04/09/2021
 Changes=Full Refactoring of Race Engineer Integration, Integrated RaceRoom Racing Experience with Jona, Integrated rFactor 2 with Jona, Jona support for practice and qualification sessions, Reimport of Race Engineer Settings during an active session, Tyre compound color coding, Integrated MSBuild into the build pipeline, Documentation for configuration tool plugin support
 [Current]
 Type=Development
+[Version]
+Release=2.8.0-release

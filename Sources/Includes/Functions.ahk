@@ -622,7 +622,7 @@ checkForUpdates() {
 			version := values2String("", string2Values(".", version[1])*)
 			current := values2String("", string2Values(".", current[1])*)
 			
-			if ((version > current) || (versionPostfix != currentPostfix)) {
+			if ((version > current) || ((version = current) && (versionPostfix != currentPostfix))) {
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
 				title := translate("Modular Simulator Controller System")
 				MsgBox 262436, %title%, % translate("A newer version of Simulator Controller is available. Do you want to download it now?")

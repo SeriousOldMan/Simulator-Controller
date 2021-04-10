@@ -6,23 +6,17 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                         Local Include Section                           ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include ..\Plugins\Libraries\Simulator Plugin.ahk
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 global kRaceEngineerPlugin = "Race Engineer"
-
-global kSessionFinished = 0
-global kSessionPaused = -1
-global kSessionOther = 1
-global kSessionPractice = 2
-global kSessionQualification = 3
-global kSessionRace = 4
-
-global kFront = 0
-global kRear = 1
-global kLeft = 2
-global kRight = 3
-global kCenter = 4
 
 
 ;;;-------------------------------------------------------------------------;;;

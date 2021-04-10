@@ -325,7 +325,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	
 	class EffectSelectorAction extends ControllerAction {
 		fireAction(function, trigger) {
-			mode := this.Controller.findMode(kMotionMode)
+			mode := this.Controller.findMode(kMotionFeedbackPlugin, kMotionMode)
 			
 			if (mode.PendingEffect || (mode.SelectedEffect != false))
 				mode.deselectEffect()
@@ -952,7 +952,7 @@ updateEffectLabels() {
 	static mode := false
 	
 	if !mode
-		mode := SimulatorController.Instance.findMode(kMotionMode)
+		mode := SimulatorController.Instance.findMode(kMotionFeedbackPlugin, kMotionMode)
 		
 	protectionOn()
 	

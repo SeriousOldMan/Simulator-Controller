@@ -32,11 +32,6 @@ global kSessionPractice = 2
 global kSessionQualification = 3
 global kSessionRace = 4
 
-global kFront = 0
-global kRear = 1
-global kLeft = 2
-global kRight = 3
-global kCenter = 4
 
 global kDebugOff := 0
 global kDebugGrammars := 1

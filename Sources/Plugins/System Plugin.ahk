@@ -72,7 +72,7 @@ class SystemPlugin extends ControllerPlugin {
 			if (true || (stateChange && (this.LaunchpadFunction != false))) {
 				controller := SimulatorController.Instance
 					
-				if (inList(controller.ActiveModes, controller.findMode(kLaunchMode))) {
+				if (inList(controller.ActiveModes, controller.findMode(kSystemPlugin, kLaunchMode))) {
 					if transition
 						this.LaunchpadFunction.setText(translate(this.LaunchpadAction.Label), "Gray")
 					else
@@ -142,7 +142,7 @@ class SystemPlugin extends ControllerPlugin {
 		
 		fireAction(function, trigger) {
 			if !this.Transition {
-				if (inList(function.Controller.ActiveModes, function.Controller.findMode(kLaunchMode))) {
+				if (inList(function.Controller.ActiveModes, function.Controller.findMode(kSystemPlugin, kLaunchMode))) {
 					this.beginTransition()
 				
 					function.setText(translate(this.Label), "Gray")
@@ -309,11 +309,13 @@ class SystemPlugin extends ControllerPlugin {
 		base.simulatorStartup(simulator)
 	}
 	
+	/*
 	simulatorShutdown(simulator) {
 		base.simulatorShutdown(simulator)
 		
 		this.Controller.setMode(this.iLaunchMode)
 	}
+	*/
 	
 	findRunnableApplication(name) {
 		for ignore, candidate in this.RunnableApplications
@@ -504,10 +506,10 @@ updateModeSelector() {
 	
 	if !controller
 		controller := SimulatorController.Instance
-	
+	/*
 	if (controller.ActiveModes.Length() == 0) {
 		if reInitialize {
-			controller.setMode(controller.findMode(kLaunchMode))
+			controller.setMode(controller.findMode(kSystemPlugin, kLaunchMode))
 			
 			reInitialize := false
 		}
@@ -516,7 +518,7 @@ updateModeSelector() {
 	}
 	else
 		reInitialize := false
-	
+	*/
 	protectionOn()
 	
 	try {
@@ -558,7 +560,7 @@ initializeSystemPlugin() {
 	
 	new SystemPlugin(controller, kSystemPlugin, controller.Configuration)
 	
-	controller.setMode(controller.findMode(kLaunchMode))
+	; controller.setMode(controller.findMode(kSystemPlugin, kLaunchMode))
 	
 	registerEventHandler("Startup", "functionEventHandler")
 }

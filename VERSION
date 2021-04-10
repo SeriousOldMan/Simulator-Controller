@@ -2,7 +2,7 @@
 Version=2.8.5-dev
 Target=2.8.5-release
 Date=04/10/2021
-Changes=New VERSION file format, Refactoring of the Simulator Plugins
+Changes=New VERSION file format, Refactoring of the Simulator Plugins, Icons for SHM Readers
 [Release]
 Version=2.8.0-release
 Date=04/09/2021

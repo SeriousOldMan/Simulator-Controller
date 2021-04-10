@@ -508,9 +508,9 @@ class RaceEngineer extends ConfigurationItem {
 		if this.iSpeechRecognizer && !this.Listening
 			if !this.iSpeechRecognizer.startRecognizer() {
 				if retry {
-					function := ObjBindMethod(this, "startListening", true)
+					callback := ObjBindMethod(this, "startListening", true)
 					
-					SetTimer %function%, -200
+					SetTimer %callback%, -200
 				}
 				
 				return false
@@ -528,9 +528,9 @@ class RaceEngineer extends ConfigurationItem {
 		if this.iSpeechRecognizer && this.Listening
 			if !this.iSpeechRecognizer.stopRecognizer() {
 				if retry {
-					function := ObjBindMethod(this, "stopListening", true)
+					callback := ObjBindMethod(this, "stopListening", true)
 					
-					SetTimer %function%, -200
+					SetTimer %callback%, -200
 				}
 				
 				return false
@@ -1325,6 +1325,7 @@ class RaceEngineer extends ConfigurationItem {
 						this.setContinuation(ObjBindMethod(this, "updateSetupDatabase", true))
 						
 						callback := ObjBindMethod(this, "forceFinishSession")
+						
 						SetTimer %callback%, -60000
 					}
 					else {

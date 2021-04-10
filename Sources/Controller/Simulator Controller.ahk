@@ -230,6 +230,9 @@ class ButtonBox extends ConfigurationItem {
 	}
 	
 	show(makeVisible := true) {
+		if !this.Controller.Started
+			return
+		
 		duration := this.VisibleDuration
 	
 		if (duration >= 9999)
@@ -360,6 +363,8 @@ class ButtonBox extends ConfigurationItem {
 }
 
 class SimulatorController extends ConfigurationItem {
+	iStarted := false
+	
 	iSettings := false
 	
 	iPlugins := []
@@ -382,6 +387,12 @@ class SimulatorController extends ConfigurationItem {
 	Settings[] {
 		Get {
 			return this.iSettings
+		}
+	}
+	
+	Started[] {
+		Get {
+			return this.iStarted
 		}
 	}
 	
@@ -506,9 +517,12 @@ class SimulatorController extends ConfigurationItem {
 		return false
 	}
 	
-	findMode(name) {
+	findMode(plugin, name) {
+		if !IsObject(plugin)
+			plugin := this.findPlugin(plugin)
+		
 		for ignore, mode in this.Modes
-			if (mode.Mode = name)
+			if ((mode.Mode = name) && (mode.Plugin == plugin))
 				return mode
 		
 		return false
@@ -570,6 +584,16 @@ class SimulatorController extends ConfigurationItem {
 			
 			this.Modes.Push(mode)
 		}
+	}
+	
+	startup() {	
+		this.iStarted := true
+		
+		this.setModes()
+		
+		for ignore, btnBox in this.ButtonBoxes
+			if btnBox.VisibleDuration >= 9999
+				btnBox.show()
 	}
 	
 	computeControllerModes() {
@@ -848,6 +872,29 @@ class SimulatorController extends ConfigurationItem {
 		
 		this.setMode(targetMode)
 	}
+	
+	setModes(simulator := false, session := false) {
+		modes := false
+		
+		if !simulator
+			modes := getConfigurationValue(this.Settings, "Button Box Modes", "Default", false)
+		else {
+			modes := getConfigurationValue(this.Settings, "Button Box Modes", ConfigurationItem.descriptor(simulator, session), false)
+		
+			if !modes
+				modes := getConfigurationValue(this.Settings, "Modes", ConfigurationItem.descriptor(simulator, "Default"), false)
+		}
+	
+		if modes
+			for ignore, theMode in string2Values(",", modes) {
+				theMode := ConfigurationItem.splitDescriptor(theMode)
+			
+				theMode := this.findMode(theMode[1], theMode[2])
+			
+				if theMode
+					this.setMode(theMode)
+			}
+	}
 
 	showLogo(show := "__Undefined__") {
 		if (show != kUndefined)
@@ -903,6 +950,29 @@ class SimulatorController extends ConfigurationItem {
 		SetTimer updateSimulatorState, -10000
 		
 		this.iShowLogo := (this.iShowLogo && !kSilentMode)
+	}
+	
+	writeConfigurationInfo() {
+		configuration := newConfiguration()
+		
+		for ignore, thePlugin in this.Plugins {
+			modes := []
+			
+			for ignore, theMode in thePlugin.Modes
+				modes.Push(theMode.Mode)
+			
+			simulators := []
+			
+			for ignore, simulator in thePlugin.Simulators
+				simulators.Push(simulator)
+			
+			setConfigurationValue(configuration, "Plugins", thePlugin.Plugin, values2String("|", this.isActive(thePlugin), values2String(",", simulators*), values2String(",", modes*)))
+		}
+		
+		for ignore, btnBox in this.ButtonBoxes
+			setConfigurationValue(configuration, "Button Boxes", btnBox.Descriptor, values2String(",", btnBox.Num1WayToggles, btnBox.Num2WayToggles, btnBox.NumButtons, btnBox.NumDials))
+		
+		writeConfiguration(kTempDirectory . "Controller.config", configuration)
 	}
 }
 
@@ -1558,13 +1628,17 @@ initializeSimulatorController() {
 startupSimulatorController() {
 	controller := SimulatorController.Instance
 	
+	if ((A_Args.Length() > 0) &&  (A_Args[1] = "-Config")) {
+		controller.writeConfigurationInfo()
+		
+		ExitApp 0
+	}
+	
 	controller.computeControllerModes()
 	
 	controller.updateLastEvent()
 	
-	for ignore, btnBox in controller.ButtonBoxes
-		if btnBox.VisibleDuration >= 9999
-			btnBox.show()
+	controller.startup()
 }
 
 

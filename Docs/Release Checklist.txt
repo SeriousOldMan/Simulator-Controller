@@ -16,6 +16,15 @@ Release 2.8.5 Checklist
 
 1. Changed VERSION file format
    a. Test against old distribution
+2. Plugin / Mode Auto Activation
+   a. Documentation
+3. New constant kTempDirectory
+   a. Documentation
+   b. Replace everywhere
+4. New property SimulatorController.Started
+   a. Documentation
+5. New parameter SimulatorController.findMode
+   a. Documentation
 
 Release 2.8 Checklist
 =====================

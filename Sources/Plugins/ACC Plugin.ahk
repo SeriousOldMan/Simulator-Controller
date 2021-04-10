@@ -6,6 +6,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                         Local Include Section                           ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include ..\Plugins\Libraries\Simulator Plugin.ahk
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -26,7 +33,7 @@ global kCenter = 4
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class ACCPlugin extends ControllerPlugin {
+class ACCPlugin extends RaceEngineerSimulatorPlugin {
 	kOpenPitstopMFDHotkey := false
 	kClosePitstopMFDHotkey := false
 	kPSMutatingOptions := ["Strategy", "Change Tyres", "Compound", "Change Brakes"]
@@ -52,10 +59,6 @@ class ACCPlugin extends ControllerPlugin {
 	
 	iRepairSuspensionChosen := true
 	iRepairBodyworkChosen := true
-	
-	iRaceEngineer := false
-	
-	iSessionState := kSessionFinished
 	
 	class ChatMode extends ControllerMode {
 		Mode[] {
@@ -239,12 +242,6 @@ class ACCPlugin extends ControllerPlugin {
 		}
 	}
 	
-	Code[] {
-		Get {
-			return kACCPlugin
-		}
-	}
-	
 	OpenPitstopMFDHotkey[] {
 		Get {
 			return this.kOpenPitstopMFDHotkey
@@ -257,22 +254,10 @@ class ACCPlugin extends ControllerPlugin {
 		}
 	}
 	
-	RaceEngineer[] {
-		Get {
-			return this.iRaceEngineer
-		}
-	}
-	
-	SessionState[] {
-		Get {
-			return this.iSessionState
-		}
-	}
-	
-	__New(controller, name, configuration := false) {
+	__New(controller, name, simulator, configuration := false) {
 		this.iChatMode := new this.ChatMode(this)
 		
-		base.__New(controller, name, configuration)
+		base.__New(controller, name, simulator, configuration)
 		
 		this.registerMode(this.iChatMode)
 		
@@ -392,19 +377,10 @@ class ACCPlugin extends ControllerPlugin {
 			logMessage(kLogWarn, translate("Pitstop action ") . action . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
 	}
 	
-	runningSimulator() {
-		return (isACCRunning() ? kACCApplication : false)
-	}
-	
 	simulatorStartup(simulator) {
 		base.simulatorStartup(simulator)
 		
 		if (simulator = kACCApplication) {
-			raceEngineer := SimulatorController.Instance.findPlugin(kRaceEngineerPlugin)
-		
-			if (raceEngineer && raceEngineer.isActive())
-				raceEngineer.startSimulation(this)
-			
 			if (inList(this.Simulators, simulator)) {
 				this.Controller.setMode(this.iChatMode)
 			}
@@ -415,13 +391,6 @@ class ACCPlugin extends ControllerPlugin {
 		base.simulatorShutdown()
 		
 		if (simulator = kACCApplication) {
-			raceEngineer := SimulatorController.Instance.findPlugin(kRaceEngineerPlugin)
-			
-			if (raceEngineer && raceEngineer.isActive() && (raceEngineer.Simulator == this))
-				raceEngineer.stopSimulation(this)
-			
-			this.updateSessionState(kSessionFinished)
-			
 			activeModes := this.Controller.ActiveModes
 			
 			if inList(activeModes, this.iChatMode)
@@ -432,7 +401,7 @@ class ACCPlugin extends ControllerPlugin {
 	}
 	
 	updateSessionState(sessionState) {
-		this.iSessionState := sessionState
+		base.updateSessionState()
 		
 		activeModes := this.Controller.ActiveModes
 		
@@ -1245,25 +1214,6 @@ class ACCPlugin extends ControllerPlugin {
 		this.openPitstopMFD(update)
 	}
 	
-	planPitstop() {
-		if this.RaceEngineer
-			this.RaceEngineer.planPitstop()
-	}
-	
-	preparePitstop(lap := false) {
-		if this.RaceEngineer
-			this.RaceEngineer.preparePitstop(lap)
-	}
-	
-	pitstopPlanned(pitstopNumber) {
-	}
-	
-	pitstopPrepared(pitstopNumber) {
-	}
-	
-	pitstopFinished(pitstopNumber) {
-	}
-	
 	startPitstopSetup(pitstopNumber) {
 		openPitstopMFD()
 	}
@@ -1316,9 +1266,6 @@ class ACCPlugin extends ControllerPlugin {
 		if (repairBodywork != this.iRepairBodyworkChosen)
 			togglePitstopActivity("Repair Bodywork")
 	}
-	
-	updateSimulatorData(data) {
-	}
 }
 
 ;;;-------------------------------------------------------------------------;;;
@@ -1326,8 +1273,7 @@ class ACCPlugin extends ControllerPlugin {
 ;;;-------------------------------------------------------------------------;;;
 
 startACC() {
-	return SimulatorController.Instance.startSimulator(new Application(kACCApplication
-													 , SimulatorController.Instance.Configuration), "Simulator Splash Images\ACC Splash.jpg")
+	return SimulatorController.Instance.startSimulator(SimulatorController.Instance.findPlugin(kACCPlugin).Simulator, "Simulator Splash Images\ACC Splash.jpg")
 }
 
 stopACC() {
@@ -1527,7 +1473,7 @@ updatePitstopState() {
 initializeACCPlugin() {
 	local controller := SimulatorController.Instance
 	
-	new ACCPlugin(controller, kACCPLugin, controller.Configuration)
+	new ACCPlugin(controller, kACCPLugin, kACCApplication, controller.Configuration)
 }
 
 

@@ -378,7 +378,7 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 	}
 	
 	updateSessionState(sessionState) {
-		base.updateSessionState()
+		base.updateSessionState(sessionState)
 		
 		activeModes := this.Controller.ActiveModes
 		

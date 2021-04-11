@@ -68,13 +68,14 @@ class SimulatorPlugin extends ControllerPlugin {
 	}
 	
 	updateSessionState(sessionState) {
-		this.iSessionState := sessionState
-		
-		if (sessionState != kSessionPaused)
+		if ((sessionState != this.iSessionState) && (sessionState != kSessionPaused)) { 
+			this.iSessionState := sessionState
+			
 			if (sessionState == kSessionFinished)
 				this.Controller.setModes()
 			else
 				this.Controller.setModes(this.Simulator.Application, ["Other", "Practice", "Qualification", "Race"][sessionState])
+		}
 	}
 }
 

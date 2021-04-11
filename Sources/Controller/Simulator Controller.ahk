@@ -882,9 +882,9 @@ class SimulatorController extends ConfigurationItem {
 			modes := getConfigurationValue(this.Settings, "Button Box Modes", ConfigurationItem.descriptor(simulator, session), false)
 		
 			if !modes
-				modes := getConfigurationValue(this.Settings, "Modes", ConfigurationItem.descriptor(simulator, "Default"), false)
+				modes := getConfigurationValue(this.Settings, "Button Box Modes", ConfigurationItem.descriptor(simulator, "Default"), false)
 		}
-	
+		
 		if modes
 			for ignore, theMode in string2Values(",", modes) {
 				theMode := ConfigurationItem.splitDescriptor(theMode)

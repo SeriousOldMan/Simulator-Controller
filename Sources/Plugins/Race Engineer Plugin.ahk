@@ -274,7 +274,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 	updateActions(sessionState) {
 		for ignore, theAction in this.Actions
 			if isInstance(theAction, RaceEngineerPlugin.RaceEngineerToggleAction) {
-				theAction.Function.setText(this.actionLabel(theAction.Label), this.RaceEngineerName ? (this.RaceEngineerEnabled ? "Green" : "Black") : "Gray")
+				theAction.Function.setText(this.actionLabel(theAction), this.RaceEngineerName ? (this.RaceEngineerEnabled ? "Green" : "Black") : "Gray")
 				
 				if !this.RaceEngineerName
 					theAction.Function.disable()

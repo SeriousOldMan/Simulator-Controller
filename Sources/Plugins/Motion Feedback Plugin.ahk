@@ -98,9 +98,11 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 				state := (isInfo ? ((this.iSelectedEffect == kUndefined) ? "Highlight" : "Info") : "Normal")
 				
 				for index, effect in this.Plugin.kEffects
-					this.findAction(this.Plugin.getLabel(ConfigurationItem.descriptor(effect, "Toggle"), effect)).updateLabel(state)
+					if inList(this.Controller.ActiveModes, this)
+						this.findAction(this.Plugin.getLabel(ConfigurationItem.descriptor(effect, "Toggle"), effect)).updateLabel(state)
 			
-				this.findAction("Motion Intensity").updateLabel(isInfo ? "Info" : "Normal")
+				if inList(this.Controller.ActiveModes, this)
+					this.findAction("Motion Intensity").updateLabel(isInfo ? "Info" : "Normal")
 			
 				isInfo := !isInfo
 			}
@@ -137,11 +139,11 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		}
 		
 		deactivate() {
+			base.deactivate()
+			
 			SetTimer updateEffectLabels, Off
 			
 			this.deselectEffect()
-			
-			base.deactivate()
 		}
 		
 		updateActionStates() {
@@ -164,23 +166,25 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		}
 		
 		fireAction(function, trigger) {
+			local plugin := this.Plugin
+			
 			if (this.Active && ((trigger = "Off") || (trigger == "Push"))) {
-				this.Plugin.findMode(kMotionMode).deselectEffect()
+				plugin.findMode(kMotionMode).deselectEffect()
 				
-				this.Plugin.stopMotion()
+				plugin.stopMotion()
 			}
 			else if (!this.Active && ((trigger = "On") || (trigger == "Push")))
-				this.Plugin.startMotion()
+				plugin.startMotion()
 				
 			if this.Active {				
-				trayMessage(translate(this.Label), translate("State: On"))
+				trayMessage(plugin.actionLabel(this), translate("State: On"))
 			
-				function.setText(translate(this.Label), "Green")
+				function.setText(plugin.actionLabel(this), "Green")
 			}
 			else {
-				trayMessage(translate(this.Label), translate("State: Off"))
+				trayMessage(plugin.actionLabel(this), translate("State: Off"))
 			
-				function.setText(translate(this.Label), "Gray")
+				function.setText(plugin.actionLabel(this), "Gray")
 			}
 		}
 	}
@@ -278,13 +282,13 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		
 		updateLabel(mode) {
 			if (mode == "Highlight")
-				this.Function.setText(translate(this.Label), "Blue")
+				this.Function.setText(this.Label, "Blue")
 			else if (mode == "Info")
 				this.Function.setText(Format("{:.1f}", this.Mode.Plugin.getEffectIntensity(this.iEffect)), "Gray")
 			else if this.Active
-				this.Function.setText(translate(this.Label), "Green")
+				this.Function.setText(this.Label, "Green")
 			else
-				this.Function.setText(translate(this.Label), "Gray")
+				this.Function.setText(this.Label, "Gray")
 		}
 	}
 			
@@ -540,7 +544,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		
 		action := this.findAction("Motion")
 		
-		action.Function.setText(translate(action.Label), isRunning ? (action.Active ? "Green" : "Black") : "Olive")
+		action.Function.setText(this.actionLabel(action), isRunning ? (action.Active ? "Green" : "Black") : "Olive")
 			
 		SetTimer updateMotionState, -100
 	}
@@ -549,6 +553,13 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		SetTimer updateMotionState, Off
 		
 		base.deactivate()
+	}
+	
+	actionLabel(action) {
+		if isInstance(action, MotionFeedbackPlugin.EffectToggleAction)
+			return action.Label
+		else
+			return translate(base.actionLabel(action))
 	}
 	
 	callSimFeedback(arguments*) {

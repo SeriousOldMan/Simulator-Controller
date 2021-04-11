@@ -74,9 +74,9 @@ class SystemPlugin extends ControllerPlugin {
 					
 				if (inList(controller.ActiveModes, controller.findMode(kSystemPlugin, kLaunchMode))) {
 					if transition
-						this.LaunchpadFunction.setText(translate(this.LaunchpadAction.Label), "Gray")
+						this.LaunchpadFunction.setText(this.LaunchpadAction.Label, "Gray")
 					else
-						this.LaunchpadFunction.setText(translate(this.LaunchpadAction.Label), isRunning ? "Green" : "Black")
+						this.LaunchpadFunction.setText(this.LaunchpadAction.Label, isRunning ? "Green" : "Black")
 				}
 			}	
 		}
@@ -114,7 +114,7 @@ class SystemPlugin extends ControllerPlugin {
 			
 			controller.rotateMode(((trigger == "Off") || (trigger == "Decrease")) ? -1 : 1, Array(controller.findButtonBox(function)))
 
-			this.Function.setText(translate(this.Label))
+			this.Function.setText(controller.findPlugin(kSystemPlugin).actionLabel(this))
 		}
 	}
 
@@ -145,7 +145,7 @@ class SystemPlugin extends ControllerPlugin {
 				if (inList(function.Controller.ActiveModes, function.Controller.findMode(kSystemPlugin, kLaunchMode))) {
 					this.beginTransition()
 				
-					function.setText(translate(this.Label), "Gray")
+					function.setText(this.Label, "Gray")
 				}
 				
 				if !this.Application.isRunning()
@@ -308,14 +308,6 @@ class SystemPlugin extends ControllerPlugin {
 	
 		base.simulatorStartup(simulator)
 	}
-	
-	/*
-	simulatorShutdown(simulator) {
-		base.simulatorShutdown(simulator)
-		
-		this.Controller.setMode(this.iLaunchMode)
-	}
-	*/
 	
 	findRunnableApplication(name) {
 		for ignore, candidate in this.RunnableApplications
@@ -480,15 +472,21 @@ unmuteSimulator() {
 
 updateApplicationStates() {
 	static plugin := false
+	static controller := false
+	static mode:= false
 	
-	if !plugin
-		plugin := SimulatorController.Instance.findPlugin(kSystemPlugin)
+	if !plugin {
+		controller := SimulatorController.Instance
+		plugin := controller.findPlugin(kSystemPlugin)
+		mode := plugin.findeMode(kLaunchMode)
+	}
 		
 	protectionOn()
 
 	try {
 		for ignore, runnable in plugin.RunnableApplications
-			runnable.updateRunningState()
+			if inList(controller.ActiveModes, mode)
+				runnable.updateRunningState()
 	}
 	finally {
 		protectionOff()
@@ -500,25 +498,12 @@ updateModeSelector() {
 	
 	static modeSelectorMode := false
 	static controller := false
-	static reInitialize := false
 	
 	nextUpdate := -500
 	
 	if !controller
 		controller := SimulatorController.Instance
-	/*
-	if (controller.ActiveModes.Length() == 0) {
-		if reInitialize {
-			controller.setMode(controller.findMode(kSystemPlugin, kLaunchMode))
-			
-			reInitialize := false
-		}
-		else
-			reInitialize := true
-	}
-	else
-		reInitialize := false
-	*/
+	
 	protectionOn()
 	
 	try {
@@ -559,8 +544,6 @@ initializeSystemPlugin() {
 	controller := SimulatorController.Instance
 	
 	new SystemPlugin(controller, kSystemPlugin, controller.Configuration)
-	
-	; controller.setMode(controller.findMode(kSystemPlugin, kLaunchMode))
 	
 	registerEventHandler("Startup", "functionEventHandler")
 }

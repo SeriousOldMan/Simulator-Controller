@@ -26,6 +26,7 @@ Release 2.8.5 Checklist
 5. New parameter SimulatorController.findMode
    a. Documentation
 6. Controller Plugin Labels Refactoring
+   - New method "actionLabel"
    a. Documentation
    b. Update Notes
    c. Update procedure

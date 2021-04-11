@@ -107,6 +107,10 @@ moveEditor() {
 	moveByMouse("CE")
 }
 
+openSettingsDocumentation() {
+	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--settings
+}
+
 editSettings(ByRef settingsOrCommand, withContinue := false) {
 	static result
 	static newSettings
@@ -214,9 +218,9 @@ restart:
 		Gui CE:Add, Text, w220 Center gmoveEditor, % translate("Modular Simulator Controller System") 
 		
 		Gui CE:Font, Norm, Arial
-		Gui CE:Font, Italic, Arial
+		Gui CE:Font, Italic Underline, Arial
 	
-		Gui CE:Add, Text, YP+20 w220 Center, % translate("Settings")
+		Gui CE:Add, Text, YP+20 w220 cBlue Center gopenSettingsDocumentation, % translate("Settings")
 	
 		coreSettings := [["Simulator Controller", true, false]]
 		feedbackSettings := []		

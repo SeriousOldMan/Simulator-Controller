@@ -39,7 +39,7 @@ Release 2.8.5 Checklist
    a. Translations
    b. Simulator Settings.ini
    c. Plugin Labels
-8. Doc Link in Race Engineer Settings
+8. Doc Link in Race Engineer Settings AND Simulator Settings
    a. Docs Image
    b. Documentation
 

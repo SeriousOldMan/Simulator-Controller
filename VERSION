@@ -1,8 +1,8 @@
 [Development]
 Version=2.8.5-dev
 Target=2.8.5-release
-Date=04/10/2021
-Changes=New VERSION file format, Refactoring of the Simulator Plugins, Icons for SHM Readers
+Date=04/11/2021
+Changes=New VERSION file format, Refactoring of the Simulator Plugins, Icons for SHM Readers, Localized "Controller Plugin Labels", Situation aware Button Box Modes incl. Configuration
 [Release]
 Version=2.8.0-release
 Date=04/09/2021

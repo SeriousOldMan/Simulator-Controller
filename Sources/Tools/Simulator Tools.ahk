@@ -509,16 +509,21 @@ updateTranslations() {
 }
 
 updatePluginLabels() {
-	userPluginLabelsFile := getFileName("Controller Plugin Labels.ini", kUserConfigDirectory)
-	userPluginLabels := readConfiguration(userPluginLabelsFile)
-	bundledPluginLabels := readConfiguration(getFileName("Controller Plugin Labels.ini", kConfigDirectory))
-	
-	for section, keyValues in bundledPluginLabels
-		for key, value in keyValues
-			if (getConfigurationValue(userPluginLabels, section, key, kUndefined) == kUndefined)
-				setConfigurationValue(userPluginLabels, section, key, value)
-	
-	writeConfiguration(userPluginLabelsFile, userPluginLabels)
+	for languageCode, language in availableLanguages() {
+		userPluginLabelsFile := (kUserConfigDirectory . "Controller Plugin Labels." . languageCode)
+		userPluginLabels := readConfiguration(userPluginLabelsFile)
+		
+		if (userPluginLabels.Count() > 0) {
+			bundledPluginLabels := readConfiguration(kResourcesDirectory . "Templates\Controller Plugin Labels." . languageCode)
+			
+			for section, keyValues in bundledPluginLabels
+				for key, value in keyValues
+					if (getConfigurationValue(userPluginLabels, section, key, kUndefined) == kUndefined)
+						setConfigurationValue(userPluginLabels, section, key, value)
+			
+			writeConfiguration(userPluginLabelsFile, userPluginLabels)
+		}
+	}
 }
 
 updateCustomCalls(startNumber, endNumber) {

@@ -877,12 +877,12 @@ class SimulatorController extends ConfigurationItem {
 		modes := false
 		
 		if !simulator
-			modes := getConfigurationValue(this.Settings, "Button Box Modes", "Default", false)
+			modes := getConfigurationValue(this.Settings, "Modes", "Default", false)
 		else {
-			modes := getConfigurationValue(this.Settings, "Button Box Modes", ConfigurationItem.descriptor(simulator, session), false)
+			modes := getConfigurationValue(this.Settings, "Modes", ConfigurationItem.descriptor(simulator, session), false)
 		
 			if !modes
-				modes := getConfigurationValue(this.Settings, "Button Box Modes", ConfigurationItem.descriptor(simulator, "Default"), false)
+				modes := getConfigurationValue(this.Settings, "Modes", ConfigurationItem.descriptor(simulator, "Default"), false)
 		}
 		
 		if modes
@@ -1321,8 +1321,14 @@ class ControllerPlugin extends Plugin {
 	}
 	
 	getLabel(descriptor, default := false) {
-		if !this.sLabelsDatabase
-			this.sLabelsDatabase := readConfiguration(kPluginLabelsFile)
+		if !this.sLabelsDatabase {
+			languageCode := getLanguage()
+			
+			this.sLabelsDatabase := readConfiguration(getFileName("Controller Plugin Labels." . languageCode, kUserConfigDirectory))
+			
+			if (this.sLabelsDatabase.Count() = 0)
+				this.sLabelsDatabase := readConfiguration(getFileName("Controller Plugin Labels.en", kUserConfigDirectory))
+		}
 		
 		label := getConfigurationValue(this.sLabelsDatabase, this.Plugin, descriptor, false)
 		
@@ -1628,6 +1634,7 @@ initializeSimulatorController() {
 	}
 	
 	registerEventHandler("Voice", "handleVoiceRemoteCalls")
+	registerEventHandler("Config", "handleConfigCalls")
 }
 
 startupSimulatorController() {
@@ -1736,6 +1743,16 @@ setMode(action) {
 ;;;-------------------------------------------------------------------------;;;
 
 handleVoiceRemoteCalls(event, data) {
+	if InStr(data, ":") {
+		data := StrSplit(data, ":", , 2)
+	
+		return withProtection(ObjBindMethod(SimulatorController.Instance, data[1]), string2Values(";", data[2])*)
+	}
+	else
+		return withProtection(ObjBindMethod(SimulatorController.Instance, data))
+}
+
+handleConfigCalls(event, data) {
 	if InStr(data, ":") {
 		data := StrSplit(data, ":", , 2)
 	

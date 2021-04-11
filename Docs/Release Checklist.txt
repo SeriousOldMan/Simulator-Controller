@@ -17,7 +17,11 @@ Release 2.8.5 Checklist
 1. Changed VERSION file format
    a. Test against old distribution
 2. Plugin / Mode Auto Activation
+   - Method setModes
+   - Settings.ini
    a. Documentation
+   b. Update Procedure
+   c. New Docs Images
 3. New constant kTempDirectory
    a. Documentation
    b. Replace everywhere
@@ -30,6 +34,12 @@ Release 2.8.5 Checklist
    a. Documentation
    b. Update Notes
    c. Update procedure
+   d. Test updatePluginLabels
+7. Update Procedure
+   a. Translations
+   b. Simulator Settings.ini
+   c. Plugin Labels
+
 
 Release 2.8 Checklist
 =====================

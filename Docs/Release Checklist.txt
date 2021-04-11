@@ -25,6 +25,10 @@ Release 2.8.5 Checklist
    a. Documentation
 5. New parameter SimulatorController.findMode
    a. Documentation
+6. Controller Plugin Labels Refactoring
+   a. Documentation
+   b. Update Notes
+   c. Update procedure
 
 Release 2.8 Checklist
 =====================

@@ -249,8 +249,13 @@ chooseApplicationExePath() {
 		
 		FileSelectFile file, 1, %applicationExePathEdit%, %title%, Executable (*.exe)
 		
-		if (file != "")
+		if (file != "") {
 			GuiControl Text, applicationExePathEdit, %file%
+			
+			applicationWorkingDirectoryPathEdit := ""
+			
+			GuiControl Text, applicationWorkingDirectoryPathEdit, %applicationWorkingDirectoryPathEdit%
+		}
 	}
 	finally {
 		protectionOff()

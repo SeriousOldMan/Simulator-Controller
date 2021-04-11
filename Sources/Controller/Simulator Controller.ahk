@@ -42,7 +42,7 @@ ListLines Off					; Disable execution history
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kPluginLabelsFile = "Controller Plugin Labels.ini"
+global kPluginLabelsFile = "Controller Plugin Labels.de"
 
 global kLogoBright = kResourcesDirectory . "Logo Bright.gif"
 global kLogoDark = kResourcesDirectory . "Logo Dark.gif"
@@ -772,7 +772,7 @@ class SimulatorController extends ConfigurationItem {
 			if (action != false) {
 				this.updateLastEvent()
 				
-				logMessage(kLogInfo, translate("Firing action ") . translate(getLabelForLogMessage(action)) . translate(" for ") . function.Descriptor)
+				logMessage(kLogInfo, translate("Firing action ") . getLabelForLogMessage(action) . translate(" for ") . function.Descriptor)
 				
 				action.fireAction(function, trigger)
 			}
@@ -1280,6 +1280,10 @@ class ControllerPlugin extends Plugin {
 			this.Actions.Push(action)
 	}
 	
+	actionLabel(action) {
+		return action.Label
+	}
+	
 	isActive() {
 		return this.Active
 	}
@@ -1293,7 +1297,7 @@ class ControllerPlugin extends Plugin {
 			controller.connectAction(theAction.Function, theAction)
 			
 			theAction.Function.enable(kAllTrigger)
-			theAction.Function.setText(translate(theAction.Label))
+			theAction.Function.setText(this.actionLabel(theAction))
 		}
 	}
 	
@@ -1315,7 +1319,7 @@ class ControllerPlugin extends Plugin {
 	
 	simulatorShutdown(simulator) {
 	}
-		
+	
 	getLabel(descriptor, default := false) {
 		if !this.sLabelsDatabase
 			this.sLabelsDatabase := readConfiguration(kPluginLabelsFile)
@@ -1410,6 +1414,7 @@ class ControllerMode {
 	}
 	
 	activate() {
+		local plugin := this.Plugin
 		controller := this.Controller
 		
 		logMessage(kLogInfo, translate("Activating mode ") . translate(getModeForLogMessage(this)))
@@ -1418,7 +1423,7 @@ class ControllerMode {
 			controller.connectAction(theAction.Function, theAction)
 			
 			theAction.Function.enable(kAllTrigger)
-			theAction.Function.setText(translate(theAction.Label))
+			theAction.Function.setText(plugin.actionLabel(theAction))
 		}
 		
 		controller.registerActiveMode(this)
@@ -1427,12 +1432,12 @@ class ControllerMode {
 	deactivate() {
 		controller := this.Controller
 		
+		controller.unregisterActiveMode(this)
+		
 		logMessage(kLogInfo, translate("Deactivating mode ") . translate(getModeForLogMessage(this)))
 		
 		for ignore, theAction in this.Actions
 			controller.disconnectAction(theAction.Function, theAction)
-		
-		controller.unregisterActiveMode(this)
 	}
 }
 

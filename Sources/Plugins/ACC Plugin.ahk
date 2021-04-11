@@ -94,11 +94,11 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 				if isInstance(theAction, ACCPlugin.PitstopAction)
 					if ((sessionState != kSessionFinished) && (sessionState != kSessionPaused)) {
 						theAction.Function.enable(kAllTrigger)
-						theAction.Function.setText(translate(theAction.Label))
+						theAction.Function.setText(theAction.Label)
 					}
 					else {
 						theAction.Function.disable(kAllTrigger)
-						theAction.Function.setText(translate(theAction.Label), "Gray")
+						theAction.Function.setText(theAction.Label, "Gray")
 					}
 		}
 		
@@ -110,11 +110,11 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 				if isInstance(theAction, ACCPlugin.RaceEngineerAction)
 					if (sessionState == kSessionRace) {
 						theAction.Function.enable(kAllTrigger)
-						theAction.Function.setText(translate(theAction.Label))
+						theAction.Function.setText(theAction.Label)
 					}
 					else {
 						theAction.Function.disable(kAllTrigger)
-						theAction.Function.setText(translate(theAction.Label), "Gray")
+						theAction.Function.setText(theAction.Label, "Gray")
 					}
 		}
 	}

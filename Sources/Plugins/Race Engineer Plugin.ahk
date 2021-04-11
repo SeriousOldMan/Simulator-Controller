@@ -136,16 +136,16 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 				if (plugin.RaceEngineerEnabled && ((trigger = "Off") || (trigger == "Push"))) {
 					plugin.disableRaceEngineer()
 				
-					trayMessage(translate(this.Label), translate("State: Off"))
+					trayMessage(plugin.actionLabel(this), translate("State: Off"))
 				
-					function.setText(translate(this.Label), "Black")
+					function.setText(plugin.actionLabel(this), "Black")
 				}
 				else if (!plugin.RaceEngineerEnabled && ((trigger = "On") || (trigger == "Push"))) {
 					plugin.enableRaceEngineer()
 				
-					trayMessage(translate(this.Label), translate("State: On"))
+					trayMessage(plugin.actionLabel(this), translate("State: On"))
 				
-					function.setText(translate(this.Label), "Green")
+					function.setText(plugin.actionLabel(this), "Green")
 				}
 		}
 	}
@@ -274,7 +274,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 	updateActions(sessionState) {
 		for ignore, theAction in this.Actions
 			if isInstance(theAction, RaceEngineerPlugin.RaceEngineerToggleAction) {
-				theAction.Function.setText(translate(theAction.Label), this.RaceEngineerName ? (this.RaceEngineerEnabled ? "Green" : "Black") : "Gray")
+				theAction.Function.setText(this.actionLabel(theAction.Label), this.RaceEngineerName ? (this.RaceEngineerEnabled ? "Green" : "Black") : "Gray")
 				
 				if !this.RaceEngineerName
 					theAction.Function.disable()
@@ -282,25 +282,25 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 			else if isInstance(theAction, RaceEngineerPlugin.RaceEngineerAction)
 				if (theAction.Action = "RaceEngineerOpenSettings") {
 					theAction.Function.enable(kAllTrigger)
-					theAction.Function.setText(translate(theAction.Label))
+					theAction.Function.setText(theAction.Label)
 				}
 				else if (theAction.Action = "RaceEngineerImportSettings") {
 					if this.Simulator {
 						theAction.Function.enable(kAllTrigger)
-						theAction.Function.setText(translate(theAction.Label))
+						theAction.Function.setText(theAction.Label)
 					}
 					else {
 						theAction.Function.disable(kAllTrigger)
-						theAction.Function.setText(translate(theAction.Label), "Gray")
+						theAction.Function.setText(theAction.Label, "Gray")
 					}
 				}
 				else if ((sessionState == kSessionRace) && (this.RaceEngineer != false)) {
 					theAction.Function.enable(kAllTrigger)
-					theAction.Function.setText(translate(theAction.Label))
+					theAction.Function.setText(theAction.Label)
 				}
 				else {
 					theAction.Function.disable(kAllTrigger)
-					theAction.Function.setText(translate(theAction.Label), "Gray")
+					theAction.Function.setText(theAction.Label, "Gray")
 				}
 	}
 	

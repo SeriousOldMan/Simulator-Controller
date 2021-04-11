@@ -377,29 +377,6 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 			logMessage(kLogWarn, translate("Pitstop action ") . action . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
 	}
 	
-	simulatorStartup(simulator) {
-		base.simulatorStartup(simulator)
-		
-		if (simulator = kACCApplication) {
-			if (inList(this.Simulators, simulator)) {
-				this.Controller.setMode(this.iChatMode)
-			}
-		}
-	}
-	
-	simulatorShutdown(simulator) {
-		base.simulatorShutdown()
-		
-		if (simulator = kACCApplication) {
-			activeModes := this.Controller.ActiveModes
-			
-			if inList(activeModes, this.iChatMode)
-				this.iChatMode.deactivate()
-			else if inList(activeModes, this.iPitstopMode)
-				this.iPitstopMode.deactivate()
-		}
-	}
-	
 	updateSessionState(sessionState) {
 		base.updateSessionState()
 		

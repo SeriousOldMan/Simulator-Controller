@@ -478,7 +478,7 @@ updateApplicationStates() {
 	if !plugin {
 		controller := SimulatorController.Instance
 		plugin := controller.findPlugin(kSystemPlugin)
-		mode := plugin.findeMode(kLaunchMode)
+		mode := plugin.findMode(kLaunchMode)
 	}
 		
 	protectionOn()

@@ -22,6 +22,7 @@ Release 2.8.5 Checklist
    a. Documentation
    b. Update Procedure
    c. New Docs Images
+   d. Call Simulator Controller -NoStartup from Update Procedure
 3. New constant kTempDirectory
    a. Documentation
    b. Replace everywhere

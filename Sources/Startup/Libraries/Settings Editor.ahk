@@ -12,6 +12,7 @@
 global kSave = "Save"
 global kContinue = "Continue"
 global kCancel = "Cancel"
+global kEditModes = "Edit"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -31,8 +32,65 @@ global buttonBoxSimulationDurationInput
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                   Private Function Declaration Section                  ;;;
+;;;                    Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+			
+initializePicturesList(pictures := "") {
+	Gui ListView, % picturesListViewHandle
+		
+	LV_Delete()
+	
+	pictures := string2Values(",", pictures)
+	
+	picturesListViewImages := IL_Create(pictures.Length())
+		
+	for ignore, picture in pictures
+		IL_Add(picturesListViewImages, LoadPicture(getFileName(picture, kUserSplashMediaDirectory, kSplashMediaDirectory), "W32 H32"), 0xFFFFFF, false)
+	
+	LV_SetImageList(picturesListViewImages)
+	
+	Loop % pictures.Length()
+		LV_Add("Check Icon" . A_Index, pictures[A_Index])
+		
+	LV_ModifyCol()
+}
+
+loadEditor(item) {
+	themeTypeDropDown := (item[1] == "Picture Carousel") ? 1 : 2
+	themeNameEdit := item[2]
+	soundFilePathEdit := item[4]
+		
+	GuiControl Choose, themeTypeDropDown, %themeTypeDropDown%
+	GuiControl Text, themeNameEdit, %themeNameEdit%
+	GuiControl Text, soundFilePathEdit, %soundFilePathEdit%
+	
+	if (themeTypeDropDown == 2)
+		videoFilePathEdit := item[3]
+	else
+		videoFilePathEdit := ""
+		
+	GuiControl Text, videoFilePathEdit, %videoFilePathEdit%
+	
+	if (themeTypeDropDown == 1) {
+		this.initializePicturesList(item[3])
+		
+		picturesDurationEdit := item[5]
+		
+		GuiControl Text, picturesDurationEdit, %picturesDurationEdit%
+	}
+	else
+		this.initializePicturesList("")
+	
+	this.updateEditor()
+}
+
+saveModes() {
+	editModes(kSave)
+}
+
+cancelModes() {
+	editModes(kCancel)
+}
 
 saveSettings() {
 	editSettings(kSave)
@@ -86,11 +144,6 @@ checkButtonBoxSimulationDuration() {
 	setInputState(buttonBoxSimulationDurationInput, (buttonBoxSimulationEnabled := !buttonBoxSimulationEnabled))
 }
 
-
-;;;-------------------------------------------------------------------------;;;
-;;;                   Private Function Declaration Section                  ;;;
-;;;-------------------------------------------------------------------------;;;
-
 computeStartupSongs() {
 	files := concatenate(getFileNames("*.wav", kUserSplashMediaDirectory, kSplashMediaDirectory), getFileNames("*.mp3", kUserSplashMediaDirectory, kSplashMediaDirectory))
 	
@@ -103,15 +156,89 @@ computeStartupSongs() {
 	return files
 }
 
-moveEditor() {
-	moveByMouse("CE")
+moveSettingsEditor() {
+	moveByMouse("SE")
+}
+
+moveModesEditor() {
+	moveByMouse("ME")
+}
+
+openModesEditor() {
+	editSettings(kEditModes)
 }
 
 openSettingsDocumentation() {
 	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--settings
 }
 
+editModes(ByRef settingsOrCommand) {
+	static newSettings
+	static result := false
+	
+	static modeContextDropDown
+	static modesListView
+	static modesListViewHandle
+	
+	if (settingsOrCommand = kSave) {
+		; saveModesList(newSettings)
+		
+		Gui ME:Destroy
+		
+		result := kSave
+	}
+	else if (settingsOrCommand = kCancel) {
+		Gui ME:Destroy
+	
+		result := kCancel
+	}
+	else {
+		newSettings := newConfiguration()
+	
+		setConfigurationSectionValues(newSettings, "Modes", getConfigurationSectionValues(settingsOrCommand, "Modes"))
+		
+		Gui ME:Default
+				
+		Gui ME:-Border ; -Caption
+		Gui ME:Color, D0D0D0
+
+		Gui ME:Font, Bold, Arial
+
+		Gui ME:Add, Text, w410 Center gmoveModesEditor, % translate("Modular Simulator Controller System") 
+
+		Gui ME:Font, Norm, Arial
+		Gui ME:Font, Italic Underline, Arial
+
+		Gui ME:Add, Text, YP+20 w410 cBlue Center gopenSettingsDocumentation, % translate("Controller Modes")
+
+		Gui ME:Font, Norm, Arial
+				
+		Gui ME:Add, Button, x128 y450 w80 h23 Default gsaveModes, % translate("Ok")
+		Gui ME:Add, Button, x226 y450 w80 h23 gcancelModes, % translate("&Cancel")
+		
+		Gui ME:Add, Text, x16 y80 w86 h23 +0x200, % translate("Context")
+		Gui ME:Add, DropDownList, x110 y80 w140 AltSubmit VmodeContextDropDown, % "Menus"
+		
+		Gui ME:Add, Text, x16 y110 w80 h23 +0x200, % translate("Modes")
+		Gui ME:Add, ListView, x110 y110 w284 h112 -Multi -LV0x10 Checked -Hdr NoSort NoSortHdr HwndmodesListViewHandle VmodesListView, % translate("Plugin") . "|" . translate("Mode")
+		
+		Gui ME:Margin, 10, 10
+		Gui ME:Show, AutoSize Center
+		
+		Loop {
+			Sleep 1000
+		} until result
+		
+		if (result == kSave)
+			settingsOrCommand := newSettings
+		
+		return result
+	}
+}
+
 editSettings(ByRef settingsOrCommand, withContinue := false) {
+	static modeSettings
+	
 	static result
 	static newSettings
 	
@@ -160,7 +287,7 @@ editSettings(ByRef settingsOrCommand, withContinue := false) {
 
 restart:
 	if (settingsOrCommand == kSave) {
-		Gui CE:Submit
+		Gui SE:Submit
 		
 		newSettings := newConfiguration()
 		
@@ -193,34 +320,47 @@ restart:
 		setConfigurationValue(newSettings, "Startup", "Splash Theme", (splashTheme == translate("None")) ? false : splashTheme)
 		setConfigurationValue(newSettings, "Startup", "Simulator", (startup ? startOption : false))
 		
-		Gui CE:Destroy
+		Gui SE:Destroy
+	
+		setConfigurationSectionValues(newSettings, "Modes", getConfigurationSectionValues(modeSettings, "Modes"))
 		
 		result := settingsOrCommand
 	}
 	else if (settingsOrCommand == kContinue) {
-		Gui CE:Destroy
+		Gui SE:Destroy
 		
 		result := settingsOrCommand
 	}
 	else if (settingsOrCommand == kCancel) {
-		Gui CE:Destroy
+		Gui SE:Destroy
 		
 		result := settingsOrCommand
 	}
+	else if (settingsOrCommand == kEditModes) {
+		Gui SE:Hide
+		
+		editModes(modeSettings)
+		
+		Gui SE:Show
+	}
 	else {
+		modeSettings := newConfiguration()
+	
+		setConfigurationSectionValues(modeSettings, "Modes", getConfigurationSectionValues(settingsOrCommand, "Modes", Object()))
+	
 		result := false
 		
-		Gui CE:-Border ; -Caption
-		Gui CE:Color, D0D0D0
+		Gui SE:-Border ; -Caption
+		Gui SE:Color, D0D0D0
 	
-		Gui CE:Font, Bold, Arial
+		Gui SE:Font, Bold, Arial
 	
-		Gui CE:Add, Text, w220 Center gmoveEditor, % translate("Modular Simulator Controller System") 
+		Gui SE:Add, Text, w220 Center gmoveSettingsEditor, % translate("Modular Simulator Controller System") 
 		
-		Gui CE:Font, Norm, Arial
-		Gui CE:Font, Italic Underline, Arial
+		Gui SE:Font, Norm, Arial
+		Gui SE:Font, Italic Underline, Arial
 	
-		Gui CE:Add, Text, YP+20 w220 cBlue Center gopenSettingsDocumentation, % translate("Settings")
+		Gui SE:Add, Text, YP+20 w220 cBlue Center gopenSettingsDocumentation, % translate("Settings")
 	
 		coreSettings := [["Simulator Controller", true, false]]
 		feedbackSettings := []		
@@ -243,12 +383,12 @@ restart:
 			
 		coreHeight := 20 + (coreSettings.Length() * 20)
 		
-		Gui CE:Font, Norm, Arial
-		Gui CE:Font, Italic, Arial
+		Gui SE:Font, Norm, Arial
+		Gui SE:Font, Italic, Arial
 	
-		Gui CE:Add, GroupBox, YP+30 w220 h%coreHeight%, % translate("Core System")
+		Gui SE:Add, GroupBox, YP+30 w220 h%coreHeight%, % translate("Core System")
 	
-		Gui CE:Font, Norm, Arial
+		Gui SE:Font, Norm, Arial
 	
 		for index, coreDescriptor in coreSettings {
 			coreOption := coreDescriptor[3] ? "" : "Disabled"
@@ -258,18 +398,18 @@ restart:
 			if (index == 1)
 				coreOption := coreOption . " YP+20 XP+10"
 				
-			Gui CE:Add, CheckBox, %coreOption% Checked%checked% vcoreVariable%index%, %coreLabel%
+			Gui SE:Add, CheckBox, %coreOption% Checked%checked% vcoreVariable%index%, %coreLabel%
 		}
 	
 		if (feedbackSettings.Length() > 0) {
 			feedbackHeight := 20 + (feedbackSettings.Length() * 20)
 		
-			Gui CE:Font, Norm, Arial
-			Gui CE:Font, Italic, Arial
+			Gui SE:Font, Norm, Arial
+			Gui SE:Font, Italic, Arial
 	
-			Gui CE:Add, GroupBox, XP-10 YP+30 w220 h%feedbackHeight%, % translate("Feedback System")
+			Gui SE:Add, GroupBox, XP-10 YP+30 w220 h%feedbackHeight%, % translate("Feedback System")
 	
-			Gui CE:Font, Norm, Arial
+			Gui SE:Font, Norm, Arial
 	
 			for index, feedbackDescriptor in feedbackSettings {
 				feedbackOption := feedbackDescriptor[3] ? "" : "Disabled"
@@ -279,7 +419,7 @@ restart:
 				if (index == 1)
 					feedbackOption := feedbackOption . " YP+20 XP+10"
 					
-				Gui CE:Add, CheckBox, %feedbackOption% Checked%checked% vfeedbackVariable%index%, %feedbackLabel%
+				Gui SE:Add, CheckBox, %feedbackOption% Checked%checked% vfeedbackVariable%index%, %feedbackLabel%
 			}
 		}
 	
@@ -305,30 +445,30 @@ restart:
 		buttonBoxEnabled := buttonBox
 		buttonBoxSimulationEnabled := buttonBoxSimulation
 		
-		Gui CE:Font, Norm, Arial
-		Gui CE:Font, Italic, Arial
+		Gui SE:Font, Norm, Arial
+		Gui SE:Font, Italic, Arial
 	
-		Gui CE:Add, GroupBox, XP-10 YP+30 w220 h135, % translate("Controller Notifications")
+		Gui SE:Add, GroupBox, XP-10 YP+30 w220 h135, % translate("Controller Notifications")
 	
-		Gui CE:Font, Norm, Arial
+		Gui SE:Font, Norm, Arial
 	
-		Gui CE:Add, CheckBox, YP+20 XP+10 Checked%trayTip% vtrayTip gcheckTrayTipDuration, % translate("Tray Tips")
+		Gui SE:Add, CheckBox, YP+20 XP+10 Checked%trayTip% vtrayTip gcheckTrayTipDuration, % translate("Tray Tips")
 		disabled := !trayTip ? "Disabled" : ""
-		Gui CE:Add, Edit, X160 YP-5 w40 h20 Limit5 Number %disabled% vtrayTipDuration HwndtrayTipDurationInput, %trayTipDuration%
-		Gui CE:Add, Text, X205 YP+5, % translate("ms")
-		Gui CE:Add, CheckBox, X20 YP+20 Checked%trayTipSimulation% vtrayTipSimulation gcheckTrayTipSimulationDuration, % translate("Tray Tips (Simulation)")
+		Gui SE:Add, Edit, X160 YP-5 w40 h20 Limit5 Number %disabled% vtrayTipDuration HwndtrayTipDurationInput, %trayTipDuration%
+		Gui SE:Add, Text, X205 YP+5, % translate("ms")
+		Gui SE:Add, CheckBox, X20 YP+20 Checked%trayTipSimulation% vtrayTipSimulation gcheckTrayTipSimulationDuration, % translate("Tray Tips (Simulation)")
 		disabled := !trayTipSimulation ? "Disabled" : ""
-		Gui CE:Add, Edit, X160 YP-5 w40 h20 Limit5 Number %disabled% vtrayTipSimulationDuration HwndtrayTipSimulationDurationInput, %trayTipSimulationDuration%
-		Gui CE:Add, Text, X205 YP+5, % translate("ms")
-		Gui CE:Add, CheckBox, X20 YP+20 Checked%buttonBox% vbuttonBox gcheckButtonBoxDuration, % translate("Button Box")
+		Gui SE:Add, Edit, X160 YP-5 w40 h20 Limit5 Number %disabled% vtrayTipSimulationDuration HwndtrayTipSimulationDurationInput, %trayTipSimulationDuration%
+		Gui SE:Add, Text, X205 YP+5, % translate("ms")
+		Gui SE:Add, CheckBox, X20 YP+20 Checked%buttonBox% vbuttonBox gcheckButtonBoxDuration, % translate("Button Box")
 		disabled := !buttonBox ? "Disabled" : ""
-		Gui CE:Add, Edit, X160 YP-5 w40 h20 Limit5 Number %disabled% vbuttonBoxDuration HwndbuttonBoxDurationInput, %buttonBoxDuration%
-		Gui CE:Add, Text, X205 YP+5, % translate("ms")
-		Gui CE:Add, CheckBox, X20 YP+20 Checked%buttonBoxSimulation% vbuttonBoxSimulation gcheckButtonBoxSimulationDuration, % translate("Button Box (Simulation)")
+		Gui SE:Add, Edit, X160 YP-5 w40 h20 Limit5 Number %disabled% vbuttonBoxDuration HwndbuttonBoxDurationInput, %buttonBoxDuration%
+		Gui SE:Add, Text, X205 YP+5, % translate("ms")
+		Gui SE:Add, CheckBox, X20 YP+20 Checked%buttonBoxSimulation% vbuttonBoxSimulation gcheckButtonBoxSimulationDuration, % translate("Button Box (Simulation)")
 		disabled := !buttonBoxSimulation ? "Disabled" : ""
-		Gui CE:Add, Edit, X160 YP-5 w40 h20 Limit5 Number %disabled% vbuttonBoxSimulationDuration HwndbuttonBoxSimulationDurationInput, %buttonBoxSimulationDuration%
-		Gui CE:Add, Text, X205 YP+5, % translate("ms")
-		Gui CE:Add, Text, X20 YP+30, % translate("Button Box Position")
+		Gui SE:Add, Edit, X160 YP-5 w40 h20 Limit5 Number %disabled% vbuttonBoxSimulationDuration HwndbuttonBoxSimulationDurationInput, %buttonBoxSimulationDuration%
+		Gui SE:Add, Text, X205 YP+5, % translate("ms")
+		Gui SE:Add, Text, X20 YP+30, % translate("Button Box Position")
 		
 		choices := ["Top Left", "Top Right", "Bottom Left", "Bottom Right", "Secondary Screen", "Last Position"]
 		chosen := inList(choices, buttonBoxPosition)
@@ -336,7 +476,9 @@ restart:
 		if !chosen
 			chosen := 4
 		
-		Gui CE:Add, DropDownList, X120 YP-5 w100 Choose%chosen% vbuttonBoxPosition, % values2String("|", map(choices, "translate")*)
+		Gui SE:Add, DropDownList, X120 YP-5 w100 Choose%chosen% vbuttonBoxPosition, % values2String("|", map(choices, "translate")*)
+		
+		Gui SE:Add, Button, X10 Y+15 w220 gopenModesEditor, % translate("Controller Modes...")
 		
 		splashTheme := getConfigurationValue(settingsOrCommand, "Startup", "Splash Theme", false)	
 	 
@@ -344,13 +486,13 @@ restart:
 		chosen := (splashTheme ? inList(themes, splashTheme) + 1 : 1)
 		themes := translate("None") "|" + values2String("|", themes*)
 		
-		Gui CE:Add, Text, X10 Y+20, % translate("Theme")
-		Gui CE:Add, DropDownList, X90 YP-5 w140 Choose%chosen% vsplashTheme, %themes%
+		Gui SE:Add, Text, X10 Y+20, % translate("Theme")
+		Gui SE:Add, DropDownList, X90 YP-5 w140 Choose%chosen% vsplashTheme, %themes%
 	
 		startupOption := getConfigurationValue(settingsOrCommand, "Startup", "Simulator", false)
 		startup := (startupOption != false)
 		
-		Gui CE:Add, CheckBox, X10 Checked%startup% vstartup, % translate("Start")
+		Gui SE:Add, CheckBox, X10 Checked%startup% vstartup, % translate("Start")
 		
 		simulators := string2Values("|", getConfigurationValue(kSimulatorConfiguration, "Configuration", "Simulators", ""))
 		
@@ -359,20 +501,20 @@ restart:
 		if ((chosen == 0) && (simulators.Length() > 0))
 			chosen := 1
 		
-		Gui CE:Add, DropDownList, X90 YP-5 w140 Choose%chosen% vstartOption, % values2String("|", simulators*)
+		Gui SE:Add, DropDownList, X90 YP-5 w140 Choose%chosen% vstartOption, % values2String("|", simulators*)
 	 
-		Gui CE:Add, Button, X10 Y+20 w220 gstartConfiguration, % translate("Configuration...")
+		Gui SE:Add, Button, X10 Y+20 w220 gstartConfiguration, % translate("Configuration...")
 		
 		margin := (withContinue ? "Y+20" : "")
 		
-		Gui CE:Add, Button, Default X10 %margin% w100 gsaveSettings, % translate("Save")
-		Gui CE:Add, Button, X+20 w100 gcancelSettings, % translate("&Cancel")
+		Gui SE:Add, Button, Default X10 %margin% w100 gsaveSettings, % translate("Save")
+		Gui SE:Add, Button, X+20 w100 gcancelSettings, % translate("&Cancel")
 		
 		if withContinue
-			Gui CE:Add, Button, X10 w220 gcontinueSettings, % translate("Co&ntinue w/o Save")
+			Gui SE:Add, Button, X10 w220 gcontinueSettings, % translate("Co&ntinue w/o Save")
 	
-		Gui CE:Margin, 10, 10
-		Gui CE:Show, AutoSize Center
+		Gui SE:Margin, 10, 10
+		Gui SE:Show, AutoSize Center
 		
 		if (readConfiguration(kSimulatorConfigurationFile).Count() == 0)
 			startConfiguration()
@@ -384,7 +526,7 @@ restart:
 		if vRestart {
 			vRestart := false
 			
-			Gui CE:Destroy
+			Gui SE:Destroy
 			
 			loadSimulatorConfiguration()
 			

@@ -483,9 +483,17 @@ class ConfigurationEditor extends ConfigurationItem {
 	}
 	
 	show() {
+		static first := true
+		
 		window := this.Window
 		
-		Gui %window%:Show, AutoSize Center
+		if first {
+			first := false
+			
+			Gui %window%:Show, AutoSize Center
+		}
+		else
+			Gui %window%:Show
 	}
 	
 	hide() {

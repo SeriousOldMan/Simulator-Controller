@@ -36,6 +36,7 @@ ListLines Off					; Disable execution history
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Libraries\SpeechRecognizer.ahk
+#Include ..\Plugins\Libraries\Simulator Plugin.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -950,11 +951,21 @@ class SimulatorController extends ConfigurationItem {
 		this.iShowLogo := (this.iShowLogo && !kSilentMode)
 	}
 	
-	writeConfigurationInfo() {
+	writeControllerConfiguration() {
 		configuration := newConfiguration()
 		
 		for ignore, thePlugin in this.Plugins {
 			modes := []
+		
+			if isInstance(thePlugin, SimulatorPlugin) {
+				states := []
+				
+				for state, code in thePlugin.SessionStates
+					states.Push(state)
+				
+				setConfigurationValue(configuration, "Simulators", thePlugin.Simulator.Application
+									, thePlugin.Plugin . "|" . values2String(",", states*))
+			}
 			
 			for ignore, theMode in thePlugin.Modes
 				modes.Push(theMode.Mode)
@@ -964,13 +975,13 @@ class SimulatorController extends ConfigurationItem {
 			for ignore, simulator in thePlugin.Simulators
 				simulators.Push(simulator)
 			
-			setConfigurationValue(configuration, "Plugins", thePlugin.Plugin, values2String("|", this.isActive(thePlugin), values2String(",", simulators*), values2String(",", modes*)))
+			setConfigurationValue(configuration, "Plugins", thePlugin.Plugin, values2String("|", (this.isActive(thePlugin) ? kTrue : kFalse), values2String(",", simulators*), values2String(",", modes*)))
 		}
 		
 		for ignore, btnBox in this.ButtonBoxes
 			setConfigurationValue(configuration, "Button Boxes", btnBox.Descriptor, values2String(",", btnBox.Num1WayToggles, btnBox.Num2WayToggles, btnBox.NumButtons, btnBox.NumDials))
 		
-		writeConfiguration(kTempDirectory . "Controller.config", configuration)
+		writeConfiguration(kUserConfigDirectory . "Simulator Controller.config", configuration)
 	}
 }
 
@@ -1632,21 +1643,19 @@ initializeSimulatorController() {
 	}
 	
 	registerEventHandler("Voice", "handleVoiceRemoteCalls")
-	registerEventHandler("Config", "handleConfigCalls")
 }
 
 startupSimulatorController() {
 	controller := SimulatorController.Instance
 	
-	if ((A_Args.Length() > 0) &&  (A_Args[1] = "-Config")) {
-		controller.writeConfigurationInfo()
-		
-		ExitApp 0
-	}
+	controller.writeControllerConfiguration()
 	
 	controller.computeControllerModes()
 	
 	controller.updateLastEvent()
+		
+	if ((A_Args.Length() > 0) &&  (A_Args[1] = "-NoStartup"))
+		ExitApp 0
 	
 	controller.startup()
 }
@@ -1741,16 +1750,6 @@ setMode(action) {
 ;;;-------------------------------------------------------------------------;;;
 
 handleVoiceRemoteCalls(event, data) {
-	if InStr(data, ":") {
-		data := StrSplit(data, ":", , 2)
-	
-		return withProtection(ObjBindMethod(SimulatorController.Instance, data[1]), string2Values(";", data[2])*)
-	}
-	else
-		return withProtection(ObjBindMethod(SimulatorController.Instance, data))
-}
-
-handleConfigCalls(event, data) {
 	if InStr(data, ":") {
 		data := StrSplit(data, ":", , 2)
 	

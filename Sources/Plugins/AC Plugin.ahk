@@ -6,6 +6,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                         Local Include Section                           ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include ..\Plugins\Libraries\Simulator Plugin.ahk
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -18,24 +25,7 @@ global kACPlugin = "AC"
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class ACPlugin extends ControllerPlugin {
-	iACApplication := false
-	
-	ACApplication[] {
-		Get {
-			return this.iACApplication
-		}
-	}
-	
-	__New(controller, name, configuration := false) {
-		this.iACApplication := new Application(kACApplication, SimulatorController.Instance.Configuration)
-		
-		base.__New(controller, name, configuration)
-	}
-	
-	runningSimulator() {
-		return (this.ACApplication.isRunning() ? kACApplication : false)
-	}
+class ACPlugin extends SimulatorPlugin {
 }
 
 
@@ -44,8 +34,7 @@ class ACPlugin extends ControllerPlugin {
 ;;;-------------------------------------------------------------------------;;;
 
 startAC() {
-	return SimulatorController.Instance.startSimulator(SimulatorController.Instance.findPlugin(kACPlugin).ACApplication
-											         , "Simulator Splash Images\AC Splash.jpg")
+	return SimulatorController.Instance.startSimulator(SimulatorController.Instance.findPlugin(kACPlugin).Simulator, "Simulator Splash Images\AC Splash.jpg")
 }
 
 
@@ -56,7 +45,7 @@ startAC() {
 initializeACPlugin() {
 	local controller := SimulatorController.Instance
 	
-	new ACPlugin(controller, kACPlugin, controller.Configuration)
+	new ACPlugin(controller, kACPlugin, kACApplication, controller.Configuration)
 }
 
 

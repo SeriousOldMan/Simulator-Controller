@@ -105,6 +105,10 @@ cancelSettings() {
 	editSettings(kCancel)
 }
 
+openSettingsDocumentation() {
+	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-engineer-settings
+}
+
 isFloat(numbers*) {
 	for ignore, value in numbers
 		if value is not float
@@ -383,9 +387,9 @@ restart:
 		Gui RES:Add, Text, w388 Center gmoveSettingsEditor, % translate("Modular Simulator Controller System") 
 
 		Gui RES:Font, Norm, Arial
-		Gui RES:Font, Italic, Arial
+		Gui RES:Font, Italic Underline, Arial
 
-		Gui RES:Add, Text, YP+20 w388 Center, % translate("Race Engineer Settings")
+		Gui RES:Add, Text, YP+20 w388 cBlue Center gopenSettingsDocumentation, % translate("Race Engineer Settings")
 
 		Gui RES:Font, Norm, Arial
 				

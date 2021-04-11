@@ -172,6 +172,8 @@ For the reactions of Jona, the format is much more simple. It looks like this:
 
 As you can see here, each phrase provides different alternative sentences. Variables may be used here as well.
 
+I strongly recommed to memorize the phrases in the language you use to interact with Jona. You will always find the current version of the grammar files in the *Config* folder of the Simulator Controller distribution. Or you can take a look at the files in the [Config directory on GitHub](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Config), for example the German version [Race Engineer.grammars.de](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Config/Race%20Engineer.grammars.de).
+
 ## Racing with Jona
 
 Racing with Jona is easy, just begin your session and wait until Jona will contact you. This will be a few seconds after you crossed the start finish line after your first complete lap. Jona will be available in Practice, Qualification and Race sessions, but the amount of support you can expect from Jona will vary between those session types. Pitstops, for example, will only be handled during race sessions.

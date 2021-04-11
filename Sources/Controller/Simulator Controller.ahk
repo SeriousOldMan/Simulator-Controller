@@ -42,8 +42,6 @@ ListLines Off					; Disable execution history
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kPluginLabelsFile = "Controller Plugin Labels.de"
-
 global kLogoBright = kResourcesDirectory . "Logo Bright.gif"
 global kLogoDark = kResourcesDirectory . "Logo Dark.gif"
 

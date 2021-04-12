@@ -1,3 +1,13 @@
+## 2.8.2-release upcoming...
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. The format of the VERSION file changed, much more information is now included.
+  4. Refactoring of the Simulator Plugins makes the implementation of a new simulator very simple now.
+  5. The shared memory reader applications for the different simulators now have there Windows Explorer icons.
+  6. The "Controller Plugin Labels" file is now available in different translations.
+  7. The active modes of the connected controllers (aka Button Boxes) can now be automatically activated depending on the current simulator and the active session.
+
 ## 2.8-release 04/09/21
 
   1. Bugfixes, as always

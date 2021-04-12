@@ -43,6 +43,8 @@ Release 2.8.5 Checklist
 8. Doc Link in Race Engineer Settings AND Simulator Settings
    a. Docs Image
    b. Documentation
+9. New class SimulatorPlugin und RaceEngineerSimulatorPlugin
+   a. Documentation
 
 
 Release 2.8 Checklist

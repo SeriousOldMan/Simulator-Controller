@@ -1,8 +1,8 @@
 [Development]
-Version=2.8.5-dev
-Target=2.8.5-release
-Date=04/11/2021
-Changes=New VERSION file format, Refactoring of the Simulator Plugins, Icons for SHM Readers, Localized "Controller Plugin Labels", Situation aware Button Box Modes incl. Configuration
+Version=2.8.2-dev
+Target=2.8.2-release
+Date=04/12/2021
+Changes=New VERSION file format, Refactoring of the Simulator Plugins, Icons for SHM Readers, Localized "Controller Plugin Labels", Situation aware Button Box Modes incl. configurable automation
 [Release]
 Version=2.8.0-release
 Date=04/09/2021
@@ -11,4 +11,4 @@ Changes=Full Refactoring of Race Engineer Integration, Integrated RaceRoom Racin
 Type=Development
 [Version]
 Release=2.8.0-release
-Development=2.8.5-dev
+Development=2.8.2-dev

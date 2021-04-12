@@ -254,6 +254,7 @@ editModes(ByRef settingsOrCommand) {
 		result := kCancel
 	}
 	else if IsObject(settingsOrCommand) {
+		result := false
 		newSettings := newConfiguration()
 	
 		setConfigurationSectionValues(newSettings, "Modes", getConfigurationSectionValues(settingsOrCommand, "Modes"))
@@ -277,6 +278,12 @@ editModes(ByRef settingsOrCommand) {
 		Gui ME:Add, Button, x88 y290 w80 h23 Default gsaveModes, % translate("Ok")
 		Gui ME:Add, Button, x186 y290 w80 h23 gcancelModes, % translate("&Cancel")
 		
+		simulators := []
+	
+		selectedSimulator := false
+		selectedSession := false
+		simulatorSessions := []
+	
 		configuration := getControllerConfiguration()
 		
 		for simulator, options in getConfigurationSectionValues(configuration, "Simulators", Object())

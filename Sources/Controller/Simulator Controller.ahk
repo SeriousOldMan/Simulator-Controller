@@ -960,8 +960,8 @@ class SimulatorController extends ConfigurationItem {
 			if isInstance(thePlugin, SimulatorPlugin) {
 				states := []
 				
-				for state, code in thePlugin.SessionStates
-					states.Push(state)
+				for ignore, name in thePlugin.SessionStates[true]
+					states.Push(name)
 				
 				setConfigurationValue(configuration, "Simulators", thePlugin.Simulator.Application
 									, thePlugin.Plugin . "|" . values2String(",", states*))

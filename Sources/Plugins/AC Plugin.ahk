@@ -26,6 +26,11 @@ global kACPlugin = "AC"
 ;;;-------------------------------------------------------------------------;;;
 
 class ACPlugin extends SimulatorPlugin {
+	SessionStates[asText := false] {
+		Get {
+			return [(asText ? "Other" : kSessionOther)]
+		}
+	}
 }
 
 

@@ -919,7 +919,7 @@ namespace RF2SHMReader
       public uint mVersionUpdateBegin;          // Incremented right before buffer is written to.
       public uint mVersionUpdateEnd;            // Incremented after buffer write is done.
 
-      public rF2PitMenu mPitMneu;
+      public rF2PitMenu mPitMenu;
     }
 
 

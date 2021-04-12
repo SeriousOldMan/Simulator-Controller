@@ -1,6 +1,7 @@
 ﻿using RF2SHMReader.rFactor2Data;
 using System;
 using System.Text;
+using System.Threading;
 using static RF2SHMReader.rFactor2Constants;
 using static RF2SHMReader.rFactor2Constants.rF2GamePhase;
 using static RF2SHMReader.rFactor2Constants.rF2PitState;
@@ -41,10 +42,7 @@ namespace RF2SHMReader {
 		rF2RulesControl rulesControl;
 		rF2PluginControl pluginControl;
 
-		public SHMReader(){
-		}
-	
-		public void Run() {
+		public SHMReader() {
 			if (!this.connected)
 				this.Connect();
 
@@ -61,7 +59,9 @@ namespace RF2SHMReader {
 			catch (Exception) {
 				this.Disconnect();
 			}
+		}
 
+		public void ReadData() {
 			rF2VehicleScoring playerScoring = GetPlayerScoring(ref scoring);
 			rF2VehicleTelemetry playerTelemetry = GetPlayerTelemetry(playerScoring.mID, ref telemetry);
 
@@ -171,6 +171,24 @@ namespace RF2SHMReader {
 				Console.Write("Weather10Min="); Console.WriteLine(theWeather);
 				Console.Write("Weather30Min="); Console.WriteLine(theWeather);
 			}
+
+			Console.WriteLine("[Pitstop Data]");
+			if (connected) {
+				Console.Write("Category="); Console.Write(pitInfo.mPitMenu.mCategoryIndex);
+				Console.Write(" -> "); Console.WriteLine(pitInfo.mPitMenu.mCategoryName);
+				Console.Write("Choices="); Console.Write(pitInfo.mPitMenu.mChoiceIndex);
+				Console.Write(" -> "); Console.WriteLine(pitInfo.mPitMenu.mChoiceString);
+				Console.Write("NumChoices="); Console.WriteLine(pitInfo.mPitMenu.mNumChoices);
+			}
+
+			Console.WriteLine("[Test Data]");
+			if (connected) {
+				Console.Write("Category="); Console.Write(pitInfo.mPitMenu.mCategoryIndex);
+				Console.Write(" -> "); Console.WriteLine(pitInfo.mPitMenu.mCategoryName);
+				Console.Write("Choices="); Console.Write(pitInfo.mPitMenu.mChoiceIndex);
+				Console.Write(" -> "); Console.WriteLine(pitInfo.mPitMenu.mChoiceString);
+				Console.Write("NumChoices="); Console.WriteLine(pitInfo.mPitMenu.mNumChoices);
+			}
 		}
 
 		private long GetRemainingLaps(ref rF2VehicleScoring playerScoring) {
@@ -215,7 +233,7 @@ namespace RF2SHMReader {
 				return (cloudLevel < 0.2) ? "HeavyRain" : "Thunderstorm";
 		}
 
-			private static double GetCelcius(double kelvin) {
+		private static double GetCelcius(double kelvin) {
 			return kelvin - 273.15;
 		}
 
@@ -268,7 +286,7 @@ namespace RF2SHMReader {
 					playerVehTelemetry = vehicle;
 
 					break;
-                }
+				}
 			}
 
 			return playerVehTelemetry;
@@ -337,6 +355,51 @@ namespace RF2SHMReader {
 			this.pluginControlBuffer.Disconnect();
 
 			this.connected = false;
+		}
+
+		private void SendPitMenuCmd(byte[] commandStr, double fRetVal) {
+			if (commandStr != null) {
+				this.hwControl.mVersionUpdateBegin = this.hwControl.mVersionUpdateEnd = this.hwControl.mVersionUpdateBegin + 1;
+
+				this.hwControl.mControlName = new byte[rFactor2Constants.MAX_HWCONTROL_NAME_LEN];
+				for (int i = 0; i < commandStr.Length; ++i)
+					this.hwControl.mControlName[i] = commandStr[i];
+
+				this.hwControl.mfRetVal = fRetVal;
+
+				this.hwControlBuffer.PutMappedData(ref this.hwControl);
+			}
+		}
+
+		private DateTime nextKeyHandlingTime = DateTime.MinValue;
+
+		public void ExecutePitCommand(string command) {
+			if (!this.connected || this.extended.mHWControlInputEnabled == 0)
+				return;
+
+			var now = DateTime.Now;
+			if (now < this.nextKeyHandlingTime)
+				return;
+
+			for (int i = 0; i < command.Length; i++) {
+				byte[] commandStr = null;
+				var fRetVal = 1.0;
+
+				if (command[i] == '+')
+					commandStr = Encoding.Default.GetBytes("PitMenuIncrementValue");
+				else if (command[i] == '-')
+					commandStr = Encoding.Default.GetBytes("PitMenuDecrementValue");
+				else if (command[i] == 'U')
+					commandStr = Encoding.Default.GetBytes("PitMenuUp");
+				else if (command[i] == 'D')
+					commandStr = Encoding.Default.GetBytes("PitMenuDown");
+
+				this.SendPitMenuCmd(commandStr, fRetVal);
+
+				Thread.Sleep(100);
+			}
+
+			this.nextKeyHandlingTime = now + TimeSpan.FromMilliseconds(100);
 		}
 	}
 }

@@ -16,12 +16,15 @@ using static RF2SHMReader.rFactor2Constants;
 namespace RF2SHMReader {
     static class Program {
         [STAThread]
-        static void Main() {
+        static void Main(string[] args) {
             Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("en-US");
 
             SHMReader reader = new SHMReader();
 
-            reader.Run();
+            if (args.Length > 0 && args[0] == "-pitCommand")
+                reader.ExecutePitCommand(args[1]);
+            else
+                reader.ReadData();
         }
     }
 }

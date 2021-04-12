@@ -175,18 +175,18 @@ namespace RF2SHMReader {
 			Console.WriteLine("[Pitstop Data]");
 			if (connected) {
 				Console.Write("Category="); Console.Write(pitInfo.mPitMenu.mCategoryIndex);
-				Console.Write(" -> "); Console.WriteLine(pitInfo.mPitMenu.mCategoryName);
+				Console.Write(" -> "); Console.WriteLine(GetStringFromBytes(pitInfo.mPitMenu.mCategoryName));
 				Console.Write("Choices="); Console.Write(pitInfo.mPitMenu.mChoiceIndex);
-				Console.Write(" -> "); Console.WriteLine(pitInfo.mPitMenu.mChoiceString);
+				Console.Write(" -> "); Console.WriteLine(GetStringFromBytes(pitInfo.mPitMenu.mChoiceString));
 				Console.Write("NumChoices="); Console.WriteLine(pitInfo.mPitMenu.mNumChoices);
 			}
 
 			Console.WriteLine("[Test Data]");
 			if (connected) {
 				Console.Write("Category="); Console.Write(pitInfo.mPitMenu.mCategoryIndex);
-				Console.Write(" -> "); Console.WriteLine(pitInfo.mPitMenu.mCategoryName);
+				Console.Write(" -> "); Console.WriteLine(GetStringFromBytes(pitInfo.mPitMenu.mCategoryName));
 				Console.Write("Choices="); Console.Write(pitInfo.mPitMenu.mChoiceIndex);
-				Console.Write(" -> "); Console.WriteLine(pitInfo.mPitMenu.mChoiceString);
+				Console.Write(" -> "); Console.WriteLine(GetStringFromBytes(pitInfo.mPitMenu.mChoiceString));
 				Console.Write("NumChoices="); Console.WriteLine(pitInfo.mPitMenu.mNumChoices);
 			}
 		}

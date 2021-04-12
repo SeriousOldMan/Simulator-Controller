@@ -58,7 +58,7 @@ class RF2Plugin extends RaceEngineerSimulatorPlugin {
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
-		this.sendPitstopCommand("Tyre Pressure", pressureFL, pressureFR, pressureRL, pressureRR)
+		this.sendPitstopCommand("Tyre Pressure", Round(pressureFL, 1), Round(pressureFR, 1), Round(pressureRL, 1), Round(pressureRR, 1))
 	}
 
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork) {

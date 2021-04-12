@@ -388,7 +388,41 @@ namespace RF2SHMReader {
 
 		private void ExecuteTyreCompoundCommand(string[] tyreArgument) {
 			string compound = tyreArgument[0];
-			string compoundColor = tyreArgument[1];
+			
+			if (compound == "Wet")
+				compound = "Rain";
+			else
+				switch (tyreArgument[1]) {
+					case "Red":
+						compound = "Soft";
+
+						break;
+					case "White":
+						compound = "Medium";
+
+						break;
+					case "Blue":
+						compound = "Hard";
+
+						break;
+					default:
+						compound = "";
+						
+						break;
+				}
+
+			void selectAxleTyreCompound(string category) {
+				SelectPitstopCategory(category);
+
+				while (!GetStringFromBytes(pitInfo.mPitMenu.mChoiceString).Contains(compound)) {
+					SendPitstopCommand("+");
+
+					pitInfoBuffer.GetMappedData(ref pitInfo);
+				}
+			}
+
+			selectAxleTyreCompound("Tyre Front");
+			selectAxleTyreCompound("Tyre Rear");
 		}
 
 		private void ExecuteTyreSetCommand(string tyreSetArgument) {
@@ -396,10 +430,21 @@ namespace RF2SHMReader {
 		}
 
 		private void ExecuteTyrePressureCommand(string[] tyreArgument) {
-			int pressureFL = (int)GetKpa(Double.Parse(tyreArgument[0]));
-			int pressureFR = (int)GetKpa(Double.Parse(tyreArgument[1]));
-			int pressureRL = (int)GetKpa(Double.Parse(tyreArgument[2]));
-			int pressureRR = (int)GetKpa(Double.Parse(tyreArgument[3]));
+			void updatePressure(string category, double targetPressure) {
+				SelectPitstopCategory(category);
+
+				int deltaPressure = (int)GetKpa(targetPressure) - pitInfo.mPitMenu.mChoiceIndex;
+
+				if (deltaPressure > 0)
+					SendPitstopCommand(new string('+', deltaPressure));
+				else
+					SendPitstopCommand(new string('-', Math.Abs(deltaPressure)));
+			}
+
+			updatePressure("FL PRS", Double.Parse(tyreArgument[0]));
+			updatePressure("FR PRS", Double.Parse(tyreArgument[1]));
+			updatePressure("RL PRS", Double.Parse(tyreArgument[2]));
+			updatePressure("RR PRS", Double.Parse(tyreArgument[3]));
 		}
 
 		private void ExecuteRepairCommand(string repairType) {

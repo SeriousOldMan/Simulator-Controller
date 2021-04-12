@@ -255,11 +255,12 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 	}
 	
 	__New(controller, name, simulator, configuration := false) {
-		this.iChatMode := new this.ChatMode(this)
+		; this.iChatMode := new this.ChatMode(this)
 		
 		base.__New(controller, name, simulator, configuration)
 		
-		this.registerMode(this.iChatMode)
+		if (this.iChatMode)
+			this.registerMode(this.iChatMode)
 		
 		this.kOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", false)
 		this.kClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
@@ -284,6 +285,9 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 			if (function != false) {
 				message := string2Values("|", message)
 			
+				if !this.iChatMode
+					this.iChatMode := new this.ChatMode(this)
+				
 				this.iChatMode.registerAction(new this.ChatAction(function, message[1], message[2]))
 			}
 			else

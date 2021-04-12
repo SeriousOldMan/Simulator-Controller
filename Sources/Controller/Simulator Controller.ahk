@@ -876,15 +876,15 @@ class SimulatorController extends ConfigurationItem {
 		modes := false
 		
 		if !simulator
-			modes := getConfigurationValue(this.Settings, "Modes", "Default", false)
+			modes := getConfigurationValue(this.Settings, "Modes", "Default", "")
 		else {
-			modes := getConfigurationValue(this.Settings, "Modes", ConfigurationItem.descriptor(simulator, session), false)
+			modes := getConfigurationValue(this.Settings, "Modes", ConfigurationItem.descriptor(simulator, session), "")
 		
-			if !modes
-				modes := getConfigurationValue(this.Settings, "Modes", ConfigurationItem.descriptor(simulator, "Default"), false)
+			if (StrLen(Trim(modes)) = 0)
+				modes := getConfigurationValue(this.Settings, "Modes", ConfigurationItem.descriptor(simulator, "Default"), "")
 		}
 		
-		if modes
+		if (StrLen(Trim(modes)) != 0)
 			for ignore, theMode in string2Values(",", modes) {
 				theMode := ConfigurationItem.splitDescriptor(theMode)
 			

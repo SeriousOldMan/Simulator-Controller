@@ -12,6 +12,7 @@
 global kSave = "Save"
 global kContinue = "Continue"
 global kCancel = "Cancel"
+global kUpdate = "Update"
 global kEditModes = "Edit"
 
 
@@ -34,55 +35,6 @@ global buttonBoxSimulationDurationInput
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
-			
-initializePicturesList(pictures := "") {
-	Gui ListView, % picturesListViewHandle
-		
-	LV_Delete()
-	
-	pictures := string2Values(",", pictures)
-	
-	picturesListViewImages := IL_Create(pictures.Length())
-		
-	for ignore, picture in pictures
-		IL_Add(picturesListViewImages, LoadPicture(getFileName(picture, kUserSplashMediaDirectory, kSplashMediaDirectory), "W32 H32"), 0xFFFFFF, false)
-	
-	LV_SetImageList(picturesListViewImages)
-	
-	Loop % pictures.Length()
-		LV_Add("Check Icon" . A_Index, pictures[A_Index])
-		
-	LV_ModifyCol()
-}
-
-loadEditor(item) {
-	themeTypeDropDown := (item[1] == "Picture Carousel") ? 1 : 2
-	themeNameEdit := item[2]
-	soundFilePathEdit := item[4]
-		
-	GuiControl Choose, themeTypeDropDown, %themeTypeDropDown%
-	GuiControl Text, themeNameEdit, %themeNameEdit%
-	GuiControl Text, soundFilePathEdit, %soundFilePathEdit%
-	
-	if (themeTypeDropDown == 2)
-		videoFilePathEdit := item[3]
-	else
-		videoFilePathEdit := ""
-		
-	GuiControl Text, videoFilePathEdit, %videoFilePathEdit%
-	
-	if (themeTypeDropDown == 1) {
-		this.initializePicturesList(item[3])
-		
-		picturesDurationEdit := item[5]
-		
-		GuiControl Text, picturesDurationEdit, %picturesDurationEdit%
-	}
-	else
-		this.initializePicturesList("")
-	
-	this.updateEditor()
-}
 
 saveModes() {
 	editModes(kSave)
@@ -126,6 +78,24 @@ startConfiguration() {
 	
 	if ErrorLevel
 		vRestart := true
+}
+
+getControllerConfiguration() {
+	if !FileExist(kUserConfigDirectory . "Simulator Controller.config")
+		try {
+			exePath := kBinariesDirectory . "Simulator Controller.exe -NoStartup"
+			
+			RunWait %exePath%, %kBinariesDirectory%
+		}
+		catch exception {
+			logMessage(kLogCritical, translate("Cannot start Simulator Controller (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
+		
+			showMessage(substituteVariables(translate("Cannot start Simulator Controller (%kBinariesDirectory%Simulator Controller.exe) - please rebuild the applications..."))
+					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+		}
+	
+	
+	return readConfiguration(kUserConfigDirectory . "Simulator Controller.config")
 }
 
 checkTrayTipDuration() {
@@ -172,17 +142,108 @@ openSettingsDocumentation() {
 	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--settings
 }
 
+getSelectedModes(modesListViewHandle) {
+	Gui ListView, % modesListViewHandle
+	
+	rowNumber := 0
+	modes := []
+	
+	Loop {
+		rowNumber := LV_GetNext(rowNumber, "C")
+		
+		if !rowNumber
+			break
+		
+		LV_GetText(thePlugin, rowNumber, 1)
+		LV_GetText(theMode, rowNumber, 2)
+		
+		modes.Push(ConfigurationItem.descriptor(thePlugin, theMode))
+	}
+	
+	return modes
+}
+
+updateModes() {
+	editModes(kUpdate)
+}
+
 editModes(ByRef settingsOrCommand) {
 	static newSettings
 	static result := false
 	
-	static modeContextDropDown
+	static configuration := false
+	static simulators := []
+	
+	static selectedSimulator := false
+	static selectedSession := false
+	static simulatorSessions := []
+	
+	static modeSimulatorDropDown
+	static modeSessionDropDown
 	static modesListView
 	static modesListViewHandle
 	
-	if (settingsOrCommand = kSave) {
-		; saveModesList(newSettings)
+	if ((settingsOrCommand = kSave) || (settingsOrCommand = kUpdate)) {
+		modes := getSelectedModes(modesListViewHandle)
 		
+		if !selectedSimulator
+			setConfigurationValue(newSettings, "Modes", "Default", values2String(",", modes*))
+		else if !selectedSession
+			setConfigurationValue(newSettings, "Modes", ConfigurationItem.descriptor(selectedSimulator, "Default"), values2String(",", modes*))
+		else
+			setConfigurationValue(newSettings, "Modes", ConfigurationItem.descriptor(selectedSimulator, simulatorSessions[selectedSession]), values2String(",", modes*))
+	}
+	
+	if (settingsOrCommand = kUpdate) {
+		GuiControlGet modeSimulatorDropDown
+		GuiControlGet modeSessionDropDown
+		
+		modes := []
+		
+		if (modeSimulatorDropDown == 1) {
+			modes := string2Values(",", getConfigurationValue(newSettings, "Modes", "Default", ""))
+			
+			selectedSimulator := false
+			selectedSession := false
+			simulatorSessions := []
+			
+			GuiControl Text, modeSessionDropDown, % "|" . translate("Inactive")
+			GuiControl Choose, modeSessionDropDown, 1
+		}
+		else {
+			if (selectedSimulator != simulators[modeSimulatorDropDown - 1]) {
+				selectedSimulator := simulators[modeSimulatorDropDown - 1]
+				modeSessionDropDown := 1
+				selectedSession := false
+				
+				simulatorSessions := string2Values(",", string2Values("|", getConfigurationValue(configuration, "Simulators", selectedSimulator, ""))[2])
+				
+				GuiControl Text, modeSessionDropDown, % "|" . translate("Inactive") . "|" . values2String("|", map(simulatorSessions, "translate")*)
+				GuiControl Choose, modeSessionDropDown, 1
+				
+				modes := string2Values(",", getConfigurationValue(newSettings, "Modes", ConfigurationItem.descriptor(selectedSimulator, "Default"), ""))
+			}
+			else if (selectedSession != (modeSessionDropDown - 1)) {
+				selectedSession := modeSessionDropDown - 1
+				
+				modes := string2Values(",", getConfigurationValue(newSettings, "Modes"
+																, ConfigurationItem.descriptor(selectedSimulator, !selectedSession ? "Default" : simulatorSessions[selectedSession]), ""))
+			}
+			else
+				Throw "Unexpected update event detected in editModes..."
+		}
+		
+		row := 1
+		
+		for thePlugin, pluginConfiguration in getConfigurationSectionValues(configuration, "Plugins", Object()) {
+			pluginConfiguration := string2Values("|", pluginConfiguration)	
+			
+			for ignore, mode in string2Values(",", pluginConfiguration[3])
+				LV_Modify(row++, inList(modes, ConfigurationItem.descriptor(thePlugin, mode)) ? "Check" : "-Check")
+		}
+	}
+	
+	if (settingsOrCommand = kSave) {
 		Gui ME:Destroy
 		
 		result := kSave
@@ -192,7 +253,7 @@ editModes(ByRef settingsOrCommand) {
 	
 		result := kCancel
 	}
-	else {
+	else if IsObject(settingsOrCommand) {
 		newSettings := newConfiguration()
 	
 		setConfigurationSectionValues(newSettings, "Modes", getConfigurationSectionValues(settingsOrCommand, "Modes"))
@@ -204,24 +265,44 @@ editModes(ByRef settingsOrCommand) {
 
 		Gui ME:Font, Bold, Arial
 
-		Gui ME:Add, Text, w410 Center gmoveModesEditor, % translate("Modular Simulator Controller System") 
+		Gui ME:Add, Text, w330 Center gmoveModesEditor, % translate("Modular Simulator Controller System") 
 
 		Gui ME:Font, Norm, Arial
 		Gui ME:Font, Italic Underline, Arial
 
-		Gui ME:Add, Text, YP+20 w410 cBlue Center gopenSettingsDocumentation, % translate("Controller Modes")
+		Gui ME:Add, Text, YP+20 w330 cBlue Center gopenSettingsDocumentation, % translate("Controller Automation")
 
 		Gui ME:Font, Norm, Arial
 				
-		Gui ME:Add, Button, x128 y450 w80 h23 Default gsaveModes, % translate("Ok")
-		Gui ME:Add, Button, x226 y450 w80 h23 gcancelModes, % translate("&Cancel")
+		Gui ME:Add, Button, x88 y290 w80 h23 Default gsaveModes, % translate("Ok")
+		Gui ME:Add, Button, x186 y290 w80 h23 gcancelModes, % translate("&Cancel")
 		
-		Gui ME:Add, Text, x16 y80 w86 h23 +0x200, % translate("Context")
-		Gui ME:Add, DropDownList, x110 y80 w140 AltSubmit VmodeContextDropDown, % "Menus"
+		configuration := getControllerConfiguration()
 		
-		Gui ME:Add, Text, x16 y110 w80 h23 +0x200, % translate("Modes")
-		Gui ME:Add, ListView, x110 y110 w284 h112 -Multi -LV0x10 Checked -Hdr NoSort NoSortHdr HwndmodesListViewHandle VmodesListView, % translate("Plugin") . "|" . translate("Mode")
+		for simulator, options in getConfigurationSectionValues(configuration, "Simulators", Object())
+			simulators.Push(simulator)
 		
+		Gui ME:Add, Text, x8 y60 w86 h23 +0x200, % translate("Simulator")
+		Gui ME:Add, DropDownList, x100 y60 w240 Choose1 AltSubmit gupdateModes VmodeSimulatorDropDown, % translate("Inactive") . ((simulators.Length() > 0) ? "|" : "") . values2String("|", simulators*)
+		
+		Gui ME:Add, Text, x8 y84 w86 h23 +0x200, % translate("Session")
+		Gui ME:Add, DropDownList, x100 y84 w100 Choose1 AltSubmit gupdateModes VmodeSessionDropDown, % translate("Inactive")
+		
+		Gui ME:Add, Text, x8 y108 w80 h23 +0x200, % translate("Modes")
+		Gui ME:Add, ListView, x100 y108 w240 h162 -Multi -LV0x10 Checked NoSort NoSortHdr HwndmodesListViewHandle VmodesListView, % translate("Plugin") . "|" . translate("Mode") . "|" . translate("Simulator(s)")
+		
+		defaultModes := string2Values(",", getConfigurationValue(newSettings, "Modes", "Default", ""))
+		
+		for thePlugin, pluginConfiguration in getConfigurationSectionValues(configuration, "Plugins", Object()) {
+			pluginConfiguration := string2Values("|", pluginConfiguration)
+			pluginSimulators := values2String(", ", string2Values(",", pluginConfiguration[2])*)			
+			
+			for ignore, mode in string2Values(",", pluginConfiguration[3])
+				LV_Add(inList(defaultModes, ConfigurationItem.descriptor(thePlugin, mode)) ? "Check" : "", thePlugin, mode, pluginSimulators)
+		}
+		
+		LV_ModifyCol()
+	
 		Gui ME:Margin, 10, 10
 		Gui ME:Show, AutoSize Center
 		
@@ -478,7 +559,7 @@ restart:
 		
 		Gui SE:Add, DropDownList, X120 YP-5 w100 Choose%chosen% vbuttonBoxPosition, % values2String("|", map(choices, "translate")*)
 		
-		Gui SE:Add, Button, X10 Y+15 w220 gopenModesEditor, % translate("Controller Modes...")
+		Gui SE:Add, Button, X10 Y+15 w220 gopenModesEditor, % translate("Controller Automation...")
 		
 		splashTheme := getConfigurationValue(settingsOrCommand, "Startup", "Splash Theme", false)	
 	 

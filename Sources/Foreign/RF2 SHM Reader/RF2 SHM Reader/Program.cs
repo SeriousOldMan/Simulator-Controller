@@ -21,8 +21,11 @@ namespace RF2SHMReader {
 
             SHMReader reader = new SHMReader();
 
-            if (args.Length > 0 && args[0] == "-pitCommand")
-                reader.ExecutePitCommand(args[1]);
+            if (args.Length > 0 && args[0] == "-Pitstop") {
+                string[] arguments = args[1].Split(':');
+
+                reader.ExecutePitstopCommand(arguments[0], arguments[1].Split(';'));
+            }
             else
                 reader.ReadData();
         }

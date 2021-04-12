@@ -241,6 +241,10 @@ namespace RF2SHMReader {
 			return kPa / 6.895;
 		}
 
+		private static double GetKpa(double psi) {
+			return psi * 6.895;
+		}
+
 		private static string GetStringFromBytes(byte[] bytes) {
 			if (bytes == null)
 				return "";
@@ -371,15 +375,81 @@ namespace RF2SHMReader {
 			}
 		}
 
-		private DateTime nextKeyHandlingTime = DateTime.MinValue;
+		private void ExecuteRefuelCommand(string fuelArgument) {
+			int targetFuel = (int)Double.Parse(fuelArgument);
 
-		public void ExecutePitCommand(string command) {
+			SelectPitstopCategory("Fuel");
+
+			int deltaFuel = targetFuel - pitInfo.mPitMenu.mChoiceIndex;
+
+			if (deltaFuel > 0)
+				SendPitstopCommand(new string('+', deltaFuel));
+		}
+
+		private void ExecuteTyreCompoundCommand(string[] tyreArgument) {
+			string compound = tyreArgument[0];
+			string compoundColor = tyreArgument[1];
+		}
+
+		private void ExecuteTyreSetCommand(string tyreSetArgument) {
+			int tyreSet = (int)Int16.Parse(tyreSetArgument);
+		}
+
+		private void ExecuteTyrePressureCommand(string[] tyreArgument) {
+			int pressureFL = (int)GetKpa(Double.Parse(tyreArgument[0]));
+			int pressureFR = (int)GetKpa(Double.Parse(tyreArgument[1]));
+			int pressureRL = (int)GetKpa(Double.Parse(tyreArgument[2]));
+			int pressureRR = (int)GetKpa(Double.Parse(tyreArgument[3]));
+		}
+
+		private void ExecuteRepairCommand(string repairType) {
+			switch (repairType) {
+				case "Bodywork":
+
+					break;
+				case "Suspension":
+
+					break;
+			}
+		}
+
+		public void ExecutePitstopCommand(string command, string[] arguments) {
 			if (!this.connected || this.extended.mHWControlInputEnabled == 0)
 				return;
 
+			switch (command) {
+				case "Refuel":
+					ExecuteRefuelCommand(arguments[1]);
+					break;
+				case "Tyre Compound":
+					ExecuteTyreCompoundCommand(arguments[1].Split(';'));
+					break;
+				case "Tyre Set":
+					ExecuteTyreSetCommand(arguments[1]);
+					break;
+				case "Tyre Pressure":
+					ExecuteTyrePressureCommand(arguments[1].Split(';'));
+					break;
+				case "Repair":
+					ExecuteRepairCommand(arguments[1]);
+					break;
+			}
+		}
+
+		private void SelectPitstopCategory(string category) {
+			while (category != GetStringFromBytes(pitInfo.mPitMenu.mCategoryName)) {
+				SendPitstopCommand("D");
+
+				pitInfoBuffer.GetMappedData(ref pitInfo);
+			}
+        }
+
+        private DateTime nextKeyHandlingTime = DateTime.MinValue;
+
+		private void SendPitstopCommand(string command) {
 			var now = DateTime.Now;
 			if (now < this.nextKeyHandlingTime)
-				return;
+				Thread.Sleep(100);
 
 			for (int i = 0; i < command.Length; i++) {
 				byte[] commandStr = null;
@@ -401,5 +471,5 @@ namespace RF2SHMReader {
 
 			this.nextKeyHandlingTime = now + TimeSpan.FromMilliseconds(100);
 		}
-	}
+    }
 }

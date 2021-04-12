@@ -287,6 +287,8 @@ This plugin handles the *Assetto Corsa* simulation game. An application with the
 
 This plugin handles the *rFactor 2* simulation game. An application with the name "rFactor 2" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startRF2" as a special function hook in this configuration. No special mode is currently defined for *rFactor 2*, but an integration with Jona is available through the "Race Engineer" plugin.
 
+Important: You must install a plugin into *rFactor 2* for the telemetry interface to work, which you can find in the *Utilities\3rd Part\rf2_sm_tools_3.7.14.2.zip*. A Readme file is included.
+
 ## Plugin *R3E*
 
 This plugin handles the *RaceRoom Racing Experience* simulation game. An application with the name "RaceRoom Racing Experience" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startR3E" as a special function hook in this configuration and define "ahk_exe RRRE64.exe" (yes, three "R"s) as the window title. No special mode is currently defined for *rFactor 2*, but an integration with Jona is available through the "Race Engineer" plugin.

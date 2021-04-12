@@ -223,14 +223,13 @@ editModes(ByRef settingsOrCommand) {
 				
 				modes := string2Values(",", getConfigurationValue(newSettings, "Modes", ConfigurationItem.descriptor(selectedSimulator, "Default"), ""))
 			}
-			else if (selectedSession != (modeSessionDropDown - 1)) {
-				selectedSession := modeSessionDropDown - 1
+			else {
+				if (selectedSession != (modeSessionDropDown - 1))
+					selectedSession := modeSessionDropDown - 1
 				
 				modes := string2Values(",", getConfigurationValue(newSettings, "Modes"
 																, ConfigurationItem.descriptor(selectedSimulator, !selectedSession ? "Default" : simulatorSessions[selectedSession]), ""))
 			}
-			else
-				Throw "Unexpected update event detected in editModes..."
 		}
 		
 		row := 1

@@ -7,7 +7,7 @@
   5. The shared memory reader applications for the different simulators now have their Windows Explorer icons.
   6. The "Controller Plugin Labels" file is now available in different translations.
   7. The active modes of the connected controllers (aka Button Boxes) can now be automatically activated depending on the current simulator and the active session.
-  8. Full Pitstop handling support by Jona for rFactor 2.
+  8. Jona now can handle the pitstop in the *rFactor 2* simulation.
 
 ## 2.8-release 04/09/21
 

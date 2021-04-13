@@ -121,6 +121,10 @@ After installing the language packs, it might be necessary to unblock the recogn
 
 Note: Since the time for offline voice recognition is almost over, a future version of Jona will use Google, Amazon or Azure services for voice recognition. But this might be a pay per use kind of service.
 
+### Installation of Telemetry Providers
+
+Jona acquires telemetry data from the different simulation games using so called telemtry providers, which in most cases reads the [required data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#telemetry-integration) from a shared memory interface. In most cases these are already included in Simulator Controller and there is nothing to do, but for *rFactor 2*, you need to install a plugin into a special location for the telemetry interface to work. You can find the plugin in the *Utilities\3rd Part\rf2_sm_tools_3.7.14.2.zip* or you can load the [latest version](https://github.com/TheIronWolfModding/rF2SharedMemoryMapPlugin) from GitHub. A Readme file is included.
+
 ## Interacting with Jona
 
 Although it is possible, to [use Jona without voice interaction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer), it is not much fun. But to have fun with Jona, you must understand, how the interaction is structured, since in the end, Jona is stupid as bread and only reacts to strong standard patterns. For each language you want to use to interact with Jona, a so called grammar file must exist. As said, grammars for English and German are already there. The grammar files are named "Race Engineer.grammars.XX", where XX is the two letter ISO language code. These files reside in the *Config* directory, either in the installation folder of Simulator Controller or in the *Simulator Controller\Config* folder in your user *Documents* folder. The later means, that you are able to provide your own grammar files or *overwrite* the existing ones. But be careful with overwriting, since this will introduce a pain in the a..., when updating to new versions.

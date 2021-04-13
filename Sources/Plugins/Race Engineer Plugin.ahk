@@ -468,9 +468,9 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 		
 			code := simulator.Code
 			
-			FileCreateDir %kUserHomeDirectory%Temp\%code% Data
+			FileCreateDir %kTempDirectory%%code% Data
 			
-			Loop Files, %kUserHomeDirectory%Temp\%code% Data\*.*
+			Loop Files, %kTempDirectory%%code% Data\*.*
 				FileDelete %A_LoopFilePath%
 		}		
 	}
@@ -625,7 +625,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 							lastLapCounter := 0
 						}
 						
-						newDataFile := kUserHomeDirectory . "Temp\" . code . " Data\Lap " . lastLap . "." . ++lastLapCounter . ".data"
+						newDataFile := kTempDirectory . code . " Data\Lap " . lastLap . "." . ++lastLapCounter . ".data"
 							
 						writeConfiguration(newDataFile, data)		; FileCopy %dataFile%, %newDataFile%, 1
 						
@@ -736,7 +736,7 @@ readSharedMemory(simulator, options := "", dataFile := false) {
 	exePath := kBinariesDirectory . simulator . " SHM Reader.exe"
 	
 	if !dataFile
-		dataFile := kUserHomeDirectory . "Temp\" . simulator . " Data\SHM.data"
+		dataFile := kTempDirectory . simulator . " Data\SHM.data"
 	
 	try {
 		RunWait %ComSpec% /c ""%exePath%" %options% > "%dataFile%"", , Hide

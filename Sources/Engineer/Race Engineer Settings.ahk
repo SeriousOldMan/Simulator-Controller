@@ -683,7 +683,7 @@ restart:
 }
 
 readSharedMemory(simulator) {
-	dataFile := kUserHomeDirectory . "Temp\" . simulator . " Data\Setup.data"
+	dataFile := kTempDirectory . simulator . " Data\Setup.data"
 	exePath := kBinariesDirectory . simulator . " SHM Reader.exe"
 		
 	try {

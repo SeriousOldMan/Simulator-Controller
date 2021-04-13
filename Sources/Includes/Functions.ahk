@@ -319,7 +319,7 @@ receiveFileMessage() {
 	
 	pid := ErrorLevel
 	
-	fileName := kUserHomeDirectory . "Temp\Messages\" . pid . ".msg"
+	fileName := kTempDirectory . "Messages\" . pid . ".msg"
 	
 	if FileExist(fileName) {
 		file := false
@@ -364,7 +364,7 @@ sendFileMessage(pid, event, data) {
 	text := event . ":" . data . "`n"
 	
 	try {
-		FileAppend %text%, % kUserHomeDirectory . "Temp\Messages\" . pid . ".msg"
+		FileAppend %text%, % kTempDirectory . "Messages\" . pid . ".msg"
 	}
 	catch exception {
 		return false
@@ -484,8 +484,8 @@ stopMessageManager() {
 	
 	pid := ErrorLevel
 	
-	if FileExist(kUserHomeDirectory . "Temp\Messages\" . pid . ".msg")
-		FileDelete %kUserHomeDirectory%Temp\Messages\%pid%.msg
+	if FileExist(kTempDirectory . "Messages\" . pid . ".msg")
+		FileDelete %kTempDirectory%Messages\%pid%.msg
 }
 
 startMessageManager() {
@@ -497,8 +497,8 @@ startMessageManager() {
 	
 	pid := ErrorLevel
 	
-	if FileExist(kUserHomeDirectory . "Temp\Messages\" . pid . ".msg")
-		FileDelete %kUserHomeDirectory%Temp\Messages\%pid%.msg
+	if FileExist(kTempDirectory . "Messages\" . pid . ".msg")
+		FileDelete %kTempDirectory%Messages\%pid%.msg
 	
 	OnExit("stopMessageManager")
 	
@@ -580,9 +580,9 @@ requestConsent() {
 			}
 			
 			try {
-				RunWait PowerShell.exe -Command Compress-Archive -LiteralPath '%kSetupDatabaseDirectory%Local' -CompressionLevel Optimal -DestinationPath '%kUserHomeDirectory%Temp\Setup Database.%id%.zip', , Hide
+				RunWait PowerShell.exe -Command Compress-Archive -LiteralPath '%kSetupDatabaseDirectory%Local' -CompressionLevel Optimal -DestinationPath '%kTempDirectory%Setup Database.%id%.zip', , Hide
 				
-				ftpUpload("ftp.drivehq.com", "TheBigO", "29605343.9318.1940", kUserHomeDirectory . "Temp\Setup Database." . id . ".zip", "Simulator Controller\Setup Database Uploads\Setup Database." . id . ".zip")
+				ftpUpload("ftp.drivehq.com", "TheBigO", "29605343.9318.1940", kTempDirectory . "Setup Database." . id . ".zip", "Simulator Controller\Setup Database Uploads\Setup Database." . id . ".zip")
 				
 				try {
 					FileDelete %kSetupDatabaseDirectory%Local\UPLOAD
@@ -607,9 +607,9 @@ requestConsent() {
 
 checkForUpdates() {
 	if inList(["Simulator Startup", "Simulator Configuration", "Simulator Settings"], StrSplit(A_ScriptName, ".")[1]) {
-		URLDownloadToFile https://www.dropbox.com/s/txa8muw9j3g66tl/VERSION?dl=1, %kUserHomeDirectory%Temp\VERSION
+		URLDownloadToFile https://www.dropbox.com/s/txa8muw9j3g66tl/VERSION?dl=1, %kTempDirectory%VERSION
 		
-		version := readConfiguration(kUserHomeDirectory . "Temp\VERSION")
+		version := readConfiguration(kTempDirectory . "VERSION")
 		version := getConfigurationValue(version, "Release", "Version", getConfigurationValue(version, "Version", "Release", false))
 		
 		if version {
@@ -649,7 +649,7 @@ checkForUpdates() {
 		writeConfiguration(userToolTargetsFile, userToolTargets)
 	}
 	
-	if (StrSplit(A_ScriptName, ".")[1] != "Simulator Tools") {
+	if (!inList(A_Args, "-NoUpdate") && (StrSplit(A_ScriptName, ".")[1] != "Simulator Tools")) {
 		updates := readConfiguration(getFileName("UPDATES", kUserConfigDirectory))
 restartUpdate:		
 		for target, arguments in getConfigurationSectionValues(toolTargets, "Update", Object())
@@ -773,7 +773,7 @@ initializeEnvironment() {
 	FileCreateDir %kUserHomeDirectory%Screen Images
 	FileCreateDir %kUserHomeDirectory%Plugins
 	FileCreateDir %kUserHomeDirectory%Temp
-	FileCreateDir %kUserHomeDirectory%Temp\Messages
+	FileCreateDir %kTempDirectory%Messages
 	FileCreateDir %kSetupDatabaseDirectory%Global
 	FileCreateDir %kSetupDatabaseDirectory%Local
 	

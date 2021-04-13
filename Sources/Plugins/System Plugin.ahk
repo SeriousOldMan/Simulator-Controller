@@ -296,7 +296,7 @@ class SystemPlugin extends ControllerPlugin {
 			;
 			; Using a sempahore file instead...
 			
-			fileName := (kUserHomeDirectory . "Temp\Startup.semaphore")
+			fileName := (kTempDirectory . "Startup.semaphore")
 						
 			try {
 				FileDelete %fileName%

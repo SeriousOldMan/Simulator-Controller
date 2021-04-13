@@ -279,7 +279,7 @@ class SimulatorStartup extends ConfigurationItem {
 ;;;-------------------------------------------------------------------------;;;
 
 watchStartupSemaphore() {
-	if !FileExist(kUserHomeDirectory . "Temp\Startup.semaphore")
+	if !FileExist(kTempDirectory . "Startup.semaphore")
 		exitStartup()
 }
 
@@ -296,7 +296,7 @@ startSimulator() {
 	;
 	; Using a sempahore file instead...
 	
-	fileName := (kUserHomeDirectory . "Temp\Startup.semaphore")
+	fileName := (kTempDirectory . "Startup.semaphore")
 	
 	if !FileExist(fileName)
 		FileAppend Startup, %fileName%
@@ -323,7 +323,7 @@ exitStartup(sayGoodbye := false) {
 		Exit
 	}
 	else {
-		fileName := (kUserHomeDirectory . "Temp\Startup.semaphore")
+		fileName := (kTempDirectory . "Startup.semaphore")
 						
 		try {
 			FileDelete %fileName%

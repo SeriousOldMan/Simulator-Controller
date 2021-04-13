@@ -27,8 +27,6 @@ global kRF2Plugin = "RF2"
 
 class RF2Plugin extends RaceEngineerSimulatorPlugin {
 	sendPitstopCommand(command, message := false, arguments*) {
-		static counter := 1
-		
 		simulator := this.Code
 		arguments := values2String(";", arguments*)
 		
@@ -36,11 +34,9 @@ class RF2Plugin extends RaceEngineerSimulatorPlugin {
 	
 		try {
 			if message
-				RunWait %ComSpec% /c ""%exePath%" -%command% "%message%:%arguments%" > "%kTempDirectory%Pitstop%counter%.out"", , Hide
+				RunWait %ComSpec% /c ""%exePath%" -%command% "%message%:%arguments%"", , Hide
 			else
-				RunWait %ComSpec% /c ""%exePath%" -%command% > "%kTempDirectory%Pitstop%counter%.out"", , Hide
-			
-			counter += 1
+				RunWait %ComSpec% /c ""%exePath%" -%command%", , Hide
 		}
 		catch exception {
 			logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% SHM Reader ("), {simulator: simulator})

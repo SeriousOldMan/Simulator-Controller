@@ -2153,7 +2153,7 @@ requestPitstopRepairs(context, pitstopNumber, repairSuspension, repairBodywork) 
 
 dumpKnowledge(knowledgeBase) {
 	try {
-		FileDelete %kUserHomeDirectory%Temp\Race Engineer.knowledge
+		FileDelete %kTempDirectory%Race Engineer.knowledge
 	}
 	catch exception {
 		; ignore
@@ -2162,6 +2162,6 @@ dumpKnowledge(knowledgeBase) {
 	for key, value in knowledgeBase.Facts.Facts {
 		text := key . " = " . value . "`n"
 	
-		FileAppend %text%, %kUserHomeDirectory%Temp\Race Engineer.knowledge
+		FileAppend %text%, %kTempDirectory%Race Engineer.knowledge
 	}
 }

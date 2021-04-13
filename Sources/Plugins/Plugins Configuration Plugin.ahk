@@ -233,6 +233,8 @@ openPluginsModesDocumentation() {
 			Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-2
 		case "Pedal Calibration":
 			Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-3
+		case "Race Engineer":
+			Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer
 		case "ACC":
 			Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-4
 		default:

@@ -1208,7 +1208,7 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 	}
 
 	setPitstopRefuelAmount(pitstopNumber, litres) {
-		data := readSharedMemory(this.Code, kUserHomeDirectory . "Temp\ACC Data\Pitstop Setup.data")
+		data := readSharedMemory(this.Code, "-Setup", kUserHomeDirectory . "Temp\ACC Data\Setup.data")
 		
 		litresIncrement := Round(litres - getConfigurationValue(data, "Setup Data", "FuelAmount", 0))
 		
@@ -1218,7 +1218,7 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor, set := false) {
 		changePitstopTyreCompound(compound)
 		
-		data := readSharedMemory(this.Code, kUserHomeDirectory . "Temp\ACC Data\Pitstop Setup.data")
+		data := readSharedMemory(this.Code, "-Setup", kUserHomeDirectory . "Temp\ACC Data\Setup.data")
 		
 		tyreSetIncrement := Round(set - getConfigurationValue(data, "Setup Data", "TyreSet", 0))
 		
@@ -1227,7 +1227,7 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
-		data := readSharedMemory(this.Code, kUserHomeDirectory . "Temp\ACC Data\Pitstop Setup.data")
+		data := readSharedMemory(this.Code, "-Setup", kUserHomeDirectory . "Temp\ACC Data\Setup.data")
 			
 		pressureFLIncrement := Round(pressureFL - getConfigurationValue(data, "Setup Data", "TyrePressureFL", 26.1), 1)
 		pressureFRIncrement := Round(pressureFR - getConfigurationValue(data, "Setup Data", "TyrePressureFR", 26.1), 1)

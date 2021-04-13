@@ -509,7 +509,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 	getSessionState(data := false) {
 		if this.Simulator {
 			if !data
-				data := readSharedMemory(this.Simulator.Code, kUserHomeDirectory . "Temp\" . this.Simulator.Code . " Data\SHM.data")
+				data := readSharedMemory(this.Simulator.Code)
 			
 			if getConfigurationValue(data, "Stint Data", "Active", false) {
 				if getConfigurationValue(data, "Stint Data", "Paused", false)
@@ -553,9 +553,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 		if this.Simulator {
 			code := this.Simulator.Code
 			
-			dataFile := kUserHomeDirectory . "Temp\" . code . " Data\SHM.data"
-			
-			data := readSharedMemory(code, dataFile)
+			data := readSharedMemory(code)
 			
 			this.Simulator.updateSimulatorData(data)
 			
@@ -734,11 +732,14 @@ openRaceEngineerSettings(import := false) {
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-readSharedMemory(simulator, dataFile) {
+readSharedMemory(simulator, options := "", dataFile := false) {
 	exePath := kBinariesDirectory . simulator . " SHM Reader.exe"
 	
+	if !dataFile
+		dataFile := kUserHomeDirectory . "Temp\" . simulator . " Data\SHM.data"
+	
 	try {
-		RunWait %ComSpec% /c ""%exePath%" > "%dataFile%"", , Hide
+		RunWait %ComSpec% /c ""%exePath%" %options% > "%dataFile%"", , Hide
 	}
 	catch exception {
 		logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% SHM Reader ("), {simulator: simulator})

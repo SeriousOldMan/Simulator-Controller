@@ -2,7 +2,7 @@
 
 Welcome to Jona, the world first fully interactive and AI-based Virtual Race Engineer for race car simulations.
 
-Ok, enough marketing bullshit. Jona is a voice chat bot with a special knowledge about racing. It uses the telemetry data provided by a simulation game and a large domain specific rule set to derive its knowledge from there. Using this knowledge, Jona can give you information about the current state of your car (temperatures, pressures, remaining laps, upcoming pitstops, and so on), and can recommend settings for the next pitstop. Currently, Jona supports the *Assetto Corsa Competizione*, *RaceRoom Racing Experience* and *rFactor 2* simulation games through their respective plugins. Using the Pitstop MFD handling for *Assetto Corsa Competizione* introduced with [Release 2.0](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-20), Jona is even capable to setup a pitstop without user interaction completely on its own, a capability, which will come to the other simulation games in the future as well.
+Ok, enough marketing bullshit. Jona is a voice chat bot with a special knowledge about racing. It uses the telemetry data provided by a simulation game and a large domain specific rule set to derive its knowledge from there. Using this knowledge, Jona can give you information about the current state of your car (temperatures, pressures, remaining laps, upcoming pitstops, and so on), and can recommend settings for the next pitstop. Currently, Jona supports the *Assetto Corsa Competizione*, *RaceRoom Racing Experience* and *rFactor 2* simulation games through their respective plugins. Using the Pitstop MFD handling for *Assetto Corsa Competizione* introduced with [Release 2.0](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-20), Jona is even capable to setup a pitstop without user interaction completely on its own in those simulations, where this is possible (currently *Assetto Corsa Competizione* and *rFactor 2*).
 
 ***
 
@@ -266,7 +266,7 @@ Additionally worth to be mentioned is the field *Pitstop.Delta*, with which you 
 
 If you open the settings tool, it will load the *Race Engineer.settings* file located in the *Simulator Controller\Config* folder in your user *Documents* folder. If you close the tool with the "Ok" button, this file will be overwritten with the new information. Beside that, you can load a settings file from a different location with the "Load..." button and you can save the current settings with the "Save..." button. This may be used to create preconfigured settings for all your cars and tracks in the various environmental conditions. By the way - this will be integrated in a future version of Simulator Controller with the setup database automatically.
 
-Good to know: When the *Race Engineer.settings* file is changed while Jona is already active, the updated settings will be imported into the active session. This is useful during Practice, Qualification or even Endurance Race sessions.
+Good to know: When the *Race Engineer.settings* file is changed while Jona is already active, the updated settings will be imported into the active session. This is useful during Practice, Qualification or even Endurance Race sessions. And, if you click on the blue label of the dialog title, this documentation will be opened in your browser.
 
 ### The pitstop
 
@@ -285,7 +285,7 @@ Last but not least, the check boxes for repair of Suspension and Bodywork must b
 
 A final warning: If you ever perform a pitstop, which has not been planned and prepared by Jona, Jona will be very confused, say the least. You can do this, but please double check the recommendations of Jona for each subsequent pitstop, especially the chosen tyre set, if you don't want to end up with worn out tyres for your last stint.
 
-Note: Similar pitstop handling will be available for *rFactor 2* in the near future.
+Note: Pitstop handling is currently available for *Assetto Corsa Competizione* and *rFactor 2*.
 
 ### Race & Setup database
 
@@ -401,8 +401,8 @@ A considerable part of the knowledge of Jona comes from the telemetry informatio
 	BodyworkDamage=0, 0, 0, 0, 0
 	SuspensionDamage=0, 0, 0, 0
 	FuelRemaining=54.6047
-	TyreCompound=Wet
-	TyreCompoundColor=Black
+	TyreCompound=Dry
+	TyreCompoundColor=White
 	TyreTemperature=84.268, 74.6507, 85.6955, 77.2675
 	TyrePressure=27.6296, 27.6063, 27.6666, 27.5575
 	[Stint Data]
@@ -423,7 +423,9 @@ A considerable part of the knowledge of Jona comes from the telemetry informatio
 	[Track Data]
 	Temperature=25.5913
 	Grip=Optimum
-	[Pitstop Data]
+	[Setup Data]
+	TyreCompound=Dry
+	TyreCompoundColor=White
 	TyreSet=2
 	FuelAmount=0
 	TyrePressureFL=25.3
@@ -443,7 +445,9 @@ A considerable part of the knowledge of Jona comes from the telemetry informatio
 
 The shared memory of the simulation games typically provide a lot more information, but this is all that is needed for Jona at the moment. Future versions of Jona will incorporate more data, as Jona gets smarter. For example, version 1.7 of *Assetto Corsa Competizione* introduced updated information for weather information and the current settings of the Pitstop MFD, which had been incorporated into the above telemetry file.
 
-The "Race Engineer" plugin writes this information to a temporary file and hands it over to Jona for each new lap. A special case is the flag *InPit*. If this is found to be *true*, the driver is currently in the pit. In this case, the ACC plugin informs Jona about this by raising the corresponding event. Another special case is the flag *Active* which is used to detect, whether you are in a simulation (Practice, Qualification, Race, whatever) right now.
+The "Race Engineer" plugin writes this information to a temporary file and hands it over to Jona for each new lap. A special case is the flag *InPit*. If this is found to be *true*, the driver is currently in the pit. In this case, the ACC plugin informs Jona about this by raising the corresponding event. Another special case is the flag *Active* which is used to detect, whether you are in a simulation (Practice, Qualification, Race, whatever) right now. Not every simulation may provide all data as in the example above. In this case, a default value will be assumed.
+
+The *[Setup Data]* section reference the settings at the start of the session and must only be written by the data provider, if the *-Setup* option has been passed to the process. These information are ussed in the pitstop preparation process and also by the *Race Engineer Settings* when importing the initial setup data.
 
 Note: If you are a developer and want to take the challenge to adopt Jona to a different simulation game, you are welcome. You can use the "RF2" plugin code and the above file format as a blueprint, but the shared memory interface of each simulation game is different. Please feel free to contact me, if you have questions. I would be happy to integrate plugins for other simulation games into Simulator Controller in the future.
 

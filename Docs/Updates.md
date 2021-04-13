@@ -43,6 +43,15 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ***
 
+## Release 2.8.2
+
+Beside the automated update, two things to mention for this update:
+
+  1. This release introduces localized versions of the *Controller Plugin Labels.ini* file, which was located in the *Simulator Controller\Config* folder in your *Documents* folder. The old file will be deleted during this transformation. Therefore, if you have modified this file, either directly or from the *Plugins* tab of the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration), please make a backup copy of this file, BEFORE running the update procedure.
+  2. The *rFactor 2* simulation telemetry provider has been extended. Jona is now able to handle a pitstop completely on its own. Please be sure to install the Shared Memory plugin in *rFactor 2* as described in the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-rf2).
+
+***
+
 ## Release 2.8
 
 As always, must of the update work in this release will be handled automatically. But there are some changes, where you might want to adjust your configuration, to get the most out of the new features:

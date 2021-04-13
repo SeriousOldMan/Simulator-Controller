@@ -26,14 +26,21 @@ global kRF2Plugin = "RF2"
 ;;;-------------------------------------------------------------------------;;;
 
 class RF2Plugin extends RaceEngineerSimulatorPlugin {
-	sendPitstopCommand(command, arguments*) {
+	sendPitstopCommand(command, message := false, arguments*) {
+		static counter := 1
+		
 		simulator := this.Code
 		arguments := values2String(";", arguments*)
 		
 		exePath := kBinariesDirectory . this.Code . " SHM Reader.exe"
 	
 		try {
-			RunWait %ComSpec% /c ""%exePath%" -Pitstop "%command%:%arguments%"", , Hide
+			if message
+				RunWait %ComSpec% /c ""%exePath%" -%command% "%message%:%arguments%" > "%kTempDirectory%Pitstop%counter%.out"", , Hide
+			else
+				RunWait %ComSpec% /c ""%exePath%" -%command% > "%kTempDirectory%Pitstop%counter%.out"", , Hide
+			
+			counter += 1
 		}
 		catch exception {
 			logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% SHM Reader ("), {simulator: simulator})
@@ -46,27 +53,42 @@ class RF2Plugin extends RaceEngineerSimulatorPlugin {
 		}
 	}
 	
+	supportsPitstop() {
+		return true
+	}
+	
+	startPitstopSetup(pitstopNumber) {
+		this.sendPitstopCommand("Setup")
+	}
+
+	finishPitstopSetup(pitstopNumber) {
+		this.sendPitstopCommand("Setup")
+	}
+	
 	setPitstopRefuelAmount(pitstopNumber, litres) {
-		this.sendPitstopCommand("Refuel", Round(litres))
+		this.sendPitstopCommand("Pitstop", "Refuel", Round(litres))
 	}
 	
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor, set := false) {
-		this.sendPitstopCommand("Tyre Compound", compound, compoundColor)
+		this.sendPitstopCommand("Pitstop", "Tyre Compound", compound, compoundColor)
 		
 		if set
-			this.sendPitstopCommand("Tyre Set", Round(set))
+			this.sendPitstopCommand("Pitstop", "Tyre Set", Round(set))
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
-		this.sendPitstopCommand("Tyre Pressure", Round(pressureFL, 1), Round(pressureFR, 1), Round(pressureRL, 1), Round(pressureRR, 1))
+		this.sendPitstopCommand("Pitstop", "Tyre Pressure", Round(pressureFL, 1), Round(pressureFR, 1), Round(pressureRL, 1), Round(pressureRR, 1))
 	}
 
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork) {
-		if repairSuspension
-			this.sendPitstopCommand("Repair", "Suspension")
-		
-		if repairBodywork
-			this.sendPitstopCommand("Repair", "Bodywork")
+		if (repairBodywork && repairSuspension)
+			this.sendPitstopCommand("Pitstop", "Repair", "Both")
+		else if repairSuspension
+			this.sendPitstopCommand("Pitstop", "Repair", "Suspension")
+		else if repairBodywork
+			this.sendPitstopCommand("Pitstop", "Repair", "Bodywork")
+		else
+			this.sendPitstopCommand("Pitstop", "Repair", "Nothing")
 	}
 }
 

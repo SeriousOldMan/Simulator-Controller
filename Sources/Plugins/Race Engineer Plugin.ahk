@@ -325,7 +325,10 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 			try {
 				logMessage(kLogInfo, translate("Starting ") . translate("Race Engineer"))
 				
-				options := " -Remote " . controllerPID . " -Settings """ . getFileName("Race Engineer.settings", kUserConfigDirectory, kConfigDirectory) . """"
+				options := " -Settings """ . getFileName("Race Engineer.settings", kUserConfigDirectory, kConfigDirectory) . """"
+				
+				if this.Simulator.supportsPitstop()
+					options .= " -Remote " . controllerPID
 				
 				if this.RaceEngineerName
 					options .= " -Name """ . this.RaceEngineerName . """"
@@ -411,6 +414,10 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 	updateLap(lapNumber, dataFile) {
 		if this.RaceEngineer
 			this.RaceEngineer.updateLap(lapNumber, dataFile)
+	}
+	
+	supportsPitstop() {
+		return (this.Simulator ? this.Simulator.supportsPitstop() : false)
 	}
 	
 	planPitstop() {

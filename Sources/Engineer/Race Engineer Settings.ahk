@@ -682,25 +682,24 @@ restart:
 	}
 }
 
-readSharedMemory(dataFile) {
-	exePath := kBinariesDirectory . "ACC SHM Reader.exe"
+readSharedMemory(simulator) {
+	dataFile := kUserHomeDirectory . "Temp\" . simulator . " Data\Setup.data"
+	exePath := kBinariesDirectory . simulator . " SHM Reader.exe"
 		
 	try {
-		RunWait %ComSpec% /c ""%exePath%" > "%dataFile%"", , Hide
-		
-		IniWrite ACC, %dataFile%, Race Data, Simulator
+		RunWait %ComSpec% /c ""%exePath%" -Setup > "%dataFile%"", , Hide
 	}
 	catch exception {
-		logMessage(kLogCritical, translate("Cannot start ACC SHM Reader (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
+		logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% SHM Reader ("), {simulator: simulator}) . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 			
-		showMessage(substituteVariables(translate("Cannot start ACC SHM Reader (%exePath%) - please check the configuration..."), {exePath: exePath})
+		showMessage(substituteVariables(translate("Cannot start %simulator% SHM Reader (%exePath%) - please check the configuration..."), {simulator: simulator, exePath: exePath})
 				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 	}
 	
 	return readConfiguration(dataFile)
 }
 
-importFromSimulation(message := false, simulator := false, code := false, settings := false) {
+importFromSimulation(message := false, simulator := false, prefix := false, settings := false) {
 	if (message != "Import") {
 		settings := false
 		
@@ -715,11 +714,11 @@ importFromSimulation(message := false, simulator := false, code := false, settin
 		
 		switch simulator {
 			case "Assetto Corsa Competizione":
-				code := "ACC"
+				prefix := "ACC"
 			case "RaceRoom Racing Experience":
-				code := "R3E"
+				prefix := "R3E"
 			case "rFactor 2":
-				code := "RF2"
+				prefix := "RF2"
 			default:
 				return
 		}
@@ -727,9 +726,9 @@ importFromSimulation(message := false, simulator := false, code := false, settin
 	
 	readTyreSetup(readConfiguration(kRaceEngineerSettingsFile))
 	
-	data := readSharedMemory(kUserHomeDirectory . "Temp\" . code . " Data\Settings.data")
+	data := readSharedMemory(prefix)
 		
-	spPitstopTyreSetEdit := getConfigurationValue(data, "Pitstop Data", "TyreSet", spPitstopTyreSetEdit)
+	spPitstopTyreSetEdit := getConfigurationValue(data, "Setup Data", "TyreSet", spPitstopTyreSetEdit)
 	spSetupTyreSetEdit := Max(1, spPitstopTyreSetEdit - 1)
 	
 	if settings {
@@ -741,24 +740,30 @@ importFromSimulation(message := false, simulator := false, code := false, settin
 		GuiControl Text, spPitstopTyreSetEdit, %spPitstopTyreSetEdit%
 	}
 	
-	if (getConfigurationValue(data, "Car Data", "TyreCompound", spSetupTyreCompoundDropDown) != "Wet") {
-		spDryFrontLeftEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureFL", spDryFrontLeftEdit)
-		spDryFrontRightEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureFR", spDryFrontRightEdit)
-		spDryRearLeftEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureRL", spDryRearLeftEdit)
-		spDryRearRightEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureRR", spDryRearRightEdit)
+	if (getConfigurationValue(data, "Setup Data", "TyreCompound", spSetupTyreCompoundDropDown) != "Wet") {
+		spDryFrontLeftEdit := getConfigurationValue(data, "Setup Data", "TyrePressureFL", spDryFrontLeftEdit)
+		spDryFrontRightEdit := getConfigurationValue(data, "Setup Data", "TyrePressureFR", spDryFrontRightEdit)
+		spDryRearLeftEdit := getConfigurationValue(data, "Setup Data", "TyrePressureRL", spDryRearLeftEdit)
+		spDryRearRightEdit := getConfigurationValue(data, "Setup Data", "TyrePressureRR", spDryRearRightEdit)
 	
 		if settings {
+			color := getConfigurationValue(data, "Setup Data", "TyreCompoundColor", "Black")
+			
 			setConfigurationValue(settings, "Session Setup", "Tyre.Compound", "Dry")
-			setConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", getConfigurationValue(data, "Car Data", "TyreCompoundColor", "Black"))
+			setConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", color)
 			
 			setConfigurationValue(settings, "Session Setup", "Tyre.Dry.Pressure.FL", Round(spDryFrontLeftEdit, 1))
 			setConfigurationValue(settings, "Session Setup", "Tyre.Dry.Pressure.FR", Round(spDryFrontRightEdit, 1))
 			setConfigurationValue(settings, "Session Setup", "Tyre.Dry.Pressure.RL", Round(spDryRearLeftEdit, 1))
 			setConfigurationValue(settings, "Session Setup", "Tyre.Dry.Pressure.RR", Round(spDryRearRightEdit, 1))
 			
-			showMessage("Tyre setup imported: Dry, Set " . spSetupTyreSetEdit . "; "
-					  . Round(spDryFrontLeftEdit, 1) . ", " . Round(spDryFrontRightEdit, 1) . ", "
-					  . Round(spDryRearLeftEdit, 1) . ", " . Round(spDryRearRightEdit, 1), false, "Information.png", 5000)
+			if (simulator != "rFactor 2") {
+				message := ((color = "Black") ? "Tyre setup imported: Dry" : "Tyre setup imported: Dry (" . color . ")")
+				
+				showMessage(message . ", Set " . spSetupTyreSetEdit . "; "
+						  . Round(spDryFrontLeftEdit, 1) . ", " . Round(spDryFrontRightEdit, 1) . ", "
+						  . Round(spDryRearLeftEdit, 1) . ", " . Round(spDryRearRightEdit, 1), false, "Information.png", 5000)
+			}
 		}
 		else {
 			choice := 2
@@ -783,10 +788,10 @@ importFromSimulation(message := false, simulator := false, code := false, settin
 		}
 	}
 	else {
-		spWetFrontLeftEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureFL", spWetFrontLeftEdit)
-		spWetFrontRightEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureFR", spWetFrontRightEdit)
-		spWetRearLeftEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureRL", spWetRearLeftEdit)
-		spWetRearRightEdit := getConfigurationValue(data, "Pitstop Data", "TyrePressureRR", spWetRearRightEdit)
+		spWetFrontLeftEdit := getConfigurationValue(data, "Setup Data", "TyrePressureFL", spWetFrontLeftEdit)
+		spWetFrontRightEdit := getConfigurationValue(data, "Setup Data", "TyrePressureFR", spWetFrontRightEdit)
+		spWetRearLeftEdit := getConfigurationValue(data, "Setup Data", "TyrePressureRL", spWetRearLeftEdit)
+		spWetRearRightEdit := getConfigurationValue(data, "Setup Data", "TyrePressureRR", spWetRearRightEdit)
 		
 		if settings {
 			setConfigurationValue(settings, "Session Setup", "Tyre.Compound", "Wet")
@@ -797,9 +802,10 @@ importFromSimulation(message := false, simulator := false, code := false, settin
 			setConfigurationValue(settings, "Session Setup", "Tyre.Wet.Pressure.RL", Round(spWetRearLeftEdit, 1))
 			setConfigurationValue(settings, "Session Setup", "Tyre.Wet.Pressure.RR", Round(spWetRearRightEdit, 1))
 			
-			showMessage("Tyre setup imported: Wet; "
-					  . Round(spWetFrontLeftEdit, 1) . ", " . Round(spWetFrontRightEdit, 1) . ", "
-					  . Round(spWetRearLeftEdit, 1) . ", " . Round(spWetRearRightEdit, 1), false, "Information.png", 5000)
+			if (simulator != "rFactor 2")
+				showMessage("Tyre setup imported: Wet; "
+						  . Round(spWetFrontLeftEdit, 1) . ", " . Round(spWetFrontRightEdit, 1) . ", "
+						  . Round(spWetRearLeftEdit, 1) . ", " . Round(spWetRearRightEdit, 1), false, "Information.png", 5000)
 		}
 		else {
 			GuiControl Choose, spSetupTyreCompoundDropDown, 1

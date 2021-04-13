@@ -395,7 +395,7 @@ class RaceEngineer extends ConfigurationItem {
 	}
 	
 	__New(configuration, raceSettings, pitstopHandler := false, name := false, language := "__Undefined__", speaker := false, listener := false, voiceServer := false) {
-		this.iDebug := (isDebug() ? kDebugKnowledgeBase : kDebugOff)
+		this.iDebug := ((true || isDebug()) ? kDebugKnowledgeBase : kDebugOff)
 		this.iRaceSettings := raceSettings
 		this.iPitstopHandler := pitstopHandler
 		this.iName := name
@@ -1758,7 +1758,7 @@ class RaceEngineer extends ConfigurationItem {
 	}
 	
 	supportsPitstop() {
-		return ((this.Session == kSessionRace) && (this.Simulator = "ACC"))
+		return ((this.Session == kSessionRace) && this.PitstopHandler)
 	}
 	
 	planPitstop(options := true, confirm := true) {

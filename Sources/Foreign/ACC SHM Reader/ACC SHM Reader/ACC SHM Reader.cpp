@@ -196,7 +196,7 @@ int main(int argc, char* argv[])
 		printData("TyrePressure", pf->wheelsPressure);
 	}
 
-	if ((argc == 1) || strchr(argv[1], 'S'))
+	if ((argc == 1) || (argv[1][0] == 'D'))
 	{
 		wcout << "[Stint Data]" << endl;
 
@@ -245,22 +245,8 @@ int main(int argc, char* argv[])
 
 		printData("Grip", trackStatus);
 	}
-
-	if ((argc == 1) || strchr(argv[1], 'P'))
-	{
-		wcout << "[Pitstop Data]" << endl;
-
-		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
-
-		printData("TyreSet", gf->mfdTyreSet + 1);
-		printData("FuelAmount", gf->mfdFuelToAdd);
-		printData("TyrePressureFL", gf->mfdTyrePressureFL);
-		printData("TyrePressureFR", gf->mfdTyrePressureFR);
-		printData("TyrePressureRL", gf->mfdTyrePressureRL);
-		printData("TyrePressureRR", gf->mfdTyrePressureRR);
-	}
 	
-	if ((argc == 1) || strchr(argv[1], 'W'))
+	if ((argc == 1) || (argv[1][0] == 'W'))
 	{
 		wcout << "[Weather Data]" << endl;
 
@@ -273,7 +259,7 @@ int main(int argc, char* argv[])
 		printData("Weather30min", getWeather(gf->rainIntensityIn30min));
 	}
 
-	if ((argc == 1) || strchr(argv[1], 'R'))
+	if ((argc == 1) || (argv[1][0] == 'S'))
 	{
 		wcout << "[Session Data]" << endl;
 
@@ -284,6 +270,25 @@ int main(int argc, char* argv[])
 		wcout << "RaceFormat=Time" << endl;
 		printData("FuelAmount", sf->maxFuel);
 
+	}
+
+	if ((argc == 2) && (strcmp(argv[1], "-Setup") == 0))
+	{
+		wcout << "[Setup Data]" << endl;
+
+		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
+
+		_bstr_t tc(gf->tyreCompound);
+		std::string tyreCompound(tc);
+
+		wcout << "TyreCompound=" << ((tyreCompound.compare("dry_compound") == 0) ? "Dry" : "Wet") << endl;
+		wcout << "TyreCompoundColor=Black" << endl;
+		printData("TyreSet", gf->mfdTyreSet + 1);
+		printData("FuelAmount", gf->mfdFuelToAdd);
+		printData("TyrePressureFL", gf->mfdTyrePressureFL);
+		printData("TyrePressureFR", gf->mfdTyrePressureFR);
+		printData("TyrePressureRL", gf->mfdTyrePressureRL);
+		printData("TyrePressureRR", gf->mfdTyrePressureRR);
 	}
 
 	dismiss(m_graphics);

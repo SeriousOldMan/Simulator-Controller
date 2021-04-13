@@ -1195,6 +1195,10 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 		this.openPitstopMFD(update)
 	}
 	
+	supportsPitstop() {
+		return true
+	}
+	
 	startPitstopSetup(pitstopNumber) {
 		openPitstopMFD()
 	}
@@ -1206,7 +1210,7 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 	setPitstopRefuelAmount(pitstopNumber, litres) {
 		data := readSharedMemory(this.Code, kUserHomeDirectory . "Temp\ACC Data\Pitstop Setup.data")
 		
-		litresIncrement := Round(litres - getConfigurationValue(data, "Pitstop Data", "FuelAmount", 0))
+		litresIncrement := Round(litres - getConfigurationValue(data, "Setup Data", "FuelAmount", 0))
 		
 		changePitstopFuelAmount((litresIncrement > 0) ? "Increase" : "Decrease", Abs(litresIncrement))
 	}
@@ -1216,7 +1220,7 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 		
 		data := readSharedMemory(this.Code, kUserHomeDirectory . "Temp\ACC Data\Pitstop Setup.data")
 		
-		tyreSetIncrement := Round(set - getConfigurationValue(data, "Pitstop Data", "TyreSet", 0))
+		tyreSetIncrement := Round(set - getConfigurationValue(data, "Setup Data", "TyreSet", 0))
 		
 		if (compound = "Dry")
 			changePitstopTyreSet((tyreSetIncrement > 0) ? "Next" : "Previous", Abs(tyreSetIncrement))
@@ -1225,10 +1229,10 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
 		data := readSharedMemory(this.Code, kUserHomeDirectory . "Temp\ACC Data\Pitstop Setup.data")
 			
-		pressureFLIncrement := Round(pressureFL - getConfigurationValue(data, "Pitstop Data", "TyrePressureFL", 26.1), 1)
-		pressureFRIncrement := Round(pressureFR - getConfigurationValue(data, "Pitstop Data", "TyrePressureFR", 26.1), 1)
-		pressureRLIncrement := Round(pressureRL - getConfigurationValue(data, "Pitstop Data", "TyrePressureRL", 26.1), 1)
-		pressureRRIncrement := Round(pressureRR - getConfigurationValue(data, "Pitstop Data", "TyrePressureRR", 26.1), 1)
+		pressureFLIncrement := Round(pressureFL - getConfigurationValue(data, "Setup Data", "TyrePressureFL", 26.1), 1)
+		pressureFRIncrement := Round(pressureFR - getConfigurationValue(data, "Setup Data", "TyrePressureFR", 26.1), 1)
+		pressureRLIncrement := Round(pressureRL - getConfigurationValue(data, "Setup Data", "TyrePressureRL", 26.1), 1)
+		pressureRRIncrement := Round(pressureRR - getConfigurationValue(data, "Setup Data", "TyrePressureRR", 26.1), 1)
 		
 		if (pressureFLIncrement != 0)
 			changePitstopTyrePressure("Front Left", (pressureFLIncrement > 0) ? "Increase" : "Decrease", Abs(Round(pressureFLIncrement * 10)))

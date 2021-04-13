@@ -125,6 +125,10 @@ class RaceEngineerSimulatorPlugin extends SimulatorPlugin {
 		}
 	}
 	
+	supportsPitstop() {
+		return false
+	}
+	
 	planPitstop() {
 		if this.RaceEngineer
 			this.RaceEngineer.planPitstop()

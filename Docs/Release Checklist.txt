@@ -45,6 +45,8 @@ Release 2.8.5 Checklist
    b. Documentation
 9. New class SimulatorPlugin und RaceEngineerSimulatorPlugin
    a. Documentation
+10. Renamed [Pitstop Data] => [Setup Data]
+    a. Documentation
 
 
 Release 2.8 Checklist

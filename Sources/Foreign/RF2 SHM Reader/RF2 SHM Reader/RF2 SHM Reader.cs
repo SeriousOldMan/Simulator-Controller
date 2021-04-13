@@ -106,8 +106,8 @@ namespace RF2SHMReader {
 					Console.WriteLine("DriverNickname=");
 				}
 
-				Console.Write("LapLastTime="); Console.WriteLine(Math.Round(playerScoring.mLastLapTime * 1000));
-				Console.Write("LapBestTime="); Console.WriteLine(Math.Round(playerScoring.mBestLapTime * 1000));
+				Console.Write("LapLastTime="); Console.WriteLine(Math.Round(Normalize(playerScoring.mLastLapTime) * 1000));
+				Console.Write("LapBestTime="); Console.WriteLine(Math.Round(Normalize(playerScoring.mBestLapTime) * 1000));
 
 				Console.Write("Laps="); Console.WriteLine(playerScoring.mTotalLaps);
 
@@ -172,15 +172,6 @@ namespace RF2SHMReader {
 				Console.Write("Weather30Min="); Console.WriteLine(theWeather);
 			}
 
-			Console.WriteLine("[Pitstop Data]");
-			if (connected) {
-				Console.Write("Category="); Console.Write(pitInfo.mPitMenu.mCategoryIndex);
-				Console.Write(" -> "); Console.WriteLine(GetStringFromBytes(pitInfo.mPitMenu.mCategoryName));
-				Console.Write("Choices="); Console.Write(pitInfo.mPitMenu.mChoiceIndex);
-				Console.Write(" -> "); Console.WriteLine(GetStringFromBytes(pitInfo.mPitMenu.mChoiceString));
-				Console.Write("NumChoices="); Console.WriteLine(pitInfo.mPitMenu.mNumChoices);
-			}
-
 			Console.WriteLine("[Test Data]");
 			if (connected) {
 				Console.Write("Category="); Console.Write(pitInfo.mPitMenu.mCategoryIndex);
@@ -189,6 +180,16 @@ namespace RF2SHMReader {
 				Console.Write(" -> "); Console.WriteLine(GetStringFromBytes(pitInfo.mPitMenu.mChoiceString));
 				Console.Write("NumChoices="); Console.WriteLine(pitInfo.mPitMenu.mNumChoices);
 			}
+		}
+
+		private long Normalize(long value) {
+			return (value < 0) ? 0 : value;
+
+		}
+
+		private double Normalize(double value) {
+			return (value < 0) ? 0 : value;
+
 		}
 
 		private long GetRemainingLaps(ref rF2VehicleScoring playerScoring) {
@@ -200,7 +201,10 @@ namespace RF2SHMReader {
 			}
 			else {
 				if (playerScoring.mLastLapTime > 0)
-					return (long)Math.Round(GetRemainingTime(ref playerScoring) / (playerScoring.mLastLapTime * 1000)) + 1;
+					if (Normalize(playerScoring.mLastLapTime) == 0)
+						return GetRemainingTime(ref playerScoring) + 1;
+					else
+						return (long)Math.Round(GetRemainingTime(ref playerScoring) / (Normalize(playerScoring.mLastLapTime) * 1000)) + 1;
 				else
 					return 0;
 			}
@@ -210,12 +214,10 @@ namespace RF2SHMReader {
 			if (playerScoring.mTotalLaps < 1)
 				return 0;
 
-			if (scoring.mScoringInfo.mEndET > 0.0) {
-				return (long)((scoring.mScoringInfo.mEndET - (playerScoring.mLastLapTime * playerScoring.mTotalLaps)) * 1000);
-			}
-			else {
-				return (long)(GetRemainingLaps(ref playerScoring) * playerScoring.mLastLapTime * 1000);
-			}
+			if (scoring.mScoringInfo.mEndET > 0.0)
+				return (long)((scoring.mScoringInfo.mEndET - (Normalize(playerScoring.mLastLapTime) * playerScoring.mTotalLaps)) * 1000);
+			else
+				return (long)(GetRemainingLaps(ref playerScoring) * Normalize(playerScoring.mLastLapTime) * 1000);
 		}
 
 		private static string GetWeather(double cloudLevel, double rainLevel) {
@@ -376,23 +378,32 @@ namespace RF2SHMReader {
 		}
 
 		private void ExecuteRefuelCommand(string fuelArgument) {
-			int targetFuel = (int)Double.Parse(fuelArgument);
+			Console.Write("Adjusting Refuel: "); Console.WriteLine(fuelArgument);
 
-			SelectPitstopCategory("Fuel");
+			int targetFuel = Int16.Parse(fuelArgument);
+
+			if (!SelectPitstopCategory("FUEL:"))
+				return;
 
 			int deltaFuel = targetFuel - pitInfo.mPitMenu.mChoiceIndex;
 
 			if (deltaFuel > 0)
 				SendPitstopCommand(new string('+', deltaFuel));
+			else
+				SendPitstopCommand(new string('-', Math.Abs(deltaFuel)));
 		}
 
-		private void ExecuteTyreCompoundCommand(string[] tyreArgument) {
-			string compound = tyreArgument[0];
+		private void ExecuteTyreCompoundCommand(string[] tyreCompoundArgument) {
+			Console.Write("Adjusting Tyre Compound: ");
+			Console.Write(tyreCompoundArgument[0]); Console.Write(" ");
+			Console.WriteLine(tyreCompoundArgument[1]);
+			
+			string compound = tyreCompoundArgument[0];
 			
 			if (compound == "Wet")
 				compound = "Rain";
 			else
-				switch (tyreArgument[1]) {
+				switch (tyreCompoundArgument[1]) {
 					case "Red":
 						compound = "Soft";
 
@@ -412,7 +423,8 @@ namespace RF2SHMReader {
 				}
 
 			void selectAxleTyreCompound(string category) {
-				SelectPitstopCategory(category);
+				if (!SelectPitstopCategory(category))
+					return;
 
 				while (!GetStringFromBytes(pitInfo.mPitMenu.mChoiceString).Contains(compound)) {
 					SendPitstopCommand("+");
@@ -421,19 +433,30 @@ namespace RF2SHMReader {
 				}
 			}
 
-			selectAxleTyreCompound("Tyre Front");
-			selectAxleTyreCompound("Tyre Rear");
+			selectAxleTyreCompound("F TIRES:");
+			selectAxleTyreCompound("R TIRES:");
 		}
 
 		private void ExecuteTyreSetCommand(string tyreSetArgument) {
-			int tyreSet = (int)Int16.Parse(tyreSetArgument);
+			Console.Write("Adjusting Tyre Set: "); Console.WriteLine(tyreSetArgument[0]);
 		}
 
-		private void ExecuteTyrePressureCommand(string[] tyreArgument) {
-			void updatePressure(string category, double targetPressure) {
-				SelectPitstopCategory(category);
+		private void ExecuteTyrePressureCommand(string[] tyrePressureArgument) {
+			void updatePressure(string category, string position, double targetPressure) {
+				targetPressure = GetKpa(targetPressure);
 
-				int deltaPressure = (int)GetKpa(targetPressure) - pitInfo.mPitMenu.mChoiceIndex;
+				Console.Write("Adjusting Tyre Pressure "); Console.Write(position); Console.Write(": ");
+				Console.WriteLine(targetPressure);
+
+				if (!SelectPitstopCategory(category))
+					return;
+
+				string currentPressure = GetStringFromBytes(pitInfo.mPitMenu.mChoiceString);
+
+				if (currentPressure.Contains(" "))
+					currentPressure = currentPressure.Split(' ')[0];
+
+				int deltaPressure = (int)targetPressure - Int16.Parse(currentPressure);
 
 				if (deltaPressure > 0)
 					SendPitstopCommand(new string('+', deltaPressure));
@@ -441,20 +464,47 @@ namespace RF2SHMReader {
 					SendPitstopCommand(new string('-', Math.Abs(deltaPressure)));
 			}
 
-			updatePressure("FL PRS", Double.Parse(tyreArgument[0]));
-			updatePressure("FR PRS", Double.Parse(tyreArgument[1]));
-			updatePressure("RL PRS", Double.Parse(tyreArgument[2]));
-			updatePressure("RR PRS", Double.Parse(tyreArgument[3]));
+			updatePressure("FL PRESS:", "FL", Double.Parse(tyrePressureArgument[0]));
+			updatePressure("FR PRESS:", "FR", Double.Parse(tyrePressureArgument[1]));
+			updatePressure("RL PRESS:", "RL", Double.Parse(tyrePressureArgument[2]));
+			updatePressure("RR PRESS:", "RR", Double.Parse(tyrePressureArgument[3]));
 		}
 
 		private void ExecuteRepairCommand(string repairType) {
+			Console.Write("Adjusting Repair: ");
+
+			string option = "not";
+
 			switch (repairType) {
 				case "Bodywork":
+					Console.WriteLine("Bodywork");
 
+					option = "Body";
 					break;
 				case "Suspension":
+					Console.WriteLine("Suspension");
 
+					option = "Suspension";
 					break;
+				case "Both":
+					Console.WriteLine("Bodywork & Suspension");
+
+					option = "All";
+					break;
+				case "Nothing":
+					Console.WriteLine("Nothing");
+
+					option = "Not";
+					break;
+			}
+
+			if (!SelectPitstopCategory("DAMAGE:"))
+				return;
+
+			while (!GetStringFromBytes(pitInfo.mPitMenu.mChoiceString).Contains(option)) {
+				SendPitstopCommand("+");
+
+				pitInfoBuffer.GetMappedData(ref pitInfo);
 			}
 		}
 
@@ -464,29 +514,43 @@ namespace RF2SHMReader {
 
 			switch (command) {
 				case "Refuel":
-					ExecuteRefuelCommand(arguments[1]);
+					ExecuteRefuelCommand(arguments[0]);
 					break;
 				case "Tyre Compound":
-					ExecuteTyreCompoundCommand(arguments[1].Split(';'));
+					ExecuteTyreCompoundCommand(arguments);
 					break;
 				case "Tyre Set":
-					ExecuteTyreSetCommand(arguments[1]);
+					ExecuteTyreSetCommand(arguments[0]);
 					break;
 				case "Tyre Pressure":
-					ExecuteTyrePressureCommand(arguments[1].Split(';'));
+					ExecuteTyrePressureCommand(arguments);
 					break;
 				case "Repair":
-					ExecuteRepairCommand(arguments[1]);
+					ExecuteRepairCommand(arguments[0]);
 					break;
 			}
 		}
 
-		private void SelectPitstopCategory(string category) {
+		private bool SelectPitstopCategory(string category) {
+			int tries = 5;
+
+			pitInfoBuffer.GetMappedData(ref pitInfo);
+
+			string start = GetStringFromBytes(pitInfo.mPitMenu.mCategoryName);
+
 			while (category != GetStringFromBytes(pitInfo.mPitMenu.mCategoryName)) {
 				SendPitstopCommand("D");
 
 				pitInfoBuffer.GetMappedData(ref pitInfo);
+
+				if ((GetStringFromBytes(pitInfo.mPitMenu.mCategoryName) == start) && (--tries == 0)) {
+					// Console.Write("Not found: "); Console.WriteLine(category);
+
+					return false;
+				}
 			}
+
+			return true;
         }
 
         private DateTime nextKeyHandlingTime = DateTime.MinValue;
@@ -515,6 +579,80 @@ namespace RF2SHMReader {
 			}
 
 			this.nextKeyHandlingTime = now + TimeSpan.FromMilliseconds(100);
+		}
+
+		public void ReadSetup() {
+			Console.WriteLine("[Setup Data]");
+			if (connected) {
+				if (!SelectPitstopCategory("FUEL:"))
+					return;
+
+				Console.Write("FuelAmount="); Console.WriteLine(pitInfo.mPitMenu.mChoiceIndex);
+
+				if (!SelectPitstopCategory("F TIRES:"))
+					return;
+
+				Console.Write("TyreCompound=");
+
+				string compound = GetStringFromBytes(pitInfo.mPitMenu.mChoiceString);
+
+				if (compound.Contains("Rain")) {
+					Console.WriteLine("Wet");
+					Console.WriteLine("TyreCompoundColor=Black");
+				}
+				else {
+					Console.WriteLine("Dry");
+
+					if (compound.Contains("Soft"))
+						Console.WriteLine("TyreCompoundColor=Red");
+					else if (compound.Contains("Medium"))
+						Console.WriteLine("TyreCompoundColor=White");
+					else if (compound.Contains("Hard"))
+						Console.WriteLine("TyreCompoundColor=Blue");
+					else
+						Console.WriteLine("TyreCompoundColor=Black");
+				}
+
+				void writePressure(string category, string key) {
+					if (!SelectPitstopCategory(category))
+						return;
+
+					string currentPressure = GetStringFromBytes(pitInfo.mPitMenu.mChoiceString);
+
+					if (currentPressure.Contains(" "))
+						currentPressure = currentPressure.Split(' ')[0];
+
+					Console.Write(key); Console.Write("="); Console.WriteLine(GetPsi(Int16.Parse(currentPressure)));
+				}
+
+				writePressure("FL PRESS:", "TyrePressureFL");
+				writePressure("FR PRESS:", "TyrePressureFR");
+				writePressure("RL PRESS:", "TyrePressureRL");
+				writePressure("RR PRESS:", "TyrePressureRR");
+
+				if (!SelectPitstopCategory("DAMAGE:"))
+					return;
+
+				string option = GetStringFromBytes(pitInfo.mPitMenu.mChoiceString);
+
+				if (option.Contains("All")) {
+					Console.WriteLine("RepairSupension=true");
+					Console.WriteLine("RepairBodywork=true");
+				}
+				else if (option.Contains("Bodywork")) {
+					Console.WriteLine("RepairSupension=false");
+					Console.WriteLine("RepairBodywork=true");
+				}
+				else if (option.Contains("Suspension")) {
+					Console.WriteLine("RepairSupension=true");
+					Console.WriteLine("RepairBodywork=false");
+				}
+				else {
+					Console.WriteLine("RepairSupension=false");
+					Console.WriteLine("RepairBodywork=false");
+				}
+
+			}
 		}
     }
 }

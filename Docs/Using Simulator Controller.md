@@ -8,7 +8,7 @@ Before starting up, *Simulator Startup* checks the configuration information. If
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Settings%20Editor.JPG)
 
-With this editor, which is also available as a separate application named *Simulator Settings.exe*, you can change the runtime settings for Simulator Controller. In contrast to the general configuration, which configures all required and optional components of your simulation rig, here you decide which of them you want to use for the next run and onward and how they should behave.
+With this editor, which is also available as a separate application named *Simulator Settings.exe*, you can change the runtime settings for Simulator Controller. In contrast to the general configuration, which configures all required and optional components of your simulation rig, here you decide which of them you want to use for the next run and onward and how they should behave. Please note, that you can click on the blue label of the dialog title, which will open this documentation in your browser.
 
 Beside maintaining this startup configuration, you can jump to the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration) by clicking on the button "Configuration...". This might be helpful, if you detect an error in your simulation rig configuration or if you want to add a new simulation game, you just installed on your PC.
 
@@ -21,6 +21,14 @@ The second group lets you decide whether to start the different feedback compone
 ### Customizing Controller Notifications
 
 In the next group, you can decide, how Simulator Controller will notify you about state changes in your simulation rig or in the applications under control of Simulator Controller. Two types of notifications are supported, Tray Tips (small message windows popping up in lower right corner of your main screen) and the Button Box, the visual representation of your controller hardware. Depending on the situation you are in (in simulation game or not), you might want to use different notifications or no notifications at all. You can configure, how long in milliseconds the Tray Tip or the Button Box window will stay open. For the Button Box, a duration of 9999 ms will be interpreted as *forever*, so the window will be kept  open all the time. Also, you can decide where the Button Box will appear. To do that, choose one of the corners of your main screen in the dropdown list below the notification duration input fields.
+
+### Configuration of the Controller Mode automation
+
+If you click on then button "Controller Automation...", a neeew dialog will open up, where you can select predefined Modes for your connected hardware controller.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Automation%20Editor.JPG)
+
+You can choose the context with the first two dropdown menus, for example 1. when no simulation is running or 2. when you are in a given simulator and there in a practice session. Then you select the *Modes* (see the documentation for [Plugins & Modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes) for more information), which will be automatically activated for this context. Please note, that more than one mode will only make sense, if you have more than one hardware controller connected, and when each mode only use one of these hardware controllers  exclusively.
 
 ### Other Settings
 

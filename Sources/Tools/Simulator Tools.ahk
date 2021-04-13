@@ -553,6 +553,44 @@ updateCustomCalls(startNumber, endNumber) {
 	}
 }
 
+updateConfigurationForV282() {
+	userSettingsFile := getFileName(kSimulatorSettingsFile, kUserConfigDirectory)
+	userSettings := readConfiguration(userSettingsFile)
+	
+	if (userSettings.Count() > 0) {
+		if !getConfigurationValue(userSettings, "Modes", "Default", false)
+			setConfigurationValue(userSettings, "Modes", "Default", "System.Launch")
+		
+		if !getConfigurationValue(userSettings, "Modes", "Assetto Corsa Competizione.Default", false)
+			setConfigurationValue(userSettings, "Modes", "Assetto Corsa Competizione.Default", "ACC.Chat")
+			
+		writeConfiguration(userSettingsFile, userSettings)
+	}
+	
+	try {
+		FileDelete %kUserConfigDirectory%Controller Plugin Labels.ini
+	}
+	catch exception {
+		; ignore
+	}
+	
+	try {
+		FileDelete %kConfigDirectory%Controller Plugin Labels.ini
+	}
+	catch exception {
+		; ignore
+	}
+	
+	try {
+		exePath := kBinariesDirectory . "Simulator Controller.exe -NoStartup -NoUpdate"
+		
+		RunWait %exePath%, %kBinariesDirectory%
+	}
+	catch exception {
+		; ignore
+	}
+}
+
 updateConfigurationForV28() {
 	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
 	userConfiguration := readConfiguration(userConfigurationFile)
@@ -838,12 +876,12 @@ runSpecialTargets(ByRef buildProgress) {
 					showProgress({progress: ++buildProgress, message: translate("Compiling ") . solution . translate("...")})
 				
 				try {
-					RunWait %ComSpec% /c ""%msBuild%" "%file%" /p:BuildMode=Release /p:Configuration=Release > "%kUserHomeDirectory%Temp\build.out"", , Hide
+					RunWait %ComSpec% /c ""%msBuild%" "%file%" /p:BuildMode=Release /p:Configuration=Release > "%kTempDirectory%build.out"", , Hide
 					
 					if ErrorLevel {
 						success := false
 						
-						FileRead text, %kUserHomeDirectory%Temp\build.out
+						FileRead text, %kTempDirectory%build.out
 						
 						if (StrLen(Trim(text)) == 0)
 							Throw "Error while compiling..."
@@ -859,9 +897,9 @@ runSpecialTargets(ByRef buildProgress) {
 				}
 				
 				if !success {
-					FileRead text, %kUserHomeDirectory%Temp\build.out
+					FileRead text, %kTempDirectory%build.out
 					
-					viewFile(kUserHomeDirectory . "Temp\build.out", translate("Error while compiling ") . solution, "Left", "Top", 800, 600)
+					viewFile(kTempDirectory . "build.out", translate("Error while compiling ") . solution, "Left", "Top", 800, 600)
 				}
 			}
 		}

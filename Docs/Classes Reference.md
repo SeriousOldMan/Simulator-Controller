@@ -416,7 +416,7 @@ This is a dispatcher method, since in the end, the [fireAction](https://github.c
 Switches the controller to a different mode. The currently active mode will be [deactivated](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#deactivate) and the new mode will be [activated](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#activate), thereby connecting all its actions to the correspondiing controller functions.
 
 #### *setModes(simulator :: String := false, session :: String := false)*
-This method is called, whenever a global state change occured in your simulation session. A state change might be the start or shutdown of a simulation game or you might enter a new session, for example a race, in your running simulation. The default implementation uses the rules, that have been defined in the [settings editor](*), to activate the modes on your controller hardware, which fit the current situation the most.
+This method is called, whenever a global state change occured in your simulation session. A state change might be the start or shutdown of a simulation game or you might enter a new session, for example a race, in your running simulation. The default implementation uses the rules, that have been defined in the [settings editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#configuration-of-the-controller-mode-automation), to activate the modes on your controller hardware, which fit the current situation the most.
 
 
 ***
@@ -699,7 +699,7 @@ The two classes *SimulatorPlugin* and *RaceEngineerSimlatorPlugin* can be used a
 
 You can take a look at a specific implementation of a simulator plugin for an example on how to use these building blocks (for example [AC Plugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/AC%20Plugin.ahk) with minimal support in SImulator Controller or [RF2 Plugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/RF2%20Plugin.ahk) with full support including the Virtual Race Engineer and pitstop handling).
 
-## SimulatorPlugin extends [ControllerPlugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controllerplugin-extends-plugin-simulator-controllerahk) ([Simulator Plugin.ahk](*))
+## SimulatorPlugin extends [ControllerPlugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controllerplugin-extends-plugin-simulator-controllerahk) ([Simulator Plugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Libraries/Simulator%20Plugin.ahk))
 This class may be used for simple simulator plugins which will NOT support the Virtual Race Engineer. The implementation *understands* that a given applicaton represents the simulator game and also is able to separate between different session types ("Practice", "Race", and so on).
 
 ### Public Properties
@@ -711,10 +711,10 @@ This property returns a three letter short name for the plugin, which is used as
 The *Application* object representing the simulation game.
 
 #### *SessionState[asText :: Boolean := false]*
-The current seesion state of an active simulation. Will be one of [kSessionFinished, kSessionPaused, kSessionOther, kSessionPractice, kSessionQualification or kSessionRace](*) or a corresponding textual representation, when *true* has been supplied for the optional parameter *asText*.
+The current seesion state of an active simulation. Will be one of [kSessionFinished, kSessionPaused, kSessionOther, kSessionPractice, kSessionQualification or kSessionRace](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#simulation-session-types-simulator-pluginahk) or a corresponding textual representation, when *true* has been supplied for the optional parameter *asText*.
 
 #### *SessionStates[asText :: Boolean := false]*
-A list of all supported session states supported by the given simulator (excluding *kSessionFinished* and *kSessionPaused*, which must be supported by everey simulator plugin). Therefore one of [kSessionOther, kSessionPractice, kSessionQualification or kSessionRace](*) or a corresponding textual representation, when *true* has been supplied for the optional parameter *asText*.
+A list of all supported session states supported by the given simulator (excluding *kSessionFinished* and *kSessionPaused*, which must be supported by everey simulator plugin). Therefore one of [kSessionOther, kSessionPractice, kSessionQualification or kSessionRace](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#simulation-session-types-simulator-pluginahk) or a corresponding textual representation, when *true* has been supplied for the optional parameter *asText*.
 
 ### Public Methods
 
@@ -724,7 +724,7 @@ The constructor adds the additional parameter *simulator* to the inherited *__Ne
 #### *updateSessionState(sessionState :: OneOf(kSessionFinished, kSessionPaused, kSessionOther, ...))*
 This method will be called, when a simulator has been started or finished, or when the user enters a simulation session. The default implementation informs the *SimulatorController* instance, which then will activate the best fitting modes on the controller hardware.
 
-## RaceEngineerSimulatorPlugin extends [SimulatorPlugin](*) ([Simulator Plugin.ahk](*))
+## RaceEngineerSimulatorPlugin extends [SimulatorPlugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#simulatorplugin-extends-controllerplugin-simulator-pluginahk) ([Simulator Plugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Libraries/Simulator%20Plugin.ahk))
 *RaceEngineerSimulatorPlugin* extends the *SimulatorPlugin* class and adds support for Jona, the Virtual Race Engineer. Jona will be started automatically, whenever the underlying simulator game is running.
 
 ### Public Properties

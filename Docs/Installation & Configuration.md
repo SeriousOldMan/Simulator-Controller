@@ -171,7 +171,7 @@ Although you may call any globally defined function, you should use only the fol
 | stopMotion | - | Motion Feedback | Stops the motion feedback system of your simulation rig and brings the rig back to its resting position. Available depending on the concrete configuration. |
 | openPitstopMFD | - | ACC | Opens the pitstop settings dialog of *Assetto Corsa Competizione*. |
 | closePitstopMFD | - | ACC | Closes the pitstop settings dialog of *Assetto Corsa Competizione*. |
-| togglePitstopActivity | activity | ACC | Enables or disables one of the activities performed by your pitstop crew. The supported activities are "Change Tyres", "Change Brakes", "Repair Bodywork" and "Repair Suspension". |
+| togglePitstopActivity | activity | ACC | Enables or disables one of the activities carried out by your pitstop crew. The supported activities are "Change Tyres", "Change Brakes", "Repair Bodywork" and "Repair Suspension". |
 | changePitstopStrategy | selection | ACC | Selects one of the pitstop strategies. *selection* must be either "Next" or "Previous". |
 | changePitstopFuelAmount | direction, [Optional] liters | ACC | Changes the amount of fuel to add during the next pitstop. *direction* must be either "Increase" or "Decrease" and *liters* may define the amount of fuel to be changed in one step. This parameter has a default of 5. |
 | changePitstopTyreSet | selection | ACC | Selects the tyre sez to change to during  the next pitstop. *selection* must be either "Next" or "Previous". |

@@ -16,6 +16,11 @@ global kSessionPractice = 2
 global kSessionQualification = 3
 global kSessionRace = 4
 
+
+;;;-------------------------------------------------------------------------;;;
+;;;                        Private Constant Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
 global kSessionStates = [kSessionOther, kSessionPractice, kSessionQualification, kSessionRace]
 global kSessionStateNames = ["Other", "Practice", "Qualification", "Race"]
 
@@ -40,9 +45,18 @@ class SimulatorPlugin extends ControllerPlugin {
 		}
 	}
 	
-	SessionState[] {
+	SessionState[asText := false] {
 		Get {
-			return this.iSessionState
+			if asText {
+				sessionState := this.iSessionState
+				
+				if (sessionState >= kSessionOther)
+					return kSessionStateNames[sessionState]
+				else
+					return ((sessionState == kSessionFinished) ? "Finished" : "Paused")
+			}
+			else
+				return this.iSessionState
 		}
 	}
 	

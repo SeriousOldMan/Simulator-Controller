@@ -18,11 +18,11 @@ You have three possibilities here:
   
 ## Automated update procedure
 
-Let's start with some low level information, to give you an understanding, what happens in the background, when an automated update is processed. A new file has been created in the *Simulator Controller\Config* folder. It is named *UPDATES* and keeps track of already performed updates. If it is missing or does not contain information for the current release (or releases you missed out), the update procedure will start. After the update finished sucessfully, this will be noted in the *UPDATES* file. And here is the trick, if you have chosen "Never" in the dialog above: Just open this file with a text editor and delete the lines for the releases in question and you will be fine.
+Let's start with some low level information, to give you an understanding, what happens in the background, when an automated update is processed. A new file has been created in the *Simulator Controller\Config* folder. It is named *UPDATES* and keeps track of already carried out updates. If it is missing or does not contain information for the current release (or releases you missed out), the update procedure will start. After the update finished sucessfully, this will be noted in the *UPDATES* file. And here is the trick, if you have chosen "Never" in the dialog above: Just open this file with a text editor and delete the lines for the releases in question and you will be fine.
 
 IMPORTANT: When you already installed and used an alpha or beta release for one of the releases described below, it might be necessary to rerun the update procedure for the final release to be sure to include all necessary updates. The procedure is the same as described above, just delete the corresponding line from the *UPDATES* file, and the update procedure will take care of the rest.
 
-When the automated update procedure runs, there are some standard task, that are performed for each release and there are release specific tasks. You will will find the release specific information for each release below. Typical standard tasks might be:
+When the automated update procedure runs, there are some standard task, that are carried out for each release and there are release specific tasks. You will will find the release specific information for each release below. Typical standard tasks might be:
 
   * Update of all translation files
     

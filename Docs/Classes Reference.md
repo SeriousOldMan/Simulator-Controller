@@ -363,8 +363,8 @@ Return the *ButtonBox* instance, that defines the given function, or *false*, if
 #### *findPlugin(name :: String)*
 Searches for a plugin with the given name. Returns *false*, if not found.
 
-#### *findMode(name :: String)*
-Searches for a mode with the given name. Returns *false*, if not found.
+#### *findMode(plugin :: TypeUnion(String, ControllerPlugin), name :: String)*
+Searches for a mode with the given name for the given plugin, which might be passed as the name of the plugin in question. Returns *false*, if not found.
 
 #### *findFunction(name :: String)*
 Searches for a controller function with the given descriptor. Returns *false*, if not found.
@@ -414,6 +414,10 @@ This is a dispatcher method, since in the end, the [fireAction](https://github.c
 
 #### *setMode(newMode :: ControllerMode)*
 Switches the controller to a different mode. The currently active mode will be [deactivated](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#deactivate) and the new mode will be [activated](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#activate), thereby connecting all its actions to the correspondiing controller functions.
+
+#### *setModes(simulator :: String := false, session :: String := false)*
+This method is called, whenever a global state change occured in your simulation session. A state change might be the start or shutdown of a simulation game or you might enter a new session, for example a race, in your running simulation. The default implementation uses the rules, that have been defined in the [settings editor](*), to activate the modes on your controller hardware, which fit the current situation the most.
+
 
 ***
 
@@ -550,6 +554,9 @@ This is an event handler method called by the controller to notify the plugin, t
 #### *getLabel(descriptor :: String, default :: String := false)*
 This method can be used to support localization or using different labels depending on the bound function in the visual representation of the controller hardware. The label texts are defined in a special configuration file named *Controller Plugin Labels.ini* located in the *Simulator Controller\Config* folder in the users *Documents* folder. The content of this file is accessible using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration).
 
+#### *actionLabel(action :: ControllerAction)*
+This method is called, whenever a label for the given action will be displayed on the visual representation of the controller hardware. The default implementation simply returns the *Label* property of the given action, but a subclass may add a translation process, for example.
+
 #### *logFunctionNotFound(functionDescriptor :: String)*
 Helper method to log the most common configuration error: A function descriptor is referenced for an action, which is unknown, i.e. is not provided by the current hardware controller.
 ***
@@ -624,7 +631,7 @@ This method must be implemented by every subclass of *ControllerAction* and act 
 ***
 
 ## [Abstract] ButtonBox extends [ConfigurationItem](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-classesahk) ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
-Instances of this class will implement a visual representation of your hardware controller. Althoug the Simulator Controller will provide complete functionality even without a visual representation, it is much more fun to see what happens. Subclasses of *ButtonBox* must use the [Gui capabilities](https://www.autohotkey.com/docs/commands/Gui.htm) of the AutoHotkey language to implement the graphical representation. See [this simple example](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/ButtonBox%20Plugin.ahk) for reference.
+Instances of this class will implement a visual representation of your hardware controller. Althoug the Simulator Controller will provide complete functionality even without a visual representation, it is much more fun to see what happens. Subclasses of *ButtonBox* must use the [Gui capabilities](https://www.autohotkey.com/docs/commands/Gui.htm) of the AutoHotkey language to implement the graphical representation. See [this  implementation](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/ButtonBox%20Plugin.ahk), which implements configuration and grid based Button Boxes for reference.
 
 ### Public Properties
 
@@ -681,3 +688,87 @@ Hides the Button Box window again. This method is automatically called, after th
 
 #### *moveByMouse(button :: String := "LButton")*
 Call this method from an event handler. It will move the Button Box window following the mouse, while the given button is down. The position will be remembered as the "Last Position" in the *Simulator Controller.ini* configuration file.
+
+***
+
+# Simulator Plugin Implementation Classes
+
+The two classes *SimulatorPlugin* and *RaceEngineerSimlatorPlugin* can be used as building blocks, when implementing a plugin for a race simulation game. Since these classes are placed in a special library file, you must include the following line at the top of your plugin script:
+
+	#Include ..\Plugins\Libraries\Simulator Plugin.ahk
+
+You can take a look at a specific implementation of a simulator plugin for an example on how to use these building blocks (for example [AC Plugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/AC%20Plugin.ahk) with minimal support in SImulator Controller or [RF2 Plugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/RF2%20Plugin.ahk) with full support including the Virtual Race Engineer and pitstop handling).
+
+## SimulatorPlugin extends [ControllerPlugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controllerplugin-extends-plugin-simulator-controllerahk) ([Simulator Plugin.ahk](*))
+This class may be used for simple simulator plugins which will NOT support the Virtual Race Engineer. The implementation *understands* that a given applicaton represents the simulator game and also is able to separate between different session types ("Practice", "Race", and so on).
+
+### Public Properties
+
+#### *Code[]*
+This property returns a three letter short name for the plugin, which is used as a descriminator in several functions of Simulator Controller. The default implementation simply returns the name of the plugin (for example "AC", "ACC", "RF2", ...).
+
+#### *Simulator[]*
+The *Application* object representing the simulation game.
+
+#### *SessionState[asText :: Boolean := false]*
+The current seesion state of an active simulation. Will be one of [kSessionFinished, kSessionPaused, kSessionOther, kSessionPractice, kSessionQualification or kSessionRace](*) or a corresponding textual representation, when *true* has been supplied for the optional parameter *asText*.
+
+#### *SessionStates[asText :: Boolean := false]*
+A list of all supported session states supported by the given simulator (excluding *kSessionFinished* and *kSessionPaused*, which must be supported by everey simulator plugin). Therefore one of [kSessionOther, kSessionPractice, kSessionQualification or kSessionRace](*) or a corresponding textual representation, when *true* has been supplied for the optional parameter *asText*.
+
+### Public Methods
+
+#### *__New(controller :: SimulatorController, name :: String, simulator :: String, configuration :: ConfigurationMap, register :: Boolean := true)*
+The constructor adds the additional parameter *simulator* to the inherited *__New* method. The name of the game application, as configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--configuration), must be supplied for the *simulator* parameter.
+
+#### *updateSessionState(sessionState :: OneOf(kSessionFinished, kSessionPaused, kSessionOther, ...))*
+This method will be called, when a simulator has been started or finished, or when the user enters a simulation session. The default implementation informs the *SimulatorController* instance, which then will activate the best fitting modes on the controller hardware.
+
+## RaceEngineerSimulatorPlugin extends [SimulatorPlugin](*) ([Simulator Plugin.ahk](*))
+*RaceEngineerSimulatorPlugin* extends the *SimulatorPlugin* class and adds support for Jona, the Virtual Race Engineer. Jona will be started automatically, whenever the underlying simulator game is running.
+
+### Public Properties
+
+#### *RaceEngineer[]*
+Returns the instance of *RaceEngineerPlugin* (see the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) of this plugin or the source code [Race Engineer Plugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Race%20Engineer%20Plugin.ahk) for more information), as long, as the simulation is running.
+
+### Public Methods
+
+#### *planPitstop()*
+Calling this method will ask Jona to plan an upcoming pitstop.
+
+#### *preparePitstop()*
+Calling this method will ask Jona to prepare the last planned pitstop.
+
+#### *supportsPitstop()*
+If thie method returns *true*, this plugin supports automated pitstop handling together with the Virtual Race Engineer. The default implementation returns *false*. Whenever a subclass of *RaceEngineerSimulatorPlugin* returns *true* here, it will implement at least some of the following methods as well.
+
+#### *pitstopPlanned(pitstopNumber :: Integer)*
+*pitstopPlanned* is called by the Race Engineer, whenever there is an updated plan for an upcoming pitstop. The default method does nothing here.
+
+#### *pitstopPrepared(pitstopNumber :: Integer)*
+*pitstopPlanned* is called by the Race Engineer, whenever the pitstop plan has been sucessfully transferred to the simulation game and the driver may enter the pit. The default method does nothing here.
+
+#### *pitstopFinished(pitstopNumber :: Integer)*
+After the pitstop has been sucessfully carried out and the driver is back on the track, this method is called. The default method does nothing here.
+
+#### *startPitstopSetup(pitstopNumber :: Integer)*
+Called at the beginning of the pitstop preparation process, this method might activated the pitstop data input widget on the simulation user interface for example or might call a special API, to tell the simulation, that a pitstop is requested. The default method does nothing here.
+
+#### *finishPitstopSetup(pitstopNumber :: Integer)*
+Called at the end of the pitstop preparation process. The implementation might close a special pitstop widget on the simulator user interface, when this has been opened by *startPitstopSetup*. The default method does nothing here.
+
+#### *setPitstopRefuelAmount(pitstopNumber :: Integer, litres :: Float)*
+The implemenzation of *setPitstopRefuelAmount* must ask the simulation to refuel the given number of litres at the next pitstop. The default method does nothing here.
+
+#### *setPitstopTyreSet(pitstopNumber :: Integer, compound :: OneOf("Dry", "Wet"), compoundColor :: OneOf("Red", "White", "Blue", "Black"), set :: Integer := false)*
+Requests new tyres at the given pitstop. *compound* will define the tyre category and *compoundColor* the compound mixture, wich will always be "Black" for "Wet" tyres. If a specific tyre set is requested, this will be passed for the last optional parameter. The default method does nothing here.
+
+#### *etPitstopTyrePressures(pitstopNumber :: Integer, pressureFL :: Float, pressureFR :: Float, pressureRL :: Float, pressureRR :: Float)*
+Dials the pressures in PSI, that has been selected previously by *setPitstopTyreSet*. The default method does nothing here.
+
+#### *requestPitstopRepairs(pitstopNumber :: Integer, repairSuspension :: Boolean, repairBodywork :: Boolean)*
+This is the last method of the pitstop preparation cycle. It requests repairs for the different parts of the car at the pitstop. The default method does nothing here.
+
+#### *updateSimulatorData(data :: ConfigurationMap)*
+*updateSimulatorData* is called after the [telemetry data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#telemetry-integration) has been loaded from the given simulation, but before the data is transferred to the Virtual Race Engineer. The implementation of *updateSimulatorData* might add some additional fields or change fields that has been provided by the simulation. See the [implementation of the *RaceRoom Racing Experience*](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/R3E%20Plugin.ahk) simulation for an example, where the name of the current car is read from an external JSON database file.

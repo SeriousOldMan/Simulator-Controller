@@ -297,7 +297,7 @@ Opens the pitstop settings dialog of *Assetto Corsa Competizione*. This action f
 Closes the pitstop settings dialog of *Assetto Corsa Competizione*. This action function is provided by the "ACC" plugin and is available depending on the concrete configuration.
 
 #### *togglePitstopActivity(activity :: String)*
-Enables or disables one of the activities performed by your pitstop crew. The supported activities are "Change Tyres", "Change Brakes", "Repair Bodywork" and "Repair Suspension". This action function is provided by the "ACC" plugin and is available depending on the concrete configuration.
+Enables or disables one of the activities carried out by your pitstop crew. The supported activities are "Change Tyres", "Change Brakes", "Repair Bodywork" and "Repair Suspension". This action function is provided by the "ACC" plugin and is available depending on the concrete configuration.
 
 #### *changePitstopStrategy(selection :: String)*
 Selects one of the pitstop strategies. *selection* must be either "Next" or "Previous". This action function is provided by the "ACC" plugin and is available depending on the concrete configuration.

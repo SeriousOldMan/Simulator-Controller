@@ -26,7 +26,9 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-None for the moment...
+[2.8.2-dev](https://www.dropbox.com/s/ort2l43lnnvk7a9/Simulator%20Controller%202.8.2-dev.zip?dl=1) (Stable development build for upcoming Release 2.8.2. New features: New VERSION file format, Refactoring of the Simulator Plugins, Icons for SHM Readers, Localized "Controller Plugin Labels", Situation aware Button Box Modes incl. configurable automation, Pitstop handling for rFactor 2. Feature complete and stable. Automated update procedure and updated documentation already included.)
+
+As always, please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - more important - the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-282) before installing and using this version.
 
 #### Latest release builds
 
@@ -34,7 +36,7 @@ None for the moment...
 
 IMPORTANT: Please read the [update notes for Release 2.7](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-27), BEFORE you use the new distribution, since there is a mandatory manual update task necessary this time.
 
-[2.8.0-release](https://www.dropbox.com/s/3ya3c30nqajsjig/Simulator%20Controller%202.8.0-release.zip?dl=1) (Second release candidate for Release 2.8. New features: New plugin "Race Engineer" for handling Jona for different simulations, Early integration of Jona for RaceRoom Racing Experience and rFactor 2, Jona now supports Practice and Qualification Sessions, Reimport of Race Engineer Settings during an active Session, Introduced tyre compound color coding (red, white, blue, black), Documentation for Configuration Tool plugin support, Integrated MSBuild into the build pipeline.s)
+[2.8.0-release](https://www.dropbox.com/s/3ya3c30nqajsjig/Simulator%20Controller%202.8.0-release.zip?dl=1) (Second release candidate for Release 2.8. New features: New plugin "Race Engineer" for handling Jona for different simulations, Early integration of Jona for RaceRoom Racing Experience and rFactor 2, Jona now supports Practice and Qualification Sessions, Reimport of Race Engineer Settings during an active Session, Introduced tyre compound color coding (red, white, blue, black), Documentation for Configuration Tool plugin support, Integrated MSBuild into the build pipeline.)
 
 As always, please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#28-release-040921) and - more important - the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-28) before installing and using this version.
 
@@ -135,12 +137,13 @@ For new features coming in the next release, take a look at the [Release Notes](
 Want to contribute? Great!
 
   - Build your own plugins and offer them on GitHub. Contact me and I will add a link to your plugin in this documentation.
-
   - Found a bug, or built a new feature? Even better. Please contact me, and I will give you access to the code repository.
+
+Heads Up: I am actively searching for a co-developer for the upcoming iRacing integration.
 
 ### To Do
 
-After firing out one release per week during the last few weeks, the project will slow down a little bit from now on. But the development of Simulator Controller still goes on, and I am sure that we will end up in a two weeks cycle for the next few months. My own list of ideas in the [backlog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Backlog) is always long enough for at least three more releases and if you want to propose a feature to be included in the backlog, you can open an enhancement issue on GitHub...
+After firing out one release per week during the last few weeks, the project will slow down a little bit from now on. But the development of Simulator Controller still goes on, and I am sure that we will end up in a two weeks cycle in the long run. My own list of ideas in the [backlog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Backlog) is always long enough for at least three more releases and if you want to propose a feature to be included in the backlog, you can open an enhancement issue on GitHub...
 
 ### License
 

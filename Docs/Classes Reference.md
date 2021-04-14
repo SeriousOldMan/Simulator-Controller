@@ -345,8 +345,8 @@ If a simulation game is currently running, the name of this application is retur
 #### *LastEvent[]*
 This property returns an integer representing the time of the last controller hardware event as reported by the special AutoHotkey variable [A_TickCount](https://www.autohotkey.com/docs/Variables.htm#TickCount).
 
-#### [Class Property] *Instance[]*
-Returns the single instance of *SimulatorController*.
+#### *Started[]*
+Is *true*, if the startup process of the controller is complete, *false* before. Before *Startup* is *true* no user interface will be available and the controller must not react to any event.
 
 ### Public Methods
 

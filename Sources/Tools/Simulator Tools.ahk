@@ -509,21 +509,35 @@ updateTranslations() {
 }
 
 updatePluginLabels() {
-	for languageCode, language in availableLanguages() {
-		userPluginLabelsFile := (kUserConfigDirectory . "Controller Plugin Labels." . languageCode)
-		userPluginLabels := readConfiguration(userPluginLabelsFile)
-		
-		if (userPluginLabels.Count() > 0) {
+	languages := availableLanguages()
+	enPluginLabels := readConfiguration(kResourcesDirectory . "Templates\Controller Plugin Labels.en")
+	
+	for ignore, userPluginLabelsFile in getFileNames("Controller Plugin Labels.*", kUserConfigDirectory) {
+		SplitPath userPluginLabelsFile, , , languageCode
+	
+		if !languages.HasKey(languageCode)
+			bundledPluginLabels := enPluginLabels
+		else {
 			bundledPluginLabels := readConfiguration(kResourcesDirectory . "Templates\Controller Plugin Labels." . languageCode)
-			
-			for section, keyValues in bundledPluginLabels
-				for key, value in keyValues
-					if (getConfigurationValue(userPluginLabels, section, key, kUndefined) == kUndefined)
-						setConfigurationValue(userPluginLabels, section, key, value)
-			
-			writeConfiguration(userPluginLabelsFile, userPluginLabels)
+		
+			if (bundledPluginLabels.Count() == 0)
+				bundledPluginLabels := enPluginLabels
 		}
-	}
+		
+		userPluginLabels := readConfiguration(userPluginLabelsFile)
+		changed := false
+		
+		for section, keyValues in bundledPluginLabels
+			for key, value in keyValues
+				if (getConfigurationValue(userPluginLabels, section, key, kUndefined) == kUndefined) {
+					setConfigurationValue(userPluginLabels, section, key, value)
+					
+					changed := true
+				}
+		
+		if changed
+			writeConfiguration(userPluginLabelsFile, userPluginLabels)
+	}	
 }
 
 updateCustomCalls(startNumber, endNumber) {

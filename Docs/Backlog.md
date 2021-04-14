@@ -1,4 +1,4 @@
-#### Driving...
+#### Driving
   1. [Target: V2.8.2][RF2 Plugin] Pitstop handling for rFactor 2
   2. [Target: V2.9][R3E Plugin] Pitstop handling for RaceRoom Racing Experience
   2. [Target: V3.0][iRC Plugin] New plugin for iRacing support

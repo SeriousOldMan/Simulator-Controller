@@ -537,7 +537,7 @@ updatePluginLabels() {
 		
 		if changed
 			writeConfiguration(userPluginLabelsFile, userPluginLabels)
-	}	
+	}
 }
 
 updateCustomCalls(startNumber, endNumber) {

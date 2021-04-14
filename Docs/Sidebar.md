@@ -68,6 +68,7 @@
     - [Global Configuration Map](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#global-configuration-map-constantsahk)
     - [Log Levels](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#log-levels-constantsahk)
     - [Controller Function Types](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#controller-function-types-constantsahk)
+    - [Simulation Session Types](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#simulation-session-types-simulator-pluginahk)
     - [Miscellaneous](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#miscellaneous-constants-constantsahk)
   - [Functions Reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference)
     - [Configurations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#configurations-functionsahk)
@@ -107,6 +108,9 @@
       - [ControllerMode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controllermode-simulator-controllerahk)
       - [ControllerAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controlleraction-simulator-controllerahk)
       - [ButtonBox](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-buttonbox-extends-configurationitem-simulator-controllerahk)
+    - [Simulator Plugin Implementation Classes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#simulator-plugin-implementation-classes)
+      - [SimulatorPlugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#simulatorplugin-extends-controllerplugin-simulator-pluginahk)
+      - [RaceEngineerSimulatorPlugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#raceengineersimulatorplugin-extends-simulatorplugin-simulator-pluginahk)
 
 [Backlog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Backlog)
 ------

@@ -4,7 +4,7 @@
   2. Documentation updates, as always
   3. (Internal): The format of the VERSION file changed, much more information is now included.
   4. The shared memory reader applications for the different simulators now have their Windows Explorer icons.
-  5. The "Controller Plugin Labels" file is now available in different translations. See the documentation on [plugin configuration](*) for more information.
+  5. The "Controller Plugin Labels" file is now available in different translations. See the documentation on [plugin configuration](*) for more information and read the [update notes](*), in case you have changed this file locally.
   6. The active modes of the connected controllers (aka Button Boxes) can now be automatically activated depending on the current simulator and the active session. A default configuration, which behaves as before, is automatically created by the update procedure, but you might want to define your own [automation rules](*).
   7. Jona now can handle the pitstop setup for you in the *rFactor 2* simulation.
   8. (Developer only): Introduced two new base classes *SimulatorPlugin* and *RaceEngineerSimulatorPlugin*, which reduces implementing plugins for simulation games to a few lines of code from now on. Please see the [updated developer reference documentation](*) for more information.

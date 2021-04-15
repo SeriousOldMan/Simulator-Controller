@@ -457,9 +457,9 @@ restart:
 			enabled := (getConfigurationValue(kSimulatorConfiguration, applicationName, "Exe Path", "") != "")
 			
 			if (descriptor[1] == "Core")
-				coreSettings.Push(Array(applicationName, getConfigurationValue(settingsOrCommand, "Core", applicationName, true), enabled))
+				coreSettings.Push(Array(applicationName, getConfigurationValue(settingsOrCommand, "Core", applicationName, false), enabled))
 			else if (descriptor[1] == "Feedback")
-				feedbackSettings.Push(Array(applicationName, getConfigurationValue(settingsOrCommand, "Feedback", applicationName, true), enabled))
+				feedbackSettings.Push(Array(applicationName, getConfigurationValue(settingsOrCommand, "Feedback", applicationName, false), enabled))
 		}
 		
 		if (coreSettings.Length() > 8)
@@ -473,7 +473,7 @@ restart:
 		Gui SE:Font, Norm, Arial
 		Gui SE:Font, Italic, Arial
 	
-		Gui SE:Add, GroupBox, YP+30 w220 h%coreHeight%, % translate("Core System")
+		Gui SE:Add, GroupBox, YP+30 w220 h%coreHeight%, % translate("Start Core System")
 	
 		Gui SE:Font, Norm, Arial
 	
@@ -494,7 +494,7 @@ restart:
 			Gui SE:Font, Norm, Arial
 			Gui SE:Font, Italic, Arial
 	
-			Gui SE:Add, GroupBox, XP-10 YP+30 w220 h%feedbackHeight%, % translate("Feedback System")
+			Gui SE:Add, GroupBox, XP-10 YP+30 w220 h%feedbackHeight%, % translate("Start Feedback System")
 	
 			Gui SE:Font, Norm, Arial
 	
@@ -510,9 +510,9 @@ restart:
 			}
 		}
 	
-		trayTipDuration := getConfigurationValue(settingsOrCommand, "Tray Tip", "Tray Tip Duration", false)
+		trayTipDuration := getConfigurationValue(settingsOrCommand, "Tray Tip", "Tray Tip Duration", 1500)
 		trayTipSimulationDuration := getConfigurationValue(settingsOrCommand, "Tray Tip", "Tray Tip Simulation Duration", 1500)
-		buttonBoxDuration := getConfigurationValue(settingsOrCommand, "Button Box", "Button Box Duration", 10000)
+		buttonBoxDuration := getConfigurationValue(settingsOrCommand, "Button Box", "Button Box Duration", false)
 		buttonBoxSimulationDuration := getConfigurationValue(settingsOrCommand, "Button Box", "Button Box Simulation Duration", false)
 		buttonBoxPosition := getConfigurationValue(settingsOrCommand, "Button Box", "Button Box Position", "Bottom Right")
 		

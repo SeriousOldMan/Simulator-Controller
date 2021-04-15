@@ -122,7 +122,7 @@ class ButtonBox extends ConfigurationItem {
 	
 				return getConfigurationValue(this.Controller.Settings, "Button Box"
 										   , inSimulation ? "Button Box Simulation Duration" : "Button Box Duration"
-										   , inSimulation ? false : 10000)
+										   , inSimulation ? false : false)
 			}
 			else
 				return false
@@ -1614,7 +1614,7 @@ updateTrayMessageState(settings := false) {
 	
 	duration := getConfigurationValue(settings, "Tray Tip"
 									, inSimulation ? "Tray Tip Simulation Duration" : "Tray Tip Duration"
-									, inSimulation ? 1500 : false)
+									, inSimulation ? 1500 : 1500)
 							   
 	if (duration > 0)
 		enableTrayMessages(duration)

@@ -169,7 +169,7 @@ class SimulatorStartup extends ConfigurationItem {
 			
 			startSimulator := (startSimulator || (GetKeyState("Ctrl") || GetKeyState("MButton")))
 			
-			if getConfigurationValue(this.Settings, section, component, true) {
+			if getConfigurationValue(this.Settings, section, component, false) {
 				if !kSilentMode
 					showProgress({message: translate("Start: ") . component . translate("...")})
 				

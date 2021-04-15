@@ -153,7 +153,7 @@ In the implementation of *loadFromConfiguration* all chat messages are retrieved
 
 The *ACCPlugin* is aware of "Assetto Corsa Competizione", as you can see by the implementation of the *runningSimulator* method above. Since "Assetto Corsa Competizione" might also be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration) as a required simulator for this plugin, the "Chat" mode will only be active, i.e. available, when "Assetto Corsa Competizione" is running. As a convinience function, the implmentation of the *simulatorStartup* method  will automatically switch to "Chat" mode, when ACC has been started, thereby making the chat messages available on the hardware controller buttons.
 
-Note: With the introduction of Release 2.0, the *ACC* plugin is much more capable. The above example shows only a fraction of the functionality of this plugin for didactical reasons.
+Note: With the introduction of Release 2.0, the *ACC* plugin has become much more capable. The above example shows only a fraction of the functionality of this plugin for didactical reasons.
 
 ## Debugging
 

@@ -35,7 +35,7 @@ The different components of Simulator Controller can be customized to a large ex
 
 Before you start: Simulator Controller comes with some predefined configurations for specialized use cases already. You will find these in the *Profiles\Simulator Controller* folder. You can pickup the file "Simulator Configuration.ini" from one of the use case folder there and drop it into the *Simulator Controller\Config* directory, which you will find in your user *Documents* folder, BEFORE you start your configuration process. These are the predefined use cases:
 
-   1. VRE Only: If you only want to use Jona, the Virtual Race Engineer, you can use this predefined configuration. All other components of Simulator Controller are disabled here and you will never see any Button Box or other visuals. You still might need to configure special aspects, for example the preparation of the [Assetto Corsa Competizione pitstop handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#important-preparation-for-the-pitstop-mfd-control) for example, but that's it.
+   1. VRE Only: If you only want to use Jona, the Virtual Race Engineer, you can use this predefined configuration. All other components of Simulator Controller are disabled here and you will never see any Button Box or other visuals. You still might need to configure special aspects, for example the preparation of the [Assetto Corsa Competizione pitstop handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#important-preparation-for-the-pitstop-mfd-handling) for example, but that's it.
 
 ## Running the configuration tool
 

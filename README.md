@@ -26,7 +26,7 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-[2.8.2-rc1](https://www.dropbox.com/s/np5xl70hlcbqnwv/Simulator%20Controller%202.8.2-rc1.zip?dl=1) (First release candidate for upcoming Release 2.8.2. New features: New VERSION file format, Refactoring of the Simulator Plugins, Icons for SHM Readers, Localized "Controller Plugin Labels", Situation aware Button Box Modes incl. configurable automation, Pitstop handling for rFactor 2. Feature complete and stable. Automated update procedure and updated documentation already included.)
+[2.8.2-rc2](https://www.dropbox.com/s/ol4xz58ceuhkhe9/Simulator%20Controller%202.8.2-rc2.zip?dl=1) (Second release candidate for upcoming Release 2.8.2. New features: New VERSION file format, Refactoring of the Simulator Plugins, Icons for SHM Readers, Localized "Controller Plugin Labels", Situation aware Button Box Modes incl. configurable automation, Pitstop handling for rFactor 2. Feature complete and stable. Automated update procedure and updated documentation already included.)
 
 As always, please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - more important - the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-282) before installing and using this version.
 

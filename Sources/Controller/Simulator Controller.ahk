@@ -1720,23 +1720,23 @@ switchToggle(toggleType, toggleNumber, mode := "activate") {
 		logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in custom controller action switchToggle - please check the configuration"))
 }
 
-setMode(action) {
+setMode(actionOrPlugin, mode := false) {
 	controller := SimulatorController.Instance
 
 	protectionOn()
 	
 	try {
-		if (action = kIncrease)
+		if (actionOrPlugin = kIncrease)
 			SimulatorController.Instance.rotateMode(1)
-		else if (action = kDecrease)
+		else if (actionOrPlugin = kDecrease)
 			SimulatorController.Instance.rotateMode(-1)
 		else {
-			mode := controller.findMode(action)
+			theMode := controller.findMode(actionOrPlugin, mode)
 			
-			if ((mode != false) && controller.isActive(mode))
-				controller.setMode(mode)
+			if ((theMode != false) && controller.isActive(mode))
+				controller.setMode(theMode)
 			else
-				trayMessage(translate("Controller"), translate("Mode: ") . translate(action) . translate(" is not available"), 10000)
+				trayMessage(translate("Controller"), translate("Mode: ") . translate(actionOrPlugin) . " - " . translate(mode) . translate(" is not available"), 10000)
 		}
 	}
 	finally {

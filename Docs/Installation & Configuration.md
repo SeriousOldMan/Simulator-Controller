@@ -37,6 +37,8 @@ Before you start: Simulator Controller comes with some predefined configurations
 
    1. VRE Only: If you only want to use Jona, the Virtual Race Engineer, you can use this predefined configuration. All other components of Simulator Controller are disabled here and you will never see any Button Box or other visuals. You still might need to configure special aspects, for example the preparation of the [Assetto Corsa Competizione pitstop handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#important-preparation-for-the-pitstop-mfd-handling) for example, but that's it.
 
+   2. Desktop Rig: Sorry for the *disrespectful* naming, more like a joke from my side. This configuration file contains everything, except for the tactile and motion feedback components, which most likely will be absent, when you are driving with a bolt-on steering wheel at your desktop. Though, you still have to customize all the other configuration items for the software only components to be up and running.
+
 ## Running the configuration tool
 
 The configuration tool is located in the *Binaries* folder and is named *Simulator Configuration.exe*. If you start it, the following window will appear:
@@ -160,7 +162,7 @@ Although you may call any globally defined function, you should use only the fol
 | pushButton | number | Builtin | Virtually pushes the button with the given number. |
 | rotateDial | number, direction | Builtin | Virtually rotates the rotary dial with the given number. *direction* must be one of "Increase" or "Decrease". |
 | switchToggle | type, number, state | Builtin | Virtually switches the toggle switch with the given number. *state* must be one of "On" or "Off" for 2-way toggle switches and "On" for 1-way toggle switches. The type of the toggle switch must be passed as *type*, one of "1WayToggle" and "2WayToggle". |
-| setMode | mode | Builtin | Switches the currently active mode for the hardware controller. See the [plugin reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes) for an in depth explanation of all available modes. |
+| setMode | plugin, mode | Builtin | Switches the currently active mode for the hardware controller. See the [plugin reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes) for an in depth explanation of all available modes. Instead of supplying the name of a plugin and mode, you can omit the second argument and supply "Increase" or "Deacrease" for the first parameter. In this case the controller will activate the next mode like in a carousel. |
 | startSimulation | [Optional] simulator | System | Starts a simulation game. If the simulator name is not provided, the first one in the list of configured simulators on the *General* tab is used. |
 | stopSimulation | - | System | Stops the currently running simulation game. |
 | shutdownSystem | - | System | Displays a dialog and asks, whether the PC should be shutdown. Use with caution. |

@@ -17,7 +17,7 @@ As an alternative, which I would recommend, leave the configuration files in pla
 
 As already mentioned in the [README](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/README.md#third-party-applications) file, you might want to install additional third party applications, that can be controlled by Simulator Controller or will enhance the overall user experience. Please take a look at this list and decide, which ones you want to install. If you want to start your own plugin development or even change the code of the Simulator Controller itself, you definitely need to have [AutoHotkey](https://www.autohotkey.com/) installed. Beginning with Release 2.1, an installation of [VisualStudio Community Edition](https://visualstudio.microsoft.com/de/vs/community/) might also be required, if you want do dig into the heavylifting part of telemetry data acquisition or voice recognition. But you can stick with the precompiled binaries from the distribution, if that is not your domain.
 
-Beside that, I recommend at least [VoiceMacro](http://www.voicemacro.net/) for handling voice commands, and depending on your equipment configuration, [SimHub](https://www.simhubdash.com/) and [SimFeedback](https://www.opensfx.com/). For the later two, very sophisticated support is built into the Simulator Controller already.
+Beside that, I can recommend [VoiceMacro](http://www.voicemacro.net/) for handling complex voice commands (support for simple commands is already builtin, but *VoiceMacro* is much better), and depending on your equipment configuration, [SimHub](https://www.simhubdash.com/) and [SimFeedback](https://www.opensfx.com/). For the later two, very sophisticated support is built into the Simulator Controller already.
 
 ## Using your own pictures, videos and sounds for all the splash screens
 
@@ -32,6 +32,10 @@ Release 2.1 introduced Jona, an artificial race engineer as an optional componen
 # Configuration
 
 The different components of Simulator Controller can be customized to a large extent. Part of this customization is handled by the configuration process, which typically you need to do only once, or maybe twice, when the configuration of your simulation equipment might change in the future. This overall configuration is handled by a specialized tool, which will be described in the following chapters. Additional customization, which address special aspects of the operation of the different applications of Simulator Controller, is possible by using separate configuration dialogs. See the documentation on [how to use](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller) the Simulator Controller for more information.
+
+Before you start: Simulator Controller comes with some predefined configurations for specialized use cases already. You will find these in the *Profiles\Simulator Controller* folder. You can pickup the file "Simulator Configuration.ini" from one of the use case folder there and drop it into the *Simulator Controller\Config* directory, which you will find in your user *Documents* folder, BEFORE you start your configuration process. These are the predefined use cases:
+
+   1. VRE Only: If you only want to use Jona, the Virtual Race Engineer, you can use this predefined configuration. All other components of Simulator Controller are disabled here and you will never see any Button Box or other visuals. You still might need to configure special aspects, for example the preparation of the [Assetto Corsa Competizione pitstop handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-pitstop) for example, but that's it.
 
 ## Running the configuration tool
 

@@ -220,12 +220,12 @@ class SimulatorStartup extends ConfigurationItem {
 			
 			showProgress({x: x, y: y, color: "Blue", message: message, title: translate("Initialize Core System")})
 		}
-					
+		
 		Loop 50 {
 			if !kSilentMode
 				showProgress({progress: A_Index * 2})
 			
-			Sleep 5
+			Sleep 20
 		}
 
 		if !kSilentMode {

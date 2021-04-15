@@ -607,32 +607,44 @@ requestConsent() {
 
 checkForUpdates() {
 	if inList(["Simulator Startup", "Simulator Configuration", "Simulator Settings"], StrSplit(A_ScriptName, ".")[1]) {
-		URLDownloadToFile https://www.dropbox.com/s/txa8muw9j3g66tl/VERSION?dl=1, %kTempDirectory%VERSION
+		check := !FileExist(kTempDirectory . "VERSION")
 		
-		version := readConfiguration(kTempDirectory . "VERSION")
-		version := getConfigurationValue(version, "Release", "Version", getConfigurationValue(version, "Version", "Release", false))
+		if !check {
+			FileGetTime lastModified, %kTempDirectory%VERSION, M
+			
+			EnvAdd lastModified, 7, Days
+			
+			check := (lastModified < A_Now)
+		}
 		
-		if version {
-			version := StrSplit(version, "-", , 2)
-			current := StrSplit(kVersion, "-", , 2)
+		if check {
+			URLDownloadToFile https://www.dropbox.com/s/txa8muw9j3g66tl/VERSION?dl=1, %kTempDirectory%VERSION
 			
-			versionPostfix := version[2]
-			currentPostfix := current[2]
+			version := readConfiguration(kTempDirectory . "VERSION")
+			version := getConfigurationValue(version, "Release", "Version", getConfigurationValue(version, "Version", "Release", false))
 			
-			version := values2String("", string2Values(".", version[1])*)
-			current := values2String("", string2Values(".", current[1])*)
-			
-			if ((version > current) || ((version = current) && (versionPostfix != currentPostfix))) {
-				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-				title := translate("Modular Simulator Controller System")
-				MsgBox 262436, %title%, % translate("A newer version of Simulator Controller is available. Do you want to download it now?")
-				OnMessage(0x44, "")
+			if version {
+				version := StrSplit(version, "-", , 2)
+				current := StrSplit(kVersion, "-", , 2)
+				
+				versionPostfix := version[2]
+				currentPostfix := current[2]
+				
+				version := values2String("", string2Values(".", version[1])*)
+				current := values2String("", string2Values(".", current[1])*)
+				
+				if ((version > current) || ((version = current) && (versionPostfix != currentPostfix))) {
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+					title := translate("Modular Simulator Controller System")
+					MsgBox 262436, %title%, % translate("A newer version of Simulator Controller is available. Do you want to download it now?")
+					OnMessage(0x44, "")
 
-				IfMsgBox Yes
-				{
-					Run https://github.com/SeriousOldMan/Simulator-Controller#latest-release-builds
-					
-					ExitApp 0
+					IfMsgBox Yes
+					{
+						Run https://github.com/SeriousOldMan/Simulator-Controller#latest-release-builds
+						
+						ExitApp 0
+					}
 				}
 			}
 		}

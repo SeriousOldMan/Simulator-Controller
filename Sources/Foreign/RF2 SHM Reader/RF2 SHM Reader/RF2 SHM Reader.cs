@@ -430,14 +430,8 @@ namespace RF2SHMReader {
 			}
 
 			void selectAxleTyreCompound(string category) {
-				if (!SelectPitstopCategory(category))
-					return;
-
-				while (!GetStringFromBytes(pitInfo.mPitMenu.mChoiceString).Contains(compound)) {
-					SendPitstopCommand("+");
-
-					pitInfoBuffer.GetMappedData(ref pitInfo);
-				}
+				if (SelectPitstopCategory(category))
+					SelectPitstopOption(compound, "+");
 			}
 
 			selectAxleTyreCompound("F TIRES:");
@@ -480,7 +474,7 @@ namespace RF2SHMReader {
 		private void ExecuteRepairCommand(string repairType) {
 			Console.Write("Adjusting Repair: ");
 
-			string option = "not";
+			string option = "Not";
 
 			switch (repairType) {
 				case "Bodywork":
@@ -505,14 +499,8 @@ namespace RF2SHMReader {
 					break;
 			}
 
-			if (!SelectPitstopCategory("DAMAGE:"))
-				return;
-
-			while (!GetStringFromBytes(pitInfo.mPitMenu.mChoiceString).Contains(option)) {
-				SendPitstopCommand("+");
-
-				pitInfoBuffer.GetMappedData(ref pitInfo);
-			}
+			if (SelectPitstopCategory("DAMAGE:"))
+				SelectPitstopOption(option, "+");
 		}
 
 		public void ExecutePitstopCommand(string command, string[] arguments) {
@@ -536,6 +524,28 @@ namespace RF2SHMReader {
 					ExecuteRepairCommand(arguments[0]);
 					break;
 			}
+		}
+		
+		private bool SelectPitstopOption(string option, string direction) {
+			int tries = 5;
+
+			pitInfoBuffer.GetMappedData(ref pitInfo);
+
+			string start = GetStringFromBytes(pitInfo.mPitMenu.mChoiceString);
+
+			while (!GetStringFromBytes(pitInfo.mPitMenu.mChoiceString).Contains(option)) {
+				SendPitstopCommand(direction);
+
+				pitInfoBuffer.GetMappedData(ref pitInfo);
+
+				if ((GetStringFromBytes(pitInfo.mPitMenu.mChoiceString) == start) && (--tries == 0)) {
+					// Console.Write("Not found: "); Console.WriteLine(category);
+
+					return false;
+				}
+			}
+			
+			return true;
 		}
 
 		private bool SelectPitstopCategory(string category) {

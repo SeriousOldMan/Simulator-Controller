@@ -1,14 +1,14 @@
 [Development]
-Version=2.8.2-rc2
+Version=2.8.2-release
 Target=2.8.2-release
-Date=04/15/2021
+Date=04/16/2021
 Changes=New VERSION file format, Refactoring of the Simulator Plugins, Icons for SHM Readers, Localized "Controller Plugin Labels", Situation aware Button Box Modes incl. configurable automation, Pitstop handling for rFactor 2
 [Release]
-Version=2.8.0-release
-Date=04/09/2021
-Changes=Full Refactoring of Race Engineer Integration, Integrated RaceRoom Racing Experience with Jona, Integrated rFactor 2 with Jona, Jona support for practice and qualification sessions, Reimport of Race Engineer Settings during an active session, Tyre compound color coding, Integrated MSBuild into the build pipeline, Documentation for configuration tool plugin support
+Version=2.8.2-release
+Date=04/16/2021
+Changes=New VERSION file format, Refactoring of the Simulator Plugins, Icons for SHM Readers, Localized "Controller Plugin Labels", Situation aware Button Box Modes incl. configurable automation, Pitstop handling for rFactor 2
 [Current]
-Type=Development
+Type=Release
 [Version]
-Release=2.8.0-release
-Development=2.8.2-dev
+Release=2.8.2-release
+Development=2.8.2-release

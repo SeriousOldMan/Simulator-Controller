@@ -270,6 +270,12 @@ Good to know: When the *Race Engineer.settings* file is changed while Jona is al
 
 ### The pitstop
 
+The process of the pitstop handling differs between the various supported simulations. Below you will find some simulation specific hints. Please note, that pitstop handling is currently available for *Assetto Corsa Competizione* and *rFactor 2*.
+
+A final warning: If you ever perform a pitstop, which has not been planned and prepared by Jona, Jona will be very confused, say the least. You can do this, but please double check the recommendations of Jona for each subsequent pitstop, especially the chosen tyre set, if you don't want to end up with worn out tyres for your last stint.
+
+#### *Assetto Corsa Competizione*
+
 To enable Jona to handle the pitstop settings in *Assetto Corsa Competizione* completely on its own, you have to prepare some things beforehand. First you have to follow the instructions in the [update information for Release 2.0](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-20), so that the ACC plugin is able to control the Pitstop MFD of *Assetto Corsa Competizione*.
 
 Before Release 2.6, you had to setup your ACC pitstop strategy in a special way for as many pitstops you expect in the given race (plus some more for a safety margin):
@@ -283,9 +289,9 @@ Beginning with Release 2.6 this is not necessary anymore, since Jona can acquire
 
 Last but not least, the check boxes for repair of Suspension and Bodywork must be both selected at the start of the race in the Pitstop MFD. After you have done all that, you can let Jona handle the pitstop setttings. Only be sure to not interfere with the artificial click and keyboard events, while Jona is managing the pitstop settings.
 
-A final warning: If you ever perform a pitstop, which has not been planned and prepared by Jona, Jona will be very confused, say the least. You can do this, but please double check the recommendations of Jona for each subsequent pitstop, especially the chosen tyre set, if you don't want to end up with worn out tyres for your last stint.
+#### *rFactor 2*
 
-Note: Pitstop handling is currently available for *Assetto Corsa Competizione* and *rFactor 2*.
+No special setup required for *rFactor 2*, since this simulation has an integrated interface to control the pitstop settings externally.
 
 ### Race & Setup database
 

@@ -225,6 +225,14 @@ editTargets(command := "") {
 	static updateVariable6
 	static updateVariable7
 	static updateVariable8
+	static updateVariable9
+	static updateVariable10
+	static updateVariable11
+	static updateVariable12
+	static updateVariable13
+	static updateVariable14
+	static updateVariable15
+	static updateVariable16
 	
 	static cleanupVariable1
 	static cleanupVariable2
@@ -275,7 +283,8 @@ editTargets(command := "") {
 		Gui TE:Submit
 		
 		for target, setting in vUpdateSettings {
-			updateVariable := "updateVariable" . A_Index
+			; updateVariable := "updateVariable" . A_Index
+			updateVariable := "updateVariable" . vUpdateSettings.Count()
 			
 			vUpdateSettings[target] := %updateVariable%
 		}
@@ -319,16 +328,16 @@ editTargets(command := "") {
 	else {
 		result := false
 		
-		if (vUpdateSettings.Length() > 8)
+		if (vUpdateSettings.Count() > 16)
 			Throw "Too many update targets detected in editTargets..."
 		
-		if (vCleanupSettings.Length() > 8)
+		if (vCleanupSettings.Count() > 8)
 			Throw "Too many cleanup targets detected in editTargets..."
 		
-		if (vCopySettings.Length() > 16)
+		if (vCopySettings.Count() > 16)
 			Throw "Too many copy targets detected in editTargets..."
 		
-		if (vBuildSettings.Length() > 16)
+		if (vBuildSettings.Count() > 16)
 			Throw "Too many build targets detected in editTargets..."
 		
 		Gui TE:-Border ; -Caption
@@ -347,7 +356,7 @@ editTargets(command := "") {
 		Gui TE:Font, Italic, Arial
 		
 		if (vUpdateSettings.Count() > 0) {
-			updateHeight := 20 + (vupdateSettings.Count() * 20)
+			updateHeight := 20 + (Min(vupdateSettings.Count(), 1) * 20)
 			
 			if (updateHeight == 20)
 				updateHeight := 40
@@ -358,12 +367,14 @@ editTargets(command := "") {
 		
 			if (vUpdateSettings.Count() > 0)
 				for target, setting in vUpdateSettings {
-					option := ""
-					
-					if (A_Index == 1)
-						option := option . " YP+20 XP+10"
+					if (A_Index == vUpdateSettings.Count()) {
+						option := ""
 						
-					Gui TE:Add, CheckBox, %option% Disabled Checked%setting% vupdateVariable%A_Index%, %target%
+						; if (A_Index == 1)
+							option := option . " YP+20 XP+10"
+							
+						Gui TE:Add, CheckBox, %option% Disabled Checked%setting% vupdateVariable%A_Index%, %target%
+					}
 				}
 			else
 				Gui TE:Add, Text, YP+20 XP+10, % translate("No updates required...")
@@ -610,41 +621,9 @@ updateConfigurationForV28() {
 	userConfiguration := readConfiguration(userConfigurationFile)
 	
 	if (userConfiguration.Count() > 0) {
-		raceEngineerPlugin := new Plugin("Race Engineer", false, true)
-		
-		if getConfigurationValue(userConfiguration, "Plugins", "ACC", false) {
-			userPlugin := new Plugin("ACC", userConfiguration)
-		
-			for ignore, parameter in ["raceEngineer", "raceEngineerName", "raceEngineerLogo", "raceEngineerOpenSettings", "raceEngineerSettings"
-									, "raceEngineerImportSettings", "raceEngineerSpeaker", "raceEngineerListener"]
-				if userPlugin.hasArgument(parameter) {
-					value := userPlugin.getArgumentValue(parameter)
-
-					userPlugin.Arguments.Delete(parameter)
-					
-					if (parameter = "raceEngineerSettings")
-						parameter := "raceEngineerOpenSettings"
-					
-					raceEngineerPlugin.setArgumentValue(parameter, value)
-				}
-			
-			userPlugin.saveToConfiguration(userConfiguration)
-		}
-		
-		if getConfigurationValue(userConfiguration, "Plugins", "RRE", false) {
-			userPlugin := new Plugin("RRE", userConfiguration)
-			
-			userPlugin.iPlugin := "R3E"
-			
-			userPlugin.saveToConfiguration(userConfiguration)
-			removeConfigurationValue(userConfiguration, "Plugins", "RRE")
-		}
-		
 		if (getConfigurationValue(userConfiguration, "Application Hooks", "RaceRoom Racing Experience.Startup", false) = "startRRE")
 			setConfigurationValue(userConfiguration, "Application Hooks", "RaceRoom Racing Experience.Startup", "startR3E")
 			
-		raceEngineerPlugin.saveToConfiguration(userConfiguration)
-		
 		writeConfiguration(userConfigurationFile, userConfiguration)
 	}
 }
@@ -706,11 +685,14 @@ updateConfigurationForV25() {
 	if (userConfiguration.Count() > 0) {
 		bundledConfiguration := readConfiguration(getFileName(kSimulatorConfigurationFile, kConfigDirectory))
 	
-		config := getConfigurationSectionValues(bundledConfiguration, "Voice Control", Object())
+		if (getConfigurationSectionValues(bundledConfiguration, "Voice Control", Object()).Count() == 0) {
+			config := getConfigurationSectionValues(bundledConfiguration, "Voice Control", Object())
+			
+			setConfigurationSectionValues(userConfiguration, "Voice Control", config)
+		}
 		
-		setConfigurationSectionValues(userConfiguration, "Voice Control", config)
-		
-		setConfigurationValue(userConfiguration, "Controller Layouts", "Button Boxes", "Master Controller")
+		if !getConfigurationValue(userConfiguration, "Controller Layouts", "Button Boxes", false)
+			setConfigurationValue(userConfiguration, "Controller Layouts", "Button Boxes", "Master Controller")
 		
 		writeConfiguration(userConfigurationFile, userConfiguration)
 	}
@@ -719,20 +701,134 @@ updateConfigurationForV25() {
 	userSettings := readConfiguration(userSettingsFile)
 	
 	if (userSettings.Count() > 0) {
-		settings := getConfigurationSectionValues(userSettings, "Controller", Object())
-		
-		setConfigurationSectionValues(userSettings, "Tray Tip", settings)
-		
-		writeConfiguration(userSettingsFile, userSettings)
+		if getConfigurationSectionValues(userSettings, "Controller", false) {
+			settings := getConfigurationSectionValues(userSettings, "Controller", Object())
+			
+			setConfigurationSectionValues(userSettings, "Tray Tip", settings)
+			
+			writeConfiguration(userSettingsFile, userSettings)
+		}
 	}
+}
+
+updateConfigurationForV203() {
+	updateCustomCalls(32, 34)
 }
 
 updateConfigurationForV20() {
 	updateCustomCalls(13, 32)
 }
 
-updateConfigurationForV203() {
-	updateCustomCalls(32, 34)
+updatePluginsForV28() {
+	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	userConfiguration := readConfiguration(userConfigurationFile)
+	
+	if (userConfiguration.Count() > 0) {
+		if !getConfigurationValue(userConfiguration, "Plugins", "Race Engineer", false) {
+			raceEngineerPlugin := new Plugin("Race Engineer", false, true)
+			
+			if getConfigurationValue(userConfiguration, "Plugins", "ACC", false) {
+				userPlugin := new Plugin("ACC", userConfiguration)
+			
+				for ignore, parameter in ["raceEngineer", "raceEngineerName", "raceEngineerLogo", "raceEngineerOpenSettings", "raceEngineerSettings"
+										, "raceEngineerImportSettings", "raceEngineerSpeaker", "raceEngineerListener"]
+					if userPlugin.hasArgument(parameter) {
+						value := userPlugin.getArgumentValue(parameter)
+
+						userPlugin.Arguments.Delete(parameter)
+						
+						if (parameter = "raceEngineerSettings")
+							parameter := "raceEngineerOpenSettings"
+						
+						raceEngineerPlugin.setArgumentValue(parameter, value)
+					}
+				
+				userPlugin.saveToConfiguration(userConfiguration)
+			}
+
+			raceEngineerPlugin.saveToConfiguration(userConfiguration)
+		}
+		
+		if !getConfigurationValue(userConfiguration, "Plugins", "R3E", false) {
+			userPlugin := new Plugin("RRE", userConfiguration)
+			
+			userPlugin.iPlugin := "R3E"
+			
+			userPlugin.saveToConfiguration(userConfiguration)
+		}
+		
+		if getConfigurationValue(userConfiguration, "Plugins", "RRE", false)
+			removeConfigurationValue(userConfiguration, "Plugins", "RRE")
+			
+		writeConfiguration(userConfigurationFile, userConfiguration)
+	}
+}
+
+updateRREPluginForV24() {
+	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	userConfiguration := readConfiguration(userConfigurationFile)
+	
+	if (userConfiguration.Count() > 0) {
+		if !getConfigurationValue(userConfiguration, "Plugins", "RRE", false) {
+			rrePlugin := new Plugin("RRE", readConfiguration(getFileName(kSimulatorConfigurationFile, kConfigDirectory)))
+				
+			rrePlugin.iIsActive := false
+			
+			rrePlugin.saveToConfiguration(userConfiguration)
+			
+			writeConfiguration(userConfigurationFile, userConfiguration)
+		}
+	}
+}
+
+updateRF2PluginForV23() {
+	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	userConfiguration := readConfiguration(userConfigurationFile)
+	
+	if (userConfiguration.Count() > 0) {
+		if !getConfigurationValue(userConfiguration, "Plugins", "RF2", false) {
+			rf2Plugin := new Plugin("RF2", readConfiguration(getFileName(kSimulatorConfigurationFile, kConfigDirectory)))
+				
+			rf2Plugin.iIsActive := false
+			
+			rf2Plugin.saveToConfiguration(userConfiguration)
+			
+			writeConfiguration(userConfigurationFile, userConfiguration)
+		}
+	}
+}
+
+updatePedalCalibrationPluginForV21() {
+	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	userConfiguration := readConfiguration(userConfigurationFile)
+	
+	if (userConfiguration.Count() > 0) {
+		pedalPlugin := new Plugin("Pedal Calibration", readConfiguration(getFileName(kSimulatorConfigurationFile, kConfigDirectory)))
+		
+		pedalPlugin.iIsActive := false
+			
+		pedalPlugin.saveToConfiguration(userConfiguration)
+		
+		writeConfiguration(userConfigurationFile, userConfiguration)
+	}
+}
+
+updateACCPluginForV21() {
+	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	userConfiguration := readConfiguration(userConfigurationFile)
+	
+	if (userConfiguration.Count() > 0) {
+		accPlugin := new Plugin("ACC", userConfiguration)
+		
+		if !accPlugin.hasArgument("raceEngineerName") {
+			accPlugin.setArgumentValue("raceEngineerName", "Jona")
+			accPlugin.setArgumentValue("raceEngineerSpeaker", kTrue)
+			
+			accPlugin.saveToConfiguration(userConfiguration)
+		}
+		
+		writeConfiguration(userConfigurationFile, userConfiguration)
+	}
 }
 
 updateACCPluginForV20() {
@@ -756,70 +852,6 @@ updateACCPluginForV20() {
 		}
 	}
 }
-
-updateACCPluginForV21() {
-	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
-	userConfiguration := readConfiguration(userConfigurationFile)
-	
-	if (userConfiguration.Count() > 0) {
-		accPlugin := new Plugin("ACC", userConfiguration)
-		
-		if !accPlugin.hasArgument("raceEngineerName") {
-			accPlugin.setArgumentValue("raceEngineerName", "Jona")
-			accPlugin.setArgumentValue("raceEngineerSpeaker", kTrue)
-			
-			accPlugin.saveToConfiguration(userConfiguration)
-		}
-		
-		writeConfiguration(userConfigurationFile, userConfiguration)
-	}
-}
-
-updatePedalCalibrationPluginForV21() {
-	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
-	userConfiguration := readConfiguration(userConfigurationFile)
-	
-	if (userConfiguration.Count() > 0) {
-		pedalPlugin := new Plugin("Pedal Calibration", readConfiguration(getFileName(kSimulatorConfigurationFile, kConfigDirectory)))
-		
-		pedalPlugin.iIsActive := false
-			
-		pedalPlugin.saveToConfiguration(userConfiguration)
-		
-		writeConfiguration(userConfigurationFile, userConfiguration)
-	}
-}
-
-updateRF2PluginForV23() {
-	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
-	userConfiguration := readConfiguration(userConfigurationFile)
-	
-	if (userConfiguration.Count() > 0) {
-		rf2Plugin := new Plugin("RF2", readConfiguration(getFileName(kSimulatorConfigurationFile, kConfigDirectory)))
-			
-		rf2Plugin.iIsActive := false
-		
-		rf2Plugin.saveToConfiguration(userConfiguration)
-		
-		writeConfiguration(userConfigurationFile, userConfiguration)
-	}
-}
-
-updateRREPluginForV24() {
-	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
-	userConfiguration := readConfiguration(userConfigurationFile)
-	
-	if (userConfiguration.Count() > 0) {
-		rrePlugin := new Plugin("RRE", readConfiguration(getFileName(kSimulatorConfigurationFile, kConfigDirectory)))
-			
-		rrePlugin.iIsActive := false
-		
-		rrePlugin.saveToConfiguration(userConfiguration)
-		
-		writeConfiguration(userConfigurationFile, userConfiguration)
-	}
-}
-
 
 updateToV15() {
 }

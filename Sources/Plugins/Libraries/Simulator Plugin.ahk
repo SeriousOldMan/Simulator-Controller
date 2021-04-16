@@ -171,7 +171,7 @@ class RaceEngineerSimulatorPlugin extends SimulatorPlugin {
 	setPitstopRefuelAmount(pitstopNumber, litres) {
 	}
 	
-	setPitstopTyreSet(pitstopNumber, compound, compoundColor, set := false) {
+	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {

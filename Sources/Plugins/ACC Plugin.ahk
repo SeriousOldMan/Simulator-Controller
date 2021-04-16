@@ -1215,15 +1215,19 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 		changePitstopFuelAmount((litresIncrement > 0) ? "Increase" : "Decrease", Abs(litresIncrement))
 	}
 	
-	setPitstopTyreSet(pitstopNumber, compound, compoundColor, set := false) {
-		changePitstopTyreCompound(compound)
-		
-		data := readSharedMemory(this.Code, "-Setup", kTempDirectory . "ACC Data\Setup.data")
-		
-		tyreSetIncrement := Round(set - getConfigurationValue(data, "Setup Data", "TyreSet", 0))
-		
-		if (compound = "Dry")
-			changePitstopTyreSet((tyreSetIncrement > 0) ? "Next" : "Previous", Abs(tyreSetIncrement))
+	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
+		if compound {
+			changePitstopTyreCompound(compound)
+			
+			data := readSharedMemory(this.Code, "-Setup", kTempDirectory . "ACC Data\Setup.data")
+			
+			tyreSetIncrement := Round(set - getConfigurationValue(data, "Setup Data", "TyreSet", 0))
+			
+			if (compound = "Dry")
+				changePitstopTyreSet((tyreSetIncrement > 0) ? "Next" : "Previous", Abs(tyreSetIncrement))
+		}
+		else if this.iPSChangeTyres
+			toggleActivity("Change Tyres")
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {

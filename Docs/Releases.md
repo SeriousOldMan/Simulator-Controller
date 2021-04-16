@@ -1,3 +1,9 @@
+## 2.8.5-release 04/23/21 (planned)
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Jona can now decide to leave the current tyres on the car during a pitstop
+
 ## 2.8.2-release 04/16/21
 
   1. Bugfixes, as always

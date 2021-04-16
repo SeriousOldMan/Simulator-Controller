@@ -65,11 +65,15 @@ class RF2Plugin extends RaceEngineerSimulatorPlugin {
 		this.sendPitstopCommand("Pitstop", "Refuel", Round(litres))
 	}
 	
-	setPitstopTyreSet(pitstopNumber, compound, compoundColor, set := false) {
-		this.sendPitstopCommand("Pitstop", "Tyre Compound", compound, compoundColor)
-		
-		if set
-			this.sendPitstopCommand("Pitstop", "Tyre Set", Round(set))
+	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
+		if compound {
+			this.sendPitstopCommand("Pitstop", "Tyre Compound", compound, compoundColor)
+			
+			if set
+				this.sendPitstopCommand("Pitstop", "Tyre Set", Round(set))
+		}
+		else
+			???? =>
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {

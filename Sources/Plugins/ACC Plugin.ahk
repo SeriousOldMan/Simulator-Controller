@@ -1227,7 +1227,7 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 				changePitstopTyreSet((tyreSetIncrement > 0) ? "Next" : "Previous", Abs(tyreSetIncrement))
 		}
 		else if this.iPSChangeTyres
-			toggleActivity("Change Tyres")
+			this.toggleActivity("Change Tyres")
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {

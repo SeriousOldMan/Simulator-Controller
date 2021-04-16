@@ -394,33 +394,40 @@ namespace RF2SHMReader {
 		}
 
 		private void ExecuteTyreCompoundCommand(string[] tyreCompoundArgument) {
-			Console.Write("Adjusting Tyre Compound: ");
-			Console.Write(tyreCompoundArgument[0]); Console.Write(" ");
-			Console.WriteLine(tyreCompoundArgument[1]);
-			
 			string compound = tyreCompoundArgument[0];
-			
-			if (compound == "Wet")
-				compound = "Rain";
-			else
-				switch (tyreCompoundArgument[1]) {
-					case "Red":
-						compound = "Soft";
 
-						break;
-					case "White":
-						compound = "Medium";
+			if (tyreCompoundArgument[0] == "None") {
+				Console.WriteLine("Adjusting Tyre Compound: No Change");
 
-						break;
-					case "Blue":
-						compound = "Hard";
+				compound = "No Change";
+			}
+			else {
+				Console.Write("Adjusting Tyre Compound: ");
+				Console.Write(compound); Console.Write(" ");
+				Console.WriteLine(tyreCompoundArgument[1]);
 
-						break;
-					default:
-						compound = "";
-						
-						break;
-				}
+				if (compound == "Wet")
+					compound = "Rain";
+				else
+					switch (tyreCompoundArgument[1]) {
+						case "Red":
+							compound = "Soft";
+
+							break;
+						case "White":
+							compound = "Medium";
+
+							break;
+						case "Blue":
+							compound = "Hard";
+
+							break;
+						default:
+							compound = "";
+
+							break;
+					}
+			}
 
 			void selectAxleTyreCompound(string category) {
 				if (!SelectPitstopCategory(category))

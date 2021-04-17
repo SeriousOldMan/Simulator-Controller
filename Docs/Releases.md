@@ -2,8 +2,8 @@
 
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. Jona can now decide to leave the current tyres on the car at a late pitstop (aka splash and dash)
-  4. Jona now intelligently reports and handles damage late in a stint
+  3. Jona can decide to leave the current tyres on the car at a late pitstop (aka splash and dash)
+  4. Jona intelligently reports and handles damage late in a stint
 
 ## 2.8.2-release 04/16/21
 

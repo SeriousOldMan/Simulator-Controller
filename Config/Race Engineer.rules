@@ -449,13 +449,16 @@ setDamageReported(?damageType, true) <= Set(Damage.Reported, !Lap), Set(Damage, 
 ;;;-------------------------------------------------------------------------;;;
 
 priority: 20, [?Lap] => (ProveAll: updateRemainingLaps, ?Lap)
-priority: 20, {All: [?Lap.Remaining.Fuel < ?Lap.Remaining.Stint],																				\
+priority: 20, {All: {Any: [?Lap.Remaining.Fuel < ?Lap.Remaining.Stint], [?Lap.Remaining.Fuel < ?Lap.Remaining.Session]},						\
 					[?Lap.Remaining.Fuel <= ?Session.Settings.Lap.PitstopWarning]} => (Prove: lowFuelWarning, ?Lap, ?Lap.Remaining)
 
 updateRemainingLaps(?lap) <= remainingStintLaps(?lap, Driver, ?driverLaps), Set(Lap.Remaining.Stint, ?driverLaps)
-updateRemainingLaps(?lap) <= remainingSessionLaps(?lap, ?sessionLaps), Set(Lap.Remaining.Session, ?sessionLaps)
 updateRemainingLaps(?lap) <= remainingStintLaps(?lap, Fuel, ?fuelLaps), Set(Lap.Remaining.Fuel, ?fuelLaps)
-updateRemainingLaps(?lap) <= !Lap.Remaining.Stint < !Lap.Remaining.Fuel, !, Set(Lap.Remaining, !Lap.Remaining.Stint)
+updateRemainingLaps(?lap) <= remainingSessionLaps(?lap, ?sessionLaps), Set(Lap.Remaining.Session, ?sessionLaps)
+updateRemainingLaps(?lap) <= !Lap.Remaining.Stint < !Lap.Remaining.Fuel, !Lap.Remaining.Stint < !Lap.Remaining.Session, !,						\
+							 Set(Lap.Remaining, !Lap.Remaining.Stint)
+updateRemainingLaps(?lap) <= !Lap.Remaining.Session < !Lap.Remaining.Fuel, !Lap.Remaining.Session < !Lap.Remaining.Stint, !,					\
+							 Set(Lap.Remaining, !Lap.Remaining.Session)
 updateRemainingLaps(?lap) <= Set(Lap.Remaining, !Lap.Remaining.Fuel)
 
 lowFuelWarning(?lap, ?remainingLaps) <= recentPitstopLap(?lap), !, fail
@@ -572,19 +575,19 @@ priority: 1,																																	\
 priority: -20, [?Pitstop.Lap = ?Lap] => (Clear: Weather.Tyre.Change.Recommended), (Clear: Weather.Change.Notified),								\
 										(Clear: Weather.Tyre.Compound.Target)
 
-weatherChangeNotification(?lap, ?weather, ?minutes) <= remainingSessionTime(?lap, ?sessionTime), ?remainingMinutes = ?sessionTime / 60000,		\
+weatherChangeNotification(?lap, ?weather, ?minutes) <= remainingStintTime(?lap, ?stintTime), ?remainingMinutes = ?stintTime / 60000,		\
 													   ?remainingMinutes > ?minutes, Call(weatherChangeNotification, true, ?minutes),			\
 													   weatherIndex(?weather, ?index), Set(Weather.Change.Notified, ?index)
-weatherChangeNotification(?lap, ?weather, ?minutes) <= remainingSessionTime(?lap, ?sessionTime), ?remainingMinutes = ?sessionTime / 60000,		\
+weatherChangeNotification(?lap, ?weather, ?minutes) <= remainingStintTime(?lap, ?stintTime), ?remainingMinutes = ?stintTime / 60000,		\
 													   =<(?remainingMinutes, ?minutes), Call(weatherChangeNotification, false, ?minutes),		\
 													   weatherIndex(?weather, ?index), Set(Weather.Change.Notified, ?index)
 											 
 weatherTyreChangeRecommendation(?lap, ?weather, ?minutes, ?compound) <=																			\
-		remainingSessionTime(?lap, ?sessionTime), ?remainingMinutes = ?sessionTime / 60000, ?remainingMinutes > ?minutes,						\
+		remainingStintTime(?lap, ?stintTime), ?remainingMinutes = ?stintTime / 60000, ?remainingMinutes > ?minutes,						\
 		Call(weatherTyreChangeRecommendation, ?minutes, ?compound), weatherIndex(?weather, ?index),												\
 		Set(Weather.Tyre.Change.Recommended, ?index), Set(Weather.Tyre.Compound.Target, ?compound)
 weatherTyreChangeRecommendation(?lap, ?weather, ?minutes, ?compound) <=																			\
-		remainingSessionTime(?lap, ?sessionTime), ?remainingMinutes = ?sessionTime / 60000, =<(?remainingMinutes, ?minutes),					\
+		remainingStintTime(?lap, ?stintTime), ?remainingMinutes = ?stintTime / 60000, =<(?remainingMinutes, ?minutes),					\
 		Call(weatherChangeNotification, false, ?minutes), weatherIndex(?weather, ?index),														\
 		Set(Weather.Tyre.Change.Recommended, ?index)
 
@@ -943,13 +946,15 @@ nextStintLaps(?laps) <= lapRemainingFuel(!Lap, ?remainingFuel), ?fuel = ?remaini
 nextStintLaps(?laps) <= remainingSessionLaps(!Lap, ?laps)
 
 remainingSessionLaps(?lap, ?remainingLaps) <= remainingSessionTime(?lap, ?remainingTime), lapAvgTime(?lap, ?avgTime),							\
-										   ?remainingLaps = ?remainingTime / ?avgTime
+											  ?remainingLaps = ?remainingTime / ?avgTime
 
 remainingSessionTime(?lap, ?remainingTime) <= Get(Lap, ?lap, Time.End, ?sessionTime), ?sessionLength = !Session.Duration * 1000,				\
-										   ?remainingTime = ?sessionLength - ?sessionTime
+											  ?remainingTime = ?sessionLength - ?sessionTime
 
 remainingStintLaps(?lap, ?remainingLaps) <= remainingStintLaps(?lap, Fuel, ?fuelLaps), remainingStintLaps(?lap, Driver, ?driverLaps),			\
-											min(?fuelLaps, ?driverLaps, ?remainingLaps)
+											min(?fuelLaps, ?driverLaps, ?remainingLaps), remainingSessionLaps(?lap, ?sessionLaps),				\
+											?remainingLaps < ?sessionLaps, !
+remainingStintLaps(?lap, ?remainingLaps) <= remainingSessionLaps(?lap, ?remainingLaps)
 
 remainingStintLaps(?lap, Fuel, ?remainingLaps) <= remainingSessionLaps(?lap, ?sessionLaps),														\
 												  lapRemainingFuel(?lap, ?fuelLeft), lapAvgFuel(?lap, ?fuelPerLap),								\
@@ -958,7 +963,9 @@ remainingStintLaps(?lap, Driver, ?remainingLaps) <= remainingStintTime(?stintTim
 													?remainingLaps = ?stintTime / ?avgTime
 
 remainingStintTime(?lap, ?remainingTime) <= remainingStintLaps(?lap, Driver, ?remainingLaps), lapAvgTime(?lap, ?avgTime),						\
-											?remainingTime = ?remainingLaps * ?avgTime
+											?remainingTime = ?remainingLaps * ?avgTime, remainingSessionTime(?lap, ?sessionTime),				\
+											?remainingTime < ?sessionTime, !
+remainingStintTime(?lap, ?remainingTime) <= remainingSessionTime(?lap, ?remainingTime)
 											
 remainingStintTime(?stintTime) <= Get(Driver.Time.Stint.Remaining, ?stintTime)
 

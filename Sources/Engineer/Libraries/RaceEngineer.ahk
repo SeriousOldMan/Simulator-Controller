@@ -2076,12 +2076,11 @@ class RaceEngineer extends ConfigurationItem {
 	weatherChangeNotification(change, minutes) {
 		local knowledgeBase := this.KnowledgeBase
 		
-		if (knowledgeBase.getValue("Lap.Remaining") > 5)
-			if this.Speaker {
-				speaker := this.getSpeaker()
-				
-				speaker.speakPhrase(change ? "WeatherChange" : "WeatherNoChange", {minutes: minutes})
-			}
+		if this.Speaker {
+			speaker := this.getSpeaker()
+			
+			speaker.speakPhrase(change ? "WeatherChange" : "WeatherNoChange", {minutes: minutes})
+		}
 	}
 	
 	weatherTyreChangeRecommendation(minutes, recommendedCompound) {

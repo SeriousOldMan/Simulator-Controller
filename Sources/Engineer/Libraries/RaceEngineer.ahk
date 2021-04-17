@@ -1860,7 +1860,7 @@ class RaceEngineer extends ConfigurationItem {
 						speaker.speakPhrase("WetTyres", {compound: fragments[compound], color: color, set: knowledgeBase.getValue("Pitstop.Planned.Tyre.Set")})
 				}
 				else {
-					if (knowledgeBase.getValue("Lap") < (knowledgeBase.getValue("Lap.Remaining.Stint") - 5))
+					if (knowledgeBase.getValue("Lap.Remaining.Stint") > 5)
 						speaker.speakPhrase("NoTyreChange")
 					else
 						speaker.speakPhrase("NoTyreChangeLap")
@@ -2042,7 +2042,7 @@ class RaceEngineer extends ConfigurationItem {
 			
 			speaker.speakPhrase(phrase)
 	
-			if (knowledgeBase.getValue("Lap") < (knowledgeBase.getValue("Lap.Remaining") - 4))
+			if (knowledgeBase.getValue("Lap.Remaining") > 5)
 				speaker.speakPhrase("DamageAnalysis")
 			else
 				speaker.speakPhrase("NoDamageAnalysis")
@@ -2052,7 +2052,7 @@ class RaceEngineer extends ConfigurationItem {
 	reportDamageAnalysis(repair, stintLaps, delta) {
 		local knowledgeBase := this.KnowledgeBase
 		
-		if (knowledgeBase.getValue("Lap") < (knowledgeBase.getValue("Lap.Remaining") - 2))
+		if (knowledgeBase.getValue("Lap.Remaining") > 3)
 			if this.Speaker {
 				speaker := this.getSpeaker()
 				
@@ -2076,7 +2076,7 @@ class RaceEngineer extends ConfigurationItem {
 	weatherChangeNotification(change, minutes) {
 		local knowledgeBase := this.KnowledgeBase
 		
-		if (knowledgeBase.getValue("Lap") < (knowledgeBase.getValue("Lap.Remaining") - 2))
+		if (knowledgeBase.getValue("Lap.Remaining") > 5)
 			if this.Speaker {
 				speaker := this.getSpeaker()
 				
@@ -2087,7 +2087,7 @@ class RaceEngineer extends ConfigurationItem {
 	weatherTyreChangeRecommendation(minutes, recommendedCompound) {
 		local knowledgeBase := this.KnowledgeBase
 		
-		if (knowledgeBase.getValue("Lap") < (knowledgeBase.getValue("Lap.Remaining") - 2))
+		if (knowledgeBase.getValue("Lap.Remaining") > 3)
 			if this.Speaker {
 				speaker := this.getSpeaker()
 				fragments := speaker.Fragments

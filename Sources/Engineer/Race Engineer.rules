@@ -409,7 +409,7 @@ reportAnalysis(?lostTime, ?stintLaps, ?delta) <= ?lostTime < !Session.Settings.P
 			[?Damage.Update.Suspension > ?Damage.Suspension.Reported]},																			\
 	  {Any: {All: [?Damage.Update.Bodywork], {None: [?Damage.Bodywork.Reported]}},																\
 			[?Damage.Update.Bodywork > ?Damage.Bodywork.Reported]}} => (Prove: reportNewDamage, !Lap)
-priority: -10, {Any: [?Damage.Update.Suspension], [?Damage.Update.Bodywork]} =>																	\
+priority: -20, {Any: [?Damage.Update.Suspension], [?Damage.Update.Bodywork]} =>																	\
 		(Clear: Damage.Update.Suspension), (Clear: Damage.Update.Bodywork)
 
 reportNewDamage(1) <= !, lapDamage(1, Suspension, ?lSDamage), lapDamage(1, Bodywork, ?lBDamage), reportNewDamage(0, ?lSDamage, 0, ?lBDamage)
@@ -442,27 +442,31 @@ setDamageReported(?damageType, true) <= Set(Damage.Reported, !Lap), Set(Damage, 
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                              Fuel Warning                               ;;;
+;;;                   Lap Calculation & Low Fuel Warning                    ;;;
 ;;;                                                                         ;;;
-;;; Updates the laps remaining with the current amount of fuel and issues   ;;;
-;;; a warning when falling below a given threshold.                         ;;;
+;;; Updates the remaining laps with the current amount of fuel and issues   ;;;
+;;; a warning when falling below a given threshold. Beside that remaining   ;;;
+;;; stint time for the current driver is calculated as well.                ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 priority: 20, [?Lap] => (ProveAll: updateRemainingLaps, ?Lap)
-priority: 20, {All: {Any: [?Lap.Remaining.Fuel < ?Lap.Remaining.Stint], [?Lap.Remaining.Fuel < ?Lap.Remaining.Session]},						\
-					[?Lap.Remaining.Fuel <= ?Session.Settings.Lap.PitstopWarning]} => (Prove: lowFuelWarning, ?Lap, ?Lap.Remaining)
 
 updateRemainingLaps(?lap) <= remainingStintLaps(?lap, Driver, ?driverLaps), Set(Lap.Remaining.Stint, ?driverLaps)
 updateRemainingLaps(?lap) <= remainingStintLaps(?lap, Fuel, ?fuelLaps), Set(Lap.Remaining.Fuel, ?fuelLaps)
 updateRemainingLaps(?lap) <= remainingSessionLaps(?lap, ?sessionLaps), Set(Lap.Remaining.Session, ?sessionLaps)
-updateRemainingLaps(?lap) <= !Lap.Remaining.Stint < !Lap.Remaining.Fuel, !Lap.Remaining.Stint < !Lap.Remaining.Session, !,						\
-							 Set(Lap.Remaining, !Lap.Remaining.Stint)
-updateRemainingLaps(?lap) <= !Lap.Remaining.Session < !Lap.Remaining.Fuel, !Lap.Remaining.Session < !Lap.Remaining.Stint, !,					\
-							 Set(Lap.Remaining, !Lap.Remaining.Session)
-updateRemainingLaps(?lap) <= Set(Lap.Remaining, !Lap.Remaining.Fuel)
+
+priority: 20, {All: {Any: [?Lap.Remaining.Fuel < ?Lap.Remaining.Stint], [?Lap.Remaining.Fuel < ?Lap.Remaining.Session]},						\
+					[?Lap.Remaining.Fuel <= ?Session.Settings.Lap.PitstopWarning]} => (Prove: lowFuelWarning, ?Lap, ?Lap.Remaining)
 
 lowFuelWarning(?lap, ?remainingLaps) <= recentPitstopLap(?lap), !, fail
 lowFuelWarning(?lap, ?remainingLaps) <= Call(lowFuelWarning, ?remainingLaps)
+
+priority: -10, {All: [?Lap.Remaining.Stint <= ?Lap.Remaining.Fuel],																				\
+					 [?Lap.Remaining.Stint <= ?Lap.Remaining.Session]} => (Set: Lap.Remaining, ?Lap.Remaining.Stint)
+priority: -10, {All: [?Lap.Remaining.Session <= ?Lap.Remaining.Fuel],																			\
+					 [?Lap.Remaining.Session <= ?Lap.Remaining.Stint]} => (Set: Lap.Remaining, ?Lap.Remaining.Session)
+priority: -10, {All: [?Lap.Remaining.Fuel <= ?Lap.Remaining.Stint],																				\
+					 [?Lap.Remaining.Fuel <= ?Lap.Remaining.Session]} => (Set: Lap.Remaining, ?Lap.Remaining.Fuel)
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -575,19 +579,19 @@ priority: 1,																																	\
 priority: -20, [?Pitstop.Lap = ?Lap] => (Clear: Weather.Tyre.Change.Recommended), (Clear: Weather.Change.Notified),								\
 										(Clear: Weather.Tyre.Compound.Target)
 
-weatherChangeNotification(?lap, ?weather, ?minutes) <= remainingStintTime(?lap, ?stintTime), ?remainingMinutes = ?stintTime / 60000,		\
+weatherChangeNotification(?lap, ?weather, ?minutes) <= remainingStintTime(?lap, ?stintTime), ?remainingMinutes = ?stintTime / 60000,			\
 													   ?remainingMinutes > ?minutes, Call(weatherChangeNotification, true, ?minutes),			\
 													   weatherIndex(?weather, ?index), Set(Weather.Change.Notified, ?index)
-weatherChangeNotification(?lap, ?weather, ?minutes) <= remainingStintTime(?lap, ?stintTime), ?remainingMinutes = ?stintTime / 60000,		\
+weatherChangeNotification(?lap, ?weather, ?minutes) <= remainingStintTime(?lap, ?stintTime), ?remainingMinutes = ?stintTime / 60000,			\
 													   =<(?remainingMinutes, ?minutes), Call(weatherChangeNotification, false, ?minutes),		\
 													   weatherIndex(?weather, ?index), Set(Weather.Change.Notified, ?index)
 											 
 weatherTyreChangeRecommendation(?lap, ?weather, ?minutes, ?compound) <=																			\
-		remainingStintTime(?lap, ?stintTime), ?remainingMinutes = ?stintTime / 60000, ?remainingMinutes > ?minutes,						\
+		remainingStintTime(?lap, ?stintTime), ?remainingMinutes = ?stintTime / 60000, ?remainingMinutes > ?minutes,								\
 		Call(weatherTyreChangeRecommendation, ?minutes, ?compound), weatherIndex(?weather, ?index),												\
 		Set(Weather.Tyre.Change.Recommended, ?index), Set(Weather.Tyre.Compound.Target, ?compound)
 weatherTyreChangeRecommendation(?lap, ?weather, ?minutes, ?compound) <=																			\
-		remainingStintTime(?lap, ?stintTime), ?remainingMinutes = ?stintTime / 60000, =<(?remainingMinutes, ?minutes),					\
+		remainingStintTime(?lap, ?stintTime), ?remainingMinutes = ?stintTime / 60000, =<(?remainingMinutes, ?minutes),							\
 		Call(weatherChangeNotification, false, ?minutes), weatherIndex(?weather, ?index),														\
 		Set(Weather.Tyre.Change.Recommended, ?index)
 
@@ -662,7 +666,7 @@ priority: 10, [?Pitstop.Plan] => (Prove: planPitstop)
 priority: -5, {All: [?Pitstop.Plan], [?Lap.Remaining.Stint <= 5]} => (Set: Pitstop.Planned.Tyre.Compound, false),								\
 																	 (Set: Pitstop.Planned.Tyre.Compound.Color, false)
 
-priority: -10, [?Pitstop.Plan] => (Set: Pitstop.Planned), (Clear: Pitstop.Plan)
+priority: -20, [?Pitstop.Plan] => (Set: Pitstop.Planned), (Clear: Pitstop.Plan)
 
 planPitstop() <= lastPitstop(?last), ?nr = ?last + 1, Set(Pitstop.Planned.Nr, ?nr)
 planPitstop() <= Set(Pitstop.Planned.Nr, 1)
@@ -674,10 +678,10 @@ planPitstop() <= Set(Pitstop.Planned.Nr, 1)
 ;;; Transfers the previously planned pitstop settings to the simulation.    ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-{All: [?Pitstop.Planned], [?Pitstop.Planned.Lap <= ?Lap]} => (Set: Pitstop.Prepare)
+{All: [?Pitstop.Planned], [?Pitstop.Planned.Lap = ?Lap]} => (Set: Pitstop.Prepare)
 
 {All: [?Pitstop.Planned], [?Pitstop.Prepare]} => (ProveAll: preparePitstop, !Pitstop.Planned.Nr)
-priority: -10, {All: [?Pitstop.Planned], [?Pitstop.Prepare]} => (Clear: Pitstop.Planned), (Clear: Pitstop.Prepare), (Set: Pitstop.Prepared)
+priority: -20, {All: [?Pitstop.Planned], [?Pitstop.Prepare]} => (Clear: Pitstop.Planned), (Clear: Pitstop.Prepare), (Set: Pitstop.Prepared)
 
 preparePitstop(?pitstopNumber) <= Call(startPitstopSetup, ?pitstopNumber)
 preparePitstop(?pitstopNumber) <= setRefuelAmount(?pitstopNumber),																				\

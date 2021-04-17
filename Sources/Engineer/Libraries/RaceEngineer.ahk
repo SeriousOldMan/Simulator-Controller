@@ -708,6 +708,10 @@ class RaceEngineer extends ConfigurationItem {
 					this.iContinuation := false
 					
 					this.pitstopAdjustNoPressureRecognized(words)
+				case "PitstopNoTyreChange":
+					this.iContinuation := false
+					
+					this.pitstopAdjustNoTyreRecognized(words)
 				case "PitstopAdjustRepairSuspension":
 					this.iContinuation := false
 					
@@ -741,7 +745,7 @@ class RaceEngineer extends ConfigurationItem {
 		if !this.hasEnoughData()
 			return
 		
-		laps := Round(knowledgeBase.getValue("Lap.Remaining"))
+		laps := Round(knowledgeBase.getValue("Lap.Remaining.Fuel", 0))
 		
 		if (laps == 0)
 			this.getSpeaker().speakPhrase("Later")
@@ -966,6 +970,25 @@ class RaceEngineer extends ConfigurationItem {
 		}
 	}
 	
+	pitstopAdjustNoTyreRecognized(words) {
+		local action
+		
+		speaker := this.getSpeaker()
+		fragments := speaker.Fragments
+		
+		if !this.hasPlannedPitstop() {
+			speaker.speakPhrase("NotPossible")
+			speaker.speakPhrase("ConfirmPlan")
+			
+			this.setContinuation(ObjBindMethod(this, "planPitstop"))
+		}
+		else {
+			speaker.speakPhrase("ConfirmNoTyreChange")
+					
+			this.setContinuation(ObjBindMethod(this, "updatePitstopTyreChange"))
+		}
+	}
+	
 	pitstopAdjustRepairRecognized(repairType, words) {
 		local action
 		
@@ -1010,7 +1033,7 @@ class RaceEngineer extends ConfigurationItem {
 		}
 	}
 	
-	updatePitstopTyreCompound(compound) {
+	updatePitstopTyreCompound(compound, color := "Black") {
 		local knowledgeBase
 		
 		speaker := this.getSpeaker()
@@ -1028,7 +1051,7 @@ class RaceEngineer extends ConfigurationItem {
 				knowledgeBase := this.KnowledgeBase
 				
 				knowledgeBase.setValue("Tyre.Compound.Target", compound)
-				knowledgeBase.setValue("Tyre.Compound.Color.Target", "Black")
+				knowledgeBase.setValue("Tyre.Compound.Color.Target", color)
 				
 				knowledgeBase.clearFact("Pitstop.Planned.Tyre.Compound")
 				knowledgeBase.clearFact("Pitstop.Planned.Tyre.Compound.Color")
@@ -1108,6 +1131,31 @@ class RaceEngineer extends ConfigurationItem {
 			knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.FR.Increment", 0)
 			knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.RL.Increment", 0)
 			knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.RR.Increment", 0)
+			
+			if this.Debug[kDebugKnowledgeBase]
+				dumpKnowledge(knowledgeBase)
+
+			speaker.speakPhrase("ConfirmPlanUpdate")
+			speaker.speakPhrase("MoreChanges")
+		}
+	}
+	
+	updatePitstopTyreChange() {
+		local knowledgeBase
+		
+		speaker := this.getSpeaker()
+		
+		if !this.hasPlannedPitstop() {
+			speaker.speakPhrase("NotPossible")
+			speaker.speakPhrase("ConfirmPlan")
+			
+			this.setContinuation(ObjBindMethod(this, "planPitstop"))
+		}
+		else {
+			knowledgeBase := this.KnowledgeBase
+		
+			knowledgeBase.setValue("Pitstop.Planned.Tyre.Compound", false)
+			knowledgeBase.setValue("Pitstop.Planned.Tyre.Compound.Color", false)
 			
 			if this.Debug[kDebugKnowledgeBase]
 				dumpKnowledge(knowledgeBase)
@@ -1800,17 +1848,26 @@ class RaceEngineer extends ConfigurationItem {
 					speaker.speakPhrase("Refuel", {litres: fuel})
 			}
 			
+			compound := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound", false)
+			
 			if ((options == true) || options.Compound) {
-				compound := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound")
-				color := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound.Color")
-				
-				if (compound = "Dry")
-					speaker.speakPhrase("DryTyres", {compound: fragments[compound], color: color, set: knowledgeBase.getValue("Pitstop.Planned.Tyre.Set")})
-				else
-					speaker.speakPhrase("WetTyres", {compound: fragments[compound], color: color, set: knowledgeBase.getValue("Pitstop.Planned.Tyre.Set")})
+				if compound {
+					color := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound.Color")
+					
+					if (compound = "Dry")
+						speaker.speakPhrase("DryTyres", {compound: fragments[compound], color: color, set: knowledgeBase.getValue("Pitstop.Planned.Tyre.Set")})
+					else
+						speaker.speakPhrase("WetTyres", {compound: fragments[compound], color: color, set: knowledgeBase.getValue("Pitstop.Planned.Tyre.Set")})
+				}
+				else {
+					if (knowledgeBase.getValue("Lap") < (knowledgeBase.getValue("Lap.Remaining.Stint") - 5))
+						speaker.speakPhrase("NoTyreChange")
+					else
+						speaker.speakPhrase("NoTyreChangeLap")
+				}
 			}
 			
-			if ((options == true) || options.Pressures) {
+			if (compound && ((options == true) || options.Pressures)) {
 				incrementFL := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL.Increment", 0), 1)
 				incrementFR := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR.Increment", 0), 1)
 				incrementRL := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL.Increment", 0), 1)
@@ -1970,6 +2027,8 @@ class RaceEngineer extends ConfigurationItem {
 	}
 	
 	damageWarning(newSuspensionDamage, newBodyworkDamage) {
+		local knowledgeBase := this.KnowledgeBase
+		
 		if this.Speaker {
 			speaker := this.getSpeaker()
 			phrase := false
@@ -1983,53 +2042,65 @@ class RaceEngineer extends ConfigurationItem {
 			
 			speaker.speakPhrase(phrase)
 	
-			speaker.speakPhrase("DamageAnalysis")
+			if (knowledgeBase.getValue("Lap") < (knowledgeBase.getValue("Lap.Remaining") - 4))
+				speaker.speakPhrase("DamageAnalysis")
+			else
+				speaker.speakPhrase("NoDamageAnalysis")
 		}
 	}
 	
 	reportDamageAnalysis(repair, stintLaps, delta) {
-		if this.Speaker {
-			speaker := this.getSpeaker()
-			
-			stintLaps := Round(stintLaps)
-			delta := Format("{:.2f}", Round(delta, 2))
-			
-			if repair {
-				speaker.speakPhrase("RepairPitstop", {laps: stintLaps, delta: delta})
+		local knowledgeBase := this.KnowledgeBase
 		
+		if (knowledgeBase.getValue("Lap") < (knowledgeBase.getValue("Lap.Remaining") - 2))
+			if this.Speaker {
+				speaker := this.getSpeaker()
+				
+				stintLaps := Round(stintLaps)
+				delta := Format("{:.2f}", Round(delta, 2))
+				
+				if repair {
+					speaker.speakPhrase("RepairPitstop", {laps: stintLaps, delta: delta})
+			
+					if (this.Listener && this.supportsPitstop()) {
+						speaker.speakPhrase("ConfirmPlan")
+					
+						this.setContinuation(ObjBindMethod(this, "planPitstop"))
+					}
+				}
+				else if (repair == false)
+					speaker.speakPhrase((delta == 0) ? "NoTimeLost" : "NoRepairPitstop", {laps: stintLaps, delta: delta})
+			}
+	}
+	
+	weatherChangeNotification(change, minutes) {
+		local knowledgeBase := this.KnowledgeBase
+		
+		if (knowledgeBase.getValue("Lap") < (knowledgeBase.getValue("Lap.Remaining") - 2))
+			if this.Speaker {
+				speaker := this.getSpeaker()
+				
+				speaker.speakPhrase(change ? "WeatherChange" : "WeatherNoChange", {minutes: minutes})
+			}
+	}
+	
+	weatherTyreChangeRecommendation(minutes, recommendedCompound) {
+		local knowledgeBase := this.KnowledgeBase
+		
+		if (knowledgeBase.getValue("Lap") < (knowledgeBase.getValue("Lap.Remaining") - 2))
+			if this.Speaker {
+				speaker := this.getSpeaker()
+				fragments := speaker.Fragments
+				
+				speaker.speakPhrase((recommendedCompound = "Wet") ? "WeatherRainChange" : "WeatherDryChange"
+								  , {minutes: minutes, compound: fragments[recommendedCompound]})
+				
 				if (this.Listener && this.supportsPitstop()) {
 					speaker.speakPhrase("ConfirmPlan")
 				
 					this.setContinuation(ObjBindMethod(this, "planPitstop"))
 				}
 			}
-			else if (repair == false)
-				speaker.speakPhrase((delta == 0) ? "NoTimeLost" : "NoRepairPitstop", {laps: stintLaps, delta: delta})
-		}
-	}
-	
-	weatherChangeNotification(change, minutes) {
-		if this.Speaker {
-			speaker := this.getSpeaker()
-			
-			speaker.speakPhrase(change ? "WeatherChange" : "WeatherNoChange", {minutes: minutes})
-		}
-	}
-	
-	weatherTyreChangeRecommendation(minutes, recommendedCompound) {
-		if this.Speaker {
-			speaker := this.getSpeaker()
-			fragments := speaker.Fragments
-			
-			speaker.speakPhrase((recommendedCompound = "Wet") ? "WeatherRainChange" : "WeatherDryChange"
-							  , {minutes: minutes, compound: fragments[recommendedCompound]})
-			
-			if (this.Listener && this.supportsPitstop()) {
-				speaker.speakPhrase("ConfirmPlan")
-			
-				this.setContinuation(ObjBindMethod(this, "planPitstop"))
-			}
-		}
 	}
 	
 	startPitstopSetup(pitstopNumber) {

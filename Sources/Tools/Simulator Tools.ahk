@@ -1315,7 +1315,7 @@ startSimulatorTools() {
 	prepareTargets(buildProgress, updateOnly)
 	
 	vTargetsCount := (vUpdateTargets.Length()
-					+ vCleanupTargets.Length() + vCopyTargets.Length() + (vBuildTargets.Length() * 2)
+					+ vCleanupTargets.Length() + (vCopyTargets.Length() * 2) + vBuildTargets.Length()
 					+ (((kMSBuildDirectory != "") && (vSpecialTargets.Length() > 0)) ? getFileNames("*", kSourcesDirectory . "Foreign\").Length() : 0))
 	
 	if !kSilentMode

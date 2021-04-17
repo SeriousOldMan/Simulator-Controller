@@ -12,6 +12,21 @@ General Release Actions
 10. Update Wiki using "update-documentation.bat"
 11. Set a Git Tag after final commit
 
+Release 2.8.5 Checklist
+=======================
+
+1. No Tyre Change Option
+   a. Documentation
+2. supportsPitstop more parameters
+   a. Documentation
+3. Late Damage Handling for Jona
+   a. Documentation
+   b. New phrase grammars
+4. Update Procedure
+   a. Phrase Grammars
+5. Splash n Dash handling for Jona
+   a. Phrase Grammars
+
 Release 2.8.2 Checklist
 =======================
 

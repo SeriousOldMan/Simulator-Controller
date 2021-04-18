@@ -1,0 +1,37 @@
+[Car Data]
+BodyworkDamage=2.31607, 0, 0, 0, 2.31607
+FuelRemaining=21.2546
+SuspensionDamage=0, 0, 0, 0
+TyreCompound=Dry
+TyreCompoundColor=Black
+TyrePressure=27.5516, 27.5155, 27.6782, 27.8131
+TyreTemperature=75.1327, 66.4234, 83.743, 74.7313
+[Session Data]
+Car=mclaren_720s_gt3
+FuelAmount=125
+RaceFormat=Time
+Simulator=ACC
+Track=monza
+[Stint Data]
+Active=true
+DriverForname=The
+DriverNickname=
+DriverSurname=BigO
+DriverTimeRemaining=6.5535e+07
+InPit=false
+LapBestTime=108516
+LapLastTime=109194
+Laps=18
+Paused=false
+RaceLapsRemaining=20.1794
+RaceTimeRemaining=2.20347e+06
+Session=Race
+StintTimeRemaining=2.20347e+06
+[Track Data]
+Grip=Optimum
+Temperature=14.4729
+[Weather Data]
+Temperature=14.4729
+Weather=Dry
+Weather10min=Dry
+Weather30min=Dry

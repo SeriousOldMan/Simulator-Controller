@@ -867,7 +867,7 @@ if !GetKeyState("Ctrl") {
 	AHKUnit.Run()
 }
 else {
-	raceNr := (GetKeyState("Alt") ? 9 : ((GetKeyState("Shift") ? 2 : 1)))
+	raceNr := (GetKeyState("Alt") ? 4 : ((GetKeyState("Shift") ? 2 : 1)))
 	engineer := new TestRaceEngineer(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Engineer.settings")
 								   , new TestPitStopHandler(), "Jona", "de", true, true)
 
@@ -1109,7 +1109,7 @@ else {
 						MsgBox Pitstop Prepare
 					}
 					
-					if (lap = 23) {
+					if (lap = 24) {
 						engineer.performPitstop(23)
 					
 						MsgBox Pitstop Perform

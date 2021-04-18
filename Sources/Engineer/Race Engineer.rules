@@ -329,7 +329,9 @@ priority: 5, {Any: [?Damage.Bodywork = 0], {None: [?Damage.Bodywork]}} => (Clear
 
 {All: [?Lap], [?Damage.Suspension > 0]} => (Prove: lapTimeDamageImpact, ?Lap, Suspension, !Damage.Supsension)
 {All: [?Lap], [?Damage.Bodywork > 0]} => (Prove: lapTimeDamageImpact, ?Lap, Bodywork, !Damage.Bodywork)
-					
+
+
+lapTimeDamageImpact(?lap, ?damageType, ?damage) <= pitstopLap(?lap), !, fail
 lapTimeDamageImpact(?lap, ?damageType, ?damage) <=																								\
 		lapAvgTime(?lap, ?lTime), preDamageLap(?damageType, ?damage, ?pdLap), lapAvgTime(?pdLap, ?pdTime),										\
 		?delta = ?pdTime - ?lTime, ?delta < 0, lapTimeStdDeviation(?pdLap, ?stdDeviation),														\
@@ -963,7 +965,8 @@ remainingStintLaps(?lap, ?remainingLaps) <= remainingSessionLaps(?lap, ?remainin
 
 remainingStintLaps(?lap, Fuel, ?remainingLaps) <= remainingSessionLaps(?lap, ?sessionLaps),														\
 												  lapRemainingFuel(?lap, ?fuelLeft), lapAvgFuel(?lap, ?fuelPerLap),								\
-												  ?fuelLaps = ?fuelLeft / ?fuelPerLap, min(?sessionLaps, ?fuelLaps, ?remainingLaps)
+												  ; ?fuelLaps = ?fuelLeft / ?fuelPerLap, min(?sessionLaps, ?fuelLaps, ?remainingLaps)
+												  ?remainingLaps = ?fuelLeft / ?fuelPerLap
 remainingStintLaps(?lap, Driver, ?remainingLaps) <= remainingStintTime(?stintTime), lapAvgTime(?lap, ?avgTime),									\
 													?remainingLaps = ?stintTime / ?avgTime
 

@@ -1,0 +1,37 @@
+[Car Data]
+BodyworkDamage=0, 0, 0, 9.91231, 9.91231
+FuelRemaining=47.4998
+SuspensionDamage=0, 0, 0, 0
+TyreCompound=Dry
+TyreCompoundColor=Black
+TyrePressure=27.4433, 27.2498, 27.1037, 26.9464
+TyreTemperature=84.0071, 80.9495, 92.9698, 91.3311
+[Session Data]
+Car=mclaren_720s_gt3
+FuelAmount=125
+RaceFormat=Time
+Simulator=ACC
+Track=nurburgring
+[Stint Data]
+Active=true
+DriverForname=The
+DriverNickname=TBO
+DriverSurname=BigO
+DriverTimeRemaining=6.5535e+07
+InPit=false
+LapBestTime=116892
+LapLastTime=175191
+Laps=11
+Paused=false
+RaceLapsRemaining=7.57392
+RaceTimeRemaining=1.32688e+06
+Session=Race
+StintTimeRemaining=1.32688e+06
+[Track Data]
+Grip=Optimum
+Temperature=35.1574
+[Weather Data]
+Temperature=27.8722
+Weather=Dry
+Weather10min=Dry
+Weather30min=Dry

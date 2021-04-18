@@ -1239,12 +1239,14 @@ class ProductionRule extends Rule {
 		iVariables := {}
 		
 		setValue(variable, value) {
-			this.iVariables[variable.Variable] := value
+			this.iVariables[variable.Variable[true]] := value
 		}
 		
 		getValue(variable, default := "__NotInitialized__") {
-			if this.iVariables.HasKey(variable.Variable)
-				return this.iVariables[variable.Variable]
+			fullName := variable.Variable[true]
+			
+			if this.iVariables.HasKey(fullName)
+				return this.iVariables[fullName]
 			else
 				return default
 		}

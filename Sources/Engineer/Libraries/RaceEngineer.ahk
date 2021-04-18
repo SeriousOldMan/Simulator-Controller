@@ -1208,10 +1208,16 @@ class RaceEngineer extends ConfigurationItem {
 				this.iSession := kSessionOther
 		}
 		
-		dataDuration := Round((getConfigurationValue(data, "Stint Data", "RaceTimeRemaining", 0) + getConfigurationValue(data, "Stint Data", "LapLastTime", 0)) / 1000)
+		lapTime := getConfigurationValue(data, "Stint Data", "LapLastTime", 0)
+		settingsLapTime := (getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.AvgTime", lapTime / 1000) * 1000)
+		
+		if ((Abs(settingsLapTime - lapTime) / settingsLapTime) > 2)
+			lapTime := settingsLapTime
+		
+		dataDuration := Round((getConfigurationValue(data, "Stint Data", "RaceTimeRemaining", 0) + lapTime) / 1000)
 		settingsDuration := getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Duration", dataDuration)
 		
-		if ((Abs(settingsDuration - dataDuration) / dataDuration) >  0.1)
+		if ((Abs(settingsDuration - dataDuration) / dataDuration) >  0.05)
 			settingsDuration := dataDuration
 		
 		facts := {"Session.Car": getConfigurationValue(data, "Session Data", "Car", "")
@@ -1464,6 +1470,10 @@ class RaceEngineer extends ConfigurationItem {
 		knowledgeBase.setFact("Weather.Weather.30Min", weather30Min)
 		
 		lapTime := getConfigurationValue(data, "Stint Data", "LapLastTime", 0)
+		settingsLapTime := (getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.AvgTime", lapTime / 1000) * 1000)
+		
+		if ((Abs(settingsLapTime - lapTime) / settingsLapTime) > 2)
+			lapTime := settingsLapTime
 		
 		knowledgeBase.addFact("Lap." . lapNumber . ".Time", lapTime)
 		knowledgeBase.addFact("Lap." . lapNumber . ".Time.Start", this.OverallTime)

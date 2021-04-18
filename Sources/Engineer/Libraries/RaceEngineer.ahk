@@ -1470,7 +1470,7 @@ class RaceEngineer extends ConfigurationItem {
 		knowledgeBase.setFact("Weather.Weather.30Min", weather30Min)
 		
 		lapTime := getConfigurationValue(data, "Stint Data", "LapLastTime", 0)
-		settingsLapTime := (getDeprecatedConfigurationValue(this.Settings, "Session Settings", "Race Settings", "Lap.AvgTime", lapTime / 1000) * 1000)
+		settingsLapTime := (getDeprecatedConfigurationValue(this.RaceSettings, "Session Settings", "Race Settings", "Lap.AvgTime", lapTime / 1000) * 1000)
 		
 		if ((Abs(settingsLapTime - lapTime) / settingsLapTime) > 2)
 			lapTime := settingsLapTime

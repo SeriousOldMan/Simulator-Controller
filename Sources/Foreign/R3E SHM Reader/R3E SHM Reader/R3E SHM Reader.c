@@ -157,8 +157,8 @@ int main()
         wprintf_s(L"SuspensionDamage=%f, %f, %f, %f\n", suspDamage, suspDamage, suspDamage, suspDamage);
         wprintf_s(L"FuelRemaining=%f\n", map_buffer->fuel_left);
         
-        char tyreCompound[5] = "Dry";
-        char tyreCompoundColor[10] = "Black";
+        char tyreCompound[6] = "Dry";
+        char tyreCompoundColor[11] = "Black";
         
         if (map_buffer->tire_subtype_front == R3E_TIRE_SUBTYPE_ALTERNATE)
             strcpy_s(tyreCompound, 5, "Wet");

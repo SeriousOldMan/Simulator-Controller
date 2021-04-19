@@ -365,10 +365,10 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 				}
 	}
 
-	changeFuelAmount(direction, liters := 5) {
+	changeFuelAmount(direction, litres := 5) {
 		if this.requirePitstopMFD()
 			if this.selectPitstopOption("Refuel")
-				this.changePitstopOption("Refuel", direction, liters)
+				this.changePitstopOption("Refuel", direction, litres)
 	}
 	
 	changeTyreSet(selection, steps := 1) {
@@ -1126,14 +1126,14 @@ changePitstopStrategy(selection, steps := 1) {
 	}
 }
 
-changePitstopFuelAmount(direction, liters := 5) {
+changePitstopFuelAmount(direction, litres := 5) {
 	if !inList(["Increase", "Decrease"], direction)
 		logMessage(kLogWarn, translate("Unsupported refuel change """) . direction . translate(""" detected in changePitstopFuelAmount - please check the configuration"))
 	
 	protectionOn()
 	
 	try {
-		SimulatorController.Instance.findPlugin(kACCPlugin).changeFuelAmount(direction, liters)
+		SimulatorController.Instance.findPlugin(kACCPlugin).changeFuelAmount(direction, litres)
 	}
 	finally {
 		protectionOff()

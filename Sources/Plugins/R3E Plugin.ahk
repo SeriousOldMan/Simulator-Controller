@@ -90,11 +90,11 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 		this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", false)
 		this.iClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
 		
-		this.iPreviousOptionHotkey := false := this.getArgumentValue("previousOptionHotkey", "W")
-		this.iNextOptionHotkey := false := this.getArgumentValue("nextOptionHotkey", "S")
-		this.iPreviousChoiceHotkey := false := this.getArgumentValue("previousChoiceHotkey", "A")
-		this.iNextChoiceHotkey := false := this.getArgumentValue("nextChoiceHotkey", "D")
-		this.iAcceptChoiceHotkey := false := this.getArgumentValue("acceptChoiceHotkey", "{Enter}")
+		this.iPreviousOptionHotkey := this.getArgumentValue("previousOptionHotkey", "W")
+		this.iNextOptionHotkey := this.getArgumentValue("nextOptionHotkey", "S")
+		this.iPreviousChoiceHotkey := this.getArgumentValue("previousChoiceHotkey", "A")
+		this.iNextChoiceHotkey := this.getArgumentValue("nextChoiceHotkey", "D")
+		this.iAcceptChoiceHotkey := this.getArgumentValue("acceptChoiceHotkey", "{Enter}")
 		
 		controller.registerPlugin(this)
 	}
@@ -195,9 +195,9 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 	}
 	
 	dialPitstopOption(option, action, steps := 1) {
-		switch direction {
+		switch action {
 			case "Increase":
-				Loop % steps {
+				Loop %steps% {
 					this.activateR3EWindow()
 
 					SendEvent % this.NextChoiceHotkey
@@ -205,7 +205,7 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 					Sleep 50
 				}
 			case "Decrease":
-				Loop % steps {
+				Loop %steps% {
 					this.activateR3EWindow()
 
 					SendEvent % this.PreviousChoiceHotkey
@@ -220,18 +220,18 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 	changePitstopOption(option, action, steps := 1) {
 		switch option {
 			case "Refuel":
-				this.changeFuelAmount(direction, liters, true)
+				this.changeFuelAmount(action, steps, true)
 			default:
 				Throw "Unsupported change operation """ . direction . """ detected in RaceEngineerSimulatorPlugin.changePitstopOption..."
 		}
 	}
 
-	changeFuelAmount(direction, liters := 5, internal := false) {
+	changeFuelAmount(direction, litres := 5, internal := false) {
 		if (internal || (this.requirePitstopMFD() && this.selectPitstopOption("Refuel"))) {
 			if this.iPitstopRefuelEntered
 				SendEvent % this.AcceptChoiceHotkey
 
-			this.dialPitstopOption("Refuel", direction, liters)
+			this.dialPitstopOption("Refuel", direction, litres)
 
 			SendEvent % this.AcceptChoiceHotkey
 			

@@ -23,6 +23,13 @@ global kR3EPlugin = "R3E"
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                         Private Constant Section                        ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global kBinaryOptions = ["Repair Aero Front", "Repair Aero Rear", "Repair Suspension"]
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -183,47 +190,82 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 		return this.openPitstopMFD()
 	}
 	
-	selectPitstopOption(option) {
-		this.activateR3EWindow()
-		
-		switch option {
-			case "Refuel":
-				return true
-			default:
-				return false
-		}
+	availableOptions() {
+		return ["Refuel"]
+	}
+	
+	optionChosen(option) {
+		return false
 	}
 	
 	dialPitstopOption(option, action, steps := 1) {
 		switch action {
 			case "Increase":
+				hotKey := (inList(kBinaryOptions, option) ? this.AcceptChoiceHotkey : this.NextChoiceHotkey)
+				
 				Loop %steps% {
 					this.activateR3EWindow()
 
-					SendEvent % this.NextChoiceHotkey
+					SendEvent %hotKey%
 
 					Sleep 50
 				}
 			case "Decrease":
+				hotKey := (inList(kBinaryOptions, option) ? this.AcceptChoiceHotkey : this.PreviousChoiceHotkey)
+				
 				Loop %steps% {
 					this.activateR3EWindow()
 
-					SendEvent % this.PreviousChoiceHotkey
+					SendEvent %hotKey%
 					
 					Sleep 50
 				}
 			default:
-				Throw "Unsupported change operation """ . direction . """ detected in R3EPlugin.dialPitstopOption..."
+				Throw "Unsupported change operation """ . action . """ detected in R3EPlugin.dialPitstopOption..."
 		}
 	}
 	
-	changePitstopOption(option, action, steps := 1) {
-		switch option {
-			case "Refuel":
-				this.changeFuelAmount(action, steps, true)
-			default:
-				Throw "Unsupported change operation """ . direction . """ detected in RaceEngineerSimulatorPlugin.changePitstopOption..."
+	selectPitstopOption(option) {
+		this.activateR3EWindow()
+		
+		index := inList(this.availableOptions(), option)
+		
+		if index {
+			index -= 1
+			
+			hotkey := this.NextOptionHotkey
+			
+			Loop %index% {
+				this.activateR3EWindow()
+
+				SendEvent %hotKey%
+
+				Sleep 50
+			}
+			
+			return true
 		}
+		else
+			return false
+	}
+	
+	changePitstopOption(option, action, steps := 1) {
+		if (option = "Refuel")
+			this.changeFuelAmount(action, steps, true)
+		else if inList(kBinaryOptions, option)
+			this.toggleActivity(option, true)
+		else
+			Throw "Unsupported change operation """ . action . """ detected in RaceEngineerSimulatorPlugin.changePitstopOption..."
+	}
+	
+	toggleActivity(activity, internal := false) {
+		if (internal || this.requirePitstopMFD())
+			if inList(kBinaryOptions, activity) {
+				if  (internal || this.selectPitstopOption(activity))
+					this.dialPitstopOption(activity, "Increase")
+			}
+			else
+				Throw "Unsupported activity """ . activity . """ detected in R3EPlugin.toggleActivity..."
 	}
 
 	changeFuelAmount(direction, litres := 5, internal := false) {
@@ -247,11 +289,18 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 		this.iPitstopMFDIsOpen := false
 		this.iPitstopRefuelEntered := false
 	}
+	
+	startPitstopSetup(pitstopNumber) {
+		; Pitstop Dialog komplett zurücksetzen
+	}
+
+	finishPitstopSetup(pitstopNumber) {
+		this.closePitstopMFD()
+	}
 
 	setPitstopRefuelAmount(pitstopNumber, litres) {
-		this.changeFuelAmount("Decrease", 85)
-		
-		this.changeFuelAmount("Increase", litres + 2)
+		if inList(this.availableOptions(), "Refuel")
+			this.changeFuelAmount("Increase", litres + 2)
 	}
 	
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
@@ -261,6 +310,17 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 	}
 
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork) {
+		if inList(this.availableOptions(), "Repair Suspension")
+			if (repairSuspension != this.chosenOption("Repair Suspension"))
+				this.toggleActivity("Repair Suspension")
+		
+		if inList(this.availableOptions(), "Repair Aero Front")
+			if (repairBodywork != this.chosenOption("Repair Aero Front"))
+				this.toggleActivity("Repair Aero Front")
+		
+		if inList(this.availableOptions(), "Repair Aero Rear")
+			if (repairBodywork != this.chosenOption("Repair Aero Rear"))
+				this.toggleActivity("Repair Aero Rear")
 	}
 	
 	updateSimulatorData(data) {

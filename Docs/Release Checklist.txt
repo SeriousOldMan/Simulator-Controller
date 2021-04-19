@@ -26,6 +26,18 @@ Release 2.8.5 Checklist
    a. Phrase Grammars
 5. Splash n Dash handling for Jona
    a. Phrase Grammars
+6. New class PitstopMode, PitstopAction, RaceEngineerAction and more refactoring in Simulator Plugin.ahk
+   a. Documentation
+   b. Translations Relocation
+7. "pitstopSettings" => "pitstopCommands" and "pitstopCommands" includes "raceEngineerCommands"
+   a. Documentation
+   b. Update Procedure
+   c. Update Notes
+8. Pitstop Mode for R3E
+   a. Documentation
+   b. Translations
+   c. Update Procedure
+   d. Controller Plugin Labels
 
 Release 2.8.2 Checklist
 =======================

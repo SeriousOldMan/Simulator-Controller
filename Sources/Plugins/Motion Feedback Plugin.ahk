@@ -819,8 +819,11 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		if this.requireSimFeedback() {
 			window := this.Application.WindowTitle
 		
-			IfWinNotActive %window%, , WinActivate, %window%
+			if !WinActive(window)
+				WinActivate %window%
+			
 			WinWaitActive %window%, , 2
+			
 			Sleep 100
 		}
 		else

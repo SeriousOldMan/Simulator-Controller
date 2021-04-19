@@ -27,6 +27,242 @@ global kR3EPlugin = "R3E"
 ;;;-------------------------------------------------------------------------;;;
 
 class R3EPlugin extends RaceEngineerSimulatorPlugin {
+	iOpenPitstopMFDHotkey := false
+	iClosePitstopMFDHotkey := false
+	
+	iPreviousOptionHotkey := false
+	iNextOptionHotkey := false
+	iPreviousChoiceHotkey := false
+	iNextChoiceHotkey := false
+	iAcceptChoiceHotkey := false
+	
+	iPitstopMFDIsOpen := false
+	
+	iPitstopRefuelEntered := false
+	
+	OpenPitstopMFDHotkey[] {
+		Get {
+			return this.iOpenPitstopMFDHotkey
+		}
+	}
+	
+	ClosePitstopMFDHotkey[] {
+		Get {
+			return this.iClosePitstopMFDHotkey
+		}
+	}
+	
+	PreviousOptionHotkey[] {
+		Get {
+			return this.iPreviousOptionHotkey
+		}
+	}
+	
+	NextOptionHotkey[] {
+		Get {
+			return this.iNextOptionHotkey
+		}
+	}
+	
+	PreviousChoiceHotkey[] {
+		Get {
+			return this.iPreviousChoiceHotkey
+		}
+	}
+	
+	NextChoiceHotkey[] {
+		Get {
+			return this.iNextChoiceHotkey
+		}
+	}
+	
+	AcceptChoiceHotkey[] {
+		Get {
+			return this.iAcceptChoiceHotkey
+		}
+	}
+	
+	__New(controller, name, simulator, configuration := false) {
+		base.__New(controller, name, simulator, configuration)
+		
+		this.iPitstopMode := this.findMode(kPitstopMode)
+		
+		this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", false)
+		this.iClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
+		
+		this.iPreviousOptionHotkey := false := this.getArgumentValue("previousOptionHotkey", "W")
+		this.iNextOptionHotkey := false := this.getArgumentValue("nextOptionHotkey", "S")
+		this.iPreviousChoiceHotkey := false := this.getArgumentValue("previousChoiceHotkey", "A")
+		this.iNextChoiceHotkey := false := this.getArgumentValue("nextChoiceHotkey", "D")
+		this.iAcceptChoiceHotkey := false := this.getArgumentValue("acceptChoiceHotkey", "{Enter}")
+		
+		controller.registerPlugin(this)
+	}
+	
+	getPitstopActions(ByRef allActions, ByRef selectActions) {
+		allActions := {Refuel: "Refuel", AeroFrontRepair: "Repair Aero Front", AeroFrontRepair: "Repair Aero Rear", SuspensionRepair: "Repair Suspension"}
+		selectActions := ["AeroFrontRepair", "AeroRearRepair", "SuspensionRepair"]
+	}
+	
+	updateSessionState(sessionState) {
+		base.updateSessionState(sessionState)
+		
+		activeModes := this.Controller.ActiveModes
+		
+		if (inList(activeModes, this.iPitstopMode))
+			this.iPitstopMode.updateActions(sessionState)
+		
+		if (sessionState == kSessionFinished) {
+			this.iPitstopRefuelEntered := false
+			this.iPitstopMFDIsOpen := false
+		}
+	}
+	
+	activateR3EWindow() {
+		window := this.Simulator.WindowTitle
+		
+		if !WinActive(window)
+			WinActivate %window%
+		
+		WinWaitActive %window%, , 2
+	}
+		
+	openPitstopMFD() {
+		static reported := false
+		
+		if !this.iPitstopMFDIsOpen {
+			this.activateR3EWindow()
+
+			if this.OpenPitstopMFDHotkey {
+				SendEvent % this.OpenPitstopMFDHotkey
+			
+				this.iPitstopMFDIsOpen := true
+				
+				return true
+			}
+			else if !reported {
+				reported := true
+			
+				logMessage(kLogCritical, translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration"))
+			
+				showMessage(translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration...")
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+						  
+				return false
+			}
+		}
+		else
+			return true
+	}
+	
+	closePitstopMFD() {
+		static reported := false
+		
+		if this.iPitstopMFDIsOpen {
+			this.activateR3EWindow()
+
+			if this.ClosePitstopMFDHotkey {
+				SendEvent % this.ClosePitstopMFDHotkey
+			
+				this.iPitstopMFDIsOpen := false
+			}
+			else if !reported {
+				reported := true
+			
+				logMessage(kLogCritical, translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration"))
+			
+				showMessage(translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration...")
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			}
+		}
+	}
+	
+	requirePitstopMFD() {
+		this.closePitstopMFD()
+		
+		return this.openPitstopMFD()
+	}
+	
+	selectPitstopOption(option) {
+		this.activateR3EWindow()
+		
+		switch option {
+			case "Refuel":
+				return true
+			default:
+				return false
+		}
+	}
+	
+	dialPitstopOption(option, action, steps := 1) {
+		switch direction {
+			case "Increase":
+				Loop % steps {
+					this.activateR3EWindow()
+
+					SendEvent % this.NextChoiceHotkey
+
+					Sleep 50
+				}
+			case "Decrease":
+				Loop % steps {
+					this.activateR3EWindow()
+
+					SendEvent % this.PreviousChoiceHotkey
+					
+					Sleep 50
+				}
+			default:
+				Throw "Unsupported change operation """ . direction . """ detected in R3EPlugin.dialPitstopOption..."
+		}
+	}
+	
+	changePitstopOption(option, action, steps := 1) {
+		switch option {
+			case "Refuel":
+				this.changeFuelAmount(direction, liters, true)
+			default:
+				Throw "Unsupported change operation """ . direction . """ detected in RaceEngineerSimulatorPlugin.changePitstopOption..."
+		}
+	}
+
+	changeFuelAmount(direction, liters := 5, internal := false) {
+		if (internal || (this.requirePitstopMFD() && this.selectPitstopOption("Refuel"))) {
+			if this.iPitstopRefuelEntered
+				SendEvent % this.AcceptChoiceHotkey
+
+			this.dialPitstopOption("Refuel", direction, liters)
+
+			SendEvent % this.AcceptChoiceHotkey
+			
+			this.iPitstopRefuelEntered := true
+		}
+	}
+	
+	supportsPitstop() {
+		return true
+	}
+	
+	pitstopFinished(pitstopNumber) {
+		this.iPitstopMFDIsOpen := false
+		this.iPitstopRefuelEntered := false
+	}
+
+	setPitstopRefuelAmount(pitstopNumber, litres) {
+		this.changeFuelAmount("Decrease", 85)
+		
+		this.changeFuelAmount("Increase", litres + 2)
+	}
+	
+	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
+	}
+
+	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
+	}
+
+	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork) {
+	}
+	
 	updateSimulatorData(data) {
 		static carDB := false
 		static lastCarID := false

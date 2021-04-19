@@ -20,7 +20,6 @@ global kACCApplication = "Assetto Corsa Competizione"
 
 global kACCPlugin = "ACC"
 global kChatMode = "Chat"
-global kPitstopMode = "Pitstop"
 
 global kFront = 0
 global kRear = 1
@@ -34,9 +33,10 @@ global kCenter = 4
 ;;;-------------------------------------------------------------------------;;;
 
 class ACCPlugin extends RaceEngineerSimulatorPlugin {
-	kOpenPitstopMFDHotkey := false
-	kClosePitstopMFDHotkey := false
 	kPSMutatingOptions := ["Strategy", "Change Tyres", "Compound", "Change Brakes"]
+	
+	iOpenPitstopMFDHotkey := false
+	iClosePitstopMFDHotkey := false
 	
 	iPSOptions := ["Pit Limiter", "Strategy", "Refuel"
 				 , "Change Tyres", "Tyre Set", "Compound", "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right"
@@ -71,148 +71,6 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 		}
 	}
 	
-	class PitstopMode extends ControllerMode {
-		Mode[] {
-			Get {
-				return kPitstopMode
-			}
-		}
-	
-		activate() {
-			base.activate()
-			
-			this.updateActions(this.Plugin.SessionState)
-		}
-		
-		updateActions(sessionState) {
-			this.updatePitstopActions(sessionState)
-			this.updateRaceEngineerActions(sessionState)
-		}			
-			
-		updatePitstopActions(sessionState) {	
-			for ignore, theAction in this.Actions
-				if isInstance(theAction, ACCPlugin.PitstopAction)
-					if ((sessionState != kSessionFinished) && (sessionState != kSessionPaused)) {
-						theAction.Function.enable(kAllTrigger)
-						theAction.Function.setText(theAction.Label)
-					}
-					else {
-						theAction.Function.disable(kAllTrigger)
-						theAction.Function.setText(theAction.Label, "Gray")
-					}
-		}
-		
-		updateRaceEngineerActions(sessionState) {
-			if !this.RaceEngineer
-				sessionState := kSessionFinished
-			
-			for ignore, theAction in this.Actions
-				if isInstance(theAction, ACCPlugin.RaceEngineerAction)
-					if (sessionState == kSessionRace) {
-						theAction.Function.enable(kAllTrigger)
-						theAction.Function.setText(theAction.Label)
-					}
-					else {
-						theAction.Function.disable(kAllTrigger)
-						theAction.Function.setText(theAction.Label, "Gray")
-					}
-		}
-	}
-	
-	class PitstopAction extends ControllerAction {
-		iPitstopOption := false
-		iSteps := 1
-		
-		Option[] {
-			Get {
-				return this.iPitstopOption
-			}
-		}
-		
-		Steps[] {
-			Get {
-				return this.iSteps
-			}
-		}
-		
-		__New(function, label, pitstopOption, steps := 1, moreArguments*) {
-			this.iPitstopOption := pitstopOption
-			this.iSteps := steps
-			
-			if (moreArguments.Length() > 0)
-				Throw "Unsupported arguments (" . values2String(", ", moreArguments*) . ") detected in PitstopAction.__New"
-			
-			base.__New(function, label)
-		}
-		
-		fireAction(function, trigger) {
-			local plugin := this.Controller.findPlugin(kACCPlugin)
-			
-			return (plugin.requirePitstopMFD() && plugin.selectPitstopOption(this.iPitstopOption))
-		}
-	}
-
-	class PitstopChangeAction extends ACCPlugin.PitstopAction {
-		iDirection := false
-		
-		__New(function, label, pitstopOption, direction, moreArguments*) {
-			this.iDirection := direction
-			
-			base.__New(function, label, pitstopOption, moreArguments*)
-		}
-		
-		fireAction(function, trigger) {
-			if base.fireAction(function, trigger)
-				this.Controller.findPlugin(kACCPlugin).changePitstopOption(this.Option, this.iDirection, this.Steps)
-		}
-	}
-	
-	class PitstopSelectAction extends ACCPlugin.PitstopChangeAction {
-		__New(function, label, pitstopOption, moreArguments*) {
-			base.__New(function, label, pitstopOption, "Increase", moreArguments*)
-		}
-	}
-
-	class PitstopToggleAction extends ACCPlugin.PitstopAction {		
-		fireAction(function, trigger) {
-			if base.fireAction(function, trigger)
-				if ((trigger == "On") || (trigger == "Increase") || (trigger == "Push") || (trigger == "Call"))
-					this.Controller.findPlugin(kACCPlugin).changePitstopOption(this.Option, "Increase", this.Steps)
-				else
-					this.Controller.findPlugin(kACCPlugin).changePitstopOption(this.Option, "Decrease", this.Steps)
-		}
-	}
-
-	class RaceEngineerAction extends ControllerAction {
-		iAction := false
-		
-		Action[] {
-			Get {
-				return this.iAction
-			}
-		}
-		
-		__New(function, label, action) {
-			this.iAction := action
-			
-			base.__New(function, label)
-		}
-		
-		fireAction(function, trigger) {
-			local plugin := this.Controller.findPlugin(kACCPlugin)
-			
-			if plugin.RaceEngineer
-				switch this.Action {
-					case "PitstopPlan":
-						plugin.planPitstop()
-					case "PitstopPrepare":
-						plugin.preparePitstop()
-					default:
-						Throw "Invalid action """ . this.Action . """ detected in RaceEngineerAction.fireAction...."
-				}
-		}
-	}
-	
 	class ChatAction extends ControllerAction {
 		iMessage := ""
 		
@@ -231,8 +89,7 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 		fireAction(function, trigger) {
 			message := this.Message
 			
-			IfWinNotActive AC2, , WinActivate, AC2
-			WinWaitActive AC2, , 2
+			this.Controller.findPlugin(kACCPlugin).activateACCWindow()
 			
 			Send {Enter}
 			Sleep 100
@@ -244,32 +101,26 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 	
 	OpenPitstopMFDHotkey[] {
 		Get {
-			return this.kOpenPitstopMFDHotkey
+			return this.iOpenPitstopMFDHotkey
 		}
 	}
 	
 	ClosePitstopMFDHotkey[] {
 		Get {
-			return this.kClosePitstopMFDHotkey
+			return this.iClosePitstopMFDHotkey
 		}
 	}
 	
 	__New(controller, name, simulator, configuration := false) {
-		; this.iChatMode := new this.ChatMode(this)
-		
 		base.__New(controller, name, simulator, configuration)
 		
-		if (this.iChatMode)
+		this.iPitstopMode := this.findMode(kPitstopMode)
+		
+		if this.iChatMode
 			this.registerMode(this.iChatMode)
 		
-		this.kOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", false)
-		this.kClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
-		
-		for ignore, theAction in string2Values(",", this.getArgumentValue("pitstopSettings", ""))
-			this.createPitstopAction(controller, string2Values(A_Space, theAction)*)
-		
-		for ignore, theAction in string2Values(",", this.getArgumentValue("raceEngineerCommands", ""))
-			this.createRaceEngineerAction(controller, string2Values(A_Space, theAction)*)
+		this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", false)
+		this.iClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
 		
 		controller.registerPlugin(this)
 	}
@@ -295,90 +146,14 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 		}
 	}
 	
-	createRaceEngineerAction(controller, action, actionFunction) {
-		local function := controller.findFunction(actionFunction)
-		static mode := false
-			
-		if (mode == false) {
-			mode := this.iPitstopMode
-		
-			if (mode == false) {
-				mode := new this.PitstopMode(this)
-				
-				this.iPitstopMode := mode
-			}
-		}
-		
-		if (function != false) {
-			if ((action = "PitstopPlan") || (action = "PitstopPrepare"))
-				mode.registerAction(new this.RaceEngineerAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Activate"), action), action))
-			else
-				logMessage(kLogWarn, translate("Action """) . action . translate(""" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
-		}
-		else
-			this.logFunctionNotFound(actionFunction)
-	}
-	
-	createPitstopAction(controller, action, increaseFunction, moreArguments*) {
-		static kActions := {Strategy: "Strategy", Refuel: "Refuel"
-						  , TyreChange: "Change Tyres", TyreSet: "Tyre Set", TyreCompound: "Compound", TyreAllAround: "All Around"
-						  , TyreFrontLeft: "Front Left", TyreFrontRight: "Front Right", TyreRearLeft: "Rear Left", TyreRearRight: "Rear Right"
-						  , BrakeChange: "Change Brakes", FrontBrake: "Front Brake", RearBrake: "Rear Brake"
-						  , DriverSelect: "Select Driver"
-						  , SuspensionRepair: "Repair Suspension", BodyworkRepair: "Repair Bodywork"}
-		static kSelectActions := ["TyreChange", "BrakeChange", "SuspensionRepair", "BodyworkRepair"]
-		static mode := false
-		local function
-		
-		if kActions.HasKey(action) {
-			decreaseFunction := false
-			
-			if (moreArguments.Length() > 0) {
-				decreaseFunction := moreArguments[1]
-				
-				if (controller.findFunction(decreaseFunction) != false)
-					moreArguments.RemoveAt(1)
-				else
-					decreaseFunction := false
-			}
-			
-			function := controller.findFunction(increaseFunction)
-			
-			if (mode == false) {
-				mode := this.iPitstopMode
-			
-				if (mode == false) {
-					mode := new this.PitstopMode(this)
-					
-					this.iPitstopMode := mode
-				}
-			}
-			
-			if !decreaseFunction {
-				if (function != false)
-					if (inList(kSelectActions, action))
-						mode.registerAction(new this.PitstopSelectAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Toggle"), action), kActions[action], moreArguments*))
-					else
-						mode.registerAction(new this.PitstopToggleAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Toggle"), action), kActions[action], moreArguments*))
-				else
-					this.logFunctionNotFound(increaseFunction)
-			}
-			else {
-				if (function != false)
-					mode.registerAction(new this.PitstopChangeAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Increase"), action), kActions[action], "Increase", moreArguments*))
-				else
-					this.logFunctionNotFound(increaseFunction)
-					
-				function := controller.findFunction(decreaseFunction)
-				
-				if (function != false)
-					mode.registerAction(new this.PitstopChangeAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Decrease"), action), kActions[action], "Decrease", moreArguments*))
-				else
-					this.logFunctionNotFound(decreaseFunction)
-			}
-		}
-		else
-			logMessage(kLogWarn, translate("Pitstop action ") . action . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
+	getPitstopActions(ByRef allActions, ByRef selectActions) {
+		allActions := {Strategy: "Strategy", Refuel: "Refuel"
+					 , TyreChange: "Change Tyres", TyreSet: "Tyre Set", TyreCompound: "Compound", TyreAllAround: "All Around"
+					 , TyreFrontLeft: "Front Left", TyreFrontRight: "Front Right", TyreRearLeft: "Rear Left", TyreRearRight: "Rear Right"
+					 , BrakeChange: "Change Brakes", FrontBrake: "Front Brake", RearBrake: "Rear Brake"
+					 , DriverSelect: "Select Driver"
+					 , SuspensionRepair: "Repair Suspension", BodyworkRepair: "Repair Bodywork"}
+		selectActions := ["TyreChange", "BrakeChange", "SuspensionRepair", "BodyworkRepair"]
 	}
 	
 	updateSessionState(sessionState) {
@@ -397,12 +172,20 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 			this.iRepairBodyworkChosen := true
 		}
 	}
+	
+	activateACCWindow() {
+		window := this.Simulator.WindowTitle
 		
+		if !WinActive(window)
+			WinActivate %window%
+		
+		WinWaitActive %window%, , 2
+	}
+	
 	openPitstopMFD(update := true) {
 		static reported := false
 		
-		IfWinNotActive AC2, , WinActivate, AC2 
-		WinWaitActive AC2, , 2
+		this.activateACCWindow()
 
 		if this.OpenPitstopMFDHotkey {
 			SendEvent % this.OpenPitstopMFDHotkey
@@ -432,8 +215,7 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 	closePitstopMFD() {
 		static reported := false
 		
-		IfWinNotActive AC2, , WinActivate, AC2
-		WinWaitActive AC2, , 2
+		this.activateACCWindow()
 
 		if this.ClosePitstopMFDHotkey {
 			SendEvent % this.ClosePitstopMFDHotkey
@@ -504,8 +286,7 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 			if (targetSelectedOption > this.iPSSelectedOption)
 				Loop % targetSelectedOption - this.iPSSelectedOption
 				{
-					IfWinNotActive AC2, , WinActivate, AC2
-					WinWaitActive AC2, , 2
+					this.activateACCWindow()
 
 					SendEvent {Down}
 					
@@ -514,8 +295,7 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 			else
 				Loop % this.iPSSelectedOption - targetSelectedOption
 				{
-					IfWinNotActive AC2, , WinActivate, AC2
-					WinWaitActive AC2, , 2
+					this.activateACCWindow()
 
 					SendEvent {Up}
 					
@@ -534,8 +314,7 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 		switch direction {
 			case "Increase":
 				Loop % steps {
-					IfWinNotActive AC2, , WinActivate, AC2
-					WinWaitActive AC2, , 2
+					this.activateACCWindow()
 
 					SendEvent {Right}
 
@@ -543,8 +322,7 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 				}
 			case "Decrease":
 				Loop % steps {
-					IfWinNotActive AC2, , WinActivate, AC2
-					WinWaitActive AC2, , 2
+					this.activateACCWindow()
 
 					SendEvent {Left}
 					
@@ -731,8 +509,7 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 		if !pitstopLabels
 			pitstopLabels := this.getLabelFileNames("PITSTOP")
 		
-		IfWinNotActive AC2, , WinActivate, AC2
-		WinWaitActive AC2, , 2
+		this.activateACCWindow()
 		
 		curTickCount := A_TickCount
 		
@@ -793,8 +570,7 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 		if !pitStrategyLabels
 			pitStrategyLabels := this.getLabelFileNames("Pit Strategy 1", "Pit Strategy 2")
 		
-		IfWinNotActive AC2, , WinActivate, AC2
-		WinWaitActive AC2, , 2
+		this.activateACCWindow()
 
 		imageX := kUndefined
 		imageY := kUndefined
@@ -866,8 +642,7 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 		if !noRefuelLabels
 			noRefuelLabels := this.getLabelFileNames("No Refuel")
 		
-		IfWinNotActive AC2, , WinActivate, AC2
-		WinWaitActive AC2, , 2
+		this.activateACCWindow()
 
 		imageX := kUndefined
 		imageY := kUndefined
@@ -942,8 +717,7 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 			compoundLabels := this.getLabelFileNames("Compound 1", "Compound 2")
 		}
 		
-		IfWinNotActive AC2, , WinActivate, AC2
-		WinWaitActive AC2, , 2
+		this.activateACCWindow()
 		
 		imageX := kUndefined
 		imageY := kUndefined
@@ -1047,8 +821,7 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 		if !frontBrakeLabels
 			frontBrakeLabels := this.getLabelFileNames("Front Brake 1", "Front Brake 2")
 		
-		IfWinNotActive AC2, , WinActivate, AC2
-		WinWaitActive AC2, , 2
+		this.activateACCWindow()
 		
 		imageX := kUndefined
 		imageY := kUndefined
@@ -1102,8 +875,7 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 		if !selectDriverLabels
 			selectDriverLabels := this.getLabelFileNames("Select Driver 1", "Select Driver 2")
 		
-		IfWinNotActive AC2, , WinActivate, AC2
-		WinWaitActive AC2, , 2
+		this.activateACCWindow()
 		
 		imageX := kUndefined
 		imageY := kUndefined
@@ -1268,8 +1040,8 @@ startACC() {
 
 stopACC() {
 	if isACCRunning() {
-		IfWinNotActive AC2, , WinActivate, AC2
-		WinWaitActive AC2, , 2
+		SimulatorController.Instance.findPlugin(kACCPlugin).activateACCWindow()
+		
 		MouseClick Left,  2093,  1052
 		Sleep 500
 		MouseClick Left,  2614,  643

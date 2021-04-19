@@ -568,7 +568,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 					for key, value in testData
 						message := message . key . " = " . value . "`n"
 
-					showMessage(message, translate("Modular Simulator Controller System"), "Information.png", 5000, "Left", "Bottom", 400, 200)
+					showMessage(message, translate("Modular Simulator Controller System"), "Information.png", 5000, "Left", "Bottom", 400, 400)
 				}
 			}
 			

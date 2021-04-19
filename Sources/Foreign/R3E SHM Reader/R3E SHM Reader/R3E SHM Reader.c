@@ -157,12 +157,8 @@ int main()
         wprintf_s(L"SuspensionDamage=%f, %f, %f, %f\n", suspDamage, suspDamage, suspDamage, suspDamage);
         wprintf_s(L"FuelRemaining=%f\n", map_buffer->fuel_left);
         
-        char tyreCompound[6] = "Dry";
         char tyreCompoundColor[11] = "Black";
         
-        if (map_buffer->tire_subtype_front == R3E_TIRE_SUBTYPE_ALTERNATE)
-            strcpy_s(tyreCompound, 5, "Wet");
-            
         if (map_buffer->tire_subtype_front == R3E_TIRE_SUBTYPE_SOFT)
             strcpy_s(tyreCompoundColor, 10, "Red");
         else if (map_buffer->tire_subtype_front == R3E_TIRE_SUBTYPE_MEDIUM)
@@ -170,7 +166,7 @@ int main()
         else if (map_buffer->tire_subtype_front == R3E_TIRE_SUBTYPE_HARD)
             strcpy_s(tyreCompoundColor, 10, "Blue");
             
-        wprintf_s(L"TyreCompound=%S\n", tyreCompound);
+        wprintf_s(L"TyreCompound=Dry\n");
         wprintf_s(L"TyreCompoundColor=%S\n", tyreCompoundColor);
         wprintf_s(L"TyreTemperature = %f, %f, %f, %f\n",
             map_buffer->tire_temp[R3E_TIRE_FRONT_LEFT].current_temp[R3E_TIRE_TEMP_CENTER],

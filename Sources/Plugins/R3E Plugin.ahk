@@ -295,7 +295,6 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 	}
 
 	finishPitstopSetup(pitstopNumber) {
-		this.closePitstopMFD()
 	}
 
 	setPitstopRefuelAmount(pitstopNumber, litres) {

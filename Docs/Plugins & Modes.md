@@ -226,7 +226,7 @@ Starting with Release 2.0, all pitstop settings of *Assetto Corsa Competizione* 
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%206.JPG)
 
-Using the buttons and dials you may change the pitstop settings in the same way as using the keyboard. All this will be achieved using the following plugin argument:
+Using the buttons and dials you may change the pitstop settings in the same way as using the keyboard. All this will be achieved using the following plugin arguments:
 
 	openPitstopMFD: P; closePitstopMFD: {Insert};
 	pitstopSettings: Strategy Dial.1, Refuel Dial.2 5, TyreSet Button.1 Button.5, TyreCompound Button.2 Button.6,
@@ -262,6 +262,8 @@ See the following table for the supported settings.
 | DriverSelect | Selects the driver for the next stint in a multiplayer team race. |
 | SuspensionRepair | Toggles the repair of the suspension components. |
 | BodyworkRepair | Toggles the repair of all the bodywork. |
+| PitstopPlan | Requests a pitstop plan from the virtual race engineer. |
+| PitstopPrepare | Requests Jona to transfer the values from the current pitstop plan to the Pitstop MFD. |
 
 Beside controlling the pitstop settings from the button box, all settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) for more information.
 
@@ -289,9 +291,48 @@ This plugin handles the *Assetto Corsa* simulation game. An application with the
 
 ## Plugin *RF2*
 
-This plugin handles the *rFactor 2* simulation game. An application with the name "rFactor 2" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startRF2" as a special function hook in this configuration. No special mode is currently defined for *rFactor 2*, but an integration with Jona is available through the "Race Engineer" plugin.
+This plugin handles the *rFactor 2* simulation game. An application with the name "rFactor 2" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startRF2" as a special function hook in this configuration. The plugin supports a mode to control the pitstop settings and an integration with Jona is available through the "Race Engineer" plugin.
 
-Important: You must install a plugin into *rFactor 2* plugins directory ([rF2]\Bin64\Plugins\) for the telemetry interface to work. You can find the plugin in the *Utilities\3rd Part\rf2_sm_tools_3.7.14.2.zip*. A Readme file is included.
+Important: You must install a plugin into *rFactor 2* plugins directory ([rF2]\Bin64\Plugins\) for the telemetry interface and the pitstop mode to work. You can find the plugin in the *Utilities\3rd Part\rf2_sm_tools_3.7.14.2.zip*. A Readme file is included.
+
+### Mode *Pitstop*
+
+Similar to the pitstop mode the plugin for *Assetto Corsa Competizione*, you can control most of the pitstop settings of *rFactor 2*. 
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%206.JPG)
+
+All this will be achieved using the following plugin arguments:
+
+	openPitstopMFD: P; closePitstopMFD: P;
+	pitstopSettings: Refuel Dial.1 5, TyreAllAround Dial.2, PitstopPlan Button.1, PitstopPrepare Button.5,
+					 TyreCompound Button.2 Button.5, RepairRequest Button.3 Button.7, DriverSelect Button.4 Button.8
+
+### Configuration
+
+First, you need to define, how to open and close the Pitstop MFD in *rFactor 2*. Please supply the bindings you have defined in the controller setup in *rFactor 2*.
+
+	openPitstopMFD: *openHotkey*; closePitstopMFD: *closeHotkey*
+	
+With the plugin parameter *pitstopSettings:* you can supply a list of the settings, you want to tweak from your hardware controller. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example tyre pressure and fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
+
+	pitstopSettings: *setting1* *settingFunction1* [*settingSteps1*],
+					 *setting2* *settingFunction2* [*settingSteps2*], ...
+					 
+See the following table for the supported settings.
+
+| Setting | Description |
+| ------ | ------ |
+| Refuel | Increment or decrement the refuel amount. Supports the additional increments argument. |
+| TyreCompound | Cycles through the available tyre compounds. |
+| TyreAllAround | Change the pressure for all tyres at once. Supports the additional increments argument. |
+| TyreFrontLeft | Change the pressure for the front left tyre. Supports the additional increments argument. |
+| TyreFrontRight | Change the pressure for the front right tyre. Supports the additional increments argument. |
+| TyreRearLeft | Change the pressure for the rear left tyre. Supports the additional increments argument. |
+| TyreRearRight | Change the pressure for the rear right tyre. Supports the additional increments argument. |
+| DriverSelect | Selects the driver for the next stint in a multiplayer team race. |
+| RepairRequest | Cycles through the available repair options. |
+| PitstopPlan | Requests a pitstop plan from the virtual race engineer. |
+| PitstopPrepare | Requests Jona to transfer the values from the current pitstop plan to the Pitstop MFD. |
 
 ## Plugin *R3E*
 

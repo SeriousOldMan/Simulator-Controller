@@ -58,6 +58,7 @@ class RF2Plugin extends RaceEngineerSimulatorPlugin {
 		allActions := {Refuel: "Refuel", TyreCompound: "Compound", TyreAllAround: "All Around"
 					 , TyreFrontLeft: "Front Left", TyreFrontRight: "Front Right", TyreRearLeft: "Rear Left", TyreRearRight: "Rear Right"
 					 , DriverSelect: "Driver", RepairRequest: "Repair"}
+		selectActions := []
 	}
 	
 	sendPitstopCommand(command, operation := false, message := false, arguments*) {

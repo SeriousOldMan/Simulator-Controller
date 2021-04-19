@@ -123,10 +123,10 @@ class PitstopAction extends ControllerAction {
 class PitstopChangeAction extends PitstopAction {
 	iDirection := false
 	
-	__New(function, label, pitstopOption, direction, moreArguments*) {
+	__New(plugin, function, label, pitstopOption, direction, moreArguments*) {
 		this.iDirection := direction
 		
-		base.__New(function, label, pitstopOption, moreArguments*)
+		base.__New(plugin, function, label, pitstopOption, moreArguments*)
 	}
 	
 	fireAction(function, trigger) {
@@ -136,8 +136,8 @@ class PitstopChangeAction extends PitstopAction {
 }
 
 class PitstopSelectAction extends PitstopChangeAction {
-	__New(function, label, pitstopOption, moreArguments*) {
-		base.__New(function, label, pitstopOption, "Increase", moreArguments*)
+	__New(plugin, function, label, pitstopOption, moreArguments*) {
+		base.__New(plugin, function, label, pitstopOption, "Increase", moreArguments*)
 	}
 }
 

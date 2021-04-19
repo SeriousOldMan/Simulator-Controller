@@ -29,12 +29,17 @@ global kCenter = 4
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                         Private Constant Section                        ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global kPSMutatingOptions = ["Strategy", "Change Tyres", "Compound", "Change Brakes"]
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 class ACCPlugin extends RaceEngineerSimulatorPlugin {
-	kPSMutatingOptions := ["Strategy", "Change Tyres", "Compound", "Change Brakes"]
-	
 	iOpenPitstopMFDHotkey := false
 	iClosePitstopMFDHotkey := false
 	
@@ -332,7 +337,7 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 				Throw "Unsupported change operation """ . direction . """ detected in ACCPlugin.changePitstopOption..."
 		}
 		
-		this.resetPitstopState(inList(this.kPSMutatingOptions, option))
+		this.resetPitstopState(inList(kPSMutatingOptions, option))
 	}
 	
 	toggleActivity(activity) {

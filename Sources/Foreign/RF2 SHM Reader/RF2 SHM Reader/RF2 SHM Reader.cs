@@ -377,7 +377,7 @@ namespace RF2SHMReader {
 			}
 		}
 
-		private void ExecuteRefuelCommand(string fuelArgument) {
+		private void ExecuteSetRefuelCommand(string fuelArgument) {
 			Console.Write("Adjusting Refuel: "); Console.WriteLine(fuelArgument);
 
 			int targetFuel = Int16.Parse(fuelArgument);
@@ -392,8 +392,15 @@ namespace RF2SHMReader {
 			else
 				SendPitstopCommand(new string('-', Math.Abs(deltaFuel)));
 		}
+		
+		private void ExecuteChangeRefuelCommand(char action, string stepsArgument) {
+			if (!SelectPitstopCategory("FUEL:"))
+				return;
 
-		private void ExecuteTyreCompoundCommand(string[] tyreCompoundArgument) {
+			SendPitstopCommand(new string(action, (int)Double.Parse(stepsArgument)));
+		}
+
+		private void ExecuteSetTyreCompoundCommand(string[] tyreCompoundArgument) {
 			string compound = tyreCompoundArgument[0];
 
 			if (tyreCompoundArgument[0] == "None") {
@@ -437,12 +444,27 @@ namespace RF2SHMReader {
 			selectAxleTyreCompound("F TIRES:");
 			selectAxleTyreCompound("R TIRES:");
 		}
+		
+		private void ExecuteChangeTyreCompoundCommand(char action, string stepsArgument) {
+			if (!SelectPitstopCategory("F TIRES:"))
+				return;
 
-		private void ExecuteTyreSetCommand(string tyreSetArgument) {
+			SendPitstopCommand(new string(action, (int)Double.Parse(stepsArgument)));
+			
+			if (!SelectPitstopCategory("R TIRES:"))
+				return;
+
+			SendPitstopCommand(new string(action, (int)Double.Parse(stepsArgument)));
+		}
+
+		private void ExecuteSetTyreSetCommand(string tyreSetArgument) {
 			Console.Write("Adjusting Tyre Set: "); Console.WriteLine(tyreSetArgument[0]);
 		}
 
-		private void ExecuteTyrePressureCommand(string[] tyrePressureArgument) {
+		private void ExecuteChangeTyreSetCommand(char action, string stepsArgument) {
+		}
+
+		private void ExecuteSetTyrePressureCommand(string[] tyrePressureArgument) {
 			void updatePressure(string category, string position, double targetPressure) {
 				targetPressure = GetKpa(targetPressure);
 
@@ -470,8 +492,22 @@ namespace RF2SHMReader {
 			updatePressure("RL PRESS:", "RL", Double.Parse(tyrePressureArgument[2]));
 			updatePressure("RR PRESS:", "RR", Double.Parse(tyrePressureArgument[3]));
 		}
+		
+		private void ExecuteChangeTyrePressureCommand(char action, string[] stepsArgument) {
+			void updatePressure(string category, double targetPressure) {
+				if (!SelectPitstopCategory(category))
+					return;
 
-		private void ExecuteRepairCommand(string repairType) {
+				SendPitstopCommand(new string(action, (int)GetKpa(targetPressure)));
+			}
+			
+			updatePressure("FL PRESS:", Double.Parse(stepsArgument[0]));
+			updatePressure("FR PRESS:", Double.Parse(stepsArgument[1]));
+			updatePressure("RL PRESS:", Double.Parse(stepsArgument[2]));
+			updatePressure("RR PRESS:", Double.Parse(stepsArgument[3]));
+		}
+
+		private void ExecuteSetRepairCommand(string repairType) {
 			Console.Write("Adjusting Repair: ");
 
 			string option = "Not";
@@ -502,26 +538,65 @@ namespace RF2SHMReader {
 			if (SelectPitstopCategory("DAMAGE:"))
 				SelectPitstopOption(option, "+");
 		}
+		
+		private void ExecuteChangeRepairCommand(char action, string stepsArgument) {
+			if (!SelectPitstopCategory("DAMAGE:"))
+				return;
 
-		public void ExecutePitstopCommand(string command, string[] arguments) {
+			SendPitstopCommand(new string(action, (int)Double.Parse(stepsArgument)));
+		}
+		
+		private void ExecuteChangeDriverCommand(char action, string stepsArgument) {
+			if (!SelectPitstopCategory("DRIVER:"))
+				return;
+
+			SendPitstopCommand(new string(action, (int)Double.Parse(stepsArgument)));
+		}
+
+		public void ExecutePitstopSetCommand(string command, string[] arguments) {
 			if (!this.connected || this.extended.mHWControlInputEnabled == 0)
 				return;
 
 			switch (command) {
 				case "Refuel":
-					ExecuteRefuelCommand(arguments[0]);
+					ExecuteSetRefuelCommand(arguments[0]);
 					break;
 				case "Tyre Compound":
-					ExecuteTyreCompoundCommand(arguments);
+					ExecuteSetTyreCompoundCommand(arguments);
 					break;
 				case "Tyre Set":
-					ExecuteTyreSetCommand(arguments[0]);
+					ExecuteSetTyreSetCommand(arguments[0]);
 					break;
 				case "Tyre Pressure":
-					ExecuteTyrePressureCommand(arguments);
+					ExecuteSetTyrePressureCommand(arguments);
 					break;
 				case "Repair":
-					ExecuteRepairCommand(arguments[0]);
+					ExecuteSetRepairCommand(arguments[0]);
+					break;
+			}
+		}
+
+		public void ExecutePitstopChangeCommand(string direction, string command, string[] arguments) {
+			if (!this.connected || this.extended.mHWControlInputEnabled == 0)
+				return;
+			
+			char action = (direction == "Increase" ? '+' : '-');
+			
+			switch (command) {
+				case "Refuel":
+					ExecuteChangeRefuelCommand(action, arguments[0]);
+					break;
+				case "Tyre Compound":
+					ExecuteChangeTyreCompoundCommand(action, arguments[0]);
+					break;
+				case "Tyre Pressure":
+					ExecuteChangeTyrePressureCommand(action, arguments);
+					break;
+				case "Driver":
+					ExecuteChangeDriverCommand(action, arguments[0]);
+					break;
+				case "Repair":
+					ExecuteChangeRepairCommand(action, arguments[0]);
 					break;
 			}
 		}

@@ -26,15 +26,49 @@ global kRF2Plugin = "RF2"
 ;;;-------------------------------------------------------------------------;;;
 
 class RF2Plugin extends RaceEngineerSimulatorPlugin {
-	sendPitstopCommand(command, message := false, arguments*) {
+	iOpenPitstopMFDHotkey := false
+	iClosePitstopMFDHotkey := false
+	
+	iPitstopMFDIsOpen := false
+	
+	OpenPitstopMFDHotkey[] {
+		Get {
+			return this.iOpenPitstopMFDHotkey
+		}
+	}
+	
+	ClosePitstopMFDHotkey[] {
+		Get {
+			return this.iClosePitstopMFDHotkey
+		}
+	}
+	
+	__New(controller, name, simulator, configuration := false) {
+		base.__New(controller, name, simulator, configuration)
+		
+		this.iPitstopMode := this.findMode(kPitstopMode)
+		
+		this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", false)
+		this.iClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
+	
+		controller.registerPlugin(this)
+	}
+	
+	getPitstopActions(ByRef allActions, ByRef selectActions) {
+		allActions := {Refuel: "Refuel", TyreCompound: "Compound", TyreAllAround: "All Around"
+					 , TyreFrontLeft: "Front Left", TyreFrontRight: "Front Right", TyreRearLeft: "Rear Left", TyreRearRight: "Rear Right"
+					 , DriverSelect: "Driver", RepairRequest: "Repair"}
+	}
+	
+	sendPitstopCommand(command, operation := false, message := false, arguments*) {
 		simulator := this.Code
 		arguments := values2String(";", arguments*)
 		
 		exePath := kBinariesDirectory . this.Code . " SHM Reader.exe"
 	
 		try {
-			if message
-				RunWait %ComSpec% /c ""%exePath%" -%command% "%message%:%arguments%"", , Hide
+			if operation
+				RunWait %ComSpec% /c ""%exePath%" -%command% "%operation%:%message%:%arguments%"", , Hide
 			else
 				RunWait %ComSpec% /c ""%exePath%" -%command%", , Hide
 		}
@@ -46,6 +80,101 @@ class RF2Plugin extends RaceEngineerSimulatorPlugin {
 			showMessage(substituteVariables(translate("Cannot start %simulator% SHM Reader (%exePath%) - please check the configuration...")
 										  , {exePath: exePath, simulator: simulator})
 					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+		}
+	}
+	
+	activateRF2Window() {
+		window := this.Simulator.WindowTitle
+		
+		if !WinActive(window)
+			WinActivate %window%
+		
+		WinWaitActive %window%, , 2
+	}
+		
+	openPitstopMFD() {
+		static reported := false
+		
+		if !this.iPitstopMFDIsOpen {
+			this.activateRF2Window()
+
+			if this.OpenPitstopMFDHotkey {
+				SendEvent % this.OpenPitstopMFDHotkey
+				
+				this.iPitstopMFDIsOpen := true
+				
+				return true
+			}
+			else if !reported {
+				reported := true
+			
+				logMessage(kLogCritical, translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration"))
+			
+				showMessage(translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration...")
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+						  
+				return false
+			}
+		}
+		else
+			return true
+	}
+	
+	closePitstopMFD() {
+		static reported := false
+		
+		if this.iPitstopMFDIsOpen {
+			this.activateRF2Window()
+
+			if this.ClosePitstopMFDHotkey {
+				SendEvent % this.ClosePitstopMFDHotkey
+			
+				this.iPitstopMFDIsOpen := false
+			}
+			else if !reported {
+				reported := true
+			
+				logMessage(kLogCritical, translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration"))
+			
+				showMessage(translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration...")
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			}
+		}
+	}
+	
+	requirePitstopMFD() {
+		this.openPitstopMFD()
+		
+		return true
+	}
+	
+	selectPitstopOption(option) {
+		options := false
+		ignore := false
+		
+		this.getPitstopActions(options, ignore)
+		
+		return inList(options, option)
+	}
+	
+	changePitstopOption(option, action, steps := 1) {
+		switch option {
+			case "Refuel":
+				this.sendPitstopCommand("Pitstop", action, "Refuel", Round(steps))
+			case "Compound":
+				this.sendPitstopCommand("Pitstop", action, "Tyre Compound", Round(steps))
+			case "All Around":
+				this.sendPitstopCommand("Pitstop", action, "Tyre Pressure", Round(steps * 0.1, 1), Round(steps * 0.1, 1), Round(steps * 0.1, 1), Round(steps * 0.1, 1))
+			case "Front Left":
+				this.sendPitstopCommand("Pitstop", action, "Tyre Pressure", Round(steps * 0.1, 1), 0.0, 0.0, 0.0)
+			case "Front Right":
+				this.sendPitstopCommand("Pitstop", action, "Tyre Pressure", 0.0, Round(steps * 0.1, 1), 0.0, 0.0)
+			case "Rear Left":
+				this.sendPitstopCommand("Pitstop", action, "Tyre Pressure", 0.0, 0.0, Round(steps * 0.1, 1), 0.0)
+			case "Rear Right":
+				this.sendPitstopCommand("Pitstop", action, "Tyre Pressure", 0.0, 0.0, 0.0, Round(steps * 0.1, 1))
+			case "Driver", "Repair":
+				this.sendPitstopCommand("Pitstop", action, option, Round(steps))
 		}
 	}
 	
@@ -62,33 +191,33 @@ class RF2Plugin extends RaceEngineerSimulatorPlugin {
 	}
 	
 	setPitstopRefuelAmount(pitstopNumber, litres) {
-		this.sendPitstopCommand("Pitstop", "Refuel", Round(litres))
+		this.sendPitstopCommand("Pitstop", "Set", "Refuel", Round(litres))
 	}
 	
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
 		if compound {
-			this.sendPitstopCommand("Pitstop", "Tyre Compound", compound, compoundColor)
+			this.sendPitstopCommand("Pitstop", "Set", "Tyre Compound", compound, compoundColor)
 			
 			if set
-				this.sendPitstopCommand("Pitstop", "Tyre Set", Round(set))
+				this.sendPitstopCommand("Pitstop", "Set", "Tyre Set", Round(set))
 		}
 		else
-			this.sendPitstopCommand("Pitstop", "Tyre Compound", "None")
+			this.sendPitstopCommand("Pitstop", "Set", "Tyre Compound", "None")
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
-		this.sendPitstopCommand("Pitstop", "Tyre Pressure", Round(pressureFL, 1), Round(pressureFR, 1), Round(pressureRL, 1), Round(pressureRR, 1))
+		this.sendPitstopCommand("Pitstop", "Set", "Tyre Pressure", Round(pressureFL, 1), Round(pressureFR, 1), Round(pressureRL, 1), Round(pressureRR, 1))
 	}
 
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork) {
 		if (repairBodywork && repairSuspension)
-			this.sendPitstopCommand("Pitstop", "Repair", "Both")
+			this.sendPitstopCommand("Pitstop", "Set", "Repair", "Both")
 		else if repairSuspension
-			this.sendPitstopCommand("Pitstop", "Repair", "Suspension")
+			this.sendPitstopCommand("Pitstop", "Set", "Repair", "Suspension")
 		else if repairBodywork
-			this.sendPitstopCommand("Pitstop", "Repair", "Bodywork")
+			this.sendPitstopCommand("Pitstop", "Set", "Repair", "Bodywork")
 		else
-			this.sendPitstopCommand("Pitstop", "Repair", "Nothing")
+			this.sendPitstopCommand("Pitstop", "Set", "Repair", "Nothing")
 	}
 }
 

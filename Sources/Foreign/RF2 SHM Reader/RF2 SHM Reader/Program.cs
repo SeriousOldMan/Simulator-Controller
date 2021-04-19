@@ -24,7 +24,10 @@ namespace RF2SHMReader {
             if (args.Length > 0 && args[0] == "-Pitstop") {
                 string[] arguments = args[1].Split(':');
 
-                reader.ExecutePitstopCommand(arguments[0], arguments[1].Split(';'));
+                if (arguments[0] == "Set")
+                    reader.ExecutePitstopSetCommand(arguments[1], arguments[2].Split(';'));
+                else if ((arguments[0] == "Increase") || (arguments[0] == "Decrease"))
+                    reader.ExecutePitstopChangeCommand(arguments[1], arguments[0], arguments[2].Split(';'));
             }
             else if (args.Length > 0 && args[0] == "-Setup")
                 reader.ReadSetup();

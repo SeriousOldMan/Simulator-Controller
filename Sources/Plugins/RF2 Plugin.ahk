@@ -183,14 +183,6 @@ class RF2Plugin extends RaceEngineerSimulatorPlugin {
 		return true
 	}
 	
-	startPitstopSetup(pitstopNumber) {
-		this.sendPitstopCommand("Setup")
-	}
-
-	finishPitstopSetup(pitstopNumber) {
-		this.sendPitstopCommand("Setup")
-	}
-	
 	setPitstopRefuelAmount(pitstopNumber, litres) {
 		this.sendPitstopCommand("Pitstop", "Set", "Refuel", Round(litres))
 	}

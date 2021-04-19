@@ -494,11 +494,13 @@ namespace RF2SHMReader {
 		}
 		
 		private void ExecuteChangeTyrePressureCommand(char action, string[] stepsArgument) {
-			void updatePressure(string category, double targetPressure) {
-				if (!SelectPitstopCategory(category))
-					return;
+			void updatePressure(string category, double pressureIncrement) {
+				if (pressureIncrement != 0.0) {
+					if (!SelectPitstopCategory(category))
+						return;
 
-				SendPitstopCommand(new string(action, (int)GetKpa(targetPressure)));
+					SendPitstopCommand(new string(action, (int)GetKpa(pressureIncrement)));
+				}
 			}
 			
 			updatePressure("FL PRESS:", Double.Parse(stepsArgument[0]));

@@ -238,7 +238,7 @@ First, you need to define, how to open and close the Pitstop MFD in *Assetto Cor
 
 	openPitstopMFD: *openHotkey*; closePitstopMFD: *closeHotkey*
 	
-With the plugin parameter *pitstopSettings:* you can supply a list of the settings, you want to tweak from your hardware controller. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example tyre pressure and fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
+With the plugin parameter *pitstopSettings:* you can supply a list of the settings, you want to tweak from your hardware controller, when the "Pitstop" mode is active. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example tyre pressure and fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
 
 	pitstopSettings: *setting1* *settingFunction1* [*settingSteps1*],
 					 *setting2* *settingFunction2* [*settingSteps2*], ...
@@ -299,7 +299,7 @@ Important: You must install a plugin into *rFactor 2* plugins directory ([rF2]\B
 
 Similar to the pitstop mode the plugin for *Assetto Corsa Competizione*, you can control most of the pitstop settings of *rFactor 2*. 
 
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%206.JPG)
+![](*)
 
 All this will be achieved using the following plugin arguments:
 
@@ -313,7 +313,7 @@ First, you need to define, how to open and close the Pitstop MFD in *rFactor 2*.
 
 	openPitstopMFD: *openHotkey*; closePitstopMFD: *closeHotkey*
 	
-With the plugin parameter *pitstopSettings:* you can supply a list of the settings, you want to tweak from your hardware controller. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example tyre pressure and fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
+With the plugin parameter *pitstopSettings:* you can supply a list of the settings, you want to tweak from your hardware controller, when the "Pitstop" mode is active. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example tyre pressure and fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
 
 	pitstopSettings: *setting1* *settingFunction1* [*settingSteps1*],
 					 *setting2* *settingFunction2* [*settingSteps2*], ...

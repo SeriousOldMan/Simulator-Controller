@@ -28,6 +28,13 @@ global kSessionStateNames = ["Other", "Practice", "Qualification", "Race"]
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                        Private Variable Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global vRunningSimulator = false
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 	
@@ -203,6 +210,8 @@ class SimulatorPlugin extends ControllerPlugin {
 			else
 				this.createPitstopAction(controller, arguments*)
 		}
+	
+		controller.registerPlugin(this)
 	}
 	
 	createPitstopAction(controller, action, increaseFunction, moreArguments*) {
@@ -260,6 +269,11 @@ class SimulatorPlugin extends ControllerPlugin {
 		logMessage(kLogWarn, translate("Action """) . action . translate(""" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
 	}
 	
+	getPitstopActions(ByRef allActions, ByRef selectActions) {
+		allActions := {}
+		selectActions := []
+	}
+	
 	runningSimulator() {
 		return (this.Simulator.isRunning() ? this.Simulator.Application : false)
 	}
@@ -267,15 +281,22 @@ class SimulatorPlugin extends ControllerPlugin {
 	simulatorStartup(simulator) {
 		base.simulatorStartup(simulator)
 		
-		if (simulator = this.Simulator.Application)
+		if (simulator = this.Simulator.Application) {
 			this.updateSessionState(kSessionFinished)
+			
+			vRunningSimulator := this
+		}
 	}
 	
 	simulatorShutdown(simulator) {
 		base.simulatorShutdown(simulator)
 		
-		if (simulator = this.Simulator.Application)
+		if (simulator = this.Simulator.Application) {
 			this.updateSessionState(kSessionFinished)
+			
+			if (vRunningSimulator == this)
+				vRunningSimulator := false
+		}
 	}
 	
 	updateSessionState(sessionState) {
@@ -292,6 +313,11 @@ class SimulatorPlugin extends ControllerPlugin {
 		
 		if (mode && inList(this.Controller.ActiveModes, mode))
 			mode.updateActions(sessionState)
+	}
+	
+	updatePitstopOoption(option, action, steps := 1) {
+		if (this.requirePitstopMFD() && this.selectPitstopOption(option))
+			this.changePitstopOption(option, action, steps)
 	}
 	
 	selectPitstopOption(option) {
@@ -312,6 +338,12 @@ class SimulatorPlugin extends ControllerPlugin {
 	
 	requirePitstopMFD() {
 		return false
+	}
+	
+	toggleActivity() {
+	}
+	
+	changeStrategy() {
 	}
 }
 
@@ -395,11 +427,6 @@ class RaceEngineerSimulatorPlugin extends SimulatorPlugin {
 			this.logFunctionNotFound(actionFunction)
 	}
 	
-	getPitstopActions(ByRef allActions, ByRef selectActions) {
-		allActions := {}
-		selectActions := []
-	}
-	
 	simulatorStartup(simulator) {
 		base.simulatorStartup(simulator)
 		
@@ -470,5 +497,227 @@ class RaceEngineerSimulatorPlugin extends SimulatorPlugin {
 	}
 	
 	updateSimulatorData(data) {
+	}
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                    Private Function Declaration Section                 ;;;
+;;;-------------------------------------------------------------------------;;;
+
+getCurrentSimulatorPlugin(option := false) {
+	if vRunningSimulator {
+		if option {
+			actions := false
+			ignore := false
+			
+			vRunningSimulator.getPitstopActions(actions, ignore)
+			
+			for ignore, candidate in actions
+				if (candidate = option)
+					return vRunningSimulator
+				
+			return false
+		}
+		else
+			return vRunningSimulator
+	}
+	else
+		return false
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                         Controller Action Section                       ;;;
+;;;-------------------------------------------------------------------------;;;
+
+openPitstopMFD() {
+	local plugin := getCurrentSimulatorPlugin()
+	
+	if plugin {
+		protectionOn()
+		
+		try {
+			plugin.openPitstopMFD()
+		}
+		finally {
+			protectionOff()
+		}
+	}
+}
+
+closePitstopMFD() {
+	local plugin := getCurrentSimulatorPlugin()
+	
+	if plugin {
+		protectionOn()
+		
+		try {
+			plugin.closePitstopMFD()
+		}
+		finally {
+			protectionOff()
+		}
+	}
+}
+
+changePitstopStrategy(selection, steps := 1) {
+	local plugin
+	
+	if !inList(["Next", "Previous"], selection)
+		logMessage(kLogWarn, translate("Unsupported strategy selection """) . selection . translate(""" detected in changePitstopStrategy - please check the configuration"))
+	
+	plugin := getCurrentSimulatorPlugin("Strategy")
+	
+	if plugin {
+		protectionOn()
+	
+		try {
+			plugin.updatePitstopOption("Strategy", (selection = "Next") ? "Increase" : "Decrease", steps)
+		}
+		finally {
+			protectionOff()
+		}
+	}
+}
+
+changePitstopFuelAmount(direction, litres := 5) {
+	local plugin := getCurrentSimulatorPlugin("Refuel")
+	
+	if plugin {
+		protectionOn()
+	
+		try {
+			plugin.updatePitstopOption("Refuel", direction, litres)
+		}
+		finally {
+			protectionOff()
+		}
+	}
+}
+
+changePitstopTyreCompound(selection) {
+	local plugin
+	
+	if !inList(["Next", "Previous"], selection)
+		logMessage(kLogWarn, translate("Unsupported tyre compound selection """) . selection . translate(""" detected in changePitstopTyreCompound - please check the configuration"))
+	
+	plugin := getCurrentSimulatorPlugin("Tyre Compound")
+	
+	if plugin {
+		protectionOn()
+		
+		try {
+			plugin.updatePitstopOption("Tyre Compound", (selection = "Next") ? "Increase" : "Decrease")
+		}
+		finally {
+			protectionOff()
+		}
+	}
+}
+
+changePitstopTyreSet(selection, steps := 1) {
+	local plugin
+	
+	if !inList(["Next", "Previous"], selection)
+		logMessage(kLogWarn, translate("Unsupported tyre set selection """) . selection . translate(""" detected in changePitstopTyreSet - please check the configuration"))
+	
+	plugin := getCurrentSimulatorPlugin("Tyre Set")
+	
+	if plugin {
+		protectionOn()
+		
+		try {
+			plugin.updatePitstopOption("Tyre Set", (selection = "Next") ? "Increase" : "Decrease", steps)
+		}
+		finally {
+			protectionOff()
+		}
+	}
+}
+
+changePitstopTyrePressure(tyre, direction, increments := 1) {
+	local plugin
+	
+	if !inList(["All Around", "Front Left", "Front Right", "Rear Left", "Rear Right"], tyre)
+		logMessage(kLogWarn, translate("Unsupported tyre position """) . tyre . translate(""" detected in changePitstopTyrePressure - please check the configuration"))
+		
+	if !inList(["Increase", "Decrease"], direction)
+		logMessage(kLogWarn, translate("Unsupported pressure change """) . direction . translate(""" detected in changePitstopTyrePressure - please check the configuration"))
+	
+	plugin := getCurrentSimulatorPlugin(tyre)
+	
+	if plugin {
+		protectionOn()
+		
+		try {
+			plugin.updatePitstopOption(tyre, direction, increments)
+		}
+		finally {
+			protectionOff()
+		}
+	}
+}
+
+changePitstopBrakeType(brake, selection) {
+	local plugin
+	
+	if !inList(["Front Brake", "Rear Brake"], selection)
+		logMessage(kLogWarn, translate("Unsupported brake unit """) . brake . translate(""" detected in changePitstopBrakeType - please check the configuration"))
+	
+	if !inList(["Next", "Previous"], selection)
+		logMessage(kLogWarn, translate("Unsupported brake selection """) . selection . translate(""" detected in changePitstopBrakeType - please check the configuration"))
+	
+	plugin := getCurrentSimulatorPlugin(brake)
+	
+	if plugin {
+		protectionOn()
+	
+		try {
+			plugin.updatePitstopOption(brake, (selection = "Next") ? "Increase" : "Decrease")
+		}
+		finally {
+			protectionOff()
+		}
+	}
+}
+
+changePitstopDriver(selection) {
+	local plugin
+	
+	if !inList(["Next", "Previous"], selection)
+		logMessage(kLogWarn, translate("Unsupported driver selection """) . selection . translate(""" detected in changePitstopDriver - please check the configuration"))
+	
+	plugin := getCurrentSimulatorPlugin("Driver")
+	
+	if plugin {
+		protectionOn()
+	
+		try {
+			plugin.updatePitstopOption("Driver", (selection = "Next") ? "Increase" : "Decrease")
+		}
+		finally {
+			protectionOff()
+		}
+	}
+}
+
+changePitstopOption(option, selection) {
+	local plugin
+	
+	if !inList(["Next", "Previous", "Increase", "Decrease"], selection)
+		logMessage(kLogWarn, translate("Unsupported option selection """) . selection . translate(""" detected in changePitstopOption - please check the configuration"))
+	
+	plugin := getCurrentSimulatorPlugin(option)
+	
+	if plugin {
+		protectionOn()
+	
+		try {
+			plugin.updatePitstopOption(option, (selection = "Next") ? "Increase" : "Decrease")
+		}
+		finally {
+			protectionOff()
+		}
 	}
 }

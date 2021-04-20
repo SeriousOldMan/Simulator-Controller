@@ -15,6 +15,7 @@ General Release Actions
 Release 2.8.5 Checklist
 =======================
 
+0. Search for new or broken links (*)
 1. No Tyre Change Option
    a. Documentation
 2. supportsPitstop more parameters
@@ -32,6 +33,7 @@ Release 2.8.5 Checklist
 6. New class PitstopMode, PitstopAction, RaceEngineerAction and more refactoring in Simulator Plugin.ahk
    a. Documentation
    b. Translations Relocation
+   c. Classes Reference.md
 7. "pitstopSettings" => "pitstopCommands" and "pitstopCommands" includes "raceEngineerCommands"
    a. Documentation
    b. Update Procedure
@@ -41,6 +43,12 @@ Release 2.8.5 Checklist
    b. Translations
    c. Update Procedure
    d. Controller Plugin Labels
+9. Moved Pitstop Actions from ACC to Simulator Plugin
+   - - toggleActivity
+   - + changePitstopOption
+   a. Updates.md
+   b. Installation & Setup.md
+   c. Function Reference.md
 
 Release 2.8.2 Checklist
 =======================

@@ -29,8 +29,6 @@ class RF2Plugin extends RaceEngineerSimulatorPlugin {
 	iOpenPitstopMFDHotkey := false
 	iClosePitstopMFDHotkey := false
 	
-	iPitstopMFDIsOpen := false
-	
 	OpenPitstopMFDHotkey[] {
 		Get {
 			return this.iOpenPitstopMFDHotkey
@@ -46,16 +44,12 @@ class RF2Plugin extends RaceEngineerSimulatorPlugin {
 	__New(controller, name, simulator, configuration := false) {
 		base.__New(controller, name, simulator, configuration)
 		
-		this.iPitstopMode := this.findMode(kPitstopMode)
-		
 		this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", false)
 		this.iClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
-	
-		controller.registerPlugin(this)
 	}
 	
 	getPitstopActions(ByRef allActions, ByRef selectActions) {
-		allActions := {Refuel: "Refuel", TyreCompound: "Compound", TyreAllAround: "All Around"
+		allActions := {Refuel: "Refuel", TyreCompound: "Tyre Compound", TyreAllAround: "All Around"
 					 , TyreFrontLeft: "Front Left", TyreFrontRight: "Front Right", TyreRearLeft: "Rear Left", TyreRearRight: "Rear Right"
 					 , DriverSelect: "Driver", RepairRequest: "Repair"}
 		selectActions := []
@@ -102,8 +96,6 @@ class RF2Plugin extends RaceEngineerSimulatorPlugin {
 			if this.OpenPitstopMFDHotkey {
 				SendEvent % this.OpenPitstopMFDHotkey
 				
-				this.iPitstopMFDIsOpen := true
-				
 				return true
 			}
 			else if !reported {
@@ -129,8 +121,6 @@ class RF2Plugin extends RaceEngineerSimulatorPlugin {
 
 			if this.ClosePitstopMFDHotkey {
 				SendEvent % this.ClosePitstopMFDHotkey
-			
-				this.iPitstopMFDIsOpen := false
 			}
 			else if !reported {
 				reported := true
@@ -144,25 +134,27 @@ class RF2Plugin extends RaceEngineerSimulatorPlugin {
 	}
 	
 	requirePitstopMFD() {
-		this.openPitstopMFD()
-		
 		return true
 	}
 	
 	selectPitstopOption(option) {
-		options := false
+		actions := false
 		ignore := false
 		
-		this.getPitstopActions(options, ignore)
+		this.getPitstopActions(actions, ignore)
 		
-		return inList(options, option)
+		for ignore, candidate in actions
+			if (candidate = option)
+				return true
+			
+		return false
 	}
 	
 	changePitstopOption(option, action, steps := 1) {
 		switch option {
 			case "Refuel":
 				this.sendPitstopCommand("Pitstop", action, "Refuel", Round(steps))
-			case "Compound":
+			case "Tyre Compound":
 				this.sendPitstopCommand("Pitstop", action, "Tyre Compound", Round(steps))
 			case "All Around":
 				this.sendPitstopCommand("Pitstop", action, "Tyre Pressure", Round(steps * 0.1, 1), Round(steps * 0.1, 1), Round(steps * 0.1, 1), Round(steps * 0.1, 1))

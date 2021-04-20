@@ -32,7 +32,7 @@ global kCenter = 4
 ;;;                         Private Constant Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kPSMutatingOptions = ["Strategy", "Change Tyres", "Compound", "Change Brakes"]
+global kPSMutatingOptions = ["Strategy", "Change Tyres", "Tyre Compound", "Change Brakes"]
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -44,7 +44,7 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 	iClosePitstopMFDHotkey := false
 	
 	iPSOptions := ["Pit Limiter", "Strategy", "Refuel"
-				 , "Change Tyres", "Tyre Set", "Compound", "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right"
+				 , "Change Tyres", "Tyre Set", "Tyre Compound", "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right"
 				 , "Change Brakes", "Front Brake", "Rear Brake", "Repair Suspension", "Repair Bodywork"]
 	
 	iPSTyreOptionPosition := inList(this.iPSOptions, "Change Tyres")
@@ -153,7 +153,7 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 	
 	getPitstopActions(ByRef allActions, ByRef selectActions) {
 		allActions := {Strategy: "Strategy", Refuel: "Refuel"
-					 , TyreChange: "Change Tyres", TyreSet: "Tyre Set", TyreCompound: "Compound", TyreAllAround: "All Around"
+					 , TyreChange: "Change Tyres", TyreSet: "Tyre Set", TyreCompound: "Tyre Compound", TyreAllAround: "All Around"
 					 , TyreFrontLeft: "Front Left", TyreFrontRight: "Front Right", TyreRearLeft: "Rear Left", TyreRearRight: "Rear Right"
 					 , BrakeChange: "Change Brakes", FrontBrake: "Front Brake", RearBrake: "Rear Brake"
 					 , DriverSelect: "Select Driver"
@@ -340,6 +340,30 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 		this.resetPitstopState(inList(kPSMutatingOptions, option))
 	}
 	
+	updatePitstopOoption(option, action, steps := 1) {
+		if inList(["Change Tyres", "Change Brakes", "Repair Bodywork", "Repair Suspension"], option)
+			this.toggleActivity(option)
+		else
+			switch option {
+				case "Strategy":
+					this.changeStrategy(action, steps)
+				case "Refuel":
+					this.changeFuelAmount(action, steps)
+				case "Tyre Compound":
+					this.changeTyreCompound(action)
+				case "Tyre Set":
+					this.changeTyreSet(action, steps)
+				case "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right":
+					this.changeTyrePressure(option, action, steps)
+				case "Front Brake", "Rear Brake":
+					this.changeBrakeType(option, action)
+				case "Driver":
+					this.changeDriver(action)
+				default:
+					base.updatePitstopOption(option, action, steps)
+			}
+	}
+	
 	toggleActivity(activity) {
 		if this.requirePitstopMFD()
 			switch activity {
@@ -365,6 +389,8 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 						this.changePitstopOption("Strategy", "Increase")
 					case "Previous":
 						this.changePitstopOption("Strategy", "Decrease")
+					case "Increase", "Decrease":
+						this.changePitstopOption("Strategy", selection)
 					default:
 						Throw "Unsupported selection """ . selection . """ detected in ACCPlugin.changeStrategy..."
 				}
@@ -376,6 +402,21 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 				this.changePitstopOption("Refuel", direction, litres)
 	}
 	
+	changeTyreCompound(type) {
+		if this.requirePitstopMFD()
+			if this.selectPitstopOption("Tyre Compound")
+				switch type {
+					case "Wet":
+						this.changePitstopOption("Tyre Compound", "Increase")
+					case "Dry":
+						this.changePitstopOption("Tyre Compound", "Decrease")
+					case "Increase", "Decrease":
+						this.changePitstopOption("Tyre Compound", type)
+					default:
+						Throw "Unsupported selection """ . selection . """ detected in ACCPlugin.changeTyreCompound..."
+				}
+	}
+	
 	changeTyreSet(selection, steps := 1) {
 		if this.requirePitstopMFD()
 			if this.selectPitstopOption("Tyre set")
@@ -384,21 +425,10 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 						this.changePitstopOption("Tyre set", "Increase", steps)
 					case "Previous":
 						this.changePitstopOption("Tyre set", "Decrease", steps)
+					case "Increase", "Decrease":
+						this.changePitstopOption("Strategy", selection)
 					default:
 						Throw "Unsupported selection """ . selection . """ detected in ACCPlugin.changeTyreSet..."
-				}
-	}
-	
-	changeTyreCompound(type) {
-		if this.requirePitstopMFD()
-			if this.selectPitstopOption("Compound")
-				switch type {
-					case "Wet":
-						this.changePitstopOption("Compound", "Increase")
-					case "Dry":
-						this.changePitstopOption("Compound", "Decrease")
-					default:
-						Throw "Unsupported selection """ . selection . """ detected in ACCPlugin.changeTyreCompound..."
 				}
 	}
 	
@@ -435,6 +465,8 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 						this.changePitstopOption(brake, "Increase")
 					case "Previous":
 						this.changePitstopOption(brake, "Decrease")
+					case "Increase", "Decrease":
+						this.changePitstopOption(brake, selection)
 					default:
 						Throw "Unsupported selection """ . selection . """ detected in ACCPlugin.changeBrakeType..."
 				}
@@ -449,6 +481,8 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 						this.changePitstopOption("Strategy", "Increase")
 					case "Previous":
 						this.changePitstopOption("Strategy", "Decrease")
+					case "Increase", "Decrease":
+						this.changePitstopOption("Strategy", selection)
 					default:
 						Throw "Unsupported selection """ . selection . """ detected in ACCPlugin.changeDriver..."
 				}
@@ -763,7 +797,7 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 		}
 		else {
 			if !inList(this.iPSOptions, "Tyre Set") {
-				this.iPSOptions.InsertAt(inList(this.iPSOptions, "Compound"), "Tyre Set")
+				this.iPSOptions.InsertAt(inList(this.iPSOptions, "Tyre Compound"), "Tyre Set")
 				this.iPSTyreOptions := 7
 				
 				this.iPSBrakeOptionPosition := inList(this.iPSOptions, "Change Brakes")
@@ -1005,7 +1039,7 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 				changePitstopTyreSet((tyreSetIncrement > 0) ? "Next" : "Previous", Abs(tyreSetIncrement))
 		}
 		else if this.iPSChangeTyres
-			togglePitstopActivity("Change Tyres")
+			this.toggleActivity("Change Tyres")
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
@@ -1028,10 +1062,10 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork) {
 		if (repairSuspension != this.iRepairSuspensionChosen)
-			togglePitstopActivity("Repair Suspension")
+			this.toggleActivity("Repair Suspension")
 			
 		if (repairBodywork != this.iRepairBodyworkChosen)
-			togglePitstopActivity("Repair Bodywork")
+			this.toggleActivity("Repair Bodywork")
 	}
 }
 
@@ -1074,151 +1108,6 @@ isACCRunning() {
 	}
 		
 	return running
-}
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                         Controller Action Section                       ;;;
-;;;-------------------------------------------------------------------------;;;
-
-openPitstopMFD() {
-	protectionOn()
-	
-	try {
-		SimulatorController.Instance.findPlugin(kACCPlugin).openPitstopMFD()
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-closePitstopMFD() {
-	protectionOn()
-	
-	try {
-		SimulatorController.Instance.findPlugin(kACCPlugin).closePitstopMFD()
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-togglePitstopActivity(activity) {
-	if !inList(["Change Tyres", "Change Brakes", "Repair Bodywork", "Repair Suspension"], activity)
-		logMessage(kLogWarn, translate("Unsupported pit stop activity """) . activity . translate(""" detected in togglePitstopActivity - please check the configuration"))
-	
-	protectionOn()
-	
-	try {
-		SimulatorController.Instance.findPlugin(kACCPlugin).toggleActivity(activity)
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-changePitstopStrategy(selection, steps := 1) {
-	if !inList(["Next", "Previous"], selection)
-		logMessage(kLogWarn, translate("Unsupported strategy selection """) . selection . translate(""" detected in changePitstopStrategy - please check the configuration"))
-	
-	protectionOn()
-	
-	try {
-		SimulatorController.Instance.findPlugin(kACCPlugin).changeStrategy(selection, steps)
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-changePitstopFuelAmount(direction, litres := 5) {
-	if !inList(["Increase", "Decrease"], direction)
-		logMessage(kLogWarn, translate("Unsupported refuel change """) . direction . translate(""" detected in changePitstopFuelAmount - please check the configuration"))
-	
-	protectionOn()
-	
-	try {
-		SimulatorController.Instance.findPlugin(kACCPlugin).changeFuelAmount(direction, litres)
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-changePitstopTyreSet(selection, steps := 1) {
-	if !inList(["Next", "Previous"], selection)
-		logMessage(kLogWarn, translate("Unsupported tyre set selection """) . selection . translate(""" detected in changePitstopTyreSet - please check the configuration"))
-	
-	protectionOn()
-	
-	try {
-		SimulatorController.Instance.findPlugin(kACCPlugin).changeTyreSet(selection, steps)
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-changePitstopTyreCompound(compound) {
-	if !inList(["Wet", "Dry"], compound)
-		logMessage(kLogWarn, translate("Unsupported tyre compound """) . compound . translate(""" detected in changePitstopTyreCompound - please check the configuration"))
-	
-	protectionOn()
-	
-	try {
-		SimulatorController.Instance.findPlugin(kACCPlugin).changeTyreCompound(compound)
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-changePitstopTyrePressure(tyre, direction, increments := 1) {
-	if !inList(["All Around", "Front Left", "Front Right", "Rear Left", "Rear Right"], tyre)
-		logMessage(kLogWarn, translate("Unsupported tyre position """) . tyre . translate(""" detected in changePitstopTyrePressure - please check the configuration"))
-		
-	if !inList(["Increase", "Decrease"], direction)
-		logMessage(kLogWarn, translate("Unsupported pressure change """) . direction . translate(""" detected in changePitstopTyrePressure - please check the configuration"))
-	
-	protectionOn()
-	
-	try {
-		SimulatorController.Instance.findPlugin(kACCPlugin).changeTyrePressure(tyre, direction, increments)
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-changePitstopBrakeType(brake, selection) {
-	if !inList(["Front Brake", "Rear Brake"], selection)
-		logMessage(kLogWarn, translate("Unsupported brake unit """) . brake . translate(""" detected in changePitstopBrakeType - please check the configuration"))
-	
-	if !inList(["Next", "Previous"], selection)
-		logMessage(kLogWarn, translate("Unsupported brake selection """) . selection . translate(""" detected in changePitstopBrakeType - please check the configuration"))
-	
-	protectionOn()
-	
-	try {
-		SimulatorController.Instance.findPlugin(kACCPlugin).changeBrakeType(brake, selection)
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-changePitstopDriver(selection) {
-	if !inList(["Next", "Previous"], selection)
-		logMessage(kLogWarn, translate("Unsupported driver selection """) . selection . translate(""" detected in changePitstopDriver - please check the configuration"))
-	
-	protectionOn()
-	
-	try {
-		SimulatorController.Instance.findPlugin(kACCPlugin).changeDriver(selection)
-	}
-	finally {
-		protectionOff()
-	}
 }
 
 

@@ -340,7 +340,7 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 		this.resetPitstopState(inList(kPSMutatingOptions, option))
 	}
 	
-	updatePitstopOoption(option, action, steps := 1) {
+	updatePitstopOption(option, action, steps := 1) {
 		if inList(["Change Tyres", "Change Brakes", "Repair Bodywork", "Repair Suspension"], option)
 			this.toggleActivity(option)
 		else

@@ -315,7 +315,7 @@ class SimulatorPlugin extends ControllerPlugin {
 			mode.updateActions(sessionState)
 	}
 	
-	updatePitstopOoption(option, action, steps := 1) {
+	updatePitstopOption(option, action, steps := 1) {
 		if (this.requirePitstopMFD() && this.selectPitstopOption(option))
 			this.changePitstopOption(option, action, steps)
 	}
@@ -702,7 +702,7 @@ changePitstopDriver(selection) {
 	}
 }
 
-changePitstopOption(option, selection) {
+changePitstopOption(option, selection := "Next") {
 	local plugin
 	
 	if !inList(["Next", "Previous", "Increase", "Decrease"], selection)

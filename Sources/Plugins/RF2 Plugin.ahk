@@ -90,46 +90,40 @@ class RF2Plugin extends RaceEngineerSimulatorPlugin {
 	openPitstopMFD() {
 		static reported := false
 		
-		if !this.iPitstopMFDIsOpen {
-			this.activateRF2Window()
+		this.activateRF2Window()
 
-			if this.OpenPitstopMFDHotkey {
-				SendEvent % this.OpenPitstopMFDHotkey
-				
-				return true
-			}
-			else if !reported {
-				reported := true
+		if this.OpenPitstopMFDHotkey {
+			SendEvent % this.OpenPitstopMFDHotkey
 			
-				logMessage(kLogCritical, translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration"))
-			
-				showMessage(translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration...")
-						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-						  
-				return false
-			}
-		}
-		else
 			return true
+		}
+		else if !reported {
+			reported := true
+		
+			logMessage(kLogCritical, translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration"))
+		
+			showMessage(translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration...")
+					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+					  
+			return false
+		}
 	}
 	
 	closePitstopMFD() {
 		static reported := false
 		
-		if this.iPitstopMFDIsOpen {
-			this.activateRF2Window()
+		this.activateRF2Window()
 
-			if this.ClosePitstopMFDHotkey {
-				SendEvent % this.ClosePitstopMFDHotkey
-			}
-			else if !reported {
-				reported := true
-			
-				logMessage(kLogCritical, translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration"))
-			
-				showMessage(translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration...")
-						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-			}
+		if this.ClosePitstopMFDHotkey {
+			SendEvent % this.ClosePitstopMFDHotkey
+		}
+		else if !reported {
+			reported := true
+		
+			logMessage(kLogCritical, translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration"))
+		
+			showMessage(translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration...")
+					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 		}
 	}
 	

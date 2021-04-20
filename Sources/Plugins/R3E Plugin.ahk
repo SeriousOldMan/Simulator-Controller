@@ -119,14 +119,12 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 	}
 	
 	activateR3EWindow() {
-		if false {
 		window := this.Simulator.WindowTitle
 		
 		if !WinActive(window)
 			WinActivate %window%
 		
 		WinWaitActive %window%, , 2
-		}
 	}
 	
 	pitstopMFDIsOpen() {
@@ -139,11 +137,14 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 		static first := true
 		static reported := false
 		
+		if (first && this.OpenPitstopMFDHotkey)
+			SendInput % this.OpenPitstopMFDHotkey
+			
 		if !this.pitstopMFDIsOpen() {
 			this.activateR3EWindow()
 
 			if this.OpenPitstopMFDHotkey {
-				Send % this.OpenPitstopMFDHotkey
+				SendInput % this.OpenPitstopMFDHotkey
 
 				Sleep 50
 				
@@ -177,7 +178,7 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 			this.activateR3EWindow()
 
 			if this.ClosePitstopMFDHotkey {
-				Send % this.ClosePitstopMFDHotkey
+				SendInput % this.ClosePitstopMFDHotkey
 				
 				Sleep 50
 			}
@@ -209,7 +210,7 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 		Loop 15 {
 			this.activateR3EWindow()
 
-			Send %hotKey%
+			SendInput %hotKey%
 
 			Sleep 50
 		}
@@ -257,8 +258,6 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 			this.iPitstopOptions.Push("Repair Suspension")
 			this.iPitstopOptionStates.Push(this.searchMFDImage("Suspension Damage Selected") != false)
 		}
-		
-		; msgbox % values2String(", ", this.iPitstopOptions*) . " " . values2String(", ", this.iPitstopOptionStates*)
 	}
 	
 	optionAvailable(option) {
@@ -283,7 +282,7 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 				Loop %steps% {
 					this.activateR3EWindow()
 
-					Send %hotKey%
+					SendInput %hotKey%
 
 					Sleep 50
 				}
@@ -293,7 +292,7 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 				Loop %steps% {
 					this.activateR3EWindow()
 
-					Send %hotKey%
+					SendInput %hotKey%
 					
 					Sleep 50
 				}
@@ -313,7 +312,7 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 			Loop 10 {
 				this.activateR3EWindow()
 
-				Send %hotKey%
+				SendInput %hotKey%
 
 				Sleep 50
 			}
@@ -325,7 +324,7 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 			Loop %index% {
 				this.activateR3EWindow()
 
-				Send %hotKey%
+				SendInput %hotKey%
 
 				Sleep 50
 			}
@@ -367,7 +366,7 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 		if (!require || this.requirePitstopMFD())
 			if (!select || this.selectPitstopOption("Refuel")) {
 				if this.this.chosenOption("Refuel")
-					Send % this.AcceptChoiceHotkey
+					SendInput % this.AcceptChoiceHotkey
 
 				Sleep 50
 				
@@ -375,7 +374,7 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 
 				Sleep 50
 				
-				Send % this.AcceptChoiceHotkey
+				SendInput % this.AcceptChoiceHotkey
 			}
 	}
 	
@@ -393,12 +392,12 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 		Loop 10 {
 			this.activateR3EWindow()
 
-			Send %hotKey%
+			SendInput %hotKey%
 
 			Sleep 50
 		}
 		
-		Send % this.AcceptChoiceHotkey
+		SendInput % this.AcceptChoiceHotkey
 	}
 
 	setPitstopRefuelAmount(pitstopNumber, litres) {
@@ -517,7 +516,7 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 			pitstopImage := pitstopImages[A_Index]
 			
 			if !this.iPSImageSearchArea {
-				ImageSearch imageX, imageY, 0, 0, A_ScreenWidth, A_ScreenHeight, *100 %pitstopImage%
+				ImageSearch imageX, imageY, 0, 0, A_ScreenWidth, A_ScreenHeight, *50 %pitstopImage%
 
 				logMessage(kLogInfo, translate("Full search for '" . imageName . "' took ") . (A_TickCount - curTickCount) . translate(" ms"))
 				
@@ -526,7 +525,7 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 						this.iPSImageSearchArea := [Max(0, imageX - kSearchAreaLeft), 0, Min(imageX + kSearchAreaRight, A_ScreenWidth), A_ScreenHeight]
 			}
 			else {
-				ImageSearch imageX, imageY, this.iPSImageSearchArea[1], this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *100 %pitstopImage%
+				ImageSearch imageX, imageY, this.iPSImageSearchArea[1], this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *50 %pitstopImage%
 
 				logMessage(kLogInfo, translate("Optimized search for '" . imageName . "' took ") . (A_TickCount - curTickCount) . translate(" ms"))
 			}

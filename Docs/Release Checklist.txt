@@ -49,6 +49,8 @@ Release 2.8.5 Checklist
    a. Updates.md
    b. Installation & Setup.md
    c. Function Reference.md
+10. Optimized search for => with variables
+   a. Translations
 
 Release 2.8.2 Checklist
 =======================

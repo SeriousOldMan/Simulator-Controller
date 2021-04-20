@@ -515,7 +515,7 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 		}
 		
 		if (fileNames.Length() == 0)
-			Throw "Unknonw label '" . labelName . "' detected in ACCPlugin.getLabelFileName..."
+			Throw "Unknown label '" . labelName . "' detected in ACCPlugin.getLabelFileName..."
 		else {
 			if isDebug()
 				showMessage("Labels: " . values2String(", ", labelNames*) . "; Images: " . values2String(", ", fileNames*), "Pitstop MFD Image Search", "Information.png", 5000)

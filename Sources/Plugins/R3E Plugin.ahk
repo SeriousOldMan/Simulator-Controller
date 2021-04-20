@@ -106,7 +106,7 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 	
 	getPitstopActions(ByRef allActions, ByRef selectActions) {
 		allActions := {Refuel: "Refuel", TyreChange: "Change Tyres", BodyworkRepair: "Repair Bodywork", SuspensionRepair: "Repair Suspension"}
-		selectActions := ["BodyworkRepair", "SuspensionRepair"]
+		selectActions := ["TyreChange", "BodyworkRepair", "SuspensionRepair"]
 	}
 	
 	updateSessionState(sessionState) {
@@ -181,11 +181,10 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 		}
 	}
 	
-	requirePitstopMFD(analyze := false) {
+	requirePitstopMFD() {
 		this.openPitstopMFD()
 		
-		if analyze
-			this.anlayzePitstopMFD()
+		this.analyzePitstopMFD()
 		
 		return true
 	}
@@ -195,7 +194,7 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 		this.iPitstopOptionStates := []
 		
 		hotkey := this.NextOptionHotkey
-			
+		
 		Loop 15 {
 			this.activateR3EWindow()
 
@@ -245,6 +244,8 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 			this.iPitstopOptions.Push("Repair Suspension")
 			this.iPitstopOptionStates.Push(this.searchMFDImage("Suspension Dmanage Selected") != false)
 		}
+		
+		msgbox % values2String(", ", this.iPitstopOptions*) . " " . values2String(", ", this.iPitstopOptionStates*)
 	}
 	
 	optionAvailable(option) {
@@ -329,9 +330,10 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 			this.toggleActivity("Change Front Tyre", false, false)
 			this.toggleActivity("Change Rear Tyre", false, false)
 		}
-		else if (option = "Repair Bodywork")
+		else if (option = "Repair Bodywork") {
 			this.toggleActivity("Repair Aero Front", false, false)
 			this.toggleActivity("Repair Aero Rear", false, false)
+		}
 		else if (option = "Repair Suspension")
 			this.toggleActivity("Repair Suspension", false, false)
 		else
@@ -475,7 +477,7 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 		}
 		
 		if (fileNames.Length() == 0)
-			Throw "Unknonw label '" . labelName . "' detected in R3EPlugin.getLabelFileName..."
+			Throw "Unknown label '" . labelName . "' detected in R3EPlugin.getLabelFileName..."
 		else {
 			if isDebug()
 				showMessage("Labels: " . values2String(", ", imageNames*) . "; Images: " . values2String(", ", fileNames*), "Pitstop MFD Image Search", "Information.png", 5000)
@@ -485,7 +487,7 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 	}
 	
 	searchMFDImage(imageName) {
-		pitstopImages := this.getLabelFileNames(imageName)
+		pitstopImages := this.getImageFileNames(imageName)
 		
 		this.activateR3EWindow()
 		
@@ -509,7 +511,8 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 				logMessage(kLogInfo, translate("Optimized search for '" . imageName . "' took ") . (A_TickCount - curTickCount) . translate(" ms"))
 			}
 			
-			return true
+			if imageX is Integer
+				return true
 		}
 		
 		return false

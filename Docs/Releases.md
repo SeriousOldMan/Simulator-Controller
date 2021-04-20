@@ -1,9 +1,11 @@
-## 2.8.5-release 04/23/21 (planned)
+## 2.8.5-release 04/30/21 (planned)
 
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. Jona can decide to leave the current tyres on the car at a late pitstop (aka splash and dash)
   4. Jona intelligently reports and handles damage late in a stint
+  5. New plugin modes for pitstop control for the plugins for *rFactor 2* and *RaceRoom Racing Experience*
+  6. Jona now can handle the pitstop setup for you in the *RaceRoom Racing Experience* simulation
 
 ## 2.8.2-release 04/16/21
 

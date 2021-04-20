@@ -339,12 +339,6 @@ class SimulatorPlugin extends ControllerPlugin {
 	requirePitstopMFD() {
 		return false
 	}
-	
-	toggleActivity() {
-	}
-	
-	changeStrategy() {
-	}
 }
 
 class RaceEngineerAction extends ControllerAction {

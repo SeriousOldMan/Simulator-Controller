@@ -580,7 +580,6 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 			
 				break
 			}
-
 		}
 		
 		lastY := false

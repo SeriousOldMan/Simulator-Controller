@@ -119,26 +119,39 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 	}
 	
 	activateR3EWindow() {
+		if false {
 		window := this.Simulator.WindowTitle
 		
 		if !WinActive(window)
 			WinActivate %window%
 		
 		WinWaitActive %window%, , 2
+		}
 	}
 	
 	pitstopMFDIsOpen() {
+		this.activateR3EWindow()
+		
 		return this.searchMFDImage("PITSTOP")
 	}
 		
 	openPitstopMFD() {
+		static first := true
 		static reported := false
 		
 		if !this.pitstopMFDIsOpen() {
 			this.activateR3EWindow()
 
 			if this.OpenPitstopMFDHotkey {
-				SendEvent % this.OpenPitstopMFDHotkey
+				Send % this.OpenPitstopMFDHotkey
+
+				Sleep 50
+				
+				if first {
+					this.searchMFDImage("PITSTOP")
+					
+					first := false
+				}
 				
 				return true
 			}
@@ -163,8 +176,11 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 		if this.pitstopMFDIsOpen() {
 			this.activateR3EWindow()
 
-			if this.ClosePitstopMFDHotkey
-				SendEvent % this.ClosePitstopMFDHotkey
+			if this.ClosePitstopMFDHotkey {
+				Send % this.ClosePitstopMFDHotkey
+				
+				Sleep 50
+			}
 			else if !reported {
 				reported := true
 			
@@ -193,7 +209,7 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 		Loop 15 {
 			this.activateR3EWindow()
 
-			SendEvent %hotKey%
+			Send %hotKey%
 
 			Sleep 50
 		}
@@ -202,7 +218,7 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 			this.iPitstopOptions.Push("Refuel")
 			this.iPitstopOptionStates.Push(true)
 		}
-		else if (this.searchMFDImage("No Refuel") == false) {
+		else if (this.searchMFDImage("No Refuel")) {
 			this.iPitstopOptions.Push("Refuel")
 			this.iPitstopOptionStates.Push(false)
 		}
@@ -230,17 +246,19 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 			this.iPitstopOptionStates.Push(this.searchMFDImage("Front Damage Selected") != false)
 		}
 		
+		/*
 		if this.searchMFDImage("Rear Damage") {
 			this.iPitstopOptions.Push("Repair Aero Rear")
 			this.iPitstopOptionStates.Push(this.searchMFDImage("Rear Damage Selected") != false)
 		}
+		*/
 		
 		if this.searchMFDImage("Suspension Damage") {
 			this.iPitstopOptions.Push("Repair Suspension")
-			this.iPitstopOptionStates.Push(this.searchMFDImage("Suspension Dmanage Selected") != false)
+			this.iPitstopOptionStates.Push(this.searchMFDImage("Suspension Damage Selected") != false)
 		}
 		
-		msgbox % values2String(", ", this.iPitstopOptions*) . " " . values2String(", ", this.iPitstopOptionStates*)
+		; msgbox % values2String(", ", this.iPitstopOptions*) . " " . values2String(", ", this.iPitstopOptionStates*)
 	}
 	
 	optionAvailable(option) {
@@ -265,7 +283,7 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 				Loop %steps% {
 					this.activateR3EWindow()
 
-					SendEvent %hotKey%
+					Send %hotKey%
 
 					Sleep 50
 				}
@@ -275,7 +293,7 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 				Loop %steps% {
 					this.activateR3EWindow()
 
-					SendEvent %hotKey%
+					Send %hotKey%
 					
 					Sleep 50
 				}
@@ -292,10 +310,10 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 		if index {
 			hotkey := this.PreviousOptionHotkey
 			
-			Loop 15 {
+			Loop 10 {
 				this.activateR3EWindow()
 
-				SendEvent %hotKey%
+				Send %hotKey%
 
 				Sleep 50
 			}
@@ -307,7 +325,7 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 			Loop %index% {
 				this.activateR3EWindow()
 
-				SendEvent %hotKey%
+				Send %hotKey%
 
 				Sleep 50
 			}
@@ -349,11 +367,15 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 		if (!require || this.requirePitstopMFD())
 			if (!select || this.selectPitstopOption("Refuel")) {
 				if this.this.chosenOption("Refuel")
-					SendEvent % this.AcceptChoiceHotkey
+					Send % this.AcceptChoiceHotkey
 
+				Sleep 50
+				
 				this.dialPitstopOption("Refuel", direction, litres)
 
-				SendEvent % this.AcceptChoiceHotkey
+				Sleep 50
+				
+				Send % this.AcceptChoiceHotkey
 			}
 	}
 	
@@ -368,15 +390,15 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 	finishPitstopSetup(pitstopNumber) {
 		hotkey := this.NextOptionHotkey
 			
-		Loop 15 {
+		Loop 10 {
 			this.activateR3EWindow()
 
-			SendEvent %hotKey%
+			Send %hotKey%
 
 			Sleep 50
 		}
 		
-		SendEvent % this.AcceptChoiceHotkey
+		Send % this.AcceptChoiceHotkey
 	}
 
 	setPitstopRefuelAmount(pitstopNumber, litres) {
@@ -501,7 +523,7 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 				
 				if imageX is Integer
 					if (imageName = "PITSTOP")
-						this.iPSImageSearchArea := [Max(0, imageX - kSearchAreaLeft), 0, Min(imageX + kSearchAreaRight, A_ScreenWidth), imageY]
+						this.iPSImageSearchArea := [Max(0, imageX - kSearchAreaLeft), 0, Min(imageX + kSearchAreaRight, A_ScreenWidth), A_ScreenHeight]
 			}
 			else {
 				ImageSearch imageX, imageY, this.iPSImageSearchArea[1], this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *100 %pitstopImage%

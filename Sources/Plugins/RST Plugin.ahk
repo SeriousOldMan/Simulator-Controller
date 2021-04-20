@@ -20,8 +20,6 @@ startRST() {
 			if !WinActive("ahk_pid " . pid)
 				WinActivate ahk_pid %pid%
 			
-			WinWaitActive ahk_pid %pid%, , 10
-			
 			protectionOn()
 			
 			try {

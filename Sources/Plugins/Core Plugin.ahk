@@ -24,10 +24,13 @@ startAITrack() {
 			active := false
 
 			while !active {
-				IfWinNotActive %windowTitle%, , WinActivate, %windowTitle% 
-				WinWaitActive %windowTitle%, , 1
+				if !WinActive(windowTitle)
+					WinActivate %windowTitle%
 			
 				active := (ErrorLevel == 0)
+				
+				if !active
+					Sleep 500
 			}
 
 			protectionOn()
@@ -72,10 +75,13 @@ startVoiceMacro() {
 				active := false
 
 				while !active {
-					IfWinNotActive %windowTitle%, , WinActivate, %windowTitle% 
-					WinWaitActive %windowTitle%, , 1
+					if !WinActive(windowTitle)
+						WinActivate %windowTitle%
 				
 					active := (ErrorLevel == 0)
+					
+					if !active
+						Sleep 500
 				}
 				
 				protectionOn()

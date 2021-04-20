@@ -822,8 +822,6 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			if !WinActive(window)
 				WinActivate %window%
 			
-			WinWaitActive %window%, , 2
-			
 			Sleep 100
 		}
 		else

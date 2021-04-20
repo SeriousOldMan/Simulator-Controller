@@ -83,8 +83,6 @@ class RF2Plugin extends RaceEngineerSimulatorPlugin {
 		
 		if !WinActive(window)
 			WinActivate %window%
-		
-		WinWaitActive %window%, , 2
 	}
 		
 	openPitstopMFD() {

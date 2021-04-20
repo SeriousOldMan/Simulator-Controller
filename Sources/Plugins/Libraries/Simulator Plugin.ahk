@@ -123,12 +123,18 @@ class PitstopAction extends ControllerAction {
 	fireAction(function, trigger) {
 		local plugin := this.Plugin
 		
-		return (plugin.requirePitstopMFD() && plugin.selectPitstopOption(this.iPitstopOption))
+		return (plugin.requirePitstopMFD() && plugin.selectPitstopOption(this.Option))
 	}
 }
 
 class PitstopChangeAction extends PitstopAction {
 	iDirection := false
+	
+	Direction[] {
+		Get {
+			return this.iDirection
+		}
+	}
 	
 	__New(plugin, function, label, pitstopOption, direction, moreArguments*) {
 		this.iDirection := direction
@@ -138,7 +144,7 @@ class PitstopChangeAction extends PitstopAction {
 	
 	fireAction(function, trigger) {
 		if base.fireAction(function, trigger)
-			this.Plugin.changePitstopOption(this.Option, this.iDirection, this.Steps)
+			this.Plugin.changePitstopOption(this.Option, this.Direction, this.Steps)
 	}
 }
 
@@ -262,7 +268,7 @@ class SimulatorPlugin extends ControllerPlugin {
 			}
 		}
 		else
-			logMessage(kLogWarn, translate("Pitstop action ") . action . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
+			logMessage(kLogWarn, translate("Action ") . action . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
 	}
 	
 	createRaceEngineerAction(controller, action, actionFunction) {
@@ -401,6 +407,8 @@ class RaceEngineerSimulatorPlugin extends SimulatorPlugin {
 			else
 				this.createPitstopAction(controller, arguments*)
 		}
+		
+		controller.registerPlugin(this)
 	}
 	
 	createRaceEngineerAction(controller, action, actionFunction) {

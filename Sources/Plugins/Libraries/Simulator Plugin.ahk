@@ -63,7 +63,7 @@ class PitstopMode extends ControllerMode {
 	}
 		
 	updateRaceEngineerActions(sessionState) {
-		if !this.Plugin.RaceEngineer
+		if (!this.Plugin.RaceEngineer || !this.Plugin.RaceEngineer.RaceEngineer)
 			sessionState := kSessionFinished
 		
 		for ignore, theAction in this.Actions
@@ -287,6 +287,11 @@ class SimulatorPlugin extends ControllerPlugin {
 			else
 				this.Controller.setModes(this.Simulator.Application, ["Other", "Practice", "Qualification", "Race"][sessionState])
 		}
+		
+		mode := this.findMode(kPitstopMode)
+		
+		if (mode && inList(this.Controller.ActiveModes, mode))
+			mode.updateActions(sessionState)
 	}
 	
 	selectPitstopOption(option) {

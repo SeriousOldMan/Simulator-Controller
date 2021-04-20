@@ -499,7 +499,7 @@ namespace RF2SHMReader {
 					if (!SelectPitstopCategory(category))
 						return;
 
-					SendPitstopCommand(new string(action, (int)GetKpa(pressureIncrement)));
+					SendPitstopCommand(new string(action, Math.Max(1, (int)Math.Round(GetKpa(pressureIncrement)))));
 				}
 			}
 			
@@ -578,7 +578,7 @@ namespace RF2SHMReader {
 			}
 		}
 
-		public void ExecutePitstopChangeCommand(string direction, string command, string[] arguments) {
+		public void ExecutePitstopChangeCommand(string command, string direction, string[] arguments) {
 			if (!this.connected || this.extended.mHWControlInputEnabled == 0)
 				return;
 			

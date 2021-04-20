@@ -43,7 +43,7 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 	iNextChoiceHotkey := false
 	iAcceptChoiceHotkey := false
 	
-	iPitstopMFDIsOpen := false
+	iPSImageSearchArea := false
 	
 	OpenPitstopMFDHotkey[] {
 		Get {
@@ -116,10 +116,6 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 		
 		if (inList(activeModes, this.iPitstopMode))
 			this.iPitstopMode.updateActions(sessionState)
-		
-		if (sessionState == kSessionFinished) {
-			this.iPitstopMFDIsOpen := false
-		}
 	}
 	
 	activateR3EWindow() {
@@ -130,17 +126,19 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 		
 		WinWaitActive %window%, , 2
 	}
+	
+	pitstopMFDIsOpen() {
+		return this.searchMFDImage("PITSTOP")
+	}
 		
 	openPitstopMFD() {
 		static reported := false
 		
-		if !this.iPitstopMFDIsOpen {
+		if !this.pitstopMFDIsOpen() {
 			this.activateR3EWindow()
 
 			if this.OpenPitstopMFDHotkey {
 				SendEvent % this.OpenPitstopMFDHotkey
-			
-				this.iPitstopMFDIsOpen := true
 				
 				return true
 			}
@@ -162,14 +160,11 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 	closePitstopMFD() {
 		static reported := false
 		
-		if this.iPitstopMFDIsOpen {
+		if this.pitstopMFDIsOpen() {
 			this.activateR3EWindow()
 
-			if this.ClosePitstopMFDHotkey {
+			if this.ClosePitstopMFDHotkey
 				SendEvent % this.ClosePitstopMFDHotkey
-			
-				this.iPitstopMFDIsOpen := false
-			}
 			else if !reported {
 				reported := true
 			
@@ -366,12 +361,8 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 		return true
 	}
 	
-	pitstopFinished(pitstopNumber) {
-		this.iPitstopMFDIsOpen := false
-	}
-	
 	startPitstopSetup(pitstopNumber) {
-		this.requirePitstopMFD(true)
+		this.requirePitstopMFD()
 	}
 
 	finishPitstopSetup(pitstopNumber) {
@@ -487,6 +478,9 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 	}
 	
 	searchMFDImage(imageName) {
+		static kSearchAreaLeft := 250
+		static kSearchAreaRight := 250
+		
 		pitstopImages := this.getImageFileNames(imageName)
 		
 		this.activateR3EWindow()
@@ -500,10 +494,14 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 		{
 			pitstopImage := pitstopImages[A_Index]
 			
-			if true {
+			if !this.iPSImageSearchArea {
 				ImageSearch imageX, imageY, 0, 0, A_ScreenWidth, A_ScreenHeight, *100 %pitstopImage%
 
 				logMessage(kLogInfo, translate("Full search for '" . imageName . "' took ") . (A_TickCount - curTickCount) . translate(" ms"))
+				
+				if imageX is Integer
+					if (imageName = "PITSTOP")
+						this.iPSImageSearchArea := [Max(0, imageX - kSearchAreaLeft), 0, Min(imageX + kSearchAreaRight, A_ScreenWidth), imageY]
 			}
 			else {
 				ImageSearch imageX, imageY, this.iPSImageSearchArea[1], this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *100 %pitstopImage%

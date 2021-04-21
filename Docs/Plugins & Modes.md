@@ -9,8 +9,8 @@ The distribution of Simulator Controller includes a set of predefined plugins, w
 | Race Engineer | This plugin integrates Jona, the Virtual Race Engineer, with all other plugins for the simulation games, like the ACC plugin. The plugin handles the data transfer between the simulation game and the Virtual Race Engineer. |
 | ACC | Provides special support for starting and stopping *Assetto Corsa Competizione* from your hardware controller. The mode "Chat", which is normally only available when "Assetto Corsa Competizione" is currently running, handle automated chat messages for the multiplayer ingame chat system, where the chat messages can be configured by the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Additionally, beginning with Release 2.0, this plugin provides sophisticated support for the Pitstop MFD of *Assetto Corsa Competizione*. All settings may be tweaked using the controller hardware, but it is also possible to control the settings using voice control to keep your hands on the steering wheel. Since Release 2.1, Jona, the Virtual Race Engineer, is integrated with the ACC plugin as well. |
 | AC | One of the smallest plugin in this list only supplies a special splash screem, when Assetto Corsa is started. No special controller mode is defined for the moment. |
-| RF2 | Similar to the AC plugin provides this plugin start and stop support for rFactor 2. No special controller mode is defined for the moment, but an integration with Jona, the Virtual Race Engineer, including full support for automated pitstop handling is available since Release 2.8. |
-| R3E | Similar to the AC and RF2 plugins provides this plugin start and stop support for RaceRoom Racing Experience. No special controller mode is defined for the moment, but an initial integration with Jona, the Virtual Race Engineer, is available since Release 2.8. |
+| RF2 | Similar to the AC plugin provides this plugin start and stop support for rFactor 2. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the Virtual Race Engineer, including full support for automated pitstop handling is available as well since Release 2.8. |
+| R3E | Similar to the AC and RF2 plugins provides this plugin start and stop support for RaceRoom Racing Experience. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the Virtual Race Engineer, including full support for automated pitstop handling is available as well. |
 | Button Box | Tools for building your own Button Box / Controller visuals. The default implementation of *ButtonBox* implements grid based Button Box layouts, which can be configured using a [graphical layout editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#button-box-layouts). |
 
 All plugins can be configured in the [Plugins tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) of the configuration tool.
@@ -287,11 +287,11 @@ See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wi
 
 ## Plugin *AC*
 
-This plugin handles the *Assetto Corsa* simulation game. An application with the name "Assetto Corsa" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startAC" as a special function hook in this configuration.
+This plugin handles starting and stopping the *Assetto Corsa* simulation game. An application with the name "Assetto Corsa" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startAC" as a special function hook in this configuration.
 
 ## Plugin *RF2*
 
-This plugin handles the *rFactor 2* simulation game. An application with the name "rFactor 2" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startRF2" as a special function hook in this configuration. The plugin supports a mode to control the pitstop settings and an integration with Jona is available through the "Race Engineer" plugin.
+This plugin handles the *rFactor 2* simulation game. An application with the name "rFactor 2" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startRF2" as a special function hook in this configuration. The plugin supports a "Pitstop" mode to control the pitstop settings and an integration with Jona is available through the "Race Engineer" plugin.
 
 Important: You must install a plugin into *rFactor 2* plugins directory ([rF2]\Bin64\Plugins\) for the telemetry interface and the pitstop mode to work. You can find the plugin in the *Utilities\3rd Part\rf2_sm_tools_3.7.14.2.zip*. A Readme file is included.
 
@@ -336,4 +336,37 @@ See the following table for the supported settings.
 
 ## Plugin *R3E*
 
-This plugin handles the *RaceRoom Racing Experience* simulation game. An application with the name "RaceRoom Racing Experience" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startR3E" as a special function hook in this configuration and define "ahk_exe RRRE64.exe" (yes, three "R"s) as the window title. No special mode is currently defined for *rFactor 2*, but an integration with Jona is available through the "Race Engineer" plugin.
+This plugin handles the *RaceRoom Racing Experience* simulation game. An application with the name "RaceRoom Racing Experience" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startR3E" as a special function hook in this configuration and define "ahk_exe RRRE64.exe" (yes, three "R"s) as the window title. The plugin supports a "Pitstop" mode to control the pitstop settings and an integration with Jona is available through the "Race Engineer" plugin.
+
+### Mode *Pitstop*
+
+Similar to the pitstop mode the plugin for *Assetto Corsa Competizione*, you can control most of the pitstop settings of *RaceRoom Racing Experience*. 
+
+![](*)
+
+All this will be achieved using the following plugin arguments:
+
+	openPitstopMFD: P; closePitstopMFD: P;
+	pitstopSettings: Refuel Dial.1 5, TyreChange Button.1, BodyworkRepair Button.2, SuspensionRepair Button.3
+
+### Configuration
+
+First, you need to define, how to open and close the Pitstop MFD in *rFactor 2*. Please supply the bindings you have defined in the controller setup in *rFactor 2*.
+
+	openPitstopMFD: *openHotkey*; closePitstopMFD: *closeHotkey*
+	
+With the plugin parameter *pitstopSettings:* you can supply a list of the settings, you want to tweak from your hardware controller, when the "Pitstop" mode is active. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
+
+	pitstopSettings: *setting1* *settingFunction1* [*settingSteps1*],
+					 *setting2* *settingFunction2* [*settingSteps2*], ...
+					 
+See the following table for the supported settings.
+
+| Setting | Description |
+| ------ | ------ |
+| Refuel | Increment or decrement the refuel amount. Supports the additional increments argument. |
+| TyreChange | Toggles, whether you want to change the tires at the next pitstop or nor. |
+| SuspensionRepair | Toggles the repair of the suspension components. |
+| BodyworkRepair | Toggles the repair of all the bodywork and aerodynamic elements. |
+| PitstopPlan | Requests a pitstop plan from the virtual race engineer. |
+| PitstopPrepare | Requests Jona to transfer the values from the current pitstop plan to the Pitstop MFD. |

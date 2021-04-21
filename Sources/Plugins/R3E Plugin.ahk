@@ -201,6 +201,13 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 		Loop 15
 			SendEvent % this.NextOptionHotkey
 		
+		/*
+		if this.searchMFDImage("Strategy") {
+			this.iPitstopOptions.Push("Strategy")
+			this.iPitstopOptionStates.Push(true)
+		}
+		*/
+		
 		if this.searchMFDImage("Refuel") {
 			this.iPitstopOptions.Push("Refuel")
 			this.iPitstopOptionStates.Push(true)

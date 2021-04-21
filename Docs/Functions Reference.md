@@ -291,34 +291,34 @@ Starts the motion feedback system of your simulation rig. This action function i
 Stops the motion feedback system of your simulation rig and brings the rig back to its resting position. This action function is provided by the "Motion Feedback" plugin and is available depending on the concrete configuration.
 
 #### *openPitstopMFD()*
-Opens the pitstop settings dialog of *Assetto Corsa Competizione*. This action function is provided by the "ACC" plugin and is available depending on the concrete configuration.
+Opens the pitstop settings dialog of *Assetto Corsa Competizione*. This action function is provided by the *SimulatorPlugin* class and is available depending on the concrete configuration and simulation.
 
 #### *closePitstopMFD()*
-Closes the pitstop settings dialog of *Assetto Corsa Competizione*. This action function is provided by the "ACC" plugin and is available depending on the concrete configuration.
+Closes the pitstop settings dialog of *Assetto Corsa Competizione*. This action function is provided by the *SimulatorPlugin* class and is available depending on the concrete configuration and simulation.
 
-#### *togglePitstopActivity(activity :: String)*
-Enables or disables one of the activities carried out by your pitstop crew. The supported activities are "Change Tyres", "Change Brakes", "Repair Bodywork" and "Repair Suspension". This action function is provided by the "ACC" plugin and is available depending on the concrete configuration.
+#### *changePitstopOption(option :: String, selection :: String, increments :: Integer := false)*
+Enables or disables one of the activities carried out by your pitstop crew.  The supported options depend on the current simlation game. For example, for ACC the options are "Change Tyres", "Change Brakes", "Repair Bodywork" and "Repair Suspension", and for R3E "Change Tyres", "Repair Bodywork" and "Repair Suspension" are available. *selection* must be either "Next" / "Increase" or "Previous" / "Decrease". For stepped options, you can supply the number of increment steps by supplying a value for *increments*. This action function is provided by the *SimulatorPlugin* class and is available depending on the concrete configuration and simulation.
 
 #### *changePitstopStrategy(selection :: String)*
-Selects one of the pitstop strategies. *selection* must be either "Next" or "Previous". This action function is provided by the "ACC" plugin and is available depending on the concrete configuration.
+Selects one of the pitstop strategies. *selection* must be either "Next" or "Previous". This action function is provided by the *SimulatorPlugin* class and is available depending on the concrete configuration and simulation.
 
 #### *changePitstopFuelAmount(direction :: String, liters :: Integer := 5)*
-Changes the amount of fuel to add during the next pitstop. *direction* must be either "Increase" or "Decrease" and *liters* may define the amount of fuel to be changed in one step. This parameter has a default of 5. This action function is provided by the "ACC" plugin and is available depending on the concrete configuration.
+Changes the amount of fuel to add during the next pitstop. *direction* must be either "Increase" or "Decrease" and *liters* may define the amount of fuel to be changed in one step. This parameter has a default of 5. This action function is provided by the *SimulatorPlugin* class and is available depending on the concrete configuration and simulation.
 
 #### *changePitstopTyreSet(selection :: String)*
-Selects the tyre sez to change to during  the next pitstop. *selection* must be either "Next" or "Previous". This action function is provided by the "ACC" plugin and is available depending on the concrete configuration.
+Selects the tyre sez to change to during  the next pitstop. *selection* must be either "Next" or "Previous". This action function is provided by the *SimulatorPlugin* class and is available depending on the concrete configuration and simulation.
 
-#### *changePitstopTyreCompound(compound :: String)*
-Selects the tyre compound to change to during  the next pitstop. *compound* must be either "Wet" or "Dry". This action function is provided by the "ACC" plugin and is available depending on the concrete configuration.
+#### *changePitstopTyreCompound(selection :: String)*
+Selects the tyre compound to change to during  the next pitstop. *selection* must be either "Next" / "Increase" or "Previous" / "Decrease". This action function is provided by the *SimulatorPlugin* class and is available depending on the concrete configuration and simulation.
 
 #### *changePitstopTyrePressure(tyre :: String, direction :: String, increments :: Integer := 1)*
-Changes the tyre pressure during the next pitstop. *tyre* must be one of "All Around", "Front Left", "Front Right", "Rear Left" and "Rear Right", and *direction* must be either "Increase" or "Decrease". *increments* with a default of 1 define the change in 0.1 psi increments. This action function is provided by the "ACC" plugin and is available depending on the concrete configuration.
+Changes the tyre pressure during the next pitstop. *tyre* must be one of "All Around", "Front Left", "Front Right", "Rear Left" and "Rear Right", and *direction* must be either "Increase" or "Decrease". *increments* with a default of 1 define the change in 0.1 psi increments. This action function is provided by the *SimulatorPlugin* class and is available depending on the concrete configuration and simulation.
 
 #### *changePitstopBrakeType(brake :: String, selection :: String)*
-Selects the brake pad compound to change to during the next pitstop. *brake* must be "Front Brake" or "Rear Brake" and *selection* must be "Next" or "Previous". This action function is provided by the "ACC" plugin and is available depending on the concrete configuration.
+Selects the brake pad compound to change to during the next pitstop. *brake* must be "Front Brake" or "Rear Brake" and *selection* must be "Next" or "Previous". This action function is provided by the *SimulatorPlugin* class and is available depending on the concrete configuration and simulation.
 
 #### *changePitstopDriver(selection :: String)*
-Selects the driver to take the car during the next pitstop. *selection* must be either "Next" or "Previous". This action function is provided by the "ACC" plugin and is available depending on the concrete configuration.
+Selects the driver to take the car during the next pitstop. *selection* must be either "Next" or "Previous". This action function is provided by the *SimulatorPlugin* class and is available depending on the concrete configuration and simulation.
 
 #### *planPitstop()*
 *planPitstop* triggers Jona, the Virtual Race Engineer, to plan a pitstop. This action function is provided by the "Race Engineer" plugin and is available depending on the concrete configuration.

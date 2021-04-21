@@ -564,147 +564,61 @@ closePitstopMFD() {
 }
 
 changePitstopStrategy(selection, steps := 1) {
-	local plugin
-	
 	if !inList(["Next", "Previous"], selection)
 		logMessage(kLogWarn, translate("Unsupported strategy selection """) . selection . translate(""" detected in changePitstopStrategy - please check the configuration"))
 	
-	plugin := getCurrentSimulatorPlugin("Strategy")
-	
-	if plugin {
-		protectionOn()
-	
-		try {
-			plugin.updatePitstopOption("Strategy", (selection = "Next") ? "Increase" : "Decrease", steps)
-		}
-		finally {
-			protectionOff()
-		}
-	}
+	changePitstopOption("Strategy", selection, steps)
 }
 
 changePitstopFuelAmount(direction, litres := 5) {
-	local plugin := getCurrentSimulatorPlugin("Refuel")
+	if !inList(["Increase", "Decrease"], direction)
+		logMessage(kLogWarn, translate("Unsupported fuel amount """) . direction . translate(""" detected in changePitstopFuelAmount - please check the configuration"))
 	
-	if plugin {
-		protectionOn()
-	
-		try {
-			plugin.updatePitstopOption("Refuel", direction, litres)
-		}
-		finally {
-			protectionOff()
-		}
-	}
+	changePitstopOption("Refuel", direction, litres)
 }
 
 changePitstopTyreCompound(selection) {
-	local plugin
-	
-	if !inList(["Next", "Previous"], selection)
+	if !inList(["Next", "Previous", "Increase", "Decrease"], selection)
 		logMessage(kLogWarn, translate("Unsupported tyre compound selection """) . selection . translate(""" detected in changePitstopTyreCompound - please check the configuration"))
 	
-	plugin := getCurrentSimulatorPlugin("Tyre Compound")
-	
-	if plugin {
-		protectionOn()
-		
-		try {
-			plugin.updatePitstopOption("Tyre Compound", (selection = "Next") ? "Increase" : "Decrease")
-		}
-		finally {
-			protectionOff()
-		}
-	}
+	changePitstopOption("Tyre Compound", selection)
 }
 
 changePitstopTyreSet(selection, steps := 1) {
-	local plugin
-	
 	if !inList(["Next", "Previous"], selection)
 		logMessage(kLogWarn, translate("Unsupported tyre set selection """) . selection . translate(""" detected in changePitstopTyreSet - please check the configuration"))
 	
-	plugin := getCurrentSimulatorPlugin("Tyre Set")
-	
-	if plugin {
-		protectionOn()
-		
-		try {
-			plugin.updatePitstopOption("Tyre Set", (selection = "Next") ? "Increase" : "Decrease", steps)
-		}
-		finally {
-			protectionOff()
-		}
-	}
+	changePitstopOption("Tyre Set", selection, steps)
 }
 
 changePitstopTyrePressure(tyre, direction, increments := 1) {
-	local plugin
-	
 	if !inList(["All Around", "Front Left", "Front Right", "Rear Left", "Rear Right"], tyre)
 		logMessage(kLogWarn, translate("Unsupported tyre position """) . tyre . translate(""" detected in changePitstopTyrePressure - please check the configuration"))
 		
 	if !inList(["Increase", "Decrease"], direction)
 		logMessage(kLogWarn, translate("Unsupported pressure change """) . direction . translate(""" detected in changePitstopTyrePressure - please check the configuration"))
 	
-	plugin := getCurrentSimulatorPlugin(tyre)
-	
-	if plugin {
-		protectionOn()
-		
-		try {
-			plugin.updatePitstopOption(tyre, direction, increments)
-		}
-		finally {
-			protectionOff()
-		}
-	}
+	changePitstopOption(tyre, selection, increments)
 }
 
 changePitstopBrakeType(brake, selection) {
-	local plugin
-	
 	if !inList(["Front Brake", "Rear Brake"], selection)
 		logMessage(kLogWarn, translate("Unsupported brake unit """) . brake . translate(""" detected in changePitstopBrakeType - please check the configuration"))
 	
 	if !inList(["Next", "Previous"], selection)
 		logMessage(kLogWarn, translate("Unsupported brake selection """) . selection . translate(""" detected in changePitstopBrakeType - please check the configuration"))
 	
-	plugin := getCurrentSimulatorPlugin(brake)
-	
-	if plugin {
-		protectionOn()
-	
-		try {
-			plugin.updatePitstopOption(brake, (selection = "Next") ? "Increase" : "Decrease")
-		}
-		finally {
-			protectionOff()
-		}
-	}
+	changePitstopOption(brake, selection)
 }
 
 changePitstopDriver(selection) {
-	local plugin
-	
 	if !inList(["Next", "Previous"], selection)
 		logMessage(kLogWarn, translate("Unsupported driver selection """) . selection . translate(""" detected in changePitstopDriver - please check the configuration"))
 	
-	plugin := getCurrentSimulatorPlugin("Driver")
-	
-	if plugin {
-		protectionOn()
-	
-		try {
-			plugin.updatePitstopOption("Driver", (selection = "Next") ? "Increase" : "Decrease")
-		}
-		finally {
-			protectionOff()
-		}
-	}
+	changePitstopOption("Driver", selection)
 }
 
-changePitstopOption(option, selection := "Next") {
+changePitstopOption(option, selection := "Next", increments := 1) {
 	local plugin
 	
 	if !inList(["Next", "Previous", "Increase", "Decrease"], selection)
@@ -716,7 +630,7 @@ changePitstopOption(option, selection := "Next") {
 		protectionOn()
 	
 		try {
-			plugin.updatePitstopOption(option, (selection = "Next") ? "Increase" : "Decrease")
+			plugin.updatePitstopOption(option, (selection = "Next") ? "Increase" : "Decrease", increments)
 		}
 		finally {
 			protectionOff()

@@ -1880,13 +1880,13 @@ class RaceEngineer extends ConfigurationItem {
 				}
 			}
 			
+			debug := this.Debug[kDebugPhrases]
+			
 			if (compound && ((options == true) || options.Pressures)) {
 				incrementFL := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL.Increment", 0), 1)
 				incrementFR := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR.Increment", 0), 1)
 				incrementRL := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL.Increment", 0), 1)
 				incrementRR := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR.Increment", 0), 1)
-			
-				debug := this.Debug[kDebugPhrases]
 			
 				if (debug || (incrementFL != 0) || (incrementFR != 0) || (incrementRL != 0) || (incrementRR != 0))
 					speaker.speakPhrase("NewPressures")

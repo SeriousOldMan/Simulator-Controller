@@ -349,15 +349,16 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 			Throw "Unsupported activity """ . activity . """ detected in R3EPlugin.toggleActivity..."
 	}
 
-	changeFuelAmount(direction, litres := 5, require := true, select := true) {
+	changeFuelAmount(direction, litres := 5, require := true, select := true, accept := true) {
 		if (!require || this.requirePitstopMFD())
 			if (!select || this.selectPitstopOption("Refuel")) {
-				if this.optionChosen("Refuel")
+				if (accept && this.optionChosen("Refuel"))
 					SendEvent % this.AcceptChoiceHotkey
 				
 				this.dialPitstopOption("Refuel", direction, litres)
 
-				SendEvent % this.AcceptChoiceHotkey
+				if accept
+					SendEvent % this.AcceptChoiceHotkey
 			}
 	}
 	
@@ -383,9 +384,14 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 
 	setPitstopRefuelAmount(pitstopNumber, litres) {
 		if this.optionAvailable("Refuel") {
-			this.changeFuelAmount("Decrease", 120, false, true)
+			if this.optionChosen("Refuel")
+				SendEvent % this.AcceptChoiceHotkey
 			
-			this.changeFuelAmount("Increase", litres + 3, false, false)
+			this.changeFuelAmount("Decrease", 120, false, true, false)
+			
+			this.changeFuelAmount("Increase", litres + 3, false, false, false)
+			
+			SendEvent % this.AcceptChoiceHotkey
 		}
 	}
 	

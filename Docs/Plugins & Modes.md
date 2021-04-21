@@ -295,7 +295,7 @@ Important: You must install a plugin into *rFactor 2* plugins directory ([rF2]\B
 
 Similar to the pitstop mode the plugin for *Assetto Corsa Competizione*, you can control most of the pitstop settings of *rFactor 2*. 
 
-![](*)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%208.JPG)
 
 All this will be achieved using the following plugin arguments:
 
@@ -342,12 +342,13 @@ This plugin handles the *RaceRoom Racing Experience* simulation game. An applica
 
 Similar to the pitstop mode the plugin for *Assetto Corsa Competizione*, you can control most of the pitstop settings of *RaceRoom Racing Experience*. 
 
-![](*)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%209.JPG)
 
 All this will be achieved using the following plugin arguments:
 
 	openPitstopMFD: P; closePitstopMFD: P;
-	pitstopSettings: Refuel Dial.1 5, TyreChange Button.1, BodyworkRepair Button.2, SuspensionRepair Button.3
+	pitstopSettings: Strategy Dial.1, Refuel Dial.2 5, TyreChange Button.1, BodyworkRepair Button.2, SuspensionRepair Button.3,
+					 PitstopPlan Button.7, PitstopPrepare Button.8
 
 ### Configuration
 

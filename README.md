@@ -26,7 +26,9 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-None for the moment...
+[2.8.5-dev](https://www.dropbox.com/s/i46mub4rczq5qr7/Simulator%20Controller%202.8.5-dev.zip?dl=0) (Stable development build for the upcoming Release 2.8.5. New features: No tyre change option for Jona pitstop handling, Intelligent late damage reporting & handling for Jona, Pitstop handling for R3E, More Refactoring of Simulator Plugins, Pitstop modes for RF2 and R3E. Feature complete and with updated documentation, but no automated update procedure yet...)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-285) of this version and all the versions you might have skipped, before installing and using this version.
 
 #### Latest release builds
 

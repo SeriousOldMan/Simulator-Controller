@@ -741,8 +741,11 @@ updatePluginsForV285() {
 						userPlugin.Arguments.Delete(parameter)
 					}
 				
-				if (newArguments.Length() > 0)
+				if (newArguments.Length() > 0) {
 					userPlugin.setArgumentValue("pitstopCommands", values2String(", ", newArguments*))
+					
+					userPlugin.saveToConfiguration(userConfiguration)
+				}
 			}
 		}
 		

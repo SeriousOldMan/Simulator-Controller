@@ -43,6 +43,14 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ***
 
+## Release 2.8.5
+
+  1. The plugin parameter "pitstopSettings" has been renamed to "pitstopCommands" for the various simulator plugins, and the actions of the "raceEngineerCommands" has been included in "pitstopCommands" and the "raceEngineerCommands" parameter is no longer valid. All this will be handled by the automated update procedure.
+  2. Several controller actions from "openPitstopMFD" up to "changePitstopDriver" had been generalized and are now available in all race simulation plugins. The action function "togglePitstopActivity" had been replaced by "changePitstopOption", and the "changePitstopTyreCompound" has changed paramater semantics (both not handled by the automated update procedure). If you have used some of these action functions in your configuration, you might want to take a look at the [documentation of the controller actions](*) for more information, and update your configuration accordingly.
+  3. A new "Pitstop" mode has been introduced for both the "R3E" and "RF2" plugins. Please take a look at the configuration documentation for the ["R3E" plugin](*) and the ["RF2" plugin](*), if you want to use these modes on your Button Box. You also might want to adjust the [controller automation rules](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#configuration-of-the-controller-mode-automation) for the new plugin modes as well.
+
+***
+
 ## Release 2.8.2
 
 Beside the automated update, two things are worth to mention for this release:

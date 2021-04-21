@@ -1,11 +1,12 @@
-## 2.8.5-release 04/30/21 (planned)
+## 2.8.5-release 04/23/21 (planned)
 
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. Jona can decide to leave the current tyres on the car at a late pitstop (aka splash and dash)
-  4. Jona intelligently reports and handles damage late in a stint
-  5. New plugin modes for pitstop control for the plugins for *rFactor 2* and *RaceRoom Racing Experience*
-  6. Jona now can handle the pitstop setup for you in the *RaceRoom Racing Experience* simulation
+  3. Jona can decide to leave the current tyres on the car at a late pitstop (aka splash and dash).
+  4. Jona intelligently reports and handles damage late in a stint.
+  5. New plugin modes for pitstop control for the plugins for [*rFactor 2*](*) and [*RaceRoom Racing Experience*](*) allow you to dial most of the pitstop settings from your controller hardware.
+  6. Jona now can handle the pitstop setup for you in the *RaceRoom Racing Experience* simulation. The support is quite limited: Jona can set the amount of fuel to add, and toggle the tyre change and the different repair options for the upcoming pitstop.
+  7. (Developer Only): Once again a lot of refactoring in the [simulator plugin implementation classes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#simulator-plugin-implementation-classes) and the various simulator plugins. The "Pitstop" mode implementation class and the various pitstop action classes has been moved to the above library.
 
 ## 2.8.2-release 04/16/21
 

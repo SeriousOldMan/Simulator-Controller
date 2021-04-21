@@ -719,6 +719,38 @@ updateConfigurationForV20() {
 	updateCustomCalls(13, 32)
 }
 
+updatePluginsForV285() {
+	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	userConfiguration := readConfiguration(userConfigurationFile)
+	
+	if (userConfiguration.Count() > 0) {
+		changed := false
+		
+		for ignore, pluginName in ["ACC", "RF2", "R3E"] {
+			if getConfigurationValue(userConfiguration, "Plugins", pluginName, false) {
+				userPlugin := new Plugin(pluginName, userConfiguration)
+				
+				newArguments := []
+				
+				for ignore, parameter in ["pitstopSettings", "raceEngineerCommands"]
+					if userPlugin.hasArgument(parameter) {
+						changed := true
+						
+						newArguments := concatenate(newArguments, string2Values(",", userPlugin.getArgumentValue(parameter)))
+						
+						userPlugin.Arguments.Delete(parameter)
+					}
+				
+				if (newArguments.Length() > 0)
+					userPlugin.setArgumentValue("pitstopCommands", values2String(", ", newArguments*))
+			}
+		}
+		
+		if changed
+			writeConfiguration(userConfigurationFile, userConfiguration)
+	}
+}
+
 updatePluginsForV28() {
 	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
 	userConfiguration := readConfiguration(userConfigurationFile)

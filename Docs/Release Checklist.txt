@@ -15,10 +15,8 @@ General Release Actions
 Release 2.8.5 Checklist
 =======================
 
-0. Search for new or broken links (*)
-1. No Tyre Change Option
-   a. Documentation
-2. supportsPitstop more parameters
+1. Search for new or broken links (*)
+2. No Tyre Change Option
    a. Documentation
 3. Late Damage Handling for Jona
    a. Documentation
@@ -38,11 +36,11 @@ Release 2.8.5 Checklist
    a. Documentation
    b. Update Procedure
    c. Update Notes
+   d. Test update procedure
 8. Pitstop Mode for R3E and RF2
    a. Documentation
    b. Translations
-   c. Update Procedure
-   d. Controller Plugin Labels
+   c. Controller Plugin Labels
 9. Moved Pitstop Actions from ACC to Simulator Plugin
    - - toggleActivity
    - + changePitstopOption

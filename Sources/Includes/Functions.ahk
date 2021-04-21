@@ -1407,7 +1407,7 @@ concatenate(arrays*) {
 	result := []
 	
 	for ignore, array in arrays
-		for index, value in array
+		for ignore, value in array
 			result.Push(value)
 			
 	return result

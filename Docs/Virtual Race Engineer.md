@@ -2,7 +2,7 @@
 
 Welcome to Jona, the world first fully interactive and AI-based Virtual Race Engineer for race car simulations.
 
-Ok, enough marketing bullshit. Jona is a voice chat bot with a special knowledge about racing. It uses the telemetry data provided by a simulation game and a large domain specific rule set to derive its knowledge from there. Using this knowledge, Jona can give you information about the current state of your car (temperatures, pressures, remaining laps, upcoming pitstops, and so on), and can recommend settings for the next pitstop. Currently, Jona supports the *Assetto Corsa Competizione*, *RaceRoom Racing Experience* and *rFactor 2* simulation games through their respective plugins. Using the Pitstop MFD handling for *Assetto Corsa Competizione* introduced with [Release 2.0](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-20), Jona is even capable to setup a pitstop without user interaction completely on its own. Step by step, this will be made available for all simulations, where this is possible (currently *Assetto Corsa Competizione* and *rFactor 2* are supported).
+Ok, enough marketing bullshit. Jona is a voice chat bot with a special knowledge about racing. It uses the telemetry data provided by a simulation game and a large domain specific rule set to derive its knowledge from there. Using this knowledge, Jona can give you information about the current state of your car (temperatures, pressures, remaining laps, upcoming pitstops, and so on), and can recommend settings for the next pitstop. Currently, Jona supports the *Assetto Corsa Competizione*, *RaceRoom Racing Experience* and *rFactor 2* simulation games through their respective plugins. Using the Pitstop MFD handling for *Assetto Corsa Competizione* introduced with [Release 2.0](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-20), Jona is even capable to setup a pitstop without user interaction completely on its own. Step by step, this will be made available for all simulations, where this is possible (currently *Assetto Corsa Competizione*, *rFactor 2* and *RaceRoom Racing Experience* are supported, although the support for *RaceRoom Racing Experience* is quite limited).
 
 ***
 
@@ -270,7 +270,7 @@ Good to know: When the *Race Engineer.settings* file is changed while Jona is al
 
 ### The pitstop
 
-The process of the pitstop handling differs between the various supported simulations. Below you will find some simulation specific hints. Please note, that pitstop handling is currently available for *Assetto Corsa Competizione* and *rFactor 2*.
+The process of the pitstop handling differs between the various supported simulations. Below you will find some simulation specific hints. Please note, that pitstop handling is currently available for *Assetto Corsa Competizione*, *rFactor 2* and *RaceRoom Racing Experience*.
 
 A final warning: If you ever perform a pitstop, which has not been planned and prepared by Jona, Jona will be very confused, say the least. You can do this, but please double check the recommendations of Jona for each subsequent pitstop, especially the chosen tyre set, if you don't want to end up with worn out tyres for your last stint.
 
@@ -292,6 +292,10 @@ Last but not least, the check boxes for repair of Suspension and Bodywork must b
 #### *rFactor 2*
 
 No special setup required for *rFactor 2*, since this simulation has an integrated interface to control the pitstop settings externally.
+
+#### *RaceRoom Racing Experience*
+
+*RaceRoom Racing Experience* does not provide any data interface for initial setup information. So you must take care, that everything is entered correctly into the settings tool, before you had out onto the track. On the other hand, the support for pitstop settings is quite limited in *RaceRoom Racing Experience*, so you might skip tyre pressures and dry vs. wet tyre considerations alltogether.
 
 ### Race & Setup database
 

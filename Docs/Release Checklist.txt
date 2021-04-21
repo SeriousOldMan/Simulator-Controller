@@ -41,6 +41,7 @@ Release 2.8.5 Checklist
    a. Documentation
    b. Translations
    c. Controller Plugin Labels
+   d. New documentation images for Button Box modes
 9. Moved Pitstop Actions from ACC to Simulator Plugin
    - - toggleActivity
    - + changePitstopOption

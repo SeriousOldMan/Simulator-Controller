@@ -2117,6 +2117,9 @@ class CutChoicePoint extends ChoicePoint {
 		candidate := base.previous()
 		
 		Loop {
+			if !candidate
+				return false
+			
 			if (ruleEngine.TraceLevel <= kTraceLight)
 				ruleEngine.trace(kTraceLight, "Cutting " . candidate.Goal.toString(resultSet))
 		
@@ -3742,7 +3745,7 @@ class NilParser extends Parser {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-debugMsgBox(ignore, args*) {
+msgBox(ignore, args*) {
 	MsgBox % "Debug: " . values2String(A_Space, args*)
 	
 	return true

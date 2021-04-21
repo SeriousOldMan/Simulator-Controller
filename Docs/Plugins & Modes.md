@@ -364,6 +364,7 @@ See the following table for the supported settings.
 
 | Setting | Description |
 | ------ | ------ |
+| Strategy | Choose one of the predefined pitstop strategies. |
 | Refuel | Increment or decrement the refuel amount. Supports the additional increments argument. |
 | TyreChange | Toggles, whether you want to change the tires at the next pitstop or nor. |
 | SuspensionRepair | Toggles the repair of the suspension components. |

@@ -105,7 +105,7 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 	}
 	
 	getPitstopActions(ByRef allActions, ByRef selectActions) {
-		allActions := {Refuel: "Refuel", TyreChange: "Change Tyres", BodyworkRepair: "Repair Bodywork", SuspensionRepair: "Repair Suspension"}
+		allActions := {Strategy: "Strategy", Refuel: "Refuel", TyreChange: "Change Tyres", BodyworkRepair: "Repair Bodywork", SuspensionRepair: "Repair Suspension"}
 		selectActions := []
 	}
 	
@@ -201,12 +201,10 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 		Loop 15
 			SendEvent % this.NextOptionHotkey
 		
-		/*
 		if this.searchMFDImage("Strategy") {
 			this.iPitstopOptions.Push("Strategy")
 			this.iPitstopOptionStates.Push(true)
 		}
-		*/
 		
 		if this.searchMFDImage("Refuel") {
 			this.iPitstopOptions.Push("Refuel")
@@ -323,7 +321,9 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 	}
 	
 	changePitstopOption(option, action, steps := 1) {
-		if (option = "Refuel")
+		if (option = "Strategy")
+			this.dialPitstopOption(option, action, steps)
+		else if (option = "Refuel")
 			this.changeFuelAmount(action, steps, false, false)
 		else if (option = "Change Tyres") {
 			this.toggleActivity("Change Front Tyres", false, true)
@@ -500,7 +500,7 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 				pitstopImage := pitstopImages[A_Index]
 				
 				if !this.iPSImageSearchArea {
-					ImageSearch imageX, imageY, 0, 0, A_ScreenWidth, A_ScreenHeight, %pitstopImage%
+					ImageSearch imageX, imageY, 0, 0, A_ScreenWidth, A_ScreenHeight, *100 %pitstopImage%
 
 					if (getLogLevel() <= kLogInfo)
 						logMessage(kLogInfo, substituteVariables(translate("Full search for '%image%' took %ticks% ms"), {image: imageName, ticks: A_TickCount - curTickCount}))
@@ -510,7 +510,7 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 							this.iPSImageSearchArea := [Max(0, imageX - kSearchAreaLeft), 0, Min(imageX + kSearchAreaRight, A_ScreenWidth), A_ScreenHeight]
 				}
 				else {
-					ImageSearch imageX, imageY, this.iPSImageSearchArea[1], this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], %pitstopImage%
+					ImageSearch imageX, imageY, this.iPSImageSearchArea[1], this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *100 %pitstopImage%
 
 					if (getLogLevel() <= kLogInfo)
 						logMessage(kLogInfo, substituteVariables(translate("Fast search for '%image%' took %ticks% ms"), {image: imageName, ticks: A_TickCount - curTickCount}))

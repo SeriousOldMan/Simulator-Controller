@@ -26,7 +26,7 @@ global kR3EPlugin = "R3E"
 ;;;                         Private Constant Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kBinaryOptions = ["Change Front Tyres", "Change Rear Tyres", "Repair Aero Front", "Repair Aero Rear", "Repair Suspension"]
+global kBinaryOptions = ["Change Front Tyres", "Change Rear Tyres", "Repair Aero Front", "Repair Aero Rear", "Repair Suspension", "Request Pitstop"]
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -44,6 +44,8 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 	iAcceptChoiceHotkey := false
 	
 	iPSImageSearchArea := false
+	iPitstopOptions := []
+	iPitstopOptionStates := []
 	
 	OpenPitstopMFDHotkey[] {
 		Get {
@@ -99,7 +101,7 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 		this.iNextChoiceHotkey := this.getArgumentValue("nextChoiceHotkey", "D")
 		this.iAcceptChoiceHotkey := this.getArgumentValue("acceptChoiceHotkey", "{Enter}")
 		
-		SetKeyDelay, 5, 15, Play
+		SetKeyDelay, 5, 15
 	}
 	
 	getPitstopActions(ByRef allActions, ByRef selectActions) {
@@ -117,7 +119,7 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 	pitstopMFDIsOpen() {
 		this.activateR3EWindow()
 		
-		return this.searchMFDImage("PITSTOP")
+		return this.searchMFDImage("PITSTOP 1", "PITSTOP 2")
 	}
 		
 	openPitstopMFD() {
@@ -142,16 +144,16 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 		secondTry := false
 		
 		if first
-			SendPlay % this.OpenPitstopMFDHotkey
+			SendEvent % this.OpenPitstopMFDHotkey
 			
-		if !this.searchMFDImage("PITSTOP") {
-			SendPlay % this.OpenPitstopMFDHotkey
+		if !this.pitstopMFDIsOpen() {
+			SendEvent % this.OpenPitstopMFDHotkey
 			
 			secondTry := true
 		}
 		
 		if (first && secondTry)
-			this.searchMFDImage("PITSTOP")
+			this.pitstopMFDIsOpen()
 		
 		first := false
 		
@@ -165,7 +167,7 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 
 		if this.pitstopMFDIsOpen() {
 			if this.ClosePitstopMFDHotkey {
-				SendPlay % this.ClosePitstopMFDHotkey
+				SendEvent % this.ClosePitstopMFDHotkey
 				
 				Sleep 50
 			}
@@ -194,17 +196,11 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 		this.iPitstopOptions := []
 		this.iPitstopOptionStates := []
 		
-		keys := ""
-		
-		Loop 15
-			keys .= this.NextOptionHotkey
-		
 		this.activateR3EWindow()
 
-		SendPlay %keys%
-
-		Sleep 50
-			
+		Loop 15
+			SendEvent % this.NextOptionHotkey
+		
 		if this.searchMFDImage("Refuel") {
 			this.iPitstopOptions.Push("Refuel")
 			this.iPitstopOptionStates.Push(true)
@@ -218,7 +214,7 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 			this.iPitstopOptions.Push("Change Front Tyres")
 			this.iPitstopOptionStates.Push(true)
 		}
-		else if this.searchMFDImage("No Front Tyre Change") {
+		else { ; if this.searchMFDImage("No Front Tyre Change") {
 			this.iPitstopOptions.Push("Change Front Tyres")
 			this.iPitstopOptionStates.Push(false)
 		}
@@ -227,7 +223,7 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 			this.iPitstopOptions.Push("Change Rear Tyres")
 			this.iPitstopOptionStates.Push(true)
 		}
-		else if this.searchMFDImage("No Rear Tyre Change") {
+		else { ; if this.searchMFDImage("No Rear Tyre Change") {
 			this.iPitstopOptions.Push("Change Rear Tyres")
 			this.iPitstopOptionStates.Push(false)
 		}
@@ -248,6 +244,15 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 			this.iPitstopOptions.Push("Repair Suspension")
 			this.iPitstopOptionStates.Push(this.searchMFDImage("Suspension Damage Selected") != false)
 		}
+		
+		if this.searchMFDImage("PIT REQUEST") {
+			this.iPitstopOptions.Push("Request Pitstop")
+			this.iPitstopOptionStates.Push(true)
+		}
+		else {
+			this.iPitstopOptions.Push("Request Pitstop")
+			this.iPitstopOptionStates.Push(false)
+		}
 	}
 	
 	optionAvailable(option) {
@@ -265,31 +270,17 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 	}
 	
 	dialPitstopOption(option, action, steps := 1) {
+		this.activateR3EWindow()
+
 		switch action {
+			case "Accept":
+				SendEvent % this.AcceptChoiceHotkey
 			case "Increase":
-				key := (inList(kBinaryOptions, option) ? this.AcceptChoiceHotkey : this.NextChoiceHotkey)
-				keys := ""
-				
 				Loop %steps%
-					keys .= key
-				
-				this.activateR3EWindow()
-
-				SendPlay %keys%
-
-				Sleep 50
+					SendEvent % this.NextChoiceHotkey
 			case "Decrease":
-				key := (inList(kBinaryOptions, option) ? this.AcceptChoiceHotkey : this.PreviousChoiceHotkey)
-				keys := ""
-				
 				Loop %steps%
-					keys .= key
-				
-				this.activateR3EWindow()
-
-				SendPlay %keys%
-
-				Sleep 50
+					SendEvent % this.PreviousChoiceHotkey
 			default:
 				Throw "Unsupported change operation """ . action . """ detected in R3EPlugin.dialPitstopOption..."
 		}
@@ -306,31 +297,16 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 			index := this.optionIndex(option)
 			
 			if index {
-				keys := ""
-					
-				Loop 10
-					keys .= this.PreviousOptionHotkey
-				
 				this.activateR3EWindow()
 
-				SendPlay %keys%
-
-				Sleep 50
+				Loop 10
+					SendEvent % this.PreviousOptionHotkey
 				
 				index -= 1
 				
-				if index {
-					keys := ""
-					
+				if index
 					Loop %index%
-						keys .= this.NextOptionHotkey
-					
-					this.activateR3EWindow()
-
-					SendPlay %hotKey%
-
-					Sleep 50
-				}
+						SendEvent % this.NextOptionHotkey
 				
 				return true
 			}
@@ -360,7 +336,7 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 		if inList(kBinaryOptions, activity) {
 			if (!require || this.requirePitstopMFD())
 				if  (!select || this.selectPitstopOption(activity))
-					this.dialPitstopOption(activity, "Increase")
+					this.dialPitstopOption(activity, "Accept")
 		}
 		else
 			Throw "Unsupported activity """ . activity . """ detected in R3EPlugin.toggleActivity..."
@@ -369,17 +345,12 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 	changeFuelAmount(direction, litres := 5, require := true, select := true) {
 		if (!require || this.requirePitstopMFD())
 			if (!select || this.selectPitstopOption("Refuel")) {
-				if this.chosenOption("Refuel") {
-					SendPlay % this.AcceptChoiceHotkey
-
-					Sleep 50
-				}
+				if this.optionChosen("Refuel")
+					SendEvent % this.AcceptChoiceHotkey
 				
 				this.dialPitstopOption("Refuel", direction, litres)
 
-				SendPlay % this.AcceptChoiceHotkey
-
-				Sleep 50
+				SendEvent % this.AcceptChoiceHotkey
 			}
 	}
 	
@@ -389,23 +360,18 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 	
 	startPitstopSetup(pitstopNumber) {
 		this.requirePitstopMFD()
+		
+		if this.optionChosen("Request Pitstop")
+			this.toggleActivity("Request Pitstop", false, true)
 	}
 
 	finishPitstopSetup(pitstopNumber) {
-		keys := ""
-		
-		Loop 10
-			key .= this.NextOptionHotkey
-			
 		this.activateR3EWindow()
 
-		SendPlay %keys%
-
-		Sleep 50
+		Loop 10
+			SendEvent % this.NextOptionHotkey
 		
-		SendPlay % this.AcceptChoiceHotkey
-
-		Sleep 50
+		SendEvent % this.AcceptChoiceHotkey
 	}
 
 	setPitstopRefuelAmount(pitstopNumber, litres) {
@@ -506,46 +472,50 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 		}
 	}
 	
-	searchMFDImage(imageName) {
-		static kSearchAreaLeft := 250
-		static kSearchAreaRight := 250
+	searchMFDImage(imageNames*) {
+		static kSearchAreaLeft := 0
+		static kSearchAreaRight := 400
 		
-		pitstopImages := this.getImageFileNames(imageName)
-		
-		this.activateR3EWindow()
-		
-		curTickCount := A_TickCount
-		
-		imageX := kUndefined
-		imageY := kUndefined
-		
-		Loop % pitstopImages.Length()
+		Loop % imageNames.Length()
 		{
-			pitstopImage := pitstopImages[A_Index]
+			imageName := imageNames[A_Index]
+			pitstopImages := this.getImageFileNames(imageName)
 			
-			if !this.iPSImageSearchArea {
-				ImageSearch imageX, imageY, 0, 0, A_ScreenWidth, A_ScreenHeight, *50 %pitstopImage%
+			this.activateR3EWindow()
+			
+			curTickCount := A_TickCount
+			
+			imageX := kUndefined
+			imageY := kUndefined
+			
+			Loop % pitstopImages.Length()
+			{
+				pitstopImage := pitstopImages[A_Index]
+				
+				if !this.iPSImageSearchArea {
+					ImageSearch imageX, imageY, 0, 0, A_ScreenWidth, A_ScreenHeight, %pitstopImage%
 
-				if (getLogLevel() <= kLogInfo)
-					logMessage(kLogInfo, substituteVariables(translate("Full search for '%image%' took %ticks% ms"), {image: imageName, ticks: A_TickCount - curTickCount}))
+					if (getLogLevel() <= kLogInfo)
+						logMessage(kLogInfo, substituteVariables(translate("Full search for '%image%' took %ticks% ms"), {image: imageName, ticks: A_TickCount - curTickCount}))
+					
+					if imageX is Integer
+						if ((imageName = "PITSTOP 1") || (imageName = "PITSTOP 2"))
+							this.iPSImageSearchArea := [Max(0, imageX - kSearchAreaLeft), 0, Min(imageX + kSearchAreaRight, A_ScreenWidth), A_ScreenHeight]
+				}
+				else {
+					ImageSearch imageX, imageY, this.iPSImageSearchArea[1], this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], %pitstopImage%
+
+					if (getLogLevel() <= kLogInfo)
+						logMessage(kLogInfo, substituteVariables(translate("Fast search for '%image%' took %ticks% ms"), {image: imageName, ticks: A_TickCount - curTickCount}))
+				}
 				
 				if imageX is Integer
-					if (imageName = "PITSTOP")
-						this.iPSImageSearchArea := [Max(0, imageX - kSearchAreaLeft), 0, Min(imageX + kSearchAreaRight, A_ScreenWidth), A_ScreenHeight]
-			}
-			else {
-				ImageSearch imageX, imageY, this.iPSImageSearchArea[1], this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *50 %pitstopImage%
-
-				if (getLogLevel() <= kLogInfo)
-					logMessage(kLogInfo, substituteVariables(translate("Fast search for '%image%' took %ticks% ms"), {image: imageName, ticks: A_TickCount - curTickCount}))
-			}
-			
-			if imageX is Integer
-			{
-				if (getLogLevel() <= kLogInfo)
-					logMessage(kLogInfo, substituteVariables(translate("'%image%' found at %x%, %y%"), {image: imageName, x: imageX, y: imageY}))
-				
-				return true
+				{
+					if (getLogLevel() <= kLogInfo)
+						logMessage(kLogInfo, substituteVariables(translate("'%image%' found at %x%, %y%"), {image: imageName, x: imageX, y: imageY}))
+					
+					return true
+				}
 			}
 		}
 		

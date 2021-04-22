@@ -394,23 +394,6 @@ class RaceEngineerSimulatorPlugin extends SimulatorPlugin {
 		}
 	}
 	
-	__New(controller, name, simulator, configuration := false) {
-		base.__New(controller, name, simulator, configuration)
-		
-		for ignore, theAction in string2Values(",", this.getArgumentValue("pitstopCommands", "")) {
-			arguments := string2Values(A_Space, theAction)
-		
-			theAction := arguments[1]
-			
-			if ((theAction = "PitstopPlan") || (theAction = "PitstopPrepare"))
-				this.createRaceEngineerAction(controller, arguments*)
-			else
-				this.createPitstopAction(controller, arguments*)
-		}
-		
-		controller.registerPlugin(this)
-	}
-	
 	createRaceEngineerAction(controller, action, actionFunction) {
 		local function := controller.findFunction(actionFunction)
 			

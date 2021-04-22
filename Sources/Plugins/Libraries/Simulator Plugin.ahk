@@ -88,7 +88,7 @@ class PitstopMode extends ControllerMode {
 
 class PitstopAction extends ControllerAction {
 	iPlugin := false
-	iPitstopOption := false
+	iOption := false
 	iSteps := 1
 	
 	Plugin[] {
@@ -99,7 +99,7 @@ class PitstopAction extends ControllerAction {
 	
 	Option[] {
 		Get {
-			return this.iPitstopOption
+			return this.iOption
 		}
 	}
 	
@@ -109,9 +109,9 @@ class PitstopAction extends ControllerAction {
 		}
 	}
 	
-	__New(plugin, function, label, pitstopOption, steps := 1, moreArguments*) {
+	__New(plugin, function, label, option, steps := 1, moreArguments*) {
 		this.iPlugin := plugin
-		this.iPitstopOption := pitstopOption
+		this.iOption := option
 		this.iSteps := steps
 		
 		if (moreArguments.Length() > 0)
@@ -136,10 +136,10 @@ class PitstopChangeAction extends PitstopAction {
 		}
 	}
 	
-	__New(plugin, function, label, pitstopOption, direction, moreArguments*) {
+	__New(plugin, function, label, option, direction, moreArguments*) {
 		this.iDirection := direction
 		
-		base.__New(plugin, function, label, pitstopOption, moreArguments*)
+		base.__New(plugin, function, label, option, moreArguments*)
 	}
 	
 	fireAction(function, trigger) {
@@ -149,8 +149,8 @@ class PitstopChangeAction extends PitstopAction {
 }
 
 class PitstopSelectAction extends PitstopChangeAction {
-	__New(plugin, function, label, pitstopOption, moreArguments*) {
-		base.__New(plugin, function, label, pitstopOption, "Increase", moreArguments*)
+	__New(plugin, function, label, option, moreArguments*) {
+		base.__New(plugin, function, label, option, "Increase", moreArguments*)
 	}
 }
 

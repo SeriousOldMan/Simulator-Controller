@@ -50,6 +50,8 @@ Release 2.8.5 Checklist
    c. Function Reference.md
 10. Optimized search for => with variables
    a. Translations
+11. SimulatorPlugin Link rename
+   a. Search and Replace in MD files
 
 Release 2.8.2 Checklist
 =======================

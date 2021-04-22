@@ -749,6 +749,16 @@ updatePluginsForV285() {
 			}
 		}
 		
+		if !getConfigurationValue(userConfiguration, "Plugins", "IRC", false) {
+			ircPlugin := new Plugin("IRC", readConfiguration(getFileName(kSimulatorConfigurationFile, kConfigDirectory)))
+				
+			ircPlugin.iIsActive := false
+			
+			ircPlugin.saveToConfiguration(userConfiguration)
+			
+			changed := true
+		}
+		
 		if changed
 			writeConfiguration(userConfigurationFile, userConfiguration)
 	}

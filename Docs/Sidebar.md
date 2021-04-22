@@ -237,13 +237,6 @@
           - [PitstopSelectAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#pitstopselectaction-extends-pitstopchangeaction-simulator-pluginahk)
         - [PitstopToggleAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#pitstoptoggleaction-extends-pitstopaction-simulator-pluginahk)
       - [RaceEngineerAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#raceengineeraction-extends-controlleraction-simulator-pluginahk)
-        
-
-
-[Backlog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Backlog)
-------
-)
-
 
 [Backlog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Backlog)
 ------

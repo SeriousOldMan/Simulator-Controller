@@ -821,7 +821,7 @@ lapAvgTime(?lap, ?times, ?avgTime) <= sum(?times, ?sTimes), length(?times, ?sLen
 recentLapTimes(?lap, ?times) <= recentLapTimes(?lap, 0, ?temp), remove(?temp, 0, ?times)
 
 recentLapTimes(?lap, ?lap, []) <= !
-recentLapTimes(?, !Session.Settings.Lap.History.Considered, []) <= !
+recentLapTimes(?, ?offset, []) <= >=(?offset, !Session.Settings.Lap.History.Considered), !
 recentLapTimes(?lap, ?offset, [0 | ?times]) <= ?tLap = ?lap - ?offset, recentPitstopLap(?tlap), !, ?nOffset = ?offset + 1,						\
 											   recentLapTimes(?lap, ?nOffset, ?times)
 recentLapTimes(?lap, ?offset, [0]) <= ?tLap = ?lap - ?offset, ?tLap = 1, !

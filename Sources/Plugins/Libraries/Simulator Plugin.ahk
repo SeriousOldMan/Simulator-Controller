@@ -581,7 +581,7 @@ changePitstopTyrePressure(tyre, direction, increments := 1) {
 	if !inList(["Increase", "Decrease"], direction)
 		logMessage(kLogWarn, translate("Unsupported pressure change """) . direction . translate(""" detected in changePitstopTyrePressure - please check the configuration"))
 	
-	changePitstopOption(tyre, selection, increments)
+	changePitstopOption(tyre, direction, increments)
 }
 
 changePitstopBrakeType(brake, selection) {

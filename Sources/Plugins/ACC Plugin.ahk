@@ -1044,7 +1044,7 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 	
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
 		if compound {
-			changePitstopTyreCompound(compound)
+			changePitstopTyreCompound((compound = "Wet") ? "Increase" : "Decrease")
 			
 			data := readSharedMemory(this.Code, "-Setup", kTempDirectory . "ACC Data\Setup.data")
 			

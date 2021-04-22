@@ -700,7 +700,7 @@ The two classes *SimulatorPlugin* and *RaceEngineerSimlatorPlugin* can be used a
 You can take a look at a specific implementation of a simulator plugin for an example on how to use these building blocks (for example [AC Plugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/AC%20Plugin.ahk) with minimal support or [RF2 Plugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/RF2%20Plugin.ahk) with full support including the Virtual Race Engineer and pitstop handling).
 
 ## SimulatorPlugin extends [ControllerPlugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controllerplugin-extends-plugin-simulator-controllerahk) ([Simulator Plugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Libraries/Simulator%20Plugin.ahk))
-This class may be used for simple simulator plugins which will NOT support the Virtual Race Engineer. The implementation *understands* that a given applicaton represents the simulator game and also is able to separate between different session types ("Practice", "Race", and so on). Depending on the technical capabilities and the supplied initialization arguements, a "Pitstop" mode (see class [PitstopMode](*)) is created upon initialization.
+This class may be used for simple simulator plugins which will NOT support the Virtual Race Engineer. The implementation *understands* that a given applicaton represents the simulator game and also is able to separate between different session types ("Practice", "Race", and so on). Depending on the technical capabilities and the supplied initialization arguements, a "Pitstop" mode (see class [PitstopMode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#pitstopmode-extends-controllermode-simulator-pluginahk)) is created upon initialization.
 
 ### Public Properties
 
@@ -722,10 +722,10 @@ A list of all supported session states supported by the given simulator (excludi
 The constructor adds the additional parameter *simulator* to the inherited *__New* method. The name of the game application, as configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--configuration), must be supplied for the *simulator* parameter.
 
 #### *createPitstopAction(controller :: SimulatorController, action :: String, increaseFunction :: String, moreArguments* :: String)*
-This factory method will be called for each supplied action identifier for the [*pitstopCommands* plugin parameter](*). Please see the documentation of [getPitstopActions] for more information. Depending on the concrete action, *moreArguments* may contain a second controller function descriptor, an initial state and other information, like the number of increments a value should be changed by the action.
+This factory method will be called for each supplied action identifier for the [*pitstopCommands* plugin parameter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-4). Please see the documentation of [getPitstopActions] for more information. Depending on the concrete action, *moreArguments* may contain a second controller function descriptor, an initial state and other information, like the number of increments a value should be changed by the action.
 
 #### *getPitstopActions(ByRef allActions :: Map(String => String), ByRef selectActions :: Array)*
-Whenever a simulator plugin can provide functionality to handle the pitstop settings automatically, this method must be overriden. All methods below (*openPitstopMFD*, *selectPitstopOption*, and so on) will only be called, if at least one pitstop action has been defined and initialized by a value for the plugin [*pitstopCommands* parameter](*). The first result parameter *allActions* must map all external action identifier used by *pitstopCommands* to internal option identifiers, which are used internally and may be shared with external code (for example, a telemetry plugin for the corresponding simulation game). Example: *TyreFrontLeft* => *FL PRESS:* (for *rFactor 2*). For each provided action, an instance of one of the subclasses of [PitstopAction](*) is created and registered for the ["Pitstop" mode](*), which is also created automatically. In *selectActions* a list of all action identifiers, for which an instance of [PitstopSelectAction](*) should be created, when only one controller function has been provided, for all other actions with one supplied controller functions, an instance of [PitstopToggleAction](*) will be created. When two controller functions has been supplied, two instances of [PitstopChangeAction](*) will be created.
+Whenever a simulator plugin can provide functionality to handle the pitstop settings automatically, this method must be overriden. All methods below (*openPitstopMFD*, *selectPitstopOption*, and so on) will only be called, if at least one pitstop action has been defined and initialized by a value for the plugin [*pitstopCommands* parameter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-4). The first result parameter *allActions* must map all external action identifier used by *pitstopCommands* to internal option identifiers, which are used internally and may be shared with external code (for example, a telemetry plugin for the corresponding simulation game). Example: *TyreFrontLeft* => *FL PRESS:* (for *rFactor 2*). For each provided action, an instance of one of the subclasses of [PitstopAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-pitstopaction-extends-controlleraction-simulator-pluginahk) is created and registered for the ["Pitstop" mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#pitstopmode-extends-controllermode-simulator-pluginahk), which is also created automatically. In *selectActions* a list of all action identifiers, for which an instance of [PitstopSelectAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#pitstopselectaction-extends-pitstopchangeaction-simulator-pluginahk) should be created, when only one controller function has been provided, for all other actions with one supplied controller functions, an instance of [PitstopToggleAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#pitstoptoggleaction-extends-pitstopaction-simulator-pluginahk) will be created. When two controller functions has been supplied, two instances of [PitstopChangeAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#pitstopchangeaction-extends-pitstopaction-simulator-pluginahk) will be created.
 
 #### [Abstract] *openPitstopMFD()*
 The implementation of *openPitstopMFD*, which must be provided by a subclass, must open the pitstop settings dialog in order to automatically apply the necessary value changes using the methods below. *openPitstopMFD* must return *true*, when the pitstop settings dialog has been opened successfully.
@@ -737,10 +737,10 @@ This method, which also must be implemented by a subclass, must close the pitsto
 *requirePitstopMFD* is always called, before a value in the pitstop settings will be changed. It should check, if the pitstop settings dialog is already open and, if not, open it using *openPitstopMFD*. *requirePitstopMFD* returns *true*, if this requirement has been met, The standard implementation returns *false*.
 
 #### [Abstract] *selectPitstopOption(option :: String)*
-Is called when a setting on a Pitstop MFD is about to be changed. The implementation may move the input focus to the corresponding input widget, if necessary. *option* is the internal name of the pitstop setting to be changed (see [*getPitstopActions*](*) for discussion on internal vs. external pitstop command names). Returns *true*, if the option has been selected successfully, This method must be implemented by a subclass.
+Is called when a setting on a Pitstop MFD is about to be changed. The implementation may move the input focus to the corresponding input widget, if necessary. *option* is the internal name of the pitstop setting to be changed (see [*getPitstopActions*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#getpitstopactionsbyref-allactions--mapstring--string-byref-selectactions--array) for discussion on internal vs. external pitstop command names). Returns *true*, if the option has been selected successfully, This method must be implemented by a subclass.
 	
 #### [Abstract] *changePitstopOption(option :: String, action :: String, steps :: Integer := 1) {
-This method is called always directly after *selectPitstopOption* to change the value of a pitstop setting. *option* is the internal name of the pitstop setting to be changed (see [*getPitstopActions*](*) for discussion on internal vs. external pitstop command names). *direction* will be either "Increase" or "Decrease" and *steps* denote the number of value increments to be applied. This method must be implemented by a subclass.
+This method is called always directly after *selectPitstopOption* to change the value of a pitstop setting. *option* is the internal name of the pitstop setting to be changed (see [*getPitstopActions*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#getpitstopactionsbyref-allactions--mapstring--string-byref-selectactions--array) for discussion on internal vs. external pitstop command names). *direction* will be either "Increase" or "Decrease" and *steps* denote the number of value increments to be applied. This method must be implemented by a subclass.
 
 #### *updateSessionState(sessionState :: OneOf(kSessionFinished, kSessionPaused, kSessionOther, ...))*
 This method will be called, when a simulator has been started or finished, or when the user enters a simulation session. The default implementation informs the *SimulatorController* instance, which then will activate the best fitting modes on the controller hardware.
@@ -756,7 +756,7 @@ Returns the instance of *RaceEngineerPlugin* (see the [documentation](https://gi
 ### Public Methods
 
 #### *createRaceEngineerAction(controller :: SimulatorController, action :: String, actionFunction :: String)*
-Very similar to the [createPitstopAction](*) factory method, this method is called for the *PitstopPlan* and *PitstopPrepare* actions. An instance of [RaceEngineerAction] will be created for each action and will be registered for the "Pitstop" mode.
+Very similar to the [createPitstopAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#createpitstopactioncontroller--simulatorcontroller-action--string-increasefunction--string-morearguments--string) factory method, this method is called for the *PitstopPlan* and *PitstopPrepare* actions. An instance of [RaceEngineerAction] will be created for each action and will be registered for the "Pitstop" mode.
 
 #### *planPitstop()*
 Calling this method will ask Jona to plan an upcoming pitstop.
@@ -765,7 +765,7 @@ Calling this method will ask Jona to plan an upcoming pitstop.
 Calling this method will ask Jona to prepare the last planned pitstop.
 
 #### *supportsPitstop()*
-If thie method returns *true*, this plugin supports automated pitstop handling together with the Virtual Race Engineer. The default implementation returns *false*. Whenever a subclass of *RaceEngineerSimulatorPlugin* returns *true* here, it will implement at least some of the following methods as well.
+If this method returns *true*, this plugin supports automated pitstop handling together with the Virtual Race Engineer. The default implementation returns *false*. Whenever a subclass of *RaceEngineerSimulatorPlugin* returns *true* here, it will implement at least some of the following methods as well.
 
 #### *pitstopPlanned(pitstopNumber :: Integer)*
 *pitstopPlanned* is called by the Race Engineer, whenever there is an updated plan for an upcoming pitstop. The default method does nothing here.
@@ -788,7 +788,7 @@ The implemenzation of *setPitstopRefuelAmount* must ask the simulation to refuel
 #### *setPitstopTyreSet(pitstopNumber :: Integer, compound :: OneOf("Dry", "Wet", *false*), compoundColor :: OneOf("Red", "White", "Blue", "Black") := false, set :: Integer := false)*
 Requests new tyres at the given pitstop. *compound* will define the tyre category and *compoundColor* the compound mixture, wich will always be "Black" for "Wet" tyres. If a specific tyre set is requested, this will be passed for the last optional parameter. If *false* has been passed for *compound*, this means that no tyre change is requested. Both *compoundColor* and *set* will be ommitted in this case. The default method does nothing here.
 
-#### *etPitstopTyrePressures(pitstopNumber :: Integer, pressureFL :: Float, pressureFR :: Float, pressureRL :: Float, pressureRR :: Float)*
+#### *setPitstopTyrePressures(pitstopNumber :: Integer, pressureFL :: Float, pressureFR :: Float, pressureRL :: Float, pressureRR :: Float)*
 Dials the pressures in PSI, that has been selected previously by *setPitstopTyreSet*. The default method does nothing here.
 
 #### *requestPitstopRepairs(pitstopNumber :: Integer, repairSuspension :: Boolean, repairBodywork :: Boolean)*
@@ -802,10 +802,10 @@ This special controller mode is created automatically by the *SimulatorPlugin* w
 
 ### Public Methods
 
-## updatePitstopActions(sessionState :: OneOf(kSessionFinished, kSessionPaused, kSessionOther, kSessionPractice, kSessionQualification, kSessionRace))*
+#### *updatePitstopActions(sessionState :: OneOf(kSessionFinished, kSessionPaused, kSessionOther, kSessionPractice, kSessionQualification, kSessionRace))*
 This is called whenever the session state changes. The availability of all pitstop actions will be updated according to the new session state. The standard implementation enables the actions, whenever you are in a race or practice session.
 
-## updateRaceEngineerActions(sessionState:: OneOf(kSessionFinished, kSessionPaused, kSessionOther, kSessionPractice, kSessionQualification, kSessionRace))*
+#### *updateRaceEngineerActions(sessionState:: OneOf(kSessionFinished, kSessionPaused, kSessionOther, kSessionPractice, kSessionQualification, kSessionRace))*
 This is called whenever the session state changes. The availability of the race engineer actions "PitstopPlan" and "PitstopPrepare* will be updated according to the new session state. The standard implementation enables the actions, whenever you are in a race session and the virtual race engineer is running.
 
 ## [Abstract] PitstopAction extends [ControllerAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controlleraction-simulator-controllerahk) ([Simulator Plugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Libraries/Simulator%20Plugin.ahk))
@@ -817,7 +817,7 @@ The base class of all pitstop actions.
 The plugin, that created and owns this action.
 
 #### *Option[]*
-The option identifier for the corresponding pitstop setting. See [getPitstopActions](*) for an explanation of option identifiers.
+The option identifier for the corresponding pitstop setting. See [getPitstopActions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#getpitstopactionsbyref-allactions--mapstring--string-byref-selectactions--array) for an explanation of option identifiers.
 
 #### *Steps[]*
 The number of steps or incerements, the corresponding pitstop setting will be changed when the action fires.
@@ -836,7 +836,7 @@ You must make sure, that all subclasses of *PitstopAction* call the base *fireAc
 		return (plugin.requirePitstopMFD() && plugin.selectPitstopOption(this.Option))
 	}
 
-## PitstopChangeAction extends [PitstopAction](*) ([Simulator Plugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Libraries/Simulator%20Plugin.ahk))
+## PitstopChangeAction extends [PitstopAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-pitstopaction-extends-controlleraction-simulator-pluginahk) ([Simulator Plugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Libraries/Simulator%20Plugin.ahk))
 A *PitstopChangeAction* changes the corresponding pitstop option always in the same direction. May be used for simple buttons on your controller hardware, for example to increase the amount of fuel to add at the next pitstop.
 
 ### Public Methods
@@ -849,7 +849,7 @@ Adds the *direction* parameter, which must be either "Increase" or "Decrease". T
 			this.Plugin.changePitstopOption(this.Option, this.Direction, this.Steps)
 	}
 
-## PitstopSelectAction extends [PitstopChangeAction](*) ([Simulator Plugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Libraries/Simulator%20Plugin.ahk))
+## PitstopSelectAction extends [PitstopChangeAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#pitstopchangeaction-extends-pitstopaction-simulator-pluginahk) ([Simulator Plugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Libraries/Simulator%20Plugin.ahk))
 A *PitstopSelectAction* is a specialized *PitstopChangeAction*, which changes the corresponding pitstop option always to the next value, which means that the *direction* will allways be "Increase".
 
 ### Public Methods
@@ -857,11 +857,11 @@ A *PitstopSelectAction* is a specialized *PitstopChangeAction*, which changes th
 #### *__New(plugin, function, label, option, steps := 1)*
 Removes the *direction* parameter from the inherited constructor, which defaults to "Increase".
 
-## PitstopToggleAction extends [PitstopAction](*) ([Simulator Plugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Libraries/Simulator%20Plugin.ahk))
-Used when the configured controller function is a binary one, for example a toggle switch or a dial. Therefore the corresponding pitstop setting can be incremented ("Increase") or decremented ("Decrease").
+## PitstopToggleAction extends [PitstopAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-pitstopaction-extends-controlleraction-simulator-pluginahk) ([Simulator Plugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Libraries/Simulator%20Plugin.ahk))
+Used when the configured controller function is binary, for example a toggle switch or a dial. Therefore the corresponding pitstop setting can be incremented ("Increase") or decremented ("Decrease").
 
 ## RaceEngineerAction extends [ControllerAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controlleraction-simulator-controllerahk) ([Simulator Plugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Libraries/Simulator%20Plugin.ahk))
-Used for the *PitstopPlan* and *PitstopPrepare* pitstop actions. The implementation of *fireAction* simply calls the [planPitstop](*) or [preparePitstop](*) methods of the [RaceEngineerPlugin](*) when the Virtual Race Engineer is running.
+Used for the *PitstopPlan* and *PitstopPrepare* pitstop actions. The implementation of *fireAction* simply calls the [planPitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#planpitstop) or [preparePitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#preparepitstop) methods of the simulator plugin, when the Virtual Race Engineer is running.
 
 ### Public Properties
 

@@ -1,14 +1,14 @@
 [Development]
-Version=2.8.5-release
-Target=2.8.5-release
+Version=2.8.7-dev
+Target=2.8.7-release
 Date=04/23/2021
-Changes=No tyre change option for Jona pitstop handling, Intelligent late damage reporting & handling for Jona, Pitstop handling for R3E, More Refactoring of Simulator Plugins, Pitstop modes for RF2 and R3E, Initial support for iRacing
+Changes=
 [Release]
 Version=2.8.5-release
 Date=04/23/2021
 Changes=No tyre change option for Jona pitstop handling, Intelligent late damage reporting & handling for Jona, Pitstop handling for R3E, More Refactoring of Simulator Plugins, Pitstop modes for RF2 and R3E, Initial support for iRacing
 [Current]
-Type=Release
+Type=Development
 [Version]
 Release=2.8.5-release
-Development=2.8.5-release
+Development=2.8.7-dev

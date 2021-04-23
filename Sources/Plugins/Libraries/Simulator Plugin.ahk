@@ -604,7 +604,11 @@ changePitstopDriver(selection) {
 changePitstopOption(option, selection := "Next", increments := 1) {
 	local plugin
 	
-	if !inList(["Next", "Previous", "Increase", "Decrease"], selection)
+	if (selection = "Next")
+		selection := "Increase"
+	else if (selection = "Previous")
+		selection := "Decrease"
+	else if !inList(["Increase", "Decrease"], selection)
 		logMessage(kLogWarn, translate("Unsupported option selection """) . selection . translate(""" detected in changePitstopOption - please check the configuration"))
 	
 	plugin := getCurrentSimulatorPlugin(option)
@@ -613,7 +617,7 @@ changePitstopOption(option, selection := "Next", increments := 1) {
 		protectionOn()
 	
 		try {
-			plugin.updatePitstopOption(option, (selection = "Next") ? "Increase" : "Decrease", increments)
+			plugin.updatePitstopOption(option, selection, increments)
 		}
 		finally {
 			protectionOff()

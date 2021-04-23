@@ -26,17 +26,15 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-[2.8.5-rc3](https://www.dropbox.com/s/bhxtg4p257i6q9n/Simulator%20Controller%202.8.5-rc3.zip?dl=1) (Third release candidate for the upcoming Release 2.8.5. New features: No tyre change option for Jona pitstop handling incl. automatic *Splash n Dash* recommendation very late in the race, Intelligent damage reporting & handling by Jona during the last laps of a race, Pitstop handling for R3E by Jona, Pitstop modes for RF2 and R3E, More Refactoring of Simulator Plugins, Initial support for iRacing. Feature complete, with updated documentation and automated update procedure, ready to release...)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-285) of this version and all the versions you might have skipped, before installing and using this version.
+None for the moment...
 
 #### Latest release builds
 
-[2.8.0-release](https://www.dropbox.com/s/3ya3c30nqajsjig/Simulator%20Controller%202.8.0-release.zip?dl=1) (New features: New plugin "Race Engineer" for handling Jona for different simulations, Early integration of Jona for RaceRoom Racing Experience and rFactor 2, Jona now supports Practice and Qualification Sessions, Reimport of Race Engineer Settings during an active Session, Introduced tyre compound color coding (red, white, blue, black), Documentation for Configuration Tool plugin support, Integrated MSBuild into the build pipeline.)
-
 [2.8.2-release](https://www.dropbox.com/s/2ax7h0ezbz6o9xs/Simulator%20Controller%202.8.2-release.zip?dl=1) (New features: New VERSION file format, Refactoring of the Simulator Plugins, Icons for SHM Readers, Localized "Controller Plugin Labels", Situation aware Button Box Modes incl. configurable automation, Pitstop handling for rFactor 2.)
 
-As always, please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#282-release-041621) and - even more important - the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-282) of this version and all the versions you might have skipped, before installing and using this version.
+[2.8.5-release](https://www.dropbox.com/s/yeiwe5pk6d4bv5h/Simulator%20Controller%202.8.5-release.zip?dl=1) (New features: No tyre change option for Jona pitstop handling incl. automatic *Splash n Dash* recommendation very late in the race, Intelligent damage reporting & handling by Jona during the last laps of a race, Pitstop handling for R3E by Jona, Pitstop modes for RF2 and R3E, More Refactoring of Simulator Plugins, Initial support for iRacing.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-285) of this version and all the versions you might have skipped, before installing and using this version.
 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [update notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.

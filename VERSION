@@ -1,14 +1,14 @@
 [Development]
-Version=2.8.5-rc3
+Version=2.8.5-release
 Target=2.8.5-release
-Date=04/22/2021
+Date=04/23/2021
 Changes=No tyre change option for Jona pitstop handling, Intelligent late damage reporting & handling for Jona, Pitstop handling for R3E, More Refactoring of Simulator Plugins, Pitstop modes for RF2 and R3E, Initial support for iRacing
 [Release]
-Version=2.8.2-release
-Date=04/16/2021
-Changes=New VERSION file format, Refactoring of the Simulator Plugins, Icons for SHM Readers, Localized "Controller Plugin Labels", Situation aware Button Box Modes incl. configurable automation, Pitstop handling for rFactor 2
+Version=2.8.5-release
+Date=04/23/2021
+Changes=No tyre change option for Jona pitstop handling, Intelligent late damage reporting & handling for Jona, Pitstop handling for R3E, More Refactoring of Simulator Plugins, Pitstop modes for RF2 and R3E, Initial support for iRacing
 [Current]
-Type=Development
+Type=Release
 [Version]
-Release=2.8.2-release
-Development=2.8.5-rc1
+Release=2.8.5-release
+Development=2.8.5-release

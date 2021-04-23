@@ -86,6 +86,7 @@ These plugins are part of the Simulator Controller distribution. Beside providin
 | Plugin | Description |
 | ------ | ------ |
 | System | Handles multiple Button Box layers and manages all applications configured for your simulation configuration. |
+| Button Box | Tools for building your own Button Box / Controller visuals. The default implementation of *ButtonBox* implements grid based Button Box layouts, which can be configured using a [graphical layout editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#button-box-layouts). |
 | Tactile Feedback | Fully configurable support for pedal and chassis vibration using [SimHub](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications). |
 | Motion Feedback | Fully configurable support for rig motion feedback using [SimFeedback](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications). |
 | Pedal Calibration | Allows to choose between the different calibration curves of your high end pedals directly from the hardware controller. |
@@ -95,7 +96,6 @@ These plugins are part of the Simulator Controller distribution. Beside providin
 | IRC | Inital support for starting and stopping iRacing from your hardware controller. More controller support and an integration with Jona, the Virtual Race Engineer will follow in the next releases. |
 | RF2 | Special support for starting and stopping rFactor 2 from your hardware controller. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the Virtual Race Engineer, including full support for automated pitstop handling is available as well since Release 2.8. |
 | R3E | Special support for starting and stopping RaceRoom Racing Experience from your hardware controller. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the Virtual Race Engineer, including full support for automated pitstop handling is available as well. |
-| Button Box | Tools for building your own Button Box / Controller visuals. The default implementation of *ButtonBox* implements grid based Button Box layouts, which can be configured using a [graphical layout editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#button-box-layouts). |
 
 ### Third party applications
 

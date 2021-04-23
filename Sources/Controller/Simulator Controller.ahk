@@ -813,10 +813,7 @@ class SimulatorController extends ConfigurationItem {
 		
 		if buttonBoxes
 			for ignore, mode in this.ActiveModes {
-				if position
-					break
-				
-				for ignore, btnBox in buttonBoxes
+				for ignore, btnBox in buttonBoxes {
 					for ignore, candidate in mode.ButtonBoxes
 						if (btnBox == candidate) {
 							position := inList(modes, mode)
@@ -824,6 +821,13 @@ class SimulatorController extends ConfigurationItem {
 							if position
 								break
 						}
+						
+					if position
+						break
+				}
+				
+				if position
+					break
 			}
 		else
 			position := inList(modes, this.ActiveModes[1])

@@ -2,7 +2,7 @@
 Version=2.8.7-dev
 Target=2.8.7-release
 Date=04/23/2021
-Changes=
+Changes=Low level integration of iRacing telemetry information
 [Release]
 Version=2.8.5-release
 Date=04/23/2021

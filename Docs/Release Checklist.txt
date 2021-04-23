@@ -12,6 +12,10 @@ General Release Actions
 10. Update Wiki using "update-documentation.bat"
 11. Set a Git Tag after final commit
 
+Release 2.8.7 Checklist
+=======================
+
+
 Release 2.8.5 Checklist
 =======================
 

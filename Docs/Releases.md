@@ -1,3 +1,9 @@
+## 2.8.7-release 04/30/21 (planned)
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Low level integration of iRacing telemetry information
+
 ## 2.8.5-release 04/23/21
 
   1. Bugfixes, as always

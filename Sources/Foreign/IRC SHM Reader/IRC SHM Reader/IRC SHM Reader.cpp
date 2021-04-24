@@ -81,25 +81,117 @@ int lastLap;
 int lapCount;
 long int lapCountOffset;
 
+inline double normalize(double value) {
+	return (value < 0) ? 0.0 : value;
+}
 
+inline double normalizeDamage(double value) {
+	if (value < 0)
+		return 0.0;
+	else
+		return ((1.0 - value) * 100);
+}
+
+void substring(char s[], char sub[], int p, int l) {
+	int c = 0;
+
+	while (c < l) {
+		sub[c] = s[p + c];
+
+		c++;
+	}
+	sub[c] = '\0';
+}
+
+/*
+long getRemainingTime();
+
+long getRemainingLaps() {
+	if (map_buffer->session_iteration < 1)
+		return 0;
+
+	if (map_buffer->session_length_format == R3E_SESSION_LENGTH_LAP_BASED) {
+		return (long)(map_buffer->race_session_laps[map_buffer->session_iteration - 1] - normalize(map_buffer->completed_laps));
+	}
+	else {
+		long time = (long)map_buffer->lap_time_previous_self;
+
+		if (time > 0)
+			return (long)(getRemainingTime() / time);
+		else
+			return 0;
+	}
+}
+
+long getRemainingTime() {
+	if (map_buffer->session_iteration < 1)
+		return 0;
+
+	if (map_buffer->session_length_format != R3E_SESSION_LENGTH_LAP_BASED) {
+		return (long)((map_buffer->race_session_minutes[map_buffer->session_iteration - 1] * 60) -
+			(normalize(map_buffer->lap_time_previous_self) * normalize(map_buffer->completed_laps)));
+	}
+	else {
+		return (long)(getRemainingLaps() * map_buffer->lap_time_previous_self);
+	}
+}
+*/
+
+
+inline void copyString(char* string, const char* value, int valueLength) {
+	int i = 0;
+
+	for (; i < valueLength; i++)
+		string[i] = value[i];
+
+	string[i] = '\0';
+}
 
 // dump data to display, for debugging
 void logHeaderToDisplay(const irsdk_header *header)
 {
 	if(header)
 	{
-		printf("\n\nSession Info String:\n\n");
+		printf("[Session Data]\n");
+		
+		char buffer[100];
 
-		// puts is safer in case the string contains '%' characters
-		puts(irsdk_getSessionInfoStr());
+		const char* valstr;
+		int valstrlen;
+		const char g_playerCarIdxPath[] = "DriverInfo:DriverCarIdx:";
+		int playerCarIdx = -1;
 
-		printf("\n\nVariable Headers:\n\n");
+		if (parseYaml(irsdk_getSessionInfoStr(), "DriverInfo:DriverCarIdx:", &valstr, &valstrlen))
+			playerCarIdx = atoi(valstr);
+
+		if (parseYaml(irsdk_getSessionInfoStr(), "DriverInfo:DriverCarFuelMaxLtr:", &valstr, &valstrlen)) {
+			copyString(buffer, valstr, valstrlen);
+			printf("FuelAmount=%s\n", buffer);
+		}
+		else
+			printf("FuelAmount=%s\n", "0");
+
+		if (parseYaml(irsdk_getSessionInfoStr(), "DriverInfo:Drivers{CarScreenName}:", &valstr, &valstrlen)) {
+			copyString(buffer, valstr, valstrlen);
+
+			printf("Car=%s\n", buffer);
+		}
+		else
+			printf("Car=%s\n", "Unknown");
+
 		for(int i=0; i<header->numVars; i++)
 		{
 			const irsdk_varHeader *rec = irsdk_getVarHeaderEntry(i);
-			printf("%s, %s, %s\n", rec->name, rec->desc, rec->unit);
+			const char* name = rec->name;
+
+			if (strcmp(name, "TrackName") == 0)
+				printf("Track=%s\n", rec->desc);
 		}
-		printf("\n\n");
+
+		printf("[Stint Data]\n");
+		printf("Active=true\n");
+
+
 	}
 }
 
@@ -163,13 +255,15 @@ void initData(const irsdk_header *header, char* &data, int &nData)
 	g_sessionTimeOffset = irsdk_varNameToOffset(g_sessionTimeString);
 	g_lapIndexOffset = irsdk_varNameToOffset(g_lapIndexString);
 
-	// get the playerCarIdx
-	//const char *valstr;
-	//int valstrlen; 
-	//const char g_playerCarIdxPath[] = "DriverInfo:DriverCarIdx:";
-	//playerCarIdx = -1;
-	//if(parseYaml(irsdk_getSessionInfoStr(), g_playerCarIdxPath, &valstr, &valstrlen))
-	//	playerCarIdx = atoi(valstr);
+	const char *valstr;
+	int valstrlen; 
+	const char g_playerCarIdxPath[] = "DriverInfo:DriverCarIdx:";
+	int playerCarIdx = -1;
+	
+	if(parseYaml(irsdk_getSessionInfoStr(), g_playerCarIdxPath, &valstr, &valstrlen))
+		playerCarIdx = atoi(valstr);
+
+
 }
 
 void end_session(bool shutdown)
@@ -205,7 +299,7 @@ int main()
 
 			logHeaderToDisplay(pHeader);
 			
-			logDataToDisplay(pHeader, g_data);
+			// logDataToDisplay(pHeader, g_data);
 		}
 		else {
 			printf("[Stint Data]\n");

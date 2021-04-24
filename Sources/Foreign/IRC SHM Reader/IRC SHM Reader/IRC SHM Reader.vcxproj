@@ -118,12 +118,19 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="irsdk_defines.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="yaml_parser.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="irsdk_utils.cpp" />
     <ClCompile Include="yaml_parser.cpp" />
     <ClCompile Include="IRC SHM Reader.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="IRC SHM Reader.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\..\..\Resources\Icons\Engine.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

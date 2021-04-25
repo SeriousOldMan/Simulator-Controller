@@ -100,40 +100,6 @@ inline void extractString(char* string, const char* value, int valueLength) {
 	substring(value, string, 0, valueLength);
 }
 
-/*
-long getRemainingTime();
-
-long getRemainingLaps() {
-	if (map_buffer->session_iteration < 1)
-		return 0;
-
-	if (map_buffer->session_length_format == R3E_SESSION_LENGTH_LAP_BASED) {
-		return (long)(map_buffer->race_session_laps[map_buffer->session_iteration - 1] - normalize(map_buffer->completed_laps));
-	}
-	else {
-		long time = (long)map_buffer->lap_time_previous_self;
-
-		if (time > 0)
-			return (long)(getRemainingTime() / time);
-		else
-			return 0;
-	}
-}
-
-long getRemainingTime() {
-	if (map_buffer->session_iteration < 1)
-		return 0;
-
-	if (map_buffer->session_length_format != R3E_SESSION_LENGTH_LAP_BASED) {
-		return (long)((map_buffer->race_session_minutes[map_buffer->session_iteration - 1] * 60) -
-			(normalize(map_buffer->lap_time_previous_self) * normalize(map_buffer->completed_laps)));
-	}
-	else {
-		return (long)(getRemainingLaps() * map_buffer->lap_time_previous_self);
-	}
-}
-*/
-
 bool getYamlValue(char* result, const char* sessionInfo, char* path) {
 	int length = -1;
 	const char* string;
@@ -156,6 +122,15 @@ bool getYamlValue(char* result, const char* sessionInfo, char* path, char* value
 	return getYamlValue(result, sessionInfo, buffer);
 }
 
+bool getYamlValue(char* result, const char* sessionInfo, char* path, char* value1, char* value2) {
+	char buffer[256];
+	int pos = 0;
+
+	sprintf(buffer, path, value1, value2);
+
+	return getYamlValue(result, sessionInfo, buffer);
+}
+
 int getCurrentSessionID(const char* sessionInfo) {
 	char id[10];
 	char result[100];
@@ -169,6 +144,37 @@ int getCurrentSessionID(const char* sessionInfo) {
 	}
 
 	return -1;
+}
+
+long getRemainingTime(const char* sessionInfo, int sessionLaps, long sessionTime, int lap, long lastTime);
+
+long getRemainingLaps(const char* sessionInfo, int sessionLaps, long sessionTime, int lap, long lastTime) {
+	char result[100];
+
+	if (lap < 1)
+		return 0;
+
+	if (sessionLaps > 0) {
+		return (long)(sessionLaps - lap);
+	}
+	else {
+		if (lastTime > 0)
+			return (long)(getRemainingTime(sessionInfo, sessionLaps, sessionTime, lap, lastTime) / lastTime);
+		else
+			return 0;
+	}
+}
+
+long getRemainingTime(const char* sessionInfo, int sessionLaps, long sessionTime, int lap, long lastTime) {
+	if (lap < 1)
+		return 0;
+
+	if (sessionLaps == -1) {
+		return (sessionTime - (lastTime * lap));
+	}
+	else {
+		return (getRemainingLaps(sessionInfo, sessionLaps, sessionTime, lap, lastTime) * lastTime);
+	}
 }
 
 void printDataValue(const irsdk_header* header, const char* data, const irsdk_varHeader* rec) {
@@ -199,6 +205,37 @@ void printDataValue(const irsdk_header* header, const char* data, const irsdk_va
 	}
 }
 
+bool getDataValue(char* value, const irsdk_header* header, const char* data, const char* variable) {
+	if (header && data) {
+		for (int i = 0; i < header->numVars; i++) {
+			const irsdk_varHeader* rec = irsdk_getVarHeaderEntry(i);
+
+			if (strcmp(rec->name, variable) == 0) {
+				switch (rec->type)
+				{
+				case irsdk_char:
+					sprintf(value, "%s", (char*)(data + rec->offset)); break;
+				case irsdk_bool:
+					sprintf(value, "%d", (bool*)(data + rec->offset)); break;
+				case irsdk_bitField:
+				case irsdk_int:
+					sprintf(value, "%d", (int*)(data + rec->offset)); break;
+				case irsdk_float:
+					sprintf(value, "%0.2f", (float*)(data + rec->offset)); break;
+				case irsdk_double:
+					sprintf(value, "%0.2f", (double*)(data + rec->offset)); break;
+				default:
+					return false;
+				}
+
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
 void printDataValue(const irsdk_header* header, const char* data, const char* variable) {
 	if (header && data) {
 		for (int i = 0; i < header->numVars; i++) {
@@ -221,11 +258,52 @@ void writeData(const irsdk_header *header, const char* data)
 		char playerCarIdx[10] = "";
 		char sessionID[10] = "";
 
+		getYamlValue(playerCarIdx, sessionInfo, "DriverInfo:DriverCarIdx:");
+
+		itoa(getCurrentSessionID(sessionInfo), sessionID, 10);
+
 		char result[100];
 
-		getYamlValue(playerCarIdx, sessionInfo, "DriverInfo:DriverCarIdx:");
-	
-		itoa(getCurrentSessionID(sessionInfo), sessionID, 10);
+		int sessionLaps = -1;
+		long sessionTime = -1;
+		int laps = 0;
+
+		if (getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:CarIdx:{%s}LapsComplete:", sessionID, playerCarIdx))
+			laps = atoi(result);
+
+		if (getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}SessionLaps:", sessionID))
+			if (strcmp(result, "unlimited") != 0)
+				sessionLaps = atoi(result);
+			else {
+				char buffer[64];
+				float time;
+
+				size_t length = strcspn(result, " ");
+
+				substring((char*)result, buffer, 0, length);
+
+				sscanf(buffer, "%f", &time);
+
+				sessionTime = ((long)time * 1000);
+			}
+
+		long lastTime = 0;
+		long bestTime = 0;
+
+		float fLastTime;
+		float fBestTime;
+
+		if (getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:CarIdx:{%s}LastTime:", sessionID, playerCarIdx))
+			sscanf(result, "%f", &fLastTime);
+
+		if (getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:CarIdx:{%s}FastestTime:", sessionID, playerCarIdx))
+			sscanf(result, "%f", &fBestTime);
+
+		lastTime = (long)(normalize(fLastTime) * 1000);
+		bestTime = (long)(normalize(fBestTime) * 1000);
+
+		if (bestTime == 0)
+			bestTime = lastTime;
 
 		printf("[Session Data]\n");
 
@@ -260,23 +338,9 @@ void writeData(const irsdk_header *header, const char* data)
 		else
 			printf("Car=Unknown\n");
 
-		if (getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}SessionLaps:")) {
-			if (strcmp(result, "unlimited"))
-				printf("SessionFormat=Time\n");
-			else
-				printf("SessionFormat=Lap\n");
-		}
-		else
-			printf("SessionFormat=Time\n");
-
-		for(int i=0; i<header->numVars; i++)
-		{
-			const irsdk_varHeader *rec = irsdk_getVarHeaderEntry(i);
-			const char* name = rec->name;
-
-			if (strcmp(name, "TrackName") == 0)
-				printf("Track=%s\n", rec->desc);
-		}
+		printf("SessionFormat=%s\n", (sessionLaps == -1) ? "Time" : "Lap");
+		
+		printf("Track="); printDataValue(header, data, "TrackName"); printf("\n");
 
 		printf("[Car Data]\n");
 
@@ -311,27 +375,23 @@ void writeData(const irsdk_header *header, const char* data)
 			printf("DriverNickname=JD\n");
 		}
 
-		printf("Lap="); printDataValue(header, data, "Lap"); printf("\n");
+		printf("Lap=%s\n", itoa(laps, result, 10));
 
-		if (getYamlValue(result, sessionInfo, "SessionInfo:ResultsPositions:CarIdx:{0}LastTime:", playerCarIdx)) {
-			float time;
+		printf("LapLastTime=%ld\n", lastTime);
+		printf("LapBestTime=%ld\n", bestTime);
 
-			sscanf(result, "%f", &time);
+		printf("SessionLapsRemaining=%ld\n", getRemainingLaps(sessionInfo, sessionLaps, sessionTime, laps, lastTime));
 
-			printf("LapLastTime=%d\n", (long)(normalize(time) * 1000));
-		}
+		long timeRemaining = (getRemainingTime(sessionInfo, sessionLaps, sessionTime, laps, lastTime) * 1000);
+
+		printf("SessionTimeRemaining=%ld\n", timeRemaining);
+		printf("StintTimeRemaining=%ld\n", timeRemaining);
+		printf("DriverTimeRemaining=%ld\n", timeRemaining);
+
+		if (getDataValue(result, header, data, "PitSvFlags"))
+			printf("InPit=%s\n", atoi(result) ? "true" : "false");
 		else
-			printf("LapLastTime=0\n");
-
-		if (getYamlValue(result, sessionInfo, "SessionInfo:ResultsPositions:CarIdx:{0}FastestTime:", playerCarIdx)) {
-			float time;
-
-			sscanf(result, "%f", &time);
-
-			printf("LapBestTime=%ld\n", (long)(normalize(time) * 1000));
-		}
-		else
-			printf("LapBestTime=0\n");
+			printf("InPit=false\n");
 
 		printf("[Track Data]\n");
 
@@ -364,8 +424,8 @@ void writeData(const irsdk_header *header, const char* data)
 		printf("Weather30Min=Dry\n");
 
 
-		printf("[Debug]\n");
-		printf("%s", sessionInfo);
+		// printf("[Debug]\n");
+		// printf("%s", sessionInfo);
 	}
 }
 
@@ -428,8 +488,6 @@ void initData(const irsdk_header *header, char* &data, int &nData)
 	g_playerInCarOffset = irsdk_varNameToOffset(g_playerInCarString);
 	g_sessionTimeOffset = irsdk_varNameToOffset(g_sessionTimeString);
 	g_lapIndexOffset = irsdk_varNameToOffset(g_lapIndexString);
-
-	printf("%d %d %d\n\n", g_playerInCarOffset, g_sessionTimeOffset, g_lapIndexOffset);
 }
 
 void end_session(bool shutdown)

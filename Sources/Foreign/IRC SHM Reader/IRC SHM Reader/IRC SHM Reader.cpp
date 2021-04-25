@@ -449,6 +449,16 @@ void writeData(const irsdk_header *header, const char* data)
 		else
 			printf("Temperature=24\n");
 
+		char gripLevel[32] = "Green";
+
+		if (getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}SessionTrackRubberState:", sessionID))
+			if (strstr(result, "high") && strstr(result, "moderately"))
+				strcpy(gripLevel, "Fast");
+			else if (strstr(result, "high"))
+				strcpy(gripLevel, "Optimum");
+
+		printf("Grip=%s\n", gripLevel);
+
 		printf("[Weather Data]\n");
 
 		if (getYamlValue(result, sessionInfo, "WeekendInfo:TrackAirTemp:")) {

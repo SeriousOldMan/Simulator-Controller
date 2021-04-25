@@ -1,8 +1,8 @@
 [Development]
 Version=2.8.7-dev
 Target=2.8.7-release
-Date=04/23/2021
-Changes=Low level integration of iRacing telemetry information
+Date=04/25/2021
+Changes=Integration of the iRacing telemetry information, Refactoring of the shared memory data fields, Pitstop mode for iRacing plugin, Jona integration incl. pitstop handling for iRacing
 [Release]
 Version=2.8.5-release
 Date=04/23/2021

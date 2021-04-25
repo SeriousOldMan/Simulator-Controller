@@ -585,7 +585,7 @@ changePitstopTyrePressure(tyre, direction, increments := 1) {
 }
 
 changePitstopBrakeType(brake, selection) {
-	if !inList(["Front Brake", "Rear Brake"], selection)
+	if !inList(["Front Brake", "Rear Brake"], brake)
 		logMessage(kLogWarn, translate("Unsupported brake unit """) . brake . translate(""" detected in changePitstopBrakeType - please check the configuration"))
 	
 	if !inList(["Next", "Previous"], selection)

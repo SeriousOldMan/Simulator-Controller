@@ -10,7 +10,7 @@ The distribution of Simulator Controller includes a set of predefined plugins, w
 | Race Engineer | This plugin integrates Jona, the Virtual Race Engineer, with all other plugins for the simulation games, like the ACC plugin. The plugin handles the data transfer between the simulation game and the Virtual Race Engineer. |
 | ACC | Provides special support for starting and stopping *Assetto Corsa Competizione* from your hardware controller. The mode "Chat", which is normally only available when "Assetto Corsa Competizione" is currently running, handle automated chat messages for the multiplayer ingame chat system, where the chat messages can be configured by the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Additionally, beginning with Release 2.0, this plugin provides sophisticated support for the Pitstop MFD of *Assetto Corsa Competizione*. All settings may be tweaked using the controller hardware, but it is also possible to control the settings using voice control to keep your hands on the steering wheel. Since Release 2.1, Jona, the Virtual Race Engineer, is integrated with the ACC plugin as well. |
 | AC | One of the smallest plugin in this list only supplies a special splash screem, when Assetto Corsa is started. No special controller mode is defined for the moment. |
-| IRC | Inital support for starting and stopping iRacing from your hardware controller. More controller support and an integration with Jona, the Virtual Race Engineer will follow in the next releases. |
+| IRC | Inital support for starting and stopping iRacing from your hardware controller.  A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the Virtual Race Engineer, including full support for automated pitstop handling is also available. |
 | RF2 | Similar to the AC plugin provides this plugin start and stop support for rFactor 2. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the Virtual Race Engineer, including full support for automated pitstop handling is available as well since Release 2.8. |
 | R3E | Similar to the AC and RF2 plugins provides this plugin start and stop support for RaceRoom Racing Experience. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the Virtual Race Engineer, including full support for automated pitstop handling is available as well. |
 
@@ -288,7 +288,44 @@ This plugin handles starting and stopping of the *Assetto Corsa* simulation game
 
 ## Plugin *IRC*
 
-This plugin handles starting and stopping of the *iRacing* simulation game. An application with the name "iRacing" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please locate the "iRacingUI.exe" application, set "ahk_exe iRacingUI.exe" as the window title and "startIRC" as a special function hook in this configuration. Controller support with specialized modes for *iRacing* and an integration with Jona, the Virtual Race Engineer will follow in the next releases.
+This plugin handles starting and stopping of the *iRacing* simulation game. An application with the name "iRacing" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please locate the "iRacingUI.exe" application, set "ahk_exe iRacingUI.exe" as the window title and "startIRC" as a special function hook in this configuration.
+
+### Mode *Pitstop*
+
+Similar to the pitstop mode the plugin for *Assetto Corsa Competizione*, you can control most of the pitstop settings of *iRacing*. 
+
+![](*)
+
+All this will be achieved using the following plugin arguments:
+
+	pitstopCommands: Refuel Dial.1 5, TyreAllAround Dial.2, PitstopPlan Button.1, PitstopPrepare Button.5,
+					 TyreChange Button.2 Button.5, RepairRequest Button.3 Button.7
+
+### Configuration
+
+With the plugin parameter *pitstopCommands:* you can supply a list of the settings, you want to tweak from your hardware controller, when the "Pitstop" mode is active. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example tyre pressure and fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
+
+	pitstopCommands: *setting1* *settingFunction1* [*settingSteps1*],
+					 *setting2* *settingFunction2* [*settingSteps2*], ...
+					 
+See the following table for the supported settings.
+
+| Setting | Description |
+| ------ | ------ |
+| Refuel | Increment or decrement the refuel amount. Supports the additional increments argument. |
+| TyreChange | Toggles, whether tyres will be changed at the pitstop. |
+| TyreAllAround | Change the pressure for all tyres at once. Supports the additional increments argument. |
+| TyreFrontLeft | Change the pressure for the front left tyre. Supports the additional increments argument. |
+| TyreFrontRight | Change the pressure for the front right tyre. Supports the additional increments argument. |
+| TyreRearLeft | Change the pressure for the rear left tyre. Supports the additional increments argument. |
+| TyreRearRight | Change the pressure for the rear right tyre. Supports the additional increments argument. |
+| RepairRequest | Toggles, whether repairs will be carried out during the next pitstop.  |
+| PitstopPlan | Requests a pitstop plan from the virtual race engineer. |
+| PitstopPrepare | Requests Jona to transfer the values from the current pitstop plan to the Pitstop MFD. |
+
+See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan* and *PitstopPrepare*.
+
+Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) for more information.
 
 ## Plugin *RF2*
 

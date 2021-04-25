@@ -26,30 +26,8 @@ global kIRCPlugin = "IRC"
 ;;;-------------------------------------------------------------------------;;;
 
 class IRCPlugin extends RaceEngineerSimulatorPlugin {
-	iOpenPitstopMFDHotkey := false
-	iClosePitstopMFDHotkey := false
-	
-	OpenPitstopMFDHotkey[] {
-		Get {
-			return this.iOpenPitstopMFDHotkey
-		}
-	}
-	
-	ClosePitstopMFDHotkey[] {
-		Get {
-			return this.iClosePitstopMFDHotkey
-		}
-	}
-	
-	__New(controller, name, simulator, configuration := false) {
-		base.__New(controller, name, simulator, configuration)
-		
-		this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", false)
-		this.iClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
-	}
-	
 	getPitstopActions(ByRef allActions, ByRef selectActions) {
-		allActions := {Refuel: "Refuel", TyreCompound: "Tyre Compound", TyreAllAround: "All Around"
+		allActions := {Refuel: "Refuel", TyreChange: "Change Tyres", TyreAllAround: "All Around"
 					 , TyreFrontLeft: "Front Left", TyreFrontRight: "Front Right", TyreRearLeft: "Rear Left", TyreRearRight: "Rear Right"
 					 , RepairRequest: "Repair"}
 		selectActions := []
@@ -63,7 +41,7 @@ class IRCPlugin extends RaceEngineerSimulatorPlugin {
 	
 		try {
 			if operation
-				RunWait %ComSpec% /c ""%exePath%" -%command% "%operation%:%message%:%arguments%"", , Hide
+				RunWait %ComSpec% /c ""%exePath%" -%command% %operation% "%message%:%arguments%"", , Hide
 			else
 				RunWait %ComSpec% /c ""%exePath%" -%command%", , Hide
 		}
@@ -78,8 +56,44 @@ class IRCPlugin extends RaceEngineerSimulatorPlugin {
 		}
 	}
 	
-	supportsPitstop() {
+	openPitstopMFD() {
+	}
+	
+	closePitstopMFD() {
+	}
+	
+	requirePitstopMFD() {
+		return true
+	}
+	
+	selectPitstopOption(option) {
+		actions := false
+		ignore := false
+		
+		this.getPitstopActions(actions, ignore)
+		
+		for ignore, candidate in actions
+			if (candidate = option)
+				return true
+			
 		return false
+	}
+	
+	changePitstopOption(option, action, steps := 1) {
+		switch option {
+			case "Refuel":
+				this.sendPitstopCommand("Pitstop", "Change", "Refuel", (action = "Increase") ? Round(steps) : Round(steps * -1))
+			case "Change Tyres":
+				this.sendPitstopCommand("Pitstop", "Change", "Tyre Change", (action = "Increase") ? "true" : "false")
+			case "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right":
+				this.sendPitstopCommand("Pitstop", "Change", option, Round(steps * 0.1 * ((action = "Increase") ? 1 : -1), 1))
+			case "Repair":
+				this.sendPitstopCommand("Pitstop", "Change", "Repair", (action = "Increase") ? "true" : "false")
+		}
+	}
+	
+	supportsPitstop() {
+		return true
 	}
 	
 	setPitstopRefuelAmount(pitstopNumber, litres) {
@@ -87,14 +101,7 @@ class IRCPlugin extends RaceEngineerSimulatorPlugin {
 	}
 	
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
-		if compound {
-			this.sendPitstopCommand("Pitstop", "Set", "Tyre Compound", compound, compoundColor)
-			
-			if set
-				this.sendPitstopCommand("Pitstop", "Set", "Tyre Set", Round(set))
-		}
-		else
-			this.sendPitstopCommand("Pitstop", "Set", "Tyre Compound", "None")
+		this.sendPitstopCommand("Pitstop", "Set", "Tyre Change", compound ? "true" : "false")
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
@@ -102,14 +109,7 @@ class IRCPlugin extends RaceEngineerSimulatorPlugin {
 	}
 
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork) {
-		if (repairBodywork && repairSuspension)
-			this.sendPitstopCommand("Pitstop", "Set", "Repair", "Both")
-		else if repairSuspension
-			this.sendPitstopCommand("Pitstop", "Set", "Repair", "Suspension")
-		else if repairBodywork
-			this.sendPitstopCommand("Pitstop", "Set", "Repair", "Bodywork")
-		else
-			this.sendPitstopCommand("Pitstop", "Set", "Repair", "Nothing")
+		this.sendPitstopCommand("Pitstop", "Set", "Repair", (repairBodywork || repairSuspension) ? "true" : "false")
 	}
 }
 

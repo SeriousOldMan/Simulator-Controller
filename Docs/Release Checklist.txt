@@ -15,6 +15,15 @@ General Release Actions
 Release 2.8.7 Checklist
 =======================
 
+0. Search for new links (*)
+1. Renaming of some of the shared memory data fields
+   a. Update Notes
+2. IRC Pitstop Handling
+   a. Documentation in Virtual Race Engineer
+   b. Update Notes
+   c. Documentation in Plugins & Modes and README
+   d. Screenshot
+   e. Controller Plugin Labels
 
 Release 2.8.5 Checklist
 =======================

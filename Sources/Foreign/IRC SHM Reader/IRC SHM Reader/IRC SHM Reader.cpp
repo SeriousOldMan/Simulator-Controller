@@ -69,6 +69,9 @@ int g_sessionTimeOffset = -1;
 const char g_lapIndexString[] = "Lap";
 int g_lapIndexOffset = -1;
 
+bool g_setup = false;
+bool g_pitstop = false;
+
 
 // place holders for variables that need to be updated in the header of our CSV file
 double startTime;
@@ -263,6 +266,137 @@ void printDataValue(const irsdk_header* header, const char* data, const char* va
 	}
 }
 
+void setPitstopRefuelAmount(char* values) {
+	float fuelAmount;
+
+	sscanf(values, "%f", &fuelAmount);
+
+	if (fuelAmount == 0)
+		irsdk_broadcastMsg(irsdk_BroadcastPitCommand, irsdk_PitCommand_ClearFuel, 0);
+	else
+		irsdk_broadcastMsg(irsdk_BroadcastPitCommand, irsdk_PitCommand_Fuel, fuelAmount);
+}
+
+void requestPitstopRepairs(char* values) {
+	if (strcmp(values, "true") == 0)
+		irsdk_broadcastMsg(irsdk_BroadcastPitCommand, irsdk_PitCommand_FR, 0);
+	else
+		irsdk_broadcastMsg(irsdk_BroadcastPitCommand, irsdk_PitCommand_ClearFR, 0);
+}
+
+void requestPitstopTyreChange(char* values) {
+	if (strcmp(values, "true") == 0) {
+		irsdk_broadcastMsg(irsdk_BroadcastPitCommand, irsdk_PitCommand_LF, 0);
+		irsdk_broadcastMsg(irsdk_BroadcastPitCommand, irsdk_PitCommand_RF, 0);
+		irsdk_broadcastMsg(irsdk_BroadcastPitCommand, irsdk_PitCommand_LR, 0);
+		irsdk_broadcastMsg(irsdk_BroadcastPitCommand, irsdk_PitCommand_RR, 0);
+	}
+	else
+		irsdk_broadcastMsg(irsdk_BroadcastPitCommand, irsdk_PitCommand_ClearTires, 0);
+}
+
+void setTyrePressure(int command, float pressure) {
+	irsdk_broadcastMsg(irsdk_BroadcastPitCommand, command, (int)GetKpa(pressure));
+}
+
+void setPitstopTyrePressures(char* values) {
+	char buffer[32];
+
+	float pressure;
+	float pressures[3];
+
+	for (int i = 0; i < 3; i++) {
+		size_t length = strcspn(values, ";");
+		
+		substring(values, buffer, 0, length);
+
+		sscanf(buffer, "%f", &pressure);
+
+		pressures[i] = pressure;
+
+		values += (length + 1);
+	}
+
+	sscanf(values, "%f", &pressure);
+
+	setTyrePressure(irsdk_PitCommand_LF, pressures[0]);
+	setTyrePressure(irsdk_PitCommand_RF, pressures[1]);
+	setTyrePressure(irsdk_PitCommand_LR, pressures[2]);
+	setTyrePressure(irsdk_PitCommand_RR, pressure);
+}
+
+void pitstopSetValues(const irsdk_header* header, const char* data, char* arguments) {
+	char service[64];
+	char values[64];
+	size_t length = strcspn(arguments, ":");
+
+	substring((char*)arguments, service, 0, length);
+	substring((char*)arguments, values, length + 1, strlen(arguments) - length - 1);
+
+	if (strcmp(service, "Refuel") == 0)
+		setPitstopRefuelAmount(values);
+	else if (strcmp(service, "Repair") == 0)
+		requestPitstopRepairs(values);
+	else if (strcmp(service, "Tyre Change") == 0)
+		requestPitstopTyreChange(values);
+	else if (strcmp(service, "Tyre Pressure") == 0)
+		setPitstopTyrePressures(values);
+}
+
+void changePitstopRefuelAmount(const irsdk_header* header, const char* data, char* values) {
+	float fuelDelta;
+
+	sscanf(values, "%f", &fuelDelta);
+
+	if (fuelDelta != 0)
+		irsdk_broadcastMsg(irsdk_BroadcastPitCommand, irsdk_PitCommand_Fuel, getDataFloat(header, data, "PitSvFuel") + fuelDelta);
+}
+
+void changePitstopTyrePressure(const irsdk_header* header, const char* data, char* tyre, char* values) {
+	float pressureDelta;
+
+	sscanf(values, "%f", &pressureDelta);
+
+	if (strcmp(tyre, "FL") == 0)
+		setTyrePressure(irsdk_PitCommand_LF, GetPsi(getDataFloat(header, data, "PitSvLFP")) + pressureDelta);
+	else if (strcmp(tyre, "FR") == 0)
+		setTyrePressure(irsdk_PitCommand_RF, GetPsi(getDataFloat(header, data, "PitSvRFP")) + pressureDelta);
+	else if (strcmp(tyre, "RL") == 0)
+		setTyrePressure(irsdk_PitCommand_LR, GetPsi(getDataFloat(header, data, "PitSvLRP")) + pressureDelta);
+	else if (strcmp(tyre, "RR") == 0)
+		setTyrePressure(irsdk_PitCommand_RR, GetPsi(getDataFloat(header, data, "PitSvRRP")) + pressureDelta);
+}
+
+void pitstopChangeValues(const irsdk_header* header, const char* data, char* arguments) {
+	char service[64];
+	char values[64];
+	size_t length = strcspn(arguments, ":");
+
+	substring((char*)arguments, service, 0, length);
+	substring((char*)arguments, values, length + 1, strlen(arguments) - length - 1);
+
+	if (strcmp(service, "Refuel") == 0)
+		changePitstopRefuelAmount(header, data, values);
+	else if (strcmp(service, "Repair") == 0)
+		requestPitstopRepairs(values);
+	else if (strcmp(service, "Tyre Change") == 0)
+		requestPitstopTyreChange(values);
+	else if (strcmp(service, "All Around") == 0) {
+		changePitstopTyrePressure(header, data, "FL", values);
+		changePitstopTyrePressure(header, data, "FR", values);
+		changePitstopTyrePressure(header, data, "RL", values);
+		changePitstopTyrePressure(header, data, "RR", values);
+	}
+	else if (strcmp(service, "Front Left") == 0)
+		changePitstopTyrePressure(header, data, "FL", values);
+	else if (strcmp(service, "Front Right") == 0)
+		changePitstopTyrePressure(header, data, "FR", values);
+	else if (strcmp(service, "Rear Left") == 0)
+		changePitstopTyrePressure(header, data, "RL", values);
+	else if (strcmp(service, "Rear Right") == 0)
+		changePitstopTyrePressure(header, data, "RR", values);
+}
+
 void writeData(const irsdk_header *header, const char* data)
 {
 	if(header && data)
@@ -325,228 +459,182 @@ void writeData(const irsdk_header *header, const char* data)
 		if (bestTime == 0)
 			bestTime = lastTime;
 
-		printf("[Session Data]\n");
+		if (g_setup) {
+			printf("[Setup Data]\n");
 
-		printf("Active=true\n");
-		printf("Paused=false\n"); // Not yet implemented
+			printf("TyreCompound=Dry\n");
+			printf("TyreCompoundColor=Black\n");
+			printf("TyreSet=1\n");
 
-		if (getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}SessionType:", sessionID)) {
-			if (strstr(result, "Practice"))
-				printf("Session=Practice\n");
-			else if (strstr(result, "Qualify"))
-				printf("Session=Qualification\n");
-			else if (strstr(result, "Race"))
-				printf("Session=Race\n");
-			else
-				printf("Session=Other\n");
-		}
-		else
-			printf("Session=Other\n");
-
-		printf("FuelAmount=%f\n", maxFuel);
-
-		if (getYamlValue(result, sessionInfo, "WeekendInfo:TrackName:"))
-			printf("Track=%s\n", result);
-		else
-			printf("Track=Unknown\n");
-
-		if (getYamlValue(result, sessionInfo, "DriverInfo:Drivers:CarIdx:{%s}CarScreenName:", playerCarIdx))
-			printf("Car=%s\n", result);
-		else
-			printf("Car=Unknown\n");
-
-		printf("SessionFormat=%s\n", (sessionLaps == -1) ? "Time" : "Lap");
-
-		printf("[Car Data]\n");
-
-		printf("BodyworkDamage=0,0,0,0,0\n");
-		printf("SuspensionDamage=0,0,0,0\n");
-
-		float fuelRemaining = 1;
-
-		if (getDataValue(result, header, data, "FuelLevel"))
-			sscanf(result, "%f", &fuelRemaining);
-
-		printf("FuelRemaining=%f\n", fuelRemaining);
-
-		printf("TyreCompound=Dry\n");
-		printf("TyreCompoundColor=Black\n");
-
-		printf("TyrePressure = %f, %f, %f, %f\n",
-			GetPsi(getDataFloat(header, data, "LFpressure")),
-			GetPsi(getDataFloat(header, data, "RFpressure")),
-			GetPsi(getDataFloat(header, data, "LRpressure")),
-			GetPsi(getDataFloat(header, data, "RRpressure")));
-
-		printf("TyreTemperature = %f, %f, %f, %f\n",
-			(getDataFloat(header, data, "LFtempL") + getDataFloat(header, data, "LFtempM") + getDataFloat(header, data, "LFtempR")) / 3,
-			(getDataFloat(header, data, "RFtempL") + getDataFloat(header, data, "RFtempM") + getDataFloat(header, data, "RFtempR")) / 3,
-			(getDataFloat(header, data, "LRtempL") + getDataFloat(header, data, "LRtempM") + getDataFloat(header, data, "LRtempR")) / 3,
-			(getDataFloat(header, data, "RRtempL") + getDataFloat(header, data, "RRtempM") + getDataFloat(header, data, "RRtempR")) / 3);
-
-		printf("[Stint Data]\n");
-
-		if (getYamlValue(result, sessionInfo, "DriverInfo:Drivers:CarIdx:{%s}UserName:", playerCarIdx)) {
-			char forName[100];
-			char surName[100];
-			char nickName[3];
-
-			size_t length = strcspn(result, " ");
-
-			substring((char*)result, forName, 0, length);
-			substring((char*)result, surName, length + 1, strlen(result) - length - 1);
-			nickName[0] = forName[0], nickName[1] = surName[0], nickName[2] = '\0';
-
-			printf("DriverForname=%s\n", forName);
-			printf("DriverSurname=%s\n", surName);
-			printf("DriverNickname=%s\n", nickName);
+			printf("TyrePressure = %f, %f, %f, %f\n",
+				GetPsi(getDataFloat(header, data, "LFcoldPressure")),
+				GetPsi(getDataFloat(header, data, "RFcoldPressure")),
+				GetPsi(getDataFloat(header, data, "LRcoldPressure")),
+				GetPsi(getDataFloat(header, data, "RRcoldPressure")));
 		}
 		else {
-			printf("DriverForname=John\n");
-			printf("DriverSurname=Doe\n");
-			printf("DriverNickname=JD\n");
+			printf("[Session Data]\n");
+
+			printf("Active=true\n");
+			printf("Paused=false\n"); // Not yet implemented
+
+			if (getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}SessionType:", sessionID)) {
+				if (strstr(result, "Practice"))
+					printf("Session=Practice\n");
+				else if (strstr(result, "Qualify"))
+					printf("Session=Qualification\n");
+				else if (strstr(result, "Race"))
+					printf("Session=Race\n");
+				else
+					printf("Session=Other\n");
+			}
+			else
+				printf("Session=Other\n");
+
+			printf("FuelAmount=%f\n", maxFuel);
+
+			if (getYamlValue(result, sessionInfo, "WeekendInfo:TrackName:"))
+				printf("Track=%s\n", result);
+			else
+				printf("Track=Unknown\n");
+
+			if (getYamlValue(result, sessionInfo, "DriverInfo:Drivers:CarIdx:{%s}CarScreenName:", playerCarIdx))
+				printf("Car=%s\n", result);
+			else
+				printf("Car=Unknown\n");
+
+			printf("SessionFormat=%s\n", (sessionLaps == -1) ? "Time" : "Lap");
+
+			printf("[Car Data]\n");
+
+			printf("BodyworkDamage=0,0,0,0,0\n");
+			printf("SuspensionDamage=0,0,0,0\n");
+
+			float fuelRemaining = 1;
+
+			if (getDataValue(result, header, data, "FuelLevel"))
+				sscanf(result, "%f", &fuelRemaining);
+
+			printf("FuelRemaining=%f\n", fuelRemaining);
+
+			printf("TyreCompound=Dry\n");
+			printf("TyreCompoundColor=Black\n");
+
+			printf("TyrePressure = %f, %f, %f, %f\n",
+				GetPsi(getDataFloat(header, data, "LFpressure")),
+				GetPsi(getDataFloat(header, data, "RFpressure")),
+				GetPsi(getDataFloat(header, data, "LRpressure")),
+				GetPsi(getDataFloat(header, data, "RRpressure")));
+
+			printf("TyreTemperature = %f, %f, %f, %f\n",
+				(getDataFloat(header, data, "LFtempL") + getDataFloat(header, data, "LFtempM") + getDataFloat(header, data, "LFtempR")) / 3,
+				(getDataFloat(header, data, "RFtempL") + getDataFloat(header, data, "RFtempM") + getDataFloat(header, data, "RFtempR")) / 3,
+				(getDataFloat(header, data, "LRtempL") + getDataFloat(header, data, "LRtempM") + getDataFloat(header, data, "LRtempR")) / 3,
+				(getDataFloat(header, data, "RRtempL") + getDataFloat(header, data, "RRtempM") + getDataFloat(header, data, "RRtempR")) / 3);
+
+			printf("[Stint Data]\n");
+
+			if (getYamlValue(result, sessionInfo, "DriverInfo:Drivers:CarIdx:{%s}UserName:", playerCarIdx)) {
+				char forName[100];
+				char surName[100];
+				char nickName[3];
+
+				size_t length = strcspn(result, " ");
+
+				substring((char*)result, forName, 0, length);
+				substring((char*)result, surName, length + 1, strlen(result) - length - 1);
+				nickName[0] = forName[0], nickName[1] = surName[0], nickName[2] = '\0';
+
+				printf("DriverForname=%s\n", forName);
+				printf("DriverSurname=%s\n", surName);
+				printf("DriverNickname=%s\n", nickName);
+			}
+			else {
+				printf("DriverForname=John\n");
+				printf("DriverSurname=Doe\n");
+				printf("DriverNickname=JD\n");
+			}
+
+			printf("Lap=%s\n", itoa(laps, result, 10));
+
+			printf("LapLastTime=%ld\n", lastTime);
+			printf("LapBestTime=%ld\n", bestTime);
+
+			long lapsRemaining = -1;
+			long timeRemaining = -1;
+
+			if (getDataValue(result, header, data, "SessionLapsRemain"))
+				lapsRemaining = atoi(result);
+
+			if (lapsRemaining == -1)
+				lapsRemaining = getRemainingLaps(sessionInfo, sessionLaps, sessionTime, laps, lastTime);
+
+			printf("SessionLapsRemaining=%ld\n", lapsRemaining);
+
+			if (getDataValue(result, header, data, "SessionTimeRemain")) {
+				float time;
+
+				sscanf(result, "%f", &time);
+
+				if (time != -1)
+					timeRemaining = ((long)time * 1000);
+			}
+
+			if (timeRemaining == -1)
+				timeRemaining = getRemainingTime(sessionInfo, sessionLaps, sessionTime, laps, lastTime);
+
+			printf("SessionTimeRemaining=%ld\n", timeRemaining);
+			printf("StintTimeRemaining=%ld\n", timeRemaining);
+			printf("DriverTimeRemaining=%ld\n", timeRemaining);
+
+			if (getDataValue(result, header, data, "PitSvFlags"))
+				printf("InPit=%s\n", atoi(result) ? "true" : "false");
+			else
+				printf("InPit=false\n");
+
+			printf("[Track Data]\n");
+
+			if (getYamlValue(result, sessionInfo, "WeekendInfo:TrackSurfaceTemp:")) {
+				char temperature[10];
+				size_t length = strcspn(result, " ");
+
+				substring((char*)result, temperature, 0, length);
+
+				printf("Temperature=%s\n", temperature);
+			}
+			else
+				printf("Temperature=24\n");
+
+			char gripLevel[32] = "Green";
+
+			if (getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}SessionTrackRubberState:", sessionID))
+				if (strstr(result, "high") && strstr(result, "moderately"))
+					strcpy(gripLevel, "Fast");
+				else if (strstr(result, "high"))
+					strcpy(gripLevel, "Optimum");
+
+			printf("Grip=%s\n", gripLevel);
+
+			printf("[Weather Data]\n");
+
+			if (getYamlValue(result, sessionInfo, "WeekendInfo:TrackAirTemp:")) {
+				char temperature[10];
+				size_t length = strcspn(result, " ");
+
+				substring((char*)result, temperature, 0, length);
+
+				printf("Temperature=%s\n", temperature);
+			}
+			else
+				printf("Temperature=24\n");
+
+			printf("Weather=Dry\n");
+			printf("Weather10Min=Dry\n");
+			printf("Weather30Min=Dry\n");
 		}
-
-		printf("Lap=%s\n", itoa(laps, result, 10));
-
-		printf("LapLastTime=%ld\n", lastTime);
-		printf("LapBestTime=%ld\n", bestTime);
-		
-		long lapsRemaining = -1;
-		long timeRemaining = -1;
-
-		if (getDataValue(result, header, data, "SessionLapsRemain"))
-			lapsRemaining = atoi(result);
-
-		if (lapsRemaining == -1)
-			lapsRemaining = getRemainingLaps(sessionInfo, sessionLaps, sessionTime, laps, lastTime);
-
-		printf("SessionLapsRemaining=%ld\n", lapsRemaining);
-
-		if (getDataValue(result, header, data, "SessionTimeRemain")) {
-			float time;
-
-			sscanf(result, "%f", &time);
-
-			if (time != -1)
-				timeRemaining = ((long)time * 1000);
-		}
-		
-		if (timeRemaining == -1)
-			timeRemaining = getRemainingTime(sessionInfo, sessionLaps, sessionTime, laps, lastTime);
-
-		printf("SessionTimeRemaining=%ld\n", timeRemaining);
-		printf("StintTimeRemaining=%ld\n", timeRemaining);
-		printf("DriverTimeRemaining=%ld\n", timeRemaining);
-
-		if (getDataValue(result, header, data, "PitSvFlags"))
-			printf("InPit=%s\n", atoi(result) ? "true" : "false");
-		else
-			printf("InPit=false\n");
-
-		printf("[Track Data]\n");
-
-		if (getYamlValue(result, sessionInfo, "WeekendInfo:TrackSurfaceTemp:")) {
-			char temperature[10];
-			size_t length = strcspn(result, " ");
-
-			substring((char*)result, temperature, 0, length);
-
-			printf("Temperature=%s\n", temperature);
-		}
-		else
-			printf("Temperature=24\n");
-
-		char gripLevel[32] = "Green";
-
-		if (getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}SessionTrackRubberState:", sessionID))
-			if (strstr(result, "high") && strstr(result, "moderately"))
-				strcpy(gripLevel, "Fast");
-			else if (strstr(result, "high"))
-				strcpy(gripLevel, "Optimum");
-
-		printf("Grip=%s\n", gripLevel);
-
-		printf("[Weather Data]\n");
-
-		if (getYamlValue(result, sessionInfo, "WeekendInfo:TrackAirTemp:")) {
-			char temperature[10];
-			size_t length = strcspn(result, " ");
-
-			substring((char*)result, temperature, 0, length);
-
-			printf("Temperature=%s\n", temperature);
-		}
-		else
-			printf("Temperature=24\n");
-
-		printf("Weather=Dry\n");
-		printf("Weather10Min=Dry\n");
-		printf("Weather30Min=Dry\n");
-
-		printf("[Setup Data]\n");
-
-		printf("TyreCompound=Dry\n");
-		printf("TyreCompoundColor=Black\n");
-		printf("TyreSet=1\n");
-
-		printf("TyrePressure = %f, %f, %f, %f\n",
-			GetPsi(getDataFloat(header, data, "LFcoldPressure")),
-			GetPsi(getDataFloat(header, data, "RFcoldPressure")),
-			GetPsi(getDataFloat(header, data, "LRcoldPressure")),
-			GetPsi(getDataFloat(header, data, "RRcoldPressure")));
 
 		// printf("[Debug]\n");
 		// printf("%s", sessionInfo);
-	}
-}
-
-void logDataToDisplay(const irsdk_header *header, const char *data)
-{
-	if(header && data)
-	{
-		for(int i=0; i<header->numVars; i++)
-		{
-			const irsdk_varHeader *rec = irsdk_getVarHeaderEntry(i);
-
-			printf("%s[", rec->name);
-
-			// only dump the first 4 entrys in an array to save space
-			// for now ony carsTrkPct and carsTrkLoc output more than 4 entrys
-			int count = 1;
-			if(rec->type != irsdk_char)
-				count = min(4, rec->count);
-
-			for(int j=0; j<count; j++)
-			{
-				switch(rec->type)
-				{
-				case irsdk_char:
-					printf("%s", (char *)(data+rec->offset) ); break;
-				case irsdk_bool:
-					printf("%d", ((bool *)(data+rec->offset))[j] ); break;
-				case irsdk_int:
-					printf("%d", ((int *)(data+rec->offset))[j] ); break;
-				case irsdk_bitField:
-					printf("0x%08x", ((int *)(data+rec->offset))[j] ); break;
-				case irsdk_float:
-					printf("%0.2f", ((float *)(data+rec->offset))[j] ); break;
-				case irsdk_double:
-					printf("%0.2f", ((double *)(data+rec->offset))[j] ); break;
-				}
-
-				if(j+1 < count)
-					printf("; ");
-			}
-			if(rec->type != irsdk_char && count < rec->count)
-				printf("; ...");
-
-			printf("]");
-
-			if((i+1) < header->numVars)
-				printf(", ");
-		}
-		printf("\n\n");
 	}
 }
 
@@ -575,8 +663,11 @@ void end_session(bool shutdown)
 	}
 }
 
-int main()
+int main(int argc, char* argv[])
 {
+	g_setup = ((argc == 2) && (strcmp(argv[1], "-Setup") == 0));
+	g_pitstop = ((argc == 2) && (strcmp(argv[1], "-Pitstop") == 0));
+
 	// bump priority up so we get time from the sim
 	SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
 
@@ -593,9 +684,14 @@ int main()
 		{
 			initData(pHeader, g_data, g_nData);
 
-			writeData(pHeader, g_data);
-			
-			// logDataToDisplay(pHeader, g_data);
+			if (g_pitstop) {
+				if (strcmp(argv[2], "Set") == 0)
+					pitstopSetValues(pHeader, g_data, argv[3]);
+				else if (strcmp(argv[2], "Change") == 0)
+					pitstopChangeValues(pHeader, g_data, argv[3]);
+			}
+			else	
+				writeData(pHeader, g_data);
 		}
 		else {
 			printf("[Session Data]\n");

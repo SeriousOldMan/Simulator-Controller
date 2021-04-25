@@ -216,14 +216,14 @@ bool getDataValue(char* value, const irsdk_header* header, const char* data, con
 				case irsdk_char:
 					sprintf(value, "%s", (char*)(data + rec->offset)); break;
 				case irsdk_bool:
-					sprintf(value, "%d", (bool*)(data + rec->offset)); break;
+					sprintf(value, "%d", ((bool*)(data + rec->offset))[0]); break;
 				case irsdk_bitField:
 				case irsdk_int:
-					sprintf(value, "%d", (int*)(data + rec->offset)); break;
+					sprintf(value, "%d", ((int*)(data + rec->offset))[0]); break;
 				case irsdk_float:
-					sprintf(value, "%0.2f", (float*)(data + rec->offset)); break;
+					sprintf(value, "%0.2f", ((float*)(data + rec->offset))[0]); break;
 				case irsdk_double:
-					sprintf(value, "%0.2f", (double*)(data + rec->offset)); break;
+					sprintf(value, "%0.2f", ((double*)(data + rec->offset))[0]); break;
 				default:
 					return false;
 				}
@@ -274,7 +274,7 @@ void writeData(const irsdk_header *header, const char* data)
 		if (getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}SessionLaps:", sessionID))
 			if (strcmp(result, "unlimited") != 0)
 				sessionLaps = atoi(result);
-			else {
+			else if (getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}SessionTime:", sessionID)) {
 				char buffer[64];
 				float time;
 
@@ -286,12 +286,15 @@ void writeData(const irsdk_header *header, const char* data)
 
 				sessionTime = ((long)time * 1000);
 			}
+			else {
+				sessionTime = 0;
+			}
 
 		long lastTime = 0;
 		long bestTime = 0;
 
-		float fLastTime;
-		float fBestTime;
+		float fLastTime = 0;
+		float fBestTime = 0;
 
 		if (getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:CarIdx:{%s}LastTime:", sessionID, playerCarIdx))
 			sscanf(result, "%f", &fLastTime);
@@ -339,8 +342,6 @@ void writeData(const irsdk_header *header, const char* data)
 			printf("Car=Unknown\n");
 
 		printf("SessionFormat=%s\n", (sessionLaps == -1) ? "Time" : "Lap");
-		
-		printf("Track="); printDataValue(header, data, "TrackName"); printf("\n");
 
 		printf("[Car Data]\n");
 
@@ -382,7 +383,7 @@ void writeData(const irsdk_header *header, const char* data)
 
 		printf("SessionLapsRemaining=%ld\n", getRemainingLaps(sessionInfo, sessionLaps, sessionTime, laps, lastTime));
 
-		long timeRemaining = (getRemainingTime(sessionInfo, sessionLaps, sessionTime, laps, lastTime) * 1000);
+		long timeRemaining = getRemainingTime(sessionInfo, sessionLaps, sessionTime, laps, lastTime);
 
 		printf("SessionTimeRemaining=%ld\n", timeRemaining);
 		printf("StintTimeRemaining=%ld\n", timeRemaining);
@@ -523,7 +524,7 @@ int main()
 
 			writeData(pHeader, g_data);
 			
-			logDataToDisplay(pHeader, g_data);
+			// logDataToDisplay(pHeader, g_data);
 		}
 		else {
 			printf("[Session Data]\n");

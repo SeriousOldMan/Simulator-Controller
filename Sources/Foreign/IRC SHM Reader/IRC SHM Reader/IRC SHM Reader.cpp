@@ -231,6 +231,16 @@ bool getDataValue(char* value, const irsdk_header* header, const char* data, con
 	return false;
 }
 
+float getDataFloat(const irsdk_header* header, const char* data, const char* variable) {
+	char result[32];
+	float value = 0;
+
+	if (getDataValue(result, header, data, variable))
+		sscanf(result, "%f", &value);
+
+	return value;
+}
+
 void printDataValue(const irsdk_header* header, const char* data, const char* variable) {
 	if (header && data) {
 		for (int i = 0; i < header->numVars; i++) {
@@ -262,6 +272,7 @@ void writeData(const irsdk_header *header, const char* data)
 		int sessionLaps = -1;
 		long sessionTime = -1;
 		int laps = 0;
+		float maxFuel = 0;
 
 		if (getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:CarIdx:{%s}LapsComplete:", sessionID, playerCarIdx))
 			laps = atoi(result);
@@ -284,6 +295,9 @@ void writeData(const irsdk_header *header, const char* data)
 			else {
 				sessionTime = 0;
 			}
+
+		if (getYamlValue(result, sessionInfo, "DriverInfo:DriverCarFuelMaxLtr:"))
+			sscanf(result, "%f", &maxFuel);
 
 		long lastTime = 0;
 		long bestTime = 0;
@@ -321,10 +335,7 @@ void writeData(const irsdk_header *header, const char* data)
 		else
 			printf("Session=Other\n");
 
-		if (getYamlValue(result, sessionInfo, "DriverInfo:DriverCarFuelMaxLtr:"))
-			printf("FuelAmount=%s\n", result);
-		else
-			printf("FuelAmount=%s\n", "0");
+		printf("FuelAmount=%f\n", maxFuel);
 
 		if (getYamlValue(result, sessionInfo, "WeekendInfo:TrackName:"))
 			printf("Track=%s\n", result);
@@ -343,10 +354,27 @@ void writeData(const irsdk_header *header, const char* data)
 		printf("BodyworkDamage=0,0,0,0,0\n");
 		printf("SuspensionDamage=0,0,0,0\n");
 
-		printf("FuelRemaining=0.0\n");
+		float percentRemaining = 1;
+
+		if (getDataValue(result, header, data, "FuelLevelPct"))
+			sscanf(result, "%f", &percentRemaining);
+
+		printf("FuelRemaining=%f\n", maxFuel * percentRemaining);
 
 		printf("TyreCompound=Dry\n");
 		printf("TyreCompoundColor=Black\n");
+
+		printf("TyrePressure = %f, %f, %f, %f\n",
+			getDataFloat(header, data, "LFpressure"),
+			getDataFloat(header, data, "RFpressure"),
+			getDataFloat(header, data, "LRpressure"),
+			getDataFloat(header, data, "RRpressure"));
+
+		printf("TyreTemperature = %f, %f, %f, %f\n",
+			(getDataFloat(header, data, "LFtempL") + getDataFloat(header, data, "LFtempM") + getDataFloat(header, data, "LFtempR")) / 3,
+			(getDataFloat(header, data, "RFtempL") + getDataFloat(header, data, "RFtempM") + getDataFloat(header, data, "RFtempR")) / 3,
+			(getDataFloat(header, data, "LRtempL") + getDataFloat(header, data, "LRtempM") + getDataFloat(header, data, "LRtempR")) / 3,
+			(getDataFloat(header, data, "RRtempL") + getDataFloat(header, data, "RRtempM") + getDataFloat(header, data, "RRtempR")) / 3);
 
 		printf("[Stint Data]\n");
 

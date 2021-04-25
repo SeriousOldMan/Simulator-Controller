@@ -66,14 +66,6 @@ namespace RF2SHMReader {
 			rF2VehicleTelemetry playerTelemetry = GetPlayerTelemetry(playerScoring.mID, ref telemetry);
 
 			Console.WriteLine("[Session Data]");
-			if (connected) {
-				Console.Write("Car="); Console.WriteLine(GetStringFromBytes(playerScoring.mVehicleName));
-				Console.Write("Track="); Console.WriteLine(GetStringFromBytes(playerTelemetry.mTrackName));
-				Console.Write("SessionFormat="); Console.WriteLine((scoring.mScoringInfo.mEndET < 0.0) ? "Lap" : "Time");
-				Console.Write("FuelAmount="); Console.WriteLine(Math.Round(playerTelemetry.mFuelCapacity));
-			}
-
-			Console.WriteLine("[Stint Data]");
 			Console.Write("Active="); Console.WriteLine((connected && (extended.mSessionStarted != 0)) ? "true" : "false");
 			if (connected) {
 				Console.Write("Paused="); Console.WriteLine(scoring.mScoringInfo.mGamePhase == (byte)PausedOrHeartbeat ? "true" : "false");
@@ -90,7 +82,15 @@ namespace RF2SHMReader {
 					session = "Other";
 
 				Console.Write("Session="); Console.WriteLine(session);
+				
+				Console.Write("Car="); Console.WriteLine(GetStringFromBytes(playerScoring.mVehicleName));
+				Console.Write("Track="); Console.WriteLine(GetStringFromBytes(playerTelemetry.mTrackName));
+				Console.Write("SessionFormat="); Console.WriteLine((scoring.mScoringInfo.mEndET < 0.0) ? "Lap" : "Time");
+				Console.Write("FuelAmount="); Console.WriteLine(Math.Round(playerTelemetry.mFuelCapacity));
+			}
 
+			Console.WriteLine("[Stint Data]");
+			if (connected) {
 				string forName = GetStringFromBytes(scoring.mScoringInfo.mPlayerName);
 
 				if (forName.Contains(" ")) {
@@ -115,7 +115,7 @@ namespace RF2SHMReader {
 
 				long time = GetRemainingTime(ref playerScoring);
 
-				Console.Write("RaceTimeRemaining="); Console.WriteLine(time);
+				Console.Write("SessionTimeRemaining="); Console.WriteLine(time);
 				Console.Write("StintTimeRemaining="); Console.WriteLine(time);
 				Console.Write("DriverTimeRemaining="); Console.WriteLine(time);
 

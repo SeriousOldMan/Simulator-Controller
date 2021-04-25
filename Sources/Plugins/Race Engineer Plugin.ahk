@@ -511,11 +511,11 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 			if !data
 				data := readSharedMemory(this.Simulator.Code)
 			
-			if getConfigurationValue(data, "Stint Data", "Active", false) {
-				if getConfigurationValue(data, "Stint Data", "Paused", false)
+			if getConfigurationValue(data, "Session Data", "Active", false) {
+				if getConfigurationValue(data, "Session Data", "Paused", false)
 					return kSessionPaused
 				else
-					switch getConfigurationValue(data, "Stint Data", "Session", "Other") {
+					switch getConfigurationValue(data, "Session Data", "Session", "Other") {
 						case "Race":
 							return kSessionRace
 						case "Practice":

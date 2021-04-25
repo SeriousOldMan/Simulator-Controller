@@ -9,7 +9,6 @@
 #pragma optimize("",off)
 using namespace std;
 
-
 template <typename T, unsigned S>
 inline unsigned arraysize(const T(&v)[S])
 {
@@ -202,10 +201,7 @@ int main(int argc, char* argv[])
 
 		SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;
 		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
-
-		printData("Active", ((gf->status == AC_LIVE) || (gf->status == AC_PAUSE)) ? "true" : "false");
-		printData("Paused", (gf->status == AC_PAUSE) ? "true" : "false");
-		printData("Session", getSession(gf->session));
+		
 		wcout << "DriverForname=" << sf->playerName << endl;
 		wcout << "DriverSurname=" << sf->playerSurname << endl;
 		wcout << "DriverNickname=" << sf->playerNick << endl;
@@ -220,7 +216,7 @@ int main(int argc, char* argv[])
 		}
 
 		printData("RaceLapsRemaining", timeLeft / gf->iLastTime);
-		printData("RaceTimeRemaining", timeLeft);
+		printData("SessionTimeRemaining", timeLeft);
 		printData("StintTimeRemaining", gf->DriverStintTimeLeft < 0 ? timeLeft : gf->DriverStintTimeLeft);
 		printData("DriverTimeRemaining", gf->DriverStintTotalTimeLeft < 0 ? timeLeft : gf->DriverStintTotalTimeLeft);
 		printData("InPit", gf->isInPit ? "true" : "false");
@@ -264,7 +260,11 @@ int main(int argc, char* argv[])
 		wcout << "[Session Data]" << endl;
 
 		SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;
+		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
+		printData("Active", ((gf->status == AC_LIVE) || (gf->status == AC_PAUSE)) ? "true" : "false");
+		printData("Paused", (gf->status == AC_PAUSE) ? "true" : "false");
+		printData("Session", getSession(gf->session));
 		wcout << "Car=" << sf->carModel << endl;
 		wcout << "Track=" << sf->track << endl;
 		wcout << "SessionFormat=Time" << endl;

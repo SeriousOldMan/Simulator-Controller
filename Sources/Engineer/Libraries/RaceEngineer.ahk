@@ -1214,7 +1214,7 @@ class RaceEngineer extends ConfigurationItem {
 		if ((lapTime / settingsLapTime) > 2)
 			lapTime := settingsLapTime
 		
-		dataDuration := Round((getConfigurationValue(data, "Stint Data", "RaceTimeRemaining", 0) + lapTime) / 1000)
+		dataDuration := Round((getConfigurationValue(data, "Stint Data", "SessionTimeRemaining", 0) + lapTime) / 1000)
 		settingsDuration := getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Duration", dataDuration)
 		
 		if ((Abs(settingsDuration - dataDuration) / dataDuration) >  0.05)
@@ -1445,7 +1445,7 @@ class RaceEngineer extends ConfigurationItem {
 		knowledgeBase.setFact("Driver.Surname", driverSurname)
 		knowledgeBase.setFact("Driver.Nickname", driverNickname)
 		
-		timeRemaining := getConfigurationValue(data, "Stint Data", "RaceTimeRemaining", 0)
+		timeRemaining := getConfigurationValue(data, "Stint Data", "SessionTimeRemaining", 0)
 		
 		knowledgeBase.setFact("Driver.Time.Remaining", getConfigurationValue(data, "Stint Data", "DriverTimeRemaining", timeRemaining))
 		knowledgeBase.setFact("Driver.Time.Stint.Remaining", getConfigurationValue(data, "Stint Data", "StintTimeRemaining", timeRemaining))

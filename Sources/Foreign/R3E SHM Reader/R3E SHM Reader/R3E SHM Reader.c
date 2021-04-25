@@ -137,7 +137,18 @@ int main()
     }
 
     wprintf_s(L"[Session Data]\n");
+    wprintf_s(L"Active=%S\n", mapped_r3e ? ((map_buffer->completed_laps >= 0) ? "true" : "false") : "false");
     if (mapped_r3e) {
+        wprintf_s(L"Paused=%S\n", map_buffer->game_paused ? "true" : "false");
+        if (map_buffer->session_type == R3E_SESSION_QUALIFY)
+            wprintf_s(L"Session=Qualification\n");
+        else if (map_buffer->session_type == R3E_SESSION_RACE)
+            wprintf_s(L"Session=Race\n");
+        else if (map_buffer->session_type == R3E_SESSION_PRACTICE)
+            wprintf_s(L"Session=Practice\n");
+        else
+            wprintf_s(L"Session=Other\n");
+		
         int modelID = map_buffer->vehicle_info.model_id;
         char buffer[33];
 
@@ -181,18 +192,7 @@ int main()
     }
 
     wprintf_s(L"[Stint Data]\n");
-    wprintf_s(L"Active=%S\n", mapped_r3e ? ((map_buffer->completed_laps >= 0) ? "true" : "false") : "false");
     if (mapped_r3e) {
-        wprintf_s(L"Paused=%S\n", map_buffer->game_paused ? "true" : "false");
-        if (map_buffer->session_type == R3E_SESSION_QUALIFY)
-            wprintf_s(L"Session=Qualification\n");
-        else if (map_buffer->session_type == R3E_SESSION_RACE)
-            wprintf_s(L"Session=Race\n");
-        else if (map_buffer->session_type == R3E_SESSION_PRACTICE)
-            wprintf_s(L"Session=Practice\n");
-        else
-            wprintf_s(L"Session=Other\n");
-		
 		if (strchr((char *)map_buffer->player_name, ' ')) {		
 			char forName[100];
             char surName[100];
@@ -227,7 +227,7 @@ int main()
 
         long timeRemaining = (getRemainingTime() * 1000);
 
-        wprintf_s(L"RaceTimeRemaining=%ld\n", timeRemaining);
+        wprintf_s(L"SessionTimeRemaining=%ld\n", timeRemaining);
         wprintf_s(L"StintTimeRemaining=%ld\n", timeRemaining);
         wprintf_s(L"DriverTimeRemaining=%ld\n", timeRemaining);
         wprintf_s(L"InPit=%S\n", (map_buffer->pit_state == 3) ? "true" : "false");

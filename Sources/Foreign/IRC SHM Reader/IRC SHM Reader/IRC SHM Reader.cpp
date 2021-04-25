@@ -154,27 +154,22 @@ long getRemainingLaps(const char* sessionInfo, int sessionLaps, long sessionTime
 	if (lap < 1)
 		return 0;
 
-	if (sessionLaps > 0) {
+	if (sessionLaps > 0)
 		return (long)(sessionLaps - lap);
-	}
-	else {
-		if (lastTime > 0)
-			return (long)(getRemainingTime(sessionInfo, sessionLaps, sessionTime, lap, lastTime) / lastTime);
-		else
-			return 0;
-	}
+	else if (lastTime > 0)
+		return (long)(getRemainingTime(sessionInfo, sessionLaps, sessionTime, lap, lastTime) / lastTime);
+	else
+		return 0;
 }
 
 long getRemainingTime(const char* sessionInfo, int sessionLaps, long sessionTime, int lap, long lastTime) {
 	if (lap < 1)
 		return 0;
 
-	if (sessionLaps == -1) {
+	if (sessionLaps == -1)
 		return (sessionTime - (lastTime * lap));
-	}
-	else {
+	else
 		return (getRemainingLaps(sessionInfo, sessionLaps, sessionTime, lap, lastTime) * lastTime);
-	}
 }
 
 void printDataValue(const irsdk_header* header, const char* data, const irsdk_varHeader* rec) {
@@ -380,10 +375,29 @@ void writeData(const irsdk_header *header, const char* data)
 
 		printf("LapLastTime=%ld\n", lastTime);
 		printf("LapBestTime=%ld\n", bestTime);
+		
+		long lapsRemaining = -1;
+		long timeRemaining = -1;
 
-		printf("SessionLapsRemaining=%ld\n", getRemainingLaps(sessionInfo, sessionLaps, sessionTime, laps, lastTime));
+		if (getDataValue(result, header, data, "SessionLapsRemain"))
+			lapsRemaining = atoi(result);
 
-		long timeRemaining = getRemainingTime(sessionInfo, sessionLaps, sessionTime, laps, lastTime);
+		if (lapsRemaining == -1)
+			lapsRemaining = getRemainingLaps(sessionInfo, sessionLaps, sessionTime, laps, lastTime);
+
+		printf("SessionLapsRemaining=%ld\n", lapsRemaining);
+
+		if (getDataValue(result, header, data, "SessionTimeRemain")) {
+			float time;
+
+			sscanf(result, "%f", &time);
+
+			if (time != -1)
+				timeRemaining = ((long)time * 1000);
+		}
+		
+		if (timeRemaining == -1)
+			timeRemaining = getRemainingTime(sessionInfo, sessionLaps, sessionTime, laps, lastTime);
 
 		printf("SessionTimeRemaining=%ld\n", timeRemaining);
 		printf("StintTimeRemaining=%ld\n", timeRemaining);
@@ -423,7 +437,6 @@ void writeData(const irsdk_header *header, const char* data)
 		printf("Weather=Dry\n");
 		printf("Weather10Min=Dry\n");
 		printf("Weather30Min=Dry\n");
-
 
 		// printf("[Debug]\n");
 		// printf("%s", sessionInfo);

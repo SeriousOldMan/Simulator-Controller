@@ -171,9 +171,51 @@ int getCurrentSessionID(const char* sessionInfo) {
 	return -1;
 }
 
-void writeData(const irsdk_header *header)
+void printDataValue(const irsdk_header* header, const char* data, const irsdk_varHeader* rec) {
+	if (header && data) {
+		int count = rec->count;
+
+		for (int j = 0; j < count; j++)
+		{
+			switch (rec->type)
+			{
+			case irsdk_char:
+				printf("%s", (char*)(data + rec->offset)); break;
+			case irsdk_bool:
+				printf("%d", ((bool*)(data + rec->offset))[j]); break;
+			case irsdk_int:
+				printf("%d", ((int*)(data + rec->offset))[j]); break;
+			case irsdk_bitField:
+				printf("0x%08x", ((int*)(data + rec->offset))[j]); break;
+			case irsdk_float:
+				printf("%0.2f", ((float*)(data + rec->offset))[j]); break;
+			case irsdk_double:
+				printf("%0.2f", ((double*)(data + rec->offset))[j]); break;
+			}
+
+			if (j + 1 < count)
+				printf(", ");
+		}
+	}
+}
+
+void printDataValue(const irsdk_header* header, const char* data, const char* variable) {
+	if (header && data) {
+		for (int i = 0; i < header->numVars; i++) {
+			const irsdk_varHeader* rec = irsdk_getVarHeaderEntry(i);
+
+			if (strcmp(rec->name, variable) == 0) {
+				printDataValue(header, data, rec);
+
+				break;
+			}
+		}
+	}
+}
+
+void writeData(const irsdk_header *header, const char* data)
 {
-	if(header)
+	if(header && data)
 	{
 		const char* sessionInfo = irsdk_getSessionInfoStr();
 		char playerCarIdx[10] = "";
@@ -269,6 +311,8 @@ void writeData(const irsdk_header *header)
 			printf("DriverNickname=JD\n");
 		}
 
+		printf("Lap="); printDataValue(header, data, "Lap"); printf("\n");
+
 		if (getYamlValue(result, sessionInfo, "SessionInfo:ResultsPositions:CarIdx:{0}LastTime:", playerCarIdx)) {
 			float time;
 
@@ -320,8 +364,8 @@ void writeData(const irsdk_header *header)
 		printf("Weather30Min=Dry\n");
 
 
-		// printf("[Debug]\n");
-		// printf("%s", sessionInfo);
+		printf("[Debug]\n");
+		printf("%s", sessionInfo);
 	}
 }
 
@@ -385,15 +429,7 @@ void initData(const irsdk_header *header, char* &data, int &nData)
 	g_sessionTimeOffset = irsdk_varNameToOffset(g_sessionTimeString);
 	g_lapIndexOffset = irsdk_varNameToOffset(g_lapIndexString);
 
-	const char *valstr;
-	int valstrlen; 
-	const char g_playerCarIdxPath[] = "DriverInfo:DriverCarIdx:";
-	int playerCarIdx = -1;
-	
-	if(parseYaml(irsdk_getSessionInfoStr(), g_playerCarIdxPath, &valstr, &valstrlen))
-		playerCarIdx = atoi(valstr);
-
-
+	printf("%d %d %d\n\n", g_playerInCarOffset, g_sessionTimeOffset, g_lapIndexOffset);
 }
 
 void end_session(bool shutdown)
@@ -427,9 +463,9 @@ int main()
 		{
 			initData(pHeader, g_data, g_nData);
 
-			writeData(pHeader);
+			writeData(pHeader, g_data);
 			
-			// logDataToDisplay(pHeader, g_data);
+			logDataToDisplay(pHeader, g_data);
 		}
 		else {
 			printf("[Session Data]\n");

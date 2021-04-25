@@ -96,6 +96,14 @@ void substring(const char s[], char sub[], int p, int l) {
 	sub[c] = '\0';
 }
 
+inline double GetPsi(double kPa) {
+	return kPa / 6.895;
+}
+
+inline double GetKpa(double psi) {
+	return psi * 6.895;
+}
+
 inline void extractString(char* string, const char* value, int valueLength) {
 	substring(value, string, 0, valueLength);
 }
@@ -354,21 +362,21 @@ void writeData(const irsdk_header *header, const char* data)
 		printf("BodyworkDamage=0,0,0,0,0\n");
 		printf("SuspensionDamage=0,0,0,0\n");
 
-		float percentRemaining = 1;
+		float fuelRemaining = 1;
 
-		if (getDataValue(result, header, data, "FuelLevelPct"))
-			sscanf(result, "%f", &percentRemaining);
+		if (getDataValue(result, header, data, "FuelLevel"))
+			sscanf(result, "%f", &fuelRemaining);
 
-		printf("FuelRemaining=%f\n", maxFuel * percentRemaining);
+		printf("FuelRemaining=%f\n", fuelRemaining);
 
 		printf("TyreCompound=Dry\n");
 		printf("TyreCompoundColor=Black\n");
 
 		printf("TyrePressure = %f, %f, %f, %f\n",
-			getDataFloat(header, data, "LFpressure"),
-			getDataFloat(header, data, "RFpressure"),
-			getDataFloat(header, data, "LRpressure"),
-			getDataFloat(header, data, "RRpressure"));
+			GetPsi(getDataFloat(header, data, "LFpressure")),
+			GetPsi(getDataFloat(header, data, "RFpressure")),
+			GetPsi(getDataFloat(header, data, "LRpressure")),
+			GetPsi(getDataFloat(header, data, "RRpressure")));
 
 		printf("TyreTemperature = %f, %f, %f, %f\n",
 			(getDataFloat(header, data, "LFtempL") + getDataFloat(header, data, "LFtempM") + getDataFloat(header, data, "LFtempR")) / 3,
@@ -475,6 +483,18 @@ void writeData(const irsdk_header *header, const char* data)
 		printf("Weather=Dry\n");
 		printf("Weather10Min=Dry\n");
 		printf("Weather30Min=Dry\n");
+
+		printf("[Setup Data]\n");
+
+		printf("TyreCompound=Dry\n");
+		printf("TyreCompoundColor=Black\n");
+		printf("TyreSet=1\n");
+
+		printf("TyrePressure = %f, %f, %f, %f\n",
+			GetPsi(getDataFloat(header, data, "LFcoldPressure")),
+			GetPsi(getDataFloat(header, data, "RFcoldPressure")),
+			GetPsi(getDataFloat(header, data, "LRcoldPressure")),
+			GetPsi(getDataFloat(header, data, "RRcoldPressure")));
 
 		// printf("[Debug]\n");
 		// printf("%s", sessionInfo);

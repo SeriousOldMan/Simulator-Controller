@@ -15,7 +15,7 @@ DriverNickname=
 Laps=37
 LapLastTime=116850
 LapBestTime=115287
-RaceTimeRemaining=0
+SessionTimeRemaining=0
 InPit=false
 [Track Data]
 Temperature=25.9956

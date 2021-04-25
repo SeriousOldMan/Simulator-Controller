@@ -24,7 +24,7 @@ LapLastTime=132978
 Laps=23
 Paused=false
 RaceLapsRemaining=false
-RaceTimeRemaining=false
+SessionTimeRemaining=false
 Session=Race
 StintTimeRemaining=false
 [Track Data]

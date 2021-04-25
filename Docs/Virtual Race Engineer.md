@@ -422,7 +422,7 @@ A considerable part of the knowledge of Jona comes from the telemetry informatio
 	Laps=3
 	LapLastTime=116697
 	LapBestTime=116697
-	RaceLapsRemaining=9
+	SessionLapsRemaining=9
 	SessionTimeRemaining=1.41874e+06
 	StintTimeRemaining=1.41874e+06
 	DriverTimeRemaining=1.41874e+06

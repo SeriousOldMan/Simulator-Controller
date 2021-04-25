@@ -111,7 +111,7 @@ namespace RF2SHMReader {
 
 				Console.Write("Laps="); Console.WriteLine(playerScoring.mTotalLaps);
 
-				Console.Write("RaceLapsRemaining="); Console.WriteLine(GetRemainingLaps(ref playerScoring));
+				Console.Write("SessionLapsRemaining="); Console.WriteLine(GetRemainingLaps(ref playerScoring));
 
 				long time = GetRemainingTime(ref playerScoring);
 

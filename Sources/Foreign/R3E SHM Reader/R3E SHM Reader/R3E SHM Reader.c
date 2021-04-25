@@ -223,7 +223,7 @@ int main()
 
         wprintf_s(L"Laps=%ld\n", (long)normalize(map_buffer->completed_laps));
 
-        wprintf_s(L"RaceLapsRemaining=%ld\n", getRemainingLaps());
+        wprintf_s(L"SessionLapsRemaining=%ld\n", getRemainingLaps());
 
         long timeRemaining = (getRemainingTime() * 1000);
 

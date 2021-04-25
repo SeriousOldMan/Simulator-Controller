@@ -92,7 +92,7 @@ inline double normalizeDamage(double value) {
 		return ((1.0 - value) * 100);
 }
 
-void substring(char s[], char sub[], int p, int l) {
+void substring(const char s[], char sub[], int p, int l) {
 	int c = 0;
 
 	while (c < l) {
@@ -101,6 +101,10 @@ void substring(char s[], char sub[], int p, int l) {
 		c++;
 	}
 	sub[c] = '\0';
+}
+
+inline void extractString(char* string, const char* value, int valueLength) {
+	substring(value, string, 0, valueLength);
 }
 
 /*
@@ -137,47 +141,64 @@ long getRemainingTime() {
 }
 */
 
+bool getYamlValue(char* result, const char* sessionInfo, char* path) {
+	int length = -1;
+	const char* string;
 
-inline void copyString(char* string, const char* value, int valueLength) {
-	int i = 0;
+	if (parseYaml(sessionInfo, path, &string, &length)) {
+		extractString(result, string, length);
 
-	for (; i < valueLength; i++)
-		string[i] = value[i];
-
-	string[i] = '\0';
+		return true;
+	}
+	else
+		return false;
 }
 
-// dump data to display, for debugging
+bool getYamlValue(char* result, const char* sessionInfo, char* path, char* value) {
+	char buffer[256];
+	int pos = 0;
+
+	sprintf(buffer, path, value);
+
+	return getYamlValue(result, sessionInfo, buffer);
+}
+
 void logHeaderToDisplay(const irsdk_header *header)
 {
 	if(header)
 	{
+		const char* sessionInfo = irsdk_getSessionInfoStr();
+		char playerCarIdx[10] = "";
+
+		char result[100];
+
 		printf("[Session Data]\n");
-		
-		char buffer[100];
 
-		const char* valstr;
-		int valstrlen;
-		const char g_playerCarIdxPath[] = "DriverInfo:DriverCarIdx:";
-		int playerCarIdx = -1;
+		getYamlValue(playerCarIdx, sessionInfo, "DriverInfo:DriverCarIdx:");
 
-		if (parseYaml(irsdk_getSessionInfoStr(), "DriverInfo:DriverCarIdx:", &valstr, &valstrlen))
-			playerCarIdx = atoi(valstr);
-
-		if (parseYaml(irsdk_getSessionInfoStr(), "DriverInfo:DriverCarFuelMaxLtr:", &valstr, &valstrlen)) {
-			copyString(buffer, valstr, valstrlen);
-			printf("FuelAmount=%s\n", buffer);
-		}
+		if (getYamlValue(result, sessionInfo, "DriverInfo:DriverCarFuelMaxLtr:"))
+			printf("FuelAmount=%s\n", result);
 		else
 			printf("FuelAmount=%s\n", "0");
 
-		if (parseYaml(irsdk_getSessionInfoStr(), "DriverInfo:Drivers{CarScreenName}:", &valstr, &valstrlen)) {
-			copyString(buffer, valstr, valstrlen);
+		if (getYamlValue(result, sessionInfo, "WeekendInfo:TrackName:"))
+			printf("Track=%s\n", result);
+		else
+			printf("Track=Unknown\n");
 
-			printf("Car=%s\n", buffer);
+		if (getYamlValue(result, sessionInfo, "DriverInfo:Drivers:CarIdx:{%s}CarScreenName:", playerCarIdx))
+			printf("Car=%s\n", result);
+		else
+			printf("Car=Unknown\n");
+
+		if (getYamlValue(result, sessionInfo, "SessionInfo:SessionNum:{0}SessionLaps:")) { // Not yet implemented - {0}
+			if (strcmp(result, "unlimited"))
+				printf("SessionFormat=Time\n", 0);
+			else
+				printf("SessionFormat=Lap\n", 0);
 		}
 		else
-			printf("Car=%s\n", "Unknown");
+			printf("SessionFormat=Time\n", 0);
 
 		for(int i=0; i<header->numVars; i++)
 		{
@@ -188,10 +209,66 @@ void logHeaderToDisplay(const irsdk_header *header)
 				printf("Track=%s\n", rec->desc);
 		}
 
+		printf("[Car Data]\n");
+
+
+
 		printf("[Stint Data]\n");
 		printf("Active=true\n");
+		printf("Paused=false\n"); // Not yet implemented
 
+		if (getYamlValue(result, sessionInfo, "SessionInfo:SessionNum:{0}SessionType:")) { // Not yet implemented - {0}
+			if (strcmp(result, "RACE") == 0) // Not yet implemented
+				printf("Session=Race\n");
+			else
+				printf("Session=Other\n");
+		}
+		else
+			printf("Session=Other\n");
+		
+		if (getYamlValue(result, sessionInfo, "DriverInfo:Drivers:CarIdx:{%s}UserName:", playerCarIdx)) {
+			char forName[100];
+			char surName[100];
+			char nickName[3];
 
+			size_t length = strcspn(result, " ");
+
+			substring((char*)result, forName, 0, length);
+			substring((char*)result, surName, length + 1, strlen(result) - length - 1);
+			nickName[0] = forName[0], nickName[1] = surName[0], nickName[2] = '\0';
+
+			printf("DriverForname=%s\n", forName);
+			printf("DriverSurname=%s\n", surName);
+			printf("DriverNickname=%s\n", nickName);
+		}
+		else {
+			printf("DriverForname=John\n");
+			printf("DriverSurname=Doe\n");
+			printf("DriverNickname=JD\n");
+		}
+
+		if (getYamlValue(result, sessionInfo, "SessionInfo:ResultsPositions:CarIdx:{0}LastTime:", playerCarIdx)) {
+			float time;
+
+			sscanf(result, "%f", &time);
+
+			printf("LapLastTime=%d\n", (long)(time * 1000));
+		}
+		else
+			printf("LapLastTime=0\n");
+
+		if (getYamlValue(result, sessionInfo, "SessionInfo:ResultsPositions:CarIdx:{0}FastestTime:", playerCarIdx)) {
+			float time;
+
+			sscanf(result, "%f", &time);
+
+			printf("LapBestTime=%ld\n", (long)(time * 1000));
+		}
+		else
+			printf("LapBestTime=0\n");
+
+		printf("[Debug]\n");
+		printf("%s", sessionInfo);
 	}
 }
 

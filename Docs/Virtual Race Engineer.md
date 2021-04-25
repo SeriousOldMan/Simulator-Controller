@@ -416,9 +416,6 @@ A considerable part of the knowledge of Jona comes from the telemetry informatio
 	TyreTemperature=84.268, 74.6507, 85.6955, 77.2675
 	TyrePressure=27.6296, 27.6063, 27.6666, 27.5575
 	[Stint Data]
-	Active=true
-	Paused=false
-	Session=Race
 	DriverForname=The
 	DriverSurname=BigO
 	DriverNickname=TBO
@@ -448,10 +445,13 @@ A considerable part of the knowledge of Jona comes from the telemetry informatio
 	Weather10min=Dry
 	Weather30min=Dry
 	[Session Data]
+	Active=true
+	Paused=false
+	Session=Race
 	Car=mclaren_720s_gt3
 	Track=Paul_Ricard
 	FuelAmount=125
-	RaceFormat=Time
+	SessionFormat=Time
 
 The shared memory of the simulation games typically provide a lot more information, but this is all that is needed for Jona at the moment. Future versions of Jona will incorporate more data, as Jona gets smarter. For example, version 1.7 of *Assetto Corsa Competizione* introduced updated information for weather information and the current settings of the Pitstop MFD, which had been incorporated into the above telemetry file.
 

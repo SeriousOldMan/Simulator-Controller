@@ -267,7 +267,7 @@ int main(int argc, char* argv[])
 
 		wcout << "Car=" << sf->carModel << endl;
 		wcout << "Track=" << sf->track << endl;
-		wcout << "RaceFormat=Time" << endl;
+		wcout << "SessionFormat=Time" << endl;
 		printData("FuelAmount", sf->maxFuel);
 
 	}

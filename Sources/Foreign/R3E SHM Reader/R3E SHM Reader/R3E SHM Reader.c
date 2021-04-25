@@ -145,8 +145,8 @@ int main()
 
         wprintf_s(L"Car=%S\n", buffer);
         wprintf_s(L"Track=%S-%S\n", map_buffer->track_name, map_buffer->layout_name);
-        wprintf_s(L"FuelAmount=%d\n", (long)map_buffer->fuel_capacity);
-        wprintf_s(L"RaceFormat=%S\n", (map_buffer->session_length_format == R3E_SESSION_LENGTH_LAP_BASED) ? "Lap" : "Time");
+        wprintf_s(L"FuelAmount=%ld\n", (long)map_buffer->fuel_capacity);
+        wprintf_s(L"SessionFormat=%S\n", (map_buffer->session_length_format == R3E_SESSION_LENGTH_LAP_BASED) ? "Lap" : "Time");
     }
 
     wprintf_s(L"[Car Data]\n");
@@ -214,22 +214,22 @@ int main()
             wprintf_s(L"DriverNickname=%S\n", "");
         }
 		
-        wprintf_s(L"LapLastTime=%d\n", (long)(normalize(map_buffer->lap_time_previous_self) * 1000));
+        wprintf_s(L"LapLastTime=%ld\n", (long)(normalize(map_buffer->lap_time_previous_self) * 1000));
 
         if (normalize(map_buffer->lap_time_best_self))
-            wprintf_s(L"LapBestTime=%d\n", (long)(normalize(map_buffer->lap_time_best_self) * 1000));
+            wprintf_s(L"LapBestTime=%ld\n", (long)(normalize(map_buffer->lap_time_best_self) * 1000));
         else
-            wprintf_s(L"LapBestTime=%d\n", (long)(normalize(map_buffer->lap_time_previous_self) * 1000));
+            wprintf_s(L"LapBestTime=%ld\n", (long)(normalize(map_buffer->lap_time_previous_self) * 1000));
 
-        wprintf_s(L"Laps=%d\n", (long)normalize(map_buffer->completed_laps));
+        wprintf_s(L"Laps=%ld\n", (long)normalize(map_buffer->completed_laps));
 
-        wprintf_s(L"RaceLapsRemaining=%d\n", getRemainingLaps());
+        wprintf_s(L"RaceLapsRemaining=%ld\n", getRemainingLaps());
 
         long timeRemaining = (getRemainingTime() * 1000);
 
-        wprintf_s(L"RaceTimeRemaining=%d\n", timeRemaining);
-        wprintf_s(L"StintTimeRemaining=%d\n", timeRemaining);
-        wprintf_s(L"DriverTimeRemaining=%d\n", timeRemaining);
+        wprintf_s(L"RaceTimeRemaining=%ld\n", timeRemaining);
+        wprintf_s(L"StintTimeRemaining=%ld\n", timeRemaining);
+        wprintf_s(L"DriverTimeRemaining=%ld\n", timeRemaining);
         wprintf_s(L"InPit=%S\n", (map_buffer->pit_state == 3) ? "true" : "false");
     }
 

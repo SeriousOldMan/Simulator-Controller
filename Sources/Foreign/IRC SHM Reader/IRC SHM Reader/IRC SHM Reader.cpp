@@ -85,13 +85,6 @@ inline double normalize(double value) {
 	return (value < 0) ? 0.0 : value;
 }
 
-inline double normalizeDamage(double value) {
-	if (value < 0)
-		return 0.0;
-	else
-		return ((1.0 - value) * 100);
-}
-
 void substring(const char s[], char sub[], int p, int l) {
 	int c = 0;
 
@@ -163,18 +156,52 @@ bool getYamlValue(char* result, const char* sessionInfo, char* path, char* value
 	return getYamlValue(result, sessionInfo, buffer);
 }
 
-void logHeaderToDisplay(const irsdk_header *header)
+int getCurrentSessionID(const char* sessionInfo) {
+	char id[10];
+	char result[100];
+	int sID = 0;
+
+	while (getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsOfficial:", itoa(sID, id, 10))) {
+		if (strcmp(result, "0") == 0)
+			return sID;
+
+		sID += 1;
+	}
+
+	return -1;
+}
+
+void writeData(const irsdk_header *header)
 {
 	if(header)
 	{
 		const char* sessionInfo = irsdk_getSessionInfoStr();
 		char playerCarIdx[10] = "";
+		char sessionID[10] = "";
 
 		char result[100];
 
+		getYamlValue(playerCarIdx, sessionInfo, "DriverInfo:DriverCarIdx:");
+	
+		itoa(getCurrentSessionID(sessionInfo), sessionID, 10);
+
 		printf("[Session Data]\n");
 
-		getYamlValue(playerCarIdx, sessionInfo, "DriverInfo:DriverCarIdx:");
+		printf("Active=true\n");
+		printf("Paused=false\n"); // Not yet implemented
+
+		if (getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}SessionType:", sessionID)) {
+			if (strstr(result, "Practice"))
+				printf("Session=Practice\n");
+			else if (strstr(result, "Qualify"))
+				printf("Session=Qualification\n");
+			else if (strstr(result, "Race"))
+				printf("Session=Race\n");
+			else
+				printf("Session=Other\n");
+		}
+		else
+			printf("Session=Other\n");
 
 		if (getYamlValue(result, sessionInfo, "DriverInfo:DriverCarFuelMaxLtr:"))
 			printf("FuelAmount=%s\n", result);
@@ -191,14 +218,14 @@ void logHeaderToDisplay(const irsdk_header *header)
 		else
 			printf("Car=Unknown\n");
 
-		if (getYamlValue(result, sessionInfo, "SessionInfo:SessionNum:{0}SessionLaps:")) { // Not yet implemented - {0}
+		if (getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}SessionLaps:")) {
 			if (strcmp(result, "unlimited"))
-				printf("SessionFormat=Time\n", 0);
+				printf("SessionFormat=Time\n");
 			else
-				printf("SessionFormat=Lap\n", 0);
+				printf("SessionFormat=Lap\n");
 		}
 		else
-			printf("SessionFormat=Time\n", 0);
+			printf("SessionFormat=Time\n");
 
 		for(int i=0; i<header->numVars; i++)
 		{
@@ -211,21 +238,16 @@ void logHeaderToDisplay(const irsdk_header *header)
 
 		printf("[Car Data]\n");
 
+		printf("BodyworkDamage=0,0,0,0,0\n");
+		printf("SuspensionDamage=0,0,0,0\n");
 
+		printf("FuelRemaining=0.0\n");
+
+		printf("TyreCompound=Dry\n");
+		printf("TyreCompoundColor=Black\n");
 
 		printf("[Stint Data]\n");
-		printf("Active=true\n");
-		printf("Paused=false\n"); // Not yet implemented
 
-		if (getYamlValue(result, sessionInfo, "SessionInfo:SessionNum:{0}SessionType:")) { // Not yet implemented - {0}
-			if (strcmp(result, "RACE") == 0) // Not yet implemented
-				printf("Session=Race\n");
-			else
-				printf("Session=Other\n");
-		}
-		else
-			printf("Session=Other\n");
-		
 		if (getYamlValue(result, sessionInfo, "DriverInfo:Drivers:CarIdx:{%s}UserName:", playerCarIdx)) {
 			char forName[100];
 			char surName[100];
@@ -252,7 +274,7 @@ void logHeaderToDisplay(const irsdk_header *header)
 
 			sscanf(result, "%f", &time);
 
-			printf("LapLastTime=%d\n", (long)(time * 1000));
+			printf("LapLastTime=%d\n", (long)(normalize(time) * 1000));
 		}
 		else
 			printf("LapLastTime=0\n");
@@ -262,13 +284,44 @@ void logHeaderToDisplay(const irsdk_header *header)
 
 			sscanf(result, "%f", &time);
 
-			printf("LapBestTime=%ld\n", (long)(time * 1000));
+			printf("LapBestTime=%ld\n", (long)(normalize(time) * 1000));
 		}
 		else
 			printf("LapBestTime=0\n");
 
-		printf("[Debug]\n");
-		printf("%s", sessionInfo);
+		printf("[Track Data]\n");
+
+		if (getYamlValue(result, sessionInfo, "WeekendInfo:TrackSurfaceTemp:")) {
+			char temperature[10];
+			size_t length = strcspn(result, " ");
+
+			substring((char*)result, temperature, 0, length);
+
+			printf("Temperature=%s\n", temperature);
+		}
+		else
+			printf("Temperature=24\n");
+
+		printf("[Weather Data]\n");
+
+		if (getYamlValue(result, sessionInfo, "WeekendInfo:TrackAirTemp:")) {
+			char temperature[10];
+			size_t length = strcspn(result, " ");
+
+			substring((char*)result, temperature, 0, length);
+
+			printf("Temperature=%s\n", temperature);
+		}
+		else
+			printf("Temperature=24\n");
+
+		printf("Weather=Dry\n");
+		printf("Weather10Min=Dry\n");
+		printf("Weather30Min=Dry\n");
+
+
+		// printf("[Debug]\n");
+		// printf("%s", sessionInfo);
 	}
 }
 
@@ -374,17 +427,17 @@ int main()
 		{
 			initData(pHeader, g_data, g_nData);
 
-			logHeaderToDisplay(pHeader);
+			writeData(pHeader);
 			
 			// logDataToDisplay(pHeader, g_data);
 		}
 		else {
-			printf("[Stint Data]\n");
+			printf("[Session Data]\n");
 			printf("Active=false\n");
 		}
 	}
 	else {
-		printf("[Stint Data]\n");
+		printf("[Session Data]\n");
 		printf("Active=false\n");
 	}
 	

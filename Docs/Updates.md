@@ -43,6 +43,12 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ***
 
+## Release 2.8.7
+
+This release finalizes the integration for iRacing. A new "Pitstop" mode has been introduced and Jona is aware of iRacing and can execute a pitstop automatically. Please take a look at the configuration documentation for the ["IRC" plugin](*), if you want to use the "Pitstop" mode on your Button Box. You also might want to adjust the [controller automation rules](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#configuration-of-the-controller-mode-automation) for the new plugin modes as well.
+
+***
+
 ## Release 2.8.5
 
 The major change in this release is the introduction of the "Pitstop" controller mode for *RaceRoom Racing Experience* and *rFactor 2*.

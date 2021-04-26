@@ -85,7 +85,7 @@ class RF2Plugin extends RaceEngineerSimulatorPlugin {
 			WinActivate %window%
 	}
 		
-	openPitstopMFD() {
+	openPitstopMFD(descriptor := false) {
 		static reported := false
 		
 		this.activateRF2Window()

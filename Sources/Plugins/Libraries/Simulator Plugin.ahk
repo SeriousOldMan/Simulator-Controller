@@ -334,7 +334,7 @@ class SimulatorPlugin extends ControllerPlugin {
 		Throw "Virtual method SimulatorPlugin.changePitstopOption must be implemented in a subclass..."
 	}
 	
-	openPitstopMFD() {
+	openPitstopMFD(descriptor := false) {
 		Throw "Virtual method SimulatorPlugin.openPitstopMFD must be implemented in a subclass..."
 	}
 	
@@ -516,14 +516,17 @@ getCurrentSimulatorPlugin(option := false) {
 ;;;                         Controller Action Section                       ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-openPitstopMFD() {
+openPitstopMFD(descriptor := false) {
 	local plugin := getCurrentSimulatorPlugin()
 	
 	if plugin {
 		protectionOn()
 		
 		try {
-			plugin.openPitstopMFD()
+			if descriptor
+				plugin.openPitstopMFD(descriptor)
+			else
+				plugin.openPitstopMFD()
 		}
 		finally {
 			protectionOff()

@@ -298,11 +298,16 @@ Similar to the pitstop mode the plugin for *Assetto Corsa Competizione*, you can
 
 All this will be achieved using the following plugin arguments:
 
+	togglePitstopFuelMFD: {F7}; togglePitstopTyreMFD: {F8};
 	pitstopCommands: Refuel Dial.1 5, TyreAllAround Dial.2, PitstopPlan Button.1, PitstopPrepare Button.5,
 					 TyreChange Button.2 Button.5, RepairRequest Button.3 Button.7
 
 ### Configuration
 
+First, you need to define, how to open and close the different Pitstop MFDs (aka Black Boxes) in *iRacing*. Please supply the bindings you have defined in the "Controls" setup in *iRacing*.
+
+	togglePitstopFuelMFD: *toggleHotkey*; togglePitstopTyreMFD: *toggleHotkey*
+	
 With the plugin parameter *pitstopCommands:* you can supply a list of the settings, you want to tweak from your hardware controller, when the "Pitstop" mode is active. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example tyre pressure and fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
 
 	pitstopCommands: *setting1* *settingFunction1* [*settingSteps1*],

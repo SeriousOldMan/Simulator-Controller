@@ -26,26 +26,28 @@ global kIRCPlugin = "IRC"
 ;;;-------------------------------------------------------------------------;;;
 
 class IRCPlugin extends RaceEngineerSimulatorPlugin {
-	iOpenPitstopMFDHotkey := false
-	iClosePitstopMFDHotkey := false
+	iCurrentPitstopMFD := false
 	
-	OpenPitstopMFDHotkey[] {
+	iPitstopFuelMFDHotkey := false
+	iPitstopTyreMFDHotkey := false
+	
+	PitstopFuelMFDHotkey[] {
 		Get {
-			return this.iOpenPitstopMFDHotkey
+			return this.iPitstopFuelMFDHotkey
 		}
 	}
 	
-	ClosePitstopMFDHotkey[] {
+	PitstopTyreMFDHotkey[] {
 		Get {
-			return this.iClosePitstopMFDHotkey
+			return this.iPitstopTyreMFDHotkey
 		}
 	}
 	
 	__New(controller, name, simulator, configuration := false) {
 		base.__New(controller, name, simulator, configuration)
 		
-		this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", false)
-		this.iClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
+		this.iPitstopFuelMFDHotkey := this.getArgumentValue("togglePitstopFuelMFD", false)
+		this.iPitstopTyreMFDHotkey := this.getArgumentValue("togglePitstopTyreMFD", false)
 	}
 	
 	getPitstopActions(ByRef allActions, ByRef selectActions) {
@@ -78,10 +80,47 @@ class IRCPlugin extends RaceEngineerSimulatorPlugin {
 		}
 	}
 	
-	openPitstopMFD() {
+	openPitstopMFD(descriptor := false) {
+		static reported := false
+		key := false
+		
+		if (!descriptor || (descriptor = "Fuel"))
+			key := this.OpenPitstopFuelMFDHotkey
+		else if (descriptor = "Tyre")
+			key := this.OpenPitstopTyreMFDHotkey
+		else
+			return false
+		
+		if key {
+			SendEvent % key
+			
+			this.iCurrentPitstopMFD := descriptor
+			
+			return true
+		}
+		else if !reported {
+			reported := true
+		
+			logMessage(kLogCritical, translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration"))
+		
+			showMessage(translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration...")
+					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+					  
+			return false
+		}			
 	}
 	
 	closePitstopMFD() {
+		key := false
+		
+		if (this.iCurrentPitstopMFD = "Fuel")
+			key := this.OpenPitstopFuelMFDHotkey
+		else if (this.iCurrentPitstopMFD = "Tyre")
+			key := this.OpenPitstopTyreMFDHotkey
+		else
+			return
+
+		SendEvent % key
 	}
 	
 	requirePitstopMFD() {

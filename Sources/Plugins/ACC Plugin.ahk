@@ -185,7 +185,7 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 			WinActivate %window%
 	}
 	
-	openPitstopMFD(update := true) {
+	openPitstopMFD(descriptor := false, update := true) {
 		static reported := false
 		
 		this.activateACCWindow()
@@ -200,7 +200,7 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 			
 			if (update || !wasOpen) {
 				if this.updatePitStopState()
-					this.openPitstopMFD(false)
+					this.openPitstopMFD(false, false)
 				
 				SetTimer updatePitstopState, 5000
 			}
@@ -1018,7 +1018,7 @@ class ACCPlugin extends RaceEngineerSimulatorPlugin {
 	}
 	
 	resetPitstopState(update := false) {
-		this.openPitstopMFD(update)
+		this.openPitstopMFD(false, update)
 	}
 	
 	supportsPitstop() {
@@ -1134,7 +1134,7 @@ updatePitstopState() {
 	protectionOn()
 	
 	try {
-		SimulatorController.Instance.findPlugin(kACCPlugin).updatePitstopState(true)
+		SimulatorController.Instance.findPlugin(kACCPlugin).updatePitstopState(false, true)
 	}
 	finally {
 		protectionOff()

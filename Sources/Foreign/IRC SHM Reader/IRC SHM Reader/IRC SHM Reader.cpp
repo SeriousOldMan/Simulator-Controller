@@ -254,18 +254,15 @@ bool getDataValue(char* value, const irsdk_header* header, const char* data, con
 
 float getDataFloat(const irsdk_header* header, const char* data, const char* variable) {
 	char result[32];
-	float value = 0;
 
 	if (getDataValue(result, header, data, variable))
-		sscanf(result, "%f", &value);
-
-	return value;
+		return atof(result);
+	else
+		return 0;
 }
 
 void setPitstopRefuelAmount(char* values) {
-	float fuelAmount;
-
-	sscanf(values, "%f", &fuelAmount);
+	float fuelAmount = atof(values);
 
 	if (fuelAmount == 0)
 		irsdk_broadcastMsg(irsdk_BroadcastPitCommand, irsdk_PitCommand_ClearFuel, 0);
@@ -292,33 +289,29 @@ void requestPitstopTyreChange(char* values) {
 }
 
 void setTyrePressure(int command, float pressure) {
-	irsdk_broadcastMsg(irsdk_BroadcastPitCommand, command, (int)GetKpa(pressure));
+	irsdk_broadcastMsg(irsdk_BroadcastPitCommand, command, (float)GetKpa(pressure));
 }
 
 void setPitstopTyrePressures(char* values) {
-	char buffer[32];
-
-	float pressure;
-	float pressures[3];
+	float pressures[4];
 
 	for (int i = 0; i < 3; i++) {
+		char buffer[32];
 		size_t length = strcspn(values, ";");
 		
 		substring(values, buffer, 0, length);
 
-		sscanf(buffer, "%f", &pressure);
-
-		pressures[i] = pressure;
+		pressures[i] = atof(buffer);
 
 		values += (length + 1);
 	}
 
-	sscanf(values, "%f", &pressure);
+	pressures[3] = atof(values);
 
 	setTyrePressure(irsdk_PitCommand_LF, pressures[0]);
 	setTyrePressure(irsdk_PitCommand_RF, pressures[1]);
 	setTyrePressure(irsdk_PitCommand_LR, pressures[2]);
-	setTyrePressure(irsdk_PitCommand_RR, pressure);
+	setTyrePressure(irsdk_PitCommand_RR, pressures[3]);
 }
 
 void pitstopSetValues(const irsdk_header* header, const char* data, char* arguments) {
@@ -339,20 +332,12 @@ void pitstopSetValues(const irsdk_header* header, const char* data, char* argume
 		setPitstopTyrePressures(values);
 }
 
-void changePitstopRefuelAmount(const irsdk_header* header, const char* data, char* values) {
-	float fuelDelta;
-
-	sscanf(values, "%f", &fuelDelta);
-
+void changePitstopRefuelAmount(const irsdk_header* header, const char* data, float fuelDelta) {
 	if (fuelDelta != 0)
 		irsdk_broadcastMsg(irsdk_BroadcastPitCommand, irsdk_PitCommand_Fuel, getDataFloat(header, data, "PitSvFuel") + fuelDelta);
 }
 
-void changePitstopTyrePressure(const irsdk_header* header, const char* data, char* tyre, char* values) {
-	float pressureDelta;
-
-	sscanf(values, "%f", &pressureDelta);
-
+void changePitstopTyrePressure(const irsdk_header* header, const char* data, char* tyre, float pressureDelta) {
 	if (strcmp(tyre, "FL") == 0)
 		setTyrePressure(irsdk_PitCommand_LF, GetPsi(getDataFloat(header, data, "PitSvLFP")) + pressureDelta);
 	else if (strcmp(tyre, "FR") == 0)
@@ -372,25 +357,25 @@ void pitstopChangeValues(const irsdk_header* header, const char* data, char* arg
 	substring((char*)arguments, values, length + 1, strlen(arguments) - length - 1);
 
 	if (strcmp(service, "Refuel") == 0)
-		changePitstopRefuelAmount(header, data, values);
+		changePitstopRefuelAmount(header, data, atof(values));
 	else if (strcmp(service, "Repair") == 0)
 		requestPitstopRepairs(values);
 	else if (strcmp(service, "Tyre Change") == 0)
 		requestPitstopTyreChange(values);
 	else if (strcmp(service, "All Around") == 0) {
-		changePitstopTyrePressure(header, data, "FL", values);
-		changePitstopTyrePressure(header, data, "FR", values);
-		changePitstopTyrePressure(header, data, "RL", values);
-		changePitstopTyrePressure(header, data, "RR", values);
+		changePitstopTyrePressure(header, data, "FL", atof(values));
+		changePitstopTyrePressure(header, data, "FR", atof(values));
+		changePitstopTyrePressure(header, data, "RL", atof(values));
+		changePitstopTyrePressure(header, data, "RR", atof(values));
 	}
 	else if (strcmp(service, "Front Left") == 0)
-		changePitstopTyrePressure(header, data, "FL", values);
+		changePitstopTyrePressure(header, data, "FL", atof(values));
 	else if (strcmp(service, "Front Right") == 0)
-		changePitstopTyrePressure(header, data, "FR", values);
+		changePitstopTyrePressure(header, data, "FR", atof(values));
 	else if (strcmp(service, "Rear Left") == 0)
-		changePitstopTyrePressure(header, data, "RL", values);
+		changePitstopTyrePressure(header, data, "RL", atof(values));
 	else if (strcmp(service, "Rear Right") == 0)
-		changePitstopTyrePressure(header, data, "RR", values);
+		changePitstopTyrePressure(header, data, "RR", atof(values));
 }
 
 void writeData(const irsdk_header *header, const char* data, bool setupOnly)
@@ -426,7 +411,7 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 
 				substring((char*)result, buffer, 0, length);
 
-				sscanf(buffer, "%f", &time);
+				time = atof(buffer);
 
 				sessionTime = ((long)time * 1000);
 			}
@@ -435,22 +420,16 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 			}
 
 		if (getYamlValue(result, sessionInfo, "DriverInfo:DriverCarFuelMaxLtr:"))
-			sscanf(result, "%f", &maxFuel);
+			maxFuel = atof(result);
 
 		long lastTime = 0;
 		long bestTime = 0;
 
-		float fLastTime = 0;
-		float fBestTime = 0;
-
 		if (getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:CarIdx:{%s}LastTime:", sessionID, playerCarIdx))
-			sscanf(result, "%f", &fLastTime);
+			lastTime = (long)(normalize(atof(result)) * 1000);
 
 		if (getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:CarIdx:{%s}FastestTime:", sessionID, playerCarIdx))
-			sscanf(result, "%f", &fBestTime);
-
-		lastTime = (long)(normalize(fLastTime) * 1000);
-		bestTime = (long)(normalize(fBestTime) * 1000);
+			bestTime = (long)(normalize(atof(result)) * 1000);
 
 		if (bestTime == 0)
 			bestTime = lastTime;
@@ -563,9 +542,7 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 			printf("SessionLapsRemaining=%ld\n", lapsRemaining);
 
 			if (getDataValue(result, header, data, "SessionTimeRemain")) {
-				float time;
-
-				sscanf(result, "%f", &time);
+				float time = atof(result);
 
 				if (time != -1)
 					timeRemaining = ((long)time * 1000);
@@ -652,10 +629,10 @@ int main(int argc, char* argv[])
 
 	while (tries-- > 0) {
 		// wait for new data and copy it into the g_data buffer, if g_data is not null
-		if (irsdk_waitForDataReady(TIMEOUT, g_data)) {
+		if (true || irsdk_waitForDataReady(TIMEOUT, g_data)) {
 			const irsdk_header* pHeader = irsdk_getHeader();
 
-			if (pHeader)
+			if (true || pHeader)
 			{
 				if ((argc > 2) && (strcmp(argv[1], "-Pitstop") == 0)) {
 					if (strcmp(argv[2], "Set") == 0)

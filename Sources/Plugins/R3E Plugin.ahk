@@ -122,7 +122,7 @@ class R3EPlugin extends RaceEngineerSimulatorPlugin {
 		return this.searchMFDImage("PITSTOP 1", "PITSTOP 2")
 	}
 		
-	openPitstopMFD() {
+	openPitstopMFD(descriptor := false) {
 		static first := true
 		static reported := false
 		

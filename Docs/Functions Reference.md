@@ -290,11 +290,11 @@ Starts the motion feedback system of your simulation rig. This action function i
 #### *stopMotion()*
 Stops the motion feedback system of your simulation rig and brings the rig back to its resting position. This action function is provided by the "Motion Feedback" plugin and is available depending on the concrete configuration.
 
-#### *openPitstopMFD()*
-Opens the pitstop settings dialog of *Assetto Corsa Competizione*. This action function is provided by the *SimulatorPlugin* class and is available depending on the concrete configuration and simulation.
+#### *openPitstopMFD(descriptor :: false)*
+Opens the pitstop settings dialog of the currently running simulator, if supported. If the given simulation supports more than one pitstop settings dialog, the optional parameter *decriptor* can be used to denote the specific dialog. For IRC this is either "Fuel" or "Tyres", with "Fuel" as the default. This action function is provided by the *SimulatorPlugin* class and is available depending on the concrete configuration and simulation.
 
 #### *closePitstopMFD()*
-Closes the pitstop settings dialog of *Assetto Corsa Competizione*. This action function is provided by the *SimulatorPlugin* class and is available depending on the concrete configuration and simulation.
+Closes the pitstop settings dialog of the currently running simulator, if supported. This action function is provided by the *SimulatorPlugin* class and is available depending on the concrete configuration and simulation.
 
 #### *changePitstopOption(option :: String, selection :: String, increments :: Integer := false)*
 Enables or disables one of the activities carried out by your pitstop crew.  The supported options depend on the current simlation game. For example, for ACC the available options are "Change Tyres", "Change Brakes", "Repair Bodywork" and "Repair Suspension", for R3E "Change Tyres", "Repair Bodywork" and "Repair Suspension", for RF2 "Repair", and for IRC "Change Tyres" and "Repair". *selection* must be either "Next" / "Increase" or "Previous" / "Decrease". For stepped options, you can supply the number of increment steps by supplying a value for *increments*. This action function is provided by the *SimulatorPlugin* class and is available depending on the concrete configuration and simulation.

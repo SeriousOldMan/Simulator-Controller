@@ -599,8 +599,8 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 			printf("StintTimeRemaining=%ld\n", timeRemaining);
 			printf("DriverTimeRemaining=%ld\n", timeRemaining);
 
-			if (getDataValue(result, header, data, "PitSvFlags"))
-				printf("InPit=%s\n", atoi(result) ? "true" : "false");
+			if (getDataValue(result, header, data, "CarIdxTrackSurface"))
+				printf("InPit=%s\n", (atoi(result) == irsdk_InPitStall) ? "true" : "false");
 			else
 				printf("InPit=false\n");
 
@@ -755,14 +755,14 @@ int main(int argc, char* argv[])
 				else
 					writeData(pHeader, g_data, ((argc == 2) && (strcmp(argv[1], "-Setup") == 0)));
 
-				logDataToDisplay(pHeader, g_data);
+				// logDataToDisplay(pHeader, g_data);
 
 				break;
 			}
 		}
 	}
 
-	if (tries == 0) {
+	if ((tries == 0) || (g_data == NULL)) {
 		printf("[Session Data]\n");
 		printf("Active=false\n");
 	}

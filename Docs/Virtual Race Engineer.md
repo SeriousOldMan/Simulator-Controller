@@ -2,7 +2,7 @@
 
 Welcome to Jona, the world first fully interactive and AI-based Virtual Race Engineer for race car simulations.
 
-Ok, enough marketing bullshit. Jona is a voice chat bot with a special knowledge about racing. It uses the telemetry data provided by a simulation game and a large domain specific rule set to derive its knowledge from there. Using this knowledge, Jona can give you information about the current state of your car (temperatures, pressures, remaining laps, upcoming pitstops, and so on), and can recommend settings for the next pitstop. Currently, Jona supports the *Assetto Corsa Competizione*, *RaceRoom Racing Experience* and *rFactor 2* simulation games through their respective plugins. Using the Pitstop MFD handling for *Assetto Corsa Competizione* introduced with [Release 2.0](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-20), Jona is even capable to setup a pitstop without user interaction completely on its own. Step by step, this will be made available for all simulations, where this is possible (currently *Assetto Corsa Competizione*, *rFactor 2* and *RaceRoom Racing Experience* are supported, although the support for *RaceRoom Racing Experience* is quite limited).
+Ok, enough marketing bullshit. Jona is a voice chat bot with a special knowledge about racing. It uses the telemetry data provided by a simulation game and a large domain specific rule set to derive its knowledge from there. Using this knowledge, Jona can give you information about the current state of your car (temperatures, pressures, remaining laps, upcoming pitstops, and so on), and can recommend settings for the next pitstop. Currently, Jona supports the *Assetto Corsa Competizione*, *RaceRoom Racing Experience*, *rFactor 2* and *iRacing* simulation games through their respective plugins. Using the Pitstop MFD handling for *Assetto Corsa Competizione* introduced with [Release 2.0](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-20), Jona is even capable to setup a pitstop without user interaction completely on its own. Step by step, this will be made available for all simulations, where this is possible (currently *Assetto Corsa Competizione*, *rFactor 2*, *RaceRoom Racing Experience* and *iRacing* are supported, although the support for *RaceRoom Racing Experience* and also *iRacing* is somewhat limited).
 
 ***
 
@@ -270,7 +270,7 @@ Good to know: When the *Race Engineer.settings* file is changed while Jona is al
 
 ### The pitstop
 
-The process of the pitstop handling differs between the various supported simulations. Below you will find some simulation specific hints. Please note, that pitstop handling is currently available for *Assetto Corsa Competizione*, *rFactor 2* and *RaceRoom Racing Experience*.
+The process of the pitstop handling differs between the various supported simulations. Below you will find some simulation specific hints. Please note, that pitstop handling is currently available for *Assetto Corsa Competizione*, *rFactor 2*, *RaceRoom Racing Experience* and *iRacing*.
 
 A final warning: If you ever perform a pitstop, which has not been planned and prepared by Jona, Jona will be very confused, say the least. You can do this, but please double check the recommendations of Jona for each subsequent pitstop, especially the chosen tyre set, if you don't want to end up with worn out tyres for your last stint.
 
@@ -292,6 +292,10 @@ Last but not least, the check boxes for repair of Suspension and Bodywork must b
 #### *rFactor 2*
 
 No special setup required for *rFactor 2*, since this simulation has an integrated interface to control the pitstop settings externally.
+
+#### *iRacing*
+
+No special setup required for *iRacing*, since this simulation has an integrated interface to control the pitstop settings externally.
 
 #### *RaceRoom Racing Experience*
 
@@ -346,6 +350,8 @@ The following statistical models are currently implemented:
      Beginning with Release 2.5, a weather model has been integrated in the working memory. The raw data is acquired from the simulation. For example, *Assetto Corsa Competizione* and *rFactor 2* supply current weather information ranging from "Dry" up to full "Thunderstorm". *Assetto Corsa Competizione* goes even further and can supply a full weather forecast from now on up to 30 minnutes into the future. Based on this information and currently mounted tyres, Jona will recommend a tyre change. This recomendation will be incorporated into the plan for an upcoming pitstop depending on the settings you have chosen in the [settings dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-engineer-settings).
 	 
 Note: Extrem changes in the conditions, for example an incoming thunderstorm on a previously dry and hot track, will result in extreme variances in the statistical models and thereby will lead to strange recommendations in most cases. This is a drawback for the moment, so always doublecheck under those circumstances. This will get much better with the next major release, which will introduce a big data collection of recent races, which in the end will allow Jona to base or at least to secure the decisions on past experiences using neural networks.
+
+Important note for *iRacing* users: It looks like that tyre pressures and also to an extent tyre temperatures are not available in the *iRacing* live data. To make it worse, damage information is also not available in the API, although *iRacing* apparently has a sophisticated damage model. Since *iRacing* is a quite mature (not to say old) simulation game, and the API hasn't changed in a while, I am quite pessimistic, that this will be fixed. Therefore, the recommendations of the Virtual Race Engineer will be at best limited and in some cases even false. Nevertheless, Jona will help you with refuel recommendation for an upcoming pitstop and you will have someone to talk to, while hunting down your opponent on the long straight.
 
 ## Technical information
 
@@ -405,7 +411,7 @@ You can take a look at the knowledge base by enabling "Debug" mode in the config
 
 ### Telemetry Integration
 
-A considerable part of the knowledge of Jona comes from the telemetry information of the simulation game. As said, data providers for *Assetto Corsa Competizione*, *RaceRoom Racing Experience* and *rFactor 2* are already builtin. The special plugin "Race Engineer" collects the data from the simulation games and hand it over to Jona. Small applications "ACC SHM Reader.exe" or "RF2 SHM Reader.exe", which are located in the *Binaries* folder, are used to acquire the data. These readers run periodically and output the following data:
+A considerable part of the knowledge of Jona comes from the telemetry information of the simulation game. As said, data providers for *Assetto Corsa Competizione*, *RaceRoom Racing Experience*, *rFactor 2* and *iRacing* are already builtin. The special plugin "Race Engineer" collects the data from the simulation games and hand it over to Jona. Small applications "ACC SHM Reader.exe" or "RF2 SHM Reader.exe", which are located in the *Binaries* folder, are used to acquire the data. These readers run periodically and output the following data:
 
 	[Car Data]
 	BodyworkDamage=0, 0, 0, 0, 0

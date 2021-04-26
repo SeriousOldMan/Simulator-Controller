@@ -54,11 +54,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // for timeBeginPeriod
 #pragma comment(lib, "Winmm")
 
-// 16 ms timeout
-#define TIMEOUT 16
+// 32 ms timeout
+#define TIMEOUT 32
 
 char *g_data = NULL;
-int g_nData = 0;
 
 const char g_playerInCarString[] = "IsOnTrack";
 int g_playerInCarOffset = -1;
@@ -68,9 +67,6 @@ int g_sessionTimeOffset = -1;
 
 const char g_lapIndexString[] = "Lap";
 int g_lapIndexOffset = -1;
-
-bool g_setup = false;
-bool g_pitstop = false;
 
 
 // place holders for variables that need to be updated in the header of our CSV file
@@ -88,6 +84,14 @@ inline double normalize(double value) {
 	return (value < 0) ? 0.0 : value;
 }
 
+inline double GetPsi(double kPa) {
+	return kPa / 6.895;
+}
+
+inline double GetKpa(double psi) {
+	return psi * 6.895;
+}
+
 void substring(const char s[], char sub[], int p, int l) {
 	int c = 0;
 
@@ -97,14 +101,6 @@ void substring(const char s[], char sub[], int p, int l) {
 		c++;
 	}
 	sub[c] = '\0';
-}
-
-inline double GetPsi(double kPa) {
-	return kPa / 6.895;
-}
-
-inline double GetKpa(double psi) {
-	return psi * 6.895;
 }
 
 inline void extractString(char* string, const char* value, int valueLength) {
@@ -211,6 +207,20 @@ void printDataValue(const irsdk_header* header, const char* data, const irsdk_va
 	}
 }
 
+void printDataValue(const irsdk_header* header, const char* data, const char* variable) {
+	if (header && data) {
+		for (int i = 0; i < header->numVars; i++) {
+			const irsdk_varHeader* rec = irsdk_getVarHeaderEntry(i);
+
+			if (strcmp(rec->name, variable) == 0) {
+				printDataValue(header, data, rec);
+
+				break;
+			}
+		}
+	}
+}
+
 bool getDataValue(char* value, const irsdk_header* header, const char* data, const char* variable) {
 	if (header && data) {
 		for (int i = 0; i < header->numVars; i++) {
@@ -250,20 +260,6 @@ float getDataFloat(const irsdk_header* header, const char* data, const char* var
 		sscanf(result, "%f", &value);
 
 	return value;
-}
-
-void printDataValue(const irsdk_header* header, const char* data, const char* variable) {
-	if (header && data) {
-		for (int i = 0; i < header->numVars; i++) {
-			const irsdk_varHeader* rec = irsdk_getVarHeaderEntry(i);
-
-			if (strcmp(rec->name, variable) == 0) {
-				printDataValue(header, data, rec);
-
-				break;
-			}
-		}
-	}
 }
 
 void setPitstopRefuelAmount(char* values) {
@@ -397,7 +393,7 @@ void pitstopChangeValues(const irsdk_header* header, const char* data, char* arg
 		changePitstopTyrePressure(header, data, "RR", values);
 }
 
-void writeData(const irsdk_header *header, const char* data)
+void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 {
 	if(header && data)
 	{
@@ -459,7 +455,7 @@ void writeData(const irsdk_header *header, const char* data)
 		if (bestTime == 0)
 			bestTime = lastTime;
 
-		if (g_setup) {
+		if (setupOnly) {
 			printf("[Setup Data]\n");
 
 			printf("TyreCompound=Dry\n");
@@ -510,12 +506,7 @@ void writeData(const irsdk_header *header, const char* data)
 			printf("BodyworkDamage=0,0,0,0,0\n");
 			printf("SuspensionDamage=0,0,0,0\n");
 
-			float fuelRemaining = 1;
-
-			if (getDataValue(result, header, data, "FuelLevel"))
-				sscanf(result, "%f", &fuelRemaining);
-
-			printf("FuelRemaining=%f\n", fuelRemaining);
+			printf("FuelRemaining=%f\n", getDataFloat(header, data, "FuelLevel"));
 
 			printf("TyreCompound=Dry\n");
 			printf("TyreCompoundColor=Black\n");
@@ -563,7 +554,7 @@ void writeData(const irsdk_header *header, const char* data)
 			long lapsRemaining = -1;
 			long timeRemaining = -1;
 
-			if (false && getDataValue(result, header, data, "SessionLapsRemain"))
+			if (getDataValue(result, header, data, "SessionLapsRemain"))
 				lapsRemaining = atoi(result);
 
 			if (lapsRemaining == -1)
@@ -571,7 +562,7 @@ void writeData(const irsdk_header *header, const char* data)
 
 			printf("SessionLapsRemaining=%ld\n", lapsRemaining);
 
-			if (false && getDataValue(result, header, data, "SessionTimeRemain")) {
+			if (getDataValue(result, header, data, "SessionTimeRemain")) {
 				float time;
 
 				sscanf(result, "%f", &time);
@@ -607,11 +598,21 @@ void writeData(const irsdk_header *header, const char* data)
 
 			char gripLevel[32] = "Green";
 
-			if (getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}SessionTrackRubberState:", sessionID))
-				if (strstr(result, "high") && strstr(result, "moderately"))
-					strcpy(gripLevel, "Fast");
-				else if (strstr(result, "high"))
-					strcpy(gripLevel, "Optimum");
+			int id = atoi(sessionID);
+
+			while (id) {
+				char session[32];
+
+				if (getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}SessionTrackRubberState:", itoa(id, session, 10)))
+					if (strstr(result, "high") && strstr(result, "moderately"))
+						strcpy(gripLevel, "Fast");
+					else if (strstr(result, "high"))
+						strcpy(gripLevel, "Optimum");
+					else if (!strstr(result, "carry over"))
+						break;
+
+				id -= 1;
+			}
 
 			printf("Grip=%s\n", gripLevel);
 
@@ -638,72 +639,45 @@ void writeData(const irsdk_header *header, const char* data)
 	}
 }
 
-void initData(const irsdk_header *header, char* &data, int &nData)
-{
-	if(data) delete [] data;
-	nData = header->bufLen;
-	data = new char[nData];
-
-	// grab the memory offset to the playerInCar flag
-	g_playerInCarOffset = irsdk_varNameToOffset(g_playerInCarString);
-	g_sessionTimeOffset = irsdk_varNameToOffset(g_sessionTimeString);
-	g_lapIndexOffset = irsdk_varNameToOffset(g_lapIndexString);
-}
-
-void end_session(bool shutdown)
-{
-	if(g_data)
-		delete[] g_data;
-	g_data = NULL;
-
-	if(shutdown)
-	{
-		irsdk_shutdown();
-		timeEndPeriod(1);
-	}
-}
-
 int main(int argc, char* argv[])
 {
-	g_setup = ((argc == 2) && (strcmp(argv[1], "-Setup") == 0));
-	g_pitstop = ((argc > 2) && (strcmp(argv[1], "-Pitstop") == 0));
-
 	// bump priority up so we get time from the sim
 	SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
 
 	// ask for 1ms timer so sleeps are more precise
 	timeBeginPeriod(1);
-	g_data = NULL;
-	g_nData = 0;
-	
-	// wait for new data and copy it into the g_data buffer, if g_data is not null
-	if(irsdk_waitForDataReady(TIMEOUT, g_data))
-	{
-		const irsdk_header *pHeader = irsdk_getHeader();
-		if(pHeader)
-		{
-			initData(pHeader, g_data, g_nData);
 
-			if (g_pitstop) {
-				if (strcmp(argv[2], "Set") == 0)
-					pitstopSetValues(pHeader, g_data, argv[3]);
-				else if (strcmp(argv[2], "Change") == 0)
-					pitstopChangeValues(pHeader, g_data, argv[3]);
+	g_data = NULL;
+	int tries = 3;
+
+	while (tries-- > 0) {
+		// wait for new data and copy it into the g_data buffer, if g_data is not null
+		if (irsdk_waitForDataReady(TIMEOUT, g_data)) {
+			const irsdk_header* pHeader = irsdk_getHeader();
+
+			if (pHeader)
+			{
+				if ((argc > 2) && (strcmp(argv[1], "-Pitstop") == 0)) {
+					if (strcmp(argv[2], "Set") == 0)
+						pitstopSetValues(pHeader, g_data, argv[3]);
+					else if (strcmp(argv[2], "Change") == 0)
+						pitstopChangeValues(pHeader, g_data, argv[3]);
+				}
+				else
+					writeData(pHeader, g_data, ((argc == 2) && (strcmp(argv[1], "-Setup") == 0)));
+
+				break;
 			}
-			else	
-				writeData(pHeader, g_data);
-		}
-		else {
-			printf("[Session Data]\n");
-			printf("Active=false\n");
 		}
 	}
-	else {
+
+	if (tries == 0) {
 		printf("[Session Data]\n");
 		printf("Active=false\n");
 	}
 	
-	end_session(true);
+	irsdk_shutdown();
+	timeEndPeriod(1);
 
 	return 0;
 }

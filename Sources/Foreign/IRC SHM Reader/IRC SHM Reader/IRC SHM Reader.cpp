@@ -58,6 +58,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TIMEOUT 32
 
 char *g_data = NULL;
+int g_nData = 0;
 
 const char g_playerInCarString[] = "IsOnTrack";
 int g_playerInCarOffset = -1;
@@ -171,7 +172,7 @@ long getRemainingLaps(const char* sessionInfo, int sessionLaps, long sessionTime
 
 long getRemainingTime(const char* sessionInfo, int sessionLaps, long sessionTime, int lap, long lastTime) {
 	if (lap < 1)
-		return 0;
+		return max(0, sessionTime);
 
 	if (sessionLaps == -1)
 		return (sessionTime - (lastTime * lap));
@@ -265,7 +266,7 @@ void setPitstopRefuelAmount(float fuelAmount) {
 	if (fuelAmount == 0)
 		irsdk_broadcastMsg(irsdk_BroadcastPitCommand, irsdk_PitCommand_ClearFuel, 0);
 	else
-		irsdk_broadcastMsg(irsdk_BroadcastPitCommand, irsdk_PitCommand_Fuel, fuelAmount);
+		irsdk_broadcastMsg(irsdk_BroadcastPitCommand, irsdk_PitCommand_Fuel, (int)fuelAmount);
 }
 
 void requestPitstopRepairs(bool repair) {
@@ -287,7 +288,7 @@ void requestPitstopTyreChange(bool change) {
 }
 
 void setTyrePressure(int command, float pressure) {
-	irsdk_broadcastMsg(irsdk_BroadcastPitCommand, command, (float)GetKpa(pressure));
+	irsdk_broadcastMsg(irsdk_BroadcastPitCommand, command, (int)GetKpa(pressure));
 }
 
 void setPitstopTyrePressures(float pressures[4]) {
@@ -334,7 +335,7 @@ void pitstopSetValues(const irsdk_header* header, const char* data, char* argume
 
 void changePitstopRefuelAmount(const irsdk_header* header, const char* data, float fuelDelta) {
 	if (fuelDelta != 0)
-		irsdk_broadcastMsg(irsdk_BroadcastPitCommand, irsdk_PitCommand_Fuel, getDataFloat(header, data, "PitSvFuel") + fuelDelta);
+		irsdk_broadcastMsg(irsdk_BroadcastPitCommand, irsdk_PitCommand_Fuel, (int)(getDataFloat(header, data, "PitSvFuel") + fuelDelta));
 }
 
 void changePitstopTyrePressure(const irsdk_header* header, const char* data, char* tyre, float pressureDelta) {
@@ -536,7 +537,7 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 			if (getDataValue(result, header, data, "SessionLapsRemain"))
 				lapsRemaining = atoi(result);
 
-			if (lapsRemaining == -1)
+			if ((lapsRemaining == -1) || (lapsRemaining == 32767))
 				lapsRemaining = getRemainingLaps(sessionInfo, sessionLaps, sessionTime, laps, lastTime);
 
 			printf("SessionLapsRemaining=%ld\n", lapsRemaining);
@@ -616,6 +617,68 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 	}
 }
 
+void initData(const irsdk_header* header, char*& data, int& nData)
+{
+	if (data) delete[] data;
+	nData = header->bufLen;
+	data = new char[nData];
+
+	// grab the memory offset to the playerInCar flag
+	g_playerInCarOffset = irsdk_varNameToOffset(g_playerInCarString);
+	g_sessionTimeOffset = irsdk_varNameToOffset(g_sessionTimeString);
+	g_lapIndexOffset = irsdk_varNameToOffset(g_lapIndexString);
+}
+
+
+void logDataToDisplay(const irsdk_header* header, const char* data)
+{
+	if (header && data)
+	{
+		for (int i = 0; i < header->numVars; i++)
+		{
+			const irsdk_varHeader* rec = irsdk_getVarHeaderEntry(i);
+
+			printf("%s[", rec->name);
+
+			// only dump the first 4 entrys in an array to save space
+			// for now ony carsTrkPct and carsTrkLoc output more than 4 entrys
+			int count = 1;
+			if (rec->type != irsdk_char)
+				count = min(4, rec->count);
+
+			for (int j = 0; j < count; j++)
+			{
+				switch (rec->type)
+				{
+				case irsdk_char:
+					printf("%s", (char*)(data + rec->offset)); break;
+				case irsdk_bool:
+					printf("%d", ((bool*)(data + rec->offset))[j]); break;
+				case irsdk_int:
+					printf("%d", ((int*)(data + rec->offset))[j]); break;
+				case irsdk_bitField:
+					printf("0x%08x", ((int*)(data + rec->offset))[j]); break;
+				case irsdk_float:
+					printf("%0.2f", ((float*)(data + rec->offset))[j]); break;
+				case irsdk_double:
+					printf("%0.2f", ((double*)(data + rec->offset))[j]); break;
+				}
+
+				if (j + 1 < count)
+					printf("; ");
+			}
+			if (rec->type != irsdk_char && count < rec->count)
+				printf("; ...");
+
+			printf("]");
+
+			if ((i + 1) < header->numVars)
+				printf(", ");
+		}
+		printf("\n\n");
+	}
+}
+
 int main(int argc, char* argv[])
 {
 	// bump priority up so we get time from the sim
@@ -634,6 +697,14 @@ int main(int argc, char* argv[])
 
 			if (pHeader)
 			{
+				if (!g_data || g_nData != pHeader->bufLen)
+				{
+					// realocate our g_data buffer to fit, and lookup some data offsets
+					initData(pHeader, g_data, g_nData);
+
+					continue;
+				}
+
 				if ((argc > 2) && (strcmp(argv[1], "-Pitstop") == 0)) {
 					if (strcmp(argv[2], "Set") == 0)
 						pitstopSetValues(pHeader, g_data, argv[3]);
@@ -642,6 +713,8 @@ int main(int argc, char* argv[])
 				}
 				else
 					writeData(pHeader, g_data, ((argc == 2) && (strcmp(argv[1], "-Setup") == 0)));
+
+				logDataToDisplay(pHeader, g_data);
 
 				break;
 			}

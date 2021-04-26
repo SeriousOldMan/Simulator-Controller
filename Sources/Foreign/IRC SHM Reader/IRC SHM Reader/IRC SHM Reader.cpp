@@ -555,7 +555,7 @@ void writeData(const irsdk_header *header, const char* data)
 				printf("DriverNickname=JD\n");
 			}
 
-			printf("Lap=%s\n", itoa(laps, result, 10));
+			printf("Laps=%s\n", itoa(laps, result, 10));
 
 			printf("LapLastTime=%ld\n", lastTime);
 			printf("LapBestTime=%ld\n", bestTime);
@@ -563,7 +563,7 @@ void writeData(const irsdk_header *header, const char* data)
 			long lapsRemaining = -1;
 			long timeRemaining = -1;
 
-			if (getDataValue(result, header, data, "SessionLapsRemain"))
+			if (false && getDataValue(result, header, data, "SessionLapsRemain"))
 				lapsRemaining = atoi(result);
 
 			if (lapsRemaining == -1)
@@ -571,7 +571,7 @@ void writeData(const irsdk_header *header, const char* data)
 
 			printf("SessionLapsRemaining=%ld\n", lapsRemaining);
 
-			if (getDataValue(result, header, data, "SessionTimeRemain")) {
+			if (false && getDataValue(result, header, data, "SessionTimeRemain")) {
 				float time;
 
 				sscanf(result, "%f", &time);
@@ -666,7 +666,7 @@ void end_session(bool shutdown)
 int main(int argc, char* argv[])
 {
 	g_setup = ((argc == 2) && (strcmp(argv[1], "-Setup") == 0));
-	g_pitstop = ((argc == 2) && (strcmp(argv[1], "-Pitstop") == 0));
+	g_pitstop = ((argc > 2) && (strcmp(argv[1], "-Pitstop") == 0));
 
 	// bump priority up so we get time from the sim
 	SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);

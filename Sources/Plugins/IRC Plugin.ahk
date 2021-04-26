@@ -26,6 +26,28 @@ global kIRCPlugin = "IRC"
 ;;;-------------------------------------------------------------------------;;;
 
 class IRCPlugin extends RaceEngineerSimulatorPlugin {
+	iOpenPitstopMFDHotkey := false
+	iClosePitstopMFDHotkey := false
+	
+	OpenPitstopMFDHotkey[] {
+		Get {
+			return this.iOpenPitstopMFDHotkey
+		}
+	}
+	
+	ClosePitstopMFDHotkey[] {
+		Get {
+			return this.iClosePitstopMFDHotkey
+		}
+	}
+	
+	__New(controller, name, simulator, configuration := false) {
+		base.__New(controller, name, simulator, configuration)
+		
+		this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", false)
+		this.iClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
+	}
+	
 	getPitstopActions(ByRef allActions, ByRef selectActions) {
 		allActions := {Refuel: "Refuel", TyreChange: "Change Tyres", TyreAllAround: "All Around"
 					 , TyreFrontLeft: "Front Left", TyreFrontRight: "Front Right", TyreRearLeft: "Rear Left", TyreRearRight: "Rear Right"

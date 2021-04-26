@@ -287,6 +287,51 @@ void requestPitstopTyreChange(bool change) {
 		irsdk_broadcastMsg(irsdk_BroadcastPitCommand, irsdk_PitCommand_ClearTires, 0);
 }
 
+float getTyreTemperature(const irsdk_header* header, const char* sessionInfo, const char* data, char* sessionPath,
+						 char* dataVariableO, char* dataVariableM, char* dataVariableI) {
+	char result[32];
+
+	if (getDataValue(result, header, data, dataVariableO))
+		return (atof(result) + getDataFloat(header, data, dataVariableM) + getDataFloat(header, data, dataVariableI)) / 3;
+	else if (getYamlValue(result, sessionInfo, sessionPath)) {
+		char* values = result;
+		float temps[3];
+
+		for (int i = 0; i < 2; i++) {
+			char buffer[32];
+			size_t length = strcspn(values, ",");
+
+			substring(values, buffer, 0, length);
+
+			temps[i] = atof(buffer);
+
+			values += (length + 1);
+		}
+
+		temps[2] = atof(values);
+
+		return (temps[0] + temps[1] + temps[2]) / 3;
+	}
+	else
+		return 0;
+}
+
+float getTyrePressure(const irsdk_header* header, const char* sessionInfo, const char* data, char* sessionPath, char* dataVariable) {
+	char result[32];
+
+	if (getDataValue(result, header, data, dataVariable))
+		return atof(result);
+	else if (getYamlValue(result, sessionInfo, sessionPath)) {
+		char temp[32];
+
+		substring((char*)result, temp, 0, strcspn(result, " "));
+
+		return atof(temp);
+	}
+	else
+		return 0;
+}
+
 void setTyrePressure(int command, float pressure) {
 	irsdk_broadcastMsg(irsdk_BroadcastPitCommand, command, (int)GetKpa(pressure));
 }
@@ -408,9 +453,7 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 				char buffer[64];
 				float time;
 
-				size_t length = strcspn(result, " ");
-
-				substring((char*)result, buffer, 0, length);
+				substring((char*)result, buffer, 0, strcspn(result, " "));
 
 				time = atof(buffer);
 
@@ -492,16 +535,16 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 			printf("TyreCompoundColor=Black\n");
 
 			printf("TyrePressure = %f, %f, %f, %f\n",
-				GetPsi(getDataFloat(header, data, "LFpressure")),
-				GetPsi(getDataFloat(header, data, "RFpressure")),
-				GetPsi(getDataFloat(header, data, "LRpressure")),
-				GetPsi(getDataFloat(header, data, "RRpressure")));
+				GetPsi(getTyrePressure(header, sessionInfo, data, "CarSetup:Suspension:LeftFront:LastHotPressure:", "LFpressure")),
+				GetPsi(getTyrePressure(header, sessionInfo, data, "CarSetup:Suspension:RightFront:LastHotPressure:", "RFpressure")),
+				GetPsi(getTyrePressure(header, sessionInfo, data, "CarSetup:Suspension:LeftRear:LastHotPressure:", "LRpressure")),
+				GetPsi(getTyrePressure(header, sessionInfo, data, "CarSetup:Suspension:RightRear:LastHotPressure:", "RRpressure")));
 
 			printf("TyreTemperature = %f, %f, %f, %f\n",
-				(getDataFloat(header, data, "LFtempL") + getDataFloat(header, data, "LFtempM") + getDataFloat(header, data, "LFtempR")) / 3,
-				(getDataFloat(header, data, "RFtempL") + getDataFloat(header, data, "RFtempM") + getDataFloat(header, data, "RFtempR")) / 3,
-				(getDataFloat(header, data, "LRtempL") + getDataFloat(header, data, "LRtempM") + getDataFloat(header, data, "LRtempR")) / 3,
-				(getDataFloat(header, data, "RRtempL") + getDataFloat(header, data, "RRtempM") + getDataFloat(header, data, "RRtempR")) / 3);
+				getTyreTemperature(header, sessionInfo, data, "CarSetup:Suspension:LeftFront:LastTempsOMI:", "LFtempCL", "LFtempCM", "LFtempCR"),
+				getTyreTemperature(header, sessionInfo, data, "CarSetup:Suspension:RightFront:LastTempsOMI:", "RFtempCL", "RFtempCM", "RLFtempCR"),
+				getTyreTemperature(header, sessionInfo, data, "CarSetup:Suspension:LeftRear:LastTempsOMI:", "LRtempCL", "LRtempCM", "LRtempCR"),
+				getTyreTemperature(header, sessionInfo, data, "CarSetup:Suspension:RightRear:LastTempsOMI:", "RRtempCL", "RRtempCM", "RRtempCR"));
 
 			printf("[Stint Data]\n");
 
@@ -565,9 +608,8 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 
 			if (getYamlValue(result, sessionInfo, "WeekendInfo:TrackSurfaceTemp:")) {
 				char temperature[10];
-				size_t length = strcspn(result, " ");
 
-				substring((char*)result, temperature, 0, length);
+				substring((char*)result, temperature, 0, strcspn(result, " "));
 
 				printf("Temperature=%s\n", temperature);
 			}
@@ -598,9 +640,8 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 
 			if (getYamlValue(result, sessionInfo, "WeekendInfo:TrackAirTemp:")) {
 				char temperature[10];
-				size_t length = strcspn(result, " ");
 
-				substring((char*)result, temperature, 0, length);
+				substring((char*)result, temperature, 0, strcspn(result, " "));
 
 				printf("Temperature=%s\n", temperature);
 			}

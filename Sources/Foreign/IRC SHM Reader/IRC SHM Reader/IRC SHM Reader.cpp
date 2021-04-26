@@ -580,8 +580,14 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 			if (getDataValue(result, header, data, "SessionLapsRemain"))
 				lapsRemaining = atoi(result);
 
-			if ((lapsRemaining == -1) || (lapsRemaining == 32767))
-				lapsRemaining = getRemainingLaps(sessionInfo, sessionLaps, sessionTime, laps, lastTime);
+			if ((lapsRemaining == -1) || (lapsRemaining == 32767)) {
+				long estTime = lastTime;
+
+				if ((estTime == 0) && getYamlValue(result, sessionInfo, "DriverInfo:DriverCarEstLapTime:"))
+					estTime = (long)(atof(result) * 1000);
+
+				lapsRemaining = getRemainingLaps(sessionInfo, sessionLaps, sessionTime, laps, estTime);
+			}
 
 			printf("SessionLapsRemaining=%ld\n", lapsRemaining);
 

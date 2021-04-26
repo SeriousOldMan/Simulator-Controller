@@ -84,43 +84,49 @@ class IRCPlugin extends RaceEngineerSimulatorPlugin {
 		static reported := false
 		key := false
 		
-		if (!descriptor || (descriptor = "Fuel"))
-			key := this.OpenPitstopFuelMFDHotkey
-		else if (descriptor = "Tyre")
-			key := this.OpenPitstopTyreMFDHotkey
-		else
-			return false
-		
-		if key {
-			SendEvent % key
+		if !this.iCurrentPitstopMFD {
+			if (!descriptor || (descriptor = "Fuel"))
+				key := this.OpenPitstopFuelMFDHotkey
+			else if (descriptor = "Tyre")
+				key := this.OpenPitstopTyreMFDHotkey
+			else
+				Throw "Unsupported Pitstop MFD detected in IRCPlugin.openPitstopMFD..."
 			
-			this.iCurrentPitstopMFD := descriptor
+			if key {
+				SendEvent % key
+				
+				this.iCurrentPitstopMFD := descriptor
+				
+				return true
+			}
+			else if !reported {
+				reported := true
 			
-			return true
+				logMessage(kLogCritical, translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration"))
+			
+				showMessage(translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration...")
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+						  
+				return false
+			}
 		}
-		else if !reported {
-			reported := true
-		
-			logMessage(kLogCritical, translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration"))
-		
-			showMessage(translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration...")
-					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-					  
-			return false
-		}			
 	}
 	
 	closePitstopMFD() {
 		key := false
 		
-		if (this.iCurrentPitstopMFD = "Fuel")
-			key := this.OpenPitstopFuelMFDHotkey
-		else if (this.iCurrentPitstopMFD = "Tyre")
-			key := this.OpenPitstopTyreMFDHotkey
-		else
-			return
+		if this.iCurrentPitstopMFD {
+			this.iCurrentPitstopMFD := false
+			
+			if (this.iCurrentPitstopMFD = "Fuel")
+				key := this.OpenPitstopFuelMFDHotkey
+			else if (this.iCurrentPitstopMFD = "Tyre")
+				key := this.OpenPitstopTyreMFDHotkey
+			else
+				Throw "Unsupported Pitstop MFD detected in IRCPlugin.closePitstopMFD..."
 
-		SendEvent % key
+			SendEvent % key
+		}
 	}
 	
 	requirePitstopMFD() {

@@ -485,7 +485,7 @@ If you still have problems with voice recognition, you might try this combinatio
 
   1. Disable voice recognition by supplying *raceEngineerListener: false* as argument for the ["Race Engineer" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer).
   2. Also, define a toggle function to switch Jona On or Off using the *raceEngineer* parameter of the "Race Engineer" plugin.
-  3. Configure all necessary options you want to use for the ["Pitstop" mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-pitstop) of the ACC plugin, especially the *raceEngineerCommands* *PitstopPlan* and *PitstopPrepare*.
+  3. Configure all necessary options you want to use for the ["Pitstop" mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-pitstop) for example for the ACC plugin, especially for the *pitstopCommands* *PitstopPlan* and *PitstopPrepare*.
 
 With this setup, Jona will be there and inform you about low fuel, damages and so on, but you have to use the Button Box to initiate pitstop planning and preparation. You will miss out all the eloquent conversations with Jona, but functionality wise, you are almost on par.
   

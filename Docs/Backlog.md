@@ -1,5 +1,5 @@
 #### Driving
-  1. [Target: V2.8.7][iRC Plugin] Integration of Jona for iRacing
+  1. [Target: V2.8.6][iRC Plugin] Integration of Jona for iRacing
   2. [Target: V3.x] More race information provided by Jona (mostly for VR-users):
      - Current race position
      - Gap to car in front

@@ -2,10 +2,10 @@
 
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. Low level integration of *iRacing* telemetry information
+  3. Low level integration of *iRacing* telemetry information (see [IRC SHM Reader](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Sources/Foreign/IRC%20SHM%20Reader/IRC%20SHM%20Reader))
   4. Renaming of selected shared memory data fields
-  5. Pitstop mode for *iRacing* plugin
-  6. Jona integration incl. pitstop handling for *iRacing*
+  5. ["Pitstop" mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-pitstop-1) for *iRacing* plugin
+  6. [Jona integration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer) incl. pitstop handling for *iRacing*
 
 ## 2.8.5-release 04/23/21
 
@@ -13,7 +13,7 @@
   2. Documentation updates, as always
   3. Jona can decide to leave the current tyres on the car at a late pitstop (aka splash and dash). You can also instruct Jona to not change tyres at the next pitstop with a phrase like this: "Can we leave the tyres on the car?"
   4. Jona intelligently reports and handles damage late in a stint.
-  5. New plugin modes for pitstop control for the plugins for [*rFactor 2*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-5) and [*RaceRoom Racing Experience*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-6) allow you to dial most of the pitstop settings from your controller hardware.
+  5. New plugin modes for pitstop control for the plugins for [*rFactor 2*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-6) and [*RaceRoom Racing Experience*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-7) allow you to dial most of the pitstop settings from your controller hardware.
   6. Jona now can handle the pitstop setup for you in the *RaceRoom Racing Experience* simulation. The support is quite limited: Jona can set the amount of fuel to add, and toggle the tyre change and the different repair options for the upcoming pitstop.
   7. (Developer Only): Once again a lot of refactoring in the [simulator plugin implementation classes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#simulator-plugin-implementation-classes) and the various simulator plugins. The "Pitstop" mode implementation class and the various pitstop action classes has been moved to the above library.
   8. Initial support for iRacing by a skeleton plugin

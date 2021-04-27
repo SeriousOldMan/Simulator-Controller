@@ -1,11 +1,11 @@
-## 2.8.7-release 04/30/21 (planned)
+## 2.8.6-release 04/30/21 (planned)
 
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. Low level integration of iRacing telemetry information
+  3. Low level integration of *iRacing* telemetry information
   4. Renaming of selected shared memory data fields
-  5. Pitstop mode for iRacing plugin
-  6. Jona integration incl. pitstop handling for iRacing
+  5. Pitstop mode for *iRacing* plugin
+  6. Jona integration incl. pitstop handling for *iRacing*
 
 ## 2.8.5-release 04/23/21
 

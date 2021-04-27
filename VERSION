@@ -1,6 +1,6 @@
 [Development]
-Version=2.8.7-dev
-Target=2.8.7-release
+Version=2.8.6-dev
+Target=2.8.6-release
 Date=04/26/2021
 Changes=Integration of the iRacing telemetry information, Refactoring of the shared memory data fields, Pitstop mode for iRacing plugin, Jona integration incl. pitstop handling for iRacing
 [Release]
@@ -11,4 +11,4 @@ Changes=No tyre change option for Jona pitstop handling, Intelligent late damage
 Type=Development
 [Version]
 Release=2.8.5-release
-Development=2.8.7-dev
+Development=2.8.6-dev

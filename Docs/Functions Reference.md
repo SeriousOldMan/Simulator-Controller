@@ -291,7 +291,7 @@ Starts the motion feedback system of your simulation rig. This action function i
 Stops the motion feedback system of your simulation rig and brings the rig back to its resting position. This action function is provided by the "Motion Feedback" plugin and is available depending on the concrete configuration.
 
 #### *openPitstopMFD(descriptor :: false)*
-Opens the pitstop settings dialog of the currently running simulator, if supported. If the given simulation supports more than one pitstop settings dialog, the optional parameter *decriptor* can be used to denote the specific dialog. For IRC this is either "Fuel" or "Tyres", with "Fuel" as the default. This action function is provided by the *SimulatorPlugin* class and is available depending on the concrete configuration and simulation.
+Opens the pitstop settings dialog of the currently running simulator, if supported. If the given simulation supports more than one pitstop settings dialog, the optional parameter *descriptor* can be used to denote the specific dialog. For IRC this is either "Fuel" or "Tyres", with "Fuel" as the default. This action function is provided by the *SimulatorPlugin* class and is available depending on the concrete configuration and simulation.
 
 #### *closePitstopMFD()*
 Closes the pitstop settings dialog of the currently running simulator, if supported. This action function is provided by the *SimulatorPlugin* class and is available depending on the concrete configuration and simulation.

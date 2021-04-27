@@ -60,37 +60,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 char *g_data = NULL;
 int g_nData = 0;
 
-const char g_playerInCarString[] = "IsOnTrack";
-int g_playerInCarOffset = -1;
-
-const char g_sessionTimeString[] = "SessionTime";
-int g_sessionTimeOffset = -1;
-
-const char g_lapIndexString[] = "Lap";
-int g_lapIndexOffset = -1;
-
-
-// place holders for variables that need to be updated in the header of our CSV file
-double startTime;
-long int startTimeOffset;
-
-double endTime;
-long int endTimeOffset;
-
-int lastLap;
-int lapCount;
-long int lapCountOffset;
-
 void initData(const irsdk_header* header, char*& data, int& nData)
 {
 	if (data) delete[] data;
 	nData = header->bufLen;
 	data = new char[nData];
-
-	// grab the memory offset to the playerInCar flag
-	g_playerInCarOffset = irsdk_varNameToOffset(g_playerInCarString);
-	g_sessionTimeOffset = irsdk_varNameToOffset(g_sessionTimeString);
-	g_lapIndexOffset = irsdk_varNameToOffset(g_lapIndexString);
 }
 
 inline double normalize(double value) {
@@ -410,7 +384,7 @@ void changePitstopTyrePressure(const irsdk_header* header, int command, char* se
 	}
 }
 
-void changePitstopTyrePressure(const irsdk_header* header, const char* data, char* tyre, float pressureDelta) {
+void changePitstopTyrePressure(const irsdk_header* header, char* tyre, float pressureDelta) {
 	if (strcmp(tyre, "FL") == 0)
 		changePitstopTyrePressure(header, irsdk_PitCommand_LF, "PitSvLFP", pressureDelta);
 	else if (strcmp(tyre, "FR") == 0)
@@ -436,19 +410,76 @@ void pitstopChangeValues(const irsdk_header* header, const char* data, char* arg
 	else if (strcmp(service, "Tyre Change") == 0)
 		requestPitstopTyreChange((strcmp(values, "true") == 0));
 	else if (strcmp(service, "All Around") == 0) {
-		changePitstopTyrePressure(header, data, "FL", atof(values));
-		changePitstopTyrePressure(header, data, "FR", atof(values));
-		changePitstopTyrePressure(header, data, "RL", atof(values));
-		changePitstopTyrePressure(header, data, "RR", atof(values));
+		changePitstopTyrePressure(header, "FL", atof(values));
+		changePitstopTyrePressure(header, "FR", atof(values));
+		changePitstopTyrePressure(header, "RL", atof(values));
+		changePitstopTyrePressure(header, "RR", atof(values));
 	}
 	else if (strcmp(service, "Front Left") == 0)
-		changePitstopTyrePressure(header, data, "FL", atof(values));
+		changePitstopTyrePressure(header, "FL", atof(values));
 	else if (strcmp(service, "Front Right") == 0)
-		changePitstopTyrePressure(header, data, "FR", atof(values));
+		changePitstopTyrePressure(header, "FR", atof(values));
 	else if (strcmp(service, "Rear Left") == 0)
-		changePitstopTyrePressure(header, data, "RL", atof(values));
+		changePitstopTyrePressure(header, "RL", atof(values));
 	else if (strcmp(service, "Rear Right") == 0)
-		changePitstopTyrePressure(header, data, "RR", atof(values));
+		changePitstopTyrePressure(header, "RR", atof(values));
+}
+
+void dumpDataToDisplay(const irsdk_header* header, const char* data)
+{
+	if (header && data)
+	{
+		int newLineCount = 5;
+
+		for (int i = 0; i < header->numVars; i++)
+		{
+			const irsdk_varHeader* rec = irsdk_getVarHeaderEntry(i);
+
+			printf("%s[", rec->name);
+
+			// only dump the first 4 entrys in an array to save space
+			// for now ony carsTrkPct and carsTrkLoc output more than 4 entrys
+			int count = 1;
+			if (rec->type != irsdk_char)
+				count = min(4, rec->count);
+
+			for (int j = 0; j < count; j++)
+			{
+				switch (rec->type)
+				{
+				case irsdk_char:
+					printf("%s", (char*)(data + rec->offset)); break;
+				case irsdk_bool:
+					printf("%d", ((bool*)(data + rec->offset))[j]); break;
+				case irsdk_int:
+					printf("%d", ((int*)(data + rec->offset))[j]); break;
+				case irsdk_bitField:
+					printf("0x%08x", ((int*)(data + rec->offset))[j]); break;
+				case irsdk_float:
+					printf("%0.2f", ((float*)(data + rec->offset))[j]); break;
+				case irsdk_double:
+					printf("%0.2f", ((double*)(data + rec->offset))[j]); break;
+				}
+
+				if (j + 1 < count)
+					printf("; ");
+			}
+			if (rec->type != irsdk_char && count < rec->count)
+				printf("; ...");
+
+			printf("]");
+
+			if ((i + 1) < header->numVars)
+				printf(", ");
+
+			if (newLineCount-- <= 0) {
+				newLineCount = 5;
+
+				printf("\n");
+			}
+		}
+		printf("\n\n");
+	}
 }
 
 void writeData(const irsdk_header *header, const char* data, bool setupOnly)
@@ -704,57 +735,14 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 			printf("Pit TP RR=%f\n", GetPsi(getDataFloat(header, data, "PitSvRRP")));
 		}
 
-		// printf("[Debug]\n");
-		// printf("%s", sessionInfo);
-	}
-}
-
-void logDataToDisplay(const irsdk_header* header, const char* data)
-{
-	if (header && data)
-	{
-		for (int i = 0; i < header->numVars; i++)
-		{
-			const irsdk_varHeader* rec = irsdk_getVarHeaderEntry(i);
-
-			printf("%s[", rec->name);
-
-			// only dump the first 4 entrys in an array to save space
-			// for now ony carsTrkPct and carsTrkLoc output more than 4 entrys
-			int count = 1;
-			if (rec->type != irsdk_char)
-				count = min(4, rec->count);
-
-			for (int j = 0; j < count; j++)
-			{
-				switch (rec->type)
-				{
-				case irsdk_char:
-					printf("%s", (char*)(data + rec->offset)); break;
-				case irsdk_bool:
-					printf("%d", ((bool*)(data + rec->offset))[j]); break;
-				case irsdk_int:
-					printf("%d", ((int*)(data + rec->offset))[j]); break;
-				case irsdk_bitField:
-					printf("0x%08x", ((int*)(data + rec->offset))[j]); break;
-				case irsdk_float:
-					printf("%0.2f", ((float*)(data + rec->offset))[j]); break;
-				case irsdk_double:
-					printf("%0.2f", ((double*)(data + rec->offset))[j]); break;
-				}
-
-				if (j + 1 < count)
-					printf("; ");
-			}
-			if (rec->type != irsdk_char && count < rec->count)
-				printf("; ...");
-
-			printf("]");
-
-			if ((i + 1) < header->numVars)
-				printf(", ");
+		if (false) {
+			printf("\n[Debug Session Info]\n");
+			printf("%s", sessionInfo);
+			printf("\n");
+			printf("[Debug Variables]\n");
+			dumpDataToDisplay(header, data);
+			printf("\n");
 		}
-		printf("\n\n");
 	}
 }
 
@@ -792,8 +780,6 @@ int main(int argc, char* argv[])
 				}
 				else
 					writeData(pHeader, g_data, ((argc == 2) && (strcmp(argv[1], "-Setup") == 0)));
-
-				// logDataToDisplay(pHeader, g_data);
 
 				break;
 			}

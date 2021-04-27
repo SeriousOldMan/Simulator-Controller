@@ -1197,14 +1197,14 @@ class RaceEngineer extends ConfigurationItem {
 		this.iDriverName := getConfigurationValue(data, "Stint Data", "DriverForname", this.DriverName)
 		this.iSimulator := getConfigurationValue(data, "Session Data", "Simulator", "")
 		
-		switch getConfigurationValue(data, "Stint Data", "Session", "Practice") {
+		switch getConfigurationValue(data, "Session Data", "Session", "Practice") {
 			case "Practice":
 				this.iSession := kSessionPractice
 			case "Qualification":
 				this.iSession := kSessionQualification
 			case "Race":
 				this.iSession := kSessionRace
-			case "Other":
+			default:
 				this.iSession := kSessionOther
 		}
 		

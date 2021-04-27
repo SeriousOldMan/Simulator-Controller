@@ -81,6 +81,18 @@ int lastLap;
 int lapCount;
 long int lapCountOffset;
 
+void initData(const irsdk_header* header, char*& data, int& nData)
+{
+	if (data) delete[] data;
+	nData = header->bufLen;
+	data = new char[nData];
+
+	// grab the memory offset to the playerInCar flag
+	g_playerInCarOffset = irsdk_varNameToOffset(g_playerInCarString);
+	g_sessionTimeOffset = irsdk_varNameToOffset(g_sessionTimeString);
+	g_lapIndexOffset = irsdk_varNameToOffset(g_lapIndexString);
+}
+
 inline double normalize(double value) {
 	return (value < 0) ? 0.0 : value;
 }
@@ -383,15 +395,30 @@ void changePitstopRefuelAmount(const irsdk_header* header, const char* data, flo
 		irsdk_broadcastMsg(irsdk_BroadcastPitCommand, irsdk_PitCommand_Fuel, (int)(getDataFloat(header, data, "PitSvFuel") + fuelDelta));
 }
 
+void changePitstopTyrePressure(const irsdk_header* header, int command, char* serviceFlag, float pressureDelta) {
+	int tries = 10;
+	float currentPressure = getDataFloat(header, g_data, serviceFlag);
+	float targetPressure = GetPsi(currentPressure) + pressureDelta;
+
+	while ((getDataFloat(header, g_data, serviceFlag) == currentPressure) && (tries-- > 0)) {
+		initData(header, g_data, g_nData);
+		irsdk_waitForDataReady(TIMEOUT, g_data);
+
+		setTyrePressure(command, targetPressure);
+
+		targetPressure += (pressureDelta >= 0) ? 0.1 : -0.1;
+	}
+}
+
 void changePitstopTyrePressure(const irsdk_header* header, const char* data, char* tyre, float pressureDelta) {
 	if (strcmp(tyre, "FL") == 0)
-		setTyrePressure(irsdk_PitCommand_LF, GetPsi(getDataFloat(header, data, "PitSvLFP")) + pressureDelta);
+		changePitstopTyrePressure(header, irsdk_PitCommand_LF, "PitSvLFP", pressureDelta);
 	else if (strcmp(tyre, "FR") == 0)
-		setTyrePressure(irsdk_PitCommand_RF, GetPsi(getDataFloat(header, data, "PitSvRFP")) + pressureDelta);
+		changePitstopTyrePressure(header, irsdk_PitCommand_RF, "PitSvRFP", pressureDelta);
 	else if (strcmp(tyre, "RL") == 0)
-		setTyrePressure(irsdk_PitCommand_LR, GetPsi(getDataFloat(header, data, "PitSvLRP")) + pressureDelta);
+		changePitstopTyrePressure(header, irsdk_PitCommand_LR, "PitSvLRP", pressureDelta);
 	else if (strcmp(tyre, "RR") == 0)
-		setTyrePressure(irsdk_PitCommand_RR, GetPsi(getDataFloat(header, data, "PitSvRRP")) + pressureDelta);
+		changePitstopTyrePressure(header, irsdk_PitCommand_RR, "PitSvRRP", pressureDelta);
 }
 
 void pitstopChangeValues(const irsdk_header* header, const char* data, char* arguments) {
@@ -542,7 +569,7 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 
 			printf("TyreTemperature = %f, %f, %f, %f\n",
 				getTyreTemperature(header, sessionInfo, data, "CarSetup:Suspension:LeftFront:LastTempsOMI:", "LFtempCL", "LFtempCM", "LFtempCR"),
-				getTyreTemperature(header, sessionInfo, data, "CarSetup:Suspension:RightFront:LastTempsOMI:", "RFtempCL", "RFtempCM", "RLFtempCR"),
+				getTyreTemperature(header, sessionInfo, data, "CarSetup:Suspension:RightFront:LastTempsOMI:", "RFtempCL", "RFtempCM", "RFtempCR"),
 				getTyreTemperature(header, sessionInfo, data, "CarSetup:Suspension:LeftRear:LastTempsOMI:", "LRtempCL", "LRtempCM", "LRtempCR"),
 				getTyreTemperature(header, sessionInfo, data, "CarSetup:Suspension:RightRear:LastTempsOMI:", "RRtempCL", "RRtempCM", "RRtempCR"));
 
@@ -626,11 +653,11 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 
 			int id = atoi(sessionID);
 
-			while (id) {
+			while (id >= 0) {
 				char session[32];
 
 				if (getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}SessionTrackRubberState:", itoa(id, session, 10)))
-					if (strstr(result, "high") && strstr(result, "moderately"))
+					if (strstr(result, "moderate") || strstr(result, "moderately"))
 						strcpy(gripLevel, "Fast");
 					else if (strstr(result, "high"))
 						strcpy(gripLevel, "Optimum");
@@ -657,25 +684,30 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 			printf("Weather=Dry\n");
 			printf("Weather10Min=Dry\n");
 			printf("Weather30Min=Dry\n");
+
+			printf("[Test Data]\n");
+			
+			id = atoi(sessionID);
+
+			while (id >= 0) {
+				char session[32];
+
+				if (getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}SessionTrackRubberState:", itoa(id, session, 10)))
+					printf("Session %d Track Grip=%s\n", id, result);
+
+				id -= 1;
+			}
+
+			printf("Pit TP FL=%f\n", GetPsi(getDataFloat(header, data, "PitSvLFP")));
+			printf("Pit TP FR=%f\n", GetPsi(getDataFloat(header, data, "PitSvRFP")));
+			printf("Pit TP RL=%f\n", GetPsi(getDataFloat(header, data, "PitSvLRP")));
+			printf("Pit TP RR=%f\n", GetPsi(getDataFloat(header, data, "PitSvRRP")));
 		}
 
 		// printf("[Debug]\n");
 		// printf("%s", sessionInfo);
 	}
 }
-
-void initData(const irsdk_header* header, char*& data, int& nData)
-{
-	if (data) delete[] data;
-	nData = header->bufLen;
-	data = new char[nData];
-
-	// grab the memory offset to the playerInCar flag
-	g_playerInCarOffset = irsdk_varNameToOffset(g_playerInCarString);
-	g_sessionTimeOffset = irsdk_varNameToOffset(g_sessionTimeString);
-	g_lapIndexOffset = irsdk_varNameToOffset(g_lapIndexString);
-}
-
 
 void logDataToDisplay(const irsdk_header* header, const char* data)
 {

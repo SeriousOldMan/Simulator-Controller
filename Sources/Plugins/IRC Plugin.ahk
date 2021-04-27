@@ -86,9 +86,9 @@ class IRCPlugin extends RaceEngineerSimulatorPlugin {
 		
 		if !this.iCurrentPitstopMFD {
 			if (!descriptor || (descriptor = "Fuel"))
-				key := this.OpenPitstopFuelMFDHotkey
+				key := this.PitstopFuelMFDHotkey
 			else if (descriptor = "Tyre")
-				key := this.OpenPitstopTyreMFDHotkey
+				key := this.PitstopTyreMFDHotkey
 			else
 				Throw "Unsupported Pitstop MFD detected in IRCPlugin.openPitstopMFD..."
 			
@@ -116,16 +116,19 @@ class IRCPlugin extends RaceEngineerSimulatorPlugin {
 		key := false
 		
 		if this.iCurrentPitstopMFD {
-			this.iCurrentPitstopMFD := false
-			
 			if (this.iCurrentPitstopMFD = "Fuel")
-				key := this.OpenPitstopFuelMFDHotkey
+				key := this.PitstopFuelMFDHotkey
 			else if (this.iCurrentPitstopMFD = "Tyre")
-				key := this.OpenPitstopTyreMFDHotkey
-			else
+				key := this.PitstopTyreMFDHotkey
+			else {
+				this.iCurrentPitstopMFD := false
+			
 				Throw "Unsupported Pitstop MFD detected in IRCPlugin.closePitstopMFD..."
-
+			}
+			
 			SendEvent % key
+			
+			this.iCurrentPitstopMFD := false
 		}
 	}
 	

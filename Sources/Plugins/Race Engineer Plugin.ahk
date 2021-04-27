@@ -559,7 +559,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 			
 			dataLastLap := getConfigurationValue(data, "Stint Data", "Laps", 0)
 			
-			if false && isDebug() {
+			if isDebug() {
 				testData := getConfigurationSectionValues(data, "Test Data", Object())
 				
 				if (testData.Count() > 0) {

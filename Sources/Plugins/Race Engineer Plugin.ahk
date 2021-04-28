@@ -462,23 +462,20 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 	
 	startSimulation(simulator) {
 		if (this.Simulator && (this.Simulator != simulator))
-			Throw "Inconsistent state detected in RaceEngineerPlugin.simulatorStartup..."
-		else if (this.Simulator != simulator) {
-			this.iSimulator := simulator
+			this.stopSimulation(this.Simulator)
 		
-			code := simulator.Code
-			
-			FileCreateDir %kTempDirectory%%code% Data
-			
-			Loop Files, %kTempDirectory%%code% Data\*.*
-				FileDelete %A_LoopFilePath%
-		}		
+		this.iSimulator := simulator
+	
+		code := simulator.Code
+		
+		FileCreateDir %kTempDirectory%%code% Data
+		
+		Loop Files, %kTempDirectory%%code% Data\*.*
+			FileDelete %A_LoopFilePath%
 	}
 	
 	stopSimulation(simulator) {
-		if (this.Simulator != simulator)
-			Throw "Inconsistent state detected in RaceEngineerPlugin.simulatorShutdown..."
-		else
+		if (this.Simulator == simulator)
 			this.iSimulator := false
 	}
 	

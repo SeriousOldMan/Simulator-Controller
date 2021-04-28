@@ -408,7 +408,7 @@ class RaceEngineerSimulatorPlugin extends SimulatorPlugin {
 			mode := new PitstopMode(this)
 		
 		if (function != false) {
-			if ((action = "PitstopPlan") || (action = "PitstopPrepare"))
+			if inList(["PitstopPlan", "PitstopPrepare", "Accept", "Reject"], action)
 				mode.registerAction(new RaceEngineerAction(this, function, this.getLabel(ConfigurationItem.descriptor(action, "Activate"), action), action))
 			else
 				logMessage(kLogWarn, translate("Action """) . action . translate(""" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
@@ -447,6 +447,16 @@ class RaceEngineerSimulatorPlugin extends SimulatorPlugin {
 	
 	supportsPitstop() {
 		return false
+	}
+	
+	accept() {
+		if this.RaceEngineer
+			this.RaceEngineer.accept()
+	}
+	
+	reject() {
+		if this.RaceEngineer
+			this.RaceEngineer.reject()
 	}
 	
 	planPitstop() {

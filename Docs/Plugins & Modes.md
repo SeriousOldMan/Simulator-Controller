@@ -208,7 +208,7 @@ It is possible, although not much fun, to use Jona without its natural language 
 	
 All these will be bound to the plugin itself, thereby are available all the time, and only unary functions are supported here. By using this actions, you will be able to use Jona with voice output, but no voice control, thereby getting most of the support from Jona, but you have to use an *oldschool* interface to control the engineer actions. To *answer* "Yes" to one of the questions of Jona, you must supply a controller function, for example a push button function, to the *accept* parameter and for "No", you must use the *reject* parameter.
 
-Note: The *PistopPlan* and *PitstopPrepare* actions are also available in some of the simulation plugins, which define a "Pitstop" mode.
+Note: The *raceEngineerCommands* actions are also available in most of the simulation plugins, which define a "Pitstop" mode.
 
 ## Plugin *ACC*
 
@@ -266,6 +266,8 @@ See the following table for the supported settings.
 | BodyworkRepair | Toggles the repair of all the bodywork. |
 | PitstopPlan | Requests a pitstop plan from the virtual race engineer. |
 | PitstopPrepare | Requests Jona to transfer the values from the current pitstop plan to the Pitstop MFD. |
+| Accept | Accepts the last recommendation of the virtual race engineer. Useful, if you don't want to use voice commands to interact with Jona. |
+| Reject | Cancels or rejectes the last recommendation of the virtual race engineer. Useful, if you don't want to use voice commands to interact with Jona. |
 
 See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan* and *PitstopPrepare*.
 
@@ -330,6 +332,8 @@ See the following table for the supported settings.
 | RepairRequest | Toggles, whether repairs will be carried out during the next pitstop.  |
 | PitstopPlan | Requests a pitstop plan from the virtual race engineer. |
 | PitstopPrepare | Requests Jona to transfer the values from the current pitstop plan to the Pitstop MFD. |
+| Accept | Accepts the last recommendation of the virtual race engineer. Useful, if you don't want to use voice commands to interact with Jona. |
+| Reject | Cancels or rejectes the last recommendation of the virtual race engineer. Useful, if you don't want to use voice commands to interact with Jona. |
 
 See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan* and *PitstopPrepare*.
 
@@ -379,6 +383,8 @@ See the following table for the supported settings.
 | RepairRequest | Cycles through the available repair options. |
 | PitstopPlan | Requests a pitstop plan from the virtual race engineer. |
 | PitstopPrepare | Requests Jona to transfer the values from the current pitstop plan to the Pitstop MFD. |
+| Accept | Accepts the last recommendation of the virtual race engineer. Useful, if you don't want to use voice commands to interact with Jona. |
+| Reject | Cancels or rejectes the last recommendation of the virtual race engineer. Useful, if you don't want to use voice commands to interact with Jona. |
 
 See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan* and *PitstopPrepare*.
 

@@ -288,29 +288,25 @@ class SimulatorPlugin extends ControllerPlugin {
 	simulatorStartup(simulator) {
 		base.simulatorStartup(simulator)
 		
-		if (simulator = this.Simulator.Application) {
-			if (vRunningSimulator != this) {
-				if vRunningSimulator
-					vRunningSimulator.simulatorShutdown(vRunningSimulation)
-				
-				this.updateSessionState(kSessionFinished)
-				
-				vRunningSimulator := this
-				vRunningSimulation := simulator
-			}
+		if ((simulator = this.Simulator.Application) && (vRunningSimulator != this)) {
+			if vRunningSimulator
+				vRunningSimulator.simulatorShutdown(vRunningSimulation)
+			
+			this.updateSessionState(kSessionFinished)
+			
+			vRunningSimulator := this
+			vRunningSimulation := simulator
 		}
 	}
 	
 	simulatorShutdown(simulator) {
 		base.simulatorShutdown(simulator)
 		
-		if (simulator = this.Simulator.Application) {
-			if (vRunningSimulator == this) {
-				this.updateSessionState(kSessionFinished)
-			
-				vRunningSimulator := false
-				vRunningSimulation := false
-			}
+		if ((simulator = this.Simulator.Application) && (vRunningSimulator == this)) {
+			this.updateSessionState(kSessionFinished)
+		
+			vRunningSimulator := false
+			vRunningSimulation := false
 		}
 	}
 	

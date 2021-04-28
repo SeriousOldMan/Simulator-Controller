@@ -1571,18 +1571,19 @@ updateSimulatorState() {
 	try {
 		updateTrayMessageState()
 		
-		changed := (isSimulatorRunning != (controller.ActiveSimulator != false))
+		currentSimulator := controller.ActiveSimulator
+		changed := (isSimulatorRunning != (currentSimulator != false))
 		
-		if controller.ActiveSimulator {
+		if currentSimulator {
 			isSimulatorRunning := true
 			
-			if (lastSimulator != controller.ActiveSimulator) {
+			if (lastSimulator != currentSimulator) {
 				if lastSimulator
 					controller.simulatorShutdown(lastSimulator)
 					
-				lastSimulator := controller.ActiveSimulator
+				lastSimulator := currentSimulator
 				
-				controller.simulatorStartup(lastSimulator)
+				controller.simulatorStartup(currentSimulator)
 			}
 		}
 		else if lastSimulator {

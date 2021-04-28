@@ -32,6 +32,7 @@ global kSessionStateNames = ["Other", "Practice", "Qualification", "Race"]
 ;;;-------------------------------------------------------------------------;;;
 
 global vRunningSimulator = false
+global vRunningSimulation = false
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -288,9 +289,15 @@ class SimulatorPlugin extends ControllerPlugin {
 		base.simulatorStartup(simulator)
 		
 		if (simulator = this.Simulator.Application) {
-			this.updateSessionState(kSessionFinished)
-			
-			vRunningSimulator := this
+			if (vRunningSimulator != this) {
+				if vRunningSimulator
+					vRunningSimulator.simulatorShutdown(vRunningSimulation)
+				
+				this.updateSessionState(kSessionFinished)
+				
+				vRunningSimulator := this
+				vRunningSimulation := simulator
+			}
 		}
 	}
 	
@@ -298,10 +305,12 @@ class SimulatorPlugin extends ControllerPlugin {
 		base.simulatorShutdown(simulator)
 		
 		if (simulator = this.Simulator.Application) {
-			this.updateSessionState(kSessionFinished)
+			if (vRunningSimulator == this) {
+				this.updateSessionState(kSessionFinished)
 			
-			if (vRunningSimulator == this)
 				vRunningSimulator := false
+				vRunningSimulation := false
+			}
 		}
 	}
 	

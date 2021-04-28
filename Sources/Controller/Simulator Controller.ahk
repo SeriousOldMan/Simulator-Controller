@@ -1570,21 +1570,32 @@ updateSimulatorState() {
 
 	try {
 		updateTrayMessageState()
-			
-		if (isSimulatorRunning != (controller.ActiveSimulator != false)) {
-			isSimulatorRunning := !isSimulatorRunning
 		
-			if isSimulatorRunning {
+		changed := (isSimulatorRunning != (controller.ActiveSimulator != false))
+		
+		if controller.ActiveSimulator {
+			isSimulatorRunning := true
+			
+			if (lastSimulator != controller.ActiveSimulator) {
+				if lastSimulator
+					controller.simulatorShutdown(lastSimulator)
+					
 				lastSimulator := controller.ActiveSimulator
 				
 				controller.simulatorStartup(lastSimulator)
 			}
-			else
-				controller.simulatorShutdown(lastSimulator)
+		}
+		else if lastSimulator {
+			isSimulatorRunning := false
+		
+			controller.simulatorShutdown(lastSimulator)
+			
+			lastSimulator := false
+		}
 
+		if changed
 			for ignore, btnBox in controller.ButtonBoxes
 				btnBox.updateVisibility()
-		}
 		
 		if isSimulatorRunning {
 			SetTimer updateSimulatorState, -5000

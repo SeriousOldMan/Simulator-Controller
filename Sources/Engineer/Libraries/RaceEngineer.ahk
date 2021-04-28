@@ -735,6 +735,14 @@ class RaceEngineer extends ConfigurationItem {
 		}
 	}
 	
+	accept() {
+		this.phraseRecognized("Yes", ["Yes"])
+	}
+	
+	reject() {
+		this.phraseRecognized("No", ["No"])
+	}
+	
 	nameRecognized(words) {
 		this.getSpeaker().speakPhrase("IHearYou")
 	}

@@ -203,11 +203,12 @@ With *true* supplied for *raceEngineerLogo*, Jona will show a nice rotating AI b
 
 It is possible, although not much fun, to use Jona without its natural language interface. Only the pitstop planning and setup capabilities are available in this cconfiguration, but it is still useful. You can use the following parameters to connect these actions to your controller hardware:
 
-	raceEngineerCommands: PitstopPlan *function*, PitstopPrepare *function*
+	raceEngineerCommands: PitstopPlan *function*, PitstopPrepare *function*;
+	accept: *acceptFunction*; reject: *rejectFunction*
 	
-Both actions will be bound to the plugin itself, thereby are available all the time, and only unary functions are supported here. An interesting combination you might try, is to use voice output for Jona, but no voice control. You will get all the information of Jona, but use an *oldschool* interface to control the engineer actions.
+All these will be bound to the plugin itself, thereby are available all the time, and only unary functions are supported here. By using this actions, you will be able to use Jona with voice output, but no voice control, thereby getting most of the support from Jona, but you have to use an *oldschool* interface to control the engineer actions. To *answer* "Yes" to one of the questions of Jona, you must supply a controller function, for example a push button function, to the *accept* parameter and for "No", you must use the *reject* parameter.
 
-Note: The *raceEngineerCommands* parameter is also available in some of the simulation plugins, which define a "Pitstop" mode, as actions for this specific mode.
+Note: The *PistopPlan* and *PitstopPrepare* actions are also available in some of the simulation plugins, which define a "Pitstop" mode.
 
 ## Plugin *ACC*
 

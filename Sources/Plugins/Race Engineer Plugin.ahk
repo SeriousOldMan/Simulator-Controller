@@ -76,6 +76,14 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 			this.callRemote("updateLap", arguments*)
 		}
 		
+		accept(arguments*) {
+			this.callRemote("accept", arguments*)
+		}
+		
+		request(arguments*) {
+			this.callRemote("request", arguments*)
+		}
+		
 		planPitstop(arguments*) {
 			this.callRemote("planPitstop", arguments*)
 		}
@@ -113,6 +121,10 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 						plugin.planPitstop()
 					case "PitstopPrepare":
 						plugin.preparePitstop()
+					case "Accept":
+						plugin.accept()
+					case "Refuse":
+						plugin.refuse()
 					default:
 						Throw "Invalid action """ . this.Action . """ detected in RaceEngineerAction.fireAction...."
 				}
@@ -252,7 +264,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 		local function := controller.findFunction(actionFunction)
 		
 		if (function != false) {
-			if ((action = "PitstopPlan") || (action = "PitstopPrepare"))
+			if inList(["PitstopPlan", "PitstopPrepare", "Accept", "Reject"], action)
 				this.registerAction(new this.RaceEngineerAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Activate"), action), action))
 			else if (action = "RaceEngineer")
 				this.registerAction(new this.RaceEngineerToggleAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Toggle"), action)))
@@ -418,6 +430,16 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 	
 	supportsPitstop() {
 		return (this.Simulator ? this.Simulator.supportsPitstop() : false)
+	}
+	
+	accept() {
+		if this.RaceEngineer
+			this.RaceEngineer.accept()
+	}
+	
+	reject() {
+		if this.RaceEngineer
+			this.RaceEngineer.reject()
 	}
 	
 	planPitstop() {

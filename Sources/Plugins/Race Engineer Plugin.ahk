@@ -123,8 +123,8 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 						plugin.preparePitstop()
 					case "Accept":
 						plugin.accept()
-					case "Refuse":
-						plugin.refuse()
+					case "Reject":
+						plugin.reject()
 					default:
 						Throw "Invalid action """ . this.Action . """ detected in RaceEngineerAction.fireAction...."
 				}

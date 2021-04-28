@@ -80,8 +80,8 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 			this.callRemote("accept", arguments*)
 		}
 		
-		request(arguments*) {
-			this.callRemote("request", arguments*)
+		reject(arguments*) {
+			this.callRemote("reject", arguments*)
 		}
 		
 		planPitstop(arguments*) {

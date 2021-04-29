@@ -6,7 +6,7 @@
   4. Renaming of selected shared memory data fields
   5. ["Pitstop" mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-pitstop-1) for *iRacing* plugin
   6. [Jona integration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer) incl. pitstop handling for *iRacing*
-  7. Two new actions "Accept" and "Reject" have been added to the "Race Engineer" plugin, which are aquivalent to the corrsponding voice commands. This will be helpful, if you want to use Jona without voice recognition support.
+  7. Two new actions "Accept" and "Reject" have been added to the ["Race Engineer" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer), which are aquivalent to the corrsponding voice commands. This will be helpful, if you want to use Jona without voice recognition support.
 
 ## 2.8.5-release 04/23/21
 

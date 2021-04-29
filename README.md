@@ -26,7 +26,7 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-[2.8.6-rc1](https://www.dropbox.com/s/s6vcuwgwlntlneu/Simulator%20Controller%202.8.6-rc1.zip?dl=1) (First release candidate for 2.8.6. New features: Full support for iRacing, incl. a specialized "Pitstop" mode and an integration with Jona, the Virtual Race Engineer, New actions "Accept" and "Reject" to extend the control of Jona directly from the Button Box. Still under testing but with almost complete documentation and update procedure.)
+[2.8.6-rc2](https://www.dropbox.com/s/dxcf5rbazn4moug/Simulator%20Controller%202.8.6-rc2.zip?dl=1) (Second release candidate for 2.8.6. New features: Full support for iRacing, incl. a specialized "Pitstop" mode and an integration with Jona, the Virtual Race Engineer, New actions "Accept" and "Reject" to extend the control of Jona directly from the Button Box. Still under testing but with almost complete documentation and update procedure.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-286) of this version and all the versions you might have skipped, before installing and using this version.
 

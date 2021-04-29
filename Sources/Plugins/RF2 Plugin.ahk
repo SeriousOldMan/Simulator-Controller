@@ -59,7 +59,7 @@ class RF2Plugin extends RaceEngineerSimulatorPlugin {
 		simulator := this.Code
 		arguments := values2String(";", arguments*)
 		
-		exePath := kBinariesDirectory . this.Code . " SHM Reader.exe"
+		exePath := kBinariesDirectory . simulator . " SHM Reader.exe"
 	
 		try {
 			if operation

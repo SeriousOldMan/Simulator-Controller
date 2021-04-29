@@ -428,6 +428,8 @@ See the following table for the supported settings.
 | BodyworkRepair | Toggles the repair of all the bodywork and aerodynamic elements. |
 | PitstopPlan | Requests a pitstop plan from the virtual race engineer. |
 | PitstopPrepare | Requests Jona to transfer the values from the current pitstop plan to the Pitstop MFD. |
+| Accept | Accepts the last recommendation of the virtual race engineer. Useful, if you don't want to use voice commands to interact with Jona. |
+| Reject | Cancels or rejectes the last recommendation of the virtual race engineer. Useful, if you don't want to use voice commands to interact with Jona. |
 
 See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan* and *PitstopPrepare*.
 

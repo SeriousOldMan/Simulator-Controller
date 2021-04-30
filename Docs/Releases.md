@@ -1,4 +1,4 @@
-## 2.8.6-release 04/30/21 (planned)
+## 2.8.6-release 04/30/21
 
   1. Bugfixes, as always
   2. Documentation updates, as always

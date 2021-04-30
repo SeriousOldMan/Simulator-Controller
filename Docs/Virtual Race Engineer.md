@@ -100,7 +100,7 @@ Before we dig deeper into the inner workings, here is a typical dialog based int
 
 (And now you are ready for your next stint...)
 
-To have an error free session like this one, you must have a perfect setup for voice recognition. I strngly recommend using a headset, since alien noises might lead to false positives in Jonas voice recognition. Please see the section on [troubleshooting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#troubleshooting), if you need some hints.
+To have an error free session like this one, you must have a perfect setup for voice recognition. I strongly recommend using a headset, since alien noises might lead to false positives in Jonas voice recognition. Please see the section on [troubleshooting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#troubleshooting), if you need some hints.
 
 ## Installation
 

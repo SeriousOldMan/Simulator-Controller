@@ -26,17 +26,15 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-[2.8.6-rc2](https://www.dropbox.com/s/dxcf5rbazn4moug/Simulator%20Controller%202.8.6-rc2.zip?dl=1) (Second release candidate for 2.8.6. New features: Full support for iRacing, incl. a specialized "Pitstop" mode and an integration with Jona, the Virtual Race Engineer, New actions "Accept" and "Reject" to extend the control of Jona directly from the Button Box. Still under testing but with almost complete documentation and update procedure.)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-286) of this version and all the versions you might have skipped, before installing and using this version.
+None for the moment...
 
 #### Latest release builds
 
-[2.8.2-release](https://www.dropbox.com/s/2ax7h0ezbz6o9xs/Simulator%20Controller%202.8.2-release.zip?dl=1) (New features: New VERSION file format, Refactoring of the Simulator Plugins, Icons for SHM Readers, Localized "Controller Plugin Labels", Situation aware Button Box Modes incl. configurable automation, Pitstop handling for rFactor 2.)
-
 [2.8.5-release](https://www.dropbox.com/s/yeiwe5pk6d4bv5h/Simulator%20Controller%202.8.5-release.zip?dl=1) (New features: No tyre change option for Jona pitstop handling incl. automatic *Splash n Dash* recommendation very late in the race, Intelligent damage reporting & handling by Jona during the last laps of a race, Pitstop handling for R3E by Jona, Pitstop modes for RF2 and R3E, More Refactoring of Simulator Plugins, Initial support for iRacing.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-285) of this version and all the versions you might have skipped, before installing and using this version.
+[2.8.6-release](https://www.dropbox.com/s/hsmzxivnttc2wpy/Simulator%20Controller%202.8.6-release.zip?dl=1) (New features: Full support for iRacing, incl. a specialized "Pitstop" mode and an integration with Jona, the Virtual Race Engineer, New actions "Accept" and "Reject" to extend the control of Jona directly from the Button Box.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-286) of this version and all the versions you might have skipped, before installing and using this version.
 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [update notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.

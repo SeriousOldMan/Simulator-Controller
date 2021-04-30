@@ -163,7 +163,7 @@ IMPORTANT: Currently, only version 1.0 of *SmartControl* is supported, since ver
 
 The plugin provides one controller mode, which lets you bind an unlimted set of calibration selectors to the buttons of your Button Box. This mode is always available, and you can change the pedal calibration even while in a race.
 
-Here is an example for typical layout.
+Here is an example for a typical layout.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%207.JPG)
 

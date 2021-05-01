@@ -1694,7 +1694,7 @@
     </Commands>
     <Commands>
       <GUID>41bbbfc0-a94c-493e-af8f-59a0b8ecc95f</GUID>
-      <RecocnitionText>Control Car</RecocnitionText>
+      <RecocnitionText>Control Chat</RecocnitionText>
       <ShortCut>
         <Key>None</Key>
         <OnKeyAction>0</OnKeyAction>

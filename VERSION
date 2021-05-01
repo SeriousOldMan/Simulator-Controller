@@ -1,14 +1,14 @@
 [Development]
-Version=2.8.6-release
+Version=2.8.7-dev
 Target=2.8.6-release
 Date=04/30/2021
-Changes=Integration of the iRacing telemetry information, Refactoring of the shared memory data fields, Pitstop mode for iRacing plugin, Jona integration incl. pitstop handling for iRacing, Accept and Reject actions for the Race Engineer Plugin, which are aquivalent to the corrsponding voice commands
+Changes=
 [Release]
 Version=2.8.6-release
 Date=04/30/2021
 Changes=Integration of the iRacing telemetry information, Refactoring of the shared memory data fields, Pitstop mode for iRacing plugin, Jona integration incl. pitstop handling for iRacing, Accept and Reject actions for the Race Engineer Plugin, which are aquivalent to the corrsponding voice commands
 [Current]
-Type=Release
+Type=Development
 [Version]
 Release=2.8.6-release
-Development=2.8.6-release
+Development=2.8.7-dev

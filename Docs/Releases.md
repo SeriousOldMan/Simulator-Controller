@@ -1,3 +1,9 @@
+## 3.0.0-release 05/14/21 (planned)
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Graphical interface for querying the setup database
+
 ## 2.8.6-release 04/30/21
 
   1. Bugfixes, as always

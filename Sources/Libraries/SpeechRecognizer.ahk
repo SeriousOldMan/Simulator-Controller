@@ -46,6 +46,36 @@ class SpeechRecognizer {
 				
 				Throw "Could not communicate with speech recognizer library (" . dllName . ")..."
 			}
+			
+			this.RecognizerList := this.createRecognizerList()
+			
+			if (this.RecognizerList.Length() == 0) {
+				logMessage(kLogCritical, translate("No languages found while initializing speech recognition system - please check the configuration"))
+				
+				showMessage(translate("No languages found while initializing speech recognition system - please check the configuration") . translate("...")
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			}
+			
+			if ((recognizer == true) && language) {
+				for ignore, recognizerDescriptor in this.getRecognizerList()
+					if (recognizerDescriptor["TwoLetterISOLanguageName"] = language) {
+						recognizer := recognizerDescriptor["ID"]
+						
+						break
+					}
+			}
+			else if (recognizer && (recognizer != true))
+				for ignore, recognizerDescriptor in this.getRecognizerList()
+					if (recognizerDescriptor["Name"] = recognizer) {
+						recognizer := recognizerDescriptor["ID"]
+						
+						break
+					}
+			
+			if (recognizer == true)
+				recognizer := false
+
+			this.initialize(recognizer ? recognizer : 0)
 		}
 		catch exception {
 			logMessage(kLogCritical, translate("Error while initializing speech recognition module - please check the configuration"))
@@ -53,36 +83,6 @@ class SpeechRecognizer {
 			showMessage(translate("Error while initializing speech recognition module - please check the configuration") . translate("...")
 					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 		}
-		
-		this.RecognizerList := this.createRecognizerList()
-		
-		if (this.RecognizerList.Length() == 0) {
-			logMessage(kLogCritical, translate("No languages found while initializing speech recognition system - please check the configuration"))
-			
-			showMessage(translate("No languages found while initializing speech recognition system - please check the configuration") . translate("...")
-					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-		}
-		
-		if ((recognizer == true) && language) {
-			for ignore, recognizerDescriptor in this.getRecognizerList()
-				if (recognizerDescriptor["TwoLetterISOLanguageName"] = language) {
-					recognizer := recognizerDescriptor["ID"]
-					
-					break
-				}
-		}
-		else if (recognizer && (recognizer != true))
-			for ignore, recognizerDescriptor in this.getRecognizerList()
-				if (recognizerDescriptor["Name"] = recognizer) {
-					recognizer := recognizerDescriptor["ID"]
-					
-					break
-				}
-		
-		if (recognizer == true)
-			recognizer := false
-
-		this.initialize(recognizer ? recognizer : 0)
 	}
 
 	createRecognizerList() {

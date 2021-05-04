@@ -56,6 +56,7 @@ dotNET Applications && DLLs=Special
 Simulator Controller=%kBinariesDirectory%Simulator Controller.exe <- %kSourcesDirectory%Controller\Simulator Controller.ahk; %kIncludesDirectory%, %kLibrariesDirectory%SpeechRecognizer.ahk, %kPluginsDirectory%, %kUserPluginsDirectory%, %kHomeDirectory%VERSION
 Race Engineer=%kBinariesDirectory%Race Engineer.exe <- %kSourcesDirectory%Engineer\Race Engineer.ahk; %kIncludesDirectory%, %kLibrariesDirectory%, %kSourcesDirectory%Engineer\Libraries\, %kHomeDirectory%VERSION
 Race Engineer Settings=%kBinariesDirectory%Race Engineer Settings.exe <- %kSourcesDirectory%Engineer\Race Engineer Settings.ahk; %kIncludesDirectory%, %kHomeDirectory%VERSION
+Race Engineer Setups=%kBinariesDirectory%Race Engineer Setups.exe <- %kSourcesDirectory%Engineer\Race Engineer Setups.ahk; %kIncludesDirectory%, %kHomeDirectory%VERSION
 Simulator Settings=%kBinariesDirectory%Simulator Settings.exe <- %kSourcesDirectory%Startup\Simulator Settings.ahk; %kIncludesDirectory%, %kSourcesDirectory%Startup\Libraries\, %kHomeDirectory%VERSION
 Simulator Startup=%kBinariesDirectory%Simulator Startup.exe <- %kSourcesDirectory%Startup\Simulator Startup.ahk; %kIncludesDirectory%, %kSourcesDirectory%Startup\Libraries\, %kHomeDirectory%VERSION
 Voice Server=%kBinariesDirectory%Voice Server.exe <- %kSourcesDirectory%Startup\Voice Server.ahk; %kIncludesDirectory%, %kLibrariesDirectory%SpeechGenerator.ahk, %kLibrariesDirectory%SpeechRecognizer.ahk, %kHomeDirectory%VERSION

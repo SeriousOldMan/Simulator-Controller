@@ -1432,6 +1432,16 @@ map(list, function) {
 	return result
 }
 
+remove(list, object) {
+	result := []
+	
+	for ignore, value in list
+		if (value != object)
+			result.Push(value)
+	
+	return result
+}
+
 bubbleSort(ByRef array, comparator) {
 	n := array.Length()
 
@@ -1632,6 +1642,24 @@ setConfigurationValues(configuration, otherConfiguration) {
 removeConfigurationValue(configuration, section, key) {
 	if configuration.HasKey(section)
 		configuration[section].Delete(key)
+}
+
+getControllerConfiguration() {
+	if !FileExist(kUserConfigDirectory . "Simulator Controller.config")
+		try {
+			exePath := kBinariesDirectory . "Simulator Controller.exe -NoStartup"
+			
+			RunWait %exePath%, %kBinariesDirectory%
+		}
+		catch exception {
+			logMessage(kLogCritical, translate("Cannot start Simulator Controller (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
+		
+			showMessage(substituteVariables(translate("Cannot start Simulator Controller (%kBinariesDirectory%Simulator Controller.exe) - please rebuild the applications..."))
+					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+		}
+	
+	
+	return readConfiguration(kUserConfigDirectory . "Simulator Controller.config")
 }
 
 

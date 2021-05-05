@@ -319,6 +319,16 @@ Note: The database is stored in the *Simulator Controller\Setup Database* folder
 
 *Very Important*: As long as we can't get the actual car setup information from the different simulation games via APIs, you **really** have to follow the guidelines from [above sections](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-engineer-settings), so that Jona has a correct understanding of your car and tyre setup. This has been important in the past to get a correct setup for an upcoming pitstop, but it is even more important when building the setup databse, so that we do not end up with compromised data. Jona will ask you at the end of the session, if you were happy with your setup and if you want to include the setup information in the database. Please only answer "Yes" here, if you are sure, that the setup information has been transferred correctly to Jona, as described above. Please note, that you still may have had a too low or too high hot tyre pressure during your session, because your initial setup was wrong in the first place. This is no problem, since Jona will store the corrected values in the database, as long as your initial setup values are known.
 
+#### Querying the setup database
+
+Whenever you have to setup your car for a given track and specific environmental conditions you can query the setup database to get a recommendation on how to setup your initial cold pressures and which tyre compound might be best for the job. When you start the application *Race Engineer Setups.exe* from the *Binaries* folder, the following dialog will open up.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Engineer%20Setups%201.JPG)
+
+You have to enter all the fields in the upper area to specify the simulation, car, track, current weather and so on. Then you will get a recommendation for initial cold tyre pressures in the lower area, if a matching setup is available in the setup database. Depending on the temperature settings the recommended tyre pressures will be marked in dark green for a perfect match, or light green or even yellow, if the values have been interpolated from different air and/or track temperatures.
+
+With the dropdown menu in the lower left corner you can choose, whether only your own setups (=> "Local") will be included in the database search or that also the setups of othe users of Simulator Controller might be considered (=> "Local & Global"). Since the community setups have not been consolidated yet, these two settings are identical for the moment.
+
 ### How it works
 
 Jona uses several statistical models to derive the data, on which the recommendations for the pitstop or other information is based. Therefore it will take some laps, before Jonas conclusion get more and more precise. So be careful, if you let Jona plan a pitstop after you have driven only three or four laps. You might end up with not enough fuel to reach the finish line.

@@ -2,7 +2,7 @@
 
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. Graphical interface for querying the setup database
+  3. Graphical interface for querying the setup database (see the updated [documentation](*) for more information)
 
 ## 2.8.6-release 04/30/21
 

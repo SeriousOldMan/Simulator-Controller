@@ -56,6 +56,8 @@ global airTemperatureEdit
 global trackTemperatureEdit
 global compoundDropDown
 
+global queryScopeDropDown
+
 global flPressure1
 global flPressure2
 global flPressure3
@@ -319,8 +321,10 @@ loadPressures() {
 			
 			if ((airDelta == 0) && (trackDelta == 0))
 				Gui RES:Color, D0D0D0, Green
-			else
+			else if (airDelta == 0)
 				Gui RES:Color, D0D0D0, Lime
+			else
+				Gui RES:Color, D0D0D0, Yellow
 			
 			for index, postfix in ["1", "2", "3", "4", "5"] {
 				pressure := Format("{:.1f}", pressure)
@@ -348,6 +352,14 @@ loadPressures() {
 	}
 }
 
+updateQueryScope() {
+	GuiControlGet queryScopeDropDown
+	
+	vIncludeGlobalDatabase := (queryScopeDropDown - 1)
+		
+	chooseSimulator()
+}
+
 showSetups(command := false, simulator := false, car := false, track := false) {
 	static result
 
@@ -371,11 +383,17 @@ showSetups(command := false, simulator := false, car := false, track := false) {
 		Gui RES:Font, Norm, Arial
 		Gui RES:Font, Italic Underline, Arial
 
-		Gui RES:Add, Text, YP+20 w380 cBlue Center gopenSetupsDocumentation, % translate("Race Engineer Setups")
+		Gui RES:Add, Text, YP+20 w380 cBlue Center gopenSetupsDocumentation, % translate("Setup Database")
 
 		Gui RES:Font, Norm, Arial
 				
-		Gui RES:Add, Button, x160 y390 w80 h23 Default gcloseSetups, % translate("Close")
+		choices := ["Local", "Local & Global"]
+		chosen := inList(choices, "Local")
+		
+		Gui RES:Add, Text, x8 y390 w55 h23 +0x200, % translate("Query")
+		Gui RES:Add, DropDownList, x63 y390 w95 AltSubmit Choose%chosen% gupdateQueryScope vqueryScopeDropDown, % values2String("|", map(choices, "translate")*)
+		
+		Gui RES:Add, Button, x310 y390 w80 h23 Default gcloseSetups, % translate("Close")
 		
 		Gui RES:Add, Text, x16 y60 w105 h23 +0x200, % translate("Simulator")
 		

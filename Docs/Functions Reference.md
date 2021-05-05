@@ -28,6 +28,9 @@ Reads a configuration map from an *.ini file. The Strings "true" and "false" wil
 #### *writeConfiguration(configFile :: String, configuration :: ConfigurationMap)*
 Stores a configuration map in the given file. All previous content of the file will be overwritten. The literal values *true* and *false* will be converted to "true" and "false", before being written to the configuration file. If *configFile* denotes an absolute path, the configuration will be saved in this file. Otherwise it will be saved relative to *kUserConfigDirectory* (see the [constants documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#installation-paths-constantsahk) for reference).
 
+#### *getControllerConfiguration()*
+This function returns a representation of the file *Simulator Controller.config* which is located in the *Simulator Controller\Config* folder, which is located in your users *Documents* folder. The configuration object consists of information about the configured plugins and simulation applications and the available modes provided by the Simulator Controller. This file is created by the *Simulator Controller.exe* application and is updated on each startup.
+
 ***
 
 ## Tray Messages ([Functions.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Functions.ahk))
@@ -110,6 +113,9 @@ Returns a freshly allocated list containing all the elements of the supplied lis
 
 #### *map(list :: Array, function :: TypeUnion(String, FuncObj))*
 Returns a new list with the result of *function* applied to each element in *list*, while preserving the order of elements.
+
+#### *remove(list :: Array, object :: Object)*
+Returns a new list with all occurencies of *object* removed from the original list.
 
 #### *bubbleSort(ByRef array :: Array, comparator :: Function Name)*
 Sorts the given array in place, using *comparator* to define the order of the elements. This function will receive two objects and must return *true*, if the first one is considered larger or of the same order than the other. Stable sorting rules apply.

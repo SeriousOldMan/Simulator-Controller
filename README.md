@@ -26,7 +26,7 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-None for the moment...
+[3.0.0-dev](https://www.dropbox.com/s/kyo9xqk6ljrvx90/Simulator%20Controller%203.0.0-dev.zip?dl=1) (New features: Query interface for the setup database. Feature complete and documented, but no automated update procedure.)
 
 #### Latest release builds
 

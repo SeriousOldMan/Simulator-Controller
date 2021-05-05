@@ -37,7 +37,7 @@ ListLines Off					; Disable execution history
 
 global kClose = "Close"
 
-global kWeatherOptions = ["Dry", "Drizzle", "Light Rain", "Medium Rain", "Heavy Rain", "Thunderstorm"]
+global kWeatherOptions = ["Dry", "Drizzle", "LightRain", "MediumRain", "HeavyRain", "Thunderstorm"]
 global kTyreCompounds = ["Wet", "Dry", "Dry (Red)", "Dry (White)", "Dry (Blue)"]
 
 
@@ -153,11 +153,97 @@ getTracks(simulator, car) {
 }
 
 getConditions(simulator, car, track) {
-	return []
+	path := (getSimulatorCode(simulator) . "\" . car . "\" . track . "\")
+	conditions := []
+	
+	for ignore, fileName in getEntries(path . "Tyre Setup*.data", "F") {
+		condition := string2Values(A_Space, StrReplace(StrReplace(fileName, "Tyre Setup ", ""), ".data", ""))
+	
+		if (condition.Length() == 2) {
+			compound := condition[1]
+			weather := condition[2]
+		}
+		else {
+			compound := condition[1] . " " . condition[2]
+			weather := condition[3]
+		}
+		
+		pressures := readConfiguration(kSetupDatabaseDirectory . "local\" . path . fileName)
+		
+		if (pressures.Count() == 0)
+			pressures := readConfiguration(kSetupDatabaseDirectory . "global\" . path . fileName)
+		
+		for descriptor, ignore in getConfigurationSectionValues(pressures, "Pressures") {
+			descriptor := ConfigurationItem.splitDescriptor(descriptor)
+		
+			if descriptor[1] {
+				conditions.Push(weather, descriptor[1], descriptor[2], compound)
+			
+				break
+			}
+		}
+	}
+	
+	return conditions
+}
+
+readPressures(fileName, airTemperature, trackTemperature, pressures) {
+	tyreSetup := getConfigurationValue(readConfiguration(fileName), "Pressures", ConfigurationItem.descriptor(airTemperature, trackTemperature), false)
+	
+	if tyreSetup {
+		tyreSetup := string2Values(";", tyreSetup)
+		
+		for index, key in ["FL", "FR", "RL", "RR"]
+			for ignore, pressure in string2Values(",", tyreSetup[index]) {
+				pressure := string2Values(":", pressure)
+			
+				if pressures[key].HasKey(pressure[1])
+					pressures[key][pressure[1]] := pressures[key][pressure[1]] + pressure[2]
+				else
+					pressures[key][pressure[1]] := pressure[2]
+			}
+	}		
 }
 
 getPressures(simulator, car, track, weather, airTemperature, trackTemperature, compound) {
-	return {FL: [], FR: [], RL: [], RR: []}
+	path := (getSimulatorCode(simulator) . "\" . car . "\" . track . "\Tyre Setup " . compound . " " . weather . ".data")
+	deltas := [0, 1, -1, 2, -2]
+	
+	Loop 5 {
+		airDelta := deltas[A_Index]
+		pressures := {FL: {}, FR: {}, RL: {}, RR: {}}
+		
+		for ignore, trackDelta in [0, 1, -1] {
+			readPressures(kSetupDatabaseDirectory . "local\" . path, airTemperature + airDelta, trackTemperature + trackDelta, pressures)
+			
+			if vIncludeGlobalDatabase
+				readPressures(kSetupDatabaseDirectory . "global\" . path, airTemperature + airDelta, trackTemperature + trackDelta, pressures)
+			
+			if (pressures["FL"].Count() != 0) {
+				thePressures := {}
+				
+				for index, tyre in ["FL", "FR", "RL", "RR"] {
+					tyrePressures := pressures[tyre]
+				
+					bestPressure := false
+					bestCount := 0
+					
+					for pressure, pressureCount in tyrePressures {
+						if (pressureCount > bestCount) {
+							bestCount := pressureCount
+							bestPressure := pressure
+						}
+					}
+						
+					thePressures[tyre] := Array(bestPressure, airDelta, trackDelta)
+				}
+				
+				return thePressures
+			}
+		}
+	}
+		
+	return {FL: [0, 0], FR: [0, 0], RL: [0, 0], RR: [0, 0]}
 }
 
 chooseSimulator() {
@@ -194,10 +280,10 @@ chooseTrack() {
 	
 	if (conditions.Length() > 0) {
 		GuiControl Choose, weatherDropDown, % inList(kWeatherOptions, conditions[1])
-		GuiControl Text, airTemperatureEdit, % conditions[1]
-		GuiControl Text, trackTemperatureEdit, % conditions[2]
+		GuiControl Text, airTemperatureEdit, % conditions[2]
+		GuiControl Text, trackTemperatureEdit, % conditions[3]
 		
-		GuiControl Choose, compoundDropDown, % inList(kTyreCompounds, conditions[3])
+		GuiControl Choose, compoundDropDown, % inList(kTyreCompounds, conditions[4])
 	}
 	else {
 		GuiControl Choose, weatherDropDown, 0
@@ -207,6 +293,10 @@ chooseTrack() {
 		GuiControl Choose, compoundDropDown, 0
 	}
 	
+	chooseTemperature()
+}
+
+chooseTemperature() {
 	loadPressures()
 }
 
@@ -219,10 +309,43 @@ loadPressures() {
 	GuiControlGet trackTemperatureEdit
 	GuiControlGet compoundDropDown
 	
-	for tyrePosition, pressures in getPressures(simulatorDropDown, carDropDown, trackDropDown, weatherDropDown, airTemperatureEdit, trackTemperatureEdit, compoundDropDown)
-		for ignore, postfix in ["1", "2", "3", "4", "5"] {
-			GuiControl Text, %tyrePosition%Pressure%postfix%, 0.0
+	for tyre, pressure in getPressures(simulatorDropDown, carDropDown, trackDropDown, kWeatherOptions[weatherDropDown]
+									 , airTemperatureEdit, trackTemperatureEdit, kTyreCompounds[compoundDropDown]) {
+		if pressure[1] {
+			trackDelta := pressure[3]
+			airDelta := pressure[2] - Round(trackDelta * 0.49)
+			pressure := pressure[1]
+			pressure -= 0.2
+			
+			if ((airDelta == 0) && (trackDelta == 0))
+				Gui RES:Color, D0D0D0, Green
+			else
+				Gui RES:Color, D0D0D0, Lime
+			
+			for index, postfix in ["1", "2", "3", "4", "5"] {
+				pressure := Format("{:.1f}", pressure)
+			
+				GuiControl Text, %tyre%Pressure%postfix%, %pressure%
+				
+				if (index = (3 + airDelta)) {
+					GuiControl +Background, %tyre%Pressure%postfix%
+					GuiControl Enable, %tyre%Pressure%postfix%
+				}
+				else {
+					GuiControl -Background, %tyre%Pressure%postfix%
+					GuiControl Disable, %tyre%Pressure%postfix%
+				}
+			
+				pressure += 0.1
+			}
 		}
+		else
+			for index, postfix in ["1", "2", "3", "4", "5"] {
+				GuiControl Text, %tyre%Pressure%postfix%, 0.0
+				GuiControl -Background, %tyre%Pressure%postfix%
+				GuiControl Disable, %tyre%Pressure%postfix%
+			}
+	}
 }
 
 showSetups(command := false, simulator := false, car := false, track := false) {
@@ -252,7 +375,7 @@ showSetups(command := false, simulator := false, car := false, track := false) {
 
 		Gui RES:Font, Norm, Arial
 				
-		Gui RES:Add, Button, x160 y450 w80 h23 Default gcloseSetups, % translate("Close")
+		Gui RES:Add, Button, x160 y390 w80 h23 Default gcloseSetups, % translate("Close")
 		
 		Gui RES:Add, Text, x16 y60 w105 h23 +0x200, % translate("Simulator")
 		
@@ -263,7 +386,7 @@ showSetups(command := false, simulator := false, car := false, track := false) {
 			chosen := 1
 		}
 		
-		Gui RES:Add, DropDownList, x106 y60 w204 Choose%chosen% gchooseSimulator vsimulatorDropDown, % values2String("|", choices*)
+		Gui RES:Add, DropDownList, x106 y60 w276 Choose%chosen% gchooseSimulator vsimulatorDropDown, % values2String("|", choices*)
 		
 		Gui RES:Add, Text, x16 y83 w105 h23 +0x200, % translate("Car / Track")
 		
@@ -280,7 +403,7 @@ showSetups(command := false, simulator := false, car := false, track := false) {
 			chosen := 0
 		}
 		
-		Gui RES:Add, DropDownList, x106 y83 w100 Choose%chosen% gchooseCar vcarDropDown, % values2String("|", ["McL 720"]*)
+		Gui RES:Add, DropDownList, x106 y83 w144 Choose%chosen% gchooseCar vcarDropDown, % values2String("|", choices*)
 		
 		if (simulator && car && track) {
 			choices := getTracks(simulator, car)
@@ -295,29 +418,24 @@ showSetups(command := false, simulator := false, car := false, track := false) {
 			chosen := 0
 		}
 		
-		Gui RES:Add, DropDownList, x210 y83 w100 Choose%chosen% gchooseTrack vtrackDropDown, % values2String("|", ["Barcelona"]*)
+		Gui RES:Add, Text, x250 y83 w20 h23 +0x200 Center, % translate("/")
+		Gui RES:Add, DropDownList, x270 y83 w112 Choose%chosen% gchooseTrack vtrackDropDown, % values2String("|", choices*)
 		
 		Gui RES:Add, Text, x16 y106 w105 h23 +0x200, % translate("Conditions")
 		choices := map(kWeatherOptions, "translate")
-		Gui RES:Add, DropDownList, x106 y106 w100 gloadPressures vweatherDropDown, % values2String("|", choices*)
+		Gui RES:Add, DropDownList, x106 y106 w100 AltSubmit gloadPressures vweatherDropDown, % values2String("|", choices*)
 		
-		Gui RES:Add, Edit, x210 y106 w40 -Background gloadPressures vairTemperatureEdit, % "19"
-		Gui RES:Add, UpDown, x242 yp-2 w18 h20, % "20"
-		Gui RES:Font, c505050 s8
-		Gui RES:Add, Text, x210 y126 w40 h23, % translate("Air")
-		Gui RES:Font, Norm cBlack, Arial
-		Gui RES:Add, Text, x250 y106 w20 h23 +0x200 Center, % translate("/")
+		Gui RES:Add, Edit, x210 y106 w40 -Background gloadPressures vairTemperatureEdit
+		Gui RES:Add, UpDown, x242 yp-2 w18 h20, % "23"
+		Gui RES:Add, Text, x252 y106 w140 h23 +0x200, % translate("Temp. Air (Celsius)")
 		
-		Gui RES:Add, Edit, x270 y106 w40 -Background gloadPressures vtrackTemperatureEdit, % "20"
-		Gui RES:Add, UpDown, x302 yp-2 w18 h20, % "20"
-		Gui RES:Add, Text, x318 y106 w60 h23 +0x200, % translate("Deg. Celsius")
-		Gui RES:Font, c505050 s8
-		Gui RES:Add, Text, x270 y126 w40 h23, % translate("Track")
-		Gui RES:Font, Norm cBlack, Arial
+		Gui RES:Add, Edit, x210 y130 w40 -Background gloadPressures vtrackTemperatureEdit
+		Gui RES:Add, UpDown, x242 yp-2 w18 h20, % "27"
+		Gui RES:Add, Text, x252 y130 w140 h23 +0x200, % translate("Temp. Track (Celsius)")
 		
 		tabs := map(["Tyres"], "translate")
 
-		Gui RES:Add, Tab3, x8 y139 w380 h304 -Wrap, % values2String("|", tabs*)
+		Gui RES:Add, Tab3, x8 y159 w380 h224 -Wrap, % values2String("|", tabs*)
 
 		Gui Tab, 1
 
@@ -325,7 +443,7 @@ showSetups(command := false, simulator := false, car := false, track := false) {
 		
 		choices := map(kTyreCompounds, "translate")
 		
-		Gui RES:Add, DropDownList, x106 yp w100 gloadPressures vcompoundDropDown, % values2String("|", choices*)
+		Gui RES:Add, DropDownList, x106 yp w100 AltSubmit gloadPressures vcompoundDropDown, % values2String("|", choices*)
 
 		Gui RES:Font, Norm, Arial
 		Gui RES:Font, Bold Italic, Arial
@@ -335,35 +453,37 @@ showSetups(command := false, simulator := false, car := false, track := false) {
 
 		Gui RES:Font, Norm, Arial
 		
-		Gui RES:Add, Text, x16 yp+30 w85 h23 +0x200, % translate("Front Left")
-		Gui RES:Add, Edit, x106 yp w50 Disabled Center vflPressure1, % "26.1"
-		Gui RES:Add, Edit, x160 yp w50 Disabled Center vflPressure2, % "26.2"
-		Gui RES:Add, Edit, x214 yp w50 Center +Background cWhite vflPressure3, % "26.3"
-		Gui RES:Add, Edit, x268 yp w50 Disabled Center vflPressure4, % "26.4"
-		Gui RES:Add, Edit, x322 yp w50 Disabled Center vflPressure5, % "26.5"
+		Gui RES:Add, Text, x16 yp+30 w85 h23 +0x200, % translate("Front Left (PSI)")
+		Gui RES:Add, Edit, x106 yp w50 Disabled Center vflPressure1, 0.0
+		Gui RES:Add, Edit, x160 yp w50 Disabled Center vflPressure2, 0.0
+		Gui RES:Add, Edit, x214 yp w50 Center +Background vflPressure3, 0.0
+		Gui RES:Add, Edit, x268 yp w50 Disabled Center vflPressure4, 0.0
+		Gui RES:Add, Edit, x322 yp w50 Disabled Center vflPressure5, 0.0
 		
-		Gui RES:Add, Text, x16 yp+30 w85 h23 +0x200, % translate("Front Right")
-		Gui RES:Add, Edit, x106 yp w50 Disabled Center vfrPressure1, % "26.1"
-		Gui RES:Add, Edit, x160 yp w50 Disabled Center vfrPressure2, % "26.2"
-		Gui RES:Add, Edit, x214 yp w50 Center +Background cWhite vfrPressure3, % "26.3"
-		Gui RES:Add, Edit, x268 yp w50 Disabled Center vfrPressure4, % "26.4"
-		Gui RES:Add, Edit, x322 yp w50 Disabled Center vfrPressure5, % "26.5"
+		Gui RES:Add, Text, x16 yp+30 w85 h23 +0x200, % translate("Front Right (PSI)")
+		Gui RES:Add, Edit, x106 yp w50 Disabled Center vfrPressure1, 0.0
+		Gui RES:Add, Edit, x160 yp w50 Disabled Center vfrPressure2, 0.0
+		Gui RES:Add, Edit, x214 yp w50 Center +Background vfrPressure3, 0.0
+		Gui RES:Add, Edit, x268 yp w50 Disabled Center vfrPressure4, 0.0
+		Gui RES:Add, Edit, x322 yp w50 Disabled Center vfrPressure5, 0.0
 		
-		Gui RES:Add, Text, x16 yp+30 w85 h23 +0x200, % translate("Rear Left")
-		Gui RES:Add, Edit, x106 yp w50 Disabled Center vrlPressure1, % "26.1"
-		Gui RES:Add, Edit, x160 yp w50 Disabled Center vrlPressure2, % "26.2"
-		Gui RES:Add, Edit, x214 yp w50 Center +Background cWhite vrlPressure3, % "26.3"
-		Gui RES:Add, Edit, x268 yp w50 Disabled Center vrlPressure4, % "26.4"
-		Gui RES:Add, Edit, x322 yp w50 Disabled Center vrlPressure5, % "26.5"
+		Gui RES:Add, Text, x16 yp+30 w85 h23 +0x200, % translate("Rear Left (PSI)")
+		Gui RES:Add, Edit, x106 yp w50 Disabled Center vrlPressure1, 0.0
+		Gui RES:Add, Edit, x160 yp w50 Disabled Center vrlPressure2, 0.0
+		Gui RES:Add, Edit, x214 yp w50 Center +Background vrlPressure3, 0.0
+		Gui RES:Add, Edit, x268 yp w50 Disabled Center vrlPressure4, 0.0
+		Gui RES:Add, Edit, x322 yp w50 Disabled Center vrlPressure5, 0.0
 		
-		Gui RES:Add, Text, x16 yp+30 w85 h23 +0x200, % translate("Rear Right")
-		Gui RES:Add, Edit, x106 yp w50 Disabled Center vrrPressure1, % "26.1"
-		Gui RES:Add, Edit, x160 yp w50 Disabled Center vrrPressure2, % "26.2"
-		Gui RES:Add, Edit, x214 yp w50 Center +Background cWhite vrrPressure3, % "26.3"
-		Gui RES:Add, Edit, x268 yp w50 Disabled Center vrrPressure4, % "26.4"
-		Gui RES:Add, Edit, x322 yp w50 Disabled Center vrrPressure5, % "26.5"
+		Gui RES:Add, Text, x16 yp+30 w85 h23 +0x200, % translate("Rear Right (PSI)")
+		Gui RES:Add, Edit, x106 yp w50 Disabled Center vrrPressure1, 0.0
+		Gui RES:Add, Edit, x160 yp w50 Disabled Center vrrPressure2, 0.0
+		Gui RES:Add, Edit, x214 yp w50 Center +Background vrrPressure3, 0.0
+		Gui RES:Add, Edit, x268 yp w50 Disabled Center vrrPressure4, 0.0
+		Gui RES:Add, Edit, x322 yp w50 Disabled Center vrrPressure5, 0.0
 
 		Gui RES:Show, AutoSize Center
+		
+		chooseSimulator()
 		
 		Loop {
 			Loop {

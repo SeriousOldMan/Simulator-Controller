@@ -1442,7 +1442,11 @@ remove(list, object) {
 	return result
 }
 
-bubbleSort(ByRef array, comparator) {
+greaterComparator(a, b) {
+	return a > b
+}
+
+bubbleSort(ByRef array, comparator := "greaterComparator") {
 	n := array.Length()
 
 	while (n > 1) {

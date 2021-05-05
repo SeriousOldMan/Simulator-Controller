@@ -215,7 +215,7 @@ getPressures(simulator, car, track, weather, airTemperature, trackTemperature, c
 		airDelta := deltas[A_Index]
 		pressures := {FL: {}, FR: {}, RL: {}, RR: {}}
 		
-		for ignore, trackDelta in [0, 1, -1] {
+		for ignore, trackDelta in [0, 1, -1, 2, -2] {
 			readPressures(kSetupDatabaseDirectory . "local\" . path, airTemperature + airDelta, trackTemperature + trackDelta, pressures)
 			
 			if vIncludeGlobalDatabase

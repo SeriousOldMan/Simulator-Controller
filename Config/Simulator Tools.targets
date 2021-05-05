@@ -16,6 +16,7 @@ Release 2.8=Release 2.7 -> updateTranslations, updatePhraseGrammars, updatePlugi
 Release 2.8.2=Release 2.8 -> updateTranslations, updateConfigurationForV282, updatePluginLabels
 Release 2.8.5=Release 2.8.2 -> updateTranslations, updatePhraseGrammars, updatePluginsForV285, updatePluginLabels
 Release 2.8.6=Release 2.8.5 -> updateTranslations, updatePluginLabels
+Release 3.0=Release 2.8.6 -> updateTranslations
 [Cleanup]
 Binaries Folder=%kBinariesDirectory%
 Logs Folder=%kLogsDirectory%

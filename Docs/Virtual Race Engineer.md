@@ -329,6 +329,8 @@ You have to enter all the fields in the upper area to specify the simulation, ca
 
 With the dropdown menu in the lower left corner you can choose, whether only your own setups (=> "Local") will be included in the database search or that also the setups of othe users of Simulator Controller might be considered (=> "Local & Global"). Since the community setups have not been consolidated yet, these two settings are identical for the moment.
 
+Note: You can use the local database, even if you do not have given consent to share your tyre pressure setups with the community.
+
 ### How it works
 
 Jona uses several statistical models to derive the data, on which the recommendations for the pitstop or other information is based. Therefore it will take some laps, before Jonas conclusion get more and more precise. So be careful, if you let Jona plan a pitstop after you have driven only three or four laps. You might end up with not enough fuel to reach the finish line.

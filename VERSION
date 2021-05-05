@@ -1,8 +1,8 @@
 [Development]
-Version=2.8.7-dev
+Version=3.0.0-dev
 Target=2.8.6-release
-Date=05/04/2021
-Changes=Setup Database Tool
+Date=05/05/2021
+Changes=Setup Database Query Tool
 [Release]
 Version=2.8.6-release
 Date=04/30/2021
@@ -11,4 +11,4 @@ Changes=Integration of the iRacing telemetry information, Refactoring of the sha
 Type=Development
 [Version]
 Release=2.8.6-release
-Development=2.8.7-dev
+Development=3.0.0-dev

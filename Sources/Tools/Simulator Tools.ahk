@@ -1294,8 +1294,10 @@ prepareTargets(ByRef buildProgress, updateOnly) {
 		}
 		
 		for target, arguments in getConfigurationSectionValues(targets, "Build", Object()) {
-			if (arguments = "Special")
-				vSpecialTargets.Push(target)
+			if (arguments = "Special") {
+				if vBuildSettings[target]
+					vSpecialTargets.Push(target)
+			}
 			else {
 				buildProgress += Floor(++counter / 20)
 				build := vBuildSettings[target]

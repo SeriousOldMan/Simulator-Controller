@@ -209,13 +209,11 @@ readPressures(fileName, airTemperature, trackTemperature, pressures) {
 
 getPressures(simulator, car, track, weather, airTemperature, trackTemperature, compound) {
 	path := (getSimulatorCode(simulator) . "\" . car . "\" . track . "\Tyre Setup " . compound . " " . weather . ".data")
-	deltas := [0, 1, -1, 2, -2]
 	
-	Loop 5 {
-		airDelta := deltas[A_Index]
-		pressures := {FL: {}, FR: {}, RL: {}, RR: {}}
-		
+	for ignore, airDelta in [0, 1, -1, 2, -2] {
 		for ignore, trackDelta in [0, 1, -1, 2, -2] {
+			pressures := {FL: {}, FR: {}, RL: {}, RR: {}}
+			
 			readPressures(kSetupDatabaseDirectory . "local\" . path, airTemperature + airDelta, trackTemperature + trackDelta, pressures)
 			
 			if vIncludeGlobalDatabase
@@ -317,7 +315,7 @@ loadPressures() {
 									 , airTemperatureEdit, trackTemperatureEdit, kTyreCompounds[compoundDropDown]) {
 		if pressure[1] {
 			trackDelta := pressure[3]
-			airDelta := pressure[2] - Round(trackDelta * 0.49)
+			airDelta := pressure[2] + Round(trackDelta * 0.49)
 			pressure := pressure[1]
 			pressure -= 0.2
 			
@@ -368,7 +366,7 @@ updateQueryScope() {
 	chooseSimulator()
 }
 
-showSetups(command := false, simulator := false, car := false, track := false, weather := "Dry", airTemperature := 23, trackTemperature := 27) {
+showSetups(command := false, simulator := false, car := false, track := false, weather := "Dry", airTemperature := 23, trackTemperature := 27, compound := "Dry") {
 	static result
 
 	if (command == kClose) {
@@ -433,7 +431,7 @@ showSetups(command := false, simulator := false, car := false, track := false, w
 		
 		if (simulator && car && track) {
 			choices := getTracks(simulator, car)
-			chosen := inList(tracks, track)
+			chosen := inList(choices, track)
 			if (!chosen && (choices.Length() > 0)) {
 				track := choices[1]
 				chosen := 1
@@ -446,6 +444,9 @@ showSetups(command := false, simulator := false, car := false, track := false, w
 		
 		Gui RES:Add, Text, x250 y83 w20 h23 +0x200 Center, % translate("/")
 		Gui RES:Add, DropDownList, x270 y83 w112 Choose%chosen% gchooseTrack vtrackDropDown, % values2String("|", choices*)
+		
+		if (simulator && car && track)
+			chooseTrack()
 		
 		Gui RES:Add, Text, x16 y106 w105 h23 +0x200, % translate("Conditions")
 		choices := map(kWeatherOptions, "translate")
@@ -473,8 +474,12 @@ showSetups(command := false, simulator := false, car := false, track := false, w
 		Gui RES:Add, Text, x16 yp+30 w85 h23 +0x200, % translate("Compound")
 		
 		choices := map(kTyreCompounds, "translate")
-		
-		Gui RES:Add, DropDownList, x106 yp w100 AltSubmit gloadPressures vcompoundDropDown, % values2String("|", choices*)
+		chosen := inList(kTyreCompounds, compound)
+		if (!chosen && (choices.Length() > 0)) {
+			compound := choices[1]
+			chosen := 1
+		}
+		Gui RES:Add, DropDownList, x106 yp w100 AltSubmit Choose%chosen% gloadPressures vcompoundDropDown, % values2String("|", choices*)
 
 		Gui RES:Font, Norm, Arial
 		Gui RES:Font, Bold Italic, Arial
@@ -514,7 +519,10 @@ showSetups(command := false, simulator := false, car := false, track := false, w
 
 		Gui RES:Show, AutoSize Center
 		
-		chooseSimulator()
+		if (simulator && car && track && weather && airTemperature && trackTemperature && compound)
+			loadPressures()
+		else if (!simulator || !car || !track)
+			chooseSimulator()
 		
 		Loop {
 			Loop {
@@ -539,6 +547,7 @@ showRaceEngineerSetups() {
 	weather := "Dry"
 	airTemperature := 23
 	trackTemperature:= 27
+	compound := "Dry"
 	
 	index := 1
 	
@@ -551,7 +560,7 @@ showRaceEngineerSetups() {
 				car := A_Args[index + 1]
 				index += 2
 			case "-Track":
-				track := (A_Args[index + 1] = kTrue) ? true : false
+				track := A_Args[index + 1]
 				index += 2
 			case "-Weather":
 				weather := A_Args[index + 1]
@@ -562,6 +571,9 @@ showRaceEngineerSetups() {
 			case "-TrackT":
 				trackTemperature := A_Args[index + 1]
 				index += 2
+			case "-Compound":
+				compound := A_Args[index + 1]
+				index += 2
 			default:
 				index += 1
 		}
@@ -569,7 +581,7 @@ showRaceEngineerSetups() {
 	
 	vControllerConfiguration := getControllerConfiguration()
 	
-	showSetups(false, simulator, car, track, weather, airTemperature, trackTemperature)
+	showSetups(false, simulator, car, track, weather, airTemperature, trackTemperature, compound)
 	
 	ExitApp 0
 }

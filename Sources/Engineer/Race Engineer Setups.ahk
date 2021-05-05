@@ -303,6 +303,8 @@ chooseTemperature() {
 }
 
 loadPressures() {
+	static lastColor := "Black"
+	
 	GuiControlGet simulatorDropDown
 	GuiControlGet carDropDown
 	GuiControlGet trackDropDown
@@ -320,11 +322,17 @@ loadPressures() {
 			pressure -= 0.2
 			
 			if ((airDelta == 0) && (trackDelta == 0))
-				Gui RES:Color, D0D0D0, Green
+				color := "Green"
 			else if (airDelta == 0)
-				Gui RES:Color, D0D0D0, Lime
+				color := "Lime"
 			else
-				Gui RES:Color, D0D0D0, Yellow
+				color := "Yellow"
+			
+			if (color != lastColor) {
+				lastColor := color
+				
+				Gui RES:Color, D0D0D0, %color%
+			}
 			
 			for index, postfix in ["1", "2", "3", "4", "5"] {
 				pressure := Format("{:.1f}", pressure)

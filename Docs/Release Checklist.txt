@@ -26,6 +26,7 @@ Release 3.0 Checklist
    b. Update Notes
    c. Screenshot
    d. Translations
+   e. openSetupsDocumentation update
 
 Release 2.8.6 Checklist
 =======================

@@ -137,6 +137,8 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 				openRaceEngineerSettings()
 			else if (this.Action = "RaceEngineerImportSettings")
 				openRaceEngineerSettings(true)
+			else if (this.Action = "RaceEngineerOpenSetups")
+				openRaceEngineerSetups()
 		}
 	}
 	
@@ -238,6 +240,11 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 		if raceEngineerImportSettings
 			this.createRaceEngineerAction(controller, "RaceEngineerImportSettings", raceEngineerImportSettings)
 		
+		raceEngineerOpenSetups := this.getArgumentValue("raceEngineerOpenSetups", false)
+		
+		if raceEngineerOpenSetups
+			this.createRaceEngineerAction(controller, "RaceEngineerOpenSetups", raceEngineerOpenSetups)
+		
 		for ignore, theAction in string2Values(",", this.getArgumentValue("raceEngineerCommands", ""))
 			this.createRaceEngineerAction(controller, string2Values(A_Space, theAction)*)
 		
@@ -268,7 +275,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 				this.registerAction(new this.RaceEngineerAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Activate"), action), action))
 			else if (action = "RaceEngineer")
 				this.registerAction(new this.RaceEngineerToggleAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Toggle"), action)))
-			else if ((action = "RaceEngineerOpenSettings") || (action = "RaceEngineerImportSettings"))
+			else if ((action = "RaceEngineerOpenSettings") || (action = "RaceEngineerImportSettings") || (action = "RaceEngineerOpenSetups"))
 				this.registerAction(new this.RaceEngineerSettingsAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Activate")), action))
 			else
 				logMessage(kLogWarn, translate("Action """) . action . translate(""" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
@@ -292,7 +299,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 					theAction.Function.disable()
 			}
 			else if isInstance(theAction, RaceEngineerPlugin.RaceEngineerAction)
-				if (theAction.Action = "RaceEngineerOpenSettings") {
+				if ((theAction.Action = "RaceEngineerOpenSettings") || (theAction.Action = "RaceEngineerOpenSetups")) {
 					theAction.Function.enable(kAllTrigger)
 					theAction.Function.setText(theAction.Label)
 				}
@@ -739,9 +746,42 @@ openRaceEngineerSettings(import := false) {
 		}
 	}
 	catch exception {
-		logMessage(kLogCritical, translate("Cannot start the Race Engineers Settings tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
+		logMessage(kLogCritical, translate("Cannot start the Race Engineer Settings tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 			
-		showMessage(substituteVariables(translate("Cannot start the Race Engineers Settings tool (%exePath%) - please check the configuration..."), {exePath: exePath})
+		showMessage(substituteVariables(translate("Cannot start the Race Engineer Settings tool (%exePath%) - please check the configuration..."), {exePath: exePath})
+				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+	}
+}
+
+openRaceEngineerSetups() {
+	local plugin
+	
+	exePath := kBinariesDirectory . "Race Engineer Setups.exe"
+	
+	try {
+		controller := SimulatorController.Instance
+		plugin := controller.findPlugin(kRaceEngineerPlugin)
+		options := ""
+		
+		if plugin.Simulator {
+			data := readSharedMemory(this.Simulator.Code)
+			
+			if getConfigurationValue(data, "Session Data", "Active", false) {
+				options := "-Simulator " . plugin.Simulator.Simulator
+				options .= " -Car " . getConfigurationValue(data, "Session Data", "Car", "Unknown")
+				options .= " -Track " . getConfigurationValue(data, "Session Data", "Track", "Unknown")
+				options .= " -Weather " . getConfigurationValue(data, "Weather Data", "Weather", "Dry")
+				options .= " -AirT " . getConfigurationValue(data, "Weather Data", "Temperature", "23")
+				options .= " -TrackT " . getConfigurationValue(data, "Track Data", "Temperature", "27")
+			}
+		}
+		
+		Run "%exePath%" %options%, %kBinariesDirectory%, , pid
+	}
+	catch exception {
+		logMessage(kLogCritical, translate("Cannot start the Race Engineer Setups tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
+			
+		showMessage(substituteVariables(translate("Cannot start the Race Engineer Setups tool (%exePath%) - please check the configuration..."), {exePath: exePath})
 				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 	}
 }

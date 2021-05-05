@@ -2,7 +2,7 @@
 Version=3.0.0-dev
 Target=2.8.6-release
 Date=05/05/2021
-Changes=Setup Database Query Tool
+Changes=Setup Database Query Tool, New plugin parameter "openRaceEngineerSetups" for the Race Engineer plugin
 [Release]
 Version=2.8.6-release
 Date=04/30/2021

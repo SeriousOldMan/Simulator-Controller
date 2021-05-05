@@ -368,7 +368,7 @@ updateQueryScope() {
 	chooseSimulator()
 }
 
-showSetups(command := false, simulator := false, car := false, track := false) {
+showSetups(command := false, simulator := false, car := false, track := false, weather := "Dry", airTemperature := 23, trackTemperature := 27) {
 	static result
 
 	if (command == kClose) {
@@ -449,14 +449,19 @@ showSetups(command := false, simulator := false, car := false, track := false) {
 		
 		Gui RES:Add, Text, x16 y106 w105 h23 +0x200, % translate("Conditions")
 		choices := map(kWeatherOptions, "translate")
-		Gui RES:Add, DropDownList, x106 y106 w100 AltSubmit gloadPressures vweatherDropDown, % values2String("|", choices*)
+		chosen := inList(kWeatherOptions, weather)
+		if (!chosen && (choices.Length() > 0)) {
+			weather := choices[1]
+			chosen := 1
+		}
+		Gui RES:Add, DropDownList, x106 y106 w100 AltSubmit Choose%chosen% gloadPressures vweatherDropDown, % values2String("|", choices*)
 		
 		Gui RES:Add, Edit, x210 y106 w40 -Background gloadPressures vairTemperatureEdit
-		Gui RES:Add, UpDown, x242 yp-2 w18 h20, % "23"
+		Gui RES:Add, UpDown, x242 yp-2 w18 h20, % airTemperature
 		Gui RES:Add, Text, x252 y106 w140 h23 +0x200, % translate("Temp. Air (Celsius)")
 		
 		Gui RES:Add, Edit, x210 y130 w40 -Background gloadPressures vtrackTemperatureEdit
-		Gui RES:Add, UpDown, x242 yp-2 w18 h20, % "27"
+		Gui RES:Add, UpDown, x242 yp-2 w18 h20, % trackTemperature
 		Gui RES:Add, Text, x252 y130 w140 h23 +0x200, % translate("Temp. Track (Celsius)")
 		
 		tabs := map(["Tyres"], "translate")
@@ -527,9 +532,44 @@ showRaceEngineerSetups() {
 	
 	Menu Tray, Icon, %icon%, , 1
 	
+	
+	simulator := false
+	car := false
+	track := false
+	weather := "Dry"
+	airTemperature := 23
+	trackTemperature:= 27
+	
+	index := 1
+	
+	while (index < A_Args.Length()) {
+		switch A_Args[index] {
+			case "-Simulator":
+				simulator := A_Args[index + 1]
+				index += 2
+			case "-car":
+				car := A_Args[index + 1]
+				index += 2
+			case "-Track":
+				track := (A_Args[index + 1] = kTrue) ? true : false
+				index += 2
+			case "-Weather":
+				weather := A_Args[index + 1]
+				index += 2
+			case "-AirT":
+				airTemperature := A_Args[index + 1]
+				index += 2
+			case "-TrackT":
+				trackTemperature := A_Args[index + 1]
+				index += 2
+			default:
+				index += 1
+		}
+	}
+	
 	vControllerConfiguration := getControllerConfiguration()
 	
-	showSetups(false, "Assetto Corsa Competizione")
+	showSetups(false, simulator, car, track, weather, airTemperature, trackTemperature)
 	
 	ExitApp 0
 }

@@ -191,11 +191,12 @@ The optional parameter *controlApplication* let you provide the name of the conf
 The "Race Engineer" plugin handles the interaction of the currently active simulation as represented by the plugins "ACC", "RF2", "R3E", and so on, and Jona, the Virtual Race Engineer. If one of these simulation is started, the "Race Engineer" plugin will be automatically activated, and will start Jona in the background according to the configuration arguments described below. The following configuration parameters allow you to customize Jona to your preferences:
 
 	raceEngineer: *initialState* *onOffFunction*; raceEngineerName: *name*; raceEngineerLogo: true or false;
-	raceEngineerOpenSettings: *settingsFunction*; raceEngineerImportSettings: *importFunction*;
+	raceEngineerOpenSettings: *settingsFunction*; raceEngineerImportSettings: *importFunction*; raceEngineerOpenSetups: *settingsFunction*;
 	raceEngineerSpeaker: false, true or *Microsoft Speech Generation Language*;
 	raceEngineerListener: false, true or *Microsoft Speech Recognition Language*
 	
 For Jona to be generally available, you must supply an argument for the *raceEngineerName* parameter. You can define a function on your hardware controller with the parameter *raceEngineer*, to enable or disable the Virtual Race Engineer dynamically. *initialState* must be either "On" or "Off" and for *onOffFunction* unary and binary functions are supported. The function will be bound to a plugin action. Additionally, the parameter *raceEngineerOpenSettings* allows you to bind a plugin action to your hardware controller, which opens the Race Engineer [settings dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-engineer-settings), which you will use before a race to give Jona the necessary information about your car setup and other stuff. As an alternative you can use the plugin action *raceEngineerImportSettings* to import the current tyre setup data only, without opening the settings dialog. Nevertheless, you will get a notification, when the setup has been imported successfully.
+Last, but not least, with *raceEngineerOpenSetups* you can open the [setup database query tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#querying-the-setup-database). If a simulation is currently running, most of the query arguments will already be prefilled. 
 
 Note: If you disable Jona during an active race, the Race Engineer will stop working immediately. You can also enable Jona at the beginning of a race, but only until you cross the start/finish line for the first time. If you enable Jona after the initial lap, Jona will not be available until the next session. 
 

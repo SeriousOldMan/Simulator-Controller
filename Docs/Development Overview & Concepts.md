@@ -204,7 +204,7 @@ A plugin must create an object that implements the protocol shown below, and mus
 	editor := ConfigurationEditor.Instance
 	editor.registerConfigurator(translate("Chat"), new ChatMessagesConfigurator(editor.Configuration))
 	
-The first argument for [registorConfigurator](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#registerconfiguratorlabel--string-configurator--configurationitem) must supply a label for the editor tab used for the configuration plugin and the second argument represents the configurator object mentioned above. Before you register your own configurators, you can remove one or more of the predefined configurators using the method *unregisterConfigurator* of the editor:
+The first argument for [registerConfigurator](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#registerconfiguratorlabel--string-configurator--configurationitem) must supply a label for the editor tab used for the configuration plugin and the second argument represents the configurator object mentioned above. Before you register your own configurators, you can remove one or more of the predefined configurators using the method *unregisterConfigurator* of the editor:
 
 	editor := ConfigurationEditor.Instance
 	editor.unregisterConfigurator(translate("Chat"))

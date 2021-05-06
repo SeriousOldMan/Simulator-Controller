@@ -232,7 +232,7 @@ Registers the given configurator and creates a tab with the given label for it i
 The method *createGui* is called by the *editor* to create the controls for the configuration plugin. All controls must be created using the AutoHotkey *Gui* command in the window defined by *editor.Window* in the boundaries *x* <-> (*x* + *width*) and *y* <-> (*y* + *height*).
 *loadFromConfiguration* (inherited from [ConfigurationItem][https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-classesahk]) is called during the initialization process. It must load the initial state from the configuration. Please note, that the *createGui* method had not been called yet. The third method of the protocol, *saveToConfiguration* (also inherited from *ConfigurationItem*), will be called, whenever the user wants to save the current state of the configuration tool.
 
-#### *unregisterConfigurator(labelOrConfigurator :: TypeUnion(String, Object))
+#### *unregisterConfigurator(labelOrConfigurator :: TypeUnion(String, Object))*
 Removes a configurator (either identified directly as argument or identified by the label, which had been supplied, when registering the configurator), from the configuration tool.
 
 #### *show()*

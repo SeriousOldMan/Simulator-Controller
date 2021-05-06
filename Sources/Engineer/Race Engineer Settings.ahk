@@ -581,7 +581,9 @@ restart:
 		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit2 Number VspPitstopTyreSetEdit, %spPitstopTyreSetEdit%
 		Gui RES:Add, UpDown, x138 yp-2 w18 h20, %spPitstopTyreSetEdit%
 		
-		Gui RES:Add, Button, x292 yp w90 h23 gimportFromSimulation, % translate("Import")
+		Gui RES:Add, Button, x292 yp-25 w90 h23 gopenSetupDatabase, % translate("Database...")
+		
+		Gui RES:Add, Button, x292 yp+25 w90 h23 gimportFromSimulation, % translate("Import")
 
 		Gui RES:Font, Norm, Arial
 		Gui RES:Font, Italic, Arial
@@ -697,6 +699,20 @@ readSharedMemory(simulator) {
 	}
 	
 	return readConfiguration(dataFile)
+}
+
+openSetupDatabase() {
+	exePath := kBinariesDirectory . "Race Engineer Setups.exe"
+	
+	try {
+		Run "%exePath%", %kBinariesDirectory%, , pid
+	}
+	catch exception {
+		logMessage(kLogCritical, translate("Cannot start the Race Engineer Setups tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
+			
+		showMessage(substituteVariables(translate("Cannot start the Race Engineer Setups tool (%exePath%) - please check the configuration..."), {exePath: exePath})
+				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+	}
 }
 
 importFromSimulation(message := false, simulator := false, prefix := false, settings := false) {

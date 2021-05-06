@@ -1294,27 +1294,25 @@ prepareTargets(ByRef buildProgress, updateOnly) {
 		}
 		
 		for target, arguments in getConfigurationSectionValues(targets, "Build", Object()) {
-			if (arguments = "Special") {
-				if vBuildSettings[target]
+			buildProgress += Floor(++counter / 20)
+			build := vBuildSettings[target]
+			
+			if !kSilentMode
+				showProgress({progress: buildProgress, message: target . ": " . (build ? translate("Yes") : translate("No"))})
+			
+			if build {
+				if (arguments = "Special")
 					vSpecialTargets.Push(target)
-			}
-			else {
-				buildProgress += Floor(++counter / 20)
-				build := vBuildSettings[target]
-				
-				if !kSilentMode
-					showProgress({progress: buildProgress, message: target . ": " . (build ? translate("Yes") : translate("No"))})
-				
-				if build {
+				else {
 					rule := string2Values("<-", substituteVariables(arguments))
 					
 					arguments := string2Values(";", rule[2])
 				
 					vBuildTargets.Push(Array(target, arguments[1], rule[1], string2Values(",", arguments[2])))
 				}
-			
-				Sleep 50
 			}
+		
+			Sleep 50
 		}
 	}
 }

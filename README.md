@@ -26,7 +26,9 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-[3.0.0-dev](https://www.dropbox.com/s/kyo9xqk6ljrvx90/Simulator%20Controller%203.0.0-dev.zip?dl=1) (New features: Query interface for the setup database, New plugin parameter "openRaceEngineerSetups" for the Race Engineer plugin. Feature complete and documented, but no automated update procedure.)
+[3.0.0-rc1](https://www.dropbox.com/s/tgys01mwu6sghvo/Simulator%20Controller%203.0.0-rc1.zip?dl=1) (Release candidate for Release 3.0. New features: Query interface for the setup database, New plugin parameter "openRaceEngineerSetups" for the Race Engineer plugin. Feature complete and documented incl. automated update procedure.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-30) of this version and all the versions you might have skipped, before installing and using this version.
 
 #### Latest release builds
 

@@ -763,20 +763,19 @@ openRaceEngineerSetups() {
 		plugin := controller.findPlugin(kRaceEngineerPlugin)
 		options := ""
 		
-		/*if plugin.Simulator {
-			data := readSharedMemory(this.Simulator.Code)
+		if plugin.Simulator {
+			data := readSharedMemory(plugin.Simulator.Code)
 			
 			if getConfigurationValue(data, "Session Data", "Active", false) {
-			*/
-				options := "-Simulator """ . plugin.Simulator.Simulator . """"
+				options := "-Simulator """ . plugin.Simulator.runningSimulator() . """"
 				options .= " -Car """ . getConfigurationValue(data, "Session Data", "Car", "Unknown") . """"
 				options .= " -Track """ . getConfigurationValue(data, "Session Data", "Track", "Unknown") . """"
 				options .= " -Weather " . getConfigurationValue(data, "Weather Data", "Weather", "Dry")
 				options .= " -AirT " . getConfigurationValue(data, "Weather Data", "Temperature", "23")
 				options .= " -TrackT " . getConfigurationValue(data, "Track Data", "Temperature", "27")
 				options .= " -Compound " . getConfigurationValue(data, "Car Data", "TyreCompound", "Dry")
-			;}
-		;}
+			}
+		}
 		
 		Run "%exePath%" %options%, %kBinariesDirectory%, , pid
 	}

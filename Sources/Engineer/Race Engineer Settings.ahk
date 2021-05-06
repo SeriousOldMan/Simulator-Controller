@@ -705,7 +705,14 @@ openSetupDatabase() {
 	exePath := kBinariesDirectory . "Race Engineer Setups.exe"
 	
 	try {
-		Run "%exePath%", %kBinariesDirectory%, , pid
+		options := []
+		
+		for ignore, arg in A_Args
+			options.Push("""" . arg . """")
+		
+		options := values2String(A_Space, options*)
+		
+		Run "%exePath%" %options%, %kBinariesDirectory%, , pid
 	}
 	catch exception {
 		logMessage(kLogCritical, translate("Cannot start the Race Engineer Setups tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))

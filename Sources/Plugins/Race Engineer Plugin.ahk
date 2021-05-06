@@ -736,8 +736,11 @@ openRaceEngineerSettings(import := false) {
 			
 			Run "%exePath%" %options%, %kBinariesDirectory%, , pid
 		}
-		else
-			Run "%exePath%", %kBinariesDirectory%, , pid
+		else {
+			options := getOptions()
+			
+			Run "%exePath%" %options%, %kBinariesDirectory%, , pid
+		}
 		
 		if pid {
 			callback := ObjBindMethod(plugin, "reloadSettings", pid, getFileName("Race Engineer.settings", kUserConfigDirectory, kConfigDirectory))
@@ -754,28 +757,10 @@ openRaceEngineerSettings(import := false) {
 }
 
 openRaceEngineerSetups() {
-	local plugin
-	
 	exePath := kBinariesDirectory . "Race Engineer Setups.exe"
 	
 	try {
-		controller := SimulatorController.Instance
-		plugin := controller.findPlugin(kRaceEngineerPlugin)
-		options := ""
-		
-		if plugin.Simulator {
-			data := readSharedMemory(plugin.Simulator.Code)
-			
-			if getConfigurationValue(data, "Session Data", "Active", false) {
-				options := "-Simulator """ . plugin.Simulator.runningSimulator() . """"
-				options .= " -Car """ . getConfigurationValue(data, "Session Data", "Car", "Unknown") . """"
-				options .= " -Track """ . getConfigurationValue(data, "Session Data", "Track", "Unknown") . """"
-				options .= " -Weather " . getConfigurationValue(data, "Weather Data", "Weather", "Dry")
-				options .= " -AirT " . getConfigurationValue(data, "Weather Data", "Temperature", "23")
-				options .= " -TrackT " . getConfigurationValue(data, "Track Data", "Temperature", "27")
-				options .= " -Compound " . getConfigurationValue(data, "Car Data", "TyreCompound", "Dry")
-			}
-		}
+		options := getOptions()
 		
 		Run "%exePath%" %options%, %kBinariesDirectory%, , pid
 	}
@@ -822,6 +807,30 @@ readSharedMemory(simulator, options := "", dataFile := false) {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+getOptions() {
+	local plugin
+	
+	controller := SimulatorController.Instance
+	plugin := controller.findPlugin(kRaceEngineerPlugin)
+	options := ""
+	
+	if plugin.Simulator {
+		data := readSharedMemory(plugin.Simulator.Code)
+		
+		if getConfigurationValue(data, "Session Data", "Active", false) {
+			options := "-Simulator """ . plugin.Simulator.runningSimulator() . """"
+			options .= " -Car """ . getConfigurationValue(data, "Session Data", "Car", "Unknown") . """"
+			options .= " -Track """ . getConfigurationValue(data, "Session Data", "Track", "Unknown") . """"
+			options .= " -Weather " . getConfigurationValue(data, "Weather Data", "Weather", "Dry")
+			options .= " -AirT " . getConfigurationValue(data, "Weather Data", "Temperature", "23")
+			options .= " -TrackT " . getConfigurationValue(data, "Track Data", "Temperature", "27")
+			options .= " -Compound " . getConfigurationValue(data, "Car Data", "TyreCompound", "Dry")
+		}
+	}
+	
+	return options
+}
 
 updateSessionState() {
 	protectionOn()

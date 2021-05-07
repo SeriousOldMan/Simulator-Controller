@@ -205,9 +205,9 @@ With *true* supplied for *raceEngineerLogo*, Jona will show a nice rotating AI b
 It is possible, although not much fun, to use Jona without its natural language interface. Only the pitstop planning and setup capabilities are available in this cconfiguration, but it is still useful. You can use the following parameters to connect these actions to your controller hardware:
 
 	raceEngineerCommands: PitstopPlan *function*, PitstopPrepare *function*;
-	accept: *acceptFunction*; reject: *rejectFunction*
+	Accept: *acceptFunction*; Reject: *rejectFunction*
 	
-All these will be bound to the plugin itself, thereby are available all the time, and only unary functions are supported here. By using this actions, you will be able to use Jona with voice output, but no voice control, thereby getting most of the support from Jona, but you have to use an *oldschool* interface to control the engineer actions. To *answer* "Yes" to one of the questions of Jona, you must supply a controller function, for example a push button function, to the *accept* parameter and for "No", you must use the *reject* parameter.
+All these will be bound to the plugin itself, thereby are available all the time, and only unary functions are supported here. By using this actions, you will be able to use Jona with voice output, but no voice control, thereby getting most of the support from Jona, but you have to use an *oldschool* interface to control the engineer actions. To *answer* "Yes" to one of the questions of Jona, you must supply a controller function, for example a push button function, to the *Accept* parameter and for "No", you must use the *Reject* parameter.
 
 Note: The *raceEngineerCommands* actions are also available in most of the simulation plugins, which define a "Pitstop" mode.
 
@@ -270,7 +270,7 @@ See the following table for the supported settings.
 | Accept | Accepts the last recommendation of the virtual race engineer. Useful, if you don't want to use voice commands to interact with Jona. |
 | Reject | Cancels or rejectes the last recommendation of the virtual race engineer. Useful, if you don't want to use voice commands to interact with Jona. |
 
-See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan* and *PitstopPrepare*.
+See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *PitstopPrepare*, *Accept* and *Reject*.
 
 Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) for more information.
 
@@ -336,7 +336,7 @@ See the following table for the supported settings.
 | Accept | Accepts the last recommendation of the virtual race engineer. Useful, if you don't want to use voice commands to interact with Jona. |
 | Reject | Cancels or rejectes the last recommendation of the virtual race engineer. Useful, if you don't want to use voice commands to interact with Jona. |
 
-See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan* and *PitstopPrepare*.
+See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *PitstopPrepare*, *Accept* and *Reject*.
 
 Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) for more information.
 
@@ -387,7 +387,7 @@ See the following table for the supported settings.
 | Accept | Accepts the last recommendation of the virtual race engineer. Useful, if you don't want to use voice commands to interact with Jona. |
 | Reject | Cancels or rejectes the last recommendation of the virtual race engineer. Useful, if you don't want to use voice commands to interact with Jona. |
 
-See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan* and *PitstopPrepare*.
+See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *PitstopPrepare*, *Accept* and *Reject*.
 
 Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) for more information.
 
@@ -432,7 +432,7 @@ See the following table for the supported settings.
 | Accept | Accepts the last recommendation of the virtual race engineer. Useful, if you don't want to use voice commands to interact with Jona. |
 | Reject | Cancels or rejectes the last recommendation of the virtual race engineer. Useful, if you don't want to use voice commands to interact with Jona. |
 
-See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan* and *PitstopPrepare*.
+See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *PitstopPrepare*, *Accept* and *Reject*.
 
 Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) for more information.### Important preparation for the Pitstop MFD handling
 

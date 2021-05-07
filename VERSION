@@ -1,14 +1,14 @@
 [Development]
-Version=3.0.0-rc1
-Target=2.8.6-release
-Date=05/06/2021
+Version=3.0.0-release
+Target=3.0.0-release
+Date=05/07/2021
 Changes=Setup Database Query Tool, New plugin parameter "openRaceEngineerSetups" for the Race Engineer plugin
 [Release]
-Version=2.8.6-release
-Date=04/30/2021
+Version=3.0.0-release
+Date=05/07/2021
 Changes=Integration of the iRacing telemetry information, Refactoring of the shared memory data fields, Pitstop mode for iRacing plugin, Jona integration incl. pitstop handling for iRacing, Accept and Reject actions for the Race Engineer Plugin, which are aquivalent to the corrsponding voice commands
 [Current]
-Type=Development
+Type=Release
 [Version]
-Release=2.8.6-release
-Development=3.0.0-rc1
+Release=3.0.0-release
+Development=3.0.0-release

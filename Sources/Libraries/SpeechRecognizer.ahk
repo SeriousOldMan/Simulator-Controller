@@ -50,9 +50,9 @@ class SpeechRecognizer {
 			this.RecognizerList := this.createRecognizerList()
 			
 			if (this.RecognizerList.Length() == 0) {
-				logMessage(kLogCritical, translate("No languages found while initializing speech recognition system - please check the configuration"))
+				logMessage(kLogCritical, translate("No languages found while initializing speech recognition system - please install the speech recognition software"))
 				
-				showMessage(translate("No languages found while initializing speech recognition system - please check the configuration") . translate("...")
+				showMessage(translate("No languages found while initializing speech recognition system - please install the speech recognition software") . translate("...")
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
 			
@@ -78,9 +78,9 @@ class SpeechRecognizer {
 			this.initialize(recognizer ? recognizer : 0)
 		}
 		catch exception {
-			logMessage(kLogCritical, translate("Error while initializing speech recognition module - please check the configuration"))
+			logMessage(kLogCritical, translate("Error while initializing speech recognition module - please install the speech recognition software"))
 			
-			showMessage(translate("Error while initializing speech recognition module - please check the configuration") . translate("...")
+			showMessage(translate("Error while initializing speech recognition module - please install the speech recognition software") . translate("...")
 					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 		}
 	}

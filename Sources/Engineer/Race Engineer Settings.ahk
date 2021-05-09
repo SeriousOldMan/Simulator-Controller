@@ -710,6 +710,12 @@ openSetupDatabase() {
 		for ignore, arg in A_Args
 			options.Push("""" . arg . """")
 		
+		options.Push("-Settings")
+		
+		Process Exist
+		
+		options.Push(ErrorLevel)
+		
 		options := values2String(A_Space, options*)
 		
 		Run "%exePath%" %options%, %kBinariesDirectory%, , pid
@@ -853,10 +859,56 @@ showRaceEngineerSettingsEditor() {
 		
 		writeConfiguration(kRaceEngineerSettingsFile, settings)
 	}
-	else if (editSettings(settings) == kOk)
-		writeConfiguration(kRaceEngineerSettingsFile, settings)
+	else {
+		registerEventHandler("Setup", "handleSetupRemoteCalls")
+	
+		if (editSettings(settings) == kOk)
+			writeConfiguration(kRaceEngineerSettingsFile, settings)
+	}
 	
 	ExitApp 0
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                          Event Handler Section                          ;;;
+;;;-------------------------------------------------------------------------;;;
+
+setTyrePressures(compound, flPressure, frPressure, rlPressure, rrPressure) {
+	Gui RES:Default
+			
+	if InStr(compound, "Wet") {
+		spWetFrontLeftEdit := Round(flPressure, 1)
+		spWetFrontRightEdit := Round(frPressure, 1)
+		spWetRearLeftEdit := Round(rlPressure, 1)
+		spWetRearRightEdit := Round(rrPressure, 1)
+		
+		GuiControl Text, spWetFrontLeftEdit, %spWetFrontLeftEdit%
+		GuiControl Text, spWetFrontRightEdit, %spWetFrontRightEdit%
+		GuiControl Text, spWetRearLeftEdit, %spWetRearLeftEdit%
+		GuiControl Text, spWetRearRightEdit, %spWetRearRightEdit%
+	}
+	else {
+		spDryFrontLeftEdit := Round(flPressure, 1)
+		spDryFrontRightEdit := Round(frPressure, 1)
+		spDryRearLeftEdit := Round(rlPressure, 1)
+		spDryRearRightEdit := Round(rrPressure, 1)
+		
+		GuiControl Text, spDryFrontLeftEdit, %spDryFrontLeftEdit%
+		GuiControl Text, spDryFrontRightEdit, %spDryFrontRightEdit%
+		GuiControl Text, spDryRearLeftEdit, %spDryRearLeftEdit%
+		GuiControl Text, spDryRearRightEdit, %spDryRearRightEdit%
+	}
+}
+
+handleSetupRemoteCalls(event, data) {
+	if InStr(data, ":") {
+		data := StrSplit(data, ":", , 2)
+	
+		return withProtection(data[1], string2Values(";", data[2])*)
+	}
+	else
+		return withProtection(data)
 }
 
 

@@ -45,6 +45,8 @@ global kTyreCompounds = ["Wet", "Dry", "Dry (Red)", "Dry (White)", "Dry (Blue)"]
 ;;;                   Private Variable Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+global vSettingsPID = false
+
 global vControllerConfiguration = false
 global vIncludeGlobalDatabase = false
 
@@ -56,6 +58,7 @@ global airTemperatureEdit
 global trackTemperatureEdit
 global compoundDropDown
 
+global transferPressuresButton
 global queryScopeDropDown
 
 global flPressure1
@@ -348,13 +351,18 @@ loadPressures() {
 			
 				pressure += 0.1
 			}
+		
+			GuiControl Enable, transferPressuresButton
 		}
-		else
+		else {
 			for index, postfix in ["1", "2", "3", "4", "5"] {
 				GuiControl Text, %tyre%Pressure%postfix%, 0.0
 				GuiControl -Background, %tyre%Pressure%postfix%
 				GuiControl Disable, %tyre%Pressure%postfix%
 			}
+		
+			GuiControl Disable, transferPressuresButton
+		}
 	}
 }
 
@@ -364,6 +372,25 @@ updateQueryScope() {
 	vIncludeGlobalDatabase := (queryScopeDropDown - 1)
 		
 	chooseSimulator()
+}
+
+transferPressures() {
+	GuiControlGet simulatorDropDown
+	GuiControlGet carDropDown
+	GuiControlGet trackDropDown
+	GuiControlGet weatherDropDown
+	GuiControlGet airTemperatureEdit
+	GuiControlGet trackTemperatureEdit
+	GuiControlGet compoundDropDown
+	
+	compound := kTyreCompounds[compoundDropDown]
+	tyrePressures := []
+	
+	for ignore, pressure in getPressures(simulatorDropDown, carDropDown, trackDropDown, kWeatherOptions[weatherDropDown]
+									   , airTemperatureEdit, trackTemperatureEdit, compound)
+		tyrePressures.Push(pressure[1])
+	
+	raiseEvent(kFileMessage, "Setup", "setTyrePressures:" . values2String(";", compound, tyrePressures*), vSettingsPID)
 }
 
 showSetups(command := false, simulator := false, car := false, track := false, weather := "Dry", airTemperature := 23, trackTemperature := 27, compound := "Dry") {
@@ -400,6 +427,9 @@ showSetups(command := false, simulator := false, car := false, track := false, w
 		Gui RES:Add, DropDownList, x63 y390 w95 AltSubmit Choose%chosen% gupdateQueryScope vqueryScopeDropDown, % values2String("|", map(choices, "translate")*)
 		
 		Gui RES:Add, Button, x310 y390 w80 h23 Default gcloseSetups, % translate("Close")
+		
+		if vSettingsPID
+			Gui RES:Add, Button, x220 y390 w80 h23 gtransferPressures vtransferPressuresButton, % translate("Transfer")
 		
 		Gui RES:Add, Text, x16 y60 w105 h23 +0x200, % translate("Simulator")
 		
@@ -573,6 +603,9 @@ showRaceEngineerSetups() {
 				index += 2
 			case "-Compound":
 				compound := A_Args[index + 1]
+				index += 2
+			case "-Settings":
+				vSettingsPID := A_Args[index + 1]
 				index += 2
 			default:
 				index += 1

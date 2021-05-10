@@ -1,3 +1,11 @@
+## 3.0.2-release 05/14/21 (planned)
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Tyre pressures can be loaded from the setup database in the *Race Engineer Settings* tool
+  4. Jona consults the setup database for a second opinion for tyre pressures
+  5. Refactoring of the setup database code
+
 ## 3.0.0-release 05/07/21
 
   1. Bugfixes, as always
@@ -82,7 +90,7 @@
 	 - Several edge case optimizations
 	 - Full integration of shared memory information for refuel amount and tyre pressuresm, therefore simplified [setup of pitstop strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#the-pitstop)
   5. Improvements for Jona
-	 - *Race Engineer Settings* Dialog can now [import the current settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tab-race) from the Pitstop MFD 
+	 - *Race Engineer Settings* tool can now [import the current settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tab-race) from the Pitstop MFD 
 	 - When driver decides for a different tyre compound than recommended, the target pressures will be fully recalculated
   5. Initial setup of database for [Big Data race setup collection](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--setup-database)
      - Opt In for community based data acquisition

@@ -19,7 +19,7 @@
 #Include ..\Libraries\RuleEngine.ahk
 #Include ..\Libraries\SpeechGenerator.ahk
 #Include ..\Libraries\SpeechRecognizer.ahk
-#Include Libraries\SetupDatabase.ahk
+#Include ..\Engineer\Libraries\SetupDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -2097,11 +2097,11 @@ class RaceEngineer extends ConfigurationItem {
 			this.PitstopHandler.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork)
 	}
 	
-	getTyrePressures(weather, airTemperature, trackTemperature, compound, compoundColor, ByRef pressures) {
+	getTyrePressures(weather, airTemperature, trackTemperature, compound, compoundColor, ByRef pressures, ByRef certainty) {
 		local knowledgeBase := this.KnowledgeBase
 		
 		return this.SetupDatabase.getTyreSetup(knowledgeBase.getValue("Session.Simulator"), knowledgeBase.getValue("Session.Car"), knowledgeBase.getValue("Session.Track")
-											 , weather, airTemperature, trackTemperature, compound, compoundColor, pressures)
+											 , weather, airTemperature, trackTemperature, compound, compoundColor, pressures, certainty)
 	}
 }
 
@@ -2188,19 +2188,21 @@ setupTyrePressures(context, weather, airTemperature, trackTemperature, compound,
 	local knowledgeBase := context.KnowledgeBase
 	
 	pressures := false
+	certainty := 1.0
 	
 	if (!inList(kTyreCompounds, compound) || !inList(kTyreCompoundColors, compoundColor)) {
 		compound := false
 		compoundColor := false
 	}
 	
-	if resultSet.KnowledgeBase.RaceEngineer.getTyrePressures(weather, airTemperature, trackTemperature, compound, compoundColor, pressures) {
-		knowledgeBase.setValue("Weather.Tyre.Setup.Compound", compound)
-		knowledgeBase.setValue("Weather.Tyre.Setup.Compound.Color", compoundColor)
-		knowledgeBase.setValue("Weather.Tyre.Setup.Pressure.FL", pressures[1])
-		knowledgeBase.setValue("Weather.Tyre.Setup.Pressure.FR", pressures[2])
-		knowledgeBase.setValue("Weather.Tyre.Setup.Pressure.RL", pressures[3])
-		knowledgeBase.setValue("Weather.Tyre.Setup.Pressure.RR", pressures[4])
+	if resultSet.KnowledgeBase.RaceEngineer.getTyrePressures(weather, airTemperature, trackTemperature, compound, compoundColor, pressures, certainty) {
+		knowledgeBase.setValue("Tyre.Setup.Certainty", certainty)
+		knowledgeBase.setValue("Tyre.Setup.Compound", compound)
+		knowledgeBase.setValue("Tyre.Setup.Compound.Color", compoundColor)
+		knowledgeBase.setValue("Tyre.Setup.Pressure.FL", pressures[1])
+		knowledgeBase.setValue("Tyre.Setup.Pressure.FR", pressures[2])
+		knowledgeBase.setValue("Tyre.Setup.Pressure.RL", pressures[3])
+		knowledgeBase.setValue("Tyre.Setup.Pressure.RR", pressures[4])
 		
 		return true
 	}

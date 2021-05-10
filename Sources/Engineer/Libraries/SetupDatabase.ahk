@@ -168,7 +168,7 @@ class SetupDatabase {
 		return conditions
 	}
 
-	getTyreSetup(simulator, car, track, weather, airTemperature, trackTemperature, ByRef compound, ByRef compoundColor, ByRef pressures) {
+	getTyreSetup(simulator, car, track, weather, airTemperature, trackTemperature, ByRef compound, ByRef compoundColor, ByRef pressures, ByRef certainty) {
 		local condition
 		
 		if !compound {
@@ -196,17 +196,27 @@ class SetupDatabase {
 			compounds := [Array(compound, compoundColor)]
 		
 		thePressures := []
+		theCertainty := 1.0
 		
 		for ignore, compoundInfo in compounds {
 			theCompound := compoundInfo[1]
 			theCompoundColor := compoundInfo[2]
 			
-			for ignore, pressureInfo in this.getPressures(simulator, car, track, weather, airTemperature, trackTemperature, theCompound, theCompoundColor)
-				thePressures.Push(pressureInfo["Pressure"] + ((pressureInfo["Delta Air"] + Round(pressureInfo["Delta Track"] * 0.49)) * 0.1))
+			for ignore, pressureInfo in this.getPressures(simulator, car, track, weather, airTemperature, trackTemperature, theCompound, theCompoundColor) {
+				deltaAir := pressureInfo["Delta Air"]
+				deltaTrack := pressureInfo["Delta Track"]
+				
+				correction := (deltaAir + Round(deltaTrack * 0.49))
+				
+				thePressures.Push(pressureInfo["Pressure"] + (correction * 0.1))
+				
+				theCertainty := Min(theCertainty, 1.0 - ((deltaAir + deltaTrack) / 4))
+			}
 			
 			if (thePressures.Length() > 0) {
 				compound := theCompound
 				compoundColor := theCompoundColor
+				certainty := theCertainty
 					
 				pressures := thePressures
 				

@@ -608,6 +608,32 @@ weatherTyreChangeRecommendation(?lap, ?weather, ?minutes, ?compound) <=									
 ;;; crash.                                                                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+priority: 20, {All: [?Pitstop.Plan = true], [?Tyre.Compound.Target]} => (Prove: updateTyrePressureTarget, !Lap)
+
+updateTyrePressureTarget(?lap) <= lapWeather(?lap, ?index), weatherSymbol(?index, ?weather),													\
+								  lapAirTemperature(?lap, ?airTemp), lapTrackTemperature(?lap, ?trackTemp),										\
+								  Call(setupTyrePressures, ?weather, ?airTemp, ?trackTemp, !Tyre.Compound.Target, !Tyre.Compound.Color.Target),	\
+								  tyrePressureCorrections([FL, FR, RL, RR], ?corrections),														\
+								  adjustCorrections(?corrections, !Tyre.Setup.Certainty, ?adjustedCorrections),									\
+								  adjustTargetPressures([FL, FR, RL, RR], ?adjustedCorrections)
+
+tyrePressureCorrections([], [])
+tyrePressureCorrections([?tyreType | ?tyreTypes], [?correction | ?corrections]) <=																\
+		Get(Tyre.Pressure.Target, ?tyreType, ?pressure), Get(Tyre.Setup.Pressure, ?tyreType, ?setupPressure),									\
+		?correction = ?setupPressure - ?pressure, tyrePressureCorrections(?tyreTypes, ?corrections)
+		
+
+adjustCorrections([], ?, [])
+adjustCorrections([?correction | ?correctionTail], ?factor, [?adjCorrection | ?adjCorrectionTail]) <=											\
+		?adjCorrection = ?correction * ?factor, adjustCorrections(?correctionTail, ?factor, ?adjCorrectionTail)
+
+adjustTargetPressures([], [])
+adjustTargetPressures([?tyreType | ?tyreTypes], [?correction | ?corrections]) <=																\
+		Get(Tyre.Pressure.Target, ?tyreType, ?pressure), ?newPressure = ?pressure + ?correction,												\
+		Set(Tyre.Pressure.Target, ?tyreType, ?newPressure), Get(Tyre.Pressure.Target, ?tyreType, Increment, ?increment),						\
+		?newIncrement = ?increment + ?correction, Set(Tyre.Pressure.Target, ?tyreType, Increment, ?newIncrement),								\
+		adjustTargetPressures(?tyreTypes, ?corrections)
+
 priority: 20, [?Pitstop.Plan = true] =>																											\
 		(Clear: Pitstop.Planned.Nr), (Clear: Pitstop.Planned.Lap),																				\
 		(Clear: Pitstop.Planned.Fuel),																											\
@@ -941,6 +967,8 @@ pitstopTyreCompound(?nr, ?compound, ?color) <= ?next = ?nr - 1, pitstopTyreCompo
 ;;;-------------------------------------------------------------------------;;;
 
 weatherIndex(?weather, ?index) <= index([Dry, Drizzle, LightRain, MediumRain, HeavyRain, Thunderstorm], ?weather, ?index)
+
+weatherSymbol(?index, ?weather) <= weatherIndex(?weather, ?index)
 
 
 ;;;-------------------------------------------------------------------------;;;

@@ -36,7 +36,7 @@ ListLines Off					; Disable execution history
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Libraries\SpeechRecognizer.ahk
-#Include ..\Plugins\Libraries\Simulator Plugin.ahk
+#Include ..\Plugins\Libraries\SimulatorPlugin.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;

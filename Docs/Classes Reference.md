@@ -695,11 +695,11 @@ Call this method from an event handler. It will move the Button Box window follo
 
 The two classes *SimulatorPlugin* and *RaceEngineerSimlatorPlugin* can be used as building blocks, when implementing a plugin for a race simulation game. Since these classes are placed in a special library file, you must include the following line at the top of your plugin script:
 
-	#Include ..\Plugins\Libraries\Simulator Plugin.ahk
+	#Include ..\Plugins\Libraries\SimulatorPlugin.ahk
 
 You can take a look at a specific implementation of a simulator plugin for an example on how to use these building blocks (for example [AC Plugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/AC%20Plugin.ahk) with minimal support or [RF2 Plugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/RF2%20Plugin.ahk) with full support including the Virtual Race Engineer and pitstop handling).
 
-## SimulatorPlugin extends [ControllerPlugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controllerplugin-extends-plugin-simulator-controllerahk) ([Simulator Plugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Libraries/Simulator%20Plugin.ahk))
+## SimulatorPlugin extends [ControllerPlugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controllerplugin-extends-plugin-simulator-controllerahk) ([SimulatorPlugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Libraries/SimulatorPlugin.ahk))
 This class may be used for simple simulator plugins which will NOT support the Virtual Race Engineer. The implementation *understands* that a given applicaton represents the simulator game and also is able to separate between different session types ("Practice", "Race", and so on). Depending on the technical capabilities and the supplied initialization arguements, a "Pitstop" mode (see class [PitstopMode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#pitstopmode-extends-controllermode-simulator-pluginahk)) is created upon initialization.
 
 ### Public Properties
@@ -745,7 +745,7 @@ This method is called always directly after *selectPitstopOption* to change the 
 #### *updateSessionState(sessionState :: OneOf(kSessionFinished, kSessionPaused, kSessionOther, ...))*
 This method will be called, when a simulator has been started or finished, or when the user enters a simulation session. The default implementation informs the *SimulatorController* instance, which then will activate the best fitting modes on the controller hardware.
 
-## RaceEngineerSimulatorPlugin extends [SimulatorPlugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#simulatorplugin-extends-controllerplugin-simulator-pluginahk) ([Simulator Plugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Libraries/Simulator%20Plugin.ahk))
+## RaceEngineerSimulatorPlugin extends [SimulatorPlugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#simulatorplugin-extends-controllerplugin-simulator-pluginahk) ([SimulatorPlugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Libraries/SimulatorPlugin.ahk))
 *RaceEngineerSimulatorPlugin* extends the *SimulatorPlugin* class and adds support for Jona, the Virtual Race Engineer. Jona will be started automatically, whenever the underlying simulator game is running.
 
 ### Public Properties
@@ -797,7 +797,7 @@ This is the last method of the pitstop preparation cycle. It requests repairs fo
 #### *updateSimulatorData(data :: ConfigurationMap)*
 *updateSimulatorData* is called after the [telemetry data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#telemetry-integration) has been loaded from the given simulation, but before the data is transferred to the Virtual Race Engineer. The implementation of *updateSimulatorData* might add some additional fields or change fields that has been provided by the simulation. See the [implementation of the *RaceRoom Racing Experience*](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/R3E%20Plugin.ahk) simulation for an example, where the name of the current car is read from an external JSON database file.
 
-## PitstopMode extends [ControllerMode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controllermode-simulator-controllerahk) ([Simulator Plugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Libraries/Simulator%20Plugin.ahk))
+## PitstopMode extends [ControllerMode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controllermode-simulator-controllerahk) ([SimulatorPlugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Libraries/SimulatorPlugin.ahk))
 This special controller mode is created automatically by the *SimulatorPlugin* whenever a pitstop action has been configured for the plugin.
 
 ### Public Methods
@@ -808,7 +808,7 @@ This is called whenever the session state changes. The availability of all pitst
 #### *updateRaceEngineerActions(sessionState:: OneOf(kSessionFinished, kSessionPaused, kSessionOther, kSessionPractice, kSessionQualification, kSessionRace))*
 This is called whenever the session state changes. The availability of the race engineer actions "PitstopPlan" and "PitstopPrepare* will be updated according to the new session state. The standard implementation enables the actions, whenever you are in a race session and the virtual race engineer is running.
 
-## [Abstract] PitstopAction extends [ControllerAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controlleraction-simulator-controllerahk) ([Simulator Plugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Libraries/Simulator%20Plugin.ahk))
+## [Abstract] PitstopAction extends [ControllerAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controlleraction-simulator-controllerahk) ([SimulatorPlugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Libraries/SimulatorPlugin.ahk))
 The base class of all pitstop actions.
 
 ### Public Properties
@@ -836,7 +836,7 @@ You must make sure, that all subclasses of *PitstopAction* call the base *fireAc
 		return (plugin.requirePitstopMFD() && plugin.selectPitstopOption(this.Option))
 	}
 
-## PitstopChangeAction extends [PitstopAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-pitstopaction-extends-controlleraction-simulator-pluginahk) ([Simulator Plugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Libraries/Simulator%20Plugin.ahk))
+## PitstopChangeAction extends [PitstopAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-pitstopaction-extends-controlleraction-simulator-pluginahk) ([SimulatorPlugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Libraries/SimulatorPlugin.ahk))
 A *PitstopChangeAction* changes the corresponding pitstop option always in the same direction. May be used for simple buttons on your controller hardware, for example to increase the amount of fuel to add at the next pitstop.
 
 ### Public Methods
@@ -849,7 +849,7 @@ Adds the *direction* parameter, which must be either "Increase" or "Decrease". T
 			this.Plugin.changePitstopOption(this.Option, this.Direction, this.Steps)
 	}
 
-## PitstopSelectAction extends [PitstopChangeAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#pitstopchangeaction-extends-pitstopaction-simulator-pluginahk) ([Simulator Plugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Libraries/Simulator%20Plugin.ahk))
+## PitstopSelectAction extends [PitstopChangeAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#pitstopchangeaction-extends-pitstopaction-simulator-pluginahk) ([SimulatorPlugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Libraries/SimulatorPlugin.ahk))
 A *PitstopSelectAction* is a specialized *PitstopChangeAction*, which changes the corresponding pitstop option always to the next value, which means that the *direction* will allways be "Increase".
 
 ### Public Methods
@@ -857,10 +857,10 @@ A *PitstopSelectAction* is a specialized *PitstopChangeAction*, which changes th
 #### *__New(plugin, function, label, option, steps := 1)*
 Removes the *direction* parameter from the inherited constructor, which defaults to "Increase".
 
-## PitstopToggleAction extends [PitstopAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-pitstopaction-extends-controlleraction-simulator-pluginahk) ([Simulator Plugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Libraries/Simulator%20Plugin.ahk))
+## PitstopToggleAction extends [PitstopAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-pitstopaction-extends-controlleraction-simulator-pluginahk) ([SimulatorPlugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Libraries/SimulatorPlugin.ahk))
 Used when the configured controller function is binary, for example a toggle switch or a dial. Therefore the corresponding pitstop setting can be incremented ("Increase") or decremented ("Decrease").
 
-## RaceEngineerAction extends [ControllerAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controlleraction-simulator-controllerahk) ([Simulator Plugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Libraries/Simulator%20Plugin.ahk))
+## RaceEngineerAction extends [ControllerAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controlleraction-simulator-controllerahk) ([SimulatorPlugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Libraries/SimulatorPlugin.ahk))
 Used for the *PitstopPlan* and *PitstopPrepare* pitstop actions. The implementation of *fireAction* simply calls the [planPitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#planpitstop) or [preparePitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#preparepitstop) methods of the simulator plugin, when the Virtual Race Engineer is running.
 
 ### Public Properties

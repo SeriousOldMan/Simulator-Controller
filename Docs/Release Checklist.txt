@@ -19,6 +19,11 @@ Release 3.0.2 Checklist
 1. New "Transfer" method for tyre pressure setups
    a. Documentation
    b. Doc Image
+2. Renamed "Simulator Plugin.ahk" => "SimulatorPlugin.ahk"
+   a. Test Doc Links in Classes.md
+3. New Library "SetupDatabase.ahk"
+4. Update Procedure
+   a. Translations
 
 
 Release 3.0 Checklist

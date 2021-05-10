@@ -19,6 +19,7 @@
 #Include ..\Libraries\RuleEngine.ahk
 #Include ..\Libraries\SpeechGenerator.ahk
 #Include ..\Libraries\SpeechRecognizer.ahk
+#Include Libraries\SetupDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -86,6 +87,8 @@ class RaceEngineer extends ConfigurationItem {
 	
 	iSetupData := {}
 	iSetupDataActive := false
+	
+	iSetupDatabase := false
 	
 	class RemoteEngineerListener {
 		iListener := false
@@ -391,6 +394,15 @@ class RaceEngineer extends ConfigurationItem {
 	SetupDataActive[] {
 		Get {
 			return this.iSetupDataActive
+		}
+	}
+	
+	SetupDatabase[] {
+		Get {
+			if !this.iSetupDatabase
+				this.iSetupDatabase := new SetupDatabase()
+			
+			return this.iSetupDatabase
 		}
 	}
 	
@@ -1564,8 +1576,8 @@ class RaceEngineer extends ConfigurationItem {
 		targetCompoundColor := knowledgeBase.getValue("Tyre.Compound.Color.Target", false)
 		
 		if (currentCompound && (currentCompound = targetCompound) && (currentCompoundColor = targetCompoundColor))
-			this.updateSetupData(knowledgeBase.getValue("Session.Simulator"), knowledgeBase.getValue("Session.Track"), knowledgeBase.getValue("Session.Car")
-							   , currentCompound, currentCompoundColor, airTemperature, trackTemperature, weatherNow)
+			this.updateSetupData(knowledgeBase.getValue("Session.Simulator"), knowledgeBase.getValue("Session.Car"), knowledgeBase.getValue("Session.Track")
+							   , weatherNow, airTemperature, trackTemperature, currentCompound, currentCompoundColor)
 		
 		return result
 	}
@@ -1657,7 +1669,7 @@ class RaceEngineer extends ConfigurationItem {
 			return true
 	}
 	
-	updateSetupData(simulator, track, car, compound, compoundColor, airTemperature, trackTemperature, weather) {
+	updateSetupData(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor) {
 		local knowledgeBase := this.KnowledgeBase
 		
 		this.iSetupDataActive := true
@@ -1720,7 +1732,7 @@ class RaceEngineer extends ConfigurationItem {
 						weather := descriptor[8]
 					}
 					
-					this.updateTyrePressures(simulator, track, car, compound, compoundColor, airTemperature, trackTemperature, weather, pressures)
+					this.SetupDatabase.updateTyrePressures(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor, pressures)
 				}
 		
 				if (confirm && this.Speaker)
@@ -1732,80 +1744,6 @@ class RaceEngineer extends ConfigurationItem {
 		}
 		
 		this.iSetupData := {}
-	}		
-	
-	updateTyrePressures(simulator, track, car, compound, compoundColor, airTemperature, trackTemperature, weather, targetPressures) {
-		local knowledgeBase := this.KnowledgeBase
-		static lastSimulator := false
-		static lastCar := false
-		static lastTrack := false
-		static lastCompound := false
-		static lastCompoundColor := false
-		static lastWeather := false
-		static database := false
-		static databaseName := false
-		
-		FileCreateDir %kSetupDatabaseDirectory%Local\%simulator%\%car%\%track%
-		
-		if ((lastSimulator != simulator) || (lastCar != car) || (lastTrack != track) || (lastCompound != compound) || (lastCompoundColor != compoundColor) || (lastWeather != weather)) {
-			database := false
-		
-			lastSimulator := simulator
-			lastCar := car
-			lastTrack := track
-			lastCompound := compound
-			lastCompoundColor := compoundColor
-			lastWeather := weather
-		}
-		
-		key := ConfigurationItem.descriptor(airTemperature, trackTemperature)
-		
-		if !database {
-			if (compoundColor = "Black")
-				databaseName := (kSetupDatabaseDirectory . "Local\" . simulator . "\" . car . "\" . track . "\Tyre Setup " . compound . " " . weather . ".data")
-			else
-				databaseName := (kSetupDatabaseDirectory . "Local\" . simulator . "\" . car . "\" . track . "\Tyre Setup " . compound . " (" . compoundColor . ") " . weather . ".data")
-		
-			database := readConfiguration(databaseName)
-		}
-		
-		pressureData := getConfigurationValue(database, "Pressures", key, false)
-		pressures := {FL: {}, FR: {}, RL: {}, RR: {}}
-		
-		if pressureData {
-			pressureData := string2Values(";", pressureData)
-			
-			for index, tyre in ["FL", "FR", "RL", "RR"]
-				for index, pressure in string2Values(",", pressureData[index]) {
-					pressure := string2Values(":", pressure)
-				
-					pressures[tyre][pressure[1]] := pressure[2]
-				}
-		}
-		
-		for tyrePressure, count in targetPressures {
-			tyrePressure := string2Values(":", tyrePressure)
-			pressure := tyrePressure[2]
-			
-			tyrePressures := pressures[tyrePressure[1]]
-			
-			tyrePressures[pressure] := (tyrePressures.HasKey(pressure) ? (tyrePressures[pressure] + count) : count)
-		}
-			
-		pressureData := []
-		
-		for ignore, tyrePressures in pressures {
-			data := []
-		
-			for pressure, count in tyrePressures
-				data.Push(pressure . ":" . count)
-			
-			pressureData.Push(values2String(",", data*))
-		}
-		
-		setConfigurationValue(database, "Pressures", key, values2String("; ", pressureData*))
-		
-		writeConfiguration(databaseName, database)
 	}
 	
 	hasEnoughData() {
@@ -2150,9 +2088,6 @@ class RaceEngineer extends ConfigurationItem {
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
-		local compound
-		local knowledgeBase
-		
 		if this.PitstopHandler
 			this.PitstopHandler.setPitstopTyrePressures(pitstopNumber, Round(pressureFL, 1), Round(pressureFR, 1), Round(pressureRL, 1), Round(pressureRR, 1))
 	}
@@ -2160,6 +2095,13 @@ class RaceEngineer extends ConfigurationItem {
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork) {
 		if this.PitstopHandler
 			this.PitstopHandler.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork)
+	}
+	
+	getTyrePressures(weather, airTemperature, trackTemperature, compound, compoundColor, ByRef pressures) {
+		local knowledgeBase := this.KnowledgeBase
+		
+		return this.SetupDatabase.getTyreSetup(knowledgeBase.getValue("Session.Simulator"), knowledgeBase.getValue("Session.Car"), knowledgeBase.getValue("Session.Track")
+											 , weather, airTemperature, trackTemperature, compound, compoundColor, pressures)
 	}
 }
 
@@ -2240,6 +2182,30 @@ requestPitstopRepairs(context, pitstopNumber, repairSuspension, repairBodywork) 
 	context.KnowledgeBase.RaceEngineer.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork)
 	
 	return true
+}
+
+setupTyrePressures(context, weather, airTemperature, trackTemperature, compound, compoundColor) {
+	local knowledgeBase := context.KnowledgeBase
+	
+	pressures := false
+	
+	if (!inList(kTyreCompounds, compound) || !inList(kTyreCompoundColors, compoundColor)) {
+		compound := false
+		compoundColor := false
+	}
+	
+	if resultSet.KnowledgeBase.RaceEngineer.getTyrePressures(weather, airTemperature, trackTemperature, compound, compoundColor, pressures) {
+		knowledgeBase.setValue("Weather.Tyre.Setup.Compound", compound)
+		knowledgeBase.setValue("Weather.Tyre.Setup.Compound.Color", compoundColor)
+		knowledgeBase.setValue("Weather.Tyre.Setup.Pressure.FL", pressures[1])
+		knowledgeBase.setValue("Weather.Tyre.Setup.Pressure.FR", pressures[2])
+		knowledgeBase.setValue("Weather.Tyre.Setup.Pressure.RL", pressures[3])
+		knowledgeBase.setValue("Weather.Tyre.Setup.Pressure.RR", pressures[4])
+		
+		return true
+	}
+	else
+		return false
 }
 
 dumpKnowledge(knowledgeBase) {

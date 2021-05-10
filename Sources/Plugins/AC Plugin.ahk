@@ -9,7 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Plugins\Libraries\Simulator Plugin.ahk
+#Include ..\Plugins\Libraries\SimulatorPlugin.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;

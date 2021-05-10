@@ -39,7 +39,7 @@ All currently defined controller function types.
 
 ***
 
-## Simulation Session Types ([Simulator Plugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Libraries/Simulator%20Plugin.ahk))
+## Simulation Session Types ([SimulatorPlugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Libraries/SimulatorPlugin.ahk))
 Thse constants define the different session types, a given simulation might support. See the class [SimulatorPlugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#simulator-plugin-implementation-classes) and its subclasses for more information about simulations and sessions.
 
 #### *kSessionFinished, kSessionPaused, kSessionOther, kSessionPractice, kSessionQualification, kSessionRace*

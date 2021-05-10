@@ -32,13 +32,17 @@ ListLines Off					; Disable execution history
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                         Local Include Section                           ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include Libraries\SetupDatabase.ahk
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Constant Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 global kClose = "Close"
-
-global kWeatherOptions = ["Dry", "Drizzle", "LightRain", "MediumRain", "HeavyRain", "Thunderstorm"]
-global kTyreCompounds = ["Wet", "Dry", "Dry (Red)", "Dry (White)", "Dry (Blue)"]
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -47,8 +51,7 @@ global kTyreCompounds = ["Wet", "Dry", "Dry (Red)", "Dry (White)", "Dry (Blue)"]
 
 global vSettingsPID = false
 
-global vControllerConfiguration = false
-global vIncludeGlobalDatabase = false
+global vSetupDatabase = false
 
 global simulatorDropDown
 global carDropDown
@@ -102,157 +105,10 @@ openSetupsDocumentation() {
 	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--setup-database
 }
 
-getSimulatorName(simulatorCode) {
-	for name, description in getConfigurationSectionValues(vControllerConfiguration, "Simulators", Object())
-		if (simulatorCode = string2Values("|", description)[1])
-			return name
-		
-	return false
-}
-
-getSimulatorCode(simulatorName) {
-	return string2Values("|", getConfigurationValue(vControllerConfiguration, "Simulators", simulatorName))[1]
-}
-
-getEntries(filter := "*.*", option := "D") {
-	result := []
-	
-	Loop Files, %kSetupDatabaseDirectory%local\%filter%, %option%
-		result.Push(A_LoopFileName)
-	
-	if vIncludeGlobalDatabase
-		Loop Files, %kSetupDatabaseDirectory%Global\%filter%, %option%
-			if !inList(result, A_LoopFileName)
-				result.Push(A_LoopFileName)
-	
-	return result
-}
-
-getSimulators() {
-	simulators := []
-	
-	for simulator, ignore in getConfigurationSectionValues(vControllerConfiguration, "Simulators", Object())
-		simulators.Push(simulator)
-			
-	return simulators
-}
-
-getCars(simulator) {
-	code := getSimulatorCode(simulator)
-	
-	if code {
-		return getEntries(code . "\*.*")
-	}
-	else
-		return []
-}
-
-getTracks(simulator, car) {
-	code := getSimulatorCode(simulator)
-	
-	if code {
-		return getEntries(code . "\" . car . "\*.*")
-	}
-	else
-		return []
-}
-
-getConditions(simulator, car, track) {
-	path := (getSimulatorCode(simulator) . "\" . car . "\" . track . "\")
-	conditions := []
-	
-	for ignore, fileName in getEntries(path . "Tyre Setup*.data", "F") {
-		condition := string2Values(A_Space, StrReplace(StrReplace(fileName, "Tyre Setup ", ""), ".data", ""))
-	
-		if (condition.Length() == 2) {
-			compound := condition[1]
-			weather := condition[2]
-		}
-		else {
-			compound := condition[1] . " " . condition[2]
-			weather := condition[3]
-		}
-		
-		pressures := readConfiguration(kSetupDatabaseDirectory . "local\" . path . fileName)
-		
-		if (pressures.Count() == 0)
-			pressures := readConfiguration(kSetupDatabaseDirectory . "global\" . path . fileName)
-		
-		for descriptor, ignore in getConfigurationSectionValues(pressures, "Pressures") {
-			descriptor := ConfigurationItem.splitDescriptor(descriptor)
-		
-			if descriptor[1] {
-				conditions.Push(weather, descriptor[1], descriptor[2], compound)
-			
-				break
-			}
-		}
-	}
-	
-	return conditions
-}
-
-readPressures(fileName, airTemperature, trackTemperature, pressures) {
-	tyreSetup := getConfigurationValue(readConfiguration(fileName), "Pressures", ConfigurationItem.descriptor(airTemperature, trackTemperature), false)
-	
-	if tyreSetup {
-		tyreSetup := string2Values(";", tyreSetup)
-		
-		for index, key in ["FL", "FR", "RL", "RR"]
-			for ignore, pressure in string2Values(",", tyreSetup[index]) {
-				pressure := string2Values(":", pressure)
-			
-				if pressures[key].HasKey(pressure[1])
-					pressures[key][pressure[1]] := pressures[key][pressure[1]] + pressure[2]
-				else
-					pressures[key][pressure[1]] := pressure[2]
-			}
-	}		
-}
-
-getPressures(simulator, car, track, weather, airTemperature, trackTemperature, compound) {
-	path := (getSimulatorCode(simulator) . "\" . car . "\" . track . "\Tyre Setup " . compound . " " . weather . ".data")
-	
-	for ignore, airDelta in [0, 1, -1, 2, -2] {
-		for ignore, trackDelta in [0, 1, -1, 2, -2] {
-			pressures := {FL: {}, FR: {}, RL: {}, RR: {}}
-			
-			readPressures(kSetupDatabaseDirectory . "local\" . path, airTemperature + airDelta, trackTemperature + trackDelta, pressures)
-			
-			if vIncludeGlobalDatabase
-				readPressures(kSetupDatabaseDirectory . "global\" . path, airTemperature + airDelta, trackTemperature + trackDelta, pressures)
-			
-			if (pressures["FL"].Count() != 0) {
-				thePressures := {}
-				
-				for index, tyre in ["FL", "FR", "RL", "RR"] {
-					tyrePressures := pressures[tyre]
-				
-					bestPressure := false
-					bestCount := 0
-					
-					for pressure, pressureCount in tyrePressures {
-						if (pressureCount > bestCount) {
-							bestCount := pressureCount
-							bestPressure := pressure
-						}
-					}
-						
-					thePressures[tyre] := Array(bestPressure, airDelta, trackDelta)
-				}
-				
-				return thePressures
-			}
-		}
-	}
-		
-	return {FL: [0, 0], FR: [0, 0], RL: [0, 0], RR: [0, 0]}
-}
-
 chooseSimulator() {
 	GuiControlGet simulatorDropDown
 	
-	choices := getCars(simulatorDropDown)
+	choices := vSetupDatabase.getCars(simulatorDropDown)
 	chosen := ((choices.Length() > 0) ? 1 : 0)
 	
 	GuiControl, , carDropDown, % "|" . values2String("|", choices*)
@@ -265,7 +121,7 @@ chooseCar() {
 	GuiControlGet simulatorDropDown
 	GuiControlGet carDropDown
 	
-	choices := getTracks(simulatorDropDown, carDropDown)
+	choices := vSetupDatabase.getTracks(simulatorDropDown, carDropDown)
 	chosen := ((choices.Length() > 0) ? 1 : 0)
 	
 	GuiControl, , trackDropDown, % "|" . values2String("|", choices*)
@@ -279,14 +135,14 @@ chooseTrack() {
 	GuiControlGet carDropDown
 	GuiControlGet trackDropDown
 	
-	conditions := getConditions(simulatorDropDown, carDropDown, trackDropDown)
+	conditions := vSetupDatabase.getConditions(simulatorDropDown, carDropDown, trackDropDown)
 	
 	if (conditions.Length() > 0) {
 		GuiControl Choose, weatherDropDown, % inList(kWeatherOptions, conditions[1])
 		GuiControl Text, airTemperatureEdit, % conditions[2]
 		GuiControl Text, trackTemperatureEdit, % conditions[3]
 		
-		GuiControl Choose, compoundDropDown, % inList(kTyreCompounds, conditions[4])
+		GuiControl Choose, compoundDropDown, % inList(kQualifiedTyreCompounds, conditions[4])
 	}
 	else {
 		GuiControl Choose, weatherDropDown, 0
@@ -304,7 +160,7 @@ chooseTemperature() {
 }
 
 loadPressures() {
-	static lastColor := "Black"
+	static lastColor := "D0D0D0"
 	
 	GuiControlGet simulatorDropDown
 	GuiControlGet carDropDown
@@ -314,12 +170,32 @@ loadPressures() {
 	GuiControlGet trackTemperatureEdit
 	GuiControlGet compoundDropDown
 	
-	for tyre, pressure in getPressures(simulatorDropDown, carDropDown, trackDropDown, kWeatherOptions[weatherDropDown]
-									 , airTemperatureEdit, trackTemperatureEdit, kTyreCompounds[compoundDropDown]) {
-		if pressure[1] {
-			trackDelta := pressure[3]
-			airDelta := pressure[2] + Round(trackDelta * 0.49)
-			pressure := pressure[1]
+	compound := string2Values(A_Space, kQualifiedTyreCompounds[compoundDropDown])
+	
+	if (compound.Length() == 1)
+		compoundColor := "Black"
+	else
+		compoundColor := SubStr(compound[2], 2, StrLen(compound[2]) - 2)
+	
+	pressureInfos := vSetupDatabase.getPressures(simulatorDropDown, carDropDown, trackDropDown, kWeatherOptions[weatherDropDown]
+											   , airTemperatureEdit, trackTemperatureEdit, compound[1], compoundColor)
+
+	if (pressureInfos.Count() == 0) {
+		for ignore, tyre in ["fl", "fr", "rl", "rr"]
+			for ignore, postfix in ["1", "2", "3", "4", "5"] {
+				GuiControl Text, %tyre%Pressure%postfix%, 0.0
+				GuiControl +Background, %tyre%Pressure%postfix%
+				GuiControl Disable, %tyre%Pressure%postfix%
+			}
+
+		GuiControl Disable, transferPressuresButton
+	}
+	else {
+		for tyre, pressureInfo in pressureInfos {
+			pressure := pressureInfo["Pressure"]
+			trackDelta := pressureInfo["Delta Track"]
+			airDelta := pressureInfo["Delta Air"] + Round(trackDelta * 0.49)
+			
 			pressure -= 0.2
 			
 			if ((airDelta == 0) && (trackDelta == 0))
@@ -354,22 +230,13 @@ loadPressures() {
 		
 			GuiControl Enable, transferPressuresButton
 		}
-		else {
-			for index, postfix in ["1", "2", "3", "4", "5"] {
-				GuiControl Text, %tyre%Pressure%postfix%, 0.0
-				GuiControl -Background, %tyre%Pressure%postfix%
-				GuiControl Disable, %tyre%Pressure%postfix%
-			}
-		
-			GuiControl Disable, transferPressuresButton
-		}
 	}
 }
 
 updateQueryScope() {
 	GuiControlGet queryScopeDropDown
 	
-	vIncludeGlobalDatabase := (queryScopeDropDown - 1)
+	vSetupDatabase.setUseGlobalDatabase(queryScopeDropDown - 1)
 		
 	chooseSimulator()
 }
@@ -383,12 +250,17 @@ transferPressures() {
 	GuiControlGet trackTemperatureEdit
 	GuiControlGet compoundDropDown
 	
-	compound := kTyreCompounds[compoundDropDown]
 	tyrePressures := []
+	compound := string2Values(A_Space, kQualifiedTyreCompounds[compoundDropDown])
 	
-	for ignore, pressure in getPressures(simulatorDropDown, carDropDown, trackDropDown, kWeatherOptions[weatherDropDown]
-									   , airTemperatureEdit, trackTemperatureEdit, compound)
-		tyrePressures.Push(pressure[1])
+	if (compound.Length() == 1)
+		compoundColor := "Black"
+	else
+		compoundColor := SubStr(compound[2], 2, StrLen(compound[2]) - 2)
+	
+	for ignore, pressureInfo in vSetupDatabase.getPressures(simulatorDropDown, carDropDown, trackDropDown, kWeatherOptions[weatherDropDown]
+														  , airTemperatureEdit, trackTemperatureEdit, compound[1], compoundColor)
+		tyrePressures.Push(pressureInfo["Pressure"] + ((pressureInfo["Delta Air"] + Round(pressureInfo["Delta Track"] * 0.49)) * 0.1))
 	
 	raiseEvent(kFileMessage, "Setup", "setTyrePressures:" . values2String(";", compound, tyrePressures*), vSettingsPID)
 }
@@ -429,11 +301,11 @@ showSetups(command := false, simulator := false, car := false, track := false, w
 		Gui RES:Add, Button, x310 y390 w80 h23 Default gcloseSetups, % translate("Close")
 		
 		if vSettingsPID
-			Gui RES:Add, Button, x220 y390 w80 h23 gtransferPressures vtransferPressuresButton, % translate("Transfer")
+			Gui RES:Add, Button, x220 y390 w80 h23 gtransferPressures vtransferPressuresButton, % translate("Load")
 		
 		Gui RES:Add, Text, x16 y60 w105 h23 +0x200, % translate("Simulator")
 		
-		choices := getSimulators()
+		choices := vSetupDatabase.getSimulators()
 		chosen := inList(choices, simulator)
 		if (!chosen && (choices.Length() > 0)) {
 			simulator := choices[1]
@@ -445,7 +317,7 @@ showSetups(command := false, simulator := false, car := false, track := false, w
 		Gui RES:Add, Text, x16 y83 w105 h23 +0x200, % translate("Car / Track")
 		
 		if (simulator && car) {
-			choices := getCars(simulator)
+			choices := vSetupDatabase.getCars(simulator)
 			chosen := inList(choices, car)
 			if (!chosen && (choices.Length() > 0)) {
 				car := choices[1]
@@ -460,7 +332,7 @@ showSetups(command := false, simulator := false, car := false, track := false, w
 		Gui RES:Add, DropDownList, x106 y83 w144 Choose%chosen% gchooseCar vcarDropDown, % values2String("|", choices*)
 		
 		if (simulator && car && track) {
-			choices := getTracks(simulator, car)
+			choices := vSetupDatabase.getTracks(simulator, car)
 			chosen := inList(choices, track)
 			if (!chosen && (choices.Length() > 0)) {
 				track := choices[1]
@@ -503,8 +375,8 @@ showSetups(command := false, simulator := false, car := false, track := false, w
 
 		Gui RES:Add, Text, x16 yp+30 w85 h23 +0x200, % translate("Compound")
 		
-		choices := map(kTyreCompounds, "translate")
-		chosen := inList(kTyreCompounds, compound)
+		choices := map(kQualifiedTyreCompounds, "translate")
+		chosen := inList(kQualifiedTyreCompounds, compound)
 		if (!chosen && (choices.Length() > 0)) {
 			compound := choices[1]
 			chosen := 1
@@ -612,7 +484,7 @@ showRaceEngineerSetups() {
 		}
 	}
 	
-	vControllerConfiguration := getControllerConfiguration()
+	vSetupDatabase := new SetupDatabase()
 	
 	showSetups(false, simulator, car, track, weather, airTemperature, trackTemperature, compound)
 	

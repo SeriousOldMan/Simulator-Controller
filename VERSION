@@ -1,8 +1,8 @@
 [Development]
 Version=3.0.2-dev
 Target=3.0.2-release
-Date=05/08/2021
-Changes=New "Transfer" method for tyre pressure setups
+Date=05/10/2021
+Changes=New "Transfer" method for tyre pressure setups, Refactoring of Setup Database code, Jona uses the Setup Database for unknown tyre pressures
 [Release]
 Version=3.0.0-release
 Date=05/07/2021

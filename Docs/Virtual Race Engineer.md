@@ -210,6 +210,8 @@ The *Race Engineer.settings* looks like this:
 	Tyre.Compound.Change=Never
 	Tyre.Compound.Change.Threshold=false
 	Tyre.Pressure.Deviation=0.2
+	Tyre.Pressure.Correction.Temperature=true
+	Tyre.Pressure.Correction.Setup=true
 	Tyre.Dry.Pressure.Target.FL=27.7
 	Tyre.Dry.Pressure.Target.FR=27.7
 	Tyre.Dry.Pressure.Target.RL=27.7

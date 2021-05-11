@@ -239,6 +239,8 @@ editSettings(ByRef settingsOrCommand) {
 	static pitstopWarningEdit
 	
 	static tyrePressureDeviationEdit
+	static temperatureCorrectionCheck
+	static setupPressureCompareCheck
 	
 	static tpDryFrontLeftEdit
 	static tpDryFrontRightEdit
@@ -296,6 +298,8 @@ restart:
 		setConfigurationValue(newSettings, "Session Settings", "Tyre.Compound.Change.Threshold", Round(changeTyreThresholdEdit, 1))
 		
 		setConfigurationValue(newSettings, "Session Settings", "Tyre.Pressure.Deviation", tyrePressureDeviationEdit)
+		setConfigurationValue(newSettings, "Session Settings", "Tyre.Pressure.Correction.Temperature", temperatureCorrectionCheck)
+		setConfigurationValue(newSettings, "Session Settings", "Tyre.Pressure.Correction.Setup", setupPressureCompareCheck)
 	
 		setConfigurationValue(newSettings, "Session Settings", "Tyre.Dry.Pressure.Target.FL", Round(tpDryFrontLeftEdit, 1))
 		setConfigurationValue(newSettings, "Session Settings", "Tyre.Dry.Pressure.Target.FR", Round(tpDryFrontRightEdit, 1))
@@ -356,6 +360,8 @@ restart:
 		changeTyreThresholdEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Compound.Change.Threshold", 0)
 							
 		tyrePressureDeviationEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Pressure.Deviation", 0.2)
+		temperatureCorrectionCheck := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Pressure.Correction.Temperature", true)
+		setupPressureCompareCheck := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Pressure.Correction.Setup", true)
 		
 		tpDryFrontLeftEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.FL", 27.7)
 		tpDryFrontRightEdit:= getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.FR", 27.7)
@@ -393,14 +399,14 @@ restart:
 
 		Gui RES:Font, Norm, Arial
 				
-		Gui RES:Add, Button, x228 y450 w80 h23 Default gacceptSettings, % translate("Ok")
-		Gui RES:Add, Button, x316 y450 w80 h23 gcancelSettings, % translate("&Cancel")
-		Gui RES:Add, Button, x8 y450 w77 h23 gloadSettings, % translate("&Load...")
-		Gui RES:Add, Button, x90 y450 w77 h23 gsaveSettings, % translate("&Save...")
+		Gui RES:Add, Button, x228 y498 w80 h23 Default gacceptSettings, % translate("Ok")
+		Gui RES:Add, Button, x316 y498 w80 h23 gcancelSettings, % translate("&Cancel")
+		Gui RES:Add, Button, x8 y498 w77 h23 gloadSettings, % translate("&Load...")
+		Gui RES:Add, Button, x90 y498 w77 h23 gsaveSettings, % translate("&Save...")
 				
 		tabs := map(["Settings", "Race"], "translate")
 
-		Gui RES:Add, Tab3, x8 y48 w388 h395 -Wrap, % values2String("|", tabs*)
+		Gui RES:Add, Tab3, x8 y48 w388 h443 -Wrap, % values2String("|", tabs*)
 
 		Gui Tab, 1
 		
@@ -468,6 +474,14 @@ restart:
 		Gui RES:Add, Text, x16 yp+30 w105 h20 Section, % translate("Deviation Threshold")
 		Gui RES:Add, Edit, x126 yp-2 w50 h20 VtyrePressureDeviationEdit, %tyrePressureDeviationEdit%
 		Gui RES:Add, Text, x184 yp+2 w70 h20, % translate("PSI")
+		
+		Gui RES:Add, Text, x16 yp+24 w105 h20 Section, % translate("Correction")
+		Gui RES:Add, CheckBox, x126 yp-3 w17 h23 Checked%temperatureCorrectionCheck% VtemperatureCorrectionCheck, %temperatureCorrectionCheck%
+		Gui RES:Add, Text, x147 yp+3 w200 h20, % translate("based on temperature trend")
+		
+		Gui RES:Add, Text, x16 yp+24 w105 h20 Section, % translate("Correction")
+		Gui RES:Add, CheckBox, x126 yp-3 w17 h23 Checked%setupPressureCompareCheck% VsetupPressureCompareCheck, %setupPressureCompareCheck%
+		Gui RES:Add, Text, x147 yp+3 w200 h20, % translate("based on setup database values")
 
 		Gui RES:Font, Norm, Arial
 		Gui RES:Font, Italic, Arial
@@ -545,11 +559,11 @@ restart:
 		Gui RES:Add, Text, x164 yp+4 w90 h20, % translate("Sec.")
 
 		Gui RES:Add, Text, x212 ys-2 w85 h23 +0x200, % translate("Formation")
-		Gui RES:Add, CheckBox, x292 yp-2 w17 h23 Checked%formationLapCheck% VformationLapCheck, %formationLapCheck%
+		Gui RES:Add, CheckBox, x292 yp-1 w17 h23 Checked%formationLapCheck% VformationLapCheck, %formationLapCheck%
 		Gui RES:Add, Text, x310 yp+4 w90 h20, % translate("Lap")
 				
 		Gui RES:Add, Text, x212 yp+22 w85 h23 +0x200, % translate("Post Race")
-		Gui RES:Add, CheckBox, x292 yp-2 w17 h23 Checked%postRaceLapCheck% VpostRaceLapCheck, %postRaceLapCheck%
+		Gui RES:Add, CheckBox, x292 yp-1 w17 h23 Checked%postRaceLapCheck% VpostRaceLapCheck, %postRaceLapCheck%
 		Gui RES:Add, Text, x310 yp+4 w90 h20, % translate("Lap")
 				
 		Gui RES:Add, Text, x212 yp+22 w85 h23 +0x200, % translate("Safety Fuel")
@@ -581,7 +595,7 @@ restart:
 		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit2 Number VspPitstopTyreSetEdit, %spPitstopTyreSetEdit%
 		Gui RES:Add, UpDown, x138 yp-2 w18 h20, %spPitstopTyreSetEdit%
 		
-		Gui RES:Add, Button, x292 yp-25 w90 h23 gopenSetupDatabase, % translate("Database...")
+		Gui RES:Add, Button, x292 yp-25 w90 h23 gopenSetupDatabase, % translate("Setups...")
 		
 		Gui RES:Add, Button, x292 yp+25 w90 h23 gimportFromSimulation, % translate("Import")
 

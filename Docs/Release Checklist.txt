@@ -24,6 +24,9 @@ Release 3.0.2 Checklist
 3. New Library "SetupDatabase.ahk"
 4. Update Procedure
    a. Translations
+5. New Race Engineer Settings (1. Temp Correction, 2. Setup Correction)
+   a. New Doc Images
+   b. Docu in Virtual Race Engineer
 
 
 Release 3.0 Checklist

@@ -520,7 +520,7 @@ projectedTyreTemperature(?lap, ?temperature) <=																									\
 ;;; derived for the next stint.                                             ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-priority: 5, [?Lap > 5] => (Prove: updateTyrePressureCorrection, ?Lap)
+priority: 5, {All: [?Lap > 5], [?Session.Settings.Tyre.Pressure.Correction.Temperature = true]} => (Prove: updateTyrePressureCorrection, ?Lap)
 
 updateTyrePressureCorrection(?lap) <=																											\
 		firstStintLap(?startlap), ?firstLap = ?startLap + 1, ?numLaps = ?lap - ?firstLap, ?numLaps > 5,											\
@@ -608,24 +608,21 @@ weatherTyreChangeRecommendation(?lap, ?weather, ?minutes, ?compound) <=									
 ;;; crash.                                                                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-priority: 20, {All: [?Pitstop.Plan = true], [?Tyre.Compound.Target]} => (Prove: updateTyrePressureTarget, !Lap)
+priority: 20, {All: [?Pitstop.Plan = true], [?Tyre.Compound.Target],																			\
+					[?Session.Settings.Tyre.Pressure.Correction.Setup = true]} => (Prove: updateTyrePressureTarget, !Lap)
 
 updateTyrePressureTarget(?lap) <= lapWeather(?lap, ?index), weatherSymbol(?index, ?weather),													\
 								  lapAirTemperature(?lap, ?airTemp), lapTrackTemperature(?lap, ?trackTemp),										\
 								  Call(setupTyrePressures, ?weather, ?airTemp, ?trackTemp, !Tyre.Compound.Target, !Tyre.Compound.Color.Target),	\
-								  tyrePressureCorrections([FL, FR, RL, RR], ?corrections),														\
-								  adjustCorrections(?corrections, !Tyre.Setup.Certainty, ?adjustedCorrections),									\
-								  adjustTargetPressures([FL, FR, RL, RR], ?adjustedCorrections)
+								  tyrePressureCorrections([FL, FR, RL, RR], ?corrections), adjustTargetPressures([FL, FR, RL, RR], ?corrections)
 
-tyrePressureCorrections([], [])
-tyrePressureCorrections([?tyreType | ?tyreTypes], [?correction | ?corrections]) <=																\
+tyrePressureCorrections(?tyreTypes, ?corrections) <= tyrePressureCorrections(?tyreTypes, !Tyre.Setup.Certainty, ?corrections)
+
+tyrePressureCorrections([], ?, [])
+tyrePressureCorrections([?tyreType | ?tyreTypes], ?factor, [?correction | ?corrections]) <=														\
 		Get(Tyre.Pressure.Target, ?tyreType, ?pressure), Get(Tyre.Setup.Pressure, ?tyreType, ?setupPressure),									\
-		?correction = ?setupPressure - ?pressure, tyrePressureCorrections(?tyreTypes, ?corrections)
-		
-
-adjustCorrections([], ?, [])
-adjustCorrections([?correction | ?correctionTail], ?factor, [?adjCorrection | ?adjCorrectionTail]) <=											\
-		?adjCorrection = ?correction * ?factor, adjustCorrections(?correctionTail, ?factor, ?adjCorrectionTail)
+		?temp = ?setupPressure - ?pressure, ?correction = ?temp * ?factor,
+		tyrePressureCorrections(?tyreTypes, ?factor, ?corrections)
 
 adjustTargetPressures([], [])
 adjustTargetPressures([?tyreType | ?tyreTypes], [?correction | ?corrections]) <=																\

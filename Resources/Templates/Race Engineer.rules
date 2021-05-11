@@ -621,7 +621,7 @@ tyrePressureCorrections(?tyreTypes, ?corrections) <= tyrePressureCorrections(?ty
 tyrePressureCorrections([], ?, [])
 tyrePressureCorrections([?tyreType | ?tyreTypes], ?factor, [?correction | ?corrections]) <=														\
 		Get(Tyre.Pressure.Target, ?tyreType, ?pressure), Get(Tyre.Setup.Pressure, ?tyreType, ?setupPressure),									\
-		?temp = ?setupPressure - ?pressure, ?correction = ?temp * ?factor,
+		?temp = ?setupPressure - ?pressure, ?correction = ?temp * ?factor,																		\
 		tyrePressureCorrections(?tyreTypes, ?factor, ?corrections)
 
 adjustTargetPressures([], [])

@@ -1,8 +1,8 @@
 [Development]
 Version=3.0.2-dev
 Target=3.0.2-release
-Date=05/10/2021
-Changes=New "Transfer" method for tyre pressure setups, Refactoring of Setup Database code, Jona consults the Setup Database for a second opion on tyre pressures
+Date=05/11/2021
+Changes=New "Transfer" method for tyre pressure setups, Refactoring of Setup Database code, Jona consults the Setup Database for a second opion on tyre pressures, Switches in Race Engineer Settings to select Jonas strategy when calculating target tyre pressures 
 [Release]
 Version=3.0.0-release
 Date=05/07/2021

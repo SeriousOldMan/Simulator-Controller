@@ -26,7 +26,7 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-None for the moment...
+[3.0.2-dev](https://www.dropbox.com/s/bxhmdawfwqiiqbs/Simulator%20Controller%203.0.2-dev.zip?dl=1) (First build for 3.0.2. New features: New "Transfer" method for tyre pressure setups from the setup database and *Race Engineer Settings*, Refactoring of setup database code, Jona consults the Setup Database for a second opion on tyre pressures, New switches in *Race Engineer Settings* to select Jonas strategy when calculating target tyre pressures. Attention, mostly untestesd...)
 
 #### Latest release builds
 

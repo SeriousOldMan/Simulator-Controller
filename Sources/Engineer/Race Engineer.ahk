@@ -37,7 +37,7 @@ ListLines Off					; Disable execution history
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Libraries\RuleEngine.ahk
-#Include Libraries\RaceEngineer.ahk
+#Include ..\Engineer\Libraries\RaceEngineer.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;

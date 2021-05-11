@@ -30,7 +30,6 @@ Release 3.0.2 Checklist
 6. Modified Text in Race Enginer Setups
    a. Update Doc Image
 
-
 Release 3.0 Checklist
 =======================
 

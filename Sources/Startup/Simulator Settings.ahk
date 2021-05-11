@@ -35,7 +35,7 @@ ListLines Off					; Disable execution history
 ;;;                        Libraries Include Secion                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include Libraries\Settings Editor.ahk
+#Include ..\Startup\Libraries\Settings Editor.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;

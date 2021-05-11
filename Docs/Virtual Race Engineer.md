@@ -252,7 +252,7 @@ The middle area with the three dropdown menus give you you control over several 
 
 For tyre compound changes, you can choose between the triggers "Never", "Tyre Temperature" and "Weather". If you choose "Weather", Jona will advise wet tyres for light rain or worse and dry tyres for a dry track or drizzle. "Tyre Temperature" will allow you to enter a temperature threshold, where Jona will plan a tyre change, if the tyre temeprature falls outside its optimal temperature window by this amount. For dry tyres, the optimal temperature is considered to be above 70 Degrees and for wet tyres below 55 Degrees.
 
-In the lower area you can define the optimal tyre pressures. When there is a deviation larger than *Deviation Threshold* form these target pressures is detected by Jona, corresponding pressure adjustments will be applied for the next pitstop. Beside this very simple approach, there are rules in the AI kernel, which try to predict future incluences by falling ambient temperatures and upcoming weather changes. You can modify the bahaviour of these rules by using the controls in the upper area.
+In the lower area you can define the optimal or target tyre pressures. When there is a deviation larger than *Deviation Threshold* from these *Target Pressures* is detected by Jona, corresponding pressure adjustments will be applied for the next pitstop. Beside this very simple approach, there are rules in the AI kernel, which try to predict future incluences by falling ambient temperatures and upcoming weather changes. Jona also might access the setup database for a second opinion on target pressures. You can modify the bahaviour of these rules by using the controls in the upper area and the *Correction* check boxes.
 
 #### Tab *Race*
 
@@ -328,6 +328,8 @@ Whenever you have to setup your car for a given track and specific environmental
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Engineer%20Setups%201.JPG)
 
 You have to enter all the fields in the upper area to specify the simulation, car, track, current weather and so on. Then you will get a recommendation for initial cold tyre pressures in the lower area, if a matching setup is available in the setup database. Depending on the temperature settings the recommended tyre pressures will be marked in dark green for a perfect match, or light green or even yellow, if the values have been extra- or interpolated from different air and/or track temperatures.
+
+If the *Race Engineer Setups* query tool has been [started by the *Race Engineer Settings* tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tab-race), you can transfer the current tyre pressure and compound information to the *Race Engineer Settings* by pressing the "Load" button.
 
 With the dropdown menu in the lower left corner you can choose, whether only your own setups (=> "Local") will be included in the database search or that also the setups of othe users of Simulator Controller might be considered (=> "Local & Global"). Since the community setups have not been consolidated yet, these two settings are identical for the moment.
 

@@ -18,6 +18,14 @@ global kQualifiedTyreCompounds = ["Wet", "Dry", "Dry (Red)", "Dry (White)", "Dry
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                        Private Constant Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global kTemperatureDeltas = [0, 1, -1, 2, -2]
+global kMaxTemperatureDelta = 4
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -55,7 +63,7 @@ class SetupDatabase {
 	getEntries(filter := "*.*", option := "D") {
 		result := []
 		
-		Loop Files, %kSetupDatabaseDirectory%local\%filter%, %option%
+		Loop Files, %kSetupDatabaseDirectory%Local\%filter%, %option%
 			result.Push(A_LoopFileName)
 		
 		if this.UseGlobalDatabase
@@ -210,7 +218,7 @@ class SetupDatabase {
 				
 				thePressures.Push(pressureInfo["Pressure"] + (correction * 0.1))
 				
-				theCertainty := Min(theCertainty, 1.0 - ((deltaAir + deltaTrack) / 4))
+				theCertainty := Min(theCertainty, 1.0 - ((deltaAir + deltaTrack) / kMaxTemperatureDelta))
 			}
 			
 			if (thePressures.Length() > 0) {
@@ -233,8 +241,8 @@ class SetupDatabase {
 		else
 			path := (this.getSimulatorCode(simulator) . "\" . car . "\" . track . "\Tyre Setup " . compound . " (" . compoundColor . ") " . weather . ".data")
 		
-		for ignore, airDelta in [0, 1, -1, 2, -2] {
-			for ignore, trackDelta in [0, 1, -1, 2, -2] {
+		for ignore, airDelta in kTemperatureDeltas {
+			for ignore, trackDelta in kTemperatureDeltas {
 				distributions := {FL: {}, FR: {}, RL: {}, RR: {}}
 		
 				this.getPressureDistributions(kSetupDatabaseDirectory . "local\" . path, airTemperature + airDelta, trackTemperature + trackDelta, distributions)

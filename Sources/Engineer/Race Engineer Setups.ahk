@@ -35,7 +35,7 @@ ListLines Off					; Disable execution history
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include Libraries\SetupDatabase.ahk
+#Include ..\Engineer\Libraries\SetupDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -387,32 +387,32 @@ showSetups(command := false, simulator := false, car := false, track := false, w
 		Gui RES:Font, Bold Italic, Arial
 
 		Gui RES:Add, Text, x62 yp+30 w262 0x10
-		Gui RES:Add, Text, x16 yp+10 w370 h20 Center BackgroundTrans, % translate("Pressures")
+		Gui RES:Add, Text, x16 yp+10 w370 h20 Center BackgroundTrans, % translate("Pressures (PSI)")
 
 		Gui RES:Font, Norm, Arial
 		
-		Gui RES:Add, Text, x16 yp+30 w85 h23 +0x200, % translate("Front Left (PSI)")
+		Gui RES:Add, Text, x16 yp+30 w85 h23 +0x200, % translate("Front Left")
 		Gui RES:Add, Edit, x106 yp w50 Disabled Center vflPressure1, 0.0
 		Gui RES:Add, Edit, x160 yp w50 Disabled Center vflPressure2, 0.0
 		Gui RES:Add, Edit, x214 yp w50 Center +Background vflPressure3, 0.0
 		Gui RES:Add, Edit, x268 yp w50 Disabled Center vflPressure4, 0.0
 		Gui RES:Add, Edit, x322 yp w50 Disabled Center vflPressure5, 0.0
 		
-		Gui RES:Add, Text, x16 yp+30 w85 h23 +0x200, % translate("Front Right (PSI)")
+		Gui RES:Add, Text, x16 yp+30 w85 h23 +0x200, % translate("Front Right")
 		Gui RES:Add, Edit, x106 yp w50 Disabled Center vfrPressure1, 0.0
 		Gui RES:Add, Edit, x160 yp w50 Disabled Center vfrPressure2, 0.0
 		Gui RES:Add, Edit, x214 yp w50 Center +Background vfrPressure3, 0.0
 		Gui RES:Add, Edit, x268 yp w50 Disabled Center vfrPressure4, 0.0
 		Gui RES:Add, Edit, x322 yp w50 Disabled Center vfrPressure5, 0.0
 		
-		Gui RES:Add, Text, x16 yp+30 w85 h23 +0x200, % translate("Rear Left (PSI)")
+		Gui RES:Add, Text, x16 yp+30 w85 h23 +0x200, % translate("Rear Left")
 		Gui RES:Add, Edit, x106 yp w50 Disabled Center vrlPressure1, 0.0
 		Gui RES:Add, Edit, x160 yp w50 Disabled Center vrlPressure2, 0.0
 		Gui RES:Add, Edit, x214 yp w50 Center +Background vrlPressure3, 0.0
 		Gui RES:Add, Edit, x268 yp w50 Disabled Center vrlPressure4, 0.0
 		Gui RES:Add, Edit, x322 yp w50 Disabled Center vrlPressure5, 0.0
 		
-		Gui RES:Add, Text, x16 yp+30 w85 h23 +0x200, % translate("Rear Right (PSI)")
+		Gui RES:Add, Text, x16 yp+30 w85 h23 +0x200, % translate("Rear Right")
 		Gui RES:Add, Edit, x106 yp w50 Disabled Center vrrPressure1, 0.0
 		Gui RES:Add, Edit, x160 yp w50 Disabled Center vrrPressure2, 0.0
 		Gui RES:Add, Edit, x214 yp w50 Center +Background vrrPressure3, 0.0

@@ -2196,7 +2196,7 @@ setupTyrePressures(context, weather, airTemperature, trackTemperature, compound,
 	pressures := false
 	certainty := 1.0
 	
-	msgbox % compound . " " . compoundColor
+	; msgbox % compound . " " . compoundColor
 	
 	if (!inList(kTyreCompounds, compound) || !inList(kTyreCompoundColors, compoundColor)) {
 		compound := false
@@ -2207,7 +2207,7 @@ setupTyrePressures(context, weather, airTemperature, trackTemperature, compound,
 		knowledgeBase.setFact("Tyre.Setup.Certainty", certainty)
 		knowledgeBase.setFact("Tyre.Setup.Compound", compound)
 		knowledgeBase.setFact("Tyre.Setup.Compound.Color", compoundColor)
-		knowledgeBase.setFact("Tyre.Setup.Compound.Weather", weather)
+		knowledgeBase.setFact("Tyre.Setup.Weather", weather)
 		knowledgeBase.setFact("Tyre.Setup.Pressure.FL", pressures[1])
 		knowledgeBase.setFact("Tyre.Setup.Pressure.FR", pressures[2])
 		knowledgeBase.setFact("Tyre.Setup.Pressure.RL", pressures[3])

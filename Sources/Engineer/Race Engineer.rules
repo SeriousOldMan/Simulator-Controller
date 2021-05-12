@@ -598,7 +598,8 @@ weatherChangeNotification(?lap, ?weather, ?minutes) <= remainingStintTime(?lap, 
 weatherTyreChangeRecommendation(?lap, ?weather, ?minutes, ?compound) <=																			\
 		remainingStintTime(?lap, ?stintTime), ?remainingMinutes = ?stintTime / 60000, ?remainingMinutes > ?minutes,								\
 		Call(weatherTyreChangeRecommendation, ?minutes, ?compound), weatherIndex(?weather, ?index),												\
-		Set(Weather.Tyre.Change.Recommended, ?index), Set(Weather.Tyre.Compound.Target, ?compound), ?????tyreCompoundColor
+		Set(Weather.Tyre.Change.Recommended, ?index), Set(Weather.Tyre.Compound.Target, ?compound),												\
+		tyreCompoundColor(?compound, ?color), Set(Weather.Tyre.Compound.Color.Target, ?color)
 weatherTyreChangeRecommendation(?lap, ?weather, ?minutes, ?compound) <=																			\
 		remainingStintTime(?lap, ?stintTime), ?remainingMinutes = ?stintTime / 60000, =<(?remainingMinutes, ?minutes),							\
 		Call(weatherChangeNotification, false, ?minutes), weatherIndex(?weather, ?index),														\

@@ -186,7 +186,7 @@ class SetupDatabase {
 	getTyreSetup(simulator, car, track, weather, airTemperature, trackTemperature, ByRef compound, ByRef compoundColor, ByRef pressures, ByRef certainty) {
 		local condition
 		
-		msgbox % values2String(" ", simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor)
+		; msgbox % values2String(" ", simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor)
 	
 		if !compound {
 			weatherIndex := inList(kWeatherOptions, weather)
@@ -239,7 +239,7 @@ class SetupDatabase {
 					
 				pressures := thePressures
 				
-				msgbox % values2String(" ", theCompound, theCompoundColor, theCertainty, thePressures*)
+				; msgbox % values2String(" ", theCompound, theCompoundColor, theCertainty, thePressures*)
 				
 				return true
 			}
@@ -294,7 +294,7 @@ class SetupDatabase {
 							thePressures[tyre]["Delta Air"] := airDelta
 							thePressures[tyre]["Delta Track"] := trackDelta
 							
-							showMessage(bestPressure . " " . airDelta . " " . trackDelta)
+							; showMessage(bestPressure . " " . airDelta . " " . trackDelta)
 						}
 						
 						return thePressures

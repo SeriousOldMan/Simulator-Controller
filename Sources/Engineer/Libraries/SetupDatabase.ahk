@@ -12,7 +12,7 @@
 global kWeatherOptions = ["Dry", "Drizzle", "LightRain", "MediumRain", "HeavyRain", "Thunderstorm"]
 
 global kTyreCompounds = ["Dry", "Wet"]
-global kTyreCompoundColors = ["Red", "White", "Blue"]
+global kTyreCompoundColors = ["Red", "White", "Blue", "Black"]
 
 global kQualifiedTyreCompounds = ["Wet", "Dry", "Dry (Red)", "Dry (White)", "Dry (Blue)"]
 
@@ -97,15 +97,22 @@ class SetupDatabase {
 	}
 
 	getSimulatorName(simulatorCode) {
-		for name, description in getConfigurationSectionValues(this.ControllerConfiguration, "Simulators", Object())
-			if (simulatorCode = string2Values("|", description)[1])
-				return name
-			
-		return false
+		if (simulatorCode = "Unknown")
+			return "Unknown"
+		else {
+			for name, description in getConfigurationSectionValues(this.ControllerConfiguration, "Simulators", Object())
+				if (simulatorCode = string2Values("|", description)[1])
+					return name
+				
+			return false
+		}
 	}
 
 	getSimulatorCode(simulatorName) {
-		return string2Values("|", getConfigurationValue(this.ControllerConfiguration, "Simulators", simulatorName))[1]
+		if (simulatorName = "Unknown")
+			return "Unknown"
+		else
+			return string2Values("|", getConfigurationValue(this.ControllerConfiguration, "Simulators", simulatorName))[1]
 	}
 
 	getSimulators() {
@@ -178,15 +185,17 @@ class SetupDatabase {
 
 	getTyreSetup(simulator, car, track, weather, airTemperature, trackTemperature, ByRef compound, ByRef compoundColor, ByRef pressures, ByRef certainty) {
 		local condition
-		
+	
 		if !compound {
+			weatherIndex := inList(kWeatherOptions, weather)
 			visited := []
 			compounds := []
 			
 			for ignore, condition in this.getConditions(simulator, car, track) {
 				theCompound := condition[4]
+				conditionIndex := inList(kWeatherOptions, condition[1])
 			
-				if ((weather = condition[1]) && !inList(visited, theCompound)) {
+				if (((Abs(weatherIndex - conditionIndex) <= 1) || ((weatherIndex >= 2) && (conditionIndex >= 2))) && !inList(visited, theCompound)) {  
 					visited.Push(theCompound)
 					
 					theCompound := string2Values(A_Space, theCompound)
@@ -218,7 +227,7 @@ class SetupDatabase {
 				
 				thePressures.Push(pressureInfo["Pressure"] + (correction * 0.1))
 				
-				theCertainty := Min(theCertainty, 1.0 - ((deltaAir + deltaTrack) / kMaxTemperatureDelta))
+				theCertainty := Min(theCertainty, 1.0 - (Abs(deltaAir + deltaTrack) / (kMaxTemperatureDelta + 1)))
 			}
 			
 			if (thePressures.Length() > 0) {
@@ -236,43 +245,54 @@ class SetupDatabase {
 	}
 
 	getPressures(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor) {
-		if (compoundColor = "Black")
-			path := (this.getSimulatorCode(simulator) . "\" . car . "\" . track . "\Tyre Setup " . compound . " " . weather . ".data")
+		weatherBaseIndex := inList(kWeatherOptions, weather)
+		
+		if (weatherBaseIndex <= 2)
+			weatherCandidateOffsets := [0, 1, -1]
 		else
-			path := (this.getSimulatorCode(simulator) . "\" . car . "\" . track . "\Tyre Setup " . compound . " (" . compoundColor . ") " . weather . ".data")
+			weatherCandidateOffsets := [0, 1, 2, 3]
 		
-		for ignore, airDelta in kTemperatureDeltas {
-			for ignore, trackDelta in kTemperatureDeltas {
-				distributions := {FL: {}, FR: {}, RL: {}, RR: {}}
+		for ignore, weatherOffset in weatherCandidateOffsets {
+			weather := kWeatherOptions[Max(0, Min(weatherBaseIndex + weatherOffset, kWeatherOptions.Length()))]
 		
-				this.getPressureDistributions(kSetupDatabaseDirectory . "local\" . path, airTemperature + airDelta, trackTemperature + trackDelta, distributions)
-				
-				if this.UseGlobalDatabase
-					this.getPressureDistributions(kSetupDatabaseDirectory . "global\" . path, airTemperature + airDelta, trackTemperature + trackDelta, distributions)
-				
-				if (distributions["FL"].Count() != 0) {
-					thePressures := {}
+			if (compoundColor = "Black")
+				path := (this.getSimulatorCode(simulator) . "\" . car . "\" . track . "\Tyre Setup " . compound . " " . weather . ".data")
+			else
+				path := (this.getSimulatorCode(simulator) . "\" . car . "\" . track . "\Tyre Setup " . compound . " (" . compoundColor . ") " . weather . ".data")
+			
+			for ignore, airDelta in kTemperatureDeltas {
+				for ignore, trackDelta in kTemperatureDeltas {
+					distributions := {FL: {}, FR: {}, RL: {}, RR: {}}
+			
+					this.getPressureDistributions(kSetupDatabaseDirectory . "local\" . path, airTemperature + airDelta, trackTemperature + trackDelta, distributions)
 					
-					for index, tyre in ["FL", "FR", "RL", "RR"] {
-						thePressures[tyre] := {}
-						tyrePressures := distributions[tyre]
+					if this.UseGlobalDatabase
+						this.getPressureDistributions(kSetupDatabaseDirectory . "global\" . path, airTemperature + airDelta, trackTemperature + trackDelta, distributions)
 					
-						bestPressure := false
-						bestCount := 0
+					if (distributions["FL"].Count() != 0) {
+						thePressures := {}
 						
-						for pressure, pressureCount in tyrePressures {
-							if (pressureCount > bestCount) {
-								bestCount := pressureCount
-								bestPressure := pressure
-							}
-						}
+						for index, tyre in ["FL", "FR", "RL", "RR"] {
+							thePressures[tyre] := {}
+							tyrePressures := distributions[tyre]
+						
+							bestPressure := false
+							bestCount := 0
 							
-						thePressures[tyre]["Pressure"] := bestPressure
-						thePressures[tyre]["Delta Air"] := airDelta
-						thePressures[tyre]["Delta Track"] := trackDelta
+							for pressure, pressureCount in tyrePressures {
+								if (pressureCount > bestCount) {
+									bestCount := pressureCount
+									bestPressure := pressure
+								}
+							}
+								
+							thePressures[tyre]["Pressure"] := bestPressure
+							thePressures[tyre]["Delta Air"] := airDelta
+							thePressures[tyre]["Delta Track"] := trackDelta
+						}
+						
+						return thePressures
 					}
-					
-					return thePressures
 				}
 			}
 		}

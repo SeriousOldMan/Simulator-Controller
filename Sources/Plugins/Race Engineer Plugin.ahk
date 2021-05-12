@@ -344,7 +344,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 			try {
 				logMessage(kLogInfo, translate("Starting ") . translate("Race Engineer"))
 				
-				options := " -Settings """ . getFileName("Race Engineer.settings", kUserConfigDirectory, kConfigDirectory) . """"
+				options := " -Settings """ . getFileName("Race Engineer.settings", kUserConfigDirectory) . """"
 				
 				if this.Simulator.supportsPitstop()
 					options .= " -Remote " . controllerPID
@@ -743,7 +743,7 @@ openRaceEngineerSettings(import := false) {
 		}
 		
 		if pid {
-			callback := ObjBindMethod(plugin, "reloadSettings", pid, getFileName("Race Engineer.settings", kUserConfigDirectory, kConfigDirectory))
+			callback := ObjBindMethod(plugin, "reloadSettings", pid, getFileName("Race Engineer.settings", kUserConfigDirectory))
 			
 			SetTimer %callback%, -1000
 		}

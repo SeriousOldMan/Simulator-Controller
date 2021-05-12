@@ -166,8 +166,8 @@ startRaceEngineer() {
 	engineerLanguage := false
 	engineerSpeaker := false
 	engineerListener:= false
+	engineerSettingsFile := getFileName("Race Engineer.settings", kUserConfigDirectory)
 	voiceServer := false
-	raceSettingsFile := getFileName("Race Engineer.settings", kUserConfigDirectory, kConfigDirectory)
 	
 	index := 1
 	
@@ -192,7 +192,7 @@ startRaceEngineer() {
 				engineerListener := A_Args[index + 1]
 				index += 2
 			case "-Settings":
-				raceSettingsFile := A_Args[index + 1]
+				engineerSettingsFile := A_Args[index + 1]
 				index += 2
 			case "-Voice":
 				voiceServer := A_Args[index + 1]
@@ -206,7 +206,7 @@ startRaceEngineer() {
 	 && (engineerListener != getConfigurationValue(kSimulatorConfiguration, "Voice", "Listener", false)))
 		voiceServer := false
 	
-	RaceEngineer.Instance := new RaceEngineer(kSimulatorConfiguration, readConfiguration(raceSettingsFile)
+	RaceEngineer.Instance := new RaceEngineer(kSimulatorConfiguration, readConfiguration(engineerSettingsFile)
 											, remotePID ? new RemotePitstopHandler(remotePID) : false
 											, engineerName, engineerLanguage, engineerSpeaker, engineerListener, voiceServer)
 	

@@ -407,7 +407,7 @@ class RaceEngineer extends ConfigurationItem {
 	}
 	
 	__New(configuration, raceSettings, pitstopHandler := false, name := false, language := "__Undefined__", speaker := false, listener := false, voiceServer := false) {
-		this.iDebug := ((true || isDebug()) ? kDebugKnowledgeBase : kDebugOff)
+		this.iDebug := (isDebug() ? kDebugKnowledgeBase : kDebugOff)
 		this.iRaceSettings := raceSettings
 		this.iPitstopHandler := pitstopHandler
 		this.iName := name
@@ -2103,7 +2103,7 @@ class RaceEngineer extends ConfigurationItem {
 			this.PitstopHandler.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork)
 	}
 	
-	getTyrePressures(weather, airTemperature, trackTemperature, compound, compoundColor, ByRef pressures, ByRef certainty) {
+	getTyrePressures(weather, airTemperature, trackTemperature, ByRef compound, ByRef compoundColor, ByRef pressures, ByRef certainty) {
 		local knowledgeBase := this.KnowledgeBase
 		
 		return this.SetupDatabase.getTyreSetup(knowledgeBase.getValue("Session.Simulator"), knowledgeBase.getValue("Session.Car"), knowledgeBase.getValue("Session.Track")
@@ -2201,14 +2201,15 @@ setupTyrePressures(context, weather, airTemperature, trackTemperature, compound,
 		compoundColor := false
 	}
 	
-	if resultSet.KnowledgeBase.RaceEngineer.getTyrePressures(weather, airTemperature, trackTemperature, compound, compoundColor, pressures, certainty) {
-		knowledgeBase.setValue("Tyre.Setup.Certainty", certainty)
-		knowledgeBase.setValue("Tyre.Setup.Compound", compound)
-		knowledgeBase.setValue("Tyre.Setup.Compound.Color", compoundColor)
-		knowledgeBase.setValue("Tyre.Setup.Pressure.FL", pressures[1])
-		knowledgeBase.setValue("Tyre.Setup.Pressure.FR", pressures[2])
-		knowledgeBase.setValue("Tyre.Setup.Pressure.RL", pressures[3])
-		knowledgeBase.setValue("Tyre.Setup.Pressure.RR", pressures[4])
+	if context.KnowledgeBase.RaceEngineer.getTyrePressures(weather, Round(airTemperature), Round(trackTemperature), compound, compoundColor, pressures, certainty) {
+		knowledgeBase.setFact("Tyre.Setup.Certainty", certainty)
+		knowledgeBase.setFact("Tyre.Setup.Compound", compound)
+		knowledgeBase.setFact("Tyre.Setup.Compound.Color", compoundColor)
+		knowledgeBase.setFact("Tyre.Setup.Compound.Weather", weather)
+		knowledgeBase.setFact("Tyre.Setup.Pressure.FL", pressures[1])
+		knowledgeBase.setFact("Tyre.Setup.Pressure.FR", pressures[2])
+		knowledgeBase.setFact("Tyre.Setup.Pressure.RL", pressures[3])
+		knowledgeBase.setFact("Tyre.Setup.Pressure.RR", pressures[4])
 		
 		return true
 	}

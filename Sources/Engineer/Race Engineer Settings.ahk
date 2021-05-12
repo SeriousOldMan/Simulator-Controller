@@ -45,7 +45,7 @@ global kCancel = "Cancel"
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kRaceEngineerSettingsFile = getFileName("Race Engineer.settings", kUserConfigDirectory, kConfigDirectory)
+global kRaceEngineerSettingsFile = getFileName("Race Engineer.settings", kUserConfigDirectory)
 
 
 ;;;-------------------------------------------------------------------------;;;

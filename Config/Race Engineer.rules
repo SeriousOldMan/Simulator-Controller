@@ -96,37 +96,43 @@ priority: 5,																																	\
 	{All: {None: [?Pitstop.Plan]}, [?Session.Settings.Tyre.Compound.Change = Weather], [?Weather.Tyre.Compound.Target],							\
 		  {Any: [?Lap], [?Pitstop.Lap], {None: [?Tyre.Compound.Target]}}} =>																	\
 		(Set: Tyre.Compound.Target, ?Weather.Tyre.Compound.Target), (Set: Tyre.Compound.Color.Target, !Weather.Tyre.Compound.Color.Target),		\
-		(Clear: Tyre.Set.Target)
+		(Set: Tyre.Weather.Target, !Weather.Weather.10Min), (Clear: Tyre.Set.Target)
 
 priority: 5,																																	\
 	{All: {None: [?Pitstop.Plan]}, [?Session.Settings.Tyre.Compound.Change = Temperature], {Any: [?Lap], [?Pitstop.Lap]},						\
 		  [?Tyre.Temperature.Window = false], [?Tyre.Compound = Dry]} =>																		\
-		(Set: Tyre.Compound.Target, Wet), (Prove: updateTargetCompoundColor, Wet), (Clear: Tyre.Set.Target)
+		(Set: Tyre.Compound.Target, Wet), (Prove: updateTargetCompoundColor, Wet),																\
+		(Set: Tyre.Weather.Target, !Weather.Weather.10Min), (Clear: Tyre.Set.Target)
 
 priority: 5,																																	\
 	{All: {None: [?Pitstop.Plan]}, [?Session.Settings.Tyre.Compound.Change = Temperature], {Any: [?Lap], [?Pitstop.Lap]},						\
 		  [?Tyre.Temperature.Window = true], [?Tyre.Compound = Dry]} =>																			\
-		(Set: Tyre.Compound.Target, Dry), (Prove: updateTargetCompoundColor, Dry), (Clear: Tyre.Set.Target)
+		(Set: Tyre.Compound.Target, Dry), (Prove: updateTargetCompoundColor, Dry),																\
+		(Set: Tyre.Weather.Target, !Weather.Weather.10Min), (Clear: Tyre.Set.Target)
 
 priority: 5,																																	\
 	{All: {None: [?Pitstop.Plan]}, [?Session.Settings.Tyre.Compound.Change = Temperature], {Any: [?Lap], [?Pitstop.Lap]},						\
 		  [?Tyre.Temperature.Window = false], [?Tyre.Compound = Wet]} =>																		\
-		(Set: Tyre.Compound.Target, Dry), (Prove: updateTargetCompoundColor, Dry), (Clear: Tyre.Set.Target)
+		(Set: Tyre.Compound.Target, Dry), (Prove: updateTargetCompoundColor, Dry),																\
+		(Set: Tyre.Weather.Target, !Weather.Weather.10Min), (Clear: Tyre.Set.Target)
 
 priority: 5,																																	\
 	{All: {None: [?Pitstop.Plan]}, [?Session.Settings.Tyre.Compound.Change = Temperature], {Any: [?Lap], [?Pitstop.Lap]},						\
 		  [?Tyre.Temperature.Window = true], [?Tyre.Compound = Wet]} =>																			\
-		(Set: Tyre.Compound.Target, Wet), (Prove: updateTargetCompoundColor, Wet), (Clear: Tyre.Set.Target)
+		(Set: Tyre.Compound.Target, Wet), (Prove: updateTargetCompoundColor, Wet),																\
+		(Set: Tyre.Weather.Target, !Weather.Weather.10Min), (Clear: Tyre.Set.Target)
 
 priority: 5,																																	\
 	{All: {None: [?Pitstop.Plan]}, [?Session.Settings.Tyre.Compound.Change = Never],															\
-		  {Any: [?Lap], [?Pitstop.Lap], {None: [?Tyre.Compound.Target]}}} => (Prove: keepTyreCompound), (Clear: Tyre.Set.Target)
+		  {Any: [?Lap], [?Pitstop.Lap], {None: [?Tyre.Compound.Target]}}} => (Prove: keepTyreCompound, !Lap), (Clear: Tyre.Set.Target)
 
-{All: {Any: [?Lap], [?Pitstop.Lap]}, {None: [?Tyre.Compound.Target]}} => (Prove: keepTyreCompound), (Clear: Tyre.Set.Target)
+{All: {Any: [?Lap], [?Pitstop.Lap]}, {None: [?Tyre.Compound.Target]}} => (Prove: keepTyreCompound, !Lap), (Clear: Tyre.Set.Target)
 
-keepTyreCompound() <= lastPitstopTyreCompound(?compound, ?color), 																				\
-					  Set(Tyre.Compound.Target, ?compound), Set(Tyre.Compound.Color.Target, ?color), !
-keepTyreCompound() <= setupTyreCompound(?compound, ?color), Set(Tyre.Compound.Target, ?compound), Set(Tyre.Compound.Color.Target, ?color)
+keepTyreCompound(?lap) <= lastPitstopTyreCompound(?compound, ?color),																			\
+						  lapWeather(?lap, ?index), weatherSymbol(?index, ?weather), Set(Tyre.Weather.Target, ?weather),						\
+						  Set(Tyre.Compound.Target, ?compound), Set(Tyre.Compound.Color.Target, ?color), !
+keepTyreCompound(?lap) <= lapWeather(?lap, ?index), weatherSymbol(?index, ?weather), Set(Tyre.Weather.Target, ?weather),						\
+						  setupTyreCompound(?compound, ?color), Set(Tyre.Compound.Target, ?compound), Set(Tyre.Compound.Color.Target, ?color)
 
 updateTargetCompoundColor(?compound) <= tyreCompoundColor(?compound, ?color), Set(Tyre.Compound.Color.Target, ?color)
 
@@ -231,11 +237,11 @@ lastPressure(?compound, ?tyreType, ?pressure) <= setupTyrePressure(?compound, ?t
 ;;;              Target pressure calculation with compound change           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-{All: [?Lap], [?Tyre.Compound], [?Tyre.Compound.Target],																						\
+{All: [?Lap], [?Tyre.Compound], [?Tyre.Compound.Target], {None: [?Tyre.Setup.Compound]},														\
 	  {None: [?Tyre.Compound = ?Tyre.Compound.Target]}, {None: [?Tyre.Pressure.Target.Correction]}} =>											\
 		(Prove: updateTyrePressureDeviation, ?Lap, ?Tyre.Compound.Target, 0)
 		
-{All: [?Lap], [?Tyre.Compound], [?Tyre.Compound.Target],																						\
+{All: [?Lap], [?Tyre.Compound], [?Tyre.Compound.Target], {None: [?Tyre.Setup.Compound]},														\
 	  {None: [?Tyre.Compound = ?Tyre.Compound.Target]}, [?Tyre.Pressure.Target.Correction]} =>													\
 		(Prove: updateTyrePressureDeviation, ?Lap, ?Tyre.Compound.Target, ?Tyre.Pressure.Target.Correction)
 
@@ -611,9 +617,9 @@ weatherTyreChangeRecommendation(?lap, ?weather, ?minutes, ?compound) <=									
 priority: 20, {All: [?Pitstop.Plan = true], [?Tyre.Compound.Target],																			\
 					[?Session.Settings.Tyre.Pressure.Correction.Setup = true]} => (Prove: updateTyrePressureTarget, !Lap)
 
-updateTyrePressureTarget(?lap) <= lapWeather(?lap, ?index), weatherSymbol(?index, ?weather),													\
-								  lapAirTemperature(?lap, ?airTemp), lapTrackTemperature(?lap, ?trackTemp),										\
+updateTyrePressureTarget(?lap) <= Get(Tyre.Weather.Target, ?weather), lapAirTemperature(?lap, ?airTemp), lapTrackTemperature(?lap, ?trackTemp),	\
 								  Call(setupTyrePressures, ?weather, ?airTemp, ?trackTemp, !Tyre.Compound.Target, !Tyre.Compound.Color.Target),	\
+								  Set(Tyre.Compound.Target, !Tyre.Setup.Compound), Set(Tyre.Compound.Color.Target, !Tyre.Setup.Compound.Color),	\
 								  tyrePressureCorrections([FL, FR, RL, RR], ?corrections), adjustTargetPressures([FL, FR, RL, RR], ?corrections)
 
 tyrePressureCorrections(?tyreTypes, ?corrections) <= tyrePressureCorrections(?tyreTypes, !Tyre.Setup.Certainty, ?corrections)
@@ -692,7 +698,11 @@ priority: 10, [?Pitstop.Plan] => (Prove: planPitstop)
 priority: -5, {All: [?Pitstop.Plan], [?Lap.Remaining.Stint <= 5]} => (Set: Pitstop.Planned.Tyre.Compound, false),								\
 																	 (Set: Pitstop.Planned.Tyre.Compound.Color, false)
 
-priority: -20, [?Pitstop.Plan] => (Set: Pitstop.Planned), (Clear: Pitstop.Plan)
+priority: -20, [?Pitstop.Plan] => (Set: Pitstop.Planned), (Clear: Pitstop.Plan),																\
+								  (Clear: Tyre.Setup.Certainty), (Clear: Tyre.Setup.Compound), (Clear: Tyre.Setup.Compound.Color),				\
+								  (Clear: Tyre.Setup.Weather), 																					\
+								  (Clear: Tyre.Setup.Pressure.FL), (Clear: Tyre.Setup.Pressure.FR), 											\
+								  (Clear: Tyre.Setup.Pressure.RL), (Clear: Tyre.Setup.Pressure.RR)
 
 planPitstop() <= lastPitstop(?last), ?nr = ?last + 1, Set(Pitstop.Planned.Nr, ?nr)
 planPitstop() <= Set(Pitstop.Planned.Nr, 1)
@@ -1101,7 +1111,7 @@ remove([?h | ?t], ?x, [?h | ?result]) <= remove(?t, ?x, ?result)
 
 index(?list, ?element, ?index) <= index(?list, ?element, 0, ?index)
 
-index([?element], ?element, ?index, ?index)
+index([?element], ?element, ?index, ?index) <= !
 index([?head | ?tail], ?head, ?index, ?index) <= !
 index([?head | ?tail], ?element, ?running, ?index) <= ?nRunning = ?running + 1, index(?tail, ?element, ?nRunning, ?index)
 

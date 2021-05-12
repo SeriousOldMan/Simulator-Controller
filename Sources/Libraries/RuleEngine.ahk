@@ -3746,7 +3746,7 @@ class NilParser extends Parser {
 ;;;-------------------------------------------------------------------------;;;
 
 msgBox(ignore, args*) {
-	MsgBox % "Debug: " . values2String(A_Space, args*)
+	MsgBox % values2String(A_Space, args*)
 	
 	return true
 }

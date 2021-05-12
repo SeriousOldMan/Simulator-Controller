@@ -565,6 +565,16 @@ theRules =
 	remove([?h | ?t], ?x, [?h | ?result]) <= remove(?t, ?x, ?result)
 	
 	complexClause(?x, ?y) <= ?x = [1, 2, 3], ?y = complex(A, foo([1, 2]))
+	
+	index(?list, ?element, ?index) <= index(?list, ?element, 0, ?index)
+
+	index([?element], ?element, ?index, ?index) <= !
+	index([?head | ?tail], ?head, ?index, ?index) <= !
+	index([?head | ?tail], ?element, ?running, ?index) <= ?nRunning = ?running + 1, index(?tail, ?element, ?nRunning, ?index)
+	
+	weatherIndex(?weather, ?index) <= index([Dry, Drizzle, LightRain, MediumRain, HeavyRain, Thunderstorm], ?weather, ?index)
+
+	weatherSymbol(?index, ?weather) <= weatherIndex(?weather, ?index)
 )
 
 productions := false
@@ -578,7 +588,7 @@ eng := new RuleEngine(productions, reductions, {})
 
 kb := eng.createKnowledgeBase(eng.createFacts(), eng.createRules())
 
-g := rc.compileGoal("remove([1,2,3,4], 3, ?r)")
+g := rc.compileGoal("weatherSymbol(4, ?s)")
 
 rs := kb.prove(g)
 

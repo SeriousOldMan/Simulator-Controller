@@ -237,11 +237,11 @@ lastPressure(?compound, ?tyreType, ?pressure) <= setupTyrePressure(?compound, ?t
 ;;;              Target pressure calculation with compound change           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-{All: [?Lap], [?Tyre.Compound], [?Tyre.Compound.Target], {None: [?Tyre.Setup.Compound]},														\
+{All: [?Lap], [?Tyre.Compound], [?Tyre.Compound.Target],																						\
 	  {None: [?Tyre.Compound = ?Tyre.Compound.Target]}, {None: [?Tyre.Pressure.Target.Correction]}} =>											\
 		(Prove: updateTyrePressureDeviation, ?Lap, ?Tyre.Compound.Target, 0)
 		
-{All: [?Lap], [?Tyre.Compound], [?Tyre.Compound.Target], {None: [?Tyre.Setup.Compound]},														\
+{All: [?Lap], [?Tyre.Compound], [?Tyre.Compound.Target],																						\
 	  {None: [?Tyre.Compound = ?Tyre.Compound.Target]}, [?Tyre.Pressure.Target.Correction]} =>													\
 		(Prove: updateTyrePressureDeviation, ?Lap, ?Tyre.Compound.Target, ?Tyre.Pressure.Target.Correction)
 
@@ -699,11 +699,7 @@ priority: 10, [?Pitstop.Plan] => (Prove: planPitstop)
 priority: -5, {All: [?Pitstop.Plan], [?Lap.Remaining.Stint <= 5]} => (Set: Pitstop.Planned.Tyre.Compound, false),								\
 																	 (Set: Pitstop.Planned.Tyre.Compound.Color, false)
 
-priority: -20, [?Pitstop.Plan] => (Set: Pitstop.Planned), (Clear: Pitstop.Plan),																\
-								  (Clear: Tyre.Setup.Certainty), (Clear: Tyre.Setup.Compound), (Clear: Tyre.Setup.Compound.Color),				\
-								  (Clear: Tyre.Setup.Weather), 																					\
-								  (Clear: Tyre.Setup.Pressure.FL), (Clear: Tyre.Setup.Pressure.FR), 											\
-								  (Clear: Tyre.Setup.Pressure.RL), (Clear: Tyre.Setup.Pressure.RR)
+priority: -20, [?Pitstop.Plan] => (Set: Pitstop.Planned), (Clear: Pitstop.Plan)
 
 planPitstop() <= lastPitstop(?last), ?nr = ?last + 1, Set(Pitstop.Planned.Nr, ?nr)
 planPitstop() <= Set(Pitstop.Planned.Nr, 1)

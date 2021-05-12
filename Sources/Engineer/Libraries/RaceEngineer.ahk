@@ -2203,11 +2203,16 @@ setupTyrePressures(context, weather, airTemperature, trackTemperature, compound,
 		compoundColor := false
 	}
 	
-	if context.KnowledgeBase.RaceEngineer.getTyrePressures(weather, Round(airTemperature), Round(trackTemperature), compound, compoundColor, pressures, certainty) {
+	airTemperature := Round(airTemperature)
+	trackTemperature := Round(trackTemperature)
+	
+	if context.KnowledgeBase.RaceEngineer.getTyrePressures(weather, airTemperature, trackTemperature, compound, compoundColor, pressures, certainty) {
 		knowledgeBase.setFact("Tyre.Setup.Certainty", certainty)
 		knowledgeBase.setFact("Tyre.Setup.Compound", compound)
 		knowledgeBase.setFact("Tyre.Setup.Compound.Color", compoundColor)
 		knowledgeBase.setFact("Tyre.Setup.Weather", weather)
+		knowledgeBase.setFact("Tyre.Setup.Temperature.Air", airTemperature)
+		knowledgeBase.setFact("Tyre.Setup.Temperature.Track", trackTemperature)
 		knowledgeBase.setFact("Tyre.Setup.Pressure.FL", pressures[1])
 		knowledgeBase.setFact("Tyre.Setup.Pressure.FR", pressures[2])
 		knowledgeBase.setFact("Tyre.Setup.Pressure.RL", pressures[3])

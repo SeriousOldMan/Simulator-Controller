@@ -26,7 +26,7 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-[3.0.2-dev](https://www.dropbox.com/s/bxhmdawfwqiiqbs/Simulator%20Controller%203.0.2-dev.zip?dl=1) (First build for 3.0.2. New features: New "Transfer" method for tyre pressure setups from the setup database and *Race Engineer Settings*, Refactoring of setup database code, Jona consults the Setup Database for a second opion on tyre pressures, New switches in *Race Engineer Settings* to select Jonas strategy when calculating target tyre pressures. Attention, mostly untested...)
+[3.0.2-alpha](https://www.dropbox.com/s/ahgypfp9l8h1h3b/Simulator%20Controller%203.0.2-alpha.zip?dl=1) (Alpha version for Release 3.0.2. New features: New "Transfer" method for tyre pressure setups from the setup database and *Race Engineer Settings*, Refactoring of setup database code, Jona consults the Setup Database for a second opinion on tyre pressures, New switches in *Race Engineer Settings* to select Jonas strategy when calculating target tyre pressures. Documented and with automated update procedure, but some parts still need more tests...)
 
 #### Latest release builds
 
@@ -136,7 +136,7 @@ Want to contribute? Great!
   - Build your own plugins and offer them on GitHub. Contact me and I will add a link to your plugin in this documentation.
   - Found a bug, or built a new feature? Even better. Please contact me, and I will give you access to the code repository.
 
-Heads Up: I am actively searching for a co-developer for the upcoming iRacing integration.
+Heads Up: I am looking for a co-developer for the some fancy upcoming AI stuff.
 
 ### To Do
 

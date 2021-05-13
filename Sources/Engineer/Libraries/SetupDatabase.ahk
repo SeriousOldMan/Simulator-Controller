@@ -101,7 +101,7 @@ class SetupDatabase {
 			return "Unknown"
 		else {
 			for name, description in getConfigurationSectionValues(this.ControllerConfiguration, "Simulators", Object())
-				if (simulatorCode = string2Values("|", description)[1])
+				if ((simulatorCode = name) || (simulatorCode = string2Values("|", description)[1]))
 					return name
 				
 			return false
@@ -186,8 +186,8 @@ class SetupDatabase {
 	getTyreSetup(simulator, car, track, weather, airTemperature, trackTemperature, ByRef compound, ByRef compoundColor, ByRef pressures, ByRef certainty) {
 		local condition
 		
-		; msgbox % values2String(" ", simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor)
-	
+		simulator := this.getSimulatorName(simulator)
+		
 		if !compound {
 			weatherIndex := inList(kWeatherOptions, weather)
 			visited := []
@@ -239,8 +239,6 @@ class SetupDatabase {
 					
 				pressures := thePressures
 				
-				; msgbox % values2String(" ", theCompound, theCompoundColor, theCertainty, thePressures*)
-				
 				return true
 			}
 		}
@@ -267,7 +265,7 @@ class SetupDatabase {
 			for ignore, airDelta in kTemperatureDeltas {
 				for ignore, trackDelta in kTemperatureDeltas {
 					distributions := {FL: {}, FR: {}, RL: {}, RR: {}}
-			
+					
 					this.getPressureDistributions(kSetupDatabaseDirectory . "local\" . path, airTemperature + airDelta, trackTemperature + trackDelta, distributions)
 					
 					if this.UseGlobalDatabase
@@ -293,8 +291,6 @@ class SetupDatabase {
 							thePressures[tyre]["Pressure"] := bestPressure
 							thePressures[tyre]["Delta Air"] := airDelta
 							thePressures[tyre]["Delta Track"] := trackDelta
-							
-							; showMessage(bestPressure . " " . airDelta . " " . trackDelta)
 						}
 						
 						return thePressures

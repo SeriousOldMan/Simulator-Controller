@@ -2196,8 +2196,6 @@ setupTyrePressures(context, weather, airTemperature, trackTemperature, compound,
 	pressures := false
 	certainty := 1.0
 	
-	; msgbox % compound . " " . compoundColor
-	
 	if (!inList(kTyreCompounds, compound) || !inList(kTyreCompoundColors, compoundColor)) {
 		compound := false
 		compoundColor := false

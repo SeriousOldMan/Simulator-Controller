@@ -6,6 +6,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                         Global Include Section                          ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include ..\Includes\Includes.ahk
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -184,7 +191,7 @@ class SetupDatabase {
 			
 				if descriptor[1] {
 					; weather, airTemperature, trackTemperature, compound
-					conditions.Push(weather, descriptor[1], descriptor[2], compound)
+					conditions.Push(Array(weather, descriptor[1], descriptor[2], compound))
 				
 					break
 				}
@@ -218,7 +225,7 @@ class SetupDatabase {
 					else
 						theCompoundColor := SubStr(theCompound[2], 2, StrLen(theCompound[2]) - 2)
 				
-					compounds.Push(Array(theCompound, theCompoundColor))
+					compounds.Push(Array(theCompound[1], theCompoundColor))
 				}
 			}
 		}
@@ -348,7 +355,7 @@ class SetupDatabase {
 			this.iDatabase := readConfiguration(this.iDatabaseName)
 		}
 		
-		pressureData := getConfigurationValue(database, "Pressures", key, false)
+		pressureData := getConfigurationValue(this.iDatabase, "Pressures", key, false)
 		pressures := {FL: {}, FR: {}, RL: {}, RR: {}}
 		
 		if pressureData {

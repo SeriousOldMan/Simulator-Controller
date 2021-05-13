@@ -6,6 +6,7 @@
   4. Jona can consult the setup database for a second opinion for tyre pressures.
   5. [New switches](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tab-settings) in *Race Engineer Settings* to control the different strategies that Jona uses to come up with target tyre pressures.
   6. Refactoring of the setup database code and some file relocations.
+  7. New Unit Tests for the setup database.
 
 ## 3.0.0-release 05/07/21
 

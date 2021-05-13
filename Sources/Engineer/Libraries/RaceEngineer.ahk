@@ -1215,7 +1215,8 @@ class RaceEngineer extends ConfigurationItem {
 		settings := this.RaceSettings
 		
 		this.iDriverName := getConfigurationValue(data, "Stint Data", "DriverForname", this.DriverName)
-		this.iSimulator := getConfigurationValue(data, "Session Data", "Simulator", "")
+		
+		this.iSimulator := this.SetupDatabase.getSimulatorName(getConfigurationValue(data, "Session Data", "Simulator", ""))
 		
 		switch getConfigurationValue(data, "Session Data", "Session", "Practice") {
 			case "Practice":

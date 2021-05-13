@@ -111,8 +111,19 @@ class SetupDatabase {
 	getSimulatorCode(simulatorName) {
 		if (simulatorName = "Unknown")
 			return "Unknown"
-		else
-			return string2Values("|", getConfigurationValue(this.ControllerConfiguration, "Simulators", simulatorName))[1]
+		else {
+			code := getConfigurationValue(this.ControllerConfiguration, "Simulators", simulatorName, false)
+		
+			if code
+				return string2Values("|", code)[1]
+			else {
+				for name, description in getConfigurationSectionValues(this.ControllerConfiguration, "Simulators", Object())
+					if (simulatorName = string2Values("|", description)[1])
+						return simulatorName
+				
+				return false
+			}
+		}
 	}
 
 	getSimulators() {

@@ -33,8 +33,8 @@ SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
 ;;;                              Test Section                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class InitializeDatabase extends Assert {
-	Initialize_Test() {
+class ClearDatabase extends Assert {
+	Clear_Test() {
 		try {
 			FileRemoveDir %kSetupDatabaseDirectory%Local\Unknown\TestCar, 1
 		}
@@ -46,7 +46,7 @@ class InitializeDatabase extends Assert {
 	}
 }
 
-class WritePressures extends Assert {	
+class InitializeDatabase extends Assert {	
 	SimpleWritePressure_Test() {
 		database := new SetupDatabase()
 		
@@ -87,9 +87,31 @@ class WritePressures extends Assert {
 		
 		this.AssertEqual(true, true)
 	}
+	
+	ConditionWritePressure_Test() {
+		database := new SetupDatabase()
+		
+		pressures := {}
+		
+		pressures["FL:26.5"] := 1
+		pressures["FR:26.4"] := 1
+		pressures["RL:26.7"] := 1
+		pressures["RR:26.5"] := 1
+		
+		database.updatePressures("Unknown", "TestCar", "TestTrack", "Drizzle", 17, 18, "Dry", "Red", pressures)
+		
+		pressures := {}
+		
+		pressures["FL:26.5"] := 1
+		pressures["FR:26.4"] := 1
+		pressures["RL:26.7"] := 1
+		pressures["RR:26.5"] := 1
+		
+		database.updatePressures("Unknown", "TestCar", "TestTrack", "MediumRain", 17, 18, "Wet", "Black", pressures)
+	}
 }
 
-class ReadPressures extends Assert {
+class SimplePressures extends Assert {
 	AssertExactResult(pressures, flPressure, frPressure, rlPressure, rrPressure) {
 		for tyre, pressureInfo in pressures {
 			switch tyre {
@@ -119,11 +141,11 @@ class ReadPressures extends Assert {
 	}
 }
 
-class ReadExtrapolatedPressures extends Assert {
-	listEqual(list1, list2) {
+class ExtrapolatedPressures extends Assert {
+	pressuresEqual(list1, list2) {
 		if (list1.Length() == list2.Length()) {
 			for index, value in list1
-				if (list2[index] != value)
+				if (Round(list2[index], 1) != Round(value, 2))
 					return false
 			
 			return true
@@ -156,7 +178,7 @@ class ReadExtrapolatedPressures extends Assert {
 		this.AssertEqual(expCompound, compound, "Compound should be " . expCompound . "...")
 		this.AssertEqual(expCompoundColor, compoundColor, "Compound color should be " . expCompoundColor . "...")
 		this.AssertEqual(expCertainty, certainty, "Certainty should be " . expCertainty . "...")
-		this.AssertEqual(true, this.listEqual(pressures, expPressures), "Pressures do not match...")
+		this.AssertEqual(true, this.pressuresEqual(pressures, expPressures), "Pressures do not match...")
 	}
 		
 	ReadPressure_Test() {
@@ -182,8 +204,63 @@ class ReadExtrapolatedPressures extends Assert {
 		certainty := false
 		
 		database.getTyreSetup("Unknown", "TestCar", "TestTrack", "Dry", 25, 25, compound, compoundColor, pressures, certainty)
-			
 		this.AssertExtrapolatedValues("Dry", compound, "Black", compoundColor, [26.1, 26.2, 26.3, 26.4], pressures, 1.0, certainty)
+		
+		database.getTyreSetup("Unknown", "TestCar", "TestTrack", "Dry", 25, 26, compound, compoundColor, pressures, certainty)
+		this.AssertExtrapolatedValues("Dry", compound, "Black", compoundColor, [26.3, 26.5, 26.4, 26.4], pressures, 1.0, certainty)
+		
+		database.getTyreSetup("Unknown", "TestCar", "TestTrack", "Dry", 24, 25, compound, compoundColor, pressures, certainty)
+		this.AssertExtrapolatedValues("Dry", compound, "Black", compoundColor, [26.2, 26.3, 26.4, 26.5], pressures, 0.8, certainty)
+		
+		database.getTyreSetup("Unknown", "TestCar", "TestTrack", "Dry", 24, 24, compound, compoundColor, pressures, certainty)
+		this.AssertExtrapolatedValues("Dry", compound, "Black", compoundColor, [26.2, 26.3, 26.4, 26.5], pressures, 0.6, certainty)
+		
+		database.getTyreSetup("Unknown", "TestCar", "TestTrack", "Dry", 24, 23, compound, compoundColor, pressures, certainty)
+		this.AssertExtrapolatedValues("Dry", compound, "Black", compoundColor, [26.3, 26.4, 26.5, 26.6], pressures, 0.4, certainty)
+		
+		database.getTyreSetup("Unknown", "TestCar", "TestTrack", "Dry", 26, 27, compound, compoundColor, pressures, certainty)
+		this.AssertExtrapolatedValues("Dry", compound, "Black", compoundColor, [26.2, 26.4, 26.3, 26.3], pressures, 0.6, certainty)
+	}
+}
+
+class DifferentCompoundPressures extends Assert {
+	pressuresEqual(list1, list2) {
+		if (list1.Length() == list2.Length()) {
+			for index, value in list1
+				if (Round(list2[index], 1) != Round(value, 2))
+					return false
+			
+			return true
+		}
+		else
+			return false
+	}
+	
+	AssertExtrapolatedValues(expCompound, compound, expCompoundColor, compoundColor, expPressures, pressures, expCertainty, certainty) {
+		this.AssertEqual(expCompound, compound, "Compound should be " . expCompound . "...")
+		this.AssertEqual(expCompoundColor, compoundColor, "Compound color should be " . expCompoundColor . "...")
+		this.AssertEqual(expCertainty, certainty, "Certainty should be " . expCertainty . "...")
+		this.AssertEqual(true, this.pressuresEqual(pressures, expPressures), "Pressures do not match...")
+	}
+	
+	CompoundSetup_Test() {
+		database := new SetupDatabase()
+		
+		compound := false
+		compoundColor := false
+		pressures := false
+		certainty := false
+		
+		database.getTyreSetup("Unknown", "TestCar", "TestTrack", "Dry", 16, 17, compound, compoundColor, pressures, certainty)
+		this.AssertExtrapolatedValues("Dry", compound, "Red", compoundColor, [26.6, 26.5, 26.8, 26.6], pressures, 0.6, certainty)
+		
+		compound := false
+		compoundColor := false
+		pressures := false
+		certainty := false
+		
+		database.getTyreSetup("Unknown", "TestCar", "TestTrack", "LightRain", 17, 17, compound, compoundColor, pressures, certainty)
+		this.AssertExtrapolatedValues("Wet", compound, "Black", compoundColor, [26.5, 26.4, 26.7, 26.5], pressures, 0.8, certainty)
 	}
 }
 
@@ -192,9 +269,10 @@ class ReadExtrapolatedPressures extends Assert {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+AHKUnit.AddTestClass(ClearDatabase)
 AHKUnit.AddTestClass(InitializeDatabase)
-AHKUnit.AddTestClass(WritePressures)
-AHKUnit.AddTestClass(ReadPressures)
-AHKUnit.AddTestClass(ReadExtrapolatedPressures)
+AHKUnit.AddTestClass(SimplePressures)
+AHKUnit.AddTestClass(ExtrapolatedPressures)
+AHKUnit.AddTestClass(DifferentCompoundPressures)
 
 AHKUnit.Run()

@@ -249,8 +249,10 @@ class SetupDatabase {
 	getPressures(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor) {
 		weatherBaseIndex := inList(kWeatherOptions, weather)
 		
-		if (weatherBaseIndex <= 2)
-			weatherCandidateOffsets := [0, 1, -1]
+		if (weatherBaseIndex == 1)
+			weatherCandidateOffsets := [0, 1]
+		if (weatherBaseIndex == 2)
+			weatherCandidateOffsets := [0, -1]
 		else
 			weatherCandidateOffsets := [0, 1, 2, 3]
 		

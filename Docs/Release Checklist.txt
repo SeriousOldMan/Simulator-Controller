@@ -12,6 +12,11 @@ General Release Actions
 10. Update Wiki using "update-documentation.bat"
 11. Set a Git Tag after final commit
 
+Release 3.0.4 Checklist
+=======================
+
+0. Search for new links (*)
+
 Release 3.0.2 Checklist
 =======================
 
@@ -26,7 +31,7 @@ Release 3.0.2 Checklist
    a. Translations
 5. New Race Engineer Settings (1. Temp Correction, 2. Setup Correction)
    a. New Doc Images
-   b. Docu in Virtual Race Engineer
+   b. Doc in Virtual Race Engineer
 6. Modified Text in Race Enginer Setups
    a. Update Doc Image
 

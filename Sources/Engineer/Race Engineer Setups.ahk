@@ -498,7 +498,7 @@ showRaceEngineerSetups() {
 			case "-Simulator":
 				simulator := A_Args[index + 1]
 				index += 2
-			case "-car":
+			case "-Car":
 				car := A_Args[index + 1]
 				index += 2
 			case "-Track":
@@ -507,10 +507,10 @@ showRaceEngineerSetups() {
 			case "-Weather":
 				weather := A_Args[index + 1]
 				index += 2
-			case "-AirT":
+			case "-AirTemperature":
 				airTemperature := A_Args[index + 1]
 				index += 2
-			case "-TrackT":
+			case "-TrackTemperature":
 				trackTemperature := A_Args[index + 1]
 				index += 2
 			case "-Compound":

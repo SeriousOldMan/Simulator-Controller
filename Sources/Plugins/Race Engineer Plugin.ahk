@@ -823,8 +823,8 @@ getOptions() {
 			options .= " -Car """ . getConfigurationValue(data, "Session Data", "Car", "Unknown") . """"
 			options .= " -Track """ . getConfigurationValue(data, "Session Data", "Track", "Unknown") . """"
 			options .= " -Weather " . getConfigurationValue(data, "Weather Data", "Weather", "Dry")
-			options .= " -AirT " . getConfigurationValue(data, "Weather Data", "Temperature", "23")
-			options .= " -TrackT " . getConfigurationValue(data, "Track Data", "Temperature", "27")
+			options .= " -AirTemperature " . getConfigurationValue(data, "Weather Data", "Temperature", "23")
+			options .= " -TrackTemperature " . getConfigurationValue(data, "Track Data", "Temperature", "27")
 			options .= " -Compound " . getConfigurationValue(data, "Car Data", "TyreCompound", "Dry")
 		}
 	}

@@ -42,7 +42,7 @@ class ClearDatabase extends Assert {
 			; ignore
 		}
 		
-		this.AssertEqual(true, true)
+		this.AssertEqual(true, !FileExist(kSetupDatabaseDirectory . "Local\Unknown\TestCar"), "Database has not been deleted...")
 	}
 }
 
@@ -59,7 +59,11 @@ class InitializeDatabase extends Assert {
 		
 		database.updatePressures("Unknown", "TestCar", "TestTrack", "Dry", 25, 25, "Dry", "Black", pressures)
 		
-		this.AssertEqual(true, true)
+		this.AssertEqual(true, (FileExist(kSetupDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Tyre Setup Dry Dry.data") != false), "Database file has not been created...")
+		
+		data := readConfiguration(kSetupDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Tyre Setup Dry Dry.data")
+		
+		this.AssertEqual(true, (getConfigurationValue(data, "Pressures", "25.25", false) != false), "Temperature entry has not been created...")
 	}
 	
 	ExtendedWritePressure_Test() {
@@ -85,7 +89,11 @@ class InitializeDatabase extends Assert {
 		
 		database.updatePressures("Unknown", "TestCar", "TestTrack", "Dry", 25, 26, "Dry", "Black", pressures)
 		
-		this.AssertEqual(true, true)
+		this.AssertEqual(true, (FileExist(kSetupDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Tyre Setup Dry Dry.data") != false), "Database file has not been created...")
+		
+		data := readConfiguration(kSetupDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Tyre Setup Dry Dry.data")
+		
+		this.AssertEqual(true, (getConfigurationValue(data, "Pressures", "25.26", false) != false), "Temperature entry has not been created...")
 	}
 	
 	ConditionWritePressure_Test() {
@@ -100,6 +108,12 @@ class InitializeDatabase extends Assert {
 		
 		database.updatePressures("Unknown", "TestCar", "TestTrack", "Drizzle", 17, 18, "Dry", "Red", pressures)
 		
+		this.AssertEqual(true, (FileExist(kSetupDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Tyre Setup Dry (Red) Drizzle.data") != false), "Database file has not been created...")
+		
+		data := readConfiguration(kSetupDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Tyre Setup Dry (Red) Drizzle.data")
+		
+		this.AssertEqual(true, (getConfigurationValue(data, "Pressures", "17.18", false) != false), "Temperature entry has not been created...")
+		
 		pressures := {}
 		
 		pressures["FL:26.5"] := 1
@@ -109,7 +123,11 @@ class InitializeDatabase extends Assert {
 		
 		database.updatePressures("Unknown", "TestCar", "TestTrack", "MediumRain", 17, 18, "Wet", "Black", pressures)
 		
-		this.AssertEqual(true, true)
+		this.AssertEqual(true, (FileExist(kSetupDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Tyre Setup Wet MediumRain.data") != false), "Database file has not been created...")
+		
+		data := readConfiguration(kSetupDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Tyre Setup Wet MediumRain.data")
+		
+		this.AssertEqual(true, (getConfigurationValue(data, "Pressures", "17.18", false) != false), "Temperature entry has not been created...")
 	}
 }
 
@@ -187,13 +205,9 @@ class ExtrapolatedPressures extends Assert {
 		database := new SetupDatabase()
 		
 		this.AssertExtrapolatedResult(database.getPressures("Unknown", "TestCar", "TestTrack", "Dry", 25, 27, "Dry", "Black"), 26.3, 26.5, 26.4, 26.4, 0, -1)
-		
 		this.AssertExtrapolatedResult(database.getPressures("Unknown", "TestCar", "TestTrack", "Dry", 25, 28, "Dry", "Black"), 26.3, 26.5, 26.4, 26.4, 0, -2)
-		
 		this.AssertExtrapolatedResult(database.getPressures("Unknown", "TestCar", "TestTrack", "Dry", 24, 26, "Dry", "Black"), 26.3, 26.5, 26.4, 26.4, 1, 0)
-		
 		this.AssertExtrapolatedResult(database.getPressures("Unknown", "TestCar", "TestTrack", "Dry", 24, 27, "Dry", "Black"), 26.3, 26.5, 26.4, 26.4, 1, -1)
-		
 		this.AssertExtrapolatedResult(database.getPressures("Unknown", "TestCar", "TestTrack", "Dry", 25, 25, "Dry", "Black"), 26.1, 26.2, 26.3, 26.4, 0, 0)
 	}
 		
@@ -276,5 +290,6 @@ AHKUnit.AddTestClass(InitializeDatabase)
 AHKUnit.AddTestClass(SimplePressures)
 AHKUnit.AddTestClass(ExtrapolatedPressures)
 AHKUnit.AddTestClass(DifferentCompoundPressures)
+AHKUnit.AddTestClass(ClearDatabase)
 
 AHKUnit.Run()

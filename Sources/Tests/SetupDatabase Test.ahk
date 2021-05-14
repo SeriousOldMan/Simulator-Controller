@@ -108,6 +108,8 @@ class InitializeDatabase extends Assert {
 		pressures["RR:26.5"] := 1
 		
 		database.updatePressures("Unknown", "TestCar", "TestTrack", "MediumRain", 17, 18, "Wet", "Black", pressures)
+		
+		this.AssertEqual(true, true)
 	}
 }
 

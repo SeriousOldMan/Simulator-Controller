@@ -106,6 +106,10 @@ openSetupsDocumentation() {
 }
 
 chooseSimulator() {
+	protectionOn()
+	
+	Gui RES:Default
+			
 	GuiControlGet simulatorDropDown
 	
 	choices := vSetupDatabase.getCars(simulatorDropDown)
@@ -115,9 +119,15 @@ chooseSimulator() {
 	GuiControl Choose, carDropDown, %chosen%
 	
 	chooseCar()
+	
+	protectionOff()
 }
 
 chooseCar() {
+	protectionOn()
+	
+	Gui RES:Default
+			
 	GuiControlGet simulatorDropDown
 	GuiControlGet carDropDown
 	
@@ -128,9 +138,15 @@ chooseCar() {
 	GuiControl Choose, trackDropDown, %chosen%
 	
 	chooseTrack()
+	
+	protectionOff()
 }
 
 chooseTrack() {
+	protectionOn()
+	
+	Gui RES:Default
+			
 	GuiControlGet simulatorDropDown
 	GuiControlGet carDropDown
 	GuiControlGet trackDropDown
@@ -138,28 +154,44 @@ chooseTrack() {
 	conditions := vSetupDatabase.getConditions(simulatorDropDown, carDropDown, trackDropDown)
 	
 	if (conditions.Length() > 0) {
-		GuiControl Choose, weatherDropDown, % inList(kWeatherOptions, conditions[1])
-		GuiControl Text, airTemperatureEdit, % conditions[2]
-		GuiControl Text, trackTemperatureEdit, % conditions[3]
+		weatherDropDown := inList(kWeatherOptions, conditions[1])
+		airTemperatureEdit := conditions[2]
+		trackTemperatureEdit := conditions[3]
 		
-		GuiControl Choose, compoundDropDown, % inList(kQualifiedTyreCompounds, conditions[4])
+		compoundDropDown := inList(kQualifiedTyreCompounds, conditions[4])
 	}
 	else {
-		GuiControl Choose, weatherDropDown, 0
-		GuiControl Text, airTemperatureEdit, 23
-		GuiControl Text, trackTemperatureEdit, 27
+		weatherDropDown := 0
+		airTemperatureEdit := 23
+		trackTemperatureEdit := 27
 		
-		GuiControl Choose, compoundDropDown, 0
+		compoundDropDown := 0
 	}
+
+	GuiControl Choose, weatherDropDown, %weatherDropDown%
+	GuiControl Text, airTemperatureEdit, %airTemperatureEdit%
+	GuiControl Text, trackTemperatureEdit, %trackTemperatureEdit%
+	
+	GuiControl Choose, compoundDropDown, %compoundDropDown%
 	
 	chooseTemperature()
+	
+	protectionOff()
 }
 
 chooseTemperature() {
+	protectionOn()
+	
 	loadPressures()
+	
+	protectionOff()
 }
 
 loadPressures() {
+	protectionOn()
+	
+	Gui RES:Default
+			
 	static lastColor := "D0D0D0"
 	
 	GuiControlGet simulatorDropDown
@@ -231,9 +263,13 @@ loadPressures() {
 			GuiControl Enable, transferPressuresButton
 		}
 	}
+	
+	protectionOff()
 }
 
 updateQueryScope() {
+	Gui RES:Default
+			
 	GuiControlGet queryScopeDropDown
 	
 	vSetupDatabase.setUseGlobalDatabase(queryScopeDropDown - 1)
@@ -242,6 +278,8 @@ updateQueryScope() {
 }
 
 transferPressures() {
+	Gui RES:Default
+			
 	GuiControlGet simulatorDropDown
 	GuiControlGet carDropDown
 	GuiControlGet trackDropDown

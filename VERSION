@@ -1,14 +1,14 @@
 [Development]
-Version=3.0.2-rc2
+Version=3.0.2-release
 Target=3.0.2-release
-Date=05/13/2021
+Date=05/14/2021
 Changes=New "Transfer" method for tyre pressure setups, Refactoring of Setup Database code, Jona consults the Setup Database for a second opion on tyre pressures, Switches in Race Engineer Settings to select Jonas strategy when calculating target tyre pressures, Unit tests for Setup Database
 [Release]
-Version=3.0.0-release
-Date=05/07/2021
-Changes=Setup Database Query Tool, New plugin parameter "openRaceEngineerSetups" for the Race Engineer plugin
+Version=3.0.2-release
+Date=05/14/2021
+Changes=New "Transfer" method for tyre pressure setups, Refactoring of Setup Database code, Jona consults the Setup Database for a second opion on tyre pressures, Switches in Race Engineer Settings to select Jonas strategy when calculating target tyre pressures, Unit tests for Setup Database
 [Current]
-Type=Development
+Type=Release
 [Version]
-Release=3.0.0-release
-Development=3.0.2-rc2
+Release=3.0.2-release
+Development=3.0.2-release

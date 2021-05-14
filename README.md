@@ -26,13 +26,13 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-[3.0.2-rc2](https://www.dropbox.com/s/ulcl4pan7n98fao/Simulator%20Controller%203.0.2-rc2.zip?dl=1) (Release candidate for Release 3.0.2. New features: New "Transfer" method for tyre pressure setups from the setup database and *Race Engineer Settings*, Refactoring of setup database code, Jona consults the Setup Database for a second opinion on tyre pressures, New switches in *Race Engineer Settings* to select Jonas strategy when calculating target tyre pressures, Unit tests for Setup Database. Documented and with automated update procedure...)
+None for the moment...
 
 #### Latest release builds
 
-[2.8.6-release](https://www.dropbox.com/s/hsmzxivnttc2wpy/Simulator%20Controller%202.8.6-release.zip?dl=1) (New features: Full support for iRacing, incl. a specialized "Pitstop" mode and an integration with Jona, the Virtual Race Engineer, New actions "Accept" and "Reject" to extend the control of Jona directly from the Button Box.)
-
 [3.0.0-release](https://www.dropbox.com/s/xrpmfki4rx9pnlv/Simulator%20Controller%203.0.0-release.zip?dl=1) (New features: Query interface for the setup database, New plugin parameter "openRaceEngineerSetups" for the Race Engineer plugin.)
+
+[3.0.2-release](https://www.dropbox.com/s/58s51i0en0bkaeg/Simulator%20Controller%203.0.2-release.zip?dl=1) (New features: New "Transfer" method for tyre pressure setups from the setup database and *Race Engineer Settings*, Refactoring of setup database code, Jona consults the Setup Database for a second opinion on tyre pressures, New switches in *Race Engineer Settings* to select Jonas strategy when calculating target tyre pressures, Unit tests for Setup Database.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-30) of this version and all the versions you might have skipped, before installing and using this version.
 

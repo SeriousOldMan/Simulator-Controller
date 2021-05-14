@@ -43,6 +43,12 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ***
 
+## Release 3.0.2
+
+No manual update steps necessary for this release, everything is handled automatically.
+
+***
+
 ## Release 3.0
 
 This update is handled completely without manual interaction. You might want to add the new application *Race Engineer Setups.exe* to your *launchpad* (see the ["Launch" mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-launch) of the "System" plugin for more information), though. Also, you might want to use the new [plugin parameter *raceEngineerOpenSetups*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin to open the setup database query tool.

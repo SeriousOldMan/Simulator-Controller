@@ -154,6 +154,8 @@ chooseTrack() {
 	conditions := vSetupDatabase.getConditions(simulatorDropDown, carDropDown, trackDropDown)
 	
 	if (conditions.Length() > 0) {
+		conditions := conditions[1]
+		
 		weatherDropDown := inList(kWeatherOptions, conditions[1])
 		airTemperatureEdit := conditions[2]
 		trackTemperatureEdit := conditions[3]

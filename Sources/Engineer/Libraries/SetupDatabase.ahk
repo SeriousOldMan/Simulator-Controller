@@ -192,8 +192,6 @@ class SetupDatabase {
 				if descriptor[1] {
 					; weather, airTemperature, trackTemperature, compound
 					conditions.Push(Array(weather, descriptor[1], descriptor[2], compound))
-				
-					break
 				}
 			}
 		}

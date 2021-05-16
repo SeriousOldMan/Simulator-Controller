@@ -1,0 +1,37 @@
+[Car Data]
+BodyworkDamage=0, 0, 0, 0, 0
+FuelRemaining=23.7335
+SuspensionDamage=0, 0, 0, 0
+TyreCompound=Dry
+TyreCompoundColor=Black
+TyrePressure=27.3671, 27.525, 27.573, 27.8165
+TyreTemperature=86.9474, 73.4004, 87.7548, 75.6285
+[Session Data]
+Active=true
+Car=mclaren_720s_gt3
+FuelAmount=125
+Paused=false
+Session=Race
+SessionFormat=Time
+Simulator=ACC
+Track=Zandvoort
+[Stint Data]
+DriverForname=The
+DriverNickname=
+DriverSurname=BigO
+DriverTimeRemaining=6.5535e+07
+InPit=false
+LapBestTime=96105
+LapLastTime=96615
+Laps=14
+SessionLapsRemaining=29.2139
+SessionTimeRemaining=2.8225e+06
+StintTimeRemaining=2.8225e+06
+[Track Data]
+Grip=Optimum
+Temperature=23.079
+[Weather Data]
+Temperature=16.5138
+Weather=Dry
+Weather10min=Dry
+Weather30min=Dry

@@ -462,6 +462,8 @@ priority: 20, [?Lap] => (ProveAll: updateRemainingLaps, ?Lap)
 updateRemainingLaps(?lap) <= remainingStintLaps(?lap, Driver, ?driverLaps), Set(Lap.Remaining.Stint, ?driverLaps)
 updateRemainingLaps(?lap) <= remainingStintLaps(?lap, Fuel, ?fuelLaps), Set(Lap.Remaining.Fuel, ?fuelLaps)
 updateRemainingLaps(?lap) <= remainingSessionLaps(?lap, ?sessionLaps), Set(Lap.Remaining.Session, ?sessionLaps)
+updateRemainingLaps(?lap) <= !Lap.Remaining.Stint > !Lap.Remaining.Fuel, Set(Lap.Remaining.Stint, !Lap.Remaining.Fuel)
+updateRemainingLaps(?lap) <= !Lap.Remaining.Stint > !Lap.Remaining.Session, Set(Lap.Remaining.Stint, !Lap.Remaining.Session)
 
 priority: 20, {All: {Any: [?Lap.Remaining.Fuel < ?Lap.Remaining.Stint], [?Lap.Remaining.Fuel < ?Lap.Remaining.Session]},						\
 					[?Lap.Remaining.Fuel <= ?Session.Settings.Lap.PitstopWarning], [?Lap.Remaining.Session > 0]} =>								\
@@ -696,8 +698,8 @@ priority: 10, [?Pitstop.Plan] => (Prove: planPitstop)
 {All: [?Pitstop.Plan], {None: [?Damage.Repair.Suspension.Target]}} => (Set: Pitstop.Planned.Repair.Suspension, false)
 {All: [?Pitstop.Plan], {None: [?Damage.Repair.Bodywork.Target]}} => (Set: Pitstop.Planned.Repair.Bodywork, false)
 
-priority: -5, {All: [?Pitstop.Plan], [?Lap.Remaining.Stint <= 5]} => (Set: Pitstop.Planned.Tyre.Compound, false),								\
-																	 (Set: Pitstop.Planned.Tyre.Compound.Color, false)
+priority: -5, {All: [?Pitstop.Plan], [?Lap.Remaining.Session <= 5]} => (Set: Pitstop.Planned.Tyre.Compound, false),								\
+																	   (Set: Pitstop.Planned.Tyre.Compound.Color, false)
 
 priority: -20, [?Pitstop.Plan] => (Set: Pitstop.Planned), (Clear: Pitstop.Plan)
 
@@ -997,10 +999,11 @@ remainingStintLaps(?lap, ?remainingLaps) <= remainingStintLaps(?lap, Fuel, ?fuel
 											?remainingLaps < ?sessionLaps, !
 remainingStintLaps(?lap, ?remainingLaps) <= remainingSessionLaps(?lap, ?remainingLaps)
 
-remainingStintLaps(?lap, Fuel, ?remainingLaps) <= remainingSessionLaps(?lap, ?sessionLaps),														\
-												  lapRemainingFuel(?lap, ?fuelLeft), lapAvgFuel(?lap, ?fuelPerLap),								\
-												  ; ?fuelLaps = ?fuelLeft / ?fuelPerLap, min(?sessionLaps, ?fuelLaps, ?remainingLaps)
+remainingStintLaps(?lap, Fuel, ?remainingLaps) <= lapRemainingFuel(?lap, ?fuelLeft), lapAvgFuel(?lap, ?fuelPerLap),								\
 												  ?remainingLaps = ?fuelLeft / ?fuelPerLap
+remainingStintLaps(?lap, Driver, ?remainingLaps) <= recentPitstopLap(?lap), !,																	\
+													Get(Lap, ?lap, Fuel.Remaining, ?fuel), Get(Lap, ?lap, Fuel.AvgConsumption, ?consumption),	\
+													?remainingLaps = ?fuel / ?consumption
 remainingStintLaps(?lap, Driver, ?remainingLaps) <= remainingStintTime(?stintTime), lapAvgTime(?lap, ?avgTime),									\
 													?remainingLaps = ?stintTime / ?avgTime
 

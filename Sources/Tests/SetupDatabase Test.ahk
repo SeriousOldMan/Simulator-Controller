@@ -30,6 +30,72 @@ SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                         Private Classes Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+class PressuresAssert extends Assert {
+	pressuresEqual(list1, list2) {
+		if (list1.Length() == list2.Length()) {
+			for index, value in list1
+				if (Round(list2[index], 1) != Round(value, 2))
+					return false
+			
+			return true
+		}
+		else
+			return false
+	}
+	
+	AssertExactResult(pressures, flPressure, frPressure, rlPressure, rrPressure) {
+		for tyre, pressureInfo in pressures {
+			switch tyre {
+				case "FL":
+					this.AssertEqual(flPressure, pressureInfo["Pressure"], "FL pressure should be " . flPressure . "...")
+				case "FR":
+					this.AssertEqual(frPressure, pressureInfo["Pressure"], "FR pressure should be " . frPressure . "...")
+				case "RL":
+					this.AssertEqual(rlPressure, pressureInfo["Pressure"], "RL pressure should be " . rlPressure . "...")
+				case "RR":
+					this.AssertEqual(rrPressure, pressureInfo["Pressure"], "RR pressure should be " . rrPressure . "...")
+				default:
+					this.AssertEqual(true, false, "Unknown tyre type encountered...")
+			}
+			
+			this.AssertEqual(0, pressureInfo["Delta Air"], "Delta Air should be 0...")
+			this.AssertEqual(0, pressureInfo["Delta Track"], "Delta Track should be 0...")
+		}
+	}
+	
+	AssertExtrapolatedResult(pressures, flPressure, frPressure, rlPressure, rrPressure, deltaAir, deltaTrack) {
+		for tyre, pressureInfo in pressures {
+			switch tyre {
+				case "FL":
+					this.AssertEqual(flPressure, pressureInfo["Pressure"], "FL pressure should be " . flPressure . "...")
+				case "FR":
+					this.AssertEqual(frPressure, pressureInfo["Pressure"], "FR pressure should be " . frPressure . "...")
+				case "RL":
+					this.AssertEqual(rlPressure, pressureInfo["Pressure"], "RL pressure should be " . rlPressure . "...")
+				case "RR":
+					this.AssertEqual(rrPressure, pressureInfo["Pressure"], "RR pressure should be " . rrPressure . "...")
+				default:
+					this.AssertEqual(true, false, "Unknown tyre type encountered...")
+			}
+			
+			this.AssertEqual(deltaAir, pressureInfo["Delta Air"], "Delta Air should be 0...")
+			this.AssertEqual(deltaTrack, pressureInfo["Delta Track"], "Delta Track should be 0...")
+		}
+	}
+	
+	AssertExtrapolatedValues(expCompound, compound, expCompoundColor, compoundColor, expPressures, pressures, expCertainty, certainty) {
+		this.AssertEqual(expCompound, compound, "Compound should be " . expCompound . "...")
+		this.AssertEqual(expCompoundColor, compoundColor, "Compound color should be " . expCompoundColor . "...")
+		this.AssertEqual(expCertainty, certainty, "Certainty should be " . expCertainty . "...")
+		this.AssertEqual(true, this.pressuresEqual(pressures, expPressures), "Pressures do not match...")
+	}
+}
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                              Test Section                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -131,27 +197,7 @@ class InitializeDatabase extends Assert {
 	}
 }
 
-class SimplePressures extends Assert {
-	AssertExactResult(pressures, flPressure, frPressure, rlPressure, rrPressure) {
-		for tyre, pressureInfo in pressures {
-			switch tyre {
-				case "FL":
-					this.AssertEqual(flPressure, pressureInfo["Pressure"], "FL pressure should be " . flPressure . "...")
-				case "FR":
-					this.AssertEqual(frPressure, pressureInfo["Pressure"], "FR pressure should be " . frPressure . "...")
-				case "RL":
-					this.AssertEqual(rlPressure, pressureInfo["Pressure"], "RL pressure should be " . rlPressure . "...")
-				case "RR":
-					this.AssertEqual(rrPressure, pressureInfo["Pressure"], "RR pressure should be " . rrPressure . "...")
-				default:
-					this.AssertEqual(true, false, "Unknown tyre type encountered...")
-			}
-			
-			this.AssertEqual(0, pressureInfo["Delta Air"], "Delta Air should be 0...")
-			this.AssertEqual(0, pressureInfo["Delta Track"], "Delta Track should be 0...")
-		}
-	}
-		
+class SimplePressures extends PressuresAssert {
 	SimpleReadPressure_Test() {
 		this.AssertExactResult(new SetupDatabase().getPressures("Unknown", "TestCar", "TestTrack", "Dry", 25, 25, "Dry", "Black"), 26.1, 26.2, 26.3, 26.4)
 	}
@@ -161,46 +207,7 @@ class SimplePressures extends Assert {
 	}
 }
 
-class ExtrapolatedPressures extends Assert {
-	pressuresEqual(list1, list2) {
-		if (list1.Length() == list2.Length()) {
-			for index, value in list1
-				if (Round(list2[index], 1) != Round(value, 2))
-					return false
-			
-			return true
-		}
-		else
-			return false
-	}
-	
-	AssertExtrapolatedResult(pressures, flPressure, frPressure, rlPressure, rrPressure, deltaAir, deltaTrack) {
-		for tyre, pressureInfo in pressures {
-			switch tyre {
-				case "FL":
-					this.AssertEqual(flPressure, pressureInfo["Pressure"], "FL pressure should be " . flPressure . "...")
-				case "FR":
-					this.AssertEqual(frPressure, pressureInfo["Pressure"], "FR pressure should be " . frPressure . "...")
-				case "RL":
-					this.AssertEqual(rlPressure, pressureInfo["Pressure"], "RL pressure should be " . rlPressure . "...")
-				case "RR":
-					this.AssertEqual(rrPressure, pressureInfo["Pressure"], "RR pressure should be " . rrPressure . "...")
-				default:
-					this.AssertEqual(true, false, "Unknown tyre type encountered...")
-			}
-			
-			this.AssertEqual(deltaAir, pressureInfo["Delta Air"], "Delta Air should be 0...")
-			this.AssertEqual(deltaTrack, pressureInfo["Delta Track"], "Delta Track should be 0...")
-		}
-	}
-	
-	AssertExtrapolatedValues(expCompound, compound, expCompoundColor, compoundColor, expPressures, pressures, expCertainty, certainty) {
-		this.AssertEqual(expCompound, compound, "Compound should be " . expCompound . "...")
-		this.AssertEqual(expCompoundColor, compoundColor, "Compound color should be " . expCompoundColor . "...")
-		this.AssertEqual(expCertainty, certainty, "Certainty should be " . expCertainty . "...")
-		this.AssertEqual(true, this.pressuresEqual(pressures, expPressures), "Pressures do not match...")
-	}
-		
+class ExtrapolatedPressures extends PressuresAssert {
 	ReadPressure_Test() {
 		database := new SetupDatabase()
 		
@@ -239,26 +246,7 @@ class ExtrapolatedPressures extends Assert {
 	}
 }
 
-class DifferentCompoundPressures extends Assert {
-	pressuresEqual(list1, list2) {
-		if (list1.Length() == list2.Length()) {
-			for index, value in list1
-				if (Round(list2[index], 1) != Round(value, 2))
-					return false
-			
-			return true
-		}
-		else
-			return false
-	}
-	
-	AssertExtrapolatedValues(expCompound, compound, expCompoundColor, compoundColor, expPressures, pressures, expCertainty, certainty) {
-		this.AssertEqual(expCompound, compound, "Compound should be " . expCompound . "...")
-		this.AssertEqual(expCompoundColor, compoundColor, "Compound color should be " . expCompoundColor . "...")
-		this.AssertEqual(expCertainty, certainty, "Certainty should be " . expCertainty . "...")
-		this.AssertEqual(true, this.pressuresEqual(pressures, expPressures), "Pressures do not match...")
-	}
-	
+class DifferentCompoundPressures extends PressuresAssert {	
 	CompoundSetup_Test() {
 		database := new SetupDatabase()
 		

@@ -1,3 +1,7 @@
+## 3.0.3-release 05/16/21
+
+  1. Critical bugfix for remaining fuel caluclation after a pitstop in races longer than an hour
+  
 ## 3.0.2-release 05/14/21
 
   1. Bugfixes, as always

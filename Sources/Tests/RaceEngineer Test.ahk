@@ -869,7 +869,7 @@ if !GetKeyState("Ctrl") {
 else {
 	raceNr := (GetKeyState("Alt") ? 12 : ((GetKeyState("Shift") ? 2 : 1)))
 	engineer := new TestRaceEngineer(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Engineer.settings")
-								   , new TestPitStopHandler(), "Jona", "de", true, true)
+								   , new TestPitStopHandler(), "Jona", "de", true, false)
 
 	engineer.setDebug(kDebugPhrases, false)
 	
@@ -1189,4 +1189,10 @@ else {
 		MsgBox Done...
 	
 	ExitApp
+}
+
+show(context, args*) {
+	showMessage(values2string(" ", args*), "Race Engineer Test", "Information.png", 2500)
+	
+	return true
 }

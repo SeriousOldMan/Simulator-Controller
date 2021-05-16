@@ -459,8 +459,8 @@ setDamageReported(?damageType, true) <= Set(Damage.Reported, !Lap), Set(Damage, 
 
 priority: 20, [?Lap] => (ProveAll: updateRemainingLaps, ?Lap)
 
-updateRemainingLaps(?lap) <= remainingStintLaps(?lap, Driver, ?driverLaps), Set(Lap.Remaining.Stint, ?driverLaps)
 updateRemainingLaps(?lap) <= remainingStintLaps(?lap, Fuel, ?fuelLaps), Set(Lap.Remaining.Fuel, ?fuelLaps)
+updateRemainingLaps(?lap) <= remainingStintLaps(?lap, Driver, ?driverLaps), Set(Lap.Remaining.Stint, ?driverLaps)
 updateRemainingLaps(?lap) <= remainingSessionLaps(?lap, ?sessionLaps), Set(Lap.Remaining.Session, ?sessionLaps)
 updateRemainingLaps(?lap) <= !Lap.Remaining.Stint > !Lap.Remaining.Fuel, Set(Lap.Remaining.Stint, !Lap.Remaining.Fuel)
 updateRemainingLaps(?lap) <= !Lap.Remaining.Stint > !Lap.Remaining.Session, Set(Lap.Remaining.Stint, !Lap.Remaining.Session)
@@ -845,7 +845,8 @@ lapRemainingFuel(?lap, ?remainingFuel) <= Get(Lap, ?lap, Fuel.Remaining, ?remain
 
 lapTime(?lap, ?time) <= Get(Lap, ?lap, Time, ?time)
 
-lapAvgTime(?lap, ?avgTime) <= weightedLapTimes(?lap, ?lapTimes), lapAvgTime(?lap, ?lapTimes, ?avgTime)
+lapAvgTime(?lap, ?avgTime) <= Get(Lap, ?lap, Time.Average, ?avgTime)
+lapAvgTime(?lap, ?avgTime) <= weightedLapTimes(?lap, ?lapTimes), lapAvgTime(?lap, ?lapTimes, ?avgTime), Set(Lap, ?lap, Time.Average, ?avgTime)
 
 lapAvgTime(?lap, [], ?avgTime) <= !, ?avgTime = !Session.Settings.Lap.AvgTime * 1000
 lapAvgTime(?lap, ?times, ?avgTime) <= sum(?times, ?sTimes), length(?times, ?sLength), ?avgTime = ?sTimes / ?sLength
@@ -936,7 +937,7 @@ recentLapWeathers(?lap, ?offset, [?weather | ?weathers]) <=																					
 ;;;                       Pitstop Information Retrieval                     ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-lastPitstop(?nr) <= bound?(!Pitstop.Last), ?nr = !Pitstop.Last
+lastPitstop(?nr) <= Get(Pitstop.Last, ?last), ?nr = ?last
 
 pitstopLap(?lap) <= lastPitstopLap(?lap)
 
@@ -1001,9 +1002,6 @@ remainingStintLaps(?lap, ?remainingLaps) <= remainingSessionLaps(?lap, ?remainin
 
 remainingStintLaps(?lap, Fuel, ?remainingLaps) <= lapRemainingFuel(?lap, ?fuelLeft), lapAvgFuel(?lap, ?fuelPerLap),								\
 												  ?remainingLaps = ?fuelLeft / ?fuelPerLap
-remainingStintLaps(?lap, Driver, ?remainingLaps) <= recentPitstopLap(?lap), !,																	\
-													Get(Lap, ?lap, Fuel.Remaining, ?fuel), Get(Lap, ?lap, Fuel.AvgConsumption, ?consumption),	\
-													?remainingLaps = ?fuel / ?consumption
 remainingStintLaps(?lap, Driver, ?remainingLaps) <= remainingStintTime(?stintTime), lapAvgTime(?lap, ?avgTime),									\
 													?remainingLaps = ?stintTime / ?avgTime
 

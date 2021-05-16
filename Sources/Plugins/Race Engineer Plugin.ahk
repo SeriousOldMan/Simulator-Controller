@@ -405,6 +405,15 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 	}
 	
 	startSession(dataFile) {
+		if this.Simulator {
+			code := this.Simulator.Code
+		
+			FileCreateDir %kTempDirectory%%code% Data
+			
+			Loop Files, %kTempDirectory%%code% Data\*.*
+				FileDelete %A_LoopFilePath%
+		}
+		
 		if this.RaceEngineer
 			this.finishSession(false)
 		else
@@ -494,13 +503,6 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 			this.stopSimulation(this.Simulator)
 		
 		this.iSimulator := simulator
-	
-		code := simulator.Code
-		
-		FileCreateDir %kTempDirectory%%code% Data
-		
-		Loop Files, %kTempDirectory%%code% Data\*.*
-			FileDelete %A_LoopFilePath%
 	}
 	
 	stopSimulation(simulator) {

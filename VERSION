@@ -1,14 +1,14 @@
 [Development]
-Version=3.0.3-release
-Target=3.0.3-release
+Version=3.0.4-dev
+Target=3.0.4-release
 Date=05/16/2021
-Changes=Critical fix for post pitstop fuel calculation
+Changes=Rework of post pitstop fuel calculation
 [Release]
 Version=3.0.3-release
 Date=05/16/2021
 Changes=Critical fix for post pitstop fuel calculation
 [Current]
-Type=Release
+Type=Development
 [Version]
 Release=3.0.3-release
-Development=3.0.3-release
+Development=3.0.4-dev

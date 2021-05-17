@@ -855,9 +855,11 @@ recentLapTimes(?lap, ?times) <= recentLapTimes(?lap, 0, ?temp), remove(?temp, 0,
 
 recentLapTimes(?lap, ?lap, []) <= !
 recentLapTimes(?, ?offset, []) <= >=(?offset, !Session.Settings.Lap.History.Considered), !
-recentLapTimes(?lap, ?offset, [0 | ?times]) <= ?tLap = ?lap - ?offset, recentPitstopLap(?tlap), !, ?nOffset = ?offset + 1,						\
-											   recentLapTimes(?lap, ?nOffset, ?times)
-recentLapTimes(?lap, ?offset, [0]) <= ?tLap = ?lap - ?offset, ?tLap = 1, !
+recentLapTimes(?lap, ?offset, [?time | ?times]) <= ?tLap = ?lap - ?offset, recentPitstopLap(?tlap), !, 											\
+												   ?nOffset = ?offset + 1, recentLapTimes(?lap, ?nOffset, ?times),								\
+												   ?time = !Session.Settings.Lap.AvgTime * 1000
+; recentLapTimes(?lap, ?offset, [?time]) <= ?tLap = ?lap - ?offset, ?tLap = 1, ?time = !Session.Settings.Lap.AvgTime * 1000, !
+recentLapTimes(?lap, ?offset, [0]) <= ?tLap = ?lap - ?offset, ?tLap = 1
 recentLapTimes(?lap, ?offset, [?time | ?times]) <= ?tLap = ?lap - ?offset, lapTime(?tlap, ?time),												\
 												   ?nOffset = ?offset + 1, recentLapTimes(?lap, ?nOffset, ?times)
 
@@ -865,9 +867,11 @@ weightedLapTimes(?lap, ?times) <= weightedLapTimes(?lap, 0, ?temp), remove(?temp
 
 weightedLapTimes(?lap, ?lap, []) <= !
 weightedLapTimes(?, ?offset, []) <= >=(?offset, !Session.Settings.Lap.History.Considered), !
-weightedLapTimes(?lap, ?offset, [0 | ?times]) <= ?tLap = ?lap - ?offset, recentPitstopLap(?tlap), !, ?nOffset = ?offset + 1, 					\
-												 weightedLapTimes(?lap, ?nOffset, ?times)
-weightedLapTimes(?lap, ?offset, [0]) <= ?tLap = ?lap - ?offset, ?tLap = 1, !
+weightedLapTimes(?lap, ?offset, [?time | ?times]) <= ?tLap = ?lap - ?offset, recentPitstopLap(?tlap), !,										\
+													 ?nOffset = ?offset + 1, weightedLapTimes(?lap, ?nOffset, ?times),							\
+													 ?time = !Session.Settings.Lap.AvgTime * 1000
+; weightedLapTimes(?lap, ?offset, [?time]) <= ?tLap = ?lap - ?offset, ?tLap = 1, ?time = !Session.Settings.Lap.AvgTime * 1000, !
+weightedLapTimes(?lap, ?offset, [0]) <= ?tLap = ?lap - ?offset, ?tLap = 1
 weightedLapTimes(?lap, ?offset, [?time | ?times]) <= ?tLap = ?lap - ?offset, weightedLapTime(?lap, ?tlap, ?time),								\
 													 ?nOffset = ?offset + 1, weightedLapTimes(?lap, ?nOffset, ?times)
 
@@ -937,7 +941,7 @@ recentLapWeathers(?lap, ?offset, [?weather | ?weathers]) <=																					
 ;;;                       Pitstop Information Retrieval                     ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-lastPitstop(?nr) <= Get(Pitstop.Last, ?last), ?nr = ?last
+lastPitstop(?nr) <= Get(Pitstop.Last, ?nr)
 
 pitstopLap(?lap) <= lastPitstopLap(?lap)
 

@@ -508,15 +508,15 @@ showFacts(knowledgeBase) {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
-
+/*
 AHKUnit.AddTestClass(Compiler)
 AHKUnit.AddTestClass(CoreEngine)
 AHKUnit.AddTestClass(Unification)
 AHKUnit.AddTestClass(HybridEngine)
 
 AHKUnit.Run()
+*/
 
-/*
 theRules =
 (
 	=<(?x, ?y) <= ?x = ?y
@@ -564,6 +564,17 @@ theRules =
 	remove([?h | ?t], ?h, ?result) <= remove(?t, ?h, ?result), !
 	remove([?h | ?t], ?x, [?h | ?result]) <= remove(?t, ?x, ?result)
 	
+	removeUnbound([], []) <= !
+	removeUnbound([?h | ?t], [?hr | ?r]) <= bound?(?h), !, removeUnbound(?h, ?hr), removeUnbound(?t, ?r)
+	removeUnbound([?h | ?t], ?r) <= unbound?(?h), !, removeUnbound(?t, ?r)
+	removeUnbound(?r, ?r)
+	
+	testRemoveUnbound(?a, ?r) <= ?a = Foo, removeUnbound([?a, ?b], ?r)
+	testRemoveUnbound(?a, ?r) <= removeUnbound([1, 2, ?a], ?r)
+	testRemoveUnbound(?a, ?r) <= ?a = Foo, removeUnbound([[?a, ?a], ?b], ?r)
+	testRemoveUnbound(?a, ?r) <= removeUnbound([[?a, ?a], ?b], ?r)
+	testRemoveUnbound(?a, ?r) <= removeUnbound([[?a, ?a, [?c, Foo]], ?b], ?r)
+	
 	complexClause(?x, ?y) <= ?x = [1, 2, 3], ?y = complex(A, foo([1, 2]))
 	
 	index(?list, ?element, ?index) <= index(?list, ?element, 0, ?index)
@@ -587,8 +598,8 @@ rc.compileRules(theRules, productions, reductions)
 eng := new RuleEngine(productions, reductions, {})
 
 kb := eng.createKnowledgeBase(eng.createFacts(), eng.createRules())
-
-g := rc.compileGoal("weatherSymbol(4, ?s)")
+; eng.setTraceLevel(kTraceFull)
+g := rc.compileGoal("testRemoveUnbound(?a, ?r)")
 
 rs := kb.prove(g)
 
@@ -600,4 +611,3 @@ while (rs != false) {
 }
 
 msgbox Done
-*/

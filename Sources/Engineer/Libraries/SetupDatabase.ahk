@@ -388,4 +388,32 @@ class SetupDatabase {
 		
 		writeConfiguration(this.iDatabaseName, this.iDatabase)
 	}
+	
+	readNotes(simulator, car, track) {
+		simulatorCode := this.getSimulatorCode(simulator)
+		
+		try {
+			FileRead notes, %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Notes.txt
+			
+			return notes
+		}
+		catch exception {
+			return ""
+		}
+	}
+	
+	writeNotes(simulator, car, track, notes) {
+		simulatorCode := this.getSimulatorCode(simulator)
+		
+		FileCreateDir %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%
+		
+		try {
+			FileDelete %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Notes.txt
+		}
+		catch exception {
+			; ignore
+		}
+		
+		FileAppend %notes%, %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Notes.txt, UTF-16
+	}
 }

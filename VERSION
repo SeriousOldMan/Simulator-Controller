@@ -1,8 +1,8 @@
 [Development]
 Version=3.0.4-dev
 Target=3.0.4-release
-Date=05/16/2021
-Changes=Rework of post pitstop fuel calculation
+Date=05/17/2021
+Changes=Rework of post pitstop fuel calculation, Store reference to car setups in the setup databse, Store Notes in the setup database
 [Release]
 Version=3.0.3-release
 Date=05/16/2021

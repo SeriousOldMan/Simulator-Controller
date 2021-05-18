@@ -1,3 +1,11 @@
+## 3.0.4-release 05/23/21
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Full rework of fuel consumption projection after a pitstop.
+  4. Simulator car setup files can be stored together with additional notes in the setup database for future use.
+  5. The setup database consent has been extended to give separate consents for tyre pressures and car setup information.
+  
 ## 3.0.3-release 05/16/21
 
   1. Critical bugfix for remaining fuel caluclation after a pitstop in races longer than an hour

@@ -59,7 +59,11 @@ global trackDropDown
 global weatherDropDown
 global airTemperatureEdit
 global trackTemperatureEdit
-global compoundDropDown
+global tyreCompoundDropDown
+
+global setupCompoundDropDown
+
+global notesEdit
 
 global transferPressuresButton
 global queryScopeDropDown
@@ -107,166 +111,202 @@ openSetupsDocumentation() {
 
 chooseSimulator() {
 	protectionOn()
-	
-	Gui RES:Default
-			
-	GuiControlGet simulatorDropDown
-	
-	choices := vSetupDatabase.getCars(simulatorDropDown)
-	chosen := ((choices.Length() > 0) ? 1 : 0)
-	
-	GuiControl, , carDropDown, % "|" . values2String("|", choices*)
-	GuiControl Choose, carDropDown, %chosen%
-	
-	chooseCar()
-	
-	protectionOff()
+
+	try {
+		Gui RES:Default
+				
+		GuiControlGet simulatorDropDown
+		
+		choices := vSetupDatabase.getCars(simulatorDropDown)
+		chosen := ((choices.Length() > 0) ? 1 : 0)
+		
+		GuiControl, , carDropDown, % "|" . values2String("|", choices*)
+		GuiControl Choose, carDropDown, %chosen%
+		
+		chooseCar()
+	}
+	catch exception {
+		; ignore
+	}
+	finally {
+		protectionOff()
+	}
 }
 
 chooseCar() {
 	protectionOn()
 	
-	Gui RES:Default
-			
-	GuiControlGet simulatorDropDown
-	GuiControlGet carDropDown
-	
-	choices := vSetupDatabase.getTracks(simulatorDropDown, carDropDown)
-	chosen := ((choices.Length() > 0) ? 1 : 0)
-	
-	GuiControl, , trackDropDown, % "|" . values2String("|", choices*)
-	GuiControl Choose, trackDropDown, %chosen%
-	
-	chooseTrack()
-	
-	protectionOff()
+	try {
+		Gui RES:Default
+				
+		GuiControlGet simulatorDropDown
+		GuiControlGet carDropDown
+		
+		choices := vSetupDatabase.getTracks(simulatorDropDown, carDropDown)
+		chosen := ((choices.Length() > 0) ? 1 : 0)
+		
+		GuiControl, , trackDropDown, % "|" . values2String("|", choices*)
+		GuiControl Choose, trackDropDown, %chosen%
+		
+		chooseTrack()
+	}
+	catch exception {
+		; ignore
+	}
+	finally {
+		protectionOff()
+	}
 }
 
 chooseTrack() {
 	protectionOn()
 	
-	Gui RES:Default
+	try {
+		Gui RES:Default
+				
+		GuiControlGet simulatorDropDown
+		GuiControlGet carDropDown
+		GuiControlGet trackDropDown
+		
+		conditions := vSetupDatabase.getConditions(simulatorDropDown, carDropDown, trackDropDown)
+		
+		if (conditions.Length() > 0) {
+			conditions := conditions[1]
 			
+			weatherDropDown := inList(kWeatherOptions, conditions[1])
+			airTemperatureEdit := conditions[2]
+			trackTemperatureEdit := conditions[3]
+			
+			tyreCompoundDropDown := inList(kQualifiedTyreCompounds, conditions[4])
+		}
+		else {
+			weatherDropDown := 0
+			airTemperatureEdit := 23
+			trackTemperatureEdit := 27
+			
+			tyreCompoundDropDown := 0
+		}
+
+		GuiControl Choose, weatherDropDown, %weatherDropDown%
+		GuiControl Text, airTemperatureEdit, %airTemperatureEdit%
+		GuiControl Text, trackTemperatureEdit, %trackTemperatureEdit%
+		
+		GuiControl Choose, tyreCompoundDropDown, %tyreCompoundDropDown%
+		
+		chooseTemperature()
+		loadNotes()
+	}
+	catch exception {
+		; ignore
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+chooseTemperature() {
+	withProtection("loadPressures")
+}
+
+loadNotes() {
 	GuiControlGet simulatorDropDown
 	GuiControlGet carDropDown
 	GuiControlGet trackDropDown
 	
-	conditions := vSetupDatabase.getConditions(simulatorDropDown, carDropDown, trackDropDown)
+	notesEdit := vSetupDatabase.readNotes(simulatorDropDown, carDropDown, trackDropDown)
 	
-	if (conditions.Length() > 0) {
-		conditions := conditions[1]
-		
-		weatherDropDown := inList(kWeatherOptions, conditions[1])
-		airTemperatureEdit := conditions[2]
-		trackTemperatureEdit := conditions[3]
-		
-		compoundDropDown := inList(kQualifiedTyreCompounds, conditions[4])
-	}
-	else {
-		weatherDropDown := 0
-		airTemperatureEdit := 23
-		trackTemperatureEdit := 27
-		
-		compoundDropDown := 0
-	}
-
-	GuiControl Choose, weatherDropDown, %weatherDropDown%
-	GuiControl Text, airTemperatureEdit, %airTemperatureEdit%
-	GuiControl Text, trackTemperatureEdit, %trackTemperatureEdit%
-	
-	GuiControl Choose, compoundDropDown, %compoundDropDown%
-	
-	chooseTemperature()
-	
-	protectionOff()
-}
-
-chooseTemperature() {
-	protectionOn()
-	
-	loadPressures()
-	
-	protectionOff()
+	GuiControl Text, notesEdit, %notesEdit%
 }
 
 loadPressures() {
 	protectionOn()
 	
-	Gui RES:Default
-			
-	static lastColor := "D0D0D0"
-	
-	GuiControlGet simulatorDropDown
-	GuiControlGet carDropDown
-	GuiControlGet trackDropDown
-	GuiControlGet weatherDropDown
-	GuiControlGet airTemperatureEdit
-	GuiControlGet trackTemperatureEdit
-	GuiControlGet compoundDropDown
-	
-	compound := string2Values(A_Space, kQualifiedTyreCompounds[compoundDropDown])
-	
-	if (compound.Length() == 1)
-		compoundColor := "Black"
-	else
-		compoundColor := SubStr(compound[2], 2, StrLen(compound[2]) - 2)
-	
-	pressureInfos := vSetupDatabase.getPressures(simulatorDropDown, carDropDown, trackDropDown, kWeatherOptions[weatherDropDown]
-											   , airTemperatureEdit, trackTemperatureEdit, compound[1], compoundColor)
-
-	if (pressureInfos.Count() == 0) {
-		for ignore, tyre in ["fl", "fr", "rl", "rr"]
-			for ignore, postfix in ["1", "2", "3", "4", "5"] {
-				GuiControl Text, %tyre%Pressure%postfix%, 0.0
-				GuiControl +Background, %tyre%Pressure%postfix%
-				GuiControl Disable, %tyre%Pressure%postfix%
-			}
-
-		GuiControl Disable, transferPressuresButton
-	}
-	else {
-		for tyre, pressureInfo in pressureInfos {
-			pressure := pressureInfo["Pressure"]
-			trackDelta := pressureInfo["Delta Track"]
-			airDelta := pressureInfo["Delta Air"] + Round(trackDelta * 0.49)
-			
-			pressure -= 0.2
-			
-			if ((airDelta == 0) && (trackDelta == 0))
-				color := "Green"
-			else if (airDelta == 0)
-				color := "Lime"
-			else
-				color := "Yellow"
-			
-			if (color != lastColor) {
-				lastColor := color
+	try {
+		Gui RES:Default
 				
-				Gui RES:Color, D0D0D0, %color%
-			}
-			
-			for index, postfix in ["1", "2", "3", "4", "5"] {
-				pressure := Format("{:.1f}", pressure)
-			
-				GuiControl Text, %tyre%Pressure%postfix%, %pressure%
-				
-				if (index = (3 + airDelta)) {
+		static lastColor := "D0D0D0"
+		
+		GuiControlGet simulatorDropDown
+		GuiControlGet carDropDown
+		GuiControlGet trackDropDown
+		GuiControlGet weatherDropDown
+		GuiControlGet airTemperatureEdit
+		GuiControlGet trackTemperatureEdit
+		GuiControlGet tyreCompoundDropDown
+		
+		compound := string2Values(A_Space, kQualifiedTyreCompounds[tyreCompoundDropDown])
+		
+		if (compound.Length() == 1)
+			compoundColor := "Black"
+		else
+			compoundColor := SubStr(compound[2], 2, StrLen(compound[2]) - 2)
+		
+		pressureInfos := vSetupDatabase.getPressures(simulatorDropDown, carDropDown, trackDropDown, kWeatherOptions[weatherDropDown]
+												   , airTemperatureEdit, trackTemperatureEdit, compound[1], compoundColor)
+
+		if (pressureInfos.Count() == 0) {
+			for ignore, tyre in ["fl", "fr", "rl", "rr"]
+				for ignore, postfix in ["1", "2", "3", "4", "5"] {
+					GuiControl Text, %tyre%Pressure%postfix%, 0.0
 					GuiControl +Background, %tyre%Pressure%postfix%
-					GuiControl Enable, %tyre%Pressure%postfix%
-				}
-				else {
-					GuiControl -Background, %tyre%Pressure%postfix%
 					GuiControl Disable, %tyre%Pressure%postfix%
 				}
+
+			if vSettingsPID
+				GuiControl Disable, transferPressuresButton
+		}
+		else {
+			for tyre, pressureInfo in pressureInfos {
+				pressure := pressureInfo["Pressure"]
+				trackDelta := pressureInfo["Delta Track"]
+				airDelta := pressureInfo["Delta Air"] + Round(trackDelta * 0.49)
+				
+				pressure -= 0.2
+				
+				if ((airDelta == 0) && (trackDelta == 0))
+					color := "Green"
+				else if (airDelta == 0)
+					color := "Lime"
+				else
+					color := "Yellow"
+				
+				if (color != lastColor) {
+					lastColor := color
+					
+					Gui RES:Color, D0D0D0, %color%
+				}
+				
+				for index, postfix in ["1", "2", "3", "4", "5"] {
+					pressure := Format("{:.1f}", pressure)
+				
+					GuiControl Text, %tyre%Pressure%postfix%, %pressure%
+					
+					if (index = (3 + airDelta)) {
+						GuiControl +Background, %tyre%Pressure%postfix%
+						GuiControl Enable, %tyre%Pressure%postfix%
+					}
+					else {
+						GuiControl -Background, %tyre%Pressure%postfix%
+						GuiControl Disable, %tyre%Pressure%postfix%
+					}
+				
+					pressure += 0.1
+				}
 			
-				pressure += 0.1
+				if vSettingsPID
+					GuiControl Enable, transferPressuresButton
 			}
-		
-			GuiControl Enable, transferPressuresButton
 		}
 	}
-	
-	protectionOff()
+	catch exception {
+		; ignore
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+loadSetups() {
 }
 
 updateQueryScope() {
@@ -279,6 +319,17 @@ updateQueryScope() {
 	chooseSimulator()
 }
 
+writeNotes() {
+	Gui RES:Default
+			
+	GuiControlGet simulatorDropDown
+	GuiControlGet carDropDown
+	GuiControlGet trackDropDown
+	GuiControlGet notesEdit
+	
+	vSetupDatabase.writeNotes(simulatorDropDown, carDropDown, trackDropDown, notesEdit)
+}
+
 transferPressures() {
 	Gui RES:Default
 			
@@ -288,10 +339,10 @@ transferPressures() {
 	GuiControlGet weatherDropDown
 	GuiControlGet airTemperatureEdit
 	GuiControlGet trackTemperatureEdit
-	GuiControlGet compoundDropDown
+	GuiControlGet tyreCompoundDropDown
 	
 	tyrePressures := []
-	compound := string2Values(A_Space, kQualifiedTyreCompounds[compoundDropDown])
+	compound := string2Values(A_Space, kQualifiedTyreCompounds[tyreCompoundDropDown])
 	
 	if (compound.Length() == 1)
 		compoundColor := "Black"
@@ -407,7 +458,7 @@ showSetups(command := false, simulator := false, car := false, track := false, w
 		Gui RES:Add, UpDown, x242 yp-2 w18 h20, % trackTemperature
 		Gui RES:Add, Text, x252 y130 w140 h23 +0x200, % translate("Temp. Track (Celsius)")
 		
-		tabs := map(["Tyres"], "translate")
+		tabs := map(["Tyres", "Setups", "Notes"], "translate")
 
 		Gui RES:Add, Tab3, x8 y159 w380 h224 -Wrap, % values2String("|", tabs*)
 
@@ -421,7 +472,7 @@ showSetups(command := false, simulator := false, car := false, track := false, w
 			compound := choices[1]
 			chosen := 1
 		}
-		Gui RES:Add, DropDownList, x106 yp w100 AltSubmit Choose%chosen% gloadPressures vcompoundDropDown, % values2String("|", choices*)
+		Gui RES:Add, DropDownList, x106 yp w100 AltSubmit Choose%chosen% gloadPressures vtyreCompoundDropDown, % values2String("|", choices*)
 
 		Gui RES:Font, Norm, Arial
 		Gui RES:Font, Bold Italic, Arial
@@ -458,6 +509,21 @@ showSetups(command := false, simulator := false, car := false, track := false, w
 		Gui RES:Add, Edit, x214 yp w50 Center +Background vrrPressure3, 0.0
 		Gui RES:Add, Edit, x268 yp w50 Disabled Center vrrPressure4, 0.0
 		Gui RES:Add, Edit, x322 yp w50 Disabled Center vrrPressure5, 0.0
+
+		Gui Tab, 2
+
+		Gui RES:Add, Text, x16 y189 w85 h23 +0x200, % translate("Compound")
+		
+		choices := map(kQualifiedTyreCompounds, "translate")
+		chosen := inList(kQualifiedTyreCompounds, compound)
+		if (!chosen && (choices.Length() > 0))
+			chosen := 1
+		
+		Gui RES:Add, DropDownList, x106 yp w100 AltSubmit Choose%chosen% gloadSetups vsetupCompoundDropDown, % values2String("|", choices*)
+
+		Gui Tab, 3
+		
+		Gui RES:Add, Edit, x16 y189 w364 h184 -Background gwriteNotes vnotesEdit
 
 		Gui RES:Show, AutoSize Center
 		

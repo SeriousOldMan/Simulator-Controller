@@ -61,8 +61,15 @@ global airTemperatureEdit
 global trackTemperatureEdit
 global tyreCompoundDropDown
 
-global setupCompoundDropDown
-
+global addDryQualificationButton
+global deleteDryQualificationButton
+global addDryRaceButton
+global deleteDryRaceButton
+global addWetQualificationButton
+global deleteWetQualificationButton
+global addWetRaceButton
+global deleteWetRaceButton
+		
 global notesEdit
 
 global transferPressuresButton
@@ -96,6 +103,47 @@ global rrPressure5
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+setButtonIcon(buttonHandle, file, index := 1, options := "") {
+;   Parameters:
+;   1) {Handle} 	HWND handle of Gui button
+;   2) {File} 		File containing icon image
+;   3) {Index} 		Index of icon in file
+;						Optional: Default = 1
+;   4) {Options}	Single letter flag followed by a number with multiple options delimited by a space
+;						W = Width of Icon (default = 16)
+;						H = Height of Icon (default = 16)
+;						S = Size of Icon, Makes Width and Height both equal to Size
+;						L = Left Margin
+;						T = Top Margin
+;						R = Right Margin
+;						B = Botton Margin
+;						A = Alignment (0 = left, 1 = right, 2 = top, 3 = bottom, 4 = center; default = 4)
+
+	RegExMatch(options, "i)w\K\d+", W), (W="") ? W := 16 :
+	RegExMatch(options, "i)h\K\d+", H), (H="") ? H := 16 :
+	RegExMatch(options, "i)s\K\d+", S), S ? W := H := S :
+	RegExMatch(options, "i)l\K\d+", L), (L="") ? L := 0 :
+	RegExMatch(options, "i)t\K\d+", T), (T="") ? T := 0 :
+	RegExMatch(options, "i)r\K\d+", R), (R="") ? R := 0 :
+	RegExMatch(options, "i)b\K\d+", B), (B="") ? B := 0 :
+	RegExMatch(options, "i)a\K\d+", A), (A="") ? A := 4 :
+
+	ptrSize := A_PtrSize = "" ? 4 : A_PtrSize, DW := "UInt", Ptr := A_PtrSize = "" ? DW : "Ptr"
+
+	VarSetCapacity(button_il, 20 + ptrSize, 0)
+
+	NumPut(normal_il := DllCall("ImageList_Create", DW, W, DW, H, DW, 0x21, DW, 1, DW, 1), button_il, 0, Ptr)	; Width & Height
+	NumPut(L, button_il, 0 + ptrSize, DW)		; Left Margin
+	NumPut(T, button_il, 4 + ptrSize, DW)		; Top Margin
+	NumPut(R, button_il, 8 + ptrSize, DW)		; Right Margin
+	NumPut(B, button_il, 12 + ptrSize, DW)		; Bottom Margin	
+	NumPut(A, button_il, 16 + ptrSize, DW)		; Alignment
+
+	SendMessage, BCM_SETIMAGELIST := 5634, 0, &button_il,, AHK_ID %buttonHandle%
+
+	return IL_Add(normal_il, file, index)
+}
 
 moveSetupsEditor() {
 	moveByMouse("RES")
@@ -306,7 +354,28 @@ loadPressures() {
 	}
 }
 
-loadSetups() {
+addDryQualificationSetup() {
+}
+
+deleteDryQualificationSetup() {
+}
+
+addDryRaceSetup() {
+}
+
+deleteDryRaceSetup() {
+}
+
+addWetQualificationSetup() {
+}
+
+deleteWetQualificationSetup() {
+}
+
+addWetRaceSetup() {
+}
+
+deleteWetRaceSetup() {
 }
 
 updateQueryScope() {
@@ -511,15 +580,36 @@ showSetups(command := false, simulator := false, car := false, track := false, w
 		Gui RES:Add, Edit, x322 yp w50 Disabled Center vrrPressure5, 0.0
 
 		Gui Tab, 2
+		
+		choices := ["Eins", "Zwei", "Drei"]
 
-		Gui RES:Add, Text, x16 y189 w85 h23 +0x200, % translate("Compound")
+		Gui RES:Add, Text, x16 y189 w120 h23 +0x200, % translate("Dry Qualification")
+		Gui RES:Add, DropDownList, x140 yp w188, % values2String("|", choices*)
+		Gui RES:Add, Button, x331 yp-1 w23 h23 HwndaddDryQualificationButtonHandle VaddDryQualificationButton gaddDryQualificationSetup
+		Gui RES:Add, Button, x356 yp w23 h23 HwnddeleteDryQualificationButtonHandle VdeleteDryQualificationButton gdeleteDryQualificationSetup
+		setButtonIcon(addDryQualificationButtonHandle, kIconsDirectory . "Plus.ico", 1)
+		setButtonIcon(deleteDryQualificationButtonHandle, kIconsDirectory . "Minus.ico", 1)
 		
-		choices := map(kQualifiedTyreCompounds, "translate")
-		chosen := inList(kQualifiedTyreCompounds, compound)
-		if (!chosen && (choices.Length() > 0))
-			chosen := 1
+		Gui RES:Add, Text, x16 yp+24 w120 h23 +0x200, % translate("Dry Race")
+		Gui RES:Add, DropDownList, x140 yp w188, % values2String("|", choices*)
+		Gui RES:Add, Button, x331 yp-1 w23 h23 HwndaddDryRaceButtonHandle VaddDryRaceButton gaddDryRaceSetup
+		Gui RES:Add, Button, x356 yp w23 h23 HwnddeleteDryRaceButtonHandle VdeleteDryRaceButton gdeleteDryRaceSetup
+		setButtonIcon(addDryRaceButtonHandle, kIconsDirectory . "Plus.ico", 1)
+		setButtonIcon(deleteDryRaceButtonHandle, kIconsDirectory . "Minus.ico", 1)
 		
-		Gui RES:Add, DropDownList, x106 yp w100 AltSubmit Choose%chosen% gloadSetups vsetupCompoundDropDown, % values2String("|", choices*)
+		Gui RES:Add, Text, x16 yp+30 w120 h23 +0x200, % translate("Wet Qualification")
+		Gui RES:Add, DropDownList, x140 yp w188, % values2String("|", choices*)
+		Gui RES:Add, Button, x331 yp-1 w23 h23 HwndaddWetQualificationButtonHandle VaddWetQualificationButton gaddWetQualificationSetup
+		Gui RES:Add, Button, x356 yp w23 h23 HwnddeleteWetQualificationButtonHandle VdeleteWetQualificationButton gdeleteWetQualificationSetup
+		setButtonIcon(addWetQualificationButtonHandle, kIconsDirectory . "Plus.ico", 1)
+		setButtonIcon(deleteWetQualificationButtonHandle, kIconsDirectory . "Minus.ico", 1)
+		
+		Gui RES:Add, Text, x16 yp+24 w120 h23 +0x200, % translate("Wet Race")
+		Gui RES:Add, DropDownList, x140 yp w188, % values2String("|", choices*)
+		Gui RES:Add, Button, x331 yp-1 w23 h23 HwndaddWetRaceButtonHandle VaddWetRaceButton gaddWetRaceSetup
+		Gui RES:Add, Button, x356 yp w23 h23 HwnddeleteWetRaceButtonHandle VdeleteWetRaceButton gdeleteWetRaceSetup
+		setButtonIcon(addWetRaceButtonHandle, kIconsDirectory . "Plus.ico", 1)
+		setButtonIcon(deleteWetRaceButtonHandle, kIconsDirectory . "Minus.ico", 1)
 
 		Gui Tab, 3
 		

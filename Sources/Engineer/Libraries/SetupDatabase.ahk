@@ -476,6 +476,7 @@ class SetupDatabase {
 			; ignore
 		}
 		
+		FileCreateDir %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Car Setups\%setupType%
 		FileAppend %setup%, %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Car Setups\%setupType%\%fileName%
 	}
 	

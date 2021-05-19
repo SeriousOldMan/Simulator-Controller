@@ -411,7 +411,8 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 			FileCreateDir %kTempDirectory%%code% Data
 			
 			Loop Files, %kTempDirectory%%code% Data\*.*
-				FileDelete %A_LoopFilePath%
+				if (A_LoopFilePath != dataFile)
+					FileDelete %A_LoopFilePath%
 		}
 		
 		if this.RaceEngineer

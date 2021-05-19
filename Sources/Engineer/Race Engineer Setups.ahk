@@ -826,8 +826,11 @@ showSetups(command := false, simulator := false, car := false, track := false, w
 
 		Gui RES:Show, AutoSize Center
 		
-		if (simulator && car && track && weather && airTemperature && trackTemperature && compound)
+		if (simulator && car && track && weather && airTemperature && trackTemperature && compound) {
 			loadPressures()
+			loadSetups()
+			loadNotes()
+		}
 		else if (!simulator || !car || !track)
 			chooseSimulator()
 		

@@ -23,6 +23,13 @@ global kTyreCompoundColors = ["Red", "White", "Blue", "Black"]
 
 global kQualifiedTyreCompounds = ["Wet", "Dry", "Dry (Red)", "Dry (White)", "Dry (Blue)"]
 
+global kDryQualificationSetup = "DQ"
+global kDryRaceSetup = "DR"
+global kWetQualificationSetup = "WQ"
+global kWetRaceSetup = "WR"
+
+global kSetupTypes = [kDryQualificationSetup, kDryRaceSetup, kWetQualificationSetup, kWetRaceSetup]
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Constant Section                         ;;;
@@ -415,5 +422,71 @@ class SetupDatabase {
 		}
 		
 		FileAppend %notes%, %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Notes.txt, UTF-16
+	}
+	
+	getSetupNames(simulator, car, track, ByRef localSetups, ByRef globalSetups) {
+		simulatorCode := this.getSimulatorCode(simulator)
+		
+		localSetups := {}
+		globalSetups := {}
+		
+		for ignore, setupType in kSetupTypes {
+			setups := []
+			
+			Loop Files, %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Car Setups\%setupType%\*.*
+			{
+				SplitPath A_LoopFileName, setupName
+			
+				setups.Push(setupName)
+			}
+			
+			localSetups[setupType] := setups
+		}
+		
+		if this.UseGlobalDatabase
+			for ignore, setupType in kSetupTypes {
+				setups := []
+				
+				Loop Files, %kSetupDatabaseDirectory%Global\%simulatorCode%\%car%\%track%\Car Setups\%setupType%\*.*
+				{
+					SplitPath A_LoopFileName, setupName
+				
+					setups.Push(setupName)
+				}
+				
+				globalSetups[setupType] := setups
+			}
+	}
+	
+	readSetup(simulator, car, track, setupType, setup) {
+		simulatorCode := this.getSimulatorCode(simulator)
+		
+		FileRead setupData, %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Car Setups\%setupType%\%setup%
+		
+		return setupData
+	}
+	
+	writeSetup(simulator, car, track, setupType, fileName, setup) {
+		simulatorCode := this.getSimulatorCode(simulator)
+		
+		try {
+			FileDelete %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Car Setups\%setupType%\%fileName%
+		}
+		catch exception {
+			; ignore
+		}
+		
+		FileAppend %setup%, %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Car Setups\%setupType%\%fileName%
+	}
+	
+	deleteSetup(simulator, car, track, setupType, setup) {
+		simulatorCode := this.getSimulatorCode(simulator)
+		
+		try {
+			FileDelete %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Car Setups\%setupType%\%setup%
+		}
+		catch exception {
+			; ignore
+		}
 	}
 }

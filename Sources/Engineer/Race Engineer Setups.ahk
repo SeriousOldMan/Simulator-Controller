@@ -61,13 +61,21 @@ global airTemperatureEdit
 global trackTemperatureEdit
 global tyreCompoundDropDown
 
-global addDryQualificationButton
+global dryQualificationDropDown
+global uploadDryQualificationButton
+global downloadDryQualificationButton
 global deleteDryQualificationButton
-global addDryRaceButton
+global dryRaceDropDown
+global uploadDryRaceButton
+global downloadDryRaceButton
 global deleteDryRaceButton
-global addWetQualificationButton
+global wetQualificationDropDown
+global uploadWetQualificationButton
+global downloadWetQualificationButton
 global deleteWetQualificationButton
-global addWetRaceButton
+global wetRaceDropDown
+global uploadWetRaceButton
+global downloadWetRaceButton
 global deleteWetRaceButton
 		
 global notesEdit
@@ -242,6 +250,7 @@ chooseTrack() {
 		GuiControl Choose, tyreCompoundDropDown, %tyreCompoundDropDown%
 		
 		chooseTemperature()
+		loadSetups()
 		loadNotes()
 	}
 	catch exception {
@@ -256,6 +265,101 @@ chooseTemperature() {
 	withProtection("loadPressures")
 }
 
+loadSetups(asynchronous := true) {
+	GuiControlGet dryQualificationDropDown
+	GuiControlGet dryRaceDropDown
+	GuiControlGet wetQualificationDropDown
+	GuiControlGet wetRaceDropDown
+	
+	if !asynchronous {
+		Gui RES:Default
+		
+		GuiControlGet simulatorDropDown
+		GuiControlGet carDropDown
+		GuiControlGet trackDropDown
+		
+		localSetups := false
+		globalSetups := false
+		
+		vSetupDatabase.getSetupNames(simulatorDropDown, carDropDown, trackDropDown, localSetups, globalSetups)
+		
+		newDryQualificationDropDown := concatenate(localSetups[kDryQualificationSetup], globalSetups[kDryQualificationSetup])
+		newDryRaceDropDown := concatenate(localSetups[kDryRaceSetup], globalSetups[kDryRaceSetup])
+		newWetQualificationDropDown := concatenate(localSetups[kWetQualificationSetup], globalSetups[kWetQualificationSetup])
+		newWetRaceDropDown := concatenate(localSetups[kWetRaceSetup], globalSetups[kWetRaceSetup])
+		
+		dryQualificationSelection := inList(newDryQualificationDropDown, dryQualificationDropDown)
+		dryRaceSelection := inList(newDryRaceDropDown, dryRaceDropDown)
+		wetQualificationSelection := inList(newWetQualificationDropDown, wetQualificationDropDown)
+		wetRaceSelection := inList(newWetRaceDropDown, wetRaceDropDown)
+		
+		if !dryQualificationSelection
+			dryQualificationSelection := ((newDryQualificationDropDown.Length() > 0) ? 1 : 0)
+		if !dryRaceSelection
+			dryRaceSelection := ((newDryRaceDropDown.Length() > 0) ? 1 : 0)
+		if !wetQualificationSelection
+			wetQualificationSelection := ((newWetQualificationDropDown.Length() > 0) ? 1 : 0)
+		if !wetRaceSelection
+			wetRaceSelection := ((newWetRaceDropDown.Length() > 0) ? 1 : 0)
+		
+		GuiControl Text, dryQualificationDropDown, % "|" . values2String("|", newDryQualificationDropDown*)
+		GuiControl Text, dryRaceDropDown, % "|" . values2String("|", newDryRaceDropDown*)
+		GuiControl Text, wetQualificationDropDown, % "|" . values2String("|", newWetQualificationDropDown*)
+		GuiControl Text, wetRaceDropDown, % "|" . values2String("|", newWetRaceDropDown*)
+		
+		GuiControl Choose, dryQualificationDropDown, %dryQualificationSelection%
+		GuiControl Choose, dryRaceDropDown, %dryRaceSelection%
+		GuiControl Choose, wetQualificationDropDown, %wetQualificationSelection%
+		GuiControl Choose, wetRaceDropDown, %wetRaceSelection%
+	
+		if ((simulatorDropDown = "") || (carDropDown = "") || (trackDropDown = "")) {
+			GuiControl Disable, uploadDryQualificationButton
+			GuiControl Disable, downloadDryQualificationButton
+			GuiControl Disable, deleteDryQualificationButton
+			GuiControl Disable, uploadDryRaceButton
+			GuiControl Disable, downloadDryRaceButton
+			GuiControl Disable, deleteDryRaceButton
+			GuiControl Disable, uploadWetQualificationButton
+			GuiControl Disable, downloadWetQualificationButton
+			GuiControl Disable, deleteWetQualificationButton
+			GuiControl Disable, uploadWetRaceButton
+			GuiControl Disable, downloadWetRaceButton
+			GuiControl Disable, deleteWetRaceButton
+		}
+		else {
+			GuiControl Enable, uploadDryQualificationButton
+			GuiControl Enable, uploadDryRaceButton
+			GuiControl Enable, uploadWetQualificationButton
+			GuiControl Enable, uploadWetRaceButton
+			
+			option := (dryQualificationSelection ? "Enable" : "Disable")
+			
+			GuiControl %option%, downloadDryQualificationButton
+			GuiControl %option%, deleteDryQualificationButton
+			
+			option := (dryRaceSelection ? "Enable" : "Disable")
+			
+			GuiControl %option%, downloadDryRaceButton
+			GuiControl %option%, deleteDryRaceButton
+			
+			option := (wetQualificationSelection ? "Enable" : "Disable")
+			
+			GuiControl %option%, downloadWetQualificationButton
+			GuiControl %option%, deleteWetQualificationButton
+			
+			option := (wetRaceSelection ? "Enable" : "Disable")
+			
+			GuiControl %option%, downloadWetRaceButton
+			GuiControl %option%, deleteWetRaceButton
+		}
+	}
+	else {
+		callback := Func("loadSetups").Bind(false)
+	
+		SetTimer %callback%, -100
+	}
+}
+
 loadNotes() {
 	GuiControlGet simulatorDropDown
 	GuiControlGet carDropDown
@@ -264,6 +368,11 @@ loadNotes() {
 	notesEdit := vSetupDatabase.readNotes(simulatorDropDown, carDropDown, trackDropDown)
 	
 	GuiControl Text, notesEdit, %notesEdit%
+	
+	if ((simulatorDropDown = "") || (carDropDown = "") || (trackDropDown = ""))
+		GuiControl Disable, notesEdit
+	else
+		GuiControl Enable, notesEdit
 }
 
 loadPressures() {
@@ -354,28 +463,122 @@ loadPressures() {
 	}
 }
 
-addDryQualificationSetup() {
+uploadSetup(setupType) {
+	GuiControlGet simulatorDropDown
+	GuiControlGet carDropDown
+	GuiControlGet trackDropDown
+
+	title := translate("Upload Setup File...")
+				
+	FileSelectFile fileName, 1, , %title%
+
+	if (fileName != "") {
+		FileRead setup, %fileName%
+		SplitPath fileName, fileName
+		
+		vSetupDatabase.writeSetup(simulatorDropDown, carDropDown, trackDropDown, setupType, fileName, setup)
+	
+		loadSetups()
+	}
+}
+
+downloadSetup(setupType, setupName) {
+	GuiControlGet simulatorDropDown
+	GuiControlGet carDropDown
+	GuiControlGet trackDropDown
+
+	title := translate("Download Setup File...")
+				
+	FileSelectFile fileName, S, %setupName%, %title%
+	
+	if (fileName != "") {
+		setupData := vSetupDatabase.readSetup(simulatorDropDown, carDropDown, trackDropDown, setupType, setupName)
+		
+		try {
+			FileDelete %fileName%
+		}
+		catch exception {
+			; ignore
+		}
+		
+		FileAppend %setupData%, %fileName%
+	
+		loadSetups()
+	}
+}
+
+deleteSetup(setupType, setupName) {
+	GuiControlGet simulatorDropDown
+	GuiControlGet carDropDown
+	GuiControlGet trackDropDown
+	
+	vSetupDatabase.deleteSetup(simulatorDropDown, carDropDown, trackDropDown, setupType, setupName)
+	
+	loadSetups()
+}
+
+uploadDryQualificationSetup() {
+	uploadSetup(kDryQualificationSetup)
+}
+
+downloadDryQualificationSetup() {
+	GuiControlGet dryQualificationDropDown
+	
+	downloadSetup(kDryQualificationSetup, dryQualificationDropDown)
 }
 
 deleteDryQualificationSetup() {
+	GuiControlGet dryQualificationDropDown
+	
+	deleteSetup(kDryQualificationSetup, dryQualificationDropDown)
 }
 
-addDryRaceSetup() {
+uploadDryRaceSetup() {
+	uploadSetup(kDryRaceSetup)
+}
+
+downloadDryRaceSetup() {
+	GuiControlGet dryRaceDropDown
+	
+	downloadSetup(kDryRaceSetup, dryRaceDropDown)
 }
 
 deleteDryRaceSetup() {
+	GuiControlGet dryRaceDropDown
+	
+	deleteSetup(kDryRaceSetup, dryRaceDropDown)
 }
 
-addWetQualificationSetup() {
+uploadWetQualificationSetup() {
+	uploadSetup(kWetQualificationSetup)
+}
+
+downloadWetQualificationSetup() {
+	GuiControlGet wetQualificationDropDown
+	
+	downloadSetup(kWetQualificationSetup, wetQualificationDropDown)
 }
 
 deleteWetQualificationSetup() {
+	GuiControlGet wetQualificationDropDown
+	
+	deleteSetup(kWetQualificationSetup, wetQualificationDropDown)
 }
 
-addWetRaceSetup() {
+uploadWetRaceSetup() {
+	uploadSetup(kWetRaceSetup)
+}
+
+downloadWetRaceSetup() {
+	GuiControlGet wetRaceDropDown
+	
+	downloadSetup(kWetRaceSetup, wetRaceDropDown)
 }
 
 deleteWetRaceSetup() {
+	GuiControlGet wetRaceDropDown
+	
+	deleteSetup(kWetRaceSetup, wetRaceDropDown)
 }
 
 updateQueryScope() {
@@ -527,7 +730,7 @@ showSetups(command := false, simulator := false, car := false, track := false, w
 		Gui RES:Add, UpDown, x242 yp-2 w18 h20, % trackTemperature
 		Gui RES:Add, Text, x252 y130 w140 h23 +0x200, % translate("Temp. Track (Celsius)")
 		
-		tabs := map(["Tyres", "Setups", "Notes"], "translate")
+		tabs := map(["Tyres", "Setup", "Notes"], "translate")
 
 		Gui RES:Add, Tab3, x8 y159 w380 h224 -Wrap, % values2String("|", tabs*)
 
@@ -580,35 +783,41 @@ showSetups(command := false, simulator := false, car := false, track := false, w
 		Gui RES:Add, Edit, x322 yp w50 Disabled Center vrrPressure5, 0.0
 
 		Gui Tab, 2
-		
-		choices := ["Eins", "Zwei", "Drei"]
 
-		Gui RES:Add, Text, x16 y189 w120 h23 +0x200, % translate("Dry Qualification")
-		Gui RES:Add, DropDownList, x140 yp w188, % values2String("|", choices*)
-		Gui RES:Add, Button, x331 yp-1 w23 h23 HwndaddDryQualificationButtonHandle VaddDryQualificationButton gaddDryQualificationSetup
+		Gui RES:Add, Text, x16 y189 w120 h23 +0x200, % translate("Qualification (Dry)")
+		Gui RES:Add, DropDownList, x140 yp w163 vdryQualificationDropDown
+		Gui RES:Add, Button, x306 yp-1 w23 h23 HwnduploadDryQualificationButtonHandle vuploadDryQualificationButton guploadDryQualificationSetup
+		Gui RES:Add, Button, x331 yp w23 h23 HwnddownloadDryQualificationButtonHandle vdownloadDryQualificationButton gdownloadDryQualificationSetup
 		Gui RES:Add, Button, x356 yp w23 h23 HwnddeleteDryQualificationButtonHandle VdeleteDryQualificationButton gdeleteDryQualificationSetup
-		setButtonIcon(addDryQualificationButtonHandle, kIconsDirectory . "Plus.ico", 1)
+		setButtonIcon(uploadDryQualificationButtonHandle, kIconsDirectory . "Upload.ico", 1)
+		setButtonIcon(downloadDryQualificationButtonHandle, kIconsDirectory . "Download.ico", 1)
 		setButtonIcon(deleteDryQualificationButtonHandle, kIconsDirectory . "Minus.ico", 1)
 		
-		Gui RES:Add, Text, x16 yp+24 w120 h23 +0x200, % translate("Dry Race")
-		Gui RES:Add, DropDownList, x140 yp w188, % values2String("|", choices*)
-		Gui RES:Add, Button, x331 yp-1 w23 h23 HwndaddDryRaceButtonHandle VaddDryRaceButton gaddDryRaceSetup
-		Gui RES:Add, Button, x356 yp w23 h23 HwnddeleteDryRaceButtonHandle VdeleteDryRaceButton gdeleteDryRaceSetup
-		setButtonIcon(addDryRaceButtonHandle, kIconsDirectory . "Plus.ico", 1)
-		setButtonIcon(deleteDryRaceButtonHandle, kIconsDirectory . "Minus.ico", 1)
-		
-		Gui RES:Add, Text, x16 yp+30 w120 h23 +0x200, % translate("Wet Qualification")
-		Gui RES:Add, DropDownList, x140 yp w188, % values2String("|", choices*)
-		Gui RES:Add, Button, x331 yp-1 w23 h23 HwndaddWetQualificationButtonHandle VaddWetQualificationButton gaddWetQualificationSetup
+		Gui RES:Add, Text, x16 yp+24 w120 h23 +0x200, % translate("Qualification (Wet)")
+		Gui RES:Add, DropDownList, x140 yp w163 vwetQualificationDropDown
+		Gui RES:Add, Button, x306 yp-1 w23 h23 HwnduploadWetQualificationButtonHandle vuploadWetQualificationButton guploadWetQualificationSetup
+		Gui RES:Add, Button, x331 yp w23 h23 HwnddownloadWetQualificationButtonHandle vdownloadWetQualificationButton gdownloadWetQualificationSetup
 		Gui RES:Add, Button, x356 yp w23 h23 HwnddeleteWetQualificationButtonHandle VdeleteWetQualificationButton gdeleteWetQualificationSetup
-		setButtonIcon(addWetQualificationButtonHandle, kIconsDirectory . "Plus.ico", 1)
+		setButtonIcon(uploadWetQualificationButtonHandle, kIconsDirectory . "Upload.ico", 1)
+		setButtonIcon(downloadWetQualificationButtonHandle, kIconsDirectory . "Download.ico", 1)
 		setButtonIcon(deleteWetQualificationButtonHandle, kIconsDirectory . "Minus.ico", 1)
 		
-		Gui RES:Add, Text, x16 yp+24 w120 h23 +0x200, % translate("Wet Race")
-		Gui RES:Add, DropDownList, x140 yp w188, % values2String("|", choices*)
-		Gui RES:Add, Button, x331 yp-1 w23 h23 HwndaddWetRaceButtonHandle VaddWetRaceButton gaddWetRaceSetup
+		Gui RES:Add, Text, x16 yp+30 w120 h23 +0x200, % translate("Race (Dry)")
+		Gui RES:Add, DropDownList, x140 yp w163 vdryRaceDropDown
+		Gui RES:Add, Button, x306 yp-1 w23 h23 HwnduploadDryRaceButtonHandle vuploadDryRaceButton guploadDryRaceSetup
+		Gui RES:Add, Button, x331 yp w23 h23 HwnddownloadDryRaceButtonHandle vdownloadDryRaceButton gdownloadDryRaceSetup
+		Gui RES:Add, Button, x356 yp w23 h23 HwnddeleteDryRaceButtonHandle VdeleteDryRaceButton gdeleteDryRaceSetup
+		setButtonIcon(uploadDryRaceButtonHandle, kIconsDirectory . "Upload.ico", 1)
+		setButtonIcon(downloadDryRaceButtonHandle, kIconsDirectory . "Download.ico", 1)
+		setButtonIcon(deleteDryRaceButtonHandle, kIconsDirectory . "Minus.ico", 1)
+		
+		Gui RES:Add, Text, x16 yp+24 w120 h23 +0x200, % translate("Race (Wet)")
+		Gui RES:Add, DropDownList, x140 yp w163 vwetRaceDropDown
+		Gui RES:Add, Button, x306 yp-1 w23 h23 HwnduploadWetRaceButtonHandle vuploadWetRaceButton guploadWetRaceSetup
+		Gui RES:Add, Button, x331 yp w23 h23 HwnddownloadWetRaceButtonHandle vdownloadWetRaceButton gdownloadWetRaceSetup
 		Gui RES:Add, Button, x356 yp w23 h23 HwnddeleteWetRaceButtonHandle VdeleteWetRaceButton gdeleteWetRaceSetup
-		setButtonIcon(addWetRaceButtonHandle, kIconsDirectory . "Plus.ico", 1)
+		setButtonIcon(uploadWetRaceButtonHandle, kIconsDirectory . "Upload.ico", 1)
+		setButtonIcon(downloadWetRaceButtonHandle, kIconsDirectory . "Download.ico", 1)
 		setButtonIcon(deleteWetRaceButtonHandle, kIconsDirectory . "Minus.ico", 1)
 
 		Gui Tab, 3

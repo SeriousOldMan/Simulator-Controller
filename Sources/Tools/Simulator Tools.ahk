@@ -578,6 +578,15 @@ updateCustomCalls(startNumber, endNumber) {
 	}
 }
 
+updateConfigurationForV304() {
+	try {
+		FileDelete % kUserConfigDirectory . "CONSENT"
+	}
+	catch exception {
+		; ignore
+	}
+}
+
 updateConfigurationForV282() {
 	userSettingsFile := getFileName(kSimulatorSettingsFile, kUserConfigDirectory)
 	userSettings := readConfiguration(userSettingsFile)

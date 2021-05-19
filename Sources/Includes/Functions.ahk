@@ -78,7 +78,8 @@ createMessageReceiver() {
 }
 
 consentDialog(id) {
-	static consentDropDown
+	static tyrePressuresConsentDropDown
+	static carSetupsConsentDropDown
 	static closed
 	
 	if (id = "Close") {
@@ -108,15 +109,19 @@ consentDialog(id) {
 	Gui CNS:Add, Text, x8 y260 w450 h23 +0x200, % translate("Your database identification key is:")
 	Gui CNS:Add, Edit, x460 y260 w332 h23 -VScroll ReadOnly Center, % id
 	
-	Gui CNS:Add, Text, x8 y300 w450 h23 +0x200, % translate("Do you agree to the transfer of your local data to a central server?")
+	Gui CNS:Add, Text, x8 y300 w450 h23 +0x200, % translate("Do you want to share your local tyre pressure data?")
 
-	Gui CNS:Add, DropDownList, x460 y300 w332 AltSubmit Choose3 VconsentDropDown, % values2String("|", map(["Yes", "No", "Ask again later..."], "translate")*)
-		
-	Gui CNS:Add, Text, x8 y340 w784 h60 -VScroll +Wrap ReadOnly, % StrReplace(StrReplace(getConfigurationValue(texts, language, "Information"), "``n", "`n"), "\<>", "=")
+	Gui CNS:Add, DropDownList, x460 y300 w332 AltSubmit Choose3 VtyrePressuresConsentDropDown, % values2String("|", map(["Yes", "No", "Ask again later..."], "translate")*)
 	
-	Gui CNS:Add, Link, x8 y410 w784 h60 cRed -VScroll +Wrap ReadOnly, % StrReplace(StrReplace(getConfigurationValue(texts, language, "Warning"), "``n", "`n"), "\<>", "=")
+	Gui CNS:Add, Text, x8 y324 w450 h23 +0x200, % translate("Do you want to share your local car setup data?")
+
+	Gui CNS:Add, DropDownList, x460 y324 w332 AltSubmit Choose3 VcarSetupsConsentDropDown, % values2String("|", map(["Yes", "No", "Ask again later..."], "translate")*)
 		
-	Gui CNS:Add, Button, x368 y490 w80 h23 Default gcloseConsentDialog, % translate("Save")
+	Gui CNS:Add, Text, x8 y364 w784 h60 -VScroll +Wrap ReadOnly, % StrReplace(StrReplace(getConfigurationValue(texts, language, "Information"), "``n", "`n"), "\<>", "=")
+	
+	Gui CNS:Add, Link, x8 y434 w784 h60 cRed -VScroll +Wrap ReadOnly, % StrReplace(StrReplace(getConfigurationValue(texts, language, "Warning"), "``n", "`n"), "\<>", "=")
+		
+	Gui CNS:Add, Button, x368 y514 w80 h23 Default gcloseConsentDialog, % translate("Save")
 	
 	Gui CNS:+AlwaysOnTop
 	Gui CNS:Show, Center AutoSize
@@ -127,11 +132,12 @@ consentDialog(id) {
 		Sleep 100
 	until closed
 	
-	GuiControlGet consentDropDown
+	GuiControlGet tyrePressuresConsentDropDown
+	GuiControlGet carSetupsConsentDropDown
 	
 	Gui CNS:Destroy
 	
-	return ["Yes", "No", "Retry"][consentDropDown]
+	return {TyrePressures: ["Yes", "No", "Retry"][tyrePressuresConsentDropDown], CarSetups: ["Yes", "No", "Retry"][carSetupsConsentDropDown]}
 }
 
 closeConsentDialog() {
@@ -552,20 +558,35 @@ requestConsent() {
 			setConfigurationValue(consent, "General", "ID", id)
 			setConfigurationValue(consent, "Consent", "Date", A_MM . "/" . A_DD . "/" . A_YYYY)
 			
-			switch consentDialog(id) {
+			result := consentDialog(id)
+			
+			switch result["TyrePressures"] {
 				case "Yes":
-					setConfigurationValue(consent, "Consent", "Share Database", "Tyre Pressures")
+					setConfigurationValue(consent, "Consent", "Share Tyre Pressures", "Yes")
 				case "No":
-					setConfigurationValue(consent, "Consent", "Share Database", false)
+					setConfigurationValue(consent, "Consent", "Share Tyre Pressures", "No")
 				case "Retry":
-					setConfigurationValue(consent, "Consent", "Share Database", "Undecided")
+					setConfigurationValue(consent, "Consent", "Share Tyre Pressures", "Undecided")
+					setConfigurationValue(consent, "General", "Countdown", 10)
+			}
+			
+			switch result["CarSetups"] {
+				case "Yes":
+					setConfigurationValue(consent, "Consent", "Share Car Setups", "Yes")
+				case "No":
+					setConfigurationValue(consent, "Consent", "Share Car Setups", "No")
+				case "Retry":
+					setConfigurationValue(consent, "Consent", "Share Car Setups", "Undecided")
 					setConfigurationValue(consent, "General", "Countdown", 10)
 			}
 			
 			writeConfiguration(kUserConfigDirectory . "CONSENT", consent)
 		}
+				
+		shareTyrePressures := (getConfigurationValue(consent, "Consent", "Share Tyre Pressures", "No") = "Yes")
+		shareCarSetups := (getConfigurationValue(consent, "Consent", "Share Car Setups", "No") = "Yes")
 		
-		if (getConfigurationValue(consent, "Consent", "Share Database", false) == "Tyre Pressures") {
+		if (shareTyrePressures || shareCarSetups) {
 			uploadTimeStamp := kSetupDatabaseDirectory . "Local\UPLOAD"
 			
 			if FileExist(uploadTimeStamp) {
@@ -580,7 +601,55 @@ requestConsent() {
 			}
 			
 			try {
-				RunWait PowerShell.exe -Command Compress-Archive -LiteralPath '%kSetupDatabaseDirectory%Local' -CompressionLevel Optimal -DestinationPath '%kTempDirectory%Setup Database.%id%.zip', , Hide
+				try {
+					FileRemoveDir %kTempDirectory%SetupDabase, 1
+				}
+				catch exception {
+					; ignore
+				}
+				
+				Loop Files, %kSetupDatabaseDirectory%Local\*.*, D									; Simulator
+				{
+					simulator := A_LoopFileName
+					
+					FileCreateDir %kTempDirectory%SetupDabase\%simulator%
+					
+					Loop Files, %kSetupDatabaseDirectory%Local\%simulator%\*.*, D					; Car
+					{
+						car := A_LoopFileName
+					
+						FileCreateDir %kTempDirectory%SetupDabase\%simulator%\%car%
+						
+						Loop Files, %kSetupDatabaseDirectory%Local\%simulator%\%car%\*.*, D			; Track
+						{
+							track := A_LoopFileName
+					
+							FileCreateDir %kTempDirectory%SetupDabase\%simulator%\%car%\%track%
+							
+							if shareTyrePressures
+								Loop Files, %kSetupDatabaseDirectory%Local\%simulator%\%car%\%track%\Tyre Setup*.*
+									FileCopy %A_LoopFilePath%, %kTempDirectory%SetupDabase\%simulator%\%car%\%track%
+							
+							if shareCarSetups {
+								try {
+									FileCopyDir %kSetupDatabaseDirectory%Local\%simulator%\%car%\%track%\Car Setups, %kTempDirectory%SetupDabase\%simulator%\%car%\%track%\Car Setups
+								}
+								catch exception {
+									; ignore
+								}
+							}
+						}
+					}
+				}
+				
+				try {
+					FileDelete %kTempDirectory%Setup Database.%id%.zip
+				}
+				catch exception {
+					; ignore
+				}
+				
+				RunWait PowerShell.exe -Command Compress-Archive -LiteralPath '%kTempDirectory%SetupDabase' -CompressionLevel Optimal -DestinationPath '%kTempDirectory%Setup Database.%id%.zip', , Hide
 				
 				ftpUpload("ftp.drivehq.com", "TheBigO", "29605343.9318.1940", kTempDirectory . "Setup Database." . id . ".zip", "Simulator Controller\Setup Database Uploads\Setup Database." . id . ".zip")
 				

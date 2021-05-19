@@ -327,6 +327,11 @@ loadSetups(asynchronous := true) {
 			GuiControl Disable, deleteWetRaceButton
 		}
 		else {
+			GuiControlGet dryQualificationDropDown
+			GuiControlGet dryRaceDropDown
+			GuiControlGet wetQualificationDropDown
+			GuiControlGet wetRaceDropDown
+			
 			GuiControl Enable, uploadDryQualificationButton
 			GuiControl Enable, uploadDryRaceButton
 			GuiControl Enable, uploadWetQualificationButton
@@ -335,21 +340,33 @@ loadSetups(asynchronous := true) {
 			option := (dryQualificationSelection ? "Enable" : "Disable")
 			
 			GuiControl %option%, downloadDryQualificationButton
+			
+			option := ((dryQualificationSelection && inList(localSetups[kDryQualificationSetup], dryQualificationDropDown)) ? "Enable" : "Disable")
+			
 			GuiControl %option%, deleteDryQualificationButton
 			
 			option := (dryRaceSelection ? "Enable" : "Disable")
 			
 			GuiControl %option%, downloadDryRaceButton
+			
+			option := ((dryRaceSelection && inList(localSetups[kDryRaceSetup], dryRaceDropDown)) ? "Enable" : "Disable")
+			
 			GuiControl %option%, deleteDryRaceButton
 			
 			option := (wetQualificationSelection ? "Enable" : "Disable")
 			
 			GuiControl %option%, downloadWetQualificationButton
+			
+			option := ((wetQualificationSelection && inList(localSetups[kWetQualificationSetup], wetQualificationDropDown)) ? "Enable" : "Disable")
+			
 			GuiControl %option%, deleteWetQualificationButton
 			
 			option := (wetRaceSelection ? "Enable" : "Disable")
 			
 			GuiControl %option%, downloadWetRaceButton
+			
+			option := ((wetRaceSelection && inList(localSetups[kWetRaceSetup], wetRaceDropDown)) ? "Enable" : "Disable")
+			
 			GuiControl %option%, deleteWetRaceButton
 		}
 	}

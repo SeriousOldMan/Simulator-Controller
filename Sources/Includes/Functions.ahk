@@ -526,7 +526,7 @@ startTrayMessageManager() {
 	SetTimer trayMessageQueue, -500
 }
 
-requestConsent() {
+requestShareSetupDatabaseConsent() {
 	program := StrSplit(A_ScriptName, ".")[1]
 	
 	if ((program = "Simulator Startup") || (program = "Simulator Configuration")) {
@@ -1809,7 +1809,7 @@ decreaseLogLevel() {
 initializeEnvironment()
 loadSimulatorConfiguration()
 checkForUpdates()
-requestConsent()
+requestShareSetupDatabaseConsent()
 shareSetupDatabase()
 initializeLoggingSystem()
 startMessageManager()

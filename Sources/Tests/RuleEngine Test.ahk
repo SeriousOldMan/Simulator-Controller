@@ -508,15 +508,15 @@ showFacts(knowledgeBase) {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
-/*
+
 AHKUnit.AddTestClass(Compiler)
 AHKUnit.AddTestClass(CoreEngine)
 AHKUnit.AddTestClass(Unification)
 AHKUnit.AddTestClass(HybridEngine)
 
 AHKUnit.Run()
-*/
 
+/*
 theRules =
 (
 	=<(?x, ?y) <= ?x = ?y
@@ -611,3 +611,4 @@ while (rs != false) {
 }
 
 msgbox Done
+*/

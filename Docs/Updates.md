@@ -43,6 +43,12 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ***
 
+## Release 3.0.4
+
+The update of the local configuration is covered by the automated update procedure, but you will be asked for a new consent for the extended setup database. Please rethink your consents and be part of the community.
+
+***
+
 ## Release 3.0.2
 
 No manual update steps necessary for this release, everything is handled automatically.

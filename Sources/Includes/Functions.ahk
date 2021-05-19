@@ -582,7 +582,19 @@ requestConsent() {
 			
 			writeConfiguration(kUserConfigDirectory . "CONSENT", consent)
 		}
-				
+	}
+}
+
+shareSetupDatabase() {
+	program := StrSplit(A_ScriptName, ".")[1]
+	
+	if ((program = "Simulator Startup") || (program = "Simulator Configuration")) {
+		idFileName := kUserConfigDirectory . "ID"
+		
+		FileReadLine id, %idFileName%, 1
+		
+		consent := readConfiguration(kUserConfigDirectory . "CONSENT")
+		
 		shareTyrePressures := (getConfigurationValue(consent, "Consent", "Share Tyre Pressures", "No") = "Yes")
 		shareCarSetups := (getConfigurationValue(consent, "Consent", "Share Car Setups", "No") = "Yes")
 		
@@ -1798,6 +1810,7 @@ initializeEnvironment()
 loadSimulatorConfiguration()
 checkForUpdates()
 requestConsent()
+shareSetupDatabase()
 initializeLoggingSystem()
 startMessageManager()
 startTrayMessageManager()

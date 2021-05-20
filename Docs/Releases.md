@@ -3,8 +3,8 @@
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. Full rework of fuel consumption projection after a pitstop.
-  4. Simulator car setup files can be stored together with additional notes in the [setup database](*) for future use.
-  5. The setup database consent has been extended to give [separate consents](*) for tyre pressures and car setup information.
+  4. Simulator car setup files can be stored together with additional notes in the [setup database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#querying-the-setup-database) for future use.
+  5. The setup database consent has been extended to give [separate consents](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--setup-database) for tyre pressures and car setup information.
   
 ## 3.0.3-release 05/16/21
 

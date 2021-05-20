@@ -1,4 +1,4 @@
-## 3.0.4-release 05/23/21
+## 3.0.4-release 05/23/21 (planned)
 
   1. Bugfixes, as always
   2. Documentation updates, as always

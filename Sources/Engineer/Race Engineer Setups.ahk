@@ -680,9 +680,6 @@ showSetups(command := false, simulator := false, car := false, track := false, w
 		
 		Gui RES:Add, Button, x310 y390 w80 h23 Default gcloseSetups, % translate("Close")
 		
-		if vSettingsPID
-			Gui RES:Add, Button, x220 y390 w80 h23 gtransferPressures vtransferPressuresButton, % translate("Load")
-		
 		Gui RES:Add, Text, x16 y60 w105 h23 +0x200, % translate("Simulator")
 		
 		choices := vSetupDatabase.getSimulators()
@@ -762,6 +759,9 @@ showSetups(command := false, simulator := false, car := false, track := false, w
 			chosen := 1
 		}
 		Gui RES:Add, DropDownList, x106 yp w100 AltSubmit Choose%chosen% gloadPressures vtyreCompoundDropDown, % values2String("|", choices*)
+		
+		if vSettingsPID
+			Gui RES:Add, Button, x292 yp w80 h23 gtransferPressures vtransferPressuresButton, % translate("Load")
 
 		Gui RES:Font, Norm, Arial
 		Gui RES:Font, Bold Italic, Arial

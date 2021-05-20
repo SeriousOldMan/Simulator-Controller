@@ -595,9 +595,21 @@ restart:
 		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit2 Number VspPitstopTyreSetEdit, %spPitstopTyreSetEdit%
 		Gui RES:Add, UpDown, x138 yp-2 w18 h20, %spPitstopTyreSetEdit%
 		
-		Gui RES:Add, Button, x292 yp-25 w90 h23 gopenSetupDatabase, % translate("Setups...")
+		import := false
 		
-		Gui RES:Add, Button, x292 yp+25 w90 h23 gimportFromSimulation, % translate("Import")
+		for simulator, ignore in getConfigurationSectionValues(getControllerConfiguration(), "Simulators", Object())
+			if new Application(simulator, kSimulatorConfiguration).isRunning() {
+				import := true
+				
+				break
+			}
+		
+		option := (import ? "yp-25" : "yp")
+
+		Gui RES:Add, Button, x292 %option% w90 h23 gopenSetupDatabase, % translate("Setups...")
+		
+		if import
+			Gui RES:Add, Button, x292 yp+25 w90 h23 gimportFromSimulation, % translate("Import")
 
 		Gui RES:Font, Norm, Arial
 		Gui RES:Font, Italic, Arial
@@ -748,7 +760,7 @@ importFromSimulation(message := false, simulator := false, prefix := false, sett
 		
 		simulator := false
 		
-		for ignore, candidate in string2Values("|", getConfigurationValue(kSimulatorConfiguration, "Configuration", "Simulators", ""))
+		for candidate, ignore in getConfigurationSectionValues(getControllerConfiguration(), "Simulators", Object())
 			if new Application(candidate, kSimulatorConfiguration).isRunning() {
 				simulator := candidate
 				

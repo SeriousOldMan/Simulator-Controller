@@ -26,7 +26,7 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-[3.0.4-rc1](https://www.dropbox.com/s/6sref3s5fzglyxw/Simulator%20Controller%203.0.4-rc1.zip?dl=1) (New features: Rework of post pitstop fuel calculation, Store reference to car setups in the setup databse, Store Notes in the setup database, New consents for the extended setup database. Feature complete, stable and with documentation and uodate procedure.)
+[3.0.4-rc2](https://www.dropbox.com/s/kmgor6y8n2y3jlg/Simulator%20Controller%203.0.4-rc2.zip?dl=1) (Release candidate for Release 3.0.4. New features: Rework of post pitstop fuel calculation, Store reference to car setups in the setup databse, Store Notes in the setup database, New consents for the extended setup database. Feature complete, stable and with documentation and uodate procedure.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-304) of this version and all the versions you might have skipped, before installing and using this version.
 

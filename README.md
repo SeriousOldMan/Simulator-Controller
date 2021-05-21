@@ -32,7 +32,9 @@ None for the moment...
 
 [3.0.3-release](https://www.dropbox.com/s/ao6tvh9morp1x9m/Simulator%20Controller%203.0.3-release.zip?dl=1) (Critical bugfix for Release 3.0.2: Remaining fuel calculation after a pitstop in races longer than an hour was not correct. New features of 3.0.2: New "Transfer" method for tyre pressure setups from the setup database and *Race Engineer Settings*, Refactoring of setup database code, Jona consults the Setup Database for a second opinion on tyre pressures, New switches in *Race Engineer Settings* to select Jonas strategy when calculating target tyre pressures, Unit tests for Setup Database.)
 
-3.0.4-release will come in a few hours...
+[3.0.4-release](https://www.dropbox.com/s/9t7g81vzq77qa46/Simulator%20Controller%203.0.4-release.zip?dl=1) (Release candidate for Release 3.0.4. New features: Rework of post pitstop fuel calculation, Store reference to car setups in the setup databse, Store Notes in the setup database, New consents for the extended setup database. Feature complete, stable and with documentation and uodate procedure.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-304) of this version and all the versions you might have skipped, before installing and using this version.
 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [update notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.

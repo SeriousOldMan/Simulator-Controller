@@ -10,5 +10,5 @@ Changes=Rework of post pitstop fuel calculation, Store reference to car setups i
 [Current]
 Type=Release
 [Version]
-Release=3.0.3-release
+Release=3.0.4-release
 Development=3.0.4-release

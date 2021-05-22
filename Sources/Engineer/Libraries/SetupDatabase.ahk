@@ -490,4 +490,74 @@ class SetupDatabase {
 			; ignore
 		}
 	}
+	
+	getSettingsNames(simulator, car, track, ByRef localSettings, ByRef globalSettings) {
+		simulatorCode := this.getSimulatorCode(simulator)
+		
+		localSettings := []
+		globalSettings := []
+			
+		Loop Files, %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Engineer Settings\*.*
+		{
+			SplitPath A_LoopFileName, settingsName
+		
+			localSettings.Push(StrReplace(settingsName, ".settings", ""))
+		}
+		
+		if this.UseGlobalDatabase {
+			Loop Files, %kSetupDatabaseDirectory%Global\%simulatorCode%\%car%\%track%\Race Engineer Settings\*.*
+			{
+				SplitPath A_LoopFileName, settingsName
+			
+				globalSettings.Push(StrReplace(settingsName, ".settings", ""))
+			}
+		}
+	}
+	
+	readSettings(simulator, car, track, settingsName) {
+		simulatorCode := this.getSimulatorCode(simulator)
+		
+		fileName = %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Engineer Settings\%settingsName%.settings
+		
+		return readConfiguration(fileName)
+	}
+	
+	writeSettings(simulator, car, track, settingsName, settings) {
+		simulatorCode := this.getSimulatorCode(simulator)
+		
+		fileName = %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Engineer Settings
+		
+		FileCreateDir %fileName%
+		
+		fileName := (fileName . "\" . settingsName . ".settings")
+		
+		writeConfiguration(fileName, settings)
+	}
+	
+	deleteSettings(simulator, car, track, settingsName) {
+		simulatorCode := this.getSimulatorCode(simulator)
+		
+		fileName = %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Engineer Settings\%settingsName%.settings
+		
+		try {
+			FileDelete %fileName%
+		}
+		catch exception {
+			; ignore
+		}
+	}
+	
+	renameSettings(simulator, car, track, oldSettingsName, newSettingsName) {
+		simulatorCode := this.getSimulatorCode(simulator)
+		
+		oldFileName = %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Engineer Settings\%oldSettingsName%.settings
+		newFileName = %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Engineer Settings\%newSettingsName%.settings
+		
+		try {
+			FileMove %oldFileName%, %newFileName%, 1
+		}
+		catch exception {
+			; ignore
+		}
+	}
 }

@@ -578,7 +578,7 @@ updateCustomCalls(startNumber, endNumber) {
 	}
 }
 
-updateConfigurationForV304() {
+renewConsent() {
 	try {
 		FileDelete % kUserConfigDirectory . "CONSENT"
 	}
@@ -638,13 +638,6 @@ updateConfigurationForV28() {
 }
 
 updateConfigurationForV27() {
-	try {
-		FileDelete % kUserConfigDirectory . "CONSENT"
-	}
-	catch exception {
-		; ignore
-	}
-	
 	try {
 		directory := SubStr(kSetupDatabaseDirectory, 1, StrLen(kSetupDatabaseDirectory) - 1)
 		

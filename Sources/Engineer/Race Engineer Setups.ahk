@@ -53,6 +53,9 @@ global vSettingsPID = false
 
 global vSetupDatabase = false
 
+global vLocalSettings = {}
+global vGlobalSettings = {}
+
 global simulatorDropDown
 global carDropDown
 global trackDropDown
@@ -77,6 +80,13 @@ global wetRaceDropDown
 global uploadWetRaceButton
 global downloadWetRaceButton
 global deleteWetRaceButton
+
+global settingsListView
+global settingsListViewHandle
+global addSettingsButton
+global editSettingsButton
+global duplicateSettingsButton
+global deleteSettingsButton
 		
 global notesEdit
 
@@ -251,6 +261,7 @@ chooseTrack() {
 		
 		chooseTemperature()
 		loadSetups()
+		loadSettings()
 		loadNotes()
 	}
 	catch exception {
@@ -374,6 +385,106 @@ loadSetups(asynchronous := true) {
 		callback := Func("loadSetups").Bind(false)
 	
 		SetTimer %callback%, -100
+	}
+}
+
+getSettings(index := false) {
+	Gui ListView, % settingsListViewHandle
+	
+	if !index
+		index := LV_GetNext()
+	
+	if index {
+		if (index <= vLocalSettings.Length())
+			return vLocalSettings[index]
+		else
+			return vGlobalSettings[index - vLocalSettings.Length()]
+	}
+	else
+		return false
+}
+
+getIndex(settings) {
+	index := inList(vLocalSettings, settings)
+	
+	if index
+		return index
+	else {
+		index := inList(vGlobalSettings, settings)
+	
+		if index
+			return (index + vLocalSettings.Length())
+		else
+			return false
+	}
+}
+
+loadSettings(settings := false) {
+	Gui RES:Default
+	Gui ListView, % settingsListViewHandle
+	
+	GuiControlGet simulatorDropDown
+	GuiControlGet carDropDown
+	GuiControlGet trackDropDown
+		
+	if ((simulatorDropDown = "") || (carDropDown = "") || (trackDropDown = "")) {
+		GuiControl Disable, addSettingsButton
+		GuiControl Disable, editSettingsButton
+		GuiControl Disable, duplicateSettingsButton
+		GuiControl Disable, deleteSettingsButton
+		
+		GuiControl +Disabled, settingsListView
+		
+		LV_Delete()
+	}
+	else {
+		GuiControl Enable, addSettingsButton
+		
+		if !settings
+			settings := getSettings()
+	
+		vSetupDatabase.getSettingsNames(simulatorDropDown, carDropDown, trackDropDown, vLocalSettings, vGlobalSettings)
+		
+		LV_Delete()
+		
+		for ignore, name in vLocalSettings {
+			LV_Add("", name)
+		}
+		
+		for ignore, name in vGlobalSettings {
+			LV_Add("", name)
+		}
+		
+		if settings {
+			index := getIndex(settings)
+			
+			if index {
+				LV_Modify(index, "Focus Select Vis")
+				
+				GuiControl Enable, duplicateSettingsButton
+				
+				if (index <= vLocalSettings.Length()) {
+					GuiControl Enable, editSettingsButton
+					GuiControl Enable, deleteSettingsButton
+				}
+				else {
+					GuiControl Disable, editSettingsButton
+					GuiControl Disable, deleteSettingsButton
+				}
+			}
+			else {
+				GuiControl Disable, editSettingsButton
+				GuiControl Disable, duplicateSettingsButton
+				GuiControl Disable, deleteSettingsButton
+			}
+		}
+		else {
+			GuiControl Disable, editSettingsButton
+			GuiControl Disable, duplicateSettingsButton
+			GuiControl Disable, deleteSettingsButton
+		}
+		
+		GuiControl -Disabled, settingsListView
 	}
 }
 
@@ -598,6 +709,150 @@ deleteWetRaceSetup() {
 	deleteSetup(kWetRaceSetup, wetRaceDropDown)
 }
 
+openSettings(mode := "New", arguments*) {
+	exePath := kBinariesDirectory . "Race Engineer Settings.exe"
+	fileName := kTempDirectory . "Temp.settings"
+				
+	Gui RES:Hide
+				
+	try {
+		options := ""
+		
+		switch mode {
+			case "New":
+				try {
+					FileDelete %fileName%
+				}
+				catch exception {
+					; ignore
+				}
+			case "Edit":
+				writeConfiguration(fileName, arguments[1])
+		}
+				
+		options := "-File """ . fileName . """"
+		
+		RunWait "%exePath%" %options%, %kBinariesDirectory%, , pid
+			
+		if ErrorLevel
+			return readConfiguration(fileName)
+		else
+			return false
+	}
+	catch exception {
+		logMessage(kLogCritical, translate("Cannot start the Race Engineer Settings tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
+			
+		showMessage(substituteVariables(translate("Cannot start the Race Engineer Settings tool (%exePath%) - please check the configuration..."), {exePath: exePath})
+				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+		
+		return false
+	}
+	finally {
+		Gui RES:Show
+	}
+}
+
+settingsListViewEvent() {
+	GuiControlGet simulatorDropDown
+	GuiControlGet carDropDown
+	GuiControlGet trackDropDown
+	
+	if (A_GuiEvent = "e") {
+		oldName := getSettings(A_EventInfo)
+		
+		LV_GetText(newName, A_EventInfo)
+		
+		vSetupDatabase.renameSettings(simulatorDropDown, carDropDown, trackDropDown, oldName, newName)
+	}
+	else {
+		index := LV_GetNext()
+		
+		if index {
+			GuiControl Enable, duplicateSettingsButton
+			
+			if (index <= vLocalSettings.Length()) {
+				GuiControl Enable, editSettingsButton
+				GuiControl Enable, deleteSettingsButton
+			}
+			else {
+				GuiControl Disable, editSettingsButton
+				GuiControl Disable, deleteSettingsButton
+			}
+			
+			if (A_GuiEvent = "DoubleClick")
+				SendEvent {F2}
+		}
+		else {
+			GuiControl Disable, editSettingsButton
+			GuiControl Disable, duplicateSettingsButton
+			GuiControl Disable, deleteSettingsButton
+		}
+	}
+}
+
+addSettings() {
+	GuiControlGet simulatorDropDown
+	GuiControlGet carDropDown
+	GuiControlGet trackDropDown
+	
+	settings := openSettings("New")
+	
+	if settings {
+		settingsName := translate("New")
+		
+		vSetupDatabase.writeSettings(simulatorDropDown, carDropDown, trackDropDown, settingsName, settings)
+	
+		loadSettings(settingsName)
+		
+		SendEvent {F2}
+	}
+}
+
+editSettings() {
+	GuiControlGet simulatorDropDown
+	GuiControlGet carDropDown
+	GuiControlGet trackDropDown
+	
+	settingsName := getSettings()
+	
+	settings := openSettings("Edit", vSetupDatabase.readSettings(simulatorDropDown, carDropDown, trackDropDown, settingsName))
+	
+	if settings
+		vSetupDatabase.writeSettings(simulatorDropDown, carDropDown, trackDropDown, settingsName, settings)
+}
+
+duplicateSettings() {
+	GuiControlGet simulatorDropDown
+	GuiControlGet carDropDown
+	GuiControlGet trackDropDown
+	
+	settingsName := getSettings()
+	
+	settings := openSettings("Edit", vSetupDatabase.readSettings(simulatorDropDown, carDropDown, trackDropDown, settingsName))
+	
+	if settings {
+		settingsName := (settingsName . translate(" Copy"))
+		
+		vSetupDatabase.writeSettings(simulatorDropDown, carDropDown, trackDropDown, settingsName, settings)
+	
+		loadSettings(settingsName)
+		
+		SendEvent {F2}
+	}
+}
+
+deleteSettings() {
+	GuiControlGet simulatorDropDown
+	GuiControlGet carDropDown
+	GuiControlGet trackDropDown
+	
+	settingsName := getSettings()
+	
+	vSetupDatabase.deleteSettings(simulatorDropDown, carDropDown, trackDropDown, settingsName)
+	
+	loadSettings()
+}
+
 updateQueryScope() {
 	Gui RES:Default
 			
@@ -744,7 +999,7 @@ showSetups(command := false, simulator := false, car := false, track := false, w
 		Gui RES:Add, UpDown, x242 yp-2 w18 h20, % trackTemperature
 		Gui RES:Add, Text, x252 y130 w140 h23 +0x200, % translate("Temp. Track (Celsius)")
 		
-		tabs := map(["Tyres", "Setup", "Notes"], "translate")
+		tabs := map(["Tyres", "Setup", "Settings", "Notes"], "translate")
 
 		Gui RES:Add, Tab3, x8 y159 w380 h224 -Wrap, % values2String("|", tabs*)
 
@@ -839,6 +1094,18 @@ showSetups(command := false, simulator := false, car := false, track := false, w
 
 		Gui Tab, 3
 		
+		Gui RES:Add, ListView, x16 y189 w364 h160 Disabled AltSubmit -Multi -Hdr NoSort NoSortHdr -ReadOnly -LV0x10 -Background HwndsettingsListViewHandle VsettingsListView gsettingsListViewEvent, % translate("Setting")
+		Gui RES:Add, Button, x281 yp+165 w23 h23 HwndaddSettingsButtonHandle gaddSettings vaddSettingsButton
+		Gui RES:Add, Button, x306 yp w23 h23 HwndeditSettingsButtonHandle geditSettings veditSettingsButton
+		Gui RES:Add, Button, x331 yp w23 h23 HwndduplicateSettingsButtonHandle VduplicateSettingsButton gduplicateSettings
+		Gui RES:Add, Button, x356 yp w23 h23 HwnddeleteSettingsButtonHandle VdeleteSettingsButton gdeleteSettings
+		setButtonIcon(addSettingsButtonHandle, kIconsDirectory . "Plus.ico", 1)
+		setButtonIcon(editSettingsButtonHandle, kIconsDirectory . "Pencil.ico", 1)
+		setButtonIcon(duplicateSettingsButtonHandle, kIconsDirectory . "Copy.ico", 1)
+		setButtonIcon(deleteSettingsButtonHandle, kIconsDirectory . "Minus.ico", 1)
+		
+		Gui Tab, 4
+		
 		Gui RES:Add, Edit, x16 y189 w364 h184 -Background gwriteNotes vnotesEdit
 
 		Gui RES:Show, AutoSize Center
@@ -846,6 +1113,7 @@ showSetups(command := false, simulator := false, car := false, track := false, w
 		if (simulator && car && track && weather && airTemperature && trackTemperature && compound) {
 			loadPressures()
 			loadSetups()
+			loadSettings()
 			loadNotes()
 		}
 		else if (!simulator || !car || !track)

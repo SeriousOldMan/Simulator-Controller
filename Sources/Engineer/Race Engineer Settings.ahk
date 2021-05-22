@@ -52,6 +52,8 @@ global kRaceEngineerSettingsFile = getFileName("Race Engineer.settings", kUserCo
 ;;;                   Private Variable Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+global vEditMode := false
+
 global repairSuspensionDropDown
 global repairSuspensionThresholdEdit
 global repairSuspensionGreaterLabel
@@ -372,10 +374,10 @@ restart:
 		tpWetRearLeftEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Wet.Pressure.Target.RL", 30.0)
 		tpWetRearRightEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Wet.Pressure.Target.RR", 30.0)
 		
-		raceDurationEdit := Round(getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Duration", 0) / 60)
-		avgLaptimeEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Lap.AvgTime", 0)
-		fuelConsumptionEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Fuel.AvgConsumption", 0.0)
-		pitstopDeltaEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Pitstop.Delta", 0)
+		raceDurationEdit := Round(getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Duration", 3600) / 60)
+		avgLaptimeEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Lap.AvgTime", 120)
+		fuelConsumptionEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Fuel.AvgConsumption", 3.0)
+		pitstopDeltaEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Pitstop.Delta", 60)
 		safetyFuelEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Fuel.SafetyMargin", 4)
 		
 		formationLapCheck := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Lap.Formation", true)
@@ -606,6 +608,7 @@ restart:
 		
 		option := (import ? "yp-25" : "yp")
 
+		if !vEditMode
 		Gui RES:Add, Button, x292 %option% w90 h23 gopenSetupDatabase, % translate("Setups...")
 		
 		if import
@@ -878,7 +881,15 @@ showRaceEngineerSettingsEditor() {
 	
 	Menu Tray, Icon, %icon%, , 1
 	
-	settings := readConfiguration(kRaceEngineerSettingsFile)
+	fileName := kRaceEngineerSettingsFile
+	
+	if ((A_Args.Length() > 0) && (A_Args[1] = "-File")) {
+		fileName := A_Args[2]
+		
+		vEditMode := true
+	}
+	
+	settings := readConfiguration(fileName)
 	
 	if ((A_Args.Length() > 0) && (A_Args[1] = "-Import")) {
 		importFromSimulation("Import", A_Args[2], A_Args[3], settings)
@@ -888,8 +899,11 @@ showRaceEngineerSettingsEditor() {
 	else {
 		registerEventHandler("Setup", "handleSetupRemoteCalls")
 	
-		if (editSettings(settings) == kOk)
-			writeConfiguration(kRaceEngineerSettingsFile, settings)
+		if (editSettings(settings) = kOk) {
+			writeConfiguration(fileName, settings)
+	
+			ExitApp %vEditMode%
+		}
 	}
 	
 	ExitApp 0

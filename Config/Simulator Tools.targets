@@ -11,14 +11,15 @@ Release 2.4=Release 2.3 -> updateTranslations, updatePhraseGrammars, updateRREPl
 Release 2.5=Release 2.4 -> updateTranslations, updatePhraseGrammars, updateConfigurationForV25
 Release 2.5.4=Release 2.5 -> updateTranslations, updatePhraseGrammars, updatePluginLabels
 Release 2.6.1=Release 2.5.4 -> updateTranslations, updatePhraseGrammars, updateConfigurationForV261, updatePluginLabels
-Release 2.7=Release 2.6.1 -> updateTranslations, updatePhraseGrammars, updateConfigurationForV27, updatePluginLabels
+Release 2.7=Release 2.6.1 -> updateTranslations, updatePhraseGrammars, updateConfigurationForV27, updatePluginLabels, renewConsent
 Release 2.8=Release 2.7 -> updateTranslations, updatePhraseGrammars, updatePluginsForV28, updateConfigurationForV28, updatePluginLabels
 Release 2.8.2=Release 2.8 -> updateTranslations, updateConfigurationForV282, updatePluginLabels
 Release 2.8.5=Release 2.8.2 -> updateTranslations, updatePhraseGrammars, updatePluginsForV285, updatePluginLabels
 Release 2.8.6=Release 2.8.5 -> updateTranslations, updatePluginLabels
 Release 3.0=Release 2.8.6 -> updateTranslations, updatePluginLabels
 Release 3.0.2=Release 3.0 -> updateTranslations
-Release 3.0.4=Release 3.0.2 -> updateTranslations, updateConfigurationForV304
+Release 3.0.4=Release 3.0.2 -> updateTranslations, renewConsent
+; Release 3.0.6=Release 3.0.4 -> updateTranslations, renewConsent
 [Cleanup]
 Binaries Folder=%kBinariesDirectory%
 Logs Folder=%kLogsDirectory%

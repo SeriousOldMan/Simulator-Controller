@@ -1,3 +1,7 @@
+/*
+Author: The Iron Wolf (vleonavicius@hotmail.com)
+Website: thecrewchief.org
+*/
 using System;
 using System.IO;
 using System.IO.MemoryMappedFiles;

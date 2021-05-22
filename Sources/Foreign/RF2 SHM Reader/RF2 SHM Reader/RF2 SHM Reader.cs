@@ -1,4 +1,9 @@
-﻿using RF2SHMReader.rFactor2Data;
+﻿/*
+RF2 SHM Reader main class.
+
+Small parts original by: The Iron Wolf (vleonavicius@hotmail.com; thecrewchief.org)
+*/
+using RF2SHMReader.rFactor2Data;
 using System;
 using System.Text;
 using System.Threading;

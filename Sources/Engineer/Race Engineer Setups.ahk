@@ -459,7 +459,7 @@ loadSettings(settings := false) {
 			index := getIndex(settings)
 			
 			if index {
-				LV_Modify(index, "Focus Select Vis")
+				LV_Modify(index, "+Focus +Select Vis")
 				
 				GuiControl Enable, duplicateSettingsButton
 				
@@ -752,6 +752,16 @@ openSettings(mode := "New", arguments*) {
 	}
 }
 
+openSettingsEditor(asynchronous := true) {
+	if !asynchronous
+		SendEvent {F2}
+	else {
+		callback := Func("openSettingsEditor").Bind(false)
+	
+		SetTimer %callback%, -500
+	}
+}
+
 settingsListViewEvent() {
 	GuiControlGet simulatorDropDown
 	GuiControlGet carDropDown
@@ -780,7 +790,7 @@ settingsListViewEvent() {
 			}
 			
 			if (A_GuiEvent = "DoubleClick")
-				SendEvent {F2}
+				openSettingsEditor()
 		}
 		else {
 			GuiControl Disable, editSettingsButton
@@ -804,7 +814,7 @@ addSettings() {
 	
 		loadSettings(settingsName)
 		
-		SendEvent {F2}
+		openSettingsEditor()
 	}
 }
 
@@ -837,7 +847,7 @@ duplicateSettings() {
 	
 		loadSettings(settingsName)
 		
-		SendEvent {F2}
+		openSettingsEditor()
 	}
 }
 

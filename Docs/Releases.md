@@ -1,3 +1,11 @@
+## 3.0.6-release 05/30/21 (planned)
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Race Engineer Settings can now be stored also in the [setup database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#querying-the-setup-database) for future use.
+  4. Before beginning a session, you can select one of the Race Engineer Settings from the setup database and activate it for the next session together with the tyre pressures for the current environmaental conditions.
+  5. The setup database consent has been extended again to give [separate consents](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--setup-database) for tyre pressures, car setup information and race engineer settings this time.
+
 ## 3.0.4-release 05/23/21
 
   1. Bugfixes, as always

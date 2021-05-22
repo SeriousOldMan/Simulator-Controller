@@ -24,6 +24,7 @@ Release 3.0.6 Checklist
    b. Documentation (Virtual Race Engineer)
 3. Update information
    a. New consents
+   b. Check new consent update procedure
 
 Release 3.0.4 Checklist
 =======================

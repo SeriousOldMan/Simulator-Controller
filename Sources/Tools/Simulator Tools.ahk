@@ -579,11 +579,12 @@ updateCustomCalls(startNumber, endNumber) {
 }
 
 renewConsent() {
-	try {
-		FileDelete % kUserConfigDirectory . "CONSENT"
-	}
-	catch exception {
-		; ignore
+	consent := readConfiguration(kUserConfigDirectory . "CONSENT")
+	
+	if (consent.Count() > 0) {
+		setConfigurationValue(consent, "General", "ReNew", true)
+		
+		writeConfiguration(kUserConfigDirectory . "CONSENT", consent)
 	}
 }
 

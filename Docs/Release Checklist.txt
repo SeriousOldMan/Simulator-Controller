@@ -12,6 +12,19 @@ General Release Actions
 10. Update Wiki using "update-documentation.bat"
 11. Set a Git Tag after final commit
 
+Release 3.0.6 Checklist
+=======================
+
+0. Search for new links (*)
+1. Update procedue
+   a. Translations
+   b. Delete old Consent
+2. New tabs in Setup Database tool
+   a. Doc Image
+   b. Documentation (Virtual Race Engineer)
+3. Update information
+   a. New consents
+
 Release 3.0.4 Checklist
 =======================
 

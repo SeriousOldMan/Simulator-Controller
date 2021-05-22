@@ -77,9 +77,10 @@ createMessageReceiver() {
 	Gui MR:Show, Hide AutoSize X0 Y0
 }
 
-consentDialog(id) {
+consentDialog(id, consent := false) {
 	static tyrePressuresConsentDropDown
 	static carSetupsConsentDropDown
+	static reSettingsConsentDropDown
 	static closed
 	
 	if (id = "Close") {
@@ -111,17 +112,24 @@ consentDialog(id) {
 	
 	Gui CNS:Add, Text, x8 y300 w450 h23 +0x200, % translate("Do you want to share your local tyre pressure data?")
 
-	Gui CNS:Add, DropDownList, x460 y300 w332 AltSubmit Choose3 VtyrePressuresConsentDropDown, % values2String("|", map(["Yes", "No", "Ask again later..."], "translate")*)
+	chosen := inList(["Yes", "No", "Undecided"], getConfigurationValue(consent, "Consent", "Share Tyre Pressures", "Undecided"))
+	Gui CNS:Add, DropDownList, x460 y300 w332 AltSubmit Choose%chosen% VtyrePressuresConsentDropDown, % values2String("|", map(["Yes", "No", "Ask again later..."], "translate")*)
 	
 	Gui CNS:Add, Text, x8 y324 w450 h23 +0x200, % translate("Do you want to share your local car setup data?")
 
-	Gui CNS:Add, DropDownList, x460 y324 w332 AltSubmit Choose3 VcarSetupsConsentDropDown, % values2String("|", map(["Yes", "No", "Ask again later..."], "translate")*)
-		
-	Gui CNS:Add, Text, x8 y364 w784 h60 -VScroll +Wrap ReadOnly, % StrReplace(StrReplace(getConfigurationValue(texts, language, "Information"), "``n", "`n"), "\<>", "=")
+	chosen := inList(["Yes", "No", "Undecided"], getConfigurationValue(consent, "Consent", "Share Car Setups", "Undecided"))
+	Gui CNS:Add, DropDownList, x460 y324 w332 AltSubmit Choose%chosen% VcarSetupsConsentDropDown, % values2String("|", map(["Yes", "No", "Ask again later..."], "translate")*)
 	
-	Gui CNS:Add, Link, x8 y434 w784 h60 cRed -VScroll +Wrap ReadOnly, % StrReplace(StrReplace(getConfigurationValue(texts, language, "Warning"), "``n", "`n"), "\<>", "=")
+	Gui CNS:Add, Text, x8 y348 w450 h23 +0x200, % translate("Do you want to share your local race engineer settings?")
+
+	chosen := inList(["Yes", "No", "Undecided"], getConfigurationValue(consent, "Consent", "Share Race Engineer Settings", "Undecided"))
+	Gui CNS:Add, DropDownList, x460 y348 w332 AltSubmit Choose%chosen% VreSettingsConsentDropDown, % values2String("|", map(["Yes", "No", "Ask again later..."], "translate")*)
 		
-	Gui CNS:Add, Button, x368 y514 w80 h23 Default gcloseConsentDialog, % translate("Save")
+	Gui CNS:Add, Text, x8 y388 w784 h60 -VScroll +Wrap ReadOnly, % StrReplace(StrReplace(getConfigurationValue(texts, language, "Information"), "``n", "`n"), "\<>", "=")
+	
+	Gui CNS:Add, Link, x8 y458 w784 h60 cRed -VScroll +Wrap ReadOnly, % StrReplace(StrReplace(getConfigurationValue(texts, language, "Warning"), "``n", "`n"), "\<>", "=")
+		
+	Gui CNS:Add, Button, x392 y514 w80 h23 Default gcloseConsentDialog, % translate("Save")
 	
 	Gui CNS:+AlwaysOnTop
 	Gui CNS:Show, Center AutoSize
@@ -134,10 +142,12 @@ consentDialog(id) {
 	
 	GuiControlGet tyrePressuresConsentDropDown
 	GuiControlGet carSetupsConsentDropDown
+	GuiControlGet reSettingsConsentDropDown
 	
 	Gui CNS:Destroy
 	
-	return {TyrePressures: ["Yes", "No", "Retry"][tyrePressuresConsentDropDown], CarSetups: ["Yes", "No", "Retry"][carSetupsConsentDropDown]}
+	return {TyrePressures: ["Yes", "No", "Retry"][tyrePressuresConsentDropDown], CarSetups: ["Yes", "No", "Retry"][carSetupsConsentDropDown]
+		  , RaceEngineerSettings: ["Yes", "No", "Retry"][reSettingsConsentDropDown]}
 }
 
 closeConsentDialog() {
@@ -536,7 +546,7 @@ requestShareSetupDatabaseConsent() {
 		
 		consent := readConfiguration(kUserConfigDirectory . "CONSENT")
 		
-		request := ((consent.Count() == 0) || (id != getConfigurationValue(consent, "General", "ID")))
+		request := ((consent.Count() == 0) || (id != getConfigurationValue(consent, "General", "ID")) || getConfigurationValue(consent, "General", "ReNew", false))
 		
 		if !request {
 			countdown := getConfigurationValue(consent, "General", "Countdown", kUndefined)
@@ -553,34 +563,44 @@ requestShareSetupDatabaseConsent() {
 		}
 		
 		if request {
-			consent := newConfiguration()
+			newConsent := newConfiguration()
 			
-			setConfigurationValue(consent, "General", "ID", id)
-			setConfigurationValue(consent, "Consent", "Date", A_MM . "/" . A_DD . "/" . A_YYYY)
+			setConfigurationValue(newConsent, "General", "ID", id)
+			setConfigurationValue(newConsent, "Consent", "Date", A_MM . "/" . A_DD . "/" . A_YYYY)
 			
-			result := consentDialog(id)
+			result := consentDialog(id, consent)
 			
 			switch result["TyrePressures"] {
 				case "Yes":
-					setConfigurationValue(consent, "Consent", "Share Tyre Pressures", "Yes")
+					setConfigurationValue(newConsent, "Consent", "Share Tyre Pressures", "Yes")
 				case "No":
-					setConfigurationValue(consent, "Consent", "Share Tyre Pressures", "No")
+					setConfigurationValue(newConsent, "Consent", "Share Tyre Pressures", "No")
 				case "Retry":
-					setConfigurationValue(consent, "Consent", "Share Tyre Pressures", "Undecided")
-					setConfigurationValue(consent, "General", "Countdown", 10)
+					setConfigurationValue(newConsent, "Consent", "Share Tyre Pressures", "Undecided")
+					setConfigurationValue(newConsent, "General", "Countdown", 10)
 			}
 			
 			switch result["CarSetups"] {
 				case "Yes":
-					setConfigurationValue(consent, "Consent", "Share Car Setups", "Yes")
+					setConfigurationValue(newConsent, "Consent", "Share Car Setups", "Yes")
 				case "No":
-					setConfigurationValue(consent, "Consent", "Share Car Setups", "No")
+					setConfigurationValue(newConsent, "Consent", "Share Car Setups", "No")
 				case "Retry":
-					setConfigurationValue(consent, "Consent", "Share Car Setups", "Undecided")
-					setConfigurationValue(consent, "General", "Countdown", 10)
+					setConfigurationValue(newConsent, "Consent", "Share Car Setups", "Undecided")
+					setConfigurationValue(newConsent, "General", "Countdown", 10)
 			}
 			
-			writeConfiguration(kUserConfigDirectory . "CONSENT", consent)
+			switch result["RaceEngineerSettings"] {
+				case "Yes":
+					setConfigurationValue(newConsent, "Consent", "Share Race Engineer Settings", "Yes")
+				case "No":
+					setConfigurationValue(newConsent, "Consent", "Share Race Engineer Settings", "No")
+				case "Retry":
+					setConfigurationValue(newConsent, "Consent", "Share Race Engineer Settings", "Undecided")
+					setConfigurationValue(newConsent, "General", "Countdown", 10)
+			}
+			
+			writeConfiguration(kUserConfigDirectory . "CONSENT", newConsent)
 		}
 	}
 }
@@ -597,8 +617,9 @@ shareSetupDatabase() {
 		
 		shareTyrePressures := (getConfigurationValue(consent, "Consent", "Share Tyre Pressures", "No") = "Yes")
 		shareCarSetups := (getConfigurationValue(consent, "Consent", "Share Car Setups", "No") = "Yes")
+		shareRESettingsSetups := (getConfigurationValue(consent, "Consent", "Share Race Engineer Settings", "No") = "Yes")
 		
-		if (shareTyrePressures || shareCarSetups) {
+		if (shareTyrePressures || shareCarSetups || shareRESettingsSetups) {
 			uploadTimeStamp := kSetupDatabaseDirectory . "Local\UPLOAD"
 			
 			if FileExist(uploadTimeStamp) {
@@ -645,6 +666,15 @@ shareSetupDatabase() {
 							if shareCarSetups {
 								try {
 									FileCopyDir %kSetupDatabaseDirectory%Local\%simulator%\%car%\%track%\Car Setups, %kTempDirectory%SetupDabase\%simulator%\%car%\%track%\Car Setups
+								}
+								catch exception {
+									; ignore
+								}
+							}
+							
+							if shareRESettingsSetups {
+								try {
+									FileCopyDir %kSetupDatabaseDirectory%Local\%simulator%\%car%\%track%\Race Engineer Settings, %kTempDirectory%SetupDabase\%simulator%\%car%\%track%\Race Engineer Settings
 								}
 								catch exception {
 									; ignore

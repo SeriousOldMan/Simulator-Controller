@@ -78,6 +78,7 @@ class RaceEngineer extends ConfigurationItem {
 	iSession := kSessionFinished
 	
 	iEnoughData := false
+	iLearningLaps := 1
 	
 	iKnowledgeBase := false
 	iOverallTime := 0
@@ -358,6 +359,12 @@ class RaceEngineer extends ConfigurationItem {
 	EnoughData[] {
 		Get {
 			return this.iEnoughData
+		}
+	}
+	
+	LearningLaps[] {
+		Get {
+			return this.iLearningLaps
 		}
 	}
 	
@@ -1273,8 +1280,7 @@ class RaceEngineer extends ConfigurationItem {
 				, "Session.Settings.Tyre.Pressure.Correction.Setup": getConfigurationValue(settings, "Session Settings", "Tyre.Pressure.Correction.Setup", true)
 				, "Session.Setup.Tyre.Set.Fresh": getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Set.Fresh", 8)
 				, "Session.Setup.Tyre.Set": getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Set", 7)}
-		
-		
+				
 		facts["Session.Setup.Tyre.Dry.Pressure.FL"] := getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Dry.Pressure.FL", 26.1)
 		facts["Session.Setup.Tyre.Dry.Pressure.FR"] := getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Dry.Pressure.FR", 26.1)
 		facts["Session.Setup.Tyre.Dry.Pressure.RL"] := getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Dry.Pressure.RL", 26.1)
@@ -1287,6 +1293,10 @@ class RaceEngineer extends ConfigurationItem {
 		facts["Session.Simulator"] := getConfigurationValue(data, "Session Data", "Simulator", "Unknown")
 		facts["Session.Setup.Tyre.Compound"] := getConfigurationValue(data, "Car Data", "TyreCompound", getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Compound", "Dry"))
 		facts["Session.Setup.Tyre.Compound.Color"] := getConfigurationValue(data, "Car Data", "TyreCompoundColor", getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Compound.Color", "Black"))
+					
+		facts["Session.Settings.Damage.Analysis.Laps"] := getConfigurationValue(data, "Session Strategies", "DamageAnalysisLaps", 1)
+		facts["Session.Settings.Lap.Learning.Laps"] := getConfigurationValue(data, "Session Strategies", "LearningLaps", 1)
+		facts["Session.Settings.Lap.Time.Adjust"] := getConfigurationValue(data, "Session Strategies", "AdjustLapTimes", true)
 				
 		return facts
 	}
@@ -1341,8 +1351,7 @@ class RaceEngineer extends ConfigurationItem {
 			
 			facts["Session.Settings.Tyre.Pressure.Correction.Temperature"] := getConfigurationValue(settings, "Session Settings", "Tyre.Pressure.Correction.Temperature", true)
 			facts["Session.Settings.Tyre.Pressure.Correction.Setup"] := getConfigurationValue(settings, "Session Settings", "Tyre.Pressure.Correction.Setup", true)
-					
-					
+			
 			for key, value in facts
 				knowledgeBase.setValue(key, value)
 			
@@ -1352,6 +1361,7 @@ class RaceEngineer extends ConfigurationItem {
 	}
 	
 	startSession(data) {
+		local knowledgeBase
 		local facts
 		
 		if !IsObject(data)
@@ -1368,7 +1378,9 @@ class RaceEngineer extends ConfigurationItem {
 
 		engine := new RuleEngine(productions, reductions, facts)
 		
-		this.iKnowledgeBase := new this.RaceKnowledgeBase(this, engine, engine.createFacts(), engine.createRules())
+		knowledgeBase := new this.RaceKnowledgeBase(this, engine, engine.createFacts(), engine.createRules())
+		
+		this.iKnowledgeBase := knowledgeBase
 		this.iLastLap := 0
 		this.iOverallTime := 0
 		this.iLastFuelAmount := 0
@@ -1376,8 +1388,35 @@ class RaceEngineer extends ConfigurationItem {
 		this.iEnoughData := false
 		this.iSetupData := {}
 		
+		this.iLearningLaps := getConfigurationValue(data, "Session Strategies", "LearningLaps", 1)
+		
 		if this.Speaker
 			this.getSpeaker().speakPhrase("Greeting")
+		
+		settings := false
+		
+		????? => ?????
+		simulator := knowledgeBase.getValue("Session.Simulator")
+		car := knowledgeBase.getValue("Session.Car")
+		track:= knowledgeBase.getValue("Session.Track")
+		
+		if getConfigurationValue(data, "Session Startup", "LoadSettings", false)
+			settings := this.SetupDatabase.querySettings(simulator, car, track, {Duration: getConfigurationValue(data, "Session Settings", "Duration", 0)}, 0.1)
+		
+		if getConfigurationValue(data, "Session Startup", "LoadTyrePressures", false)
+			tyrePressures := this.getTyrePressures(weather, airTemperature, trackTemperature, ByRef compound, ByRef compoundColor, ByRef pressures, ByRef certainty)
+		
+		if settings
+			this.updateSession(settings)
+		
+		????? >=
+		
+		this.iLoadSettings := 
+		this.iLoadTyrePressures := getConfigurationValue(data, "Session Startup", "LoadTyrePressures", kAsk)
+		
+		this.iSaveSettings := getConfigurationValue(data, "Session Shutdown", "SaveSettings", kNever)
+		this.iSaveTyrePressures := getConfigurationValue(data, "Session Shutdown", "SaveTyrePressures", kAsk)
+		
 		
 		if this.Debug[kDebugKnowledgeBase]
 			dumpKnowledge(this.KnowledgeBase)
@@ -1452,11 +1491,10 @@ class RaceEngineer extends ConfigurationItem {
 		else
 			knowledgeBase.setValue("Lap", lapNumber)
 			
-		if !this.iInitialFuelAmount
+		if !this.InitialFuelAmount
 			baseLap := lapNumber
 		
-		if (lapNumber > baseLap)
-			this.iEnoughData := true
+		this.iEnoughData := (lapNumber > (baseLap + this.LearningLaps))
 		
 		driverForname := getConfigurationValue(data, "Stint Data", "DriverForname", this.DriverName)
 		driverSurname := getConfigurationValue(data, "Stint Data", "DriverSurname", "Doe")
@@ -1523,7 +1561,7 @@ class RaceEngineer extends ConfigurationItem {
 			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.AvgConsumption", 0)
 			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.Consumption", 0)
 		}
-		else if !this.iInitialFuelAmount {
+		else if !this.InitialFuelAmount {
 			; This is the case after a pitstop
 			this.iInitialFuelAmount := fuelRemaining
 			this.iLastFuelAmount := fuelRemaining
@@ -1533,7 +1571,7 @@ class RaceEngineer extends ConfigurationItem {
 		}
 		else {
 			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.AvgConsumption", Round((this.InitialFuelAmount - fuelRemaining) / (lapNumber - baseLap), 2))
-			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.Consumption", Round(this.iLastFuelAmount - fuelRemaining, 2))
+			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.Consumption", Round(this.LastFuelAmount - fuelRemaining, 2))
 			
 			this.iLastFuelAmount := fuelRemaining
 		}

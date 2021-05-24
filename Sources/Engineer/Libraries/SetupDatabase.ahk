@@ -519,7 +519,15 @@ class SetupDatabase {
 		
 		fileName = %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Engineer Settings\%settingsName%.settings
 		
-		return readConfiguration(fileName)
+		settings := readConfiguration(fileName)
+		
+		if (settings.Count() = 0) {
+			fileName = %kSetupDatabaseDirectory%Global\%simulatorCode%\%car%\%track%\Race Engineer Settings\%settingsName%.settings
+		
+			return readConfiguration(fileName)
+		}
+		else
+			return settings
 	}
 	
 	writeSettings(simulator, car, track, settingsName, settings) {

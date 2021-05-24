@@ -574,6 +574,31 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 		this.updateActions(sessionState)
 	}
 	
+	updateSimulatorData(data) {
+		if (getConfigurationValue(data, "Stint Data", "Laps", 0) == 1) {
+			simulator := this.Simulator.runningSimulator()
+			
+			setConfigurationValue(data, "Session Startup", "LoadSettings"
+								, getConfigurationValue(kSimulatorConfiguration, "Race Engineer Startup", simulator . ".LoadSettings", false))
+			setConfigurationValue(data, "Session Startup", "LoadTyrePressures"
+								, getConfigurationValue(kSimulatorConfiguration, "Race Engineer Startup", simulator . ".LoadTyrePressures", false))
+		
+			setConfigurationValue(data, "Session Shutdown", "SaveSettings"
+								, getConfigurationValue(kSimulatorConfiguration, "Race Engineer Shutdown", simulator . ".SaveSettings", "Ask"))
+			setConfigurationValue(data, "Session Shutdown", "SaveTyrePressures"
+								, getConfigurationValue(kSimulatorConfiguration, "Race Engineer Shutdown", simulator . ".SaveTyrePressures", "Ask"))
+		
+			setConfigurationValue(data, "Session Strategies", "LearningLaps"
+								, getConfigurationValue(kSimulatorConfiguration, "Race Engineer Strategies", simulator . ".LearningLaps", 1))
+			setConfigurationValue(data, "Session Strategies", "AdjustLapTimes"
+								, getConfigurationValue(kSimulatorConfiguration, "Race Engineer Strategies", simulator . ".AdjustLapTimes", true))
+			setConfigurationValue(data, "Session Strategies", "DamageAnalysisLaps"
+								, getConfigurationValue(kSimulatorConfiguration, "Race Engineer Strategies", simulator . ".DamageAnalysisLaps", 1))
+		}
+		
+		this.Simulator.updateSimulatorData(data)
+	}
+	
 	collectSessionData() {
 		static lastLap := 0
 		static lastLapCounter := 0
@@ -584,7 +609,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 			
 			data := readSharedMemory(code)
 			
-			this.Simulator.updateSimulatorData(data)
+			this.updateSimulatorData(data)
 			
 			dataLastLap := getConfigurationValue(data, "Stint Data", "Laps", 0)
 			

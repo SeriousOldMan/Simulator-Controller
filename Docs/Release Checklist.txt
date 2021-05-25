@@ -18,13 +18,23 @@ Release 3.0.6 Checklist
 0. Search for new links (*)
 1. Update procedue
    a. Translations
-   b. Delete old Consent
+   b. Update Phrase Grammars
 2. New tabs in Setup Database tool
    a. Doc Image
    b. Documentation (Virtual Race Engineer)
 3. Update information
-   a. New consents
-   b. Check new consent update procedure
+   a. New Race Engineer configuration documentation
+4. New Race Engineer Configuration Editor
+   a. Doc Images
+   b. Plugin & Modes Documentation
+   c. Virtual Race Engineer Documentation
+   c. Update Notes
+5. Rework of Race Engineer Settings
+   a. Update Notes
+   b. Doc Images
+   c. Plugin & Modes Documentation
+   d. Virtual Race Engineer Documentation
+   e. Update Notes
 
 Release 3.0.4 Checklist
 =======================

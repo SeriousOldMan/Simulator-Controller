@@ -463,7 +463,7 @@ class DamageAnalysis extends Assert {
 					this.AssertEqual(kNotInitialized, vSuspensionDamage, "Expected suspension damage not to be reported...")
 					this.AssertEqual(kNotInitialized, vBodyworkDamage, "Expected bodywork damage not to be reported...")
 					this.AssertEqual(false, vDamageRepair, "Expected pitstop to be recommended...")
-					this.AssertEqual(1.1, Round(vDamageLapDelta, 1), "Expected lap delta to be 1.1...")
+					this.AssertEqual(1.3, Round(vDamageLapDelta, 1), "Expected lap delta to be 1.3...")
 					this.AssertEqual(5, Round(vDamageStintLaps), "Expected remaining stints to be 5...")
 				}
 				else {
@@ -857,6 +857,10 @@ class PitstopHandling extends Assert {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+setConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", "Unknown" . ".ConsideredHistoryLaps", 2)
+setConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", "Unknown" . ".HistoryLapsDamping", 0.5)
+setConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", "Unknown" . ".AdjustLapTimes", false)
 
 if !GetKeyState("Ctrl") {
 	AHKUnit.AddTestClass(FuelReporting)

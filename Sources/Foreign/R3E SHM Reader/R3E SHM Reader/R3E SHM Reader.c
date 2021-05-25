@@ -158,6 +158,10 @@ int main()
         wprintf_s(L"Track=%S-%S\n", map_buffer->track_name, map_buffer->layout_name);
         wprintf_s(L"FuelAmount=%ld\n", (long)map_buffer->fuel_capacity);
         wprintf_s(L"SessionFormat=%S\n", (map_buffer->session_length_format == R3E_SESSION_LENGTH_LAP_BASED) ? "Lap" : "Time");
+
+        long timeRemaining = (getRemainingTime() * 1000);
+
+        wprintf_s(L"SessionTimeRemaining=%ld\n", timeRemaining);
     }
 
     wprintf_s(L"[Car Data]\n");
@@ -227,7 +231,6 @@ int main()
 
         long timeRemaining = (getRemainingTime() * 1000);
 
-        wprintf_s(L"SessionTimeRemaining=%ld\n", timeRemaining);
         wprintf_s(L"StintTimeRemaining=%ld\n", timeRemaining);
         wprintf_s(L"DriverTimeRemaining=%ld\n", timeRemaining);
         wprintf_s(L"InPit=%S\n", (map_buffer->pit_state == 3) ? "true" : "false");

@@ -216,7 +216,6 @@ int main(int argc, char* argv[])
 		}
 
 		printData("SessionLapsRemaining", timeLeft / gf->iLastTime);
-		printData("SessionTimeRemaining", timeLeft);
 		printData("StintTimeRemaining", gf->DriverStintTimeLeft < 0 ? timeLeft : gf->DriverStintTimeLeft);
 		printData("DriverTimeRemaining", gf->DriverStintTotalTimeLeft < 0 ? timeLeft : gf->DriverStintTotalTimeLeft);
 		printData("InPit", gf->isInPit ? "true" : "false");
@@ -269,6 +268,14 @@ int main(int argc, char* argv[])
 		wcout << "Track=" << sf->track << endl;
 		wcout << "SessionFormat=Time" << endl;
 		printData("FuelAmount", sf->maxFuel);
+
+		double timeLeft = gf->sessionTimeLeft;
+
+		if (timeLeft < 0) {
+			timeLeft = 3600.0 * 1000;
+		}
+		
+		printData("SessionTimeRemaining", timeLeft);
 
 	}
 

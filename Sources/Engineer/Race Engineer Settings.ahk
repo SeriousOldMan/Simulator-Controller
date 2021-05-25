@@ -236,8 +236,6 @@ editSettings(ByRef settingsOrCommand) {
 	static result
 	static newSettings
 	
-	static lapsConsideredEdit
-	static dampingFactorEdit
 	static pitstopWarningEdit
 	
 	static tyrePressureDeviationEdit
@@ -271,7 +269,7 @@ restart:
 		
 		newSettings := newConfiguration()
 		
-		if (!isFloat(tyrePressureDeviationEdit, dampingFactorEdit, fuelConsumptionEdit
+		if (!isFloat(tyrePressureDeviationEdit, fuelConsumptionEdit
 				   , tpDryFrontLeftEdit, tpDryFrontRightEdit, tpDryRearLeftEdit, tpDryRearRightEdit
 				   , tpWetFrontLeftEdit, tpWetFrontRightEdit, tpWetRearLeftEdit, tpWetRearRightEdit)
 		 || !isNumber(repairSuspensionThresholdEdit, repairBodyworkThresholdEdit)) {
@@ -283,8 +281,6 @@ restart:
 			return false
 		}
 		
-		setConfigurationValue(newSettings, "Session Settings", "Lap.History.Considered", lapsConsideredEdit)
-		setConfigurationValue(newSettings, "Session Settings", "Lap.History.Damping", Round(dampingFactorEdit, 2))
 		setConfigurationValue(newSettings, "Session Settings", "Lap.PitstopWarning", pitstopWarningEdit)
 		
 		setConfigurationValue(newSettings, "Session Settings", "Damage.Suspension.Repair"
@@ -348,8 +344,6 @@ restart:
 	else {
 		result := false
 	
-		lapsConsideredEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Lap.History.Considered", 5)
-		dampingFactorEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Lap.History.Damping", 0.2)
 		pitstopWarningEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Lap.PitstopWarning", 3)
 		
 		repairSuspensionDropDown := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Suspension.Repair", "Always")
@@ -401,27 +395,18 @@ restart:
 
 		Gui RES:Font, Norm, Arial
 				
-		Gui RES:Add, Button, x228 y498 w80 h23 Default gacceptSettings, % translate("Ok")
-		Gui RES:Add, Button, x316 y498 w80 h23 gcancelSettings, % translate("&Cancel")
-		Gui RES:Add, Button, x8 y498 w77 h23 gloadSettings, % translate("&Load...")
-		Gui RES:Add, Button, x90 y498 w77 h23 gsaveSettings, % translate("&Save...")
+		Gui RES:Add, Button, x228 y450 w80 h23 Default gacceptSettings, % translate("Ok")
+		Gui RES:Add, Button, x316 y450 w80 h23 gcancelSettings, % translate("&Cancel")
+		Gui RES:Add, Button, x8 y450 w77 h23 gloadSettings, % translate("&Load...")
+		Gui RES:Add, Button, x90 y450 w77 h23 gsaveSettings, % translate("&Save...")
 				
-		tabs := map(["Settings", "Race"], "translate")
+		tabs := map(["Race", "Pitstop"], "translate")
 
-		Gui RES:Add, Tab3, x8 y48 w388 h443 -Wrap, % values2String("|", tabs*)
+		Gui RES:Add, Tab3, x8 y48 w388 h395 -Wrap, % values2String("|", tabs*)
 
-		Gui Tab, 1
+		Gui Tab, 2
 		
-		Gui RES:Add, Text, x16 y82 w105 h20 Section, % translate("Statistical Window")
-		Gui RES:Add, Edit, x126 yp-2 w50 h20 Limit2 Number VlapsConsideredEdit, %lapsConsideredEdit%
-		Gui RES:Add, UpDown, x158 yp-2 w18 h20, %lapsConsideredEdit%
-		Gui RES:Add, Text, x184 yp+2 w70 h20, % translate("Laps")
-
-		Gui RES:Add, Text, x16 yp+24 w105 h20 Section, % translate("Damping Factor")
-		Gui RES:Add, Edit, x126 yp-2 w50 h20 VdampingFactorEdit, %dampingFactorEdit%
-		Gui RES:Add, Text, x184 yp+2 w70 h20, % translate("p. Lap")
-
-		Gui RES:Add, Text, x16 yp+24 w105 h20 Section, % translate("Pitstop Warning")
+		Gui RES:Add, Text, x16 y82 w105 h20 Section, % translate("Pitstop Warning")
 		Gui RES:Add, Edit, x126 yp-2 w50 h20 Limit1 Number VpitstopWarningEdit, %pitstopWarningEdit%
 		Gui RES:Add, UpDown, x158 yp-2 w18 h20, %pitstopWarningEdit%
 		Gui RES:Add, Text, x184 yp+2 w70 h20, % translate("Laps")
@@ -539,7 +524,7 @@ restart:
 		; Gui RES:Add, UpDown, x324 yp-2 w18 h20
 		Gui RES:Add, Text, x350 yp+2 w30 h20, % translate("PSI")
 
-		Gui Tab, 2		
+		Gui Tab, 1		
 		
 		Gui RES:Add, Text, x16 y82 w90 h20 Section, % translate("Race Duration")
 		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 Number VraceDurationEdit, %raceDurationEdit%

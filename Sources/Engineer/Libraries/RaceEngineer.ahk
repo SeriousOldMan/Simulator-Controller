@@ -33,13 +33,16 @@ global kSessionPractice = 2
 global kSessionQualification = 3
 global kSessionRace = 4
 
-
 global kDebugOff := 0
 global kDebugGrammars := 1
 global kDebugPhrases := 2
 global kDebugRecognitions := 4
 global kDebugKnowledgeBase := 8
 global kDebugAll = (kDebugGrammars + kDebugPhrases + kDebugRecognitions + kDebugKnowledgeBase)
+
+global kAsk = "Ask"
+global kAlways = "Always"
+global kNever = "Never"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -80,14 +83,20 @@ class RaceEngineer extends ConfigurationItem {
 	iEnoughData := false
 	iLearningLaps := 1
 	
+	iSaveSettings := kNever
+	iSaveTyrePressures := kAsk
+	
 	iKnowledgeBase := false
 	iOverallTime := 0
 	iLastLap := 0
 	iLastFuelAmount := 0
 	iInitialFuelAmount := 0
 	
+	iAvgFuelConsumption := 0
+	iLapTime := 0
+	
 	iSetupData := {}
-	iSetupDataActive := false
+	iSessionDataActive := false
 	
 	iSetupDatabase := false
 	
@@ -392,15 +401,27 @@ class RaceEngineer extends ConfigurationItem {
 		}
 	}
 	
+	SaveSettings[] {
+		Get {
+			return this.iSaveSettings
+		}
+	}
+	
+	SaveTyrePressures[] {
+		Get {
+			return this.iSaveTyrePressures
+		}
+	}
+	
 	SetupData[] {
 		Get {
 			return this.iSetupData
 		}
 	}
 	
-	SetupDataActive[] {
+	SessionDataActive[] {
 		Get {
-			return this.iSetupDataActive
+			return this.iSessionDataActive
 		}
 	}
 	
@@ -1242,11 +1263,14 @@ class RaceEngineer extends ConfigurationItem {
 		if ((lapTime / settingsLapTime) > 2)
 			lapTime := settingsLapTime
 		
-		dataDuration := Round((getConfigurationValue(data, "Stint Data", "SessionTimeRemaining", 0) + lapTime) / 1000)
+		dataDuration := Round((getDeprecatedConfigurationValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0) + lapTime) / 1000)
 		settingsDuration := getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Duration", dataDuration)
 		
 		if ((Abs(settingsDuration - dataDuration) / dataDuration) >  0.05)
 			settingsDuration := dataDuration
+		
+		simulator := getConfigurationValue(data, "Session Data", "Simulator", "Unknown")
+		simulatorName := this.SetupDatabase.getSimulatorName(simulator)
 		
 		facts := {"Session.Car": getConfigurationValue(data, "Session Data", "Car", "")
 				, "Session.Track": getConfigurationValue(data, "Session Data", "Track", "")
@@ -1259,8 +1283,8 @@ class RaceEngineer extends ConfigurationItem {
 				, "Session.Settings.Fuel.SafetyMargin": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Fuel.SafetyMargin", 5)
 				, "Session.Settings.Lap.PitstopWarning": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.PitstopWarning", 5)
 				, "Session.Settings.Lap.AvgTime": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.AvgTime", 0)
-				, "Session.Settings.Lap.History.Considered": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.History.Considered", 5)
-				, "Session.Settings.Lap.History.Damping": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.History.Damping", 0.2)
+				, "Session.Settings.Lap.History.Considered": getConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", simulatorName . ".ConsideredHistoryLaps", 5)
+				, "Session.Settings.Lap.History.Damping": getConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", simulatorName . ".HistoryLapsDamping", 0.2)
 				, "Session.Settings.Damage.Suspension.Repair": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Damage.Suspension.Repair", "Always")
 				, "Session.Settings.Damage.Suspension.Repair.Threshold": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Damage.Suspension.Repair.Threshold", 0)
 				, "Session.Settings.Damage.Bodywork.Repair": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Damage.Bodywork.Repair", "Threshold")
@@ -1290,13 +1314,13 @@ class RaceEngineer extends ConfigurationItem {
 		facts["Session.Setup.Tyre.Wet.Pressure.RL"] := getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Wet.Pressure.RL", 28.2)
 		facts["Session.Setup.Tyre.Wet.Pressure.RR"] := getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Wet.Pressure.RR", 28.2)
 
-		facts["Session.Simulator"] := getConfigurationValue(data, "Session Data", "Simulator", "Unknown")
+		facts["Session.Simulator"] := simulator
 		facts["Session.Setup.Tyre.Compound"] := getConfigurationValue(data, "Car Data", "TyreCompound", getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Compound", "Dry"))
 		facts["Session.Setup.Tyre.Compound.Color"] := getConfigurationValue(data, "Car Data", "TyreCompoundColor", getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Compound.Color", "Black"))
-					
-		facts["Session.Settings.Damage.Analysis.Laps"] := getConfigurationValue(data, "Session Strategies", "DamageAnalysisLaps", 1)
-		facts["Session.Settings.Lap.Learning.Laps"] := getConfigurationValue(data, "Session Strategies", "LearningLaps", 1)
-		facts["Session.Settings.Lap.Time.Adjust"] := getConfigurationValue(data, "Session Strategies", "AdjustLapTimes", true)
+		
+		facts["Session.Settings.Damage.Analysis.Laps"] := getConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", simulatorName . ".DamageAnalysisLaps", 1)
+		facts["Session.Settings.Lap.Learning.Laps"] := getConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", simulatorName . ".LearningLaps", 1)
+		facts["Session.Settings.Lap.Time.Adjust"] := getConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", simulatorName . ".AdjustLapTimes", true)
 				
 		return facts
 	}
@@ -1311,6 +1335,8 @@ class RaceEngineer extends ConfigurationItem {
 			
 			this.iRaceSettings := settings
 			
+			simulatorName := this.SetupDatabase.getSimulatorName(this.Simulator)
+		
 			facts := {"Session.Settings.Lap.Formation": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.Formation", true)
 					, "Session.Settings.Lap.PostRace": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.PostRace", true)
 					, "Session.Settings.Fuel.AvgConsumption": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Fuel.AvgConsumption", 0)
@@ -1318,8 +1344,8 @@ class RaceEngineer extends ConfigurationItem {
 					, "Session.Settings.Fuel.SafetyMargin": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Fuel.SafetyMargin", 5)
 					, "Session.Settings.Lap.PitstopWarning": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.PitstopWarning", 5)
 					, "Session.Settings.Lap.AvgTime": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.AvgTime", 0)
-					, "Session.Settings.Lap.History.Considered": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.History.Considered", 5)
-					, "Session.Settings.Lap.History.Damping": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.History.Damping", 0.2)
+					, "Session.Settings.Lap.History.Considered": getConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", simulatorName . ".ConsideredHistoryLaps", 5)
+					, "Session.Settings.Lap.History.Damping": getConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", simulatorName . ".HistoryLapsDamping", 0.2)
 					, "Session.Settings.Damage.Suspension.Repair": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Damage.Suspension.Repair", "Always")
 					, "Session.Settings.Damage.Suspension.Repair.Threshold": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Damage.Suspension.Repair.Threshold", 0)
 					, "Session.Settings.Damage.Bodywork.Repair": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Damage.Bodywork.Repair", "Threshold")
@@ -1351,6 +1377,10 @@ class RaceEngineer extends ConfigurationItem {
 			
 			facts["Session.Settings.Tyre.Pressure.Correction.Temperature"] := getConfigurationValue(settings, "Session Settings", "Tyre.Pressure.Correction.Temperature", true)
 			facts["Session.Settings.Tyre.Pressure.Correction.Setup"] := getConfigurationValue(settings, "Session Settings", "Tyre.Pressure.Correction.Setup", true)
+			
+			facts["Session.Settings.Damage.Analysis.Laps"] := getConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", simulatorName . ".DamageAnalysisLaps", 1)
+			facts["Session.Settings.Lap.Learning.Laps"] := getConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", simulatorName . ".LearningLaps", 1)
+			facts["Session.Settings.Lap.Time.Adjust"] := getConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", simulatorName . ".AdjustLapTimes", true)
 			
 			for key, value in facts
 				knowledgeBase.setValue(key, value)
@@ -1388,35 +1418,14 @@ class RaceEngineer extends ConfigurationItem {
 		this.iEnoughData := false
 		this.iSetupData := {}
 		
-		this.iLearningLaps := getConfigurationValue(data, "Session Strategies", "LearningLaps", 1)
+		simulatorName := this.SetupDatabase.getSimulatorName(this.Simulator)
+		
+		this.iLearningLaps := getConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", simulatorName . ".LearningLaps", 1)
+		this.iSaveSettings := getConfigurationValue(kSimulatorConfiguration, "Race Engineer Shutdown", simulatorName . ".SaveSettings", kNever)
+		this.iSaveTyrePressures := getConfigurationValue(kSimulatorConfiguration, "Race Engineer Shutdown", simulatorName . ".SaveTyrePressures", kAsk)
 		
 		if this.Speaker
 			this.getSpeaker().speakPhrase("Greeting")
-		
-		settings := false
-		
-		????? => ?????
-		simulator := knowledgeBase.getValue("Session.Simulator")
-		car := knowledgeBase.getValue("Session.Car")
-		track:= knowledgeBase.getValue("Session.Track")
-		
-		if getConfigurationValue(data, "Session Startup", "LoadSettings", false)
-			settings := this.SetupDatabase.querySettings(simulator, car, track, {Duration: getConfigurationValue(data, "Session Settings", "Duration", 0)}, 0.1)
-		
-		if getConfigurationValue(data, "Session Startup", "LoadTyrePressures", false)
-			tyrePressures := this.getTyrePressures(weather, airTemperature, trackTemperature, ByRef compound, ByRef compoundColor, ByRef pressures, ByRef certainty)
-		
-		if settings
-			this.updateSession(settings)
-		
-		????? >=
-		
-		this.iLoadSettings := 
-		this.iLoadTyrePressures := getConfigurationValue(data, "Session Startup", "LoadTyrePressures", kAsk)
-		
-		this.iSaveSettings := getConfigurationValue(data, "Session Shutdown", "SaveSettings", kNever)
-		this.iSaveTyrePressures := getConfigurationValue(data, "Session Shutdown", "SaveTyrePressures", kAsk)
-		
 		
 		if this.Debug[kDebugKnowledgeBase]
 			dumpKnowledge(this.KnowledgeBase)
@@ -1429,43 +1438,35 @@ class RaceEngineer extends ConfigurationItem {
 		this.iInitialFuelAmount := 0
 		this.iEnoughData := false
 			
-		if this.KnowledgeBase
-			if this.Speaker {
+		if this.KnowledgeBase {
+			if this.Speaker
 				this.getSpeaker().speakPhrase("Bye")
-				
-				if (this.SetupData.Count() > 0) {
-					if (this.Listener && ((this.Session == kSessionPractice) || (this.Session == kSessionRace))) {
-						this.getSpeaker().speakPhrase("ConfirmUpdateSetupDatabase")
+			
+			if ((this.Session == kSessionPractice) || (this.Session == kSessionRace)) {
+				this.updateSessionData()
 						
-						this.setContinuation(ObjBindMethod(this, "updateSetupDatabase", true))
-						
-						callback := ObjBindMethod(this, "forceFinishSession")
-						
-						SetTimer %callback%, -60000
-					}
-					else {
-						if ((this.Session == kSessionPractice) || (this.Session == kSessionRace))
-							this.updateSetupDatabase()
+				if (this.Listener && (((this.SaveTyrePressures == kAsk) && (this.SetupData.Count() > 0)) || (this.SaveSettings == kAsk))) {
+					this.getSpeaker().speakPhrase("ConfirmDataUpdate")
 					
-						this.iKnowledgeBase := false
-					}
+					this.setContinuation(ObjBindMethod(this, "updateSessionData", true))
+					
+					callback := ObjBindMethod(this, "forceFinishSession")
+					
+					SetTimer %callback%, -60000
 				}
 				else
 					this.iKnowledgeBase := false
 			}
-			else {
-				if (((this.Session == kSessionPractice) || (this.Session == kSessionRace)) && (this.SetupData.Count() > 0))
-					this.updateSetupDatabase()
-			
+			else
 				this.iKnowledgeBase := false
-			}
+		}
 			
 		this.iSimulator := ""
 		this.iSession := kSessionFinished
 	}
 	
 	forceFinishSession() {
-		if !this.SetupDataActive {
+		if !this.SessionDataActive {
 			this.iKnowledgeBase := false
 			this.iSetupData := {}
 			this.iSimulator := ""
@@ -1494,7 +1495,7 @@ class RaceEngineer extends ConfigurationItem {
 		if !this.InitialFuelAmount
 			baseLap := lapNumber
 		
-		this.iEnoughData := (lapNumber > (baseLap + this.LearningLaps))
+		this.iEnoughData := (lapNumber > (baseLap + (this.LearningLaps - 1)))
 		
 		driverForname := getConfigurationValue(data, "Stint Data", "DriverForname", this.DriverName)
 		driverSurname := getConfigurationValue(data, "Stint Data", "DriverSurname", "Doe")
@@ -1510,7 +1511,7 @@ class RaceEngineer extends ConfigurationItem {
 		knowledgeBase.setFact("Driver.Surname", driverSurname)
 		knowledgeBase.setFact("Driver.Nickname", driverNickname)
 		
-		timeRemaining := getConfigurationValue(data, "Stint Data", "SessionTimeRemaining", 0)
+		timeRemaining := getDeprecatedConfigurationValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0)
 		
 		knowledgeBase.setFact("Driver.Time.Remaining", getConfigurationValue(data, "Stint Data", "DriverTimeRemaining", timeRemaining))
 		knowledgeBase.setFact("Driver.Time.Stint.Remaining", getConfigurationValue(data, "Stint Data", "StintTimeRemaining", timeRemaining))
@@ -1536,12 +1537,17 @@ class RaceEngineer extends ConfigurationItem {
 		
 		lapTime := getConfigurationValue(data, "Stint Data", "LapLastTime", 0)
 		
-		if (lapNumber <= 2) {
+		if ((lapNumber <= 2) && knowledgeBase.getValue("Session.Settings.Lap.Time.Adjust", false)) {
 			settingsLapTime := (getDeprecatedConfigurationValue(this.RaceSettings, "Session Settings", "Race Settings", "Lap.AvgTime", lapTime / 1000) * 1000)
 			
 			if ((lapTime / settingsLapTime) > 2)
 				lapTime := settingsLapTime
 		}
+		
+		if (this.iLapTime = 0)
+			this.iLapTime := lapTime
+		else
+			this.iLapTime := Min(this.iLapTime, lapTime)
 		
 		knowledgeBase.addFact("Lap." . lapNumber . ".Time", lapTime)
 		knowledgeBase.addFact("Lap." . lapNumber . ".Time.Start", this.OverallTime)
@@ -1553,6 +1559,8 @@ class RaceEngineer extends ConfigurationItem {
 		fuelRemaining := getConfigurationValue(data, "Car Data", "FuelRemaining", 0)
 		
 		knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.Remaining", Round(fuelRemaining, 2))
+		
+		this.iAvgFuelConsumption := 0
 		
 		if (lapNumber == 1) {
 			this.iInitialFuelAmount := fuelRemaining
@@ -1570,7 +1578,9 @@ class RaceEngineer extends ConfigurationItem {
 			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.Consumption", knowledgeBase.getValue("Lap." . (lapNumber - 1) . ".Fuel.Consumption", 0))
 		}
 		else {
-			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.AvgConsumption", Round((this.InitialFuelAmount - fuelRemaining) / (lapNumber - baseLap), 2))
+			this.iAvgFuelConsumption := Round((this.InitialFuelAmount - fuelRemaining) / (lapNumber - baseLap), 2)
+			
+			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.AvgConsumption", this.iAvgFuelConsumption)
 			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.Consumption", Round(this.LastFuelAmount - fuelRemaining, 2))
 			
 			this.iLastFuelAmount := fuelRemaining
@@ -1717,7 +1727,7 @@ class RaceEngineer extends ConfigurationItem {
 	updateSetupData(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor) {
 		local knowledgeBase := this.KnowledgeBase
 		
-		this.iSetupDataActive := true
+		this.iSessionDataActive := true
 		
 		try {
 			targetPressures := Array(Round(knowledgeBase.getValue("Tyre.Pressure.Target.FL"), 1)
@@ -1745,47 +1755,71 @@ class RaceEngineer extends ConfigurationItem {
 			}
 		}
 		finally {
-			this.iSetupDataActive := false
+			this.iSessionDataActive := false
 		}
 	}
 	
-	updateSetupDatabase(confirm := false) {
-		local compound
-		
-		this.iSetupDataActive := true
+	updateSessionData(confirm := false) {
+		this.iSessionDataActive := true
 		
 		try {
-			if this.KnowledgeBase {
-				for descriptor, pressures in this.SetupData {
-					descriptor := ConfigurationItem.splitDescriptor(descriptor)
-				
-					simulator := descriptor[1]
-					track := descriptor[2]
-					car := descriptor[3]
-					compound := descriptor[4]
-					
-					if (descriptor.Length() = 7) {
-						compoundColor := "Black"
-						airTemperature := descriptor[5]
-						trackTemperature := descriptor[6]
-						weather := descriptor[7]
-					}
-					else {
-						compoundColor := descriptor[5]
-						airTemperature := descriptor[6]
-						trackTemperature := descriptor[7]
-						weather := descriptor[8]
-					}
-					
-					this.SetupDatabase.updateTyrePressures(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor, pressures)
-				}
-		
-				if (confirm && this.Speaker)
-					this.getSpeaker().speakPhrase("SetupDatabaseUpdated")
-			}
+			if (this.SaveSettings == (confirm ? kAsk : kAlways))
+				this.updateSettings()
+			
+			if ((this.SaveTyrePressures == (confirm ? kAsk : kAlways)) && (this.SetupData.Count() > 0))
+				this.updateSetupDatabase()
 		}
 		finally {
-			this.iSetupDataActive := false
+			this.iSessionDataActive := false
+		}
+		
+		if (confirm && this.Speaker) {
+			this.getSpeaker().speakPhrase("DataUpdated")
+			
+			this.iKnowledgeBase := false
+		}
+	}
+	
+	updateSettings() {
+		local knowledgeBase := this.KnowledgeBase
+		
+		if knowledgeBase {
+			simulator := knowledgeBase.getValue("Session.Simulator")
+			car := knowledgeBase.getValue("Session.Car")
+			track := knowledgeBase.getValue("Session.Track")
+			duration := knowledgeBase.getValue("Session.Duration")
+			
+			this.SetupDatabase.updateSettings(simulator, car, track, duration, Round(this.iLapTime / 1000), this.iAvgFuelConsumption)
+		}
+	}
+
+	updateSetupDatabase() {
+		local compound
+		
+		if this.KnowledgeBase {
+			for descriptor, pressures in this.SetupData {
+				descriptor := ConfigurationItem.splitDescriptor(descriptor)
+			
+				simulator := descriptor[1]
+				track := descriptor[2]
+				car := descriptor[3]
+				compound := descriptor[4]
+				
+				if (descriptor.Length() = 7) {
+					compoundColor := "Black"
+					airTemperature := descriptor[5]
+					trackTemperature := descriptor[6]
+					weather := descriptor[7]
+				}
+				else {
+					compoundColor := descriptor[5]
+					airTemperature := descriptor[6]
+					trackTemperature := descriptor[7]
+					weather := descriptor[8]
+				}
+				
+				this.SetupDatabase.updateTyrePressures(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor, pressures)
+			}
 		}
 		
 		this.iSetupData := {}

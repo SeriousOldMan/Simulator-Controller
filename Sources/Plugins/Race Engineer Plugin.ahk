@@ -404,6 +404,53 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 			this.RaceEngineer.updateSession(settingsFileName)
 	}
 	
+	prepareSettings(data) {
+		setupDatabase := new SetupDatabase()
+							
+		simulator := getConfigurationValue(data, "Session Data", "Simulator")
+		car := getConfigurationValue(data, "Session Data", "Car")
+		track := getConfigurationValue(data, "Session Data", "Track")
+		
+		simulatorName := setupDatabase.getSimulatorName(simulator)
+		
+		duration := Round((getConfigurationValue(data, "Stint Data", "LapLastTiem") - getConfigurationValue(data, "Session Data", "SessionTimeRemaining")) / 1000)
+	
+		settings := setupDatabase.getSettings(simulator, car, track, duration)
+		
+		tpSetting := getConfigurationValue(kSimulatorConfiguration, "Race Engineer Startup", simulatorName . ".LoadTyrePressures", "Default")
+		
+		if (tpSetting = "SetupDatabase") {
+			trackTemperature := getConfigurationValue(data, "Track Data", "Temperature", 23)
+			airTemperature := getConfigurationValue(data, "Weather Data", "Temperature", 27)
+			weather := getConfigurationValue(data, "Weather Data", "Waether", "Dry")
+			
+			compound := false
+			compoundColor := false
+			pressures := {}
+			certainty := 1.0
+			
+			if setupDatabase.getTyreSetup(simulatorName, car, track,
+										, weather, airTemperature, trackTemperature, compound, compoundColor, pressures, certainty) {
+				setConfigurationValue(settings, "Session Setup", "Tyre.Compound", compound)
+				setConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", compoundColor)
+				
+				setConfigurationValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.FL", Round(pressures[1], 1))
+				setConfigurationValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.FR", Round(pressures[2], 1))
+				setConfigurationValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.RL", Round(pressures[3], 1))
+				setConfigurationValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.RR", Round(pressures[4], 1))
+			}
+			
+			writeConfiguration(kUserConfigDirectory . "Race Engineer.settings", settings)
+		}
+		else if (tpSetting = "Import") {
+			writeConfiguration(kUserConfigDirectory . "Race Engineer.settings", settings)
+			
+			openRaceEngineerSettings(true)
+		}
+		else
+			writeConfiguration(kUserConfigDirectory . "Race Engineer.settings", settings)
+	}
+	
 	startSession(dataFile) {
 		if this.Simulator {
 			code := this.Simulator.Code
@@ -575,27 +622,6 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 	}
 	
 	updateSimulatorData(data) {
-		if (getConfigurationValue(data, "Stint Data", "Laps", 0) == 1) {
-			simulator := this.Simulator.runningSimulator()
-			
-			setConfigurationValue(data, "Session Startup", "LoadSettings"
-								, getConfigurationValue(kSimulatorConfiguration, "Race Engineer Startup", simulator . ".LoadSettings", false))
-			setConfigurationValue(data, "Session Startup", "LoadTyrePressures"
-								, getConfigurationValue(kSimulatorConfiguration, "Race Engineer Startup", simulator . ".LoadTyrePressures", false))
-		
-			setConfigurationValue(data, "Session Shutdown", "SaveSettings"
-								, getConfigurationValue(kSimulatorConfiguration, "Race Engineer Shutdown", simulator . ".SaveSettings", "Ask"))
-			setConfigurationValue(data, "Session Shutdown", "SaveTyrePressures"
-								, getConfigurationValue(kSimulatorConfiguration, "Race Engineer Shutdown", simulator . ".SaveTyrePressures", "Ask"))
-		
-			setConfigurationValue(data, "Session Strategies", "LearningLaps"
-								, getConfigurationValue(kSimulatorConfiguration, "Race Engineer Strategies", simulator . ".LearningLaps", 1))
-			setConfigurationValue(data, "Session Strategies", "AdjustLapTimes"
-								, getConfigurationValue(kSimulatorConfiguration, "Race Engineer Strategies", simulator . ".AdjustLapTimes", true))
-			setConfigurationValue(data, "Session Strategies", "DamageAnalysisLaps"
-								, getConfigurationValue(kSimulatorConfiguration, "Race Engineer Strategies", simulator . ".DamageAnalysisLaps", 1))
-		}
-		
 		this.Simulator.updateSimulatorData(data)
 	}
 	
@@ -683,8 +709,11 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 							
 						writeConfiguration(newDataFile, data)		; FileCopy %dataFile%, %newDataFile%, 1
 						
-						if firstLap
+						if firstLap {
+							this.prepareSettings(data)
+							
 							this.startSession(newDataFile)
+						}
 						
 						if newLap
 							this.addLap(dataLastLap, newDataFile)

@@ -582,6 +582,20 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 
 			printf("SessionFormat=%s\n", (sessionLaps == -1) ? "Time" : "Lap");
 
+			long timeRemaining = -1;
+			
+			if (getDataValue(result, header, data, "SessionTimeRemain")) {
+				float time = atof(result);
+
+				if (time != -1)
+					timeRemaining = ((long)time * 1000);
+			}
+
+			if (timeRemaining == -1)
+				timeRemaining = getRemainingTime(sessionInfo, sessionLaps, sessionTime, laps, lastTime);
+
+			printf("SessionTimeRemaining=%ld\n", timeRemaining);
+
 			printf("[Car Data]\n");
 
 			printf("BodyworkDamage=0,0,0,0,0\n");
@@ -633,7 +647,8 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 			printf("LapBestTime=%ld\n", bestTime);
 
 			long lapsRemaining = -1;
-			long timeRemaining = -1;
+			
+			timeRemaining = -1;
 
 			if (getDataValue(result, header, data, "SessionLapsRemain"))
 				lapsRemaining = atoi(result);
@@ -659,7 +674,6 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 			if (timeRemaining == -1)
 				timeRemaining = getRemainingTime(sessionInfo, sessionLaps, sessionTime, laps, lastTime);
 
-			printf("SessionTimeRemaining=%ld\n", timeRemaining);
 			printf("StintTimeRemaining=%ld\n", timeRemaining);
 			printf("DriverTimeRemaining=%ld\n", timeRemaining);
 

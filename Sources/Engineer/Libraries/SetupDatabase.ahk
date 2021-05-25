@@ -514,6 +514,56 @@ class SetupDatabase {
 		}
 	}
 	
+	mapSettings(simulator, car, track, function) {
+		localSettings := false
+		globalSettings := false
+		
+		this.getSettingsNames(simulator, car, track, localSettings, globalSettings)
+		
+		for ignore, name in localSettings
+			%function%(simulator, car, track, name)
+		
+		for ignore, name in globalSettings
+			%function%(simulator, car, track, name)
+	}
+	
+	matchDuration(data, simulator, car, track, name) {
+		if !data.HasKey("Name") {
+			data["Name"] := name
+			data["Settings"] := this.readSettings(simulator, car, track, name)
+		}
+		else {
+			newSettings := this.readSettings(simulator, car, track, name)
+			duration := data["Duration"]
+			
+			if (Abs(getConfigurationValue(newSettings, "Session Settings", "Duration") - duration) < Abs(getConfigurationValue(data["Settings"], "Session Settings", "Duration") - duration)) {
+				data["Name"] := name
+				data["Settings"] := newSettings
+			}
+		}
+	}
+	
+	getSettings(simulator, car, track, duration) {
+		simulatorName := this.getSimulatorName(simulator)
+		
+		loadSettings := getConfigurationValue(kSimulatorConfiguration, "Race Engineer Startup", simulatorName . ".LoadSettings", "Default")
+		
+		if (loadSettings = "Default")
+			return readConfiguration(getFileName("Race Engineer.settings", kUserConfigDirectory))
+		else {
+			data := {Duration: duration}
+			
+			this.mapSettings(simulatorName, car, track, ObjBindMethod(this, "matchDuration", data))
+		
+			settingsName := (data.HasKey("Name") ? data["Name"] : false)
+			
+			if settingsName
+				return this.readSettings(simulatorName, car, track, settingsName)
+			else
+				return readConfiguration(getFileName("Race Engineer.settings", kUserConfigDirectory))
+		}
+	}
+	
 	readSettings(simulator, car, track, settingsName) {
 		simulatorCode := this.getSimulatorCode(simulator)
 		
@@ -566,6 +616,49 @@ class SetupDatabase {
 		}
 		catch exception {
 			; ignore
+		}
+	}
+	
+	updateSettings(simulator, car, track, duration, lapTime, avgFuelConsumption) {
+		simulatorName := this.getSimulatorName(simulator)
+		
+		loadSettings := getConfigurationValue(kSimulatorConfiguration, "Race Engineer Startup", simulatorName . ".LoadSettings", "Default")
+		
+		if (loadSettings = "Default") {
+			fileName := getFileName("Race Engineer.settings", kUserConfigDirectory)
+			
+			settings := readConfiguration(fileName)
+			
+			setConfigurationValue(settings, "Session Settings", "Lap.AvgTime", lapTime)
+			setConfigurationValue(settings, "Session Settings", "Fuel.AvgConsumption", avgFuelConsumption)
+			
+			writeConfiguration(fileName, settings)
+		}
+		else if (loadSettings = "SetupDatabase") {
+			data := {Duration: duration}
+			
+			this.mapSettings(simulatorName, car, track, ObjBindMethod(this, "matchDuration", data))
+		
+			settingsName := (data.HasKey("Name") ? data["Name"] : false)
+			
+			if settingsName {
+				settings := this.readSettings(simulatorName, car, track, settingsName)
+			
+				setConfigurationValue(settings, "Session Settings", "Lap.AvgTime", lapTime)
+				setConfigurationValue(settings, "Session Settings", "Fuel.AvgConsumption", avgFuelConsumption)
+				
+				this.writeSettings(simulatorName, car, track, settingsName, settings)
+			}
+			else {
+				fileName := getFileName("Race Engineer.settings", kUserConfigDirectory)
+				
+				settings := readConfiguration(fileName)
+				
+				setConfigurationValue(settings, "Session Settings", "Lap.AvgTime", lapTime)
+				setConfigurationValue(settings, "Session Settings", "Fuel.AvgConsumption", avgFuelConsumption)
+				
+				writeConfiguration(fileName, settings)
+			}
 		}
 	}
 }

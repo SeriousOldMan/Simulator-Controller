@@ -394,7 +394,7 @@ priority: -5, {All: [?Lap], [?Damage.Reported],																									\
 reportAnalysis(?, ?) <= recentPitstopLap(!Lap), !, fail
 reportAnalysis(?sDelta, ?bDelta) <= unbound?(?sDelta), reportAnalysis(0, ?bDelta), !
 reportAnalysis(?sDelta, ?bDelta) <= unbound?(?bDelta), reportAnalysis(?sDelta, 0), !
-reportAnalysis(?sDelta, ?bDelta) <= ?temp = !Damage.Reported + !Session.Settings.Damage.Analysis.Laps, !Lap > ?temp,																	\
+reportAnalysis(?sDelta, ?bDelta) <= ?temp = !Damage.Reported + !Session.Settings.Damage.Analysis.Laps, !Lap > ?temp,							\
 									max(?sDelta, ?bDelta, ?delta), remainingStintLaps(!Lap, ?stintLaps),										\
 									?lostTime = ?stintLaps * ?delta, reportAnalysis(?lostTime, ?stintLaps, ?delta)
 
@@ -857,7 +857,7 @@ recentLapTimes(?lap, ?times) <= recentLapTimes(?lap, 0, ?temp), remove(?temp, 0,
 recentLapTimes(?lap, ?lap, []) <= !
 recentLapTimes(?, ?offset, []) <= >=(?offset, !Session.Settings.Lap.History.Considered), !
 recentLapTimes(?lap, ?offset, [?time | ?times]) <= Get(Session.Settings.Lap.Time.Adjust, true),													\
-												   ?tLap = ?lap - ?offset, recentPitstopLap(?tlap), !, 											\
+ 												   ?tLap = ?lap - ?offset, recentPitstopLap(?tlap), !, 											\
 												   ?nOffset = ?offset + 1, recentLapTimes(?lap, ?nOffset, ?times),								\
 												   ?time = !Session.Settings.Lap.AvgTime * 1000
 recentLapTimes(?lap, ?offset, [0 | ?times]) <= ?tLap = ?lap - ?offset, recentPitstopLap(?tlap), !, 												\

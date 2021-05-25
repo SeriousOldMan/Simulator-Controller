@@ -92,6 +92,10 @@ namespace RF2SHMReader {
 				Console.Write("Track="); Console.WriteLine(GetStringFromBytes(playerTelemetry.mTrackName));
 				Console.Write("SessionFormat="); Console.WriteLine((scoring.mScoringInfo.mEndET < 0.0) ? "Lap" : "Time");
 				Console.Write("FuelAmount="); Console.WriteLine(Math.Round(playerTelemetry.mFuelCapacity));
+				
+				long time = GetRemainingTime(ref playerScoring);
+
+				Console.Write("SessionTimeRemaining="); Console.WriteLine(time);
 			}
 
 			Console.WriteLine("[Stint Data]");
@@ -120,7 +124,6 @@ namespace RF2SHMReader {
 
 				long time = GetRemainingTime(ref playerScoring);
 
-				Console.Write("SessionTimeRemaining="); Console.WriteLine(time);
 				Console.Write("StintTimeRemaining="); Console.WriteLine(time);
 				Console.Write("DriverTimeRemaining="); Console.WriteLine(time);
 

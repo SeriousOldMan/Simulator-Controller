@@ -1674,7 +1674,14 @@ class TranslationsList extends ConfigurationItemList {
 		
 		this.ItemList := []
 		
-		for original, translation in readTranslations(this.iLanguageCode)
+		translations := readTranslations(this.iLanguageCode)
+		
+		if (this.iLanguageCode != "en")
+			for original, translation in readTranslations("en")
+				if !translations.HasKey(original)
+					translations[original] := translation
+				
+		for original, translation in translations
 			this.ItemList.Push(Array(original, translation))
 			
 		this.loadList(this.ItemList)

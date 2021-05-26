@@ -63,6 +63,9 @@
 	- [Setup Database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--setup-database)
 	- [Strategies & Algorithms](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#how-it-works)
   - [Technical Information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#technical-information)
+    - [Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#the-rule-engine)
+	- [States & History](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#interaction-states)
+	- [Telemetry Integration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#telemetry-integration)
   - [Troubleshooting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#troubleshooting)
 
 [Development Guide](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts)

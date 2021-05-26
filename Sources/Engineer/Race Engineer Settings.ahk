@@ -846,7 +846,7 @@ importFromSimulation(message := false, simulator := false, prefix := false, sett
 			setConfigurationValue(settings, "Session Setup", "Tyre.Wet.Pressure.RL", Round(spWetRearLeftEdit, 1))
 			setConfigurationValue(settings, "Session Setup", "Tyre.Wet.Pressure.RR", Round(spWetRearRightEdit, 1))
 			
-			if (simulator != "rFactor 2")
+			if (!vSilentMode && (simulator != "rFactor 2"))
 				showMessage("Tyre setup imported: Wet; "
 						  . Round(spWetFrontLeftEdit, 1) . ", " . Round(spWetFrontRightEdit, 1) . ", "
 						  . Round(spWetRearLeftEdit, 1) . ", " . Round(spWetRearRightEdit, 1), false, "Information.png", 5000)

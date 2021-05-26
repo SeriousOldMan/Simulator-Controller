@@ -193,8 +193,8 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 			configuration["LoadSettings"] := ["Default", "SetupDatabase"][loadSettingsDropDown]
 			configuration["LoadTyrePressures"] := ["Default", "SetupDatabase", "Import"][loadTyrePressuresDropDown]
 			
-			configuration["SaveSettings"] := ["Ask", "Always", "Never"][loadSettingsDropDown]
-			configuration["SaveTyrePressures"] := ["Ask", "Always", "Never"][loadTyrePressuresDropDown]
+			configuration["SaveSettings"] := ["Ask", "Always", "Never"][saveSettingsDropDown]
+			configuration["SaveTyrePressures"] := ["Ask", "Always", "Never"][saveTyrePressuresDropDown]
 			
 			configuration["LearningLaps"] := learningLapsEdit
 			configuration["ConsideredHistoryLaps"] := lapsConsideredEdit

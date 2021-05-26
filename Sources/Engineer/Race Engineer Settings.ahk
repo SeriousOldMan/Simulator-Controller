@@ -52,6 +52,7 @@ global kRaceEngineerSettingsFile = getFileName("Race Engineer.settings", kUserCo
 ;;;                   Private Variable Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+global vSilentMode := kSilentMode
 global vEditMode := false
 
 global repairSuspensionDropDown
@@ -800,7 +801,7 @@ importFromSimulation(message := false, simulator := false, prefix := false, sett
 			setConfigurationValue(settings, "Session Setup", "Tyre.Dry.Pressure.RL", Round(spDryRearLeftEdit, 1))
 			setConfigurationValue(settings, "Session Setup", "Tyre.Dry.Pressure.RR", Round(spDryRearRightEdit, 1))
 			
-			if (simulator != "rFactor 2") {
+			if (!vSilentMode && (simulator != "rFactor 2")) {
 				message := ((color = "Black") ? "Tyre setup imported: Dry" : "Tyre setup imported: Dry (" . color . ")")
 				
 				showMessage(message . ", Set " . spSetupTyreSetEdit . "; "
@@ -875,6 +876,9 @@ showRaceEngineerSettingsEditor() {
 	}
 	
 	settings := readConfiguration(fileName)
+	
+	if ((A_Args.Length() > 0) && inList(A_Args, "-Silent"))
+		vSilentMode := true
 	
 	if ((A_Args.Length() > 0) && (A_Args[1] = "-Import")) {
 		importFromSimulation("Import", A_Args[2], A_Args[3], settings)

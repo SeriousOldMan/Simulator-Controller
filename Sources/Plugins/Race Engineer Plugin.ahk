@@ -10,6 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Plugins\Libraries\SimulatorPlugin.ahk
+#Include ..\Engineer\Libraries\SetupDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -405,17 +406,17 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 	}
 	
 	prepareSettings(data) {
-		setupDatabase := new SetupDatabase()
+		setupDB := new SetupDatabase()
 							
 		simulator := getConfigurationValue(data, "Session Data", "Simulator")
 		car := getConfigurationValue(data, "Session Data", "Car")
 		track := getConfigurationValue(data, "Session Data", "Track")
 		
-		simulatorName := setupDatabase.getSimulatorName(simulator)
+		simulatorName := setupDB.getSimulatorName(simulator)
 		
 		duration := Round((getConfigurationValue(data, "Stint Data", "LapLastTiem") - getConfigurationValue(data, "Session Data", "SessionTimeRemaining")) / 1000)
 	
-		settings := setupDatabase.getSettings(simulatorName, car, track, duration)
+		settings := setupDB.getSettings(simulatorName, car, track, duration)
 		
 		tpSetting := getConfigurationValue(kSimulatorConfiguration, "Race Engineer Startup", simulatorName . ".LoadTyrePressures", "Default")
 		
@@ -429,8 +430,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 			pressures := {}
 			certainty := 1.0
 			
-			if setupDatabase.getTyreSetup(simulatorName, car, track,
-										, weather, airTemperature, trackTemperature, compound, compoundColor, pressures, certainty) {
+			if setupDB.getTyreSetup(simulatorName, car, track, weather, airTemperature, trackTemperature, compound, compoundColor, pressures, certainty) {
 				setConfigurationValue(settings, "Session Setup", "Tyre.Compound", compound)
 				setConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", compoundColor)
 				
@@ -445,7 +445,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 		else if (tpSetting = "Import") {
 			writeConfiguration(kUserConfigDirectory . "Race Engineer.settings", settings)
 			
-			openRaceEngineerSettings(true)
+			openRaceEngineerSettings(true, true)
 		}
 		else
 			writeConfiguration(kUserConfigDirectory . "Race Engineer.settings", settings)
@@ -776,7 +776,7 @@ preparePitstop() {
 	}
 }
 
-openRaceEngineerSettings(import := false) {
+openRaceEngineerSettings(import := false, silent := false) {
 	local plugin
 	
 	exePath := kBinariesDirectory . "Race Engineer Settings.exe"
@@ -790,6 +790,9 @@ openRaceEngineerSettings(import := false) {
 			
 			if (plugin && plugin.Simulator)
 				options := (options . " """ . controller.ActiveSimulator . """ " . plugin.Simulator.Code)
+			
+			if silent
+				options .= " -Silent"
 			
 			Run "%exePath%" %options%, %kBinariesDirectory%, , pid
 		}

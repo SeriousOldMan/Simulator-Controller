@@ -1818,7 +1818,7 @@ class RaceEngineer extends ConfigurationItem {
 					weather := descriptor[8]
 				}
 				
-				this.SetupDatabase.updateTyrePressures(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor, pressures)
+				this.SetupDatabase.updatePressures(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor, pressures)
 			}
 		}
 		

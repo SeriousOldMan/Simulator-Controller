@@ -26,7 +26,9 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-None for the moment...
+[3.0.6-alpha](https://www.dropbox.com/s/q99n141lcw760au/Simulator%20Controller%203.0.6-alpha.zip?dl=1) (Early development version for Release 3.0.6. New features: Store reference to Race Engineer Settings in the setup databse, Full configuration of Race Engineer behaviour incl. automatic update of setup database at session end, Overhaul of the Race Engineer Settings tool. Feature complete, with documentation and uodate procedure, but mostly untested.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-306) of this version and all the versions you might have skipped, before installing and using this version.
 
 #### Latest release builds
 

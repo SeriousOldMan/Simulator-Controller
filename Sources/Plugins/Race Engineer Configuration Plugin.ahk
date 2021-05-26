@@ -57,11 +57,11 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		
 		Gui %window%:Font, Norm, Arial
 		
-		Gui %window%:Add, Text, x24 y137 w160 h23 +0x200, % translate("Settings")
+		Gui %window%:Add, Text, x24 y137 w160 h23 +0x200, % translate("Load Settings")
 		choices := map(["Use values from previous Session", "Load from Setup Database"], "translate")
 		Gui %window%:Add, DropDownList, x156 y137 w307 AltSubmit vloadSettingsDropDown, % values2String("|", choices*)
 		
-		Gui %window%:Add, Text, x24 y161 w160 h23 +0x200, % translate("Tyre Pressures")
+		Gui %window%:Add, Text, x24 y161 w160 h23 +0x200, % translate("Load Tyre Pressures")
 		choices := map(["Use Values from Settings", "Load from Setup Database", "Import from Simulator"], "translate")
 		chosen := 1
 		Gui %window%:Add, DropDownList, x156 y161 w307 AltSubmit vloadTyrePressuresDropDown, % values2String("|", choices*)

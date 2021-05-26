@@ -550,7 +550,7 @@ class SetupDatabase {
 		
 		if (loadSettings = "Default")
 			return readConfiguration(getFileName("Race Engineer.settings", kUserConfigDirectory))
-		else {
+		else if (loadSettings = "SetupDatabase") {
 			data := {Duration: duration}
 			
 			this.mapSettings(simulatorName, car, track, ObjBindMethod(this, "matchDuration", data))
@@ -562,6 +562,8 @@ class SetupDatabase {
 			else
 				return readConfiguration(getFileName("Race Engineer.settings", kUserConfigDirectory))
 		}
+		else
+			return readConfiguration(getFileName("Race Engineer.settings", kUserConfigDirectory))
 	}
 	
 	readSettings(simulator, car, track, settingsName) {

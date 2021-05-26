@@ -415,7 +415,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 		
 		duration := Round((getConfigurationValue(data, "Stint Data", "LapLastTiem") - getConfigurationValue(data, "Session Data", "SessionTimeRemaining")) / 1000)
 	
-		settings := setupDatabase.getSettings(simulator, car, track, duration)
+		settings := setupDatabase.getSettings(simulatorName, car, track, duration)
 		
 		tpSetting := getConfigurationValue(kSimulatorConfiguration, "Race Engineer Startup", simulatorName . ".LoadTyrePressures", "Default")
 		

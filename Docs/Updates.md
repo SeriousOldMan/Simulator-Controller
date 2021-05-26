@@ -45,7 +45,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 3.0.6
 
-The local configuration database will be covered as usual by the automatic update procedure. But you will take a look at the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration), since a new configuration page has been added for the Virtual Race Engineer. A lot of [new configuration options](*) will allow you to control the dynamic behaviour of certain algorithms of the AI kernel and the integration of Jona with the setup database. The default values of all thesse new options has been chosen so, that the default behaviour should be the same as before.
+The local configuration database will be covered as usual by the automatic update procedure. But you will take a look at the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration), since a new configuration page has been added for the Virtual Race Engineer. A lot of [new configuration options](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-engineer) will allow you to control the dynamic behaviour of certain algorithms of the AI kernel and the integration of Jona with the setup database. The default values of all thesse new options has been chosen so, that the default behaviour should be the same as before.
 
 ***
 

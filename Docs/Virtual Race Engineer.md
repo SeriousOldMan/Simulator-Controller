@@ -334,7 +334,7 @@ The second tab allows you to store your preferred car setup files for different 
 
 The dropdown menus let you access all setup files, which had been associated with the given car and track, either by you or by another person from the community. The buttons on the right side of the dropdown menu let you 1. upload a setup to the database, 2. download a setup and store it in the specific folder for a simulation and 3. delete one of your setups from the database.
 
-Session settings created by the [*Race Engineer Settings*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-engineer-settings) tool can be stored in the setup database as well. You can configure Jona with the [configuration tool](*) to load the best matching settings according to the session duration at the beginning of a new session.
+Session settings created by the [*Race Engineer Settings*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-engineer-settings) tool can be stored in the setup database as well. You can configure Jona with the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-engineer) to load the best matching settings according to the session duration at the beginning of a new session.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Engineer%20Setups%204.JPG)
 

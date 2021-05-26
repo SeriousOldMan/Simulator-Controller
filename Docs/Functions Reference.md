@@ -203,7 +203,7 @@ Starts a protected section of code. Calls to protectionOn() may be nested.
 Finishes a protected section of code. Only if the outermost section has been finished, the current thread becomes interruptable again.
 
 #### *withProtection(function :: TypeUnion(String, FuncObj), #rest params)*
-Convinience function to call a given function with supplied parameters in a protected section.
+Convenience function to call a given function with supplied parameters in a protected section.
 
 ***
 

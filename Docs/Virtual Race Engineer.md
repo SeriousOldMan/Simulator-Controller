@@ -112,7 +112,7 @@ Almost every Windows installation already has builtin support for voice generati
 
 ### Installation of Speech Recognition Libraries
 
-The installation of the voice recognition engine sometimes needs a little bit more effort. Jona relies on the speech recognition runtime from Microsoft, which is not necessarily part of a Windows standard distribution. You can check this in your settings dialog as well. If you do not have any voice recognition capabilities available, you can use the installer provided for your convinience in the *Utilities\3rd party* folder, as long you have a 64-bit Windows installation. Please install the runtime first and the two provided language packs for English and German afterwards. Alternatively you can download the necessary installation files from [this site at Microsoft](https://www.microsoft.com/en-us/download/details.aspx?id=16789).
+The installation of the voice recognition engine sometimes needs a little bit more effort. Jona relies on the speech recognition runtime from Microsoft, which is not necessarily part of a Windows standard distribution. You can check this in your settings dialog as well. If you do not have any voice recognition capabilities available, you can use the installer provided for your convenience in the *Utilities\3rd party* folder, as long you have a 64-bit Windows installation. Please install the runtime first and the two provided language packs for English and German afterwards. Alternatively you can download the necessary installation files from [this site at Microsoft](https://www.microsoft.com/en-us/download/details.aspx?id=16789).
 
 After installing the language packs, it might be necessary to unblock the recognizer DLLs of Jona, which are provided in the *Binaries* folder. Windows might have blocked these DLLs for security reasons, because you downloaded it from a non-trusted location. You will find a little Powershell script in the *Utilities* folder, which you can copy to the *Binaries* folder and execute it there with Administrator privileges. These are the commands, which need be executed:
 
@@ -197,8 +197,6 @@ The *Race Engineer.settings* looks like this:
 	Lap.AvgTime=106
 	Lap.Formation=true
 	Lap.PostRace=true
-	Lap.History.Considered=5
-	Lap.History.Damping=0.20
 	Lap.PitstopWarning=3
 	Fuel.AvgConsumption=2.7
 	Fuel.SafetyMargin=3
@@ -234,37 +232,36 @@ The *Race Engineer.settings* looks like this:
 	Tyre.Wet.Pressure.RL=28.2
 	Tyre.Wet.Pressure.RR=28.2
 
-
 Most options above define general settings which will be applicable to any race event. But the options from the *[Session Setup]* section need to be adjusted for each individual race event, as long, as you want Jona to come to correct recommendations.
 
   - The first fresh tyre set (*Tyre.Set.Fresh*), which is available for a pitstop and the tyres and pressures (*Tyre.XXX.Pressure.YY*) used for the first stint. Jona needs this information to calculate the target pressures for the first pitstop.
   - The *Lap.AvgTime* and *Fuel.AvgConsumption* are more informational, but might lead to more accurate estimations for the fuel calulations in the first few laps, where you typically have much slower lap times.
 
-#### Tab *Settings*
+Let's have a look at the settings tool, which provides a graphical user interface for the *Race Engineer.settings* file. The dialog provides two distinct areas as tabs.
 
-Let's have a look at the settings tool, which provides a graphical user interface for the *Race Engineer.settings* file. The dialog provides two distinct areas as tabs. The first tab, *Settings*, contains information that are independent of the current race situation.
+#### Tab *Race*
+
+The first tab of the settings tool contains information about the actual session, which typically will be a race.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Engineer%20Settings%202.JPG)
+
+You must supply the tyre selection and pressure setup, that is used at the beginning of the race, in the lower area of the *Race* tab, wherease the static information for the given track and race is located in the upper area. With the "Setups..." button you can open the [setup database query tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#querying-the-setup-database) to look up the best match for tyre pressures from recent sessions. Beside that, you can use the "Import" button to retrieve the current tyre setup information from your simulation game. But which data are available for an import depends on the capabilities of the simulator game in use. For example, *Assetto Corsa Competizione* currently only gives access to the tyre pressures that are configured in the Pitstop MFD. But you may use the "Use current pressures" option in the *Assetto Corsa Competizione* "Fuel & Strategy" area to transfer your current tyre setup to the Pitstop MFD and "import" the settings from there. Depending on your currently mounted tyres, the values will be imported as "Dry" or "Wet" setup values. As a convenience shortcut, the *Import* operation can also be triggered by your hardware controller without opening the settings dialog, which might be all you need during a race preparation. Please consult the documentation for the ["Race Engineer" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) on how to do this.
+
+Note: We requested a more versatile access to setup informations from Kunos already. Hopefully, this will be available in a future version of *Assetto Corsa Competizione*, and the whole process will become much less cumbersome. But to be honest, there is even less functionality available at the moment for other simulators.
+
+Additionally worth to be mentioned is the field *Pitstop.Delta*, with which you supply the difference time needed for a normal pitstop (time for pit in and pit out plus the time needed for a tyre change minus the time to pass the pit area on the track). This information is used by Jona to decide, whether an early pitstop for a tyre change or damage repair might be worthwhile.
+
+#### Tab *Pitstop*
+
+The second tab, *Pitstop*, contains information that will be used to derived the settings for a pitstop.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Engineer%20Settings%201.JPG)
 
-In the upper area you find configuration information, that are used by Jona while *computing* the recommendations for the upcoming pitstop. Especially the first field, *Statistical Window*, is quite important. It defines the number of recent laps, which are used for each and every statistical calculation, for example the standard deviation of tyre pressures. The next field, *Damping Factor*, can be used to influence the calculation weight for each of thos laps. If you want all laps to be considered with equal weight, set this to *0*.
-
-The middle area with the three dropdown menus give you you control over several decisions, Jona will take for an upcoming pitstop. For the repair settings you can decide between "Never", "Always", "Threshold" and "Impact", where "Threshold" will allow you to enter a value. If the current damage is above this value, Jona will advise to go for a repair on the next pitstop. Please note, that these values are NOT to be confused with the number of seconds for example shown on the *Assetto Corsa Competizione* Pitstop MFD, which references the number of seconds it will take to repair the damage. Typically a good threshold for bodywork damage will be between 30 and 40, but it strongly depends on the type of damage (front/rear or on the sides). For supsension damage, I advise to go always for a repair, but you might also use a threshold range around 5. For "Impact" you can enter a number of seconds. Jona will analyse your lap time and will go for a repair, if your lap time is slower by the number you entered with regards to a reference lap before the accident.
+The upper area with the three dropdown menus give you you control over several decisions, Jona will take for an upcoming pitstop. For the repair settings you can decide between "Never", "Always", "Threshold" and "Impact", where "Threshold" will allow you to enter a value. If the current damage is above this value, Jona will advise to go for a repair on the next pitstop. Please note, that these values are NOT to be confused with the number of seconds for example shown on the *Assetto Corsa Competizione* Pitstop MFD, which references the number of seconds it will take to repair the damage. Typically a good threshold for bodywork damage will be between 30 and 40, but it strongly depends on the type of damage (front/rear or on the sides). For supsension damage, I advise to go always for a repair, but you might also use a threshold range around 5. For "Impact" you can enter a number of seconds. Jona will analyse your lap time and will go for a repair, if your lap time is slower by the number you entered with regards to a reference lap before the accident.
 
 For tyre compound changes, you can choose between the triggers "Never", "Tyre Temperature" and "Weather". If you choose "Weather", Jona will advise wet tyres for light rain or worse and dry tyres for a dry track or drizzle. "Tyre Temperature" will allow you to enter a temperature threshold, where Jona will plan a tyre change, if the tyre temeprature falls outside its optimal temperature window by this amount. For dry tyres, the optimal temperature is considered to be above 70 Degrees and for wet tyres below 55 Degrees.
 
 In the lower area you can define the optimal or target tyre pressures. When there is a deviation larger than *Deviation Threshold* from these *Target Pressures* is detected by Jona, corresponding pressure adjustments will be applied for the next pitstop. Beside this very simple approach, there are rules in the AI kernel, which try to predict future incluences by falling ambient temperatures and upcoming weather changes. Jona also might access the setup database for a second opinion on target pressures. You can modify the bahaviour of these rules by using the controls in the upper area and the *Correction* check boxes.
-
-#### Tab *Race*
-
-The second tab of the settings tool contains information about the actual race.
-
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Engineer%20Settings%202.JPG)
-
-You must supply the tyre selection and pressure setup, that is used at the beginning of the race, in the lower area of the *Race* tab, wherease the static information for the given track and race is located in the upper area. With the "Setups..." button you can open the [setup database query tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#querying-the-setup-database) to look up the best match for tyre pressures from recent sessions. Beside that, you can use the "Import" button to retrieve the current tyre setup information from your simulation game. But which data are available for an import depends on the capabilities of the simulator game in use. For example, *Assetto Corsa Competizione* currently only gives access to the tyre pressures that are configured in the Pitstop MFD. But you may use the "Use current pressures" option in the *Assetto Corsa Competizione* "Fuel & Strategy" area to transfer your current tyre setup to the Pitstop MFD and "import" the settings from there. Depending on your currently mounted tyres, the values will be imported as "Dry" or "Wet" setup values. As a convinience shortcut, the *Import* operation can also be triggered by your hardware controller without opening the settings dialog, which might be all you need during a race preparation. Please consult the documentation for the ["Race Engineer" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) on how to do this.
-
-Note: We requested a more versatile access to setup informations from Kunos already. Hopefully, this will be available in a future version of *Assetto Corsa Competizione*, and the whole process will become much less cumbersome. For other simulators, there is even less functionality available at the moment.
-
-Additionally worth to be mentioned is the field *Pitstop.Delta*, with which you supply the difference time needed for a normal pitstop (time for pit in and pit out plus the time needed for a tyre change minus the time to pass the pit area on the track). This information is used by Jona to decide, whether an early pitstop for a tyre change or damage repair might be worthwhile.
 
 If you open the settings tool, it will load the *Race Engineer.settings* file located in the *Simulator Controller\Config* folder in your user *Documents* folder. If you close the tool with the "Ok" button, this file will be overwritten with the new information. Beside that, you can load a settings file from a different location with the "Load..." button and you can save the current settings with the "Save..." button. This may be used to create preconfigured settings for all your cars and tracks in the various environmental conditions. By the way - this will be integrated in a future version of Simulator Controller with the setup database automatically.
 
@@ -331,11 +328,17 @@ You have to enter all the fields in the upper area to specify the simulation, ca
 
 Note: If the *Race Engineer Setups* query tool has been [started by the *Race Engineer Settings* tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tab-race), you can transfer the current tyre pressure and compound information to the *Race Engineer Settings* by pressing the "Load" button.
 
-The second tab allows you to store your preffered car setup files for different conditions (Wet vs. Dry) and different Sessions (Qualification vs. Race) in the setup database.
+The second tab allows you to store your preferred car setup files for different conditions (Wet vs. Dry) and different Sessions (Qualification vs. Race) in the setup database.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Engineer%20Setups%202.JPG)
 
 The dropdown menus let you access all setup files, which had been associated with the given car and track, either by you or by another person from the community. The buttons on the right side of the dropdown menu let you 1. upload a setup to the database, 2. download a setup and store it in the specific folder for a simulation and 3. delete one of your setups from the database.
+
+Session settings created by the [*Race Engineer Settings*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-engineer-settings) tool can be stored in the setup database as well. You can configure Jona with the [configuration tool](*) to load the best matching settings according to the session duration at the beginning of a new session.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Engineer%20Setups%204.JPG)
+
+The buttons below the list of settings will allow you to create new settings, edit the selected settings, clone the selected settings or delete the selected settings. Settings may alos be renamed by double clicking on the corresponding line or pressing *F2* while a line is selected.
 
 In the last tab you can take some notes on the track, or open issues with your setups and so on.
 
@@ -457,7 +460,6 @@ A considerable part of the knowledge of Jona comes from the telemetry informatio
 	LapLastTime=116697
 	LapBestTime=116697
 	SessionLapsRemaining=9
-	SessionTimeRemaining=1.41874e+06
 	StintTimeRemaining=1.41874e+06
 	DriverTimeRemaining=1.41874e+06
 	InPit=false
@@ -486,6 +488,7 @@ A considerable part of the knowledge of Jona comes from the telemetry informatio
 	Track=Paul_Ricard
 	FuelAmount=125
 	SessionFormat=Time
+	SessionTimeRemaining=1.41874e+06
 
 The shared memory of the simulation games typically provide a lot more information, but this is all that is needed for Jona at the moment. Future versions of Jona will incorporate more data, as Jona gets smarter. For example, version 1.7 of *Assetto Corsa Competizione* introduced updated information for weather information and the current settings of the Pitstop MFD, which had been incorporated into the above telemetry file.
 

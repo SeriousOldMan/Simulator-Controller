@@ -2,7 +2,7 @@
 Version=3.0.6-dev
 Target=3.0.4-release
 Date=05/26/2021
-Changes=Store reference to Race Engineer Settings in the setup databse, Full configuration of Race Engineer behaviour incl. automatic update of setup database at session end
+Changes=Store reference to Race Engineer Settings in the setup databse, Full configuration of Race Engineer behaviour incl. automatic update of setup database at session end, Overhaul of the Race Engineer Settings tool
 [Release]
 Version=3.0.4-release
 Date=05/21/2021

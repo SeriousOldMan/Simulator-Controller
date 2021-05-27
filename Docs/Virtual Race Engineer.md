@@ -104,7 +104,7 @@ To have an error free session like this one, you must have a perfect setup for v
 
 ## Installation
 
-Not much to do here, since Jona is a fully integrated component of the Simulator Controller package. You might want to have a look at the ["Race Engineer" plugin arguments](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer), since this plugin controls Jona during your simulator sessions. And you might have to install (additional) voice support in your Windows operating system depending on the Windows isntallation you have.
+Not much to do here, since Jona is a fully integrated component of the Simulator Controller package. Of yourse, you have to configure the Simulator Controller software, before you can use the Virtual Race Engineer. Please read the [installation documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration) for a complete overview of the steps required. You might want to have a look at the ["Race Engineer" plugin arguments](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer), since this plugin controls Jona during your simulator sessions. And you might have to install (additional) voice support in your Windows operating system depending on the Windows isntallation you have.
 
 ### Installation of additional Voices
 

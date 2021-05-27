@@ -1406,8 +1406,6 @@ class RaceEngineer extends ConfigurationItem {
 			facts["Session.Settings.Lap.Learning.Laps"] := getConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", simulatorName . ".LearningLaps", 1)
 			facts["Session.Settings.Lap.Time.Adjust"] := this.AdjustLapTime
 			
-			facts["Session.Format"] := getConfigurationValue(data, "Session Data", "SessionFormat", "Time")
-			
 			for key, value in facts
 				knowledgeBase.setValue(key, value)
 			

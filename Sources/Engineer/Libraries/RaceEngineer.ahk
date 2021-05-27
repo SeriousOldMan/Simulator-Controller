@@ -82,6 +82,7 @@ class RaceEngineer extends ConfigurationItem {
 	
 	iEnoughData := false
 	iLearningLaps := 1
+	iAdjustLapTime := true
 	
 	iSaveSettings := kNever
 	iSaveTyrePressures := kAsk
@@ -374,6 +375,12 @@ class RaceEngineer extends ConfigurationItem {
 	LearningLaps[] {
 		Get {
 			return this.iLearningLaps
+		}
+	}
+	
+	AdjustLapTime[] {
+		Get {
+			return this.iAdjustLapTime
 		}
 	}
 	
@@ -1257,24 +1264,38 @@ class RaceEngineer extends ConfigurationItem {
 				this.iSession := kSessionOther
 		}
 		
-		lapTime := getConfigurationValue(data, "Stint Data", "LapLastTime", 0)
-		settingsLapTime := (getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.AvgTime", lapTime / 1000) * 1000)
-		
-		if ((lapTime / settingsLapTime) > 2)
-			lapTime := settingsLapTime
-		
-		dataDuration := Round((getDeprecatedConfigurationValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0) + lapTime) / 1000)
-		settingsDuration := getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Duration", dataDuration)
-		
-		if ((Abs(settingsDuration - dataDuration) / dataDuration) >  0.05)
-			settingsDuration := dataDuration
-		
 		simulator := getConfigurationValue(data, "Session Data", "Simulator", "Unknown")
 		simulatorName := this.SetupDatabase.getSimulatorName(simulator)
 		
+		lapTime := getConfigurationValue(data, "Stint Data", "LapLastTime", 0)
+		
+		if this.AdjustLapTime {
+			settingsLapTime := (getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.AvgTime", lapTime / 1000) * 1000)
+			
+			if ((lapTime / settingsLapTime) > 2)
+				lapTime := settingsLapTime
+		}
+		
+		sessionFormat := getConfigurationValue(data, "Session Data", "SessionFormat", "Time")
+		sessionTimeRemaining := getDeprecatedConfigurationValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0)
+		dataDuration := Round((sessionTimeRemaining + lapTime) / 1000)
+		
+		if (sessionFormat = "Time")
+			duration := dataDuration
+		else {
+			settingsDuration := getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Duration", dataDuration)
+			
+			if ((Abs(settingsDuration - dataDuration) / dataDuration) >  0.05)
+				duration := dataDuration
+			else
+				duration := settingsDuration
+		}
+		
 		facts := {"Session.Car": getConfigurationValue(data, "Session Data", "Car", "")
 				, "Session.Track": getConfigurationValue(data, "Session Data", "Track", "")
-				, "Session.Duration": settingsDuration
+				, "Session.Duration": duration
+				, "Session.Format": sessionFormat
+				, "Session.Time.Remaining": sessionTimeRemaining
 				, "Session.Settings.Lap.Formation": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.Formation", true)
 				, "Session.Settings.Lap.PostRace": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.PostRace", true)
 				, "Session.Settings.Fuel.Max": getConfigurationValue(data, "Session Data", "FuelAmount", 0)
@@ -1320,7 +1341,7 @@ class RaceEngineer extends ConfigurationItem {
 		
 		facts["Session.Settings.Damage.Analysis.Laps"] := getConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", simulatorName . ".DamageAnalysisLaps", 1)
 		facts["Session.Settings.Lap.Learning.Laps"] := getConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", simulatorName . ".LearningLaps", 1)
-		facts["Session.Settings.Lap.Time.Adjust"] := getConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", simulatorName . ".AdjustLapTimes", true)
+		facts["Session.Settings.Lap.Time.Adjust"] := this.AdjustLapTime
 				
 		return facts
 	}
@@ -1380,7 +1401,9 @@ class RaceEngineer extends ConfigurationItem {
 			
 			facts["Session.Settings.Damage.Analysis.Laps"] := getConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", simulatorName . ".DamageAnalysisLaps", 1)
 			facts["Session.Settings.Lap.Learning.Laps"] := getConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", simulatorName . ".LearningLaps", 1)
-			facts["Session.Settings.Lap.Time.Adjust"] := getConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", simulatorName . ".AdjustLapTimes", true)
+			facts["Session.Settings.Lap.Time.Adjust"] := this.AdjustLapTime
+			
+			facts["Session.Format"] := getConfigurationValue(data, "Session Data", "SessionFormat", "Time")
 			
 			for key, value in facts
 				knowledgeBase.setValue(key, value)
@@ -1421,6 +1444,7 @@ class RaceEngineer extends ConfigurationItem {
 		simulatorName := this.SetupDatabase.getSimulatorName(this.Simulator)
 		
 		this.iLearningLaps := getConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", simulatorName . ".LearningLaps", 1)
+		this.iAdjustLapTime := getConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", simulatorName . ".AdjustLapTime", true)
 		this.iSaveSettings := getConfigurationValue(kSimulatorConfiguration, "Race Engineer Shutdown", simulatorName . ".SaveSettings", kNever)
 		this.iSaveTyrePressures := getConfigurationValue(kSimulatorConfiguration, "Race Engineer Shutdown", simulatorName . ".SaveTyrePressures", kAsk)
 		
@@ -1496,6 +1520,8 @@ class RaceEngineer extends ConfigurationItem {
 			baseLap := lapNumber
 		
 		this.iEnoughData := (lapNumber > (baseLap + (this.LearningLaps - 1)))
+		
+		knowledgeBase.setFact("Session.Time.Remaining", getDeprecatedConfigurationValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0))
 		
 		driverForname := getConfigurationValue(data, "Stint Data", "DriverForname", this.DriverName)
 		driverSurname := getConfigurationValue(data, "Stint Data", "DriverSurname", "Doe")

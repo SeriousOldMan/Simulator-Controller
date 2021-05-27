@@ -1001,6 +1001,7 @@ nextStintLaps(?laps) <= remainingSessionLaps(!Lap, ?laps)
 remainingSessionLaps(?lap, ?remainingLaps) <= remainingSessionTime(?lap, ?remainingTime), lapAvgTime(?lap, ?avgTime),							\
 											  ?remainingLaps = ?remainingTime / ?avgTime
 
+remainingSessionTime(?lap, ?remainingTime) <= Get(Session.Format, Time), !, get(Session.Time.Remaining, ?remainingTime)
 remainingSessionTime(?lap, ?remainingTime) <= Get(Lap, ?lap, Time.End, ?sessionTime), ?sessionLength = !Session.Duration * 1000,				\
 											  ?remainingTime = ?sessionLength - ?sessionTime
 

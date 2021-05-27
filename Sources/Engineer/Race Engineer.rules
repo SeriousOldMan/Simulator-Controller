@@ -998,6 +998,7 @@ nextStintLaps(?laps) <= lapRemainingFuel(!Lap, ?remainingFuel), ?fuel = ?remaini
 						lapAvgFuel(!Lap, ?fuelPerLap), ?laps = ?fuel / ?fuelPerLap
 nextStintLaps(?laps) <= remainingSessionLaps(!Lap, ?laps)
 
+remainingSessionLaps(?lap, ?remainingLaps) <= Get(Session.Format, Lap), !, get(Session.Lap.Remaining, ?remainingLaps)
 remainingSessionLaps(?lap, ?remainingLaps) <= remainingSessionTime(?lap, ?remainingTime), lapAvgTime(?lap, ?avgTime),							\
 											  ?remainingLaps = ?remainingTime / ?avgTime
 

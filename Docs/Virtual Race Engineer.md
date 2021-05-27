@@ -491,6 +491,7 @@ A considerable part of the knowledge of Jona comes from the telemetry informatio
 	FuelAmount=125
 	SessionFormat=Time
 	SessionTimeRemaining=1.41874e+06
+	SessionLapsRemaining=13
 
 The shared memory of the simulation games typically provide a lot more information, but this is all that is needed for Jona at the moment. Future versions of Jona will incorporate more data, as Jona gets smarter. For example, version 1.7 of *Assetto Corsa Competizione* introduced updated information for weather information and the current settings of the Pitstop MFD, which had been incorporated into the above telemetry file.
 

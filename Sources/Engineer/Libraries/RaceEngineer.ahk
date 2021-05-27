@@ -1278,6 +1278,8 @@ class RaceEngineer extends ConfigurationItem {
 		
 		sessionFormat := getConfigurationValue(data, "Session Data", "SessionFormat", "Time")
 		sessionTimeRemaining := getDeprecatedConfigurationValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0)
+		sessionLapsRemaining := getDeprecatedConfigurationValue(data, "Session Data", "Stint Data", "SessionLapsRemaining", 0)
+		
 		dataDuration := Round((sessionTimeRemaining + lapTime) / 1000)
 		
 		if (sessionFormat = "Time")
@@ -1296,6 +1298,7 @@ class RaceEngineer extends ConfigurationItem {
 				, "Session.Duration": duration
 				, "Session.Format": sessionFormat
 				, "Session.Time.Remaining": sessionTimeRemaining
+				, "Session.Lap.Remaining": sessionLapsRemaining
 				, "Session.Settings.Lap.Formation": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.Formation", true)
 				, "Session.Settings.Lap.PostRace": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.PostRace", true)
 				, "Session.Settings.Fuel.Max": getConfigurationValue(data, "Session Data", "FuelAmount", 0)
@@ -1522,6 +1525,7 @@ class RaceEngineer extends ConfigurationItem {
 		this.iEnoughData := (lapNumber > (baseLap + (this.LearningLaps - 1)))
 		
 		knowledgeBase.setFact("Session.Time.Remaining", getDeprecatedConfigurationValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0))
+		knowledgeBase.setFact("Session.Lap.Remaining", getDeprecatedConfigurationValue(data, "Session Data", "Stint Data", "SessionLapsRemaining", 0))
 		
 		driverForname := getConfigurationValue(data, "Stint Data", "DriverForname", this.DriverName)
 		driverSurname := getConfigurationValue(data, "Stint Data", "DriverSurname", "Doe")

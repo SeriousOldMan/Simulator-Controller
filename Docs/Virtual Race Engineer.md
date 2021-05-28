@@ -104,7 +104,7 @@ To have an error free session like this one, you must have a perfect setup for v
 
 ## Installation
 
-Not much to do here, since Jona is a fully integrated component of the Simulator Controller package. You might want to have a look at the ["Race Engineer" plugin arguments](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer), since this plugin controls Jona during your simulator sessions. And you might have to install (additional) voice support in your Windows operating system depending on the Windows isntallation you have.
+Not much to do here, since Jona is a fully integrated component of the Simulator Controller package. Of yourse, you have to configure the Simulator Controller software, before you can use the Virtual Race Engineer. Please read the [installation documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration) for a complete overview of the steps required. You might want to have a look at the ["Race Engineer" plugin arguments](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer), since this plugin controls Jona during your simulator sessions. And you might have to install (additional) voice support in your Windows operating system depending on the Windows isntallation you have.
 
 ### Installation of additional Voices
 
@@ -263,9 +263,11 @@ For tyre compound changes, you can choose between the triggers "Never", "Tyre Te
 
 In the lower area you can define the optimal or target tyre pressures. When there is a deviation larger than *Deviation Threshold* from these *Target Pressures* is detected by Jona, corresponding pressure adjustments will be applied for the next pitstop. Beside this very simple approach, there are rules in the AI kernel, which try to predict future incluences by falling ambient temperatures and upcoming weather changes. Jona also might access the setup database for a second opinion on target pressures. You can modify the bahaviour of these rules by using the controls in the upper area and the *Correction* check boxes.
 
-If you open the settings tool, it will load the *Race Engineer.settings* file located in the *Simulator Controller\Config* folder in your user *Documents* folder. If you close the tool with the "Ok" button, this file will be overwritten with the new information. Beside that, you can load a settings file from a different location with the "Load..." button and you can save the current settings with the "Save..." button. This may be used to create preconfigured settings for all your cars and tracks in the various environmental conditions. By the way - this will be integrated in a future version of Simulator Controller with the setup database automatically.
+If you open the settings tool, it will load the *Race Engineer.settings* file located in the *Simulator Controller\Config* folder in your user *Documents* folder. If you close the tool with the "Ok" button, this file will be overwritten with the new information. Beside that, you can load a settings file from a different location with the "Load..." button and you can save the current settings with the "Save..." button. Beside handling the file locations yourself, you can use the setup database to organize your settings files. Plesse see the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--setup-database) for the setup database for further information.
 
 Good to know: When the *Race Engineer.settings* file is changed while Jona is already active, the updated settings will be imported into the active session. This is useful during Practice, Qualification or even Endurance Race sessions. And, if you click on the blue label of the dialog title, this documentation will be opened in your browser.
+
+Beside the session respectively race specific settings described in the previous sections, the general behaviour of the Virtual Race Engineer can be customized using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-engineer). 
 
 ### The pitstop
 
@@ -298,7 +300,7 @@ No special setup required for *iRacing*, since this simulation has an integrated
 
 #### *RaceRoom Racing Experience*
 
-*RaceRoom Racing Experience* does not provide any data interface for initial setup information. So you must take care, that everything is entered correctly into the settings tool, before you had out onto the track. On the other hand, the support for pitstop settings is quite limited in *RaceRoom Racing Experience*, so you might skip tyre pressures and dry vs. wet tyre considerations alltogether.
+*RaceRoom Racing Experience* does not provide any data interface for initial setup information. So you must take care, that everything is entered correctly into the settings tool, before you head out onto the track. On the other hand, the support for pitstop settings is quite limited in *RaceRoom Racing Experience*, so you might skip tyre pressures and dry vs. wet tyre considerations alltogether.
 
 ### Race & Setup database
 
@@ -334,7 +336,7 @@ The second tab allows you to store your preferred car setup files for different 
 
 The dropdown menus let you access all setup files, which had been associated with the given car and track, either by you or by another person from the community. The buttons on the right side of the dropdown menu let you 1. upload a setup to the database, 2. download a setup and store it in the specific folder for a simulation and 3. delete one of your setups from the database.
 
-Session settings created by the [*Race Engineer Settings*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-engineer-settings) tool can be stored in the setup database as well. You can configure Jona with the [configuration tool](*) to load the best matching settings according to the session duration at the beginning of a new session.
+Session settings created by the [*Race Engineer Settings*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-engineer-settings) tool can be stored in the setup database as well. You can configure Jona with the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-engineer) to load the best matching settings according to the session duration at the beginning of a new session.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Engineer%20Setups%204.JPG)
 
@@ -489,6 +491,7 @@ A considerable part of the knowledge of Jona comes from the telemetry informatio
 	FuelAmount=125
 	SessionFormat=Time
 	SessionTimeRemaining=1.41874e+06
+	SessionLapsRemaining=13
 
 The shared memory of the simulation games typically provide a lot more information, but this is all that is needed for Jona at the moment. Future versions of Jona will incorporate more data, as Jona gets smarter. For example, version 1.7 of *Assetto Corsa Competizione* introduced updated information for weather information and the current settings of the Pitstop MFD, which had been incorporated into the above telemetry file.
 

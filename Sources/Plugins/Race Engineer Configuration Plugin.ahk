@@ -25,7 +25,7 @@ global learningLapsEdit
 global lapsConsideredEdit
 global dampingFactorEdit
 
-global adjustLapTimesCheck
+global adjustLapTimeCheck
 global damageAnalysisLapsEdit
 
 class RaceEngineerConfigurator extends ConfigurationItem {
@@ -103,7 +103,7 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		Gui %window%:Add, Text, x200 yp+2 w170 h20, % translate("p. Lap")
 
 		Gui %window%:Add, Text, x24 ys+30 w160 h23 +0x200 Section, % translate("Adjust Lap Time")
-		Gui %window%:Add, CheckBox, x156 yp w300 h23 VadjustLapTimesCheck, % translate("for Start, Pitstop or imcomplete Laps (use from Settings)")
+		Gui %window%:Add, CheckBox, x156 yp w300 h23 VadjustLapTimeCheck, % translate("for Start, Pitstop or imcomplete Laps (use from Settings)")
 		
 		Gui %window%:Add, Text, x24 ys+30 w160 h23 +0x200 Section, % translate("Damage Analysis for")
 		Gui %window%:Add, Edit, x156 yp w40 h21 Number VdamageAnalysisLapsEdit
@@ -128,7 +128,7 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 			simulatorConfiguration["LearningLaps"] := getConfigurationValue(configuration, "Race Engineer Analysis", simulator . ".LearningLaps", 1)
 			simulatorConfiguration["ConsideredHistoryLaps"] := getConfigurationValue(configuration, "Race Engineer Analysis", simulator . ".ConsideredHistoryLaps", 5)
 			simulatorConfiguration["HistoryLapsDamping"] := getConfigurationValue(configuration, "Race Engineer Analysis", simulator . ".HistoryLapsDamping", 0.2)
-			simulatorConfiguration["AdjustLapTimes"] := getConfigurationValue(configuration, "Race Engineer Analysis", simulator . ".AdjustLapTimes", true)
+			simulatorConfiguration["AdjustLapTime"] := getConfigurationValue(configuration, "Race Engineer Analysis", simulator . ".AdjustLapTime", true)
 			simulatorConfiguration["DamageAnalysisLaps"] := getConfigurationValue(configuration, "Race Engineer Analysis", simulator . ".DamageAnalysisLaps", 1)
 								
 			this.iSimulatorConfigurations[simulator] := simulatorConfiguration
@@ -147,7 +147,7 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 			for ignore, key in ["SaveSettings", "SaveTyrePressures"]
 				setConfigurationValue(configuration, "Race Engineer Shutdown", simulator . "." . key, simulatorConfiguration[key])
 			
-			for ignore, key in ["LearningLaps", "ConsideredHistoryLaps", "HistoryLapsDamping", "AdjustLapTimes", "DamageAnalysisLaps"]
+			for ignore, key in ["LearningLaps", "ConsideredHistoryLaps", "HistoryLapsDamping", "AdjustLapTime", "DamageAnalysisLaps"]
 				setConfigurationValue(configuration, "Race Engineer Analysis", simulator . "." . key, simulatorConfiguration[key])
 		}
 	}
@@ -169,7 +169,7 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		GuiControl Text, lapsConsideredEdit, % configuration["ConsideredHistoryLaps"]
 		GuiControl Text, dampingFactorEdit, % configuration["HistoryLapsDamping"]
 		
-		GuiControl, , adjustLapTimesCheck, % configuration["AdjustLapTimes"]
+		GuiControl, , adjustLapTimeCheck, % configuration["AdjustLapTime"]
 		
 		GuiControl Text, damageAnalysisLapsEdit, % configuration["DamageAnalysisLaps"]
 	}
@@ -185,7 +185,7 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 			GuiControlGet lapsConsideredEdit
 			GuiControlGet dampingFactorEdit
 			
-			GuiControlGet adjustLapTimesCheck
+			GuiControlGet adjustLapTimeCheck
 			GuiControlGet damageAnalysisLapsEdit
 			
 			configuration := this.iSimulatorConfigurations[simulatorDropDown]
@@ -200,7 +200,7 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 			configuration["ConsideredHistoryLaps"] := lapsConsideredEdit
 			configuration["HistoryLapsDamping"] := dampingFactorEdit
 			
-			configuration["AdjustLapTimes"] := adjustLapTimesCheck
+			configuration["AdjustLapTime"] := adjustLapTimeCheck
 			
 			configuration["DamageAnalysisLaps"] := damageAnalysisLapsEdit
 		}

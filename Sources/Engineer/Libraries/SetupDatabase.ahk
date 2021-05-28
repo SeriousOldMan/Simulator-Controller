@@ -659,7 +659,7 @@ class SetupDatabase {
 				setConfigurationValue(settings, "Session Settings", "Lap.AvgTime", lapTime)
 				setConfigurationValue(settings, "Session Settings", "Fuel.AvgConsumption", avgFuelConsumption)
 				
-				writeConfiguration(fileName, settings)
+				this.writeSettings(simulatorName, car, track, translate("New") . " - " . A_Now, settings)
 			}
 		}
 	}

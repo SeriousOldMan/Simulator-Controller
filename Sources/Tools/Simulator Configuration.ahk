@@ -1569,7 +1569,10 @@ class TranslationsList extends ConfigurationItemList {
 		Gui TE:Add, Edit, x110 yp w283 h80 Disabled VoriginalTextEdit, %originalTextEdit%
 	
 		Gui TE:Add, Text, x16 w86 h23 +0x200, % translate("Translation")
-		Gui TE:Add, Button, x85 yp w23 h23 Default HwndnextUntranslatedButtonHandle gnextUntranslated
+		
+		option := (this.iLanguageCode = "en") ? "Disabled" : ""
+		
+		Gui TE:Add, Button, x85 yp w23 h23 %option% Default HwndnextUntranslatedButtonHandle gnextUntranslated
 		setButtonIcon(nextUntranslatedButtonHandle, kIconsDirectory . "Down Arrow.ico", 1)
 		Gui TE:Add, Edit, x110 yp w283 h80 VtranslationTextEdit, %translationTextEdit%
 		
@@ -1671,6 +1674,11 @@ class TranslationsList extends ConfigurationItemList {
 	
 	loadTranslations(languageCode) {
 		this.iLanguageCode := languageCode
+		
+		if (languageCode = "en")
+			GuiControl Disable, %nextUntranslatedButtonHandle%
+		else
+			GuiControl Enable, %nextUntranslatedButtonHandle%
 		
 		this.ItemList := []
 		

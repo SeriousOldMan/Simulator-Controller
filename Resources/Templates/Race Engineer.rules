@@ -375,7 +375,7 @@ lapTimeStdDeviation(?lap, ?deviation) <= weightedLapTimes(?lap, ?lapTimes), stdD
 priority: 5, {All: {Any: [?Damage.Suspension.Lap.Delta = 0], {None: [?Damage.Suspension.Lap.Delta]},											\
 						 [?Damage.Suspension = 0], {None: [?Damage.Suspension]}},																\
 				   {Any: [?Damage.Bodywork.Lap.Delta = 0], {None: [?Damage.Bodywork.Lap.Delta]},												\
-						 [?Damage.Bodywork = 0], {None: [?Damage.Bodywork]}}} => (Clear: Damage.Analysis.Reported)
+						 [?Damage.Bodywork = 0], {None: [?Damage.Bodywork]}}} => (Clear: Damage.Analysis.Reported), (Clear: Damage.Reported)
 				   
 priority: -5, {All: [?Lap], [?Damage.Reported],																									\
 					{None: [?Damage.Analysis.Reported > ?Damage.Reported]},																		\
@@ -998,9 +998,11 @@ nextStintLaps(?laps) <= lapRemainingFuel(!Lap, ?remainingFuel), ?fuel = ?remaini
 						lapAvgFuel(!Lap, ?fuelPerLap), ?laps = ?fuel / ?fuelPerLap
 nextStintLaps(?laps) <= remainingSessionLaps(!Lap, ?laps)
 
+remainingSessionLaps(?lap, ?remainingLaps) <= Get(Session.Format, Lap), !, get(Session.Lap.Remaining, ?remainingLaps)
 remainingSessionLaps(?lap, ?remainingLaps) <= remainingSessionTime(?lap, ?remainingTime), lapAvgTime(?lap, ?avgTime),							\
 											  ?remainingLaps = ?remainingTime / ?avgTime
 
+remainingSessionTime(?lap, ?remainingTime) <= Get(Session.Format, Time), !, get(Session.Time.Remaining, ?remainingTime)
 remainingSessionTime(?lap, ?remainingTime) <= Get(Lap, ?lap, Time.End, ?sessionTime), ?sessionLength = !Session.Duration * 1000,				\
 											  ?remainingTime = ?sessionLength - ?sessionTime
 

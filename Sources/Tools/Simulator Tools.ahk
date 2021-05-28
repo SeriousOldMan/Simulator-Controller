@@ -283,7 +283,6 @@ editTargets(command := "") {
 		Gui TE:Submit
 		
 		for target, setting in vUpdateSettings {
-			; updateVariable := "updateVariable" . A_Index
 			updateVariable := "updateVariable" . vUpdateSettings.Count()
 			
 			vUpdateSettings[target] := %updateVariable%
@@ -367,14 +366,8 @@ editTargets(command := "") {
 		
 			if (vUpdateSettings.Count() > 0)
 				for target, setting in vUpdateSettings {
-					if (A_Index == vUpdateSettings.Count()) {
-						option := ""
-						
-						; if (A_Index == 1)
-							option := option . " YP+20 XP+10"
-							
-						Gui TE:Add, CheckBox, %option% Disabled Checked%setting% vupdateVariable%A_Index%, %target%
-					}
+					if (A_Index == vUpdateSettings.Count())
+						Gui TE:Add, CheckBox, YP+20 XP+10 Disabled Checked%setting% vupdateVariable%A_Index%, %target%
 				}
 			else
 				Gui TE:Add, Text, YP+20 XP+10, % translate("No updates required...")

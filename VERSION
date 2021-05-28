@@ -1,14 +1,14 @@
 [Development]
-Version=3.0.6-dev
-Target=3.0.4-release
-Date=05/26/2021
-Changes=Store reference to Race Engineer Settings in the setup databse, Full configuration of Race Engineer behaviour incl. automatic update of setup database at session end, Overhaul of the Race Engineer Settings tool
+Version=3.0.8-dev
+Target=3.0.8-release
+Date=05/28/2021
+Changes=
 [Release]
-Version=3.0.4-release
-Date=05/21/2021
-Changes=Rework of post pitstop fuel calculation, Store reference to car setups in the setup databse, Store Notes in the setup database, New consents for the extended setup database
+Version=3.0.6-release
+Date=05/28/2021
+Changes=Store reference to Race Engineer Settings in the setup databse, Full configuration of Race Engineer behaviour incl. automatic update of setup database at session end, Overhaul of the Race Engineer Settings tool
 [Current]
 Type=Development
 [Version]
-Release=3.0.4-release
-Development=3.0.6-dev
+Release=3.0.6-release
+Development=3.0.8-dev

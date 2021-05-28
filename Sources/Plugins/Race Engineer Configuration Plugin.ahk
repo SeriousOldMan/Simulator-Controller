@@ -64,7 +64,7 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		Gui %window%:Add, Text, x24 y161 w160 h23 +0x200, % translate("Load Tyre Pressures")
 		choices := map(["Use Values from Settings", "Load from Setup Database", "Import from Simulator"], "translate")
 		chosen := 1
-		Gui %window%:Add, DropDownList, x156 y161 w307 AltSubmit vloadTyrePressuresDropDown, % values2String("|", choices*)
+		Gui %window%:Add, DropDownList, x156 y161 w307 AltSubmit Choose%chosen% vloadTyrePressuresDropDown, % values2String("|", choices*)
 		
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial

@@ -1189,6 +1189,11 @@ showRaceEngineerSetups() {
 	
 	vSetupDatabase := new SetupDatabase()
 	
+	if ((airTemperature == 0) || (trackTemperature == 0)) {
+		airTemperature := 23
+		trackTemperature := 27
+	}
+	
 	showSetups(false, simulator, car, track, weather, airTemperature, trackTemperature, compound)
 	
 	ExitApp 0

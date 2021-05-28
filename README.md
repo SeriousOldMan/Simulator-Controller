@@ -26,6 +26,8 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
+None for the moment...
+
 #### Latest release builds
 
 [3.0.4-release](https://www.dropbox.com/s/9t7g81vzq77qa46/Simulator%20Controller%203.0.4-release.zip?dl=1) (New features: Rework of post pitstop fuel calculation, Store reference to car setups in the setup databse, Store Notes in the setup database, New consents for the extended setup database. Feature complete, stable and with documentation and uodate procedure.)

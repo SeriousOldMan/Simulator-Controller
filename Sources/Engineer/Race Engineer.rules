@@ -375,7 +375,7 @@ lapTimeStdDeviation(?lap, ?deviation) <= weightedLapTimes(?lap, ?lapTimes), stdD
 priority: 5, {All: {Any: [?Damage.Suspension.Lap.Delta = 0], {None: [?Damage.Suspension.Lap.Delta]},											\
 						 [?Damage.Suspension = 0], {None: [?Damage.Suspension]}},																\
 				   {Any: [?Damage.Bodywork.Lap.Delta = 0], {None: [?Damage.Bodywork.Lap.Delta]},												\
-						 [?Damage.Bodywork = 0], {None: [?Damage.Bodywork]}}} => (Clear: Damage.Analysis.Reported)
+						 [?Damage.Bodywork = 0], {None: [?Damage.Bodywork]}}} => (Clear: Damage.Analysis.Reported), (Clear: Damage.Reported)
 				   
 priority: -5, {All: [?Lap], [?Damage.Reported],																									\
 					{None: [?Damage.Analysis.Reported > ?Damage.Reported]},																		\

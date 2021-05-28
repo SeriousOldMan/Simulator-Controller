@@ -1597,7 +1597,7 @@ class RaceEngineer extends ConfigurationItem {
 			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.AvgConsumption", 0)
 			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.Consumption", 0)
 		}
-		else if !this.InitialFuelAmount {
+		else if (!this.InitialFuelAmount || (fuelRemaining > this.iLastFuelAmount)) {
 			; This is the case after a pitstop
 			this.iInitialFuelAmount := fuelRemaining
 			this.iLastFuelAmount := fuelRemaining

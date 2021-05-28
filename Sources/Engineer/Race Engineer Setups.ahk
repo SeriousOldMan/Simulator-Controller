@@ -1128,6 +1128,8 @@ showSetups(command := false, simulator := false, car := false, track := false, w
 		}
 		else if (!simulator || !car || !track)
 			chooseSimulator()
+		else
+			chooseTrack()
 		
 		Loop {
 			Loop {
@@ -1187,12 +1189,13 @@ showRaceEngineerSetups() {
 		}
 	}
 	
-	vSetupDatabase := new SetupDatabase()
-	
-	if ((airTemperature == 0) || (trackTemperature == 0)) {
-		airTemperature := 23
-		trackTemperature := 27
+	if ((airTemperature <= 0) || (trackTemperature <= 0)) {
+		airTemperature := false
+		trackTemperature := false
 	}
+		
+	
+	vSetupDatabase := new SetupDatabase()
 	
 	showSetups(false, simulator, car, track, weather, airTemperature, trackTemperature, compound)
 	

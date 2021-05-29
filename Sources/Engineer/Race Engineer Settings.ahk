@@ -464,12 +464,12 @@ restart:
 		Gui RES:Add, Text, x184 yp+2 w70 h20, % translate("PSI")
 		
 		Gui RES:Add, Text, x16 yp+24 w105 h20 Section, % translate("Correction")
-		Gui RES:Add, CheckBox, x126 yp-3 w17 h23 Checked%temperatureCorrectionCheck% VtemperatureCorrectionCheck, %temperatureCorrectionCheck%
-		Gui RES:Add, Text, x147 yp+3 w200 h20, % translate("based on temperature trend")
+		Gui RES:Add, CheckBox, x126 yp-4 w17 h23 Checked%temperatureCorrectionCheck% VtemperatureCorrectionCheck, %temperatureCorrectionCheck%
+		Gui RES:Add, Text, x147 yp+4 w200 h20, % translate("based on temperature trend")
 		
 		Gui RES:Add, Text, x16 yp+24 w105 h20 Section, % translate("Correction")
-		Gui RES:Add, CheckBox, x126 yp-3 w17 h23 Checked%setupPressureCompareCheck% VsetupPressureCompareCheck, %setupPressureCompareCheck%
-		Gui RES:Add, Text, x147 yp+3 w200 h20, % translate("based on setup database values")
+		Gui RES:Add, CheckBox, x126 yp-4 w17 h23 Checked%setupPressureCompareCheck% VsetupPressureCompareCheck, %setupPressureCompareCheck%
+		Gui RES:Add, Text, x147 yp+4 w200 h20, % translate("based on setup database values")
 
 		Gui RES:Font, Norm, Arial
 		Gui RES:Font, Italic, Arial

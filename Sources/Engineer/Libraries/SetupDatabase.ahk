@@ -304,7 +304,7 @@ class SetupDatabase {
 							bestCount := 0
 							
 							for pressure, pressureCount in tyrePressures {
-								if (pressureCount > bestCount) {
+								if ((pressureCount > bestCount) || ((pressureCount == bestCount) && (bestPressure < pressure))) {
 									bestCount := pressureCount
 									bestPressure := pressure
 								}

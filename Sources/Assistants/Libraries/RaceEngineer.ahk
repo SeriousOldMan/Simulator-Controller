@@ -16,156 +16,30 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Libraries\RuleEngine.ahk
-#Include ..\Assistants\Libraries\VoiceAssistant.ahk
-#Include ..\Assistants\Libraries\SetupDatabase.ahk
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                         Public Constant Section                         ;;;
-;;;-------------------------------------------------------------------------;;;
-
-global kDebugKnowledgeBase := 1
-
-global kSessionFinished = 0
-global kSessionPaused = -1
-global kSessionOther = 1
-global kSessionPractice = 2
-global kSessionQualification = 3
-global kSessionRace = 4
-
-global kAsk = "Ask"
-global kAlways = "Always"
-global kNever = "Never"
+#Include ..\Assistants\Libraries\RaceAssistant.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class RaceEngineer extends ConfigurationItem {
-	iDebug := kDebugOff
-
+class RaceEngineer extends RaceAssistant {
 	iPitstopHandler := false
-	iRaceSettings := false
 	
-	iVoiceAssistant := false
-	iOptions := {}
-	
-	iSimulator := ""
-	iSession := kSessionFinished
-	
-	iDriverName := "John"
-	
-	iEnoughData := false
-	iLearningLaps := 1
 	iAdjustLapTime := true
 	
-	iSaveSettings := kNever
 	iSaveTyrePressures := kAsk
 	
-	iKnowledgeBase := false
+	iEnoughData := false
+	
 	iOverallTime := 0
 	iLastLap := 0
 	iLastFuelAmount := 0
 	iInitialFuelAmount := 0
-	
 	iAvgFuelConsumption := 0
-	iLapTime := 0
 	
 	iSetupData := {}
 	iSessionDataActive := false
-	
-	iSetupDatabase := false
-	
-	class RaceEngineerVoiceAssistant extends VoiceAssistant {
-		iRaceEngineer := false
-		
-		RaceEngineer[] {
-			Get {
-				return this.iRaceEngineer
-			}
-		}
-		
-		User[] {
-			Get {
-				return this.RaceEngineer.DriverName
-			}
-		}
-		
-		__New(raceEngineer, name, options) {
-			this.iRaceEngineer := raceEngineer
-			
-			base.__New(name, options)
-		}
-		
-		getPhraseVariables(variables := false) {
-			variables := base.getPhraseVariables(variables)
-			
-			variables["Driver"] := variables["User"]
-			
-			return variables
-		}
-	
-		getGrammars(language) {
-			grammars := readConfiguration(getFileName("Race Engineer.grammars." . language, kUserConfigDirectory, kConfigDirectory))
-			
-			if (grammars.Count() == 0)
-				grammars := readConfiguration(getFileName("Race Engineer.grammars.en", kUserConfigDirectory, kConfigDirectory))
-			
-			return grammars
-		}
-		
-		handleVoiceCommand(phrase, words) {
-			this.RaceEngineer.handleVoiceCommand(phrase, words)
-		}
-	}
-	
-	class RaceKnowledgeBase extends KnowledgeBase {
-		iEngineer := false
-		
-		RaceEngineer[] {
-			Get {
-				return this.iRaceEngineer
-			}
-		}
-		
-		__New(raceEngineer, ruleEngine, facts, rules) {
-			this.iRaceEngineer := raceEngineer
-			
-			base.__New(ruleEngine, facts, rules)
-		}
-	}
-	
-	Debug[option] {
-		Get {
-			return (this.iDebug & option)
-		}
-	}
-	
-	Simulator[] {
-		Get {
-			return this.iSimulator
-		}
-	}
-	
-	Session[] {
-		Get {
-			return this.iSession
-		}
-	}
-	
-	KnowledgeBase[] {
-		Get {
-			return this.iKnowledgeBase
-		}
-	}
-	
-	RaceSettings[] {
-		Get {
-			return this.iRaceSettings
-		}
-	}
 	
 	PitstopHandler[] {
 		Get {
@@ -173,45 +47,15 @@ class RaceEngineer extends ConfigurationItem {
 		}
 	}
 	
-	VoiceAssistant[] {
+	AdjustLapTime[] {
 		Get {
-			return this.iVoiceAssistant
-		}
-	}
-	
-	Speaker[] {
-		Get {
-			return this.VoiceAssistant.Speaker
-		}
-	}
-	
-	Listener[] {
-		Get {
-			return this.VoiceAssistant.Listener
-		}
-	}
-	
-	DriverName[] {
-		Get {
-			return this.iDriverName
+			return this.iAdjustLapTime
 		}
 	}
 	
 	EnoughData[] {
 		Get {
 			return this.iEnoughData
-		}
-	}
-	
-	LearningLaps[] {
-		Get {
-			return this.iLearningLaps
-		}
-	}
-	
-	AdjustLapTime[] {
-		Get {
-			return this.iAdjustLapTime
 		}
 	}
 	
@@ -239,9 +83,9 @@ class RaceEngineer extends ConfigurationItem {
 		}
 	}
 	
-	SaveSettings[] {
+	AvgFuelConsumption[] {
 		Get {
-			return this.iSaveSettings
+			return this.iAvgFuelConsumption
 		}
 	}
 	
@@ -263,65 +107,50 @@ class RaceEngineer extends ConfigurationItem {
 		}
 	}
 	
-	SetupDatabase[] {
-		Get {
-			if !this.iSetupDatabase
-				this.iSetupDatabase := new SetupDatabase()
-			
-			return this.iSetupDatabase
-		}
+	__New(configuration, engineerSettings, pitstopHandler := false, name := false, language := "__Undefined__", speaker := false, listener := false, voiceServer := false) {
+		base.__New(configuration, "Race Engineer", engineerSettings, pitstopHandler, name, language, speaker, listener, voiceServer)
 	}
 	
-	__New(configuration, raceSettings, pitstopHandler := false, name := false, language := "__Undefined__", speaker := false, listener := false, voiceServer := false) {
-		this.iDebug := (isDebug() ? kDebugKnowledgeBase : kDebugOff)
-		this.iRaceSettings := raceSettings
-		this.iPitstopHandler := pitstopHandler
+	updateConfigurationValues(values) {
+		base.updateConfigurationValues(values)
+								   
+		if values.HasKey("AdjustLapTime")
+			this.iAdjustLapTime := values["AdjustLapTime"]
 		
-		base.__New(configuration)
+		if values.HasKey("SaveSettings")
+			this.iSaveSettings := values["SaveSettings"]
 		
-		options := this.iOptions
-		
-		if (language != kUndefined) {
-			listener := ((speaker != false) ? listener : false)
-			
-			if (language != false)
-				options["Language"] := language
-			
-			options["Speaker"] := speaker
-			options["Listener"] := listener
-			
-			if (voiceServer && (language != getConfigurationValue(configuration, "Voice Control", "Language", getLanguage())))
-				voiceServer := false
-			
-			options["VoiceServer"] := voiceServer
-		}
-		
-		this.iVoiceAssistant := new this.RaceEngineerVoiceAssistant(this, name, options)
+		if values.HasKey("SaveTyrePressures")
+			this.iSaveTyrePressures := values["SaveTyrePressures"]
 	}
 	
-	loadFromConfiguration(configuration) {
-		base.loadFromConfiguration(configuration)
-		
-		options := this.iOptions
-		
-		options["Language"] := getConfigurationValue(configuration, "Voice Control", "Language", getLanguage())
-		options["Speaker"] := getConfigurationValue(configuration, "Voice Control", "Speaker", true)
-		options["SpeakerVolume"] := getConfigurationValue(configuration, "Voice Control", "SpeakerVolume", 100)
-		options["SpeakerPitch"] := getConfigurationValue(configuration, "Voice Control", "SpeakerPitch", 0)
-		options["SpeakerSpeed"] := getConfigurationValue(configuration, "Voice Control", "SpeakerSpeed", 0)
-		options["Listener"] := getConfigurationValue(configuration, "Voice Control", "Listener", false)
-		options["PushToTalk"] := getConfigurationValue(configuration, "Voice Control", "PushToTalk", false)
+	updateSessionValues(values) {
+		base.updateSessionValues(values)
 	}
 	
-	setDebug(option, enabled) {
-		if enabled
-			this.iDebug := (this.iDebug | option)
-		else if (this.Debug[option] == option)
-			this.iDebug := (this.iDebug - option)
-	}
-	
-	getSpeaker() {
-		return this.VoiceAssistant.getSpeaker()
+	updateDynamicValues(values) {
+		base.updateDynamicValues(values)
+		
+		if values.HasKey("LastLap")
+			this.iLastLap := values["LastLap"]
+		
+		if values.HasKey("OverallTime")
+			this.iOverallTime := values["OverallTime"]
+		
+		if values.HasKey("LastFuelAmount")
+			this.iLastFuelAmount := values["LastFuelAmount"]
+		
+		if values.HasKey("InitialFuelAmount")
+			this.iInitialFuelAmount := values["InitialFuelAmount"]
+		
+		if values.HasKey("AvgFuelConsumption")
+			this.iAvgFuelConsumption := values["AvgFuelConsumption"]
+		
+		if values.HasKey("SetupData")
+			this.iSetupData := values["SetupData"]
+		
+		if values.HasKey("EnoughData")
+			this.iEnoughData := values["EnoughData"]
 	}
 	
 	handleVoiceCommand(grammar, words) {
@@ -398,7 +227,7 @@ class RaceEngineer extends ConfigurationItem {
 				else
 					this.pitstopAdjustRepairRecognized("Bodywork", words)
 			default:
-				Throw "Unknown grammar """ . grammar . """ detected in RaceEngineer.phraseRecognized...."
+				Throw "Unknown grammar """ . grammar . """ detected in RaceEngineer.handleVoiceCommand...."
 		}
 	}
 	
@@ -863,25 +692,24 @@ class RaceEngineer extends ConfigurationItem {
 	createSession(data) {
 		local facts
 		
-		settings := this.RaceSettings
-		
-		this.iDriverName := getConfigurationValue(data, "Stint Data", "DriverForname", this.DriverName)
-		
-		this.iSimulator := this.SetupDatabase.getSimulatorName(getConfigurationValue(data, "Session Data", "Simulator", ""))
-		
-		switch getConfigurationValue(data, "Session Data", "Session", "Practice") {
-			case "Practice":
-				this.iSession := kSessionPractice
-			case "Qualification":
-				this.iSession := kSessionQualification
-			case "Race":
-				this.iSession := kSessionRace
-			default:
-				this.iSession := kSessionOther
-		}
+		settings := this.AssistantSettings
 		
 		simulator := getConfigurationValue(data, "Session Data", "Simulator", "Unknown")
 		simulatorName := this.SetupDatabase.getSimulatorName(simulator)
+		
+		switch getConfigurationValue(data, "Session Data", "Session", "Practice") {
+			case "Practice":
+				session := kSessionPractice
+			case "Qualification":
+				session := kSessionQualification
+			case "Race":
+				session := kSessionRace
+			default:
+				session := kSessionOther
+		}
+		
+		this.updateSessionValues({Simulator: simulatorName, Session: session
+								, Driver: getConfigurationValue(data, "Stint Data", "DriverForname", this.DriverName)})
 		
 		lapTime := getConfigurationValue(data, "Stint Data", "LapLastTime", 0)
 		
@@ -973,9 +801,9 @@ class RaceEngineer extends ConfigurationItem {
 			if !IsObject(settings)
 				settings := readConfiguration(settings)
 			
-			this.iRaceSettings := settings
+			this.iAssistantSettings := settings
 			
-			simulatorName := this.SetupDatabase.getSimulatorName(this.Simulator)
+			simulatorName := this.Simulator
 		
 			facts := {"Session.Settings.Lap.Formation": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.Formation", true)
 					, "Session.Settings.Lap.PostRace": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.PostRace", true)
@@ -1031,39 +859,18 @@ class RaceEngineer extends ConfigurationItem {
 	}
 	
 	startSession(data) {
-		local knowledgeBase
-		local facts
-		
 		if !IsObject(data)
 			data := readConfiguration(data)
 		
-		facts := this.createSession(data)
+		simulatorName := this.Simulator
 		
-		FileRead engineerRules, % getFileName("Race Engineer.rules", kConfigDirectory, kUserConfigDirectory)
+		this.updateConfigurationValues({LearningLaps: getConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", simulatorName . ".LearningLaps", 1)
+									  , AdjustLapTime: getConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", simulatorName . ".AdjustLapTime", true)
+									  , SaveSettings: getConfigurationValue(kSimulatorConfiguration, "Race Engineer Shutdown", simulatorName . ".SaveSettings", kNever)
+									  , SaveTyrePressures: getConfigurationValue(kSimulatorConfiguration, "Race Engineer Shutdown", simulatorName . ".SaveTyrePressures", kAsk)})
 		
-		productions := false
-		reductions := false
-
-		new RuleCompiler().compileRules(engineerRules, productions, reductions)
-
-		engine := new RuleEngine(productions, reductions, facts)
-		
-		knowledgeBase := new this.RaceKnowledgeBase(this, engine, engine.createFacts(), engine.createRules())
-		
-		this.iKnowledgeBase := knowledgeBase
-		this.iLastLap := 0
-		this.iOverallTime := 0
-		this.iLastFuelAmount := 0
-		this.iInitialFuelAmount := 0
-		this.iEnoughData := false
-		this.iSetupData := {}
-		
-		simulatorName := this.SetupDatabase.getSimulatorName(this.Simulator)
-		
-		this.iLearningLaps := getConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", simulatorName . ".LearningLaps", 1)
-		this.iAdjustLapTime := getConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", simulatorName . ".AdjustLapTime", true)
-		this.iSaveSettings := getConfigurationValue(kSimulatorConfiguration, "Race Engineer Shutdown", simulatorName . ".SaveSettings", kNever)
-		this.iSaveTyrePressures := getConfigurationValue(kSimulatorConfiguration, "Race Engineer Shutdown", simulatorName . ".SaveTyrePressures", kAsk)
+		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(this.createSession(data)), SetupData: {}
+								, LastLap: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
 		
 		if this.Speaker
 			this.getSpeaker().speakPhrase("Greeting")
@@ -1073,11 +880,7 @@ class RaceEngineer extends ConfigurationItem {
 	}
 	
 	finishSession() {
-		this.iLastLap := 0
-		this.iOverallTime := 0
-		this.iLastFuelAmount := 0
-		this.iInitialFuelAmount := 0
-		this.iEnoughData := false
+		this.updateDynamicValues({LastLap: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
 			
 		if this.KnowledgeBase {
 			if this.Speaker
@@ -1096,22 +899,19 @@ class RaceEngineer extends ConfigurationItem {
 					SetTimer %callback%, -60000
 				}
 				else
-					this.iKnowledgeBase := false
+					this.updateDynamicValues({KnowledgeBase: false})
 			}
 			else
-				this.iKnowledgeBase := false
+				this.updateDynamicValues({KnowledgeBase: false})
 		}
-			
-		this.iSimulator := ""
-		this.iSession := kSessionFinished
+		
+		this.updateSessionValues({Simulator: "", Session: kSessionFinished})
 	}
 	
 	forceFinishSession() {
 		if !this.SessionDataActive {
-			this.iKnowledgeBase := false
-			this.iSetupData := {}
-			this.iSimulator := ""
-			this.iSession := kSessionFinished
+			this.updateSessionValues({Simulator: "", Session: kSessionFinished})
+			this.updateSessionValues({KnowledgeBase: false, SetupData: {}})
 		}	
 	}
 	
@@ -1136,7 +936,7 @@ class RaceEngineer extends ConfigurationItem {
 		if !this.InitialFuelAmount
 			baseLap := lapNumber
 		
-		this.iEnoughData := (lapNumber > (baseLap + (this.LearningLaps - 1)))
+		this.updateDynamicValues({EnoughData: (lapNumber > (baseLap + (this.LearningLaps - 1)))})
 		
 		knowledgeBase.setFact("Session.Time.Remaining", getDeprecatedConfigurationValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0))
 		knowledgeBase.setFact("Session.Lap.Remaining", getDeprecatedConfigurationValue(data, "Session Data", "Stint Data", "SessionLapsRemaining", 0))
@@ -1145,7 +945,7 @@ class RaceEngineer extends ConfigurationItem {
 		driverSurname := getConfigurationValue(data, "Stint Data", "DriverSurname", "Doe")
 		driverNickname := getConfigurationValue(data, "Stint Data", "DriverNickname", "JD")
 		
-		this.iDriverName := driverForname
+		this.updateSessionValues({Driver: driverForname})
 			
 		knowledgeBase.addFact("Lap." . lapNumber . ".Driver.Forname", driverForname)
 		knowledgeBase.addFact("Lap." . lapNumber . ".Driver.Surname", driverSurname)
@@ -1182,7 +982,7 @@ class RaceEngineer extends ConfigurationItem {
 		lapTime := getConfigurationValue(data, "Stint Data", "LapLastTime", 0)
 		
 		if ((lapNumber <= 2) && knowledgeBase.getValue("Session.Settings.Lap.Time.Adjust", false)) {
-			settingsLapTime := (getDeprecatedConfigurationValue(this.RaceSettings, "Session Settings", "Race Settings", "Lap.AvgTime", lapTime / 1000) * 1000)
+			settingsLapTime := (getDeprecatedConfigurationValue(this.AssistantSettings, "Session Settings", "Race Settings", "Lap.AvgTime", lapTime / 1000) * 1000)
 			
 			if ((lapTime / settingsLapTime) > 2)
 				lapTime := settingsLapTime
@@ -1196,38 +996,36 @@ class RaceEngineer extends ConfigurationItem {
 		knowledgeBase.addFact("Lap." . lapNumber . ".Time", lapTime)
 		knowledgeBase.addFact("Lap." . lapNumber . ".Time.Start", this.OverallTime)
 		
-		this.iOverallTime := this.OverallTime + lapTime
+		overallTime := (this.OverallTime + lapTime)
 		
-		knowledgeBase.addFact("Lap." . lapNumber . ".Time.End", this.OverallTime)
+		this.updateDynamicValues({OverallTime: overallTime})
+		
+		knowledgeBase.addFact("Lap." . lapNumber . ".Time.End", overallTime)
 		
 		fuelRemaining := getConfigurationValue(data, "Car Data", "FuelRemaining", 0)
 		
 		knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.Remaining", Round(fuelRemaining, 2))
 		
-		this.iAvgFuelConsumption := 0
-		
 		if (lapNumber == 1) {
-			this.iInitialFuelAmount := fuelRemaining
-			this.iLastFuelAmount := fuelRemaining
+			this.updateDynamicValues({LastFuelAmount: fuelRemaining, InitialFuelAmount: fuelRemaining, AvgFuelConsumption: 0})
 			
 			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.AvgConsumption", 0)
 			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.Consumption", 0)
 		}
-		else if (!this.InitialFuelAmount || (fuelRemaining > this.iLastFuelAmount)) {
+		else if (!this.InitialFuelAmount || (fuelRemaining > this.LastFuelAmount)) {
 			; This is the case after a pitstop
-			this.iInitialFuelAmount := fuelRemaining
-			this.iLastFuelAmount := fuelRemaining
+			this.updateDynamicValues({LastFuelAmount: fuelRemaining, InitialFuelAmount: fuelRemaining, AvgFuelConsumption: 0})
 			
 			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.AvgConsumption", knowledgeBase.getValue("Lap." . (lapNumber - 1) . ".Fuel.AvgConsumption", 0))
 			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.Consumption", knowledgeBase.getValue("Lap." . (lapNumber - 1) . ".Fuel.Consumption", 0))
 		}
 		else {
-			this.iAvgFuelConsumption := Round((this.InitialFuelAmount - fuelRemaining) / (lapNumber - baseLap), 2)
+			avgFuelConsumption := Round((this.InitialFuelAmount - fuelRemaining) / (lapNumber - baseLap), 2)
 			
-			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.AvgConsumption", this.iAvgFuelConsumption)
+			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.AvgConsumption", avgFuelConsumption)
 			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.Consumption", Round(this.LastFuelAmount - fuelRemaining, 2))
 			
-			this.iLastFuelAmount := fuelRemaining
+			this.updateDynamicValues({LastFuelAmount: fuelRemaining, AvgFuelConsumption: avgFuelConsumption})
 		}
 		
 		tyrePressures := string2Values(",", getConfigurationValue(data, "Car Data", "TyrePressure", ""))
@@ -1433,7 +1231,7 @@ class RaceEngineer extends ConfigurationItem {
 			track := knowledgeBase.getValue("Session.Track")
 			duration := knowledgeBase.getValue("Session.Duration")
 			
-			this.SetupDatabase.updateSettings(simulator, car, track, duration, Round(this.iLapTime / 1000), this.iAvgFuelConsumption)
+			this.SetupDatabase.updateSettings(simulator, car, track, duration, Round(this.iLapTime / 1000), this.AvgFuelConsumption)
 		}
 	}
 
@@ -1467,16 +1265,6 @@ class RaceEngineer extends ConfigurationItem {
 		}
 		
 		this.iSetupData := {}
-	}
-	
-	hasEnoughData() {
-		if this.EnoughData
-			return true
-		else if this.Speaker {
-			this.getSpeaker().speakPhrase("Later")
-			
-			return false
-		}
 	}
 	
 	hasPlannedPitstop() {
@@ -1672,9 +1460,7 @@ class RaceEngineer extends ConfigurationItem {
 		
 		result := this.KnowledgeBase.produce()
 		
-		this.iEnoughData := false
-		this.iLastFuelAmount := 0
-		this.iInitialFuelAmount := 0
+		this.updateDynamicValues({LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
 		
 		if this.Debug[kDebugKnowledgeBase]
 			dumpKnowledge(this.KnowledgeBase)
@@ -1937,19 +1723,4 @@ setupTyrePressures(context, weather, airTemperature, trackTemperature, compound,
 	}
 	else
 		return false
-}
-
-dumpKnowledge(knowledgeBase) {
-	try {
-		FileDelete %kTempDirectory%Race Engineer.knowledge
-	}
-	catch exception {
-		; ignore
-	}
-
-	for key, value in knowledgeBase.Facts.Facts {
-		text := key . " = " . value . "`n"
-	
-		FileAppend %text%, %kTempDirectory%Race Engineer.knowledge
-	}
 }

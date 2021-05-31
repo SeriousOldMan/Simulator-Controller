@@ -59,7 +59,7 @@ showLogo() {
 
 	SysGet mainScreen, MonitorWorkArea
 	
-	x := mainScreenRight - 299
+	x := mainScreenLeft
 	y := mainScreenBottom - 234
 
 	title1 := translate("Modular Simulator Controller System")

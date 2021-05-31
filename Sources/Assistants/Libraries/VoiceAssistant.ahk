@@ -255,7 +255,7 @@ class VoiceAssistant {
 		}
 	}
 	
-	__New(name, options) { ; language := "__Undefined__", speaker := false, listener := false, voiceServer := false) {
+	__New(name, options) {
 		this.iName := name
 		
 		this.initialize(options)

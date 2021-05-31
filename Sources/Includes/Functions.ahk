@@ -531,7 +531,7 @@ startTrayMessageManager() {
 requestShareSetupDatabaseConsent() {
 	program := StrSplit(A_ScriptName, ".")[1]
 	
-	if ((program = "Simulator Startup") || (program = "Simulator Configuration")) {
+	if ((program = "Simulator Startup") || (program = "Simulator Configuration") || (program = "Simulator Settings")) {
 		idFileName := kUserConfigDirectory . "ID"
 		
 		FileReadLine id, %idFileName%, 1

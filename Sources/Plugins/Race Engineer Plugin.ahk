@@ -10,7 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Plugins\Libraries\SimulatorPlugin.ahk
-#Include ..\Engineer\Libraries\SetupDatabase.ahk
+#Include ..\Assistants\Libraries\SetupDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -50,7 +50,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 		}
 		
 		callRemote(function, arguments*) {
-			raiseEvent(kFileMessage, "Race", function . ":" . values2String(";", arguments*), this.RemotePID)
+			raiseEvent(kFileMessage, "Engineer", function . ":" . values2String(";", arguments*), this.RemotePID)
 		}
 		
 		shutdown(arguments*) {

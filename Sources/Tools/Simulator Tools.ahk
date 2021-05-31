@@ -355,7 +355,7 @@ editTargets(command := "") {
 		Gui TE:Font, Italic, Arial
 		
 		if (vUpdateSettings.Count() > 0) {
-			updateHeight := 20 + (Min(vupdateSettings.Count(), 1) * 20)
+			updateHeight := (20 + (Min(vUpdateSettings.Count(), 1) * 20))
 			
 			if (updateHeight == 20)
 				updateHeight := 40

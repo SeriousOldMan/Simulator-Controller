@@ -3,7 +3,6 @@
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2021) Creative Commons - BY-NC-SA                        ;;;
-;;;   License:    (2021) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -37,7 +36,7 @@ ListLines Off					; Disable execution history
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Libraries\RuleEngine.ahk
-#Include ..\Engineer\Libraries\RaceEngineer.ahk
+#Include ..\Assistants\Libraries\RaceEngineer.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -210,7 +209,7 @@ startRaceEngineer() {
 											, remotePID ? new RemotePitstopHandler(remotePID) : false
 											, engineerName, engineerLanguage, engineerSpeaker, engineerListener, voiceServer)
 	
-	registerEventHandler("Race", "handleRaceRemoteCalls")
+	registerEventHandler("Engineer", "handleEngineerRemoteCalls")
 	
 	if engineerLogo
 		showLogo()
@@ -234,7 +233,7 @@ shutdownRaceEngineer() {
 		SetTimer shutdownRaceEngineer, -1000
 }
 
-handleRaceRemoteCalls(event, data) {
+handleEngineerRemoteCalls(event, data) {
 	if InStr(data, ":") {
 		data := StrSplit(data, ":", , 2)
 		

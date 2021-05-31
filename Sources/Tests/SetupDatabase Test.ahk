@@ -25,7 +25,7 @@ SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Engineer\Libraries\SetupDatabase.ahk
+#Include ..\Assistants\Libraries\SetupDatabase.ahk
 #Include AHKUnit\AHKUnit.ahk
 
 

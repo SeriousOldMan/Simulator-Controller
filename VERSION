@@ -1,8 +1,8 @@
 [Development]
 Version=3.0.8-dev
 Target=3.0.8-release
-Date=05/28/2021
-Changes=
+Date=05/30/2021
+Changes=Refactoring for multiple Voice Assistants, Initial version of Race Strategist Assistent
 [Release]
 Version=3.0.6-release
 Date=05/28/2021

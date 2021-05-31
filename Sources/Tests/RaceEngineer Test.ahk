@@ -27,7 +27,7 @@ SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Libraries\RuleEngine.ahk
-#Include ..\Engineer\Libraries\RaceEngineer.ahk
+#Include ..\Assistants\Libraries\RaceEngineer.ahk
 #Include AHKUnit\AHKUnit.ahk
 
 
@@ -873,7 +873,7 @@ if !GetKeyState("Ctrl") {
 else {
 	raceNr := (GetKeyState("Alt") ? 12 : ((GetKeyState("Shift") ? 2 : 1)))
 	engineer := new TestRaceEngineer(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Engineer.settings")
-								   , new TestPitStopHandler(), "Jona", "de", true, false)
+								   , new TestPitStopHandler(), "Jona", "de", true, true)
 
 	engineer.setDebug(kDebugPhrases, false)
 	

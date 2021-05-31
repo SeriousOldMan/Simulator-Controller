@@ -1,5 +1,5 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - AI Race Engineer                ;;;
+;;;   Modular Simulator Controller System - AI Race Strategist              ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2021) Creative Commons - BY-NC-SA                        ;;;
@@ -19,7 +19,7 @@
 #Include ..\Libraries\RuleEngine.ahk
 #Include ..\Libraries\SpeechGenerator.ahk
 #Include ..\Libraries\SpeechRecognizer.ahk
-#Include ..\Engineer\Libraries\SetupDatabase.ahk
+#Include ..\Assistants\Libraries\SetupDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -49,7 +49,7 @@ global kNever = "Never"
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class RaceEngineer extends ConfigurationItem {
+class RaceStrategist extends ConfigurationItem {
 	iDebug := kDebugOff
 
 	iPitstopHandler := false
@@ -101,7 +101,7 @@ class RaceEngineer extends ConfigurationItem {
 	
 	iSetupDatabase := false
 	
-	class RemoteEngineerListener {
+	class RemoteStrategistListener {
 		iListener := false
 		iLanguage := false
 		
@@ -111,17 +111,17 @@ class RaceEngineer extends ConfigurationItem {
 		}
 	}
 	
-	class RemoteEngineerSpeaker {
-		iEngineer := false
+	class RemoteStrategistSpeaker {
+		iStrategist := false
 		iFragments := {}
 		iPhrases := {}
 		
 		iSpeaker := false
 		iLanguage := false
 		
-		Engineer[] {
+		Strategist[] {
 			Get {
-				return this.iEngineer
+				return this.iStrategist
 			}
 		}
 		
@@ -137,8 +137,8 @@ class RaceEngineer extends ConfigurationItem {
 			}
 		}
 		
-		__New(engineer, speaker, language, fragments, phrases) {
-			this.iEngineer := engineer
+		__New(strategist, speaker, language, fragments, phrases) {
+			this.iStrategist := strategist
 			this.iFragments := fragments
 			this.iPhrases := phrases
 			
@@ -147,7 +147,7 @@ class RaceEngineer extends ConfigurationItem {
 		}
 		
 		speak(text) {
-			raiseEvent(kFileMessage, "Voice", "speakWith:" . values2String(";", this.iSpeaker, this.iLanguage, text), this.Engineer.VoiceServer)
+			raiseEvent(kFileMessage, "Voice", "speakWith:" . values2String(";", this.iSpeaker, this.iLanguage, text), this.Strategist.VoiceServer)
 		}
 		
 		speakPhrase(phrase, variables := false) {
@@ -163,11 +163,11 @@ class RaceEngineer extends ConfigurationItem {
 				if variables {
 					variables := variables.Clone()
 					
-					variables["name"] := this.Engineer.Name
-					variables["driver"] := this.Engineer.DriverName
+					variables["name"] := this.Strategist.Name
+					variables["driver"] := this.Strategist.DriverName
 				}
 				else
-					variables := {name: this.Engineer.Name, driver: this.Engineer.DriverName}
+					variables := {name: this.Strategist.Name, driver: this.Strategist.DriverName}
 				
 				phrase := substituteVariables(phrase, variables)
 			}
@@ -177,14 +177,14 @@ class RaceEngineer extends ConfigurationItem {
 		}
 	}
 	
-	class LocalEngineerSpeaker extends SpeechGenerator {
-		iEngineer := false
+	class LocalStrategistSpeaker extends SpeechGenerator {
+		iStrategist := false
 		iFragments := {}
 		iPhrases := {}
 		
-		Engineer[] {
+		Strategist[] {
 			Get {
-				return this.iEngineer
+				return this.iStrategist
 			}
 		}
 		
@@ -200,8 +200,8 @@ class RaceEngineer extends ConfigurationItem {
 			}
 		}
 		
-		__New(engineer, speaker, language, fragments, phrases) {
-			this.iEngineer := engineer
+		__New(strategist, speaker, language, fragments, phrases) {
+			this.iStrategist := strategist
 			this.iFragments := fragments
 			this.iPhrases := phrases
 			
@@ -209,7 +209,7 @@ class RaceEngineer extends ConfigurationItem {
 		}
 		
 		speak(text) {
-			stopped := this.Engineer.stopListening()
+			stopped := this.Strategist.stopListening()
 			
 			try {
 				this.iIsSpeaking := true
@@ -222,8 +222,8 @@ class RaceEngineer extends ConfigurationItem {
 				}
 			}
 			finally {
-				if (stopped && !this.Engineer.PushTalk)
-					this.Engineer.startListening()
+				if (stopped && !this.Strategist.PushTalk)
+					this.Strategist.startListening()
 			}
 		}
 		
@@ -240,11 +240,11 @@ class RaceEngineer extends ConfigurationItem {
 				if variables {
 					variables := variables.Clone()
 					
-					variables["name"] := this.Engineer.Name
-					variables["driver"] := this.Engineer.DriverName
+					variables["name"] := this.Strategist.Name
+					variables["driver"] := this.Strategist.DriverName
 				}
 				else
-					variables := {name: this.Engineer.Name, driver: this.Engineer.DriverName}
+					variables := {name: this.Strategist.Name, driver: this.Strategist.DriverName}
 				
 				phrase := substituteVariables(phrase, variables)
 			}
@@ -255,16 +255,16 @@ class RaceEngineer extends ConfigurationItem {
 	}
 	
 	class RaceKnowledgeBase extends KnowledgeBase {
-		iEngineer := false
+		iStrategist := false
 		
-		RaceEngineer[] {
+		RaceStrategist[] {
 			Get {
-				return this.iRaceEngineer
+				return this.iRaceStrategist
 			}
 		}
 		
-		__New(raceEngineer, ruleEngine, facts, rules) {
-			this.iRaceEngineer := raceEngineer
+		__New(raceStrategist, ruleEngine, facts, rules) {
+			this.iRaceStrategist := raceStrategist
 			
 			base.__New(ruleEngine, facts, rules)
 		}
@@ -506,10 +506,10 @@ class RaceEngineer extends ConfigurationItem {
 	getSpeaker() {
 		if (this.Speaker && !this.iSpeechGenerator) {
 			if this.VoiceServer
-				this.iSpeechGenerator := new this.RemoteEngineerSpeaker(this, this.Speaker, this.Language
+				this.iSpeechGenerator := new this.RemoteStrategistSpeaker(this, this.Speaker, this.Language
 																	  , this.buildFragments(this.Language), this.buildPhrases(this.Language))
 			else {
-				this.iSpeechGenerator := new this.LocalEngineerSpeaker(this, this.Speaker, this.Language
+				this.iSpeechGenerator := new this.LocalStrategistSpeaker(this, this.Speaker, this.Language
 																	 , this.buildFragments(this.Language), this.buildPhrases(this.Language))
 			
 				this.iSpeechGenerator.setVolume(this.iSpeakerVolume)
@@ -587,10 +587,10 @@ class RaceEngineer extends ConfigurationItem {
 	buildFragments(language) {
 		fragments := {}
 		
-		settings := readConfiguration(getFileName("Race Engineer.grammars." . language, kUserConfigDirectory, kConfigDirectory))
+		settings := readConfiguration(getFileName("Race Strategist.grammars." . language, kUserConfigDirectory, kConfigDirectory))
 		
 		if (settings.Count() == 0)
-			settings := readConfiguration(getFileName("Race Engineer.grammars.en", kUserConfigDirectory, kConfigDirectory))
+			settings := readConfiguration(getFileName("Race Strategist.grammars.en", kUserConfigDirectory, kConfigDirectory))
 		
 		for fragment, word in getConfigurationSectionValues(settings, "Fragments", {})
 			fragments[fragment] := word
@@ -601,10 +601,10 @@ class RaceEngineer extends ConfigurationItem {
 	buildPhrases(language) {
 		phrases := {}
 		
-		settings := readConfiguration(getFileName("Race Engineer.grammars." . language, kUserConfigDirectory, kConfigDirectory))
+		settings := readConfiguration(getFileName("Race Strategist.grammars." . language, kUserConfigDirectory, kConfigDirectory))
 		
 		if (settings.Count() == 0)
-			settings := readConfiguration(getFileName("Race Engineer.grammars.en", kUserConfigDirectory, kConfigDirectory))
+			settings := readConfiguration(getFileName("Race Strategist.grammars.en", kUserConfigDirectory, kConfigDirectory))
 		
 		for key, value in getConfigurationSectionValues(settings, "Speaker Phrases", {}) {
 			key := ConfigurationItem.splitDescriptor(key)[1]
@@ -619,10 +619,10 @@ class RaceEngineer extends ConfigurationItem {
 	}
 	
 	buildGrammars(speechRecognizer, language) {
-		settings := readConfiguration(getFileName("Race Engineer.grammars." . language, kUserConfigDirectory, kConfigDirectory))
+		settings := readConfiguration(getFileName("Race Strategist.grammars." . language, kUserConfigDirectory, kConfigDirectory))
 		
 		if (settings.Count() == 0)
-			settings := readConfiguration(getFileName("Race Engineer.grammars.en", kUserConfigDirectory, kConfigDirectory))
+			settings := readConfiguration(getFileName("Race Strategist.grammars.en", kUserConfigDirectory, kConfigDirectory))
 		
 		for name, choices in getConfigurationSectionValues(settings, "Choices", {})
 			if speechRecognizer
@@ -774,7 +774,7 @@ class RaceEngineer extends ConfigurationItem {
 					else
 						this.pitstopAdjustRepairRecognized("Bodywork", words)
 				default:
-					Throw "Unknown grammar """ . grammar . """ detected in RaceEngineer.phraseRecognized...."
+					Throw "Unknown grammar """ . grammar . """ detected in RaceStrategist.phraseRecognized...."
 			}
 		}
 		finally {
@@ -1307,8 +1307,8 @@ class RaceEngineer extends ConfigurationItem {
 				, "Session.Settings.Fuel.SafetyMargin": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Fuel.SafetyMargin", 5)
 				, "Session.Settings.Lap.PitstopWarning": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.PitstopWarning", 5)
 				, "Session.Settings.Lap.AvgTime": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.AvgTime", 0)
-				, "Session.Settings.Lap.History.Considered": getConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", simulatorName . ".ConsideredHistoryLaps", 5)
-				, "Session.Settings.Lap.History.Damping": getConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", simulatorName . ".HistoryLapsDamping", 0.2)
+				, "Session.Settings.Lap.History.Considered": getConfigurationValue(kSimulatorConfiguration, "Race Strategist Analysis", simulatorName . ".ConsideredHistoryLaps", 5)
+				, "Session.Settings.Lap.History.Damping": getConfigurationValue(kSimulatorConfiguration, "Race Strategist Analysis", simulatorName . ".HistoryLapsDamping", 0.2)
 				, "Session.Settings.Damage.Suspension.Repair": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Damage.Suspension.Repair", "Always")
 				, "Session.Settings.Damage.Suspension.Repair.Threshold": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Damage.Suspension.Repair.Threshold", 0)
 				, "Session.Settings.Damage.Bodywork.Repair": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Damage.Bodywork.Repair", "Threshold")
@@ -1342,8 +1342,8 @@ class RaceEngineer extends ConfigurationItem {
 		facts["Session.Setup.Tyre.Compound"] := getConfigurationValue(data, "Car Data", "TyreCompound", getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Compound", "Dry"))
 		facts["Session.Setup.Tyre.Compound.Color"] := getConfigurationValue(data, "Car Data", "TyreCompoundColor", getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Compound.Color", "Black"))
 		
-		facts["Session.Settings.Damage.Analysis.Laps"] := getConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", simulatorName . ".DamageAnalysisLaps", 1)
-		facts["Session.Settings.Lap.Learning.Laps"] := getConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", simulatorName . ".LearningLaps", 1)
+		facts["Session.Settings.Damage.Analysis.Laps"] := getConfigurationValue(kSimulatorConfiguration, "Race Strategist Analysis", simulatorName . ".DamageAnalysisLaps", 1)
+		facts["Session.Settings.Lap.Learning.Laps"] := getConfigurationValue(kSimulatorConfiguration, "Race Strategist Analysis", simulatorName . ".LearningLaps", 1)
 		facts["Session.Settings.Lap.Time.Adjust"] := this.AdjustLapTime
 				
 		return facts
@@ -1368,8 +1368,8 @@ class RaceEngineer extends ConfigurationItem {
 					, "Session.Settings.Fuel.SafetyMargin": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Fuel.SafetyMargin", 5)
 					, "Session.Settings.Lap.PitstopWarning": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.PitstopWarning", 5)
 					, "Session.Settings.Lap.AvgTime": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.AvgTime", 0)
-					, "Session.Settings.Lap.History.Considered": getConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", simulatorName . ".ConsideredHistoryLaps", 5)
-					, "Session.Settings.Lap.History.Damping": getConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", simulatorName . ".HistoryLapsDamping", 0.2)
+					, "Session.Settings.Lap.History.Considered": getConfigurationValue(kSimulatorConfiguration, "Race Strategist Analysis", simulatorName . ".ConsideredHistoryLaps", 5)
+					, "Session.Settings.Lap.History.Damping": getConfigurationValue(kSimulatorConfiguration, "Race Strategist Analysis", simulatorName . ".HistoryLapsDamping", 0.2)
 					, "Session.Settings.Damage.Suspension.Repair": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Damage.Suspension.Repair", "Always")
 					, "Session.Settings.Damage.Suspension.Repair.Threshold": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Damage.Suspension.Repair.Threshold", 0)
 					, "Session.Settings.Damage.Bodywork.Repair": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Damage.Bodywork.Repair", "Threshold")
@@ -1402,8 +1402,8 @@ class RaceEngineer extends ConfigurationItem {
 			facts["Session.Settings.Tyre.Pressure.Correction.Temperature"] := getConfigurationValue(settings, "Session Settings", "Tyre.Pressure.Correction.Temperature", true)
 			facts["Session.Settings.Tyre.Pressure.Correction.Setup"] := getConfigurationValue(settings, "Session Settings", "Tyre.Pressure.Correction.Setup", true)
 			
-			facts["Session.Settings.Damage.Analysis.Laps"] := getConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", simulatorName . ".DamageAnalysisLaps", 1)
-			facts["Session.Settings.Lap.Learning.Laps"] := getConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", simulatorName . ".LearningLaps", 1)
+			facts["Session.Settings.Damage.Analysis.Laps"] := getConfigurationValue(kSimulatorConfiguration, "Race Strategist Analysis", simulatorName . ".DamageAnalysisLaps", 1)
+			facts["Session.Settings.Lap.Learning.Laps"] := getConfigurationValue(kSimulatorConfiguration, "Race Strategist Analysis", simulatorName . ".LearningLaps", 1)
 			facts["Session.Settings.Lap.Time.Adjust"] := this.AdjustLapTime
 			
 			for key, value in facts
@@ -1423,12 +1423,12 @@ class RaceEngineer extends ConfigurationItem {
 		
 		facts := this.createSession(data)
 		
-		FileRead engineerRules, % getFileName("Race Engineer.rules", kConfigDirectory, kUserConfigDirectory)
+		FileRead strategistRules, % getFileName("Race Strategist.rules", kConfigDirectory, kUserConfigDirectory)
 		
 		productions := false
 		reductions := false
 
-		new RuleCompiler().compileRules(engineerRules, productions, reductions)
+		new RuleCompiler().compileRules(strategistRules, productions, reductions)
 
 		engine := new RuleEngine(productions, reductions, facts)
 		
@@ -1444,10 +1444,10 @@ class RaceEngineer extends ConfigurationItem {
 		
 		simulatorName := this.SetupDatabase.getSimulatorName(this.Simulator)
 		
-		this.iLearningLaps := getConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", simulatorName . ".LearningLaps", 1)
-		this.iAdjustLapTime := getConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", simulatorName . ".AdjustLapTime", true)
-		this.iSaveSettings := getConfigurationValue(kSimulatorConfiguration, "Race Engineer Shutdown", simulatorName . ".SaveSettings", kNever)
-		this.iSaveTyrePressures := getConfigurationValue(kSimulatorConfiguration, "Race Engineer Shutdown", simulatorName . ".SaveTyrePressures", kAsk)
+		this.iLearningLaps := getConfigurationValue(kSimulatorConfiguration, "Race Strategist Analysis", simulatorName . ".LearningLaps", 1)
+		this.iAdjustLapTime := getConfigurationValue(kSimulatorConfiguration, "Race Strategist Analysis", simulatorName . ".AdjustLapTime", true)
+		this.iSaveSettings := getConfigurationValue(kSimulatorConfiguration, "Race Strategist Shutdown", simulatorName . ".SaveSettings", kNever)
+		this.iSaveTyrePressures := getConfigurationValue(kSimulatorConfiguration, "Race Strategist Shutdown", simulatorName . ".SaveTyrePressures", kAsk)
 		
 		if this.Speaker
 			this.getSpeaker().speakPhrase("Greeting")
@@ -2226,67 +2226,67 @@ getDeprecatedConfigurationValue(data, newSection, oldSection, key, default := fa
 }
 
 lowFuelWarning(context, remainingLaps) {
-	context.KnowledgeBase.RaceEngineer.lowFuelWarning(Round(remainingLaps))
+	context.KnowledgeBase.RaceStrategist.lowFuelWarning(Round(remainingLaps))
 	
 	return true
 }
 
 damageWarning(context, newSuspensionDamage, newBodyworkDamage) {
-	context.KnowledgeBase.RaceEngineer.damageWarning(newSuspensionDamage, newBodyworkDamage)
+	context.KnowledgeBase.RaceStrategist.damageWarning(newSuspensionDamage, newBodyworkDamage)
 	
 	return true
 }
 
 reportDamageAnalysis(context, repair, stintLaps, delta) {
-	context.KnowledgeBase.RaceEngineer.reportDamageAnalysis(repair, stintLaps, delta)
+	context.KnowledgeBase.RaceStrategist.reportDamageAnalysis(repair, stintLaps, delta)
 	
 	return true
 }
 
 weatherChangeNotification(context, change, minutes) {
-	context.KnowledgeBase.RaceEngineer.weatherChangeNotification(change, minutes)
+	context.KnowledgeBase.RaceStrategist.weatherChangeNotification(change, minutes)
 	
 	return true
 }
 
 weatherTyreChangeRecommendation(context, minutes, recommendedCompound) {
-	context.KnowledgeBase.RaceEngineer.weatherTyreChangeRecommendation(minutes, recommendedCompound)
+	context.KnowledgeBase.RaceStrategist.weatherTyreChangeRecommendation(minutes, recommendedCompound)
 	
 	return true
 }
 
 startPitstopSetup(context, pitstopNumber) {
-	context.KnowledgeBase.RaceEngineer.startPitstopSetup(pitstopNumber)
+	context.KnowledgeBase.RaceStrategist.startPitstopSetup(pitstopNumber)
 	
 	return true
 }
 
 finishPitstopSetup(context, pitstopNumber) {
-	context.KnowledgeBase.RaceEngineer.finishPitstopSetup(pitstopNumber)
+	context.KnowledgeBase.RaceStrategist.finishPitstopSetup(pitstopNumber)
 	
 	return true
 }
 
 setPitstopRefuelAmount(context, pitstopNumber, litres) {
-	context.KnowledgeBase.RaceEngineer.setPitstopRefuelAmount(pitstopNumber, litres)
+	context.KnowledgeBase.RaceStrategist.setPitstopRefuelAmount(pitstopNumber, litres)
 	
 	return true
 }
 
 setPitstopTyreSet(context, pitstopNumber, compound, compoundColor, set) {
-	context.KnowledgeBase.RaceEngineer.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
+	context.KnowledgeBase.RaceStrategist.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
 	
 	return true
 }
 
 setPitstopTyrePressures(context, pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
-	context.KnowledgeBase.RaceEngineer.setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR)
+	context.KnowledgeBase.RaceStrategist.setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR)
 	
 	return true
 }
 
 requestPitstopRepairs(context, pitstopNumber, repairSuspension, repairBodywork) {
-	context.KnowledgeBase.RaceEngineer.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork)
+	context.KnowledgeBase.RaceStrategist.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork)
 	
 	return true
 }
@@ -2305,7 +2305,7 @@ setupTyrePressures(context, weather, airTemperature, trackTemperature, compound,
 	airTemperature := Round(airTemperature)
 	trackTemperature := Round(trackTemperature)
 	
-	if context.KnowledgeBase.RaceEngineer.getTyrePressures(weather, airTemperature, trackTemperature, compound, compoundColor, pressures, certainty) {
+	if context.KnowledgeBase.RaceStrategist.getTyrePressures(weather, airTemperature, trackTemperature, compound, compoundColor, pressures, certainty) {
 		knowledgeBase.setFact("Tyre.Setup.Certainty", certainty)
 		knowledgeBase.setFact("Tyre.Setup.Compound", compound)
 		knowledgeBase.setFact("Tyre.Setup.Compound.Color", compoundColor)
@@ -2325,7 +2325,7 @@ setupTyrePressures(context, weather, airTemperature, trackTemperature, compound,
 
 dumpKnowledge(knowledgeBase) {
 	try {
-		FileDelete %kTempDirectory%Race Engineer.knowledge
+		FileDelete %kTempDirectory%Race Strategist.knowledge
 	}
 	catch exception {
 		; ignore
@@ -2334,6 +2334,6 @@ dumpKnowledge(knowledgeBase) {
 	for key, value in knowledgeBase.Facts.Facts {
 		text := key . " = " . value . "`n"
 	
-		FileAppend %text%, %kTempDirectory%Race Engineer.knowledge
+		FileAppend %text%, %kTempDirectory%Race Strategist.knowledge
 	}
 }

@@ -35,7 +35,7 @@ ListLines Off					; Disable execution history
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Engineer\Libraries\SetupDatabase.ahk
+#Include ..\Assistants\Libraries\SetupDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;

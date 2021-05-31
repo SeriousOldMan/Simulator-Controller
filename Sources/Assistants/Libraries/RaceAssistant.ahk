@@ -92,7 +92,7 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	
 		getGrammars(language) {
-			prefix := this.RaceAssistant.RaceAssistantType . ".grammars."
+			prefix := this.RaceAssistant.AssistantType . ".grammars."
 			
 			grammars := readConfiguration(getFileName(prefix . language, kUserConfigDirectory, kConfigDirectory))
 			
@@ -210,7 +210,7 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 	
-	__New(configuration, assistantType, assistantSettings, pitstopHandler := false, name := false, language := "__Undefined__", speaker := false, listener := false, voiceServer := false) {
+	__New(configuration, assistantType, assistantSettings, name := false, language := "__Undefined__", speaker := false, listener := false, voiceServer := false) {
 		this.iDebug := (isDebug() ? kDebugKnowledgeBase : kDebugOff)
 		this.iAssistantType := assistantType
 		this.iAssistantSettings := assistantSettings
@@ -234,7 +234,7 @@ class RaceAssistant extends ConfigurationItem {
 			options["VoiceServer"] := voiceServer
 		}
 		
-		this.iVoiceAssistant := new this.RaceAssistantVoiceAssistant(this, name, options)
+		this.iVoiceAssistant := new this.RaceVoiceAssistant(this, name, options)
 	}
 	
 	loadFromConfiguration(configuration) {
@@ -273,7 +273,7 @@ class RaceAssistant extends ConfigurationItem {
 	}
 	
 	createKnowledgeBase(facts) {
-		fileName := this.RaceAssistant.RaceAssistantType . ".rules"
+		fileName := this.AssistantType . ".rules"
 		
 		FileRead engineerRules, % getFileName(fileName, kConfigDirectory, kUserConfigDirectory)
 		
@@ -307,23 +307,21 @@ class RaceAssistant extends ConfigurationItem {
 			return false
 		}
 	}
-}
-
-;;;-------------------------------------------------------------------------;;;
-;;;                   Private Function Declaration Section                  ;;;
-;;;-------------------------------------------------------------------------;;;
-
-dumpKnowledge(knowledgeBase) {
-	try {
-		FileDelete %kTempDirectory%Race Assistant.knowledge
-	}
-	catch exception {
-		; ignore
-	}
-
-	for key, value in knowledgeBase.Facts.Facts {
-		text := key . " = " . value . "`n"
 	
-		FileAppend %text%, %kTempDirectory%Race Assistant.knowledge
+	dumpKnowledge(knowledgeBase) {
+		prefix := this.AssistantType
+		
+		try {
+			FileDelete %kTempDirectory%%prefix%.knowledge
+		}
+		catch exception {
+			; ignore
+		}
+
+		for key, value in knowledgeBase.Facts.Facts {
+			text := key . " = " . value . "`n"
+		
+			FileAppend %text%, %kTempDirectory%%prefix%.knowledge
+		}
 	}
 }

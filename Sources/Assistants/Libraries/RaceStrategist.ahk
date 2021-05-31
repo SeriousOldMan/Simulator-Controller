@@ -26,6 +26,6 @@
 
 class RaceStrategist extends RaceAssistant {
 	__New(configuration, engineerSettings, name := false, language := "__Undefined__", speaker := false, listener := false, voiceServer := false) {
-		base.__New(configuration, "Race Strategist", engineerSettings, pitstopHandler, name, language, speaker, listener, voiceServer)
+		base.__New(configuration, "Race Strategist", engineerSettings, name, language, speaker, listener, voiceServer)
 	}
 }

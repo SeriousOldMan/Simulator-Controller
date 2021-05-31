@@ -108,7 +108,9 @@ class RaceEngineer extends RaceAssistant {
 	}
 	
 	__New(configuration, engineerSettings, pitstopHandler := false, name := false, language := "__Undefined__", speaker := false, listener := false, voiceServer := false) {
-		base.__New(configuration, "Race Engineer", engineerSettings, pitstopHandler, name, language, speaker, listener, voiceServer)
+		this.iPitstopHandler := pitstopHandler
+		
+		base.__New(configuration, "Race Engineer", engineerSettings, name, language, speaker, listener, voiceServer)
 	}
 	
 	updateConfigurationValues(values) {
@@ -526,7 +528,7 @@ class RaceEngineer extends RaceAssistant {
 			this.KnowledgeBase.setValue("Pitstop.Planned.Fuel", litres)
 			
 			if this.Debug[kDebugKnowledgeBase]
-				dumpKnowledge(this.KnowledgeBase)
+				this.dumpKnowledge(this.KnowledgeBase)
 
 			speaker.speakPhrase("ConfirmPlanUpdate")
 			speaker.speakPhrase("MoreChanges")
@@ -593,7 +595,7 @@ class RaceEngineer extends RaceAssistant {
 			knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure." . tyreType . ".Increment", targetIncrement + delta)
 			
 			if this.Debug[kDebugKnowledgeBase]
-				dumpKnowledge(this.KnowledgeBase)
+				this.dumpKnowledge(this.KnowledgeBase)
 
 			speaker.speakPhrase("ConfirmPlanUpdate")
 			speaker.speakPhrase("MoreChanges")
@@ -633,7 +635,7 @@ class RaceEngineer extends RaceAssistant {
 			knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.RR.Increment", 0)
 			
 			if this.Debug[kDebugKnowledgeBase]
-				dumpKnowledge(knowledgeBase)
+				this.dumpKnowledge(knowledgeBase)
 
 			speaker.speakPhrase("ConfirmPlanUpdate")
 			speaker.speakPhrase("MoreChanges")
@@ -658,7 +660,7 @@ class RaceEngineer extends RaceAssistant {
 			knowledgeBase.setValue("Pitstop.Planned.Tyre.Compound.Color", false)
 			
 			if this.Debug[kDebugKnowledgeBase]
-				dumpKnowledge(knowledgeBase)
+				this.dumpKnowledge(knowledgeBase)
 
 			speaker.speakPhrase("ConfirmPlanUpdate")
 			speaker.speakPhrase("MoreChanges")
@@ -678,7 +680,7 @@ class RaceEngineer extends RaceAssistant {
 			this.KnowledgeBase.setValue("Pitstop.Planned.Repair." . repairType, repair)
 			
 			if this.Debug[kDebugKnowledgeBase]
-				dumpKnowledge(this.KnowledgeBase)
+				this.dumpKnowledge(this.KnowledgeBase)
 
 			speaker.speakPhrase("ConfirmPlanUpdate")
 			speaker.speakPhrase("MoreChanges")
@@ -854,7 +856,7 @@ class RaceEngineer extends RaceAssistant {
 				knowledgeBase.setValue(key, value)
 			
 			if this.Debug[kDebugKnowledgeBase]
-				dumpKnowledge(knowledgeBase)
+				this.dumpKnowledge(knowledgeBase)
 		}
 	}
 	
@@ -876,7 +878,7 @@ class RaceEngineer extends RaceAssistant {
 			this.getSpeaker().speakPhrase("Greeting")
 		
 		if this.Debug[kDebugKnowledgeBase]
-			dumpKnowledge(this.KnowledgeBase)
+			this.dumpKnowledge(this.KnowledgeBase)
 	}
 	
 	finishSession() {
@@ -1065,7 +1067,7 @@ class RaceEngineer extends RaceAssistant {
 		result := knowledgeBase.produce()
 		
 		if this.Debug[kDebugKnowledgeBase]
-			dumpKnowledge(this.KnowledgeBase)
+			this.dumpKnowledge(this.KnowledgeBase)
 		
 		currentCompound := knowledgeBase.getValue("Tyre.Compound", false)
 		currentCompoundColor := knowledgeBase.getValue("Tyre.Compound.Color", false)
@@ -1158,7 +1160,7 @@ class RaceEngineer extends RaceAssistant {
 			result := knowledgeBase.produce()
 			
 			if this.Debug[kDebugKnowledgeBase]
-				dumpKnowledge(this.KnowledgeBase)
+				this.dumpKnowledge(this.KnowledgeBase)
 			
 			return result
 		}
@@ -1298,7 +1300,7 @@ class RaceEngineer extends RaceAssistant {
 		result := knowledgeBase.produce()
 		
 		if this.Debug[kDebugKnowledgeBase]
-			dumpKnowledge(this.KnowledgeBase)
+			this.dumpKnowledge(knowledgeBase)
 		
 		pitstopNumber := knowledgeBase.getValue("Pitstop.Planned.Nr")
 		
@@ -1446,7 +1448,7 @@ class RaceEngineer extends RaceAssistant {
 			result := this.KnowledgeBase.produce()
 			
 			if this.Debug[kDebugKnowledgeBase]
-				dumpKnowledge(this.KnowledgeBase)
+				this.dumpKnowledge(this.KnowledgeBase)
 					
 			return result
 		}
@@ -1463,7 +1465,7 @@ class RaceEngineer extends RaceAssistant {
 		this.updateDynamicValues({LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
 		
 		if this.Debug[kDebugKnowledgeBase]
-			dumpKnowledge(this.KnowledgeBase)
+			this.dumpKnowledge(this.KnowledgeBase)
 		
 		if (result && this.PitstopHandler)
 			this.PitstopHandler.pitstopFinished(this.KnowledgeBase.getValue("Pitstop.Last", 0))
@@ -1628,67 +1630,67 @@ getDeprecatedConfigurationValue(data, newSection, oldSection, key, default := fa
 }
 
 lowFuelWarning(context, remainingLaps) {
-	context.KnowledgeBase.RaceEngineer.lowFuelWarning(Round(remainingLaps))
+	context.KnowledgeBase.RaceAssistant.lowFuelWarning(Round(remainingLaps))
 	
 	return true
 }
 
 damageWarning(context, newSuspensionDamage, newBodyworkDamage) {
-	context.KnowledgeBase.RaceEngineer.damageWarning(newSuspensionDamage, newBodyworkDamage)
+	context.KnowledgeBase.RaceAssistant.damageWarning(newSuspensionDamage, newBodyworkDamage)
 	
 	return true
 }
 
 reportDamageAnalysis(context, repair, stintLaps, delta) {
-	context.KnowledgeBase.RaceEngineer.reportDamageAnalysis(repair, stintLaps, delta)
+	context.KnowledgeBase.RaceAssistant.reportDamageAnalysis(repair, stintLaps, delta)
 	
 	return true
 }
 
 weatherChangeNotification(context, change, minutes) {
-	context.KnowledgeBase.RaceEngineer.weatherChangeNotification(change, minutes)
+	context.KnowledgeBase.RaceAssistant.weatherChangeNotification(change, minutes)
 	
 	return true
 }
 
 weatherTyreChangeRecommendation(context, minutes, recommendedCompound) {
-	context.KnowledgeBase.RaceEngineer.weatherTyreChangeRecommendation(minutes, recommendedCompound)
+	context.KnowledgeBase.RaceAssistant.weatherTyreChangeRecommendation(minutes, recommendedCompound)
 	
 	return true
 }
 
 startPitstopSetup(context, pitstopNumber) {
-	context.KnowledgeBase.RaceEngineer.startPitstopSetup(pitstopNumber)
+	context.KnowledgeBase.RaceAssistant.startPitstopSetup(pitstopNumber)
 	
 	return true
 }
 
 finishPitstopSetup(context, pitstopNumber) {
-	context.KnowledgeBase.RaceEngineer.finishPitstopSetup(pitstopNumber)
+	context.KnowledgeBase.RaceAssistant.finishPitstopSetup(pitstopNumber)
 	
 	return true
 }
 
 setPitstopRefuelAmount(context, pitstopNumber, litres) {
-	context.KnowledgeBase.RaceEngineer.setPitstopRefuelAmount(pitstopNumber, litres)
+	context.KnowledgeBase.RaceAssistant.setPitstopRefuelAmount(pitstopNumber, litres)
 	
 	return true
 }
 
 setPitstopTyreSet(context, pitstopNumber, compound, compoundColor, set) {
-	context.KnowledgeBase.RaceEngineer.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
+	context.KnowledgeBase.RaceAssistant.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
 	
 	return true
 }
 
 setPitstopTyrePressures(context, pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
-	context.KnowledgeBase.RaceEngineer.setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR)
+	context.KnowledgeBase.RaceAssistant.setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR)
 	
 	return true
 }
 
 requestPitstopRepairs(context, pitstopNumber, repairSuspension, repairBodywork) {
-	context.KnowledgeBase.RaceEngineer.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork)
+	context.KnowledgeBase.RaceAssistant.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork)
 	
 	return true
 }
@@ -1707,7 +1709,7 @@ setupTyrePressures(context, weather, airTemperature, trackTemperature, compound,
 	airTemperature := Round(airTemperature)
 	trackTemperature := Round(trackTemperature)
 	
-	if context.KnowledgeBase.RaceEngineer.getTyrePressures(weather, airTemperature, trackTemperature, compound, compoundColor, pressures, certainty) {
+	if context.KnowledgeBase.RaceAssistant.getTyrePressures(weather, airTemperature, trackTemperature, compound, compoundColor, pressures, certainty) {
 		knowledgeBase.setFact("Tyre.Setup.Certainty", certainty)
 		knowledgeBase.setFact("Tyre.Setup.Compound", compound)
 		knowledgeBase.setFact("Tyre.Setup.Compound.Color", compoundColor)

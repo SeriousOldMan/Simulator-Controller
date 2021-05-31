@@ -106,11 +106,11 @@ class SpeechRecognizer {
 			return this.Instance.Initialize(id)
 	}
 	
-	startRecognizer(){
+	startRecognizer() {
 		return this.Instance.StartRecognizer()
 	}
 	
-	stopRecognizer(){
+	stopRecognizer() {
 		return this.Instance.StopRecognizer()
 	}
 	

@@ -44,21 +44,282 @@ ListLines Off					; Disable execution history
 ;;;-------------------------------------------------------------------------;;;
 
 class VoiceServer extends ConfigurationItem {
+	iVoiceClients := {}
+	iFocusedVoiceClient := false
+	
+	class VoiceClient {
+		iCounter := 1
+		
+		iVoiceServer := false
+		iDescriptor := false
+		iPID := 0
+		
+		iLanguage := "en"
+		iSpeaker := true
+		iSpeakerVolume := 100
+		iSpeakerPitch := 0
+		iSpeakerSpeed := 0
+		iListener := false
+		iPushToTalk := false
+	
+		iSpeechGenerator := false
+		
+		iSpeechRecognizer := false
+		iIsSpeaking := false
+		iIsListening := false
+		
+		iVoiceCommands := {}
+	
+		VoiceServer[] {
+			Get {
+				return this.iVoiceServer
+			}
+		}
+		
+		Descriptor[] {
+			Get {
+				return this.iDescriptor
+			}
+		}
+		
+		PID[] {
+			Get {
+				return this.iPID
+			}
+		}
+	
+		Language[] {
+			Get {
+				return this.iLanguage
+			}
+		}
+		
+		Speaker[] {
+			Get {
+				return this.iSpeaker
+			}
+		}
+	
+		Speaking[] {
+			Get {
+				return this.iIsSpeaking
+			}
+		}
+		
+		Listener[] {
+			Get {
+				return this.iListener
+			}
+		}
+		
+		Listening[] {
+			Get {
+				return this.iIsListening
+			}
+		}
+		
+		SpeakerVolume[] {
+			Get {
+				return this.iSpeakerVolume
+			}
+		}
+		
+		SpeakerPitch[] {
+			Get {
+				return this.iSpeakerPitch
+			}
+		}
+		
+		SpeakerSpeed[] {
+			Get {
+				return this.iSpeakerSpeed
+			}
+		}
+		
+		PushToTalk[] {
+			Get {
+				return this.iPushToTalk
+			}
+		}
+		
+		VoiceCommands[] {
+			Get {
+				return this.iVoiceCommands
+			}
+		}
+	
+		SpeechGenerator[create := false] {
+			Get {
+				if (create && this.Speaker && !this.iSpeechGenerator) {
+					this.iSpeechGenerator := new SpeechGenerator(this.Speaker, this.Language)
+					
+					this.iSpeechGenerator.setVolume(this.iSpeakerVolume)
+					this.iSpeechGenerator.setPitch(this.iSpeakerPitch)
+					this.iSpeechGenerator.setRate(this.iSpeakerSpeed)
+				}
+				
+				return this.iSpeechGenerator
+			}
+		}
+		
+		SpeechRecognizer[create := false] {
+			Get {
+				if (create && this.Listener && !this.iSpeechRecognizer)
+					this.iSpeechRecognizer := new SpeechRecognizer(this.Listener, this.Language)
+				
+				return this.iSpeechRecognizer
+			}
+		}
+		
+		__New(voiceServer, descriptor, pid, language, speaker, listener, pushToTalk, speakerVolume, speakerPitch, speakerSpeed) {
+			this.iVoiceServer := voiceServer
+			this.iDescriptor := descriptor
+			this.iPID := pid
+			this.iLanguage := language
+			this.iSpeaker := speaker
+			this.iListener := listener
+			this.iPushToTalk := pushToTalk
+			this.iSpeakerVolume := speakerVolume
+			this.iSpeakerPitch := speakerPitch
+			this.iSpeakerSpeed := speakerSpeed
+		}
+	
+		speak(text) {
+			stopped := this.VoiceServer.stopListening()
+			oldSpeaking := this.Speaking
+			
+			this.iIsSpeaking := true
+				
+			try {
+				try {
+					this.SpeechGenerator[true].speak(text, true)
+				}
+				finally {
+					this.iIsSpeaking := oldSpeaking
+				}
+			}
+			finally {
+				if (stopped && !this.PushToTalk)
+					this.VoiceServer.startListening()
+			}
+		}
+	
+		startListening(retry := true) {
+			local function
+			
+			if (this.SpeechRecognizer && !this.Listening)
+				if !this.SpeechRecognizer.startRecognizer() {
+					if retry {
+						function := ObjBindMethod(this, "startListening", true)
+						
+						SetTimer %function%, -200
+					}
+					
+					return false
+				}
+				else {
+					this.iIsListening := true
+				
+					return true
+				}
+		}
+		
+		stopListening(retry := false) {
+			local function
+			
+			if (this.SpeechRecognizer && this.Listening)
+				if !this.SpeechRecognizer.stopRecognizer() {
+					if retry {
+						function := ObjBindMethod(this, "stopListening", true)
+						
+						SetTimer %function%, -200
+					}
+					
+					return false
+				}
+				else {
+					this.iIsListening := false
+				
+					return true
+				}
+		}
+		
+		registerChoices(name, choices*) {
+			recognizer := this.SpeechRecognizer[true]
+			
+			recognizer.setChoices(name, values2String(",", choices*))
+		}
+	
+		registerVoiceCommand(grammar, command, callback) {
+			recognizer := this.SpeechRecognizer[true]
+
+			if !grammar {
+				for key, descriptor in this.iVoiceCommands
+					if ((descriptor[1] = command) && (descriptor[2] = callback))
+						return
+					
+				grammar := ("__Grammar." . this.iCounter++)
+			}
+			else if this.iVoiceCommands.HasKey(grammar) {
+				descriptor := this.iVoiceCommands[grammar]
+				
+				if ((descriptor[1] = command) && (descriptor[2] = callback))
+					return
+			}
+				
+			if isDebug() {
+				nextCharIndex := 1
+				
+				showMessage("Register voice command: " . new GrammarCompiler(recognizer).readGrammar(command, nextCharIndex).toString())					  
+			}
+			
+			try {
+				recognizer.loadGrammar(grammar, recognizer.compileGrammar(command), ObjBindMethod(this, "voiceCommandRecognized"))
+			}
+			catch exception {
+				logMessage(kLogCritical, translate("Error while registering voice command """) . command . translate(""" - please check the configuration"))
+			
+				showMessage(substituteVariables(translate("Cannot register voice command ""%command%"" - please check the configuration..."), {command: command})
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			}
+			
+			this.VoiceCommands[grammar] := Array(command, callback)
+		}
+		
+		voiceCommandRecognized(grammar, words) {
+			if isDebug()
+				showMessage("Voice command recognized: " . values2String(" ", words*))
+			
+			descriptor := this.iVoiceCommands[grammar]
+			
+			raiseEvent(kFileMessage, "Voice", descriptor[2] . ":" . values2String(";", grammar, descriptor[1], words*), this.PID)
+		}
+	}
+
 	iLanguage := "en"
 	iSpeaker := true
 	iSpeakerVolume := 100
 	iSpeakerPitch := 0
 	iSpeakerSpeed := 0
 	iListener := false
-	iPushTalk := false
-	
-	iSpeechGenerator := false
+	iPushToTalk := false
 	
 	iSpeechRecognizer := false
+	
 	iIsSpeaking := false
 	iIsListening := false
 	
-	iVoiceCommands := {}
+	VoiceClients[] {
+		Get {
+			return this.iVoiceClients
+		}
+	}
+	
+	FocusedVoiceClient[] {
+		Get {
+			return this.iFocusedVoiceClient
+		}
+	}
 	
 	Language[] {
 		Get {
@@ -71,7 +332,7 @@ class VoiceServer extends ConfigurationItem {
 			return this.iSpeaker
 		}
 	}
-	
+		
 	Speaking[] {
 		Get {
 			return this.iIsSpeaking
@@ -83,39 +344,25 @@ class VoiceServer extends ConfigurationItem {
 			return this.iListener
 		}
 	}
-	
+		
 	Listening[] {
 		Get {
 			return this.iIsListening
 		}
 	}
 	
-	PushTalk[] {
+	PushToTalk[] {
 		Get {
-			return this.iPushTalk
+			return this.iPushToTalk
 		}
 	}
-	
-	SpeechGenerator[create := false] {
-		Get {
-			if (create && this.Speaker && !this.iSpeechGenerator) {
-				this.iSpeechGenerator := new SpeechGenerator(this.Speaker, this.Language)
-				
-				this.iSpeechGenerator.setVolume(this.iSpeakerVolume)
-				this.iSpeechGenerator.setPitch(this.iSpeakerPitch)
-				this.iSpeechGenerator.setRate(this.iSpeakerSpeed)
-			}
-			
-			return this.iSpeechGenerator
-		}
-	}
-	
+		
 	SpeechRecognizer[create := false] {
 		Get {
 			if (create && this.Listener && !this.iSpeechRecognizer) {
 				this.iSpeechRecognizer := new SpeechRecognizer(this.Listener, this.Language)
 				
-				if !this.PushTalk
+				if !this.PushToTalk
 					this.startListening()
 			}
 			
@@ -138,17 +385,17 @@ class VoiceServer extends ConfigurationItem {
 		this.iSpeakerPitch := getConfigurationValue(configuration, "Voice Control", "SpeakerPitch", 0)
 		this.iSpeakerSpeed := getConfigurationValue(configuration, "Voice Control", "SpeakerSpeed", 0)
 		this.iListener := getConfigurationValue(configuration, "Voice Control", "Listener", false)
-		this.iPushTalk := getConfigurationValue(configuration, "Voice Control", "PushToTalk", false)
+		this.iPushToTalk := getConfigurationValue(configuration, "Voice Control", "PushToTalk", false)
 		
-		if this.PushTalk {
-			pushToTalk := ObjBindMethod(this, "pushToTalk")
+		if this.PushToTalk {
+			listen := ObjBindMethod(this, "listen")
 			
-			SetTimer %pushToTalk%, 100
+			SetTimer %listen%, 100
 		}
 	}
 	
-	pushToTalk() {
-		theHotkey := this.PushTalk
+	listen() {
+		theHotkey := this.PushToTalk
 		
 		if !this.Speaking && GetKeyState(theHotKey, "P")
 			this.startListening()
@@ -156,46 +403,30 @@ class VoiceServer extends ConfigurationItem {
 			this.stopListening()
 	}
 	
-	speak(text) {
-		stopped := this.stopListening()
-			
-		try {
-			this.iIsSpeaking := true
-			
-			try {
-				this.SpeechGenerator[true].speak(text, true)
-			}
-			finally {
-				this.iIsSpeaking := false
-			}
-		}
-		finally {
-			if (stopped && !this.PushTalk)
-				this.startListening()
-		}
+	getVoiceClient(descriptor := false) {
+		if descriptor
+			return this.VoiceClients[descriptor]
+		else
+			return this.FocusedVoiceClient
 	}
 	
-	speakWith(speaker, language, text) {
-		generator := this.SpeechGenerator[true]
-		currentVoice := generator.ActiveVoice
+	focusVoiceClient(descriptor) {
+		if (this.FocusedVoiceClient && this.PushToTalk && this.FocusedVoiceClient.Listening)
+			this.FocusedVoiceClient.stoplistening()
 		
-		generator.setVoice(generator.computeVoice(speaker, language, false))
+		this.FocusedVoiceClient := this.VoiceClients[descriptor]
 		
-		try {
-			this.speak(text)
-		}
-		finally {
-			generator.setVoice(currentVoice)
-		}
+		if !this.PushToTalk
+			this.startListening()
 	}
 	
-	startListening(retry := true) {
+	startActivationListener(retry := false) {
 		local function
-		
+			
 		if (this.SpeechRecognizer && !this.Listening)
 			if !this.SpeechRecognizer.startRecognizer() {
 				if retry {
-					function := ObjBindMethod(this, "startListening", true)
+					function := ObjBindMethod(this, "startActivationListener", true)
 					
 					SetTimer %function%, -200
 				}
@@ -208,14 +439,14 @@ class VoiceServer extends ConfigurationItem {
 				return true
 			}
 	}
-	
-	stopListening(retry := false) {
+		
+	stopActivationListener(retry := false) {
 		local function
 		
 		if (this.SpeechRecognizer && this.Listening)
 			if !this.SpeechRecognizer.stopRecognizer() {
 				if retry {
-					function := ObjBindMethod(this, "stopListening", true)
+					function := ObjBindMethod(this, "stopActivationListener", true)
 					
 					SetTimer %function%, -200
 				}
@@ -229,63 +460,102 @@ class VoiceServer extends ConfigurationItem {
 			}
 	}
 	
-	registerChoices(name, choices*) {
-		recognizer := this.SpeechRecognizer[true]
+	startListening(retry := true) {
+		this.startActivationListener(retry)
 		
-		recognizer.setChoices(name, values2String(",", choices*))
+		focusedClient := this.getVoiceClient()
+		
+		return (focusedClient ? focusedClient.startListening(retry) : false)
 	}
 	
-	registerVoiceCommand(grammar, command, pid, callback) {
-		static counter := 1
+	stopListening(retry := false) {
+		this.stopActivationListener(retry)
 		
-		recognizer := this.SpeechRecognizer[true]
-
-		if !grammar {
-			for key, descriptor in this.iVoiceCommands
-				if ((descriptor[1] = command) && (descriptor[3] = callback)) {
-					descriptor[2] := pid
-					
-					return
-				}
-				
-			grammar := ("__Grammar." . counter++)
-		}
-		else if this.iVoiceCommands.HasKey(grammar) {
-			descriptor := this.iVoiceCommands[grammar]
-			
-			if ((descriptor[1] = command) && (descriptor[3] = callback)) {
-				descriptor[2] := pid
-				
-				return
-			}
-		}
-			
-		if isDebug() {
-			nextCharIndex := 1
-			
-			showMessage("Register voice command: " . new GrammarCompiler(recognizer).readGrammar(command, nextCharIndex).toString())					  
-		}
+		focusedClient := this.getVoiceClient()
+		
+		return (focusedClient ? focusedClient.stopListening(retry) : false)
+	}
+	
+	speak(descriptor, text, focus := false) {
+		oldSpeaking := this.Speaking
+		
+		this.iIsSpeaking := true
 		
 		try {
-			recognizer.loadGrammar(grammar, recognizer.compileGrammar(command), ObjBindMethod(this, "voiceCommandRecognized"))
+			this.getVoiceClient(descriptor).speak(text)
+			
+			if focus
+				this.focusVoiceClient(descriptor)
 		}
-		catch exception {
-			logMessage(kLogCritical, translate("Error while registering voice command """) . command . translate(""" - please check the configuration"))
-		
-			showMessage(substituteVariables(translate("Cannot register voice command ""%command%"" - please check the configuration..."), {command: command})
-					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+		finally {
+			this.iIsSpeaking := oldSpeaking
 		}
-		
-		this.iVoiceCommands[grammar] := Array(command, pid, callback)
 	}
 	
-	voiceCommandRecognized(grammar, words) {
+	registerVoiceClient(descriptor, pid, activationCommand := false, language := false, speaker := true, listener := false, pushToTalk := false, speakerVolume := "__Undefined__", speakerPitch := "__Undefined__", speakerSpeed := "__Undefined__") {
+		static counter := 1
+		
+		if (speakerVolume = kUndefined)
+			speakerVolume := this.iSpeakerVolume
+		
+		if (speakerPitch = kUndefined)
+			speakerPitch := this.iSpeakerPitch
+		
+		if (speakerSpeed = kUndefined)
+			speakerSpeed := this.iSpeakerSpeed
+		
+		if !pushToTalk
+			pushToTalk := this.iPushToTalk
+		
+		if (speaker == true)
+			speaker := this.iSpeaker
+		
+		if (listener == true)
+			listener := this.iListener
+		
+		if (language == false)
+			language := this.iLanguage
+		
+		client := new VoiceClient(this, descriptor, pid, language, speaker, listener, pushToTalk, speakerVolume, speakerPitch, speakerSpeed)
+		
+		this.VoiceClients[descriptor] := client
+		this.VoiceClients[pid] := client
+		
+		if activationCommand {
+			recognizer := this.SpeechRecognizer[true]
+			grammar := (descriptor . "." . counter++)
+			
+			if isDebug() {
+				nextCharIndex := 1
+				
+				showMessage("Register activation command: " . new GrammarCompiler(recognizer).readGrammar(activationCommand, nextCharIndex).toString())					  
+			}
+				
+			try {
+				recognizer.loadGrammar(grammar, recognizer.compileGrammar(activationCommand), ObjBindMethod(this, "activationCommandRecognized"))
+			}
+			catch exception {
+				logMessage(kLogCritical, translate("Error while registering voice command """) . command . translate(""" - please check the configuration"))
+			
+				showMessage(substituteVariables(translate("Cannot register voice command ""%command%"" - please check the configuration..."), {command: command})
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			}
+		}
+	}
+	
+	registerChoices(descriptor, name, choices*) {
+		this.getVoiceClient(descriptor).registerChoices(name, choices*)
+	}
+	
+	registerVoiceCommand(descriptor, grammar, command, callback) {
+		this.getVoiceClient(descriptor).registerVoiceCommand(grammar, command, callback)
+	}
+		
+	activationCommandRecognized(grammar, words) {
 		if isDebug()
-			showMessage("Voice command recognized: " . values2String(" ", words*))
+			showMessage("Activation command recognized: " . values2String(" ", words*))
 		
-		descriptor := this.iVoiceCommands[grammar]
-		
-		raiseEvent(kFileMessage, "Voice", descriptor[3] . ":" . values2String(";", grammar, descriptor[1], words*), descriptor[2])
+		this.focusVoiceClient(ConfigurationItem.splitDescriptor(grammar)[1])
 	}
 }
 

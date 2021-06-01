@@ -104,18 +104,7 @@ class VoiceAssistant {
 				
 				Random index, 1, % phrases.Length()
 				
-				phrase := phrases[Round(index)]
-				
-				if variables {
-					variables := variables.Clone()
-					
-					variables["Name"] := this.Assistant.Name
-					variables["user"] := this.Assistant.User
-				}
-				else
-					variables := {name: this.Assistant.Name, driver: this.Assistant.User}
-				
-				phrase := substituteVariables(phrase, variables)
+				phrase := substituteVariables(phrases[Round(index)], this.Assistant.getPhraseVariables(variables))
 			}
 			
 			if phrase

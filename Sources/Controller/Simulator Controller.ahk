@@ -712,6 +712,8 @@ class SimulatorController extends ConfigurationItem {
 	}
 	
 	getVoiceCommandDescriptor(command) {
+		static registered := false
+		
 		if this.iVoiceCommands.HasKey(command)
 			return this.iVoiceCommands[command]
 		else {
@@ -721,8 +723,16 @@ class SimulatorController extends ConfigurationItem {
 			
 			if this.VoiceServer {
 				Process Exist
+		
+				processID := ErrorLevel
 				
-				raiseEvent(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", false, command, ErrorLevel, "voiceCommand"), this.VoiceServer)
+				if !registered {
+					raiseEvent(kFileMessage, "Voice", "registerVoiceClient:" . values2String(";", "Controller", processID, "Controller", false, false, true))
+																							
+					registered := true
+				}
+				
+				raiseEvent(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", "Controller", false, command, "voiceCommand"), this.VoiceServer)
 			}
 			
 			return descriptor

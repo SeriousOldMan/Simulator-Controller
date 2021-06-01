@@ -229,7 +229,7 @@ class RaceEngineer extends RaceAssistant {
 				else
 					this.pitstopAdjustRepairRecognized("Bodywork", words)
 			default:
-				Throw "Unknown grammar """ . grammar . """ detected in RaceEngineer.handleVoiceCommand...."
+				base.handleVoiceCommand(grammar, words)
 		}
 	}
 	
@@ -694,7 +694,7 @@ class RaceEngineer extends RaceAssistant {
 	createSession(data) {
 		local facts
 		
-		settings := this.AssistantSettings
+		settings := this.Settings
 		
 		simulator := getConfigurationValue(data, "Session Data", "Simulator", "Unknown")
 		simulatorName := this.SetupDatabase.getSimulatorName(simulator)
@@ -803,7 +803,7 @@ class RaceEngineer extends RaceAssistant {
 			if !IsObject(settings)
 				settings := readConfiguration(settings)
 			
-			this.iAssistantSettings := settings
+			this.updateConfigurationValues({Settings: settings})
 			
 			simulatorName := this.Simulator
 		
@@ -984,7 +984,7 @@ class RaceEngineer extends RaceAssistant {
 		lapTime := getConfigurationValue(data, "Stint Data", "LapLastTime", 0)
 		
 		if ((lapNumber <= 2) && knowledgeBase.getValue("Session.Settings.Lap.Time.Adjust", false)) {
-			settingsLapTime := (getDeprecatedConfigurationValue(this.AssistantSettings, "Session Settings", "Race Settings", "Lap.AvgTime", lapTime / 1000) * 1000)
+			settingsLapTime := (getDeprecatedConfigurationValue(this.Settings, "Session Settings", "Race Settings", "Lap.AvgTime", lapTime / 1000) * 1000)
 			
 			if ((lapTime / settingsLapTime) > 2)
 				lapTime := settingsLapTime

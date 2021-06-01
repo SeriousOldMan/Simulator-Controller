@@ -1,0 +1,143 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;   Modular Simulator Controller System - Race Strategist Rules           ;;;
+;;;                                                                         ;;;
+;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
+;;;   License:    (2021) Creative Commons - BY-NC-SA                        ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;-------------------------------------------------------------------------;;;
+;;;                             Global Trigger                              ;;;
+;;;                                                                         ;;;
+;;; Entry points for the surrounding script code. Typically, the rule       ;;;
+;;; will be triggered by setting a target fact and call "produce()" on the  ;;;
+;;; KnowledgeBase instance.                                                 ;;;
+;;;-------------------------------------------------------------------------;;;
+
+;;;-------------------------------------------------------------------------;;;
+;;; Each lap, after all the lap data has been copied to the knowledge base, ;;;
+;;; all target data for race positions, lap times and strategy will be      ;;;
+;;; recomputed upon the data of the last laps, and so on.                   ;;;
+;;;-------------------------------------------------------------------------;;;
+
+; [?Lap] => ...
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                         Statistical Computations                        ;;;
+;;;-------------------------------------------------------------------------;;;
+
+dampingFactor(?distance, ?maxDistance, ?damping, ?factor) <= ?distance < ?maxDistance, ?temp = ?distance * ?damping, ?factor = 1 - ?temp, !
+dampingFactor(?, ?, ?, 0)
+
+average([], 0) <= !
+average(?list, ?average) <= sum(?list, ?sum), length(?list, ?length), ?average = ?sum / ?length
+
+maxDeviation(?list, ?deviation) <= average(?list, ?average), maxDeviation(?list, ?average, ?deviation)
+
+maxDeviation([?x], ?x, 0)
+maxDeviation([?h | ?t], ?average, ?deviation) <= maxDeviation(?t, ?average, ?tDeviation), ?d = ?average - ?h, abs(?d, ?absD),					\
+												 ?absD > ?tDeviation, !, ?deviation = ?absD
+maxDeviation([?h | ?t], ?average, ?deviation) <= maxDeviation(?t, ?average, ?deviation)
+
+stdDeviation(?list, ?deviation) <= variance(?list, ?variance), sqrt(?variance, ?deviation)
+
+variance([], 0) <= !
+variance(?list, ?variance) <= average(?list, ?average), squaredDeviation(?list, ?average, ?squared),											\
+							  length(?list, ?length), ?variance = ?squared / ?length
+
+squaredDeviation([], ?, 0)
+squaredDeviation([?h | ?t], ?avg, ?squared) <= ?delta = ?h - ?avg, ?hSquared = ?delta * ?delta,													\
+											   squaredDeviation(?t, ?avg, ?tSquared), ?squared = ?hSquared + ?tSquared
+
+linRegression(?xValues, ?yValues, ?a, ?b) <= average(?xValues, ?xAverage), average(?yValues, ?yAverage),										\
+											 avgDeltaProductSums(?xValues, ?xAverage, ?yValues, ?yAverage, ?dividend, ?divisor),				\
+											 ?b = ?dividend / ?divisor, ?temp = ?b * ?xAverage, ?a = ?yAverage - ?temp
+										  
+avgDeltaProductSums([], ?, [], ?, 0, 0)
+avgDeltaProductSums([?h1 | ?t1], ?avg1, [?h2 | ?t2], ?avg2, ?sum1, ?sum2) <=																	\
+		?d1 = ?h1 - ?avg1, ?d2 = ?h2 - ?avg2, ?p1 = ?d1 * ?d2, ?p2 = ?d1 * ?d1,																	\
+		avgDeltaProductSums(?t1, ?avg1, ?t2, ?avg2, ?tSum1, ?tSum2), ?sum1 = ?p1 + ?tSum1, ?sum2 = ?p2 + ?tSum2
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                             Utility Rules                               ;;;
+;;;-------------------------------------------------------------------------;;;
+
+=<(?x, ?y) <= ?x = ?y
+=<(?x, ?y) <= ?x < ?y
+
+>=(?x, ?y) <= ?x = ?y
+>=(?x, ?y) <= ?x > ?y
+
+>(?x, ?y, true) <= ?x > ?y, !
+>(?x, ?y, false)
+
+max(?x, ?y, ?x) <= ?x > ?y, !
+max(?x, ?y, ?y)
+
+min(?x, ?y, ?x) <= ?x < ?y, !
+min(?x, ?y, ?y)
+
+abs(?x, ?r) <= ?x < 0, ?r = ?x * -1, !
+abs(?x, ?x)
+
+fact?(?f) <= Get(?f, ?)
+
+bound?(?x) <= unbound?(?x), !, fail
+bound?(?)
+
+any?(?value, [?value | ?]) <= !
+any?(?value, [? | ?tail]) <= any?(?value, ?tail)
+
+all?(?value, [?value])
+all?(?value, [?value | ?tail]) <= all?(?value, ?tail)
+
+none?(?value, [])
+none?(?value, [?value | ?]) <= !, fail
+none?(?value, [? | ?tail]) <= none?(?value, ?tail)
+
+one?(?value, []) <= fail
+one?(?value, [?value | ?tail]) <= !, none?(?value, ?tail)
+one?(?value, [? | ?tail]) <= one?(?value, ?tail)
+
+sequence(?x, ?x, [?x]) <= !
+sequence(?from, ?to, [?from | ?more]) <= ?temp = ?from + 1, sequence(?temp, ?to, ?more)
+				
+length([], 0)
+length([?h | ?t], ?length) <= length(?t, ?tLength), ?length = ?tLength + 1
+
+reverse([], [])
+reverse([?h | ?t], ?rev) <= reverse(?t, ?rt), concat(?rt, [?h], ?rev)
+
+concat([], ?l, ?l)
+concat([?h | ?t], ?l, [?h | ?r]) <= concat(?t, ?l, ?r)
+
+remove([], ?, [])
+remove([?h | ?t], ?h, ?result) <= remove(?t, ?h, ?result), !
+remove([?h | ?t], ?x, [?h | ?result]) <= remove(?t, ?x, ?result)
+
+index(?list, ?element, ?index) <= index(?list, ?element, 0, ?index)
+
+index([?element], ?element, ?index, ?index) <= !
+index([?head | ?tail], ?head, ?index, ?index) <= !
+index([?head | ?tail], ?element, ?running, ?index) <= ?nRunning = ?running + 1, index(?tail, ?element, ?nRunning, ?index)
+
+element(?list, ?index, ?element) <= element(?list, 0, ?index, ?element)
+
+element([?element], ?index, ?index, ?element)
+element([?head | ?tail], ?index, ?index, ?head) <= !
+element([?head | ?tail], ?running, ?index, ?element) <= ?nRunning = ?running + 1, element(?tail, ?nRunning, ?index, ?element)
+
+sum([], 0)
+sum([?h | ?t], ?sum) <= sum(?t, ?tSum), ?sum = ?h + ?tSum
+
+productSum([], [], 0)
+productSum([?h1 | ?t1], [?h2 | ?t2], ?sum) <= ?p = ?h1 * ?h2, productSum(?t1, ?t2, ?tSum), ?sum = ?p + ?tSum
+
+min([?x], ?x)
+min([?h | ?t], ?min) <= min(?t, ?tMin), ?tMin < ?h, !, ?min = ?tMin
+min([?h | ?t], ?h)
+
+max([?x], ?x)
+max([?h | ?t], ?max) <= max(?t, ?tMax), ?tMax > ?h, !, ?max = ?tMax
+max([?h | ?t], ?h)

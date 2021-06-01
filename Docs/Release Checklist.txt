@@ -18,6 +18,15 @@ Release 3.0.8 Checklist
 0. Search for new links (*)
 1. Race Engineer Refactoring
 2. New Race Strategist
+   a. Translations
+   b. New Configuration
+   c. New Grammars
+   d. Update Notes
+   e. Plugin & Modes
+   f. Complete new Documentation "Virtual Race Strategist"
+3. Update Procedure
+   a. Translations
+   b. Configuration for new Plugin
 
 Release 3.0.6 Checklist
 =======================

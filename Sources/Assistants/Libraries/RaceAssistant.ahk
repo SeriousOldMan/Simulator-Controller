@@ -48,7 +48,7 @@ class RaceAssistant extends ConfigurationItem {
 	iOptions := {}
 
 	iAssistantType := ""
-	iAssistantSettings := false
+	iSettings := false
 	iVoiceAssistant := false
 	
 	iSimulator := ""
@@ -135,9 +135,9 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 	
-	AssistantSettings[] {
+	Settings[] {
 		Get {
-			return this.iAssistantSettings
+			return this.iSettings
 		}
 	}
 	
@@ -210,10 +210,10 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 	
-	__New(configuration, assistantType, assistantSettings, name := false, language := "__Undefined__", speaker := false, listener := false, voiceServer := false) {
+	__New(configuration, assistantType, settings, name := false, language := "__Undefined__", speaker := false, listener := false, voiceServer := false) {
 		this.iDebug := (isDebug() ? kDebugKnowledgeBase : kDebugOff)
 		this.iAssistantType := assistantType
-		this.iAssistantSettings := assistantSettings
+		this.iSettings := settings
 		
 		base.__New(configuration)
 		
@@ -252,6 +252,9 @@ class RaceAssistant extends ConfigurationItem {
 	}
 	
 	updateConfigurationValues(values) {
+		if values.HasKey("Settings")
+			this.iSettings := values["Settings"]
+		
 		if values.HasKey("LearningLaps")
 			this.iLearningLaps := values["LearningLaps"]
 	}
@@ -272,15 +275,47 @@ class RaceAssistant extends ConfigurationItem {
 			this.iKnowledgeBase := values["KnowledgeBase"]
 	}
 	
+	handleVoiceCommand(grammar, words) {
+		switch grammar {
+			case "Yes":
+				continuation := this.Continuation
+				
+				this.clearContinuation()
+				
+				if continuation {
+					this.getSpeaker().speakPhrase("Confirm")
+
+					%continuation%()
+				}
+			case "No":
+				continuation := this.Continuation
+				
+				this.clearContinuation()
+				
+				if continuation
+					this.getSpeaker().speakPhrase("Okay")
+			case "Call", "Harsh":
+				this.nameRecognized(words)
+			case "Catch":
+				this.getSpeaker().speakPhrase("Repeat")
+			default:
+				Throw "Unknown grammar """ . grammar . """ detected in RaceAssistant.handleVoiceCommand...."
+		}
+	}
+	
+	nameRecognized(words) {
+		this.getSpeaker().speakPhrase("IHearYou")
+	}
+	
 	createKnowledgeBase(facts) {
-		fileName := this.AssistantType . ".rules"
+		local rules
 		
-		FileRead engineerRules, % getFileName(fileName, kConfigDirectory, kUserConfigDirectory)
+		FileRead rules, % getFileName(this.AssistantType . ".rules", kConfigDirectory, kUserConfigDirectory)
 		
 		productions := false
 		reductions := false
 
-		new RuleCompiler().compileRules(engineerRules, productions, reductions)
+		new RuleCompiler().compileRules(rules, productions, reductions)
 
 		engine := new RuleEngine(productions, reductions, facts)
 		

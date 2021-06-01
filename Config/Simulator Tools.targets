@@ -55,6 +55,12 @@ Race Engineer Configuration.5=%kConfigDirectory%Race Engineer.grammars.en <- %kS
 Race Engineer Configuration.6=%kResourcesDirectory%Templates\Race Engineer.grammars.en <- %kSourcesDirectory%Assistants\Race Engineer.grammars.en
 Race Engineer Configuration.7=%kConfigDirectory%Race Engineer.grammars.de <- %kSourcesDirectory%Assistants\Race Engineer.grammars.de
 Race Engineer Configuration.8=%kResourcesDirectory%Templates\Race Engineer.grammars.de <- %kSourcesDirectory%Assistants\Race Engineer.grammars.de
+Race Strategist Configuration.1=%kConfigDirectory%Race Strategist.rules <- %kSourcesDirectory%Assistants\Race Strategist.rules
+Race Strategist Configuration.2=%kResourcesDirectory%Templates\Race Strategist.rules <- %kSourcesDirectory%Assistants\Race Strategist.rules
+Race Strategist Configuration.3=%kConfigDirectory%Race Strategist.grammars.en <- %kSourcesDirectory%Assistants\Race Strategist.grammars.en
+Race Strategist Configuration.4=%kResourcesDirectory%Templates\Race Strategist.grammars.en <- %kSourcesDirectory%Assistants\Race Strategist.grammars.en
+Race Strategist Configuration.5=%kConfigDirectory%Race Strategist.grammars.de <- %kSourcesDirectory%Assistants\Race Strategist.grammars.de
+Race Strategist Configuration.6=%kResourcesDirectory%Templates\Race Strategist.grammars.de <- %kSourcesDirectory%Assistants\Race Strategist.grammars.de
 [Build]
 dotNET Applications && DLLs=Special
 Simulator Controller=%kBinariesDirectory%Simulator Controller.exe <- %kSourcesDirectory%Controller\Simulator Controller.ahk; %kIncludesDirectory%, %kLibrariesDirectory%SpeechRecognizer.ahk, %kPluginsDirectory%, %kUserPluginsDirectory%, %kHomeDirectory%VERSION

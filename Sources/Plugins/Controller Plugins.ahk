@@ -14,6 +14,7 @@
 #Include ..\Plugins\Tactile Feedback Plugin.ahk
 #Include ..\Plugins\Pedal Calibration Plugin.ahk
 #Include ..\Plugins\Race Engineer Plugin.ahk			; Must be loaded before any other Simulator Plugins
+#Include ..\Plugins\Race Strategist Plugin.ahk			; Must be loaded before any other Simulator Plugins
 #Include ..\Plugins\AC Plugin.ahk
 #Include ..\Plugins\ACC Plugin.ahk
 #Include ..\Plugins\IRC Plugin.ahk

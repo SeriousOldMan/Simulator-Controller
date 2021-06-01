@@ -92,11 +92,11 @@ class VoiceAssistant {
 			this.iLanguage := language
 		}
 		
-		speak(text) {
-			raiseEvent(kFileMessage, "Voice", "speakWith:" . values2String(";", this.iSpeaker, this.iLanguage, text), this.Assistant.VoiceServer)
+		speak(text, focus := false) {
+			raiseEvent(kFileMessage, "Voice", "speak:" . values2String(";", this.Assistant.Name, text, focus), this.Assistant.VoiceServer)
 		}
 		
-		speakPhrase(phrase, variables := false) {
+		speakPhrase(phrase, variables := false, focus := false) {
 			phrases := this.Phrases
 			
 			if phrases.HasKey(phrase) {
@@ -119,7 +119,7 @@ class VoiceAssistant {
 			}
 			
 			if phrase
-				this.speak(phrase)
+				this.speak(phrase, focus)
 		}
 	}
 	
@@ -154,7 +154,7 @@ class VoiceAssistant {
 			base.__New(speaker, language)
 		}
 		
-		speak(text) {
+		speak(text, focus := false) {
 			stopped := this.Assistant.stopListening()
 			
 			try {
@@ -173,7 +173,7 @@ class VoiceAssistant {
 			}
 		}
 		
-		speakPhrase(phrase, variables := false) {
+		speakPhrase(phrase, variables := false, focus := false) {
 			phrases := this.Phrases
 			
 			if phrases.HasKey(phrase) {
@@ -185,7 +185,7 @@ class VoiceAssistant {
 			}
 			
 			if phrase
-				this.speak(phrase)
+				this.speak(phrase, focus)
 		}
 	}
 	
@@ -332,9 +332,19 @@ class VoiceAssistant {
 		
 	getSpeaker() {
 		if (this.Speaker && !this.iSpeechGenerator) {
-			if this.VoiceServer
+			if this.VoiceServer {
+				Process Exist
+			
+				processID := ErrorLevel
+				
+				activationCommand := getConfigurationValue(this.getGrammars(this.Language), "Listener Grammars", "Call", false)
+				
+				raiseEvent(kFileMessage, "Voice", "registerVoiceClient:" . values2String(";", this.Name, processID, activationCommand
+																							, this.Language, this.Speaker, this.Listener))
+																						
 				this.iSpeechGenerator := new this.RemoteSpeaker(this, this.Speaker, this.Language
 																	  , this.buildFragments(this.Language), this.buildPhrases(this.Language))
+			}
 			else {
 				this.iSpeechGenerator := new this.LocalSpeaker(this, this.Speaker, this.Language
 																	 , this.buildFragments(this.Language), this.buildPhrases(this.Language))
@@ -450,11 +460,7 @@ class VoiceAssistant {
 			if speechRecognizer
 				speechRecognizer.setChoices(name, choices)
 			else
-				raiseEvent(kFileMessage, "Voice", "registerChoices:" . values2String(";", name, string2Values(",", choices)*), this.VoiceServer)
-		
-		Process Exist
-		
-		processID := ErrorLevel
+				raiseEvent(kFileMessage, "Voice", "registerChoices:" . values2String(";", this.Name, name, string2Values(",", choices)*), this.VoiceServer)
 		
 		for grammar, definition in getConfigurationSectionValues(grammars, "Listener Grammars", {}) {
 			definition := substituteVariables(definition, {name: this.Name})
@@ -468,7 +474,7 @@ class VoiceAssistant {
 			if speechRecognizer
 				speechRecognizer.loadGrammar(grammar, speechRecognizer.compileGrammar(definition), ObjBindMethod(this, "raisePhraseRecognized"))
 			else
-				raiseEvent(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", grammar, definition, processID, "remotePhraseRecognized"), this.VoiceServer)
+				raiseEvent(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, grammar, definition, "remotePhraseRecognized"), this.VoiceServer)
 		}
 	}
 
@@ -501,31 +507,7 @@ class VoiceAssistant {
 		protectionOn()
 		
 		try {
-			switch grammar {
-				case "Yes":
-					continuation := this.Continuation
-					
-					this.clearContinuation()
-					
-					if continuation {
-						this.getSpeaker().speakPhrase("Confirm")
-
-						%continuation%()
-					}
-				case "No":
-					continuation := this.Continuation
-					
-					this.clearContinuation()
-					
-					if continuation
-						this.getSpeaker().speakPhrase("Okay")
-				case "Call", "Harsh":
-					this.nameRecognized(words)
-				case "Catch":
-					this.getSpeaker().speakPhrase("Repeat")
-				default:
-					this.handleVoiceCommand(grammar, words)
-			}
+			this.handleVoiceCommand(grammar, words)
 		}
 		finally {
 			protectionOff()
@@ -541,10 +523,6 @@ class VoiceAssistant {
 	
 	clearContinuation() {
 		this.iContinuation := false
-	}
-	
-	nameRecognized(words) {
-		this.getSpeaker().speakPhrase("IHearYou")
 	}
 	
 	handleVoiceCommand(phrase, words) {

@@ -263,9 +263,9 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 		controller.registerPlugin(this)
 	
 		if (this.RaceEngineerName)
-			SetTimer collectSessionData, 10000
+			SetTimer collectRaceEngineerSessionData, 10000
 		else
-			SetTimer updateSessionState, 5000
+			SetTimer updateRaceEngineerSessionState, 5000
 	}
 	
 	createRaceEngineerAction(controller, action, actionFunction) {
@@ -457,7 +457,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 		
 			FileCreateDir %kTempDirectory%%code% Data
 			
-			Loop Files, %kTempDirectory%%code% Data\*.*
+			Loop Files, %kTempDirectory%%code% Data\%kRaceEngineerPlugin%*.*
 				if (A_LoopFilePath != dataFile)
 					FileDelete %A_LoopFilePath%
 		}
@@ -522,7 +522,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 		
 			this.iPitstopPending := false
 					
-			SetTimer collectSessionData, 10000
+			SetTimer collectRaceEngineerSessionData, 10000
 		}
 	}
 	
@@ -535,7 +535,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 		
 		this.Simulator.pitstopPrepared(pitstopNumber)
 		
-		SetTimer collectSessionData, 5000
+		SetTimer collectRaceEngineerSessionData, 5000
 	}
 	
 	pitstopFinished(pitstopNumber) {
@@ -543,7 +543,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 		
 		this.Simulator.pitstopFinished(pitstopNumber)
 		
-		SetTimer collectSessionData, 10000
+		SetTimer collectRaceEngineerSessionData, 10000
 	}
 	
 	startSimulation(simulator) {
@@ -587,23 +587,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 			if !data
 				data := readSharedMemory(this.Simulator.Code)
 			
-			if getConfigurationValue(data, "Session Data", "Active", false) {
-				if getConfigurationValue(data, "Session Data", "Paused", false)
-					return kSessionPaused
-				else
-					switch getConfigurationValue(data, "Session Data", "Session", "Other") {
-						case "Race":
-							return kSessionRace
-						case "Practice":
-							return kSessionPractice
-						case "Qualification":
-							return kSessionQualification
-						default:
-							return kSessionOther
-					}
-			}
-			else
-				return kSessionFinished
+			return getDataSessionState(data)
 		}
 		else
 			return kSessionFinished
@@ -705,9 +689,9 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 							lastLapCounter := 0
 						}
 						
-						newDataFile := kTempDirectory . code . " Data\Lap " . lastLap . "." . ++lastLapCounter . ".data"
+						newDataFile := kTempDirectory . code . " Data\" . kRaceEngineerPlugin . " Lap " . lastLap . "." . ++lastLapCounter . ".data"
 							
-						writeConfiguration(newDataFile, data)		; FileCopy %dataFile%, %newDataFile%, 1
+						writeConfiguration(newDataFile, data)
 						
 						if firstLap {
 							this.prepareSettings(data)
@@ -797,7 +781,7 @@ openRaceEngineerSettings(import := false, silent := false) {
 			Run "%exePath%" %options%, %kBinariesDirectory%, , pid
 		}
 		else {
-			options := getOptions()
+			options := getRaceEngineerOptions()
 			
 			Run "%exePath%" %options%, %kBinariesDirectory%, , pid
 		}
@@ -820,7 +804,7 @@ openRaceEngineerSetups() {
 	exePath := kBinariesDirectory . "Race Engineer Setups.exe"
 	
 	try {
-		options := getOptions()
+		options := getRaceEngineerOptions()
 		
 		Run "%exePath%" %options%, %kBinariesDirectory%, , pid
 	}
@@ -837,11 +821,12 @@ openRaceEngineerSetups() {
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-readSharedMemory(simulator, options := "", dataFile := false) {
+readSharedMemory(simulator, options := "") {
 	exePath := kBinariesDirectory . simulator . " SHM Reader.exe"
 	
-	if !dataFile
-		dataFile := kTempDirectory . simulator . " Data\SHM.data"
+	Random prefix, 1, 1000000
+		
+	dataFile := kTempDirectory . simulator . " Data\SHM_" . Round(prefix) . ".data"
 	
 	try {
 		RunWait %ComSpec% /c ""%exePath%" %options% > "%dataFile%"", , Hide
@@ -858,9 +843,36 @@ readSharedMemory(simulator, options := "", dataFile := false) {
 	
 	data := readConfiguration(dataFile)
 	
+	try {
+		FileDelete %dataFile%
+	}
+	catch exception {
+		; ignore
+	}
+	
 	setConfigurationValue(data, "Session Data", "Simulator", simulator)
 	
 	return data
+}
+
+getDataSessionState(data) {
+	if getConfigurationValue(data, "Session Data", "Active", false) {
+		if getConfigurationValue(data, "Session Data", "Paused", false)
+			return kSessionPaused
+		else
+			switch getConfigurationValue(data, "Session Data", "Session", "Other") {
+				case "Race":
+					return kSessionRace
+				case "Practice":
+					return kSessionPractice
+				case "Qualification":
+					return kSessionQualification
+				default:
+					return kSessionOther
+			}
+	}
+	else
+		return kSessionFinished
 }
 
 
@@ -868,7 +880,7 @@ readSharedMemory(simulator, options := "", dataFile := false) {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-getOptions() {
+getRaceEngineerOptions() {
 	local plugin
 	
 	controller := SimulatorController.Instance
@@ -892,7 +904,7 @@ getOptions() {
 	return options
 }
 
-updateSessionState() {
+updateRaceEngineerSessionState() {
 	protectionOn()
 	
 	try {
@@ -903,7 +915,7 @@ updateSessionState() {
 	}
 }
 
-collectSessionData() {
+collectRaceEngineerSessionData() {
 	protectionOn()
 	
 	try {

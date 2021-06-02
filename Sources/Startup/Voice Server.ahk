@@ -295,8 +295,11 @@ class VoiceServer extends ConfigurationItem {
 		}
 		
 		activate(words) {
-			if (this.ActivationCallback)
+			if (this.ActivationCallback && words)
 				raiseEvent(kFileMessage, "Voice", this.ActivationCallback . ":" . values2String(";", words*), this.PID)
+		}
+		
+		deactivate() {
 		}
 		
 		voiceCommandRecognized(grammar, words) {
@@ -424,17 +427,32 @@ class VoiceServer extends ConfigurationItem {
 	}
 	
 	activateVoiceClient(descriptor, words := false) {
-		if (this.ActiveVoiceClient && this.PushToTalk && this.ActiveVoiceClient.Listening)
-			this.ActiveVoiceClient.stoplistening()
+		if (this.ActiveVoiceClient && (this.ActiveVoiceClient.Descriptor = descriptor))
+			return
+		
+		if this.ActiveVoiceClient
+			this.deactivateVoiceClient(this.ActiveVoiceClient.Descriptor)
 		
 		activeVoiceClient := this.VoiceClients[descriptor]
 		
 		this.iActiveVoiceClient := activeVoiceClient
 		
-		activeVoiceClient.activate(words ? words : [])
+		activeVoiceClient.activate(words)
 		
 		if !this.PushToTalk
 			this.startListening()
+	}
+	
+	deactivateVoiceClient(descriptor) {
+		activeVoiceClient := this.ActiveVoiceClient
+		
+		if (activeVoiceClient && (activeVoiceClient.Descriptor = descriptor)) {
+			activeVoiceClient.stoplistening()
+		
+			this.iActiveVoiceClient := false
+		
+			activeVoiceClient.deactivate()
+		}
 	}
 	
 	startActivationListener(retry := false) {
@@ -558,6 +576,13 @@ class VoiceServer extends ConfigurationItem {
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
 		}
+		
+		if (this.VoiceClients.Count() = 1)
+			this.activateVoiceClient(descriptor)
+		else if (this.VoiceClients.Count() = 2)
+			for theDescriptor, theClient in this.VoiceClients
+				if (descriptor != theDescriptor)
+					this.deactivateVoiceClient(theDescriptor)
 	}
 	
 	registerChoices(descriptor, name, choices*) {

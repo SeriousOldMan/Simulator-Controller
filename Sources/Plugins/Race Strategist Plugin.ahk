@@ -70,44 +70,6 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 		addLap(arguments*) {
 			this.callRemote("addLap", arguments*)
 		}
-		
-		accept(arguments*) {
-			this.callRemote("accept", arguments*)
-		}
-		
-		reject(arguments*) {
-			this.callRemote("reject", arguments*)
-		}
-	}
-
-	class RaceStrategistAction extends ControllerAction {
-		iAction := false
-		
-		Action[] {
-			Get {
-				return this.iAction
-			}
-		}
-		
-		__New(function, label, action) {
-			this.iAction := action
-			
-			base.__New(function, label)
-		}
-		
-		fireAction(function, trigger) {
-			local plugin := this.Controller.findPlugin(kRaceStrategistPlugin)
-			
-			if plugin.RaceStrategist
-				switch this.Action {
-					case "Accept":
-						plugin.accept()
-					case "Reject":
-						plugin.reject()
-					default:
-						Throw "Invalid action """ . this.Action . """ detected in RaceStrategistAction.fireAction...."
-				}
-		}
 	}
 	
 	class RaceStrategistToggleAction extends ControllerAction {
@@ -192,9 +154,6 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 		else
 			this.iRaceStrategistEnabled := (this.iRaceStrategistName != false)
 		
-		for ignore, theAction in string2Values(",", this.getArgumentValue("raceStrategistCommands", ""))
-			this.createRaceStrategistAction(controller, string2Values(A_Space, theAction)*)
-		
 		strategistSpeaker := this.getArgumentValue("raceStrategistSpeaker", false)
 		
 		if ((strategistSpeaker != false) && (strategistSpeaker != kFalse)) {
@@ -218,9 +177,7 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 		local function := controller.findFunction(actionFunction)
 		
 		if (function != false) {
-			if inList(["Accept", "Reject"], action)
-				this.registerAction(new this.RaceStrategistAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Activate"), action), action))
-			else if (action = "RaceStrategist")
+			if (action = "RaceStrategist")
 				this.registerAction(new this.RaceStrategistToggleAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Toggle"), action)))
 			else
 				logMessage(kLogWarn, translate("Action """) . action . translate(""" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
@@ -243,15 +200,6 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 				if !this.RaceStrategistName
 					theAction.Function.disable()
 			}
-			else if isInstance(theAction, RaceStrategistPlugin.RaceStrategistAction)
-				if ((sessionState == kSessionRace) && (this.RaceStrategist != false)) {
-					theAction.Function.enable(kAllTrigger)
-					theAction.Function.setText(theAction.Label)
-				}
-				else {
-					theAction.Function.disable(kAllTrigger)
-					theAction.Function.setText(theAction.Label, "Gray")
-				}
 	}
 	
 	enableRaceStrategist() {
@@ -359,16 +307,6 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 	updateLap(lapNumber, dataFile) {
 		if this.RaceStrategist
 			this.RaceStrategist.updateLap(lapNumber, dataFile)
-	}
-	
-	accept() {
-		if this.RaceStrategist
-			this.RaceStrategist.accept()
-	}
-	
-	reject() {
-		if this.RaceStrategist
-			this.RaceStrategist.reject()
 	}
 	
 	startSimulation(simulator) {

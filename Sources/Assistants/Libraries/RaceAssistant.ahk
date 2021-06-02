@@ -222,15 +222,9 @@ class RaceAssistant extends ConfigurationItem {
 		if (language != kUndefined) {
 			listener := ((speaker != false) ? listener : false)
 			
-			if (language != false)
-				options["Language"] := language
-			
-			options["Speaker"] := speaker
-			options["Listener"] := listener
-			
-			if (voiceServer && (language != getConfigurationValue(configuration, "Voice Control", "Language", getLanguage())))
-				voiceServer := false
-			
+			options["Language"] := (language != false) ? language : options["Language"]
+			options["Speaker"] := (speaker == true) ? options["Speaker"] : speaker
+			options["Listener"] := (listener == true) ? options["Listener"] : listener
 			options["VoiceServer"] := voiceServer
 		}
 		

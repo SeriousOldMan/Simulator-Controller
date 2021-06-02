@@ -432,6 +432,11 @@ class RaceEngineerSimulatorPlugin extends SimulatorPlugin {
 				
 				this.iRaceEngineer := raceEngineer
 			}
+			
+			raceStrategist := SimulatorController.Instance.findPlugin(kRaceStrategistPlugin)
+			
+			if (raceStrategist && raceStrategist.isActive())
+				raceStrategist.startSimulation(this)
 		}
 	}
 	
@@ -446,6 +451,11 @@ class RaceEngineerSimulatorPlugin extends SimulatorPlugin {
 				
 				this.iRaceEngineer := false
 			}
+			
+			raceStrategist := SimulatorController.Instance.findPlugin(kRaceStrategistPlugin)
+			
+			if (raceStrategist && raceStrategist.isActive())
+				raceStrategist.stopSimulation(this)
 		}
 	}
 	

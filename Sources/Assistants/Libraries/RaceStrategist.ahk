@@ -270,10 +270,4 @@ class RaceStrategist extends RaceAssistant {
 		
 		return result
 	}
-	
-	accept() {
-	}
-	
-	reject() {
-	}
 }

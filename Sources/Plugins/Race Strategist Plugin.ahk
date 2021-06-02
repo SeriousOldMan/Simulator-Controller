@@ -27,6 +27,7 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 	iRaceStrategistEnabled := false
 	iRaceStrategistName := false
 	iRaceStrategistLogo := false
+	iRaceStrategistLanguage := false
 	iRaceStrategistSpeaker := false
 	iRaceStrategistListener := false
 	
@@ -124,6 +125,12 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 		}
 	}
 	
+	RaceStrategistLanguage[] {
+		Get {
+			return this.iRaceStrategistLanguage
+		}
+	}
+	
 	RaceStrategistSpeaker[] {
 		Get {
 			return this.iRaceStrategistSpeaker
@@ -141,6 +148,7 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 		
 		this.iRaceStrategistName := this.getArgumentValue("raceStrategistName", false)
 		this.iRaceStrategistLogo := this.getArgumentValue("raceStrategistLogo", false)
+		this.iRaceStrategistLanguage := this.getArgumentValue("raceStrategistLanguage", false)
 		
 		raceStrategistToggle := this.getArgumentValue("raceStrategist", false)
 		
@@ -232,6 +240,9 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 				
 				if this.RaceStrategistLogo
 					options .= " -Logo """ . this.RaceStrategistLogo . """"
+				
+				if this.RaceStrategistLanguage
+					options .= " -Language """ . this.RaceStrategistLanguage . """"
 				
 				if this.RaceStrategistSpeaker
 					options .= " -Speaker """ . this.RaceStrategistSpeaker . """"

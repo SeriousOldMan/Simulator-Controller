@@ -24,7 +24,14 @@ Release 3.0.8 Checklist
    d. Update Notes
    e. Plugin & Modes
    f. Complete new Documentation "Virtual Race Strategist"
-3. Update Procedure
+3. New Race Strategist Plugin
+   a. Plugin Arguments (especially raceStrategistLanguage / raceEngineerLanguage)
+   b. New Configuration
+   c. Translations
+   d. Update Notes
+   e. Plugin & Modes
+   f. Complete new Documentation "Virtual Race Strategist"
+4. Update Procedure
    a. Translations
    b. Configuration for new Plugin
 

@@ -28,6 +28,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 	iRaceEngineerEnabled := false
 	iRaceEngineerName := false
 	iRaceEngineerLogo := false
+	iRaceEngineerLanguage := false
 	iRaceEngineerSpeaker := false
 	iRaceEngineerListener := false
 	
@@ -195,6 +196,12 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 		}
 	}
 	
+	RaceEngineerLanguage[] {
+		Get {
+			return this.iRaceEngineerLanguage
+		}
+	}
+	
 	RaceEngineerSpeaker[] {
 		Get {
 			return this.iRaceEngineerSpeaker
@@ -218,6 +225,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 		
 		this.iRaceEngineerName := this.getArgumentValue("raceEngineerName", false)
 		this.iRaceEngineerLogo := this.getArgumentValue("raceEngineerLogo", false)
+		this.iRaceEngineerLanguage := this.getArgumentValue("raceEngineerLanguage", false)
 		
 		raceEngineerToggle := this.getArgumentValue("raceEngineer", false)
 		
@@ -355,6 +363,9 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 				
 				if this.RaceEngineerLogo
 					options .= " -Logo """ . this.RaceEngineerLogo . """"
+				
+				if this.RaceEngineerLanguage
+					options .= " -Language """ . this.RaceEngineerLanguage . """"
 				
 				if this.RaceEngineerSpeaker
 					options .= " -Speaker """ . this.RaceEngineerSpeaker . """"

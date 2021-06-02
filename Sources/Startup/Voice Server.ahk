@@ -577,9 +577,9 @@ class VoiceServer extends ConfigurationItem {
 			}
 		}
 		
-		if (this.VoiceClients.Count() = 1)
+		if (this.VoiceClients.Count() = 2)
 			this.activateVoiceClient(descriptor)
-		else if (this.VoiceClients.Count() = 2)
+		else if (this.VoiceClients.Count() = 4)
 			for theDescriptor, theClient in this.VoiceClients
 				if (descriptor != theDescriptor)
 					this.deactivateVoiceClient(theDescriptor)

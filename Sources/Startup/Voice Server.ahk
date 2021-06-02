@@ -269,7 +269,7 @@ class VoiceServer extends ConfigurationItem {
 				grammar := ("__Grammar." . this.iCounter++)
 			}
 			else if this.iVoiceCommands.HasKey(grammar) {
-				descriptor := this.iVoiceCommands[grammar]
+				descriptor := this.VoiceCommands[grammar]
 				
 				if ((descriptor[1] = command) && (descriptor[2] = callback))
 					return
@@ -303,8 +303,8 @@ class VoiceServer extends ConfigurationItem {
 			if isDebug()
 				showMessage("Voice command recognized: " . values2String(" ", words*))
 			
-			descriptor := this.iVoiceCommands[grammar]
-			
+			descriptor := this.VoiceCommands[grammar]
+
 			raiseEvent(kFileMessage, "Voice", descriptor[2] . ":" . values2String(";", grammar, descriptor[1], words*), this.PID)
 		}
 	}
@@ -533,7 +533,7 @@ class VoiceServer extends ConfigurationItem {
 		if (language == false)
 			language := this.iLanguage
 		
-		client := new VoiceClient(this, descriptor, pid, language, speaker, listener, pushToTalk, speakerVolume, speakerPitch, speakerSpeed, activationCallback)
+		client := new this.VoiceClient(this, descriptor, pid, language, speaker, listener, pushToTalk, speakerVolume, speakerPitch, speakerSpeed, activationCallback)
 		
 		this.VoiceClients[descriptor] := client
 		this.VoiceClients[pid] := client

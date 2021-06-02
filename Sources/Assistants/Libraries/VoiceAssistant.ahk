@@ -328,7 +328,8 @@ class VoiceAssistant {
 				
 				activationCommand := getConfigurationValue(this.getGrammars(this.Language), "Listener Grammars", "Call", false)
 				
-				raiseEvent(kFileMessage, "Voice", "registerVoiceClient:" . values2String(";", this.Name, processID, activationCommand
+				raiseEvent(kFileMessage, "Voice", "registerVoiceClient:" . values2String(";", this.Name, processID
+																							, activationCommand, "remoteActivationRecognized"
 																							, this.Language, this.Speaker, this.Listener))
 																						
 				this.iSpeechGenerator := new this.RemoteSpeaker(this, this.Speaker, this.Language
@@ -483,6 +484,10 @@ class VoiceAssistant {
 	
 	localPhraseRecognized(grammar, words*) {
 		this.phraseRecognized(grammar, words)
+	}
+	
+	remoteActivationRecognized(words*) {
+		this.phraseRecognized("Call", words)
 	}
 	
 	remotePhraseRecognized(grammar, command, words*) {

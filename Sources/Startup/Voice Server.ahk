@@ -45,7 +45,7 @@ ListLines Off					; Disable execution history
 
 class VoiceServer extends ConfigurationItem {
 	iVoiceClients := {}
-	iFocusedVoiceClient := false
+	iActiveVoiceClient := false
 	
 	class VoiceClient {
 		iCounter := 1
@@ -68,6 +68,7 @@ class VoiceServer extends ConfigurationItem {
 		iIsSpeaking := false
 		iIsListening := false
 		
+		iActivationCallback := false
 		iVoiceCommands := {}
 	
 		VoiceServer[] {
@@ -142,6 +143,12 @@ class VoiceServer extends ConfigurationItem {
 			}
 		}
 		
+		ActivationCallback[] {
+			Get {
+				return this.iActivationCallback
+			}
+		}
+		
 		VoiceCommands[] {
 			Get {
 				return this.iVoiceCommands
@@ -171,7 +178,7 @@ class VoiceServer extends ConfigurationItem {
 			}
 		}
 		
-		__New(voiceServer, descriptor, pid, language, speaker, listener, pushToTalk, speakerVolume, speakerPitch, speakerSpeed) {
+		__New(voiceServer, descriptor, pid, language, speaker, listener, pushToTalk, speakerVolume, speakerPitch, speakerSpeed, activationCallback) {
 			this.iVoiceServer := voiceServer
 			this.iDescriptor := descriptor
 			this.iPID := pid
@@ -182,6 +189,7 @@ class VoiceServer extends ConfigurationItem {
 			this.iSpeakerVolume := speakerVolume
 			this.iSpeakerPitch := speakerPitch
 			this.iSpeakerSpeed := speakerSpeed
+			this.iActivationCallback := activationCallback
 		}
 	
 		speak(text) {
@@ -286,6 +294,11 @@ class VoiceServer extends ConfigurationItem {
 			this.VoiceCommands[grammar] := Array(command, callback)
 		}
 		
+		activate(words) {
+			if (this.ActivationCallback)
+				raiseEvent(kFileMessage, "Voice", this.ActivationCallback . ":" . values2String(";", words*), this.PID)
+		}
+		
 		voiceCommandRecognized(grammar, words) {
 			if isDebug()
 				showMessage("Voice command recognized: " . values2String(" ", words*))
@@ -315,9 +328,9 @@ class VoiceServer extends ConfigurationItem {
 		}
 	}
 	
-	FocusedVoiceClient[] {
+	ActiveVoiceClient[] {
 		Get {
-			return this.iFocusedVoiceClient
+			return this.iActiveVoiceClient
 		}
 	}
 	
@@ -407,14 +420,18 @@ class VoiceServer extends ConfigurationItem {
 		if descriptor
 			return this.VoiceClients[descriptor]
 		else
-			return this.FocusedVoiceClient
+			return this.ActiveVoiceClient
 	}
 	
-	focusVoiceClient(descriptor) {
-		if (this.FocusedVoiceClient && this.PushToTalk && this.FocusedVoiceClient.Listening)
-			this.FocusedVoiceClient.stoplistening()
+	activateVoiceClient(descriptor, words := false) {
+		if (this.ActiveVoiceClient && this.PushToTalk && this.ActiveVoiceClient.Listening)
+			this.ActiveVoiceClient.stoplistening()
 		
-		this.FocusedVoiceClient := this.VoiceClients[descriptor]
+		activeVoiceClient := this.VoiceClients[descriptor]
+		
+		this.iActiveVoiceClient := activeVoiceClient
+		
+		activeVoiceClient.activate(words ? words : [])
 		
 		if !this.PushToTalk
 			this.startListening()
@@ -463,20 +480,20 @@ class VoiceServer extends ConfigurationItem {
 	startListening(retry := true) {
 		this.startActivationListener(retry)
 		
-		focusedClient := this.getVoiceClient()
+		activeClient := this.getVoiceClient()
 		
-		return (focusedClient ? focusedClient.startListening(retry) : false)
+		return (activeClient ? activeClient.startListening(retry) : false)
 	}
 	
 	stopListening(retry := false) {
 		this.stopActivationListener(retry)
 		
-		focusedClient := this.getVoiceClient()
+		activeClient := this.getVoiceClient()
 		
-		return (focusedClient ? focusedClient.stopListening(retry) : false)
+		return (activeClient ? activeClient.stopListening(retry) : false)
 	}
 	
-	speak(descriptor, text, focus := false) {
+	speak(descriptor, text, activate := false) {
 		oldSpeaking := this.Speaking
 		
 		this.iIsSpeaking := true
@@ -484,15 +501,15 @@ class VoiceServer extends ConfigurationItem {
 		try {
 			this.getVoiceClient(descriptor).speak(text)
 			
-			if focus
-				this.focusVoiceClient(descriptor)
+			if activate
+				this.activateVoiceClient(descriptor)
 		}
 		finally {
 			this.iIsSpeaking := oldSpeaking
 		}
 	}
 	
-	registerVoiceClient(descriptor, pid, activationCommand := false, language := false, speaker := true, listener := false, pushToTalk := false, speakerVolume := "__Undefined__", speakerPitch := "__Undefined__", speakerSpeed := "__Undefined__") {
+	registerVoiceClient(descriptor, pid, activationCommand := false, activationCallback := false, language := false, speaker := true, listener := false, pushToTalk := false, speakerVolume := "__Undefined__", speakerPitch := "__Undefined__", speakerSpeed := "__Undefined__") {
 		static counter := 1
 		
 		if (speakerVolume = kUndefined)
@@ -516,7 +533,7 @@ class VoiceServer extends ConfigurationItem {
 		if (language == false)
 			language := this.iLanguage
 		
-		client := new VoiceClient(this, descriptor, pid, language, speaker, listener, pushToTalk, speakerVolume, speakerPitch, speakerSpeed)
+		client := new VoiceClient(this, descriptor, pid, language, speaker, listener, pushToTalk, speakerVolume, speakerPitch, speakerSpeed, activationCallback)
 		
 		this.VoiceClients[descriptor] := client
 		this.VoiceClients[pid] := client
@@ -555,7 +572,7 @@ class VoiceServer extends ConfigurationItem {
 		if isDebug()
 			showMessage("Activation command recognized: " . values2String(" ", words*))
 		
-		this.focusVoiceClient(ConfigurationItem.splitDescriptor(grammar)[1])
+		this.activateVoiceClient(ConfigurationItem.splitDescriptor(grammar)[1], words)
 	}
 }
 

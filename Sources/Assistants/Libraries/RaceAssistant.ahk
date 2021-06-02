@@ -304,7 +304,8 @@ class RaceAssistant extends ConfigurationItem {
 	}
 	
 	nameRecognized(words) {
-		this.getSpeaker().speakPhrase("IHearYou")
+		if (words.Length() > 0)
+			this.getSpeaker().speakPhrase("IHearYou")
 	}
 	
 	createKnowledgeBase(facts) {

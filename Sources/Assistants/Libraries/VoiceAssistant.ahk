@@ -327,17 +327,18 @@ class VoiceAssistant {
 				processID := ErrorLevel
 				
 				activationCommand := getConfigurationValue(this.getGrammars(this.Language), "Listener Grammars", "Call", false)
+				activationCommand := substituteVariables(activationCommand, {name: this.Name})
 				
 				raiseEvent(kFileMessage, "Voice", "registerVoiceClient:" . values2String(";", this.Name, processID
 																							, activationCommand, "remoteActivationRecognized"
 																							, this.Language, this.Speaker, this.Listener))
 																						
 				this.iSpeechGenerator := new this.RemoteSpeaker(this, this.Speaker, this.Language
-																	  , this.buildFragments(this.Language), this.buildPhrases(this.Language))
+															  , this.buildFragments(this.Language), this.buildPhrases(this.Language))
 			}
 			else {
 				this.iSpeechGenerator := new this.LocalSpeaker(this, this.Speaker, this.Language
-																	 , this.buildFragments(this.Language), this.buildPhrases(this.Language))
+															 , this.buildFragments(this.Language), this.buildPhrases(this.Language))
 			
 				this.iSpeechGenerator.setVolume(this.iSpeakerVolume)
 				this.iSpeechGenerator.setPitch(this.iSpeakerPitch)

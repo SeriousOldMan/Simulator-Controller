@@ -222,9 +222,9 @@ class RaceAssistant extends ConfigurationItem {
 		if (language != kUndefined) {
 			listener := ((speaker != false) ? listener : false)
 			
-			options["Language"] := (language != false) ? language : options["Language"]
-			options["Speaker"] := (speaker == true) ? options["Speaker"] : speaker
-			options["Listener"] := (listener == true) ? options["Listener"] : listener
+			options["Language"] := ((language != false) ? language : options["Language"])
+			options["Speaker"] := ((speaker == true) ? options["Speaker"] : speaker)
+			options["Listener"] := ((listener == true) ? options["Listener"] : listener)
 			options["VoiceServer"] := voiceServer
 		}
 		
@@ -298,8 +298,7 @@ class RaceAssistant extends ConfigurationItem {
 	}
 	
 	nameRecognized(words) {
-		if (words.Length() > 0)
-			this.getSpeaker().speakPhrase("IHearYou")
+		this.getSpeaker().speakPhrase("IHearYou")
 	}
 	
 	createKnowledgeBase(facts) {

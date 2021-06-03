@@ -251,9 +251,6 @@ class VoiceAssistant {
 		
 		if !this.Speaker
 			this.iListener := false
-			
-		if (this.VoiceServer && (this.Language != getConfigurationValue(kSimulatorConfiguration, "Voice Control", "Language", getLanguage())))
-			this.iVoiceServer := false
 
 		registerEventHandler("Voice", ObjBindMethod(this, "handleVoiceCalls"))
 		

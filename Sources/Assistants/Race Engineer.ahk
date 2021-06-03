@@ -201,10 +201,6 @@ startRaceEngineer() {
 		}
 	}
 	
-	if (engineerListener && (engineerListener != true)
-	 && (engineerListener != getConfigurationValue(kSimulatorConfiguration, "Voice", "Listener", false)))
-		voiceServer := false
-	
 	RaceEngineer.Instance := new RaceEngineer(kSimulatorConfiguration, readConfiguration(engineerSettingsFile)
 											, remotePID ? new RemotePitstopHandler(remotePID) : false
 											, engineerName, engineerLanguage, engineerSpeaker, engineerListener, voiceServer)

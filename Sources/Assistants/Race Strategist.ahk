@@ -143,10 +143,6 @@ startRaceStrategist() {
 		}
 	}
 	
-	if (strategistListener && (strategistListener != true)
-	 && (strategistListener != getConfigurationValue(kSimulatorConfiguration, "Voice", "Listener", false)))
-		voiceServer := false
-	
 	RaceStrategist.Instance := new RaceStrategist(kSimulatorConfiguration, readConfiguration(strategistSettingsFile)
 												, strategistName, strategistLanguage, strategistSpeaker, strategistListener, voiceServer)
 	

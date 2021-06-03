@@ -34,6 +34,9 @@ Release 3.0.8 Checklist
 4. Update Procedure
    a. Translations
    b. Configuration for new Plugin
+5. Multiple Voice Inputs with Activation Phrase
+   a. Documentation
+   b. "Hey %name%" and "Controller"
 
 Release 3.0.6 Checklist
 =======================

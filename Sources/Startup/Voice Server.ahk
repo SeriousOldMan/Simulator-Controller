@@ -554,7 +554,6 @@ class VoiceServer extends ConfigurationItem {
 		client := new this.VoiceClient(this, descriptor, pid, language, speaker, listener, pushToTalk, speakerVolume, speakerPitch, speakerSpeed, activationCallback)
 		
 		this.VoiceClients[descriptor] := client
-		this.VoiceClients[pid] := client
 		
 		if activationCommand {
 			recognizer := this.SpeechRecognizer[true]
@@ -577,9 +576,9 @@ class VoiceServer extends ConfigurationItem {
 			}
 		}
 		
-		if (this.VoiceClients.Count() = 2)
+		if (this.VoiceClients.Count() = 1)
 			this.activateVoiceClient(descriptor)
-		else if (this.VoiceClients.Count() = 4)
+		else if (this.VoiceClients.Count() = 2)
 			for theDescriptor, theClient in this.VoiceClients
 				if (descriptor != theDescriptor)
 					this.deactivateVoiceClient(theDescriptor)

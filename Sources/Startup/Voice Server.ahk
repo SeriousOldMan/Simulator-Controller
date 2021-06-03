@@ -566,6 +566,11 @@ class VoiceServer extends ConfigurationItem {
 		if (language == false)
 			language := this.iLanguage
 		
+		client := this.VoiceClients[descriptor]
+		
+		if (client && (this.ActiveVoiceClient == client))
+			this.deactivateVoiceClient(descriptor)
+			
 		client := new this.VoiceClient(this, descriptor, pid, language, speaker, listener, pushToTalk, speakerVolume, speakerPitch, speakerSpeed, activationCallback, deactivationCallback)
 		
 		this.VoiceClients[descriptor] := client

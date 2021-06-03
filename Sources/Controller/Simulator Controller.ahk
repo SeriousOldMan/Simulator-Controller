@@ -727,9 +727,9 @@ class SimulatorController extends ConfigurationItem {
 				processID := ErrorLevel
 				
 				if !registered {
-					raiseEvent(kFileMessage, "Voice", "registerVoiceClient:" . values2String(";", "Controller", processID, "Controller", "activationCommand", false, false, true), this.VoiceServer)
+					raiseEvent(kFileMessage, "Voice", "registerVoiceClient:" . values2String(";", "Controller", processID, "Controller", "activationCommand", false, false, false, true), this.VoiceServer)
 					
-					raiseEvent(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", "Controller", false, "Controller", "activationCommand"), this.VoiceServer)
+					; raiseEvent(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", "Controller", false, "Controller", "activationCommand"), this.VoiceServer)
 				
 					registered := true
 				}

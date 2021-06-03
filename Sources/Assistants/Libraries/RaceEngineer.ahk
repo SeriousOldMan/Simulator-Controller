@@ -166,7 +166,7 @@ class RaceEngineer extends RaceAssistant {
 			case "Weather":
 				this.weatherRecognized(words)
 			case "PitstopPlan":
-				this.VoiceAssistant.clearContinuation()
+				this.clearContinuation()
 				
 				if !this.supportsPitstop()
 					this.getSpeaker().speakPhrase("NoPitstop")
@@ -176,7 +176,7 @@ class RaceEngineer extends RaceAssistant {
 					this.planPitstopRecognized(words)
 				}
 			case "PitstopPrepare":
-				this.VoiceAssistant.clearContinuation()
+				this.clearContinuation()
 				
 				if !this.supportsPitstop()
 					this.getSpeaker().speakPhrase("NoPitstop")
@@ -186,43 +186,43 @@ class RaceEngineer extends RaceAssistant {
 					this.preparePitstopRecognized(words)
 				}
 			case "PitstopAdjustFuel":
-				this.VoiceAssistant.clearContinuation()
+				this.clearContinuation()
 				
 				if !this.supportsPitstop()
 					this.getSpeaker().speakPhrase("NoPitstop")
 				else
 					this.pitstopAdjustFuelRecognized(words)
 			case "PitstopAdjustCompound":
-				this.VoiceAssistant.clearContinuation()
+				this.clearContinuation()
 				
 				if !this.supportsPitstop()
 					this.getSpeaker().speakPhrase("NoPitstop")
 				else
 					this.pitstopAdjustCompoundRecognized(words)
 			case "PitstopAdjustPressureUp", "PitstopAdjustPressureDown":
-				this.VoiceAssistant.clearContinuation()
+				this.clearContinuation()
 				
 				if !this.supportsPitstop()
 					this.getSpeaker().speakPhrase("NoPitstop")
 				else
 					this.pitstopAdjustPressureRecognized(words)
 			case "PitstopNoPressureChange":
-				this.VoiceAssistant.clearContinuation()
+				this.clearContinuation()
 				
 				this.pitstopAdjustNoPressureRecognized(words)
 			case "PitstopNoTyreChange":
-				this.VoiceAssistant.clearContinuation()
+				this.clearContinuation()
 				
 				this.pitstopAdjustNoTyreRecognized(words)
 			case "PitstopAdjustRepairSuspension":
-				this.VoiceAssistant.clearContinuation()
+				this.clearContinuation()
 				
 				if !this.supportsPitstop()
 					this.getSpeaker().speakPhrase("NoPitstop")
 				else
 					this.pitstopAdjustRepairRecognized("Suspension", words)
 			case "PitstopAdjustRepairBodywork":
-				this.VoiceAssistant.clearContinuation()
+				this.clearContinuation()
 				
 				if !this.supportsPitstop()
 					this.getSpeaker().speakPhrase("NoPitstop")
@@ -690,6 +690,10 @@ class RaceEngineer extends RaceAssistant {
 	setContinuation(continuation) {
 		this.VoiceAssistant.setContinuation(continuation)
 	}
+			
+	clearContinuation() {
+		this.VoiceAssistant.clearContinuation()
+	}
 	
 	createSession(data) {
 		local facts
@@ -913,7 +917,7 @@ class RaceEngineer extends RaceAssistant {
 	forceFinishSession() {
 		if !this.SessionDataActive {
 			this.updateSessionValues({Simulator: "", Session: kSessionFinished})
-			this.updateSessionValues({KnowledgeBase: false, SetupData: {}})
+			this.updateDynamicValues({KnowledgeBase: false, SetupData: {}})
 		}	
 	}
 	

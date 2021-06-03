@@ -521,6 +521,7 @@ class VoiceServer extends ConfigurationItem {
 			
 			if activate
 				this.activateVoiceClient(descriptor)
+				
 		}
 		finally {
 			this.iIsSpeaking := oldSpeaking

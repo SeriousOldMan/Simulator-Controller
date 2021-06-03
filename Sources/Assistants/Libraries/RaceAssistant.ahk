@@ -159,6 +159,12 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 	
+	Continuation[] {
+		Get {
+			return this.VoiceAssistant.Continuation
+		}
+	}
+	
 	DriverName[] {
 		Get {
 			return this.iDriverName

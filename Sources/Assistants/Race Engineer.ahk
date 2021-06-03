@@ -179,7 +179,7 @@ startRaceEngineer() {
 				engineerName := A_Args[index + 1]
 				index += 2
 			case "-Logo":
-				engineerLogo := (A_Args[index + 1] = kTrue) ? true : false
+				engineerLogo := ((A_Args[index + 1] = kTrue) || (A_Args[index + 1] = true)) ? true : false
 				index += 2
 			case "-Language":
 				engineerLanguage := A_Args[index + 1]

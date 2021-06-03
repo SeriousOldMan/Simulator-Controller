@@ -135,6 +135,9 @@ class RaceStrategist extends RaceAssistant {
 		
 		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(this.createSession(data))})
 		
+		if this.Speaker
+			this.getSpeaker().speak("")
+		
 		if this.Debug[kDebugKnowledgeBase]
 			this.dumpKnowledge(this.KnowledgeBase)
 	}

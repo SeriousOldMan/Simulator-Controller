@@ -248,8 +248,6 @@ class VoiceAssistant {
 		this.iName := name
 		
 		this.initialize(options)
-		
-		this.setDebug(kDebugRecognitions, true)
 
 		if !this.Speaker
 			this.iListener := false

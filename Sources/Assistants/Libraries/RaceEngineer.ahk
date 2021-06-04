@@ -896,7 +896,7 @@ class RaceEngineer extends RaceAssistant {
 			if this.Speaker
 				this.getSpeaker().speakPhrase("Bye")
 			
-			if ((this.Session == kSessionPractice) || (this.Session == kSessionRace)) {
+			if (this.hasEnoughData() || ((this.Session == kSessionPractice) || (this.Session == kSessionRace))) {
 				this.updateSessionData()
 						
 				if (this.Listener && (((this.SaveTyrePressures == kAsk) && (this.SetupData.Count() > 0)) || (this.SaveSettings == kAsk))) {

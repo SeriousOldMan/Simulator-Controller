@@ -60,6 +60,7 @@ class VoiceServer extends ConfigurationItem {
 	iIsSpeaking := false
 	iIsListening := false
 	
+	iPendingCommands := []
 	iLastCommand := A_TickCount
 	
 	class VoiceClient {
@@ -86,8 +87,6 @@ class VoiceServer extends ConfigurationItem {
 		iActivationCallback := false
 		iDeactivationCallback := false
 		iVoiceCommands := {}
-		
-		iPendingCommands := []
 	
 		VoiceServer[] {
 			Get {
@@ -629,14 +628,14 @@ class VoiceServer extends ConfigurationItem {
 		this.iPendingCommands := []
 	}
 	
-	runPendingCommand() {
+	runPendingCommands() {
 		if (A_Now < (this.iLastCommand + 2000))
 			return
 		
-		if (this.iPendingsCommands.Length() == 0)
+		if (this.iPendingCommands.Length() == 0)
 			return
 		else {
-			command := this.iPendingsCommands.RemoveAt(1)
+			command := this.iPendingCommands.RemoveAt(1)
 		
 			if command
 				%command%()

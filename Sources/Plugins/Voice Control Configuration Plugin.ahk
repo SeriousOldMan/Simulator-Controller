@@ -21,6 +21,7 @@ global speakerPitchSlider
 global speakerSpeedSlider
 global listenerDropDown
 global pushToTalkEdit = ""
+global activationCommandEdit = ""
 
 class VoiceControlConfigurator extends ConfigurationItem {
 	__New(configuration) {
@@ -112,6 +113,9 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		Gui %window%:Add, Edit, x134 y240 w110 h21 VpushToTalkEdit, %pushToTalkEdit%
 		Gui %window%:Add, Button, x246 y239 w23 h23 ggetPTTHotkey HwnddetectPTTButtonHandle
 		setButtonIcon(detectPTTButtonHandle, kIconsDirectory . "Key.ico", 1)
+		
+		Gui %window%:Add, Text, x16 y264 w100 h23 +0x200, % translate("Activation Command")
+		Gui %window%:Add, Edit, x134 y264 w135 h21 VactivationCommandEdit, %activationCommandEdit%
 	}
 	
 	loadFromConfiguration(configuration) {
@@ -132,9 +136,13 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		
 		listenerDropDown := getConfigurationValue(configuration, "Voice Control", "Listener", false)
 		pushToTalkEdit := getConfigurationValue(configuration, "Voice Control", "PushToTalk", false)
+		activationCommandEdit := getConfigurationValue(configuration, "Voice Control", "ActivationCommand", false)
 		
 		if (pushToTalkEdit = false)
 			pushToTalkEdit := ""
+		
+		if (activationCommandEdit = false)
+			activationCommandEdit := ""
 		
 		if (speakerDropDown == true)
 			speakerDropDown := translate("Automatic")
@@ -157,6 +165,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		GuiControlGet speakerSpeedSlider
 		GuiControlGet listenerDropDown
 		GuiControlGet pushToTalkEdit
+		GuiControlGet activationCommandEdit
 		
 		languageCode := "en"
 		languages := availableLanguages()
@@ -203,6 +212,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		setConfigurationValue(configuration, "Voice Control", "SpeakerSpeed", speakerSpeedSlider)
 		setConfigurationValue(configuration, "Voice Control", "Listener", listenerDropDown)
 		setConfigurationValue(configuration, "Voice Control", "PushToTalk", (Trim(pushToTalkEdit) = "") ? false : pushToTalkEdit)
+		setConfigurationValue(configuration, "Voice Control", "ActivationCommand", (Trim(activationCommandEdit) = "") ? false : activationCommandEdit)
 	}
 }
 

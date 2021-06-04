@@ -5,6 +5,7 @@
   3. Full rework of voice generation and recognition to allow for multiple voices even using diffeerent languages
   4. Initial integration of the new AI-based Virtual Race Strategist
   5. New Plugin "Race Strategist" to control the new Virtual Race Strategist
+  6. New Tab in the configuration tool for the new Virtual Race Strategist
 
 ## 3.0.6-release 05/28/21
 

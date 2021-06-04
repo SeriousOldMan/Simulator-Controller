@@ -13,3 +13,4 @@
 #Include ..\Plugins\Launchpad Configuration Plugin.ahk
 #Include ..\Plugins\Chat Messages Configuration Plugin.ahk
 #Include ..\Plugins\Race Engineer Configuration Plugin.ahk
+#Include ..\Plugins\Race Strategist Configuration Plugin.ahk

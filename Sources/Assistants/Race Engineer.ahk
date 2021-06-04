@@ -108,7 +108,7 @@ class RemotePitstopHandler {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-showLogo() {
+showLogo(name) {
 	static videoPlayer
 
 	info := kVersion . " - 2021, Oliver Juwig`nCreative Commons - BY-NC-SA"
@@ -121,7 +121,7 @@ showLogo() {
 	y := mainScreenBottom - 234
 
 	title1 := translate("Modular Simulator Controller System")
-	title2 := translate("Jona - The Virtual Race Engineer")
+	title2 := substituteVariables(translate("%name% - The Virtual Race Engineer"), {name: name})
 	SplashImage %image%, B FS8 CWD0D0D0 w299 x%x% y%y% ZH155 ZW279, %info%, %title1%`n%title2%
 
 	Gui Logo:-Border -Caption 
@@ -208,7 +208,7 @@ startRaceEngineer() {
 	registerEventHandler("Engineer", "handleEngineerRemoteCalls")
 	
 	if engineerLogo
-		showLogo()
+		showLogo(engineerName)
 	
 	if (remotePID != 0) {
 		vRemotePID := remotePID

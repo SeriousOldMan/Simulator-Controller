@@ -14,19 +14,19 @@
 ;;; RaceEngineerConfigurator                                                ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-global simulatorDropDown
+global reSimulatorDropDown
 
-global loadSettingsDropDown
-global loadTyrePressuresDropDown
-global saveSettingsDropDown
-global saveTyrePressuresDropDown
+global reLoadSettingsDropDown
+global reLoadTyrePressuresDropDown
+global reSaveSettingsDropDown
+global reSaveTyrePressuresDropDown
 
-global learningLapsEdit
-global lapsConsideredEdit
-global dampingFactorEdit
+global reLearningLapsEdit
+global reLapsConsideredEdit
+global reDampingFactorEdit
 
-global adjustLapTimeCheck
-global damageAnalysisLapsEdit
+global reAdjustLapTimeCheck
+global reDamageAnalysisLapsEdit
 
 class RaceEngineerConfigurator extends ConfigurationItem {
 	iSimulatorConfigurations := {}
@@ -48,7 +48,7 @@ class RaceEngineerConfigurator extends ConfigurationItem {
  		choices := this.getSimulators()
 		chosen := (choices.Length() > 0) ? 1 : 0
 		
-		Gui %window%:Add, DropDownList, x156 y80 w307 Choose%chosen% gchooseSimulator vsimulatorDropDown, % values2String("|", choices*)
+		Gui %window%:Add, DropDownList, x156 y80 w307 Choose%chosen% gchooseRaceEngineerSimulator vreSimulatorDropDown, % values2String("|", choices*)
 		
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
@@ -59,12 +59,12 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		
 		Gui %window%:Add, Text, x24 y137 w160 h23 +0x200, % translate("Load Settings")
 		choices := map(["Use values from previous Session", "Load from Setup Database"], "translate")
-		Gui %window%:Add, DropDownList, x156 y137 w307 AltSubmit vloadSettingsDropDown, % values2String("|", choices*)
+		Gui %window%:Add, DropDownList, x156 y137 w307 AltSubmit vreLoadSettingsDropDown, % values2String("|", choices*)
 		
 		Gui %window%:Add, Text, x24 y161 w160 h23 +0x200, % translate("Load Tyre Pressures")
 		choices := map(["Use Values from Settings", "Load from Setup Database", "Import from Simulator"], "translate")
 		chosen := 1
-		Gui %window%:Add, DropDownList, x156 y161 w307 AltSubmit Choose%chosen% vloadTyrePressuresDropDown, % values2String("|", choices*)
+		Gui %window%:Add, DropDownList, x156 y161 w307 AltSubmit Choose%chosen% vreLoadTyrePressuresDropDown, % values2String("|", choices*)
 		
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
@@ -75,11 +75,11 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		
 		choices := map(["Ask", "Always", "Never"], "translate")
 		Gui %window%:Add, Text, x24 y213 w160 h23 +0x200, % translate("Save Settings")
-		Gui %window%:Add, DropDownList, x156 y213 w140 AltSubmit vsaveSettingsDropDown, % values2String("|", choices*)
+		Gui %window%:Add, DropDownList, x156 y213 w140 AltSubmit vreSaveSettingsDropDown, % values2String("|", choices*)
 		
 		choices := map(["Ask", "Always", "Never"], "translate")
 		Gui %window%:Add, Text, x24 y237 w160 h23 +0x200, % translate("Save Tyre Pressures")
-		Gui %window%:Add, DropDownList, x156 y237 w140 AltSubmit vsaveTyrePressuresDropDown, % values2String("|", choices*)
+		Gui %window%:Add, DropDownList, x156 y237 w140 AltSubmit vreSaveTyrePressuresDropDown, % values2String("|", choices*)
 		
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
@@ -89,24 +89,24 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 		
 		Gui %window%:Add, Text, x24 y289 w160 h23 +0x200, % translate("Learn for")
-		Gui %window%:Add, Edit, x156 yp w40 h21 Number vlearningLapsEdit
+		Gui %window%:Add, Edit, x156 yp w40 h21 Number vreLearningLapsEdit
 		Gui %window%:Add, UpDown, x196 yp w17 h21, 1
 		Gui %window%:Add, Text, x200 yp w260 h23 +0x200, % translate("Laps after Start or Pitstop")
 		
 		Gui %window%:Add, Text, x24 yp+26 w105 h20 Section, % translate("Statistical Window")
-		Gui %window%:Add, Edit, x156 yp-2 w40 h21 Number vlapsConsideredEdit
+		Gui %window%:Add, Edit, x156 yp-2 w40 h21 Number vreLapsConsideredEdit
 		Gui %window%:Add, UpDown, x196 yp w17 h21, 1
 		Gui %window%:Add, Text, x200 yp+2 w170 h20, % translate("Laps")
 		
 		Gui %window%:Add, Text, x24 ys+24 w105 h20 Section, % translate("Damping Factor")
-		Gui %window%:Add, Edit, x156 yp-2 w40 h21 vdampingFactorEdit
+		Gui %window%:Add, Edit, x156 yp-2 w40 h21 vreDampingFactorEdit
 		Gui %window%:Add, Text, x200 yp+2 w170 h20, % translate("p. Lap")
 
 		Gui %window%:Add, Text, x24 ys+30 w160 h23 +0x200 Section, % translate("Adjust Lap Time")
-		Gui %window%:Add, CheckBox, x156 yp w300 h23 VadjustLapTimeCheck, % translate("for Start, Pitstop or imcomplete Laps (use from Settings)")
+		Gui %window%:Add, CheckBox, x156 yp w300 h23 VreAdjustLapTimeCheck, % translate("for Start, Pitstop or imcomplete Laps (use from Settings)")
 		
 		Gui %window%:Add, Text, x24 ys+30 w160 h23 +0x200 Section, % translate("Damage Analysis for")
-		Gui %window%:Add, Edit, x156 yp w40 h21 Number VdamageAnalysisLapsEdit
+		Gui %window%:Add, Edit, x156 yp w40 h21 Number VreDamageAnalysisLapsEdit
 		Gui %window%:Add, UpDown, x196 yp w17 h21, 1
 		Gui %window%:Add, Text, x200 yp-2 w260 h23 +0x200, % translate("Laps after Incident")
 		
@@ -153,56 +153,56 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 	}
 	
 	loadSimulatorConfiguration() {
-		GuiControlGet simulatorDropDown
+		GuiControlGet reSimulatorDropDown
 		
-		this.iCurrentSimulator := simulatorDropDown
+		this.iCurrentSimulator := reSimulatorDropDown
 		
-		configuration := this.iSimulatorConfigurations[simulatorDropDown]
+		configuration := this.iSimulatorConfigurations[reSimulatorDropDown]
 		
-		GuiControl Choose, loadSettingsDropDown, % inList(["Default", "SetupDatabase"], configuration["LoadSettings"])
-		GuiControl Choose, loadTyrePressuresDropDown, % inList(["Default", "SetupDatabase", "Import"], configuration["LoadTyrePressures"])
+		GuiControl Choose, reLoadSettingsDropDown, % inList(["Default", "SetupDatabase"], configuration["LoadSettings"])
+		GuiControl Choose, reLoadTyrePressuresDropDown, % inList(["Default", "SetupDatabase", "Import"], configuration["LoadTyrePressures"])
 		
-		GuiControl Choose, saveSettingsDropDown, % inList(["Ask", "Always", "Never"], configuration["SaveSettings"])
-		GuiControl Choose, saveTyrePressuresDropDown, % inList(["Ask", "Always", "Never"], configuration["SaveTyrePressures"])
+		GuiControl Choose, reSaveSettingsDropDown, % inList(["Ask", "Always", "Never"], configuration["SaveSettings"])
+		GuiControl Choose, reSaveTyrePressuresDropDown, % inList(["Ask", "Always", "Never"], configuration["SaveTyrePressures"])
 		
-		GuiControl Text, learningLapsEdit, % configuration["LearningLaps"]
-		GuiControl Text, lapsConsideredEdit, % configuration["ConsideredHistoryLaps"]
-		GuiControl Text, dampingFactorEdit, % configuration["HistoryLapsDamping"]
+		GuiControl Text, reLearningLapsEdit, % configuration["LearningLaps"]
+		GuiControl Text, reLapsConsideredEdit, % configuration["ConsideredHistoryLaps"]
+		GuiControl Text, reDampingFactorEdit, % configuration["HistoryLapsDamping"]
 		
-		GuiControl, , adjustLapTimeCheck, % configuration["AdjustLapTime"]
+		GuiControl, , reAdjustLapTimeCheck, % configuration["AdjustLapTime"]
 		
-		GuiControl Text, damageAnalysisLapsEdit, % configuration["DamageAnalysisLaps"]
+		GuiControl Text, reDamageAnalysisLapsEdit, % configuration["DamageAnalysisLaps"]
 	}
 	
 	saveSimulatorConfiguration() {
 		if this.iCurrentSimulator {
-			GuiControlGet loadSettingsDropDown
-			GuiControlGet loadTyrePressuresDropDown
-			GuiControlGet saveSettingsDropDown
-			GuiControlGet saveTyrePressuresDropDown
+			GuiControlGet reLoadSettingsDropDown
+			GuiControlGet reLoadTyrePressuresDropDown
+			GuiControlGet reSaveSettingsDropDown
+			GuiControlGet reSaveTyrePressuresDropDown
 			
-			GuiControlGet learningLapsEdit
-			GuiControlGet lapsConsideredEdit
-			GuiControlGet dampingFactorEdit
+			GuiControlGet reLearningLapsEdit
+			GuiControlGet reLapsConsideredEdit
+			GuiControlGet reDampingFactorEdit
 			
-			GuiControlGet adjustLapTimeCheck
-			GuiControlGet damageAnalysisLapsEdit
+			GuiControlGet reAdjustLapTimeCheck
+			GuiControlGet reDamageAnalysisLapsEdit
 			
-			configuration := this.iSimulatorConfigurations[simulatorDropDown]
+			configuration := this.iSimulatorConfigurations[reSimulatorDropDown]
 			
-			configuration["LoadSettings"] := ["Default", "SetupDatabase"][loadSettingsDropDown]
-			configuration["LoadTyrePressures"] := ["Default", "SetupDatabase", "Import"][loadTyrePressuresDropDown]
+			configuration["LoadSettings"] := ["Default", "SetupDatabase"][reLoadSettingsDropDown]
+			configuration["LoadTyrePressures"] := ["Default", "SetupDatabase", "Import"][reLoadTyrePressuresDropDown]
 			
-			configuration["SaveSettings"] := ["Ask", "Always", "Never"][saveSettingsDropDown]
-			configuration["SaveTyrePressures"] := ["Ask", "Always", "Never"][saveTyrePressuresDropDown]
+			configuration["SaveSettings"] := ["Ask", "Always", "Never"][reSaveSettingsDropDown]
+			configuration["SaveTyrePressures"] := ["Ask", "Always", "Never"][reSaveTyrePressuresDropDown]
 			
-			configuration["LearningLaps"] := learningLapsEdit
-			configuration["ConsideredHistoryLaps"] := lapsConsideredEdit
-			configuration["HistoryLapsDamping"] := dampingFactorEdit
+			configuration["LearningLaps"] := reLearningLapsEdit
+			configuration["ConsideredHistoryLaps"] := reLapsConsideredEdit
+			configuration["HistoryLapsDamping"] := reDampingFactorEdit
 			
-			configuration["AdjustLapTime"] := adjustLapTimeCheck
+			configuration["AdjustLapTime"] := reAdjustLapTimeCheck
 			
-			configuration["DamageAnalysisLaps"] := damageAnalysisLapsEdit
+			configuration["DamageAnalysisLaps"] := reDamageAnalysisLapsEdit
 		}
 	}
 
@@ -221,7 +221,7 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-chooseSimulator() {
+chooseRaceEngineerSimulator() {
 	configurator := RaceEngineerConfigurator.Instance
 	
 	configurator.saveSimulatorConfiguration()

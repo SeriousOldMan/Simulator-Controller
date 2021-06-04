@@ -1234,7 +1234,7 @@ prepareTargets(ByRef buildProgress, updateOnly) {
 	targets := readConfiguration(kToolsTargetsFile)
 	
 	for target, arguments in getConfigurationSectionValues(targets, "Update", Object()) {
-		buildProgress += Floor(A_Index / 4)
+		buildProgress += Min(Floor(A_Index / 4), 1)
 		update := vUpdateSettings[target]
 		
 		if !kSilentMode
@@ -1257,7 +1257,7 @@ prepareTargets(ByRef buildProgress, updateOnly) {
 	if !updateOnly {
 		for target, arguments in getConfigurationSectionValues(targets, "Cleanup", Object()) {
 			targetName := ConfigurationItem.splitDescriptor(target)[1]
-			buildProgress += Floor(++counter / 20)
+			buildProgress += Min(Floor(++counter / 20), 1)
 			cleanup := (InStr(target, "*.bak") ? vCleanupSettings[target] : vCleanupSettings[targetName])
 			
 			if !kSilentMode
@@ -1274,7 +1274,7 @@ prepareTargets(ByRef buildProgress, updateOnly) {
 		
 		for target, arguments in getConfigurationSectionValues(targets, "Copy", Object()) {
 			targetName := ConfigurationItem.splitDescriptor(target)[1]
-			buildProgress += Floor(++counter / 20)
+			buildProgress += Min(Floor(++counter / 20), 1)
 			copy := vCopySettings[targetName]
 			
 			if !kSilentMode
@@ -1290,7 +1290,7 @@ prepareTargets(ByRef buildProgress, updateOnly) {
 		}
 		
 		for target, arguments in getConfigurationSectionValues(targets, "Build", Object()) {
-			buildProgress += Floor(++counter / 20)
+			buildProgress += Min(Floor(++counter / 20), 1)
 			build := vBuildSettings[target]
 			
 			if !kSilentMode

@@ -333,11 +333,12 @@ class RaceAssistant extends ConfigurationItem {
 		return this.VoiceAssistant.getSpeaker()
 	}
 	
-	hasEnoughData() {
+	hasEnoughData(inform := true) {
 		if this.EnoughData
 			return true
-		else if this.Speaker {
-			this.getSpeaker().speakPhrase("Later")
+		else {
+			if (inform && this.Speaker)
+				this.getSpeaker().speakPhrase("Later")
 			
 			return false
 		}

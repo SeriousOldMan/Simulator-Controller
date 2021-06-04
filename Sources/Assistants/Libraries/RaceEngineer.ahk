@@ -890,13 +890,11 @@ class RaceEngineer extends RaceAssistant {
 	}
 	
 	finishSession() {
-		this.updateDynamicValues({LastLap: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
-			
 		if this.KnowledgeBase {
 			if this.Speaker
 				this.getSpeaker().speakPhrase("Bye")
 			
-			if (this.hasEnoughData() || ((this.Session == kSessionPractice) || (this.Session == kSessionRace))) {
+			if (this.hasEnoughData(false) && ((this.Session == kSessionPractice) || (this.Session == kSessionRace))) {
 				this.updateSessionData()
 						
 				if (this.Listener && (((this.SaveTyrePressures == kAsk) && (this.SetupData.Count() > 0)) || (this.SaveSettings == kAsk))) {
@@ -915,6 +913,7 @@ class RaceEngineer extends RaceAssistant {
 				this.updateDynamicValues({KnowledgeBase: false})
 		}
 		
+		this.updateDynamicValues({LastLap: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
 		this.updateSessionValues({Simulator: "", Session: kSessionFinished})
 	}
 	

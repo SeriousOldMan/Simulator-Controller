@@ -1663,9 +1663,10 @@ initializeSimulatorController() {
 	
 	updateTrayMessageState(settings)
 	
+	argIndex := inList(A_Args, "-Voice")
 	voice := false
 	
-	if inList(A_Args, "-Voice")
+	if argIndex
 		voice := A_Args[argIndex + 1]
 	else {
 		Process Exist, Voice Server.exe

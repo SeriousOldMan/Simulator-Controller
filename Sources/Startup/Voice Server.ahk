@@ -597,38 +597,41 @@ class VoiceServer extends ConfigurationItem {
 	}
 	
 	registerVoiceCommand(descriptor, grammar, command, callback) {
-		if this.iHasPendingActivation
-			return
-		
 		this.getVoiceClient(descriptor).registerVoiceCommand(grammar, command, callback)
 	}
 	
 	recognizeActivationCommand(grammar, words) {
-		if this.iHasPendingActivation
-			return
-		
-		this.iHasPendingActivation := true
-		this.clearPendingCommands()
-		
-		this.addPendingCommand(ObjBindMethod(this, "activationCommandRecognized", grammar, words))
+		this.addPendingCommand(ObjBindMethod(this, "activationCommandRecognized", grammar, words), true)
 	}
 	
 	recognizeVoiceCommand(voiceClient, grammar, words) {
 		this.addPendingCommand(ObjBindMethod(this, "voiceCommandRecognized", voiceClient, grammar, words))
 	}
 	
-	addPendingCommand(command) {
+	addPendingCommand(command, activation := false) {
+		lastCommand := this.iLastCommand
+		
+		this.iLastCommand := A_TickCount
+		
+		if this.iHasPendingActivation
+			return
+		
+		if (A_TickCount < (lastCommand + 2000))
+			return
+		
+		if activation
+			this.clearPendingCommands()
+
 		this.iPendingCommands.Push(command)
+		this.iHasPendingActivation := activation
 	}
 	
 	clearPendingCommands() {
+		this.iHasPendingActivation := false
 		this.iPendingCommands := []
 	}
 	
 	runPendingCommands() {
-		if (A_Now < (this.iLastCommand + 2000))
-			return
-		
 		if (this.iPendingCommands.Length() == 0)
 			return
 		else {
@@ -638,23 +641,9 @@ class VoiceServer extends ConfigurationItem {
 				%command%()
 		}
 	}
-	
-	ignoreCommand(grammar, words) {
-		ignore := false
-		
-		if (A_Now < (this.iLastCommand + 2000))
-			ignore := true
-		
-		this.iLastCommand := A_TickCount
-		
-		return ignore
-	}
 		
 	activationCommandRecognized(grammar, words) {
 		this.iHasPendingActivation := false
-		
-		if this.ignoreCommand(grammar, words)
-			return
 		
 		if isDebug()
 			showMessage("Activation command recognized: " . values2String(" ", words*))
@@ -663,9 +652,6 @@ class VoiceServer extends ConfigurationItem {
 	}
 		
 	voiceCommandRecognized(voiceClient, grammar, words) {
-		if this.ignoreCommand(grammar, words)
-			return
-		
 		if isDebug()
 			showMessage("Voice command recognized: " . values2String(" ", words*))
 		

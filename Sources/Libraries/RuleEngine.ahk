@@ -2922,9 +2922,23 @@ class RuleEngine {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class RuleCompiler {
-	compileRules(text, ByRef productions, ByRef reductions) {
-		productions := []
-		reductions := []
+	compile(fileName, ByRef productions, ByRef reductions, path := false) {
+		if !path {
+			productions := false
+			reductions := false
+		}
+		
+		FileRead text, %fileName%
+		SplitPath fileName, , path
+		
+		this.compileRules(text, productions, reductions, path)
+	}
+	
+	compileRules(text, ByRef productions, ByRef reductions, path := false) {
+		if !path {
+			productions := []
+			reductions := []
+		}
 		
 		incompleteLine := false
 		
@@ -2932,24 +2946,43 @@ class RuleCompiler {
 		{
 			line := Trim(A_LoopField)
 			
-			if ((line != "") && this.skipDelimiter(";", line, 1, false))
-				line := ""
-		
-			if (incompleteLine && (line != "")) {
-				line := incompleteLine . line
-				incompleteLine := false
+			if (InStr(line, "#Include") == 1) {
+				fileName := substituteVariables(Trim(SubStr(line, 9)))
+				
+				currentDirectory := A_WorkingDir
+				
+				try {
+					if (path && (Trim(path) != ""))
+						SetWorkingDir %path%
+					
+					SplitPath fileName, , path
+					
+					this.compile(fileName, productions, reductions, path)
+				}
+				finally {
+					SetWorkingDir %currentDirectory%
+				}
 			}
+			else {
+				if ((line != "") && this.skipDelimiter(";", line, 1, false))
+					line := ""
 			
-			if ((line != "") && (SubStr(line, StrLen(line), 1) == "\"))
-				incompleteLine := SubStr(line, 1, StrLen(line) - 1)
+				if (incompleteLine && (line != "")) {
+					line := incompleteLine . line
+					incompleteLine := false
+				}
 				
-			if (!incompleteLine && (line != "")) {
-				compiledRule := this.compileRule(line)
-				
-				if (compiledRule.Type == kProduction)
-					productions.Push(compiledRule)
-				else
-					reductions.Push(compiledRule)
+				if ((line != "") && (SubStr(line, StrLen(line), 1) == "\"))
+					incompleteLine := SubStr(line, 1, StrLen(line) - 1)
+					
+				if (!incompleteLine && (line != "")) {
+					compiledRule := this.compileRule(line)
+					
+					if (compiledRule.Type == kProduction)
+						productions.Push(compiledRule)
+					else
+						reductions.Push(compiledRule)
+				}
 			}
 		}
 	}

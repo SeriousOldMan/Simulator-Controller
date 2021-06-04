@@ -1,0 +1,85 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;   Modular Simulator Controller System - Utility Rules                   ;;;
+;;;                                                                         ;;;
+;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
+;;;   License:    (2021) Creative Commons - BY-NC-SA                        ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+=<(?x, ?y) <= ?x = ?y
+=<(?x, ?y) <= ?x < ?y
+
+>=(?x, ?y) <= ?x = ?y
+>=(?x, ?y) <= ?x > ?y
+
+>(?x, ?y, true) <= ?x > ?y, !
+>(?x, ?y, false)
+
+max(?x, ?y, ?x) <= ?x > ?y, !
+max(?x, ?y, ?y)
+
+min(?x, ?y, ?x) <= ?x < ?y, !
+min(?x, ?y, ?y)
+
+abs(?x, ?r) <= ?x < 0, ?r = ?x * -1, !
+abs(?x, ?x)
+
+fact?(?f) <= Get(?f, ?)
+
+bound?(?x) <= unbound?(?x), !, fail
+bound?(?)
+
+any?(?value, [?value | ?]) <= !
+any?(?value, [? | ?tail]) <= any?(?value, ?tail)
+
+all?(?value, [?value])
+all?(?value, [?value | ?tail]) <= all?(?value, ?tail)
+
+none?(?value, [])
+none?(?value, [?value | ?]) <= !, fail
+none?(?value, [? | ?tail]) <= none?(?value, ?tail)
+
+one?(?value, []) <= fail
+one?(?value, [?value | ?tail]) <= !, none?(?value, ?tail)
+one?(?value, [? | ?tail]) <= one?(?value, ?tail)
+
+sequence(?x, ?x, [?x]) <= !
+sequence(?from, ?to, [?from | ?more]) <= ?temp = ?from + 1, sequence(?temp, ?to, ?more)
+				
+length([], 0)
+length([?h | ?t], ?length) <= length(?t, ?tLength), ?length = ?tLength + 1
+
+reverse([], [])
+reverse([?h | ?t], ?rev) <= reverse(?t, ?rt), concat(?rt, [?h], ?rev)
+
+concat([], ?l, ?l)
+concat([?h | ?t], ?l, [?h | ?r]) <= concat(?t, ?l, ?r)
+
+remove([], ?, [])
+remove([?h | ?t], ?h, ?result) <= remove(?t, ?h, ?result), !
+remove([?h | ?t], ?x, [?h | ?result]) <= remove(?t, ?x, ?result)
+
+index(?list, ?element, ?index) <= index(?list, ?element, 0, ?index)
+
+index([?element], ?element, ?index, ?index) <= !
+index([?head | ?tail], ?head, ?index, ?index) <= !
+index([?head | ?tail], ?element, ?running, ?index) <= ?nRunning = ?running + 1, index(?tail, ?element, ?nRunning, ?index)
+
+element(?list, ?index, ?element) <= element(?list, 0, ?index, ?element)
+
+element([?element], ?index, ?index, ?element)
+element([?head | ?tail], ?index, ?index, ?head) <= !
+element([?head | ?tail], ?running, ?index, ?element) <= ?nRunning = ?running + 1, element(?tail, ?nRunning, ?index, ?element)
+
+sum([], 0)
+sum([?h | ?t], ?sum) <= sum(?t, ?tSum), ?sum = ?h + ?tSum
+
+productSum([], [], 0)
+productSum([?h1 | ?t1], [?h2 | ?t2], ?sum) <= ?p = ?h1 * ?h2, productSum(?t1, ?t2, ?tSum), ?sum = ?p + ?tSum
+
+min([?x], ?x)
+min([?h | ?t], ?min) <= min(?t, ?tMin), ?tMin < ?h, !, ?min = ?tMin
+min([?h | ?t], ?h)
+
+max([?x], ?x)
+max([?h | ?t], ?max) <= max(?t, ?tMax), ?tMax > ?h, !, ?max = ?tMax
+max([?h | ?t], ?h)

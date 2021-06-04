@@ -63,7 +63,7 @@ showLogo(name) {
 	y := mainScreenBottom - 234
 
 	title1 := translate("Modular Simulator Controller System")
-	substituteVariables(translate("%name% - The Virtual Race Engineer"), {name: name})
+	title2 := substituteVariables(translate("%name% - The Virtual Race Strategist"), {name: name})
 	SplashImage %image%, B FS8 CWD0D0D0 w299 x%x% y%y% ZH155 ZW279, %info%, %title1%`n%title2%
 
 	Gui Logo:-Border -Caption 
@@ -102,7 +102,7 @@ startRaceStrategist() {
 	
 	remotePID := 0
 	remoteHandle := false
-	strategistName := "Kim"
+	strategistName := "Dylan"
 	strategistLogo := false
 	strategistLanguage := false
 	strategistSpeaker := false

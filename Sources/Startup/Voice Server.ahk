@@ -61,6 +61,7 @@ class VoiceServer extends ConfigurationItem {
 	iIsListening := false
 	
 	iPendingCommands := []
+	iHasPendingActivation := false
 	iLastCommand := A_TickCount
 	
 	class VoiceClient {
@@ -607,10 +608,17 @@ class VoiceServer extends ConfigurationItem {
 	}
 	
 	registerVoiceCommand(descriptor, grammar, command, callback) {
+		if this.iHasPendingActivation
+			return
+		
 		this.getVoiceClient(descriptor).registerVoiceCommand(grammar, command, callback)
 	}
 	
 	recognizeActivationCommand(grammar, words) {
+		if this.iHasPendingActivation
+			return
+		
+		this.iHasPendingActivation := true
 		this.clearPendingCommands()
 		
 		this.addPendingCommand(ObjBindMethod(this, "activationCommandRecognized", grammar, words))
@@ -654,6 +662,8 @@ class VoiceServer extends ConfigurationItem {
 	}
 		
 	activationCommandRecognized(grammar, words) {
+		this.iHasPendingActivation := false
+		
 		if this.ignoreCommand(grammar, words)
 			return
 		

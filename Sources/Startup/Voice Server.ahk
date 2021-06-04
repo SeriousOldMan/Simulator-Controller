@@ -77,7 +77,6 @@ class VoiceServer extends ConfigurationItem {
 		iSpeakerPitch := 0
 		iSpeakerSpeed := 0
 		iListener := false
-		iPushToTalk := false
 	
 		iSpeechGenerator := false
 		
@@ -155,12 +154,6 @@ class VoiceServer extends ConfigurationItem {
 			}
 		}
 		
-		PushToTalk[] {
-			Get {
-				return this.iPushToTalk
-			}
-		}
-		
 		ActivationCallback[] {
 			Get {
 				return this.iActivationCallback
@@ -202,14 +195,13 @@ class VoiceServer extends ConfigurationItem {
 			}
 		}
 		
-		__New(voiceServer, descriptor, pid, language, speaker, listener, pushToTalk, speakerVolume, speakerPitch, speakerSpeed, activationCallback, deactivationCallback) {
+		__New(voiceServer, descriptor, pid, language, speaker, listener, speakerVolume, speakerPitch, speakerSpeed, activationCallback, deactivationCallback) {
 			this.iVoiceServer := voiceServer
 			this.iDescriptor := descriptor
 			this.iPID := pid
 			this.iLanguage := language
 			this.iSpeaker := speaker
 			this.iListener := listener
-			this.iPushToTalk := pushToTalk
 			this.iSpeakerVolume := speakerVolume
 			this.iSpeakerPitch := speakerPitch
 			this.iSpeakerSpeed := speakerSpeed
@@ -232,7 +224,7 @@ class VoiceServer extends ConfigurationItem {
 				}
 			}
 			finally {
-				if (stopped && !this.PushToTalk)
+				if stopped
 					this.VoiceServer.startListening()
 			}
 		}
@@ -240,7 +232,7 @@ class VoiceServer extends ConfigurationItem {
 		startListening(retry := true) {
 			local function
 			
-			if (this.SpeechRecognizer && !this.Listening)
+			if (this.SpeechRecognizer[true] && !this.Listening)
 				if !this.SpeechRecognizer.startRecognizer() {
 					if retry {
 						function := ObjBindMethod(this, "startListening", true)
@@ -541,7 +533,7 @@ class VoiceServer extends ConfigurationItem {
 		}
 	}
 	
-	registerVoiceClient(descriptor, pid, activationCommand := false, activationCallback := false, deactivationCallback := false, language := false, speaker := true, listener := false, pushToTalk := false, speakerVolume := "__Undefined__", speakerPitch := "__Undefined__", speakerSpeed := "__Undefined__") {
+	registerVoiceClient(descriptor, pid, activationCommand := false, activationCallback := false, deactivationCallback := false, language := false, speaker := true, listener := false, speakerVolume := "__Undefined__", speakerPitch := "__Undefined__", speakerSpeed := "__Undefined__") {
 		static counter := 1
 		
 		if (speakerVolume = kUndefined)
@@ -552,9 +544,6 @@ class VoiceServer extends ConfigurationItem {
 		
 		if (speakerSpeed = kUndefined)
 			speakerSpeed := this.iSpeakerSpeed
-		
-		if !pushToTalk
-			pushToTalk := this.iPushToTalk
 		
 		if (speaker == true)
 			speaker := this.iSpeaker
@@ -570,7 +559,7 @@ class VoiceServer extends ConfigurationItem {
 		if (client && (this.ActiveVoiceClient == client))
 			this.deactivateVoiceClient(descriptor)
 			
-		client := new this.VoiceClient(this, descriptor, pid, language, speaker, listener, pushToTalk, speakerVolume, speakerPitch, speakerSpeed, activationCallback, deactivationCallback)
+		client := new this.VoiceClient(this, descriptor, pid, language, speaker, listener, speakerVolume, speakerPitch, speakerSpeed, activationCallback, deactivationCallback)
 		
 		this.VoiceClients[descriptor] := client
 		

@@ -728,10 +728,8 @@ class SimulatorController extends ConfigurationItem {
 				
 				if !registered {
 					activationCommand := getConfigurationValue(this.Configuration, "Voice Control", "ActivationCommand", false)
-					
+					 
 					raiseEvent(kFileMessage, "Voice", "registerVoiceClient:" . values2String(";", "Controller", processID, activationCommand, "activationCommand", false, false, false, true), this.VoiceServer)
-					
-					; raiseEvent(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", "Controller", false, "Controller", "activationCommand"), this.VoiceServer)
 				
 					registered := true
 				}
@@ -1665,12 +1663,20 @@ initializeSimulatorController() {
 	
 	updateTrayMessageState(settings)
 	
-	argIndex := inList(A_Args, "-Voice")
+	voice := false
 	
+	if inList(A_Args, "-Voice")
+		voice := A_Args[argIndex + 1]
+	else {
+		Process Exist, Voice Server.exe
+		
+		voice := ErrorLevel
+	}
+
 	protectionOn()
 	
 	try {
-		new SimulatorController(kSimulatorConfiguration, settings, argIndex ? A_Args[argIndex + 1] : false)
+		new SimulatorController(kSimulatorConfiguration, settings, voice)
 	}
 	finally {
 		protectionOff()

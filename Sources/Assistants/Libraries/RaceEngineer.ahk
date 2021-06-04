@@ -743,6 +743,8 @@ class RaceEngineer extends RaceAssistant {
 				duration := settingsDuration
 		}
 		
+		configuration := this.Configuration
+			
 		facts := {"Session.Car": getConfigurationValue(data, "Session Data", "Car", "")
 				, "Session.Track": getConfigurationValue(data, "Session Data", "Track", "")
 				, "Session.Duration": duration
@@ -757,8 +759,8 @@ class RaceEngineer extends RaceAssistant {
 				, "Session.Settings.Fuel.SafetyMargin": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Fuel.SafetyMargin", 5)
 				, "Session.Settings.Lap.PitstopWarning": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.PitstopWarning", 5)
 				, "Session.Settings.Lap.AvgTime": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.AvgTime", 0)
-				, "Session.Settings.Lap.History.Considered": getConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", simulatorName . ".ConsideredHistoryLaps", 5)
-				, "Session.Settings.Lap.History.Damping": getConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", simulatorName . ".HistoryLapsDamping", 0.2)
+				, "Session.Settings.Lap.History.Considered": getConfigurationValue(configuration, "Race Engineer Analysis", simulatorName . ".ConsideredHistoryLaps", 5)
+				, "Session.Settings.Lap.History.Damping": getConfigurationValue(configuration, "Race Engineer Analysis", simulatorName . ".HistoryLapsDamping", 0.2)
 				, "Session.Settings.Damage.Suspension.Repair": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Damage.Suspension.Repair", "Always")
 				, "Session.Settings.Damage.Suspension.Repair.Threshold": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Damage.Suspension.Repair.Threshold", 0)
 				, "Session.Settings.Damage.Bodywork.Repair": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Damage.Bodywork.Repair", "Threshold")
@@ -792,8 +794,8 @@ class RaceEngineer extends RaceAssistant {
 		facts["Session.Setup.Tyre.Compound"] := getConfigurationValue(data, "Car Data", "TyreCompound", getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Compound", "Dry"))
 		facts["Session.Setup.Tyre.Compound.Color"] := getConfigurationValue(data, "Car Data", "TyreCompoundColor", getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Compound.Color", "Black"))
 		
-		facts["Session.Settings.Damage.Analysis.Laps"] := getConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", simulatorName . ".DamageAnalysisLaps", 1)
-		facts["Session.Settings.Lap.Learning.Laps"] := getConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", simulatorName . ".LearningLaps", 1)
+		facts["Session.Settings.Damage.Analysis.Laps"] := getConfigurationValue(configuration, "Race Engineer Analysis", simulatorName . ".DamageAnalysisLaps", 1)
+		facts["Session.Settings.Lap.Learning.Laps"] := getConfigurationValue(configuration, "Race Engineer Analysis", simulatorName . ".LearningLaps", 1)
 		facts["Session.Settings.Lap.Time.Adjust"] := this.AdjustLapTime
 				
 		return facts
@@ -810,7 +812,8 @@ class RaceEngineer extends RaceAssistant {
 			this.updateConfigurationValues({Settings: settings})
 			
 			simulatorName := this.Simulator
-		
+			configuration := this.Configuration
+			
 			facts := {"Session.Settings.Lap.Formation": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.Formation", true)
 					, "Session.Settings.Lap.PostRace": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.PostRace", true)
 					, "Session.Settings.Fuel.AvgConsumption": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Fuel.AvgConsumption", 0)
@@ -818,8 +821,8 @@ class RaceEngineer extends RaceAssistant {
 					, "Session.Settings.Fuel.SafetyMargin": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Fuel.SafetyMargin", 5)
 					, "Session.Settings.Lap.PitstopWarning": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.PitstopWarning", 5)
 					, "Session.Settings.Lap.AvgTime": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.AvgTime", 0)
-					, "Session.Settings.Lap.History.Considered": getConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", simulatorName . ".ConsideredHistoryLaps", 5)
-					, "Session.Settings.Lap.History.Damping": getConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", simulatorName . ".HistoryLapsDamping", 0.2)
+					, "Session.Settings.Lap.History.Considered": getConfigurationValue(configuration, "Race Engineer Analysis", simulatorName . ".ConsideredHistoryLaps", 5)
+					, "Session.Settings.Lap.History.Damping": getConfigurationValue(configuration, "Race Engineer Analysis", simulatorName . ".HistoryLapsDamping", 0.2)
 					, "Session.Settings.Damage.Suspension.Repair": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Damage.Suspension.Repair", "Always")
 					, "Session.Settings.Damage.Suspension.Repair.Threshold": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Damage.Suspension.Repair.Threshold", 0)
 					, "Session.Settings.Damage.Bodywork.Repair": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Damage.Bodywork.Repair", "Threshold")
@@ -852,8 +855,8 @@ class RaceEngineer extends RaceAssistant {
 			facts["Session.Settings.Tyre.Pressure.Correction.Temperature"] := getConfigurationValue(settings, "Session Settings", "Tyre.Pressure.Correction.Temperature", true)
 			facts["Session.Settings.Tyre.Pressure.Correction.Setup"] := getConfigurationValue(settings, "Session Settings", "Tyre.Pressure.Correction.Setup", true)
 			
-			facts["Session.Settings.Damage.Analysis.Laps"] := getConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", simulatorName . ".DamageAnalysisLaps", 1)
-			facts["Session.Settings.Lap.Learning.Laps"] := getConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", simulatorName . ".LearningLaps", 1)
+			facts["Session.Settings.Damage.Analysis.Laps"] := getConfigurationValue(configuration, "Race Engineer Analysis", simulatorName . ".DamageAnalysisLaps", 1)
+			facts["Session.Settings.Lap.Learning.Laps"] := getConfigurationValue(configuration, "Race Engineer Analysis", simulatorName . ".LearningLaps", 1)
 			facts["Session.Settings.Lap.Time.Adjust"] := this.AdjustLapTime
 			
 			for key, value in facts
@@ -869,11 +872,12 @@ class RaceEngineer extends RaceAssistant {
 			data := readConfiguration(data)
 		
 		simulatorName := this.Simulator
+		configuration := this.Configuration
 		
-		this.updateConfigurationValues({LearningLaps: getConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", simulatorName . ".LearningLaps", 1)
-									  , AdjustLapTime: getConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", simulatorName . ".AdjustLapTime", true)
-									  , SaveSettings: getConfigurationValue(kSimulatorConfiguration, "Race Engineer Shutdown", simulatorName . ".SaveSettings", kNever)
-									  , SaveTyrePressures: getConfigurationValue(kSimulatorConfiguration, "Race Engineer Shutdown", simulatorName . ".SaveTyrePressures", kAsk)})
+		this.updateConfigurationValues({LearningLaps: getConfigurationValue(configuration, "Race Engineer Analysis", simulatorName . ".LearningLaps", 1)
+									  , AdjustLapTime: getConfigurationValue(configuration, "Race Engineer Analysis", simulatorName . ".AdjustLapTime", true)
+									  , SaveSettings: getConfigurationValue(configuration, "Race Engineer Shutdown", simulatorName . ".SaveSettings", kNever)
+									  , SaveTyrePressures: getConfigurationValue(configuration, "Race Engineer Shutdown", simulatorName . ".SaveTyrePressures", kAsk)})
 		
 		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(this.createSession(data)), SetupData: {}
 								, LastLap: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})

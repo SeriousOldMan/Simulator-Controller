@@ -46,6 +46,21 @@ ListLines Off					; Disable execution history
 class VoiceServer extends ConfigurationItem {
 	iVoiceClients := {}
 	iActiveVoiceClient := false
+
+	iLanguage := "en"
+	iSpeaker := true
+	iSpeakerVolume := 100
+	iSpeakerPitch := 0
+	iSpeakerSpeed := 0
+	iListener := false
+	iPushToTalk := false
+	
+	iSpeechRecognizer := false
+	
+	iIsSpeaking := false
+	iIsListening := false
+	
+	iLastCommand := A_TickCount
 	
 	class VoiceClient {
 		iCounter := 1
@@ -71,6 +86,8 @@ class VoiceServer extends ConfigurationItem {
 		iActivationCallback := false
 		iDeactivationCallback := false
 		iVoiceCommands := {}
+		
+		iPendingCommands := []
 	
 		VoiceServer[] {
 			Get {
@@ -290,7 +307,7 @@ class VoiceServer extends ConfigurationItem {
 			}
 			
 			try {
-				recognizer.loadGrammar(grammar, recognizer.compileGrammar(command), ObjBindMethod(this, "voiceCommandRecognized"))
+				recognizer.loadGrammar(grammar, recognizer.compileGrammar(command), ObjBindMethod(this.VoiceServer, "recognizeVoiceCommand", this))
 			}
 			catch exception {
 				logMessage(kLogCritical, translate("Error while registering voice command """) . command . translate(""" - please check the configuration"))
@@ -315,29 +332,7 @@ class VoiceServer extends ConfigurationItem {
 			if this.DeactivationCallback
 				raiseEvent(kFileMessage, "Voice", this.DeactivationCallback, this.PID)
 		}
-		
-		voiceCommandRecognized(grammar, words) {
-			if isDebug()
-				showMessage("Voice command recognized: " . values2String(" ", words*))
-			
-			descriptor := this.VoiceCommands[grammar]
-
-			raiseEvent(kFileMessage, "Voice", descriptor[2] . ":" . values2String(";", grammar, descriptor[1], words*), this.PID)
-		}
 	}
-
-	iLanguage := "en"
-	iSpeaker := true
-	iSpeakerVolume := 100
-	iSpeakerPitch := 0
-	iSpeakerSpeed := 0
-	iListener := false
-	iPushToTalk := false
-	
-	iSpeechRecognizer := false
-	
-	iIsSpeaking := false
-	iIsListening := false
 	
 	VoiceClients[] {
 		Get {
@@ -404,6 +399,10 @@ class VoiceServer extends ConfigurationItem {
 		base.__New(configuration)
 		
 		VoiceServer.Instance := this
+		
+		timer := ObjBindMethod(this, "runPendingCommands")
+		
+		SetTimer %timer%, 500
 	}
 	
 	loadFromConfiguration(configuration) {
@@ -586,7 +585,7 @@ class VoiceServer extends ConfigurationItem {
 			}
 				
 			try {
-				recognizer.loadGrammar(grammar, recognizer.compileGrammar(activationCommand), ObjBindMethod(this, "activationCommandRecognized"))
+				recognizer.loadGrammar(grammar, recognizer.compileGrammar(activationCommand), ObjBindMethod(this, "recognizeActivationCommand"))
 			}
 			catch exception {
 				logMessage(kLogCritical, translate("Error while registering voice command """) . command . translate(""" - please check the configuration"))
@@ -611,12 +610,70 @@ class VoiceServer extends ConfigurationItem {
 	registerVoiceCommand(descriptor, grammar, command, callback) {
 		this.getVoiceClient(descriptor).registerVoiceCommand(grammar, command, callback)
 	}
+	
+	recognizeActivationCommand(grammar, words) {
+		this.clearPendingCommands()
+		
+		this.addPendingCommand(ObjBindMethod(this, "activationCommandRecognized", grammar, words))
+	}
+	
+	recognizeVoiceCommand(voiceClient, grammar, words) {
+		this.addPendingCommand(ObjBindMethod(this, "voiceCommandRecognized", voiceClient, grammar, words))
+	}
+	
+	addPendingCommand(command) {
+		this.iPendingCommands.Push(command)
+	}
+	
+	clearPendingCommands() {
+		this.iPendingCommands := []
+	}
+	
+	runPendingCommand() {
+		if (A_Now < (this.iLastCommand + 2000))
+			return
+		
+		if (this.iPendingsCommands.Length() == 0)
+			return
+		else {
+			command := this.iPendingsCommands.RemoveAt(1)
+		
+			if command
+				%command%()
+		}
+	}
+	
+	ignoreCommand(grammar, words) {
+		ignore := false
+		
+		if (A_Now < (this.iLastCommand + 2000))
+			ignore := true
+		
+		this.iLastCommand := A_TickCount
+		
+		return ignore
+	}
 		
 	activationCommandRecognized(grammar, words) {
+		if this.ignoreCommand(grammar, words)
+			return
+		
 		if isDebug()
 			showMessage("Activation command recognized: " . values2String(" ", words*))
 		
 		this.activateVoiceClient(ConfigurationItem.splitDescriptor(grammar)[1], words)
+	}
+		
+	voiceCommandRecognized(voiceClient, grammar, words) {
+		if this.ignoreCommand(grammar, words)
+			return
+		
+		if isDebug()
+			showMessage("Voice command recognized: " . values2String(" ", words*))
+		
+		descriptor := voiceClient.VoiceCommands[grammar]
+
+		raiseEvent(kFileMessage, "Voice", descriptor[2] . ":" . values2String(";", grammar, descriptor[1], words*), voiceClient.PID)
 	}
 }
 

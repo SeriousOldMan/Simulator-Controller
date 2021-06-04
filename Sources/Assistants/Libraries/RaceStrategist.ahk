@@ -90,8 +90,8 @@ class RaceStrategist extends RaceAssistant {
 				, "Session.Settings.Pitstop.Delta": getConfigurationValue(settings, "Session Settings", "Pitstop.Delta", 30)
 				, "Session.Settings.Fuel.SafetyMargin": getConfigurationValue(settings, "Session Settings", "Fuel.SafetyMargin", 5)
 				, "Session.Settings.Lap.AvgTime": getConfigurationValue(settings, "Session Settings", "Lap.AvgTime", 0)
-				, "Session.Settings.Lap.History.Considered": getConfigurationValue(kSimulatorConfiguration, "Race Strategist Analysis", simulatorName . ".ConsideredHistoryLaps", 5)
-				, "Session.Settings.Lap.History.Damping": getConfigurationValue(kSimulatorConfiguration, "Race Strategist Analysis", simulatorName . ".HistoryLapsDamping", 0.2)}
+				, "Session.Settings.Lap.History.Considered": getConfigurationValue(this.Configuration, "Race Strategist Analysis", simulatorName . ".ConsideredHistoryLaps", 5)
+				, "Session.Settings.Lap.History.Damping": getConfigurationValue(this.Configuration, "Race Strategist Analysis", simulatorName . ".HistoryLapsDamping", 0.2)}
 				
 		return facts
 	}
@@ -114,8 +114,8 @@ class RaceStrategist extends RaceAssistant {
 					, "Session.Settings.Pitstop.Delta": getConfigurationValue(settings, "Session Settings", "Pitstop.Delta", 30)
 					, "Session.Settings.Lap.AvgTime": getConfigurationValue(settings, "Session Settings", "Lap.AvgTime", 0)
 					, "Session.Settings.Fuel.SafetyMargin": getConfigurationValue(settings, "Session Settings", "Fuel.SafetyMargin", 5)
-					, "Session.Settings.Lap.History.Considered": getConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", simulatorName . ".ConsideredHistoryLaps", 5)
-					, "Session.Settings.Lap.History.Damping": getConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", simulatorName . ".HistoryLapsDamping", 0.2)}
+					, "Session.Settings.Lap.History.Considered": getConfigurationValue(this.Configuration, "Race Engineer Analysis", simulatorName . ".ConsideredHistoryLaps", 5)
+					, "Session.Settings.Lap.History.Damping": getConfigurationValue(this.Configuration, "Race Engineer Analysis", simulatorName . ".HistoryLapsDamping", 0.2)}
 			
 			for key, value in facts
 				knowledgeBase.setValue(key, value)

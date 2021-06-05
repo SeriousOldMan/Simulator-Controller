@@ -1,0 +1,38 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;   Modular Simulator Controller System - Session Information Retrieval   ;;;
+;;;                                                                         ;;;
+;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
+;;;   License:    (2021) Creative Commons - BY-NC-SA                        ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+firstStintLap(?lap) <= pitstopLap(?lap), !
+firstStintLap(1)
+
+nextStintLaps(?laps) <= lapRemainingFuel(!Lap, ?remainingFuel), ?fuel = ?remainingFuel + !Fuel.Amount.Target, !,								\
+						lapAvgFuel(!Lap, ?fuelPerLap), ?laps = ?fuel / ?fuelPerLap
+nextStintLaps(?laps) <= remainingSessionLaps(!Lap, ?laps)
+
+remainingSessionLaps(?lap, ?remainingLaps) <= Get(Session.Format, Lap), !, get(Session.Lap.Remaining, ?remainingLaps)
+remainingSessionLaps(?lap, ?remainingLaps) <= remainingSessionTime(?lap, ?remainingTime), lapAvgTime(?lap, ?avgTime),							\
+											  ?remainingLaps = ?remainingTime / ?avgTime
+
+remainingSessionTime(?lap, ?remainingTime) <= Get(Session.Format, Time), !, get(Session.Time.Remaining, ?remainingTime)
+remainingSessionTime(?lap, ?remainingTime) <= Get(Lap, ?lap, Time.End, ?sessionTime), ?sessionLength = !Session.Duration * 1000,				\
+											  ?remainingTime = ?sessionLength - ?sessionTime
+
+remainingStintLaps(?lap, ?remainingLaps) <= remainingStintLaps(?lap, Fuel, ?fuelLaps), remainingStintLaps(?lap, Driver, ?driverLaps),			\
+											min(?fuelLaps, ?driverLaps, ?remainingLaps), remainingSessionLaps(?lap, ?sessionLaps),				\
+											?remainingLaps < ?sessionLaps, !
+remainingStintLaps(?lap, ?remainingLaps) <= remainingSessionLaps(?lap, ?remainingLaps)
+
+remainingStintLaps(?lap, Fuel, ?remainingLaps) <= lapRemainingFuel(?lap, ?fuelLeft), lapAvgFuel(?lap, ?fuelPerLap),								\
+												  ?remainingLaps = ?fuelLeft / ?fuelPerLap
+remainingStintLaps(?lap, Driver, ?remainingLaps) <= remainingStintTime(?stintTime), lapAvgTime(?lap, ?avgTime),									\
+													?remainingLaps = ?stintTime / ?avgTime
+
+remainingStintTime(?lap, ?remainingTime) <= remainingStintLaps(?lap, Driver, ?remainingLaps), lapAvgTime(?lap, ?avgTime),						\
+											?remainingTime = ?remainingLaps * ?avgTime, remainingSessionTime(?lap, ?sessionTime),				\
+											?remainingTime < ?sessionTime, !
+remainingStintTime(?lap, ?remainingTime) <= remainingSessionTime(?lap, ?remainingTime)
+											
+remainingStintTime(?stintTime) <= Get(Driver.Time.Stint.Remaining, ?stintTime)

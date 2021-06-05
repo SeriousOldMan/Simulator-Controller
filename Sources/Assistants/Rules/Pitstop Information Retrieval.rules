@@ -1,0 +1,37 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;   Modular Simulator Controller System - Pitstop Information Retrieval   ;;;
+;;;                                                                         ;;;
+;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
+;;;   License:    (2021) Creative Commons - BY-NC-SA                        ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+lastPitstop(?nr) <= Get(Pitstop.Last, ?nr)
+
+pitstopLap(?lap) <= lastPitstopLap(?lap)
+
+lastPitstopLap(?lap) <= lastPitstop(?nr), Get(Pitstop, ?nr, Lap, ?lap)
+
+recentPitstopLap(?lap) <= lastPitstopLap(?lap)
+recentPitstopLap(?lap) <= lastPitstopLap(?lastLap), ?lap = ?lastLap + 1
+
+lastPitstopTyreSet(?tyreSet) <= lastPitstop(?nr), Get(Pitstop, ?nr, Tyre.Set, ?tyreSet)
+
+lastPitstopTyreCompound(?tyreCompound) <= lastPitstop(?nr), Get(Pitstop, ?nr, Tyre.Compound, ?tyreCompound)
+
+lastPitstopTyreCompound(?tyreCompound, ?tyreCompoundColor) <= lastPitstop(?nr), Get(Pitstop, ?nr, Tyre.Compound, ?tyreCompound),				\
+															  Get(Pitstop, ?nr, Tyre.Compound.Color, ?tyreCompoundColor)
+
+lastPitstopTyrePressure(?compound, ?tyreType, ?pressure) <= lastPitstopTyreCompound(?compound), lastPitstop(?nr),								\
+															Get(Pitstop, ?nr, Tyre.Pressure, ?tyreType, ?pressure)
+
+lastPitstopTyrePressures(?compound, [], [])
+lastPitstopTyrePressures(?compound, [?tyreType | ?tyreTypes], [?pressure | ?pressures]) <=														\
+		lastPitstopTyrePressure(?compound, ?tyreType, ?pressure), setupTyrePressure(?compound, ?tyreTypes, ?pressures)
+
+lastPitstopDamageRepair(Suspension, ?repair) <= lastPitstop(?nr), Get(Pitstop, ?nr, Repair.Suspension, ?repair)
+lastPitstopDamageRepair(Bodywork, ?repair) <= lastPitstop(?nr), Get(Pitstop, ?nr, Repair.Bodywork, ?repair)
+
+pitstopTyreCompound(?compound, ?color) <= lastPitstop(?nr), pitstopTyreCompound(?nr, ?compound, ?color)
+pitstopTyreCompound(0, ?, ?) <= !, fail
+pitstopTyreCompound(?nr, ?compound, ?color) <= Get(Pitstop, ?nr, Tyre.Compound, ?compound), Get(Pitstop, ?nr, Tyre.Compound.Color, ?color)
+pitstopTyreCompound(?nr, ?compound, ?color) <= ?next = ?nr - 1, pitstopTyreCompound(?next, ?compound, ?color)

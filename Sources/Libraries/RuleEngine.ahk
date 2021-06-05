@@ -2968,7 +2968,7 @@ class RuleCompiler {
 					line := ""
 			
 				if (incompleteLine && (line != "")) {
-					line := incompleteLine . line
+					line := (incompleteLine . line)
 					incompleteLine := false
 				}
 				

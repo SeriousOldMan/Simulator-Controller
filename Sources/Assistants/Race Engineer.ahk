@@ -222,7 +222,7 @@ startRaceEngineer() {
 ;;;                          Event Handler Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-shutdownRaceEngineer() {
+shutdownRaceEngineer(shutdown := false) {
 	if shutdown
 		ExitApp 0
 

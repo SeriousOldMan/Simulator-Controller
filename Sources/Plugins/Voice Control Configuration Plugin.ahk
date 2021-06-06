@@ -68,7 +68,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		if (chosen == 0)
 			chosen := enIndex
 			
-		Gui %window%:Add, Text, x16 y80 w100 h23 +0x200, % translate("Language")
+		Gui %window%:Add, Text, x16 y80 w110 h23 +0x200, % translate("Language")
 		Gui %window%:Add, DropDownList, x134 y80 w135 Choose%chosen% VvoiceLanguageDropDown, % values2String("|", choices*)
 		
 		voices := new SpeechGenerator().Voices.Clone()
@@ -81,16 +81,16 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		if (chosen == 0)
 			chosen := 1
 		
-		Gui %window%:Add, Text, x16 y112 w100 h23 +0x200, % translate("Speech Generator")
+		Gui %window%:Add, Text, x16 y112 w110 h23 +0x200, % translate("Speech Generator")
 		Gui %window%:Add, DropDownList, x134 y112 w340 Choose%chosen% VspeakerDropDown, % values2String("|", voices*)
 		
-		Gui %window%:Add, Text, x16 y136 w100 h23 +0x200, % translate("Volume")
+		Gui %window%:Add, Text, x16 y136 w110 h23 +0x200, % translate("Volume")
 		Gui %window%:Add, Slider, x134 y136 w135 Range0-100 ToolTip VspeakerVolumeSlider, % speakerVolumeSlider
 		
-		Gui %window%:Add, Text, x16 y160 w100 h23 +0x200, % translate("Pitch")
+		Gui %window%:Add, Text, x16 y160 w110 h23 +0x200, % translate("Pitch")
 		Gui %window%:Add, Slider, x134 y160 w135 Range-10-10 ToolTip VspeakerPitchSlider, % speakerPitchSlider
 		
-		Gui %window%:Add, Text, x16 y184 w100 h23 +0x200, % translate("Speed")
+		Gui %window%:Add, Text, x16 y184 w110 h23 +0x200, % translate("Speed")
 		Gui %window%:Add, Slider, x134 y184 w135 Range-10-10 ToolTip VspeakerSpeedSlider, % speakerSpeedSlider
 		
 		recognizers := new SpeechRecognizer().getRecognizerList().Clone()
@@ -106,15 +106,15 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		if (chosen == 0)
 			chosen := 1
 		
-		Gui %window%:Add, Text, x16 y216 w100 h23 +0x200, % translate("Speech Recognizer")
+		Gui %window%:Add, Text, x16 y216 w110 h23 +0x200, % translate("Speech Recognizer")
 		Gui %window%:Add, DropDownList, x134 y216 w340 Choose%chosen% VlistenerDropDown, % values2String("|", recognizers*)
 		
-		Gui %window%:Add, Text, x16 y240 w70 h23 +0x200, % translate("Push To Talk")
+		Gui %window%:Add, Text, x16 y240 w110 h23 +0x200, % translate("Push To Talk")
 		Gui %window%:Add, Edit, x134 y240 w110 h21 VpushToTalkEdit, %pushToTalkEdit%
 		Gui %window%:Add, Button, x246 y239 w23 h23 ggetPTTHotkey HwnddetectPTTButtonHandle
 		setButtonIcon(detectPTTButtonHandle, kIconsDirectory . "Key.ico", 1)
 		
-		Gui %window%:Add, Text, x16 y264 w100 h23 +0x200, % translate("Activation Command")
+		Gui %window%:Add, Text, x16 y264 w110 h23 +0x200, % translate("Activation Command")
 		Gui %window%:Add, Edit, x134 y264 w135 h21 VactivationCommandEdit, %activationCommandEdit%
 	}
 	

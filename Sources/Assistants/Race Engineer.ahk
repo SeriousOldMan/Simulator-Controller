@@ -166,7 +166,10 @@ startRaceEngineer() {
 	engineerSpeaker := false
 	engineerListener:= false
 	engineerSettingsFile := getFileName("Race Engineer.settings", kUserConfigDirectory)
-	voiceServer := false
+	
+	Process Exist, Voice Server.exe
+	
+	voiceServer := ErrorLevel
 	
 	index := 1
 	

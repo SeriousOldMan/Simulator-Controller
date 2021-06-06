@@ -395,6 +395,10 @@ class VoiceServer extends ConfigurationItem {
 		timer := ObjBindMethod(this, "runPendingCommands")
 		
 		SetTimer %timer%, 500
+		
+		timer := ObjBindMethod(this, "unregisterStaleVoiceClients")
+		
+		SetTimer %timer%, 5000
 	}
 	
 	loadFromConfiguration(configuration) {
@@ -605,6 +609,27 @@ class VoiceServer extends ConfigurationItem {
 				this.activateVoiceClient(theDescriptor)
 	}
 	
+	unregisterStaleVoiceClients() {
+		protectionOn()
+		
+		try {
+			for descriptor, voiceClient in this.VoiceClients {
+				pid := voiceClient.PID
+			
+				Process Exist, %pid%
+				
+				if !ErrorLevel {
+					this.unregisterVoiceClient(descriptor, pid)
+					
+					this.unregisterStaleClients()
+				}
+			}
+		}
+		finally {
+			protectionOff()
+		}
+	}
+	
 	registerChoices(descriptor, name, choices*) {
 		this.getVoiceClient(descriptor).registerChoices(name, choices*)
 	}
@@ -645,13 +670,20 @@ class VoiceServer extends ConfigurationItem {
 	}
 	
 	runPendingCommands() {
-		if (this.iPendingCommands.Length() == 0)
-			return
-		else {
-			command := this.iPendingCommands.RemoveAt(1)
+		protectionOn()
 		
-			if command
-				%command%()
+		try {
+			if (this.iPendingCommands.Length() == 0)
+				return
+			else {
+				command := this.iPendingCommands.RemoveAt(1)
+			
+				if command
+					%command%()
+			}
+		}
+		finally {
+			protectionOff()
 		}
 	}
 		

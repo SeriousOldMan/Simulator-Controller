@@ -223,8 +223,14 @@ startRaceEngineer() {
 ;;;-------------------------------------------------------------------------;;;
 
 shutdownRaceEngineer() {
-	if !RaceEngineer.Instance.KnowledgeBase
+	if shutdown
 		ExitApp 0
+
+	if !RaceEngineer.Instance.KnowledgeBase {
+		callback := Func("shutdownRaceEngineer").Bind(true)
+		
+		SetTimer %callback%, -5000
+	}
 	else
 		SetTimer shutdownRaceEngineer, -1000
 }

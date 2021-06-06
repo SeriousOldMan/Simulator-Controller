@@ -2956,7 +2956,7 @@ class RuleCompiler {
 						SetWorkingDir %path%
 					
 					SplitPath fileName, , path
-					
+				
 					this.compile(fileName, productions, reductions, path)
 				}
 				finally {

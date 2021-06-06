@@ -894,13 +894,13 @@ class RaceEngineer extends RaceAssistant {
 			if this.Speaker
 				this.getSpeaker().speakPhrase("Bye")
 			
-			if (this.hasEnoughData(false) && ((this.Session == kSessionPractice) || (this.Session == kSessionRace))) {
-				this.updateSessionData()
+			if ((this.Session == kSessionPractice) || (this.Session == kSessionRace)) {
+				this.shutdownSession("Before")
 						
 				if (this.Listener && (((this.SaveTyrePressures == kAsk) && (this.SetupData.Count() > 0)) || (this.SaveSettings == kAsk))) {
 					this.getSpeaker().speakPhrase("ConfirmDataUpdate", false, true)
 					
-					this.setContinuation(ObjBindMethod(this, "updateSessionData", true))
+					this.setContinuation(ObjBindMethod(this, "shutdownSession", "After"))
 					
 					callback := ObjBindMethod(this, "forceFinishSession")
 					
@@ -912,15 +912,17 @@ class RaceEngineer extends RaceAssistant {
 			else
 				this.updateDynamicValues({KnowledgeBase: false})
 		}
-		
-		this.updateDynamicValues({LastLap: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
-		this.updateSessionValues({Simulator: "", Session: kSessionFinished})
+		else {
+			this.updateDynamicValues({LastLap: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
+			this.updateSessionValues({Simulator: "", Session: kSessionFinished})
+		}
 	}
 	
 	forceFinishSession() {
 		if !this.SessionDataActive {
-			this.updateSessionValues({Simulator: "", Session: kSessionFinished})
 			this.updateDynamicValues({KnowledgeBase: false, SetupData: {}})
+			
+			this.finishSession()
 		}	
 	}
 	
@@ -1076,14 +1078,16 @@ class RaceEngineer extends RaceAssistant {
 		if this.Debug[kDebugKnowledgeBase]
 			this.dumpKnowledge(this.KnowledgeBase)
 		
-		currentCompound := knowledgeBase.getValue("Tyre.Compound", false)
-		currentCompoundColor := knowledgeBase.getValue("Tyre.Compound.Color", false)
-		targetCompound := knowledgeBase.getValue("Tyre.Compound.Target", false)
-		targetCompoundColor := knowledgeBase.getValue("Tyre.Compound.Color.Target", false)
-		
-		if (currentCompound && (currentCompound = targetCompound) && (currentCompoundColor = targetCompoundColor))
-			this.updateSetupData(knowledgeBase.getValue("Session.Simulator"), knowledgeBase.getValue("Session.Car"), knowledgeBase.getValue("Session.Track")
-							   , weatherNow, airTemperature, trackTemperature, currentCompound, currentCompoundColor)
+		if this.hasEnoughData(false) {
+			currentCompound := knowledgeBase.getValue("Tyre.Compound", false)
+			currentCompoundColor := knowledgeBase.getValue("Tyre.Compound.Color", false)
+			targetCompound := knowledgeBase.getValue("Tyre.Compound.Target", false)
+			targetCompoundColor := knowledgeBase.getValue("Tyre.Compound.Color.Target", false)
+			
+			if (currentCompound && (currentCompound = targetCompound) && (currentCompoundColor = targetCompoundColor))
+				this.updateSetupData(knowledgeBase.getValue("Session.Simulator"), knowledgeBase.getValue("Session.Car"), knowledgeBase.getValue("Session.Track")
+								   , weatherNow, airTemperature, trackTemperature, currentCompound, currentCompoundColor)
+		}
 		
 		return result
 	}
@@ -1210,24 +1214,27 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 	
-	updateSessionData(confirm := false) {
+	shutdownSession(phase) {
 		this.iSessionDataActive := true
 		
 		try {
-			if (this.SaveSettings == (confirm ? kAsk : kAlways))
+			if (this.SaveSettings = ((phase = "Before") ? kAlways : kAsk))
 				this.updateSettings()
 			
-			if ((this.SaveTyrePressures == (confirm ? kAsk : kAlways)) && (this.SetupData.Count() > 0))
-				this.updateSetupDatabase()
+			if ((this.SaveTyrePressures = ((phase = "After") ? kAsk : kAlways)) && (this.SetupData.Count() > 0))
+				this.updateTyrePressures()
 		}
 		finally {
 			this.iSessionDataActive := false
 		}
 		
-		if (confirm && this.Speaker) {
-			this.getSpeaker().speakPhrase("DataUpdated")
+		if (phase = "After") {
+			if this.Speaker
+				this.getSpeaker().speakPhrase("DataUpdated")
 			
-			this.iKnowledgeBase := false
+			this.updateDynamicValues({KnowledgeBase: false, SetupData: {}})
+			
+			this.finishSession()
 		}
 	}
 	
@@ -1244,10 +1251,10 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 
-	updateSetupDatabase() {
+	updateTyrePressures() {
 		local compound
 		
-		if this.KnowledgeBase {
+		if this.KnowledgeBase
 			for descriptor, pressures in this.SetupData {
 				descriptor := ConfigurationItem.splitDescriptor(descriptor)
 			
@@ -1271,9 +1278,8 @@ class RaceEngineer extends RaceAssistant {
 				
 				this.SetupDatabase.updatePressures(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor, pressures)
 			}
-		}
 		
-		this.iSetupData := {}
+		this.updateDynamicValues({SetupData: {}})
 	}
 	
 	hasPlannedPitstop() {

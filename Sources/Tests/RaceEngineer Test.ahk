@@ -176,7 +176,7 @@ class TestPitstopHandler {
 
 class FuelReporting extends Assert {
 	FuelWarningTest() {
-		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), false, false, false)
+		engineer := new TestRaceEngineer(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), false, false, false)
 
 		vFuelWarnings := {}
 		
@@ -199,7 +199,7 @@ class FuelReporting extends Assert {
 	}
 
 	RemainingFuelTest() {
-		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), false, false, false)
+		engineer := new TestRaceEngineer(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), false, false, false)
 
 		vFuelWarnings := {}
 		
@@ -222,7 +222,7 @@ class FuelReporting extends Assert {
 
 class DamageReporting extends Assert {
 	DamageReportingTest() {
-		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), new TestPitStopHandler(), false, false)
+		engineer := new TestRaceEngineer(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), new TestPitStopHandler(), false, false)
 		
 		Loop {
 			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
@@ -261,7 +261,7 @@ global vDamageStintLaps
 
 class DamageAnalysis extends Assert {
 	DamageRace2ReportingTest() {
-		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 2\Race Engineer.settings"), new TestPitStopHandler(), false, false)
+		engineer := new TestRaceEngineer(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 2\Race Engineer.settings"), new TestPitStopHandler(), false, false)
 		
 		done := false
 	
@@ -326,7 +326,7 @@ class DamageAnalysis extends Assert {
 	}
 	
 	DamageRace3ReportingTest() {
-		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 3\Race Engineer.settings"), new TestPitStopHandler(), false, false)
+		engineer := new TestRaceEngineer(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 3\Race Engineer.settings"), new TestPitStopHandler(), false, false)
 		
 		done := false
 	
@@ -402,7 +402,7 @@ class DamageAnalysis extends Assert {
 	}
 	
 	DamageRace4ReportingTest() {
-		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 4\Race Engineer.settings"), new TestPitStopHandler(), false, false)
+		engineer := new TestRaceEngineer(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 4\Race Engineer.settings"), new TestPitStopHandler(), false, false)
 		
 		done := false
 	
@@ -491,7 +491,7 @@ class PitstopHandling extends Assert {
 	}
 
 	PitstopPlanLap3Test() {
-		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), new TestPitStopHandler(), false, false)
+		engineer := new TestRaceEngineer(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), new TestPitStopHandler(), false, false)
 		
 		vCompletedActions := {}
 		
@@ -535,7 +535,7 @@ class PitstopHandling extends Assert {
 	}
 	
 	PitstopPlanLap4Test() {
-		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), new TestPitStopHandler(), false, false)
+		engineer := new TestRaceEngineer(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), new TestPitStopHandler(), false, false)
 		
 		vCompletedActions := {}
 		
@@ -579,7 +579,7 @@ class PitstopHandling extends Assert {
 	}
 	
 	PitstopPlanLap5Test() {
-		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), new TestPitStopHandler(), false, false)
+		engineer := new TestRaceEngineer(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), new TestPitStopHandler(), false, false)
 		
 		vCompletedActions := {}
 		
@@ -626,7 +626,7 @@ class PitstopHandling extends Assert {
 	}
 	
 	PitstopPrepare3Test() {
-		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), new TestPitStopHandler(), false, false)
+		engineer := new TestRaceEngineer(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), new TestPitStopHandler(), false, false)
 		
 		vCompletedActions := {}
 		
@@ -678,7 +678,7 @@ class PitstopHandling extends Assert {
 	}
 	
 	PitstopPrepare5Test() {
-		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), new TestPitStopHandler(), false, false)
+		engineer := new TestRaceEngineer(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), new TestPitStopHandler(), false, false)
 		
 		vCompletedActions := {}
 		
@@ -730,7 +730,7 @@ class PitstopHandling extends Assert {
 	}
 	
 	PitstopPerformedTest() {
-		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), new TestPitStopHandler(), false, false)
+		engineer := new TestRaceEngineer(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), new TestPitStopHandler(), false, false)
 		
 		vCompletedActions := {}
 		
@@ -796,7 +796,7 @@ class PitstopHandling extends Assert {
 	}
 	
 	PitstopMultipleTest() {
-		engineer := new TestRaceEngineer(false, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), new TestPitStopHandler(), false, false)
+		engineer := new TestRaceEngineer(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), new TestPitStopHandler(), false, false)
 		
 		Loop {
 			vSuspensionDamage := kNotInitialized

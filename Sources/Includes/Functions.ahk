@@ -177,7 +177,7 @@ playThemeSong(songFile) {
 readLanguage(targetLanguageCode) {
 	translations := {}
 	
-	Loop Read, % getFileName("Translations." . targetLanguageCode, kUserConfigDirectory, kConfigDirectory)
+	Loop Read, % getFileName("Translations." . targetLanguageCode, kUserTranslationsDirectory, kTranslationsDirectory)
 	{
 		translation := StrSplit(A_LoopReadLine, "=>")
 		
@@ -863,10 +863,13 @@ initializeEnvironment() {
 	
 	FileCreateDir %A_MyDocuments%\Simulator Controller
 	FileCreateDir %kUserHomeDirectory%Config
+	FileCreateDir %kUserHomeDirectory%Rules
 	FileCreateDir %kUserHomeDirectory%Logs
 	FileCreateDir %kUserHomeDirectory%Splash Media
 	FileCreateDir %kUserHomeDirectory%Screen Images
 	FileCreateDir %kUserHomeDirectory%Plugins
+	FileCreateDir %kUserHomeDirectory%Translations
+	FileCreateDir %kUserHomeDirectory%Grammars
 	FileCreateDir %kUserHomeDirectory%Temp
 	FileCreateDir %kTempDirectory%Messages
 	FileCreateDir %kSetupDatabaseDirectory%Global
@@ -881,8 +884,8 @@ initializeEnvironment() {
 	for ignore, fileName in getFileNames("Controller Plugin Labels.*", kResourcesDirectory . "Templates\") {
 		SplitPath fileName, , , languageCode
 	
-		if !FileExist(kUserConfigDirectory . "Controller Plugin Labels." . languageCode)
-			FileCopy %kResourcesDirectory%Templates\Controller Plugin Labels.%languageCode%, %kUserConfigDirectory%
+		if !FileExist(kUserTranslationsDirectory . "Controller Plugin Labels." . languageCode)
+			FileCopy %kResourcesDirectory%Templates\Controller Plugin Labels.%languageCode%, %kUserTranslationsDirectory%
 	}
 	
 	if !FileExist(kUserConfigDirectory . "Race Engineer.settings")
@@ -1248,7 +1251,7 @@ logMessage(logLevel, message) {
 availableLanguages() {
 	translations := {en: "English"}
 	
-	for ignore, fileName in getFileNames("Translations.*", kConfigDirectory, kUserConfigDirectory) {
+	for ignore, fileName in getFileNames("Translations.*", kTranslationsDirectory, kUserTranslationsDirectory) {
 		SplitPath fileName, , , languageCode
 		
 		translations[languageCode] := readLanguage(languageCode)
@@ -1258,7 +1261,7 @@ availableLanguages() {
 }
 
 readTranslations(targetLanguageCode, withUserTranslations := true) {
-	directories := withUserTranslations ? [kUserConfigDirectory, kConfigDirectory] : [kConfigDirectory]
+	directories := withUserTranslations ? [kUserTranslationsDirectory, kTranslationsDirectory] : [kTranslationsDirectory]
 	translations := {}
 	
 	Loop Read, % getFileName("Translations." . targetLanguageCode, directories*)

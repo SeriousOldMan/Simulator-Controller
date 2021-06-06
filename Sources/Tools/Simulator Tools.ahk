@@ -476,11 +476,11 @@ editTargets(command := "") {
 updatePhraseGrammars() {
 	languages := availableLanguages()
 	
-	for ignore, grammarFileName in getFileNames("Race Engineer.grammars.*", kUserConfigDirectory) {
+	for ignore, grammarFileName in getFileNames("Race Engineer.grammars.*", kUserGrammarsDirectory, kUserConfigDirectory) {
 		SplitPath grammarFileName, , , languageCode
 		
 		userGrammars := readConfiguration(grammarFileName)
-		bundledGrammars := readConfiguration(getFileName("Race Engineer.grammars." . languageCode, kConfigDirectory))
+		bundledGrammars := readConfiguration(getFileName("Race Engineer.grammars." . languageCode, kGrammarsDirectory, kConfigDirectory))
 	
 		for section, keyValues in bundledGrammars
 			for key, value in keyValues
@@ -494,12 +494,12 @@ updatePhraseGrammars() {
 updateTranslations() {
 	languages := availableLanguages()
 	
-	for ignore, translationFileName in getFileNames("Translations.*", kUserConfigDirectory) {
+	for ignore, translationFileName in getFileNames("Translations.*", kUserTranslationsDirectory, kUserConfigDirectory) {
 		SplitPath translationFileName, , , languageCode
 		
 		translations := readTranslations(languageCode)
 		
-		if FileExist(getFileName(kConfigDirectory . "Translations." . languageCode))
+		if (FileExist(getFileName(kTranslationsDirectory . "Translations." . languageCode)) || FileExist(getFileName(kConfigDirectory . "Translations." . languageCode)))
 			originalLanguageCode := languageCode
 		else
 			originalLanguageCode := "en"
@@ -516,7 +516,7 @@ updatePluginLabels() {
 	languages := availableLanguages()
 	enPluginLabels := readConfiguration(kResourcesDirectory . "Templates\Controller Plugin Labels.en")
 	
-	for ignore, userPluginLabelsFile in getFileNames("Controller Plugin Labels.*", kUserConfigDirectory) {
+	for ignore, userPluginLabelsFile in getFileNames("Controller Plugin Labels.*", kUserTranslationsDirectory, kUserConfigDirectory) {
 		SplitPath userPluginLabelsFile, , , languageCode
 	
 		if !languages.HasKey(languageCode)

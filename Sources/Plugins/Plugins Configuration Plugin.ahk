@@ -218,7 +218,7 @@ comparePlugins(p1, p2) {
 }
 
 openLabelsEditor() {
-	Run % "notepad.exe " . """" . kUserConfigDirectory . "Controller Plugin Labels." . getLanguage() . """"
+	Run % "notepad.exe " . """" . kUserTranslationsDirectory . "Controller Plugin Labels." . getLanguage() . """"
 }
 
 openPluginsModesDocumentation() {

@@ -164,7 +164,7 @@ startRaceStrategist() {
 ;;;-------------------------------------------------------------------------;;;
 
 shutdownRaceStrategist() {
-	if !RaceStrategist.Instance.KnowledgeBase
+	if (RaceEngineer.Instance.Session == kSessionFinished)
 		ExitApp 0
 	else
 		SetTimer shutdownRaceStrategist, -1000

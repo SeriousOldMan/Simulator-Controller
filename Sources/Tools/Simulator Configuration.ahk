@@ -1486,7 +1486,7 @@ class TranslationsEditor extends ConfigurationItem {
 					languageCode := code
 			
 			if (languageCode != kUndefined)
-				for ignore, fileName in getFileNames("Translations." . languageCode, kUserConfigDirectory, kConfigDirectory)
+				for ignore, fileName in getFileNames("Translations." . languageCode, kUserTranslationsDirectory, kTranslationsDirectory)
 					try {
 						FileDelete %fileName%
 					}

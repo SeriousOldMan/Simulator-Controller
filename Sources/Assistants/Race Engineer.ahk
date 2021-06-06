@@ -223,7 +223,7 @@ startRaceEngineer() {
 ;;;-------------------------------------------------------------------------;;;
 
 shutdownRaceEngineer() {
-	if !RaceEngineer.Instance.KnowledgeBase
+	if (RaceEngineer.Instance.Session == kSessionFinished)
 		ExitApp 0
 	else
 		SetTimer shutdownRaceEngineer, -1000

@@ -31,6 +31,15 @@ global kUserPluginsDirectory = kUserHomeDirectory . "Plugins\"
 global kConfigDirectory = normalizeFilePath(A_ScriptDir . (A_IsCompiled ? "\..\Config\" : "\..\..\Config\"))
 global kUserConfigDirectory = kUserHomeDirectory . "Config\"
 
+global kTranslationsDirectory = kResourcesDirectory . "Translations\"
+global kUserTranslationsDirectory = kUserHomeDirectory . "Translations\"
+
+global kGrammarsDirectory = kResourcesDirectory . "Grammars\"
+global kUserGrammarsDirectory = kUserHomeDirectory . "Grammars\"
+
+global kRulesDirectory = kResourcesDirectory . "Rules\"
+global kUserRulesDirectory = kUserHomeDirectory . "Rules\"
+
 global kSplashMediaDirectory = kResourcesDirectory . "Splash Media\"
 global kUserSplashMediaDirectory = kUserHomeDirectory . "Splash Media\"
 

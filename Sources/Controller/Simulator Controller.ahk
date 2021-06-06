@@ -1353,10 +1353,10 @@ class ControllerPlugin extends Plugin {
 		if !this.sLabelsDatabase {
 			languageCode := getLanguage()
 			
-			this.sLabelsDatabase := readConfiguration(getFileName("Controller Plugin Labels." . languageCode, kUserConfigDirectory))
+			this.sLabelsDatabase := readConfiguration(getFileName("Controller Plugin Labels." . languageCode, kUserTranslationsDirectory))
 			
 			if (this.sLabelsDatabase.Count() = 0)
-				this.sLabelsDatabase := readConfiguration(getFileName("Controller Plugin Labels.en", kUserConfigDirectory))
+				this.sLabelsDatabase := readConfiguration(getFileName("Controller Plugin Labels.en", kUserTranslationsDirectory))
 		}
 		
 		label := getConfigurationValue(this.sLabelsDatabase, this.Plugin, descriptor, false)

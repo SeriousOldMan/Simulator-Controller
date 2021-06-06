@@ -259,6 +259,14 @@ class VoiceAssistant {
 			
 			SetTimer %listen%, 100
 		}
+		
+		if this.VoiceServer
+			OnExit(ObjBindMethod(this, "shutdownVoiceAssistant"))
+	}
+	
+	shutdownVoiceAssistant() {
+		if (this.VoiceServer && this.iSpeechGenerator)
+			raiseEvent(kFileMessage, "Voice", "unregisterVoiceClient:" . values2String(";", this.Name, processID), this.VoiceServer)
 	}
 	
 	initialize(options) {

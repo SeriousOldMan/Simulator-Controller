@@ -148,7 +148,7 @@ startRaceStrategist() {
 	
 	registerEventHandler("Strategist", "handleStrategistRemoteCalls")
 	
-	if strategistLogo
+	if (strategistLogo && !kSilentMode)
 		showLogo(strategistName)
 	
 	if (remotePID != 0) {
@@ -167,7 +167,9 @@ shutdownRaceStrategist(shutdown := false) {
 	if shutdown
 		ExitApp 0
 
-	if !RaceStrategist.Instance.KnowledgeBase {
+	if (RaceStrategist.Instance.Session == kSessionFinished) {
+		RaceStrategist.Instance.shutdownVoiceAssistant()
+		
 		callback := Func("shutdownRaceStrategist").Bind(true)
 		
 		SetTimer %callback%, -5000

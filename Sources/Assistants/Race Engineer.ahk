@@ -207,7 +207,7 @@ startRaceEngineer() {
 	
 	registerEventHandler("Engineer", "handleEngineerRemoteCalls")
 	
-	if engineerLogo
+	if (engineerLogo && !SilentMode)
 		showLogo(engineerName)
 	
 	if (remotePID != 0) {
@@ -226,7 +226,9 @@ shutdownRaceEngineer(shutdown := false) {
 	if shutdown
 		ExitApp 0
 
-	if !RaceEngineer.Instance.KnowledgeBase {
+	if (RaceEngineer.Instance.Session == kSessionFinished) {
+		RaceStrategist.Instance.shutdownVoiceAssistant()
+		
 		callback := Func("shutdownRaceEngineer").Bind(true)
 		
 		SetTimer %callback%, -5000

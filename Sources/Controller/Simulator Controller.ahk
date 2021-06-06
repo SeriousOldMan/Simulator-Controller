@@ -742,7 +742,8 @@ class SimulatorController extends ConfigurationItem {
 	}
 	
 	activationCommand(words*) {
-		SoundPlay %kResourcesDirectory%Sounds\Activated.wav
+		if !kSilentMode
+			SoundPlay %kResourcesDirectory%Sounds\Activated.wav
 	}
 	
 	voiceCommand(grammar, command, words*) {

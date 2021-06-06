@@ -222,9 +222,15 @@ startRaceEngineer() {
 ;;;                          Event Handler Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-shutdownRaceEngineer() {
-	if (RaceEngineer.Instance.Session == kSessionFinished)
+shutdownRaceEngineer(shutdown := false) {
+	if shutdown
 		ExitApp 0
+
+	if !RaceEngineer.Instance.KnowledgeBase {
+		callback := Func("shutdownRaceEngineer").Bind(true)
+		
+		SetTimer %callback%, -5000
+	}
 	else
 		SetTimer shutdownRaceEngineer, -1000
 }

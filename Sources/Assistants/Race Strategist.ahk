@@ -102,7 +102,7 @@ startRaceStrategist() {
 	
 	remotePID := 0
 	remoteHandle := false
-	strategistName := "Dylan"
+	strategistName := "Toni"
 	strategistLogo := false
 	strategistLanguage := false
 	strategistSpeaker := false
@@ -163,9 +163,15 @@ startRaceStrategist() {
 ;;;                          Event Handler Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-shutdownRaceStrategist() {
-	if (RaceEngineer.Instance.Session == kSessionFinished)
+shutdownRaceStrategist(shutdown := false) {
+	if shutdown
 		ExitApp 0
+
+	if !RaceStrategist.Instance.KnowledgeBase {
+		callback := Func("shutdownRaceStrategist").Bind(true)
+		
+		SetTimer %callback%, -5000
+	}
 	else
 		SetTimer shutdownRaceStrategist, -1000
 }

@@ -265,8 +265,13 @@ class VoiceAssistant {
 	}
 	
 	shutdownVoiceAssistant() {
-		if (this.VoiceServer && this.iSpeechGenerator)
+		if (this.VoiceServer && this.iSpeechGenerator) {
+			Process Exist
+			
+			processID := ErrorLevel
+				
 			raiseEvent(kFileMessage, "Voice", "unregisterVoiceClient:" . values2String(";", this.Name, processID), this.VoiceServer)
+		}
 	}
 	
 	initialize(options) {

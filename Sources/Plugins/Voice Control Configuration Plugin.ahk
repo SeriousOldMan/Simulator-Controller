@@ -51,7 +51,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 				enIndex := A_Index
 		}
 			
-		for ignore, grammarFile in getFileNames("Race Engineer.grammars.*", kUserConfigDirectory, kConfigDirectory) {
+		for ignore, grammarFile in getFileNames("Race Engineer.grammars.*", kUserGrammarsDirectory, kGrammarsDirectory) {
 			SplitPath grammarFile, , , languageCode
 		
 			if !languages.HasKey(languageCode) {
@@ -180,7 +180,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 			}
 			
 		if !found
-			for ignore, grammarFile in getFileNames("Race Engineer.grammars.*", kUserConfigDirectory, kConfigDirectory) {
+			for ignore, grammarFile in getFileNames("Race Engineer.grammars.*", kUserGrammarsDirectory, kGrammarsDirectory) {
 				SplitPath grammarFile, , , grammarLanguageCode
 			
 				if languages.HasKey(grammarLanguageCode)

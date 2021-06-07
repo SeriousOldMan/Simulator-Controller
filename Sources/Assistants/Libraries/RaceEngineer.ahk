@@ -905,17 +905,16 @@ class RaceEngineer extends RaceAssistant {
 					callback := ObjBindMethod(this, "forceFinishSession")
 					
 					SetTimer %callback%, -60000
+					
+					return
 				}
-				else
-					this.updateDynamicValues({KnowledgeBase: false})
 			}
-			else
-				this.updateDynamicValues({KnowledgeBase: false})
+			
+			this.updateDynamicValues({KnowledgeBase: false})
 		}
-		else {
-			this.updateDynamicValues({LastLap: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
-			this.updateSessionValues({Simulator: "", Session: kSessionFinished})
-		}
+
+		this.updateDynamicValues({LastLap: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
+		this.updateSessionValues({Simulator: "", Session: kSessionFinished})
 	}
 	
 	forceFinishSession() {

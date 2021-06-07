@@ -43,6 +43,16 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ***
 
+## Release 3.1.0
+
+Release 3.1 introduces a new assistant, Toni, the Virtual Race Strategist. The new assistant, although fully integrated already, does not do anything useful at the moment, so you can ignore it for the moment, but to integrate the new assistant in Simulator Controller, a lot of small changes were necessary:
+
+  - The voice handling framework now supports multiple different active communication partners. Each one must have an activation command to *focus* the voice recognition for this client (see the [new documentation for voice control](*) for more information). For the assistants Jona and Toni this is the call phrase "Hey %name%", where %name% is the configured name of the assistant. If you also use voice commands for some of the [controller actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller), you must set the activation command for the Simulator Controller itself in the [configuration tab for voice control](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control).
+  - A new plugin has been created for the control of the new Virtual Race Strategist. Please take a look at the documentation of the ["Race Strategist" plugin](*) for more information.
+  - [Mostly for Developers]: In the course of the integration of Toni, a lot of files were moved to new locations. This will be handled by the automated update procedure. Affected are Plugin Labels, Translations, Grammars and Rules. If you have created your own translations for example, you will find those files from now on in the *Simulator Controller\Translations* folder, which is located in your user *Documents* folder. Furthermore, the Rules files had been split apart to allow for a more modular approach.
+
+***
+
 ## Release 3.0.6
 
 The local configuration database will be covered as usual by the automatic update procedure. But you will take a look at the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration), since a new configuration page has been added for the Virtual Race Engineer. A lot of [new configuration options](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-engineer) will allow you to control the dynamic behaviour of certain algorithms of the AI kernel and the integration of Jona with the setup database. The default values of all thesse new options has been chosen so, that the default behaviour should be the same as before.

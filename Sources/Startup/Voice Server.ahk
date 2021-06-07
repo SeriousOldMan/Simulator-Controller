@@ -622,6 +622,8 @@ class VoiceServer extends ConfigurationItem {
 					this.unregisterVoiceClient(descriptor, pid)
 					
 					this.unregisterStaleClients()
+					
+					break
 				}
 			}
 		}

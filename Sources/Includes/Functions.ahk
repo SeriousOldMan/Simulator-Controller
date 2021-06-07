@@ -1280,7 +1280,7 @@ readTranslations(targetLanguageCode, withUserTranslations := true) {
 }
 
 writeTranslations(languageCode, languageName, translations) {
-	fileName := kUserConfigDirectory . "Translations." . languageCode
+	fileName := kUserTranslationsDirectory . "Translations." . languageCode
 	
 	try {
 		FileDelete %fileName%

@@ -25,9 +25,9 @@ The startup process of Simulator Controller can entertain you with splash images
 
 Note: Choosing media files depending on the currently selected simulation game is on the wish list for a future release :-)
 
-## Installation and Configuration of Jona, the Virtual Race Engineer
+## Installation and Configuration of the different Race Assistants
 
-Release 2.1 introduced Jona, an artificial race engineer as an optional component of the Simulator Controller package. Since Jona is quite a complex piece of software, and also requires additional installation steps, you will find all necessary information about Jona in a separate [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer).
+Release 2.1 introduced Jona, an artificial Race Engineer as an optional component of the Simulator Controller package. Since Jona is quite a complex piece of software, and also requires additional installation steps, you will find all necessary information about Jona in a separate [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer). The configuration for Toni, a Virtual Race Strategist, is very similar, because it is based on the same technology. Please see the [separate documentation](*) for more information.
 
 # Configuration
 

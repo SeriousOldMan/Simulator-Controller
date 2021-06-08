@@ -660,6 +660,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 					; Not on track
 				
 					lastLap := 0
+					inPit := false
 			
 					if this.RaceEngineer
 						this.finishSession()
@@ -668,9 +669,10 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 				}
 				
 				if ((dataLastLap <= 1) && (dataLastLap < lastLap)) {
-					; Start of new race without finishing previous race first
+					; Start of new session without finishing previous session first
 				
 					lastLap := 0
+					inPit := false
 			
 					if this.RaceEngineer
 						this.finishSession()
@@ -735,6 +737,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 				}
 			
 			lastLap := 0
+			inPit := false
 		
 			if this.RaceEngineer
 				this.finishSession()

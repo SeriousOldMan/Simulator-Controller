@@ -71,6 +71,10 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 		addLap(arguments*) {
 			this.callRemote("addLap", arguments*)
 		}
+		
+		performPitstop(arguments*) {
+			this.callRemote("performPitstop", arguments*)
+		}
 	}
 	
 	class RaceStrategistToggleAction extends ControllerAction {
@@ -320,6 +324,11 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 			this.RaceStrategist.updateLap(lapNumber, dataFile)
 	}
 	
+	performPitstop(lapNumber) {
+		if this.RaceStrategist
+			this.RaceStrategist.performPitstop(lapNumber)
+	}
+	
 	startSimulation(simulator) {
 		if (this.Simulator && (this.Simulator != simulator))
 			this.stopSimulation(this.Simulator)
@@ -361,6 +370,7 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 	
 	collectSessionData() {
 		static lastLap := 0
+		static inPit := false
 		
 		if this.Simulator {
 			code := this.Simulator.Code
@@ -384,6 +394,7 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 					; Not in a race
 				
 					lastLap := 0
+					inPit := false
 			
 					if this.RaceStrategist
 						this.finishSession()
@@ -395,19 +406,29 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 					; Start of new race without finishing previous race first
 				
 					lastLap := 0
+					inPit := false
 			
 					if this.RaceStrategist
 						this.finishSession()
 				}
 				
 				if this.RaceStrategistEnabled {
-					if (dataLastLap > 0) {
+					if (getConfigurationValue(data, "Stint Data", "InPit", false) && !inPit) {
+						; Car is in the Pit
+						
+						this.performPitstop(dataLastLap)
+						
+						inPit := true
+					}
+					else if (dataLastLap > 0) {
 						; Car is on the track
 					
 						if ((dataLastLap > 1) && (lastLap == 0))
 							return
 						
 						newLap := (dataLastLap > lastLap)
+					
+						inPit := false
 					
 						if newLap {
 							firstLap := (lastLap == 0)
@@ -426,8 +447,10 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 						}
 					}
 				}
-				else
+				else {
 					lastLap := 0
+					inPit := false
+				}
 			}
 			finally {
 				protectionOff()
@@ -443,6 +466,7 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 				}
 			
 			lastLap := 0
+			inPit := false
 		
 			if this.RaceStrategist
 				this.finishSession()

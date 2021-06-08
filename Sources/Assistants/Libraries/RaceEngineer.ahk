@@ -33,7 +33,6 @@ class RaceEngineer extends RaceAssistant {
 	iEnoughData := false
 	
 	iOverallTime := 0
-	iLastLap := 0
 	iLastFuelAmount := 0
 	iInitialFuelAmount := 0
 	iAvgFuelConsumption := 0
@@ -62,12 +61,6 @@ class RaceEngineer extends RaceAssistant {
 	OverallTime[] {
 		Get {
 			return this.iOverallTime
-		}
-	}
-	
-	LastLap[] {
-		Get {
-			return this.iLastLap
 		}
 	}
 	
@@ -132,9 +125,6 @@ class RaceEngineer extends RaceAssistant {
 	
 	updateDynamicValues(values) {
 		base.updateDynamicValues(values)
-		
-		if values.HasKey("LastLap")
-			this.iLastLap := values["LastLap"]
 		
 		if values.HasKey("OverallTime")
 			this.iOverallTime := values["OverallTime"]
@@ -849,8 +839,8 @@ class RaceEngineer extends RaceAssistant {
 					, "Session.Setup.Tyre.Wet.Pressure.RL": getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Wet.Pressure.RL", 28.2)
 					, "Session.Setup.Tyre.Wet.Pressure.RR": getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Wet.Pressure.RR", 28.2)}
 					
-			facts["Session.Setup.Tyre.Compound"] := getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Compound", "Dry")
-			facts["Session.Setup.Tyre.Compound.Color"] := getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Compound.Color", "Black")
+			; facts["Session.Setup.Tyre.Compound"] := getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Compound", "Dry")
+			; facts["Session.Setup.Tyre.Compound.Color"] := getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Compound.Color", "Black")
 			
 			facts["Session.Settings.Tyre.Pressure.Correction.Temperature"] := getConfigurationValue(settings, "Session Settings", "Tyre.Pressure.Correction.Temperature", true)
 			facts["Session.Settings.Tyre.Pressure.Correction.Setup"] := getConfigurationValue(settings, "Session Settings", "Tyre.Pressure.Correction.Setup", true)
@@ -880,7 +870,7 @@ class RaceEngineer extends RaceAssistant {
 									  , SaveTyrePressures: getConfigurationValue(configuration, "Race Engineer Shutdown", simulatorName . ".SaveTyrePressures", kAsk)})
 		
 		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(this.createSession(data)), SetupData: {}
-								, LastLap: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
+								, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
 		
 		if this.Speaker
 			this.getSpeaker().speakPhrase("Greeting")
@@ -913,7 +903,7 @@ class RaceEngineer extends RaceAssistant {
 			this.updateDynamicValues({KnowledgeBase: false})
 		}
 
-		this.updateDynamicValues({LastLap: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
+		this.updateDynamicValues({OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
 		this.updateSessionValues({Simulator: "", Session: kSessionFinished})
 	}
 	
@@ -964,6 +954,9 @@ class RaceEngineer extends RaceAssistant {
 		knowledgeBase.setFact("Driver.Forname", driverForname)
 		knowledgeBase.setFact("Driver.Surname", driverSurname)
 		knowledgeBase.setFact("Driver.Nickname", driverNickname)
+		
+		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Compound", getConfigurationValue(data, "Car Data", "TyreCompound", "Dry"))
+		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Compound.Color", getConfigurationValue(data, "Car Data", "TyreCompoundColor", "Black"))
 		
 		timeRemaining := getDeprecatedConfigurationValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0)
 		
@@ -1467,20 +1460,22 @@ class RaceEngineer extends RaceAssistant {
 	}
 	
 	performPitstop(lapNumber := false) {
+		local knowledgeBase := this.KnowledgeBase
+		
 		if this.Speaker
 			this.getSpeaker().speakPhrase("Perform")
 		
-		this.KnowledgeBase.addFact("Pitstop.Lap", lapNumber ? lapNumber : this.KnowledgeBase.getValue("Lap"))
+		knowledgeBase.addFact("Pitstop.Lap", lapNumber ? lapNumber : knowledgeBase.getValue("Lap"))
 		
-		result := this.KnowledgeBase.produce()
+		result := knowledgeBase.produce()
 		
 		this.updateDynamicValues({LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
 		
 		if this.Debug[kDebugKnowledgeBase]
-			this.dumpKnowledge(this.KnowledgeBase)
+			this.dumpKnowledge(knowledgeBase)
 		
 		if (result && this.PitstopHandler)
-			this.PitstopHandler.pitstopFinished(this.KnowledgeBase.getValue("Pitstop.Last", 0))
+			this.PitstopHandler.pitstopFinished(knowledgeBase.getValue("Pitstop.Last", 0))
 		
 		return result
 	}

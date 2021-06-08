@@ -780,26 +780,10 @@ pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Repair.Bodywork, !Pi
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                     Tyre Setup Information Retrieval                    ;;;
+;;;                        Tyre Information Retrieval                       ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-currentTyreCompound(?compound, ?color) <= lastPitstopTyreCompound(?compound, ?color), !
-currentTyreCompound(?compound, ?color) <= setupTyreCompound(?compound, ?color)
-
-tyreCompoundColor(Wet, Black)
-tyreCompoundColor(Dry, ?color) <= pitstopTyreCompound(Dry, ?color)
-tyreCompoundColor(Dry, ?color) <= setupTyreCompound(Dry, ?color)
-tyreCompoundColor(Dry, Black)
-
-setupTyreCompound(?compound, ?color) <= Get(Session.Setup.Tyre.Compound, ?compound), Get(Session.Setup.Tyre.Compound.Color, ?color)
-
-setupTyrePressure(?compound, ?tyreType, ?pressure) <= Get(Session.Setup.Tyre, ?compound, Pressure, ?tyreType, ?pressure)
-
-setupTyrePressures(?compound, [], [])
-setupTyrePressures(?compound, [?tyreType | ?tyreTypes], [?pressure | ?pressures]) <=															\
-		setupTyrePressure(?compound, ?tyreType, ?pressure), setupTyrePressures(?compound, ?tyreTypes, ?pressures)
-
-tyrePressureTarget(?compound, ?tyreType, ?pressure) <= Get(Session.Settings.Tyre, ?compound, Pressure.Target, ?tyreType, ?pressure)
+#Include %kResourcesDirectory%Rules\Tyre Information Retrieval.rules
 
 
 ;;;-------------------------------------------------------------------------;;;

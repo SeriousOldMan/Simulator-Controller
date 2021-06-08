@@ -25,14 +25,68 @@
 ;;;-------------------------------------------------------------------------;;;
 
 class RaceStrategist extends RaceAssistant {
+	iEnoughData := false
+	
+	iOverallTime := 0
+	iLastFuelAmount := 0
+	iInitialFuelAmount := 0
+	iAvgFuelConsumption := 0
+	
 	EnoughData[] {
 		Get {
-			return true
+			return this.iEnoughData
+		}
+	}
+	
+	OverallTime[] {
+		Get {
+			return this.iOverallTime
+		}
+	}
+	
+	InitialFuelAmount[] {
+		Get {
+			return this.iInitialFuelAmount
+		}
+	}
+	
+	LastFuelAmount[] {
+		Get {
+			return this.iLastFuelAmount
+		}
+	}
+	
+	AvgFuelConsumption[] {
+		Get {
+			return this.iAvgFuelConsumption
 		}
 	}
 	
 	__New(configuration, strategistSettings, name := false, language := "__Undefined__", speaker := false, listener := false, voiceServer := false) {
 		base.__New(configuration, "Race Strategist", strategistSettings, name, language, speaker, listener, voiceServer)
+	}
+	
+	updateSessionValues(values) {
+		base.updateSessionValues(values)
+	}
+	
+	updateDynamicValues(values) {
+		base.updateDynamicValues(values)
+		
+		if values.HasKey("OverallTime")
+			this.iOverallTime := values["OverallTime"]
+		
+		if values.HasKey("LastFuelAmount")
+			this.iLastFuelAmount := values["LastFuelAmount"]
+		
+		if values.HasKey("InitialFuelAmount")
+			this.iInitialFuelAmount := values["InitialFuelAmount"]
+		
+		if values.HasKey("AvgFuelConsumption")
+			this.iAvgFuelConsumption := values["AvgFuelConsumption"]
+		
+		if values.HasKey("EnoughData")
+			this.iEnoughData := values["EnoughData"]
 	}
 	
 	handleVoiceCommand(grammar, words) {
@@ -171,7 +225,8 @@ class RaceStrategist extends RaceAssistant {
 		
 		this.updateConfigurationValues({})
 		
-		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(this.createSession(data))})
+		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(this.createSession(data))
+							   , OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
 		
 		if this.Speaker
 			this.getSpeaker().speak("")
@@ -181,7 +236,7 @@ class RaceStrategist extends RaceAssistant {
 	}
 	
 	finishSession() {
-		this.updateDynamicValues({KnowledgeBase: false})
+		this.updateDynamicValues({KnowledgeBase: false, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
 		
 		this.updateSessionValues({Simulator: "", Session: kSessionFinished})
 	}
@@ -225,6 +280,9 @@ class RaceStrategist extends RaceAssistant {
 		knowledgeBase.setFact("Driver.Forname", driverForname)
 		knowledgeBase.setFact("Driver.Surname", driverSurname)
 		knowledgeBase.setFact("Driver.Nickname", driverNickname)
+		
+		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Compound", getConfigurationValue(data, "Car Data", "TyreCompound", "Dry"))
+		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Compound.Color", getConfigurationValue(data, "Car Data", "TyreCompoundColor", "Black"))
 		
 		timeRemaining := getConfigurationValue(data, "Session Data", "SessionTimeRemaining", 0)
 		
@@ -308,6 +366,21 @@ class RaceStrategist extends RaceAssistant {
 		
 		if this.Debug[kDebugKnowledgeBase]
 			this.dumpKnowledge(this.KnowledgeBase)
+		
+		return result
+	}
+	
+	performPitstop(lapNumber := false) {
+		local knowledgeBase := this.KnowledgeBase
+		
+		knowledgeBase.addFact("Pitstop.Lap", lapNumber ? lapNumber : knowledgeBase.getValue("Lap"))
+		
+		result := knowledgeBase.produce()
+		
+		this.updateDynamicValues({LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
+		
+		if this.Debug[kDebugKnowledgeBase]
+			this.dumpKnowledge(knowledgeBase)
 		
 		return result
 	}

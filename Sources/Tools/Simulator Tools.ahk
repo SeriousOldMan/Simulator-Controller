@@ -581,6 +581,40 @@ renewConsent() {
 	}
 }
 
+updateConfigurationForV310() {
+	if FileExist(kUserConfigDirectory . "Race Engineer.rules")
+		try {
+			FileMove %kUserConfigDirectory%Race Engineer.rules, %kUserRulesDirectory%, 1
+		}
+		catch exception {
+			; ignore
+		}
+	
+	for ignore, fileName in getFileNames("Translations.*", kUserConfigDirectory)
+		try {
+			FileMove %fileName%, %kUserTranslationsDirectory%, 1
+		}
+		catch exception {
+			; ignore
+		}
+	
+	for ignore, fileName in getFileNames("Controller Plugin Labels.*", kUserConfigDirectory)
+		try {
+			FileMove %fileName%, %kUserTranslationsDirectory%, 1
+		}
+		catch exception {
+			; ignore
+		}
+	
+	for ignore, fileName in getFileNames("Race Engineer.grammars.*", kUserConfigDirectory)
+		try {
+			FileMove %fileName%, %kUserGrammarsDirectory%, 1
+		}
+		catch exception {
+			; ignore
+		}
+}
+
 updateConfigurationForV282() {
 	userSettingsFile := getFileName(kSimulatorSettingsFile, kUserConfigDirectory)
 	userSettings := readConfiguration(userSettingsFile)
@@ -713,6 +747,22 @@ updateConfigurationForV203() {
 
 updateConfigurationForV20() {
 	updateCustomCalls(13, 32)
+}
+
+updatePluginsForV310() {
+	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	userConfiguration := readConfiguration(userConfigurationFile)
+	
+	if (userConfiguration.Count() > 0)
+		if !getConfigurationValue(userConfiguration, "Plugins", "Race Strategist", false) {
+			raceStrategistPlugin := new Plugin("Race Strategist", readConfiguration(getFileName(kSimulatorConfigurationFile, kConfigDirectory)))
+				
+			raceStrategistPlugin.iIsActive := false
+			
+			raceStrategistPlugin.saveToConfiguration(userConfiguration)
+			
+			writeConfiguration(userConfigurationFile, userConfiguration)
+		}
 }
 
 updatePluginsForV285() {

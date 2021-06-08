@@ -1404,9 +1404,12 @@ getFileName(fileName, directories*) {
 getFileNames(filePattern, directories*) {
 	files := []
 	
-	for ignore, directory in directories
-		Loop Files, % directory . filePattern, FD
+	for ignore, directory in directories {
+		pattern := directory . filePattern
+	
+		Loop Files, %pattern%, FD
 			files.Push(A_LoopFileLongPath)
+	}
 	
 	return files
 }

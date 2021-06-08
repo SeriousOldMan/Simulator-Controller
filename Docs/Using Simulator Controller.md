@@ -54,9 +54,13 @@ Normally, it is not necessary to close *Simulator Controller.exe*, since it is v
 
 The Simulator Controller framework supports a sophisticated natural language interface. This capability is used by the race assistants Jona and Toni, thereby allowing a fully voice enabled dialog between you and these assistants, but the voice recognition can also be used to control parts of your controller hardware by [voice commands](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller).
 
-With the introduction of a new race assistant in Release 3.1 there are now three different *dialog partners* and it is very important that the system understands, to whom you are talking. Therefore an activatiom command, very simular to other digital assistants, has been introduced. For Jona and Toni, this activation is the *Call* phrase as defined in the [phrase grammars](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#phrase-grammars). For example, if you say "Hi Jona" (as long as you sticked to the preconfigured name "Jona"), the Virtual Race Engineer will start to listen for your commands. The race assistant will give a short answer so you know that the activation was successful. The listen mode will be activated automatically, when the assistant has asked a question and is waiting for your answer.
+With the introduction of a new race assistant in Release 3.1 there are now several different *communication partners* and it is very important that the system understands, to whom you are talking. Therefore an activatiom command, very simular to other digital assistants like Alexa or Cortana, has been introduced. For the assistants Jona and Toni this is the call phrase "Hey %name%", where %name% is the configured name of the assistant. For example, if you say "Hi Jona" (as long as you sticked to the preconfigured name "Jona"), the Virtual Race Engineer will start to listen for your commands. Jona will give a short answer so you know that the activation was successful. Beside this activation, the dedicated listen mode will also be activated, when any of the assistants has asked you a question and is waiting for the answer.
 
-The listen mode of the Simulator Controller itself, which allows you to trigger controller actions by voice, must be activated by an activation command as well. This activation command can be configured in the [voice tab of the configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control). When this activation command is recognized, you will hear a short chime tone as receipt and the system is ready to activate controller actions by voice.
+The listen mode of the Simulator Controller itself, which allows you to trigger [controller actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller) by voice, must be activated by an activation command as well. This activation command can be configured in the [voice control tab of the configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control). When this activation command is recognized, you will hear a short chime tone as confirmation and the system is ready to activate controller actions by voice.
+
+Note: If there is only *one* dialog partner configured, this will be activated for listen mode by default. In this situation, no activation command is necesssary.
+
+Beside the *builtin* voice recognition capabilities, you can still use a specialized external voice recognition appplications like [VoiceMacro](http://www.voicemacro.net/) as an external event source for controller actions, since this speciaized applications have a much better recognition quality in most cases.
 
 #### Jona, the Virtual Race Engineer
 
@@ -64,7 +68,7 @@ Release 2.1 introduced Jona, an artificial Race Engineer as an optional componen
 
 #### Toni, the Virtual Race Strategist
 
-Using the technology developed for Jona, Release 3.1 introduced an additional race assitant. This asssistant is named Toni and is a kind of race strategy expert. It is also fully in a separate [documentation chapter](*).
+Using the technology developed for Jona, Release 3.1 introduced an additional Race Assitant. This Assistant is named Toni and is a kind of Race Strategy Expert. It is also fully covered in a separate [documentation chapter](*).
 
 ## And now it's time
 

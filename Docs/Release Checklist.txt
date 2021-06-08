@@ -35,6 +35,7 @@ Release 3.1.0 Checklist
    a. Translations
    b. Configuration for new Plugin
    c. Phrase Grammars
+   d. New file locations (Rules, Translations, Grammars)
 5. Multiple Voice Inputs with Activation Phrase
    a. Documentation
    b. "Hey %name%" and "Controller"
@@ -46,10 +47,6 @@ Release 3.1.0 Checklist
    c. Plugins & Modes
 7. New constants kRulesDirectory, kUserRulesDirectory, kTranslationsDirectory, kUserTranslationsDirectory, kGrammarsDirectory, kUserGrammarsDirectory
    a. Constants.md
-8. Update Procedure
-   a. New file locations (Rules, Translations, Grammars)
-   b. Translations.
-   c. Phrase Grammars
 
 Release 3.0.6 Checklist
 =======================

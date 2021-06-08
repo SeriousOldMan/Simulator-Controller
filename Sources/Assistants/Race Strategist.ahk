@@ -146,6 +146,16 @@ startRaceStrategist() {
 		}
 	}
 	
+	if (strategistSpeaker = kTrue)
+		strategistSpeaker := true
+	else if (strategistSpeaker = kFalse)
+		strategistSpeaker := false
+	
+	if (strategistListener = kTrue)
+		strategistListener := true
+	else if (strategistListener = kFalse)
+		strategistListener := false
+	
 	RaceStrategist.Instance := new RaceStrategist(kSimulatorConfiguration, readConfiguration(strategistSettingsFile)
 												, strategistName, strategistLanguage, strategistSpeaker, strategistListener, voiceServer)
 	

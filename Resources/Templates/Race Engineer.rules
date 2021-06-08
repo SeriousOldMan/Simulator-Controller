@@ -481,7 +481,7 @@ priority: -10, {All: [?Lap.Remaining.Fuel <= ?Lap.Remaining.Stint],													
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                Weather & Tyre Temeperature Trend Projection             ;;;
+;;;                Weather & Tyre Temperature Trend Projection              ;;;
 ;;;                                                                         ;;;
 ;;; The rules in this section try to derive future weather data on past     ;;;
 ;;; weather trends and weather forecast information (as far as available).  ;;;

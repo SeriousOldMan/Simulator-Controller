@@ -45,7 +45,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 3.1.0
 
-Release 3.1 introduces a new assistant, Toni, the Virtual Race Strategist. The new assistant, although fully integrated already, does not do anything useful yet, so you can ignore it for the moment. But to integrate the new assistant in Simulator Controller, a lot of small changes were necessary:
+Release 3.1 introduces a new assistant, Toni, the Virtual Race Strategist. The new assistant, although fully integrated already, does not do anything useful yet (you can ask for info about the remaining laps and upcoming weather changes for demo purposes, though), so you can ignore it for the moment. But to integrate the new assistant in Simulator Controller, a lot of small changes were necessary:
 
   - The voice handling framework now supports multiple different active communication partners. Each one must have an activation command to *focus* the voice recognition for this communication partner (see the [new documentation for voice control](*) for more information).
   - A new plugin has been created for the control of the new Virtual Race Strategist. Please take a look at the documentation of the ["Race Strategist" plugin](*) for more information. This plugin will be added automatically to your configuration, but it will be deactivated by default.

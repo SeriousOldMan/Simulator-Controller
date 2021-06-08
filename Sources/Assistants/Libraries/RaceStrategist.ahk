@@ -35,6 +35,44 @@ class RaceStrategist extends RaceAssistant {
 		base.__New(configuration, "Race Strategist", strategistSettings, name, language, speaker, listener, voiceServer)
 	}
 	
+	handleVoiceCommand(grammar, words) {
+		switch grammar {
+			case "LapsRemaining":
+				this.lapInfoRecognized(words)
+			case "Weather":
+				this.weatherRecognized(words)
+			default:
+				base.handleVoiceCommand(grammar, words)
+		}
+	}
+	
+	lapInfoRecognized(words) {
+		local knowledgeBase := this.KnowledgeBase
+		
+		if !this.hasEnoughData()
+			return
+		
+		laps := Round(knowledgeBase.getValue("Lap.Remaining.Fuel", 0))
+		
+		if (laps == 0)
+			this.getSpeaker().speakPhrase("Later")
+		else
+			this.getSpeaker().speakPhrase("Laps", {laps: laps})
+	}
+	
+	weatherRecognized(words) {
+		local knowledgeBase := this.KnowledgeBase
+		
+		weather10Min := knowledgeBase.getValue("Weather.Weather.10Min", false)
+		
+		if !weather10Min
+			this.getSpeaker().speakPhrase("Later")
+		else if (weather10Min = "Dry")
+			this.getSpeaker().speakPhrase("WeatherGood")
+		else
+			this.getSpeaker().speakPhrase("WeatherRain")
+	}
+	
 	createSession(data) {
 		local facts
 		

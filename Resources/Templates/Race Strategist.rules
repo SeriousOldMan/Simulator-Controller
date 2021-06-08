@@ -23,6 +23,102 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                          Lap & Fuel Calculation                         ;;;
+;;;                                                                         ;;;
+;;; Updates the remaining laps with the current amount of fuel and the      ;;;
+;;; remaining stint time for the current driver.                            ;;;
+;;;-------------------------------------------------------------------------;;;
+
+priority: 20, [?Lap] => (ProveAll: updateRemainingLaps, ?Lap)
+
+updateRemainingLaps(?lap) <= remainingStintLaps(?lap, Fuel, ?fuelLaps), Set(Lap.Remaining.Fuel, ?fuelLaps)
+updateRemainingLaps(?lap) <= remainingStintLaps(?lap, Driver, ?driverLaps), Set(Lap.Remaining.Stint, ?driverLaps)
+updateRemainingLaps(?lap) <= remainingSessionLaps(?lap, ?sessionLaps), Set(Lap.Remaining.Session, ?sessionLaps)
+updateRemainingLaps(?lap) <= !Lap.Remaining.Stint > !Lap.Remaining.Fuel, Set(Lap.Remaining.Stint, !Lap.Remaining.Fuel)
+updateRemainingLaps(?lap) <= !Lap.Remaining.Stint > !Lap.Remaining.Session, Set(Lap.Remaining.Stint, !Lap.Remaining.Session)
+
+priority: -10, {All: [?Lap.Remaining.Stint <= ?Lap.Remaining.Fuel],																				\
+					 [?Lap.Remaining.Stint <= ?Lap.Remaining.Session]} => (Set: Lap.Remaining, ?Lap.Remaining.Stint)
+priority: -10, {All: [?Lap.Remaining.Session <= ?Lap.Remaining.Fuel],																			\
+					 [?Lap.Remaining.Session <= ?Lap.Remaining.Stint]} => (Set: Lap.Remaining, ?Lap.Remaining.Session)
+priority: -10, {All: [?Lap.Remaining.Fuel <= ?Lap.Remaining.Stint],																				\
+					 [?Lap.Remaining.Fuel <= ?Lap.Remaining.Session]} => (Set: Lap.Remaining, ?Lap.Remaining.Fuel)
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                Weather & Tyre Temperature Trend Calculation             ;;;
+;;;                                                                         ;;;
+;;; The rules in this section try to derive future weather data on past     ;;;
+;;; weather trends and weather forecast information (as far as available).  ;;;
+;;;-------------------------------------------------------------------------;;;
+
+priority: 5, {Any: [?Weather.Weather.10Min], {None: [?Weather.Weather.10Min.Index]}} => (Prove: updateWeatherIndex, 10Min)
+priority: 5, {Any: [?Weather.Weather.30Min], {None: [?Weather.Weather.30Min.Index]}} => (Prove: updateWeatherIndex, 30Min)
+
+updateWeatherIndex(?time) <= Get(Weather.Weather, ?time, ?weather), weatherIndex(?weather, ?index), Set(Weather.Weather, ?time, Index, ?index)
+
+[?Lap > 5] => (Prove: updateWeatherTrend, ?Lap)
+
+updateWeatherTrend(?lap) <= firstStintLap(?startlap), ?deltaLaps = ?lap - ?startlap,															\
+							lapAirTemperature(?startlap, ?startAirTemperature), projectedAirTemperature(?lap, ?curAirTemperature),				\
+							lapTrackTemperature(?startlap, ?startTrackTemperature), projectedTrackTemperature(?lap, ?curTrackTemperature),		\
+							lapWeather(?startlap, ?startWeather), projectedWeather(?lap, ?curWeather),											\
+							lapTyreTemperature(?startlap, ?startTyreTemperature), projectedTyreTemperature(?lap, ?curTyreTemperature),			\
+							?tempAir = ?curAirTemperature - ?startAirTemperature, ?tempTrack = ?curTrackTemperature - ?startTrackTemperature,	\
+							?deltaAirTemperature = ?tempAir / ?deltaLaps, ?deltaTrackTemperature = ?tempTrack / ?deltaLaps,						\
+							?tempWeather = ?curWeather - ?startWeather, ?deltaWeather = ?tempWeather / ?deltaLaps,								\
+							?tempTyreTemperature = ?curTyreTemperature - ?startTyreTemperature,													\
+							?deltaTyreTemperature = ?tempTyreTemperature / ?deltaLaps,															\
+							Set(Weather.Temperature.Air.Delta, ?deltaAirTemperature),															\
+							Set(Weather.Temperature.Track.Delta, ?deltaTrackTemperature), Set(Weather.Weather.Delta, ?deltaWeather),			\
+							Set(Weather.Temperature.Tyre.Delta, ?deltaTyreTemperature)
+
+projectedWeather(?lap, ?weather) <=																												\
+		firstStintLap(?firstlap), sequence(?firstlap, !Lap, ?indices), lapWeathers(?firstlap, !Lap, ?weathers),									\
+		linRegression(?indices, ?weathers, ?a, ?b), ?temp = ?b * ?lap, ?weather = ?a + ?temp
+
+projectedAirTemperature(?lap, ?temperature) <=																									\
+		firstStintLap(?firstlap), sequence(?firstlap, !Lap, ?indices), lapAirTemperatures(?firstlap, !Lap, ?temperatures),						\
+		linRegression(?indices, ?temperatures, ?a, ?b), ?temp = ?b * ?lap, ?temperature = ?a + ?temp
+
+projectedTrackTemperature(?lap, ?temperature) <=																								\
+		firstStintLap(?firstlap), sequence(?firstlap, !Lap, ?indices), lapTrackTemperatures(?firstlap, !Lap, ?temperatures),					\
+		linRegression(?indices, ?temperatures, ?a, ?b), ?temp = ?b * ?lap, ?temperature = ?a + ?temp
+
+projectedTyreTemperature(?lap, ?temperature) <=																									\
+		firstStintLap(?firstlap), sequence(?firstlap, !Lap, ?indices), lapTyreTemperatures(?firstlap, !Lap, ?temperatures),						\
+		linRegression(?indices, ?temperatures, ?a, ?b), ?temp = ?b * ?lap, ?temperature = ?a + ?temp
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                         Lap Information Retrieval                       ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include %kResourcesDirectory%Rules\Lap Information Retrieval.rules
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                       Pitstop Information Retrieval                     ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include %kResourcesDirectory%Rules\Pitstop Information Retrieval.rules
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                       Weather Information Retrieval                     ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include %kResourcesDirectory%Rules\Weather Information Retrieval.rules
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                   Session & Stint Information Retrieval                 ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include %kResourcesDirectory%Rules\Session Information Retrieval.rules
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                         Statistical Computations                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -30,7 +126,7 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                             Utility Rules                               ;;;
+;;;                               Utilities                                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 #Include %kResourcesDirectory%Rules\Utilities.rules

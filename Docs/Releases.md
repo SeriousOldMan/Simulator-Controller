@@ -2,11 +2,11 @@
 
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. Full rework of voice generation and recognition to allow for multiple voices even using different languages (see the [new documentation for voice control](*) for more information)
+  3. Full rework of voice generation and recognition to allow for multiple voices even using different languages (see the [new documentation for voice control](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#voice-commands) for more information)
   4. New plugin parameter *raceEngineerLanguage* for the ["Race Engineer" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) to overwrite the default language for the Virtual Race Engineer (same applies for the new Virtual Race Strategist)
-  5. Initial integration of the new AI-based Virtual Race Strategist
-  6. [New Plugin "Race Strategist"](*) to control the new Virtual Race Strategist
-  7. [New Tab in the configuration tool](*) for the new Virtual Race Strategist
+  5. Initial integration of the new AI-based [Virtual Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist). No useful initial functionality, but you can ask for weather information and remaining laps based on fuel or stint time calculation.
+  6. [New Plugin "Race Strategist"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) to control the new Virtual Race Strategist
+  7. [New Tab in the configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-strategist) for the new Virtual Race Strategist
 
 ## 3.0.6-release 05/28/21
 

@@ -68,7 +68,7 @@ Release 2.1 introduced Jona, an artificial Race Engineer as an optional componen
 
 #### Cato, the Virtual Race Strategist
 
-Using the technology developed for Jona, Release 3.1 introduced an additional Race Assitant. This Assistant is named Cato and is a kind of Race Strategy Expert. It is also fully covered in a separate [documentation chapter](*).
+Using the technology developed for Jona, Release 3.1 introduced an additional Race Assitant. This Assistant is named Cato and is a kind of Race Strategy Expert. It is also fully covered in a separate [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist).
 
 ## And now it's time
 

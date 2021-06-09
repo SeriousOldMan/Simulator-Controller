@@ -102,7 +102,7 @@ startRaceStrategist() {
 	
 	remotePID := 0
 	remoteHandle := false
-	strategistName := "Toni"
+	strategistName := "Cato"
 	strategistLogo := false
 	strategistLanguage := false
 	strategistSpeaker := false

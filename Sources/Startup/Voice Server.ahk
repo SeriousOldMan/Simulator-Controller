@@ -649,11 +649,11 @@ class VoiceServer extends ConfigurationItem {
 	}
 	
 	addPendingCommand(command, activation := false) {
-		if (activation && (activation != this.ActiveVoiceClient))
-			this.iPendingCommands := []
-		
-		if (activation && (this.iPendingCommands.Length() > 0))
-			return
+		if activation
+			if (activation != this.ActiveVoiceClient)
+				this.iPendingCommands := []
+			else if (this.iPendingCommands.Length() > 0)
+				return
 		
 		this.iLastCommand := A_TickCount
 		

@@ -578,7 +578,7 @@ class VoiceServer extends ConfigurationItem {
 			}
 				
 			try {
-				recognizer.loadGrammar(grammar, recognizer.compileGrammar(activationCommand), ObjBindMethod(this, "recognizeActivationCommand"))
+				recognizer.loadGrammar(grammar, recognizer.compileGrammar(activationCommand), ObjBindMethod(this, "recognizeActivationCommand", client))
 			}
 			catch exception {
 				logMessage(kLogCritical, translate("Error while registering voice command """) . command . translate(""" - please check the configuration"))
@@ -640,8 +640,8 @@ class VoiceServer extends ConfigurationItem {
 		this.getVoiceClient(descriptor).registerVoiceCommand(grammar, command, callback)
 	}
 	
-	recognizeActivationCommand(grammar, words) {
-		this.addPendingCommand(ObjBindMethod(this, "activationCommandRecognized", grammar, words), true)
+	recognizeActivationCommand(voiceClient, grammar, words) {
+		this.addPendingCommand(ObjBindMethod(this, "activationCommandRecognized", voiceClient, grammar, words), voiceClient)
 	}
 	
 	recognizeVoiceCommand(voiceClient, grammar, words) {
@@ -649,29 +649,35 @@ class VoiceServer extends ConfigurationItem {
 	}
 	
 	addPendingCommand(command, activation := false) {
-		lastCommand := this.iLastCommand
+		if (activation && (activation != this.ActiveVoiceClient))
+			this.iPendingCommands := []
+		
+		if (activation && (this.iPendingCommands.Length() > 0))
+			return
 		
 		this.iLastCommand := A_TickCount
 		
-		if this.iHasPendingActivation
-			return
-		
-		if (A_TickCount < (lastCommand + 2000))
-			return
-		
-		if activation
-			this.clearPendingCommands()
+		if !activation
+			this.clearPendingActivations()
 
-		this.iPendingCommands.Push(command)
-		this.iHasPendingActivation := activation
+		this.iPendingCommands.Push(Array(activation, command))
 	}
 	
-	clearPendingCommands() {
-		this.iHasPendingActivation := false
-		this.iPendingCommands := []
+	clearPendingActivations() {
+		for index, command in this.iPendingCommands
+			if command[1] {
+				this.iPendingCommands.RemoveAt(index)
+				
+				this.clearPendingActivations()
+				
+				break
+			}
 	}
 	
 	runPendingCommands() {
+		if (A_TickCount < (this.iLastCommand + 1000))
+			return
+		
 		protectionOn()
 		
 		try {
@@ -680,8 +686,11 @@ class VoiceServer extends ConfigurationItem {
 			else {
 				command := this.iPendingCommands.RemoveAt(1)
 			
-				if command
+				if command {
+					command := command[2]
+					
 					%command%()
+				}
 			}
 		}
 		finally {
@@ -689,9 +698,7 @@ class VoiceServer extends ConfigurationItem {
 		}
 	}
 		
-	activationCommandRecognized(grammar, words) {
-		this.iHasPendingActivation := false
-		
+	activationCommandRecognized(voiceClient, grammar, words) {
 		if isDebug()
 			showMessage("Activation command recognized: " . values2String(" ", words*))
 		

@@ -294,7 +294,7 @@ class RaceAssistant extends ConfigurationItem {
 				
 				if continuation
 					this.getSpeaker().speakPhrase("Okay")
-			case "Call", "Harsh":
+			case "Call":
 				this.nameRecognized(words)
 			case "Catch":
 				this.getSpeaker().speakPhrase("Repeat")

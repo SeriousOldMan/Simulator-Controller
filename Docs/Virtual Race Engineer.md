@@ -140,8 +140,7 @@ Here is a small excerpt from the input setion of the English grammar file:
 	CanWe=Can you, Can we, Please
 	[Listener Grammars]
 	// Conversation //
-	Call={Hi, Hey} %name%
-	Harsh={%name% do you hear me, %name% I need you, Hey %name% where are you}
+	Call=[{Hi, Hey} %name%, {%name% do you hear me, %name% I need you, Hey %name% where are you}]
 	Yes={Yes please, Yes go on, Perfect go on, Go on please, Head on please, Okay let's go on}
 	No=No {thank you, not now, I will call you later}
 	// Information //

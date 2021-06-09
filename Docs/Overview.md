@@ -23,7 +23,7 @@ Welcome to the Simulator Controller documentation. Here you will find everything
     You don't want to miss out Jona, the world first full voice dialog capable Virtual Race Engineer based on artificial intelligence algorithms. 
 	
   - [Virtual Race Strategist](*) 
-    The other assistant, Toni, takes care of all strategic aspects during races with one or more pit stops, even under changeable weather conditions.
+    The other assistant, Cato, takes care of all strategic aspects during races with one or more pit stops, even under changeable weather conditions.
 	
   - [Development Guide](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts)  
     Complete set of information for developers, who want to create their own plugins or even contribute to the further development of Simulator Controller.

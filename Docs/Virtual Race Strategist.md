@@ -1,1 +1,3 @@
-To be continued...
+The documentation for Cato, the Virtual Race Strategist, will be completed step by step with the next releases, just as Cato's capabilities are developing. At the moment, Cato can only answer questions about the weather forecast and the remaining race laps, so the use is still very limited.
+
+Note: Cato is based entirely on the technology of Jona, the Virtual Race Engineer. Therefore, all concepts from the [associated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer), especially for installation and configuration, also apply here.

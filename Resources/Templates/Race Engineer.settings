@@ -1,32 +1,31 @@
-[Session Settings]
-Damage.Bodywork.Repair=Always
-Damage.Bodywork.Repair.Threshold=false
+[Race Settings]
+Damage.Bodywork.Repair=Threshold
+Damage.Bodywork.Repair.Threshold=20.0
 Damage.Suspension.Repair=Always
 Damage.Suspension.Repair.Threshold=false
-Duration=3600
+Duration=60
 Fuel.AvgConsumption=2.7
 Fuel.SafetyMargin=3
-Lap.AvgTime=106
 Lap.Formation=true
+Lap.AvgTime=106
+Lap.History.Considered=5
+Lap.History.Damping=0.20
 Lap.PitstopWarning=3
 Lap.PostRace=true
-Pitstop.Delta=60
+Pitstop.Duration=50
 Tyre.Compound.Change=Never
 Tyre.Compound.Change.Threshold=false
 Tyre.Dry.Pressure.Target.FL=27.7
 Tyre.Dry.Pressure.Target.FR=27.7
 Tyre.Dry.Pressure.Target.RL=27.7
 Tyre.Dry.Pressure.Target.RR=27.7
-Tyre.Pressure.Correction.Setup=true
-Tyre.Pressure.Correction.Temperature=true
 Tyre.Pressure.Deviation=0.2
 Tyre.Wet.Pressure.Target.FL=30.0
 Tyre.Wet.Pressure.Target.FR=30.0
 Tyre.Wet.Pressure.Target.RL=30.0
 Tyre.Wet.Pressure.Target.RR=30.0
-[Session Setup]
+[Race Setup]
 Tyre.Compound=Dry
-Tyre.Compound.Color=Black
 Tyre.Dry.Pressure.FL=26.1
 Tyre.Dry.Pressure.FR=26.1
 Tyre.Dry.Pressure.RL=26.1

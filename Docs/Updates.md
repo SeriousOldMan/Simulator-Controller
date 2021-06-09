@@ -49,13 +49,11 @@ Release 3.1 introduces a new assistant, Cato, the Virtual Race Strategist. The n
 
   - The voice handling framework now supports multiple different active communication partners. Each one must have an activation command to *focus* the voice recognition for this communication partner (see the [new documentation for voice control](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#voice-commands) for more information).
   - A new plugin has been created for the control of the new Virtual Race Strategist. Please take a look at the documentation of the ["Race Strategist" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#voice-commands) for more information. This plugin will be added automatically to your configuration, but it will be deactivated by default.
-  - [Mostly for Developers]: A lot of files were moved to new locations in the course of the integration of Cato. This will be handled by the automated update procedure. Affected are Plugin Labels, Translations, Grammars and Rules. If you have created your own translations for example, you will find those files from now on in the *Simulator Controller\Translations* folder, which is located in your user *Documents* folder. Furthermore, the Rules files had been split apart to allow for a more modular approach.
-  
-  | Files | Old Location | New Location |
+  - [Mostly for Developers]: A lot of files were moved to new locations in the course of the integration of Cato. This will be handled by the automated update procedure. Affected are Plugin Labels, Translations, Grammars and Rules. If you have created your own translations for example, you will find those files from now on in the *Simulator Controller\Translations* folder, which is located in your user *Documents* folder. Furthermore, the Rules files had been split apart to allow for a more modular approach. | Files | Old Location | New Location |
   | ----- | ------------ | ------------ |
   | Translations | Config | Resources\Translations |
   | Controller Plugin Labels | Config | Resources\Translations |
-  | Graammars | Config | Resources\Grammars |
+  | Grammars | Config | Resources\Grammars |
   | Rules | Config | Resources\Rules |
 
 ***

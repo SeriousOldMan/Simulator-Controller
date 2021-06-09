@@ -223,7 +223,7 @@ The third group allows you to customize some parts of the statistical algorithms
 
 ### Tab *Race Strategist*
 
-Similar to the tab for the *Race Engineer*, the dynamic behaviour of the [Virtual Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist) can be customized. All options can be chosen independently for each configured simulation game.
+Similar as with the tab for the *Race Engineer*, the dynamic behaviour of the [Virtual Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist) can be customized here. All options can be chosen independently for each configured simulation game.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%209.JPG)
 

@@ -106,8 +106,9 @@ startRaceStrategist() {
 	strategistLogo := false
 	strategistLanguage := false
 	strategistSpeaker := false
-	strategistListener:= false
+	strategistListener := false
 	strategistSettingsFile := getFileName("Race Strategist.settings", kUserConfigDirectory)
+	debug := false
 	
 	Process Exist, Voice Server.exe
 	
@@ -141,6 +142,9 @@ startRaceStrategist() {
 			case "-Voice":
 				voiceServer := A_Args[index + 1]
 				index += 2
+			case "-Debug":
+				debug := A_Args[index + 1]
+				index += 2
 			default:
 				index += 1
 		}
@@ -160,6 +164,9 @@ startRaceStrategist() {
 												, strategistName, strategistLanguage, strategistSpeaker, strategistListener, voiceServer)
 	
 	registerEventHandler("Strategist", "handleStrategistRemoteCalls")
+	
+	if (debug && strategistSpeaker)
+		RaceStrategist.Instance.getSpeaker()
 	
 	if (strategistLogo && !kSilentMode)
 		showLogo(strategistName)

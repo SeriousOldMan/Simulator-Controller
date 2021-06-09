@@ -164,8 +164,9 @@ startRaceEngineer() {
 	engineerLogo := false
 	engineerLanguage := false
 	engineerSpeaker := false
-	engineerListener:= false
+	engineerListener := false
 	engineerSettingsFile := getFileName("Race Engineer.settings", kUserConfigDirectory)
+	debug := false
 	
 	Process Exist, Voice Server.exe
 	
@@ -199,6 +200,9 @@ startRaceEngineer() {
 			case "-Voice":
 				voiceServer := A_Args[index + 1]
 				index += 2
+			case "-Debug":
+				debug := A_Args[index + 1]
+				index += 2
 			default:
 				index += 1
 		}
@@ -219,6 +223,9 @@ startRaceEngineer() {
 											, engineerName, engineerLanguage, engineerSpeaker, engineerListener, voiceServer)
 	
 	registerEventHandler("Engineer", "handleEngineerRemoteCalls")
+	
+	if (debug && engineerSpeaker)
+		RaceEngineer.Instance.getSpeaker()
 	
 	if (engineerLogo && !SilentMode)
 		showLogo(engineerName)

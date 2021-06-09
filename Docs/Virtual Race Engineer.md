@@ -170,6 +170,9 @@ For the reactions of Jona, the format is much more simple. It looks like this:
 	Confirm.1=Roger, I come back to you as soon as possible.
 	Confirm.2=Okay, give me a second.
 	Comfirm.3=Wait a minute.
+	
+	
+	
 	Okay.1=Okay. Call me when you are ready.
 	Okay.2=Understood. I am here.
 
@@ -460,7 +463,6 @@ A considerable part of the knowledge of Jona comes from the telemetry informatio
 	Laps=3
 	LapLastTime=116697
 	LapBestTime=116697
-	SessionLapsRemaining=9
 	StintTimeRemaining=1.41874e+06
 	DriverTimeRemaining=1.41874e+06
 	InPit=false
@@ -490,7 +492,7 @@ A considerable part of the knowledge of Jona comes from the telemetry informatio
 	FuelAmount=125
 	SessionFormat=Time
 	SessionTimeRemaining=1.41874e+06
-	SessionLapsRemaining=13
+	SessionLapsRemaining=9
 
 The shared memory of the simulation games typically provide a lot more information, but this is all that is needed for Jona at the moment. Future versions of Jona will incorporate more data, as Jona gets smarter. For example, version 1.7 of *Assetto Corsa Competizione* introduced updated information for weather information and the current settings of the Pitstop MFD, which had been incorporated into the above telemetry file.
 

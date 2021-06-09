@@ -596,6 +596,24 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 
 			printf("SessionTimeRemaining=%ld\n", timeRemaining);
 
+			long lapsRemaining = -1;
+			
+			timeRemaining = -1;
+
+			if (getDataValue(result, header, data, "SessionLapsRemain"))
+				lapsRemaining = atoi(result);
+
+			if ((lapsRemaining == -1) || (lapsRemaining == 32767)) {
+				long estTime = lastTime;
+
+				if ((estTime == 0) && getYamlValue(result, sessionInfo, "DriverInfo:DriverCarEstLapTime:"))
+					estTime = (long)(atof(result) * 1000);
+
+				lapsRemaining = getRemainingLaps(sessionInfo, sessionLaps, sessionTime, laps, estTime);
+			}
+
+			printf("SessionLapsRemaining=%ld\n", lapsRemaining);
+
 			printf("[Car Data]\n");
 
 			printf("BodyworkDamage=0,0,0,0,0\n");
@@ -645,24 +663,6 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 
 			printf("LapLastTime=%ld\n", lastTime);
 			printf("LapBestTime=%ld\n", bestTime);
-
-			long lapsRemaining = -1;
-			
-			timeRemaining = -1;
-
-			if (getDataValue(result, header, data, "SessionLapsRemain"))
-				lapsRemaining = atoi(result);
-
-			if ((lapsRemaining == -1) || (lapsRemaining == 32767)) {
-				long estTime = lastTime;
-
-				if ((estTime == 0) && getYamlValue(result, sessionInfo, "DriverInfo:DriverCarEstLapTime:"))
-					estTime = (long)(atof(result) * 1000);
-
-				lapsRemaining = getRemainingLaps(sessionInfo, sessionLaps, sessionTime, laps, estTime);
-			}
-
-			printf("SessionLapsRemaining=%ld\n", lapsRemaining);
 
 			if (getDataValue(result, header, data, "SessionTimeRemain")) {
 				float time = atof(result);

@@ -215,7 +215,6 @@ int main(int argc, char* argv[])
 			timeLeft = 3600.0 * 1000;
 		}
 
-		printData("SessionLapsRemaining", timeLeft / gf->iLastTime);
 		printData("StintTimeRemaining", gf->DriverStintTimeLeft < 0 ? timeLeft : gf->DriverStintTimeLeft);
 		printData("DriverTimeRemaining", gf->DriverStintTotalTimeLeft < 0 ? timeLeft : gf->DriverStintTotalTimeLeft);
 		printData("InPit", gf->isInPit ? "true" : "false");
@@ -276,6 +275,7 @@ int main(int argc, char* argv[])
 		}
 		
 		printData("SessionTimeRemaining", timeLeft);
+		printData("SessionLapsRemaining", timeLeft / gf->iLastTime);
 
 	}
 

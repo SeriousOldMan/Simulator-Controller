@@ -162,6 +162,8 @@ int main()
         long timeRemaining = (getRemainingTime() * 1000);
 
         wprintf_s(L"SessionTimeRemaining=%ld\n", timeRemaining);
+
+        wprintf_s(L"SessionLapsRemaining=%ld\n", getRemainingLaps());
     }
 
     wprintf_s(L"[Car Data]\n");
@@ -226,8 +228,6 @@ int main()
             wprintf_s(L"LapBestTime=%ld\n", (long)(normalize(map_buffer->lap_time_previous_self) * 1000));
 
         wprintf_s(L"Laps=%ld\n", (long)normalize(map_buffer->completed_laps));
-
-        wprintf_s(L"SessionLapsRemaining=%ld\n", getRemainingLaps());
 
         long timeRemaining = (getRemainingTime() * 1000);
 

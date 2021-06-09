@@ -96,6 +96,8 @@ namespace RF2SHMReader {
 				long time = GetRemainingTime(ref playerScoring);
 
 				Console.Write("SessionTimeRemaining="); Console.WriteLine(time);
+
+				Console.Write("SessionLapsRemaining="); Console.WriteLine(GetRemainingLaps(ref playerScoring));
 			}
 
 			Console.WriteLine("[Stint Data]");
@@ -119,8 +121,6 @@ namespace RF2SHMReader {
 				Console.Write("LapBestTime="); Console.WriteLine(Math.Round(Normalize(playerScoring.mBestLapTime) * 1000));
 
 				Console.Write("Laps="); Console.WriteLine(playerScoring.mTotalLaps);
-
-				Console.Write("SessionLapsRemaining="); Console.WriteLine(GetRemainingLaps(ref playerScoring));
 
 				long time = GetRemainingTime(ref playerScoring);
 

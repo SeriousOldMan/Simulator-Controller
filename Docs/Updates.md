@@ -51,12 +51,12 @@ Release 3.1 introduces a new assistant, Cato, the Virtual Race Strategist. The n
   - A new plugin has been created for the control of the new Virtual Race Strategist. Please take a look at the documentation of the ["Race Strategist" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#voice-commands) for more information. This plugin will be added automatically to your configuration, but it will be deactivated by default.
   - [Mostly for Developers]: A lot of files were moved to new locations in the course of the integration of Cato. This will be handled by the automated update procedure. Affected are Plugin Labels, Translations, Grammars and Rules. If you have created your own translations for example, you will find those files from now on in the *Simulator Controller\Translations* folder, which is located in your user *Documents* folder. Furthermore, the Rules files had been split apart to allow for a more modular approach.
   
-  | Files | Old Location | New Location |
-  | ----- | ------------ | ------------ |
-  | Translations | Config | Resources\Translations |
-  | Controller Plugin Labels | Config | Resources\Translations |
-  | Grammars | Config | Resources\Grammars |
-  | Rules | Config | Resources\Rules |
+  | Files | Old Location | New Standard Location | New User Location |
+  | ----- | ------------ | --------------------- | ----------------- |
+  | Translations | [SC]\Config | [SC]\Resources\Translations | Simulator Controller\Translations |
+  | Controller Plugin Labels | Config | [SC]\Resources\Translations | Simulator Controller\Translations |
+  | Grammars | Config | [SC]\Resources\Grammars | Simulator Controller\Grammars |
+  | Rules | Config | [SC]\Resources\Rules | Simulator Controller\Rules |
 
 ***
 

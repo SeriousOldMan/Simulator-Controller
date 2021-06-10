@@ -1251,7 +1251,7 @@ logMessage(logLevel, message) {
 availableLanguages() {
 	translations := {en: "English"}
 	
-	for ignore, fileName in getFileNames("Translations.*", kTranslationsDirectory, kUserTranslationsDirectory) {
+	for ignore, fileName in getFileNames("Translations.*", kUserTranslationsDirectory, kTranslationsDirectory) {
 		SplitPath fileName, , , languageCode
 		
 		translations[languageCode] := readLanguage(languageCode)

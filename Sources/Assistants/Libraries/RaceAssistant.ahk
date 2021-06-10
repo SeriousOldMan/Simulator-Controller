@@ -310,7 +310,7 @@ class RaceAssistant extends ConfigurationItem {
 	createKnowledgeBase(facts) {
 		local rules
 		
-		FileRead rules, % getFileName(this.AssistantType . ".rules", kRulesDirectory, kUserRulesDirectory)
+		FileRead rules, % getFileName(this.AssistantType . ".rules", kUserRulesDirectory, kRulesDirectory)
 		
 		productions := false
 		reductions := false

@@ -26,7 +26,7 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-[3.1.0-rc1](https://www.dropbox.com/s/8lhg6o8w4l02tx5/Simulator%20Controller%203.1.0-rc1.zip?dl=1) (Release candidate for Release 3.1.0. New features: Support for multiple Voice Assistants, Initial version of Race Strategist Assistant, New Race Strategist Plugin to control the Race Strategist, New Configuration Plugin for Race Strategist, Voice Management now allows for multiple voices even with multiple languages, Refactoring of several file locations (rules, translations, grammars). Quite stable incl. documentation and automated update procedure...)
+[3.1.0-rc1](https://www.dropbox.com/s/8lhg6o8w4l02tx5/Simulator%20Controller%203.1.0-rc1.zip?dl=1) (Release candidate for Release 3.1.0. New features: Support for multiple Voice Assistants, Initial version of Race Strategist Assistant, New Race Strategist Plugin to control the Race Strategist, New Configuration Plugin for Race Strategist, Voice Management now allows for multiple voices even with multiple languages, Refactoring of several file locations (rules, translations, grammars). Fully tested incl. documentation and automated update procedure...)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-310) of this version and all the versions you might have skipped, before installing and using this version.
 

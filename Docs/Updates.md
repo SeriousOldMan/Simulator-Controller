@@ -53,7 +53,7 @@ Release 3.1 introduces a new assistant, Cato, the Virtual Race Strategist. The n
   
   | Files | Old Location | New Standard Location | New User Location |
   | ----- | ------------ | --------------------- | ----------------- |
-  | Translations | [SC]\Config | [SC]\Resources\Translations | Simulator Controller\Translations |
+  | Translations | Config | [SC]\Resources\Translations | Simulator Controller\Translations |
   | Controller Plugin Labels | Config | [SC]\Resources\Translations | Simulator Controller\Translations |
   | Grammars | Config | [SC]\Resources\Grammars | Simulator Controller\Grammars |
   | Rules | Config | [SC]\Resources\Rules | Simulator Controller\Rules |

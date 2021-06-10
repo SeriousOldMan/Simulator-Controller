@@ -11,10 +11,10 @@ Welcome to the Simulator Controller documentation. Here you will find everything
     Beginning with Version 2.0, Simulator Controller supports an update mechanism for your local configurations, which is mostly automated. Please read the information on this page carefully, if you update an already configured installation to a newer version, to be sure, that all the new features will be available in your configuration as well. Here you will also find information for additional manual installation or configuration activities, that might be necessary for new features introduced by a given release.
 	
   - [Installation & Configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration)
-    Maybe the most important part of the documentation, this part decribes how to install and configure Simulator Controller. Especially the second part gives you complete information how to configure all parts to be a perfect fit to your simulation equipment.  
+    Maybe the most important part of the documentation, a complete description on how to install and configure Simulator Controller. The documentation is structured along different topics, which will give you complete control to adapt Simulator Controller to your equipment.
 	
   - [Using Simulator Controller](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller)
-    General information how to start and use the Simulator Controller and how to use the available runtime options.	 
+    General information how to start and use the Simulator Controller and how to use the available runtime options.	You will also find information on how to use voice control and how to interact with the race assistants using.
 	
   - [Plugin & Modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes)
     Reference information for all the builtin plugins and modes.  
@@ -23,7 +23,7 @@ Welcome to the Simulator Controller documentation. Here you will find everything
     You don't want to miss out Jona, the world first full voice dialog capable Virtual Race Engineer based on artificial intelligence algorithms. 
 	
   - [Virtual Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist)
-    The other assistant, Cato, takes care of all strategic aspects during races with one or more pit stops, even under changeable weather conditions.
+    The other assistant, Cato, takes care of all strategic aspects during races with one or more pit stops, even under changing weather conditions.
 	
   - [Development Guide](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts)
     Complete set of information for developers, who want to create their own plugins or even contribute to the further development of Simulator Controller.

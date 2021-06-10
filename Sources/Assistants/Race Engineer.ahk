@@ -227,7 +227,7 @@ startRaceEngineer() {
 	if (debug && engineerSpeaker)
 		RaceEngineer.Instance.getSpeaker()
 	
-	if (engineerLogo && !SilentMode)
+	if (engineerLogo && !kSilentMode)
 		showLogo(engineerName)
 	
 	if (remotePID != 0) {

@@ -1,4 +1,4 @@
-## 3.1.0-release 06/11/21 (planned)
+## 3.1.0-release 06/11/21
 
   1. Bugfixes, as always
   2. Documentation updates, as always

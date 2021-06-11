@@ -1,14 +1,14 @@
 [Development]
-Version=3.1.0-rc2
+Version=3.1.0-release
 Target=3.1.0-release
-Date=06/10/2021
+Date=06/11/2021
 Changes=Support for multiple Voice Assistants, Initial version of Race Strategist Assistant, New Race Strategist Plugin to control the Race Strategist, New Configuration Plugin for Race Strategist, Voice Management now allows for multiple voices even with multiple languages, Refactoring of several file locations (rules, translations, grammars)
 [Release]
-Version=3.0.6-release
-Date=05/28/2021
-Changes=Store reference to Race Engineer Settings in the setup databse, Full configuration of Race Engineer behaviour incl. automatic update of setup database at session end, Overhaul of the Race Engineer Settings tool
+Version=3.1.0-release
+Date=06/11/2021
+Changes=Support for multiple Voice Assistants, Initial version of Race Strategist Assistant, New Race Strategist Plugin to control the Race Strategist, New Configuration Plugin for Race Strategist, Voice Management now allows for multiple voices even with multiple languages, Refactoring of several file locations (rules, translations, grammars)
 [Current]
-Type=Development
+Type=Release
 [Version]
-Release=3.0.6-release
-Development=3.1.0-rc2
+Release=3.1.0-release
+Development=3.1.0-release

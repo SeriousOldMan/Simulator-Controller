@@ -456,7 +456,7 @@ class VoiceServer extends ConfigurationItem {
 		activeVoiceClient := this.ActiveVoiceClient
 		
 		if (activeVoiceClient && (activeVoiceClient.Descriptor = descriptor)) {
-			activeVoiceClient.stoplistening()
+			activeVoiceClient.stopListening()
 		
 			this.iActiveVoiceClient := false
 		

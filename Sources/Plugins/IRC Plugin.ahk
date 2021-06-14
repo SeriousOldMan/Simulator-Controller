@@ -181,6 +181,12 @@ class IRCPlugin extends RaceEngineerSimulatorPlugin {
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork) {
 		this.sendPitstopCommand("Pitstop", "Set", "Repair", (repairBodywork || repairSuspension) ? "true" : "false")
 	}
+	
+	updateStandingsData(data) {
+		standings := readSharedMemory(this.Code, "-Standings")
+		
+		setConfigurationSectionValues(data, "Position Data", getConfigurationSectionValues(standings, "Position Data"))
+	}
 }
 
 

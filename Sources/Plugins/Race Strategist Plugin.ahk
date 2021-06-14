@@ -368,6 +368,10 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 		this.Simulator.updateSimulatorData(data)
 	}
 	
+	updateStandingsData(data) {
+		this.Simulator.updateStandingsData(data)
+	}
+	
 	collectSessionData() {
 		static lastLap := 0
 		static inPit := false
@@ -434,6 +438,8 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 							firstLap := (lastLap == 0)
 						
 							lastLap := dataLastLap
+							
+							this.updateStandingsData(data)
 						
 							newDataFile := kTempDirectory . code . " Data\" . kRaceStrategistPlugin . " Lap " . lastLap . ".data"
 								

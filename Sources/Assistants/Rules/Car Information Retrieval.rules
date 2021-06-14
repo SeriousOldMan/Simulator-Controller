@@ -11,7 +11,7 @@ carLaps(?car, INCOMPLETE, ?laps) <= Get(Car, ?car, Lap, ?completedLaps), carLapT
 									
 carPosition(?car, ?position) <= Get(Car, ?car, Position, ?position)
 
-carLapTime(?car, ?lapTime) <= Get(Car, ?car, Time, ?lapTime)
+carLapTime(?car, ?time) <= Get(Car, ?car, Time, ?time)
 
 carTimeIntoLap(?car, ?time) <= Get(Car, ?car, Time.Running, ?time)
 

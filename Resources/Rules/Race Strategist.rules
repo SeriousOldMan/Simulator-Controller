@@ -104,12 +104,12 @@ projectedTyreTemperature(?lap, ?temperature) <=																									\
 ;;; Updates the gaps and lap time deltas for various cars each lap.         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-priotity 5, {Any: [?Lap], [?Sector]} => (Clear: Position.Ahead.Car), (Clear: Position.Ahead.Distance), (Clear: Position.Ahead.Delta),			\
+priotity 5, {Any: [?Lap], [?Sector]} => (Clear: Position.Front.Car), (Clear: Position.Front.Distance), (Clear: Position.Front.Delta),			\
 										(Clear: Position.Behind.Car), (Clear: Position.Behind.Distance), (Clear: Position.Behind.Delta),		\
 										(Clear: Position.Lead.Car), (Clear: Position.Lead.Distance), (Clear: Position.Lead.Delta)
 {Any: [?Lap], [?Sector]} => (Prove: updateStandings, ?Lap)
 
-updateStandings(?lap) <= updatePosition(?lap, !Cars.Count)
+updateStandings(?lap) <= updatePosition(?lap, !Car.Count)
 
 updatePosition(?, 0) <= !
 updatePosition(?lap, !Driver.Car) <= !, carPosition(!Driver.Car, ?position), Set(Position, ?position),											\
@@ -121,16 +121,16 @@ updatePosition(?lap, ?car) <= carPosition(?car, ?position), Set(Standings.Lap, ?
 							  ?distance = ?driverLaps - ?carLaps, ?timeDelta = ?lapTime * ?distance,											\
 							  Set(Standings.Lap, ?lap, Car, ?car, Delta, ?timeDelta),															\
 							  Set(Standings.Lap, ?lap, Car, ?car, Laps, ?carLaps),																\
-							  updateAheadDelta(?lap, ?car, ?distance, ?timeDelta), updateBehindDelta(?lap, ?car, ?distance, ?timeDelta),		\
+							  updateFrontDelta(?lap, ?car, ?distance, ?timeDelta), updateBehindDelta(?lap, ?car, ?distance, ?timeDelta),		\
 							  updateLeadDelta(?lap, ?car, ?distance, ?timeDelta), ?nextCar = ?car - 1, updatePosition(?lap, ?nextCar)
 
-updateAheadDelta(?, !Driver.Car, ?, ?) <= !
-updateAheadDelta(?, ?car, ?distance, ?delta) <= ?delta < 0, Get(Position.Ahead.Delta, ?curDelta), ?curDelta < 0, ?delta > ?curDelta,			\
-												Set(Position.Ahead.Car, ?car), Set(Position.Ahead.Distance, ?distance),							\
-												Set(Position.Ahead.Delta, ?delta)
+updateFrontDelta(?, !Driver.Car, ?, ?) <= !
+updateFrontDelta(?, ?car, ?distance, ?delta) <= ?delta < 0, Get(Position.Front.Delta, ?curDelta), ?curDelta < 0, ?delta > ?curDelta,			\
+												Set(Position.Front.Car, ?car), Set(Position.Front.Distance, ?distance),							\
+												Set(Position.Front.Delta, ?delta)
 
 updateBehindDelta(?, !Driver.Car, ?, ?) <= !
-updateBehindDelta(?, ?car, ?distance, ?delta) <= ?delta > 0, Get(Position.Ahead.Delta, ?curDelta), ?curDelta > 0, ?delta < ?curDelta,			\
+updateBehindDelta(?, ?car, ?distance, ?delta) <= ?delta > 0, Get(Position.Front.Delta, ?curDelta), ?curDelta > 0, ?delta < ?curDelta,			\
 												 Set(Position.Behind.Car, ?car), Set(Position.Behind.Distance, ?distance),						\
 												 Set(Position.Behind.Delta, ?delta)
 

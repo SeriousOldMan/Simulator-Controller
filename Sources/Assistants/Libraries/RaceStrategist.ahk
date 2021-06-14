@@ -97,8 +97,8 @@ class RaceStrategist extends RaceAssistant {
 				this.weatherRecognized(words)
 			case "Position":
 				this.positionRecognized(words)
-			case "GapToAhead":
-				this.gapToAheadRecognized(words)
+			case "GapToFront":
+				this.gapToFrontRecognized(words)
 			case "GapToBehind":
 				this.gapToBehindRecognized(words)
 			case "GapToLead":
@@ -149,18 +149,18 @@ class RaceStrategist extends RaceAssistant {
 			this.getSpeaker().speakPhrase("Great")
 	}
 	
-	gapToAheadRecognized(words) {
+	gapToFrontRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
 		
 		if !this.hasEnoughData()
 			return
 		
 		if (Round(knowledgeBase.getValue("Position", 0)) = 1)
-			this.getSpeaker().speakPhrase("NoGapToAhead")
+			this.getSpeaker().speakPhrase("NoGapToFront")
 		else {
-			delta := Abs(Round(knowledgeBase.getValue("Position.Ahead.Delta", 0) / 1000, 1))
+			delta := Abs(Round(knowledgeBase.getValue("Position.Front.Delta", 0) / 1000, 1))
 			
-			this.getSpeaker().speakPhrase("GapToAhead", {delta: delta})
+			this.getSpeaker().speakPhrase("GapToFront", {delta: delta})
 		}
 	}
 	
@@ -186,7 +186,7 @@ class RaceStrategist extends RaceAssistant {
 			return
 		
 		if (Round(knowledgeBase.getValue("Position", 0)) = 1)
-			this.getSpeaker().speakPhrase("NoGapToAhead")
+			this.getSpeaker().speakPhrase("NoGapToFront")
 		else {
 			delta := Abs(Round(knowledgeBase.getValue("Position.Lead.Delta", 0) / 1000, 1))
 		
@@ -328,6 +328,9 @@ class RaceStrategist extends RaceAssistant {
 			
 		if !this.InitialFuelAmount
 			baseLap := lapNumber
+		
+		for key, value in getConfigurationSectionValues(data, "Position Data", Object())
+			knowledgeBase.setFact(key, value)
 		
 		this.updateDynamicValues({EnoughData: (lapNumber > (baseLap + (this.LearningLaps - 1)))})
 		

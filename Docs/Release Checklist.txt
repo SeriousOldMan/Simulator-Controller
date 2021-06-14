@@ -24,6 +24,9 @@ Release 3.1.2 Checklist
    b. Update Notes
 3. Renamed Toni => Cato in Simulator Configuration.ini
    a. Update Procedure
+4. Update Procedure
+   a. Phrase Grammars
+   b. Rename Toni => Cato in Config
 
 Release 3.1.0 Checklist
 =======================

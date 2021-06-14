@@ -512,11 +512,9 @@ void writeStandings(const irsdk_header *header, const char* data)
 
 		char result[100];
 
-		printf("[Driver Data]\n");
-		
-		printf("Car=%s\n", playerCarIdx);
-		
 		printf("[Position Data]\n");
+		
+		printf("Driver.Car=%s\n", playerCarIdx);
 		
 		for (int i = 1; ; i++) {
 			char posIdx[10];
@@ -553,8 +551,11 @@ void writeStandings(const irsdk_header *header, const char* data)
 				printf("Car.%s.Driver.Surname=%s\n", carIdx, surName);
 				printf("Car.%s.Driver.Nickname=%s\n", carIdx, nickName);
 			}
-			else
+			else {
+				printf("Car.Count=%s\n", posIdx);
+				
 				break;
+			}
 		}
 	}
 }
@@ -858,7 +859,7 @@ int main(int argc, char* argv[])
 					else if (strcmp(argv[2], "Change") == 0)
 						pitstopChangeValues(pHeader, g_data, argv[3]);
 				}
-				else if ((argc > 2) && (strcmp(argv[1], "-Standings") == 0)) {
+				else if ((argc > 0) && (strcmp(argv[1], "-Standings") == 0)) {
 					writeStandings(pHeader, g_data);
 				}
 				else

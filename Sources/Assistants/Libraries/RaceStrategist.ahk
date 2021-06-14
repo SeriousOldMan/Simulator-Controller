@@ -95,6 +95,14 @@ class RaceStrategist extends RaceAssistant {
 				this.lapInfoRecognized(words)
 			case "Weather":
 				this.weatherRecognized(words)
+			case "Position":
+				this.positionRecognized(words)
+			case "GapToAhead":
+				this.gapToAheadRecognized(words)
+			case "GapToBehind":
+				this.gapToBehindRecognized(words)
+			case "GapToLead":
+				this.gapToLeadRecognized(words)
 			default:
 				base.handleVoiceCommand(grammar, words)
 		}
@@ -125,6 +133,65 @@ class RaceStrategist extends RaceAssistant {
 			this.getSpeaker().speakPhrase("WeatherGood")
 		else
 			this.getSpeaker().speakPhrase("WeatherRain")
+	}
+	
+	positionRecognized(words) {
+		local knowledgeBase := this.KnowledgeBase
+		
+		if !this.hasEnoughData()
+			return
+		
+		position := Round(knowledgeBase.getValue("Position", 0))
+		
+		this.getSpeaker().speakPhrase("Position", {position: position})
+		
+		if (position <= 3)
+			this.getSpeaker().speakPhrase("Great")
+	}
+	
+	gapToAheadRecognized(words) {
+		local knowledgeBase := this.KnowledgeBase
+		
+		if !this.hasEnoughData()
+			return
+		
+		if (Round(knowledgeBase.getValue("Position", 0)) = 1)
+			this.getSpeaker().speakPhrase("NoGapToAhead")
+		else {
+			delta := Abs(Round(knowledgeBase.getValue("Position.Ahead.Delta", 0) / 1000, 1))
+			
+			this.getSpeaker().speakPhrase("GapToAhead", {delta: delta})
+		}
+	}
+	
+	gapToBehindRecognized(words) {
+		local knowledgeBase := this.KnowledgeBase
+		
+		if !this.hasEnoughData()
+			return
+		
+		if (Round(knowledgeBase.getValue("Position", 0)) = Round(knowledgeBase.getValue("Cars.Count", 0)))
+			this.getSpeaker().speakPhrase("NoGapToBehind")
+		else {
+			delta := Abs(Round(knowledgeBase.getValue("Position.Behind.Delta", 0) / 1000, 1))
+		
+			this.getSpeaker().speakPhrase("GapToBehind", {delta: delta})
+		}
+	}
+	
+	gapToLeadRecognized(words) {
+		local knowledgeBase := this.KnowledgeBase
+		
+		if !this.hasEnoughData()
+			return
+		
+		if (Round(knowledgeBase.getValue("Position", 0)) = 1)
+			this.getSpeaker().speakPhrase("NoGapToAhead")
+		else {
+			delta := Abs(Round(knowledgeBase.getValue("Position.Lead.Delta", 0) / 1000, 1))
+		
+			this.getSpeaker().speakPhrase("GapToLead", {delta: delta})
+		}
 	}
 	
 	createSession(data) {

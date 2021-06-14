@@ -482,9 +482,86 @@ void dumpDataToDisplay(const irsdk_header* header, const char* data)
 	}
 }
 
+void readDriverInfo(const char* sessionInfo, char* carIdx, char* forName, char* surName, char* nickName) {
+	char result[100];
+
+	if (getYamlValue(result, sessionInfo, "DriverInfo:Drivers:CarIdx:{%s}UserName:", carIdx)) {
+		size_t length = strcspn(result, " ");
+
+		substring((char*)result, forName, 0, length);
+		substring((char*)result, surName, length + 1, strlen(result) - length - 1);
+		nickName[0] = forName[0], nickName[1] = surName[0], nickName[2] = '\0';
+	} else {
+		strcpy(forName, "John");
+		strcpy(surName, "Doe");
+		strcpy(nickName, "JD");
+	}
+}
+
+void writeStandings(const irsdk_header *header, const char* data)
+{
+	if (header && data)
+	{
+		const char* sessionInfo = irsdk_getSessionInfoStr();
+		char playerCarIdx[10] = "";
+		char sessionID[10] = "";
+
+		getYamlValue(playerCarIdx, sessionInfo, "DriverInfo:DriverCarIdx:");
+
+		itoa(getCurrentSessionID(sessionInfo), sessionID, 10);
+
+		char result[100];
+
+		printf("[Driver Data]\n");
+		
+		printf("Car=%s\n", playerCarIdx);
+		
+		printf("[Position Data]\n");
+		
+		for (int i = 1; ; i++) {
+			char posIdx[10];
+			char carIdx[10];
+			
+			itoa(i, posIdx, 10);
+			
+			if (getYamlValue(carIdx, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:Position:{%s}Position:", sessionID, posIdx)) {
+				printf("Car.%s.Position=%s\n", carIdx, posIdx);
+
+				getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:CarIdx:{%s}LapsComplete:", sessionID, carIdx);
+
+				printf("Car.%s.Lap=%s\n", carIdx, result);
+
+				getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:CarIdx:{%s}LastTime:", sessionID, carIdx);
+				
+				printf("Car.%s.Time=%ld\n", carIdx, (long)(normalize(atof(result)) * 1000));
+
+				getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:CarIdx:{%s}Time:", sessionID, carIdx);
+
+				printf("Car.%s.Time.Running=%ld\n", carIdx, (long)(normalize(atof(result)) * 1000));
+
+				getYamlValue(result, sessionInfo, "DriverInfo:Drivers:CarIdx:{%s}CarScreenName:", carIdx);
+				
+				printf("Car.%s.Car=%s\n", carIdx, result);
+
+				char forName[100];
+				char surName[100];
+				char nickName[3];
+
+				readDriverInfo(sessionInfo, carIdx, forName, surName, nickName);
+
+				printf("Car.%s.Driver.Forname=%s\n", carIdx, forName);
+				printf("Car.%s.Driver.Surname=%s\n", carIdx, surName);
+				printf("Car.%s.Driver.Nickname=%s\n", carIdx, nickName);
+			}
+			else
+				break;
+		}
+	}
+}
+
 void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 {
-	if(header && data)
+	if (header && data)
 	{
 		const char* sessionInfo = irsdk_getSessionInfoStr();
 		char playerCarIdx[10] = "";
@@ -637,27 +714,16 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 				getTyreTemperature(header, sessionInfo, data, "CarSetup:Suspension:RightRear:LastTempsOMI:", "RRtempCL", "RRtempCM", "RRtempCR"));
 
 			printf("[Stint Data]\n");
+			
+			char forName[100];
+			char surName[100];
+			char nickName[3];
+				
+			readDriverInfo(sessionInfo, playerCarIdx, forName, surName, nickName);
 
-			if (getYamlValue(result, sessionInfo, "DriverInfo:Drivers:CarIdx:{%s}UserName:", playerCarIdx)) {
-				char forName[100];
-				char surName[100];
-				char nickName[3];
-
-				size_t length = strcspn(result, " ");
-
-				substring((char*)result, forName, 0, length);
-				substring((char*)result, surName, length + 1, strlen(result) - length - 1);
-				nickName[0] = forName[0], nickName[1] = surName[0], nickName[2] = '\0';
-
-				printf("DriverForname=%s\n", forName);
-				printf("DriverSurname=%s\n", surName);
-				printf("DriverNickname=%s\n", nickName);
-			}
-			else {
-				printf("DriverForname=John\n");
-				printf("DriverSurname=Doe\n");
-				printf("DriverNickname=JD\n");
-			}
+			printf("DriverForname=%s\n", forName);
+			printf("DriverSurname=%s\n", surName);
+			printf("DriverNickname=%s\n", nickName);
 
 			printf("Laps=%s\n", itoa(laps, result, 10));
 
@@ -791,6 +857,9 @@ int main(int argc, char* argv[])
 						pitstopSetValues(pHeader, g_data, argv[3]);
 					else if (strcmp(argv[2], "Change") == 0)
 						pitstopChangeValues(pHeader, g_data, argv[3]);
+				}
+				else if ((argc > 2) && (strcmp(argv[1], "-Standings") == 0)) {
+					writeStandings(pHeader, g_data);
 				}
 				else
 					writeData(pHeader, g_data, ((argc == 2) && (strcmp(argv[1], "-Setup") == 0)));

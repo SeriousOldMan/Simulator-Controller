@@ -99,6 +99,47 @@ projectedTyreTemperature(?lap, ?temperature) <=																									\
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                      Position & Lap Delta Calculation                   ;;;
+;;;                                                                         ;;;
+;;; Updates the gaps and lap time deltas for various cars each lap.         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+priotity 5, {Any: [?Lap], [?Sector]} => (Clear: Position.Ahead.Car), (Clear: Position.Ahead.Distance), (Clear: Position.Ahead.Delta),			\
+										(Clear: Position.Behind.Car), (Clear: Position.Behind.Distance), (Clear: Position.Behind.Delta),		\
+										(Clear: Position.Lead.Car), (Clear: Position.Lead.Distance), (Clear: Position.Lead.Delta)
+{Any: [?Lap], [?Sector]} => (Prove: updateStandings, ?Lap)
+
+updateStandings(?lap) <= updatePosition(?lap, !Cars.Count)
+
+updatePosition(?, 0) <= !
+updatePosition(?lap, !Driver.Car) <= !, carPosition(!Driver.Car, ?position), Set(Position, ?position),											\
+									 Set(Standings.Lap, ?lap, Position, ?position), Set(Standings.Lap, ?lap, Car, !Driver.Car, Delta, 0),		\
+									 Set(Standings.Lap, ?lap, Car, !Driver.Car, Laps, ?lap),													\
+									 ?nextCar = !Driver.Car - 1, updatePosition(?lap, ?nextCar)
+updatePosition(?lap, ?car) <= carPosition(?car, ?position), Set(Standings.Lap, ?lap, Position, ?position),										\
+							  carLaps(?car, INCOMPLETE, ?carLaps), carLaps(!Driver.Car, INCOMPLETE, ?driverLaps), lapTime(?lap, ?lapTime),		\
+							  ?distance = ?driverLaps - ?carLaps, ?timeDelta = ?lapTime * ?distance,											\
+							  Set(Standings.Lap, ?lap, Car, ?car, Delta, ?timeDelta),															\
+							  Set(Standings.Lap, ?lap, Car, ?car, Laps, ?carLaps),																\
+							  updateAheadDelta(?lap, ?car, ?distance, ?timeDelta), updateBehindDelta(?lap, ?car, ?distance, ?timeDelta),		\
+							  updateLeadDelta(?lap, ?car, ?distance, ?timeDelta), ?nextCar = ?car - 1, updatePosition(?lap, ?nextCar)
+
+updateAheadDelta(?, !Driver.Car, ?, ?) <= !
+updateAheadDelta(?, ?car, ?distance, ?delta) <= ?delta < 0, Get(Position.Ahead.Delta, ?curDelta), ?curDelta < 0, ?delta > ?curDelta,			\
+												Set(Position.Ahead.Car, ?car), Set(Position.Ahead.Distance, ?distance),							\
+												Set(Position.Ahead.Delta, ?delta)
+
+updateBehindDelta(?, !Driver.Car, ?, ?) <= !
+updateBehindDelta(?, ?car, ?distance, ?delta) <= ?delta > 0, Get(Position.Ahead.Delta, ?curDelta), ?curDelta > 0, ?delta < ?curDelta,			\
+												 Set(Position.Behind.Car, ?car), Set(Position.Behind.Distance, ?distance),						\
+												 Set(Position.Behind.Delta, ?delta)
+
+updateLeadDelta(?, !Position.Car, ?, ?) <= !
+updateLeadDelta(?lap, ?car, ?distance, ?delta) <= carPosition(?car, 1), Set(Position.Lead.Car, ?car),											\
+												  Set(Position.Lead.Distance, ?distance), Set(Position.Lead.Delta, ?delta)
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                             Pitstop Performed                           ;;;
 ;;;                                                                         ;;;
 ;;; After a pitstop has been performed, the pitstop plan is copied to the   ;;;

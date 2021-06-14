@@ -19,10 +19,11 @@ Release 3.1.2 Checklist
 1. Multiple actions for controller functions
    a. Documentation
    b. Update Notes (Refactoring getActions / fireActions)
-   
 2. New argument "raceStrategist" for "Race Strategist" plugin
    a. Documentation
    b. Update Notes
+3. Renamed Toni => Cato in Simulator Configuration.ini
+   a. Update Procedure
 
 Release 3.1.0 Checklist
 =======================

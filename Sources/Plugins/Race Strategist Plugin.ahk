@@ -210,7 +210,7 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 				theAction.Function.setText(this.actionLabel(theAction), this.RaceStrategistName ? (this.RaceStrategistEnabled ? "Green" : "Black") : "Gray")
 				
 				if !this.RaceStrategistName
-					theAction.Function.disable()
+					theAction.Function.disable(kAllTrigger, theAction)
 			}
 	}
 	

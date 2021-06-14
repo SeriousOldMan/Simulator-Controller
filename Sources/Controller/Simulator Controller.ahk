@@ -533,8 +533,8 @@ class SimulatorController extends ConfigurationItem {
 		return (functions.HasKey(descriptor) ? functions[descriptor] : false)
 	}
 	
-	getAction(function, trigger) {
-		return (this.iFunctionActions.HasKey(function) ? this.iFunctionActions[function] : false)
+	getActions(function, trigger) {
+		return (this.iFunctionActions.HasKey(function) ? this.iFunctionActions[function] : [])
 	}
 	
 	getLogo() {
@@ -766,7 +766,10 @@ class SimulatorController extends ConfigurationItem {
 		
 		function.connectAction(action)
 		
-		this.iFunctionActions[function] := action
+		if !this.iFunctionActions.HasKey(function)
+			this.iFunctionActions[function] := Array()
+		
+		this.iFunctionActions[function].Push(action)
 	}
 	
 	disconnectAction(function, action) {
@@ -774,26 +777,33 @@ class SimulatorController extends ConfigurationItem {
 		
 		function.disconnectAction(action)
 		
-		this.iFunctionActions.Delete(function)
+		index := inList(this.iFunctionActions[function], action)
+		
+		while index {
+			this.iFunctionActions[function].RemoveAt(index)
+		
+			index := inList(this.iFunctionActions[function], action)
+		}
 	}
 	
 	updateLastEvent() {
 		this.iLastEvent := A_TickCount
 	}
 	
-	fireAction(function, trigger) {
-		local action := this.getAction(function, trigger)
+	fireActions(function, trigger) {
+		local action
 		
-		if function.Enabled
-			if (action != false) {
-				this.updateLastEvent()
-				
-				logMessage(kLogInfo, translate("Firing action ") . getLabelForLogMessage(action) . translate(" for ") . function.Descriptor)
-				
-				action.fireAction(function, trigger)
-			}
-			else
-				Throw "Cannot find action for " . function.Descriptor . ".trigger " . " in SimulatorController.fireAction..."
+		for ignore, action in this.getActions(function, trigger)
+			if function.Enabled[action]
+				if (action != false) {
+					this.updateLastEvent()
+					
+					logMessage(kLogInfo, translate("Firing action ") . getLabelForLogMessage(action) . translate(" for ") . function.Descriptor)
+					
+					action.fireAction(function, trigger)
+				}
+				else
+					Throw "Cannot find action for " . function.Descriptor . ".trigger " . " in SimulatorController.fireAction..."
 	}	
 
 	setMode(newMode) {
@@ -1009,7 +1019,8 @@ class SimulatorController extends ConfigurationItem {
 class ControllerFunction {
 	iController := false
 	iFunction := false
-	iEnabled := false
+		
+	iEnabledActions := {}
 	
 	Controller[] {
 		Get {
@@ -1041,9 +1052,12 @@ class ControllerFunction {
 		}
 	}
 	
-	Enabled[] {
+	Enabled[action := false] {
 		Get {
-			return this.iEnabled
+			if action
+				return this.iEnabledActions.HasKey(action)
+			else
+				return (this.iEnabledActions.Count() > 0)
 		}
 	}
 	
@@ -1075,8 +1089,8 @@ class ControllerFunction {
 			btnBox.setControlText(this, text, color)
 	}
 	
-	enable(trigger := "__All Trigger__") {
-		this.iEnabled := true
+	enable(trigger := "__All Trigger__", action := false) {
+		this.iEnabledActions[action] := true
 		
 		if (trigger == kAllTrigger)
 			for ignore, trigger in this.Trigger
@@ -1085,20 +1099,21 @@ class ControllerFunction {
 			setHotkeyEnabled(this, trigger, true)
 	}
 	
-	disable(trigger := "__All Trigger__") {
-		this.iEnabled := false
+	disable(trigger := "__All Trigger__", action := false) {
+		this.iEnabledActions.Delete(action)
 		
-		if (trigger == kAllTrigger)
-			for ignore, trigger in this.Trigger
+		if !this.Enabled
+			if (trigger == kAllTrigger)
+				for ignore, trigger in this.Trigger
+					setHotkeyEnabled(this, trigger, false)
+			else
 				setHotkeyEnabled(this, trigger, false)
-		else
-			setHotkeyEnabled(this, trigger, false)
 	}
 	
 	connectAction(action) {
 		local controller := this.Controller
 		
-		this.iEnabled := true
+		this.iEnabledActions[action] := true
 		
 		for ignore, trigger in this.Trigger {
 			handler := this.Actions[trigger]
@@ -1132,16 +1147,17 @@ class ControllerFunction {
 	disconnectAction(action) {
 		local controller := this.Controller
 		
-		this.iEnabled := false
+		this.iEnabledActions.Delete(action)
 		
 		this.setText("")
 		
 		for ignore, trigger in this.Function.Trigger {
-			for ignore, theHotkey in this.Hotkeys[trigger]
+			for ignore, theHotkey in this.Hotkeys[trigger] {
 				if (SubStr(theHotkey, 1, 1) = "?")
 					controller.disableVoiceCommand(SubStr(theHotkey, 2))
 				else
 					Hotkey %theHotkey%, Off
+			}
 		}
 	}
 }
@@ -1326,7 +1342,7 @@ class ControllerPlugin extends Plugin {
 		for ignore, theAction in this.Actions {
 			controller.connectAction(theAction.Function, theAction)
 			
-			theAction.Function.enable(kAllTrigger)
+			theAction.Function.enable(kAllTrigger, theAction)
 			theAction.Function.setText(this.actionLabel(theAction))
 		}
 	}
@@ -1458,7 +1474,7 @@ class ControllerMode {
 		for ignore, theAction in this.Actions {
 			controller.connectAction(theAction.Function, theAction)
 			
-			theAction.Function.enable(kAllTrigger)
+			theAction.Function.enable(kAllTrigger, theAction)
 			theAction.Function.setText(plugin.actionLabel(theAction))
 		}
 		
@@ -1536,14 +1552,14 @@ setHotkeyEnabled(function, trigger, enabled) {
 }
 
 functionActionCallable(function, trigger, action) {
-	return (action ? action : Func("fireControllerAction").Bind(function, trigger))
+	return (action ? action : Func("fireControllerActions").Bind(function, trigger))
 }
 
-fireControllerAction(function, trigger) {
+fireControllerActions(function, trigger) {
 	protectionOn()
 	
 	try {
-		function.Controller.fireAction(function, trigger)
+		function.Controller.fireActions(function, trigger)
 	}
 	finally {
 		protectionOff()
@@ -1713,8 +1729,8 @@ pushButton(buttonNumber) {
 	descriptor := ConfigurationItem.descriptor(kButtonType, buttonNumber)
 	function := SimulatorController.Instance.findFunction(descriptor)
 	
-	if ((function != false) && SimulatorController.Instance.getAction(function, "Push"))
-		fireControllerAction(function, "Push")
+	if ((function != false) && (SimulatorController.Instance.getActions(function, "Push").Length() > 0))
+		fireControllerActions(function, "Push")
 	else
 		logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in custom controller action pushButton - please check the configuration"))
 }
@@ -1735,8 +1751,8 @@ rotateDial(dialNumber, direction) {
 	descriptor := ConfigurationItem.descriptor(kDialType, dialNumber)
 	function := SimulatorController.Instance.findFunction(descriptor)
 	
-	if ((function != false) && SimulatorController.Instance.getAction(function, direction))
-		fireControllerAction(function, direction)
+	if ((function != false) && (SimulatorController.Instance.getActions(function, direction).Length() > 0))
+		fireControllerActions(function, direction)
 	else
 		logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in custom controller action rotateDial - please check the configuration"))
 }
@@ -1748,10 +1764,10 @@ switchToggle(toggleType, toggleNumber, mode := "activate") {
 	function := SimulatorController.Instance.findFunction(descriptor)
 	
 	if (function != false) {
-		if (((mode = "activate") || (mode = "on")) && SimulatorController.Instance.getAction(function, "On"))
-			fireControllerAction(function, "On")
-		else if (((mode = "deactivate") || (mode = "off")) && SimulatorController.Instance.getAction(function, "Off"))
-			fireControllerAction(function, "Off")
+		if (((mode = "activate") || (mode = "on")) && (SimulatorController.Instance.getActions(function, "On").Length() > 0))
+			fireControllerActions(function, "On")
+		else if (((mode = "deactivate") || (mode = "off")) && (SimulatorController.Instance.getActions(function, "Off").Length() > 0))
+			fireControllerActions(function, "Off")
 		else {
 			logMessage(kLogWarn, translate("Unsupported argument (") . mode . translate(") detected in switchToggle - please check the configuration"))
 		

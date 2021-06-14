@@ -4,4 +4,6 @@ Thanks for your interest in Simulator Controller, a set of tools for a better us
 
 A little lecture in history: Simulator Controller started in late 2020 as a tiny collection of keyboard macros to automate some repetitive tasks in Assetto Corsa Competizione. But as usual, the code base grew very fast and several later, I decided to conduct a complete rewrite in a plugin capable, object oriented architecture. The current distribution consists of a set of specialized applications and more than 30.000 lines of code and even incorporates a very sophisticated AI kernel for a voice chat capable virtual Race Assistants since Release 2.1. Every aspect is fully customizable using a graphical, user friendly [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration) and provides a [plugin interface and class library](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts) for developers.
 
+If you want to join the very young and small Discord Community for Simulator Controller, please use [this invitation](https://discord.gg/5N8JrNr48H)...
+
 And now it's time to start with the [Overview](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Overview)...

@@ -61,11 +61,11 @@ class PitstopMode extends ControllerMode {
 		for ignore, theAction in this.Actions
 			if isInstance(theAction, PitstopAction)
 				if ((sessionState != kSessionFinished) && (sessionState != kSessionPaused)) {
-					theAction.Function.enable(kAllTrigger)
+					theAction.Function.enable(kAllTrigger, theAction)
 					theAction.Function.setText(theAction.Label)
 				}
 				else {
-					theAction.Function.disable(kAllTrigger)
+					theAction.Function.disable(kAllTrigger, theAction)
 					theAction.Function.setText(theAction.Label, "Gray")
 				}
 	}
@@ -77,11 +77,11 @@ class PitstopMode extends ControllerMode {
 		for ignore, theAction in this.Actions
 			if isInstance(theAction, RaceEngineerAction)
 				if (sessionState == kSessionRace) {
-					theAction.Function.enable(kAllTrigger)
+					theAction.Function.enable(kAllTrigger, theAction)
 					theAction.Function.setText(theAction.Label)
 				}
 				else {
-					theAction.Function.disable(kAllTrigger)
+					theAction.Function.disable(kAllTrigger, theAction)
 					theAction.Function.setText(theAction.Label, "Gray")
 				}
 	}

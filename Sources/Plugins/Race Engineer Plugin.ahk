@@ -309,25 +309,25 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 			}
 			else if isInstance(theAction, RaceEngineerPlugin.RaceEngineerAction)
 				if ((theAction.Action = "RaceEngineerOpenSettings") || (theAction.Action = "RaceEngineerOpenSetups")) {
-					theAction.Function.enable(kAllTrigger)
+					theAction.Function.enable(kAllTrigger, theAction)
 					theAction.Function.setText(theAction.Label)
 				}
 				else if (theAction.Action = "RaceEngineerImportSettings") {
 					if this.Simulator {
-						theAction.Function.enable(kAllTrigger)
+						theAction.Function.enable(kAllTrigger, theAction)
 						theAction.Function.setText(theAction.Label)
 					}
 					else {
-						theAction.Function.disable(kAllTrigger)
+						theAction.Function.disable(kAllTrigger, theAction)
 						theAction.Function.setText(theAction.Label, "Gray")
 					}
 				}
 				else if ((sessionState == kSessionRace) && (this.RaceEngineer != false)) {
-					theAction.Function.enable(kAllTrigger)
+					theAction.Function.enable(kAllTrigger, theAction)
 					theAction.Function.setText(theAction.Label)
 				}
 				else {
-					theAction.Function.disable(kAllTrigger)
+					theAction.Function.disable(kAllTrigger, theAction)
 					theAction.Function.setText(theAction.Label, "Gray")
 				}
 	}

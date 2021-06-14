@@ -369,8 +369,8 @@ Searches for a mode with the given name for the given plugin, which might be pas
 #### *findFunction(name :: String)*
 Searches for a controller function with the given descriptor. Returns *false*, if not found.
 
-#### *getAction(function :: ControllerFunction, trigger :: String)*
-Returns the controller action for the given function / trigger combination. Only currently active actions, which are bound to a function by their mode or plugin, are considered. Returns *false*, if there is no action currently connected to the function.
+#### *getActions(function :: ControllerFunction, trigger :: String)*
+Returns the controller actions for the given function / trigger combination. Only currently active actions, which are bound to a function by their mode or plugin, are considered. Returns *false*, if there is no action currently connected to the function.
 
 #### *registerButtonBox(buttonBox :: ButtonBox)*
 Registers a visual representation for the hardware controller. This method is automatically called by the constructor of [ButtonBox](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-buttonbox-extends-configurationitem-simulator-controllerahk).
@@ -409,8 +409,8 @@ Connects a given action unambiguously to the given function. All future activati
 #### *disconnectAction(function :: ControllerFunction, action :: ControllerAction)*
 Disconnects the given action from the given function. Normally, *disconnectAction* is called during [deactivation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#deactivate) of plugins and modes.
 
-#### *fireAction(function :: ControllerFunction, trigger :: String)*
-This is a dispatcher method, since in the end, the [fireAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-fireactionfunction--controllerfunction-trigger--string) method of the corresponding action is called. This action is retrieved using [getAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#getactionfunction--controllerfunction-trigger--string).
+#### *fireActions(function :: ControllerFunction, trigger :: String)*
+This is a dispatcher method, since in the end, the [fireAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-fireactionfunction--controllerfunction-trigger--string) method of the corresponding actions is called. These actions are retrieved using [getActions](*).
 
 #### *setMode(newMode :: ControllerMode)*
 Switches the controller to a different mode. The currently active mode will be [deactivated](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#deactivate) and the new mode will be [activated](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#activate), thereby connecting all its actions to the correspondiing controller functions.
@@ -441,8 +441,8 @@ Returns the running number of the controller function. For example Button # **3*
 #### *Descriptor[]*
 The resource descriptor of the given function. Typically looks like "Button.3" or "Dial.2".
 
-#### *Enabled[]*
-*true*, if the function can currently be triggered.
+#### *Enabled[action :: ControllerAction := false]*
+*true*, if the function can currently be triggered. If *action* is not supplied, the property will evaluate, if any of the actions might be triggered, otherwise the supplied action will be checked.
 
 #### *Trigger[]*
 Returns a list of all triggers available for this controller function. A button class might return ["Push"], beacause only this single functionality is provided, whereas a dial function might return ["Increase", "Decrease"].
@@ -458,11 +458,11 @@ Similar to the *Hotkeys* property, this property returns the defined actions. Se
 #### *__New(controller :: SimulatorController, function :: Function)*
 Constructs an instance of *ControllerFunction*. The supplied *function* must be an instance of the wrapped class [Function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-function-extends-configurationitem-classesahk), which provides the configuration information.
 
-#### *enable(trigger :: String := false)*
-Enables the given trigger (for example "Push") for this controller function, which means, that the connected action can be triggered by the hardware controller. If *trigger* is not supplied, all triggers will be enabled.
+#### *enable(trigger :: String := false, action :: ControllerAction := false)*
+Enables the given trigger (for example "Push") for this controller function, which means, that the connected action can be triggered by the hardware controller. If *trigger* is not supplied, all triggers will be enabled. If *action* is supplied, the function is enabled only for the given action.
 
-#### *disable(trigger :: String := false)*
-Disables the given trigger (for example "Push") for this controller function, which means, that the connected action cannot be triggered anymore by the hardware controller. If *trigger* is not supplied, all triggers will be disabled.
+#### *disable(trigger :: String := false, action :: ControllerAction := false)*
+Disables the given trigger (for example "Push") for this controller function, which means, that the connected action cannot be triggered anymore by the hardware controller. If *trigger* is not supplied, all triggers will be disabled. If *action* is supplied, the function is disabled only for the given action.
 
 #### *setText(test :: String, color :: String := "Black")*
 If the controller has an associated visual representation of the hardware controller, the visual label of the function might be changed with this method. The given color must be a defined HTML color descriptor.

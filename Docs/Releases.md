@@ -1,3 +1,11 @@
+## 3.1.2-release 06/18/21 (planned)
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Multiple actions can be bound to one controller functions. Useful, to group several activation actions into one toggle switch for example.
+  4. Model and Rules for race standings has been finalized for Cato, the Virtual Race Strategist.
+  5. Data mapping for Standings Model integrated for iRacing.
+
 ## 3.1.0-release 06/11/21
 
   1. Bugfixes, as always

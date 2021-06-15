@@ -208,6 +208,22 @@ void printDataValue(const irsdk_header* header, const char* data, const char* va
 	}
 }
 
+bool getRawDataValue(char* value, const irsdk_header* header, const char* data, const char* variable) {
+	if (header && data) {
+		for (int i = 0; i < header->numVars; i++) {
+			const irsdk_varHeader* rec = irsdk_getVarHeaderEntry(i);
+
+			if (strcmp(rec->name, variable) == 0) {
+				value = (char*)(data + rec->offset);
+
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
 bool getDataValue(char* value, const irsdk_header* header, const char* data, const char* variable) {
 	if (header && data) {
 		for (int i = 0; i < header->numVars; i++) {
@@ -525,9 +541,10 @@ void writeStandings(const irsdk_header *header, const char* data)
 			itoa(i, posIdx, 10);
 			
 			if (getYamlValue(carIdx, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:Position:{%s}CarIdx:", sessionID, posIdx)) {
+				int carIndex = atoi(carIdx);
 				char carIdx1[10];
 
-				itoa(atoi(carIdx) + 1, carIdx1, 10);
+				itoa(carIndex + 1, carIdx1, 10);
 
 				printf("Car.%s.Position=%s\n", carIdx1, posIdx);
 
@@ -539,9 +556,10 @@ void writeStandings(const irsdk_header *header, const char* data)
 				
 				printf("Car.%s.Time=%ld\n", carIdx1, (long)(normalize(atof(result)) * 1000));
 
-				getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:CarIdx:{%s}Time:", sessionID, carIdx);
-
-				printf("Car.%s.Time.Running=%ld\n", carIdx1, (long)(normalize(atof(result)) * 1000));
+				float trackPositions[64];
+				
+				if (getRawDataValue((char*)trackPositions, header, data, "CarIdxLapDistPct"))
+					printf("Car.%s.Lap.Running=%f\n", carIdx1, trackPositions[carIndex]);
 
 				getYamlValue(result, sessionInfo, "DriverInfo:Drivers:CarIdx:{%s}CarScreenName:", carIdx);
 				

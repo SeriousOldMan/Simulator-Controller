@@ -5,15 +5,12 @@
 ;;;   License:    (2021) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-carLaps(?car, COMPLETE, ?laps) <= Get(Car, ?car, Lap, ?laps)
-carLaps(?car, INCOMPLETE, ?laps) <= Get(Car, ?car, Lap, ?completedLaps), carLapTime(?car, ?lapTime), carTimeIntoLap(?car, ?partialTime),				\
-									?partialLap = ?partialTime / ?lapTime, ?laps = ?completedLaps + ?partialLap
+carLaps(?car, COMPLETED, ?laps) <= Get(Car, ?car, Lap, ?laps)
+carLaps(?car, FULL, ?laps) <= Get(Car, ?car, Lap, ?completedLaps), Get(Car, ?car, Lap.Running, ?runningLap), ?laps = ?completedLaps + ?runningLap
 									
 carPosition(?car, ?position) <= Get(Car, ?car, Position, ?position)
 
 carLapTime(?car, ?time) <= Get(Car, ?car, Time, ?time)
-
-carTimeIntoLap(?car, ?time) <= Get(Car, ?car, Time.Running, ?time)
 
 carDriverForname(?car, ?forname) <= Get(Car, ?car, Driver.Forname, ?forname)
 carDriverSurname(?car, ?surname) <= Get(Car, ?car, Driver.Surname, ?surname)

@@ -160,7 +160,7 @@ class RaceStrategist extends RaceAssistant {
 		else {
 			delta := Abs(Round(knowledgeBase.getValue("Position.Front.Delta", 0) / 1000, 1))
 			
-			this.getSpeaker().speakPhrase("GapToFront", {delta: delta})
+			this.getSpeaker().speakPhrase("GapToFront", {delta: Format("{:.1f}", delta)})
 		}
 	}
 	
@@ -175,7 +175,7 @@ class RaceStrategist extends RaceAssistant {
 		else {
 			delta := Abs(Round(knowledgeBase.getValue("Position.Behind.Delta", 0) / 1000, 1))
 		
-			this.getSpeaker().speakPhrase("GapToBehind", {delta: delta})
+			this.getSpeaker().speakPhrase("GapToBehind", {delta: Format("{:.1f}", delta)})
 		}
 	}
 	
@@ -190,7 +190,7 @@ class RaceStrategist extends RaceAssistant {
 		else {
 			delta := Abs(Round(knowledgeBase.getValue("Position.Lead.Delta", 0) / 1000, 1))
 		
-			this.getSpeaker().speakPhrase("GapToLead", {delta: delta})
+			this.getSpeaker().speakPhrase("GapToLead", {delta: Format("{:.1f}", delta)})
 		}
 	}
 	

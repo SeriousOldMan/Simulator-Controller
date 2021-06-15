@@ -522,7 +522,7 @@ void writeStandings(const irsdk_header *header, const char* data)
 			
 			itoa(i, posIdx, 10);
 			
-			if (getYamlValue(carIdx, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:Position:{%s}Position:", sessionID, posIdx)) {
+			if (getYamlValue(carIdx, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:Position:{%s}CarIdx:", sessionID, posIdx)) {
 				printf("Car.%s.Position=%s\n", carIdx, posIdx);
 
 				getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:CarIdx:{%s}LapsComplete:", sessionID, carIdx);
@@ -801,6 +801,8 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 			
 			id = atoi(sessionID);
 
+			printf("Driver.Car=%s\n", playerCarIdx);
+
 			while (id >= 0) {
 				char session[32];
 
@@ -816,7 +818,7 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 			printf("Pit TP RR=%f\n", GetPsi(getDataFloat(header, data, "PitSvRRP")));
 		}
 
-		if (false) {
+		if (true) {
 			printf("\n[Debug Session Info]\n");
 			printf("%s", sessionInfo);
 			printf("\n");
@@ -859,7 +861,7 @@ int main(int argc, char* argv[])
 					else if (strcmp(argv[2], "Change") == 0)
 						pitstopChangeValues(pHeader, g_data, argv[3]);
 				}
-				else if ((argc > 0) && (strcmp(argv[1], "-Standings") == 0)) {
+				else if ((argc > 1) && (strcmp(argv[1], "-Standings") == 0)) {
 					writeStandings(pHeader, g_data);
 				}
 				else

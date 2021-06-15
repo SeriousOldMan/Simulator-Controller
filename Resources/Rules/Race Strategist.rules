@@ -104,9 +104,9 @@ projectedTyreTemperature(?lap, ?temperature) <=																									\
 ;;; Updates the gaps and lap time deltas for various cars each lap.         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-priotity 5, {Any: [?Lap], [?Sector]} => (Clear: Position.Front.Car), (Clear: Position.Front.Distance), (Clear: Position.Front.Delta),			\
-										(Clear: Position.Behind.Car), (Clear: Position.Behind.Distance), (Clear: Position.Behind.Delta),		\
-										(Clear: Position.Lead.Car), (Clear: Position.Lead.Distance), (Clear: Position.Lead.Delta)
+priority: 5, {Any: [?Lap], [?Sector]} => (Clear: Position.Front.Car), (Clear: Position.Front.Distance), (Clear: Position.Front.Delta),			\
+										 (Clear: Position.Behind.Car), (Clear: Position.Behind.Distance), (Clear: Position.Behind.Delta),		\
+										 (Clear: Position.Lead.Car), (Clear: Position.Lead.Distance), (Clear: Position.Lead.Delta)
 {Any: [?Lap], [?Sector]} => (Prove: updateStandings, ?Lap)
 
 updateStandings(?lap) <= updatePosition(?lap, !Car.Count)

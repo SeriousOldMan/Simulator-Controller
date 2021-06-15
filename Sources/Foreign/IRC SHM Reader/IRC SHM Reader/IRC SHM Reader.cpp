@@ -511,35 +511,41 @@ void writeStandings(const irsdk_header *header, const char* data)
 		itoa(getCurrentSessionID(sessionInfo), sessionID, 10);
 
 		char result[100];
-
+		char posIdx[10];
+		char carIdx[10];
+		char carIdx1[10];
+		
 		printf("[Position Data]\n");
 		
-		printf("Driver.Car=%s\n", playerCarIdx);
+		itoa(atoi(playerCarIdx) + 1, carIdx1, 10);
+
+		printf("Driver.Car=%s\n", carIdx1);
 		
 		for (int i = 1; ; i++) {
-			char posIdx[10];
-			char carIdx[10];
-			
 			itoa(i, posIdx, 10);
 			
 			if (getYamlValue(carIdx, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:Position:{%s}CarIdx:", sessionID, posIdx)) {
-				printf("Car.%s.Position=%s\n", carIdx, posIdx);
+				char carIdx1[10];
+
+				itoa(atoi(carIdx) + 1, carIdx1, 10);
+
+				printf("Car.%s.Position=%s\n", carIdx1, posIdx);
 
 				getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:CarIdx:{%s}LapsComplete:", sessionID, carIdx);
 
-				printf("Car.%s.Lap=%s\n", carIdx, result);
+				printf("Car.%s.Lap=%s\n", carIdx1, result);
 
 				getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:CarIdx:{%s}LastTime:", sessionID, carIdx);
 				
-				printf("Car.%s.Time=%ld\n", carIdx, (long)(normalize(atof(result)) * 1000));
+				printf("Car.%s.Time=%ld\n", carIdx1, (long)(normalize(atof(result)) * 1000));
 
 				getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:CarIdx:{%s}Time:", sessionID, carIdx);
 
-				printf("Car.%s.Time.Running=%ld\n", carIdx, (long)(normalize(atof(result)) * 1000));
+				printf("Car.%s.Time.Running=%ld\n", carIdx1, (long)(normalize(atof(result)) * 1000));
 
 				getYamlValue(result, sessionInfo, "DriverInfo:Drivers:CarIdx:{%s}CarScreenName:", carIdx);
 				
-				printf("Car.%s.Car=%s\n", carIdx, result);
+				printf("Car.%s.Car=%s\n", carIdx1, result);
 
 				char forName[100];
 				char surName[100];
@@ -547,11 +553,13 @@ void writeStandings(const irsdk_header *header, const char* data)
 
 				readDriverInfo(sessionInfo, carIdx, forName, surName, nickName);
 
-				printf("Car.%s.Driver.Forname=%s\n", carIdx, forName);
-				printf("Car.%s.Driver.Surname=%s\n", carIdx, surName);
-				printf("Car.%s.Driver.Nickname=%s\n", carIdx, nickName);
+				printf("Car.%s.Driver.Forname=%s\n", carIdx1, forName);
+				printf("Car.%s.Driver.Surname=%s\n", carIdx1, surName);
+				printf("Car.%s.Driver.Nickname=%s\n", carIdx1, nickName);
 			}
 			else {
+				itoa(i - 1, posIdx, 10);
+
 				printf("Car.Count=%s\n", posIdx);
 				
 				break;

@@ -104,9 +104,9 @@ projectedTyreTemperature(?lap, ?temperature) <=																									\
 ;;; Updates the gaps and lap time deltas for various cars each lap.         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-priotity 5, {Any: [?Lap], [?Sector]} => (Clear: Position.Front.Car), (Clear: Position.Front.Distance), (Clear: Position.Front.Delta),			\
-										(Clear: Position.Behind.Car), (Clear: Position.Behind.Distance), (Clear: Position.Behind.Delta),		\
-										(Clear: Position.Lead.Car), (Clear: Position.Lead.Distance), (Clear: Position.Lead.Delta)
+priority: 5, {Any: [?Lap], [?Sector]} => (Clear: Position.Front.Car), (Clear: Position.Front.Distance), (Clear: Position.Front.Delta),			\
+										 (Clear: Position.Behind.Car), (Clear: Position.Behind.Distance), (Clear: Position.Behind.Delta),		\
+										 (Clear: Position.Lead.Car), (Clear: Position.Lead.Distance), (Clear: Position.Lead.Delta)
 {Any: [?Lap], [?Sector]} => (Prove: updateStandings, ?Lap)
 
 updateStandings(?lap) <= updatePosition(?lap, !Car.Count)
@@ -116,7 +116,7 @@ updatePosition(?lap, !Driver.Car) <= !, carPosition(!Driver.Car, ?position), Set
 									 Set(Standings.Lap, ?lap, Position, ?position), Set(Standings.Lap, ?lap, Car, !Driver.Car, Delta, 0),		\
 									 Set(Standings.Lap, ?lap, Car, !Driver.Car, Laps, ?lap),													\
 									 ?nextCar = !Driver.Car - 1, updatePosition(?lap, ?nextCar)
-updatePosition(?lap, ?car) <= carPosition(?car, ?position), Set(Standings.Lap, ?lap, Position, ?position),										\
+updatePosition(?lap, ?car) <= Call(msgBox, ?lap, ?car), carPosition(?car, ?position), Call(msgBox, ?position), Set(Standings.Lap, ?lap, Position, ?position),										\
 							  carLaps(?car, INCOMPLETE, ?carLaps), carLaps(!Driver.Car, INCOMPLETE, ?driverLaps), lapTime(?lap, ?lapTime),		\
 							  ?distance = ?driverLaps - ?carLaps, ?timeDelta = ?lapTime * ?distance,											\
 							  Set(Standings.Lap, ?lap, Car, ?car, Delta, ?timeDelta),															\

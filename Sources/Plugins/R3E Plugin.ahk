@@ -33,7 +33,7 @@ global kBinaryOptions = ["Change Front Tyres", "Change Rear Tyres", "Repair Aero
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class R3EPlugin extends RaceEngineerSimulatorPlugin {
+class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	iOpenPitstopMFDHotkey := false
 	iClosePitstopMFDHotkey := false
 	

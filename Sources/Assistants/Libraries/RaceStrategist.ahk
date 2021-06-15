@@ -440,6 +440,26 @@ class RaceStrategist extends RaceAssistant {
 		return result
 	}
 	
+	updateLap(lapNumber, data) {
+		local knowledgeBase := this.KnowledgeBase
+		local fact
+		
+		if !IsObject(data)
+			data := readConfiguration(data)
+		
+		for key, value in getConfigurationSectionValues(data, "Position Data", Object())
+			knowledgeBase.setFact(key, value)
+	
+		knowledgeBase.addFact("Sector", true)
+		
+		result := knowledgeBase.produce()
+			
+		if this.Debug[kDebugKnowledgeBase]
+			this.dumpKnowledge(this.KnowledgeBase)
+		
+		return result
+	}
+	
 	performPitstop(lapNumber := false) {
 		local knowledgeBase := this.KnowledgeBase
 		

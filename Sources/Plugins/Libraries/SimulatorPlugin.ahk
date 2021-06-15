@@ -394,12 +394,19 @@ class RaceEngineerAction extends ControllerAction {
 	}
 }
 
-class RaceEngineerSimulatorPlugin extends SimulatorPlugin {
+class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	iRaceEngineer := false
+	iRaceStrategist := false
 	
 	RaceEngineer[] {
 		Get {
 			return this.iRaceEngineer
+		}
+	}
+	
+	RaceStrategist[] {
+		Get {
+			return this.iRaceStrategist
 		}
 	}
 	
@@ -435,8 +442,11 @@ class RaceEngineerSimulatorPlugin extends SimulatorPlugin {
 			
 			raceStrategist := SimulatorController.Instance.findPlugin(kRaceStrategistPlugin)
 			
-			if (raceStrategist && raceStrategist.isActive())
+			if (raceStrategist && raceStrategist.isActive()) {
 				raceStrategist.startSimulation(this)
+				
+				this.iRaceStrategist := raceEngineer
+			}
 		}
 	}
 	
@@ -454,8 +464,11 @@ class RaceEngineerSimulatorPlugin extends SimulatorPlugin {
 			
 			raceStrategist := SimulatorController.Instance.findPlugin(kRaceStrategistPlugin)
 			
-			if (raceStrategist && raceStrategist.isActive())
+			if (raceStrategist && raceStrategist.isActive()) {
 				raceStrategist.stopSimulation(this)
+				
+				this.iRaceStrategist := false
+			}
 		}
 	}
 	
@@ -508,6 +521,9 @@ class RaceEngineerSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork) {
+	}
+	
+	updateStandingsData(data) {
 	}
 	
 	updateSimulatorData(data) {

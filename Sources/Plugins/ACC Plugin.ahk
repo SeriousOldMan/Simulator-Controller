@@ -39,7 +39,7 @@ global kPSMutatingOptions = ["Strategy", "Change Tyres", "Tyre Compound", "Chang
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class ACCPlugin extends RaceEngineerSimulatorPlugin {
+class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	iOpenPitstopMFDHotkey := false
 	iClosePitstopMFDHotkey := false
 	

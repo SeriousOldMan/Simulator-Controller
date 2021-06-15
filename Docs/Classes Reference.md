@@ -753,6 +753,9 @@ This method will be called, when a simulator has been started or finished, or wh
 #### *RaceEngineer[]*
 Returns the instance of *RaceEngineerPlugin* (see the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) of this plugin or the source code [Race Engineer Plugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Race%20Engineer%20Plugin.ahk) for more information), as long, as the simulation is running.
 
+#### *RaceStrategist[]*
+Returns the instance of *RaceStrategistPlugin* (see the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) of this plugin or the source code [Race Strategist Plugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Race%20Strategist%20Plugin.ahk) for more information), as long, as the simulation is running.
+
 ### Public Methods
 
 #### *createRaceEngineerAction(controller :: SimulatorController, action :: String, actionFunction :: String)*
@@ -793,6 +796,9 @@ Dials the pressures in PSI, that has been selected previously by *setPitstopTyre
 
 #### *requestPitstopRepairs(pitstopNumber :: Integer, repairSuspension :: Boolean, repairBodywork :: Boolean)*
 This is the last method of the pitstop preparation cycle. It requests repairs for the different parts of the car at the pitstop. The default method does nothing here.
+
+#### *updateStandingsData(data :: ConfigurationMap)*
+*updateStandingsData* is called after the [telemetry data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#telemetry-integration) has been loaded from the given simulation, but before the data is transferred to the Virtual Race Strategist. The implementation of *updateStandingsData* must add the position and timing information for all cars to the data object. See the documentation for the Virtual Race Strategist for more information about a [description of the corrsponding data fields](*).
 
 #### *updateSimulatorData(data :: ConfigurationMap)*
 *updateSimulatorData* is called after the [telemetry data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#telemetry-integration) has been loaded from the given simulation, but before the data is transferred to the Virtual Race Engineer. The implementation of *updateSimulatorData* might add some additional fields or change fields that has been provided by the simulation. See the [implementation of the *RaceRoom Racing Experience*](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/R3E%20Plugin.ahk) simulation for an example, where the name of the current car is read from an external JSON database file.

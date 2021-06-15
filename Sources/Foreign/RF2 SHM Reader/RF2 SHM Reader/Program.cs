@@ -31,6 +31,8 @@ namespace RF2SHMReader {
             }
             else if (args.Length > 0 && args[0] == "-Setup")
                 reader.ReadSetup();
+            else if (args.Length > 0 && args[0] == "-Standings")
+                reader.ReadStandings();
             else
                 reader.ReadData();
         }

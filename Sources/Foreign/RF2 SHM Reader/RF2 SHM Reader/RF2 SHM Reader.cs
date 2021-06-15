@@ -66,6 +66,70 @@ namespace RF2SHMReader {
 			}
 		}
 
+		public string GetForname(byte[] name) {
+			string forName = GetStringFromBytes(name);
+
+			if (forName.Contains(" ")) {
+				string[] names = forName.Split(' ');
+
+				return names[0];
+			}
+			else
+				return forName;
+		}
+
+		public string GetSurname(byte[] name) {
+			string forName = GetStringFromBytes(name);
+
+			if (forName.Contains(" ")) {
+				string[] names = forName.Split(' ');
+
+				return names[1];
+			}
+			else
+				return "";
+		}
+
+		public string GetNickname(byte[] name) {
+			string forName = GetStringFromBytes(name);
+
+			if (forName.Contains(" ")) {
+				string[] names = forName.Split(' ');
+
+				return names[0].Substring(0, 1) + names[1].Substring(0, 1);
+			}
+			else
+				return "";
+		}
+
+		public void ReadStandings() {
+			rF2VehicleScoring playerScoring = GetPlayerScoring(ref scoring);
+			rF2VehicleTelemetry playerTelemetry = GetPlayerTelemetry(playerScoring.mID, ref telemetry);
+
+			Console.WriteLine("[Position Data]");
+
+			Console.Write("Car.Count="); Console.WriteLine(scoring.mScoringInfo.mNumVehicles);
+
+			for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i) {
+				rF2VehicleScoring vehicle = scoring.mVehicles[i];
+				Console.Write("Car."); Console.Write(i); Console.Write(".Position="); Console.WriteLine(vehicle.mPlace);
+
+				Console.Write("Car."); Console.Write(i); Console.Write(".Lap="); Console.WriteLine(vehicle.mTotalLaps);
+				Console.Write("Car."); Console.Write(i); Console.Write(".Lap.Running="); Console.WriteLine(vehicle.mLapDist);
+
+				Console.Write("Car."); Console.Write(i); Console.Write(".Time="); Console.WriteLine(Math.Round(Normalize(vehicle.mLastLapTime) * 1000));
+
+				Console.Write("Car."); Console.Write(i); Console.Write(".Car="); Console.WriteLine(GetStringFromBytes(vehicle.mVehicleName));
+
+				Console.Write("Car."); Console.Write(i); Console.Write(".Driver.Forname="); Console.WriteLine(GetForname(vehicle.mDriverName));
+				Console.Write("Car."); Console.Write(i); Console.Write(".Driver.Surname="); Console.WriteLine(GetSurname(vehicle.mDriverName));
+				Console.Write("Car."); Console.Write(i); Console.Write(".Driver.Nickname="); Console.WriteLine(GetNickname(vehicle.mDriverName));
+
+				if (vehicle.mIsPlayer != 0)
+					Console.Write("Driver.Car="); Console.WriteLine(i);
+			}
+		}
+
 		public void ReadData() {
 			rF2VehicleScoring playerScoring = GetPlayerScoring(ref scoring);
 			rF2VehicleTelemetry playerTelemetry = GetPlayerTelemetry(playerScoring.mID, ref telemetry);
@@ -102,20 +166,9 @@ namespace RF2SHMReader {
 
 			Console.WriteLine("[Stint Data]");
 			if (connected) {
-				string forName = GetStringFromBytes(scoring.mScoringInfo.mPlayerName);
-
-				if (forName.Contains(" ")) {
-					string[] names = forName.Split(' ');
-
-					Console.Write("DriverForname="); Console.WriteLine(names[0]);
-					Console.Write("DriverSurname="); Console.WriteLine(names[1]);
-					Console.Write("DriverNickname="); Console.WriteLine(names[0].Substring(0, 1) + names[1].Substring(0, 1));
-				}
-				else {
-					Console.Write("DriverForname="); Console.WriteLine(forName);
-					Console.WriteLine("DriverSurname=");
-					Console.WriteLine("DriverNickname=");
-				}
+				Console.Write("DriverForname="); Console.WriteLine(GetForname(scoring.mScoringInfo.mPlayerName));
+				Console.Write("DriverSurname="); Console.WriteLine(GetSurname(scoring.mScoringInfo.mPlayerName));
+				Console.Write("DriverNickname="); Console.WriteLine(GetNickname(scoring.mScoringInfo.mPlayerName));
 
 				Console.Write("LapLastTime="); Console.WriteLine(Math.Round(Normalize(playerScoring.mLastLapTime) * 1000));
 				Console.Write("LapBestTime="); Console.WriteLine(Math.Round(Normalize(playerScoring.mBestLapTime) * 1000));

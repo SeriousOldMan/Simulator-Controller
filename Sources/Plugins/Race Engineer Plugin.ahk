@@ -679,12 +679,14 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 				}
 				
 				if this.RaceEngineerEnabled {
-					if (this.PitstopPending && getConfigurationValue(data, "Stint Data", "InPit", false) && !inPit) {
+					if getConfigurationValue(data, "Stint Data", "InPit", false) {
 						; Car is in the Pit
 						
-						this.performPitstop(dataLastLap)
+						if !inPit {
+							this.performPitstop(dataLastLap)
 						
-						inPit := true
+							inPit := true
+						}
 					}
 					else if (dataLastLap > 0) {
 						; Car is on the track

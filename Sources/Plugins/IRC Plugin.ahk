@@ -25,7 +25,7 @@ global kIRCPlugin = "IRC"
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class IRCPlugin extends RaceEngineerSimulatorPlugin {
+class IRCPlugin extends RaceAssistantSimulatorPlugin {
 	iCurrentPitstopMFD := false
 	
 	iPitstopFuelMFDHotkey := false

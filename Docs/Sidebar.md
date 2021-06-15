@@ -129,7 +129,7 @@
       - [ButtonBox](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-buttonbox-extends-configurationitem-simulator-controllerahk)
     - [Simulator Plugin Implementation Classes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#simulator-plugin-implementation-classes)
       - [SimulatorPlugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#simulatorplugin-extends-controllerplugin-simulatorpluginahk)
-      - [RaceEngineerSimulatorPlugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#raceengineersimulatorplugin-extends-simulatorplugin-simulatorpluginahk)
+      - [RaceAssistantSimulatorPlugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#raceassistantsimulatorplugin-extends-simulatorplugin-simulatorpluginahk)
       - [PitstopMode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#pitstopmode-extends-controllermode-simulatorpluginahk)
       - [PitstopAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-pitstopaction-extends-controlleraction-simulatorpluginahk)
         - [PitstopChangeAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#pitstopchangeaction-extends-pitstopaction-simulatorpluginahk)

@@ -108,6 +108,7 @@ priority: 5, {Any: [?Lap], [?Sector]} => (Clear: Position.Front.Car), (Clear: Po
 										 (Clear: Position.Behind.Car), (Clear: Position.Behind.Distance), (Clear: Position.Behind.Delta),		\
 										 (Clear: Position.Lead.Car), (Clear: Position.Lead.Distance), (Clear: Position.Lead.Delta)
 {Any: [?Lap], [?Sector]} => (Prove: updateStandings, ?Lap)
+priority: -5, [?Sector] => (Clear: Sector)
 
 updateStandings(?lap) <= updatePosition(?lap, !Car.Count)
 

@@ -72,6 +72,10 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 			this.callRemote("addLap", arguments*)
 		}
 		
+		updateLap(arguments*) {
+			this.callRemote("updateLap", arguments*)
+		}
+		
 		performPitstop(arguments*) {
 			this.callRemote("performPitstop", arguments*)
 		}
@@ -374,6 +378,7 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 	
 	collectSessionData() {
 		static lastLap := 0
+		static lastLapCounter := 0
 		static inPit := false
 		
 		if this.Simulator {
@@ -417,12 +422,14 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 				}
 				
 				if this.RaceStrategistEnabled {
-					if (getConfigurationValue(data, "Stint Data", "InPit", false) && !inPit) {
+					if getConfigurationValue(data, "Stint Data", "InPit", false) {
 						; Car is in the Pit
 						
-						this.performPitstop(dataLastLap)
+						if !inPit {
+							this.performPitstop(dataLastLap)
 						
-						inPit := true
+							inPit := true
+						}
 					}
 					else if (dataLastLap > 0) {
 						; Car is on the track
@@ -430,27 +437,29 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 						if ((dataLastLap > 1) && (lastLap == 0))
 							return
 						
+						firstLap := (lastLap == 0)
 						newLap := (dataLastLap > lastLap)
 					
 						inPit := false
-					
+						
 						if newLap {
-							firstLap := (lastLap == 0)
-						
 							lastLap := dataLastLap
-							
-							this.updateStandingsData(data)
-						
-							newDataFile := kTempDirectory . code . " Data\" . kRaceStrategistPlugin . " Lap " . lastLap . ".data"
-								
-							writeConfiguration(newDataFile, data)
-							
-							if firstLap
-								this.startSession(newDataFile)
-							
-							if newLap
-								this.addLap(dataLastLap, newDataFile)
+							lastLapCounter := 0
 						}
+							
+						this.updateStandingsData(data)
+						
+						newDataFile := kTempDirectory . code . " Data\" . kRaceStrategistPlugin . " Lap " . lastLap . "." . ++lastLapCounter . ".data"
+							
+						writeConfiguration(newDataFile, data)
+						
+						if firstLap
+							this.startSession(newDataFile)
+						
+						if newLap
+							this.addLap(dataLastLap, newDataFile)
+						else	
+							this.updateLap(dataLastLap, newDataFile)
 					}
 				}
 				else {

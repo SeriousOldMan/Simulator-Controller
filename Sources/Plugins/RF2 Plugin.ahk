@@ -25,7 +25,7 @@ global kRF2Plugin = "RF2"
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class RF2Plugin extends RaceEngineerSimulatorPlugin {
+class RF2Plugin extends RaceAssistantSimulatorPlugin {
 	iOpenPitstopMFDHotkey := false
 	iClosePitstopMFDHotkey := false
 	

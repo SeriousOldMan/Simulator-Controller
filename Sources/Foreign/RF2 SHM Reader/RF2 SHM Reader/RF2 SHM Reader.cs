@@ -110,12 +110,13 @@ namespace RF2SHMReader {
 
 			Console.Write("Car.Count="); Console.WriteLine(scoring.mScoringInfo.mNumVehicles);
 
-			for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i) {
-				rF2VehicleScoring vehicle = scoring.mVehicles[i];
+			for (int i = 1; i <= scoring.mScoringInfo.mNumVehicles; ++i) {
+				rF2VehicleScoring vehicle = scoring.mVehicles[i - 1];
+
 				Console.Write("Car."); Console.Write(i); Console.Write(".Position="); Console.WriteLine(vehicle.mPlace);
 
 				Console.Write("Car."); Console.Write(i); Console.Write(".Lap="); Console.WriteLine(vehicle.mTotalLaps);
-				Console.Write("Car."); Console.Write(i); Console.Write(".Lap.Running="); Console.WriteLine(vehicle.mLapDist);
+				Console.Write("Car."); Console.Write(i); Console.Write(".Lap.Running="); Console.WriteLine(vehicle.mPathLateral);
 
 				Console.Write("Car."); Console.Write(i); Console.Write(".Time="); Console.WriteLine(Math.Round(Normalize(vehicle.mLastLapTime) * 1000));
 

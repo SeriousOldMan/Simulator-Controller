@@ -880,7 +880,7 @@ int main(int argc, char* argv[])
 
 					continue;
 				}
-				writeStandings(pHeader, g_data);
+				
 				if ((argc > 2) && (strcmp(argv[1], "-Pitstop") == 0)) {
 					if (strcmp(argv[2], "Set") == 0)
 						pitstopSetValues(pHeader, g_data, argv[3]);

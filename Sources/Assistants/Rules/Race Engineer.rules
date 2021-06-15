@@ -757,8 +757,8 @@ priority: -10, [?Pitstop.Lap] => (Clear: Pitstop.Planned.Lap),																		
 								 (Clear: Pitstop.Planned.Tyre.Pressure.RL.Increment), (Clear: Pitstop.Planned.Tyre.Pressure.RR.Increment), 		\
 								 (Clear: Pitstop.Planned.Tyre.Pressure.Correction),																\
 								 (Clear: Pitstop.Planned.Repair.Suspension), (Clear: Pitstop.Planned.Repair.Bodywork)
-priority: -20, [?Pitstop.Lap] => (Set: Pitstop.Last, !Pitstop.Planned.Nr), (Clear: Pitstop.Planned.Nr),											\
-								 (Clear: Pitstop.Lap), (Clear: Pitstop.Prepared)
+priority: -20, {All: [?Pitstop.Lap], [?Pitstop.Planned.Nr]} => (Set: Pitstop.Last, ?Pitstop.Planned.Nr), (Clear: Pitstop.Planned.Nr)
+priority: -20, [?Pitstop.Lap] => (Clear: Pitstop.Lap), (Clear: Pitstop.Prepared)
 
 pitstopPerformed(?lap) <= unbound?(!Pitstop.Prepared), !, fail
 pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Lap, ?lap)

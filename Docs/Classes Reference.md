@@ -745,8 +745,8 @@ This method is called always directly after *selectPitstopOption* to change the 
 #### *updateSessionState(sessionState :: OneOf(kSessionFinished, kSessionPaused, kSessionOther, ...))*
 This method will be called, when a simulator has been started or finished, or when the user enters a simulation session. The default implementation informs the *SimulatorController* instance, which then will activate the best fitting modes on the controller hardware.
 
-## RaceEngineerSimulatorPlugin extends [SimulatorPlugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#simulatorplugin-extends-controllerplugin-simulatorpluginahk) ([SimulatorPlugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Libraries/SimulatorPlugin.ahk))
-*RaceEngineerSimulatorPlugin* extends the *SimulatorPlugin* class and adds support for Jona, the Virtual Race Engineer. Jona will be started automatically, whenever the underlying simulator game is running.
+## RaceAssistantSimulatorPlugin extends [SimulatorPlugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#simulatorplugin-extends-controllerplugin-simulatorpluginahk) ([SimulatorPlugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Libraries/SimulatorPlugin.ahk))
+*RaceAssistantSimulatorPlugin* extends the *SimulatorPlugin* class and adds support for Jona, the Virtual Race Engineer. Jona will be started automatically, whenever the underlying simulator game is running.
 
 ### Public Properties
 
@@ -768,7 +768,7 @@ Calling this method will ask Jona to plan an upcoming pitstop.
 Calling this method will ask Jona to prepare the last planned pitstop.
 
 #### *supportsPitstop()*
-If this method returns *true*, this plugin supports automated pitstop handling together with the Virtual Race Engineer. The default implementation returns *false*. Whenever a subclass of *RaceEngineerSimulatorPlugin* returns *true* here, it will implement at least some of the following methods as well.
+If this method returns *true*, this plugin supports automated pitstop handling together with the Virtual Race Engineer. The default implementation returns *false*. Whenever a subclass of *RaceAssistantSimulatorPlugin* returns *true* here, it will implement at least some of the following methods as well.
 
 #### *pitstopPlanned(pitstopNumber :: Integer)*
 *pitstopPlanned* is called by the Race Engineer, whenever there is an updated plan for an upcoming pitstop. The default method does nothing here.

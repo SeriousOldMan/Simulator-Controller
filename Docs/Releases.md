@@ -6,7 +6,8 @@
   4. Model and Rules for race standings has been finalized for Cato, the Virtual Race Strategist.
   5. iRacing data acquisition for Cato, the Virtual Race Strategist.
   6. rFactor 2 data acquisition for Cato, the Virtual Race Strategist.
-  7. [For Developer]: Refactored *RaceEngineerSimulatorPlugin* into *RaceAssistantSimulatorPlugin*, which now can handle multiple race assistants.
+  7. RaceRoom Racing Experience data acquisition for Cato, the Virtual Race Strategist.
+  8. [For Developer]: Refactored *RaceEngineerSimulatorPlugin* into *RaceAssistantSimulatorPlugin*, which now can handle multiple race assistants.
 
 ## 3.1.0-release 06/11/21
 

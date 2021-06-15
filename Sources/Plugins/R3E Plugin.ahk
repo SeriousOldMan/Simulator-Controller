@@ -426,7 +426,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 				this.toggleActivity("Repair Aero Rear", false, true)
 	}
 	
-	updateSimulatorData(data) {
+	getCarName(carID) {
 		static carDB := false
 		static lastCarID := false
 		static lastCarName := false
@@ -437,16 +437,31 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 			carDB := JSON.parse(script)["cars"]
 		}
 		
-		carID := getConfigurationValue(data, "Session Data", "Car", "")
-		
-		if (carID = lastCarID)
-			setConfigurationValue(data, "Session Data", "Car", lastCarName)
-		else {
+		if (carID != lastCarID) {
 			lastCarID := carID
 			lastCarName := (carDB.HasKey(carID) ? carDB[carID]["Name"] : "Unknown")
-			
-			setConfigurationValue(data, "Session Data", "Car", lastCarName)
 		}
+			
+		return lastCarName
+	}
+	
+	updateStandingsData(data) {
+		standings := readSharedMemory(this.Code, "-Standings")
+		
+		Loop {
+			carID := getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Car", kUndefined)
+		
+			if (carID == kUndefined)
+				break
+			else
+				setConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Car", this.getCarName(carID))
+		}
+		
+		setConfigurationSectionValues(data, "Position Data", getConfigurationSectionValues(standings, "Position Data"))
+	}
+	
+	updateSimulatorData(data) {
+		setConfigurationValue(data, "Session Data", "Car", this.getCarName(getConfigurationValue(data, "Session Data", "Car", "")))
 	}
 	
 	getImageFileNames(imageNames*) {

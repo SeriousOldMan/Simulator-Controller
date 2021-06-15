@@ -30,7 +30,7 @@ Release 3.1.2 Checklist
 5. Refactor "RaceEngineerSimulatorPlugin" => "RaceAssistantSimulatorPlugin"
    a. Classes.md
    b. Update Notes
-6. Race Strategist integration for iRacing and rFactor 2
+6. Race Strategist integration for iRacing, rFactor 2 and RaceRoom Racing Experience
    a. Documentation
 
 Release 3.1.0 Checklist

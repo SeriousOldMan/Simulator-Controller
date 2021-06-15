@@ -2,7 +2,7 @@
 Version=3.1.2-dev
 Target=3.1.0-release
 Date=06/15/2021
-Changes=Support for multiple aaction for one controller function, New plugin argument "raceStrategist", First Rule Set for Race Strategist, iRacing integration for Race Strategist, rFactor 2 integration for Race Strategist
+Changes=Support for multiple aaction for one controller function, New plugin argument "raceStrategist", First Rule Set for Race Strategist, iRacing integration for Race Strategist, rFactor 2 integration for Race Strategist, RaceRoom Racing Experience integration for Race Strategist
 [Release]
 Version=3.1.0-release
 Date=06/11/2021

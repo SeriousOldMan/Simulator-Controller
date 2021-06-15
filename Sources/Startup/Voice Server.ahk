@@ -437,19 +437,20 @@ class VoiceServer extends ConfigurationItem {
 	
 	activateVoiceClient(descriptor, words := false) {
 		if (this.ActiveVoiceClient && (this.ActiveVoiceClient.Descriptor = descriptor))
-			return
-		
-		if this.ActiveVoiceClient
-			this.deactivateVoiceClient(this.ActiveVoiceClient.Descriptor)
-		
-		activeVoiceClient := this.VoiceClients[descriptor]
-		
-		this.iActiveVoiceClient := activeVoiceClient
-		
-		activeVoiceClient.activate(words)
-		
-		if !this.PushToTalk
-			this.startListening()
+			this.ActiveVoiceClient.activate(words)
+		else {
+			if this.ActiveVoiceClient
+				this.deactivateVoiceClient(this.ActiveVoiceClient.Descriptor)
+			
+			activeVoiceClient := this.VoiceClients[descriptor]
+			
+			this.iActiveVoiceClient := activeVoiceClient
+			
+			activeVoiceClient.activate(words)
+			
+			if !this.PushToTalk
+				this.startListening()
+		}
 	}
 	
 	deactivateVoiceClient(descriptor) {

@@ -104,9 +104,9 @@ projectedTyreTemperature(?lap, ?temperature) <=																									\
 ;;; Updates the gaps and lap time deltas for various cars each lap.         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-priority: 5, {Any: [?Lap], [?Sector]} => (Clear: Position.Front.Car), (Clear: Position.Front.Distance), (Clear: Position.Front.Delta),			\
-										 (Clear: Position.Behind.Car), (Clear: Position.Behind.Distance), (Clear: Position.Behind.Delta),		\
-										 (Clear: Position.Lead.Car), (Clear: Position.Lead.Distance), (Clear: Position.Lead.Delta)
+priotity 5, {Any: [?Lap], [?Sector]} => (Clear: Position.Front.Car), (Clear: Position.Front.Distance), (Clear: Position.Front.Delta),			\
+										(Clear: Position.Behind.Car), (Clear: Position.Behind.Distance), (Clear: Position.Behind.Delta),		\
+										(Clear: Position.Lead.Car), (Clear: Position.Lead.Distance), (Clear: Position.Lead.Delta)
 {Any: [?Lap], [?Sector]} => (Prove: updateStandings, ?Lap)
 
 updateStandings(?lap) <= updatePosition(?lap, !Car.Count)
@@ -151,6 +151,13 @@ priority: -20, [?Pitstop.Lap] => (Clear: Pitstop.Lap)
 
 updatePitstopLap(?lap) <= Get(Pitstop.Last, ?last), ?next = ?last + 1, Set(Pitstop, ?next, Lap, ?lap), Set(Pitstop.Last, ?next), !
 updatePitstopLap(?lap) <= Set(Pitstop.1.Lap, ?lap), Set(Pitstop.Last, 1)
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                      Standings Information Retrieval                    ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include %kResourcesDirectory%Rules\Standings Information Retrieval.rules
 
 
 ;;;-------------------------------------------------------------------------;;;

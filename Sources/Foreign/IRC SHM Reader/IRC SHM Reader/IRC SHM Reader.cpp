@@ -818,7 +818,7 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 			printf("Pit TP RR=%f\n", GetPsi(getDataFloat(header, data, "PitSvRRP")));
 		}
 
-		if (true) {
+		if (false) {
 			printf("\n[Debug Session Info]\n");
 			printf("%s", sessionInfo);
 			printf("\n");

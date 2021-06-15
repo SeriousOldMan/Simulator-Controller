@@ -208,7 +208,7 @@ void printDataValue(const irsdk_header* header, const char* data, const char* va
 	}
 }
 
-bool getRawDataValue(char* value, const irsdk_header* header, const char* data, const char* variable) {
+bool getRawDataValue(char* &value, const irsdk_header* header, const char* data, const char* variable) {
 	if (header && data) {
 		for (int i = 0; i < header->numVars; i++) {
 			const irsdk_varHeader* rec = irsdk_getVarHeaderEntry(i);
@@ -556,10 +556,10 @@ void writeStandings(const irsdk_header *header, const char* data)
 				
 				printf("Car.%s.Time=%ld\n", carIdx1, (long)(normalize(atof(result)) * 1000));
 
-				float trackPositions[64];
+				char* trackPositions;
 				
-				if (getRawDataValue((char*)trackPositions, header, data, "CarIdxLapDistPct"))
-					printf("Car.%s.Lap.Running=%f\n", carIdx1, trackPositions[carIndex]);
+				if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct"))
+					printf("Car.%s.Lap.Running=%f\n", carIdx1, ((float*)trackPositions)[carIndex]);
 
 				getYamlValue(result, sessionInfo, "DriverInfo:Drivers:CarIdx:{%s}CarScreenName:", carIdx);
 				
@@ -880,7 +880,7 @@ int main(int argc, char* argv[])
 
 					continue;
 				}
-
+				writeStandings(pHeader, g_data);
 				if ((argc > 2) && (strcmp(argv[1], "-Pitstop") == 0)) {
 					if (strcmp(argv[2], "Set") == 0)
 						pitstopSetValues(pHeader, g_data, argv[3]);

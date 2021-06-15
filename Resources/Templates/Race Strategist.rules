@@ -133,7 +133,7 @@ updateFrontDelta(?, ?, ?, ?)
 
 updateBehindDelta(?, ?car, ?distance, ?delta) <= ?delta > 0, unbound?(!Position.Behind.Car), !, Set(Position.Behind.Car, ?car),					\
 												 Set(Position.Behind.Distance, ?distance), Set(Position.Behind.Delta, ?delta)
-updateBehindDelta(?, ?car, ?distance, ?delta) <= ?delta > 0, Get(Position.Front.Delta, ?curDelta), ?delta < ?curDelta,							\
+updateBehindDelta(?, ?car, ?distance, ?delta) <= ?delta > 0, Get(Position.Behind.Delta, ?curDelta), ?delta < ?curDelta,							\
 												 Set(Position.Behind.Car, ?car), Set(Position.Behind.Distance, ?distance),						\
 												 Set(Position.Behind.Delta, ?delta)
 updateBehindDelta(?, ?, ?, ?)
@@ -153,6 +153,7 @@ updateLeadDelta(?, ?, ?, ?)
 [?Pitstop.Lap] => (Prove: updatePitstopLap, ?Pitstop.Lap)
 priority: -20, [?Pitstop.Lap] => (Clear: Pitstop.Lap)
 
+updatePitstopLap(?lap) <= Get(Pitstop.Last, ?last), Get(Pitstop, ?last, Lap, ?lap), !
 updatePitstopLap(?lap) <= Get(Pitstop.Last, ?last), ?next = ?last + 1, Set(Pitstop, ?next, Lap, ?lap), Set(Pitstop.Last, ?next), !
 updatePitstopLap(?lap) <= Set(Pitstop.1.Lap, ?lap), Set(Pitstop.Last, 1)
 

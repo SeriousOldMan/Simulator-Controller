@@ -54,6 +54,7 @@ Race Assistant Configuration.3=%kResourcesDirectory%Rules\Session Information Re
 Race Assistant Configuration.4=%kResourcesDirectory%Rules\Weather Information Retrieval.rules <- %kSourcesDirectory%Assistants\Rules\Weather Information Retrieval.rules
 Race Assistant Configuration.5=%kResourcesDirectory%Rules\Pitstop Information Retrieval.rules <- %kSourcesDirectory%Assistants\Rules\Pitstop Information Retrieval.rules
 Race Assistant Configuration.6=%kResourcesDirectory%Rules\Lap Information Retrieval.rules <- %kSourcesDirectory%Assistants\Rules\Lap Information Retrieval.rules
+Race Assistant Configuration.7=%kResourcesDirectory%Rules\Standings Information Retrieval.rules <- %kSourcesDirectory%Assistants\Rules\Standings Information Retrieval.rules
 Race Engineer Configuration.1=%kConfigDirectory%Race Engineer.settings <- %kSourcesDirectory%Assistants\Race Engineer.settings
 Race Engineer Configuration.2=%kResourcesDirectory%Templates\Race Engineer.settings <- %kSourcesDirectory%Assistants\Race Engineer.settings
 Race Engineer Configuration.3=%kResourcesDirectory%Rules\Race Engineer.rules <- %kSourcesDirectory%Assistants\Rules\Race Engineer.rules

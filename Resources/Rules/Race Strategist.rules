@@ -120,27 +120,29 @@ updatePosition(?lap, ?car) <= carPosition(?car, ?position), Set(Standings.Lap, ?
 							  carLaps(?car, INCOMPLETE, ?carLaps), carLaps(!Driver.Car, INCOMPLETE, ?driverLaps), lapTime(?lap, ?lapTime),		\
 							  ?distance = ?driverLaps - ?carLaps, ?timeDelta = ?lapTime * ?distance,											\
 							  Set(Standings.Lap, ?lap, Car, ?car, Delta, ?timeDelta),															\
-							  Set(Standings.Lap, ?lap, Car, ?car, Laps, ?carLaps),																\
+							  Set(Standings.Lap, ?lap, Car, ?car, Laps, ?carLaps), 																\
 							  updateFrontDelta(?lap, ?car, ?distance, ?timeDelta), updateBehindDelta(?lap, ?car, ?distance, ?timeDelta),		\
 							  updateLeadDelta(?lap, ?car, ?distance, ?timeDelta), ?nextCar = ?car - 1, updatePosition(?lap, ?nextCar)
 
 updateFrontDelta(?, !Driver.Car, ?, ?) <= !
-updateFrontDelta(?, ?car, ?distance, ?delta) <= ?delta < 0, Get(Position.Front.Delta, ?curDelta), !, ?curDelta < 0, ?delta > ?curDelta,			\
+updateFrontDelta(?, ?car, ?distance, ?delta) <= ?delta < 0, unbound?(!Position.Front.Car), !, Set(Position.Front.Car, ?car),					\
+												Set(Position.Front.Distance, ?distance), Set(Position.Front.Delta, ?delta)
+updateFrontDelta(?, ?car, ?distance, ?delta) <= ?delta < 0, Get(Position.Front.Delta, ?curDelta), ?curDelta < 0, ?delta > ?curDelta,			\
 												Set(Position.Front.Car, ?car), Set(Position.Front.Distance, ?distance),							\
 												Set(Position.Front.Delta, ?delta)
-updateFrontDelta(?, ?car, ?distance, ?delta) <= ?delta < 0,	Set(Position.Front.Car, ?car), Set(Position.Front.Distance, ?distance),				\
-												Set(Position.Front.Delta, ?delta)
+updateFrontDelta(?, ?, ?, ?)
 
 updateBehindDelta(?, !Driver.Car, ?, ?) <= !
-updateBehindDelta(?, ?car, ?distance, ?delta) <= ?delta > 0, Get(Position.Front.Delta, ?curDelta), !, ?curDelta > 0, ?delta < ?curDelta,		\
+updateBehindDelta(?, ?car, ?distance, ?delta) <= ?delta > 0, unbound?(!Position.Behind.Car), !, Set(Position.Behind.Car, ?car),					\
+												 Set(Position.Behind.Distance, ?distance), Set(Position.Behind.Delta, ?delta)
+updateBehindDelta(?, ?car, ?distance, ?delta) <= ?delta > 0, Get(Position.Front.Delta, ?curDelta), ?curDelta > 0, ?delta < ?curDelta,			\
 												 Set(Position.Behind.Car, ?car), Set(Position.Behind.Distance, ?distance),						\
 												 Set(Position.Behind.Delta, ?delta)
-updateBehindDelta(?, ?car, ?distance, ?delta) <= ?delta > 0, Set(Position.Behind.Car, ?car), Set(Position.Behind.Distance, ?distance),			\
-												 Set(Position.Behind.Delta, ?delta)
+updateBehindDelta(?, ?, ?, ?)
 
-updateLeadDelta(?, !Position.Car, ?, ?) <= !
-updateLeadDelta(?lap, ?car, ?distance, ?delta) <= carPosition(?car, 1), Set(Position.Lead.Car, ?car),											\
+updateLeadDelta(?lap, ?car, ?distance, ?delta) <= carPosition(?car, 1), !, Set(Position.Lead.Car, ?car),										\
 												  Set(Position.Lead.Distance, ?distance), Set(Position.Lead.Delta, ?delta)
+updateLeadDelta(?, ?, ?, ?)												  
 
 
 ;;;-------------------------------------------------------------------------;;;

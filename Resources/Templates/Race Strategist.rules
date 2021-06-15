@@ -116,14 +116,15 @@ updatePosition(?, 0) <= !
 updatePosition(?lap, !Driver.Car) <= !, carPosition(!Driver.Car, ?position), Set(Position, ?position),											\
 									 Set(Standings.Lap, ?lap, Position, ?position), Set(Standings.Lap, ?lap, Car, !Driver.Car, Delta, 0),		\
 									 Set(Standings.Lap, ?lap, Car, !Driver.Car, Laps, ?lap),													\
+									 Set(Standings.Lap, ?lap, Car, !Driver.Car, Position, ?position),											\
 									 ?nextCar = !Driver.Car - 1, updatePosition(?lap, ?nextCar)
-updatePosition(?lap, ?car) <= carPosition(?car, ?position), Set(Standings.Lap, ?lap, Position, ?position),										\
-							  carLaps(?car, FULL, ?carLaps), carLaps(!Driver.Car, FULL, ?driverLaps), lapTime(?lap, ?lapTime),					\
-							  ?distance = ?driverLaps - ?carLaps, ?timeDelta = ?lapTime * ?distance,											\
-							  Set(Standings.Lap, ?lap, Car, ?car, Delta, ?timeDelta),															\
-							  Set(Standings.Lap, ?lap, Car, ?car, Laps, ?carLaps), 																\
-							  updateFrontDelta(?lap, ?car, ?distance, ?timeDelta), updateBehindDelta(?lap, ?car, ?distance, ?timeDelta),		\
-							  updateLeadDelta(?lap, ?car, ?distance, ?timeDelta), ?nextCar = ?car - 1, updatePosition(?lap, ?nextCar)
+updatePosition(?lap, ?car) <= carPosition(?car, ?position), carLaps(?car, FULL, ?carLaps), carLaps(!Driver.Car, FULL, ?driverLaps),				\
+							  lapTime(?lap, ?lapTime), ?distance = ?driverLaps - ?carLaps, ?delta = ?lapTime * ?distance,						\
+							  Set(Standings.Lap, ?lap, Car, ?car, Delta, ?delta),																\
+							  Set(Standings.Lap, ?lap, Car, ?car, Laps, ?carLaps),																\
+							  Set(Standings.Lap, ?lap, Car, ?car, Position, ?position), 														\
+							  updateFrontDelta(?lap, ?car, ?distance, ?delta), updateBehindDelta(?lap, ?car, ?distance, ?delta),				\
+							  updateLeadDelta(?lap, ?car, ?distance, ?delta), ?nextCar = ?car - 1, updatePosition(?lap, ?nextCar)
 
 updateFrontDelta(?, ?car, ?distance, ?delta) <= ?delta < 0, unbound?(!Position.Front.Car), !, Set(Position.Front.Car, ?car),					\
 												Set(Position.Front.Distance, ?distance), Set(Position.Front.Delta, ?delta)

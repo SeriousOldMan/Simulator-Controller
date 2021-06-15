@@ -170,7 +170,7 @@ class RaceStrategist extends RaceAssistant {
 		if !this.hasEnoughData()
 			return
 		
-		if (Round(knowledgeBase.getValue("Position", 0)) = Round(knowledgeBase.getValue("Cars.Count", 0)))
+		if (Round(knowledgeBase.getValue("Position", 0)) = Round(knowledgeBase.getValue("Car.Count", 0)))
 			this.getSpeaker().speakPhrase("NoGapToBehind")
 		else {
 			delta := Abs(Round(knowledgeBase.getValue("Position.Behind.Delta", 0) / 1000, 1))

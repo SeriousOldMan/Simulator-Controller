@@ -116,7 +116,7 @@ updatePosition(?lap, !Driver.Car) <= !, carPosition(!Driver.Car, ?position), Set
 									 Set(Standings.Lap, ?lap, Position, ?position), Set(Standings.Lap, ?lap, Car, !Driver.Car, Delta, 0),		\
 									 Set(Standings.Lap, ?lap, Car, !Driver.Car, Laps, ?lap),													\
 									 ?nextCar = !Driver.Car - 1, updatePosition(?lap, ?nextCar)
-updatePosition(?lap, ?car) <= Call(msgBox, ?lap, ?car), carPosition(?car, ?position), Call(msgBox, ?position), Set(Standings.Lap, ?lap, Position, ?position),										\
+updatePosition(?lap, ?car) <= carPosition(?car, ?position), Set(Standings.Lap, ?lap, Position, ?position),										\
 							  carLaps(?car, INCOMPLETE, ?carLaps), carLaps(!Driver.Car, INCOMPLETE, ?driverLaps), lapTime(?lap, ?lapTime),		\
 							  ?distance = ?driverLaps - ?carLaps, ?timeDelta = ?lapTime * ?distance,											\
 							  Set(Standings.Lap, ?lap, Car, ?car, Delta, ?timeDelta),															\

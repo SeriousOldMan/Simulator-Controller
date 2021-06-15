@@ -103,9 +103,6 @@ namespace RF2SHMReader {
 		}
 
 		public void ReadStandings() {
-			rF2VehicleScoring playerScoring = GetPlayerScoring(ref scoring);
-			rF2VehicleTelemetry playerTelemetry = GetPlayerTelemetry(playerScoring.mID, ref telemetry);
-
 			Console.WriteLine("[Position Data]");
 
 			Console.Write("Car.Count="); Console.WriteLine(scoring.mScoringInfo.mNumVehicles);
@@ -116,7 +113,7 @@ namespace RF2SHMReader {
 				Console.Write("Car."); Console.Write(i); Console.Write(".Position="); Console.WriteLine(vehicle.mPlace);
 
 				Console.Write("Car."); Console.Write(i); Console.Write(".Lap="); Console.WriteLine(vehicle.mTotalLaps);
-				Console.Write("Car."); Console.Write(i); Console.Write(".Lap.Running="); Console.WriteLine(vehicle.mPathLateral);
+				Console.Write("Car."); Console.Write(i); Console.Write(".Lap.Running="); Console.WriteLine(vehicle.mLapDist / scoring.mScoringInfo.mLapDist);
 
 				Console.Write("Car."); Console.Write(i); Console.Write(".Time="); Console.WriteLine(Math.Round(Normalize(vehicle.mLastLapTime) * 1000));
 

@@ -73,6 +73,12 @@
 
 [Virtual Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist)
 ------
+  - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#introduction)
+  - [Installation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#installation)
+  - [Interacting with Cato](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#interacting-with-cato)
+  - [Technical Information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#technical-information)
+    - [Data acquisition](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#data-acquisition)
+  - [Troubleshooting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#troubleshooting)
 
 [Development Guide](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts)
 ------

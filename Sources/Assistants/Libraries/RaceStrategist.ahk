@@ -103,6 +103,8 @@ class RaceStrategist extends RaceAssistant {
 				this.gapToBehindRecognized(words)
 			case "GapToLead":
 				this.gapToLeadRecognized(words)
+			case "LapTimes":
+				this.lapTimesInfoRecognized(words)
 			default:
 				base.handleVoiceCommand(grammar, words)
 		}
@@ -192,6 +194,23 @@ class RaceStrategist extends RaceAssistant {
 		
 			this.getSpeaker().speakPhrase("GapToLead", {delta: Format("{:.1f}", delta)})
 		}
+	}
+	
+	lapTimesInfoRecognized(words) {
+		local knowledgeBase := this.KnowledgeBase
+		
+		if !this.hasEnoughData()
+			return
+		
+		car := knowledgeBase.getValue("Driver.Car", 0)
+		lap := knowledgeBase.getValue("Lap", 0)
+		
+		lapTime := Round(knowledgeBase.getValue("Car." . car . ".Time") / 1000, 1)
+		
+		if (lap == 0)
+			this.getSpeaker().speakPhrase("Later")
+		else
+			this.getSpeaker().speakPhrase("LapTime", {time: lapTime})
 	}
 	
 	createSession(data) {

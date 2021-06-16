@@ -217,7 +217,7 @@ class RaceAssistant extends ConfigurationItem {
 	}
 	
 	__New(configuration, assistantType, settings, name := false, language := "__Undefined__", speaker := false, listener := false, voiceServer := false) {
-		this.iDebug := (true || isDebug() ? kDebugKnowledgeBase : kDebugOff)
+		this.iDebug := (isDebug() ? kDebugKnowledgeBase : kDebugOff)
 		this.iAssistantType := assistantType
 		this.iSettings := settings
 		

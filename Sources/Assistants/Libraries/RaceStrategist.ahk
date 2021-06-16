@@ -197,15 +197,17 @@ class RaceStrategist extends RaceAssistant {
 	}
 	
 	reportLapTime(phrase, driverLapTime, car) {
-		lapTime := Round(knowledgeBase.getValue("Car." . car . ".Time", false) / 1000, 1)
+		lapTime := Round(this.KnowledgeBase.getValue("Car." . car . ".Time", false) / 1000, 1)
 		
 		if lapTime {
-			this.getSpeaker().speakPhrase(phrase, {time: lapTime})
+			speaker := this.getSpeaker()
+			
+			speaker.speakPhrase(phrase, {time: lapTime})
 			
 			delta := (driverLapTime - lapTime)
 		
 			if (Abs(delta) > 0.5)
-				this.getSpeaker().speakPhrase("LapTimeDelta", {delta: delta, difference: fragments[(delta > 0) ? "Faster" : "Slower"]})
+				this.getSpeaker().speakPhrase("LapTimeDelta", {delta: Format("{:.1f}", delta), difference: speaker.Fragments[(delta > 0) ? "Faster" : "Slower"]})
 		}
 	}
 	
@@ -225,10 +227,7 @@ class RaceStrategist extends RaceAssistant {
 		if (lap == 0)
 			this.getSpeaker().speakPhrase("Later")
 		else {
-			speaker := this.getSpeaker()
-			fragments := speaker.Fragments
-		
-			speaker.speakPhrase("LapTime", {time: driverLapTime})
+			this.getSpeaker().speakPhrase("LapTime", {time: driverLapTime})
 		
 			if (position > 2)
 				this.reportLapTime("LapTimeFront", driverLapTime, knowledgeBase.getValue("Position.Front.Car", 0))

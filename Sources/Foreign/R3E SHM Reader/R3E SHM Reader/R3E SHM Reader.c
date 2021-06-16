@@ -147,8 +147,8 @@ int main(int argc, char* argv[])
 			
 			wprintf_s(L"Car.%d.Position=%d\n", i, vehicle.place);
 			wprintf_s(L"Car.%d.Lap=%d\n", i, vehicle.completed_laps);
-			wprintf_s(L"Car.%d.Lap.Running=%f\n", i, vehicle.lap_distance);
-			wprintf_s(L"Car.%d.Time=%ld\n", i, (long)(vehicle.lap_time_current_self * 1000));
+			wprintf_s(L"Car.%d.Lap.Running=%f\n", i, (float)((double)(vehicle.lap_distance / map_buffer->lap_distance) * map_buffer->lap_distance_fraction));
+			wprintf_s(L"Car.%d.Time=%ld\n", i, (long)((vehicle.sector_time_previous_self[0] + vehicle.sector_time_previous_self[1] + vehicle.sector_time_previous_self[2]) * 1000));
 			
 			char buffer[33];
 

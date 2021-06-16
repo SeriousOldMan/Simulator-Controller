@@ -106,7 +106,7 @@ projectedTyreTemperature(?lap, ?temperature) <=																									\
 
 priority: 5, {Any: [?Lap], [?Sector]} => (Clear: Position.Front.Car), (Clear: Position.Front.Distance), (Clear: Position.Front.Delta),			\
 										 (Clear: Position.Behind.Car), (Clear: Position.Behind.Distance), (Clear: Position.Behind.Delta),		\
-										 (Clear: Position.Lead.Car), (Clear: Position.Lead.Distance), (Clear: Position.Lead.Delta)
+										 (Clear: Position.Leader.Car), (Clear: Position.Leader.Distance), (Clear: Position.Leader.Delta)
 {Any: [?Lap], [?Sector]} => (Prove: updateStandings, ?Lap)
 priority: -5, [?Sector] => (Clear: Sector)
 
@@ -140,8 +140,8 @@ updateBehindDelta(?, ?car, ?distance, ?delta) <= ?delta > 0, Get(Position.Behind
 												 Set(Position.Behind.Delta, ?delta)
 updateBehindDelta(?, ?, ?, ?)
 
-updateLeadDelta(?lap, ?car, ?distance, ?delta) <= carPosition(?car, 1), !, Set(Position.Lead.Car, ?car),										\
-												  Set(Position.Lead.Distance, ?distance), Set(Position.Lead.Delta, ?delta)
+updateLeadDelta(?lap, ?car, ?distance, ?delta) <= carPosition(?car, 1), !, Set(Position.Leader.Car, ?car),										\
+												  Set(Position.Leader.Distance, ?distance), Set(Position.Leader.Delta, ?delta)
 updateLeadDelta(?, ?, ?, ?)												  
 
 

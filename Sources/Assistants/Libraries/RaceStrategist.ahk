@@ -190,7 +190,7 @@ class RaceStrategist extends RaceAssistant {
 		if (Round(knowledgeBase.getValue("Position", 0)) = 1)
 			this.getSpeaker().speakPhrase("NoGapToFront")
 		else {
-			delta := Abs(Round(knowledgeBase.getValue("Position.Lead.Delta", 0) / 1000, 1))
+			delta := Abs(Round(knowledgeBase.getValue("Position.Leader.Delta", 0) / 1000, 1))
 		
 			this.getSpeaker().speakPhrase("GapToLead", {delta: Format("{:.1f}", delta)})
 		}
@@ -204,13 +204,40 @@ class RaceStrategist extends RaceAssistant {
 		
 		car := knowledgeBase.getValue("Driver.Car", 0)
 		lap := knowledgeBase.getValue("Lap", 0)
+		position := Round(knowledgeBase.getValue("Position", 0))
+		cars := Round(knowledgeBase.getValue("Car.Count", 0))
 		
 		lapTime := Round(knowledgeBase.getValue("Car." . car . ".Time") / 1000, 1)
 		
 		if (lap == 0)
 			this.getSpeaker().speakPhrase("Later")
-		else
+		else {
 			this.getSpeaker().speakPhrase("LapTime", {time: lapTime})
+		
+			if (position > 1) {
+				car := knowledgeBase.getValue("Position.Front.Car", 0)
+				lapTime := Round(knowledgeBase.getValue("Car." . car . ".Time") / 1000, false)
+				
+				if lapTime
+					this.getSpeaker().speakPhrase("LapTimeFront", {time: lapTime})
+			}
+			
+			if (position < cars) {
+				car := knowledgeBase.getValue("Position.Behind.Car", 0)
+				lapTime := Round(knowledgeBase.getValue("Car." . car . ".Time") / 1000, false)
+				
+				if lapTime
+					this.getSpeaker().speakPhrase("LapTimeBehind", {time: lapTime})
+			}
+			
+			if (position > 1) {
+				car := knowledgeBase.getValue("Position.Leader.Car", 0)
+				lapTime := Round(knowledgeBase.getValue("Car." . car . ".Time") / 1000, false)
+				
+				if lapTime
+					this.getSpeaker().speakPhrase("LapTimeLeader", {time: lapTime})
+			}
+		}
 	}
 	
 	createSession(data) {

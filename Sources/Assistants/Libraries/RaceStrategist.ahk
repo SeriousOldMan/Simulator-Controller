@@ -140,15 +140,16 @@ class RaceStrategist extends RaceAssistant {
 	positionRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
 		
-		if !this.hasEnoughData()
-			return
-		
 		position := Round(knowledgeBase.getValue("Position", 0))
 		
-		this.getSpeaker().speakPhrase("Position", {position: position})
-		
-		if (position <= 3)
-			this.getSpeaker().speakPhrase("Great")
+		if (position == 0)
+			this.getSpeaker().speakPhrase("Later")
+		else {
+			this.getSpeaker().speakPhrase("Position", {position: position})
+			
+			if (position <= 3)
+				this.getSpeaker().speakPhrase("Great")
+		}
 	}
 	
 	gapToFrontRecognized(words) {
@@ -201,6 +202,7 @@ class RaceStrategist extends RaceAssistant {
 		
 		if lapTime {
 			speaker := this.getSpeaker()
+			fragments := speaker.Fragments
 			
 			speaker.speakPhrase(phrase, {time: Format("{:.1f}", lapTime)})
 			

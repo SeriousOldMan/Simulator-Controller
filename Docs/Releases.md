@@ -2,12 +2,15 @@
 
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. Multiple actions can be bound to one controller functions. Useful, to group several activation actions into one toggle switch for example.
-  4. Model and initial rule set for race standings has been implemented for Cato, the Virtual Race Strategist.
-  5. iRacing data acquisition for Cato, the Virtual Race Strategist.
-  6. rFactor 2 data acquisition for Cato, the Virtual Race Strategist.
-  7. RaceRoom Racing Experience data acquisition for Cato, the Virtual Race Strategist.
-  8. [For Developer]: Refactored *RaceEngineerSimulatorPlugin* into *RaceAssistantSimulatorPlugin*, which now can handle multiple race assistants.
+  3. Multiple actions can be bound to one controller functions. Useful, to group several activation actions into one toggle switch for example. Please consult the [revised documentation](*) for more details, if you want to use this new feature.
+  4. The [documentation](*) for the Virtual Race Strategist has been extendend - give it a read...
+  4. Model and initial rule set for race standings, lap time analysis and gaps between cars have been implemented for Cato, the Virtual Race Strategist.
+  5. New iRacing data acquisition for Cato, the Virtual Race Strategist.
+  6. New rFactor 2 data acquisition for Cato, the Virtual Race Strategist.
+  7. New  RaceRoom Racing Experience data acquisition for Cato, the Virtual Race Strategist.
+  8. [For Developers]:
+     - Refactored *RaceEngineerSimulatorPlugin* into *RaceAssistantSimulatorPlugin*, which now can handle multiple race assistants.
+	 - Refactord the *getAction* and *fireAction* methods of *SimulatorController* into *getActions* and *fireActions* for multiple actions per controller function.
 
 ## 3.1.0-release 06/11/21
 

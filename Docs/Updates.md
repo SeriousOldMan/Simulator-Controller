@@ -47,12 +47,21 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ***
 
+## Release 3.1.2
+
+This release takes the next step for Cato, the Virtual Race Strategist and introduces integrations for iRacing, rFactor 2 and RaceRoom Racing Experience. Nothing to do here on your side. Small adaptions may be necessary for:
+
+  - A new plugin parameter *raceStrategist* has been implemented for the ["Race Strategist" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-strategist), which allows you to enable or disble the assistant from your controller hardware. Maybe you want to add this parameter to your configuration.
+  - [For Developers]: The class *RaceEngineerSimulatorPlugin* has been renamed to *RaceAssistantSimulatorPlugin* the methods *getAction* and *fireAction* of the class *SimulatorController* have been renamed to *getActions* and *fireActions* and now support multiple actions for one controller function.
+
+***
+
 ## Release 3.1.0
 
 Release 3.1 introduces a new assistant, Cato, the Virtual Race Strategist. The new assistant, although fully integrated already, does not do anything useful yet (you can ask for info about the remaining laps and upcoming weather changes for demo purposes, though), so you can ignore it for the moment. But to integrate the new assistant in Simulator Controller, a lot of small changes were necessary:
 
   - The voice handling framework now supports multiple different active communication partners. Each one must have an activation command to *focus* the voice recognition for this communication partner (see the [new documentation for voice control](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#voice-commands) for more information).
-  - A new plugin has been created for the control of the new Virtual Race Strategist. Please take a look at the documentation of the ["Race Strategist" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#voice-commands) for more information. This plugin will be added automatically to your configuration, but it will be deactivated by default.
+  - A new plugin has been created for the control of the new Virtual Race Strategist. Please take a look at the documentation of the ["Race Strategist" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-strategist) for more information. This plugin will be added automatically to your configuration, but it will be deactivated by default.
   - [Mostly for Developers]: A lot of files were moved to new locations in the course of the integration of Cato. This will be handled by the automated update procedure. Affected are Plugin Labels, Translations, Grammars and Rules. If you have created your own translations for example, you will find those files from now on in the *Simulator Controller\Translations* folder, which is located in your user *Documents* folder. Furthermore, the Rules files had been split apart to allow for a more modular approach.
   
   | Files | Old Location | New Standard Location | New User Location |

@@ -749,6 +749,24 @@ updateConfigurationForV20() {
 	updateCustomCalls(13, 32)
 }
 
+updatePluginsForV312() {
+	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	userConfiguration := readConfiguration(userConfigurationFile)
+	
+	if (userConfiguration.Count() > 0)
+		if getConfigurationValue(userConfiguration, "Plugins", "Race Strategist", false) {
+			raceStrategistPlugin := new Plugin("Race Strategist", userConfiguration)
+				
+			if (raceStrategistPlugin.getArgumentValue("raceStrategistName", "Toni") = "Toni") {
+				raceStrategistPlugin.setArgumentValue("raceStrategistName", "Cato")
+				
+				raceStrategistPlugin.saveToConfiguration(userConfiguration)
+			
+				writeConfiguration(userConfigurationFile, userConfiguration)
+			}
+		}
+}
+
 updatePluginsForV310() {
 	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
 	userConfiguration := readConfiguration(userConfigurationFile)

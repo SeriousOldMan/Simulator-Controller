@@ -26,7 +26,9 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-None for the moment...
+[3.1.2-beta](https://www.dropbox.com/s/pcitc73i50hcifs/Simulator%20Controller%203.1.2-beta.zip?dl=1) (Initial version for Release 3.1.2. New features: Support for multiple aaction for one controller function, New plugin argument "raceStrategist", First Rule Set for Race Strategist, iRacing integration for Race Strategist, rFactor 2 integration for Race Strategist, RaceRoom Racing Experience integration for Race Strategist. Feature complete, stable, incl. documentation and update procedure.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-312) of this version and all the versions you might have skipped, before installing and using this version.
 
 #### Latest release builds
 

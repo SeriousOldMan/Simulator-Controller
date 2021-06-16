@@ -202,12 +202,13 @@ class RaceStrategist extends RaceAssistant {
 		if lapTime {
 			speaker := this.getSpeaker()
 			
-			speaker.speakPhrase(phrase, {time: lapTime})
+			speaker.speakPhrase(phrase, {time: Format("{:.1f}", lapTime)})
 			
 			delta := (driverLapTime - lapTime)
 		
 			if (Abs(delta) > 0.5)
-				this.getSpeaker().speakPhrase("LapTimeDelta", {delta: Format("{:.1f}", delta), difference: speaker.Fragments[(delta > 0) ? "Faster" : "Slower"]})
+				this.getSpeaker().speakPhrase("LapTimeDelta", {delta: Format("{:.1f}", delta)
+															 , difference: (delta > 0) ? fragments["Faster"] : fragments["Slower"]})
 		}
 	}
 	
@@ -227,7 +228,7 @@ class RaceStrategist extends RaceAssistant {
 		if (lap == 0)
 			this.getSpeaker().speakPhrase("Later")
 		else {
-			this.getSpeaker().speakPhrase("LapTime", {time: driverLapTime})
+			this.getSpeaker().speakPhrase("LapTime", {time: Format("{:.1f}", driverLapTime)})
 		
 			if (position > 2)
 				this.reportLapTime("LapTimeFront", driverLapTime, knowledgeBase.getValue("Position.Front.Car", 0))

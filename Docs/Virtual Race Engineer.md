@@ -6,13 +6,15 @@ Ok, enough marketing bullshit. Jona is a voice chat bot with a special knowledge
 
 ***
 
-Before we head on, an important note: The current version of Jona uses the local offline speech generation and recognition framework, that is built into Windows, which is not on par with current cloud based solutions. In the future, there will be the option to use a cloud based voice recognition integration insteaad of this Windows local offline speech recognition runtime. Although a cloud based solution might impose a pay wall depending on your usage, this will be quite negliable. And, last but not least, I have concepts for a server based solution in the drawer, which will allow Jona to act as a race engineer for a complete team multiplayer endurance race. But this will be quite a huge undertaking and will take a while, depending on my available time to invest in this project.
+Before we head on, an important note: The current version of the race assistants uses the local offline speech generation and recognition framework, that is built into Windows, which is not on par with current cloud based solutions. In the future, there will be the option to use a cloud based voice recognition integration insteaad of this Windows local offline speech recognition runtime. Although a cloud based solution might impose a pay wall depending on your usage, this will be quite negliable. And, last but not least, I have concepts for a server based solution in the drawer, which will allow Jona to act as a race engineer for a complete team multiplayer endurance race. But this will be quite a huge undertaking and will take a while, depending on my available time to invest in this project.
 
 ***
 
 As said above, Jona is a voice chat bot and therefore you can control Jona completely by voice. If you don't want to use voice control, there are other possibilities as well. More on that later in this documentation.
 
 Before we dig deeper into the inner workings, here is a typical dialog based interaction, to give you an understanding of the current capabilities of Jona.
+
+Important: If you have multiple *dialog partners* active, for example Jona and Cato, it will benecessary to use the [activation phrase](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#voice-commands) the first time you start talking to a specific *dialog partner*.
 
 ### A typical dialog
 
@@ -127,7 +129,7 @@ Jona acquires telemetry data from the different simulation games using so called
 
 ## Interacting with Jona
 
-Although it is possible, to [use Jona without voice interaction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer), it is not much fun. But to have fun with Jona, you must understand, how the interaction is structured, since in the end, Jona is stupid as bread and only reacts to strong standard patterns. For each language you want to use to interact with Jona, a so called grammar file must exist. As said, grammars for English and German are already there. The grammar files are named "Race Engineer.grammars.XX", where XX is the two letter ISO language code. These files reside in a special folder directory, either in the *Resources\Grammars* folder of Simulator Controller or in the *Simulator Controller\Grammars* folder in your user *Documents* folder. The later means, that you are able to provide your own grammar files or *overwrite* the existing ones. But be careful with overwriting, since this will introduce a pain in the a..., when updating to new versions.
+Although it is possible, to [use parts of Jona without voice interaction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer), it is not much fun. But to have fun with Jona, you must understand, how the interaction is structured, since in the end, Jona is stupid as bread and only reacts to strong standard patterns. For each language you want to use to interact with Jona, a so called grammar file must exist. As said, grammars for English and German are already there. The grammar files are named "Race Engineer.grammars.XX", where XX is the two letter ISO language code. These files reside in a special folder directory, either in the *Resources\Grammars* folder of Simulator Controller or in the *Simulator Controller\Grammars* folder in your user *Documents* folder. The later means, that you are able to provide your own grammar files or *overwrite* the existing ones. But be careful with overwriting, since this will introduce a pain in the a..., when updating to new versions.
 
 Tha grammar files define the input patterns which Jona uses to understand you and also all reactions of Jona as predefined phrases. For each reaction, an unlimited number of phrases may exist (typically 2-4 different ones in the predefined grammar files) to provide for an entertaining variety of answers.
 
@@ -178,7 +180,7 @@ For the reactions of Jona, the format is much more simple. It looks like this:
 
 As you can see here, each phrase provides different alternative sentences. Variables may be used here as well.
 
-I strongly recommed to memorize the phrases in the language you use to interact with Jona. You will always find the current version of the grammar files in the *Config* folder of the Simulator Controller distribution. Or you can take a look at the files in the [Resources\Grammars directory on GitHub](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Resources/Grammars), for example the German version [Race Engineer.grammars.de](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Grammars/Race%20Engineer.grammars.de).
+I strongly recommed to memorize the phrases in the language you use to interact with Jona. You will always find the current version of the grammar files in the *Resources\Grammars* folder of the Simulator Controller distribution. Or you can take a look at the files in the [Resources\Grammars directory on GitHub](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Resources/Grammars), for example the German version [Race Engineer.grammars.de](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Grammars/Race%20Engineer.grammars.de).
 
 ## Racing with Jona
 

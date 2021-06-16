@@ -102,7 +102,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 						this.findAction(this.Plugin.getLabel(ConfigurationItem.descriptor(effect, "Toggle"), effect)).updateLabel(state)
 			
 				if inList(this.Controller.ActiveModes, this)
-					this.findAction("Motion Intensity").updateLabel(isInfo ? "Info" : "Normal")
+					this.findAction(this.Plugin.getLabel(ConfigurationItem.descriptor("Motion Intensity", "Dial"), "Motion Intensity")).updateLabel(isInfo ? "Info" : "Normal")
 			
 				isInfo := !isInfo
 			}
@@ -212,8 +212,8 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	}
 			
 	class MotionIntensityAction extends MotionFeedbackPlugin.MotionModeAction {
-		__New(function, motionMode) {
-			base.__New(function, motionMode, "Motion Intensity")
+		__New(function, motionMode, label) {
+			base.__New(function, motionMode, label)
 		}
 		
 		fireAction(function, trigger) {
@@ -409,7 +409,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		function := this.Controller.findFunction(descriptor)
 		
 		if (function != false)
-			this.registerAction(new this.MotionToggleAction(function, "Motion"))
+			this.registerAction(new this.MotionToggleAction(function, this.getLabel(ConfigurationItem.descriptor("Motion", "Toggle"), "Motion")))
 		else
 			this.logFunctionNotFound(descriptor)
 		
@@ -421,7 +421,8 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		function := this.Controller.findFunction(descriptor)
 		
 		if (function != false)
-			motionMode.registerAction(new this.MotionIntensityAction(function, motionMode))
+			motionMode.registerAction(new this.MotionIntensityAction(function, motionMode
+																   , this.getLabel(ConfigurationItem.descriptor("Motion Intensity", "Dial"), "Motion Intensity")))
 		else
 			this.logFunctionNotFound(descriptor)
 		
@@ -542,7 +543,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	
 		isRunning := this.Application.isRunning()
 		
-		action := this.findAction("Motion")
+		action := this.findAction(this.getLabel(ConfigurationItem.descriptor("Motion", "Toggle"), "Motion"))
 		
 		action.Function.setText(this.actionLabel(action), isRunning ? (action.Active ? "Green" : "Black") : "Olive")
 			
@@ -942,7 +943,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			protectionOff()
 		}
 
-		SetTimer updateMotionState, % isRunning ? 5000 : 1000
+		SetTimer updateMotionState, % isRunning ? 10000 : 5000
 	}
 }
 
@@ -1013,12 +1014,13 @@ initializeMotionFeedbackPlugin() {
 ;;;-------------------------------------------------------------------------;;;
 
 startMotion() {
+	local plugin := SimulatorController.Instance.findPlugin(kMotionFeedbackPlugin)
 	local action
 	
 	protectionOn()
 	
 	try {
-		action := SimulatorController.Instance.findPlugin(kMotionFeedbackPlugin).findAction("Motion")
+		action := plugin.findAction(plugin.getLabel(ConfigurationItem.descriptor("Motion", "Toggle"), "Motion"))
 	
 		action.fireAction(action.Function, "On")
 	}
@@ -1028,12 +1030,13 @@ startMotion() {
 }
 
 stopMotion() {
+	local plugin := SimulatorController.Instance.findPlugin(kMotionFeedbackPlugin)
 	local action
 	
 	protectionOn()
 	
 	try {
-		action := SimulatorController.Instance.findPlugin(kMotionFeedbackPlugin).findAction("Motion")
+		action := plugin.findAction(plugin.getLabel(ConfigurationItem.descriptor("Motion", "Toggle"), "Motion"))
 	
 		action.fireAction(action.Function, "Off")
 	}

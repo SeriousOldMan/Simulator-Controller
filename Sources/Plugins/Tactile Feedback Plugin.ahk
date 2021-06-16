@@ -197,15 +197,15 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		frontChassisVibrationArguments := string2Values(A_Space, this.getArgumentValue("frontChassisVibration", ""))
 		rearChassisVibrationArguments := string2Values(A_Space, this.getArgumentValue("rearChassisVibration", ""))
 		
-		this.createPluginToggleAction("Pedal Vibration", "togglePedalVibration", pedalVibrationArguments[2], (pedalVibrationArguments[1] = "On"))
-		this.createPluginToggleAction("Front Vibration", "toggleFrontChassisVibration", frontChassisVibrationArguments[2], (frontChassisVibrationArguments[1] = "On"))
-		this.createPluginToggleAction("Rear Vibration", "toggleRearChassisVibration", rearChassisVibrationArguments[2], (rearChassisVibrationArguments[1] = "On"))
+		this.createPluginToggleAction("PedalVibration", "togglePedalVibration", pedalVibrationArguments[2], (pedalVibrationArguments[1] = "On"))
+		this.createPluginToggleAction("FrontVibration", "toggleFrontChassisVibration", frontChassisVibrationArguments[2], (frontChassisVibrationArguments[1] = "On"))
+		this.createPluginToggleAction("RearVibration", "toggleRearChassisVibration", rearChassisVibrationArguments[2], (rearChassisVibrationArguments[1] = "On"))
 		
 		pedalMode := new this.PedalVibrationMode(this)
 		
 		this.iPedalVibrationMode := pedalMode
 		
-		this.createPluginDialAction(pedalMode, "Pedal Vibration", "Pedal", pedalVibrationArguments[3])
+		this.createPluginDialAction(pedalMode, "Pedal", pedalVibrationArguments[3])
 		
 		for ignore, effect in string2Values(",", this.getArgumentValue("pedalEffects", ""))
 			this.createModeAction(controller, pedalMode, string2Values(A_Space, effect)*)
@@ -214,8 +214,8 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		
 		this.iChassisVibrationMode := chassisMode
 		
-		this.createPluginDialAction(chassisMode, "Front Vibration", "FrontChassis", frontChassisVibrationArguments[3])
-		this.createPluginDialAction(chassisMode, "Rear Vibration", "RearChassis", rearChassisVibrationArguments[3])
+		this.createPluginDialAction(chassisMode, "FrontChassis", frontChassisVibrationArguments[3])
+		this.createPluginDialAction(chassisMode, "RearChassis", rearChassisVibrationArguments[3])
 	
 		for ignore, effect in string2Values(",", this.getArgumentValue("chassisEffects", ""))
 			this.createModeAction(controller, chassisMode, string2Values(A_Space, effect)*)
@@ -223,24 +223,24 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		controller.registerPlugin(this)
 	}
 
-	createPluginToggleAction(label, command, descriptor, initialState) {
+	createPluginToggleAction(toggle, command, descriptor, initialState) {
 		local function
 		
 		if (descriptor != false) {
 			function := this.Controller.findFunction(descriptor)
 			
 			if (function != false)
-				this.registerAction(new this.FXToggleAction(function, label, command, initialState))
+				this.registerAction(new this.FXToggleAction(function, this.getLabel(ConfigurationItem.descriptor(toggle, "Toggle"), toggle), command, initialState))
 			else
 				this.logFunctionNotFound(descriptor)
 		}
 	}
 
-	createPluginDialAction(mode, label, effect, descriptor) {
+	createPluginDialAction(mode, effect, descriptor) {
 		local function := this.Controller.findFunction(descriptor)
 		
 		if (function != false)
-			mode.registerAction(new this.FXChangeAction(function, label, effect, kIncrease, kDecrease))
+			mode.registerAction(new this.FXChangeAction(function, this.getLabel(ConfigurationItem.descriptor(effect, "Dial"), effect), effect, kIncrease, kDecrease))
 		else
 			this.logFunctionNotFound(descriptor)
 	}
@@ -387,37 +387,43 @@ callSimHub(command) {
 }
 
 activatePedalVibration() {
-	local action := SimulatorController.Instance.findPlugin(kTactileFeedbackPlugin).findAction("Pedal Vibration")
+	local plugin := SimulatorController.Instance.findPlugin(kTactileFeedbackPlugin)
+	local action := plugin.findAction(plugin.getLabel(ConfigurationItem.descriptor("PedalVibration", "Toggle"), "PedalVibration"))
 	
 	action.fireAction(action.Function, "On")
 }
 
 deactivatePedalVibration() {
-	local action := SimulatorController.Instance.findPlugin(kTactileFeedbackPlugin).findAction("Pedal Vibration")
+	local plugin := SimulatorController.Instance.findPlugin(kTactileFeedbackPlugin)
+	local action := plugin.findAction(plugin.getLabel(ConfigurationItem.descriptor("PedalVibration", "Toggle"), "PedalVibration"))
 	
 	action.fireAction(action.Function, "Off")
 }
 
 activateFrontChassisVibration() {
-	local action := SimulatorController.Instance.findPlugin(kTactileFeedbackPlugin).findAction("Front Vibration")
+	local plugin := SimulatorController.Instance.findPlugin(kTactileFeedbackPlugin)
+	local action := plugin.findAction(plugin.getLabel(ConfigurationItem.descriptor("FrontVibration", "Toggle"), "FrontVibration"))
 	
 	action.fireAction(action.Function, "On")
 }
 
 deactivateFrontChassisVibration() {
-	local action := SimulatorController.Instance.findPlugin(kTactileFeedbackPlugin).findAction("Front Vibration")
+	local plugin := SimulatorController.Instance.findPlugin(kTactileFeedbackPlugin)
+	local action := plugin.findAction(plugin.getLabel(ConfigurationItem.descriptor("FrontVibration", "Toggle"), "FrontVibration"))
 	
 	action.fireAction(action.Function, "Off")
 }
 
 activateRearChassisVibration() {
-	local action := SimulatorController.Instance.findPlugin(kTactileFeedbackPlugin).findAction("Rear Vibration")
+	local plugin := SimulatorController.Instance.findPlugin(kTactileFeedbackPlugin)
+	local action := plugin.findAction(plugin.getLabel(ConfigurationItem.descriptor("RearVibration", "Toggle"), "RearVibration"))
 	
 	action.fireAction(action.Function, "On")
 }
 
 deactivateRearChassisVibration() {
-	local action := SimulatorController.Instance.findPlugin(kTactileFeedbackPlugin).findAction("Rear Vibration")
+	local plugin := SimulatorController.Instance.findPlugin(kTactileFeedbackPlugin)
+	local action := plugin.findAction(plugin.getLabel(ConfigurationItem.descriptor("RearVibration", "Toggle"), "RearVibration"))
 	
 	action.fireAction(action.Function, "Off")
 }

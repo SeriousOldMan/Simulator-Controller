@@ -196,6 +196,19 @@ class RaceStrategist extends RaceAssistant {
 		}
 	}
 	
+	reportLapTime(phrase, driverLapTime, car) {
+		lapTime := Round(knowledgeBase.getValue("Car." . car . ".Time", false) / 1000, 1)
+		
+		if lapTime {
+			this.getSpeaker().speakPhrase(phrase, {time: lapTime})
+			
+			delta := (driverLapTime - lapTime)
+		
+			if (Abs(delta) > 0.5)
+				this.getSpeaker().speakPhrase("LapTimeDelta", {delta: delta, difference: fragments[(delta > 0) ? "Faster" : "Slower"]})
+		}
+	}
+	
 	lapTimesInfoRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
 		
@@ -207,36 +220,24 @@ class RaceStrategist extends RaceAssistant {
 		position := Round(knowledgeBase.getValue("Position", 0))
 		cars := Round(knowledgeBase.getValue("Car.Count", 0))
 		
-		lapTime := Round(knowledgeBase.getValue("Car." . car . ".Time") / 1000, 1)
+		driverLapTime := Round(knowledgeBase.getValue("Car." . car . ".Time") / 1000, 1)
 		
 		if (lap == 0)
 			this.getSpeaker().speakPhrase("Later")
 		else {
-			this.getSpeaker().speakPhrase("LapTime", {time: lapTime})
+			speaker := this.getSpeaker()
+			fragments := speaker.Fragments
 		
-			if (position > 1) {
-				car := knowledgeBase.getValue("Position.Front.Car", 0)
-				lapTime := Round(knowledgeBase.getValue("Car." . car . ".Time") / 1000, false)
-				
-				if lapTime
-					this.getSpeaker().speakPhrase("LapTimeFront", {time: lapTime})
-			}
+			speaker.speakPhrase("LapTime", {time: driverLapTime})
+		
+			if (position > 2)
+				this.reportLapTime("LapTimeFront", driverLapTime, knowledgeBase.getValue("Position.Front.Car", 0))
 			
-			if (position < cars) {
-				car := knowledgeBase.getValue("Position.Behind.Car", 0)
-				lapTime := Round(knowledgeBase.getValue("Car." . car . ".Time") / 1000, false)
-				
-				if lapTime
-					this.getSpeaker().speakPhrase("LapTimeBehind", {time: lapTime})
-			}
+			if (position < cars)
+				this.reportLapTime("LapTimeBehind", driverLapTime, knowledgeBase.getValue("Position.Behind.Car", 0))
 			
-			if (position > 1) {
-				car := knowledgeBase.getValue("Position.Leader.Car", 0)
-				lapTime := Round(knowledgeBase.getValue("Car." . car . ".Time") / 1000, false)
-				
-				if lapTime
-					this.getSpeaker().speakPhrase("LapTimeLeader", {time: lapTime})
-			}
+			if (position > 1)
+				this.reportLapTime("LapTimeLeader", driverLapTime, knowledgeBase.getValue("Position.Leader.Car", 0))
 		}
 	}
 	

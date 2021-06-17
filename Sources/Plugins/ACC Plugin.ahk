@@ -178,6 +178,36 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 	
+	updateStandingsData(data) {
+		static carNames := false
+		
+		if !carNames
+			carNames := readConfiguration(kResourcesDirectory . "Simulator Data\ACC\Car Model.ini")
+		
+		standings := readSimulatorData(this.Code, "-Standings", "UDP")
+		
+		driverForname := getConfigurationValue(data, "Stint Data", "DriverForname", "John")
+		driverSurname := getConfigurationValue(data, "Stint Data", "DriverSurname", "Doe")
+		driverNickname := getConfigurationValue(data, "Stint Data", "DriverNickname", "JD")
+		
+		Loop {
+			carID := getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Car", kUndefined)
+		
+			if (carID == kUndefined)
+				break
+			else {
+				setConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Car", getConfigurationValue(carNames, "Car Model", carID, "Unknown"))
+			
+				if ((getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Driver.Forname") = driverForname)
+				 && (getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Driver.Surname") = driverSurname)
+				 && (getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Driver.Nickname") = driverNickname))
+					setConfigurationValue(standings, "Position Data", "Driver.Car", A_Index)
+			}
+		}
+		
+		setConfigurationSectionValues(data, "Position Data", getConfigurationSectionValues(standings, "Position Data"))
+	}
+	
 	activateACCWindow() {
 		window := this.Simulator.WindowTitle
 		
@@ -1034,7 +1064,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	setPitstopRefuelAmount(pitstopNumber, litres) {
-		data := readSharedMemory(this.Code, "-Setup")
+		data := readSimulatorData(this.Code, "-Setup")
 		
 		litresIncrement := Round(litres - getConfigurationValue(data, "Setup Data", "FuelAmount", 0))
 
@@ -1046,7 +1076,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		if compound {
 			changePitstopTyreCompound((compound = "Wet") ? "Increase" : "Decrease")
 			
-			data := readSharedMemory(this.Code, "-Setup")
+			data := readSimulatorData(this.Code, "-Setup")
 			
 			tyreSetIncrement := Round(set - getConfigurationValue(data, "Setup Data", "TyreSet", 0))
 			
@@ -1058,7 +1088,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
-		data := readSharedMemory(this.Code, "-Setup")
+		data := readSimulatorData(this.Code, "-Setup")
 			
 		pressureFLIncrement := Round(pressureFL - getConfigurationValue(data, "Setup Data", "TyrePressureFL", 26.1), 1)
 		pressureFRIncrement := Round(pressureFR - getConfigurationValue(data, "Setup Data", "TyrePressureFR", 26.1), 1)

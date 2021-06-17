@@ -446,7 +446,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 	
 	updateStandingsData(data) {
-		standings := readSharedMemory(this.Code, "-Standings")
+		standings := readSimulatorData(this.Code, "-Standings")
 		
 		Loop {
 			carID := getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Car", kUndefined)

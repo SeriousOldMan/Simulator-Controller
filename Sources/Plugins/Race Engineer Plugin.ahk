@@ -596,7 +596,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 	getSessionState(data := false) {
 		if this.Simulator {
 			if !data
-				data := readSharedMemory(this.Simulator.Code)
+				data := readSimulatorData(this.Simulator.Code)
 			
 			return getDataSessionState(data)
 		}
@@ -628,7 +628,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 		if this.Simulator {
 			code := this.Simulator.Code
 			
-			data := readSharedMemory(code)
+			data := readSimulatorData(code)
 			
 			this.updateSimulatorData(data)
 			
@@ -837,22 +837,22 @@ openRaceEngineerSetups() {
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-readSharedMemory(simulator, options := "") {
-	exePath := kBinariesDirectory . simulator . " SHM Reader.exe"
+readSimulatorData(simulator, options := "", protocol := "SHM") {
+	exePath := kBinariesDirectory . simulator . " " . protocol . " Reader.exe"
 	
 	Random prefix, 1, 1000000
 		
-	dataFile := kTempDirectory . simulator . " Data\SHM_" . Round(prefix) . ".data"
+	dataFile := kTempDirectory . simulator . " Data\" . protocol . "_" . Round(prefix) . ".data"
 	
 	try {
 		RunWait %ComSpec% /c ""%exePath%" %options% > "%dataFile%"", , Hide
 	}
 	catch exception {
-		logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% SHM Reader ("), {simulator: simulator})
+		logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Reader ("), {simulator: simulator, protocol: protocol})
 												   . exePath . translate(") - please rebuild the applications in the binaries folder (")
 												   . kBinariesDirectory . translate(")"))
 			
-		showMessage(substituteVariables(translate("Cannot start %simulator% SHM Reader (%exePath%) - please check the configuration...")
+		showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Reader (%exePath%) - please check the configuration...")
 									  , {exePath: exePath, simulator: simulator})
 				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 	}
@@ -904,7 +904,7 @@ getRaceEngineerOptions() {
 	options := ""
 	
 	if plugin.Simulator {
-		data := readSharedMemory(plugin.Simulator.Code)
+		data := readSimulatorData(plugin.Simulator.Code)
 		
 		if getConfigurationValue(data, "Session Data", "Active", false) {
 			options := "-Simulator """ . plugin.Simulator.runningSimulator() . """"

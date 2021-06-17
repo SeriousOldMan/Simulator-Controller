@@ -348,7 +348,7 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 	getSessionState(data := false) {
 		if this.Simulator {
 			if !data
-				data := readSharedMemory(this.Simulator.Code)
+				data := readSimulatorData(this.Simulator.Code)
 			
 			return getDataSessionState(data)
 		}
@@ -384,7 +384,7 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 		if this.Simulator {
 			code := this.Simulator.Code
 			
-			data := readSharedMemory(code)
+			data := readSimulatorData(code)
 			
 			this.updateSimulatorData(data)
 			

@@ -70,12 +70,12 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 				RunWait %ComSpec% /c ""%exePath%" -%command%", , Hide
 		}
 		catch exception {
-			logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% SHM Reader ("), {simulator: simulator})
+			logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Reader ("), {simulator: simulator, protocol: "SHM"})
 													   . exePath . translate(") - please rebuild the applications in the binaries folder (")
 													   . kBinariesDirectory . translate(")"))
 				
-			showMessage(substituteVariables(translate("Cannot start %simulator% SHM Reader (%exePath%) - please check the configuration...")
-										  , {exePath: exePath, simulator: simulator})
+			showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Reader (%exePath%) - please check the configuration...")
+										  , {exePath: exePath, simulator: simulator, protocol: "SHM"})
 					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 		}
 	}
@@ -183,7 +183,7 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 	
 	updateStandingsData(data) {
-		standings := readSharedMemory(this.Code, "-Standings")
+		standings := readSimulatorData(this.Code, "-Standings")
 		
 		setConfigurationSectionValues(data, "Position Data", getConfigurationSectionValues(standings, "Position Data"))
 	}

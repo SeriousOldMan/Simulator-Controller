@@ -223,100 +223,56 @@ namespace ACCUDPReader {
         public UDPReader() {
 		}
 
-		private static string GetStringFromBytes(byte[] bytes) {
-			if (bytes == null)
-				return "";
-
-			var nullIdx = Array.IndexOf(bytes, (byte)0);
-
-			return nullIdx >= 0 ? Encoding.Default.GetString(bytes, 0, nullIdx) : Encoding.Default.GetString(bytes);
-		}
-
-		public string GetForname(byte[] name) {
-			string forName = GetStringFromBytes(name);
-
-			if (forName.Contains(" ")) {
-				string[] names = forName.Split(' ');
-
-				return names[0];
-			}
-			else
-				return forName;
-		}
-
-		public string GetSurname(byte[] name) {
-			string forName = GetStringFromBytes(name);
-
-			if (forName.Contains(" ")) {
-				string[] names = forName.Split(' ');
-
-				return names[1];
-			}
-			else
-				return "";
-		}
-
-		public string GetNickname(byte[] name) {
-			string forName = GetStringFromBytes(name);
-
-			if (forName.Contains(" ")) {
-				string[] names = forName.Split(' ');
-
-				return names[0].Substring(0, 1) + names[1].Substring(0, 1);
-			}
-			else
-				return "";
-		}
-
 		public void ReadStandings() {
 			ACCUdpRemoteClient client = new ACCUdpRemoteClient("127.0.0.1", 9000, "", "asd", "", 100);
 
             client.MessageHandler.OnRealtimeUpdate += OnRealtimeUpdate;
-            client.MessageHandler.OnBroadcastingEvent += OnBroadcastingEvent;
 
             client.MessageHandler.OnTrackDataUpdate += OnTrackDataUpdate;
             client.MessageHandler.OnEntrylistUpdate += OnEntryListUpdate;
             client.MessageHandler.OnRealtimeCarUpdate += OnRealtimeCarUpdate;
+
+            int retries = 1;
 
             while (!finished) {
                 int count = Cars.Count;
 
                 Thread.Sleep(1000);
 
-                if (Cars.Count == count)
-                    finished = true;
+                if (Cars.Count == count) {
+                    if (retries-- == 0)
+                        finished = true;
+                }
+                else
+                    retries = 1;
             }
 
             Console.WriteLine("[Position Data]");
 
             Console.Write("Car.Count="); Console.WriteLine(Cars.Count);
 
-            while (true) {
-                int index = 1;
+           int index = 1;
 
-                foreach (CarData car in Cars) {
-                    Console.Write("Car."); Console.Write(index); Console.Write(".Position="); Console.WriteLine(car.Position);
-                    Console.Write("Car."); Console.Write(index); Console.Write(".Lap="); Console.WriteLine(car.Laps);
-                    Console.Write("Car."); Console.Write(index); Console.Write(".Lap.Running="); Console.WriteLine(car.SplinePosition);
+            foreach (CarData car in Cars) {
+                Console.Write("Car."); Console.Write(index); Console.Write(".Position="); Console.WriteLine(car.Position);
+                Console.Write("Car."); Console.Write(index); Console.Write(".Lap="); Console.WriteLine(car.Laps);
+                Console.Write("Car."); Console.Write(index); Console.Write(".Lap.Running="); Console.WriteLine(car.SplinePosition);
 
-                    LapData lastLap = car.LastLap;
+                LapData lastLap = car.LastLap;
 
-                    Console.Write("Car."); Console.Write(index); Console.Write(".Time="); Console.WriteLine(lastLap != null ? lastLap.LaptimeMS : 0);
+                Console.Write("Car."); Console.Write(index); Console.Write(".Time="); Console.WriteLine(lastLap != null ? lastLap.LaptimeMS : 0);
 
-                    Console.Write("Car."); Console.Write(index); Console.Write(".Car="); Console.WriteLine(car.CarModelEnum);
+                Console.Write("Car."); Console.Write(index); Console.Write(".Car="); Console.WriteLine(car.CarModelEnum);
 
-                    DriverData currentDriver = car.CurrentDriver;
+                DriverData currentDriver = car.CurrentDriver;
 
-                    if (currentDriver != null) {
-                        Console.Write("Car."); Console.Write(index); Console.Write(".Driver.Forname="); Console.WriteLine(currentDriver.FirstName);
-                        Console.Write("Car."); Console.Write(index); Console.Write(".Driver.Surname="); Console.WriteLine(currentDriver.LastName);
-                        Console.Write("Car."); Console.Write(index); Console.Write(".Driver.Nickname="); Console.WriteLine(currentDriver.ShortName);
-                    }
-
-                    index += 1;
+                if (currentDriver != null) {
+                    Console.Write("Car."); Console.Write(index); Console.Write(".Driver.Forname="); Console.WriteLine(currentDriver.FirstName);
+                    Console.Write("Car."); Console.Write(index); Console.Write(".Driver.Surname="); Console.WriteLine(currentDriver.LastName);
+                    Console.Write("Car."); Console.Write(index); Console.Write(".Driver.Nickname="); Console.WriteLine(currentDriver.ShortName);
                 }
 
-                Thread.Sleep(1000);
+                index += 1;
             }
 
             client.Shutdown();
@@ -366,10 +322,6 @@ namespace ACCUDPReader {
             catch (Exception ex) {
                 Debug.WriteLine(ex.Message);
             }
-        }
-
-        private void OnBroadcastingEvent(string sender, BroadcastingEvent broadcatingEvent) {
-            // Do something with data
         }
     }
 }

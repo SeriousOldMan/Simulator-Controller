@@ -853,7 +853,7 @@ readSimulatorData(simulator, options := "", protocol := "SHM") {
 												   . kBinariesDirectory . translate(")"))
 			
 		showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Reader (%exePath%) - please check the configuration...")
-									  , {exePath: exePath, simulator: simulator})
+									  , {exePath: exePath, simulator: simulator, protocol: protocol})
 				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 	}
 	

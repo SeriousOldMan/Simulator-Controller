@@ -299,13 +299,19 @@ namespace ACCUDPReader {
                     Console.Write("Car."); Console.Write(index); Console.Write(".Lap="); Console.WriteLine(car.Laps);
                     Console.Write("Car."); Console.Write(index); Console.Write(".Lap.Running="); Console.WriteLine(car.SplinePosition);
 
-                    Console.Write("Car."); Console.Write(index); Console.Write(".Time="); Console.WriteLine(car.LastLap.LaptimeMS);
+                    LapData lastLap = car.LastLap;
+
+                    Console.Write("Car."); Console.Write(index); Console.Write(".Time="); Console.WriteLine(lastLap != null ? lastLap.LaptimeMS : 0);
 
                     Console.Write("Car."); Console.Write(index); Console.Write(".Car="); Console.WriteLine(car.CarModelEnum);
 
-                    Console.Write("Car."); Console.Write(index); Console.Write(".Driver.Forname="); Console.WriteLine(car.CurrentDriver.FirstName);
-                    Console.Write("Car."); Console.Write(index); Console.Write(".Driver.Surname="); Console.WriteLine(car.CurrentDriver.LastName);
-                    Console.Write("Car."); Console.Write(index); Console.Write(".Driver.Nickname="); Console.WriteLine(car.CurrentDriver.ShortName);
+                    DriverData currentDriver = car.CurrentDriver;
+
+                    if (currentDriver != null) {
+                        Console.Write("Car."); Console.Write(index); Console.Write(".Driver.Forname="); Console.WriteLine(currentDriver.FirstName);
+                        Console.Write("Car."); Console.Write(index); Console.Write(".Driver.Surname="); Console.WriteLine(currentDriver.LastName);
+                        Console.Write("Car."); Console.Write(index); Console.Write(".Driver.Nickname="); Console.WriteLine(currentDriver.ShortName);
+                    }
 
                     index += 1;
                 }

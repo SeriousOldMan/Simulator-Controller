@@ -252,39 +252,51 @@ namespace ACCUDPReader {
                     retries = 1;
             }
 
-            while (true)
+            bool done = false;
+
+            while (!done)
                 if (File.Exists(cmdFileName)) {
-                    StreamWriter outStream = new StreamWriter(File.Create(outFileName));
+                    StreamReader cmdStream = new StreamReader(cmdFileName);
 
-                    outStream.WriteLine("[Position Data]");
+                    string command = cmdStream.ReadLine();
 
-                    outStream.Write("Car.Count="); outStream.WriteLine(Cars.Count);
+                    if (command == "Exit")
+                        done = true;
+                    else if (command == "Read") {
+                        StreamWriter outStream = new StreamWriter(outFileName);
 
-                    int index = 1;
+                        outStream.WriteLine("[Position Data]");
 
-                    foreach (CarData car in Cars) {
-                        outStream.Write("Car."); outStream.Write(index); outStream.Write(".Position="); outStream.WriteLine(car.Position);
-                        outStream.Write("Car."); outStream.Write(index); outStream.Write(".Lap="); outStream.WriteLine(car.Laps);
-                        outStream.Write("Car."); outStream.Write(index); outStream.Write(".Lap.Running="); outStream.WriteLine(car.SplinePosition);
+                        outStream.Write("Car.Count="); outStream.WriteLine(Cars.Count);
 
-                        LapData lastLap = car.LastLap;
+                        int index = 1;
 
-                        outStream.Write("Car."); outStream.Write(index); outStream.Write(".Time="); outStream.WriteLine(lastLap != null ? lastLap.LaptimeMS : 0);
+                        foreach (CarData car in Cars) {
+                            outStream.Write("Car."); outStream.Write(index); outStream.Write(".Position="); outStream.WriteLine(car.Position);
+                            outStream.Write("Car."); outStream.Write(index); outStream.Write(".Lap="); outStream.WriteLine(car.Laps);
+                            outStream.Write("Car."); outStream.Write(index); outStream.Write(".Lap.Running="); outStream.WriteLine(car.SplinePosition);
 
-                        outStream.Write("Car."); outStream.Write(index); outStream.Write(".Car="); outStream.WriteLine(car.CarModelEnum);
+                            LapData lastLap = car.LastLap;
 
-                        DriverData currentDriver = car.CurrentDriver;
+                            outStream.Write("Car."); outStream.Write(index); outStream.Write(".Time="); outStream.WriteLine(lastLap != null ? lastLap.LaptimeMS : 0);
 
-                        if (currentDriver != null) {
-                            outStream.Write("Car."); outStream.Write(index); outStream.Write(".Driver.Forname="); outStream.WriteLine(currentDriver.FirstName);
-                            outStream.Write("Car."); outStream.Write(index); outStream.Write(".Driver.Surname="); outStream.WriteLine(currentDriver.LastName);
-                            outStream.Write("Car."); outStream.Write(index); outStream.Write(".Driver.Nickname="); outStream.WriteLine(currentDriver.ShortName);
+                            outStream.Write("Car."); outStream.Write(index); outStream.Write(".Car="); outStream.WriteLine(car.CarModelEnum);
+
+                            DriverData currentDriver = car.CurrentDriver;
+
+                            if (currentDriver != null) {
+                                outStream.Write("Car."); outStream.Write(index); outStream.Write(".Driver.Forname="); outStream.WriteLine(currentDriver.FirstName);
+                                outStream.Write("Car."); outStream.Write(index); outStream.Write(".Driver.Surname="); outStream.WriteLine(currentDriver.LastName);
+                                outStream.Write("Car."); outStream.Write(index); outStream.Write(".Driver.Nickname="); outStream.WriteLine(currentDriver.ShortName);
+                            }
+
+                            index += 1;
                         }
 
-                        index += 1;
+                        outStream.Close();
                     }
 
-                    outStream.Close();
+                    cmdStream.Close();
 
                     File.Delete(cmdFileName);
                 }

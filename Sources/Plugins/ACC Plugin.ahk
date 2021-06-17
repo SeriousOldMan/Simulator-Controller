@@ -40,6 +40,7 @@ global kPSMutatingOptions = ["Strategy", "Change Tyres", "Tyre Compound", "Chang
 ;;;-------------------------------------------------------------------------;;;
 
 class ACCPlugin extends RaceAssistantSimulatorPlugin {
+	iUDPClient := false
 	iOpenPitstopMFDHotkey := false
 	iClosePitstopMFDHotkey := false
 	
@@ -116,6 +117,12 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 	
+	UDPClient[] {
+		Get {
+			return this.iUDPClient
+		}
+	}
+	
 	__New(controller, name, simulator, configuration := false) {
 		base.__New(controller, name, simulator, configuration)
 		
@@ -161,6 +168,35 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		selectActions := ["TyreChange", "BrakeChange", "SuspensionRepair", "BodyworkRepair"]
 	}
 	
+	startupUDPClient() {
+		if !this.UDPClient {
+			exePath := kBinariesDirectory . "ACC UDP Reader.exe"
+			
+			try {
+				RunWait %ComSpec% /c ""%exePath%" "%kTempDirectory%ACCUDP.cmd" "%kTempDirectory%ACCUDP.out"" , , Hide, pid
+				
+				this.iUDPClient := pid
+			}
+			catch exception {
+				logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Reader ("), {simulator: "ACC", protocol: "UDP"})
+														   . exePath . translate(") - please rebuild the applications in the binaries folder (")
+														   . kBinariesDirectory . translate(")"))
+					
+				showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Reader (%exePath%) - please check the configuration...")
+											  , {exePath: exePath, simulator: "ACC", protocol: "UDP"})
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			}
+		}
+	}
+	
+	shutdownUDPClient() {
+		if this.UDPClient {
+			FileAppend Exit, %kTempDirectory%ACCUDP.cmd
+			
+			this.iUDPClient := false
+		}
+	}
+	
 	updateSessionState(sessionState) {
 		base.updateSessionState(sessionState)
 		
@@ -172,9 +208,15 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		if (inList(activeModes, this.iPitstopMode))
 			this.iPitstopMode.updateActions(sessionState)
 		
+		if (sessionState == kSessionRace)
+			this.startupUDPClient()
+			
+		
 		if (sessionState == kSessionFinished) {
 			this.iRepairSuspensionChosen := true
 			this.iRepairBodyworkChosen := true
+			
+			this.shutdownUDPClient()
 		}
 	}
 	
@@ -184,7 +226,23 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		if !carNames
 			carNames := readConfiguration(kResourcesDirectory . "Simulator Data\ACC\Car Model.ini")
 		
-		standings := readSimulatorData(this.Code, "-Standings", "UDP")
+		fileName := kTempDirectory . "ACCUDP.cmd"
+		
+		FileAppend Read, %fileName%
+		
+		while FileExist(fileName)
+			Sleep 200
+		
+		fileName := kTempDirectory . "ACCUDP.out"
+		
+		standings := readConfiguration(fileName)
+		
+		try {
+			FileDelete %fileName%
+		}
+		catch exception {
+			; ignore
+		}
 		
 		driverForname := getConfigurationValue(data, "Stint Data", "DriverForname", "John")
 		driverSurname := getConfigurationValue(data, "Stint Data", "DriverSurname", "Doe")

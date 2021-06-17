@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -217,11 +218,15 @@ namespace ACCUDPReader {
         public ObservableCollection<DriverData> Drivers { get; } = new ObservableCollection<DriverData>();
         public ObservableCollection<LapData> Laps { get; } = new ObservableCollection<LapData>();
 
-        private bool finished;
-        private float trackMeters;
+        private bool finished = false;
+        private float trackMeters = 0;
+        private string cmdFileName;
+        private string outFileName;
 
-        public UDPReader() {
-		}
+        public UDPReader(string cmdFileName, string outFileName) {
+            this.cmdFileName = cmdFileName;
+            this.outFileName = outFileName;
+        }
 
 		public void ReadStandings(string ip, int port, string displayName, string connectionPassword, string commandPassword) {
 			ACCUdpRemoteClient client = new ACCUdpRemoteClient(ip, port, displayName, connectionPassword, commandPassword, 100);
@@ -244,36 +249,47 @@ namespace ACCUDPReader {
                         finished = true;
                 }
                 else
-                    retries = 3;
+                    retries = 1;
             }
 
-            Console.WriteLine("[Position Data]");
+            while (true)
+                if (File.Exists(cmdFileName)) {
+                    StreamWriter outStream = new StreamWriter(File.Create(outFileName));
 
-            Console.Write("Car.Count="); Console.WriteLine(Cars.Count);
+                    outStream.WriteLine("[Position Data]");
 
-            int index = 1;
+                    outStream.Write("Car.Count="); outStream.WriteLine(Cars.Count);
 
-            foreach (CarData car in Cars) {
-                Console.Write("Car."); Console.Write(index); Console.Write(".Position="); Console.WriteLine(car.Position);
-                Console.Write("Car."); Console.Write(index); Console.Write(".Lap="); Console.WriteLine(car.Laps);
-                Console.Write("Car."); Console.Write(index); Console.Write(".Lap.Running="); Console.WriteLine(car.SplinePosition);
+                    int index = 1;
 
-                LapData lastLap = car.LastLap;
+                    foreach (CarData car in Cars) {
+                        outStream.Write("Car."); outStream.Write(index); outStream.Write(".Position="); outStream.WriteLine(car.Position);
+                        outStream.Write("Car."); outStream.Write(index); outStream.Write(".Lap="); outStream.WriteLine(car.Laps);
+                        outStream.Write("Car."); outStream.Write(index); outStream.Write(".Lap.Running="); outStream.WriteLine(car.SplinePosition);
 
-                Console.Write("Car."); Console.Write(index); Console.Write(".Time="); Console.WriteLine(lastLap != null ? lastLap.LaptimeMS : 0);
+                        LapData lastLap = car.LastLap;
 
-                Console.Write("Car."); Console.Write(index); Console.Write(".Car="); Console.WriteLine(car.CarModelEnum);
+                        outStream.Write("Car."); outStream.Write(index); outStream.Write(".Time="); outStream.WriteLine(lastLap != null ? lastLap.LaptimeMS : 0);
 
-                DriverData currentDriver = car.CurrentDriver;
+                        outStream.Write("Car."); outStream.Write(index); outStream.Write(".Car="); outStream.WriteLine(car.CarModelEnum);
 
-                if (currentDriver != null) {
-                    Console.Write("Car."); Console.Write(index); Console.Write(".Driver.Forname="); Console.WriteLine(currentDriver.FirstName);
-                    Console.Write("Car."); Console.Write(index); Console.Write(".Driver.Surname="); Console.WriteLine(currentDriver.LastName);
-                    Console.Write("Car."); Console.Write(index); Console.Write(".Driver.Nickname="); Console.WriteLine(currentDriver.ShortName);
+                        DriverData currentDriver = car.CurrentDriver;
+
+                        if (currentDriver != null) {
+                            outStream.Write("Car."); outStream.Write(index); outStream.Write(".Driver.Forname="); outStream.WriteLine(currentDriver.FirstName);
+                            outStream.Write("Car."); outStream.Write(index); outStream.Write(".Driver.Surname="); outStream.WriteLine(currentDriver.LastName);
+                            outStream.Write("Car."); outStream.Write(index); outStream.Write(".Driver.Nickname="); outStream.WriteLine(currentDriver.ShortName);
+                        }
+
+                        index += 1;
+                    }
+
+                    outStream.Close();
+
+                    File.Delete(cmdFileName);
                 }
-
-                index += 1;
-            }
+                else
+                    Thread.Sleep(1000);
 
             client.MessageHandler.OnRealtimeUpdate -= OnRealtimeUpdate;
             client.MessageHandler.OnTrackDataUpdate -= OnTrackDataUpdate;

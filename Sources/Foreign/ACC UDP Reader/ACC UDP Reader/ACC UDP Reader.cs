@@ -223,35 +223,35 @@ namespace ACCUDPReader {
         public UDPReader() {
 		}
 
-		public void ReadStandings() {
-			ACCUdpRemoteClient client = new ACCUdpRemoteClient("127.0.0.1", 9000, "", "asd", "", 100);
+		public void ReadStandings(string ip, int port, string displayName, string connectionPassword, string commandPassword) {
+			ACCUdpRemoteClient client = new ACCUdpRemoteClient(ip, port, displayName, connectionPassword, commandPassword, 100);
 
             client.MessageHandler.OnRealtimeUpdate += OnRealtimeUpdate;
-
             client.MessageHandler.OnTrackDataUpdate += OnTrackDataUpdate;
             client.MessageHandler.OnEntrylistUpdate += OnEntryListUpdate;
             client.MessageHandler.OnRealtimeCarUpdate += OnRealtimeCarUpdate;
+            client.MessageHandler.OnBroadcastingEvent += OnBroadcastingEvent;
 
-            int retries = 1;
+            int retries = 3;
 
             while (!finished) {
                 int count = Cars.Count;
 
-                Thread.Sleep(1000);
+                Thread.Sleep(500);
 
                 if (Cars.Count == count) {
                     if (retries-- == 0)
                         finished = true;
                 }
                 else
-                    retries = 1;
+                    retries = 3;
             }
 
             Console.WriteLine("[Position Data]");
 
             Console.Write("Car.Count="); Console.WriteLine(Cars.Count);
 
-           int index = 1;
+            int index = 1;
 
             foreach (CarData car in Cars) {
                 Console.Write("Car."); Console.Write(index); Console.Write(".Position="); Console.WriteLine(car.Position);
@@ -275,7 +275,16 @@ namespace ACCUDPReader {
                 index += 1;
             }
 
+            client.MessageHandler.OnRealtimeUpdate -= OnRealtimeUpdate;
+            client.MessageHandler.OnTrackDataUpdate -= OnTrackDataUpdate;
+            client.MessageHandler.OnEntrylistUpdate -= OnEntryListUpdate;
+            client.MessageHandler.OnRealtimeCarUpdate -= OnRealtimeCarUpdate;
+            client.MessageHandler.OnBroadcastingEvent -= OnBroadcastingEvent;
+
             client.Shutdown();
+        }
+
+        private void OnBroadcastingEvent(string sender, BroadcastingEvent evt) {
         }
 
         private void OnTrackDataUpdate(string sender, TrackData trackData) {

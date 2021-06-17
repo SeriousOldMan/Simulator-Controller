@@ -10,7 +10,7 @@ namespace ACCUDPReader {
 
             UDPReader reader = new UDPReader();
 
-            reader.ReadStandings();
+            reader.ReadStandings("127.0.0.1", 9000, "", "asd", "");
         }
     }
 }

@@ -173,7 +173,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			exePath := kBinariesDirectory . "ACC UDP Reader.exe"
 			
 			try {
-				RunWait %ComSpec% /c ""%exePath%" "%kTempDirectory%ACCUDP.cmd" "%kTempDirectory%ACCUDP.out"" , , Hide, pid
+				Run %ComSpec% /c ""%exePath%" "%kTempDirectory%ACCUDP.cmd" "%kTempDirectory%ACCUDP.out"" , , Hide, pid
 				
 				this.iUDPClient := pid
 			}

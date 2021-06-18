@@ -209,7 +209,7 @@ class RaceStrategist extends RaceAssistant {
 			delta := (driverLapTime - lapTime)
 		
 			if (Abs(delta) > 0.5)
-				this.getSpeaker().speakPhrase("LapTimeDelta", {delta: Format("{:.1f}", delta)
+				this.getSpeaker().speakPhrase("LapTimeDelta", {delta: Format("{:.1f}", Abs(delta))
 															 , difference: (delta > 0) ? fragments["Faster"] : fragments["Slower"]})
 		}
 	}

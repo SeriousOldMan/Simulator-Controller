@@ -14,7 +14,7 @@ Important: If you have multiple *dialog partners* active, for example Jona and C
 
 ### A typical dialog
 
-(You are on the track, for example in the third lap. A lot of traffic has developed around you, and you want get more information about the current standings. You can call Cato anytime using one of the key phrases - see the section about [phrase grammars](*) for more information.)
+(You are on the track, for example in the third lap. A lot of traffic has developed around you, and you want get more information about the current standings. You can call Cato anytime using one of the key phrases - see the section about [phrase grammars](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#phrase-grammars) for more information.)
 
 **Driver: "What is my position?"**
 

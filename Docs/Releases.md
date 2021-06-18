@@ -1,9 +1,9 @@
-## 3.1.2-release 06/18/21 (planned)
+## 3.1.2-release 06/18/21
 
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. Multiple actions can be bound to one controller functions. Useful, to group several activation actions into one toggle switch for example. Please consult the [revised documentation](*) for more details, if you want to use this new feature.
-  4. The [documentation](*) for the Virtual Race Strategist has been extendend - give it a read...
+  3. Multiple actions can be bound to one controller functions. Useful, to group several activation actions into one toggle switch for example. Please consult the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller) for more details, if you want to use this new feature.
+  4. The [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist) for the Virtual Race Strategist has been extendend - give it a read...
   4. Model and initial rule set for race standings, lap time analysis and gaps between cars have been implemented for Cato, the Virtual Race Strategist.
   5. New iRacing data acquisition for Cato, the Virtual Race Strategist.
   6. New rFactor 2 data acquisition for Cato, the Virtual Race Strategist.

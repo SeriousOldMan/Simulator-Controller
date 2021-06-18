@@ -26,7 +26,7 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-None for the moment...
+[3.1.4-dev](https://www.dropbox.com/s/fa12p88ncjeombh/Simulator%20Controller%203.1.4-dev.zip?dl=1) (Very early build for Release 3.1.4. New features: Assetto Corsa Competizione integration for Race Strategist. Stable, but without documentation. No configuration update necessary.)
 
 #### Latest release builds
 

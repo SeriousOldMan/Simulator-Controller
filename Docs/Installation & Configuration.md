@@ -37,7 +37,11 @@ Before you start: Simulator Controller comes with some predefined configurations
 
    1. VRE Only: If you only want to use Jona, the Virtual Race Engineer, you can use this predefined configuration. All other components of Simulator Controller are disabled here and you will never see any Button Box or other visuals. You still might need to configure special aspects, for example the preparation of the [Assetto Corsa Competizione pitstop handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#important-preparation-for-the-pitstop-mfd-handling) for example, but that's it.
 
-   2. Desktop Rig: Sorry for the *disrespectful* naming, more like a joke from my side. This configuration file contains everything, except for the tactile and motion feedback components, which most likely will be absent, when you are driving with a bolt-on steering wheel at your desktop. Though, you still have to customize all the other configuration items for the software only components to be up and running.
+   2. VRS Only: Similar configuration for Cato, the Virtual Race Strategist.
+
+   3. VRE&VRS Only: Use this configuration, if you want to enable both assistants.
+
+   4. Desktop Rig: Sorry for the *disrespectful* naming, more like a joke from my side. This configuration file contains everything, except for the tactile and motion feedback components, which most likely will be absent, when you are driving with a bolt-on steering wheel at your desktop. Though, you still have to customize all the other configuration items for the software only components to be up and running.
 
 ## Running the configuration tool
 

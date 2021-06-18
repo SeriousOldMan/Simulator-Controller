@@ -53,6 +53,8 @@ This release takes the next step for Cato, the Virtual Race Strategist and intro
 
   - A new plugin parameter *raceStrategist* has been implemented for the ["Race Strategist" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-strategist), which allows you to enable or disble the assistant from your controller hardware. Maybe you want to add this parameter to your configuration.
   - [For Developers]: The class *RaceEngineerSimulatorPlugin* has been renamed to *RaceAssistantSimulatorPlugin* the methods *getAction* and *fireAction* of the class *SimulatorController* have been renamed to *getActions* and *fireActions* and now support multiple actions for one controller function.
+  
+Note: Beginning with this release, the source code is no longer part of the distribution to save some space. But you can always load the sources from GitHub, if required.
 
 ***
 

@@ -38,9 +38,9 @@ global kProveAll = "ProveAll:"
 global kSet = "Set:"
 global kClear = "Clear:"
 
-global kBuiltinFunctors = ["option", "sqrt", "+", "-", "*", "/", ">", "<", "=", "unbound?", "append", "get"]
-global kBuiltinFunctions = ["option", "squareRoot", "plus", "minus", "multiply", "divide", "greater", "less", "equal", "unbound", "append", "get"]
-global kBuiltinAritys = [2, 2, 3, 3, 3, 3, 2, 2, 2, 1, -1, -1]
+global kBuiltinFunctors = ["option", "sqrt", "+", "-", "*", "/", ">", "<", "=", "builtin1", "unbound?", "append", "get"]
+global kBuiltinFunctions = ["option", "squareRoot", "plus", "minus", "multiply", "divide", "greater", "less", "equal", "builtin1", "unbound", "append", "get"]
+global kBuiltinAritys = [2, 2, 3, 3, 3, 3, 2, 2, 2, 3, 1, -1, -1]
 
 global kProduction = "Production"
 global kReduction = "Reduction"
@@ -3993,6 +3993,17 @@ less(choicePoint, operand1, operand2) {
 
 equal(choicePoint, operand1, operand2) {
 	return choicePoint.ResultSet.unify(choicePoint, operand1, operand2)
+}
+
+builtin1(choicePoint, function, operand1, operand2) {
+	local resultSet := choicePoint.ResultSet
+	
+	operand1 := operand1.getValue(resultSet, operand1)
+	
+	if (isInstance(operand1, Variable) || operand1.isUnbound(resultSet))
+		return false
+	else
+		return resultSet.unify(choicePoint, new Literal(%function%(operand1.toString(resultSet))), operand2)
 }
 
 unbound(choicePoint, operand1) {

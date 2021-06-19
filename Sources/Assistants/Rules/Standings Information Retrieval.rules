@@ -6,6 +6,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 carLaps(?car, COMPLETED, ?laps) <= Get(Car, ?car, Lap, ?laps)
+carLaps(?car, RUNNING, ?laps) <= Get(Car, ?car, Lap.Running, ?runningLap)
 carLaps(?car, FULL, ?laps) <= Get(Car, ?car, Lap, ?completedLaps), Get(Car, ?car, Lap.Running, ?runningLap), ?laps = ?completedLaps + ?runningLap
 									
 carPosition(?car, ?position) <= Get(Car, ?car, Position, ?position)

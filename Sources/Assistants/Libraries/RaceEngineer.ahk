@@ -1534,7 +1534,7 @@ class RaceEngineer extends RaceAssistant {
 				speaker := this.getSpeaker()
 				
 				stintLaps := Round(stintLaps)
-				delta := Format("{:.2f}", Round(delta, 2))
+				delta := Format("{:.1f}", Round(delta, 2))
 				
 				if repair {
 					speaker.speakPhrase("RepairPitstop", {laps: stintLaps, delta: delta})

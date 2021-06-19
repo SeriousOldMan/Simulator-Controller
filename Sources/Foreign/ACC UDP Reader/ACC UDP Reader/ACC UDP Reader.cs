@@ -287,7 +287,7 @@ namespace ACCUDPReader {
                             if (currentDriver != null) {
                                 outStream.Write("Car."); outStream.Write(index); outStream.Write(".Driver.Forname="); outStream.WriteLine(currentDriver.FirstName);
                                 outStream.Write("Car."); outStream.Write(index); outStream.Write(".Driver.Surname="); outStream.WriteLine(currentDriver.LastName);
-                                outStream.Write("Car."); outStream.Write(index); outStream.Write(".Driver.Nickname="); outStream.WriteLine(currentDriver.ShortName);
+                                outStream.Write("Car."); outStream.Write(index); outStream.Write(".Driver.Nickname=");outStream.WriteLine(currentDriver.ShortName);
                             }
 
                             index += 1;

@@ -3999,6 +3999,9 @@ builtin1(choicePoint, function, operand1, operand2) {
 	local resultSet := choicePoint.ResultSet
 	
 	operand1 := operand1.getValue(resultSet, operand1)
+	operand2 := operand2.getValue(resultSet, operand2)
+	
+	function := function.toString(resultSet)
 	
 	if (isInstance(operand1, Variable) || operand1.isUnbound(resultSet))
 		return false

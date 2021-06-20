@@ -147,14 +147,21 @@ class RaceStrategist extends RaceAssistant {
 		if (position == 0)
 			this.getSpeaker().speakPhrase("Later")
 		else {
-			this.getSpeaker().speakPhrase("Position", {position: position})
-			
-			if (position <= 3)
-				this.getSpeaker().speakPhrase("Great")
+			lapPosition := inList(words, fragments["Laps"])
+				
+			if lapPosition
+				this.futurePositionRecognized(words)
+			else {
+				this.getSpeaker().speakPhrase("Position", {position: position})
+				
+				if (position <= 3)
+					this.getSpeaker().speakPhrase("Great")
+			}
 		}
 	}
 	
 	futurePositionRecognized(words) {
+		local knowledgeBase = this.KnowledgeBase
 		local action
 		
 		if !this.hasEnoughData()
@@ -163,14 +170,31 @@ class RaceStrategist extends RaceAssistant {
 		speaker := this.getSpeaker()
 		fragments := speaker.Fragments
 		
-		lapsPosition := inList(words, fragments["Laps"])
+		lapPosition := inList(words, fragments["Laps"])
 				
-		if lapsPosition {
-			laps := words[litresPosition - 1]
+		if lapPosition {
+			lap := words[litresPosition - 1]
 			
-			if laps is number
+			if lap is number
 			{
-				speaker.speakPhrase("Not yet implemented")
+				if (lap <= knowledgeBase.getValue("Lap"))
+					speaker.speakPhrase("NoFutureLap")
+				else {
+					knowledgeBase.setFact("Lap.Extrapolate", lap)
+		
+					knowledgeBase.produce()
+					
+					if this.Debug[kDebugKnowledgeBase]
+						this.dumpKnowledge(this.KnowledgeBase)
+					
+					car := knowledgeBase.getValue("Driver.Car")
+					position := knowledgeBase.getValue("Standings.Extrapolated." . lap . ".Car." . car . ".Position", false)
+					
+					if position
+						speaker.speakPhrase("FuturePosition", {position: position})
+					else
+						speaker.speakPhrase("NoFuturePosition")
+				}
 				
 				return
 			}

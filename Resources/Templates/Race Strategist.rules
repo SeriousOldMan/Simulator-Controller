@@ -21,6 +21,13 @@
 
 ; [?Lap] => ...
 
+;;;-------------------------------------------------------------------------;;;
+;;; You can set this fact to a future lap number to request a standings     ;;;
+;;; projection for this future lap.                                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+; [?Lap.Extrapolate] => ...
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;; "Pitstop.Lap" must be set to the lap number, where the pitstop has been ;;;
@@ -163,6 +170,8 @@ updateLeadDelta(?, ?, ?, ?)
 ;;;                                                                         ;;;
 ;;; This rule set will extrapolate the race positions into the future.      ;;;
 ;;;-------------------------------------------------------------------------;;;
+		
+[?Lap.Extrapolate] => (Prove: extrapolateLap, ?Lap.Extrapolate), (Clear: Lap.Extrapolate)
 
 priority: -20, [?Lap] => (Prove: clearExtrapolatedLap, ?Lap, !Car.Count)
 
@@ -177,6 +186,10 @@ priority: -20, {All: [?Lap], [?Session.Settings.Standings.Extrapolation.Laps]} =
 		(Prove: correctPositions, ?Lap, !Session.Settings.Standings.Extrapolation.Overtake.Delta,												\
 										?Session.Settings.Standings.Extrapolation.Laps),														\
 		(Prove: updatePositions, ?Lap, ?Session.Settings.Standings.Extrapolation.Laps)
+
+extrapolateLap(?lap, ?futureLap) <= ?futureLap < ?lap, !, fail
+extrapolateLap(?lap, ?futureLap) <= carAvgLapTime(?lap, !Driver.Car, ?avgLapTime), ?lapDelta = ?futureLap - ?lap, 								\
+									?futureTime = ?lapDelta * ?avgLapTime, extrapolatePositions(?lap, !Car.Count, ?futureLap, ?futureTime)
 		
 extrapolatePositions(?, 0) <= !
 extrapolatePositions(?lap, ?lapDelta) <= carAvgLapTime(?lap, !Driver.Car, ?avgLapTime), ?futureTime = ?lapDelta * ?avgLapTime,					\

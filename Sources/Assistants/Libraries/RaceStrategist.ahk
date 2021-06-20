@@ -299,8 +299,9 @@ class RaceStrategist extends RaceAssistant {
 				, "Session.Settings.Fuel.SafetyMargin": getConfigurationValue(settings, "Session Settings", "Fuel.SafetyMargin", 5)
 				, "Session.Settings.Lap.AvgTime": getConfigurationValue(settings, "Session Settings", "Lap.AvgTime", 0)
 				, "Session.Settings.Lap.History.Considered": getConfigurationValue(this.Configuration, "Race Strategist Analysis", simulatorName . ".ConsideredHistoryLaps", 5)
-				, "Session.Settings.Lap.History.Damping": getConfigurationValue(this.Configuration, "Race Strategist Analysis", simulatorName . ".HistoryLapsDamping", 0.2)}
-				
+				, "Session.Settings.Lap.History.Damping": getConfigurationValue(this.Configuration, "Race Strategist Analysis", simulatorName . ".HistoryLapsDamping", 0.2)
+				, "Session.Settings.Standings.Extrapolation.Laps": getConfigurationValue(settings, "Session Settings", simulatorName . ".ExtrapolationLaps", 2)
+				, "Session.Settings.Standings.Extrapolation.Overtake.Delta": Round(getConfigurationValue(settings, "Session Settings", simulatorName . ".OvertakeDelta", 1) * 1000)}
 		return facts
 	}
 	
@@ -523,4 +524,47 @@ class RaceStrategist extends RaceAssistant {
 		
 		return result
 	}
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                   Private Function Declaration Section                  ;;;
+;;;-------------------------------------------------------------------------;;;
+
+comparePositions(c1, c2) {
+	if (c1[2] > c2[2])
+		return false
+	else if (c1[2] = c2[2])
+		return !(c1[3] > c2[3])
+	else
+		return true
+}
+
+updatePositions(context, futureLap) {
+	local knowledgeBase := context.KnowledgeBase
+	
+	cars := []
+	count := 0
+	
+	Loop {
+		laps := knowledgeBase.getValue("Standings.Extrapolated." . futureLap . "Car." . A_Index . ".Laps", kUndefined)
+		
+		if (laps == kUndefined)
+			break
+		else
+			cars.Push(A_Index, laps, knowledgeBase.getValue("Standings.Extrapolated." . futureLap . "Car." . A_Index . ".Running"))
+		
+		count += 1
+	}
+	
+	bubbleSort(cars, "comparePositions")
+	
+	Loop {
+		if (A_Index > count)
+			break
+		
+		knowledgeBase.setFact("Standings.Extrapolated." . futureLap . "Car." . cars[A_Index][1] . ".Position", A_Index)
+	}
+	
+	return true
 }

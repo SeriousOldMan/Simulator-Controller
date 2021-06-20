@@ -532,12 +532,7 @@ class RaceStrategist extends RaceAssistant {
 ;;;-------------------------------------------------------------------------;;;
 
 comparePositions(c1, c2) {
-	if (c1[2] > c2[2])
-		return false
-	else if (c1[2] = c2[2])
-		return !(c1[3] > c2[3])
-	else
-		return true
+	return !(c1[2] > c2[2])
 }
 
 updatePositions(context, futureLap) {
@@ -552,7 +547,7 @@ updatePositions(context, futureLap) {
 		if (laps == kUndefined)
 			break
 		else
-			cars.Push(A_Index, laps, knowledgeBase.getValue("Standings.Extrapolated." . futureLap . "Car." . A_Index . ".Running"))
+			cars.Push(Array(A_Index, laps))
 		
 		count += 1
 	}

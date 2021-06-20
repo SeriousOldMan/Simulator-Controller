@@ -97,6 +97,8 @@ class RaceStrategist extends RaceAssistant {
 				this.weatherRecognized(words)
 			case "Position":
 				this.positionRecognized(words)
+			case "FuturePosition":
+				this.futurePositionRecognized(words)
 			case "GapToFront":
 				this.gapToFrontRecognized(words)
 			case "GapToBehind":
@@ -150,6 +152,31 @@ class RaceStrategist extends RaceAssistant {
 			if (position <= 3)
 				this.getSpeaker().speakPhrase("Great")
 		}
+	}
+	
+	futurePositionRecognized(words) {
+		local action
+		
+		if !this.hasEnoughData()
+			return
+		
+		speaker := this.getSpeaker()
+		fragments := speaker.Fragments
+		
+		lapsPosition := inList(words, fragments["Laps"])
+				
+		if lapsPosition {
+			laps := words[litresPosition - 1]
+			
+			if laps is number
+			{
+				speaker.speakPhrase("Not yet implemented")
+				
+				return
+			}
+		}
+			
+		speaker.speakPhrase("Repeat")
 	}
 	
 	gapToFrontRecognized(words) {
@@ -542,7 +569,7 @@ updatePositions(context, futureLap) {
 	count := 0
 	
 	Loop {
-		laps := knowledgeBase.getValue("Standings.Extrapolated." . futureLap . "Car." . A_Index . ".Laps", kUndefined)
+		laps := knowledgeBase.getValue("Standings.Extrapolated." . futureLap . ".Car." . A_Index . ".Laps", kUndefined)
 		
 		if (laps == kUndefined)
 			break
@@ -558,7 +585,7 @@ updatePositions(context, futureLap) {
 		if (A_Index > count)
 			break
 		
-		knowledgeBase.setFact("Standings.Extrapolated." . futureLap . "Car." . cars[A_Index][1] . ".Position", A_Index)
+		knowledgeBase.setFact("Standings.Extrapolated." . futureLap . ".Car." . cars[A_Index][1] . ".Position", A_Index)
 	}
 	
 	return true

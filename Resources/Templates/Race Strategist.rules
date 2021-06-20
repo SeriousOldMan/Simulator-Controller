@@ -168,8 +168,8 @@ priority: -20, [?Lap] => (Prove: clearExtrapolatedLap, ?Lap, !Car.Count)
 
 clearExtrapolatedLap(?lap, 0) <= !
 clearExtrapolatedLap(?lap, ?car)  <= Clear(Standings.Extrapolated, ?lap, Car, ?car, Position),													\
-									 Clear(Standings.Extrapolated, ?lap, Car, ?car, Laps), ?nextCar = ?car - 1,									\
-									 clearExtrapolatedLap(?nextLap, ?car)
+									 Clear(Standings.Extrapolated, ?lap, Car, ?car, Laps),														\
+									 ?nextCar = ?car - 1, clearExtrapolatedLap(?lap, ?nextCar)
 
 priority: -20, {All: [?Lap], [?Session.Settings.Standings.Extrapolation.Laps]} =>																\
 		(Prove: extrapolatePositions, ?Lap, ?Session.Settings.Standings.Extrapolation.Laps),													\
@@ -194,7 +194,7 @@ extrapolatePositions(?lap, ?car, ?futureLap, ?deltaTime) <= carAvgLapTime(?lap, 
 
 updatePositions(?, 0) <= !
 updatePositions(?lap, ?lapDelta) <= ?futureLap = ?lap + ?lapDelta, Call(updatePositions, ?futureLap),											\
-									?nextDelta = ?lapDelta - 1, extrapolateStandings(?lap, ?nextDelta)
+									?nextDelta = ?lapDelta - 1, updatePositions(?lap, ?nextDelta)
 
 correctPositions(?, ?, 0) <= !
 correctPositions(?lap, ?overtakeDelta, ?lapDelta) <= ?futureLap = ?lap + ?lapDelta,																\

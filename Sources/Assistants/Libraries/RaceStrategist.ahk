@@ -142,21 +142,18 @@ class RaceStrategist extends RaceAssistant {
 	positionRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
 		
+		speaker := this.getSpeaker()
 		position := Round(knowledgeBase.getValue("Position", 0))
 		
 		if (position == 0)
-			this.getSpeaker().speakPhrase("Later")
+			speaker.speakPhrase("Later")
+		else if inList(words, speaker.Fragments["Laps"])
+			this.futurePositionRecognized(words)
 		else {
-			lapPosition := inList(words, fragments["Laps"])
-				
-			if lapPosition
-				this.futurePositionRecognized(words)
-			else {
-				this.getSpeaker().speakPhrase("Position", {position: position})
-				
-				if (position <= 3)
-					this.getSpeaker().speakPhrase("Great")
-			}
+			speaker.speakPhrase("Position", {position: position})
+			
+			if (position <= 3)
+				speaker.speakPhrase("Great")
 		}
 	}
 	

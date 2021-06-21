@@ -415,17 +415,56 @@ class VoiceServer extends ConfigurationItem {
 		if this.PushToTalk {
 			listen := ObjBindMethod(this, "listen")
 			
-			SetTimer %listen%, 100
+			SetTimer %listen%, 50
 		}
 	}
 	
 	listen() {
-		theHotkey := this.PushToTalk
+		static isPressed := false
+		static isActivation := false
+		static lastDown := 0
+		static lastUp := 0
+		static clicks := 0
 		
-		if !this.Speaking && GetKeyState(theHotKey, "P")
-			this.startListening()
-		else if !GetKeyState(theHotKey, "P")
-			this.stopListening()
+		theHotkey := this.PushToTalk
+		pressed := GetKeyState(theHotKey, "P")
+		activation := false
+		
+		if (pressed && !isPressed) {
+			lastDown := A_TickCount
+			isPressed := true
+			
+			if (((lastDown - lastUp) < 400) && (clicks == 1))
+				activation := true
+			else
+				clicks := 0
+		}
+		else if (!pressed && isPressed) {
+			lastUp := A_TickCount
+			isPressed := false
+			
+			if ((lastUp - lastDown) < 400)
+				clicks += 1
+			else
+				clicks := 0
+		}
+		
+		if !this.Speaking && pressed {
+			if activation
+				this.startActivationListener()
+			else
+				this.startListening(false)
+			
+			isActivation := activation
+		}
+		else if !pressed {
+			if isActivation
+				this.stopActivationListener()
+			else
+				this.stopListening()
+			
+			isActivation := false
+		}
 	}
 	
 	getVoiceClient(descriptor := false) {
@@ -506,16 +545,12 @@ class VoiceServer extends ConfigurationItem {
 	}
 	
 	startListening(retry := true) {
-		this.startActivationListener(retry)
-		
 		activeClient := this.getVoiceClient()
-		
+			
 		return (activeClient ? activeClient.startListening(retry) : false)
 	}
 	
 	stopListening(retry := false) {
-		this.stopActivationListener(retry)
-		
 		activeClient := this.getVoiceClient()
 		
 		return (activeClient ? activeClient.stopListening(retry) : false)

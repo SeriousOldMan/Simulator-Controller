@@ -16,6 +16,14 @@ Release 3.1.4 Checklist
 =======================
 
 0. Search for new links (*)
+1. New double click activation for activation phrases
+   a. Documentation
+   b. Release Notes
+2. New Settings for Race Strategist
+   a. Documentation
+   b. Docs Image
+   c. Installation & Setup.md
+   d. Virtual Race Strategist.md
 
 Release 3.1.2 Checklist
 =======================

@@ -36,6 +36,18 @@ Important: If you have multiple *dialog partners* active, for example Jona and C
 
 (You regain your focus and try to overtake P 11. It will be a nice safety barrier between you and the faster car behind you...)
 
+(Finally, after you've managed to gain P 11 and settled your pace, you want your strategist to run a simulation, how the race might develop in the next few laps.)
+
+**Driver: "What will be my position in 4 laps?"**
+
+**Cato: "Understood. Please give me a few seconds."**
+
+(Cato runs a simulation in the background to calculate the possible race positions for the requested lap. Cato will use the average pace of all drivers and takes into account, how many seconds an overtake might need depending on the settings.)
+
+**Cato: "The simulation shows you on P 8."**
+
+(That is a very good message. You put your foot down on the pedal and push a little bit more to bridge the gap to the car in front of you.)
+
 To have an error free session like this one, you must have a perfect setup for voice recognition. I strongly recommend using a headset, since alien noises might lead to false positives in Catos voice recognition. Please see the section on [troubleshooting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#troubleshooting) in the documentation for Jona, if you need some hints.
 
 ## Installation

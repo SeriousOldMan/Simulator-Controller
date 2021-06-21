@@ -170,13 +170,18 @@ class RaceStrategist extends RaceAssistant {
 		lapPosition := inList(words, fragments["Laps"])
 				
 		if lapPosition {
-			lap := words[litresPosition - 1]
+			lapDelta := words[litresPosition - 1]
 			
-			if lap is number
+			if lapDelta is number
 			{
-				if (lap <= knowledgeBase.getValue("Lap"))
+				currentLap := knowledgeBase.getValue("Lap")
+				lap := currentLap + lap
+				
+				if (lap <= currentLap)
 					speaker.speakPhrase("NoFutureLap")
 				else {
+					speaker.speakPhrase("Confirm")
+					
 					knowledgeBase.setFact("Lap.Extrapolate", lap)
 		
 					knowledgeBase.produce()

@@ -1,3 +1,11 @@
+## 3.1.2-release 06//21 (planned)
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. New Assetto Corsa Competizione data acquisition for Cato, the Virtual Race Strategist.
+  4. Full propabilistic model for future race positions. You can ask Cato for future race standings.
+  5. New settings for the Race Strategist.
+
 ## 3.1.2-release 06/18/21
 
   1. Bugfixes, as always

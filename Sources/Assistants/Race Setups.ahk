@@ -1,5 +1,5 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Race Engineer Setups Tool       ;;;
+;;;   Modular Simulator Controller System - Race Setups Tool                ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2021) Creative Commons - BY-NC-SA                        ;;;
@@ -21,7 +21,7 @@ SetBatchLines -1				; Maximize CPU utilization
 ListLines Off					; Disable execution history
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Wrench.ico
-;@Ahk2Exe-ExeName Race Engineer Setups.exe
+;@Ahk2Exe-ExeName Race Setups.exe
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -710,7 +710,7 @@ deleteWetRaceSetup() {
 }
 
 openSettings(mode := "New", arguments*) {
-	exePath := kBinariesDirectory . "Race Engineer Settings.exe"
+	exePath := kBinariesDirectory . "Race Assistant Settings.exe"
 	fileName := kTempDirectory . "Temp.settings"
 				
 	Gui RES:Hide
@@ -740,9 +740,9 @@ openSettings(mode := "New", arguments*) {
 			return false
 	}
 	catch exception {
-		logMessage(kLogCritical, translate("Cannot start the Race Engineer Settings tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
+		logMessage(kLogCritical, translate("Cannot start the Race Assistant Settings tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 			
-		showMessage(substituteVariables(translate("Cannot start the Race Engineer Settings tool (%exePath%) - please check the configuration..."), {exePath: exePath})
+		showMessage(substituteVariables(translate("Cannot start the Race Assistant Settings tool (%exePath%) - please check the configuration..."), {exePath: exePath})
 				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 		
 		return false
@@ -1142,7 +1142,7 @@ showSetups(command := false, simulator := false, car := false, track := false, w
 	}
 }
 
-showRaceEngineerSetups() {
+showRaceSetups() {
 	icon := kIconsDirectory . "Wrench.ico"
 	
 	Menu Tray, Icon, %icon%, , 1
@@ -1207,4 +1207,4 @@ showRaceEngineerSetups() {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-showRaceEngineerSetups()
+showRaceSetups()

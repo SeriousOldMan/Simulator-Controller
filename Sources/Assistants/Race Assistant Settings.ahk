@@ -1,5 +1,5 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Race Engineer Settings Editor   ;;;
+;;;   Modular Simulator Controller System - Race Assistant Settings Editor  ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2021) Creative Commons - BY-NC-SA                        ;;;
@@ -21,7 +21,7 @@ SetBatchLines -1				; Maximize CPU utilization
 ListLines Off					; Disable execution history
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Artificial Intelligence Settings.ico
-;@Ahk2Exe-ExeName Race Engineer Settings.exe
+;@Ahk2Exe-ExeName Race Assistant Settings.exe
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -45,7 +45,7 @@ global kCancel = "Cancel"
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kRaceEngineerSettingsFile = getFileName("Race Engineer.settings", kUserConfigDirectory)
+global kRaceEngineerSettingsFile = getFileName("Race Assistant.settings", kUserConfigDirectory)
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -109,7 +109,7 @@ cancelSettings() {
 }
 
 openSettingsDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-engineer-settings
+	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings
 }
 
 isFloat(numbers*) {
@@ -392,7 +392,7 @@ restart:
 		Gui RES:Font, Norm, Arial
 		Gui RES:Font, Italic Underline, Arial
 
-		Gui RES:Add, Text, YP+20 w388 cBlue Center gopenSettingsDocumentation, % translate("Race Engineer Settings")
+		Gui RES:Add, Text, YP+20 w388 cBlue Center gopenSettingsDocumentation, % translate("Race Assistant Settings")
 
 		Gui RES:Font, Norm, Arial
 				
@@ -401,7 +401,7 @@ restart:
 		Gui RES:Add, Button, x8 y450 w77 h23 gloadSettings, % translate("&Load...")
 		Gui RES:Add, Button, x90 y450 w77 h23 gsaveSettings, % translate("&Save...")
 				
-		tabs := map(["Race", "Pitstop"], "translate")
+		tabs := map(["Race", "Pitstop", "Strategy"], "translate")
 
 		Gui RES:Add, Tab3, x8 y48 w388 h395 -Wrap, % values2String("|", tabs*)
 
@@ -541,11 +541,6 @@ restart:
 		Gui RES:Add, Edit, x106 yp-2 w50 h20 VfuelConsumptionEdit, %fuelConsumptionEdit%
 		Gui RES:Add, Text, x164 yp+4 w90 h20, % translate("Ltr.")
 
-		Gui RES:Add, Text, x16 yp+22 w85 h20 +0x200, % translate("Pitstop Delta")
-		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit2 Number VpitstopDeltaEdit, %pitstopDeltaEdit%
-		Gui RES:Add, UpDown, x138 yp-2 w18 h20 0x80, %pitstopDeltaEdit%
-		Gui RES:Add, Text, x164 yp+4 w90 h20, % translate("Sec.")
-
 		Gui RES:Add, Text, x212 ys-2 w85 h23 +0x200, % translate("Formation")
 		Gui RES:Add, CheckBox, x292 yp-1 w17 h23 Checked%formationLapCheck% VformationLapCheck, %formationLapCheck%
 		Gui RES:Add, Text, x310 yp+4 w90 h20, % translate("Lap")
@@ -562,7 +557,7 @@ restart:
 		Gui RES:Font, Norm, Arial
 		Gui RES:Font, Bold Italic, Arial
 
-		Gui RES:Add, Text, x66 yp+52 w270 0x10
+		Gui RES:Add, Text, x66 yp+28 w270 0x10
 		Gui RES:Add, Text, x16 yp+10 w370 h20 Center BackgroundTrans, % translate("Initial Setup")
 
 		Gui RES:Font, Norm, Arial
@@ -654,6 +649,23 @@ restart:
 		; Gui RES:Add, UpDown, x324 yp-2 w18 h20
 		Gui RES:Add, Text, x350 yp+2 w30 h20, % translate("PSI")
 
+		Gui Tab, 3
+		
+		Gui RES:Add, Text, x16 y82 w105 h20 Section, % translate("Race positions")
+		Gui RES:Add, Edit, x126 yp-2 w50 h20 Limit1 Number ; VpitstopWarningEdit, %pitstopWarningEdit%
+		Gui RES:Add, UpDown, x158 yp-2 w18 h20 ;, %pitstopWarningEdit%
+		Gui RES:Add, Text, x184 yp+2 w290 h20, % translate("simulated future laps")
+
+		Gui RES:Add, Text, x16 yp+20 w85 h23 +0x200, % translate("Overtake")
+		Gui RES:Add, Edit, x126 yp w50 h20 Limit3 Number ; VavgLaptimeEdit, %avgLaptimeEdit%
+		Gui RES:Add, UpDown, x158 yp-2 w18 h20 Range1-999 0x80 ;, %avgLaptimeEdit%
+		Gui RES:Add, Text, x184 yp+4 w290 h20, % translate("additional seconds for each passed car")
+
+		Gui RES:Add, Text, x16 yp+22 w85 h20 +0x200, % translate("Pitstop Delta")
+		Gui RES:Add, Edit, x126 yp-2 w50 h20 Limit2 Number VpitstopDeltaEdit, %pitstopDeltaEdit%
+		Gui RES:Add, UpDown, x158 yp-2 w18 h20 0x80, %pitstopDeltaEdit%
+		Gui RES:Add, Text, x184 yp+4 w290 h20, % translate("seconds for a drive through")
+
 		Gui RES:Show, AutoSize Center
 		
 		Loop {
@@ -664,7 +676,7 @@ restart:
 			if (result == kLoad) {
 				result := false
 				
-				title := translate("Load Race Engineer Settings...")
+				title := translate("Load Race Assistant Settings...")
 				
 				FileSelectFile file, 1, %kRaceEngineerSettingsFile%, %title%, Settings (*.settings)
 			
@@ -679,7 +691,7 @@ restart:
 			else if (result == kSave) {
 				result := false
 			
-				title := translate("Save Race Engineer Settings...")
+				title := translate("Save Race Assistant Settings...")
 				
 				FileSelectFile file, S, %kRaceEngineerSettingsFile%, %title%, Settings (*.settings)
 			
@@ -717,7 +729,7 @@ readSimulatorData(simulator) {
 }
 
 openSetupDatabase() {
-	exePath := kBinariesDirectory . "Race Engineer Setups.exe"
+	exePath := kBinariesDirectory . "Race Setups.exe"
 	
 	try {
 		options := []
@@ -736,9 +748,9 @@ openSetupDatabase() {
 		Run "%exePath%" %options%, %kBinariesDirectory%, , pid
 	}
 	catch exception {
-		logMessage(kLogCritical, translate("Cannot start the Race Engineer Setups tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
+		logMessage(kLogCritical, translate("Cannot start the Race Setups tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 			
-		showMessage(substituteVariables(translate("Cannot start the Race Engineer Setups tool (%exePath%) - please check the configuration..."), {exePath: exePath})
+		showMessage(substituteVariables(translate("Cannot start the Race Setups tool (%exePath%) - please check the configuration..."), {exePath: exePath})
 				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 	}
 }

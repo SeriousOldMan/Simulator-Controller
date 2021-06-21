@@ -133,14 +133,14 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 		}
 	}
 
-	class RaceEngineerSettingsAction extends RaceEngineerPlugin.RaceEngineerAction {
+	class RaceAssistantSettingsAction extends RaceEngineerPlugin.RaceEngineerAction {
 		fireAction(function, trigger) {
 			if (this.Action = "RaceEngineerOpenSettings")
-				openRaceEngineerSettings()
+				openRaceAssistantSettings()
 			else if (this.Action = "RaceEngineerImportSettings")
-				openRaceEngineerSettings(true)
+				openRaceAssistantSettings(true)
 			else if (this.Action = "RaceEngineerOpenSetups")
-				openRaceEngineerSetups()
+				openRaceSetups()
 		}
 	}
 	
@@ -285,7 +285,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 			else if (action = "RaceEngineer")
 				this.registerAction(new this.RaceEngineerToggleAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Toggle"), action)))
 			else if ((action = "RaceEngineerOpenSettings") || (action = "RaceEngineerImportSettings") || (action = "RaceEngineerOpenSetups"))
-				this.registerAction(new this.RaceEngineerSettingsAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Activate")), action))
+				this.registerAction(new this.RaceAssistantSettingsAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Activate")), action))
 			else
 				logMessage(kLogWarn, translate("Action """) . action . translate(""" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
 		}
@@ -353,7 +353,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 			try {
 				logMessage(kLogInfo, translate("Starting ") . translate("Race Engineer"))
 				
-				options := " -Settings """ . getFileName("Race Engineer.settings", kUserConfigDirectory) . """"
+				options := " -Settings """ . getFileName("Race Assistant.settings", kUserConfigDirectory) . """"
 				
 				if this.Simulator.supportsPitstop()
 					options .= " -Remote " . controllerPID
@@ -451,15 +451,15 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 				setConfigurationValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.RR", Round(pressures[4], 1))
 			}
 			
-			writeConfiguration(kUserConfigDirectory . "Race Engineer.settings", settings)
+			writeConfiguration(kUserConfigDirectory . "Race Assistant.settings", settings)
 		}
 		else if (tpSetting = "Import") {
-			writeConfiguration(kUserConfigDirectory . "Race Engineer.settings", settings)
+			writeConfiguration(kUserConfigDirectory . "Race Assistant.settings", settings)
 			
-			openRaceEngineerSettings(true, true)
+			openRaceAssistantSettings(true, true)
 		}
 		else
-			writeConfiguration(kUserConfigDirectory . "Race Engineer.settings", settings)
+			writeConfiguration(kUserConfigDirectory . "Race Assistant.settings", settings)
 	}
 	
 	startSession(dataFile) {
@@ -776,10 +776,10 @@ preparePitstop() {
 	}
 }
 
-openRaceEngineerSettings(import := false, silent := false) {
+openRaceAssistantSettings(import := false, silent := false) {
 	local plugin
 	
-	exePath := kBinariesDirectory . "Race Engineer Settings.exe"
+	exePath := kBinariesDirectory . "Race Assistant Settings.exe"
 	
 	try {
 		controller := SimulatorController.Instance
@@ -803,21 +803,21 @@ openRaceEngineerSettings(import := false, silent := false) {
 		}
 		
 		if pid {
-			callback := ObjBindMethod(plugin, "reloadSettings", pid, getFileName("Race Engineer.settings", kUserConfigDirectory))
+			callback := ObjBindMethod(plugin, "reloadSettings", pid, getFileName("Race Assistant.settings", kUserConfigDirectory))
 			
 			SetTimer %callback%, -1000
 		}
 	}
 	catch exception {
-		logMessage(kLogCritical, translate("Cannot start the Race Engineer Settings tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
+		logMessage(kLogCritical, translate("Cannot start the Race Assistant Settings tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 			
-		showMessage(substituteVariables(translate("Cannot start the Race Engineer Settings tool (%exePath%) - please check the configuration..."), {exePath: exePath})
+		showMessage(substituteVariables(translate("Cannot start the Race Assistant Settings tool (%exePath%) - please check the configuration..."), {exePath: exePath})
 				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 	}
 }
 
-openRaceEngineerSetups() {
-	exePath := kBinariesDirectory . "Race Engineer Setups.exe"
+openRaceSetups() {
+	exePath := kBinariesDirectory . "Race Setups.exe"
 	
 	try {
 		options := getRaceEngineerOptions()
@@ -825,9 +825,9 @@ openRaceEngineerSetups() {
 		Run "%exePath%" %options%, %kBinariesDirectory%, , pid
 	}
 	catch exception {
-		logMessage(kLogCritical, translate("Cannot start the Race Engineer Setups tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
+		logMessage(kLogCritical, translate("Cannot start the Race Setups tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 			
-		showMessage(substituteVariables(translate("Cannot start the Race Engineer Setups tool (%exePath%) - please check the configuration..."), {exePath: exePath})
+		showMessage(substituteVariables(translate("Cannot start the Race Setups tool (%exePath%) - please check the configuration..."), {exePath: exePath})
 				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 	}
 }

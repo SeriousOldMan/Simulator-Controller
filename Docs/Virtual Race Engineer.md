@@ -192,9 +192,9 @@ Most of the information, that Jona needs, will be collected from the telemetry i
 
 ### Race Settings
 
-That said, we now come to an unpleasant part of the game, at least for the moment. The additional knowledge Jona needs is stored in a special file, *Race.settings*, that exists in the *Simulator Controller\Config* folder in your user *Documents* folder, which you have to modify for each session. You can do this by editing this file using a text editor or you can use a graphical user interface by using the application *Race Settings.exe* from the *Binaries* folder. As a side note, I am still trying to gather at least the setup part of this information from the simulation game itself.
+That said, we now come to an unpleasant part of the game, at least for the moment. The additional knowledge Jona needs is stored in a special file, *Race Assistant.settings*, that exists in the *Simulator Controller\Config* folder in your user *Documents* folder, which you have to modify for each session. You can do this by editing this file using a text editor or you can use a graphical user interface by using the application *Race Settings.exe* from the *Binaries* folder. As a side note, I am still trying to gather at least the setup part of this information from the simulation game itself.
 
-The *Race.settings* looks like this:
+The *Race Assistant.settings* looks like this:
 
 	[Session Settings]
 	Duration=3600
@@ -245,13 +245,13 @@ Most options above define general settings which may be applicable to many diffe
   - The first fresh tyre set (*Tyre.Set.Fresh*), which is available for a pitstop and the tyres and pressures (*Tyre.XXX.Pressure.YY*) used for the first stint. Jona needs this information to calculate the target pressures for the first pitstop.
   - The *Lap.AvgTime* and *Fuel.AvgConsumption* are more informational, but might lead to more accurate estimations for the fuel calulations in the first few laps, where you typically have much slower lap times.
 
-Let's have a look at the settings tool, which provides a graphical user interface for the *Race.settings* file. The dialog provides two distinct areas as tabs.
+Let's have a look at the settings tool, which provides a graphical user interface for the *Race Assistant.settings* file. The dialog provides two distinct areas as tabs.
 
 #### Tab *Race*
 
 The first tab of the settings tool contains information about the actual session, which typically will be a race.
 
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Engineer%20Settings%202.JPG)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Assistant%20Settings%202.JPG)
 
 You must supply the tyre selection and pressure setup, that is used at the beginning of the race, in the lower area of the *Race* tab, wherease the static information for the given track and race is located in the upper area. With the "Setups..." button you can open the [setup database query tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#querying-the-setup-database) to look up the best match for tyre pressures from recent sessions. Beside that, you can use the "Import" button to retrieve the current tyre setup information from your simulation game. But which data are available for an import depends on the capabilities of the simulator game in use. For example, *Assetto Corsa Competizione* currently only gives access to the tyre pressures that are configured in the Pitstop MFD. But you may use the "Use current pressures" option in the *Assetto Corsa Competizione* "Fuel & Strategy" area to transfer your current tyre setup to the Pitstop MFD and "import" the settings from there. Depending on your currently mounted tyres, the values will be imported as "Dry" or "Wet" setup values. As a convenience shortcut, the *Import* operation can also be triggered by your hardware controller without opening the settings dialog, which might be all you need during a race preparation. Please consult the documentation for the ["Race Engineer" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) on how to do this.
 
@@ -263,7 +263,7 @@ Additionally worth to be mentioned is the field *Pitstop.Delta*, with which you 
 
 The second tab, *Pitstop*, contains information that will be used to derived the settings for a pitstop.
 
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Engineer%20Settings%201.JPG)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Assistant%20Settings%201.JPG)
 
 The upper area with the three dropdown menus give you you control over several decisions, Jona will take for an upcoming pitstop. For the repair settings you can decide between "Never", "Always", "Threshold" and "Impact", where "Threshold" will allow you to enter a value. If the current damage is above this value, Jona will advise to go for a repair on the next pitstop. Please note, that these values are NOT to be confused with the number of seconds for example shown on the *Assetto Corsa Competizione* Pitstop MFD, which references the number of seconds it will take to repair the damage. Typically a good threshold for bodywork damage will be between 30 and 40, but it strongly depends on the type of damage (front/rear or on the sides). For supsension damage, I advise to go always for a repair, but you might also use a threshold range around 5. For "Impact" you can enter a number of seconds. Jona will analyse your lap time and will go for a repair, if your lap time is slower by the number you entered with regards to a reference lap before the accident.
 
@@ -271,9 +271,9 @@ For tyre compound changes, you can choose between the triggers "Never", "Tyre Te
 
 In the lower area you can define the optimal or target tyre pressures. When there is a deviation larger than *Deviation Threshold* from these *Target Pressures* is detected by Jona, corresponding pressure adjustments will be applied for the next pitstop. Beside this very simple approach, there are rules in the AI kernel, which try to predict future influences by falling or rising ambient temperatures and upcoming weather changes, and Jona also might access the setup database for a second opinion on target pressures, both depending on the selection of the *Correction* check boxes.
 
-If you open the settings tool, it will load the *Race.settings* file located in the *Simulator Controller\Config* folder in your user *Documents* folder. If you close the tool with the "Ok" button, this file will be overwritten with the new information. Beside that, you can load a settings file from a different location with the "Load..." button and you can save the current settings with the "Save..." button. As an alternative to handle the locations of the settings files yourself, you can use the setup database to organize them. Plesse see the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--setup-database) for the setup database for further information.
+If you open the settings tool, it will load the *Race Assistant.settings* file located in the *Simulator Controller\Config* folder in your user *Documents* folder. If you close the tool with the "Ok" button, this file will be overwritten with the new information. Beside that, you can load a settings file from a different location with the "Load..." button and you can save the current settings with the "Save..." button. As an alternative to handle the locations of the settings files yourself, you can use the setup database to organize them. Plesse see the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--setup-database) for the setup database for further information.
 
-Good to know: When the *Race.settings* file is changed while Jona is already active, the updated settings will be imported into the active session. This is useful during Practice, Qualification or even Endurance Race sessions. And, if you click on the blue label of the dialog title, this documentation will be opened in your browser.
+Good to know: When the *Race Assistant.settings* file is changed while Jona is already active, the updated settings will be imported into the active session. This is useful during Practice, Qualification or even Endurance Race sessions. And, if you click on the blue label of the dialog title, this documentation will be opened in your browser.
 
 Beside the session respectively race specific settings described in the previous sections, the general behaviour of the Virtual Race Engineer can be customized using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-engineer). 
 
@@ -292,7 +292,7 @@ Before Release 2.6, you had to setup your ACC pitstop strategy in a special way 
   - Refueling must be set to zero litres for each strategy
   - Each strategy has to use the Dry tyre compound
   - Each strategy has to use the next fresh tyre set after the previous strategy
-  - For each strategy, the tyre pressures must be those as used for the first stint and documented in the *Race.settings* file as described above
+  - For each strategy, the tyre pressures must be those as used for the first stint and documented in the *Race Assistant.settings* file as described above
 
 Beginning with Release 2.6 this is not necessary anymore, since Jona can acquire the curent settings directly from *Assetto Corsa Competizione* via APIs. Jona now uses the values already set in the Pitstop MFD and calculates the delta to the desired target values. Please note, that this requires the settings in the [*Race Settings*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tab-race) dialog to be valid, especially the value for the first fresh dry tyre set. Beside that, I still recommend to setup a reasonable pitstop strategy, since this will reduce the time needed to dial in all those numbers (going from 0 to 120 litres of refueling will take quite some time).
 
@@ -332,7 +332,7 @@ Note: The database is stored in the *Simulator Controller\Setup Database* folder
 
 Whenever you have to setup your car for a given track and specific environmental conditions you can query the setup database to get a recommendation on how to setup your car. When you start the application *Setup Database.exe* from the *Binaries* folder, the following dialog will open up.
 
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Engineer%20Setups%201.JPG)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Setup%20Database%201.JPG)
 
 You have to enter all the fields in the upper area to specify the simulation, car, track, current weather and so on. Then you will get a recommendation for initial cold tyre pressures in the first tab in the lower area, if a matching setup is available in the setup database. Depending on the temperature settings the recommended tyre pressures will be marked in dark green for a perfect match, or light green or even yellow, if the values have been extra- or interpolated from different air and/or track temperatures.
 
@@ -340,19 +340,19 @@ Note: If the *Setup Database* query tool has been [started by the *Race Settings
 
 The second tab allows you to store your preferred car setup files for different conditions (Wet vs. Dry) and different Sessions (Qualification vs. Race) in the setup database.
 
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Engineer%20Setups%202.JPG)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Setup%20Database%202.JPG)
 
 The dropdown menus let you access all setup files, which had been associated with the given car and track, either by you or by another person from the community. The buttons on the right side of the dropdown menu let you 1. upload a setup to the database, 2. download a setup and store it in the specific folder for a simulation and 3. delete one of your setups from the database.
 
 Session settings created by the [*Race Settings*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-engineer-settings) tool can be stored in the setup database as well. You can configure Jona with the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-engineer) to load the best matching settings according to the session duration at the beginning of a new session.
 
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Engineer%20Setups%204.JPG)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Setup%20Database%204.JPG)
 
 The buttons below the list of settings will allow you to create new settings, edit the selected settings, clone the selected settings or delete the selected settings. Settings may alos be renamed by double clicking on the corresponding line or pressing *F2* while a line is selected.
 
 In the last tab you can take some notes on the track, or open issues with your setups and so on.
 
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Engineer%20Setups%203.JPG)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Setup%20Database%203.JPG)
 
 With the dropdown menu in the lower left corner you can choose, whether only your own setups (=> "Local") will be included in the database search or that also the setups of othe users of Simulator Controller might be considered (=> "Local & Global"). Since the community setups have not been consolidated yet, these two settings are identical for the moment.
 

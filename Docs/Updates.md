@@ -47,6 +47,16 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ***
 
+## Release 3.1.4
+
+Please take note of the following:
+
+  - The "Race Engineer.settings" file has been renamed to "Race Assistant.settings". The automated update procedure will take care of the renaming in all locations, even in the local setup database.
+  - The controller actions "openRaceEngineerSettings" and "openRaceEngineerSetups" have been renamed to "openRaceAssistantSettings" and "openSetupDatabase" respectively. If you have used them in your configuration, you must rename them manually.
+
+
+***
+
 ## Release 3.1.2
 
 This release takes the next step for Cato, the Virtual Race Strategist and introduces integrations for iRacing, rFactor 2 and RaceRoom Racing Experience. Nothing to do here on your side. Small adaptions may be necessary for:

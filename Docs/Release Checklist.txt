@@ -24,13 +24,13 @@ Release 3.1.4 Checklist
    b. Docs Image
    c. Installation & Setup.md
    d. Virtual Race Strategist.md
-3. Renamed "Race Engineer Settings" to "Race Settings" and extended for Strategy
+3. Renamed "Race Engineer Settings" to "Race Assistant Settings" and extended for Strategy
    a. Documentation
    b. Update Procedure for Setup Database
-4. Renamed "Race Engineer Setups" to "Race Setups"
+4. Renamed "Race Engineer Setups" to "Setup Database"
    a. Documentation
    b. Update Procedure for Setup Database
-5. Renamed "Race Engineer Settings.ini" to "Race Settings.ini"
+5. Renamed "Race Engineer.settings" to "Race Assistant.settings"
    a. Documentation
    b. Update Procedure
 6. Renamed "openRaceEngineerSettings" to "openRaceAssistantSettings"

@@ -1,5 +1,5 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Race Setups Tool                ;;;
+;;;   Modular Simulator Controller System - Setup Database Tool             ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2021) Creative Commons - BY-NC-SA                        ;;;
@@ -21,7 +21,7 @@ SetBatchLines -1				; Maximize CPU utilization
 ListLines Off					; Disable execution history
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Wrench.ico
-;@Ahk2Exe-ExeName Race Setups.exe
+;@Ahk2Exe-ExeName Setup Database.exe
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -1142,7 +1142,7 @@ showSetups(command := false, simulator := false, car := false, track := false, w
 	}
 }
 
-showRaceSetups() {
+showSetupDatabase() {
 	icon := kIconsDirectory . "Wrench.ico"
 	
 	Menu Tray, Icon, %icon%, , 1
@@ -1207,4 +1207,4 @@ showRaceSetups() {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-showRaceSetups()
+showSetupDatabase()

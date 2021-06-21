@@ -36,9 +36,13 @@ Release 3.1.4 Checklist
 6. Renamed "openRaceEngineerSettings" to "openRaceAssistantSettings"
    a. Documentation
    b. Update Procedure
-7. Renamed "openRaceEngineerSetups" to "openRaceAssistantSetups"
+7. Renamed "openRaceEngineerSetups" to "openSetupDatabase"
    a. Documentation
    b. Update Procedure
+8. Update procedure
+   a. Translations
+   b. Paths in Setup Database
+   c. Renaming of "Race Engineer.settings" in all locations
 
 Release 3.1.2 Checklist
 =======================

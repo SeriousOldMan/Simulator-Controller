@@ -95,7 +95,7 @@ No manual update steps necessary for this release, everything is handled automat
 
 ## Release 3.0
 
-This update is handled completely without manual interaction. You might want to add the new application *Race Engineer Setups.exe* to your *launchpad* (see the ["Launch" mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-launch) of the "System" plugin for more information), though. Also, you might want to use the new [plugin parameter *raceEngineerOpenSetups*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin to open the setup database query tool.
+This update is handled completely without manual interaction. You might want to add the new application *Setup Database.exe* to your *launchpad* (see the ["Launch" mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-launch) of the "System" plugin for more information), though. Also, you might want to use the new [plugin parameter *raceEngineerOpenSetups*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin to open the setup database query tool.
 
 ***
 
@@ -171,7 +171,7 @@ With this release, Jona is feature complete and therefore no longer to be consid
 
 The format of the *Race Engineer.settings* file changed again and the [settings tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-engineer-settings) had been updated for the tyre compound selection rules. Please open the settings tool and check all values, especially for weather related tyre compound changes on upcoming pitstops, and leave the dialog by pressing "Ok".
 
-Beside tremendous changes under the hood for Jona, Release 2.5.4 delivers a new plugin argument for the *Assetto Corsa Competizione* plugin, which allows you to open the race engineer settings dialog from your hardware controller. Please consult the update [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-acc) for more information as well.
+Beside tremendous changes under the hood for Jona, Release 2.5.4 delivers a new plugin argument for the *Assetto Corsa Competizione* plugin, which allows you to open the Race Settings dialog from your hardware controller. Please consult the update [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-acc) for more information as well.
 
 And, last but not least, the support for multiple button boxes has been extended. You can now distribute the applications of the Lauchpad and also the chat messages across multiple Button Boxes using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration).
 
@@ -194,7 +194,7 @@ Release 2.4 introduces the first version of the plugin for RaceRoom Racing Exper
 The automated update procedure described above will add the plugin descriptor to your local configuration, but the plugin will be deactivated. You may want to activate it using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration), but to do so, you also have to add a new application on the [Applications tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-applications), which must be named "RaceRoom Racing Experience". Please set "startRRE" as the *Startup Function Hook* and "ahk_exe RRRE64.exe" (yes, three "R"s) as the window title. And last but not least, you may want to add "RaceRoom Racing Experience" to the list of Simulators on the [General tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-general).
 
 Unfortunately, the format of some of the Settings files have changed again with this release and you have to recreate them:
-  1. The format of the *Race Engineer Settings* file has changed again. Please start the *Race Engineer Settings* application, adjust all the settings and close the dialog with the "Ok" button.
+  1. The format of the *Race Settings* file has changed again. Please start the *Race Settings* application, adjust all the settings and close the dialog with the "Ok" button.
   2. Hold the control button down, while starting "Simulator Startup" and adjust the Button Box position. This is necessary, since Simulator Controller now supports multiple Button Boxes.
   
 Last, but not least, the former automatically activated "Shutdown" function in the "Launch" mode now is configured by an explicit plugin argument of the *System* plugin. You must update your [plugin configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration), if you want the "Shutdown" function to still be available.
@@ -207,7 +207,7 @@ Beside lots of new functionality for Jona, the Virtual Race Engineer, this relea
 
 The automated update procedure described above will add the plugin descriptor to your local configuration, but the plugin will be deactivated. You may want to activate it using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration), but to do so, you also have to add a new application on the [Applications tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-applications), which must be named "rFactor 2". Please set "startRF2" as the *Startup Function Hook*. And last but not least, you may want to add "rFactor 2" to the list of Simulators on the [General tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-general).
 
-A second step for the update requires the recreation of of the *Race Engineer.settings* file, since the format has changed substantially. Please start the *Race Engineer Settings* application, adjust all the settings and close the dialog with the "Ok" button.
+A second step for the update requires the recreation of of the *Race Engineer.settings* file, since the format has changed substantially. Please start the *Race Settings* application, adjust all the settings and close the dialog with the "Ok" button.
 
 The last step is only required by the developers amongst you: If you are using a local version of the *Simulator Tools.targets* file, you need to take a look witth you favorite Diff tool, since the original file changed substantially as well.
 

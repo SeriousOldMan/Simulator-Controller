@@ -330,13 +330,13 @@ Note: The database is stored in the *Simulator Controller\Setup Database* folder
 
 #### Querying the setup database
 
-Whenever you have to setup your car for a given track and specific environmental conditions you can query the setup database to get a recommendation on how to setup your car. When you start the application *Race Setups.exe* from the *Binaries* folder, the following dialog will open up.
+Whenever you have to setup your car for a given track and specific environmental conditions you can query the setup database to get a recommendation on how to setup your car. When you start the application *Setup Database.exe* from the *Binaries* folder, the following dialog will open up.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Engineer%20Setups%201.JPG)
 
 You have to enter all the fields in the upper area to specify the simulation, car, track, current weather and so on. Then you will get a recommendation for initial cold tyre pressures in the first tab in the lower area, if a matching setup is available in the setup database. Depending on the temperature settings the recommended tyre pressures will be marked in dark green for a perfect match, or light green or even yellow, if the values have been extra- or interpolated from different air and/or track temperatures.
 
-Note: If the *Race Setups* query tool has been [started by the *Race Settings* tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tab-race), you can transfer the current tyre pressure and compound information to the *Race Settings* by pressing the "Load" button.
+Note: If the *Setup Database* query tool has been [started by the *Race Settings* tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tab-race), you can transfer the current tyre pressure and compound information to the *Race Settings* by pressing the "Load" button.
 
 The second tab allows you to store your preferred car setup files for different conditions (Wet vs. Dry) and different Sessions (Qualification vs. Race) in the setup database.
 

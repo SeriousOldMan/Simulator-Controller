@@ -335,5 +335,5 @@ Selects the driver to take the car during the next pitstop. *selection* must be 
 #### *openRaceAssistantSettings(import :: Boolean := false)*
 Opens the settings tool, with which you can edit all the race specific settings, Jona needs for a given race. This action function is provided by the "Race Engineer" plugin and is available depending on the concrete configuration. If you supply *true* for the *import* parameter, the setup data is imported directly from a running simulation and the dialog is not opened.
 
-#### *openRaceEngineerSetups()*
+#### *openSetupDatabase()*
 Opens the query tool for the setup database, with which you can get the tyre pressures for a given session depending on the current environmental conditions. If a simulation is currently running, most of the query arguments will already be prefilled. This action function is provided by the "Race Engineer" plugin and is available depending on the concrete configuration.

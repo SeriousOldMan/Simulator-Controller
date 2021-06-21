@@ -421,7 +421,6 @@ class VoiceServer extends ConfigurationItem {
 	
 	listen() {
 		static isPressed := false
-		static isActivation := false
 		static lastDown := 0
 		static lastUp := 0
 		static clicks := 0
@@ -454,16 +453,10 @@ class VoiceServer extends ConfigurationItem {
 				this.startActivationListener()
 			else
 				this.startListening(false)
-			
-			isActivation := activation
 		}
 		else if !pressed {
-			if isActivation
-				this.stopActivationListener()
-			else
-				this.stopListening()
-			
-			isActivation := false
+			this.stopActivationListener()
+			this.stopListening()
 		}
 	}
 	

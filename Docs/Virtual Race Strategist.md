@@ -60,24 +60,6 @@ The same principles as [described for Jona](https://github.com/SeriousOldMan/Sim
 
 I strongly recommed to memorize the phrases in the language you use to interact with Cato. You will always find the current version of the grammar files in the *Resources\Grammars* folder of the Simulator Controller distribution. Or you can take a look at the files in the [*Resources\Grammars* directory on GitHub](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Resources/Grammars), for example the German version [Race Strategist.grammars.de](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Grammars/Race%20Strategist.grammars.de).
 
-### How it works
-
-Cato uses the position data gathered from the simulation game to a complete overview of all drivers, their lap times and the development of their positions on track, even with different pit strategies. Using this knowledge, Cato can give you valuable information, but also can derive race strategies, when your are stuck in traffic or are faced with other challenges.
-
-The following statistical models are currently implemented:
-
-  1. Weather trend analysis
-  
-     Cato will observe the weather development using the same rule set, that Jona uses. Thereby, Cato will notify you, when it is time to change the tyres, to achieve the best results. If you accept the recommendation, Cato will inform Jona to plan a pitstop with the best tyre compound for the upcoming conditions.
-
-  2. Fuel availabilty and stint time calculation
-  
-     Cato will observe the average fuel comsumption. Depending on the race situation and strategy requirements, Cato might suggest to save fuel to get one or two more laps from the available full. 
-
-  3. Standings and race position development
-
-     Using the position data gathered from the simulation game, Cato builds a knowledge of the pace of the various drivers. As a simple application of this knowledge, Cato can give you information about the current race positions and lap times of your opponents and the gaps between the cars. A more complex application will be a forecast of the race positions in a given time frame. This knowledge can be used for strategy development, for example to plan an undercut.
-
 ## Racing with Cato
 
 Using Cato during a race is easy. You can activate the assitant anytime using the activation phrase and ask then for information about current lap times, current and possible future standings and so on. Normally, Cato will not contact you on its own like Jona does, but Cato will also collaberate with Jona, when it is time for a pitstop. In this situation, Cato might suggest a specific lap for the next pitstop to optimize your race position after the stop.
@@ -96,6 +78,24 @@ Using the fields in the first group, you can customize the projection of current
 With the second field, *Overtake Delta*, you specify the number of seconds as time discount for each overtake for the passing and for the passed car.
 
 The second group of fields specify the time required for several pitstop activities. With the value of *Pitstop Delta*, you supply the difference time needed for a normal pitstop (time for pit in and pit out but without any service time minus the time to pass the pit area on the track, i.e. Drive through vs. Drive by), The fields below specify the time required for the various pit services, like changing tyres, refueling, and so on.
+
+### How it works
+
+Cato uses the position data gathered from the simulation game to form a complete overview of all drivers, their lap times and the development of their positions on track, even with different pit strategies. Using this knowledge, Cato can give you valuable information, but also can derive adapted race strategies, when your are stuck in traffic or are faced with other challenges.
+
+The following statistical models are currently implemented:
+
+  1. Weather trend analysis
+  
+     Cato will observe the weather development using the same rule set, that Jona uses. Thereby, Cato will notify you, when it is time to change the tyres, to achieve the best results. If you accept the recommendation, Cato will inform Jona to plan a pitstop with the best tyre compound for the upcoming conditions.
+
+  2. Fuel availabilty and stint time calculation
+  
+     Cato will observe the average fuel comsumption. Depending on the race situation and strategy requirements, Cato might suggest to save fuel to get one or two more laps from the available full. 
+
+  3. Standings and race position development
+
+     Using the position data gathered from the simulation game, Cato builds a knowledge of the pace of the various drivers. As a simple application of this knowledge, Cato can give you information about the current race positions and lap times of your opponents and the gaps between the cars. A more complex application will be a forecast of the race positions in a given time frame. This knowledge can be used for strategy development, for example to plan an undercut.
 
 ## Technical information
 

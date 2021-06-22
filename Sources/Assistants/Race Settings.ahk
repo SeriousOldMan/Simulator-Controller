@@ -260,6 +260,8 @@ editSettings(ByRef settingsOrCommand) {
 	static postRaceLapCheck
 	static fuelConsumptionEdit
 	static pitstopDeltaEdit
+	static pitstopTyreServiceEdit
+	static pitstopRefuelServiceEdit
 	static safetyFuelEdit
 
 restart:
@@ -272,7 +274,7 @@ restart:
 		
 		newSettings := newConfiguration()
 		
-		if (!isFloat(tyrePressureDeviationEdit, fuelConsumptionEdit
+		if (!isFloat(tyrePressureDeviationEdit, fuelConsumptionEdit, pitstopRefuelServiceEdit
 				   , tpDryFrontLeftEdit, tpDryFrontRightEdit, tpDryRearLeftEdit, tpDryRearRightEdit
 				   , tpWetFrontLeftEdit, tpWetFrontRightEdit, tpWetRearLeftEdit, tpWetRearRightEdit)
 		 || !isNumber(repairSuspensionThresholdEdit, repairBodyworkThresholdEdit)) {
@@ -339,6 +341,8 @@ restart:
 		setConfigurationValue(newSettings, "Session Setup", "Tyre.Wet.Pressure.RR", Round(spWetRearRightEdit, 1))
 		
 		setConfigurationValue(newSettings, "Strategy Settings", "Pitstop.Delta", pitstopDeltaEdit)
+		setConfigurationValue(newSettings, "Strategy Settings", "Service.Tyres", pitstopTyreServiceEdit)
+		setConfigurationValue(newSettings, "Strategy Settings", "Service.Refuel", pitstopRefuelServiceEdit)
 		setConfigurationValue(newSettings, "Strategy Settings", "Extrapolation.Laps", extrapolationLapsEdit)
 		setConfigurationValue(newSettings, "Strategy Settings", "Overtake.Delta", overtakeDeltaEdit)
 		
@@ -383,6 +387,8 @@ restart:
 		postRaceLapCheck := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Lap.PostRace", true)
 
 		pitstopDeltaEdit := getConfigurationValue(settingsOrCommand, "Strategy Settings", "Pitstop.Delta", getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Pitstop.Delta", 60))
+		pitstopTyreServiceEdit := getConfigurationValue(settingsOrCommand, "Strategy Settings", "Service.Tyres", 30)
+		pitstopRefuelServiceEdit := getConfigurationValue(settingsOrCommand, "Strategy Settings", "Service.Refuel", 1.5)
 		extrapolationLapsEdit := getConfigurationValue(settingsOrCommand, "Strategy Settings", "Extrapolation.Laps", 3)
 		overtakeDeltaEdit := getConfigurationValue(settingsOrCommand, "Strategy Settings", "Overtake.Delta", 1)
 		
@@ -669,10 +675,21 @@ restart:
 		Gui RES:Add, UpDown, x158 yp-2 w18 h20 Range1-999 0x80, %overtakeDeltaEdit%
 		Gui RES:Add, Text, x184 yp+4 w290 h20, % translate("additional seconds for each passed car")
 
-		Gui RES:Add, Text, x16 yp+22 w85 h20 +0x200, % translate("Pitstop Delta")
+		Gui RES:Add, Text, x66 yp+28 w270 0x10
+
+		Gui RES:Add, Text, x16 yp+15 w85 h20 +0x200, % translate("Pitstop Delta")
 		Gui RES:Add, Edit, x126 yp-2 w50 h20 Limit2 Number VpitstopDeltaEdit, %pitstopDeltaEdit%
 		Gui RES:Add, UpDown, x158 yp-2 w18 h20 0x80, %pitstopDeltaEdit%
-		Gui RES:Add, Text, x184 yp+4 w290 h20, % translate("seconds for a drive through")
+		Gui RES:Add, Text, x184 yp+4 w290 h20, % translate("Seconds (Drive through - Drive by)")
+
+		Gui RES:Add, Text, x16 yp+22 w85 h20 +0x200, % translate("Tyre Service")
+		Gui RES:Add, Edit, x126 yp-2 w50 h20 Limit2 Number VpitstopTyreServiceEdit, %pitstopTyreServiceEdit%
+		Gui RES:Add, UpDown, x158 yp-2 w18 h20 0x80, %pitstopTyreServiceEdit%
+		Gui RES:Add, Text, x184 yp+4 w290 h20, % translate("Seconds (Change four tyres)")
+
+		Gui RES:Add, Text, x16 yp+22 w85 h20 +0x200, % translate("Refuel Service")
+		Gui RES:Add, Edit, x126 yp-2 w50 h20 VpitstopRefuelServiceEdit, %pitstopRefuelServiceEdit%
+		Gui RES:Add, Text, x184 yp+4 w290 h20, % translate("Seconds (Refuel of 10 litres)")
 
 		Gui RES:Show, AutoSize Center
 		

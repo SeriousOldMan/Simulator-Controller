@@ -476,19 +476,20 @@ editTargets(command := "") {
 updatePhraseGrammars() {
 	languages := availableLanguages()
 	
-	for ignore, grammarFileName in getFileNames("Race Engineer.grammars.*", kUserGrammarsDirectory, kUserConfigDirectory) {
-		SplitPath grammarFileName, , , languageCode
+	for ignore, filePrefix in ["Race Engineer.grammars.*", "Race Strategist.grammars.*"]
+		for ignore, grammarFileName in getFileNames(filePrefix, kUserGrammarsDirectory, kUserConfigDirectory) {
+			SplitPath grammarFileName, , , languageCode
+			
+			userGrammars := readConfiguration(grammarFileName)
+			bundledGrammars := readConfiguration(getFileName("Race Engineer.grammars." . languageCode, kGrammarsDirectory, kConfigDirectory))
 		
-		userGrammars := readConfiguration(grammarFileName)
-		bundledGrammars := readConfiguration(getFileName("Race Engineer.grammars." . languageCode, kGrammarsDirectory, kConfigDirectory))
-	
-		for section, keyValues in bundledGrammars
-			for key, value in keyValues
-				if (getConfigurationValue(userGrammars, section, key, kUndefined) == kUndefined)
-					setConfigurationValue(userGrammars, section, key, value)
-					
-		writeConfiguration(grammarFileName, userGrammars)
-	}
+			for section, keyValues in bundledGrammars
+				for key, value in keyValues
+					if (getConfigurationValue(userGrammars, section, key, kUndefined) == kUndefined)
+						setConfigurationValue(userGrammars, section, key, value)
+						
+			writeConfiguration(grammarFileName, userGrammars)
+		}
 }
 
 updateTranslations() {
@@ -578,6 +579,38 @@ renewConsent() {
 		setConfigurationValue(consent, "General", "ReNew", true)
 		
 		writeConfiguration(kUserConfigDirectory . "CONSENT", consent)
+	}
+}
+
+updateConfigurationForV314() {
+	if FileExist(kUserConfigDirectory . "Race Engineer.settings")
+		try {
+			FileMove %kUserConfigDirectory%Race Engineer.settings, %kUserConfigDirectory%Race.settings, 1
+		}
+		catch exception {
+			; ignore
+		}
+	
+	Loop Files, %kSetupDatabaseDirectory%Local\*.*, D									; Simulator
+	{
+		simulator := A_LoopFileName
+		
+		Loop Files, %kSetupDatabaseDirectory%Local\%simulator%\*.*, D					; Car
+		{
+			car := A_LoopFileName
+			
+			Loop Files, %kSetupDatabaseDirectory%Local\%simulator%\%car%\*.*, D			; Track
+			{
+				track := A_LoopFileName
+		
+				try {
+					FileMoveDir %kSetupDatabaseDirectory%Local\%simulator%\%car%\%track%\Race Engineer Settings, %kSetupDatabaseDirectory%Local\%simulator%\%car%\%track%\Race Settings, R
+				}
+				catch exception {
+					; ignore
+				}
+			}
+		}
 	}
 }
 

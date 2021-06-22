@@ -22,6 +22,7 @@ Release 3.0.4=Release 3.0.2 -> updateTranslations, renewConsent
 Release 3.0.6=Release 3.0.4 -> updateTranslations, updatePhraseGrammars
 Release 3.1.0=Release 3.0.6 -> updatePluginsForV310, updateConfigurationForV310, updateTranslations, updatePhraseGrammars
 Release 3.1.2=Release 3.1.0 -> updatePluginsForV312, updateTranslations, updatePhraseGrammars
+; Release 3.1.4=Release 3.1.2 -> updateConfigurationForV314, updateTranslations, updatePhraseGrammars, updatePluginLabels
 [Cleanup]
 Binaries Folder=%kBinariesDirectory%
 Logs Folder=%kLogsDirectory%
@@ -58,8 +59,7 @@ Race Assistant Configuration.4=%kResourcesDirectory%Rules\Weather Information Re
 Race Assistant Configuration.5=%kResourcesDirectory%Rules\Pitstop Information Retrieval.rules <- %kSourcesDirectory%Assistants\Rules\Pitstop Information Retrieval.rules
 Race Assistant Configuration.6=%kResourcesDirectory%Rules\Lap Information Retrieval.rules <- %kSourcesDirectory%Assistants\Rules\Lap Information Retrieval.rules
 Race Assistant Configuration.7=%kResourcesDirectory%Rules\Standings Information Retrieval.rules <- %kSourcesDirectory%Assistants\Rules\Standings Information Retrieval.rules
-Race Assistant Configuration.8=%kConfigDirectory%Race.settings <- %kSourcesDirectory%Assistants\Race.settings
-Race Assistant Configuration.9=%kResourcesDirectory%Templates\Race.settings <- %kSourcesDirectory%Assistants\Race.settings
+Race Assistant Configuration.8=%kResourcesDirectory%Templates\Race.settings <- %kSourcesDirectory%Assistants\Race.settings
 Race Engineer Configuration.1=%kResourcesDirectory%Rules\Race Engineer.rules <- %kSourcesDirectory%Assistants\Rules\Race Engineer.rules
 Race Engineer Configuration.2=%kResourcesDirectory%Templates\Race Engineer.rules <- %kSourcesDirectory%Assistants\Rules\Race Engineer.rules
 Race Engineer Configuration.3=%kGrammarsDirectory%Race Engineer.grammars.en <- %kSourcesDirectory%Assistants\Grammars\Race Engineer.grammars.en

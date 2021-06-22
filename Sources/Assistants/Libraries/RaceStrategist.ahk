@@ -175,7 +175,7 @@ class RaceStrategist extends RaceAssistant {
 			if lapDelta is number
 			{
 				currentLap := knowledgeBase.getValue("Lap")
-				lap := currentLap + lap
+				lap := currentLap + lapDelta
 				
 				if (lap <= currentLap)
 					speaker.speakPhrase("NoFutureLap")

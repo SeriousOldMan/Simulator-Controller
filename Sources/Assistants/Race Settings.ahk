@@ -238,6 +238,8 @@ editSettings(ByRef settingsOrCommand) {
 	static newSettings
 	
 	static pitstopWarningEdit
+	static extrapolationLapsEdit
+	static overtakeDeltaEdit
 	
 	static tyrePressureDeviationEdit
 	static temperatureCorrectionCheck
@@ -312,7 +314,6 @@ restart:
 		setConfigurationValue(newSettings, "Session Settings", "Duration", raceDurationEdit * 60)
 		setConfigurationValue(newSettings, "Session Settings", "Lap.AvgTime", avgLaptimeEdit)
 		setConfigurationValue(newSettings, "Session Settings", "Fuel.AvgConsumption", Round(fuelConsumptionEdit, 1))
-		setConfigurationValue(newSettings, "Session Settings", "Pitstop.Delta", pitstopDeltaEdit)
 		setConfigurationValue(newSettings, "Session Settings", "Fuel.SafetyMargin", safetyFuelEdit)
 		
 		setConfigurationValue(newSettings, "Session Settings", "Lap.Formation", formationLapCheck)
@@ -336,6 +337,10 @@ restart:
 		setConfigurationValue(newSettings, "Session Setup", "Tyre.Wet.Pressure.FR", Round(spWetFrontRightEdit, 1))
 		setConfigurationValue(newSettings, "Session Setup", "Tyre.Wet.Pressure.RL", Round(spWetRearLeftEdit, 1))
 		setConfigurationValue(newSettings, "Session Setup", "Tyre.Wet.Pressure.RR", Round(spWetRearRightEdit, 1))
+		
+		setConfigurationValue(newSettings, "Strategy Settings", "Pitstop.Delta", pitstopDeltaEdit)
+		setConfigurationValue(newSettings, "Strategy Settings", "Extrapolation.Laps", extrapolationLapsEdit)
+		setConfigurationValue(newSettings, "Strategy Settings", "Overtake.Delta", overtakeDeltaEdit)
 		
 		if (settingsOrCommand == kOk)
 			Gui RES:Destroy
@@ -372,12 +377,15 @@ restart:
 		raceDurationEdit := Round(getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Duration", 3600) / 60)
 		avgLaptimeEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Lap.AvgTime", 120)
 		fuelConsumptionEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Fuel.AvgConsumption", 3.0)
-		pitstopDeltaEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Pitstop.Delta", 60)
 		safetyFuelEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Fuel.SafetyMargin", 4)
 		
 		formationLapCheck := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Lap.Formation", true)
 		postRaceLapCheck := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Lap.PostRace", true)
 
+		pitstopDeltaEdit := getConfigurationValue(settingsOrCommand, "Strategy Settings", "Pitstop.Delta", getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Pitstop.Delta", 60))
+		extrapolationLapsEdit := getConfigurationValue(settingsOrCommand, "Strategy Settings", "Extrapolation.Laps", 3)
+		overtakeDeltaEdit := getConfigurationValue(settingsOrCommand, "Strategy Settings", "Overtake.Delta", 1)
+		
 		readTyreSetup(settingsOrCommand)
 		
 		Gui RES:Default
@@ -652,13 +660,13 @@ restart:
 		Gui Tab, 3
 		
 		Gui RES:Add, Text, x16 y82 w105 h20 Section, % translate("Race positions")
-		Gui RES:Add, Edit, x126 yp-2 w50 h20 Limit1 Number ; VpitstopWarningEdit, %pitstopWarningEdit%
-		Gui RES:Add, UpDown, x158 yp-2 w18 h20 ;, %pitstopWarningEdit%
+		Gui RES:Add, Edit, x126 yp-2 w50 h20 Limit1 Number VextrapolationLapsEdit, %extrapolationLapsEdit%
+		Gui RES:Add, UpDown, x158 yp-2 w18 h20, %extrapolationLapsEdit%
 		Gui RES:Add, Text, x184 yp+2 w290 h20, % translate("simulated future laps")
 
 		Gui RES:Add, Text, x16 yp+20 w85 h23 +0x200, % translate("Overtake")
-		Gui RES:Add, Edit, x126 yp w50 h20 Limit3 Number ; VavgLaptimeEdit, %avgLaptimeEdit%
-		Gui RES:Add, UpDown, x158 yp-2 w18 h20 Range1-999 0x80 ;, %avgLaptimeEdit%
+		Gui RES:Add, Edit, x126 yp w50 h20 Limit3 Number VovertakeDeltaEdit, %overtakeDeltaEdit%
+		Gui RES:Add, UpDown, x158 yp-2 w18 h20 Range1-999 0x80, %overtakeDeltaEdit%
 		Gui RES:Add, Text, x184 yp+4 w290 h20, % translate("additional seconds for each passed car")
 
 		Gui RES:Add, Text, x16 yp+22 w85 h20 +0x200, % translate("Pitstop Delta")

@@ -180,17 +180,21 @@ class RaceStrategist extends RaceAssistant {
 				if (lap <= currentLap)
 					speaker.speakPhrase("NoFutureLap")
 				else {
-					speaker.speakPhrase("Confirm")
-					
-					knowledgeBase.setFact("Lap.Extrapolate", lap)
-		
-					knowledgeBase.produce()
-					
-					if this.Debug[kDebugKnowledgeBase]
-						this.dumpKnowledge(this.KnowledgeBase)
-					
 					car := knowledgeBase.getValue("Driver.Car")
 					position := knowledgeBase.getValue("Standings.Extrapolated." . lap . ".Car." . car . ".Position", false)
+					
+					if !position {
+						speaker.speakPhrase("Confirm")
+						
+						knowledgeBase.setFact("Lap.Extrapolate", lap)
+			
+						knowledgeBase.produce()
+						
+						if this.Debug[kDebugKnowledgeBase]
+							this.dumpKnowledge(this.KnowledgeBase)
+						
+						position := knowledgeBase.getValue("Standings.Extrapolated." . lap . ".Car." . car . ".Position", false)
+					}					
 					
 					if position
 						speaker.speakPhrase("FuturePosition", {position: position})
@@ -353,8 +357,8 @@ class RaceStrategist extends RaceAssistant {
 				, "Session.Settings.Lap.AvgTime": getConfigurationValue(settings, "Session Settings", "Lap.AvgTime", 0)
 				, "Session.Settings.Lap.History.Considered": getConfigurationValue(this.Configuration, "Race Strategist Analysis", simulatorName . ".ConsideredHistoryLaps", 5)
 				, "Session.Settings.Lap.History.Damping": getConfigurationValue(this.Configuration, "Race Strategist Analysis", simulatorName . ".HistoryLapsDamping", 0.2)
-				, "Session.Settings.Standings.Extrapolation.Laps": getConfigurationValue(settings, "Strategy Settings", "Standings.Extrapolation.Laps", 2)
-				, "Session.Settings.Standings.Extrapolation.Overtake.Delta": Round(getConfigurationValue(settings, "Strategy Settings", simulatorName . "Standings.Extrapolation.Overtake.Delta", 1) * 1000)}
+				, "Session.Settings.Standings.Extrapolation.Laps": getConfigurationValue(settings, "Strategy Settings", "Extrapolation.Laps", 2)
+				, "Session.Settings.Standings.Extrapolation.Overtake.Delta": Round(getConfigurationValue(settings, "Strategy Settings", "Overtake.Delta", 1) * 1000)}
 		return facts
 	}
 	
@@ -373,11 +377,13 @@ class RaceStrategist extends RaceAssistant {
 			facts := {"Session.Settings.Lap.Formation": getConfigurationValue(settings, "Session Settings", "Lap.Formation", true)
 					, "Session.Settings.Lap.PostRace": getConfigurationValue(settings, "Session Settings", "Lap.PostRace", true)
 					, "Session.Settings.Fuel.AvgConsumption": getConfigurationValue(settings, "Session Settings", "Fuel.AvgConsumption", 0)
-					, "Session.Settings.Pitstop.Delta": getConfigurationValue(settings, "Session Settings", "Pitstop.Delta", 30)
+					, "Session.Settings.Pitstop.Delta": getConfigurationValue(settings, "Strategy Settings", "Pitstop.Delta", getConfigurationValue(settings, "Session Settings", "Pitstop.Delta", 30))
 					, "Session.Settings.Lap.AvgTime": getConfigurationValue(settings, "Session Settings", "Lap.AvgTime", 0)
 					, "Session.Settings.Fuel.SafetyMargin": getConfigurationValue(settings, "Session Settings", "Fuel.SafetyMargin", 5)
 					, "Session.Settings.Lap.History.Considered": getConfigurationValue(this.Configuration, "Race Strategist Analysis", simulatorName . ".ConsideredHistoryLaps", 5)
-					, "Session.Settings.Lap.History.Damping": getConfigurationValue(this.Configuration, "Race Strategist Analysis", simulatorName . ".HistoryLapsDamping", 0.2)}
+					, "Session.Settings.Lap.History.Damping": getConfigurationValue(this.Configuration, "Race Strategist Analysis", simulatorName . ".HistoryLapsDamping", 0.2)
+					, "Session.Settings.Standings.Extrapolation.Laps": getConfigurationValue(settings, "Strategy Settings", "Extrapolation.Laps", 2)
+					, "Session.Settings.Standings.Extrapolation.Overtake.Delta": Round(getConfigurationValue(settings, "Strategy Settings", "Overtake.Delta", 1) * 1000)}
 			
 			for key, value in facts
 				knowledgeBase.setValue(key, value)

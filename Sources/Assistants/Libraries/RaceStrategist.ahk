@@ -170,7 +170,7 @@ class RaceStrategist extends RaceAssistant {
 		lapPosition := inList(words, fragments["Laps"])
 				
 		if lapPosition {
-			lapDelta := words[litresPosition - 1]
+			lapDelta := words[lapPosition - 1]
 			
 			if lapDelta is number
 			{

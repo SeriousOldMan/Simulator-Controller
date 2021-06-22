@@ -1,4 +1,4 @@
-## 3.1.2-release 06//21 (planned)
+## 3.1.4-release 06//21 (planned)
 
   1. Bugfixes, as always
   2. Documentation updates, as always
@@ -9,6 +9,8 @@
      - "Race Engineer Settings" => "Race Settings"
 	 - "Race Engineer Setups" => "Setup Database"
   7. Renamed "Race Engineer.settings" => "Race.settings"
+  8. The "Race Strategist" plugin now supports plugin parameters ("raceStrategistOpenSettings", "raceStrategistOpenSetups") to open the settings dialog and the setup database query tool similar to the plugin parameters of the "Race Engineer" plugin. Please see the [plugin documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for more information.
+  9. [VERY IMPORTANT]: This release introduces an extended *Push To Talk*, which will be active, when multiple *dialog partners* are active. Please read the [revised voice commands documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#voice-commands) for more information.
 
 ## 3.1.2-release 06/18/21
 

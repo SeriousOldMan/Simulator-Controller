@@ -3,13 +3,12 @@
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. New Assetto Corsa Competizione data acquisition for Cato, the Virtual Race Strategist.
-  4. Full propabilistic model for future race positions. You can ask Cato for future race standings.
-  5. New settings for the Race Strategist.
+  4. Full propabilistic model for future race positions. You can ask Cato for future race standings (Example: "What will be my position in 4 laps").
+  5. New settings for the Virtual Race Strategist in order to customize the standings prediction model. See the ["Strategy" tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#tab-strategy) in the "Race Settings" tool for more information.
   6. Renaming of several applications:
      - "Race Engineer Settings" => "Race Settings"
 	 - "Race Engineer Setups" => "Setup Database"
   7. Renamed "Race Engineer.settings" => "Race.settings"
-  8. Added new "Strategy" tab in the "Race Settings" tool
 
 ## 3.1.2-release 06/18/21
 

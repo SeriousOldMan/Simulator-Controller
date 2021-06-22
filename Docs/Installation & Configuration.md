@@ -235,6 +235,8 @@ Similar as with the tab for the *Race Engineer*, the dynamic behaviour of the [V
 
 Choose the simulator with the topmost dropdown menu, before you change one of the settings beneath. Then you can customize some parts of the statistical algorithms of Cato, the Virtual Race Strategist. The first field defines the number of laps, Cato uses to populate its data collection. During this period, most of the functions of Cato are not available, but the predictions of dynamic values will be much more precise afterwards. The second field, *Statistical Window*, is also quite important. It defines the number of recent laps, which are used for each and every statistical calculation, for example the standard deviation of tyre pressures. The next field, *Damping Factor*, can be used to influence the calculation weight for each of those laps.
 
+Note: The settings for loading and saving the *Race Settings* specified on *Race Engineer* tab apply for the Virtual Race Strategist as well.
+
 ## Themes Editor
 
 This special editor, which can be opened from the *General* tab of the configuration tool, allows you to define a combination of pictures or animation files together with a sound file. This combination is called a splash theme and will be used by the startup sequence. You may have a Rallye theme for your favorite Rallye session, or an F1 theme, or even some cinematic impressions from various airplanes in the sky, while waiting for your flight simulator to startup.

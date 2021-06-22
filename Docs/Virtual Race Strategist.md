@@ -78,6 +78,25 @@ The following statistical models are currently implemented:
 
      Using the position data gathered from the simulation game, Cato builds a knowledge of the pace of the various drivers. As a simple application of this knowledge, Cato can give you information about the current race positions and lap times of your opponents and the gaps between the cars. A more complex application will be a forecast of the race positions in a given time frame. This knowledge can be used for strategy development, for example to plan an undercut.
 
+## Racing with Cato
+
+Using Cato during a race is easy. You can activate the assitant anytime using the activation phrase and ask then for information about current lap times, current and possible future standings and so on. Normally, Cato will not contact you on its own like Jona does, but Cato will also collaberate with Jona, when it is time for a pitstop. In this situation, Cato might suggest a specific lap for the next pitstop to optimize your race position after the stop.
+
+### Race Settings
+
+Cato shares a lot of settings with Jona. Therefore consult the documentation on the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings) in the documentation for Jona for the general use of the settings tool.
+
+#### Tab *Strategy*
+
+You will find settings for the race strategy analysis and simulation in the third tab of the settings tool.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Settings%203.JPG)
+
+Using the fields in the first group, you can customize the projection of current race positions into a model of future race standings. Cato will calculate this model each lap and will store the future standings for a given number of laps in the working memory and use them for strategy decisions. You can control the number of laps calculated for future standings by changing the value in the field *Race positions*. Greater numbers will yield better predictions, but take care, it might cost a lot of computing power.
+With the second field, *Overtake Delta*, you specify the number of seconds as time discount for each overtake for the passing and for the passed car.
+
+The second group of fields specify the time required for several pitstop activities. With the value of *Pitstop Delta*, you supply the difference time needed for a normal pitstop (time for pit in and pit out but without any service time minus the time to pass the pit area on the track, i.e. Drive through vs. Drive by), The fields below specify the time required for the various pit services, like changing tyres, refueling, and so on.
+
 ## Technical information
 
 Cato uses the same AI kernel as Jona. In fact, large parts of the basic rule set is identical for both assistants. Therefore, you can consult the [technical information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#technical-information) of Jona, if you want to dig deeper into the inner workings.

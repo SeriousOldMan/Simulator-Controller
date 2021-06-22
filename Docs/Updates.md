@@ -52,8 +52,8 @@ Note: Some of you might want to have more control. No problem. All the files in 
 Please take note of the following:
 
   - The "Race Engineer.settings" file has been renamed to "Race.settings". The automated update procedure will take care of the renaming in all locations, even in the local setup database.
-  - The controller actions "openRaceEngineerSettings" and "openRaceEngineerSetups" have been renamed to "openRaceAssistantSettings" and "openSetupDatabase" respectively. If you have used them in your configuration, you must rename them manually.
-
+  - The controller actions "openRaceEngineerSettings" and "openRaceEngineerSetups" have been renamed to "openRaceAssistantSettings" and "openSetupDatabase" respectively. If you have used them in your configuration, you must rename them manually using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration).
+  - The application "Race Engineer Settings" has been renamed to "Race Settings" and the application "Race Engineer Setups" has been renamed to "Setup Database". If you have referenced the *outside* of Simulator Controller, for example in a StreamDeck configuration, please take care of the renaming.
 
 ***
 

@@ -80,6 +80,33 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 			this.callRemote("performPitstop", arguments*)
 		}
 	}
+
+	class RaceSettingsAction extends ControllerAction {
+		iAction := false
+		
+		Action[] {
+			Get {
+				return this.iAction
+			}
+		}
+		
+		__New(function, label, action) {
+			this.iAction := action
+			
+			base.__New(function, label)
+		}
+		
+		fireAction(function, trigger) {
+			local plugin := this.Controller.findPlugin(kRaceStrategistPlugin)
+			
+			if (this.Action = "RaceStrategistOpenSettings")
+				openRaceSettings(plugin)
+			else if (this.Action = "RaceStrategistImportSettings")
+				openRaceSettings(true, false, plugin)
+			else if (this.Action = "RaceStrategistOpenSetups")
+				openSetupDatabase(plugin)
+		}
+	}
 	
 	class RaceStrategistToggleAction extends ControllerAction {
 		fireAction(function, trigger) {
@@ -170,6 +197,21 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 		else
 			this.iRaceStrategistEnabled := (this.iRaceStrategistName != false)
 		
+		raceStrategistOpenSettings := this.getArgumentValue("raceStrategistOpenSettings", false)
+		
+		if raceStrategistOpenSettings
+			this.createRaceStrategistAction(controller, "RaceStrategistOpenSettings", raceStrategistOpenSettings)
+		
+		raceStrategistImportSettings := this.getArgumentValue("raceStrategistImportSettings", false)
+		
+		if raceStrategistImportSettings
+			this.createRaceStrategistAction(controller, "RaceStrategistImportSettings", raceStrategistImportSettings)
+		
+		raceStrategistOpenSetups := this.getArgumentValue("raceStrategistOpenSetups", false)
+		
+		if raceStrategistOpenSetups
+			this.createRaceStrategistAction(controller, "RaceStrategistOpenSetups", raceStrategistOpenSetups)
+		
 		strategistSpeaker := this.getArgumentValue("raceStrategistSpeaker", false)
 		
 		if ((strategistSpeaker != false) && (strategistSpeaker != kFalse)) {
@@ -195,6 +237,8 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 		if (function != false) {
 			if (action = "RaceStrategist")
 				this.registerAction(new this.RaceStrategistToggleAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Toggle"), action)))
+			else if ((action = "RaceStrategistOpenSettings") || (action = "RaceStrategistImportSettings") || (action = "RaceStrategistOpenSetups"))
+				this.registerAction(new this.RaceSettingsAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Activate")), action))
 			else
 				logMessage(kLogWarn, translate("Action """) . action . translate(""" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
 		}
@@ -216,6 +260,21 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 				if !this.RaceStrategistName
 					theAction.Function.disable(kAllTrigger, theAction)
 			}
+			else if isInstance(theAction, RaceStrategistPlugin.RaceSettingsAction)
+				if ((theAction.Action = "RaceEngineerOpenSettings") || (theAction.Action = "RaceEngineerOpenSetups")) {
+					theAction.Function.enable(kAllTrigger, theAction)
+					theAction.Function.setText(theAction.Label)
+				}
+				else if (theAction.Action = "RaceEngineerImportSettings") {
+					if this.Simulator {
+						theAction.Function.enable(kAllTrigger, theAction)
+						theAction.Function.setText(theAction.Label)
+					}
+					else {
+						theAction.Function.disable(kAllTrigger, theAction)
+						theAction.Function.setText(theAction.Label, "Gray")
+					}
+				}
 	}
 	
 	enableRaceStrategist() {

@@ -51,7 +51,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 Please take note of the following:
 
-  - The "Race Engineer.settings" file has been renamed to "Race Assistant.settings". The automated update procedure will take care of the renaming in all locations, even in the local setup database.
+  - The "Race Engineer.settings" file has been renamed to "Race.settings". The automated update procedure will take care of the renaming in all locations, even in the local setup database.
   - The controller actions "openRaceEngineerSettings" and "openRaceEngineerSetups" have been renamed to "openRaceAssistantSettings" and "openSetupDatabase" respectively. If you have used them in your configuration, you must rename them manually.
 
 

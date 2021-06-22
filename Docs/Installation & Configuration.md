@@ -194,8 +194,8 @@ Although you may call any globally defined function, you should use only the fol
 | changePitstopDriver | selection | ACC, RF2 | Selects the driver to take the car during the next pitstop. *selection* must be either "Next" or "Previous". |
 | planPitstop | - | Race Engineer | *planPitstop* triggers Jona, the Virtual Race Engineer, to plan a pitstop. |
 | preparePitstop | - | Race Engineer | *preparePitstop* triggers Jona, the Virtual Race Engineer, to prepare a previously planned pitstop. |
-| openRaceAssistantSettings | import | Race Engineer | Opens the settings tool, with which you can edit all the race specific settings, Jona needs for a given race. If you supply *true* for the optional *import* parameter, the setup data is imported directly from a running simulation and the dialog is not opened. |
-| openSetupDatabase | - | Race Engineer | Opens the query tool for the setup database, with which you can get the tyre pressures for a given session depending on the current environmental conditions. If a simulation is currently running, most of the query arguments will already be prefilled. |
+| openRaceSettings | import | Race Engineer, Race Strategist | Opens the settings tool, with which you can edit all the race specific settings, Jona needs for a given race. If you supply *true* for the optional *import* parameter, the setup data is imported directly from a running simulation and the dialog is not opened. |
+| openSetupDatabase | - | Race Engineer, Race Strategist | Opens the query tool for the setup database, with which you can get the tyre pressures for a given session depending on the current environmental conditions. If a simulation is currently running, most of the query arguments will already be prefilled. |
  
 #### Key Detector Tool
 

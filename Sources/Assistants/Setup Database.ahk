@@ -710,7 +710,7 @@ deleteWetRaceSetup() {
 }
 
 openSettings(mode := "New", arguments*) {
-	exePath := kBinariesDirectory . "Race Assistant Settings.exe"
+	exePath := kBinariesDirectory . "Race Settings.exe"
 	fileName := kTempDirectory . "Temp.settings"
 				
 	Gui RES:Hide
@@ -740,9 +740,9 @@ openSettings(mode := "New", arguments*) {
 			return false
 	}
 	catch exception {
-		logMessage(kLogCritical, translate("Cannot start the Race Assistant Settings tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
+		logMessage(kLogCritical, translate("Cannot start the Race Settings tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 			
-		showMessage(substituteVariables(translate("Cannot start the Race Assistant Settings tool (%exePath%) - please check the configuration..."), {exePath: exePath})
+		showMessage(substituteVariables(translate("Cannot start the Race Settings tool (%exePath%) - please check the configuration..."), {exePath: exePath})
 				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 		
 		return false

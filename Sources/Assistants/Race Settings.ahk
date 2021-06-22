@@ -1,5 +1,5 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Race Assistant Settings Editor  ;;;
+;;;   Modular Simulator Controller System - Race Settings Editor            ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2021) Creative Commons - BY-NC-SA                        ;;;
@@ -21,7 +21,7 @@ SetBatchLines -1				; Maximize CPU utilization
 ListLines Off					; Disable execution history
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Artificial Intelligence Settings.ico
-;@Ahk2Exe-ExeName Race Assistant Settings.exe
+;@Ahk2Exe-ExeName Race Settings.exe
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -45,7 +45,7 @@ global kCancel = "Cancel"
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kRaceEngineerSettingsFile = getFileName("Race Assistant.settings", kUserConfigDirectory)
+global kRaceSettingsFile = getFileName("Race.settings", kUserConfigDirectory)
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -392,7 +392,7 @@ restart:
 		Gui RES:Font, Norm, Arial
 		Gui RES:Font, Italic Underline, Arial
 
-		Gui RES:Add, Text, YP+20 w388 cBlue Center gopenSettingsDocumentation, % translate("Race Assistant Settings")
+		Gui RES:Add, Text, YP+20 w388 cBlue Center gopenSettingsDocumentation, % translate("Race Settings")
 
 		Gui RES:Font, Norm, Arial
 				
@@ -676,9 +676,9 @@ restart:
 			if (result == kLoad) {
 				result := false
 				
-				title := translate("Load Race Assistant Settings...")
+				title := translate("Load Race Settings...")
 				
-				FileSelectFile file, 1, %kRaceEngineerSettingsFile%, %title%, Settings (*.settings)
+				FileSelectFile file, 1, %kRaceSettingsFile%, %title%, Settings (*.settings)
 			
 				if (file != "") {
 					settingsOrCommand := readConfiguration(file)
@@ -691,9 +691,9 @@ restart:
 			else if (result == kSave) {
 				result := false
 			
-				title := translate("Save Race Assistant Settings...")
+				title := translate("Save Race Settings...")
 				
-				FileSelectFile file, S, %kRaceEngineerSettingsFile%, %title%, Settings (*.settings)
+				FileSelectFile file, S, %kRaceSettingsFile%, %title%, Settings (*.settings)
 			
 				if (file != "")
 					writeConfiguration(file, newSettings)
@@ -780,7 +780,7 @@ importFromSimulation(message := false, simulator := false, prefix := false, sett
 		}
 	}
 	
-	readTyreSetup(readConfiguration(kRaceEngineerSettingsFile))
+	readTyreSetup(readConfiguration(kRaceSettingsFile))
 	
 	data := readSimulatorData(prefix)
 		
@@ -874,12 +874,12 @@ importFromSimulation(message := false, simulator := false, prefix := false, sett
 	}
 }
 
-showRaceEngineerSettingsEditor() {
+showRaceSettingsEditor() {
 	icon := kIconsDirectory . "Artificial Intelligence Settings.ico"
 	
 	Menu Tray, Icon, %icon%, , 1
 	
-	fileName := kRaceEngineerSettingsFile
+	fileName := kRaceSettingsFile
 	
 	if ((A_Args.Length() > 0) && (A_Args[1] = "-File")) {
 		fileName := A_Args[2]
@@ -895,7 +895,7 @@ showRaceEngineerSettingsEditor() {
 	if ((A_Args.Length() > 0) && (A_Args[1] = "-Import")) {
 		importFromSimulation("Import", A_Args[2], A_Args[3], settings)
 		
-		writeConfiguration(kRaceEngineerSettingsFile, settings)
+		writeConfiguration(kRaceSettingsFile, settings)
 	}
 	else {
 		registerEventHandler("Setup", "handleSetupRemoteCalls")
@@ -957,4 +957,4 @@ handleSetupRemoteCalls(event, data) {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-showRaceEngineerSettingsEditor()
+showRaceSettingsEditor()

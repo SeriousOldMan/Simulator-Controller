@@ -888,8 +888,8 @@ initializeEnvironment() {
 			FileCopy %kResourcesDirectory%Templates\Controller Plugin Labels.%languageCode%, %kUserTranslationsDirectory%
 	}
 	
-	if !FileExist(kUserConfigDirectory . "Race Assistant.settings")
-		FileCopy %kResourcesDirectory%Templates\Race Assistant.settings, %kUserConfigDirectory%
+	if !FileExist(kUserConfigDirectory . "Race.settings")
+		FileCopy %kResourcesDirectory%Templates\Race.settings, %kUserConfigDirectory%
 			
 	if !FileExist(kUserConfigDirectory . "ID") {
 		ticks := A_TickCount

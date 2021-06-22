@@ -133,12 +133,12 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 		}
 	}
 
-	class RaceAssistantSettingsAction extends RaceEngineerPlugin.RaceEngineerAction {
+	class RaceSettingsAction extends RaceEngineerPlugin.RaceEngineerAction {
 		fireAction(function, trigger) {
 			if (this.Action = "RaceEngineerOpenSettings")
-				openRaceAssistantSettings()
+				openRaceSettings()
 			else if (this.Action = "RaceEngineerImportSettings")
-				openRaceAssistantSettings(true)
+				openRaceSettings(true)
 			else if (this.Action = "RaceEngineerOpenSetups")
 				openSetupDatabase()
 		}
@@ -285,7 +285,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 			else if (action = "RaceEngineer")
 				this.registerAction(new this.RaceEngineerToggleAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Toggle"), action)))
 			else if ((action = "RaceEngineerOpenSettings") || (action = "RaceEngineerImportSettings") || (action = "RaceEngineerOpenSetups"))
-				this.registerAction(new this.RaceAssistantSettingsAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Activate")), action))
+				this.registerAction(new this.RaceSettingsAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Activate")), action))
 			else
 				logMessage(kLogWarn, translate("Action """) . action . translate(""" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
 		}
@@ -353,7 +353,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 			try {
 				logMessage(kLogInfo, translate("Starting ") . translate("Race Engineer"))
 				
-				options := " -Settings """ . getFileName("Race Assistant.settings", kUserConfigDirectory) . """"
+				options := " -Settings """ . getFileName("Race.settings", kUserConfigDirectory) . """"
 				
 				if this.Simulator.supportsPitstop()
 					options .= " -Remote " . controllerPID
@@ -451,15 +451,15 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 				setConfigurationValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.RR", Round(pressures[4], 1))
 			}
 			
-			writeConfiguration(kUserConfigDirectory . "Race Assistant.settings", settings)
+			writeConfiguration(kUserConfigDirectory . "Race.settings", settings)
 		}
 		else if (tpSetting = "Import") {
-			writeConfiguration(kUserConfigDirectory . "Race Assistant.settings", settings)
+			writeConfiguration(kUserConfigDirectory . "Race.settings", settings)
 			
-			openRaceAssistantSettings(true, true)
+			openRaceSettings(true, true)
 		}
 		else
-			writeConfiguration(kUserConfigDirectory . "Race Assistant.settings", settings)
+			writeConfiguration(kUserConfigDirectory . "Race.settings", settings)
 	}
 	
 	startSession(dataFile) {
@@ -776,14 +776,14 @@ preparePitstop() {
 	}
 }
 
-openRaceAssistantSettings(import := false, silent := false) {
-	local plugin
-	
-	exePath := kBinariesDirectory . "Race Assistant Settings.exe"
+openRaceSettings(import := false, silent := false, plugin := false) {
+	exePath := kBinariesDirectory . "Race Settings.exe"
 	
 	try {
 		controller := SimulatorController.Instance
-		plugin := controller.findPlugin(kRaceEngineerPlugin)
+		
+		if !plugin
+			plugin := controller.findPlugin(kRaceEngineerPlugin)
 		
 		if import {
 			options := "-Import"
@@ -797,30 +797,33 @@ openRaceAssistantSettings(import := false, silent := false) {
 			Run "%exePath%" %options%, %kBinariesDirectory%, , pid
 		}
 		else {
-			options := getRaceEngineerOptions()
+			options := getSimulatorOptions(plugin)
 			
 			Run "%exePath%" %options%, %kBinariesDirectory%, , pid
 		}
 		
 		if pid {
-			callback := ObjBindMethod(plugin, "reloadSettings", pid, getFileName("Race Assistant.settings", kUserConfigDirectory))
+			callback := ObjBindMethod(plugin, "reloadSettings", pid, getFileName("Race.settings", kUserConfigDirectory))
 			
 			SetTimer %callback%, -1000
 		}
 	}
 	catch exception {
-		logMessage(kLogCritical, translate("Cannot start the Race Assistant Settings tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
+		logMessage(kLogCritical, translate("Cannot start the Race Settings tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 			
-		showMessage(substituteVariables(translate("Cannot start the Race Assistant Settings tool (%exePath%) - please check the configuration..."), {exePath: exePath})
+		showMessage(substituteVariables(translate("Cannot start the Race Settings tool (%exePath%) - please check the configuration..."), {exePath: exePath})
 				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 	}
 }
 
-openSetupDatabase() {
+openSetupDatabase(plugin := false) {
 	exePath := kBinariesDirectory . "Setup Database.exe"
 	
+	if !plugin
+		plugin := SimulatorController.Instance.findPlugin(kRaceEngineerPlugin)
+	
 	try {
-		options := getRaceEngineerOptions()
+		options := getSimulatorOptions(plugin)
 		
 		Run "%exePath%" %options%, %kBinariesDirectory%, , pid
 	}
@@ -891,16 +894,10 @@ getDataSessionState(data) {
 		return kSessionFinished
 }
 
-
-;;;-------------------------------------------------------------------------;;;
-;;;                   Private Function Declaration Section                  ;;;
-;;;-------------------------------------------------------------------------;;;
-
-getRaceEngineerOptions() {
-	local plugin
+getSimulatorOptions(plugin := false) {
+	if !plugin
+		plugin := SimulatorController.Instance.findPlugin(kRaceEngineerPlugin)
 	
-	controller := SimulatorController.Instance
-	plugin := controller.findPlugin(kRaceEngineerPlugin)
 	options := ""
 	
 	if plugin.Simulator {
@@ -919,6 +916,11 @@ getRaceEngineerOptions() {
 	
 	return options
 }
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                   Private Function Declaration Section                  ;;;
+;;;-------------------------------------------------------------------------;;;
 
 updateRaceEngineerSessionState() {
 	protectionOn()

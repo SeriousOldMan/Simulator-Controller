@@ -43,6 +43,9 @@ Release 3.1.4 Checklist
    a. Translations
    b. Paths in Setup Database
    c. Renaming of "Race Engineer.settings" in all locations
+   d. Plugin Labels
+9. New plugin arguments "raceStrategistOpenSettings", "raceStrategistOpenSetups" and "raceStrategistImportSettings"
+   a. Doocumentation
 
 Release 3.1.2 Checklist
 =======================

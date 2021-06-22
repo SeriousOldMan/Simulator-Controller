@@ -107,7 +107,7 @@ startRaceStrategist() {
 	strategistLanguage := false
 	strategistSpeaker := false
 	strategistListener := false
-	strategistSettingsFile := getFileName("Race Strategist.settings", kUserConfigDirectory)
+	strategistSettingsFile := getFileName("Race.settings", kUserConfigDirectory)
 	debug := false
 	
 	Process Exist, Voice Server.exe

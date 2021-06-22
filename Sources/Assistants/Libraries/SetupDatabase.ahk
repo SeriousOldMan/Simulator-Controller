@@ -497,7 +497,7 @@ class SetupDatabase {
 		localSettings := []
 		globalSettings := []
 			
-		Loop Files, %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Assistant Settings\*.*
+		Loop Files, %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Settings\*.*
 		{
 			SplitPath A_LoopFileName, settingsName
 		
@@ -505,7 +505,7 @@ class SetupDatabase {
 		}
 		
 		if this.UseGlobalDatabase {
-			Loop Files, %kSetupDatabaseDirectory%Global\%simulatorCode%\%car%\%track%\Race Assistant Settings\*.*
+			Loop Files, %kSetupDatabaseDirectory%Global\%simulatorCode%\%car%\%track%\Race Settings\*.*
 			{
 				SplitPath A_LoopFileName, settingsName
 			
@@ -549,7 +549,7 @@ class SetupDatabase {
 		loadSettings := getConfigurationValue(kSimulatorConfiguration, "Race Engineer Startup", simulatorName . ".LoadSettings", "Default")
 		
 		if (loadSettings = "Default")
-			return readConfiguration(getFileName("Race Assistant.settings", kUserConfigDirectory))
+			return readConfiguration(getFileName("Race.settings", kUserConfigDirectory))
 		else if (loadSettings = "SetupDatabase") {
 			data := {Duration: duration}
 			
@@ -560,21 +560,21 @@ class SetupDatabase {
 			if settingsName
 				return this.readSettings(simulatorName, car, track, settingsName)
 			else
-				return readConfiguration(getFileName("Race Assistant.settings", kUserConfigDirectory))
+				return readConfiguration(getFileName("Race.settings", kUserConfigDirectory))
 		}
 		else
-			return readConfiguration(getFileName("Race Assistant.settings", kUserConfigDirectory))
+			return readConfiguration(getFileName("Race.settings", kUserConfigDirectory))
 	}
 	
 	readSettings(simulator, car, track, settingsName) {
 		simulatorCode := this.getSimulatorCode(simulator)
 		
-		fileName = %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Assistant Settings\%settingsName%.settings
+		fileName = %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Settings\%settingsName%.settings
 		
 		settings := readConfiguration(fileName)
 		
 		if (settings.Count() = 0) {
-			fileName = %kSetupDatabaseDirectory%Global\%simulatorCode%\%car%\%track%\Race Assistant Settings\%settingsName%.settings
+			fileName = %kSetupDatabaseDirectory%Global\%simulatorCode%\%car%\%track%\Race Settings\%settingsName%.settings
 		
 			return readConfiguration(fileName)
 		}
@@ -585,7 +585,7 @@ class SetupDatabase {
 	writeSettings(simulator, car, track, settingsName, settings) {
 		simulatorCode := this.getSimulatorCode(simulator)
 		
-		fileName = %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Assistant Settings
+		fileName = %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Settings
 		
 		FileCreateDir %fileName%
 		
@@ -597,7 +597,7 @@ class SetupDatabase {
 	deleteSettings(simulator, car, track, settingsName) {
 		simulatorCode := this.getSimulatorCode(simulator)
 		
-		fileName = %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Assistant Settings\%settingsName%.settings
+		fileName = %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Settings\%settingsName%.settings
 		
 		try {
 			FileDelete %fileName%
@@ -610,8 +610,8 @@ class SetupDatabase {
 	renameSettings(simulator, car, track, oldSettingsName, newSettingsName) {
 		simulatorCode := this.getSimulatorCode(simulator)
 		
-		oldFileName = %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Assistant Settings\%oldSettingsName%.settings
-		newFileName = %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Assistant Settings\%newSettingsName%.settings
+		oldFileName = %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Settings\%oldSettingsName%.settings
+		newFileName = %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Settings\%newSettingsName%.settings
 		
 		try {
 			FileMove %oldFileName%, %newFileName%, 1
@@ -627,7 +627,7 @@ class SetupDatabase {
 		loadSettings := getConfigurationValue(kSimulatorConfiguration, "Race Engineer Startup", simulatorName . ".LoadSettings", "Default")
 		
 		if (loadSettings = "Default") {
-			fileName := getFileName("Race Assistant.settings", kUserConfigDirectory)
+			fileName := getFileName("Race.settings", kUserConfigDirectory)
 			
 			settings := readConfiguration(fileName)
 			
@@ -652,7 +652,7 @@ class SetupDatabase {
 				this.writeSettings(simulatorName, car, track, settingsName, settings)
 			}
 			else {
-				fileName := getFileName("Race Assistant.settings", kUserConfigDirectory)
+				fileName := getFileName("Race.settings", kUserConfigDirectory)
 				
 				settings := readConfiguration(fileName)
 				

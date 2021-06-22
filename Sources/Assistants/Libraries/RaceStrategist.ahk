@@ -181,20 +181,19 @@ class RaceStrategist extends RaceAssistant {
 					speaker.speakPhrase("NoFutureLap")
 				else {
 					car := knowledgeBase.getValue("Driver.Car")
-					position := knowledgeBase.getValue("Standings.Extrapolated." . lap . ".Car." . car . ".Position", false)
 					
-					if !position {
-						speaker.speakPhrase("Confirm")
+					speaker.speakPhrase("Confirm")
 						
-						knowledgeBase.setFact("Lap.Extrapolate", lap)
-			
-						knowledgeBase.produce()
-						
-						if this.Debug[kDebugKnowledgeBase]
-							this.dumpKnowledge(this.KnowledgeBase)
-						
-						position := knowledgeBase.getValue("Standings.Extrapolated." . lap . ".Car." . car . ".Position", false)
-					}					
+					Sleep 2000
+					
+					knowledgeBase.setFact("Standings.Extrapolate", lap)
+		
+					knowledgeBase.produce()
+					
+					if this.Debug[kDebugKnowledgeBase]
+						this.dumpKnowledge(this.KnowledgeBase)
+					
+					position := knowledgeBase.getValue("Standings.Extrapolated." . lap . ".Car." . car . ".Position", false)
 					
 					if position
 						speaker.speakPhrase("FuturePosition", {position: position})

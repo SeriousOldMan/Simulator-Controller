@@ -162,6 +162,8 @@ class RaceEngineer extends RaceAssistant {
 					this.getSpeaker().speakPhrase("NoPitstop")
 				else {
 					this.getSpeaker().speakPhrase("Confirm")
+				
+					Sleep 2000
 					
 					this.planPitstopRecognized(words)
 				}
@@ -172,6 +174,8 @@ class RaceEngineer extends RaceAssistant {
 					this.getSpeaker().speakPhrase("NoPitstop")
 				else {
 					this.getSpeaker().speakPhrase("Confirm")
+					
+					Sleep 2000
 					
 					this.preparePitstopRecognized(words)
 				}

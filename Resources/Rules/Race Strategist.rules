@@ -171,11 +171,14 @@ updateLeadDelta(?, ?, ?, ?)
 ;;; This rule set will extrapolate the race positions into the future.      ;;;
 ;;;-------------------------------------------------------------------------;;;
 		
-[?Lap.Extrapolate] => (Prove: extrapolateLap, ?Lap.Extrapolate), (Clear: Lap.Extrapolate)
+[?Standings.Extrapolate] => (Prove: extrapolateLap, !Lap, ?Standings.Extrapolate), (Clear: Standings.Extrapolate)
 
 extrapolateLap(?lap, ?futureLap) <= ?futureLap < ?lap, !, fail
 extrapolateLap(?lap, ?futureLap) <= carAvgLapTime(?lap, !Driver.Car, ?avgLapTime), ?lapDelta = ?futureLap - ?lap, 								\
-									?futureTime = ?lapDelta * ?avgLapTime, extrapolatePositions(?lap, !Car.Count, ?futureLap, ?futureTime)
+									?futureTime = ?lapDelta * ?avgLapTime, extrapolatePositions(?lap, !Car.Count, ?futureLap, ?futureTime),		\
+									Call(updatePositions, ?futureLap),																			\
+									correctPositions(?lap, !Car.Count, !Session.Settings.Standings.Extrapolation.Overtake.Delta, ?futureLap),	\
+									Call(updatePositions, ?futureLap)
 
 priority: -20, [?Lap] => (Prove: clearExtrapolatedLap, ?Lap, !Car.Count)
 

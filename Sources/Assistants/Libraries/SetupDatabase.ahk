@@ -546,7 +546,7 @@ class SetupDatabase {
 	getSettings(simulator, car, track, duration) {
 		simulatorName := this.getSimulatorName(simulator)
 		
-		loadSettings := getConfigurationValue(kSimulatorConfiguration, "Race Engineer Startup", simulatorName . ".LoadSettings", "Default")
+		loadSettings := getConfigurationValue(kSimulatorConfiguration, "Race Assistant Startup", simulatorName . ".LoadSettings", getConfigurationValue(kSimulatorConfiguration, "Race Engineer Startup", simulatorName . ".LoadSettings", "Default"))
 		
 		if (loadSettings = "Default")
 			return readConfiguration(getFileName("Race.settings", kUserConfigDirectory))
@@ -624,7 +624,7 @@ class SetupDatabase {
 	updateSettings(simulator, car, track, duration, lapTime, avgFuelConsumption) {
 		simulatorName := this.getSimulatorName(simulator)
 		
-		loadSettings := getConfigurationValue(kSimulatorConfiguration, "Race Engineer Startup", simulatorName . ".LoadSettings", "Default")
+		loadSettings := getConfigurationValue(kSimulatorConfiguration, "Race Assistant Startup", simulatorName . ".LoadSettings", getConfigurationValue(kSimulatorConfiguration, "Race Engineer Startup", simulatorName . ".LoadSettings", "Default"))
 		
 		if (loadSettings = "Default") {
 			fileName := getFileName("Race.settings", kUserConfigDirectory)

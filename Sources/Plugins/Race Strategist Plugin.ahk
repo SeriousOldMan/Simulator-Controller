@@ -10,6 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Plugins\Libraries\SimulatorPlugin.ahk
+#Include ..\Assistants\Libraries\SetupDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -298,7 +299,7 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 			try {
 				logMessage(kLogInfo, translate("Starting ") . translate("Race Strategist"))
 				
-				options := " -Settings """ . getFileName("Race Strategist.settings", kUserConfigDirectory) . """"
+				options := " -Settings """ . kTempDirectory . "Race Strategist.settings" . """"
 				
 				options .= " -Remote " . controllerPID
 				
@@ -346,6 +347,22 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 		
 		if raceStrategist
 			raceStrategist.shutdown()
+	}
+	
+	prepareSettings(data) {
+		setupDB := new SetupDatabase()
+							
+		simulator := getConfigurationValue(data, "Session Data", "Simulator")
+		car := getConfigurationValue(data, "Session Data", "Car")
+		track := getConfigurationValue(data, "Session Data", "Track")
+		
+		simulatorName := setupDB.getSimulatorName(simulator)
+		
+		duration := Round((getConfigurationValue(data, "Stint Data", "LapLastTiem") - getConfigurationValue(data, "Session Data", "SessionTimeRemaining")) / 1000)
+	
+		settings := setupDB.getSettings(simulatorName, car, track, duration)
+		
+		writeConfiguration(kTempDirectory . "Race Strategist.settings", settings)
 	}
 	
 	startSession(dataFile) {
@@ -512,8 +529,11 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 							
 						writeConfiguration(newDataFile, data)
 						
-						if firstLap
+						if firstLap {
+							this.prepareSettings(data)
+							
 							this.startSession(newDataFile)
+						}
 						
 						if newLap
 							this.addLap(dataLastLap, newDataFile)

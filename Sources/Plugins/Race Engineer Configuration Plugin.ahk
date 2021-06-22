@@ -53,32 +53,32 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
 		
-		Gui %window%:Add, GroupBox, x16 y120 w458 h70, % translate("Session Begin")
+		Gui %window%:Add, GroupBox, x16 y120 w458 h70, % translate("Settings (for all Race Assistants)")
 		
 		Gui %window%:Font, Norm, Arial
 		
-		Gui %window%:Add, Text, x24 y137 w160 h23 +0x200, % translate("Load Settings")
+		Gui %window%:Add, Text, x24 y137 w160 h23 +0x200, % translate("@ Session Begin")
 		choices := map(["Use values from previous Session", "Load from Setup Database"], "translate")
 		Gui %window%:Add, DropDownList, x156 y137 w307 AltSubmit vreLoadSettingsDropDown, % values2String("|", choices*)
 		
-		Gui %window%:Add, Text, x24 y161 w160 h23 +0x200, % translate("Load Tyre Pressures")
-		choices := map(["Use Values from Settings", "Load from Setup Database", "Import from Simulator"], "translate")
-		chosen := 1
-		Gui %window%:Add, DropDownList, x156 y161 w307 AltSubmit Choose%chosen% vreLoadTyrePressuresDropDown, % values2String("|", choices*)
+		choices := map(["Ask", "Always save", "No action"], "translate")
+		Gui %window%:Add, Text, x24 y161 w160 h23 +0x200, % translate("@ Session End")
+		Gui %window%:Add, DropDownList, x156 y161 w140 AltSubmit vreSaveSettingsDropDown, % values2String("|", choices*)
 		
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
 		
-		Gui %window%:Add, GroupBox, x16 y196 w458 h70, % translate("Session End")
+		Gui %window%:Add, GroupBox, x16 y196 w458 h70, % translate("Tyre Pressures")
 		
 		Gui %window%:Font, Norm, Arial
 		
-		choices := map(["Ask", "Always", "Never"], "translate")
-		Gui %window%:Add, Text, x24 y213 w160 h23 +0x200, % translate("Save Settings")
-		Gui %window%:Add, DropDownList, x156 y213 w140 AltSubmit vreSaveSettingsDropDown, % values2String("|", choices*)
+		Gui %window%:Add, Text, x24 y213 w160 h23 +0x200, % translate("@ Session Begin")
+		choices := map(["Use Values from Settings", "Load from Setup Database", "Import from Simulator"], "translate")
+		chosen := 1
+		Gui %window%:Add, DropDownList, x156 y213 w307 AltSubmit Choose%chosen% vreLoadTyrePressuresDropDown, % values2String("|", choices*)
 		
-		choices := map(["Ask", "Always", "Never"], "translate")
-		Gui %window%:Add, Text, x24 y237 w160 h23 +0x200, % translate("Save Tyre Pressures")
+		choices := map(["Ask", "Always save", "No action"], "translate")
+		Gui %window%:Add, Text, x24 y237 w160 h23 +0x200, % translate("@ Session End")
 		Gui %window%:Add, DropDownList, x156 y237 w140 AltSubmit vreSaveTyrePressuresDropDown, % values2String("|", choices*)
 		
 		Gui %window%:Font, Norm, Arial
@@ -119,10 +119,10 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		for ignore, simulator in this.getSimulators() {
 			simulatorConfiguration := {}
 		
-			simulatorConfiguration["LoadSettings"] := getConfigurationValue(configuration, "Race Engineer Startup", simulator . ".LoadSettings", "Default")
+			simulatorConfiguration["LoadSettings"] := getConfigurationValue(configuration, "Race Assistant Startup", simulator . ".LoadSettings", getConfigurationValue(configuration, "Race Engineer Startup", simulator . ".LoadSettings", "Default"))
 			simulatorConfiguration["LoadTyrePressures"] := getConfigurationValue(configuration, "Race Engineer Startup", simulator . ".LoadTyrePressures", "Default")
 		
-			simulatorConfiguration["SaveSettings"] := getConfigurationValue(configuration, "Race Engineer Shutdown", simulator . ".SaveSettings", "Never")
+			simulatorConfiguration["SaveSettings"] := getConfigurationValue(configuration, "Race Assistant Shutdown", simulator . ".SaveSettings", getConfigurationValue(configuration, "Race Engineer Shutdown", simulator . ".SaveSettings", "Never"))
 			simulatorConfiguration["SaveTyrePressures"] := getConfigurationValue(configuration, "Race Engineer Shutdown", simulator . ".SaveTyrePressures", "Ask")
 		
 			simulatorConfiguration["LearningLaps"] := getConfigurationValue(configuration, "Race Engineer Analysis", simulator . ".LearningLaps", 1)
@@ -142,10 +142,10 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		
 		for simulator, simulatorConfiguration in this.iSimulatorConfigurations {
 			for ignore, key in ["LoadSettings", "LoadTyrePressures"]
-				setConfigurationValue(configuration, "Race Engineer Startup", simulator . "." . key, simulatorConfiguration[key])
+				setConfigurationValue(configuration, "Race Assistant Startup", simulator . "." . key, simulatorConfiguration[key])
 			
 			for ignore, key in ["SaveSettings", "SaveTyrePressures"]
-				setConfigurationValue(configuration, "Race Engineer Shutdown", simulator . "." . key, simulatorConfiguration[key])
+				setConfigurationValue(configuration, "Race Assistant Shutdown", simulator . "." . key, simulatorConfiguration[key])
 			
 			for ignore, key in ["LearningLaps", "ConsideredHistoryLaps", "HistoryLapsDamping", "AdjustLapTime", "DamageAnalysisLaps"]
 				setConfigurationValue(configuration, "Race Engineer Analysis", simulator . "." . key, simulatorConfiguration[key])

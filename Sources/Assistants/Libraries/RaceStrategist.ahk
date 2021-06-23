@@ -183,8 +183,13 @@ class RaceStrategist extends RaceAssistant {
 					car := knowledgeBase.getValue("Driver.Car")
 					
 					speaker.speakPhrase("Confirm")
+				
+					Loop 10 {
+						Loop 100
+							i := A_Index + 1
 						
-					Sleep 2000
+						Sleep 200
+					}
 					
 					knowledgeBase.setFact("Standings.Extrapolate", lap)
 		

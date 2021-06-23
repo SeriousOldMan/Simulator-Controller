@@ -245,6 +245,8 @@ class VoiceAssistant {
 	}
 	
 	__New(name, options) {
+		this.iDebug := (isDebug() ? (kDebugGrammars + kDebugRecognitions) : kDebugOff)
+		
 		this.iName := name
 		
 		this.initialize(options)
@@ -445,6 +447,9 @@ class VoiceAssistant {
 		for key, value in getConfigurationSectionValues(grammars, "Speaker Phrases", {}) {
 			key := ConfigurationItem.splitDescriptor(key)[1]
 		
+			if this.Debug[kDebugPhrases]
+				showMessage("Register voice phrase: " . key . " = " . value)
+		
 			if phrases.HasKey(key)
 				phrases[key].Push(value)
 			else
@@ -466,14 +471,15 @@ class VoiceAssistant {
 		for grammar, definition in getConfigurationSectionValues(grammars, "Listener Grammars", {}) {
 			definition := substituteVariables(definition, {name: this.Name})
 		
-			if this.Debug[kDebugGrammars] {
-				nextCharIndex := 1
-				
-				showMessage("Register phrase grammar: " . new GrammarCompiler(speechRecognizer).readGrammar(definition, nextCharIndex).toString())
-			}
+			if speechRecognizer {
+				if this.Debug[kDebugGrammars] {
+					nextCharIndex := 1
+					
+					showMessage("Register command phrase: " . new GrammarCompiler(speechRecognizer).readGrammar(definition, nextCharIndex).toString())
+				}
 			
-			if speechRecognizer
 				speechRecognizer.loadGrammar(grammar, speechRecognizer.compileGrammar(definition), ObjBindMethod(this, "raisePhraseRecognized"))
+			}
 			else if (grammar != "Call")
 				raiseEvent(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, grammar, definition, "remotePhraseRecognized"), this.VoiceServer)
 		}
@@ -499,16 +505,16 @@ class VoiceAssistant {
 	
 	remoteActivationRecognized(words*) {
 		if (words.Length() > 0)
-			this.phraseRecognized("Call", words)
+			this.phraseRecognized("Call", words, true)
 	}
 	
 	remotePhraseRecognized(grammar, command, words*) {
-		this.phraseRecognized(grammar, words)
+		this.phraseRecognized(grammar, words, true)
 	}
 	
-	phraseRecognized(grammar, words) {
-		if this.Debug[kDebugRecognitions]
-			showMessage("Phrase " . grammar . " recognized: " . values2String(" ", words*))
+	phraseRecognized(grammar, words, remote := false) {
+		if (this.Debug[kDebugRecognitions] && !remote)
+			showMessage("Command phrase recognized: " . values2String(" ", words*))
 		
 		protectionOn()
 		

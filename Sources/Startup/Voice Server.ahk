@@ -40,10 +40,22 @@ ListLines Off					; Disable execution history
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                         Public Constant Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global kDebugOff := 0
+global kDebugGrammars := 1
+global kDebugPhrases := 2
+global kDebugRecognitions := 4
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 class VoiceServer extends ConfigurationItem {
+	iDebug := kDebugOff
+	
 	iVoiceClients := {}
 	iActiveVoiceClient := false
 
@@ -292,10 +304,10 @@ class VoiceServer extends ConfigurationItem {
 					return
 			}
 				
-			if isDebug() {
+			if this.VoiceServer.Debug[kDebugGrammars] {
 				nextCharIndex := 1
 				
-				showMessage("Register voice command: " . new GrammarCompiler(recognizer).readGrammar(command, nextCharIndex).toString())					  
+				showMessage("Register command phrase: " . new GrammarCompiler(recognizer).readGrammar(command, nextCharIndex).toString())					  
 			}
 			
 			try {
@@ -323,6 +335,12 @@ class VoiceServer extends ConfigurationItem {
 		deactivate() {
 			if this.DeactivationCallback
 				raiseEvent(kFileMessage, "Voice", this.DeactivationCallback, this.PID)
+		}
+	}
+	
+	Debug[option] {
+		Get {
+			return (this.iDebug & option)
 		}
 	}
 	
@@ -388,6 +406,8 @@ class VoiceServer extends ConfigurationItem {
 	}
 	
 	__New(configuration := false) {
+		this.iDebug := (isDebug() ? (kDebugGrammars + kDebugPhrases + kDebugRecognitions) : kDebugOff)
+			
 		base.__New(configuration)
 		
 		VoiceServer.Instance := this
@@ -458,6 +478,13 @@ class VoiceServer extends ConfigurationItem {
 			this.stopActivationListener()
 			this.stopListening()
 		}
+	}
+	
+	setDebug(option, enabled) {
+		if enabled
+			this.iDebug := (this.iDebug | option)
+		else if (this.Debug[option] == option)
+			this.iDebug := (this.iDebug - option)
 	}
 	
 	getVoiceClient(descriptor := false) {
@@ -600,10 +627,10 @@ class VoiceServer extends ConfigurationItem {
 			recognizer := this.SpeechRecognizer[true]
 			grammar := (descriptor . "." . counter++)
 			
-			if isDebug() {
+			if this.Debug[kDebugGrammars] {
 				nextCharIndex := 1
 				
-				showMessage("Register activation command: " . new GrammarCompiler(recognizer).readGrammar(activationCommand, nextCharIndex).toString())					  
+				showMessage("Register activation phrase: " . new GrammarCompiler(recognizer).readGrammar(activationCommand, nextCharIndex).toString())					  
 			}
 				
 			try {
@@ -728,15 +755,15 @@ class VoiceServer extends ConfigurationItem {
 	}
 		
 	activationCommandRecognized(voiceClient, grammar, words) {
-		if isDebug()
-			showMessage("Activation command recognized: " . values2String(" ", words*))
+		if this.Debug[kDebugRecognitions]
+			showMessage("Activation phrase recognized: " . values2String(" ", words*))
 		
 		this.activateVoiceClient(ConfigurationItem.splitDescriptor(grammar)[1], words)
 	}
 		
 	voiceCommandRecognized(voiceClient, grammar, words) {
-		if isDebug()
-			showMessage("Voice command recognized: " . values2String(" ", words*))
+		if this.Debug[kDebugRecognitions]
+			showMessage("Command phrase recognized: " . values2String(" ", words*))
 		
 		descriptor := voiceClient.VoiceCommands[grammar]
 
@@ -752,6 +779,23 @@ initializeVoiceServer() {
 	icon := kIconsDirectory . "Microphon.ico"
 	
 	Menu Tray, Icon, %icon%, , 1
+	
+	debug := false
+	
+	index := 1
+	
+	while (index < A_Args.Length()) {
+		switch A_Args[index] {
+			case "-Debug":
+				debug := (((A_Args[index + 1] = kTrue) || (A_Args[index + 1] = true)) ? true : false)
+				index += 2
+			default:
+				index += 1
+		}
+	}
+	
+	if debug
+		setDebug(true)
 	
 	new VoiceServer(kSimulatorConfiguration)
 	

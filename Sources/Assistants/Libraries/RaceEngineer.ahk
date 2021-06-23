@@ -163,8 +163,10 @@ class RaceEngineer extends RaceAssistant {
 				else {
 					this.getSpeaker().speakPhrase("Confirm")
 				
+					sendMessage()
+				
 					Loop 10
-						Sleep 200
+						Sleep 500
 					
 					this.planPitstopRecognized(words)
 				}
@@ -176,8 +178,10 @@ class RaceEngineer extends RaceAssistant {
 				else {
 					this.getSpeaker().speakPhrase("Confirm")
 				
+					sendMessage()
+					
 					Loop 10
-						Sleep 200
+						Sleep 500
 					
 					this.preparePitstopRecognized(words)
 				}

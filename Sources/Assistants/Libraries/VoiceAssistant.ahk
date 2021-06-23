@@ -481,7 +481,7 @@ class VoiceAssistant {
 				speechRecognizer.loadGrammar(grammar, speechRecognizer.compileGrammar(definition), ObjBindMethod(this, "raisePhraseRecognized"))
 			}
 			else if (grammar != "Call")
-				raiseEvent(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, grammar, definition, "remotePhraseRecognized"), this.VoiceServer)
+				raiseEvent(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, grammar, definition, "remoteCommandRecognized"), this.VoiceServer)
 		}
 	}
 
@@ -508,7 +508,7 @@ class VoiceAssistant {
 			this.phraseRecognized("Call", words, true)
 	}
 	
-	remotePhraseRecognized(grammar, command, words*) {
+	remoteCommandRecognized(grammar, command, words*) {
 		this.phraseRecognized(grammar, words, true)
 	}
 	

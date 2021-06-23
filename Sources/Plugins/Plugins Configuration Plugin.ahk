@@ -235,8 +235,16 @@ openPluginsModesDocumentation() {
 			Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-3
 		case "Race Engineer":
 			Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer
+		case "Race Strategist":
+			Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategistv
 		case "ACC":
 			Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-4
+		case "IRC":
+			Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-5
+		case "RF2":
+			Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-6
+		case "R3E":
+			Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-7
 		default:
 			Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes
 	}

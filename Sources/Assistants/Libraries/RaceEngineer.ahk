@@ -33,6 +33,8 @@ class RaceEngineer extends RaceAssistant {
 	iEnoughData := false
 	
 	iOverallTime := 0
+	iBestLapTime := 0
+	
 	iLastFuelAmount := 0
 	iInitialFuelAmount := 0
 	iAvgFuelConsumption := 0
@@ -55,6 +57,12 @@ class RaceEngineer extends RaceAssistant {
 	EnoughData[] {
 		Get {
 			return this.iEnoughData
+		}
+	}
+	
+	BestLapTime[] {
+		Get {
+			return this.iBestLapTime
 		}
 	}
 	
@@ -128,6 +136,9 @@ class RaceEngineer extends RaceAssistant {
 		
 		if values.HasKey("OverallTime")
 			this.iOverallTime := values["OverallTime"]
+		
+		if values.HasKey("BestLapTime")
+			this.iBestLapTime := values["BestLapTime"]
 		
 		if values.HasKey("LastFuelAmount")
 			this.iLastFuelAmount := values["LastFuelAmount"]
@@ -882,7 +893,7 @@ class RaceEngineer extends RaceAssistant {
 									  , SaveTyrePressures: getConfigurationValue(configuration, "Race Engineer Shutdown", simulatorName . ".SaveTyrePressures", kAsk)})
 		
 		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(session), SetupData: {}
-								, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
+								, BestLapTime: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
 		
 		if this.Speaker
 			this.getSpeaker().speakPhrase("Greeting")
@@ -915,7 +926,7 @@ class RaceEngineer extends RaceAssistant {
 			this.updateDynamicValues({KnowledgeBase: false})
 		}
 
-		this.updateDynamicValues({OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
+		this.updateDynamicValues({BestLapTime: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
 		this.updateSessionValues({Simulator: "", Session: kSessionFinished})
 	}
 	
@@ -1003,17 +1014,13 @@ class RaceEngineer extends RaceAssistant {
 				lapTime := settingsLapTime
 		}
 		
-		if (this.iLapTime = 0)
-			this.iLapTime := lapTime
-		else
-			this.iLapTime := Min(this.iLapTime, lapTime)
-		
 		knowledgeBase.addFact("Lap." . lapNumber . ".Time", lapTime)
 		knowledgeBase.addFact("Lap." . lapNumber . ".Time.Start", this.OverallTime)
 		
 		overallTime := (this.OverallTime + lapTime)
 		
-		this.updateDynamicValues({OverallTime: overallTime})
+		if (lapTime > 0)
+			this.updateDynamicValues({BestLapTime: (this.BestLapTime = 0) ? lapTime : Min(this.BestLapTime, lapTime), OverallTime: overallTime})
 		
 		knowledgeBase.addFact("Lap." . lapNumber . ".Time.End", overallTime)
 		
@@ -1251,7 +1258,7 @@ class RaceEngineer extends RaceAssistant {
 			track := knowledgeBase.getValue("Session.Track")
 			duration := knowledgeBase.getValue("Session.Duration")
 			
-			this.SetupDatabase.updateSettings(simulator, car, track, duration, Round(this.iLapTime / 1000), this.AvgFuelConsumption)
+			this.SetupDatabase.updateSettings(simulator, car, track, duration, Round(this.BestLapTime / 1000), this.AvgFuelConsumption)
 		}
 	}
 

@@ -236,9 +236,11 @@ The *Race.settings* looks like this:
 	Tyre.Wet.Pressure.RL=28.2
 	Tyre.Wet.Pressure.RR=28.2
 	[Strategy Settings]
+	Extrapolation.Laps=2
+	Overtake.Delta=2
 	Pitstop.Delta=50
-	Standings.Extrapolation.Laps=2
-	Standings.Extrapolation.Overtake.Delta=1.5
+	Service.Tyres=30
+	Service.Refuel=1.5
 
 Most options above define general settings which may be applicable to many different race event. But the options from the *[Session Setup]* section need to be adjusted for each individual race event, as long, as you want Jona to come to correct recommendations.
 

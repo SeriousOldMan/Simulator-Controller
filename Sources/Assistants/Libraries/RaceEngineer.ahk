@@ -871,6 +871,8 @@ class RaceEngineer extends RaceAssistant {
 		if !IsObject(data)
 			data := readConfiguration(data)
 		
+		session := this.createSession(data)
+		
 		simulatorName := this.Simulator
 		configuration := this.Configuration
 		
@@ -879,7 +881,7 @@ class RaceEngineer extends RaceAssistant {
 									  , SaveSettings: getConfigurationValue(configuration, "Race Assistant Shutdown", simulatorName . ".SaveSettings", getConfigurationValue(configuration, "Race Engineer Shutdown", simulatorName . ".SaveSettings", kNever))
 									  , SaveTyrePressures: getConfigurationValue(configuration, "Race Engineer Shutdown", simulatorName . ".SaveTyrePressures", kAsk)})
 		
-		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(this.createSession(data)), SetupData: {}
+		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(session), SetupData: {}
 								, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
 		
 		if this.Speaker

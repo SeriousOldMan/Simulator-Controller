@@ -184,12 +184,8 @@ class RaceStrategist extends RaceAssistant {
 					
 					speaker.speakPhrase("Confirm")
 				
-					Loop 10 {
-						Loop 100
-							i := A_Index + 1
-						
+					Loop 10
 						Sleep 200
-					}
 					
 					knowledgeBase.setFact("Standings.Extrapolate", lap)
 		

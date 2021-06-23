@@ -77,7 +77,7 @@
   - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#introduction)
   - [Installation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#installation)
   - [Interacting with Cato](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#interacting-with-cato)
-  - [Racing with Cato](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#racing-with-cato)
+  - [Racing with Cato](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#racing-with-cato)
     - [Strategy Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#tab-strategy)
 	- [Models & Algorithms](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#how-it-works)
   - [Technical Information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#technical-information)

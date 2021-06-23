@@ -26,7 +26,7 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-[3.1.4-dev](https://www.dropbox.com/s/fa12p88ncjeombh/Simulator%20Controller%203.1.4-dev.zip?dl=1) (First feature complete build for Release 3.1.4. New features: Assetto Corsa Competizione integration for Race Strategist, Position projection and simulation model, New settings for Race Strategist, New voice activation command behaviour, Renaming of several applications and files, Better debug support for race assistants. Stable, with documentation. and including update procedure.)
+[3.1.4-alpha](https://www.dropbox.com/s/vn884tejr915kiw/Simulator%20Controller%203.1.4-alpha.zip?dl=1) (First public test build for Release 3.1.4. New features: Assetto Corsa Competizione integration for Race Strategist, Position projection and simulation model, New settings for Race Strategist, New voice activation command behaviour, Renaming of several applications and files, Better debug support for race assistants. Stable, with documentation. and including update procedure.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-314) of this version and all the versions you might have skipped, before installing and using this version.
 

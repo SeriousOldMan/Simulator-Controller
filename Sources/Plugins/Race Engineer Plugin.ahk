@@ -807,7 +807,7 @@ openRaceSettings(import := false, silent := false, plugin := false, fileName := 
 			Run "%exePath%" %options%, %kBinariesDirectory%, , pid
 		}
 		else {
-			options := "-File """ . fileName . """" . getSimulatorOptions(plugin)
+			options := "-File """ . fileName . """ " . getSimulatorOptions(plugin)
 			
 			Run "%exePath%" %options%, %kBinariesDirectory%, , pid
 		}

@@ -906,8 +906,10 @@ showRaceSettingsEditor() {
 	
 	fileName := kRaceSettingsFile
 	
-	if ((A_Args.Length() > 0) && (A_Args[1] = "-File")) {
-		fileName := A_Args[2]
+	index := inList(A_Args, "-File")
+	
+	if ((A_Args.Length() > 0) && index) {
+		fileName := A_Args[index + 1]
 		
 		vEditMode := true
 	}
@@ -917,10 +919,12 @@ showRaceSettingsEditor() {
 	if ((A_Args.Length() > 0) && inList(A_Args, "-Silent"))
 		vSilentMode := true
 	
-	if ((A_Args.Length() > 0) && (A_Args[1] = "-Import")) {
-		importFromSimulation("Import", A_Args[2], A_Args[3], settings)
+	index := inList(A_Args, "-Import")
+	
+	if ((A_Args.Length() > 0) && index) {
+		importFromSimulation("Import", A_Args[index + 1], A_Args[index + 2], settings)
 		
-		writeConfiguration(kRaceSettingsFile, settings)
+		writeConfiguration(fileName, settings)
 	}
 	else {
 		registerEventHandler("Setup", "handleSetupRemoteCalls")

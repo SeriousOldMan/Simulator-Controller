@@ -353,7 +353,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 			try {
 				logMessage(kLogInfo, translate("Starting ") . translate("Race Engineer"))
 				
-				options := " -Settings """ . getFileName("Race.settings", kUserConfigDirectory) . """"
+				options := " -Settings """ . kTempDirectory . "Race Engineer.settings" . """"
 				
 				if this.Simulator.supportsPitstop()
 					options .= " -Remote " . controllerPID
@@ -425,16 +425,23 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 		
 		simulatorName := setupDB.getSimulatorName(simulator)
 		
-		duration := Round((getConfigurationValue(data, "Stint Data", "LapLastTiem") - getConfigurationValue(data, "Session Data", "SessionTimeRemaining")) / 1000)
-	
-		settings := setupDB.getSettings(simulatorName, car, track, duration)
+		duration := Round((getConfigurationValue(data, "Stint Data", "LapLastTime") - getConfigurationValue(data, "Session Data", "SessionTimeRemaining")) / 1000)
+		weather := getConfigurationValue(data, "Weather Data", "Weather", "Dry")
+		compound := getConfigurationValue(data, "Car Data", "TyreCompound", "Dry")
+		compoundColor := getConfigurationValue(data, "Car Data", "TyreCompoundColor", "Black")
 		
-		tpSetting := getConfigurationValue(kSimulatorConfiguration, "Race Engineer Startup", simulatorName . ".LoadTyrePressures", "Default")
+		loadSettings := getConfigurationValue(this.Configuration, "Race Assistant Startup", simulatorName . ".LoadSettings", getConfigurationValue(this.Configuration, "Race Engineer Startup", simulatorName . ".LoadSettings", "Default"))
+		
+		if (loadSettings = "SetupDatabase")
+			settings := setupDB.getSettings(simulatorName, car, track, {Weather: weather, Duration: duration, Compound: compound, CompoundColor: compoundColor})
+		else
+			settings := readConfiguration(getFileName("Race.settings", kUserConfigDirectory))
+		
+		tpSetting := getConfigurationValue(this.Configuration, "Race Engineer Startup", simulatorName . ".LoadTyrePressures", "Default")
 		
 		if (tpSetting = "SetupDatabase") {
 			trackTemperature := getConfigurationValue(data, "Track Data", "Temperature", 23)
 			airTemperature := getConfigurationValue(data, "Weather Data", "Temperature", 27)
-			weather := getConfigurationValue(data, "Weather Data", "Waether", "Dry")
 			
 			compound := false
 			compoundColor := false
@@ -451,15 +458,15 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 				setConfigurationValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.RR", Round(pressures[4], 1))
 			}
 			
-			writeConfiguration(kUserConfigDirectory . "Race.settings", settings)
+			writeConfiguration(kTempDirectory . "Race Engineer.settings", settings)
 		}
 		else if (tpSetting = "Import") {
-			writeConfiguration(kUserConfigDirectory . "Race.settings", settings)
+			writeConfiguration(kTempDirectory . "Race Engineer.settings", settings)
 			
-			openRaceSettings(true, true)
+			openRaceSettings(true, true, false, kTempDirectory . "Race Engineer.settings")
 		}
 		else
-			writeConfiguration(kUserConfigDirectory . "Race.settings", settings)
+			writeConfiguration(kTempDirectory . "Race Engineer.settings", settings)
 	}
 	
 	startSession(dataFile) {
@@ -776,8 +783,11 @@ preparePitstop() {
 	}
 }
 
-openRaceSettings(import := false, silent := false, plugin := false) {
+openRaceSettings(import := false, silent := false, plugin := false, fileName := false) {
 	exePath := kBinariesDirectory . "Race Settings.exe"
+	
+	if !fileName
+		fileName := kUserConfigDirectory . "Race.settings"
 	
 	try {
 		controller := SimulatorController.Instance
@@ -786,7 +796,7 @@ openRaceSettings(import := false, silent := false, plugin := false) {
 			plugin := controller.findPlugin(kRaceEngineerPlugin)
 		
 		if import {
-			options := "-Import"
+			options := "-File """ . fileName . """ -Import"
 			
 			if (plugin && plugin.Simulator)
 				options := (options . " """ . controller.ActiveSimulator . """ " . plugin.Simulator.Code)
@@ -797,13 +807,13 @@ openRaceSettings(import := false, silent := false, plugin := false) {
 			Run "%exePath%" %options%, %kBinariesDirectory%, , pid
 		}
 		else {
-			options := getSimulatorOptions(plugin)
+			options := "-File """ . fileName . """" . getSimulatorOptions(plugin)
 			
 			Run "%exePath%" %options%, %kBinariesDirectory%, , pid
 		}
 		
 		if pid {
-			callback := ObjBindMethod(plugin, "reloadSettings", pid, getFileName("Race.settings", kUserConfigDirectory))
+			callback := ObjBindMethod(plugin, "reloadSettings", pid, fileName)
 			
 			SetTimer %callback%, -1000
 		}

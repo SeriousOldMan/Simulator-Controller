@@ -358,9 +358,17 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 		
 		simulatorName := setupDB.getSimulatorName(simulator)
 		
-		duration := Round((getConfigurationValue(data, "Stint Data", "LapLastTiem") - getConfigurationValue(data, "Session Data", "SessionTimeRemaining")) / 1000)
+		duration := Round((getConfigurationValue(data, "Stint Data", "LapLastTime") - getConfigurationValue(data, "Session Data", "SessionTimeRemaining")) / 1000)
+		weather := getConfigurationValue(data, "Weather Data", "Weather", "Dry")
+		compound := getConfigurationValue(data, "Car Data", "TyreCompound", "Dry")
+		compoundColor := getConfigurationValue(data, "Car Data", "TyreCompoundColor", "Black")
 	
-		settings := setupDB.getSettings(simulatorName, car, track, duration)
+		loadSettings := getConfigurationValue(this.Configuration, "Race Assistant Startup", simulatorName . ".LoadSettings", getConfigurationValue(this.Configuration, "Race Strategist Startup", simulatorName . ".LoadSettings", "Default"))
+		
+		if (loadSettings = "SetupDatabase")
+			settings := setupDB.getSettings(simulatorName, car, track, {Weather: weather, Duration: duration, Compound: compound, CompoundColor: compoundColor})
+		else
+			settings := readConfiguration(getFileName("Race.settings", kUserConfigDirectory))
 		
 		writeConfiguration(kTempDirectory . "Race Strategist.settings", settings)
 	}

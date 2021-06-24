@@ -1251,14 +1251,37 @@ class RaceEngineer extends RaceAssistant {
 	
 	updateSettings() {
 		local knowledgeBase := this.KnowledgeBase
+		local compound
 		
 		if knowledgeBase {
-			simulator := knowledgeBase.getValue("Session.Simulator")
+			setupDB := this.SetupDatabase
+			
+			simulatorName := setupDB.getSimulatorName(knowledgeBase.getValue("Session.Simulator"))
 			car := knowledgeBase.getValue("Session.Car")
 			track := knowledgeBase.getValue("Session.Track")
 			duration := knowledgeBase.getValue("Session.Duration")
+			weather := knowledgeBase.getValue("Weather.Now")
+			compound := knowledgeBase.getValue("Tyre.Compound")
+			compoundColor := knowledgeBase.getValue("Tyre.Compound.Color")
 			
-			this.SetupDatabase.updateSettings(simulator, car, track, duration, Round(this.BestLapTime / 1000), this.AvgFuelConsumption)
+			oldValue := getConfigurationValue(this.Configuration, "Race Engineer Startup", simulatorName . ".LoadSettings", "Default")
+			loadSettings := getConfigurationValue(this.Configuration, "Race Assistant Startup", simulatorName . ".LoadSettings", oldValue)
+		
+			values := {AvgLapTime: Round(this.BestLapTime / 1000), AvgFuelConsumption: this.AvgFuelConsumption
+					 , Compound: compound, CompoundColor: compoundColor}
+			
+			if (loadSettings = "SetupDatabase")
+				setupDB.updateSettings(simulatorName, car, track
+									 , {Duration: duration, Weather: weather, Compound: compound, CompoundColor: compoundColor}, values)
+			else {
+				fileName := getFileName("Race.settings", kUserConfigDirectory)
+				
+				settings := readConfiguration(fileName)
+				
+				setupDB.updateSettingsValues(settings, values)
+				
+				writeConfiguration(fileName, settings)
+			}
 		}
 	}
 

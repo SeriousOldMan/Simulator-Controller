@@ -514,7 +514,7 @@ class SetupDatabase {
 		}
 	}
 	
-	mapSettings(simulator, car, track, function) {
+	doSettings(simulator, car, track, function) {
 		localSettings := false
 		globalSettings := false
 		
@@ -527,41 +527,71 @@ class SetupDatabase {
 			%function%(simulator, car, track, name)
 	}
 	
-	matchDuration(data, simulator, car, track, name) {
-		if !data.HasKey("Name") {
-			data["Name"] := name
-			data["Settings"] := this.readSettings(simulator, car, track, name)
+	matchProperties(query, precise, result, simulator, car, track, name) {
+		local compound
+		
+		if precise {
+			match := true
+			
+			newSettings := this.readSettings(simulator, car, track, name)
+			
+			if (query.HasKey("Duration") && (getConfigurationValue(newSettings, "Session Settings", "Duration") != query["Duration"]))
+				match := false
+			
+			if (query.HasKey("Compound") && (getConfigurationValue(newSettings, "Session Setup", "Compound") != query["Compound"]))
+				match := false
+			
+			if match {
+				result["Name"] := name
+				result["Settings"] := newSettings
+			}
 		}
 		else {
-			newSettings := this.readSettings(simulator, car, track, name)
-			duration := data["Duration"]
+			if !result.HasKey("Name") {
+				result["Name"] := name
+				result["Settings"] := this.readSettings(simulator, car, track, name)
+			}
+			else {
+				newSettings := this.readSettings(simulator, car, track, name)
 			
-			if (Abs(getConfigurationValue(newSettings, "Session Settings", "Duration") - duration) < Abs(getConfigurationValue(data["Settings"], "Session Settings", "Duration") - duration)) {
-				data["Name"] := name
-				data["Settings"] := newSettings
+				if query.HasKey("Compound") {
+					duration := query["Duration"]
+					
+					betterMatchingDuration := (Abs(getConfigurationValue(newSettings, "Session Settings", "Duration") - duration) < Abs(getConfigurationValue(result["Settings"], "Session Settings", "Duration") - duration))
+				}
+				else
+					betterMatchingDuration := false
+				
+				if query.HasKey("Compound") {
+					compound := query["Compound"]
+					
+					betterMatchingTyres := ((query["Compound"] = getConfigurationValue(newSettings, "Session Setup", "Tyre.Compound", "Dry"))
+										 && (query["Compound"] != getConfigurationValue(result["Settings"], "Session Setup", "Tyre.Compound", "Dry")))
+				}
+				else if (getConfigurationValue(result["Settings"], "Session Setup", "Tyre.Compound", "Dry") = "Dry")
+					betterMatchingTyres := false
+				else
+					betterMatchingTyres := (getConfigurationValue(newSettings, "Session Setup", "Tyre.Compound", "Dry") = "Dry")
+				
+				if (betterMatchingTyres || betterMatchingDuration) {
+					result["Name"] := name
+					result["Settings"] := newSettings
+				}
 			}
 		}
 	}
 	
-	getSettings(simulator, car, track, duration) {
+	getSettings(simulator, car, track, query) {
 		simulatorName := this.getSimulatorName(simulator)
 		
-		loadSettings := getConfigurationValue(kSimulatorConfiguration, "Race Assistant Startup", simulatorName . ".LoadSettings", getConfigurationValue(kSimulatorConfiguration, "Race Engineer Startup", simulatorName . ".LoadSettings", "Default"))
-		
-		if (loadSettings = "Default")
-			return readConfiguration(getFileName("Race.settings", kUserConfigDirectory))
-		else if (loadSettings = "SetupDatabase") {
-			data := {Duration: duration}
+		result := {}
 			
-			this.mapSettings(simulatorName, car, track, ObjBindMethod(this, "matchDuration", data))
+		this.doSettings(simulatorName, car, track, ObjBindMethod(this, "matchProperties", query, false, result))
+	
+		settingsName := (result.HasKey("Name") ? result["Name"] : false)
 		
-			settingsName := (data.HasKey("Name") ? data["Name"] : false)
-			
-			if settingsName
-				return this.readSettings(simulatorName, car, track, settingsName)
-			else
-				return readConfiguration(getFileName("Race.settings", kUserConfigDirectory))
-		}
+		if settingsName
+			return this.readSettings(simulatorName, car, track, settingsName)
 		else
 			return readConfiguration(getFileName("Race.settings", kUserConfigDirectory))
 	}
@@ -621,46 +651,44 @@ class SetupDatabase {
 		}
 	}
 	
-	updateSettings(simulator, car, track, duration, lapTime, avgFuelConsumption) {
+	updateSettingsValues(settings, values) {
+		if values.HasKey("Compound")
+			setConfigurationValue(settings, "Session Setup", "Tyre.Compound", values["Compound"])
+		
+		if values.HasKey("CompoundColor")
+			setConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", values["CompoundColor"])
+		
+		if values.HasKey("AvgLapTime")
+			setConfigurationValue(settings, "Session Settings", "Lap.AvgTime", values["AvgLapTime"])
+		
+		if values.HasKey("AvgFuelConsumption")
+			setConfigurationValue(settings, "Session Settings", "Fuel.AvgConsumption", values["AvgFuelConsumption"])
+	}
+	
+	updateSettings(simulator, car, track, query, values) {
 		simulatorName := this.getSimulatorName(simulator)
 		
-		loadSettings := getConfigurationValue(kSimulatorConfiguration, "Race Assistant Startup", simulatorName . ".LoadSettings", getConfigurationValue(kSimulatorConfiguration, "Race Engineer Startup", simulatorName . ".LoadSettings", "Default"))
+		result := {}
 		
-		if (loadSettings = "Default") {
+		this.doSettings(simulatorName, car, track, ObjBindMethod(this, "matchProperties", query, true, result))
+	
+		settingsName := (result.HasKey("Name") ? result["Name"] : false)
+		
+		if settingsName {
+			settings := this.readSettings(simulatorName, car, track, settingsName)
+		
+			this.updateSettingsValues(settings, values)
+			
+			this.writeSettings(simulatorName, car, track, settingsName, settings)
+		}
+		else {
 			fileName := getFileName("Race.settings", kUserConfigDirectory)
 			
 			settings := readConfiguration(fileName)
 			
-			setConfigurationValue(settings, "Session Settings", "Lap.AvgTime", lapTime)
-			setConfigurationValue(settings, "Session Settings", "Fuel.AvgConsumption", avgFuelConsumption)
+			this.updateSettingsValues(settings, values)
 			
-			writeConfiguration(fileName, settings)
-		}
-		else if (loadSettings = "SetupDatabase") {
-			data := {Duration: duration}
-			
-			this.mapSettings(simulatorName, car, track, ObjBindMethod(this, "matchDuration", data))
-		
-			settingsName := (data.HasKey("Name") ? data["Name"] : false)
-			
-			if settingsName {
-				settings := this.readSettings(simulatorName, car, track, settingsName)
-			
-				setConfigurationValue(settings, "Session Settings", "Lap.AvgTime", lapTime)
-				setConfigurationValue(settings, "Session Settings", "Fuel.AvgConsumption", avgFuelConsumption)
-				
-				this.writeSettings(simulatorName, car, track, settingsName, settings)
-			}
-			else {
-				fileName := getFileName("Race.settings", kUserConfigDirectory)
-				
-				settings := readConfiguration(fileName)
-				
-				setConfigurationValue(settings, "Session Settings", "Lap.AvgTime", lapTime)
-				setConfigurationValue(settings, "Session Settings", "Fuel.AvgConsumption", avgFuelConsumption)
-				
-				this.writeSettings(simulatorName, car, track, translate("New") . " - " . A_Now, settings)
-			}
+			this.writeSettings(simulatorName, car, track, translate("New") . " - " . A_Now, settings)
 		}
 	}
 }

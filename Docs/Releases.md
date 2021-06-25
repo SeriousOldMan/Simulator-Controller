@@ -1,4 +1,4 @@
-## 3.1.4-release 06/25/21 (planned)
+## 3.1.4-release 06/25/21
 
   1. Bugfixes, as always
   2. Documentation updates, as always

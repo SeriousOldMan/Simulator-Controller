@@ -433,7 +433,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 		loadSettings := getConfigurationValue(this.Configuration, "Race Assistant Startup", simulatorName . ".LoadSettings", getConfigurationValue(this.Configuration, "Race Engineer Startup", simulatorName . ".LoadSettings", "Default"))
 		
 		if (loadSettings = "SetupDatabase")
-			settings := setupDB.getSettings(simulatorName, car, track, {Weather: weather, Duration: duration, Compound: compound, CompoundColor: compoundColor})
+			settings := setupDB.getSettings(simulatorName, car, track, {Weather: weather, Duration: (Round((duration / 60) / 5) * 300), Compound: compound, CompoundColor: compoundColor})
 		else
 			settings := readConfiguration(getFileName("Race.settings", kUserConfigDirectory))
 		

@@ -133,7 +133,7 @@ priority: -5, [?Sector] => (Clear: Sector)
 
 updateStandings(?lap) <= updatePosition(?lap, !Car.Count)
 
-updatePosition(?, 0) <= !
+updatePosition(?, ?car) <= =<(?car, 0), !
 updatePosition(?lap, !Driver.Car) <= !, carPosition(!Driver.Car, ?position), Set(Position, ?position), carLaps(!Driver.Car, FULL, ?laps),		\
 									 Set(Standings.Lap, ?lap, Position, ?position), Set(Standings.Lap, ?lap, Car, !Driver.Car, Delta, 0),		\
 									 Set(Standings.Lap, ?lap, Car, !Driver.Car, Laps, ?laps),													\
@@ -183,7 +183,7 @@ extrapolateLap(?lap, ?futureLap) <= carAvgLapTime(?lap, !Driver.Car, ?avgLapTime
 
 priority: -20, [?Lap] => (Prove: clearExtrapolatedLap, ?Lap, !Car.Count)
 
-clearExtrapolatedLap(?lap, 0) <= !
+clearExtrapolatedLap(?, ?car) <= =<(?car, 0), !
 clearExtrapolatedLap(?lap, ?car)  <= Clear(Standings.Extrapolated, ?lap, Car, ?car, Position),													\
 									 Clear(Standings.Extrapolated, ?lap, Car, ?car, Laps),														\
 									 ?nextCar = ?car - 1, clearExtrapolatedLap(?lap, ?nextCar)
@@ -195,12 +195,12 @@ priority: -20, {All: [?Lap], [?Session.Settings.Standings.Extrapolation.Laps]} =
 										?Session.Settings.Standings.Extrapolation.Laps),														\
 		(Prove: updatePositions, ?Lap, ?Session.Settings.Standings.Extrapolation.Laps)
 		
-extrapolatePositions(?, 0) <= !
+extrapolatePositions(?, ?lapDelta) <= =<(?lapDelta, 0), !
 extrapolatePositions(?lap, ?lapDelta) <= carAvgLapTime(?lap, !Driver.Car, ?avgLapTime), ?futureTime = ?lapDelta * ?avgLapTime,					\
 										 ?futureLap = ?lap + ?lapDelta, extrapolatePositions(?lap, !Car.Count, ?futureLap, ?futureTime),		\
 										 ?nextDelta = ?lapDelta - 1, extrapolatePositions(?lap, ?nextDelta)
 
-extrapolatePositions(?, 0, ?, ?) <= !
+extrapolatePositions(?, ?car, ?, ?) <= =<(?car, 0), !
 extrapolatePositions(?, ?, ?, 0) <= !
 extrapolatePositions(?lap, ?car, ?futureLap, ?deltaTime) <= carAvgLapTime(?lap, ?car, 0), !
 extrapolatePositions(?lap, ?car, ?futureLap, ?deltaTime) <= carAvgLapTime(?lap, ?car, ?carLapTime), ?deltaLaps = ?deltaTime / ?carLapTime,		\
@@ -209,16 +209,16 @@ extrapolatePositions(?lap, ?car, ?futureLap, ?deltaTime) <= carAvgLapTime(?lap, 
 															Set(Standings.Extrapolated, ?futureLap, Car, ?car, Laps, ?futureLaps),				\
 															?nextCar = ?car - 1, extrapolatePositions(?lap, ?nextCar, ?futureLap, ?deltaTime)
 
-updatePositions(?, 0) <= !
+updatePositions(?, ?lapDelta) <= =<(?lapDelta, 0), !
 updatePositions(?lap, ?lapDelta) <= ?futureLap = ?lap + ?lapDelta, Call(updatePositions, ?futureLap),											\
 									?nextDelta = ?lapDelta - 1, updatePositions(?lap, ?nextDelta)
 
-correctPositions(?, ?, 0) <= !
+correctPositions(?, ?, ?lapDelta) <= =<(?lapDelta, 0), !
 correctPositions(?lap, ?overtakeDelta, ?lapDelta) <= ?futureLap = ?lap + ?lapDelta,																\
 													 correctPositions(?lap, !Car.Count, ?overtakeDelta, ?futureLap),							\
 													 ?nextDelta = ?lapDelta - 1, correctPositions(?lap, ?overtakeDelta, ?nextDelta)
 
-correctPositions(?, 0, ?, ?) <= !
+correctPositions(?, ?car, ?, ?) <= =<(?car, 0), !
 correctPositions(?lap, ?car, ?overtakeDelta, ?futureLap) <= Get(Standings.Lap, ?lap, Car, ?car, Position, ?currentPosition),					\
 															Get(Standings.Extrapolated, ?futureLap, Car, ?car, Position, ?futurePosition),		\
 															?deltaPosition = ?futurePosition - ?currentPosition,								\

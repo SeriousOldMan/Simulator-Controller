@@ -554,7 +554,7 @@ class SetupDatabase {
 			else {
 				newSettings := this.readSettings(simulator, car, track, name)
 			
-				if query.HasKey("Compound") {
+				if query.HasKey("Duration") {
 					duration := query["Duration"]
 					
 					betterMatchingDuration := (Abs(getConfigurationValue(newSettings, "Session Settings", "Duration") - duration) < Abs(getConfigurationValue(result["Settings"], "Session Settings", "Duration") - duration))
@@ -564,14 +564,22 @@ class SetupDatabase {
 				
 				if query.HasKey("Compound") {
 					compound := query["Compound"]
+				
+					matchingTyres := (query["Compound"] = getConfigurationValue(newSettings, "Session Setup", "Tyre.Compound", "Dry"))
 					
-					betterMatchingTyres := ((query["Compound"] = getConfigurationValue(newSettings, "Session Setup", "Tyre.Compound", "Dry"))
-										 && (query["Compound"] != getConfigurationValue(result["Settings"], "Session Setup", "Tyre.Compound", "Dry")))
+					betterMatchingTyres := (matchingTyres && (query["Compound"] != getConfigurationValue(result["Settings"], "Session Setup", "Tyre.Compound", "Dry")))
 				}
-				else if (getConfigurationValue(result["Settings"], "Session Setup", "Tyre.Compound", "Dry") = "Dry")
-					betterMatchingTyres := false
-				else
-					betterMatchingTyres := (getConfigurationValue(newSettings, "Session Setup", "Tyre.Compound", "Dry") = "Dry")
+				else {
+					matchingTyres := (getConfigurationValue(newSettings, "Session Setup", "Tyre.Compound", "Dry") = "Dry")
+				
+					if (getConfigurationValue(result["Settings"], "Session Setup", "Tyre.Compound", "Dry") = "Dry")
+						betterMatchingTyres := false
+					else
+						betterMatchingTyres := matchingTyres
+				}
+				
+				if (betterMatchingDuration && !matchingTyres)
+					betterMatchingDuration := false
 				
 				if (betterMatchingTyres || betterMatchingDuration) {
 					result["Name"] := name

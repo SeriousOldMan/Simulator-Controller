@@ -34,6 +34,8 @@ None for the moment...
 
 [3.1.4-release](https://www.dropbox.com/s/3rcdu6iddxr3oyt/Simulator%20Controller%203.1.4-release.zip?dl=1) (New features: Assetto Corsa Competizione integration for Race Strategist, Position projection and simulation model, New settings for Race Strategist, New voice activation command behaviour, Renaming of several applications and files, Better debug support for race assistants.)
 
+[3.1.5-release](https://www.dropbox.com/s/ebuuhx380tb8y44/Simulator%20Controller%203.1.5-release.zip?dl=1) (Maintenance release for 3.1.4)
+
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-314) of this version and all the versions you might have skipped, before installing and using this version.
 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):

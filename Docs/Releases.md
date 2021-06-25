@@ -1,3 +1,7 @@
+## 3.1.5-release 06/25/21
+
+  1. Bugfix for several Setup Database issues.
+
 ## 3.1.4-release 06/25/21
 
   1. Bugfixes, as always

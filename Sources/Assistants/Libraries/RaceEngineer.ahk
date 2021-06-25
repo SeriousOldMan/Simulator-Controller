@@ -1268,7 +1268,7 @@ class RaceEngineer extends RaceAssistant {
 			loadSettings := getConfigurationValue(this.Configuration, "Race Assistant Startup", simulatorName . ".LoadSettings", oldValue)
 		
 			values := {AvgLapTime: Round(this.BestLapTime / 1000), AvgFuelConsumption: this.AvgFuelConsumption
-					 , Compound: compound, CompoundColor: compoundColor}
+					 , Compound: compound, CompoundColor: compoundColor, Duration: duration}
 			
 			if (loadSettings = "SetupDatabase")
 				setupDB.updateSettings(simulatorName, car, track

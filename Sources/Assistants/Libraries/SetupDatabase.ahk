@@ -663,6 +663,9 @@ class SetupDatabase {
 		
 		if values.HasKey("AvgFuelConsumption")
 			setConfigurationValue(settings, "Session Settings", "Fuel.AvgConsumption", values["AvgFuelConsumption"])
+		
+		if values.HasKey("Duration")
+			setConfigurationValue(settings, "Session Settings", "Duration", values["Duration"])
 	}
 	
 	updateSettings(simulator, car, track, query, values) {

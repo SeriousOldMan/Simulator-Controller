@@ -101,7 +101,7 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 			local plugin := this.Controller.findPlugin(kRaceStrategistPlugin)
 			
 			if (this.Action = "RaceStrategistOpenSettings")
-				openRaceSettings(plugin)
+				openRaceSettings(false, false, plugin)
 			else if (this.Action = "RaceStrategistImportSettings")
 				openRaceSettings(true, false, plugin)
 			else if (this.Action = "RaceStrategistOpenSetups")

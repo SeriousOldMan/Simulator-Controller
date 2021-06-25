@@ -538,7 +538,7 @@ class SetupDatabase {
 			if (query.HasKey("Duration") && (getConfigurationValue(newSettings, "Session Settings", "Duration") != query["Duration"]))
 				match := false
 			
-			if (getConfigurationValue(newSettings, "Session Setup", "Tyre.Compound", "Dry") != (query.HasKey("Compound") ? query["Compound"] : "Dry")))
+			if (getConfigurationValue(newSettings, "Session Setup", "Tyre.Compound", "Dry") != (query.HasKey("Compound") ? query["Compound"] : "Dry"))
 				match := false
 			
 			if match {

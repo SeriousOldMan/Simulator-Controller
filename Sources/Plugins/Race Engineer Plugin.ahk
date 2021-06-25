@@ -854,7 +854,9 @@ readSimulatorData(simulator, options := "", protocol := "SHM") {
 	exePath := kBinariesDirectory . simulator . " " . protocol . " Reader.exe"
 	
 	Random prefix, 1, 1000000
-		
+	
+	FileCreateDir %kTempDirectory%%simulator% Data
+	
 	dataFile := kTempDirectory . simulator . " Data\" . protocol . "_" . Round(prefix) . ".data"
 	
 	try {

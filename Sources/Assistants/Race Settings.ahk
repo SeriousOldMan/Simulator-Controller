@@ -739,7 +739,9 @@ restart:
 readSimulatorData(simulator) {
 	dataFile := kTempDirectory . simulator . " Data\Setup.data"
 	exePath := kBinariesDirectory . simulator . " SHM Reader.exe"
-		
+	
+	FileCreateDir %kTempDirectory%%simulator% Data
+	
 	try {
 		RunWait %ComSpec% /c ""%exePath%" -Setup > "%dataFile%"", , Hide
 	}

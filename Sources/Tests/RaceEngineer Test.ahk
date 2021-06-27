@@ -760,7 +760,7 @@ class PitstopHandling extends Assert {
 					this.AssertEqual(false, engineer.KnowledgeBase.getValue("Pitstop.1.Repair.Bodywork"), "Pitstop bodywork repair info not in history memory...")
 					this.AssertEqual(25, engineer.KnowledgeBase.getValue("Pitstop.1.Temperature.Air"), "Pitstop air temperature not in history memory...")
 					this.AssertEqual(32, engineer.KnowledgeBase.getValue("Pitstop.1.Temperature.Track"), "Pitstop track temperature not in history memory...")
-					this.AssertEqual(626905, engineer.KnowledgeBase.getValue("Pitstop.1.Time"), "Pitstop timestamp not in history memory...")
+					this.AssertEqual(544615, engineer.KnowledgeBase.getValue("Pitstop.1.Time"), "Pitstop timestamp not in history memory...")
 					
 					this.AssertEqual("Dry", engineer.KnowledgeBase.getValue("Pitstop.1.Tyre.Compound"), "Pitstop tyre compound not in history memory...")
 					this.AssertEqual(8, engineer.KnowledgeBase.getValue("Pitstop.1.Tyre.Set"), "Pitstop tyre set not in history memory...")

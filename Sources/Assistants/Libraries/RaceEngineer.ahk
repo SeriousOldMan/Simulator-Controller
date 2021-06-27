@@ -733,7 +733,7 @@ class RaceEngineer extends RaceAssistant {
 		if this.AdjustLapTime {
 			settingsLapTime := (getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.AvgTime", lapTime / 1000) * 1000)
 			
-			if ((lapTime / settingsLapTime) > 1.2)
+			if ((lapTime / settingsLapTime) > 2)
 				lapTime := settingsLapTime
 		}
 		
@@ -1010,7 +1010,7 @@ class RaceEngineer extends RaceAssistant {
 		if ((lapNumber <= 2) && knowledgeBase.getValue("Session.Settings.Lap.Time.Adjust", false)) {
 			settingsLapTime := (getDeprecatedConfigurationValue(this.Settings, "Session Settings", "Race Settings", "Lap.AvgTime", lapTime / 1000) * 1000)
 			
-			if ((lapTime / settingsLapTime) > 1.2)
+			if ((lapTime / settingsLapTime) > 2)
 				lapTime := settingsLapTime
 		}
 		
@@ -1019,13 +1019,8 @@ class RaceEngineer extends RaceAssistant {
 		
 		overallTime := (this.OverallTime + lapTime)
 		
-		values := {OverallTime: overallTime}
-		
-		if (lapNumber > 2)
-			values["BestLapTime"] := (this.BestLapTime = 0) ? lapTime : Min(this.BestLapTime, lapTime)
-		
 		if (lapTime > 0)
-			this.updateDynamicValues(values)
+			this.updateDynamicValues({BestLapTime: (this.BestLapTime = 0) ? lapTime : Min(this.BestLapTime, lapTime), OverallTime: overallTime})
 		
 		knowledgeBase.addFact("Lap." . lapNumber . ".Time.End", overallTime)
 		
@@ -1568,7 +1563,7 @@ class RaceEngineer extends RaceAssistant {
 			
 			speaker.speakPhrase(phrase)
 	
-			if (knowledgeBase.getValue("Lap.Remaining") > 4)
+			if (knowledgeBase.getValue("Lap.Remaining") > 5)
 				speaker.speakPhrase("DamageAnalysis")
 			else
 				speaker.speakPhrase("NoDamageAnalysis")

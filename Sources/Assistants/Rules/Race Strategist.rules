@@ -114,7 +114,7 @@ projectedTyreTemperature(?lap, ?temperature) <=																									\
 
 {Any: [?Lap], [?Sector]} => (Prove: updateLapTimes, ?Lap, !Car.Count)
 
-updateLapTimes(?, 0) <= !
+updateLapTimes(?, ?car) <= =<(?car, 0), !
 updateLapTimes(?lap, ?car) <= carLapTime(?car, ?lapTime), Set(Standings.Lap, ?lap, Car, ?car, Time, ?lapTime),									\
 							  ?nextCar = ?car - 1, updateLapTimes(?lap, ?nextCar)
 
@@ -224,7 +224,7 @@ correctPositions(?lap, ?car, ?overtakeDelta, ?futureLap) <= Get(Standings.Lap, ?
 															?deltaPosition = ?futurePosition - ?currentPosition,								\
 															?temp = ?overtakeDelta * ?deltaPosition, abs(?temp, ?correction),					\
 															correctPosition(?lap, ?car, ?correction, ?futureLap),								\
-															?nextCar = ?car - 1, correctPositions(?lap, ?overtakeDelta, ?nextCar, ?futureLap)
+															?nextCar = ?car - 1, correctPositions(?lap, ?nextCar, ?overtakeDelta, ?futureLap)
 
 correctPosition(?, ?, 0, ?) <= !
 correctPosition(?lap, ?car, ?timeCorrection, ?futureLap) <= carAvgLapTime(?lap, ?car, 0), !  
@@ -250,7 +250,7 @@ carWeightedLapTime(?referenceLap, ?car, ?lap, ?time) <=																							\
 		lapWeight(?referenceLap, ?lap, ?weight), ?delta = ?lastTime - ?lapTime, ?weightedDelta = ?delta * ?weight,								\
 		?time = ?lastTime - ?weightedDelta
 
-carLapTime(0, ?, 0) <= !
+carLapTime(?lap, ?, 0) <= =<(?lap, 0), !
 carLapTime(?lap, ?car, ?lapTime) <= Get(Standings.Lap, ?lap, Car, ?car, Time, ?lapTime), !
 carLapTime(?lap, ?car, ?lapTime) <= ?pLap = ?lap - 1, carLapTime(?pLap, ?car, ?lapTime)
 

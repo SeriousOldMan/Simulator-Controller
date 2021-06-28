@@ -52,7 +52,7 @@ To have an error free session like this one, you must have a perfect setup for v
 
 ## Installation
 
-The installation procedure for Cato is the same as the [installation procedure for Jona](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#installation), which means, that, if you have everything setup correctly for Jona, you are also well prepared to use Cato.
+The installation procedure for Cato is the same as the [installation procedure for Jona](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#installation), which means, that you are also well prepared to use Cato, if you have everything setup correctly for Jona.
 
 ## Interacting with Cato
 

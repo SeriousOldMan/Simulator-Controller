@@ -48,6 +48,20 @@ Important: If you have multiple *dialog partners* active, for example Jona and C
 
 (That is a very good message. You put your foot down on the pedal and push a little bit more to bridge the gap to the car in front of you.)
 
+(After a few laps, you finally managed to gain P 8. Now it is time to plan for the upcoming pitstop. Maybe Cato can give you some recommendation...)
+
+**Driver: "What is the best lap for the next pitstop?"**
+
+**Cato: "Understood. Please give me a few seconds."**
+
+(Cato again runs a complex simulation, taking into account your remaining fuel, the current race positions and the weather outlook. Cato will recommend the lap for the pitstop, where you will have the least traffic after the stop, or the lap where an undercut might be possible, taking into account the best lap for a tyre compound change, if applicable.)
+
+**Cato: "I recommend a pitstop in lap 17. Should I inform your race engineer?"**
+
+**Driver: "Yes, please."
+
+(Cato will hand over the information to your virtual race engineer, which will handle the technical stuff and plan the pitstop.)
+
 To have an error free session like this one, you must have a perfect setup for voice recognition. I strongly recommend using a headset, since alien noises might lead to false positives in Catos voice recognition. Please see the section on [troubleshooting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#troubleshooting) in the documentation for Jona, if you need some hints.
 
 ## Installation

@@ -107,6 +107,8 @@ class RaceStrategist extends RaceAssistant {
 				this.gapToLeadRecognized(words)
 			case "LapTimes":
 				this.lapTimesInfoRecognized(words)
+			case "PitstopLap":
+				this.pitstopLapRecognized(words)
 			default:
 				base.handleVoiceCommand(grammar, words)
 		}
@@ -300,6 +302,15 @@ class RaceStrategist extends RaceAssistant {
 			if (position > 1)
 				this.reportLapTime("LapTimeLeader", driverLapTime, knowledgeBase.getValue("Position.Leader.Car", 0))
 		}
+	}
+	
+	pitstopLapRecognized(words) {
+		local knowledgeBase := this.KnowledgeBase
+		
+		if !this.hasEnoughData()
+			return
+		
+		this.getSpeaker().speakPhrase("Cannot do this right now")
 	}
 	
 	createSession(data) {

@@ -12,6 +12,16 @@ General Release Actions
 10. Update Wiki using "update-documentation.bat"
 11. Set a Git Tag after final commit
 
+Release 3.1.6 Checklist
+=======================
+
+0. Search for new links (*)
+1. Integration of Autombilista 2
+   a. Update procedure
+   b. Plugins & Modes
+   c. Updates.md
+   d. Plugins list in Readme and in Plugins & Modes
+
 Release 3.1.4 Checklist
 =======================
 

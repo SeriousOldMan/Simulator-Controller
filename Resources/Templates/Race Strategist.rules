@@ -31,6 +31,18 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;; "Pitstop.Plan" can be set, if you want to run an analysis for the best  ;;;
+;;; lap for the next pitstop. If this fact is set to true, the analysis     ;;;
+;;; searches for a lap using the remaining fuel as a hint for the window of ;;;
+;;; laps to analyze. But you can also set "Pitstop.Plan" to a specific lap, ;;;
+;;; if you want to search for the best pitstop option in a lap close to     ;;;
+;;; this given lap.                                                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+; [?Pitstop.Plan] => ...
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;; "Pitstop.Lap" must be set to the lap number, where the pitstop has been ;;;
 ;;; done.                                                                   ;;;
 ;;;-------------------------------------------------------------------------;;;

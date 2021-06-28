@@ -1,8 +1,8 @@
 [Development]
 Version=3.1.6-dev
 Target=3.1.6-release
-Date=06/25/2021
-Changes=
+Date=06/28/2021
+Changes=Initial support for Automobilista 2
 [Release]
 Version=3.1.5-release
 Date=06/25/2021

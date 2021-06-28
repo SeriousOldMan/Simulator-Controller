@@ -1,3 +1,9 @@
+## 3.1.6-release 07/02/21
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Initial support for *Automobilista 2*
+
 ## 3.1.5-release 06/25/21
 
   1. Bugfix for several Setup Database issues.

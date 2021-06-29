@@ -240,6 +240,8 @@ editSettings(ByRef settingsOrCommand) {
 	static pitstopWarningEdit
 	static extrapolationLapsEdit
 	static overtakeDeltaEdit
+	static trafficConsideredEdit
+	static pitstopStrategyWindowEdit
 	
 	static tyrePressureDeviationEdit
 	static temperatureCorrectionCheck
@@ -277,7 +279,8 @@ restart:
 		if (!isFloat(tyrePressureDeviationEdit, fuelConsumptionEdit, pitstopRefuelServiceEdit
 				   , tpDryFrontLeftEdit, tpDryFrontRightEdit, tpDryRearLeftEdit, tpDryRearRightEdit
 				   , tpWetFrontLeftEdit, tpWetFrontRightEdit, tpWetRearLeftEdit, tpWetRearRightEdit)
-		 || !isNumber(repairSuspensionThresholdEdit, repairBodyworkThresholdEdit)) {
+		 || !isNumber(repairSuspensionThresholdEdit, repairBodyworkThresholdEdit)
+		 || (trafficConsideredEdit < 1) || (trafficConsideredEdit > 100)) {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 			title := translate("Error")
 			MsgBox 262160, %title%, % translate("Invalid values detected - please correct...")
@@ -345,6 +348,8 @@ restart:
 		setConfigurationValue(newSettings, "Strategy Settings", "Service.Refuel", pitstopRefuelServiceEdit)
 		setConfigurationValue(newSettings, "Strategy Settings", "Extrapolation.Laps", extrapolationLapsEdit)
 		setConfigurationValue(newSettings, "Strategy Settings", "Overtake.Delta", overtakeDeltaEdit)
+		setConfigurationValue(newSettings, "Strategy Settings", "Traffic.Considered", trafficConsideredEdit)
+		setConfigurationValue(newSettings, "Strategy Settings", "Strategy.Window.Considered", pitstopStrategyWindowEdit)
 		
 		if (settingsOrCommand == kOk)
 			Gui RES:Destroy
@@ -391,6 +396,8 @@ restart:
 		pitstopRefuelServiceEdit := getConfigurationValue(settingsOrCommand, "Strategy Settings", "Service.Refuel", 1.5)
 		extrapolationLapsEdit := getConfigurationValue(settingsOrCommand, "Strategy Settings", "Extrapolation.Laps", 3)
 		overtakeDeltaEdit := getConfigurationValue(settingsOrCommand, "Strategy Settings", "Overtake.Delta", 1)
+		trafficConsideredEdit := getConfigurationValue(settingsOrCommand, "Strategy Settings", "Traffic.Considered", 5)
+		pitstopStrategyWindowEdit := getConfigurationValue(settingsOrCommand, "Strategy Settings", "Strategy.Window.Considered", 2)
 		
 		readTyreSetup(settingsOrCommand)
 		
@@ -675,9 +682,19 @@ restart:
 		Gui RES:Add, UpDown, x158 yp-2 w18 h20 Range1-999 0x80, %overtakeDeltaEdit%
 		Gui RES:Add, Text, x184 yp+4 w290 h20, % translate("additional seconds for each passed car")
 
+		Gui RES:Add, Text, x16 yp+20 w85 h23 +0x200, % translate("Traffic")
+		Gui RES:Add, Edit, x126 yp w50 h20 Limit3 Number VtrafficConsideredEdit, %trafficConsideredEdit%
+		Gui RES:Add, UpDown, x158 yp-2 w18 h20 Range1-100 0x80, %trafficConsideredEdit%
+		Gui RES:Add, Text, x184 yp+4 w290 h20, % translate("% track length")
+
 		Gui RES:Add, Text, x66 yp+28 w270 0x10
 
-		Gui RES:Add, Text, x16 yp+15 w85 h20 +0x200, % translate("Pitstop Delta")
+		Gui RES:Add, Text, x16 yp+15 w105 h23 +0x200, % translate("Pitstop Window")
+		Gui RES:Add, Edit, x126 yp w50 h20 Limit1 Number VpitstopStrategyWindowEdit, %pitstopStrategyWindowEdit%
+		Gui RES:Add, UpDown, x158 yp-2 w18 h20 Range1-9 0x80, %pitstopStrategyWindowEdit%
+		Gui RES:Add, Text, x184 yp+4 w290 h20, % translate("Laps +/- around optimal lap")
+
+		Gui RES:Add, Text, x16 yp+22 w105 h20 +0x200, % translate("Pitstop Delta")
 		Gui RES:Add, Edit, x126 yp-2 w50 h20 Limit2 Number VpitstopDeltaEdit, %pitstopDeltaEdit%
 		Gui RES:Add, UpDown, x158 yp-2 w18 h20 0x80, %pitstopDeltaEdit%
 		Gui RES:Add, Text, x184 yp+4 w290 h20, % translate("Seconds (Drive through - Drive by)")

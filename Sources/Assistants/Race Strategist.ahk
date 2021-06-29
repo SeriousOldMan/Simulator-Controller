@@ -168,8 +168,11 @@ startRaceStrategist() {
 	
 	registerEventHandler("Strategist", "handleStrategistRemoteCalls")
 	
-	if (debug && strategistSpeaker)
+	if (debug && strategistSpeaker) {
 		RaceStrategist.Instance.getSpeaker()
+		
+		RaceStrategist.Instance.createKnowledgeBase({})
+	}
 	
 	if (strategistLogo && !kSilentMode)
 		showLogo(strategistName)

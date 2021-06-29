@@ -227,8 +227,11 @@ startRaceEngineer() {
 	
 	registerEventHandler("Engineer", "handleEngineerRemoteCalls")
 	
-	if (debug && engineerSpeaker)
+	if (debug && engineerSpeaker) {
 		RaceEngineer.Instance.getSpeaker()
+		
+		RaceEngineer.Instance.createKnowledgeBase({})
+	}
 	
 	if (engineerLogo && !kSilentMode)
 		showLogo(engineerName)

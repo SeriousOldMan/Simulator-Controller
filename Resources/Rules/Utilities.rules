@@ -25,6 +25,8 @@ abs(?x, ?x)
 
 floor(?x, ?f) <= builtin1(floor, ?x, ?f)
 
+round(?x, ?r) <= builtin1(floor, ?x, ?r)
+
 fact?(?f) <= Get(?f, ?)
 
 bound?(?x) <= unbound?(?x), !, fail

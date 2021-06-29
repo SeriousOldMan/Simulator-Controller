@@ -21,6 +21,11 @@ Release 3.1.6 Checklist
    b. Plugins & Modes
    c. Updates.md
    d. Plugins list in Readme and in Plugins & Modes
+2. New setting in for traffic in Race Settings
+   a. Doc Image
+   b. Virtual Race Strategist.md
+3. Update Procedure
+   a. Translations
 
 Release 3.1.4 Checklist
 =======================

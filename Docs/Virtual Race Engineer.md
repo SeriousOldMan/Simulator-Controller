@@ -238,6 +238,7 @@ The *Race.settings* looks like this:
 	[Strategy Settings]
 	Extrapolation.Laps=2
 	Overtake.Delta=2
+	Traffic.Considered=5
 	Pitstop.Delta=50
 	Service.Tyres=30
 	Service.Refuel=1.5

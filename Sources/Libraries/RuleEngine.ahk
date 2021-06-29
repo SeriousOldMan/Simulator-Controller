@@ -25,6 +25,7 @@ global kNone = "None:"
 global kPredicate = "Predicate:"
 
 global kEqual = "="
+global kNotEqual = "!="
 global kIdentical = "=="
 global kLess = "<"
 global kLessOrEqual = "<="
@@ -38,8 +39,8 @@ global kProveAll = "ProveAll:"
 global kSet = "Set:"
 global kClear = "Clear:"
 
-global kBuiltinFunctors = ["option", "sqrt", "+", "-", "*", "/", ">", "<", "=", "builtin1", "unbound?", "append", "get"]
-global kBuiltinFunctions = ["option", "squareRoot", "plus", "minus", "multiply", "divide", "greater", "less", "equal", "builtin1", "unbound", "append", "get"]
+global kBuiltinFunctors = ["option", "sqrt", "+", "-", "*", "/", ">", "<", "=", "!=", "builtin1", "unbound?", "append", "get"]
+global kBuiltinFunctions = ["option", "squareRoot", "plus", "minus", "multiply", "divide", "greater", "less", "equal", "unequal", "builtin1", "unbound", "append", "get"]
 global kBuiltinAritys = [2, 2, 3, 3, 3, 3, 2, 2, 2, 3, 1, -1, -1]
 
 global kProduction = "Production"
@@ -285,6 +286,8 @@ class Predicate extends Condition {
 					result := true
 				case kEqual:
 					result := (leftPrimary = rightPrimary)
+				case kNotEqual:
+					result := (leftPrimary != rightPrimary)
 				case kIdentical:
 					result := (leftPrimary == rightPrimary)
 				case kLess:
@@ -3104,6 +3107,14 @@ class RuleCompiler {
 			else {
 				this.skipWhiteSpace(text, nextCharIndex)
 				
+				if (SubStr(text, nextCharIndex, 2) = "!=") {
+					; r != x
+					nextCharIndex += 2
+					 
+					xOperand := this.readCompoundArgument(text, nextCharIndex)
+					
+					return Array("!=", functor, xOperand)
+				}
 				if (SubStr(text, nextCharIndex, 1) = "=") {
 					; r = x op y OR x = y
 					nextCharIndex += 1
@@ -3993,6 +4004,10 @@ less(choicePoint, operand1, operand2) {
 
 equal(choicePoint, operand1, operand2) {
 	return choicePoint.ResultSet.unify(choicePoint, operand1, operand2)
+}
+
+unequal(choicePoint, operand1, operand2) {
+	return !choicePoint.ResultSet.unify(choicePoint, operand1, operand2)
 }
 
 builtin1(choicePoint, function, operand1, operand2) {

@@ -1335,9 +1335,15 @@ class RaceEngineer extends RaceAssistant {
 		return ((this.Session == kSessionRace) && this.PitstopHandler)
 	}
 	
-	planPitstop(options := true, confirm := true) {
+	planPitstop(optionsOrLap := true, confirm := true) {
 		local knowledgeBase := this.KnowledgeBase
 		local compound
+		
+		plannedLap := false
+		
+		if (options != true)
+			if options is number
+				plannedLap := options
 		
 		if !this.hasEnoughData()
 			return false
@@ -1357,6 +1363,8 @@ class RaceEngineer extends RaceAssistant {
 			this.dumpKnowledge(knowledgeBase)
 		
 		pitstopNumber := knowledgeBase.getValue("Pitstop.Planned.Nr")
+		
+		knowledgeBase.setFact("Pitstop.Planned.Lap", plannedLap)
 		
 		if this.Speaker {
 			speaker := this.getSpeaker()

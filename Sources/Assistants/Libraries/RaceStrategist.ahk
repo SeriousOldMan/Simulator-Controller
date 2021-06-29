@@ -107,8 +107,10 @@ class RaceStrategist extends RaceAssistant {
 				this.gapToLeadRecognized(words)
 			case "LapTimes":
 				this.lapTimesInfoRecognized(words)
-			case "PitstopLap":
+			case "PitstopPlan":
 				this.pitstopLapRecognized(words)
+			case "PitstopLap":
+				this.pitstopLapRecognized(words, true)
 			default:
 				base.handleVoiceCommand(grammar, words)
 		}
@@ -304,13 +306,66 @@ class RaceStrategist extends RaceAssistant {
 		}
 	}
 	
-	pitstopLapRecognized(words) {
+	pitstopLapRecognized(words, lap := false) {
 		local knowledgeBase := this.KnowledgeBase
 		
 		if !this.hasEnoughData()
 			return
 		
-		this.getSpeaker().speakPhrase("Cannot do this right now")
+		speaker := this.getSpeaker()
+		fragments := speaker.Fragments
+		
+		if lap {
+			lapPosition := inList(words, fragments["Lap"])
+			
+			if lapPosition {
+				lap := words[lapPosition + 1]
+				
+				if lap is not number
+					lap := false
+			}
+			else
+				lap := false
+		}
+					
+		speaker.speakPhrase("Confirm")
+	
+		sendMessage()
+		
+		Loop 10
+			Sleep 500
+				
+		knowledgeBase.setFact("Pitstop.Strategy.Plan", lap ? lap : true)
+		
+		knowledgeBase.produce()
+		
+		if this.Debug[kDebugKnowledgeBase]
+			this.dumpKnowledge(this.KnowledgeBase)
+		
+		plannedLap := knowledgebase.getValue("Pitstop.Strategy.Lap", false)
+		
+		if !plannedLap
+			speaker.speakPhrase("NoPlannedPitstop")
+		else {
+			speaker.speakPhrase("PistopLap", {lap: plannedLap})
+		
+			Process Exist, Race Engineer.exe
+			
+			pid := ErrorLevel
+			
+			if (pid && this.Listener) {
+				speaker.speakPhrase("InformEngineer", false, true)
+				
+				this.setContinuation(ObjBindMethod(this, "planPitstop", plannedLap))
+			}
+		}
+	}
+	
+	planPitstop(plannedLap) {
+		Process Exist, Race Engineer.exe
+		
+		if ErrorLevel
+			raiseEvent(kFileMessage, "Engineer", "planPitstop:" . plannedLap, ErrorLevel)
 	}
 	
 	createSession(data) {
@@ -371,7 +426,11 @@ class RaceStrategist extends RaceAssistant {
 				, "Session.Settings.Lap.History.Considered": getConfigurationValue(this.Configuration, "Race Strategist Analysis", simulatorName . ".ConsideredHistoryLaps", 5)
 				, "Session.Settings.Lap.History.Damping": getConfigurationValue(this.Configuration, "Race Strategist Analysis", simulatorName . ".HistoryLapsDamping", 0.2)
 				, "Session.Settings.Standings.Extrapolation.Laps": getConfigurationValue(settings, "Strategy Settings", "Extrapolation.Laps", 2)
-				, "Session.Settings.Standings.Extrapolation.Overtake.Delta": Round(getConfigurationValue(settings, "Strategy Settings", "Overtake.Delta", 1) * 1000)}
+				, "Session.Settings.Standings.Extrapolation.Overtake.Delta": Round(getConfigurationValue(settings, "Strategy Settings", "Overtake.Delta", 1) * 1000)
+				, "Session.Settings.Strategy.Traffic.Considered": getConfigurationValue(settings, "Strategy Settings", "Traffic.Considered", 5) / 100
+				, "Session.Settings.Pitstop.Service.Refuel": getConfigurationValue(settings, "Strategy Settings", "Service.Refuel", 1.5)
+				, "Session.Settings.Pitstop.Service.Tyres": getConfigurationValue(settings, "Strategy Settings", "Service.Tyres", 30)
+				, "Session.Settings.Pitstop.Strategy.Window.Considered": getConfigurationValue(settings, "Strategy Settings", "Strategy.Window.Considered", 2)}
 		return facts
 	}
 	
@@ -396,7 +455,11 @@ class RaceStrategist extends RaceAssistant {
 					, "Session.Settings.Lap.History.Considered": getConfigurationValue(this.Configuration, "Race Strategist Analysis", simulatorName . ".ConsideredHistoryLaps", 5)
 					, "Session.Settings.Lap.History.Damping": getConfigurationValue(this.Configuration, "Race Strategist Analysis", simulatorName . ".HistoryLapsDamping", 0.2)
 					, "Session.Settings.Standings.Extrapolation.Laps": getConfigurationValue(settings, "Strategy Settings", "Extrapolation.Laps", 2)
-					, "Session.Settings.Standings.Extrapolation.Overtake.Delta": Round(getConfigurationValue(settings, "Strategy Settings", "Overtake.Delta", 1) * 1000)}
+					, "Session.Settings.Standings.Extrapolation.Overtake.Delta": Round(getConfigurationValue(settings, "Strategy Settings", "Overtake.Delta", 1) * 1000)
+					, "Session.Settings.Strategy.Traffic.Considered": getConfigurationValue(settings, "Strategy Settings", "Traffic.Considered", 5) / 100
+					, "Session.Settings.Pitstop.Service.Refuel": getConfigurationValue(settings, "Strategy Settings", "Service.Refuel", 1.5)
+					, "Session.Settings.Pitstop.Service.Tyres": getConfigurationValue(settings, "Strategy Settings", "Service.Tyres", 30)
+					, "Session.Settings.Pitstop.Strategy.Window.Considered": getConfigurationValue(settings, "Strategy Settings", "Strategy.Window.Considered", 2)}
 			
 			for key, value in facts
 				knowledgeBase.setValue(key, value)

@@ -26,6 +26,8 @@ Release 3.1.6 Checklist
    b. Virtual Race Strategist.md
 3. Update Procedure
    a. Translations
+   b. Phrase Grammars
+   c. Plugin Update
 
 Release 3.1.4 Checklist
 =======================

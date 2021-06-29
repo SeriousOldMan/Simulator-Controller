@@ -782,6 +782,23 @@ updateConfigurationForV20() {
 	updateCustomCalls(13, 32)
 }
 
+updatePluginsForV316() {
+	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	userConfiguration := readConfiguration(userConfigurationFile)
+	
+	if (userConfiguration.Count() > 0) {
+		if !getConfigurationValue(userConfiguration, "Plugins", "AM2", false) {
+			am2Plugin := new Plugin("AM2", readConfiguration(getFileName(kSimulatorConfigurationFile, kConfigDirectory)))
+				
+			am2Plugin.iIsActive := false
+			
+			am2Plugin.saveToConfiguration(userConfiguration)
+			
+			writeConfiguration(userConfigurationFile, userConfiguration)
+		}
+	}
+}
+
 updatePluginsForV312() {
 	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
 	userConfiguration := readConfiguration(userConfigurationFile)

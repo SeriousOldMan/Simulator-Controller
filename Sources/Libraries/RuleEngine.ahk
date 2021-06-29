@@ -41,7 +41,7 @@ global kClear = "Clear:"
 
 global kBuiltinFunctors = ["option", "sqrt", "+", "-", "*", "/", ">", "<", "=", "!=", "builtin1", "unbound?", "append", "get"]
 global kBuiltinFunctions = ["option", "squareRoot", "plus", "minus", "multiply", "divide", "greater", "less", "equal", "unequal", "builtin1", "unbound", "append", "get"]
-global kBuiltinAritys = [2, 2, 3, 3, 3, 3, 2, 2, 2, 3, 1, -1, -1]
+global kBuiltinAritys = [2, 2, 3, 3, 3, 3, 2, 2, 2, 2, 3, 1, -1, -1]
 
 global kProduction = "Production"
 global kReduction = "Reduction"
@@ -3115,7 +3115,7 @@ class RuleCompiler {
 					
 					return Array("!=", functor, xOperand)
 				}
-				if (SubStr(text, nextCharIndex, 1) = "=") {
+				else if (SubStr(text, nextCharIndex, 1) = "=") {
 					; r = x op y OR x = y
 					nextCharIndex += 1
 					 

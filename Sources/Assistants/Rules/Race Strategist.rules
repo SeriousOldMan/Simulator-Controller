@@ -293,12 +293,14 @@ carLapAvgTime(?lap, ?car, ?times, ?avgTime) <= sum(?times, ?sTimes), length(?tim
 
 priority: 5, [?Pitstop.Strategy.Plan] => (Clear: Pitstop.Strategy.Lap)
 
-[?Pitstop.Strategy.Plan = true] => (Prove: updatePitstopStrategy, !Lap), (Clear: Pitstop.Strategy.Plan)
-[?Pitstop.Strategy.Plan] => (Prove: updatePitstopStrategy, !Pitstop.Strategy.Plan), (Clear: Pitstop.Strategy.Plan)
+[?Pitstop.Strategy.Plan = true] => (Prove: updatePitstopStrategy, !Lap)
+[?Pitstop.Strategy.Plan > 1] => (Prove: updatePitstopStrategy, !Pitstop.Strategy.Plan)
+
+priority: -5, [?Pitstop.Strategy.Plan] => (Clear: Pitstop.Strategy.Plan)
 
 updatePitstopStrategy(?lap) <= ?lap < !Lap, !, fail
 updatePitstopStrategy(!Lap) <= !, ?temp = !Lap.Remaining.Fuel / 2, round(?temp, ?halfFuelLap),													\
-							   ?targetLap = !Lap + ?halfFuelLap, updatePitstopStrategy(?targetLap)
+							   ?targetLap = !Lap + ?halfFuelLap, ?targetLap != !Lap, updatePitstopStrategy(?targetLap)
 updatePitstopStrategy(?lap) <= ?deltaLaps = ?lap - !Lap, ?deltaFuelLaps = !Lap.Remaining.Fuel - ?deltaLaps, ?deltaFuelLaps > 0,					\
 							   updatePitstopStrategy(?lap, ?deltaFuelLaps)
 
@@ -312,7 +314,7 @@ updatePitstopStrategy(?lap, ?fromLap, ?toLap) <= updatePitstopStrategy(?lap, ?fr
 
 updatePitstopStrategy(?lap, ?fromLap, ?fromLap, [], [], []) <= !
 updatePitstopStrategy(?lap, ?fromLap, ?toLap, [?fromLap | ?laps], [?position | ?positions], [?trafficDensity | ?trafficDensities]) <=			\
-		simulatePitstop(?lap, ?fromLap, ?pitDelta), extrapolateLap(?lap, ?fromLap, ?pitDelta),													\
+		pitstopDeltaTime(?lap, ?fromLap, ?pitDelta), extrapolateLap(?lap, ?fromLap, ?pitDelta),													\
 		evaluatePosition(?fromLap, ?position, ?trafficDensity),																					\
 		?nextLap = ?fromLap + 1, updatePitstopStrategy(?lap, ?nextLap, ?toLap, ?laps, ?positions, ?trafficDensities)
 
@@ -321,14 +323,14 @@ pitstopWindow(?lap, ?targetLap, ?remainingLaps, ?fromLap, ?toLap) <=												
 		?tempSL = ?targetLap - !Session.Settings.Pitstop.Strategy.Window.Considered, max(?lap, ?tempSL, ?fromLap),								\
 		?tempTL = ?targetLap + !Session.Settings.Pitstop.Strategy.Window.Considered, min(?maxLap, ?tempTL, ?toLap)
 
-simulatePitstop(?lap, ?targetLap, ?pitstopDeltaTime) <= pitstopRefuelServiceTime(?lap, ?targetLap, ?refuelServiceTime),							\
-														pitstopTyreServiceTime(?lap, ?targetLap, ?tyreServiceTime),								\
-														?temp1 = ?refuelServiceTime + ?tyreServiceTime,											\
-														?temp2 = !Session.Settings.Pitstop.Delta + ?temp1, ?pitstopDeltaTime = ?temp2 * 1000
+pitstopDeltaTime(?lap, ?targetLap, ?pitstopDeltaTime) <= pitstopRefuelServiceTime(?lap, ?targetLap, ?refuelServiceTime),						\
+														 pitstopTyreServiceTime(?lap, ?targetLap, ?tyreServiceTime),							\
+														 ?temp1 = ?refuelServiceTime + ?tyreServiceTime,										\
+														 ?temp2 = !Session.Settings.Pitstop.Delta + ?temp1, ?pitstopDeltaTime = ?temp2 * 1000
 
 pitstopRefuelServiceTime(?lap, ?targetLap, ?refillTime) <=																						\
-		?deltaLap = ?targetLap - ?lap,																											\
-		lapAvgFuel(?lap, ?avgFuel), lapRemainingFuel(?lap, ?temp), ?correction = ?deltaLap * ?avgFuel, ?remainingFuel = ?temp - ?correction,	\
+		?deltaLaps = ?targetLap - ?lap,																											\
+		lapAvgFuel(?lap, ?avgFuel), lapRemainingFuel(?lap, ?temp), ?correction = ?deltaLaps * ?avgFuel, ?remainingFuel = ?temp - ?correction,	\
 		remainingSessionLaps(?lap, ?tempLaps), ?remainingLaps = ?tempLaps - ?deltaLaps,															\
 		?sessionFuel = ?avgFuel * ?remainingLaps, safetyFuel(?avgFuel, ?safetyFuel),															\
 		?neededFuel = ?sessionFuel + ?safetyFuel, ?refillAmount = ?neededFuel - ?remainingFuel,													\
@@ -336,7 +338,7 @@ pitstopRefuelServiceTime(?lap, ?targetLap, ?refillTime) <=																						
 		?refillIncrements = ?adjustedRefillAmount / 10, ?refillTime = ?refillIncrements * !Session.Settings.Pitstop.Service.Refuel
 
 pitstopTyreServiceTime(?lap, ?targetLap, !Session.Settings.Pitstop.Service.Tyres) <=															\
-		?deltaLap = ?targetLap - ?lap,																											\
+		?deltaLaps = ?targetLap - ?lap,																											\
 		remainingSessionLaps(?lap, ?tempLaps), ?remainingLaps = ?tempLaps - ?deltaLaps,															\
 		?remainingLaps > 5, ! 
 pitstopTyreServiceTime(?, ?, 0)

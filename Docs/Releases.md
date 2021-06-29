@@ -1,8 +1,10 @@
-## 3.1.6-release 07/02/21
+## 3.1.6-release 07/02/21 (planned)
 
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. Initial support for *Automobilista 2*
+  4. Recommendation for best pitstop lap in relation to traffic density and position development
+  5. Handover between virtual strategist and engineer during pitstop planning
 
 ## 3.1.5-release 06/25/21
 

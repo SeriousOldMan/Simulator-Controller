@@ -354,7 +354,7 @@ trafficDensity(?lap, ?car, ?from, ?to, ?count) <= Get(Standings.Extrapolated, ?l
 trafficDensity(?lap, ?car, ?from, ?to, ?count) <= ?nextCar = ?car - 1, trafficDensity(?lap, ?nextCar, ?from, ?to, ?count)
 
 bestPitstopLap([?cLap | ?laps], [?cPosition | ?positions], [?cTrafficDensity | ?trafficDensities], ?lap) <=										\
-	bestPitstopLap(?laps, ?positions, ?trafficDensities, ?cLap, ?cPosition, ?cTrafficDensity, ?lap)
+		bestPitstopLap(?laps, ?positions, ?trafficDensities, ?cLap, ?cPosition, ?cTrafficDensity, ?lap)
 
 bestPitstopLap([], [], [], ?candidateLap, ?, ?, ?candidateLap)
 bestPitstopLap([?cLap | ?laps], [?cPosition | ?positions], [?cDensity | ?densities], ?bestLap, ?bestPosition, ?bestDensity, ?lap) <=			\

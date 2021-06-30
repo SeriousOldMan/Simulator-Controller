@@ -2,9 +2,10 @@
 
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. Initial support for *Automobilista 2*
-  4. Recommendation for best pitstop lap in relation to traffic density and position development
-  5. Handover between virtual strategist and engineer during pitstop planning
+  3. Initial support for *Automobilista 2*.
+  4. Recommendation for best pitstop lap in relation to traffic density and position development (see the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#a-typical-dialog) for an example on how to use this feature).
+  5. Handover between virtual strategist and engineer during pitstop planning (part of the above example).
+  6. [New options](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#tab-strategy) in the settings dialog for the Virtual Race Strategist.
 
 ## 3.1.5-release 06/25/21
 

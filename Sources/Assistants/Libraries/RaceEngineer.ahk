@@ -1226,7 +1226,7 @@ class RaceEngineer extends RaceAssistant {
 		this.iSessionDataActive := true
 		
 		try {
-			if (this.SaveSettings = ((phase = "Before") ? kAlways : kAsk))
+			if ((this.Session == kSessionRace) && (this.SaveSettings = ((phase = "Before") ? kAlways : kAsk)))
 				this.updateSettings()
 			
 			if ((this.SaveTyrePressures = ((phase = "After") ? kAsk : kAlways)) && (this.SetupData.Count() > 0))

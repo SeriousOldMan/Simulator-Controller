@@ -697,14 +697,6 @@ class RaceEngineer extends RaceAssistant {
 			speaker.speakPhrase("MoreChanges", false, true)
 		}
 	}
-			
-	setContinuation(continuation) {
-		this.VoiceAssistant.setContinuation(continuation)
-	}
-			
-	clearContinuation() {
-		this.VoiceAssistant.clearContinuation()
-	}
 	
 	createSession(data) {
 		local facts

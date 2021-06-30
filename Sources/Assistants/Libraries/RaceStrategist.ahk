@@ -360,6 +360,11 @@ class RaceStrategist extends RaceAssistant {
 	}
 	
 	planPitstop(plannedLap) {
+		sendMessage()
+		
+		Loop 10
+			Sleep 500
+		
 		Process Exist, Race Engineer.exe
 		
 		if ErrorLevel

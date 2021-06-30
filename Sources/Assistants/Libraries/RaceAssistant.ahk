@@ -306,6 +306,14 @@ class RaceAssistant extends ConfigurationItem {
 	nameRecognized(words) {
 		this.getSpeaker().speakPhrase("IHearYou")
 	}
+			
+	setContinuation(continuation) {
+		this.VoiceAssistant.setContinuation(continuation)
+	}
+			
+	clearContinuation() {
+		this.VoiceAssistant.clearContinuation()
+	}
 	
 	createKnowledgeBase(facts) {
 		local rules

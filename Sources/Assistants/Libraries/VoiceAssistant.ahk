@@ -92,11 +92,11 @@ class VoiceAssistant {
 			this.iLanguage := language
 		}
 		
-		speak(text, focus := false) {
-			raiseEvent(kFileMessage, "Voice", "speak:" . values2String(";", this.Assistant.Name, text, focus), this.Assistant.VoiceServer)
+		speak(text, question := false) {
+			raiseEvent(kFileMessage, "Voice", "speak:" . values2String(";", this.Assistant.Name, text, question), this.Assistant.VoiceServer)
 		}
 		
-		speakPhrase(phrase, variables := false, focus := false) {
+		speakPhrase(phrase, variables := false, question := false) {
 			phrases := this.Phrases
 			
 			if phrases.HasKey(phrase) {
@@ -108,7 +108,7 @@ class VoiceAssistant {
 			}
 			
 			if phrase
-				this.speak(phrase, focus)
+				this.speak(phrase, question)
 		}
 	}
 	

@@ -1339,11 +1339,15 @@ class RaceEngineer extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local compound
 		
+		options := optionsOrLap
 		plannedLap := false
 		
-		if (options != true)
-			if options is number
-				plannedLap := options
+		if (optionsOrLap != true)
+			if optionsOrLap is number {
+				plannedLap := optionsOrLap
+				
+				options := true
+			}
 		
 		if !this.hasEnoughData()
 			return false

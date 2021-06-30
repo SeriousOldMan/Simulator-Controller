@@ -302,9 +302,9 @@ updatePitstopStrategy(?lap) <= ?lap < !Lap, !, fail
 updatePitstopStrategy(!Lap) <= !, lapAvgFuel(!Lap, ?avgFuel), safetyFuel(?avgFuel, ?safetyFuel),												\
 							   ?safetyLaps = ?safetyFuel / ?avgFuel, ?temp1 = !Lap.Remaining - ?safetyLaps,										\
 							   ?temp2 = ?temp1 - !Session.Settings.Pitstop.Strategy.Window.Considered, round(?temp2, ?targetLap),				\
-							   updatePitstopStrategy(?targetLap)
-updatePitstopStrategy(?lap) <= ?deltaLaps = ?lap - !Lap, ?deltaFuelLaps = !Lap.Remaining.Fuel - ?deltaLaps, ?deltaFuelLaps > 0,					\
-							   updatePitstopStrategy(?lap, ?deltaFuelLaps)
+							   ?targetLap != !Lap, updatePitstopStrategy(?targetLap)
+updatePitstopStrategy(?lap) <= ?deltaLaps = ?lap - !Lap, ?temp = !Lap.Remaining - ?deltaLaps, round(?temp, ?remainingLaps), ?remainingLaps > 0,	\
+							   updatePitstopStrategy(?lap, ?remainingLaps)
 
 updatePitstopStrategy(?targetLap, ?remainingLaps) <= ?remainingLaps < 3, Set(Pitstop.Strategy.Lap, ?targetLap), !
 updatePitstopStrategy(?targetLap, ?remainingLaps) <= pitstopWindow(!Lap, ?targetLap, ?remainingLaps, ?fromLap, ?toLap), >=(?toLap, ?fromLap),	\
@@ -312,7 +312,8 @@ updatePitstopStrategy(?targetLap, ?remainingLaps) <= pitstopWindow(!Lap, ?target
 
 updatePitstopStrategy(?lap, ?fromLap, ?fromLap) <= !, Set(Pitstop.Strategy.Lap, ?fromLap)
 updatePitstopStrategy(?lap, ?fromLap, ?toLap) <= updatePitstopStrategy(?lap, ?fromLap, ?toLap, ?laps, ?positions, ?trafficDensities),			\
-												 Call(msgbox, ?laps, ?positions, ?trafficDensities), bestPitstopLap(?laps, ?positions, ?trafficDensities, ?targetLap), Call(msgbox, ?targetLap), Set(Pitstop.Strategy.Lap, ?targetLap)
+												 bestPitstopLap(?laps, ?positions, ?trafficDensities, ?targetLap),								\
+												 Set(Pitstop.Strategy.Lap, ?targetLap)
 
 updatePitstopStrategy(?lap, ?fromLap, ?fromLap, [], [], []) <= !
 updatePitstopStrategy(?lap, ?fromLap, ?toLap, [?fromLap | ?laps], [?position | ?positions], [?trafficDensity | ?trafficDensities]) <=			\
@@ -359,7 +360,7 @@ trafficDensity(?lap, ?car, ?from, ?to, ?count) <= Get(Standings.Extrapolated, ?l
 trafficDensity(?lap, ?car, ?from, ?to, ?count) <= ?nextCar = ?car - 1, trafficDensity(?lap, ?nextCar, ?from, ?to, ?count)
 
 bestPitstopLap([?cLap | ?laps], [?cPosition | ?positions], [?cTrafficDensity | ?trafficDensities], ?lap) <=										\
-		Call(msgbox, ?laps, ?positions, ?trafficDensities, ?cLap, ?cPosition, ?cTrafficDensity, ?lap), bestPitstopLap(?laps, ?positions, ?trafficDensities, ?cLap, ?cPosition, ?cTrafficDensity, ?lap)
+		bestPitstopLap(?laps, ?positions, ?trafficDensities, ?cLap, ?cPosition, ?cTrafficDensity, ?lap)
 
 bestPitstopLap([], [], [], ?candidateLap, ?, ?, ?candidateLap)
 bestPitstopLap([?cLap | ?laps], [?cPosition | ?positions], [?cDensity | ?densities], ?bestLap, ?bestPosition, ?bestDensity, ?lap) <=			\

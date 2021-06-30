@@ -351,9 +351,7 @@ class RaceStrategist extends RaceAssistant {
 		
 			Process Exist, Race Engineer.exe
 			
-			pid := ErrorLevel
-			
-			if (pid && this.Listener) {
+			if (ErrorLevel && this.Listener) {
 				speaker.speakPhrase("InformEngineer", false, true)
 				
 				this.setContinuation(ObjBindMethod(this, "planPitstop", plannedLap))

@@ -58,7 +58,7 @@ Important: If you have multiple *dialog partners* active, for example Jona and C
 
 **Cato: "I recommend a pitstop in lap 17. Should I inform your race engineer?"**
 
-**Driver: "Yes, please."
+**Driver: "Yes, please."**
 
 (Cato will hand over the information to your virtual race engineer, which will handle the technical stuff and plan the pitstop.)
 

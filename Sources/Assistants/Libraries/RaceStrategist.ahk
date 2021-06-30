@@ -309,9 +309,6 @@ class RaceStrategist extends RaceAssistant {
 	pitstopLapRecognized(words, lap := false) {
 		local knowledgeBase := this.KnowledgeBase
 		
-		if !this.hasEnoughData()
-			return
-		
 		speaker := this.getSpeaker()
 		fragments := speaker.Fragments
 		
@@ -334,6 +331,9 @@ class RaceStrategist extends RaceAssistant {
 		
 		Loop 10
 			Sleep 500
+		
+		if false && !this.hasEnoughData()
+			return
 				
 		knowledgeBase.setFact("Pitstop.Strategy.Plan", lap ? lap : true)
 		
@@ -347,7 +347,7 @@ class RaceStrategist extends RaceAssistant {
 		if !plannedLap
 			speaker.speakPhrase("NoPlannedPitstop")
 		else {
-			speaker.speakPhrase("PistopLap", {lap: plannedLap})
+			speaker.speakPhrase("PitstopLap", {lap: plannedLap})
 		
 			Process Exist, Race Engineer.exe
 			

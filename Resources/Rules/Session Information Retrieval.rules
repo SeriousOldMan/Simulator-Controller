@@ -36,3 +36,6 @@ remainingStintTime(?lap, ?remainingTime) <= remainingStintLaps(?lap, Driver, ?re
 remainingStintTime(?lap, ?remainingTime) <= remainingSessionTime(?lap, ?remainingTime)
 											
 remainingStintTime(?stintTime) <= Get(Driver.Time.Stint.Remaining, ?stintTime)
+
+safetyFuel(?avgFuel, ?safetyFuel) <= !Session.Settings.Lap.PostRace = true, ?safetyFuel = ?avgFuel + !Session.Settings.Fuel.SafetyMargin, !
+safetyFuel(?, !Session.Settings.Fuel.SafetyMargin)

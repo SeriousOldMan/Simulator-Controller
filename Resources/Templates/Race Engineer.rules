@@ -65,9 +65,6 @@ updateFuelTarget(?lap) <= lapAvgFuel(?lap, ?avgFuel), lapRemainingFuel(?lap, ?re
 						  Set(Fuel.Amount.Target, ?adjustedRefillAmount), !
 updateFuelTarget(?lap) <= Clear(Fuel.Amount.Target)
 
-safetyFuel(?avgFuel, ?safetyFuel) <= !Session.Settings.Lap.PostRace = true, ?safetyFuel = ?avgFuel + !Session.Settings.Fuel.SafetyMargin, !
-safetyFuel(?, !Session.Settings.Fuel.SafetyMargin)
-
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                     Tyre Compound Target Calculation                    ;;;

@@ -1343,7 +1343,8 @@ class RaceEngineer extends RaceAssistant {
 		plannedLap := false
 		
 		if (optionsOrLap != true)
-			if optionsOrLap is number {
+			if optionsOrLap is number
+			{
 				plannedLap := optionsOrLap
 				
 				options := true

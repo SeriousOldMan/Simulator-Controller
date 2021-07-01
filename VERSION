@@ -1,7 +1,7 @@
 [Development]
-Version=3.1.6-dev
+Version=3.1.6-beta
 Target=3.1.6-release
-Date=06/30/2021
+Date=07/01/2021
 Changes=Initial support for Automobilista 2, Recommendation for best pitstop lap in relation to traffic density, Handover between virtual strategist and engineer during pitstop planning
 [Release]
 Version=3.1.5-release
@@ -11,4 +11,4 @@ Changes=Assetto Corsa Competizione integration for Race Strategist Race Strategi
 Type=Development
 [Version]
 Release=3.1.5-release
-Development=3.1.6-release
+Development=3.1.6-beta

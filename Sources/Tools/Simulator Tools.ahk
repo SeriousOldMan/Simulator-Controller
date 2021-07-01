@@ -787,12 +787,12 @@ updatePluginsForV316() {
 	userConfiguration := readConfiguration(userConfigurationFile)
 	
 	if (userConfiguration.Count() > 0) {
-		if !getConfigurationValue(userConfiguration, "Plugins", "AM2", false) {
-			am2Plugin := new Plugin("AM2", readConfiguration(getFileName(kSimulatorConfigurationFile, kConfigDirectory)))
+		if !getConfigurationValue(userConfiguration, "Plugins", "AMS2", false) {
+			ams2Plugin := new Plugin("AMS2", readConfiguration(getFileName(kSimulatorConfigurationFile, kConfigDirectory)))
 				
-			am2Plugin.iIsActive := false
+			ams2Plugin.iIsActive := false
 			
-			am2Plugin.saveToConfiguration(userConfiguration)
+			ams2Plugin.saveToConfiguration(userConfiguration)
 			
 			writeConfiguration(userConfigurationFile, userConfiguration)
 		}

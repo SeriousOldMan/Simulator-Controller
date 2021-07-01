@@ -1,5 +1,5 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - AM2 Plugin                      ;;;
+;;;   Modular Simulator Controller System - AMS2 Plugin                     ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2021) Creative Commons - BY-NC-SA                        ;;;
@@ -16,16 +16,16 @@
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kAM2Application = "Automobilista 2"
+global kAMS2Application = "Automobilista 2"
 
-global kAM2Plugin = "AM2"
+global kAMS2Plugin = "AMS2"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class AM2Plugin extends SimulatorPlugin {
+class AMS2Plugin extends SimulatorPlugin {
 	SessionStates[asText := false] {
 		Get {
 			return [(asText ? "Other" : kSessionOther)]
@@ -38,8 +38,8 @@ class AM2Plugin extends SimulatorPlugin {
 ;;;                     Function Hook Declaration Section                   ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-startAM2() {
-	return SimulatorController.Instance.startSimulator(SimulatorController.Instance.findPlugin(kAM2Plugin).Simulator, "Simulator Splash Images\AM2 Splash.jpg")
+startAMS2() {
+	return SimulatorController.Instance.startSimulator(SimulatorController.Instance.findPlugin(kAMS2Plugin).Simulator, "Simulator Splash Images\AMS2 Splash.jpg")
 }
 
 
@@ -47,10 +47,10 @@ startAM2() {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-initializeAM2Plugin() {
+initializeAMS2Plugin() {
 	local controller := SimulatorController.Instance
 	
-	new AM2Plugin(controller, kAM2Plugin, kAM2Application, controller.Configuration)
+	new AMS2Plugin(controller, kAMS2Plugin, kAMS2Application, controller.Configuration)
 }
 
 
@@ -58,4 +58,4 @@ initializeAM2Plugin() {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-initializeAM2Plugin()
+initializeAMS2Plugin()

@@ -26,7 +26,9 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-None for the moment...
+[3.1.6-beta](https://cntr.click/2VdWxjc) (Stable build for Release 3.1.6. New features: Initial support for Automobilista 2, Recommendation for best pitstop lap in relation to traffic density, Handover between virtual strategist and engineer during pitstop planning. Tested, with documentation and update procedure.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-316) of this version and all the versions you might have skipped, before installing and using this version.
 
 #### Latest release builds
 

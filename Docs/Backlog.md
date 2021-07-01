@@ -8,6 +8,9 @@
 #### Strategy
   1. [Target: V3.x - V4.0] Using the technology of Jona, implement a Race Strategy Expert
      - Adjust pitstop strategy depending on upcoming weather conditions
+
+#### Setup Database
+  1. [Target: V3.x - V4.0] Consolidating the shared setup database and build a distribution process
   
 #### General
   1. [Target: V3.x] Choosing a specific theme depending on the selected simulation game

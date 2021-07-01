@@ -3845,13 +3845,28 @@ squareRoot(choicePoint, operand1, operand2) {
 	else if isInstance(operand2, Variable) {
 		if isInstance(operand1, Variable)
 			return false
-		else
-			return resultSet.unify(choicePoint, operand2, new Literal(Sqrt(operand1.toString(resultSet))))
+		else {
+			value1 := operand1.toString(resultSet)
+			
+			if value1 is not number
+				return false
+			
+			return resultSet.unify(choicePoint, operand2, new Literal(Sqrt(value1)))
+		}
 	}
 	else if ((operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)))
 		return false
-	else
-		return (Sqrt(operand1.toString(resultSet)) = operand2.toString(resultSet))
+	else {
+		value1 := operand1.toString(resultSet)
+		value2 := operand2.toString(resultSet)
+		
+		if value1 is not number
+			return false
+		if value2 is not number
+			return false
+		
+		return (Sqrt(value1) = value2)
+	}
 }
 
 plus(choicePoint, operand1, operand2, operand3) {
@@ -3864,25 +3879,64 @@ plus(choicePoint, operand1, operand2, operand3) {
 	if isInstance(operand1, Variable) {
 		if (isInstance(operand2, Variable) || isInstance(operand3, Variable) || (operand2.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
 			return false
-		else
-			return resultSet.unify(choicePoint, operand1, new Literal(operand2.toString(resultSet) + operand3.toString(resultSet)))
+		else {
+			value2 := operand2.toString(resultSet)
+			value3 := operand3.toString(resultSet)
+			
+			if value2 is not number
+				return false
+			if value3 is not number
+				return false
+			
+			return resultSet.unify(choicePoint, operand1, new Literal(value2 + value3))
+		}
 	}
 	else if isInstance(operand2, Variable) {
 		if (isInstance(operand1, Variable) || isInstance(operand3, Variable) || (operand1.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
 			return false
-		else
-			return resultSet.unify(choicePoint, operand2, new Literal(operand1.toString(resultSet) - operand3.toString(resultSet)))
+		else {
+			value1 := operand1.toString(resultSet)
+			value3 := operand3.toString(resultSet)
+			
+			if value1 is not number
+				return false
+			if value3 is not number
+				return false
+			
+			return resultSet.unify(choicePoint, operand2, new Literal(value1 - value3))
+		}
 	}
 	else if isInstance(operand3, Variable) {
 		if (isInstance(operand1, Variable) || isInstance(operand2, Variable) || (operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)))
 			return false
-		else
-			return resultSet.unify(choicePoint, operand3, new Literal(operand1.toString(resultSet) - operand2.toString(resultSet)))
+		else {
+			value1 := operand1.toString(resultSet)
+			value2 := operand2.toString(resultSet)
+			
+			if value1 is not number
+				return false
+			if value2 is not number
+				return false
+			
+			return resultSet.unify(choicePoint, operand3, new Literal(value1 - value2))
+		}
 	}
 	else if ((operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
 		return false
-	else
-		return (operand1.toString(resultSet) = (operand2.toString(resultSet) + operand3.toString(resultSet)))
+	else {
+		value1 := operand1.toString(resultSet)
+		value2 := operand2.toString(resultSet)
+		value3 := operand3.toString(resultSet)
+		
+		if value1 is not number
+			return false
+		if value2 is not number
+			return false
+		if value3 is not number
+			return false
+			
+		return (value1 = (value2 + value3))
+	}
 }
 
 minus(choicePoint, operand1, operand2, operand3) {
@@ -3895,25 +3949,64 @@ minus(choicePoint, operand1, operand2, operand3) {
 	if isInstance(operand1, Variable) {
 		if (isInstance(operand2, Variable) || isInstance(operand3, Variable) || (operand2.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
 			return false
-		else
-			return resultSet.unify(choicePoint, operand1, new Literal(operand2.toString(resultSet) - operand3.toString(resultSet)))
+		else {
+			value2 := operand2.toString(resultSet)
+			value3 := operand3.toString(resultSet)
+			
+			if value2 is not number
+				return false
+			if value3 is not number
+				return false
+			
+			return resultSet.unify(choicePoint, operand1, new Literal(value2 - value3))
+		}
 	}
 	else if isInstance(operand2, Variable) {
 		if (isInstance(operand1, Variable) || isInstance(operand3, Variable) || (operand1.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
 			return false
-		else
-			return resultSet.unify(choicePoint, operand2, new Literal(operand1.toString(resultSet) + operand3.toString(resultSet)))
+		else {
+			value1 := operand1.toString(resultSet)
+			value3 := operand3.toString(resultSet)
+			
+			if value1 is not number
+				return false
+			if value3 is not number
+				return false
+			
+			return resultSet.unify(choicePoint, operand2, new Literal(value1 + value3))
+		}
 	}
 	else if isInstance(operand3, Variable) {
 		if (isInstance(operand1, Variable) || isInstance(operand2, Variable) || (operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)))
 			return false
-		else
-			return resultSet.unify(choicePoint, operand3, new Literal(operand1.toString(resultSet) + operand2.toString(resultSet)))
+		else {
+			value1 := operand1.toString(resultSet)
+			value2 := operand2.toString(resultSet)
+			
+			if value1 is not number
+				return false
+			if value2 is not number
+				return false
+			
+			return resultSet.unify(choicePoint, operand3, new Literal(value1 + value2))
+		}
 	}
 	else if ((operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
 		return false
-	else
-		return (operand1.toString(resultSet) = (operand2.toString(resultSet) - operand3.toString(resultSet)))
+	else {
+		value1 := operand1.toString(resultSet)
+		value2 := operand2.toString(resultSet)
+		value3 := operand3.toString(resultSet)
+		
+		if value1 is not number
+			return false
+		if value2 is not number
+			return false
+		if value3 is not number
+			return false
+			
+		return (value1 = (value2 - value3))
+	}
 }
 
 multiply(choicePoint, operand1, operand2, operand3) {
@@ -3926,25 +4019,64 @@ multiply(choicePoint, operand1, operand2, operand3) {
 	if isInstance(operand1, Variable) {
 		if (isInstance(operand2, Variable) || isInstance(operand3, Variable) || (operand2.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
 			return false
-		else
-			return resultSet.unify(choicePoint, operand1, new Literal(operand2.toString(resultSet) * operand3.toString(resultSet)))
+		else {
+			value2 := operand2.toString(resultSet)
+			value3 := operand3.toString(resultSet)
+			
+			if value2 is not number
+				return false
+			if value3 is not number
+				return false
+			
+			return resultSet.unify(choicePoint, operand1, new Literal(value2 * value3))
+		}
 	}
 	else if isInstance(operand2, Variable) {
 		if (isInstance(operand1, Variable) || isInstance(operand3, Variable) || (operand1.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
 			return false
-		else
-			return resultSet.unify(choicePoint, operand2, new Literal(operand1.toString(resultSet) / operand3.toString(resultSet)))
+		else {
+			value1 := operand1.toString(resultSet)
+			value3 := operand3.toString(resultSet)
+			
+			if value1 is not number
+				return false
+			if value3 is not number
+				return false
+			
+			return resultSet.unify(choicePoint, operand2, new Literal(value1 / value3))
+		}
 	}
 	else if isInstance(operand3, Variable) {
 		if (isInstance(operand1, Variable) || isInstance(operand2, Variable) || (operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)))
 			return false
-		else
-			return resultSet.unify(choicePoint, operand3, new Literal(operand1.toString(resultSet) / operand2.toString(resultSet)))
+		else {
+			value1 := operand1.toString(resultSet)
+			value2 := operand2.toString(resultSet)
+			
+			if value1 is not number
+				return false
+			if value2 is not number
+				return false
+			
+			return resultSet.unify(choicePoint, operand3, new Literal(value1 / value2))
+		}
 	}
 	else if ((operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
 		return false
-	else
-		return (operand1.toString(resultSet) = (operand2.toString(resultSet) * operand3.toString(resultSet)))
+	else {
+		value1 := operand1.toString(resultSet)
+		value2 := operand2.toString(resultSet)
+		value3 := operand3.toString(resultSet)
+		
+		if value1 is not number
+			return false
+		if value2 is not number
+			return false
+		if value3 is not number
+			return false
+			
+		return (value1 = (value2 * value3))
+	}
 }
 
 divide(choicePoint, operand1, operand2, operand3) {
@@ -3957,25 +4089,64 @@ divide(choicePoint, operand1, operand2, operand3) {
 	if isInstance(operand1, Variable) {
 		if (isInstance(operand2, Variable) || isInstance(operand3, Variable) || (operand2.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
 			return false
-		else
-			return resultSet.unify(choicePoint, operand1, new Literal(operand2.toString(resultSet) / operand3.toString(resultSet)))
+		else {
+			value2 := operand2.toString(resultSet)
+			value3 := operand3.toString(resultSet)
+			
+			if value2 is not number
+				return false
+			if value3 is not number
+				return false
+
+			return resultSet.unify(choicePoint, operand1, new Literal(value2 / value3))
+		}
 	}
 	else if isInstance(operand2, Variable) {
 		if (isInstance(operand1, Variable) || isInstance(operand3, Variable) || (operand1.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
 			return false
-		else
-			return resultSet.unify(choicePoint, operand2, new Literal(operand1.toString(resultSet) * operand3.toString(resultSet)))
+		else {
+			value1 := operand1.toString(resultSet)
+			value3 := operand3.toString(resultSet)
+			
+			if value1 is not number
+				return false
+			if value3 is not number
+				return false
+			
+			return resultSet.unify(choicePoint, operand2, new Literal(value1 * value3))
+		}
 	}
 	else if isInstance(operand3, Variable) {
 		if (isInstance(operand1, Variable) || isInstance(operand2, Variable) || (operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)))
 			return false
-		else
-			return resultSet.unify(choicePoint, operand3, new Literal(operand1.toString(resultSet) * operand2.toString(resultSet)))
+		else {
+			value1 := operand1.toString(resultSet)
+			value2 := operand2.toString(resultSet)
+			
+			if value1 is not number
+				return false
+			if value2 is not number
+				return false
+			
+			return resultSet.unify(choicePoint, operand3, new Literal(value1 * value2))
+		}
 	}
 	else if ((operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
 		return false
-	else
-		return (operand1.toString(resultSet) = (operand2.toString(resultSet) / operand3.toString(resultSet)))
+	else {
+		value1 := operand1.toString(resultSet)
+		value2 := operand2.toString(resultSet)
+		value3 := operand3.toString(resultSet)
+		
+		if value1 is not number
+			return false
+		if value2 is not number
+			return false
+		if value3 is not number
+			return false
+			
+		return (value1 = (value2 / value3))
+	}
 }
 
 greater(choicePoint, operand1, operand2) {
@@ -3986,8 +4157,17 @@ greater(choicePoint, operand1, operand2) {
 	
 	if (isInstance(operand1, Variable) || isInstance(operand2, Variable) || (operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)))
 		return false
-	else
-		return (operand1.toString(resultSet) > operand2.toString(resultSet))
+	else {
+		value1 := operand1.toString(resultSet)
+		value2 := operand2.toString(resultSet)
+		
+		if value1 is not number
+			return false
+		if value2 is not number
+			return false
+		
+		return (value1 > value2)
+	}
 }
 
 less(choicePoint, operand1, operand2) {
@@ -3998,8 +4178,17 @@ less(choicePoint, operand1, operand2) {
 	
 	if (isInstance(operand1, Variable) || isInstance(operand2, Variable) || (operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)))
 		return false
-	else
-		return (operand1.toString(resultSet) < operand2.toString(resultSet))
+	else {
+		value1 := operand1.toString(resultSet)
+		value2 := operand2.toString(resultSet)
+		
+		if value1 is not number
+			return false
+		if value2 is not number
+			return false
+		
+		return (value1 < value2)
+	}
 }
 
 equal(choicePoint, operand1, operand2) {

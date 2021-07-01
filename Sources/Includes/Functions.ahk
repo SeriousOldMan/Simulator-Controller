@@ -1671,7 +1671,7 @@ readConfiguration(configFile) {
 				
 				value := keyValue[2]
 				
-				sectionValues[keyValue[1]] := ((value == kTrue) ? true : ((value == kFalse) ? false : value))
+				sectionValues[keyValue[1]] := ((value = kTrue) ? true : ((value = kFalse) ? false : value))
 			}
 		}
 		

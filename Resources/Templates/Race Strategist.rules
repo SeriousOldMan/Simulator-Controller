@@ -221,9 +221,9 @@ extrapolatePositions(?lap, ?lapDelta) <= carAvgLapTime(?lap, !Driver.Car, ?avgLa
 
 extrapolatePositions(?, ?car, ?, ?, ?) <= =<(?car, 0), !
 extrapolatePositions(?, ?, ?, 0, ?) <= !
-extrapolatePositions(?lap, ?car, ?futureLap, ?deltaTime, ?) <= carAvgLapTime(?lap, ?car, 0), !
+extrapolatePositions(?lap, ?car, ?, ?, ?) <= carAvgLapTime(?lap, ?car, 0), !
 extrapolatePositions(?lap, !Driver.Car, ?futureLap, ?deltaTime, ?deltaPitTime) <=																\
-		?delta != 0, !, extrapolatePosition(?lap, !Driver.Car, ?futureLap, ?deltaTime, 0),														\
+		?deltaPitTime != 0, !, extrapolatePosition(?lap, !Driver.Car, ?futureLap, ?deltaTime, 0),												\
 		?nextCar = !Driver.Car - 1, extrapolatePositions(?lap, ?nextCar, ?futureLap, ?deltaTime, ?deltaPitTime)
 extrapolatePositions(?lap, ?car, ?futureLap, ?deltaTime, ?deltaPitTime) <=																		\
 		extrapolatePosition(?lap, ?car, ?futureLap, ?deltaTime, ?deltaPitTime),																	\

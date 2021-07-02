@@ -80,7 +80,14 @@
     <ClCompile Include="AMS2 SHM Reader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="resource.h" />
     <ClInclude Include="SharedMemory.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\..\..\Resources\Icons\Engine.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="AMS2 SHM Reader.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

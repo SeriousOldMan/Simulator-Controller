@@ -1,4 +1,4 @@
-## 3.1.6-release 07/02/21 (planned)
+## 3.1.6-release 07/02/21
 
   1. Bugfixes, as always
   2. Documentation updates, as always

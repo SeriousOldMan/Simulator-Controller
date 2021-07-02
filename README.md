@@ -26,19 +26,15 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-[3.1.6-rc1](https://www.dropbox.com/s/z7vime1zvy2ghc6/Simulator%20Controller%203.1.6-rc1.zip?dl=1) (Release candidate for Release 3.1.6. New features: Initial support for Automobilista 2, Recommendation for best pitstop lap in relation to traffic density, Handover between virtual strategist and engineer during pitstop planning. Tested, with documentation and update procedure.)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-316) of this version and all the versions you might have skipped, before installing and using this version.
+None for the moment...
 
 #### Latest release builds
 
-[3.1.2-release](https://www.dropbox.com/s/mc8qggu5qbbyx1d/Simulator%20Controller%203.1.2-release.zip?dl=1) (New features: Support for multiple actions for one controller function, New plugin argument "raceStrategist", First Rule Set for Race Strategist, iRacing integration for Race Strategist, rFactor 2 integration for Race Strategist, RaceRoom Racing Experience integration for Race Strategist.)
+[3.1.5-release](https://www.dropbox.com/s/3rcdu6iddxr3oyt/Simulator%20Controller%203.1.4-release.zip?dl=1) (New features: Assetto Corsa Competizione integration for Race Strategist, Position projection and simulation model, New settings for Race Strategist, New voice activation command behaviour, Renaming of several applications and files, Better debug support for race assistants.)
 
-[3.1.4-release](https://www.dropbox.com/s/3rcdu6iddxr3oyt/Simulator%20Controller%203.1.4-release.zip?dl=1) (New features: Assetto Corsa Competizione integration for Race Strategist, Position projection and simulation model, New settings for Race Strategist, New voice activation command behaviour, Renaming of several applications and files, Better debug support for race assistants.)
+[3.1.6-release](https://cntr.click/VM6RaFB) (New features: Initial support for Automobilista 2, Recommendation for best pitstop lap in relation to traffic density, Handover between virtual strategist and engineer during pitstop planning.)
 
-[3.1.5-release](https://cntr.click/1Lm2Zt6) (Maintenance release for 3.1.4)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-314) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-316) of this version and all the versions you might have skipped, before installing and using this version.
 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.

@@ -38,6 +38,7 @@ Data Provider.3=%kBinariesDirectory%RF2 SHM Reader.exe <- %kSourcesDirectory%For
 Data Provider.4=%kBinariesDirectory%IRC SHM Reader.exe <- %kSourcesDirectory%Foreign\IRC SHM Reader\Release\Win32\IRC SHM Reader.exe
 Data Provider.5=%kBinariesDirectory%ACC UDP Reader.exe <- %kSourcesDirectory%Foreign\ACC UDP Reader\Release\ACC UDP Reader.exe
 Data Provider.6=%kBinariesDirectory%ksBroadcastingNetwork.dll <- %kSourcesDirectory%Foreign\ACC UDP Reader\Release\ksBroadcastingNetwork.dll
+Data Provider.7=%kBinariesDirectory%AMS2 SHM Reader.exe <- %kSourcesDirectory%Foreign\AMS2 SHM Reader\Release\AMS2 SHM Reader.exe
 Speech Interface.1=%kBinariesDirectory%Speech.Recognizer.dll <- %kSourcesDirectory%Foreign\Speech Recognizer\Release\HotVoice.dll
 Speech Interface.2=%kBinariesDirectory%Microsoft.Speech.dll <- %kSourcesDirectory%Foreign\Speech Recognizer\Release\Microsoft.Speech.dll
 Controller Configuration.1=%kConfigDirectory%Simulator Configuration.ini <- %kSourcesDirectory%Tools\Simulator Configuration.ini

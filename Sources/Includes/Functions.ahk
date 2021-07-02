@@ -123,7 +123,7 @@ consentDialog(id, consent := false) {
 	
 	Gui CNS:Add, Link, x8 y434 w784 h60 cRed -VScroll +Wrap ReadOnly, % StrReplace(StrReplace(getConfigurationValue(texts, language, "Warning"), "``n", "`n"), "\<>", "=")
 		
-	Gui CNS:Add, Button, x392 y490 w80 h23 Default gcloseConsentDialog, % translate("Save")
+	Gui CNS:Add, Button, x368 y490 w80 h23 Default gcloseConsentDialog, % translate("Save")
 	
 	Gui CNS:+AlwaysOnTop
 	Gui CNS:Show, Center AutoSize

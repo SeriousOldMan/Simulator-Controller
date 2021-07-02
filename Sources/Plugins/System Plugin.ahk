@@ -603,6 +603,15 @@ startupExited() {
 ;;;                        Controller Action Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+execute(command) {
+	try {
+		Run %command%
+	}
+	catch exception {
+		logMessage(kLogWarn, substituteVariables(translate("Cannot execute command (%command%) - please check the configuration"), {command: command}))
+	}
+}
+
 startSimulation(name := false) {
 	local controller := SimulatorController.Instance
 	

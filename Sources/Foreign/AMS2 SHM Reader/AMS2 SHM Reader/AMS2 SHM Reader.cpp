@@ -20,129 +20,264 @@ inline double normalizeDamage(double value) {
 		return (value * 100);
 }
 
-inline float normalizeKelvin(double value) {
+inline double normalizeKelvin(double value) {
 	if (value < 0)
 		return 0.0;
 	else
 		return (value - 273.15);
 }
 
-long getRemainingTime(SharedMemory* shm) {
-	return normalize(shm->mEventTimeRemaining);
-}
+long getRemainingTime(SharedMemory* shm);
 
 long getRemainingLaps(SharedMemory* shm) {
-	long time = (long)(shm->mLastLapTime * 1000);
+	if (shm->mLapsInEvent > 0) {
+		return (long)shm->mLapsInEvent - shm->mParticipantInfo[shm->mViewedParticipantIndex].mLapsCompleted;
+	}
+	else {
+		long time = (long)(shm->mLastLapTime * 1000);
 
-	if (time > 0)
-		return (long)(getRemainingTime(shm) / time);
-	else
-		return 0;
+		if (time > 0)
+			return (long)(getRemainingTime(shm) / time);
+		else
+			return 0;
+	}
 }
 
+long getRemainingTime(SharedMemory* shm) {
+	if (shm->mLapsInEvent > 0) {
+		return getRemainingLaps(shm) * (long)(shm->mLastLapTime * 1000);
+	}
+	else
+		return normalize(shm->mEventTimeRemaining);
+}
 
-int main()
-{
-	printf("[Session Data]\n");
+char * getWeather(SharedMemory * shm) {
+	float rainLevel = shm->mRainDensity;
 
+	if (rainLevel <= 0.1)
+		return "Dry";
+	else if (rainLevel <= 0.2)
+		return "Drizzle";
+	else if (rainLevel <= 0.4)
+		return "LightRain";
+	else if (rainLevel <= 0.6)
+		return "MediumRain";
+	else if (rainLevel <= 0.8)
+		return "HeavyRain";
+	else
+		return "Thunderstorm";
+}
+
+void substring(char s[], char sub[], int p, int l) {
+	int c = 0;
+
+	while (c < l) {
+		sub[c] = s[p + c];
+
+		c++;
+	}
+	sub[c] = '\0';
+}
+
+int main(int argc, char* argv[]) {
 	// Open the memory-mapped file
 	HANDLE fileHandle = OpenFileMappingA(PAGE_READONLY, FALSE, MAP_OBJECT_NAME);
-	if (fileHandle == NULL)
-	{
-		printf("Active=false\n");
-		return 1;
-	}
 
-	// Get the data structure
-	const SharedMemory* sharedData = (SharedMemory*)MapViewOfFile(fileHandle, PAGE_READONLY, 0, 0, sizeof(SharedMemory));
-	SharedMemory* localCopy = new SharedMemory;
-	if (sharedData == NULL)
-	{
-		printf("Active=false\n");
+	const SharedMemory* sharedData = NULL;
+	SharedMemory* localCopy = NULL;
 
-		CloseHandle(fileHandle);
-		return 1;
-	}
-
-	// Ensure we're sync'd to the correct data version
-	if (sharedData->mVersion != SHARED_MEMORY_VERSION)
-	{
-		printf("Active=false\n");
-
-		return 1;
-	}
-
-
-	//------------------------------------------------------------------------------
-	// TEST DISPLAY CODE
-	//------------------------------------------------------------------------------
-	unsigned int updateIndex(0);
-	unsigned int indexChange(0);
+	if (fileHandle != NULL) {
+		sharedData = (SharedMemory*)MapViewOfFile(fileHandle, PAGE_READONLY, 0, 0, sizeof(SharedMemory));
+		localCopy = new SharedMemory;
 	
-	while (true)
-	{
-		if (sharedData->mSequenceNumber % 2)
-		{
-			// Odd sequence number indicates, that write into the shared memory is just happening
-			continue;
+		if (sharedData == NULL) {
+			CloseHandle(fileHandle);
+
+			fileHandle = NULL;
+		}
+		else if (sharedData->mVersion != SHARED_MEMORY_VERSION) {
+			CloseHandle(fileHandle);
+
+			fileHandle = NULL;
 		}
 
-		indexChange = sharedData->mSequenceNumber - updateIndex;
-		updateIndex = sharedData->mSequenceNumber;
+		//------------------------------------------------------------------------------
+		// TEST DISPLAY CODE
+		//------------------------------------------------------------------------------
+		unsigned int updateIndex(0);
+		unsigned int indexChange(0);
 
-		//Copy the whole structure before processing it, otherwise the risk of the game writing into it during processing is too high.
-		memcpy(localCopy, sharedData, sizeof(SharedMemory));
-
-
-		if (localCopy->mSequenceNumber != updateIndex)
+		while (true)
 		{
-			// More writes had happened during the read. Should be rare, but can happen.
-			continue;
-		}
+			if (sharedData->mSequenceNumber % 2)
+			{
+				// Odd sequence number indicates, that write into the shared memory is just happening
+				continue;
+			}
 
-		break;
+			indexChange = sharedData->mSequenceNumber - updateIndex;
+			updateIndex = sharedData->mSequenceNumber;
+
+			//Copy the whole structure before processing it, otherwise the risk of the game writing into it during processing is too high.
+			memcpy(localCopy, sharedData, sizeof(SharedMemory));
+
+
+			if (localCopy->mSequenceNumber != updateIndex)
+			{
+				// More writes had happened during the read. Should be rare, but can happen.
+				continue;
+			}
+
+			break;
+		}
 	}
 
-	printf("Active=true\n");
-	printf("Paused=%s\n", (localCopy->mGameState == GAME_INGAME_PAUSED) ? "true" : "false");
-	
-	if ((localCopy->mSessionState == SESSION_FORMATION_LAP) || (localCopy->mSessionState == SESSION_RACE))
-		printf("Session=Race\n");
-	else if (localCopy->mSessionState == SESSION_QUALIFY)
-		printf("Session=Qualification\n");
-	else if (localCopy->mSessionState == SESSION_PRACTICE)
-		printf("Session=Practice\n");
-	else
-		printf("Session=Other\n");
+	if ((argc > 1) && (strcmp(argv[1], "-Standings") == 0)) {
+		printf("[Position Data]\n");
 
-	printf("Car=%s\n", localCopy->mCarName);
-	printf("Track=%s-%s\n", localCopy->mTrackLocation, localCopy->mTrackVariation);
-	printf("FuelAmount=%d\n", (int)localCopy->mFuelCapacity);
+		if (fileHandle == NULL)
+			printf("Car.Count=0\n");
+		else {
+			printf("Car.Count=%d\n", localCopy->mNumParticipants);
+			printf("Driver.Car=%d\n", localCopy->mViewedParticipantIndex + 1);
 
-	printf("SessionFormat=Time\n");
-	printf("SessionTimeRemaining=%ld\n", getRemainingTime(localCopy));
-	printf("SessionLapsRemaining=%ld\n", getRemainingLaps(localCopy));
+			for (int i = 1; i <= localCopy->mNumParticipants; ++i) {
+				ParticipantInfo vehicle = localCopy->mParticipantInfo[i - 1];
 
-	printf("[Car Data]\n");
+				printf("Car.%d.Position=%d\n", i, vehicle.mRacePosition);
+				printf("Car.%d.Lap=%d\n", i, vehicle.mLapsCompleted);
+				printf("Car.%d.Lap.Running=%f\n", i, vehicle.mCurrentLapDistance / localCopy->mTrackLength);
+				printf("Car.%d.Time=%ld\n", i, (long)(localCopy->mLastLapTimes[i - 1] * 1000));
 
-	printf("BodyworkDamage=%f, %f, %f, %f, %f\n", 0.0, 0.0, 0.0, 0.0, normalizeDamage(localCopy->mAeroDamage));
-	printf("SuspensionDamage=%f, %f, %f, %f\n", normalizeDamage(localCopy->mSuspensionDamage[TYRE_FRONT_LEFT]),
-												normalizeDamage(localCopy->mSuspensionDamage[TYRE_FRONT_RIGHT]),
-												normalizeDamage(localCopy->mSuspensionDamage[TYRE_REAR_LEFT]),
-												normalizeDamage(localCopy->mSuspensionDamage[TYRE_REAR_RIGHT]));
+				printf("Car.%d.Car=%s\n", i, localCopy->mCarNames[i - 1]);
 
-	printf("TyreCompound=Dry\n");
-	printf("TyreCompoundColor=Black\n");
+				char* name = (char*)vehicle.mName;
 
-	printf("TyreTemperature=%f, %f, %f, %f\n", localCopy->mTyreTemp[TYRE_FRONT_LEFT],
-											   localCopy->mTyreTemp[TYRE_FRONT_RIGHT],
-											   localCopy->mTyreTemp[TYRE_REAR_LEFT],
-											   localCopy->mTyreTemp[TYRE_REAR_RIGHT]);
+				if (strchr((char*)name, ' ')) {
+					char forName[100];
+					char surName[100];
+					char nickName[3];
 
-	printf("TyrePressure = %f, %f, %f, %f\n", localCopy->mAirPressure[TYRE_FRONT_LEFT],
-											  localCopy->mAirPressure[TYRE_FRONT_RIGHT],
-											  localCopy->mAirPressure[TYRE_REAR_LEFT],
-											  localCopy->mAirPressure[TYRE_REAR_RIGHT]);
+					size_t length = strcspn(name, " ");
+
+					substring(name, forName, 0, length);
+					substring(name, surName, length + 1, strlen(name) - length - 1);
+					nickName[0] = forName[0], nickName[1] = surName[0], nickName[2] = '\0';
+
+					printf("Car.%d.Driver.Forname=%s\n", i, forName);
+					printf("Car.%d.Driver.Surname=%s\n", i, surName);
+					printf("Car.%d.Driver.Nickname=%s\n", i, nickName);
+				}
+				else {
+					printf("Car.%d.Driver.Forname=%s\n", i, name);
+					printf("Car.%d.Driver.Surname=%s\n", i, "");
+					printf("Car.%d.Driver.Nickname=%s\n", i, "");
+				}
+			}
+		}
+	}
+	else {
+		printf("[Session Data]\n");
+
+		if (fileHandle == NULL) {
+			printf("Active=false\n");
+
+			return 1;
+		}
+
+		printf("Active=true\n");
+		printf("Paused=%s\n", (localCopy->mGameState == GAME_INGAME_PAUSED) ? "true" : "false");
+
+		if ((localCopy->mSessionState == SESSION_FORMATION_LAP) || (localCopy->mSessionState == SESSION_RACE))
+			printf("Session=Race\n");
+		else if (localCopy->mSessionState == SESSION_QUALIFY)
+			printf("Session=Qualification\n");
+		else if (localCopy->mSessionState == SESSION_PRACTICE)
+			printf("Session=Practice\n");
+		else
+			printf("Session=Other\n");
+
+		printf("Car=%s\n", localCopy->mCarName);
+		printf("Track=%s-%s\n", localCopy->mTrackLocation, localCopy->mTrackVariation);
+		printf("FuelAmount=%d\n", (int)localCopy->mFuelCapacity);
+
+		printf("SessionFormat=%s\n", (localCopy->mLapsInEvent == 0) ? "Time" : "Lap");
+		printf("SessionTimeRemaining=%ld\n", getRemainingTime(localCopy));
+		printf("SessionLapsRemaining=%ld\n", getRemainingLaps(localCopy));
+
+		printf("[Car Data]\n");
+
+		printf("BodyworkDamage=%f, %f, %f, %f, %f\n", 0.0, 0.0, 0.0, 0.0, normalizeDamage(localCopy->mAeroDamage));
+		printf("SuspensionDamage=%f, %f, %f, %f\n", normalizeDamage(localCopy->mSuspensionDamage[TYRE_FRONT_LEFT]),
+			normalizeDamage(localCopy->mSuspensionDamage[TYRE_FRONT_RIGHT]),
+			normalizeDamage(localCopy->mSuspensionDamage[TYRE_REAR_LEFT]),
+			normalizeDamage(localCopy->mSuspensionDamage[TYRE_REAR_RIGHT]));
+
+		printf("TyreCompound=Dry\n");
+		printf("TyreCompoundColor=Black\n");
+
+		printf("TyreTemperature=%f, %f, %f, %f\n", localCopy->mTyreTemp[TYRE_FRONT_LEFT],
+			localCopy->mTyreTemp[TYRE_FRONT_RIGHT],
+			localCopy->mTyreTemp[TYRE_REAR_LEFT],
+			localCopy->mTyreTemp[TYRE_REAR_RIGHT]);
+
+		printf("TyrePressure = %f, %f, %f, %f\n", localCopy->mAirPressure[TYRE_FRONT_LEFT],
+			localCopy->mAirPressure[TYRE_FRONT_RIGHT],
+			localCopy->mAirPressure[TYRE_REAR_LEFT],
+			localCopy->mAirPressure[TYRE_REAR_RIGHT]);
+
+		printf("[Stint Data]\n");
+
+		char* name = localCopy->mParticipantInfo[localCopy->mViewedParticipantIndex].mName;
+
+		if (strchr(name, ' ')) {
+			char forName[100];
+			char surName[100];
+			char nickName[3];
+
+			size_t length = strcspn(name, " ");
+
+			substring((char*)name, forName, 0, length);
+			substring((char*)name, surName, length + 1, strlen((char*)name) - length - 1);
+			nickName[0] = forName[0], nickName[1] = surName[0], nickName[2] = '\0';
+
+			printf("DriverForname=%s\n", forName);
+			printf("DriverSurname=%s\n", surName);
+			printf("DriverNickname=%s\n", nickName);
+		}
+		else {
+			printf("DriverForname=%s\n", name);
+			printf("DriverSurname=%s\n", "");
+			printf("DriverNickname=%s\n", "");
+		}
+
+		printf("LapLastTime=%ld\n", (long)(normalize(localCopy->mLastLapTime) * 1000));
+
+		if (normalize(localCopy->mBestLapTime) != 0)
+			printf("LapBestTime=%ld\n", (long)(normalize(localCopy->mBestLapTime) * 1000));
+		else
+			printf("LapBestTime=%ld\n", (long)(normalize(localCopy->mLastLapTime) * 1000));
+
+		printf("Laps=%ld\n", (long)normalize(localCopy->mParticipantInfo[localCopy->mViewedParticipantIndex].mLapsCompleted));
+
+		long timeRemaining = (getRemainingTime(localCopy) * 1000);
+
+		printf("StintTimeRemaining=%ld\n", timeRemaining);
+		printf("DriverTimeRemaining=%ld\n", timeRemaining);
+		printf("InPit=%s\n", (localCopy->mPitMode == PIT_MODE_IN_PIT) ? "true" : "false");
+
+		printf("[Track Data]\n");
+		printf("Temperature=%f\n", localCopy->mTrackTemperature);
+		printf("Grip=Optimum\n");
+
+		char* weather = getWeather(localCopy);
+
+		printf("[Weather Data]\n");
+		printf("Temperature=%f\n", localCopy->mAmbientTemperature);
+		printf("Weather=%s\n", weather);
+		printf("Weather10Min=%s\n", weather);
+		printf("Weather30Min=%s\n", weather);
+	}
 
 	//------------------------------------------------------------------------------
 
@@ -153,95 +288,3 @@ int main()
 
 	return 0;
 }
-
-
-
-
-/*
-int main()
-{
-	// Open the memory-mapped file
-	HANDLE fileHandle = OpenFileMappingA( PAGE_READONLY, FALSE, MAP_OBJECT_NAME );
-	if (fileHandle == NULL)
-	{
-		printf( "Could not open file mapping object (%d).\n", GetLastError() );
-		return 1;
-	}
-
-	// Get the data structure
-	const SharedMemory* sharedData = (SharedMemory*)MapViewOfFile( fileHandle, PAGE_READONLY, 0, 0, sizeof(SharedMemory) );
-	SharedMemory* localCopy = new SharedMemory;
-	if (sharedData == NULL)
-	{
-		printf( "Could not map view of file (%d).\n", GetLastError() );
-
-		CloseHandle( fileHandle );
-		return 1;
-	}
-
-	// Ensure we're sync'd to the correct data version
-	if ( sharedData->mVersion != SHARED_MEMORY_VERSION )
-	{
-		printf( "Data version mismatch\n");
-		return 1;
-	}
-
-
-	//------------------------------------------------------------------------------
-	// TEST DISPLAY CODE
-	//------------------------------------------------------------------------------
-	unsigned int updateIndex(0);
-	unsigned int indexChange(0);
-	printf( "ESC TO EXIT\n\n" );
-	while (true)
-	{
-		if ( sharedData->mSequenceNumber % 2 )
-		{
-			// Odd sequence number indicates, that write into the shared memory is just happening
-			continue;
-		}
-
-		indexChange = sharedData->mSequenceNumber - updateIndex;
-		updateIndex = sharedData->mSequenceNumber;
-
-		//Copy the whole structure before processing it, otherwise the risk of the game writing into it during processing is too high.
-		memcpy(localCopy,sharedData,sizeof(SharedMemory));
-
-
-		if (localCopy->mSequenceNumber != updateIndex )
-		{
-			// More writes had happened during the read. Should be rare, but can happen.
-			continue;
-		}
-
-		printf( "Sequence number increase %d, current index %d, previous index %d\n", indexChange, localCopy->mSequenceNumber, updateIndex );
-
-		const bool isValidParticipantIndex = localCopy->mViewedParticipantIndex != -1 && localCopy->mViewedParticipantIndex < localCopy->mNumParticipants && localCopy->mViewedParticipantIndex < STORED_PARTICIPANTS_MAX;
-		if ( isValidParticipantIndex )
-		{
-			const ParticipantInfo& viewedParticipantInfo = localCopy->mParticipantInfo[sharedData->mViewedParticipantIndex];
-			printf( "mParticipantName: (%s)\n", viewedParticipantInfo.mName );
-			printf( "lap Distance = %f \n", viewedParticipantInfo.mCurrentLapDistance );
-		}
-
-		printf( "mGameState: (%d)\n", localCopy->mGameState );
-		printf( "mSessionState: (%d)\n", localCopy->mSessionState );
-		printf( "mOdometerKM: (%0.2f)\n", localCopy->mOdometerKM );
-
-		system("cls");
-
-		if ( _kbhit() && _getch() == 27 ) // check for escape
-		{
-			break;
-		}
-	}
-	//------------------------------------------------------------------------------
-
-	// Cleanup
-	UnmapViewOfFile( sharedData );
-	CloseHandle( fileHandle );
-	delete localCopy;
-
-	return 0;
-}
-*/

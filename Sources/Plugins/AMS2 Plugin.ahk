@@ -25,11 +25,17 @@ global kAMS2Plugin = "AMS2"
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class AMS2Plugin extends SimulatorPlugin {
+class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 	SessionStates[asText := false] {
 		Get {
 			return [(asText ? "Other" : kSessionOther)]
 		}
+	}
+	
+	updateStandingsData(data) {
+		standings := readSimulatorData(this.Code, "-Standings")
+		
+		setConfigurationSectionValues(data, "Position Data", getConfigurationSectionValues(standings, "Position Data"))
 	}
 }
 

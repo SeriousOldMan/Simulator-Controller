@@ -12,7 +12,7 @@
 int main()
 {
 	// Open the memory-mapped file
-	HANDLE fileHandle = OpenFileMapping( PAGE_READONLY, FALSE, MAP_OBJECT_NAME );
+	HANDLE fileHandle = OpenFileMappingA( PAGE_READONLY, FALSE, MAP_OBJECT_NAME );
 	if (fileHandle == NULL)
 	{
 		printf( "Could not open file mapping object (%d).\n", GetLastError() );

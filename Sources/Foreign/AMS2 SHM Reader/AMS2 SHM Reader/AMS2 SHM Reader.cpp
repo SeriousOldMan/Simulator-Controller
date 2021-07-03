@@ -95,11 +95,13 @@ int main(int argc, char* argv[]) {
 
 			fileHandle = NULL;
 		}
+		/*
 		else if (sharedData->mVersion != SHARED_MEMORY_VERSION) {
 			CloseHandle(fileHandle);
 
 			fileHandle = NULL;
 		}
+		*/
 
 		//------------------------------------------------------------------------------
 		// TEST DISPLAY CODE
@@ -221,10 +223,10 @@ int main(int argc, char* argv[]) {
 			localCopy->mTyreTemp[TYRE_REAR_LEFT],
 			localCopy->mTyreTemp[TYRE_REAR_RIGHT]);
 
-		printf("TyrePressure = %f, %f, %f, %f\n", localCopy->mAirPressure[TYRE_FRONT_LEFT],
-			localCopy->mAirPressure[TYRE_FRONT_RIGHT],
-			localCopy->mAirPressure[TYRE_REAR_LEFT],
-			localCopy->mAirPressure[TYRE_REAR_RIGHT]);
+		printf("TyrePressure = %f, %f, %f, %f\n", localCopy->mAirPressure[TYRE_FRONT_LEFT] / 10,
+			localCopy->mAirPressure[TYRE_FRONT_RIGHT] / 10,
+			localCopy->mAirPressure[TYRE_REAR_LEFT] / 10,
+			localCopy->mAirPressure[TYRE_REAR_RIGHT] / 10);
 
 		printf("[Stint Data]\n");
 
@@ -260,7 +262,7 @@ int main(int argc, char* argv[]) {
 
 		printf("Laps=%ld\n", (long)normalize(localCopy->mParticipantInfo[localCopy->mViewedParticipantIndex].mLapsCompleted));
 
-		long timeRemaining = (getRemainingTime(localCopy) * 1000);
+		long timeRemaining = getRemainingTime(localCopy);
 
 		printf("StintTimeRemaining=%ld\n", timeRemaining);
 		printf("DriverTimeRemaining=%ld\n", timeRemaining);

@@ -366,6 +366,10 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		return true
 	}
 	
+	supportsSetupImport() {
+		return true
+	}
+	
 	startPitstopSetup(pitstopNumber) {
 		this.requirePitstopMFD()
 		

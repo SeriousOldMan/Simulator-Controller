@@ -167,6 +167,10 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 		return true
 	}
 	
+	supportsSetupImport() {
+		return true
+	}
+	
 	setPitstopRefuelAmount(pitstopNumber, litres) {
 		this.sendPitstopCommand("Pitstop", "Set", "Refuel", Round(litres))
 	}

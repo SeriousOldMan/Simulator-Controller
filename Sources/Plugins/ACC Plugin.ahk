@@ -1113,6 +1113,10 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		return true
 	}
 	
+	supportsSetupImport() {
+		return true
+	}
+	
 	startPitstopSetup(pitstopNumber) {
 		openPitstopMFD()
 	}

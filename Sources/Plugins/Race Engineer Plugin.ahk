@@ -137,7 +137,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 		fireAction(function, trigger) {
 			if (this.Action = "RaceEngineerOpenSettings")
 				openRaceSettings()
-			else if (this.Action = "RaceEngineerImportSettings")
+			else if (this.Action = "RaceEngineerImportSetup")
 				openRaceSettings(true)
 			else if (this.Action = "RaceEngineerOpenSetups")
 				openSetupDatabase()
@@ -244,10 +244,10 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 		if raceEngineerOpenSettings
 			this.createRaceEngineerAction(controller, "RaceEngineerOpenSettings", raceEngineerOpenSettings)
 		
-		raceEngineerImportSettings := this.getArgumentValue("raceEngineerImportSettings", false)
+		raceEngineerImportSetup := this.getArgumentValue("raceEngineerImportSetup", this.getArgumentValue("raceEngineerImportSettings", false))
 		
-		if raceEngineerImportSettings
-			this.createRaceEngineerAction(controller, "RaceEngineerImportSettings", raceEngineerImportSettings)
+		if raceEngineerImportSetup
+			this.createRaceEngineerAction(controller, "RaceEngineerImportSetup", raceEngineerImportSetup)
 		
 		raceEngineerOpenSetups := this.getArgumentValue("raceEngineerOpenSetups", false)
 		
@@ -284,7 +284,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 				this.registerAction(new this.RaceEngineerAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Activate"), action), action))
 			else if (action = "RaceEngineer")
 				this.registerAction(new this.RaceEngineerToggleAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Toggle"), action)))
-			else if ((action = "RaceEngineerOpenSettings") || (action = "RaceEngineerImportSettings") || (action = "RaceEngineerOpenSetups"))
+			else if ((action = "RaceEngineerOpenSettings") || (action = "RaceEngineerImportSetup") || (action = "RaceEngineerOpenSetups"))
 				this.registerAction(new this.RaceSettingsAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Activate")), action))
 			else
 				logMessage(kLogWarn, translate("Action """) . action . translate(""" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
@@ -312,8 +312,8 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 					theAction.Function.enable(kAllTrigger, theAction)
 					theAction.Function.setText(theAction.Label)
 				}
-				else if (theAction.Action = "RaceEngineerImportSettings") {
-					if this.Simulator {
+				else if (theAction.Action = "RaceEngineerImportSetup") {
+					if this.supportsSetupImport() {
 						theAction.Function.enable(kAllTrigger, theAction)
 						theAction.Function.setText(theAction.Label)
 					}
@@ -512,6 +512,10 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 	
 	supportsPitstop() {
 		return (this.Simulator ? this.Simulator.supportsPitstop() : false)
+	}
+	
+	supportsSetupImport() {
+		return (this.Simulator ? this.Simulator.supportsSetupImport() : false)
 	}
 	
 	accept() {

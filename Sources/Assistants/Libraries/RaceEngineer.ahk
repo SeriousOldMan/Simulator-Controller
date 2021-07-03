@@ -1013,7 +1013,7 @@ class RaceEngineer extends RaceAssistant {
 		
 		values := {OverallTime: overallTime}
 		
-		if (lapNumber > 2)
+		if (lapNumber > 1)
 			values["BestLapTime"] := (this.BestLapTime = 0) ? lapTime : Min(this.BestLapTime, lapTime)
 		
 		if (lapTime > 0)
@@ -1266,8 +1266,12 @@ class RaceEngineer extends RaceAssistant {
 		
 			duration := (Round((duration / 60) / 5) * 300)
 			
-			values := {AvgLapTime: Round(this.BestLapTime / 1000), AvgFuelConsumption: this.AvgFuelConsumption
-					 , Compound: compound, CompoundColor: compoundColor, Duration: duration}
+			values := {AvgFuelConsumption: this.AvgFuelConsumption, Compound: compound, CompoundColor: compoundColor, Duration: duration}
+			
+			lapTime := Round(this.BestLapTime / 1000)
+			
+			if (lapTime > 10)
+				values["AvgLapTime"] := lapTime
 			
 			if (loadSettings = "SetupDatabase")
 				setupDB.updateSettings(simulatorName, car, track

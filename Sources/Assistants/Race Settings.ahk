@@ -929,7 +929,7 @@ showRaceSettingsEditor() {
 	
 	index := inList(A_Args, "-File")
 	
-	if ((A_Args.Length() > 0) && index) {
+	if index {
 		fileName := A_Args[index + 1]
 		
 		vEditMode := true
@@ -937,12 +937,12 @@ showRaceSettingsEditor() {
 	
 	settings := readConfiguration(fileName)
 	
-	if ((A_Args.Length() > 0) && inList(A_Args, "-Silent"))
+	if inList(A_Args, "-Silent")
 		vSilentMode := true
 	
 	index := inList(A_Args, "-Import")
 	
-	if ((A_Args.Length() > 0) && index) {
+	if index {
 		importFromSimulation("Import", A_Args[index + 1], A_Args[index + 2], settings)
 		
 		writeConfiguration(fileName, settings)

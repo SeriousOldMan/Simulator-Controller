@@ -33,7 +33,7 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 	iPreviousChoiceHotkey := false
 	iNextChoiceHotkey := false
 	
-	iChangeTyresChosen := false
+	iChangeTyresChosen := 0
 	iRepairSuspensionChosen := true
 	iRepairBodyworkChosen := true
 	
@@ -178,12 +178,15 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 			this.closePitstopMFD("Refuel")
 		}
 		else if (option = "Change Tyres") {
-			this.iChangeTyresChosen := !this.iChangeTyresChosen
+			this.iChangeTyresChosen += 1
 		
+			if (this.iChangeTyresChosen > 2)
+				this.iChangeTyresChosen := 0
+			
 			this.dialPitstopOption("Change Tyres", "Decrease", 4)
 			
 			if this.iChangeTyresChosen
-				this.dialPitstopOption("Change Tyres", "Increase", 3)
+				this.dialPitstopOption("Change Tyres", "Increase", this.iChangeTyresChosen)
 			
 			this.closePitstopMFD("Change Tyres")
 		}
@@ -244,10 +247,12 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 			this.dialPitstopOption("Change Tyres", "Decrease", 4)
 			
 			if (compound = "Dry")
-				this.dialPitstopOption("Change Tyres", "Decrease", 1)
+				this.iChangeTyresChosen := 1
 			else if (compound = "Wet")
-				this.dialPitstopOption("Change Tyres", "Decrease", 2)
+				this.iChangeTyresChosen := 2
 			
+			this.dialPitstopOption("Change Tyres", "Increase", this.iChangeTyresChosen)
+				
 			this.closePitstopMFD("Change Tyres")
 		}
 	}
@@ -267,7 +272,7 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 		base.updateSessionState(sessionState)
 		
 		if (sessionState == kSessionFinished) {
-			this.iChangeTyresChosen := false
+			this.iChangeTyresChosen := 0
 			this.iRepairSuspensionChosen := true
 			this.iRepairBodyworkChosen := true
 		}

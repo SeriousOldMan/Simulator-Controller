@@ -476,6 +476,10 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		return false
 	}
 	
+	supportsSetupImport() {
+		return false
+	}
+	
 	accept() {
 		if this.RaceEngineer
 			this.RaceEngineer.accept()

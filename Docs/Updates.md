@@ -45,6 +45,12 @@ Although the code, that handles all the update tasks, is integrated into *Simula
 
 Note: Some of you might want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars* and *Simulator Controller\Rules* folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does, on your own. But be sure to make a backup copy of all the files, just for peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor, that can handle this.
 
+## Release 3.1.8
+
+Release 3.1.8 integrates the telemetry and data provider for *Automobilista 2*. Nothing to do for ou with regards to installation, but you must enable the shared memory interface of *Automobilista 2* in the settings of the game. Please choose the mode "PCars 2".
+
+***
+
 ## Release 3.1.6
 
 This release introduces the first version of the plugin for Automobilista 2. If you are a fan of Automobilista 2, you will see growing support for this simulation, including an integration with Jona and Cato, in the upcoming releases of Simulator Controller.
@@ -174,6 +180,8 @@ Most of the changes necessary for release 2.7 will then have been handled automa
   5. Since many of you did not trust the setup database collection, the text of the consent has been changed to state specifically, that only tyre setup informations are collected. Therefore the consent dialog will appear again and you might rethink your decision. If more data will be collected in the future, I promise that you can decide for each data category separately. Also, since there were some confusions about the required steps to create the correct content in the setup database, I decided to delete all content for this release again. If you are really sure that your recorded tyre setups have been created with the correct initial setup data, move your *Setup Database* folder to a secure location, run the update procedure and restore the database afterwards. Since Jona [now asks at the end of a race](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tab-race), if you want to store your data in the database, in the future you can easily make sure, that only correct data will be stored.
 
 Note: Please see the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#27-release-040121) for links to the documentation of all the new features.
+
+***
 
 ## Release 2.6
 

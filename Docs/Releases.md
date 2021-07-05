@@ -1,3 +1,10 @@
+## 3.1.8-release 07/09/21
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. New fully integrated telemetry provider for *Automobilista 2*, incl. support for Jona and Cato but no automated pitstop handling yet.
+  4. New [controller action "execute"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) can integrate and control each Windows application from your hardware controler.
+
 ## 3.1.6-release 07/02/21
 
   1. Bugfixes, as always

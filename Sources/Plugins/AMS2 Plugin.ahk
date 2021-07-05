@@ -237,8 +237,11 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 
 	setPitstopRefuelAmount(pitstopNumber, litres) {
 		if this.selectPitstopOption("Refuel") {
-			changePitstopOption("Refuel", "Decrease", 200)
-			changePitstopOption("Refuel", "Increase", Round(litres))
+			this.dialPitstopOption("Refuel", "Decrease", 200)
+			
+			this.dialPitstopOption("Refuel", "Increase", Round(litres))
+			
+			this.closePitstopMFD("Refuel")
 		}
 	}
 	
@@ -250,6 +253,8 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 				this.iChangeTyresChosen := 1
 			else if (compound = "Wet")
 				this.iChangeTyresChosen := 2
+			else
+				this.iChangeTyresChosen := 0
 			
 			this.dialPitstopOption("Change Tyres", "Increase", this.iChangeTyresChosen)
 				
@@ -262,7 +267,8 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 			if this.selectPitstopOption("Repair Suspension")
 				this.changePitstopOption("Repair Suspension")
 		}
-		else if (this.iRepairBodyworkChosen != repairBodywork) {
+		
+		if (this.iRepairBodyworkChosen != repairBodywork) {
 			if this.selectPitstopOption("Repair Bodywork")
 				this.changePitstopOption("Repair Bodywork")
 		}

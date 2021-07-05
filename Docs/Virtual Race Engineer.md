@@ -323,9 +323,9 @@ No special setup required for *iRacing*, since this simulation has an integrated
 
 #### *Automobilista 2*
 
-*Automobilista 2* does not provide any data interface for initial setup information as well. So you must take care here, that everything is entered correctly into the settings tool, before you head out onto the track.
+*Automobilista 2* also does not provide any data interface for initial setup information. Therefore you must take care here as well, that everything is entered correctly into the settings tool, before you head out onto the track.
 
-It is very important, that you do not use the *Automobilista 2* ICM on your own, if you want Jona to control the pitstop settings. Furthermore, you must leave *all* repairs selected in the default pitstop strategy and select *no tyre change* in the default pitstop strategy as well. Not complying with this requirements will give you funny results at least.
+Furthermore, it is very important, that you do not use the *Automobilista 2* ICM yourself, while you want Jona to control the pitstop settings or want to use the "Pitstop" mode of the "AMS2" plugin. Additionally, you must leave *all* repairs selected in the default pitstop strategy and select *no tyre change* in the default pitstop strategy as well. Not complying with this requirements will give you funny results at least.
 
 ### Race & Setup database
 

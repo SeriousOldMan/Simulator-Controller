@@ -95,11 +95,11 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", false)
 		this.iClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
 		
-		this.iPreviousOptionHotkey := this.getArgumentValue("previousOptionHotkey", "W")
-		this.iNextOptionHotkey := this.getArgumentValue("nextOptionHotkey", "S")
-		this.iPreviousChoiceHotkey := this.getArgumentValue("previousChoiceHotkey", "A")
-		this.iNextChoiceHotkey := this.getArgumentValue("nextChoiceHotkey", "D")
-		this.iAcceptChoiceHotkey := this.getArgumentValue("acceptChoiceHotkey", "{Enter}")
+		this.iPreviousOptionHotkey := this.getArgumentValue("previousOption", "W")
+		this.iNextOptionHotkey := this.getArgumentValue("nextOption", "S")
+		this.iPreviousChoiceHotkey := this.getArgumentValue("previousChoice", "A")
+		this.iNextChoiceHotkey := this.getArgumentValue("nextChoice", "D")
+		this.iAcceptChoiceHotkey := this.getArgumentValue("acceptChoice", "{Enter}")
 		
 		SetKeyDelay 5, 15
 	}

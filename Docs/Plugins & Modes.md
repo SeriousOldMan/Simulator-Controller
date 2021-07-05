@@ -233,7 +233,7 @@ With *true* supplied for *raceStrategistLogo*, Cato will show a nice rotating AI
 
 ## Plugin *ACC*
 
-This plugin handles the *Assetto Corsa Competizione* simulation game. This plugin needs an application with the name "Assetto Corsa Competizione" to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startACC", "stopACC" and "isACCRunning" as special function hooks in this configuration.
+This plugin handles the *Assetto Corsa Competizione* simulation game. This plugin needs an application with the name "Assetto Corsa Competizione" to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startACC", "stopACC" and "isACCRunning" as special function hooks in this configuration. An integration with Jona is available through the "Race Engineer" plugin, and an integration with Cato through the plugin "Race Strategist".
 
 ### Mode *Chat*
 
@@ -312,7 +312,7 @@ This plugin handles starting and stopping of the *Assetto Corsa* simulation game
 
 ## Plugin *IRC*
 
-This plugin handles starting and stopping of the *iRacing* simulation game. An application with the name "iRacing" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please locate the "iRacingUI.exe" application, set "ahk_exe iRacingUI.exe" as the window title and "startIRC" as a special function hook in this configuration.
+This plugin handles starting and stopping of the *iRacing* simulation game. An application with the name "iRacing" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please locate the "iRacingUI.exe" application, set "ahk_exe iRacingUI.exe" as the window title and "startIRC" as a special function hook in this configuration. An integration with Jona is available through the "Race Engineer" plugin, and an integration with Cato through the plugin "Race Strategist".
 
 ### Mode *Pitstop*
 
@@ -362,7 +362,7 @@ Beside controlling the pitstop settings from the button box, most of the setting
 
 ## Plugin *RF2*
 
-This plugin handles the *rFactor 2* simulation game. An application with the name "rFactor 2" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startRF2" as a special function hook in this configuration. The plugin supports a "Pitstop" mode to control the pitstop settings and an integration with Jona is available through the "Race Engineer" plugin.
+This plugin handles the *rFactor 2* simulation game. An application with the name "rFactor 2" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startRF2" as a special function hook in this configuration. The plugin supports a "Pitstop" mode to control the pitstop settings and an integration with Jona is available through the "Race Engineer" plugin, and an integration with Cato through the plugin "Race Strategist".
 
 Important: You must install a plugin into *rFactor 2* plugins directory ([rF2]\Bin64\Plugins\) for the telemetry interface and the pitstop mode to work. You can find the plugin in the *Utilities\3rd Part\rf2_sm_tools_3.7.14.2.zip*. A Readme file is included.
 
@@ -413,7 +413,7 @@ Beside controlling the pitstop settings from the button box, most of the setting
 
 ## Plugin *R3E*
 
-This plugin handles the *RaceRoom Racing Experience* simulation game. An application with the name "RaceRoom Racing Experience" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startR3E" as a special function hook in this configuration and define "ahk_exe RRRE64.exe" (yes, three "R"s) as the window title. The plugin supports a "Pitstop" mode to control the pitstop settings and an integration with Jona is available through the "Race Engineer" plugin.
+This plugin handles the *RaceRoom Racing Experience* simulation game. An application with the name "RaceRoom Racing Experience" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startR3E" as a special function hook in this configuration and define "ahk_exe RRRE64.exe" (yes, three "R"s) as the window title. The plugin supports a "Pitstop" mode to control the pitstop settings and an integration with Jona is available through the "Race Engineer" plugin, and an integration with Cato through the plugin "Race Strategist".
 
 ### Mode *Pitstop*
 
@@ -429,10 +429,15 @@ All this will be achieved using the following plugin arguments:
 
 ### Configuration
 
-First, you need to define, how to open and close the Pitstop MFD in *rFactor 2*. Please supply the bindings you have defined in the controller setup in *rFactor 2*.
+First, you need to define, how to open and close the Pitstop MFD in *RaceRoom Racing Experience*. Please supply the bindings you have defined in the controller setup in *RaceRoom Racing Experience*.
 
-	openPitstopMFD: *openHotkey*; closePitstopMFD: *closeHotkey*
+	openPitstopMFD: *openHotkey*; closePitstopMFD: *closeHotkey*;
+	previousOption: *previousOptionHotkey*; nextOption: *nextOptionHotkey*;
+	previousChoice: *previousChoiceHotkey*; nextChoice: *nextChoiceHotkey*;
+	acceptChoice: *acceptChoiceHotkey*
 	
+Use the *...Option* and *...Choice* parameters to specify the keys, that will be send to *RaceRoom Racing Experience* to control the Pitstop MFD. These parameters are defaulted to "W", "S", "A", "D" and "{Enter}", which are the default bindings of *RaceRoom Racing Experience*, so you won't have to supply them normally.
+
 With the plugin parameter *pitstopCommands:* you can supply a list of the settings, you want to tweak from your hardware controller, when the "Pitstop" mode is active. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
 
 	pitstopCommands: *setting1* *settingFunction1* [*settingSteps1*],
@@ -444,7 +449,7 @@ See the following table for the supported settings.
 | ------ | ------ |
 | Strategy | Choose one of the predefined pitstop strategies. |
 | Refuel | Increment or decrement the refuel amount. Supports the additional increments argument. |
-| TyreChange | Toggles, whether you want to change the tires at the next pitstop or nor. |
+| TyreChange | Toggles, whether you want to change the tyres at the next pitstop or not. |
 | SuspensionRepair | Toggles the repair of the suspension components. |
 | BodyworkRepair | Toggles the repair of all the bodywork and aerodynamic elements. |
 | PitstopPlan | Requests a pitstop plan from the virtual race engineer. |
@@ -471,3 +476,52 @@ Second note: The image search algorithm used here is as good as it can be. But u
 This plugin handles the *Automobilista 2* simulation game. An application with the name "Automobilista 2" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startAMS2" as a special function hook in this configuration and "Automobilista 2" as the window title.
 
 Important: So that the telemetry data can be accessed, the shared memory interface must be activated in the settings of *Automobilista 2* in the "PCars 2" mode.
+
+The plugin supports a "Pitstop" mode to control the pitstop settings and an integration with Jona is available through the "Race Engineer" plugin, and an integration with Cato through the plugin "Race Strategist".
+
+### Mode *Pitstop*
+
+Similar to the pitstop mode the plugin for *Assetto Corsa Competizione*, you can control most of the pitstop settings of *Automobilista 2*. 
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%2011.JPG)
+
+All this will be achieved using the following plugin arguments:
+
+	openPitstopMFD: I; previousOption: Z; nextOption: H; previousChoice: G; nextChoice: J;
+	pitstopCommands: Refuel Dial.2 5, TyreChange Button.1, BodyworkRepair Button.2, SuspensionRepair Button.3
+
+### Configuration
+
+First, you need to define, how to open the Pitstop MFD in *Automobilista 2*. "I" is the default value for *openPitstopMFD*, which is **not** the standard binding of *Automobilista 2*. You need to change these bindings in *Automobilista 2*, since the standard bindings are controller buttons, which cannot be generated by software.
+
+	openPitstopMFD: *openHotkey*;
+	previousOption: *previousOptionHotkey*; nextOption: *nextOptionHotkey*;
+	previousChoice: *previousChoiceHotkey*; nextChoice: *nextChoiceHotkey*
+	
+Use the *...Option* and *...Choice* parameters to specify the keys, that will be send to *Automobilista 2* to control the Pitstop MFD. These parameters are defaulted to "Z", "H", "G" and "J", which are **not** the default bindings of *Automobilista 2* (see above).
+
+With the plugin parameter *pitstopCommands:* you can supply a list of the settings, you want to tweak from your hardware controller, when the "Pitstop" mode is active. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
+
+	pitstopCommands: *setting1* *settingFunction1* [*settingSteps1*],
+					 *setting2* *settingFunction2* [*settingSteps2*], ...
+					 
+See the following table for the supported settings.
+
+| Setting | Description |
+| ------ | ------ |
+| Refuel | Increment or decrement the refuel amount. Supports the additional increments argument. |
+| TyreChange | Chooses between "Dry" and "Wet" tyres for the next pitstop or no tyre change at all. Currently, only vehicles with one dry tyre compound and one wet tyre compound are supported. |
+| SuspensionRepair | Toggles the repair of the suspension components. |
+| BodyworkRepair | Toggles the repair of all the bodywork and aerodynamic elements. |
+| PitstopPlan | Requests a pitstop plan from the virtual race engineer. |
+| PitstopPrepare | Requests Jona to transfer the values from the current pitstop plan to the Pitstop MFD. |
+| Accept | Accepts the last recommendation of the virtual race engineer. Useful, if you don't want to use voice commands to interact with Jona. |
+| Reject | Cancels or rejectes the last recommendation of the virtual race engineer. Useful, if you don't want to use voice commands to interact with Jona. |
+
+See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *PitstopPrepare*, *Accept* and *Reject*.
+
+Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) for more information.
+
+### Special requirements when using the Pitstop MFD automation
+
+It is very important, that you do not use the *Automobilista 2* ICM on your own, when you want to control the pitstop settings using the "Pitstop" mode, or if you want Jona to control the pitstop settings. Furthermore, you must leave *all* repairs selected in the default pitstop strategy and select *no tyre change* in the default pitstop strategy as well. Not complying with this requirements will give you funny results at least.

@@ -26,7 +26,7 @@ global kAMS2Plugin = "AMS2"
 ;;;-------------------------------------------------------------------------;;;
 
 class AMS2Plugin extends RaceAssistantSimulatorPlugin {
-	iOpenICMHotkey := false
+	iOpenPitstopMFDHotkey := false
 	
 	iPreviousOptionHotkey := false
 	iNextOptionHotkey := false
@@ -37,9 +37,9 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 	iRepairSuspensionChosen := true
 	iRepairBodyworkChosen := true
 	
-	OpenICMHotkey[] {
+	OpenPitstopMFDHotkey[] {
 		Get {
-			return this.iOpenICMHotkey
+			return this.iOpenPitstopMFDHotkey
 		}
 	}
 	
@@ -70,12 +70,12 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 	__New(controller, name, simulator, configuration := false) {
 		base.__New(controller, name, simulator, configuration)
 		
-		this.iOpenICMHotkey := this.getArgumentValue("openICMHotkey", "I")
+		this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", "I")
 		
-		this.iPreviousOptionHotkey := this.getArgumentValue("previousOptionHotkey", "Z")
-		this.iNextOptionHotkey := this.getArgumentValue("nextOptionHotkey", "H")
-		this.iPreviousChoiceHotkey := this.getArgumentValue("previousChoiceHotkey", "G")
-		this.iNextChoiceHotkey := this.getArgumentValue("nextChoiceHotkey", "J")
+		this.iPreviousOptionHotkey := this.getArgumentValue("previousOption", "Z")
+		this.iNextOptionHotkey := this.getArgumentValue("nextOption", "H")
+		this.iPreviousChoiceHotkey := this.getArgumentValue("previousChoice", "G")
+		this.iNextChoiceHotkey := this.getArgumentValue("nextChoice", "J")
 		
 		SetKeyDelay 5, 15
 	}
@@ -92,7 +92,7 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 	openPitstopMFD(descriptor := false) {
 		static reported := false
 		
-		if !this.OpenICMHotkey {
+		if !this.OpenPitstopMFDHotkey {
 			if !reported {
 				reported := true
 			
@@ -105,7 +105,7 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 			return false
 		}
 		
-		SendEvent % this.OpenICMHotkey
+		SendEvent % this.OpenPitstopMFDHotkey
 		
 		return true
 	}
@@ -183,7 +183,7 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 			if (this.iChangeTyresChosen > 2)
 				this.iChangeTyresChosen := 0
 			
-			this.dialPitstopOption("Change Tyres", "Decrease", 4)
+			this.dialPitstopOption("Change Tyres", "Decrease", 10)
 			
 			if this.iChangeTyresChosen
 				this.dialPitstopOption("Change Tyres", "Increase", this.iChangeTyresChosen)
@@ -244,7 +244,7 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 	
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
 		if this.selectPitstopOption("Change Tyres") {
-			this.dialPitstopOption("Change Tyres", "Decrease", 4)
+			this.dialPitstopOption("Change Tyres", "Decrease", 10)
 			
 			if (compound = "Dry")
 				this.iChangeTyresChosen := 1

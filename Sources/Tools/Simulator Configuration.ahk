@@ -2154,7 +2154,7 @@ showKeyDetector() {
 				found := false
 			}
 			else				
-				Sleep 400
+				Sleep 750
 			
 			if vResult
 				break

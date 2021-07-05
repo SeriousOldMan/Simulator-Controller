@@ -26,10 +26,22 @@ global kAMS2Plugin = "AMS2"
 ;;;-------------------------------------------------------------------------;;;
 
 class AMS2Plugin extends RaceAssistantSimulatorPlugin {
+	iOpenICMHotkey := false
+	
 	iPreviousOptionHotkey := false
 	iNextOptionHotkey := false
 	iPreviousChoiceHotkey := false
 	iNextChoiceHotkey := false
+	
+	iChangeTyresChosen := false
+	iRepairSuspensionChosen := true
+	iRepairBodyworkChosen := true
+	
+	OpenICMHotkey[] {
+		Get {
+			return this.iOpenICMHotkey
+		}
+	}
 	
 	PreviousOptionHotkey[] {
 		Get {
@@ -55,21 +67,17 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 	
-	SessionStates[asText := false] {
-		Get {
-			return [(asText ? "Other" : kSessionOther)]
-		}
-	}
-	
 	__New(controller, name, simulator, configuration := false) {
 		base.__New(controller, name, simulator, configuration)
 		
-		this.iPreviousOptionHotkey := this.getArgumentValue("previousOptionHotkey", "W")
-		this.iNextOptionHotkey := this.getArgumentValue("nextOptionHotkey", "S")
-		this.iPreviousChoiceHotkey := this.getArgumentValue("previousChoiceHotkey", "A")
-		this.iNextChoiceHotkey := this.getArgumentValue("nextChoiceHotkey", "D")
+		this.iOpenICMHotkey := this.getArgumentValue("openICMHotkey", "I")
 		
-		SetKeyDelay, 5, 15
+		this.iPreviousOptionHotkey := this.getArgumentValue("previousOptionHotkey", "Z")
+		this.iNextOptionHotkey := this.getArgumentValue("nextOptionHotkey", "H")
+		this.iPreviousChoiceHotkey := this.getArgumentValue("previousChoiceHotkey", "G")
+		this.iNextChoiceHotkey := this.getArgumentValue("nextChoiceHotkey", "J")
+		
+		SetKeyDelay 5, 15
 	}
 	
 	getPitstopActions(ByRef allActions, ByRef selectActions) {
@@ -77,42 +85,192 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 		selectActions := []
 	}
 	
-	selectPitstopOption(option) {
-		Throw "Virtual method SimulatorPlugin.selectPitstopOption must be implemented in a subclass..."
-	}
-	
-	changePitstopOption(option, action, steps := 1) {
-		Throw "Virtual method SimulatorPlugin.changePitstopOption must be implemented in a subclass..."
+	supportsPitstop() {
+		return true
 	}
 	
 	openPitstopMFD(descriptor := false) {
-		Throw "Virtual method SimulatorPlugin.openPitstopMFD must be implemented in a subclass..."
+		static reported := false
+		
+		if !this.OpenICMHotkey {
+			if !reported {
+				reported := true
+			
+				logMessage(kLogCritical, translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration"))
+			
+				showMessage(translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration...")
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			}
+			
+			return false
+		}
+		
+		SendEvent % this.OpenICMHotkey
+		
+		return true
 	}
 	
-	closePitstopMFD() {
-		Throw "Virtual method SimulatorPlugin.closePitstopMFD must be implemented in a subclass..."
+	closePitstopMFD(option := false) {
+		if (option = "Change Tyres") {
+			SendEvent % this.PreviousOptionHotkey
+		}
+		else if (option = "Refuel") {
+			SendEvent % this.PreviousOptionHotkey
+			SendEvent % this.PreviousOptionHotkey
+		}
+		else if ((option = "Repair Bodywork") || (option = "Repair Suspension")) {
+			Loop 3
+				SendEvent % this.PreviousOptionHotkey
+		}
+		
+		SendEvent % this.NextChoiceHotkey
+		SendEvent % this.PreviousOptionHotkey
+		SendEvent % this.PreviousOptionHotkey
+		SendEvent % this.NextChoiceHotkey
+		SendEvent % this.NextOptionHotkey
+		SendEvent % this.NextChoiceHotkey
 	}
 	
 	requirePitstopMFD() {
-		return false
+		return this.openPitstopMFD()
 	}
 	
-	startPitstopSetup(pitstopNumber) {
+	selectPitstopOption(option) {
+		SendEvent % this.PreviousOptionHotkey
+		SendEvent % this.NextChoiceHotkey
+		SendEvent % this.NextOptionHotkey
+		SendEvent % this.NextOptionHotkey
+		SendEvent % this.NextChoiceHotkey
+		
+		if (option = "Change Tyres") {
+			SendEvent % this.NextOptionHotkey
+			
+			return true
+		}
+		else if (option = "Refuel") {
+			SendEvent % this.NextOptionHotkey
+			SendEvent % this.NextOptionHotkey
+			
+			return true
+		}
+		else if ((option = "Repair Bodywork") || (option = "Repair Suspension")) {
+			Loop 3
+				SendEvent % this.NextOptionHotkey
+			
+			return true
+		}
+		else {
+			SendEvent % this.NextChoiceHotkey
+			SendEvent % this.PreviousOptionHotkey
+			SendEvent % this.PreviousOptionHotkey
+			SendEvent % this.NextChoiceHotkey
+			SendEvent % this.NextOptionHotkey
+			SendEvent % this.NextChoiceHotkey
+			
+			return false
+		}
 	}
-
-	finishPitstopSetup(pitstopNumber) {
+	
+	changePitstopOption(option, action := "Increase", steps := 1) {
+		if (option = "Refuel") {
+			this.dialPitstopOption("Refuel", action, steps)
+			
+			this.closePitstopMFD("Refuel")
+		}
+		else if (option = "Change Tyres") {
+			this.iChangeTyresChosen := !this.iChangeTyresChosen
+		
+			this.dialPitstopOption("Change Tyres", "Decrease", 4)
+			
+			if this.iChangeTyresChosen
+				this.dialPitstopOption("Change Tyres", "Increase", 3)
+			
+			this.closePitstopMFD("Change Tyres")
+		}
+		else if (option = "Repair Bodywork") {
+			this.dialPitstopOption("Repair Bodywork", "Decrease", 4)
+		
+			this.iRepairBodyworkChosen := !this.iRepairBodyworkChosen
+			
+			if (this.iRepairBodyworkChosen && this.iRepairSuspensionChosen)
+				this.dialPitstopOption("Repair All", "Increase", 3)
+			else if this.iRepairBodyworkChosen
+				this.dialPitstopOption("Repair Bodywork", "Increase", 1)
+			else if this.iRepairSuspensionChosen
+				this.dialPitstopOption("Repair Suspension", "Increase", 2)
+			
+			this.closePitstopMFD("Repair Bodywork")
+		}
+		else if (option = "Repair Suspension") {
+			this.dialPitstopOption("Repair Suspension", "Decrease", 4)
+		
+			this.iRepairSuspensionChosen := !this.iRepairSuspensionChosen
+			
+			if (this.iRepairBodyworkChosen && this.iRepairSuspensionChosen)
+				this.dialPitstopOption("Repair All", "Increase", 3)
+			else if this.iRepairBodyworkChosen
+				this.dialPitstopOption("Repair Bodywork", "Increase", 1)
+			else if this.iRepairSuspensionChosen
+				this.dialPitstopOption("Repair Suspension", "Increase", 2)
+			
+			this.closePitstopMFD("Repair Suspension")
+		}
+		else
+			Throw "Unsupported change operation """ . action . """ detected in AMS2Plugin.changePitstopOption..."
+	}
+	
+	dialPitstopOption(option, action, steps := 1) {
+		switch action {
+			case "Increase":
+				Loop %steps%
+					SendEvent % this.NextChoiceHotkey
+			case "Decrease":
+				Loop %steps%
+					SendEvent % this.PreviousChoiceHotkey
+			default:
+				Throw "Unsupported change operation """ . action . """ detected in AMS2Plugin.dialPitstopOption..."
+		}
 	}
 
 	setPitstopRefuelAmount(pitstopNumber, litres) {
+		if this.selectPitstopOption("Refuel") {
+			changePitstopOption("Refuel", "Decrease", 200)
+			changePitstopOption("Refuel", "Increase", Round(litres))
+		}
 	}
 	
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
-	}
-
-	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
+		if this.selectPitstopOption("Change Tyres") {
+			this.dialPitstopOption("Change Tyres", "Decrease", 4)
+			
+			if (compound = "Dry")
+				this.dialPitstopOption("Change Tyres", "Decrease", 1)
+			else if (compound = "Wet")
+				this.dialPitstopOption("Change Tyres", "Decrease", 2)
+			
+			this.closePitstopMFD("Change Tyres")
+		}
 	}
 
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork) {
+		if (this.iRepairSuspensionChosen != repairSuspension) {
+			if this.selectPitstopOption("Repair Suspension")
+				this.changePitstopOption("Repair Suspension")
+		}
+		else if (this.iRepairBodyworkChosen != repairBodywork) {
+			if this.selectPitstopOption("Repair Bodywork")
+				this.changePitstopOption("Repair Bodywork")
+		}
+	}
+	
+	updateSessionState(sessionState) {
+		base.updateSessionState(sessionState)
+		
+		if (sessionState == kSessionFinished) {
+			this.iChangeTyresChosen := false
+			this.iRepairSuspensionChosen := true
+			this.iRepairBodyworkChosen := true
+		}
 	}
 	
 	updateStandingsData(data) {

@@ -101,7 +101,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		this.iNextChoiceHotkey := this.getArgumentValue("nextChoiceHotkey", "D")
 		this.iAcceptChoiceHotkey := this.getArgumentValue("acceptChoiceHotkey", "{Enter}")
 		
-		SetKeyDelay, 5, 15
+		SetKeyDelay 5, 15
 	}
 	
 	getPitstopActions(ByRef allActions, ByRef selectActions) {

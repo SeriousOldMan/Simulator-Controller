@@ -212,7 +212,7 @@ class SimulatorPlugin extends ControllerPlugin {
 		
 			theAction := arguments[1]
 			
-			if ((theAction = "PitstopPlan") || (theAction = "PitstopPrepare"))
+			if inList(["PitstopPlan", "PitstopPrepare", "Accept", "Reject"], theAction)
 				this.createRaceEngineerAction(controller, arguments*)
 			else
 				this.createPitstopAction(controller, arguments*)

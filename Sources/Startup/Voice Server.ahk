@@ -779,6 +779,7 @@ initializeVoiceServer() {
 	icon := kIconsDirectory . "Microphon.ico"
 	
 	Menu Tray, Icon, %icon%, , 1
+	Menu Tray, Tip, Voice Server
 	
 	debug := false
 	

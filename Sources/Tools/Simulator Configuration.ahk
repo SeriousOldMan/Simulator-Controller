@@ -2189,6 +2189,7 @@ initializeSimulatorConfiguration() {
 	icon := kIconsDirectory . "Configuration.ico"
 	
 	Menu Tray, Icon, %icon%, , 1
+	Menu Tray, Tip, Simulator Configuration
 	
 	protectionOn()
 	

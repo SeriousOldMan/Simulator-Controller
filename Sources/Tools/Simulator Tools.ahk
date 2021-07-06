@@ -1437,6 +1437,7 @@ startSimulatorTools() {
 	icon := kIconsDirectory . "Tools.ico"
 	
 	Menu Tray, Icon, %icon%, , 1
+	Menu Tray, Tip, Simulator Tools
 	
 	readToolsConfiguration(vUpdateSettings, vCleanupSettings, vCopySettings, vBuildSettings, vSplashTheme)
 	

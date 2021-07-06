@@ -924,6 +924,7 @@ showRaceSettingsEditor() {
 	icon := kIconsDirectory . "Artificial Intelligence Settings.ico"
 	
 	Menu Tray, Icon, %icon%, , 1
+	Menu Tray, Tip, Race Settings
 	
 	fileName := kRaceSettingsFile
 	

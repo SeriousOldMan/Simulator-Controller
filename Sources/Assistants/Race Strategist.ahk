@@ -99,6 +99,7 @@ startRaceStrategist() {
 	icon := kIconsDirectory . "Artificial Intelligence.ico"
 	
 	Menu Tray, Icon, %icon%, , 1
+	Menu Tray, Tip, Race Strategist
 	
 	remotePID := 0
 	remoteHandle := false

@@ -48,7 +48,7 @@ long getRemainingTime(SharedMemory* shm) {
 		return getRemainingLaps(shm) * (long)(shm->mLastLapTime * 1000);
 	}
 	else
-		return normalize(shm->mEventTimeRemaining);
+		return normalize(shm->mEventTimeRemaining) * 1000;
 }
 
 char * getWeather(SharedMemory * shm) {

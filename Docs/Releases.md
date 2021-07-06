@@ -2,9 +2,10 @@
 
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. New fully integrated telemetry provider for *Automobilista 2*, incl. support for Jona and Cato.
-  4. [New "Pitstop" mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-pitstop-4) for the "AMS2" plugin to control the pitstop settings from your hardware controller.
-  4. New [controller action "execute"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) can integrate and control each Windows application from your hardware controller.
+  3. New fully integrated telemetry provider for *Automobilista 2* (see [AMS2 SHM Reader](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Sources/Foreign/AMS2%20SHM%20Reader)).
+  4. Full support for Jona and Cato incl. automated pitstop handling for *Automobilista 2*.
+  5. [New "Pitstop" mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-pitstop-4) for the "AMS2" plugin to control the pitstop settings from your hardware controller.
+  6. New [controller action "execute"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) can integrate and control each Windows application from your hardware controller.
 
 ## 3.1.6-release 07/02/21
 

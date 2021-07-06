@@ -261,9 +261,11 @@ class RaceStrategist extends RaceAssistant {
 	}
 	
 	reportLapTime(phrase, driverLapTime, car) {
-		lapTime := Round(this.KnowledgeBase.getValue("Car." . car . ".Time", false) / 1000, 1)
+		lapTime := this.KnowledgeBase.getValue("Car." . car . ".Time", false)
 		
 		if lapTime {
+			lapTime := Round(lapTime / 1000, 1)
+			
 			speaker := this.getSpeaker()
 			fragments := speaker.Fragments
 			

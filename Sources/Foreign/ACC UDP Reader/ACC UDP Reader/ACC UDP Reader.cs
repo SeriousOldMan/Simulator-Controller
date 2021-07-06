@@ -278,7 +278,8 @@ namespace ACCUDPReader {
 
                             LapData lastLap = car.LastLap;
 
-                            outStream.Write("Car."); outStream.Write(index); outStream.Write(".Time="); outStream.WriteLine(lastLap != null ? lastLap.LaptimeMS : 0);
+                            outStream.Write("Car."); outStream.Write(index); outStream.Write(".Time=");
+							outStream.WriteLine(lastLap != null ? (lastLap.LaptimeMS != null ? lastLap.LaptimeMS : 0) : 0);
 
                             outStream.Write("Car."); outStream.Write(index); outStream.Write(".Car="); outStream.WriteLine(car.CarModelEnum);
 

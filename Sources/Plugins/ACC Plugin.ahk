@@ -197,6 +197,11 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 	
+	requireUDPClient() {
+		if !this.UDPClient
+			this.startupUDPClient()
+	}
+	
 	updateSessionState(sessionState) {
 		base.updateSessionState(sessionState)
 		
@@ -210,7 +215,6 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		
 		if (sessionState == kSessionRace)
 			this.startupUDPClient()
-			
 		
 		if (sessionState == kSessionFinished) {
 			this.iRepairSuspensionChosen := true
@@ -223,6 +227,9 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	updateStandingsData(data) {
 		static carNames := false
 		
+		if !this.UDPClient
+			return
+		
 		if !carNames
 			carNames := readConfiguration(kResourcesDirectory . "Simulator Data\ACC\Car Model.ini")
 		
@@ -230,40 +237,58 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		
 		FileAppend Read, %fileName%
 		
-		while FileExist(fileName)
+		tries := 10
+		
+		while FileExist(fileName) {
 			Sleep 200
 		
-		fileName := kTempDirectory . "ACCUDP.out"
-		
-		standings := readConfiguration(fileName)
-		
-		try {
-			FileDelete %fileName%
-		}
-		catch exception {
-			; ignore
-		}
-		
-		driverForname := getConfigurationValue(data, "Stint Data", "DriverForname", "John")
-		driverSurname := getConfigurationValue(data, "Stint Data", "DriverSurname", "Doe")
-		driverNickname := getConfigurationValue(data, "Stint Data", "DriverNickname", "JD")
-		
-		Loop {
-			carID := getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Car", kUndefined)
-		
-			if (carID == kUndefined)
+			if (--tries <= 0)
 				break
-			else {
-				setConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Car", getConfigurationValue(carNames, "Car Model", carID, "Unknown"))
-			
-				if ((getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Driver.Forname") = driverForname)
-				 && (getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Driver.Surname") = driverSurname)
-				 && (getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Driver.Nickname") = driverNickname))
-					setConfigurationValue(standings, "Position Data", "Driver.Car", A_Index)
-			}
 		}
 		
-		setConfigurationSectionValues(data, "Position Data", getConfigurationSectionValues(standings, "Position Data"))
+		if (tries > 0) {
+			fileName := kTempDirectory . "ACCUDP.out"
+			
+			standings := readConfiguration(fileName)
+			
+			try {
+				FileDelete %fileName%
+			}
+			catch exception {
+				; ignore
+			}
+			
+			driverForname := getConfigurationValue(data, "Stint Data", "DriverForname", "John")
+			driverSurname := getConfigurationValue(data, "Stint Data", "DriverSurname", "Doe")
+			driverNickname := getConfigurationValue(data, "Stint Data", "DriverNickname", "JD")
+			
+			Loop {
+				carID := getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Car", kUndefined)
+			
+				if (carID == kUndefined)
+					break
+				else {
+					setConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Car", getConfigurationValue(carNames, "Car Model", carID, "Unknown"))
+				
+					if ((getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Driver.Forname") = driverForname)
+					 && (getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Driver.Surname") = driverSurname)
+					 && (getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Driver.Nickname") = driverNickname))
+						setConfigurationValue(standings, "Position Data", "Driver.Car", A_Index)
+				}
+			}
+			
+			setConfigurationSectionValues(data, "Position Data", getConfigurationSectionValues(standings, "Position Data"))
+		}
+		else {
+			try {
+				FileDelete %fileName%
+			}
+			catch exception {
+				; ignore
+			}
+			
+			this.iUDPClient := false
+		}
 	}
 	
 	activateACCWindow() {

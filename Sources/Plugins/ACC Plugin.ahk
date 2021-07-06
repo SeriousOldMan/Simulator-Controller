@@ -227,7 +227,9 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	updateStandingsData(data) {
 		static carNames := false
 		
-		if !this.UDPClient
+		if (this.SessionState == kSessionRace)
+			this.requireUDPClient()
+		else if !this.UDPClient
 			return
 		
 		if !carNames

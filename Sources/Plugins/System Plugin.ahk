@@ -604,10 +604,8 @@ startupExited() {
 ;;;-------------------------------------------------------------------------;;;
 
 execute(command) {
-	command := substituteVariables(command)
-	
 	try {
-		Run %command%
+		Run % substituteVariables(command)
 	}
 	catch exception {
 		logMessage(kLogWarn, substituteVariables(translate("Cannot execute command (%command%) - please check the configuration"), {command: command}))

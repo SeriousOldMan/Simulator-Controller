@@ -45,9 +45,9 @@ Although the code, that handles all the update tasks, is integrated into *Simula
 
 Note: Some of you might want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars* and *Simulator Controller\Rules* folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does, on your own. But be sure to make a backup copy of all the files, just for peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor, that can handle this.
 
-## Release 3.1.8
+## Release 3.2.0
 
-Release 3.1.8 integrates the telemetry and data provider for *Automobilista 2*. Nothing to do for you with regards to installation, but you must enable the shared memory interface of *Automobilista 2* in the settings of the game. Please choose the mode "PCars 2".
+Release 3.2.0 integrates the telemetry and data provider for *Automobilista 2*. Nothing to do for you with regards to installation, but you must enable the shared memory interface of *Automobilista 2* in the settings of the game. Please choose the mode "PCars 2".
 
 Furthermore, a "Pitstop" controller mode is available for *Automobilista 2* as well. Please take a look at the configuration documentation for the ["AMS2" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-8), if you want to use the new modeon your Button Box. You also might want to adjust the [controller automation rules](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#configuration-of-the-controller-mode-automation) as well, so that the pitstop mode is automatically selected in a race or practice session.
 

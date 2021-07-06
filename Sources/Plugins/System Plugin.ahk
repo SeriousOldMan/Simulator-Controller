@@ -604,6 +604,8 @@ startupExited() {
 ;;;-------------------------------------------------------------------------;;;
 
 execute(command) {
+	command := substituteVariables(command)
+	
 	try {
 		Run %command%
 	}

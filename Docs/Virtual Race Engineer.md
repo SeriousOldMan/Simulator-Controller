@@ -290,7 +290,11 @@ Please see the [documentation](https://github.com/SeriousOldMan/Simulator-Contro
 
 ### The pitstop
 
-The process of the pitstop handling differs between the various supported simulations. Below you will find some simulation specific hints. Please note, that pitstop handling is currently available for *Assetto Corsa Competizione*, *rFactor 2*, *RaceRoom Racing Experience* and *iRacing*.
+The process of the pitstop handling differs between the various supported simulations. Below you will find some simulation specific hints. Please note, that pitstop handling is currently available for *Assetto Corsa Competizione*, *rFactor 2*, *RaceRoom Racing Experience*, *iRacing* and *Automobilista 2*.
+
+The pitstop is handled by Jona in two phases. In the first phase, the planning phase, Jona creates a list of the necessary activities (refueling, changing tires, repairs) and gives you the chosen service tasks by radio. If you then agree with the selected services, or after you have made any necessary corrections, the settings are transferred to the simulation in the second phase, the preparation phase. After the preparation is finished, you can come to the pit anytime (depending on the simulation, it might be necessary, to activate a "Request pitstop" function as well).
+
+Good to know: If Jona has planned the pitstop based on a request from Cato, the Virtual Race Engineer, the lap in which you should come to the pit is already known. In this case, the preparation phase does not have to be triggered explicitly, since the preparation for the pitstop takes place automatically when you start the selected lap.
 
 A final warning: If you ever perform a pitstop, which has not been planned and prepared by Jona, Jona will be very confused, say the least. You can do this, but please double check the recommendations of Jona for each subsequent pitstop, especially the chosen tyre set, if you don't want to end up with worn out tyres for your last stint.
 

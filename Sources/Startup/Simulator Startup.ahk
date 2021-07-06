@@ -287,6 +287,7 @@ startSimulator() {
 	icon := kIconsDirectory . "Startup.ico"
 		
 	Menu Tray, Icon, %icon%, , 1
+	Menu Tray, Tip, Simulator Startup
 						
 	new SimulatorStartup(kSimulatorConfiguration, readConfiguration(kSimulatorSettingsFile)).startup()
 	

@@ -1146,7 +1146,7 @@ showSetupDatabase() {
 	icon := kIconsDirectory . "Wrench.ico"
 	
 	Menu Tray, Icon, %icon%, , 1
-	
+	Menu Tray, Tip, Setup Database
 	
 	simulator := false
 	car := false

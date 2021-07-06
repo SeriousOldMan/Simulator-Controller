@@ -157,6 +157,7 @@ startRaceEngineer() {
 	icon := kIconsDirectory . "Artificial Intelligence.ico"
 	
 	Menu Tray, Icon, %icon%, , 1
+	Menu Tray, Tip, Race Engineer
 	
 	remotePID := 0
 	remoteHandle := false

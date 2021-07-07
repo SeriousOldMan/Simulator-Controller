@@ -464,7 +464,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		setConfigurationSectionValues(data, "Position Data", getConfigurationSectionValues(standings, "Position Data"))
 	}
 	
-	updateSimulatorData(data) {
+	updateSessionData(data) {
 		setConfigurationValue(data, "Session Data", "Car", this.getCarName(getConfigurationValue(data, "Session Data", "Car", "")))
 	}
 	

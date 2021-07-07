@@ -452,8 +452,8 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 		this.updateActions(sessionState)
 	}
 	
-	updateSimulatorData(data) {
-		this.Simulator.updateSimulatorData(data)
+	updateSessionData(data) {
+		this.Simulator.updateSessionData(data)
 	}
 	
 	updateStandingsData(data) {
@@ -470,7 +470,7 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 			
 			data := readSimulatorData(code)
 			
-			this.updateSimulatorData(data)
+			this.updateSessionData(data)
 			
 			dataLastLap := getConfigurationValue(data, "Stint Data", "Laps", 0)
 			

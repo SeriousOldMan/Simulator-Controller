@@ -530,7 +530,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	updateStandingsData(data) {
 	}
 	
-	updateSimulatorData(data) {
+	updateSessionData(data) {
 	}
 }
 

@@ -675,6 +675,13 @@ comparePositions(c1, c2) {
 	return !(c1[2] > c2[2])
 }
 
+compareSequences(c1, c2) {
+	c1 := (c1 - Floor(c1))
+	c2 := (c2 - Floor(c2))
+	
+	return !(c1 > c2)
+}
+
 updatePositions(context, futureLap) {
 	local knowledgeBase := context.KnowledgeBase
 	
@@ -699,6 +706,15 @@ updatePositions(context, futureLap) {
 			break
 		
 		knowledgeBase.setFact("Standings.Extrapolated." . futureLap . ".Car." . cars[A_Index][1] . ".Position", A_Index)
+	}
+	
+	bubbleSort(cars, "compareSequences")
+	
+	Loop {
+		if (A_Index > count)
+			break
+		
+		knowledgeBase.setFact("Standings.Extrapolated." . futureLap . ".Car." . cars[A_Index][1] . ".Sequence", A_Index)
 	}
 	
 	return true

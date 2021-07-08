@@ -879,8 +879,28 @@ class RaceEngineer extends RaceAssistant {
 		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(session), SetupData: {}
 								, BestLapTime: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
 		
-		if this.Speaker
-			this.getSpeaker().speakPhrase("Greeting")
+		if this.Speaker {
+			speaker := this.getSpeaker()
+			
+			speaker.speakPhrase("Greeting")
+			
+			Process Exist, Race Strategist.exe
+			
+			if ErrorLevel {
+				strategistPlugin := new Plugin("Race Strategist", kSimulatorConfiguration)
+				strategistName := strategistPlugin.getArgumentValue("raceStaretgistName", false)
+				
+				if strategistName {
+					speaker.speakPhrase("GreetingStrategist", {strategist: strategistName})
+				
+					speaker.speakPhrase("CallUs")
+				}
+				else
+					speaker.speakPhrase("CallMe")
+			}
+			else
+				speaker.speakPhrase("CallMe")
+		}
 		
 		if this.Debug[kDebugKnowledgeBase]
 			this.dumpKnowledge(this.KnowledgeBase)

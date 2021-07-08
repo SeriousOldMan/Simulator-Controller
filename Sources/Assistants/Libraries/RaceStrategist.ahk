@@ -553,8 +553,11 @@ class RaceStrategist extends RaceAssistant {
 		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(this.createSession(data))
 							   , OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
 		
-		if this.Speaker
-			this.getSpeaker().speak("")
+		if this.Speaker {
+			Process Exist, Race Engineer.exe
+			
+			this.getSpeaker().speakPhrase(ErrorLevel ? "" : "Greeting")
+		}
 		
 		if this.Debug[kDebugKnowledgeBase]
 			this.dumpKnowledge(this.KnowledgeBase)

@@ -750,7 +750,7 @@ checkForUpdates() {
 		writeConfiguration(userToolTargetsFile, userToolTargets)
 	}
 	
-	if (!inList(A_Args, "-NoUpdate") && (StrSplit(A_ScriptName, ".")[1] != "Simulator Tools")) {
+	if (!inList(A_Args, "-NoUpdate") && inList(["Simulator Startup", "Simulator Configuration", "Simulator Settings"], StrSplit(A_ScriptName, ".")[1])) {
 		updates := readConfiguration(getFileName("UPDATES", kUserConfigDirectory))
 restartUpdate:		
 		for target, arguments in getConfigurationSectionValues(toolTargets, "Update", Object())

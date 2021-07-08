@@ -26,7 +26,7 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-[3.2.0-dev](https://www.dropbox.com/s/nwvfooy0oei5utz/Simulator%20Controller%203.2.0-dev.zip?dl=1) (Development build for Release 3.2.0. New features: Shared memory data provider for Automobilista 2, New controller action "execute" to execute any command, Integration of Automobilista 2 with Jona and Cato, New "Pitstop" mode for "AMS2" plugin. Mostly untested, but with documentation and update procedure.)
+[3.2.0-beta](https://www.dropbox.com/s/3xgfajv70hugbw8/Simulator%20Controller%203.2.0-beta.zip?dl=1) (First stable build for Release 3.2.0. New features: Shared memory data provider for Automobilista 2, New controller action "execute" to execute any command, Integration of Automobilista 2 with Jona and Cato, New "Pitstop" mode for "AMS2" plugin. Including documentation and update procedure.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-320) of this version and all the versions you might have skipped, before installing and using this version.
 

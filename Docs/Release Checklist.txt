@@ -19,6 +19,9 @@ Release 3.2.2 Checklist
 1. Update procedure
    a. Phrase Grammars
    b. Plugin Labels
+2. SimulatorPlugin => RaceEngineerAction => RaceAssistantAction, RaceEngineerSimulatorPlugin => RaceAssistantSimulatorPlugin, ...
+   a. Class Reference.md
+   b. Update Notes
 
 Release 3.2.0 Checklist
 =======================

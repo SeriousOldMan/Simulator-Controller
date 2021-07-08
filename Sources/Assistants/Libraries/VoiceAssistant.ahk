@@ -47,6 +47,7 @@ class VoiceAssistant {
 	iListener := false
 	
 	iVoiceServer := false
+	iGrammars := {}
 	
 	iPushToTalk := false
 	
@@ -471,6 +472,8 @@ class VoiceAssistant {
 		for grammar, definition in getConfigurationSectionValues(grammars, "Listener Grammars", {}) {
 			definition := substituteVariables(definition, {name: this.Name})
 		
+			this.iGramars[grammar] := definition
+			
 			if speechRecognizer {
 				if this.Debug[kDebugGrammars] {
 					nextCharIndex := 1
@@ -524,6 +527,14 @@ class VoiceAssistant {
 		finally {
 			protectionOff()
 		}
+	}
+	
+	recognizeCommand(grammer, words) {
+		if this.iGrammars.HasKey(grammar)
+			if this.VoiceServer
+				raiseEvent(kFileMessage, "Voice", "recognizeCommand:" . values2String(";", grammar, words*), this.VoiceServer)
+			else
+				this.phraseRecognized(grammar, words)
 	}
 	
 	setContinuation(continuation) {

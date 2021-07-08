@@ -303,6 +303,20 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 	
+	accept() {
+		if this.Continuation
+			this.phraseRecognized("Yes", ["Yes"])
+		else if this.VoiceAssistant
+			this.VoiceAssistant.recognizeCommand("Yes", ["Yes"])
+	}
+	
+	reject() {
+		if this.Continuation
+			this.phraseRecognized("No", ["No"])
+		else if this.VoiceAssistant
+			this.VoiceAssistant.recognizeCommand("No", ["No"])
+	}
+	
 	nameRecognized(words) {
 		this.getSpeaker().speakPhrase("IHearYou")
 	}

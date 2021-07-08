@@ -293,10 +293,11 @@ See the following table for the supported settings.
 | DriverSelect | Selects the driver for the next stint in a multiplayer team race. |
 | SuspensionRepair | Toggles the repair of the suspension components. |
 | BodyworkRepair | Toggles the repair of all the bodywork. |
+| PitstopRecommend | Asks the virtual race strategist for a recommendation for the next pitstop. |
 | PitstopPlan | Requests a pitstop plan from the virtual race engineer. |
 | PitstopPrepare | Requests Jona to transfer the values from the current pitstop plan to the Pitstop MFD. |
-| Accept | Accepts the last recommendation of the virtual race engineer. Useful, if you don't want to use voice commands to interact with Jona. |
-| Reject | Cancels or rejectes the last recommendation of the virtual race engineer. Useful, if you don't want to use voice commands to interact with Jona. |
+| Accept | Accepts the last recommendation by one of the virtual race assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
+| Reject | Cancels or rejects the last recommendation by one of the virtual race assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
 
 See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *PitstopPrepare*, *Accept* and *Reject*.
 
@@ -359,10 +360,11 @@ See the following table for the supported settings.
 | TyreRearLeft | Change the pressure for the rear left tyre. Supports the additional increments argument. |
 | TyreRearRight | Change the pressure for the rear right tyre. Supports the additional increments argument. |
 | RepairRequest | Toggles, whether repairs will be carried out during the next pitstop.  |
+| PitstopRecommend | Asks the virtual race strategist for a recommendation for the next pitstop. |
 | PitstopPlan | Requests a pitstop plan from the virtual race engineer. |
 | PitstopPrepare | Requests Jona to transfer the values from the current pitstop plan to the Pitstop MFD. |
-| Accept | Accepts the last recommendation of the virtual race engineer. Useful, if you don't want to use voice commands to interact with Jona. |
-| Reject | Cancels or rejectes the last recommendation of the virtual race engineer. Useful, if you don't want to use voice commands to interact with Jona. |
+| Accept | Accepts the last recommendation by one of the virtual race assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
+| Reject | Cancels or rejects the last recommendation by one of the virtual race assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
 
 See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *PitstopPrepare*, *Accept* and *Reject*.
 
@@ -410,10 +412,11 @@ See the following table for the supported settings.
 | TyreRearRight | Change the pressure for the rear right tyre. Supports the additional increments argument. |
 | DriverSelect | Selects the driver for the next stint in a multiplayer team race. |
 | RepairRequest | Cycles through the available repair options. |
+| PitstopRecommend | Asks the virtual race strategist for a recommendation for the next pitstop. |
 | PitstopPlan | Requests a pitstop plan from the virtual race engineer. |
 | PitstopPrepare | Requests Jona to transfer the values from the current pitstop plan to the Pitstop MFD. |
-| Accept | Accepts the last recommendation of the virtual race engineer. Useful, if you don't want to use voice commands to interact with Jona. |
-| Reject | Cancels or rejectes the last recommendation of the virtual race engineer. Useful, if you don't want to use voice commands to interact with Jona. |
+| Accept | Accepts the last recommendation by one of the virtual race assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
+| Reject | Cancels or rejects the last recommendation by one of the virtual race assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
 
 See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *PitstopPrepare*, *Accept* and *Reject*.
 
@@ -460,10 +463,11 @@ See the following table for the supported settings.
 | TyreChange | Toggles, whether you want to change the tyres at the next pitstop or not. |
 | SuspensionRepair | Toggles the repair of the suspension components. |
 | BodyworkRepair | Toggles the repair of all the bodywork and aerodynamic elements. |
+| PitstopRecommend | Asks the virtual race strategist for a recommendation for the next pitstop. |
 | PitstopPlan | Requests a pitstop plan from the virtual race engineer. |
 | PitstopPrepare | Requests Jona to transfer the values from the current pitstop plan to the Pitstop MFD. |
-| Accept | Accepts the last recommendation of the virtual race engineer. Useful, if you don't want to use voice commands to interact with Jona. |
-| Reject | Cancels or rejectes the last recommendation of the virtual race engineer. Useful, if you don't want to use voice commands to interact with Jona. |
+| Accept | Accepts the last recommendation by one of the virtual race assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
+| Reject | Cancels or rejects the last recommendation by one of the virtual race assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
 
 See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *PitstopPrepare*, *Accept* and *Reject*.
 
@@ -521,10 +525,11 @@ See the following table for the supported settings.
 | TyreChange | Chooses between "Dry" and "Wet" tyres for the next pitstop or no tyre change at all. Currently, only vehicles with one dry tyre compound and one wet tyre compound are supported. |
 | SuspensionRepair | Toggles the repair of the suspension components. |
 | BodyworkRepair | Toggles the repair of all the bodywork and aerodynamic elements. |
+| PitstopRecommend | Asks the virtual race strategist for a recommendation for the next pitstop. |
 | PitstopPlan | Requests a pitstop plan from the virtual race engineer. |
 | PitstopPrepare | Requests Jona to transfer the values from the current pitstop plan to the Pitstop MFD. |
-| Accept | Accepts the last recommendation of the virtual race engineer. Useful, if you don't want to use voice commands to interact with Jona. |
-| Reject | Cancels or rejectes the last recommendation of the virtual race engineer. Useful, if you don't want to use voice commands to interact with Jona. |
+| Accept | Accepts the last recommendation by one of the virtual race assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
+| Reject | Cancels or rejects the last recommendation by one of the virtual race assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
 
 See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *PitstopPrepare*, *Accept* and *Reject*.
 

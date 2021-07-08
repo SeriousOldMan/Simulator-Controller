@@ -134,14 +134,6 @@ class RaceStrategist extends RaceAssistant {
 		}
 	}
 	
-	accept() {
-		this.phraseRecognized("Yes", ["Yes"])
-	}
-	
-	reject() {
-		this.phraseRecognized("No", ["No"])
-	}
-	
 	lapInfoRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
 		

@@ -54,7 +54,7 @@ class PitstopMode extends ControllerMode {
 	
 	updateActions(sessionState) {
 		this.updatePitstopActions(sessionState)
-		this.updateRaceEngineerActions(sessionState)
+		this.updateRaceAssistantActions(sessionState)
 	}			
 		
 	updatePitstopActions(sessionState) {	
@@ -70,12 +70,12 @@ class PitstopMode extends ControllerMode {
 				}
 	}
 		
-	updateRaceEngineerActions(sessionState) {
+	updateRaceAssistantActions(sessionState) {
 		if (!this.Plugin.RaceEngineer || !this.Plugin.RaceEngineer.RaceEngineer)
 			sessionState := kSessionFinished
 		
 		for ignore, theAction in this.Actions
-			if isInstance(theAction, RaceEngineerAction)
+			if isInstance(theAction, RaceAssistantAction)
 				if (sessionState == kSessionRace) {
 					theAction.Function.enable(kAllTrigger, theAction)
 					theAction.Function.setText(theAction.Label)
@@ -212,8 +212,8 @@ class SimulatorPlugin extends ControllerPlugin {
 		
 			theAction := arguments[1]
 			
-			if inList(["PitstopPlan", "PitstopPrepare", "Accept", "Reject"], theAction)
-				this.createRaceEngineerAction(controller, arguments*)
+			if inList(["PitstopRecommend", "PitstopPlan", "PitstopPrepare", "Accept", "Reject"], theAction)
+				this.createRaceAssistantAction(controller, arguments*)
 			else
 				this.createPitstopAction(controller, arguments*)
 		}
@@ -272,7 +272,7 @@ class SimulatorPlugin extends ControllerPlugin {
 			logMessage(kLogWarn, translate("Action ") . action . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
 	}
 	
-	createRaceEngineerAction(controller, action, actionFunction) {
+	createRaceAssistantAction(controller, action, actionFunction) {
 		logMessage(kLogWarn, translate("Action """) . action . translate(""" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
 	}
 	
@@ -352,7 +352,7 @@ class SimulatorPlugin extends ControllerPlugin {
 	}
 }
 
-class RaceEngineerAction extends ControllerAction {
+class RaceAssistantAction extends ControllerAction {
 	iPlugin := false
 	iAction := false
 	
@@ -378,19 +378,20 @@ class RaceEngineerAction extends ControllerAction {
 	fireAction(function, trigger) {
 		local plugin := this.Plugin
 		
-		if plugin.RaceEngineer
-			switch this.Action {
-				case "PitstopPlan":
-					plugin.planPitstop()
-				case "PitstopPrepare":
-					plugin.preparePitstop()
-				case "Accept":
-					plugin.accept()
-				case "Reject":
-					plugin.reject()
-				default:
-					Throw "Invalid action """ . this.Action . """ detected in RaceEngineerAction.fireAction...."
-			}
+		switch this.Action {
+			case "PitstopRecommend":
+				plugin.recommendPitstop()
+			case "PitstopPlan":
+				plugin.planPitstop()
+			case "PitstopPrepare":
+				plugin.preparePitstop()
+			case "Accept":
+				plugin.accept()
+			case "Reject":
+				plugin.reject()
+			default:
+				Throw "Invalid action """ . this.Action . """ detected in RaceAssistantAction.fireAction...."
+		}
 	}
 }
 
@@ -410,7 +411,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		}
 	}
 	
-	createRaceEngineerAction(controller, action, actionFunction) {
+	createRaceAssistantAction(controller, action, actionFunction) {
 		local function := controller.findFunction(actionFunction)
 			
 		mode := this.findMode(kPitstopMode)
@@ -419,8 +420,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			mode := new PitstopMode(this)
 		
 		if (function != false) {
-			if inList(["PitstopPlan", "PitstopPrepare", "Accept", "Reject"], action)
-				mode.registerAction(new RaceEngineerAction(this, function, this.getLabel(ConfigurationItem.descriptor(action, "Activate"), action), action))
+			if inList(["PitstopRecommend", "PitstopPlan", "PitstopPrepare", "Accept", "Reject"], action)
+				mode.registerAction(new RaceAssistantAction(this, function, this.getLabel(ConfigurationItem.descriptor(action, "Activate"), action), action))
 			else
 				logMessage(kLogWarn, translate("Action """) . action . translate(""" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
 		}
@@ -483,11 +484,20 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	accept() {
 		if this.RaceEngineer
 			this.RaceEngineer.accept()
+		else if this.RaceStrategist
+			this.RaceStrategist.accept()
 	}
 	
 	reject() {
 		if this.RaceEngineer
 			this.RaceEngineer.reject()
+		else if this.RaceStrategist
+			this.RaceStrategist.reject()
+	}
+	
+	recommendPitstop() {
+		if this.RaceStrategist
+			this.RaceStrategist.recommendPitstop()
 	}
 	
 	planPitstop() {

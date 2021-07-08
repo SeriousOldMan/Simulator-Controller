@@ -2,7 +2,7 @@
 Version=3.2.2-dev
 Target=3.2.2-release
 Date=07/08/2021
-Changes=More information supplied by Jona, New plugin arguments for Race Strategist plugin
+Changes=More information supplied by Jona, New plugin arguments for Race Strategist plugin, Accept & Reject plugin commands now works always for the currently focused voice assistant
 [Release]
 Version=3.1.6-release
 Date=07/02/2021

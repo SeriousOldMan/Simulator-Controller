@@ -1,7 +1,7 @@
 [Development]
-Version=3.2.0-dev
+Version=3.2.0-beta
 Target=3.1.6-release
-Date=07/06/2021
+Date=07/08/2021
 Changes=Shared memory data provider for Automobilista 2, New controller action "execute" to execute any command, Integration of Automobilista 2 with Jona and Cato, New "Pitstop" mode for "AMS2" plugin
 [Release]
 Version=3.1.6-release
@@ -11,4 +11,4 @@ Changes=Initial support for Automobilista 2, Recommendation for best pitstop lap
 Type=Development
 [Version]
 Release=3.1.6-release
-Development=3.2.0-dev
+Development=3.2.0-beta

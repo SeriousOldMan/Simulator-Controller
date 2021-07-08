@@ -227,6 +227,12 @@ class VoiceAssistant {
 		}
 	}
 	
+	Grammars[] {
+		Get {
+			return this.iGrammars
+		}
+	}
+	
 	PushToTalk[] {
 		Get {
 			return this.iPushToTalk
@@ -472,7 +478,7 @@ class VoiceAssistant {
 		for grammar, definition in getConfigurationSectionValues(grammars, "Listener Grammars", {}) {
 			definition := substituteVariables(definition, {name: this.Name})
 		
-			this.iGramars[grammar] := definition
+			this.Grammars[grammar] := definition
 			
 			if speechRecognizer {
 				if this.Debug[kDebugGrammars] {
@@ -530,7 +536,7 @@ class VoiceAssistant {
 	}
 	
 	recognizeCommand(grammer, words) {
-		if this.iGrammars.HasKey(grammar)
+		if this.Grammars.HasKey(grammar)
 			if this.VoiceServer
 				raiseEvent(kFileMessage, "Voice", "recognizeCommand:" . values2String(";", grammar, words*), this.VoiceServer)
 			else

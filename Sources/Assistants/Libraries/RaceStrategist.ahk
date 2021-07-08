@@ -107,13 +107,39 @@ class RaceStrategist extends RaceAssistant {
 				this.gapToLeaderRecognized(words)
 			case "LapTimes":
 				this.lapTimesInfoRecognized(words)
-			case "PitstopPlan":
-				this.pitstopLapRecognized(words)
-			case "PitstopLap":
-				this.pitstopLapRecognized(words, true)
+			case "PitstopRecommend":
+				this.clearContinuation()
+				
+				this.getSpeaker().speakPhrase("Confirm")
+			
+				sendMessage()
+				
+				Loop 10
+					Sleep 500
+				
+				this.recommendPitstopRecognized(words)
+			case "PitstopSimulate":
+				this.clearContinuation()
+				
+				this.getSpeaker().speakPhrase("Confirm")
+			
+				sendMessage()
+				
+				Loop 10
+					Sleep 500
+				
+				this.simulatePitstopRecognized(words)
 			default:
 				base.handleVoiceCommand(grammar, words)
 		}
+	}
+	
+	accept() {
+		this.phraseRecognized("Yes", ["Yes"])
+	}
+	
+	reject() {
+		this.phraseRecognized("No", ["No"])
 	}
 	
 	lapInfoRecognized(words) {
@@ -354,14 +380,17 @@ class RaceStrategist extends RaceAssistant {
 		}
 	}
 	
+	recommendPitstopRecognized(words) {
+		this.pitstopLapRecognized(words)
+	}
+	
+	simulatePitstopRecognized(words) {
+		this.pitstopLapRecognized(words, true)
+	}
+	
 	pitstopLapRecognized(words, lap := false) {
-		local knowledgeBase := this.KnowledgeBase
-		
-		speaker := this.getSpeaker()
-		fragments := speaker.Fragments
-		
 		if lap {
-			lapPosition := inList(words, fragments["Lap"])
+			lapPosition := inList(words, this.getSpeaker().Fragments["Lap"])
 			
 			if lapPosition {
 				lap := words[lapPosition + 1]
@@ -372,13 +401,14 @@ class RaceStrategist extends RaceAssistant {
 			else
 				lap := false
 		}
-					
-		speaker.speakPhrase("Confirm")
-	
-		sendMessage()
 		
-		Loop 10
-			Sleep 500
+		this.recommendPitstop(lap)
+	}
+	
+	recommendPitstop(lap := false) {
+		local knowledgeBase := this.KnowledgeBase
+		
+		speaker := this.getSpeaker()
 		
 		if false && !this.hasEnoughData()
 			return

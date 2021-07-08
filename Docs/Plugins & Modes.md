@@ -209,7 +209,7 @@ With *true* supplied for *raceEngineerLogo*, Jona will show a nice rotating AI b
 It is possible, although not much fun, to use Jona without its natural language interface. Only the pitstop planning and setup capabilities are available in this cconfiguration, but it is still useful. You can use the following parameters to connect these actions to your controller hardware:
 
 	raceEngineerCommands: PitstopPlan *function*, PitstopPrepare *function*;
-	Accept: *acceptFunction*; Reject: *rejectFunction*
+						  Accept: *acceptFunction*; Reject: *rejectFunction*
 	
 All these will be bound to the plugin itself, thereby are available all the time, and only unary functions are supported here. By using this actions, you will be able to use Jona with voice output, but no voice control, thereby getting most of the support from Jona, but you have to use an *oldschool* interface to control the engineer actions. To *answer* "Yes" to one of the questions of Jona, you must supply a controller function, for example a push button function, to the *Accept* parameter and for "No", you must use the *Reject* parameter.
 
@@ -230,6 +230,14 @@ For Cato to be generally available, you must supply an argument for the *raceStr
 Hint: You can bind the activation and deactivation of the Virtual Race Engineer and the Virtual Race Strategist to one function, if you want to control them both with the same switch on your hardwar controller.
 
 With *true* supplied for *raceStrategistLogo*, Cato will show a nice rotating AI brain in the lower left corner of the screen, while the AI kernel is working, but you will get a short lag in your simulation, when this window pops up. With *raceStrategistSpeaker* and *raceStrategistListener* you can customize the natural language interface (or the personality) of Cato. If you simply supply *true* as arguments, a voice and the corresponding recognition engine will be choosen based on the currently configured language. If you prefer a specific voice and / or a specific language, you can supply the name for this voice and language instead (Example: "Microsoft David Desktop" is a male US-English voice and "Microsoft Server Speech Recognition - TELE (de-DE)" provide german spoken language recognition. The phrase grammars of Cato can be localized for any language, with English and German already supplied by the standard distribution of Simulator Controller, but you will also need the corresponding Windows libraries for TTS (text-to-speech) and STT (speech-to-text). For more information about Cato, see the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist). With *raceStrategistLanguage* you can overwrite the default language, which has been configured in the [voice tab of the configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control).
+
+Similar as for Jona, you can use the following parameters to trigger some of Catos service without using voice commands:
+
+	raceStrategistCommands: PitstopRecommend *function*, Accept: *acceptFunction*; Reject: *rejectFunction*
+	
+All these will be bound to the plugin itself, thereby are available all the time, and only unary functions are supported here. By using this actions, you will be able to use Cato with voice output, but no voice control, thereby getting most of the support from Cato, but you have to use an *oldschool* interface to control the strategist actions. To *answer* "Yes" to one of the questions of Cato, you must supply a controller function, for example a push button function, to the *Accept* parameter and for "No", you must use the *Reject* parameter.
+
+Note: The *raceStrategistCommands* actions are also available in most of the simulation plugins, which define a "Pitstop" mode.
 
 ## Plugin *ACC*
 

@@ -18,6 +18,7 @@ Release 3.2.2 Checklist
 0. Search for new links (*)
 1. Update procedure
    a. Phrase Grammars
+   b. Plugin Labels
 
 Release 3.2.0 Checklist
 =======================

@@ -2,7 +2,7 @@
 Version=3.2.2-dev
 Target=3.2.2-release
 Date=07/07/2021
-Changes=More information supplied by Jona
+Changes=More information supplied by Jona, New plugin arguments for Race Strategist plugin
 [Release]
 Version=3.1.6-release
 Date=07/02/2021

@@ -77,8 +77,52 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 			this.callRemote("updateLap", arguments*)
 		}
 		
+		accept(arguments*) {
+			this.callRemote("accept", arguments*)
+		}
+		
+		reject(arguments*) {
+			this.callRemote("reject", arguments*)
+		}
+		
+		recommendPitstop(arguments*) {
+			this.callRemote("recommendPitstop", arguments*)
+		}
+		
 		performPitstop(arguments*) {
 			this.callRemote("performPitstop", arguments*)
+		}
+	}
+
+	class RaceStrategistAction extends ControllerAction {
+		iAction := false
+		
+		Action[] {
+			Get {
+				return this.iAction
+			}
+		}
+		
+		__New(function, label, action) {
+			this.iAction := action
+			
+			base.__New(function, label)
+		}
+		
+		fireAction(function, trigger) {
+			local plugin := this.Controller.findPlugin(kRaceStrategistPlugin)
+			
+			if plugin.RaceStrategist
+				switch this.Action {
+					case "PitstopRecommend":
+						plugin.recommendPitstop()
+					case "Accept":
+						plugin.accept()
+					case "Reject":
+						plugin.reject()
+					default:
+						Throw "Invalid action """ . this.Action . """ detected in RaceStrategistAction.fireAction...."
+				}
 		}
 	}
 
@@ -236,6 +280,8 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 		local function := controller.findFunction(actionFunction)
 		
 		if (function != false) {
+			if inList(["PitstopRecommend", "Accept", "Reject"], action)
+				this.registerAction(new this.RaceStrategistAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Activate"), action), action))
 			if (action = "RaceStrategist")
 				this.registerAction(new this.RaceStrategistToggleAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Toggle"), action)))
 			else if ((action = "RaceStrategistOpenSettings") || (action = "RaceStrategistImportSetup") || (action = "RaceStrategistOpenSetups"))
@@ -267,7 +313,7 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 					theAction.Function.setText(theAction.Label)
 				}
 				else if (theAction.Action = "RaceStrategistImportSetup") {
-					if this.Simulator {
+					if this.supportsSetupImport() {
 						theAction.Function.enable(kAllTrigger, theAction)
 						theAction.Function.setText(theAction.Label)
 					}
@@ -275,6 +321,14 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 						theAction.Function.disable(kAllTrigger, theAction)
 						theAction.Function.setText(theAction.Label, "Gray")
 					}
+				}
+				else if ((sessionState == kSessionRace) && (this.RaceStrategist != false)) {
+					theAction.Function.enable(kAllTrigger, theAction)
+					theAction.Function.setText(theAction.Label)
+				}
+				else {
+					theAction.Function.disable(kAllTrigger, theAction)
+					theAction.Function.setText(theAction.Label, "Gray")
 				}
 	}
 	
@@ -410,6 +464,25 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 	updateLap(lapNumber, dataFile) {
 		if this.RaceStrategist
 			this.RaceStrategist.updateLap(lapNumber, dataFile)
+	}
+	
+	supportsSetupImport() {
+		return (this.Simulator ? this.Simulator.supportsSetupImport() : false)
+	}
+	
+	accept() {
+		if this.RaceStrategist
+			this.RaceStrategist.accept()
+	}
+	
+	reject() {
+		if this.RaceStrategist
+			this.RaceStrategist.reject()
+	}
+	
+	recommendPitstop(lapNumber) {
+		if this.RaceStrategist
+			this.RaceStrategist.recommendPitstop(lapNumber)
 	}
 	
 	performPitstop(lapNumber) {

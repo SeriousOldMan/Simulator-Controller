@@ -349,7 +349,7 @@ class VoiceAssistant {
 				activationCommand := substituteVariables(activationCommand, {name: this.Name})
 																							
 				raiseEvent(kFileMessage, "Voice", "registerVoiceClient:" . values2String(";", this.Name, processID
-																							, activationCommand, "remoteActivationRecognized", false,
+																							, activationCommand, "remoteActivationRecognized", "remoteDeactivationRecognized",
 																							, this.Language, this.Speaker, this.Listener), this.VoiceServer)
 																						
 				this.iSpeechGenerator := new this.RemoteSpeaker(this, this.Speaker, this.Language
@@ -515,6 +515,10 @@ class VoiceAssistant {
 	remoteActivationRecognized(words*) {
 		if (words.Length() > 0)
 			this.phraseRecognized("Call", words, true)
+	}
+	
+	remoteDeactivationRecognized(words*) {
+		this.clearContinuation()
 	}
 	
 	remoteCommandRecognized(grammar, command, words*) {

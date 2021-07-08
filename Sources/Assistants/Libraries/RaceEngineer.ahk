@@ -882,7 +882,7 @@ class RaceEngineer extends RaceAssistant {
 		if this.Speaker {
 			speaker := this.getSpeaker()
 			
-			speaker.speakPhrase("Greeting")
+			speaker.speakPhrase("GreetingEngineer")
 			
 			Process Exist, Race Strategist.exe
 			

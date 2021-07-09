@@ -32,7 +32,7 @@ None for the moment...
 
 [3.1.6-release](https://cntr.click/VM6RaFB) (New features: Initial support for Automobilista 2, Recommendation for best pitstop lap in relation to traffic density, Handover between virtual strategist and engineer during pitstop planning.)
 
-[3.2.0-release](https://www.dropbox.com/s/mg7ckg1u398kf9l/Simulator%20Controller%203.2.0-release.zip?dl=1) (New features: Shared memory data provider for Automobilista 2, New controller action "execute" to execute any command, Integration of Automobilista 2 with Jona and Cato, New "Pitstop" mode for "AMS2" plugin.)
+[3.2.0-release](https://cntr.click/3sgB5PD) (New features: Shared memory data provider for Automobilista 2, New controller action "execute" to execute any command, Integration of Automobilista 2 with Jona and Cato, New "Pitstop" mode for "AMS2" plugin.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-320) of this version and all the versions you might have skipped, before installing and using this version.
 

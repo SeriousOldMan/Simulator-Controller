@@ -1,14 +1,14 @@
 [Development]
-Version=3.2.0-rc1
+Version=3.2.0-release
 Target=3.2.0-release
-Date=07/08/2021
+Date=07/09/2021
 Changes=Shared memory data provider for Automobilista 2, New controller action "execute" to execute any command, Integration of Automobilista 2 with Jona and Cato, New "Pitstop" mode for "AMS2" plugin
 [Release]
-Version=3.1.6-release
-Date=07/02/2021
-Changes=Initial support for Automobilista 2, Recommendation for best pitstop lap in relation to traffic density, Handover between virtual strategist and engineer during pitstop planning
+Version=3.2.0-release
+Date=07/09/2021
+Changes=Shared memory data provider for Automobilista 2, New controller action "execute" to execute any command, Integration of Automobilista 2 with Jona and Cato, New "Pitstop" mode for "AMS2" plugin
 [Current]
-Type=Development
+Type=Release
 [Version]
-Release=3.1.6-release
-Development=3.2.0-rc1
+Release=3.2.0-release
+Development=3.2.0-release

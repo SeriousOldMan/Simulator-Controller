@@ -86,6 +86,10 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 			this.callRemote("reject", arguments*)
 		}
 		
+		requestInformation(arguments*) {
+			this.callRemote("requestInformation", arguments*)
+		}
+		
 		planPitstop(arguments*) {
 			this.callRemote("planPitstop", arguments*)
 		}
@@ -101,6 +105,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 
 	class RaceEngineerAction extends ControllerAction {
 		iAction := false
+		iArguments := false
 		
 		Action[] {
 			Get {
@@ -108,8 +113,15 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 			}
 		}
 		
-		__New(function, label, action) {
+		Arguments[] {
+			Get {
+				return this.iArguments
+			}
+		}
+		
+		__New(function, label, action, arguments*) {
 			this.iAction := action
+			this.iArguments := arguments
 			
 			base.__New(function, label)
 		}
@@ -119,6 +131,8 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 			
 			if plugin.RaceEngineer
 				switch this.Action {
+					case "InformationRequest":
+						plugin.requestInformation(this.Arguments*)
 					case "PitstopPlan":
 						plugin.planPitstop()
 					case "PitstopPrepare":
@@ -276,11 +290,16 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 			SetTimer updateRaceEngineerSessionState, 5000
 	}
 	
-	createRaceEngineerAction(controller, action, actionFunction) {
+	createRaceEngineerAction(controller, action, actionFunction, arguments*) {
 		local function := controller.findFunction(actionFunction)
 		
 		if (function != false) {
-			if inList(["PitstopPlan", "PitstopPrepare", "Accept", "Reject"], action)
+			if (action = "InformationRequest") {
+				action := values2String("", arguments*)
+				
+				this.registerAction(new this.RaceEngineerAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Activate"), action), action, arguments*))
+			}
+			else if inList(["PitstopPlan", "PitstopPrepare", "Accept", "Reject"], action)
 				this.registerAction(new this.RaceEngineerAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Activate"), action), action))
 			else if (action = "RaceEngineer")
 				this.registerAction(new this.RaceEngineerToggleAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Toggle"), action)))
@@ -516,6 +535,16 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 	
 	supportsSetupImport() {
 		return (this.Simulator ? this.Simulator.supportsSetupImport() : false)
+	}
+	
+	requestInformation(arguments*) {
+		if (this.RaceEngineer && inList(["LapsRemaining", "Weather", "TyrePressures", "TyreTemperatures"], arguments[1])) {
+			this.RaceEngineer.requestInformation(arguments*)
+		
+			return true
+		}
+		else
+			return false
 	}
 	
 	accept() {

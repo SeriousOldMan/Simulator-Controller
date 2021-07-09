@@ -397,6 +397,23 @@ class RaceStrategist extends RaceAssistant {
 		this.recommendPitstop(lap)
 	}
 	
+	requestInformation(category, arguments*) {
+		switch category {
+			case "LapsRemaining":
+				this.lapInfoRecognized([])
+			case "Weather":
+				this.weatherRecognized([])
+			case "Position":
+				this.positionRecognized([])
+			case "GapToFront":
+				this.gapToFrontRecognized((arguments[1] = "Track") ? Array(this.getSpeaker().Fragments["Car"]) : [])
+			case "GapToBehind":
+				this.gapToBehindRecognized((arguments[1] = "Track") ? Array(this.getSpeaker().Fragments["Car"]) : [])
+			case "GapToLeader":
+				this.gapToLeaderRecognized([])
+		}
+	}
+	
 	recommendPitstop(lap := false) {
 		local knowledgeBase := this.KnowledgeBase
 		

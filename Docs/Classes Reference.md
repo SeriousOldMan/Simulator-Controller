@@ -770,6 +770,9 @@ Calling this method will ask Jona to prepare the last planned pitstop.
 #### *supportsPitstop()*
 If this method returns *true*, this plugin supports automated pitstop handling together with the Virtual Race Engineer. The default implementation returns *false*. Whenever a subclass of *RaceAssistantSimulatorPlugin* returns *true* here, it will implement at least some of the following methods as well.
 
+#### *supportsSetupImport()*
+If this method returns *true*, this plugin supports loading setup information from the underlying . The default implementation returns *false*. Whenever a subclass of *RaceAssistantSimulatorPlugin* returns *true* here, the telemetry provider must implement the "-Setup" protocol.
+
 #### *pitstopPlanned(pitstopNumber :: Integer)*
 *pitstopPlanned* is called by the Race Engineer, whenever there is an updated plan for an upcoming pitstop. The default method does nothing here.
 

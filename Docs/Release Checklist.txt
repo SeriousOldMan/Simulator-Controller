@@ -10,7 +10,9 @@ General Release Actions
 8. Update "Backlog.md"
 9. Check, whether update documentation for the release is required in "Updates.md"
 10. Update Wiki using "update-documentation.bat"
-11. Set a Git Tag after final commit
+11. Update commands in Discord
+12. Update #releases and #anouncements in Discord
+13. Set a Git Tag after final commit
 
 Release 3.2.2 Checklist
 =======================
@@ -19,9 +21,15 @@ Release 3.2.2 Checklist
 1. Update procedure
    a. Phrase Grammars
    b. Plugin Labels
+   c. Translations
 2. SimulatorPlugin => RaceEngineerAction => RaceAssistantAction, RaceEngineerSimulatorPlugin => RaceAssistantSimulatorPlugin, ...
    a. Class Reference.md
    b. Update Notes
+3. New "Assistant" Mode
+   a. Plugins & Modes.md
+   b. Class Reference.md
+   c. Update Notes
+   d. Sidebar.md
 
 Release 3.2.0 Checklist
 =======================

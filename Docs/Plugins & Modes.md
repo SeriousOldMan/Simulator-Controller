@@ -233,11 +233,23 @@ With *true* supplied for *raceStrategistLogo*, Cato will show a nice rotating AI
 
 Similar as for Jona, you can use the following parameters to trigger some of Catos service without using voice commands:
 
-	raceStrategistCommands: PitstopRecommend *function*, Accept: *acceptFunction*; Reject: *rejectFunction*
+	raceStrategistCommands: PitstopRecommend *function*, Accept: *acceptFunction*; Reject: *rejectFunction*, ... information requests ...
 	
-All these will be bound to the plugin itself, thereby are available all the time, and only unary functions are supported here. By using this actions, you will be able to use Cato with voice output, but no voice control, thereby getting most of the support from Cato, but you have to use an *oldschool* interface to control the strategist actions. To *answer* "Yes" to one of the questions of Cato, you must supply a controller function, for example a push button function, to the *Accept* parameter and for "No", you must use the *Reject* parameter.
+All these will be bound to the plugin itself, thereby are available all the time, and only unary functions are supported here. By using these actions, you will be able to use Cato with voice output, but no voice control, thereby getting most of the support from Cato, but you have to use an *oldschool* interface to control the strategist actions. To *answer* "Yes" to one of the questions of Cato, you must supply a controller function, for example a push button function, to the *Accept* parameter and for "No", you must use the *Reject* parameter.
 
-Note: The *raceStrategistCommands* actions are also available in most of the simulation plugins, which define a "Pitstop" mode.
+Note: The "PitstopRecommend", "Accept" and "Reject" are also available in most of the simulation plugins, which define a "Pitstop" mode.
+
+Furthermore, you can request a lot of information from Cato about the current race situation. Please see the following table for available information commands.
+
+| Command | Description |
+| ------ | ------ |
+| Position | Cato will tell you your current position. |
+| LapTimes | You will be given information about your average lap time and those of your direct opponents. |
+| StandingsGapToFront | Cato will tell you the gap in seconds to the car one position ahead of you. |
+| StandingsGapToBehind | Cato will tell you the gap in seconds to the car one position behind you. |
+| TrackGapToFront | Cato will tell you the gap in seconds to the car directly in front of you. |
+| TrackGapToBehind | Cato will tell you the gap in seconds to the car directly behind you. |
+| GapToLeader | Cato will tell you the gap in seconds to the leading car. |
 
 ## Plugin *ACC*
 
@@ -276,7 +288,7 @@ With the plugin parameter *pitstopCommands:* you can supply a list of the settin
 					 
 See the following table for the supported settings.
 
-| Setting | Description |
+| Setting/Command | Description |
 | ------ | ------ |
 | Strategy | Choose one of the predefined pitstop strategies. |
 | Refuel | Increment or decrement the refuel amount. Supports the additional increments argument. |
@@ -350,7 +362,7 @@ With the plugin parameter *pitstopCommands:* you can supply a list of the settin
 					 
 See the following table for the supported settings.
 
-| Setting | Description |
+| Setting/Command | Description |
 | ------ | ------ |
 | Refuel | Increment or decrement the refuel amount. Supports the additional increments argument. |
 | TyreChange | Toggles, whether tyres will be changed at the pitstop. |
@@ -401,7 +413,7 @@ With the plugin parameter *pitstopCommands:* you can supply a list of the settin
 					 
 See the following table for the supported settings.
 
-| Setting | Description |
+| Setting/Command | Description |
 | ------ | ------ |
 | Refuel | Increment or decrement the refuel amount. Supports the additional increments argument. |
 | TyreCompound | Cycles through the available tyre compounds. |
@@ -456,7 +468,7 @@ With the plugin parameter *pitstopCommands:* you can supply a list of the settin
 					 
 See the following table for the supported settings.
 
-| Setting | Description |
+| Setting/Command | Description |
 | ------ | ------ |
 | Strategy | Choose one of the predefined pitstop strategies. |
 | Refuel | Increment or decrement the refuel amount. Supports the additional increments argument. |
@@ -519,7 +531,7 @@ With the plugin parameter *pitstopCommands:* you can supply a list of the settin
 					 
 See the following table for the supported settings.
 
-| Setting | Description |
+| Setting/Command | Description |
 | ------ | ------ |
 | Refuel | Increment or decrement the refuel amount. Supports the additional increments argument. |
 | TyreChange | Chooses between "Dry" and "Wet" tyres for the next pitstop or no tyre change at all. Currently, only vehicles with one dry tyre compound and one wet tyre compound are supported. |

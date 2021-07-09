@@ -17,6 +17,7 @@ global kSessionQualification = 3
 global kSessionRace = 4
 
 global kPitstopMode = "Pitstop"
+global kAssistantMode = "Assistant"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -25,6 +26,8 @@ global kPitstopMode = "Pitstop"
 
 global kSessionStates = [kSessionOther, kSessionPractice, kSessionQualification, kSessionRace]
 global kSessionStateNames = ["Other", "Practice", "Qualification", "Race"]
+
+global kAssistantRaceActions = ["PitstopRecommend", "PitstopPlan", "PitstopPrepare", "Accept", "Reject"]
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -39,10 +42,10 @@ global vRunningSimulation = false
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 	
-class PitstopMode extends ControllerMode {
+class AssistantMode extends ControllerMode {
 	Mode[] {
 		Get {
-			return kPitstopMode
+			return kAssistantMode
 		}
 	}
 
@@ -53,10 +56,51 @@ class PitstopMode extends ControllerMode {
 	}
 	
 	updateActions(sessionState) {
-		this.updatePitstopActions(sessionState)
 		this.updateRaceAssistantActions(sessionState)
 	}			
 		
+	updateRaceAssistantActions(sessionState) {
+		if (!this.Plugin.RaceEngineer || !this.Plugin.RaceEngineer.RaceEngineer)
+			sessionState := kSessionFinished
+		
+		for ignore, theAction in this.Actions
+			if isInstance(theAction, RaceAssistantAction)
+				if inList(kAssistantRaceActions, theAction.Action) {
+					if (sessionState == kSessionRace) {
+						theAction.Function.enable(kAllTrigger, theAction)
+						theAction.Function.setText(theAction.Label)
+					}
+					else {
+						theAction.Function.disable(kAllTrigger, theAction)
+						theAction.Function.setText(theAction.Label, "Gray")
+					}
+				}
+				else if (theAction.Action = "InformationRequest") {
+					if inList([kSessionPractice, kSessionRace], sessionState) {
+						theAction.Function.enable(kAllTrigger, theAction)
+						theAction.Function.setText(theAction.Label)
+					}
+					else {
+						theAction.Function.disable(kAllTrigger, theAction)
+						theAction.Function.setText(theAction.Label, "Gray")
+					}
+				}
+	}
+}
+
+class PitstopMode extends AssistantMode {
+	Mode[] {
+		Get {
+			return kPitstopMode
+		}
+	}
+	
+	updateActions(sessionState) {
+		this.updatePitstopActions(sessionState)
+	
+		base.updateActions(sessionState)
+	}			
+	
 	updatePitstopActions(sessionState) {	
 		for ignore, theAction in this.Actions
 			if isInstance(theAction, PitstopAction)
@@ -68,23 +112,7 @@ class PitstopMode extends ControllerMode {
 					theAction.Function.disable(kAllTrigger, theAction)
 					theAction.Function.setText(theAction.Label, "Gray")
 				}
-	}
-		
-	updateRaceAssistantActions(sessionState) {
-		if (!this.Plugin.RaceEngineer || !this.Plugin.RaceEngineer.RaceEngineer)
-			sessionState := kSessionFinished
-		
-		for ignore, theAction in this.Actions
-			if isInstance(theAction, RaceAssistantAction)
-				if (sessionState == kSessionRace) {
-					theAction.Function.enable(kAllTrigger, theAction)
-					theAction.Function.setText(theAction.Label)
-				}
-				else {
-					theAction.Function.disable(kAllTrigger, theAction)
-					theAction.Function.setText(theAction.Label, "Gray")
-				}
-	}
+	}	
 }
 
 class PitstopAction extends ControllerAction {
@@ -212,7 +240,7 @@ class SimulatorPlugin extends ControllerPlugin {
 		
 			theAction := arguments[1]
 			
-			if inList(["PitstopRecommend", "PitstopPlan", "PitstopPrepare", "Accept", "Reject"], theAction)
+			if (inList(kAssistantRaceActions, theAction) || (theAction = "InformationRequest"))
 				this.createRaceAssistantAction(controller, arguments*)
 			else
 				this.createPitstopAction(controller, arguments*)
@@ -272,7 +300,7 @@ class SimulatorPlugin extends ControllerPlugin {
 			logMessage(kLogWarn, translate("Action ") . action . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
 	}
 	
-	createRaceAssistantAction(controller, action, actionFunction) {
+	createRaceAssistantAction(controller, action, actionFunction, arguments*) {
 		logMessage(kLogWarn, translate("Action """) . action . translate(""" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
 	}
 	
@@ -355,7 +383,8 @@ class SimulatorPlugin extends ControllerPlugin {
 class RaceAssistantAction extends ControllerAction {
 	iPlugin := false
 	iAction := false
-	
+	iArguments := false
+		
 	Plugin[] {
 		Get {
 			return this.iPlugin
@@ -368,9 +397,16 @@ class RaceAssistantAction extends ControllerAction {
 		}
 	}
 	
-	__New(pluginOrMode, function, label, action) {
+	Arguments[] {
+		Get {
+			return this.iArguments
+		}
+	}
+	
+	__New(pluginOrMode, function, label, action, arguments*) {
 		this.iPlugin := (isInstance(pluginOrMode, ControllerMode) ? pluginOrMode.Plugin : pluginOrMode)
 		this.iAction := action
+		this.iArguments := arguments
 		
 		base.__New(function, label)
 	}
@@ -379,6 +415,8 @@ class RaceAssistantAction extends ControllerAction {
 		local plugin := this.Plugin
 		
 		switch this.Action {
+			case "InformationRequest":
+				plugin.requestInformation(this.Arguments*)
 			case "PitstopRecommend":
 				plugin.recommendPitstop()
 			case "PitstopPlan":
@@ -396,6 +434,8 @@ class RaceAssistantAction extends ControllerAction {
 }
 
 class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
+	iActionMode := kPitstopMode
+	
 	iRaceEngineer := false
 	iRaceStrategist := false
 	
@@ -411,16 +451,27 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		}
 	}
 	
-	createRaceAssistantAction(controller, action, actionFunction) {
+	__New(controller, name, simulator, configuration := false) {
+		base.__New(controller, name, simulator, configuration)
+	
+		this.iActionMode := kAssistantMode
+		
+		for ignore, theAction in string2Values(",", this.getArgumentValue("assistantCommands", ""))
+			this.createRaceAssistantAction(controller, string2Values(A_Space, theAction)*)
+	
+		controller.registerPlugin(this)
+	}
+	
+	createRaceAssistantAction(controller, action, actionFunction, arguments*) {
 		local function := controller.findFunction(actionFunction)
-			
-		mode := this.findMode(kPitstopMode)
+		
+		mode := this.findMode(this.iActionMode)
 		
 		if (mode == false)
 			mode := new PitstopMode(this)
 		
 		if (function != false) {
-			if inList(["PitstopRecommend", "PitstopPlan", "PitstopPrepare", "Accept", "Reject"], action)
+			if inList(kAssistantRaceActions, action)
 				mode.registerAction(new RaceAssistantAction(this, function, this.getLabel(ConfigurationItem.descriptor(action, "Activate"), action), action))
 			else
 				logMessage(kLogWarn, translate("Action """) . action . translate(""" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
@@ -479,6 +530,13 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	
 	supportsSetupImport() {
 		return false
+	}
+	
+	requestInformation(arguments*) {
+		if (this.RaceEngineer && this.RaceEngineer.requestInformation(arguments*))
+			return
+		else if this.RaceStrategist
+			this.RaceStrategist.requestInformation(arguments*)
 	}
 	
 	accept() {

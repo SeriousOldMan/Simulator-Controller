@@ -1343,6 +1343,19 @@ class RaceEngineer extends RaceAssistant {
 		return ((this.Session == kSessionRace) && this.PitstopHandler)
 	}
 	
+	requestInformation(category, arguments*) {
+		switch category {
+			case "LapsRemaining":
+				this.lapInfoRecognized([])
+			case "Weather":
+				this.weatherRecognized([])
+			case "TyrePressures":
+				this.tyreInfoRecognized(Array(this.getSpeaker().Fragments["pressures"]))
+			case "TyreTemperatures":
+				this.tyreInfoRecognized(Array(this.getSpeaker().Fragments["temperatures"]))
+		}
+	}
+	
 	planPitstop(optionsOrLap := true, confirm := true) {
 		local knowledgeBase := this.KnowledgeBase
 		local compound

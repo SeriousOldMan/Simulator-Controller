@@ -45,6 +45,10 @@ Although the code, that handles all the update tasks, is integrated into *Simula
 
 Note: Some of you might want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars* and *Simulator Controller\Rules* folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does, on your own. But be sure to make a backup copy of all the files, just for peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor, that can handle this.
 
+## Release 3.2.2
+
+A lot of new plugin parameters has been introduced for the "Race Strategist" plugin. You might want to take a look at the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) and integrate the new functions into your Controller configuration. Furthermore, the "Accept" and "Reject" commands of the "Race Engineer" and "Race Strategist" and of the "Pitstop" modes of all simulation game plugins will now trigger the answer for the currently focused race assistant.
+
 ## Release 3.2.0
 
 Release 3.2.0 integrates the telemetry and data provider for *Automobilista 2*. Nothing to do here with regards to installation, but you must enable the shared memory interface of *Automobilista 2* in the settings of the game. Please choose the mode "PCars 2".

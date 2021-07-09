@@ -85,6 +85,10 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 			this.callRemote("reject", arguments*)
 		}
 		
+		requestInformation(arguments*) {
+			this.callRemote("requestInformation", arguments*)
+		}
+		
 		recommendPitstop(arguments*) {
 			this.callRemote("recommendPitstop", arguments*)
 		}
@@ -96,6 +100,7 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 
 	class RaceStrategistAction extends ControllerAction {
 		iAction := false
+		iArguments := false
 		
 		Action[] {
 			Get {
@@ -103,8 +108,15 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 			}
 		}
 		
-		__New(function, label, action) {
+		Arguments[] {
+			Get {
+				return this.iArguments
+			}
+		}
+		
+		__New(function, label, action, arguments*) {
 			this.iAction := action
+			this.iArguments := arguments
 			
 			base.__New(function, label)
 		}
@@ -114,6 +126,8 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 			
 			if plugin.RaceStrategist
 				switch this.Action {
+					case "InformationRequest":
+						plugin.requestInformation(this.Arguments*)
 					case "PitstopRecommend":
 						plugin.recommendPitstop()
 					case "Accept":
@@ -257,6 +271,9 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 		if raceStrategistOpenSetups
 			this.createRaceStrategistAction(controller, "RaceStrategistOpenSetups", raceStrategistOpenSetups)
 		
+		for ignore, theAction in string2Values(",", this.getArgumentValue("raceStrategistCommands", ""))
+			this.createRaceStrategistAction(controller, string2Values(A_Space, theAction)*)
+		
 		strategistSpeaker := this.getArgumentValue("raceStrategistSpeaker", false)
 		
 		if ((strategistSpeaker != false) && (strategistSpeaker != kFalse)) {
@@ -276,13 +293,18 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 			SetTimer updateRaceStrategistSessionState, 5000
 	}
 	
-	createRaceStrategistAction(controller, action, actionFunction) {
+	createRaceStrategistAction(controller, action, actionFunction, arguments*) {
 		local function := controller.findFunction(actionFunction)
 		
 		if (function != false) {
-			if inList(["PitstopRecommend", "Accept", "Reject"], action)
+			if (action = "InformationRequest") {
+				action := values2String("", arguments*)
+				
+				this.registerAction(new this.RaceStrategistAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Activate"), action), "InformationRequest", arguments*))
+			}
+			else if inList(["PitstopRecommend", "Accept", "Reject"], action)
 				this.registerAction(new this.RaceStrategistAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Activate"), action), action))
-			if (action = "RaceStrategist")
+			else if (action = "RaceStrategist")
 				this.registerAction(new this.RaceStrategistToggleAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Toggle"), action)))
 			else if ((action = "RaceStrategistOpenSettings") || (action = "RaceStrategistImportSetup") || (action = "RaceStrategistOpenSetups"))
 				this.registerAction(new this.RaceSettingsAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Activate")), action))
@@ -468,6 +490,16 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 	
 	supportsSetupImport() {
 		return (this.Simulator ? this.Simulator.supportsSetupImport() : false)
+	}
+	
+	requestInformation(arguments*) {
+		if (this.RaceStrategist && inList(["LapsRemaining", "Weather", "Position", "LapTimes", "GapToFront", "GapToBehind", "GapToLeader"], arguments[1])) {
+			this.RaceStrategist.requestInformation(arguments*)
+		
+			return true
+		}
+		else
+			return false
 	}
 	
 	accept() {

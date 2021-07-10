@@ -44,8 +44,8 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 	__New(controller, name, simulator, configuration := false) {
 		base.__New(controller, name, simulator, configuration)
 		
-		this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", false)
-		this.iClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
+		this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopHUD", this.getArgumentValue("openPitstopMFD", false))
+		this.iClosePitstopMFDHotkey := this.getArgumentValue("closePitstopHUD", this.getArgumentValue("closePitstopMFD", false))
 	}
 	
 	getPitstopActions(ByRef allActions, ByRef selectActions) {

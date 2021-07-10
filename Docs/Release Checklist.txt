@@ -30,6 +30,18 @@ Release 3.2.2 Checklist
    b. Class Reference.md
    c. Update Notes
    d. Sidebar.md
+4. Renamed MFD to BB in IRC
+   a. Update Notes
+   b. Update Procedure
+5. Renamed MFD to HUD in RF2
+   a. Update Notes
+   b. Update Procedure
+6. Renamed MFD to Menu in R3E
+   a. Update Notes
+   b. Update Procedure
+7. Renamed MFD to ICM in AMS2
+   a. Update Notes
+   b. Update Procedure
 
 Release 3.2.0 Checklist
 =======================

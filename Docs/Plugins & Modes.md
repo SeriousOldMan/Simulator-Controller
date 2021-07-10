@@ -208,10 +208,30 @@ With *true* supplied for *raceEngineerLogo*, Jona will show a nice rotating AI b
 
 It is possible, although not much fun, to use Jona without its natural language interface. Only the pitstop planning and setup capabilities are available in this cconfiguration, but it is still useful. You can use the following parameters to connect these actions to your controller hardware:
 
-	raceEngineerCommands: PitstopPlan *function*, PitstopPrepare *function*;
-						  Accept: *acceptFunction*; Reject: *rejectFunction*
+	raceEngineerCommands: PitstopPlan *function*, PitstopPrepare *function*,
+						  Accept *acceptFunction*, Reject *rejectFunction*,
+						  InformationRequest *requestFunction* *command* [*arguments*], ...
 	
 All these will be bound to the plugin itself, thereby are available all the time, and only unary functions are supported here. By using this actions, you will be able to use Jona with voice output, but no voice control, thereby getting most of the support from Jona, but you have to use an *oldschool* interface to control the engineer actions. To *answer* "Yes" to one of the questions of Jona, you must supply a controller function, for example a push button function, to the *Accept* parameter and for "No", you must use the *Reject* parameter.
+
+Furthermore, you can request a lot of information from Jona, mostly about the current state of your car. Thefore, you can supply the *InformationRequest* parameter multiple times.
+
+Example:
+
+	raceEngineerCommands: ...,
+						  InformationRequest LapsRemaining Button.1,
+						  InformationRequest TyrePressures Button.2,
+						  InformationRequest TyreTemperatures Button.3,
+						  ...
+	
+Please see the following table for available information commands.
+
+| Command | Description |
+| ------ | ------ |
+| LapsRemaining | Jona will give you the number of laps still to drive. The number of remaining laps is determined by the remaining stint, session or driver time, but of course is also limited by the remaining fuel. |
+| Weather | You will get information about the current and upcoming weather. |
+| TyrePressures | Cato will tell you the current pressures in your tyres in PSI. |
+| TyreTemperatures | This command will give you the current temperatures in the core of your tyres in Degrees Celsius. |
 
 Note: The *raceEngineerCommands* actions are also available in most of the simulation plugins, which define a "Pitstop" mode.
 
@@ -233,23 +253,32 @@ With *true* supplied for *raceStrategistLogo*, Cato will show a nice rotating AI
 
 Similar as for Jona, you can use the following parameters to trigger some of Catos service without using voice commands:
 
-	raceStrategistCommands: PitstopRecommend *function*, Accept: *acceptFunction*; Reject: *rejectFunction*, ... information requests ...
+	raceStrategistCommands: PitstopRecommend *function*, Accept *acceptFunction*, Reject *rejectFunction*,
+							InformationRequest *requestFunction* *command* [*arguments*], ...
 	
 All these will be bound to the plugin itself, thereby are available all the time, and only unary functions are supported here. By using these actions, you will be able to use Cato with voice output, but no voice control, thereby getting most of the support from Cato, but you have to use an *oldschool* interface to control the strategist actions. To *answer* "Yes" to one of the questions of Cato, you must supply a controller function, for example a push button function, to the *Accept* parameter and for "No", you must use the *Reject* parameter.
 
-Note: The "PitstopRecommend", "Accept" and "Reject" are also available in most of the simulation plugins, which define a "Pitstop" mode.
+Furthermore, you can request a lot of information from Cato about the current race situation. Thefore, you can supply the *InformationRequest* parameter multiple times.
 
-Furthermore, you can request a lot of information from Cato about the current race situation. Please see the following table for available information commands.
+Example:
+
+	raceStrategistCommands: ...,
+							InformationRequest Position Button.1,
+							InformationRequest GapToFront Track Button.2,
+							InformationRequest GapToRear Track Button.3,
+							...
+	
+Please see the following table for available information commands.
 
 | Command | Description |
 | ------ | ------ |
 | Position | Cato will tell you your current position. |
 | LapTimes | You will be given information about your average lap time and those of your direct opponents. |
-| StandingsGapToFront | Cato will tell you the gap in seconds to the car one position ahead of you. |
-| StandingsGapToBehind | Cato will tell you the gap in seconds to the car one position behind you. |
-| TrackGapToFront | Cato will tell you the gap in seconds to the car directly in front of you. |
-| TrackGapToBehind | Cato will tell you the gap in seconds to the car directly behind you. |
+| GapToFront [Standings, Track] | Cato will tell you the gap in seconds to the car one position ahead of you or to the car directly in front of you. If you you don't supply *Standings* or *Track*, it will default to *Standings*. |
+| GapToBehind [Standings, Track] | Cato will tell you the gap in seconds to the car one position behind you or to the car directly behind you. If you you don't supply *Standings* or *Track*, it will default to *Standings*. |
 | GapToLeader | Cato will tell you the gap in seconds to the leading car. |
+
+Note: All these commands are also available in most of the simulation plugins, either in the "Pitstop" mode or in the "Assistant" mode, depending on the configuration parameters.
 
 ## Plugin *ACC*
 
@@ -281,12 +310,12 @@ First, you need to define, how to open and close the Pitstop MFD in *Assetto Cor
 
 	openPitstopMFD: *openHotkey*; closePitstopMFD: *closeHotkey*
 	
-With the plugin parameter *pitstopCommands:* you can supply a list of the settings, you want to tweak from your hardware controller, when the "Pitstop" mode is active. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example tyre pressure and fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
+With the plugin parameter *pitstopCommands:* you can supply a list of the settings, you want to tweak from your hardware controller or the commands you want to trigger, when the "Pitstop" mode is active. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example tyre pressure and fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
 
-	pitstopCommands: *setting1* *settingFunction1* [*settingSteps1*],
-					 *setting2* *settingFunction2* [*settingSteps2*], ...
+	pitstopCommands: *settingOrCommand1* *function1* [*settingSteps1*],
+					 *settingOrCommand2* *function2* [*settingSteps2*], ...
 					 
-See the following table for the supported settings.
+See the following table for the supported settings and commands.
 
 | Setting/Command | Description |
 | ------ | ------ |
@@ -305,6 +334,7 @@ See the following table for the supported settings.
 | DriverSelect | Selects the driver for the next stint in a multiplayer team race. |
 | SuspensionRepair | Toggles the repair of the suspension components. |
 | BodyworkRepair | Toggles the repair of all the bodywork. |
+| InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your race assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
 | PitstopRecommend | Asks the virtual race strategist for a recommendation for the next pitstop. |
 | PitstopPlan | Requests a pitstop plan from the virtual race engineer. |
 | PitstopPrepare | Requests Jona to transfer the values from the current pitstop plan to the Pitstop MFD. |
@@ -355,12 +385,12 @@ First, you need to define, how to open and close the different Pitstop MFDs (aka
 
 If the opening of the Pitstop MFD for *iRacing* is requested without specifying which type of MFD is meant (for example by calling the controller action *openPitstopMFD* without specifying the optional argument for the *descriptor* parameter), the MFD for the fuel settings will be opened.
 	
-With the plugin parameter *pitstopCommands:* you can supply a list of the settings, you want to tweak from your hardware controller, when the "Pitstop" mode is active. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example tyre pressure and fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
+With the plugin parameter *pitstopCommands:* you can supply a list of the settings, you want to tweak from your hardware controller or the commands you want to trigger, when the "Pitstop" mode is active. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example tyre pressure and fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
 
-	pitstopCommands: *setting1* *settingFunction1* [*settingSteps1*],
-					 *setting2* *settingFunction2* [*settingSteps2*], ...
+	pitstopCommands: *settingOrCommand1* *function1* [*settingSteps1*],
+					 *settingOrCommand2* *function2* [*settingSteps2*], ...
 					 
-See the following table for the supported settings.
+See the following table for the supported settings and commands.
 
 | Setting/Command | Description |
 | ------ | ------ |
@@ -372,6 +402,7 @@ See the following table for the supported settings.
 | TyreRearLeft | Change the pressure for the rear left tyre. Supports the additional increments argument. |
 | TyreRearRight | Change the pressure for the rear right tyre. Supports the additional increments argument. |
 | RepairRequest | Toggles, whether repairs will be carried out during the next pitstop.  |
+| InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your race assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
 | PitstopRecommend | Asks the virtual race strategist for a recommendation for the next pitstop. |
 | PitstopPlan | Requests a pitstop plan from the virtual race engineer. |
 | PitstopPrepare | Requests Jona to transfer the values from the current pitstop plan to the Pitstop MFD. |
@@ -406,12 +437,12 @@ First, you need to define, how to open and close the Pitstop MFD in *rFactor 2*.
 
 	openPitstopMFD: *openHotkey*; closePitstopMFD: *closeHotkey*
 	
-With the plugin parameter *pitstopCommands:* you can supply a list of the settings, you want to tweak from your hardware controller, when the "Pitstop" mode is active. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example tyre pressure and fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
+With the plugin parameter *pitstopCommands:* you can supply a list of the settings, you want to tweak from your hardware controller or the commands you want to trigger, when the "Pitstop" mode is active. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example tyre pressure and fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
 
-	pitstopCommands: *setting1* *settingFunction1* [*settingSteps1*],
-					 *setting2* *settingFunction2* [*settingSteps2*], ...
+	pitstopCommands: *settingOrCommand1* *function1* [*settingSteps1*],
+					 *settingOrCommand2* *function2* [*settingSteps2*], ...
 					 
-See the following table for the supported settings.
+See the following table for the supported settings and commands.
 
 | Setting/Command | Description |
 | ------ | ------ |
@@ -424,6 +455,7 @@ See the following table for the supported settings.
 | TyreRearRight | Change the pressure for the rear right tyre. Supports the additional increments argument. |
 | DriverSelect | Selects the driver for the next stint in a multiplayer team race. |
 | RepairRequest | Cycles through the available repair options. |
+| InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your race assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
 | PitstopRecommend | Asks the virtual race strategist for a recommendation for the next pitstop. |
 | PitstopPlan | Requests a pitstop plan from the virtual race engineer. |
 | PitstopPrepare | Requests Jona to transfer the values from the current pitstop plan to the Pitstop MFD. |
@@ -461,12 +493,12 @@ First, you need to define, how to open and close the Pitstop MFD in *RaceRoom Ra
 	
 Use the *...Option* and *...Choice* parameters to specify the keys, that will be send to *RaceRoom Racing Experience* to control the Pitstop MFD. These parameters are defaulted to "W", "S", "A", "D" and "{Enter}", which are the default bindings of *RaceRoom Racing Experience*, so you won't have to supply them normally.
 
-With the plugin parameter *pitstopCommands:* you can supply a list of the settings, you want to tweak from your hardware controller, when the "Pitstop" mode is active. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
+With the plugin parameter *pitstopCommands:* you can supply a list of the settings, you want to tweak from your hardware controller or the commands you want to trigger, when the "Pitstop" mode is active. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
 
-	pitstopCommands: *setting1* *settingFunction1* [*settingSteps1*],
-					 *setting2* *settingFunction2* [*settingSteps2*], ...
+	pitstopCommands: *settingOrCommand1* *function1* [*settingSteps1*],
+					 *settingOrCommand2* *function2* [*settingSteps2*], ...
 					 
-See the following table for the supported settings.
+See the following table for the supported settings and commands.
 
 | Setting/Command | Description |
 | ------ | ------ |
@@ -475,6 +507,7 @@ See the following table for the supported settings.
 | TyreChange | Toggles, whether you want to change the tyres at the next pitstop or not. |
 | SuspensionRepair | Toggles the repair of the suspension components. |
 | BodyworkRepair | Toggles the repair of all the bodywork and aerodynamic elements. |
+| InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your race assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
 | PitstopRecommend | Asks the virtual race strategist for a recommendation for the next pitstop. |
 | PitstopPlan | Requests a pitstop plan from the virtual race engineer. |
 | PitstopPrepare | Requests Jona to transfer the values from the current pitstop plan to the Pitstop MFD. |
@@ -524,12 +557,12 @@ First, you need to define, how to open the Pitstop MFD in *Automobilista 2*. "I"
 	
 Use the *...Option* and *...Choice* parameters to specify the keys, that will be send to *Automobilista 2* to control the Pitstop MFD. These parameters are defaulted to "Z", "H", "G" and "J", which are **not** the default bindings of *Automobilista 2* (see above).
 
-With the plugin parameter *pitstopCommands:* you can supply a list of the settings, you want to tweak from your hardware controller, when the "Pitstop" mode is active. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
+With the plugin parameter *pitstopCommands:* you can supply a list of the settings, you want to tweak from your hardware controller or the commands you want to trigger, when the "Pitstop" mode is active. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
 
-	pitstopCommands: *setting1* *settingFunction1* [*settingSteps1*],
-					 *setting2* *settingFunction2* [*settingSteps2*], ...
+	pitstopCommands: *settingOrCommand1* *function1* [*settingSteps1*],
+					 *settingOrCommand2* *function2* [*settingSteps2*], ...
 					 
-See the following table for the supported settings.
+See the following table for the supported settings and commands.
 
 | Setting/Command | Description |
 | ------ | ------ |
@@ -537,6 +570,7 @@ See the following table for the supported settings.
 | TyreChange | Chooses between "Dry" and "Wet" tyres for the next pitstop or no tyre change at all. Currently, only vehicles with one dry tyre compound and one wet tyre compound are supported. |
 | SuspensionRepair | Toggles the repair of the suspension components. |
 | BodyworkRepair | Toggles the repair of all the bodywork and aerodynamic elements. |
+| InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your race assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
 | PitstopRecommend | Asks the virtual race strategist for a recommendation for the next pitstop. |
 | PitstopPlan | Requests a pitstop plan from the virtual race engineer. |
 | PitstopPrepare | Requests Jona to transfer the values from the current pitstop plan to the Pitstop MFD. |

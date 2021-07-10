@@ -294,7 +294,15 @@ class RaceStrategistPlugin extends ControllerPlugin  {
 	}
 	
 	createRaceStrategistAction(controller, action, actionFunction, arguments*) {
-		local function := controller.findFunction(actionFunction)
+		local function
+		
+		if (action = "InformationRequest") {
+			arguments.InsertAt(1, actionFunction)
+			
+			actionFunction := arguments.Pop()
+		}
+		
+		function := controller.findFunction(actionFunction)
 		
 		if (function != false) {
 			if (action = "InformationRequest") {

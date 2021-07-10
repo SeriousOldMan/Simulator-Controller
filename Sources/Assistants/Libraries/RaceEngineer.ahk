@@ -268,9 +268,9 @@ class RaceEngineer extends RaceAssistant {
 		speaker := this.getSpeaker()
 		fragments := speaker.Fragments
 		
-		if inList(words, fragments["temperatures"])
+		if inList(words, fragments["Temperatures"])
 			value := "Temperature"
-		else if inList(words, fragments["pressures"])
+		else if inList(words, fragments["Pressures"])
 			value := "Pressure"
 		else {
 			speaker.speakPhrase("Repeat")
@@ -888,7 +888,7 @@ class RaceEngineer extends RaceAssistant {
 			
 			if ErrorLevel {
 				strategistPlugin := new Plugin("Race Strategist", kSimulatorConfiguration)
-				strategistName := strategistPlugin.getArgumentValue("raceStaretgistName", false)
+				strategistName := strategistPlugin.getArgumentValue("raceStrategistName", false)
 				
 				if strategistName {
 					speaker.speakPhrase("GreetingStrategist", {strategist: strategistName})
@@ -1350,9 +1350,9 @@ class RaceEngineer extends RaceAssistant {
 			case "Weather":
 				this.weatherRecognized([])
 			case "TyrePressures":
-				this.tyreInfoRecognized(Array(this.getSpeaker().Fragments["pressures"]))
+				this.tyreInfoRecognized(Array(this.getSpeaker().Fragments["Pressures"]))
 			case "TyreTemperatures":
-				this.tyreInfoRecognized(Array(this.getSpeaker().Fragments["temperatures"]))
+				this.tyreInfoRecognized(Array(this.getSpeaker().Fragments["Temperatures"]))
 		}
 	}
 	

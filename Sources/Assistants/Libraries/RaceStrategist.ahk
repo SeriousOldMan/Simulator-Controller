@@ -405,10 +405,18 @@ class RaceStrategist extends RaceAssistant {
 				this.weatherRecognized([])
 			case "Position":
 				this.positionRecognized([])
+			case "GapToFrontStandings":
+				this.gapToFrontRecognized([])
+			case "GapToFrontTrack":
+				this.gapToFrontRecognized(["Car"])
 			case "GapToFront":
-				this.gapToFrontRecognized((arguments[1] = "Track") ? Array(this.getSpeaker().Fragments["Car"]) : [])
+				this.gapToFrontRecognized(inList(arguments, "Track") ? Array(this.getSpeaker().Fragments["Car"]) : [])
+			case "GapToBehindStandings":
+				this.gapToBehindRecognized([])
+			case "GapToBehindTrack":
+				this.gapToBehindRecognized(["Car"])
 			case "GapToBehind":
-				this.gapToBehindRecognized((arguments[1] = "Track") ? Array(this.getSpeaker().Fragments["Car"]) : [])
+				this.gapToBehindRecognized(inList(arguments, "Track") ? Array(this.getSpeaker().Fragments["Car"]) : [])
 			case "GapToLeader":
 				this.gapToLeaderRecognized([])
 		}

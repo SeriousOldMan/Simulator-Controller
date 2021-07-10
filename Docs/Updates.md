@@ -47,13 +47,16 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 3.2.2
 
-A lot of new plugin parameters has been introduced for the "Race Strategist" plugin. You might want to take a look at the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) and integrate the new functions into your Controller configuration. Furthermore, the "Accept" and "Reject" commands of the "Race Engineer" and "Race Strategist" and of the "Pitstop" modes of all simulation game plugins will now trigger the answer for the currently focused race assistant.
+A lot of new plugin parameters has been introduced for the ["Race Strategist"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) and the ["Race Engineer"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin. You might want to take a look at the documentation and integrate the new functions into your Controller configuration. All these new actions can also be configured for the "Pitstop" modes of all the simulator plugins or for the new "Assistant" mode, which has been introduced with this release. You may want to adjust the [controller automation rules](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#configuration-of-the-controller-mode-automation), if you use this new mode, so that it is automatically selected during a race or practice session.
+Furthermore, the "Accept" and "Reject" commands of the "Race Engineer" and "Race Strategist" and of the "Pitstop" modes of all simulation game plugins will now trigger the answer for the currently focused race assistant. Nothing to do here, but you should be aware of this new behaviour.
+
+***
 
 ## Release 3.2.0
 
 Release 3.2.0 integrates the telemetry and data provider for *Automobilista 2*. Nothing to do here with regards to installation, but you must enable the shared memory interface of *Automobilista 2* in the settings of the game. Please choose the mode "PCars 2".
 
-Furthermore, a "Pitstop" controller mode is available for *Automobilista 2* as well. Please take a look at the configuration documentation for the ["AMS2" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-8), if you want to use the new mode on your Button Box. You also might want to adjust the [controller automation rules](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#configuration-of-the-controller-mode-automation) as well, so that the pitstop mode is automatically selected in a race or practice session.
+Furthermore, a "Pitstop" controller mode is available for *Automobilista 2* as well. Please take a look at the configuration documentation for the ["AMS2" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-8), if you want to use the new mode on your Button Box. You also might want to adjust the [controller automation rules](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#configuration-of-the-controller-mode-automation) as well, so that the pitstop mode is automatically selected during a race or practice session.
 
 ***
 

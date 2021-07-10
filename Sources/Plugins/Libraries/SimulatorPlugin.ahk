@@ -476,10 +476,15 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		mode := this.findMode(this.iActionMode)
 		
 		if (mode == false)
-			mode := new PitstopMode(this)
+			mode := ((this.iActionMode = "Pitstop") ? new PitstopMode(this) : new AssistantMode(this))
 		
 		if (function != false) {
-			if inList(kAssistantRaceActions, action)
+			if (action = "InformationRequest") {
+				action := values2String("", arguments*)
+				
+				mode.registerAction(new RaceAssistantAction(this, function, this.getLabel(ConfigurationItem.descriptor(action, "Activate"), action), "InformationRequest", arguments*))
+			}
+			else if inList(kAssistantRaceActions, action)
 				mode.registerAction(new RaceAssistantAction(this, function, this.getLabel(ConfigurationItem.descriptor(action, "Activate"), action), action))
 			else
 				logMessage(kLogWarn, translate("Action """) . action . translate(""" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))

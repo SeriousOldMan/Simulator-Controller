@@ -272,6 +272,8 @@ Please see the following table for available information commands.
 
 | Command | Description |
 | ------ | ------ |
+| LapsRemaining | Cato will give you the number of laps still to drive. The number of remaining laps is determined by the remaining stint, session or driver time, but of course is also limited by the remaining fuel. |
+| Weather | You will get information about the current and upcoming weather. |
 | Position | Cato will tell you your current position. |
 | LapTimes | You will be given information about your average lap time and those of your direct opponents. |
 | GapToFront [Standings, Track] | Cato will tell you the gap in seconds to the car one position ahead of you or to the car directly in front of you. If you you don't supply *Standings* or *Track*, it will default to *Standings*. |
@@ -304,20 +306,36 @@ Using the buttons and dials you may change the pitstop settings in the same way 
 	pitstopCommands: Strategy Dial.1, Refuel Dial.2 5, TyreSet Button.1 Button.5, TyreCompound Button.2 Button.6,
 					 TyreAllAround Button.3 Button.7, SuspensionRepair Button.4, BodyworkRepair Button.8
 
+### Mode *Assistant*
+
+This mode allows you to group all the available actions of the active race assistants into one layer of controls on your hardware controller. Although all these actions are also available as plugin actions of the "Race Engineer" and "Race Strategist" plugins, it may be more practicle to use the "Assistant" mode, when your set of available hardware controls is limited, since plugin actions always occupy a given control.
+
+![](*)
+
+The above will be achieved using the following plugin argument:
+
+	assistantCommands: InformationRequest Position Button.9, InformationRequest LapTimes Button.10,
+					   InformationRequest LapsRemaining Button.11, InformationRequest Weather Button.12,
+					   InformationRequest GapToFront Standings Button.13, InformationRequest GapToBehind Standings Button.14,
+					   PitstopRecommend Button.16,
+					   PitstopPlan Button.17, PitstopPrepare Button.18, Accept Button.19, Reject Button.20
+
+Note: You can use all these commands in the *pitstopCommands* list as well, which will generate one giant controller mode.
+
 ### Configuration
 
 First, you need to define, how to open and close the Pitstop MFD in *Assetto Corsa Competizione*. If the standard keyboard mapping is used, this will be the "P" and the "Insert" keys on the keyboard.
 
 	openPitstopMFD: *openHotkey*; closePitstopMFD: *closeHotkey*
 	
-With the plugin parameter *pitstopCommands:* you can supply a list of the settings, you want to tweak from your hardware controller or the commands you want to trigger, when the "Pitstop" mode is active. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example tyre pressure and fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
+With the plugin parameter *pitstopCommands* you can supply a list of the settings, you want to tweak from your hardware controller, when the "Pitstop" mode is active. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example tyre pressure and fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
 
-	pitstopCommands: *settingOrCommand1* *function1* [*settingSteps1*],
-					 *settingOrCommand2* *function2* [*settingSteps2*], ...
+	pitstopCommands: *setting1* *settingsFunction1* [*settingSteps1*],
+					 *setting2* *settingsFunction2* [*settingSteps2*], ...
 					 
-See the following table for the supported settings and commands.
+See the following table for the supported settings:
 
-| Setting/Command | Description |
+| Setting | Description |
 | ------ | ------ |
 | Strategy | Choose one of the predefined pitstop strategies. |
 | Refuel | Increment or decrement the refuel amount. Supports the additional increments argument. |
@@ -334,6 +352,19 @@ See the following table for the supported settings and commands.
 | DriverSelect | Selects the driver for the next stint in a multiplayer team race. |
 | SuspensionRepair | Toggles the repair of the suspension components. |
 | BodyworkRepair | Toggles the repair of all the bodywork. |
+
+Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) for more information.
+
+With the plugin parameter *assistantCommands* you can supply a list of the commands you want to trigger, when the "Assistant" mode is active. Only unary controller functions are allowed here.
+
+	assistantCommands: PitstopRecommend *function*, PitstopPlan *function*, PitstopPrepare *function*,
+					   Accept *acceptFunction*, Reject *rejectFunction*,
+					   InformationRequest *requestFunction* *command* [*arguments*], ...
+					 
+See the following table for the supported assistant commands.
+
+| Setting/Command | Description |
+| ------ | ------ |
 | InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your race assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
 | PitstopRecommend | Asks the virtual race strategist for a recommendation for the next pitstop. |
 | PitstopPlan | Requests a pitstop plan from the virtual race engineer. |
@@ -341,9 +372,9 @@ See the following table for the supported settings and commands.
 | Accept | Accepts the last recommendation by one of the virtual race assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
 | Reject | Cancels or rejects the last recommendation by one of the virtual race assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
 
-See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *PitstopPrepare*, *Accept* and *Reject*.
+See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *PitstopPrepare*, *Accept* and *Reject* and the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin above for more information on *PitstopRecommend*.
 
-Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) for more information.
+Note: For convinience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
 
 ### Important preparation for the Pitstop MFD handling
 
@@ -377,6 +408,22 @@ All this will be achieved using the following plugin arguments:
 	pitstopCommands: Refuel Dial.1 5, TyreAllAround Dial.2, PitstopPlan Button.1, PitstopPrepare Button.5,
 					 TyreChange Button.2 Button.5, RepairRequest Button.3 Button.7
 
+### Mode *Assistant*
+
+This mode allows you to group all the available actions of the active race assistants into one layer of controls on your hardware controller. Although all these actions are also available as plugin actions of the "Race Engineer" and "Race Strategist" plugins, it may be more practicle to use the "Assistant" mode, when your set of available hardware controls is limited, since plugin actions always occupy a given control.
+
+![](*)
+
+The above will be achieved using the following plugin argument:
+
+	assistantCommands: InformationRequest Position Button.9, InformationRequest LapTimes Button.10,
+					   InformationRequest LapsRemaining Button.11, InformationRequest Weather Button.12,
+					   InformationRequest GapToFront Standings Button.13, InformationRequest GapToBehind Standings Button.14,
+					   PitstopRecommend Button.16,
+					   PitstopPlan Button.17, PitstopPrepare Button.18, Accept Button.19, Reject Button.20
+
+Note: You can use all these commands in the *pitstopCommands* list as well, which will generate one giant controller mode.
+
 ### Configuration
 
 First, you need to define, how to open and close the different Pitstop MFDs (aka Black Boxes) in *iRacing*. Please supply the bindings you have defined in the "Controls" setup in *iRacing*.
@@ -385,12 +432,12 @@ First, you need to define, how to open and close the different Pitstop MFDs (aka
 
 If the opening of the Pitstop MFD for *iRacing* is requested without specifying which type of MFD is meant (for example by calling the controller action *openPitstopMFD* without specifying the optional argument for the *descriptor* parameter), the MFD for the fuel settings will be opened.
 	
-With the plugin parameter *pitstopCommands:* you can supply a list of the settings, you want to tweak from your hardware controller or the commands you want to trigger, when the "Pitstop" mode is active. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example tyre pressure and fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
+With the plugin parameter *pitstopCommands* you can supply a list of the settings, you want to tweak from your hardware controller, when the "Pitstop" mode is active. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example tyre pressure and fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
 
-	pitstopCommands: *settingOrCommand1* *function1* [*settingSteps1*],
-					 *settingOrCommand2* *function2* [*settingSteps2*], ...
+	pitstopCommands: *setting1* *settingsFunction1* [*settingSteps1*],
+					 *setting2* *settingsFunction2* [*settingSteps2*], ...
 					 
-See the following table for the supported settings and commands.
+See the following table for the supported settings:
 
 | Setting/Command | Description |
 | ------ | ------ |
@@ -402,6 +449,19 @@ See the following table for the supported settings and commands.
 | TyreRearLeft | Change the pressure for the rear left tyre. Supports the additional increments argument. |
 | TyreRearRight | Change the pressure for the rear right tyre. Supports the additional increments argument. |
 | RepairRequest | Toggles, whether repairs will be carried out during the next pitstop.  |
+
+Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) for more information.
+
+With the plugin parameter *assistantCommands* you can supply a list of the commands you want to trigger, when the "Assistant" mode is active. Only unary controller functions are allowed here.
+
+	assistantCommands: PitstopRecommend *function*, PitstopPlan *function*, PitstopPrepare *function*,
+					   Accept *acceptFunction*, Reject *rejectFunction*,
+					   InformationRequest *requestFunction* *command* [*arguments*], ...
+					 
+See the following table for the supported assistant commands.
+
+| Setting/Command | Description |
+| ------ | ------ |
 | InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your race assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
 | PitstopRecommend | Asks the virtual race strategist for a recommendation for the next pitstop. |
 | PitstopPlan | Requests a pitstop plan from the virtual race engineer. |
@@ -409,9 +469,9 @@ See the following table for the supported settings and commands.
 | Accept | Accepts the last recommendation by one of the virtual race assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
 | Reject | Cancels or rejects the last recommendation by one of the virtual race assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
 
-See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *PitstopPrepare*, *Accept* and *Reject*.
+See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *PitstopPrepare*, *Accept* and *Reject* and the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin above for more information on *PitstopRecommend*.
 
-Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) for more information.
+Note: For convinience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
 
 ## Plugin *RF2*
 
@@ -431,18 +491,34 @@ All this will be achieved using the following plugin arguments:
 	pitstopCommands: Refuel Dial.1 5, TyreAllAround Dial.2, PitstopPlan Button.1, PitstopPrepare Button.5,
 					 TyreCompound Button.2 Button.5, RepairRequest Button.3 Button.7, DriverSelect Button.4 Button.8
 
+### Mode *Assistant*
+
+This mode allows you to group all the available actions of the active race assistants into one layer of controls on your hardware controller. Although all these actions are also available as plugin actions of the "Race Engineer" and "Race Strategist" plugins, it may be more practicle to use the "Assistant" mode, when your set of available hardware controls is limited, since plugin actions always occupy a given control.
+
+![](*)
+
+The above will be achieved using the following plugin argument:
+
+	assistantCommands: InformationRequest Position Button.9, InformationRequest LapTimes Button.10,
+					   InformationRequest LapsRemaining Button.11, InformationRequest Weather Button.12,
+					   InformationRequest GapToFront Standings Button.13, InformationRequest GapToBehind Standings Button.14,
+					   PitstopRecommend Button.16,
+					   PitstopPlan Button.17, PitstopPrepare Button.18, Accept Button.19, Reject Button.20
+
+Note: You can use all these commands in the *pitstopCommands* list as well, which will generate one giant controller mode.
+
 ### Configuration
 
 First, you need to define, how to open and close the Pitstop MFD (aka HUD) in *rFactor 2*. Please supply the bindings you have defined in the controller setup in *rFactor 2*.
 
 	openPitstopMFD: *openHotkey*; closePitstopMFD: *closeHotkey*
 	
-With the plugin parameter *pitstopCommands:* you can supply a list of the settings, you want to tweak from your hardware controller or the commands you want to trigger, when the "Pitstop" mode is active. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example tyre pressure and fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
+With the plugin parameter *pitstopCommands* you can supply a list of the settings, you want to tweak from your hardware controller, when the "Pitstop" mode is active. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example tyre pressure and fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
 
-	pitstopCommands: *settingOrCommand1* *function1* [*settingSteps1*],
-					 *settingOrCommand2* *function2* [*settingSteps2*], ...
+	pitstopCommands: *setting1* *settingsFunction1* [*settingSteps1*],
+					 *setting2* *settingsFunction2* [*settingSteps2*], ...
 					 
-See the following table for the supported settings and commands.
+See the following table for the supported settings:
 
 | Setting/Command | Description |
 | ------ | ------ |
@@ -455,6 +531,19 @@ See the following table for the supported settings and commands.
 | TyreRearRight | Change the pressure for the rear right tyre. Supports the additional increments argument. |
 | DriverSelect | Selects the driver for the next stint in a multiplayer team race. |
 | RepairRequest | Cycles through the available repair options. |
+
+Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) for more information.
+
+With the plugin parameter *assistantCommands* you can supply a list of the commands you want to trigger, when the "Assistant" mode is active. Only unary controller functions are allowed here.
+
+	assistantCommands: PitstopRecommend *function*, PitstopPlan *function*, PitstopPrepare *function*,
+					   Accept *acceptFunction*, Reject *rejectFunction*,
+					   InformationRequest *requestFunction* *command* [*arguments*], ...
+					 
+See the following table for the supported assistant commands.
+
+| Setting/Command | Description |
+| ------ | ------ |
 | InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your race assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
 | PitstopRecommend | Asks the virtual race strategist for a recommendation for the next pitstop. |
 | PitstopPlan | Requests a pitstop plan from the virtual race engineer. |
@@ -462,9 +551,9 @@ See the following table for the supported settings and commands.
 | Accept | Accepts the last recommendation by one of the virtual race assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
 | Reject | Cancels or rejects the last recommendation by one of the virtual race assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
 
-See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *PitstopPrepare*, *Accept* and *Reject*.
+See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *PitstopPrepare*, *Accept* and *Reject* and the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin above for more information on *PitstopRecommend*.
 
-Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) for more information.
+Note: For convinience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
 
 ## Plugin *R3E*
 
@@ -482,6 +571,22 @@ All this will be achieved using the following plugin arguments:
 	pitstopCommands: Strategy Dial.1, Refuel Dial.2 5, TyreChange Button.1, BodyworkRepair Button.2, SuspensionRepair Button.3,
 					 PitstopPlan Button.7, PitstopPrepare Button.8
 
+### Mode *Assistant*
+
+This mode allows you to group all the available actions of the active race assistants into one layer of controls on your hardware controller. Although all these actions are also available as plugin actions of the "Race Engineer" and "Race Strategist" plugins, it may be more practicle to use the "Assistant" mode, when your set of available hardware controls is limited, since plugin actions always occupy a given control.
+
+![](*)
+
+The above will be achieved using the following plugin argument:
+
+	assistantCommands: InformationRequest Position Button.9, InformationRequest LapTimes Button.10,
+					   InformationRequest LapsRemaining Button.11, InformationRequest Weather Button.12,
+					   InformationRequest GapToFront Standings Button.13, InformationRequest GapToBehind Standings Button.14,
+					   PitstopRecommend Button.16,
+					   PitstopPlan Button.17, PitstopPrepare Button.18, Accept Button.19, Reject Button.20
+
+Note: You can use all these commands in the *pitstopCommands* list as well, which will generate one giant controller mode.
+
 ### Configuration
 
 First, you need to define, how to open and close the Pitstop MFD (aka Menu) in *RaceRoom Racing Experience*. Please supply the bindings you have defined in the controller setup in *RaceRoom Racing Experience*.
@@ -492,13 +597,13 @@ First, you need to define, how to open and close the Pitstop MFD (aka Menu) in *
 	acceptChoice: *acceptChoiceHotkey*
 	
 Use the *...Option* and *...Choice* parameters to specify the keys, that will be send to *RaceRoom Racing Experience* to control the Pitstop MFD. These parameters are defaulted to "W", "S", "A", "D" and "{Enter}", which are the default bindings of *RaceRoom Racing Experience*, so you won't have to supply them normally.
+	
+With the plugin parameter *pitstopCommands* you can supply a list of the settings, you want to tweak from your hardware controller, when the "Pitstop" mode is active. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example tyre pressure and fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
 
-With the plugin parameter *pitstopCommands:* you can supply a list of the settings, you want to tweak from your hardware controller or the commands you want to trigger, when the "Pitstop" mode is active. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
-
-	pitstopCommands: *settingOrCommand1* *function1* [*settingSteps1*],
-					 *settingOrCommand2* *function2* [*settingSteps2*], ...
+	pitstopCommands: *setting1* *settingsFunction1* [*settingSteps1*],
+					 *setting2* *settingsFunction2* [*settingSteps2*], ...
 					 
-See the following table for the supported settings and commands.
+See the following table for the supported settings:
 
 | Setting/Command | Description |
 | ------ | ------ |
@@ -507,6 +612,19 @@ See the following table for the supported settings and commands.
 | TyreChange | Toggles, whether you want to change the tyres at the next pitstop or not. |
 | SuspensionRepair | Toggles the repair of the suspension components. |
 | BodyworkRepair | Toggles the repair of all the bodywork and aerodynamic elements. |
+
+Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) for more information.
+
+With the plugin parameter *assistantCommands* you can supply a list of the commands you want to trigger, when the "Assistant" mode is active. Only unary controller functions are allowed here.
+
+	assistantCommands: PitstopRecommend *function*, PitstopPlan *function*, PitstopPrepare *function*,
+					   Accept *acceptFunction*, Reject *rejectFunction*,
+					   InformationRequest *requestFunction* *command* [*arguments*], ...
+					 
+See the following table for the supported assistant commands.
+
+| Setting/Command | Description |
+| ------ | ------ |
 | InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your race assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
 | PitstopRecommend | Asks the virtual race strategist for a recommendation for the next pitstop. |
 | PitstopPlan | Requests a pitstop plan from the virtual race engineer. |
@@ -514,9 +632,9 @@ See the following table for the supported settings and commands.
 | Accept | Accepts the last recommendation by one of the virtual race assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
 | Reject | Cancels or rejects the last recommendation by one of the virtual race assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
 
-See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *PitstopPrepare*, *Accept* and *Reject*.
+See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *PitstopPrepare*, *Accept* and *Reject* and the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin above for more information on *PitstopRecommend*.
 
-Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) for more information.
+Note: For convinience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
 
 ### Important preparation for the Pitstop MFD handling
 
@@ -547,6 +665,22 @@ All this will be achieved using the following plugin arguments:
 	openPitstopMFD: I; previousOption: Z; nextOption: H; previousChoice: G; nextChoice: J;
 	pitstopCommands: Refuel Dial.2 5, TyreChange Button.1, BodyworkRepair Button.2, SuspensionRepair Button.3
 
+### Mode *Assistant*
+
+This mode allows you to group all the available actions of the active race assistants into one layer of controls on your hardware controller. Although all these actions are also available as plugin actions of the "Race Engineer" and "Race Strategist" plugins, it may be more practicle to use the "Assistant" mode, when your set of available hardware controls is limited, since plugin actions always occupy a given control.
+
+![](*)
+
+The above will be achieved using the following plugin argument:
+
+	assistantCommands: InformationRequest Position Button.9, InformationRequest LapTimes Button.10,
+					   InformationRequest LapsRemaining Button.11, InformationRequest Weather Button.12,
+					   InformationRequest GapToFront Standings Button.13, InformationRequest GapToBehind Standings Button.14,
+					   PitstopRecommend Button.16,
+					   PitstopPlan Button.17, PitstopPrepare Button.18, Accept Button.19, Reject Button.20
+
+Note: You can use all these commands in the *pitstopCommands* list as well, which will generate one giant controller mode.
+
 ### Configuration
 
 First, you need to define, how to open the Pitstop MFD (a part of the In Car Menu, aka ICM) in *Automobilista 2*. "I" is the default value for *openPitstopMFD*, which is **not** the standard binding of *Automobilista 2*. You need to change these bindings in *Automobilista 2*, since the standard bindings are controller buttons, for which unfortunately no events can be generated by software.
@@ -556,13 +690,13 @@ First, you need to define, how to open the Pitstop MFD (a part of the In Car Men
 	previousChoice: *previousChoiceHotkey*; nextChoice: *nextChoiceHotkey*
 	
 Use the *...Option* and *...Choice* parameters to specify the keys, that will be send to *Automobilista 2* to control the Pitstop MFD. These parameters are defaulted to "Z", "H", "G" and "J", which are **not** the default bindings of *Automobilista 2* (see above).
+	
+With the plugin parameter *pitstopCommands* you can supply a list of the settings, you want to tweak from your hardware controller, when the "Pitstop" mode is active. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example tyre pressure and fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
 
-With the plugin parameter *pitstopCommands:* you can supply a list of the settings, you want to tweak from your hardware controller or the commands you want to trigger, when the "Pitstop" mode is active. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
-
-	pitstopCommands: *settingOrCommand1* *function1* [*settingSteps1*],
-					 *settingOrCommand2* *function2* [*settingSteps2*], ...
+	pitstopCommands: *setting1* *settingsFunction1* [*settingSteps1*],
+					 *setting2* *settingsFunction2* [*settingSteps2*], ...
 					 
-See the following table for the supported settings and commands.
+See the following table for the supported settings:
 
 | Setting/Command | Description |
 | ------ | ------ |
@@ -570,6 +704,19 @@ See the following table for the supported settings and commands.
 | TyreChange | Chooses between "Dry" and "Wet" tyres for the next pitstop or no tyre change at all. Currently, only vehicles with one dry tyre compound and one wet tyre compound are supported. |
 | SuspensionRepair | Toggles the repair of the suspension components. |
 | BodyworkRepair | Toggles the repair of all the bodywork and aerodynamic elements. |
+
+Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) for more information.
+
+With the plugin parameter *assistantCommands* you can supply a list of the commands you want to trigger, when the "Assistant" mode is active. Only unary controller functions are allowed here.
+
+	assistantCommands: PitstopRecommend *function*, PitstopPlan *function*, PitstopPrepare *function*,
+					   Accept *acceptFunction*, Reject *rejectFunction*,
+					   InformationRequest *requestFunction* *command* [*arguments*], ...
+					 
+See the following table for the supported assistant commands.
+
+| Setting/Command | Description |
+| ------ | ------ |
 | InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your race assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
 | PitstopRecommend | Asks the virtual race strategist for a recommendation for the next pitstop. |
 | PitstopPlan | Requests a pitstop plan from the virtual race engineer. |
@@ -577,9 +724,9 @@ See the following table for the supported settings and commands.
 | Accept | Accepts the last recommendation by one of the virtual race assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
 | Reject | Cancels or rejects the last recommendation by one of the virtual race assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
 
-See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *PitstopPrepare*, *Accept* and *Reject*.
+See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *PitstopPrepare*, *Accept* and *Reject* and the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin above for more information on *PitstopRecommend*.
 
-Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) for more information.
+Note: For convinience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
 
 ### Special requirements when using the Pitstop automation
 

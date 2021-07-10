@@ -305,7 +305,7 @@ class RaceEngineerPlugin extends ControllerPlugin  {
 			if (action = "InformationRequest") {
 				action := values2String("", arguments*)
 				
-				this.registerAction(new this.RaceEngineerAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Activate"), action), action, arguments*))
+				this.registerAction(new this.RaceEngineerAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Activate"), action), "InformationRequest", arguments*))
 			}
 			else if inList(["PitstopPlan", "PitstopPrepare", "Accept", "Reject"], action)
 				this.registerAction(new this.RaceEngineerAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Activate"), action), action))

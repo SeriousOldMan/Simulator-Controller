@@ -1,4 +1,4 @@
-[Race Settings]
+[Session Settings]
 Damage.Bodywork.Repair=Threshold
 Damage.Bodywork.Repair.Threshold=20.0
 Damage.Suspension.Repair=Always
@@ -24,7 +24,7 @@ Tyre.Wet.Pressure.Target.FL=30.0
 Tyre.Wet.Pressure.Target.FR=30.0
 Tyre.Wet.Pressure.Target.RL=30.0
 Tyre.Wet.Pressure.Target.RR=30.0
-[Race Setup]
+[Session Setup]
 Tyre.Compound=Dry
 Tyre.Dry.Pressure.FL=26.1
 Tyre.Dry.Pressure.FR=26.1

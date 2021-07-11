@@ -1,8 +1,8 @@
 [Development]
 Version=3.2.2-dev
 Target=3.2.2-release
-Date=07/10/2021
-Changes=More information supplied by Jona, New plugin arguments for Race Strategist plugin, Accept & Reject plugin commands now works always for the currently focused voice assistant, New information actions for "Race Engineer" plugin, New information actions for "Race Strategist" plugin, Use the information actions on all "Pitstop" modes, New "Assistant" mode for all simulator plugins
+Date=07/11/2021
+Changes=More information supplied by Jona, New plugin arguments for Race Strategist plugin, Accept & Reject plugin commands now works always for the currently focused voice assistant, New information actions for "Race Engineer" plugin, New information actions for "Race Strategist" plugin, Use the information actions on all "Pitstop" modes, New "Assistant" mode for all simulator plugins, Refactoring of assistant plugins and introduction of *RaceAssistantPlugin* base class
 [Release]
 Version=3.2.0-release
 Date=07/09/2021

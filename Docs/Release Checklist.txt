@@ -22,6 +22,8 @@ Release 3.2.2 Checklist
    a. Phrase Grammars
    b. Plugin Labels
    c. Translations
+   d. "raceAssistant..." renaming
+   e. Reemove unused Plugin Label keys
 2. SimulatorPlugin => RaceEngineerAction => RaceAssistantAction, RaceEngineerSimulatorPlugin => RaceAssistantSimulatorPlugin, ...
    a. Class Reference.md
    b. Update Notes
@@ -30,6 +32,15 @@ Release 3.2.2 Checklist
    b. Class Reference.md
    c. Update Notes
    d. Sidebar.md
+4. Renamed all "raceEngineer..." and "raceStrategist..." parameters to "raceAssistant..."
+   a. Update procedure
+   b. Update notes
+   c. Plugins & Modes.md
+   d. Plugin Labels
+5. Renamed "openRaceSettings", "importSetup", "openSetupDatabase"
+   a. Update procedure
+   b. Update notes
+   c. Plugins & Modes.md
 
 Release 3.2.0 Checklist
 =======================

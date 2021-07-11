@@ -301,11 +301,6 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		}
 		
 		controller.registerPlugin(this)
-		
-		if (this.RaceAssistantName)
-			SetTimer collectRaceAssistantSessionData, 10000
-		else
-			SetTimer updateRaceAssistantSessionState, 5000
 	}
 	
 	createRaceAssistantAction(controller, action, actionFunction, arguments*) {

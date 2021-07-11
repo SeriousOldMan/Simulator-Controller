@@ -798,6 +798,7 @@ updatePluginsForV322() {
 		engineerDescriptor := getConfigurationValue(userConfiguration, "Plugins", "Race Engineer", false)
 		
 		if engineerDescriptor {
+			engineerDescriptor := StrReplace(engineerDescriptor, "raceEngineerCommands", "commands")
 			engineerDescriptor := StrReplace(engineerDescriptor, "raceEngineerOpenSettings", "openRaceSettings")
 			engineerDescriptor := StrReplace(engineerDescriptor, "raceEngineerOpenSetups", "openSetupDatabase")
 			engineerDescriptor := StrReplace(engineerDescriptor, "raceEngineerImportSetup", "importSetup")
@@ -810,6 +811,7 @@ updatePluginsForV322() {
 		
 		if strategistDescriptor {
 			strategistDescriptor := StrReplace(strategistDescriptor, "Cato", "Khato")
+			strategistDescriptor := StrReplace(strategistDescriptor, "raceStrategistCommands", "commands")
 			strategistDescriptor := StrReplace(strategistDescriptor, "raceStrategistOpenSettings", "openRaceSettings")
 			strategistDescriptor := StrReplace(strategistDescriptor, "raceStrategistOpenSetups", "openSetupDatabase")
 			strategistDescriptor := StrReplace(strategistDescriptor, "raceStrategistImportSetup", "importSetup")

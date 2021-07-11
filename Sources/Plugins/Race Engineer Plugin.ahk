@@ -80,7 +80,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 				this.logFunctionNotFound(actionFunction)
 		}
 		else
-			return base.createRaceStrategistAction(controller, action, actionFunction, arguments*)
+			return base.createRaceAssistantAction(controller, action, actionFunction, arguments*)
 	}
 	
 	createRaceAssistant(pid) {

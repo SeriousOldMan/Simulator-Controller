@@ -29,6 +29,11 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	
 	iSimulator := false
 	
+	iLastLap := 0
+	iLastLapCounter := 0
+	iInPit := false
+	iFinished := false
+	
 	class RemoteRaceAssistant {
 		iRemotePID := false
 		
@@ -592,10 +597,6 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 	
 	collectSessionData() {
-		static lastLap := 0
-		static lastLapCounter := 0
-		static inPit := false
-		
 		if this.Simulator {
 			code := this.Simulator.Code
 			
@@ -627,11 +628,12 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				
 				if (sessionState == kSessionPaused)
 					return
-				else if (sessionState < kSessionRace) {
-					; Not in a race
+				else if (this.iFinished || (sessionState < (isInstance(this, RaceEngineerPlugin) ? kSessionPractice : kSessionRace))) {
+					; Not in a supported session
 				
-					lastLap := 0
-					inPit := false
+					this.iLastLap := 0
+					this.iFinished := false
+					this.iInPit := false
 			
 					if this.RaceAssistant
 						this.finishSession()
@@ -639,11 +641,12 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					return
 				}
 				
-				if ((dataLastLap <= 1) && (dataLastLap < lastLap)) {
+				if ((dataLastLap <= 1) && (dataLastLap < this.iLastLap)) {
 					; Start of new race without finishing previous race first
 				
-					lastLap := 0
-					inPit := false
+					this.iLastLap := 0
+					this.iFinished := false
+					this.iInPit := false
 			
 					if this.RaceAssistant
 						this.finishSession()
@@ -653,32 +656,37 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					if getConfigurationValue(data, "Stint Data", "InPit", false) {
 						; Car is in the Pit
 						
-						if !inPit {
+						if !this.iInPit {
 							this.performPitstop(dataLastLap)
 						
-							inPit := true
+							this.iInPit := true
 						}
 					}
 					else if (dataLastLap > 0) {
 						; Car is on the track
 					
-						if ((dataLastLap > 1) && (lastLap == 0))
+						if ((dataLastLap > 1) && (this.iLastLap == 0))
 							return
 						
-						firstLap := (lastLap == 0)
-						newLap := (dataLastLap > lastLap)
+						firstLap := (this.iLastLap == 0)
+						newLap := (dataLastLap > this.iLastLap)
 					
-						inPit := false
+						this.iInPit := false
 						
 						if newLap {
-							lastLap := dataLastLap
-							lastLapCounter := 0
+							this.iLastLap := dataLastLap
+							this.iLastLapCounter := 0
+							
+							if !firstLap
+								this.iFinished := (getConfigurationValue(data, "Session Data", "SessionTimeRemaining", 0) == 0)
 						}
-						
+							
 						if isInstance(this, RaceStrategistPlugin)
 							this.updateStandingsData(data)
 						
-						newDataFile := kTempDirectory . code . " Data\" . this.Plugin . " Lap " . lastLap . "." . ++lastLapCounter . ".data"
+						this.iLastLapCounter := this.iLastLapCounter + 1
+						
+						newDataFile := kTempDirectory . code . " Data\" . this.Plugin . " Lap " . this.iLastLap . "." . this.iLastLapCounter . ".data"
 							
 						writeConfiguration(newDataFile, data)
 						
@@ -695,8 +703,9 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					}
 				}
 				else {
-					lastLap := 0
-					inPit := false
+					this.iLastLap := 0
+					this.iFinished := false
+					this.iInPit := false
 				}
 			}
 			finally {
@@ -712,8 +721,9 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					Sleep 500
 				}
 			
-			lastLap := 0
-			inPit := false
+			this.iLastLap := 0
+			this.iFinished := false
+			this.iInPit := false
 		
 			if this.RaceAssistant
 				this.finishSession()

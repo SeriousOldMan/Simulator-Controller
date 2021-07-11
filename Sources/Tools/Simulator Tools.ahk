@@ -790,6 +790,38 @@ updateConfigurationForV20() {
 	updateCustomCalls(13, 32)
 }
 
+updatePluginsForV322() {
+	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	userConfiguration := readConfiguration(userConfigurationFile)
+	
+	if (userConfiguration.Count() > 0) {
+		engineerDescriptor := getConfigurationValue(userConfiguration, "Plugins", "Race Engineer", false)
+		
+		if engineerDescriptor {
+			engineerDescriptor := StrReplace(engineerDescriptor, "raceEngineerOpenSettings", "openRaceSettings")
+			engineerDescriptor := StrReplace(engineerDescriptor, "raceEngineerOpenSetups", "openSetupDatabase")
+			engineerDescriptor := StrReplace(engineerDescriptor, "raceEngineerImportSetup", "importSetup")
+			engineerDescriptor := StrReplace(engineerDescriptor, "raceEngineer", "raceAssistant")
+			
+			setConfigurationValue(userConfiguration, "Plugins", "Race Engineer", engineerDescriptor)
+		}
+		
+		strategistDescriptor := getConfigurationValue(userConfiguration, "Plugins", "Race Strategist", false)
+		
+		if strategistDescriptor {
+			strategistDescriptor := StrReplace(strategistDescriptor, "Cato", "Khato")
+			strategistDescriptor := StrReplace(strategistDescriptor, "raceStrategistOpenSettings", "openRaceSettings")
+			strategistDescriptor := StrReplace(strategistDescriptor, "raceStrategistOpenSetups", "openSetupDatabase")
+			strategistDescriptor := StrReplace(strategistDescriptor, "raceStrategistImportSetup", "importSetup")
+			strategistDescriptor := StrReplace(strategistDescriptor, "raceStrategist", "raceAssistant")
+			
+			setConfigurationValue(userConfiguration, "Plugins", "Race Strategist", strategistDescriptor)
+		}
+			
+		writeConfiguration(userConfigurationFile, userConfiguration)
+	}
+}
+
 updatePluginsForV316() {
 	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
 	userConfiguration := readConfiguration(userConfigurationFile)

@@ -431,8 +431,6 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				exePath := kBinariesDirectory . this.Plugin . ".exe" . options
 				
 				Run %exePath%, %kBinariesDirectory%, , raceAssistantPID
-				
-				Sleep 1000
 			}
 			catch exception {
 				logMessage(kLogCritical, translate("Cannot start " . this.Plugin . " (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))

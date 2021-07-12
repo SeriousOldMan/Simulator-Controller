@@ -337,7 +337,7 @@ class VoiceServer extends ConfigurationItem {
 				raiseEvent(kFileMessage, "Voice", this.DeactivationCallback, this.PID)
 		}
 	
-		recognizeVoiceCommand(grammer, words*) {
+		recognizeVoiceCommand(grammar, words*) {
 			if this.VoiceCommands.HasKey(grammar)
 				this.VoiceServer.recognizeVoiceCommand(this, grammar, words)
 		}
@@ -701,7 +701,7 @@ class VoiceServer extends ConfigurationItem {
 		this.getVoiceClient(descriptor).registerVoiceCommand(grammar, command, callback)
 	}
 	
-	recognizeCommand(grammer, words*) {
+	recognizeCommand(grammar, words*) {
 		if this.ActiveVoiceClient
 			this.ActiveVoiceClient.recognizeVoiceCommand(grammar, words)
 	}

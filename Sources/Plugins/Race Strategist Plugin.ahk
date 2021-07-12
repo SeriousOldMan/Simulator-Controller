@@ -25,6 +25,10 @@ global kRaceStrategistPlugin = "Race Strategist"
 
 class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	class RemoteRaceStrategist extends RaceAssistantPlugin.RemoteRaceAssistant {
+		__New(remotePID) {
+			base.__New("Strategist", remotePID)
+		}
+		
 		recommendPitstop(arguments*) {
 			this.callRemote("recommendPitstop", arguments*)
 		}
@@ -61,7 +65,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			function := controller.findFunction(actionFunction)
 			
 			if (function != false)
-				this.registerAction(new this.RaceStrategistAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Activate"), action), action))
+				this.registerAction(new this.RaceStrategistAction(this, function, this.getLabel(ConfigurationItem.descriptor(action, "Activate"), action), action))
 			else
 				this.logFunctionNotFound(actionFunction)
 		}

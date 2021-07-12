@@ -26,7 +26,11 @@ global kRaceEngineerPlugin = "Race Engineer"
 class RaceEngineerPlugin extends RaceAssistantPlugin  {
 	iPitstopPending := false
 	
-	class RemoteRaceStrategist extends RaceAssistantPlugin.RemoteRaceAssistant {
+	class RemoteRaceEngineer extends RaceAssistantPlugin.RemoteRaceAssistant {
+		__New(remotePID) {
+			base.__New("Engineer", remotePID)
+		}
+		
 		planPitstop(arguments*) {
 			this.callRemote("planPitstop", arguments*)
 		}
@@ -74,8 +78,11 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		if inList(["PitstopPlan", "PitstopPrepare"], action) {
 			function := controller.findFunction(actionFunction)
 			
-			if (function != false)
-				this.registerAction(new this.RaceEngineerAction(function, this.getLabel(ConfigurationItem.descriptor(action, "Activate"), action), action))
+			if (function != false) {
+				action := new this.RaceEngineerAction(this, function, this.getLabel(ConfigurationItem.descriptor(action, "Activate"), action), action)
+				
+				this.registerAction(action)
+			}
 			else
 				this.logFunctionNotFound(actionFunction)
 		}

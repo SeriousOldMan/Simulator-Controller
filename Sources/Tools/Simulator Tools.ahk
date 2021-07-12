@@ -540,13 +540,19 @@ updatePluginLabels() {
 					changed := true
 				}
 		
-		for section, keyValues in userPluginLabels
+		for section, keyValues in userPluginLabels {
+			keys := []
+		
 			for key, value in keyValues
 				if (getConfigurationValue(bundledPluginLabels, section, key, kUndefined) == kUndefined) {
-					removeConfigurationValue(userPluginLabels, section, key)
+					keys.Push(key)
 					
 					changed := true
 				}
+				
+			for ignore, key in keys
+				removeConfigurationValue(userPluginLabels, section, key)
+		}
 		
 		if changed
 			writeConfiguration(userPluginLabelsFile, userPluginLabels)
@@ -798,10 +804,10 @@ updatePluginsForV322() {
 		engineerDescriptor := getConfigurationValue(userConfiguration, "Plugins", "Race Engineer", false)
 		
 		if engineerDescriptor {
-			engineerDescriptor := StrReplace(engineerDescriptor, "raceEngineerCommands", "commands")
+			engineerDescriptor := StrReplace(engineerDescriptor, "raceEngineerCommands", "assistantCommands")
 			engineerDescriptor := StrReplace(engineerDescriptor, "raceEngineerOpenSettings", "openRaceSettings")
 			engineerDescriptor := StrReplace(engineerDescriptor, "raceEngineerOpenSetups", "openSetupDatabase")
-			engineerDescriptor := StrReplace(engineerDescriptor, "raceEngineerImportSetup", "importSetup")
+			engineerDescriptor := StrReplace(engineerDescriptor, "raceEngineerImportSettings", "importSetup")
 			engineerDescriptor := StrReplace(engineerDescriptor, "raceEngineer", "raceAssistant")
 			
 			setConfigurationValue(userConfiguration, "Plugins", "Race Engineer", engineerDescriptor)
@@ -811,10 +817,10 @@ updatePluginsForV322() {
 		
 		if strategistDescriptor {
 			strategistDescriptor := StrReplace(strategistDescriptor, "Cato", "Khato")
-			strategistDescriptor := StrReplace(strategistDescriptor, "raceStrategistCommands", "commands")
+			strategistDescriptor := StrReplace(strategistDescriptor, "raceStrategistCommands", "assistantCommands")
 			strategistDescriptor := StrReplace(strategistDescriptor, "raceStrategistOpenSettings", "openRaceSettings")
 			strategistDescriptor := StrReplace(strategistDescriptor, "raceStrategistOpenSetups", "openSetupDatabase")
-			strategistDescriptor := StrReplace(strategistDescriptor, "raceStrategistImportSetup", "importSetup")
+			strategistDescriptor := StrReplace(strategistDescriptor, "raceStrategistImportSettings", "importSetup")
 			strategistDescriptor := StrReplace(strategistDescriptor, "raceStrategist", "raceAssistant")
 			
 			setConfigurationValue(userConfiguration, "Plugins", "Race Strategist", strategistDescriptor)

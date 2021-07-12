@@ -35,6 +35,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	iFinished := false
 	
 	class RemoteRaceAssistant {
+		iRemoteEvent := false
 		iRemotePID := false
 		
 		RemotePID[] {
@@ -43,12 +44,13 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			}
 		}
 		
-		__New(remotePID) {
+		__New(remoteEvent, remotePID) {
+			this.iRemoteEvent := remoteEvent
 			this.iRemotePID := remotePID
 		}
 		
 		callRemote(function, arguments*) {
-			raiseEvent(kFileMessage, "Assistant", function . ":" . values2String(";", arguments*), this.RemotePID)
+			raiseEvent(kFileMessage, this.iRemoteEvent, function . ":" . values2String(";", arguments*), this.RemotePID)
 		}
 		
 		shutdown(arguments*) {
@@ -291,7 +293,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		if openSetupDatabase
 			this.createRaceAssistantAction(controller, "SetupDatabaseOpen", openSetupDatabase)
 		
-		for ignore, theAction in string2Values(",", this.getArgumentValue("commands", ""))
+		for ignore, theAction in string2Values(",", this.getArgumentValue("assistantCommands", ""))
 			this.createRaceAssistantAction(controller, string2Values(A_Space, theAction)*)
 		
 		assistantSpeaker := this.getArgumentValue("raceAssistantSpeaker", false)
@@ -352,7 +354,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				if !this.RaceAssistantName
 					theAction.Function.disable(kAllTrigger, theAction)
 			}
-			else if isInstance(theAction, RaceAssistantPlugin.RaceSettingsAction)
+			else if isInstance(theAction, RaceAssistantPlugin.RaceSettingsAction) {
 				if ((theAction.Action = "RaceSettingsOpen") || (theAction.Action = "SetupDatabaseOpen")) {
 					theAction.Function.enable(kAllTrigger, theAction)
 					theAction.Function.setText(theAction.Label)
@@ -367,7 +369,9 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 						theAction.Function.setText(theAction.Label, "Gray")
 					}
 				}
-				else if ((sessionState == kSessionRace) && (this.RaceAssistant != false)) {
+			}
+			else if isInstance(theAction, RaceAssistantPlugin.RaceAssistantAction)
+				if (((sessionState == kSessionRace) || (theAction.Action = "InformationRequest")) && (this.RaceAssistant != false)) {
 					theAction.Function.enable(kAllTrigger, theAction)
 					theAction.Function.setText(theAction.Label)
 				}
@@ -428,7 +432,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				
 				Run %exePath%, %kBinariesDirectory%, , raceAssistantPID
 				
-				Sleep 5000
+				Sleep 1000
 			}
 			catch exception {
 				logMessage(kLogCritical, translate("Cannot start " . this.Plugin . " (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
@@ -439,7 +443,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				return false
 			}
 			
-			this.iRaceAssistant := this.createRaceAssistant(pid)
+			this.iRaceAssistant := this.createRaceAssistant(raceAssistantPID)
 		}
 	}
 	
@@ -797,8 +801,12 @@ getDataSessionState(data) {
 getSimulatorOptions(plugin := false) {
 	controller := SimulatorController.Instance
 	
-	if !plugin
-		plugin := (controller.findPlugin(kRaceEngineerPlugin) || controller.findPlugin(kRaceStrategistPlugin))
+	if !plugin {
+		plugin := controller.findPlugin(kRaceEngineerPlugin)
+		
+		if !plugin
+			plugin := controller.findPlugin(kRaceStrategistPlugin)
+	}
 	
 	options := ""
 	
@@ -828,8 +836,12 @@ openRaceSettings(import := false, silent := false, plugin := false, fileName := 
 	exePath := kBinariesDirectory . "Race Settings.exe"
 	controller := SimulatorController.Instance
 	
-	if !plugin
-		plugin := (controller.findPlugin(kRaceEngineerPlugin) || controller.findPlugin(kRaceStrategistPlugin))
+	if !plugin {
+		plugin := controller.findPlugin(kRaceEngineerPlugin)
+		
+		if !plugin
+			plugin := controller.findPlugin(kRaceStrategistPlugin)
+	}
 	
 	if !fileName
 		fileName := kUserConfigDirectory . "Race.settings"
@@ -870,8 +882,12 @@ openSetupDatabase(plugin := false) {
 	exePath := kBinariesDirectory . "Setup Database.exe"	
 	controller := SimulatorController.Instance
 	
-	if !plugin
-		plugin := (controller.findPlugin(kRaceEngineerPlugin) || controller.findPlugin(kRaceStrategistPlugin))
+	if !plugin {
+		plugin := controller.findPlugin(kRaceEngineerPlugin)
+		
+		if !plugin
+			plugin := controller.findPlugin(kRaceStrategistPlugin)
+	}
 	
 	try {
 		options := getSimulatorOptions(plugin)

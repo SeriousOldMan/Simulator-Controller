@@ -153,7 +153,7 @@ priority: -5, [?Sector] => (Clear: Sector)
 updatePositions(?lap) <= updateStandingsPositions(?lap, !Car.Count), updateTrackPositions(?lap, !Car.Count),									\
 						 updateTrackFront(?lap), updateTrackBehind(?lap)
 
-updateStandingsPositions(?lap, ?car) <= =<(?car, 0), !
+updateStandingsPositions(?, ?car) <= =<(?car, 0), !
 updateStandingsPositions(?lap, !Driver.Car) <= carPosition(!Driver.Car, ?position), Set(Position, ?position),									\
 											   carLaps(!Driver.Car, FULL, ?laps), Set(Standings.Lap, ?lap, Position, ?position),				\
 											   Set(Standings.Lap, ?lap, Car, !Driver.Car, Delta, 0),											\
@@ -273,7 +273,7 @@ extrapolateLap(?lap, ?futureLap, ?pitDelta) <=																									\
 		
 extrapolateLaps(?lap, ?lapDelta) <= =<(?lapDelta, 0), !
 extrapolateLaps(?lap, ?lapDelta) <= ?futureLap = ?lap + ?lapDelta, extrapolateLap(?lap, ?futureLap),											\
-									?nLapDelta = ?lapDelta - 1, extrapolateLaps(?lap, ?nLapDelta)
+									?nextLapDelta = ?lapDelta - 1, extrapolateLaps(?lap, ?nextLapDelta)
 
 priority: -20, [?Lap] => (Prove: clearExtrapolatedLap, ?Lap, !Car.Count)
 
@@ -292,7 +292,7 @@ priority: -20, {All: [?Lap], [?Session.Settings.Standings.Extrapolation.Laps]} =
 extrapolatePositions(?, ?lapDelta) <= =<(?lapDelta, 0), !
 extrapolatePositions(?lap, ?lapDelta) <= carAvgLapTime(?lap, !Driver.Car, ?avgLapTime), ?futureTime = ?lapDelta * ?avgLapTime,					\
 										 ?futureLap = ?lap + ?lapDelta, extrapolatePositions(?lap, !Car.Count, ?futureLap, ?futureTime, 0),		\
-										 ?nextDelta = ?lapDelta - 1, extrapolatePositions(?lap, ?nextDelta)
+										 ?nextLapDelta = ?lapDelta - 1, extrapolatePositions(?lap, ?nextLapDelta)
 
 extrapolatePositions(?, ?car, ?, ?, ?) <= =<(?car, 0), !
 extrapolatePositions(?, ?, ?, 0, ?) <= !
@@ -313,7 +313,7 @@ extrapolatePosition(?lap, ?car, ?futureLap, ?deltaTime, ?deltaPitTime) <=							
 correctPositions(?, ?, ?lapDelta) <= =<(?lapDelta, 0), !
 correctPositions(?lap, ?overtakeDelta, ?lapDelta) <= ?futureLap = ?lap + ?lapDelta,																\
 													 correctPositions(?lap, !Car.Count, ?overtakeDelta, ?futureLap),							\
-													 ?nextDelta = ?lapDelta - 1, correctPositions(?lap, ?overtakeDelta, ?nextDelta)
+													 ?nextLapDelta = ?lapDelta - 1, correctPositions(?lap, ?overtakeDelta, ?nextLapDelta)
 
 correctPositions(?, ?car, ?, ?) <= =<(?car, 0), !
 correctPositions(?lap, ?car, ?overtakeDelta, ?futureLap) <= Get(Standings.Lap, ?lap, Car, ?car, Position, ?currentPosition),					\
@@ -349,7 +349,7 @@ carWeightedLapTime(?referenceLap, ?car, ?lap, ?time) <=																							\
 
 carLapTime(?lap, ?, 0) <= =<(?lap, 0), !
 carLapTime(?lap, ?car, ?lapTime) <= Get(Standings.Lap, ?lap, Car, ?car, Time, ?lapTime), !
-carLapTime(?lap, ?car, ?lapTime) <= ?pLap = ?lap - 1, carLapTime(?pLap, ?car, ?lapTime)
+carLapTime(?lap, ?car, ?lapTime) <= ?previousLap = ?lap - 1, carLapTime(?previousLap, ?car, ?lapTime)
 
 carLapAvgTime(?lap, !Driver.Car, ?lapTimes, ?avgTime) <= !, lapAvgTime(?lap, ?lapTimes, ?avgTime)
 carLapAvgTime(?lap, ?, [], 0) <= !

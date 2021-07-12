@@ -293,6 +293,8 @@ class VoiceAssistant {
 				
 			raiseEvent(kFileMessage, "Voice", "unregisterVoiceClient:" . values2String(";", this.Name, processID), this.VoiceServer)
 		}
+		
+		return false
 	}
 	
 	initialize(options) {

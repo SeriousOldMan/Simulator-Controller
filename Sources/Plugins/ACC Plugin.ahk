@@ -175,7 +175,9 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			try {
 				Run %ComSpec% /c ""%exePath%" "%kTempDirectory%ACCUDP.cmd" "%kTempDirectory%ACCUDP.out"" , , Hide, pid
 				
-				this.iUDPClient := pid
+				this.iUDPClient := ObjBindMethod(this, "shutdownUDPClient")
+				
+				OnExit(this.iUDPClient)
 			}
 			catch exception {
 				logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Reader ("), {simulator: "ACC", protocol: "UDP"})
@@ -193,8 +195,12 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		if this.UDPClient {
 			FileAppend Exit, %kTempDirectory%ACCUDP.cmd
 			
+			OnExit(this.iUDPClient, 0)
+			
 			this.iUDPClient := false
 		}
+		
+		return false
 	}
 	
 	requireUDPClient() {

@@ -178,9 +178,19 @@ class VoiceServer extends ConfigurationItem {
 			}
 		}
 		
-		VoiceCommands[] {
+		VoiceCommands[key := "__Undefined__"] {
 			Get {
-				return this.iVoiceCommands
+				if (key != kUndefined)
+					return this.iVoiceCommands[key]
+				else
+					return this.iVoiceCommands
+			}
+		
+			Set {
+				if (key != kUndefined)
+					return this.iVoiceCommands[key] := value
+				else
+					return this.iVoiceCommands := value
 			}
 		}
 	
@@ -297,7 +307,7 @@ class VoiceServer extends ConfigurationItem {
 					
 				grammar := ("__Grammar." . this.iCounter++)
 			}
-			else if this.iVoiceCommands.HasKey(grammar) {
+			else if this.VoiceCommands.HasKey(grammar) {
 				descriptor := this.VoiceCommands[grammar]
 				
 				if ((descriptor[1] = command) && (descriptor[2] = callback))
@@ -337,7 +347,7 @@ class VoiceServer extends ConfigurationItem {
 				raiseEvent(kFileMessage, "Voice", this.DeactivationCallback, this.PID)
 		}
 	
-		recognizeVoiceCommand(grammar, words*) {
+		recognizeVoiceCommand(grammar, words) {
 			if this.VoiceCommands.HasKey(grammar)
 				this.VoiceServer.recognizeVoiceCommand(this, grammar, words)
 		}

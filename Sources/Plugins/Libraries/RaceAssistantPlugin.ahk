@@ -666,8 +666,14 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 							this.iInPit := true
 						}
 					}
-					else if (dataLastLap > 0) {
+					else if (dataLastLap == 0) {
 						; Car is on the track
+					
+						if !this.RaceAssistant
+							this.startupRaceAssistant()
+					}
+					else if (dataLastLap > 0) {
+						; Car has finished the first lap
 					
 						if ((dataLastLap > 1) && (this.iLastLap == 0))
 							return

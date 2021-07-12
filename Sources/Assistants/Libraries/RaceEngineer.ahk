@@ -888,7 +888,7 @@ class RaceEngineer extends RaceAssistant {
 			
 			if ErrorLevel {
 				strategistPlugin := new Plugin("Race Strategist", kSimulatorConfiguration)
-				strategistName := strategistPlugin.getArgumentValue("raceStrategistName", false)
+				strategistName := strategistPlugin.getArgumentValue("raceAssistantName", false)
 				
 				if strategistName {
 					speaker.speakPhrase("GreetingStrategist", {strategist: strategistName})

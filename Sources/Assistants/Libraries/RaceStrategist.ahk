@@ -581,7 +581,9 @@ class RaceStrategist extends RaceAssistant {
 		if this.Speaker {
 			Process Exist, Race Engineer.exe
 			
-			this.getSpeaker().speakPhrase(ErrorLevel ? "" : "Greeting")
+			exists := ErrorLevel
+			
+			this.getSpeaker().speakPhrase(exists ? "" : "Greeting")
 		}
 		
 		if this.Debug[kDebugKnowledgeBase]

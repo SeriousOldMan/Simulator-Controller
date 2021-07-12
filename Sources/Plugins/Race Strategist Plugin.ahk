@@ -87,7 +87,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			return false
 	}
 	
-	recommendPitstop(lapNumber) {
+	recommendPitstop(lapNumber := false) {
 		if this.RaceStrategist
 			this.RaceStrategist.recommendPitstop(lapNumber)
 	}

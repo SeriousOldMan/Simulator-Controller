@@ -352,6 +352,11 @@ class SimulatorPlugin extends ControllerPlugin {
 		
 		if (mode && inList(this.Controller.ActiveModes, mode))
 			mode.updateActions(sessionState)
+		
+		mode := this.findMode(kAssistantMode)
+		
+		if (mode && inList(this.Controller.ActiveModes, mode))
+			mode.updateActions(sessionState)
 	}
 	
 	updatePitstopOption(option, action, steps := 1) {
@@ -510,7 +515,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			if (raceStrategist && raceStrategist.isActive()) {
 				raceStrategist.startSimulation(this)
 				
-				this.iRaceStrategist := raceEngineer
+				this.iRaceStrategist := raceStrategist
 			}
 		}
 	}

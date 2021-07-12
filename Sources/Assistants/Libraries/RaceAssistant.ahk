@@ -356,7 +356,7 @@ class RaceAssistant extends ConfigurationItem {
 	}
 	
 	hasEnoughData(inform := true) {
-		if this.EnoughData
+		if (this.KnowledgeBase && this.EnoughData)
 			return true
 		else {
 			if (inform && this.Speaker)

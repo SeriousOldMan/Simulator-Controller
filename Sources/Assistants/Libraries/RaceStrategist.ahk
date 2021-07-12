@@ -238,7 +238,6 @@ class RaceStrategist extends RaceAssistant {
 		
 		if !this.hasEnoughData()
 			return
-		
 		if inList(words, this.getSpeaker().Fragments["Car"])
 			this.trackGapToFrontRecognized(words)
 		else

@@ -72,15 +72,21 @@ class VoiceAssistant {
 			}
 		}
 		
-		Phrases[] {
+		Phrases[key := false] {
 			Get {
-				return this.iPhrases
+				if key
+					return this.iPhrases[key]
+				else
+					return this.iPhrases
 			}
 		}
 		
-		Fragments[] {
+		Fragments[key := false] {
 			Get {
-				return this.iFragments
+				if key
+					return this.iFragments[key]
+				else
+					return this.iFragments
 			}
 		}
 		
@@ -124,15 +130,21 @@ class VoiceAssistant {
 			}
 		}
 		
-		Phrases[] {
+		Phrases[key := false] {
 			Get {
-				return this.iPhrases
+				if key
+					return this.iPhrases[key]
+				else
+					return this.iPhrases
 			}
 		}
 		
-		Fragments[] {
+		Fragments[key := false] {
 			Get {
-				return this.iFragments
+				if key
+					return this.iFragments[key]
+				else
+					return this.iFragments
 			}
 		}
 		

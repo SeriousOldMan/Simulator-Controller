@@ -630,7 +630,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				
 				if (sessionState == kSessionPaused)
 					return
-				else if (this.iFinished || (sessionState < (isInstance(this, RaceEngineerPlugin) ? kSessionPractice : kSessionRace))) {
+				else if (sessionState < (isInstance(this, RaceEngineerPlugin) ? kSessionPractice : kSessionRace)) {
 					; Not in a supported session
 				
 					this.iLastLap := 0
@@ -682,6 +682,17 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 						this.iInPit := false
 						
 						if newLap {
+							if this.iFinished {
+								this.iLastLap := 0
+								this.iFinished := false
+								this.iInPit := false
+						
+								if this.RaceAssistant
+									this.finishSession()
+								
+								return
+							}
+							
 							this.iLastLap := dataLastLap
 							this.iLastLapCounter := 0
 							

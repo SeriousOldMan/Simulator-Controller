@@ -92,7 +92,7 @@ class RaceStrategist extends RaceAssistant {
 	handleVoiceCommand(grammar, words) {
 		switch grammar {
 			case "LapsRemaining":
-				this.lapInfoRecognized(words)
+				this.lapsRemainingRecognized(words)
 			case "Weather":
 				this.weatherRecognized(words)
 			case "Position":
@@ -106,7 +106,7 @@ class RaceStrategist extends RaceAssistant {
 			case "GapToLeader":
 				this.gapToLeaderRecognized(words)
 			case "LapTimes":
-				this.lapTimesInfoRecognized(words)
+				this.lapTimesRecognized(words)
 			case "PitstopRecommend":
 				this.clearContinuation()
 				
@@ -134,7 +134,7 @@ class RaceStrategist extends RaceAssistant {
 		}
 	}
 	
-	lapInfoRecognized(words) {
+	lapsRemainingRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
 		
 		if !this.hasEnoughData()
@@ -343,7 +343,7 @@ class RaceStrategist extends RaceAssistant {
 		}
 	}
 	
-	lapTimesInfoRecognized(words) {
+	lapTimesRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
 		
 		if !this.hasEnoughData()
@@ -400,9 +400,11 @@ class RaceStrategist extends RaceAssistant {
 	requestInformation(category, arguments*) {
 		switch category {
 			case "LapsRemaining":
-				this.lapInfoRecognized([])
+				this.lapsRemainingRecognized([])
 			case "Weather":
 				this.weatherRecognized([])
+			case "LapTimes":
+				this.lapTimesRecognized([])
 			case "Position":
 				this.positionRecognized([])
 			case "GapToFrontStandings":

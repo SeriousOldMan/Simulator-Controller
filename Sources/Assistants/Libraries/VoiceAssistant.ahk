@@ -551,7 +551,7 @@ class VoiceAssistant {
 		}
 	}
 	
-	recognizeCommand(grammer, words) {
+	recognizeCommand(grammar, words) {
 		if this.Grammars.HasKey(grammar)
 			if this.VoiceServer
 				raiseEvent(kFileMessage, "Voice", "recognizeCommand:" . values2String(";", grammar, words*), this.VoiceServer)

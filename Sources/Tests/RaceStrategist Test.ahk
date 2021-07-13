@@ -41,6 +41,10 @@ SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+setConfigurationValue(kSimulatorConfiguration, "Race Strategist Analysis", "Assetto Corsa Competizione" . ".ConsideredHistoryLaps", 2)
+setConfigurationValue(kSimulatorConfiguration, "Race Strategist Analysis", "Assetto Corsa Competizione" . ".HistoryLapsDamping", 0.5)
+setConfigurationValue(kSimulatorConfiguration, "Race Strategist Analysis", "Assetto Corsa Competizione" . ".AdjustLapTime", false)
+
 if !GetKeyState("Ctrl") {
 	AHKUnit.Run()
 }
@@ -96,7 +100,7 @@ else {
 }
 
 show(context, args*) {
-	showMessage(values2string(" ", args*), "Race Strategist Test", "Information.png", 2500)
+	showMessage(values2string(" ", args*), "Race Strategist Test", "Information.png", 500)
 	
 	return true
 }

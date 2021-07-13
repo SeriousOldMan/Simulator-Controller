@@ -1,5 +1,7 @@
 General Release Actions
 =======================
+
+0. Search for "false &&" and "true ||"
 1. Update [Updates] section in "Simulator Tools.targets"
 2. Update [Processed] section in "UPDATES"
 3. Update "VERSION" file, especially *Release* setting

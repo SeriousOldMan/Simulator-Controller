@@ -797,14 +797,14 @@ class RaceStrategist extends RaceAssistant {
 ;;;-------------------------------------------------------------------------;;;
 
 comparePositions(c1, c2) {
-	return !(c1[2] > c2[2])
+	return (c1[2] < c2[2])
 }
 
 compareSequences(c1, c2) {
 	c1 := c1[2]
 	c2 := c2[2]
 	
-	return !((c1 - Floor(c1)) > (c2 - Floor(c2)))
+	return ((c1 - Floor(c1)) < (c2 - Floor(c2)))
 }
 
 updatePositions(context, futureLap) {
@@ -813,15 +813,15 @@ updatePositions(context, futureLap) {
 	cars := []
 	count := 0
 	
-	Loop {
+	Loop % knowledgeBase.getValue("Car.Count", 0)
+	{
 		laps := knowledgeBase.getValue("Standings.Extrapolated." . futureLap . ".Car." . A_Index . ".Laps", kUndefined)
 		
-		if (laps == kUndefined)
-			break
-		else
+		if (laps != kUndefined) {
 			cars.Push(Array(A_Index, laps))
 		
-		count += 1
+			count += 1
+		}
 	}
 	
 	bubbleSort(cars, "comparePositions")

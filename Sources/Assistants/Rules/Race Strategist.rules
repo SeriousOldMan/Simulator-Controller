@@ -279,6 +279,7 @@ priority: -20, [?Lap] => (Prove: clearExtrapolatedLap, ?Lap, !Car.Count)
 
 clearExtrapolatedLap(?, ?car) <= =<(?car, 0), !
 clearExtrapolatedLap(?lap, ?car)  <= Clear(Standings.Extrapolated, ?lap, Car, ?car, Position),													\
+									 Clear(Standings.Extrapolated, ?lap, Car, ?car, Sequence),													\
 									 Clear(Standings.Extrapolated, ?lap, Car, ?car, Laps),														\
 									 ?nextCar = ?car - 1, clearExtrapolatedLap(?lap, ?nextCar)
 
@@ -290,9 +291,15 @@ priority: -20, {All: [?Lap], [?Session.Settings.Standings.Extrapolation.Laps]} =
 		(Prove: updatePositions, ?Lap, ?Session.Settings.Standings.Extrapolation.Laps)
 		
 extrapolatePositions(?, ?lapDelta) <= =<(?lapDelta, 0), !
+extrapolatePositions(?lap, ?lapDelta) <= carAvgLapTime(?lap, !Driver.Car, 0),																	\
+										 ?nextLapDelta = ?lapDelta - 1, extrapolatePositions(?lap, ?nextLapDelta)
 extrapolatePositions(?lap, ?lapDelta) <= carAvgLapTime(?lap, !Driver.Car, ?avgLapTime), ?deltaTime = ?lapDelta * ?avgLapTime,					\
 										 ?futureLap = ?lap + ?lapDelta, extrapolatePositions(?lap, !Car.Count, ?futureLap, ?deltaTime, 0),		\
 										 ?nextLapDelta = ?lapDelta - 1, extrapolatePositions(?lap, ?nextLapDelta)
+
+updatePositions(?, ?lapDelta) <= =<(?lapDelta, 0), !
+updatePositions(?lap, ?lapDelta) <= ?futureLap = ?lap + ?lapDelta, Call(updatePositions, ?futureLap),											\
+									?nextLapDelta = ?lapDelta - 1, updatePositions(?lap, ?nextLapDelta)
 
 extrapolatePositions(?, ?car, ?, ?, ?) <= =<(?car, 0), !
 extrapolatePositions(?, ?, ?, 0, ?) <= !, fail
@@ -307,9 +314,10 @@ extrapolatePositions(?lap, ?car, ?futureLap, ?deltaTime, ?deltaPitTime) <=						
 
 extrapolatePosition(?lap, ?car, ?futureLap, ?deltaTime, ?deltaPitTime) <=																		\
 		?sumDeltaTime = ?deltaTime + ?deltaPitTime,																								\
-		carAvgLapTime(?lap, ?car, ?carLapTime), ?deltaLaps = ?sumDeltaTime / ?carLapTime,														\
+		carAvgLapTime(?lap, ?car, ?carLapTime), ?carLapTime > 0, ?deltaLaps = ?sumDeltaTime / ?carLapTime,										\
 		Get(Standings.Lap, ?lap, Car, ?car, Laps, ?carLaps), ?futureLaps = ?carLaps + ?deltaLaps,												\
 		Set(Standings.Extrapolated, ?futureLap, Car, ?car, Laps, ?futureLaps)
+extrapolatePosition(?lap, ?car, ?futureLap, ?deltaTime, ?deltaPitTime)
 
 correctPositions(?, ?, ?lapDelta) <= =<(?lapDelta, 0), !
 correctPositions(?lap, ?overtakeDelta, ?lapDelta) <= ?futureLap = ?lap + ?lapDelta,																\
@@ -335,12 +343,16 @@ correctPosition(?lap, ?car, ?timeCorrection, ?futureLap) <= carAvgLapTime(?lap, 
 carAvgLapTime(?lap, ?car, ?avgTime) <= Get(Standings.Lap, ?lap, Car, ?car, Time.Average, ?avgTime)
 carAvgLapTime(?lap, ?car, ?avgTime) <= carWeightedLapTimes(?lap, ?car, ?lapTimes), carLapAvgTime(?lap, ?car, ?lapTimes, ?avgTime),				\
 									   Set(Standings.Lap, ?lap, Car, ?car, Time.Average, ?avgTime)
+;?avgTime > 0, !,
+;carAvgLapTime(?lap, ?car, ?avgTime) <= Get(Standings.Lap, ?lap, Car, ?car, Time, ?avgTime),													\
+;										Set(Standings.Lap, ?lap, Car, ?car, Time.Average, ?avgTime)
+;carAvgLapTime(?lap, ?car, ?avgTime) <= ?avgTime = !Session.Settings.Lap.AvgTime * 1000,															\
+;									   Set(Standings.Lap, ?lap, Car, ?car, Time.Average, ?avgTime)
 
-carWeightedLapTimes(?lap, ?car, ?times) <= carWeightedLapTimes(?lap, ?car, 0, ?temp), remove(?temp, 0, ?times)
+carWeightedLapTimes(?lap, ?car, ?times) <= carWeightedLapTimes(?lap, ?car, 0, ?temp), remove(?temp, 0, ?times) 
 
 carWeightedLapTimes(?lap, ?, ?lap, []) <= !
 carWeightedLapTimes(?, ?, ?offset, []) <= >=(?offset, !Session.Settings.Lap.History.Considered), !
-carWeightedLapTimes(?lap, ?, ?offset, [0]) <= ?tLap = ?lap - ?offset, ?tLap = 1
 carWeightedLapTimes(?lap, ?car, ?offset, [?time | ?times]) <= ?tLap = ?lap - ?offset, carWeightedLapTime(?lap, ?car, ?tlap, ?time),				\
 															  ?nOffset = ?offset + 1, carWeightedLapTimes(?lap, ?car, ?nOffset, ?times)
 
@@ -354,7 +366,7 @@ carLapTime(?lap, ?car, ?lapTime) <= Get(Standings.Lap, ?lap, Car, ?car, Time, ?l
 carLapTime(?lap, ?car, ?lapTime) <= ?previousLap = ?lap - 1, carLapTime(?previousLap, ?car, ?lapTime)
 
 carLapAvgTime(?lap, !Driver.Car, ?lapTimes, ?avgTime) <= !, lapAvgTime(?lap, ?lapTimes, ?avgTime)
-carLapAvgTime(?lap, ?, [], 0) <= !
+carLapAvgTime(?, ?, [], 0) <= !
 carLapAvgTime(?lap, ?car, ?times, ?avgTime) <= sum(?times, ?sTimes), length(?times, ?sLength), ?avgTime = ?sTimes / ?sLength
 
 

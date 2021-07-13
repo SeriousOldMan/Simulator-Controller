@@ -759,7 +759,7 @@ Returns the instance of *RaceStrategistPlugin* (see the [documentation](https://
 ### Public Methods
 
 #### *createRaceAssistantAction(controller :: SimulatorController, action :: String, actionFunction :: String)*
-Very similar to the [createPitstopAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#createpitstopactioncontroller--simulatorcontroller-action--string-increasefunction--string-morearguments--string) factory method, this method is called for the *PitstopPlan* and *PitstopPrepare* actions. An instance of [RaceAssistantAction](*) will be created for each action and will be registered for the "Pitstop" mode.
+Very similar to the [createPitstopAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#createpitstopactioncontroller--simulatorcontroller-action--string-increasefunction--string-morearguments--string) factory method, this method is called for the *PitstopPlan* and *PitstopPrepare* actions. An instance of [RaceAssistantAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#raceassistantaction-extends-controlleraction-simulatorpluginahk) will be created for each action and will be registered for the "Pitstop" mode.
 
 #### *planPitstop()*
 Calling this method will ask Jona to plan an upcoming pitstop.

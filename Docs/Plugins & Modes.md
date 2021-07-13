@@ -9,12 +9,12 @@ The distribution of Simulator Controller includes a set of predefined plugins, w
 | [Pedal Calibration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-pedal-calibration) | Allows to choose between the different calibration curves of your high end pedals directly from the hardware controller. The current implementation supports the Heusinkveld *SmartControl* application, but adopting the plugin to a different pedal vendor is quite easy. |
 | [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) | This plugin integrates Jona, the Virtual Race Engineer, with all other plugins for the simulation games, like the ACC plugin. The plugin handles the data transfer between the simulation game and the Virtual Race Engineer. |
 | [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) | This plugin integrates Cato, the Virtual Race Strategist, with all other plugins for the simulation games, like the ACC plugin. The plugin handles the data transfer between the simulation game and the Virtual Race Strategist. |
-| [ACC](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-acc) | Provides special support for starting and stopping *Assetto Corsa Competizione* from your hardware controller. The mode "Chat", which is available when *Assetto Corsa Competizione* is currently running, handle automated chat messages for the multiplayer ingame chat system, where the chat messages can be configured by the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Additionally, beginning with Release 2.0, this plugin provides sophisticated support for the Pitstop MFD of *Assetto Corsa Competizione*. All settings may be tweaked using the controller hardware, but it is also possible to control the settings using voice control to keep your hands on the steering wheel. Since Release 2.1, Jona, the Virtual Race Engineer, is integrated with the ACC plugin as well and an integration with Cato, the Virtual Race Strategist exists since Release 3.1.6. |
+| [ACC](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-acc) | Provides special support for starting and stopping *Assetto Corsa Competizione* from your hardware controller. The mode "Chat", which is available when *Assetto Corsa Competizione* is currently running, handle automated chat messages for the multiplayer ingame chat system, where the chat messages can be configured by the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Additionally, beginning with Release 2.0, this plugin provides sophisticated support for the Pitstop MFD of *Assetto Corsa Competizione*. All settings may be tweaked with the controller hardware using the "Pitstop" mode, but it is also possible to control the settings using voice control to keep your hands on the steering wheel. Since Release 2.1, Jona, the Virtual Race Engineer, is integrated with the ACC plugin as well and an integration with Cato, the Virtual Race Strategist exists since Release 3.1.6. The "Assistant" mode can handle most of the race assistant commands from your hardware controller. |
 | [AC](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-ac) | One of the smallest plugin in this list only supplies a special splash screem, when *Assetto Corsa* is started. No special controller mode is defined for the moment. |
-| [Automobilista 2](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-AMS2) | Also a small plugin in this list only supplies a special splash screem, when *Automobilista 2* is started. No special controller mode is defined for the moment, but an integration with Jona, the Virtual Race Engineer, as well as wtih Cato, the Virtual Race Strategist, is available since Release 3.1.8. |
-| [IRC](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-irc) | This plugin integrates the *iRacing* simulation game with Simulator Controller. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the Virtual Race Engineer, including full support for automated pitstop handling is also available, as well as wtih Cato, the Virtual Race Strategist. |
-| [RF2](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-rf2) | Similar to the ACC and IRC plugin provides this plugin start and stop support for *rFactor 2*. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the Virtual Race Engineer, including full support for automated pitstop handling is available as well since Release 2.8. An integration with Cato, the Virtual Race Strategist exists since Release 3.1.6. |
-| [R3E](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-rre) | Similar to the ACC, IRC and RF2 plugins provides this plugin start and stop support for *RaceRoom Racing Experience*. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the Virtual Race Engineer, including full support for automated pitstop handling is available as well. An integration with Cato, the Virtual Race Strategist exists since Release 3.1.6. |
+| [Automobilista 2](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-AMS2) | Also a small plugin in this list only supplies a special splash screem, when *Automobilista 2* is started. An integration with Jona, the Virtual Race Engineer, as well as wtih Cato, the Virtual Race Strategist, is available since Release 3.1.8 and the plugin supports a "Pitstop" mode for adjusting pitstop settings and a "Assistant" mode to interact with the race assistants. |
+| [IRC](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-irc) | This plugin integrates the *iRacing* simulation game with Simulator Controller. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the Virtual Race Engineer, including full support for automated pitstop handling is also available, as well as wtih Cato, the Virtual Race Strategist. The "Assistant" mode can handle most of the race assistant commands from your hardware controller. |
+| [RF2](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-rf2) | Similar to the ACC and IRC plugin provides this plugin start and stop support for *rFactor 2*. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the Virtual Race Engineer, including full support for automated pitstop handling is available as well since Release 2.8. An integration with Cato, the Virtual Race Strategist exists since Release 3.1.6. The "Assistant" mode can handle most of the race assistant commands from your hardware controller. |
+| [R3E](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-rre) | Similar to the ACC, IRC and RF2 plugins provides this plugin start and stop support for *RaceRoom Racing Experience*. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the Virtual Race Engineer, including full support for automated pitstop handling is available as well. An integration with Cato, the Virtual Race Strategist exists since Release 3.1.6. The "Assistant" mode can handle most of the race assistant commands from your hardware controller. |
 
 All plugins can be configured in the [Plugins tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) of the configuration tool.
 
@@ -211,7 +211,7 @@ It is possible, although not much fun, to use Jona without its natural language 
 			  Accept *acceptFunction*, Reject *rejectFunction*,
 			  InformationRequest *requestFunction* *command* [*arguments*], ...
 	
-All these will be bound to the plugin itself, thereby are available all the time, and only unary functions are supported here. By using this actions, you will be able to use Jona with voice output, but no voice control, thereby getting most of the support from Jona, but you have to use an *oldschool* interface to control the engineer actions. To *answer* "Yes" to one of the questions of Jona, you must supply a controller function, for example a push button function, to the *Accept* parameter and for "No", you must use the *Reject* parameter.
+All these command actions will be bound to the plugin itself, thereby are available all the time, and only unary functions are supported here. By using this actions, you will be able to use Jona with voice output, but no voice control, thereby getting most of the support from Jona, but you have to use an *oldschool* interface to control the engineer actions. To *answer* "Yes" to one of the questions of Jona, you must supply a controller function, for example a push button function, to the *Accept* parameter and for "No", you must use the *Reject* parameter.
 
 Furthermore, you can request a lot of information from Jona, mostly about the current state of your car. Thefore, you can supply the *InformationRequest* parameter multiple times.
 
@@ -255,7 +255,7 @@ Similar as for Jona, you can use the following parameters to trigger some of Cat
 	commands: PitstopRecommend *function*, Accept *acceptFunction*, Reject *rejectFunction*,
 			  InformationRequest *requestFunction* *command* [*arguments*], ...
 	
-All these will be bound to the plugin itself, thereby are available all the time, and only unary functions are supported here. By using these actions, you will be able to use Cato with voice output, but no voice control, thereby getting most of the support from Cato, but you have to use an *oldschool* interface to control the strategist actions. To *answer* "Yes" to one of the questions of Cato, you must supply a controller function, for example a push button function, to the *Accept* parameter and for "No", you must use the *Reject* parameter.
+All these command actions will be bound to the plugin itself, thereby are available all the time, and only unary functions are supported here. By using these actions, you will be able to use Cato with voice output, but no voice control, thereby getting most of the support from Cato, but you have to use an *oldschool* interface to control the strategist actions. To *answer* "Yes" to one of the questions of Cato, you must supply a controller function, for example a push button function, to the *Accept* parameter and for "No", you must use the *Reject* parameter.
 
 Furthermore, you can request a lot of information from Cato about the current race situation. Thefore, you can supply the *InformationRequest* parameter multiple times.
 
@@ -361,7 +361,7 @@ With the plugin parameter *assistantCommands* you can supply a list of the comma
 					 
 See the following table for the supported assistant commands.
 
-| Setting/Command | Description |
+| Command | Description |
 | ------ | ------ |
 | InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your race assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
 | PitstopRecommend | Asks the virtual race strategist for a recommendation for the next pitstop. |
@@ -436,7 +436,7 @@ With the plugin parameter *pitstopCommands* you can supply a list of the setting
 					 
 See the following table for the supported settings:
 
-| Setting/Command | Description |
+| Setting | Description |
 | ------ | ------ |
 | Refuel | Increment or decrement the refuel amount. Supports the additional increments argument. |
 | TyreChange | Toggles, whether tyres will be changed at the pitstop. |
@@ -457,7 +457,7 @@ With the plugin parameter *assistantCommands* you can supply a list of the comma
 					 
 See the following table for the supported assistant commands.
 
-| Setting/Command | Description |
+| Command | Description |
 | ------ | ------ |
 | InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your race assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
 | PitstopRecommend | Asks the virtual race strategist for a recommendation for the next pitstop. |
@@ -516,7 +516,7 @@ With the plugin parameter *pitstopCommands* you can supply a list of the setting
 					 
 See the following table for the supported settings:
 
-| Setting/Command | Description |
+| Setting | Description |
 | ------ | ------ |
 | Refuel | Increment or decrement the refuel amount. Supports the additional increments argument. |
 | TyreCompound | Cycles through the available tyre compounds. |
@@ -538,7 +538,7 @@ With the plugin parameter *assistantCommands* you can supply a list of the comma
 					 
 See the following table for the supported assistant commands.
 
-| Setting/Command | Description |
+| Command | Description |
 | ------ | ------ |
 | InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your race assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
 | PitstopRecommend | Asks the virtual race strategist for a recommendation for the next pitstop. |
@@ -600,7 +600,7 @@ With the plugin parameter *pitstopCommands* you can supply a list of the setting
 					 
 See the following table for the supported settings:
 
-| Setting/Command | Description |
+| Setting | Description |
 | ------ | ------ |
 | Strategy | Choose one of the predefined pitstop strategies. |
 | Refuel | Increment or decrement the refuel amount. Supports the additional increments argument. |
@@ -618,7 +618,7 @@ With the plugin parameter *assistantCommands* you can supply a list of the comma
 					 
 See the following table for the supported assistant commands.
 
-| Setting/Command | Description |
+| Command | Description |
 | ------ | ------ |
 | InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your race assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
 | PitstopRecommend | Asks the virtual race strategist for a recommendation for the next pitstop. |
@@ -692,7 +692,7 @@ With the plugin parameter *pitstopCommands* you can supply a list of the setting
 					 
 See the following table for the supported settings:
 
-| Setting/Command | Description |
+| Setting | Description |
 | ------ | ------ |
 | Refuel | Increment or decrement the refuel amount. Supports the additional increments argument. |
 | TyreChange | Chooses between "Dry" and "Wet" tyres for the next pitstop or no tyre change at all. Currently, only vehicles with one dry tyre compound and one wet tyre compound are supported. |
@@ -709,7 +709,7 @@ With the plugin parameter *assistantCommands* you can supply a list of the comma
 					 
 See the following table for the supported assistant commands.
 
-| Setting/Command | Description |
+| Command | Description |
 | ------ | ------ |
 | InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your race assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
 | PitstopRecommend | Asks the virtual race strategist for a recommendation for the next pitstop. |

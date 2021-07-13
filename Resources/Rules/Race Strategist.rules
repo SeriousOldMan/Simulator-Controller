@@ -378,13 +378,13 @@ updatePitstopStrategy(?lap) <= ?deltaLaps = ?lap - !Lap, ?temp = !Lap.Remaining 
 							   updatePitstopStrategy(?lap, ?remainingLaps)
 
 updatePitstopStrategy(?targetLap, ?remainingLaps) <= ?remainingLaps < 3, Set(Pitstop.Strategy.Lap, ?targetLap), !
-updatePitstopStrategy(?targetLap, ?remainingLaps) <= Call(msgbox, P1), pitstopWindow(!Lap, ?targetLap, ?remainingLaps, ?fromLap, ?toLap), Call(msgbox, P2), >=(?toLap, ?fromLap),	\
+updatePitstopStrategy(?targetLap, ?remainingLaps) <= Call(msgbox, P1), pitstopWindow(!Lap, ?targetLap, ?remainingLaps, ?fromLap, ?toLap), Call(msgbox, P2, ?targetLap, ?remainingLaps, ?fromLap, ?toLap), >=(?toLap, ?fromLap),	\
 													 updatePitstopStrategy(!Lap, ?fromLap, ?toLap)
 
 updatePitstopStrategy(?lap, ?fromLap, ?fromLap) <= !, Set(Pitstop.Strategy.Lap, ?fromLap)
 updatePitstopStrategy(?lap, ?fromLap, ?toLap) <= Call(msgbox, S1), updatePitstopStrategy(?lap, ?fromLap, ?toLap, ?laps, ?positions, ?trafficDensities),			\
-												 Call(msgbox, S2), bestPitstopLap(?laps, ?positions, ?trafficDensities, ?targetLap),								\
-												 Call(msgbox, S3), Set(Pitstop.Strategy.Lap, ?targetLap)
+												 Call(msgbox, S2, ?fromLap, ?toLap, ?laps, ?positions, ?trafficDensities), bestPitstopLap(?laps, ?positions, ?trafficDensities, ?targetLap),								\
+												 Call(msgbox, S3, ?positions, ?trafficDensities, ?targetLap), Set(Pitstop.Strategy.Lap, ?targetLap)
 
 updatePitstopStrategy(?lap, ?fromLap, ?fromLap, [], [], []) <= !
 updatePitstopStrategy(?lap, ?fromLap, ?toLap, [?fromLap | ?laps], [?position | ?positions], [?trafficDensity | ?trafficDensities]) <=			\

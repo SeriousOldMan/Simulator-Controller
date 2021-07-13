@@ -452,7 +452,7 @@ class RaceStrategist extends RaceAssistant {
 			this.dumpKnowledge(this.KnowledgeBase)
 		
 		plannedLap := knowledgebase.getValue("Pitstop.Strategy.Lap", false)
-		
+		msgbox % plannedLap
 		if !plannedLap
 			speaker.speakPhrase("NoPlannedPitstop")
 		else {

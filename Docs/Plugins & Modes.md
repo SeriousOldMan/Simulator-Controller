@@ -309,15 +309,14 @@ Using the buttons and dials you may change the pitstop settings in the same way 
 
 This mode allows you to group all the available actions of the active race assistants into one layer of controls on your hardware controller. Although all these actions are also available as plugin actions of the "Race Engineer" and "Race Strategist" plugins, it may be more practicle to use the "Assistant" mode, when your set of available hardware controls is limited, since plugin actions always occupy a given control.
 
-![](*)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%2012.JPG)
 
 The above will be achieved using the following plugin argument:
 
-	assistantCommands: InformationRequest Position Button.9, InformationRequest LapTimes Button.10,
-					   InformationRequest LapsRemaining Button.11, InformationRequest Weather Button.12,
-					   InformationRequest GapToFront Standings Button.13, InformationRequest GapToBehind Standings Button.14,
-					   PitstopRecommend Button.16,
-					   PitstopPlan Button.17, PitstopPrepare Button.18, Accept Button.19, Reject Button.20
+	assistantCommands: InformationRequest Position Button.1, InformationRequest LapTimes Button.2,
+					   InformationRequest LapsRemaining Button.3, InformationRequest Weather Button.4,
+					   InformationRequest GapToFront Standings Button.5, InformationRequest GapToBehind Standings Button.6,
+					   Accept Button.7, Reject Button.8
 
 Note: You can use all these commands in the *pitstopCommands* list as well, which will generate one giant controller mode.
 
@@ -411,15 +410,14 @@ All this will be achieved using the following plugin arguments:
 
 This mode allows you to group all the available actions of the active race assistants into one layer of controls on your hardware controller. Although all these actions are also available as plugin actions of the "Race Engineer" and "Race Strategist" plugins, it may be more practicle to use the "Assistant" mode, when your set of available hardware controls is limited, since plugin actions always occupy a given control.
 
-![](*)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%2012.JPG)
 
 The above will be achieved using the following plugin argument:
 
-	assistantCommands: InformationRequest Position Button.9, InformationRequest LapTimes Button.10,
-					   InformationRequest LapsRemaining Button.11, InformationRequest Weather Button.12,
-					   InformationRequest GapToFront Standings Button.13, InformationRequest GapToBehind Standings Button.14,
-					   PitstopRecommend Button.16,
-					   PitstopPlan Button.17, PitstopPrepare Button.18, Accept Button.19, Reject Button.20
+	assistantCommands: InformationRequest Position Button.1, InformationRequest LapTimes Button.2,
+					   InformationRequest LapsRemaining Button.3, InformationRequest Weather Button.4,
+					   InformationRequest GapToFront Standings Button.5, InformationRequest GapToBehind Standings Button.6,
+					   Accept Button.7, Reject Button.8
 
 Note: You can use all these commands in the *pitstopCommands* list as well, which will generate one giant controller mode.
 
@@ -494,15 +492,14 @@ All this will be achieved using the following plugin arguments:
 
 This mode allows you to group all the available actions of the active race assistants into one layer of controls on your hardware controller. Although all these actions are also available as plugin actions of the "Race Engineer" and "Race Strategist" plugins, it may be more practicle to use the "Assistant" mode, when your set of available hardware controls is limited, since plugin actions always occupy a given control.
 
-![](*)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%2012.JPG)
 
 The above will be achieved using the following plugin argument:
 
-	assistantCommands: InformationRequest Position Button.9, InformationRequest LapTimes Button.10,
-					   InformationRequest LapsRemaining Button.11, InformationRequest Weather Button.12,
-					   InformationRequest GapToFront Standings Button.13, InformationRequest GapToBehind Standings Button.14,
-					   PitstopRecommend Button.16,
-					   PitstopPlan Button.17, PitstopPrepare Button.18, Accept Button.19, Reject Button.20
+	assistantCommands: InformationRequest Position Button.1, InformationRequest LapTimes Button.2,
+					   InformationRequest LapsRemaining Button.3, InformationRequest Weather Button.4,
+					   InformationRequest GapToFront Standings Button.5, InformationRequest GapToBehind Standings Button.6,
+					   Accept Button.7, Reject Button.8
 
 Note: You can use all these commands in the *pitstopCommands* list as well, which will generate one giant controller mode.
 
@@ -574,15 +571,14 @@ All this will be achieved using the following plugin arguments:
 
 This mode allows you to group all the available actions of the active race assistants into one layer of controls on your hardware controller. Although all these actions are also available as plugin actions of the "Race Engineer" and "Race Strategist" plugins, it may be more practicle to use the "Assistant" mode, when your set of available hardware controls is limited, since plugin actions always occupy a given control.
 
-![](*)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%2012.JPG)
 
 The above will be achieved using the following plugin argument:
 
-	assistantCommands: InformationRequest Position Button.9, InformationRequest LapTimes Button.10,
-					   InformationRequest LapsRemaining Button.11, InformationRequest Weather Button.12,
-					   InformationRequest GapToFront Standings Button.13, InformationRequest GapToBehind Standings Button.14,
-					   PitstopRecommend Button.16,
-					   PitstopPlan Button.17, PitstopPrepare Button.18, Accept Button.19, Reject Button.20
+	assistantCommands: InformationRequest Position Button.1, InformationRequest LapTimes Button.2,
+					   InformationRequest LapsRemaining Button.3, InformationRequest Weather Button.4,
+					   InformationRequest GapToFront Standings Button.5, InformationRequest GapToBehind Standings Button.6,
+					   Accept Button.7, Reject Button.8
 
 Note: You can use all these commands in the *pitstopCommands* list as well, which will generate one giant controller mode.
 
@@ -668,15 +664,14 @@ All this will be achieved using the following plugin arguments:
 
 This mode allows you to group all the available actions of the active race assistants into one layer of controls on your hardware controller. Although all these actions are also available as plugin actions of the "Race Engineer" and "Race Strategist" plugins, it may be more practicle to use the "Assistant" mode, when your set of available hardware controls is limited, since plugin actions always occupy a given control.
 
-![](*)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%2012.JPG)
 
 The above will be achieved using the following plugin argument:
 
-	assistantCommands: InformationRequest Position Button.9, InformationRequest LapTimes Button.10,
-					   InformationRequest LapsRemaining Button.11, InformationRequest Weather Button.12,
-					   InformationRequest GapToFront Standings Button.13, InformationRequest GapToBehind Standings Button.14,
-					   PitstopRecommend Button.16,
-					   PitstopPlan Button.17, PitstopPrepare Button.18, Accept Button.19, Reject Button.20
+	assistantCommands: InformationRequest Position Button.1, InformationRequest LapTimes Button.2,
+					   InformationRequest LapsRemaining Button.3, InformationRequest Weather Button.4,
+					   InformationRequest GapToFront Standings Button.5, InformationRequest GapToBehind Standings Button.6,
+					   Accept Button.7, Reject Button.8
 
 Note: You can use all these commands in the *pitstopCommands* list as well, which will generate one giant controller mode.
 

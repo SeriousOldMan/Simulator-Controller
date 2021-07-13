@@ -1139,6 +1139,9 @@ runSpecialTargets(ByRef buildProgress) {
 						if (StrLen(Trim(text)) == 0)
 							Throw "Error while compiling..."
 					}
+					
+					if FileExist(kTempDirectory . "build.out")
+						FileDelete %kTempDirectory%build.out
 				}
 				catch exception {
 					logMessage(kLogCritical, translate("Cannot compile ") . solution . translate(" - Solution or MSBuild (") . msBuild . translate(") not found"))

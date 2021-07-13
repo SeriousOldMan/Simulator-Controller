@@ -173,6 +173,12 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			exePath := kBinariesDirectory . "ACC UDP Reader.exe"
 			
 			try {
+				if FileExist(kTempDirectory . "ACCUDP.cmd")
+					FileDelete %kTempDirectory%ACCUDP.cmd
+					
+				if FileExist(kTempDirectory . "ACCUDP.out")
+					FileDelete %kTempDirectory%ACCUDP.out
+					
 				Run %ComSpec% /c ""%exePath%" "%kTempDirectory%ACCUDP.cmd" "%kTempDirectory%ACCUDP.out"" , , Hide, pid
 				
 				this.iUDPClient := ObjBindMethod(this, "shutdownUDPClient")

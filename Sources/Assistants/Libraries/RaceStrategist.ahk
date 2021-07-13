@@ -451,10 +451,12 @@ class RaceStrategist extends RaceAssistant {
 		if this.Debug[kDebugKnowledgeBase]
 			this.dumpKnowledge(this.KnowledgeBase)
 		
-		plannedLap := knowledgebase.getValue("Pitstop.Strategy.Lap", false)
+		plannedLap := knowledgebase.getValue("Pitstop.Strategy.Lap", kUndefined)
 		
-		if !plannedLap
+		if (plannedLap == kUndefined)
 			speaker.speakPhrase("NoPlannedPitstop")
+		else if !plannedLap
+			speaker.speakPhrase("NoPitstopNeeded")
 		else {
 			speaker.speakPhrase("PitstopLap", {lap: plannedLap})
 		

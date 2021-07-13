@@ -284,11 +284,11 @@ clearExtrapolatedLap(?lap, ?car)  <= Clear(Standings.Extrapolated, ?lap, Car, ?c
 									 ?nextCar = ?car - 1, clearExtrapolatedLap(?lap, ?nextCar)
 
 priority: -20, {All: [?Lap], [?Session.Settings.Standings.Extrapolation.Laps]} =>																\
-		(Call: msgbox, 1), (Prove: extrapolatePositions, ?Lap, ?Session.Settings.Standings.Extrapolation.Laps),													\
-		(Call: msgbox, 2), (Prove: updatePositions, ?Lap, ?Session.Settings.Standings.Extrapolation.Laps),															\
-		(Call: msgbox, 3), (Prove: correctPositions, ?Lap, !Session.Settings.Standings.Extrapolation.Overtake.Delta,												\
+		(Prove: extrapolatePositions, ?Lap, ?Session.Settings.Standings.Extrapolation.Laps),													\
+		(Prove: updatePositions, ?Lap, ?Session.Settings.Standings.Extrapolation.Laps),															\
+		(Prove: correctPositions, ?Lap, !Session.Settings.Standings.Extrapolation.Overtake.Delta,												\
 										?Session.Settings.Standings.Extrapolation.Laps),														\
-		(Call: msgbox, 4), (Prove: updatePositions, ?Lap, ?Session.Settings.Standings.Extrapolation.Laps)
+		(Prove: updatePositions, ?Lap, ?Session.Settings.Standings.Extrapolation.Laps)
 		
 extrapolatePositions(?, ?lapDelta) <= =<(?lapDelta, 0), !
 extrapolatePositions(?lap, ?lapDelta) <= carAvgLapTime(?lap, !Driver.Car, 0),																	\
@@ -378,8 +378,10 @@ carLapAvgTime(?lap, ?car, ?times, ?avgTime) <= sum(?times, ?sTimes), length(?tim
 
 priority: 5, [?Pitstop.Strategy.Plan] => (Clear: Pitstop.Strategy.Lap)
 
-[?Pitstop.Strategy.Plan = true] => (Prove: updatePitstopStrategy, !Lap)
-[?Pitstop.Strategy.Plan > 1] => (Prove: updatePitstopStrategy, !Pitstop.Strategy.Plan)
+{All: [?Lap.Remaining.Session > ?Lap.Remaining.Fuel], [?Pitstop.Strategy.Plan = true]} => (Prove: updatePitstopStrategy, !Lap)
+{All: [?Lap.Remaining.Session > ?Lap.Remaining.Fuel], [?Pitstop.Strategy.Plan > 1]} => (Prove: updatePitstopStrategy, !Pitstop.Strategy.Plan)
+
+{All: {None: [?Pitstop.Strategy.Lap]}, [?Lap.Remaining.Session < ?Lap.Remaining.Fuel]} => (Set: Pitstop.Strategy.Lap, false)
 
 priority: -5, [?Pitstop.Strategy.Plan] => (Clear: Pitstop.Strategy.Plan)
 

@@ -378,7 +378,7 @@ updatePitstopStrategy(?lap) <= ?deltaLaps = ?lap - !Lap, ?temp = !Lap.Remaining 
 							   updatePitstopStrategy(?lap, ?remainingLaps)
 
 updatePitstopStrategy(?targetLap, ?remainingLaps) <= ?remainingLaps < 3, Set(Pitstop.Strategy.Lap, ?targetLap), !
-updatePitstopStrategy(?targetLap, ?remainingLaps) <= pitstopWindow(!Lap, ?targetLap, ?remainingLaps, ?fromLap, ?toLap), >=(?toLap, ?fromLap),	\
+updatePitstopStrategy(?targetLap, ?remainingLaps) <= Call(msgbox, P1), pitstopWindow(!Lap, ?targetLap, ?remainingLaps, ?fromLap, ?toLap), Call(msgbox, P2), >=(?toLap, ?fromLap),	\
 													 updatePitstopStrategy(!Lap, ?fromLap, ?toLap)
 
 updatePitstopStrategy(?lap, ?fromLap, ?fromLap) <= !, Set(Pitstop.Strategy.Lap, ?fromLap)

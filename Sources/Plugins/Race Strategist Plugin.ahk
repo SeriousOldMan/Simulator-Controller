@@ -30,7 +30,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		}
 		
 		recommendPitstop(arguments*) {
-			this.callRemote("recommendPitstop", arguments*)
+			this.callRemote("callRecommendPitstop", arguments*)
 		}
 	}
 

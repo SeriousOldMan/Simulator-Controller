@@ -217,7 +217,7 @@ class RaceAssistant extends ConfigurationItem {
 	}
 	
 	__New(configuration, assistantType, settings, name := false, language := "__Undefined__", speaker := false, listener := false, voiceServer := false) {
-		this.iDebug := (true || isDebug() ? kDebugKnowledgeBase : kDebugOff)
+		this.iDebug := (isDebug() ? kDebugKnowledgeBase : kDebugOff)
 		this.iAssistantType := assistantType
 		this.iSettings := settings
 		
@@ -304,15 +304,23 @@ class RaceAssistant extends ConfigurationItem {
 	}
 	
 	accept() {
-		if this.Continuation
-			this.phraseRecognized("Yes", ["Yes"])
+		if this.Continuation {
+			if this.VoiceAssistant
+				this.VoiceAssistant.phraseRecognized("Yes", ["Yes"])
+			else
+				this.handleVoiceCommand("Yes", ["Yes"])
+		}
 		else if this.VoiceAssistant
 			this.VoiceAssistant.recognizeCommand("Yes", ["Yes"])
 	}
 	
 	reject() {
-		if this.Continuation
-			this.phraseRecognized("No", ["No"])
+		if this.Continuation {
+			if this.VoiceAssistant
+				this.VoiceAssistant.phraseRecognized("No", ["No"])
+			else
+				this.handleVoiceCommand("No", ["No"])
+		}
 		else if this.VoiceAssistant
 			this.VoiceAssistant.recognizeCommand("No", ["No"])
 	}

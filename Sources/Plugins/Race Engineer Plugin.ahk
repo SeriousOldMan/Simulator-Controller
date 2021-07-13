@@ -32,11 +32,11 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		}
 		
 		planPitstop(arguments*) {
-			this.callRemote("planPitstop", arguments*)
+			this.callRemote("callPlanPitstop", arguments*)
 		}
 		
 		preparePitstop(arguments*) {
-			this.callRemote("preparePitstop", arguments*)
+			this.callRemote("callPreparePitstop", arguments*)
 		}
 	}
 

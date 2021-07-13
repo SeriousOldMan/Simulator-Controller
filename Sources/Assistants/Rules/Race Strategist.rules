@@ -266,7 +266,7 @@ extrapolateLap(?lap, ?futureLap) <= extrapolateLap(?lap, ?futureLap, 0)
 
 extrapolateLap(?lap, ?futureLap, ?pitDelta) <=																									\
 		carAvgLapTime(?lap, !Driver.Car, ?avgLapTime), ?lapDelta = ?futureLap - ?lap, 															\
-		?futureTime = ?lapDelta * ?avgLapTime, extrapolatePositions(?lap, !Car.Count, ?futureLap, ?futureTime, ?pitDelta),						\
+		?deltaTime = ?lapDelta * ?avgLapTime, extrapolatePositions(?lap, !Car.Count, ?futureLap, ?deltaTime, ?pitDelta),						\
 		Call(updatePositions, ?futureLap),																										\
 		correctPositions(?lap, !Car.Count, !Session.Settings.Standings.Extrapolation.Overtake.Delta, ?futureLap),								\
 		Call(updatePositions, ?futureLap)
@@ -290,18 +290,19 @@ priority: -20, {All: [?Lap], [?Session.Settings.Standings.Extrapolation.Laps]} =
 		(Prove: updatePositions, ?Lap, ?Session.Settings.Standings.Extrapolation.Laps)
 		
 extrapolatePositions(?, ?lapDelta) <= =<(?lapDelta, 0), !
-extrapolatePositions(?lap, ?lapDelta) <= carAvgLapTime(?lap, !Driver.Car, ?avgLapTime), ?futureTime = ?lapDelta * ?avgLapTime,					\
-										 ?futureLap = ?lap + ?lapDelta, extrapolatePositions(?lap, !Car.Count, ?futureLap, ?futureTime, 0),		\
+extrapolatePositions(?lap, ?lapDelta) <= carAvgLapTime(?lap, !Driver.Car, ?avgLapTime), ?deltaTime = ?lapDelta * ?avgLapTime,					\
+										 ?futureLap = ?lap + ?lapDelta, extrapolatePositions(?lap, !Car.Count, ?futureLap, ?deltaTime, 0),		\
 										 ?nextLapDelta = ?lapDelta - 1, extrapolatePositions(?lap, ?nextLapDelta)
 
 extrapolatePositions(?, ?car, ?, ?, ?) <= =<(?car, 0), !
-extrapolatePositions(?, ?, ?, 0, ?) <= !
-extrapolatePositions(?lap, ?car, ?, ?, ?) <= carAvgLapTime(?lap, ?car, 0), !
+extrapolatePositions(?, ?, ?, 0, ?) <= !, fail
 extrapolatePositions(?lap, !Driver.Car, ?futureLap, ?deltaTime, ?deltaPitTime) <=																\
 		?deltaPitTime != 0, !, extrapolatePosition(?lap, !Driver.Car, ?futureLap, ?deltaTime, 0),												\
 		?nextCar = !Driver.Car - 1, extrapolatePositions(?lap, ?nextCar, ?futureLap, ?deltaTime, ?deltaPitTime)
 extrapolatePositions(?lap, ?car, ?futureLap, ?deltaTime, ?deltaPitTime) <=																		\
 		extrapolatePosition(?lap, ?car, ?futureLap, ?deltaTime, ?deltaPitTime),																	\
+		?nextCar = ?car - 1, extrapolatePositions(?lap, ?nextCar, ?futureLap, ?deltaTime, ?deltaPitTime)
+extrapolatePositions(?lap, ?car, ?futureLap, ?deltaTime, ?deltaPitTime) <=																		\
 		?nextCar = ?car - 1, extrapolatePositions(?lap, ?nextCar, ?futureLap, ?deltaTime, ?deltaPitTime)
 
 extrapolatePosition(?lap, ?car, ?futureLap, ?deltaTime, ?deltaPitTime) <=																		\
@@ -321,7 +322,8 @@ correctPositions(?lap, ?car, ?overtakeDelta, ?futureLap) <= Get(Standings.Lap, ?
 															?deltaPosition = ?futurePosition - ?currentPosition,								\
 															?temp = ?overtakeDelta * ?deltaPosition, abs(?temp, ?correction),					\
 															correctPosition(?lap, ?car, ?correction, ?futureLap),								\
-															?nextCar = ?car - 1, correctPositions(?lap, ?nextCar, ?overtakeDelta, ?futureLap)
+															?nextCar = ?car - 1, correctPositions(?lap, ?nextCar, ?overtakeDelta, ?futureLap), !
+correctPositions(?lap, ?car, ?overtakeDelta, ?futureLap) <= ?nextCar = ?car - 1, correctPositions(?lap, ?nextCar, ?overtakeDelta, ?futureLap)
 
 correctPosition(?, ?, 0, ?) <= !
 correctPosition(?lap, ?car, ?timeCorrection, ?futureLap) <= carAvgLapTime(?lap, ?car, 0), !  
@@ -378,13 +380,13 @@ updatePitstopStrategy(?lap) <= ?deltaLaps = ?lap - !Lap, ?temp = !Lap.Remaining 
 							   updatePitstopStrategy(?lap, ?remainingLaps)
 
 updatePitstopStrategy(?targetLap, ?remainingLaps) <= ?remainingLaps < 3, Set(Pitstop.Strategy.Lap, ?targetLap), !
-updatePitstopStrategy(?targetLap, ?remainingLaps) <= Call(msgbox, P1), pitstopWindow(!Lap, ?targetLap, ?remainingLaps, ?fromLap, ?toLap), Call(msgbox, P2, ?targetLap, ?remainingLaps, ?fromLap, ?toLap), >=(?toLap, ?fromLap),	\
+updatePitstopStrategy(?targetLap, ?remainingLaps) <= pitstopWindow(!Lap, ?targetLap, ?remainingLaps, ?fromLap, ?toLap), >=(?toLap, ?fromLap),	\
 													 updatePitstopStrategy(!Lap, ?fromLap, ?toLap)
 
 updatePitstopStrategy(?lap, ?fromLap, ?fromLap) <= !, Set(Pitstop.Strategy.Lap, ?fromLap)
-updatePitstopStrategy(?lap, ?fromLap, ?toLap) <= Call(msgbox, S1), updatePitstopStrategy(?lap, ?fromLap, ?toLap, ?laps, ?positions, ?trafficDensities),			\
-												 Call(msgbox, S2, ?fromLap, ?toLap, ?laps, ?positions, ?trafficDensities), bestPitstopLap(?laps, ?positions, ?trafficDensities, ?targetLap),								\
-												 Call(msgbox, S3, ?positions, ?trafficDensities, ?targetLap), Set(Pitstop.Strategy.Lap, ?targetLap)
+updatePitstopStrategy(?lap, ?fromLap, ?toLap) <= updatePitstopStrategy(?lap, ?fromLap, ?toLap, ?laps, ?positions, ?trafficDensities),			\
+												 bestPitstopLap(?laps, ?positions, ?trafficDensities, ?targetLap),								\
+												 Set(Pitstop.Strategy.Lap, ?targetLap)
 
 updatePitstopStrategy(?lap, ?fromLap, ?fromLap, [], [], []) <= !
 updatePitstopStrategy(?lap, ?fromLap, ?toLap, [?fromLap | ?laps], [?position | ?positions], [?trafficDensity | ?trafficDensities]) <=			\

@@ -441,7 +441,7 @@ class RaceStrategist extends RaceAssistant {
 		
 		speaker := this.getSpeaker()
 		
-		if false && !this.hasEnoughData()
+		if !this.hasEnoughData()
 			return
 				
 		knowledgeBase.setFact("Pitstop.Strategy.Plan", lap ? lap : true)
@@ -452,7 +452,7 @@ class RaceStrategist extends RaceAssistant {
 			this.dumpKnowledge(this.KnowledgeBase)
 		
 		plannedLap := knowledgebase.getValue("Pitstop.Strategy.Lap", false)
-		msgbox % plannedLap
+		
 		if !plannedLap
 			speaker.speakPhrase("NoPlannedPitstop")
 		else {
@@ -776,6 +776,19 @@ class RaceStrategist extends RaceAssistant {
 		
 		return result
 	}
+	
+	callRecommendPitstop() {
+		this.clearContinuation()
+				
+		this.getSpeaker().speakPhrase("Confirm")
+	
+		sendMessage()
+		
+		Loop 10
+			Sleep 500
+		
+		this.recommendPitstop()
+	}
 }
 
 
@@ -788,10 +801,10 @@ comparePositions(c1, c2) {
 }
 
 compareSequences(c1, c2) {
-	c1 := (c1 - Floor(c1))
-	c2 := (c2 - Floor(c2))
+	c1 := c1[2]
+	c2 := c2[2]
 	
-	return !(c1 > c2)
+	return !((c1 - Floor(c1)) > (c2 - Floor(c2)))
 }
 
 updatePositions(context, futureLap) {

@@ -1563,6 +1563,46 @@ class RaceEngineer extends RaceAssistant {
 		return result
 	}
 	
+	callPlanPitstop(lap := false) {		
+		this.clearContinuation()
+		
+		if !this.supportsPitstop()
+			this.getSpeaker().speakPhrase("NoPitstop")
+		else {
+			this.getSpeaker().speakPhrase("Confirm")
+		
+			sendMessage()
+		
+			Loop 10
+				Sleep 500
+			
+			if lap
+				this.planPitstop(lap)
+			else
+				this.planPitstop()
+		}
+	}
+	
+	callPreparePitstop(lap := false) {		
+		this.clearContinuation()
+				
+		if !this.supportsPitstop()
+			this.getSpeaker().speakPhrase("NoPitstop")
+		else {
+			this.getSpeaker().speakPhrase("Confirm")
+		
+			sendMessage()
+			
+			Loop 10
+				Sleep 500
+			
+			if lap
+				this.preparePitstop(lap)
+			else
+				this.preparePitstop()
+		}
+	}
+	
 	lowFuelWarning(remainingLaps) {
 		if this.Speaker {
 			speaker := this.getSpeaker()

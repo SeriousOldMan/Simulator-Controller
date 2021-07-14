@@ -9,6 +9,7 @@
   7. New ["Assistant" mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-assistant) for all simulator plugins, which may be used to group all assistant actions, like information requests or pitstop planning, into one dedicated layer for your hardware controller.
   8. Many of the plugin parameters for the ["Race Engineer" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) and ["Race Strategist" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) have been renamed.
   9. [Developer] Refactoring of assistant plugins and introduction of *RaceAssistantPlugin* base class.
+  9. [Developer] Automated unit tests for *RaceStrategist* class.
 
 ## 3.2.0-release 07/09/21
 

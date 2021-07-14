@@ -35,23 +35,98 @@ SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
 ;;;                         Private Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+class BasicReporting extends Assert {
+	BasisTest() {
+		strategist := new RaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
 
+		Loop {
+			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
+			
+			if (data.Count() == 0)
+				break
+			else
+				strategist.addLap(A_Index, data)
+			
+			switch A_Index {
+				case 1, 2, 3:
+					this.AssertEqual(7, strategist.KnowledgeBase.getValue("Position"), "Unexpected position detected in lap " . A_Index . "...")
+				case 4:
+					this.AssertEqual(6, strategist.KnowledgeBase.getValue("Position"), "Unexpected position detected in lap " . A_Index . "...")
+				case 5:
+					this.AssertEqual(5, strategist.KnowledgeBase.getValue("Position"), "Unexpected position detected in lap " . A_Index . "...")
+			}
+			
+			fuel := Round(strategist.KnowledgeBase.getValue("Lap.Remaining.Fuel"))
+			
+			switch A_Index {
+				case 2:
+					this.AssertEqual(14, fuel, "Unexpected remaining laps detected in lap " . A_Index . "...")
+				case 3:
+					this.AssertEqual(13, fuel, "Unexpected remaining laps detected in lap " . A_Index . "...")
+				case 4:
+					this.AssertEqual(12, fuel, "Unexpected remaining laps detected in lap " . A_Index . "...")
+				case 5:
+					this.AssertEqual(11, fuel, "Unexpected remaining laps detected in lap " . A_Index . "...")
+			}
+			
+			strategist.dumpKnowledge(strategist.KnowledgeBase)
+			
+			if (A_Index >= 5)
+				break
+		}
+	}
+	
+	StandingsMemoryTest() {
+		strategist := new RaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
+
+		Loop {
+			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
+			
+			if (data.Count() == 0)
+				break
+			else
+				strategist.addLap(A_Index, data)
+			
+			strategist.dumpKnowledge(strategist.KnowledgeBase)
+			
+			if (A_Index >= 5)
+				break
+		}
+		
+		this.AssertEqual(7, strategist.KnowledgeBase.getValue("Standings.Lap.1.Car.13.Position"), "Unexpected position detected in lap 1...")
+		this.AssertEqual(117417, strategist.KnowledgeBase.getValue("Standings.Lap.1.Car.13.Time"), "Unexpected time detected in lap 1...")
+		this.AssertEqual(117417, Round(strategist.KnowledgeBase.getValue("Standings.Lap.1.Car.13.Time.Average")), "Unexpected average time detected in lap 1...")
+		this.AssertEqual(7, strategist.KnowledgeBase.getValue("Standings.Lap.2.Car.13.Position"), "Unexpected position detected in lap 2...")
+		this.AssertEqual(105939, strategist.KnowledgeBase.getValue("Standings.Lap.2.Car.13.Time"), "Unexpected time detected in lap 2...")
+		this.AssertEqual(110530, Round(strategist.KnowledgeBase.getValue("Standings.Lap.2.Car.13.Time.Average")), "Unexpected average time detected in lap 2...")
+		this.AssertEqual(7, strategist.KnowledgeBase.getValue("Standings.Lap.3.Car.13.Position"), "Unexpected position detected in lap 3...")
+		this.AssertEqual(104943, strategist.KnowledgeBase.getValue("Standings.Lap.3.Car.13.Time"), "Unexpected time detected in lap 3...")
+		this.AssertEqual(107703, Round(strategist.KnowledgeBase.getValue("Standings.Lap.3.Car.13.Time.Average")), "Unexpected average time detected in lap 3...")
+		this.AssertEqual(6, strategist.KnowledgeBase.getValue("Standings.Lap.4.Car.13.Position"), "Unexpected position detected in lap 4...")
+		this.AssertEqual(103383, strategist.KnowledgeBase.getValue("Standings.Lap.4.Car.13.Time"), "Unexpected time detected in lap 4...")
+		this.AssertEqual(105481, Round(strategist.KnowledgeBase.getValue("Standings.Lap.4.Car.13.Time.Average")), "Unexpected average time detected in lap 4...")
+		this.AssertEqual(5, strategist.KnowledgeBase.getValue("Standings.Lap.5.Car.13.Position"), "Unexpected position detected in lap 5...")
+		this.AssertEqual(103032, strategist.KnowledgeBase.getValue("Standings.Lap.5.Car.13.Time"), "Unexpected time detected in lap 5...")
+		this.AssertEqual(103679, Round(strategist.KnowledgeBase.getValue("Standings.Lap.5.Car.13.Time.Average")), "Unexpected average time detected in lap 5...")
+	}
+}
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-setConfigurationValue(kSimulatorConfiguration, "Race Strategist Analysis", "Assetto Corsa Competizione" . ".ConsideredHistoryLaps", 2)
-setConfigurationValue(kSimulatorConfiguration, "Race Strategist Analysis", "Assetto Corsa Competizione" . ".HistoryLapsDamping", 0.5)
-setConfigurationValue(kSimulatorConfiguration, "Race Strategist Analysis", "Assetto Corsa Competizione" . ".AdjustLapTime", false)
-
 if !GetKeyState("Ctrl") {
+	AHKUnit.AddTestClass(BasicReporting)
+	; AHKUnit.AddTestClass(LapTimesReporting)
+	; AHKUnit.AddTestClass(PositionProjection)
+	; AHKUnit.AddTestClass(GapReporting)
+
 	AHKUnit.Run()
 }
 else {
 	raceNr := 13
 	strategist := new RaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist.settings")
-								   , "Khato", "de", true, true)
+								   , "Khato", "en", true, true)
 
 	strategist.VoiceAssistant.setDebug(kDebugGrammars, false)
 	
@@ -84,6 +159,9 @@ else {
 					if isDebug()
 						showMessage("Data " lap . "." . A_Index . " loaded...")
 				}
+				
+				if (A_Index = 1)
+					break
 			}
 		} until done
 		

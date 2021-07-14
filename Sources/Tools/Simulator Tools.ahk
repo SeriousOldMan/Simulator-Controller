@@ -1139,9 +1139,6 @@ runSpecialTargets(ByRef buildProgress) {
 						if (StrLen(Trim(text)) == 0)
 							Throw "Error while compiling..."
 					}
-					
-					if FileExist(kTempDirectory . "build.out")
-						FileDelete %kTempDirectory%build.out
 				}
 				catch exception {
 					logMessage(kLogCritical, translate("Cannot compile ") . solution . translate(" - Solution or MSBuild (") . msBuild . translate(") not found"))
@@ -1152,11 +1149,11 @@ runSpecialTargets(ByRef buildProgress) {
 					success := true
 				}
 				
-				if !success {
-					FileRead text, %kTempDirectory%build.out
-					
+				if !success
 					viewFile(kTempDirectory . "build.out", translate("Error while compiling ") . solution, "Left", "Top", 800, 600)
-				}
+					
+				if FileExist(kTempDirectory . "build.out")
+					FileDelete %kTempDirectory%build.out
 			}
 		}
 	}

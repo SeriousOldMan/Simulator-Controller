@@ -207,9 +207,9 @@ With *true* supplied for *raceAssistantLogo*, Jona will show a nice rotating AI 
 
 It is possible, although not much fun, to use Jona without its natural language interface. Only the pitstop planning and setup capabilities are available in this cconfiguration, but it is still useful. You can use the following parameters to connect these actions to your controller hardware:
 
-	commands: PitstopPlan *function*, PitstopPrepare *function*,
-			  Accept *acceptFunction*, Reject *rejectFunction*,
-			  InformationRequest *requestFunction* *command* [*arguments*], ...
+	assistantCommands: PitstopPlan *function*, PitstopPrepare *function*,
+					   Accept *acceptFunction*, Reject *rejectFunction*,
+					   InformationRequest *requestFunction* *command* [*arguments*], ...
 	
 All these command actions will be bound to the plugin itself, thereby are available all the time, and only unary functions are supported here. By using this actions, you will be able to use Jona with voice output, but no voice control, thereby getting most of the support from Jona, but you have to use an *oldschool* interface to control the engineer actions. To *answer* "Yes" to one of the questions of Jona, you must supply a controller function, for example a push button function, to the *Accept* parameter and for "No", you must use the *Reject* parameter.
 
@@ -217,11 +217,11 @@ Furthermore, you can request a lot of information from Jona, mostly about the cu
 
 Example:
 
-	commands: ...,
-			  InformationRequest LapsRemaining Button.1,
-			  InformationRequest TyrePressures Button.2,
-			  InformationRequest TyreTemperatures Button.3,
-			  ...
+	assistantCommands: ...,
+					   InformationRequest LapsRemaining Button.1,
+					   InformationRequest TyrePressures Button.2,
+					   InformationRequest TyreTemperatures Button.3,
+					   ...
 	
 Please see the following table for available information commands.
 
@@ -232,7 +232,7 @@ Please see the following table for available information commands.
 | TyrePressures | Cato will tell you the current pressures in your tyres in PSI. |
 | TyreTemperatures | This command will give you the current temperatures in the core of your tyres in Degrees Celsius. |
 
-Note: The *commands* actions are also available in most of the simulation plugins, which define a "Pitstop" mode.
+Note: All these commands are also available in most of the simulation plugins, either in the "Pitstop" mode or in the "Assistant" mode, depending on the configuration parameters.
 
 ## Plugin *Race Strategist*
 
@@ -252,8 +252,8 @@ With *true* supplied for *raceAssistantLogo*, Cato will show a nice rotating AI 
 
 Similar as for Jona, you can use the following parameters to trigger some of Catos service without using voice commands:
 
-	commands: PitstopRecommend *function*, Accept *acceptFunction*, Reject *rejectFunction*,
-			  InformationRequest *requestFunction* *command* [*arguments*], ...
+	assistantCommands: PitstopRecommend *function*, Accept *acceptFunction*, Reject *rejectFunction*,
+					   InformationRequest *requestFunction* *command* [*arguments*], ...
 	
 All these command actions will be bound to the plugin itself, thereby are available all the time, and only unary functions are supported here. By using these actions, you will be able to use Cato with voice output, but no voice control, thereby getting most of the support from Cato, but you have to use an *oldschool* interface to control the strategist actions. To *answer* "Yes" to one of the questions of Cato, you must supply a controller function, for example a push button function, to the *Accept* parameter and for "No", you must use the *Reject* parameter.
 
@@ -261,11 +261,11 @@ Furthermore, you can request a lot of information from Cato about the current ra
 
 Example:
 
-	commands: ...,
-			  InformationRequest Position Button.1,
-			  InformationRequest GapToFront Track Button.2,
-			  InformationRequest GapToRear Track Button.3,
-			  ...
+	assistantCommands: ...,
+					   InformationRequest Position Button.1,
+					   InformationRequest GapToFront Track Button.2,
+					   InformationRequest GapToRear Track Button.3,
+					   ...
 	
 Please see the following table for available information commands.
 

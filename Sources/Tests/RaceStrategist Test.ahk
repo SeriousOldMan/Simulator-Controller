@@ -104,10 +104,10 @@ class BasicReporting extends Assert {
 		this.AssertEqual(107703, Round(strategist.KnowledgeBase.getValue("Standings.Lap.3.Car.13.Time.Average")), "Unexpected average time detected in lap 3...")
 		this.AssertEqual(6, strategist.KnowledgeBase.getValue("Standings.Lap.4.Car.13.Position"), "Unexpected position detected in lap 4...")
 		this.AssertEqual(103383, strategist.KnowledgeBase.getValue("Standings.Lap.4.Car.13.Time"), "Unexpected time detected in lap 4...")
-		this.AssertEqual(105481, Round(strategist.KnowledgeBase.getValue("Standings.Lap.4.Car.13.Time.Average")), "Unexpected average time detected in lap 4...")
+		this.AssertEqual(105482, Round(strategist.KnowledgeBase.getValue("Standings.Lap.4.Car.13.Time.Average")), "Unexpected average time detected in lap 4...")
 		this.AssertEqual(5, strategist.KnowledgeBase.getValue("Standings.Lap.5.Car.13.Position"), "Unexpected position detected in lap 5...")
 		this.AssertEqual(103032, strategist.KnowledgeBase.getValue("Standings.Lap.5.Car.13.Time"), "Unexpected time detected in lap 5...")
-		this.AssertEqual(103679, Round(strategist.KnowledgeBase.getValue("Standings.Lap.5.Car.13.Time.Average")), "Unexpected average time detected in lap 5...")
+		this.AssertEqual(103680, Round(strategist.KnowledgeBase.getValue("Standings.Lap.5.Car.13.Time.Average")), "Unexpected average time detected in lap 5...")
 	}
 }
 

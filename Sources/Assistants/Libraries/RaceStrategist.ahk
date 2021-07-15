@@ -409,79 +409,6 @@ class RaceStrategist extends RaceAssistant {
 		this.recommendPitstop(lap)
 	}
 	
-	requestInformation(category, arguments*) {
-		switch category {
-			case "LapsRemaining":
-				this.lapsRemainingRecognized([])
-			case "Weather":
-				this.weatherRecognized([])
-			case "LapTimes":
-				this.lapTimesRecognized([])
-			case "Position":
-				this.positionRecognized([])
-			case "GapToFrontStandings":
-				this.gapToFrontRecognized([])
-			case "GapToFrontTrack":
-				this.gapToFrontRecognized(["Car"])
-			case "GapToFront":
-				this.gapToFrontRecognized(inList(arguments, "Track") ? Array(this.getSpeaker().Fragments["Car"]) : [])
-			case "GapToBehindStandings":
-				this.gapToBehindRecognized([])
-			case "GapToBehindTrack":
-				this.gapToBehindRecognized(["Car"])
-			case "GapToBehind":
-				this.gapToBehindRecognized(inList(arguments, "Track") ? Array(this.getSpeaker().Fragments["Car"]) : [])
-			case "GapToLeader":
-				this.gapToLeaderRecognized([])
-		}
-	}
-	
-	recommendPitstop(lap := false) {
-		local knowledgeBase := this.KnowledgeBase
-		
-		speaker := this.getSpeaker()
-		
-		if !this.hasEnoughData()
-			return
-				
-		knowledgeBase.setFact("Pitstop.Strategy.Plan", lap ? lap : true)
-		
-		knowledgeBase.produce()
-		
-		if this.Debug[kDebugKnowledgeBase]
-			this.dumpKnowledge(this.KnowledgeBase)
-		
-		plannedLap := knowledgebase.getValue("Pitstop.Strategy.Lap", kUndefined)
-		
-		if (plannedLap == kUndefined)
-			speaker.speakPhrase("NoPlannedPitstop")
-		else if !plannedLap
-			speaker.speakPhrase("NoPitstopNeeded")
-		else {
-			speaker.speakPhrase("PitstopLap", {lap: plannedLap})
-		
-			Process Exist, Race Engineer.exe
-			
-			if (ErrorLevel && this.Listener) {
-				speaker.speakPhrase("InformEngineer", false, true)
-				
-				this.setContinuation(ObjBindMethod(this, "planPitstop", plannedLap))
-			}
-		}
-	}
-	
-	planPitstop(plannedLap) {
-		sendMessage()
-		
-		Loop 10
-			Sleep 500
-		
-		Process Exist, Race Engineer.exe
-		
-		if ErrorLevel
-			raiseEvent(kFileMessage, "Engineer", "planPitstop:" . plannedLap, ErrorLevel)
-	}
-	
 	createSession(data) {
 		local facts
 		
@@ -764,6 +691,82 @@ class RaceStrategist extends RaceAssistant {
 		return result
 	}
 	
+	requestInformation(category, arguments*) {
+		switch category {
+			case "LapsRemaining":
+				this.lapsRemainingRecognized([])
+			case "Weather":
+				this.weatherRecognized([])
+			case "LapTimes":
+				this.lapTimesRecognized([])
+			case "Position":
+				this.positionRecognized([])
+			case "GapToFrontStandings":
+				this.gapToFrontRecognized([])
+			case "GapToFrontTrack":
+				this.gapToFrontRecognized(["Car"])
+			case "GapToFront":
+				this.gapToFrontRecognized(inList(arguments, "Track") ? Array(this.getSpeaker().Fragments["Car"]) : [])
+			case "GapToBehindStandings":
+				this.gapToBehindRecognized([])
+			case "GapToBehindTrack":
+				this.gapToBehindRecognized(["Car"])
+			case "GapToBehind":
+				this.gapToBehindRecognized(inList(arguments, "Track") ? Array(this.getSpeaker().Fragments["Car"]) : [])
+			case "GapToLeader":
+				this.gapToLeaderRecognized([])
+		}
+	}
+	
+	recommendPitstop(lap := false) {
+		local knowledgeBase := this.KnowledgeBase
+		
+		speaker := this.getSpeaker()
+		
+		if !this.hasEnoughData()
+			return
+				
+		knowledgeBase.setFact("Pitstop.Strategy.Plan", lap ? lap : true)
+		
+		knowledgeBase.produce()
+		
+		if this.Debug[kDebugKnowledgeBase]
+			this.dumpKnowledge(this.KnowledgeBase)
+		
+		plannedLap := knowledgebase.getValue("Pitstop.Strategy.Lap", kUndefined)
+		
+		if (plannedLap == kUndefined)
+			speaker.speakPhrase("NoPlannedPitstop")
+		else if !plannedLap
+			speaker.speakPhrase("NoPitstopNeeded")
+		else {
+			speaker.speakPhrase("PitstopLap", {lap: plannedLap})
+		
+			Process Exist, Race Engineer.exe
+			
+			if (ErrorLevel && this.Listener) {
+				speaker.speakPhrase("InformEngineer", false, true)
+				
+				this.setContinuation(ObjBindMethod(this, "planPitstop", plannedLap))
+			}
+		}
+	}
+	
+	planPitstop(plannedLap := false) {
+		sendMessage()
+		
+		Loop 10
+			Sleep 500
+		
+		Process Exist, Race Engineer.exe
+		
+		if ErrorLevel
+			if plannedLap
+				raiseEvent(kFileMessage, "Engineer", "planPitstop:" . plannedLap, ErrorLevel)
+			else
+				raiseEvent(kFileMessage, "Engineer", "planPitstop", ErrorLevel)
+	}
+	
 	performPitstop(lapNumber := false) {
 		local knowledgeBase := this.KnowledgeBase
 		
@@ -790,6 +793,37 @@ class RaceStrategist extends RaceAssistant {
 			Sleep 500
 		
 		this.recommendPitstop()
+	}
+	
+	weatherChangeNotification(change, minutes) {
+		local knowledgeBase := this.KnowledgeBase
+		
+		if this.Speaker {
+			speaker := this.getSpeaker()
+			
+			speaker.speakPhrase(change ? "WeatherChange" : "WeatherNoChange", {minutes: minutes})
+		}
+	}
+	
+	weatherTyreChangeRecommendation(minutes, recommendedCompound) {
+		local knowledgeBase := this.KnowledgeBase
+		
+		if (knowledgeBase.getValue("Lap.Remaining") > 3)
+			if this.Speaker {
+				speaker := this.getSpeaker()
+				fragments := speaker.Fragments
+				
+				speaker.speakPhrase((recommendedCompound = "Wet") ? "WeatherRainChange" : "WeatherDryChange"
+								  , {minutes: minutes, compound: fragments[recommendedCompound]})
+				
+				Process Exist, Race Engineer.exe
+					
+				if (ErrorLevel && this.Listener) {
+					speaker.speakPhrase("InformEngineer", false, true)
+					
+					this.setContinuation(ObjBindMethod(this, "planPitstop"))
+				}
+			}
 	}
 }
 

@@ -1675,18 +1675,23 @@ class RaceEngineer extends RaceAssistant {
 	
 	weatherChangeNotification(change, minutes) {
 		local knowledgeBase := this.KnowledgeBase
-		
-		if this.Speaker {
-			speaker := this.getSpeaker()
 			
-			speaker.speakPhrase(change ? "WeatherChange" : "WeatherNoChange", {minutes: minutes})
-		}
+		Process Exist, Race Strategist.exe
+		
+		if !ErrorLevel
+			if this.Speaker {
+				speaker := this.getSpeaker()
+				
+				speaker.speakPhrase(change ? "WeatherChange" : "WeatherNoChange", {minutes: minutes})
+			}
 	}
 	
 	weatherTyreChangeRecommendation(minutes, recommendedCompound) {
 		local knowledgeBase := this.KnowledgeBase
 		
-		if (knowledgeBase.getValue("Lap.Remaining") > 3)
+		Process Exist, Race Strategist.exe
+		
+		if (!ErrorLevel && (knowledgeBase.getValue("Lap.Remaining") > 3))
 			if this.Speaker {
 				speaker := this.getSpeaker()
 				fragments := speaker.Fragments

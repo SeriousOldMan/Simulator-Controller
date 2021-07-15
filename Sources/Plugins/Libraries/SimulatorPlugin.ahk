@@ -551,10 +551,10 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 	
 	requestInformation(arguments*) {
-		if (this.RaceEngineer && this.RaceEngineer.requestInformation(arguments*))
+		if (this.RaceStrategist && this.RaceStrategist.requestInformation(arguments*))
 			return
-		else if this.RaceStrategist
-			this.RaceStrategist.requestInformation(arguments*)
+		else if this.RaceEngineer
+			this.RaceEngineer.requestInformation(arguments*)
 	}
 	
 	accept() {

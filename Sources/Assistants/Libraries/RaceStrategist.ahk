@@ -880,3 +880,15 @@ updatePositions(context, futureLap) {
 	
 	return true
 }
+
+weatherChangeNotification(context, change, minutes) {
+	context.KnowledgeBase.RaceAssistant.weatherChangeNotification(change, minutes)
+	
+	return true
+}
+
+weatherTyreChangeRecommendation(context, minutes, recommendedCompound) {
+	context.KnowledgeBase.RaceAssistant.weatherTyreChangeRecommendation(minutes, recommendedCompound)
+	
+	return true
+}

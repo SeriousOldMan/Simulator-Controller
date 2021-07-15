@@ -1,0 +1,65 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;   Modular Simulator Controller System - Weather Notifications           ;;;
+;;;                                                                         ;;;
+;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
+;;;   License:    (2021) Creative Commons - BY-NC-SA                        ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+priority: 5, {Any: [?Weather.Weather.10Min], {None: [?Weather.Weather.10Min.Index]}} => (Prove: updateWeatherIndex, 10Min)
+priority: 5, {Any: [?Weather.Weather.30Min], {None: [?Weather.Weather.30Min.Index]}} => (Prove: updateWeatherIndex, 30Min)
+
+updateWeatherIndex(?time) <= Get(Weather.Weather, ?time, ?weather), weatherIndex(?weather, ?index), Set(Weather.Weather, ?time, Index, ?index)
+
+priority: 1,																																	\
+	{All: [?Lap], [?Tyre.Compound = Dry], {None: [?Weather.Tyre.Change.Recommended]},															\
+		  {Any: [?Weather.Weather.10Min = LightRain], [?Weather.Weather.10Min = MediumRain],													\
+				[?Weather.Weather.10Min = HeavyRain], [?Weather.Weather.10Min = Thunderstorm]}} =>												\
+		(Prove: weatherTyreChangeRecommendation, ?Lap, ?Weather.Weather.10Min, 10, Wet)
+priority: 1,																																	\
+	{All: [?Lap], [?Tyre.Compound = Dry],																										\
+		  {Any: [?Weather.Weather.10Min = Dry], [?Weather.Weather.10Min = Drizzle]}} =>															\
+		(Set: Weather.Tyre.Compound.Target, Dry), (Set: Weather.Tyre.Compound.Color.Target, !Tyre.Compound.Color)
+priority: 1,																																	\
+	{All: [?Lap], [?Tyre.Compound = Wet], {None: [?Weather.Change.Recommended]},																\
+		  {Any: [?Weather.Weather.10Min = Dry], [?Weather.Weather.10Min = Drizzle]}} =>															\
+		(Prove: weatherTyreChangeRecommendation, ?Lap, ?Weather.Weather.10Min, 10, Dry)
+priority: 1,																																	\
+	{All: [?Lap], [?Tyre.Compound = Wet],																										\
+		  {Any: [?Weather.Weather.10Min = LightRain], [?Weather.Weather.10Min = MediumRain],													\
+				[?Weather.Weather.10Min = HeavyRain], [?Weather.Weather.10Min = Thunderstorm]}} =>												\
+		(Set: Weather.Tyre.Compound.Target, Wet), (Set: Weather.Tyre.Compound.Color.Target, Black)
+		
+{All: [?Lap], [?Tyre.Compound = Dry],																											\
+	  {Any: {All: {None: [?Weather.Change.Notified]},																							\
+				  {Any: [?Weather.Weather.Now = Dry], [?Weather.Weather.Now = Drizzle]},														\
+				  {Any: [?Weather.Weather.30Min = LightRain], [?Weather.Weather.30Min = MediumRain],											\
+						[?Weather.Weather.30Min = HeavyRain], [?Weather.Weather.30Min = Thunderstorm]}},										\
+			[?Weather.Change.Notified < ?Weather.Weather.30Min.Index]}} =>																		\
+		(Prove: weatherChangeNotification, ?Lap, !Weather.Weather.30Min, 30)
+{All: [?Lap], [?Tyre.Compound = Wet],																											\
+	  {Any: {All: {None: [?Weather.Change.Notified]},																							\
+				  {Any: [?Weather.Weather.Now = LightRain], [?Weather.Weather.Now = MediumRain],												\
+						[?Weather.Weather.Now = HeavyRain], [?Weather.Weather.Now = Thunderstorm]},												\
+				  {Any: [?Weather.Weather.30Min = Dry], [?Weather.Weather.30Min = Drizzle]}},													\
+			[?Weather.Change.Notified > ?Weather.Weather.30Min.Index]}} =>																		\
+		(Prove: weatherChangeNotification, ?Lap, !Weather.Weather.30Min, 30)
+
+priority: -20, [?Pitstop.Lap = ?Lap] => (Clear: Weather.Tyre.Change.Recommended), (Clear: Weather.Change.Notified),								\
+										(Clear: Weather.Tyre.Compound.Target), (Clear: Weather.Tyre.Compound.Color.Target)
+
+weatherChangeNotification(?lap, ?weather, ?minutes) <= remainingStintTime(?lap, ?stintTime), ?remainingMinutes = ?stintTime / 60000,			\
+													   ?remainingMinutes > ?minutes, Call(weatherChangeNotification, true, ?minutes),			\
+													   weatherIndex(?weather, ?index), Set(Weather.Change.Notified, ?index)
+weatherChangeNotification(?lap, ?weather, ?minutes) <= remainingStintTime(?lap, ?stintTime), ?remainingMinutes = ?stintTime / 60000,			\
+													   =<(?remainingMinutes, ?minutes), Call(weatherChangeNotification, false, ?minutes),		\
+													   weatherIndex(?weather, ?index), Set(Weather.Change.Notified, ?index)
+											 
+weatherTyreChangeRecommendation(?lap, ?weather, ?minutes, ?compound) <=																			\
+		remainingStintTime(?lap, ?stintTime), ?remainingMinutes = ?stintTime / 60000, ?remainingMinutes > ?minutes,								\
+		Call(weatherTyreChangeRecommendation, ?minutes, ?compound), weatherIndex(?weather, ?index),												\
+		Set(Weather.Tyre.Change.Recommended, ?index), Set(Weather.Tyre.Compound.Target, ?compound),												\
+		tyreCompoundColor(?compound, ?color), Set(Weather.Tyre.Compound.Color.Target, ?color)
+weatherTyreChangeRecommendation(?lap, ?weather, ?minutes, ?compound) <=																			\
+		remainingStintTime(?lap, ?stintTime), ?remainingMinutes = ?stintTime / 60000, =<(?remainingMinutes, ?minutes),							\
+		Call(weatherChangeNotification, false, ?minutes), weatherIndex(?weather, ?index),														\
+		Set(Weather.Tyre.Change.Recommended, ?index)

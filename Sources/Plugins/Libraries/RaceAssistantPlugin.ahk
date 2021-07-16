@@ -428,7 +428,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				if this.Controller.VoiceServer
 					options .= " -Voice """ . this.Controller.VoiceServer . """"
 				
-				exePath := kBinariesDirectory . this.Plugin . ".exe" . options
+				exePath := """" . kBinariesDirectory . this.Plugin . ".exe""" . options
 				
 				Run %exePath%, %kBinariesDirectory%, , raceAssistantPID
 			}

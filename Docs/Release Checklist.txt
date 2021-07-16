@@ -23,6 +23,9 @@ Release 3.2.4 Checklist
 1. New option for Audio Processing
    a. Installation & Configuration
    b. Image
+2. Update Procedure
+   a. Translations
+   b. Phrase Grammars
 
 Release 3.2.2 Checklist
 =======================

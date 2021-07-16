@@ -566,8 +566,15 @@ requestShareSetupDatabaseConsent() {
 			setConfigurationValue(newConsent, "General", "ID", id)
 			setConfigurationValue(newConsent, "Consent", "Date", A_MM . "/" . A_DD . "/" . A_YYYY)
 			
-			result := consentDialog(id, consent)
+			if FileExist(kConfigDirectory . "Consent.ini")
+				result := consentDialog(id, consent)
+			else {
+				result := {}
 			
+				result["TyrePressures"] := "Retry"
+				result["CarSetups"] := "Retry"
+			}
+				
 			switch result["TyrePressures"] {
 				case "Yes":
 					setConfigurationValue(newConsent, "Consent", "Share Tyre Pressures", "Yes")

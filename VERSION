@@ -1,14 +1,14 @@
 [Development]
-Version=3.2.2-alpha
+Version=3.2.2-release
 Target=3.2.2-release
-Date=07/14/2021
+Date=07/16/2021
 Changes=More information supplied by Jona, New plugin arguments for Race Strategist plugin, Accept & Reject plugin commands now works always for the currently focused voice assistant, New information actions for "Race Engineer" plugin, New information actions for "Race Strategist" plugin, Use the information actions on all "Pitstop" modes, New "Assistant" mode for all simulator plugins, Refactoring of assistant plugins and introduction of *RaceAssistantPlugin* base class, Renaming of all plugin arguments of the plugins "Race Engineer" and "Race Strategist", Automated tests for "RaceStrategist" class, Support for new repair options in RaceRoom Racing Experience Pitstop MFD
 [Release]
-Version=3.2.0-release
-Date=07/09/2021
-Changes=Shared memory data provider for Automobilista 2, New controller action "execute" to execute any command, Integration of Automobilista 2 with Jona and Cato, New "Pitstop" mode for "AMS2" plugin
+Version=3.2.2-release
+Date=07/16/2021
+Changes=More information supplied by Jona, New plugin arguments for Race Strategist plugin, Accept & Reject plugin commands now works always for the currently focused voice assistant, New information actions for "Race Engineer" plugin, New information actions for "Race Strategist" plugin, Use the information actions on all "Pitstop" modes, New "Assistant" mode for all simulator plugins, Refactoring of assistant plugins and introduction of *RaceAssistantPlugin* base class, Renaming of all plugin arguments of the plugins "Race Engineer" and "Race Strategist", Automated tests for "RaceStrategist" class, Support for new repair options in RaceRoom Racing Experience Pitstop MFD
 [Current]
-Type=Development
+Type=Release
 [Version]
-Release=3.2.0-release
-Development=3.2.2-alpha
+Release=3.2.2-release
+Development=3.2.2-release

@@ -174,7 +174,7 @@ As always, must of the update work in this release will be handled automatically
 
 ## Release 2.7
 
-VERY IMPORTANT: You MUST run *Simulator Tools* from the *Binaries* folder BEFORE running any other application of Simulator Tools, and accept the "Update" of the local database. Otherwise you might get execution errors from the other applications. But before you do this, read this update notes carefully, since you may want to *rescue* your setup database, before running the update.
+VERY IMPORTANT: You MUST run *Simulator Tools* from the *Binaries* folder BEFORE running any other application of Simulator Controller, and accept the "Update" of the local database. Otherwise you might get execution errors from the other applications. But before you do this, read this update notes carefully, since you may want to *rescue* your setup database, before running the update.
 
 Note: If you have you already installed and used an early or development release for version 2.7, it is NECESSARY to rerun the update procedure for the final release to be sure to include all required updates. To achieve this, just delete the corresponding line from the *UPDATES* file in the *Simulator Controller\Config* folder in your users *Documents* folder, and the update procedure will take care of the rest.
 

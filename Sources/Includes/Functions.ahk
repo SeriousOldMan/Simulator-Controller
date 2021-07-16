@@ -858,6 +858,15 @@ loadSimulatorConfiguration() {
 	else
 		logMessage(kLogWarn, translate("NirCmd executable not configured"))
 	
+	path := getConfigurationValue(kSimulatorConfiguration, "Voice Control", "SoX Path")
+	if path {
+		kSoX := path . "\sox.exe"
+		
+		logMessage(kLogInfo, translate("SoX executable set to ") . kSox)
+	}
+	else
+		logMessage(kLogWarn, translate("SoX executable not configured"))
+	
 	kSilentMode := getConfigurationValue(kSimulatorConfiguration, "Configuration", "Silent Mode", false)
 	
 	if (!A_IsCompiled || getConfigurationValue(kSimulatorConfiguration, "Configuration", "Debug", false))

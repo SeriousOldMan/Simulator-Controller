@@ -52,15 +52,70 @@ class SpeechGenerator {
 		
 		Loop, % this.iSpeechGenerator.GetVoices.Count
 			this.Voices.Push(this.iSpeechGenerator.GetVoices.Item(A_Index-1).GetAttribute("Name"))
-	
+		
 		this.setVoice(this.computeVoice(voice, language))
 	}
 
 	speak(text, wait := true) {
 		this.stop()
-		
-		this.iSpeechGenerator.Speak(text, (wait ? 0x0 : 0x1))
+
+		if kSoX {
+			Random postfix, 1, 1000000
+			
+			postfix := Round(postfix)
+	
+			temp1Name := kTempDirectory . "temp1_" . postfix . ".wav"
+			temp2Name := kTempDirectory . "temp2_" . postfix . ".wav"
+			
+			this.speakToFile(temp1Name, text)
+			
+			try {
+				RunWait "%kSoX%" "%temp1Name%" "%temp2Name%" rate 16k channels 1 overdrive 20 20 highpass 800 lowpass 1800, , Hide
+				RunWait "%kSoX%" -m -v 0.2 "%kResourcesDirectory%Sounds\Noise.wav" "%temp2Name%" "%temp1Name%" channels 1 reverse vad -p 1 reverse, , Hide
+				RunWait "%kSoX%" "%kResourcesDirectory%Sounds\Click.wav" "%temp1Name%" "%temp2Name%", , Hide
+				
+				SoundPlay %temp2Name%, Wait
+			}
+			catch exception {
+				showMessage(substituteVariables(translate("Cannot start SoX (%kSoX%) - please check the configuration..."))
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+					  
+				this.iSpeechGenerator.Speak(text, (wait ? 0x0 : 0x1))
+			}
+			finally {
+				if FileExist(temp1Name)
+					FileDelete %temp1Name%
+				
+				if FileExist(temp2Name)
+					FileDelete %temp2Name%
+			}
+		}
+		else
+			this.iSpeechGenerator.Speak(text, (wait ? 0x0 : 0x1))
 	}
+
+	speakToFile(fileName, text) {
+		this.stop()
+		
+		oldStream := this.iSpeechGenerator.AudioOutputStream
+		
+		stream := ComObjCreate("Sapi.SpFileStream")
+		
+		try {
+			stream.Open(fileName, 0x3, 0)
+		
+			this.iSpeechGenerator.AudioOutputStream := stream
+		
+			this.iSpeechGenerator.Speak(text, 0x0)
+		}
+		finally {
+			stream.Close()
+			
+			this.iSpeechGenerator.AudioOutputStream := oldStream
+		}
+	}
+	
+		
 	
 	pause() {
 		status := this.iSpeechGenerator.Status.RunningState

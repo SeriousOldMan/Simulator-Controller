@@ -19,6 +19,7 @@ global speakerDropDown
 global speakerVolumeSlider
 global speakerPitchSlider
 global speakerSpeedSlider
+global soXPathEdit = ""
 global listenerDropDown
 global pushToTalkEdit = ""
 global activationCommandEdit = ""
@@ -92,7 +93,14 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		
 		Gui %window%:Add, Text, x16 y184 w110 h23 +0x200, % translate("Speed")
 		Gui %window%:Add, Slider, x134 y184 w135 Range-10-10 ToolTip VspeakerSpeedSlider, % speakerSpeedSlider
-		
+	
+		Gui %window%:Add, Text, x16 y208 w140 h23 +0x200, % translate("SoX Folder (optional)")
+		Gui %window%:Font, c505050 s8
+		Gui %window%:Add, Text, x24 y226 w133 h23, % translate("(Post Processing)")
+		Gui %window%:Font
+		Gui %window%:Add, Edit, x134 y208 w314 h21 VsoXPathEdit, %soXPathEdit%
+		Gui %window%:Add, Button, x450 y208 w23 h23 gchooseSoXPath, % translate("...")
+
 		recognizers := new SpeechRecognizer().getRecognizerList().Clone()
 		
 		Loop % recognizers.Length()
@@ -106,16 +114,16 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		if (chosen == 0)
 			chosen := 1
 		
-		Gui %window%:Add, Text, x16 y216 w110 h23 +0x200, % translate("Speech Recognizer")
-		Gui %window%:Add, DropDownList, x134 y216 w340 Choose%chosen% VlistenerDropDown, % values2String("|", recognizers*)
+		Gui %window%:Add, Text, x16 y250 w110 h23 +0x200, % translate("Speech Recognizer")
+		Gui %window%:Add, DropDownList, x134 y250 w340 Choose%chosen% VlistenerDropDown, % values2String("|", recognizers*)
 		
-		Gui %window%:Add, Text, x16 y240 w110 h23 +0x200, % translate("Push To Talk")
-		Gui %window%:Add, Edit, x134 y240 w110 h21 VpushToTalkEdit, %pushToTalkEdit%
-		Gui %window%:Add, Button, x246 y239 w23 h23 ggetPTTHotkey HwnddetectPTTButtonHandle
+		Gui %window%:Add, Text, x16 y274 w110 h23 +0x200, % translate("Push To Talk")
+		Gui %window%:Add, Edit, x134 y274 w110 h21 VpushToTalkEdit, %pushToTalkEdit%
+		Gui %window%:Add, Button, x246 y273 w23 h23 ggetPTTHotkey HwnddetectPTTButtonHandle
 		setButtonIcon(detectPTTButtonHandle, kIconsDirectory . "Key.ico", 1)
 		
-		Gui %window%:Add, Text, x16 y264 w110 h23 +0x200, % translate("Activation Command")
-		Gui %window%:Add, Edit, x134 y264 w135 h21 VactivationCommandEdit, %activationCommandEdit%
+		Gui %window%:Add, Text, x16 y298 w110 h23 +0x200, % translate("Activation Command")
+		Gui %window%:Add, Edit, x134 y298 w135 h21 VactivationCommandEdit, %activationCommandEdit%
 	}
 	
 	loadFromConfiguration(configuration) {
@@ -133,6 +141,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		speakerVolumeSlider := getConfigurationValue(configuration, "Voice Control", "SpeakerVolume", 100)
 		speakerPitchSlider := getConfigurationValue(configuration, "Voice Control", "SpeakerPitch", 0)
 		speakerSpeedSlider := getConfigurationValue(configuration, "Voice Control", "SpeakerSpeed", 0)
+		soXPathEdit := getConfigurationValue(configuration, "Voice Control", "SoX Path", "")
 		
 		listenerDropDown := getConfigurationValue(configuration, "Voice Control", "Listener", false)
 		pushToTalkEdit := getConfigurationValue(configuration, "Voice Control", "PushToTalk", false)
@@ -163,6 +172,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		GuiControlGet speakerVolumeSlider
 		GuiControlGet speakerPitchSlider
 		GuiControlGet speakerSpeedSlider
+		GuiControlGet soXPathEdit
 		GuiControlGet listenerDropDown
 		GuiControlGet pushToTalkEdit
 		GuiControlGet activationCommandEdit
@@ -210,6 +220,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		setConfigurationValue(configuration, "Voice Control", "SpeakerVolume", speakerVolumeSlider)
 		setConfigurationValue(configuration, "Voice Control", "SpeakerPitch", speakerPitchSlider)
 		setConfigurationValue(configuration, "Voice Control", "SpeakerSpeed", speakerSpeedSlider)
+		setConfigurationValue(configuration, "Voice Control", "SoX Path", soXPathEdit)
 		setConfigurationValue(configuration, "Voice Control", "Listener", listenerDropDown)
 		setConfigurationValue(configuration, "Voice Control", "PushToTalk", (Trim(pushToTalkEdit) = "") ? false : pushToTalkEdit)
 		setConfigurationValue(configuration, "Voice Control", "ActivationCommand", (Trim(activationCommandEdit) = "") ? false : activationCommandEdit)
@@ -240,6 +251,20 @@ getPTTHotkey() {
 	
 	try {
 		ConfigurationEditor.Instance.toggleKeyDetector("setPTTHotkey")
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+chooseSoXPath() {
+	protectionOn()
+	
+	try{
+		FileSelectFolder directory, *%soXPathEdit%, 0, % translate("Select SoX folder...")
+	
+		if (directory != "")
+			GuiControl Text, soXPathEdit, %directory%
 	}
 	finally {
 		protectionOff()

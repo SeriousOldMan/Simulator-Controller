@@ -760,11 +760,11 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 readSimulatorData(simulator, options := "", protocol := "SHM") {
 	exePath := kBinariesDirectory . simulator . " " . protocol . " Reader.exe"
 	
-	Random prefix, 1, 1000000
+	Random postfix, 1, 1000000
 	
 	FileCreateDir %kTempDirectory%%simulator% Data
 	
-	dataFile := kTempDirectory . simulator . " Data\" . protocol . "_" . Round(prefix) . ".data"
+	dataFile := kTempDirectory . simulator . " Data\" . protocol . "_" . Round(postfix) . ".data"
 	
 	try {
 		RunWait %ComSpec% /c ""%exePath%" %options% > "%dataFile%"", , Hide

@@ -61,6 +61,7 @@ global kSimulatorConfiguration
 global kSilentMode = false
 
 global kNirCmd = false
+global kSoX = false
 
 global k1WayToggleType = "1WayToggle"
 global k2WayToggleType = "2WayToggle"

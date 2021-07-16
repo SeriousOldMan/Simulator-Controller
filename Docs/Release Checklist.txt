@@ -16,6 +16,14 @@ General Release Actions
 12. Update #releases and #anouncements in Discord
 13. Set a Git Tag after final commit
 
+Release 3.2.4 Checklist
+=======================
+
+0. Search for new links (*)
+1. New option for Audio Processing
+   a. Installation & Configuration
+   b. Image
+
 Release 3.2.2 Checklist
 =======================
 

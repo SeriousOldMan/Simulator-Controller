@@ -26,6 +26,8 @@ Release 3.2.4 Checklist
 2. Update Procedure
    a. Translations
    b. Phrase Grammars
+3. File Refactoring (Startup => Controller; Tools => Configuration)
+   a. Update Notes
 
 Release 3.2.2 Checklist
 =======================

@@ -196,7 +196,7 @@ Returns the values for the given argument as string, or the supplied *default* v
 
 The two classes *ConfigurationEditor* and *ConfigurationItemList* implement the configuration tool framework. The conifguration tool can be extended by registering so called configurators, which, in the end, will add a tab in the dialog of the configuration tool. Please see the corresponding documentation on [Customizing the Configuration Tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts#customizing-the-configuration-tool) for more information.
 
-## [Singleton] ConfigurationEditor extends [ConfigurationItem](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-classesahk) ([Simulator Configuration.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Tools/Simulator%20Configuration.ahk))
+## [Singleton] ConfigurationEditor extends [ConfigurationItem](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-classesahk) ([Simulator Configuration.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Configuration/Simulator%20Configuration.ahk))
 This is the main class of the configuration tool. It opens the editor window and creates a tabbed view for all the configurator plugins.
 
 ### Public Properties
@@ -249,7 +249,7 @@ Calling *toggleKeyDetector* enables or disables a special tool to detect buttons
 
 ***
 
-## [Abstract] ConfigurationItemList extends [ConfigurationItem](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-classesahk) ([Simulator Configuration.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Tools/Simulator%20Configuration.ahk))
+## [Abstract] ConfigurationItemList extends [ConfigurationItem](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-classesahk) ([Simulator Configuration.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Configuration/Simulator%20Configuration.ahk))
 This abstract class implements a list of items, which might be edited with an associated editor. Basis control on item selection, openening and closing the editor area, loading and saving items to and from the editor is already builtin. Please see the [implementation for the "Chat Messages Configuration" plugin](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Chat%20Messages%20Configuration%20Plugin.ahk) for a simple example of a concrete implementation of *ConfigurationItemList*.
 
 ### Public Properties

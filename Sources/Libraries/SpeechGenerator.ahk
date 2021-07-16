@@ -72,7 +72,7 @@ class SpeechGenerator {
 			try {
 				RunWait "%kSoX%" "%temp1Name%" "%temp2Name%" rate 16k channels 1 overdrive 20 20 highpass 800 lowpass 1800, , Hide
 				RunWait "%kSoX%" -m -v 0.2 "%kResourcesDirectory%Sounds\Noise.wav" "%temp2Name%" "%temp1Name%" channels 1 reverse vad -p 1 reverse, , Hide
-				RunWait "%kSoX%" "%kResourcesDirectory%Sounds\Click.wav" "%temp1Name%" "%temp2Name%", , Hide
+				RunWait "%kSoX%" "%kResourcesDirectory%Sounds\Click.wav" "%temp1Name%" "%temp2Name%" norm, , Hide
 				
 				SoundPlay %temp2Name%, Wait
 			}

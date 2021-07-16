@@ -1,4 +1,4 @@
-## 3.2.2-release 07/16/21 (planned)
+## 3.2.2-release 07/16/21
 
   1. Bugfixes, as always
   2. Documentation updates, as always

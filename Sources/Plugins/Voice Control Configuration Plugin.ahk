@@ -205,14 +205,8 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		
 		voiceSynthesizerDropDown := inList(["Windows", "Azure"], getConfigurationValue(configuration, "Voice Control", "Synthesizer", "Windows"))
 		
-		if (voiceSynthesizerDropDown == 1) {
-			windowsSpeakerDropDown := getConfigurationValue(configuration, "Voice Control", "Speaker", true)
-			azureVoiceEdit := ""
-		}
-		else {
-			azureVoiceEdit := getConfigurationValue(configuration, "Voice Control", "Speaker", "")
-			windowsSpeakerDropDown := true
-		}
+		azureVoiceEdit := getConfigurationValue(configuration, "Voice Control", "Speaker.Azure", "")
+		windowsSpeakerDropDown := getConfigurationValue(configuration, "Voice Control", "Speaker.Windows",  getConfigurationValue(configuration, "Voice Control", "Speaker", true))
 		
 		azureSubscriptionKeyEdit := getConfigurationValue(configuration, "Voice Control", "SubscriptionKey", "")
 		azureTokenIssuerEdit := getConfigurationValue(configuration, "Voice Control", "TokenIssuer", "")
@@ -284,21 +278,18 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		
 		setConfigurationValue(configuration, "Voice Control", "Synthesizer", ["Windows", "Azure"][voiceSynthesizerDropDown])
 		
-		if (voiceSynthesizerDropDown == 1) {
-			GuiControlGet windowsSpeakerDropDown
-
-			if (windowsSpeakerDropDown = translate("Automatic"))
-				windowsSpeakerDropDown := true
-			else if ((windowsSpeakerDropDown = translate("Deactivated")) || (windowsSpeakerDropDown = " "))
-				windowsSpeakerDropDown := false
-
-			setConfigurationValue(configuration, "Voice Control", "Speaker", windowsSpeakerDropDown)
-		}
-		else {
-			GuiControlGet azureVoiceEdit
+		GuiControlGet windowsSpeakerDropDown
+		GuiControlGet azureVoiceEdit
 		
-			setConfigurationValue(configuration, "Voice Control", "Speaker", azureVoiceEdit)
-		}
+		if (windowsSpeakerDropDown = translate("Automatic"))
+			windowsSpeakerDropDown := true
+		else if ((windowsSpeakerDropDown = translate("Deactivated")) || (windowsSpeakerDropDown = " "))
+			windowsSpeakerDropDown := false
+
+		setConfigurationValue(configuration, "Voice Control", "Speaker.Windows", windowsSpeakerDropDown)
+		setConfigurationValue(configuration, "Voice Control", "Speaker.Azure", azureVoiceEdit)
+		
+		setConfigurationValue(configuration, "Voice Control", "Speaker", (voiceSynthesizerDropDown == 1) ? windowsSpeakerDropDown : azureVoiceEdit)
 
 		GuiControlGet azureSubscriptionKeyEdit
 		GuiControlGet azureTokenIssuerEdit

@@ -7,6 +7,14 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                          Local Include Section                          ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include ..\Libraries\SpeechSynthesizer.ahk
+#Include ..\Libraries\SpeechRecognizer.ahk
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -105,7 +113,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		Gui %window%:Add, Text, x16 yp+32 w110 h23 +0x200 Section, % translate("Speech Synthesizer")
 		Gui %window%:Add, DropDownList, AltSubmit x134 yp w160 Choose%chosen% gchooseVoiceSynthesizer VvoiceSynthesizerDropDown, % values2String("|", map(choices, "translate")*)
 		
-		voices := new SpeechGenerator().Voices.Clone()
+		voices := new SpeechSynthesizer("Windows").Voices.Clone()
 		
 		voices.InsertAt(1, translate("Deactivated"))
 		voices.InsertAt(1, translate("Automatic"))
@@ -280,6 +288,9 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		
 		GuiControlGet windowsSpeakerDropDown
 		GuiControlGet azureVoiceEdit
+		GuiControlGet azureSubscriptionKeyEdit
+		GuiControlGet azureTokenIssuerEdit
+		GuiControlGet azureLanguageEdit
 		
 		if (windowsSpeakerDropDown = translate("Automatic"))
 			windowsSpeakerDropDown := true
@@ -289,12 +300,15 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		setConfigurationValue(configuration, "Voice Control", "Speaker.Windows", windowsSpeakerDropDown)
 		setConfigurationValue(configuration, "Voice Control", "Speaker.Azure", azureVoiceEdit)
 		
-		setConfigurationValue(configuration, "Voice Control", "Speaker", (voiceSynthesizerDropDown == 1) ? windowsSpeakerDropDown : azureVoiceEdit)
+		if (voiceSynthesizerDropDown == 1) {
+			setConfigurationValue(configuration, "Voice Control", "Service", "Windows")
+			setConfigurationValue(configuration, "Voice Control", "Speaker", windowsSpeakerDropDown)
+		}
+		else {
+			setConfigurationValue(configuration, "Voice Control", "Service", "Azure|" . azureTokenIssuerEdit . "|" . azureSubscriptionKeyEdit)
+			setConfigurationValue(configuration, "Voice Control", "Speaker", azureVoiceEdit)
+		}
 
-		GuiControlGet azureSubscriptionKeyEdit
-		GuiControlGet azureTokenIssuerEdit
-		GuiControlGet azureLanguageEdit
-			
 		setConfigurationValue(configuration, "Voice Control", "SubscriptionKey", azureSubscriptionKeyEdit)
 		setConfigurationValue(configuration, "Voice Control", "TokenIssuer", azureTokenIssuerEdit)
 		setConfigurationValue(configuration, "Voice Control", "SpeakerLanguage", azureLanguageEdit)

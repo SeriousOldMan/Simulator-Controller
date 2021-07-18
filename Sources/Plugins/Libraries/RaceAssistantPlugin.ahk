@@ -22,6 +22,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	iRaceAssistantName := false
 	iRaceAssistantLogo := false
 	iRaceAssistantLanguage := false
+	iRaceAssistantService := false
 	iRaceAssistantSpeaker := false
 	iRaceAssistantListener := false
 	
@@ -247,6 +248,12 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		}
 	}
 	
+	RaceAssistantService[] {
+		Get {
+			return this.iRaceAssistantService
+		}
+	}
+	
 	RaceAssistantSpeaker[] {
 		Get {
 			return this.iRaceAssistantSpeaker
@@ -295,6 +302,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		
 		for ignore, theAction in string2Values(",", this.getArgumentValue("assistantCommands", ""))
 			this.createRaceAssistantAction(controller, string2Values(A_Space, theAction)*)
+		
+		this.iRaceAssistantService := this.getArgumentValue("raceAssistantService", "Windows")
 		
 		assistantSpeaker := this.getArgumentValue("raceAssistantSpeaker", false)
 		
@@ -418,6 +427,9 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				
 				if this.RaceAssistantLanguage
 					options .= " -Language """ . this.RaceAssistantLanguage . """"
+				
+				if this.RaceAssistantService
+					options .= " -Service """ . this.RaceAssistantService . """"
 				
 				if this.RaceAssistantSpeaker
 					options .= " -Speaker """ . this.RaceAssistantSpeaker . """"

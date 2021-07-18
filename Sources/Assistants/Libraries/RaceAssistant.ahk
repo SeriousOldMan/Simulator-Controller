@@ -216,7 +216,7 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 	
-	__New(configuration, assistantType, settings, name := false, language := "__Undefined__", speaker := false, listener := false, voiceServer := false) {
+	__New(configuration, assistantType, settings, name := false, language := "__Undefined__", service := false, speaker := false, listener := false, voiceServer := false) {
 		this.iDebug := (isDebug() ? kDebugKnowledgeBase : kDebugOff)
 		this.iAssistantType := assistantType
 		this.iSettings := settings
@@ -229,6 +229,7 @@ class RaceAssistant extends ConfigurationItem {
 			listener := ((speaker != false) ? listener : false)
 			
 			options["Language"] := ((language != false) ? language : options["Language"])
+			options["Service"] := ((service == true) ? options["Service"] : service)
 			options["Speaker"] := ((speaker == true) ? options["Speaker"] : speaker)
 			options["Listener"] := ((listener == true) ? options["Listener"] : listener)
 			options["VoiceServer"] := voiceServer
@@ -243,6 +244,7 @@ class RaceAssistant extends ConfigurationItem {
 		options := this.iOptions
 		
 		options["Language"] := getConfigurationValue(configuration, "Voice Control", "Language", getLanguage())
+		options["Service"] := getConfigurationValue(configuration, "Voice Control", "Service", "Windows")
 		options["Speaker"] := getConfigurationValue(configuration, "Voice Control", "Speaker", true)
 		options["SpeakerVolume"] := getConfigurationValue(configuration, "Voice Control", "SpeakerVolume", 100)
 		options["SpeakerPitch"] := getConfigurationValue(configuration, "Voice Control", "SpeakerPitch", 0)

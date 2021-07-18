@@ -106,6 +106,7 @@ startRaceStrategist() {
 	strategistName := "Cato"
 	strategistLogo := false
 	strategistLanguage := false
+	strategistService := "Windows"
 	strategistSpeaker := false
 	strategistListener := false
 	strategistSettingsFile := getFileName("Race.settings", kUserConfigDirectory)
@@ -130,6 +131,9 @@ startRaceStrategist() {
 				index += 2
 			case "-Language":
 				strategistLanguage := A_Args[index + 1]
+				index += 2
+			case "-Service":
+				strategistService := A_Args[index + 1]
 				index += 2
 			case "-Speaker":
 				strategistSpeaker := A_Args[index + 1]
@@ -165,7 +169,7 @@ startRaceStrategist() {
 		setDebug(true)
 	
 	RaceStrategist.Instance := new RaceStrategist(kSimulatorConfiguration, readConfiguration(strategistSettingsFile)
-												, strategistName, strategistLanguage, strategistSpeaker, strategistListener, voiceServer)
+												, strategistName, strategistLanguage, strategistService, strategistSpeaker, strategistListener, voiceServer)
 	
 	registerEventHandler("Strategist", "handleStrategistRemoteCalls")
 	

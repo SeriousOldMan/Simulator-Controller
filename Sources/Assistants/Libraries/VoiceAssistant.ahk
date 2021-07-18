@@ -16,7 +16,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Libraries\SpeechGenerator.ahk
+#Include ..\Libraries\SpeechSynthesizer.ahk
 #Include ..\Libraries\SpeechRecognizer.ahk
 
 
@@ -39,11 +39,14 @@ class VoiceAssistant {
 	
 	iLanguage := "en"
 	
-	iName := false	
+	iName := false
+	
+	iService := "Windows"
 	iSpeaker := false
 	iSpeakerVolume := 100
 	iSpeakerPitch := 0
 	iSpeakerSpeed := 0
+	
 	iListener := false
 	
 	iVoiceServer := false
@@ -51,7 +54,7 @@ class VoiceAssistant {
 	
 	iPushToTalk := false
 	
-	iSpeechGenerator := false
+	iSpeechSynthesizer := false
 	iSpeechRecognizer := false
 	iIsSpeaking := false
 	iIsListening := false
@@ -90,7 +93,7 @@ class VoiceAssistant {
 			}
 		}
 		
-		__New(assistant, speaker, language, fragments, phrases) {
+		__New(assistant, service, speaker, language, fragments, phrases) {
 			this.iAssistant := assistant
 			this.iFragments := fragments
 			this.iPhrases := phrases
@@ -119,7 +122,7 @@ class VoiceAssistant {
 		}
 	}
 	
-	class LocalSpeaker extends SpeechGenerator {
+	class LocalSpeaker extends SpeechSynthesizer {
 		iAssistant := false
 		iFragments := {}
 		iPhrases := {}
@@ -148,12 +151,12 @@ class VoiceAssistant {
 			}
 		}
 		
-		__New(assistant, speaker, language, fragments, phrases) {
+		__New(assistant, service, speaker, language, fragments, phrases) {
 			this.iAssistant := assistant
 			this.iFragments := fragments
 			this.iPhrases := phrases
 			
-			base.__New(speaker, language)
+			base.__New(service, speaker, language)
 		}
 		
 		speak(text, focus := false) {
@@ -212,6 +215,12 @@ class VoiceAssistant {
 	Name[] {
 		Get {
 			return this.iName
+		}
+	}
+	
+	Service[] {
+		Get {
+			return this.iService
 		}
 	}
 	
@@ -286,7 +295,7 @@ class VoiceAssistant {
 	}
 	
 	shutdownVoiceAssistant() {
-		if (this.VoiceServer && this.iSpeechGenerator) {
+		if (this.VoiceServer && this.iSpeechSynthesizer) {
 			Process Exist
 			
 			processID := ErrorLevel
@@ -300,6 +309,9 @@ class VoiceAssistant {
 	initialize(options) {
 		if options.HasKey("Language")
 			this.iLanguage := options["Language"]
+		
+		if options.HasKey("Service")
+			this.iService := options["Service"]
 		
 		if options.HasKey("Speaker")
 			this.iSpeaker := options["Speaker"]
@@ -353,7 +365,7 @@ class VoiceAssistant {
 	}
 		
 	getSpeaker() {
-		if (this.Speaker && !this.iSpeechGenerator) {
+		if (this.Speaker && !this.iSpeechSynthesizer) {
 			if this.VoiceServer {
 				Process Exist
 			
@@ -364,24 +376,24 @@ class VoiceAssistant {
 																							
 				raiseEvent(kFileMessage, "Voice", "registerVoiceClient:" . values2String(";", this.Name, processID
 																							, activationCommand, "remoteActivationRecognized", "remoteDeactivationRecognized",
-																							, this.Language, this.Speaker, this.Listener), this.VoiceServer)
+																							, this.Language, this.Service, this.Speaker, this.Listener), this.VoiceServer)
 																						
-				this.iSpeechGenerator := new this.RemoteSpeaker(this, this.Speaker, this.Language
-															  , this.buildFragments(this.Language), this.buildPhrases(this.Language))
+				this.iSpeechSynthesizer := new this.RemoteSpeaker(this, this.Service, this.Speaker, this.Language
+																, this.buildFragments(this.Language), this.buildPhrases(this.Language))
 			}
 			else {
-				this.iSpeechGenerator := new this.LocalSpeaker(this, this.Speaker, this.Language
-															 , this.buildFragments(this.Language), this.buildPhrases(this.Language))
+				this.iSpeechSynthesizer := new this.LocalSpeaker(this, this.Service, this.Speaker, this.Language
+															   , this.buildFragments(this.Language), this.buildPhrases(this.Language))
 			
-				this.iSpeechGenerator.setVolume(this.iSpeakerVolume)
-				this.iSpeechGenerator.setPitch(this.iSpeakerPitch)
-				this.iSpeechGenerator.setRate(this.iSpeakerSpeed)
+				this.iSpeechSynthesizer.setVolume(this.iSpeakerVolume)
+				this.iSpeechSynthesizer.setPitch(this.iSpeakerPitch)
+				this.iSpeechSynthesizer.setRate(this.iSpeakerSpeed)
 			}
 				
 			this.startListener()
 		}
 		
-		return this.iSpeechGenerator
+		return this.iSpeechSynthesizer
 	}
 	
 	startListener() {

@@ -6,3 +6,4 @@ Setup.lnk
 Sources/Foreign/**/.vs/
 Sources/Foreign/**/Debug/
 Sources/Foreign/**/Release/
+Sources/Foreign/**/packages/

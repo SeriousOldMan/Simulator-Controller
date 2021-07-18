@@ -35,7 +35,7 @@ ListLines Off					; Disable execution history
 ;;;                          Local Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Libraries\SpeechGenerator.ahk
+#Include ..\Libraries\SpeechSynthesizer.ahk
 #Include ..\Libraries\SpeechRecognizer.ahk
 
 
@@ -60,6 +60,7 @@ class VoiceServer extends ConfigurationItem {
 	iActiveVoiceClient := false
 
 	iLanguage := "en"
+	iService := "Windows"
 	iSpeaker := true
 	iSpeakerVolume := 100
 	iSpeakerPitch := 0
@@ -84,13 +85,14 @@ class VoiceServer extends ConfigurationItem {
 		iPID := 0
 		
 		iLanguage := "en"
+		iService := "Windows"
 		iSpeaker := true
 		iSpeakerVolume := 100
 		iSpeakerPitch := 0
 		iSpeakerSpeed := 0
 		iListener := false
 	
-		iSpeechGenerator := false
+		iSpeechSynthesizer := false
 		
 		iSpeechRecognizer := false
 		iIsSpeaking := false
@@ -121,6 +123,12 @@ class VoiceServer extends ConfigurationItem {
 		Language[] {
 			Get {
 				return this.iLanguage
+			}
+		}
+		
+		Service[] {
+			Get {
+				return this.iService
 			}
 		}
 		
@@ -194,17 +202,17 @@ class VoiceServer extends ConfigurationItem {
 			}
 		}
 	
-		SpeechGenerator[create := false] {
+		SpeechSynthesizer[create := false] {
 			Get {
-				if (create && this.Speaker && !this.iSpeechGenerator) {
-					this.iSpeechGenerator := new SpeechGenerator(this.Speaker, this.Language)
+				if (create && this.Speaker && !this.iSpeechSynthesizer) {
+					this.iSpeechSynthesizer := new SpeechSynthesizer(this.Service, this.Speaker, this.Language)
 					
-					this.iSpeechGenerator.setVolume(this.iSpeakerVolume)
-					this.iSpeechGenerator.setPitch(this.iSpeakerPitch)
-					this.iSpeechGenerator.setRate(this.iSpeakerSpeed)
+					this.iSpeechSynthesizer.setVolume(this.iSpeakerVolume)
+					this.iSpeechSynthesizer.setPitch(this.iSpeakerPitch)
+					this.iSpeechSynthesizer.setRate(this.iSpeakerSpeed)
 				}
 				
-				return this.iSpeechGenerator
+				return this.iSpeechSynthesizer
 			}
 		}
 		
@@ -222,6 +230,7 @@ class VoiceServer extends ConfigurationItem {
 			this.iDescriptor := descriptor
 			this.iPID := pid
 			this.iLanguage := language
+			this.iService := service
 			this.iSpeaker := speaker
 			this.iListener := listener
 			this.iSpeakerVolume := speakerVolume
@@ -239,7 +248,7 @@ class VoiceServer extends ConfigurationItem {
 				
 			try {
 				try {
-					this.SpeechGenerator[true].speak(text, true)
+					this.SpeechSynthesizer[true].speak(text, true)
 				}
 				finally {
 					this.iIsSpeaking := oldSpeaking
@@ -376,6 +385,12 @@ class VoiceServer extends ConfigurationItem {
 			return this.iLanguage
 		}
 	}
+		
+	Service[] {
+		Get {
+			return this.iService
+		}
+	}
 	
 	Speaker[] {
 		Get {
@@ -440,6 +455,7 @@ class VoiceServer extends ConfigurationItem {
 		base.loadFromConfiguration(configuration)
 		
 		this.iLanguage := getConfigurationValue(configuration, "Voice Control", "Language", getLanguage())
+		this.iService := getConfigurationValue(configuration, "Voice Control", "Service", "Windows")
 		this.iSpeaker := getConfigurationValue(configuration, "Voice Control", "Speaker", true)
 		this.iSpeakerVolume := getConfigurationValue(configuration, "Voice Control", "SpeakerVolume", 100)
 		this.iSpeakerPitch := getConfigurationValue(configuration, "Voice Control", "SpeakerPitch", 0)
@@ -608,7 +624,7 @@ class VoiceServer extends ConfigurationItem {
 		}
 	}
 	
-	registerVoiceClient(descriptor, pid, activationCommand := false, activationCallback := false, deactivationCallback := false, language := false, speaker := true, listener := false, speakerVolume := "__Undefined__", speakerPitch := "__Undefined__", speakerSpeed := "__Undefined__") {
+	registerVoiceClient(descriptor, pid, activationCommand := false, activationCallback := false, deactivationCallback := false, language := false, service := true, speaker := true, listener := false, speakerVolume := "__Undefined__", speakerPitch := "__Undefined__", speakerSpeed := "__Undefined__") {
 		static counter := 1
 		
 		if (speakerVolume = kUndefined)
@@ -619,6 +635,9 @@ class VoiceServer extends ConfigurationItem {
 		
 		if (speakerSpeed = kUndefined)
 			speakerSpeed := this.iSpeakerSpeed
+		
+		if (service == true)
+			service := this.iService
 		
 		if (speaker == true)
 			speaker := this.iSpeaker

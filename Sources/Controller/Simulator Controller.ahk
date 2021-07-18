@@ -729,7 +729,7 @@ class SimulatorController extends ConfigurationItem {
 				if !registered {
 					activationCommand := getConfigurationValue(this.Configuration, "Voice Control", "ActivationCommand", false)
 					 
-					raiseEvent(kFileMessage, "Voice", "registerVoiceClient:" . values2String(";", "Controller", processID, activationCommand, "activationCommand", false, false, false, true), this.VoiceServer)
+					raiseEvent(kFileMessage, "Voice", "registerVoiceClient:" . values2String(";", "Controller", processID, activationCommand, "activationCommand", false, false, false, false, true), this.VoiceServer)
 				
 					registered := true
 				}

@@ -164,6 +164,7 @@ startRaceEngineer() {
 	engineerName := "Jona"
 	engineerLogo := false
 	engineerLanguage := false
+	engineerService := "Windowws"
 	engineerSpeaker := false
 	engineerListener := false
 	engineerSettingsFile := getFileName("Race.settings", kUserConfigDirectory)
@@ -188,6 +189,9 @@ startRaceEngineer() {
 				index += 2
 			case "-Language":
 				engineerLanguage := A_Args[index + 1]
+				index += 2
+			case "-Service":
+				engineerService := A_Args[index + 1]
 				index += 2
 			case "-Speaker":
 				engineerSpeaker := A_Args[index + 1]
@@ -224,7 +228,7 @@ startRaceEngineer() {
 	
 	RaceEngineer.Instance := new RaceEngineer(kSimulatorConfiguration, readConfiguration(engineerSettingsFile)
 											, remotePID ? new RemotePitstopHandler(remotePID) : false
-											, engineerName, engineerLanguage, engineerSpeaker, engineerListener, voiceServer)
+											, engineerName, engineerLanguage, engineerService, engineerSpeaker, engineerListener, voiceServer)
 	
 	registerEventHandler("Engineer", "handleEngineerRemoteCalls")
 	

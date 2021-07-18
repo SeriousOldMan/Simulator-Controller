@@ -1,5 +1,5 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Speach Generator                ;;;
+;;;   Modular Simulator Controller System - Speech Synthesizer              ;;;
 ;;;                                                                         ;;;
 ;;;   Part of this code is based on work of evilC and Learning one.         ;;;
 ;;;   See www.autohotkey.com/forum/topic57773.html and                      ;;;
@@ -19,6 +19,13 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                         Local Include Section                           ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include ..\Libraries\CLR.ahk
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -31,9 +38,16 @@ global kLanguageVoices = {de: ["Microsoft Hedda Desktop", "Microsoft Katja Deskt
 ;;;                          Public Class Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class SpeechGenerator {
+class SpeechSynthesizer {
+	iService := "Windows"
 	iVoices := []
 	iActiveVoice := ""
+	
+	Service[] {
+		Get {
+			return this.iService
+		}
+	}
 	
 	Voices[] {
 		Get {
@@ -47,13 +61,42 @@ class SpeechGenerator {
 		}
 	}
 	
-	__New(voice := false, language := false) {
-		this.iSpeechGenerator := ComObjCreate("SAPI.SpVoice")
-		
-		Loop, % this.iSpeechGenerator.GetVoices.Count
-			this.Voices.Push(this.iSpeechGenerator.GetVoices.Item(A_Index-1).GetAttribute("Name"))
-		
-		this.setVoice(this.computeVoice(voice, language))
+	__New(service, voice := false, language := false) {
+		if (service = "Windows") {
+			this.iSpeechSynthesizer := ComObjCreate("SAPI.SpVoice")
+			
+			Loop, % this.iSpeechSynthesizer.GetVoices.Count
+				this.Voices.Push(this.iSpeechSynthesizer.GetVoices.Item(A_Index-1).GetAttribute("Name"))
+			
+			this.setVoice(this.computeVoice(voice, language))
+		}
+		else if (InStr(service, "Azure|") == 1) {
+			dllName := "Speech.Synthesizer.dll"
+			dllFile := kBinariesDirectory . dllName
+			
+			try {
+				if (!FileExist(dllFile)) {
+					logMessage(kLogCritical, translate("Speech.Synthesizer.dll not found in " . kBinariesDirectory))
+					
+					Throw "Unable to find Speech.Synthesizer.dll in " . kBinariesDirectory . "..."
+				}
+
+				this.iSpeechSynthesizer := CLR_LoadLibrary(dllFile).CreateInstance("CSSpeech.SpeechSynthesizer")
+				
+				service := string2Values("|", service)
+				
+				if !this.iSpeechSynthesizer.Connect(service[2], service[3])
+					MsgBox Oops
+				
+				msgbox % this.iSpeechSynthesizer.GetAccessToken()
+			}
+			catch exception {
+				logMessage(kLogCritical, translate("Error while initializing speech synthesizer module - please install the speech synthesizer software"))
+				
+				showMessage(translate("Error while initializing speech synthesizer module - please install the speech synthesizer software") . translate("...")
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			}
+		}
 	}
 
 	speak(text, wait := true) {
@@ -80,7 +123,7 @@ class SpeechGenerator {
 				showMessage(substituteVariables(translate("Cannot start SoX (%kSoX%) - please check the configuration..."))
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 					  
-				this.iSpeechGenerator.Speak(text, (wait ? 0x0 : 0x1))
+				this.iSpeechSynthesizer.Speak(text, (wait ? 0x0 : 0x1))
 			}
 			finally {
 				if FileExist(temp1Name)
@@ -91,60 +134,60 @@ class SpeechGenerator {
 			}
 		}
 		else
-			this.iSpeechGenerator.Speak(text, (wait ? 0x0 : 0x1))
+			this.iSpeechSynthesizer.Speak(text, (wait ? 0x0 : 0x1))
 	}
 
 	speakToFile(fileName, text) {
 		this.stop()
 		
-		oldStream := this.iSpeechGenerator.AudioOutputStream
+		oldStream := this.iSpeechSynthesizer.AudioOutputStream
 		
 		stream := ComObjCreate("Sapi.SpFileStream")
 		
 		try {
 			stream.Open(fileName, 0x3, 0)
 		
-			this.iSpeechGenerator.AudioOutputStream := stream
+			this.iSpeechSynthesizer.AudioOutputStream := stream
 		
-			this.iSpeechGenerator.Speak(text, 0x0)
+			this.iSpeechSynthesizer.Speak(text, 0x0)
 		}
 		finally {
 			stream.Close()
 			
-			this.iSpeechGenerator.AudioOutputStream := oldStream
+			this.iSpeechSynthesizer.AudioOutputStream := oldStream
 		}
 	}
 	
 		
 	
 	pause() {
-		status := this.iSpeechGenerator.Status.RunningState
+		status := this.iSpeechSynthesizer.Status.RunningState
 		
 		if (status = 0)
-			this.iSpeechGenerator.Resume
+			this.iSpeechSynthesizer.Resume
 		else if (status = 2)
-			this.iSpeechGenerator.Pause
+			this.iSpeechSynthesizer.Pause
 	}
 	
 	stop() {
-		status := this.iSpeechGenerator.Status.RunningState
+		status := this.iSpeechSynthesizer.Status.RunningState
 		
 		if (status = 0)
-			this.iSpeechGenerator.Resume
+			this.iSpeechSynthesizer.Resume
 		
-		this.iSpeechGenerator.Speak("", 0x1 | 0x2)
+		this.iSpeechSynthesizer.Speak("", 0x1 | 0x2)
 	}
 	
 	setRate(rate) {
-		this.iSpeechGenerator.Rate := rate
+		this.iSpeechSynthesizer.Rate := rate
 	}
 	
 	setVolume(volume) {
-		this.iSpeechGenerator.Volume := volume
+		this.iSpeechSynthesizer.Volume := volume
 	}
 	
 	setPitch(pitch) {
-		this.iSpeechGenerator.Speak("<pitch absmiddle = '" pitch "'/>", 0x20)
+		this.iSpeechSynthesizer.Speak("<pitch absmiddle = '" pitch "'/>", 0x20)
 	}
 
 	computeVoice(voice, language, randomize := true) {
@@ -183,10 +226,10 @@ class SpeechGenerator {
 		if !inList(this.Voices, name)
 			return false
 		
-		while !(this.iSpeechGenerator.Status.RunningState = 1)
+		while !(this.iSpeechSynthesizer.Status.RunningState = 1)
 			Sleep 200
 		
-		this.iSpeechGenerator.Voice := this.iSpeechGenerator.GetVoices("Name=" . name).Item(0) 
+		this.iSpeechSynthesizer.Voice := this.iSpeechSynthesizer.GetVoices("Name=" . name).Item(0) 
 		this.iActiveVoice := name
 		
 		return true

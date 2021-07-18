@@ -108,10 +108,10 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 	
-	__New(configuration, engineerSettings, pitstopHandler := false, name := false, language := "__Undefined__", speaker := false, listener := false, voiceServer := false) {
+	__New(configuration, engineerSettings, pitstopHandler := false, name := false, language := "__Undefined__", service := false, speaker := false, listener := false, voiceServer := false) {
 		this.iPitstopHandler := pitstopHandler
 		
-		base.__New(configuration, "Race Engineer", engineerSettings, name, language, speaker, listener, voiceServer)
+		base.__New(configuration, "Race Engineer", engineerSettings, name, language, service, speaker, listener, voiceServer)
 	}
 	
 	updateConfigurationValues(values) {

@@ -47,7 +47,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 3.3.0
 
-This release is all about speech synthesis.
+This release is all about speech synthesis - and it took a great step forward.
 
   1. Support for *Azure Cognitive Services* for speech synthesis is now available. Please see the revised documentation for [Voice Control configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) for more information. If you are using Jona and/or Cato, you can choose between different synthesization engines and voices using a new plugin parameter. See the documentation for the ["Race Engineer" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer), it is worth it.
   2. Audio post processing for a really immersive in-car team radio sound is also available now. You have to install a small sound processing utility] [SoX](http://sox.sourceforge.net/) on your computer and you have to configure it in the [Voice Control configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) as well. It will take only a few minutes, and the immersion effect is great, so you don't want to miss this.

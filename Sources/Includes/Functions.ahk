@@ -1129,7 +1129,7 @@ showProgress(options) {
 		GuiControl, , vProgressMessage, % options.message
 	
 	if options.HasKey("progress")
-		GuiControl, , vProgressBar, % options.progress
+		GuiControl, , vProgressBar, % Round(options.progress)
 	
 	if options.HasKey("color") {
 		color := options.color

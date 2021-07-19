@@ -1195,7 +1195,7 @@ runUpdateTargets(ByRef buildProgress) {
 			buildProgress += progressStep
 		}
 				
-		buildProgress += Round(100 / (vTargetsCount + 1))
+		buildProgress += (100 / (vTargetsCount + 1))
 			
 		if !kSilentMode
 			showProgress({progress: buildProgress})
@@ -1276,7 +1276,7 @@ runCleanTargets(ByRef buildProgress) {
 			
 		Sleep 50
 				
-		buildProgress += Round(100 / (vTargetsCount + 1))
+		buildProgress += (100 / (vTargetsCount + 1))
 			
 		if !kSilentMode
 			showProgress({progress: buildProgress})
@@ -1321,12 +1321,12 @@ runCopyTargets(ByRef buildProgress) {
 			FileCopy %targetSource%, %targetDestination%, 1
 			
 			Sleep 50
-		}
 		
-		buildProgress += Round(100 / (vTargetsCount + 1))
-			
-		if !kSilentMode
-			showProgress({progress: buildProgress})
+			buildProgress += (100 / (vTargetsCount + 1))
+				
+			if !kSilentMode
+				showProgress({progress: buildProgress})
+		}
 	}
 }
 
@@ -1382,7 +1382,7 @@ runBuildTargets(ByRef buildProgress) {
 			FileMove %compiledFile%, %targetDirectory%, 1
 		}
 		
-		buildProgress += Round(100 / (vTargetsCount + 1))
+		buildProgress += (100 / (vTargetsCount + 1))
 			
 		if !kSilentMode
 			showProgress({progress: buildProgress})

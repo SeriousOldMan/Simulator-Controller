@@ -276,6 +276,10 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			driverSurname := getConfigurationValue(data, "Stint Data", "DriverSurname", "Doe")
 			driverNickname := getConfigurationValue(data, "Stint Data", "DriverNickname", "JD")
 			
+			lapTime := getConfigurationValue(data, "Stint Data", "LapLastTime", 0)
+			
+			driverCar := false
+			
 			Loop {
 				carID := getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Car", kUndefined)
 			
@@ -286,11 +290,17 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				
 					if ((getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Driver.Forname") = driverForname)
 					 && (getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Driver.Surname") = driverSurname)
-					 && (getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Driver.Nickname") = driverNickname))
-						setConfigurationValue(standings, "Position Data", "Driver.Car", A_Index)
+					 && (getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Driver.Nickname") = driverNickname)) {
+						driverCar := A_Index
+						
+						break
+					}
+					else if (getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Time") = lapTime)
+						driverCar := A_index
 				}
 			}
 			
+			setConfigurationValue(standings, "Position Data", "Driver.Car", driverCar)
 			setConfigurationSectionValues(data, "Position Data", getConfigurationSectionValues(standings, "Position Data"))
 		}
 		else {

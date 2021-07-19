@@ -561,7 +561,8 @@ class RaceStrategist extends RaceAssistant {
 			baseLap := lapNumber
 		
 		for key, value in getConfigurationSectionValues(data, "Position Data", Object())
-			knowledgeBase.setFact(key, value)
+			if ((lapNumber = 1) || (key != "Driver.Car"))
+				knowledgeBase.setFact(key, value)
 		
 		this.updateDynamicValues({EnoughData: (lapNumber > (baseLap + (this.LearningLaps - 1)))})
 		

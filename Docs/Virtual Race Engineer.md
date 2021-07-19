@@ -6,7 +6,7 @@ Ok, enough marketing bullshit. Jona is a voice chat bot with a special knowledge
 
 ***
 
-Before we head on, an important note: The current version of the race assistants uses the local offline speech generation and recognition framework, that is built into Windows, which is not on par with current cloud based solutions. In the future, there will be the option to use a cloud based voice recognition integration insteaad of this Windows local offline speech recognition runtime. Although a cloud based solution might impose a pay wall depending on your usage, this will be quite negliable. And, last but not least, I have concepts for a server based solution in the drawer, which will allow Jona to act as a race engineer for a complete team multiplayer endurance race. But this will be quite a huge undertaking and will take a while, depending on my available time to invest in this project.
+Before we head on, an important note: Depending on the simulation, the race assistants can not be used in a team race, since the required data is not availabe, when you are not the currently active driver.  I have concepts for a server based solution in the drawer, which will allow Jona to act as a race engineer for a complete team multiplayer endurance race. But this will be quite a huge undertaking and will take a while, depending on my available time to invest in this project.
 
 ***
 

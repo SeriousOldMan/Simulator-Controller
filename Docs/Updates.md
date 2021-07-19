@@ -45,6 +45,15 @@ Although the code, that handles all the update tasks, is integrated into *Simula
 
 Note: Some of you might want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars* and *Simulator Controller\Rules* folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does, on your own. But be sure to make a backup copy of all the files, just for peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor, that can handle this.
 
+## Release 3.3.0
+
+This release is all about speech synthesis.
+
+  1. Support for *Azure Cognitive Services* for speech synthesis is now available. Please see the revised documentation for [Voice Control configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) for more information. If you are using Jona and/or Cato, you can choose between different synthesization engines and voices using a new plugin parameter. See the documentation for the ["Race Engineer" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer), it is worth it.
+  2. Audio post processing for a really immersive in-car team radio sound is also available now. You have to install a small sound processing utility] [SoX](http://sox.sourceforge.net/) on your computer and you have to configure it in the [Voice Control configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) as well. It will take only a few minutes, and the immersion effect is great, so you don't want to miss this.
+
+***
+
 ## Release 3.2.2
 
   - A lot of new plugin parameters has been introduced for the ["Race Strategist"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) and the ["Race Engineer"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and most of the present parameters have been renamed. The renaming will be handled by the automated update procedure, but you might want to take a look at the documentation and integrate the new functions into your Controller configuration.

@@ -1,3 +1,11 @@
+## 3.3.0-release 07/23/21 (planned)
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Full support for cloud based voice synthesis. Use *Azure Cognitive Services* for the best sound, most natural speech generation. You can choose in the [configuration process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control), which speech synthesizer engine you want to use.
+  4. Support for audio post processing to create the typical sound of a in-car team radio. You have to install a small audio manipulation utility to be ready for this, please see the [update notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-330) for more information.
+  5. A lot of refactoring and file location changes, which will most likely be completely transparent for you, unless you are a developer.
+
 ## 3.2.2-release 07/16/21
 
   1. Bugfixes, as always

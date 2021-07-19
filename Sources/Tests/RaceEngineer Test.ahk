@@ -861,7 +861,7 @@ class PitstopHandling extends Assert {
 setConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", "Unknown" . ".ConsideredHistoryLaps", 2)
 setConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", "Unknown" . ".HistoryLapsDamping", 0.5)
 setConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", "Unknown" . ".AdjustLapTime", false)
-????? alle korrigieren
+
 if !GetKeyState("Ctrl") {
 	AHKUnit.AddTestClass(FuelReporting)
 	AHKUnit.AddTestClass(DamageReporting)

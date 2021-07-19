@@ -1117,7 +1117,7 @@ runSpecialTargets(ByRef buildProgress) {
 	currentDirectory := A_WorkingDir
 	
 	try {
-		for index, directory in getFileNames("*", kSourcesDirectory . "Foreign\") {
+		for index, directory in getFileNames("*", kSourcesDirectory . "Special\") {
 			SetWorkingDir %directory%
 			
 			for ignore, file in getFileNames("*.sln", directory . "\") {
@@ -1527,7 +1527,7 @@ startSimulatorTools() {
 	
 	vTargetsCount := (vUpdateTargets.Length()
 					+ vCleanupTargets.Length() + (vCopyTargets.Length() * 2) + vBuildTargets.Length()
-					+ (((kMSBuildDirectory != "") && (vSpecialTargets.Length() > 0)) ? getFileNames("*", kSourcesDirectory . "Foreign\").Length() : 0))
+					+ (((kMSBuildDirectory != "") && (vSpecialTargets.Length() > 0)) ? getFileNames("*", kSourcesDirectory . "Special\").Length() : 0))
 	
 	if !kSilentMode
 		showProgress({message: "", color: "Green", title: translate("Running Targets")})

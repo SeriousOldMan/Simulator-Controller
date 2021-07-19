@@ -38,10 +38,8 @@ global azureSubscriptionKeyLabel
 global azureSubscriptionKeyEdit = ""
 global azureTokenIssuerLabel
 global azureTokenIssuerEdit = ""
-global azureLanguageLabel
-global azureLanguageEdit = ""
-global azureVoiceLabel
-global azureVoiceEdit = ""
+global azureSpeakerLabel
+global azureSpeakerDropDown
 
 global soXPathLabel1
 global soXPathLabel2
@@ -74,29 +72,34 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		choices := []
 		chosen := 0
 		enIndex := 0
+		languageCode := "en"
 		
 		languages := availableLanguages()
 		
 		for code, language in languages {
 			choices.Push(language)
 			
-			if (language == voiceLanguageDropDown)
+			if (language == voiceLanguageDropDown) {
 				chosen := A_Index
+				languageCode := code
+			}
 				
 			if (code = "en")
 				enIndex := A_Index
 		}
 			
 		for ignore, grammarFile in getFileNames("Race Engineer.grammars.*", kUserGrammarsDirectory, kGrammarsDirectory) {
-			SplitPath grammarFile, , , languageCode
+			SplitPath grammarFile, , , code
 		
-			if !languages.HasKey(languageCode) {
-				choices.Push(languageCode)
+			if !languages.HasKey(code) {
+				choices.Push(code)
 				
-				if (languageCode == voiceLanguageDropDown)
+				if (code == voiceLanguageDropDown) {
 					chosen := choices.Length()
+					languageCode := code
+				}
 					
-				if (languageCode = "en")
+				if (code = "en")
 					enIndex := choices.Length()
 			}
 		}
@@ -105,7 +108,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 			chosen := enIndex
 		
 		Gui %window%:Add, Text, x16 y80 w110 h23 +0x200, % translate("Language")
-		Gui %window%:Add, DropDownList, x134 yp w160 Choose%chosen% VvoiceLanguageDropDown, % values2String("|", choices*)
+		Gui %window%:Add, DropDownList, x134 yp w160 Choose%chosen% VvoiceLanguageDropDown GupdateVoices, % values2String("|", choices*)
 		
 		choices := choices := ["Windows Speech", "Azure Cognitive Services"]
 		chosen := voiceSynthesizerDropDown
@@ -113,18 +116,10 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		Gui %window%:Add, Text, x16 yp+32 w110 h23 +0x200 Section, % translate("Speech Synthesizer")
 		Gui %window%:Add, DropDownList, AltSubmit x134 yp w160 Choose%chosen% gchooseVoiceSynthesizer VvoiceSynthesizerDropDown, % values2String("|", map(choices, "translate")*)
 		
-		voices := new SpeechSynthesizer("Windows").Voices.Clone()
-		
-		voices.InsertAt(1, translate("Deactivated"))
-		voices.InsertAt(1, translate("Automatic"))
-		
-		chosen := inList(voices, windowsSpeakerDropDown)
-		
-		if (chosen == 0)
-			chosen := 1
+		voices := [translate("Automatic"), translate("Deactivated")]
 		
 		Gui %window%:Add, Text, x16 ys+24 w110 h23 +0x200 VwindowsSpeakerLabel, % translate("Voice")
-		Gui %window%:Add, DropDownList, x134 yp w340 Choose%chosen% VwindowsSpeakerDropDown, % values2String("|", voices*)
+		Gui %window%:Add, DropDownList, x134 yp w340 VwindowsSpeakerDropDown, % values2String("|", voices*)
 		
 		Gui %window%:Add, Text, x16 ys+24 w110 h23 +0x200 VwindowsSpeakerVolumeLabel, % translate("Volume")
 		Gui %window%:Add, Slider, x134 yp w135 Range0-100 ToolTip VspeakerVolumeSlider, % speakerVolumeSlider
@@ -176,19 +171,19 @@ class VoiceControlConfigurator extends ConfigurationItem {
 							 , ["activationCommandLabel", "activationCommandEdit"]]
 		
 		Gui %window%:Add, Text, x16 ys+24 w140 h23 +0x200 VazureSubscriptionKeyLabel, % translate("Subscription Key")
-		Gui %window%:Add, Edit, x134 yp w340 h21 VazureSubscriptionKeyEdit, %azureSubscriptionKeyEdit%
+		Gui %window%:Add, Edit, x134 yp w340 h21 VazureSubscriptionKeyEdit GupdateAzureVoices, %azureSubscriptionKeyEdit%
 		
 		Gui %window%:Add, Text, x16 yp+24 w140 h23 +0x200 VazureTokenIssuerLabel, % translate("Token Issuer Endpoint")
-		Gui %window%:Add, Edit, x134 yp w340 h21 VazureTokenIssuerEdit, %azureTokenIssuerEdit%
+		Gui %window%:Add, Edit, x134 yp w340 h21 VazureTokenIssuerEdit GupdateAzureVoices, %azureTokenIssuerEdit%
 		
-		Gui %window%:Add, Text, x16 yp+24 w140 h23 +0x200 VazureLanguageLabel, % translate("Language")
-		Gui %window%:Add, Edit, x134 yp w135 h21 VazureLanguageEdit, %azureLanguageEdit%
+		voices := [translate("Automatic"), translate("Deactivated")]
 		
-		Gui %window%:Add, Text, x16 yp+24 w140 h23 +0x200 VazureVoiceLabel, % translate("Voice")
-		Gui %window%:Add, Edit, x134 yp w135 h21 VazureVoiceEdit, %azureVoiceEdit%
+		Gui %window%:Add, Text, x16 yp+24 w110 h23 +0x200 VazureSpeakerLabel, % translate("Voice")
+		Gui %window%:Add, DropDownList, x134 yp w340 VazureSpeakerDropDown, % values2String("|", voices*)
 		
-		this.iAzureVoiceWidgets := [["azureSubscriptionKeyLabel", "azureSubscriptionKeyEdit"], ["azureTokenIssuerLabel", "azureTokenIssuerEdit"]
-								  , ["azureLanguageLabel", "azureLanguageEdit"], ["azureVoiceLabel", "azureVoiceEdit"]]
+		this.iAzureVoiceWidgets := [["azureSubscriptionKeyLabel", "azureSubscriptionKeyEdit"], ["azureTokenIssuerLabel", "azureTokenIssuerEdit"], ["azureSpeakerLabel", "azureSpeakerDropDown"]]
+
+		this.updateVoices()
 		
 		hideWidgets(this.iWindowsVoiceWidgets)
 		hideWidgets(this.iAzureVoiceWidgets)
@@ -213,12 +208,11 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		
 		voiceSynthesizerDropDown := inList(["Windows", "Azure"], getConfigurationValue(configuration, "Voice Control", "Synthesizer", "Windows"))
 		
-		azureVoiceEdit := getConfigurationValue(configuration, "Voice Control", "Speaker.Azure", "")
+		azureSpeakerDropDown := getConfigurationValue(configuration, "Voice Control", "Speaker.Azure", true)
 		windowsSpeakerDropDown := getConfigurationValue(configuration, "Voice Control", "Speaker.Windows",  getConfigurationValue(configuration, "Voice Control", "Speaker", true))
 		
 		azureSubscriptionKeyEdit := getConfigurationValue(configuration, "Voice Control", "SubscriptionKey", "")
 		azureTokenIssuerEdit := getConfigurationValue(configuration, "Voice Control", "TokenIssuer", "")
-		azureLanguageEdit := getConfigurationValue(configuration, "Voice Control", "SpeakerLanguage", "")
 		
 		speakerVolumeSlider := getConfigurationValue(configuration, "Voice Control", "SpeakerVolume", 100)
 		speakerPitchSlider := getConfigurationValue(configuration, "Voice Control", "SpeakerPitch", 0)
@@ -250,47 +244,16 @@ class VoiceControlConfigurator extends ConfigurationItem {
 	saveToConfiguration(configuration) {
 		base.saveToConfiguration(configuration)
 		
-		GuiControlGet voiceLanguageDropDown
-		
-		languageCode := "en"
-		languages := availableLanguages()
-		
-		found := false
-
-		for code, language in availableLanguages()
-			if (language = voiceLanguageDropDown) {
-				found := true
-				
-				languageCode := code
-			}
-			
-		if !found
-			for ignore, grammarFile in getFileNames("Race Engineer.grammars.*", kUserGrammarsDirectory, kGrammarsDirectory) {
-				SplitPath grammarFile, , , grammarLanguageCode
-			
-				if languages.HasKey(grammarLanguageCode)
-					language := languages[grammarLanguageCode]
-				else
-					language := grammarLanguageCode
-				
-				if (language = voiceLanguageDropDown) {
-					languageCode := grammarLanguageCode
-					
-					break
-				}
-			}
-			
-		setConfigurationValue(configuration, "Voice Control", "Language", languageCode)
+		setConfigurationValue(configuration, "Voice Control", "Language", this.getCurrentLanguage())
 			
 		GuiControlGet voiceSynthesizerDropDown
 		
 		setConfigurationValue(configuration, "Voice Control", "Synthesizer", ["Windows", "Azure"][voiceSynthesizerDropDown])
 		
 		GuiControlGet windowsSpeakerDropDown
-		GuiControlGet azureVoiceEdit
+		GuiControlGet azureSpeakerDropDown
 		GuiControlGet azureSubscriptionKeyEdit
 		GuiControlGet azureTokenIssuerEdit
-		GuiControlGet azureLanguageEdit
 		
 		if (windowsSpeakerDropDown = translate("Automatic"))
 			windowsSpeakerDropDown := true
@@ -298,7 +261,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 			windowsSpeakerDropDown := false
 
 		setConfigurationValue(configuration, "Voice Control", "Speaker.Windows", windowsSpeakerDropDown)
-		setConfigurationValue(configuration, "Voice Control", "Speaker.Azure", azureVoiceEdit)
+		setConfigurationValue(configuration, "Voice Control", "Speaker.Azure", azureSpeakerDropDown)
 		
 		if (voiceSynthesizerDropDown == 1) {
 			setConfigurationValue(configuration, "Voice Control", "Service", "Windows")
@@ -306,12 +269,11 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		}
 		else {
 			setConfigurationValue(configuration, "Voice Control", "Service", "Azure|" . azureTokenIssuerEdit . "|" . azureSubscriptionKeyEdit)
-			setConfigurationValue(configuration, "Voice Control", "Speaker", azureVoiceEdit)
+			setConfigurationValue(configuration, "Voice Control", "Speaker", azureSpeakerDropDown)
 		}
 
 		setConfigurationValue(configuration, "Voice Control", "SubscriptionKey", azureSubscriptionKeyEdit)
 		setConfigurationValue(configuration, "Voice Control", "TokenIssuer", azureTokenIssuerEdit)
-		setConfigurationValue(configuration, "Voice Control", "SpeakerLanguage", azureLanguageEdit)
 
 		GuiControlGet speakerVolumeSlider
 		GuiControlGet speakerPitchSlider
@@ -359,12 +321,112 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		hideWidgets(this.iOtherWidgets)
 		translateWidgets(this.iOtherWidgets, -24 * this.iAzureVoiceWidgets.Length())
 	}
+	
+	getCurrentLanguage() {
+		GuiControlGet voiceLanguageDropDown
+		
+		languageCode := "en"
+		languages := availableLanguages()
+		
+		found := false
+
+		for code, language in availableLanguages()
+			if (language = voiceLanguageDropDown) {
+				found := true
+				
+				languageCode := code
+			}
+			
+		if !found
+			for ignore, grammarFile in getFileNames("Race Engineer.grammars.*", kUserGrammarsDirectory, kGrammarsDirectory) {
+				SplitPath grammarFile, , , grammarLanguageCode
+			
+				if languages.HasKey(grammarLanguageCode)
+					language := languages[grammarLanguageCode]
+				else
+					language := grammarLanguageCode
+				
+				if (language = voiceLanguageDropDown) {
+					languageCode := grammarLanguageCode
+					
+					break
+				}
+			}
+		
+		return languageCode
+	}
+	
+	updateVoices() {
+		this.updateWindowsVoices()
+		this.updateAzureVoices()
+	}
+	
+	updateWindowsVoices() {
+		voices := []
+		
+		GuiControlGet windowsSpeakerDropDown
+		
+		if !windowsSpeakerDropDown
+			windowsSpeakerDropDown := getConfigurationValue(this.Configuration, "Voice Control", "Speaker.Windows",  getConfigurationValue(this.Configuration, "Voice Control", "Speaker", true))
+			
+		
+		language := this.getCurrentLanguage()
+			
+		voices := new SpeechSynthesizer("Windows", true, language).Voices[language].Clone()
+		
+		voices.InsertAt(1, translate("Deactivated"))
+		voices.InsertAt(1, translate("Automatic"))
+		
+		chosen := inList(voices, windowsSpeakerDropDown)
+		
+		if (chosen == 0)
+			chosen := 1
+		
+		GuiControl, , windowsSpeakerDropDown, % "|" . values2String("|", voices*)
+		GuiControl Choose, windowsSpeakerDropDown, % chosen
+	}
+	
+	updateAzureVoices() {
+		voices := []
+		
+		GuiControlGet azureSubscriptionKeyEdit
+		GuiControlGet azureTokenIssuerEdit
+		GuiControlGet azureSpeakerDropDown
+		
+		if !azureSpeakerDropDown
+			azureSpeakerDropDown := getConfigurationValue(this.Configuration, "Voice Control", "Speaker.Azure", true)
+		
+		if ((azureSubscriptionKeyEdit != "") && (azureTokenIssuerEdit)) {
+			language := this.getCurrentLanguage()
+			
+			voices := new SpeechSynthesizer("Azure|" . azureTokenIssuerEdit . "|" . azureSubscriptionKeyEdit, true, language).Voices[language].Clone()
+		}
+		
+		voices.InsertAt(1, translate("Deactivated"))
+		voices.InsertAt(1, translate("Automatic"))
+		
+		chosen := inList(voices, azureSpeakerDropDown)
+		
+		if (chosen == 0)
+			chosen := 1
+		
+		GuiControl, , azureSpeakerDropDown, % "|" . values2String("|", voices*)
+		GuiControl Choose, azureSpeakerDropDown, % chosen
+	}
 }
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+updateVoices() {
+	VoiceControlConfigurator.Instance.updateVoices()
+}
+
+updateAzureVoices() {
+	VoiceControlConfigurator.Instance.updateAzureVoices()
+}
 
 showWidgets(widgets) {
 	for ignore, widget in widgets

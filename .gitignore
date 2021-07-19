@@ -3,7 +3,8 @@ desktop.ini
 Releases/*.*
 Build.lnk
 Setup.lnk
-Sources/Foreign/**/.vs/
-Sources/Foreign/**/Debug/
-Sources/Foreign/**/Release/
-Sources/Foreign/**/packages/
+Sources/Special/**/.vs/
+Sources/Special/**/Debug/
+Sources/Special/**/Release/
+Sources/Special/**/packages/
+Sources/Special/ACC UDP Reader/ksbroadcastingnetwork/

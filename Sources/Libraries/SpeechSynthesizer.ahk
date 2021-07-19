@@ -183,6 +183,13 @@ class SpeechSynthesizer {
 			
 			this.speakToFile(temp1Name, text)
 			
+			if !FileExist(temp1Name) {
+				if (this.Service = "Windows")
+					this.iSpeechSynthesizer.Speak(text, (wait ? 0x0 : 0x1))
+				
+				return
+			}
+				
 			try {
 				RunWait "%kSoX%" "%temp1Name%" "%temp2Name%" rate 16k channels 1 overdrive 20 20 highpass 800 lowpass 1800, , Hide
 				RunWait "%kSoX%" -m -v 0.2 "%kResourcesDirectory%Sounds\Noise.wav" "%temp2Name%" "%temp1Name%" channels 1 reverse vad -p 1 reverse, , Hide
@@ -193,8 +200,9 @@ class SpeechSynthesizer {
 			catch exception {
 				showMessage(substituteVariables(translate("Cannot start SoX (%kSoX%) - please check the configuration..."))
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-					  
-				this.iSpeechSynthesizer.Speak(text, (wait ? 0x0 : 0x1))
+				
+				if (this.Service = "Windows")
+					this.iSpeechSynthesizer.Speak(text, (wait ? 0x0 : 0x1))
 			}
 			finally {
 				if FileExist(temp1Name)
@@ -215,6 +223,9 @@ class SpeechSynthesizer {
 				tempName := kTempDirectory . "temp_" . postfix . ".wav"
 
 				this.SpeakToFile(tempName, text)
+				
+				if !FileExist(tempName)
+					return
 				
 				if wait {
 					SoundPlay %tempName%, WAIT
@@ -260,7 +271,12 @@ class SpeechSynthesizer {
 			ssml := substituteVariables(ssml, {volume: this.iVolume, pitch: ((this.iPitch > 0) ? "+" : "-") . Abs(this.iPitch) . "st", rate: 1 + (0.05 * this.iRate)
 									  , language: this.Locale, voice: this.Voice, text: text})
 			
-			this.iSpeechSynthesizer.SpeakSsmlToFile(fileName, ssml)
+			try {
+				this.iSpeechSynthesizer.SpeakSsmlToFile(fileName, ssml)
+			}
+			catch exception {
+				new SpeechSynthesizer("Windows", true, "en").speak("Error while calling Azure Cognitive Services. Maybe your monthly contingent is exhausted.")
+			}
 		}
 	}
 	

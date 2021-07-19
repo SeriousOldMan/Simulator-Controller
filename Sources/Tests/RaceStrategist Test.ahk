@@ -281,7 +281,7 @@ if !GetKeyState("Ctrl") {
 else {
 	raceNr := 13
 	strategist := new RaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist.settings")
-								   , "Khato", "de", true, true, true)
+								   , "Khato", "de", "Windows", true, true)
 
 	strategist.VoiceAssistant.setDebug(kDebugGrammars, false)
 	

@@ -225,7 +225,7 @@ class VoiceServer extends ConfigurationItem {
 			}
 		}
 		
-		__New(voiceServer, descriptor, pid, language, speaker, listener, speakerVolume, speakerPitch, speakerSpeed, activationCallback, deactivationCallback) {
+		__New(voiceServer, descriptor, pid, language, service, speaker, listener, speakerVolume, speakerPitch, speakerSpeed, activationCallback, deactivationCallback) {
 			this.iVoiceServer := voiceServer
 			this.iDescriptor := descriptor
 			this.iPID := pid
@@ -653,7 +653,7 @@ class VoiceServer extends ConfigurationItem {
 		if (client && (this.ActiveVoiceClient == client))
 			this.deactivateVoiceClient(descriptor)
 			
-		client := new this.VoiceClient(this, descriptor, pid, language, speaker, listener, speakerVolume, speakerPitch, speakerSpeed, activationCallback, deactivationCallback)
+		client := new this.VoiceClient(this, descriptor, pid, language, service, speaker, listener, speakerVolume, speakerPitch, speakerSpeed, activationCallback, deactivationCallback)
 		
 		this.VoiceClients[descriptor] := client
 		

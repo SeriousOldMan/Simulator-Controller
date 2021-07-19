@@ -679,7 +679,7 @@ class Plugin extends ConfigurationItem {
 		descriptor := getConfigurationValue(configuration, "Plugins", this.Plugin, "")
 		
 		if (StrLen(descriptor) > 0) {
-			descriptor := string2Values("|", descriptor)
+			descriptor := StrSplit(descriptor, "|", " `t", 3)
 			
 			if (descriptor.Length() > 0) {
 				this.iIsActive := (descriptor[1] = kTrue) ? true : false

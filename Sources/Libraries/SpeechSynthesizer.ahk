@@ -33,7 +33,8 @@ global kWindowsVoices = {de: ["Microsoft Hedda Desktop", "Microsoft Katja Deskto
 					   , en: ["Microsoft David Desktop", "Microsoft Mark Desktop", "Microsoft Zira Desktop"]
 					   , fr: ["Microsoft Hortence Desktop", "Microsoft Julie Desktop", "Microsoft Paul Desktop"]}
 
-global kAzureVoices = {de: [["de-AT", "de-AT-JonasNeural"], ["de-DE", "de-DE-KatjaNeural"], ["de-DE", "de-DE-ConradNeural"]
+global kAzureVoices = {de: [["de-AT", "de-AT-IngridNeural"], ["de-AT", "de-AT-JonasNeural"]
+						  , ["de-DE", "de-DE-KatjaNeural"], ["de-DE", "de-DE-ConradNeural"]
 						  , ["de-CH", "de-CH-LeniNeural"], ["de-CH", "de-CH-JanNeural"]]
 					 , en: [["en-AU", "en-AU-NatashaNeural"], ["en-AU", "en-AU-WilliamNeural"]
 						  , ["en-CA", "en-CA-ClaraNeural"], ["en-CA", "en-CA-LiamNeural"]
@@ -125,14 +126,14 @@ class SpeechSynthesizer {
 			dllName := "Speech.Synthesizer.dll"
 			dllFile := kBinariesDirectory . dllName
 			
-			try {
+			; try {
 				if (!FileExist(dllFile)) {
 					logMessage(kLogCritical, translate("Speech.Synthesizer.dll not found in " . kBinariesDirectory))
 					
 					Throw "Unable to find Speech.Synthesizer.dll in " . kBinariesDirectory . "..."
 				}
 
-				this.iSpeechSynthesizer := CLR_LoadLibrary(dllFile).CreateInstance("CSSpeech.SpeechSynthesizer")
+				this.iSpeechSynthesizer := CLR_LoadLibrary(dllFile).CreateInstance("Speech.SpeechSynthesizer")
 				
 				service := string2Values("|", service)
 				
@@ -142,6 +143,7 @@ class SpeechSynthesizer {
 				
 					Throw "Could not communicate with speech synthesizer library (" . dllName . ")..."
 				}
+			/*
 			}
 			catch exception {
 				logMessage(kLogCritical, translate("Error while initializing speech synthesizer module - please install the speech synthesizer software"))
@@ -149,7 +151,7 @@ class SpeechSynthesizer {
 				showMessage(translate("Error while initializing speech synthesizer module - please install the speech synthesizer software") . translate("...")
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
-			
+			*/
 			
 			voices := this.iSpeechSynthesizer.GetVoices()
 			

@@ -1,8 +1,8 @@
 [Development]
-Version=3.2.4-dev
+Version=3.3.0-dev
 Target=3.2.4-release
 Date=07/16/2021
-Changes=Audio processing for team radio voice
+Changes=Audio processing for team radio voice, File location refactoring, Azure Service for speech synthesis
 [Release]
 Version=3.2.2-release
 Date=07/16/2021
@@ -11,4 +11,4 @@ Changes=More information supplied by Jona, New plugin arguments for Race Strateg
 Type=Development
 [Version]
 Release=3.2.2-release
-Development=3.2.4-dev
+Development=3.3.0-dev

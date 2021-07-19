@@ -873,7 +873,7 @@ if !GetKeyState("Ctrl") {
 else {
 	raceNr := (GetKeyState("Alt") ? 12 : ((GetKeyState("Shift") ? 2 : 1)))
 	engineer := new TestRaceEngineer(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Engineer.settings")
-								   , new TestPitStopHandler(), "Jona", "de", true, true)
+								   , new TestPitStopHandler(), "Jona", "de", true, true, true)
 
 	engineer.VoiceAssistant.setDebug(kDebugGrammars, false)
 	

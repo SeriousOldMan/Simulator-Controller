@@ -61,7 +61,7 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 		simulator := this.Code
 		arguments := values2String(";", arguments*)
 		
-		exePath := kBinariesDirectory . simulator . " SHM Reader.exe"
+		exePath := kBinariesDirectory . simulator . " SHM Provider.exe"
 	
 		try {
 			if operation
@@ -70,11 +70,11 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 				RunWait %ComSpec% /c ""%exePath%" -%command%", , Hide
 		}
 		catch exception {
-			logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Reader ("), {simulator: simulator, protocol: "SHM"})
+			logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: simulator, protocol: "SHM"})
 													   . exePath . translate(") - please rebuild the applications in the binaries folder (")
 													   . kBinariesDirectory . translate(")"))
 				
-			showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Reader (%exePath%) - please check the configuration...")
+			showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration...")
 										  , {exePath: exePath, simulator: simulator, protocol: "SHM"})
 					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 		}

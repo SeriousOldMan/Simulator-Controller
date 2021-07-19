@@ -45,7 +45,7 @@ class SpeechRecognizer {
 				Throw "Unable to find Speech.Recognizer.dll in " . kBinariesDirectory . "..."
 			}
 
-			this.Instance := CLR_LoadLibrary(dllFile).CreateInstance("HotVoice.HotVoice")
+			this.Instance := CLR_LoadLibrary(dllFile).CreateInstance("Speech.SpeechRecognizer")
 
 			if (this.Instance.OkCheck() != "OK") {
 				logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))

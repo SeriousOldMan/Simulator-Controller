@@ -16,7 +16,7 @@ General Release Actions
 12. Update #releases and #anouncements in Discord
 13. Set a Git Tag after final commit
 
-Release 3.2.4 Checklist
+Release 3.3.0 Checklist
 =======================
 
 0. Search for new links (*)
@@ -26,8 +26,13 @@ Release 3.2.4 Checklist
 2. Update Procedure
    a. Translations
    b. Phrase Grammars
-3. File Refactoring (Startup => Controller; Tools => Configuration)
+3. File Refactoring (Startup => Controller; Tools => Configuration; Reader => Provider)
    a. Update Notes
+4. Azure Service for speech synthesis
+   a. Documetation
+   b. Images
+   c. Translations
+   d. Update Notes
 
 Release 3.2.2 Checklist
 =======================

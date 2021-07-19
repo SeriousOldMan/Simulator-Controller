@@ -473,7 +473,7 @@ You can take a look at the knowledge base by enabling "Debug" mode in the config
 
 ### Telemetry Integration
 
-A considerable part of the knowledge of Jona comes from the telemetry information of the simulation game. As said, data providers for *Assetto Corsa Competizione*, *RaceRoom Racing Experience*, *rFactor 2*, *iRacing* and *Automobilista 2* are already builtin. The special plugin "Race Engineer" collects the data from the simulation games and hand it over to Jona. Small applications "ACC SHM Reader.exe" or "RF2 SHM Reader.exe", which are located in the *Binaries* folder, are used to acquire the data. These readers run periodically and output the following data:
+A considerable part of the knowledge of Jona comes from the telemetry information of the simulation game. As said, data providers for *Assetto Corsa Competizione*, *RaceRoom Racing Experience*, *rFactor 2*, *iRacing* and *Automobilista 2* are already builtin. The special plugin "Race Engineer" collects the data from the simulation games and hand it over to Jona. Small applications "ACC SHM Provider.exe" or "RF2 SHM Provider.exe", which are located in the *Binaries* folder, are used to acquire the data. These readers run periodically and output the following data:
 
 	[Car Data]
 	BodyworkDamage=0, 0, 0, 0, 0

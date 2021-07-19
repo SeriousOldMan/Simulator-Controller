@@ -770,7 +770,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 ;;;-------------------------------------------------------------------------;;;
 
 readSimulatorData(simulator, options := "", protocol := "SHM") {
-	exePath := kBinariesDirectory . simulator . " " . protocol . " Reader.exe"
+	exePath := kBinariesDirectory . simulator . " " . protocol . " Provider.exe"
 	
 	Random postfix, 1, 1000000
 	
@@ -782,11 +782,11 @@ readSimulatorData(simulator, options := "", protocol := "SHM") {
 		RunWait %ComSpec% /c ""%exePath%" %options% > "%dataFile%"", , Hide
 	}
 	catch exception {
-		logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Reader ("), {simulator: simulator, protocol: protocol})
+		logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: simulator, protocol: protocol})
 												   . exePath . translate(") - please rebuild the applications in the binaries folder (")
 												   . kBinariesDirectory . translate(")"))
 			
-		showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Reader (%exePath%) - please check the configuration...")
+		showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration...")
 									  , {exePath: exePath, simulator: simulator, protocol: protocol})
 				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 	}

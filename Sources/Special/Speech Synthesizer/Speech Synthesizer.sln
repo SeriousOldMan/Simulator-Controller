@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30907.101
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CS Speech", "CS Speech\CS Speech.csproj", "{7E910DC5-49AC-4917-B4F5-A43062A9325A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Speech Synthesizer", "Speech Synthesizer\Speech Synthesizer.csproj", "{7E910DC5-49AC-4917-B4F5-A43062A9325A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

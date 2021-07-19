@@ -1,0 +1,102 @@
+Server Log Start
+Server Version 212
+SessionStateChange: 1 start: 40.000000 end: 5000.000000
+Sent Lobby Registration Request with trackName hungaroring
+RegisterToLobby succeeded 
+WARNING: Lobby accepted connection
+Sent config to kson
+Sent connected drivers list to kson
+SessionStateChange: 4 start: 5002.000000 end: 5002.000000
+Sent new session state to kson
+SessionStateChange: 5 start: 5008.000000 end: 1805008.000000
+Sent new session state to kson
+SessionStateChange: 6 start: 5008.000000 end: 1820009.000000
+Sent new session state to kson
+SessionStateChange: 7 start: 5008.000000 end: 1830012.000000
+Sent new session state to kson
+SessionStateChange: 8 start: 5008.000000 end: 1845015.000000
+Sent new session state to kson
+SessionOverUpdate currentSessionIndex: 1 currentEventIndex: 0
+SessionStateChange: 1 start: 1845063.000000 end: 5000.000000
+Sent new session state to kson
+SessionStateChange: 4 start: 5003.000000 end: 5003.000000
+Sent new session state to kson
+SessionStateChange: 5 start: 5010.000000 end: 3605010.000000
+Sent new session state to kson
+New connection received 336
+TCP PACKET received with ID:9
+ACP_REQUEST_CONNECTION
+CLIENT VERSION: 212
+addNewConnectedCar: new car connected, adding it to the list of connected cars
+Found and added a new player
+New Connection created, new connectedCarId: 1 new connectionId: 1
+Sent connected drivers list to kson
+SessionStateChange: 1 start: 2473227.000000 end: 5000.000000
+Sent new session state to kson
+UDP Packet id: 19
+TCP PACKET received with ID:44
+TCP PACKET received with ID:44
+TCP PACKET received with ID:41
+TCP PACKET received with ID:45
+TCP PACKET received with ID:48
+SessionStateChange: 4 start: 5005.000000 end: 5005.000000
+Sent new session state to kson
+SessionStateChange: 5 start: 5012.000000 end: 1805012.000000
+Sent new session state to kson
+TCP PACKET received with ID:50
+ACP_CAR_LOCATION_UPDATE location updated for carIndex 0
+TCP PACKET received with ID:50
+ACP_CAR_LOCATION_UPDATE location updated for carIndex 0
+TCP PACKET received with ID:49
+ACP_RACE_MANAGER_INFO_COMPLETED connectionId 1 is ready to reaceive packets
+TCP PACKET received with ID:50
+ACP_CAR_LOCATION_UPDATE location updated for carIndex 0
+TCP PACKET received with ID:50
+ACP_CAR_LOCATION_UPDATE location updated for carIndex 0
+TCP PACKET received with ID:50
+ACP_CAR_LOCATION_UPDATE location updated for carIndex 0
+New connection received 344
+TCP PACKET received with ID:9
+ACP_REQUEST_CONNECTION
+CLIENT VERSION: 212
+addNewConnectedCar: new car connected, adding it to the list of connected cars
+Found and added a new player
+New Connection created, new connectedCarId: 2 new connectionId: 2
+Sent connected drivers list to kson
+UDP Packet id: 19
+TCP PACKET received with ID:44
+TCP PACKET received with ID:44
+TCP PACKET received with ID:41
+TCP PACKET received with ID:45
+TCP PACKET received with ID:48
+TCP PACKET received with ID:49
+ACP_RACE_MANAGER_INFO_COMPLETED connectionId 2 is ready to reaceive packets
+TCP PACKET received with ID:34
+CAR_INFO_REQUEST for ID: 2
+Car Info Response sent idRequested: 2, carIndex: 1, driverIndex: 1
+TCP PACKET received with ID:50
+ACP_CAR_LOCATION_UPDATE location updated for carIndex 1
+TCP PACKET received with ID:50
+ACP_CAR_LOCATION_UPDATE location updated for carIndex 1
+TCP PACKET received with ID:34
+CAR_INFO_REQUEST for ID: 1
+Car Info Response sent idRequested: 1, carIndex: 0, driverIndex: 0
+TCP PACKET received with ID:50
+ACP_CAR_LOCATION_UPDATE location updated for carIndex 1
+TCP PACKET received with ID:33
+TCP PACKET received with ID:50
+ACP_CAR_LOCATION_UPDATE location updated for carIndex 1
+TCP PACKET received with ID:50
+ACP_CAR_LOCATION_UPDATE location updated for carIndex 1
+TCP PACKET received with ID:33
+TCP PACKET received with ID:50
+ACP_CAR_LOCATION_UPDATE location updated for carIndex 1
+TCP PACKET received with ID:50
+ACP_CAR_LOCATION_UPDATE location updated for carIndex 0
+TCP PACKET received with ID:50
+ACP_CAR_LOCATION_UPDATE location updated for carIndex 0
+TCP PACKET received with ID:50
+ACP_CAR_LOCATION_UPDATE location updated for carIndex 0
+TCP PACKET received with ID:33
+TCP PACKET received with ID:50
+ACP_CAR_LOCATION_UPDATE 

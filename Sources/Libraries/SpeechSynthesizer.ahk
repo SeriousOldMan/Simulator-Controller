@@ -126,7 +126,7 @@ class SpeechSynthesizer {
 			dllName := "Speech.Synthesizer.dll"
 			dllFile := kBinariesDirectory . dllName
 			
-			; try {
+			try {
 				if (!FileExist(dllFile)) {
 					logMessage(kLogCritical, translate("Speech.Synthesizer.dll not found in " . kBinariesDirectory))
 					
@@ -143,7 +143,6 @@ class SpeechSynthesizer {
 				
 					Throw "Could not communicate with speech synthesizer library (" . dllName . ")..."
 				}
-			/*
 			}
 			catch exception {
 				logMessage(kLogCritical, translate("Error while initializing speech synthesizer module - please install the speech synthesizer software"))
@@ -151,7 +150,6 @@ class SpeechSynthesizer {
 				showMessage(translate("Error while initializing speech synthesizer module - please install the speech synthesizer software") . translate("...")
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
-			*/
 			
 			voices := this.iSpeechSynthesizer.GetVoices()
 			

@@ -28,9 +28,9 @@ When the automated update procedure runs, there are some standard task, that are
     
 	If the release introduces new translations, the local translation files in the *Simulator Controller\Translations* folder will be updated to include the new translatable items. It cannot give you a full tranlation, as long as the corresponding language is not part of the standard distribution, but you will be able to edit these items using the [translation tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#translations-editor).
 	
-  * Update of *Controller Plugin Labels.ini*
+  * Update of *Controller Plugin Labels*
     
-	New labels for the controller hardware, which has been introduced by plugin extensions in the current release, will be automatically copied to your local file in the *Simulator Controller\Translations* folder.
+	New labels for the controller hardware, which has been introduced by plugin extensions in the current release, will be automatically copied to your local files in the *Simulator Controller\Translations* folder in your user documents folder.
 	
   * Update of Phrase Grammars
     
@@ -43,7 +43,7 @@ When the automated update procedure runs, there are some standard task, that are
 The update procedure itself is handled by the application *Simulator Tools*. It is autmatically started and the other application, which detected the need for the update will wait, until the update finished successfully. You might want to start *Simulator Tools* manually, but in this case, it will also try to perform other maintenance tasks as well, which might result in warning messages, if your distribution is not configured for development. But you can safely ignore those warnings about missing compiler and so on, nothing harmful will happen.
 Although the code, that handles all the update tasks, is integrated into *Simulator Tools*, the activation and, much more important, the dependencies are defined in the *Simulator Tools.targets* file. I do not recommend to change the contents of this file, but it might be helpful to take a look into the update rules, to get a better understanding of the things behind the curtain.
 
-Note: Some of you might want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars* and *Simulator Controller\Rules* folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does, on your own. But be sure to make a backup copy of all the files, just for peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor, that can handle this.
+Note: Some of you might want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars* and *Simulator Controller\Rules* folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does on your own. But be sure to make a backup copy of all the files, just for peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor that can handle this.
 
 ## Release 3.3.0
 

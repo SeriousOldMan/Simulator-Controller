@@ -259,11 +259,11 @@ class SpeechSynthesizer {
 		}
 		else if (this.Service = "Azure") {
 			ssml := "<speak version=""1.0"" xmlns=""http://www.w3.org/2001/10/synthesis"" xml:lang=""%language%"">"
-		    ssml .= "  <voice name=""%voice%"">"
-			ssml .= "    <prosody pitch=""%pitch%"" rate=""%rate%"" volume=""%volume%"">"
-			ssml .= "      %text%"
-			ssml .= "    </prosody>"
-			ssml .= "  </voice>"
+		    ssml .= " <voice name=""%voice%"">"
+			ssml .= "  <prosody pitch=""%pitch%"" rate=""%rate%"" volume=""%volume%"">"
+			ssml .= "  %text%"
+			ssml .= "  </prosody>"
+			ssml .= " </voice>"
 			ssml .= "</speak>"
 			
 			ssml := substituteVariables(ssml, {volume: this.iVolume, pitch: ((this.iPitch > 0) ? "+" : "-") . Abs(this.iPitch) . "st", rate: 1 + (0.05 * this.iRate)

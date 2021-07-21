@@ -1689,7 +1689,7 @@ readConfiguration(configFile) {
 		
 		for j, keyValue in keyValues {
 			if (SubStr(keyValue, 1, 2) != "//") {
-				keyValue := StrSplit(keyValue, "=")
+				keyValue := StrSplit(keyValue, "=", "", 2)
 				
 				value := keyValue[2]
 				

@@ -60,12 +60,21 @@ global infoViewer
 global stepTitle
 global stepSubtitle
 
+global previousPageButton
+global nextPageButton
+global finishButton
+
 class SetupWizard extends ConfigurationItem {
 	iWizardWindow := "SW"
 	iHelpWindow := "SH"
 	
 	iDefinition := false
+	
+	iSteps := {}
 	iStepWizards := {}
+	
+	iStep := 0
+	iPage := 0
 	
 	WizardWindow[] {
 		Get {
@@ -85,6 +94,15 @@ class SetupWizard extends ConfigurationItem {
 		}
 	}
 	
+	Steps[step := false] {
+		Get {
+			if step
+				return this.iSteps[step]
+			else
+				return this.iSteps
+		}
+	}
+	
 	StepWizards[descriptor := false] {
 		Get {
 			if descriptor
@@ -98,6 +116,18 @@ class SetupWizard extends ConfigurationItem {
 		}
 	}
 	
+	Step[] {
+		Get {
+			return this.iStep
+		}
+	}
+	
+	Page[] {
+		Get {
+			return this.iPage
+		}
+	}
+	
 	__New(configuration, definition) {
 		this.iDefinition := definition
 		
@@ -106,8 +136,8 @@ class SetupWizard extends ConfigurationItem {
 		SetupWizard.Instance := this
 	}
 	
-	registerStepWizard(descriptor, stepWizard) {
-		this.StepWizards[descriptor] := stepWizard
+	registerStepWizard(stepWizard) {
+		this.StepWizards[stepWizard.Step] := stepWizard
 	}
 	
 	unregisterStepWizard(descriptorOrWizard) {
@@ -122,6 +152,8 @@ class SetupWizard extends ConfigurationItem {
 	}
 	
 	createGui(configuration) {
+		local stepWizard
+		
 		window := this.WizardWindow
 		
 		Gui %window%:Default
@@ -142,9 +174,9 @@ class SetupWizard extends ConfigurationItem {
 
 		Gui %window%:Font, Norm, Arial
 		
-		Gui %window%:Add, Button, x16 y540 w30 h30 HwndpreviousButtonHandle
+		Gui %window%:Add, Button, x16 y540 w30 h30 HwndpreviousButtonHandle Disabled VpreviousPageButton GpreviousPage
 		setButtonIcon(previousButtonHandle, kIconsDirectory . "Previous.ico", 1, "L2 T2 R2 B2 H24 W24")
-		Gui %window%:Add, Button, x670 y540 w30 h30 HwndnextButtonHandle
+		Gui %window%:Add, Button, x670 y540 w30 h30 HwndnextButtonHandle Disabled VnextPageButton GnextPage
 		setButtonIcon(nextButtonHandle, kIconsDirectory . "Next.ico", 1, "L2 T2 R2 B2 H24 W24")
 		
 		Gui %window%:Add, Text, x8 yp+34 w700 0x10
@@ -177,7 +209,8 @@ class SetupWizard extends ConfigurationItem {
 
 		infoViewer.Document.Write(html)
 		
-		; 16, 60, 684, 470
+		for step, stepWizard in this.StepWizards
+			stepWizard.createGui(this, 16, 60, 684, 470)
 	}
 	
 	saveToConfiguration(configuration) {
@@ -228,6 +261,163 @@ class SetupWizard extends ConfigurationItem {
 		Gui %helpWindow%:Destroy
 	}
 	
+	startSetup() {
+		local stepWizard
+		
+		for descriptor, definition in getConfigurationSectionValues(this.Definition, "Setup.Steps") {
+			descriptor := string2Values(".", descriptor)
+		
+			step := descriptor[3]
+			stepWizard := this.StepWizards[step]
+			
+			stepWizard.setDefinition(definition)
+			
+			this.Steps[step] := stepWizard
+			this.Steps[descriptor[2]] := stepWizard
+			this.Steps[stepWizard] := descriptor[2]
+		}
+		
+		this.iStep := false
+		this.iPage := false
+		
+		this.nextPage()
+	}
+	
+	getPreviousPage(ByRef step, ByRef page) {
+		if !this.Step
+			return false
+		else if this.Page > 1 {
+			step := this.Step
+			page := this.Page - 1
+			
+			return true
+		}
+		else {
+			index := this.Steps[this.Step]
+		
+			if (index == 1)
+				return false
+			else
+				Loop {
+					if (index == 0)
+						return false
+					else {
+						candidate := this.Steps[--index]
+					
+						if (candidate.Pages > 0) {
+							step := candidate
+							page := candidate.Pages
+							
+							return true
+						}
+					}
+				}
+		}
+	}
+	
+	getNextPage(ByRef step, ByRef page) {
+		if (this.Step && (this.Page < this.Step.Pages)) {
+			step := this.Step
+			page := this.Page + 1
+			
+			return true
+		}
+		else {
+			count := this.StepWizards.Count()
+		
+			if !this.Step
+				index := 1
+			else
+				index := this.Steps[this.Step] + 1
+			
+			Loop {
+				if (index > count)
+					return false
+				else {
+					candidate := this.Steps[index++]
+				
+					if (candidate.Pages > 0) {
+						step := candidate
+						page := 1
+						
+						return true
+					}
+				}
+			}
+		}
+	}
+	
+	isFirstPage() {
+		step := false
+		page := false
+		
+		return !this.getPreviousPage(step, page)
+	}
+	
+	isLastPage() {
+		step := false
+		page := false
+		
+		return !this.getNextPage(step, page)
+	}
+	
+	showPage(step, page) {
+		change := (step != this.Step)
+		
+		if this.Step {
+			this.Step.hidePage(this.Page)
+			
+			if (step != this.Step)
+				hide := true
+		}
+		
+		this.iStep := step
+		this.iPage := page
+		
+		if change
+			this.Step.show()
+		
+		this.Step.showPage(page)
+		
+		this.updateState()
+	}
+	
+	previousPage() {
+		step := false
+		page := false
+		
+		if this.getPreviousPage(step, page)
+			this.showPage(step, page)
+	}
+	
+	nextPage() {
+		step := false
+		page := false
+		
+		if this.getNextPage(step, page)
+			this.showPage(step, page)
+	}
+
+	updateState() {
+		window := this.WizardWindow
+	
+		Gui %window%:Default
+		
+		if this.isFirstPage()
+			GuiControl Disable, previousPageButton
+		else
+			GuiControl Enable, previousPageButton
+		
+		if this.isLastPage() {
+			GuiControl Disable, nextPageButton
+			GuiControl Enable, finishButton
+		}
+		else {
+			GuiControl Enable, nextPageButton
+			GuiControl Disable, finishButton
+		}
+	}
+	
 	setTitle(title) {
 		window := this.HelpWindow
 		
@@ -265,6 +455,7 @@ class SetupWizard extends ConfigurationItem {
 class StepWizard extends ConfigurationItem {
 	iSetupWizard := false
 	iStep := false
+	iDefinition := false
 		
 	iWidgets := {}
 	
@@ -283,6 +474,12 @@ class StepWizard extends ConfigurationItem {
 	Step[] {
 		Get {
 			return this.iStep
+		}
+	}
+	
+	Definition[] {
+		Get {
+			return this.iDefinition
 		}
 	}
 	
@@ -316,13 +513,23 @@ class StepWizard extends ConfigurationItem {
 		this.iWidgets[page].Push(widget)
 	}
 	
-	startStep() {
+	setDefinition(definition) {
+		this.iDefinition := definition
+	}
+	
+	show() {
 		language := getLanguage()
 		definition := this.SetupWizard.Definition
 		
 		this.setTitle(getConfigurationValue(definition, "Setup." . this.Step, this.Step . ".Title." . language))
 		this.setSubtitle(getConfigurationValue(definition, "Setup." . this.Step, this.Step . ".Subtitle." . language))
 		this.setInfo(getConfigurationValue(definition, "Setup." . this.Step, this.Step . ".Info." . language))
+	}
+	
+	hide() {
+		this.setTitle("")
+		this.setSubtitle("")
+		this.setInfo("")
 	}
 	
 	showPage(page) {
@@ -407,6 +614,14 @@ cancelAndExit() {
 	vResult := kCancel
 }
 
+previousPage() {
+	SetupWizard.Instance.previousPage()
+}
+
+nextPage() {
+	SetupWizard.Instance.nextPage()
+}
+
 moveSetupWizard() {
 	moveByMouse(SetupWizard.Instance.WizardWindow)
 }
@@ -441,7 +656,9 @@ initializeSimulatorSetup() {
 	protectionOn()
 	
 	try {
-		new SetupWizard(kSimulatorConfiguration, readConfiguration(kConfigDirectory . "Simulator Setup.ini"))
+		wizard := new SetupWizard(kSimulatorConfiguration, readConfiguration(kConfigDirectory . "Simulator Setup.ini"))
+		
+		wizard.registerStepWizard(new StartStepWizard(wizard, "Start", kSimulatorConfiguration))
 	}
 	finally {
 		protectionOff()
@@ -452,26 +669,13 @@ startupSimulatorSetup() {
 	wizard := SetupWizard.Instance
 	
 	wizard.createGui(wizard.Configuration)
-		
-	stepWiz := new StartStepWizard(wizard, "Start", kSimulatorConfiguration)
 	
-	stepWiz.createGui(wizard, 16, 60, 684, 470)
-	stepWiz.startStep()
-	stepWiz.showPage(1)
+	wizard.startSetup()
 	
 	done := false
 	saved := false
 
 	wizard.show()
-	
-	Sleep 2000
-	
-	stepWiz.hidePage(1)
-	
-	Sleep 2000
-	stepWiz.startStep()
-	
-	stepWiz.showPage(1)
 	
 	try {
 		Loop {

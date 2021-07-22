@@ -960,12 +960,11 @@ class InstallationStepWizard extends StepWizard {
 				
 				if locatable
 					this.registerWidget(page, locateButtonHandle)
+				
+				this.iSoftwareLocators[software] := (locatable ? [installButtonHandle, locateButtonHandle] : [installButtonHandle])
 		
 				if !this.iPages.HasKey(page)
 					this.iPages[page] := {}
-				
-				if locatable
-					this.iSoftwareLocators[software] := [installButtonHandle, locateButtonHandle]
 				
 				this.iPages[page][software] := [iconHandle, labelHandle, installButtonHandle, locateButtonHandle, infoTextHandle]
 				
@@ -1047,10 +1046,17 @@ class InstallationStepWizard extends StepWizard {
 			
 				GuiControl Disable, % buttons[1]
 				
-				button := buttons[2]
+				if (buttons.Length() > 1) {
+					button := buttons[2]
+					
+					GuiControl Disable, %button% 
+					GuiControl Text, %button%, % translate("Installed")
+				}
+				else {
+					button := buttons[1]
 				
-				GuiControl Disable, %button% 
-				GuiControl Text, %button%, % translate("Installed")
+					GuiControl Text, %button%, % translate("Installed")
+				}
 			}
 	}
 	
@@ -1197,12 +1203,30 @@ findExecutable(definition, software) {
 			descriptor := string2Values("|", descriptor)
 		
 			if (software = descriptor[1]) {
-				folder := findApplicationInstallPath(descriptor[2])
+				locator := descriptor[2]
+				
+				if (InStr(locator, "File:") == 1) {
+					locator := StrReplace(locator, "File:", "")
+					
+					if FileExist(locator)
+						return locator
+				}
+				else if (InStr(locator, "RegistryExist:") == 1) {
+					RegRead value, % StrReplace(locator, "RegistryExist:", "")
+				
+					if (value != "")
+						return true
+				}
+				else if (InStr(locator, "RegistryScan:") == 1) {
+					folder := findApplicationInstallPath(StrReplace(locator, "RegistryScan:", ""))
 			
-				if ((folder != "") && FileExist(folder . descriptor[3]))
-					return (folder . descriptor[3])
+					if ((folder != "") && FileExist(folder . descriptor[3]))
+						return (folder . descriptor[3])
+				}
 			}
 		}
+	
+	return false
 }		
 
 saveConfiguration(configurationFile, wizard) {

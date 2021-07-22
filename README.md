@@ -26,7 +26,7 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-[3.3.0-dev](https://www.dropbox.com/s/zmlqxm02nyf8ut5/Simulator%20Controller%203.3.0-dev.zip?dl=1) (Early build for the upcoming release 3.3.0. New features: Audio post processing for team radio voice, File location refactoring, Use Azure Service for speech synthesis, New "raceAssistantService" parameter for the "Race Engineer" and "Race Strategist" plugins. Quite stable, incl. documentation and update procedure.)
+[3.3.0-rc1](https://www.dropbox.com/s/o4reroyjbj9k08o/Simulator%20Controller%203.3.0-rc1.zip?dl=1) (Release candidate for the upcoming release 3.3.0. New features: Audio post processing for team radio voice, File location refactoring, Use Azure Service for speech synthesis, New "raceAssistantService" parameter for the "Race Engineer" and "Race Strategist" plugins. Quite stable, incl. documentation and update procedure.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-330) of this version and all the versions you might have skipped, before installing and using this version.
 

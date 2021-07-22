@@ -912,6 +912,7 @@ class InstallationStepWizard extends StepWizard {
 				infoTextHandle := false
 		
 				installer := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Installation", "Installation." . software))
+				locatable := getConfigurationValue(this.SetupWizard.Definition, "Setup.Installation", "Installation." . software . ".Locatable", true)
 				info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Installation", "Installation." . software . ".Info." . getLanguage()))
 				
 				label := (translate("Software: ") . software)
@@ -919,8 +920,12 @@ class InstallationStepWizard extends StepWizard {
 				
 				installed := this.SetupWizard.Installed[software]
 				
-				buttonX := x + width - 185
-				labelWidth := width - 30
+				buttonX := x + width - 90
+				
+				if locatable
+					buttonX -= 95
+				
+				labelWidth := width - 30 - 90 - (locatable * 95)
 				labelX := x + 45
 				labelY := y + 5
 				
@@ -934,9 +939,11 @@ class InstallationStepWizard extends StepWizard {
 				
 				Gui %window%:Add, Button, x%buttonX% y%y% w90 h23 HWNDinstallButtonHandle VinstallButton%A_Index% GinstallSoftware Hidden, % (InStr(installer, "http") = 1) ? translate("Download...") : translate("Install...")
 				
-				buttonX += 95
-				
-				Gui %window%:Add, Button, x%buttonX% y%y% w90 h23 HWNDlocateButtonHandle VlocateButton%A_Index% GlocateSoftware Hidden, % installed ? translate("Installed") : translate("Locate...")
+				if locatable {
+					buttonX += 95
+					
+					Gui %window%:Add, Button, x%buttonX% y%y% w90 h23 HWNDlocateButtonHandle VlocateButton%A_Index% GlocateSoftware Hidden, % installed ? translate("Installed") : translate("Locate...")
+				}
 				
 				Gui %window%:Add, ActiveX, x%x% yp+33 w%width% h120 HWNDinfoTextHandle VinfoText%A_Index% Hidden, shell explorer
 	
@@ -949,12 +956,16 @@ class InstallationStepWizard extends StepWizard {
 				
 				page := Ceil(A_Index / 3)
 				
-				this.registerWidgets(page, iconHandle, labelHandle, installButtonHandle, locateButtonHandle, infoTextHandle)
+				this.registerWidgets(page, iconHandle, labelHandle, installButtonHandle, infoTextHandle)
+				
+				if locatable
+					this.registerWidget(page, locateButtonHandle)
 		
 				if !this.iPages.HasKey(page)
 					this.iPages[page] := {}
 				
-				this.iSoftwareLocators[software] := [installButtonHandle, locateButtonHandle]
+				if locatable
+					this.iSoftwareLocators[software] := [installButtonHandle, locateButtonHandle]
 				
 				this.iPages[page][software] := [iconHandle, labelHandle, installButtonHandle, locateButtonHandle, infoTextHandle]
 				
@@ -982,7 +993,7 @@ class InstallationStepWizard extends StepWizard {
 			this.iSoftware.Push(name)
 			this.iRules[name] := rule
 		
-			executable := findSoftwareExecutable(name)
+			executable := findExecutable(this.SetupWizard.Definition, name)
 			
 			if (executable != "")
 				this.SetupWizard.locateSoftware(name, executable)
@@ -1031,7 +1042,7 @@ class InstallationStepWizard extends StepWizard {
 			if !this.softwareActive(this.iRules[software])
 				for ignore, widget in widgets
 					GuiControl Disable, %widget%
-			else if this.SetupWizard.Installed[software] {
+			else if (this.SetupWizard.Installed[software] && this.iSoftwareLocators.HasKey(software)) {
 				buttons := this.iSoftwareLocators[software]
 			
 				GuiControl Disable, % buttons[1]
@@ -1164,13 +1175,9 @@ findApplicationInstallPath(name) {
 		return value
 }
 
-findSoftwareExecutable(software) {
-	local application
-	
-	definition := SetupWizard.Instance.Definition
-	
-	for ignore, section in ["Applications.Core", "Applications.Feedback", "Applications.Other"]
-		for application, descriptor in getConfigurationSectionValues(definition, section, Object()) {
+findExecutable(definition, software) {
+	for ignore, section in ["Applications.Core", "Applications.Feedback", "Applications.Other", "Applications.Special"]
+		for ignore, descriptor in getConfigurationSectionValues(definition, section, Object()) {
 			descriptor := string2Values("|", descriptor)
 		
 			if (software = descriptor[1]) {
@@ -1200,8 +1207,6 @@ initializeSimulatorSetup() {
 	
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Simulator Setup
-	
-	path := findApplicationInstallPath("GIMP")
 	
 	protectionOn()
 	

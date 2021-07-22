@@ -433,7 +433,7 @@ showWidgets(widgets) {
 		for ignore, widgetPart in widget {
 			GuiControl Enable, %widgetPart%
 			GuiControl Show, %widgetPart%
-	}
+		}
 }
 
 hideWidgets(widgets) {
@@ -441,7 +441,7 @@ hideWidgets(widgets) {
 		for ignore, widgetPart in widget {
 			GuiControl Disable, %widgetPart%
 			GuiControl Hide, %widgetPart%
-	}
+		}
 }
 
 translateWidgets(widgets, offset) {

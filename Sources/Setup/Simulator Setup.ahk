@@ -517,7 +517,7 @@ class SetupWizard extends ConfigurationItem {
 		
 		Gui %window%:Default
 		
-		GuiControl Text, stepSubtitle, % subtitle
+		GuiControl Text, stepSubtitle, % translate("Step ") . this.Steps[this.Step] . translate(": ") . subtitle
 	}
 	
 	setInfo(html) {
@@ -1061,6 +1061,22 @@ class InstallationStepWizard extends StepWizard {
 }
 
 
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; ApplicationsStepWizard                                                  ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class ApplicationsStepWizard extends StepWizard {
+	Pages[] {
+		Get {
+			return 1
+		}
+	}
+	
+	createGui(wizard, x := false, y := false, width := false, height := false) {
+	}
+}
+
+
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
@@ -1218,6 +1234,7 @@ initializeSimulatorSetup() {
 		wizard.registerStepWizard(new StartStepWizard(wizard, "Start", kSimulatorConfiguration))
 		wizard.registerStepWizard(new ModulesStepWizard(wizard, "Modules", kSimulatorConfiguration))
 		wizard.registerStepWizard(new InstallationStepWizard(wizard, "Installation", kSimulatorConfiguration))
+		wizard.registerStepWizard(new ApplicationsStepWizard(wizard, "Applications", kSimulatorConfiguration))
 	}
 	finally {
 		protectionOff()

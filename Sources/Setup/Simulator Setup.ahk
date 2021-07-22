@@ -1242,7 +1242,6 @@ findExecutable(definition, software) {
 	if ((software = "Sox") && kSoX && FileExist(kSox))
 		return kSoX
 	
-	
 	return false
 }		
 

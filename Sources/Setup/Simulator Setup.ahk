@@ -1211,29 +1211,29 @@ findExecutable(definition, software) {
 				locator := descriptor[2]
 				
 				if (InStr(locator, "File:") == 1) {
-					locator := StrReplace(locator, "File:", "")
+					locator := substituteVariables(StrReplace(locator, "File:", ""))
 					
 					if FileExist(locator)
 						return locator
 				}
 				else if (InStr(locator, "RegistryExist:") == 1) {
-					RegRead value, % StrReplace(locator, "RegistryExist:", "")
+					RegRead value, % substituteVariables(StrReplace(locator, "RegistryExist:", ""))
 				
 					if (value != "")
 						return true
 				}
 				else if (InStr(locator, "RegistryScan:") == 1) {
-					folder := findApplicationInstallPath(StrReplace(locator, "RegistryScan:", ""))
+					folder := findApplicationInstallPath(substituteVariables(StrReplace(locator, "RegistryScan:", "")))
 			
 					if ((folder != "") && FileExist(folder . descriptor[3]))
 						return (folder . descriptor[3])
 				}
+			
+				exePath := getConfigurationValue(kSimulatorConfiguration, name, "Exe Path", false)
+				
+				if (exePath && FileExist(exePath))
+					return exePath
 			}
-			
-			exePath := getConfigurationValue(kSimulatorConfiguration, name, "Exe Path", false)
-			
-			if (exePath && FileExist(exePath))
-				return exePath
 		}
 		
 	if ((software = "NirCmd") && kNirCmd && FileExist(kNirCmd))

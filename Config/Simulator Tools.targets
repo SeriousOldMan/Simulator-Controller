@@ -56,7 +56,7 @@ Controller Configuration.1=%kConfigDirectory%Simulator Configuration.ini <- %kSo
 Controller Configuration.2=%kResourcesDirectory%Templates\Simulator Configuration.ini <- %kSourcesDirectory%Configuration\Simulator Configuration.ini
 Controller Configuration.3=%kConfigDirectory%Button Box Configuration.ini <- %kSourcesDirectory%Plugins\Button Box Configuration.ini
 Controller Configuration.4=%kResourcesDirectory%Templates\Button Box Configuration.ini <- %kSourcesDirectory%Plugins\Button Box Configuration.ini
-Setup Configuration.1=%kConfigDirectory%Simulator Setup.ini <- %kSourcesDirectory%Setup\Simulator Setup.ini
+Setup Configuration.1=%kResourcesDirectory%Setup\Simulator Setup.ini <- %kSourcesDirectory%Setup\Simulator Setup.ini
 Build Targets.1=%kConfigDirectory%Simulator Tools.targets <- %kSourcesDirectory%Configuration\Simulator Tools.targets
 Build Targets.2=%kResourcesDirectory%Templates\Simulator Tools.targets <- %kSourcesDirectory%Configuration\Simulator Tools.targets
 Translations.1=%kTranslationsDirectory%Translations.en <- %kSourcesDirectory%Configuration\Translations\Translations.en
@@ -88,7 +88,7 @@ Race Strategist Configuration.4=%kResourcesDirectory%Templates\Race Strategist.g
 Race Strategist Configuration.5=%kGrammarsDirectory%Race Strategist.grammars.de <- %kSourcesDirectory%Assistants\Grammars\Race Strategist.grammars.de
 Race Strategist Configuration.6=%kResourcesDirectory%Templates\Race Strategist.grammars.de <- %kSourcesDirectory%Assistants\Grammars\Race Strategist.grammars.de
 [Build]
-dotNET Applications && DLLs=Special
+External Applications && DLLs=Special
 Simulator Controller=%kBinariesDirectory%Simulator Controller.exe <- %kSourcesDirectory%Controller\Simulator Controller.ahk; %kIncludesDirectory%, %kLibrariesDirectory%SpeechRecognizer.ahk, %kPluginsDirectory%, %kUserPluginsDirectory%, %kHomeDirectory%VERSION
 Race Engineer=%kBinariesDirectory%Race Engineer.exe <- %kSourcesDirectory%Assistants\Race Engineer.ahk; %kIncludesDirectory%, %kLibrariesDirectory%, %kSourcesDirectory%Assistants\Libraries\, %kHomeDirectory%VERSION
 Race Strategist=%kBinariesDirectory%Race Strategist.exe <- %kSourcesDirectory%Assistants\Race Strategist.ahk; %kIncludesDirectory%, %kLibrariesDirectory%, %kSourcesDirectory%Assistants\Libraries\, %kHomeDirectory%VERSION

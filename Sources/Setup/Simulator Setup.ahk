@@ -76,6 +76,8 @@ class SetupWizard extends ConfigurationItem {
 	iStep := 0
 	iPage := 0
 	
+	iSelectedModules := {}
+	
 	WizardWindow[] {
 		Get {
 			return this.iWizardWindow
@@ -128,6 +130,12 @@ class SetupWizard extends ConfigurationItem {
 		}
 	}
 	
+	Selected[module] {
+		Get {
+			return (this.iSelectedModules.HasKey(module) ? this.iSelectedModules[module] : false)
+		}
+	}
+	
 	__New(configuration, definition) {
 		this.iDefinition := definition
 		
@@ -151,6 +159,13 @@ class SetupWizard extends ConfigurationItem {
 			}
 	}
 	
+	getWorkArea(ByRef x, ByRef y, ByRef width, ByRef height) {
+		x := 16
+		y := 60
+		width := 684
+		height := 470
+	}
+	
 	createGui(configuration) {
 		local stepWizard
 		
@@ -161,14 +176,14 @@ class SetupWizard extends ConfigurationItem {
 		Gui %window%:-Border ; -Caption
 		Gui %window%:Color, D0D0D0
 
-		Gui %window%:Font, Bold, Arial
+		Gui %window%:Font, s10 Bold, Arial
 
 		Gui %window%:Add, Text, w700 Center gmoveSetupWizard, % translate("Modular Simulator Controller System") 
 		
-		Gui %window%:Font, Norm, Arial
+		Gui %window%:Font, s9 Norm, Arial
 		Gui %window%:Font, Italic Underline, Arial
 
-		Gui %window%:Add, Text, YP+20 w700 cBlue Center gopenSetupDocumentation, % translate("Setup & Configuration")
+		Gui %window%:Add, Text, YP+20 w700 cBlue Center gopenSetupDocumentation, % translate("Setup && Configuration")
 		
 		Gui %window%:Add, Text, yp+20 w700 0x10
 
@@ -191,17 +206,17 @@ class SetupWizard extends ConfigurationItem {
 		Gui %window%:-Border ; -Caption
 		Gui %window%:Color, D0D0D0
 
-		Gui %window%:Font, Bold, Arial
+		Gui %window%:Font, s10 Bold, Arial
 
 		Gui %window%:Add, Text, w350 Center gmoveSetupHelp VstepTitle, % translate("Title")
 		
-		Gui %window%:Font, Norm, Arial
+		Gui %window%:Font, s9 Norm, Arial
 
 		Gui %window%:Add, Text, YP+20 w350 Center VstepSubtitle, % translate("Subtitle")
 		
 		Gui %window%:Add, Text, yp+20 w350 0x10
 		
-		Gui %window%:Add, ActiveX, x16 yp+10 w350 h545 vinfoViewer, shell explorer
+		Gui %window%:Add, ActiveX, x12 yp+10 w350 h545 vinfoViewer, shell explorer
 	
 		infoViewer.Navigate("about:blank")
 		
@@ -209,8 +224,10 @@ class SetupWizard extends ConfigurationItem {
 
 		infoViewer.Document.Write(html)
 		
+		this.getWorkArea(x, y, width, height)
+		
 		for step, stepWizard in this.StepWizards
-			stepWizard.createGui(this, 16, 60, 684, 470)
+			stepWizard.createGui(this, x, y, width, height)
 	}
 	
 	saveToConfiguration(configuration) {
@@ -416,6 +433,15 @@ class SetupWizard extends ConfigurationItem {
 			GuiControl Enable, nextPageButton
 			GuiControl Disable, finishButton
 		}
+		
+		Loop % this.StepWizards.Count()
+			this.Steps[A_Index].updateState()
+	}
+	
+	selectModule(module, selected) {
+		this.iSelectedModules[module] := selected
+		
+		this.updateState()
 	}
 	
 	setTitle(title) {
@@ -439,7 +465,7 @@ class SetupWizard extends ConfigurationItem {
 		
 		Gui %window%:Default
 		
-		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . html . "</body></html>"
+		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . html . "</body></html>"
 
 		infoViewer.Document.Open()
 		infoViewer.Document.Write(html)
@@ -502,6 +528,10 @@ class StepWizard extends ConfigurationItem {
 		base.__New(configuration)
 	}
 	
+	getWorkArea(ByRef x, ByRef y, ByRef width, ByRef height) {
+		this.SetupWizard.getWorkArea(x, y, width, height)
+	}
+	
 	createGui(wizard, x, y, width, height) {
 		Throw "Virtual method StepWizard.createGui must be implemented in a subclass..."
 	}
@@ -511,6 +541,15 @@ class StepWizard extends ConfigurationItem {
 			this.iWidgets[page] := []
 		
 		this.iWidgets[page].Push(widget)
+	}
+	
+	registerWidgets(page, widgets*) {
+		for ignore, widget in widgets
+			this.registerWidget(page, widget)
+	}
+	
+	deleteWidgets(page) {
+		this.iWidgets.Delete(page)
 	}
 	
 	setDefinition(definition) {
@@ -554,6 +593,9 @@ class StepWizard extends ConfigurationItem {
 		}
 	}
 	
+	updateState() {
+	}
+	
 	setTitle(title) {
 		this.SetupWizard.setTitle(title)
 	}
@@ -573,31 +615,290 @@ class StepWizard extends ConfigurationItem {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class StartStepWizard extends StepWizard {
-	iWorkingArea := false
-	iImageViewer := false
-	
 	createGui(wizard, x, y, width, height) {
 		static imageViewer
 		static imageViewerHandle
-		
-		this.iWorkingArea := [x, y, width, height]
 		
 		window := this.Window
 		
 		Gui %window%:Add, ActiveX, x%x% y%y% w%width% h%height% HWNDimageViewerHandle VimageViewer Hidden, shell explorer
 	
-		; image := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup." . this.Step, this.Step . ".Image"))
-		image := "D:\Controller\Resources\Rotating Brain.gif"
+		text := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Start", "Start.Text." . getLanguage()))
+		image := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Start", "Start.Image"))
 		
-		imageHeight := Round(width / 16 * 9)
-		margin := Round((height - imageHeight) / 2)
+		text := "<div style='text-align: center' style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px'>" . text . "</div>"
 		
-		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='" . margin . "' rightmargin='0' bottommargin='0'><img src='" . image . "' width='" . width . "' height='" . imageHeight . "' border='0' padding='0'></body></html>"
+		height := Round(width / 16 * 9)
+		
+		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><br>" . text . "<br><img src='" . image . "' width='" . width . "' height='" . height . "' border='0' padding='0'></body></html>"
 
 		imageViewer.Navigate("about:blank")
 		imageViewer.document.write(html)
 		
 		this.registerWidget(1, imageViewerHandle)
+	}
+}
+
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; ModulesStepWizard                                                       ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class ModulesStepWizard extends StepWizard {
+	iSelectedModules := []
+	
+	Pages[] {
+		Get {
+			return Ceil(this.Definition.Length() / 3)
+		}
+	}
+	
+	createGui(wizard, x := false, y := false, width := false, height := false) {
+		static infoText1
+		static infoText2
+		static infoText3
+		static infoText4
+		static infoText5
+		static infoText6
+		static infoText7
+		static infoText8
+		static infoText9
+		static infoText10
+		static infoText11
+		static infoText12
+		
+		if !x {
+			definition := this.Definition
+			
+			this.getWorkArea(x, y, width, height)
+			
+			startY := y
+			
+			if (definition.Length() > 12)
+				Throw "Too many modules detected in ModulesStepWizard.createGui..."
+			
+			Loop % definition.Length()
+			{
+				window := this.Window
+			
+				iconHandle := false
+				labelHandle := false
+				checkBoxHandle := false
+				infoTextHandle := false
+			
+				Gui %window%:Font, s12 Bold, Arial
+
+				module := definition[A_Index]
+				
+				this.SetupWizard.selectModule(module, true)
+				
+				info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules." . module . ".Info." . getLanguage()))
+				module := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules." . module . "." . getLanguage()))
+				
+				label := (translate("Module: ") . module)
+				info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px'>" . info . "</div>"
+				
+				checkX := x + width - 20
+				labelWidth := width - 30
+				labelX := x + 45
+				labelY := y + 5
+				
+				Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDiconHandle Hidden, %kResourcesDirectory%Setup\Images\Module.png
+				Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h30 HWNDlabelHandle Hidden, % label
+				Gui %window%:Add, CheckBox, Checked1 x%checkX% y%y% w23 h23 HWNDcheckBoxHandle Hidden gupdateSelectedModules
+				Gui %window%:Add, ActiveX, x%x% yp+33 w%width% h120 HWNDinfoTextHandle VinfoText%A_Index% Hidden, shell explorer
+	
+				html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+
+				infoText%A_Index%.Navigate("about:blank")
+				infoText%A_Index%.document.write(html)
+		
+				y += 170
+				
+				this.iSelectedModules.Push(checkBoxHandle)
+				
+				this.registerWidgets(Ceil(A_Index / 3), iconHandle, labelHandle, checkBoxHandle, infoTextHandle)
+				
+				if (((A_Index / 3) - Floor(A_Index / 3)) == 0)
+					y := startY
+			}
+		}
+	}
+	
+	setDefinition(definition) {
+		definition := string2Values("|", definition)
+		
+		base.setDefinition(definition)
+		
+		this.createGui(this.SetupWizard)
+	}
+	
+	updateSelectedModules() {
+		definition := this.Definition
+		
+		Loop % definition.Length()
+		{
+			variable := this.iSelectedModules[A_Index]
+			
+			GuiControlGet %variable%
+			
+			this.SetupWizard.selectModule(definition[A_Index], %variable%)
+		}
+	}
+}
+
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; InstallationStepWizard                                                  ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class InstallationStepWizard extends StepWizard {
+	iSoftware := []
+	iRules := {}
+	iPages := {}
+	
+	Pages[] {
+		Get {
+			return Ceil(this.iSoftware.Length() / 3)
+		}
+	}
+	
+	createGui(wizard, x := false, y := false, width := false, height := false) {
+		static infoText1
+		static infoText2
+		static infoText3
+		static infoText4
+		static infoText5
+		static infoText6
+		static infoText7
+		static infoText8
+		static infoText9
+		static infoText10
+		static infoText11
+		static infoText12
+		
+		static installButton1
+		static installButton2
+		static installButton3
+		static installButton4
+		static installButton5
+		static installButton6
+		static installButton7
+		static installButton8
+		static installButton9
+		static installButton10
+		static installButton11
+		static installButton12
+		
+		if !x {
+			definition := this.Definition
+		
+			this.getWorkArea(x, y, width, height)
+			
+			startY := y
+			
+			if (this.iSoftware.Count() > 12)
+				Throw "Too many modules detected in InstallationStepWizard.createGui..."
+			
+			window := this.Window
+		
+			for ignore, software in this.iSoftware
+			{
+				iconHandle := false
+				labelHandle := false
+				installButtonHandle := false
+				infoTextHandle := false
+		
+				installer := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Installation", "Installation." . software))
+				info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Installation", "Installation." . software . ".Info." . getLanguage()))
+				
+				label := (translate("Software: ") . software)
+				info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px'>" . info . "</div>"
+				
+				buttonX := x + width - 90
+				labelWidth := width - 30
+				labelX := x + 45
+				labelY := y + 5
+				
+				Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDiconHandle Hidden, %kResourcesDirectory%Setup\Images\Install.png
+				
+				Gui %window%:Font, s12 Bold, Arial
+				
+				Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h30 HWNDlabelHandle Hidden, % label
+				
+				Gui %window%:Font, s9 Norm, Arial
+				
+				Gui %window%:Add, Button, x%buttonX% y%y% w90 h23 HWNDinstallButtonHandle VinstallButton%A_Index% GinstallSoftware Hidden, % (InStr(installer, "http") = 1) ? translate("Download...") : translate("Install...")
+				
+				Gui %window%:Add, ActiveX, x%x% yp+33 w%width% h120 HWNDinfoTextHandle VinfoText%A_Index% Hidden, shell explorer
+	
+				html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+
+				infoText%A_Index%.Navigate("about:blank")
+				infoText%A_Index%.document.write(html)
+		
+				y += 170
+				
+				page := Ceil(A_Index / 3)
+				
+				this.registerWidgets(page, iconHandle, labelHandle, installButtonHandle, infoTextHandle)
+		
+				if !this.iPages.HasKey(page)
+					this.iPages[page] := {}
+				
+				this.iPages[page][software] := [iconHandle, labelHandle, installButtonHandle, infoTextHandle]
+				
+				if (((A_Index / 3) - Floor(A_Index / 3)) == 0)
+					y := startY
+			}
+		}
+	}
+	
+	setDefinition(definition) {
+		definition := string2Values("|", definition)
+		
+		base.setDefinition(definition)
+		
+		for ignore, rule in definition {
+			name := this.softwareName(rule)
+		
+			this.iSoftware.Push(name)
+			this.iRules[name] := rule
+		}
+		
+		this.createGui(this.SetupWizard)
+	}
+	
+	softwareName(rule) {
+		if (InStr(rule, "[") == 1)
+			return string2Values("=>", StrReplace(StrReplace(rule, "[", ""), "]", ""))[2]
+		else
+			return rule
+	}
+			
+	softwareActive(rule) {
+		if (InStr(rule, "[") == 1)
+			return this.SetupWizard.Selected[string2Values("=>", StrReplace(StrReplace(rule, "[", ""), "]", ""))[1]]
+		else
+			return true
+	}
+	
+	softwareInstall(rule, arguments*) {
+		Run % substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Installation", "Installation." . this.softwareName(rule)))
+	}
+	
+	showPage(page) {
+		base.showPage(page)
+	
+		for software, widgets in this.iPages[page]
+			if !this.softwareActive(this.iRules[software])
+				for ignore, widget in widgets
+					GuiControl Disable, %widget%
+	}
+	
+	updateState() {
+		for ignore, rule in this.Definition
+			this.iActiveSoftware[this.SoftwareName(rule)] := this.softwareActive(rule)
 	}
 }
 
@@ -620,6 +921,18 @@ previousPage() {
 
 nextPage() {
 	SetupWizard.Instance.nextPage()
+}
+
+updateSelectedModules() {
+	SetupWizard.Instance.StepWizards["Modules"].updateSelectedModules()
+}
+
+installSoftware() {
+	local stepWizard := SetupWizard.Instance.StepWizards["Installation"]
+	
+	definition := stepWizard.Definition
+	
+	stepWizard.softwareInstall(definition[StrReplace(A_GuiControl, "installButton", "")])
 }
 
 moveSetupWizard() {
@@ -656,9 +969,11 @@ initializeSimulatorSetup() {
 	protectionOn()
 	
 	try {
-		wizard := new SetupWizard(kSimulatorConfiguration, readConfiguration(kConfigDirectory . "Simulator Setup.ini"))
+		wizard := new SetupWizard(kSimulatorConfiguration, readConfiguration(kResourcesDirectory . "Setup\Simulator Setup.ini"))
 		
 		wizard.registerStepWizard(new StartStepWizard(wizard, "Start", kSimulatorConfiguration))
+		wizard.registerStepWizard(new ModulesStepWizard(wizard, "Modules", kSimulatorConfiguration))
+		wizard.registerStepWizard(new InstallationStepWizard(wizard, "Installation", kSimulatorConfiguration))
 	}
 	finally {
 		protectionOff()

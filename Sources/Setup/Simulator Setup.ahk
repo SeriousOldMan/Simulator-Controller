@@ -221,8 +221,8 @@ class SetupWizard extends ConfigurationItem {
 		
 		Gui %window%:Add, Text, x8 yp+34 w700 0x10
 		
-		Gui %window%:Add, Text, x16 y580 w55 h23 +0x200, % translate("Sprache")
-		Gui %window%:Add, DropDownList, x71 y580 w75 Choose%chosen% gchooseLanguage VlanguageDropDown, % values2String("|", map(choices, "translate")*)
+		Gui %window%:Add, Text, x16 y580 w85 h23 +0x200, % translate("Language")
+		Gui %window%:Add, DropDownList, x100 y580 w75 Choose%chosen% gchooseLanguage VlanguageDropDown, % values2String("|", map(choices, "translate")*)
 		
 		Gui %window%:Add, Button, x535 y580 w80 h23 Disabled GsaveAndExit VfinishButton, % translate("Finish")
 		Gui %window%:Add, Button, x620 y580 w80 h23 GcancelAndExit, % translate("Cancel")
@@ -1137,19 +1137,24 @@ locateSoftware() {
 	definition := definition[StrReplace(A_GuiControl, "locateButton", "")]
 	
 	name := stepWizard.softwareName(definition)
+	executable := findExecutable(this.SetupWizard.Definition, name)
 	
-	protectionOn()
-	
-	try {
-		title := substituteVariables(translate("Select %name% executable..."), {name: name})
+	if executable
+		stepWizard.softwareLocate(definition, executable)
+	else {
+		protectionOn()
 		
-		FileSelectFile file, 1, , %title%, Executable (*.exe)
-		
-		if (file != "")
-			stepWizard.softwareLocate(definition, file)
-	}
-	finally {
-		protectionOff()
+		try {
+			title := substituteVariables(translate("Select %name% executable..."), {name: name})
+			
+			FileSelectFile file, 1, , %title%, Executable (*.exe)
+			
+			if (file != "")
+				stepWizard.softwareLocate(definition, file)
+		}
+		finally {
+			protectionOff()
+		}
 	}
 }
 
@@ -1199,7 +1204,7 @@ findApplicationInstallPath(name) {
 
 findExecutable(definition, software) {
 	for ignore, section in ["Applications.Core", "Applications.Feedback", "Applications.Other", "Applications.Special"]
-		for ignore, descriptor in getConfigurationSectionValues(definition, section, Object()) {
+		for name, descriptor in getConfigurationSectionValues(definition, section, Object()) {
 			descriptor := string2Values("|", descriptor)
 		
 			if (software = descriptor[1]) {
@@ -1224,7 +1229,19 @@ findExecutable(definition, software) {
 						return (folder . descriptor[3])
 				}
 			}
+			
+			exePath := getConfigurationValue(kSimulatorConfiguration, name, "Exe Path", false)
+			
+			if (exePath && FileExist(exePath))
+				return exePath
 		}
+		
+	if ((software = "NirCmd") && kNirCmd && FileExist(kNirCmd))
+		return kNirCmd
+		
+	if ((software = "Sox") && kSoX && FileExist(kSox))
+		return kSoX
+	
 	
 	return false
 }		

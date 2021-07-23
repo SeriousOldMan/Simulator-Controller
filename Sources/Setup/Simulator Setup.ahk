@@ -1079,6 +1079,24 @@ class ApplicationsStepWizard extends StepWizard {
 	}
 	
 	createGui(wizard, x := false, y := false, width := false, height := false) {
+		wizard.getWorkArea(x, y, width, height)
+		
+		labelY := y
+		
+		window := this.Window
+		
+		for simulator, descriptor in getConfigurationSectionValues(wizard.Definition, "Applications.Simulators") {
+			descriptor := string2Values("|", descriptor)
+		
+			executable := findExecutable(wizard.Definition, descriptor[1])
+			labelHandle := false
+			
+			Gui %window%:Add, Text, x%x% y%labelY% w%width% h30 HWNDlabelHandle Hidden, % simulator . " => " . executable
+			
+			labelY += 30
+			
+			this.registerWidget(1, labelHandle)
+		}
 	}
 }
 
@@ -1203,30 +1221,32 @@ findApplicationInstallPath(name) {
 }
 
 findExecutable(definition, software) {
-	for ignore, section in ["Applications.Core", "Applications.Feedback", "Applications.Other", "Applications.Special"]
+	for ignore, section in ["Applications.Simulators", "Applications.Core", "Applications.Feedback", "Applications.Other", "Applications.Special"]
 		for name, descriptor in getConfigurationSectionValues(definition, section, Object()) {
 			descriptor := string2Values("|", descriptor)
 		
 			if (software = descriptor[1]) {
-				locator := descriptor[2]
-				
-				if (InStr(locator, "File:") == 1) {
-					locator := substituteVariables(StrReplace(locator, "File:", ""))
+				for ignore, locator in string2Values(";", descriptor[2]) {
+					locator := descriptor[2]
 					
-					if FileExist(locator)
-						return locator
-				}
-				else if (InStr(locator, "RegistryExist:") == 1) {
-					RegRead value, % substituteVariables(StrReplace(locator, "RegistryExist:", ""))
+					if (InStr(locator, "File:") == 1) {
+						locator := substituteVariables(StrReplace(locator, "File:", ""))
+						
+						if FileExist(locator)
+							return locator
+					}
+					else if (InStr(locator, "RegistryExist:") == 1) {
+						RegRead value, % substituteVariables(StrReplace(locator, "RegistryExist:", ""))
+					
+						if (value != "")
+							return true
+					}
+					else if (InStr(locator, "RegistryScan:") == 1) {
+						folder := findApplicationInstallPath(substituteVariables(StrReplace(locator, "RegistryScan:", "")))
 				
-					if (value != "")
-						return true
-				}
-				else if (InStr(locator, "RegistryScan:") == 1) {
-					folder := findApplicationInstallPath(substituteVariables(StrReplace(locator, "RegistryScan:", "")))
-			
-					if ((folder != "") && FileExist(folder . descriptor[3]))
-						return (folder . descriptor[3])
+						if ((folder != "") && FileExist(folder . descriptor[3]))
+							return (folder . descriptor[3])
+					}
 				}
 			
 				exePath := getConfigurationValue(kSimulatorConfiguration, name, "Exe Path", false)

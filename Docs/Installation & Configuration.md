@@ -73,7 +73,26 @@ The last group, which is only present in developer mode as mentioned above, lets
 
 ### Tab *Voice Control*
 
-On this tab, you can configure the voice control support of Simulator Controller. Voice output is used by Jona, the [Virtual Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer), to give you crucial information during a race. But Simulator Controller also supports voice input to give you complete hands free control over all possible commands. These commands can be configured in the [*Controller* tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller) tab below. Jona also supports voice recognition, thereby allowing you a full interactive dialog with your race engineer.
+On this tab, you can configure the voice control support of Simulator Controller. Voice output is used by Jona, the [Virtual Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer) and Cato, the [Virtual Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist), to give you crucial information during a session. Jona and Ctato also support voice recognition, thereby allowing you a full interactive dialog with your race assistants. And, last but not least, Simulator Controller also supports voice input to give you complete hands free control over all possible commands. These commands can be configured in the [*Controller* tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller) tab below. 
+
+Voice output generation is built into the Windows operating system, but you might have to install (additional) voices depending on the Windows isntallation and language packs you have.
+
+#### Installation of additional Voices
+
+Almost every Windows installation already has builtin support for voice generation (called TTS, aka text-to-speech). If you want to install more voices (and Jona and Cato will use all of them according to the configured language), you might want to install some additional packages. Depending on your Windows license you can do this on the windows settings dialog as described in the [Microsoft documentation](https://support.microsoft.com/en-us/office/how-to-download-text-to-speech-languages-for-windows-10-d5a6b612-b3ae-423f-afa5-4f6caf1ec5d3) ([German version](https://support.microsoft.com/de-de/office/herunterladen-von-text-zu-sprache-sprachen-f%C3%BCr-windows-10-d5a6b612-b3ae-423f-afa5-4f6caf1ec5d3)). The current language support of zhe race assistants comes with translations for English and German, as these are the languages supported by Simulator Controller out of the box. Therefore I recommend to install voices for these languages at least.
+
+#### Installation of Speech Recognition Libraries
+
+The installation of the voice recognition engine sometimes needs a little bit more effort. Simulator Controller relies on the speech recognition runtime from Microsoft, which is not necessarily part of a Windows standard distribution. You can check this in your settings dialog as well. If you do not have any voice recognition capabilities available, you can use the installer provided for your convenience in the *Utilities\3rd party* folder, as long you have a 64-bit Windows installation. Please install the runtime first and the two provided language packs for English and German afterwards. Alternatively you can download the necessary installation files from [this site at Microsoft](https://www.microsoft.com/en-us/download/details.aspx?id=16789).
+
+After installing the language packs, it might be necessary to unblock the recognizer DLLs of Jona, which are provided in the *Binaries* folder. Windows might have blocked these DLLs for security reasons, because you downloaded it from a non-trusted location. You will find a little Powershell script in the *Utilities* folder, which you can copy to the *Binaries* folder and execute it there with Administrator privileges. These are the commands, which need be executed:
+
+	takeown.exe /F . /R /D N
+	Get-ChildItem -Path '.' -Recurse | Unblock-File
+
+Note: Since the time for offline voice recognition is almost over, a future version of Jona will use Google, Amazon or Azure services for voice recognition. But this might be a pay per use kind of service.
+
+After you have sucessfully installaed all the necessary support packages, we can come back to the configuration of the voice capabilities.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%207.JPG)
 

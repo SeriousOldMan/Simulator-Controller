@@ -1,14 +1,14 @@
 [Development]
-Version=3.3.0-rc1
+Version=3.3.0-release
 Target=3.3.0-release
-Date=07/22/2021
+Date=07/23/2021
 Changes=Audio post processing for team radio voice, File location refactoring, Use Azure Service for speech synthesis, New "raceAssistantService" parameter for the "Race Engineer" and "Race Strategist" plugins
 [Release]
-Version=3.2.2-release
-Date=07/16/2021
-Changes=More information supplied by Jona, New plugin arguments for Race Strategist plugin, Accept & Reject plugin commands now works always for the currently focused voice assistant, New information actions for "Race Engineer" plugin, New information actions for "Race Strategist" plugin, Use the information actions on all "Pitstop" modes, New "Assistant" mode for all simulator plugins, Refactoring of assistant plugins and introduction of *RaceAssistantPlugin* base class, Renaming of all plugin arguments of the plugins "Race Engineer" and "Race Strategist", Automated tests for "RaceStrategist" class, Support for new repair options in RaceRoom Racing Experience Pitstop MFD
+Version=3.3.0-release
+Date=07/23/2021
+Changes=Audio post processing for team radio voice, File location refactoring, Use Azure Service for speech synthesis, New "raceAssistantService" parameter for the "Race Engineer" and "Race Strategist" plugins
 [Current]
-Type=Development
+Type=Release
 [Version]
-Release=3.2.2-release
-Development=3.3.0-rc1
+Release=3.3.0-release
+Development=3.3.0-release

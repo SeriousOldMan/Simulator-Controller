@@ -1121,6 +1121,8 @@ class InstallationStepWizard extends StepWizard {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class ApplicationsStepWizard extends StepWizard {
+	iModuleApplications := {}
+	
 	iSimulatorsListView := false
 	iApplicationsListView := false
 	
@@ -1207,9 +1209,21 @@ class ApplicationsStepWizard extends StepWizard {
 	}
 	
 	setDefinition(definition) {
+		definition := string2Values("|", definition)
+		
 		base.setDefinition(definition)
+	
+		for ignore, rule in definition
+			this.iModuleApplications[string2Values("=>", StrReplace(StrReplace(rule, "[", ""), "]", ""))[1]] := string2Values("=>", StrReplace(StrReplace(rule, "[", ""), "]", ""))[2]
 		
 		this.updateSelectedApplications()
+	}
+	
+	applicationActive(application) {
+		if this.iModuleApplications.HasKey(application)
+			return this.SetupWizard.SelectedModule[this.iModuleApplications[application]]
+		else
+			return true
 	}
 	
 	reset() {
@@ -1240,22 +1254,23 @@ class ApplicationsStepWizard extends StepWizard {
 		
 		wizard := this.SetupWizard
 		
-		for simulator, descriptor in getConfigurationSectionValues(wizard.Definition, "Installation.Simulators") {
-			descriptor := string2Values("|", descriptor)
-		
-			executable := findSoftware(wizard.Definition, descriptor[1])
+		for simulator, descriptor in getConfigurationSectionValues(wizard.Definition, "Installation.Simulators")
+			if this.applicationActive(simulator) {
+				descriptor := string2Values("|", descriptor)
 			
-			if executable {
-				iconFile := findInstallProperty(simulator, "DisplayIcon")
+				executable := findSoftware(wizard.Definition, descriptor[1])
 				
-				if iconFile
-					icons.Push(iconFile)
-				else
-					icons.Push(executable)
-				
-				rows.Push(Array((wizard.SelectedApplication[simulator] ? "Check Icon" : "Icon") . (rows.Length() + 1), simulator, executable ? executable : translate("Not installed")))
+				if executable {
+					iconFile := findInstallProperty(simulator, "DisplayIcon")
+					
+					if iconFile
+						icons.Push(iconFile)
+					else
+						icons.Push(executable)
+					
+					rows.Push(Array((wizard.SelectedApplication[simulator] ? "Check Icon" : "Icon") . (rows.Length() + 1), simulator, executable ? executable : translate("Not installed")))
+				}
 			}
-		}
 		
 		listViewIcons := IL_Create(icons.Length())
 			
@@ -1279,15 +1294,16 @@ class ApplicationsStepWizard extends StepWizard {
 		LV_Delete()
 		
 		for category, section in {Core: "Installation.Core", Feedback: "Installation.Feedback", Other: "Installation.Other"} {
-			for application, descriptor in getConfigurationSectionValues(wizard.Definition, section) {
-				descriptor := string2Values("|", descriptor)
-			
-				executable := findSoftware(wizard.Definition, descriptor[1])
-			
-				if (executable && (executable != true))
-					LV_Add(wizard.SelectedApplication[application] ? "Check" : "", category, application, executable ? executable : translate("Not installed"))
+			for application, descriptor in getConfigurationSectionValues(wizard.Definition, section)
+				if this.applicationActive(simulator) {
+					descriptor := string2Values("|", descriptor)
+				
+					executable := findSoftware(wizard.Definition, descriptor[1])
+				
+					if (executable && (executable != true))
+						LV_Add(wizard.SelectedApplication[application] ? "Check" : "", category, application, executable ? executable : translate("Not installed"))
+				}
 			}
-		}
 		
 		if first {
 			LV_ModifyCol(1, "AutoHdr")
@@ -1342,7 +1358,7 @@ class ApplicationsStepWizard extends StepWizard {
 		else
 			for category, section in {Simulators: "Installation.Simulators", Core: "Installation.Core", Feedback: "Installation.Feedback", Other: "Installation.Other"} {
 				for name, descriptor in getConfigurationSectionValues(wizard.Definition, section) {
-					if !wizard.SelectedApplications.HasKey(name) {
+					if !wizard.SelectedApplications.HasKey(name) && this.applicationActive(name) {
 						descriptor := string2Values("|", descriptor)
 					
 						executable := findSoftware(wizard.Definition, descriptor[1])

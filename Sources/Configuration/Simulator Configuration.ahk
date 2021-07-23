@@ -75,7 +75,6 @@ class ConfigurationItemList extends ConfigurationItem {
 		Get {
 			return this.iListHandle
 		}
-			
 	}
 	
 	ItemList[index := "__Undefined__"] {
@@ -1163,7 +1162,9 @@ class ThemesList extends ConfigurationItemList {
 		picturesListViewImages := IL_Create(pictures.Length())
 			
 		for ignore, picture in pictures
-			IL_Add(picturesListViewImages, LoadPicture(getFileName(picture, kUserSplashMediaDirectory, kSplashMediaDirectory), "W32 H32"), 0xFFFFFF, false)
+			IL_Add(picturesListViewImages, getFileName(picture, kUserSplashMediaDirectory, kSplashMediaDirectory))
+		
+			; IL_Add(picturesListViewImages, LoadPicture(getFileName(picture, kUserSplashMediaDirectory, kSplashMediaDirectory), "W32 H32"), 0xFFFFFF, false)
 		
 		LV_SetImageList(picturesListViewImages)
 		

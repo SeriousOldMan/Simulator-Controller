@@ -80,16 +80,17 @@ class SetupWizard extends ConfigurationItem {
 	iWizardWindow := "SW"
 	iHelpWindow := "SH"
 	
+	iStepWizards := {}
+	
 	iDefinition := false
 	
 	iSteps := {}
-	iStepWizards := {}
-	
 	iStep := 0
 	iPage := 0
 	
 	iSelectedModules := {}
 	iInstalledSoftware := {}
+	iSelectedApplications := {}
 	
 	WizardWindow[] {
 		Get {
@@ -143,13 +144,31 @@ class SetupWizard extends ConfigurationItem {
 		}
 	}
 	
-	Selected[module] {
+	SelectedModules[] {
+		Get {
+			return this.iSelectedModules
+		}
+	}
+	
+	SelectedModule[module] {
 		Get {
 			return (this.iSelectedModules.HasKey(module) ? this.iSelectedModules[module] : false)
 		}
 	}
 	
-	Installed[software] {
+	SelectedApplications[] {
+		Get {
+			return this.iSelectedApplications
+		}
+	}
+	
+	SelectedApplication[application] {
+		Get {
+			return (this.iSelectedApplications.HasKey(application) ? this.iSelectedApplications[application] : false)
+		}
+	}
+	
+	InstalledSoftware[software] {
 		Get {
 			return (this.iInstalledSoftware.HasKey(software) ? this.iInstalledSoftware[software] : false)
 		}
@@ -161,6 +180,30 @@ class SetupWizard extends ConfigurationItem {
 		base.__New(configuration)
 		
 		SetupWizard.Instance := this
+	}
+	
+	loadDefinition(definition := false) {
+		local stepWizard
+		
+		if !definition
+			definition := this.Definition
+		
+		this.iSteps := {}
+		this.iStep := 0
+		this.iPage := 0
+		
+		for descriptor, definition in getConfigurationSectionValues(definition, "Setup.Steps") {
+			descriptor := string2Values(".", descriptor)
+		
+			step := descriptor[3]
+			stepWizard := this.StepWizards[step]
+			
+			stepWizard.setDefinition(definition)
+			
+			this.Steps[step] := stepWizard
+			this.Steps[descriptor[2]] := stepWizard
+			this.Steps[stepWizard] := descriptor[2]
+		}
 	}
 	
 	registerStepWizard(stepWizard) {
@@ -259,10 +302,10 @@ class SetupWizard extends ConfigurationItem {
 
 		infoViewer.Document.Write(html)
 		
-		this.createStepGuis()
+		this.createSteps()
 	}
 	
-	createStepGuis(restart := false) {
+	createSteps() {
 		local stepWizard
 		
 		x := 0
@@ -273,10 +316,7 @@ class SetupWizard extends ConfigurationItem {
 		this.getWorkArea(x, y, width, height)
 		
 		for step, stepWizard in this.StepWizards
-			if restart
-				stepWizard.createGui(this)
-			else
-				stepWizard.createGui(this, x, y, width, height)
+			stepWizard.createGui(this, x, y, width, height)
 	}
 	
 	saveToConfiguration(configuration) {
@@ -288,17 +328,17 @@ class SetupWizard extends ConfigurationItem {
 			stepWizard.saveToConfiguration(configuration)
 	}
 
-	restart() {
+	reset() {
 		this.show(true)
 		
 		Loop % this.StepWizards.Count()
-			this.Steps[A_Index].restart()
+			this.Steps[A_Index].reset()
 	}
 	
-	show(restart := false) {
+	show(reset := false) {
 		static first := true
 		
-		if restart
+		if reset
 			first := true
 		else {
 			wizardWindow := this.WizardWindow
@@ -442,6 +482,14 @@ class SetupWizard extends ConfigurationItem {
 	showPage(step, page) {
 		change := (step != this.Step)
 		
+		window := this.WizardWindow
+	
+		Gui %window%:Default
+		
+		GuiControl Disable, previousPageButton
+		GuiControl Disable, nextPageButton
+		GuiControl Disable, finishButton
+		
 		if this.Step {
 			this.Step.hidePage(this.Page)
 			
@@ -499,10 +547,18 @@ class SetupWizard extends ConfigurationItem {
 			this.Steps[A_Index].updateState()
 	}
 	
-	selectModule(module, selected) {
+	selectModule(module, selected, update := true) {
 		this.iSelectedModules[module] := selected
 		
-		this.updateState()
+		if update
+			this.updateState()
+	}
+	
+	selectApplication(application, selected, update := true) {
+		this.iSelectedApplications[application] := selected
+		
+		if update
+			this.updateState()
 	}
 	
 	locateSoftware(software, executable) {
@@ -623,7 +679,7 @@ class StepWizard extends ConfigurationItem {
 		this.iDefinition := definition
 	}
 	
-	restart() {
+	reset() {
 		this.iWidgets := {}
 	}
 	
@@ -686,29 +742,27 @@ class StepWizard extends ConfigurationItem {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class StartStepWizard extends StepWizard {
-	createGui(wizard, x := false, y := false, width := false, height := false) {
+	createGui(wizard, x, y, width, height) {
 		static imageViewer
 		static imageViewerHandle
 		
-		if x {
-			window := this.Window
-			
-			Gui %window%:Add, ActiveX, x%x% y%y% w%width% h%height% HWNDimageViewerHandle VimageViewer Hidden, shell explorer
+		window := this.Window
 		
-			text := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Start", "Start.Text." . getLanguage()))
-			image := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Start", "Start.Image"))
-			
-			text := "<div style='text-align: center' style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px'>" . text . "</div>"
-			
-			height := Round(width / 16 * 9)
-			
-			html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><br>" . text . "<br><img src='" . image . "' width='" . width . "' height='" . height . "' border='0' padding='0'></body></html>"
+		Gui %window%:Add, ActiveX, x%x% y%y% w%width% h%height% HWNDimageViewerHandle VimageViewer Hidden, shell explorer
+	
+		text := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Start", "Start.Text." . getLanguage()))
+		image := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Start", "Start.Image"))
+		
+		text := "<div style='text-align: center' style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px'>" . text . "</div>"
+		
+		height := Round(width / 16 * 9)
+		
+		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><br>" . text . "<br><img src='" . image . "' width='" . width . "' height='" . height . "' border='0' padding='0'></body></html>"
 
-			imageViewer.Navigate("about:blank")
-			imageViewer.document.write(html)
-			
-			this.registerWidget(1, imageViewerHandle)
-		}
+		imageViewer.Navigate("about:blank")
+		imageViewer.Document.Write(html)
+		
+		this.registerWidget(1, imageViewerHandle)
 	}
 }
 
@@ -726,7 +780,7 @@ class ModulesStepWizard extends StepWizard {
 		}
 	}
 	
-	createGui(wizard, x := false, y := false, width := false, height := false) {
+	createGui(wizard, x, y, width, height) {
 		static infoText1
 		static infoText2
 		static infoText3
@@ -740,65 +794,61 @@ class ModulesStepWizard extends StepWizard {
 		static infoText11
 		static infoText12
 		
-		if !x {
-			definition := this.Definition
-			
-			this.getWorkArea(x, y, width, height)
-			
-			startY := y
-			
-			if (definition.Length() > 12)
-				Throw "Too many modules detected in ModulesStepWizard.createGui..."
-			
-			Loop % definition.Length()
-			{
-				window := this.Window
-			
-				iconHandle := false
-				labelHandle := false
-				checkBoxHandle := false
-				infoTextHandle := false
-			
-				Gui %window%:Font, s12 Bold, Arial
-
-				module := definition[A_Index]
-				selected := this.SetupWizard.Selected(module)
-				
-				info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules." . module . ".Info." . getLanguage()))
-				module := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules." . module . "." . getLanguage()))
-				
-				label := (translate("Module: ") . module)
-				info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px'>" . info . "</div>"
-				
-				checkX := x + width - 20
-				labelWidth := width - 30
-				labelX := x + 45
-				labelY := y + 5
-				
-				Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDiconHandle Hidden, %kResourcesDirectory%Setup\Images\Module.png
-				Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h30 HWNDlabelHandle Hidden, % label
-				Gui %window%:Add, CheckBox, Checked%selected% x%checkX% y%y% w23 h23 HWNDcheckBoxHandle Hidden gupdateSelectedModules
-				Gui %window%:Add, ActiveX, x%x% yp+33 w%width% h120 HWNDinfoTextHandle VinfoText%A_Index% Hidden, shell explorer
-	
-				html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
-
-				infoText%A_Index%.Navigate("about:blank")
-				infoText%A_Index%.document.write(html)
+		definition := this.Definition
 		
-				y += 170
-				
-				this.iModuleSelectors.Push(checkBoxHandle)
-				
-				this.registerWidgets(Ceil(A_Index / 3), iconHandle, labelHandle, checkBoxHandle, infoTextHandle)
-				
-				if (((A_Index / 3) - Floor(A_Index / 3)) == 0)
-					y := startY
-			}
+		startY := y
+		
+		if (definition.Length() > 12)
+			Throw "Too many modules detected in ModulesStepWizard.createGui..."
+		
+		Loop % definition.Length()
+		{
+			window := this.Window
+		
+			iconHandle := false
+			labelHandle := false
+			checkBoxHandle := false
+			infoTextHandle := false
+		
+			Gui %window%:Font, s12 Bold, Arial
+
+			module := definition[A_Index]
+			selected := this.SetupWizard.Selected(module)
+			
+			info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules." . module . ".Info." . getLanguage()))
+			module := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules." . module . "." . getLanguage()))
+			
+			label := (translate("Module: ") . module)
+			info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px'>" . info . "</div>"
+			
+			checkX := x + width - 20
+			labelWidth := width - 30
+			labelX := x + 45
+			labelY := y + 5
+			
+			Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDiconHandle Hidden, %kResourcesDirectory%Setup\Images\Module.png
+			Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h30 HWNDlabelHandle Hidden, % label
+			Gui %window%:Add, CheckBox, Checked%selected% x%checkX% y%y% w23 h23 HWNDcheckBoxHandle Hidden gupdateSelectedModules
+			Gui %window%:Add, ActiveX, x%x% yp+33 w%width% h120 HWNDinfoTextHandle VinfoText%A_Index% Hidden, shell explorer
+
+			html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+
+			infoText%A_Index%.Navigate("about:blank")
+			infoText%A_Index%.Document.Write(html)
+	
+			y += 170
+			
+			this.iModuleSelectors.Push(checkBoxHandle)
+			
+			this.registerWidgets(Ceil(A_Index / 3), iconHandle, labelHandle, checkBoxHandle, infoTextHandle)
+			
+			if (((A_Index / 3) - Floor(A_Index / 3)) == 0)
+				y := startY
 		}
 	}
 	
-	restart() {
-		base.restart()
+	reset() {
+		base.reset()
 		
 		this.iModuleSelectors := []
 	}
@@ -810,8 +860,6 @@ class ModulesStepWizard extends StepWizard {
 		
 		for ignore, module in definition
 			this.SetupWizard.selectModule(module, true)
-		
-		this.createGui(this.SetupWizard)
 	}
 	
 	updateSelectedModules() {
@@ -846,7 +894,7 @@ class InstallationStepWizard extends StepWizard {
 		}
 	}
 	
-	createGui(wizard, x := false, y := false, width := false, height := false) {
+	createGui(wizard, x, y, width, height) {
 		static infoText1
 		static infoText2
 		static infoText3
@@ -898,91 +946,87 @@ class InstallationStepWizard extends StepWizard {
 		static locateButton15
 		static locateButton16
 		
-		if !x {
-			definition := this.Definition
+		definition := this.Definition
 		
-			this.getWorkArea(x, y, width, height)
-			
-			startY := y
-			
-			if (this.iSoftware.Count() > 16)
-				Throw "Too many modules detected in InstallationStepWizard.createGui..."
-			
-			window := this.Window
+		startY := y
 		
-			for ignore, software in this.iSoftware
-			{
-				iconHandle := false
-				labelHandle := false
-				installButtonHandle := false
-				locateButtonHandle := false
-				infoTextHandle := false
+		if (this.iSoftware.Count() > 16)
+			Throw "Too many modules detected in InstallationStepWizard.createGui..."
 		
-				installer := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Installation", "Installation." . software))
-				locatable := getConfigurationValue(this.SetupWizard.Definition, "Setup.Installation", "Installation." . software . ".Locatable", true)
-				info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Installation", "Installation." . software . ".Info." . getLanguage()))
-				
-				label := (translate("Software: ") . software)
-				info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px'>" . info . "</div>"
-				
-				installed := this.SetupWizard.Installed[software]
-				
-				buttonX := x + width - 90
-				
-				if locatable
-					buttonX -= 95
-				
-				labelWidth := width - 60 - 90 - (locatable * 95)
-				labelX := x + 45
-				labelY := y + 5
-				
-				Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDiconHandle Hidden, %kResourcesDirectory%Setup\Images\Install.png
-				
-				Gui %window%:Font, s12 Bold, Arial
-				
-				Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h30 HWNDlabelHandle Hidden, % label
-				
-				Gui %window%:Font, s9 Norm, Arial
-				
-				Gui %window%:Add, Button, x%buttonX% y%y% w90 h23 HWNDinstallButtonHandle VinstallButton%A_Index% GinstallSoftware Hidden, % (InStr(installer, "http") = 1) ? translate("Download...") : translate("Install...")
-				
-				if locatable {
-					buttonX += 95
-					
-					Gui %window%:Add, Button, x%buttonX% y%y% w90 h23 HWNDlocateButtonHandle VlocateButton%A_Index% GlocateSoftware Hidden, % installed ? translate("Installed") : translate("Locate...")
-				}
-				
-				Gui %window%:Add, ActiveX, x%x% yp+33 w%width% h120 HWNDinfoTextHandle VinfoText%A_Index% Hidden, shell explorer
+		window := this.Window
 	
-				html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
-
-				infoText%A_Index%.Navigate("about:blank")
-				infoText%A_Index%.document.write(html)
-		
-				y += 170
+		for ignore, software in this.iSoftware
+		{
+			iconHandle := false
+			labelHandle := false
+			installButtonHandle := false
+			locateButtonHandle := false
+			infoTextHandle := false
+	
+			installer := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Installation", "Installation." . software))
+			locatable := getConfigurationValue(this.SetupWizard.Definition, "Setup.Installation", "Installation." . software . ".Locatable", true)
+			info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Installation", "Installation." . software . ".Info." . getLanguage()))
+			
+			label := (translate("Software: ") . software)
+			info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px'>" . info . "</div>"
+			
+			installed := this.SetupWizard.InstalledSoftware[software]
+			
+			buttonX := x + width - 90
+			
+			if locatable
+				buttonX -= 95
+			
+			labelWidth := width - 60 - 90 - (locatable * 95)
+			labelX := x + 45
+			labelY := y + 5
+			
+			Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDiconHandle Hidden, %kResourcesDirectory%Setup\Images\Install.png
+			
+			Gui %window%:Font, s12 Bold, Arial
+			
+			Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h30 HWNDlabelHandle Hidden, % label
+			
+			Gui %window%:Font, s9 Norm, Arial
+			
+			Gui %window%:Add, Button, x%buttonX% y%y% w90 h23 HWNDinstallButtonHandle VinstallButton%A_Index% GinstallSoftware Hidden, % (InStr(installer, "http") = 1) ? translate("Download...") : translate("Install...")
+			
+			if locatable {
+				buttonX += 95
 				
-				page := Ceil(A_Index / 3)
-				
-				this.registerWidgets(page, iconHandle, labelHandle, installButtonHandle, infoTextHandle)
-				
-				if locatable
-					this.registerWidget(page, locateButtonHandle)
-				
-				this.iSoftwareLocators[software] := (locatable ? [installButtonHandle, locateButtonHandle] : [installButtonHandle])
-		
-				if !this.iPages.HasKey(page)
-					this.iPages[page] := {}
-				
-				this.iPages[page][software] := [iconHandle, labelHandle, installButtonHandle, locateButtonHandle, infoTextHandle]
-				
-				if (((A_Index / 3) - Floor(A_Index / 3)) == 0)
-					y := startY
+				Gui %window%:Add, Button, x%buttonX% y%y% w90 h23 HWNDlocateButtonHandle VlocateButton%A_Index% GlocateSoftware Hidden, % installed ? translate("Installed") : translate("Locate...")
 			}
+			
+			Gui %window%:Add, ActiveX, x%x% yp+33 w%width% h120 HWNDinfoTextHandle VinfoText%A_Index% Hidden, shell explorer
+
+			html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+
+			infoText%A_Index%.Navigate("about:blank")
+			infoText%A_Index%.Document.Write(html)
+	
+			y += 170
+			
+			page := Ceil(A_Index / 3)
+			
+			this.registerWidgets(page, iconHandle, labelHandle, installButtonHandle, infoTextHandle)
+			
+			if locatable
+				this.registerWidget(page, locateButtonHandle)
+			
+			this.iSoftwareLocators[software] := (locatable ? [installButtonHandle, locateButtonHandle] : [installButtonHandle])
+	
+			if !this.iPages.HasKey(page)
+				this.iPages[page] := {}
+			
+			this.iPages[page][software] := [iconHandle, labelHandle, installButtonHandle, locateButtonHandle, infoTextHandle]
+			
+			if (((A_Index / 3) - Floor(A_Index / 3)) == 0)
+				y := startY
 		}
 	}
 	
-	restart() {
-		base.restart()
+	reset() {
+		base.reset()
 		
 		this.iPages := {}
 		this.iSoftwareLocators := {}
@@ -1004,8 +1048,6 @@ class InstallationStepWizard extends StepWizard {
 			if (executable != "")
 				this.SetupWizard.locateSoftware(name, executable)
 		}
-		
-		this.createGui(this.SetupWizard)
 	}
 	
 	softwareName(rule) {
@@ -1017,7 +1059,7 @@ class InstallationStepWizard extends StepWizard {
 			
 	softwareActive(rule) {
 		if (InStr(rule, "[") == 1)
-			return this.SetupWizard.Selected[string2Values("=>", StrReplace(StrReplace(rule, "[", ""), "]", ""))[1]]
+			return this.SetupWizard.SelectedModule[string2Values("=>", StrReplace(StrReplace(rule, "[", ""), "]", ""))[1]]
 		else
 			return true
 	}
@@ -1048,7 +1090,7 @@ class InstallationStepWizard extends StepWizard {
 			if !this.softwareActive(this.iRules[software])
 				for ignore, widget in widgets
 					GuiControl Disable, %widget%
-			else if (this.SetupWizard.Installed[software] && this.iSoftwareLocators.HasKey(software)) {
+			else if (this.SetupWizard.InstalledSoftware[software] && this.iSoftwareLocators.HasKey(software)) {
 				buttons := this.iSoftwareLocators[software]
 			
 				GuiControl Disable, % buttons[1]
@@ -1079,52 +1121,190 @@ class InstallationStepWizard extends StepWizard {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class ApplicationsStepWizard extends StepWizard {
+	iSimulatorsListView := false
+	iApplicationsListView := false
+	
 	Pages[] {
 		Get {
 			return 1
 		}
 	}
 	
-	createGui(wizard, x := false, y := false, width := false, height := false) {
-		if x {
-			labelY := y
+	createGui(wizard, x, y, width, height) {
+		local application
+		
+		static simulatorsInfoText
+		
+		labelY := y
+		
+		window := this.Window
+		
+		Gui %window%:Default
+		
+		simulatorsIconHandle := false
+		simulatorsLabelHandle := false
+		simulatorsListViewHandle := false
+		simulatorsInfoTextHandle := false
+		
+		labelWidth := width - 30
+		labelX := x + 45
+		labelY := y + 5
+		
+		Gui %window%:Font, s12 Bold, Arial
+		
+		Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDsimulatorsIconHandle Hidden, %kResourcesDirectory%Setup\Images\Gaming Wheel.ico
+		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h30 HWNDsimulatorsLabelHandle Hidden, % translate("Detected Simulations")
+		
+		Gui %window%:Font, s9 Norm, Arial
+		
+		Gui Add, ListView, x%x% yp+33 w%width% h100 -Multi -LV0x10 Checked NoSort NoSortHdr HWNDsimulatorsListViewHandle Hidden, % values2String("|", map(["Simulation", "Executable"], "translate")*)
+		
+		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Applications", "Applications.Simulators.Info." . getLanguage()))
+		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px'>" . info . "</div>"
+		
+		Gui %window%:Add, ActiveX, x%x% yp+105 w%width% h90 HWNDsimulatorsInfoTextHandle VsimulatorsInfoText Hidden, shell explorer
+
+		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+
+		simulatorsInfoText.Navigate("about:blank")
+		simulatorsInfoText.Document.Write(html)
+		
+		this.iSimulatorsListView := simulatorsListViewHandle
+		
+		this.registerWidgets(1, simulatorsIconHandle, simulatorsLabelHandle, simulatorsListViewHandle, simulatorsInfoTextHandle)
+		
+		applicationsIconHandle := false
+		applicationsLabelHandle := false
+		applicationsListViewHandle := false
+		applicationsInfoTextHandle := false
+		
+		y += 240
+		
+		labelY := y + 5
+		
+		Gui %window%:Font, s12 Bold, Arial
+		
+		Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDapplicationsIconHandle Hidden, %kResourcesDirectory%Setup\Images\Tool Chest.ico
+		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h30 HWNDapplicationsLabelHandle Hidden, % translate("Detected Applications && Tools")
+		
+		Gui %window%:Font, s9 Norm, Arial
+		
+		Gui Add, ListView, x%x% yp+33 w%width% h100 -Multi -LV0x10 Checked NoSort NoSortHdr HWNDapplicationsListViewHandle Hidden, % values2String("|", map(["Category", "Application", "Executable"], "translate")*)
+		
+		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Applications", "Applications.Applications.Info." . getLanguage()))
+		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px'>" . info . "</div>"
+		
+		Gui %window%:Add, ActiveX, x%x% yp+105 w%width% h90 HWNDapplicationsInfoTextHandle VapplicationsInfoText Hidden, shell explorer
+
+		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+
+		applicationsInfoText.Navigate("about:blank")
+		applicationsInfoText.Document.Write(html)
+		
+		this.iApplicationsListView := applicationsListViewHandle
+		
+		this.registerWidgets(1, applicationsIconHandle, applicationsLabelHandle, applicationsListViewHandle, applicationsInfoTextHandle)
+	}
+	
+	setDefinition(definition) {
+		base.setDefinition(definition)
+		
+		this.updateSelectedApplications()
+	}
+	
+	reset() {
+		base.reset()
+		
+		this.iSimulatorsListView := false
+		this.iApplicationsListView := false
+	}
+	
+	showPage(page) {
+		local application
+		
+		base.showPage(page)
+		
+		this.updateSelectedApplications(false)
+		
+		static first := true
+	
+		if !this.iSimulatorsListView
+			first := true
+		
+		icons := []
 			
-			window := this.Window
+		Gui ListView, % this.iSimulatorsListView
+		
+		LV_Delete()
+		
+		wizard := this.SetupWizard
+		
+		for simulator, descriptor in getConfigurationSectionValues(wizard.Definition, "Installation.Simulators") {
+			descriptor := string2Values("|", descriptor)
+		
+			executable := findSoftware(wizard.Definition, descriptor[1])
 			
-			for simulator, descriptor in getConfigurationSectionValues(wizard.Definition, "Installation.Simulators") {
+			if executable {
+				iconFile := findInstallProperty(simulator, "DisplayIcon")
+			
+				icons.Push(iconFile)
+				
+				LV_Add(wizard.SelectedApplication[simulator] ? "Check" : "", simulator, executable ? executable : translate("Not installed"))
+			}
+		}
+		
+		listViewIcons := IL_Create(icons.Length())
+			
+		for ignore, icon in icons
+			IL_Add(listViewIcons, icon)
+		
+		LV_SetImageList(listViewIcons)
+		
+		if first {
+			LV_ModifyCol(1, "AutoHdr")
+			LV_ModifyCol(2, "AutoHdr")
+		}
+		
+		Gui ListView, % this.iApplicationsListView
+		
+		icons := []
+		
+		LV_Delete()
+		
+		for category, section in {Core: "Installation.Core", Feedback: "Installation.Feedback", Other: "Installation.Other", Special: "Installation.Special"} {
+			for application, descriptor in getConfigurationSectionValues(wizard.Definition, section) {
 				descriptor := string2Values("|", descriptor)
 			
 				executable := findSoftware(wizard.Definition, descriptor[1])
-				labelHandle := false
-				iconHandle := false
-				
-				labelX := x + 50
-				labelWidth := width - 50
-				
-				iconFile := findInstallProperty(simulator, "DisplayIcon")
-				
-				if iconFile
-					Gui %window%:Add, Picture, x%x% y%labelY% w20 h20 HWNDiconHandle Hidden, % iconFile
-				Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h30 HWNDlabelHandle Hidden, % simulator . " => " . executable
-				
-				labelY += 25
-				
-				this.registerWidgets(1, labelHandle, iconHandle)
-			}
 			
-			for ignore, section in ["Installation.Core", "Installation.Feedback", "Installation.Other", "Installation.Special"]
-				for app, descriptor in getConfigurationSectionValues(wizard.Definition, section) {
+				if (executable && (executable != true))
+					LV_Add(wizard.SelectedApplication[application] ? "Check" : "", category, application, executable ? executable : translate("Not installed"))
+			}
+		}
+		
+		if first {
+			LV_ModifyCol(1, "AutoHdr")
+			LV_ModifyCol(2, "AutoHdr")
+			LV_ModifyCol(3, "AutoHdr")
+		}
+		
+		first := false
+	}
+
+	updateSelectedApplications(update := true) {
+		wizard := this.SetupWizard
+		
+		for category, section in {Simulators: "Installation.Simulators", Core: "Installation.Core", Feedback: "Installation.Feedback", Other: "Installation.Other", Special: "Installation.Special"} {
+			for name, descriptor in getConfigurationSectionValues(wizard.Definition, section) {
+				if !wizard.SelectedApplications.HasKey(name) {
 					descriptor := string2Values("|", descriptor)
 				
 					executable := findSoftware(wizard.Definition, descriptor[1])
-					labelHandle := false
 					
-					Gui %window%:Add, Text, x%x% y%labelY% w%width% h30 HWNDlabelHandle Hidden, % app . " => " . executable
-					
-					labelY += 25
-					
-					this.registerWidget(1, labelHandle)
+					if executable
+						wizard.selectApplication(name, true, update)
 				}
+			}
 		}
 	}
 }
@@ -1367,15 +1547,12 @@ initializeSimulatorSetup() {
 }
 
 startupSimulatorSetup() {
-	static restart := false
-	
-restart:
 	wizard := SetupWizard.Instance
 	
-	wizard.createGui(wizard.Configuration)
+	wizard.loadDefinition()
 	
-	if restart
-		wizard.createStepGuis(true)
+restart:
+	wizard.createGui(wizard.Configuration)
 	
 	wizard.startSetup()
 	
@@ -1409,9 +1586,7 @@ restart:
 		vResult := false
 		
 		wizard.close()
-		wizard.restart()
-		
-		restart := true
+		wizard.reset()
 		
 		Goto restart
 	}

@@ -1295,7 +1295,7 @@ class ApplicationsStepWizard extends StepWizard {
 		
 		for category, section in {Core: "Installation.Core", Feedback: "Installation.Feedback", Other: "Installation.Other"} {
 			for application, descriptor in getConfigurationSectionValues(wizard.Definition, section)
-				if this.applicationActive(simulator) {
+				if this.applicationActive(application) {
 					descriptor := string2Values("|", descriptor)
 				
 					executable := findSoftware(wizard.Definition, descriptor[1])

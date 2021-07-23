@@ -32,6 +32,13 @@ ListLines Off					; Disable execution history
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                         Local Include Section                           ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include ..\Libraries\JSON.ahk
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -992,7 +999,7 @@ class InstallationStepWizard extends StepWizard {
 			this.iSoftware.Push(name)
 			this.iRules[name] := rule
 		
-			executable := findExecutable(this.SetupWizard.Definition, name)
+			executable := findSoftware(this.SetupWizard.Definition, name)
 			
 			if (executable != "")
 				this.SetupWizard.locateSoftware(name, executable)
@@ -1085,18 +1092,32 @@ class ApplicationsStepWizard extends StepWizard {
 		
 		window := this.Window
 		
-		for simulator, descriptor in getConfigurationSectionValues(wizard.Definition, "Applications.Simulators") {
+		for simulator, descriptor in getConfigurationSectionValues(wizard.Definition, "Installation.Simulators") {
 			descriptor := string2Values("|", descriptor)
 		
-			executable := findExecutable(wizard.Definition, descriptor[1])
+			executable := findSoftware(wizard.Definition, descriptor[1])
 			labelHandle := false
 			
 			Gui %window%:Add, Text, x%x% y%labelY% w%width% h30 HWNDlabelHandle Hidden, % simulator . " => " . executable
 			
-			labelY += 30
+			labelY += 25
 			
 			this.registerWidget(1, labelHandle)
 		}
+		
+		for ignore, section in ["Installation.Core", "Installation.Feedback", "Installation.Other", "Installation.Special"]
+			for app, descriptor in getConfigurationSectionValues(wizard.Definition, section) {
+				descriptor := string2Values("|", descriptor)
+			
+				executable := findSoftware(wizard.Definition, descriptor[1])
+				labelHandle := false
+				
+				Gui %window%:Add, Text, x%x% y%labelY% w%width% h30 HWNDlabelHandle Hidden, % app . " => " . executable
+				
+				labelY += 25
+				
+				this.registerWidget(1, labelHandle)
+			}
 	}
 }
 
@@ -1155,7 +1176,7 @@ locateSoftware() {
 	definition := definition[StrReplace(A_GuiControl, "locateButton", "")]
 	
 	name := stepWizard.softwareName(definition)
-	executable := findExecutable(this.SetupWizard.Definition, name)
+	executable := findSoftware(this.SetupWizard.Definition, name)
 	
 	if executable
 		stepWizard.softwareLocate(definition, executable)
@@ -1188,6 +1209,28 @@ openSetupDocumentation() {
 	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#setup
 }
 
+convertVDF2JSON(vdf) {
+	; encapsulate in braces
+    vdf := "{`n" . vdf . "`n}"
+
+    ; replace open braces
+	vdf := RegExReplace(vdf, """(.*)""\s*{", """${1}"": {")
+	
+	; replace values
+	vdf := RegExReplace(vdf, """([^""]*)""\s*""([^""]*)""", """${1}"": ""${2}"",")
+
+	; remove trailing commas
+	vdf := RegExReplace(vdf, ",(\s*[}\]])", "${1}")
+
+    ; add commas
+    vdf := RegExReplace(vdf, "([}\]])(\s*)(""[^""]*"":\s*)?([{\[])/", "${1},${2}${3}${4}")
+
+    ; object as value
+    vdf := RegExReplace(vdf, "}(\s*""[^""]*"":)", "},${1}")
+
+	return vdf
+}
+
 findInRegistry(collection, filterName, filterValue, valueName) {
 	Loop Reg, %collection%, R
 		if (A_LoopRegName = filterName) {
@@ -1203,7 +1246,7 @@ findInRegistry(collection, filterName, filterValue, valueName) {
 	return ""
 }
 
-findApplicationInstallPath(name) {
+findInstallPath(name) {
 	value := findInRegistry("HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall", "DisplayName", name, "InstallLocation")
 	
 	if (value != "")
@@ -1220,8 +1263,8 @@ findApplicationInstallPath(name) {
 		return value
 }
 
-findExecutable(definition, software) {
-	for ignore, section in ["Applications.Simulators", "Applications.Core", "Applications.Feedback", "Applications.Other", "Applications.Special"]
+findSoftware(definition, software) {
+	for ignore, section in ["Installation.Simulators", "Installation.Core", "Installation.Feedback", "Installation.Other", "Installation.Special"]
 		for name, descriptor in getConfigurationSectionValues(definition, section, Object()) {
 			descriptor := string2Values("|", descriptor)
 		
@@ -1239,14 +1282,12 @@ findExecutable(definition, software) {
 						if (value != "")
 							return true
 					}
-					/*
 					else if (InStr(locator, "RegistryScan:") == 1) {
-						folder := findApplicationInstallPath(substituteVariables(StrReplace(locator, "RegistryScan:", "")))
+						folder := findInstallPath(substituteVariables(StrReplace(locator, "RegistryScan:", "")))
 				
 						if ((folder != "") && FileExist(folder . descriptor[3]))
 							return (folder . descriptor[3])
 					}
-					*/
 					else if (InStr(locator, "Steam:") == 1) {
 						locator := substituteVariables(StrReplace(locator, "Steam:", ""))
 						
@@ -1255,7 +1296,7 @@ findExecutable(definition, software) {
 						if (installPath != "") {
 							FileRead script, %installPath%\steamapps\libraryfolders.vdf
 							
-							folders := JSON.parse(script)
+							folders := JSON.parse(convertVDF2JSON(script))
 							folders := folders["LibraryFolders"]
 							fileName := folders[1] . "\steamapps\common\" . locator
 							

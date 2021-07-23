@@ -1278,7 +1278,7 @@ class ApplicationsStepWizard extends StepWizard {
 		
 		LV_Delete()
 		
-		for category, section in {Core: "Installation.Core", Feedback: "Installation.Feedback", Other: "Installation.Other", Special: "Installation.Special"} {
+		for category, section in {Core: "Installation.Core", Feedback: "Installation.Feedback", Other: "Installation.Other"} {
 			for application, descriptor in getConfigurationSectionValues(wizard.Definition, section) {
 				descriptor := string2Values("|", descriptor)
 			
@@ -1340,7 +1340,7 @@ class ApplicationsStepWizard extends StepWizard {
 			wizard.updateState()
 		}
 		else
-			for category, section in {Simulators: "Installation.Simulators", Core: "Installation.Core", Feedback: "Installation.Feedback", Other: "Installation.Other", Special: "Installation.Special"} {
+			for category, section in {Simulators: "Installation.Simulators", Core: "Installation.Core", Feedback: "Installation.Feedback", Other: "Installation.Other"} {
 				for name, descriptor in getConfigurationSectionValues(wizard.Definition, section) {
 					if !wizard.SelectedApplications.HasKey(name) {
 						descriptor := string2Values("|", descriptor)

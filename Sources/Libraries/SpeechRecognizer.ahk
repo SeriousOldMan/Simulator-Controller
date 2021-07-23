@@ -34,9 +34,12 @@ class SpeechRecognizer {
 	iChoices := {}
 	_grammarCallbacks := {}
 	
-	__New(recognizer := false, language := false) {
+	__New(recognizer := false, language := false, silent := false) {
 		dllName := "Speech.Recognizer.dll"
 		dllFile := kBinariesDirectory . dllName
+		
+		this.Instance := false
+		this.RecognizerList := []
 		
 		try {
 			if (!FileExist(dllFile)) {
@@ -59,8 +62,9 @@ class SpeechRecognizer {
 			if (this.RecognizerList.Length() == 0) {
 				logMessage(kLogCritical, translate("No languages found while initializing speech recognition system - please install the speech recognition software"))
 				
-				showMessage(translate("No languages found while initializing speech recognition system - please install the speech recognition software") . translate("...")
-						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+				if !silent
+					showMessage(translate("No languages found while initializing speech recognition system - please install the speech recognition software") . translate("...")
+							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
 			
 			if ((recognizer == true) && language) {
@@ -87,8 +91,9 @@ class SpeechRecognizer {
 		catch exception {
 			logMessage(kLogCritical, translate("Error while initializing speech recognition module - please install the speech recognition software"))
 			
-			showMessage(translate("Error while initializing speech recognition module - please install the speech recognition software") . translate("...")
-					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			if !silent
+				showMessage(translate("Error while initializing speech recognition module - please install the speech recognition software") . translate("...")
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 		}
 	}
 
@@ -114,11 +119,11 @@ class SpeechRecognizer {
 	}
 	
 	startRecognizer() {
-		return this.Instance.StartRecognizer()
+		return (this.Instance ? this.Instance.StartRecognizer() : false)
 	}
 	
 	stopRecognizer() {
-		return this.Instance.StopRecognizer()
+		return (this.Instance ? this.Instance.StopRecognizer() : false)
 	}
 	
 	getRecognizerList() {
@@ -138,7 +143,7 @@ class SpeechRecognizer {
 		if this.iChoices.HasKey(name)
 			return this.iChoices[name]
 		else
-			return this.Instance.GetChoices(name)
+			return (this.Instance ? this.Instance.GetChoices(name) : [])
 	}
 	
 	setChoices(name, choiceList) {

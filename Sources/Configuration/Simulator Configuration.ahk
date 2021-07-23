@@ -1164,8 +1164,6 @@ class ThemesList extends ConfigurationItemList {
 		for ignore, picture in pictures
 			IL_Add(picturesListViewImages, getFileName(picture, kUserSplashMediaDirectory, kSplashMediaDirectory))
 		
-			; IL_Add(picturesListViewImages, LoadPicture(getFileName(picture, kUserSplashMediaDirectory, kSplashMediaDirectory), "W32 H32"), 0xFFFFFF, false)
-		
 		LV_SetImageList(picturesListViewImages)
 		
 		Loop % pictures.Length()

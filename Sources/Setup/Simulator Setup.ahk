@@ -1232,6 +1232,7 @@ class ApplicationsStepWizard extends StepWizard {
 			first := true
 		
 		icons := []
+		rows := []
 			
 		Gui ListView, % this.iSimulatorsListView
 		
@@ -1246,10 +1247,13 @@ class ApplicationsStepWizard extends StepWizard {
 			
 			if executable {
 				iconFile := findInstallProperty(simulator, "DisplayIcon")
-			
-				icons.Push(iconFile)
 				
-				LV_Add(wizard.SelectedApplication[simulator] ? "Check" : "", simulator, executable ? executable : translate("Not installed"))
+				if iconFile
+					icons.Push(iconFile)
+				else
+					icons.Push(executable)
+				
+				rows.Push(Array((wizard.SelectedApplication[simulator] ? "Check Icon" : "Icon") . (rows.Length() + 1), simulator, executable ? executable : translate("Not installed")))
 			}
 		}
 		
@@ -1259,6 +1263,9 @@ class ApplicationsStepWizard extends StepWizard {
 			IL_Add(listViewIcons, icon)
 		
 		LV_SetImageList(listViewIcons)
+		
+		for ignore, row in rows
+			LV_Add(row*)
 		
 		if first {
 			LV_ModifyCol(1, "AutoHdr")
@@ -1290,22 +1297,61 @@ class ApplicationsStepWizard extends StepWizard {
 		
 		first := false
 	}
+	
+	hidePage(page) {
+		this.updateSelectedApplications("Selection")
+		
+		base.hidePage(page)
+	}
 
 	updateSelectedApplications(update := true) {
 		wizard := this.SetupWizard
 		
-		for category, section in {Simulators: "Installation.Simulators", Core: "Installation.Core", Feedback: "Installation.Feedback", Other: "Installation.Other", Special: "Installation.Special"} {
-			for name, descriptor in getConfigurationSectionValues(wizard.Definition, section) {
-				if !wizard.SelectedApplications.HasKey(name) {
-					descriptor := string2Values("|", descriptor)
+		if (update = "Selection") {
+			for ignore, listView in [this.iSimulatorsListView, this.iApplicationsListView] {
+				Gui ListView, % listView
 				
-					executable := findSoftware(wizard.Definition, descriptor[1])
+				column := A_Index
+				
+				checked := {}
+			
+				row := 0
+				
+				Loop {
+					row := LV_GetNext(row, "C")
+				
+					if row {
+						LV_GetText(name, row, column)
+						
+						checked[name] := true
+					}
+					else
+						break
+				}
+				
+				Loop % LV_GetCount()
+				{
+					LV_GetText(name, A_Index, column)
 					
-					if executable
-						wizard.selectApplication(name, true, update)
+					wizard.selectApplication(name, checked.HasKey(name) ? checked[name] : false, false)
 				}
 			}
+			
+			wizard.updateState()
 		}
+		else
+			for category, section in {Simulators: "Installation.Simulators", Core: "Installation.Core", Feedback: "Installation.Feedback", Other: "Installation.Other", Special: "Installation.Special"} {
+				for name, descriptor in getConfigurationSectionValues(wizard.Definition, section) {
+					if !wizard.SelectedApplications.HasKey(name) {
+						descriptor := string2Values("|", descriptor)
+					
+						executable := findSoftware(wizard.Definition, descriptor[1])
+						
+						if executable
+							wizard.selectApplication(name, true, update)
+					}
+				}
+			}
 	}
 }
 

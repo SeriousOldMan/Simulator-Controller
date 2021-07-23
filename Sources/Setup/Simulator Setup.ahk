@@ -32,6 +32,13 @@ ListLines Off					; Disable execution history
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                         Local Include Section                           ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include ..\Libraries\JSON.ahk
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -925,7 +932,7 @@ class InstallationStepWizard extends StepWizard {
 				if locatable
 					buttonX -= 95
 				
-				labelWidth := width - 30 - 90 - (locatable * 95)
+				labelWidth := width - 60 - 90 - (locatable * 95)
 				labelX := x + 45
 				labelY := y + 5
 				
@@ -1227,8 +1234,6 @@ findExecutable(definition, software) {
 		
 			if (software = descriptor[1]) {
 				for ignore, locator in string2Values(";", descriptor[2]) {
-					locator := descriptor[2]
-					
 					if (InStr(locator, "File:") == 1) {
 						locator := substituteVariables(StrReplace(locator, "File:", ""))
 						
@@ -1241,11 +1246,29 @@ findExecutable(definition, software) {
 						if (value != "")
 							return true
 					}
+					/*
 					else if (InStr(locator, "RegistryScan:") == 1) {
 						folder := findApplicationInstallPath(substituteVariables(StrReplace(locator, "RegistryScan:", "")))
 				
 						if ((folder != "") && FileExist(folder . descriptor[3]))
 							return (folder . descriptor[3])
+					}
+					*/
+					else if (InStr(locator, "Steam:") == 1) {
+						locator := substituteVariables(StrReplace(locator, "Steam:", ""))
+						
+						RegRead installPath, HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Valve\Steam, InstallPath
+						
+						if (installPath != "") {
+							FileRead script, %installPath%\steamapps\libraryfolders.vdf
+							
+							folders := JSON.parse(script)
+							folders := folders["LibraryFolders"]
+							fileName := folders[1] . "\steamapps\common\" . locator
+							
+							if FileExist(fileName)
+								return fileName
+						}
 					}
 				}
 			

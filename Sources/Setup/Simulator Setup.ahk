@@ -1086,38 +1086,46 @@ class ApplicationsStepWizard extends StepWizard {
 	}
 	
 	createGui(wizard, x := false, y := false, width := false, height := false) {
-		wizard.getWorkArea(x, y, width, height)
-		
-		labelY := y
-		
-		window := this.Window
-		
-		for simulator, descriptor in getConfigurationSectionValues(wizard.Definition, "Installation.Simulators") {
-			descriptor := string2Values("|", descriptor)
-		
-			executable := findSoftware(wizard.Definition, descriptor[1])
-			labelHandle := false
+		if x {
+			labelY := y
 			
-			Gui %window%:Add, Text, x%x% y%labelY% w%width% h30 HWNDlabelHandle Hidden, % simulator . " => " . executable
+			window := this.Window
 			
-			labelY += 25
-			
-			this.registerWidget(1, labelHandle)
-		}
-		
-		for ignore, section in ["Installation.Core", "Installation.Feedback", "Installation.Other", "Installation.Special"]
-			for app, descriptor in getConfigurationSectionValues(wizard.Definition, section) {
+			for simulator, descriptor in getConfigurationSectionValues(wizard.Definition, "Installation.Simulators") {
 				descriptor := string2Values("|", descriptor)
 			
 				executable := findSoftware(wizard.Definition, descriptor[1])
 				labelHandle := false
+				iconHandle := false
 				
-				Gui %window%:Add, Text, x%x% y%labelY% w%width% h30 HWNDlabelHandle Hidden, % app . " => " . executable
+				labelX := x + 50
+				labelWidth := width - 50
+				
+				iconFile := findInstallProperty(simulator, "DisplayIcon")
+				
+				if iconFile
+					Gui %window%:Add, Picture, x%x% y%labelY% w20 h20 HWNDiconHandle Hidden, % iconFile
+				Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h30 HWNDlabelHandle Hidden, % simulator . " => " . executable
 				
 				labelY += 25
 				
-				this.registerWidget(1, labelHandle)
+				this.registerWidgets(1, labelHandle, iconHandle)
 			}
+			
+			for ignore, section in ["Installation.Core", "Installation.Feedback", "Installation.Other", "Installation.Special"]
+				for app, descriptor in getConfigurationSectionValues(wizard.Definition, section) {
+					descriptor := string2Values("|", descriptor)
+				
+					executable := findSoftware(wizard.Definition, descriptor[1])
+					labelHandle := false
+					
+					Gui %window%:Add, Text, x%x% y%labelY% w%width% h30 HWNDlabelHandle Hidden, % app . " => " . executable
+					
+					labelY += 25
+					
+					this.registerWidget(1, labelHandle)
+				}
+		}
 	}
 }
 
@@ -1246,18 +1254,18 @@ findInRegistry(collection, filterName, filterValue, valueName) {
 	return ""
 }
 
-findInstallPath(name) {
-	value := findInRegistry("HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall", "DisplayName", name, "InstallLocation")
+findInstallProperty(name, property) {
+	value := findInRegistry("HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall", "DisplayName", name, property)
 	
 	if (value != "")
 		return value
 	
-	value := findInRegistry("HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall", "DisplayName", name, "InstallLocation")
+	value := findInRegistry("HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall", "DisplayName", name, property)
 	
 	if (value != "")
 		return value
 	
-	value := findInRegistry("HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall", "DisplayName", name, "InstallLocation")
+	value := findInRegistry("HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall", "DisplayName", name, property)
 	
 	if (value != "")
 		return value
@@ -1283,7 +1291,7 @@ findSoftware(definition, software) {
 							return true
 					}
 					else if (InStr(locator, "RegistryScan:") == 1) {
-						folder := findInstallPath(substituteVariables(StrReplace(locator, "RegistryScan:", "")))
+						folder := findInstallProperty(substituteVariables(StrReplace(locator, "RegistryScan:", "")), "InstallLocation")
 				
 						if ((folder != "") && FileExist(folder . descriptor[3]))
 							return (folder . descriptor[3])

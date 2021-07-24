@@ -303,7 +303,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		for ignore, theAction in string2Values(",", this.getArgumentValue("assistantCommands", ""))
 			this.createRaceAssistantAction(controller, string2Values(A_Space, theAction)*)
 		
-		this.iRaceAssistantService := this.getArgumentValue("raceAssistantService", "Windows")
+		this.iRaceAssistantService := this.getArgumentValue("raceAssistantService", false)
 		
 		assistantSpeaker := this.getArgumentValue("raceAssistantSpeaker", false)
 		

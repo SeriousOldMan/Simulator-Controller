@@ -205,6 +205,7 @@ class VoiceServer extends ConfigurationItem {
 		SpeechSynthesizer[create := false] {
 			Get {
 				if (create && this.Speaker && !this.iSpeechSynthesizer) {
+					msgbox % this.Service
 					this.iSpeechSynthesizer := new SpeechSynthesizer(this.Service, this.Speaker, this.Language)
 					
 					this.iSpeechSynthesizer.setVolume(this.iSpeakerVolume)

@@ -164,7 +164,7 @@ startRaceEngineer() {
 	engineerName := "Jona"
 	engineerLogo := false
 	engineerLanguage := false
-	engineerService := "Windowws"
+	engineerService := true
 	engineerSpeaker := false
 	engineerListener := false
 	engineerSettingsFile := getFileName("Race.settings", kUserConfigDirectory)

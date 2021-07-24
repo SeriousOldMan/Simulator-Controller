@@ -106,7 +106,7 @@ startRaceStrategist() {
 	strategistName := "Cato"
 	strategistLogo := false
 	strategistLanguage := false
-	strategistService := "Windows"
+	strategistService := true
 	strategistSpeaker := false
 	strategistListener := false
 	strategistSettingsFile := getFileName("Race.settings", kUserConfigDirectory)

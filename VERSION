@@ -1,14 +1,14 @@
 [Development]
-Version=3.3.0-release
-Target=3.3.0-release
-Date=07/23/2021
+Version=3.3.1-dev
+Target=3.3.1-release
+Date=07/25/2021
 Changes=Audio post processing for team radio voice, File location refactoring, Use Azure Service for speech synthesis, New "raceAssistantService" parameter for the "Race Engineer" and "Race Strategist" plugins
 [Release]
 Version=3.3.0-release
 Date=07/23/2021
 Changes=Audio post processing for team radio voice, File location refactoring, Use Azure Service for speech synthesis, New "raceAssistantService" parameter for the "Race Engineer" and "Race Strategist" plugins
 [Current]
-Type=Release
+Type=Development
 [Version]
 Release=3.3.0-release
-Development=3.3.0-release
+Development=3.3.1-dev

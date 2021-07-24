@@ -38,7 +38,7 @@ global kCompilerCompliantTestRules
 				 , "reverse([1,2,3,4], ?L)"
 				 , "foo(?A, bar(?B, [?C])) <= baz(?, foo(?A, ?)), !, fail"
 				 , "reverse([ ?H |?T ], ?REV )<= reverse(?T,?RT), concat(?RT,[?H],?REV)"
-				 , "Priority: 5, {Any: [?Peter.grandchild], [Predicate: ?Peter.son = true]} => (Set: Peter, happy), (Call: showRelationship, 1, 2), (Prove: father, maria, willy), (Call: showRelationship, 2, 1)"
+				 , "Priority: 5, {Any: [?Peter.grandchild], [Predicate: ?Peter.son = true]} => (Set: Peter, happy), (Call: showRelationship(1, 2)), (Prove: father(maria, willy)), (Call: showRelationship(2, 1))"
 				 , "fac(?X, ?R) <= >(?X, 0), -(?N, ?X, 1), fac(?N, ?T), *(?R, ?T, ?X)"]
 
 global kCompilerNonCompliantTestRules
@@ -46,7 +46,7 @@ global kCompilerNonCompliantTestRules
 				 , "reverse([1,2,3,4]], ?L)"
 				 , "foo(?A, bar(?B)) => baz(?, foo([?A], !), !, fail"
 				 , "reverse([ ?H | ], ?REV )<= reverse(?T,,?RT), concat ?RT,[?H],?REV)"
-				 , "Priority: 5, [Any: [?Peter.grandchild], [Preddicate: ?Peter.son = true]} => [Set: Peter, happy), (Call: showRelationship, 1, 2), (Prove: father, maria, willy), (Call: showRelationship, 2, 1)"]
+				 , "Priority: 5, [Any: [?Peter.grandchild], [Preddicate: ?Peter.son = true]} => [Set: Peter, happy), (Call: showRelationship(1, 2)), (Prove: father(maria, willy)), (Call: showRelationship(2, 1))"]
 
 kRules =
 (
@@ -90,7 +90,7 @@ kRules =
 				complexClause(?x, ?y) <= ?x = [1, 2, 3], ?y = complex(A, foo([1, 2]))
 				
 				{Any: [?Peter.grandchild], [?Peter.son]} => (Set: Peter, happy)
-				[?Peter = happy] => (Call: celebrate)
+				[?Peter = happy] => (Call: celebrate())
 				{Any: [?Paul.grandchild], [?Willy.grandChild]} => (Set: Bound, ?Paul.grandchild), (Set: NotBound, ?Peter.son), (Set: ForcedBound, !Willy.grandchild)
 )
 

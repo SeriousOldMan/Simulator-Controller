@@ -57,7 +57,7 @@
 ;;; remaining stint time for the current driver.                            ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-priority: 20, [?Lap] => (ProveAll: updateRemainingLaps, ?Lap)
+priority: 20, [?Lap] => (ProveAll: updateRemainingLaps(?Lap))
 
 updateRemainingLaps(?lap) <= remainingStintLaps(?lap, Fuel, ?fuelLaps), Set(Lap.Remaining.Fuel, ?fuelLaps)
 updateRemainingLaps(?lap) <= remainingStintLaps(?lap, Driver, ?driverLaps), Set(Lap.Remaining.Stint, ?driverLaps)
@@ -80,12 +80,12 @@ priority: -10, {All: [?Lap.Remaining.Fuel <= ?Lap.Remaining.Stint],													
 ;;; weather trends and weather forecast information (as far as available).  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-priority: 5, {Any: [?Weather.Weather.10Min], {None: [?Weather.Weather.10Min.Index]}} => (Prove: updateWeatherIndex, 10Min)
-priority: 5, {Any: [?Weather.Weather.30Min], {None: [?Weather.Weather.30Min.Index]}} => (Prove: updateWeatherIndex, 30Min)
+priority: 5, {Any: [?Weather.Weather.10Min], {None: [?Weather.Weather.10Min.Index]}} => (Prove: updateWeatherIndex(10Min))
+priority: 5, {Any: [?Weather.Weather.30Min], {None: [?Weather.Weather.30Min.Index]}} => (Prove: updateWeatherIndex(30Min))
 
 updateWeatherIndex(?time) <= Get(Weather.Weather, ?time, ?weather), weatherIndex(?weather, ?index), Set(Weather.Weather, ?time, Index, ?index)
 
-[?Lap > 5] => (Prove: updateWeatherTrend, ?Lap)
+[?Lap > 5] => (Prove: updateWeatherTrend(?Lap))
 
 updateWeatherTrend(?lap) <= firstStintLap(?startlap), ?deltaLaps = ?lap - ?startlap,															\
 							lapAirTemperature(?startlap, ?startAirTemperature), projectedAirTemperature(?lap, ?curAirTemperature),				\
@@ -124,7 +124,7 @@ projectedTyreTemperature(?lap, ?temperature) <=																									\
 ;;; Updates the for all cars each lap.                                      ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-{Any: [?Lap], [?Sector]} => (Prove: updateLapTimes, ?Lap, !Car.Count)
+{Any: [?Lap], [?Sector]} => (Prove: updateLapTimes(?Lap, !Car.Count))
 
 updateLapTimes(?, ?car) <= =<(?car, 0), !
 updateLapTimes(?lap, ?car) <= carLapTime(?car, ?lapTime), Set(Standings.Lap, ?lap, Car, ?car, Time, ?lapTime),									\
@@ -147,7 +147,7 @@ priority: 5, {Any: [?Lap], [?Sector]} => (Clear: Position.Standings.Front.Car),	
 										 (Clear: Position.Track.Front.Distance), (Clear: Position.Track.Front.Delta),							\
 										 (Clear: Position.Track.Behind.Car),																	\
 										 (Clear: Position.Track.Behind.Distance), (Clear: Position.Track.Behind.Delta)
-{Any: [?Lap], [?Sector]} => (Prove: updatePositions, !Lap)
+{Any: [?Lap], [?Sector]} => (Prove: updatePositions(!Lap))
 priority: -5, [?Sector] => (Clear: Sector)
 
 updatePositions(?lap) <= updateStandingsPositions(?lap, !Car.Count), updateTrackPositions(?lap, !Car.Count),									\
@@ -259,7 +259,7 @@ updateTrackBehind(?lap, ?running, ?car) <= carLaps(?car, RUNNING, ?carRunning), 
 ;;; This rule set will extrapolate the race positions into the future.      ;;;
 ;;;-------------------------------------------------------------------------;;;
 		
-[?Standings.Extrapolate] => (Prove: extrapolateLap, !Lap, ?Standings.Extrapolate), (Clear: Standings.Extrapolate)
+[?Standings.Extrapolate] => (Prove: extrapolateLap(!Lap, ?Standings.Extrapolate)), (Clear: Standings.Extrapolate)
 
 extrapolateLap(?lap, ?futureLap) <= ?futureLap < ?lap, !, fail
 extrapolateLap(?lap, ?futureLap) <= extrapolateLap(?lap, ?futureLap, 0)
@@ -275,7 +275,7 @@ extrapolateLaps(?lap, ?lapDelta) <= =<(?lapDelta, 0), !
 extrapolateLaps(?lap, ?lapDelta) <= ?futureLap = ?lap + ?lapDelta, extrapolateLap(?lap, ?futureLap),											\
 									?nextLapDelta = ?lapDelta - 1, extrapolateLaps(?lap, ?nextLapDelta)
 
-priority: -20, [?Lap] => (Prove: clearExtrapolatedLap, ?Lap, !Car.Count)
+priority: -20, [?Lap] => (Prove: clearExtrapolatedLap(?Lap, !Car.Count))
 
 clearExtrapolatedLap(?, ?car) <= =<(?car, 0), !
 clearExtrapolatedLap(?lap, ?car)  <= Clear(Standings.Extrapolated, ?lap, Car, ?car, Position),													\
@@ -284,11 +284,11 @@ clearExtrapolatedLap(?lap, ?car)  <= Clear(Standings.Extrapolated, ?lap, Car, ?c
 									 ?nextCar = ?car - 1, clearExtrapolatedLap(?lap, ?nextCar)
 
 priority: -20, {All: [?Lap], [?Session.Settings.Standings.Extrapolation.Laps]} =>																\
-		(Prove: extrapolatePositions, ?Lap, ?Session.Settings.Standings.Extrapolation.Laps),													\
-		(Prove: updatePositions, ?Lap, ?Session.Settings.Standings.Extrapolation.Laps),															\
-		(Prove: correctPositions, ?Lap, !Session.Settings.Standings.Extrapolation.Overtake.Delta,												\
-										?Session.Settings.Standings.Extrapolation.Laps),														\
-		(Prove: updatePositions, ?Lap, ?Session.Settings.Standings.Extrapolation.Laps)
+		(Prove: extrapolatePositions(?Lap, ?Session.Settings.Standings.Extrapolation.Laps)),													\
+		(Prove: updatePositions(?Lap, ?Session.Settings.Standings.Extrapolation.Laps)),															\
+		(Prove: correctPositions(?Lap, !Session.Settings.Standings.Extrapolation.Overtake.Delta,												\
+									   ?Session.Settings.Standings.Extrapolation.Laps)),														\
+		(Prove: updatePositions(?Lap, ?Session.Settings.Standings.Extrapolation.Laps))
 		
 extrapolatePositions(?, ?lapDelta) <= =<(?lapDelta, 0), !
 extrapolatePositions(?lap, ?lapDelta) <= carAvgLapTime(?lap, !Driver.Car, 0),																	\
@@ -374,7 +374,7 @@ carLapAvgTime(?lap, ?car, ?times, ?avgTime) <= sum(?times, ?sTimes), length(?tim
 ;;; made.                                                                   ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-priority: 5, {None: [?Tyre.Compound]} => (Prove: currentTyreCompound)
+priority: 5, {None: [?Tyre.Compound]} => (Prove: currentTyreCompound())
 
 currentTyreCompound() <= currentTyreCompound(?compound, ?color), Set(Tyre.Compound, ?compound), Set(Tyre.Compound.Color, ?color)
 
@@ -389,8 +389,8 @@ currentTyreCompound() <= currentTyreCompound(?compound, ?color), Set(Tyre.Compou
 
 priority: 5, [?Pitstop.Strategy.Plan] => (Clear: Pitstop.Strategy.Lap)
 
-{All: [?Lap.Remaining.Session > ?Lap.Remaining.Fuel], [?Pitstop.Strategy.Plan = true]} => (Prove: updatePitstopStrategy, !Lap)
-{All: [?Lap.Remaining.Session > ?Lap.Remaining.Fuel], [?Pitstop.Strategy.Plan > 1]} => (Prove: updatePitstopStrategy, !Pitstop.Strategy.Plan)
+{All: [?Lap.Remaining.Session > ?Lap.Remaining.Fuel], [?Pitstop.Strategy.Plan = true]} => (Prove: updatePitstopStrategy(!Lap))
+{All: [?Lap.Remaining.Session > ?Lap.Remaining.Fuel], [?Pitstop.Strategy.Plan > 1]} => (Prove: updatePitstopStrategy(!Pitstop.Strategy.Plan))
 
 {All: {None: [?Pitstop.Strategy.Lap]}, [?Lap.Remaining.Session < ?Lap.Remaining.Fuel]} => (Set: Pitstop.Strategy.Lap, false)
 
@@ -480,7 +480,7 @@ bestPitstopLap([? | ?laps], [? | ?positions], [? | ?densities], ?bestLap, ?bestP
 ;;; history memory as a reference for future calculations.                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Pitstop.Lap] => (Prove: updatePitstopLap, ?Pitstop.Lap)
+[?Pitstop.Lap] => (Prove: updatePitstopLap(?Pitstop.Lap))
 priority: -20, [?Pitstop.Lap] => (Clear: Pitstop.Lap)
 
 updatePitstopLap(?lap) <= Get(Pitstop.Last, ?last), Get(Pitstop, ?last, Lap, ?lap), !

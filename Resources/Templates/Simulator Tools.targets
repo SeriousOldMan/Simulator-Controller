@@ -57,6 +57,7 @@ Controller Configuration.2=%kResourcesDirectory%Templates\Simulator Configuratio
 Controller Configuration.3=%kConfigDirectory%Button Box Configuration.ini <- %kSourcesDirectory%Plugins\Button Box Configuration.ini
 Controller Configuration.4=%kResourcesDirectory%Templates\Button Box Configuration.ini <- %kSourcesDirectory%Plugins\Button Box Configuration.ini
 Setup Configuration.1=%kResourcesDirectory%Setup\Simulator Setup.ini <- %kSourcesDirectory%Setup\Simulator Setup.ini
+Setup Configuration.2=%kResourcesDirectory%Setup\Simulator Setup.rules <- %kSourcesDirectory%Setup\Simulator Setup.rules
 Build Targets.1=%kConfigDirectory%Simulator Tools.targets <- %kSourcesDirectory%Configuration\Simulator Tools.targets
 Build Targets.2=%kResourcesDirectory%Templates\Simulator Tools.targets <- %kSourcesDirectory%Configuration\Simulator Tools.targets
 Translations.1=%kTranslationsDirectory%Translations.en <- %kSourcesDirectory%Configuration\Translations\Translations.en

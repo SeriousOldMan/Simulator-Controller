@@ -36,6 +36,7 @@ ListLines Off					; Disable execution history
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Libraries\JSON.ahk
+#Include ..\Libraries\RuleEngine.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -59,6 +60,14 @@ global vResult = false
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                        Public Constant Section                          ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global kDebugOff = 0
+global kDebugKnowledgeBase = 1
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -77,20 +86,25 @@ global nextPageButton
 global finishButton
 
 class SetupWizard extends ConfigurationItem {
+	iDebug := kDebugOff
+	
 	iWizardWindow := "SW"
 	iHelpWindow := "SH"
 	
 	iStepWizards := {}
 	
 	iDefinition := false
+	iKnowledgeBase := false
 	
 	iSteps := {}
 	iStep := 0
 	iPage := 0
 	
-	iSelectedModules := {}
-	iInstalledSoftware := {}
-	iSelectedApplications := {}
+	Debug[option] {
+		Get {
+			return (this.iDebug & option)
+		}
+	}
 	
 	WizardWindow[] {
 		Get {
@@ -110,10 +124,16 @@ class SetupWizard extends ConfigurationItem {
 		}
 	}
 	
+	KnowledgeBase[] {
+		Get {
+			return this.iKnowledgeBase
+		}
+	}
+	
 	Steps[step := false] {
 		Get {
 			if step
-				return this.iSteps[step]
+				return (this.iSteps.HasKey(step) ? this.iSteps[step] : false)
 			else
 				return this.iSteps
 		}
@@ -144,37 +164,8 @@ class SetupWizard extends ConfigurationItem {
 		}
 	}
 	
-	SelectedModules[] {
-		Get {
-			return this.iSelectedModules
-		}
-	}
-	
-	SelectedModule[module] {
-		Get {
-			return (this.iSelectedModules.HasKey(module) ? this.iSelectedModules[module] : false)
-		}
-	}
-	
-	SelectedApplications[] {
-		Get {
-			return this.iSelectedApplications
-		}
-	}
-	
-	SelectedApplication[application] {
-		Get {
-			return (this.iSelectedApplications.HasKey(application) ? this.iSelectedApplications[application] : false)
-		}
-	}
-	
-	InstalledSoftware[software] {
-		Get {
-			return (this.iInstalledSoftware.HasKey(software) ? this.iInstalledSoftware[software] : false)
-		}
-	}
-	
 	__New(configuration, definition) {
+		this.iDebug := (isDebug() ? kDebugKnowledgeBase : kDebugOff)
 		this.iDefinition := definition
 		
 		base.__New(configuration)
@@ -182,28 +173,66 @@ class SetupWizard extends ConfigurationItem {
 		SetupWizard.Instance := this
 	}
 	
+	createKnowledgeBase(facts) {
+		local rules
+		
+		FileRead rules, % kResourcesDirectory . "Setup\Simulator Setup.rules"
+		
+		productions := false
+		reductions := false
+
+		new RuleCompiler().compileRules(rules, productions, reductions)
+		
+		engine := new RuleEngine(productions, reductions, facts)
+		
+		return new KnowledgeBase(engine, engine.createFacts(), engine.createRules())
+	}
+	
+	addRule(rule) {
+		this.KnowledgeBase.addRule(new RuleCompiler().compileRule(rule))
+	}
+	
 	loadDefinition(definition := false) {
+		local knowledgeBase
 		local stepWizard
 		
 		if !definition
 			definition := this.Definition
 		
+		this.iKnowledgeBase := this.createKnowledgeBase({})
+		
 		this.iSteps := {}
 		this.iStep := 0
 		this.iPage := 0
 		
-		for descriptor, definition in getConfigurationSectionValues(definition, "Setup.Steps") {
+		count := 0
+		
+		for descriptor, stepDefinition in getConfigurationSectionValues(definition, "Setup.Steps") {
 			descriptor := string2Values(".", descriptor)
 		
 			step := descriptor[3]
 			stepWizard := this.StepWizards[step]
 			
-			stepWizard.setDefinition(definition)
-			
 			this.Steps[step] := stepWizard
 			this.Steps[descriptor[2]] := stepWizard
 			this.Steps[stepWizard] := descriptor[2]
+			
+			count := Max(count, descriptor[2])
 		}
+		
+		Loop %count% {
+			step := this.Steps[A_Index]
+		
+			if step
+				step.loadDefinition(definition, getConfigurationValue(definition, "Setup.Steps", "Step." . A_Index . "." . step.Step))
+		}
+		
+		this.KnowledgeBase.addFact("Initialize", true)
+			
+		this.KnowledgeBase.produce()
+					
+		if this.Debug[kDebugKnowledgeBase]
+			this.dumpKnowledge(this.KnowledgeBase)
 	}
 	
 	registerStepWizard(stepWizard) {
@@ -335,6 +364,13 @@ class SetupWizard extends ConfigurationItem {
 			this.Steps[A_Index].reset()
 	}
 	
+	setDebug(option, enabled) {
+		if enabled
+			this.iDebug := (this.iDebug | option)
+		else if (this.Debug[option] == option)
+			this.iDebug := (this.iDebug - option)
+	}
+	
 	show(reset := false) {
 		static first := true
 		
@@ -379,22 +415,6 @@ class SetupWizard extends ConfigurationItem {
 	}
 	
 	startSetup() {
-		local stepWizard
-		
-		if (this.Steps.Count() == 0)
-			for descriptor, definition in getConfigurationSectionValues(this.Definition, "Setup.Steps") {
-				descriptor := string2Values(".", descriptor)
-			
-				step := descriptor[3]
-				stepWizard := this.StepWizards[step]
-				
-				stepWizard.setDefinition(definition)
-				
-				this.Steps[step] := stepWizard
-				this.Steps[descriptor[2]] := stepWizard
-				this.Steps[stepWizard] := descriptor[2]
-			}
-		
 		this.iStep := false
 		this.iPage := false
 		
@@ -525,6 +545,14 @@ class SetupWizard extends ConfigurationItem {
 	}
 
 	updateState() {
+		this.KnowledgeBase.produce()			
+
+		if this.Debug[kDebugKnowledgeBase]
+			this.dumpKnowledge(this.KnowledgeBase)
+		
+		Loop % this.StepWizards.Count()
+			this.Steps[A_Index].updateState()
+		
 		window := this.WizardWindow
 	
 		Gui %window%:Default
@@ -542,29 +570,97 @@ class SetupWizard extends ConfigurationItem {
 			GuiControl Enable, nextPageButton
 			GuiControl Disable, finishButton
 		}
-		
-		Loop % this.StepWizards.Count()
-			this.Steps[A_Index].updateState()
 	}
 	
 	selectModule(module, selected, update := true) {
-		this.iSelectedModules[module] := selected
+		this.KnowledgeBase.setFact("Module." . module . ".Selected", selected != false)
 		
 		if update
 			this.updateState()
+		else {
+			this.KnowledgeBase.produce()
+		
+			if this.Debug[kDebugKnowledgeBase]
+				this.dumpKnowledge(this.KnowledgeBase)
+		}
+	}
+	
+	isModuleSelected(module) {
+		return this.KnowledgeBase.getValue("Module." . module . ".Selected", false)
+	}
+	
+	isSoftwareRequested(software) {
+		return (this.KnowledgeBase.getValue("Software." . software . ".Requested", false) != false)
+	}
+	
+	isSoftwareOptional(software) {
+		return (this.KnowledgeBase.getValue("Software." . software . ".Requested", "OPTIONAL") = "OPTIONAL")
+	}
+	
+	isSoftwareInstalled(software) {
+		return this.KnowledgeBase.getValue("Software." . software . ".Installed", false)
+	}
+	
+	locateSoftware(software, executable := false) {
+		local knowledgeBase := this.KnowledgeBase
+		
+		if !executable {
+			executable := findSoftware(this.Definition, software)
+			
+			if (executable == "")
+				executable := false
+		}
+			
+		knowledgeBase.setFact("Software." . software . ".Installed", executable != false)
+		
+		if (executable == true)
+			knowledgeBase.removeFact("Software." . software . ".Path")
+		else
+			knowledgeBase.setFact("Software." . software . ".Path", executable)
+		
+		this.updateState()
+	}
+	
+	softwarePath(software) {
+		return this.KnowledgeBase.getValue("Software." . software . ".Path", false)
+	}
+	
+	requireApplication(application, required, update := true) {
+		this.KnowledgeBase.setFact("Application." . module . ".Required", required != false)
+		
+		if update
+			this.updateState()
+		else {
+			this.KnowledgeBase.produce()
+		
+			if this.Debug[kDebugKnowledgeBase]
+				this.dumpKnowledge(this.KnowledgeBase)
+		}
 	}
 	
 	selectApplication(application, selected, update := true) {
-		this.iSelectedApplications[application] := selected
+		this.KnowledgeBase.setFact("Application." . module . ".Selected", selected != false)
 		
 		if update
 			this.updateState()
+		else {
+			this.KnowledgeBase.produce()
+			
+			if this.Debug[kDebugKnowledgeBase]
+				this.dumpKnowledge(this.KnowledgeBase)
+		}
 	}
 	
-	locateSoftware(software, executable) {
-		this.iInstalledSoftware[software] := executable
-		
-		this.updateState()
+	isApplicationRequired(application) {
+		return this.KnowledgeBase.getValue("Application." . application . ".Required", false)
+	}
+	
+	isApplicationInstalled(application) {
+		return this.KnowledgeBase.getValue("Application." . application . ".Installed", false)
+	}
+	
+	isApplicationSelected(application) {
+		return this.KnowledgeBase.getValue("Application." . application . ".Selected", false)
 	}
 	
 	setTitle(title) {
@@ -593,6 +689,21 @@ class SetupWizard extends ConfigurationItem {
 		infoViewer.Document.Open()
 		infoViewer.Document.Write(html)
 		infoViewer.Document.Close()
+	}
+	
+	dumpKnowledge(knowledgeBase) {
+		try {
+			FileDelete %kTempDirectory%Simulator Setup.knowledge
+		}
+		catch exception {
+			; ignore
+		}
+
+		for key, value in knowledgeBase.Facts.Facts {
+			text := key . " = " . value . "`n"
+		
+			FileAppend %text%, %kTempDirectory%Simulator Setup.knowledge
+		}
 	}
 }
 
@@ -651,6 +762,30 @@ class StepWizard extends ConfigurationItem {
 		base.__New(configuration)
 	}
 	
+	loadStepDefinition(definition) {
+		this.iDefinition := string2Values("|", definition)
+	}
+	
+	loadDefinition(definition, stepDefinition) {
+		local rule
+		local rules := {}
+		count := 0
+		
+		for descriptor, rule in getConfigurationSectionValues(definition, "Setup." . this.Step, Object())
+			if (InStr(descriptor, this.Step . ".Rule") == 1) {
+				index := string2Values(".", descriptor)[3]
+			
+				count := Max(count, index)
+				rules[index] := rule
+			}
+		
+		Loop %count%
+			if rules.HasKey(A_Index)
+				this.SetupWizard.addRule(rules[A_Index])
+		
+		this.loadStepDefinition(stepDefinition)
+	}
+	
 	getWorkArea(ByRef x, ByRef y, ByRef width, ByRef height) {
 		this.SetupWizard.getWorkArea(x, y, width, height)
 	}
@@ -673,10 +808,6 @@ class StepWizard extends ConfigurationItem {
 	
 	deleteWidgets(page) {
 		this.iWidgets.Delete(page)
-	}
-	
-	setDefinition(definition) {
-		this.iDefinition := definition
 	}
 	
 	reset() {
@@ -813,7 +944,7 @@ class ModulesStepWizard extends StepWizard {
 			Gui %window%:Font, s12 Bold, Arial
 
 			module := definition[A_Index]
-			selected := this.SetupWizard.Selected(module)
+			selected := this.SetupWizard.isModuleSelected(module)
 			
 			info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules." . module . ".Info." . getLanguage()))
 			module := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules." . module . "." . getLanguage()))
@@ -853,16 +984,35 @@ class ModulesStepWizard extends StepWizard {
 		this.iModuleSelectors := []
 	}
 	
-	setDefinition(definition) {
-		definition := string2Values("|", definition)
+	updateState() {
+		local variable
 		
-		base.setDefinition(definition)
+		base.updateState()
 		
-		for ignore, module in definition
-			this.SetupWizard.selectModule(module, true)
+		window := this.Window
+		
+		Gui %window%:Default
+		
+		definition := this.Definition
+		
+		Loop % definition.Length()
+		{
+			variable := this.iModuleSelectors[A_Index]
+			name := definition[A_Index]
+			
+			chosen := this.SetupWizard.isModuleSelected(name)
+			
+			GuiControl, , %variable%, %chosen%
+		}
 	}
 	
 	updateSelectedModules() {
+		local variable
+		
+		window := this.Window
+		
+		Gui %window%:Default
+		
 		definition := this.Definition
 		
 		Loop % definition.Length()
@@ -871,8 +1021,10 @@ class ModulesStepWizard extends StepWizard {
 			
 			GuiControlGet %variable%
 			
-			this.SetupWizard.selectModule(definition[A_Index], %variable%)
+			this.SetupWizard.selectModule(definition[A_Index], %variable%, false)
 		}
+		
+		this.SetupWizard.updateState()
 	}
 }
 
@@ -882,15 +1034,12 @@ class ModulesStepWizard extends StepWizard {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class InstallationStepWizard extends StepWizard {
-	iSoftware := []
-	iRules := {}
 	iPages := {}
-	
 	iSoftwareLocators := {}
 	
 	Pages[] {
 		Get {
-			return Ceil(this.iSoftware.Length() / 3)
+			return Ceil(this.Definition.Length() / 3)
 		}
 	}
 	
@@ -950,12 +1099,12 @@ class InstallationStepWizard extends StepWizard {
 		
 		startY := y
 		
-		if (this.iSoftware.Count() > 16)
+		if (this.Definition.Count() > 16)
 			Throw "Too many modules detected in InstallationStepWizard.createGui..."
 		
 		window := this.Window
 	
-		for ignore, software in this.iSoftware
+		for ignore, software in this.Definition
 		{
 			iconHandle := false
 			labelHandle := false
@@ -970,7 +1119,7 @@ class InstallationStepWizard extends StepWizard {
 			label := (translate("Software: ") . software)
 			info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px'>" . info . "</div>"
 			
-			installed := this.SetupWizard.InstalledSoftware[software]
+			installed := this.SetupWizard.isSoftwareInstalled(software)
 			
 			buttonX := x + width - 90
 			
@@ -1032,45 +1181,18 @@ class InstallationStepWizard extends StepWizard {
 		this.iSoftwareLocators := {}
 	}
 	
-	setDefinition(definition) {
-		definition := string2Values("|", definition)
+	loadStepDefinition(definition) {
+		base.loadStepDefinition(definition)
 		
-		base.setDefinition(definition)
-		
-		for ignore, rule in definition {
-			name := this.softwareName(rule)
-		
-			this.iSoftware.Push(name)
-			this.iRules[name] := rule
-		
-			executable := findSoftware(this.SetupWizard.Definition, name)
-			
-			if (executable != "")
-				this.SetupWizard.locateSoftware(name, executable)
-		}
+		for ignore, software in this.Definition
+			this.SetupWizard.locateSoftware(software)
 	}
 	
-	softwareName(rule) {
-		if (InStr(rule, "[") == 1)
-			return string2Values("=>", StrReplace(StrReplace(rule, "[", ""), "]", ""))[2]
-		else
-			return rule
-	}
-			
-	softwareActive(rule) {
-		if (InStr(rule, "[") == 1)
-			return this.SetupWizard.SelectedModule[string2Values("=>", StrReplace(StrReplace(rule, "[", ""), "]", ""))[1]]
-		else
-			return true
+	installSoftware(software) {
+		Run % substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Installation", "Installation." . software))
 	}
 	
-	softwareInstall(rule) {
-		Run % substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Installation", "Installation." . this.softwareName(rule)))
-	}
-	
-	softwareLocate(rule, executable) {
-		software := this.softwareName(rule)
-		
+	locateSoftware(software, executable) {
 		this.SetupWizard.locateSoftware(software, executable)
 		
 		buttons := this.iSoftwareLocators[software]
@@ -1087,10 +1209,10 @@ class InstallationStepWizard extends StepWizard {
 		base.showPage(page)
 	
 		for software, widgets in this.iPages[page]
-			if !this.softwareActive(this.iRules[software])
+			if !this.SetupWizard.isSoftwareRequested(software)
 				for ignore, widget in widgets
 					GuiControl Disable, %widget%
-			else if (this.SetupWizard.InstalledSoftware[software] && this.iSoftwareLocators.HasKey(software)) {
+			else if (this.SetupWizard.isSoftwareInstalled(software) && this.iSoftwareLocators.HasKey(software)) {
 				buttons := this.iSoftwareLocators[software]
 			
 				GuiControl Disable, % buttons[1]
@@ -1107,11 +1229,6 @@ class InstallationStepWizard extends StepWizard {
 					GuiControl Text, %button%, % translate("Installed")
 				}
 			}
-	}
-	
-	updateState() {
-		for ignore, rule in this.Definition
-			this.iActiveSoftware[this.SoftwareName(rule)] := this.softwareActive(rule)
 	}
 }
 
@@ -1209,6 +1326,8 @@ class ApplicationsStepWizard extends StepWizard {
 	}
 	
 	setDefinition(definition) {
+		local rule
+		
 		definition := string2Values("|", definition)
 		
 		base.setDefinition(definition)
@@ -1217,13 +1336,6 @@ class ApplicationsStepWizard extends StepWizard {
 			this.iModuleApplications[string2Values("=>", StrReplace(StrReplace(rule, "[", ""), "]", ""))[1]] := string2Values("=>", StrReplace(StrReplace(rule, "[", ""), "]", ""))[2]
 		
 		this.updateSelectedApplications()
-	}
-	
-	applicationActive(application) {
-		if this.iModuleApplications.HasKey(application)
-			return this.SetupWizard.SelectedModule[this.iModuleApplications[application]]
-		else
-			return true
 	}
 	
 	reset() {
@@ -1255,7 +1367,7 @@ class ApplicationsStepWizard extends StepWizard {
 		wizard := this.SetupWizard
 		
 		for simulator, descriptor in getConfigurationSectionValues(wizard.Definition, "Installation.Simulators")
-			if this.applicationActive(simulator) {
+			if this.SetupWizard.isApplicationSelected(simulator) {
 				descriptor := string2Values("|", descriptor)
 			
 				executable := findSoftware(wizard.Definition, descriptor[1])
@@ -1295,13 +1407,13 @@ class ApplicationsStepWizard extends StepWizard {
 		
 		for category, section in {Core: "Installation.Core", Feedback: "Installation.Feedback", Other: "Installation.Other"} {
 			for application, descriptor in getConfigurationSectionValues(wizard.Definition, section)
-				if this.applicationActive(application) {
+				if wizard.isApplicationSelected(application) {
 					descriptor := string2Values("|", descriptor)
 				
 					executable := findSoftware(wizard.Definition, descriptor[1])
 				
 					if (executable && (executable != true))
-						LV_Add(wizard.SelectedApplication[application] ? "Check" : "", category, application, executable ? executable : translate("Not installed"))
+						LV_Add(wizard.isApplicationSelected(application) ? "Check" : "", category, application, executable ? executable : translate("Not installed"))
 				}
 			}
 		
@@ -1358,7 +1470,7 @@ class ApplicationsStepWizard extends StepWizard {
 		else
 			for category, section in {Simulators: "Installation.Simulators", Core: "Installation.Core", Feedback: "Installation.Feedback", Other: "Installation.Other"} {
 				for name, descriptor in getConfigurationSectionValues(wizard.Definition, section) {
-					if !wizard.SelectedApplications.HasKey(name) && this.applicationActive(name) {
+					if !wizard.SelectedApplications.HasKey(name) && this.SetupWizard.isApplicationSelected(name) {
 						descriptor := string2Values("|", descriptor)
 					
 						executable := findSoftware(wizard.Definition, descriptor[1])
@@ -1416,34 +1528,27 @@ installSoftware() {
 	
 	definition := stepWizard.Definition
 	
-	stepWizard.softwareInstall(definition[StrReplace(A_GuiControl, "installButton", "")])
+	stepWizard.installSoftware(definition[StrReplace(A_GuiControl, "installButton", "")])
 }
 
 locateSoftware() {
-	local stepWizard := SetupWizard.Instance.StepWizards["Installation"]
+	wizard := SetupWizard.Instance.StepWizards["Installation"]
 	
-	definition := stepWizard.Definition
-	definition := definition[StrReplace(A_GuiControl, "locateButton", "")]
+	definition := wizard.Definition
+	name := definition[StrReplace(A_GuiControl, "locateButton", "")]
 	
-	name := stepWizard.softwareName(definition)
-	executable := findSoftware(this.SetupWizard.Definition, name)
+	protectionOn()
 	
-	if executable
-		stepWizard.softwareLocate(definition, executable)
-	else {
-		protectionOn()
+	try {
+		title := substituteVariables(translate("Select %name% executable..."), {name: name})
 		
-		try {
-			title := substituteVariables(translate("Select %name% executable..."), {name: name})
-			
-			FileSelectFile file, 1, , %title%, Executable (*.exe)
-			
-			if (file != "")
-				stepWizard.softwareLocate(definition, file)
-		}
-		finally {
-			protectionOff()
-		}
+		FileSelectFile file, 1, , %title%, Executable (*.exe)
+		
+		if (file != "")
+			wizard.locateSoftware(name, file)
+	}
+	finally {
+		protectionOff()
 	}
 }
 

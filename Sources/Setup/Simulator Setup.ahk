@@ -925,6 +925,19 @@ class ModulesStepWizard extends StepWizard {
 		static infoText11
 		static infoText12
 		
+		static moduleCheck1
+		static moduleCheck2
+		static moduleCheck3
+		static moduleCheck4
+		static moduleCheck5
+		static moduleCheck6
+		static moduleCheck7
+		static moduleCheck8
+		static moduleCheck9
+		static moduleCheck10
+		static moduleCheck11
+		static moduleCheck12
+		
 		definition := this.Definition
 		
 		startY := y
@@ -959,7 +972,7 @@ class ModulesStepWizard extends StepWizard {
 			
 			Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDiconHandle Hidden, %kResourcesDirectory%Setup\Images\Module.png
 			Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h30 HWNDlabelHandle Hidden, % label
-			Gui %window%:Add, CheckBox, Checked%selected% x%checkX% y%y% w23 h23 HWNDcheckBoxHandle Hidden gupdateSelectedModules
+			Gui %window%:Add, CheckBox, Checked%selected% x%checkX% y%y% w23 h23 HWNDcheckBoxHandle VmoduleCheck%A_Index% Hidden gupdateSelectedModules
 			Gui %window%:Add, ActiveX, x%x% yp+33 w%width% h120 HWNDinfoTextHandle VinfoText%A_Index% Hidden, shell explorer
 
 			html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
@@ -1018,13 +1031,16 @@ class ModulesStepWizard extends StepWizard {
 		Loop % definition.Length()
 		{
 			variable := this.iModuleSelectors[A_Index]
+			name := definition[A_Index]
 			
-			GuiControlGet %variable%
+			GuiControlGet checked, , %variable%
 			
-			this.SetupWizard.selectModule(definition[A_Index], %variable%, false)
+			if (checked != this.SetupWizard.isModuleSelected(name)) {
+				this.SetupWizard.selectModule(name, checked)
+				
+				return
+			}
 		}
-		
-		this.SetupWizard.updateState()
 	}
 }
 

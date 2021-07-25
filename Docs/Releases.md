@@ -1,3 +1,7 @@
+## 3.3.1-release 07/25/21
+
+  1. Bugfix for voice service default selection
+
 ## 3.3.0-release 07/23/21
 
   1. Bugfixes, as always

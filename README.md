@@ -33,7 +33,7 @@ None for the moment...
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[3.3.0-release](https://cntr.click/YnK4h0m) (New features: Audio post processing for team radio voice, File location refactoring, Use Azure Service for speech synthesis, New "raceAssistantService" parameter for the "Race Engineer" and "Race Strategist" plugins.)
+[3.3.1-release](https://cntr.click/Gvk9FKc) (New features of Version 3.3.0: Audio post processing for team radio voice, File location refactoring, Use Azure Service for speech synthesis, New "raceAssistantService" parameter for the "Race Engineer" and "Race Strategist" plugins. **Version 3.1.1 is a maintenance release for 3.3.0 with a fix for default voice service selection.**)
 
 Once again: Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-330) of this version and all the versions you might have skipped, before installing and using this version.
 

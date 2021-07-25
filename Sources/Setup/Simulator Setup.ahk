@@ -519,14 +519,17 @@ class SetupWizard extends ConfigurationItem {
 		}
 		
 		this.iStep := step
-		this.iPage := page
 		
 		if change
 			this.Step.show()
 		
 		this.Step.showPage(page)
 		
+		this.iPage := page
+		
 		this.updateState()
+		
+		this.saveKnowledgeBase()
 	}
 	
 	previousPage() {
@@ -543,8 +546,6 @@ class SetupWizard extends ConfigurationItem {
 		
 		if this.getNextPage(step, page)
 			this.showPage(step, page)
-		
-		this.saveKnowledgeBase()
 	}
 
 	updateState() {
@@ -576,15 +577,17 @@ class SetupWizard extends ConfigurationItem {
 	}
 	
 	selectModule(module, selected, update := true) {
-		this.KnowledgeBase.setFact("Module." . module . ".Selected", selected != false)
-		
-		if update
-			this.updateState()
-		else {
-			this.KnowledgeBase.produce()
-		
-			if this.Debug[kDebugKnowledgeBase]
-				this.dumpKnowledge(this.KnowledgeBase)
+		if (this.isModuleSelected(module) != (selected != false)) {
+			this.KnowledgeBase.setFact("Module." . module . ".Selected", selected != false)
+			
+			if update
+				this.updateState()
+			else {
+				this.KnowledgeBase.produce()
+			
+				if this.Debug[kDebugKnowledgeBase]
+					this.dumpKnowledge(this.KnowledgeBase)
+			}
 		}
 	}
 	
@@ -631,16 +634,18 @@ class SetupWizard extends ConfigurationItem {
 	}
 	
 	selectApplication(application, selected, update := true) {
-		if this.isApplicationOptional(application) {
-			this.KnowledgeBase.setFact("Application." . application . ".Selected", selected != false)
-			
-			if update
-				this.updateState()
-			else {
-				this.KnowledgeBase.produce()
+		if (this.isApplicationSelected(application) != (selected != false)) {
+			if this.isApplicationOptional(application) {
+				this.KnowledgeBase.setFact("Application." . application . ".Selected", selected != false)
 				
-				if this.Debug[kDebugKnowledgeBase]
-					this.dumpKnowledge(this.KnowledgeBase)
+				if update
+					this.updateState()
+				else {
+					this.KnowledgeBase.produce()
+					
+					if this.Debug[kDebugKnowledgeBase]
+						this.dumpKnowledge(this.KnowledgeBase)
+				}
 			}
 		}
 	}
@@ -1410,86 +1415,89 @@ class ApplicationsStepWizard extends StepWizard {
 		
 		base.showPage(page)
 		
-		static first := true
-	
-		if !this.iSimulatorsListView
-			first := true
+		static first1 := true
+		static first2 := true
 		
 		icons := []
 		rows := []
 			
-		Gui ListView, % this.iSimulatorsListView
-		
-		LV_Delete()
-		
-		wizard := this.SetupWizard
-		definition := this.Definition
-		
-		for simulator, descriptor in getConfigurationSectionValues(wizard.Definition, definition[1]) {
-			if wizard.isApplicationInstalled(simulator) {
-				descriptor := string2Values("|", descriptor)
+		if (page == 1) {
+			Gui ListView, % this.iSimulatorsListView
 			
-				executable := wizard.applicationPath(simulator)
-				
-				iconFile := findInstallProperty(simulator, "DisplayIcon")
-				
-				if iconFile
-					icons.Push(iconFile)
-				else if executable
-					icons.Push(executable)
-				else
-					icons.Push("")
-				
-				rows.Push(Array((wizard.isApplicationSelected(simulator) ? "Check Icon" : "Icon") . (rows.Length() + 1), simulator, executable ? executable : translate("Not installed")))
-			}
-		}
-		
-		listViewIcons := IL_Create(icons.Length())
+			LV_Delete()
 			
-		for ignore, icon in icons
-			IL_Add(listViewIcons, icon)
-		
-		LV_SetImageList(listViewIcons)
-		
-		for ignore, row in rows
-			LV_Add(row*)
-		
-		if first {
-			LV_ModifyCol(1, "AutoHdr")
-			LV_ModifyCol(2, "AutoHdr")
-		}
-		
-		Gui ListView, % this.iApplicationsListView
-		
-		icons := []
-		
-		LV_Delete()
-		
-		for ignore, section in string2Values(",", definition[2]) {
-			category := ConfigurationItem.splitDescriptor(section)[2]
-		
-			for application, descriptor in getConfigurationSectionValues(wizard.Definition, section) {
-				if (wizard.isApplicationInstalled(application) || !wizard.isApplicationOptional(application)) {
+			wizard := this.SetupWizard
+			definition := this.Definition
+			
+			for simulator, descriptor in getConfigurationSectionValues(wizard.Definition, definition[1]) {
+				if wizard.isApplicationInstalled(simulator) {
 					descriptor := string2Values("|", descriptor)
 				
-					executable := wizard.applicationPath(application)
-				
-					LV_Add(wizard.isApplicationSelected(application) ? "Check" : "", category, application, executable ? executable : translate("Not installed"))
+					executable := wizard.applicationPath(simulator)
+					
+					iconFile := findInstallProperty(simulator, "DisplayIcon")
+					
+					if iconFile
+						icons.Push(iconFile)
+					else if executable
+						icons.Push(executable)
+					else
+						icons.Push("")
+					
+					rows.Push(Array((wizard.isApplicationSelected(simulator) ? "Check Icon" : "Icon") . (rows.Length() + 1), simulator, executable ? executable : translate("Not installed")))
 				}
 			}
+			
+			listViewIcons := IL_Create(icons.Length())
+				
+			for ignore, icon in icons
+				IL_Add(listViewIcons, icon)
+			
+			LV_SetImageList(listViewIcons)
+			
+			for ignore, row in rows
+				LV_Add(row*)
+			
+			if first1 {
+				LV_ModifyCol(1, "AutoHdr")
+				LV_ModifyCol(2, "AutoHdr")
+				
+				first1 := false
+			}
 		}
-		
-		if first {
-			LV_ModifyCol(1, "AutoHdr")
-			LV_ModifyCol(2, "AutoHdr")
-			LV_ModifyCol(3, "AutoHdr")
+		else if (page == 2) {
+			Gui ListView, % this.iApplicationsListView
+			
+			icons := []
+			
+			LV_Delete()
+			
+			for ignore, section in string2Values(",", definition[2]) {
+				category := ConfigurationItem.splitDescriptor(section)[2]
+			
+				for application, descriptor in getConfigurationSectionValues(wizard.Definition, section) {
+					if (wizard.isApplicationInstalled(application) || !wizard.isApplicationOptional(application)) {
+						descriptor := string2Values("|", descriptor)
+					
+						executable := wizard.applicationPath(application)
+					
+						LV_Add(wizard.isApplicationSelected(application) ? "Check" : "", category, application, executable ? executable : translate("Not installed"))
+					}
+				}
+			}
+			
+			if first2 {
+				LV_ModifyCol(1, "AutoHdr")
+				LV_ModifyCol(2, "AutoHdr")
+				LV_ModifyCol(3, "AutoHdr")
+				
+				first2 := false
+			}
 		}
-		
-		first := false
 	}
 	
 	hidePage(page) {
-		this.updateSelectedApplications()
+		this.updateSelectedApplications(page)
 		
 		base.hidePage(page)
 	}
@@ -1516,39 +1524,37 @@ class ApplicationsStepWizard extends StepWizard {
 		}
 	}
 
-	updateSelectedApplications() {
+	updateSelectedApplications(page) {
 		wizard := this.SetupWizard
 		
-		for ignore, listView in [this.iSimulatorsListView, this.iApplicationsListView] {
-			Gui ListView, % listView
-			
-			column := A_Index
-			
-			checked := {}
+		Gui ListView, % ((page == 1) ? [this.iSimulatorsListView] : [this.iApplicationsListView])
 		
-			row := 0
-			
-			Loop {
-				row := LV_GetNext(row, "C")
-			
-				if row {
-					LV_GetText(name, row, column)
-					
-					checked[name] := true
-				}
-				else
-					break
-			}
-			
-			Loop % LV_GetCount()
-			{
-				LV_GetText(name, A_Index, column)
+		column := ((page == 1) ? 1 : 2)
+		
+		checked := {}
+	
+		row := 0
+		
+		Loop {
+			row := LV_GetNext(row, "C")
+		
+			if row {
+				LV_GetText(name, row, column)
 				
-				if wizard.isApplicationOptional(name)
-					wizard.selectApplication(name, checked.HasKey(name) ? checked[name] : false, false)
-				else 
-					LV_Modify(A_Index, "Check")
+				checked[name] := true
 			}
+			else
+				break
+		}
+		
+		Loop % LV_GetCount()
+		{
+			LV_GetText(name, A_Index, column)
+	
+			if wizard.isApplicationOptional(name)
+				wizard.selectApplication(name, checked.HasKey(name) ? checked[name] : false, false)
+			else 
+				LV_Modify(A_Index, "Check")
 		}
 			
 		wizard.updateState()
@@ -1596,7 +1602,9 @@ updateSelectedModules() {
 }
 
 updateSelectedApplications() {
-	SetupWizard.Instance.StepWizards["Applications"].updateSelectedApplications()
+	wizard := SetupWizard.Instance
+	
+	wizard.StepWizards["Applications"].updateSelectedApplications(wizard.Page)
 }
 
 installSoftware() {

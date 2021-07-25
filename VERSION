@@ -1,14 +1,14 @@
 [Development]
-Version=3.3.1-relese
-Target=3.3.1-release
+Version=3.5.0-dev
+Target=3.5.0-release
 Date=07/25/2021
-Changes=Bugfix for Azure default handling
+Changes=
 [Release]
 Version=3.3.1-release
 Date=07/25/2021
 Changes=Bugfix for Azure default handling
 [Current]
-Type=Release
+Type=Development
 [Version]
 Release=3.3.1-release
-Development=3.3.1-release
+Development=3.5.0-dev

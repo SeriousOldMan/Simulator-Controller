@@ -548,6 +548,7 @@ class Literal extends Primary {
 	}
 	
 	toString(factsOrResultSet := "__NotInitialized__") {
+		; return RegExReplace(this.Literal, "([^\\]) ", "$1\ ")
 		return this.Literal
 	}
 	
@@ -582,6 +583,12 @@ class Action {
 class CallAction extends Action {
 	iFunction := kNotInitialized
 	iArguments := []
+	
+	Action[] {
+		Get {
+			return kCall
+		}
+	}
 	
 	Function[variablesOrFacts := "__NotInitialized__"] {
 		Get {
@@ -641,10 +648,10 @@ class CallAction extends Action {
 	toString(facts := "__NotInitialized__") {
 		arguments := []
 		
-		for ignore, argument in this.Arguments
+		for index, argument in this.Arguments
 			arguments.Push(argument.toString(facts))
 			
-		return ("(Call: " .  values2String(", ", this.Function.toString(facts), arguments*) . ")")
+		return ("(" . this.Action . " " .  this.Function.toString(facts) . "(" . values2String(", ", arguments*) . "))")
 	}
 }
 
@@ -654,6 +661,12 @@ class CallAction extends Action {
 
 class ProveAction extends CallAction {
 	iProveAll := false
+	
+	Action[] {
+		Get {
+			return (this.iProveAll ? kProveAll : kProve)
+		}
+	}
 	
 	Functor[variablesOrFacts := "__NotInitialized__"] {
 		Get {
@@ -677,7 +690,7 @@ class ProveAction extends CallAction {
 			if isInstance(argument, Variable)
 				arguments.Push(new Literal(argument.toString(variables)))
 			else
-				arguments.Push(new Literal(argument.toString(facts)))
+				arguments.Push(argument.substituteVariables(variables))
 		
 		goal := new Compound(isInstance(this.Functor, Variable) ? this.Functor[variables] : this.Functor[facts], arguments)
 		
@@ -690,15 +703,6 @@ class ProveAction extends CallAction {
 			Loop
 				if !resultSet.nextResult()
 					break
-	}
-	
-	toString(facts := "__NotInitialized__") {
-		arguments := []
-		
-		for ignore, argument in this.Arguments
-			arguments.Push(argument.toString(facts))
-			
-		return ("(Prove: " .  values2String(", ", this.Functor.toString(facts), arguments*) . ")")
 	}
 }
 
@@ -2749,7 +2753,7 @@ class Rules {
 			Loop {
 				if !candidate {
 					if last
-						new Production(rule).insertAfter(last)
+						new this.Production(rule, last)
 					else
 						this.iProductions := new Production(rule)
 					
@@ -2758,11 +2762,13 @@ class Rules {
 					break
 				}
 				else if (priority > candidate.Rule.Priority) {
-					production := new Production(rule, last)
+					newProduction := new this.Production(rule)
 					
-					if !last
-						this.iProductions := production
-						
+					newProduction.insertBefore(candidate)
+					
+					if (this.iProductions == candidate)
+						this.iProductions := newProduction
+					
 					this.iGeneration += 1
 					
 					break
@@ -3271,21 +3277,29 @@ class RuleCompiler {
 	}
 	
 	readActions(ByRef text, ByRef nextCharIndex) {
+		local action
+		
 		actions := []
 		
 		Loop {
 			this.skipDelimiter("(", text, nextCharIndex)
 			
-			arguments := Array(this.readLiteral(text, nextCharIndex))
+			action := this.readLiteral(text, nextCharIndex)
 			
-			Loop {
-				if ((A_Index > 1) && !this.skipDelimiter(",", text, nextCharIndex, false))
-					break
+			if inList([kCall, kProve, kProveAll], action)
+				actions.Push(Array(action, this.readCompound(text, nextCharIndex)))
+			else {
+				arguments := Array(action)
 				
-				arguments.Push(this.readLiteral(text, nextCharIndex))
+				Loop {
+					if ((A_Index > 1) && !this.skipDelimiter(",", text, nextCharIndex, false))
+						break
+					
+					arguments.Push(this.readLiteral(text, nextCharIndex))
+				}
+				
+				actions.Push(arguments)
 			}
-			
-			actions.Push(arguments)
 			
 			this.skipDelimiter(")", text, nextCharIndex)
 			
@@ -3341,17 +3355,33 @@ class RuleCompiler {
 		this.skipWhiteSpace(text, nextCharIndex)
 		
 		beginCharIndex := nextCharIndex
+		quoted := false
 		
 		Loop {
 			character := SubStr(text, nextCharIndex, 1)
+		
+			if (character == "\") {
+				nextCharIndex := nextCharIndex + 2
+				
+				quoted := true
+				
+				continue
+			}
 			
 			if (InStr(delimiters, character) || (nextCharIndex > length)) {
 				literal := SubStr(text, beginCharIndex, nextCharIndex - beginCharIndex)
 				
-				if (literal = kTrue)
+				if (delimiters == """")
+					return literal
+				else if (literal = kTrue)
 					return true
 				else if (literal = kFalse)
 					return false
+				else if quoted {
+					Random rand, 1, 100000
+				
+					return StrReplace(StrReplace(StrReplace(literal, "\\", "###" . rand . "###"), "\", ""), "###" . rand . "###", "\")
+				}
 				else
 					return literal
 			}
@@ -3654,35 +3684,46 @@ class PrimaryParser extends Parser {
 
 class ActionParser extends Parser {
 	parse(expressions) {
+		local compound
+	
 		local action := expressions[1]
-		
-		argument := this.Compiler.createPrimaryParser(expressions[2], this.Variables).parse(expressions[2])
 		
 		switch action {
 			case kCall:
-				return new CallAction(argument, this.parseArguments(expressions, 3))
+				compound := this.Compiler.createCompoundParser(expressions[2]).parse(expressions[2])
+				
+				return new CallAction(new Literal(compound.Functor), compound.Arguments)
 			case kProve:
-				return new ProveAction(argument, this.parseArguments(expressions, 3))
+				compound := this.Compiler.createCompoundParser(expressions[2]).parse(expressions[2])
+				
+				return new ProveAction(new Literal(compound.Functor), compound.Arguments)
 			case kProveAll:
-				return new ProveAction(argument, this.parseArguments(expressions, 3), true)
-			case kSet:
-				arguments := this.parseArguments(expressions, 3)
+				compound := this.Compiler.createCompoundParser(expressions[2]).parse(expressions[2])
 				
-				if (arguments.Length() = 1)
-					return new SetFactAction(argument, arguments[1])
-				else if (arguments.Length() > 1)
-					return new SetComposedFactAction(argument, arguments*)
-				else
-					return new SetFactAction(argument)
-			case kClear:
-				arguments := this.parseArguments(expressions, 3)
-				
-				if (arguments.Length() > 0)
-					return new ClearComposedFactAction(argument, arguments*)
-				else
-					return new ClearFactAction(argument)
+				return new ProveAction(new Literal(compound.Functor), compound.Arguments, true)
 			default:
-				Throw "Unknown action type """ . action . """ detected in ActionParser.parse..."
+				argument := this.Compiler.createPrimaryParser(expressions[2], this.Variables).parse(expressions[2])
+		
+				switch action {
+					case kSet:
+						arguments := this.parseArguments(expressions, 3)
+						
+						if (arguments.Length() = 1)
+							return new SetFactAction(argument, arguments[1])
+						else if (arguments.Length() > 1)
+							return new SetComposedFactAction(argument, arguments*)
+						else
+							return new SetFactAction(argument)
+					case kClear:
+						arguments := this.parseArguments(expressions, 3)
+						
+						if (arguments.Length() > 0)
+							return new ClearComposedFactAction(argument, arguments*)
+						else
+							return new ClearFactAction(argument)
+					default:
+						Throw "Unknown action type """ . action . """ detected in ActionParser.parse..."
+				}
 		}
 	}
 	

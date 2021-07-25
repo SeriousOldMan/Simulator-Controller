@@ -139,7 +139,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		Gui %window%:Add, Edit, x134 yp-18 w314 h21 VsoXPathEdit, %soXPathEdit%
 		Gui %window%:Add, Button, x450 yp w23 h23 gchooseSoXPath VsoXPathButton, % translate("...")
 
-		recognizers := new SpeechRecognizer().getRecognizerList().Clone()
+		recognizers := new SpeechRecognizer(false, false, true).getRecognizerList().Clone()
 		
 		Loop % recognizers.Length()
 			recognizers[A_Index] := recognizers[A_Index].Name
@@ -433,7 +433,7 @@ showWidgets(widgets) {
 		for ignore, widgetPart in widget {
 			GuiControl Enable, %widgetPart%
 			GuiControl Show, %widgetPart%
-	}
+		}
 }
 
 hideWidgets(widgets) {
@@ -441,7 +441,7 @@ hideWidgets(widgets) {
 		for ignore, widgetPart in widget {
 			GuiControl Disable, %widgetPart%
 			GuiControl Hide, %widgetPart%
-	}
+		}
 }
 
 translateWidgets(widgets, offset) {

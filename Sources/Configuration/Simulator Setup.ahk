@@ -934,6 +934,7 @@ class StartStepWizard extends StepWizard {
 	
 		text := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Start", "Start.Text." . getLanguage()))
 		image := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Start", "Start.Image"))
+		audio := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Start", "Start.Audio", false))
 		
 		text := "<div style='text-align: center' style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px'>" . text . "</div>"
 		
@@ -944,7 +945,21 @@ class StartStepWizard extends StepWizard {
 		imageViewer.Navigate("about:blank")
 		imageViewer.Document.Write(html)
 		
+		if audio
+			SoundPlay %audio%
+		
 		this.registerWidget(1, imageViewerHandle)
+	}
+	
+	hidePage(page) {
+		base.hidePage(page)
+		
+		try {
+			SoundPlay NonExistent.avi
+		}
+		catch exception {
+			; ignore
+		}
 	}
 }
 
@@ -1570,6 +1585,22 @@ class ApplicationsStepWizard extends StepWizard {
 class ButtonBoxStepWizard extends StepWizard {
 	iButtonBoxEditor := false
 	
+	iFunctionsListView := false
+	
+	class StepButtonBoxEditor extends ButtonBoxEditor {
+		configurationChanged(name) {
+			base.configurationChanged(name)
+			
+			configuration := newConfiguration()
+			
+			this.saveToConfiguration(configuration)
+			
+			callback := ObjBindMethod(SetupWizard.Instance.StepWizards["Button Box"], "configurationChanged", configuration)
+			
+			SetTimer %callback%, -50
+		}
+	}
+	
 	Pages[] {
 		Get {
 			definition := this.Definition
@@ -1579,9 +1610,43 @@ class ButtonBoxStepWizard extends StepWizard {
 	}
 	
 	createGui(wizard, x, y, width, height) {
+		local application
+		
+		static functionsInfoText
+		
+		labelY := y
+		
+		window := this.Window
+		
+		Gui %window%:Default
+		
+		functionsListViewHandle := false
+		functionsInfoTextHandle := false
+		
+		Gui %window%:Font, s9 Norm, Arial
+		
+		Gui Add, ListView, x%x% y%y% w%width% h400 -Multi -LV0x10 NoSort NoSortHdr HWNDfunctionsListViewHandle Hidden, % values2String("|", map(["Controller", "Function", "Number"], "translate")*)
+		
+		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Button Box", "Button Box.Info." . getLanguage()))
+		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px'>" . info . "</div>"
+		
+		Gui %window%:Add, ActiveX, x%x% yp+405 w%width% h70 HWNDfunctionsInfoTextHandle VfunctionsInfoText Hidden, shell explorer
+
+		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+
+		functionsInfoText.Navigate("about:blank")
+		functionsInfoText.Document.Write(html)
+		
+		this.ifunctionsListView := functionsListViewHandle
+		
+		this.registerWidgets(1, functionsListViewHandle, functionsInfoTextHandle)
 	}
 	
 	reset() {
+		base.reset()
+		
+		this.iFunctionsListView := false
+		
 		if this.iButtonBoxEditor {
 			this.iButtonBoxEditor.close(true)
 			
@@ -1595,9 +1660,11 @@ class ButtonBoxStepWizard extends StepWizard {
 		if !FileExist(kUserHomeDirectory . "Install\Button Box Configuration.ini")
 			FileCopy %kResourcesDirectory%Setup\Button Box Configuration.ini, %kUserHomeDirectory%Install\Button Box Configuration.ini
 			
-		this.iButtonBoxEditor := new ButtonBoxEditor("Default", this.SetupWizard.Configuration, kUserHomeDirectory . "Install\Button Box Configuration.ini", false)
+		this.iButtonBoxEditor := new this.StepButtonBoxEditor("Default", this.SetupWizard.Configuration, kUserHomeDirectory . "Install\Button Box Configuration.ini", false)
 		
 		this.iButtonBoxEditor.open(50)
+		
+		this.configurationChanged(readConfiguration(kUserHomeDirectory . "Install\Button Box Configuration.ini"))
 	}
 	
 	hidePage(page) {
@@ -1606,6 +1673,38 @@ class ButtonBoxStepWizard extends StepWizard {
 		this.iButtonBoxEditor := false
 		
 		base.hidePage(page)
+	}
+	
+	configurationChanged(configuration) {
+		local function
+		
+		controls := {}
+		
+		for control, descriptor in getConfigurationSectionValues(configuration, "Controls")
+			controls[control] := string2Values(";", descriptor)[1]
+		
+		window := this.Window
+		
+		Gui %window%:Default
+		
+		Gui ListView, % this.iFunctionsListView
+		
+		LV_Delete()
+		
+		for controller, definition in getConfigurationSectionValues(configuration, "Layouts") {
+			controller := ConfigurationItem.splitDescriptor(controller)
+		
+			if (controller[2] != "Layout") {
+				controller := controller[1]
+				
+				for ignore, function in string2Values(";", definition) {
+					function := ConfigurationItem.splitDescriptor(string2Values(",", function)[1])
+				
+					if (function && (funtion != ""))
+						LV_Add("", controller, translate(controls[function[1]]), function[2])
+				}
+			}
+		}
 	}
 }
 

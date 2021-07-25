@@ -201,6 +201,10 @@ class ButtonBoxEditor extends ConfigurationItem {
 		until this.iClosed
 	}
 	
+	configurationChanged(name) {
+		this.updateButtonBoxPreview(name)
+	}
+
 	updateButtonBoxPreview(name) {
 		configuration := newConfiguration()
 		
@@ -322,7 +326,7 @@ class ControlsList extends ConfigurationItemList {
 			first := false
 		}
 		
-		ButtonBoxEditor.Instance.updateButtonBoxPreview(LayoutsList.Instance.CurrentButtonBox)
+		ButtonBoxEditor.Instance.configurationChanged(LayoutsList.Instance.CurrentButtonBox)
 	}
 	
 	loadEditor(item) {
@@ -473,7 +477,7 @@ class LabelsList extends ConfigurationItemList {
 			first := false
 		}
 		
-		ButtonBoxEditor.Instance.updateButtonBoxPreview(LayoutsList.Instance.CurrentButtonBox)
+		ButtonBoxEditor.Instance.configurationChanged(LayoutsList.Instance.CurrentButtonBox)
 	}
 	
 	loadEditor(item) {
@@ -695,7 +699,7 @@ class LayoutsList extends ConfigurationItemList {
 			first := false
 		}
 		
-		ButtonBoxEditor.Instance.updateButtonBoxPreview(LayoutsList.Instance.CurrentButtonBox)
+		ButtonBoxEditor.Instance.configurationChanged(LayoutsList.Instance.CurrentButtonBox)
 	}
 	
 	loadEditor(item) {
@@ -754,7 +758,7 @@ class LayoutsList extends ConfigurationItemList {
 		preview := ButtonBoxEditor.Instance.ButtonBoxPreview
 		
 		if ((this.CurrentButtonBox != layoutNameEdit) || (!preview && (layoutNameEdit != "")) || (preview && (preview.Name != layoutNameEdit)))
-			ButtonBoxEditor.Instance.updateButtonBoxPreview(layoutNameEdit)
+			ButtonBoxEditor.Instance.configurationChanged(layoutNameEdit)
 	}
 	
 	addItem() {
@@ -765,7 +769,7 @@ class LayoutsList extends ConfigurationItemList {
 		preview := ButtonBoxEditor.Instance.ButtonBoxPreview
 		
 		if ((this.CurrentButtonBox != layoutNameEdit) || (!preview && (layoutNameEdit != "")) || (preview && (preview.Name != layoutNameEdit)))
-			ButtonBoxEditor.Instance.updateButtonBoxPreview(this.CurrentButtonBox)
+			ButtonBoxEditor.Instance.configurationChanged(this.CurrentButtonBox)
 	}
 	
 	clearEditor() {
@@ -898,7 +902,7 @@ class LayoutsList extends ConfigurationItemList {
 		
 		this.updateItem()
 		
-		ButtonBoxEditor.Instance.updateButtonBoxPreview(this.CurrentButtonBox)
+		ButtonBoxEditor.Instance.configurationChanged(this.CurrentButtonBox)
 	}
 	
 	changeControl(row, column, control, number := false) {

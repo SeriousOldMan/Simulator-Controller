@@ -2753,7 +2753,7 @@ class Rules {
 			Loop {
 				if !candidate {
 					if last
-						new this.Production(rule).insertAfter(last)
+						new this.Production(rule, last)
 					else
 						this.iProductions := new Production(rule)
 					
@@ -2762,11 +2762,13 @@ class Rules {
 					break
 				}
 				else if (priority > candidate.Rule.Priority) {
-					newProduction := new this.Production(rule, last)
+					newProduction := new this.Production(rule)
 					
-					if !last
+					newProduction.insertBefore(candidate)
+					
+					if (this.iProductions == candidate)
 						this.iProductions := newProduction
-						
+					
 					this.iGeneration += 1
 					
 					break

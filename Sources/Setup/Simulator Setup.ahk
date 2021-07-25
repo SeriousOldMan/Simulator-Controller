@@ -226,8 +226,9 @@ class SetupWizard extends ConfigurationItem {
 			if step
 				step.loadDefinition(definition, getConfigurationValue(definition, "Setup.Steps", "Step." . A_Index . "." . step.Step))
 		}
-		
-		this.KnowledgeBase.addFact("Initialize", true)
+
+		if !this.loadKnowledgeBase()
+			this.KnowledgeBase.addFact("Initialize", true)
 			
 		this.KnowledgeBase.produce()
 					
@@ -542,6 +543,8 @@ class SetupWizard extends ConfigurationItem {
 		
 		if this.getNextPage(step, page)
 			this.showPage(step, page)
+		
+		this.saveKnowledgeBase()
 	}
 
 	updateState() {
@@ -604,21 +607,23 @@ class SetupWizard extends ConfigurationItem {
 	locateSoftware(software, executable := false) {
 		local knowledgeBase := this.KnowledgeBase
 		
-		if !executable {
-			executable := findSoftware(this.Definition, software)
+		if !this.isSoftwareInstalled(software) {
+			if !executable {
+				executable := findSoftware(this.Definition, software)
+				
+				if (executable == "")
+					executable := false
+			}
+				
+			knowledgeBase.setFact("Software." . software . ".Installed", executable != false)
 			
-			if (executable == "")
-				executable := false
+			if (executable == true)
+				knowledgeBase.removeFact("Software." . software . ".Path")
+			else
+				knowledgeBase.setFact("Software." . software . ".Path", executable)
+			
+			this.updateState()
 		}
-			
-		knowledgeBase.setFact("Software." . software . ".Installed", executable != false)
-		
-		if (executable == true)
-			knowledgeBase.removeFact("Software." . software . ".Path")
-		else
-			knowledgeBase.setFact("Software." . software . ".Path", executable)
-		
-		this.updateState()
 	}
 	
 	softwarePath(software) {
@@ -627,7 +632,7 @@ class SetupWizard extends ConfigurationItem {
 	
 	selectApplication(application, selected, update := true) {
 		if this.isApplicationOptional(application) {
-			this.KnowledgeBase.setFact("Application." . module . ".Selected", selected != false)
+			this.KnowledgeBase.setFact("Application." . application . ".Selected", selected != false)
 			
 			if update
 				this.updateState()
@@ -655,7 +660,7 @@ class SetupWizard extends ConfigurationItem {
 	locateApplication(application, executable := false) {
 		local knowledgeBase := this.KnowledgeBase
 		
-		if !knowledgeBase.getValue("Application." . application . ".Installed", false) {
+		if !this.isApplicationInstalled(application) {
 			if !executable
 				for ignore, section in ["Applications.Simulators", "Applications.Core", "Applications.Feedback", "Applications.Other"] {
 					descriptor := getConfigurationValue(this.Definition, section, application, false)
@@ -664,6 +669,8 @@ class SetupWizard extends ConfigurationItem {
 						descriptor := string2Values("|", descriptor)
 						
 						executable := findSoftware(this.Definition, descriptor[1])
+						
+						break
 					}
 				}
 			
@@ -676,7 +683,7 @@ class SetupWizard extends ConfigurationItem {
 		}
 	}
 	
-	applicationPath(software) {
+	applicationPath(application) {
 		return this.KnowledgeBase.getValue("Application." . application . ".Path", false)
 	}
 	
@@ -706,6 +713,27 @@ class SetupWizard extends ConfigurationItem {
 		infoViewer.Document.Open()
 		infoViewer.Document.Write(html)
 		infoViewer.Document.Close()
+	}
+	
+	saveKnowledgeBase() {
+		savedKnowledgeBase := newConfiguration()
+		
+		setConfigurationSectionValues(savedKnowledgeBase, "Setup", this.KnowledgeBase.Facts.Facts)
+		
+		writeConfiguration(kUserHomeDirectory . "Install\Simulator Setup.data", savedKnowledgeBase)
+	}
+	
+	loadKnowledgeBase() {
+		local knowledgeBase = this.KnowledgeBase
+		
+		if FileExist(kUserHomeDirectory . "Install\Simulator Setup.data") {
+			for key, value in getConfigurationSectionValues(readConfiguration(kUserHomeDirectory . "Install\Simulator Setup.data"), "Setup")
+				knowledgeBase.setFact(key, value)
+			
+			return true
+		}
+		else
+			return false
 	}
 	
 	dumpKnowledge(knowledgeBase) {
@@ -779,10 +807,6 @@ class StepWizard extends ConfigurationItem {
 		base.__New(configuration)
 	}
 	
-	loadStepDefinition(definition) {
-		this.iDefinition := string2Values("|", definition)
-	}
-	
 	loadDefinition(definition, stepDefinition) {
 		local rule
 		local rules := {}
@@ -801,6 +825,10 @@ class StepWizard extends ConfigurationItem {
 				this.SetupWizard.addRule(rules[A_Index])
 		
 		this.loadStepDefinition(stepDefinition)
+	}
+	
+	loadStepDefinition(definition) {
+		this.iDefinition := string2Values("|", definition)
 	}
 	
 	getWorkArea(ByRef x, ByRef y, ByRef width, ByRef height) {
@@ -1278,7 +1306,7 @@ class ApplicationsStepWizard extends StepWizard {
 	
 	Pages[] {
 		Get {
-			return 1
+			return 2
 		}
 	}
 	
@@ -1309,12 +1337,12 @@ class ApplicationsStepWizard extends StepWizard {
 		
 		Gui %window%:Font, s9 Norm, Arial
 		
-		Gui Add, ListView, x%x% yp+33 w%width% h100 -Multi -LV0x10 Checked NoSort NoSortHdr HWNDsimulatorsListViewHandle Hidden, % values2String("|", map(["Simulation", "Executable"], "translate")*)
+		Gui Add, ListView, x%x% yp+33 w%width% h200 -Multi -LV0x10 Checked NoSort NoSortHdr HWNDsimulatorsListViewHandle Hidden, % values2String("|", map(["Simulation", "Path"], "translate")*)
 		
 		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Applications", "Applications.Simulators.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px'>" . info . "</div>"
 		
-		Gui %window%:Add, ActiveX, x%x% yp+105 w%width% h90 HWNDsimulatorsInfoTextHandle VsimulatorsInfoText Hidden, shell explorer
+		Gui %window%:Add, ActiveX, x%x% yp+205 w%width% h180 HWNDsimulatorsInfoTextHandle VsimulatorsInfoText Hidden, shell explorer
 
 		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
@@ -1330,8 +1358,6 @@ class ApplicationsStepWizard extends StepWizard {
 		applicationsListViewHandle := false
 		applicationsInfoTextHandle := false
 		
-		y += 240
-		
 		labelY := y + 5
 		
 		Gui %window%:Font, s12 Bold, Arial
@@ -1341,12 +1367,12 @@ class ApplicationsStepWizard extends StepWizard {
 		
 		Gui %window%:Font, s9 Norm, Arial
 		
-		Gui Add, ListView, x%x% yp+33 w%width% h100 -Multi -LV0x10 AltSubmit Checked NoSort NoSortHdr HWNDapplicationsListViewHandle GupdateSelectedApplications Hidden, % values2String("|", map(["Category", "Application", "Executable"], "translate")*)
+		Gui Add, ListView, x%x% yp+33 w%width% h200 -Multi -LV0x10 AltSubmit Checked NoSort NoSortHdr HWNDapplicationsListViewHandle GupdateSelectedApplications Hidden, % values2String("|", map(["Category", "Application", "Path"], "translate")*)
 		
 		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Applications", "Applications.Applications.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px'>" . info . "</div>"
 		
-		Gui %window%:Add, ActiveX, x%x% yp+105 w%width% h90 HWNDapplicationsInfoTextHandle VapplicationsInfoText Hidden, shell explorer
+		Gui %window%:Add, ActiveX, x%x% yp+205 w%width% h180 HWNDapplicationsInfoTextHandle VapplicationsInfoText Hidden, shell explorer
 
 		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
@@ -1355,13 +1381,14 @@ class ApplicationsStepWizard extends StepWizard {
 		
 		this.iApplicationsListView := applicationsListViewHandle
 		
-		this.registerWidgets(1, applicationsIconHandle, applicationsLabelHandle, applicationsListViewHandle, applicationsInfoTextHandle)
+		this.registerWidgets(2, applicationsIconHandle, applicationsLabelHandle, applicationsListViewHandle, applicationsInfoTextHandle)
 	}
 	
 	loadStepDefinition(definition) {
 		base.loadStepDefinition(definition)
 		
-		this.updateAvailableApplications()
+		if !FileExist(kUserHomeDirectory . "Install\Simulator Setup.data")
+			this.updateAvailableApplications(true)
 	}
 	
 	reset() {
@@ -1374,7 +1401,8 @@ class ApplicationsStepWizard extends StepWizard {
 	updateState() {
 		base.updateState()
 		
-		this.updateAvailableApplications()
+		if this.Definition
+			this.updateAvailableApplications()
 	}
 	
 	showPage(page) {
@@ -1412,7 +1440,7 @@ class ApplicationsStepWizard extends StepWizard {
 				else
 					icons.Push("")
 				
-				rows.Push(Array((wizard.SelectedApplication[simulator] ? "Check Icon" : "Icon") . (rows.Length() + 1), simulator, executable ? executable : translate("Not installed")))
+				rows.Push(Array((wizard.isApplicationSelected(simulator) ? "Check Icon" : "Icon") . (rows.Length() + 1), simulator, executable ? executable : translate("Not installed")))
 			}
 		}
 		
@@ -1466,17 +1494,25 @@ class ApplicationsStepWizard extends StepWizard {
 		base.hidePage(page)
 	}
 	
-	updateAvailableApplications() {
+	updateAvailableApplications(initialize := false) {
 		local application
 		
 		wizard := this.SetupWizard
 		definition := this.Definition
 		
-		for ignore, section in concatenate([definition[1]], definition[2]) {
+		for ignore, section in concatenate([definition[1]], string2Values(",", definition[2])) {
 			category := ConfigurationItem.splitDescriptor(section)[2]
 		
-			for application, descriptor in getConfigurationSectionValues(wizard.Definition, section)
-				wizard.locateApplication(string2Values("|", descriptor)[1])
+			for application, ignore in getConfigurationSectionValues(wizard.Definition, section) {
+				if !wizard.isApplicationInstalled(application) {
+					wizard.locateApplication(application)
+				
+					if (initialize && wizard.isApplicationInstalled(application))
+						wizard.selectApplication(application, true, false)
+				}
+				else if initialize
+					wizard.selectApplication(application, true, false)
+			}
 		}
 	}
 
@@ -1735,6 +1771,8 @@ initializeSimulatorSetup() {
 	
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Simulator Setup
+	
+	FileCreateDir %kUserHomeDirectory%Install
 	
 	protectionOn()
 	

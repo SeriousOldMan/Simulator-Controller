@@ -548,12 +548,8 @@ class Literal extends Primary {
 	}
 	
 	toString(factsOrResultSet := "__NotInitialized__") {
-		/*
-		if (InStr(this.Literal, A_Space) && (this.Literal[1] != """"))
-			return """" . this.Literal . """"
-		else
-		*/
-			return this.Literal
+		; return RegExReplace(this.Literal, "([^\\]) ", "$1\ ")
+		return this.Literal
 	}
 	
 	unify(choicePoint, term) {

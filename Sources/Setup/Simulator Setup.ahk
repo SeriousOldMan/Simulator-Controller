@@ -625,34 +625,23 @@ class SetupWizard extends ConfigurationItem {
 		return this.KnowledgeBase.getValue("Software." . software . ".Path", false)
 	}
 	
-	requireApplication(application, required, update := true) {
-		this.KnowledgeBase.setFact("Application." . module . ".Required", required != false)
-		
-		if update
-			this.updateState()
-		else {
-			this.KnowledgeBase.produce()
-		
-			if this.Debug[kDebugKnowledgeBase]
-				this.dumpKnowledge(this.KnowledgeBase)
-		}
-	}
-	
 	selectApplication(application, selected, update := true) {
-		this.KnowledgeBase.setFact("Application." . module . ".Selected", selected != false)
-		
-		if update
-			this.updateState()
-		else {
-			this.KnowledgeBase.produce()
+		if this.isApplicationOptional(application) {
+			this.KnowledgeBase.setFact("Application." . module . ".Selected", selected != false)
 			
-			if this.Debug[kDebugKnowledgeBase]
-				this.dumpKnowledge(this.KnowledgeBase)
+			if update
+				this.updateState()
+			else {
+				this.KnowledgeBase.produce()
+				
+				if this.Debug[kDebugKnowledgeBase]
+					this.dumpKnowledge(this.KnowledgeBase)
+			}
 		}
 	}
 	
-	isApplicationRequired(application) {
-		return this.KnowledgeBase.getValue("Application." . application . ".Required", false)
+	isApplicationOptional(application) {
+		return (this.KnowledgeBase.getValue("Application." . application . ".Requested", "OPTIONAL") = "OPTIONAL")
 	}
 	
 	isApplicationInstalled(application) {
@@ -661,6 +650,34 @@ class SetupWizard extends ConfigurationItem {
 	
 	isApplicationSelected(application) {
 		return this.KnowledgeBase.getValue("Application." . application . ".Selected", false)
+	}
+	
+	locateApplication(application, executable := false) {
+		local knowledgeBase := this.KnowledgeBase
+		
+		if !knowledgeBase.getValue("Application." . application . ".Installed", false) {
+			if !executable
+				for ignore, section in ["Applications.Simulators", "Applications.Core", "Applications.Feedback", "Applications.Other"] {
+					descriptor := getConfigurationValue(this.Definition, section, application, false)
+				
+					if descriptor {
+						descriptor := string2Values("|", descriptor)
+						
+						executable := findSoftware(this.Definition, descriptor[1])
+					}
+				}
+			
+			if executable {
+				knowledgeBase.setFact("Application." . application . ".Installed", true)
+				knowledgeBase.setFact("Application." . application . ".Path", executable)
+				
+				this.updateState()
+			}
+		}
+	}
+	
+	applicationPath(software) {
+		return this.KnowledgeBase.getValue("Application." . application . ".Path", false)
 	}
 	
 	setTitle(title) {
@@ -1324,7 +1341,7 @@ class ApplicationsStepWizard extends StepWizard {
 		
 		Gui %window%:Font, s9 Norm, Arial
 		
-		Gui Add, ListView, x%x% yp+33 w%width% h100 -Multi -LV0x10 Checked NoSort NoSortHdr HWNDapplicationsListViewHandle Hidden, % values2String("|", map(["Category", "Application", "Executable"], "translate")*)
+		Gui Add, ListView, x%x% yp+33 w%width% h100 -Multi -LV0x10 AltSubmit Checked NoSort NoSortHdr HWNDapplicationsListViewHandle GupdateSelectedApplications Hidden, % values2String("|", map(["Category", "Application", "Executable"], "translate")*)
 		
 		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Applications", "Applications.Applications.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px'>" . info . "</div>"
@@ -1341,17 +1358,10 @@ class ApplicationsStepWizard extends StepWizard {
 		this.registerWidgets(1, applicationsIconHandle, applicationsLabelHandle, applicationsListViewHandle, applicationsInfoTextHandle)
 	}
 	
-	setDefinition(definition) {
-		local rule
+	loadStepDefinition(definition) {
+		base.loadStepDefinition(definition)
 		
-		definition := string2Values("|", definition)
-		
-		base.setDefinition(definition)
-	
-		for ignore, rule in definition
-			this.iModuleApplications[string2Values("=>", StrReplace(StrReplace(rule, "[", ""), "]", ""))[1]] := string2Values("=>", StrReplace(StrReplace(rule, "[", ""), "]", ""))[2]
-		
-		this.updateSelectedApplications()
+		this.updateAvailableApplications()
 	}
 	
 	reset() {
@@ -1361,12 +1371,16 @@ class ApplicationsStepWizard extends StepWizard {
 		this.iApplicationsListView := false
 	}
 	
+	updateState() {
+		base.updateState()
+		
+		this.updateAvailableApplications()
+	}
+	
 	showPage(page) {
 		local application
 		
 		base.showPage(page)
-		
-		this.updateSelectedApplications(false)
 		
 		static first := true
 	
@@ -1381,24 +1395,26 @@ class ApplicationsStepWizard extends StepWizard {
 		LV_Delete()
 		
 		wizard := this.SetupWizard
+		definition := this.Definition
 		
-		for simulator, descriptor in getConfigurationSectionValues(wizard.Definition, "Installation.Simulators")
-			if this.SetupWizard.isApplicationSelected(simulator) {
+		for simulator, descriptor in getConfigurationSectionValues(wizard.Definition, definition[1]) {
+			if wizard.isApplicationInstalled(simulator) {
 				descriptor := string2Values("|", descriptor)
 			
-				executable := findSoftware(wizard.Definition, descriptor[1])
+				executable := wizard.applicationPath(simulator)
 				
-				if executable {
-					iconFile := findInstallProperty(simulator, "DisplayIcon")
-					
-					if iconFile
-						icons.Push(iconFile)
-					else
-						icons.Push(executable)
-					
-					rows.Push(Array((wizard.SelectedApplication[simulator] ? "Check Icon" : "Icon") . (rows.Length() + 1), simulator, executable ? executable : translate("Not installed")))
-				}
+				iconFile := findInstallProperty(simulator, "DisplayIcon")
+				
+				if iconFile
+					icons.Push(iconFile)
+				else if executable
+					icons.Push(executable)
+				else
+					icons.Push("")
+				
+				rows.Push(Array((wizard.SelectedApplication[simulator] ? "Check Icon" : "Icon") . (rows.Length() + 1), simulator, executable ? executable : translate("Not installed")))
 			}
+		}
 		
 		listViewIcons := IL_Create(icons.Length())
 			
@@ -1421,17 +1437,19 @@ class ApplicationsStepWizard extends StepWizard {
 		
 		LV_Delete()
 		
-		for category, section in {Core: "Installation.Core", Feedback: "Installation.Feedback", Other: "Installation.Other"} {
-			for application, descriptor in getConfigurationSectionValues(wizard.Definition, section)
-				if wizard.isApplicationSelected(application) {
+		for ignore, section in string2Values(",", definition[2]) {
+			category := ConfigurationItem.splitDescriptor(section)[2]
+		
+			for application, descriptor in getConfigurationSectionValues(wizard.Definition, section) {
+				if (wizard.isApplicationInstalled(application) || !wizard.isApplicationOptional(application)) {
 					descriptor := string2Values("|", descriptor)
 				
-					executable := findSoftware(wizard.Definition, descriptor[1])
+					executable := wizard.applicationPath(application)
 				
-					if (executable && (executable != true))
-						LV_Add(wizard.isApplicationSelected(application) ? "Check" : "", category, application, executable ? executable : translate("Not installed"))
+					LV_Add(wizard.isApplicationSelected(application) ? "Check" : "", category, application, executable ? executable : translate("Not installed"))
 				}
 			}
+		}
 		
 		if first {
 			LV_ModifyCol(1, "AutoHdr")
@@ -1443,59 +1461,61 @@ class ApplicationsStepWizard extends StepWizard {
 	}
 	
 	hidePage(page) {
-		this.updateSelectedApplications("Selection")
+		this.updateSelectedApplications()
 		
 		base.hidePage(page)
 	}
+	
+	updateAvailableApplications() {
+		local application
+		
+		wizard := this.SetupWizard
+		definition := this.Definition
+		
+		for ignore, section in concatenate([definition[1]], definition[2]) {
+			category := ConfigurationItem.splitDescriptor(section)[2]
+		
+			for application, descriptor in getConfigurationSectionValues(wizard.Definition, section)
+				wizard.locateApplication(string2Values("|", descriptor)[1])
+		}
+	}
 
-	updateSelectedApplications(update := true) {
+	updateSelectedApplications() {
 		wizard := this.SetupWizard
 		
-		if (update = "Selection") {
-			for ignore, listView in [this.iSimulatorsListView, this.iApplicationsListView] {
-				Gui ListView, % listView
-				
-				column := A_Index
-				
-				checked := {}
+		for ignore, listView in [this.iSimulatorsListView, this.iApplicationsListView] {
+			Gui ListView, % listView
 			
-				row := 0
-				
-				Loop {
-					row := LV_GetNext(row, "C")
-				
-					if row {
-						LV_GetText(name, row, column)
-						
-						checked[name] := true
-					}
-					else
-						break
-				}
-				
-				Loop % LV_GetCount()
-				{
-					LV_GetText(name, A_Index, column)
+			column := A_Index
+			
+			checked := {}
+		
+			row := 0
+			
+			Loop {
+				row := LV_GetNext(row, "C")
+			
+				if row {
+					LV_GetText(name, row, column)
 					
+					checked[name] := true
+				}
+				else
+					break
+			}
+			
+			Loop % LV_GetCount()
+			{
+				LV_GetText(name, A_Index, column)
+				
+				if wizard.isApplicationOptional(name)
 					wizard.selectApplication(name, checked.HasKey(name) ? checked[name] : false, false)
-				}
+				else 
+					LV_Modify(A_Index, "Check")
 			}
-			
-			wizard.updateState()
 		}
-		else
-			for category, section in {Simulators: "Installation.Simulators", Core: "Installation.Core", Feedback: "Installation.Feedback", Other: "Installation.Other"} {
-				for name, descriptor in getConfigurationSectionValues(wizard.Definition, section) {
-					if !wizard.SelectedApplications.HasKey(name) && this.SetupWizard.isApplicationSelected(name) {
-						descriptor := string2Values("|", descriptor)
-					
-						executable := findSoftware(wizard.Definition, descriptor[1])
-						
-						if executable
-							wizard.selectApplication(name, true, update)
-					}
-				}
-			}
+			
+		wizard.updateState()
 	}
 }
 
@@ -1537,6 +1557,10 @@ chooseLanguage() {
 
 updateSelectedModules() {
 	SetupWizard.Instance.StepWizards["Modules"].updateSelectedModules()
+}
+
+updateSelectedApplications() {
+	SetupWizard.Instance.StepWizards["Applications"].updateSelectedApplications()
 }
 
 installSoftware() {
@@ -1635,7 +1659,7 @@ findInstallProperty(name, property) {
 }
 
 findSoftware(definition, software) {
-	for ignore, section in ["Installation.Simulators", "Installation.Core", "Installation.Feedback", "Installation.Other", "Installation.Special"]
+	for ignore, section in ["Applications.Simulators", "Applications.Core", "Applications.Feedback", "Applications.Other", "Applications.Special"]
 		for name, descriptor in getConfigurationSectionValues(definition, section, Object()) {
 			descriptor := string2Values("|", descriptor)
 		

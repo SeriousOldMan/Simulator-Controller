@@ -37,6 +37,7 @@ ListLines Off					; Disable execution history
 
 #Include ..\Libraries\JSON.ahk
 #Include ..\Libraries\RuleEngine.ahk
+#Include Libraries\ButtonBoxEditor.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -725,14 +726,14 @@ class SetupWizard extends ConfigurationItem {
 		
 		setConfigurationSectionValues(savedKnowledgeBase, "Setup", this.KnowledgeBase.Facts.Facts)
 		
-		writeConfiguration(kUserHomeDirectory . "Install\Simulator Setup.data", savedKnowledgeBase)
+		writeConfiguration(kUserHomeDirectory . "Install\Install.data", savedKnowledgeBase)
 	}
 	
 	loadKnowledgeBase() {
 		local knowledgeBase = this.KnowledgeBase
 		
-		if FileExist(kUserHomeDirectory . "Install\Simulator Setup.data") {
-			for key, value in getConfigurationSectionValues(readConfiguration(kUserHomeDirectory . "Install\Simulator Setup.data"), "Setup")
+		if FileExist(kUserHomeDirectory . "Install\Install.data") {
+			for key, value in getConfigurationSectionValues(readConfiguration(kUserHomeDirectory . "Install\Install.data"), "Setup")
 				knowledgeBase.setFact(key, value)
 			
 			return true
@@ -1338,7 +1339,7 @@ class ApplicationsStepWizard extends StepWizard {
 		Gui %window%:Font, s12 Bold, Arial
 		
 		Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDsimulatorsIconHandle Hidden, %kResourcesDirectory%Setup\Images\Gaming Wheel.ico
-		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h30 HWNDsimulatorsLabelHandle Hidden, % translate("Detected Simulations")
+		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h30 HWNDsimulatorsLabelHandle Hidden, % translate("Installed Simulations")
 		
 		Gui %window%:Font, s9 Norm, Arial
 		
@@ -1368,7 +1369,7 @@ class ApplicationsStepWizard extends StepWizard {
 		Gui %window%:Font, s12 Bold, Arial
 		
 		Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDapplicationsIconHandle Hidden, %kResourcesDirectory%Setup\Images\Tool Chest.ico
-		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h30 HWNDapplicationsLabelHandle Hidden, % translate("Detected Applications && Tools")
+		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h30 HWNDapplicationsLabelHandle Hidden, % translate("Installed Applications && Tools")
 		
 		Gui %window%:Font, s9 Norm, Arial
 		
@@ -1558,6 +1559,53 @@ class ApplicationsStepWizard extends StepWizard {
 		}
 			
 		wizard.updateState()
+	}
+}
+
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; ButtonBoxStepWizard                                                     ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class ButtonBoxStepWizard extends StepWizard {
+	iButtonBoxEditor := false
+	
+	Pages[] {
+		Get {
+			definition := this.Definition
+			
+			return (this.SetupWizard.isModuleSelected(definition[1]) ? 1 : 0)
+		}
+	}
+	
+	createGui(wizard, x, y, width, height) {
+	}
+	
+	reset() {
+		if this.iButtonBoxEditor {
+			this.iButtonBoxEditor.close(true)
+			
+			this.iButtonBoxEditor := false
+		}		
+	}
+	
+	showPage(page) {
+		base.showPage(page)
+		
+		if !FileExist(kUserHomeDirectory . "Install\Button Box Configuration.ini")
+			FileCopy %kResourcesDirectory%Setup\Button Box Configuration.ini, %kUserHomeDirectory%Install\Button Box Configuration.ini
+			
+		this.iButtonBoxEditor := new ButtonBoxEditor("Default", this.SetupWizard.Configuration, kUserHomeDirectory . "Install\Button Box Configuration.ini", false)
+		
+		this.iButtonBoxEditor.open(50)
+	}
+	
+	hidePage(page) {
+		this.iButtonBoxEditor.close(true)
+		
+		this.iButtonBoxEditor := false
+		
+		base.hidePage(page)
 	}
 }
 
@@ -1793,6 +1841,7 @@ initializeSimulatorSetup() {
 		wizard.registerStepWizard(new ModulesStepWizard(wizard, "Modules", kSimulatorConfiguration))
 		wizard.registerStepWizard(new InstallationStepWizard(wizard, "Installation", kSimulatorConfiguration))
 		wizard.registerStepWizard(new ApplicationsStepWizard(wizard, "Applications", kSimulatorConfiguration))
+		wizard.registerStepWizard(new ButtonBoxStepWizard(wizard, "Button Box", kSimulatorConfiguration))
 	}
 	finally {
 		protectionOff()

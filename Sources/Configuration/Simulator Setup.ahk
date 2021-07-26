@@ -513,7 +513,8 @@ class SetupWizard extends ConfigurationItem {
 		GuiControl Disable, finishButton
 		
 		if this.Step {
-			this.Step.hidePage(this.Page)
+			if !this.Step.hidePage(this.Page)
+				return false
 			
 			if (step != this.Step)
 				hide := true
@@ -900,6 +901,8 @@ class StepWizard extends ConfigurationItem {
 			GuiControl Disable, %widget%
 			GuiControl Hide, %widget%
 		}
+		
+		return true
 	}
 	
 	updateState() {
@@ -952,14 +955,18 @@ class StartStepWizard extends StepWizard {
 	}
 	
 	hidePage(page) {
-		base.hidePage(page)
-		
-		try {
-			SoundPlay NonExistent.avi
+		if base.hidePage(page) {
+			try {
+				SoundPlay NonExistent.avi
+			}
+			catch exception {
+				; ignore
+			}
+			
+			return true
 		}
-		catch exception {
-			; ignore
-		}
+		else
+			return false
 	}
 }
 
@@ -1515,7 +1522,7 @@ class ApplicationsStepWizard extends StepWizard {
 	hidePage(page) {
 		this.updateSelectedApplications(page)
 		
-		base.hidePage(page)
+		return base.hidePage(page)
 	}
 	
 	updateAvailableApplications(initialize := false) {
@@ -1595,9 +1602,18 @@ class ButtonBoxStepWizard extends StepWizard {
 			
 			this.saveToConfiguration(configuration)
 			
-			callback := ObjBindMethod(SetupWizard.Instance.StepWizards["Button Box"], "configurationChanged", configuration)
+			protectionOn()
+	
+			oldGui := A_DefaultGui
 			
-			SetTimer %callback%, -50
+			try {
+				SetupWizard.Instance.StepWizards["Button Box"].configurationChanged(configuration)
+			}
+			finally {
+				protectionOff()
+				
+				Gui %oldGui%:Default
+			}
 		}
 	}
 	
@@ -1625,12 +1641,12 @@ class ButtonBoxStepWizard extends StepWizard {
 		
 		Gui %window%:Font, s9 Norm, Arial
 		
-		Gui Add, ListView, x%x% y%y% w%width% h400 -Multi -LV0x10 NoSort NoSortHdr HWNDfunctionsListViewHandle Hidden, % values2String("|", map(["Controller", "Function", "Number"], "translate")*)
+		Gui Add, ListView, x%x% y%y% w%width% h300 -Multi -LV0x10 NoSort NoSortHdr HWNDfunctionsListViewHandle Hidden, % values2String("|", map(["Controller / Button Box", "Function", "Number", "Conflict"], "translate")*)
 		
-		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Button Box", "Button Box.Info." . getLanguage()))
+		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Button Box", "Button Box.Functions.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px'>" . info . "</div>"
 		
-		Gui %window%:Add, ActiveX, x%x% yp+405 w%width% h70 HWNDfunctionsInfoTextHandle VfunctionsInfoText Hidden, shell explorer
+		Gui %window%:Add, ActiveX, x%x% yp+305 w%width% h170 HWNDfunctionsInfoTextHandle VfunctionsInfoText Hidden, shell explorer
 
 		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
@@ -1668,16 +1684,55 @@ class ButtonBoxStepWizard extends StepWizard {
 	}
 	
 	hidePage(page) {
-		this.iButtonBoxEditor.close(true)
+		if this.conflictingFunctions(readConfiguration(kUserHomeDirectory . "Install\Button Box Configuration.ini")) {
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+			title := translate("Error")
+			MsgBox 262160, %title%, % translate("There are still conflicting functions - please correct...")
+			OnMessage(0x44, "")
+			
+			return false
+		}
 		
-		this.iButtonBoxEditor := false
+		if base.hidePage(page) {
+			this.iButtonBoxEditor.close(true)
+			
+			this.iButtonBoxEditor := false
+			
+			return true
+		}
+		else
+			return false
+	}
+	
+	conflictingFunctions(configuration) {
+		functions := {}
+		conflict := false
 		
-		base.hidePage(page)
+		for controller, definition in getConfigurationSectionValues(configuration, "Layouts") {
+			controller := ConfigurationItem.splitDescriptor(controller)
+		
+			if (controller[2] != "Layout") {
+				controller := controller[1]
+				
+				definition := string2Values(";", definition)
+				
+				for ignore, theFunction in definition
+					theFunction := string2Values(",", theFunction)
+					theFunction := theFunction[1]
+				
+					if (theFunction != "")
+						if !functions.HasKey(theFunction)
+							functions[theFunction] := [controller]
+						else {
+							functions[theFunction].Push(controller)
+						
+							conflict := true
+						}
+			}
+		}
 	}
 	
 	configurationChanged(configuration) {
-		local function
-		
 		controls := {}
 		
 		for control, descriptor in getConfigurationSectionValues(configuration, "Controls")
@@ -1691,19 +1746,39 @@ class ButtonBoxStepWizard extends StepWizard {
 		
 		LV_Delete()
 		
+		lastController := false
+		
+		conflicts := this.conflictingFunctions(configuration)
+		
 		for controller, definition in getConfigurationSectionValues(configuration, "Layouts") {
 			controller := ConfigurationItem.splitDescriptor(controller)
 		
 			if (controller[2] != "Layout") {
 				controller := controller[1]
+			
+				for ignore, theFunction in string2Values(";", definition) {
+					theFunction := string2Values(",", theFunction)
+					theFunction := theFunction[1]
 				
-				for ignore, function in string2Values(";", definition) {
-					function := ConfigurationItem.splitDescriptor(string2Values(",", function)[1])
+					if (theFunction != "") {
+						conflict := ""
+						
+						if (conflicts && conflicts[theFunction].Length() > 1)
+							conflict := translate("This function is used multiple times. Please correct!")
+						
+						theFunction := ConfigurationItem.splitDescriptor(theFunction)
+					
+						first := (controller != lastController)
+						lastController := controller
 				
-					if (function && (funtion != ""))
-						LV_Add("", controller, translate(controls[function[1]]), function[2])
+						LV_Add("", (first ? controller : ""), controls[theFunction[1]], theFunction[2], conflict)
+					}
 				}
 			}
+			
+			LV_ModifyCol(1, "AutoHdr")
+			LV_ModifyCol(2, "AutoHdr")
+			LV_ModifyCol(3, "AutoHdr")
 		}
 	}
 }

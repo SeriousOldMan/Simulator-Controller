@@ -725,17 +725,16 @@ class SetupWizard extends ConfigurationItem {
 		}
 		
 		for ignore, function in functions {
-			if IsObject(function)
-				function := values2String("|", function*)
-			else
-				function := Array(function)
+			function := IsObject(function) ? function.Clone() : Array(function)
 			
 			name := function[1]
 			
 			function.RemoveAt(1)
 			
 			knowledgeBase.addFact("Controller.Function." . A_Index, name)
-			knowledgeBase.addFact("Controller.Function." . name . ".Keys", values2String("|", function))
+			
+			if (function.Length() > 0)
+				knowledgeBase.addFact("Controller.Function." . name . ".Keys", values2String("|", function*))
 		}
 		
 		knowledgeBase.setFact("Controller.Function.Count", functions.Length())
@@ -1783,12 +1782,18 @@ class ButtonBoxStepWizard extends StepWizard {
 	controllerFunctions(configuration) {
 		local function
 		
+		controls := {}
 		functions := {}
+		
+		for control, descriptor in getConfigurationSectionValues(configuration, "Controls")
+			controls[control] := string2Values(";", descriptor)[1]
 		
 		for controller, definition in getConfigurationSectionValues(configuration, "Layouts")
 			if (ConfigurationItem.splitDescriptor(controller)[2] != "Layout")
 				for ignore, function in string2Values(";", definition) {
 					function := string2Values(",", function)[1]
+					function := ConfigurationItem.splitDescriptor(function)
+					function := ConfigurationItem.descriptor(controls[function[1]], function[2])
 				
 					if (function != "")
 						if this.iFunctionKeys.HasKey(function)
@@ -1869,14 +1874,19 @@ class ButtonBoxStepWizard extends StepWizard {
 							conflict := translate("Duplicate function detected. Please correct!")
 						
 						parts := ConfigurationItem.splitDescriptor(function)
-					
+						function := ConfigurationItem.descriptor(controls[parts[1]], parts[2])
+						
 						first := (controller != lastController)
 						lastController := controller
 				
 						functionKeys := wizard.getControllerFunctionKeys(function)
 						
-						keys := values2String(" | ", functionKeys*)
-						this.iFunctionKeys[function] := functionKeys
+						if (functionKeys.Length() > 0) {
+							keys := values2String(" | ", functionKeys*)
+							this.iFunctionKeys[function] := functionKeys
+						}
+						else
+							keys := ""
 						
 						LV_Add("", (first ? controller : ""), translate(controls[parts[1]]), parts[2], keys, conflict)
 					}
@@ -1926,13 +1936,18 @@ class ButtonBoxStepWizard extends StepWizard {
 		local controller
 		local number
 		
-		Gui ListView, % this.iFunctionsListView
+		wizard := this.SetupWizard
+			
+		SoundPlay %kResourcesDirectory%Sounds\Activated.wav
 		
 		if (firstHotkey == true) {
-			callback := ObjBindMethod(this, "registerHotkey", function, line, firstHotkey)
+			callback := ObjBindMethod(this, "registerHotkey", function, line, hotkey)
 		
-			this.SetupWizard.toggleKeyDetectord()
-			this.SetupWizard.toggleKeyDetector(callback)
+			wizard.toggleKeyDetector()
+			
+			Sleep 2000
+			
+			wizard.toggleKeyDetector(callback)
 			
 			return
 		}
@@ -1948,11 +1963,17 @@ class ButtonBoxStepWizard extends StepWizard {
 		
 		wizard.toggleKeyDetector()
 		
+		window := this.Window
+		
+		Gui %window%:Default
+		Gui ListView, % this.iFunctionsListView
+		
 		LV_GetText(controller, line, 1)
 		LV_GetText(function, line, 2)
 		LV_GetText(number, line, 3)
 		
-		LV_Modify(line, "", controller, function, number, hotykey)
+		LV_Modify(line, "", controller, function, number, hotkey)
+		LV_ModifyCol(4, "AutoHdr")
 	}
 }
 
@@ -2039,7 +2060,7 @@ updateFunctionKeys() {
 	wizard := SetupWizard.Instance
 	
 	if (A_GuiEvent = "DoubleClick") {
-		wizard.StepWizards["Button Box"].updateFunctionKeys(EventInfo)
+		wizard.StepWizards["Button Box"].updateFunctionKeys(A_EventInfo)
 		
 	}
 }
@@ -2047,12 +2068,12 @@ updateFunctionKeys() {
 stopKeyDetector() {
 	wizard := SetupWizard.Instance.StepWizards["Button Box"]
 	
-	if !wizard.iActiveKeyDetector
+	if !wizard.iKeyModeActive
 		SetTimer stopKeyDetector, Off
 	else if GetKeyState("Esc", "P") {
 		wizard.SetupWizard.toggleKeyDetector()
 	
-		wizard.iActiveKeyDetector
+		wizard.iKeyModeActive := false
 		
 		SetTimer stopKeyDetector, Off
 	}

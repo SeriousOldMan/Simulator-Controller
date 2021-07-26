@@ -483,6 +483,8 @@ setPTTHotkey(hotkey) {
 		
 		window := ConfigurationEditor.Instance.Window
 		
+		SoundPlay %kResourcesDirectory%Sounds\Activated.wav
+		
 		Gui %window%:Default
 		GuiControl Text, pushToTalkEdit, %pushToTalkEdit%
 		

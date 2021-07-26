@@ -274,6 +274,9 @@ showKeyDetector() {
 		found := false
 		
 		Loop {
+			if (vKeyDetectorCallback && (returnHotKey != vKeyDetectorCallback))
+				returnHotKey := vKeyDetectorCallback
+			
 			joystickNumber := joystickNumbers[1]
 			
 			joystickNumbers.RemoveAt(1)

@@ -37,6 +37,7 @@ ListLines Off					; Disable execution history
 
 #Include ..\Libraries\JSON.ahk
 #Include ..\Libraries\RuleEngine.ahk
+#Include Libraries\ConfigurationEditor.ahk
 #Include Libraries\ButtonBoxEditor.ahk
 
 
@@ -97,6 +98,8 @@ class SetupWizard extends ConfigurationItem {
 	iDefinition := false
 	iKnowledgeBase := false
 	
+	iCount := 0
+	
 	iSteps := {}
 	iStep := 0
 	iPage := 0
@@ -131,6 +134,12 @@ class SetupWizard extends ConfigurationItem {
 		}
 	}
 	
+	Count[] {
+		Get {
+			return this.iCount
+		}
+	}
+	
 	Steps[step := false] {
 		Get {
 			if step
@@ -143,7 +152,7 @@ class SetupWizard extends ConfigurationItem {
 	StepWizards[descriptor := false] {
 		Get {
 			if descriptor
-				return this.iStepWizards[descriptor]
+				return (this.iStepWizards.HasKey(descriptor) ? this.iStepWizards[descriptor] : false)
 			else
 				return this.iStepWizards
 		}
@@ -196,6 +205,7 @@ class SetupWizard extends ConfigurationItem {
 	loadDefinition(definition := false) {
 		local knowledgeBase
 		local stepWizard
+		local count
 		
 		if !definition
 			definition := this.Definition
@@ -214,11 +224,13 @@ class SetupWizard extends ConfigurationItem {
 			step := descriptor[3]
 			stepWizard := this.StepWizards[step]
 			
-			this.Steps[step] := stepWizard
-			this.Steps[descriptor[2]] := stepWizard
-			this.Steps[stepWizard] := descriptor[2]
+			if stepWizard {
+				this.Steps[step] := stepWizard
+				this.Steps[descriptor[2]] := stepWizard
+				this.Steps[stepWizard] := descriptor[2]
 			
-			count := Max(count, descriptor[2])
+				count := Max(count, descriptor[2])
+			}
 		}
 		
 		Loop %count% {
@@ -227,6 +239,8 @@ class SetupWizard extends ConfigurationItem {
 			if step
 				step.loadDefinition(definition, getConfigurationValue(definition, "Setup.Steps", "Step." . A_Index . "." . step.Step))
 		}
+		
+		this.iCount := count
 
 		if !this.loadKnowledgeBase()
 			this.KnowledgeBase.addFact("Initialize", true)
@@ -444,7 +458,7 @@ class SetupWizard extends ConfigurationItem {
 					else {
 						candidate := this.Steps[--index]
 					
-						if (candidate.Active && (candidate.Pages > 0)) {
+						if (candidate && candidate.Active && (candidate.Pages > 0)) {
 							step := candidate
 							page := candidate.Pages
 							
@@ -471,12 +485,12 @@ class SetupWizard extends ConfigurationItem {
 				index := this.Steps[this.Step] + 1
 			
 			Loop {
-				if (index > count)
+				if (index > this.Count)
 					return false
 				else {
 					candidate := this.Steps[index++]
 				
-					if (candidate.Active && (candidate.Pages > 0)) {
+					if (candidate && candidate.Active && (candidate.Pages > 0)) {
 						step := candidate
 						page := 1
 						
@@ -508,17 +522,20 @@ class SetupWizard extends ConfigurationItem {
 	
 		Gui %window%:Default
 		
+		GuiControl Disable, previousPageButton
+		GuiControl Disable, nextPageButton
+		GuiControl Disable, finishButton
+		
 		if this.Step {
-			if !this.Step.hidePage(this.Page)
+			if !this.Step.hidePage(this.Page) {
+				this.updateState()
+				
 				return false
+			}
 			
 			if (step != this.Step)
 				hide := true
 		}
-		
-		GuiControl Disable, previousPageButton
-		GuiControl Disable, nextPageButton
-		GuiControl Disable, finishButton
 		
 		this.iStep := step
 		
@@ -694,6 +711,42 @@ class SetupWizard extends ConfigurationItem {
 		return this.KnowledgeBase.getValue("Application." . application . ".Path", false)
 	}
 	
+	setControllerFunctions(functions) {
+		local knowledgeBase := this.KnowledgeBase
+		local function
+		
+		Loop % knowledgeBase.getValue("Controller.Function.Count", 0) {
+			function := knowledgeBase.getValue("Controller.Function." . A_Index, false)
+		
+			if function
+				knowledgeBase.removeFact("Controller.Function." . function . ".Key")
+			
+			knowledgeBase.removeFact("Controller.Function." . A_Index)
+		}
+		
+		for ignore, function in functions {
+			if IsObject(function)
+				function := values2String("|", function*)
+			else
+				function := Array(function)
+			
+			name := function[1]
+			
+			function.RemoveAt(1)
+			
+			knowledgeBase.addFact("Controller.Function." . A_Index, name)
+			knowledgeBase.addFact("Controller.Function." . name . ".Key", values2String("|", function))
+		}
+		
+		knowledgeBase.setFact("Controller.Function.Count", functions.Length())
+		
+		this.updateState()
+	}
+	
+	getControllerFunctionKeys(function) {
+		return string2Values("|", this.KnowledgeBase.getValue("Controller.Function." . function . ".Key", ""))
+	}
+	
 	setTitle(title) {
 		window := this.HelpWindow
 		
@@ -756,6 +809,20 @@ class SetupWizard extends ConfigurationItem {
 		
 			FileAppend %text%, %kTempDirectory%Simulator Setup.knowledge
 		}
+	}
+	
+	toggleKeyDetector(callback := false) {
+		if callback {
+			if !vShowKeyDetector
+				vKeyDetectorCallback := callback
+		}
+		else
+			vKeyDetectorCallback := false
+	
+		vShowKeyDetector := !vShowKeyDetector
+		
+		if vShowKeyDetector
+			SetTimer showKeyDetector, -100
 	}
 }
 
@@ -1361,7 +1428,7 @@ class ApplicationsStepWizard extends StepWizard {
 		Gui %window%:Font, s12 Bold, Arial
 		
 		Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDsimulatorsIconHandle Hidden, %kResourcesDirectory%Setup\Images\Gaming Wheel.ico
-		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h30 HWNDsimulatorsLabelHandle Hidden, % translate("Installed Simulations")
+		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h30 HWNDsimulatorsLabelHandle Hidden, % translate("Simulations")
 		
 		Gui %window%:Font, s9 Norm, Arial
 		
@@ -1369,7 +1436,7 @@ class ApplicationsStepWizard extends StepWizard {
 		
 		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Applications", "Applications.Simulators.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px'>" . info . "</div>"
-		
+
 		Gui %window%:Add, ActiveX, x%x% yp+205 w%width% h180 HWNDsimulatorsInfoTextHandle VsimulatorsInfoText Hidden, shell explorer
 
 		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
@@ -1391,7 +1458,7 @@ class ApplicationsStepWizard extends StepWizard {
 		Gui %window%:Font, s12 Bold, Arial
 		
 		Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDapplicationsIconHandle Hidden, %kResourcesDirectory%Setup\Images\Tool Chest.ico
-		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h30 HWNDapplicationsLabelHandle Hidden, % translate("Installed Applications && Tools")
+		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h30 HWNDapplicationsLabelHandle Hidden, % translate("Applications && Tools")
 		
 		Gui %window%:Font, s9 Norm, Arial
 		
@@ -1594,6 +1661,8 @@ class ButtonBoxStepWizard extends StepWizard {
 	
 	iFunctionsListView := false
 	
+	iFunctionKeys := {}
+		
 	class StepButtonBoxEditor extends ButtonBoxEditor {
 		configurationChanged(name) {
 			base.configurationChanged(name)
@@ -1643,7 +1712,7 @@ class ButtonBoxStepWizard extends StepWizard {
 		
 		Gui %window%:Font, s9 Norm, Arial
 		
-		Gui Add, ListView, x%x% y%y% w%width% h300 -Multi -LV0x10 NoSort NoSortHdr HWNDfunctionsListViewHandle Hidden, % values2String("|", map(["Controller / Button Box", "Function", "Number", "Conflict"], "translate")*)
+		Gui Add, ListView, x%x% y%y% w%width% h300 -Multi -LV0x10 NoSort NoSortHdr HWNDfunctionsListViewHandle gupdateFunctionKeys Hidden, % values2String("|", map(["Controller / Button Box", "Function", "Number", "Key(s)", "Conflict"], "translate")*)
 		
 		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Button Box", "Button Box.Functions.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px'>" . info . "</div>"
@@ -1664,6 +1733,7 @@ class ButtonBoxStepWizard extends StepWizard {
 		base.reset()
 		
 		this.iFunctionsListView := false
+		this.iFunctionKeys := {}
 		
 		if this.iButtonBoxEditor {
 			this.iButtonBoxEditor.close(true)
@@ -1680,16 +1750,18 @@ class ButtonBoxStepWizard extends StepWizard {
 			
 		this.iButtonBoxEditor := new this.StepButtonBoxEditor("Default", this.SetupWizard.Configuration, kUserHomeDirectory . "Install\Button Box Configuration.ini", false)
 		
-		this.iButtonBoxEditor.open(A_ScreenWidth - Round(A_ScreenWidth / 3) + Round(A_ScreenWidth / 3 / 2) - 100)
+		this.iButtonBoxEditor.open(Min(A_ScreenWidth - Round(A_ScreenWidth / 3) + Round(A_ScreenWidth / 3 / 2) - 225, A_ScreenWidth - 450))
 		
 		this.configurationChanged(readConfiguration(kUserHomeDirectory . "Install\Button Box Configuration.ini"))
 	}
 	
 	hidePage(page) {
-		if this.conflictingFunctions(readConfiguration(kUserHomeDirectory . "Install\Button Box Configuration.ini")) {
+		configuration := readConfiguration(kUserHomeDirectory . "Install\Button Box Configuration.ini")
+		
+		if this.conflictingFunctions(configuration) {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 			title := translate("Error")
-			MsgBox 262160, %title%, % translate("There are still conflicting functions - please correct...")
+			MsgBox 262160, %title%, % translate("There are still duplicate functions - please correct...")
 			OnMessage(0x44, "")
 			
 			return false
@@ -1699,6 +1771,8 @@ class ButtonBoxStepWizard extends StepWizard {
 			this.iButtonBoxEditor.close(true)
 			
 			this.iButtonBoxEditor := false
+		
+			this.SetupWizard.setControllerFunctions(this.controllerFunctions(configuration))
 			
 			return true
 		}
@@ -1706,7 +1780,29 @@ class ButtonBoxStepWizard extends StepWizard {
 			return false
 	}
 	
+	controllerFunctions(configuration) {
+		local function
+		
+		functions := {}
+		
+		for controller, definition in getConfigurationSectionValues(configuration, "Layouts")
+			if (ConfigurationItem.splitDescriptor(controller)[2] != "Layout")
+				for ignore, function in string2Values(";", definition) {
+					function := string2Values(",", function)[1]
+				
+					if (function != "")
+						if this.iFunctionKeys.HasKey(function)
+							functions.Push(Array(function, this.iFunctionKeys[function]*))
+						else
+							functions.Push(function)
+				}
+				
+		return functions
+	}
+	
 	conflictingFunctions(configuration) {
+		local function
+		
 		functions := {}
 		conflict := false
 		
@@ -1716,14 +1812,14 @@ class ButtonBoxStepWizard extends StepWizard {
 			if (controller[2] != "Layout") {
 				controller := controller[1]
 				
-				for ignore, theFunction in string2Values(";", definition) {
-					theFunction := string2Values(",", theFunction)[1]
+				for ignore, function in string2Values(";", definition) {
+					function := string2Values(",", function)[1]
 				
-					if (theFunction != "")
-						if !functions.HasKey(theFunction)
-							functions[theFunction] := [controller]
+					if (function != "")
+						if !functions.HasKey(function)
+							functions[function] := [controller]
 						else {
-							functions[theFunction].Push(controller)
+							functions[function].Push(controller)
 						
 							conflict := true
 						}
@@ -1735,16 +1831,21 @@ class ButtonBoxStepWizard extends StepWizard {
 	}
 	
 	configurationChanged(configuration) {
+		local function
+		
 		controls := {}
 		
 		for control, descriptor in getConfigurationSectionValues(configuration, "Controls")
 			controls[control] := string2Values(";", descriptor)[1]
 		
 		window := this.Window
+		wizard := this.SetupWizard
 		
 		Gui %window%:Default
 		
 		Gui ListView, % this.iFunctionsListView
+		
+		this.iFunctionKeys := {}
 		
 		LV_Delete()
 		
@@ -1758,29 +1859,100 @@ class ButtonBoxStepWizard extends StepWizard {
 			if (controller[2] != "Layout") {
 				controller := controller[1]
 			
-				for ignore, theFunction in string2Values(";", definition) {
-					theFunction := string2Values(",", theFunction)[1]
+				for ignore, function in string2Values(";", definition) {
+					function := string2Values(",", function)[1]
 				
-					if (theFunction != "") {
+					if (function != "") {
 						conflict := ""
 						
-						if (conflicts && conflicts[theFunction].Length() > 1)
-							conflict := translate("This function is used multiple times. Please correct!")
+						if (conflicts && conflicts[function].Length() > 1)
+							conflict := translate("Duplicate function detected. Please correct!")
 						
-						theFunction := ConfigurationItem.splitDescriptor(theFunction)
+						parts := ConfigurationItem.splitDescriptor(function)
 					
 						first := (controller != lastController)
 						lastController := controller
 				
-						LV_Add("", (first ? controller : ""), controls[theFunction[1]], theFunction[2], conflict)
+						functionKeys := wizard.getControllerFunctionKeys(function)
+						
+						keys := values2String(" | ", functionKeys*)
+						this.iFunctionKeys[function] := functionKeys
+						
+						LV_Add("", (first ? controller : ""), translate(controls[parts[1]]), parts[2], keys, conflict)
 					}
 				}
 			}
 			
 			LV_ModifyCol(1, "AutoHdr")
 			LV_ModifyCol(2, "AutoHdr")
-			LV_ModifyCol(3, "AutoHdr")
+			LV_ModifyCol(3, "AutoHdr Integer Center")
+			LV_ModifyCol(4, "AutoHdr")
+			LV_ModifyCol(5, "AutoHdr")
 		}
+	}
+	
+	updateFunctionKeys(line) {
+		local function
+		
+		wizard := this.SetupWizard
+		
+		if this.iKeyModeActive
+			wizard.toggleKeyDetector()
+		
+		Gui ListView, % this.iFunctionsListView
+		
+		LV_GetText(type, line, 2)
+		LV_GetText(number, line, 3)
+		
+		switch type {
+			case translate(k2WayToggleType):
+				callback := ObjBindMethod(this, "registerHotkey", k2WayToggleType . "." . number, line, true)
+			case translate(kDialType):
+				callback := ObjBindMethod(this, "registerHotkey", kDialType . "." . number, line, true)
+			case translate(k1WayToggleType):
+				callback := ObjBindMethod(this, "registerHotkey", k1WayToggleType . "." . number, line, false)
+			case translate(kButtonType):
+				callback := ObjBindMethod(this, "registerHotkey", kButtonType . "." . number, line, false)
+		}
+		
+		this.iKeyModeActive := true
+		
+		wizard.toggleKeyDetector(callback)
+		
+		SetTimer stopKeyDetector, 100
+	}
+	
+	registerHotKey(function, line, firstHotkey, hotkey) {
+		local controller
+		local number
+		
+		Gui ListView, % this.iFunctionsListView
+		
+		if (firstHotkey == true) {
+			callback := ObjBindMethod(this, "registerHotkey", function, line, firstHotkey)
+		
+			this.SetupWizard.toggleKeyDetectord()
+			this.SetupWizard.toggleKeyDetector(callback)
+			
+			return
+		}
+		else if (firstHotkey != false) {
+			this.iFunctionKeys[function] := [firstHotkey, hotkey]
+		
+			hotkey := firstHotkey . " | " . hotkey
+		}
+		else
+			this.iFunctionKeys[function] := [hotkey]
+		
+		this.iKeyModeActive := false
+		
+		wizard.toggleKeyDetector()
+		
+		LV_GetText(controller, line, 1)
+		LV_GetText(function, line, 2)
+		LV_GetText(number, line, 3)
+		
+		LV_Modify(line, "", controller, function, number, hotykey)
 	}
 }
 
@@ -1788,14 +1960,6 @@ class ButtonBoxStepWizard extends StepWizard {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
-
-saveAndExit() {
-	vResult := kOk
-}
-
-cancelAndExit() {
-	vResult := kCancel
-}
 
 previousPage() {
 	SetupWizard.Instance.previousPage()
@@ -1818,6 +1982,18 @@ chooseLanguage() {
 			
 			return
 		}
+}
+
+moveSetupWizard() {
+	moveByMouse(SetupWizard.Instance.WizardWindow)
+}
+
+moveSetupHelp() {
+	moveByMouse(SetupWizard.Instance.HelpWindow)
+}
+
+openSetupDocumentation() {
+	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#setup
 }
 
 updateSelectedModules() {
@@ -1859,16 +2035,27 @@ locateSoftware() {
 	}
 }
 
-moveSetupWizard() {
-	moveByMouse(SetupWizard.Instance.WizardWindow)
+updateFunctionKeys() {
+	wizard := SetupWizard.Instance
+	
+	if (A_GuiEvent = "DoubleClick") {
+		wizard.StepWizards["Button Box"].updateFunctionKeys(EventInfo)
+		
+	}
 }
 
-moveSetupHelp() {
-	moveByMouse(SetupWizard.Instance.HelpWindow)
-}
-
-openSetupDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#setup
+stopKeyDetector() {
+	wizard := SetupWizard.Instance.StepWizards["Button Box"]
+	
+	if !wizard.iActiveKeyDetector
+		SetTimer stopKeyDetector, Off
+	else if GetKeyState("Esc", "P") {
+		wizard.SetupWizard.toggleKeyDetector()
+	
+		wizard.iActiveKeyDetector
+		
+		SetTimer stopKeyDetector, Off
+	}
 }
 
 convertVDF2JSON(vdf) {
@@ -2013,9 +2200,9 @@ initializeSimulatorSetup() {
 		wizard := new SetupWizard(kSimulatorConfiguration, definition)
 		
 		wizard.registerStepWizard(new StartStepWizard(wizard, "Start", kSimulatorConfiguration))
-		wizard.registerStepWizard(new ModulesStepWizard(wizard, "Modules", kSimulatorConfiguration))
-		wizard.registerStepWizard(new InstallationStepWizard(wizard, "Installation", kSimulatorConfiguration))
-		wizard.registerStepWizard(new ApplicationsStepWizard(wizard, "Applications", kSimulatorConfiguration))
+		; wizard.registerStepWizard(new ModulesStepWizard(wizard, "Modules", kSimulatorConfiguration))
+		; wizard.registerStepWizard(new InstallationStepWizard(wizard, "Installation", kSimulatorConfiguration))
+		; wizard.registerStepWizard(new ApplicationsStepWizard(wizard, "Applications", kSimulatorConfiguration))
 		wizard.registerStepWizard(new ButtonBoxStepWizard(wizard, "Button Box", kSimulatorConfiguration))
 	}
 	finally {
@@ -2073,52 +2260,6 @@ restart:
 		else
 			ExitApp 0
 	}
-}
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                    Public Function Declaration Section                  ;;;
-;;;-------------------------------------------------------------------------;;;
-
-setButtonIcon(buttonHandle, file, index := 1, options := "") {
-;   Parameters:
-;   1) {Handle} 	HWND handle of Gui button
-;   2) {File} 		File containing icon image
-;   3) {Index} 		Index of icon in file
-;						Optional: Default = 1
-;   4) {Options}	Single letter flag followed by a number with multiple options delimited by a space
-;						W = Width of Icon (default = 16)
-;						H = Height of Icon (default = 16)
-;						S = Size of Icon, Makes Width and Height both equal to Size
-;						L = Left Margin
-;						T = Top Margin
-;						R = Right Margin
-;						B = Botton Margin
-;						A = Alignment (0 = left, 1 = right, 2 = top, 3 = bottom, 4 = center; default = 4)
-
-	RegExMatch(options, "i)w\K\d+", W), (W="") ? W := 16 :
-	RegExMatch(options, "i)h\K\d+", H), (H="") ? H := 16 :
-	RegExMatch(options, "i)s\K\d+", S), S ? W := H := S :
-	RegExMatch(options, "i)l\K\d+", L), (L="") ? L := 0 :
-	RegExMatch(options, "i)t\K\d+", T), (T="") ? T := 0 :
-	RegExMatch(options, "i)r\K\d+", R), (R="") ? R := 0 :
-	RegExMatch(options, "i)b\K\d+", B), (B="") ? B := 0 :
-	RegExMatch(options, "i)a\K\d+", A), (A="") ? A := 4 :
-
-	ptrSize := A_PtrSize = "" ? 4 : A_PtrSize, DW := "UInt", Ptr := A_PtrSize = "" ? DW : "Ptr"
-
-	VarSetCapacity(button_il, 20 + ptrSize, 0)
-
-	NumPut(normal_il := DllCall("ImageList_Create", DW, W, DW, H, DW, 0x21, DW, 1, DW, 1), button_il, 0, Ptr)	; Width & Height
-	NumPut(L, button_il, 0 + ptrSize, DW)		; Left Margin
-	NumPut(T, button_il, 4 + ptrSize, DW)		; Top Margin
-	NumPut(R, button_il, 8 + ptrSize, DW)		; Right Margin
-	NumPut(B, button_il, 12 + ptrSize, DW)		; Bottom Margin	
-	NumPut(A, button_il, 16 + ptrSize, DW)		; Alignment
-
-	SendMessage, BCM_SETIMAGELIST := 5634, 0, &button_il,, AHK_ID %buttonHandle%
-
-	return IL_Add(normal_il, file, index)
 }
 
 

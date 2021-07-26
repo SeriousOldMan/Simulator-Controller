@@ -508,10 +508,6 @@ class SetupWizard extends ConfigurationItem {
 	
 		Gui %window%:Default
 		
-		GuiControl Disable, previousPageButton
-		GuiControl Disable, nextPageButton
-		GuiControl Disable, finishButton
-		
 		if this.Step {
 			if !this.Step.hidePage(this.Page)
 				return false
@@ -519,6 +515,10 @@ class SetupWizard extends ConfigurationItem {
 			if (step != this.Step)
 				hide := true
 		}
+		
+		GuiControl Disable, previousPageButton
+		GuiControl Disable, nextPageButton
+		GuiControl Disable, finishButton
 		
 		this.iStep := step
 		
@@ -1602,6 +1602,8 @@ class ButtonBoxStepWizard extends StepWizard {
 			
 			this.saveToConfiguration(configuration)
 			
+			writeConfiguration(kUserHomeDirectory . "Install\Button Box Configuration.ini", configuration)
+			
 			protectionOn()
 	
 			oldGui := A_DefaultGui
@@ -1678,7 +1680,7 @@ class ButtonBoxStepWizard extends StepWizard {
 			
 		this.iButtonBoxEditor := new this.StepButtonBoxEditor("Default", this.SetupWizard.Configuration, kUserHomeDirectory . "Install\Button Box Configuration.ini", false)
 		
-		this.iButtonBoxEditor.open(50)
+		this.iButtonBoxEditor.open(A_ScreenWidth - Round(A_ScreenWidth / 3) + Round(A_ScreenWidth / 3 / 2) - 100)
 		
 		this.configurationChanged(readConfiguration(kUserHomeDirectory . "Install\Button Box Configuration.ini"))
 	}
@@ -1714,11 +1716,8 @@ class ButtonBoxStepWizard extends StepWizard {
 			if (controller[2] != "Layout") {
 				controller := controller[1]
 				
-				definition := string2Values(";", definition)
-				
-				for ignore, theFunction in definition
-					theFunction := string2Values(",", theFunction)
-					theFunction := theFunction[1]
+				for ignore, theFunction in string2Values(";", definition) {
+					theFunction := string2Values(",", theFunction)[1]
 				
 					if (theFunction != "")
 						if !functions.HasKey(theFunction)
@@ -1728,8 +1727,11 @@ class ButtonBoxStepWizard extends StepWizard {
 						
 							conflict := true
 						}
+				}
 			}
 		}
+		
+		return (conflict ? functions : false)
 	}
 	
 	configurationChanged(configuration) {
@@ -1757,8 +1759,7 @@ class ButtonBoxStepWizard extends StepWizard {
 				controller := controller[1]
 			
 				for ignore, theFunction in string2Values(";", definition) {
-					theFunction := string2Values(",", theFunction)
-					theFunction := theFunction[1]
+					theFunction := string2Values(",", theFunction)[1]
 				
 					if (theFunction != "") {
 						conflict := ""

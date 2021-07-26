@@ -719,7 +719,7 @@ class SetupWizard extends ConfigurationItem {
 			function := knowledgeBase.getValue("Controller.Function." . A_Index, false)
 		
 			if function
-				knowledgeBase.removeFact("Controller.Function." . function . ".Key")
+				knowledgeBase.removeFact("Controller.Function." . function . ".Keys")
 			
 			knowledgeBase.removeFact("Controller.Function." . A_Index)
 		}
@@ -735,7 +735,7 @@ class SetupWizard extends ConfigurationItem {
 			function.RemoveAt(1)
 			
 			knowledgeBase.addFact("Controller.Function." . A_Index, name)
-			knowledgeBase.addFact("Controller.Function." . name . ".Key", values2String("|", function))
+			knowledgeBase.addFact("Controller.Function." . name . ".Keys", values2String("|", function))
 		}
 		
 		knowledgeBase.setFact("Controller.Function.Count", functions.Length())
@@ -744,7 +744,7 @@ class SetupWizard extends ConfigurationItem {
 	}
 	
 	getControllerFunctionKeys(function) {
-		return string2Values("|", this.KnowledgeBase.getValue("Controller.Function." . function . ".Key", ""))
+		return string2Values("|", this.KnowledgeBase.getValue("Controller.Function." . function . ".Keys", ""))
 	}
 	
 	setTitle(title) {

@@ -1711,7 +1711,7 @@ class ButtonBoxStepWizard extends StepWizard {
 		
 		Gui %window%:Font, s9 Norm, Arial
 		
-		Gui Add, ListView, x%x% y%y% w%width% h300 -Multi -LV0x10 NoSort NoSortHdr HWNDfunctionsListViewHandle gupdateFunctionKeys Hidden, % values2String("|", map(["Controller / Button Box", "Function", "Number", "Key(s)", "Conflict"], "translate")*)
+		Gui Add, ListView, x%x% y%y% w%width% h300 -Multi -LV0x10 NoSort NoSortHdr HWNDfunctionsListViewHandle gupdateFunctionKeys Hidden, % values2String("|", map(["Controller / Button Box", "Function", "Number", "Key(s)", "Notes"], "translate")*)
 		
 		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Button Box", "Button Box.Functions.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px'>" . info . "</div>"
@@ -1757,10 +1757,10 @@ class ButtonBoxStepWizard extends StepWizard {
 	hidePage(page) {
 		configuration := readConfiguration(kUserHomeDirectory . "Install\Button Box Configuration.ini")
 		
-		if this.conflictingFunctions(configuration) {
+		if (this.conflictingFunctions(configuration) || this.conflictingKeys(configuration)) {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 			title := translate("Error")
-			MsgBox 262160, %title%, % translate("There are still duplicate functions - please correct...")
+			MsgBox 262160, %title%, % translate("There are still duplicate functions or duplicate keys - please correct...")
 			OnMessage(0x44, "")
 			
 			return false
@@ -1808,8 +1808,12 @@ class ButtonBoxStepWizard extends StepWizard {
 	conflictingFunctions(configuration) {
 		local function
 		
+		controls := {}
 		functions := {}
 		conflict := false
+		
+		for control, descriptor in getConfigurationSectionValues(configuration, "Controls")
+			controls[control] := string2Values(";", descriptor)[1]
 		
 		for controller, definition in getConfigurationSectionValues(configuration, "Layouts") {
 			controller := ConfigurationItem.splitDescriptor(controller)
@@ -1820,7 +1824,10 @@ class ButtonBoxStepWizard extends StepWizard {
 				for ignore, function in string2Values(";", definition) {
 					function := string2Values(",", function)[1]
 				
-					if (function != "")
+					if (function != "") {
+						function := ConfigurationItem.splitDescriptor(function)
+						function := ConfigurationItem.descriptor(controls[function[1]], function[2])
+						
 						if !functions.HasKey(function)
 							functions[function] := [controller]
 						else {
@@ -1828,11 +1835,30 @@ class ButtonBoxStepWizard extends StepWizard {
 						
 							conflict := true
 						}
+					}
 				}
 			}
 		}
 		
 		return (conflict ? functions : false)
+	}
+	
+	conflictingKeys(configuration) {
+		local function
+		
+		keys := {}
+		conflict := false
+		
+		for function, keys in this.iFunctionKeys
+			if !keys.HasKey(key)
+				keys[key] := [function]
+			else {
+				keys[key].Push(function)
+			
+				conflict := true
+			}
+		
+		return (conflict ? keys : false)
 	}
 	
 	configurationChanged(configuration) {
@@ -1856,7 +1882,8 @@ class ButtonBoxStepWizard extends StepWizard {
 		
 		lastController := false
 		
-		conflicts := this.conflictingFunctions(configuration)
+		functionConflicts := this.conflictingFunctions(configuration)
+		keyConflicts := this.conflictingKeys(configuration)
 		
 		for controller, definition in getConfigurationSectionValues(configuration, "Layouts") {
 			controller := ConfigurationItem.splitDescriptor(controller)
@@ -1868,11 +1895,6 @@ class ButtonBoxStepWizard extends StepWizard {
 					function := string2Values(",", function)[1]
 				
 					if (function != "") {
-						conflict := ""
-						
-						if (conflicts && conflicts[function].Length() > 1)
-							conflict := translate("Duplicate function detected. Please correct!")
-						
 						parts := ConfigurationItem.splitDescriptor(function)
 						function := ConfigurationItem.descriptor(controls[parts[1]], parts[2])
 						
@@ -1881,8 +1903,29 @@ class ButtonBoxStepWizard extends StepWizard {
 				
 						functionKeys := wizard.getControllerFunctionKeys(function)
 						
+						conflict := 0
+						
+						if (functionConflicts && functionConflicts[function].Length() > 1)
+							conflict += 1
+						
+						if keyConflicts
+							for ignore, key in functionKeys
+								if (keyConflicts[key].Length() > 1) {
+									conflict += 2
+									
+									break
+								}
+							
+						if (conflict == 1)
+							conflict := translate("Duplicate function detected. Please correct!")
+						else if (conflict == 2)
+							conflict := translate("Duplicate key(s) detected. Please correct!")
+						else if (conflict == 3)
+							conflict := translate("Duplicate function and duplicate key(s) detected. Please correct!")
+						
 						if (functionKeys.Length() > 0) {
 							keys := values2String(" | ", functionKeys*)
+							
 							this.iFunctionKeys[function] := functionKeys
 						}
 						else
@@ -1963,6 +2006,8 @@ class ButtonBoxStepWizard extends StepWizard {
 		
 		wizard.toggleKeyDetector()
 		
+		this.configurationChanged(readConfiguration(kUserHomeDirectory . "Install\Button Box Configuration.ini"))
+		
 		window := this.Window
 		
 		Gui %window%:Default
@@ -1972,8 +2017,7 @@ class ButtonBoxStepWizard extends StepWizard {
 		LV_GetText(function, line, 2)
 		LV_GetText(number, line, 3)
 		
-		LV_Modify(line, "", controller, function, number, hotkey)
-		LV_ModifyCol(4, "AutoHdr")
+		LV_Modify(line, "Vis")
 	}
 }
 

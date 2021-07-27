@@ -1021,6 +1021,32 @@ class StartStepWizard extends StepWizard {
 	}
 	
 	hidePage(page) {
+		if !(A_IsAdmin || RegExMatch(DllCall("GetCommandLine", "str"), " /restart(?!\S)")) {
+			try {
+				if A_IsCompiled
+					Run *RunAs "%A_ScriptFullPath%" /restart
+				else
+					Run *RunAs "%A_AhkPath%" /restart "%A_ScriptFullPath%"
+			}
+			catch exception {
+				;ignore
+			}
+			
+			ExitApp
+		}
+
+		currentDirectory := A_WorkingDir
+	
+		try {
+			SetWorkingDir %kBinariesDirectory%
+			
+			if A_IsAdmin
+				Run Powershell -Command Get-ChildItem -Path '.' -Recurse | Unblock-File
+		}
+		finally {
+			SetWorkingDir %currentDirectory%
+		}
+		
 		if base.hidePage(page) {
 			try {
 				SoundPlay NonExistent.avi
@@ -1677,7 +1703,7 @@ class ButtonBoxStepWizard extends StepWizard {
 			oldGui := A_DefaultGui
 			
 			try {
-				SetupWizard.Instance.StepWizards["Button Box"].configurationChanged(configuration)
+				SetupWizard.Instance.StepWizards["Button Box"].loadFunctions(configuration)
 			}
 			finally {
 				protectionOff()
@@ -1706,17 +1732,28 @@ class ButtonBoxStepWizard extends StepWizard {
 		
 		Gui %window%:Default
 		
+		functionsIconHandle := false
+		functionsIconLabelHandle := false
 		functionsListViewHandle := false
 		functionsInfoTextHandle := false
 		
+		labelWidth := width - 30
+		labelX := x + 45
+		labelY := y + 5
+		
+		Gui %window%:Font, s12 Bold, Arial
+		
+		Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDfunctionsIconHandle Hidden, %kResourcesDirectory%Setup\Images\Controller.ico
+		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h30 HWNDfunctionsLabelHandle Hidden, % translate("Controller Configuration")
+		
 		Gui %window%:Font, s9 Norm, Arial
 		
-		Gui Add, ListView, x%x% y%y% w%width% h300 -Multi -LV0x10 NoSort NoSortHdr HWNDfunctionsListViewHandle gupdateFunctionKeys Hidden, % values2String("|", map(["Controller / Button Box", "Function", "Number", "Key(s)", "Notes"], "translate")*)
+		Gui Add, ListView, x%x% yp+33 w%width% h300 -Multi -LV0x10 NoSort NoSortHdr HWNDfunctionsListViewHandle gupdateFunctionKeys Hidden, % values2String("|", map(["Controller / Button Box", "Function", "Number", "Key(s)", "Notes"], "translate")*)
 		
 		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Button Box", "Button Box.Functions.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px'>" . info . "</div>"
 		
-		Gui %window%:Add, ActiveX, x%x% yp+305 w%width% h170 HWNDfunctionsInfoTextHandle VfunctionsInfoText Hidden, shell explorer
+		Gui %window%:Add, ActiveX, x%x% yp+305 w%width% h135 HWNDfunctionsInfoTextHandle VfunctionsInfoText Hidden, shell explorer
 
 		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
@@ -1725,7 +1762,7 @@ class ButtonBoxStepWizard extends StepWizard {
 		
 		this.ifunctionsListView := functionsListViewHandle
 		
-		this.registerWidgets(1, functionsListViewHandle, functionsInfoTextHandle)
+		this.registerWidgets(1, functionsIconHandle, functionsLabelHandle, functionsListViewHandle, functionsInfoTextHandle)
 	}
 	
 	reset() {
@@ -1751,7 +1788,7 @@ class ButtonBoxStepWizard extends StepWizard {
 		
 		this.iButtonBoxEditor.open(Min(A_ScreenWidth - Round(A_ScreenWidth / 3) + Round(A_ScreenWidth / 3 / 2) - 225, A_ScreenWidth - 450))
 		
-		this.configurationChanged(readConfiguration(kUserHomeDirectory . "Install\Button Box Configuration.ini"))
+		this.loadFunctions(readConfiguration(kUserHomeDirectory . "Install\Button Box Configuration.ini"), true)
 	}
 	
 	hidePage(page) {
@@ -1849,19 +1886,20 @@ class ButtonBoxStepWizard extends StepWizard {
 		keys := {}
 		conflict := false
 		
-		for function, keys in this.iFunctionKeys
-			if !keys.HasKey(key)
-				keys[key] := [function]
-			else {
-				keys[key].Push(function)
-			
-				conflict := true
-			}
+		for function, functionKeys in this.iFunctionKeys
+			for ignore, key in functionKeys
+				if !keys.HasKey(key)
+					keys[key] := [function]
+				else {
+					keys[key].Push(function)
+				
+					conflict := true
+				}
 		
 		return (conflict ? keys : false)
 	}
 	
-	configurationChanged(configuration) {
+	loadFunctions(configuration, load := false) {
 		local function
 		
 		controls := {}
@@ -1876,7 +1914,8 @@ class ButtonBoxStepWizard extends StepWizard {
 		
 		Gui ListView, % this.iFunctionsListView
 		
-		this.iFunctionKeys := {}
+		if load
+			this.iFunctionKeys := {}
 		
 		LV_Delete()
 		
@@ -1901,7 +1940,10 @@ class ButtonBoxStepWizard extends StepWizard {
 						first := (controller != lastController)
 						lastController := controller
 				
-						functionKeys := wizard.getControllerFunctionKeys(function)
+						if this.iFunctionKeys.HasKey(function)
+							functionKeys := this.iFunctionKeys[function]
+						else
+							functionKeys := wizard.getControllerFunctionKeys(function)
 						
 						conflict := 0
 						
@@ -1917,16 +1959,19 @@ class ButtonBoxStepWizard extends StepWizard {
 								}
 							
 						if (conflict == 1)
-							conflict := translate("Duplicate function detected. Please correct!")
+							conflict := translate("Duplicate function...")
 						else if (conflict == 2)
-							conflict := translate("Duplicate key(s) detected. Please correct!")
+							conflict := translate("Duplicate key(s)...")
 						else if (conflict == 3)
-							conflict := translate("Duplicate function and duplicate key(s) detected. Please correct!")
+							conflict := translate("Duplicate function and duplicate key(s)...")
+						else
+							conflict := ""
 						
 						if (functionKeys.Length() > 0) {
 							keys := values2String(" | ", functionKeys*)
 							
-							this.iFunctionKeys[function] := functionKeys
+							if load
+								this.iFunctionKeys[function] := functionKeys
 						}
 						else
 							keys := ""
@@ -1935,13 +1980,13 @@ class ButtonBoxStepWizard extends StepWizard {
 					}
 				}
 			}
-			
-			LV_ModifyCol(1, "AutoHdr")
-			LV_ModifyCol(2, "AutoHdr")
-			LV_ModifyCol(3, "AutoHdr Integer Center")
-			LV_ModifyCol(4, "AutoHdr")
-			LV_ModifyCol(5, "AutoHdr")
 		}
+			
+		LV_ModifyCol(1, "AutoHdr")
+		LV_ModifyCol(2, "AutoHdr")
+		LV_ModifyCol(3, "AutoHdr Integer Center")
+		LV_ModifyCol(4, "AutoHdr")
+		LV_ModifyCol(5, "AutoHdr")
 	}
 	
 	updateFunctionKeys(line) {
@@ -2006,16 +2051,12 @@ class ButtonBoxStepWizard extends StepWizard {
 		
 		wizard.toggleKeyDetector()
 		
-		this.configurationChanged(readConfiguration(kUserHomeDirectory . "Install\Button Box Configuration.ini"))
+		this.loadFunctions(readConfiguration(kUserHomeDirectory . "Install\Button Box Configuration.ini"))
 		
 		window := this.Window
 		
 		Gui %window%:Default
 		Gui ListView, % this.iFunctionsListView
-		
-		LV_GetText(controller, line, 1)
-		LV_GetText(function, line, 2)
-		LV_GetText(number, line, 3)
 		
 		LV_Modify(line, "Vis")
 	}

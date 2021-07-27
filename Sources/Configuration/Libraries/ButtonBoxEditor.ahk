@@ -20,6 +20,19 @@ global kEmptySpaceDescriptor = "Button;" . kButtonBoxImagesDirectory . "Empty.pn
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                         Public Constants Section                        ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global kControlTypes = {}
+
+kControlTypes[k1WayToggleType] := "1-way Toggle"
+kControlTypes[k2WayToggleType] := "2-way Toggle"
+kControlTypes[kButtonType] := "Button"
+kControlTypes[kDialType] := "Rotary"
+kControlTypes[kCustomType] := "Custom"
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -315,7 +328,7 @@ class ControlsList extends ConfigurationItemList {
 		this.ItemList := items
 		
 		for ignore, control in items
-			LV_Add("", control[1], control[2], control[4])
+			LV_Add("", control[1], translate(kControlTypes[control[2]]), control[4])
 		
 		if first {
 			LV_ModifyCol()

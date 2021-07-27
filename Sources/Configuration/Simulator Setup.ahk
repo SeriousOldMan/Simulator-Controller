@@ -285,12 +285,12 @@ class SetupWizard extends ConfigurationItem {
 
 		Gui %window%:Font, s10 Bold, Arial
 
-		Gui %window%:Add, Text, w700 Center gmoveSetupWizard, % translate("Modular Simulator Controller System") 
+		Gui %window%:Add, Text, w684 Center gmoveSetupWizard, % translate("Modular Simulator Controller System") 
 		
 		Gui %window%:Font, s9 Norm, Arial
 		Gui %window%:Font, Italic Underline, Arial
 
-		Gui %window%:Add, Text, YP+20 w700 cBlue Center gopenSetupDocumentation, % translate("Setup && Configuration")
+		Gui %window%:Add, Text, YP+20 w684 cBlue Center gopenSetupDocumentation, % translate("Setup && Configuration")
 		
 		Gui %window%:Add, Text, yp+20 w700 0x10
 
@@ -825,7 +825,6 @@ class SetupWizard extends ConfigurationItem {
 	}
 }
 
-
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; StepWizard                                                              ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -987,15 +986,24 @@ class StepWizard extends ConfigurationItem {
 	}
 }
 
-
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; StartStepWizard                                                         ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class StartStepWizard extends StepWizard {
+	iImageViewer := false
+	iImageViewerHTML := false
+	
+	Pages[] {
+		Get {
+			return (A_IsAdmin ? 1 : 2)
+		}
+	}
+	
 	createGui(wizard, x, y, width, height) {
 		static imageViewer
 		static imageViewerHandle
+		static infoText
 		
 		window := this.Window
 		
@@ -1003,56 +1011,102 @@ class StartStepWizard extends StepWizard {
 	
 		text := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Start", "Start.Text." . getLanguage()))
 		image := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Start", "Start.Image"))
-		audio := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Start", "Start.Audio", false))
 		
 		text := "<div style='text-align: center' style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px'>" . text . "</div>"
 		
 		height := Round(width / 16 * 9)
 		
 		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><br>" . text . "<br><img src='" . image . "' width='" . width . "' height='" . height . "' border='0' padding='0'></body></html>"
-
-		imageViewer.Navigate("about:blank")
-		imageViewer.Document.Write(html)
 		
-		if audio
-			SoundPlay %audio%
+		imageViewer.Navigate("about:blank")
+			
+		this.iImageViewer := imageViewer
+		this.iImageViewerHTML := html
 		
 		this.registerWidget(1, imageViewerHandle)
+		
+		if !A_IsAdmin {
+			labelWidth := width - 30
+			labelX := x + 45
+			labelY := y + 5
+			
+			iconHandle := false
+			labelHandle := false
+			infoTextHandle := false
+			restartButtonHandle := false
+			
+			info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Start", "Start.Unblocking.Info." . getLanguage()))
+			info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px'>" . info . "</div>"
+			
+			Gui %window%:Font, s12 Bold, Arial
+			
+			Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDiconHandle Hidden, %kResourcesDirectory%Setup\Images\Security.ico
+			Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h30 HWNDlabelHandle Hidden, % translate("Unblocking of the applications and DLLs")
+			
+			Gui %window%:Font, s9 Norm, Arial
+			
+			Gui %window%:Add, ActiveX, x%x% yp+33 w%width% h350 HWNDinfoTextHandle VinfoText Hidden, shell explorer
+			
+			x := x + Round(width / 2) - 120
+			
+			Gui %window%:Font, s12 Bold, Arial
+			
+			Gui %window%:Add, Button, x%x% yp+380 w240 h30 HWNDrestartButtonHandle GelevateAndRestart Hidden, % translate("Restart as Administrator")
+
+			html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+
+			infoText.Navigate("about:blank")
+			infoText.Document.Write(html)
+			
+			this.registerWidgets(2, iconHandle, labelHandle, infoTextHandle, restartButtonHandle)
+		}
+		else {
+			currentDirectory := A_WorkingDir
+
+			try {
+				SetWorkingDir %kBinariesDirectory%
+				
+				if A_IsAdmin
+					Run Powershell -Command Get-ChildItem -Path '.' -Recurse | Unblock-File
+			}
+			finally {
+				SetWorkingDir %currentDirectory%
+			}
+		}
+	}
+	
+	showPage(page) {
+		if (page == 1) {
+			imageViewer := this.iImageViewer
+			
+			imageViewer.Document.Open()
+			imageViewer.Document.Write(this.iImageViewerHTML)
+			imageViewer.Document.Close()
+			
+			audio := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Start", "Start.Audio", false))			
+			
+			if audio
+				SoundPlay %audio%
+		}
+		
+		base.showPage(page)
 	}
 	
 	hidePage(page) {
-		if !(A_IsAdmin || RegExMatch(DllCall("GetCommandLine", "str"), " /restart(?!\S)")) {
-			try {
-				if A_IsCompiled
-					Run *RunAs "%A_ScriptFullPath%" /restart
-				else
-					Run *RunAs "%A_AhkPath%" /restart "%A_ScriptFullPath%"
-			}
-			catch exception {
-				;ignore
-			}
-			
-			ExitApp
-		}
-
-		currentDirectory := A_WorkingDir
-	
-		try {
-			SetWorkingDir %kBinariesDirectory%
-			
-			if A_IsAdmin
-				Run Powershell -Command Get-ChildItem -Path '.' -Recurse | Unblock-File
-		}
-		finally {
-			SetWorkingDir %currentDirectory%
-		}
-		
 		if base.hidePage(page) {
-			try {
-				SoundPlay NonExistent.avi
-			}
-			catch exception {
-				; ignore
+			if (page == 1) {
+				imageViewer := this.iImageViewer
+			
+				imageViewer.Document.Open()
+				imageViewer.Document.Write("<html></html>")
+				imageViewer.Document.Close()
+				
+				try {
+					SoundPlay NonExistent.avi
+				}
+				catch exception {
+					; ignore
+				}
 			}
 			
 			return true
@@ -1061,7 +1115,6 @@ class StartStepWizard extends StepWizard {
 			return false
 	}
 }
-
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; ModulesStepWizard                                                       ;;;
@@ -1208,7 +1261,6 @@ class ModulesStepWizard extends StepWizard {
 		}
 	}
 }
-
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; InstallationStepWizard                                                  ;;;
@@ -1412,7 +1464,6 @@ class InstallationStepWizard extends StepWizard {
 			}
 	}
 }
-
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; ApplicationsStepWizard                                                  ;;;
@@ -1676,7 +1727,6 @@ class ApplicationsStepWizard extends StepWizard {
 	}
 }
 
-
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; ButtonBoxStepWizard                                                     ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -1748,7 +1798,7 @@ class ButtonBoxStepWizard extends StepWizard {
 		
 		Gui %window%:Font, s9 Norm, Arial
 		
-		Gui Add, ListView, x%x% yp+33 w%width% h300 -Multi -LV0x10 NoSort NoSortHdr HWNDfunctionsListViewHandle gupdateFunctionKeys Hidden, % values2String("|", map(["Controller / Button Box", "Function", "Number", "Key(s)", "Notes"], "translate")*)
+		Gui Add, ListView, x%x% yp+33 w%width% h300 -Multi -LV0x10 NoSort NoSortHdr HWNDfunctionsListViewHandle gupdateFunctionKeys Hidden, % values2String("|", map(["Controller / Button Box", "Control", "Function", "Number", "Key(s)", "Hints"], "translate")*)
 		
 		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Button Box", "Button Box.Functions.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px'>" . info . "</div>"
@@ -1801,6 +1851,21 @@ class ButtonBoxStepWizard extends StepWizard {
 			OnMessage(0x44, "")
 			
 			return false
+		}
+		
+		window := this.Window
+		
+		Gui %window%:Default
+		Gui ListView, % this.iFunctionsListView
+		
+		if (LV_GetCount() != this.iFunctionKeys.Length()) {
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+			title := translate("Delete")
+			MsgBox 262436, %title%, % translate("Not all functions have been assigned to physical controls. Do you really want to proceed?")
+			OnMessage(0x44, "")
+			
+			IfMsgBox No
+				return false
 		}
 		
 		if base.hidePage(page) {
@@ -1930,12 +1995,12 @@ class ButtonBoxStepWizard extends StepWizard {
 			if (controller[2] != "Layout") {
 				controller := controller[1]
 			
-				for ignore, function in string2Values(";", definition) {
-					function := string2Values(",", function)[1]
+				for ignore, control in string2Values(";", definition) {
+					control := string2Values(",", control)[1]
 				
-					if (function != "") {
-						parts := ConfigurationItem.splitDescriptor(function)
-						function := ConfigurationItem.descriptor(controls[parts[1]], parts[2])
+					if (control != "") {
+						control := ConfigurationItem.splitDescriptor(control)
+						function := ConfigurationItem.descriptor(controls[control[1]], control[2])
 						
 						first := (controller != lastController)
 						lastController := controller
@@ -1976,7 +2041,7 @@ class ButtonBoxStepWizard extends StepWizard {
 						else
 							keys := ""
 						
-						LV_Add("", (first ? controller : ""), translate(controls[parts[1]]), parts[2], keys, conflict)
+						LV_Add("", (first ? controller : ""), control[1], translate(controls[control[1]]), control[2], keys, conflict)
 					}
 				}
 			}
@@ -1984,9 +2049,10 @@ class ButtonBoxStepWizard extends StepWizard {
 			
 		LV_ModifyCol(1, "AutoHdr")
 		LV_ModifyCol(2, "AutoHdr")
-		LV_ModifyCol(3, "AutoHdr Integer Center")
-		LV_ModifyCol(4, "AutoHdr")
+		LV_ModifyCol(3, "AutoHdr")
+		LV_ModifyCol(4, "AutoHdr Integer Center")
 		LV_ModifyCol(5, "AutoHdr")
+		LV_ModifyCol(6, "AutoHdr")
 	}
 	
 	updateFunctionKeys(line) {
@@ -1999,8 +2065,8 @@ class ButtonBoxStepWizard extends StepWizard {
 		
 		Gui ListView, % this.iFunctionsListView
 		
-		LV_GetText(type, line, 2)
-		LV_GetText(number, line, 3)
+		LV_GetText(type, line, 3)
+		LV_GetText(number, line, 4)
 		
 		switch type {
 			case translate(k2WayToggleType):
@@ -2059,6 +2125,31 @@ class ButtonBoxStepWizard extends StepWizard {
 		Gui ListView, % this.iFunctionsListView
 		
 		LV_Modify(line, "Vis")
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; SimulatorsStepWizard                                                     ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class SimulatorsStepWizard extends StepWizard {
+	Pages[] {
+		Get {
+			wizard := this.SetupWizard
+			
+			numSimulations := 0
+			
+			for ignore, simulator in this.Definition
+				if wizard.isApplicationSelected(simulator)
+					numSimulations +=1
+			
+			hasAssistant := (wizard.isModuleSelected("Race Engineer") | wizard.isModuleSelected("Race Strategist"))
+			
+			pages := 2 + (((hasAssistant && (numSimulations > 0)) ? 1 : 0) + numSimulations)
+		}
+	}
+	
+	createGui(wizard, x, y, width, height) {
 	}
 }
 
@@ -2275,7 +2366,23 @@ findSoftware(definition, software) {
 		return kSoX
 	
 	return false
-}		
+}
+
+elevateAndRestart() {
+	if !(A_IsAdmin || RegExMatch(DllCall("GetCommandLine", "str"), " /restart(?!\S)")) {
+		try {
+			if A_IsCompiled
+				Run *RunAs "%A_ScriptFullPath%" /restart
+			else
+				Run *RunAs "%A_AhkPath%" /restart "%A_ScriptFullPath%"
+		}
+		catch exception {
+			;ignore
+		}
+		
+		ExitApp
+	}
+}	
 
 saveConfiguration(configurationFile, wizard) {
 	configuration := newConfiguration()
@@ -2310,6 +2417,7 @@ initializeSimulatorSetup() {
 		; wizard.registerStepWizard(new InstallationStepWizard(wizard, "Installation", kSimulatorConfiguration))
 		; wizard.registerStepWizard(new ApplicationsStepWizard(wizard, "Applications", kSimulatorConfiguration))
 		wizard.registerStepWizard(new ButtonBoxStepWizard(wizard, "Button Box", kSimulatorConfiguration))
+		wizard.registerStepWizard(new SimulatorsStepWizard(wizard, "Simulators", kSimulatorConfiguration))
 	}
 	finally {
 		protectionOff()

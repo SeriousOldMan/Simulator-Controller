@@ -280,7 +280,7 @@ class FunctionsList extends ConfigurationItemList {
 	
 		Gui %window%:Add, Text, x16 y360 w86 h23 +0x200, % translate("Function")
 		Gui %window%:Add, DropDownList, x124 y360 w91 AltSubmit Choose%functionTypeDropDown% VfunctionTypeDropDown gupdateFunctionEditorState
-								, % values2String("|", map(["1-way Toggle", "2-way Toggle", "Button", "Dial", "Custom"], "translate")*)
+								, % values2String("|", map(["1-way Toggle", "2-way Toggle", "Button", "Rotary", "Custom"], "translate")*)
 		Gui %window%:Add, Edit, x220 y360 w40 h21 Number VfunctionNumberEdit, %functionNumberEdit%
 		Gui %window%:Add, UpDown, x260 y360 w17 h21, 1
 		
@@ -371,12 +371,7 @@ class FunctionsList extends ConfigurationItemList {
 	}
 
 	computeFunctionType(functionType) {
-		if (functionType == k1WayToggleType)
-			return "1-way Toggle"
-		else if (functionType == k2WayToggleType)
-			return "2-way Toggle"
-		else
-			return functionType
+		return kControlTypes[functionType]
 	}
 
 	computeHotkeysAndActionText(hotkeys, action) {

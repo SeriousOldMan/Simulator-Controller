@@ -32,8 +32,8 @@ global kCancel = "cancel"
 ;;;                         Public Variable Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global vShowKeyDetector = false
-global vKeyDetectorCallback = false
+global vShowTriggerDetector = false
+global vTriggerDetectorCallback = false
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -101,7 +101,7 @@ class ConfigurationEditor extends ConfigurationItem {
 		Gui %window%:Default
 	
 		Gui %window%:-Border ; -Caption
-		Gui %window%:Color, D0D0D0
+		Gui %window%:Color, D0D0D0, F2F2F2
 
 		Gui %window%:Font, Bold, Arial
 
@@ -196,18 +196,18 @@ class ConfigurationEditor extends ConfigurationItem {
 		Gui %window%:Destroy
 	}
 	
-	toggleKeyDetector(callback := false) {
+	toggleTriggerDetector(callback := false) {
 		if callback {
-			if !vShowKeyDetector
-				vKeyDetectorCallback := callback
+			if !vShowTriggerDetector
+				vTriggerDetectorCallback := callback
 		}
 		else
-			vKeyDetectorCallback := false
+			vTriggerDetectorCallback := false
 	
-		vShowKeyDetector := !vShowKeyDetector
+		vShowTriggerDetector := !vShowTriggerDetector
 		
-		if vShowKeyDetector
-			SetTimer showKeyDetector, -100
+		if vShowTriggerDetector
+			SetTimer showTriggerDetector, -100
 	}
 }
 
@@ -248,11 +248,11 @@ openConfigurationDocumentation() {
 ;;;-------------------------------------------------------------------------;;;
 
 
-showKeyDetector() {
-	returnHotKey := vKeyDetectorCallback
+showTriggerDetector() {
+	returnHotKey := vTriggerDetectorCallback
 	joystickNumbers := []
 	
-	vKeyDetectorCallback := false
+	vTriggerDetectorCallback := false
 
 	Loop 16 { ; Query each joystick number to find out which ones exist.
 		GetKeyState joyName, %A_Index%JoyName
@@ -267,15 +267,15 @@ showKeyDetector() {
 		MsgBox 262192, %title%, % translate("No controller detected...")
 		OnMessage(0x44, "")
 		
-		vShowKeyDetector := false
+		vShowTriggerDetector := false
 	}
 
-	if vShowKeyDetector {
+	if vShowTriggerDetector {
 		found := false
 		
 		Loop {
-			if (vKeyDetectorCallback && (returnHotKey != vKeyDetectorCallback))
-				returnHotKey := vKeyDetectorCallback
+			if (vTriggerDetectorCallback && (returnHotKey != vTriggerDetectorCallback))
+				returnHotKey := vTriggerDetectorCallback
 			
 			joystickNumber := joystickNumbers[1]
 			
@@ -288,7 +288,7 @@ showKeyDetector() {
 			GetKeyState joy_name, %joystickNumber%JoyName
 			GetKeyState joy_info, %joystickNumber%JoyInfo
 
-			if !vShowKeyDetector {
+			if !vShowTriggerDetector {
 				ToolTip, , , 1
 				
 				break

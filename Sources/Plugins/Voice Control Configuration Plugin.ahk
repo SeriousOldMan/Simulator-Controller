@@ -122,13 +122,13 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		Gui %window%:Add, DropDownList, x134 yp w340 VwindowsSpeakerDropDown, % values2String("|", voices*)
 		
 		Gui %window%:Add, Text, x16 ys+24 w110 h23 +0x200 VwindowsSpeakerVolumeLabel, % translate("Volume")
-		Gui %window%:Add, Slider, x134 yp w135 Range0-100 ToolTip VspeakerVolumeSlider, % speakerVolumeSlider
+		Gui %window%:Add, Slider, x134 yp w135 0x10 Range0-100 ToolTip VspeakerVolumeSlider, % speakerVolumeSlider
 		
 		Gui %window%:Add, Text, x16 yp+24 w110 h23 +0x200 VwindowsSpeakerPitchLabel, % translate("Pitch")
-		Gui %window%:Add, Slider, x134 yp w135 Range-10-10 ToolTip VspeakerPitchSlider, % speakerPitchSlider
+		Gui %window%:Add, Slider, x134 yp w135 0x10 Range-10-10 ToolTip VspeakerPitchSlider, % speakerPitchSlider
 		
 		Gui %window%:Add, Text, x16 yp+24 w110 h23 +0x200 VwindowsSpeakerSpeedLabel, % translate("Speed")
-		Gui %window%:Add, Slider, x134 yp w135 Range-10-10 ToolTip VspeakerSpeedSlider, % speakerSpeedSlider
+		Gui %window%:Add, Slider, x134 yp w135 0x10 Range-10-10 ToolTip VspeakerSpeedSlider, % speakerSpeedSlider
 		
 		this.iWindowsVoiceWidgets := [["windowsSpeakerLabel", "windowsSpeakerDropDown"]]
 		
@@ -488,7 +488,7 @@ setPTTHotkey(hotkey) {
 		Gui %window%:Default
 		GuiControl Text, pushToTalkEdit, %pushToTalkEdit%
 		
-		ConfigurationEditor.Instance.toggleKeyDetector()
+		ConfigurationEditor.Instance.toggleTriggerDetector()
 	}
 }
 
@@ -496,7 +496,7 @@ getPTTHotkey() {
 	protectionOn()
 	
 	try {
-		ConfigurationEditor.Instance.toggleKeyDetector("setPTTHotkey")
+		ConfigurationEditor.Instance.toggleTriggerDetector("setPTTHotkey")
 	}
 	finally {
 		protectionOff()

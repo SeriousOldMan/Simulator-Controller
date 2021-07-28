@@ -281,7 +281,7 @@ class SetupWizard extends ConfigurationItem {
 		Gui %window%:Default
 	
 		Gui %window%:-Border ; -Caption
-		Gui %window%:Color, D0D0D0
+		Gui %window%:Color, D0D0D0, F2F2F2
 
 		Gui %window%:Font, s10 Bold, Arial
 
@@ -327,7 +327,7 @@ class SetupWizard extends ConfigurationItem {
 		Gui %window%:Default
 	
 		Gui %window%:-Border ; -Caption
-		Gui %window%:Color, D0D0D0
+		Gui %window%:Color, D0D0D0, E5E5E5
 
 		Gui %window%:Font, s10 Bold, Arial
 
@@ -719,7 +719,7 @@ class SetupWizard extends ConfigurationItem {
 			function := knowledgeBase.getValue("Controller.Function." . A_Index, false)
 		
 			if function
-				knowledgeBase.removeFact("Controller.Function." . function . ".Keys")
+				knowledgeBase.removeFact("Controller.Function." . function . ".Triggers")
 			
 			knowledgeBase.removeFact("Controller.Function." . A_Index)
 		}
@@ -734,7 +734,7 @@ class SetupWizard extends ConfigurationItem {
 			knowledgeBase.addFact("Controller.Function." . A_Index, name)
 			
 			if (function.Length() > 0)
-				knowledgeBase.addFact("Controller.Function." . name . ".Keys", values2String("|", function*))
+				knowledgeBase.addFact("Controller.Function." . name . ".Triggers", values2String("|", function*))
 		}
 		
 		knowledgeBase.setFact("Controller.Function.Count", functions.Length())
@@ -742,8 +742,39 @@ class SetupWizard extends ConfigurationItem {
 		this.updateState()
 	}
 	
-	getControllerFunctionKeys(function) {
-		return string2Values("|", this.KnowledgeBase.getValue("Controller.Function." . function . ".Keys", ""))
+	getControllerFunctionTriggers(function) {
+		return string2Values("|", this.KnowledgeBase.getValue("Controller.Function." . function . ".Triggers", ""))
+	}
+	
+	setSimulatorCommandFunctions(simulator, mode, functions) {
+		local knowledgeBase := this.KnowledgeBase
+		local function
+		
+		Loop % knowledgeBase.getValue("Simulator." . simulator . ".Mode." . mode . ".Command.Count", 0) {
+			command := knowledgeBase.getValue("Simulator." . simulator . ".Mode." . mode . ".Command." . A_Index, false)
+		
+			if command
+				knowledgeBase.removeFact("Simulator." . simulator . ".Mode." . mode . ".Command." . command . ".Function")
+			
+			knowledgeBase.removeFact("Simulator." . simulator . ".Mode." . mode . ".Command." . A_Index)
+		}
+		
+		for command, function in functions {
+			knowledgeBase.addFact("Simulator." . simulator . ".Mode." . mode . ".Command." . A_Index, command)
+			knowledgeBase.addFact("Simulator." . simulator . ".Mode." . mode . ".Command." . command . ".Function", function)
+		}
+		
+		knowledgeBase.setFact("Simulator." . simulator . ".Mode." . mode . ".Command.Count", functions.Length())
+		
+		this.updateState()
+	}
+	
+	getSimulatorCommandFunction(simulator, mode, command) {
+		return this.KnowledgeBase.getValue("Simulator." . simulator . ".Mode." . mode . ".Command." . command . ".Function", "")
+	}
+	
+	simulatorCommandAvailable(simulator, mode, command) {
+		return this.KnowledgeBase.getValue("Command." . command, false)
 	}
 	
 	setTitle(title) {
@@ -810,18 +841,18 @@ class SetupWizard extends ConfigurationItem {
 		}
 	}
 	
-	toggleKeyDetector(callback := false) {
+	toggleTriggerDetector(callback := false) {
 		if callback {
-			if !vShowKeyDetector
-				vKeyDetectorCallback := callback
+			if !vShowTriggerDetector
+				vTriggerDetectorCallback := callback
 		}
 		else
-			vKeyDetectorCallback := false
+			vTriggerDetectorCallback := false
 	
-		vShowKeyDetector := !vShowKeyDetector
+		vShowTriggerDetector := !vShowTriggerDetector
 		
-		if vShowKeyDetector
-			SetTimer showKeyDetector, -100
+		if vShowTriggerDetector
+			SetTimer showTriggerDetector, -100
 	}
 }
 
@@ -1736,7 +1767,7 @@ class ButtonBoxStepWizard extends StepWizard {
 	
 	iFunctionsListView := false
 	
-	iFunctionKeys := {}
+	iFunctionTriggers := {}
 		
 	class StepButtonBoxEditor extends ButtonBoxEditor {
 		configurationChanged(name) {
@@ -1794,11 +1825,11 @@ class ButtonBoxStepWizard extends StepWizard {
 		Gui %window%:Font, s12 Bold, Arial
 		
 		Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDfunctionsIconHandle Hidden, %kResourcesDirectory%Setup\Images\Controller.ico
-		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h30 HWNDfunctionsLabelHandle Hidden, % translate("Controller Configuration")
+		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h30 HWNDfunctionsLabelHandle Hidden, % translate("Controller Layout && Triggers")
 		
 		Gui %window%:Font, s9 Norm, Arial
 		
-		Gui Add, ListView, x%x% yp+33 w%width% h300 -Multi -LV0x10 NoSort NoSortHdr HWNDfunctionsListViewHandle gupdateFunctionKeys Hidden, % values2String("|", map(["Controller / Button Box", "Control", "Function", "Number", "Key(s)", "Hints"], "translate")*)
+		Gui Add, ListView, x%x% yp+33 w%width% h300 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDfunctionsListViewHandle gupdateFunctionTriggers Hidden, % values2String("|", map(["Controller / Button Box", "Control", "Function", "Number", "Trigger(s)", "Hints"], "translate")*)
 		
 		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Button Box", "Button Box.Functions.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px'>" . info . "</div>"
@@ -1819,7 +1850,7 @@ class ButtonBoxStepWizard extends StepWizard {
 		base.reset()
 		
 		this.iFunctionsListView := false
-		this.iFunctionKeys := {}
+		this.iFunctionTriggers := {}
 		
 		if this.iButtonBoxEditor {
 			this.iButtonBoxEditor.close(true)
@@ -1844,10 +1875,10 @@ class ButtonBoxStepWizard extends StepWizard {
 	hidePage(page) {
 		configuration := readConfiguration(kUserHomeDirectory . "Install\Button Box Configuration.ini")
 		
-		if (this.conflictingFunctions(configuration) || this.conflictingKeys(configuration)) {
+		if (this.conflictingFunctions(configuration) || this.conflictingTriggers(configuration)) {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-			title := translate("Error")
-			MsgBox 262160, %title%, % translate("There are still duplicate functions or duplicate keys - please correct...")
+			title := translate("Functions")
+			MsgBox 262160, %title%, % translate("There are still duplicate functions or duplicate triggers - please correct...")
 			OnMessage(0x44, "")
 			
 			return false
@@ -1858,9 +1889,9 @@ class ButtonBoxStepWizard extends StepWizard {
 		Gui %window%:Default
 		Gui ListView, % this.iFunctionsListView
 		
-		if (LV_GetCount() != this.iFunctionKeys.Length()) {
+		if (LV_GetCount() != this.iFunctionTriggers.Length()) {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-			title := translate("Delete")
+			title := translate("Functions")
 			MsgBox 262436, %title%, % translate("Not all functions have been assigned to physical controls. Do you really want to proceed?")
 			OnMessage(0x44, "")
 			
@@ -1890,19 +1921,23 @@ class ButtonBoxStepWizard extends StepWizard {
 		for control, descriptor in getConfigurationSectionValues(configuration, "Controls")
 			controls[control] := string2Values(";", descriptor)[1]
 		
-		for controller, definition in getConfigurationSectionValues(configuration, "Layouts")
-			if (ConfigurationItem.splitDescriptor(controller)[2] != "Layout")
+		for controller, definition in getConfigurationSectionValues(configuration, "Layouts") {
+			controller := ConfigurationItem.splitDescriptor(controller)
+		
+			if ((controller[2] != "Layout") && (controller[2] != "Visible")) {
 				for ignore, function in string2Values(";", definition) {
 					function := string2Values(",", function)[1]
 					function := ConfigurationItem.splitDescriptor(function)
 					function := ConfigurationItem.descriptor(controls[function[1]], function[2])
 				
 					if (function != "")
-						if this.iFunctionKeys.HasKey(function)
-							functions.Push(Array(function, this.iFunctionKeys[function]*))
+						if this.iFunctionTriggers.HasKey(function)
+							functions.Push(Array(function, this.iFunctionTriggers[function]*))
 						else
 							functions.Push(function)
 				}
+			}
+		}
 				
 		return functions
 	}
@@ -1920,7 +1955,7 @@ class ButtonBoxStepWizard extends StepWizard {
 		for controller, definition in getConfigurationSectionValues(configuration, "Layouts") {
 			controller := ConfigurationItem.splitDescriptor(controller)
 		
-			if (controller[2] != "Layout") {
+			if ((controller[2] != "Layout") && (controller[2] != "Visible")) {
 				controller := controller[1]
 				
 				for ignore, function in string2Values(";", definition) {
@@ -1945,23 +1980,23 @@ class ButtonBoxStepWizard extends StepWizard {
 		return (conflict ? functions : false)
 	}
 	
-	conflictingKeys(configuration) {
+	conflictingTriggers(configuration) {
 		local function
 		
-		keys := {}
+		triggers := {}
 		conflict := false
 		
-		for function, functionKeys in this.iFunctionKeys
-			for ignore, key in functionKeys
-				if !keys.HasKey(key)
-					keys[key] := [function]
+		for function, functionTriggers in this.iFunctionTriggers
+			for ignore, trigger in functionTriggers
+				if !triggers.HasKey(trigger)
+					triggers[trigger] := [function]
 				else {
-					keys[key].Push(function)
+					triggers[trigger].Push(function)
 				
 					conflict := true
 				}
 		
-		return (conflict ? keys : false)
+		return (conflict ? triggers : false)
 	}
 	
 	loadFunctions(configuration, load := false) {
@@ -1980,19 +2015,19 @@ class ButtonBoxStepWizard extends StepWizard {
 		Gui ListView, % this.iFunctionsListView
 		
 		if load
-			this.iFunctionKeys := {}
+			this.iFunctionTriggers := {}
 		
 		LV_Delete()
 		
 		lastController := false
 		
 		functionConflicts := this.conflictingFunctions(configuration)
-		keyConflicts := this.conflictingKeys(configuration)
+		triggerConflicts := this.conflictingTriggers(configuration)
 		
 		for controller, definition in getConfigurationSectionValues(configuration, "Layouts") {
 			controller := ConfigurationItem.splitDescriptor(controller)
 		
-			if (controller[2] != "Layout") {
+			if ((controller[2] != "Layout") && (controller[2] != "Visible")) {
 				controller := controller[1]
 			
 				for ignore, control in string2Values(";", definition) {
@@ -2005,19 +2040,19 @@ class ButtonBoxStepWizard extends StepWizard {
 						first := (controller != lastController)
 						lastController := controller
 				
-						if this.iFunctionKeys.HasKey(function)
-							functionKeys := this.iFunctionKeys[function]
+						if this.iFunctionTriggers.HasKey(function)
+							functionTriggers := this.iFunctionTriggers[function]
 						else
-							functionKeys := wizard.getControllerFunctionKeys(function)
+							functionTriggers := wizard.getControllerFunctionTriggers(function)
 						
 						conflict := 0
 						
 						if (functionConflicts && functionConflicts[function].Length() > 1)
 							conflict += 1
 						
-						if keyConflicts
-							for ignore, key in functionKeys
-								if (keyConflicts[key].Length() > 1) {
+						if triggerConflicts
+							for ignore, trigger in functionTriggers
+								if (triggerConflicts[trigger].Length() > 1) {
 									conflict += 2
 									
 									break
@@ -2026,22 +2061,22 @@ class ButtonBoxStepWizard extends StepWizard {
 						if (conflict == 1)
 							conflict := translate("Duplicate function...")
 						else if (conflict == 2)
-							conflict := translate("Duplicate key(s)...")
+							conflict := translate("Duplicate trigger(s)...")
 						else if (conflict == 3)
-							conflict := translate("Duplicate function and duplicate key(s)...")
+							conflict := translate("Duplicate function and duplicate trigger(s)...")
 						else
 							conflict := ""
 						
-						if (functionKeys.Length() > 0) {
-							keys := values2String(" | ", functionKeys*)
+						if (functionTriggers.Length() > 0) {
+							triggers := values2String(" | ", functionTriggers*)
 							
 							if load
-								this.iFunctionKeys[function] := functionKeys
+								this.iFunctionTriggers[function] := functionTriggers
 						}
 						else
-							keys := ""
+							triggers := ""
 						
-						LV_Add("", (first ? controller : ""), control[1], translate(controls[control[1]]), control[2], keys, conflict)
+						LV_Add("", (first ? controller : ""), control[1], translate(controls[control[1]]), control[2], triggers, conflict)
 					}
 				}
 			}
@@ -2055,38 +2090,41 @@ class ButtonBoxStepWizard extends StepWizard {
 		LV_ModifyCol(6, "AutoHdr")
 	}
 	
-	updateFunctionKeys(line) {
+	updateFunctionTriggers(row) {
 		local function
 		
 		wizard := this.SetupWizard
 		
-		if this.iKeyModeActive
-			wizard.toggleKeyDetector()
+		if this.iTriggerModeActive
+			wizard.toggleTriggerDetector()
 		
+		window := this.Window
+		
+		Gui %window%:Default
 		Gui ListView, % this.iFunctionsListView
 		
-		LV_GetText(type, line, 3)
-		LV_GetText(number, line, 4)
+		LV_GetText(type, row, 3)
+		LV_GetText(number, row, 4)
 		
 		switch type {
 			case translate(k2WayToggleType):
-				callback := ObjBindMethod(this, "registerHotkey", k2WayToggleType . "." . number, line, true)
+				callback := ObjBindMethod(this, "registerHotkey", k2WayToggleType . "." . number, row, true)
 			case translate(kDialType):
-				callback := ObjBindMethod(this, "registerHotkey", kDialType . "." . number, line, true)
+				callback := ObjBindMethod(this, "registerHotkey", kDialType . "." . number, row, true)
 			case translate(k1WayToggleType):
-				callback := ObjBindMethod(this, "registerHotkey", k1WayToggleType . "." . number, line, false)
+				callback := ObjBindMethod(this, "registerHotkey", k1WayToggleType . "." . number, row, false)
 			case translate(kButtonType):
-				callback := ObjBindMethod(this, "registerHotkey", kButtonType . "." . number, line, false)
+				callback := ObjBindMethod(this, "registerHotkey", kButtonType . "." . number, row, false)
 		}
 		
-		this.iKeyModeActive := true
+		this.iTriggerModeActive := true
 		
-		wizard.toggleKeyDetector(callback)
+		wizard.toggleTriggerDetector(callback)
 		
-		SetTimer stopKeyDetector, 100
+		SetTimer stopTriggerDetector, 100
 	}
 	
-	registerHotKey(function, line, firstHotkey, hotkey) {
+	registerHotKey(function, row, firstHotkey, hotkey) {
 		local controller
 		local number
 		
@@ -2095,27 +2133,27 @@ class ButtonBoxStepWizard extends StepWizard {
 		SoundPlay %kResourcesDirectory%Sounds\Activated.wav
 		
 		if (firstHotkey == true) {
-			callback := ObjBindMethod(this, "registerHotkey", function, line, hotkey)
+			callback := ObjBindMethod(this, "registerHotkey", function, row, hotkey)
 		
-			wizard.toggleKeyDetector()
+			wizard.toggleTriggerDetector()
 			
 			Sleep 2000
 			
-			wizard.toggleKeyDetector(callback)
+			wizard.toggleTriggerDetector(callback)
 			
 			return
 		}
 		else if (firstHotkey != false) {
-			this.iFunctionKeys[function] := [firstHotkey, hotkey]
+			this.iFunctionTriggers[function] := [firstHotkey, hotkey]
 		
 			hotkey := firstHotkey . " | " . hotkey
 		}
 		else
-			this.iFunctionKeys[function] := [hotkey]
+			this.iFunctionTriggers[function] := [hotkey]
 		
-		this.iKeyModeActive := false
+		this.iTriggerModeActive := false
 		
-		wizard.toggleKeyDetector()
+		wizard.toggleTriggerDetector()
 		
 		this.loadFunctions(readConfiguration(kUserHomeDirectory . "Install\Button Box Configuration.ini"))
 		
@@ -2124,15 +2162,26 @@ class ButtonBoxStepWizard extends StepWizard {
 		Gui %window%:Default
 		Gui ListView, % this.iFunctionsListView
 		
-		LV_Modify(line, "Vis")
+		LV_Modify(row, "Vis")
 	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; SimulatorsStepWizard                                                     ;;;
+;;; SimulatorsStepWizard                                                    ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class SimulatorsStepWizard extends StepWizard {
+	iPendingFunctionRegistration := false
+	iButtonBoxPreviews := []
+	iButtonBoxPreviewCenterY := 0
+	
+	iCurrentSimulator := "Assetto Corsa Competizione"
+	
+	iCommandsListView := false
+	
+	iCommands := {}
+	iFunctions := {}
+	
 	Pages[] {
 		Get {
 			wizard := this.SetupWizard
@@ -2145,11 +2194,221 @@ class SimulatorsStepWizard extends StepWizard {
 			
 			hasAssistant := (wizard.isModuleSelected("Race Engineer") | wizard.isModuleSelected("Race Strategist"))
 			
-			pages := 2 + (((hasAssistant && (numSimulations > 0)) ? 1 : 0) + numSimulations)
+			return 2 + (((hasAssistant && (numSimulations > 0)) ? 1 : 0) + numSimulations)
 		}
 	}
 	
 	createGui(wizard, x, y, width, height) {
+		local application
+		
+		static commandsInfoText
+		
+		labelY := y
+		
+		window := this.Window
+		
+		Gui %window%:Default
+		
+		commandsIconHandle := false
+		commandsIconLabelHandle := false
+		commandsListViewHandle := false
+		commandsInfoTextHandle := false
+		
+		labelWidth := width - 30
+		labelX := x + 45
+		labelY := y + 5
+		
+		Gui %window%:Font, s12 Bold, Arial
+		
+		Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDcommandsIconHandle Hidden, %kResourcesDirectory%Setup\Images\Controller.ico
+		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h30 HWNDcommandsLabelHandle Hidden, % translate("Controller Assignments for Simulators")
+		
+		Gui %window%:Font, s9 Norm, Arial
+		
+		listX := x + 250
+		listWidth := width - 250
+		Gui Add, ListView, x%listX% yp+33 w%listWidth% h300 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDcommandsListViewHandle gupdateCommandFunction Hidden, % values2String("|", map(["Mode", "Command / Setting", "Label", "Function"], "translate")*)
+		
+		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Simulators", "Simulators.Commands.Info." . getLanguage()))
+		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px'>" . info . "</div>"
+		
+		Gui %window%:Add, ActiveX, x%x% yp+305 w%width% h135 HWNDcommandsInfoTextHandle VcommandsInfoText Hidden, shell explorer
+
+		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+
+		commandsInfoText.Navigate("about:blank")
+		commandsInfoText.Document.Write(html)
+		
+		this.iCommandsListView := commandsListViewHandle
+		
+		this.registerWidgets(1, commandsIconHandle, commandsLabelHandle, commandsListViewHandle, commandsInfoTextHandle)
+	}
+	
+	showPage(page) {
+		base.showPage(page)
+		
+		this.loadCommands(this.iCurrentSimulator)
+		
+		this.openButtonBoxes()
+	}
+	
+	hidePage(page) {
+		if base.hidePage(page) {
+			this.closeButtonBoxes()
+			
+			return true
+		}
+		else
+			return false
+	}
+	
+	loadCommands(simulator) {
+		this.iCommands := {}
+		
+		window := this.Window
+		wizard := this.SetupWizard
+		
+		Gui %window%:Default
+		
+		Gui ListView, % this.iCommandsListView
+		
+		pluginLabels := readConfiguration(kUserTranslationsDirectory . "Controller Plugin Labels." . getLanguage())
+		
+		code := string2Values("|", getConfigurationValue(wizard.Definition, "Applications.Simulators", simulator))[1]
+		
+		LV_Delete()
+		
+		lastMode := false
+		count := 1
+		
+		for ignore, mode in ["Pitstop", "Assistant"]
+			for ignore, command in string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Simulators", (mode = "Assistant") ? "Simulators.Commands.Assistant" : ("Simulators.Settings.Pitstop." . code))) {
+				first := (mode != lastMode)
+				lastMode := mode
+				
+				if wizard.simulatorCommandAvailable(simulator, mode, command) {
+					this.iFunctions[command] := wizard.getSimulatorCommandFunction(simulator, mode, command)
+					
+					subCommand := ConfigurationItem.splitDescriptor(command)
+				
+					if (subCommand[1] = "InformationRequest") {
+						subCommand := subCommand[2]
+						
+						isInformationRequest := true
+					}
+					else {
+						subCommand := subCommand[1]
+						
+						isInformationRequest := false
+					}
+					
+					label := getConfigurationValue(pluginLabels, code, subCommand . ".Toggle", kUndefined)
+					
+					if (label == kUndefined) {
+						label := getConfigurationValue(pluginLabels, code, subCommand . ".Activate")
+						
+						this.iCommands[subCommand] := [isInformationRequest, "Activate"]
+						this.iCommands[command] := [isInformationRequest, "Activate"]
+					}
+					else {
+						this.iCommands[subCommand] := [isInformationRequest, "Toggle", "Increase", "Decrease"]
+						this.iCommands[command] := [isInformationRequest, "Toggle", "Increase", "Decrease"]
+					}
+					
+					this.iCommands[count] := command
+					
+					LV_Add("", (first ? mode : ""), subCommand, label, this.iFunctions[command])
+					
+					count += 1
+				}
+			}
+			
+		LV_ModifyCol(1, "AutoHdr")
+		LV_ModifyCol(2, "AutoHdr")
+		LV_ModifyCol(3, "AutoHdr")
+	}
+	
+	getCommand(row) {
+		return this.iCommands[row]
+	}
+	
+	getPreviewCenter(ByRef centerX, ByRef centerY) {
+		centerX := false
+		centerY := this.iButtonBoxPreviewCenterY
+	}
+	
+	getPreviewMover() {
+		return false
+	}
+	
+	openButtonBoxes() {
+		configuration := readConfiguration(kUserHomeDirectory . "Install\Button Box Configuration.ini")
+		
+		controllers := []
+		
+		for controller, definition in getConfigurationSectionValues(configuration, "Layouts") {
+			controller := ConfigurationItem.splitDescriptor(controller)
+		
+			if !inList(controllers, controller[1])
+				controllers.Push(controller[1])
+		}
+		
+		for index, controller in controllers {
+			preview := new ButtonBoxPreview(this, controller, configuration)
+		
+			preview.setControlClickHandler(ObjBindMethod(this, "controlClick"))
+		
+			if (index = 1) {
+				SysGet mainScreen, MonitorWorkArea
+				
+				this.iButtonBoxPreviewCenterY := (mainScreenBottom - Round(preview.Height / 2))
+			}
+			else
+				this.iButtonBoxPreviewCenterY -= Round(preview.Height / 2)
+			
+			preview.open()
+			
+			this.iButtonBoxPreviewCenterY -= Round(preview.Height / 2)
+			this.iButtonBoxPreviews.Push(preview)
+		}
+		
+		this.iPendingFunctionRegistration := false
+	}
+	
+	closeButtonBoxes() {
+		for ignore, preview in this.iButtonBoxPreviews
+			preview.close()
+		
+		this.iButtonBoxPreviews := []
+	}
+	
+	updateCommandFunction(row) {
+		SetTimer showFunctionSelectorHint, 100
+		
+		this.iPendingFunctionRegistration := row
+	}
+	
+	controlClick(element, function, row, column, isEmpty) {
+		if this.iPendingFunctionRegistration {
+			SoundPlay %kResourcesDirectory%Sounds\Activated.wav
+			
+			this.iFunctions[this.getCommand(this.iPendingFunctionRegistration)] := function
+			
+			this.loadCommands(this.iCurrentSimulator)
+			
+			window := this.Window
+			
+			Gui %window%:Default
+			Gui ListView, % this.iFunctionsListView
+	
+			LV_Modify(this.iPendingFunctionRegistration, "Vis")
+		}
+
+		SetTimer showFunctionSelectorHint, Off
+		
+		ToolTip, , , 1
+		
+		this.iPendingFunctionRegistration := false
 	}
 }
 
@@ -2230,28 +2489,158 @@ locateSoftware() {
 	finally {
 		protectionOff()
 	}
+}	
+
+LV_ClickedColumn(listViewHandle) {
+	static LVM_SUBITEMHITTEST := 0x1039
+
+	VarSetCapacity(POINT, 8, 0)
+
+	DllCall("User32.dll\GetCursorPos", "Ptr", &POINT)
+	DllCall("User32.dll\ScreenToClient", "Ptr", listViewHandle, "Ptr", &POINT)
+
+	VarSetCapacity(LVHITTESTINFO, 24, 0)
+	NumPut(NumGet(POINT, 0, "Int"), LVHITTESTINFO, 0, "Int")
+	NumPut(NumGet(POINT, 4, "Int"), LVHITTESTINFO, 4, "Int")
+
+	SendMessage, LVM_SUBITEMHITTEST, 0, &LVHITTESTINFO, , ahk_id %listViewHandle%
+
+	return ((ErrorLevel = -1) ? 0 : (NumGet(LVHITTESTINFO, 16, "Int") + 1))
 }
 
-updateFunctionKeys() {
-	wizard := SetupWizard.Instance
+updateFunctionTriggers() {
+	Loop % LV_GetCount()
+		LV_Modify(A_Index, "-Select")
 	
 	if (A_GuiEvent = "DoubleClick") {
-		wizard.StepWizards["Button Box"].updateFunctionKeys(A_EventInfo)
+		if (A_EventInfo > 0) {
+			wizard := SetupWizard.Instance.StepWizards["Button Box"]
 		
+			wizard.updateFunctionTriggers(A_EventInfo)
+		}
+	}
+	else if (A_GuiEvent = "RightClick") {
+		if (A_EventInfo > 0) {
+			row := A_EventInfo
+			
+			wizard := SetupWizard.Instance.StepWizards["Button Box"]
+		
+			curCoordMode := A_CoordModeMouse
+
+			LV_GetText(control, row, 2)
+			LV_GetText(number, row, 4)
+			
+			menuItem := ConfigurationItem.descriptor(control, number)
+			
+			try {
+				Menu ContextMenu, DeleteAll
+			}
+			catch exception {
+				; ignore
+			}
+			
+			window := SetupWizard.Instance.WizardWindow
+			
+			Gui %window%:Default
+			
+			Menu ContextMenu, Add, %menuItem%, menuIgnore
+			Menu ContextMenu, Disable, %menuItem%
+			Menu ContextMenu, Add
+			
+			menuItem := translate("Press the trigger(s)...")
+			handler := ObjBindMethod(wizard, "updateFunctionTriggers", row)
+			
+			Menu ContextMenu, Add, %menuItem%, %handler%
+			
+			Menu ContextMenu, Show
+		}
+	}
+	
+	Loop % LV_GetCount()
+		LV_Modify(A_Index, "-Select")
+}
+
+stopTriggerDetector() {
+	wizard := SetupWizard.Instance.StepWizards["Button Box"]
+	
+	if (!wizard.iTriggerModeActive || !vShowTriggerDetector) {
+		SetTimer stopTriggerDetector, Off
+	
+		wizard.iTriggerModeActive := false
+	}
+	else if GetKeyState("Esc", "P") {
+		wizard.SetupWizard.toggleTriggerDetector()
+	
+		wizard.iTriggerModeActive := false
+		
+		SetTimer stopTriggerDetector, Off
 	}
 }
 
-stopKeyDetector() {
-	wizard := SetupWizard.Instance.StepWizards["Button Box"]
+updateCommandFunction() {
+	Loop % LV_GetCount()
+		LV_Modify(A_Index, "-Select")
 	
-	if !wizard.iKeyModeActive
-		SetTimer stopKeyDetector, Off
-	else if GetKeyState("Esc", "P") {
-		wizard.SetupWizard.toggleKeyDetector()
-	
-		wizard.iKeyModeActive := false
+	if (A_GuiEvent = "DoubleClick") {
+		if (A_EventInfo > 0) {
+			wizard := SetupWizard.Instance.StepWizards["Simulators"]
 		
-		SetTimer stopKeyDetector, Off
+			wizard.updateCommandFunction(A_EventInfo)
+		}
+	}
+	else if (A_GuiEvent = "RightClick") {
+		if (A_EventInfo > 0) {
+			row := A_EventInfo
+			
+			wizard := SetupWizard.Instance.StepWizards["Simulators"]
+		
+			curCoordMode := A_CoordModeMouse
+
+			LV_GetText(command, row, 2)
+			LV_GetText(label, row, 3)
+			
+			menuItem := (command . ": " . label)
+			
+			try {
+				Menu ContextMenu, DeleteAll
+			}
+			catch exception {
+				; ignore
+			}
+			
+			window := SetupWizard.Instance.WizardWindow
+			
+			Gui %window%:Default
+			
+			Menu ContextMenu, Add, %menuItem%, menuIgnore
+			Menu ContextMenu, Disable, %menuItem%
+			Menu ContextMenu, Add
+			
+			menuItem := translate("Please select a controller function...")
+			handler := ObjBindMethod(wizard, "updateCommandFunction", row)
+			
+			Menu ContextMenu, Add, %menuItem%, %handler%
+			
+			Menu ContextMenu, Show
+		}
+	}
+	
+	Loop % LV_GetCount()
+		LV_Modify(A_Index, "-Select")
+}
+
+showFunctionSelectorHint() {
+	if GetKeyState("Esc", "P") {
+		SetTimer showFunctionSelectorHint, Off
+		
+		SetupWizard.Instance.StepWizards["Simulators"].iPendingFunctionRegistration := false
+		
+		ToolTip, , , 1
+	}
+	else {
+		hint := translate("Please select a controller function...")
+		
+		ToolTip %hint%, , , 1
 	}
 }
 
@@ -2382,7 +2771,7 @@ elevateAndRestart() {
 		
 		ExitApp
 	}
-}	
+}
 
 saveConfiguration(configurationFile, wizard) {
 	configuration := newConfiguration()

@@ -243,7 +243,7 @@ editModes(ByRef settingsOrCommand) {
 		Gui ME:Default
 				
 		Gui ME:-Border ; -Caption
-		Gui ME:Color, D0D0D0
+		Gui ME:Color, D0D0D0, E5E5E5
 
 		Gui ME:Font, Bold, Arial
 
@@ -420,7 +420,7 @@ restart:
 		result := false
 		
 		Gui SE:-Border ; -Caption
-		Gui SE:Color, D0D0D0
+		Gui SE:Color, D0D0D0, E5E5E5
 	
 		Gui SE:Font, Bold, Arial
 	

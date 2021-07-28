@@ -46,7 +46,7 @@ class ControllerConfigurator extends ConfigurationItem {
 		this.iButtonBoxesList.createGui(editor, x, y, width, height)
 		this.iFunctionsList.createGui(editor, x, y, width, height)
 		
-		Gui %window%:Add, Button, x16 y490 w100 h23 gtoggleKeyDetector, % translate("Key Detector...")
+		Gui %window%:Add, Button, x16 y490 w100 h23 gtoggleTriggerDetector, % translate("Trigger...")
 	}
 	
 	saveToConfiguration(configuration) {
@@ -562,11 +562,11 @@ class FunctionsList extends ConfigurationItemList {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-toggleKeyDetector(callback := false) {
+toggleTriggerDetector(callback := false) {
 	protectionOn()
 	
 	try {
-		ConfigurationEditor.Instance.toggleKeyDetector()
+		ConfigurationEditor.Instance.toggleTriggerDetector()
 	}
 	finally {
 		protectionOff()

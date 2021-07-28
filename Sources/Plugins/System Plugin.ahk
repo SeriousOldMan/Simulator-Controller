@@ -206,8 +206,6 @@ class SystemPlugin extends ControllerPlugin {
 		local function
 		local action
 		
-		this.iLaunchMode := new this.LaunchMode(this)
-		
 		if inList(A_Args, "-Startup")
 			this.iChildProcess := true
 		
@@ -233,8 +231,12 @@ class SystemPlugin extends ControllerPlugin {
 		if (descriptor != false) {
 			function := controller.findFunction(descriptor)
 		
-			if (function != false)
+			if (function != false) {
+				if !this.iLaunchMode
+					this.iLaunchMode := new this.LaunchMode(this)
+				
 				this.iLaunchMode.registerAction(new this.LogoToggleAction(function, ""))
+			}
 			else
 				this.logFunctionNotFound(descriptor)
 		}
@@ -244,13 +246,19 @@ class SystemPlugin extends ControllerPlugin {
 		if (descriptor != false) {
 			function := controller.findFunction(descriptor)
 		
-			if (function != false)
+			if (function != false) {
+				if !this.iLaunchMode
+					this.iLaunchMode := new this.LaunchMode(this)
+				
 				this.iLaunchMode.registerAction(new this.SystemShutdownAction(function, "Shutdown"))
+			}
 			else
 				this.logFunctionNotFound(descriptor)
 		}
 		
-		this.registerMode(this.iLaunchMode)
+		if this.iLaunchMode
+			this.registerMode(this.iLaunchMode)
+		
 		controller.registerPlugin(this)
 		
 		this.initializeBackgroundTasks()
@@ -275,7 +283,10 @@ class SystemPlugin extends ControllerPlugin {
 				
 				if (runnable != false) {
 					action := new this.LaunchAction(function, appDescriptor[1], appDescriptor[2])
-					
+
+					if !this.iLaunchMode
+						this.iLaunchMode := new this.LaunchMode(this)
+				
 					this.iLaunchMode.registerAction(action)
 				
 					runnable.connectAction(function, action)

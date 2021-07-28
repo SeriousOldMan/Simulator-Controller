@@ -774,7 +774,11 @@ class SetupWizard extends ConfigurationItem {
 	}
 	
 	simulatorCommandAvailable(simulator, mode, command) {
-		return this.KnowledgeBase.getValue("Command." . command, false)
+		local knowledgeBase := this.KnowledgeBase
+		
+		goal := new RuleCompiler().compileGoal("simulatorCommandAvailable(" . StrReplace(simulator, " ", "\ ") . ", " . StrReplace(mode, " ", "\ ") . ", " . StrReplace(command, " ", "\ ") . ")")
+		
+		return knowledgeBase.prove(goal)
 	}
 	
 	setTitle(title) {
@@ -2244,10 +2248,20 @@ class SimulatorsStepWizard extends StepWizard {
 		this.registerWidgets(1, commandsIconHandle, commandsLabelHandle, commandsListViewHandle, commandsInfoTextHandle)
 	}
 	
+	reset() {
+		base.reset()
+		
+		this.iCommandsListView := false
+		this.iCommands := {}
+		this.iFunctions := {}
+		
+		this.closeButtonBoxes()
+	}
+	
 	showPage(page) {
 		base.showPage(page)
 		
-		this.loadCommands(this.iCurrentSimulator)
+		this.loadCommands(this.iCurrentSimulator, true)
 		
 		this.openButtonBoxes()
 	}
@@ -2262,11 +2276,16 @@ class SimulatorsStepWizard extends StepWizard {
 			return false
 	}
 	
-	loadCommands(simulator) {
+	loadCommands(simulator, load := false) {
 		this.iCommands := {}
 		
 		window := this.Window
 		wizard := this.SetupWizard
+		
+		if load
+			this.iFunctions := {}
+		
+		this.iCommands := {}
 		
 		Gui %window%:Default
 		
@@ -2287,7 +2306,8 @@ class SimulatorsStepWizard extends StepWizard {
 				lastMode := mode
 				
 				if wizard.simulatorCommandAvailable(simulator, mode, command) {
-					this.iFunctions[command] := wizard.getSimulatorCommandFunction(simulator, mode, command)
+					if load
+						this.iFunctions[command] := wizard.getSimulatorCommandFunction(simulator, mode, command)
 					
 					subCommand := ConfigurationItem.splitDescriptor(command)
 				
@@ -2802,9 +2822,9 @@ initializeSimulatorSetup() {
 		wizard := new SetupWizard(kSimulatorConfiguration, definition)
 		
 		wizard.registerStepWizard(new StartStepWizard(wizard, "Start", kSimulatorConfiguration))
-		; wizard.registerStepWizard(new ModulesStepWizard(wizard, "Modules", kSimulatorConfiguration))
-		; wizard.registerStepWizard(new InstallationStepWizard(wizard, "Installation", kSimulatorConfiguration))
-		; wizard.registerStepWizard(new ApplicationsStepWizard(wizard, "Applications", kSimulatorConfiguration))
+		wizard.registerStepWizard(new ModulesStepWizard(wizard, "Modules", kSimulatorConfiguration))
+		wizard.registerStepWizard(new InstallationStepWizard(wizard, "Installation", kSimulatorConfiguration))
+		wizard.registerStepWizard(new ApplicationsStepWizard(wizard, "Applications", kSimulatorConfiguration))
 		wizard.registerStepWizard(new ButtonBoxStepWizard(wizard, "Button Box", kSimulatorConfiguration))
 		wizard.registerStepWizard(new SimulatorsStepWizard(wizard, "Simulators", kSimulatorConfiguration))
 	}

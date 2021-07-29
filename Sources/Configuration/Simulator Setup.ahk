@@ -2398,6 +2398,11 @@ class CommandsStepWizard extends StepWizard {
 		this.iButtonBoxPreviews := []
 	}
 	
+	resetButtonBoxes() {
+		for ignore, preview in this.iButtonBoxPreviews
+			preview.resetLabels()
+	}
+	
 	updateCommandFunction(row) {
 		SetTimer showFunctionSelectorHint, 100
 	
@@ -2595,6 +2600,7 @@ class SimulatorsStepWizard extends CommandsStepWizard {
 		
 		this.iCurrentSimulator := simulatorDropDown
 		
+		this.resetButtonBoxes()
 		this.loadCommands(simulatorDropDown, true)
 	}
 	
@@ -2839,6 +2845,7 @@ class AssistantsStepWizard extends CommandsStepWizard {
 		
 		this.iCurrentAssistant := assistantDropDown
 		
+		this.resetButtonBoxes()
 		this.loadCommands(assistantDropDown, true)
 	}
 	

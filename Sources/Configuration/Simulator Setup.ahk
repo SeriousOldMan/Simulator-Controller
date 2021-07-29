@@ -376,8 +376,9 @@ class SetupWizard extends ConfigurationItem {
 	reset() {
 		this.show(true)
 		
-		Loop % this.StepWizards.Count()
-			this.Steps[A_Index].reset()
+		Loop % this.Count
+			if this.Steps.HasKey(A_Index)
+				this.Steps[A_Index].reset()
 	}
 	
 	setDebug(option, enabled) {
@@ -431,6 +432,8 @@ class SetupWizard extends ConfigurationItem {
 	}
 	
 	startSetup() {
+		this.updateState()
+		
 		this.iStep := false
 		this.iPage := false
 		
@@ -477,7 +480,7 @@ class SetupWizard extends ConfigurationItem {
 			return true
 		}
 		else {
-			count := this.StepWizards.Count()
+			count := this.Count
 		
 			if !this.Step
 				index := 1
@@ -573,8 +576,9 @@ class SetupWizard extends ConfigurationItem {
 		if this.Debug[kDebugKnowledgeBase]
 			this.dumpKnowledge(this.KnowledgeBase)
 		
-		Loop % this.StepWizards.Count()
-			this.Steps[A_Index].updateState()
+		Loop % this.Count
+			if this.Steps.HasKey(A_Index)
+				this.Steps[A_Index].updateState()
 		
 		window := this.WizardWindow
 	
@@ -734,7 +738,7 @@ class SetupWizard extends ConfigurationItem {
 			knowledgeBase.addFact("Controller.Function." . A_Index, name)
 			
 			if (function.Length() > 0)
-				knowledgeBase.addFact("Controller.Function." . name . ".Triggers", values2String("|", function*))
+				knowledgeBase.addFact("Controller.Function." . name . ".Triggers", values2String(" | ", function*))
 		}
 		
 		knowledgeBase.setFact("Controller.Function.Count", functions.Length())
@@ -759,24 +763,93 @@ class SetupWizard extends ConfigurationItem {
 			knowledgeBase.removeFact("Simulator." . simulator . ".Mode." . mode . ".Command." . A_Index)
 		}
 		
+		count := 0
+		
 		for command, function in functions {
-			knowledgeBase.addFact("Simulator." . simulator . ".Mode." . mode . ".Command." . A_Index, command)
-			knowledgeBase.addFact("Simulator." . simulator . ".Mode." . mode . ".Command." . command . ".Function", function)
+			if (function && ((IsObject(function) && (function.Length() > 0)) || (function != ""))) {
+				if !IsObject(function)
+					function := Array(function)
+				
+				count += 1
+				
+				knowledgeBase.addFact("Simulator." . simulator . ".Mode." . mode . ".Command." . count, command)
+				knowledgeBase.addFact("Simulator." . simulator . ".Mode." . mode . ".Command." . command . ".Function", values2String(" | ", function*))
+			}
 		}
 		
-		knowledgeBase.setFact("Simulator." . simulator . ".Mode." . mode . ".Command.Count", functions.Length())
+		knowledgeBase.setFact("Simulator." . simulator . ".Mode." . mode . ".Command.Count", count)
 		
 		this.updateState()
 	}
 	
 	getSimulatorCommandFunction(simulator, mode, command) {
-		return this.KnowledgeBase.getValue("Simulator." . simulator . ".Mode." . mode . ".Command." . command . ".Function", "")
+		local function := this.KnowledgeBase.getValue("Simulator." . simulator . ".Mode." . mode . ".Command." . command . ".Function", false)
+		
+		if function {
+			function := string2Values("|", function)
+			
+			return ((function.Length() == 1) ? function[1] : function)
+		}
+		else
+			return ""
 	}
 	
 	simulatorCommandAvailable(simulator, mode, command) {
 		local knowledgeBase := this.KnowledgeBase
 		
 		goal := new RuleCompiler().compileGoal("simulatorCommandAvailable(" . StrReplace(simulator, " ", "\ ") . ", " . StrReplace(mode, " ", "\ ") . ", " . StrReplace(command, " ", "\ ") . ")")
+		
+		return knowledgeBase.prove(goal)
+	}
+	
+	setAssistantCommandFunctions(assistant, functions) {
+		local knowledgeBase := this.KnowledgeBase
+		local function
+		
+		Loop % knowledgeBase.getValue("Assistant." . assistant . ".Command.Count", 0) {
+			command := knowledgeBase.getValue("Assistant." . assistant . ".Command." . A_Index, false)
+		
+			if command
+				knowledgeBase.removeFact("Assistant." . assistant . ".Command." . command . ".Function")
+			
+			knowledgeBase.removeFact("Assistant." . assistant . ".Command." . A_Index)
+		}
+		
+		count := 0
+		
+		for command, function in functions {
+			if (function && ((IsObject(function) && (function.Length() > 0)) || (function != ""))) {
+				if !IsObject(function)
+					function := Array(function)
+				
+				count += 1
+				
+				knowledgeBase.addFact("Assistant." . assistant . ".Command." . count, command)
+				knowledgeBase.addFact("Assistant." . assistant . ".Command." . command . ".Function", values2String(" | ", function*))
+			}
+		}
+		
+		knowledgeBase.setFact("Assistant." . assistant . ".Mode." . mode . ".Command.Count", count)
+		
+		this.updateState()
+	}
+	
+	getAssistantCommandFunction(assistant, command) {
+		local function := this.KnowledgeBase.getValue("Assistant." . assistant . ".Command." . command . ".Function", false)
+		
+		if function {
+			function := string2Values("|", function)
+			
+			return ((function.Length() == 1) ? function[1] : function)
+		}
+		else
+			return ""
+	}
+	
+	assistantCommandAvailable(assistant, command) {
+		local knowledgeBase := this.KnowledgeBase
+		
+		goal := new RuleCompiler().compileGoal("assistantCommandAvailable(" . StrReplace(assistant, " ", "\ ") . ", " . StrReplace(command, " ", "\ ") . ")")
 		
 		return knowledgeBase.prove(goal)
 	}
@@ -2171,97 +2244,40 @@ class ButtonBoxStepWizard extends StepWizard {
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; SimulatorsStepWizard                                                    ;;;
+;;; CommandsStepWizard                                                      ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class SimulatorsStepWizard extends StepWizard {
+class CommandsStepWizard extends StepWizard {
 	iPendingFunctionRegistration := false
 	iButtonBoxPreviews := []
 	iButtonBoxPreviewCenterY := 0
-	
-	iCurrentSimulator := "Assetto Corsa Competizione"
 	
 	iCommandsListView := false
 	
 	iCommands := {}
 	iFunctions := {}
 	
-	Pages[] {
+	CommandsListView[] {
 		Get {
-			wizard := this.SetupWizard
-			
-			numSimulations := 0
-			
-			for ignore, simulator in this.Definition
-				if wizard.isApplicationSelected(simulator)
-					numSimulations +=1
-			
-			hasAssistant := (wizard.isModuleSelected("Race Engineer") | wizard.isModuleSelected("Race Strategist"))
-			
-			return 2 + (((hasAssistant && (numSimulations > 0)) ? 1 : 0) + numSimulations)
+			return this.iCommandsListView
 		}
-	}
-	
-	createGui(wizard, x, y, width, height) {
-		local application
-		
-		static commandsInfoText
-		
-		labelY := y
-		
-		window := this.Window
-		
-		Gui %window%:Default
-		
-		commandsIconHandle := false
-		commandsIconLabelHandle := false
-		commandsListViewHandle := false
-		commandsInfoTextHandle := false
-		
-		labelWidth := width - 30
-		labelX := x + 45
-		labelY := y + 5
-		
-		Gui %window%:Font, s12 Bold, Arial
-		
-		Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDcommandsIconHandle Hidden, %kResourcesDirectory%Setup\Images\Controller.ico
-		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h30 HWNDcommandsLabelHandle Hidden, % translate("Controller Assignments for Simulators")
-		
-		Gui %window%:Font, s9 Norm, Arial
-		
-		listX := x + 250
-		listWidth := width - 250
-		Gui Add, ListView, x%listX% yp+33 w%listWidth% h300 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDcommandsListViewHandle gupdateCommandFunction Hidden, % values2String("|", map(["Mode", "Command / Setting", "Label", "Function"], "translate")*)
-		
-		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Simulators", "Simulators.Commands.Info." . getLanguage()))
-		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px'>" . info . "</div>"
-		
-		Gui %window%:Add, ActiveX, x%x% yp+305 w%width% h135 HWNDcommandsInfoTextHandle VcommandsInfoText Hidden, shell explorer
-
-		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
-
-		commandsInfoText.Navigate("about:blank")
-		commandsInfoText.Document.Write(html)
-		
-		this.iCommandsListView := commandsListViewHandle
-		
-		this.registerWidgets(1, commandsIconHandle, commandsLabelHandle, commandsListViewHandle, commandsInfoTextHandle)
 	}
 	
 	reset() {
 		base.reset()
 		
 		this.iCommandsListView := false
-		this.iCommands := {}
-		this.iFunctions := {}
+		
+		this.clearCommands()
+		this.clearCommandFunctions()
 		
 		this.closeButtonBoxes()
 	}
 	
 	showPage(page) {
 		base.showPage(page)
-		
-		this.loadCommands(this.iCurrentSimulator, true)
+
+		this.loadCommands(true)
 		
 		this.openButtonBoxes()
 	}
@@ -2269,6 +2285,8 @@ class SimulatorsStepWizard extends StepWizard {
 	hidePage(page) {
 		if base.hidePage(page) {
 			this.closeButtonBoxes()
+		
+			this.saveCommands()
 			
 			return true
 		}
@@ -2276,80 +2294,45 @@ class SimulatorsStepWizard extends StepWizard {
 			return false
 	}
 	
-	loadCommands(simulator, load := false) {
-		this.iCommands := {}
-		
-		window := this.Window
-		wizard := this.SetupWizard
-		
-		if load
-			this.iFunctions := {}
-		
-		this.iCommands := {}
-		
-		Gui %window%:Default
-		
-		Gui ListView, % this.iCommandsListView
-		
-		pluginLabels := readConfiguration(kUserTranslationsDirectory . "Controller Plugin Labels." . getLanguage())
-		
-		code := string2Values("|", getConfigurationValue(wizard.Definition, "Applications.Simulators", simulator))[1]
-		
-		LV_Delete()
-		
-		lastMode := false
-		count := 1
-		
-		for ignore, mode in ["Pitstop", "Assistant"]
-			for ignore, command in string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Simulators", (mode = "Assistant") ? "Simulators.Commands.Assistant" : ("Simulators.Settings.Pitstop." . code))) {
-				first := (mode != lastMode)
-				lastMode := mode
-				
-				if wizard.simulatorCommandAvailable(simulator, mode, command) {
-					if load
-						this.iFunctions[command] := wizard.getSimulatorCommandFunction(simulator, mode, command)
-					
-					subCommand := ConfigurationItem.splitDescriptor(command)
-				
-					if (subCommand[1] = "InformationRequest") {
-						subCommand := subCommand[2]
-						
-						isInformationRequest := true
-					}
-					else {
-						subCommand := subCommand[1]
-						
-						isInformationRequest := false
-					}
-					
-					label := getConfigurationValue(pluginLabels, code, subCommand . ".Toggle", kUndefined)
-					
-					if (label == kUndefined) {
-						label := getConfigurationValue(pluginLabels, code, subCommand . ".Activate")
-						
-						this.iCommands[subCommand] := [isInformationRequest, "Activate"]
-						this.iCommands[command] := [isInformationRequest, "Activate"]
-					}
-					else {
-						this.iCommands[subCommand] := [isInformationRequest, "Toggle", "Increase", "Decrease"]
-						this.iCommands[command] := [isInformationRequest, "Toggle", "Increase", "Decrease"]
-					}
-					
-					this.iCommands[count] := command
-					
-					LV_Add("", (first ? mode : ""), subCommand, label, this.iFunctions[command])
-					
-					count += 1
-				}
-			}
-			
-		LV_ModifyCol(1, "AutoHdr")
-		LV_ModifyCol(2, "AutoHdr")
-		LV_ModifyCol(3, "AutoHdr")
+	loadCommands(load := false) {
+		Throw "Virtual method CommandsStepWizard.loadCommands must be implemented in a subclass..."
+	}
+	
+	saveCommands() {
+		Throw "Virtual method CommandsStepWizard.saveCommands must be implemented in a subclass..."
+	}
+	
+	setCommandsListView(commandsListView) {
+		this.iCommandsListView := commandsListView
+	}
+	
+	setCommandFunction(command, functionDescriptor) {
+		this.iFunctions[command] := functionDescriptor
+	}
+	
+	getCommandFunction(command) {
+		return (this.iFunctions.HasKey(command) ? this.iFunctions[command] : false)
+	}
+	
+	clearCommandFunctions() {
+		this.iFunctions := {}
+	}
+	
+	setCommand(row, command, commandDescriptor) {
+		this.iCommands[row] := command
+		this.iCommands[command] := commandDescriptor
 	}
 	
 	getCommand(row) {
 		return this.iCommands[row]
+	}
+	
+	getCommandDescriptor(row) {
+		return this.iCommands[this.getCommand(row)]
+	}
+	
+	clearCommands() {
+		this.iCommands := {}
 	}
 	
 	getPreviewCenter(ByRef centerX, ByRef centerY) {
@@ -2412,16 +2395,70 @@ class SimulatorsStepWizard extends StepWizard {
 		if this.iPendingFunctionRegistration {
 			SoundPlay %kResourcesDirectory%Sounds\Activated.wav
 			
-			this.iFunctions[this.getCommand(this.iPendingFunctionRegistration)] := function
+			SoundPlay *32
+		
+			command := this.getCommand(this.iPendingFunctionRegistration)
+			commandDescriptor := this.getCommandDescriptor(this.iPendingFunctionRegistration)
+			functionType := ConfigurationItem.splitDescriptor(function)[1]
 			
-			this.loadCommands(this.iCurrentSimulator)
-			
-			window := this.Window
-			
-			Gui %window%:Default
-			Gui ListView, % this.iFunctionsListView
-	
-			LV_Modify(this.iPendingFunctionRegistration, "Vis")
+			if (((functionType == k2WayToggleType) || (functionType == kDialType)) && (commandDescriptor[2] == "Toggle"))
+				function := [function]
+			else if (commandDescriptor[2] == "Activate")
+				function := [function]
+			else {
+				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Increase", "Decrease", "Cancel"]))
+				title := translate("Function")
+				MsgBox 262179, %title%, % translate("What type of action do you want to trigger for ") . command . translate("?")
+				OnMessage(0x44, "")
+				
+				currentFunction := this.getCommandFunction(command)
+				
+				IfMsgBox Cancel
+					function := false
+					
+				IfMsgBox Yes
+				{
+					if currentFunction {
+						if (currentFunction.Length() == 1)
+							function := [function, ""]
+						else {
+							currentFunction[1] := function
+							
+							function := currentFunction
+						}
+					}
+					else
+						function := [function, ""]
+				}
+				
+				IfMsgBox No
+				{
+					if currentFunction {
+						if (currentFunction.Length() == 1)
+							function := ["", function]
+						else {
+							currentFunction[2] := function
+							
+							function := currentFunction
+						}
+					}
+					else
+						function := ["", function]
+				}
+			}
+
+			if function {
+				this.setCommandFunction(command, function)
+				
+				this.loadCommands()
+				
+				window := this.Window
+				
+				Gui %window%:Default
+				Gui ListView, % this.CommandsListView
+		
+				LV_Modify(this.iPendingFunctionRegistration, "Vis")
+			}
 		}
 
 		SetTimer showFunctionSelectorHint, Off
@@ -2429,6 +2466,456 @@ class SimulatorsStepWizard extends StepWizard {
 		ToolTip, , , 1
 		
 		this.iPendingFunctionRegistration := false
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; SimulatorsStepWizard                                                    ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+global simulatorDropDown
+
+class SimulatorsStepWizard extends CommandsStepWizard {
+	iSimulators := []
+	iCurrentSimulator := false
+	
+	Pages[] {
+		Get {
+			wizard := this.SetupWizard
+			
+			for ignore, simulator in this.Definition
+				if wizard.isApplicationSelected(simulator)
+					return 1
+				
+			return 0
+		}
+	}
+	
+	createGui(wizard, x, y, width, height) {
+		local application
+		
+		static commandsInfoText
+		
+		labelY := y
+		
+		window := this.Window
+		
+		Gui %window%:Default
+		
+		commandsIconHandle := false
+		commandsIconLabelHandle := false
+		commandsListViewHandle := false
+		commandsInfoTextHandle := false
+		
+		labelWidth := width - 30
+		labelX := x + 45
+		labelY := y + 5
+		
+		Gui %window%:Font, s12 Bold, Arial
+		
+		Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDcommandsIconHandle Hidden, %kResourcesDirectory%Setup\Images\Controller.ico
+		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h30 HWNDcommandsLabelHandle Hidden Section, % translate("Controller Assignments for Simulators")
+		
+		Gui %window%:Font, s9 Norm, Arial
+		
+		secondX := x + 80
+		secondWidth := 160
+		
+		simulatorLabelHandle := false
+		simulatorDropDownHandle := false
+		
+		Gui %window%:Add, Text, x%x% yp+33 w105 h23 +0x200 HWNDsimulatorLabelHandle Hidden, % translate("Simulator")
+		Gui %window%:Add, DropDownList, x%secondX% yp w%secondWidth% Choose%chosen% HWNDsimulatorDropDownHandle gchooseSimulator vsimulatorDropDown Hidden
+		
+		listX := x + 250
+		listWidth := width - 250
+		Gui Add, ListView, x%listX% ys+33 w%listWidth% h300 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDcommandsListViewHandle gupdateSimulatorCommandFunction Hidden, % values2String("|", map(["Mode", "Command / Setting", "Label", "Function"], "translate")*)
+		
+		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Simulators", "Simulators.Commands.Info." . getLanguage()))
+		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px'>" . info . "</div>"
+		
+		Gui %window%:Add, ActiveX, x%x% yp+305 w%width% h135 HWNDcommandsInfoTextHandle VcommandsInfoText Hidden, shell explorer
+
+		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+
+		commandsInfoText.Navigate("about:blank")
+		commandsInfoText.Document.Write(html)
+		
+		this.setCommandsListView(commandsListViewHandle)
+		
+		this.registerWidgets(1, commandsIconHandle, commandsLabelHandle, commandsListViewHandle, commandsInfoTextHandle, simulatorLabelHandle, simulatorDropDownHandle)
+	}
+	
+	updateState() {
+		base.updateState()
+		
+		wizard := this.SetupWizard
+		simulators := []
+		
+		for ignore, simulator in this.Definition
+			if wizard.isApplicationSelected(simulator)
+				simulators.Push(simulator)
+			
+		this.iSimulators := simulators
+	}
+	
+	showPage(page) {
+		chosen := (this.iSimulators.Length() > 0) ? 1 : 0
+		
+		this.iCurrentSimulator := ((chosen > 0) ? this.iSimulators[chosen] : false)
+		
+		base.showPage(page)
+		
+		GuiControl, , simulatorDropDown, % "|" . values2String("|", this.iSimulators*)
+		GuiControl Choose, simulatorDropDown, % chosen
+	}
+	
+	chooseSimulator() {
+		this.saveCommands()
+		
+		GuiControlGet simulatorDropDown
+		
+		this.iCurrentSimulator := simulatorDropDown
+		
+		this.loadCommands(simulatorDropDown, true)
+	}
+	
+	loadCommands(load := false) {
+		if this.iCurrentSimulator
+			this.loadSimulatorCommands(this.iCurrentSimulator, load)
+	}
+	
+	saveCommands() {
+		if this.iCurrentSimulator
+			this.saveSimulatorCommands(this.iCurrentSimulator)
+	}
+	
+	loadSimulatorCommands(simulator, load := false) {
+		local function
+		
+		window := this.Window
+		wizard := this.SetupWizard
+		
+		if load
+			this.clearCommandFunctions()
+		
+		this.clearCommands()
+		
+		Gui %window%:Default
+		
+		Gui ListView, % this.CommandsListView
+		
+		pluginLabels := readConfiguration(kUserTranslationsDirectory . "Controller Plugin Labels." . getLanguage())
+		
+		code := string2Values("|", getConfigurationValue(wizard.Definition, "Applications.Simulators", simulator))[1]
+		
+		LV_Delete()
+		
+		lastMode := false
+		count := 1
+		
+		for ignore, mode in ["Pitstop", "Assistant"]
+			for ignore, command in string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Simulators", (mode = "Assistant") ? "Simulators.Commands.Assistant" : ("Simulators.Settings.Pitstop." . code))) {
+				first := (mode != lastMode)
+				lastMode := mode
+				
+				if wizard.simulatorCommandAvailable(simulator, mode, command) {
+					if load {
+						function := wizard.getSimulatorCommandFunction(simulator, mode, command)
+						
+						if (function != "")
+							this.setCommandFunction(command, (IsObject(function) ? function : Array(function)))
+					}
+					
+					subCommand := ConfigurationItem.splitDescriptor(command)
+				
+					if (subCommand[1] = "InformationRequest") {
+						subCommand := subCommand[2]
+						
+						isInformationRequest := true
+					}
+					else {
+						subCommand := subCommand[1]
+						
+						isInformationRequest := false
+					}
+					
+					label := getConfigurationValue(pluginLabels, code, subCommand . ".Toggle", kUndefined)
+					
+					if (label == kUndefined) {
+						label := getConfigurationValue(pluginLabels, code, subCommand . ".Activate")
+		
+						this.setCommand(count, command, [isInformationRequest, "Activate"])
+						
+						isBinary := false
+					}
+					else {
+						this.setCommand(count, command, [isInformationRequest, "Toggle", "Increase", "Decrease"])
+						
+						isBinary := true
+					}
+					
+					function := this.getCommandFunction(command)
+					
+					if function {
+						if (function.Length() == 1)
+							function := (!isBinary ? function[1] : ("+/-: " . function[1]))
+						else
+							function := ("+: " . function[1] . " | -: " . function[2])
+					}
+					else
+						function := ""
+					
+					LV_Add("", (first ? mode : ""), subCommand, label, function)
+					
+					count += 1
+				}
+			}
+			
+		LV_ModifyCol(1, "AutoHdr")
+		LV_ModifyCol(2, "AutoHdr")
+		LV_ModifyCol(3, "AutoHdr")
+		LV_ModifyCol(4, "AutoHdr")
+	}
+	
+	saveSimulatorCommands(simulator) {
+		local function
+		
+		wizard := this.SetupWizard
+		code := string2Values("|", getConfigurationValue(wizard.Definition, "Applications.Simulators", simulator))[1]
+		
+		for ignore, mode in ["Pitstop", "Assistant"] {
+			modeFunctions := {}
+		
+			for ignore, command in string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Simulators", (mode = "Assistant") ? "Simulators.Commands.Assistant" : ("Simulators.Settings.Pitstop." . code)))				
+				if wizard.simulatorCommandAvailable(simulator, mode, command) {
+					function := this.getCommandFunction(command)
+					
+					if function
+						modeFunctions[command] := function
+				}
+			
+			wizard.setSimulatorCommandFunctions(simulator, mode, modeFunctions)
+		}
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; AssistantsStepWizard                                                    ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+global assistantDropDown
+
+class AssistantsStepWizard extends CommandsStepWizard {
+	iAssistants := []
+	iCurrentAssistant := false
+	
+	Pages[] {
+		Get {
+			wizard := this.SetupWizard
+			
+			for ignore, assistant in this.Definition
+				if wizard.isModuleSelected(assistant)
+					return 1
+				
+			return 0
+		}
+	}
+	
+	createGui(wizard, x, y, width, height) {
+		local application
+		
+		static commandsInfoText
+		
+		labelY := y
+		
+		window := this.Window
+		
+		Gui %window%:Default
+		
+		commandsIconHandle := false
+		commandsIconLabelHandle := false
+		commandsListViewHandle := false
+		commandsInfoTextHandle := false
+		
+		labelWidth := width - 30
+		labelX := x + 45
+		labelY := y + 5
+		
+		Gui %window%:Font, s12 Bold, Arial
+		
+		Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDcommandsIconHandle Hidden, %kResourcesDirectory%Setup\Images\Controller.ico
+		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h30 HWNDcommandsLabelHandle Hidden Section, % translate("Controller Assignments for Assistants")
+		
+		Gui %window%:Font, s9 Norm, Arial
+		
+		secondX := x + 80
+		secondWidth := 160
+		
+		assistantLabelHandle := false
+		assistantDropDownHandle := false
+		
+		Gui %window%:Add, Text, x%x% yp+33 w105 h23 +0x200 HWNDassistantLabelHandle Hidden, % translate("Assistant")
+		Gui %window%:Add, DropDownList, x%secondX% yp w%secondWidth% Choose%chosen% HWNDassistantDropDownHandle gchooseAssistant vassistantDropDown Hidden
+		
+		listX := x + 250
+		listWidth := width - 250
+		Gui Add, ListView, x%listX% ys+33 w%listWidth% h300 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDcommandsListViewHandle gupdateAssistantCommandFunction Hidden, % values2String("|", map(["Command", "Label", "Function"], "translate")*)
+		
+		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Assistants", "Assistants.Commands.Info." . getLanguage()))
+		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px'>" . info . "</div>"
+		
+		Gui %window%:Add, ActiveX, x%x% yp+305 w%width% h135 HWNDcommandsInfoTextHandle VcommandsInfoText Hidden, shell explorer
+
+		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+
+		commandsInfoText.Navigate("about:blank")
+		commandsInfoText.Document.Write(html)
+		
+		this.setCommandsListView(commandsListViewHandle)
+		
+		this.registerWidgets(1, commandsIconHandle, commandsLabelHandle, commandsListViewHandle, commandsInfoTextHandle, assistantLabelHandle, assistantDropDownHandle)
+	}
+	
+	updateState() {
+		base.updateState()
+		
+		wizard := this.SetupWizard
+		assistants := []
+		
+		for ignore, assistant in this.Definition
+			if wizard.isModuleSelected(assistant)
+				assistants.Push(assistant)
+			
+		this.iAssistants := assistants
+	}
+	
+	showPage(page) {
+		chosen := (this.iAssistants.Length() > 0) ? 1 : 0
+		
+		this.iCurrentAssistant := ((chosen > 0) ? this.iAssistants[chosen] : false)
+		
+		base.showPage(page)
+		
+		GuiControl, , assistantDropDown, % "|" . values2String("|", this.iAssistants*)
+		GuiControl Choose, assistantDropDown, % chosen
+	}
+	
+	chooseAssistant() {
+		this.saveCommands()
+		
+		GuiControlGet assistantDropDown
+		
+		this.iCurrentAssistant := assistantDropDown
+		
+		this.loadCommands(assistantDropDown, true)
+	}
+	
+	loadCommands(load := false) {
+		if this.iCurrentAssistant
+			this.loadAssistantCommands(this.iCurrentAssistant, load)
+	}
+	
+	saveCommands() {
+		if this.iCurrentAssistant
+			this.saveAssistantCommands(this.iCurrentAssistant)
+	}
+	
+	loadAssistantCommands(assistant, load := false) {
+		local function
+		
+		window := this.Window
+		wizard := this.SetupWizard
+		
+		if load
+			this.clearCommandFunctions()
+		
+		this.clearCommands()
+		
+		Gui %window%:Default
+		
+		Gui ListView, % this.CommandsListView
+		
+		pluginLabels := readConfiguration(kUserTranslationsDirectory . "Controller Plugin Labels." . getLanguage())
+		
+		LV_Delete()
+		
+		count := 1
+		
+		for ignore, command in string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Assistants", "Assistants.Commands")) {
+			if wizard.assistantCommandAvailable(assistant, command) {
+				if load {
+					function := wizard.getAssistantCommandFunction(assistant, command)
+					
+					if (function != "")
+						this.setCommandFunction(command, (IsObject(function) ? function : Array(function)))
+				}
+				
+				subCommand := ConfigurationItem.splitDescriptor(command)
+			
+				if (subCommand[1] = "InformationRequest") {
+					subCommand := subCommand[2]
+					
+					isInformationRequest := true
+				}
+				else {
+					subCommand := subCommand[1]
+					
+					isInformationRequest := false
+				}
+				
+				label := getConfigurationValue(pluginLabels, assistant, subCommand . ".Toggle", kUndefined)
+				
+				if (label == kUndefined) {
+					label := getConfigurationValue(pluginLabels, code, subCommand . ".Activate")
+	
+					this.setCommand(count, command, [isInformationRequest, "Activate"])
+					
+					isBinary := false
+				}
+				else {
+					this.setCommand(count, command, [isInformationRequest, "Toggle", "Increase", "Decrease"])
+					
+					isBinary := true
+				}
+				
+				function := this.getCommandFunction(command)
+				
+				if function {
+					if (function.Length() == 1)
+						function := (!isBinary ? function[1] : ("+/-: " . function[1]))
+					else
+						function := ("+: " . function[1] . " | -: " . function[2])
+				}
+				else
+					function := ""
+				
+				LV_Add("", subCommand, label, function)
+				
+				count += 1
+			}
+		}
+			
+		LV_ModifyCol(1, "AutoHdr")
+		LV_ModifyCol(2, "AutoHdr")
+		LV_ModifyCol(3, "AutoHdr")
+	}
+	
+	saveAssistantCommands(assistant) {
+		local function
+		
+		wizard := this.SetupWizard
+		functions := {}
+		
+		for ignore, command in string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Assistants", "Assistants.Commands"))				
+			if wizard.assistantCommandAvailable(assistant, command) {
+				function := this.getCommandFunction(command)
+				
+				if function
+					functions[command] := function
+			}
+		
+		wizard.setAssistantCommandFunctions(assistant, functions)
 	}
 }
 
@@ -2509,23 +2996,6 @@ locateSoftware() {
 	finally {
 		protectionOff()
 	}
-}	
-
-LV_ClickedColumn(listViewHandle) {
-	static LVM_SUBITEMHITTEST := 0x1039
-
-	VarSetCapacity(POINT, 8, 0)
-
-	DllCall("User32.dll\GetCursorPos", "Ptr", &POINT)
-	DllCall("User32.dll\ScreenToClient", "Ptr", listViewHandle, "Ptr", &POINT)
-
-	VarSetCapacity(LVHITTESTINFO, 24, 0)
-	NumPut(NumGet(POINT, 0, "Int"), LVHITTESTINFO, 0, "Int")
-	NumPut(NumGet(POINT, 4, "Int"), LVHITTESTINFO, 4, "Int")
-
-	SendMessage, LVM_SUBITEMHITTEST, 0, &LVHITTESTINFO, , ahk_id %listViewHandle%
-
-	return ((ErrorLevel = -1) ? 0 : (NumGet(LVHITTESTINFO, 16, "Int") + 1))
 }
 
 updateFunctionTriggers() {
@@ -2597,23 +3067,26 @@ stopTriggerDetector() {
 	}
 }
 
-updateCommandFunction() {
+updateSimulatorCommandFunction() {
+	updateCommandFunction(SetupWizard.Instance.StepWizards["Simulators"])
+}
+
+updateAssistantCommandFunction() {
+	updateCommandFunction(SetupWizard.Instance.StepWizards["Assistants"])
+}
+
+updateCommandFunction(wizard) {
 	Loop % LV_GetCount()
 		LV_Modify(A_Index, "-Select")
 	
 	if (A_GuiEvent = "DoubleClick") {
-		if (A_EventInfo > 0) {
-			wizard := SetupWizard.Instance.StepWizards["Simulators"]
-		
+		if (A_EventInfo > 0)
 			wizard.updateCommandFunction(A_EventInfo)
-		}
 	}
 	else if (A_GuiEvent = "RightClick") {
 		if (A_EventInfo > 0) {
 			row := A_EventInfo
 			
-			wizard := SetupWizard.Instance.StepWizards["Simulators"]
-		
 			curCoordMode := A_CoordModeMouse
 
 			LV_GetText(command, row, 2)
@@ -2628,7 +3101,7 @@ updateCommandFunction() {
 				; ignore
 			}
 			
-			window := SetupWizard.Instance.WizardWindow
+			window := wizard.Window
 			
 			Gui %window%:Default
 			
@@ -2662,6 +3135,31 @@ showFunctionSelectorHint() {
 		
 		ToolTip %hint%, , , 1
 	}
+}
+
+chooseSimulator() {
+	SetupWizard.Instance.StepWizards["Simulators"].chooseSimulator()
+}
+
+chooseAssistant() {
+	SetupWizard.Instance.StepWizards["Assistants"].chooseAssistant()
+}
+
+LV_ClickedColumn(listViewHandle) {
+	static LVM_SUBITEMHITTEST := 0x1039
+
+	VarSetCapacity(POINT, 8, 0)
+
+	DllCall("User32.dll\GetCursorPos", "Ptr", &POINT)
+	DllCall("User32.dll\ScreenToClient", "Ptr", listViewHandle, "Ptr", &POINT)
+
+	VarSetCapacity(LVHITTESTINFO, 24, 0)
+	NumPut(NumGet(POINT, 0, "Int"), LVHITTESTINFO, 0, "Int")
+	NumPut(NumGet(POINT, 4, "Int"), LVHITTESTINFO, 4, "Int")
+
+	SendMessage, LVM_SUBITEMHITTEST, 0, &LVHITTESTINFO, , ahk_id %listViewHandle%
+
+	return ((ErrorLevel = -1) ? 0 : (NumGet(LVHITTESTINFO, 16, "Int") + 1))
 }
 
 convertVDF2JSON(vdf) {
@@ -2822,11 +3320,12 @@ initializeSimulatorSetup() {
 		wizard := new SetupWizard(kSimulatorConfiguration, definition)
 		
 		wizard.registerStepWizard(new StartStepWizard(wizard, "Start", kSimulatorConfiguration))
-		wizard.registerStepWizard(new ModulesStepWizard(wizard, "Modules", kSimulatorConfiguration))
-		wizard.registerStepWizard(new InstallationStepWizard(wizard, "Installation", kSimulatorConfiguration))
-		wizard.registerStepWizard(new ApplicationsStepWizard(wizard, "Applications", kSimulatorConfiguration))
-		wizard.registerStepWizard(new ButtonBoxStepWizard(wizard, "Button Box", kSimulatorConfiguration))
+		; wizard.registerStepWizard(new ModulesStepWizard(wizard, "Modules", kSimulatorConfiguration))
+		; wizard.registerStepWizard(new InstallationStepWizard(wizard, "Installation", kSimulatorConfiguration))
+		; wizard.registerStepWizard(new ApplicationsStepWizard(wizard, "Applications", kSimulatorConfiguration))
+		; wizard.registerStepWizard(new ButtonBoxStepWizard(wizard, "Button Box", kSimulatorConfiguration))
 		wizard.registerStepWizard(new SimulatorsStepWizard(wizard, "Simulators", kSimulatorConfiguration))
+		wizard.registerStepWizard(new AssistantsStepWizard(wizard, "Assistants", kSimulatorConfiguration))
 	}
 	finally {
 		protectionOff()

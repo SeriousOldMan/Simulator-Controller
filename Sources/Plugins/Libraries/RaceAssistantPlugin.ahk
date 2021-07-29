@@ -277,6 +277,9 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		
 		if raceAssistantToggle {
 			arguments := string2Values(A_Space, raceAssistantToggle)
+	
+			if (arguments.Length() == 2)
+				arguments.InsertAt(2, "On")
 			
 			this.iRaceAssistantEnabled := (arguments[1] = "On")
 			

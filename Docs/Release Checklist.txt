@@ -27,6 +27,9 @@ Release 3.5.0 Checklist
    b. Translations
    c. Documentation
    d. Doc Image
+3. Renamed "Key Detector Tool"
+   a. Documentatiom
+   b. Doc Image
 
 Release 3.3.0 Checklist
 =======================

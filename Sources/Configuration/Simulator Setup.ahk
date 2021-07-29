@@ -1020,10 +1020,12 @@ class StepWizard extends ConfigurationItem {
 	}
 	
 	registerWidget(page, widget) {
-		if !this.iWidgets.HasKey(page)
-			this.iWidgets[page] := []
-		
-		this.iWidgets[page].Push(widget)
+		if widget {
+			if !this.iWidgets.HasKey(page)
+				this.iWidgets[page] := []
+			
+			this.iWidgets[page].Push(widget)
+		}
 	}
 	
 	registerWidgets(page, widgets*) {
@@ -2255,6 +2257,7 @@ class CommandsStepWizard extends StepWizard {
 	iCommandsListView := false
 	
 	iCommands := {}
+	iLabels := {}
 	iFunctions := {}
 	
 	CommandsListView[] {
@@ -2276,10 +2279,10 @@ class CommandsStepWizard extends StepWizard {
 	
 	showPage(page) {
 		base.showPage(page)
-
-		this.loadCommands(true)
 		
 		this.openButtonBoxes()
+
+		this.loadCommands(true)
 	}
 	
 	hidePage(page) {
@@ -2318,13 +2321,18 @@ class CommandsStepWizard extends StepWizard {
 		this.iFunctions := {}
 	}
 	
-	setCommand(row, command, commandDescriptor) {
+	setCommand(row, command, commandDescriptor, label) {
 		this.iCommands[row] := command
 		this.iCommands[command] := commandDescriptor
+		this.iLabels[row] := label
 	}
 	
 	getCommand(row) {
 		return this.iCommands[row]
+	}
+	
+	getCommandLabel(row) {
+		return this.iLabels[row]
 	}
 	
 	getCommandDescriptor(row) {
@@ -2333,6 +2341,7 @@ class CommandsStepWizard extends StepWizard {
 	
 	clearCommands() {
 		this.iCommands := {}
+		this.iLabels := {}
 	}
 	
 	getPreviewCenter(ByRef centerX, ByRef centerY) {
@@ -2345,36 +2354,40 @@ class CommandsStepWizard extends StepWizard {
 	}
 	
 	openButtonBoxes() {
-		configuration := readConfiguration(kUserHomeDirectory . "Install\Button Box Configuration.ini")
-		
-		controllers := []
-		
-		for controller, definition in getConfigurationSectionValues(configuration, "Layouts") {
-			controller := ConfigurationItem.splitDescriptor(controller)
-		
-			if !inList(controllers, controller[1])
-				controllers.Push(controller[1])
-		}
-		
-		for index, controller in controllers {
-			preview := new ButtonBoxPreview(this, controller, configuration)
-		
-			preview.setControlClickHandler(ObjBindMethod(this, "controlClick"))
-		
-			if (index = 1) {
-				SysGet mainScreen, MonitorWorkArea
-				
-				this.iButtonBoxPreviewCenterY := (mainScreenBottom - Round(preview.Height / 2))
+		if this.SetupWizard.isModuleSelected("Button Box") {
+			configuration := readConfiguration(kUserHomeDirectory . "Install\Button Box Configuration.ini")
+			
+			controllers := []
+			
+			for controller, definition in getConfigurationSectionValues(configuration, "Layouts") {
+				controller := ConfigurationItem.splitDescriptor(controller)
+			
+				if !inList(controllers, controller[1])
+					controllers.Push(controller[1])
 			}
-			else
+			
+			for index, controller in controllers {
+				preview := new ButtonBoxPreview(this, controller, configuration)
+			
+				preview.setControlClickHandler(ObjBindMethod(this, "controlClick"))
+			
+				if (index = 1) {
+					SysGet mainScreen, MonitorWorkArea
+					
+					this.iButtonBoxPreviewCenterY := (mainScreenBottom - Round(preview.Height / 2))
+				}
+				else
+					this.iButtonBoxPreviewCenterY -= Round(preview.Height / 2)
+				
+				preview.open()
+				
 				this.iButtonBoxPreviewCenterY -= Round(preview.Height / 2)
-			
-			preview.open()
-			
-			this.iButtonBoxPreviewCenterY -= Round(preview.Height / 2)
-			this.iButtonBoxPreviews.Push(preview)
+				this.iButtonBoxPreviews.Push(preview)
+			}
 		}
-		
+		else
+			this.iButtonBoxPreviews := []
+			
 		this.iPendingFunctionRegistration := false
 	}
 	
@@ -2387,7 +2400,7 @@ class CommandsStepWizard extends StepWizard {
 	
 	updateCommandFunction(row) {
 		SetTimer showFunctionSelectorHint, 100
-		
+	
 		this.iPendingFunctionRegistration := row
 	}
 	
@@ -2415,7 +2428,7 @@ class CommandsStepWizard extends StepWizard {
 				
 				IfMsgBox Cancel
 					function := false
-					
+			
 				IfMsgBox Yes
 				{
 					if currentFunction {
@@ -2450,6 +2463,10 @@ class CommandsStepWizard extends StepWizard {
 			if function {
 				this.setCommandFunction(command, function)
 				
+				for ignore, preview in this.iButtonBoxPreviews
+					if (A_Gui = preview.Window)
+						preview.setLabel(row, column, this.getCommandLabel(this.iPendingFunctionRegistration))
+				
 				this.loadCommands()
 				
 				window := this.Window
@@ -2482,10 +2499,11 @@ class SimulatorsStepWizard extends CommandsStepWizard {
 	Pages[] {
 		Get {
 			wizard := this.SetupWizard
-			
-			for ignore, simulator in this.Definition
-				if wizard.isApplicationSelected(simulator)
-					return 1
+
+			if (wizard.isModuleSelected("Button Box") || wizard.isModuleSelected("Race Engineer"))
+				for ignore, simulator in this.Definition
+					if wizard.isApplicationSelected(simulator)
+						return 1
 				
 			return 0
 		}
@@ -2517,12 +2535,12 @@ class SimulatorsStepWizard extends CommandsStepWizard {
 		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h30 HWNDcommandsLabelHandle Hidden Section, % translate("Controller Assignments for Simulators")
 		
 		Gui %window%:Font, s9 Norm, Arial
-		
-		secondX := x + 80
-		secondWidth := 160
-		
+
 		simulatorLabelHandle := false
 		simulatorDropDownHandle := false
+	
+		secondX := x + 80
+		secondWidth := 160
 		
 		Gui %window%:Add, Text, x%x% yp+33 w105 h23 +0x200 HWNDsimulatorLabelHandle Hidden, % translate("Simulator")
 		Gui %window%:Add, DropDownList, x%secondX% yp w%secondWidth% Choose%chosen% HWNDsimulatorDropDownHandle gchooseSimulator vsimulatorDropDown Hidden
@@ -2581,12 +2599,12 @@ class SimulatorsStepWizard extends CommandsStepWizard {
 	}
 	
 	loadCommands(load := false) {
-		if this.iCurrentSimulator
+		if (this.iCurrentSimulator && this.SetupWizard.isModuleSelected("Button Box"))
 			this.loadSimulatorCommands(this.iCurrentSimulator, load)
 	}
 	
 	saveCommands() {
-		if this.iCurrentSimulator
+		if (this.iCurrentSimulator && this.SetupWizard.isModuleSelected("Button Box"))
 			this.saveSimulatorCommands(this.iCurrentSimulator)
 	}
 	
@@ -2645,12 +2663,12 @@ class SimulatorsStepWizard extends CommandsStepWizard {
 					if (label == kUndefined) {
 						label := getConfigurationValue(pluginLabels, code, subCommand . ".Activate")
 		
-						this.setCommand(count, command, [isInformationRequest, "Activate"])
+						this.setCommand(count, command, [isInformationRequest, "Activate"], label)
 						
 						isBinary := false
 					}
 					else {
-						this.setCommand(count, command, [isInformationRequest, "Toggle", "Increase", "Decrease"])
+						this.setCommand(count, command, [isInformationRequest, "Toggle", "Increase", "Decrease"], label)
 						
 						isBinary := true
 					}
@@ -2658,6 +2676,19 @@ class SimulatorsStepWizard extends CommandsStepWizard {
 					function := this.getCommandFunction(command)
 					
 					if function {
+						for ignore, partFunction in function {
+							row := false
+							column := false
+							
+							for ignore, preview in this.iButtonBoxPreviews {
+								if preview.findFunction(partFunction, row, column) {
+									preview.setLabel(row, column, label)
+									
+									break
+								}
+							}
+						}
+					
 						if (function.Length() == 1)
 							function := (!isBinary ? function[1] : ("+/-: " . function[1]))
 						else
@@ -2812,12 +2843,12 @@ class AssistantsStepWizard extends CommandsStepWizard {
 	}
 	
 	loadCommands(load := false) {
-		if this.iCurrentAssistant
+		if (this.iCurrentAssistant && this.SetupWizard.isModuleSelected(this.iCurrentAssistant))
 			this.loadAssistantCommands(this.iCurrentAssistant, load)
 	}
 	
 	saveCommands() {
-		if this.iCurrentAssistant
+		if (this.iCurrentAssistant && this.SetupWizard.isModuleSelected(this.iCurrentAssistant))
 			this.saveAssistantCommands(this.iCurrentAssistant)
 	}
 	
@@ -2869,12 +2900,12 @@ class AssistantsStepWizard extends CommandsStepWizard {
 				if (label == kUndefined) {
 					label := getConfigurationValue(pluginLabels, assistant, subCommand . ".Activate")
 	
-					this.setCommand(count, command, [isInformationRequest, "Activate"])
+					this.setCommand(count, command, [isInformationRequest, "Activate"], label)
 					
 					isBinary := false
 				}
 				else {
-					this.setCommand(count, command, [isInformationRequest, "Toggle", "Increase", "Decrease"])
+					this.setCommand(count, command, [isInformationRequest, "Toggle", "Increase", "Decrease"], label)
 					
 					isBinary := true
 				}
@@ -3079,47 +3110,49 @@ updateCommandFunction(wizard) {
 	Loop % LV_GetCount()
 		LV_Modify(A_Index, "-Select")
 	
-	if (A_GuiEvent = "DoubleClick") {
-		if (A_EventInfo > 0)
-			wizard.updateCommandFunction(A_EventInfo)
-	}
-	else if (A_GuiEvent = "RightClick") {
-		if (A_EventInfo > 0) {
-			row := A_EventInfo
-			
-			curCoordMode := A_CoordModeMouse
-
-			LV_GetText(command, row, 2)
-			LV_GetText(label, row, 3)
-			
-			menuItem := (command . ": " . label)
-			
-			try {
-				Menu ContextMenu, DeleteAll
-			}
-			catch exception {
-				; ignore
-			}
-			
-			window := wizard.Window
-			
-			Gui %window%:Default
-			
-			Menu ContextMenu, Add, %menuItem%, menuIgnore
-			Menu ContextMenu, Disable, %menuItem%
-			Menu ContextMenu, Add
-			
-			menuItem := translate("Please select a controller function...")
-			handler := ObjBindMethod(wizard, "updateCommandFunction", row)
-			
-			Menu ContextMenu, Add, %menuItem%, %handler%
-			
-			Menu ContextMenu, Show
+	if wizard.SetupWizard.isModuleSelected("Button Box") {
+		if (A_GuiEvent = "DoubleClick") {
+			if (A_EventInfo > 0)
+				wizard.updateCommandFunction(A_EventInfo)
 		}
+		else if (A_GuiEvent = "RightClick") {
+			if (A_EventInfo > 0) {
+				row := A_EventInfo
+				
+				curCoordMode := A_CoordModeMouse
+
+				LV_GetText(command, row, 2)
+				LV_GetText(label, row, 3)
+				
+				menuItem := (command . ": " . label)
+				
+				try {
+					Menu ContextMenu, DeleteAll
+				}
+				catch exception {
+					; ignore
+				}
+				
+				window := wizard.Window
+				
+				Gui %window%:Default
+				
+				Menu ContextMenu, Add, %menuItem%, menuIgnore
+				Menu ContextMenu, Disable, %menuItem%
+				Menu ContextMenu, Add
+				
+				menuItem := translate("Please select a controller function...")
+				handler := ObjBindMethod(wizard, "updateCommandFunction", row)
+				
+				Menu ContextMenu, Add, %menuItem%, %handler%
+				
+				Menu ContextMenu, Show
+			}
+		}
+		
+		Loop % LV_GetCount()
+			LV_Modify(A_Index, "-Select")
 	}
-	
-	Loop % LV_GetCount()
-		LV_Modify(A_Index, "-Select")
 }
 
 showFunctionSelectorHint() {
@@ -3319,11 +3352,11 @@ initializeSimulatorSetup() {
 		
 		wizard := new SetupWizard(kSimulatorConfiguration, definition)
 		
-		wizard.registerStepWizard(new StartStepWizard(wizard, "Start", kSimulatorConfiguration))
-		wizard.registerStepWizard(new ModulesStepWizard(wizard, "Modules", kSimulatorConfiguration))
-		wizard.registerStepWizard(new InstallationStepWizard(wizard, "Installation", kSimulatorConfiguration))
-		wizard.registerStepWizard(new ApplicationsStepWizard(wizard, "Applications", kSimulatorConfiguration))
-		wizard.registerStepWizard(new ButtonBoxStepWizard(wizard, "Button Box", kSimulatorConfiguration))
+		; wizard.registerStepWizard(new StartStepWizard(wizard, "Start", kSimulatorConfiguration))
+		; wizard.registerStepWizard(new ModulesStepWizard(wizard, "Modules", kSimulatorConfiguration))
+		; wizard.registerStepWizard(new InstallationStepWizard(wizard, "Installation", kSimulatorConfiguration))
+		; wizard.registerStepWizard(new ApplicationsStepWizard(wizard, "Applications", kSimulatorConfiguration))
+		; wizard.registerStepWizard(new ButtonBoxStepWizard(wizard, "Button Box", kSimulatorConfiguration))
 		wizard.registerStepWizard(new SimulatorsStepWizard(wizard, "Simulators", kSimulatorConfiguration))
 		wizard.registerStepWizard(new AssistantsStepWizard(wizard, "Assistants", kSimulatorConfiguration))
 	}

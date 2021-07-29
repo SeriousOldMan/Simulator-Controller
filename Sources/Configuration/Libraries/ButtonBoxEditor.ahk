@@ -1026,7 +1026,9 @@ class ButtonBoxPreview extends ConfigurationItem {
 	iBottomMargin := this.kBottomMargin
 	
 	iRowDefinitions := []
-	iControls := {}
+	
+	iFunctions := {}
+	iLabels := {}
 	
 	iControlClickHandler := ObjBindMethod(this, "openControlMenu")
 	
@@ -1163,6 +1165,8 @@ class ButtonBoxPreview extends ConfigurationItem {
 		
 		Loop % this.Rows
 		{
+			row := A_Index
+			
 			rowHeight := rowHeights[A_Index]
 			rowDefinition := this.RowDefinitions[A_Index]
 		
@@ -1170,6 +1174,8 @@ class ButtonBoxPreview extends ConfigurationItem {
 			
 			Loop % this.Columns
 			{
+				column := A_Index
+				
 				columnWidth := columnWidths[A_Index]
 			
 				descriptor := rowDefinition[A_Index]
@@ -1212,6 +1218,11 @@ class ButtonBoxPreview extends ConfigurationItem {
 					
 					function := ConfigurationItem.descriptor(function, number)
 
+					if !this.iFunctions.HasKey(row)
+						this.iFunctions[row] := {}
+					
+					this.iFunctions[row][column] := function
+					
 					x := horizontal + Round((columnWidth - imageWidth) / 2)
 					y := vertical + Round((rowHeight - (labelHeight + this.kLabelMargin) - imageHeight) / 2)
 					
@@ -1222,8 +1233,15 @@ class ButtonBoxPreview extends ConfigurationItem {
 				
 						x := horizontal + Round((columnWidth - labelWidth) / 2)
 						y := vertical + rowHeight - labelHeight
+				
+						labelHandle := false
 						
-						Gui %window%:Add, Text, x%x% y%y% w%labelWidth% h%labelHeight% +Border -Background +0x1000 +0x1 gcontrolClick, %number%
+						Gui %window%:Add, Text, x%x% y%y% w%labelWidth% h%labelHeight% +Border -Background HWNDlabelHandle +0x1000 +0x1 gcontrolClick, %number%
+			
+						if !this.iLabels.HasKey(row)
+							this.iLabels[row] := {}
+						
+						this.iLabels[row][column] := labelHandle
 					}
 				}
 				
@@ -1432,6 +1450,48 @@ class ButtonBoxPreview extends ConfigurationItem {
 		}
 
 		return false
+	}
+	
+	getFunction(row, column) {
+		if this.iFunctions.HasKey(row) {
+			rowFunctions := this.iFunctions[row]
+			
+			if rowFunctions.HasKey(column)
+				return rowFunctions[column]
+		}
+		
+		return false
+	}
+	
+	findFunction(function, ByRef row, ByRef column) {
+		Loop % this.Rows
+		{
+			cRow := A_Index
+			
+			Loop % this.Columns
+			{
+				if (this.getFunction(cRow, A_Index) = function) {
+					row := cRow
+					column := A_Index
+					
+					return true
+				}	
+			}	
+		}
+		
+		return false
+	}
+	
+	setLabel(row, column, text) {
+		if this.iLabels.HasKey(row) {
+			rowLabels := this.iLabels[row]
+			
+			if rowLabels.HasKey(column) {
+				label := rowLabels[column]
+				
+				GuiControl Text, %label%, %text%
+			}
+		}
 	}
 	
 	setControlClickHandler(handler) {

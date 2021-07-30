@@ -236,6 +236,15 @@ class GeneralTab extends ConfigurationItem {
 		this.iSimulatorsList.saveToConfiguration(configuration)
 	}
 	
+	getSimulators() {
+		simulators := []
+		
+		for simulator, ignore in getConfigurationSectionValues(getControllerConfiguration(), "Simulators", Object())
+			simulators.Push(simulator)
+				
+		return simulators
+	}
+	
 	openTranslationsEditor() {
 		GuiControlGet languageDropDown
 		
@@ -474,6 +483,8 @@ initializeSimulatorConfiguration() {
 	
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Simulator Configuration
+	
+	kConfigurationEditor := true
 	
 	protectionOn()
 	

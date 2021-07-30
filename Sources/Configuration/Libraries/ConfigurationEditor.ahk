@@ -23,6 +23,8 @@ global vResult = false
 ;;;                        Public Constant Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+global kConfigurationEditor = false
+
 global kApply = "apply"
 global kOk = "ok"
 global kCancel = "cancel"
@@ -144,6 +146,10 @@ class ConfigurationEditor extends ConfigurationItem {
 		}
 	}
 	
+	registerWidget(plugin, widget) {
+		GuiControl Show, %widget%
+	}
+	
 	loadFromConfiguration(configuration) {
 		base.loadFromConfiguration(configuration)
 		
@@ -208,6 +214,10 @@ class ConfigurationEditor extends ConfigurationItem {
 		
 		if vShowTriggerDetector
 			SetTimer showTriggerDetector, -100
+	}
+	
+	getSimulators() {
+		return this.iGeneralTab.getSimulators()
 	}
 }
 

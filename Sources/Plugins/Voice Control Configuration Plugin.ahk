@@ -54,11 +54,21 @@ global activationCommandLabel
 global activationCommandEdit = ""
 
 class VoiceControlConfigurator extends ConfigurationItem {
+	iEditor := false
+	
 	iWindowsVoiceWidgets := []
 	iAzureVoiceWidgets := []
 	iOtherWidgets := []
 	
-	__New(configuration) {
+	Editor[] {
+		Get {
+			return this.iEditor
+		}
+	}
+	
+	__New(editor, configuration) {
+		this.iEditor := editor
+		
 		base.__New(configuration)
 		
 		VoiceControlConfigurator.Instance := this
@@ -518,9 +528,11 @@ chooseSoXPath() {
 }
 
 initializeVoiceControlConfigurator() {
-	editor := ConfigurationEditor.Instance
-	
-	editor.registerConfigurator(translate("Voice Control"), new VoiceControlConfigurator(editor.Configuration))
+	if kConfigurationEditor {
+		editor := ConfigurationEditor.Instance
+		
+		editor.registerConfigurator(translate("Voice Control"), new VoiceControlConfigurator(editor, editor.Configuration))
+	}
 }
 
 

@@ -509,106 +509,107 @@ showFacts(knowledgeBase) {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-AHKUnit.AddTestClass(Compiler)
-AHKUnit.AddTestClass(CoreEngine)
-AHKUnit.AddTestClass(Unification)
-AHKUnit.AddTestClass(HybridEngine)
+if true {
+	AHKUnit.AddTestClass(Compiler)
+	AHKUnit.AddTestClass(CoreEngine)
+	AHKUnit.AddTestClass(Unification)
+	AHKUnit.AddTestClass(HybridEngine)
 
-AHKUnit.Run()
-
-/*
-theRules =
-(
-	=<(?x, ?y) <= ?x = ?y
-	=<(?x, ?y) <= ?x < ?y
-
-	>=(?x, ?y) <= ?x = ?y
-	>=(?x, ?y) <= ?x > ?y
-
-	>(?x, ?y, true) <= ?x > ?y, !
-	>(?x, ?y, false)
-
-	max(?x, ?y, ?x) <= ?x > ?y, !
-	max(?x, ?y, ?y)
-
-	min(?x, ?y, ?x) <= ?x < ?y, !
-	min(?x, ?y, ?y)
-
-	abs(?x, ?r) <= ?x < 0, ?r = ?x * -1, !
-	abs(?x, ?x)
-
-	bound?(?x) <= unbound?(?x), !, fail
-	bound?(?)
-
-	any?(?value, [?value | ?]) <= !
-	any?(?value, [? | ?tail]) <= any?(?value, ?tail)
-
-	all?(?value, [?value])
-	all?(?value, [?value | ?tail]) <= all?(?value, ?tail)
-
-	none?(?value, [])
-	none?(?value, [?value | ?]) <= !, fail
-	none?(?value, [? | ?tail]) <= none?(?value, ?tail)
-
-	one?(?value, []) <= fail
-	one?(?value, [?value | ?tail]) <= !, none?(?value, ?tail)
-	one?(?value, [? | ?tail]) <= one?(?value, ?tail)
-
-	length([], 0)
-	length([?h | ?t], ?length) <= length(?t, ?tLength), ?length = ?tLength + 1
-
-	sum([], 0)
-	sum([?h | ?t], ?sum) <= sum(?t, ?tSum), ?sum = ?h + ?tSum
-
-	remove([], ?, [])
-	remove([?h | ?t], ?h, ?result) <= remove(?t, ?h, ?result), !
-	remove([?h | ?t], ?x, [?h | ?result]) <= remove(?t, ?x, ?result)
-	
-	removeUnbound([], []) <= !
-	removeUnbound([?h | ?t], [?hr | ?r]) <= bound?(?h), !, removeUnbound(?h, ?hr), removeUnbound(?t, ?r)
-	removeUnbound([?h | ?t], ?r) <= unbound?(?h), !, removeUnbound(?t, ?r)
-	removeUnbound(?r, ?r)
-	
-	testRemoveUnbound(?a, ?r) <= ?a = Foo, removeUnbound([?a, ?b], ?r)
-	testRemoveUnbound(?a, ?r) <= removeUnbound([1, 2, ?a], ?r)
-	testRemoveUnbound(?a, ?r) <= ?a = Foo, removeUnbound([[?a, ?a], ?b], ?r)
-	testRemoveUnbound(?a, ?r) <= removeUnbound([[?a, ?a], ?b], ?r)
-	testRemoveUnbound(?a, ?r) <= removeUnbound([[?a, ?a, [?c, Foo]], ?b], ?r)
-	
-	complexClause(?x, ?y) <= ?x = [1, 2, 3], ?y = complex(A, foo([1, 2]))
-	
-	index(?list, ?element, ?index) <= index(?list, ?element, 0, ?index)
-
-	index([?element], ?element, ?index, ?index) <= !
-	index([?head | ?tail], ?head, ?index, ?index) <= !
-	index([?head | ?tail], ?element, ?running, ?index) <= ?nRunning = ?running + 1, index(?tail, ?element, ?nRunning, ?index)
-	
-	weatherIndex(?weather, ?index) <= index([Dry, Drizzle, LightRain, MediumRain, HeavyRain, Thunderstorm], ?weather, ?index)
-
-	weatherSymbol(?index, ?weather) <= weatherIndex(?weather, ?index)
-)
-
-productions := false
-reductions := false
-
-rc := new RuleCompiler()
-
-rc.compileRules(theRules, productions, reductions)
-
-eng := new RuleEngine(productions, reductions, {})
-
-kb := eng.createKnowledgeBase(eng.createFacts(), eng.createRules())
-; eng.setTraceLevel(kTraceFull)
-g := rc.compileGoal("testRemoveUnbound(?a, ?r)")
-
-rs := kb.prove(g)
-
-while (rs != false) {
-	MsgBox % g.toString(rs)
-
-	if !rs.nextResult()
-		rs := false
+	AHKUnit.Run()
 }
+else {
+	theRules =
+	(
+		=<(?x, ?y) <= ?x = ?y
+		=<(?x, ?y) <= ?x < ?y
 
-msgbox Done
-*/
+		>=(?x, ?y) <= ?x = ?y
+		>=(?x, ?y) <= ?x > ?y
+
+		>(?x, ?y, true) <= ?x > ?y, !
+		>(?x, ?y, false)
+
+		max(?x, ?y, ?x) <= ?x > ?y, !
+		max(?x, ?y, ?y)
+
+		min(?x, ?y, ?x) <= ?x < ?y, !
+		min(?x, ?y, ?y)
+
+		abs(?x, ?r) <= ?x < 0, ?r = ?x * -1, !
+		abs(?x, ?x)
+
+		bound?(?x) <= unbound?(?x), !, fail
+		bound?(?)
+
+		any?(?value, [?value | ?])
+		any?(?value, [? | ?tail]) <= any?(?value, ?tail)
+
+		all?(?value, [?value])
+		all?(?value, [?value | ?tail]) <= all?(?value, ?tail)
+
+		none?(?value, [])
+		none?(?value, [?value | ?]) <= !, fail
+		none?(?value, [? | ?tail]) <= none?(?value, ?tail)
+
+		one?(?value, []) <= fail
+		one?(?value, [?value | ?tail]) <= !, none?(?value, ?tail)
+		one?(?value, [? | ?tail]) <= one?(?value, ?tail)
+
+		length([], 0)
+		length([?h | ?t], ?length) <= length(?t, ?tLength), ?length = ?tLength + 1
+
+		sum([], 0)
+		sum([?h | ?t], ?sum) <= sum(?t, ?tSum), ?sum = ?h + ?tSum
+
+		remove([], ?, [])
+		remove([?h | ?t], ?h, ?result) <= remove(?t, ?h, ?result), !
+		remove([?h | ?t], ?x, [?h | ?result]) <= remove(?t, ?x, ?result)
+		
+		removeUnbound([], []) <= !
+		removeUnbound([?h | ?t], [?hr | ?r]) <= bound?(?h), !, removeUnbound(?h, ?hr), removeUnbound(?t, ?r)
+		removeUnbound([?h | ?t], ?r) <= unbound?(?h), !, removeUnbound(?t, ?r)
+		removeUnbound(?r, ?r)
+		
+		testRemoveUnbound(?a, ?r) <= ?a = Foo, removeUnbound([?a, ?b], ?r)
+		testRemoveUnbound(?a, ?r) <= removeUnbound([1, 2, ?a], ?r)
+		testRemoveUnbound(?a, ?r) <= ?a = Foo, removeUnbound([[?a, ?a], ?b], ?r)
+		testRemoveUnbound(?a, ?r) <= removeUnbound([[?a, ?a], ?b], ?r)
+		testRemoveUnbound(?a, ?r) <= removeUnbound([[?a, ?a, [?c, Foo]], ?b], ?r)
+		
+		complexClause(?x, ?y) <= ?x = [1, 2, 3], ?y = complex(A, foo([1, 2]))
+		
+		index(?list, ?element, ?index) <= index(?list, ?element, 0, ?index)
+
+		index([?element], ?element, ?index, ?index) <= !
+		index([?head | ?tail], ?head, ?index, ?index) <= !
+		index([?head | ?tail], ?element, ?running, ?index) <= ?nRunning = ?running + 1, index(?tail, ?element, ?nRunning, ?index)
+		
+		weatherIndex(?weather, ?index) <= index([Dry, Drizzle, LightRain, MediumRain, HeavyRain, Thunderstorm], ?weather, ?index)
+
+		weatherSymbol(?index, ?weather) <= weatherIndex(?weather, ?index)
+	)
+
+	productions := false
+	reductions := false
+
+	rc := new RuleCompiler()
+
+	rc.compileRules(theRules, productions, reductions)
+
+	eng := new RuleEngine(productions, reductions, {})
+
+	kb := eng.createKnowledgeBase(eng.createFacts(), eng.createRules())
+	; eng.setTraceLevel(kTraceFull)
+	g := rc.compileGoal("any?(?r, [1, 2, 3])")
+
+	rs := kb.prove(g)
+
+	while (rs != false) {
+		MsgBox % g.toString(rs)
+
+		if !rs.nextResult()
+			rs := false
+	}
+
+	msgbox Done
+}

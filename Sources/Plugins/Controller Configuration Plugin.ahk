@@ -28,10 +28,20 @@ global kEmptySpaceDescriptor = "Button;" . kButtonBoxImagesDirectory . "Empty.pn
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class ControllerConfigurator extends ConfigurationItem {
+	iEditor := false
+	
 	iButtonBoxesList := false
 	iFunctionsist := false
 	
-	__New(configuration) {
+	Editor[] {
+		Get {
+			return this.iEditor
+		}
+	}
+	
+	__New(editor, configuration) {
+		this.iEditor := editor
+		
 		this.iButtonBoxesList := new ButtonBoxesList(configuration)
 		this.iFunctionsList := new FunctionsList(configuration)
 		
@@ -597,9 +607,11 @@ openActionsDocumentation() {
 }
 
 initializeControllerConfigurator() {
-	editor := ConfigurationEditor.Instance
-	
-	editor.registerConfigurator(translate("Controller"), new ControllerConfigurator(editor.Configuration))
+	if kConfigurationEditor {
+		editor := ConfigurationEditor.Instance
+		
+		editor.registerConfigurator(translate("Controller"), new ControllerConfigurator(editor, editor.Configuration))
+	}
 }
 
 

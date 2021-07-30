@@ -21,10 +21,20 @@ global rsLapsConsideredEdit
 global rsDampingFactorEdit
 
 class RaceStrategistConfigurator extends ConfigurationItem {
+	iEditor := false
+	
 	iSimulatorConfigurations := {}
 	iCurrentSimulator := false
 	
-	__New(configuration) {
+	Editor[] {
+		Get {
+			return this.iEditor
+		}
+	}
+	
+	__New(editor, configuration) {
+		this.iEditor := editor
+		
 		base.__New(configuration)
 		
 		RaceStrategistConfigurator.Instance := this
@@ -35,33 +45,36 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 		
 		Gui %window%:Font, Norm, Arial
 		
-		Gui %window%:Add, Text, x24 y80 w105 h23 +0x200, % translate("Simulator")
+		Gui %window%:Add, Text, x24 y80 w105 h23 +0x200 HWNDwidget1 Hidden, % translate("Simulator")
 		
  		choices := this.getSimulators()
 		chosen := (choices.Length() > 0) ? 1 : 0
 		
-		Gui %window%:Add, DropDownList, x156 y80 w307 Choose%chosen% gchooseRaceStrategistSimulator vrsSimulatorDropDown, % values2String("|", choices*)
+		Gui %window%:Add, DropDownList, x156 y80 w307 Choose%chosen% gchooseRaceStrategistSimulator vrsSimulatorDropDown HWNDwidget2 Hidden, % values2String("|", choices*)
 		
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
 		
-		Gui %window%:Add, GroupBox, x16 y120 w458 h96, % translate("Data Analysis")
+		Gui %window%:Add, GroupBox, x16 y120 w458 h96 HWNDwidget3 Hidden, % translate("Data Analysis")
 		
 		Gui %window%:Font, Norm, Arial
 		
-		Gui %window%:Add, Text, x24 y137 w160 h23 +0x200, % translate("Learn for")
-		Gui %window%:Add, Edit, x156 yp w40 h21 Number vrsLearningLapsEdit
-		Gui %window%:Add, UpDown, x196 yp w17 h21, 1
-		Gui %window%:Add, Text, x200 yp w260 h23 +0x200, % translate("Laps after Start or Pitstop")
+		Gui %window%:Add, Text, x24 y137 w160 h23 +0x200 HWNDwidget4 Hidden, % translate("Learn for")
+		Gui %window%:Add, Edit, x156 yp w40 h21 Number vrsLearningLapsEdit HWNDwidget5 Hidden
+		Gui %window%:Add, UpDown, x196 yp w17 h21 HWNDwidget6 Hidden, 1
+		Gui %window%:Add, Text, x200 yp w260 h23 +0x200 HWNDwidget7 Hidden, % translate("Laps after Start or Pitstop")
 		
-		Gui %window%:Add, Text, x24 yp+26 w105 h20 Section, % translate("Statistical Window")
-		Gui %window%:Add, Edit, x156 yp-2 w40 h21 Number vrsLapsConsideredEdit
-		Gui %window%:Add, UpDown, x196 yp w17 h21, 1
-		Gui %window%:Add, Text, x200 yp+2 w170 h20, % translate("Laps")
+		Gui %window%:Add, Text, x24 yp+26 w105 h20 Section HWNDwidget8 Hidden, % translate("Statistical Window")
+		Gui %window%:Add, Edit, x156 yp-2 w40 h21 Number vrsLapsConsideredEdit HWNDwidget9 Hidden
+		Gui %window%:Add, UpDown, x196 yp w17 h21 HWNDwidget10 Hidden, 1
+		Gui %window%:Add, Text, x200 yp+2 w170 h20 HWNDwidget11 Hidden, % translate("Laps")
 		
-		Gui %window%:Add, Text, x24 ys+24 w105 h20 Section, % translate("Damping Factor")
-		Gui %window%:Add, Edit, x156 yp-2 w40 h21 vrsDampingFactorEdit
-		Gui %window%:Add, Text, x200 yp+2 w170 h20, % translate("p. Lap")
+		Gui %window%:Add, Text, x24 ys+24 w105 h20 Section HWNDwidget12 Hidden, % translate("Damping Factor")
+		Gui %window%:Add, Edit, x156 yp-2 w40 h21 vrsDampingFactorEdit HWNDwidget13 Hidden
+		Gui %window%:Add, Text, x200 yp+2 w170 h20 HWNDwidget14 Hidden, % translate("p. Lap")
+		
+		Loop 14
+			editor.registerWidget(this, widget%A_Index%)
 		
 		this.loadSimulatorConfiguration()
 	}
@@ -118,12 +131,7 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 	}
 
 	getSimulators() {
-		simulators := []
-		
-		for simulator, ignore in getConfigurationSectionValues(getControllerConfiguration(), "Simulators", Object())
-			simulators.Push(simulator)
-				
-		return simulators
+		return this.Editor.getSimulators()
 	}
 }
 
@@ -140,9 +148,11 @@ chooseRaceStrategistSimulator() {
 }
 
 initializeRaceStrategistConfigurator() {
-	editor := ConfigurationEditor.Instance
+	if kConfigurationEditor {
+		editor := ConfigurationEditor.Instance
 	
-	editor.registerConfigurator(translate("Race Strategist"), new RaceStrategistConfigurator(editor.Configuration))
+		editor.registerConfigurator(translate("Race Strategist"), new RaceStrategistConfigurator(editor, editor.Configuration))
+	}
 }
 
 

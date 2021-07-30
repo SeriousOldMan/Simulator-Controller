@@ -23,7 +23,17 @@ global chatMessageDeleteButton
 global chatMessageUpdateButton
 		
 class ChatMessagesConfigurator extends ConfigurationItemList {
-	__New(configuration) {
+	iEditor := false
+	
+	Editor[] {
+		Get {
+			return this.iEditor
+		}
+	}
+	
+	__New(editor, configuration) {
+		this.iEditor := editor
+		
 		base.__New(configuration)
 				 
 		ChatMessagesConfigurator.Instance := this
@@ -31,6 +41,7 @@ class ChatMessagesConfigurator extends ConfigurationItemList {
 					
 	createGui(editor, x, y, width, height) {
 		window := editor.Window
+		
 		configuration := editor.Configuration
 		
 		Gui %window%:Add, ListView, x16 y80 w457 h205 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndchatMessagesListViewHandle VchatMessagesListView glistEvent
@@ -166,9 +177,11 @@ compareChatMessages(c1, c2) {
 }
 
 initializeChatMessagesConfigurator() {
-	editor := ConfigurationEditor.Instance
-	
-	editor.registerConfigurator(translate("Chat"), new ChatMessagesConfigurator(editor.Configuration))
+	if kConfigurationEditor {
+		editor := ConfigurationEditor.Instance
+		
+		editor.registerConfigurator(translate("Chat"), new ChatMessagesConfigurator(editor, editor.Configuration))
+	}
 }
 
 

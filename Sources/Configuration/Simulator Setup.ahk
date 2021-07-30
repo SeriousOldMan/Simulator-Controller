@@ -40,6 +40,8 @@ ListLines Off					; Disable execution history
 #Include ..\Controller\Libraries\SettingsEditor.ahk
 #Include Libraries\ConfigurationEditor.ahk
 #Include Libraries\ButtonBoxEditor.ahk
+#Include ..\Plugins\Race Engineer Configuration Plugin.ahk
+#Include ..\Plugins\Race Strategist Configuration Plugin.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -454,7 +456,7 @@ class SetupWizard extends ConfigurationItem {
 				if FileExist(kUserHomeDirectory . "Install\Simulator Settings.ini")
 					FileCopy %kUserHomeDirectory%Install\Simulator Settings.ini, %kUserConfigDirectory%Simulator Settings.ini
 					
-				writeConfiguration(kUserConfigDirectory . "Simulator Configuration.ini", this.generateSimulatorConfiguration())
+				writeConfiguration(kUserConfigDirectory . "Simulator Configuration.ini", this.getSimulatorConfiguration())
 				
 				if this.isModuleSelected("Button Box") {
 					if FileExist(kUserConfigDirectory . "Button Box Configuration.ini")
@@ -470,7 +472,7 @@ class SetupWizard extends ConfigurationItem {
 			return false
 	}
 	
-	generateSimulatorConfiguration() {
+	getSimulatorConfiguration() {
 		configuration := newConfiguration()
 		
 		this.saveToConfiguration(configuration)
@@ -723,7 +725,7 @@ class SetupWizard extends ConfigurationItem {
 		return this.KnowledgeBase.getValue("Application." . application . ".Selected", false)
 	}
 	
-	locateApplication(application, executable := false) {
+	locateApplication(application, executable := false, update := true) {
 		local knowledgeBase := this.KnowledgeBase
 		
 		if !this.isApplicationInstalled(application) {
@@ -744,7 +746,8 @@ class SetupWizard extends ConfigurationItem {
 				knowledgeBase.setFact("Application." . application . ".Installed", true)
 				knowledgeBase.setFact("Application." . application . ".Path", executable)
 				
-				this.updateState()
+				if update
+					this.updateState()
 			}
 		}
 	}
@@ -835,7 +838,7 @@ class SetupWizard extends ConfigurationItem {
 	simulatorCommandAvailable(simulator, mode, command) {
 		local knowledgeBase := this.KnowledgeBase
 		
-		goal := new RuleCompiler().compileGoal("simulatorCommandAvailable(" . StrReplace(simulator, " ", "\ ") . ", " . StrReplace(mode, " ", "\ ") . ", " . StrReplace(command, " ", "\ ") . ")")
+		goal := new RuleCompiler().compileGoal("simulatorCommandAvailable?(" . StrReplace(simulator, " ", "\ ") . ", " . StrReplace(mode, " ", "\ ") . ", " . StrReplace(command, " ", "\ ") . ")")
 		
 		return knowledgeBase.prove(goal)
 	}
@@ -887,7 +890,7 @@ class SetupWizard extends ConfigurationItem {
 	assistantCommandAvailable(assistant, command) {
 		local knowledgeBase := this.KnowledgeBase
 		
-		goal := new RuleCompiler().compileGoal("assistantCommandAvailable(" . StrReplace(assistant, " ", "\ ") . ", " . StrReplace(command, " ", "\ ") . ")")
+		goal := new RuleCompiler().compileGoal("assistantCommandAvailable?(" . StrReplace(assistant, " ", "\ ") . ", " . StrReplace(command, " ", "\ ") . ")")
 		
 		return knowledgeBase.prove(goal)
 	}
@@ -1221,7 +1224,7 @@ class StartStepWizard extends StepWizard {
 			Gui %window%:Font, s12 Bold, Arial
 			
 			Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDiconHandle Hidden, %kResourcesDirectory%Setup\Images\Security.ico
-			Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h30 HWNDlabelHandle Hidden, % translate("Unblocking of the applications and DLLs")
+			Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h30 HWNDlabelHandle Hidden, % translate("Unblocking of the Applications and DLLs")
 			
 			Gui %window%:Font, s9 Norm, Arial
 			
@@ -1275,11 +1278,7 @@ class StartStepWizard extends StepWizard {
 	hidePage(page) {
 		if base.hidePage(page) {
 			if (page == 1) {
-				imageViewer := this.iImageViewer
-			
-				imageViewer.Document.Open()
-				imageViewer.Document.Write("<html></html>")
-				imageViewer.Document.Close()
+				volume := fadeOut()
 				
 				try {
 					SoundPlay NonExistent.avi
@@ -1287,6 +1286,14 @@ class StartStepWizard extends StepWizard {
 				catch exception {
 					; ignore
 				}
+				
+				resetVolume(volume)
+				
+				imageViewer := this.iImageViewer
+			
+				imageViewer.Document.Open()
+				imageViewer.Document.Write("<html></html>")
+				imageViewer.Document.Close()
 			}
 			
 			return true
@@ -1915,7 +1922,7 @@ class ApplicationsStepWizard extends StepWizard {
 		
 			for application, ignore in getConfigurationSectionValues(wizard.Definition, section) {
 				if !wizard.isApplicationInstalled(application) {
-					wizard.locateApplication(application)
+					wizard.locateApplication(application, false, false)
 				
 					if (initialize && wizard.isApplicationInstalled(application))
 						wizard.selectApplication(application, true, false)
@@ -2082,7 +2089,7 @@ class ButtonBoxStepWizard extends StepWizard {
 		
 		if (this.conflictingFunctions(configuration) || this.conflictingTriggers(configuration)) {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-			title := translate("Functions")
+			title := translate("Setup")
 			MsgBox 262160, %title%, % translate("There are still duplicate functions or duplicate triggers - please correct...")
 			OnMessage(0x44, "")
 			
@@ -2096,7 +2103,7 @@ class ButtonBoxStepWizard extends StepWizard {
 		
 		if (LV_GetCount() != this.iFunctionTriggers.Length()) {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-			title := translate("Functions")
+			title := translate("Setup")
 			MsgBox 262436, %title%, % translate("Not all functions have been assigned to physical controls. Do you really want to proceed?")
 			OnMessage(0x44, "")
 			
@@ -2371,6 +2378,67 @@ class ButtonBoxStepWizard extends StepWizard {
 	}
 }
 
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; GeneralStepWizard                                                       ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class GeneralStepWizard extends StepWizard {
+	Pages[] {
+		Get {
+			return 0
+		}
+	}
+	createGui(wizard, x, y, width, height) {
+	}
+	
+	saveToConfiguration(configuration) {
+		base.saveToConfiguration(configuration)
+		
+		wizard := this.SetupWizard
+		
+		language := getLanguage()
+		
+		setConfigurationSectionValues(configuration, "Splash Window", getConfigurationSectionValues(this.SetupWizard.Definition, "Splash Window"))
+		setConfigurationSectionValues(configuration, "Splash Themes", getConfigurationSectionValues(this.SetupWizard.Definition, "Splash Themes"))
+		
+		setConfigurationValue(configuration, "Configuration", "Start With Windows", false)
+		setConfigurationValue(configuration, "Configuration", "Log Level", "Warn")
+		setConfigurationValue(configuration, "Configuration", "Debug", false)
+		
+		setConfigurationValue(configuration, "Configuration", "Silent Mode", false)
+		setConfigurationValue(configuration, "Configuration", "Language", language)
+		
+		if wizard.isSoftwareInstalled("NirCmd")
+			setConfigurationValue(configuration, "Configuration", "NirCmd Path", wizard.softwarePath("NirCmd"))
+		
+		if wizard.isModuleSelected("Voice Control") {
+			if wizard.isSoftwareInstalled("SoX")
+				setConfigurationValue(configuration, "Voice Control", "SoX Path", wizard.softwarePath("SoX"))
+		
+			setConfigurationValue(configuration, "Voice Control", "Speaker", true)
+			
+			if wizard.isSoftwareInstalled("MSSpeechRuntime") {
+				setConfigurationValue(configuration, "Voice Control", "Listener", true)
+			
+				enListener := wizard.isSoftwareInstalled("MSSpeechLibrary_en-US")
+				deListener := wizard.isSoftwareInstalled("MSSpeechLibrary_de-DE")
+				
+				if (deListener && enListener)
+					setConfigurationValue(configuration, "Voice Control", "Language", language)
+				else if enListener
+					setConfigurationValue(configuration, "Voice Control", "Language", "EN")
+				else
+					setConfigurationValue(configuration, "Voice Control", "Language", "DE")
+			}
+			else {
+				setConfigurationValue(configuration, "Voice Control", "Listener", false)
+				setConfigurationValue(configuration, "Voice Control", "Language", language)
+			}
+		}
+	}
+}
+
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; CommandsStepWizard                                                      ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -2551,7 +2619,7 @@ class CommandsStepWizard extends StepWizard {
 				function := [function]
 			else {
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Increase", "Decrease", "Cancel"]))
-				title := translate("Function")
+				title := translate("Setup")
 				MsgBox 262179, %title%, % translate("What type of action do you want to trigger for ") . command . translate("?")
 				OnMessage(0x44, "")
 				
@@ -2877,11 +2945,13 @@ class AssistantsStepWizard extends CommandsStepWizard {
 		Get {
 			wizard := this.SetupWizard
 			
+			pages := 0
+			
 			for ignore, assistant in this.Definition
 				if wizard.isModuleSelected(assistant)
-					return 1
+					pages += 1
 				
-			return 0
+			return pages
 		}
 	}
 	
@@ -2937,7 +3007,18 @@ class AssistantsStepWizard extends CommandsStepWizard {
 		
 		this.setCommandsListView(commandsListViewHandle)
 		
+		new RaceEngineerConfigurator(this, this.SetupWizard.getSimulatorConfiguration()).createGui(this, x, y, width, height)
+		
 		this.registerWidgets(1, commandsIconHandle, commandsLabelHandle, commandsListViewHandle, commandsInfoTextHandle, assistantLabelHandle, assistantDropDownHandle)
+	}
+	
+	registerWidget(page, widget) {
+		if isInstance(page, RaceEngineerConfigurator)
+			base.registerWidget(1, widget)
+		else if isInstance(page, RaceStrategistConfigurator)
+			base.registerWidget(Min(this.Pages, 2), widget)
+		else
+			base.registerWidget(page, widget)
 	}
 	
 	updateState() {
@@ -2962,6 +3043,31 @@ class AssistantsStepWizard extends CommandsStepWizard {
 		
 		GuiControl, , assistantDropDown, % "|" . values2String("|", this.iAssistants*)
 		GuiControl Choose, assistantDropDown, % chosen
+	}
+	
+	getSimulators() {
+		local knowledgeBase := this.SetupWizard.KnowledgeBase
+		local resultSet
+		local variable
+		
+		if this.iCurrentAssistant {
+			goal := new RuleCompiler().compileGoal("assistantSimulator?(" . StrReplace(this.iCurrentAssistant, " ", "\ ") . ", ?simulator)")
+			variable := goal.Arguments[2]
+			
+			resultSet := knowledgeBase.prove(goal)
+			simulators := []
+			
+			while resultSet {
+				simulators.Push(resultSet.getValue(variable).toString())
+			
+				if !resultSet.nextResult()
+					resultSet := false
+			}
+			
+			return simulators
+		}
+		else
+			return []
 	}
 	
 	chooseAssistant() {
@@ -3118,23 +3224,12 @@ class FinishStepWizard extends StepWizard {
 		this.registerWidget(1, imageViewerHandle)
 	}
 	
-	saveToConfiguration(configuration) {
-		base.saveToConfiguration(configuration)
-		
-		setConfigurationSectionValues(configuration, "Splash Window", getConfigurationSectionValues(this.SetupWizard.Definition, "Splash Window"))
-		setConfigurationSectionValues(configuration, "Splash Themes", getConfigurationSectionValues(this.SetupWizard.Definition, "Splash Themes"))
-		
-		setConfigurationValue(configuration, "Configuration", "Start With Windows", false)
-		setConfigurationValue(configuration, "Configuration", "Log Level", "Warn")
-		setConfigurationValue(configuration, "Configuration", "Debug", false)
-	}
-	
 	showPage(page) {
 		base.showPage(page)
 		
 		settingsEditor := ObjBindMethod(this, "settingsEditor")
 		
-		SetTimer %settingsEditor%, -1000
+		SetTimer %settingsEditor%, % isDebug() ? -5000 : -2500
 	}
 	
 	hidePage(page) {
@@ -3153,7 +3248,7 @@ class FinishStepWizard extends StepWizard {
 		else
 			settings := newConfiguration()
 		
-		configuration := this.SetupWizard.generateSimulatorConfiguration()
+		configuration := this.SetupWizard.getSimulatorConfiguration()
 		
 		editSettings(settings, false, configuration, Min(A_ScreenWidth - Round(A_ScreenWidth / 3) + Round(A_ScreenWidth / 3 / 2) - 180, A_ScreenWidth - 360))
 		
@@ -3176,7 +3271,7 @@ finishSetup(finish := false, save := false) {
 	else {
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
 		title := translate("Setup")
-		MsgBox 262436, %title%, % translate("Do you want to generate the new configuration? Backup files will be genaretd for your current configuration in the ""Simulator Controller\Config"" folder in your user Documents folder.")
+		MsgBox 262436, %title%, % translate("Do you want to generate the new configuration?`n`nBackup files will be saved for your current configuration in the ""Simulator Controller\Config"" folder in your user Documents folder.")
 		OnMessage(0x44, "")
 		
 		IfMsgBox Yes
@@ -3190,7 +3285,7 @@ finishSetup(finish := false, save := false) {
 		
 		; Let other threads finish...
 			
-		SetTimer %callback%, -2000
+		SetTimer %callback%, % isDebug() ? -5000 : -2000
 	}
 }
 
@@ -3578,6 +3673,30 @@ elevateAndRestart() {
 	}
 }
 
+fadeOut() {
+	SoundGet masterVolume, MASTER
+
+	currentVolume := masterVolume
+
+	Loop {
+		currentVolume -= 5
+
+		if (currentVolume <= 0)
+			break
+		else {
+			SoundSet %currentVolume%, MASTER
+
+			Sleep 200
+		}
+	}
+	
+	return masterVolume
+}
+
+resetVolume(masterVolume) {
+	SoundSet %masterVolume%, MASTER
+}
+
 initializeSimulatorSetup() {
 	icon := kIconsDirectory . "Wand.ico"
 	
@@ -3593,14 +3712,15 @@ initializeSimulatorSetup() {
 		
 		wizard := new SetupWizard(kSimulatorConfiguration, definition)
 		
-		wizard.registerStepWizard(new StartStepWizard(wizard, "Start", kSimulatorConfiguration))
-		wizard.registerStepWizard(new ModulesStepWizard(wizard, "Modules", kSimulatorConfiguration))
-		wizard.registerStepWizard(new InstallationStepWizard(wizard, "Installation", kSimulatorConfiguration))
-		wizard.registerStepWizard(new ApplicationsStepWizard(wizard, "Applications", kSimulatorConfiguration))
-		wizard.registerStepWizard(new ButtonBoxStepWizard(wizard, "Button Box", kSimulatorConfiguration))
+		;~ wizard.registerStepWizard(new StartStepWizard(wizard, "Start", kSimulatorConfiguration))
+		;~ wizard.registerStepWizard(new ModulesStepWizard(wizard, "Modules", kSimulatorConfiguration))
+		;~ wizard.registerStepWizard(new InstallationStepWizard(wizard, "Installation", kSimulatorConfiguration))
+		;~ wizard.registerStepWizard(new ApplicationsStepWizard(wizard, "Applications", kSimulatorConfiguration))
+		;~ wizard.registerStepWizard(new ButtonBoxStepWizard(wizard, "Button Box", kSimulatorConfiguration))
+		;~ wizard.registerStepWizard(new GeneralStepWizard(wizard, "General", kSimulatorConfiguration))
 		wizard.registerStepWizard(new SimulatorsStepWizard(wizard, "Simulators", kSimulatorConfiguration))
 		wizard.registerStepWizard(new AssistantsStepWizard(wizard, "Assistants", kSimulatorConfiguration))
-		wizard.registerStepWizard(new FinishStepWizard(wizard, "Finish", kSimulatorConfiguration))
+		;~ wizard.registerStepWizard(new FinishStepWizard(wizard, "Finish", kSimulatorConfiguration))
 	}
 	finally {
 		protectionOff()
@@ -3612,7 +3732,7 @@ startupSimulatorSetup() {
 	
 	wizard.loadDefinition()
 	
-	if this.Debug[kDebugRules]
+	if wizard.Debug[kDebugRules]
 		wizard.dumpRules(wizard.KnowledgeBase)
 	
 restartSetup:
@@ -3647,7 +3767,7 @@ restartSetup:
 	else {
 		; Let finish all threads
 	
-		SetTimer exitApp, -2000
+		SetTimer exitApp, % isDebug() ? -5000 : -2000
 	}
 }
 

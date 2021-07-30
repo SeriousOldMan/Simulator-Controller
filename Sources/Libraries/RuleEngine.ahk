@@ -980,6 +980,8 @@ class Compound extends Term {
 	
 	Arguments[resultSet := "__NotInitialized__"] {
 		Get {
+			if resultSet is Number
+				return this.iArguments[resultSet]
 			if (resultSet == kNotInitialized)
 				return this.iArguments
 			else
@@ -1941,6 +1943,12 @@ class FactChoicePoint extends ChoicePoint {
 		}
 	}
 	
+	reset() {
+		base.reset()
+		
+		this.iFirst := true
+	}
+	
 	resetVariables() {
 		local facts
 		
@@ -2007,6 +2015,12 @@ class CallChoicePoint extends ChoicePoint {
 		
 			return false
 		}
+	}
+	
+	reset() {
+		base.reset()
+		
+		this.iFirst := true
 	}
 	
 	foreignCall() {
@@ -2097,6 +2111,12 @@ class ProduceChoicePoint extends ChoicePoint {
 		else
 			return false
 	}
+	
+	reset() {
+		base.reset()
+		
+		this.iFirst := true
+	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -2114,6 +2134,12 @@ class CutChoicePoint extends ChoicePoint {
 		}
 		else
 			return false
+	}
+	
+	reset() {
+		base.reset()
+		
+		this.iFirst := true
 	}
 	
 	previous() {

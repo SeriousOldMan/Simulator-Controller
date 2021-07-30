@@ -1386,27 +1386,29 @@ withProtection(function, params*) {
 }
 
 isInstance(object, root) {
-	candidate := object.base
-	
-	while IsObject(candidate)
-		if (candidate == root)
-			return true
-		else {
-			classVar := candidate.base.__Class
+	if IsObject(object) {
+		candidate := object.base
 		
-			if (classVar && (classVar != "")) {
-				if InStr(classVar, ".") {
-					classVar := StrSplit(classVar, ".")
-					outerClassVar := classVar[1]
-					
-					candidate := %outerClassVar%[classVar[2]]
+		while IsObject(candidate)
+			if (candidate == root)
+				return true
+			else {
+				classVar := candidate.base.__Class
+			
+				if (classVar && (classVar != "")) {
+					if InStr(classVar, ".") {
+						classVar := StrSplit(classVar, ".")
+						outerClassVar := classVar[1]
+						
+						candidate := %outerClassVar%[classVar[2]]
+					}
+					else
+						candidate := %classVar%
 				}
 				else
-					candidate := %classVar%
+					return false
 			}
-			else
-				return false
-		}
+	}
 		
 	return false
 }

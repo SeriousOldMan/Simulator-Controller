@@ -29,10 +29,20 @@ global reAdjustLapTimeCheck
 global reDamageAnalysisLapsEdit
 
 class RaceEngineerConfigurator extends ConfigurationItem {
+	iEditor := false
+	
 	iSimulatorConfigurations := {}
 	iCurrentSimulator := false
 	
-	__New(configuration) {
+	Editor[] {
+		Get {
+			return this.iEditor
+		}
+	}
+	
+	__New(editor, configuration) {
+		this.iEditor := editor
+		
 		base.__New(configuration)
 		
 		RaceEngineerConfigurator.Instance := this
@@ -43,72 +53,75 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		
 		Gui %window%:Font, Norm, Arial
 		
-		Gui %window%:Add, Text, x24 y80 w105 h23 +0x200, % translate("Simulator")
+		Gui %window%:Add, Text, x24 y80 w105 h23 +0x200 HWNDwidget1 Hidden, % translate("Simulator")
 		
  		choices := this.getSimulators()
 		chosen := (choices.Length() > 0) ? 1 : 0
 		
-		Gui %window%:Add, DropDownList, x156 y80 w307 Choose%chosen% gchooseRaceEngineerSimulator vreSimulatorDropDown, % values2String("|", choices*)
+		Gui %window%:Add, DropDownList, x156 y80 w307 Choose%chosen% gchooseRaceEngineerSimulator vreSimulatorDropDown HWNDwidget2 Hidden, % values2String("|", choices*)
 		
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
 		
-		Gui %window%:Add, GroupBox, x16 y120 w458 h70, % translate("Settings (for all Race Assistants)")
+		Gui %window%:Add, GroupBox, x16 y120 w458 h70 HWNDwidget3 Hidden, % translate("Settings (for all Race Assistants)")
 		
 		Gui %window%:Font, Norm, Arial
 		
-		Gui %window%:Add, Text, x24 y137 w160 h23 +0x200, % translate("@ Session Begin")
+		Gui %window%:Add, Text, x24 y137 w160 h23 +0x200 HWNDwidget4 Hidden, % translate("@ Session Begin")
 		choices := map(["Use values from previous Session", "Load from Setup Database"], "translate")
-		Gui %window%:Add, DropDownList, x156 y137 w307 AltSubmit vreLoadSettingsDropDown, % values2String("|", choices*)
+		Gui %window%:Add, DropDownList, x156 y137 w307 AltSubmit vreLoadSettingsDropDown HWNDwidget5 Hidden, % values2String("|", choices*)
 		
 		choices := map(["Ask", "Always save", "No action"], "translate")
-		Gui %window%:Add, Text, x24 y161 w160 h23 +0x200, % translate("@ Session End")
-		Gui %window%:Add, DropDownList, x156 y161 w140 AltSubmit vreSaveSettingsDropDown, % values2String("|", choices*)
+		Gui %window%:Add, Text, x24 y161 w160 h23 +0x200 HWNDwidget6 Hidden, % translate("@ Session End")
+		Gui %window%:Add, DropDownList, x156 y161 w140 AltSubmit vreSaveSettingsDropDown HWNDwidget7 Hidden, % values2String("|", choices*)
 		
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
 		
-		Gui %window%:Add, GroupBox, x16 y196 w458 h70, % translate("Tyre Pressures")
+		Gui %window%:Add, GroupBox, x16 y196 w458 h70 HWNDwidget8 Hidden, % translate("Tyre Pressures")
 		
 		Gui %window%:Font, Norm, Arial
 		
-		Gui %window%:Add, Text, x24 y213 w160 h23 +0x200, % translate("@ Session Begin")
+		Gui %window%:Add, Text, x24 y213 w160 h23 +0x200 HWNDwidget9 Hidden, % translate("@ Session Begin")
 		choices := map(["Use Values from Settings", "Load from Setup Database", "Import from Simulator"], "translate")
 		chosen := 1
-		Gui %window%:Add, DropDownList, x156 y213 w307 AltSubmit Choose%chosen% vreLoadTyrePressuresDropDown, % values2String("|", choices*)
+		Gui %window%:Add, DropDownList, x156 y213 w307 AltSubmit Choose%chosen% vreLoadTyrePressuresDropDown HWNDwidget10 Hidden, % values2String("|", choices*)
 		
 		choices := map(["Ask", "Always save", "No action"], "translate")
-		Gui %window%:Add, Text, x24 y237 w160 h23 +0x200, % translate("@ Session End")
-		Gui %window%:Add, DropDownList, x156 y237 w140 AltSubmit vreSaveTyrePressuresDropDown, % values2String("|", choices*)
+		Gui %window%:Add, Text, x24 y237 w160 h23 +0x200 HWNDwidget11 Hidden, % translate("@ Session End")
+		Gui %window%:Add, DropDownList, x156 y237 w140 AltSubmit vreSaveTyrePressuresDropDown HWNDwidget12 Hidden, % values2String("|", choices*)
 		
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
 		
-		Gui %window%:Add, GroupBox, x16 y272 w458 h156, % translate("Data Analysis")
+		Gui %window%:Add, GroupBox, x16 y272 w458 h156 HWNDwidget13 Hidden, % translate("Data Analysis")
 		
 		Gui %window%:Font, Norm, Arial
 		
-		Gui %window%:Add, Text, x24 y289 w160 h23 +0x200, % translate("Learn for")
-		Gui %window%:Add, Edit, x156 yp w40 h21 Number vreLearningLapsEdit
-		Gui %window%:Add, UpDown, x196 yp w17 h21, 1
-		Gui %window%:Add, Text, x200 yp w260 h23 +0x200, % translate("Laps after Start or Pitstop")
+		Gui %window%:Add, Text, x24 y289 w160 h23 +0x200 HWNDwidget14 Hidden, % translate("Learn for")
+		Gui %window%:Add, Edit, x156 yp w40 h21 Number vreLearningLapsEdit HWNDwidget15 Hidden
+		Gui %window%:Add, UpDown, x196 yp w17 h21 HWNDwidget16 Hidden, 1
+		Gui %window%:Add, Text, x200 yp w260 h23 +0x200 HWNDwidget17 Hidden, % translate("Laps after Start or Pitstop")
 		
-		Gui %window%:Add, Text, x24 yp+26 w105 h20 Section, % translate("Statistical Window")
-		Gui %window%:Add, Edit, x156 yp-2 w40 h21 Number vreLapsConsideredEdit
-		Gui %window%:Add, UpDown, x196 yp w17 h21, 1
-		Gui %window%:Add, Text, x200 yp+2 w170 h20, % translate("Laps")
+		Gui %window%:Add, Text, x24 yp+26 w105 h20 Section HWNDwidget18 Hidden, % translate("Statistical Window")
+		Gui %window%:Add, Edit, x156 yp-2 w40 h21 Number vreLapsConsideredEdit HWNDwidget19 Hidden
+		Gui %window%:Add, UpDown, x196 yp w17 h21 HWNDwidget20 Hidden, 1
+		Gui %window%:Add, Text, x200 yp+2 w170 h20 HWNDwidget21 Hidden, % translate("Laps")
 		
-		Gui %window%:Add, Text, x24 ys+24 w105 h20 Section, % translate("Damping Factor")
-		Gui %window%:Add, Edit, x156 yp-2 w40 h21 vreDampingFactorEdit
-		Gui %window%:Add, Text, x200 yp+2 w170 h20, % translate("p. Lap")
+		Gui %window%:Add, Text, x24 ys+24 w105 h20 Section HWNDwidget22 Hidden, % translate("Damping Factor")
+		Gui %window%:Add, Edit, x156 yp-2 w40 h21 vreDampingFactorEdit HWNDwidget23 Hidden
+		Gui %window%:Add, Text, x200 yp+2 w170 h20 HWNDwidget24 Hidden, % translate("p. Lap")
 
-		Gui %window%:Add, Text, x24 ys+30 w160 h23 +0x200 Section, % translate("Adjust Lap Time")
-		Gui %window%:Add, CheckBox, x156 yp w300 h23 VreAdjustLapTimeCheck, % translate("for Start, Pitstop or imcomplete Laps (use from Settings)")
+		Gui %window%:Add, Text, x24 ys+30 w160 h23 +0x200 Section HWNDwidget25 Hidden, % translate("Adjust Lap Time")
+		Gui %window%:Add, CheckBox, x156 yp w300 h23 VreAdjustLapTimeCheck HWNDwidget26 Hidden, % translate("for Start, Pitstop or imcomplete Laps (use from Settings)")
 		
-		Gui %window%:Add, Text, x24 ys+30 w160 h23 +0x200 Section, % translate("Damage Analysis for")
-		Gui %window%:Add, Edit, x156 yp w40 h21 Number VreDamageAnalysisLapsEdit
-		Gui %window%:Add, UpDown, x196 yp w17 h21, 1
-		Gui %window%:Add, Text, x200 yp-2 w260 h23 +0x200, % translate("Laps after Incident")
+		Gui %window%:Add, Text, x24 ys+30 w160 h23 +0x200 Section HWNDwidget27 Hidden, % translate("Damage Analysis for")
+		Gui %window%:Add, Edit, x156 yp w40 h21 Number VreDamageAnalysisLapsEdit HWNDwidget28 Hidden
+		Gui %window%:Add, UpDown, x196 yp w17 h21 HWNDwidget29 Hidden, 1
+		Gui %window%:Add, Text, x200 yp-2 w260 h23 +0x200 HWNDwidget30 Hidden, % translate("Laps after Incident")
+		
+		Loop 30
+			editor.registerWidget(this, widget%A_Index%)
 		
 		this.loadSimulatorConfiguration()
 	}
@@ -207,12 +220,7 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 	}
 
 	getSimulators() {
-		simulators := []
-		
-		for simulator, ignore in getConfigurationSectionValues(getControllerConfiguration(), "Simulators", Object())
-			simulators.Push(simulator)
-				
-		return simulators
+		return this.Editor.getSimulators()
 	}
 }
 
@@ -229,9 +237,11 @@ chooseRaceEngineerSimulator() {
 }
 
 initializeRaceEngineerConfigurator() {
-	editor := ConfigurationEditor.Instance
-	
-	editor.registerConfigurator(translate("Race Engineer"), new RaceEngineerConfigurator(editor.Configuration))
+	if kConfigurationEditor {
+		editor := ConfigurationEditor.Instance
+		
+		editor.registerConfigurator(translate("Race Engineer"), new RaceEngineerConfigurator(editor, editor.Configuration))
+	}
 }
 
 

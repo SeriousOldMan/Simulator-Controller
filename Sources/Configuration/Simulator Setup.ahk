@@ -443,14 +443,17 @@ class SetupWizard extends ConfigurationItem {
 	
 	finishSetup(save := true) {
 		if save {
-			if FileExist(kUserConfigDirectory . "Simulator Configuration.ini") {
+			if FileExist(kUserConfigDirectory . "Simulator Configuration.ini")
 				FileMove %kUserConfigDirectory%Simulator Configuration.ini, %kUserConfigDirectory%Simulator Configuration.ini.bak, 1
-				
-				writeConfiguration(kUserConfigDirectory . "Simulator Configuration.ini", this.generateSimulatorConfiguration())
-			}
 			
-			if (this.isModuleSelected("Button Box") && FileExist(kUserConfigDirectory . "Button Box Configuration.ini")) {
-				FileMove %kUserConfigDirectory%Button Box Configuration.ini, %kUserConfigDirectory%Button Box Configuration.ini.bak, 1
+			if (FileExist(kUserConfigDirectory . "Simulator Settings.ini") && FileExist(kUserHomeDirectory . "Install\Simulator Settings.ini"))
+				FileCopy %kUserHomeDirectory%Install\Simulator Settings.ini, %kUserConfigDirectory%Simulator Settings.ini
+				
+			writeConfiguration(kUserConfigDirectory . "Simulator Configuration.ini", this.generateSimulatorConfiguration())
+			
+			if this.isModuleSelected("Button Box") {
+				if FileExist(kUserConfigDirectory . "Button Box Configuration.ini")
+					FileMove %kUserConfigDirectory%Button Box Configuration.ini, %kUserConfigDirectory%Button Box Configuration.ini.bak, 1
 				
 				FileCopy %kUserHomeDirectory%Install\Button Box Configuration.ini, %kUserConfigDirectory%Button Box Configuration.ini
 			}
@@ -463,6 +466,13 @@ class SetupWizard extends ConfigurationItem {
 		configuration := newConfiguration()
 		
 		this.saveToConfiguration(configuration)
+		
+		setConfigurationSectionValues(configuration, "Splash Window", getConfigurationSectionValues(this.Definition, "Splash Window"))
+		setConfigurationSectionValues(configuration, "Splash Themes", getConfigurationSectionValues(this.Definition, "Splash Themes"))
+		
+		setConfigurationValue(configuration, "Configuration", "Start With Windows", false)
+		setConfigurationValue(configuration, "Configuration", "Log Level", "Warn")
+		setConfigurationValue(configuration, "Configuration", "Debug", false)
 		
 		return configuration
 	}
@@ -1653,33 +1663,57 @@ class ApplicationsStepWizard extends StepWizard {
 	saveToConfiguration(configuration) {
 		local application
 		
-		wizard := this.SetupWizard
+		base.saveToConfiguration(configuration)
 		
-		for ignore, applications in this.Definition
-			if (applications != "Applications.Special")
-				for application, ignore in getConfigurationSectionValues(wizard.Definition, applications)
-					if (wizard.isApplicationInstalled(application) && wizard.isApplicationSelected(application)) {
-						descriptor := getApplicationDescriptor(application)
+		wizard := this.SetupWizard
+		definition := this.Definition
+		
+		groups := {}
+		simulators := []
+		
+		for ignore, applications in concatenate([definition[1]], string2Values(",", definition[2]))
+			for application, ignore in getConfigurationSectionValues(wizard.Definition, applications)
+				if (wizard.isApplicationInstalled(application) && wizard.isApplicationSelected(application)) {
+					descriptor := getApplicationDescriptor(application)
+				
+					exePath := wizard.applicationPath(application)
 					
-						exePath := wizard.applicationPath(simulator)
+					SplitPath exePath, , workingDirectory
+					
+					setConfigurationValue(configuration, application, "Exe Path", exePath)
+					setConfigurationValue(configuration, application, "Working Directory", workingDirectory)
+					setConfigurationValue(configuration, application, "Window Title", descriptor[4])
+					
+					hooks := string2Values(";", descriptor[5])
+					
+					if hooks[1]
+						setConfigurationValue(configuration, "Application Hooks", application . ".Startup", hooks[1])
+					
+					if hooks[2]
+						setConfigurationValue(configuration, "Application Hooks", application . ".Shutdown", hooks[2])
+					
+					if hooks[3]
+						setConfigurationValue(configuration, "Application Hooks", application . ".Running", hooks[3])
+					
+					group := ConfigurationItem.splitDescriptor(applications)[2]
+					
+					if (group = "Simulators") {
+						simulators.Push(application)
 						
-						SplitPath exePath, , workingDirectory
-						
-						setConfigurationValue(configuration, application, "Exe Path", exePath)
-						setConfigurationValue(configuration, application, "Working Directory", workingDirectory)
-						setConfigurationValue(configuration, application, "Window Title", descriptor[4])
-						
-						hooks := string2Values(";", descriptor[5])
-						
-						if hooks[1]
-							setConfigurationValue(configuration, "Application Hooks", application . "Startup", hooks[1])
-						
-						if hooks[2]
-							setConfigurationValue(configuration, "Application Hooks", application . "Shutdown", hooks[2])
-						
-						if hooks[3]
-							setConfigurationValue(configuration, "Application Hooks", application . "Running", hooks[3])
+						group := "Other"
 					}
+					
+					if !groups.HasKey(group)
+						groups[group] := []
+					
+					groups[group].Push(application)
+				}
+		
+		for group, applications in groups
+			for ignore, application in applications
+				setConfigurationValue(configuration, "Applications", group . "." . A_Index, application)
+		
+		setConfigurationValue(configuration, "Configuration", "Simulators", values2String("|", simulators*))
 	}
 	
 	createGui(wizard, x, y, width, height) {
@@ -3407,6 +3441,8 @@ findSoftware(definition, software) {
 }
 	
 getApplicationDescriptor(application) {
+	definition := SetupWizard.Instance.Definition
+	
 	for ignore, section in ["Applications.Simulators", "Applications.Core", "Applications.Feedback", "Applications.Other", "Applications.Special"]
 		for name, descriptor in getConfigurationSectionValues(definition, section, Object())
 			if (name = application)

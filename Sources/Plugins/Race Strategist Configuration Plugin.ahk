@@ -45,33 +45,41 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 		
 		Gui %window%:Font, Norm, Arial
 		
-		Gui %window%:Add, Text, x24 y80 w105 h23 +0x200 HWNDwidget1 Hidden, % translate("Simulator")
+		x0 := x + 8
+		x1 := x + 132
+		x2 := x + 172
+		x3 := x + 176
+		
+		w1 := width - (x1 - x + 8)
+		w3 := width - (x3 - x + 8)
+		
+		Gui %window%:Add, Text, x%x0% y%y% w105 h23 +0x200 HWNDwidget1 Hidden, % translate("Simulator")
 		
  		choices := this.getSimulators()
 		chosen := (choices.Length() > 0) ? 1 : 0
 		
-		Gui %window%:Add, DropDownList, x156 y80 w307 Choose%chosen% gchooseRaceStrategistSimulator vrsSimulatorDropDown HWNDwidget2 Hidden, % values2String("|", choices*)
+		Gui %window%:Add, DropDownList, x%x1% y%y% w%w1% Choose%chosen% gchooseRaceStrategistSimulator vrsSimulatorDropDown HWNDwidget2 Hidden, % values2String("|", choices*)
 		
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
 		
-		Gui %window%:Add, GroupBox, x16 y120 w458 h96 HWNDwidget3 Hidden, % translate("Data Analysis")
+		Gui %window%:Add, GroupBox, x%x% yp+40 w%width% h96 HWNDwidget3 Hidden, % translate("Data Analysis")
 		
 		Gui %window%:Font, Norm, Arial
 		
-		Gui %window%:Add, Text, x24 y137 w160 h23 +0x200 HWNDwidget4 Hidden, % translate("Learn for")
-		Gui %window%:Add, Edit, x156 yp w40 h21 Number vrsLearningLapsEdit HWNDwidget5 Hidden
-		Gui %window%:Add, UpDown, x196 yp w17 h21 HWNDwidget6 Hidden, 1
-		Gui %window%:Add, Text, x200 yp w260 h23 +0x200 HWNDwidget7 Hidden, % translate("Laps after Start or Pitstop")
+		Gui %window%:Add, Text, x%x0% yp+17 w160 h23 +0x200 HWNDwidget4 Hidden, % translate("Learn for")
+		Gui %window%:Add, Edit, x%x1% yp w40 h21 Number vrsLearningLapsEdit HWNDwidget5 Hidden
+		Gui %window%:Add, UpDown, x%x2% yp w17 h21 HWNDwidget6 Hidden, 1
+		Gui %window%:Add, Text, x%x3% yp w%w3% h23 +0x200 HWNDwidget7 Hidden, % translate("Laps after Start or Pitstop")
 		
-		Gui %window%:Add, Text, x24 yp+26 w105 h20 Section HWNDwidget8 Hidden, % translate("Statistical Window")
-		Gui %window%:Add, Edit, x156 yp-2 w40 h21 Number vrsLapsConsideredEdit HWNDwidget9 Hidden
-		Gui %window%:Add, UpDown, x196 yp w17 h21 HWNDwidget10 Hidden, 1
-		Gui %window%:Add, Text, x200 yp+2 w170 h20 HWNDwidget11 Hidden, % translate("Laps")
+		Gui %window%:Add, Text, x%x0% yp+26 w105 h20 Section HWNDwidget8 Hidden, % translate("Statistical Window")
+		Gui %window%:Add, Edit, x%x1% yp-2 w40 h21 Number vrsLapsConsideredEdit HWNDwidget9 Hidden
+		Gui %window%:Add, UpDown, x%x2% yp w17 h21 HWNDwidget10 Hidden, 1
+		Gui %window%:Add, Text, x%x3% yp+2 w80 h20 HWNDwidget11 Hidden, % translate("Laps")
 		
-		Gui %window%:Add, Text, x24 ys+24 w105 h20 Section HWNDwidget12 Hidden, % translate("Damping Factor")
-		Gui %window%:Add, Edit, x156 yp-2 w40 h21 vrsDampingFactorEdit HWNDwidget13 Hidden
-		Gui %window%:Add, Text, x200 yp+2 w170 h20 HWNDwidget14 Hidden, % translate("p. Lap")
+		Gui %window%:Add, Text, x%x0% ys+24 w105 h20 Section HWNDwidget12 Hidden, % translate("Damping Factor")
+		Gui %window%:Add, Edit, x%x1% yp-2 w40 h21 vrsDampingFactorEdit HWNDwidget13 Hidden
+		Gui %window%:Add, Text, x%x3% yp+2 w80 h20 HWNDwidget14 Hidden, % translate("p. Lap")
 		
 		Loop 14
 			editor.registerWidget(this, widget%A_Index%)

@@ -372,6 +372,9 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 				return
 		}
 		
+		if (!this.Active && !isDebug())
+			return
+		
 		kSimFeedbackConnector := this.getArgumentValue("connector", false)
 		
 		if !FileExist(kSimFeedbackConnector) {

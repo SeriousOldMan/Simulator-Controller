@@ -1146,10 +1146,13 @@ hideProgress() {
 	}
 }
 
-getAllThemes() {
+getAllThemes(configuration := false) {
 	themes := []
 	
-	for descriptor, value in getConfigurationSectionValues(kSimulatorConfiguration, "Splash Themes", Object()) {
+	if !configuration
+		configuration := kSimulatorConfiguration
+	
+	for descriptor, value in getConfigurationSectionValues(configuration, "Splash Themes", Object()) {
 		theme := StrSplit(descriptor, ".")[1]
 		
 		if !inList(themes, theme)
@@ -1761,12 +1764,23 @@ removeConfigurationValue(configuration, section, key) {
 		configuration[section].Delete(key)
 }
 
-getControllerConfiguration() {
-	if !FileExist(kUserConfigDirectory . "Simulator Controller.config")
+getControllerConfiguration(configuration := false) {
+	if (configuration || !FileExist(kUserConfigDirectory . "Simulator Controller.config"))
 		try {
-			exePath := kBinariesDirectory . "Simulator Controller.exe -NoStartup"
+			if configuration {
+				writeConfiguration(kTempDirectory . "Simulator Configuration.ini", configuration)
+				
+				options := " -Configuration """ . kTempDirectory . "Simulator Configuration.ini" . """"
+			}
+			else
+				options := ""
+			
+			exePath := kBinariesDirectory . "Simulator Controller.exe -NoStartup" .  options
 			
 			RunWait %exePath%, %kBinariesDirectory%
+			
+			if configuration
+				FileDelete %kTempDirectory%Simulator Configuration.ini
 		}
 		catch exception {
 			logMessage(kLogCritical, translate("Cannot start Simulator Controller (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))

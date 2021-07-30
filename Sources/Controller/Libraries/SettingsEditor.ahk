@@ -149,7 +149,7 @@ updateModes() {
 	editModes(kUpdate)
 }
 
-editModes(ByRef settingsOrCommand) {
+editModes(ByRef settingsOrCommand, globalConfiguration := false) {
 	static newSettings
 	static result := false
 	
@@ -265,7 +265,7 @@ editModes(ByRef settingsOrCommand) {
 		selectedSession := false
 		simulatorSessions := []
 	
-		configuration := getControllerConfiguration()
+		configuration := getControllerConfiguration(globalConfiguration)
 		
 		for simulator, options in getConfigurationSectionValues(configuration, "Simulators", Object())
 			simulators.Push(simulator)
@@ -283,19 +283,24 @@ editModes(ByRef settingsOrCommand) {
 		
 		for thePlugin, pluginConfiguration in getConfigurationSectionValues(configuration, "Plugins", Object()) {
 			pluginConfiguration := string2Values("|", pluginConfiguration)
-			pluginSimulators := values2String(", ", string2Values(",", pluginConfiguration[2])*)			
 			
-			for ignore, mode in string2Values(",", pluginConfiguration[3])
-				LV_Add(inList(defaultModes, ConfigurationItem.descriptor(thePlugin, mode)) ? "Check" : "", thePlugin, mode, pluginSimulators)
+			if pluginConfiguration[1] {
+				pluginSimulators := values2String(", ", string2Values(",", pluginConfiguration[2])*)			
+				
+				for ignore, mode in string2Values(",", pluginConfiguration[3])
+					LV_Add(inList(defaultModes, ConfigurationItem.descriptor(thePlugin, mode)) ? "Check" : "", thePlugin, mode, pluginSimulators)
+			}
 		}
 		
-		LV_ModifyCol()
+		LV_ModifyCol(1, "AutoHdr")
+		LV_ModifyCol(2, "AutoHdr")
+		LV_ModifyCol(3, "AutoHdr")
 	
 		Gui ME:Margin, 10, 10
 		Gui ME:Show, AutoSize Center
 		
 		Loop {
-			Sleep 1000
+			Sleep 200
 		} until result
 		
 		if (result == kSave)
@@ -307,6 +312,7 @@ editModes(ByRef settingsOrCommand) {
 
 editSettings(ByRef settingsOrCommand, withContinue := false, fromSetup := false, x := "Center", y := "Center") {
 	static modeSettings
+	static configuration
 	
 	static result
 	static newSettings
@@ -408,7 +414,7 @@ restartSettings:
 	else if (settingsOrCommand == kEditModes) {
 		Gui SE:Hide
 		
-		editModes(modeSettings)
+		editModes(modeSettings, configuration)
 		
 		Gui SE:Show
 	}
@@ -552,7 +558,7 @@ restartSettings:
 		
 		splashTheme := getConfigurationValue(settingsOrCommand, "Startup", "Splash Theme", false)	
 	 
-		themes := getAllThemes()
+		themes := getAllThemes(configuration)
 		chosen := (splashTheme ? inList(themes, splashTheme) + 1 : 1)
 		themes := translate("None") "|" + values2String("|", themes*)
 		
@@ -592,7 +598,7 @@ restartSettings:
 			startConfiguration()
 			
 		Loop {
-			Sleep 1000
+			Sleep 200
 		} until (result || vRestart)
 		
 		if vRestart {

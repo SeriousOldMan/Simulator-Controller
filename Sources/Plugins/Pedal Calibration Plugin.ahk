@@ -190,6 +190,9 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 				return
 		}
 		
+		if (!this.Active && !isDebug())
+			return
+		
 		this.iPedalProfileMode := new this.PedalProfileMode(this)
 		
 		this.registerMode(this.iPedalProfileMode)

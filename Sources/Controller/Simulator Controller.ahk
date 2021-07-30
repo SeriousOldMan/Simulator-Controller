@@ -1691,11 +1691,18 @@ initializeSimulatorController() {
 		
 		voice := ErrorLevel
 	}
-
+	
+	configuration := kSimulatorConfiguration
+	
+	argIndex := inList(A_Args, "-Configuration")
+	
+	if argIndex
+		configuration := readConfiguration(A_Args[argIndex + 1])
+		
 	protectionOn()
 	
 	try {
-		new SimulatorController(kSimulatorConfiguration, settings, voice)
+		new SimulatorController(configuration, settings, voice)
 	}
 	finally {
 		protectionOff()

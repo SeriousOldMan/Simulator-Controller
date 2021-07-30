@@ -191,6 +191,9 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 				return
 		}
 		
+		if (!this.Active && !isDebug())
+			return
+		
 		this.iVibrationApplication := new Application(kTactileFeedbackPlugin, configuration)
 		
 		pedalVibrationArguments := string2Values(A_Space, this.getArgumentValue("pedalVibration", ""))

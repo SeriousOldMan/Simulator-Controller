@@ -1674,7 +1674,7 @@ class ApplicationsStepWizard extends StepWizard {
 		
 		for ignore, applications in concatenate([definition[1]], string2Values(",", definition[2]))
 			for application, ignore in getConfigurationSectionValues(wizard.Definition, applications)
-				if (wizard.isApplicationInstalled(application) && wizard.isApplicationSelected(application)) {
+				if (((applications != "Applications.Simulators") || wizard.isApplicationInstalled(application)) && wizard.isApplicationSelected(application)) {
 					descriptor := getApplicationDescriptor(application)
 				
 					exePath := wizard.applicationPath(application)
@@ -3121,8 +3121,8 @@ class FinishStepWizard extends StepWizard {
 	saveToConfiguration(configuration) {
 		base.saveToConfiguration(configuration)
 		
-		setConfigurationSectionValues(configuration, "Splash Window", getConfigurationSectionValues(this.Definition, "Splash Window"))
-		setConfigurationSectionValues(configuration, "Splash Themes", getConfigurationSectionValues(this.Definition, "Splash Themes"))
+		setConfigurationSectionValues(configuration, "Splash Window", getConfigurationSectionValues(this.SetupWizard.Definition, "Splash Window"))
+		setConfigurationSectionValues(configuration, "Splash Themes", getConfigurationSectionValues(this.SetupWizard.Definition, "Splash Themes"))
 		
 		setConfigurationValue(configuration, "Configuration", "Start With Windows", false)
 		setConfigurationValue(configuration, "Configuration", "Log Level", "Warn")
@@ -3134,7 +3134,7 @@ class FinishStepWizard extends StepWizard {
 		
 		settingsEditor := ObjBindMethod(this, "settingsEditor")
 		
-		SetTimer %settingsEditor%, -2000
+		SetTimer %settingsEditor%, -1000
 	}
 	
 	hidePage(page) {
@@ -3190,7 +3190,7 @@ finishSetup(finish := false, save := false) {
 		
 		; Let other threads finish...
 			
-		SetTimer %callback%, -4000
+		SetTimer %callback%, -2000
 	}
 }
 
@@ -3647,7 +3647,7 @@ restartSetup:
 	else {
 		; Let finish all threads
 	
-		SetTimer exitApp, -4000
+		SetTimer exitApp, -2000
 	}
 }
 

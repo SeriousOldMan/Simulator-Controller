@@ -37,6 +37,7 @@ ListLines Off					; Disable execution history
 
 #Include ..\Libraries\JSON.ahk
 #Include ..\Libraries\RuleEngine.ahk
+#Include ..\Controller\Libraries\SettingsEditor.ahk
 #Include Libraries\ConfigurationEditor.ahk
 #Include Libraries\ButtonBoxEditor.ahk
 
@@ -176,7 +177,7 @@ class SetupWizard extends ConfigurationItem {
 	}
 	
 	__New(configuration, definition) {
-		this.iDebug := (isDebug() ? kDebugKnowledgeBase : kDebugOff)
+		this.iDebug := (isDebug() ? (kDebugKnowledgeBase + kDebugRules) : kDebugOff)
 		this.iDefinition := definition
 		
 		base.__New(configuration)
@@ -320,8 +321,8 @@ class SetupWizard extends ConfigurationItem {
 		Gui %window%:Add, Text, x16 y580 w85 h23 +0x200, % translate("Language")
 		Gui %window%:Add, DropDownList, x100 y580 w75 Choose%chosen% gchooseLanguage VlanguageDropDown, % values2String("|", map(choices, "translate")*)
 		
-		Gui %window%:Add, Button, x535 y580 w80 h23 Disabled GsaveAndExit VfinishButton, % translate("Finish")
-		Gui %window%:Add, Button, x620 y580 w80 h23 GcancelAndExit, % translate("Cancel")
+		Gui %window%:Add, Button, x535 y580 w80 h23 Disabled GfinishSetup VfinishButton, % translate("Finish")
+		Gui %window%:Add, Button, x620 y580 w80 h23 GcancelSetup, % translate("Cancel")
 		
 		window := this.HelpWindow
 		
@@ -442,37 +443,37 @@ class SetupWizard extends ConfigurationItem {
 	}
 	
 	finishSetup(save := true) {
-		if save {
-			if FileExist(kUserConfigDirectory . "Simulator Configuration.ini")
-				FileMove %kUserConfigDirectory%Simulator Configuration.ini, %kUserConfigDirectory%Simulator Configuration.ini.bak, 1
-			
-			if (FileExist(kUserConfigDirectory . "Simulator Settings.ini") && FileExist(kUserHomeDirectory . "Install\Simulator Settings.ini"))
-				FileCopy %kUserHomeDirectory%Install\Simulator Settings.ini, %kUserConfigDirectory%Simulator Settings.ini
+		if (this.Step && this.Step.hidePage(this.Page)) {
+			if save {
+				if FileExist(kUserConfigDirectory . "Simulator Configuration.ini")
+					FileMove %kUserConfigDirectory%Simulator Configuration.ini, %kUserConfigDirectory%Simulator Configuration.ini.bak, 1
 				
-			writeConfiguration(kUserConfigDirectory . "Simulator Configuration.ini", this.generateSimulatorConfiguration())
-			
-			if this.isModuleSelected("Button Box") {
-				if FileExist(kUserConfigDirectory . "Button Box Configuration.ini")
-					FileMove %kUserConfigDirectory%Button Box Configuration.ini, %kUserConfigDirectory%Button Box Configuration.ini.bak, 1
+				if (FileExist(kUserConfigDirectory . "Simulator Settings.ini") && FileExist(kUserHomeDirectory . "Install\Simulator Settings.ini"))
+					FileMove %kUserConfigDirectory%Simulator Settings.ini, %kUserConfigDirectory%Simulator Settings.ini.bak, 1
 				
-				FileCopy %kUserHomeDirectory%Install\Button Box Configuration.ini, %kUserConfigDirectory%Button Box Configuration.ini
+				if FileExist(kUserHomeDirectory . "Install\Simulator Settings.ini")
+					FileCopy %kUserHomeDirectory%Install\Simulator Settings.ini, %kUserConfigDirectory%Simulator Settings.ini
+					
+				writeConfiguration(kUserConfigDirectory . "Simulator Configuration.ini", this.generateSimulatorConfiguration())
+				
+				if this.isModuleSelected("Button Box") {
+					if FileExist(kUserConfigDirectory . "Button Box Configuration.ini")
+						FileMove %kUserConfigDirectory%Button Box Configuration.ini, %kUserConfigDirectory%Button Box Configuration.ini.bak, 1
+					
+					FileCopy %kUserHomeDirectory%Install\Button Box Configuration.ini, %kUserConfigDirectory%Button Box Configuration.ini
+				}
 			}
+			
+			return true
 		}
-		
-		ExitApp 0
+		else
+			return false
 	}
 	
 	generateSimulatorConfiguration() {
 		configuration := newConfiguration()
 		
 		this.saveToConfiguration(configuration)
-		
-		setConfigurationSectionValues(configuration, "Splash Window", getConfigurationSectionValues(this.Definition, "Splash Window"))
-		setConfigurationSectionValues(configuration, "Splash Themes", getConfigurationSectionValues(this.Definition, "Splash Themes"))
-		
-		setConfigurationValue(configuration, "Configuration", "Start With Windows", false)
-		setConfigurationValue(configuration, "Configuration", "Log Level", "Warn")
-		setConfigurationValue(configuration, "Configuration", "Debug", false)
 		
 		return configuration
 	}
@@ -3082,10 +3083,120 @@ class AssistantsStepWizard extends CommandsStepWizard {
 	}
 }
 
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; FinishStepWizard                                                        ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class FinishStepWizard extends StepWizard {
+	Pages[] {
+		Get {
+			return 1
+		}
+	}
+	
+	createGui(wizard, x, y, width, height) {
+		static imageViewer
+		
+		window := this.Window
+		
+		imageViewerHandle := false
+		
+		Gui %window%:Add, ActiveX, x%x% y%y% w%width% h%height% HWNDimageViewerHandle VimageViewer Hidden, shell explorer
+	
+		image := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Finish", "Finish.Image"))
+		text := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Finish", "Finish.Text." . getLanguage()))
+		
+		text := "<div style='text-align: center' style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px'>" . text . "</div>"
+		
+		height := Round(width / 16 * 9)
+		
+		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><img src='" . image . "' width='" . width . "' height='" . height . "' border='0' padding='0'><br>" . text . "</body></html>"
+		
+		imageViewer.Navigate("about:blank")
+		imageViewer.Document.Write(html)
+			
+		this.registerWidget(1, imageViewerHandle)
+	}
+	
+	saveToConfiguration(configuration) {
+		base.saveToConfiguration(configuration)
+		
+		setConfigurationSectionValues(configuration, "Splash Window", getConfigurationSectionValues(this.Definition, "Splash Window"))
+		setConfigurationSectionValues(configuration, "Splash Themes", getConfigurationSectionValues(this.Definition, "Splash Themes"))
+		
+		setConfigurationValue(configuration, "Configuration", "Start With Windows", false)
+		setConfigurationValue(configuration, "Configuration", "Log Level", "Warn")
+		setConfigurationValue(configuration, "Configuration", "Debug", false)
+	}
+	
+	showPage(page) {
+		base.showPage(page)
+		
+		settingsEditor := ObjBindMethod(this, "settingsEditor")
+		
+		SetTimer %settingsEditor%, -2000
+	}
+	
+	hidePage(page) {
+		if base.hidePage(page) {
+			editSettings(kSave)
+			
+			return true
+		}
+		else
+			return false
+	}
+	
+	settingsEditor() {
+		if FileExist(kUserHomeDirectory . "Install\Simulator Settings.ini")
+			settings := readConfiguration(kUserHomeDirectory . "Install\Simulator Settings.ini")
+		else
+			settings := newConfiguration()
+		
+		configuration := this.SetupWizard.generateSimulatorConfiguration()
+		
+		editSettings(settings, false, configuration, Min(A_ScreenWidth - Round(A_ScreenWidth / 3) + Round(A_ScreenWidth / 3 / 2) - 180, A_ScreenWidth - 360))
+		
+		writeConfiguration(kUserHomeDirectory . "Install\Simulator Settings.ini", settings)
+	}
+}
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+finishSetup(finish := false, save := false) {
+	if (finish = "Finish") {
+		if SetupWizard.Instance.finishSetup(save)
+			ExitApp 0
+		else
+			SetupWizard.Instance.showPage(SetupWizard.Instance.Step, SetupWizard.Instance.Page)
+	}
+	else {
+		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+		title := translate("Setup")
+		MsgBox 262436, %title%, % translate("Do you want to generate the new configuration? Backup files will be genaretd for your current configuration in the ""Simulator Controller\Config"" folder in your user Documents folder.")
+		OnMessage(0x44, "")
+		
+		IfMsgBox Yes
+			save := true
+		else
+			save := false
+		
+		SetupWizard.Instance.Step.hidePage(SetupWizard.Instance.Page)
+		
+		callback := Func("finishSetup").Bind("Finish", save)
+		
+		; Let other threads finish...
+			
+		SetTimer %callback%, -4000
+	}
+}
+
+cancelSetup() {
+	ExitApp 0
+}
 
 previousPage() {
 	SetupWizard.Instance.previousPage()
@@ -3463,7 +3574,7 @@ elevateAndRestart() {
 			;ignore
 		}
 		
-		ExitApp
+		ExitApp 0
 	}
 }
 
@@ -3489,6 +3600,7 @@ initializeSimulatorSetup() {
 		wizard.registerStepWizard(new ButtonBoxStepWizard(wizard, "Button Box", kSimulatorConfiguration))
 		wizard.registerStepWizard(new SimulatorsStepWizard(wizard, "Simulators", kSimulatorConfiguration))
 		wizard.registerStepWizard(new AssistantsStepWizard(wizard, "Assistants", kSimulatorConfiguration))
+		wizard.registerStepWizard(new FinishStepWizard(wizard, "Finish", kSimulatorConfiguration))
 	}
 	finally {
 		protectionOff()
@@ -3503,13 +3615,12 @@ startupSimulatorSetup() {
 	if this.Debug[kDebugRules]
 		wizard.dumpRules(wizard.KnowledgeBase)
 	
-restart:
+restartSetup:
 	wizard.createGui(wizard.Configuration)
 	
 	wizard.startSetup()
 	
 	done := false
-	saved := false
 
 	wizard.show()
 	
@@ -3517,25 +3628,8 @@ restart:
 		Loop {
 			Sleep 200
 			
-			if (vResult == kCancel)
+			if (vResult == kLanguage)
 				done := true
-			else if (vResult == kOk) {
-				saved := true
-				done := true
-				
-				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-				title := translate("Setup")
-				MsgBox 262436, %title%, % translate("Do you want to generate the configuration? The old configuration file will be saved as ""Simulator Configuration.ini.bak""")
-				OnMessage(0x44, "")
-				
-				IfMsgBox Yes
-					wizard.finishSetup(true)
-				else
-					wizard.finishSetup(false)
-			}
-			else if (vResult == kLanguage) {
-				done := true
-			}
 		} until done
 	}
 	finally {
@@ -3548,14 +3642,17 @@ restart:
 		wizard.close()
 		wizard.reset()
 		
-		Goto restart
+		Goto restartSetup
 	}
 	else {
-		if saved
-			ExitApp 1
-		else
-			ExitApp 0
+		; Let finish all threads
+	
+		SetTimer exitApp, -4000
 	}
+}
+
+exitApp() {
+	ExitApp 0
 }
 
 

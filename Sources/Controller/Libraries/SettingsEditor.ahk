@@ -305,7 +305,7 @@ editModes(ByRef settingsOrCommand) {
 	}
 }
 
-editSettings(ByRef settingsOrCommand, withContinue := false) {
+editSettings(ByRef settingsOrCommand, withContinue := false, fromSetup := false, x := "Center", y := "Center") {
 	static modeSettings
 	
 	static result
@@ -354,7 +354,7 @@ editSettings(ByRef settingsOrCommand, withContinue := false) {
 	static feedbackVariable7
 	static feedbackVariable8
 
-restart:
+restartSettings:
 	if (settingsOrCommand == kSave) {
 		Gui SE:Submit
 		
@@ -413,6 +413,7 @@ restart:
 		Gui SE:Show
 	}
 	else {
+		configuration := (fromSetup ? fromSetup : kSimulatorConfiguration)
 		modeSettings := newConfiguration()
 	
 		setConfigurationSectionValues(modeSettings, "Modes", getConfigurationSectionValues(settingsOrCommand, "Modes", Object()))
@@ -434,9 +435,9 @@ restart:
 		coreSettings := [["Simulator Controller", true, false]]
 		feedbackSettings := []		
 		
-		for descriptor, applicationName in getConfigurationSectionValues(kSimulatorConfiguration, "Applications", Object()) {
+		for descriptor, applicationName in getConfigurationSectionValues(configuration, "Applications", Object()) {
 			descriptor := ConfigurationItem.splitDescriptor(descriptor)
-			enabled := (getConfigurationValue(kSimulatorConfiguration, applicationName, "Exe Path", "") != "")
+			enabled := (getConfigurationValue(configuration, applicationName, "Exe Path", "") != "")
 			
 			if (descriptor[1] == "Core")
 				coreSettings.Push(Array(applicationName, getConfigurationValue(settingsOrCommand, "Core", applicationName, false), enabled))
@@ -563,7 +564,7 @@ restart:
 		
 		Gui SE:Add, CheckBox, X10 Checked%startup% vstartup, % translate("Start")
 		
-		simulators := string2Values("|", getConfigurationValue(kSimulatorConfiguration, "Configuration", "Simulators", ""))
+		simulators := string2Values("|", getConfigurationValue(configuration, "Configuration", "Simulators", ""))
 		
 		chosen := inList(simulators, startupOption)
 		
@@ -572,20 +573,22 @@ restart:
 		
 		Gui SE:Add, DropDownList, X90 YP-5 w140 Choose%chosen% vstartOption, % values2String("|", simulators*)
 	 
-		Gui SE:Add, Button, X10 Y+20 w220 gstartConfiguration, % translate("Configuration...")
+		if !fromSetup {
+			Gui SE:Add, Button, X10 Y+20 w220 gstartConfiguration, % translate("Configuration...")
+			
+			margin := (withContinue ? "Y+20" : "")
+			
+			Gui SE:Add, Button, Default X10 %margin% w100 gsaveSettings, % translate("Save")
+			Gui SE:Add, Button, X+20 w100 gcancelSettings, % translate("&Cancel")
+			
+			if withContinue
+				Gui SE:Add, Button, X10 w220 gcontinueSettings, % translate("Co&ntinue w/o Save")
+		}
 		
-		margin := (withContinue ? "Y+20" : "")
-		
-		Gui SE:Add, Button, Default X10 %margin% w100 gsaveSettings, % translate("Save")
-		Gui SE:Add, Button, X+20 w100 gcancelSettings, % translate("&Cancel")
-		
-		if withContinue
-			Gui SE:Add, Button, X10 w220 gcontinueSettings, % translate("Co&ntinue w/o Save")
-	
 		Gui SE:Margin, 10, 10
-		Gui SE:Show, AutoSize Center
+		Gui SE:Show, AutoSize x%x% y%y%
 		
-		if (readConfiguration(kSimulatorConfigurationFile).Count() == 0)
+		if (!fromSetup && (readConfiguration(kSimulatorConfigurationFile).Count() == 0))
 			startConfiguration()
 			
 		Loop {
@@ -599,7 +602,7 @@ restart:
 			
 			loadSimulatorConfiguration()
 			
-			Goto restart
+			Goto restartSettings
 		}
 		
 		if (result == kSave)

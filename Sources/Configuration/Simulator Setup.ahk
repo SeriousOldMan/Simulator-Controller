@@ -67,6 +67,7 @@ global vResult = false
 
 global kDebugOff = 0
 global kDebugKnowledgeBase = 1
+global kDebugRules = 2
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -438,6 +439,32 @@ class SetupWizard extends ConfigurationItem {
 		this.iPage := false
 		
 		this.nextPage()
+	}
+	
+	finishSetup(save := true) {
+		if save {
+			if FileExist(kUserConfigDirectory . "Simulator Configuration.ini") {
+				FileMove %kUserConfigDirectory%Simulator Configuration.ini, %kUserConfigDirectory%Simulator Configuration.ini.bak, 1
+				
+				writeConfiguration(kUserConfigDirectory . "Simulator Configuration.ini", this.generateSimulatorConfiguration())
+			}
+			
+			if (this.isModuleSelected("Button Box") && FileExist(kUserConfigDirectory . "Button Box Configuration.ini")) {
+				FileMove %kUserConfigDirectory%Button Box Configuration.ini, %kUserConfigDirectory%Button Box Configuration.ini.bak, 1
+				
+				FileCopy %kUserHomeDirectory%Install\Button Box Configuration.ini, %kUserConfigDirectory%Button Box Configuration.ini
+			}
+		}
+		
+		ExitApp 0
+	}
+	
+	generateSimulatorConfiguration() {
+		configuration := newConfiguration()
+		
+		this.saveToConfiguration(configuration)
+		
+		return configuration
 	}
 	
 	getPreviousPage(ByRef step, ByRef page) {
@@ -912,10 +939,42 @@ class SetupWizard extends ConfigurationItem {
 		}
 
 		for key, value in knowledgeBase.Facts.Facts {
-			text := key . " = " . value . "`n"
+			text := (key . " = " . value . "`n")
 		
 			FileAppend %text%, %kTempDirectory%Simulator Setup.knowledge
 		}
+	}
+	
+	dumpRules(knowledgeBase) {
+		local rules
+		local rule
+		
+		try {
+			FileDelete %kTempDirectory%Simulator Setup.rules
+		}
+		catch exception {
+			; ignore
+		}
+
+		production := knowledgeBase.Rules.Productions[false]
+		
+		Loop {
+			if !production
+				break
+			
+			text := (production.Rule.toString() . "`n")
+		
+			FileAppend %text%, %kTempDirectory%Simulator Setup.rules
+			
+			production := production.Next[false]
+		}
+
+		for ignore, rules in knowledgeBase.Rules.Reductions
+			for ignore, rule in rules {
+				text := (rule.toString() . "`n")
+			
+				FileAppend %text%, %kTempDirectory%Simulator Setup.rules
+			}
 	}
 	
 	toggleTriggerDetector(callback := false) {
@@ -1589,6 +1648,38 @@ class ApplicationsStepWizard extends StepWizard {
 		Get {
 			return 2
 		}
+	}
+	
+	saveToConfiguration(configuration) {
+		local application
+		
+		wizard := this.SetupWizard
+		
+		for ignore, applications in this.Definition
+			if (applications != "Applications.Special")
+				for application, ignore in getConfigurationSectionValues(wizard.Definition, applications)
+					if (wizard.isApplicationInstalled(application) && wizard.isApplicationSelected(application)) {
+						descriptor := getApplicationDescriptor(application)
+					
+						exePath := wizard.applicationPath(simulator)
+						
+						SplitPath exePath, , workingDirectory
+						
+						setConfigurationValue(configuration, application, "Exe Path", exePath)
+						setConfigurationValue(configuration, application, "Working Directory", workingDirectory)
+						setConfigurationValue(configuration, application, "Window Title", descriptor[4])
+						
+						hooks := string2Values(";", descriptor[5])
+						
+						if hooks[1]
+							setConfigurationValue(configuration, "Application Hooks", application . "Startup", hooks[1])
+						
+						if hooks[2]
+							setConfigurationValue(configuration, "Application Hooks", application . "Shutdown", hooks[2])
+						
+						if hooks[3]
+							setConfigurationValue(configuration, "Application Hooks", application . "Running", hooks[3])
+					}
 	}
 	
 	createGui(wizard, x, y, width, height) {
@@ -3314,6 +3405,15 @@ findSoftware(definition, software) {
 	
 	return false
 }
+	
+getApplicationDescriptor(application) {
+	for ignore, section in ["Applications.Simulators", "Applications.Core", "Applications.Feedback", "Applications.Other", "Applications.Special"]
+		for name, descriptor in getConfigurationSectionValues(definition, section, Object())
+			if (name = application)
+				return string2Values("|", descriptor)
+	
+	return false
+}
 
 elevateAndRestart() {
 	if !(A_IsAdmin || RegExMatch(DllCall("GetCommandLine", "str"), " /restart(?!\S)")) {
@@ -3329,19 +3429,6 @@ elevateAndRestart() {
 		
 		ExitApp
 	}
-}
-
-saveConfiguration(configurationFile, wizard) {
-	configuration := newConfiguration()
-
-	wizard.saveToConfiguration(configuration)
-
-	configFile := getFileName(configurationFile, kUserConfigDirectory)
-	
-	if FileExist(configFile)
-		FileMove %configFile%, % configFile . ".bak"
-	
-	writeConfiguration(configurationFile, configuration)
 }
 
 initializeSimulatorSetup() {
@@ -3377,6 +3464,9 @@ startupSimulatorSetup() {
 	
 	wizard.loadDefinition()
 	
+	if this.Debug[kDebugRules]
+		wizard.dumpRules(wizard.KnowledgeBase)
+	
 restart:
 	wizard.createGui(wizard.Configuration)
 	
@@ -3397,7 +3487,15 @@ restart:
 				saved := true
 				done := true
 				
-				saveConfiguration(kSimulatorConfigurationFile, wizard)
+				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+				title := translate("Setup")
+				MsgBox 262436, %title%, % translate("Do you want to generate the configuration? The old configuration file will be saved as ""Simulator Configuration.ini.bak""")
+				OnMessage(0x44, "")
+				
+				IfMsgBox Yes
+					wizard.finishSetup(true)
+				else
+					wizard.finishSetup(false)
 			}
 			else if (vResult == kLanguage) {
 				done := true

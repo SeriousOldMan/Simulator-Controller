@@ -182,6 +182,10 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 	}
 	
 	loadSimulatorConfiguration(simulator := false) {
+		window := this.Editor.Window
+		
+		Gui %window%:Default
+		
 		if simulator {
 			reSimulatorDropDown := simulator
 			
@@ -210,6 +214,10 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 	}
 	
 	saveSimulatorConfiguration() {
+		window := this.Editor.Window
+		
+		Gui %window%:Default
+		
 		if this.iCurrentSimulator {
 			GuiControlGet reLoadSettingsDropDown
 			GuiControlGet reLoadTyrePressuresDropDown
@@ -223,7 +231,7 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 			GuiControlGet reAdjustLapTimeCheck
 			GuiControlGet reDamageAnalysisLapsEdit
 			
-			configuration := this.iSimulatorConfigurations[reSimulatorDropDown]
+			configuration := this.iSimulatorConfigurations[this.iCurrentSimulator]
 			
 			configuration["LoadSettings"] := ["Default", "SetupDatabase"][reLoadSettingsDropDown]
 			configuration["LoadTyrePressures"] := ["Default", "SetupDatabase", "Import"][reLoadTyrePressuresDropDown]
@@ -242,6 +250,10 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 	}
 	
 	setSimulators(simulators) {
+		window := this.Editor.Window
+		
+		Gui %window%:Default
+		
 		this.iSimulators := simulators
 		
 		GuiControl, , reSimulatorDropDown, % "|" . values2String("|", simulators*)

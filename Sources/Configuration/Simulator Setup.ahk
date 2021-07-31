@@ -1077,9 +1077,12 @@ class StepWizard extends ConfigurationItem {
 		}
 	}
 	
-	Definition[] {
+	Definition[key := false] {
 		Get {
-			return this.iDefinition
+			if key
+				return this.iDefinition[key]
+			else
+				return this.iDefinition
 		}
 	}
 	
@@ -1318,19 +1321,21 @@ class StartStepWizard extends StepWizard {
 	}
 	
 	hidePage(page) {
+		if (page == 1) {
+			volume := fadeOut()
+			
+			try {
+				SoundPlay NonExistent.avi
+			}
+			catch exception {
+				; ignore
+			}
+			
+			resetVolume(volume)
+		}
+		
 		if base.hidePage(page) {
 			if (page == 1) {
-				volume := fadeOut()
-				
-				try {
-					SoundPlay NonExistent.avi
-				}
-				catch exception {
-					; ignore
-				}
-				
-				resetVolume(volume)
-				
 				imageViewer := this.iImageViewer
 			
 				imageViewer.Document.Open()
@@ -2516,16 +2521,23 @@ class CommandsStepWizard extends StepWizard {
 	showPage(page) {
 		base.showPage(page)
 		
-		this.openButtonBoxes()
+		if this.SetupWizard.isModuleSelected("Button Box") {
+			this.openButtonBoxes()
 
-		this.loadCommands(true)
+			this.loadCommands(true)
+		}
+		else
+			GuiControl Hide, % this.CommandsListView
+			
 	}
 	
 	hidePage(page) {
 		if base.hidePage(page) {
-			this.closeButtonBoxes()
-		
-			this.saveCommands()
+			if this.SetupWizard.isModuleSelected("Button Box") {
+				this.closeButtonBoxes()
+			
+				this.saveCommands()
+			}
 			
 			return true
 		}
@@ -2978,7 +2990,6 @@ class SimulatorsStepWizard extends CommandsStepWizard {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class AssistantsStepWizard extends CommandsStepWizard {
-	iAssistants := []
 	iCurrentAssistant := false
 	
 	iCommandsListViews := []
@@ -2986,7 +2997,27 @@ class AssistantsStepWizard extends CommandsStepWizard {
 	
 	Pages[] {
 		Get {
-			return this.iAssistants.Length()
+			wizard := this.SetupWizard
+			count := 0
+		
+			for ignore, assistant in this.Definition
+				if wizard.isModuleSelected(assistant)
+					count += 1
+			
+			return count
+		}
+	}
+	
+	TransposePage[page] {
+		Get {
+			wizard := this.SetupWizard
+			count := 0
+		
+			for index, assistant in this.Definition
+				if (wizard.isModuleSelected(assistant) && (++count == page))
+					return index
+			
+			return 0
 		}
 	}
 	
@@ -3006,63 +3037,58 @@ class AssistantsStepWizard extends CommandsStepWizard {
 		
 		Gui %window%:Default
 		
-		page := 0
-		
-		for ignore, assistant in this.Definition
-			if wizard.isModuleSelected(assistant) {
-				page += 1
-				
-				commandsIconHandle := false
-				commandsIconLabelHandle := false
-				commandsListViewHandle := false
-				commandsInfoTextHandle := false
-				
-				labelWidth := width - 30
-				labelX := x + 45
-				labelY := y + 5
-				
-				Gui %window%:Font, s10 Bold, Arial
+		for page, assistant in this.Definition {
+			commandsIconHandle := false
+			commandsIconLabelHandle := false
+			commandsListViewHandle := false
+			commandsInfoTextHandle := false
 			
-				label := substituteVariables(translate("Configuration for %assistant%"), {assistant: translate(assistant)})
-				
-				Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDcommandsIconHandle Hidden, %kResourcesDirectory%Setup\Images\Controller.ico
-				Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h30 HWNDcommandsLabelHandle Hidden Section, % label
-				
-				Gui %window%:Font, s8 Norm, Arial
-				
-				listX := x + 400
-				listY := labelY + 33
-				listWidth := width - 400
-				
-				Gui Add, ListView, x%listX% y%listY% w%listWidth% h347 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDcommandsListViewHandle gupdateAssistantCommandFunction Hidden Section, % values2String("|", map(["Command", "Label", "Function"], "translate")*)
-				
-				info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Assistants", "Assistants.Commands.Info." . getLanguage()))
-				info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'>" . info . "</div>"
-				
-				Gui %window%:Add, ActiveX, x%x% yp+352 w%width% h135 HWNDcommandsInfoTextHandle VcommandsInfoText%page% Hidden, shell explorer
-
-				html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
-
-				commandsInfoText%page%.Navigate("about:blank")
-				commandsInfoText%page%.Document.Write(html)
-				
-				this.iCommandsListViews.Push(commandsListViewHandle)
+			labelWidth := width - 30
+			labelX := x + 45
+			labelY := y + 5
 			
-				if (assistant = "Race Engineer")
-					configurator := new RaceEngineerConfigurator(this)
-				else if (assistant = "Race Strategist")
-					configurator := new RaceStrategistConfigurator(this)
-				else
-					configurator := false
-					
-				if configurator {
-					this.iAssistantConfigurators.Push(configurator)
+			Gui %window%:Font, s10 Bold, Arial
 		
-					configurator.createGui(this, x, listY, 400 - x, height)
-				}
+			label := substituteVariables(translate("Configuration for %assistant%"), {assistant: translate(assistant)})
+			
+			Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDcommandsIconHandle Hidden, %kResourcesDirectory%Setup\Images\Controller.ico
+			Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h30 HWNDcommandsLabelHandle Hidden Section, % label
+			
+			Gui %window%:Font, s8 Norm, Arial
+			
+			listX := x + 400
+			listY := labelY + 33
+			listWidth := width - 400
+			
+			Gui Add, ListView, x%listX% y%listY% w%listWidth% h347 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDcommandsListViewHandle gupdateAssistantCommandFunction Hidden Section, % values2String("|", map(["Command", "Label", "Function"], "translate")*)
+			
+			info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Assistants", "Assistants.Commands.Info." . getLanguage()))
+			info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'>" . info . "</div>"
+			
+			Gui %window%:Add, ActiveX, x%x% yp+352 w%width% h135 HWNDcommandsInfoTextHandle VcommandsInfoText%page% Hidden, shell explorer
+
+			html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+
+			commandsInfoText%page%.Navigate("about:blank")
+			commandsInfoText%page%.Document.Write(html)
+			
+			this.iCommandsListViews.Push(commandsListViewHandle)
+		
+			if (assistant = "Race Engineer")
+				configurator := new RaceEngineerConfigurator(this)
+			else if (assistant = "Race Strategist")
+				configurator := new RaceStrategistConfigurator(this)
+			else
+				configurator := false
 				
-				this.registerWidgets(page, commandsIconHandle, commandsLabelHandle, commandsListViewHandle, commandsInfoTextHandle)
+			if configurator {
+				this.iAssistantConfigurators.Push(configurator)
+	
+				configurator.createGui(this, x, listY, 400 - x, height)
 			}
+			
+			this.registerWidgets(page, commandsIconHandle, commandsLabelHandle, commandsListViewHandle, commandsInfoTextHandle)
+		}
 	}
 	
 	registerWidget(page, widget) {
@@ -3081,21 +3107,10 @@ class AssistantsStepWizard extends CommandsStepWizard {
 		this.iCommandsListViews := []
 	}
 	
-	updateState() {
-		base.updateState()
-		
-		wizard := this.SetupWizard
-		assistants := []
-		
-		for ignore, assistant in this.Definition
-			if wizard.isModuleSelected(assistant)
-				assistants.Push(assistant)
-			
-		this.iAssistants := assistants
-	}
-	
 	showPage(page) {
-		this.iCurrentAssistant := this.iAssistants[page]
+		page := this.TransposePage[page]
+		
+		this.iCurrentAssistant := this.Definition[page]
 		
 		this.setCommandsListView(this.iCommandsListViews[page])
 		
@@ -3117,6 +3132,8 @@ class AssistantsStepWizard extends CommandsStepWizard {
 	}
 	
 	hidePage(page) {
+		page := this.TransposePage[page]
+		
 		if base.hidePage(page) {
 			configurator := this.iAssistantConfigurators[page]
 			
@@ -3297,7 +3314,7 @@ class FinishStepWizard extends StepWizard {
 		
 		settingsEditor := ObjBindMethod(this, "settingsEditor")
 		
-		SetTimer %settingsEditor%, % isDebug() ? -5000 : -2500
+		SetTimer %settingsEditor%, % isDebug() ? -5000 : -2000
 	}
 	
 	hidePage(page) {
@@ -3780,15 +3797,15 @@ initializeSimulatorSetup() {
 		
 		wizard := new SetupWizard(kSimulatorConfiguration, definition)
 		
-		;~ wizard.registerStepWizard(new StartStepWizard(wizard, "Start", kSimulatorConfiguration))
+		wizard.registerStepWizard(new StartStepWizard(wizard, "Start", kSimulatorConfiguration))
 		wizard.registerStepWizard(new ModulesStepWizard(wizard, "Modules", kSimulatorConfiguration))
-		;~ wizard.registerStepWizard(new InstallationStepWizard(wizard, "Installation", kSimulatorConfiguration))
-		;~ wizard.registerStepWizard(new ApplicationsStepWizard(wizard, "Applications", kSimulatorConfiguration))
-		;~ wizard.registerStepWizard(new ButtonBoxStepWizard(wizard, "Button Box", kSimulatorConfiguration))
-		;~ wizard.registerStepWizard(new GeneralStepWizard(wizard, "General", kSimulatorConfiguration))
+		wizard.registerStepWizard(new InstallationStepWizard(wizard, "Installation", kSimulatorConfiguration))
+		wizard.registerStepWizard(new ApplicationsStepWizard(wizard, "Applications", kSimulatorConfiguration))
+		wizard.registerStepWizard(new ButtonBoxStepWizard(wizard, "Button Box", kSimulatorConfiguration))
+		wizard.registerStepWizard(new GeneralStepWizard(wizard, "General", kSimulatorConfiguration))
 		wizard.registerStepWizard(new SimulatorsStepWizard(wizard, "Simulators", kSimulatorConfiguration))
 		wizard.registerStepWizard(new AssistantsStepWizard(wizard, "Assistants", kSimulatorConfiguration))
-		;~ wizard.registerStepWizard(new FinishStepWizard(wizard, "Finish", kSimulatorConfiguration))
+		wizard.registerStepWizard(new FinishStepWizard(wizard, "Finish", kSimulatorConfiguration))
 	}
 	finally {
 		protectionOff()

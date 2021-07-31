@@ -121,6 +121,10 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 	}
 	
 	loadSimulatorConfiguration(simulator := false) {
+		window := this.Editor.Window
+		
+		Gui %window%:Default
+		
 		if simulator {
 			rsSimulatorDropDown := simulator
 			
@@ -139,12 +143,16 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 	}
 	
 	saveSimulatorConfiguration() {
+		window := this.Editor.Window
+		
+		Gui %window%:Default
+		
 		if this.iCurrentSimulator {
 			GuiControlGet rsLearningLapsEdit
 			GuiControlGet rsLapsConsideredEdit
 			GuiControlGet rsDampingFactorEdit
 			
-			configuration := this.iSimulatorConfigurations[rsSimulatorDropDown]
+			configuration := this.iSimulatorConfigurations[this.iCurrentSimulator]
 			
 			configuration["LearningLaps"] := rsLearningLapsEdit
 			configuration["ConsideredHistoryLaps"] := rsLapsConsideredEdit
@@ -153,6 +161,10 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 	}
 	
 	setSimulators(simulators) {
+		window := this.Editor.Window
+		
+		Gui %window%:Default
+		
 		this.iSimulators := simulators
 		
 		GuiControl, , rsSimulatorDropDown, % "|" . values2String("|", simulators*)

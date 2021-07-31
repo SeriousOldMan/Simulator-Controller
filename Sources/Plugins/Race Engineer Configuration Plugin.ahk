@@ -31,6 +31,7 @@ global reDamageAnalysisLapsEdit
 class RaceEngineerConfigurator extends ConfigurationItem {
 	iEditor := false
 	
+	iSimulators := []
 	iSimulatorConfigurations := {}
 	iCurrentSimulator := false
 	
@@ -40,7 +41,13 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		}
 	}
 	
-	__New(editor, configuration) {
+	Simulators[] {
+		Get {
+			return this.iSimulators
+		}
+	}
+	
+	__New(editor, configuration := false) {
 		this.iEditor := editor
 		
 		base.__New(configuration)
@@ -59,11 +66,12 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		x3 := x + 176
 		
 		w1 := width - (x1 - x + 8)
-		w3 := width - (x3 - x + 8)
+		w3 := width - (x3 - x + 16)
 		
 		Gui %window%:Add, Text, x%x0% y%y% w105 h23 +0x200 HWNDwidget1 Hidden, % translate("Simulator")
 		
- 		choices := this.getSimulators()
+		this.iSimulators := this.getSimulators()
+ 		choices := this.iSimulators
 		chosen := (choices.Length() > 0) ? 1 : 0
 		
 		Gui %window%:Add, DropDownList, x%x1% y%y% w%w1% Choose%chosen% gchooseRaceEngineerSimulator vreSimulatorDropDown HWNDwidget2 Hidden, % values2String("|", choices*)
@@ -75,12 +83,12 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		
 		Gui %window%:Font, Norm, Arial
 		
-		Gui %window%:Add, Text, x%x0% yp+17 w160 h23 +0x200 HWNDwidget4 Hidden, % translate("@ Session Begin")
+		Gui %window%:Add, Text, x%x0% yp+17 w120 h23 +0x200 HWNDwidget4 Hidden, % translate("@ Session Begin")
 		choices := map(["Use values from previous Session", "Load from Setup Database"], "translate")
 		Gui %window%:Add, DropDownList, x%x1% yp w%w1% AltSubmit vreLoadSettingsDropDown HWNDwidget5 Hidden, % values2String("|", choices*)
 		
 		choices := map(["Ask", "Always save", "No action"], "translate")
-		Gui %window%:Add, Text, x%x0% yp+24 w160 h23 +0x200 HWNDwidget6 Hidden, % translate("@ Session End")
+		Gui %window%:Add, Text, x%x0% yp+24 w120 h23 +0x200 HWNDwidget6 Hidden, % translate("@ Session End")
 		Gui %window%:Add, DropDownList, x%x1% yp w140 AltSubmit vreSaveSettingsDropDown HWNDwidget7 Hidden, % values2String("|", choices*)
 		
 		Gui %window%:Font, Norm, Arial
@@ -90,13 +98,13 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		
 		Gui %window%:Font, Norm, Arial
 		
-		Gui %window%:Add, Text, x%x0% yp+17 w160 h23 +0x200 HWNDwidget9 Hidden, % translate("@ Session Begin")
+		Gui %window%:Add, Text, x%x0% yp+17 w120 h23 +0x200 HWNDwidget9 Hidden, % translate("@ Session Begin")
 		choices := map(["Use Values from Settings", "Load from Setup Database", "Import from Simulator"], "translate")
 		chosen := 1
 		Gui %window%:Add, DropDownList, x%x1% yp w%w1% AltSubmit Choose%chosen% vreLoadTyrePressuresDropDown HWNDwidget10 Hidden, % values2String("|", choices*)
 		
 		choices := map(["Ask", "Always save", "No action"], "translate")
-		Gui %window%:Add, Text, x%x0% yp+24 w160 h23 +0x200 HWNDwidget11 Hidden, % translate("@ Session End")
+		Gui %window%:Add, Text, x%x0% yp+24 w120 h23 +0x200 HWNDwidget11 Hidden, % translate("@ Session End")
 		Gui %window%:Add, DropDownList, x%x1% yp w140 AltSubmit vreSaveTyrePressuresDropDown HWNDwidget12 Hidden, % values2String("|", choices*)
 		
 		Gui %window%:Font, Norm, Arial
@@ -106,7 +114,7 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		
 		Gui %window%:Font, Norm, Arial
 		
-		Gui %window%:Add, Text, x%x0% yp+17 w160 h23 +0x200 HWNDwidget14 Hidden, % translate("Learn for")
+		Gui %window%:Add, Text, x%x0% yp+17 w80 h23 +0x200 HWNDwidget14 Hidden, % translate("Learn for")
 		Gui %window%:Add, Edit, x%x1% yp w40 h21 Number vreLearningLapsEdit HWNDwidget15 Hidden
 		Gui %window%:Add, UpDown, x%x2% yp w17 h21 HWNDwidget16 Hidden, 1
 		Gui %window%:Add, Text, x%x3% yp w%w3% h23 +0x200 HWNDwidget17 Hidden, % translate("Laps after Start or Pitstop")
@@ -121,9 +129,9 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		Gui %window%:Add, Text, x%x3% yp+2 w%w3% h20 HWNDwidget24 Hidden, % translate("p. Lap")
 
 		Gui %window%:Add, Text, x%x0% ys+30 w160 h23 +0x200 Section HWNDwidget25 Hidden, % translate("Adjust Lap Time")
-		Gui %window%:Add, CheckBox, x%x1% yp w300 h23 VreAdjustLapTimeCheck HWNDwidget26 Hidden, % translate("for Start, Pitstop or imcomplete Laps (use from Settings)")
+		Gui %window%:Add, CheckBox, x%x1% yp w%w1% h23 VreAdjustLapTimeCheck HWNDwidget26 Hidden, % translate("for Start, Pitstop or imcomplete Laps (use from Settings)")
 		
-		Gui %window%:Add, Text, x%x0% ys+30 w160 h23 +0x200 Section HWNDwidget27 Hidden, % translate("Damage Analysis for")
+		Gui %window%:Add, Text, x%x0% ys+30 w120 h23 +0x200 Section HWNDwidget27 Hidden, % translate("Damage Analysis for")
 		Gui %window%:Add, Edit, x%x1% yp w40 h21 Number VreDamageAnalysisLapsEdit HWNDwidget28 Hidden
 		Gui %window%:Add, UpDown, x%x2% yp w17 h21 HWNDwidget29 Hidden, 1
 		Gui %window%:Add, Text, x%x3% yp-2 w%w3% h23 +0x200 HWNDwidget30 Hidden, % translate("Laps after Incident")
@@ -137,7 +145,7 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 	loadFromConfiguration(configuration) {
 		base.loadFromConfiguration(configuration)
 		
-		for ignore, simulator in this.getSimulators() {
+		for ignore, simulator in this.Simulators {
 			simulatorConfiguration := {}
 		
 			simulatorConfiguration["LoadSettings"] := getConfigurationValue(configuration, "Race Assistant Startup", simulator . ".LoadSettings", getConfigurationValue(configuration, "Race Engineer Startup", simulator . ".LoadSettings", "Default"))
@@ -173,8 +181,14 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		}
 	}
 	
-	loadSimulatorConfiguration() {
-		GuiControlGet reSimulatorDropDown
+	loadSimulatorConfiguration(simulator := false) {
+		if simulator {
+			reSimulatorDropDown := simulator
+			
+			GuiControl Choose, reSimulatorDropDown, % inList(this.iSimulators, simulator)
+		}	
+		else
+			GuiControlGet reSimulatorDropDown
 		
 		this.iCurrentSimulator := reSimulatorDropDown
 		
@@ -224,6 +238,18 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 			configuration["AdjustLapTime"] := reAdjustLapTimeCheck
 			
 			configuration["DamageAnalysisLaps"] := reDamageAnalysisLapsEdit
+		}
+	}
+	
+	setSimulators(simulators) {
+		this.iSimulators := simulators
+		
+		GuiControl, , reSimulatorDropDown, % "|" . values2String("|", simulators*)
+		
+		if (simulators.Length() > 0) {
+			this.loadFromConfiguration(this.Configuration)
+			
+			this.loadSimulatorConfiguration(simulators[1])
 		}
 	}
 

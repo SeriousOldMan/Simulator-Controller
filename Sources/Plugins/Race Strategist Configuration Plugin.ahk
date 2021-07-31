@@ -23,6 +23,7 @@ global rsDampingFactorEdit
 class RaceStrategistConfigurator extends ConfigurationItem {
 	iEditor := false
 	
+	iSimulators := []
 	iSimulatorConfigurations := {}
 	iCurrentSimulator := false
 	
@@ -32,7 +33,13 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 		}
 	}
 	
-	__New(editor, configuration) {
+	Simulators[] {
+		Get {
+			return this.iSimulators
+		}
+	}
+	
+	__New(editor, configuration := false) {
 		this.iEditor := editor
 		
 		base.__New(configuration)
@@ -51,11 +58,12 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 		x3 := x + 176
 		
 		w1 := width - (x1 - x + 8)
-		w3 := width - (x3 - x + 8)
+		w3 := width - (x3 - x + 16)
 		
 		Gui %window%:Add, Text, x%x0% y%y% w105 h23 +0x200 HWNDwidget1 Hidden, % translate("Simulator")
 		
- 		choices := this.getSimulators()
+		this.iSimulators := this.getSimulators()
+ 		choices := this.iSimulators
 		chosen := (choices.Length() > 0) ? 1 : 0
 		
 		Gui %window%:Add, DropDownList, x%x1% y%y% w%w1% Choose%chosen% gchooseRaceStrategistSimulator vrsSimulatorDropDown HWNDwidget2 Hidden, % values2String("|", choices*)
@@ -67,7 +75,7 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 		
 		Gui %window%:Font, Norm, Arial
 		
-		Gui %window%:Add, Text, x%x0% yp+17 w160 h23 +0x200 HWNDwidget4 Hidden, % translate("Learn for")
+		Gui %window%:Add, Text, x%x0% yp+17 w80 h23 +0x200 HWNDwidget4 Hidden, % translate("Learn for")
 		Gui %window%:Add, Edit, x%x1% yp w40 h21 Number vrsLearningLapsEdit HWNDwidget5 Hidden
 		Gui %window%:Add, UpDown, x%x2% yp w17 h21 HWNDwidget6 Hidden, 1
 		Gui %window%:Add, Text, x%x3% yp w%w3% h23 +0x200 HWNDwidget7 Hidden, % translate("Laps after Start or Pitstop")
@@ -90,7 +98,7 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 	loadFromConfiguration(configuration) {
 		base.loadFromConfiguration(configuration)
 		
-		for ignore, simulator in this.getSimulators() {
+		for ignore, simulator in this.Simulators {
 			simulatorConfiguration := {}
 		
 			simulatorConfiguration["LearningLaps"] := getConfigurationValue(configuration, "Race Strategist Analysis", simulator . ".LearningLaps", 1)
@@ -112,9 +120,15 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 		}
 	}
 	
-	loadSimulatorConfiguration() {
-		GuiControlGet rsSimulatorDropDown
-		
+	loadSimulatorConfiguration(simulator := false) {
+		if simulator {
+			rsSimulatorDropDown := simulator
+			
+			GuiControl Choose, rsSimulatorDropDown, % inList(this.iSimulators, simulator)
+		}	
+		else
+			GuiControlGet rsSimulatorDropDown
+			
 		this.iCurrentSimulator := rsSimulatorDropDown
 		
 		configuration := this.iSimulatorConfigurations[rsSimulatorDropDown]
@@ -135,6 +149,18 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 			configuration["LearningLaps"] := rsLearningLapsEdit
 			configuration["ConsideredHistoryLaps"] := rsLapsConsideredEdit
 			configuration["HistoryLapsDamping"] := rsDampingFactorEdit
+		}
+	}
+	
+	setSimulators(simulators) {
+		this.iSimulators := simulators
+		
+		GuiControl, , rsSimulatorDropDown, % "|" . values2String("|", simulators*)
+		
+		if (simulators.Length() > 0) {
+			this.loadFromConfiguration(this.Configuration)
+			
+			this.loadSimulatorConfiguration(simulators[1])
 		}
 	}
 

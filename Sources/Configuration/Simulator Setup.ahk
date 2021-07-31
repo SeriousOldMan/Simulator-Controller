@@ -291,7 +291,7 @@ class SetupWizard extends ConfigurationItem {
 
 		Gui %window%:Add, Text, w684 Center gmoveSetupWizard, % translate("Modular Simulator Controller System") 
 		
-		Gui %window%:Font, s9 Norm, Arial
+		Gui %window%:Font, s8 Norm, Arial
 		Gui %window%:Font, Italic Underline, Arial
 
 		Gui %window%:Add, Text, YP+20 w684 cBlue Center gopenSetupDocumentation, % translate("Setup && Configuration")
@@ -337,7 +337,7 @@ class SetupWizard extends ConfigurationItem {
 
 		Gui %window%:Add, Text, w350 Center gmoveSetupHelp VstepTitle, % translate("Title")
 		
-		Gui %window%:Font, s9 Norm, Arial
+		Gui %window%:Font, s8 Norm, Arial
 
 		Gui %window%:Add, Text, YP+20 w350 Center VstepSubtitle, % translate("Subtitle")
 		
@@ -895,6 +895,48 @@ class SetupWizard extends ConfigurationItem {
 		return knowledgeBase.prove(goal)
 	}
 	
+	assistantSimulators(assistant) {
+		local knowledgeBase := this.KnowledgeBase
+		local resultSet
+		local variable
+		
+		goal := new RuleCompiler().compileGoal("assistantSupportedSimulator?(" . StrReplace(assistant, " ", "\ ") . ", ?simulator)")
+		variable := goal.Arguments[2]
+		
+		resultSet := knowledgeBase.prove(goal)
+		simulators := []
+		
+		while resultSet {
+			simulators.Push(resultSet.getValue(variable).toString())
+		
+			if !resultSet.nextResult()
+				resultSet := false
+		}
+		
+		return simulators
+	}
+	
+	assistantAvailableCommands(assistant) {
+		local knowledgeBase := this.SetupWizard.KnowledgeBase
+		local resultSet
+		local variable
+		
+		goal := new RuleCompiler().compileGoal("assistantCommandAvailable?(" . StrReplace(assistant, " ", "\ ") . ", ?command)")
+		variable := goal.Arguments[2]
+		
+		resultSet := knowledgeBase.prove(goal)
+		commands := []
+		
+		while resultSet {
+			commands.Push(resultSet.getValue(variable).toString())
+		
+			if !resultSet.nextResult()
+				resultSet := false
+		}
+		
+		return commands
+	}
+	
 	setTitle(title) {
 		window := this.HelpWindow
 		
@@ -916,7 +958,7 @@ class SetupWizard extends ConfigurationItem {
 		
 		Gui %window%:Default
 		
-		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . html . "</body></html>"
+		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . html . "</body></html>"
 
 		infoViewer.Document.Open()
 		infoViewer.Document.Write(html)
@@ -1195,7 +1237,7 @@ class StartStepWizard extends StepWizard {
 		text := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Start", "Start.Text." . getLanguage()))
 		image := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Start", "Start.Image"))
 		
-		text := "<div style='text-align: center' style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px'>" . text . "</div>"
+		text := "<div style='text-align: center' style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'>" . text . "</div>"
 		
 		height := Round(width / 16 * 9)
 		
@@ -1219,20 +1261,20 @@ class StartStepWizard extends StepWizard {
 			restartButtonHandle := false
 			
 			info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Start", "Start.Unblocking.Info." . getLanguage()))
-			info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px'>" . info . "</div>"
+			info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'>" . info . "</div>"
 			
-			Gui %window%:Font, s12 Bold, Arial
+			Gui %window%:Font, s10 Bold, Arial
 			
 			Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDiconHandle Hidden, %kResourcesDirectory%Setup\Images\Security.ico
 			Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h30 HWNDlabelHandle Hidden, % translate("Unblocking of the Applications and DLLs")
 			
-			Gui %window%:Font, s9 Norm, Arial
+			Gui %window%:Font, s8 Norm, Arial
 			
 			Gui %window%:Add, ActiveX, x%x% yp+33 w%width% h350 HWNDinfoTextHandle VinfoText Hidden, shell explorer
 			
 			x := x + Round(width / 2) - 120
 			
-			Gui %window%:Font, s12 Bold, Arial
+			Gui %window%:Font, s10 Bold, Arial
 			
 			Gui %window%:Add, Button, x%x% yp+380 w240 h30 HWNDrestartButtonHandle GelevateAndRestart Hidden, % translate("Restart as Administrator")
 
@@ -1359,7 +1401,7 @@ class ModulesStepWizard extends StepWizard {
 			checkBoxHandle := false
 			infoTextHandle := false
 		
-			Gui %window%:Font, s12 Bold, Arial
+			Gui %window%:Font, s10 Bold, Arial
 
 			module := definition[A_Index]
 			selected := this.SetupWizard.isModuleSelected(module)
@@ -1367,8 +1409,8 @@ class ModulesStepWizard extends StepWizard {
 			info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules." . module . ".Info." . getLanguage()))
 			module := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules." . module . "." . getLanguage()))
 			
-			label := (translate("Module: ") . module)
-			info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px'>" . info . "</div>"
+			label := substituteVariables(translate("Module: %module%"), {module: module})
+			info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'>" . info . "</div>"
 			
 			checkX := x + width - 20
 			labelWidth := width - 30
@@ -1537,7 +1579,7 @@ class InstallationStepWizard extends StepWizard {
 			info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Installation", "Installation." . software . ".Info." . getLanguage()))
 			
 			label := (translate("Software: ") . software)
-			info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px'>" . info . "</div>"
+			info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'>" . info . "</div>"
 			
 			installed := this.SetupWizard.isSoftwareInstalled(software)
 			
@@ -1552,11 +1594,11 @@ class InstallationStepWizard extends StepWizard {
 			
 			Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDiconHandle Hidden, %kResourcesDirectory%Setup\Images\Install.png
 			
-			Gui %window%:Font, s12 Bold, Arial
+			Gui %window%:Font, s10 Bold, Arial
 			
 			Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h30 HWNDlabelHandle Hidden, % label
 			
-			Gui %window%:Font, s9 Norm, Arial
+			Gui %window%:Font, s8 Norm, Arial
 			
 			Gui %window%:Add, Button, x%buttonX% y%y% w90 h23 HWNDinstallButtonHandle VinstallButton%A_Index% GinstallSoftware Hidden, % (InStr(installer, "http") = 1) ? translate("Download...") : translate("Install...")
 			
@@ -1744,17 +1786,17 @@ class ApplicationsStepWizard extends StepWizard {
 		labelX := x + 45
 		labelY := y + 5
 		
-		Gui %window%:Font, s12 Bold, Arial
+		Gui %window%:Font, s10 Bold, Arial
 		
 		Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDsimulatorsIconHandle Hidden, %kResourcesDirectory%Setup\Images\Gaming Wheel.ico
 		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h30 HWNDsimulatorsLabelHandle Hidden, % translate("Simulations")
 		
-		Gui %window%:Font, s9 Norm, Arial
+		Gui %window%:Font, s8 Norm, Arial
 		
 		Gui Add, ListView, x%x% yp+33 w%width% h200 -Multi -LV0x10 Checked NoSort NoSortHdr HWNDsimulatorsListViewHandle Hidden, % values2String("|", map(["Simulation", "Path"], "translate")*)
 		
 		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Applications", "Applications.Simulators.Info." . getLanguage()))
-		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px'>" . info . "</div>"
+		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'>" . info . "</div>"
 
 		Gui %window%:Add, ActiveX, x%x% yp+205 w%width% h180 HWNDsimulatorsInfoTextHandle VsimulatorsInfoText Hidden, shell explorer
 
@@ -1774,17 +1816,17 @@ class ApplicationsStepWizard extends StepWizard {
 		
 		labelY := y + 5
 		
-		Gui %window%:Font, s12 Bold, Arial
+		Gui %window%:Font, s10 Bold, Arial
 		
 		Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDapplicationsIconHandle Hidden, %kResourcesDirectory%Setup\Images\Tool Chest.ico
 		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h30 HWNDapplicationsLabelHandle Hidden, % translate("Applications && Tools")
 		
-		Gui %window%:Font, s9 Norm, Arial
+		Gui %window%:Font, s8 Norm, Arial
 		
 		Gui Add, ListView, x%x% yp+33 w%width% h200 -Multi -LV0x10 AltSubmit Checked NoSort NoSortHdr HWNDapplicationsListViewHandle GupdateSelectedApplications Hidden, % values2String("|", map(["Category", "Application", "Path"], "translate")*)
 		
 		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Applications", "Applications.Applications.Info." . getLanguage()))
-		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px'>" . info . "</div>"
+		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'>" . info . "</div>"
 		
 		Gui %window%:Add, ActiveX, x%x% yp+205 w%width% h180 HWNDapplicationsInfoTextHandle VapplicationsInfoText Hidden, shell explorer
 
@@ -2034,17 +2076,17 @@ class ButtonBoxStepWizard extends StepWizard {
 		labelX := x + 45
 		labelY := y + 5
 		
-		Gui %window%:Font, s12 Bold, Arial
+		Gui %window%:Font, s10 Bold, Arial
 		
 		Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDfunctionsIconHandle Hidden, %kResourcesDirectory%Setup\Images\Controller.ico
 		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h30 HWNDfunctionsLabelHandle Hidden, % translate("Controller Layout && Triggers")
 		
-		Gui %window%:Font, s9 Norm, Arial
+		Gui %window%:Font, s8 Norm, Arial
 		
 		Gui Add, ListView, x%x% yp+33 w%width% h300 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDfunctionsListViewHandle gupdateFunctionTriggers Hidden, % values2String("|", map(["Controller / Button Box", "Control", "Function", "Number", "Trigger(s)", "Hints"], "translate")*)
 		
 		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Button Box", "Button Box.Functions.Info." . getLanguage()))
-		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px'>" . info . "</div>"
+		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'>" . info . "</div>"
 		
 		Gui %window%:Add, ActiveX, x%x% yp+305 w%width% h135 HWNDfunctionsInfoTextHandle VfunctionsInfoText Hidden, shell explorer
 
@@ -2728,12 +2770,12 @@ class SimulatorsStepWizard extends CommandsStepWizard {
 		labelX := x + 45
 		labelY := y + 5
 		
-		Gui %window%:Font, s12 Bold, Arial
+		Gui %window%:Font, s10 Bold, Arial
 		
 		Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDcommandsIconHandle Hidden, %kResourcesDirectory%Setup\Images\Controller.ico
 		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h30 HWNDcommandsLabelHandle Hidden Section, % translate("Controller Assignments for Simulators")
 		
-		Gui %window%:Font, s9 Norm, Arial
+		Gui %window%:Font, s8 Norm, Arial
 
 		simulatorLabelHandle := false
 		simulatorDropDownHandle := false
@@ -2749,7 +2791,7 @@ class SimulatorsStepWizard extends CommandsStepWizard {
 		Gui Add, ListView, x%listX% ys+33 w%listWidth% h300 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDcommandsListViewHandle gupdateSimulatorCommandFunction Hidden, % values2String("|", map(["Mode", "Command / Setting", "Label", "Function"], "translate")*)
 		
 		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Simulators", "Simulators.Commands.Info." . getLanguage()))
-		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px'>" . info . "</div>"
+		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'>" . info . "</div>"
 		
 		Gui %window%:Add, ActiveX, x%x% yp+305 w%width% h135 HWNDcommandsInfoTextHandle VcommandsInfoText Hidden, shell explorer
 
@@ -2834,10 +2876,10 @@ class SimulatorsStepWizard extends CommandsStepWizard {
 		
 		for ignore, mode in ["Pitstop", "Assistant"]
 			for ignore, command in string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Simulators", (mode = "Assistant") ? "Simulators.Commands.Assistant" : ("Simulators.Settings.Pitstop." . code))) {
-				first := (mode != lastMode)
-				lastMode := mode
-				
 				if wizard.simulatorCommandAvailable(simulator, mode, command) {
+					first := (mode != lastMode)
+					lastMode := mode
+				
 					if load {
 						function := wizard.getSimulatorCommandFunction(simulator, mode, command)
 						
@@ -2935,90 +2977,108 @@ class SimulatorsStepWizard extends CommandsStepWizard {
 ;;; AssistantsStepWizard                                                    ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-global assistantDropDown
-
 class AssistantsStepWizard extends CommandsStepWizard {
 	iAssistants := []
 	iCurrentAssistant := false
 	
+	iCommandsListViews := []
+	iAssistantConfigurators := []
+	
 	Pages[] {
 		Get {
-			wizard := this.SetupWizard
-			
-			pages := 0
-			
-			for ignore, assistant in this.Definition
-				if wizard.isModuleSelected(assistant)
-					pages += 1
-				
-			return pages
+			return this.iAssistants.Length()
 		}
 	}
 	
 	createGui(wizard, x, y, width, height) {
 		local application
 		
-		static commandsInfoText
+		static commandsInfoText1
+		static commandsInfoText2
+		static commandsInfoText3
+		static commandsInfoText4
+		static commandsInfoText5
 		
 		labelY := y
 		
+		wizard := this.SetupWizard
 		window := this.Window
 		
 		Gui %window%:Default
 		
-		commandsIconHandle := false
-		commandsIconLabelHandle := false
-		commandsListViewHandle := false
-		commandsInfoTextHandle := false
+		page := 0
 		
-		labelWidth := width - 30
-		labelX := x + 45
-		labelY := y + 5
-		
-		Gui %window%:Font, s12 Bold, Arial
-		
-		Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDcommandsIconHandle Hidden, %kResourcesDirectory%Setup\Images\Controller.ico
-		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h30 HWNDcommandsLabelHandle Hidden Section, % translate("Controller Assignments for Assistants")
-		
-		Gui %window%:Font, s9 Norm, Arial
-		
-		secondX := x + 80
-		secondWidth := 160
-		
-		assistantLabelHandle := false
-		assistantDropDownHandle := false
-		
-		Gui %window%:Add, Text, x%x% yp+33 w105 h23 +0x200 HWNDassistantLabelHandle Hidden, % translate("Assistant")
-		Gui %window%:Add, DropDownList, x%secondX% yp w%secondWidth% Choose%chosen% HWNDassistantDropDownHandle gchooseAssistant vassistantDropDown Hidden
-		
-		listX := x + 250
-		listWidth := width - 250
-		Gui Add, ListView, x%listX% ys+33 w%listWidth% h300 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDcommandsListViewHandle gupdateAssistantCommandFunction Hidden, % values2String("|", map(["Command", "Label", "Function"], "translate")*)
-		
-		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Assistants", "Assistants.Commands.Info." . getLanguage()))
-		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px'>" . info . "</div>"
-		
-		Gui %window%:Add, ActiveX, x%x% yp+305 w%width% h135 HWNDcommandsInfoTextHandle VcommandsInfoText Hidden, shell explorer
+		for ignore, assistant in this.Definition
+			if wizard.isModuleSelected(assistant) {
+				page += 1
+				
+				commandsIconHandle := false
+				commandsIconLabelHandle := false
+				commandsListViewHandle := false
+				commandsInfoTextHandle := false
+				
+				labelWidth := width - 30
+				labelX := x + 45
+				labelY := y + 5
+				
+				Gui %window%:Font, s10 Bold, Arial
+			
+				label := substituteVariables(translate("Configuration for %assistant%"), {assistant: translate(assistant)})
+				
+				Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDcommandsIconHandle Hidden, %kResourcesDirectory%Setup\Images\Controller.ico
+				Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h30 HWNDcommandsLabelHandle Hidden Section, % label
+				
+				Gui %window%:Font, s8 Norm, Arial
+				
+				listX := x + 400
+				listY := labelY + 33
+				listWidth := width - 400
+				
+				Gui Add, ListView, x%listX% y%listY% w%listWidth% h347 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDcommandsListViewHandle gupdateAssistantCommandFunction Hidden Section, % values2String("|", map(["Command", "Label", "Function"], "translate")*)
+				
+				info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Assistants", "Assistants.Commands.Info." . getLanguage()))
+				info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'>" . info . "</div>"
+				
+				Gui %window%:Add, ActiveX, x%x% yp+352 w%width% h135 HWNDcommandsInfoTextHandle VcommandsInfoText%page% Hidden, shell explorer
 
-		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+				html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
-		commandsInfoText.Navigate("about:blank")
-		commandsInfoText.Document.Write(html)
+				commandsInfoText%page%.Navigate("about:blank")
+				commandsInfoText%page%.Document.Write(html)
+				
+				this.iCommandsListViews.Push(commandsListViewHandle)
+			
+				if (assistant = "Race Engineer")
+					configurator := new RaceEngineerConfigurator(this)
+				else if (assistant = "Race Strategist")
+					configurator := new RaceStrategistConfigurator(this)
+				else
+					configurator := false
+					
+				if configurator {
+					this.iAssistantConfigurators.Push(configurator)
 		
-		this.setCommandsListView(commandsListViewHandle)
-		
-		new RaceEngineerConfigurator(this, this.SetupWizard.getSimulatorConfiguration()).createGui(this, x, y, width, height)
-		
-		this.registerWidgets(1, commandsIconHandle, commandsLabelHandle, commandsListViewHandle, commandsInfoTextHandle, assistantLabelHandle, assistantDropDownHandle)
+					configurator.createGui(this, x, listY, 400 - x, height)
+				}
+				
+				this.registerWidgets(page, commandsIconHandle, commandsLabelHandle, commandsListViewHandle, commandsInfoTextHandle)
+			}
 	}
 	
 	registerWidget(page, widget) {
-		if isInstance(page, RaceEngineerConfigurator)
-			base.registerWidget(1, widget)
-		else if isInstance(page, RaceStrategistConfigurator)
-			base.registerWidget(Min(this.Pages, 2), widget)
+		index := inList(this.iAssistantConfigurators, page)
+		
+		if index
+			base.registerWidget(index, widget)
 		else
 			base.registerWidget(page, widget)
+	}
+	
+	reset() {
+		base.reset()
+		
+		this.iAssistantConfigurators := []
+		this.iCommandsListViews := []
 	}
 	
 	updateState() {
@@ -3035,50 +3095,58 @@ class AssistantsStepWizard extends CommandsStepWizard {
 	}
 	
 	showPage(page) {
-		chosen := (this.iAssistants.Length() > 0) ? 1 : 0
+		this.iCurrentAssistant := this.iAssistants[page]
 		
-		this.iCurrentAssistant := ((chosen > 0) ? this.iAssistants[chosen] : false)
+		this.setCommandsListView(this.iCommandsListViews[page])
 		
 		base.showPage(page)
+				
+		configuration := this.SetupWizard.getSimulatorConfiguration()
+		assistantConfiguration := readConfiguration(kUserHomeDirectory . "Install\" . this.iCurrentAssistant . " Configuration.ini")
 		
-		GuiControl, , assistantDropDown, % "|" . values2String("|", this.iAssistants*)
-		GuiControl Choose, assistantDropDown, % chosen
+		for ignore, section in ["Race Assistant Startup", "Race Assistant Shutdown", "Race Engineer Startup", "Race Engineer Shutdown"
+							  , "Race Strategist Startup", "Race Strategist Shutdown", "Race Engineer Analysis", "Race Strategist Analysis"] {
+			subConfiguration := getConfigurationSectionValues(assistantConfiguration, section, false)
+			
+			if subConfiguration
+				setConfigurationSectionValues(configuration, section, subConfiguration)
+		}
+		
+		this.iAssistantConfigurators[page].loadFromConfiguration(configuration)
+		this.iAssistantConfigurators[page].setSimulators(this.getSimulators())
+	}
+	
+	hidePage(page) {
+		if base.hidePage(page) {
+			configurator := this.iAssistantConfigurators[page]
+			
+			configuration := newConfiguration()
+			
+			configurator.saveToConfiguration(configuration)
+			
+			assistantConfiguration := newConfiguration()
+	
+			for ignore, section in ["Race Assistant Startup", "Race Assistant Shutdown", "Race Engineer Startup", "Race Engineer Shutdown"
+								  , "Race Strategist Startup", "Race Strategist Shutdown", "Race Engineer Analysis", "Race Strategist Analysis"] {
+				subConfiguration := getConfigurationSectionValues(configuration, section, false)
+				
+				if subConfiguration
+					setConfigurationSectionValues(assistantConfiguration, section, subConfiguration)
+			}
+				
+			writeConfiguration(kUserHomeDirectory . "Install\" . this.iCurrentAssistant . " Configuration.ini", assistantConfiguration)
+			
+			return true
+		}
+		else
+			return false
 	}
 	
 	getSimulators() {
-		local knowledgeBase := this.SetupWizard.KnowledgeBase
-		local resultSet
-		local variable
-		
-		if this.iCurrentAssistant {
-			goal := new RuleCompiler().compileGoal("assistantSimulator?(" . StrReplace(this.iCurrentAssistant, " ", "\ ") . ", ?simulator)")
-			variable := goal.Arguments[2]
-			
-			resultSet := knowledgeBase.prove(goal)
-			simulators := []
-			
-			while resultSet {
-				simulators.Push(resultSet.getValue(variable).toString())
-			
-				if !resultSet.nextResult()
-					resultSet := false
-			}
-			
-			return simulators
-		}
+		if this.iCurrentAssistant
+			return this.SetupWizard.assistantSimulators(this.iCurrentAssistant)
 		else
 			return []
-	}
-	
-	chooseAssistant() {
-		this.saveCommands()
-		
-		GuiControlGet assistantDropDown
-		
-		this.iCurrentAssistant := assistantDropDown
-		
-		this.resetButtonBoxes()
-		this.loadCommands(assistantDropDown, true)
 	}
 	
 	loadCommands(load := false) {
@@ -3212,7 +3280,7 @@ class FinishStepWizard extends StepWizard {
 		image := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Finish", "Finish.Image"))
 		text := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Finish", "Finish.Text." . getLanguage()))
 		
-		text := "<div style='text-align: center' style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px'>" . text . "</div>"
+		text := "<div style='text-align: center' style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'>" . text . "</div>"
 		
 		height := Round(width / 16 * 9)
 		
@@ -3713,7 +3781,7 @@ initializeSimulatorSetup() {
 		wizard := new SetupWizard(kSimulatorConfiguration, definition)
 		
 		;~ wizard.registerStepWizard(new StartStepWizard(wizard, "Start", kSimulatorConfiguration))
-		;~ wizard.registerStepWizard(new ModulesStepWizard(wizard, "Modules", kSimulatorConfiguration))
+		wizard.registerStepWizard(new ModulesStepWizard(wizard, "Modules", kSimulatorConfiguration))
 		;~ wizard.registerStepWizard(new InstallationStepWizard(wizard, "Installation", kSimulatorConfiguration))
 		;~ wizard.registerStepWizard(new ApplicationsStepWizard(wizard, "Applications", kSimulatorConfiguration))
 		;~ wizard.registerStepWizard(new ButtonBoxStepWizard(wizard, "Button Box", kSimulatorConfiguration))

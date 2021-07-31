@@ -601,7 +601,9 @@ class CallAction extends Action {
 	
 	Arguments[variablesOrFacts := "__NotInitialized__"] {
 		Get {
-			if (variablesOrFacts == kNotInitialized)
+			if variablesOrFacts is Number
+				return this.iArguments[variablesOrFacts]
+			else if (variablesOrFacts == kNotInitialized)
 				return this.iArguments
 			else
 				this.getValues(variablesOrFacts)

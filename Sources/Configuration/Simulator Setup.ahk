@@ -760,7 +760,8 @@ class SetupWizard extends ConfigurationItem {
 		local knowledgeBase := this.KnowledgeBase
 		local function
 		
-		Loop % knowledgeBase.getValue("Controller.Function.Count", 0) {
+		Loop % knowledgeBase.getValue("Controller.Function.Count", 0)
+		{
 			function := knowledgeBase.getValue("Controller.Function." . A_Index, false)
 		
 			if function
@@ -795,7 +796,8 @@ class SetupWizard extends ConfigurationItem {
 		local knowledgeBase := this.KnowledgeBase
 		local function
 		
-		Loop % knowledgeBase.getValue("Simulator." . simulator . ".Mode." . mode . ".Command.Count", 0) {
+		Loop % knowledgeBase.getValue("Simulator." . simulator . ".Mode." . mode . ".Command.Count", 0)
+		{
 			command := knowledgeBase.getValue("Simulator." . simulator . ".Mode." . mode . ".Command." . A_Index, false)
 		
 			if command
@@ -847,7 +849,8 @@ class SetupWizard extends ConfigurationItem {
 		local knowledgeBase := this.KnowledgeBase
 		local function
 		
-		Loop % knowledgeBase.getValue("Assistant." . assistant . ".Command.Count", 0) {
+		Loop % knowledgeBase.getValue("Assistant." . assistant . ".Command.Count", 0)
+		{
 			command := knowledgeBase.getValue("Assistant." . assistant . ".Command." . A_Index, false)
 		
 			if command
@@ -870,7 +873,7 @@ class SetupWizard extends ConfigurationItem {
 			}
 		}
 		
-		knowledgeBase.setFact("Assistant." . assistant . ".Mode." . mode . ".Command.Count", count)
+		knowledgeBase.setFact("Assistant." . assistant . ".Command.Count", count)
 		
 		this.updateState()
 	}
@@ -1733,6 +1736,9 @@ class ApplicationsStepWizard extends StepWizard {
 				
 					exePath := wizard.applicationPath(application)
 					
+					if !exePath
+						exePath := ""
+					
 					SplitPath exePath, , workingDirectory
 					
 					setConfigurationValue(configuration, application, "Exe Path", exePath)
@@ -2436,6 +2442,7 @@ class GeneralStepWizard extends StepWizard {
 			return 0
 		}
 	}
+	
 	createGui(wizard, x, y, width, height) {
 	}
 	
@@ -2660,8 +2667,6 @@ class CommandsStepWizard extends StepWizard {
 	controlClick(element, function, row, column, isEmpty) {
 		if this.iPendingFunctionRegistration {
 			SoundPlay %kResourcesDirectory%Sounds\Activated.wav
-			
-			SoundPlay *32
 		
 			command := this.getCommand(this.iPendingFunctionRegistration)
 			commandDescriptor := this.getCommandDescriptor(this.iPendingFunctionRegistration)
@@ -2760,6 +2765,48 @@ class SimulatorsStepWizard extends CommandsStepWizard {
 				
 			return 0
 		}
+	}
+	
+	saveToConfiguration(configuration) {
+		local function
+		
+		base.saveToConfiguration(configuration)
+		
+		wizard := this.SetupWizard
+		
+		for ignore, simulator in this.Definition
+			if wizard.isApplicationSelected(simulator) {
+				code := string2Values("|", getConfigurationValue(wizard.Definition, "Applications.Simulators", simulator))[1]
+				arguments := ""
+				
+				for ignore, mode in ["Pitstop", "Assistant"] {
+					commands := ""
+				
+					for ignore, command in string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Simulators", (mode = "Assistant") ? "Simulators.Commands.Assistant" : ("Simulators.Settings.Pitstop." . code)))
+						if wizard.simulatorCommandAvailable(simulator, mode, command) {
+							function := wizard.getSimulatorCommandFunction(simulator, mode, command)
+
+							if !IsObject(function)
+								function := ((function != "") ? Array(function) : [])
+							
+							if (function.Length() > 0) {
+								if (commands != "")
+									commands .= ", "
+								
+								commands .= (command . " " . values2String(" ", function*))
+							}
+						}
+				
+					if (commands != "") {
+						if (arguments != "")
+							arguments .= "; "
+						
+						arguments .= (((mode = "Pitstop") ? "pitstopCommands: " : "assistantCommands: ") . commands)
+					}
+				}
+				
+				new Plugin(code, false, true, simulator, arguments).saveToConfiguration(configuration)
+			}
 	}
 	
 	createGui(wizard, x, y, width, height) {
@@ -3021,6 +3068,89 @@ class AssistantsStepWizard extends CommandsStepWizard {
 		}
 	}
 	
+	saveToConfiguration(configuration) {
+		local function
+		
+		base.saveToConfiguration(configuration)
+		
+		wizard := this.SetupWizard
+		
+		for ignore, assistant in this.Definition
+			if wizard.isModuleSelected(assistant) {
+				assistantConfiguration := readConfiguration(kUserHomeDirectory . "Install\" . assistant . " Configuration.ini")
+		
+				for ignore, section in ["Race Assistant Startup", "Race Assistant Shutdown", "Race Engineer Startup", "Race Engineer Shutdown"
+									  , "Race Strategist Startup", "Race Strategist Shutdown", "Race Engineer Analysis", "Race Strategist Analysis"] {
+					subConfiguration := getConfigurationSectionValues(assistantConfiguration, section, false)
+					
+					if subConfiguration
+						setConfigurationSectionValues(configuration, section, subConfiguration)
+				}
+				
+				if (assistant = "Race Engineer")
+					arguments := "assistantName: Jona"
+				else if (assistant = "Race Strategist")
+					arguments := "assistantName: Khato"
+				else
+					Throw "Unsupported race assistant detected in AssistantsStepWizard.saveToConfiguration..."
+				
+				commands := ""
+				
+				for ignore, command in string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Assistants", "Assistants.Commands"))
+					if wizard.assistantCommandAvailable(assistant, command) {
+						function := wizard.getAssistantCommandFunction(assistant, command)
+
+						if !IsObject(function)
+							function := ((function != "") ? Array(function) : [])
+						
+						if (function.Length() > 0) {
+							if (commands != "")
+								commands .= ", "
+							
+							commands .= (command . " " . values2String(" ", function*))
+						}
+					}
+				
+				if (commands != "")
+					arguments .= ("; assistantCommands: " . commands)
+				
+				if wizard.isModuleSelected("Voice Control") {
+					arguments .= "; assistantSpeaker: true"
+					
+					if wizard.isSoftwareInstalled("MSSpeechRuntime")
+						arguments .= "; assistantListener: true"
+					else
+						arguments .= "; assistantListener: false"
+				}
+				else
+					arguments .= "; assistantSpeaker: false"
+				
+				for ignore, command in string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Assistants", "Assistants.Commands.Special"))
+					if wizard.assistantCommandAvailable(assistant, command) {
+						function := wizard.getAssistantCommandFunction(assistant, command)
+
+						if !IsObject(function)
+							function := ((function != "") ? Array(function) : [])
+						
+						if (function.Length() > 0)
+							switch command {
+								case "RaceAssistant":
+									arguments .= ("; raceAssistant: On " . values2String(" ", function*))
+								case "SetupDatabaseOpen":
+									arguments .= ("; openSetupDatabase: " . values2String(" ", function*))
+								case "RaceSettingsOpen":
+									arguments .= ("; openRaceSettings: " . values2String(" ", function*))
+								case "SetupImport":
+									arguments .= ("; importSetup: " . values2String(" ", function*))
+								default:
+									Throw "Unsupported special command detected in AssistantsStepWizard.saveToConfiguration..."
+							}
+					}
+					
+				new Plugin(assistant, false, true, "", arguments).saveToConfiguration(configuration)
+			}
+	}
+	
 	createGui(wizard, x, y, width, height) {
 		local application
 		
@@ -3197,7 +3327,8 @@ class AssistantsStepWizard extends CommandsStepWizard {
 		
 		count := 1
 		
-		for ignore, command in string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Assistants", "Assistants.Commands")) {
+		for ignore, command in concatenate(string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Assistants", "Assistants.Commands"))
+										 , string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Assistants", "Assistants.Commands.Special"))) {
 			if wizard.assistantCommandAvailable(assistant, command) {
 				if load {
 					function := wizard.getAssistantCommandFunction(assistant, command)
@@ -3262,7 +3393,8 @@ class AssistantsStepWizard extends CommandsStepWizard {
 		wizard := this.SetupWizard
 		functions := {}
 		
-		for ignore, command in string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Assistants", "Assistants.Commands"))				
+		for ignore, command in concatenate(string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Assistants", "Assistants.Commands"))
+										 , string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Assistants", "Assistants.Commands.Special")))
 			if wizard.assistantCommandAvailable(assistant, command) {
 				function := this.getCommandFunction(command)
 				
@@ -3315,6 +3447,8 @@ class FinishStepWizard extends StepWizard {
 		settingsEditor := ObjBindMethod(this, "settingsEditor")
 		
 		SetTimer %settingsEditor%, % isDebug() ? -5000 : -2000
+		
+		Critical
 	}
 	
 	hidePage(page) {
@@ -3347,30 +3481,37 @@ class FinishStepWizard extends StepWizard {
 ;;;-------------------------------------------------------------------------;;;
 
 finishSetup(finish := false, save := false) {
-	if (finish = "Finish") {
-		if SetupWizard.Instance.finishSetup(save)
-			ExitApp 0
-		else
-			SetupWizard.Instance.showPage(SetupWizard.Instance.Step, SetupWizard.Instance.Page)
-	}
-	else {
-		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-		title := translate("Setup")
-		MsgBox 262436, %title%, % translate("Do you want to generate the new configuration?`n`nBackup files will be saved for your current configuration in the ""Simulator Controller\Config"" folder in your user Documents folder.")
-		OnMessage(0x44, "")
-		
-		IfMsgBox Yes
-			save := true
-		else
-			save := false
-		
-		SetupWizard.Instance.Step.hidePage(SetupWizard.Instance.Page)
-		
-		callback := Func("finishSetup").Bind("Finish", save)
-		
-		; Let other threads finish...
+	protectionOn()
+	
+	try {
+		if (finish = "Finish") {
+			if SetupWizard.Instance.finishSetup(save)
+				ExitApp 0
+			else
+				SetupWizard.Instance.showPage(SetupWizard.Instance.Step, SetupWizard.Instance.Page)
+		}
+		else {
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+			title := translate("Setup")
+			MsgBox 262436, %title%, % translate("Do you want to generate the new configuration?`n`nBackup files will be saved for your current configuration in the ""Simulator Controller\Config"" folder in your user Documents folder.")
+			OnMessage(0x44, "")
 			
-		SetTimer %callback%, % isDebug() ? -5000 : -2000
+			IfMsgBox Yes
+				save := true
+			else
+				save := false
+			
+			SetupWizard.Instance.Step.hidePage(SetupWizard.Instance.Page)
+			
+			callback := Func("finishSetup").Bind("Finish", save)
+			
+			; Let other threads finish...
+				
+			SetTimer %callback%, % isDebug() ? -5000 : -2000
+		}
+	}
+	finally {
+		protectionOff()
 	}
 }
 
@@ -3424,7 +3565,9 @@ updateSelectedApplications() {
 }
 
 installSoftware() {
-	local stepWizard := SetupWizard.Instance.StepWizards["Installation"]
+	local stepWizard
+	
+	stepWizard := SetupWizard.Instance.StepWizards["Installation"]
 	
 	definition := stepWizard.Definition
 	
@@ -3432,24 +3575,17 @@ installSoftware() {
 }
 
 locateSoftware() {
-	wizard := SetupWizard.Instance.StepWizards["Installation"]
+	local stepWizard := SetupWizard.Instance.StepWizards["Installation"]
 	
-	definition := wizard.Definition
+	definition := stepWizard.Definition
 	name := definition[StrReplace(A_GuiControl, "locateButton", "")]
 	
-	protectionOn()
+	title := substituteVariables(translate("Select %name% executable..."), {name: name})
 	
-	try {
-		title := substituteVariables(translate("Select %name% executable..."), {name: name})
-		
-		FileSelectFile file, 1, , %title%, Executable (*.exe)
-		
-		if (file != "")
-			wizard.locateSoftware(name, file)
-	}
-	finally {
-		protectionOff()
-	}
+	FileSelectFile file, 1, , %title%, Executable (*.exe)
+	
+	if (file != "")
+		stepWizard.locateSoftware(name, file)
 }
 
 updateFunctionTriggers() {
@@ -3457,18 +3593,13 @@ updateFunctionTriggers() {
 		LV_Modify(A_Index, "-Select")
 	
 	if (A_GuiEvent = "DoubleClick") {
-		if (A_EventInfo > 0) {
-			wizard := SetupWizard.Instance.StepWizards["Button Box"]
-		
-			wizard.updateFunctionTriggers(A_EventInfo)
-		}
+		if (A_EventInfo > 0)
+			SetupWizard.Instance.StepWizards["Button Box"].updateFunctionTriggers(A_EventInfo)
 	}
 	else if (A_GuiEvent = "RightClick") {
 		if (A_EventInfo > 0) {
 			row := A_EventInfo
 			
-			wizard := SetupWizard.Instance.StepWizards["Button Box"]
-		
 			curCoordMode := A_CoordModeMouse
 
 			LV_GetText(control, row, 2)
@@ -3492,7 +3623,7 @@ updateFunctionTriggers() {
 			Menu ContextMenu, Add
 			
 			menuItem := translate("Press the trigger(s)...")
-			handler := ObjBindMethod(wizard, "updateFunctionTriggers", row)
+			handler := ObjBindMethod(SetupWizard.Instance.StepWizards["Button Box"], "updateFunctionTriggers", row)
 			
 			Menu ContextMenu, Add, %menuItem%, %handler%
 			
@@ -3595,10 +3726,6 @@ showFunctionSelectorHint() {
 
 chooseSimulator() {
 	SetupWizard.Instance.StepWizards["Simulators"].chooseSimulator()
-}
-
-chooseAssistant() {
-	SetupWizard.Instance.StepWizards["Assistants"].chooseAssistant()
 }
 
 LV_ClickedColumn(listViewHandle) {

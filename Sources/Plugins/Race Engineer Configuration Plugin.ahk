@@ -70,7 +70,9 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		
 		Gui %window%:Add, Text, x%x0% y%y% w105 h23 +0x200 HWNDwidget1 Hidden, % translate("Simulator")
 		
-		this.iSimulators := this.getSimulators()
+		if (this.Simulators.Length() = 0)
+			this.iSimulators := this.getSimulators()
+		
  		choices := this.iSimulators
 		chosen := (choices.Length() > 0) ? 1 : 0
 		
@@ -145,6 +147,9 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 	loadFromConfiguration(configuration) {
 		base.loadFromConfiguration(configuration)
 		
+		if (this.Simulators.Length() = 0)
+			this.iSimulators := this.getSimulators()
+			
 		for ignore, simulator in this.Simulators {
 			simulatorConfiguration := {}
 		

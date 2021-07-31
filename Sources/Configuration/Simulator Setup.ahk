@@ -447,6 +447,10 @@ class SetupWizard extends ConfigurationItem {
 	
 	finishSetup(save := true) {
 		if (this.Step && this.Step.hidePage(this.Page)) {
+			GuiControl Disable, previousPageButton
+			GuiControl Disable, nextPageButton
+			GuiControl Disable, finishButton
+			
 			vWorking := true
 			
 			if save {
@@ -2096,7 +2100,7 @@ class ButtonBoxStepWizard extends StepWizard {
 		
 		Gui %window%:Font, s8 Norm, Arial
 		
-		Gui Add, ListView, x%x% yp+33 w%width% h300 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDfunctionsListViewHandle gupdateFunctionTriggers Hidden, % values2String("|", map(["Controller / Button Box", "Control", "Function", "Number", "Trigger(s)", "Hints"], "translate")*)
+		Gui Add, ListView, x%x% yp+33 w%width% h300 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDfunctionsListViewHandle gupdateFunctionTriggers Hidden, % values2String("|", map(["Controller / Button Box", "Control", "Function", "Number", "Trigger(s)", "Hints & Conflicts"], "translate")*)
 		
 		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Button Box", "Button Box.Functions.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'>" . info . "</div>"

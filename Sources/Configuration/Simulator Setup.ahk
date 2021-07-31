@@ -62,6 +62,7 @@ global vInstallerLanguage = false
 ;;;-------------------------------------------------------------------------;;;
 
 global vResult = false
+global vWorking = false
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -446,6 +447,8 @@ class SetupWizard extends ConfigurationItem {
 	
 	finishSetup(save := true) {
 		if (this.Step && this.Step.hidePage(this.Page)) {
+			vWorking := true
+			
 			if save {
 				if FileExist(kUserConfigDirectory . "Simulator Configuration.ini")
 					FileMove %kUserConfigDirectory%Simulator Configuration.ini, %kUserConfigDirectory%Simulator Configuration.ini.bak, 1
@@ -465,6 +468,8 @@ class SetupWizard extends ConfigurationItem {
 					FileCopy %kUserHomeDirectory%Install\Button Box Configuration.ini, %kUserConfigDirectory%Button Box Configuration.ini
 				}
 			}
+			
+			vWorking := false
 			
 			return true
 		}
@@ -595,19 +600,27 @@ class SetupWizard extends ConfigurationItem {
 	}
 	
 	previousPage() {
+		vWorking := true
+		
 		step := false
 		page := false
 		
 		if this.getPreviousPage(step, page)
 			this.showPage(step, page)
+	
+		vWorking := false
 	}
 	
 	nextPage() {
+		vWorking := true
+		
 		step := false
 		page := false
 		
 		if this.getNextPage(step, page)
 			this.showPage(step, page)
+		
+		vWorking := false
 	}
 
 	updateState() {
@@ -3446,9 +3459,7 @@ class FinishStepWizard extends StepWizard {
 		
 		settingsEditor := ObjBindMethod(this, "settingsEditor")
 		
-		SetTimer %settingsEditor%, % isDebug() ? -5000 : -2000
-		
-		Critical
+		SetTimer %settingsEditor%, -200
 	}
 	
 	hidePage(page) {
@@ -3462,6 +3473,14 @@ class FinishStepWizard extends StepWizard {
 	}
 	
 	settingsEditor() {
+		if vWorking {
+			settingsEditor := ObjBindMethod(this, "settingsEditor")
+					
+			SetTimer %settingsEditor%, -200
+			
+			return
+		}
+	
 		if FileExist(kUserHomeDirectory . "Install\Simulator Settings.ini")
 			settings := readConfiguration(kUserHomeDirectory . "Install\Simulator Settings.ini")
 		else
@@ -3521,10 +3540,14 @@ cancelSetup() {
 
 previousPage() {
 	SetupWizard.Instance.previousPage()
+	
+	vWorking := false
 }
 
 nextPage() {
 	SetupWizard.Instance.nextPage()
+	
+	vWorking := false
 }
 
 chooseLanguage() {
@@ -3958,6 +3981,8 @@ restartSetup:
 	
 	try {
 		Loop {
+			vWorking := false
+		
 			Sleep 200
 			
 			if (vResult == kLanguage)

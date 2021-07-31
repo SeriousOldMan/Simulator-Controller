@@ -853,7 +853,7 @@ class SetupWizard extends ConfigurationItem {
 	simulatorCommandAvailable(simulator, mode, command) {
 		local knowledgeBase := this.KnowledgeBase
 		
-		goal := new RuleCompiler().compileGoal("simulatorCommandAvailable?(" . StrReplace(simulator, " ", "\ ") . ", " . StrReplace(mode, " ", "\ ") . ", " . StrReplace(command, " ", "\ ") . ")")
+		goal := new RuleCompiler().compileGoal("simulatorCommandAvailable?(" . StrReplace(simulator, A_Space, "\ ") . ", " . StrReplace(mode, A_Space, "\ ") . ", " . StrReplace(command, A_Space, "\ ") . ")")
 		
 		return knowledgeBase.prove(goal)
 	}
@@ -906,7 +906,7 @@ class SetupWizard extends ConfigurationItem {
 	assistantCommandAvailable(assistant, command) {
 		local knowledgeBase := this.KnowledgeBase
 		
-		goal := new RuleCompiler().compileGoal("assistantCommandAvailable?(" . StrReplace(assistant, " ", "\ ") . ", " . StrReplace(command, " ", "\ ") . ")")
+		goal := new RuleCompiler().compileGoal("assistantCommandAvailable?(" . StrReplace(assistant, A_Space, "\ ") . ", " . StrReplace(command, A_Space, "\ ") . ")")
 		
 		return knowledgeBase.prove(goal)
 	}
@@ -916,7 +916,7 @@ class SetupWizard extends ConfigurationItem {
 		local resultSet
 		local variable
 		
-		goal := new RuleCompiler().compileGoal("assistantSupportedSimulator?(" . StrReplace(assistant, " ", "\ ") . ", ?simulator)")
+		goal := new RuleCompiler().compileGoal("assistantSupportedSimulator?(" . StrReplace(assistant, A_Space, "\ ") . ", ?simulator)")
 		variable := goal.Arguments[2]
 		
 		resultSet := knowledgeBase.prove(goal)
@@ -937,7 +937,7 @@ class SetupWizard extends ConfigurationItem {
 		local resultSet
 		local variable
 		
-		goal := new RuleCompiler().compileGoal("assistantCommandAvailable?(" . StrReplace(assistant, " ", "\ ") . ", ?command)")
+		goal := new RuleCompiler().compileGoal("assistantCommandAvailable?(" . StrReplace(assistant, A_Space, "\ ") . ", ?command)")
 		variable := goal.Arguments[2]
 		
 		resultSet := knowledgeBase.prove(goal)
@@ -1285,7 +1285,7 @@ class StartStepWizard extends StepWizard {
 			Gui %window%:Font, s10 Bold, Arial
 			
 			Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDiconHandle Hidden, %kResourcesDirectory%Setup\Images\Security.ico
-			Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h30 HWNDlabelHandle Hidden, % translate("Unblocking of the Applications and DLLs")
+			Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h30 HWNDlabelHandle Hidden, % translate("Unblocking of Applications and DLLs")
 			
 			Gui %window%:Font, s8 Norm, Arial
 			
@@ -1754,20 +1754,9 @@ class ApplicationsStepWizard extends StepWizard {
 					
 					SplitPath exePath, , workingDirectory
 					
-					setConfigurationValue(configuration, application, "Exe Path", exePath)
-					setConfigurationValue(configuration, application, "Working Directory", workingDirectory)
-					setConfigurationValue(configuration, application, "Window Title", descriptor[4])
-					
 					hooks := string2Values(";", descriptor[5])
 					
-					if hooks[1]
-						setConfigurationValue(configuration, "Application Hooks", application . ".Startup", hooks[1])
-					
-					if hooks[2]
-						setConfigurationValue(configuration, "Application Hooks", application . ".Shutdown", hooks[2])
-					
-					if hooks[3]
-						setConfigurationValue(configuration, "Application Hooks", application . ".Running", hooks[3])
+					new Application(application, false, exePath, workingDirectory, descriptor[4], hooks[1], hooks[2], hooks[3]).saveToConfiguration(configuration)
 					
 					group := ConfigurationItem.splitDescriptor(applications)[2]
 					
@@ -2444,15 +2433,109 @@ class ButtonBoxStepWizard extends StepWizard {
 	}
 }
 
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; ButtonoxPreviewStepWizard                                               ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class ButtonBoxPreviewStepWizard extends StepWizard {
+	iButtonBoxPreviews := []
+	iButtonBoxPreviewCenterY := 0
+	
+	reset() {
+		base.reset()
+		
+		this.closeButtonBoxes()
+	}
+	
+	showPage(page) {
+		base.showPage(page)
+		
+		if this.SetupWizard.isModuleSelected("Button Box")
+			this.openButtonBoxes()
+	}
+	
+	hidePage(page) {
+		if base.hidePage(page) {
+			if this.SetupWizard.isModuleSelected("Button Box")
+				this.closeButtonBoxes()
+			
+			return true
+		}
+		else
+			return false
+	}
+	
+	getPreviewCenter(ByRef centerX, ByRef centerY) {
+		centerX := false
+		centerY := this.iButtonBoxPreviewCenterY
+	}
+	
+	getPreviewMover() {
+		return false
+	}
+	
+	openButtonBoxes() {
+		if this.SetupWizard.isModuleSelected("Button Box") {
+			configuration := readConfiguration(kUserHomeDirectory . "Install\Button Box Configuration.ini")
+			
+			controllers := []
+			
+			for controller, definition in getConfigurationSectionValues(configuration, "Layouts") {
+				controller := ConfigurationItem.splitDescriptor(controller)
+			
+				if !inList(controllers, controller[1])
+					controllers.Push(controller[1])
+			}
+			
+			for index, controller in controllers {
+				preview := new ButtonBoxPreview(this, controller, configuration)
+			
+				preview.setControlClickHandler(ObjBindMethod(this, "controlClick"))
+			
+				if (index = 1) {
+					SysGet mainScreen, MonitorWorkArea
+					
+					this.iButtonBoxPreviewCenterY := (mainScreenBottom - Round(preview.Height / 2))
+				}
+				else
+					this.iButtonBoxPreviewCenterY -= Round(preview.Height / 2)
+				
+				preview.open()
+				
+				this.iButtonBoxPreviewCenterY -= Round(preview.Height / 2)
+				this.iButtonBoxPreviews.Push(preview)
+			}
+		}
+		else
+			this.iButtonBoxPreviews := []
+	}
+	
+	closeButtonBoxes() {
+		for ignore, preview in this.iButtonBoxPreviews
+			preview.close()
+		
+		this.iButtonBoxPreviews := []
+		this.iButtonBoxPreviewCenterY := 0
+	}
+	
+	controlClick(element, function, row, column, isEmpty) {
+		Throw "Virtual method ButtonBoxPreviewStepWizard.controlClick must be implemented by a subclass..."
+	}
+}
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; GeneralStepWizard                                                       ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class GeneralStepWizard extends StepWizard {
+class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
+	iButtonBoxPreviews := []
+	
+	iLanguage := getLanguage()
+	iModeSelectors := []
+	
 	Pages[] {
 		Get {
-			return 0
+			return (this.SetupWizard.isModuleSelected("Button Box") ? 1 : 0)
 		}
 	}
 	
@@ -2464,8 +2547,6 @@ class GeneralStepWizard extends StepWizard {
 		
 		wizard := this.SetupWizard
 		
-		language := getLanguage()
-		
 		setConfigurationSectionValues(configuration, "Splash Window", getConfigurationSectionValues(this.SetupWizard.Definition, "Splash Window"))
 		setConfigurationSectionValues(configuration, "Splash Themes", getConfigurationSectionValues(this.SetupWizard.Definition, "Splash Themes"))
 		
@@ -2474,7 +2555,7 @@ class GeneralStepWizard extends StepWizard {
 		setConfigurationValue(configuration, "Configuration", "Debug", false)
 		
 		setConfigurationValue(configuration, "Configuration", "Silent Mode", false)
-		setConfigurationValue(configuration, "Configuration", "Language", language)
+		setConfigurationValue(configuration, "Configuration", "Language", this.iLanguage)
 		
 		if wizard.isSoftwareInstalled("NirCmd")
 			setConfigurationValue(configuration, "Configuration", "NirCmd Path", wizard.softwarePath("NirCmd"))
@@ -2492,7 +2573,7 @@ class GeneralStepWizard extends StepWizard {
 				deListener := wizard.isSoftwareInstalled("MSSpeechLibrary_de-DE")
 				
 				if (deListener && enListener)
-					setConfigurationValue(configuration, "Voice Control", "Language", language)
+					setConfigurationValue(configuration, "Voice Control", "Language", this.iLanguage)
 				else if enListener
 					setConfigurationValue(configuration, "Voice Control", "Language", "EN")
 				else
@@ -2500,9 +2581,22 @@ class GeneralStepWizard extends StepWizard {
 			}
 			else {
 				setConfigurationValue(configuration, "Voice Control", "Listener", false)
-				setConfigurationValue(configuration, "Voice Control", "Language", language)
+				setConfigurationValue(configuration, "Voice Control", "Language", this.iLanguage)
 			}
 		}
+		
+		arguments := ""
+		
+		if (this.iModeSelectors.Length() > 0)
+			arguments := ("modeSelectors: " . values2String(A_Space, this.iModeSelectors*))
+		
+		new Plugin("System", false, true, "", arguments).saveToConfiguration(configuration)
+	}
+	
+	reset() {
+		base.reset()
+		
+		this.iModeSelectors := []
 	}
 }
 
@@ -2510,10 +2604,8 @@ class GeneralStepWizard extends StepWizard {
 ;;; CommandsStepWizard                                                      ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class CommandsStepWizard extends StepWizard {
+class CommandsStepWizard extends ButtonBoxPreviewStepWizard {
 	iPendingFunctionRegistration := false
-	iButtonBoxPreviews := []
-	iButtonBoxPreviewCenterY := 0
 	
 	iCommandsListView := false
 	
@@ -2534,30 +2626,21 @@ class CommandsStepWizard extends StepWizard {
 		
 		this.clearCommands()
 		this.clearCommandFunctions()
-		
-		this.closeButtonBoxes()
 	}
 	
 	showPage(page) {
 		base.showPage(page)
 		
-		if this.SetupWizard.isModuleSelected("Button Box") {
-			this.openButtonBoxes()
-
+		if this.SetupWizard.isModuleSelected("Button Box")
 			this.loadCommands(true)
-		}
 		else
 			GuiControl Hide, % this.CommandsListView
-			
 	}
 	
 	hidePage(page) {
 		if base.hidePage(page) {
-			if this.SetupWizard.isModuleSelected("Button Box") {
-				this.closeButtonBoxes()
-			
+			if this.SetupWizard.isModuleSelected("Button Box")
 				this.saveCommands()
-			}
 			
 			return true
 		}
@@ -2612,58 +2695,10 @@ class CommandsStepWizard extends StepWizard {
 		this.iLabels := {}
 	}
 	
-	getPreviewCenter(ByRef centerX, ByRef centerY) {
-		centerX := false
-		centerY := this.iButtonBoxPreviewCenterY
-	}
-	
-	getPreviewMover() {
-		return false
-	}
-	
 	openButtonBoxes() {
-		if this.SetupWizard.isModuleSelected("Button Box") {
-			configuration := readConfiguration(kUserHomeDirectory . "Install\Button Box Configuration.ini")
-			
-			controllers := []
-			
-			for controller, definition in getConfigurationSectionValues(configuration, "Layouts") {
-				controller := ConfigurationItem.splitDescriptor(controller)
-			
-				if !inList(controllers, controller[1])
-					controllers.Push(controller[1])
-			}
-			
-			for index, controller in controllers {
-				preview := new ButtonBoxPreview(this, controller, configuration)
-			
-				preview.setControlClickHandler(ObjBindMethod(this, "controlClick"))
-			
-				if (index = 1) {
-					SysGet mainScreen, MonitorWorkArea
-					
-					this.iButtonBoxPreviewCenterY := (mainScreenBottom - Round(preview.Height / 2))
-				}
-				else
-					this.iButtonBoxPreviewCenterY -= Round(preview.Height / 2)
-				
-				preview.open()
-				
-				this.iButtonBoxPreviewCenterY -= Round(preview.Height / 2)
-				this.iButtonBoxPreviews.Push(preview)
-			}
-		}
-		else
-			this.iButtonBoxPreviews := []
-			
-		this.iPendingFunctionRegistration := false
-	}
-	
-	closeButtonBoxes() {
-		for ignore, preview in this.iButtonBoxPreviews
-			preview.close()
+		base.openButtonBoxes()
 		
-		this.iButtonBoxPreviews := []
+		this.iPendingFunctionRegistration := false
 	}
 	
 	resetButtonBoxes() {
@@ -2806,7 +2841,7 @@ class SimulatorsStepWizard extends CommandsStepWizard {
 								if (commands != "")
 									commands .= ", "
 								
-								commands .= (command . " " . values2String(" ", function*))
+								commands .= (command . A_Space . values2String(A_Space, function*))
 							}
 						}
 				
@@ -3120,7 +3155,7 @@ class AssistantsStepWizard extends CommandsStepWizard {
 							if (commands != "")
 								commands .= ", "
 							
-							commands .= (command . " " . values2String(" ", function*))
+							commands .= (command . A_Space . values2String(A_Space, function*))
 						}
 					}
 				
@@ -3148,13 +3183,13 @@ class AssistantsStepWizard extends CommandsStepWizard {
 						if (function.Length() > 0)
 							switch command {
 								case "RaceAssistant":
-									arguments .= ("; raceAssistant: On " . values2String(" ", function*))
+									arguments .= ("; raceAssistant: On " . values2String(A_Space, function*))
 								case "SetupDatabaseOpen":
-									arguments .= ("; openSetupDatabase: " . values2String(" ", function*))
+									arguments .= ("; openSetupDatabase: " . values2String(A_Space, function*))
 								case "RaceSettingsOpen":
-									arguments .= ("; openRaceSettings: " . values2String(" ", function*))
+									arguments .= ("; openRaceSettings: " . values2String(A_Space, function*))
 								case "SetupImport":
-									arguments .= ("; importSetup: " . values2String(" ", function*))
+									arguments .= ("; importSetup: " . values2String(A_Space, function*))
 								default:
 									Throw "Unsupported special command detected in AssistantsStepWizard.saveToConfiguration..."
 							}

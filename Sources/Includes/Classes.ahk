@@ -598,7 +598,7 @@ class DialFunction extends Function {
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; [Controller Functions}:  Action for Custom Controls                     ;;;
+;;; [Controller Functions}:  Function for Custom Controls                   ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class CustomFunction extends Function {

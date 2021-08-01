@@ -40,6 +40,7 @@ ListLines Off					; Disable execution history
 #Include ..\Controller\Libraries\SettingsEditor.ahk
 #Include Libraries\ConfigurationEditor.ahk
 #Include Libraries\ButtonBoxEditor.ahk
+#Include ..\Plugins\Voice Control Configuration Plugin.ahk
 #Include ..\Plugins\Race Engineer Configuration Plugin.ahk
 #Include ..\Plugins\Race Strategist Configuration Plugin.ahk
 
@@ -2617,15 +2618,17 @@ class ButtonBoxPreviewStepWizard extends StepWizard {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
+	iVoiceControlConfigurator := false
+	
 	iLanguage := getLanguage()
 	iModeSelectors := []
 	
 	iModeSelectorsLabelHandle := false
-	iModeSelectorsFieldHandle := false
+	iModeSelectorsListHandle := false
 	
 	Pages[] {
 		Get {
-			return (this.SetupWizard.isModuleSelected("Button Box") ? 1 : 0)
+			return 1
 		}
 	}
 	
@@ -2654,18 +2657,25 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 		Gui %window%:Font, s8 Norm, Arial
 		
 		modeSelectorsLabelHandle := false
-		modeSelectorsFieldHandle := false
+		modeSelectorsListHandle := false
 	
 		secondX := x + 105
 		secondWidth := width - 105
 		
-		Gui %window%:Add, Text, x%x% yp+33 w105 h23 +0x200 HWNDmodeSelectorLabelHandle Hidden, % translate("Mode Selector")
+		Gui %window%:Add, Text, x%x% yp+33 w105 h23 +0x200 HWNDmodeSelectorsLabelHandle Hidden, % translate("Mode Selector")
 		
 		Gui %window%:Font, s8 Bold, Arial
 		
-		Gui %window%:Add, Edit, x%secondX% yp w%secondWidth% Disabled HWNDmodeSelectorEditHandle Hidden
+		Gui %window%:Add, ListBox, x%secondX% yp w120 h60 Disabled HWNDmodeSelectorsListHandle Hidden
 		
 		Gui %window%:Font, s8 Norm, Arial
+		
+		configurator := new VoiceControlConfigurator(this)
+		
+		this.iVoiceControlConfigurator := configurator
+		
+		configurator.createGui(this, secondX + 200, labelY + 33, width - 200 - secondX, height, 0)
+		configurator.hideWidgets()
 		
 		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.General", "General.General.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'>" . info . "</div>"
@@ -2677,10 +2687,17 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 		generalInfoText.Navigate("about:blank")
 		generalInfoText.Document.Write(html)
 		
-		this.iModeSelectorsLabelHandle := modeSelectorLabelHandle
-		this.iModeSelectorsFieldHandle := modeSelectorEditHandle
+		this.iModeSelectorsLabelHandle := modeSelectorsLabelHandle
+		this.iModeSelectorsListHandle := modeSelectorsListHandle
 		
-		this.registerWidgets(1, generalIconHandle, generalLabelHandle, modeSelectorLabelHandle, modeSelectorEditHandle, generalInfoTextHandle)
+		this.registerWidgets(1, generalIconHandle, generalLabelHandle, modeSelectorsLabelHandle, modeSelectorsListHandle, generalInfoTextHandle)
+	}
+	
+	registerWidget(page, widget) {
+		if (page = this.iVoiceControlConfigurator)
+			base.registerWidget(1, widget)
+		else
+			base.registerWidget(page, widget)
 	}
 	
 	saveToConfiguration(configuration) {
@@ -2737,8 +2754,9 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 	reset() {
 		base.reset()
 		
+		this.iVoiceControlConfigurator := false
 		this.iModeSelectorsLabelHandle := false
-		this.iModeSelectorsFieldHandle := false
+		this.iModeSelectorsListHandle := false
 		this.iModeSelectors := []
 	}
 	
@@ -2746,16 +2764,21 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 		base.showPage(page)
 		
 		this.iModeSelectors := this.SetupWizard.getModeSelectors()
+		
+		this.iVoiceControlConfigurator.hideWidgets()
+			
+		if this.SetupWizard.isModuleSelected("Voice Control")
+			this.iVoiceControlConfigurator.showWidgets()
 			
 		if this.SetupWizard.isModuleSelected("Button Box") {
-			field := this.iModeSelectorsFieldHandle
+			listBox := this.iModeSelectorsListHandle
 			
-			GuiControl Disable, %field%
-			GuiControl, , %field%, % values2String(", ", this.iModeSelectors*)
+			GuiControl Disable, %listBox%
+			GuiControl, , %listBox%, % "|" . values2String("|", this.iModeSelectors*)
 		}
 		else {
 			GuiControl Hide, % this.iModeSelectorsLabelHandle
-			GuiControl Hide, % this.iModeSelectorsFieldHandle
+			GuiControl Hide, % this.iModeSelectorsListHandle
 		}
 	}
 	
@@ -2775,9 +2798,9 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 			
 			SoundPlay %kResourcesDirectory%Sounds\Activated.wav
 			
-			field := this.iModeSelectorsFieldHandle
+			listBox := this.iModeSelectorsListHandle
 			
-			GuiControl, , %field%, % values2String(", ", this.iModeSelectors*)
+			GuiControl, , %listBox%, % "|" . values2String("|", this.iModeSelectors*)
 			
 			this.SetupWizard.addControllerStaticFunction("System", function, translate("Mode Selector"))
 			
@@ -2793,9 +2816,9 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 			
 			SoundPlay %kResourcesDirectory%Sounds\Activated.wav
 			
-			field := this.iModeSelectorsFieldHandle
+			listBox := this.iModeSelectorsListHandle
 			
-			GuiControl, , %field%, % values2String(", ", this.iModeSelectors*)
+			GuiControl, , %field%, % "|" . values2String("|", this.iModeSelectors*)
 			
 			this.SetupWizard.removeControllerStaticFunction("System", function)
 			
@@ -3185,7 +3208,7 @@ class SimulatorsStepWizard extends CommandsStepWizard {
 		Gui %window%:Font, s10 Bold, Arial
 		
 		Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDcommandsIconHandle Hidden, %kResourcesDirectory%Setup\Images\Controller.ico
-		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h30 HWNDcommandsLabelHandle Hidden Section, % translate("Controller Assignments for Simulators")
+		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h30 HWNDcommandsLabelHandle Hidden Section, % translate("Simulator(s) Configuration")
 		
 		Gui %window%:Font, s8 Norm, Arial
 
@@ -3532,7 +3555,7 @@ class AssistantsStepWizard extends CommandsStepWizard {
 			
 			Gui %window%:Font, s10 Bold, Arial
 		
-			label := substituteVariables(translate("Configuration for %assistant%"), {assistant: translate(assistant)})
+			label := substituteVariables(translate("%assistant% Configuration"), {assistant: translate(assistant)})
 			
 			Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDcommandsIconHandle Hidden, %kResourcesDirectory%Setup\Images\Controller.ico
 			Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h30 HWNDcommandsLabelHandle Hidden Section, % label
@@ -4317,10 +4340,10 @@ initializeSimulatorSetup() {
 		wizard := new SetupWizard(kSimulatorConfiguration, definition)
 		
 		;~ wizard.registerStepWizard(new StartStepWizard(wizard, "Start", kSimulatorConfiguration))
-		;~ wizard.registerStepWizard(new ModulesStepWizard(wizard, "Modules", kSimulatorConfiguration))
+		wizard.registerStepWizard(new ModulesStepWizard(wizard, "Modules", kSimulatorConfiguration))
 		;~ wizard.registerStepWizard(new InstallationStepWizard(wizard, "Installation", kSimulatorConfiguration))
 		;~ wizard.registerStepWizard(new ApplicationsStepWizard(wizard, "Applications", kSimulatorConfiguration))
-		;~ wizard.registerStepWizard(new ButtonBoxStepWizard(wizard, "Button Box", kSimulatorConfiguration))
+		;- wizard.registerStepWizard(new ButtonBoxStepWizard(wizard, "Button Box", kSimulatorConfiguration))
 		wizard.registerStepWizard(new GeneralStepWizard(wizard, "General", kSimulatorConfiguration))
 		wizard.registerStepWizard(new SimulatorsStepWizard(wizard, "Simulators", kSimulatorConfiguration))
 		wizard.registerStepWizard(new AssistantsStepWizard(wizard, "Assistants", kSimulatorConfiguration))

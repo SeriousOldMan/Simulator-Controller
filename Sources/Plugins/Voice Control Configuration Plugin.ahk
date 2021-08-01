@@ -22,17 +22,17 @@
 ;;; VoiceControlConfigurator                                                ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-global voiceLanguageDropDown
-global voiceSynthesizerDropDown
+global voiceLanguageDropDown = 1
+global voiceSynthesizerDropDown = 1
 
 global windowsSpeakerLabel
 global windowsSpeakerDropDown
 global windowsSpeakerVolumeLabel
-global speakerVolumeSlider
+global speakerVolumeSlider = 100
 global windowsSpeakerPitchLabel
-global speakerPitchSlider
+global speakerPitchSlider = 0
 global windowsSpeakerSpeedLabel
-global speakerSpeedSlider
+global speakerSpeedSlider = 0
 
 global azureSubscriptionKeyLabel
 global azureSubscriptionKeyEdit = ""
@@ -46,7 +46,7 @@ global soXPathLabel2
 global soXPathEdit = ""
 global soXPathButton
 global listenerLabel
-global listenerDropDown
+global listenerDropDown = ""
 global pushToTalkLabel
 global pushToTalkEdit = ""
 global pushToTalkButton
@@ -56,9 +56,14 @@ global activationCommandEdit = ""
 class VoiceControlConfigurator extends ConfigurationItem {
 	iEditor := false
 	
+	iMode := false
+
+	iTopWidgets := []
 	iWindowsVoiceWidgets := []
 	iAzureVoiceWidgets := []
 	iOtherWidgets := []
+	
+	iCorrection := 0
 	
 	Editor[] {
 		Get {
@@ -74,7 +79,9 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		VoiceControlConfigurator.Instance := this
 	}
 	
-	createGui(editor, x, y, width, height) {
+	createGui(editor, x, y, width, height, correction := 71) {
+		this.iCorrection := correction
+		
 		window := editor.Window
 		
 		Gui %window%:Font, Norm, Arial
@@ -117,37 +124,44 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		if (chosen == 0)
 			chosen := enIndex
 		
-		Gui %window%:Add, Text, x16 y80 w110 h23 +0x200, % translate("Language")
-		Gui %window%:Add, DropDownList, x134 yp w160 Choose%chosen% VvoiceLanguageDropDown GupdateVoices, % values2String("|", choices*)
+		x0 := x + 8
+		x1 := x + 118
+		x2 := x + 230
+		x3 := x + 434
+		
+		Gui %window%:Add, Text, x%x% y%y% w110 h23 +0x200 HWNDwidget1 Hidden, % translate("Language")
+		Gui %window%:Add, DropDownList, x%x1% yp w160 Choose%chosen% HWNDwidget2 VvoiceLanguageDropDown GupdateVoices Hidden, % values2String("|", choices*)
 		
 		choices := choices := ["Windows Speech", "Azure Cognitive Services"]
 		chosen := voiceSynthesizerDropDown
 		
-		Gui %window%:Add, Text, x16 yp+32 w110 h23 +0x200 Section, % translate("Speech Synthesizer")
-		Gui %window%:Add, DropDownList, AltSubmit x134 yp w160 Choose%chosen% gchooseVoiceSynthesizer VvoiceSynthesizerDropDown, % values2String("|", map(choices, "translate")*)
+		Gui %window%:Add, Text, x%x% yp+32 w110 h23 +0x200 HWNDwidget3 Section Hidden, % translate("Speech Synthesizer")
+		Gui %window%:Add, DropDownList, AltSubmit x%x1% yp w160 Choose%chosen% HWNDwidget4 gchooseVoiceSynthesizer VvoiceSynthesizerDropDown Hidden, % values2String("|", map(choices, "translate")*)
+		
+		this.iTopWidgets := [[widget1, widget2], [widget3, widget4]]
 		
 		voices := [translate("Automatic"), translate("Deactivated")]
 		
-		Gui %window%:Add, Text, x16 ys+24 w110 h23 +0x200 VwindowsSpeakerLabel, % translate("Voice")
-		Gui %window%:Add, DropDownList, x134 yp w340 VwindowsSpeakerDropDown, % values2String("|", voices*)
+		Gui %window%:Add, Text, x%x% ys+24 w110 h23 +0x200 HWNDwidget5 VwindowsSpeakerLabel Hidden, % translate("Voice")
+		Gui %window%:Add, DropDownList, x%x1% yp w340 HWNDwidget6 VwindowsSpeakerDropDown Hidden, % values2String("|", voices*)
 		
-		Gui %window%:Add, Text, x16 ys+24 w110 h23 +0x200 VwindowsSpeakerVolumeLabel, % translate("Volume")
-		Gui %window%:Add, Slider, x134 yp w135 0x10 Range0-100 ToolTip VspeakerVolumeSlider, % speakerVolumeSlider
+		Gui %window%:Add, Text, x%x% ys+24 w110 h23 +0x200 HWNDwidget6 VwindowsSpeakerVolumeLabel Hidden, % translate("Volume")
+		Gui %window%:Add, Slider, x%x1% yp w135 0x10 Range0-100 ToolTip HWNDwidget7 VspeakerVolumeSlider Hidden, % speakerVolumeSlider
 		
-		Gui %window%:Add, Text, x16 yp+24 w110 h23 +0x200 VwindowsSpeakerPitchLabel, % translate("Pitch")
-		Gui %window%:Add, Slider, x134 yp w135 0x10 Range-10-10 ToolTip VspeakerPitchSlider, % speakerPitchSlider
+		Gui %window%:Add, Text, x%x% yp+24 w110 h23 +0x200 HWNDwidget8 VwindowsSpeakerPitchLabel Hidden, % translate("Pitch")
+		Gui %window%:Add, Slider, x%x1% yp w135 0x10 Range-10-10 ToolTip HWNDwidget9 VspeakerPitchSlider Hidden, % speakerPitchSlider
 		
-		Gui %window%:Add, Text, x16 yp+24 w110 h23 +0x200 VwindowsSpeakerSpeedLabel, % translate("Speed")
-		Gui %window%:Add, Slider, x134 yp w135 0x10 Range-10-10 ToolTip VspeakerSpeedSlider, % speakerSpeedSlider
+		Gui %window%:Add, Text, x%x% yp+24 w110 h23 +0x200 HWNDwidget10 VwindowsSpeakerSpeedLabel Hidden, % translate("Speed")
+		Gui %window%:Add, Slider, x%x1% yp w135 0x10 Range-10-10 ToolTip HWNDwidget11 VspeakerSpeedSlider Hidden, % speakerSpeedSlider
 		
 		this.iWindowsVoiceWidgets := [["windowsSpeakerLabel", "windowsSpeakerDropDown"]]
 		
-		Gui %window%:Add, Text, x16 yp+24 w140 h23 +0x200 VsoXPathLabel1, % translate("SoX Folder (optional)")
+		Gui %window%:Add, Text, x%x% yp+24 w140 h23 +0x200 HWNDwidget12 VsoXPathLabel1 Hidden, % translate("SoX Folder (optional)")
 		Gui %window%:Font, c505050 s8
-		Gui %window%:Add, Text, x24 yp+18 w133 h23 VsoXPathLabel2, % translate("(Post Processing)")
+		Gui %window%:Add, Text, x%x0% yp+18 w133 h23 HWNDwidget13 VsoXPathLabel2 Hidden, % translate("(Post Processing)")
 		Gui %window%:Font
-		Gui %window%:Add, Edit, x134 yp-18 w314 h21 VsoXPathEdit, %soXPathEdit%
-		Gui %window%:Add, Button, x450 yp w23 h23 gchooseSoXPath VsoXPathButton, % translate("...")
+		Gui %window%:Add, Edit, x%x1% yp-18 w314 h21 HWNDwidget14 VsoXPathEdit Hidden, %soXPathEdit%
+		Gui %window%:Add, Button, x%x3% yp w23 h23 gchooseSoXPath HWNDwidget15 VsoXPathButton Hidden, % translate("...")
 
 		recognizers := new SpeechRecognizer(false, false, true).getRecognizerList().Clone()
 		
@@ -162,16 +176,16 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		if (chosen == 0)
 			chosen := 1
 		
-		Gui %window%:Add, Text, x16 yp+42 w110 h23 +0x200 VlistenerLabel, % translate("Speech Recognizer")
-		Gui %window%:Add, DropDownList, x134 yp w340 Choose%chosen% VlistenerDropDown, % values2String("|", recognizers*)
+		Gui %window%:Add, Text, x%x% yp+42 w110 h23 +0x200 HWNDwidget16 VlistenerLabel Hidden, % translate("Speech Recognizer")
+		Gui %window%:Add, DropDownList, x%x1% yp w340 Choose%chosen% HWNDwidget17 VlistenerDropDown Hidden, % values2String("|", recognizers*)
 		
-		Gui %window%:Add, Text, x16 yp+24 w110 h23 +0x200 VpushToTalkLabel, % translate("Push To Talk")
-		Gui %window%:Add, Edit, x134 yp w110 h21 VpushToTalkEdit, %pushToTalkEdit%
-		Gui %window%:Add, Button, x246 yp-1 w23 h23 ggetPTTHotkey HwnddetectPTTButtonHandle VpushToTalkButton
+		Gui %window%:Add, Text, x%x% yp+24 w110 h23 +0x200 HWNDwidget18 VpushToTalkLabel Hidden, % translate("Push To Talk")
+		Gui %window%:Add, Edit, x%x1% yp w110 h21 HWNDwidget19 VpushToTalkEdit Hidden, %pushToTalkEdit%
+		Gui %window%:Add, Button, x%x2% yp-1 w23 h23 HWNDwidget20 ggetPTTHotkey HwnddetectPTTButtonHandle VpushToTalkButton Hidden
 		setButtonIcon(detectPTTButtonHandle, kIconsDirectory . "Key.ico", 1)
 		
-		Gui %window%:Add, Text, x16 yp+24 w110 h23 +0x200 VactivationCommandLabel, % translate("Activation Command")
-		Gui %window%:Add, Edit, x134 yp w135 h21 VactivationCommandEdit, %activationCommandEdit%
+		Gui %window%:Add, Text, x%x% yp+24 w110 h23 +0x200 HWNDwidget21 VactivationCommandLabel Hidden, % translate("Activation Command")
+		Gui %window%:Add, Edit, x%x1% yp w135 h21 HWNDwidget22 VactivationCommandEdit Hidden, %activationCommandEdit%
 		
 		this.iOtherWidgets := [["windowsSpeakerVolumeLabel", "speakerVolumeSlider"]
 							 , ["windowsSpeakerPitchLabel", "speakerPitchSlider"]
@@ -180,21 +194,25 @@ class VoiceControlConfigurator extends ConfigurationItem {
 							 , ["listenerLabel", "listenerDropDown"], ["pushToTalkLabel", "pushToTalkEdit", "pushToTalkButton"],
 							 , ["activationCommandLabel", "activationCommandEdit"]]
 		
-		Gui %window%:Add, Text, x16 ys+24 w140 h23 +0x200 VazureSubscriptionKeyLabel, % translate("Subscription Key")
-		Gui %window%:Add, Edit, x134 yp w340 h21 VazureSubscriptionKeyEdit GupdateAzureVoices, %azureSubscriptionKeyEdit%
+		Gui %window%:Add, Text, x%x% ys+24 w140 h23 +0x200 HWNDwidget23 VazureSubscriptionKeyLabel Hidden, % translate("Subscription Key")
+		Gui %window%:Add, Edit, x%x1% yp w340 h21 HWNDwidget24 VazureSubscriptionKeyEdit GupdateAzureVoices Hidden, %azureSubscriptionKeyEdit%
 		
-		Gui %window%:Add, Text, x16 yp+24 w140 h23 +0x200 VazureTokenIssuerLabel, % translate("Token Issuer Endpoint")
-		Gui %window%:Add, Edit, x134 yp w340 h21 VazureTokenIssuerEdit GupdateAzureVoices, %azureTokenIssuerEdit%
+		Gui %window%:Add, Text, x%x% yp+24 w140 h23 +0x200 HWNDwidget25 VazureTokenIssuerLabel Hidden, % translate("Token Issuer Endpoint")
+		Gui %window%:Add, Edit, x%x1% yp w340 h21 HWNDwidget26 VazureTokenIssuerEdit GupdateAzureVoices Hidden, %azureTokenIssuerEdit%
 		
 		voices := [translate("Automatic"), translate("Deactivated")]
 		
-		Gui %window%:Add, Text, x16 yp+24 w110 h23 +0x200 VazureSpeakerLabel, % translate("Voice")
-		Gui %window%:Add, DropDownList, x134 yp w340 VazureSpeakerDropDown, % values2String("|", voices*)
+		Gui %window%:Add, Text, x%x% yp+24 w110 h23 +0x200 HWNDwidget27 VazureSpeakerLabel Hidden, % translate("Voice")
+		Gui %window%:Add, DropDownList, x%x1% yp w340 HWNDwidget28 VazureSpeakerDropDown Hidden, % values2String("|", voices*)
 		
 		this.iAzureVoiceWidgets := [["azureSubscriptionKeyLabel", "azureSubscriptionKeyEdit"], ["azureTokenIssuerLabel", "azureTokenIssuerEdit"], ["azureSpeakerLabel", "azureSpeakerDropDown"]]
 
 		this.updateVoices()
 		
+		Loop 28
+			editor.registerWidget(this, widget%A_Index%)
+		
+		hideWidgets(this.iTopWidgets)
 		hideWidgets(this.iWindowsVoiceWidgets)
 		hideWidgets(this.iAzureVoiceWidgets)
 		hideWidgets(this.iOtherWidgets)
@@ -308,28 +326,63 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		setConfigurationValue(configuration, "Voice Control", "ActivationCommand", (Trim(activationCommandEdit) = "") ? false : activationCommandEdit)
 	}
 	
+	showWidgets() {
+		if !voiceSynthesizerDropDown
+			voiceSynthesizerDropDown := 1
+		
+		if (voiceSynthesizerDropDown == 1)
+			this.showWindowsVoiceEditor()
+		else
+			this.showAzureVoiceEditor()
+	}
+	
+	hideWidgets() {
+		hideWidgets(this.iTopWidgets)
+		hideWidgets(this.iWindowsVoiceWidgets)
+		hideWidgets(this.iAzureVoiceWidgets)
+		hideWidgets(this.iOtherWidgets)
+	}
+	
 	showWindowsVoiceEditor() {
+		showWidgets(this.iTopWidgets)
 		showWidgets(this.iWindowsVoiceWidgets)
-		translateWidgets(this.iOtherWidgets, 24 * this.iWindowsVoiceWidgets.Length())
+		
+		if (this.iMode != "Windows")
+			transposeWidgets(this.iOtherWidgets, 24 * this.iWindowsVoiceWidgets.Length(), this.iCorrection)
+		
 		showWidgets(this.iOtherWidgets)
+		
+		this.iMode := false
 	}
 	
 	hideWindowsVoiceEditor() {
+		hideWidgets(this.iTopWidgets)
 		hideWidgets(this.iWindowsVoiceWidgets)
 		hideWidgets(this.iOtherWidgets)
-		translateWidgets(this.iOtherWidgets, -24 * this.iWindowsVoiceWidgets.Length())
+		transposeWidgets(this.iOtherWidgets, -24 * this.iWindowsVoiceWidgets.Length(), this.iCorrection)
+		
+		this.iMode := false
 	}
 	
 	showAzureVoiceEditor() {
+		showWidgets(this.iTopWidgets)
 		showWidgets(this.iAzureVoiceWidgets)
-		translateWidgets(this.iOtherWidgets, 24 * this.iAzureVoiceWidgets.Length())
+		
+		if (this.iMode != "Azure")
+			transposeWidgets(this.iOtherWidgets, 24 * this.iAzureVoiceWidgets.Length(), this.iCorrection)
+		
 		showWidgets(this.iOtherWidgets)
+		
+		this.iMode := "Azure"
 	}
 	
 	hideAzureVoiceEditor() {
+		hideWidgets(this.iTopWidgets)
 		hideWidgets(this.iAzureVoiceWidgets)
 		hideWidgets(this.iOtherWidgets)
-		translateWidgets(this.iOtherWidgets, -24 * this.iAzureVoiceWidgets.Length())
+		transposeWidgets(this.iOtherWidgets, -24 * this.iAzureVoiceWidgets.Length(), this.iCorrection)
+		
+		this.iMode := false
 	}
 	
 	getCurrentLanguage() {
@@ -454,9 +507,7 @@ hideWidgets(widgets) {
 		}
 }
 
-translateWidgets(widgets, offset) {
-	correction := 71
-	
+transposeWidgets(widgets, offset, correction) {
 	for ignore, widget in widgets
 		for ignore, widgetPart in widget {
 			GuiControlGet tempPos, Pos, %widgetPart%

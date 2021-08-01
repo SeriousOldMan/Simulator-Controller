@@ -2719,6 +2719,7 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 			setConfigurationValue(configuration, "Configuration", "NirCmd Path", wizard.softwarePath("NirCmd"))
 		
 		if wizard.isModuleSelected("Voice Control") {
+			/*
 			if wizard.isSoftwareInstalled("SoX")
 				setConfigurationValue(configuration, "Voice Control", "SoX Path", wizard.softwarePath("SoX"))
 		
@@ -2740,6 +2741,16 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 			else {
 				setConfigurationValue(configuration, "Voice Control", "Listener", false)
 				setConfigurationValue(configuration, "Voice Control", "Language", this.iLanguage)
+			}
+			*/
+			
+			voiceControlConfiguration := readConfiguration(kUserHomeDirectory . "Install\Voice Control Configuration.ini")
+		
+			for ignore, section in ["Voice Control"] {
+				subConfiguration := getConfigurationSectionValues(voiceControlConfiguration, section, false)
+				
+				if subConfiguration
+					setConfigurationSectionValues(configuration, section, subConfiguration)
 			}
 		}
 		
@@ -2767,8 +2778,21 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 		
 		this.iVoiceControlConfigurator.hideWidgets()
 			
-		if this.SetupWizard.isModuleSelected("Voice Control")
+		if this.SetupWizard.isModuleSelected("Voice Control") {
+			configuration := this.SetupWizard.getSimulatorConfiguration()
+			voiceControlConfiguration := readConfiguration(kUserHomeDirectory . "Install\Voice Control Configuration.ini")
+		
+			for ignore, section in ["Voice Control"] {
+				subConfiguration := getConfigurationSectionValues(voiceControlConfiguration, section, false)
+				
+				if subConfiguration
+					setConfigurationSectionValues(configuration, section, subConfiguration)
+			}
+		
+			
+			this.iVoiceControlConfigurator.loadFromConfiguration(configuration)
 			this.iVoiceControlConfigurator.showWidgets()
+		}
 			
 		if this.SetupWizard.isModuleSelected("Button Box") {
 			listBox := this.iModeSelectorsListHandle

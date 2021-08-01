@@ -773,7 +773,18 @@ class SetupWizard extends ConfigurationItem {
 		return this.KnowledgeBase.getValue("Application." . application . ".Path", false)
 	}
 	
-	setControllerStaticFunction(reference, function, label) {
+	setModeSelectors(modeSelectors) {
+		if (modeSelectors.Length() > 0)
+			this.KnowledgeBase.setFact("Controller.Mode.Selectors", values2String("|", modeSelectors*))
+		else
+			this.KnowledgeBase.removeFact("Controller.Mode.Selectors")
+	}
+	
+	getModeSelectors() {
+		return string2Values("|", this.KnowledgeBase.getValue("Controller.Mode.Selectors", ""))
+	}
+	
+	addControllerStaticFunction(reference, function, label) {
 		local knowledgeBase := this.KnowledgeBase
 		
 		functions := string2Values("|", knowledgeBase.getValue("Controller.Function.Static", ""))
@@ -2606,10 +2617,11 @@ class ButtonBoxPreviewStepWizard extends StepWizard {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
-	iButtonBoxPreviews := []
-	
 	iLanguage := getLanguage()
 	iModeSelectors := []
+	
+	iModeSelectorsLabelHandle := false
+	iModeSelectorsFieldHandle := false
 	
 	Pages[] {
 		Get {
@@ -2618,6 +2630,57 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 	}
 	
 	createGui(wizard, x, y, width, height) {
+		static generalInfoText
+		
+		labelY := y
+		
+		window := this.Window
+		
+		Gui %window%:Default
+		
+		generalIconHandle := false
+		generalLabelHandle := false
+		generalInfoTextHandle := false
+		
+		labelWidth := width - 30
+		labelX := x + 45
+		labelY := y + 5
+		
+		Gui %window%:Font, s10 Bold, Arial
+		
+		Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDgeneralIconHandle Hidden, %kResourcesDirectory%Setup\Images\Gears.ico
+		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h30 HWNDgeneralLabelHandle Hidden, % translate("Global Configuration")
+		
+		Gui %window%:Font, s8 Norm, Arial
+		
+		modeSelectorsLabelHandle := false
+		modeSelectorsFieldHandle := false
+	
+		secondX := x + 105
+		secondWidth := width - 105
+		
+		Gui %window%:Add, Text, x%x% yp+33 w105 h23 +0x200 HWNDmodeSelectorLabelHandle Hidden, % translate("Mode Selector")
+		
+		Gui %window%:Font, s8 Bold, Arial
+		
+		Gui %window%:Add, Edit, x%secondX% yp w%secondWidth% Disabled HWNDmodeSelectorEditHandle Hidden
+		
+		Gui %window%:Font, s8 Norm, Arial
+		
+		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.General", "General.General.Info." . getLanguage()))
+		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'>" . info . "</div>"
+
+		Gui %window%:Add, ActiveX, x%x% yp+30 w%width% h180 HWNDgeneralInfoTextHandle VgeneralInfoText Hidden, shell explorer
+
+		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+
+		generalInfoText.Navigate("about:blank")
+		generalInfoText.Document.Write(html)
+		
+		this.iModeSelectorsLabelHandle := modeSelectorLabelHandle
+		this.iModeSelectorsFieldHandle := modeSelectorEditHandle
+		
+		this.registerWidgets(1, generalIconHandle, generalLabelHandle, modeSelectorLabelHandle, modeSelectorEditHandle, generalInfoTextHandle)
 	}
 	
 	saveToConfiguration(configuration) {
@@ -2674,7 +2737,113 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 	reset() {
 		base.reset()
 		
+		this.iModeSelectorsLabelHandle := false
+		this.iModeSelectorsFieldHandle := false
 		this.iModeSelectors := []
+	}
+	
+	showPage(page) {
+		base.showPage(page)
+		
+		this.iModeSelectors := this.SetupWizard.getModeSelectors()
+			
+		if this.SetupWizard.isModuleSelected("Button Box") {
+			field := this.iModeSelectorsFieldHandle
+			
+			GuiControl Disable, %field%
+			GuiControl, , %field%, % values2String(", ", this.iModeSelectors*)
+		}
+		else {
+			GuiControl Hide, % this.iModeSelectorsLabelHandle
+			GuiControl Hide, % this.iModeSelectorsFieldHandle
+		}
+	}
+	
+	hidePage(page) {
+		if base.hidePage(page) {
+			this.SetupWizard.setModeSelectors(this.iModeSelectors)
+			
+			return true
+		}
+		else
+			return false
+	}
+	
+	addModeSelector(preview, function, control, row, column) {
+		if !inList(this.iModeSelectors, function) {
+			this.iModeSelectors.Push(function)
+			
+			SoundPlay %kResourcesDirectory%Sounds\Activated.wav
+			
+			field := this.iModeSelectorsFieldHandle
+			
+			GuiControl, , %field%, % values2String(", ", this.iModeSelectors*)
+			
+			this.SetupWizard.addControllerStaticFunction("System", function, translate("Mode Selector"))
+			
+			preview.setLabel(row, column, translate("Mode Selector"))
+		}
+	}
+			
+	removeModeSelector(preview, function, control, row, column) {
+		index := inList(this.iModeSelectors, function)
+		
+		if index {
+			this.iModeSelectors.RemoveAt(index)
+			
+			SoundPlay %kResourcesDirectory%Sounds\Activated.wav
+			
+			field := this.iModeSelectorsFieldHandle
+			
+			GuiControl, , %field%, % values2String(", ", this.iModeSelectors*)
+			
+			this.SetupWizard.removeControllerStaticFunction("System", function)
+			
+			preview.setLabel(row, column, ConfigurationItem.splitDescriptor(control)[2])
+			
+			for ignore, function in this.SetupWizard.getControllerStaticFunctions()
+				if preview.findFunction(function[1], row, column)
+					preview.setLabel(row, column, function[2])
+		}
+	}
+	
+	controlClick(preview, element, function, row, column, isEmpty) {
+		if (element[1] = "Control") {
+			menuItem := (translate(element[1] . ": ") . element[2] . " (" . row . " x " . column . ")")
+				
+			try {
+				Menu ContextMenu, DeleteAll
+			}
+			catch exception {
+				; ignore
+			}
+			
+			window := SetupWizard.Instance.WizardWindow
+			
+			Gui %window%:Default
+			
+			Menu ContextMenu, Add, %menuItem%, menuIgnore
+			Menu ContextMenu, Disable, %menuItem%
+			Menu ContextMenu, Add
+			
+			menuItem := translate("Set Mode Selector")
+			handler := ObjBindMethod(this, "addModeSelector", preview, function, element[2], row, column)
+			
+			Menu ContextMenu, Add, %menuItem%, %handler%
+			
+			if inList(this.iModeSelectors, function)
+				Menu ContextMenu, Disable, %menuItem%
+			
+			menuItem := translate("Clear Mode Selector")
+			handler := ObjBindMethod(this, "removeModeSelector", preview, function, element[2], row, column)
+			
+			Menu ContextMenu, Add, %menuItem%, %handler%
+			
+			if !inList(this.iModeSelectors, function)
+				Menu ContextMenu, Disable, %menuItem%
+			
+			Menu ContextMenu, Show
+		}
 	}
 }
 
@@ -2824,105 +2993,107 @@ class CommandsStepWizard extends ButtonBoxPreviewStepWizard {
 	}
 	
 	controlClick(preview, element, function, row, column, isEmpty) {
-		if !this.iPendingFunctionRegistration {
-			menuItem := (translate(element[1] . ": ") . element[2] . " (" . row . " x " . column . ")")
-			
-			try {
-				Menu ContextMenu, DeleteAll
-			}
-			catch exception {
-				; ignore
-			}
-			
-			window := SetupWizard.Instance.WizardWindow
-			
-			Gui %window%:Default
-			
-			Menu ContextMenu, Add, %menuItem%, menuIgnore
-			Menu ContextMenu, Disable, %menuItem%
-			Menu ContextMenu, Add
-			
-			menuItem := translate("Clear Action")
-			handler := ObjBindMethod(this, "clearAction", preview, function, element[2], row, column)
-			
-			Menu ContextMenu, Add, %menuItem%, %handler%
-			
-			Menu ContextMenu, Show
-		}
-		else {
-			SoundPlay %kResourcesDirectory%Sounds\Activated.wav
-		
-			command := this.getCommand(this.iPendingFunctionRegistration)
-			commandDescriptor := this.getCommandDescriptor(this.iPendingFunctionRegistration)
-			functionType := ConfigurationItem.splitDescriptor(function)[1]
-			
-			if (((functionType == k2WayToggleType) || (functionType == kDialType)) && (commandDescriptor[2] == "Toggle"))
-				function := [function]
-			else if (commandDescriptor[2] == "Activate")
-				function := [function]
-			else {
-				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Increase", "Decrease", "Cancel"]))
-				title := translate("Setup")
-				MsgBox 262179, %title%, % translate("What type of action do you want to trigger for ") . command . translate("?")
-				OnMessage(0x44, "")
+		if (element[1] = "Control") {
+			if !this.iPendingFunctionRegistration {
+				menuItem := (translate(element[1] . ": ") . element[2] . " (" . row . " x " . column . ")")
 				
-				currentFunction := this.getCommandFunction(command)
-				
-				IfMsgBox Cancel
-					function := false
-			
-				IfMsgBox Yes
-				{
-					if currentFunction {
-						if (currentFunction.Length() == 1)
-							function := [function, ""]
-						else {
-							currentFunction[1] := function
-							
-							function := currentFunction
-						}
-					}
-					else
-						function := [function, ""]
+				try {
+					Menu ContextMenu, DeleteAll
+				}
+				catch exception {
+					; ignore
 				}
 				
-				IfMsgBox No
-				{
-					if currentFunction {
-						if (currentFunction.Length() == 1)
-							function := ["", function]
-						else {
-							currentFunction[2] := function
-							
-							function := currentFunction
-						}
-					}
-					else
-						function := ["", function]
-				}
-			}
-
-			if function {
-				this.setCommandFunction(command, function)
-				
-				preview.setLabel(row, column, this.getCommandLabel(this.iPendingFunctionRegistration))
-				
-				this.loadCommands()
-				
-				window := this.Window
+				window := SetupWizard.Instance.WizardWindow
 				
 				Gui %window%:Default
-				Gui ListView, % this.CommandsListView
-		
-				LV_Modify(this.iPendingFunctionRegistration, "Vis")
+				
+				Menu ContextMenu, Add, %menuItem%, menuIgnore
+				Menu ContextMenu, Disable, %menuItem%
+				Menu ContextMenu, Add
+				
+				menuItem := translate("Clear Action")
+				handler := ObjBindMethod(this, "clearAction", preview, function, element[2], row, column)
+				
+				Menu ContextMenu, Add, %menuItem%, %handler%
+				
+				Menu ContextMenu, Show
 			}
-		}
+			else {
+				SoundPlay %kResourcesDirectory%Sounds\Activated.wav
+			
+				command := this.getCommand(this.iPendingFunctionRegistration)
+				commandDescriptor := this.getCommandDescriptor(this.iPendingFunctionRegistration)
+				functionType := ConfigurationItem.splitDescriptor(function)[1]
+				
+				if (((functionType == k2WayToggleType) || (functionType == kDialType)) && (commandDescriptor[2] == "Toggle"))
+					function := [function]
+				else if (commandDescriptor[2] == "Activate")
+					function := [function]
+				else {
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Increase", "Decrease", "Cancel"]))
+					title := translate("Setup")
+					MsgBox 262179, %title%, % translate("What type of action do you want to trigger for ") . command . translate("?")
+					OnMessage(0x44, "")
+					
+					currentFunction := this.getCommandFunction(command)
+					
+					IfMsgBox Cancel
+						function := false
+				
+					IfMsgBox Yes
+					{
+						if currentFunction {
+							if (currentFunction.Length() == 1)
+								function := [function, ""]
+							else {
+								currentFunction[1] := function
+								
+								function := currentFunction
+							}
+						}
+						else
+							function := [function, ""]
+					}
+					
+					IfMsgBox No
+					{
+						if currentFunction {
+							if (currentFunction.Length() == 1)
+								function := ["", function]
+							else {
+								currentFunction[2] := function
+								
+								function := currentFunction
+							}
+						}
+						else
+							function := ["", function]
+					}
+				}
 
-		SetTimer showFunctionSelectorHint, Off
-		
-		ToolTip, , , 1
-		
-		this.iPendingFunctionRegistration := false
+				if function {
+					this.setCommandFunction(command, function)
+					
+					preview.setLabel(row, column, this.getCommandLabel(this.iPendingFunctionRegistration))
+					
+					this.loadCommands()
+					
+					window := this.Window
+					
+					Gui %window%:Default
+					Gui ListView, % this.CommandsListView
+			
+					LV_Modify(this.iPendingFunctionRegistration, "Vis")
+				}
+			}
+
+			SetTimer showFunctionSelectorHint, Off
+			
+			ToolTip, , , 1
+			
+			this.iPendingFunctionRegistration := false
+		}
 	}
 }
 
@@ -3492,7 +3663,7 @@ class AssistantsStepWizard extends CommandsStepWizard {
 			column := false
 		
 			for ignore, function in functions {
-				wizard.setControllerStaticFunction(this.iCurrentAssistant, function, label)
+				wizard.addControllerStaticFunction(this.iCurrentAssistant, function, label)
 			
 				for ignore, preview in this.iButtonBoxPreviews
 					if preview.findFunction(function, row, column)
@@ -4150,7 +4321,7 @@ initializeSimulatorSetup() {
 		;~ wizard.registerStepWizard(new InstallationStepWizard(wizard, "Installation", kSimulatorConfiguration))
 		;~ wizard.registerStepWizard(new ApplicationsStepWizard(wizard, "Applications", kSimulatorConfiguration))
 		;~ wizard.registerStepWizard(new ButtonBoxStepWizard(wizard, "Button Box", kSimulatorConfiguration))
-		;~ wizard.registerStepWizard(new GeneralStepWizard(wizard, "General", kSimulatorConfiguration))
+		wizard.registerStepWizard(new GeneralStepWizard(wizard, "General", kSimulatorConfiguration))
 		wizard.registerStepWizard(new SimulatorsStepWizard(wizard, "Simulators", kSimulatorConfiguration))
 		wizard.registerStepWizard(new AssistantsStepWizard(wizard, "Assistants", kSimulatorConfiguration))
 		wizard.registerStepWizard(new FinishStepWizard(wizard, "Finish", kSimulatorConfiguration))

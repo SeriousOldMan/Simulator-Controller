@@ -247,7 +247,7 @@ class SetupWizard extends ConfigurationItem {
 		
 		this.iCount := count
 
-		if !this.loadKnowledgeBase()
+		if ((GetKeyState("Ctrl") && GetKeyState("Shift")) || !this.loadKnowledgeBase())
 			this.KnowledgeBase.addFact("Initialize", true)
 			
 		this.KnowledgeBase.produce()
@@ -771,6 +771,70 @@ class SetupWizard extends ConfigurationItem {
 	
 	applicationPath(application) {
 		return this.KnowledgeBase.getValue("Application." . application . ".Path", false)
+	}
+	
+	setControllerStaticFunction(reference, function, label) {
+		local knowledgeBase := this.KnowledgeBase
+		
+		functions := string2Values("|", knowledgeBase.getValue("Controller.Function.Static", ""))
+		
+		for index, descriptor in functions {
+			parts := string2Values("###", descriptor)
+		
+			if ((parts[1] = reference) && (parts[2] = function)) {
+				parts[3] := Label
+				functions[index] := values2String("###", parts*)
+				
+				knowledgeBase.setValue("Controller.Function.Static", values2String("|", functions*))
+				
+				return
+			}
+		}
+		
+		functions.Push(values2String("###", reference, function, label))
+		
+		knowledgeBase.setFact("Controller.Function.Static", values2String("|", functions*))
+	}
+	
+	removeControllerStaticFunction(reference, function) {
+		local knowledgeBase := this.KnowledgeBase
+		
+		functions := string2Values("|", knowledgeBase.getValue("Controller.Function.Static", ""))
+		
+		for index, descriptor in functions {
+			parts := string2Values("###", descriptor)
+		
+			if ((parts[1] = reference) && (parts[2] = function)) {
+				functions.RemoveAt(index)
+				
+				if (functions.Length() == 0)
+					knowledgeBase.removeFact("Controller.Function.Static")
+				else
+					knowledgeBase.setValue("Controller.Function.Static", values2String("|", functions*))
+				
+				return
+			}
+		}
+	}
+	
+	getControllerStaticFunctions(reference := false) {
+		local knowledgeBase := this.KnowledgeBase
+		
+		functions := string2Values("|", knowledgeBase.getValue("Controller.Function.Static", ""))
+		result := []
+		
+		for index, descriptor in functions {
+			parts := string2Values("###", descriptor)
+		
+			if reference {
+				if (parts[1] = reference)
+					result.Push(Array(parts[2], parts[3]))
+			}
+			else
+				result.Push(Array(parts[2], parts[3]))
+		}
+		
+		return result
 	}
 	
 	setControllerFunctions(functions) {
@@ -2479,9 +2543,12 @@ class ButtonBoxPreviewStepWizard extends StepWizard {
 	}
 	
 	openButtonBoxes() {
+		local function
+		
 		if this.SetupWizard.isModuleSelected("Button Box") {
 			configuration := readConfiguration(kUserHomeDirectory . "Install\Button Box Configuration.ini")
 			
+			staticFunctions := this.SetupWizard.getControllerStaticFunctions()
 			controllers := []
 			
 			for controller, definition in getConfigurationSectionValues(configuration, "Layouts") {
@@ -2506,6 +2573,13 @@ class ButtonBoxPreviewStepWizard extends StepWizard {
 				
 				preview.open()
 				
+				row := false
+				column := false
+				
+				for ignore, function in staticFunctions
+					if preview.findFunction(function[1], row, column)
+						preview.setLabel(row, column, function[2])
+				
 				this.iButtonBoxPreviewCenterY -= Round(preview.Height / 2)
 				this.iButtonBoxPreviews.Push(preview)
 			}
@@ -2522,7 +2596,7 @@ class ButtonBoxPreviewStepWizard extends StepWizard {
 		this.iButtonBoxPreviewCenterY := 0
 	}
 	
-	controlClick(element, function, row, column, isEmpty) {
+	controlClick(preview, element, function, row, column, isEmpty) {
 		Throw "Virtual method ButtonBoxPreviewStepWizard.controlClick must be implemented by a subclass..."
 	}
 }
@@ -2672,6 +2746,19 @@ class CommandsStepWizard extends ButtonBoxPreviewStepWizard {
 		return (this.iFunctions.HasKey(command) ? this.iFunctions[command] : false)
 	}
 	
+	clearCommandFunction(command, function) {
+		if this.iFunctions.HasKey(command) {
+			functions := this.iFunctions[command]
+			
+			for index, candidate in functions
+				if (candidate = function)
+					functions[index] := ""
+			
+			if (functions.Length() == 1)
+				this.iFunctions.Delete(command)
+		}
+	}
+	
 	clearCommandFunctions() {
 		this.iFunctions := {}
 	}
@@ -2716,8 +2803,53 @@ class CommandsStepWizard extends ButtonBoxPreviewStepWizard {
 		this.iPendingFunctionRegistration := row
 	}
 	
-	controlClick(element, function, row, column, isEmpty) {
-		if this.iPendingFunctionRegistration {
+	clearAction(preview, function, control, row, column) {
+		for command, functions in this.iFunctions
+			for ignore, candidate in functions
+				if (candidate = function) {
+					SoundPlay %kResourcesDirectory%Sounds\Activated.wav
+					
+					this.clearCommandFunction(command, function)
+					
+					preview.setLabel(row, column, ConfigurationItem.splitDescriptor(control)[2])
+			
+					for ignore, function in this.SetupWizard.getControllerStaticFunctions()
+						if preview.findFunction(function[1], row, column)
+							preview.setLabel(row, column, function[2])
+					
+					this.loadCommands()
+					
+					break
+				}
+	}
+	
+	controlClick(preview, element, function, row, column, isEmpty) {
+		if !this.iPendingFunctionRegistration {
+			menuItem := (translate(element[1] . ": ") . element[2] . " (" . row . " x " . column . ")")
+			
+			try {
+				Menu ContextMenu, DeleteAll
+			}
+			catch exception {
+				; ignore
+			}
+			
+			window := SetupWizard.Instance.WizardWindow
+			
+			Gui %window%:Default
+			
+			Menu ContextMenu, Add, %menuItem%, menuIgnore
+			Menu ContextMenu, Disable, %menuItem%
+			Menu ContextMenu, Add
+			
+			menuItem := translate("Clear Action")
+			handler := ObjBindMethod(this, "clearAction", preview, function, element[2], row, column)
+			
+			Menu ContextMenu, Add, %menuItem%, %handler%
+			
+			Menu ContextMenu, Show
+		}
+		else {
 			SoundPlay %kResourcesDirectory%Sounds\Activated.wav
 		
 			command := this.getCommand(this.iPendingFunctionRegistration)
@@ -2773,9 +2905,7 @@ class CommandsStepWizard extends ButtonBoxPreviewStepWizard {
 			if function {
 				this.setCommandFunction(command, function)
 				
-				for ignore, preview in this.iButtonBoxPreviews
-					if (A_Gui = preview.Window)
-						preview.setLabel(row, column, this.getCommandLabel(this.iPendingFunctionRegistration))
+				preview.setLabel(row, column, this.getCommandLabel(this.iPendingFunctionRegistration))
 				
 				this.loadCommands()
 				
@@ -2899,7 +3029,7 @@ class SimulatorsStepWizard extends CommandsStepWizard {
 		
 		listX := x + 250
 		listWidth := width - 250
-		Gui Add, ListView, x%listX% ys+33 w%listWidth% h300 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDcommandsListViewHandle gupdateSimulatorCommandFunction Hidden, % values2String("|", map(["Mode", "Command / Setting", "Label", "Function"], "translate")*)
+		Gui Add, ListView, x%listX% ys+33 w%listWidth% h300 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDcommandsListViewHandle gupdateSimulatorCommandFunction Hidden, % values2String("|", map(["Mode", "Action", "Label", "Function"], "translate")*)
 		
 		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Simulators", "Simulators.Commands.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'>" . info . "</div>"
@@ -3014,7 +3144,7 @@ class SimulatorsStepWizard extends CommandsStepWizard {
 					label := getConfigurationValue(pluginLabels, code, subCommand . ".Toggle", kUndefined)
 					
 					if (label == kUndefined) {
-						label := getConfigurationValue(pluginLabels, code, subCommand . ".Activate")
+						label := getConfigurationValue(pluginLabels, code, subCommand . ".Activate", "")
 		
 						this.setCommand(count, command, [isInformationRequest, "Activate"], label)
 						
@@ -3242,7 +3372,7 @@ class AssistantsStepWizard extends CommandsStepWizard {
 			listY := labelY + 33
 			listWidth := width - 400
 			
-			Gui Add, ListView, x%listX% y%listY% w%listWidth% h347 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDcommandsListViewHandle gupdateAssistantCommandFunction Hidden Section, % values2String("|", map(["Command", "Label", "Function"], "translate")*)
+			Gui Add, ListView, x%listX% y%listY% w%listWidth% h347 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDcommandsListViewHandle gupdateAssistantCommandFunction Hidden Section, % values2String("|", map(["Action", "Label", "Function"], "translate")*)
 			
 			info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Assistants", "Assistants.Commands.Info." . getLanguage()))
 			info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'>" . info . "</div>"
@@ -3348,6 +3478,35 @@ class AssistantsStepWizard extends CommandsStepWizard {
 			return []
 	}
 	
+	setCommand(row, command, commandDescriptor, label) {
+		local function
+		
+		wizard := this.SetupWizard
+		
+		base.setCommand(row, command, commandDescriptor, label)
+		
+		functions := this.getCommandFunction(command)
+		
+		if functions {
+			row := false
+			column := false
+		
+			for ignore, function in functions {
+				wizard.setControllerStaticFunction(this.iCurrentAssistant, function, label)
+			
+				for ignore, preview in this.iButtonBoxPreviews
+					if preview.findFunction(function, row, column)
+						preview.setLabel(row, column, label)
+			}
+		}
+	}
+	
+	clearCommandFunction(command, function) {
+		base.clearCommandFunction(command, function)
+		
+		this.SetupWizard.removeControllerStaticFunction(this.iCurrentAssistant, function)
+	}
+	
 	loadCommands(load := false) {
 		if (this.iCurrentAssistant && this.SetupWizard.isModuleSelected(this.iCurrentAssistant))
 			this.loadAssistantCommands(this.iCurrentAssistant, load)
@@ -3405,7 +3564,7 @@ class AssistantsStepWizard extends CommandsStepWizard {
 				label := getConfigurationValue(pluginLabels, assistant, subCommand . ".Toggle", kUndefined)
 				
 				if (label == kUndefined) {
-					label := getConfigurationValue(pluginLabels, assistant, subCommand . ".Activate")
+					label := getConfigurationValue(pluginLabels, assistant, subCommand . ".Activate", "")
 	
 					this.setCommand(count, command, [isInformationRequest, "Activate"], label)
 					
@@ -3684,7 +3843,7 @@ updateFunctionTriggers() {
 			Menu ContextMenu, Disable, %menuItem%
 			Menu ContextMenu, Add
 			
-			menuItem := translate("Press the trigger(s)...")
+			menuItem := translate("Press Trigger(s)")
 			handler := ObjBindMethod(SetupWizard.Instance.StepWizards["Button Box"], "updateFunctionTriggers", row)
 			
 			Menu ContextMenu, Add, %menuItem%, %handler%
@@ -3986,12 +4145,12 @@ initializeSimulatorSetup() {
 		
 		wizard := new SetupWizard(kSimulatorConfiguration, definition)
 		
-		wizard.registerStepWizard(new StartStepWizard(wizard, "Start", kSimulatorConfiguration))
-		wizard.registerStepWizard(new ModulesStepWizard(wizard, "Modules", kSimulatorConfiguration))
-		wizard.registerStepWizard(new InstallationStepWizard(wizard, "Installation", kSimulatorConfiguration))
-		wizard.registerStepWizard(new ApplicationsStepWizard(wizard, "Applications", kSimulatorConfiguration))
-		wizard.registerStepWizard(new ButtonBoxStepWizard(wizard, "Button Box", kSimulatorConfiguration))
-		wizard.registerStepWizard(new GeneralStepWizard(wizard, "General", kSimulatorConfiguration))
+		;~ wizard.registerStepWizard(new StartStepWizard(wizard, "Start", kSimulatorConfiguration))
+		;~ wizard.registerStepWizard(new ModulesStepWizard(wizard, "Modules", kSimulatorConfiguration))
+		;~ wizard.registerStepWizard(new InstallationStepWizard(wizard, "Installation", kSimulatorConfiguration))
+		;~ wizard.registerStepWizard(new ApplicationsStepWizard(wizard, "Applications", kSimulatorConfiguration))
+		;~ wizard.registerStepWizard(new ButtonBoxStepWizard(wizard, "Button Box", kSimulatorConfiguration))
+		;~ wizard.registerStepWizard(new GeneralStepWizard(wizard, "General", kSimulatorConfiguration))
 		wizard.registerStepWizard(new SimulatorsStepWizard(wizard, "Simulators", kSimulatorConfiguration))
 		wizard.registerStepWizard(new AssistantsStepWizard(wizard, "Assistants", kSimulatorConfiguration))
 		wizard.registerStepWizard(new FinishStepWizard(wizard, "Finish", kSimulatorConfiguration))

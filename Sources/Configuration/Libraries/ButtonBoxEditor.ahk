@@ -1529,10 +1529,10 @@ class ButtonBoxPreview extends ConfigurationItem {
 				break
 			}
 			
-		return %handler%(element, function, row, column, isEmpty)
+		return %handler%(this, element, function, row, column, isEmpty)
 	}
 	
-	openControlMenu(element, function, row, column, isEmpty) {
+	openControlMenu(preview, element, function, row, column, isEmpty) {
 		menuItem := (translate(element[1] . ": ") . element[2] . " (" . row . " x " . column . ")")
 		
 		try {

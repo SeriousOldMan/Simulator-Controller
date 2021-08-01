@@ -1724,7 +1724,7 @@ writeConfiguration(configFile, configuration) {
 			
 		section := "[" . section . "]" . pairs . "`n"
 		
-		FileAppend %section%, %configFile%
+		FileAppend %section%, %configFile%, UTF-16
 	}
 }
 

@@ -93,9 +93,6 @@
   <ItemGroup>
     <ResourceCompile Include="ACC SHM Provider.rc" />
   </ItemGroup>
-  <ItemGroup>
-    <Image Include="..\..\..\..\Resources\Icons\Engine.ico" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

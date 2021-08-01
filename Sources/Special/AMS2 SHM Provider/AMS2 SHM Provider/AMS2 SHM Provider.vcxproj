@@ -84,10 +84,10 @@
     <ClInclude Include="SharedMemory.h" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\..\..\..\Resources\Icons\Engine.ico" />
+    <ResourceCompile Include="AMS2 SHM Provider.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="AMS2 SHM Provider.rc" />
+    <Image Include="Engine.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

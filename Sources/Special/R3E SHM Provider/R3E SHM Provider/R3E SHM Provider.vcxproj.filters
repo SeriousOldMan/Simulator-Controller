@@ -7,29 +7,28 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\R3E SHM Reader\R3E SHM Reader.c">
+    <ClCompile Include="..\R3E SHM Provider\R3E SHM Provider.c">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\R3E SHM Reader\utils.c">
+    <ClCompile Include="..\R3E SHM Provider\utils.c">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\R3E SHM Reader\r3e.h">
-      <Filter>Source</Filter>
-    </ClInclude>
-    <ClInclude Include="..\R3E SHM Reader\utils.h">
-      <Filter>Source</Filter>
-    </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Source</Filter>
     </ClInclude>
+    <ClInclude Include="..\R3E SHM Provider\r3e.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\R3E SHM Provider\utils.h">
+      <Filter>Source</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="R3E SHM Reader.rc" />
+    <ResourceCompile Include="R3E SHM Provider.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\..\..\..\Resources\Icons\Engine.ico" />
-    <Image Include="..\..\..\..\resources\icons\icon2.ico" />
+    <Image Include="Engine.ico" />
   </ItemGroup>
 </Project>

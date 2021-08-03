@@ -53,6 +53,45 @@ class ButtonBoxStepWizard extends StepWizard {
 		}
 	}
 	
+	saveToConfiguration(configuration) {
+		base.saveToConfiguration(configuration)
+		
+		controllerConfiguration := readConfiguration(kUserHomeDirectory . "Install\Button Box Configuration.ini")
+		wizard := this.SetupWizard
+		
+		if wizard.isModuleSelected("Button Box") {
+			controls := {}
+			
+			for control, descriptor in getConfigurationSectionValues(controllerConfiguration, "Controls")
+				controls[control] := string2Values(";", descriptor)[1]
+			
+			for controller, definition in getConfigurationSectionValues(controllerConfiguration, "Layouts") {
+				controller := ConfigurationItem.splitDescriptor(controller)
+			
+				if ((controller[2] != "Layout") && (controller[2] != "Visible")) {
+					controller := controller[1]
+				
+					for ignore, control in string2Values(";", definition) {
+						control := string2Values(",", control)[1]
+					
+						if (control != "") {
+							control := ConfigurationItem.splitDescriptor(control)
+							theFunction := ConfigurationItem.descriptor(controls[control[1]], control[2])
+							
+							functionTriggers := wizard.getControllerFunctionTriggers(theFunction)
+							
+							if (functionTriggers.Length() > 0) {
+								theFunction := Function.createFunction(theFunction, false, functionTriggers[1], "", functionTriggers[2], "")
+								
+								theFunction.saveToConfiguration(configuration)
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	
 	createGui(wizard, x, y, width, height) {
 		local application
 		

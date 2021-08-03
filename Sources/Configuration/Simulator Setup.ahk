@@ -450,6 +450,10 @@ class SetupWizard extends ConfigurationItem {
 	
 	finishSetup(save := true) {
 		if (this.Step && this.Step.hidePage(this.Page)) {
+			window := this.WizardWindow
+	
+			Gui %window%:Default
+			
 			GuiControl Disable, previousPageButton
 			GuiControl Disable, nextPageButton
 			GuiControl Disable, finishButton
@@ -1369,7 +1373,7 @@ class StartStepWizard extends StepWizard {
 			Gui %window%:Font, s10 Bold, Arial
 			
 			Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDiconHandle Hidden, %kResourcesDirectory%Setup\Images\Security.ico
-			Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h26 HWNDlabelHandle Hidden, % translate("Unblocking of Applications and DLLs")
+			Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h26 HWNDlabelHandle Hidden, % translate("Unblocking Applications and DLLs")
 			
 			Gui %window%:Font, s8 Norm, Arial
 			
@@ -1879,13 +1883,13 @@ initializeSimulatorSetup()
 ;;;                          Plugin Include Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include Libraries\ModulesStepWizard.ahk
-#Include Libraries\InstallationStepWizard.ahk
-#Include Libraries\ApplicationsStepWizard.ahk
+;~ #Include Libraries\ModulesStepWizard.ahk
+;~ #Include Libraries\InstallationStepWizard.ahk
+;~ #Include Libraries\ApplicationsStepWizard.ahk
 #Include Libraries\ButtonBoxStepWizard.ahk
-#Include Libraries\GeneralStepWizard.ahk
-#Include Libraries\SimulatorsStepWizard.ahk
-#Include Libraries\ApplicationsStepWizard.ahk
+;~ #Include Libraries\GeneralStepWizard.ahk
+;~ #Include Libraries\SimulatorsStepWizard.ahk
+;~ #Include Libraries\ApplicationsStepWizard.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;

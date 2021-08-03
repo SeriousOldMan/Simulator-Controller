@@ -20,6 +20,10 @@
 ;;; GeneralStepWizard                                                       ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
+global uiLanguageDropDown = ""
+global startWithWindowsCheck = 1
+global silentModeCheck = 1
+
 class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 	iVoiceControlConfigurator := false
 	
@@ -46,6 +50,11 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 		generalLabelHandle := false
 		generalInfoTextHandle := false
 		
+		languageLabelHandle := false
+		languageDropDownHandle := false
+		startWithWindowsHandle := false
+		silentModeHandle := false
+		
 		labelWidth := width - 30
 		labelX := x + 45
 		labelY := y + 8
@@ -61,6 +70,8 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 		colummLine1Handle := false
 		colummLabel2Handle := false
 		colummLine2Handle := false
+		colummLabel3Handle := false
+		colummLine3Handle := false
 		
 		modeSelectorsLabelHandle := false
 		modeSelectorsListHandle := false
@@ -74,6 +85,36 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 		
 		Gui %window%:Add, Text, x%x% yp+30 w%col1Width% h23 +0x200 HWNDcolumnLabel1Handle Hidden Section, % translate("General")
 		Gui %window%:Add, Text, yp+20 x%x% w%col1Width% 0x10 HWNDcolumnLine1Handle Hidden
+
+		Gui %window%:Font, Norm, Arial
+		
+		choices := []
+		chosen := 0
+		enIndex := 0
+		
+		for code, language in availableLanguages() {
+			choices.Push(language)
+			
+			if (language == uiLanguageDropDown)
+				chosen := A_Index
+				
+			if (code = "en")
+				enIndex := A_Index
+		}
+		
+		if (chosen == 0)
+			chosen := enIndex
+		
+		Gui %window%:Add, Text, x%x% yp+10 w86 h23 +0x200 HWNDlanguageLabelHandle Hidden, % translate("Language")
+		Gui %window%:Add, DropDownList, x%secondX% yp w120 Choose%chosen% HWNDlanguageDropDownHandle VuiLanguageDropDown Hidden, % values2String("|", choices*)
+		
+		Gui %window%:Add, CheckBox, x%x% yp+30 w242 h23 Checked%startWithWindowsCheck% HWNDstartWithWindowsHandle VstartWithWindowsCheck Hidden, % translate("Start with Windows")
+		Gui %window%:Add, CheckBox, x%x% yp+24 w242 h23 Checked%silentModeCheck% HWNDsilentModeHandle VsilentModeCheck Hidden, % translate("Silent mode (no splash screen, no sound)")
+		
+		Gui %window%:Font, Bold, Arial
+		
+		Gui %window%:Add, Text, x%x% yp+30 w%col1Width% h23 +0x200 HWNDcolumnLabel3Handle Hidden, % translate("Mode Control")
+		Gui %window%:Add, Text, yp+20 x%x% w%col1Width% 0x10 HWNDcolumnLine3Handle Hidden
 
 		Gui %window%:Font, Norm, Arial
 		
@@ -115,7 +156,7 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 		this.iModeSelectorsLabelHandle := modeSelectorsLabelHandle
 		this.iModeSelectorsListHandle := modeSelectorsListHandle
 		
-		this.registerWidgets(1, generalIconHandle, generalLabelHandle, modeSelectorsLabelHandle, modeSelectorsListHandle, generalInfoTextHandle, columnLabel1Handle, columnLine1Handle, columnLabel2Handle, columnLine2Handle)
+		this.registerWidgets(1, generalIconHandle, generalLabelHandle, modeSelectorsLabelHandle, modeSelectorsListHandle, generalInfoTextHandle, columnLabel1Handle, columnLine1Handle, columnLabel2Handle, columnLine2Handle, columnLabel3Handle, columnLine3Handle, languageLabelHandle, languageDropDownHandle, startWithWindowsHandle, silentModeHandle)
 	}
 	
 	registerWidget(page, widget) {

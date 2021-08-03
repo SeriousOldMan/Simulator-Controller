@@ -1887,8 +1887,8 @@ initializeSimulatorSetup()
 ; #Include Libraries\InstallationStepWizard.ahk
 ; #Include Libraries\ApplicationsStepWizard.ahk
 ; #Include Libraries\ButtonBoxStepWizard.ahk
-; #Include Libraries\GeneralStepWizard.ahk
-#Include Libraries\SimulatorsStepWizard.ahk
+#Include Libraries\GeneralStepWizard.ahk
+; #Include Libraries\SimulatorsStepWizard.ahk
 ; #Include Libraries\AssistantsStepWizard.ahk
 
 

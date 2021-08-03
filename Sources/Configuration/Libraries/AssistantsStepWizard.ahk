@@ -169,11 +169,23 @@ class AssistantsStepWizard extends ActionsStepWizard {
 			
 			Gui %window%:Font, s8 Norm, Arial
 			
+			colummLabel1Handle := false
+			colummLine1Handle := false
+			colummLabel2Handle := false
+			colummLine2Handle := false
+		
 			listX := x + 400
 			listY := labelY + 30
 			listWidth := width - 400
 			
-			Gui Add, ListView, x%listX% y%listY% w%listWidth% h347 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDactionsListViewHandle gupdateAssistantActionFunction Hidden Section, % values2String("|", map(["Action", "Label", "Function"], "translate")*)
+			Gui %window%:Font, Bold, Arial
+			
+			Gui %window%:Add, Text, x%listX% yp+30 w%listWidth% h23 +0x200 HWNDcolumnLabel1Handle Hidden Section, % translate("Actions")
+			Gui %window%:Add, Text, yp+20 x%listX% w%listWidth% 0x10 HWNDcolumnLine1Handle Hidden
+
+			Gui %window%:Font, Norm, Arial
+			
+			Gui Add, ListView, x%listX% yp+10 w%listWidth% h347 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDactionsListViewHandle gupdateAssistantActionFunction Hidden, % values2String("|", map(["Action", "Label", "Function"], "translate")*)
 			
 			info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Assistants", "Assistants.Actions.Info." . getLanguage()))
 			info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'>" . info . "</div>"
@@ -193,14 +205,23 @@ class AssistantsStepWizard extends ActionsStepWizard {
 				configurator := new RaceStrategistConfigurator(this)
 			else
 				configurator := false
-				
+			
+			colWidth := 400 - x
+			
+			Gui %window%:Font, Bold, Arial
+			
+			Gui %window%:Add, Text, x%x% ys w%colWidth% h23 +0x200 HWNDcolumnLabel2Handle Hidden Section, % translate("Configuration")
+			Gui %window%:Add, Text, yp+20 x%x% w%colWidth% 0x10 HWNDcolumnLine2Handle Hidden
+
+			Gui %window%:Font, Norm, Arial
+			
 			if configurator {
 				this.iAssistantConfigurators.Push(configurator)
 	
-				configurator.createGui(this, x, listY, 400 - x, height)
+				configurator.createGui(this, x, listY + 30, colWidth, height)
 			}
 			
-			this.registerWidgets(page, actionsIconHandle, actionsLabelHandle, actionsListViewHandle, actionsInfoTextHandle)
+			this.registerWidgets(page, actionsIconHandle, actionsLabelHandle, actionsListViewHandle, actionsInfoTextHandle, columnLabel1Handle, columnLine1Handle, columnLabel2Handle, columnLine2Handle)
 		}
 	}
 	

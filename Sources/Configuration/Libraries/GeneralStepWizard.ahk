@@ -6,6 +6,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                         Local Include Section                           ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include Libraries\ButtonBoxStepWizard.ahk
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -50,13 +57,27 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 		
 		Gui %window%:Font, s8 Norm, Arial
 		
+		colummLabel1Handle := false
+		colummLine1Handle := false
+		colummLabel2Handle := false
+		colummLine2Handle := false
+		
 		modeSelectorsLabelHandle := false
 		modeSelectorsListHandle := false
 	
 		secondX := x + 105
 		secondWidth := width - 105
 		
-		Gui %window%:Add, Text, x%x% yp+30 w105 h23 +0x200 HWNDmodeSelectorsLabelHandle Hidden, % translate("Mode Selector")
+		col1Width := (secondX - x) + 120
+
+		Gui %window%:Font, Bold, Arial
+		
+		Gui %window%:Add, Text, x%x% yp+30 w%col1Width% h23 +0x200 HWNDcolumnLabel1Handle Hidden Section, % translate("General")
+		Gui %window%:Add, Text, yp+20 x%x% w%col1Width% 0x10 HWNDcolumnLine1Handle Hidden
+
+		Gui %window%:Font, Norm, Arial
+		
+		Gui %window%:Add, Text, x%x% yp+10 w105 h23 +0x200 HWNDmodeSelectorsLabelHandle Hidden, % translate("Mode Selector")
 		
 		Gui %window%:Font, s8 Bold, Arial
 		
@@ -64,11 +85,21 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 		
 		Gui %window%:Font, s8 Norm, Arial
 		
+		col2X := secondX + 140
+		col2Width := width - 140 - secondX + x
+
+		Gui %window%:Font, Bold, Arial
+		
+		Gui %window%:Add, Text, x%col2X% ys w%col2Width% h23 +0x200 HWNDcolumnLabel2Handle Hidden Section, % translate("Voice Control")
+		Gui %window%:Add, Text, yp+20 x%col2X% w%col2Width% 0x10 HWNDcolumnLine2Handle Hidden
+
+		Gui %window%:Font, Norm, Arial
+		
 		configurator := new VoiceControlConfigurator(this)
 		
 		this.iVoiceControlConfigurator := configurator
 		
-		configurator.createGui(this, secondX + 140, labelY + 33, width - 140 - secondX + x, height, 0)
+		configurator.createGui(this, col2X, labelY + 33 + 30, col2Width, height, 0)
 		configurator.hideWidgets()
 		
 		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.General", "General.General.Info." . getLanguage()))
@@ -84,7 +115,7 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 		this.iModeSelectorsLabelHandle := modeSelectorsLabelHandle
 		this.iModeSelectorsListHandle := modeSelectorsListHandle
 		
-		this.registerWidgets(1, generalIconHandle, generalLabelHandle, modeSelectorsLabelHandle, modeSelectorsListHandle, generalInfoTextHandle)
+		this.registerWidgets(1, generalIconHandle, generalLabelHandle, modeSelectorsLabelHandle, modeSelectorsListHandle, generalInfoTextHandle, columnLabel1Handle, columnLine1Handle, columnLabel2Handle, columnLine2Handle)
 	}
 	
 	registerWidget(page, widget) {

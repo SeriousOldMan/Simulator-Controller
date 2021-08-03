@@ -1344,7 +1344,7 @@ class StartStepWizard extends StepWizard {
 		text := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Start", "Start.Text." . getLanguage()))
 		image := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Start", "Start.Image"))
 		
-		text := "<div style='text-align: center' style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'>" . text . "</div>"
+		text := "<div style='text-align: center' style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px' style='font-weight: 600'>" . text . "</div>"
 		
 		height := Round(width / 16 * 9)
 		
@@ -1883,13 +1883,13 @@ initializeSimulatorSetup()
 ;;;                          Plugin Include Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-;~ #Include Libraries\ModulesStepWizard.ahk
-;~ #Include Libraries\InstallationStepWizard.ahk
-;~ #Include Libraries\ApplicationsStepWizard.ahk
-#Include Libraries\ButtonBoxStepWizard.ahk
-;~ #Include Libraries\GeneralStepWizard.ahk
-;~ #Include Libraries\SimulatorsStepWizard.ahk
-;~ #Include Libraries\ApplicationsStepWizard.ahk
+; #Include Libraries\ModulesStepWizard.ahk
+; #Include Libraries\InstallationStepWizard.ahk
+; #Include Libraries\ApplicationsStepWizard.ahk
+; #Include Libraries\ButtonBoxStepWizard.ahk
+; #Include Libraries\GeneralStepWizard.ahk
+#Include Libraries\SimulatorsStepWizard.ahk
+; #Include Libraries\AssistantsStepWizard.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;

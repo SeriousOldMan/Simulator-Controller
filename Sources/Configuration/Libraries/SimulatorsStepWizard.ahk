@@ -103,27 +103,54 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		Gui %window%:Font, s10 Bold, Arial
 		
 		Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDactionsIconHandle Hidden, %kResourcesDirectory%Setup\Images\Controller.ico
-		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h26 HWNDactionsLabelHandle Hidden Section, % translate("Simulator(s) Configuration")
+		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h26 HWNDactionsLabelHandle Hidden, % translate("Simulator(s) Configuration")
 		
 		Gui %window%:Font, s8 Norm, Arial
 
 		simulatorLabelHandle := false
 		simulatorDropDownHandle := false
+		
+		colummLabel1Handle := false
+		colummLine1Handle := false
+		colummLabel2Handle := false
+		colummLine2Handle := false
 	
 		secondX := x + 80
 		secondWidth := 160
 		
+		col1Width := (secondX - x) + secondWidth
+		
 		Gui %window%:Add, Text, x%x% yp+30 w105 h23 +0x200 HWNDsimulatorLabelHandle Hidden, % translate("Simulator")
 		Gui %window%:Add, DropDownList, x%secondX% yp w%secondWidth% Choose%chosen% HWNDsimulatorDropDownHandle gchooseSimulator vsimulatorDropDown Hidden
 		
+		Gui %window%:Font, Bold, Arial
+		
+		Gui %window%:Add, Text, x%x% yp+30 w%col1Width% h23 +0x200 HWNDcolumnLabel1Handle Hidden Section, % translate("Pitstop MFD")
+		Gui %window%:Add, Text, yp+20 x%x% w%col1Width% 0x10 HWNDcolumnLine1Handle Hidden
+
+		Gui %window%:Font, Norm, Arial
+		
+		colummLabel1Handle := false
+		colummLine1Handle := false
+		colummLabel2Handle := false
+		colummLine2Handle := false
+		
 		listX := x + 250
 		listWidth := width - 250
-		Gui Add, ListView, x%listX% ys+33 w%listWidth% h300 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDactionsListViewHandle gupdateSimulatorActionFunction Hidden, % values2String("|", map(["Mode", "Action", "Label", "Function"], "translate")*)
+		
+		Gui %window%:Font, Bold, Arial
+		
+		Gui %window%:Add, Text, x%listX% ys w%listWidth% h23 +0x200 HWNDcolumnLabel2Handle Hidden, % translate("Actions")
+		Gui %window%:Add, Text, yp+20 x%listX% w%listWidth% 0x10 HWNDcolumnLine2Handle Hidden
+
+		Gui %window%:Font, Norm, Arials
+		
+		Gui Add, ListView, x%listX% yp+10 w%listWidth% h300 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDactionsListViewHandle gupdateSimulatorActionFunction Hidden, % values2String("|", map(["Mode", "Action", "Label", "Function"], "translate")*)
 		
 		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Simulators", "Simulators.Actions.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'>" . info . "</div>"
 		
-		Gui %window%:Add, ActiveX, x%x% yp+305 w%width% h135 HWNDactionsInfoTextHandle VactionsInfoText Hidden, shell explorer
+		Gui %window%:Add, ActiveX, x%x% yp+305 w%width% h105 HWNDactionsInfoTextHandle VactionsInfoText Hidden, shell explorer
 
 		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
@@ -132,7 +159,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		
 		this.setActionsListView(actionsListViewHandle)
 		
-		this.registerWidgets(1, actionsIconHandle, actionsLabelHandle, actionsListViewHandle, actionsInfoTextHandle, simulatorLabelHandle, simulatorDropDownHandle)
+		this.registerWidgets(1, actionsIconHandle, actionsLabelHandle, actionsListViewHandle, actionsInfoTextHandle, simulatorLabelHandle, simulatorDropDownHandle, columnLabel1Handle, columnLine1Handle, columnLabel2Handle, columnLine2Handle)
 	}
 	
 	updateState() {

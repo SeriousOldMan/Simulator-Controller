@@ -1711,13 +1711,18 @@ readConfiguration(configFile) {
 writeConfiguration(configFile, configuration) {
 	configFile := getFileName(configFile, kUserConfigDirectory)
 	
+	try {
+		FileDelete %configfile%
+	}
+	catch exception {
+		; ignore
+	}
+	
 	SplitPath configFile, , directory
 	FileCreateDir %directory%
 	
 	for section, keyValues in configuration {
 		pairs := ""
-		
-		IniDelete %configFile%, %section%
 		
 		for key, value in keyValues
 			pairs := pairs . "`n" . key . "=" . ((value == true) ? kTrue : ((value == false) ? kFalse : value))

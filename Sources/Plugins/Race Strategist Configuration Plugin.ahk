@@ -125,6 +125,12 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 		}
 	}
 	
+	loadConfigurator(configuration, simulators) {
+		this.loadFromConfiguration(configuration)
+		
+		this.setSimulators(simulators)
+	}
+	
 	loadSimulatorConfiguration(simulator := false) {
 		window := this.Editor.Window
 		

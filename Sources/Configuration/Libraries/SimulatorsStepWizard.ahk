@@ -148,9 +148,9 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		Gui Add, ListView, x%listX% yp+10 w%listWidth% h300 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDactionsListViewHandle gupdateSimulatorActionFunction Hidden, % values2String("|", map(["Mode", "Action", "Label", "Function"], "translate")*)
 		
 		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Simulators", "Simulators.Actions.Info." . getLanguage()))
-		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'>" . info . "</div>"
+		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
 		
-		Gui %window%:Add, ActiveX, x%x% yp+305 w%width% h105 HWNDactionsInfoTextHandle VactionsInfoText Hidden, shell explorer
+		Gui %window%:Add, ActiveX, x%x% yp+305 w%width% h80 HWNDactionsInfoTextHandle VactionsInfoText Hidden, shell explorer
 
 		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 

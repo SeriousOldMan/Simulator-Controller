@@ -394,8 +394,8 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		
 		effectFunctions := []
 		
-		for index, effect in motionEffectsArguments {
-			effect := string2Values(A_Space, effect)
+		for ignore, effect in motionEffectsArguments {
+			effect := this.parseValues(A_Space, effect)
 			
 			this.kEffects.Push(StrReplace(effect[1], "_", A_Space))
 			this.kInitialEffectStates.Push(effect[2] = "On" ? true : false)

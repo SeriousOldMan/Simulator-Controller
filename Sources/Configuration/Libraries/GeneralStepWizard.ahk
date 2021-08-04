@@ -13,6 +13,13 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                        Private Variable Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global vCurrentLaunchWizard = false
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -26,17 +33,82 @@ global silentModeCheck = 1
 
 class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 	iVoiceControlConfigurator := false
-	
-	iLanguage := getLanguage()
-	iModeSelectors := []
-	
-	iModeSelectorsLabelHandle := false
 	iModeSelectorsListHandle := false
+	iLaunchApplicationsListHandle := false
+	
+	iModeSelectors := []
+	iLaunchApplications := {}
+	
+	iPendingApplicationRegistration := false
+	iPendingFunctionRegistration := false
+	
+	iButtonBoxWidgets := []
 	
 	Pages[] {
 		Get {
 			return 1
 		}
+	}
+	
+	saveToConfiguration(configuration) {
+		local application
+		local function
+		
+		base.saveToConfiguration(configuration)
+		
+		wizard := this.SetupWizard
+		
+		setConfigurationSectionValues(configuration, "Splash Window", getConfigurationSectionValues(this.SetupWizard.Definition, "Splash Window"))
+		setConfigurationSectionValues(configuration, "Splash Themes", getConfigurationSectionValues(this.SetupWizard.Definition, "Splash Themes"))
+	
+		wizard.getGeneralConfiguration(language, startWithWindows, silentMode)
+		
+		setConfigurationValue(configuration, "Configuration", "Language", language)
+		setConfigurationValue(configuration, "Configuration", "Start With Windows", startWithWindows)
+		setConfigurationValue(configuration, "Configuration", "Silent Mode", silentMode)
+		
+		setConfigurationValue(configuration, "Configuration", "Log Level", "Warn")
+		setConfigurationValue(configuration, "Configuration", "Debug", false)
+		
+		if wizard.isSoftwareInstalled("NirCmd")
+			setConfigurationValue(configuration, "Configuration", "NirCmd Path", wizard.softwarePath("NirCmd"))
+		
+		if wizard.isModuleSelected("Voice Control") {
+			voiceControlConfiguration := readConfiguration(kUserHomeDirectory . "Install\Voice Control Configuration.ini")
+		
+			for ignore, section in ["Voice Control"] {
+				subConfiguration := getConfigurationSectionValues(voiceControlConfiguration, section, false)
+				
+				if subConfiguration
+					setConfigurationSectionValues(configuration, section, subConfiguration)
+			}
+		}
+		
+		modeSelectors := wizard.getModeSelectors()
+		arguments := ""
+
+		if (modeSelectors.Length() > 0)
+			arguments := ("modeSelectors: " . values2String(A_Space, modeSelectors*))
+		
+		launchApplications := []
+
+		for ignore, section in string2Values(",", this.Defintion[1])
+			for application, descriptor in getConfigurationSectionValues(wizard.Definition, section) {
+				if wizard.isApplicationSelected(application) {
+					function := wizard.getLaunchApplicationFunction(application)
+					
+					if (function && (function != "")) {
+						label := wizard.getLaunchApplicationLabel(application)
+						
+						launchApplications.Push("""" . label . """ """ . application . """ " . function)
+					}
+				}
+			}
+		
+		if (launchApplications.Length() > 0)
+			arguments .= ("launchApplications: " . values2String(", ", launchApplications*))
+			
+		new Plugin("System", false, true, "", arguments).saveToConfiguration(configuration)
 	}
 	
 	createGui(wizard, x, y, width, height) {
@@ -62,7 +134,7 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 		Gui %window%:Font, s10 Bold, Arial
 		
 		Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDgeneralIconHandle Hidden, %kResourcesDirectory%Setup\Images\Gears.ico
-		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h26 HWNDgeneralLabelHandle Hidden, % translate("Global Configuration")
+		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h26 HWNDgeneralLabelHandle Hidden, % translate("General Configuration")
 		
 		Gui %window%:Font, s8 Norm, Arial
 		
@@ -75,6 +147,8 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 		
 		modeSelectorsLabelHandle := false
 		modeSelectorsListHandle := false
+		launchApplicationsLabelHandle := false
+		launchApplicationsListHandle := false
 	
 		secondX := x + 105
 		secondWidth := width - 105
@@ -89,31 +163,19 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 		Gui %window%:Font, Norm, Arial
 		
 		choices := []
-		chosen := 0
-		enIndex := 0
 		
-		for code, language in availableLanguages() {
+		for code, language in availableLanguages()
 			choices.Push(language)
-			
-			if (language == uiLanguageDropDown)
-				chosen := A_Index
-				
-			if (code = "en")
-				enIndex := A_Index
-		}
-		
-		if (chosen == 0)
-			chosen := enIndex
 		
 		Gui %window%:Add, Text, x%x% yp+10 w86 h23 +0x200 HWNDlanguageLabelHandle Hidden, % translate("Language")
-		Gui %window%:Add, DropDownList, x%secondX% yp w120 Choose%chosen% HWNDlanguageDropDownHandle VuiLanguageDropDown Hidden, % values2String("|", choices*)
+		Gui %window%:Add, DropDownList, x%secondX% yp w120 HWNDlanguageDropDownHandle VuiLanguageDropDown Hidden, % values2String("|", choices*)
 		
 		Gui %window%:Add, CheckBox, x%x% yp+30 w242 h23 Checked%startWithWindowsCheck% HWNDstartWithWindowsHandle VstartWithWindowsCheck Hidden, % translate("Start with Windows")
 		Gui %window%:Add, CheckBox, x%x% yp+24 w242 h23 Checked%silentModeCheck% HWNDsilentModeHandle VsilentModeCheck Hidden, % translate("Silent mode (no splash screen, no sound)")
 		
 		Gui %window%:Font, Bold, Arial
 		
-		Gui %window%:Add, Text, x%x% yp+30 w%col1Width% h23 +0x200 HWNDcolumnLabel3Handle Hidden, % translate("Mode Control")
+		Gui %window%:Add, Text, x%x% yp+30 w%col1Width% h23 +0x200 HWNDcolumnLabel3Handle Hidden, % translate("Controller / Button Box")
 		Gui %window%:Add, Text, yp+20 x%x% w%col1Width% 0x10 HWNDcolumnLine3Handle Hidden
 
 		Gui %window%:Font, Norm, Arial
@@ -125,6 +187,19 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 		Gui %window%:Add, ListBox, x%secondX% yp w120 h60 Disabled HWNDmodeSelectorsListHandle Hidden
 		
 		Gui %window%:Font, s8 Norm, Arial
+		
+		Gui %window%:Add, Text, x%x% yp+60 w140 h23 +0x200 HWNDlaunchApplicationsLabelHandle Hidden, % translate("Launch Mode")
+		Gui %window%:Add, ListView, x%x% yp+24 w%col1Width% h114 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDlaunchApplicationsListHandle gupdateApplicationFunction Hidden, % values2String("|", map(["Application", "Label", "Function"], "translate")*)
+		
+		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.General", "General.General.Info." . getLanguage()))
+		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
+
+		Gui %window%:Add, ActiveX, x%x% yp+120 w%width% h88 HWNDgeneralInfoTextHandle VgeneralInfoText Hidden, shell explorer
+
+		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+
+		generalInfoText.Navigate("about:blank")
+		generalInfoText.Document.Write(html)
 		
 		col2X := secondX + 140
 		col2Width := width - 140 - secondX + x
@@ -143,20 +218,12 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 		configurator.createGui(this, col2X, labelY + 33 + 30, col2Width, height, 0)
 		configurator.hideWidgets()
 		
-		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.General", "General.General.Info." . getLanguage()))
-		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'>" . info . "</div>"
-
-		Gui %window%:Add, ActiveX, x%x% yp+30 w%width% h180 HWNDgeneralInfoTextHandle VgeneralInfoText Hidden, shell explorer
-
-		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
-
-		generalInfoText.Navigate("about:blank")
-		generalInfoText.Document.Write(html)
-		
-		this.iModeSelectorsLabelHandle := modeSelectorsLabelHandle
 		this.iModeSelectorsListHandle := modeSelectorsListHandle
+		this.iLaunchApplicationsListHandle := launchApplicationsListHandle
 		
-		this.registerWidgets(1, generalIconHandle, generalLabelHandle, modeSelectorsLabelHandle, modeSelectorsListHandle, generalInfoTextHandle, columnLabel1Handle, columnLine1Handle, columnLabel2Handle, columnLine2Handle, columnLabel3Handle, columnLine3Handle, languageLabelHandle, languageDropDownHandle, startWithWindowsHandle, silentModeHandle)
+		this.iButtonBoxWidgets := Array(modeSelectorsLabelHandle, modeSelectorsListHandle, launchApplicationsLabelHandle, launchApplicationsListHandle, columnLabel3Handle, columnLine3Handle)
+		
+		this.registerWidgets(1, generalIconHandle, generalLabelHandle, modeSelectorsLabelHandle, modeSelectorsListHandle, launchApplicationsLabelHandle, launchApplicationsListHandle, generalInfoTextHandle, columnLabel1Handle, columnLine1Handle, columnLabel2Handle, columnLine2Handle, columnLabel3Handle, columnLine3Handle, languageLabelHandle, languageDropDownHandle, startWithWindowsHandle, silentModeHandle)
 	}
 	
 	registerWidget(page, widget) {
@@ -166,56 +233,46 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 			base.registerWidget(page, widget)
 	}
 	
-	saveToConfiguration(configuration) {
-		base.saveToConfiguration(configuration)
-		
-		wizard := this.SetupWizard
-		
-		setConfigurationSectionValues(configuration, "Splash Window", getConfigurationSectionValues(this.SetupWizard.Definition, "Splash Window"))
-		setConfigurationSectionValues(configuration, "Splash Themes", getConfigurationSectionValues(this.SetupWizard.Definition, "Splash Themes"))
-		
-		setConfigurationValue(configuration, "Configuration", "Start With Windows", false)
-		setConfigurationValue(configuration, "Configuration", "Log Level", "Warn")
-		setConfigurationValue(configuration, "Configuration", "Debug", false)
-		
-		setConfigurationValue(configuration, "Configuration", "Silent Mode", false)
-		setConfigurationValue(configuration, "Configuration", "Language", this.iLanguage)
-		
-		if wizard.isSoftwareInstalled("NirCmd")
-			setConfigurationValue(configuration, "Configuration", "NirCmd Path", wizard.softwarePath("NirCmd"))
-		
-		if wizard.isModuleSelected("Voice Control") {
-			voiceControlConfiguration := readConfiguration(kUserHomeDirectory . "Install\Voice Control Configuration.ini")
-		
-			for ignore, section in ["Voice Control"] {
-				subConfiguration := getConfigurationSectionValues(voiceControlConfiguration, section, false)
-				
-				if subConfiguration
-					setConfigurationSectionValues(configuration, section, subConfiguration)
-			}
-		}
-		
-		arguments := ""
-		
-		if (this.iModeSelectors.Length() > 0)
-			arguments := ("modeSelectors: " . values2String(A_Space, this.iModeSelectors*))
-		
-		new Plugin("System", false, true, "", arguments).saveToConfiguration(configuration)
-	}
-	
 	reset() {
 		base.reset()
 		
 		this.iVoiceControlConfigurator := false
-		this.iModeSelectorsLabelHandle := false
 		this.iModeSelectorsListHandle := false
+		this.iLaunchApplicationsListHandle := false
+		
+		this.iButtonBoxWidgets := []
+		
 		this.iModeSelectors := []
+		this.iLaunchApplications := {}
 	}
 	
 	showPage(page) {
+		vCurrentLaunchWizard := this
+
 		base.showPage(page)
 		
-		this.iModeSelectors := this.SetupWizard.getModeSelectors()
+		wizard := this.SetupWizard
+		
+		wizard.getGeneralConfiguration(uiLanguage, startWithWindows, silentMode)
+		
+		for code, language in availableLanguages() {
+			if (code = uiLanguage)
+				chosen := A_Index
+			else if (code = "en")
+				enIndex := A_Index
+		}
+		
+		if (chosen == 0)
+			chosen := enIndex
+		
+		GuiControl Choose, uiLanguageDropDown, %chosen%
+		GuiControl, , startWithWindowsCheck, % startWithWindows
+		GuiControl, , silentModeCheck, % silentMode
+		
+		chosen := 0
+		enIndex := 0
+		
+		this.iModeSelectors := wizard.getModeSelectors()
 		
 		this.iVoiceControlConfigurator.hideWidgets()
 			
@@ -239,38 +296,121 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 			
 			GuiControl Disable, %listBox%
 			GuiControl, , %listBox%, % "|" . values2String("|", this.iModeSelectors*)
+			
+			this.loadApplications(true)
 		}
-		else {
-			GuiControl Hide, % this.iModeSelectorsLabelHandle
-			GuiControl Hide, % this.iModeSelectorsListHandle
-		}
+		else
+			for ignore, widget in this.iButtonBoxWidgets
+				GuiControl Hide, %widget%
 	}
 	
 	hidePage(page) {
 		this.iVoiceControlConfigurator.hideWidgets()
-			
+				
 		if base.hidePage(page) {
-			this.SetupWizard.setModeSelectors(this.iModeSelectors)
+			vCurrentLaunchWizard := false
+
+			wizard := this.SetupWizard
+
+			GuiControlGet uiLanguageDropDown
+			GuiControlGet startWithWindowsCheck
+			GuiControlGet silentModeCheck
+
+			languageCode := "en"
+		
+			for code, language in availableLanguages()
+				if (language = uiLanguageDropDown) {
+					languageCode := code
+					
+					break
+				}
 			
-			configuration := newConfiguration()
+			wiard.setGeneralConfiguration(languageCode, startWithWindowsCheck, silentModeCheck)
 			
-			this.iVoiceControlConfigurator.saveToConfiguration(configuration)
-			
-			voiceControlConfiguration := newConfiguration()
-	
-			for ignore, section in ["Voice Control"] {
-				subConfiguration := getConfigurationSectionValues(configuration, section, false)
+			if wizard.isModuleSelected("Button Box") {
+				wizard.setModeSelectors(this.iModeSelectors)
 				
-				if subConfiguration
-					setConfigurationSectionValues(voiceControlConfiguration, section, subConfiguration)
+				this.saveApplications()
 			}
+	
+			if this.isModuleSelected("Voice Control") {
+				configuration := newConfiguration()
 				
-			writeConfiguration(kUserHomeDirectory . "Install\Voice Control Configuration.ini", voiceControlConfiguration)
+				this.iVoiceControlConfigurator.saveToConfiguration(configuration)
+				
+				voiceControlConfiguration := newConfiguration()
+		
+				for ignore, section in ["Voice Control"] {
+					subConfiguration := getConfigurationSectionValues(configuration, section, false)
+					
+					if subConfiguration
+						setConfigurationSectionValues(voiceControlConfiguration, section, subConfiguration)
+				}
+					
+				writeConfiguration(kUserHomeDirectory . "Install\Voice Control Configuration.ini", voiceControlConfiguration)
+			}
+			
+			this.iPendingApplicationRegistration := false
+			this.iPendingFunctionRegistration := false
 			
 			return true
 		}
-		else
+		else {
+			this.iVoiceControlConfigurator.showWidgets()
+		
 			return false
+		}
+	}
+	
+	loadApplications(load := false) {
+		local application
+		local function
+		
+		window := this.Window
+		wizard := this.SetupWizard
+		
+		if load
+			this.iLaunchApplications := {}
+		
+		Gui %window%:Default
+		
+		Gui ListView, % this.iLaunchApplicationsListHandle
+		
+		LV_Delete()
+		
+		row := false
+		column := false
+		
+		for ignore, section in string2Values(",", this.Definition[3])
+			for application, descriptor in getConfigurationSectionValues(wizard.Definition, section) {
+				if wizard.isApplicationSelected(application) {
+					if load {
+						function := wizard.getLaunchApplicationFunction(application)
+						
+						if (function != "") {
+							label := wizard.getLaunchApplicationLabel(application)
+						
+							this.iLaunchApplications[application] := Array(label, function)
+				
+							for ignore, preview in this.ButtonBoxPreviews
+								if preview.findFunction(function, row, column)
+									preview.setLabel(row, column, (label != "") ? label : application)
+						}
+					}
+					
+					if this.iLaunchApplications.HasKey(application)
+						LV_Add("", application, this.iLaunchApplications[application][1], this.iLaunchApplications[application][2])
+					else
+						LV_Add("", application, "", "")
+				}
+			}
+			
+		LV_ModifyCol(1, "AutoHdr")
+		LV_ModifyCol(2, "AutoHdr")
+	}
+	
+	saveApplications() {
+		this.SetupWizard.setLaunchApplicationLabelsAndFunctions(this.iLaunchApplications)
 	}
 	
 	addModeSelector(preview, function, control, row, column) {
@@ -311,42 +451,154 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 		}
 	}
 	
-	controlClick(preview, element, function, row, column, isEmpty) {
-		if (element[1] = "Control") {
-			menuItem := (translate(element[1] . ": ") . element[2] . " (" . row . " x " . column . ")")
+	setLaunchApplication(arguments) {
+		this.iPendingApplicationRegistration := arguments
+		
+		SetTimer showLaunchHint, 100
+	}
+	
+	clearLaunchApplication(preview, function, control, row, column) {
+		local application
+		
+		for application, candidate in this.iLaunchApplications
+			if (candidate[2] = function) {
+				SoundPlay %kResourcesDirectory%Sounds\Activated.wav
 				
-			try {
-				Menu ContextMenu, DeleteAll
+				this.iLaunchApplications.Delete(application)
+				
+				preview.setLabel(row, column, ConfigurationItem.splitDescriptor(control)[2])
+		
+				for ignore, function in this.SetupWizard.getControllerStaticFunctions()
+					if preview.findFunction(function[1], row, column)
+						preview.setLabel(row, column, function[2])
+				
+				this.loadApplications()
+				
+				break
 			}
-			catch exception {
-				; ignore
+	}
+	
+	updateApplicationFunction(row) {
+		if this.iPendingApplicationRegistration {
+			arguments := this.iPendingApplicationRegistration
+		
+			this.iPendingApplicationRegistration := false
+			this.iPendingFunctionRegistration := row
+			
+			this.controlClick(arguments*)
+		}
+		else {
+			this.iPendingFunctionRegistration := row
+			
+			SetTimer showLaunchHint, 100
+		}
+	}
+	
+	controlClick(preview, element, function, row, column, isEmpty, applicationRegistration := false) {
+		local application
+		
+		if (element[1] = "Control") {
+			if (!this.iPendingFunctionRegistration && !applicationRegistration) {
+				menuItem := (translate(element[1] . ": ") . element[2] . " (" . row . " x " . column . ")")
+				
+				try {
+					Menu ContextMenu, DeleteAll
+				}
+				catch exception {
+					; ignore
+				}
+				
+				window := SetupWizard.Instance.WizardWindow
+				
+				Gui %window%:Default
+				
+				Menu ContextMenu, Add, %menuItem%, menuIgnore
+				Menu ContextMenu, Disable, %menuItem%
+				Menu ContextMenu, Add
+				
+				menuItem := translate("Set Mode Selector")
+				handler := ObjBindMethod(this, "addModeSelector", preview, function, element[2], row, column)
+				
+				Menu ContextMenu, Add, %menuItem%, %handler%
+				
+				if inList(this.iModeSelectors, function)
+					Menu ContextMenu, Disable, %menuItem%
+				
+				menuItem := translate("Clear Mode Selector")
+				handler := ObjBindMethod(this, "removeModeSelector", preview, function, element[2], row, column)
+				
+				Menu ContextMenu, Add, %menuItem%, %handler%
+				
+				if !inList(this.iModeSelectors, function)
+					Menu ContextMenu, Disable, %menuItem%
+				
+				Menu ContextMenu, Add
+				
+				menuItem := translate("Set Application")
+				handler := ObjBindMethod(this, "setLaunchApplication", Array(preview, element, function, row, column, false, true))
+				
+				Menu ContextMenu, Add, %menuItem%, %handler%
+				
+				/*
+				for ignore, candidate in this.iLaunchApplications
+					if (candidate[2] == function) {
+						Menu ContextMenu, Disable, %menuItem%
+						
+						break
+					}
+				*/
+				
+				menuItem := translate("Clear Application")
+				handler := ObjBindMethod(this, "clearLaunchApplication", preview, function, element[2], row, column)
+				
+				Menu ContextMenu, Add, %menuItem%, %handler%
+				Menu ContextMenu, Disable, %menuItem%
+				
+				for ignore, candidate in this.iLaunchApplications
+					if (candidate[2] == function) {
+						Menu ContextMenu, Enable, %menuItem%
+						
+						break
+					}
+				
+				Menu ContextMenu, Show
 			}
+			else {
+				SoundPlay %kResourcesDirectory%Sounds\Activated.wav
+					
+				window := this.Window
+				
+				Gui %window%:Default
+				Gui ListView, % this.iLaunchApplicationsListHandle
 			
-			window := SetupWizard.Instance.WizardWindow
+				LV_GetText(application, this.iPendingFunctionRegistration, 1)
+				
+				if function {
+					if this.iLaunchApplications.HasKey(application)
+						this.iLaunchApplications[application][2] := function
+					else
+						this.iLaunchApplications[application] := Array("", function)
+					
+					label := this.iLaunchApplications[application][1]
+					
+					preview.setLabel(row, column, (label != "") ? label : application)
+					
+					this.loadApplications()
+					
+					window := this.Window
+					
+					Gui %window%:Default
+					Gui ListView, % this.iLaunchApplicationsListHandle
 			
-			Gui %window%:Default
-			
-			Menu ContextMenu, Add, %menuItem%, menuIgnore
-			Menu ContextMenu, Disable, %menuItem%
-			Menu ContextMenu, Add
-			
-			menuItem := translate("Set Mode Selector")
-			handler := ObjBindMethod(this, "addModeSelector", preview, function, element[2], row, column)
-			
-			Menu ContextMenu, Add, %menuItem%, %handler%
-			
-			if inList(this.iModeSelectors, function)
-				Menu ContextMenu, Disable, %menuItem%
-			
-			menuItem := translate("Clear Mode Selector")
-			handler := ObjBindMethod(this, "removeModeSelector", preview, function, element[2], row, column)
-			
-			Menu ContextMenu, Add, %menuItem%, %handler%
-			
-			if !inList(this.iModeSelectors, function)
-				Menu ContextMenu, Disable, %menuItem%
-			
-			Menu ContextMenu, Show
+					LV_Modify(this.iPendingFunctionRegistration, "Vis")
+				}
+				
+				SetTimer showLaunchHint, Off
+				
+				ToolTip, , , 1
+				
+				this.iPendingFunctionRegistration := false
+			}
 		}
 	}
 	
@@ -359,6 +611,119 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+updateApplicationFunction() {
+	Loop % LV_GetCount()
+		LV_Modify(A_Index, "-Select")
+	
+	wizard := SetupWizard.Instance.StepWizards["General"]
+	
+	if ((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick")) {
+		if (A_EventInfo > 0) {
+			if wizard.SetupWizard.isModuleSelected("Button Box") {
+				row := A_EventInfo
+				
+				if wizard.iPendingApplicationRegistration
+					wizard.updateApplicationFunction(row)
+				else {
+					curCoordMode := A_CoordModeMouse
+
+					LV_GetText(application, row, 1)
+					
+					menuItem := application
+					
+					try {
+						Menu ContextMenu, DeleteAll
+					}
+					catch exception {
+						; ignore
+					}
+					
+					window := wizard.Window
+					
+					Gui %window%:Default
+					
+					Menu ContextMenu, Add, %menuItem%, menuIgnore
+					Menu ContextMenu, Disable, %menuItem%
+					Menu ContextMenu, Add
+					
+					menuItem := translate("Set Function")
+					handler := ObjBindMethod(wizard, "updateApplicationFunction", row)
+					
+					Menu ContextMenu, Add, %menuItem%, %handler%
+					Menu ContextMenu, Add
+					
+					menuItem := translate("Input Label...")
+					handler := Func("inputLabel").Bind(wizard, row)
+					
+					Menu ContextMenu, Add, %menuItem%, %handler%
+					
+					Menu ContextMenu, Show
+				}
+			}
+		}
+		
+		Loop % LV_GetCount()
+			LV_Modify(A_Index, "-Select")
+	}
+}
+
+inputLabel(wizard, row) {
+	local function
+	
+	title := translate("Setup")
+	prompt := translate("Please enter a label:")
+	
+	window := wizard.Window
+
+	Gui %window%:Default
+	Gui ListView, % wizard.iLaunchApplicationsListHandle
+
+	LV_GetText(application, row, 1)
+	LV_GetText(label, row, 2)
+	LV_GetText(function, row, 3)
+	
+	locale := ((getLanguage() = "en") ? "" : "Locale")
+	
+	InputBox label, %title%, %prompt%, , 200, 150, , , %locale%, , %label%
+
+	if ErrorLevel
+		return
+	else {
+		if wizard.iLaunchApplications.HasKey(application)
+			wizard.iLaunchApplications[application][1] := label
+		else
+			wizard.iLaunchApplications[application] := Array(label, "")
+				
+		if (function != "")
+			for ignore, preview in wizard.ButtonBoxPreviews
+				if preview.findFunction(function, row, column)
+					preview.setLabel(row, column, (label != "") ? label : application)
+	
+		wizard.loadApplications()
+	}
+}
+
+showLaunchHint() {
+	if (GetKeyState("Esc", "P") || !vCurrentLaunchWizard) {
+		SetTimer showSelectorHint, Off
+		
+		vCurrentLaunchWizard.iPendingApplicationRegistration := false
+		vCurrentLaunchWizard.iPendingFunctionRegistration := false
+		
+		ToolTip, , , 1
+	}
+	else if vCurrentLaunchWizard.iPendingFunctionRegistration {
+		hint := translate("Click on a controller function...")
+		
+		ToolTip %hint%, , , 1
+	}
+	else if vCurrentLaunchWizard.iPendingApplicationRegistration {
+		hint := translate("Click on an application...")
+		
+		ToolTip %hint%, , , 1
+	}
+}
 
 initializeGeneralStepWizard() {
 	SetupWizard.Instance.registerStepWizard(new GeneralStepWizard(SetupWizard.Instance, "General", kSimulatorConfiguration))

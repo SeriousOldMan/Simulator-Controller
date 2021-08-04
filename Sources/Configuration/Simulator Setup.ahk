@@ -65,8 +65,6 @@ global vInstallerLanguage = false
 global vResult = false
 global vWorking = false
 
-global vCurrentRegistrationWizard = false
-
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                        Public Constant Section                          ;;;
@@ -780,6 +778,22 @@ class SetupWizard extends ConfigurationItem {
 		return this.KnowledgeBase.getValue("Application." . application . ".Path", false)
 	}
 	
+	setGeneralConfiguration(language, startWithWindows, silentMode) {
+		local knowledgeBase := this.KnowledgeBase
+		
+		knowledgeBase.setFact("General.Language", language)
+		knowledgeBase.setFact("General.Start With Windows", startWithWindows)
+		knowledgeBase.setFact("General.Silent Mode", silentMode)
+	}
+	
+	getGeneralConfiguration(ByRef language, ByRef startWithWindows, ByRef silentMode) {
+		local knowledgeBase := this.KnowledgeBase
+		
+		language := knowledgeBase.getValue("General.Language", "EN")
+		startWithWindows := knowledgeBase.getValue("General.Start With Windows", true)
+		silentMode := knowledgeBase.getValue("General.Silent Mode", false)
+	}
+	
 	setModeSelectors(modeSelectors) {
 		if (modeSelectors.Length() > 0)
 			this.KnowledgeBase.setFact("Controller.Mode.Selectors", values2String("|", modeSelectors*))
@@ -789,6 +803,50 @@ class SetupWizard extends ConfigurationItem {
 	
 	getModeSelectors() {
 		return string2Values("|", this.KnowledgeBase.getValue("Controller.Mode.Selectors", ""))
+	}
+	
+	setLaunchApplicationLabelsAndFunctions(labelsAndFunctions) {
+		local knowledgeBase := this.KnowledgeBase
+		local application
+		local function
+		
+		Loop % knowledgeBase.getValue("System.Launch.Application.Count", 0)
+		{
+			application := knowledgeBase.getValue("System.Launch.Application." . A_Index, false)
+		
+			if application {
+				knowledgeBase.removeFact("System.Launch.Application." . application . ".Label")
+				knowledgeBase.removeFact("System.Launch.Application." . application . ".Function")
+			}
+			
+			knowledgeBase.removeFact("System.Launch.Application." . A_Index)
+		}
+		
+		count := 0
+		
+		for application, labelAndFunction in labelsAndFunctions {
+			function := labelAndFunction[2]
+			
+			if (function && (function != "")) {
+				count += 1
+			
+				knowledgeBase.addFact("System.Launch.Application." . count, application)
+				knowledgeBase.addFact("System.Launch.Application." . application . ".Label", labelAndFunction[1])
+				knowledgeBase.addFact("System.Launch.Application." . application . ".Function", function)
+			}
+		}
+		
+		knowledgeBase.setFact("System.Launch.Application.Count", count)
+		
+		this.updateState()
+	}
+	
+	getLaunchApplicationLabel(application) {
+		return this.KnowledgeBase.getValue("System.Launch.Application." application . ".Label", "")
+	}
+	
+	getLaunchApplicationFunction(application) {
+		return this.KnowledgeBase.getValue("System.Launch.Application." application . ".Function", "")
 	}
 	
 	addControllerStaticFunction(reference, function, label) {
@@ -1886,7 +1944,7 @@ initializeSimulatorSetup()
 ; #Include Libraries\ModulesStepWizard.ahk
 ; #Include Libraries\InstallationStepWizard.ahk
 ; #Include Libraries\ApplicationsStepWizard.ahk
-; #Include Libraries\ButtonBoxStepWizard.ahk
+#Include Libraries\ButtonBoxStepWizard.ahk
 #Include Libraries\GeneralStepWizard.ahk
 ; #Include Libraries\SimulatorsStepWizard.ahk
 ; #Include Libraries\AssistantsStepWizard.ahk

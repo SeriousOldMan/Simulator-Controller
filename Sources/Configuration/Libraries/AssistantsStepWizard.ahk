@@ -188,7 +188,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 			Gui Add, ListView, x%listX% yp+10 w%listWidth% h347 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDactionsListViewHandle gupdateAssistantActionFunction Hidden, % values2String("|", map(["Action", "Label", "Function"], "translate")*)
 			
 			info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Assistants", "Assistants.Actions.Info." . getLanguage()))
-			info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'>" . info . "</div>"
+			info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
 			
 			Gui %window%:Add, ActiveX, x%x% yp+352 w%width% h135 HWNDactionsInfoTextHandle VactionsInfoText%page% Hidden, shell explorer
 

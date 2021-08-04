@@ -30,6 +30,8 @@ Release 3.5.0 Checklist
 3. Renamed "Key Detector Tool"
    a. Documentatiom
    b. Doc Image
+4. "launchApplications" parameter
+   a. Documentation
 
 Release 3.3.0 Checklist
 =======================

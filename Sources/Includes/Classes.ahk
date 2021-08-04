@@ -724,4 +724,37 @@ class Plugin extends ConfigurationItem {
 	setArgumentValue(argument, value) {
 		this.iArguments[argument] := value
 	}
+	
+	parseValues(delimiter, string) {
+		arguments := {}
+		
+		Loop {
+			startPos := InStr(string, """")
+			
+			if startPos {
+				startPos += 1
+				endPos := InStr(string, """", false, startPos)
+				
+				if endPos {
+					argument := SubStr(string, startPos, endPos - startPos)
+					key := "/#/" . A_Index . "/#/"
+				
+					arguments[key] := argument
+					
+					string := StrReplace(string, """" . argument . """", key)
+				}
+				else
+					Throw "Second "" not found while parsing (" . string . ") for quoted argument values in Plugin.parseValues..."
+			}
+			else
+				break
+		}
+			
+		result := []
+		
+		for ignore, value in string2Values(delimiter, string)
+			result.Push(arguments.HasKey(value) ? arguments[value] : value)
+		
+		return result
+	}
 } 

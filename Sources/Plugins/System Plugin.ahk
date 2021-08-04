@@ -226,6 +226,9 @@ class SystemPlugin extends ControllerPlugin {
 					this.logFunctionNotFound(descriptor)
 			}
 		
+		for ignore, arguments in this.parseValues(",", this.getArgumentValue("launchApplications", ""))
+			this.createLaunchAction(controller, this.parseValues(A_Space, arguments)*)
+		
 		descriptor := this.getArgumentValue("logo", false)
 		
 		if (descriptor != false) {
@@ -297,6 +300,27 @@ class SystemPlugin extends ControllerPlugin {
 			else
 				this.logFunctionNotFound(descriptor)
 		}
+	}
+	
+	createLaunchAction(controller, label, application, function) {
+		function := this.Controller.findFunction(function)
+			
+		if (function != false) {
+			runnable := this.findRunnableApplication(application)
+			
+			if (runnable != false) {
+				action := new this.LaunchAction(function, label, application)
+
+				if !this.iLaunchMode
+					this.iLaunchMode := new this.LaunchMode(this)
+			
+				this.iLaunchMode.registerAction(action)
+			
+				runnable.connectAction(function, action)
+			}
+		}
+		else
+			logMessage(kLogWarn, translate("Application ") . application . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
 	}
 	
 	simulatorStartup(simulator) {

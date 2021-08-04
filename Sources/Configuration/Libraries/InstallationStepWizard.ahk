@@ -97,7 +97,7 @@ class InstallationStepWizard extends StepWizard {
 			info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Installation", "Installation." . software . ".Info." . getLanguage()))
 			
 			label := (translate("Software: ") . software)
-			info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'>" . info . "</div>"
+			info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
 			
 			installed := this.SetupWizard.isSoftwareInstalled(software)
 			
@@ -118,12 +118,14 @@ class InstallationStepWizard extends StepWizard {
 			
 			Gui %window%:Font, s8 Norm, Arial
 			
-			Gui %window%:Add, Button, x%buttonX% y%y% w90 h23 HWNDinstallButtonHandle VinstallButton%A_Index% GinstallSoftware Hidden, % (InStr(installer, "http") = 1) ? translate("Download...") : translate("Install...")
+			buttonY := y + 5
+			
+			Gui %window%:Add, Button, x%buttonX% y%buttonY% w90 h23 HWNDinstallButtonHandle VinstallButton%A_Index% GinstallSoftware Hidden, % (InStr(installer, "http") = 1) ? translate("Download...") : translate("Install...")
 			
 			if locatable {
 				buttonX += 95
 				
-				Gui %window%:Add, Button, x%buttonX% y%y% w90 h23 HWNDlocateButtonHandle VlocateButton%A_Index% GlocateSoftware Hidden, % installed ? translate("Installed") : translate("Locate...")
+				Gui %window%:Add, Button, x%buttonX% y%buttonY% w90 h23 HWNDlocateButtonHandle VlocateButton%A_Index% GlocateSoftware Hidden, % installed ? translate("Installed") : translate("Locate...")
 			}
 			
 			Gui %window%:Add, ActiveX, x%x% yp+33 w%width% h120 HWNDinfoTextHandle VinfoText%A_Index% Hidden, shell explorer

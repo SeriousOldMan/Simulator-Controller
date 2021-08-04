@@ -198,7 +198,7 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 		this.registerMode(this.iPedalProfileMode)
 		
 		for ignore, theAction in string2Values(",", this.getArgumentValue("pedalCalibrations", ""))
-			this.createPedalCalibrationAction(controller, string2Values(A_Space, theAction)*)
+			this.createPedalCalibrationAction(controller, this.parseValues(A_Space, theAction)*)
 		
 		controller.registerPlugin(this)
 	}

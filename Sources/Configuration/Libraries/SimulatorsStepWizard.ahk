@@ -26,6 +26,8 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 	iSimulators := []
 	iCurrentSimulator := false
 	
+	iButtonBoxWidgets := []
+	
 	Pages[] {
 		Get {
 			wizard := this.SetupWizard
@@ -157,9 +159,17 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		actionsInfoText.Navigate("about:blank")
 		actionsInfoText.Document.Write(html)
 		
+		this.iButtonBoxWidgets := [columnLabel2Handle, columnLine2Handle]
+		
 		this.setActionsListView(actionsListViewHandle)
 		
 		this.registerWidgets(1, actionsIconHandle, actionsLabelHandle, actionsListViewHandle, actionsInfoTextHandle, simulatorLabelHandle, simulatorDropDownHandle, columnLabel1Handle, columnLine1Handle, columnLabel2Handle, columnLine2Handle)
+	}
+	
+	reset() {
+		base.reset()
+		
+		this.iButtonBoxWidgets := []
 	}
 	
 	updateState() {
@@ -181,6 +191,10 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		this.iCurrentSimulator := ((chosen > 0) ? this.iSimulators[chosen] : false)
 		
 		base.showPage(page)
+		
+		if !this.SetupWizard.isModuleSelected("Button Box")
+			for ignore, widget in this.iButtonBoxWidgets
+				GuiControl Hide, %widget%
 		
 		GuiControl, , simulatorDropDown, % "|" . values2String("|", this.iSimulators*)
 		GuiControl Choose, simulatorDropDown, % chosen

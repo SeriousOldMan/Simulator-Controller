@@ -242,8 +242,13 @@ class SetupWizard extends ConfigurationItem {
 		Loop %count% {
 			step := this.Steps[A_Index]
 		
-			if step
+			if step {
+				stepDefinition := readConfiguration(kResourcesDirectory . "Setup\Definitions\" . step.Step . " Step.ini")
+				
+				setConfigurationSectionValues(definition, "Setup." . step.Step, getConfigurationSectionValues(stepDefinition, "Setup." . step.Step, Object()))
+				
 				step.loadDefinition(definition, getConfigurationValue(definition, "Setup.Steps", "Step." . A_Index . "." . step.Step))
+			}
 		}
 		
 		this.iCount := count
@@ -1465,6 +1470,23 @@ class StartStepWizard extends StepWizard {
 		}
 	}
 	
+	reset() {
+		base.reset()
+		
+		this.iImageViewer := false
+		
+		volume := fadeOut()
+			
+		try {
+			SoundPlay NonExistent.avi
+		}
+		catch exception {
+			; ignore
+		}
+	
+		resetVolume(volume)
+	}
+	
 	showPage(page) {
 		if (page == 1) {
 			imageViewer := this.iImageViewer
@@ -1944,10 +1966,13 @@ initializeSimulatorSetup()
 ; #Include Libraries\ModulesStepWizard.ahk
 ; #Include Libraries\InstallationStepWizard.ahk
 ; #Include Libraries\ApplicationsStepWizard.ahk
-#Include Libraries\ButtonBoxStepWizard.ahk
+; #Include Libraries\ButtonBoxStepWizard.ahk
 #Include Libraries\GeneralStepWizard.ahk
 ; #Include Libraries\SimulatorsStepWizard.ahk
 ; #Include Libraries\AssistantsStepWizard.ahk
+; #Include Libraries\MotionControlStepWizard.ahk
+; #Include Libraries\VibrationControlStepWizard.ahk
+; #Include Libraries\PedalCalibrationStepWizard.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;

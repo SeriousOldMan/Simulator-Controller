@@ -191,7 +191,7 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 		Gui %window%:Add, Text, x%x% yp+60 w140 h23 +0x200 HWNDlaunchApplicationsLabelHandle Hidden, % translate("Launch Mode")
 		Gui %window%:Add, ListView, x%x% yp+24 w%col1Width% h114 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDlaunchApplicationsListHandle gupdateApplicationFunction Hidden, % values2String("|", map(["Application", "Label", "Function"], "translate")*)
 		
-		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.General", "General.General.Info." . getLanguage()))
+		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.General", "General.Settings.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
 
 		Gui %window%:Add, ActiveX, x%x% yp+120 w%width% h88 HWNDgeneralInfoTextHandle VgeneralInfoText Hidden, shell explorer

@@ -23,6 +23,8 @@
 class AssistantsStepWizard extends ActionsStepWizard {
 	iCurrentAssistant := false
 	
+	iButtonBoxWidgets := []
+	
 	iActionsListViews := []
 	iAssistantConfigurators := []
 	
@@ -221,6 +223,9 @@ class AssistantsStepWizard extends ActionsStepWizard {
 				configurator.createGui(this, x, listY + 30, colWidth, height)
 			}
 			
+			this.iButtonBoxWidgets.Push(columnLabel1Handle)
+			this.iButtonBoxWidgets.Push(columnLine1Handle)
+			
 			this.registerWidgets(page, actionsIconHandle, actionsLabelHandle, actionsListViewHandle, actionsInfoTextHandle, columnLabel1Handle, columnLine1Handle, columnLabel2Handle, columnLine2Handle)
 		}
 	}
@@ -237,6 +242,8 @@ class AssistantsStepWizard extends ActionsStepWizard {
 	reset() {
 		base.reset()
 		
+		this.iButtonBoxWidgets := []
+		
 		this.iAssistantConfigurators := []
 		this.iActionsListViews := []
 	}
@@ -249,7 +256,11 @@ class AssistantsStepWizard extends ActionsStepWizard {
 		this.setActionsListView(this.iActionsListViews[page])
 		
 		base.showPage(page)
-				
+		
+		if !this.SetupWizard.isModuleSelected("Button Box")
+			for ignore, widget in this.iButtonBoxWidgets
+				GuiControl Hide, %widget%
+			
 		configuration := this.SetupWizard.getSimulatorConfiguration()
 		assistantConfiguration := readConfiguration(kUserHomeDirectory . "Install\" . this.iCurrentAssistant . " Configuration.ini")
 		

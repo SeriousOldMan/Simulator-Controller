@@ -1960,16 +1960,16 @@ initializeSimulatorSetup()
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                          Plugin Include Section                         ;;;
+;;;                          Wizard Include Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-; #Include Libraries\ModulesStepWizard.ahk
+#Include Libraries\ModulesStepWizard.ahk
 ; #Include Libraries\InstallationStepWizard.ahk
 ; #Include Libraries\ApplicationsStepWizard.ahk
-; #Include Libraries\ButtonBoxStepWizard.ahk
+#Include Libraries\ButtonBoxStepWizard.ahk
 #Include Libraries\GeneralStepWizard.ahk
-; #Include Libraries\SimulatorsStepWizard.ahk
-; #Include Libraries\AssistantsStepWizard.ahk
+#Include Libraries\SimulatorsStepWizard.ahk
+#Include Libraries\AssistantsStepWizard.ahk
 ; #Include Libraries\MotionControlStepWizard.ahk
 ; #Include Libraries\VibrationControlStepWizard.ahk
 ; #Include Libraries\PedalCalibrationStepWizard.ahk

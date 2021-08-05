@@ -176,9 +176,9 @@ class AssistantsStepWizard extends ActionsStepWizard {
 			colummLabel2Handle := false
 			colummLine2Handle := false
 		
-			listX := x + 400
+			listX := x + 350
 			listY := labelY + 30
-			listWidth := width - 400
+			listWidth := width - 350
 			
 			Gui %window%:Font, Bold, Arial
 			
@@ -208,7 +208,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 			else
 				configurator := false
 			
-			colWidth := 400 - x
+			colWidth := 350 - x
 			
 			Gui %window%:Font, Bold, Arial
 			

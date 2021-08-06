@@ -311,7 +311,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 					else
 						function := ""
 					
-					LV_Add("", (first ? mode : ""), subAction, label, function)
+					LV_Add("", (first ? translate(mode) : ""), subAction, label, function)
 					
 					count += 1
 				}

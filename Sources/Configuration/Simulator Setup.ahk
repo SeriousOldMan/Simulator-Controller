@@ -1123,11 +1123,14 @@ class SetupWizard extends ConfigurationItem {
 		count := 0
 		
 		for action, function in functions {
-			if (function && (function != "")) {
+			if (function && ((IsObject(function) && (function.Length() > 0)) || (function != ""))) {
+				if !IsObject(function)
+					function := Array(function)
+				
 				count += 1
 				
 				knowledgeBase.addFact("Module." . module . modeClause . ".Action." . count, action)
-				knowledgeBase.addFact("Module." . module . modeClause . ".Action." . action . ".Function", function)
+				knowledgeBase.addFact("Module." . module . modeClause . ".Action." . action . ".Function", values2String("|", function*))
 			}
 		}
 		
@@ -1141,7 +1144,28 @@ class SetupWizard extends ConfigurationItem {
 		
 		modeClause := (mode ? (".Mode." . mode) : "")
 		
-		return this.KnowledgeBase.getValue("Module." . module . modeClause . ".Action." . action . ".Function", "")
+		function := this.KnowledgeBase.getValue("Module." . module . modeClause . ".Action." . action . ".Function", false)
+		
+		if function {
+			function := string2Values("|", function)
+			
+			return ((function.Length() == 1) ? function[1] : function)
+		}
+		else
+			return ""
+	}
+	
+	moduleActionAvailable(module, mode, action) {
+		local knowledgeBase := this.KnowledgeBase
+		
+		if mode
+			goal := "moduleActionAvailable?(" . StrReplace(module, A_Space, "\ ") . ", " . StrReplace(mode, A_Space, "\ ") . ", " . StrReplace(action, A_Space, "\ ") . ")"
+		else
+			goal := "moduleActionAvailable?(" . StrReplace(module, A_Space, "\ ") . ", " . StrReplace(action, A_Space, "\ ") . ")"
+		
+		goal := new RuleCompiler().compileGoal(goal)
+		
+		return knowledgeBase.prove(goal)
 	}
 	
 	setTitle(title) {
@@ -2003,13 +2027,13 @@ initializeSimulatorSetup()
 ;;;                          Wizard Include Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-;~ #Include Libraries\ModulesStepWizard.ahk
-;~ #Include Libraries\InstallationStepWizard.ahk
+#Include Libraries\ModulesStepWizard.ahk
+#Include Libraries\InstallationStepWizard.ahk
 ;~ #Include Libraries\ApplicationsStepWizard.ahk
 ;~ #Include Libraries\ButtonBoxStepWizard.ahk
 ;~ #Include Libraries\GeneralStepWizard.ahk
-#Include Libraries\SimulatorsStepWizard.ahk
-#Include Libraries\AssistantsStepWizard.ahk
+;~ #Include Libraries\SimulatorsStepWizard.ahk
+;~ #Include Libraries\AssistantsStepWizard.ahk
 ; #Include Libraries\MotionControlStepWizard.ahk
 ; #Include Libraries\VibrationControlStepWizard.ahk
 #Include Libraries\PedalCalibrationStepWizard.ahk

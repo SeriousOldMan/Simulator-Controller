@@ -52,7 +52,7 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 				action := (pedal . "." . action)
 				function := wizard.getModuleActionFunction("Pedal Calibration", "Pedal Calibration", action)
 				
-				if (function && (function != "")) {
+				if (function && (function != ""))
 					calibrations.Push("""" . action . """ " . function)
 			}
 		
@@ -102,7 +102,7 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-updateSimulatorActionFunction() {
+updatePedalCalibrationActionFunction() {
 	updateActionFunction(SetupWizard.Instance.StepWizards["Pedal Calibration"])
 }
 

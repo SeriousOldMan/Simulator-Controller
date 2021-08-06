@@ -54,9 +54,7 @@ class ButtonBoxStepWizard extends StepWizard {
 	
 	Pages[] {
 		Get {
-			definition := this.Definition
-			
-			return (this.SetupWizard.isModuleSelected(definition[1]) ? 1 : 0)
+			return (this.SetupWizard.isModuleSelected("Button Box") ? 1 : 0)
 		}
 	}
 	

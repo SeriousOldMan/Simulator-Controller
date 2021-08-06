@@ -224,10 +224,9 @@ class SetupWizard extends ConfigurationItem {
 		
 		count := 0
 		
-		for descriptor, stepDefinition in getConfigurationSectionValues(definition, "Setup.Steps") {
-			descriptor := string2Values(".", descriptor)
+		for descriptor, step in getConfigurationSectionValues(definition, "Setup.Steps") {
+			descriptor := ConfigurationItem.splitDescriptor(descriptor)
 		
-			step := descriptor[3]
 			stepWizard := this.StepWizards[step]
 			
 			if stepWizard {
@@ -247,7 +246,7 @@ class SetupWizard extends ConfigurationItem {
 				
 				setConfigurationSectionValues(definition, "Setup." . step.Step, getConfigurationSectionValues(stepDefinition, "Setup." . step.Step, Object()))
 				
-				step.loadDefinition(definition, getConfigurationValue(definition, "Setup.Steps", "Step." . A_Index . "." . step.Step))
+				step.loadDefinition(definition, getConfigurationValue(definition, "Setup." . step.Step, step.Step . ".Definition", Object()))
 			}
 		}
 		
@@ -1598,7 +1597,7 @@ class FinishStepWizard extends StepWizard {
 		image := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Finish", "Finish.Image"))
 		text := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Finish", "Finish.Text." . getLanguage()))
 		
-		text := "<div style='text-align: center' style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'>" . text . "</div>"
+		text := "<div style='text-align: center' style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px' style='font-weight: 600'>" . text . "</div>"
 		
 		height := Round(width / 16 * 9)
 		
@@ -2004,16 +2003,16 @@ initializeSimulatorSetup()
 ;;;                          Wizard Include Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include Libraries\ModulesStepWizard.ahk
-; #Include Libraries\InstallationStepWizard.ahk
-; #Include Libraries\ApplicationsStepWizard.ahk
-#Include Libraries\ButtonBoxStepWizard.ahk
-#Include Libraries\GeneralStepWizard.ahk
+;~ #Include Libraries\ModulesStepWizard.ahk
+;~ #Include Libraries\InstallationStepWizard.ahk
+;~ #Include Libraries\ApplicationsStepWizard.ahk
+;~ #Include Libraries\ButtonBoxStepWizard.ahk
+;~ #Include Libraries\GeneralStepWizard.ahk
 #Include Libraries\SimulatorsStepWizard.ahk
 #Include Libraries\AssistantsStepWizard.ahk
 ; #Include Libraries\MotionControlStepWizard.ahk
 ; #Include Libraries\VibrationControlStepWizard.ahk
-; #Include Libraries\PedalCalibrationStepWizard.ahk
+#Include Libraries\PedalCalibrationStepWizard.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;

@@ -1104,6 +1104,47 @@ class SetupWizard extends ConfigurationItem {
 		return actions
 	}
 	
+	setModuleActionFunctions(module, mode, functions) {
+		local knowledgeBase := this.KnowledgeBase
+		local function
+		local action
+		
+		modeClause := (mode ? (".Mode." . mode) : "")
+		
+		Loop % knowledgeBase.getValue("Module." . module . modeClause . ".Action.Count", 0)
+		{
+			action := knowledgeBase.getValue("Module." . module . modeClause . ".Action." . A_Index, false)
+		
+			if action
+				knowledgeBase.removeFact("Module." . module . modeClause . ".Action." . action . ".Function")
+			
+			knowledgeBase.removeFact("Module." . module . modeClause . ".Action." . A_Index)
+		}
+		
+		count := 0
+		
+		for action, function in functions {
+			if (function && (function != "")) {
+				count += 1
+				
+				knowledgeBase.addFact("Module." . module . modeClause . ".Action." . count, action)
+				knowledgeBase.addFact("Module." . module . modeClause . ".Action." . action . ".Function", function)
+			}
+		}
+		
+		knowledgeBase.setFact("Module." . module . modeClause . ".Action.Count", count)
+		
+		this.updateState()
+	}
+	
+	getModuleActionFunction(module, mode, action) {
+		local function
+		
+		modeClause := (mode ? (".Mode." . mode) : "")
+		
+		return this.KnowledgeBase.getValue("Module." . module . modeClause . ".Action." . action . ".Function", "")
+	}
+	
 	setTitle(title) {
 		window := this.HelpWindow
 		

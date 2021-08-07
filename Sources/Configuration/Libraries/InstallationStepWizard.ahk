@@ -212,6 +212,30 @@ class InstallationStepWizard extends StepWizard {
 				}
 			}
 	}
+	
+	hidePage(oage) {
+		wizard := this.SetupWizard
+		done := true
+		
+		for software, ignore in this.iPages[page]
+			if (wizard.isSoftwareRequested(software) && !wizard.isSoftwareInstalled(software)) {
+				done := false
+				
+				break
+			}
+		
+		if !done {
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+			title := translate("Setup")
+			MsgBox 262436, %title%, % translate("Not all required software components have been installed. Do you really want to proceed?")
+			OnMessage(0x44, "")
+			
+			IfMsgBox No
+				return false
+		}
+		
+		return hidePage(page)
+	}
 }
 
 

@@ -957,6 +957,7 @@ class SetupWizard extends ConfigurationItem {
 		local knowledgeBase := this.KnowledgeBase
 		local function
 		local action
+		local count := 0
 		
 		Loop % knowledgeBase.getValue("Simulator." . simulator . ".Mode." . mode . ".Action.Count", 0)
 		{
@@ -967,8 +968,6 @@ class SetupWizard extends ConfigurationItem {
 			
 			knowledgeBase.removeFact("Simulator." . simulator . ".Mode." . mode . ".Action." . A_Index)
 		}
-		
-		count := 0
 		
 		for action, function in functions {
 			if (function && ((IsObject(function) && (function.Length() > 0)) || (function != ""))) {
@@ -1004,13 +1003,14 @@ class SetupWizard extends ConfigurationItem {
 		
 		goal := new RuleCompiler().compileGoal("simulatorActionAvailable?(" . StrReplace(simulator, A_Space, "\ ") . ", " . StrReplace(mode, A_Space, "\ ") . ", " . StrReplace(action, A_Space, "\ ") . ")")
 		
-		return knowledgeBase.prove(goal)
+		return (knowledgeBase.prove(goal) != false)
 	}
 	
 	setAssistantActionFunctions(assistant, functions) {
 		local knowledgeBase := this.KnowledgeBase
 		local function
 		local action
+		local count := 0
 		
 		Loop % knowledgeBase.getValue("Assistant." . assistant . ".Action.Count", 0)
 		{
@@ -1021,8 +1021,6 @@ class SetupWizard extends ConfigurationItem {
 			
 			knowledgeBase.removeFact("Assistant." . assistant . ".Action." . A_Index)
 		}
-		
-		count := 0
 		
 		for action, function in functions {
 			if (function && ((IsObject(function) && (function.Length() > 0)) || (function != ""))) {
@@ -1058,7 +1056,7 @@ class SetupWizard extends ConfigurationItem {
 		
 		goal := new RuleCompiler().compileGoal("assistantActionAvailable?(" . StrReplace(assistant, A_Space, "\ ") . ", " . StrReplace(action, A_Space, "\ ") . ")")
 		
-		return knowledgeBase.prove(goal)
+		return (knowledgeBase.prove(goal) != false)
 	}
 	
 	assistantSimulators(assistant) {
@@ -1082,35 +1080,17 @@ class SetupWizard extends ConfigurationItem {
 		return simulators
 	}
 	
-	assistantAvailableActions(assistant) {
-		local knowledgeBase := this.SetupWizard.KnowledgeBase
-		local resultSet
-		local variable
-		
-		goal := new RuleCompiler().compileGoal("assistantActionAvailable?(" . StrReplace(assistant, A_Space, "\ ") . ", ?action)")
-		variable := goal.Arguments[2]
-		
-		resultSet := knowledgeBase.prove(goal)
-		actions := []
-		
-		while resultSet {
-			actions.Push(resultSet.getValue(variable).toString())
-		
-			if !resultSet.nextResult()
-				resultSet := false
-		}
-		
-		return actions
-	}
-	
-	setModuleActionFunctions(module, mode, functions) {
+	setModuleAvailableActions(module, mode, actions) {
 		local knowledgeBase := this.KnowledgeBase
 		local function
 		local action
+		local count
 		
 		modeClause := (mode ? (".Mode." . mode) : "")
 		
-		Loop % knowledgeBase.getValue("Module." . module . modeClause . ".Action.Count", 0)
+		count := knowledgeBase.getValue("Module." . module . modeClause . ".Action.Count", 0)
+		
+		Loop % count
 		{
 			action := knowledgeBase.getValue("Module." . module . modeClause . ".Action." . A_Index, false)
 		
@@ -1120,7 +1100,30 @@ class SetupWizard extends ConfigurationItem {
 			knowledgeBase.removeFact("Module." . module . modeClause . ".Action." . A_Index)
 		}
 		
-		count := 0
+		for index, action in actions
+			knowledgeBase.addFact("Module." . module . modeClause . ".Action." . index, action)
+		
+		knowledgeBase.setFact("Module." . module . modeClause . ".Action.Count", count + 1)
+		knowledgeBase.setFact("Module." . module . modeClause . ".Action.Count", actions.Length())
+		
+		this.updateState()
+	}
+	
+	setModuleActionFunctions(module, mode, functions) {
+		local knowledgeBase := this.KnowledgeBase
+		local function
+		local action
+		local count := 0
+		
+		modeClause := (mode ? (".Mode." . mode) : "")
+		
+		Loop % knowledgeBase.getValue("Module." . module . modeClause . ".Action.Count", 0)
+		{
+			action := knowledgeBase.getValue("Module." . module . modeClause . ".Action." . A_Index, false)
+		
+			if action
+				knowledgeBase.removeFact("Module." . module . modeClause . ".Action." . action . ".Function")
+		}
 		
 		for action, function in functions {
 			if (function && ((IsObject(function) && (function.Length() > 0)) || (function != ""))) {
@@ -1129,12 +1132,9 @@ class SetupWizard extends ConfigurationItem {
 				
 				count += 1
 				
-				knowledgeBase.addFact("Module." . module . modeClause . ".Action." . count, action)
 				knowledgeBase.addFact("Module." . module . modeClause . ".Action." . action . ".Function", values2String("|", function*))
 			}
 		}
-		
-		knowledgeBase.setFact("Module." . module . modeClause . ".Action.Count", count)
 		
 		this.updateState()
 	}
@@ -1166,6 +1166,32 @@ class SetupWizard extends ConfigurationItem {
 		goal := new RuleCompiler().compileGoal(goal)
 		
 		return knowledgeBase.prove(goal)
+	}
+	
+	moduleAvailableActions(module, mode) {
+		local knowledgeBase := this.SetupWizard.KnowledgeBase
+		local resultSet
+		local variable
+		
+		if mode
+			goal := "moduleActionAvailable?(" . StrReplace(module, A_Space, "\ ") . ", " . StrReplace(mode, A_Space, "\ ") . ", ?action)"
+		else
+			goal := "moduleActionAvailable?(" . StrReplace(module, A_Space, "\ ") . ", ?action)"
+		
+		goal := new RuleCompiler().compileGoal(goal)
+		variable := goal.Arguments[mode ? 3 : 2]
+		
+		resultSet := knowledgeBase.prove(goal)
+		actions := []
+		
+		while resultSet {
+			actions.Push(resultSet.getValue(variable).toString())
+		
+			if !resultSet.nextResult()
+				resultSet := false
+		}
+		
+		return actions
 	}
 	
 	setTitle(title) {
@@ -1339,7 +1365,7 @@ class StepWizard extends ConfigurationItem {
 	loadDefinition(definition, stepDefinition) {
 		local rule
 		local rules := {}
-		count := 0
+		local count := 0
 		
 		for descriptor, rule in getConfigurationSectionValues(definition, "Setup." . this.Step, Object())
 			if (InStr(descriptor, this.Step . ".Rule") == 1) {
@@ -2027,16 +2053,16 @@ initializeSimulatorSetup()
 ;;;                          Wizard Include Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include Libraries\ModulesStepWizard.ahk
-#Include Libraries\InstallationStepWizard.ahk
+; #Include Libraries\ModulesStepWizard.ahk
+;~ #Include Libraries\InstallationStepWizard.ahk
 ;~ #Include Libraries\ApplicationsStepWizard.ahk
-;~ #Include Libraries\ButtonBoxStepWizard.ahk
+; #Include Libraries\ButtonBoxStepWizard.ahk
 ;~ #Include Libraries\GeneralStepWizard.ahk
 ;~ #Include Libraries\SimulatorsStepWizard.ahk
-;~ #Include Libraries\AssistantsStepWizard.ahk
-; #Include Libraries\MotionControlStepWizard.ahk
-; #Include Libraries\VibrationControlStepWizard.ahk
-#Include Libraries\PedalCalibrationStepWizard.ahk
+; #Include Libraries\AssistantsStepWizard.ahk
+; #Include Libraries\MotionFeedbackStepWizard.ahk
+#Include Libraries\TactileFeedbackStepWizard.ahk
+; #Include Libraries\PedalCalibrationStepWizard.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;

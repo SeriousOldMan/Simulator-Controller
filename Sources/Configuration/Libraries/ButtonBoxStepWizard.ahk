@@ -781,7 +781,7 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 				actionDescriptor := this.getActionDescriptor(this.iPendingFunctionRegistration)
 				functionType := ConfigurationItem.splitDescriptor(function)[1]
 				
-				if (((functionType == k2WayToggleType) || (functionType == kDialType)) && (actionDescriptor[2] == "Toggle"))
+				if (((functionType == k2WayToggleType) || (functionType == kDialType)) && ((actionDescriptor[2] == "Toggle") || (actionDescriptor[2] == "Dial")))
 					function := [function]
 				else if (actionDescriptor[2] == "Activate")
 					function := [function]

@@ -22,6 +22,7 @@ Release 3.5.0 Checklist
 0. Search for new links (*)
 1. Update Procedure
    a. Translations
+   b. Plugin Labels
 2. Invisible Button Boxes
    a. Update Notes
    b. Translations

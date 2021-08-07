@@ -145,7 +145,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		Gui %window%:Add, Text, x%listX% ys w%listWidth% h23 +0x200 HWNDcolumnLabel2Handle Hidden, % translate("Actions")
 		Gui %window%:Add, Text, yp+20 x%listX% w%listWidth% 0x10 HWNDcolumnLine2Handle Hidden
 
-		Gui %window%:Font, Norm, Arials
+		Gui %window%:Font, Norm, Arial
 		
 		Gui Add, ListView, x%listX% yp+10 w%listWidth% h300 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDactionsListViewHandle gupdateSimulatorActionFunction Hidden, % values2String("|", map(["Mode", "Action", "Label", "Function"], "translate")*)
 		
@@ -224,6 +224,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 	loadSimulatorActions(simulator, load := false) {
 		local function
 		local action
+		local count
 		
 		window := this.Window
 		wizard := this.SetupWizard
@@ -294,7 +295,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 							row := false
 							column := false
 							
-							for ignore, preview in this.iButtonBoxPreviews {
+							for ignore, preview in this.ButtonBoxPreviews {
 								if preview.findFunction(partFunction, row, column) {
 									preview.setLabel(row, column, label)
 									

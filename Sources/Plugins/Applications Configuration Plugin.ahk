@@ -113,9 +113,10 @@ class ApplicationsConfigurator extends ConfigurationItemList {
 	}
 		
 	saveToConfiguration(configuration) {
+		local count := 0
+		
 		base.saveToConfiguration(configuration)
 		
-		count := 0
 		lastType := ""
 		
 		for index, theApplication in this.ItemList {

@@ -20,11 +20,7 @@
 ;;; PedalCalibrationStepWizard                                              ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-global simulatorDropDown
-
 class PedalCalibrationStepWizard extends ActionsStepWizard {
-	iModeActions := []
-	
 	Pages[] {
 		Get {
 			wizard := this.SetupWizard
@@ -47,9 +43,9 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 		arguments := ""
 		calibrations := []
 
-		for ignore, pedal in getConfigurationValue(wizard.Definition, "Setup.Pedal Calibration", "Pedal Calibration.Pedals")
-			for ignore, action in getConfigurationValue(wizard.Definition, "Setup.Pedal Calibration", "Pedal Calibration.Actions") {
-				action := (pedal . "." . action)
+		for ignore, pedal in this.Definition
+			for ignore, curve in string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Pedal Calibration", "Pedal Calibration.Curves")) {
+				action := (pedal . "." . curve)
 				function := wizard.getModuleActionFunction("Pedal Calibration", "Pedal Calibration", action)
 				
 				if (function && (function != ""))
@@ -104,12 +100,6 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 		this.registerWidgets(1, pedalCalibrationIconHandle, pedalCalibrationLabelHandle, pedalCalibrationListViewHandle, pedalCalibrationInfoTextHandle)
 	}
 	
-	reset() {
-		base.reset()
-		
-		this.iModeActions := false
-	}
-	
 	hidePage(page) {
 		wizard := this.SetupWizard
 		
@@ -129,6 +119,7 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 	loadActions(load := false) {
 		local function
 		local action
+		local count
 		
 		window := this.Window
 		wizard := this.SetupWizard
@@ -146,7 +137,7 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 		
 		count := 1
 		
-		for ignore, pedal in string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Pedal Calibration", "Pedal Calibration.Pedals"))
+		for ignore, pedal in this.Definition
 			for ignore, curve in string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Pedal Calibration", "Pedal Calibration.Curves")) {
 				action := (pedal . "." . curve)
 				
@@ -172,7 +163,7 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 						row := false
 						column := false
 						
-						for ignore, preview in this.iButtonBoxPreviews {
+						for ignore, preview in this.ButtonBoxPreviews {
 							if preview.findFunction(function, row, column) {
 								preview.setLabel(row, column, label)
 								
@@ -202,8 +193,8 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 		wizard := this.SetupWizard
 		
 		modeFunctions := {}
-			
-		for ignore, pedal in string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Pedal Calibration", "Pedal Calibration.Pedals"))
+		
+		for ignore, pedal in this.Definition
 			for ignore, curve in string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Pedal Calibration", "Pedal Calibration.Curves")) {
 				action := (pedal . "." . curve)
 				

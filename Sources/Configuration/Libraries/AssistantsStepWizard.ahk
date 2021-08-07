@@ -326,7 +326,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 			for ignore, function in functions {
 				wizard.addControllerStaticFunction(this.iCurrentAssistant, function, label)
 			
-				for ignore, preview in this.iButtonBoxPreviews
+				for ignore, preview in this.ButtonBoxPreviews
 					if preview.findFunction(function, row, column)
 						preview.setLabel(row, column, label)
 			}
@@ -352,6 +352,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 	loadAssistantActions(assistant, load := false) {
 		local function
 		local action
+		local count
 		
 		window := this.Window
 		wizard := this.SetupWizard
@@ -406,7 +407,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 				else {
 					this.setAction(count, action, [isInformationRequest, "Toggle", "Increase", "Decrease"], label)
 					
-					isBinary := true
+					isBinary := (action != "RaceAssistant")
 				}
 				
 				function := this.getActionFunction(action)

@@ -21,6 +21,8 @@
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class PedalCalibrationStepWizard extends ActionsStepWizard {
+	iCachedActions := false
+	
 	Pages[] {
 		Get {
 			wizard := this.SetupWizard
@@ -43,14 +45,12 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 		arguments := ""
 		calibrations := []
 
-		for ignore, pedal in this.Definition
-			for ignore, curve in string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Pedal Calibration", "Pedal Calibration.Curves")) {
-				action := (pedal . "." . curve)
-				function := wizard.getModuleActionFunction("Pedal Calibration", "Pedal Calibration", action)
-				
-				if (function && (function != ""))
-					calibrations.Push("""" . action . """ " . (IsObject(function) ? function[1] : function))
-			}
+		for ignore, action in this.getActions() {
+			function := wizard.getModuleActionFunction("Pedal Calibration", "Pedal Calibration", action)
+			
+			if (function && (function != ""))
+				calibrations.Push("""" . action . """ " . (IsObject(function) ? function[1] : function))
+		}
 		
 		if (calibrations.Length() > 0)
 			arguments .= ("pedalCalibrations: " . values2String(", ", calibrations*))
@@ -78,7 +78,7 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 		
 		Gui %window%:Font, s10 Bold, Arial
 		
-		Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDpedalCalibrationIconHandle Hidden, %kResourcesDirectory%Setup\Images\Pedal.ico
+		Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDpedalCalibrationIconHandle Hidden, %kResourcesDirectory%Setup\Images\Brake.png
 		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h26 HWNDpedalCalibrationLabelHandle Hidden, % translate("Pedal Calibration")
 		
 		Gui %window%:Font, s8 Norm, Arial
@@ -100,6 +100,12 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 		this.registerWidgets(1, pedalCalibrationIconHandle, pedalCalibrationLabelHandle, pedalCalibrationListViewHandle, pedalCalibrationInfoTextHandle)
 	}
 	
+	reset() {
+		base.reset()
+	
+		this.iCachedActions := false
+	}
+	
 	hidePage(page) {
 		wizard := this.SetupWizard
 		
@@ -116,6 +122,30 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 		return base.hidePage(page)
 	}
 	
+	getActions() {
+		if this.iCachedActions
+			return this.iCachedActions
+		else {
+			wizard := this.SetupWizard
+			
+			actions := wizard.moduleAvailableActions("Pedal Calibration", "Pedal Calibration")
+			
+			if (actions.Length() == 0) {
+				actions := []
+				
+				for ignore, pedal in this.Definition
+					for ignore, curve in string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Pedal Calibration", "Pedal Calibration.Curves"))
+						actions.Push(pedal . "." . curve)
+				
+				wizard.setModuleAvailableActions("Pedal Calibration", "Pedal Calibration", actions)
+			}
+			
+			this.iCachedActions := actions
+			
+			return actions
+		}
+	}
+	
 	loadActions(load := false) {
 		local function
 		local action
@@ -124,8 +154,11 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 		window := this.Window
 		wizard := this.SetupWizard
 		
-		if load
+		if load {
+			this.iCachedActions := false
+			
 			this.clearActionFunctions()
+		}
 		
 		this.clearActions()
 		
@@ -137,48 +170,45 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 		
 		count := 1
 		
-		for ignore, pedal in this.Definition
-			for ignore, curve in string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Pedal Calibration", "Pedal Calibration.Curves")) {
-				action := (pedal . "." . curve)
+		for ignore, action in this.getActions() {
+			if wizard.moduleActionAvailable("Pedal Calibration", "Pedal Calibration", action) {
+				if load {
+					function := wizard.getModuleActionFunction("Pedal Calibration", "Pedal Calibration", action)
+					
+					if (function && (function != ""))
+						this.setActionFunction("Pedal Calibration", action, (IsObject(function) ? function : Array(function)))
+				}
 				
-				if wizard.moduleActionAvailable("Pedal Calibration", "Pedal Calibration", action) {
-					if load {
-						function := wizard.getModuleActionFunction("Pedal Calibration", "Pedal Calibration", action)
-						
-						if (function && (function != ""))
-							this.setActionFunction("Pedal Calibration", action, (IsObject(function) ? function : Array(function)))
-					}
+				subAction := ConfigurationItem.splitDescriptor(action)
+				
+				label := (translate(subAction[1]) . " " . subAction[2])
+				
+				this.setAction(count, "Pedal Calibration", action, [false, "Activate"], label)
+				
+				function := this.getActionFunction("Pedal Calibration", action)
+				
+				if (function && (function != "")) {
+					function := (IsObject(function) ? function[1] : function)
 					
-					subAction := ConfigurationItem.splitDescriptor(action)
+					row := false
+					column := false
 					
-					label := (translate(subAction[1]) . " " . subAction[2])
-					
-					this.setAction(count, "Pedal Calibration", action, [false, "Activate"], label)
-					
-					function := this.getActionFunction("Pedal Calibration", action)
-					
-					if (function && (function != "")) {
-						function := (IsObject(function) ? function[1] : function)
-						
-						row := false
-						column := false
-						
-						for ignore, preview in this.ButtonBoxPreviews {
-							if preview.findFunction(function, row, column) {
-								preview.setLabel(row, column, label)
-								
-								break
-							}
+					for ignore, preview in this.ButtonBoxPreviews {
+						if preview.findFunction(function, row, column) {
+							preview.setLabel(row, column, label)
+							
+							break
 						}
 					}
-					else
-						function := ""
-					
-					LV_Add("", ((count = 1) ? translate("Pedal Calibration") : ""), action, label, function)
-					
-					count += 1
 				}
+				else
+					function := ""
+				
+				LV_Add("", ((count = 1) ? translate("Pedal Calibration") : ""), action, label, function)
+				
+				count += 1
 			}
+		}
 			
 		LV_ModifyCol(1, "AutoHdr")
 		LV_ModifyCol(2, "AutoHdr")
@@ -194,17 +224,14 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 		
 		modeFunctions := {}
 		
-		for ignore, pedal in this.Definition
-			for ignore, curve in string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Pedal Calibration", "Pedal Calibration.Curves")) {
-				action := (pedal . "." . curve)
+		for ignore, action in this.getActions() {
+			if wizard.moduleActionAvailable("Pedal Calibration", "Pedal Calibration", action) {
+				function := this.getActionFunction("Pedal Calibration", action)
 				
-				if wizard.moduleActionAvailable("Pedal Calibration", "Pedal Calibration", action) {
-					function := this.getActionFunction("Pedal Calibration", action)
-					
-					if (function && (function != ""))
-						modeFunctions[action] := function
-				}
+				if (function && (function != ""))
+					modeFunctions[action] := function
 			}
+		}
 					
 		wizard.setModuleActionFunctions("Pedal Calibration", "Pedal Calibration", modeFunctions)
 	}

@@ -740,8 +740,15 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 	}
 	
 	resetButtonBoxes() {
-		for ignore, preview in this.iButtonBoxPreviews
+		local function
+		
+		for ignore, preview in this.iButtonBoxPreviews {
 			preview.resetLabels()
+				
+			for ignore, function in this.SetupWizard.getControllerStaticFunctions()
+				if preview.findFunction(function[1], row, column)
+					preview.setLabel(row, column, function[2])
+		}
 	}
 	
 	updateActionFunction(row) {
@@ -775,7 +782,7 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 					if (candidate = function) {
 						SoundPlay %kResourcesDirectory%Sounds\Activated.wav
 						
-						this.clearActionFunction(action, function)
+						this.clearActionFunction(mode, action, function)
 						
 						preview.setLabel(row, column, ConfigurationItem.splitDescriptor(control)[2])
 				

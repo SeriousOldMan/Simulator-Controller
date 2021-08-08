@@ -118,11 +118,11 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		
 		labelWidth := width - 30
 		labelX := x + 45
-		labelY := y + 8
+		labelY := y + 10
 		
 		Gui %window%:Font, s10 Bold, Arial
 		
-		Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDmotionFeedbackIconHandle Hidden, %kResourcesDirectory%Setup\Images\Motion.ico
+		Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDmotionFeedbackIconHandle Hidden, %kResourcesDirectory%Setup\Images\Car 2.ico
 		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h26 HWNDmotionFeedbackLabelHandle Hidden, % translate("Motion Feedback")
 		
 		Gui %window%:Font, s8 Norm, Arial
@@ -143,7 +143,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		Gui %window%:Add, Text, yp+20 x%x% w%colWidth% 0x10 HWNDcolumnLine1Handle Hidden
 		
 		secondX := x + 155
-		buttonX := secondX - 24
+		buttonX := secondX - 26
 		secondWidth := colWidth - 155
 		
 		Gui %window%:Font, s8 Norm, Arial
@@ -152,7 +152,8 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		
 		Gui %window%:Font, s8 Bold, Arial
 		
-		Gui %window%:Add, Button, x%buttonX% yp w23 h23 HWNDmotionEffectsButtonHandle gchangeMotionEffects Hidden, % translate("...")
+		Gui %window%:Add, Button, x%buttonX% yp w23 h23 HWNDmotionEffectsButtonHandle gchangeMotionEffects Hidden
+		setButtonIcon(motionEffectsButtonHandle, kResourcesDirectory . "Setup\Images\Pencil.ico", 1, "L2 T2 R2 B2 H16 W16")
 		Gui %window%:Add, ListBox, x%secondX% yp w%secondWidth% h60 Disabled HWNDmotionEffectsListHandle Hidden
 		
 		Gui %window%:Font, s8 Norm, Arial

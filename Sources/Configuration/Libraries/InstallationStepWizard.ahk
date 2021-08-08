@@ -213,7 +213,7 @@ class InstallationStepWizard extends StepWizard {
 			}
 	}
 	
-	hidePage(oage) {
+	hidePage(page) {
 		wizard := this.SetupWizard
 		done := true
 		
@@ -234,7 +234,7 @@ class InstallationStepWizard extends StepWizard {
 				return false
 		}
 		
-		return hidePage(page)
+		return base.hidePage(page)
 	}
 }
 

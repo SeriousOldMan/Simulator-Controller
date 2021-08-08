@@ -124,7 +124,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 		
 		Gui %window%:Font, s10 Bold, Arial
 		
-		Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDtactileFeedbackIconHandle Hidden, %kResourcesDirectory%Setup\Images\Pedals.ico
+		Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDtactileFeedbackIconHandle Hidden, %kResourcesDirectory%Setup\Images\Vibration.ico
 		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h26 HWNDtactileFeedbackLabelHandle Hidden, % translate("Tactile Feedback")
 		
 		Gui %window%:Font, s8 Norm, Arial
@@ -145,7 +145,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 		Gui %window%:Add, Text, yp+20 x%x% w%colWidth% 0x10 HWNDcolumnLine1Handle Hidden
 		
 		secondX := x + 155
-		buttonX := secondX - 24
+		buttonX := secondX - 26
 		secondWidth := colWidth - 155
 		
 		Gui %window%:Font, s8 Norm, Arial
@@ -154,7 +154,8 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 		
 		Gui %window%:Font, s8 Bold, Arial
 		
-		Gui %window%:Add, Button, x%buttonX% yp w23 h23 HWNDpedalEffectsButtonHandle gchangePedalEffects Hidden, % translate("...")
+		Gui %window%:Add, Button, x%buttonX% yp w23 h23 HWNDpedalEffectsButtonHandle gchangePedalEffects Hidden
+		setButtonIcon(pedalEffectsButtonHandle, kResourcesDirectory . "Setup\Images\Pencil.ico", 1, "L2 T2 R2 B2 H16 W16")
 		Gui %window%:Add, ListBox, x%secondX% yp w%secondWidth% h60 Disabled HWNDpedalEffectsListHandle Hidden
 		
 		Gui %window%:Font, s8 Norm, Arial
@@ -163,7 +164,8 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 		
 		Gui %window%:Font, s8 Bold, Arial
 		
-		Gui %window%:Add, Button, x%buttonX% yp w23 h23 HWNDchassisEffectsButtonHandle gchangeChassisEffects Hidden, % translate("...")
+		Gui %window%:Add, Button, x%buttonX% yp w23 h23 HWNDchassisEffectsButtonHandle gchangeChassisEffects Hidden
+		setButtonIcon(chassisEffectsButtonHandle, kResourcesDirectory . "Setup\Images\Pencil.ico", 1, "L2 T2 R2 B2 H16 W16")
 		Gui %window%:Add, ListBox, x%secondX% yp w%secondWidth% h60 Disabled HWNDchassisEffectsListHandle Hidden
 		
 		Gui %window%:Font, s8 Norm, Arial

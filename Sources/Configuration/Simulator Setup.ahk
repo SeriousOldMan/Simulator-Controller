@@ -2085,16 +2085,16 @@ initializeSimulatorSetup()
 ;;;                          Wizard Include Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-; #Include Libraries\ModulesStepWizard.ahk
+;~ #Include Libraries\ModulesStepWizard.ahk
 ;~ #Include Libraries\InstallationStepWizard.ahk
 ;~ #Include Libraries\ApplicationsStepWizard.ahk
-; #Include Libraries\ButtonBoxStepWizard.ahk
+;~ #Include Libraries\ButtonBoxStepWizard.ahk
 ;~ #Include Libraries\GeneralStepWizard.ahk
 ;~ #Include Libraries\SimulatorsStepWizard.ahk
-; #Include Libraries\AssistantsStepWizard.ahk
+;~ #Include Libraries\AssistantsStepWizard.ahk
 #Include Libraries\MotionFeedbackStepWizard.ahk
-; #Include Libraries\TactileFeedbackStepWizard.ahk
-; #Include Libraries\PedalCalibrationStepWizard.ahk
+#Include Libraries\TactileFeedbackStepWizard.ahk
+#Include Libraries\PedalCalibrationStepWizard.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;

@@ -773,7 +773,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 ;;;-------------------------------------------------------------------------;;;
 
 readSimulatorData(simulator, options := "", protocol := "SHM") {
-	exePath := kBinariesDirectory . simulator . " " . protocol . " Provider.exe"
+	exePath := kBinariesDirectory . simulator . A_Space . protocol . " Provider.exe"
 	
 	Random postfix, 1, 1000000
 	

@@ -444,7 +444,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 			if wizard.assistantActionAvailable(assistant, action) {
 				function := this.getActionFunction(action)
 				
-				if function
+				if (function && (function != ""))
 					functions[action] := function
 			}
 		

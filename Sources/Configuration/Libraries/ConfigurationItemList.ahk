@@ -132,7 +132,7 @@ class ConfigurationItemList extends ConfigurationItem {
 		static lastEvent := false
 		static lastEditor := false
 		
-		event := (A_GuiEvent . " " . A_GuiControl . " " . A_EventInfo)
+		event := (A_GuiEvent . A_Space . A_GuiControl . A_Space . A_EventInfo)
 		
 		if (event = lastEvent)
 			return false

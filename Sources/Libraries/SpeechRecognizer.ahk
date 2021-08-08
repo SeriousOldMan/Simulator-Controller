@@ -589,7 +589,7 @@ class GrammarList {
 			
 		for ignore, value in this.List {
 			if (A_Index > 1)
-				result .= " "
+				result .= A_Space
 			
 			result .= value.toString()
 		}

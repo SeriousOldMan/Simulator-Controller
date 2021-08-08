@@ -120,7 +120,7 @@ class CompositeCondition extends Condition {
 
 class Quantor extends CompositeCondition {
 	toString(facts := "__NotInitialized__") {
-		return "{" . this.Type . " " . base.toString(facts) . "}"
+		return "{" . this.Type . A_Space . base.toString(facts) . "}"
 	}
 }
 
@@ -321,7 +321,7 @@ class Predicate extends Condition {
 		if (this.Operator == kNotInitialized)
 			return ("[" . this.LeftPrimary.toString(facts) . "]")
 		else
-			return ("[" . this.LeftPrimary.toString(facts) . " " . this.Operator . " " . this.RightPrimary.toString(facts) "]")
+			return ("[" . this.LeftPrimary.toString(facts) . A_Space . this.Operator . A_Space . this.RightPrimary.toString(facts) "]")
 	}
 }
 
@@ -653,7 +653,7 @@ class CallAction extends Action {
 		for index, argument in this.Arguments
 			arguments.Push(argument.toString(facts))
 			
-		return ("(" . this.Action . " " .  this.Function.toString(facts) . "(" . values2String(", ", arguments*) . "))")
+		return ("(" . this.Action . A_Space .  this.Function.toString(facts) . "(" . values2String(", ", arguments*) . "))")
 	}
 }
 

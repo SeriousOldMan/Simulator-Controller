@@ -208,7 +208,8 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		
 		this.iPedalVibrationMode := pedalMode
 		
-		this.createDialAction(pedalMode, "Pedal", pedalVibrationArguments[3])
+		if (pedalVibrationArguments.Length() > 2)
+			this.createDialAction(pedalMode, "Pedal", pedalVibrationArguments[3])
 		
 		for ignore, effect in string2Values(",", this.getArgumentValue("pedalEffects", ""))
 			this.createEffectAction(controller, pedalMode, string2Values(A_Space, effect)*)
@@ -217,8 +218,11 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		
 		this.iChassisVibrationMode := chassisMode
 		
-		this.createDialAction(chassisMode, "FrontChassis", frontChassisVibrationArguments[3])
-		this.createDialAction(chassisMode, "RearChassis", rearChassisVibrationArguments[3])
+		if (frontChassisVibrationArguments.Length() > 2)
+			this.createDialAction(chassisMode, "FrontChassis", frontChassisVibrationArguments[3])
+		
+		if (rearChassisVibrationArguments.Length() > 2)
+			this.createDialAction(chassisMode, "RearChassis", rearChassisVibrationArguments[3])
 	
 		for ignore, effect in string2Values(",", this.getArgumentValue("chassisEffects", ""))
 			this.createEffectAction(controller, chassisMode, string2Values(A_Space, effect)*)

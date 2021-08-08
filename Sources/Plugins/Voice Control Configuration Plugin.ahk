@@ -301,14 +301,14 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		
 		if (windowsSpeakerDropDown = translate("Automatic"))
 			windowsSpeakerDropDown := true
-		else if ((windowsSpeakerDropDown = translate("Deactivated")) || (windowsSpeakerDropDown = " "))
+		else if ((windowsSpeakerDropDown = translate("Deactivated")) || (windowsSpeakerDropDown = A_Space))
 			windowsSpeakerDropDown := false
 
 		setConfigurationValue(configuration, "Voice Control", "Speaker.Windows", windowsSpeakerDropDown)
 		
 		if (azureSpeakerDropDown = translate("Automatic"))
 			azureSpeakerDropDown := true
-		else if ((azureSpeakerDropDown = translate("Deactivated")) || (azureSpeakerDropDown = " "))
+		else if ((azureSpeakerDropDown = translate("Deactivated")) || (azureSpeakerDropDown = A_Space))
 			azureSpeakerDropDown := false
 		
 		setConfigurationValue(configuration, "Voice Control", "Speaker.Azure", azureSpeakerDropDown)
@@ -340,7 +340,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 				
 		if (listenerDropDown = translate("Automatic"))
 			listenerDropDown := true
-		else if ((listenerDropDown = translate("Deactivated")) || (listenerDropDown = " "))
+		else if ((listenerDropDown = translate("Deactivated")) || (listenerDropDown = A_Space))
 			listenerDropDown := false
 		
 		setConfigurationValue(configuration, "Voice Control", "Listener", listenerDropDown)

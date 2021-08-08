@@ -79,15 +79,15 @@ You will achieve this controller configuration with the following plugin argumen
 As you have seen, "Tactile Feedback" is quite flexible and therefore provides many plugin parameters. All the arguments for these parameters must be supplied in the [Plugins tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) of the configuration tool.
 
 	controlApplication: *Name of the SimHub application configuration*;
-	pedalVibration: *initialState* *onOffFunction* *intensityFunction*;
-	frontChassisVibration: *initialState* *onOffFunction* *intensityFunction*;
-	rearChassisVibration: *initialState* *onOffFunction* *intensityFunction*
+	pedalVibration: *initialState* *onOffFunction* [*intensityFunction*];
+	frontChassisVibration: *initialState* *onOffFunction* [*intensityFunction*];
+	rearChassisVibration: *initialState* *onOffFunction* [*intensityFunction*]
 	
 The optional parameter *controlApplication* let you provide the name of the configured application object for *SimHub*, if it is not named "Tactile Feedback".
 The other three parameters follow the same format and let you control the respective group of vibration effects.
 *initialState* must be either "On" or "Off". Unfortunately, there is no way to query *SimHub* to request the current state of a toggleable effect, so this can get out of sync, if you left it in the other state the last time you used your rig.
 *onOffFunction* will define a controller function to switch the respective vibration effect group on or off. Both, unary and binary functions are supported. This function is connected to the plugin itself and is therefore always available. For all this to work as expected, you must define a trigger in *SimHub* at the respective effect group, which must be named "toggle[*Effect*]Vibration", where *Effect* is either "Pedal", "FrontChassis" or "RearChassis".
-Last, *intensityFunction*, which is part of the respective mode, will let you control the overall intensity of the effect group. You may have to supply a descriptor for a binary function here, unless you only want to increase the intensity all the time. Example: "pedalVibration: On 2WayToggle.3 Dial.1"
+The optional argument *intensityFunction*, which is part of the respective mode, will let you control the overall intensity of the effect group. You may have to supply a descriptor for a binary function here, unless you only want to increase the intensity all the time. Example: "pedalVibration: On 2WayToggle.3 Dial.1". You can achieve the same result by supplying an effect named "Pedal", "FrontChassis" or "RearChassis" in the respective mode effects parameter below. As a bonus, you are able to specify two unary functions to control the vibration intensity, if you are using this variant.
 
 In the next step, you may describe all the individual effects for your vibration settings:
 

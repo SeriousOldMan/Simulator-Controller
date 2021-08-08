@@ -795,14 +795,14 @@ class VoiceServer extends ConfigurationItem {
 		
 	activationCommandRecognized(voiceClient, grammar, words) {
 		if this.Debug[kDebugRecognitions]
-			showMessage("Activation phrase recognized: " . values2String(" ", words*))
+			showMessage("Activation phrase recognized: " . values2String(A_Space, words*))
 		
 		this.activateVoiceClient(ConfigurationItem.splitDescriptor(grammar)[1], words)
 	}
 		
 	voiceCommandRecognized(voiceClient, grammar, words) {
 		if this.Debug[kDebugRecognitions]
-			showMessage("Command phrase recognized: " . values2String(" ", words*))
+			showMessage("Command phrase recognized: " . values2String(A_Space, words*))
 		
 		descriptor := voiceClient.VoiceCommands[grammar]
 

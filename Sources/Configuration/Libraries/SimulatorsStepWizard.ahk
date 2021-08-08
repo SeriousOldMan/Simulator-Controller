@@ -338,7 +338,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 				if wizard.simulatorActionAvailable(simulator, mode, action) {
 					function := this.getActionFunction(action)
 					
-					if function
+					if (function && (function != ""))
 						modeFunctions[action] := function
 				}
 			

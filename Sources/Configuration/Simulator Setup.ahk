@@ -1094,8 +1094,10 @@ class SetupWizard extends ConfigurationItem {
 		{
 			action := knowledgeBase.getValue("Module." . module . modeClause . ".Action." . A_Index, false)
 		
-			if action
+			if action {
 				knowledgeBase.removeFact("Module." . module . modeClause . ".Action." . action . ".Function")
+				knowledgeBase.removeFact("Module." . module . modeClause . ".Action." . action . ".Argument")
+			}
 			
 			knowledgeBase.removeFact("Module." . module . modeClause . ".Action." . A_Index)
 		}
@@ -1113,7 +1115,6 @@ class SetupWizard extends ConfigurationItem {
 		local knowledgeBase := this.KnowledgeBase
 		local function
 		local action
-		local count := 0
 		
 		modeClause := (mode ? (".Mode." . mode) : "")
 		
@@ -1129,8 +1130,6 @@ class SetupWizard extends ConfigurationItem {
 			if (function && ((IsObject(function) && (function.Length() > 0)) || (function != ""))) {
 				if !IsObject(function)
 					function := Array(function)
-				
-				count += 1
 				
 				knowledgeBase.addFact("Module." . module . modeClause . ".Action." . action . ".Function", values2String("|", function*))
 			}
@@ -1153,6 +1152,33 @@ class SetupWizard extends ConfigurationItem {
 		}
 		else
 			return ""
+	}
+	
+	setModuleActionArguments(module, mode, arguments) {
+		local knowledgeBase := this.KnowledgeBase
+		local action
+		
+		modeClause := (mode ? (".Mode." . mode) : "")
+		
+		Loop % knowledgeBase.getValue("Module." . module . modeClause . ".Action.Count", 0)
+		{
+			action := knowledgeBase.getValue("Module." . module . modeClause . ".Action." . A_Index, false)
+		
+			if action
+				knowledgeBase.removeFact("Module." . module . modeClause . ".Action." . action . ".Argument")
+		}
+		
+		for action, argument in arguments
+			if (argument && (argument != ""))
+				knowledgeBase.addFact("Module." . module . modeClause . ".Action." . action . ".Argument", argument)
+		
+		this.updateState()
+	}
+	
+	getModuleActionArgument(module, mode, action) {
+		modeClause := (mode ? (".Mode." . mode) : "")
+		
+		return this.KnowledgeBase.getValue("Module." . module . modeClause . ".Action." . action . ".Argument", "")
 	}
 	
 	moduleActionAvailable(module, mode, action) {
@@ -1949,6 +1975,10 @@ exitApp() {
 ;;;                   Public Function Declaration Section                   ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+openLabelsEditor() {
+	Run % "notepad.exe " . """" . kUserTranslationsDirectory . "Controller Plugin Labels." . getLanguage() . """"
+}
+
 findSoftware(definition, software) {
 	for ignore, section in ["Applications.Simulators", "Applications.Core", "Applications.Feedback", "Applications.Other", "Applications.Special"]
 		for name, descriptor in getConfigurationSectionValues(definition, section, Object()) {
@@ -2062,8 +2092,8 @@ initializeSimulatorSetup()
 ;~ #Include Libraries\GeneralStepWizard.ahk
 ;~ #Include Libraries\SimulatorsStepWizard.ahk
 ; #Include Libraries\AssistantsStepWizard.ahk
-; #Include Libraries\MotionFeedbackStepWizard.ahk
-#Include Libraries\TactileFeedbackStepWizard.ahk
+#Include Libraries\MotionFeedbackStepWizard.ahk
+; #Include Libraries\TactileFeedbackStepWizard.ahk
 ; #Include Libraries\PedalCalibrationStepWizard.ahk
 
 

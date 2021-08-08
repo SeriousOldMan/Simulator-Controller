@@ -146,16 +146,16 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 						function := wizard.getModuleActionFunction("Pedal Calibration", "Pedal Calibration", action)
 						
 						if (function && (function != ""))
-							this.setActionFunction(action, (IsObject(function) ? function : Array(function)))
+							this.setActionFunction("Pedal Calibration", action, (IsObject(function) ? function : Array(function)))
 					}
 					
 					subAction := ConfigurationItem.splitDescriptor(action)
 					
 					label := (translate(subAction[1]) . " " . subAction[2])
 					
-					this.setAction(count, action, [false, "Activate"], label)
+					this.setAction(count, "Pedal Calibration", action, [false, "Activate"], label)
 					
-					function := this.getActionFunction(action)
+					function := this.getActionFunction("Pedal Calibration", action)
 					
 					if (function && (function != "")) {
 						function := (IsObject(function) ? function[1] : function)
@@ -199,7 +199,7 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 				action := (pedal . "." . curve)
 				
 				if wizard.moduleActionAvailable("Pedal Calibration", "Pedal Calibration", action) {
-					function := this.getActionFunction(action)
+					function := this.getActionFunction("Pedal Calibration", action)
 					
 					if (function && (function != ""))
 						modeFunctions[action] := function

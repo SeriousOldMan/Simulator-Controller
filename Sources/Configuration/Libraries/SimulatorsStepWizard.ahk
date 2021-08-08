@@ -49,9 +49,10 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		
 		wizard := this.SetupWizard
 		
-		for ignore, simulator in this.Definition
+		for ignore, simulator in this.Definition {
+			code := string2Values("|", getConfigurationValue(wizard.Definition, "Applications.Simulators", simulator))[1]
+			
 			if wizard.isApplicationSelected(simulator) {
-				code := string2Values("|", getConfigurationValue(wizard.Definition, "Applications.Simulators", simulator))[1]
 				arguments := ""
 				
 				for ignore, mode in ["Pitstop", "Assistant"] {
@@ -82,6 +83,9 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 				
 				new Plugin(code, false, true, simulator, arguments).saveToConfiguration(configuration)
 			}
+			else
+				new Plugin(code, false, false, simulator, "").saveToConfiguration(configuration)
+		}
 	}
 	
 	createGui(wizard, x, y, width, height) {
@@ -257,7 +261,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 						function := wizard.getSimulatorActionFunction(simulator, mode, action)
 						
 						if (function != "")
-							this.setActionFunction(action, (IsObject(function) ? function : Array(function)))
+							this.setActionFunction(mode, action, (IsObject(function) ? function : Array(function)))
 					}
 					
 					subAction := ConfigurationItem.splitDescriptor(action)
@@ -278,17 +282,17 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 					if (label == kUndefined) {
 						label := getConfigurationValue(pluginLabels, code, subAction . ".Activate", "")
 		
-						this.setAction(count, action, [isInformationRequest, "Activate"], label)
+						this.setAction(count, mode, action, [isInformationRequest, "Activate"], label)
 						
 						isBinary := false
 					}
 					else {
-						this.setAction(count, action, [isInformationRequest, "Toggle", "Increase", "Decrease"], label)
+						this.setAction(count, mode, action, [isInformationRequest, "Toggle", "Increase", "Decrease"], label)
 						
 						isBinary := true
 					}
 					
-					function := this.getActionFunction(action)
+					function := this.getActionFunction(mode, action)
 					
 					if function {
 						for ignore, partFunction in function {
@@ -336,7 +340,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		
 			for ignore, action in string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Simulators", (mode = "Assistant") ? "Simulators.Actions.Assistant" : ("Simulators.Settings.Pitstop." . code)))				
 				if wizard.simulatorActionAvailable(simulator, mode, action) {
-					function := this.getActionFunction(action)
+					function := this.getActionFunction(mode, action)
 					
 					if (function && (function != ""))
 						modeFunctions[action] := function

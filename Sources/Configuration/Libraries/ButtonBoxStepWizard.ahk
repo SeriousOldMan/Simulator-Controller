@@ -575,9 +575,12 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 	
 	iActionsListView := false
 	
+	iModes := {}
 	iActions := {}
+	iDescriptors := {}
 	iLabels := {}
 	iFunctions := {}
+	iArguments := {}
 	
 	ActionsListView[] {
 		Get {
@@ -592,6 +595,7 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 		
 		this.clearActions()
 		this.clearActionFunctions()
+		this.clearActionArguments()
 	}
 	
 	showPage(page) {
@@ -633,24 +637,79 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 		this.iActionsListView := actionsListView
 	}
 	
-	setActionFunction(action, functionDescriptor) {
-		this.iFunctions[action] := functionDescriptor
+	setAction(row, mode, action, actionDescriptor, label, argument := false) {
+		this.iModes[row] := mode
+		this.iModes[mode . "." . action] := row
+		this.iActions[row] := action
+		this.iDescriptors[row] := actionDescriptor
+		this.iLabels[row] := label
+		
+		if argument
+			this.iArguments[row] := argument
 	}
 	
-	getActionFunction(action) {
-		return (this.iFunctions.HasKey(action) ? this.iFunctions[action] : false)
+	getAction(row) {
+		return this.iActions[row]
 	}
 	
-	clearActionFunction(action, function) {
-		if this.iFunctions.HasKey(action) {
-			functions := this.iFunctions[action]
+	getActionRow(mode, action) {
+		return this.iModes[mode . "." . action]
+	}
+	
+	getActionMode(row) {
+		return this.iModes[row]
+	}
+	
+	getActionDescriptor(row) {
+		return this.iDescriptors[row]
+	}
+	
+	setActionLabel(row, label) {
+		this.iLabels[row] := label
+	}
+	
+	getActionLabel(row) {
+		return this.iLabels[row]
+	}
+	
+	clearActions() {
+		this.iModes := {}
+		this.iActions := {}
+		this.iDescriptors := {}
+		this.iLabels := {}
+	}
+	
+	setActionFunction(mode, action, functionDescriptor) {
+		if !this.iFunctions.HasKey(mode)
+			this.iFunctions[mode] := {}
+		
+		this.iFunctions[mode][action] := functionDescriptor
+	}
+	
+	getActionFunction(mode, action) {
+		if this.iFunctions.HasKey(mode) {
+			functions := this.iFunctions[mode]
 			
-			for index, candidate in functions
-				if (candidate = function)
-					functions[index] := ""
+			return (functions.HasKey(action) ? functions[action] : false)
+		}
+		else
+			return false
+	}
+	
+	clearActionFunction(mode, action, function) {
+		if this.iFunctions.HasKey(mode) {
+			functions := this.iFunctions[mode]
 			
-			if (functions.Length() == 1)
-				this.iFunctions.Delete(action)
+			if functions.HasKey(action) {
+				functions := functions[action]
+				
+				for index, candidate in functions
+					if (candidate = function)
+						functions[index] := ""
+				
+				if (functions.Length() == 1)
+					this.iFunctions.Delete(action)
+			}
 		}
 	}
 	
@@ -658,27 +717,19 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 		this.iFunctions := {}
 	}
 	
-	setAction(row, action, actionDescriptor, label) {
-		this.iActions[row] := action
-		this.iActions[action] := actionDescriptor
-		this.iLabels[row] := label
+	setActionArgument(row, argument) {
+		this.iArguments[row] := argument
 	}
 	
-	getAction(row) {
-		return this.iActions[row]
+	getActionArgument(rowOrMode, action := false) {
+		if action
+			rowOrMode := this.getActionRow(rowOrMode, action)
+			
+		return (this.iArguments.HasKey(rowOrMode) ? this.iArguments[rowOrMode] : false)
 	}
 	
-	getActionLabel(row) {
-		return this.iLabels[row]
-	}
-	
-	getActionDescriptor(row) {
-		return this.iActions[this.getAction(row)]
-	}
-	
-	clearActions() {
-		this.iActions := {}
-		this.iLabels := {}
+	clearActionArguments() {
+		this.iArguments := {}
 	}
 	
 	openButtonBoxes() {
@@ -718,23 +769,48 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 	clearFunctionAction(preview, function, control, row, column) {
 		local action
 		
-		for action, functions in this.iFunctions
-			for ignore, candidate in functions
-				if (candidate = function) {
-					SoundPlay %kResourcesDirectory%Sounds\Activated.wav
+		for mode, modeFunctions in this.iFunctions
+			for action, functions in modeFunctions
+				for ignore, candidate in functions
+					if (candidate = function) {
+						SoundPlay %kResourcesDirectory%Sounds\Activated.wav
+						
+						this.clearActionFunction(action, function)
+						
+						preview.setLabel(row, column, ConfigurationItem.splitDescriptor(control)[2])
+				
+						for ignore, function in this.SetupWizard.getControllerStaticFunctions()
+							if preview.findFunction(function[1], row, column)
+								preview.setLabel(row, column, function[2])
+						
+						this.loadActions()
+						
+						break
+					}
+	}
+	
+	createActionsMenu(title, row) {
+		window := this.Window
 					
-					this.clearActionFunction(action, function)
+		Gui %window%:Default
 					
-					preview.setLabel(row, column, ConfigurationItem.splitDescriptor(control)[2])
-			
-					for ignore, function in this.SetupWizard.getControllerStaticFunctions()
-						if preview.findFunction(function[1], row, column)
-							preview.setLabel(row, column, function[2])
-					
-					this.loadActions()
-					
-					break
-				}
+		try {
+			Menu ContextMenu, DeleteAll
+		}
+		catch exception {
+			; ignore
+		}
+		
+		Menu ContextMenu, Add, %title%, menuIgnore
+		Menu ContextMenu, Disable, %title%
+		Menu ContextMenu, Add
+		
+		menuItem := translate("Set Function")
+		handler := ObjBindMethod(this, "updateActionFunction", row)
+		
+		Menu ContextMenu, Add, %menuItem%, %handler%
+		
+		return "ContextMenu"
 	}
 	
 	controlClick(preview, element, function, row, column, isEmpty, actionRegistration := false) {
@@ -777,8 +853,11 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 			else {
 				SoundPlay %kResourcesDirectory%Sounds\Activated.wav
 			
-				action := this.getAction(this.iPendingFunctionRegistration)
-				actionDescriptor := this.getActionDescriptor(this.iPendingFunctionRegistration)
+				actionRow := this.iPendingFunctionRegistration
+				
+				mode := this.getActionMode(actionRow)
+				action := this.getAction(actionRow)
+				actionDescriptor := this.getActionDescriptor(actionRow)
 				functionType := ConfigurationItem.splitDescriptor(function)[1]
 				
 				if (((functionType == k2WayToggleType) || (functionType == kDialType)) && ((actionDescriptor[2] == "Toggle") || (actionDescriptor[2] == "Dial")))
@@ -791,7 +870,7 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 					MsgBox 262179, %title%, % translate("What type of action do you want to trigger for ") . action . translate("?")
 					OnMessage(0x44, "")
 					
-					currentFunction := this.getActionFunction(action)
+					currentFunction := this.getActionFunction(mode, action)
 					
 					IfMsgBox Cancel
 						function := false
@@ -828,9 +907,9 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 				}
 
 				if function {
-					this.setActionFunction(action, function)
+					this.setActionFunction(mode, action, function)
 					
-					preview.setLabel(row, column, this.getActionLabel(this.iPendingFunctionRegistration))
+					preview.setLabel(row, column, this.getActionLabel(actionRow))
 					
 					this.loadActions()
 					
@@ -839,7 +918,7 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 					Gui %window%:Default
 					Gui ListView, % this.ActionsListView
 			
-					LV_Modify(this.iPendingFunctionRegistration, "Vis")
+					LV_Modify(actionRow, "Vis")
 				}
 
 				SetTimer showSelectorHint, Off
@@ -869,34 +948,12 @@ updateActionFunction(wizard) {
 				if wizard.iPendingActionRegistration
 					wizard.updateActionFunction(row)
 				else {
-					curCoordMode := A_CoordModeMouse
-
 					LV_GetText(action, row, 2)
 					LV_GetText(label, row, 3)
 					
-					menuItem := (action . ": " . label)
+					contextMenu := wizard.createActionsMenu(action . ": " . label, row)
 					
-					try {
-						Menu ContextMenu, DeleteAll
-					}
-					catch exception {
-						; ignore
-					}
-					
-					window := wizard.Window
-					
-					Gui %window%:Default
-					
-					Menu ContextMenu, Add, %menuItem%, menuIgnore
-					Menu ContextMenu, Disable, %menuItem%
-					Menu ContextMenu, Add
-					
-					menuItem := translate("Set Function")
-					handler := ObjBindMethod(wizard, "updateActionFunction", row)
-					
-					Menu ContextMenu, Add, %menuItem%, %handler%
-					
-					Menu ContextMenu, Show
+					Menu %contextMenu%, Show
 				}
 			}
 		}

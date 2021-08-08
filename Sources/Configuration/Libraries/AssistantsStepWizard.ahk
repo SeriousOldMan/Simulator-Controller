@@ -136,6 +136,8 @@ class AssistantsStepWizard extends ActionsStepWizard {
 					
 				new Plugin(assistant, false, true, "", arguments).saveToConfiguration(configuration)
 			}
+			else
+				new Plugin(assistant, false, false, "", "").saveToConfiguration(configuration)
 	}
 	
 	createGui(wizard, x, y, width, height) {
@@ -310,14 +312,14 @@ class AssistantsStepWizard extends ActionsStepWizard {
 			return []
 	}
 	
-	setAction(row, action, actionDescriptor, label) {
+	setAction(row, mode, action, actionDescriptor, label, argument := false) {
 		local function
 		
 		wizard := this.SetupWizard
 		
-		base.setAction(row, action, actionDescriptor, label)
+		base.setAction(row, mode, action, actionDescriptor, label, argument)
 		
-		functions := this.getActionFunction(action)
+		functions := this.getActionFunction(false, action)
 		
 		if functions {
 			row := false
@@ -333,8 +335,8 @@ class AssistantsStepWizard extends ActionsStepWizard {
 		}
 	}
 	
-	clearActionFunction(action, function) {
-		base.clearActionFunction(action, function)
+	clearActionFunction(mode, action, function) {
+		base.clearActionFunction(mode, action, function)
 		
 		this.SetupWizard.removeControllerStaticFunction(this.iCurrentAssistant, function)
 	}
@@ -379,7 +381,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 					function := wizard.getAssistantActionFunction(assistant, action)
 					
 					if (function != "")
-						this.setActionFunction(action, (IsObject(function) ? function : Array(function)))
+						this.setActionFunction(false, action, (IsObject(function) ? function : Array(function)))
 				}
 				
 				subAction := ConfigurationItem.splitDescriptor(action)
@@ -400,17 +402,17 @@ class AssistantsStepWizard extends ActionsStepWizard {
 				if (label == kUndefined) {
 					label := getConfigurationValue(pluginLabels, assistant, subAction . ".Activate", "")
 	
-					this.setAction(count, action, [isInformationRequest, "Activate"], label)
+					this.setAction(count, false, action, [isInformationRequest, "Activate"], label)
 					
 					isBinary := false
 				}
 				else {
-					this.setAction(count, action, [isInformationRequest, "Toggle", "Increase", "Decrease"], label)
+					this.setAction(count, false, action, [isInformationRequest, "Toggle", "Increase", "Decrease"], label)
 					
 					isBinary := (action != "RaceAssistant")
 				}
 				
-				function := this.getActionFunction(action)
+				function := this.getActionFunction(false, action)
 				
 				if function {
 					if (function.Length() == 1)
@@ -442,7 +444,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 		for ignore, action in concatenate(string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Assistants", "Assistants.Actions"))
 										, string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Assistants", "Assistants.Actions.Special")))
 			if wizard.assistantActionAvailable(assistant, action) {
-				function := this.getActionFunction(action)
+				function := this.getActionFunction(false, action)
 				
 				if (function && (function != ""))
 					functions[action] := function

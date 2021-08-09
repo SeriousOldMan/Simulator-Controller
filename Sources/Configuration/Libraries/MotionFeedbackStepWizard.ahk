@@ -17,11 +17,21 @@
 ;;;-------------------------------------------------------------------------;;;
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; MotionFeedbackStepWizard                                              ;;;
+;;; MotionFeedbackStepWizard                                                ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+global motionIntensityField
+global effectSelectorField
+global effectIntensityField
 
 class MotionFeedbackStepWizard extends ActionsStepWizard {
 	iMotionEffectsList := false
+	
+	iMotionIntensityDial := false
+	iEffectSelectorField := false
+	iEffectIntensityDial := false
+	
+	iDisabledWidgets := []
 	
 	iCachedActions := {}
 	
@@ -44,32 +54,60 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		
 		wizard := this.SetupWizard
 	
-		if wizard.isModuleSelected("Tactile Feedback") {
+		if wizard.isModuleSelected("Motion Feedback") {
 			connector := wizard.softwarePath("StreamDeck Extension")
 			
 			arguments := ((connector && (connector != "")) ? ("connector: " . connector) : "")
 			
 			parameters := string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Motion Feedback", "Motion Feedback.Parameters", ""))
 			
-			for ignore, action in string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Motion Feedback", "Motion Feedback.Toggles", "")) {
-				function := wizard.getModuleActionFunction("Motion Feedback", false, action)
+			function := wizard.getModuleActionFunction("Motion Feedback", false, "Motion")
+			actionArguments := wizard.getModuleActionArgument("Motion Feedback", false, "Motion")
+			motionIntensity := wizard.getModuleValue("Motion Feedback", "Motion Intensity")
+			
+			if (actionArguments && (actionArguments != ""))
+				actionArguments := string2Values("|", actionArguments)
+			else if mode
+				actionArguments := Array("On", 1.0)
+			else
+				actionArguments := Array("On", 50)
 
-				if !IsObject(function)
-					function := ((function != "") ? Array(function) : [])
+			if !IsObject(function)
+				function := ((function != "") ? Array(function) : [])
+			
+			if (function.Length() > 0) {
+				if (arguments != "")
+					arguments .= "; "
+			
+				if (motionIntensity != "")
+					motionIntensity .= A_Space
 				
-				if (function.Length() > 0) {
-					if (arguments != "")
-						arguments .= "; "
-					
-					arguments .= (parameters[A_Index] . " On " . values2String(A_Space, function*))
-				}
+				arguments .= ("motion: " . actionArguments[1] . A_Space . values2String(A_Space, function*) . A_Space . motionIntensity . actionArguments[2])
 			}
+			
+			effectSelector := wizard.getModuleValue("Motion Feedback", "Effect Selector")
+			effectIntensity := wizard.getModuleValue("Motion Feedback", "Effect Intensity")
+			
+			if ((effectSelector != "") && (effectIntensity != "")) {
+				if (arguments != "")
+					arguments .= "; "
+				
+				arguments .= ("motionEffectIntensity: " . effectSelector . A_Space . effectIntensity)
+			}	
 
 			for ignore, mode in this.Definition {
 				actions := ""
 			
 				for ignore, action in this.getActions(mode) {
 					function := wizard.getModuleActionFunction("Motion Feedback", mode, action)
+					actionArguments := wizard.getModuleActionArgument("Motion Feedback", mode, action)
+					
+					if (actionArguments && (actionArguments != ""))
+						actionArguments := string2Values("|", actionArguments)
+					else if mode
+						actionArguments := Array("On", 1.0)
+					else
+						actionArguments := Array("On", 50)
 
 					if !IsObject(function)
 						function := ((function != "") ? Array(function) : [])
@@ -78,7 +116,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 						if (actions != "")
 							actions .= ", "
 						
-						actions .= (action . A_Space . values2String(A_Space, function*))
+						actions .= (action . A_Space actionArguments[1] . A_Space . actionArguments[2] . A_Space . values2String(A_Space, function*))
 					}
 				}
 				
@@ -115,6 +153,13 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		motionEffectsListHandle := false
 		
 		labelsEditorButtonHandle := false
+		
+		motionIntensityLabelHandle := false
+		motionIntensityFieldHandle := false
+		effectSelectorLabelHandle := false
+		effectSelectorFieldHandle := false
+		effectIntensityLabelHandle := false
+		effectIntensityFieldHandle := false
 		
 		labelWidth := width - 30
 		labelX := x + 45
@@ -158,12 +203,38 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		
 		Gui %window%:Font, s8 Norm, Arial
 		
-		Gui %window%:Add, Button, x%x% yp+70 w%colWidth% h23 HWNDlabelsEditorButtonHandle gopenLabelsEditor Hidden, % translate("Edit Plugin Labels...")
+		Gui %window%:Add, Text, x%x% yp+70 w105 h23 +0x200 HWNDmotionIntensityLabelHandle Hidden, % translate("Motion Intensity")
 		
+		Gui %window%:Font, s8 Bold, Arial
+		
+		Gui %window%:Add, Edit, x%secondX% yp w%secondWidth% h23 +0x200 HWNDmotionIntensityFieldHandle vmotionIntensityField Hidden
+		
+		Gui %window%:Font, s8 Norm, Arial
+		
+		Gui %window%:Add, Text, x%x% yp+24 w105 h23 +0x200 HWNDeffectSelectorLabelHandle Hidden, % translate("Effect Selector")
+		
+		Gui %window%:Font, s8 Bold, Arial
+		
+		Gui %window%:Add, Edit, x%secondX% yp w%secondWidth% h23 +0x200 HWNDeffectSelectorFieldHandle veffectSelectorField Hidden
+		
+		Gui %window%:Font, s8 Norm, Arial
+		
+		Gui %window%:Add, Text, x%x% yp+24 w105 h23 +0x200 HWNDeffectIntensityLabelHandle Hidden, % translate("Effect Intensity")
+		
+		Gui %window%:Font, s8 Bold, Arial
+		
+		Gui %window%:Add, Edit, x%secondX% yp w%secondWidth% h23 +0x200 HWNDeffectIntensityFieldHandle veffectIntensityField Hidden
+		
+		Gui %window%:Font, s8 Norm, Arial
+		
+		Gui %window%:Add, Button, x%x% yp+30 w%colWidth% h23 HWNDlabelsEditorButtonHandle gopenLabelsEditor Hidden, % translate("Edit Labels...")
+		
+		Gui %window%:Font, s8 Bold, Arial
+			
 		Gui %window%:Add, Text, x%listX% ys w%listWidth% h23 +0x200 HWNDcolumnLabel2Handle Hidden Section, % translate("Actions")
 		Gui %window%:Add, Text, yp+20 x%listX% w%listWidth% 0x10 HWNDcolumnLine2Handle Hidden
 
-		Gui %window%:Font, Norm, Arial
+		Gui %window%:Font, s8 Norm, Arial
 		
 		Gui Add, ListView, x%listX% yp+10 w%listWidth% h270 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDmotionFeedbackListViewHandle gupdateMotionFeedbackActionFunction Hidden, % values2String("|", map(["Mode", "Action", "Label", "State", "Value", "Function"], "translate")*)
 		
@@ -180,26 +251,78 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		this.setActionsListView(motionFeedbackListViewHandle)
 		
 		this.iMotionEffectsList := motionEffectsListHandle
+		this.iMotionIntensityDial := motionIntensityFieldHandle
+		this.iEffectSelectorField := effectSelectorFieldHandle
+		this.iEffectIntensityDial := effectIntensityFieldHandle
 		
-		this.registerWidgets(1, motionFeedbackIconHandle, motionFeedbackLabelHandle, motionFeedbackListViewHandle, motionFeedbackInfoTextHandle, columnLabel1Handle, columnLine1Handle, columnLabel2Handle, columnLine2Handle, motionEffectsLabelHandle, motionEffectsButtonHandle, motionEffectsListHandle, labelsEditorButtonHandle)
+		this.iDisabledWidgets := [motionEffectsListHandle, motionIntensityFieldHandle, effectSelectorFieldHandle, effectIntensityFieldHandle]
+		
+		this.registerWidgets(1, motionFeedbackIconHandle, motionFeedbackLabelHandle, motionFeedbackListViewHandle, motionFeedbackInfoTextHandle, columnLabel1Handle, columnLine1Handle, columnLabel2Handle, columnLine2Handle, motionEffectsLabelHandle, motionEffectsButtonHandle, motionEffectsListHandle, labelsEditorButtonHandle, motionIntensityLabelHandle, motionIntensityFieldHandle, effectSelectorLabelHandle, effectSelectorFieldHandle, effectIntensityLabelHandle, effectIntensityFieldHandle)
 	}
 	
 	reset() {
 		base.reset()
 	
-		this.iMotionEffectsList := {}
+		motionIntensityField := false
+		effectSelectorField := false
+		effectIntensityField := false
+		
+		this.iMotionEffectsList := false
+		this.iMotionIntensityDial := false
+		this.iEffectSelectorField := false
+		this.iEffectIntensityDial := false
+		this.iDisabledWidgets := []
 		this.iCachedActions := {}
 	}
 	
 	showPage(page) {
 		base.showPage(page)
 		
-		list := this.iMotionEffectsList
+		wizard := this.SetupWizard
 		
-		GuiControl Disable, %list%
+		for ignore, widget in this.iDisabledWidgets
+			GuiControl Disable, %widget%
+		
+		motionIntensityField := wizard.getModuleValue("Motion Feedback", "Motion Intensity")
+		effectSelectorField := wizard.getModuleValue("Motion Feedback", "Effect Selector")
+		effectIntensityField := wizard.getModuleValue("Motion Feedback", "Effect Intensity")
+		
+		GuiControl Text, motionIntensityField, %motionIntensityField%
+		GuiControl Text, effectSelectorField, %effectSelectorField%
+		GuiControl Text, effectIntensityField, %effectIntensityField%
+		
+		row := false
+		column := false
+		
+		if (motionIntensityField != "")
+			for ignore, preview in this.ButtonBoxPreviews
+				if preview.findFunction(motionIntensityField, row, column) {
+					preview.setLabel(row, column, translate("Motion Intensity"))
+					
+					break
+				}
+		
+		if (effectSelectorField != "")
+			for ignore, preview in this.ButtonBoxPreviews
+				if preview.findFunction(effectSelectorField, row, column) {
+					preview.setLabel(row, column, translate("Effect Selector"))
+					
+					break
+				}
+		
+		if (effectIntensityField != "")
+			for ignore, preview in this.ButtonBoxPreviews
+				if preview.findFunction(effectIntensityField, row, column) {
+					preview.setLabel(row, column, translate("Effect Intensity"))
+					
+					break
+				}
 	}
 	
 	hidePage(page) {
+		local function
+		local action
+		
 		wizard := this.SetupWizard
 		
 		if (!wizard.isSoftwareInstalled("SimFeedback") || !wizard.isSoftwareInstalled("StreamDeck Extension")) {
@@ -212,7 +335,86 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 				return false
 		}
 		
-		return base.hidePage(page)
+		function := this.getActionFunction(false, "Motion")
+		
+		if !function {
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+			title := translate("Setup")
+			MsgBox 262436, %title%, % translate("The function for the ""Motion"" action has not been set. You will not be able to activate or deactivate motion. Do you really want to proceed?")
+			OnMessage(0x44, "")
+			
+			IfMsgBox No
+				return false
+		}
+		
+		valid := true
+		
+		for ignore, mode in concatenate([false], this.Definition) {
+			for ignore, action in this.getActions(mode) {
+				if this.getActionFunction(mode, action) {
+					arguments := this.getActionArgument(mode, action)
+					
+					if ((!arguments || (arguments = "")) || (arguments[2] = ""))
+						valid := false
+				}
+				
+				if !valid
+					break
+			}
+			
+			if !valid
+				break
+		}
+		
+		if !valid {
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+			title := translate("Setup")
+			MsgBox 262436, %title%, % translate("Not all configured effects have defined initial values. Do you really want to proceed? (Default is 50%)")
+			OnMessage(0x44, "")
+			
+			IfMsgBox No
+				return false
+		}
+		
+		GuiControlGet effectSelectorField
+		GuiControlGet effectIntensityField
+		
+		if (((effectSelectorField != "") && (effectIntensityField = "")) || ((effectSelectorField = "") && (effectIntensityField != ""))) {
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+			title := translate("Setup")
+			MsgBox 262436, %title%, % translate("You must specify both ""Effect Selector"" and ""Effect Intensity"" functions, if you want to control effect intensities. Do you really want to proceed?")
+			OnMessage(0x44, "")
+			
+			IfMsgBox No
+				return false
+		}
+		
+		if base.hidePage(page) {
+			wizard := this.SetupWizard
+			
+			GuiControlGet motionIntensityField
+			GuiControlGet effectSelectorField
+			GuiControlGet effectIntensityField
+			
+			if (motionIntensityField != "")
+				wizard.setModuleValue("Motion Feedback", "Motion Intensity", motionIntensityField, false)
+			else
+				wizard.clearModuleValue("Motion Feedback", "Motion Intensity", false)
+			
+			if (effectSelectorField != "")
+				wizard.setModuleValue("Motion Feedback", "Effect Selector", effectSelectorField, false)
+			else
+				wizard.clearModuleValue("Motion Feedback", "Effect Selector", false)
+			
+			if (effectIntensityField != "")
+				wizard.setModuleValue("Motion Feedback", "Effect Intensity", effectIntensityField, false)
+			else
+				wizard.clearModuleValue("Motion Feedback", "Effect Intensity", false)
+			
+			return true
+		}
+		else
+			return false
 	}
 	
 	getActions(mode := false) {
@@ -225,10 +427,9 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 			
 			if (actions.Length() == 0) {
 				if mode
-					actions := concatenate(string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Motion Feedback", "Motion Feedback." . mode . ".Effects", ""))
-										 , string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Motion Feedback", "Motion Feedback." . mode . ".Intensity", "")))
+					actions := string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Motion Feedback", "Motion Feedback." . mode . ".Effects", ""))
 				else
-					actions := string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Motion Feedback", "Motion Feedback.Toggles", ""))
+					actions := ["Motion"]
 				
 				wizard.setModuleAvailableActions("Motion Feedback", mode, actions)
 			}
@@ -257,8 +458,11 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 					wizard.addControllerStaticFunction("Motion Feedback", function, label)
 				
 					for ignore, preview in this.ButtonBoxPreviews
-						if preview.findFunction(function, row, column)
+						if preview.findFunction(function, row, column) {
 							preview.setLabel(row, column, label)
+							
+							break
+						}
 				}
 			}
 		}
@@ -269,6 +473,60 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		
 		if inList(this.getActions(false), action)
 			this.SetupWizard.removeControllerStaticFunction("Motion Feedback", function)
+	}
+	
+	resetButtonBoxes() {
+		local function
+		local action
+		
+		base.resetButtonBoxes()
+		
+		wizard := this.SetupWizard
+		
+		GuiControlGet motionIntensityField
+		GuiControlGet effectSelectorField
+		GuiControlGet effectIntensityField
+		
+		row := false
+		column := false
+		
+		if (motionIntensityField != "")
+			for ignore, preview in this.ButtonBoxPreviews
+				if preview.findFunction(motionIntensityField, row, column) {
+					preview.setLabel(row, column, translate("Motion Intensity"))
+					
+					break
+				}
+		
+		if (effectSelectorField != "")
+			for ignore, preview in this.ButtonBoxPreviews
+				if preview.findFunction(effectSelectorField, row, column) {
+					preview.setLabel(row, column, translate("Effect Selector"))
+					
+					break
+				}
+		
+		if (effectIntensityField != "")
+			for ignore, preview in this.ButtonBoxPreviews
+				if preview.findFunction(effectIntensityField, row, column) {
+					preview.setLabel(row, column, translate("Effect Intensity"))
+					
+					break
+				}
+				
+		for ignore, mode in concatenate([false], this.Definition)
+			for ignore, action in this.getActions(mode)
+				if wizard.moduleActionAvailable("Motion Feedback", mode, action) {
+					function := wizard.getModuleActionFunction("Motion Feedback", mode, action)
+					
+					if function
+						for ignore, preview in this.ButtonBoxPreviews
+							if preview.findFunction(function[1], row, column) {
+								preview.setLabel(row, column, this.getActionLabel(this.getActionRow(mode, action)))
+						
+								break
+							}
+				}
 	}
 	
 	loadActions(load := false) {
@@ -321,20 +579,14 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 							this.setActionArgument(count, arguments)
 					}
 					
-					label := getConfigurationValue(pluginLabels, "Motion Feedback", action . (mode ? ".Dial" : ".Toggle"), kUndefined)
+					label := getConfigurationValue(pluginLabels, "Motion Feedback", action . ".Toggle", kUndefined)
 					
-					if (label == kUndefined) {
+					if (label == kUndefined)
 						label := getConfigurationValue(pluginLabels, code, action . ".Activate", "")
 		
-						this.setAction(count, mode, action, [false, "Activate"], label)
+					this.setAction(count, mode, action, [false, "Activate"], label)
 						
-						isBinary := false
-					}
-					else {
-						this.setAction(count, mode, action, [false, (mode ? "Dial" : "Toggle"), "Increase", "Decrease"], label)
-						
-						isBinary := (mode != false)
-					}
+					isBinary := false
 					
 					function := this.getActionFunction(mode, action)
 					
@@ -352,10 +604,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 							}
 						}
 					
-						if (function.Length() == 1)
-							function := (!isBinary ? function[1] : ("+/-: " . function[1]))
-						else
-							function := ("+: " . function[1] . " | -: " . function[2])
+						function := function[1]
 					}
 					else
 						function := ""
@@ -440,22 +689,139 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		}
 	}
 	
-	createActionsMenu(title, row) {
-		contextMenu := base.createActionsMenu(title, row)
+	setMotionIntensityDial(preview, function, control, row, column) {
+		window := this.Window
 		
-		Menu %contextMenu%, Add
+		Gui %window%:Default
 		
-		menuItem := translate("Toggle State")
-		handler := ObjBindMethod(this, "toggleState", row)
+		GuiControlGet motionIntensityField
 		
-		Menu %contextMenu%, Add, %menuItem%, %handler%
+		if (motionIntensityField != "") {
+			cRow := false
+			cColumn := false
+			
+			for ignore, bbPreview in this.ButtonBoxPreviews
+				if bbPreview.findFunction(motionIntensityField, cRow, cColumn) {
+					this.clearMotionIntensityDial(preview, motionIntensityField
+												, ConfigurationItem.descriptor("Ignore", ConfigurationItem.splitDescriptor(motionIntensityField)[2])
+												, cRow, cColumn, false)
+					
+					break
+				}
+		}
 		
-		menuItem := translate("Set Value...")
-		handler := ObjBindMethod(this, "inputValue", row)
+		motionIntensityField := function
 		
-		Menu %contextMenu%, Add, %menuItem%, %handler%
+		GuiControl, , motionIntensityField, %motionIntensityField%
 		
-		return contextMenu
+		SoundPlay %kResourcesDirectory%Sounds\Activated.wav
+		
+		preview.setLabel(row, column, translate("Motion Intensity"))
+	}
+			
+	clearMotionIntensityDial(preview, function, control, row, column, sound := true) {
+		window := this.Window
+		
+		Gui %window%:Default
+		
+		motionIntensityField := ""
+		
+		GuiControl, , motionIntensityField, %motionIntensityField%
+		
+		if sound
+			SoundPlay %kResourcesDirectory%Sounds\Activated.wav
+		
+		this.resetButtonBoxes()
+	}
+	
+	setEffectSelector(preview, function, control, row, column) {
+		window := this.Window
+		
+		Gui %window%:Default
+		
+		GuiControlGet effectSelectorField
+		
+		if (effectSelectorField != "") {
+			cRow := false
+			cColumn := false
+			
+			for ignore, bbPreview in this.ButtonBoxPreviews
+				if bbPreview.findFunction(effectSelectorField, cRow, cColumn) {
+					this.clearEffectSelector(preview, effectSelectorField
+										   , ConfigurationItem.descriptor("Ignore", ConfigurationItem.splitDescriptor(effectSelectorField)[2])
+										   , cRow, cColumn, false)
+					
+					break
+				}
+		}
+		
+		effectSelectorField := function
+		
+		GuiControl, , effectSelectorField, %effectSelectorField%
+		
+		SoundPlay %kResourcesDirectory%Sounds\Activated.wav
+		
+		preview.setLabel(row, column, translate("Effect Selector"))
+	}
+			
+	clearEffectSelector(preview, function, control, row, column, sound := true) {
+		window := this.Window
+		
+		Gui %window%:Default
+		
+		effectSelectorField := ""
+		
+		GuiControl, , effectSelectorField, %effectSelectorField%
+		
+		if sound
+			SoundPlay %kResourcesDirectory%Sounds\Activated.wav
+		
+		this.resetButtonBoxes()
+	}
+	
+	setEffectIntensityDial(preview, function, control, row, column) {
+		window := this.Window
+		
+		Gui %window%:Default
+		
+		GuiControlGet effectIntensityField
+		
+		if (effectIntensityField != "") {
+			cRow := false
+			cColumn := false
+			
+			for ignore, bbPreview in this.ButtonBoxPreviews
+				if bbPreview.findFunction(effectIntensityField, cRow, cColumn) {
+					this.clearEffectIntensityDial(preview, effectIntensityField
+												, ConfigurationItem.descriptor("Ignore", ConfigurationItem.splitDescriptor(effectIntensityField)[2])
+												, cRow, cColumn, false)
+					
+					break
+				}
+		}
+		
+		effectIntensityField := function
+		
+		GuiControl, , effectIntensityField, %effectIntensityField%
+		
+		SoundPlay %kResourcesDirectory%Sounds\Activated.wav
+		
+		preview.setLabel(row, column, translate("Effect Intensity"))
+	}
+			
+	clearEffectIntensityDial(preview, function, control, row, column, sound := true) {
+		window := this.Window
+		
+		Gui %window%:Default
+		
+		effectIntensityField := ""
+		
+		GuiControl, , effectIntensityField, %effectIntensityField%
+		
+		if sound
+			SoundPlay %kResourcesDirectory%Sounds\Activated.wav
+		
+		this.resetButtonBoxes()
 	}
 	
 	toggleState(row) {
@@ -502,14 +868,29 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		InputBox value, %title%, %prompt%, , 200, 150, , , %locale%, , %value%
 		
 		if !ErrorLevel {
+			message := (mode ? "You must enter a valid number between 0.0 and 2.0..." : "You must enter a valid integer between 0 and 100...")
+			
+			valid := false
+			
 			if value is number
-				if ((value >= 0) && (value <= 100))
+				if (!mode && (value >= 0) && (value <= 100)) {
+					if value is integer
+					{
+						valid := true
+						
+						value := Round(value)
+					}
+				}
+				else if (mode && (value >= 0.0) && (value <= 2.0)) {
 					valid := true
+						
+					value := Round(value, 1)
+				}
 			
 			if !valid {
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 				title := translate("Error")
-				MsgBox 262160, %title%, % translate("You must enter a valid value between 0 and 100...")
+				MsgBox 262160, %title%, % translate(message)
 				OnMessage(0x44, "")
 				
 				return
@@ -521,6 +902,87 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 			
 			this.loadActions()
 		}
+	}
+	
+	createActionsMenu(title, row) {
+		contextMenu := base.createActionsMenu(title, row)
+		
+		Menu %contextMenu%, Add
+		
+		menuItem := translate("Toggle State")
+		handler := ObjBindMethod(this, "toggleState", row)
+		
+		Menu %contextMenu%, Add, %menuItem%, %handler%
+		
+		menuItem := translate("Set Value...")
+		handler := ObjBindMethod(this, "inputValue", row)
+		
+		Menu %contextMenu%, Add, %menuItem%, %handler%
+		
+		return contextMenu
+	}
+	
+	createControlMenu(title, preview, element, function, row, column) {
+		contextMenu := base.createControlMenu(title, preview, element, function, row, column)
+		
+		functionType := ConfigurationItem.splitDescriptor(function)[1]
+		
+		GuiControlGet motionIntensityField
+		GuiControlGet effectSelectorField
+		GuiControlGet effectIntensityField
+		
+		Menu %contextMenu%, Add
+		
+		menuItem := translate("Set Motion Intensity Dial")
+		handler := ObjBindMethod(this, "setMotionIntensityDial", preview, function, element[2], row, column)
+		
+		Menu %contextMenu%, Add, %menuItem%, %handler%
+		
+		if ((functionType != k2WayToggleType) && (functionType != kDialType))
+			Menu %contextMenu%, Disable, %menuItem%
+		
+		menuItem := translate("Clear Motion Intensity Dial")
+		handler := ObjBindMethod(this, "clearMotionIntensityDial", preview, function, element[2], row, column)
+		
+		Menu %contextMenu%, Add, %menuItem%, %handler%
+		
+		if ((motionIntensityField = "") || (motionIntensityField != function))
+			Menu %contextMenu%, Disable, %menuItem%
+		
+		Menu %contextMenu%, Add
+		
+		menuItem := translate("Set Effect Selector")
+		handler := ObjBindMethod(this, "setEffectSelector", preview, function, element[2], row, column)
+		
+		Menu %contextMenu%, Add, %menuItem%, %handler%
+		
+		menuItem := translate("Clear Effect Selector")
+		handler := ObjBindMethod(this, "clearEffectSelector", preview, function, element[2], row, column)
+		
+		Menu %contextMenu%, Add, %menuItem%, %handler%
+		
+		if ((effectSelectorField = "") || (effectSelectorField != function))
+			Menu %contextMenu%, Disable, %menuItem%
+		
+		Menu %contextMenu%, Add
+		
+		menuItem := translate("Set Effect Intensity Dial")
+		handler := ObjBindMethod(this, "setEffectIntensityDial", preview, function, element[2], row, column)
+		
+		Menu %contextMenu%, Add, %menuItem%, %handler%
+		
+		if ((functionType != k2WayToggleType) && (functionType != kDialType))
+			Menu %contextMenu%, Disable, %menuItem%
+		
+		menuItem := translate("Clear Effect Intensity Dial")
+		handler := ObjBindMethod(this, "clearEffectIntensityDial", preview, function, element[2], row, column)
+		
+		Menu %contextMenu%, Add, %menuItem%, %handler%
+		
+		if ((effectIntensityField = "") || (effectIntensityField != function))
+			Menu %contextMenu%, Disable, %menuItem%
+		
+		return contextMenu
 	}
 }
 

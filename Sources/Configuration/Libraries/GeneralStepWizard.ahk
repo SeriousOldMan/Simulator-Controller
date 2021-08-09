@@ -393,8 +393,11 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 							this.iLaunchApplications[application] := Array(label, function)
 				
 							for ignore, preview in this.ButtonBoxPreviews
-								if preview.findFunction(function, row, column)
+								if preview.findFunction(function, row, column) {
 									preview.setLabel(row, column, (label != "") ? label : application)
+									
+									break
+								}
 						}
 					}
 					
@@ -538,15 +541,6 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 				handler := ObjBindMethod(this, "setLaunchApplication", Array(preview, element, function, row, column, false, true))
 				
 				Menu ContextMenu, Add, %menuItem%, %handler%
-				
-				/*
-				for ignore, candidate in this.iLaunchApplications
-					if (candidate[2] == function) {
-						Menu ContextMenu, Disable, %menuItem%
-						
-						break
-					}
-				*/
 				
 				menuItem := translate("Clear Application")
 				handler := ObjBindMethod(this, "clearLaunchApplication", preview, function, element[2], row, column)

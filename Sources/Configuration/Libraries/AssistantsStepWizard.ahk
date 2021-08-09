@@ -329,8 +329,11 @@ class AssistantsStepWizard extends ActionsStepWizard {
 				wizard.addControllerStaticFunction(this.iCurrentAssistant, function, label)
 			
 				for ignore, preview in this.ButtonBoxPreviews
-					if preview.findFunction(function, row, column)
+					if preview.findFunction(function, row, column) {
 						preview.setLabel(row, column, label)
+						
+						break
+					}
 			}
 		}
 	}

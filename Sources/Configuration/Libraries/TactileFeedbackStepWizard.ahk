@@ -170,12 +170,14 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 		
 		Gui %window%:Font, s8 Norm, Arial
 		
-		Gui %window%:Add, Button, x%x% yp+70 w%colWidth% h23 HWNDlabelsEditorButtonHandle gopenLabelsEditor Hidden, % translate("Edit Plugin Labels...")
+		Gui %window%:Add, Button, x%x% yp+70 w%colWidth% h23 HWNDlabelsEditorButtonHandle gopenLabelsEditor Hidden, % translate("Edit Labels...")
 		
+		Gui %window%:Font, s8 Bold, Arial
+			
 		Gui %window%:Add, Text, x%listX% ys w%listWidth% h23 +0x200 HWNDcolumnLabel2Handle Hidden Section, % translate("Actions")
 		Gui %window%:Add, Text, yp+20 x%listX% w%listWidth% 0x10 HWNDcolumnLine2Handle Hidden
 
-		Gui %window%:Font, Norm, Arial
+		Gui %window%:Font, s8 Norm, Arial
 		
 		Gui Add, ListView, x%listX% yp+10 w%listWidth% h270 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDtactileFeedbackListViewHandle gupdateTactileFeedbackActionFunction Hidden, % values2String("|", map(["Mode", "Action", "Label", "Function"], "translate")*)
 		
@@ -275,8 +277,11 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 					wizard.addControllerStaticFunction("Tactile Feedback", function, label)
 				
 					for ignore, preview in this.ButtonBoxPreviews
-						if preview.findFunction(function, row, column)
+						if preview.findFunction(function, row, column) {
 							preview.setLabel(row, column, label)
+							
+							break
+						}
 				}
 			}
 		}

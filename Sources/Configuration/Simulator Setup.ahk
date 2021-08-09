@@ -1080,6 +1080,24 @@ class SetupWizard extends ConfigurationItem {
 		return simulators
 	}
 	
+	setModuleValue(module, key, value, update := true) {
+		this.KnowledgeBase.setFact("Module." . module . ".Key." . key, value)
+		
+		if update
+			this.updateState()
+	}
+	
+	getModuleValue(module, key) {
+		return this.KnowledgeBase.getValue("Module." . module . ".Key." . key, "")
+	}
+	
+	clearModuleValue(module, key, update := true) {
+		this.KnowledgeBase.removeFact("Module." . module . ".Key." . key, "")
+		
+		if update
+			this.updateState()
+	}
+	
 	setModuleAvailableActions(module, mode, actions) {
 		local knowledgeBase := this.KnowledgeBase
 		local function
@@ -2087,7 +2105,7 @@ initializeSimulatorSetup()
 
 ;~ #Include Libraries\ModulesStepWizard.ahk
 ;~ #Include Libraries\InstallationStepWizard.ahk
-;~ #Include Libraries\ApplicationsStepWizard.ahk
+#Include Libraries\ApplicationsStepWizard.ahk
 ;~ #Include Libraries\ButtonBoxStepWizard.ahk
 ;~ #Include Libraries\GeneralStepWizard.ahk
 ;~ #Include Libraries\SimulatorsStepWizard.ahk

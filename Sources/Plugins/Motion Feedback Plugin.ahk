@@ -387,7 +387,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		motionEffectsArguments := string2Values(",", this.getArgumentValue("motionEffects", ""))
 		motionEffectIntensityArguments := string2Values(A_Space, this.getArgumentValue("motionEffectIntensity", ""))
 		
-		initialIntensity := motionArguments[4]
+		initialIntensity := motionArguments[motionArguments.Length()]
 				
 		this.kInitialMotionIntensity := initialIntensity
 		this.iCurrentMotionIntensity := initialIntensity
@@ -420,14 +420,16 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		
 		this.iMotionMode := motionMode
 		
-		descriptor := motionArguments[3]
-		function := this.Controller.findFunction(descriptor)
-		
-		if (function != false)
-			motionMode.registerAction(new this.MotionIntensityAction(function, motionMode
-																   , this.getLabel(ConfigurationItem.descriptor("Motion Intensity", "Dial"), "Motion Intensity")))
-		else
-			this.logFunctionNotFound(descriptor)
+		if (motionArguments.Length() > 3) {
+			descriptor := motionArguments[3]
+			function := this.Controller.findFunction(descriptor)
+			
+			if (function != false)
+				motionMode.registerAction(new this.MotionIntensityAction(function, motionMode
+																	   , this.getLabel(ConfigurationItem.descriptor("Motion Intensity", "Dial"), "Motion Intensity")))
+			else
+				this.logFunctionNotFound(descriptor)
+		}
 		
 		for index, effect in this.kEffects
 			this.createEffectToggleAction(controller, motionMode, effectFunctions[index], effect)

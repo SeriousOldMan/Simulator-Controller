@@ -24,8 +24,6 @@ class ApplicationsStepWizard extends StepWizard {
 	}
 	
 	saveToConfiguration(configuration) {
-		local application
-		
 		base.saveToConfiguration(configuration)
 		
 		wizard := this.SetupWizard
@@ -35,11 +33,11 @@ class ApplicationsStepWizard extends StepWizard {
 		simulators := []
 		
 		for ignore, applications in concatenate([definition[1]], string2Values(",", definition[2]))
-			for application, ignore in getConfigurationSectionValues(wizard.Definition, applications)
-				if (((applications != "Applications.Simulators") || wizard.isApplicationInstalled(application)) && wizard.isApplicationSelected(application)) {
-					descriptor := getApplicationDescriptor(application)
+			for theApplication, ignore in getConfigurationSectionValues(wizard.Definition, applications)
+				if (((applications != "Applications.Simulators") || wizard.isApplicationInstalled(theApplication)) && wizard.isApplicationSelected(theApplication)) {
+					descriptor := getApplicationDescriptor(theApplication)
 				
-					exePath := wizard.applicationPath(application)
+					exePath := wizard.applicationPath(theApplication)
 					
 					if !exePath
 						exePath := ""
@@ -48,12 +46,12 @@ class ApplicationsStepWizard extends StepWizard {
 					
 					hooks := string2Values(";", descriptor[5])
 					
-					new Application(application, false, exePath, workingDirectory, descriptor[4], hooks[1], hooks[2], hooks[3]).saveToConfiguration(configuration)
+					new Application(theApplication, false, exePath, workingDirectory, descriptor[4], hooks[1], hooks[2], hooks[3]).saveToConfiguration(configuration)
 					
 					group := ConfigurationItem.splitDescriptor(applications)[2]
 					
 					if (group = "Simulators") {
-						simulators.Push(application)
+						simulators.Push(theApplication)
 						
 						group := "Other"
 					}
@@ -61,12 +59,12 @@ class ApplicationsStepWizard extends StepWizard {
 					if !groups.HasKey(group)
 						groups[group] := []
 					
-					groups[group].Push(application)
+					groups[group].Push(theApplication)
 				}
 		
 		for group, applications in groups
-			for ignore, application in applications
-				setConfigurationValue(configuration, "Applications", group . "." . A_Index, application)
+			for ignore, theApplication in applications
+				setConfigurationValue(configuration, "Applications", group . "." . A_Index, theApplication)
 		
 		setConfigurationValue(configuration, "Configuration", "Simulators", values2String("|", simulators*))
 	}

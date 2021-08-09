@@ -820,6 +820,116 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 		return "ContextMenu"
 	}
 	
+	createControlMenu(title, preview, element, function, row, column) {
+		local action
+		
+		window := this.Window
+		
+		Gui %window%:Default
+
+		try {
+			Menu ContextMenu, DeleteAll
+		}
+		catch exception {
+			; ignore
+		}
+		
+		Menu ContextMenu, Add, %title%, menuIgnore
+		Menu ContextMenu, Disable, %title%
+		Menu ContextMenu, Add
+		
+		menuItem := translate("Set Action")
+		handler := ObjBindMethod(this, "setFunctionAction", Array(preview, element, function, row, column, false, true))
+		
+		Menu ContextMenu, Add, %menuItem%, %handler%
+		
+		menuItem := translate("Clear Action")
+		handler := ObjBindMethod(this, "clearFunctionAction", preview, function, element[2], row, column)
+						
+		Menu ContextMenu, Add, %menuItem%, %handler%
+		
+		disable := true
+		
+		for mode, modeFunctions in this.iFunctions {
+			for action, functions in modeFunctions {
+				for ignore, candidate in functions
+					if (candidate = function) {
+						disable := false
+						
+						break
+					}
+				
+				if disable
+					break
+			}
+			
+			if disable
+				break
+		}
+		
+		if disable
+			Menu ContextMenu, Disable, %menuItem%
+		
+		return "ContextMenu"
+	}
+	
+	setControlFunction(row, function) {
+		local action
+		
+		mode := this.getActionMode(row)
+		action := this.getAction(row)
+		actionDescriptor := this.getActionDescriptor(row)
+		functionType := ConfigurationItem.splitDescriptor(function)[1]
+		
+		if (((functionType == k2WayToggleType) || (functionType == kDialType)) && ((actionDescriptor[2] == "Toggle") || (actionDescriptor[2] == "Dial")))
+			function := [function]
+		else if (actionDescriptor[2] == "Activate")
+			function := [function]
+		else {
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Increase", "Decrease", "Cancel"]))
+			title := translate("Setup")
+			MsgBox 262179, %title%, % translate("What type of action do you want to trigger for ") . action . translate("?")
+			OnMessage(0x44, "")
+			
+			currentFunction := this.getActionFunction(mode, action)
+			
+			IfMsgBox Cancel
+				function := false
+		
+			IfMsgBox Yes
+			{
+				if currentFunction {
+					if (currentFunction.Length() == 1)
+						function := [function, ""]
+					else {
+						currentFunction[1] := function
+						
+						function := currentFunction
+					}
+				}
+				else
+					function := [function, ""]
+			}
+			
+			IfMsgBox No
+			{
+				if currentFunction {
+					if (currentFunction.Length() == 1)
+						function := ["", function]
+					else {
+						currentFunction[2] := function
+						
+						function := currentFunction
+					}
+				}
+				else
+					function := ["", function]
+			}
+		}
+		
+		return function
+	}
+	
 	controlClick(preview, element, function, row, column, isEmpty, actionRegistration := false) {
 		local action
 		
@@ -828,34 +938,11 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 				return
 			
 			if (!this.iPendingFunctionRegistration && !actionRegistration) {
-				menuItem := (translate(element[1] . ": ") . element[2] . " (" . row . " x " . column . ")")
+				title := (translate(element[1] . ": ") . element[2] . " (" . row . " x " . column . ")")
 				
-				try {
-					Menu ContextMenu, DeleteAll
-				}
-				catch exception {
-					; ignore
-				}
+				controlMenu := this.createControlMenu(title, preview, element, function, row, column)
 				
-				window := SetupWizard.Instance.WizardWindow
-				
-				Gui %window%:Default
-				
-				Menu ContextMenu, Add, %menuItem%, menuIgnore
-				Menu ContextMenu, Disable, %menuItem%
-				Menu ContextMenu, Add
-				
-				menuItem := translate("Set Action")
-				handler := ObjBindMethod(this, "setFunctionAction", Array(preview, element, function, row, column, false, true))
-				
-				Menu ContextMenu, Add, %menuItem%, %handler%
-				
-				menuItem := translate("Clear Action")
-				handler := ObjBindMethod(this, "clearFunctionAction", preview, function, element[2], row, column)
-				
-				Menu ContextMenu, Add, %menuItem%, %handler%
-				
-				Menu ContextMenu, Show
+				Menu %controlMenu%, Show
 			}
 			else {
 				SoundPlay %kResourcesDirectory%Sounds\Activated.wav
@@ -864,54 +951,7 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 				
 				mode := this.getActionMode(actionRow)
 				action := this.getAction(actionRow)
-				actionDescriptor := this.getActionDescriptor(actionRow)
-				functionType := ConfigurationItem.splitDescriptor(function)[1]
-				
-				if (((functionType == k2WayToggleType) || (functionType == kDialType)) && ((actionDescriptor[2] == "Toggle") || (actionDescriptor[2] == "Dial")))
-					function := [function]
-				else if (actionDescriptor[2] == "Activate")
-					function := [function]
-				else {
-					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Increase", "Decrease", "Cancel"]))
-					title := translate("Setup")
-					MsgBox 262179, %title%, % translate("What type of action do you want to trigger for ") . action . translate("?")
-					OnMessage(0x44, "")
-					
-					currentFunction := this.getActionFunction(mode, action)
-					
-					IfMsgBox Cancel
-						function := false
-				
-					IfMsgBox Yes
-					{
-						if currentFunction {
-							if (currentFunction.Length() == 1)
-								function := [function, ""]
-							else {
-								currentFunction[1] := function
-								
-								function := currentFunction
-							}
-						}
-						else
-							function := [function, ""]
-					}
-					
-					IfMsgBox No
-					{
-						if currentFunction {
-							if (currentFunction.Length() == 1)
-								function := ["", function]
-							else {
-								currentFunction[2] := function
-								
-								function := currentFunction
-							}
-						}
-						else
-							function := ["", function]
-					}
-				}
+				function := this.setControlFunction(actionRow, function)
 
 				if function {
 					this.setActionFunction(mode, action, function)

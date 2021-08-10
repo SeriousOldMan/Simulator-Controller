@@ -235,6 +235,14 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 		return base.hidePage(page)
 	}
 	
+	getModule() {
+		return "Tactile Feedback"
+	}
+	
+	getModes() {
+		return Array(false, this.Definition*)
+	}
+	
 	getActions(mode := false) {
 		if this.iCachedActions.HasKey(mode)
 			return this.iCachedActions[mode]
@@ -269,21 +277,10 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 		if inList(this.getActions(false), action) {
 			functions := this.getActionFunction(this.getActionMode(row), action)
 			
-			if functions {
-				row := false
-				column := false
-			
-				for ignore, function in functions {
-					wizard.addControllerStaticFunction("Tactile Feedback", function, label)
-				
-					for ignore, preview in this.ButtonBoxPreviews
-						if preview.findFunction(function, row, column) {
-							preview.setLabel(row, column, label)
-							
-							break
-						}
-				}
-			}
+			if functions
+				for ignore, function in functions
+					if (function && (function != ""))
+						wizard.addControllerStaticFunction("Tactile Feedback", function, label)
 		}
 	}
 	
@@ -329,7 +326,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 		lastMode := -1
 		count := 1
 		
-		for ignore, mode in concatenate([false], this.Definition) {
+		for ignore, mode in this.getModes() {
 			for ignore, action in this.getActions(mode) {
 				if wizard.moduleActionAvailable("Tactile Feedback", mode, action) {
 					first := (mode != lastMode)
@@ -360,19 +357,6 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 					function := this.getActionFunction(mode, action)
 					
 					if function {
-						for ignore, partFunction in function {
-							row := false
-							column := false
-							
-							for ignore, preview in this.ButtonBoxPreviews {
-								if preview.findFunction(partFunction, row, column) {
-									preview.setLabel(row, column, label)
-									
-									break
-								}
-							}
-						}
-					
 						if (function.Length() == 1)
 							function := (!isBinary ? function[1] : ("+/-: " . function[1]))
 						else
@@ -387,6 +371,8 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 				}
 			}
 		}
+		
+		this.loadButtonBoxLabels()
 			
 		LV_ModifyCol(1, "AutoHdr")
 		LV_ModifyCol(2, "AutoHdr")
@@ -400,7 +386,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 		
 		wizard := this.SetupWizard
 		
-		for ignore, mode in concatenate([false], this.Definition) {
+		for ignore, mode in this.getModes() {
 			modeFunctions := {}
 		
 			for ignore, action in this.getActions(mode)

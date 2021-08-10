@@ -26,7 +26,11 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 	iSimulators := []
 	iCurrentSimulator := false
 	
+	iSimulatorMFDKeys := {}
 	iButtonBoxWidgets := []
+	
+	iCachedActions := {}
+	iCachedSimulator := false
 	
 	Pages[] {
 		Get {
@@ -55,10 +59,20 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 			if wizard.isApplicationSelected(simulator) {
 				arguments := ""
 				
+				for ignore, descriptor in this.iSimulatorMFDKeys[simulator] {
+					key := descriptor[3]
+					value := wizard.getSimulatorValue(simulator, key, descriptor[4])
+					
+					if (arguments != "")
+						arguments .= "; "
+					
+					arguments .= (key . ": " . value)
+				}
+				
 				for ignore, mode in ["Pitstop", "Assistant"] {
 					actions := ""
 				
-					for ignore, action in string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Simulators", (mode = "Assistant") ? "Simulators.Actions.Assistant" : ("Simulators.Settings.Pitstop." . code)))
+					for ignore, action in this.getActions(mode, simulator)
 						if wizard.simulatorActionAvailable(simulator, mode, action) {
 							function := wizard.getSimulatorActionFunction(simulator, mode, action)
 
@@ -93,6 +107,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		
 		static actionsInfoText
 		
+		wizard := this.SetupWizard
 		window := this.Window
 		
 		Gui %window%:Default
@@ -116,10 +131,10 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		simulatorLabelHandle := false
 		simulatorDropDownHandle := false
 		
-		colummLabel1Handle := false
-		colummLine1Handle := false
-		colummLabel2Handle := false
-		colummLine2Handle := false
+		columnLabel1Handle := false
+		columnLine1Handle := false
+		columnLabel2Handle := false
+		columnLine2Handle := false
 	
 		secondX := x + 80
 		secondWidth := 160
@@ -136,10 +151,36 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 
 		Gui %window%:Font, Norm, Arial
 		
-		colummLabel1Handle := false
-		colummLine1Handle := false
-		colummLabel2Handle := false
-		colummLine2Handle := false
+		labelHandle := false
+		editHandle := false
+		
+		secondX := x + 140
+		
+		for ignore, simulator in this.Definition {
+			code := string2Values("|", getConfigurationValue(wizard.Definition, "Applications.Simulators", simulator))[1]
+			keys := getConfigurationValue(wizard.Definition, "Setup.Simulators", "Simulators.MFDKeys." . code, false)
+			
+			if keys {
+				this.iSimulatorMFDKeys[simulator] := []
+				keyY := labelY + 90
+				
+				for ignore, key in string2Values("|", keys) {
+					key := string2Values(":", key)
+					default := key[2]
+					key := key[1]
+					
+					label := getConfigurationValue(wizard.Definition, "Setup.Simulators", "Simulators.MFDKeys." . key . "." . getLanguage(), key)
+				
+					Gui %window%:Add, Text, x%x% y%keyY% w105 h23 +0x200 HWNDlabelHandle Hidden, % label
+					Gui %window%:Add, Edit, x%secondX% yp w60 h23 +0x200 HWNDeditHandle Hidden, % default
+		
+					this.iSimulatorMFDKeys[simulator].Push(Array(labelHandle, editHandle, key, default))
+					this.registerWidgets(1, labelHandle, editHandle)
+					
+					keyY += 24
+				}
+			}
+		}
 		
 		listX := x + 250
 		listWidth := width - 250
@@ -173,7 +214,10 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 	reset() {
 		base.reset()
 		
+		this.iSimulatorMFDKeys := {}
 		this.iButtonBoxWidgets := []
+		this.iCachedActions := {}
+		this.iCachedSimulator := false
 	}
 	
 	updateState() {
@@ -200,18 +244,61 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 			for ignore, widget in this.iButtonBoxWidgets
 				GuiControl Hide, %widget%
 		
+		this.loadSimulatorMFDKeys(this.iCurrentSimulator)
+		
 		GuiControl, , simulatorDropDown, % "|" . values2String("|", this.iSimulators*)
 		GuiControl Choose, simulatorDropDown, % chosen
+	}
+	
+	hidePage(page) {
+		if base.hidePage(page) {
+			this.saveSimulatorMFDKeys(this.iCurrentSimulator)
+				
+			return true
+		}
+		else
+			return false
+	}
+	
+	getModes() {
+		return ["Pitstop", "Assistant"]
+	}
+	
+	getActions(mode, simulator := false) {
+		if !simulator
+			simulator := this.iCurrentSimulator
+
+		if (simulator != this.iCachedSimulator) {
+			this.iCachedActions := {}
+		
+			this.iCachedSimulator := simulator
+		}
+		
+		if this.iCachedActions.HasKey(mode)
+			return this.iCachedActions[mode]
+		else {
+			wizard := this.SetupWizard
+			
+			code := string2Values("|", getConfigurationValue(wizard.Definition, "Applications.Simulators", simulator))[1]
+			actions := string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Simulators", (mode = "Assistant") ? "Simulators.Actions.Assistant" : ("Simulators.Settings.Pitstop." . code)))
+			
+			this.iCachedActions[mode] := actions
+			
+			return actions
+		}
 	}
 	
 	chooseSimulator() {
 		this.saveActions()
 		
+		this.saveSimulatorMFDKeys(this.iCurrentSimulator)
+		
 		GuiControlGet simulatorDropDown
 		
 		this.iCurrentSimulator := simulatorDropDown
 		
-		this.resetButtonBoxes()
+		this.loadSimulatorMFDKeys(simulatorDropDown)
+		
 		this.loadActions(simulatorDropDown, true)
 	}
 	
@@ -233,8 +320,11 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		window := this.Window
 		wizard := this.SetupWizard
 		
-		if load
+		if load {
+			this.iCachedActions := {}
+			
 			this.clearActionFunctions()
+		}
 		
 		this.clearActions()
 		
@@ -252,7 +342,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		count := 1
 		
 		for ignore, mode in ["Pitstop", "Assistant"]
-			for ignore, action in string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Simulators", (mode = "Assistant") ? "Simulators.Actions.Assistant" : ("Simulators.Settings.Pitstop." . code))) {
+			for ignore, action in this.getActions(mode, simulator) {
 				if wizard.simulatorActionAvailable(simulator, mode, action) {
 					first := (mode != lastMode)
 					lastMode := mode
@@ -295,19 +385,6 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 					function := this.getActionFunction(mode, action)
 					
 					if function {
-						for ignore, partFunction in function {
-							row := false
-							column := false
-							
-							for ignore, preview in this.ButtonBoxPreviews {
-								if preview.findFunction(partFunction, row, column) {
-									preview.setLabel(row, column, label)
-									
-									break
-								}
-							}
-						}
-					
 						if (function.Length() == 1)
 							function := (!isBinary ? function[1] : ("+/-: " . function[1]))
 						else
@@ -321,7 +398,9 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 					count += 1
 				}
 			}
-			
+		
+		this.loadButtonBoxLabels()
+		
 		LV_ModifyCol(1, "AutoHdr")
 		LV_ModifyCol(2, "AutoHdr")
 		LV_ModifyCol(3, "AutoHdr")
@@ -338,7 +417,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		for ignore, mode in ["Pitstop", "Assistant"] {
 			modeFunctions := {}
 		
-			for ignore, action in string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Simulators", (mode = "Assistant") ? "Simulators.Actions.Assistant" : ("Simulators.Settings.Pitstop." . code)))				
+			for ignore, action in this.getActions(mode, simulator)
 				if wizard.simulatorActionAvailable(simulator, mode, action) {
 					function := this.getActionFunction(mode, action)
 					
@@ -347,6 +426,67 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 				}
 			
 			wizard.setSimulatorActionFunctions(simulator, mode, modeFunctions)
+		}
+	}
+	
+	loadSimulatorMFDKeys(simulator) {
+		wizard := this.SetupWizard
+		
+		for ignore, descriptors in this.iSimulatorMFDKeys
+			for ignore, descriptor in descriptors {
+				GuiControl Hide, % descriptor[1]
+				GuiControl Hide, % descriptor[2]
+			}
+		
+		for ignore, descriptor in this.iSimulatorMFDKeys[simulator] {
+			value := wizard.getSimulatorValue(simulator, descriptor[3], descriptor[4])
+			
+			widget := descriptor[2]
+			
+			GuiControl, , %widget%, %value%
+			
+			GuiControl Show, % descriptor[1]
+			GuiControl Show, % descriptor[2]
+			GuiControl Enable, % descriptor[1]
+			GuiControl Enable, % descriptor[2]
+		}
+	}
+	
+	saveSimulatorMFDKeys(simulator) {
+		wizard := this.SetupWizard
+		
+		for ignore, descriptor in this.iSimulatorMFDKeys[simulator] {
+			GuiControlGet value, , % descriptor[2]
+			
+			wizard.setSimulatorValue(simulator, descriptor[3], value, false)
+		}
+	}
+	
+	loadButtonBoxLabels() {
+		local function
+		local action
+		
+		base.loadButtonBoxLabels()
+		
+		wizard := this.SetupWizard
+		simulator := this.iCurrentSimulator
+		
+		for ignore, preview in this.ButtonBoxPreviews {
+			for ignore, mode in this.getModes()
+				for ignore, action in this.getActions(mode, simulator)
+					if wizard.simulatorActionAvailable(simulator, mode, action) {
+						function := this.getActionFunction(mode, action)
+							
+						if (function && (function != "")) {
+							if !IsObject(function)
+								function := Array(function)
+								
+							for ignore, partFunction in function
+								if (partFunction && (partFunction != ""))
+									if preview.findFunction(partFunction, row, column)
+										preview.setLabel(row, column, this.getActionLabel(this.getActionRow(mode, action)))
+						}
+					}
 		}
 	}
 }

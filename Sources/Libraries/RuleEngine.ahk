@@ -2330,6 +2330,10 @@ class KnowledgeBase {
 		local rules := this.Rules
 		local result := false
 		
+		static counter := 1
+		
+		tickCount := A_TickCount
+		
 		Loop {
 			generation := facts.Generation
 			produced := false
@@ -2363,6 +2367,9 @@ class KnowledgeBase {
 			if !produced
 				break
 		}
+		
+		if isDebug()
+			showMessage("Produce " . counter++ . " took " . (A_TickCount - tickCount) . " milliseconds...")
 		
 		return result
 	}

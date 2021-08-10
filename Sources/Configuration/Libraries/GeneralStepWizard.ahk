@@ -387,10 +387,44 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 					if load {
 						function := wizard.getLaunchApplicationFunction(application)
 						
+						if (function != "")
+							this.iLaunchApplications[application] := Array(wizard.getLaunchApplicationLabel(application), function)
+					}
+					
+					if this.iLaunchApplications.HasKey(application)
+						LV_Add("", application, this.iLaunchApplications[application][1], this.iLaunchApplications[application][2])
+					else
+						LV_Add("", application, "", "")
+				}
+			}
+		
+		this.loadButtonBoxLabels()
+			
+		LV_ModifyCol(1, "AutoHdr")
+		LV_ModifyCol(2, "AutoHdr")
+	}
+	
+	saveApplications() {
+		this.SetupWizard.setLaunchApplicationLabelsAndFunctions(this.iLaunchApplications)
+	}
+	
+	loadButtonBoxLabels() {
+		local application
+		local function
+		local action
+		
+		base.loadButtonBoxLabels()
+		
+		wizard := this.SetupWizard
+		
+		for ignore, preview in this.ButtonBoxPreviews {
+			for ignore, section in string2Values(",", this.Definition[3])
+				for application, descriptor in getConfigurationSectionValues(wizard.Definition, section)
+					if wizard.isApplicationSelected(application) {
+						function := wizard.getLaunchApplicationFunction(application)
+							
 						if (function != "") {
-							label := wizard.getLaunchApplicationLabel(application)
-						
-							this.iLaunchApplications[application] := Array(label, function)
+							label := this.iLaunchApplications[application][1]
 				
 							for ignore, preview in this.ButtonBoxPreviews
 								if preview.findFunction(function, row, column) {
@@ -400,20 +434,7 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 								}
 						}
 					}
-					
-					if this.iLaunchApplications.HasKey(application)
-						LV_Add("", application, this.iLaunchApplications[application][1], this.iLaunchApplications[application][2])
-					else
-						LV_Add("", application, "", "")
-				}
-			}
-			
-		LV_ModifyCol(1, "AutoHdr")
-		LV_ModifyCol(2, "AutoHdr")
-	}
-	
-	saveApplications() {
-		this.SetupWizard.setLaunchApplicationLabelsAndFunctions(this.iLaunchApplications)
+		}
 	}
 	
 	addModeSelector(preview, function, control, row, column) {
@@ -428,7 +449,7 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 			
 			this.SetupWizard.addControllerStaticFunction("System", function, translate("Mode Selector"))
 			
-			preview.setLabel(row, column, translate("Mode Selector"))
+			this.loadButtonBoxLabels()
 		}
 	}
 			
@@ -442,15 +463,11 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 			
 			listBox := this.iModeSelectorsListHandle
 			
-			GuiControl, , %field%, % "|" . values2String("|", this.iModeSelectors*)
+			GuiControl, , %listBox%, % "|" . values2String("|", this.iModeSelectors*)
 			
 			this.SetupWizard.removeControllerStaticFunction("System", function)
 			
-			preview.setLabel(row, column, ConfigurationItem.splitDescriptor(control)[2])
-			
-			for ignore, function in this.SetupWizard.getControllerStaticFunctions()
-				if preview.findFunction(function[1], row, column)
-					preview.setLabel(row, column, function[2])
+			this.loadButtonBoxLabels()
 		}
 	}
 	
@@ -468,13 +485,7 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 				SoundPlay %kResourcesDirectory%Sounds\Activated.wav
 				
 				this.iLaunchApplications.Delete(application)
-				
-				preview.setLabel(row, column, ConfigurationItem.splitDescriptor(control)[2])
-		
-				for ignore, function in this.SetupWizard.getControllerStaticFunctions()
-					if preview.findFunction(function[1], row, column)
-						preview.setLabel(row, column, function[2])
-				
+			
 				this.loadApplications()
 				
 				break
@@ -574,8 +585,6 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 						this.iLaunchApplications[application] := Array("", function)
 					
 					label := this.iLaunchApplications[application][1]
-					
-					preview.setLabel(row, column, (label != "") ? label : application)
 					
 					this.loadApplications()
 					
@@ -688,11 +697,6 @@ inputLabel(wizard, row) {
 			wizard.iLaunchApplications[application][1] := label
 		else
 			wizard.iLaunchApplications[application] := Array(label, "")
-				
-		if (function != "")
-			for ignore, preview in wizard.ButtonBoxPreviews
-				if preview.findFunction(function, row, column)
-					preview.setLabel(row, column, (label != "") ? label : application)
 	
 		wizard.loadApplications()
 	}

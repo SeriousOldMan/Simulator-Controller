@@ -28,6 +28,8 @@ class AssistantsStepWizard extends ActionsStepWizard {
 	iActionsListViews := []
 	iAssistantConfigurators := []
 	
+	iCachedActions := false
+	
 	Pages[] {
 		Get {
 			wizard := this.SetupWizard
@@ -248,6 +250,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 		
 		this.iAssistantConfigurators := []
 		this.iActionsListViews := []
+		this.iCachedActions := false
 	}
 	
 	showPage(page) {
@@ -312,6 +315,31 @@ class AssistantsStepWizard extends ActionsStepWizard {
 			return []
 	}
 	
+	getModule() {
+		return this.iCurrentAssistant
+	}
+	
+	getModes() {
+		return [false]
+	}
+	
+	getActions(mode := false) {
+		if this.iCachedActions
+			return this.iCachedActions
+		else {
+			wizard := this.SetupWizard
+			
+			actions := concatenate(string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Assistants", "Assistants.Actions"))
+								 , string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Assistants", "Assistants.Actions.Special")))
+			
+			wizard.setModuleAvailableActions(this.iCurrentAssistant, false, actions)
+			
+			this.iCachedActions := actions
+			
+			return actions
+		}
+	}
+	
 	setAction(row, mode, action, actionDescriptor, label, argument := false) {
 		local function
 		
@@ -321,21 +349,10 @@ class AssistantsStepWizard extends ActionsStepWizard {
 		
 		functions := this.getActionFunction(false, action)
 		
-		if functions {
-			row := false
-			column := false
-		
-			for ignore, function in functions {
+		if functions
+			for ignore, function in functions
+				if (function && (function != ""))
 				wizard.addControllerStaticFunction(this.iCurrentAssistant, function, label)
-			
-				for ignore, preview in this.ButtonBoxPreviews
-					if preview.findFunction(function, row, column) {
-						preview.setLabel(row, column, label)
-						
-						break
-					}
-			}
-		}
 	}
 	
 	clearActionFunction(mode, action, function) {
@@ -362,8 +379,11 @@ class AssistantsStepWizard extends ActionsStepWizard {
 		window := this.Window
 		wizard := this.SetupWizard
 		
-		if load
+		if load {
+			this.iCachedActions := false
+			
 			this.clearActionFunctions()
+		}
 		
 		this.clearActions()
 		
@@ -377,8 +397,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 		
 		count := 1
 		
-		for ignore, action in concatenate(string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Assistants", "Assistants.Actions"))
-										, string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Assistants", "Assistants.Actions.Special"))) {
+		for ignore, action in this.getActions() {
 			if wizard.assistantActionAvailable(assistant, action) {
 				if load {
 					function := wizard.getAssistantActionFunction(assistant, action)
@@ -431,6 +450,8 @@ class AssistantsStepWizard extends ActionsStepWizard {
 				count += 1
 			}
 		}
+		
+		this.loadButtonBoxLabels()
 			
 		LV_ModifyCol(1, "AutoHdr")
 		LV_ModifyCol(2, "AutoHdr")
@@ -444,8 +465,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 		wizard := this.SetupWizard
 		functions := {}
 		
-		for ignore, action in concatenate(string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Assistants", "Assistants.Actions"))
-										, string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Assistants", "Assistants.Actions.Special")))
+		for ignore, action in this.getActions()
 			if wizard.assistantActionAvailable(assistant, action) {
 				function := this.getActionFunction(false, action)
 				
@@ -454,6 +474,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 			}
 		
 		wizard.setAssistantActionFunctions(assistant, functions)
+		wizard.setModuleActionFunctions(assistant, false, functions)
 	}
 }
 

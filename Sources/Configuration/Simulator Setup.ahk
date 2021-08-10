@@ -639,6 +639,10 @@ class SetupWizard extends ConfigurationItem {
 	updateState() {
 		this.KnowledgeBase.produce()			
 
+		static counter := 1
+		
+		tickCount := A_TickCount
+		
 		if this.Debug[kDebugKnowledgeBase]
 			this.dumpKnowledge(this.KnowledgeBase)
 		
@@ -663,6 +667,9 @@ class SetupWizard extends ConfigurationItem {
 			GuiControl Enable, nextPageButton
 			GuiControl Disable, finishButton
 		}
+		
+		if isDebug()
+			showMessage("State update " . counter++ . " took " . (A_TickCount - tickCount) . " milliseconds...")
 	}
 	
 	selectModule(module, selected, update := true) {
@@ -881,18 +888,26 @@ class SetupWizard extends ConfigurationItem {
 		
 		functions := string2Values("|", knowledgeBase.getValue("Controller.Function.Static", ""))
 		
-		for index, descriptor in functions {
-			parts := string2Values("###", descriptor)
+		found := true
 		
-			if ((parts[1] = reference) && (parts[2] = function)) {
-				functions.RemoveAt(index)
-				
-				if (functions.Length() == 0)
-					knowledgeBase.removeFact("Controller.Function.Static")
-				else
-					knowledgeBase.setValue("Controller.Function.Static", values2String("|", functions*))
-				
-				return
+		while found {
+			found := false
+		
+			for index, descriptor in functions {
+				parts := string2Values("###", descriptor)
+			
+				if ((parts[1] = reference) && (parts[2] = function)) {
+					functions.RemoveAt(index)
+					
+					if (functions.Length() == 0)
+						knowledgeBase.removeFact("Controller.Function.Static")
+					else
+						knowledgeBase.setValue("Controller.Function.Static", values2String("|", functions*))
+					
+					found := true
+					
+					break
+				}
 			}
 		}
 	}
@@ -1006,6 +1021,24 @@ class SetupWizard extends ConfigurationItem {
 		return (knowledgeBase.prove(goal) != false)
 	}
 	
+	setSimulatorValue(simulator, key, value, update := true) {
+		this.KnowledgeBase.setFact("Simulator." . simulator . ".Key." . key, value)
+		
+		if update
+			this.updateState()
+	}
+	
+	getSimulatorValue(simulator, key, default := "") {
+		return this.KnowledgeBase.getValue("Simulator." . simulator . ".Key." . key, default)
+	}
+	
+	clearSimulatorValue(simulator, key, update := true) {
+		this.KnowledgeBase.removeFact("Simulator." . simulator . ".Key." . key, "")
+		
+		if update
+			this.updateState()
+	}
+	
 	setAssistantActionFunctions(assistant, functions) {
 		local knowledgeBase := this.KnowledgeBase
 		local function
@@ -1087,8 +1120,8 @@ class SetupWizard extends ConfigurationItem {
 			this.updateState()
 	}
 	
-	getModuleValue(module, key) {
-		return this.KnowledgeBase.getValue("Module." . module . ".Key." . key, "")
+	getModuleValue(module, key, default := "") {
+		return this.KnowledgeBase.getValue("Module." . module . ".Key." . key, default)
 	}
 	
 	clearModuleValue(module, key, update := true) {
@@ -1112,7 +1145,7 @@ class SetupWizard extends ConfigurationItem {
 		{
 			action := knowledgeBase.getValue("Module." . module . modeClause . ".Action." . A_Index, false)
 		
-			if action {
+			if (action && !inList(actions, action)) {
 				knowledgeBase.removeFact("Module." . module . modeClause . ".Action." . action . ".Function")
 				knowledgeBase.removeFact("Module." . module . modeClause . ".Action." . action . ".Argument")
 			}
@@ -2103,13 +2136,13 @@ initializeSimulatorSetup()
 ;;;                          Wizard Include Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-;~ #Include Libraries\ModulesStepWizard.ahk
-;~ #Include Libraries\InstallationStepWizard.ahk
+#Include Libraries\ModulesStepWizard.ahk
+#Include Libraries\InstallationStepWizard.ahk
 #Include Libraries\ApplicationsStepWizard.ahk
-;~ #Include Libraries\ButtonBoxStepWizard.ahk
-;~ #Include Libraries\GeneralStepWizard.ahk
-;~ #Include Libraries\SimulatorsStepWizard.ahk
-;~ #Include Libraries\AssistantsStepWizard.ahk
+#Include Libraries\ButtonBoxStepWizard.ahk
+#Include Libraries\GeneralStepWizard.ahk
+#Include Libraries\SimulatorsStepWizard.ahk
+#Include Libraries\AssistantsStepWizard.ahk
 #Include Libraries\MotionFeedbackStepWizard.ahk
 #Include Libraries\TactileFeedbackStepWizard.ahk
 #Include Libraries\PedalCalibrationStepWizard.ahk

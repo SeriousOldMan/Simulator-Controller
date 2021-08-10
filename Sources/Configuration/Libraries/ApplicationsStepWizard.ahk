@@ -158,12 +158,14 @@ class ApplicationsStepWizard extends StepWizard {
 	updateState() {
 		base.updateState()
 		
-		if this.Definition
+		if (this.Definition && (wizard.Step == this))
 			this.updateAvailableApplications()
 	}
 	
 	showPage(page) {
 		local application
+		
+		this.updateAvailableApplications()
 		
 		base.showPage(page)
 		
@@ -228,7 +230,7 @@ class ApplicationsStepWizard extends StepWizard {
 				category := ConfigurationItem.splitDescriptor(section)[2]
 			
 				for application, descriptor in getConfigurationSectionValues(wizard.Definition, section) {
-					if (wizard.isApplicationInstalled(application) || !wizard.isApplicationOptional(application)) {
+					if (wizard.isApplicationSelected(application) || wizard.isApplicationInstalled(application) || !wizard.isApplicationOptional(application)) {
 						descriptor := string2Values("|", descriptor)
 					
 						executable := wizard.applicationPath(application)
@@ -249,7 +251,7 @@ class ApplicationsStepWizard extends StepWizard {
 	}
 	
 	hidePage(page) {
-		this.updateSelectedApplications(page)
+		this.updateSelectedApplications(page, false)
 		
 		return base.hidePage(page)
 	}
@@ -276,7 +278,7 @@ class ApplicationsStepWizard extends StepWizard {
 		}
 	}
 
-	updateSelectedApplications(page) {
+	updateSelectedApplications(page, update := true) {
 		wizard := this.SetupWizard
 		
 		Gui ListView, % ((page == 1) ? [this.iSimulatorsListView] : [this.iApplicationsListView])
@@ -308,8 +310,9 @@ class ApplicationsStepWizard extends StepWizard {
 			else 
 				LV_Modify(A_Index, "Check")
 		}
-			
-		wizard.updateState()
+		
+		if update
+			wizard.updateState()
 	}
 }
 
@@ -319,9 +322,10 @@ class ApplicationsStepWizard extends StepWizard {
 ;;;-------------------------------------------------------------------------;;;
 
 updateSelectedApplications() {
-	wizard := SetupWizard.Instance
+	Loop % LV_GetCount()
+		LV_Modify(A_Index, "-Select")
 	
-	wizard.StepWizards["Applications"].updateSelectedApplications(wizard.Page)
+	SetupWizard.Instance.StepWizards["Applications"].updateSelectedApplications(SetupWizard.Instance.Page, false)
 }
 
 initializeApplicationsStepWizard() {

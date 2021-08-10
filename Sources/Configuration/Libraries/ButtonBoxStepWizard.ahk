@@ -537,27 +537,37 @@ class ButtonBoxPreviewStepWizard extends StepWizard {
 				
 				preview.open()
 				
-				row := false
-				column := false
-				
-				for ignore, function in staticFunctions
-					if preview.findFunction(function[1], row, column)
-						preview.setLabel(row, column, function[2])
-				
 				this.iButtonBoxPreviewCenterY -= Round(preview.Height / 2)
 				this.iButtonBoxPreviews.Push(preview)
 			}
+			
+			this.loadButtonBoxLabels()
 		}
 		else
 			this.iButtonBoxPreviews := []
 	}
 	
 	closeButtonBoxes() {
-		for ignore, preview in this.iButtonBoxPreviews
+		for ignore, preview in this.ButtonBoxPreviews
 			preview.close()
 		
 		this.iButtonBoxPreviews := []
 		this.iButtonBoxPreviewCenterY := 0
+	}
+	
+	loadButtonBoxLabels() {
+		local function
+		
+		row := false
+		column := false
+		
+		for ignore, preview in this.ButtonBoxPreviews {
+			preview.resetLabels()
+				
+			for ignore, function in this.SetupWizard.getControllerStaticFunctions()
+				if preview.findFunction(function[1], row, column)
+					preview.setLabel(row, column, function[2])
+		}
 	}
 	
 	controlClick(preview, element, function, row, column, isEmpty) {
@@ -637,6 +647,18 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 		this.iActionsListView := actionsListView
 	}
 	
+	getModule() {
+		return false
+	}
+	
+	getModes() {
+		Throw "Virtual method ActionsStepWizard.getModes must be implemented in a subclass..."
+	}
+	
+	getActions(mode) {
+		Throw "Virtual method ActionsStepWizard.getActions must be implemented in a subclass..."
+	}
+	
 	setAction(row, mode, action, actionDescriptor, label, argument := false) {
 		this.iModes[row] := mode
 		this.iModes[mode . "." . action] := row
@@ -680,6 +702,24 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 	}
 	
 	setActionFunction(mode, action, functionDescriptor) {
+		oldFunction := this.getActionFunction(mode, action)
+		
+		if (oldFunction && (oldFunction != "")) {
+			changed := []
+			
+			if (IsObject(oldfunction) && IsObject(function)) {
+				Loop % oldFunction.Length()
+					if (oldFunction[A_Index] != functionDescriptor[A_Index])
+						changed.Push(oldFunction[A_Index])
+			}
+			else if (oldFunction != functionDescriptor)
+				changed.Push(oldFunction)
+			
+			for ignore, oldValue in changed
+				if (oldValue != "")
+					this.clearActionFunction(mode, action, oldValue)
+		}
+		
 		if !this.iFunctions.HasKey(mode)
 			this.iFunctions[mode] := {}
 		
@@ -701,14 +741,16 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 			functions := this.iFunctions[mode]
 			
 			if functions.HasKey(action) {
-				functions := functions[action]
+				actionFunctions := functions[action]
 				
-				for index, candidate in functions
+				for index, candidate in actionFunctions
 					if (candidate = function)
-						functions[index] := ""
+						actionFunctions[index] := ""
 				
-				if (functions.Length() == 1)
-					this.iFunctions.Delete(action)
+				if (actionFunctions.Length() == 1)
+					functions.Delete(action)
+				else if ((actionFunctions[1] = "") && (actionFunctions[2] = ""))
+					functions.Delete(action)
 			}
 		}
 	}
@@ -739,32 +781,55 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 		this.iPendingActionRegistration := false
 	}
 	
-	resetButtonBoxes() {
+	loadButtonBoxLabels() {
 		local function
+		local action
 		
-		for ignore, preview in this.iButtonBoxPreviews {
-			preview.resetLabels()
-				
-			for ignore, function in this.SetupWizard.getControllerStaticFunctions()
-				if preview.findFunction(function[1], row, column)
-					preview.setLabel(row, column, function[2])
+		base.loadButtonBoxLabels()
+		
+		module := this.getModule()
+		
+		if module {
+			row := false
+			column := false
+		
+			for ignore, preview in this.ButtonBoxPreviews
+				for ignore, mode in this.getModes()
+					for ignore, action in this.getActions(mode)
+						if wizard.moduleActionAvailable(module, mode, action) {
+							function := this.getActionFunction(mode, action)
+							
+							if (function && (function != "")) {
+								if !IsObject(function)
+									function := Array(function)
+								
+								for ignore, partFunction in function
+									if (partFunction && (partFunction != ""))
+										if preview.findFunction(partFunction, row, column)
+											preview.setLabel(row, column, this.getActionLabel(this.getActionRow(mode, action)))
+							}
+						}
 		}
 	}
 	
 	updateActionFunction(row) {
-		if this.iPendingActionRegistration {
-			arguments := this.iPendingActionRegistration
+		if ((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick"))
+			if this.iPendingActionRegistration {
+				arguments := this.iPendingActionRegistration
+			
+				this.iPendingActionRegistration := false
+				this.iPendingFunctionRegistration := row
+				
+				this.controlClick(arguments*)
+			}
+			else {
+				this.iPendingFunctionRegistration := row
+				
+				SetTimer showSelectorHint, 100
+			}
 		
-			this.iPendingActionRegistration := false
-			this.iPendingFunctionRegistration := row
-			
-			this.controlClick(arguments*)
-		}
-		else {
-			this.iPendingFunctionRegistration := row
-			
-			SetTimer showSelectorHint, 100
-		}
+		Loop % LV_GetCount()
+			LV_Modify(A_Index, "-Select")
 	}
 	
 	setFunctionAction(arguments) {
@@ -783,12 +848,6 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 						SoundPlay %kResourcesDirectory%Sounds\Activated.wav
 						
 						this.clearActionFunction(mode, action, function)
-						
-						preview.setLabel(row, column, ConfigurationItem.splitDescriptor(control)[2])
-				
-						for ignore, function in this.SetupWizard.getControllerStaticFunctions()
-							if preview.findFunction(function[1], row, column)
-								preview.setLabel(row, column, function[2])
 						
 						this.loadActions()
 						
@@ -859,11 +918,11 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 						break
 					}
 				
-				if disable
+				if !disable
 					break
 			}
 			
-			if disable
+			if !disable
 				break
 		}
 		
@@ -891,7 +950,7 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 			MsgBox 262179, %title%, % translate("What type of action do you want to trigger for ") . action . translate("?")
 			OnMessage(0x44, "")
 			
-			currentFunction := this.getActionFunction(mode, action)
+			currentFunction := this.getActionFunction(mode, action).Clone()
 			
 			IfMsgBox Cancel
 				function := false
@@ -956,8 +1015,6 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 				if function {
 					this.setActionFunction(mode, action, function)
 					
-					preview.setLabel(row, column, this.getActionLabel(actionRow))
-					
 					this.loadActions()
 					
 					window := this.Window
@@ -1004,9 +1061,6 @@ updateActionFunction(wizard) {
 				}
 			}
 		}
-		
-		Loop % LV_GetCount()
-			LV_Modify(A_Index, "-Select")
 	}
 }
 

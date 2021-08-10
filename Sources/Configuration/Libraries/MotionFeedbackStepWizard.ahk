@@ -93,7 +93,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 					arguments .= "; "
 				
 				arguments .= ("motionEffectIntensity: " . effectSelector . A_Space . effectIntensity)
-			}	
+			}
 
 			for ignore, mode in this.Definition {
 				actions := ""
@@ -349,7 +349,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		
 		valid := true
 		
-		for ignore, mode in concatenate([false], this.Definition) {
+		for ignore, mode in this.getModes() {
 			for ignore, action in this.getActions(mode) {
 				if this.getActionFunction(mode, action) {
 					arguments := this.getActionArgument(mode, action)
@@ -417,6 +417,14 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 			return false
 	}
 	
+	getModule() {
+		return "Motion Feedback"
+	}
+	
+	getModes() {
+		return Array(false, this.Definition*)
+	}
+	
 	getActions(mode := false) {
 		if this.iCachedActions.HasKey(mode)
 			return this.iCachedActions[mode]
@@ -450,21 +458,10 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		if inList(this.getActions(false), action) {
 			functions := this.getActionFunction(this.getActionMode(row), action)
 			
-			if functions {
-				row := false
-				column := false
-			
-				for ignore, function in functions {
-					wizard.addControllerStaticFunction("Motion Feedback", function, label)
-				
-					for ignore, preview in this.ButtonBoxPreviews
-						if preview.findFunction(function, row, column) {
-							preview.setLabel(row, column, label)
-							
-							break
-						}
-				}
-			}
+			if functions
+				for ignore, function in functions
+					if (function && (function != ""))
+						wizard.addControllerStaticFunction("Motion Feedback", function, label)
 		}
 	}
 	
@@ -475,11 +472,11 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 			this.SetupWizard.removeControllerStaticFunction("Motion Feedback", function)
 	}
 	
-	resetButtonBoxes() {
+	loadButtonBoxLabels() {
 		local function
 		local action
 		
-		base.resetButtonBoxes()
+		base.loadButtonBoxLabels()
 		
 		wizard := this.SetupWizard
 		
@@ -512,20 +509,6 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 					preview.setLabel(row, column, translate("Effect Intensity"))
 					
 					break
-				}
-				
-		for ignore, mode in concatenate([false], this.Definition)
-			for ignore, action in this.getActions(mode)
-				if wizard.moduleActionAvailable("Motion Feedback", mode, action) {
-					function := wizard.getModuleActionFunction("Motion Feedback", mode, action)
-					
-					if function
-						for ignore, preview in this.ButtonBoxPreviews
-							if preview.findFunction(function[1], row, column) {
-								preview.setLabel(row, column, this.getActionLabel(this.getActionRow(mode, action)))
-						
-								break
-							}
 				}
 	}
 	
@@ -561,7 +544,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		lastMode := -1
 		count := 1
 		
-		for ignore, mode in concatenate([false], this.Definition) {
+		for ignore, mode in this.getModes() {
 			for ignore, action in this.getActions(mode) {
 				if wizard.moduleActionAvailable("Motion Feedback", mode, action) {
 					first := (mode != lastMode)
@@ -590,22 +573,8 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 					
 					function := this.getActionFunction(mode, action)
 					
-					if function {
-						for ignore, partFunction in function {
-							row := false
-							column := false
-							
-							for ignore, preview in this.ButtonBoxPreviews {
-								if preview.findFunction(partFunction, row, column) {
-									preview.setLabel(row, column, label)
-									
-									break
-								}
-							}
-						}
-					
+					if function
 						function := function[1]
-					}
 					else
 						function := ""
 					
@@ -627,6 +596,8 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 				}
 			}
 		}
+		
+		this.loadButtonBoxLabels()
 			
 		LV_ModifyCol(1, "AutoHdr")
 		LV_ModifyCol(2, "AutoHdr")
@@ -642,7 +613,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		
 		wizard := this.SetupWizard
 		
-		for ignore, mode in concatenate([false], this.Definition) {
+		for ignore, mode in this.getModes() {
 			modeFunctions := {}
 		
 			for ignore, action in this.getActions(mode)
@@ -731,7 +702,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		if sound
 			SoundPlay %kResourcesDirectory%Sounds\Activated.wav
 		
-		this.resetButtonBoxes()
+		this.loadButtonBoxLabels()
 	}
 	
 	setEffectSelector(preview, function, control, row, column) {
@@ -776,7 +747,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		if sound
 			SoundPlay %kResourcesDirectory%Sounds\Activated.wav
 		
-		this.resetButtonBoxes()
+		this.loadButtonBoxLabels()
 	}
 	
 	setEffectIntensityDial(preview, function, control, row, column) {
@@ -821,7 +792,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		if sound
 			SoundPlay %kResourcesDirectory%Sounds\Activated.wav
 		
-		this.resetButtonBoxes()
+		this.loadButtonBoxLabels()
 	}
 	
 	toggleState(row) {

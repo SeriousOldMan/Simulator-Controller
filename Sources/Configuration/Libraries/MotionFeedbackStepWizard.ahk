@@ -565,7 +565,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 					label := getConfigurationValue(pluginLabels, "Motion Feedback", action . ".Toggle", kUndefined)
 					
 					if (label == kUndefined)
-						label := getConfigurationValue(pluginLabels, code, action . ".Activate", "")
+						label := getConfigurationValue(pluginLabels, "Motion Feedback", action . ".Activate", "")
 		
 					this.setAction(count, mode, action, [false, "Activate"], label)
 						

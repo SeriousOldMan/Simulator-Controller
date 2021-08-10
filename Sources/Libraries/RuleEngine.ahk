@@ -1540,6 +1540,8 @@ class ResultSet {
 		local ruleEngine := this.RuleEngine
 		local choicePoint
 
+		tickCount := A_TickCount
+		
 		if this.iExhausted
 			return false
 			
@@ -1556,7 +1558,10 @@ class ResultSet {
 				else {
 					if (ruleEngine.TraceLevel <= kTraceMedium)
 						ruleEngine.trace(kTraceMedium, "Query yields " . this.ChoicePoint.Goal.toString(this))
-					
+		
+					if (ruleEngine.TraceLevel <= kTraceMedium)
+						showMessage("NextResult took " . (A_TickCount - tickCount) . " milliseconds...")
+			
 					return true
 				}
 			}
@@ -1564,8 +1569,11 @@ class ResultSet {
 				choicePoint := choicePoint.previous()
 				
 				if !choicePoint {
-					if (ruleEngine.TraceLevel <= kTraceMedium)
+					if (ruleEngine.TraceLevel <= kTraceMedium) {
 						ruleEngine.trace(kTraceMedium, "Query is exhausted")
+						
+						showMessage("NextResult took " . (A_TickCount - tickCount) . " milliseconds...")
+					}
 					
 					this.iExhausted := true
 					
@@ -2330,8 +2338,6 @@ class KnowledgeBase {
 		local rules := this.Rules
 		local result := false
 		
-		static counter := 1
-		
 		tickCount := A_TickCount
 		
 		Loop {
@@ -2368,17 +2374,25 @@ class KnowledgeBase {
 				break
 		}
 		
-		if isDebug()
-			showMessage("Produce " . counter++ . " took " . (A_TickCount - tickCount) . " milliseconds...")
+		if (this.RuleEngine.TraceLevel <= kTraceMedium)
+			showMessage("Produce took " . (A_TickCount - tickCount) . " milliseconds...")
 		
 		return result
 	}
 	
 	prove(goal) {
-		local resultSet := this.RuleEngine.createResultSet(this, goal)
+		local resultSet
 		
-		if resultSet.nextResult()
+		tickCount := A_TickCount
+		
+		resultSet := this.RuleEngine.createResultSet(this, goal)
+		
+		if resultSet.nextResult() {
+			if (this.RuleEngine.TraceLevel <= kTraceMedium)
+				showMessage("Prove took " . (A_TickCount - tickCount) . " milliseconds...")
+			
 			return resultSet
+		}
 		else
 			return false
 	}

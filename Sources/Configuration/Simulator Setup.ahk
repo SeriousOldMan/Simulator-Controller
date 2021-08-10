@@ -639,10 +639,6 @@ class SetupWizard extends ConfigurationItem {
 	updateState() {
 		this.KnowledgeBase.produce()			
 
-		static counter := 1
-		
-		tickCount := A_TickCount
-		
 		if this.Debug[kDebugKnowledgeBase]
 			this.dumpKnowledge(this.KnowledgeBase)
 		
@@ -667,9 +663,6 @@ class SetupWizard extends ConfigurationItem {
 			GuiControl Enable, nextPageButton
 			GuiControl Disable, finishButton
 		}
-		
-		if isDebug()
-			showMessage("State update " . counter++ . " took " . (A_TickCount - tickCount) . " milliseconds...")
 	}
 	
 	selectModule(module, selected, update := true) {
@@ -2136,13 +2129,13 @@ initializeSimulatorSetup()
 ;;;                          Wizard Include Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include Libraries\ModulesStepWizard.ahk
-#Include Libraries\InstallationStepWizard.ahk
-#Include Libraries\ApplicationsStepWizard.ahk
-#Include Libraries\ButtonBoxStepWizard.ahk
-#Include Libraries\GeneralStepWizard.ahk
-#Include Libraries\SimulatorsStepWizard.ahk
-#Include Libraries\AssistantsStepWizard.ahk
+;~ #Include Libraries\ModulesStepWizard.ahk
+;~ #Include Libraries\InstallationStepWizard.ahk
+;~ #Include Libraries\ApplicationsStepWizard.ahk
+;~ #Include Libraries\ButtonBoxStepWizard.ahk
+;~ #Include Libraries\GeneralStepWizard.ahk
+;~ #Include Libraries\SimulatorsStepWizard.ahk
+;~ #Include Libraries\AssistantsStepWizard.ahk
 #Include Libraries\MotionFeedbackStepWizard.ahk
 #Include Libraries\TactileFeedbackStepWizard.ahk
 #Include Libraries\PedalCalibrationStepWizard.ahk

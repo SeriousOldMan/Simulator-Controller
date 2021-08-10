@@ -342,11 +342,20 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 					label := getConfigurationValue(pluginLabels, "Tactile Feedback", action . (mode ? ".Dial" : ".Toggle"), kUndefined)
 					
 					if (label == kUndefined) {
-						label := getConfigurationValue(pluginLabels, code, action . ".Activate", "")
-		
-						this.setAction(count, mode, action, [false, "Activate"], label)
+						label := getConfigurationValue(pluginLabels, "Tactile Feednack", action . ".Activate", kUndefined)
 						
-						isBinary := false
+						if (label == kUndefined) {
+							label := ""
+							
+							this.setAction(count, mode, action, [false, (mode ? "Dial" : "Toggle"), "Increase", "Decrease"], label)
+						
+							isBinary := (mode != false)
+						}
+						else {
+							this.setAction(count, mode, action, [false, "Activate"], label)
+							
+							isBinary := false
+						}
 					}
 					else {
 						this.setAction(count, mode, action, [false, (mode ? "Dial" : "Toggle"), "Increase", "Decrease"], label)

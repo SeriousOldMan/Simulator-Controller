@@ -813,23 +813,19 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 	}
 	
 	updateActionFunction(row) {
-		if ((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick"))
-			if this.iPendingActionRegistration {
-				arguments := this.iPendingActionRegistration
-			
-				this.iPendingActionRegistration := false
-				this.iPendingFunctionRegistration := row
-				
-				this.controlClick(arguments*)
-			}
-			else {
-				this.iPendingFunctionRegistration := row
-				
-				SetTimer showSelectorHint, 100
-			}
+		if this.iPendingActionRegistration {
+			arguments := this.iPendingActionRegistration
 		
-		Loop % LV_GetCount()
-			LV_Modify(A_Index, "-Select")
+			this.iPendingActionRegistration := false
+			this.iPendingFunctionRegistration := row
+			
+			this.controlClick(arguments*)
+		}
+		else {
+			this.iPendingFunctionRegistration := row
+			
+			SetTimer showSelectorHint, 100
+		}
 	}
 	
 	setFunctionAction(arguments) {

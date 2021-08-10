@@ -43,6 +43,7 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 	iPendingFunctionRegistration := false
 	
 	iButtonBoxWidgets := []
+	iVoiceControlWidgets := []
 	
 	Pages[] {
 		Get {
@@ -222,6 +223,7 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 		this.iLaunchApplicationsListHandle := launchApplicationsListHandle
 		
 		this.iButtonBoxWidgets := Array(modeSelectorsLabelHandle, modeSelectorsListHandle, launchApplicationsLabelHandle, launchApplicationsListHandle, columnLabel3Handle, columnLine3Handle)
+		this.iVoiceControlWidgets := Array(columnLabel2Handle, columnLine2Handle)
 		
 		this.registerWidgets(1, generalIconHandle, generalLabelHandle, modeSelectorsLabelHandle, modeSelectorsListHandle, launchApplicationsLabelHandle, launchApplicationsListHandle, generalInfoTextHandle, columnLabel1Handle, columnLine1Handle, columnLabel2Handle, columnLine2Handle, columnLabel3Handle, columnLine3Handle, languageLabelHandle, languageDropDownHandle, startWithWindowsHandle, silentModeHandle)
 	}
@@ -241,6 +243,7 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 		this.iLaunchApplicationsListHandle := false
 		
 		this.iButtonBoxWidgets := []
+		this.iVoiceControlWidgets := []
 		
 		this.iModeSelectors := []
 		this.iLaunchApplications := {}
@@ -290,6 +293,9 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 			this.iVoiceControlConfigurator.loadConfigurator(configuration)
 			this.iVoiceControlConfigurator.showWidgets()
 		}
+		else
+			for ignore, widget in this.iVoiceControlWidgets
+				GuiControl Hide, %widget%
 			
 		if this.SetupWizard.isModuleSelected("Button Box") {
 			listBox := this.iModeSelectorsListHandle
@@ -417,21 +423,26 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 		
 		wizard := this.SetupWizard
 		
+		row := false
+		column := false
+		
 		for ignore, preview in this.ButtonBoxPreviews {
 			for ignore, section in string2Values(",", this.Definition[3])
 				for application, descriptor in getConfigurationSectionValues(wizard.Definition, section)
 					if wizard.isApplicationSelected(application) {
-						function := wizard.getLaunchApplicationFunction(application)
+						if this.iLaunchApplications.HasKey(application) {
+							function := this.iLaunchApplications[application][2]
 							
-						if (function != "") {
-							label := this.iLaunchApplications[application][1]
-				
-							for ignore, preview in this.ButtonBoxPreviews
-								if preview.findFunction(function, row, column) {
-									preview.setLabel(row, column, (label != "") ? label : application)
-									
-									break
-								}
+							if (function != "") {
+								label := this.iLaunchApplications[application][1]
+					
+								for ignore, preview in this.ButtonBoxPreviews
+									if preview.findFunction(function, row, column) {
+										preview.setLabel(row, column, (label != "") ? label : application)
+										
+										break
+									}
+							}
 						}
 					}
 		}

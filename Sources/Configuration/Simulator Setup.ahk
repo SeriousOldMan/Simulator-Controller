@@ -2126,7 +2126,7 @@ resetVolume(masterVolume) {
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                         Initialization Section                          ;;;
+;;;                       Initialization Section Part 1                     ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 initializeSimulatorSetup()

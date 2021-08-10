@@ -540,7 +540,7 @@ startupSimulatorConfiguration() {
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                         Initialization Section                          ;;;
+;;;                       Initialization Section Part 1                     ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 initializeSimulatorConfiguration()

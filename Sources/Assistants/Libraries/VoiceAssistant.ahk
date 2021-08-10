@@ -431,6 +431,8 @@ class VoiceAssistant {
 				return false
 			}
 			else {
+				SoundPlay %kResourcesDirectory%Sounds\Talk.wav
+				
 				this.iIsListening := true
 			
 				return true

@@ -274,6 +274,8 @@ class VoiceServer extends ConfigurationItem {
 					return false
 				}
 				else {
+					SoundPlay %kResourcesDirectory%Sounds\Talk.wav
+					
 					this.iIsListening := true
 				
 					return true

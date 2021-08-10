@@ -1721,7 +1721,7 @@ class FinishStepWizard extends StepWizard {
 		
 		height := Round(width / 16 * 9)
 		
-		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><img src='" . image . "' width='" . width . "' height='" . height . "' border='0' padding='0'><br>" . text . "</body></html>"
+		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='auto' bottommargin='0'><img src='" . image . "' width='" . width . "' height='" . height . "' border='0' padding='0'><br><br><br>" . text . "</body></html>"
 		
 		imageViewer.Navigate("about:blank")
 		imageViewer.Document.Write(html)
@@ -2129,13 +2129,13 @@ initializeSimulatorSetup()
 ;;;                          Wizard Include Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-;~ #Include Libraries\ModulesStepWizard.ahk
-;~ #Include Libraries\InstallationStepWizard.ahk
-;~ #Include Libraries\ApplicationsStepWizard.ahk
-;~ #Include Libraries\ButtonBoxStepWizard.ahk
-;~ #Include Libraries\GeneralStepWizard.ahk
-;~ #Include Libraries\SimulatorsStepWizard.ahk
-;~ #Include Libraries\AssistantsStepWizard.ahk
+#Include Libraries\ModulesStepWizard.ahk
+#Include Libraries\InstallationStepWizard.ahk
+#Include Libraries\ApplicationsStepWizard.ahk
+#Include Libraries\ButtonBoxStepWizard.ahk
+#Include Libraries\GeneralStepWizard.ahk
+#Include Libraries\SimulatorsStepWizard.ahk
+#Include Libraries\AssistantsStepWizard.ahk
 #Include Libraries\MotionFeedbackStepWizard.ahk
 #Include Libraries\TactileFeedbackStepWizard.ahk
 #Include Libraries\PedalCalibrationStepWizard.ahk

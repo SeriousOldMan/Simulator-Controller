@@ -33,6 +33,13 @@ Release 3.5.0 Checklist
    b. Doc Image
 4. Mew "launchApplications" parameter
    a. Documentation
+5. Rework of many Controller Plugin Labels
+   a. Delete old Plugin Labels in Update Procedure
+   b. IMPORTANT Update Nots
+6. New Setup Tool
+   a. Images
+   b. Documentation
+   c. Create Backup Files in Update Procedure
 
 Release 3.3.0 Checklist
 =======================

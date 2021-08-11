@@ -941,7 +941,11 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 		else if (actionDescriptor[2] == "Activate")
 			function := [function]
 		else {
-			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Increase", "Decrease", "Cancel"]))
+			if (actionDescriptor[2] == "Toggle")
+				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["On", "Off", "Cancel"]))
+			else
+				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Increase", "Decrease", "Cancel"]))
+			
 			title := translate("Setup")
 			MsgBox 262179, %title%, % translate("What type of action do you want to trigger for ") . action . translate("?")
 			OnMessage(0x44, "")
@@ -1037,6 +1041,8 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 ;;;-------------------------------------------------------------------------;;;
 
 updateActionFunction(wizard) {
+	local action
+	
 	Loop % LV_GetCount()
 		LV_Modify(A_Index, "-Select")
 	
@@ -1048,8 +1054,8 @@ updateActionFunction(wizard) {
 				if wizard.iPendingActionRegistration
 					wizard.updateActionFunction(row)
 				else {
-					LV_GetText(action, row, 2)
-					LV_GetText(label, row, 3)
+					action := wizard.getAction(row)
+					label := wizard.getActionLabel(row)
 					
 					contextMenu := wizard.createActionsMenu(action . ": " . label, row)
 					

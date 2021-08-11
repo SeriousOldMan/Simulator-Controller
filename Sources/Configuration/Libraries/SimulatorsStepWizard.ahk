@@ -370,25 +370,37 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 					label := getConfigurationValue(pluginLabels, code, subAction . ".Toggle", kUndefined)
 					
 					if (label == kUndefined) {
-						label := getConfigurationValue(pluginLabels, code, subAction . ".Activate", "")
-		
-						this.setAction(count, mode, action, [isInformationRequest, "Activate"], label)
+						label := getConfigurationValue(pluginLabels, code, subAction . ".Dial", kUndefined)
 						
-						isBinary := false
+						if (label != kUndefined) {
+							this.setAction(count, mode, action, [isInformationRequest, "Dial", "Increase", "Decrease"], label)
+						
+							isBinary := true
+							isDial := true
+						}
+						else {
+							label := getConfigurationValue(pluginLabels, code, subAction . ".Activate", "")
+			
+							this.setAction(count, mode, action, [isInformationRequest, "Activate"], label)
+							
+							isBinary := false
+							isDial := false
+						}
 					}
 					else {
 						this.setAction(count, mode, action, [isInformationRequest, "Toggle", "Increase", "Decrease"], label)
 						
 						isBinary := true
+						isDial := false
 					}
 					
 					function := this.getActionFunction(mode, action)
 					
 					if function {
 						if (function.Length() == 1)
-							function := (!isBinary ? function[1] : ("+/-: " . function[1]))
+							function := (!isBinary ? function[1] : ((isDial ? translate("+/-: ") : translate("On/Off: ")) . function[1]))
 						else
-							function := ("+: " . function[1] . " | -: " . function[2])
+							function := ((isDial ? translate("+: ") : translate("On: ")) . function[1] . (isDial ? translate(" | -: ") : translate(" | Off: ")) . function[2])
 					}
 					else
 						function := ""

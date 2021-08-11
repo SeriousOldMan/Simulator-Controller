@@ -152,23 +152,15 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 		
 		Gui %window%:Add, Text, x%x% yp+10 w105 h23 +0x200 HWNDpedalEffectsLabelHandle Hidden, % translate("Pedal Effects")
 		
-		Gui %window%:Font, s8 Bold, Arial
-		
 		Gui %window%:Add, Button, x%buttonX% yp w23 h23 HWNDpedalEffectsButtonHandle gchangePedalEffects Hidden
 		setButtonIcon(pedalEffectsButtonHandle, kResourcesDirectory . "Setup\Images\Pencil.ico", 1, "L2 T2 R2 B2 H16 W16")
-		Gui %window%:Add, ListBox, x%secondX% yp w%secondWidth% h60 Disabled HWNDpedalEffectsListHandle Hidden
-		
-		Gui %window%:Font, s8 Norm, Arial
+		Gui %window%:Add, ListBox, x%secondX% yp w%secondWidth% h60 ReadOnly Disabled HWNDpedalEffectsListHandle Hidden
 		
 		Gui %window%:Add, Text, x%x% yp+65 w105 h23 +0x200 HWNDchassisEffectsLabelHandle Hidden, % translate("Chassis Effects")
 		
-		Gui %window%:Font, s8 Bold, Arial
-		
 		Gui %window%:Add, Button, x%buttonX% yp w23 h23 HWNDchassisEffectsButtonHandle gchangeChassisEffects Hidden
 		setButtonIcon(chassisEffectsButtonHandle, kResourcesDirectory . "Setup\Images\Pencil.ico", 1, "L2 T2 R2 B2 H16 W16")
-		Gui %window%:Add, ListBox, x%secondX% yp w%secondWidth% h60 Disabled HWNDchassisEffectsListHandle Hidden
-		
-		Gui %window%:Font, s8 Norm, Arial
+		Gui %window%:Add, ListBox, x%secondX% yp w%secondWidth% h60 ReadOnly Disabled HWNDchassisEffectsListHandle Hidden
 		
 		Gui %window%:Add, Button, x%x% yp+70 w%colWidth% h23 HWNDlabelsEditorButtonHandle gopenLabelsEditor Hidden, % translate("Edit Labels...")
 		
@@ -207,6 +199,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 		this.iCachedActions := {}
 	}
 	
+	/*
 	showPage(page) {
 		base.showPage(page)
 		
@@ -218,6 +211,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 		
 		GuiControl Disable, %list%
 	}
+	*/
 	
 	hidePage(page) {
 		wizard := this.SetupWizard
@@ -349,7 +343,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 							
 							this.setAction(count, mode, action, [false, (mode ? "Dial" : "Toggle"), "Increase", "Decrease"], label)
 						
-							isBinary := (mode != false)
+							isBinary := true
 						}
 						else {
 							this.setAction(count, mode, action, [false, "Activate"], label)
@@ -358,18 +352,21 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 						}
 					}
 					else {
-						this.setAction(count, mode, action, [false, (mode ? "Dial" : "Toggle"), "Increase", "Decrease"], label)
+						if mode
+							this.setAction(count, mode, action, [false, "Dial", "Increase", "Decrease"], label)
+						else
+							this.setAction(count, mode, action, [false, "Activate"], label)
 						
-						isBinary := (mode != false)
+						isBinary := true
 					}
 					
 					function := this.getActionFunction(mode, action)
 					
 					if function {
 						if (function.Length() == 1)
-							function := (!isBinary ? function[1] : ("+/-: " . function[1]))
+							function := (!isBinary ? function[1] : ((mode ? translate("+/-: ") : translate("On/Off: ")) . function[1]))
 						else
-							function := ("+: " . function[1] . " | -: " . function[2])
+							function := ((mode ? translate("+: ") : translate("On: ")) . function[1] . (mode ? translate(" | -: ") : translate(" | Off: ")) . function[2])
 					}
 					else
 						function := ""

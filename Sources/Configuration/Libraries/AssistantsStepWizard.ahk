@@ -180,9 +180,9 @@ class AssistantsStepWizard extends ActionsStepWizard {
 			colummLabel2Handle := false
 			colummLine2Handle := false
 		
-			listX := x + 350
+			listX := x + 375
 			listY := labelY + 30
-			listWidth := width - 350
+			listWidth := width - 375
 			
 			Gui %window%:Font, Bold, Arial
 			
@@ -212,7 +212,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 			else
 				configurator := false
 			
-			colWidth := 350 - x
+			colWidth := 375 - x
 			
 			Gui %window%:Font, Bold, Arial
 			
@@ -431,16 +431,16 @@ class AssistantsStepWizard extends ActionsStepWizard {
 				else {
 					this.setAction(count, false, action, [isInformationRequest, "Toggle", "Increase", "Decrease"], label)
 					
-					isBinary := (action != "RaceAssistant")
+					isBinary := true
 				}
 				
 				function := this.getActionFunction(false, action)
 				
 				if function {
 					if (function.Length() == 1)
-						function := (!isBinary ? function[1] : ("+/-: " . function[1]))
+						function := (!isBinary ? function[1] : (translate("On/Off: ") . function[1]))
 					else
-						function := ("+: " . function[1] . " | -: " . function[2])
+						function := (translate("On: ") . function[1] . translate(" | Off: ") . function[2])
 				}
 				else
 					function := ""

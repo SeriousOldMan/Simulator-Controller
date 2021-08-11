@@ -195,13 +195,9 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		
 		Gui %window%:Add, Text, x%x% yp+10 w105 h23 +0x200 HWNDmotionEffectsLabelHandle Hidden, % translate("Motion Effects")
 		
-		Gui %window%:Font, s8 Bold, Arial
-		
 		Gui %window%:Add, Button, x%buttonX% yp w23 h23 HWNDmotionEffectsButtonHandle gchangeMotionEffects Hidden
 		setButtonIcon(motionEffectsButtonHandle, kResourcesDirectory . "Setup\Images\Pencil.ico", 1, "L2 T2 R2 B2 H16 W16")
-		Gui %window%:Add, ListBox, x%secondX% yp w%secondWidth% h60 Disabled HWNDmotionEffectsListHandle Hidden
-		
-		Gui %window%:Font, s8 Norm, Arial
+		Gui %window%:Add, ListBox, x%secondX% yp w%secondWidth% h60 Disabled ReadOnly HWNDmotionEffectsListHandle Hidden
 		
 		Gui %window%:Add, Text, x%x% yp+70 w105 h23 +0x200 HWNDmotionIntensityLabelHandle Hidden, % translate("Motion Intensity")
 		
@@ -236,7 +232,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 
 		Gui %window%:Font, s8 Norm, Arial
 		
-		Gui Add, ListView, x%listX% yp+10 w%listWidth% h270 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDmotionFeedbackListViewHandle gupdateMotionFeedbackActionFunction Hidden, % values2String("|", map(["Mode", "Action", "Label", "State", "Value", "Function"], "translate")*)
+		Gui Add, ListView, x%listX% yp+10 w%listWidth% h270 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDmotionFeedbackListViewHandle gupdateMotionFeedbackActionFunction Hidden, % values2String("|", map(["Mode", "Action", "Label", "State", "Intensity", "Function"], "translate")*)
 		
 		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Motion Feedback", "Motion Feedback.Actions.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
@@ -255,7 +251,8 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		this.iEffectSelectorField := effectSelectorFieldHandle
 		this.iEffectIntensityDial := effectIntensityFieldHandle
 		
-		this.iDisabledWidgets := [motionEffectsListHandle, motionIntensityFieldHandle, effectSelectorFieldHandle, effectIntensityFieldHandle]
+		; this.iDisabledWidgets := [motionEffectsListHandle, motionIntensityFieldHandle, effectSelectorFieldHandle, effectIntensityFieldHandle]
+		this.iDisabledWidgets := [motionIntensityFieldHandle, effectSelectorFieldHandle, effectIntensityFieldHandle]
 		
 		this.registerWidgets(1, motionFeedbackIconHandle, motionFeedbackLabelHandle, motionFeedbackListViewHandle, motionFeedbackInfoTextHandle, columnLabel1Handle, columnLine1Handle, columnLabel2Handle, columnLine2Handle, motionEffectsLabelHandle, motionEffectsButtonHandle, motionEffectsListHandle, labelsEditorButtonHandle, motionIntensityLabelHandle, motionIntensityFieldHandle, effectSelectorLabelHandle, effectSelectorFieldHandle, effectIntensityLabelHandle, effectIntensityFieldHandle)
 	}
@@ -574,7 +571,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 					function := this.getActionFunction(mode, action)
 					
 					if function
-						function := function[1]
+						function := (mode ? function[1] : (translate("On/Off: ") . function[1]))
 					else
 						function := ""
 					
@@ -582,15 +579,15 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 					
 					if (arguments && (arguments != "")) {
 						state := string2Values("|", arguments)
-						value := state[2]
+						intensity := state[2]
 						state := state[1]
 					}
 					else {
 						state := true
-						value := ""
+						intensity := ""
 					}
 					
-					LV_Add("", (first ? translate(mode ? mode : "Independent") : ""), action, label, state ? "On" : "Off", value, function)
+					LV_Add("", (first ? translate(mode ? mode : "Independent") : ""), action, label, state ? "On" : "Off", intensity, function)
 					
 					count += 1
 				}
@@ -814,13 +811,13 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		this.loadActions()
 	}
 	
-	inputValue(row) {
+	inputIntensity(row) {
 		local action := this.getAction(row)
 		
 		mode := this.getActionMode(row)
 		
 		title := translate("Setup")
-		prompt := translate("Please input initial effect value (use dot as decimal point):")
+		prompt := translate(mode ? "Please input initial effect intensity (use dot as decimal point):" : "Please input initial motion intensity (use dot as decimal point):")
 		locale := ((getLanguage() = "en") ? "" : "Locale")
 		
 		arguments := this.getActionArgument(row)
@@ -880,13 +877,13 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		
 		Menu %contextMenu%, Add
 		
-		menuItem := translate("Toggle State")
+		menuItem := translate("Toggle Initial State")
 		handler := ObjBindMethod(this, "toggleState", row)
 		
 		Menu %contextMenu%, Add, %menuItem%, %handler%
 		
-		menuItem := translate("Set Value...")
-		handler := ObjBindMethod(this, "inputValue", row)
+		menuItem := translate("Set Initial Intensity...")
+		handler := ObjBindMethod(this, "inputIntensity", row)
 		
 		Menu %contextMenu%, Add, %menuItem%, %handler%
 		

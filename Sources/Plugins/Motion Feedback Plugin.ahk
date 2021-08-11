@@ -102,7 +102,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 						this.findAction(this.Plugin.getLabel(ConfigurationItem.descriptor(effect, "Toggle"), effect)).updateLabel(state)
 			
 				if inList(this.Controller.ActiveModes, this)
-					this.findAction(this.Plugin.getLabel(ConfigurationItem.descriptor("Motion Intensity", "Dial"), "Motion Intensity")).updateLabel(isInfo ? "Info" : "Normal")
+					this.findAction(this.Plugin.getLabel(ConfigurationItem.descriptor("MotionIntensity", "Dial"), "Motion Intensity")).updateLabel(isInfo ? "Info" : "Normal")
 			
 				isInfo := !isInfo
 			}
@@ -426,7 +426,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			
 			if (function != false)
 				motionMode.registerAction(new this.MotionIntensityAction(function, motionMode
-																	   , this.getLabel(ConfigurationItem.descriptor("Motion Intensity", "Dial"), "Motion Intensity")))
+																	   , this.getLabel(ConfigurationItem.descriptor("MotionIntensity", "Dial"), "Motion Intensity")))
 			else
 				this.logFunctionNotFound(descriptor)
 		}

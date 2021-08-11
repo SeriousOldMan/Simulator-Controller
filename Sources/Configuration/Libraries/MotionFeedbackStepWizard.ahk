@@ -67,8 +67,6 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 			
 			if (actionArguments && (actionArguments != ""))
 				actionArguments := string2Values("|", actionArguments)
-			else if mode
-				actionArguments := Array("On", 1.0)
 			else
 				actionArguments := Array("On", 50)
 
@@ -104,10 +102,8 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 					
 					if (actionArguments && (actionArguments != ""))
 						actionArguments := string2Values("|", actionArguments)
-					else if mode
-						actionArguments := Array("On", 1.0)
 					else
-						actionArguments := Array("On", 50)
+						actionArguments := Array("On", 1.0)
 
 					if !IsObject(function)
 						function := ((function != "") ? Array(function) : [])

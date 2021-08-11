@@ -1786,7 +1786,7 @@ finishSetup(finish := false, save := false) {
 		}
 		else {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-			title := translate("Setup")
+			title := translate("Setup ")
 			MsgBox 262436, %title%, % translate("Do you want to generate the new configuration?`n`nBackup files will be saved for your current configuration in the ""Simulator Controller\Config"" folder in your user ""Documents"" folder.")
 			OnMessage(0x44, "")
 			
@@ -2129,11 +2129,11 @@ initializeSimulatorSetup()
 ;;;                          Wizard Include Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-;~ #Include Libraries\ModulesStepWizard.ahk
-;~ #Include Libraries\InstallationStepWizard.ahk
-;~ #Include Libraries\ApplicationsStepWizard.ahk
-;~ #Include Libraries\ButtonBoxStepWizard.ahk
-;~ #Include Libraries\GeneralStepWizard.ahk
+#Include Libraries\ModulesStepWizard.ahk
+#Include Libraries\InstallationStepWizard.ahk
+#Include Libraries\ApplicationsStepWizard.ahk
+#Include Libraries\ButtonBoxStepWizard.ahk
+#Include Libraries\GeneralStepWizard.ahk
 #Include Libraries\SimulatorsStepWizard.ahk
 #Include Libraries\AssistantsStepWizard.ahk
 #Include Libraries\MotionFeedbackStepWizard.ahk

@@ -1535,7 +1535,7 @@ class ButtonBoxPreview extends ConfigurationItem {
 	openControlMenu(preview, element, function, row, column, isEmpty) {
 		local count
 		
-		menuItem := (translate(element[1] . ": ") . element[2] . " (" . row . " x " . column . ")")
+		menuItem := (translate(element[1]) . translate(": ") . element[2] . " (" . row . " x " . column . ")")
 		
 		try {
 			Menu GridElement, DeleteAll

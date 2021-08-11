@@ -189,7 +189,7 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 		
 		Gui %window%:Font, s8 Norm, Arial
 		
-		Gui %window%:Add, Text, x%x% yp+60 w140 h23 +0x200 HWNDlaunchApplicationsLabelHandle Hidden, % translate("Launch Mode")
+		Gui %window%:Add, Text, x%x% yp+60 w140 h23 +0x200 HWNDlaunchApplicationsLabelHandle Hidden, % translate("Launchpad Mode")
 		Gui %window%:Add, ListView, x%x% yp+24 w%col1Width% h114 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDlaunchApplicationsListHandle gupdateApplicationFunction Hidden, % values2String("|", map(["Application", "Label", "Function"], "translate")*)
 		
 		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.General", "General.Settings.Info." . getLanguage()))
@@ -503,7 +503,7 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 			}
 	}
 	
-	updateApplicationFunction(row) {
+	setApplicationFunction(row) {
 		if this.iPendingApplicationRegistration {
 			arguments := this.iPendingApplicationRegistration
 		
@@ -519,12 +519,34 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 		}
 	}
 	
+	clearApplicationFunction(row) {
+		local application
+		local function
+		
+		window := this.Window
+				
+		Gui %window%:Default
+		Gui ListView, % this.iLaunchApplicationsListHandle
+	
+		LV_GetText(application, row, 1)
+
+		function := this.iLaunchApplications[application]
+		
+		if (function && (function != "")) {
+			SoundPlay %kResourcesDirectory%Sounds\Activated.wav
+			
+			this.iLaunchApplications.Delete(application)
+		
+			this.loadApplications()
+		}
+	}
+	
 	controlClick(preview, element, function, row, column, isEmpty, applicationRegistration := false) {
 		local application
 		
 		if (element[1] = "Control") {
 			if (!this.iPendingFunctionRegistration && !applicationRegistration) {
-				menuItem := (translate(element[1] . ": ") . element[2] . " (" . row . " x " . column . ")")
+				menuItem := (translate(element[1]) . translate(": ") . element[2] . " (" . row . " x " . column . ")")
 				
 				try {
 					Menu ContextMenu, DeleteAll
@@ -627,6 +649,8 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 ;;;-------------------------------------------------------------------------;;;
 
 updateApplicationFunction() {
+	local function
+	
 	Loop % LV_GetCount()
 		LV_Modify(A_Index, "-Select")
 	
@@ -638,7 +662,7 @@ updateApplicationFunction() {
 				row := A_EventInfo
 				
 				if wizard.iPendingApplicationRegistration
-					wizard.updateApplicationFunction(row)
+					wizard.setApplicationFunction(row)
 				else {
 					curCoordMode := A_CoordModeMouse
 
@@ -659,12 +683,28 @@ updateApplicationFunction() {
 					
 					Menu ContextMenu, Add, %menuItem%, menuIgnore
 					Menu ContextMenu, Disable, %menuItem%
+					
 					Menu ContextMenu, Add
 					
 					menuItem := translate("Set Function")
-					handler := ObjBindMethod(wizard, "updateApplicationFunction", row)
+					handler := ObjBindMethod(wizard, "setApplicationFunction", row)
 					
 					Menu ContextMenu, Add, %menuItem%, %handler%
+					
+					menuItem := translate("Clear Function")
+					handler := ObjBindMethod(wizard, "clearApplicationFunction", row)
+					
+					Menu ContextMenu, Add, %menuItem%, %handler%
+
+					Gui ListView, % wizard.iLaunchApplicationsListHandle
+				
+					LV_GetText(application, row, 1)
+
+					function := wizard.iLaunchApplications[application]
+					
+					if (!function || (function = ""))
+						Menu ContextMenu, Disable, %menuItem%
+					
 					Menu ContextMenu, Add
 					
 					menuItem := translate("Input Label...")
@@ -685,7 +725,7 @@ updateApplicationFunction() {
 inputLabel(wizard, row) {
 	local function
 	
-	title := translate("Setup")
+	title := translate("Setup ")
 	prompt := translate("Please enter a label:")
 	
 	window := wizard.Window

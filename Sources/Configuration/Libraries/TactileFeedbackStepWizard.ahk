@@ -124,8 +124,8 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 		
 		Gui %window%:Font, s10 Bold, Arial
 		
-		Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDtactileFeedbackIconHandle Hidden, %kResourcesDirectory%Setup\Images\Vibration.ico
-		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h26 HWNDtactileFeedbackLabelHandle Hidden, % translate("Tactile Feedback")
+		Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDtactileFeedbackIconHandle Hidden, %kResourcesDirectory%Setup\Images\Vibration 1.ico
+		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h26 HWNDtactileFeedbackLabelHandle Hidden, % translate("Tactile Feedback Configuration")
 		
 		Gui %window%:Font, s8 Norm, Arial
 			
@@ -141,7 +141,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 		
 		Gui %window%:Font, Bold, Arial
 			
-		Gui %window%:Add, Text, x%x% yp+30 w%colWidth% h23 +0x200 HWNDcolumnLabel1Handle Hidden Section, % translate("Setup")
+		Gui %window%:Add, Text, x%x% yp+30 w%colWidth% h23 +0x200 HWNDcolumnLabel1Handle Hidden Section, % translate("Setup ")
 		Gui %window%:Add, Text, yp+20 x%x% w%colWidth% 0x10 HWNDcolumnLine1Handle Hidden
 		
 		secondX := x + 155
@@ -218,7 +218,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 		
 		if !wizard.isSoftwareInstalled("SimHub") {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-			title := translate("Setup")
+			title := translate("Setup ")
 			MsgBox 262436, %title%, % translate("SimHub cannot be found. Do you really want to proceed?")
 			OnMessage(0x44, "")
 			
@@ -410,7 +410,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 	changeEffects(mode) {
 		actions := this.getActions(mode)
 		
-		title := translate("Setup")
+		title := translate("Setup ")
 		prompt := translate("Please input effect names (seperated by comma):")
 		locale := ((getLanguage() = "en") ? "" : "Locale")
 		

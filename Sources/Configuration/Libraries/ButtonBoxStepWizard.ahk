@@ -118,7 +118,7 @@ class ButtonBoxStepWizard extends StepWizard {
 		Gui %window%:Font, s10 Bold, Arial
 		
 		Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDfunctionsIconHandle Hidden, %kResourcesDirectory%Setup\Images\Controller.ico
-		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h26 HWNDfunctionsLabelHandle Hidden, % translate("Controller Layout && Triggers")
+		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h26 HWNDfunctionsLabelHandle Hidden, % translate("Controller Configuration")
 		
 		Gui %window%:Font, s8 Norm, Arial
 		
@@ -170,7 +170,7 @@ class ButtonBoxStepWizard extends StepWizard {
 		
 		if (this.conflictingFunctions(configuration) || this.conflictingTriggers(configuration)) {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-			title := translate("Setup")
+			title := translate("Setup ")
 			MsgBox 262160, %title%, % translate("There are still duplicate functions or duplicate triggers - please correct...")
 			OnMessage(0x44, "")
 			
@@ -184,7 +184,7 @@ class ButtonBoxStepWizard extends StepWizard {
 		
 		if (LV_GetCount() != this.iFunctionTriggers.Length()) {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-			title := translate("Setup")
+			title := translate("Setup ")
 			MsgBox 262436, %title%, % translate("Not all functions have been assigned to physical controls. Do you really want to proceed?")
 			OnMessage(0x44, "")
 			
@@ -812,7 +812,7 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 		}
 	}
 	
-	updateActionFunction(row) {
+	setFunction(row) {
 		if this.iPendingActionRegistration {
 			arguments := this.iPendingActionRegistration
 		
@@ -825,6 +825,27 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 			this.iPendingFunctionRegistration := row
 			
 			SetTimer showSelectorHint, 100
+		}
+	}
+	
+	clearFunction(row) {
+		local action := this.getAction(row)
+		local function
+		
+		mode := this.getActionMode(row)
+		function := this.getActionFunction(mode, action)
+		
+		if (function && (function != "")) {
+			SoundPlay %kResourcesDirectory%Sounds\Activated.wav
+			
+			if IsObject(function) {
+				for ignore, function in function
+					this.clearActionFunction(mode, action, function)
+			}
+			else
+				this.clearActionFunction(mode, action, function)
+						
+			this.loadActions()
 		}
 	}
 	
@@ -852,6 +873,8 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 	}
 	
 	createActionsMenu(title, row) {
+		local function
+		
 		window := this.Window
 					
 		Gui %window%:Default
@@ -868,9 +891,19 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 		Menu ContextMenu, Add
 		
 		menuItem := translate("Set Function")
-		handler := ObjBindMethod(this, "updateActionFunction", row)
+		handler := ObjBindMethod(this, "setFunction", row)
 		
 		Menu ContextMenu, Add, %menuItem%, %handler%
+		
+		menuItem := translate("Clear Function")
+		handler := ObjBindMethod(this, "clearFunction", row)
+		
+		Menu ContextMenu, Add, %menuItem%, %handler%
+		
+		function := this.getActionFunction(this.getActionMode(row), this.getAction(row))
+		
+		if (!function || (function = ""))
+			Menu ContextMenu, Disable, %menuItem%
 		
 		return "ContextMenu"
 	}
@@ -946,8 +979,8 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 			else
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Increase", "Decrease", "Cancel"]))
 			
-			title := translate("Setup")
-			MsgBox 262179, %title%, % translate("What type of action do you want to trigger for ") . action . translate("?")
+			title := translate("Setup ")
+			MsgBox 262179, %title%, % translate("Trigger for ") . action . translate("?")
 			OnMessage(0x44, "")
 			
 			currentFunction := this.getActionFunction(mode, action).Clone()
@@ -997,7 +1030,7 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 				return
 			
 			if (!this.iPendingFunctionRegistration && !actionRegistration) {
-				title := (translate(element[1] . ": ") . element[2] . " (" . row . " x " . column . ")")
+				title := (translate(element[1]) . translate(": ") . element[2] . " (" . row . " x " . column . ")")
 				
 				controlMenu := this.createControlMenu(title, preview, element, function, row, column)
 				
@@ -1052,7 +1085,7 @@ updateActionFunction(wizard) {
 				row := A_EventInfo
 				
 				if wizard.iPendingActionRegistration
-					wizard.updateActionFunction(row)
+					wizard.setFunction(row)
 				else {
 					action := wizard.getAction(row)
 					label := wizard.getActionLabel(row)

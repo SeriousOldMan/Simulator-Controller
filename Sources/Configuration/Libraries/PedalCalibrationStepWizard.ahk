@@ -81,7 +81,7 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 		Gui %window%:Font, s10 Bold, Arial
 		
 		Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDpedalCalibrationIconHandle Hidden, %kResourcesDirectory%Setup\Images\Brake.png
-		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h26 HWNDpedalCalibrationLabelHandle Hidden, % translate("Pedal Calibration")
+		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h26 HWNDpedalCalibrationLabelHandle Hidden, % translate("Pedal Calibration Configuration")
 		
 		colummLabel1Handle := false
 		colummLine1Handle := false
@@ -168,7 +168,7 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 		
 		if !wizard.isSoftwareInstalled("SmartControl") {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-			title := translate("Setup")
+			title := translate("Setup ")
 			MsgBox 262436, %title%, % translate("Heusinkveld SmartControl cannot be found. Do you really want to proceed?")
 			OnMessage(0x44, "")
 			

@@ -163,12 +163,12 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		
 		labelWidth := width - 30
 		labelX := x + 45
-		labelY := y + 10
+		labelY := y + 8
 		
 		Gui %window%:Font, s10 Bold, Arial
 		
-		Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDmotionFeedbackIconHandle Hidden, %kResourcesDirectory%Setup\Images\Car 2.ico
-		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h26 HWNDmotionFeedbackLabelHandle Hidden, % translate("Motion Feedback")
+		Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDmotionFeedbackIconHandle Hidden, %kResourcesDirectory%Setup\Images\Motion 1.ico
+		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h26 HWNDmotionFeedbackLabelHandle Hidden, % translate("Motion Feedback Configuration")
 		
 		Gui %window%:Font, s8 Norm, Arial
 			
@@ -184,7 +184,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		
 		Gui %window%:Font, Bold, Arial
 			
-		Gui %window%:Add, Text, x%x% yp+30 w%colWidth% h23 +0x200 HWNDcolumnLabel1Handle Hidden Section, % translate("Setup")
+		Gui %window%:Add, Text, x%x% yp+30 w%colWidth% h23 +0x200 HWNDcolumnLabel1Handle Hidden Section, % translate("Setup ")
 		Gui %window%:Add, Text, yp+20 x%x% w%colWidth% 0x10 HWNDcolumnLine1Handle Hidden
 		
 		secondX := x + 155
@@ -324,7 +324,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		
 		if (!wizard.isSoftwareInstalled("SimFeedback") || !wizard.isSoftwareInstalled("StreamDeck Extension")) {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-			title := translate("Setup")
+			title := translate("Setup ")
 			MsgBox 262436, %title%, % translate("SimFeedback cannot be found or the StreamDeck Extension was not installed. Do you really want to proceed?")
 			OnMessage(0x44, "")
 			
@@ -336,7 +336,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		
 		if !function {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-			title := translate("Setup")
+			title := translate("Setup ")
 			MsgBox 262436, %title%, % translate("The function for the ""Motion"" action has not been set. You will not be able to activate or deactivate motion. Do you really want to proceed?")
 			OnMessage(0x44, "")
 			
@@ -348,7 +348,9 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		
 		for ignore, mode in this.getModes() {
 			for ignore, action in this.getActions(mode) {
-				if this.getActionFunction(mode, action) {
+				function := this.getActionFunction(mode, action)
+			
+				if (function && (function != "")) {
 					arguments := this.getActionArgument(mode, action)
 					
 					if ((!arguments || (arguments = "")) || (arguments[2] = ""))
@@ -365,8 +367,8 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		
 		if !valid {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-			title := translate("Setup")
-			MsgBox 262436, %title%, % translate("Not all configured effects have defined initial values. Do you really want to proceed? (Default is 50%)")
+			title := translate("Setup ")
+			MsgBox 262436, %title%, % translate("Not all configured effects have defined initial intensities. Do you really want to proceed? (Default is 50%)")
 			OnMessage(0x44, "")
 			
 			IfMsgBox No
@@ -378,7 +380,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		
 		if (((effectSelectorField != "") && (effectIntensityField = "")) || ((effectSelectorField = "") && (effectIntensityField != ""))) {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-			title := translate("Setup")
+			title := translate("Setup ")
 			MsgBox 262436, %title%, % translate("You must specify both ""Effect Selector"" and ""Effect Intensity"" functions, if you want to control effect intensities. Do you really want to proceed?")
 			OnMessage(0x44, "")
 			
@@ -640,7 +642,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 	changeEffects(mode) {
 		actions := this.getActions(mode)
 		
-		title := translate("Setup")
+		title := translate("Setup ")
 		prompt := translate("Please input effect names (seperated by comma):")
 		locale := ((getLanguage() = "en") ? "" : "Locale")
 		
@@ -808,6 +810,8 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 					
 		this.setActionArgument(row, values2String("|", arguments*))
 		
+		SoundPlay %kResourcesDirectory%Sounds\Activated.wav
+		
 		this.loadActions()
 	}
 	
@@ -816,8 +820,8 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		
 		mode := this.getActionMode(row)
 		
-		title := translate("Setup")
-		prompt := translate(mode ? "Please input initial effect intensity (use dot as decimal point):" : "Please input initial motion intensity (use dot as decimal point):")
+		title := translate("Setup ")
+		prompt := translate(mode ? "Please input initial effect intensity (use dot as decimal point):" : "Please input initial motion intensity:")
 		locale := ((getLanguage() = "en") ? "" : "Locale")
 		
 		arguments := this.getActionArgument(row)
@@ -833,7 +837,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 			value := ""
 		}
 		
-		InputBox value, %title%, %prompt%, , 200, 150, , , %locale%, , %value%
+		InputBox value, %title%, %prompt%, , 300, 150, , , %locale%, , %value%
 		
 		if !ErrorLevel {
 			message := (mode ? "You must enter a valid number between 0.0 and 2.0..." : "You must enter a valid integer between 0 and 100...")
@@ -867,6 +871,8 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 			arguments[2] := value
 			
 			this.setActionArgument(row, values2String("|", arguments*))
+			
+			SoundPlay %kResourcesDirectory%Sounds\Activated.wav
 			
 			this.loadActions()
 		}

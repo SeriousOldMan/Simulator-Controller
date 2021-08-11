@@ -170,7 +170,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 		
 			label := substituteVariables(translate("%assistant% Configuration"), {assistant: translate(assistant)})
 			
-			Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDactionsIconHandle Hidden, %kResourcesDirectory%Setup\Images\Controller.ico
+			Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDactionsIconHandle Hidden, %kResourcesDirectory%Setup\Images\Artificial Intelligence.ico
 			Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h26 HWNDactionsLabelHandle Hidden Section, % label
 			
 			Gui %window%:Font, s8 Norm, Arial

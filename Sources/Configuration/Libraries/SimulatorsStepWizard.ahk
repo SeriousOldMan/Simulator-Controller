@@ -123,7 +123,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		
 		Gui %window%:Font, s10 Bold, Arial
 		
-		Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDactionsIconHandle Hidden, %kResourcesDirectory%Setup\Images\Controller.ico
+		Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDactionsIconHandle Hidden, %kResourcesDirectory%Setup\Images\Gaming Wheel.ico
 		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h26 HWNDactionsLabelHandle Hidden, % translate("Simulator Configuration")
 		
 		Gui %window%:Font, s8 Norm, Arial

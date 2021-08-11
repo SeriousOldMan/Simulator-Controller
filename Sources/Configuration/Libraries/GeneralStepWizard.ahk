@@ -749,6 +749,8 @@ inputLabel(wizard, row) {
 		else
 			wizard.iLaunchApplications[application] := Array(label, "")
 	
+		SoundPlay %kResourcesDirectory%Sounds\Activated.wav
+		
 		wizard.loadApplications()
 	}
 }

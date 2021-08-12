@@ -251,8 +251,39 @@ class SetupWizard extends ConfigurationItem {
 		}
 		
 		this.iCount := count
+		
+		if (GetKeyState("Ctrl") && GetKeyState("Shift")) {
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+			title := translate("Setup")
+			MsgBox 262436, %title%, % translate("Do you really want to start with a fresh configuration?")
+			OnMessage(0x44, "")
+			
+			IfMsgBox Yes
+				initialize := true
+			else
+				initialize := false
+		}
+		else
+			initialize  := false
 
-		if ((GetKeyState("Ctrl") && GetKeyState("Shift")) || !this.loadKnowledgeBase())
+		if initialize {
+			try {
+				FileDelete %kUserHomeDirectory%Install\Button Box Configuration.ini
+			}
+			catch exception {
+				; ignore
+			}
+			
+			try {
+				FileDelete %kUserHomeDirectory%Install\Voice Control Configuration.ini
+			}
+			catch exception {
+				; ignore
+			}
+			
+			this.KnowledgeBase.addFact("Initialize", true)
+		}
+		else if !this.loadKnowledgeBase()
 			this.KnowledgeBase.addFact("Initialize", true)
 			
 		this.KnowledgeBase.produce()

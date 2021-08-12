@@ -66,15 +66,19 @@ class ButtonBoxStepWizard extends StepWizard {
 		
 		if wizard.isModuleSelected("Button Box") {
 			controls := {}
+			controllers := []
 			
 			for control, descriptor in getConfigurationSectionValues(controllerConfiguration, "Controls")
 				controls[control] := string2Values(";", descriptor)[1]
 			
 			for controller, definition in getConfigurationSectionValues(controllerConfiguration, "Layouts") {
 				controller := ConfigurationItem.splitDescriptor(controller)
-			
+
 				if ((controller[2] != "Layout") && (controller[2] != "Visible")) {
 					controller := controller[1]
+			
+					if !inList(controllers, controller)
+						controllers.Push(controller)
 				
 					for ignore, control in string2Values(";", definition) {
 						control := string2Values(",", control)[1]
@@ -93,6 +97,15 @@ class ButtonBoxStepWizard extends StepWizard {
 						}
 					}
 				}
+			}
+			
+			if (controllers.Length() > 0) {
+				Loop % controllers.Length()
+				{
+					controllers[A_Index] := (controllers[A_Index] . ":" . controllers[A_Index])
+				}
+				
+				setConfigurationValue(configuration, "Controller Layouts", "Button Boxes", values2String("|", controllers*))
 			}
 		}
 	}

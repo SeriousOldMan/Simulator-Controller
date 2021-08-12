@@ -339,7 +339,7 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 				this.saveApplications()
 			}
 	
-			if this.isModuleSelected("Voice Control") {
+			if wizard.isModuleSelected("Voice Control") {
 				configuration := newConfiguration()
 				
 				this.iVoiceControlConfigurator.saveToConfiguration(configuration)

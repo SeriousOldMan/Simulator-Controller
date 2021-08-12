@@ -259,7 +259,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		
 		soXPathEdit := getConfigurationValue(configuration, "Voice Control", "SoX Path", "")
 		
-		listenerDropDown := getConfigurationValue(configuration, "Voice Control", "Listener", false)
+		listenerDropDown := getConfigurationValue(configuration, "Voice Control", "Listener", true)
 		pushToTalkEdit := getConfigurationValue(configuration, "Voice Control", "PushToTalk", false)
 		activationCommandEdit := getConfigurationValue(configuration, "Voice Control", "ActivationCommand", false)
 		
@@ -393,8 +393,8 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		GuiControl, , azureSubscriptionKeyEdit, %azureSubscriptionKeyEdit%
 		GuiControl, , azureTokenIssuerEdit, %azureTokenIssuerEdit%
 		
-		this.loadWindowsVoices(configuration)
-		this.loadAzureVoices(configuration)
+		this.updateWindowsVoices(configuration)
+		this.updateAzureVoices(configuration)
 		
 		GuiControl, , speakerVolumeSlider, %speakerVolumeSlider%
 		GuiControl, , speakerPitchSlider, %speakerPitchSlider%
@@ -402,7 +402,19 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		
 		GuiControl, , soXPathEdit, %soXPathEdit%
 		
-		GuiControl Choose, listenerDropDown, % inList(this.iRecognizers, listenerDropDown)
+		listenerDropDown := getConfigurationValue(configuration, "Voice Control", "Listener", true)
+		
+		if (listenerDropDown == true)
+			listenerDropDown := translate("Automatic")
+		else if (listenerDropDown == false)
+			listenerDropDown := translate("Deactivated")
+
+		chosen := inList(this.iRecognizers, listenerDropDown)
+		
+		if (chosen == 0)
+			chosen = 1
+		
+		GuiControl Choose, listenerDropDown, % chosen
 		
 		GuiControl, , pushToTalkEdit, %pushToTalkEdit%
 		GuiControl, , activationCommandEdit, %activationCommandEdit%

@@ -1,4 +1,17 @@
-## 3.3.0-release 07/23/21 (planned)
+## 3.5.0-release 08/20/21 (planned)
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. All new Setup Wizard, which greatly flattens the learning curve, while installing and configuring Simulator Controller. Please see the [documentation](*) for more information.
+  4. Button Boxes can now be invisible to define and group controls, which are located on non-typical controllers like steering wheels.
+  5. For the introduction of the new Setup Wizard, the localized Plugin Labels has been extensively reworked. Please see the [update notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-350), if you have changed the default Plugin Labels and want to preserve your changes.
+  6. The Push-To-Talk function now emits a short sound, when the listen mode is activated.
+
+## 3.3.1-release 07/25/21
+
+  1. Bugfix for voice service default selection
+
+## 3.3.0-release 07/23/21
 
   1. Bugfixes, as always
   2. Documentation updates, as always

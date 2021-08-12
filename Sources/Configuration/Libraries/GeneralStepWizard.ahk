@@ -406,8 +406,9 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 		
 		this.loadButtonBoxLabels()
 			
-		LV_ModifyCol(1, "AutoHdr")
+		LV_ModifyCol(1, 120)
 		LV_ModifyCol(2, "AutoHdr")
+		LV_ModifyCol(3, "AutoHdr")
 	}
 	
 	saveApplications() {

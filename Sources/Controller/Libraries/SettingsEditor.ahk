@@ -149,7 +149,7 @@ updateModes() {
 	editModes(kUpdate)
 }
 
-editModes(ByRef settingsOrCommand) {
+editModes(ByRef settingsOrCommand, globalConfiguration := false) {
 	static newSettings
 	static result := false
 	
@@ -243,7 +243,7 @@ editModes(ByRef settingsOrCommand) {
 		Gui ME:Default
 				
 		Gui ME:-Border ; -Caption
-		Gui ME:Color, D0D0D0
+		Gui ME:Color, D0D0D0, E5E5E5
 
 		Gui ME:Font, Bold, Arial
 
@@ -265,7 +265,7 @@ editModes(ByRef settingsOrCommand) {
 		selectedSession := false
 		simulatorSessions := []
 	
-		configuration := getControllerConfiguration()
+		configuration := getControllerConfiguration(globalConfiguration)
 		
 		for simulator, options in getConfigurationSectionValues(configuration, "Simulators", Object())
 			simulators.Push(simulator)
@@ -283,19 +283,24 @@ editModes(ByRef settingsOrCommand) {
 		
 		for thePlugin, pluginConfiguration in getConfigurationSectionValues(configuration, "Plugins", Object()) {
 			pluginConfiguration := string2Values("|", pluginConfiguration)
-			pluginSimulators := values2String(", ", string2Values(",", pluginConfiguration[2])*)			
 			
-			for ignore, mode in string2Values(",", pluginConfiguration[3])
-				LV_Add(inList(defaultModes, ConfigurationItem.descriptor(thePlugin, mode)) ? "Check" : "", thePlugin, mode, pluginSimulators)
+			if pluginConfiguration[1] {
+				pluginSimulators := values2String(", ", string2Values(",", pluginConfiguration[2])*)			
+				
+				for ignore, mode in string2Values(",", pluginConfiguration[3])
+					LV_Add(inList(defaultModes, ConfigurationItem.descriptor(thePlugin, mode)) ? "Check" : "", thePlugin, mode, pluginSimulators)
+			}
 		}
 		
-		LV_ModifyCol()
+		LV_ModifyCol(1, "AutoHdr")
+		LV_ModifyCol(2, "AutoHdr")
+		LV_ModifyCol(3, "AutoHdr")
 	
 		Gui ME:Margin, 10, 10
 		Gui ME:Show, AutoSize Center
 		
 		Loop {
-			Sleep 1000
+			Sleep 200
 		} until result
 		
 		if (result == kSave)
@@ -305,8 +310,9 @@ editModes(ByRef settingsOrCommand) {
 	}
 }
 
-editSettings(ByRef settingsOrCommand, withContinue := false) {
+editSettings(ByRef settingsOrCommand, withContinue := false, fromSetup := false, x := "Center", y := "Center") {
 	static modeSettings
+	static configuration
 	
 	static result
 	static newSettings
@@ -354,7 +360,7 @@ editSettings(ByRef settingsOrCommand, withContinue := false) {
 	static feedbackVariable7
 	static feedbackVariable8
 
-restart:
+restartSettings:
 	if (settingsOrCommand == kSave) {
 		Gui SE:Submit
 		
@@ -408,11 +414,12 @@ restart:
 	else if (settingsOrCommand == kEditModes) {
 		Gui SE:Hide
 		
-		editModes(modeSettings)
+		editModes(modeSettings, configuration)
 		
 		Gui SE:Show
 	}
 	else {
+		configuration := (fromSetup ? fromSetup : kSimulatorConfiguration)
 		modeSettings := newConfiguration()
 	
 		setConfigurationSectionValues(modeSettings, "Modes", getConfigurationSectionValues(settingsOrCommand, "Modes", Object()))
@@ -420,7 +427,7 @@ restart:
 		result := false
 		
 		Gui SE:-Border ; -Caption
-		Gui SE:Color, D0D0D0
+		Gui SE:Color, D0D0D0, E5E5E5
 	
 		Gui SE:Font, Bold, Arial
 	
@@ -434,9 +441,9 @@ restart:
 		coreSettings := [["Simulator Controller", true, false]]
 		feedbackSettings := []		
 		
-		for descriptor, applicationName in getConfigurationSectionValues(kSimulatorConfiguration, "Applications", Object()) {
+		for descriptor, applicationName in getConfigurationSectionValues(configuration, "Applications", Object()) {
 			descriptor := ConfigurationItem.splitDescriptor(descriptor)
-			enabled := (getConfigurationValue(kSimulatorConfiguration, applicationName, "Exe Path", "") != "")
+			enabled := (getConfigurationValue(configuration, applicationName, "Exe Path", "") != "")
 			
 			if (descriptor[1] == "Core")
 				coreSettings.Push(Array(applicationName, getConfigurationValue(settingsOrCommand, "Core", applicationName, false), enabled))
@@ -551,7 +558,7 @@ restart:
 		
 		splashTheme := getConfigurationValue(settingsOrCommand, "Startup", "Splash Theme", false)	
 	 
-		themes := getAllThemes()
+		themes := getAllThemes(configuration)
 		chosen := (splashTheme ? inList(themes, splashTheme) + 1 : 1)
 		themes := translate("None") "|" + values2String("|", themes*)
 		
@@ -563,7 +570,7 @@ restart:
 		
 		Gui SE:Add, CheckBox, X10 Checked%startup% vstartup, % translate("Start")
 		
-		simulators := string2Values("|", getConfigurationValue(kSimulatorConfiguration, "Configuration", "Simulators", ""))
+		simulators := string2Values("|", getConfigurationValue(configuration, "Configuration", "Simulators", ""))
 		
 		chosen := inList(simulators, startupOption)
 		
@@ -572,24 +579,26 @@ restart:
 		
 		Gui SE:Add, DropDownList, X90 YP-5 w140 Choose%chosen% vstartOption, % values2String("|", simulators*)
 	 
-		Gui SE:Add, Button, X10 Y+20 w220 gstartConfiguration, % translate("Configuration...")
+		if !fromSetup {
+			Gui SE:Add, Button, X10 Y+20 w220 gstartConfiguration, % translate("Configuration...")
+			
+			margin := (withContinue ? "Y+20" : "")
+			
+			Gui SE:Add, Button, Default X10 %margin% w100 gsaveSettings, % translate("Save")
+			Gui SE:Add, Button, X+20 w100 gcancelSettings, % translate("&Cancel")
+			
+			if withContinue
+				Gui SE:Add, Button, X10 w220 gcontinueSettings, % translate("Co&ntinue w/o Save")
+		}
 		
-		margin := (withContinue ? "Y+20" : "")
-		
-		Gui SE:Add, Button, Default X10 %margin% w100 gsaveSettings, % translate("Save")
-		Gui SE:Add, Button, X+20 w100 gcancelSettings, % translate("&Cancel")
-		
-		if withContinue
-			Gui SE:Add, Button, X10 w220 gcontinueSettings, % translate("Co&ntinue w/o Save")
-	
 		Gui SE:Margin, 10, 10
-		Gui SE:Show, AutoSize Center
+		Gui SE:Show, AutoSize x%x% y%y%
 		
-		if (readConfiguration(kSimulatorConfigurationFile).Count() == 0)
+		if (!fromSetup && (readConfiguration(kSimulatorConfigurationFile).Count() == 0))
 			startConfiguration()
 			
 		Loop {
-			Sleep 1000
+			Sleep 200
 		} until (result || vRestart)
 		
 		if vRestart {
@@ -599,7 +608,7 @@ restart:
 			
 			loadSimulatorConfiguration()
 			
-			Goto restart
+			Goto restartSettings
 		}
 		
 		if (result == kSave)

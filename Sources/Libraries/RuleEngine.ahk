@@ -120,7 +120,7 @@ class CompositeCondition extends Condition {
 
 class Quantor extends CompositeCondition {
 	toString(facts := "__NotInitialized__") {
-		return "{" . this.Type . " " . base.toString(facts) . "}"
+		return "{" . this.Type . A_Space . base.toString(facts) . "}"
 	}
 }
 
@@ -321,7 +321,7 @@ class Predicate extends Condition {
 		if (this.Operator == kNotInitialized)
 			return ("[" . this.LeftPrimary.toString(facts) . "]")
 		else
-			return ("[" . this.LeftPrimary.toString(facts) . " " . this.Operator . " " . this.RightPrimary.toString(facts) "]")
+			return ("[" . this.LeftPrimary.toString(facts) . A_Space . this.Operator . A_Space . this.RightPrimary.toString(facts) "]")
 	}
 }
 
@@ -601,7 +601,9 @@ class CallAction extends Action {
 	
 	Arguments[variablesOrFacts := "__NotInitialized__"] {
 		Get {
-			if (variablesOrFacts == kNotInitialized)
+			if variablesOrFacts is Number
+				return this.iArguments[variablesOrFacts]
+			else if (variablesOrFacts == kNotInitialized)
 				return this.iArguments
 			else
 				this.getValues(variablesOrFacts)
@@ -651,7 +653,7 @@ class CallAction extends Action {
 		for index, argument in this.Arguments
 			arguments.Push(argument.toString(facts))
 			
-		return ("(" . this.Action . " " .  this.Function.toString(facts) . "(" . values2String(", ", arguments*) . "))")
+		return ("(" . this.Action . A_Space .  this.Function.toString(facts) . "(" . values2String(", ", arguments*) . "))")
 	}
 }
 
@@ -980,6 +982,8 @@ class Compound extends Term {
 	
 	Arguments[resultSet := "__NotInitialized__"] {
 		Get {
+			if resultSet is Number
+				return this.iArguments[resultSet]
 			if (resultSet == kNotInitialized)
 				return this.iArguments
 			else
@@ -1536,6 +1540,8 @@ class ResultSet {
 		local ruleEngine := this.RuleEngine
 		local choicePoint
 
+		tickCount := A_TickCount
+		
 		if this.iExhausted
 			return false
 			
@@ -1552,7 +1558,10 @@ class ResultSet {
 				else {
 					if (ruleEngine.TraceLevel <= kTraceMedium)
 						ruleEngine.trace(kTraceMedium, "Query yields " . this.ChoicePoint.Goal.toString(this))
-					
+		
+					if (ruleEngine.TraceLevel <= kTraceMedium)
+						showMessage("NextResult took " . (A_TickCount - tickCount) . " milliseconds...")
+			
 					return true
 				}
 			}
@@ -1560,8 +1569,11 @@ class ResultSet {
 				choicePoint := choicePoint.previous()
 				
 				if !choicePoint {
-					if (ruleEngine.TraceLevel <= kTraceMedium)
+					if (ruleEngine.TraceLevel <= kTraceMedium) {
 						ruleEngine.trace(kTraceMedium, "Query is exhausted")
+						
+						showMessage("NextResult took " . (A_TickCount - tickCount) . " milliseconds...")
+					}
 					
 					this.iExhausted := true
 					
@@ -1941,6 +1953,12 @@ class FactChoicePoint extends ChoicePoint {
 		}
 	}
 	
+	reset() {
+		base.reset()
+		
+		this.iFirst := true
+	}
+	
 	resetVariables() {
 		local facts
 		
@@ -2007,6 +2025,12 @@ class CallChoicePoint extends ChoicePoint {
 		
 			return false
 		}
+	}
+	
+	reset() {
+		base.reset()
+		
+		this.iFirst := true
 	}
 	
 	foreignCall() {
@@ -2097,6 +2121,12 @@ class ProduceChoicePoint extends ChoicePoint {
 		else
 			return false
 	}
+	
+	reset() {
+		base.reset()
+		
+		this.iFirst := true
+	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -2114,6 +2144,12 @@ class CutChoicePoint extends ChoicePoint {
 		}
 		else
 			return false
+	}
+	
+	reset() {
+		base.reset()
+		
+		this.iFirst := true
 	}
 	
 	previous() {
@@ -2302,6 +2338,8 @@ class KnowledgeBase {
 		local rules := this.Rules
 		local result := false
 		
+		tickCount := A_TickCount
+		
 		Loop {
 			generation := facts.Generation
 			produced := false
@@ -2336,14 +2374,25 @@ class KnowledgeBase {
 				break
 		}
 		
+		if (this.RuleEngine.TraceLevel <= kTraceMedium)
+			showMessage("Produce took " . (A_TickCount - tickCount) . " milliseconds...")
+		
 		return result
 	}
 	
 	prove(goal) {
-		local resultSet := this.RuleEngine.createResultSet(this, goal)
+		local resultSet
 		
-		if resultSet.nextResult()
+		tickCount := A_TickCount
+		
+		resultSet := this.RuleEngine.createResultSet(this, goal)
+		
+		if resultSet.nextResult() {
+			if (this.RuleEngine.TraceLevel <= kTraceMedium)
+				showMessage("Prove took " . (A_TickCount - tickCount) . " milliseconds...")
+			
 			return resultSet
+		}
 		else
 			return false
 	}

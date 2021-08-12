@@ -155,7 +155,7 @@ class ButtonBox extends ConfigurationItem {
 		
 		this.iButtonBoxGuis[window] := this
 		
-		logMessage(kLogInfo, translate("Controller layout initialized:") . " #" . num1WayToggles . " " . translate("1-Way Toggles") . ", #" . num2WayToggles . " " . translate("2-Way Toggles") . ", #" . numButtons . " " . translate("Buttons") . ", #" . numDials . " " . translate("Dials"))
+		logMessage(kLogInfo, translate("Controller layout initialized:") . " #" . num1WayToggles . A_Space . translate("1-Way Toggles") . ", #" . num2WayToggles . A_Space . translate("2-Way Toggles") . ", #" . numButtons . A_Space . translate("Buttons") . ", #" . numDials . A_Space . translate("Dials"))
 	}
 	
 	findButtonBox(window) {
@@ -1691,11 +1691,18 @@ initializeSimulatorController() {
 		
 		voice := ErrorLevel
 	}
-
+	
+	configuration := kSimulatorConfiguration
+	
+	argIndex := inList(A_Args, "-Configuration")
+	
+	if argIndex
+		configuration := readConfiguration(A_Args[argIndex + 1])
+		
 	protectionOn()
 	
 	try {
-		new SimulatorController(kSimulatorConfiguration, settings, voice)
+		new SimulatorController(configuration, settings, voice)
 	}
 	finally {
 		protectionOff()

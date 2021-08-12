@@ -184,7 +184,7 @@ class SetupDatabase {
 				weather := condition[2]
 			}
 			else {
-				compound := condition[1] . " " . condition[2]
+				compound := condition[1] . A_Space . condition[2]
 				weather := condition[3]
 			}
 			
@@ -280,7 +280,7 @@ class SetupDatabase {
 			weather := kWeatherOptions[Max(0, Min(weatherBaseIndex + weatherOffset, kWeatherOptions.Length()))]
 		
 			if (compoundColor = "Black")
-				path := (this.getSimulatorCode(simulator) . "\" . car . "\" . track . "\Tyre Setup " . compound . " " . weather . ".data")
+				path := (this.getSimulatorCode(simulator) . "\" . car . "\" . track . "\Tyre Setup " . compound . A_Space . weather . ".data")
 			else
 				path := (this.getSimulatorCode(simulator) . "\" . car . "\" . track . "\Tyre Setup " . compound . " (" . compoundColor . ") " . weather . ".data")
 			
@@ -350,7 +350,7 @@ class SetupDatabase {
 		
 		if !this.iDatabase {
 			if (compoundColor = "Black")
-				this.iDatabaseName := (kSetupDatabaseDirectory . "Local\" . simulatorCode . "\" . car . "\" . track . "\Tyre Setup " . compound . " " . weather . ".data")
+				this.iDatabaseName := (kSetupDatabaseDirectory . "Local\" . simulatorCode . "\" . car . "\" . track . "\Tyre Setup " . compound . A_Space . weather . ".data")
 			else
 				this.iDatabaseName := (kSetupDatabaseDirectory . "Local\" . simulatorCode . "\" . car . "\" . track . "\Tyre Setup " . compound . " (" . compoundColor . ") " . weather . ".data")
 		

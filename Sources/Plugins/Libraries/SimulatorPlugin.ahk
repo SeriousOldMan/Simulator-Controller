@@ -274,11 +274,17 @@ class SimulatorPlugin extends ControllerPlugin {
 				mode := new PitstopMode(this)
 			
 			if !decreaseFunction {
-				if (function != false)
+				if (function != false) {
+					label := this.getLabel(ConfigurationItem.descriptor(action, "Toggle"), kUndefined)
+					
+					if (label == kUndefined)
+						label := this.getLabel(ConfigurationItem.descriptor(action, "Dial"), action)
+					
 					if (inList(selectActions, action))
-						mode.registerAction(new PitstopSelectAction(this, function, this.getLabel(ConfigurationItem.descriptor(action, "Toggle"), action), actions[action], moreArguments*))
+						mode.registerAction(new PitstopSelectAction(this, function, label, actions[action], moreArguments*))
 					else
-						mode.registerAction(new PitstopToggleAction(this, function, this.getLabel(ConfigurationItem.descriptor(action, "Toggle"), action), actions[action], moreArguments*))
+						mode.registerAction(new PitstopToggleAction(this, function, label, actions[action], moreArguments*))
+				}
 				else
 					this.logFunctionNotFound(increaseFunction)
 			}

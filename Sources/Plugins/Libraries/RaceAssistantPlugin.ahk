@@ -277,6 +277,9 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		
 		if raceAssistantToggle {
 			arguments := string2Values(A_Space, raceAssistantToggle)
+	
+			if (arguments.Length() == 1)
+				arguments.InsertAt(1, "On")
 			
 			this.iRaceAssistantEnabled := (arguments[1] = "On")
 			
@@ -770,7 +773,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 ;;;-------------------------------------------------------------------------;;;
 
 readSimulatorData(simulator, options := "", protocol := "SHM") {
-	exePath := kBinariesDirectory . simulator . " " . protocol . " Provider.exe"
+	exePath := kBinariesDirectory . simulator . A_Space . protocol . " Provider.exe"
 	
 	Random postfix, 1, 1000000
 	

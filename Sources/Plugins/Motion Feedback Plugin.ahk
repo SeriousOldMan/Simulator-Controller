@@ -102,7 +102,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 						this.findAction(this.Plugin.getLabel(ConfigurationItem.descriptor(effect, "Toggle"), effect)).updateLabel(state)
 			
 				if inList(this.Controller.ActiveModes, this)
-					this.findAction(this.Plugin.getLabel(ConfigurationItem.descriptor("Motion Intensity", "Dial"), "Motion Intensity")).updateLabel(isInfo ? "Info" : "Normal")
+					this.findAction(this.Plugin.getLabel(ConfigurationItem.descriptor("MotionIntensity", "Dial"), "Motion Intensity")).updateLabel(isInfo ? "Info" : "Normal")
 			
 				isInfo := !isInfo
 			}
@@ -372,6 +372,9 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 				return
 		}
 		
+		if (!this.Active && !isDebug())
+			return
+		
 		kSimFeedbackConnector := this.getArgumentValue("connector", false)
 		
 		if !FileExist(kSimFeedbackConnector) {
@@ -384,15 +387,15 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		motionEffectsArguments := string2Values(",", this.getArgumentValue("motionEffects", ""))
 		motionEffectIntensityArguments := string2Values(A_Space, this.getArgumentValue("motionEffectIntensity", ""))
 		
-		initialIntensity := motionArguments[4]
+		initialIntensity := motionArguments[motionArguments.Length()]
 				
 		this.kInitialMotionIntensity := initialIntensity
 		this.iCurrentMotionIntensity := initialIntensity
 		
 		effectFunctions := []
 		
-		for index, effect in motionEffectsArguments {
-			effect := string2Values(A_Space, effect)
+		for ignore, effect in motionEffectsArguments {
+			effect := this.parseValues(A_Space, effect)
 			
 			this.kEffects.Push(StrReplace(effect[1], "_", A_Space))
 			this.kInitialEffectStates.Push(effect[2] = "On" ? true : false)
@@ -417,14 +420,16 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		
 		this.iMotionMode := motionMode
 		
-		descriptor := motionArguments[3]
-		function := this.Controller.findFunction(descriptor)
-		
-		if (function != false)
-			motionMode.registerAction(new this.MotionIntensityAction(function, motionMode
-																   , this.getLabel(ConfigurationItem.descriptor("Motion Intensity", "Dial"), "Motion Intensity")))
-		else
-			this.logFunctionNotFound(descriptor)
+		if (motionArguments.Length() > 3) {
+			descriptor := motionArguments[3]
+			function := this.Controller.findFunction(descriptor)
+			
+			if (function != false)
+				motionMode.registerAction(new this.MotionIntensityAction(function, motionMode
+																	   , this.getLabel(ConfigurationItem.descriptor("MotionIntensity", "Dial"), "Motion Intensity")))
+			else
+				this.logFunctionNotFound(descriptor)
+		}
 		
 		for index, effect in this.kEffects
 			this.createEffectToggleAction(controller, motionMode, effectFunctions[index], effect)

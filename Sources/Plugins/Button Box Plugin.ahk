@@ -421,10 +421,13 @@ moveButtonBox() {
 initializeButtonBoxPlugin() {
 	controller := SimulatorController.Instance
 	
+	configuration := readConfiguration(getFileName("Button Box Configuration.ini", kUserConfigDirectory, kConfigDirectory))
+	
 	for ignore, btnBox in string2Values("|", getConfigurationValue(controller.Configuration, "Controller Layouts", "Button Boxes", "")) {
 		btnBox := string2Values(":", btnBox)
 	
-		new GridButtonBox(btnBox[1], btnBox[2], controller, readConfiguration(getFileName("Button Box Configuration.ini", kUserConfigDirectory, kConfigDirectory)))
+		if getConfigurationValue(configuration, "Layouts", btnBox[2] . ".Visible", true)
+			new GridButtonBox(btnBox[1], btnBox[2], controller, configuration)
 	}
 }
 

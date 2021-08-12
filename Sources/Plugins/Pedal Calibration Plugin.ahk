@@ -190,12 +190,15 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 				return
 		}
 		
+		if (!this.Active && !isDebug())
+			return
+		
 		this.iPedalProfileMode := new this.PedalProfileMode(this)
 		
 		this.registerMode(this.iPedalProfileMode)
 		
 		for ignore, theAction in string2Values(",", this.getArgumentValue("pedalCalibrations", ""))
-			this.createPedalCalibrationAction(controller, string2Values(A_Space, theAction)*)
+			this.createPedalCalibrationAction(controller, this.parseValues(A_Space, theAction)*)
 		
 		controller.registerPlugin(this)
 	}
@@ -207,7 +210,7 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 		pedal := pedalAndShape[1]
 		shape := StrReplace(pedalAndShape[2], "_", A_Space)
 		
-		label := translate(pedal) . " " . shape
+		label := translate(pedal) . A_Space . shape
 		
 		if (function != false)
 			this.iPedalProfileMode.registerAction(new this.CurveShapeAction(function, label, pedal, shape))

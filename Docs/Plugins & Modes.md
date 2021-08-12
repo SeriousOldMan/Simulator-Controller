@@ -79,15 +79,15 @@ You will achieve this controller configuration with the following plugin argumen
 As you have seen, "Tactile Feedback" is quite flexible and therefore provides many plugin parameters. All the arguments for these parameters must be supplied in the [Plugins tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) of the configuration tool.
 
 	controlApplication: *Name of the SimHub application configuration*;
-	pedalVibration: *initialState* *onOffFunction* *intensityFunction*;
-	frontChassisVibration: *initialState* *onOffFunction* *intensityFunction*;
-	rearChassisVibration: *initialState* *onOffFunction* *intensityFunction*
+	pedalVibration: *initialState* *onOffFunction* [*intensityFunction*];
+	frontChassisVibration: *initialState* *onOffFunction* [*intensityFunction*];
+	rearChassisVibration: *initialState* *onOffFunction* [*intensityFunction*]
 	
 The optional parameter *controlApplication* let you provide the name of the configured application object for *SimHub*, if it is not named "Tactile Feedback".
 The other three parameters follow the same format and let you control the respective group of vibration effects.
 *initialState* must be either "On" or "Off". Unfortunately, there is no way to query *SimHub* to request the current state of a toggleable effect, so this can get out of sync, if you left it in the other state the last time you used your rig.
 *onOffFunction* will define a controller function to switch the respective vibration effect group on or off. Both, unary and binary functions are supported. This function is connected to the plugin itself and is therefore always available. For all this to work as expected, you must define a trigger in *SimHub* at the respective effect group, which must be named "toggle[*Effect*]Vibration", where *Effect* is either "Pedal", "FrontChassis" or "RearChassis".
-Last, *intensityFunction*, which is part of the respective mode, will let you control the overall intensity of the effect group. You may have to supply a descriptor for a binary function here, unless you only want to increase the intensity all the time. Example: "pedalVibration: On 2WayToggle.3 Dial.1"
+The optional argument *intensityFunction*, which is part of the respective mode, will let you control the overall intensity of the effect group. You may have to supply a descriptor for a binary function here, unless you only want to increase the intensity all the time. Example: "pedalVibration: On 2WayToggle.3 Dial.1". You can achieve the same result by supplying an effect named "Pedal", "FrontChassis" or "RearChassis" in the respective mode effects parameter below. As a bonus, you are able to specify two unary functions to control the vibration intensity, if you are using this variant.
 
 In the next step, you may describe all the individual effects for your vibration settings:
 
@@ -134,12 +134,12 @@ All the arguments for the plugin parameters of the "Motion Feedback" plugin must
 
 	controlApplication: *Name of the SimFeedback application configuration*;
 	connector: *path to sfx-100-console-application*;
-	motion: *initialState* *onOffFunction* *intensityFunction* *initialIntensity*
+	motion: *initialState* *onOffFunction* [*intensityFunction*] *initialIntensity*
 
 The optional parameter *controlApplication* let you provide the name of the configured application object for *SimFeedback*, if it is not named "Motion Feedback". The *connector* parameter may be used, when *SimFeedack* is running in expert mode and you have installed the extensions mentioned above. The path must be set to the location of the console executable, as in "D:\Programme\SimFeedback Connector\sfx-100-streamdeck-console.exe". For *motion*, you supply the *initialState* as one of "On" or "Off". 
-*onOffFunction* will define a controller function to start or stop the motion actuator motors. Both, unary and binary functions are supported. This function is connected to the plugin itself and is therefore always available. With *intensityFunction*, you supply a function to control the overall motion intensity starting with *initialIntensity*. You may have to supply a descriptor for binary function here, unless you only want to increase the intensity all the time. Example: "motion: Off 2WayToggle.2 Dial.1 30"
+*onOffFunction* will define a controller function to start or stop the motion actuator motors. Both, unary and binary functions are supported. This function is connected to the plugin itself and is therefore always available. You can supply a function to control the overall motion intensity starting with *initialIntensity* with the optional *intensityFunction* parameter. You must supply a descriptor for a binary function here, unless you only want to increase the intensity all the time. Example: "motion: Off 2WayToggle.2 Dial.1 30". The intensity function will become an element of the "Motion" mode.
 
-Warning: *initialState* and *initialIntensity* will only be used, when using mouse automation to control *SimFeedback*. It is absolutely cruicial, that these settings correspnd with the current settings in *SimFeedback*, when it starts. Otherwise, you will get unpredictable results, since the emulated mouse clicks may be going wild. When using the connector, the initial values will be ignored and the current state will be requested from *SimFeedback* using the API integration instead.
+Warning: *initialState* and *initialIntensity* will only be used at startup, when using mouse automation to control *SimFeedback*. It is absolutely cruicial, that these settings correspond with the current settings in *SimFeedback*, when it starts. Otherwise, you will get unpredictable results, since the emulated mouse clicks may be going wild. When using the connector, the initial values will be ignored and the current state will be reoquested from *SimFeedback* using the API integration instead. However, if motion is switched off, all effect states and intensities will be reset to their initial states, even when using the connector.
 
 With the following parameters you can configure the available effects for the "Motion" mode:
 
@@ -149,7 +149,7 @@ With the following parameters you can configure the available effects for the "M
 
 *effectX* is the name of the effect, for example "Heave". With *initialStateX* and *intialIntensityX* you supply "On" or "Off" and a value between 0.0 and 2.0 respectively. These values will only be used, when mouse automation is used to control *SimFeedback*. Last, you need to supply a controller function with *effectToggleFunctionX* to enable or disable the effect or choose it for intensity manipulation after pressing the "Effect Selector" button, which must have been configured by supplying values for the "motionEffectIntensity" parameter. Example: "Heave On 1.0 Button.1"
 
-Important: Please be aware, that any spaces in effect names must be substituted with an underscore, since spaces are allowed in *SimFeedback* effect names, but not in plugin arguments. The underscores will be replaced with spaces again, before being transmitted to *SimFeedback*.
+Important: Please be aware, that any spaces in effect names must be substituted with an underscore, since spaces are allowed in *SimFeedback* effect names, but not in plugin arguments. The underscores will be replaced with spaces again, before being transmitted to *SimFeedback*. You may also use double quotes for the effect names, that contain spaces.
 
 Note: To change the labels, that are displayed for all these effects and triggers on the visual representation of your controller hardware, use the *Labels Editor*, which is available at the [Plugins tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) of the configuration tool.
 
@@ -188,17 +188,19 @@ All the arguments for the plugin parameters of the "Pedal Calibration" plugin mu
 
 The optional parameter *controlApplication* let you provide the name of the configured application object for *SmartControl*, as long as it is not named "Pedal Calibration". With the *pedalCalibrations* parameter, you can provide all calibration selections, you want to have on your Button Box. *pedal* can be either "Clutch", "Brake" or "Trottle" and *calibration* must be one of "Linear", "Sense+1", "Sense+2", "Sense-1", "Sense-2", "S-Shape", "S_on_Side", "Slow_Start", "Slow_End" or "Custom" for the Heusinkveld Pedals. "Example: "pedalCalibrations: Clutch.Linear Button.1, Brake.Linear Button.2, ..."
 
+Important: Please be aware, that any spaces in curve names must be substituted with an underscore, since spaces are allowed in *SmartControl* curve names, but not in plugin arguments. The underscores will be replaced with spaces again, before being transmitted to *SmartControl*. You may also use double quotes for the curve names, that contain spaces.
+
 ## Plugin *Race Engineer*
 
 The "Race Engineer" plugin handles the interaction of the currently active simulation as represented by the plugins "ACC", "RF2", "R3E", and so on, and Jona, the Virtual Race Engineer. If one of these simulation is started, the "Race Engineer" plugin will be automatically activated, and will start Jona in the background according to the configuration arguments described below. The following configuration parameters allow you to customize Jona to your preferences:
 
-	raceAssistant: *initialState* *onOffFunction*; raceAssistantName: *name*; raceAssistantLogo: true or false;
+	raceAssistant: [*initialState*] *onOffFunction*; raceAssistantName: *name*; raceAssistantLogo: true or false;
 	raceAssistantLanguage: DE | EN | ...; raceAssistantService: Windows | Azure|tokenIssuerEndpoint|subscriptionKey;
 	raceAssistantSpeaker: false, true or *Microsoft Speech Generation Language*;
 	raceAssistantListener: false, true or *Microsoft Speech Recognition Language*;
 	openRaceSettings: *settingsFunction*; importSetup: *importFunction*; openSetupDatabase: *setupsFunction*
 	
-For Jona to be generally available, you must supply an argument for the *raceAssistantName* parameter. You can define a function on your hardware controller with the parameter *raceAssistant*, to enable or disable the Virtual Race Engineer dynamically. *initialState* must be either "On" or "Off" and for *onOffFunction* unary and binary functions are supported. The function will be bound to a plugin action. Additionally, the parameter *openRaceSettings* allows you to bind a plugin action to your hardware controller, which opens the [settings dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings), which you will use before a race to give Jona the necessary information about your car setup and other stuff. As an alternative you can use the plugin action *importSetup* to import the current tyre setup data only, without opening the settings dialog. Nevertheless, you will get a notification, when the setup has been imported successfully.
+For Jona to be generally available, you must supply an argument for the *raceAssistantName* parameter. You can define a function on your hardware controller with the parameter *raceAssistant*, to enable or disable the Virtual Race Engineer dynamically. The optional *initialState* must be either "On" or "Off" (default is "On") and for *onOffFunction* unary and binary functions are supported. The function will be bound to a plugin action. Additionally, the parameter *openRaceSettings* allows you to bind a plugin action to your hardware controller, which opens the [settings dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings), which you will use before a race to give Jona the necessary information about your car setup and other stuff. As an alternative you can use the plugin action *importSetup* to import the current tyre setup data only, without opening the settings dialog. Nevertheless, you will get a notification, when the setup has been imported successfully.
 Last, but not least, with *openSetupDatabase* you can open the [setup database query tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#querying-the-setup-database). If a simulation is currently running, most of the query arguments will already be prefilled. 
 
 Note: If you disable Jona during an active race, the Race Engineer will stop working immediately. You can also enable Jona at the beginning of a race, but only until you cross the start/finish line for the first time. If you enable Jona after the initial lap, Jona will not be available until the next session. 
@@ -242,13 +244,13 @@ Note: All these commands are also available in most of the simulation plugins, e
 
 The "Race Strategist" plugin handles the interaction of the currently active simulation as represented by the plugins "ACC", "RF2", "R3E", and so on, and Cato, the Virtual Race Strategist. If one of these simulation is started, the "Race Strategist" plugin will be automatically activated, and will start Cato in the background according to the configuration arguments described below. The following configuration parameters allow you to customize Cato to your preferences:
 
-	raceAssistant: *initialState* *onOffFunction*; raceAssistantName: *name*; raceAssistantLogo: true or false; 
+	raceAssistant: [*initialState*] *onOffFunction*; raceAssistantName: *name*; raceAssistantLogo: true or false; 
 	raceAssistantLanguage: DE | EN | ...; raceAssistantService: Windows | Azure|tokenIssuerEndpoint|subscriptionKey;
 	raceAssistantSpeaker: false, true or *Microsoft Speech Generation Language*;
 	raceAssistantListener: false, true or *Microsoft Speech Recognition Language*;
 	openRaceSettings: *settingsFunction*; openSetupDatabase: *setupsFunction*
 	
-For Cato to be generally available, you must supply an argument for the *raceAssistantName* parameter.You can define a function on your hardware controller with the parameter *raceAssistant*, to enable or disable the Virtual Race Strategist dynamically. *initialState* must be either "On" or "Off" and for *onOffFunction* unary and binary functions are supported. The function will be bound to a plugin action. Additionally, the parameter *openRaceSettings* allows you to bind a plugin action to your hardware controller, which opens the [settings dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-settings), which you will use before a race to give Cato the necessary information about your car setup and strategy options. And with *openSetupDatabase* you can open the [setup database query tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#querying-the-setup-database). If a simulation is currently running, most of the query arguments will already be prefilled. 
+For Cato to be generally available, you must supply an argument for the *raceAssistantName* parameter.You can define a function on your hardware controller with the parameter *raceAssistant*, to enable or disable the Virtual Race Strategist dynamically. The optional *initialState* must be either "On" or "Off" (default is "On") and for *onOffFunction* unary and binary functions are supported. The function will be bound to a plugin action. Additionally, the parameter *openRaceSettings* allows you to bind a plugin action to your hardware controller, which opens the [settings dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-settings), which you will use before a race to give Cato the necessary information about your car setup and strategy options. And with *openSetupDatabase* you can open the [setup database query tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#querying-the-setup-database). If a simulation is currently running, most of the query arguments will already be prefilled. 
 
 Hint: You can bind the activation and deactivation of the Virtual Race Engineer and the Virtual Race Strategist to one function, if you want to control them both with the same switch on your hardwar controller.
 

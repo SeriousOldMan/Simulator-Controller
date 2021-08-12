@@ -22,7 +22,17 @@ global launchpadDeleteButton
 global launchpadUpdateButton
 		
 class LaunchpadConfigurator extends ConfigurationItemList {
-	__New(configuration) {
+	iEditor := false
+	
+	Editor[] {
+		Get {
+			return this.iEditor
+		}
+	}
+	
+	__New(editor, configuration) {
+		this.iEditor := editor
+		
 		base.__New(configuration, this.createControls(configuration), "launchpadListView"
 				 , "launchpadAddButton", "launchpadDeleteButton", "launchpadUpdateButton")
 				 
@@ -187,9 +197,11 @@ compareLaunchApplications(a1, a2) {
 }
 
 initializeLaunchpadConfigurator() {
-	editor := ConfigurationEditor.Instance
-	
-	editor.registerConfigurator(translate("Launchpad"), new LaunchpadConfigurator(editor.Configuration))
+	if kConfigurationEditor {
+		editor := ConfigurationEditor.Instance
+		
+		editor.registerConfigurator(translate("Launchpad"), new LaunchpadConfigurator(editor, editor.Configuration))
+	}
 }
 
 

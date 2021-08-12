@@ -333,7 +333,7 @@ else {
 }
 
 show(context, args*) {
-	showMessage(values2string(" ", args*), "Race Strategist Test", "Information.png", 500)
+	showMessage(values2string(A_Space, args*), "Race Strategist Test", "Information.png", 500)
 	
 	return true
 }

@@ -16,6 +16,31 @@ General Release Actions
 12. Update #releases and #anouncements in Discord
 13. Set a Git Tag after final commit
 
+Release 3.5.0 Checklist
+=======================
+
+0. Search for new links (*)
+1. Update Procedure
+   a. Translations
+   b. Plugin Labels
+2. Invisible Button Boxes
+   a. Update Notes
+   b. Translations
+   c. Documentation
+   d. Doc Image
+3. Renamed "Key Detector Tool"
+   a. Documentatiom
+   b. Doc Image
+4. Mew "launchApplications" parameter
+   a. Documentation
+5. Rework of many Controller Plugin Labels
+   a. Delete old Plugin Labels in Update Procedure
+   b. IMPORTANT Update Nots
+6. New Setup Tool
+   a. Images
+   b. Documentation
+   c. Create Backup Files in Update Procedure
+
 Release 3.3.0 Checklist
 =======================
 

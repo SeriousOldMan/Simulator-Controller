@@ -26,6 +26,14 @@ global pluginDeleteButton
 global pluginUpdateButton
 		
 class PluginsConfigurator extends ConfigurationItemList {
+	iEditor := false
+	
+	Editor[] {
+		Get {
+			return this.iEditor
+		}
+	}
+	
 	Plugins[] {
 		Get {
 			result := []
@@ -37,7 +45,9 @@ class PluginsConfigurator extends ConfigurationItemList {
 		}
 	}
 	
-	__New(configuration) {
+	__New(editor, configuration) {
+		this.iEditor := editor
+		
 		base.__New(configuration)
 				 
 		PluginsConfigurator.Instance := this
@@ -253,9 +263,11 @@ openPluginsModesDocumentation() {
 }
 
 initializePluginsConfigurator() {
-	editor := ConfigurationEditor.Instance
-	
-	editor.registerConfigurator(translate("Plugins"), new PluginsConfigurator(editor.Configuration))
+	if kConfigurationEditor {
+		editor := ConfigurationEditor.Instance
+		
+		editor.registerConfigurator(translate("Plugins"), new PluginsConfigurator(editor, editor.Configuration))
+	}
 }
 
 

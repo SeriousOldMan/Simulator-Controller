@@ -28,10 +28,20 @@ global kEmptySpaceDescriptor = "Button;" . kButtonBoxImagesDirectory . "Empty.pn
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class ControllerConfigurator extends ConfigurationItem {
+	iEditor := false
+	
 	iButtonBoxesList := false
 	iFunctionsist := false
 	
-	__New(configuration) {
+	Editor[] {
+		Get {
+			return this.iEditor
+		}
+	}
+	
+	__New(editor, configuration) {
+		this.iEditor := editor
+		
 		this.iButtonBoxesList := new ButtonBoxesList(configuration)
 		this.iFunctionsList := new FunctionsList(configuration)
 		
@@ -46,7 +56,7 @@ class ControllerConfigurator extends ConfigurationItem {
 		this.iButtonBoxesList.createGui(editor, x, y, width, height)
 		this.iFunctionsList.createGui(editor, x, y, width, height)
 		
-		Gui %window%:Add, Button, x16 y490 w100 h23 gtoggleKeyDetector, % translate("Key Detector...")
+		Gui %window%:Add, Button, x16 y490 w100 h23 gtoggleTriggerDetector, % translate("Trigger...")
 	}
 	
 	saveToConfiguration(configuration) {
@@ -280,7 +290,7 @@ class FunctionsList extends ConfigurationItemList {
 	
 		Gui %window%:Add, Text, x16 y360 w86 h23 +0x200, % translate("Function")
 		Gui %window%:Add, DropDownList, x124 y360 w91 AltSubmit Choose%functionTypeDropDown% VfunctionTypeDropDown gupdateFunctionEditorState
-								, % values2String("|", map(["1-way Toggle", "2-way Toggle", "Button", "Dial", "Custom"], "translate")*)
+								, % values2String("|", map(["1-way Toggle", "2-way Toggle", "Button", "Rotary", "Custom"], "translate")*)
 		Gui %window%:Add, Edit, x220 y360 w40 h21 Number VfunctionNumberEdit, %functionNumberEdit%
 		Gui %window%:Add, UpDown, x260 y360 w17 h21, 1
 		
@@ -371,12 +381,7 @@ class FunctionsList extends ConfigurationItemList {
 	}
 
 	computeFunctionType(functionType) {
-		if (functionType == k1WayToggleType)
-			return "1-way Toggle"
-		else if (functionType == k2WayToggleType)
-			return "2-way Toggle"
-		else
-			return functionType
+		return kControlTypes[functionType]
 	}
 
 	computeHotkeysAndActionText(hotkeys, action) {
@@ -567,11 +572,11 @@ class FunctionsList extends ConfigurationItemList {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-toggleKeyDetector(callback := false) {
+toggleTriggerDetector(callback := false) {
 	protectionOn()
 	
 	try {
-		ConfigurationEditor.Instance.toggleKeyDetector()
+		ConfigurationEditor.Instance.toggleTriggerDetector()
 	}
 	finally {
 		protectionOff()
@@ -602,9 +607,11 @@ openActionsDocumentation() {
 }
 
 initializeControllerConfigurator() {
-	editor := ConfigurationEditor.Instance
-	
-	editor.registerConfigurator(translate("Controller"), new ControllerConfigurator(editor.Configuration))
+	if kConfigurationEditor {
+		editor := ConfigurationEditor.Instance
+		
+		editor.registerConfigurator(translate("Controller"), new ControllerConfigurator(editor, editor.Configuration))
+	}
 }
 
 

@@ -191,39 +191,46 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 				return
 		}
 		
+		if (!this.Active && !isDebug())
+			return
+		
 		this.iVibrationApplication := new Application(kTactileFeedbackPlugin, configuration)
 		
 		pedalVibrationArguments := string2Values(A_Space, this.getArgumentValue("pedalVibration", ""))
 		frontChassisVibrationArguments := string2Values(A_Space, this.getArgumentValue("frontChassisVibration", ""))
 		rearChassisVibrationArguments := string2Values(A_Space, this.getArgumentValue("rearChassisVibration", ""))
 		
-		this.createPluginToggleAction("PedalVibration", "togglePedalVibration", pedalVibrationArguments[2], (pedalVibrationArguments[1] = "On"))
-		this.createPluginToggleAction("FrontVibration", "toggleFrontChassisVibration", frontChassisVibrationArguments[2], (frontChassisVibrationArguments[1] = "On"))
-		this.createPluginToggleAction("RearVibration", "toggleRearChassisVibration", rearChassisVibrationArguments[2], (rearChassisVibrationArguments[1] = "On"))
+		this.createToggleAction("PedalVibration", "togglePedalVibration", pedalVibrationArguments[2], (pedalVibrationArguments[1] = "On"))
+		this.createToggleAction("FrontVibration", "toggleFrontChassisVibration", frontChassisVibrationArguments[2], (frontChassisVibrationArguments[1] = "On"))
+		this.createToggleAction("RearVibration", "toggleRearChassisVibration", rearChassisVibrationArguments[2], (rearChassisVibrationArguments[1] = "On"))
 		
 		pedalMode := new this.PedalVibrationMode(this)
 		
 		this.iPedalVibrationMode := pedalMode
 		
-		this.createPluginDialAction(pedalMode, "Pedal", pedalVibrationArguments[3])
+		if (pedalVibrationArguments.Length() > 2)
+			this.createDialAction(pedalMode, "Pedal", pedalVibrationArguments[3])
 		
 		for ignore, effect in string2Values(",", this.getArgumentValue("pedalEffects", ""))
-			this.createModeAction(controller, pedalMode, string2Values(A_Space, effect)*)
+			this.createEffectAction(controller, pedalMode, string2Values(A_Space, effect)*)
 		
 		chassisMode := new this.ChassisVibrationMode(this)
 		
 		this.iChassisVibrationMode := chassisMode
 		
-		this.createPluginDialAction(chassisMode, "FrontChassis", frontChassisVibrationArguments[3])
-		this.createPluginDialAction(chassisMode, "RearChassis", rearChassisVibrationArguments[3])
+		if (frontChassisVibrationArguments.Length() > 2)
+			this.createDialAction(chassisMode, "FrontChassis", frontChassisVibrationArguments[3])
+		
+		if (rearChassisVibrationArguments.Length() > 2)
+			this.createDialAction(chassisMode, "RearChassis", rearChassisVibrationArguments[3])
 	
 		for ignore, effect in string2Values(",", this.getArgumentValue("chassisEffects", ""))
-			this.createModeAction(controller, chassisMode, string2Values(A_Space, effect)*)
+			this.createEffectAction(controller, chassisMode, string2Values(A_Space, effect)*)
 		
 		controller.registerPlugin(this)
 	}
 
-	createPluginToggleAction(toggle, command, descriptor, initialState) {
+	createToggleAction(toggle, command, descriptor, initialState) {
 		local function
 		
 		if (descriptor != false) {
@@ -236,7 +243,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		}
 	}
 
-	createPluginDialAction(mode, effect, descriptor) {
+	createDialAction(mode, effect, descriptor) {
 		local function := this.Controller.findFunction(descriptor)
 		
 		if (function != false)
@@ -245,12 +252,12 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 			this.logFunctionNotFound(descriptor)
 	}
 	
-	createModeAction(controller, mode, effect, increaseFunction, decreaseFunction := false) {
+	createEffectAction(controller, mode, effect, increaseFunction, decreaseFunction := false) {
 		local function := this.Controller.findFunction(increaseFunction)
 		
 		if !decreaseFunction {
 			if (function != false)
-				mode.registerAction(new this.FXChangeAction(function, this.getLabel(ConfigurationItem.descriptor(effect, "Toggle"), effect), effect, kIncrease, kDecrease))
+				mode.registerAction(new this.FXChangeAction(function, this.getLabel(ConfigurationItem.descriptor(effect, "Dial"), effect), effect, kIncrease, kDecrease))
 			else
 				this.logFunctionNotFound(increaseFunction)
 		}

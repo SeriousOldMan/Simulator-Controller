@@ -29,6 +29,14 @@ global applicationDeleteButton
 global applicationUpdateButton
 		
 class ApplicationsConfigurator extends ConfigurationItemList {
+	iEditor := false
+	
+	Editor[] {
+		Get {
+			return this.iEditor
+		}
+	}
+	
 	Applications[types := false] {
 		Get {
 			result := []
@@ -43,7 +51,9 @@ class ApplicationsConfigurator extends ConfigurationItemList {
 		}
 	}
 	
-	__New(configuration) {
+	__New(editor, configuration) {
+		this.iEditor := editor
+		
 		base.__New(configuration)
 				 
 		ApplicationsConfigurator.Instance := this
@@ -103,9 +113,10 @@ class ApplicationsConfigurator extends ConfigurationItemList {
 	}
 		
 	saveToConfiguration(configuration) {
+		local count := 0
+		
 		base.saveToConfiguration(configuration)
 		
-		count := 0
 		lastType := ""
 		
 		for index, theApplication in this.ItemList {
@@ -278,9 +289,11 @@ chooseApplicationWorkingDirectoryPath() {
 
 
 initializeApplicationsConfigurator() {
-	editor := ConfigurationEditor.Instance
-	
-	editor.registerConfigurator(translate("Applications"), new ApplicationsConfigurator(editor.Configuration))
+	if kConfigurationEditor {
+		editor := ConfigurationEditor.Instance
+		
+		editor.registerConfigurator(translate("Applications"), new ApplicationsConfigurator(editor, editor.Configuration))
+	}
 }
 
 

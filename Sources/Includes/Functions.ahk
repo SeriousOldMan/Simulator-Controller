@@ -69,7 +69,7 @@ ftpUpload(server, user, password, localFile, remoteFile) {
 
 createMessageReceiver() {
 	Gui MR:-Border -Caption
-	Gui MR:Color, D0D0D0
+	Gui MR:Color, D0D0D0, E5E5E5
 	Gui MR:Add, Text, X10 Y10, % translate("Modular Simulator Controller System")
 	Gui MR:Add, Text, , % A_ScriptName
 	
@@ -98,7 +98,7 @@ consentDialog(id, consent := false) {
 	texts := readConfiguration(kConfigDirectory . "Consent.ini")
 	
 	Gui CNS:-Border ; -Caption
-	Gui CNS:Color, D0D0D0
+	Gui CNS:Color, D0D0D0, E5E5E5
 	Gui CNS:Font, s10 Bold
 	Gui CNS:Add, Text, x0 y8 w800 +0x200 +0x1 BackgroundTrans gmoveConsentDialog, % translate("Modular Simulator Controller System")
 	Gui CNS:Font, Norm, Arial
@@ -537,7 +537,7 @@ startTrayMessageManager() {
 requestShareSetupDatabaseConsent() {
 	program := StrSplit(A_ScriptName, ".")[1]
 	
-	if ((program = "Simulator Startup") || (program = "Simulator Configuration") || (program = "Simulator Settings")) {
+	if ((program = "Simulator Startup") || (program = "Simulator Configuration") || (program = "Simulator Settings") || (program = "Simulator Setup")) {
 		idFileName := kUserConfigDirectory . "ID"
 		
 		FileReadLine id, %idFileName%, 1
@@ -958,7 +958,7 @@ showSplash(image, alwaysOnTop := true, video := false) {
 	SplitPath image, , , extension
 	
 	Gui %vSplashCounter%:-Border -Caption
-	Gui %vSplashCounter%:Color, D0D0D0
+	Gui %vSplashCounter%:Color, D0D0D0, E5E5E5
 
 	Gui %vSplashCounter%:Font, s10 Bold, Arial
 	Gui %vSplashCounter%:Add, Text, x10 w780 Center, %title% 
@@ -1106,7 +1106,7 @@ showProgress(options) {
 	
 		Gui Progress:Default
 		Gui Progress:-Border -Caption
-		Gui Progress:Color, D0D0D0
+		Gui Progress:Color, D0D0D0, E5E5E5
 
 		Gui Progress:Font, s10 Bold, Arial
 		Gui Progress:Add, Text, x10 w%w% Center vvProgressTitle
@@ -1146,10 +1146,13 @@ hideProgress() {
 	}
 }
 
-getAllThemes() {
+getAllThemes(configuration := false) {
 	themes := []
 	
-	for descriptor, value in getConfigurationSectionValues(kSimulatorConfiguration, "Splash Themes", Object()) {
+	if !configuration
+		configuration := kSimulatorConfiguration
+	
+	for descriptor, value in getConfigurationSectionValues(configuration, "Splash Themes", Object()) {
 		theme := StrSplit(descriptor, ".")[1]
 		
 		if !inList(themes, theme)
@@ -1167,7 +1170,7 @@ showMessage(message, title := false, icon := "Information.png", duration := 1000
 		title := translate("Modular Simulator Controller System")
 	
 	Gui SM:-Border -Caption
-	Gui SM:Color, D0D0D0
+	Gui SM:Color, D0D0D0, E5E5E5
 	Gui SM:Font, s10 Bold
 	Gui SM:Add, Text, x8 y8 W%innerWidth% +0x200 +0x1 BackgroundTrans, %title%
 	Gui SM:Font
@@ -1383,27 +1386,29 @@ withProtection(function, params*) {
 }
 
 isInstance(object, root) {
-	candidate := object.base
-	
-	while IsObject(candidate)
-		if (candidate == root)
-			return true
-		else {
-			classVar := candidate.base.__Class
+	if IsObject(object) {
+		candidate := object.base
 		
-			if (classVar && (classVar != "")) {
-				if InStr(classVar, ".") {
-					classVar := StrSplit(classVar, ".")
-					outerClassVar := classVar[1]
-					
-					candidate := %outerClassVar%[classVar[2]]
+		while IsObject(candidate)
+			if (candidate == root)
+				return true
+			else {
+				classVar := candidate.base.__Class
+			
+				if (classVar && (classVar != "")) {
+					if InStr(classVar, ".") {
+						classVar := StrSplit(classVar, ".")
+						outerClassVar := classVar[1]
+						
+						candidate := %outerClassVar%[classVar[2]]
+					}
+					else
+						candidate := %classVar%
 				}
 				else
-					candidate := %classVar%
+					return false
 			}
-			else
-				return false
-		}
+	}
 		
 	return false
 }
@@ -1706,20 +1711,25 @@ readConfiguration(configFile) {
 writeConfiguration(configFile, configuration) {
 	configFile := getFileName(configFile, kUserConfigDirectory)
 	
+	try {
+		FileDelete %configfile%
+	}
+	catch exception {
+		; ignore
+	}
+	
 	SplitPath configFile, , directory
 	FileCreateDir %directory%
 	
 	for section, keyValues in configuration {
 		pairs := ""
 		
-		IniDelete %configFile%, %section%
-		
 		for key, value in keyValues
 			pairs := pairs . "`n" . key . "=" . ((value == true) ? kTrue : ((value == false) ? kFalse : value))
 			
 		section := "[" . section . "]" . pairs . "`n"
 		
-		FileAppend %section%, %configFile%
+		FileAppend %section%, %configFile%, UTF-16
 	}
 }
 
@@ -1761,12 +1771,23 @@ removeConfigurationValue(configuration, section, key) {
 		configuration[section].Delete(key)
 }
 
-getControllerConfiguration() {
-	if !FileExist(kUserConfigDirectory . "Simulator Controller.config")
+getControllerConfiguration(configuration := false) {
+	if (configuration || !FileExist(kUserConfigDirectory . "Simulator Controller.config"))
 		try {
-			exePath := kBinariesDirectory . "Simulator Controller.exe -NoStartup"
+			if configuration {
+				writeConfiguration(kTempDirectory . "Simulator Configuration.ini", configuration)
+				
+				options := " -Configuration """ . kTempDirectory . "Simulator Configuration.ini" . """"
+			}
+			else
+				options := ""
+			
+			exePath := kBinariesDirectory . "Simulator Controller.exe -NoStartup" .  options
 			
 			RunWait %exePath%, %kBinariesDirectory%
+			
+			if configuration
+				FileDelete %kTempDirectory%Simulator Configuration.ini
 		}
 		catch exception {
 			logMessage(kLogCritical, translate("Cannot start Simulator Controller (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))

@@ -206,8 +206,6 @@ class SystemPlugin extends ControllerPlugin {
 		local function
 		local action
 		
-		this.iLaunchMode := new this.LaunchMode(this)
-		
 		if inList(A_Args, "-Startup")
 			this.iChildProcess := true
 		
@@ -228,13 +226,20 @@ class SystemPlugin extends ControllerPlugin {
 					this.logFunctionNotFound(descriptor)
 			}
 		
+		for ignore, arguments in this.parseValues(",", this.getArgumentValue("launchApplications", ""))
+			this.createLaunchAction(controller, this.parseValues(A_Space, arguments)*)
+		
 		descriptor := this.getArgumentValue("logo", false)
 		
 		if (descriptor != false) {
 			function := controller.findFunction(descriptor)
 		
-			if (function != false)
+			if (function != false) {
+				if !this.iLaunchMode
+					this.iLaunchMode := new this.LaunchMode(this)
+				
 				this.iLaunchMode.registerAction(new this.LogoToggleAction(function, ""))
+			}
 			else
 				this.logFunctionNotFound(descriptor)
 		}
@@ -244,13 +249,19 @@ class SystemPlugin extends ControllerPlugin {
 		if (descriptor != false) {
 			function := controller.findFunction(descriptor)
 		
-			if (function != false)
+			if (function != false) {
+				if !this.iLaunchMode
+					this.iLaunchMode := new this.LaunchMode(this)
+				
 				this.iLaunchMode.registerAction(new this.SystemShutdownAction(function, "Shutdown"))
+			}
 			else
 				this.logFunctionNotFound(descriptor)
 		}
 		
-		this.registerMode(this.iLaunchMode)
+		if this.iLaunchMode
+			this.registerMode(this.iLaunchMode)
+		
 		controller.registerPlugin(this)
 		
 		this.initializeBackgroundTasks()
@@ -275,7 +286,10 @@ class SystemPlugin extends ControllerPlugin {
 				
 				if (runnable != false) {
 					action := new this.LaunchAction(function, appDescriptor[1], appDescriptor[2])
-					
+
+					if !this.iLaunchMode
+						this.iLaunchMode := new this.LaunchMode(this)
+				
 					this.iLaunchMode.registerAction(action)
 				
 					runnable.connectAction(function, action)
@@ -286,6 +300,27 @@ class SystemPlugin extends ControllerPlugin {
 			else
 				this.logFunctionNotFound(descriptor)
 		}
+	}
+	
+	createLaunchAction(controller, label, application, function) {
+		function := this.Controller.findFunction(function)
+			
+		if (function != false) {
+			runnable := this.findRunnableApplication(application)
+			
+			if (runnable != false) {
+				action := new this.LaunchAction(function, label, application)
+
+				if !this.iLaunchMode
+					this.iLaunchMode := new this.LaunchMode(this)
+			
+				this.iLaunchMode.registerAction(action)
+			
+				runnable.connectAction(function, action)
+			}
+		}
+		else
+			logMessage(kLogWarn, translate("Application ") . application . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
 	}
 	
 	simulatorStartup(simulator) {

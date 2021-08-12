@@ -113,7 +113,7 @@ Using *Activation Command* you can supply a keyword or a complete phrase to focu
 
 Before you can use the voice capabilities of Simulator Controller, you must configure Windows for voice generation and recognition. Voice generation is normally preinstalled and preconfigured, but you can add additional voices using the Windows Settings dialog. The speech recognition runtime from Microsoft is not necessarily part of a Windows standard distribution. You can check this in your Settings dialog as well. If you do not have any voice recognition capabilities available, you can use the installer provided for your convenience in the *Utilities\3rd party* folder, as long you have a 64-bit Windows installation. Please install the runtime first and the two provided language packs for English and German afterwards. Alternatively you can download the necessary installation files from [this site at Microsoft](https://www.microsoft.com/en-us/download/details.aspx?id=16789).
 
-Note: You can use the [Key Detector Tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#key-detector-tool) to find out, which button codes your connected controller actually use, by clicking the small button on the right side of the *Push To Talk* entry field. If you push a simple button on your external controller, the corresponding hotkey name will be inserted into the *Push To Talk* edit field.
+Note: You can use the [Trigger Detector Tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#trigger-detector-tool) to find out, which button codes your connected controller actually use, by clicking the small button on the right side of the *Push To Talk* entry field. If you push a simple button on your external controller, the corresponding hotkey name will be inserted into the *Push To Talk* edit field.
 
 ### Tab *Plugins*
 
@@ -181,7 +181,7 @@ Below you will find a brief and incomplete overview over the possible hotkeys, t
 | F1 - Fn | A function key on the keyboard, if avilable. |
 | Numpad0 - Numpad9 | A numpad key on the keyboard, if avilable. These will only be send, if NumLock is activated on the keyboard. |
 | LMouse, RMouse | The left and the right mouse button. |
-| {X}Joy{Y}| The y-th button on the x-th connected joystick or general hardware controller. Example: "2Joy7". You can use the [Key Detector Tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#key-detector-tool) to find out, which button codes your connected controller actually use. |
+| {X}Joy{Y}| The y-th button on the x-th connected joystick or general hardware controller. Example: "2Joy7". You can use the [Trigger Detector Tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#trigger-detector-tool) to find out, which button codes your connected controller actually use. |
 
 #### Actions
 
@@ -226,10 +226,10 @@ Although you may call any globally defined function, you should use only the fol
 | preparePitstop | - | Race Engineer | *preparePitstop* triggers Jona, the Virtual Race Engineer, to prepare a previously planned pitstop. |
 | openRaceSettings | import | Race Engineer, Race Strategist | Opens the settings tool, with which you can edit all the race specific settings, Jona needs for a given race. If you supply *true* for the optional *import* parameter, the setup data is imported directly from a running simulation and the dialog is not opened. |
 | openSetupDatabase | - | Race Engineer, Race Strategist | Opens the query tool for the setup database, with which you can get the tyre pressures for a given session depending on the current environmental conditions. If a simulation is currently running, most of the query arguments will already be prefilled. |
- 
-#### Key Detector Tool
 
-This little tool will help you identifying the button numbers of your hardware controller. If you push the "Key Detector" button, a flying tool tip will apear next to your mouse cursor, which provide some information about your connected controller devices and the buttons or other triggers, that are currently beeing pushed there. To disable the tool tip, press the "Key Detector" button again.
+#### Trigger Detector Tool
+
+This little tool will help you identifying the button numbers of your hardware controller. If you push the "Trigger..." button, a flying tool tip will apear next to your mouse cursor, which provide some information about your connected controller devices and the buttons or other triggers, that are currently beeing pushed there. To disable the tool tip, press the "Trigger..." button again.
 
 ### Tab *Launchpad*
 
@@ -305,10 +305,12 @@ Beginning with Release 2.5 it is possible to define Button Box layouts using a s
 	Label=56 x 30
 	[Layouts]
 	Controller 1.Layout=3 x 5
+	Controller 1.Visible=true
 	Controller 1.1=Switch.1,Label;Switch.2,Label;Switch.3,Label;Switch.4,Label;Switch.5,Label
 	Controller 1.2=Push.1,Label;Push.2,Label;Push.3,Label;Push.4,Label;Rotary.1,Label
 	Controller 1.3=Push.5,Label;Push.6,Label;Push.7,Label;Push.8,Label;Rotary.2,Label
 	Controller 2.Layout=3 x 4, 20, 60, 20, 15
+	Controller 2.Visible=true
 	Controller 2.1=Push.9,Label;Push.10,Label;Push.11,Label;Push.12,Label
 	Controller 2.2=Push.13,Label;Push.14,Label;Push.15,Label;Push.16,Label
 	Controller 2.3=Push.17,Label;Push.18,Label;Push.19,Label;Push.20,Label

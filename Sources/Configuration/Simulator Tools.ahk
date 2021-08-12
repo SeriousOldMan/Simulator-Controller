@@ -149,7 +149,7 @@ viewFile(fileName, title := false, x := "Center", y := "Center", width := 800, h
 	innerWidth := width - 16
 	
 	Gui FV:-Border -Caption
-	Gui FV:Color, D0D0D0
+	Gui FV:Color, D0D0D0, E5E5E5
 	Gui FV:Font, s10 Bold
 	Gui FV:Add, Text, x8 y8 W%innerWidth% +0x200 +0x1 BackgroundTrans gmoveFileViewer, % translate("Modular Simulator Controller System - Compiler")
 	Gui FV:Font
@@ -340,7 +340,7 @@ editTargets(command := "") {
 			Throw "Too many build targets detected in editTargets..."
 		
 		Gui TE:-Border ; -Caption
-		Gui TE:Color, D0D0D0
+		Gui TE:Color, D0D0D0, E5E5E5
 	
 		Gui TE:Font, Bold, Arial
 		
@@ -1294,38 +1294,78 @@ runCopyTargets(ByRef buildProgress) {
 			
 		logMessage(kLogInfo, translate("Check ") . targetName)
 
-		copy := false
-		
 		targetSource := target[2]
 		targetDestination := target[3]
 		
-		FileGetTime srcLastModified, %targetSource%, M
-		FileGetTime dstLastModified, %targetDestination%, M
-		
-		if srcLastModified
-			if dstLastModified
-				copy := (srcLastModified > dstLastModified)
-			else
-				copy := true
-		
-		if copy {
-			if !kSilentMode
-				showProgress({progress: buildProgress, message: translate("Copying ") . targetName . translate("...")})
-		
-			logMessage(kLogInfo, targetName . translate(" out of date - update needed"))
-			logMessage(kLogInfo, translate("Copying ") . targetSource)
+		if InStr(targetSource, "*") {
+			FileCreateDir %targetDestination%
 			
-			SplitPath targetDestination, , targetDirectory
-			
-			FileCreateDir %targetDirectory%
-			FileCopy %targetSource%, %targetDestination%, 1
-			
-			Sleep 50
-		
-			buildProgress += (100 / (vTargetsCount + 1))
+			Loop Files, %targetSource%
+			{
+				targetFile := (targetDestination . A_LoopFileName)
 				
-			if !kSilentMode
-				showProgress({progress: buildProgress})
+				FileGetTime srcLastModified, %A_LoopFilePath%, M
+				FileGetTime dstLastModified, %targetFile%, M
+				
+				if srcLastModified {
+					if dstLastModified
+						copy := (srcLastModified > dstLastModified)
+					else
+						copy := true
+				}
+				else
+					copy := false
+				
+				if copy {
+					if !kSilentMode
+						showProgress({progress: buildProgress, message: translate("Copying ") . targetName . translate("...")})
+				
+					logMessage(kLogInfo, targetName . translate(" out of date - update needed"))
+					logMessage(kLogInfo, translate("Copying ") . A_LoopFilePath)
+					
+					FileCopy %A_LoopFilePath%, %targetFile%, 1
+					
+					Sleep 50
+				
+					buildProgress += (100 / (vTargetsCount + 1))
+						
+					if !kSilentMode
+						showProgress({progress: buildProgress})
+				}
+			}
+		}
+		else {
+			FileGetTime srcLastModified, %targetSource%, M
+			FileGetTime dstLastModified, %targetDestination%, M
+			
+			if srcLastModified {
+				if dstLastModified
+					copy := (srcLastModified > dstLastModified)
+				else
+					copy := true
+			}
+			else
+				copy := false
+			
+			if copy {
+				if !kSilentMode
+					showProgress({progress: buildProgress, message: translate("Copying ") . targetName . translate("...")})
+			
+				logMessage(kLogInfo, targetName . translate(" out of date - update needed"))
+				logMessage(kLogInfo, translate("Copying ") . targetSource)
+				
+				SplitPath targetDestination, , targetDirectory
+				
+				FileCreateDir %targetDirectory%
+				FileCopy %targetSource%, %targetDestination%, 1
+				
+				Sleep 50
+			
+				buildProgress += (100 / (vTargetsCount + 1))
+					
+				if !kSilentMode
+					showProgress({progress: buildProgress})
+			}
 		}
 	}
 }

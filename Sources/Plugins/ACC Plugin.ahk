@@ -664,7 +664,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			SplitPath image, fileName
 			
 			Gui LABEL:-Border -Caption +AlwaysOnTop
-			Gui LABEL:Color, D0D0D0
+			Gui LABEL:Color, D0D0D0, E5E5E5
 			Gui LABEL:Add, Text, x0 y0 w100 h23 +0x200 +0x1 BackgroundTrans, %fileName%
 			
 			Gui LABEL:Show, AutoSize x%x%, y%y%

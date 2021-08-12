@@ -53,9 +53,13 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 				calibrations.Push("""" . action . """ " . (IsObject(function) ? function[1] : function))
 		}
 		
-		if (calibrations.Length() > 0)
+		if (calibrations.Length() > 0) {
+			if (arguments != "")
+				arguments .= "; "
+
 			arguments .= ("pedalCalibrations: " . values2String(", ", calibrations*))
-				
+		}
+		
 		new Plugin("Pedal Calibration", false, true, "", arguments).saveToConfiguration(configuration)
 	}
 	

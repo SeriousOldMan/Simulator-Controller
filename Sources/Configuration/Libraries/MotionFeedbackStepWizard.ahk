@@ -233,7 +233,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Motion Feedback", "Motion Feedback.Actions.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
 
-		Gui %window%:Add, ActiveX, x%x% yp+275 w%width% h80 HWNDmotionFeedbackInfoTextHandle VmotionFeedbackInfoText Hidden, shell explorer
+		Gui %window%:Add, ActiveX, x%x% yp+275 w%width% h137 HWNDmotionFeedbackInfoTextHandle VmotionFeedbackInfoText Hidden, shell explorer
 
 		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
@@ -585,7 +585,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 						intensity := ""
 					}
 					
-					LV_Add("", (first ? translate(mode ? mode : "Independent") : ""), action, label, state ? "On" : "Off", intensity, function)
+					LV_Add("", (first ? translate(mode ? mode : "Independent") : ""), action, label, translate(state ? "On" : "Off"), intensity, function)
 					
 					count += 1
 				}

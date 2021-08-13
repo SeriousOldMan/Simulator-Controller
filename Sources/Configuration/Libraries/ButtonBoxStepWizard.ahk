@@ -125,7 +125,7 @@ class ButtonBoxStepWizard extends StepWizard {
 		functionsInfoTextHandle := false
 		
 		labelWidth := width - 30
-		labelX := x + 45
+		labelX := x + 35
 		labelY := y + 8
 		
 		Gui %window%:Font, s10 Bold, Arial
@@ -142,7 +142,7 @@ class ButtonBoxStepWizard extends StepWizard {
 		
 		Sleep 200
 		
-		Gui %window%:Add, ActiveX, x%x% yp+245 w%width% h195 HWNDfunctionsInfoTextHandle VfunctionsInfoText Hidden, shell explorer
+		Gui %window%:Add, ActiveX, x%x% yp+245 w%width% h195 HWNDfunctionsInfoTextHandle VfunctionsInfoText Hidden, shell.explorer
 
 		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
@@ -521,6 +521,10 @@ class ButtonBoxPreviewStepWizard extends StepWizard {
 		return false
 	}
 	
+	createButtonBoxPreview(controller, configuration) {
+		return new ButtonBoxPreview(this, controller, configuration)
+	}
+	
 	openButtonBoxes() {
 		local function
 		
@@ -538,7 +542,7 @@ class ButtonBoxPreviewStepWizard extends StepWizard {
 			}
 			
 			for index, controller in controllers {
-				preview := new ButtonBoxPreview(this, controller, configuration)
+				preview := this.createButtonBoxPreview(controller, configuration)
 			
 				preview.setControlClickHandler(ObjBindMethod(this, "controlClick"))
 			
@@ -606,6 +610,56 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 	iLabels := {}
 	iFunctions := {}
 	iArguments := {}
+	
+	class ActionsButtonBoxPreview extends ButtonBoxPreview {
+		iModeDropDownHandle := false
+		
+		iModes := []
+		
+		Mode[] {
+			Get {
+				GuiControlGet mode, , % this.iModeDropDownHandle
+				
+				if (mode == translate("All Modes"))
+					return true
+				else if (mode == translate("Independent"))
+					return false
+				else
+					for ignore, candidate in this.iModes
+						if (mode = translate(candidate))
+							return mode
+		
+				return true
+			}
+		}	
+		
+		__New(previewManager, name, configuration, modes) {
+			this.iModes := modes
+			
+			base.__New(previewManager, name, configuration)
+		}
+		
+		createGui(configuration) {
+			base.createGui(configuration)
+			
+			window := this.Window
+			
+			modeDropDownHandle := false
+			modes := []
+			
+			for ignore, mode in this.iModes
+				if mode
+					modes.Push(translate(mode))
+				else
+					modes.Push(translate("Independent"))
+			
+			modes.InsertAt(1, translate("All Modes"))
+			
+			Gui %window%:Add, DropDownList, x8 y8 w75 Choose1 HWNDmodeDropDownHandle gupdateButtonBoxLabels, % values2String("|", modes*)
+			
+			this.iModeDropDownHandle := modeDropDownHandle
+		}
+	}
 	
 	ActionsListView[] {
 		Get {
@@ -795,6 +849,10 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 		this.iArguments := {}
 	}
 	
+	createButtonBoxPreview(controller, configuration) {
+		return new this.ActionsButtonBoxPreview(this, controller, configuration, this.getModes())
+	}
+	
 	openButtonBoxes() {
 		base.openButtonBoxes()
 		
@@ -814,22 +872,26 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 			row := false
 			column := false
 		
-			for ignore, preview in this.ButtonBoxPreviews
+			for ignore, preview in this.ButtonBoxPreviews {
+				targetMode := preview.Mode
+			
 				for ignore, mode in this.getModes()
-					for ignore, action in this.getActions(mode)
-						if wizard.moduleActionAvailable(module, mode, action) {
-							function := this.getActionFunction(mode, action)
-							
-							if (function && (function != "")) {
-								if !IsObject(function)
-									function := Array(function)
+					if ((targetMode == true) || (mode = targetMode))
+						for ignore, action in this.getActions(mode)
+							if wizard.moduleActionAvailable(module, mode, action) {
+								function := this.getActionFunction(mode, action)
 								
-								for ignore, partFunction in function
-									if (partFunction && (partFunction != ""))
-										if preview.findFunction(partFunction, row, column)
-											preview.setLabel(row, column, this.getActionLabel(this.getActionRow(mode, action), partFunction))
+								if (function && (function != "")) {
+									if !IsObject(function)
+										function := Array(function)
+									
+									for ignore, partFunction in function
+										if (partFunction && (partFunction != ""))
+											if preview.findFunction(partFunction, row, column)
+												preview.setLabel(row, column, this.getActionLabel(this.getActionRow(mode, action), partFunction))
+								}
 							}
-						}
+			}
 		}
 	}
 	
@@ -1124,6 +1186,10 @@ updateActionFunction(wizard) {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+updateButtonBoxLabels() {
+	SetupWizard.Instance.Step.loadButtonBoxLabels()
+}
 
 showSelectorHint() {
 	if (GetKeyState("Esc", "P") || !vCurrentRegistrationWizard) {

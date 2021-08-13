@@ -84,7 +84,7 @@ class ApplicationsStepWizard extends StepWizard {
 		simulatorsInfoTextHandle := false
 		
 		labelWidth := width - 30
-		labelX := x + 45
+		labelX := x + 35
 		labelY := y + 8
 		
 		Gui %window%:Font, s10 Bold, Arial
@@ -101,7 +101,7 @@ class ApplicationsStepWizard extends StepWizard {
 
 		Sleep 200
 		
-		Gui %window%:Add, ActiveX, x%x% yp+205 w%width% h180 HWNDsimulatorsInfoTextHandle VsimulatorsInfoText Hidden, shell explorer
+		Gui %window%:Add, ActiveX, x%x% yp+205 w%width% h180 HWNDsimulatorsInfoTextHandle VsimulatorsInfoText Hidden, shell.explorer
 
 		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
@@ -133,7 +133,7 @@ class ApplicationsStepWizard extends StepWizard {
 		
 		Sleep 200
 			
-		Gui %window%:Add, ActiveX, x%x% yp+265 w%width% h120 HWNDapplicationsInfoTextHandle VapplicationsInfoText Hidden, shell explorer
+		Gui %window%:Add, ActiveX, x%x% yp+265 w%width% h120 HWNDapplicationsInfoTextHandle VapplicationsInfoText Hidden, shell.explorer
 
 		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 

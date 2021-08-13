@@ -382,11 +382,11 @@ class SetupWizard extends ConfigurationItem {
 		
 		Sleep 200
 		
-		Gui %window%:Add, ActiveX, x12 yp+10 w350 h545 vinfoViewer, shell explorer
+		Gui %window%:Add, ActiveX, x12 yp+10 w350 h545 vinfoViewer, shell.explorer
 	
 		infoViewer.Navigate("about:blank")
 		
-		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
+		html := "<html><head><meta http-equiv=""X-UA-Compatible"" content=""IE=Edge""></head><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
 
 		infoViewer.Document.Write(html)
 		
@@ -1597,7 +1597,7 @@ class StartStepWizard extends StepWizard {
 		
 		Sleep 200
 		
-		Gui %window%:Add, ActiveX, x%x% y%y% w%width% h%height% HWNDimageViewerHandle VimageViewer Hidden, shell explorer
+		Gui %window%:Add, ActiveX, x%x% y%y% w%width% h%height% HWNDimageViewerHandle VimageViewer Hidden, shell.explorer
 	
 		text := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Start", "Start.Text." . getLanguage()))
 		image := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Start", "Start.Image"))
@@ -1617,7 +1617,7 @@ class StartStepWizard extends StepWizard {
 		
 		if !A_IsAdmin {
 			labelWidth := width - 30
-			labelX := x + 45
+			labelX := x + 35
 			labelY := y + 8
 			
 			iconHandle := false
@@ -1637,7 +1637,7 @@ class StartStepWizard extends StepWizard {
 		
 			Sleep 200
 			
-			Gui %window%:Add, ActiveX, x%x% yp+30 w%width% h350 HWNDinfoTextHandle VinfoText Hidden, shell explorer
+			Gui %window%:Add, ActiveX, x%x% yp+30 w%width% h350 HWNDinfoTextHandle VinfoText Hidden, shell.explorer
 			
 			x := x + Round(width / 2) - 120
 			
@@ -1749,7 +1749,7 @@ class FinishStepWizard extends StepWizard {
 		
 		imageViewerHandle := false
 		
-		Gui %window%:Add, ActiveX, x%x% y%y% w%width% h%height% HWNDimageViewerHandle VimageViewer Hidden, shell explorer
+		Gui %window%:Add, ActiveX, x%x% y%y% w%width% h%height% HWNDimageViewerHandle VimageViewer Hidden, shell.explorer
 	
 		image := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Finish", "Finish.Image"))
 		text := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Finish", "Finish.Text." . getLanguage()))

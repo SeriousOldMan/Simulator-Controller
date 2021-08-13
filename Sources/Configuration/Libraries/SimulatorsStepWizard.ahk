@@ -118,7 +118,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		actionsInfoTextHandle := false
 		
 		labelWidth := width - 30
-		labelX := x + 45
+		labelX := x + 35
 		labelY := y + 8
 		
 		Gui %window%:Font, s10 Bold, Arial
@@ -199,7 +199,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		
 		Sleep 200
 		
-		Gui %window%:Add, ActiveX, x%x% yp+305 w%width% h76 HWNDactionsInfoTextHandle VactionsInfoText Hidden, shell explorer
+		Gui %window%:Add, ActiveX, x%x% yp+305 w%width% h76 HWNDactionsInfoTextHandle VactionsInfoText Hidden, shell.explorer
 
 		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
@@ -496,21 +496,24 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		simulator := this.iCurrentSimulator
 		
 		for ignore, preview in this.ButtonBoxPreviews {
+			targetMode := preview.Mode
+		
 			for ignore, mode in this.getModes()
-				for ignore, action in this.getActions(mode, simulator)
-					if wizard.simulatorActionAvailable(simulator, mode, action) {
-						function := this.getActionFunction(mode, action)
-							
-						if (function && (function != "")) {
-							if !IsObject(function)
-								function := Array(function)
+				if ((targetMode == true) || (mode = targetMode))
+					for ignore, action in this.getActions(mode, simulator)
+						if wizard.simulatorActionAvailable(simulator, mode, action) {
+							function := this.getActionFunction(mode, action)
 								
-							for ignore, partFunction in function
-								if (partFunction && (partFunction != ""))
-									if preview.findFunction(partFunction, row, column)
-										preview.setLabel(row, column, this.getActionLabel(this.getActionRow(mode, action), partFunction))
+							if (function && (function != "")) {
+								if !IsObject(function)
+									function := Array(function)
+									
+								for ignore, partFunction in function
+									if (partFunction && (partFunction != ""))
+										if preview.findFunction(partFunction, row, column)
+											preview.setLabel(row, column, this.getActionLabel(this.getActionRow(mode, action), partFunction))
+							}
 						}
-					}
 		}
 	}
 }

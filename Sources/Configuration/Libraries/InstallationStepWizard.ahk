@@ -107,7 +107,7 @@ class InstallationStepWizard extends StepWizard {
 				buttonX -= 95
 			
 			labelWidth := width - 60 - 90 - (locatable * 95)
-			labelX := x + 45
+			labelX := x + 35
 			labelY := y + 8
 			
 			Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDiconHandle Hidden, %kResourcesDirectory%Setup\Images\Install.png
@@ -130,7 +130,7 @@ class InstallationStepWizard extends StepWizard {
 			
 			Sleep 200
 			
-			Gui %window%:Add, ActiveX, x%x% yp+33 w%width% h120 HWNDinfoTextHandle VinfoText%A_Index% Hidden, shell explorer
+			Gui %window%:Add, ActiveX, x%x% yp+33 w%width% h120 HWNDinfoTextHandle VinfoText%A_Index% Hidden, shell.explorer
 
 			html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 

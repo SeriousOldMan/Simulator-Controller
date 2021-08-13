@@ -163,7 +163,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 			actionsInfoTextHandle := false
 			
 			labelWidth := width - 30
-			labelX := x + 45
+			labelX := x + 35
 			labelY := y + 8
 			
 			Gui %window%:Font, s10 Bold, Arial
@@ -198,7 +198,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 			
 			Sleep 200
 			
-			Gui %window%:Add, ActiveX, x%x% yp+352 w%width% h58 HWNDactionsInfoTextHandle VactionsInfoText%page% Hidden, shell explorer
+			Gui %window%:Add, ActiveX, x%x% yp+352 w%width% h58 HWNDactionsInfoTextHandle VactionsInfoText%page% Hidden, shell.explorer
 
 			html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 

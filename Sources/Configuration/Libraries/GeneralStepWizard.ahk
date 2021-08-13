@@ -185,12 +185,12 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 		Gui %window%:Add, ListBox, x%secondX% yp w120 h60 Disabled ReadOnly HWNDmodeSelectorsListHandle Hidden
 		
 		Gui %window%:Add, Text, x%x% yp+60 w140 h23 +0x200 HWNDlaunchApplicationsLabelHandle Hidden, % translate("Launchpad Mode")
-		Gui %window%:Add, ListView, x%x% yp+24 w%col1Width% h114 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDlaunchApplicationsListHandle gupdateApplicationFunction Hidden, % values2String("|", map(["Application", "Label", "Function"], "translate")*)
+		Gui %window%:Add, ListView, x%x% yp+24 w%col1Width% h112 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDlaunchApplicationsListHandle gupdateApplicationFunction Hidden, % values2String("|", map(["Application", "Label", "Function"], "translate")*)
 		
 		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.General", "General.Settings.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
 
-		Gui %window%:Add, ActiveX, x%x% yp+120 w%width% h91 HWNDgeneralInfoTextHandle VgeneralInfoText Hidden, shell explorer
+		Gui %window%:Add, ActiveX, x%x% yp+118 w%width% h94 HWNDgeneralInfoTextHandle VgeneralInfoText Hidden, shell explorer
 
 		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
@@ -211,7 +211,7 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 		
 		this.iVoiceControlConfigurator := configurator
 		
-		configurator.createGui(this, col2X, labelY + 33 + 30, col2Width, height, 0)
+		configurator.createGui(this, col2X, labelY + 30 + 30, col2Width, height, 0)
 		configurator.hideWidgets()
 		
 		this.iModeSelectorsListHandle := modeSelectorsListHandle

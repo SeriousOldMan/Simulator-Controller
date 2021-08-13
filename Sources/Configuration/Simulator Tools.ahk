@@ -1576,7 +1576,7 @@ startSimulatorTools() {
 	if !updateOnly {
 		runCleanTargets(buildProgress)
 		
-		if ((kMSBuildDirectory != "") && (vSpecialTargets.Length() > 0))
+		if (vSpecialTargets.Length() > 0)
 			runSpecialTargets(buildProgress)
 		
 		runCopyTargets(buildProgress)

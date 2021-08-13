@@ -256,8 +256,8 @@ editModes(ByRef settingsOrCommand, globalConfiguration := false) {
 
 		Gui ME:Font, Norm, Arial
 				
-		Gui ME:Add, Button, x88 y290 w80 h23 Default gsaveModes, % translate("Ok")
-		Gui ME:Add, Button, x186 y290 w80 h23 gcancelModes, % translate("&Cancel")
+		Gui ME:Add, Button, x170 y280 w80 h23 Default gsaveModes, % translate("Ok")
+		Gui ME:Add, Button, x260 y280 w80 h23 gcancelModes, % translate("&Cancel")
 		
 		simulators := []
 	

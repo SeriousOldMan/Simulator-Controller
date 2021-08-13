@@ -328,14 +328,14 @@ class SetupWizard extends ConfigurationItem {
 
 		Gui %window%:Add, Text, w684 Center gmoveSetupWizard, % translate("Modular Simulator Controller System") 
 		
-		Gui %window%:Font, s8 Norm, Arial
+		Gui %window%:Font, s9 Norm, Arial
 		Gui %window%:Font, Italic Underline, Arial
 
 		Gui %window%:Add, Text, YP+20 w684 cBlue Center gopenSetupDocumentation, % translate("Setup && Configuration")
 		
 		Gui %window%:Add, Text, yp+20 w700 0x10
 
-		Gui %window%:Font, Norm, Arial
+		Gui %window%:Font, s8 Norm, Arial
 		
 		Gui %window%:Add, Button, x16 y540 w30 h30 HwndpreviousButtonHandle Disabled VpreviousPageButton GpreviousPage
 		setButtonIcon(previousButtonHandle, kIconsDirectory . "Previous.ico", 1, "L2 T2 R2 B2 H24 W24")
@@ -374,7 +374,7 @@ class SetupWizard extends ConfigurationItem {
 
 		Gui %window%:Add, Text, w350 Center gmoveSetupHelp VstepTitle, % translate("Title")
 		
-		Gui %window%:Font, s8 Norm, Arial
+		Gui %window%:Font, s9 Norm, Arial
 
 		Gui %window%:Add, Text, YP+20 w350 Center VstepSubtitle, % translate("Subtitle")
 		
@@ -390,10 +390,10 @@ class SetupWizard extends ConfigurationItem {
 
 		infoViewer.Document.Write(html)
 		
-		this.createSteps()
+		this.createStepsGui()
 	}
 	
-	createSteps() {
+	createStepsGui() {
 		local stepWizard
 		
 		x := 0
@@ -1318,7 +1318,7 @@ class SetupWizard extends ConfigurationItem {
 		
 		Gui %window%:Default
 		
-		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . html . "</body></html>"
+		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . html . "</body></html>"
 
 		infoViewer.Document.Open()
 		infoViewer.Document.Write(html)
@@ -1626,7 +1626,7 @@ class StartStepWizard extends StepWizard {
 			restartButtonHandle := false
 			
 			info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Start", "Start.Unblocking.Info." . getLanguage()))
-			info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'>" . info . "</div>"
+			info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px'>" . info . "</div>"
 			
 			Gui %window%:Font, s10 Bold, Arial
 			
@@ -1917,6 +1917,31 @@ elevateAndRestart() {
 	}
 }
 
+fixIE(version := 0, exeName := "") {
+	static key := "Software\Microsoft\Internet Explorer\MAIN\FeatureControl\FEATURE_BROWSER_EMULATION"
+	static versions := {7: 7000, 8: 8888, 9: 9999, 10: 10001, 11: 11001}
+	
+	if versions.HasKey(version)
+		Version := Versions[Version]
+	
+	if !exeName {
+		if A_IsCompiled
+			exeName := A_ScriptName
+		else
+			SplitPath A_AhkPath, exeName
+	}
+	
+	RegRead PreviousValue, HKCU, %key%, %exeName%
+
+	if (version = "")
+		RegDelete, HKCU, %key%, %exeName%
+	else
+		RegWrite, REG_DWORD, HKCU, %key%, %exeName%, %version%
+	
+	return previousValue
+}
+
+
 LV_ClickedColumn(listViewHandle) {
 	static LVM_SUBITEMHITTEST := 0x1039
 
@@ -2005,7 +2030,8 @@ initializeSimulatorSetup() {
 		setConfigurationSectionValues(kSimulatorConfiguration, "Splash Themes", getConfigurationSectionValues(definition, "Splash Themes"))
 	
 		setConfigurationValue(kSimulatorConfiguration, "Splash Window", "Title", translate("Modular Simulator Controller System") . translate(" - ") . translate("Setup && Configuration"))
-		showSplashTheme("McLaren 720s GT3 Pictures")
+		
+		showSplashTheme("Rotating Brain")
 	
 		wizard := new SetupWizard(kSimulatorConfiguration, definition)
 		
@@ -2028,7 +2054,14 @@ startupSimulatorSetup() {
 		wizard.dumpRules(wizard.KnowledgeBase)
 	
 restartSetup:
-	wizard.createGui(wizard.Configuration)
+	previous := fixIE()
+	
+	try {
+		wizard.createGui(wizard.Configuration)
+	}
+	finally {
+		fixIE(previous)
+	}
 	
 	wizard.startSetup()
 	

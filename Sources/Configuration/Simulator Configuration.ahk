@@ -488,10 +488,24 @@ initializeSimulatorConfiguration() {
 	
 	protectionOn()
 	
+	if (GetKeyState("Ctrl") && GetKeyState("Shift")) {
+		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+		title := translate("Configuration")
+		MsgBox 262436, %title%, % translate("Do you really want to start with a fresh configuration?")
+		OnMessage(0x44, "")
+		
+		IfMsgBox Yes
+			initialize := true
+		else
+			initialize := false
+	}
+	else
+		initialize := false
+			
 	try {
 		new ConfigurationEditor(FileExist("C:\Program Files\AutoHotkey") || GetKeyState("Ctrl")
 							 || (getConfigurationValue(kSimulatorConfiguration, "Configuration", "AHK Path", "") != "")
-							 , (GetKeyState("Ctrl") && GetKeyState("Shift")) ? newConfiguration() : kSimulatorConfiguration)
+							 , initialize ? newConfiguration() : kSimulatorConfiguration)
 	}
 	finally {
 		protectionOff()

@@ -196,6 +196,8 @@ class AssistantsStepWizard extends ActionsStepWizard {
 			info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Assistants", "Assistants.Actions.Info." . getLanguage()))
 			info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
 			
+			Sleep 200
+			
 			Gui %window%:Add, ActiveX, x%x% yp+352 w%width% h58 HWNDactionsInfoTextHandle VactionsInfoText%page% Hidden, shell explorer
 
 			html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"

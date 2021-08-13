@@ -66,15 +66,19 @@ class ButtonBoxStepWizard extends StepWizard {
 		
 		if wizard.isModuleSelected("Button Box") {
 			controls := {}
+			controllers := []
 			
 			for control, descriptor in getConfigurationSectionValues(controllerConfiguration, "Controls")
 				controls[control] := string2Values(";", descriptor)[1]
 			
 			for controller, definition in getConfigurationSectionValues(controllerConfiguration, "Layouts") {
 				controller := ConfigurationItem.splitDescriptor(controller)
-			
+
 				if ((controller[2] != "Layout") && (controller[2] != "Visible")) {
 					controller := controller[1]
+			
+					if !inList(controllers, controller)
+						controllers.Push(controller)
 				
 					for ignore, control in string2Values(";", definition) {
 						control := string2Values(",", control)[1]
@@ -93,6 +97,15 @@ class ButtonBoxStepWizard extends StepWizard {
 						}
 					}
 				}
+			}
+			
+			if (controllers.Length() > 0) {
+				Loop % controllers.Length()
+				{
+					controllers[A_Index] := (controllers[A_Index] . ":" . controllers[A_Index])
+				}
+				
+				setConfigurationValue(configuration, "Controller Layouts", "Button Boxes", values2String("|", controllers*))
 			}
 		}
 	}
@@ -126,6 +139,8 @@ class ButtonBoxStepWizard extends StepWizard {
 		
 		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Button Box", "Button Box.Functions.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
+		
+		Sleep 200
 		
 		Gui %window%:Add, ActiveX, x%x% yp+245 w%width% h195 HWNDfunctionsInfoTextHandle VfunctionsInfoText Hidden, shell explorer
 
@@ -686,12 +701,18 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 		return this.iDescriptors[row]
 	}
 	
-	setActionLabel(row, label) {
-		this.iLabels[row] := label
+	setActionLabel(row, function, label) {
+		this.iLabels[row . "." . function] := label
 	}
 	
-	getActionLabel(row) {
-		return this.iLabels[row]
+	getActionLabel(row, function := false) {
+		if function {
+			key := (row . "." . function)
+			
+			return this.iLabels[this.iLabels.HasKey(key) ? key : row]
+		}
+		else
+			return this.iLabels[row]
 	}
 	
 	clearActions() {
@@ -806,7 +827,7 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 								for ignore, partFunction in function
 									if (partFunction && (partFunction != ""))
 										if preview.findFunction(partFunction, row, column)
-											preview.setLabel(row, column, this.getActionLabel(this.getActionRow(mode, action)))
+											preview.setLabel(row, column, this.getActionLabel(this.getActionRow(mode, action), partFunction))
 							}
 						}
 		}

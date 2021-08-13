@@ -1,5 +1,5 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Tactile Feedback Step Wizard   ;;;
+;;;   Modular Simulator Controller System - Tactile Feedback Step Wizard    ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2021) Creative Commons - BY-NC-SA                        ;;;
@@ -17,7 +17,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; TactileFeedbackStepWizard                                              ;;;
+;;; TactileFeedbackStepWizard                                               ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class TactileFeedbackStepWizard extends ActionsStepWizard {
@@ -176,6 +176,8 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Tactile Feedback", "Tactile Feedback.Actions.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
 
+		Sleep 200
+		
 		Gui %window%:Add, ActiveX, x%x% yp+275 w%width% h135 HWNDtactileFeedbackInfoTextHandle VtactileFeedbackInfoText Hidden, shell explorer
 
 		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
@@ -365,8 +367,18 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 					if function {
 						if (function.Length() == 1)
 							function := (!isBinary ? function[1] : ((mode ? translate("+/-: ") : translate("On/Off: ")) . function[1]))
-						else
+						else {
+							onLabel := getConfigurationValue(pluginLabels, "Tactile Feedback", action . ".Increase", false)
+							offLabel := getConfigurationValue(pluginLabels, "Tactile Feedback", action . ".Decrease", false)
+							
+							if (onLabel && (function[1] != ""))
+								this.setActionLabel(count, function[1], onLabel)
+							
+							if (offLabel && (function[2] != ""))
+								this.setActionLabel(count, function[2], offLabel)
+							
 							function := ((mode ? translate("+: ") : translate("On: ")) . function[1] . (mode ? translate(" | -: ") : translate(" | Off: ")) . function[2])
+						}
 					}
 					else
 						function := ""

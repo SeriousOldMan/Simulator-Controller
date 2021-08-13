@@ -251,8 +251,39 @@ class SetupWizard extends ConfigurationItem {
 		}
 		
 		this.iCount := count
+		
+		if (GetKeyState("Ctrl") && GetKeyState("Shift")) {
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+			title := translate("Setup")
+			MsgBox 262436, %title%, % translate("Do you really want to start with a fresh configuration?")
+			OnMessage(0x44, "")
+			
+			IfMsgBox Yes
+				initialize := true
+			else
+				initialize := false
+		}
+		else
+			initialize  := false
 
-		if ((GetKeyState("Ctrl") && GetKeyState("Shift")) || !this.loadKnowledgeBase())
+		if initialize {
+			try {
+				FileDelete %kUserHomeDirectory%Install\Button Box Configuration.ini
+			}
+			catch exception {
+				; ignore
+			}
+			
+			try {
+				FileDelete %kUserHomeDirectory%Install\Voice Control Configuration.ini
+			}
+			catch exception {
+				; ignore
+			}
+			
+			this.KnowledgeBase.addFact("Initialize", true)
+		}
+		else if !this.loadKnowledgeBase()
 			this.KnowledgeBase.addFact("Initialize", true)
 			
 		this.KnowledgeBase.produce()
@@ -348,6 +379,8 @@ class SetupWizard extends ConfigurationItem {
 		Gui %window%:Add, Text, YP+20 w350 Center VstepSubtitle, % translate("Subtitle")
 		
 		Gui %window%:Add, Text, yp+20 w350 0x10
+		
+		Sleep 200
 		
 		Gui %window%:Add, ActiveX, x12 yp+10 w350 h545 vinfoViewer, shell explorer
 	
@@ -1562,6 +1595,8 @@ class StartStepWizard extends StepWizard {
 		
 		window := this.Window
 		
+		Sleep 200
+		
 		Gui %window%:Add, ActiveX, x%x% y%y% w%width% h%height% HWNDimageViewerHandle VimageViewer Hidden, shell explorer
 	
 		text := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Start", "Start.Text." . getLanguage()))
@@ -1599,6 +1634,8 @@ class StartStepWizard extends StepWizard {
 			Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h26 HWNDlabelHandle Hidden, % translate("Unblocking Applications and DLLs")
 			
 			Gui %window%:Font, s8 Norm, Arial
+		
+			Sleep 200
 			
 			Gui %window%:Add, ActiveX, x%x% yp+30 w%width% h350 HWNDinfoTextHandle VinfoText Hidden, shell explorer
 			
@@ -1810,9 +1847,8 @@ finishSetup(finish := false, save := false) {
 }
 
 cancelSetup() {
-	SetupWizard.Instance.finishSetup(false)
-	
-	ExitApp 0
+	if SetupWizard.Instance.finishSetup(false)
+		ExitApp 0
 }
 
 previousPage() {
@@ -1828,15 +1864,26 @@ nextPage() {
 }
 
 chooseLanguage() {
+	local code
+	
 	GuiControlGet languageDropDown
 	
 	languages := string2Values("|", getConfigurationValue(SetupWizard.Instance.Definition, "Setup", "Languages"))
 	
 	for code, language in availableLanguages()
 		if (language = languageDropDown) {
-			setLanguage(code)
+			if SetupWizard.Instance.finishSetup(false) {
+				setLanguage(code)
 			
-			vResult := kLanguage
+				vResult := kLanguage
+			}
+			else
+				for code, language in availableLanguages()
+					if (code = getLanguage()) {
+						GuiControl Choose, languageDropDown, %A_Index%
+						
+						break
+					}
 			
 			return
 		}
@@ -1953,7 +2000,13 @@ initializeSimulatorSetup() {
 	
 	try {
 		definition := readConfiguration(kResourcesDirectory . "Setup\Simulator Setup.ini")
-		
+	
+		setConfigurationSectionValues(kSimulatorConfiguration, "Splash Window", getConfigurationSectionValues(definition, "Splash Window"))
+		setConfigurationSectionValues(kSimulatorConfiguration, "Splash Themes", getConfigurationSectionValues(definition, "Splash Themes"))
+	
+		setConfigurationValue(kSimulatorConfiguration, "Splash Window", "Title", translate("Modular Simulator Controller System") . translate(" - ") . translate("Setup && Configuration"))
+		showSplashTheme("McLaren 720s GT3 Pictures")
+	
 		wizard := new SetupWizard(kSimulatorConfiguration, definition)
 		
 		wizard.registerStepWizard(new StartStepWizard(wizard, "Start", kSimulatorConfiguration))
@@ -1965,6 +2018,8 @@ initializeSimulatorSetup() {
 }
 
 startupSimulatorSetup() {
+	static first := true
+	
 	wizard := SetupWizard.Instance
 	
 	wizard.loadDefinition()
@@ -1976,6 +2031,12 @@ restartSetup:
 	wizard.createGui(wizard.Configuration)
 	
 	wizard.startSetup()
+	
+	if first {
+		first := false
+		
+		hideSplashTheme()
+	}
 	
 	done := false
 

@@ -808,7 +808,7 @@ restartUpdate:
 
 loadSimulatorConfiguration() {
 	kSimulatorConfiguration := readConfiguration(kSimulatorConfigurationFile)
-	vTargetLanguageCode := getConfigurationValue(kSimulatorConfiguration, "Configuration", "Language", "en")
+	vTargetLanguageCode := getConfigurationValue(kSimulatorConfiguration, "Configuration", "Language", getSystemLanguage())
 	
 	version := readConfiguration(kHomeDirectory . "VERSION")
 	section := getConfigurationValue(version, "Current", "Type", false)
@@ -1360,6 +1360,21 @@ setLanguage(languageCode) {
 	vTargetLanguageCode := languageCode
 }
 
+getSystemLanguage() {
+	languageCode_0407 := "German_Standard"
+	languageCode_0807 := "German_Swiss"
+	languageCode_0c07 := "German_Austrian"
+	languageCode_1007 := "German_Luxembourg"
+	languageCode_1407 := "German_Liechtenstein"
+	
+	language := languageCode_%A_Language%
+	
+	if InStr(language, "German")
+		return "DE"
+	else
+		return "EN"
+}
+
 getLanguage() {
 	return vTargetLanguageCode
 }
@@ -1414,6 +1429,8 @@ isInstance(object, root) {
 }
 
 getFileName(fileName, directories*) {
+	fileName := substituteVariables(fileName)
+	
 	SplitPath fileName, , , , , driveName
 
 	if (driveName && (driveName != ""))

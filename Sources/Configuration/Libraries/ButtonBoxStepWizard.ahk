@@ -699,12 +699,18 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 		return this.iDescriptors[row]
 	}
 	
-	setActionLabel(row, label) {
-		this.iLabels[row] := label
+	setActionLabel(row, function, label) {
+		this.iLabels[row . "." . function] := label
 	}
 	
-	getActionLabel(row) {
-		return this.iLabels[row]
+	getActionLabel(row, function := false) {
+		if function {
+			key := (row . "." . function)
+			
+			return this.iLabels[this.iLabels.HasKey(key) ? key : row]
+		}
+		else
+			return this.iLabels[row]
 	}
 	
 	clearActions() {
@@ -819,7 +825,7 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 								for ignore, partFunction in function
 									if (partFunction && (partFunction != ""))
 										if preview.findFunction(partFunction, row, column)
-											preview.setLabel(row, column, this.getActionLabel(this.getActionRow(mode, action)))
+											preview.setLabel(row, column, this.getActionLabel(this.getActionRow(mode, action), partFunction))
 							}
 						}
 		}

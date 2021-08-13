@@ -399,8 +399,18 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 					if function {
 						if (function.Length() == 1)
 							function := (!isBinary ? function[1] : ((isDial ? translate("+/-: ") : translate("On/Off: ")) . function[1]))
-						else
+						else {
+							onLabel := getConfigurationValue(pluginLabels, code, subAction . ".Increase", false)
+							offLabel := getConfigurationValue(pluginLabels, code, subAction . ".Decrease", false)
+							
+							if (onLabel && (function[1] != ""))
+								this.setActionLabel(count, function[1], onLabel)
+							
+							if (offLabel && (function[2] != ""))
+								this.setActionLabel(count, function[2], offLabel)
+							
 							function := ((isDial ? translate("+: ") : translate("On: ")) . function[1] . (isDial ? translate(" | -: ") : translate(" | Off: ")) . function[2])
+						}
 					}
 					else
 						function := ""
@@ -496,7 +506,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 							for ignore, partFunction in function
 								if (partFunction && (partFunction != ""))
 									if preview.findFunction(partFunction, row, column)
-										preview.setLabel(row, column, this.getActionLabel(this.getActionRow(mode, action)))
+										preview.setLabel(row, column, this.getActionLabel(this.getActionRow(mode, action), partFunction))
 						}
 					}
 		}

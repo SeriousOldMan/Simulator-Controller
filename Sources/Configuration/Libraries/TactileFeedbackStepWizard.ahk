@@ -1,5 +1,5 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Tactile Feedback Step Wizard   ;;;
+;;;   Modular Simulator Controller System - Tactile Feedback Step Wizard    ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2021) Creative Commons - BY-NC-SA                        ;;;
@@ -17,7 +17,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; TactileFeedbackStepWizard                                              ;;;
+;;; TactileFeedbackStepWizard                                               ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class TactileFeedbackStepWizard extends ActionsStepWizard {
@@ -365,8 +365,18 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 					if function {
 						if (function.Length() == 1)
 							function := (!isBinary ? function[1] : ((mode ? translate("+/-: ") : translate("On/Off: ")) . function[1]))
-						else
+						else {
+							onLabel := getConfigurationValue(pluginLabels, "Tactile Feedback", action . ".Increase", false)
+							offLabel := getConfigurationValue(pluginLabels, "Tactile Feedback", action . ".Decrease", false)
+							
+							if (onLabel && (function[1] != ""))
+								this.setActionLabel(count, function[1], onLabel)
+							
+							if (offLabel && (function[2] != ""))
+								this.setActionLabel(count, function[2], offLabel)
+							
 							function := ((mode ? translate("+: ") : translate("On: ")) . function[1] . (mode ? translate(" | -: ") : translate(" | Off: ")) . function[2])
+						}
 					}
 					else
 						function := ""

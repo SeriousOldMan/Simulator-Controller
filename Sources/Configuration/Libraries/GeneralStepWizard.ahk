@@ -284,6 +284,13 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 				if subConfiguration
 					setConfigurationSectionValues(configuration, section, subConfiguration)
 			}
+			
+			if (getConfigurationValue(configuration, "Voice Control", "SoX Path", "") = "") {
+				path := wizard.softwarePath("SoX")
+			
+				if path
+					setConfigurationValue(configuration, "Voice Control", "SoX Path", path)
+			}
 		
 			this.iVoiceControlConfigurator.loadConfigurator(configuration)
 			this.iVoiceControlConfigurator.showWidgets()

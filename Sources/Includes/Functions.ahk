@@ -1429,6 +1429,8 @@ isInstance(object, root) {
 }
 
 getFileName(fileName, directories*) {
+	fileName := substituteVariables(fileName)
+	
 	SplitPath fileName, , , , , driveName
 
 	if (driveName && (driveName != ""))

@@ -80,6 +80,8 @@ class ModulesStepWizard extends StepWizard {
 			labelWidth := width - 30
 			labelX := x + 45
 			labelY := y + 8
+
+			Sleep 200
 			
 			Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDiconHandle Hidden, %kResourcesDirectory%Setup\Images\Module.png
 			Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h26 HWNDlabelHandle Hidden, % label

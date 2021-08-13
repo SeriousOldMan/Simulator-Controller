@@ -380,6 +380,8 @@ class SetupWizard extends ConfigurationItem {
 		
 		Gui %window%:Add, Text, yp+20 w350 0x10
 		
+		Sleep 200
+		
 		Gui %window%:Add, ActiveX, x12 yp+10 w350 h545 vinfoViewer, shell explorer
 	
 		infoViewer.Navigate("about:blank")
@@ -1593,6 +1595,8 @@ class StartStepWizard extends StepWizard {
 		
 		window := this.Window
 		
+		Sleep 200
+		
 		Gui %window%:Add, ActiveX, x%x% y%y% w%width% h%height% HWNDimageViewerHandle VimageViewer Hidden, shell explorer
 	
 		text := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Start", "Start.Text." . getLanguage()))
@@ -1630,6 +1634,8 @@ class StartStepWizard extends StepWizard {
 			Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h26 HWNDlabelHandle Hidden, % translate("Unblocking Applications and DLLs")
 			
 			Gui %window%:Font, s8 Norm, Arial
+		
+			Sleep 200
 			
 			Gui %window%:Add, ActiveX, x%x% yp+30 w%width% h350 HWNDinfoTextHandle VinfoText Hidden, shell explorer
 			
@@ -1994,7 +2000,13 @@ initializeSimulatorSetup() {
 	
 	try {
 		definition := readConfiguration(kResourcesDirectory . "Setup\Simulator Setup.ini")
-		
+	
+		setConfigurationSectionValues(kSimulatorConfiguration, "Splash Window", getConfigurationSectionValues(definition, "Splash Window"))
+		setConfigurationSectionValues(kSimulatorConfiguration, "Splash Themes", getConfigurationSectionValues(definition, "Splash Themes"))
+	
+		setConfigurationValue(kSimulatorConfiguration, "Splash Window", "Title", translate("Modular Simulator Controller System") . translate(" - ") . translate("Setup && Configuration"))
+		showSplashTheme("McLaren 720s GT3 Pictures")
+	
 		wizard := new SetupWizard(kSimulatorConfiguration, definition)
 		
 		wizard.registerStepWizard(new StartStepWizard(wizard, "Start", kSimulatorConfiguration))
@@ -2006,6 +2018,8 @@ initializeSimulatorSetup() {
 }
 
 startupSimulatorSetup() {
+	static first := true
+	
 	wizard := SetupWizard.Instance
 	
 	wizard.loadDefinition()
@@ -2017,6 +2031,12 @@ restartSetup:
 	wizard.createGui(wizard.Configuration)
 	
 	wizard.startSetup()
+	
+	if first {
+		first := false
+		
+		hideSplashTheme()
+	}
 	
 	done := false
 

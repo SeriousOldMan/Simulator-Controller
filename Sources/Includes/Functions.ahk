@@ -1111,7 +1111,7 @@ showProgress(options) {
 		Gui Progress:Font, s10 Bold, Arial
 		Gui Progress:Add, Text, x10 w%w% Center vvProgressTitle
 		
-		Gui Progress:Add, Progress, x10 y30 w%w% h20 c%color% BackgroundGray vvProgressBar, 50
+		Gui Progress:Add, Progress, x10 y30 w%w% h20 c%color% BackgroundGray vvProgressBar, 0
 		
 		Gui Progress:Font, s8 Norm, Arial
 		Gui Progress:Add, Text, x10 y55 w%w% Center vvProgressMessage
@@ -1121,6 +1121,8 @@ showProgress(options) {
 		
 		vProgressIsOpen := true
 	}
+	
+	Gui Progress:Default
 	
 	if options.HasKey("title")
 		GuiControl, , vProgressTitle, % options.title

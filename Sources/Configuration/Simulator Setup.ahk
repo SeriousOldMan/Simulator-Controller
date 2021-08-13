@@ -62,6 +62,8 @@ global vInstallerLanguage = false
 ;;;                        Private Variable Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+global vProgressCount = 0
+
 global vResult = false
 global vWorking = false
 
@@ -241,6 +243,10 @@ class SetupWizard extends ConfigurationItem {
 		Loop %count% {
 			step := this.Steps[A_Index]
 		
+			vProgressCount += 2
+			
+			showProgress({progress: vProgressCount})
+		
 			if step {
 				stepDefinition := readConfiguration(kResourcesDirectory . "Setup\Definitions\" . step.Step . " Step.ini")
 				
@@ -249,6 +255,8 @@ class SetupWizard extends ConfigurationItem {
 				step.loadDefinition(definition, getConfigurationValue(definition, "Setup." . step.Step, step.Step . ".Definition", Object()))
 			}
 		}
+		
+		showProgress({progress: ++vProgressCount, message: translate("Initializing AI kernel...")})
 		
 		this.iCount := count
 		
@@ -403,8 +411,13 @@ class SetupWizard extends ConfigurationItem {
 		
 		this.getWorkArea(x, y, width, height)
 		
-		for step, stepWizard in this.StepWizards
+		for step, stepWizard in this.StepWizards {
+			vProgressCount += 2
+			
+			showProgress({progress: vProgressCount, message: translate("Creating UI for Step: ") . translate(step)})
+		
 			stepWizard.createGui(this, x, y, width, height)
+		}
 	}
 	
 	saveToConfiguration(configuration) {
@@ -475,10 +488,14 @@ class SetupWizard extends ConfigurationItem {
 	}
 	
 	startSetup() {
+		showProgress({progress: ++vProgressCount, message: translate("Initializing Settings && Options...")})
+		
 		this.updateState()
 		
 		this.iStep := false
 		this.iPage := false
+		
+		showProgress({progress: ++vProgressCount, color: "Green", title: translate("Starting Setup Wizard"), message: translate("Starting Configuration Engine...")})
 		
 		this.nextPage()
 	}
@@ -1470,6 +1487,10 @@ class StepWizard extends ConfigurationItem {
 		local rules := {}
 		local count := 0
 		
+		showProgress({message: translate("Step: ") . getConfigurationValue(definition, "Setup." . this.Step, this.Step . ".Subtitle." . getLanguage())})
+		
+		Sleep 100
+		
 		for descriptor, rule in getConfigurationSectionValues(definition, "Setup." . this.Step, Object())
 			if (InStr(descriptor, this.Step . ".Rule") == 1) {
 				index := string2Values(".", descriptor)[3]
@@ -1922,7 +1943,7 @@ fixIE(version := 0, exeName := "") {
 	static versions := {7: 7000, 8: 8888, 9: 9999, 10: 10001, 11: 11001}
 	
 	if versions.HasKey(version)
-		Version := Versions[Version]
+		version := versions[version]
 	
 	if !exeName {
 		if A_IsCompiled
@@ -2032,6 +2053,15 @@ initializeSimulatorSetup() {
 		setConfigurationValue(kSimulatorConfiguration, "Splash Window", "Title", translate("Modular Simulator Controller System") . translate(" - ") . translate("Setup && Configuration"))
 		
 		showSplashTheme("Rotating Brain")
+		
+		x := Round((A_ScreenWidth - 300) / 2)
+		y := A_ScreenHeight - 150
+		
+		vPorogressCount := 0
+		
+		showProgress({x: x, y: y, color: "Blue", title: translate("Initializing Setup Wizard"), message: translate("Preparing Configuration Steps...")})
+		
+		Sleep 500
 	
 		wizard := new SetupWizard(kSimulatorConfiguration, definition)
 		
@@ -2053,6 +2083,8 @@ startupSimulatorSetup() {
 	if wizard.Debug[kDebugRules]
 		wizard.dumpRules(wizard.KnowledgeBase)
 	
+	fixIE(7)
+	
 restartSetup:
 	previous := fixIE()
 	
@@ -2065,11 +2097,19 @@ restartSetup:
 	
 	wizard.startSetup()
 	
+	while (vProgressCount < 100) {
+		showProgress({progress: ++vProgressCount, message: translate("Starting UI...")})
+	
+		Sleep 5
+	}
+	
 	if first {
 		first := false
 		
 		hideSplashTheme()
 	}
+		
+	hideProgress()
 	
 	done := false
 
@@ -2094,6 +2134,8 @@ restartSetup:
 		
 		wizard.close()
 		wizard.reset()
+		
+		vProgressCount := 0
 		
 		Goto restartSetup
 	}
@@ -2223,13 +2265,13 @@ initializeSimulatorSetup()
 ;;;                          Wizard Include Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include Libraries\ModulesStepWizard.ahk
-#Include Libraries\InstallationStepWizard.ahk
-#Include Libraries\ApplicationsStepWizard.ahk
-#Include Libraries\ButtonBoxStepWizard.ahk
-#Include Libraries\GeneralStepWizard.ahk
-#Include Libraries\SimulatorsStepWizard.ahk
-#Include Libraries\AssistantsStepWizard.ahk
+;~ #Include Libraries\ModulesStepWizard.ahk
+;~ #Include Libraries\InstallationStepWizard.ahk
+;~ #Include Libraries\ApplicationsStepWizard.ahk
+;~ #Include Libraries\ButtonBoxStepWizard.ahk
+;~ #Include Libraries\GeneralStepWizard.ahk
+;~ #Include Libraries\SimulatorsStepWizard.ahk
+;~ #Include Libraries\AssistantsStepWizard.ahk
 #Include Libraries\MotionFeedbackStepWizard.ahk
 #Include Libraries\TactileFeedbackStepWizard.ahk
 #Include Libraries\PedalCalibrationStepWizard.ahk

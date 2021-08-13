@@ -256,8 +256,6 @@ class SetupWizard extends ConfigurationItem {
 			}
 		}
 		
-		showProgress({progress: ++vProgressCount, message: translate("Initializing AI kernel...")})
-		
 		this.iCount := count
 		
 		if (GetKeyState("Ctrl") && GetKeyState("Shift")) {
@@ -274,6 +272,8 @@ class SetupWizard extends ConfigurationItem {
 		else
 			initialize  := false
 
+		showProgress({progress: ++vProgressCount, message: translate("Initializing AI kernel...")})
+		
 		if initialize {
 			try {
 				FileDelete %kUserHomeDirectory%Install\Button Box Configuration.ini
@@ -293,6 +293,10 @@ class SetupWizard extends ConfigurationItem {
 		}
 		else if !this.loadKnowledgeBase()
 			this.KnowledgeBase.addFact("Initialize", true)
+		
+		Sleep 1000
+
+		showProgress({progress: ++vProgressCount, message: translate("Starting AI kernel...")})
 			
 		this.KnowledgeBase.produce()
 					
@@ -414,7 +418,7 @@ class SetupWizard extends ConfigurationItem {
 		for step, stepWizard in this.StepWizards {
 			vProgressCount += 2
 			
-			showProgress({progress: vProgressCount, message: translate("Creating UI for Step: ") . translate(step)})
+			showProgress({progress: vProgressCount, message: translate("Creating UI for Step: ") . translate(step) . translate("...")})
 		
 			stepWizard.createGui(this, x, y, width, height)
 		}
@@ -1489,7 +1493,7 @@ class StepWizard extends ConfigurationItem {
 		
 		showProgress({message: translate("Step: ") . getConfigurationValue(definition, "Setup." . this.Step, this.Step . ".Subtitle." . getLanguage())})
 		
-		Sleep 100
+		Sleep 250
 		
 		for descriptor, rule in getConfigurationSectionValues(definition, "Setup." . this.Step, Object())
 			if (InStr(descriptor, this.Step . ".Rule") == 1) {
@@ -2057,7 +2061,7 @@ initializeSimulatorSetup() {
 		x := Round((A_ScreenWidth - 300) / 2)
 		y := A_ScreenHeight - 150
 		
-		vPorogressCount := 0
+		vProgressCount := 0
 		
 		showProgress({x: x, y: y, color: "Blue", title: translate("Initializing Setup Wizard"), message: translate("Preparing Configuration Steps...")})
 		
@@ -2136,6 +2140,13 @@ restartSetup:
 		wizard.reset()
 		
 		vProgressCount := 0
+		
+		x := Round((A_ScreenWidth - 300) / 2)
+		y := A_ScreenHeight - 150
+		
+		vProgressCount := 0
+		
+		showProgress({x: x, y: y, color: "Blue", title: translate("Initializing Setup Wizard"), message: translate("")})
 		
 		Goto restartSetup
 	}
@@ -2265,13 +2276,13 @@ initializeSimulatorSetup()
 ;;;                          Wizard Include Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-;~ #Include Libraries\ModulesStepWizard.ahk
-;~ #Include Libraries\InstallationStepWizard.ahk
-;~ #Include Libraries\ApplicationsStepWizard.ahk
-;~ #Include Libraries\ButtonBoxStepWizard.ahk
-;~ #Include Libraries\GeneralStepWizard.ahk
-;~ #Include Libraries\SimulatorsStepWizard.ahk
-;~ #Include Libraries\AssistantsStepWizard.ahk
+#Include Libraries\ModulesStepWizard.ahk
+#Include Libraries\InstallationStepWizard.ahk
+#Include Libraries\ApplicationsStepWizard.ahk
+#Include Libraries\ButtonBoxStepWizard.ahk
+#Include Libraries\GeneralStepWizard.ahk
+#Include Libraries\SimulatorsStepWizard.ahk
+#Include Libraries\AssistantsStepWizard.ahk
 #Include Libraries\MotionFeedbackStepWizard.ahk
 #Include Libraries\TactileFeedbackStepWizard.ahk
 #Include Libraries\PedalCalibrationStepWizard.ahk

@@ -74,7 +74,7 @@ class ModulesStepWizard extends StepWizard {
 			module := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules." . module . "." . getLanguage()))
 			
 			label := substituteVariables(translate("Module: %module%"), {module: module})
-			info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px'><hr style='width: 90%'>" . info . "</div>"
+			info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
 			
 			checkX := x + width - 20
 			labelWidth := width - 30

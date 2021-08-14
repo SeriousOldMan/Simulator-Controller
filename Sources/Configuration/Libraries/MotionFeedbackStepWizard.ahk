@@ -231,7 +231,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		Gui Add, ListView, x%listX% yp+10 w%listWidth% h270 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDmotionFeedbackListViewHandle gupdateMotionFeedbackActionFunction Hidden, % values2String("|", map(["Mode", "Action", "Label", "State", "Intensity", "Function"], "translate")*)
 		
 		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Motion Feedback", "Motion Feedback.Actions.Info." . getLanguage()))
-		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px'><hr style='width: 90%'>" . info . "</div>"
+		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
 
 		Sleep 200
 		

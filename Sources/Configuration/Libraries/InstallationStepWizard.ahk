@@ -97,7 +97,7 @@ class InstallationStepWizard extends StepWizard {
 			info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Installation", "Installation." . software . ".Info." . getLanguage()))
 			
 			label := (translate("Software: ") . software)
-			info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px'><hr style='width: 90%'>" . info . "</div>"
+			info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
 			
 			installed := this.SetupWizard.isSoftwareInstalled(software)
 			
@@ -130,7 +130,7 @@ class InstallationStepWizard extends StepWizard {
 			
 			Sleep 200
 			
-			Gui %window%:Add, ActiveX, x%x% yp+33 w%width% h120 HWNDinfoTextHandle VinfoText%A_Index% Hidden, shell.explorer
+			Gui %window%:Add, ActiveX, x%x% yp+33 w%width% h121 HWNDinfoTextHandle VinfoText%A_Index% Hidden, shell.explorer
 
 			html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 

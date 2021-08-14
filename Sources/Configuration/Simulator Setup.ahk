@@ -1339,7 +1339,7 @@ class SetupWizard extends ConfigurationItem {
 		
 		Gui %window%:Default
 		
-		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . html . "</body></html>"
+		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . html . "</body></html>"
 
 		infoViewer.Document.Open()
 		infoViewer.Document.Write(html)
@@ -1627,7 +1627,7 @@ class StartStepWizard extends StepWizard {
 		text := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Start", "Start.Text." . getLanguage()))
 		image := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Start", "Start.Image"))
 		
-		text := "<div style='text-align: center' style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px' style='font-weight: 600'>" . text . "</div>"
+		text := "<div style='text-align: center' style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px' style='font-weight: 600'>" . text . "</div>"
 		
 		height := Round(width / 16 * 9)
 		
@@ -1651,7 +1651,7 @@ class StartStepWizard extends StepWizard {
 			restartButtonHandle := false
 			
 			info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Start", "Start.Unblocking.Info." . getLanguage()))
-			info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px'>" . info . "</div>"
+			info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'>" . info . "</div>"
 			
 			Gui %window%:Font, s10 Bold, Arial
 			
@@ -1779,7 +1779,7 @@ class FinishStepWizard extends StepWizard {
 		image := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Finish", "Finish.Image"))
 		text := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Finish", "Finish.Text." . getLanguage()))
 		
-		text := "<div style='text-align: center' style='font-family: Arial, Helvetica, sans-serif' style='font-size: 12px' style='font-weight: 600'>" . text . "</div>"
+		text := "<div style='text-align: center' style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px' style='font-weight: 600'>" . text . "</div>"
 		
 		height := Round(width / 16 * 9)
 		
@@ -2087,7 +2087,7 @@ startupSimulatorSetup() {
 	if wizard.Debug[kDebugRules]
 		wizard.dumpRules(wizard.KnowledgeBase)
 	
-	fixIE(7)
+	fixIE(9)
 	
 restartSetup:
 	previous := fixIE()

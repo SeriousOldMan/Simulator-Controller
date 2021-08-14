@@ -35,7 +35,7 @@ class ButtonBoxStepWizard extends StepWizard {
 			
 			this.saveToConfiguration(configuration)
 			
-			writeConfiguration(kUserHomeDirectory . "Install\Button Box Configuration.ini", configuration)
+			writeConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini", configuration)
 			
 			protectionOn()
 	
@@ -61,7 +61,7 @@ class ButtonBoxStepWizard extends StepWizard {
 	saveToConfiguration(configuration) {
 		base.saveToConfiguration(configuration)
 		
-		controllerConfiguration := readConfiguration(kUserHomeDirectory . "Install\Button Box Configuration.ini")
+		controllerConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
 		wizard := this.SetupWizard
 		
 		if wizard.isModuleSelected("Button Box") {
@@ -170,18 +170,18 @@ class ButtonBoxStepWizard extends StepWizard {
 	showPage(page) {
 		base.showPage(page)
 		
-		if !FileExist(kUserHomeDirectory . "Install\Button Box Configuration.ini")
-			FileCopy %kResourcesDirectory%Setup\Button Box Configuration.ini, %kUserHomeDirectory%Install\Button Box Configuration.ini
+		if !FileExist(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
+			FileCopy %kResourcesDirectory%Setup\Button Box Configuration.ini, %kUserHomeDirectory%Setup\Button Box Configuration.ini
 			
-		this.iButtonBoxEditor := new this.StepButtonBoxEditor("Default", this.SetupWizard.Configuration, kUserHomeDirectory . "Install\Button Box Configuration.ini", false)
+		this.iButtonBoxEditor := new this.StepButtonBoxEditor("Default", this.SetupWizard.Configuration, kUserHomeDirectory . "Setup\Button Box Configuration.ini", false)
 		
 		this.iButtonBoxEditor.open(Min(A_ScreenWidth - Round(A_ScreenWidth / 3) + Round(A_ScreenWidth / 3 / 2) - 225, A_ScreenWidth - 450))
 		
-		this.loadFunctions(readConfiguration(kUserHomeDirectory . "Install\Button Box Configuration.ini"), true)
+		this.loadFunctions(readConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini"), true)
 	}
 	
 	hidePage(page) {
-		configuration := readConfiguration(kUserHomeDirectory . "Install\Button Box Configuration.ini")
+		configuration := readConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
 		
 		if (this.conflictingFunctions(configuration) || this.conflictingTriggers(configuration)) {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
@@ -463,7 +463,7 @@ class ButtonBoxStepWizard extends StepWizard {
 		
 		wizard.toggleTriggerDetector()
 		
-		this.loadFunctions(readConfiguration(kUserHomeDirectory . "Install\Button Box Configuration.ini"))
+		this.loadFunctions(readConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini"))
 		
 		window := this.Window
 		
@@ -529,7 +529,7 @@ class ButtonBoxPreviewStepWizard extends StepWizard {
 		local function
 		
 		if this.SetupWizard.isModuleSelected("Button Box") {
-			configuration := readConfiguration(kUserHomeDirectory . "Install\Button Box Configuration.ini")
+			configuration := readConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
 			
 			staticFunctions := this.SetupWizard.getControllerStaticFunctions()
 			controllers := []

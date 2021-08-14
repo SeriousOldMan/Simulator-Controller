@@ -148,7 +148,7 @@ class ApplicationsStepWizard extends StepWizard {
 	loadStepDefinition(definition) {
 		base.loadStepDefinition(definition)
 		
-		if !FileExist(kUserHomeDirectory . "Install\Simulator Setup.data")
+		if !FileExist(kUserHomeDirectory . "Setup\Simulator Setup.data")
 			this.updateAvailableApplications(true)
 	}
 	

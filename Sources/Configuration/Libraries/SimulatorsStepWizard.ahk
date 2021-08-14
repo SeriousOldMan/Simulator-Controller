@@ -154,7 +154,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		labelHandle := false
 		editHandle := false
 		
-		secondX := x + 140
+		secondX := x + 150
 		
 		for ignore, simulator in this.Definition {
 			code := string2Values("|", getConfigurationValue(wizard.Definition, "Applications.Simulators", simulator))[1]
@@ -171,7 +171,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 					
 					label := getConfigurationValue(wizard.Definition, "Setup.Simulators", "Simulators.MFDKeys." . key . "." . getLanguage(), key)
 				
-					Gui %window%:Add, Text, x%x% y%keyY% w105 h23 +0x200 HWNDlabelHandle Hidden, % label
+					Gui %window%:Add, Text, x%x% y%keyY% w148 h23 +0x200 HWNDlabelHandle Hidden, % label
 					Gui %window%:Add, Edit, x%secondX% yp w60 h23 +0x200 HWNDeditHandle Hidden, % default
 		
 					this.iSimulatorMFDKeys[simulator].Push(Array(labelHandle, editHandle, key, default))

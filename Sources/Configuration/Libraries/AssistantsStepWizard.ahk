@@ -66,7 +66,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 		
 		for ignore, assistant in this.Definition
 			if wizard.isModuleSelected(assistant) {
-				assistantConfiguration := readConfiguration(kUserHomeDirectory . "Install\" . assistant . " Configuration.ini")
+				assistantConfiguration := readConfiguration(kUserHomeDirectory . "Setup\" . assistant . " Configuration.ini")
 		
 				for ignore, section in ["Race Assistant Startup", "Race Assistant Shutdown", "Race Engineer Startup", "Race Engineer Shutdown"
 									  , "Race Strategist Startup", "Race Strategist Shutdown", "Race Engineer Analysis", "Race Strategist Analysis"] {
@@ -269,7 +269,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 				GuiControl Hide, %widget%
 			
 		configuration := this.SetupWizard.getSimulatorConfiguration()
-		assistantConfiguration := readConfiguration(kUserHomeDirectory . "Install\" . this.iCurrentAssistant . " Configuration.ini")
+		assistantConfiguration := readConfiguration(kUserHomeDirectory . "Setup\" . this.iCurrentAssistant . " Configuration.ini")
 		
 		for ignore, section in ["Race Assistant Startup", "Race Assistant Shutdown", "Race Engineer Startup", "Race Engineer Shutdown"
 							  , "Race Strategist Startup", "Race Strategist Shutdown", "Race Engineer Analysis", "Race Strategist Analysis"] {
@@ -302,7 +302,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 					setConfigurationSectionValues(assistantConfiguration, section, subConfiguration)
 			}
 				
-			writeConfiguration(kUserHomeDirectory . "Install\" . this.iCurrentAssistant . " Configuration.ini", assistantConfiguration)
+			writeConfiguration(kUserHomeDirectory . "Setup\" . this.iCurrentAssistant . " Configuration.ini", assistantConfiguration)
 			
 			return true
 		}

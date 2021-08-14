@@ -75,7 +75,7 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 			setConfigurationValue(configuration, "Configuration", "NirCmd Path", wizard.softwarePath("NirCmd"))
 		
 		if wizard.isModuleSelected("Voice Control") {
-			voiceControlConfiguration := readConfiguration(kUserHomeDirectory . "Install\Voice Control Configuration.ini")
+			voiceControlConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Voice Control Configuration.ini")
 		
 			for ignore, section in ["Voice Control"] {
 				subConfiguration := getConfigurationSectionValues(voiceControlConfiguration, section, false)
@@ -278,7 +278,7 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 			
 		if this.SetupWizard.isModuleSelected("Voice Control") {
 			configuration := this.SetupWizard.getSimulatorConfiguration()
-			voiceControlConfiguration := readConfiguration(kUserHomeDirectory . "Install\Voice Control Configuration.ini")
+			voiceControlConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Voice Control Configuration.ini")
 		
 			for ignore, section in ["Voice Control"] {
 				subConfiguration := getConfigurationSectionValues(voiceControlConfiguration, section, false)
@@ -359,7 +359,7 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 						setConfigurationSectionValues(voiceControlConfiguration, section, subConfiguration)
 				}
 					
-				writeConfiguration(kUserHomeDirectory . "Install\Voice Control Configuration.ini", voiceControlConfiguration)
+				writeConfiguration(kUserHomeDirectory . "Setup\Voice Control Configuration.ini", voiceControlConfiguration)
 			}
 			
 			this.iPendingApplicationRegistration := false

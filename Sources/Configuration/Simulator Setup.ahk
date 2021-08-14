@@ -278,14 +278,14 @@ class SetupWizard extends ConfigurationItem {
 		
 		if initialize {
 			try {
-				FileDelete %kUserHomeDirectory%Install\Button Box Configuration.ini
+				FileDelete %kUserHomeDirectory%Setup\Button Box Configuration.ini
 			}
 			catch exception {
 				; ignore
 			}
 			
 			try {
-				FileDelete %kUserHomeDirectory%Install\Voice Control Configuration.ini
+				FileDelete %kUserHomeDirectory%Setup\Voice Control Configuration.ini
 			}
 			catch exception {
 				; ignore
@@ -523,11 +523,11 @@ class SetupWizard extends ConfigurationItem {
 				if FileExist(kUserConfigDirectory . "Simulator Configuration.ini")
 					FileMove %kUserConfigDirectory%Simulator Configuration.ini, %kUserConfigDirectory%Simulator Configuration.ini.bak, 1
 				
-				if (FileExist(kUserConfigDirectory . "Simulator Settings.ini") && FileExist(kUserHomeDirectory . "Install\Simulator Settings.ini"))
+				if (FileExist(kUserConfigDirectory . "Simulator Settings.ini") && FileExist(kUserHomeDirectory . "Setup\Simulator Settings.ini"))
 					FileMove %kUserConfigDirectory%Simulator Settings.ini, %kUserConfigDirectory%Simulator Settings.ini.bak, 1
 				
-				if FileExist(kUserHomeDirectory . "Install\Simulator Settings.ini")
-					FileCopy %kUserHomeDirectory%Install\Simulator Settings.ini, %kUserConfigDirectory%Simulator Settings.ini
+				if FileExist(kUserHomeDirectory . "Setup\Simulator Settings.ini")
+					FileCopy %kUserHomeDirectory%Setup\Simulator Settings.ini, %kUserConfigDirectory%Simulator Settings.ini
 					
 				writeConfiguration(kUserConfigDirectory . "Simulator Configuration.ini", this.getSimulatorConfiguration())
 				
@@ -535,7 +535,7 @@ class SetupWizard extends ConfigurationItem {
 					if FileExist(kUserConfigDirectory . "Button Box Configuration.ini")
 						FileMove %kUserConfigDirectory%Button Box Configuration.ini, %kUserConfigDirectory%Button Box Configuration.ini.bak, 1
 					
-					FileCopy %kUserHomeDirectory%Install\Button Box Configuration.ini, %kUserConfigDirectory%Button Box Configuration.ini
+					FileCopy %kUserHomeDirectory%Setup\Button Box Configuration.ini, %kUserConfigDirectory%Button Box Configuration.ini
 				}
 			}
 			
@@ -650,6 +650,8 @@ class SetupWizard extends ConfigurationItem {
 		try {
 			if this.Step {
 				if !this.Step.hidePage(this.Page) {
+					vPageSwitch := oldPageSwitch
+					
 					this.updateState()
 					
 					return false
@@ -1364,14 +1366,14 @@ class SetupWizard extends ConfigurationItem {
 		
 		setConfigurationSectionValues(savedKnowledgeBase, "Setup", this.KnowledgeBase.Facts.Facts)
 		
-		writeConfiguration(kUserHomeDirectory . "Install\Install.data", savedKnowledgeBase)
+		writeConfiguration(kUserHomeDirectory . "Setup\Setup.data", savedKnowledgeBase)
 	}
 	
 	loadKnowledgeBase() {
 		local knowledgeBase = this.KnowledgeBase
 		
-		if FileExist(kUserHomeDirectory . "Install\Install.data") {
-			for key, value in getConfigurationSectionValues(readConfiguration(kUserHomeDirectory . "Install\Install.data"), "Setup")
+		if FileExist(kUserHomeDirectory . "Setup\Setup.data") {
+			for key, value in getConfigurationSectionValues(readConfiguration(kUserHomeDirectory . "Setup\Setup.data"), "Setup")
 				knowledgeBase.setFact(key, value)
 			
 			return true
@@ -1832,8 +1834,8 @@ class FinishStepWizard extends StepWizard {
 			return
 		}
 	
-		if FileExist(kUserHomeDirectory . "Install\Simulator Settings.ini")
-			settings := readConfiguration(kUserHomeDirectory . "Install\Simulator Settings.ini")
+		if FileExist(kUserHomeDirectory . "Setup\Simulator Settings.ini")
+			settings := readConfiguration(kUserHomeDirectory . "Setup\Simulator Settings.ini")
 		else
 			settings := newConfiguration()
 		
@@ -1841,7 +1843,7 @@ class FinishStepWizard extends StepWizard {
 		
 		editSettings(settings, false, configuration, Min(A_ScreenWidth - Round(A_ScreenWidth / 3) + Round(A_ScreenWidth / 3 / 2) - 180, A_ScreenWidth - 360))
 		
-		writeConfiguration(kUserHomeDirectory . "Install\Simulator Settings.ini", settings)
+		writeConfiguration(kUserHomeDirectory . "Setup\Simulator Settings.ini", settings)
 	}
 }
 
@@ -2021,16 +2023,25 @@ convertVDF2JSON(vdf) {
 }
 
 findInRegistry(collection, filterName, filterValue, valueName) {
-	Loop Reg, %collection%, R
-		if (A_LoopRegName = filterName) {
-			RegRead candidate
-		
-			if (InStr(candidate, filterValue) = 1) {
-				RegRead value, %A_LoopRegKey%\%A_LoopRegSubKey%, %valueName%
+	Loop 2 {
+		exact := (A_Index = 1)
+	
+		Loop Reg, %collection%, R
+			if (A_LoopRegName = filterName) {
+				RegRead candidate
 			
-				return value
+				if ((exact && () candidate = filterValue) || (!exact && InStr(candidate, filterValue) = 1)) {
+					try {
+						RegRead value, %A_LoopRegKey%\%A_LoopRegSubKey%, %valueName%
+					}
+					catch exception {
+						value := ""
+					}
+				
+					return value
+				}
 			}
-		}
+	}
 	
 	return ""
 }
@@ -2058,7 +2069,7 @@ initializeSimulatorSetup() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Simulator Setup
 	
-	FileCreateDir %kUserHomeDirectory%Install
+	FileCreateDir %kUserHomeDirectory%Setup
 	
 	protectionOn()
 	

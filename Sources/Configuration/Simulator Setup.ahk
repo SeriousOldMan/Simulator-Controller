@@ -67,6 +67,8 @@ global vProgressCount = 0
 global vResult = false
 global vWorking = false
 
+global vPageSwitch = false
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                        Public Constant Section                          ;;;
@@ -294,7 +296,8 @@ class SetupWizard extends ConfigurationItem {
 		else if !this.loadKnowledgeBase()
 			this.KnowledgeBase.addFact("Initialize", true)
 		
-		Sleep 1000
+		if isDebug()
+			Sleep 1000
 
 		showProgress({progress: ++vProgressCount, message: translate("Starting AI kernel...")})
 			
@@ -636,30 +639,38 @@ class SetupWizard extends ConfigurationItem {
 		window := this.WizardWindow
 	
 		Gui %window%:Default
-		
+			
 		GuiControl Disable, previousPageButton
 		GuiControl Disable, nextPageButton
 		GuiControl Disable, finishButton
 		
-		if this.Step {
-			if !this.Step.hidePage(this.Page) {
-				this.updateState()
+		oldPageSwitch := vPageSwitch
+		vPageSwitch := true
+		
+		try {
+			if this.Step {
+				if !this.Step.hidePage(this.Page) {
+					this.updateState()
+					
+					return false
+				}
 				
-				return false
+				if (step != this.Step)
+					hide := true
 			}
 			
-			if (step != this.Step)
-				hide := true
+			this.iStep := step
+			
+			if change
+				this.Step.show()
+			
+			this.Step.showPage(page)
+		
+			this.iPage := page
 		}
-		
-		this.iStep := step
-		
-		if change
-			this.Step.show()
-		
-		this.Step.showPage(page)
-		
-		this.iPage := page
+		finally {
+			vPageSwitch := oldPageSwitch
+		}
 		
 		this.updateState()
 		
@@ -704,18 +715,20 @@ class SetupWizard extends ConfigurationItem {
 	
 		Gui %window%:Default
 		
-		if this.isFirstPage()
-			GuiControl Disable, previousPageButton
-		else
-			GuiControl Enable, previousPageButton
-		
-		if this.isLastPage() {
-			GuiControl Disable, nextPageButton
-			GuiControl Enable, finishButton
-		}
-		else {
-			GuiControl Enable, nextPageButton
-			GuiControl Disable, finishButton
+		if !vPageSwitch {
+			if this.isFirstPage()
+				GuiControl Disable, previousPageButton
+			else
+				GuiControl Enable, previousPageButton
+			
+			if this.isLastPage() {
+				GuiControl Disable, nextPageButton
+				GuiControl Enable, finishButton
+			}
+			else {
+				GuiControl Enable, nextPageButton
+				GuiControl Disable, finishButton
+			}
 		}
 	}
 	
@@ -1493,7 +1506,8 @@ class StepWizard extends ConfigurationItem {
 		
 		showProgress({message: translate("Step: ") . getConfigurationValue(definition, "Setup." . this.Step, this.Step . ".Subtitle." . getLanguage())})
 		
-		Sleep 250
+		if isDebug()
+			Sleep 250
 		
 		for descriptor, rule in getConfigurationSectionValues(definition, "Setup." . this.Step, Object())
 			if (InStr(descriptor, this.Step . ".Rule") == 1) {
@@ -2065,7 +2079,8 @@ initializeSimulatorSetup() {
 		
 		showProgress({x: x, y: y, color: "Blue", title: translate("Initializing Setup Wizard"), message: translate("Preparing Configuration Steps...")})
 		
-		Sleep 500
+		if isDebug()
+			Sleep 500
 	
 		wizard := new SetupWizard(kSimulatorConfiguration, definition)
 		
@@ -2184,7 +2199,12 @@ findSoftware(definition, software) {
 							return locator
 					}
 					else if (InStr(locator, "RegistryExist:") == 1) {
-						RegRead value, % substituteVariables(StrReplace(locator, "RegistryExist:", ""))
+						try {
+							RegRead value, % substituteVariables(StrReplace(locator, "RegistryExist:", ""))
+						}
+						catch exception {
+							value := ""
+						}
 					
 						if (value != "")
 							return true
@@ -2198,7 +2218,12 @@ findSoftware(definition, software) {
 					else if (InStr(locator, "Steam:") == 1) {
 						locator := substituteVariables(StrReplace(locator, "Steam:", ""))
 						
-						RegRead installPath, HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Valve\Steam, InstallPath
+						try {
+							RegRead installPath, HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Valve\Steam, InstallPath
+						}
+						catch exception {
+							installPath := ""
+						}
 						
 						if (installPath != "") {
 							FileRead script, %installPath%\steamapps\libraryfolders.vdf

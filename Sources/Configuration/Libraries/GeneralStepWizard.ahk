@@ -320,7 +320,10 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 			vCurrentLaunchWizard := false
 
 			wizard := this.SetupWizard
-
+			window := this.Window
+			
+			Gui %window%:Default
+			
 			GuiControlGet uiLanguageDropDown
 			GuiControlGet startWithWindowsCheck
 			GuiControlGet silentModeCheck

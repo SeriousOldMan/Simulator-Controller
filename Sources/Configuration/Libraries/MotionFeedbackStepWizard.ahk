@@ -351,7 +351,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 				if (function && (function != "")) {
 					arguments := this.getActionArgument(mode, action)
 					
-					if ((!arguments || (arguments = "")) || (arguments[2] = ""))
+					if ((!arguments || (arguments = "")) || (string2Values("|", arguments)[2] = ""))
 						valid := false
 				}
 				

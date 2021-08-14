@@ -627,7 +627,7 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 				else
 					for ignore, candidate in this.iModes
 						if (mode = translate(candidate))
-							return mode
+							return candidate
 		
 				return true
 			}

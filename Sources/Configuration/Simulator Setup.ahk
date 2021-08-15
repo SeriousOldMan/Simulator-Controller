@@ -537,6 +537,10 @@ class SetupWizard extends ConfigurationItem {
 					
 					FileCopy %kUserHomeDirectory%Setup\Button Box Configuration.ini, %kUserConfigDirectory%Button Box Configuration.ini
 				}
+	
+				for ignore, name in ["Simulator Startup", "Simulator Settings", "Race Settings", "Setup Database"]
+					if ((A_Index < 3) || this.isModuleSelected("Race Engineer") || this.isModuleSelected("Race Strategist"))
+						FileCreateShortCut %kBinariesDirectory%%name%.exe, %A_StartMenu%\%name%.lnk, %kBinariesDirectory%
 			}
 			
 			vWorking := false
@@ -649,16 +653,13 @@ class SetupWizard extends ConfigurationItem {
 		
 		try {
 			if this.Step {
-				if !this.Step.hidePage(this.Page) {
+				if !this.hidePage(this.Step, this.Page) {
 					vPageSwitch := oldPageSwitch
 					
 					this.updateState()
 					
 					return false
 				}
-				
-				if (step != this.Step)
-					hide := true
 			}
 			
 			this.iStep := step
@@ -675,8 +676,16 @@ class SetupWizard extends ConfigurationItem {
 		}
 		
 		this.updateState()
-		
-		this.saveKnowledgeBase()
+	}
+	
+	hidePage(step, page) {
+		if step.hidePage(page) {
+			this.saveKnowledgeBase()
+			
+			return true
+		}
+		else
+			return false
 	}
 	
 	previousPage() {
@@ -1873,7 +1882,7 @@ finishSetup(finish := false, save := false) {
 			else
 				save := false
 			
-			SetupWizard.Instance.Step.hidePage(SetupWizard.Instance.Page)
+			SetupWizard.Instance.hidePage(SetupWizard.Instance.Step, SetupWizard.Instance.Page)
 			
 			callback := Func("finishSetup").Bind("Finish", save)
 			
@@ -2030,7 +2039,7 @@ findInRegistry(collection, filterName, filterValue, valueName) {
 			if (A_LoopRegName = filterName) {
 				RegRead candidate
 			
-				if ((exact && () candidate = filterValue) || (!exact && InStr(candidate, filterValue) = 1)) {
+				if ((exact && (candidate = filterValue)) || (!exact && InStr(candidate, filterValue) = 1)) {
 					try {
 						RegRead value, %A_LoopRegKey%\%A_LoopRegSubKey%, %valueName%
 					}
@@ -2113,10 +2122,11 @@ startupSimulatorSetup() {
 	if wizard.Debug[kDebugRules]
 		wizard.dumpRules(wizard.KnowledgeBase)
 	
-	fixIE(9)
-	
 restartSetup:
 	previous := fixIE()
+	
+	if (previous = "")
+		previous := "9"
 	
 	try {
 		wizard.createGui(wizard.Configuration)
@@ -2312,16 +2322,16 @@ initializeSimulatorSetup()
 ;;;                          Wizard Include Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include Libraries\ModulesStepWizard.ahk
-#Include Libraries\InstallationStepWizard.ahk
-#Include Libraries\ApplicationsStepWizard.ahk
-#Include Libraries\ButtonBoxStepWizard.ahk
-#Include Libraries\GeneralStepWizard.ahk
-#Include Libraries\SimulatorsStepWizard.ahk
-#Include Libraries\AssistantsStepWizard.ahk
-#Include Libraries\MotionFeedbackStepWizard.ahk
-#Include Libraries\TactileFeedbackStepWizard.ahk
-#Include Libraries\PedalCalibrationStepWizard.ahk
+;~ #Include Libraries\ModulesStepWizard.ahk
+;~ #Include Libraries\InstallationStepWizard.ahk
+;~ #Include Libraries\ApplicationsStepWizard.ahk
+;~ #Include Libraries\ButtonBoxStepWizard.ahk
+;~ #Include Libraries\GeneralStepWizard.ahk
+;~ #Include Libraries\SimulatorsStepWizard.ahk
+;~ #Include Libraries\AssistantsStepWizard.ahk
+;~ #Include Libraries\MotionFeedbackStepWizard.ahk
+;~ #Include Libraries\TactileFeedbackStepWizard.ahk
+;~ #Include Libraries\PedalCalibrationStepWizard.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;

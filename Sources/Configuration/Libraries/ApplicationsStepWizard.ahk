@@ -329,7 +329,8 @@ updateSelectedApplications() {
 	Loop % LV_GetCount()
 		LV_Modify(A_Index, "-Select")
 	
-	SetupWizard.Instance.StepWizards["Applications"].updateSelectedApplications(SetupWizard.Instance.Page, false)
+	if ((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick"))
+		SetupWizard.Instance.StepWizards["Applications"].updateSelectedApplications(SetupWizard.Instance.Page, false)
 }
 
 initializeApplicationsStepWizard() {

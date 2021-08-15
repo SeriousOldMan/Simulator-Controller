@@ -941,18 +941,27 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 	clearFunctionAction(preview, function, control, row, column) {
 		local action
 		
-		for mode, modeFunctions in this.iFunctions
-			for action, functions in modeFunctions
-				for ignore, candidate in functions
-					if (candidate = function) {
-						SoundPlay %kResourcesDirectory%Sounds\Activated.wav
-						
-						this.clearActionFunction(mode, action, function)
-						
-						this.loadActions()
-						
-						break
-					}
+		changed := false
+		found := true
+
+		while found {
+			found := false
+		
+			for mode, modeFunctions in this.iFunctions
+				for action, functions in modeFunctions
+					for ignore, candidate in functions
+						if (candidate = function) {
+							SoundPlay %kResourcesDirectory%Sounds\Activated.wav
+							
+							this.clearActionFunction(mode, action, function)
+							
+							found := true
+							changed := true
+						}
+		}
+		
+		if changed
+			this.loadActions()
 	}
 	
 	createActionsMenu(title, row) {
@@ -978,14 +987,26 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 		
 		Menu ContextMenu, Add, %menuItem%, %handler%
 		
-		menuItem := translate("Clear Function")
+		function := this.getActionFunction(this.getActionMode(row), this.getAction(row))
+		count := 0
+		
+		if IsObject(function) {
+			if ((function.Length() > 1) && (function[1] != "") && (function[2] != ""))
+				count := 2
+			else if (function[1] != "")
+				count := 1
+		}
+		else if (function != "")
+			count := 1
+		
+		menuItem := translate((count > 1) ? "Clear Function(s)" : "Clear Function")
 		handler := ObjBindMethod(this, "clearFunction", row)
 		
 		Menu ContextMenu, Add, %menuItem%, %handler%
 		
 		function := this.getActionFunction(this.getActionMode(row), this.getAction(row))
 		
-		if (!function || (function = ""))
+		if (count == 0)
 			Menu ContextMenu, Disable, %menuItem%
 		
 		return "ContextMenu"
@@ -1014,31 +1035,20 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 		
 		Menu ContextMenu, Add, %menuItem%, %handler%
 		
-		menuItem := translate("Clear Action")
+		count := 0
+		
+		for mode, modeFunctions in this.iFunctions
+			for action, functions in modeFunctions
+				for ignore, candidate in functions
+					if (candidate = function)
+						count += 1
+		
+		menuItem := translate((count > 1) ? "Clear Action(s)" : "Clear Action")
 		handler := ObjBindMethod(this, "clearFunctionAction", preview, function, element[2], row, column)
 						
 		Menu ContextMenu, Add, %menuItem%, %handler%
 		
-		disable := true
-		
-		for mode, modeFunctions in this.iFunctions {
-			for action, functions in modeFunctions {
-				for ignore, candidate in functions
-					if (candidate = function) {
-						disable := false
-						
-						break
-					}
-				
-				if !disable
-					break
-			}
-			
-			if !disable
-				break
-		}
-		
-		if disable
+		if (count = 0)
 			Menu ContextMenu, Disable, %menuItem%
 		
 		return "ContextMenu"

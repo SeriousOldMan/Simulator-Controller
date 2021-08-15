@@ -428,7 +428,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 		
 		actions := values2String(", ", actions*)
 		
-		InputBox actions, %title%, %prompt%, , 300, 150, , , %locale%, , %actions%
+		InputBox actions, %title%, %prompt%, , 450, 150, , , %locale%, , %actions%
 		
 		if !ErrorLevel {
 			this.saveActions()

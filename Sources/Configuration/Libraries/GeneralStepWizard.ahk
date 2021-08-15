@@ -501,16 +501,25 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 	clearLaunchApplication(preview, function, control, row, column) {
 		local application
 		
-		for application, candidate in this.iLaunchApplications
-			if (candidate[2] = function) {
-				SoundPlay %kResourcesDirectory%Sounds\Activated.wav
+		changed := false
+		found := true
+		
+		while found {
+			found := false
+		
+			for application, candidate in this.iLaunchApplications
+				if (candidate[2] = function) {
+					SoundPlay %kResourcesDirectory%Sounds\Activated.wav
+					
+					this.iLaunchApplications.Delete(application)
 				
-				this.iLaunchApplications.Delete(application)
-			
-				this.loadApplications()
-				
-				break
-			}
+					changed := true
+					found := true
+				}
+		}
+		
+		if changed
+			this.loadApplications()
 	}
 	
 	setApplicationFunction(row) {
@@ -596,18 +605,19 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 				
 				Menu ContextMenu, Add, %menuItem%, %handler%
 				
-				menuItem := translate("Clear Application")
+				count := 0
+				
+				for ignore, candidate in this.iLaunchApplications
+					if (candidate[2] == function)
+						count += 1
+				
+				menuItem := translate((count > 1) ? "Clear Application(s)" : "Clear Application")
 				handler := ObjBindMethod(this, "clearLaunchApplication", preview, function, element[2], row, column)
 				
 				Menu ContextMenu, Add, %menuItem%, %handler%
-				Menu ContextMenu, Disable, %menuItem%
 				
-				for ignore, candidate in this.iLaunchApplications
-					if (candidate[2] == function) {
-						Menu ContextMenu, Enable, %menuItem%
-						
-						break
-					}
+				if (count == 0)
+					Menu ContextMenu, Disable, %menuItem%
 				
 				Menu ContextMenu, Show
 			}
@@ -624,10 +634,16 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 				if function {
 					if this.iLaunchApplications.HasKey(application)
 						this.iLaunchApplications[application][2] := function
-					else
-						this.iLaunchApplications[application] := Array("", function)
+					else {
+						label := getConfigurationValue(wizard.Definition, "Applications.Simulators", application, false)
 					
-					label := this.iLaunchApplications[application][1]
+						if label
+							label := string2Values("|", label)[1]
+						else
+							label := ""
+						
+						this.iLaunchApplications[application] := Array(label, function)
+					}
 					
 					this.loadApplications()
 					

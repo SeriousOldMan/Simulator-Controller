@@ -342,6 +342,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 				return false
 		}
 		
+		/*
 		valid := true
 		
 		for ignore, mode in this.getModes() {
@@ -372,6 +373,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 			IfMsgBox No
 				return false
 		}
+		*/
 		
 		GuiControlGet effectSelectorField
 		GuiControlGet effectIntensityField
@@ -596,7 +598,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 					}
 					else {
 						state := true
-						intensity := ""
+						intensity := (mode ? "1.0" : "50")
 					}
 					
 					LV_Add("", (first ? translate(mode ? mode : "Independent") : ""), action, label, translate(state ? "On" : "Off"), intensity, function)
@@ -658,7 +660,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		
 		actions := values2String(", ", actions*)
 		
-		InputBox actions, %title%, %prompt%, , 300, 150, , , %locale%, , %actions%
+		InputBox actions, %title%, %prompt%, , 450, 150, , , %locale%, , %actions%
 		
 		if !ErrorLevel {
 			this.saveActions()
@@ -844,7 +846,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		else {
 			arguments := Array(true, "")
 		
-			value := ""
+			value := (mode ? "1.0" : "50")
 		}
 		
 		InputBox value, %title%, %prompt%, , 300, 150, , , %locale%, , %value%

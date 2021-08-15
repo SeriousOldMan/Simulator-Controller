@@ -526,7 +526,7 @@ class SetupWizard extends ConfigurationItem {
 				if (FileExist(kUserConfigDirectory . "Simulator Settings.ini") && FileExist(kUserHomeDirectory . "Setup\Simulator Settings.ini"))
 					FileMove %kUserConfigDirectory%Simulator Settings.ini, %kUserConfigDirectory%Simulator Settings.ini.bak, 1
 				
-				if FileExist(kUserHomeDirectory . "Setup\Simulator Settings.ini")
+				if FileExist(kUserHomeDirectory . "Setup\Simulator Settings.ini") {
 					settings := readConfiguration(kUserHomeDirectory . "Setup\Simulator Settings.ini")
 				else
 					settings := newConfiguration()

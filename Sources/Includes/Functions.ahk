@@ -1791,7 +1791,9 @@ removeConfigurationValue(configuration, section, key) {
 }
 
 getControllerConfiguration(configuration := false) {
-	if (configuration || !FileExist(kUserConfigDirectory . "Simulator Controller.config"))
+	Process Exist, Simulator Controller.exe
+	
+	if (!ErrorLevel && (configuration || !FileExist(kUserConfigDirectory . "Simulator Controller.config")))
 		try {
 			if configuration {
 				writeConfiguration(kTempDirectory . "Simulator Configuration.ini", configuration)

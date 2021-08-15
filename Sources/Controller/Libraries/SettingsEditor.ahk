@@ -557,7 +557,10 @@ restartSettings:
 		
 		Gui SE:Add, DropDownList, X120 YP-5 w100 Choose%chosen% vbuttonBoxPosition, % values2String("|", map(choices, "translate")*)
 		
-		Gui SE:Add, Button, X10 Y+15 w220 gopenModesEditor, % translate("Controller Automation...")
+		if fromSetup
+			Gui SE:Add, Button, X10 Y+15 w220 Disabled gopenModesEditor, % translate("Controller Automation...")
+		else
+			Gui SE:Add, Button, X10 Y+15 w220 gopenModesEditor, % translate("Controller Automation...")
 		
 		splashTheme := getConfigurationValue(settingsOrCommand, "Startup", "Splash Theme", false)	
 	 

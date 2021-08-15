@@ -175,11 +175,11 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		this.saveSimulatorConfiguration()
 		
 		for simulator, simulatorConfiguration in this.iSimulatorConfigurations {
-			for ignore, key in ["LoadSettings", "LoadTyrePressures"]
-				setConfigurationValue(configuration, "Race Assistant Startup", simulator . "." . key, simulatorConfiguration[key])
-			
-			for ignore, key in ["SaveSettings", "SaveTyrePressures"]
-				setConfigurationValue(configuration, "Race Assistant Shutdown", simulator . "." . key, simulatorConfiguration[key])
+			setConfigurationValue(configuration, "Race Assistant Startup", simulator . "." . "LoadSettings", simulatorConfiguration["LoadSettings"])
+			setConfigurationValue(configuration, "Race Assistant Shutdown", simulator . "." . "SaveSettings", simulatorConfiguration["SaveSettings"])
+		
+			setConfigurationValue(configuration, "Race Engineer Startup", simulator . "." . "LoadTyrePressures", simulatorConfiguration["LoadTyrePressures"])
+			setConfigurationValue(configuration, "Race Engineer Shutdown", simulator . "." . "SaveTyrePressures", simulatorConfiguration["SaveTyrePressures"])
 			
 			for ignore, key in ["LearningLaps", "ConsideredHistoryLaps", "HistoryLapsDamping", "AdjustLapTime", "DamageAnalysisLaps"]
 				setConfigurationValue(configuration, "Race Engineer Analysis", simulator . "." . key, simulatorConfiguration[key])

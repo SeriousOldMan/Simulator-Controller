@@ -89,7 +89,7 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 		arguments := ""
 
 		if (modeSelectors.Length() > 0)
-			arguments := ("modeSelectors: " . values2String(A_Space, modeSelectors*))
+			arguments := ("modeSelector: " . values2String(A_Space, modeSelectors*))
 		
 		launchApplications := []
 
@@ -340,7 +340,7 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 					break
 				}
 			
-			wiard.setGeneralConfiguration(languageCode, startWithWindowsCheck, silentModeCheck)
+			wizard.setGeneralConfiguration(languageCode, startWithWindowsCheck, silentModeCheck)
 			
 			if wizard.isModuleSelected("Button Box") {
 				wizard.setModeSelectors(this.iModeSelectors)

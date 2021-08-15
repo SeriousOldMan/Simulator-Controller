@@ -284,6 +284,9 @@ showTriggerDetector() {
 		found := false
 		
 		Loop {
+			if GetKeyState("Esc", "P")
+				vShowTriggerDetector := false
+	
 			if (vTriggerDetectorCallback && (returnHotKey != vTriggerDetectorCallback))
 				returnHotKey := vTriggerDetectorCallback
 			

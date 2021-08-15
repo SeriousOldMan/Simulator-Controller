@@ -1826,7 +1826,9 @@ class FinishStepWizard extends StepWizard {
 	
 	hidePage(page) {
 		if base.hidePage(page) {
-			editSettings(kSave)
+			settings := editSettings(kSave, false, true)
+			
+			writeConfiguration(kUserHomeDirectory . "Setup\Simulator Settings.ini", settings)
 			
 			return true
 		}
@@ -1851,8 +1853,6 @@ class FinishStepWizard extends StepWizard {
 		configuration := this.SetupWizard.getSimulatorConfiguration()
 		
 		editSettings(settings, false, configuration, Min(A_ScreenWidth - Round(A_ScreenWidth / 3) + Round(A_ScreenWidth / 3 / 2) - 180, A_ScreenWidth - 360))
-		
-		writeConfiguration(kUserHomeDirectory . "Setup\Simulator Settings.ini", settings)
 	}
 }
 
@@ -1868,8 +1868,6 @@ finishSetup(finish := false, save := false) {
 		if (finish = "Finish") {
 			if SetupWizard.Instance.finishSetup(save)
 				ExitApp 0
-			else
-				SetupWizard.Instance.showPage(SetupWizard.Instance.Step, SetupWizard.Instance.Page)
 		}
 		else {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
@@ -2322,16 +2320,16 @@ initializeSimulatorSetup()
 ;;;                          Wizard Include Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-;~ #Include Libraries\ModulesStepWizard.ahk
-;~ #Include Libraries\InstallationStepWizard.ahk
-;~ #Include Libraries\ApplicationsStepWizard.ahk
-;~ #Include Libraries\ButtonBoxStepWizard.ahk
-;~ #Include Libraries\GeneralStepWizard.ahk
-;~ #Include Libraries\SimulatorsStepWizard.ahk
-;~ #Include Libraries\AssistantsStepWizard.ahk
-;~ #Include Libraries\MotionFeedbackStepWizard.ahk
-;~ #Include Libraries\TactileFeedbackStepWizard.ahk
-;~ #Include Libraries\PedalCalibrationStepWizard.ahk
+#Include Libraries\ModulesStepWizard.ahk
+#Include Libraries\InstallationStepWizard.ahk
+#Include Libraries\ApplicationsStepWizard.ahk
+#Include Libraries\ButtonBoxStepWizard.ahk
+#Include Libraries\GeneralStepWizard.ahk
+#Include Libraries\SimulatorsStepWizard.ahk
+#Include Libraries\AssistantsStepWizard.ahk
+#Include Libraries\MotionFeedbackStepWizard.ahk
+#Include Libraries\TactileFeedbackStepWizard.ahk
+#Include Libraries\PedalCalibrationStepWizard.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;

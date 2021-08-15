@@ -101,6 +101,9 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 					if (function && (function != "")) {
 						label := wizard.getLaunchApplicationLabel(application)
 						
+						if (label = "")
+							label := application
+						
 						launchApplications.Push("""" . label . """ """ . application . """ " . function)
 					}
 				}

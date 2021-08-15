@@ -399,7 +399,10 @@ restartSettings:
 	
 		setConfigurationSectionValues(newSettings, "Modes", getConfigurationSectionValues(modeSettings, "Modes"))
 		
-		result := settingsOrCommand
+		if fromSetup
+			return newSettings
+		else
+			result := settingsOrCommand
 	}
 	else if (settingsOrCommand == kContinue) {
 		Gui SE:Destroy
@@ -596,24 +599,28 @@ restartSettings:
 		
 		if (!fromSetup && (readConfiguration(kSimulatorConfigurationFile).Count() == 0))
 			startConfiguration()
-			
-		Loop {
-			Sleep 200
-		} until (result || vRestart)
 		
-		if vRestart {
-			vRestart := false
+		if fromSetup
+			return false
+		else {
+			Loop {
+				Sleep 200
+			} until (result || vRestart)
 			
-			Gui SE:Destroy
+			if vRestart {
+				vRestart := false
+				
+				Gui SE:Destroy
+				
+				loadSimulatorConfiguration()
+				
+				Goto restartSettings
+			}
 			
-			loadSimulatorConfiguration()
+			if (result == kSave)
+				settingsOrCommand := newSettings
 			
-			Goto restartSettings
+			return result
 		}
-		
-		if (result == kSave)
-			settingsOrCommand := newSettings
-		
-		return result
 	}
 }

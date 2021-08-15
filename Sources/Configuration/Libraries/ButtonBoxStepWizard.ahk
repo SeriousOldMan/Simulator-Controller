@@ -197,7 +197,7 @@ class ButtonBoxStepWizard extends StepWizard {
 		Gui %window%:Default
 		Gui ListView, % this.iFunctionsListView
 		
-		if (LV_GetCount() != this.iFunctionTriggers.Length()) {
+		if (LV_GetCount() != this.iFunctionTriggers.Count()) {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
 			title := translate("Setup ")
 			MsgBox 262436, %title%, % translate("Not all functions have been assigned to physical controls. Do you really want to proceed?")

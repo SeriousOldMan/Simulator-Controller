@@ -528,8 +528,15 @@ class SetupWizard extends ConfigurationItem {
 				
 				if FileExist(kUserHomeDirectory . "Setup\Simulator Settings.ini")
 					FileCopy %kUserHomeDirectory%Setup\Simulator Settings.ini, %kUserConfigDirectory%Simulator Settings.ini
+				
+				configuration := this.getSimulatorConfiguration()
+				
+				if FileExist(kUserHomeDirectory . "Setup\Patch.ini")
+					for section, values in readConfiguration(kUserHomeDirectory . "Setup\Patch.ini")
+						for key, value in values
+							setConfigurationValue(configuration, section, key, value)
 					
-				writeConfiguration(kUserConfigDirectory . "Simulator Configuration.ini", this.getSimulatorConfiguration())
+				writeConfiguration(kUserConfigDirectory . "Simulator Configuration.ini", configuration)
 				
 				if this.isModuleSelected("Button Box") {
 					if FileExist(kUserConfigDirectory . "Button Box Configuration.ini")

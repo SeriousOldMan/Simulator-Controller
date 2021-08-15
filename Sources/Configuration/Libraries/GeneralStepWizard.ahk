@@ -93,7 +93,7 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 		
 		launchApplications := []
 
-		for ignore, section in string2Values(",", this.Defintion[1])
+		for ignore, section in string2Values(",", this.Definition[3])
 			for application, descriptor in getConfigurationSectionValues(wizard.Definition, section) {
 				if wizard.isApplicationSelected(application) {
 					function := wizard.getLaunchApplicationFunction(application)
@@ -109,8 +109,12 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 				}
 			}
 		
-		if (launchApplications.Length() > 0)
+		if (launchApplications.Length() > 0) {
+			if (arguments != "")
+				arguments .= "; "
+			
 			arguments .= ("launchApplications: " . values2String(", ", launchApplications*))
+		}
 			
 		new Plugin("System", false, true, "", arguments).saveToConfiguration(configuration)
 	}
@@ -623,7 +627,8 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 			}
 			else {
 				SoundPlay %kResourcesDirectory%Sounds\Activated.wav
-					
+				
+				wizard := this.SetupWizard
 				window := this.Window
 				
 				Gui %window%:Default

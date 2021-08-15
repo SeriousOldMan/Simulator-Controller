@@ -112,7 +112,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 						if (actions != "")
 							actions .= ", "
 						
-						actions .= (action . A_Space actionArguments[1] . A_Space . actionArguments[2] . A_Space . values2String(A_Space, function*))
+						actions .= ("""" . action . """ " . actionArguments[1] . A_Space . actionArguments[2] . A_Space . values2String(A_Space, function*))
 					}
 				}
 				

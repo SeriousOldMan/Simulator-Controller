@@ -226,7 +226,7 @@ class SystemPlugin extends ControllerPlugin {
 					this.logFunctionNotFound(descriptor)
 			}
 		
-		for ignore, arguments in this.parseValues(",", this.getArgumentValue("launchApplications", ""))
+		for ignore, arguments in string2Values(",", this.getArgumentValue("launchApplications", ""))
 			this.createLaunchAction(controller, this.parseValues(A_Space, arguments)*)
 		
 		descriptor := this.getArgumentValue("logo", false)

@@ -655,7 +655,7 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 			
 			modes.InsertAt(1, translate("All Modes"))
 			
-			Gui %window%:Add, DropDownList, x8 y8 w75 Choose1 HWNDmodeDropDownHandle gupdateButtonBoxLabels, % values2String("|", modes*)
+			Gui %window%:Add, DropDownList, x8 y8 w82 Choose1 HWNDmodeDropDownHandle gupdateButtonBoxLabels, % values2String("|", modes*)
 			
 			this.iModeDropDownHandle := modeDropDownHandle
 		}

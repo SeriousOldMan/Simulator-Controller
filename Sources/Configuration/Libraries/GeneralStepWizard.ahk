@@ -640,14 +640,9 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 					if this.iLaunchApplications.HasKey(application)
 						this.iLaunchApplications[application][2] := function
 					else {
-						label := getConfigurationValue(wizard.Definition, "Applications.Simulators", application, false)
-					
-						if label
-							label := string2Values("|", label)[1]
-						else
-							label := ""
+						descriptor := getApplicationDescriptor(application)
 						
-						this.iLaunchApplications[application] := Array(label, function)
+						this.iLaunchApplications[application] := Array((descriptor ? descriptor[1] : ""), function)
 					}
 					
 					this.loadApplications()

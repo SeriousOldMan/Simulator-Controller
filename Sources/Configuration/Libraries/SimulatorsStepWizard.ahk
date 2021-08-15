@@ -54,7 +54,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		wizard := this.SetupWizard
 		
 		for ignore, simulator in this.Definition {
-			code := string2Values("|", getConfigurationValue(wizard.Definition, "Applications.Simulators", simulator))[1]
+			code := getApplicationDescriptor(simulator)[1]
 			
 			if wizard.isApplicationSelected(simulator) {
 				arguments := ""
@@ -157,7 +157,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		secondX := x + 150
 		
 		for ignore, simulator in this.Definition {
-			code := string2Values("|", getConfigurationValue(wizard.Definition, "Applications.Simulators", simulator))[1]
+			code := getApplicationDescriptor(simulator)[1]
 			keys := getConfigurationValue(wizard.Definition, "Setup.Simulators", "Simulators.MFDKeys." . code, false)
 			
 			if keys {
@@ -281,7 +281,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		else {
 			wizard := this.SetupWizard
 			
-			code := string2Values("|", getConfigurationValue(wizard.Definition, "Applications.Simulators", simulator))[1]
+			code := getApplicationDescriptor(simulator)[1]
 			actions := string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Simulators", (mode = "Assistant") ? "Simulators.Actions.Assistant" : ("Simulators.Settings.Pitstop." . code)))
 			
 			this.iCachedActions[mode] := actions
@@ -336,7 +336,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		
 		pluginLabels := readConfiguration(kUserTranslationsDirectory . "Controller Plugin Labels." . getLanguage())
 		
-		code := string2Values("|", getConfigurationValue(wizard.Definition, "Applications.Simulators", simulator))[1]
+		code := getApplicationDescriptor(simulator)[1]
 		
 		LV_Delete()
 		
@@ -436,7 +436,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		local action
 		
 		wizard := this.SetupWizard
-		code := string2Values("|", getConfigurationValue(wizard.Definition, "Applications.Simulators", simulator))[1]
+		code := getApplicationDescriptor(simulator)[1]
 		
 		for ignore, mode in ["Pitstop", "Assistant"] {
 			modeFunctions := {}

@@ -948,74 +948,6 @@ class SetupWizard extends ConfigurationItem {
 		return this.KnowledgeBase.getValue("System.Launch.Application." application . ".Function", "")
 	}
 	
-	addModuleStaticFunction(module, function, label) {
-		local knowledgeBase := this.KnowledgeBase
-		
-		functions := string2Values("|", knowledgeBase.getValue("Controller.Function.Static", ""))
-		
-		for index, descriptor in functions {
-			parts := string2Values("###", descriptor)
-		
-			if ((parts[1] = module) && (parts[2] = function)) {
-				parts[3] := Label
-				functions[index] := values2String("###", parts*)
-				
-				knowledgeBase.setValue("Controller.Function.Static", values2String("|", functions*))
-				
-				return
-			}
-		}
-		
-		functions.Push(values2String("###", module, function, label))
-		
-		knowledgeBase.setFact("Controller.Function.Static", values2String("|", functions*))
-	}
-	
-	removeModuleStaticFunction(module, function) {
-		local knowledgeBase := this.KnowledgeBase
-		
-		functions := string2Values("|", knowledgeBase.getValue("Controller.Function.Static", ""))
-		
-		found := true
-		
-		while found {
-			found := false
-		
-			for index, descriptor in functions {
-				parts := string2Values("###", descriptor)
-			
-				if ((parts[1] = module) && (parts[2] = function)) {
-					functions.RemoveAt(index)
-					
-					if (functions.Length() == 0)
-						knowledgeBase.removeFact("Controller.Function.Static")
-					else
-						knowledgeBase.setValue("Controller.Function.Static", values2String("|", functions*))
-					
-					found := true
-					
-					break
-				}
-			}
-		}
-	}
-	
-	getModuleStaticFunctions() {
-		local knowledgeBase := this.KnowledgeBase
-		
-		functions := string2Values("|", knowledgeBase.getValue("Controller.Function.Static", ""))
-		result := []
-		
-		for index, descriptor in functions {
-			parts := string2Values("###", descriptor)
-		
-			if wizard.isModuleSelected(parts[1])
-				result.Push(Array(parts[2], parts[3]))
-		}
-		
-		return result
-	}
-	
 	setControllerFunctions(functions) {
 		local knowledgeBase := this.KnowledgeBase
 		local function
@@ -1213,6 +1145,74 @@ class SetupWizard extends ConfigurationItem {
 		
 		if update
 			this.updateState()
+	}
+	
+	addModuleStaticFunction(module, function, label) {
+		local knowledgeBase := this.KnowledgeBase
+		
+		functions := string2Values("|", knowledgeBase.getValue("Controller.Function.Static", ""))
+		
+		for index, descriptor in functions {
+			parts := string2Values("###", descriptor)
+		
+			if ((parts[1] = module) && (parts[2] = function)) {
+				parts[3] := Label
+				functions[index] := values2String("###", parts*)
+				
+				knowledgeBase.setValue("Controller.Function.Static", values2String("|", functions*))
+				
+				return
+			}
+		}
+		
+		functions.Push(values2String("###", module, function, label))
+		
+		knowledgeBase.setFact("Controller.Function.Static", values2String("|", functions*))
+	}
+	
+	removeModuleStaticFunction(module, function) {
+		local knowledgeBase := this.KnowledgeBase
+		
+		functions := string2Values("|", knowledgeBase.getValue("Controller.Function.Static", ""))
+		
+		found := true
+		
+		while found {
+			found := false
+		
+			for index, descriptor in functions {
+				parts := string2Values("###", descriptor)
+			
+				if ((parts[1] = module) && (parts[2] = function)) {
+					functions.RemoveAt(index)
+					
+					if (functions.Length() == 0)
+						knowledgeBase.removeFact("Controller.Function.Static")
+					else
+						knowledgeBase.setValue("Controller.Function.Static", values2String("|", functions*))
+					
+					found := true
+					
+					break
+				}
+			}
+		}
+	}
+	
+	getModuleStaticFunctions() {
+		local knowledgeBase := this.KnowledgeBase
+		
+		functions := string2Values("|", knowledgeBase.getValue("Controller.Function.Static", ""))
+		result := []
+		
+		for index, descriptor in functions {
+			parts := string2Values("###", descriptor)
+		
+			if wizard.isModuleSelected(parts[1])
+				result.Push(Array(parts[2], parts[3]))
+		}
+		
+		return result
 	}
 	
 	setModuleAvailableActions(module, mode, actions) {

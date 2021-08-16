@@ -2,14 +2,14 @@
 
 Download one of the releases, preferably the latest stable build, and unzip it at any location you like. Then go to the *Binaries* folder, where you will find two applications, which handle the installation & setup process.
 
-  - The first, ["Simulator Setup"](*), which was introduced with Release 3.5, is a kind of intelligent *Setup Wizard*, which guides you through the first installation & configuration process. Many of the tasks described below will be handled automatically by this tool. After you have successfully completed the process using this tool, you will have a running installation of *Simulator Controller* completely customized to your environment.
-  - After you have finished the initial installation process and created your first running configuration using *Simulator Setup*, you might decide to use [*Simulator Configuration*](*) for all your further configuration tasks. This tool requires a much deeper knowledge about the inner workings of *Simulator Controller*, but on the other side gives you access to even more functionality compared to the more simple *Simulator Setup* tool. Anyway, as long as you are happy with the options provided by *Simulator Setup*, I recommend to stick to this tool, since it is much easier and more fail-safe.
+  - The first, ["Simulator Setup"](*), which was introduced with Release 3.5, is a kind of intelligent *Setup Wizard*, which guides you through the first installation & configuration process. Many of the tasks described below will be handled automatically by this tool. After you have successfully completed the process using this tool, you will have a running installation of Simulator Controller completely customized to your environment.
+  - After you have finished the initial installation process and created your first running configuration using *Simulator Setup*, you might decide to use [*Simulator Configuration*](*) for all your further configuration tasks. This tool requires a much deeper knowledge about the inner workings of Simulator Controller, but on the other side gives you access to even more functionality compared to the more simple *Simulator Setup* tool. Anyway, as long as you are happy with the options provided by *Simulator Setup*, I recommend to stick to this tool, since it is much easier and more fail-safe.
 
 But vefore you start the installation & configuration process, some remarks *behind the curtain*:
 
-## Storage of the configuration files of *Simulator Controller*
+## Storage of the configuration files of Simulator Controller
 
-All our (configuration) files will be saved to the *Simulator Controller* folder in your user *Documents* folder. There are also a locations in the main folder of *Simulator Controller*, where similar configuration files might be found. These files will be used, whenever you have not created your own configuration files, for example for translations. But your local folder will always be searched first, whenever a configuration file is looked up.
+All our (configuration) files will be saved to the *Simulator Controller* folder in your user *Documents* folder. There are also a locations in the main folder of Simulator Controller, where similar configuration files might be found. These files will be used, whenever you have not created your own configuration files, for example for translations. But your local folder will always be searched first, whenever a configuration file is looked up.
 
 For your safety and your peace of mind, I recommend that you always make a backup of this folder, whenever you change your configuration, either with *Simulator Setup* or with *Simulator Configuration*.
 
@@ -36,7 +36,7 @@ Note: Choosing media files depending on the currently selected simulation game i
 
 ## Special configuration steps for *Assetto Corsa Compeitizione* and *RaceRoom Racinng Experience*
 
-If you want to use the automated handling of the pitstop settings for the *Assetto Corsa Competizione* or *RaceRoom Racinng Experience* simulations, you need to create small graphical elements, which *Simulator Controller* uses to detect and *understand* the currently chossen pitstop settings. You will find detailed instructions for this task in the documentation for the [*Assetto Corsa Competizione* plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#important-preparation-for-the-pitstop-mfd-handling) and for the [*RaceRoom Racinng Experience* plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#important-preparation-for-the-pitstop-mfd-handling-1).
+If you want to use the automated handling of the pitstop settings for the *Assetto Corsa Competizione* or *RaceRoom Racinng Experience* simulations, you need to create small graphical elements, which Simulator Controller uses to detect and *understand* the currently chossen pitstop settings. You will find detailed instructions for this task in the documentation for the [*Assetto Corsa Competizione* plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#important-preparation-for-the-pitstop-mfd-handling) and for the [*RaceRoom Racinng Experience* plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#important-preparation-for-the-pitstop-mfd-handling-1).
 
 ## Installation and Configuration of the different Race Assistants
 
@@ -56,18 +56,18 @@ This tool is self-explanatory to a great extent, so you don't have to read the r
 
 If you ever have the need to start with an empty, fresh configuration, you can this either by deleting the *Simulator Controller\Setup* folder or you can hold the Shift and Control key, while starting *Simulator Setup*. You will be asked, if you want to ignore all the saved settings and options.
 
-Additionally, since the configuration files will only be created in the last step the process, you can experiment with the settings & options until you are satisfied with your choices. Doing this, you will learn a lot about the functionalities of *Simulator Controller*. If you decide to generate a new configuration in the last step of the installation & configuration step, backup files of all changed configurartion files will be created automatically, so you can always rescue your current configuration, if something goes wrong.
+Additionally, since the configuration files will only be created in the last step the process, you can experiment with the settings & options until you are satisfied with your choices. Doing this, you will learn a lot about the functionalities of Simulator Controller. If you decide to generate a new configuration in the last step of the installation & configuration step, backup files of all changed configurartion files will be created automatically, so you can always rescue your current configuration, if something goes wrong.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Setup%202.JPG)
 
 Three files will be created by the *Simulator Setup* tool at the end of the installation & configuration process, all of which are stored in the *Simulator Controller\Config* folder in your *Documents* folder:
 
   - *Simulator Configuration.ini*
-    This is the main configuration file of *Simulator Controller*. You can customize every aspect of this file using the *Simulator Configuration* application later on. See the remaining chapters in this documentation for more information.
+    This is the main configuration file of Simulator Controller. You can customize every aspect of this file using the *Simulator Configuration* application later on. See the remaining chapters in this documentation for more information.
   - *Button Box Configuration.ini*
     This special configuration file describes the [layout and control elements](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#button-box-layouts) of your connected hardware controller and Button Boxes.
   - *Simulator Settings.ini*
-    This file is also created in the last step of *Simulator Setup* and is maintained in the future by the *Simulator Settings* application. It defines the [runtime and startup settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--settings) of *Simulator Controller*.
+    This file is also created in the last step of *Simulator Setup* and is maintained in the future by the *Simulator Settings* application. It defines the [runtime and startup settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--settings) of Simulator Controller.
 
 As already said, I recommend to stick to this tool for all your configuration tasks, unless you have a configuration need, which cannot be handled by *Simulator Setup*. Please note, that ecach configuration change that you make with the *Simulator Configuration* tool, which is described in the following chapters, will be overwritten, if you ever use *Simulator Setup* afterwards.
 

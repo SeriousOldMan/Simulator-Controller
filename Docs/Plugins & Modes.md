@@ -28,16 +28,21 @@ The "System" plugin creates the controller mode "Launch", which serves as a laun
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%201.JPG)
 
+As an alternative, you can use the *launchApplications* parameter to specify the applications for the "Launch" mode:
+
+	launchApplications: ACC "Assetto Corsa Competizione" Button.1, FanaLab Fanalab Button.2, TS TeamSpeak Button.3
+
 ### Configuration
 
 The "System" plugin accepts one configuration argument in the [Plugins tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) of the configuration tool, which you almost always will provide:
 
 	modeSelector: *modeSelectorFunction1* *modeSelectorFunction2* ...;
+	launschApplications: *label* *application* *launchFunction1*, ...;
 	shutdown: *shutdownFunction*
 	
 The *modeSelector* parameter allows you to define controller functions that switch between modes on your Button Boxes. The *modeSelectorFunctionX* must be in the descriptor format, i.e. *"functionType*.*number*". You can use binary functions, such as 2-way toggle switches or dials, to switch forward and backward between modes, but a simple push button can also be used. Example: "modeSelector: 2WayToggle.1". If you have multiple Button Boxes, you may want to create a mode selector for each one, especially, if you have defined modes, whose actions are exclusive for one of those Button Boxes. Doing this, you can have mutiple modes active on the same time on your Button Boxes and you can switch between those modes on each of those Button Boxes separately. An example: You may bind all action for controlling the ["Motion" mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-motion) to one Button Box and all actions for the ["Pitstop" mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-pitstop-1) to a different Button Box. In this configuration, both modes can be active at the same time.
 
-With the *shutdown* parameter, a unary function can be supplied to shutdown the complete simulator system. This function will be available in the "Launch" mode.
+The parameter *launchApplications* allows you to specify a list of applications that you want to start and stop from your Button Box. *label* will be used as the display name and *application* must reference the application as defined in the [applications tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-applications). With the *shutdown* parameter, a unary function can be supplied to shutdown the complete simulator system. This function will be available in the "Launch" mode.
 
 ## Plugin *Tactile Feedback*
 

@@ -27,6 +27,7 @@ Release 3.1.6=Release 3.1.4 -> updatePluginsForV316, updateTranslations, updateP
 Release 3.2.0=Release 3.1.6 -> updateTranslations, updatePhraseGrammars, updatePluginLabels
 Release 3.2.2=Release 3.2.0 -> updatePluginsForV322, updateTranslations, updatePhraseGrammars, updatePluginLabels
 Release 3.3.0=Release 3.2.2 -> updateTranslations, updatePhraseGrammars
+; Release 3.5.0=Release 3.3.0 -> updateTranslations, overwritePluginLabels
 [Cleanup]
 Binaries Folder=%kBinariesDirectory%
 Logs Folder=%kLogsDirectory%

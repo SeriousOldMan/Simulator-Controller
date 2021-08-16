@@ -513,6 +513,18 @@ updateTranslations() {
 	}
 }
 
+overwritePluginLabels() {
+	for ignore, fileName in getFileNames("Controller Plugin Labels.*", kUserTranslationsDirectory)
+		FileMove %filename%, %filename%.bak, 1
+	
+	for ignore, fileName in getFileNames("Controller Plugin Labels.*", kResourcesDirectory . "Templates\") {
+		SplitPath fileName, , , languageCode
+	
+		if !FileExist(kUserTranslationsDirectory . "Controller Plugin Labels." . languageCode)
+			FileCopy %kResourcesDirectory%Templates\Controller Plugin Labels.%languageCode%, %kUserTranslationsDirectory%
+	}
+}
+
 updatePluginLabels() {
 	languages := availableLanguages()
 	enPluginLabels := readConfiguration(kResourcesDirectory . "Templates\Controller Plugin Labels.en")

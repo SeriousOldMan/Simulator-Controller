@@ -1,6 +1,21 @@
 # Installation
 
-Download one of the releases, preferably the latest stable build, and unzip it at any location you like. Then go to the *Binaries* folder, where you will find several applications. Depending on your Windows security settings, you need to unblock these applications, since Windows might not trust them. You can do this by checking the checkbox in the standard properties dialog. Do this for the DLL files in the *Binaries* folder as well.
+Download one of the releases, preferably the latest stable build, and unzip it at any location you like. Then go to the *Binaries* folder, where you will find two applications, which handle the installation & setup process.
+
+  - The first, ["Simulator Setup"](*), which was introduced with Release 3.5, is a kind of intelligent *Setup Wizard*, which guides you through the first installation & configuration process. Many of the tasks described below will be handled automatically by this tool. After you have successfully completed the process using this tool, you will have a running installation of *Simulator Controller* completely customized to your environment.
+  - After you have finished the initial installation process and created your first running configuration using *Simulator Setup*, you might decide to use [*Simulator Configuration*](*) for all your further configuration tasks. This tool requires a much deeper knowledge about the inner workings of *Simulator Controller*, but on the other side gives you access to even more functionality compared to the more simple *Simulator Setup* tool. Anyway, as long as you are happy with the options provided by *Simulator Setup*, I recommend to stick to this tool, since it is much easier and more fail-safe.
+
+But vefore you start the installation & configuration process, some remarks *behind the curtain*:
+
+## Storage of the configuration files of *Simulator Controller*
+
+All our (configuration) files will be saved to the *Simulator Controller* folder in your user *Documents* folder. There are also a locations in the main folder of *Simulator Controller*, where similar configuration files might be found. These files will be used, whenever you have not created your own configuration files, for example for translations. But your local folder will always be searched first, whenever a configuration file is looked up.
+
+For your safety and your peace of mind, I recommend that you always make a backup of this folder, whenever you change your configuration, either with *Simulator Setup* or with *Simulator Configuration*.
+
+## Unblocking of Applications & DLLs
+
+Depending on your Windows security settings, you need to unblock all the files in the *Binaries* folder, since Windows might not trust them, because you downloaded them from an untrusted location on the internet. You can do this by checking the checkbox in the standard properties dialog. Do this for the DLL files in the *Binaries* folder as well.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Unblock.JPG)
 
@@ -9,15 +24,9 @@ You might still encounter execution errors later on because of Windows security 
 	takeown.exe /F . /R /D N
 	Get-ChildItem -Path '.' -Recurse | Unblock-File
 
-After you have done all that, I recommend to add a Start menu shortcut to *Simulator Startup.exe* and *Simulator Configuration.exe*, since you will need those two applications the most. After that, you want to visit the *Config* folder. If you want to start with a clean, empty configuration, you may want to delete all *.ini files, but it will be a good idea to make a backup copies for later reference. Also, leave all other files, like the *Simulator Tools.targets* file in place.
-
-As an alternative, which I would recommend, leave the configuration files in place and use the given configuration as a starting point to understand how everything fits together. Then create your own configuration by changing this configuration using *Simulator Configuration.exe*, as described in the chapters below. The files in the *Config* folder will never get overwritten, when you save your own configuration. Instead, your configuration files will be saved to the *Simulator Controller\Config* folder in your user *Documents* folder. This folder will be searched first, when a configuration file is looked up. You can always revert to the original configuration by deleting the *.ini files in the *Simulator Controller\Config* folder.
-
 ## Installing additional components
 
-As already mentioned in the [README](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/README.md#third-party-applications) file, you might want to install additional third party applications, that can be controlled by Simulator Controller or will enhance the overall user experience. Please take a look at this list and decide, which ones you want to install. If you want to start your own plugin development or even change the code of the Simulator Controller itself, you definitely need to have [AutoHotkey](https://www.autohotkey.com/) installed. Beginning with Release 2.1, an installation of [VisualStudio Community Edition](https://visualstudio.microsoft.com/de/vs/community/) might also be required, if you want do dig into the heavylifting part of telemetry data acquisition or voice recognition. But you can stick with the precompiled binaries from the distribution, if that is not your domain.
-
-Beside that, I can recommend [VoiceMacro](http://www.voicemacro.net/) for handling complex voice commands (support for simple commands is already builtin, but *VoiceMacro* is much better), and depending on your equipment configuration, [SimHub](https://www.simhubdash.com/) and [SimFeedback](https://www.opensfx.com/). For the later two, very sophisticated support is built into the Simulator Controller already.
+As already mentioned in the [README](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/README.md#third-party-applications) file, you might want to install additional third party applications, that can be controlled by Simulator Controller or will enhance the overall user experience. Please take a look at this list and decide, which ones you want to install during the installation & setup process. If you want to start your own plugin development or even change the code of the Simulator Controller itself, you definitely need to have [AutoHotkey](https://www.autohotkey.com/) installed. Beginning with Release 2.1, an installation of [VisualStudio Community Edition](https://visualstudio.microsoft.com/de/vs/community/) might also be required, if you want do dig into the heavylifting part of telemetry data acquisition or voice recognition. But you can stick with the precompiled binaries from the distribution, if that is not your domain.
 
 ## Using your own pictures, videos and sounds for all the splash screens
 
@@ -25,31 +34,50 @@ The startup process of Simulator Controller can entertain you with splash images
 
 Note: Choosing media files depending on the currently selected simulation game is on the wish list for a future release :-)
 
+## Special configuration steps for *Assetto Corsa Compeitizione* and *RaceRoom Racinng Experience*
+
+If you want to use the automated handling of the pitstop settings for the *Assetto Corsa Competizione* or *RaceRoom Racinng Experience* simulations, you need to create small graphical elements, which *Simulator Controller* uses to detect and *understand* the currently chossen pitstop settings. You will find detailed instructions for this task in the documentation for the [*Assetto Corsa Competizione* plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#important-preparation-for-the-pitstop-mfd-handling) and for the [*RaceRoom Racinng Experience* plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#important-preparation-for-the-pitstop-mfd-handling-1).
+
 ## Installation and Configuration of the different Race Assistants
 
 Release 2.1 introduced Jona, an artificial Race Engineer as an optional component of the Simulator Controller package. Since Jona is quite a complex piece of software, and also requires additional installation steps, you will find all necessary information about Jona in a separate [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer). The configuration for Cato, a Virtual Race Strategist (introduced with Release 3.1), is very similar, since it is based on the same technology. Please see the [separate documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist) for more information.
 
 # Configuration
 
-The different components of Simulator Controller can be customized to a large extent. Part of this customization is handled by the configuration process, which typically you need to do only once, or maybe twice, when the configuration of your simulation equipment might change in the future. This overall configuration is handled by a specialized tool, which will be described in the following chapters. Additional customization, which address special aspects of the operation of the different applications of Simulator Controller, is possible by using separate configuration dialogs. See the documentation on [how to use](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller) the Simulator Controller for more information.
+The different components of Simulator Controller can be customized to a large extent. Part of this customization is handled by the installation & configuration process, which typically you need to do only once, unless your the configuration of your simulation equipment might have changed in the future. As mentioned, there is a special *Setup Wizard* available for the initial installation & configuration, whereas the somewhat more advanced configuration is handled by a specialized tool, which will be described in the following chapters. Additional customization, which address special aspects of the day to day operations of the different applications of Simulator Controller, is possible by using separate settings dialogs. See the documentation on [how to use](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller) the Simulator Controller for more information.
 
-Before you start: Simulator Controller comes with some predefined configurations for specialized use cases already. You will find these in the *Profiles\Simulator Controller* folder. You can pickup the file "Simulator Configuration.ini" from one of the use case folder there and drop it into the *Simulator Controller\Config* directory, which you will find in your user *Documents* folder, BEFORE you start your configuration process. These are the predefined use cases:
+## Running the Setup tool
 
-   1. VRE Only: If you only want to use Jona, the Virtual Race Engineer, you can use this predefined configuration. All other components of Simulator Controller are disabled here and you will never see any Button Box or other visuals. You still might need to configure special aspects, for example the preparation of the [Assetto Corsa Competizione pitstop handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#important-preparation-for-the-pitstop-mfd-handling) for example, but that's it.
+The initial installation & configuration process is handled by the tool *Simulator Setup*.
 
-   2. VRS Only: Similar configuration for Cato, the Virtual Race Strategist.
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Setup%201.PNG)
 
-   3. VRE&VRS Only: Use this configuration, if you want to enable both assistants.
+This tool is self-explanatory to a great extent, so you don't have to read the remaining documentation chapters, before you start your initial installation & configuration process. And you can repeat the installation & configuration process with *Simulator Setup* as many times as you want, since the tool will retain your work between sessions. The current state of the installation & configuration process is stored in the folder *Simulator Controller\Setup* in your *Documents* folder, if you want to make a backup of your currently chosen settings and options.
 
-   4. Desktop Rig: Sorry for the *disrespectful* naming, more like a joke from my side. This configuration file contains everything, except for the tactile and motion feedback components, which most likely will be absent, when you are driving with a bolt-on steering wheel at your desktop. Though, you still have to customize all the other configuration items for the software only components to be up and running.
+If you ever have the need to start with an empty, fresh configuration, you can this either by deleting the *Simulator Controller\Setup* folder or you can hold the Shift and Control key, while starting *Simulator Setup*. You will be asked, if you want to ignore all the saved settings and options.
 
-## Running the configuration tool
+Additionally, since the configuration files will only be created in the last step the process, you can experiment with the settings & options until you are satisfied with your choices. Doing this, you will learn a lot about the functionalities of *Simulator Controller*. If you decide to generate a new configuration in the last step of the installation & configuration step, backup files of all changed configurartion files will be created automatically, so you can always rescue your current configuration, if something goes wrong.
 
-The configuration tool is located in the *Binaries* folder and is named *Simulator Configuration.exe*. If you start it, the following window will appear:
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Setup%202.JPG)
+
+Three files will be created by the *Simulator Setup* tool at the end of the installation & configuration process, all of which are stored in the *Simulator Controller\Config* folder in your *Documents* folder:
+
+  - *Simulator Configuration.ini*
+    This is the main configuration file of *Simulator Controller*. You can customize every aspect of this file using the *Simulator Configuration* application later on. See the remaining chapters in this documentation for more information.
+  - *Button Box Configuration.ini*
+    This special configuration file describes the [layout and control elements](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#button-box-layouts) of your connected hardware controller and Button Boxes.
+  - *Simulator Settings.ini*
+    This file is also created in the last step of *Simulator Setup* and is maintained in the future by the *Simulator Settings* application. It defines the [runtime and startup settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--settings) of *Simulator Controller*.
+
+As already said, I recommend to stick to this tool for all your configuration tasks, unless you have a configuration need, which cannot be handled by *Simulator Setup*. Please note, that ecach configuration change that you make with the *Simulator Configuration* tool, which is described in the following chapters, will be overwritten, if you ever use *Simulator Setup* afterwards.
+
+## Running the Configuration tool
+
+The more comprehesive configuration tool is located in the *Binaries* folder and is named *Simulator Configuration.exe*. If you start it, the following window will appear:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Editor.JPG)
 
-The tool is divided in tabs for each aspect of the configuration process. You will find an explanation of each tab and its content below. Before you start experimenting with the configuration tool, be sure to make a backup copy of the current configuration file *Simulator Configuration.ini* in the *Config* folder, just to be safe. But you will always find a fresh copy in the *Resources\Templates* folder for your peace of mind. Generally, all your changes to the configuration files will be saved to the *Simulator Controller\Config* folder in your user *Documents* folder.
+The tool is divided in tabs for each aspect of the configuration process. You will find an explanation of each tab and its content below. Before you start experimenting with the configuration tool, be sure to make a backup copy of the current configuration file *Simulator Configuration.ini* in the *Config* folder, just to be safe. But you will always find a fresh copy in the *Resources\Templates* folder for your peace of mind. Generally, all your changes to the configuration files will be saved to the *Simulator Controller\Config* *Simulator Controller\Translations* folders in your user *Documents* folder.
 
 Hint: Beside simply running the configuration tool by double clicking it, there are two hidden modifiers. First, if you hold the Control key down, additional options for developers will be available. These will automatically appear, when an active AutoHotkey installation is detected (by checking, if the folder C:\Program Files\AutoHotkey is available). Second, if ou hold the Control key and the Shift key simultneously  while starting the configuration tool, any currently available configuration file in the *Config* folder will be ignored and you will start with a fresh, completely empty configuration.
 

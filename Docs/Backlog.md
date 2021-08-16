@@ -15,4 +15,3 @@
   
 #### General
   1. [Target: V3.x] Choosing a specific theme depending on the selected simulation game
-  2. [Target: V4.0] An interview based setup wizard, that guides through the configuration process

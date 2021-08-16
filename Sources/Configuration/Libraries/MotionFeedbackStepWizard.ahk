@@ -593,7 +593,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 					
 					if (arguments && (arguments != "")) {
 						state := string2Values("|", arguments)
-						intensity := state[2]
+						intensity := ((state[2] != "") ? state[2] : (mode ? "1.0" : "50"))
 						state := state[1]
 					}
 					else {

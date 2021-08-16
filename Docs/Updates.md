@@ -45,6 +45,12 @@ Although the code, that handles all the update tasks, is integrated into *Simula
 
 Note: Some of you might want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars* and *Simulator Controller\Rules* folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does on your own. But be sure to make a backup copy of all the files, just for peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor that can handle this.
 
+## Release 3.5.0
+
+The biggest change in this release is the introduction of the all-new [Setup Wizard](*). In the course of implementing this very challenging tool, the labels for the visual representation of the Button Boxes were extensively revised. Therefore the [plugin label files](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Templates/Controller%20Plugin%20Labels.de) will be completely overwritten in this release. If you have edited your local files in the *Simulator Controller\Translations* folder in your *Documents* folder and introduced your own label identifiers, make backup copies before the update and then re-integrate your changes.
+
+***
+
 ## Release 3.3.0
 
 This release is all about speech synthesis - and it took a great step forward.

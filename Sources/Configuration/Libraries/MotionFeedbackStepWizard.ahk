@@ -460,7 +460,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 			if functions
 				for ignore, function in functions
 					if (function && (function != ""))
-						wizard.addControllerStaticFunction("Motion Feedback", function, label)
+						wizard.addModuleStaticFunction("Motion Feedback", function, label)
 		}
 	}
 	
@@ -468,7 +468,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		base.clearActionFunction(mode, action, function)
 		
 		if inList(this.getActions(false), action)
-			this.SetupWizard.removeControllerStaticFunction("Motion Feedback", function)
+			this.SetupWizard.removeModuleStaticFunction("Motion Feedback", function)
 	}
 	
 	loadButtonBoxLabels() {

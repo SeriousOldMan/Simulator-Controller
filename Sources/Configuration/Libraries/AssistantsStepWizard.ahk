@@ -354,13 +354,13 @@ class AssistantsStepWizard extends ActionsStepWizard {
 		if functions
 			for ignore, function in functions
 				if (function && (function != ""))
-				wizard.addControllerStaticFunction(this.iCurrentAssistant, function, label)
+				wizard.addModuleStaticFunction(this.iCurrentAssistant, function, label)
 	}
 	
 	clearActionFunction(mode, action, function) {
 		base.clearActionFunction(mode, action, function)
 		
-		this.SetupWizard.removeControllerStaticFunction(this.iCurrentAssistant, function)
+		this.SetupWizard.removeModuleStaticFunction(this.iCurrentAssistant, function)
 	}
 	
 	loadActions(load := false) {

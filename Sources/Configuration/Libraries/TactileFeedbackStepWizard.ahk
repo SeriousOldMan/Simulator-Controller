@@ -276,7 +276,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 			if functions
 				for ignore, function in functions
 					if (function && (function != ""))
-						wizard.addControllerStaticFunction("Tactile Feedback", function, label)
+						wizard.addModuleStaticFunction("Tactile Feedback", function, label)
 		}
 	}
 	
@@ -284,7 +284,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 		base.clearActionFunction(mode, action, function)
 		
 		if inList(this.getActions(false), action)
-			this.SetupWizard.removeControllerStaticFunction("Tactile Feedback", function)
+			this.SetupWizard.removeModuleStaticFunction("Tactile Feedback", function)
 	}
 	
 	loadActions(load := false) {

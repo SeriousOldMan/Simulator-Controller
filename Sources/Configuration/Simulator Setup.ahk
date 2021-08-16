@@ -948,7 +948,7 @@ class SetupWizard extends ConfigurationItem {
 		return this.KnowledgeBase.getValue("System.Launch.Application." application . ".Function", "")
 	}
 	
-	addControllerStaticFunction(reference, function, label) {
+	addModuleStaticFunction(module, function, label) {
 		local knowledgeBase := this.KnowledgeBase
 		
 		functions := string2Values("|", knowledgeBase.getValue("Controller.Function.Static", ""))
@@ -956,7 +956,7 @@ class SetupWizard extends ConfigurationItem {
 		for index, descriptor in functions {
 			parts := string2Values("###", descriptor)
 		
-			if ((parts[1] = reference) && (parts[2] = function)) {
+			if ((parts[1] = module) && (parts[2] = function)) {
 				parts[3] := Label
 				functions[index] := values2String("###", parts*)
 				
@@ -966,12 +966,12 @@ class SetupWizard extends ConfigurationItem {
 			}
 		}
 		
-		functions.Push(values2String("###", reference, function, label))
+		functions.Push(values2String("###", module, function, label))
 		
 		knowledgeBase.setFact("Controller.Function.Static", values2String("|", functions*))
 	}
 	
-	removeControllerStaticFunction(reference, function) {
+	removeModuleStaticFunction(module, function) {
 		local knowledgeBase := this.KnowledgeBase
 		
 		functions := string2Values("|", knowledgeBase.getValue("Controller.Function.Static", ""))
@@ -984,7 +984,7 @@ class SetupWizard extends ConfigurationItem {
 			for index, descriptor in functions {
 				parts := string2Values("###", descriptor)
 			
-				if ((parts[1] = reference) && (parts[2] = function)) {
+				if ((parts[1] = module) && (parts[2] = function)) {
 					functions.RemoveAt(index)
 					
 					if (functions.Length() == 0)
@@ -1000,7 +1000,7 @@ class SetupWizard extends ConfigurationItem {
 		}
 	}
 	
-	getControllerStaticFunctions(reference := false) {
+	getModuleStaticFunctions() {
 		local knowledgeBase := this.KnowledgeBase
 		
 		functions := string2Values("|", knowledgeBase.getValue("Controller.Function.Static", ""))
@@ -1009,11 +1009,7 @@ class SetupWizard extends ConfigurationItem {
 		for index, descriptor in functions {
 			parts := string2Values("###", descriptor)
 		
-			if reference {
-				if (parts[1] = reference)
-					result.Push(Array(parts[2], parts[3]))
-			}
-			else
+			if wizard.isModuleSelected(parts[1])
 				result.Push(Array(parts[2], parts[3]))
 		}
 		

@@ -480,7 +480,7 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 			
 			GuiControl, , %listBox%, % "|" . values2String("|", this.iModeSelectors*)
 			
-			this.SetupWizard.addControllerStaticFunction("System", function, translate("Mode Selector"))
+			this.SetupWizard.addModuleStaticFunction("System", function, translate("Mode Selector"))
 			
 			this.loadButtonBoxLabels()
 		}
@@ -498,7 +498,7 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 			
 			GuiControl, , %listBox%, % "|" . values2String("|", this.iModeSelectors*)
 			
-			this.SetupWizard.removeControllerStaticFunction("System", function)
+			this.SetupWizard.removeModuleStaticFunction("System", function)
 			
 			this.loadButtonBoxLabels()
 		}

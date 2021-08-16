@@ -531,7 +531,7 @@ class ButtonBoxPreviewStepWizard extends StepWizard {
 		if this.SetupWizard.isModuleSelected("Button Box") {
 			configuration := readConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
 			
-			staticFunctions := this.SetupWizard.getControllerStaticFunctions()
+			staticFunctions := this.SetupWizard.getModuleStaticFunctions()
 			controllers := []
 			
 			for controller, definition in getConfigurationSectionValues(configuration, "Layouts") {
@@ -583,7 +583,7 @@ class ButtonBoxPreviewStepWizard extends StepWizard {
 		for ignore, preview in this.ButtonBoxPreviews {
 			preview.resetLabels()
 				
-			for ignore, function in this.SetupWizard.getControllerStaticFunctions()
+			for ignore, function in this.SetupWizard.getModuleStaticFunctions()
 				if preview.findFunction(function[1], row, column)
 					preview.setLabel(row, column, function[2])
 		}

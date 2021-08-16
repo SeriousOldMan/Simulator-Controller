@@ -36,7 +36,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		Get {
 			wizard := this.SetupWizard
 
-			if (wizard.isModuleSelected("Button Box") || wizard.isModuleSelected("Race Engineer"))
+			if (wizard.isModuleSelected("Button Box") || wizard.isModuleSelected("Race Engineer") || wizard.isModuleSelected("Race Strategist"))
 				for ignore, simulator in this.Definition
 					if wizard.isApplicationSelected(simulator)
 						return 1
@@ -56,7 +56,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		for ignore, simulator in this.Definition {
 			code := getApplicationDescriptor(simulator)[1]
 			
-			if wizard.isApplicationSelected(simulator) {
+			if (wizard.isApplicationSelected(simulator) && wizard.isModuleSelected("Button Box")) {
 				arguments := ""
 				
 				for ignore, descriptor in this.iSimulatorMFDKeys[simulator] {
@@ -69,36 +69,37 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 					arguments .= (key . ": " . value)
 				}
 				
-				for ignore, mode in ["Pitstop", "Assistant"] {
-					actions := ""
-				
-					for ignore, action in this.getActions(mode, simulator)
-						if wizard.simulatorActionAvailable(simulator, mode, action) {
-							function := wizard.getSimulatorActionFunction(simulator, mode, action)
+				if wizard.isModuleSelected("Button Box")
+					for ignore, mode in ["Pitstop", "Assistant"] {
+						actions := ""
+					
+						for ignore, action in this.getActions(mode, simulator)
+							if wizard.simulatorActionAvailable(simulator, mode, action) {
+								function := wizard.getSimulatorActionFunction(simulator, mode, action)
 
-							if !IsObject(function)
-								function := ((function != "") ? Array(function) : [])
-							
-							if (function.Length() > 0) {
-								if (actions != "")
-									actions .= ", "
+								if !IsObject(function)
+									function := ((function != "") ? Array(function) : [])
 								
-								actions .= (StrReplace(action, "InformationRequest.", "InformationRequest ") . A_Space . values2String(A_Space, function*))
+								if (function.Length() > 0) {
+									if (actions != "")
+										actions .= ", "
+									
+									actions .= (StrReplace(action, "InformationRequest.", "InformationRequest ") . A_Space . values2String(A_Space, function*))
+								}
 							}
+					
+						if (actions != "") {
+							if (arguments != "")
+								arguments .= "; "
+							
+							arguments .= (((mode = "Pitstop") ? "pitstopCommands: " : "assistantCommands: ") . actions)
 						}
-				
-					if (actions != "") {
-						if (arguments != "")
-							arguments .= "; "
-						
-						arguments .= (((mode = "Pitstop") ? "pitstopCommands: " : "assistantCommands: ") . actions)
 					}
-				}
 				
 				new Plugin(code, false, true, simulator, arguments).saveToConfiguration(configuration)
 			}
 			else
-				new Plugin(code, false, false, simulator, "").saveToConfiguration(configuration)
+				new Plugin(code, false, true, simulator, "").saveToConfiguration(configuration)
 		}
 	}
 	
@@ -462,18 +463,19 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 				GuiControl Hide, % descriptor[2]
 			}
 		
-		for ignore, descriptor in this.iSimulatorMFDKeys[simulator] {
-			value := wizard.getSimulatorValue(simulator, descriptor[3], descriptor[4])
-			
-			widget := descriptor[2]
-			
-			GuiControl, , %widget%, %value%
-			
-			GuiControl Show, % descriptor[1]
-			GuiControl Show, % descriptor[2]
-			GuiControl Enable, % descriptor[1]
-			GuiControl Enable, % descriptor[2]
-		}
+		if (wizard.isModuleSelected("Button Box") || wizard.isModuleSelected("Race Engineer"))
+			for ignore, descriptor in this.iSimulatorMFDKeys[simulator] {
+				value := wizard.getSimulatorValue(simulator, descriptor[3], descriptor[4])
+				
+				widget := descriptor[2]
+				
+				GuiControl, , %widget%, %value%
+				
+				GuiControl Show, % descriptor[1]
+				GuiControl Show, % descriptor[2]
+				GuiControl Enable, % descriptor[1]
+				GuiControl Enable, % descriptor[2]
+			}
 	}
 	
 	saveSimulatorMFDKeys(simulator) {

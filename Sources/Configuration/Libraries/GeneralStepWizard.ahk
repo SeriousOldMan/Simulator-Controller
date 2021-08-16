@@ -71,8 +71,13 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 		setConfigurationValue(configuration, "Configuration", "Log Level", "Warn")
 		setConfigurationValue(configuration, "Configuration", "Debug", false)
 		
-		if wizard.isSoftwareInstalled("NirCmd")
-			setConfigurationValue(configuration, "Configuration", "NirCmd Path", wizard.softwarePath("NirCmd"))
+		if wizard.isSoftwareInstalled("NirCmd") {
+			path := wizard.softwarePath("NirCmd")
+			
+			SplitPath path, , directory
+			
+			setConfigurationValue(configuration, "Configuration", "NirCmd Path", directory)
+		}
 		
 		if wizard.isModuleSelected("Voice Control") {
 			voiceControlConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Voice Control Configuration.ini")
@@ -297,8 +302,11 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 			if (getConfigurationValue(configuration, "Voice Control", "SoX Path", "") = "") {
 				path := wizard.softwarePath("SoX")
 			
-				if path
-					setConfigurationValue(configuration, "Voice Control", "SoX Path", path)
+				if path {
+					SplitPath path, , directory
+					
+					setConfigurationValue(configuration, "Voice Control", "SoX Path", directory)
+				}
 			}
 		
 			this.iVoiceControlConfigurator.loadConfigurator(configuration)

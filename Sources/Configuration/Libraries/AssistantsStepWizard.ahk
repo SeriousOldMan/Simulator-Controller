@@ -77,9 +77,9 @@ class AssistantsStepWizard extends ActionsStepWizard {
 				}
 				
 				if (assistant = "Race Engineer")
-					arguments := "assistantName: Jona"
+					arguments := "raceAssistantName: Jona"
 				else if (assistant = "Race Strategist")
-					arguments := "assistantName: Khato"
+					arguments := "raceAssistantName: Khato"
 				else
 					Throw "Unsupported race assistant detected in AssistantsStepWizard.saveToConfiguration..."
 				
@@ -96,7 +96,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 							if (actions != "")
 								actions .= ", "
 							
-							actions .= (action . A_Space . values2String(A_Space, function*))
+							actions .= (StrReplace(action, "InformationRequest.", "InformationRequest ") . A_Space . values2String(A_Space, function*))
 						}
 					}
 				
@@ -104,15 +104,15 @@ class AssistantsStepWizard extends ActionsStepWizard {
 					arguments .= ("; assistantCommands: " . actions)
 				
 				if wizard.isModuleSelected("Voice Control") {
-					arguments .= "; assistantSpeaker: true"
+					arguments .= "; raceAssistantSpeaker: true"
 					
 					if wizard.isSoftwareInstalled("MSSpeechRuntime")
-						arguments .= "; assistantListener: true"
+						arguments .= "; raceAssistantListener: true"
 					else
-						arguments .= "; assistantListener: false"
+						arguments .= "; raceAssistantListener: false"
 				}
 				else
-					arguments .= "; assistantSpeaker: false"
+					arguments .= "; raceAssistantSpeaker: false"
 				
 				for ignore, action in string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Assistants", "Assistants.Actions.Special"))
 					if wizard.assistantActionAvailable(assistant, action) {

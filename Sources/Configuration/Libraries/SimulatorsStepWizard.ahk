@@ -83,7 +83,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 								if (actions != "")
 									actions .= ", "
 								
-								actions .= (action . A_Space . values2String(A_Space, function*))
+								actions .= (StrReplace(action, "InformationRequest.", "InformationRequest ") . A_Space . values2String(A_Space, function*))
 							}
 						}
 				

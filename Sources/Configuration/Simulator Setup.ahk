@@ -1889,7 +1889,7 @@ finishSetup(finish := false, save := false) {
 		else {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
 			title := translate("Setup ")
-			MsgBox 262436, %title%, % translate("Do you want to generate the new configuration?`n`nBackup files will be saved for your current configuration in the ""Simulator Controller\Config"" folder in your user ""Documents"" folder.")
+			MsgBox 262436, %title%, % translate("Do you want to generate the new configuration?") . "`n`n" . translate("Backup files will be saved for your current configuration in the ""Simulator Controller\Config"" folder in your user ""Documents"" folder.")
 			OnMessage(0x44, "")
 			
 			IfMsgBox Yes

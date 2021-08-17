@@ -393,7 +393,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 		
 		Gui ListView, % this.ActionsListView
 		
-		pluginLabels := readConfiguration(kUserTranslationsDirectory . "Controller Plugin Labels." . getLanguage())
+		pluginLabels := readConfiguration(getFileName("Controller Plugin Labels." . getLanguage(), kUserTranslationsDirectory, kTranslationsDirectory))
 		
 		LV_Delete()
 		

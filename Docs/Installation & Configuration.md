@@ -2,10 +2,10 @@
 
 Download one of the releases, preferably the latest stable build, and unzip it at any location you like. Then go to the *Binaries* folder, where you will find two applications, which handle the installation & setup process.
 
-  - The first, ["Simulator Setup"](*), which was introduced with Release 3.5, is a kind of intelligent *Setup Wizard*, which guides you through the first installation & configuration process. Many of the tasks described below will be handled automatically by this tool. After you have successfully completed the process using this tool, you will have a running installation of Simulator Controller completely customized to your environment.
-  - After you have finished the initial installation process and created your first running configuration using *Simulator Setup*, you might decide to use [*Simulator Configuration*](*) for all your further configuration tasks. This tool requires a much deeper knowledge about the inner workings of Simulator Controller, but on the other side gives you access to even more functionality compared to the more simple *Simulator Setup* tool. Anyway, as long as you are happy with the options provided by *Simulator Setup*, I recommend to stick to this tool, since it is much easier and more fail-safe.
+  - The first, ["Simulator Setup"](*), which was introduced with Release 3.5, is an intelligent *Setup Wizard*, which guides you through the initial installation & configuration process. Many of the tasks described below will be handled automatically by this tool. After you have successfully completed the process using this tool, you will have a running installation of Simulator Controller completely customized to your environment.
+  - After you have finished the initial installation process and created your first running configuration using *Simulator Setup*, you might decide to use [*Simulator Configuration*](*) for all your further configuration tasks. This tool requires a much deeper knowledge about the inner workings of Simulator Controller, but on the other side gives you access to even more functionality compared to the more simple *Simulator Setup* tool. However, as long as you are happy with the options provided by *Simulator Setup*, I recommend to stick to this tool, since it is much easier and more fail-safe.
 
-But vefore you start the installation & configuration process, some remarks *behind the curtain*:
+Before you start the installation & configuration process, some *behind the curtain* information might might give you a better understanding of the installation & configuration process (on the other hand, you can skip these for the time being and go straight to the instructions for the [*Setup Wizard*](*)):
 
 ## Storage of the configuration files of Simulator Controller
 
@@ -70,6 +70,8 @@ Three files will be created by the *Simulator Setup* tool at the end of the inst
     This file is also created in the last step of *Simulator Setup* and is maintained in the future by the *Simulator Settings* application. It defines the [runtime and startup settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--settings) of Simulator Controller.
 
 As already said, I recommend to stick to this tool for all your configuration tasks, unless you have a configuration need, which cannot be handled by *Simulator Setup*. Please note, that ecach configuration change that you make with the *Simulator Configuration* tool, which is described in the following chapters, will be overwritten, if you ever use *Simulator Setup* afterwards.
+
+Here is a tip for very experienced users: It is possible to patch the generated configuration and/or settings files created by "Simulator Setup". To do this, create a *.ini file with those section/key/value information you want to substitute in or add to the final configuration and/or settings information, name them "Conifguration Patch.ini" or "Settings Patch.ini" and drop them into the *Simulator Controller\Setup* folder in your user *Documents* folder. Corresponding sample files can be found in the *Resources\Templates* folder.
 
 ## Running the Configuration tool
 

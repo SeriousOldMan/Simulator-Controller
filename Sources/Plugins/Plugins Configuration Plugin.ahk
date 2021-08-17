@@ -228,6 +228,11 @@ comparePlugins(p1, p2) {
 }
 
 openLabelsEditor() {
+	fileName := ("Controller Plugin Labels." . getLanguage())
+	
+	if !FileExist(kUserTranslationsDirectory . fileName)
+		FileCopy %kResourcesDirectory%Templates\%fileName%, %kUserTranslationsDirectory%%fileName%
+		
 	Run % "notepad.exe " . """" . kUserTranslationsDirectory . "Controller Plugin Labels." . getLanguage() . """"
 }
 

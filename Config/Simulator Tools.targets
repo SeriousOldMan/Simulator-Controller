@@ -27,7 +27,7 @@ Release 3.1.6=Release 3.1.4 -> updatePluginsForV316, updateTranslations, updateP
 Release 3.2.0=Release 3.1.6 -> updateTranslations, updatePhraseGrammars, updatePluginLabels
 Release 3.2.2=Release 3.2.0 -> updatePluginsForV322, updateTranslations, updatePhraseGrammars, updatePluginLabels
 Release 3.3.0=Release 3.2.2 -> updateTranslations, updatePhraseGrammars
-; Release 3.5.0=Release 3.3.0 -> updateTranslations, overwritePluginLabels
+Release 3.5.0=Release 3.3.0 -> updateTranslations, deletePluginLabels
 [Cleanup]
 Binaries Folder=%kBinariesDirectory%
 Logs Folder=%kLogsDirectory%
@@ -69,7 +69,7 @@ Translations.3=%kTranslationsDirectory%Translations.de <- %kSourcesDirectory%Con
 Translations.4=%kResourcesDirectory%Templates\Translations.de <- %kSourcesDirectory%Configuration\Translations\Translations.de
 Translations.5=%kResourcesDirectory%Templates\Controller Plugin Labels.en <- %kSourcesDirectory%Plugins\Controller Plugin Labels.en
 Translations.6=%kResourcesDirectory%Templates\Controller Plugin Labels.de <- %kSourcesDirectory%Plugins\Controller Plugin Labels.de
-Consent=%kConfigDirectory%Consent.ini <- %kSourcesDirectory%Assistants\Consent.ini
+Consent=%kTranslationsDirectory%Consent.ini <- %kSourcesDirectory%Assistants\Consent.ini
 Race Assistant Configuration.1=%kResourcesDirectory%Rules\Utilities.rules <- %kSourcesDirectory%Assistants\Rules\Utilities.rules
 Race Assistant Configuration.2=%kResourcesDirectory%Rules\Statistical Computations.rules <- %kSourcesDirectory%Assistants\Rules\Statistical Computations.rulesrules
 Race Assistant Configuration.3=%kResourcesDirectory%Rules\Session Information Retrieval.rules <- %kSourcesDirectory%Assistants\Rules\Session Information Retrieval.rules

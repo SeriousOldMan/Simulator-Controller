@@ -95,7 +95,7 @@ consentDialog(id, consent := false) {
 	if ((language != "en") && (language != "de"))
 		language := "en"
 	
-	texts := readConfiguration(kConfigDirectory . "Consent.ini")
+	texts := readConfiguration(kTranslationsDirectory . "Consent.ini")
 	
 	Gui CNS:-Border ; -Caption
 	Gui CNS:Color, D0D0D0, E5E5E5
@@ -566,7 +566,7 @@ requestShareSetupDatabaseConsent() {
 			setConfigurationValue(newConsent, "General", "ID", id)
 			setConfigurationValue(newConsent, "Consent", "Date", A_MM . "/" . A_DD . "/" . A_YYYY)
 			
-			if FileExist(kConfigDirectory . "Consent.ini")
+			if FileExist(kTranslationsDirectory . "Consent.ini")
 				result := consentDialog(id, consent)
 			else {
 				result := {}
@@ -904,13 +904,6 @@ initializeEnvironment() {
 	
 	if !FileExist(A_MyDocuments . "\Simulator Controller\Plugins\Configuration Plugins.ahk")
 		FileCopy %kResourcesDirectory%Templates\Configuration Plugins.ahk, %A_MyDocuments%\Simulator Controller\Plugins
-	
-	for ignore, fileName in getFileNames("Controller Plugin Labels.*", kResourcesDirectory . "Templates\") {
-		SplitPath fileName, , , languageCode
-	
-		if !FileExist(kUserTranslationsDirectory . "Controller Plugin Labels." . languageCode)
-			FileCopy %kResourcesDirectory%Templates\Controller Plugin Labels.%languageCode%, %kUserTranslationsDirectory%
-	}
 	
 	if !FileExist(kUserConfigDirectory . "Race.settings")
 		FileCopy %kResourcesDirectory%Templates\Race.settings, %kUserConfigDirectory%

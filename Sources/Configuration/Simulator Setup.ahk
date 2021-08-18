@@ -37,7 +37,7 @@ ListLines Off					; Disable execution history
 
 #Include ..\Libraries\JSON.ahk
 #Include ..\Libraries\RuleEngine.ahk
-#Include ..\Controller\Libraries\SettingsEditor.ahk
+#Include Libraries\SettingsEditor.ahk
 #Include Libraries\ConfigurationEditor.ahk
 #Include Libraries\ButtonBoxEditor.ahk
 #Include ..\Plugins\Voice Control Configuration Plugin.ahk
@@ -1839,9 +1839,14 @@ class FinishStepWizard extends StepWizard {
 	
 	hidePage(page) {
 		if base.hidePage(page) {
-			settings := editSettings(kSave, false, true)
-			
-			writeConfiguration(kUserHomeDirectory . "Setup\Simulator Settings.ini", settings)
+			try {
+				settings := editSettings(kSave, false, true)
+				
+				writeConfiguration(kUserHomeDirectory . "Setup\Simulator Settings.ini", settings)
+			}
+			catch exception {
+				; ignore
+			}
 			
 			return true
 		}
@@ -2263,16 +2268,21 @@ findSoftware(definition, software) {
 						}
 						
 						if (installPath != "") {
-							FileRead script, %installPath%\steamapps\libraryfolders.vdf
-							
-							folders := JSON.parse(convertVDF2JSON(script))
-							folders := folders["LibraryFolders"]
-							
-							for ignore, folder in folders {
-								fileName := folder . "\steamapps\common\" . locator . "\" . descriptor[3]
+							try {
+								FileRead script, %installPath%\steamapps\libraryfolders.vdf
 								
-								if FileExist(fileName)
-									return fileName
+								folders := JSON.parse(convertVDF2JSON(script))
+								folders := folders["LibraryFolders"]
+								
+								for ignore, folder in folders {
+									fileName := folder . "\steamapps\common\" . locator . "\" . descriptor[3]
+									
+									if FileExist(fileName)
+										return fileName
+								}
+							}
+							catch exception {
+								;
 							}
 						}
 					}

@@ -2040,7 +2040,7 @@ convertVDF2JSON(vdf) {
     vdf := "{`n" . vdf . "`n}"
 
     ; replace open braces
-	vdf := RegExReplace(vdf, """(.*)""\s*{", """${1}"": {")
+	vdf := RegExReplace(vdf, """([^""]*)""\s*{", """${1}"": {")
 	
 	; replace values
 	vdf := RegExReplace(vdf, """([^""]*)""\s*""([^""]*)""", """${1}"": ""${2}"",")
@@ -2285,6 +2285,9 @@ findSoftware(definition, software) {
 								folders := folders["LibraryFolders"]
 								
 								for ignore, folder in folders {
+									if IsObject(folder)
+										folder := folder[path]
+									
 									fileName := folder . "\steamapps\common\" . locator . "\" . descriptor[3]
 									
 									if FileExist(fileName)

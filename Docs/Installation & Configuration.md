@@ -63,7 +63,7 @@ Additionally, since the configuration files will only be created in the last ste
 Three files will be created by the *Simulator Setup* tool at the end of the installation & configuration process, all of which are stored in the *Simulator Controller\Config* folder in your *Documents* folder:
 
   - *Simulator Configuration.ini*
-    This is the main configuration file of Simulator Controller. You can customize every aspect of this file using the *Simulator Configuration* application later on. See the remaining chapters in this documentation for more information.
+    This is the main configuration file of Simulator Controller. You can customize every aspect of this file using the *Simulator Configuration* application after the initial installation & configuration process. See the remaining chapters in this documentation for more information.
   - *Button Box Configuration.ini*
     This special configuration file describes the [layout and control elements](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#button-box-layouts) of your connected hardware controller and Button Boxes.
   - *Simulator Settings.ini*

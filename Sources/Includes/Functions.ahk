@@ -1356,15 +1356,7 @@ setLanguage(languageCode) {
 }
 
 getSystemLanguage() {
-	languageCode_0407 := "German_Standard"
-	languageCode_0807 := "German_Swiss"
-	languageCode_0c07 := "German_Austrian"
-	languageCode_1007 := "German_Luxembourg"
-	languageCode_1407 := "German_Liechtenstein"
-	
-	language := languageCode_%A_Language%
-	
-	if InStr(language, "German")
+	if inList(["0407", "0807", "0c07", "1007", "1407"], A_Language)
 		return "DE"
 	else
 		return "EN"

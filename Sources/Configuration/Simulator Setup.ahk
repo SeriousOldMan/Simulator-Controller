@@ -1715,19 +1715,19 @@ class StartStepWizard extends StepWizard {
 			
 			this.registerWidgets(2, iconHandle, labelHandle, infoTextHandle, restartButtonHandle)
 		}
-		else {
-			currentDirectory := A_WorkingDir
+		else if A_IsAdmin
+			for ignore, directory in [kBinariesDirectory, kResourcesDirectory . "Setup\Installer\"] {
+				currentDirectory := A_WorkingDir
 
-			try {
-				SetWorkingDir %kBinariesDirectory%
-				
-				if A_IsAdmin
+				try {
+					SetWorkingDir %directory%
+					
 					Run Powershell -Command Get-ChildItem -Path '.' -Recurse | Unblock-File
+				}
+				finally {
+					SetWorkingDir %currentDirectory%
+				}
 			}
-			finally {
-				SetWorkingDir %currentDirectory%
-			}
-		}
 	}
 	
 	reset() {

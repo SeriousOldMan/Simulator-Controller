@@ -173,7 +173,33 @@ class InstallationStepWizard extends StepWizard {
 	}
 	
 	installSoftware(software) {
-		Run % substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Installation", "Installation." . software))
+		wizard := this.SetupWizard
+			
+		if !getConfigurationValue(wizard.Definition, "Setup.Installation", "Installation." . software . ".Locatable", true) {
+			RunWait % substituteVariables(getConfigurationValue(wizard.Definition, "Setup.Installation", "Installation." . software))
+			
+			wizard.locateSoftware(software)
+	
+			if (wizard.isSoftwareInstalled(software) && this.iSoftwareLocators.HasKey(software)) {
+				buttons := this.iSoftwareLocators[software]
+			
+				GuiControl Disable, % buttons[1]
+				
+				if (buttons.Length() > 1) {
+					button := buttons[2]
+					
+					GuiControl Disable, %button% 
+					GuiControl Text, %button%, % translate("Installed")
+				}
+				else {
+					button := buttons[1]
+				
+					GuiControl Text, %button%, % translate("Installed")
+				}
+			}
+		}
+		else
+			Run % substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Installation", "Installation." . software))
 	}
 	
 	locateSoftware(software, executable) {
@@ -196,21 +222,25 @@ class InstallationStepWizard extends StepWizard {
 			if !this.SetupWizard.isSoftwareRequested(software)
 				for ignore, widget in widgets
 					GuiControl Disable, %widget%
-			else if (this.SetupWizard.isSoftwareInstalled(software) && this.iSoftwareLocators.HasKey(software)) {
-				buttons := this.iSoftwareLocators[software]
-			
-				GuiControl Disable, % buttons[1]
+			else {
+				this.SetupWizard.locateSoftware(software)
+		
+				if (this.SetupWizard.isSoftwareInstalled(software) && this.iSoftwareLocators.HasKey(software)) {
+					buttons := this.iSoftwareLocators[software]
 				
-				if (buttons.Length() > 1) {
-					button := buttons[2]
+					GuiControl Disable, % buttons[1]
 					
-					GuiControl Disable, %button% 
-					GuiControl Text, %button%, % translate("Installed")
-				}
-				else {
-					button := buttons[1]
-				
-					GuiControl Text, %button%, % translate("Installed")
+					if (buttons.Length() > 1) {
+						button := buttons[2]
+						
+						GuiControl Disable, %button% 
+						GuiControl Text, %button%, % translate("Installed")
+					}
+					else {
+						button := buttons[1]
+					
+						GuiControl Text, %button%, % translate("Installed")
+					}
 				}
 			}
 	}

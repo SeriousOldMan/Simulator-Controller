@@ -26,7 +26,7 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-[3.5.0-dev](https://cntr.click/K3zvP5Y) (Early build for Release 3.5. New features: All new Setup Wizard, Button Boxes can be invisible, Rework of Plugin Labels, Play a short tone when Push2Talk is activated, New "launchApplications" parameter for the "System" plugin, Templates Cleanup. Quite stable, incl. documentation and update procedure.)
+[3.5.0-alpha](https://cntr.click/3KV0BLx) (Early build for Release 3.5. New features: All new Setup Wizard, Button Boxes can be invisible, Rework of Plugin Labels, Play a short tone when Push2Talk is activated, New "launchApplications" parameter for the "System" plugin, Templates Cleanup. Quite stable, incl. documentation and update procedure.)
 
 IMPORTANT: Please make a backup copy of your *Simulator Controller* folder in your user *Documents* folder, if you want to play with this early build. A lot of files changed there and there might be no rollback to the current version possible, once you have startet V3.5 for the first time. Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-350) of this version and all the versions you might have skipped, before installing and using this version.
 

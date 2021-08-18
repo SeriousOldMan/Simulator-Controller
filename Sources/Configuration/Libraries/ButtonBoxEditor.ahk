@@ -1717,30 +1717,25 @@ openButtonBoxesDocumentation() {
 }
 
 chooseImageFilePath() {
-	protectionOn()
+	GuiControlGet imageFilePathEdit
 	
-	try {
-		GuiControlGet imageFilePathEdit
-		
-		path := imageFilePathEdit
+	path := imageFilePathEdit
+
+	if (path && (path != ""))
+		path := getFileName(path, kButtonBoxImagesDirectory)
+	else
+		path := SubStr(kButtonBoxImagesDirectory, 1, StrLen(kButtonBoxImagesDirectory) - 1)
 	
-		if (path && (path != ""))
-			path := getFileName(path, kButtonBoxImagesDirectory)
-		else
-			path := SubStr(kButtonBoxImagesDirectory, 1, StrLen(kButtonBoxImagesDirectory) - 1)
-		
-		title := translate("Select Image...")
+	title := translate("Select Image...")
+
+	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Cancel"]))
+	FileSelectFile pictureFile, 1, , %title%, Image (*.jpg; *.png; *.gif)
+	OnMessage(0x44, "")
 	
-		FileSelectFile pictureFile, 1, , %title%, Image (*.jpg; *.png; *.gif)
+	if (pictureFile != "") {
+		imageFilePathEdit := pictureFile
 		
-		if (pictureFile != "") {
-			imageFilePathEdit := pictureFile
-			
-			GuiControl Text, imageFilePathEdit, %imageFilePathEdit%
-		}
-	}
-	finally {
-		protectionOff()
+		GuiControl Text, imageFilePathEdit, %imageFilePathEdit%
 	}
 }
 

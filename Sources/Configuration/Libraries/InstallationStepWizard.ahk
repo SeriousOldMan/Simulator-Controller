@@ -293,7 +293,9 @@ locateSoftware() {
 	
 	title := substituteVariables(translate("Select %name% executable..."), {name: name})
 	
+	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Cancel"]))
 	FileSelectFile file, 1, , %title%, Executable (*.exe)
+	OnMessage(0x44, "")
 	
 	if (file != "")
 		stepWizard.locateSoftware(name, file)

@@ -687,17 +687,12 @@ getPTTHotkey() {
 }
 
 chooseSoXPath() {
-	protectionOn()
+	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
+	FileSelectFolder directory, *%soXPathEdit%, 0, % translate("Select SoX folder...")
+	OnMessage(0x44, "")
 	
-	try{
-		FileSelectFolder directory, *%soXPathEdit%, 0, % translate("Select SoX folder...")
-	
-		if (directory != "")
-			GuiControl Text, soXPathEdit, %directory%
-	}
-	finally {
-		protectionOff()
-	}
+	if (directory != "")
+		GuiControl Text, soXPathEdit, %directory%
 }
 
 initializeVoiceControlConfigurator() {

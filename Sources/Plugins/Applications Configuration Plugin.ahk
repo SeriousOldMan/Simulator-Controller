@@ -258,7 +258,9 @@ chooseApplicationExePath() {
 		
 		title := translate("Select application executable...")
 		
+		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Cancel"]))
 		FileSelectFile file, 1, %applicationExePathEdit%, %title%, Executable (*.exe)
+		OnMessage(0x44, "")
 		
 		if (file != "") {
 			GuiControl Text, applicationExePathEdit, %file%
@@ -277,8 +279,10 @@ chooseApplicationWorkingDirectoryPath() {
 	protectionOn()
 	
 	try {
+		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
 		FileSelectFolder directory, *%applicationWorkingDirectoryPathEdit%, 0, % translate("Select working directory...")
-	
+		OnMessage(0x44, "")
+		
 		if (directory != "")
 			GuiControl Text, applicationWorkingDirectoryPathEdit, %directory%
 	}

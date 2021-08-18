@@ -1889,9 +1889,9 @@ finishSetup(finish := false, save := false) {
 	try {
 		if (finish = "Finish") {
 			if !vSettingsReady {
-				callback := Func("finishSetup").Bind("Finish", save)
-			
 				; Let other threads finish...
+				
+				callback := Func("finishSetup").Bind("Finish", save)
 					
 				SetTimer %callback%, % -200
 				
@@ -1912,11 +1912,7 @@ finishSetup(finish := false, save := false) {
 			else
 				save := false
 			
-			SetupWizard.Instance.hidePage(SetupWizard.Instance.Step, SetupWizard.Instance.Page)
-			
 			callback := Func("finishSetup").Bind("Finish", save)
-			
-			; Let other threads finish...
 				
 			SetTimer %callback%, % -200
 		}

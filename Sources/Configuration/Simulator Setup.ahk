@@ -55,8 +55,6 @@ global kNext = "next"
 global kPrevious = "previous"
 global kLanguage = "language"
 
-global vInstallerLanguage = false
-
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Variable Section                         ;;;
@@ -68,6 +66,8 @@ global vResult = false
 global vWorking = false
 
 global vPageSwitch = false
+
+global vSettingsReady = false
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -1830,6 +1830,8 @@ class FinishStepWizard extends StepWizard {
 	}
 	
 	showPage(page) {
+		vSettingsReady := false
+		
 		base.showPage(page)
 		
 		settingsEditor := ObjBindMethod(this, "settingsEditor")
@@ -1871,6 +1873,8 @@ class FinishStepWizard extends StepWizard {
 		configuration := this.SetupWizard.getSimulatorConfiguration()
 		
 		editSettings(settings, false, configuration, Min(A_ScreenWidth - Round(A_ScreenWidth / 3) + Round(A_ScreenWidth / 3 / 2) - 180, A_ScreenWidth - 360))
+		
+		vSettingsReady := true
 	}
 }
 
@@ -1884,6 +1888,16 @@ finishSetup(finish := false, save := false) {
 	
 	try {
 		if (finish = "Finish") {
+			if !vSettingsReady {
+				callback := Func("finishSetup").Bind("Finish", save)
+			
+				; Let other threads finish...
+					
+				SetTimer %callback%, % -200
+				
+				return
+			}
+			
 			if SetupWizard.Instance.finishSetup(save)
 				ExitApp 0
 		}
@@ -1904,7 +1918,7 @@ finishSetup(finish := false, save := false) {
 			
 			; Let other threads finish...
 				
-			SetTimer %callback%, % isDebug() ? -5000 : -2000
+			SetTimer %callback%, % -200
 		}
 	}
 	finally {

@@ -2286,7 +2286,7 @@ findSoftware(definition, software) {
 								
 								for ignore, folder in folders {
 									if IsObject(folder)
-										folder := folder[path]
+										folder := folder["path"]
 									
 									fileName := folder . "\steamapps\common\" . locator . "\" . descriptor[3]
 									

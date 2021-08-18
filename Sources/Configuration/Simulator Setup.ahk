@@ -2267,10 +2267,13 @@ findSoftware(definition, software) {
 							
 							folders := JSON.parse(convertVDF2JSON(script))
 							folders := folders["LibraryFolders"]
-							fileName := folders[1] . "\steamapps\common\" . locator . "\" . descriptor[3]
 							
-							if FileExist(fileName)
-								return fileName
+							for ignore, folder in folders {
+								fileName := folder . "\steamapps\common\" . locator . "\" . descriptor[3]
+								
+								if FileExist(fileName)
+									return fileName
+							}
 						}
 					}
 				}

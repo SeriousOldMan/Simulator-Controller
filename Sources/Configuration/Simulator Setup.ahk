@@ -2247,7 +2247,7 @@ findSoftware(definition, software) {
 							return true
 					}
 					else if (InStr(locator, "RegistryScan:") == 1) {
-						folder := findInstallProperty(substituteVariables(StrReplace(locator, "RegistryScan:", "")), "InstallLocation")
+						folder := findInstallProperty(substituteVariables(Trim(StrReplace(locator, "RegistryScan:", ""))), "InstallLocation")
 				
 						if ((folder != "") && FileExist(folder . descriptor[3]))
 							return (folder . descriptor[3])
@@ -2274,7 +2274,7 @@ findSoftware(definition, software) {
 						}
 					}
 				}
-			
+
 				exePath := getConfigurationValue(kSimulatorConfiguration, name, "Exe Path", false)
 				
 				if (exePath && FileExist(exePath))

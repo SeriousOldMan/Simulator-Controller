@@ -1702,7 +1702,7 @@ class StartStepWizard extends StepWizard {
 			
 			Gui %window%:Add, ActiveX, x%x% yp+30 w%width% h350 HWNDinfoTextHandle VinfoText Hidden, shell.explorer
 			
-			x := x + Round(width / 2) - 120
+			x := x + Round((width - 240) / 2)
 			
 			Gui %window%:Font, s10 Bold, Arial
 			

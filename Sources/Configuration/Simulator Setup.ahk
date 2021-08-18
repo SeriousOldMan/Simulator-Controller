@@ -1884,41 +1884,39 @@ class FinishStepWizard extends StepWizard {
 ;;;-------------------------------------------------------------------------;;;
 
 finishSetup(finish := false, save := false) {
-	protectionOn()
-	
-	try {
-		if (finish = "Finish") {
-			if !vSettingsReady {
-				; Let other threads finish...
-				
-				callback := Func("finishSetup").Bind("Finish", save)
-					
-				SetTimer %callback%, % -200
-				
-				return
-			}
-			
-			if SetupWizard.Instance.finishSetup(save)
-				ExitApp 0
-		}
-		else {
-			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-			title := translate("Setup ")
-			MsgBox 262436, %title%, % translate("Do you want to generate the new configuration?") . "`n`n" . translate("Backup files will be saved for your current configuration in the ""Simulator Controller\Config"" folder in your user ""Documents"" folder.")
-			OnMessage(0x44, "")
-			
-			IfMsgBox Yes
-				save := true
-			else
-				save := false
+	if (finish = "Finish") {
+		if !vSettingsReady {
+			; Let other threads finish...
 			
 			callback := Func("finishSetup").Bind("Finish", save)
 				
 			SetTimer %callback%, % -200
+			
+			return
 		}
+		
+		if SetupWizard.Instance.finishSetup(save)
+			ExitApp 0
 	}
-	finally {
-		protectionOff()
+	else {
+		window := SetupWizard.Instance.WizardWindow
+	
+		Gui %window%:Show
+		
+		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+		title := translate("Setup ")
+		message := (translate("Do you want to generate the new configuration?") . "`n`n" . translate("Backup files will be saved for your current configuration in the ""Simulator Controller\Config"" folder in your user ""Documents"" folder."))
+		MsgBox 262436, %title%, %message%
+		OnMessage(0x44, "")
+		
+		IfMsgBox Yes
+			save := true
+		else
+			save := false
+		
+		callback := Func("finishSetup").Bind("Finish", save)
+			
+		SetTimer %callback%, % -200
 	}
 }
 

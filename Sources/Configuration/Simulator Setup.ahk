@@ -55,7 +55,8 @@ global kNext = "next"
 global kPrevious = "previous"
 global kLanguage = "language"
 
-global vInstallerLanguage = false
+global kUninstallKey := "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\SimulatorController"
+global kSimulatorControllerKey := "SOFTWARE\SimulatorController"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -554,10 +555,6 @@ class SetupWizard extends ConfigurationItem {
 					
 					FileCopy %kUserHomeDirectory%Setup\Button Box Configuration.ini, %kUserConfigDirectory%Button Box Configuration.ini
 				}
-	
-				for ignore, name in ["Simulator Startup", "Simulator Settings", "Race Settings", "Setup Database"]
-					if ((A_Index < 3) || this.isModuleSelected("Race Engineer") || this.isModuleSelected("Race Strategist"))
-						FileCreateShortCut %kBinariesDirectory%%name%.exe, %A_StartMenu%\%name%.lnk, %kBinariesDirectory%
 			}
 			
 			vWorking := false
@@ -566,6 +563,75 @@ class SetupWizard extends ConfigurationItem {
 		}
 		else
 			return false
+	}
+	
+	install() {
+		this.createStartMenuEntries()
+		
+		this.writeAppPaths()
+		this.writeUninstallerInfo()
+	}
+	
+	uninstall() {
+	}
+	
+	createStartMenuEntries() {
+		for ignore, name in ["Simulator Startup", "Simulator Settings", "Race Settings", "Setup Database"]
+			if ((A_Index < 3) || this.isModuleSelected("Race Engineer") || this.isModuleSelected("Race Strategist"))
+				FileCreateShortCut %kBinariesDirectory%%name%.exe, %A_StartMenu%\%name%.lnk, %kBinariesDirectory%
+			else
+				try {
+					FileDelete %A_StartMenu%\%name%.lnk
+				}
+				catch exception {
+					; ignore
+				}
+	}
+	
+	removeStartMenuEntries() {
+		for ignore, name in ["Simulator Startup", "Simulator Settings", "Race Settings", "Setup Database"]
+			try {
+				FileDelete %A_StartMenu%\%name%.lnk
+			}
+			catch exception {
+				; ignore
+			}
+	}
+	
+	writeAppPaths() {
+		RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\Simulator Startup.exe,, %kBinariesDirectory%Simulator Startup.exe
+		RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\Simulator Controller.exe,, %kBinariesDirectory%Simulator Controller.exe
+		RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\Simulator Settings.exe,, %kBinariesDirectory%Simulator Settings.exe
+		RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\Simulator Configuration.exe,, %kBinariesDirectory%Simulator Configuration.exe
+		RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\Race Settings.exe,, %kBinariesDirectory%Race Settings.exe
+		RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\Setup Database.exe,, %kBinariesDirectory%Setup Database.exe
+	}
+	
+	deleteAppPaths() {
+		RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\Simulator Startup.exe
+		RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\Simulator Controller.exe
+		RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\Simulator Settings.exe
+		RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\Simulator Configuration.exe
+		RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\Race Settings.exe
+		RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\Setup Database.exe
+	}
+	
+	writeUninstallerInfo() {
+		version := StrSplit(kVersion, "-", , 2)[1]
+		
+		RegWrite REG_SZ, HKLM, %kUninstallKey%, DisplayName, Simulator Controller
+		RegWrite REG_SZ, HKLM, %kUninstallKey%, InstallLocation, %kHomeDirectory%
+		RegWrite REG_SZ, HKLM, %kUninstallKey%, UninstallString, "%kBinariesDirectory%Simulator Setup.exe" -Uninstall
+		RegWrite REG_SZ, HKLM, %kUninstallKey%, QuietUninstallString, "%kBinariesDirectory%Simulator Setup.exe" -Uninstall -Quiet
+		RegWrite REG_SZ, HKLM, %kUninstallKey%, DisplayIcon, "%kResourcesDirectory%Icons\Artificial Intelligence.ico"
+		RegWrite REG_SZ, HKLM, %kUninstallKey%, DisplayVersion, %version%
+		RegWrite REG_SZ, HKLM, %kUninstallKey%, URLInfoAbout, https://github.com/SeriousOldMan/Simulator-Controller/wiki
+		RegWrite REG_SZ, HKLM, %kUninstallKey%, Publisher, Oliver Juwig (TheBigO)
+		RegWrite REG_SZ, HKLM, %kUninstallKey%, NoModify, 1
+	}
+	
+	deleteUninstallerInfo() {
+		RegDelete HKLM, %kUninstallKey%
 	}
 	
 	getSimulatorConfiguration() {

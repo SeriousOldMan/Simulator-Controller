@@ -26,7 +26,9 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-None for the moment...
+[3.5.0-rc1](https://cntr.click/HH12RLk) (First release candidate for Release 3.5. New features: All new Setup Wizard, Button Boxes can be invisible, Rework of Plugin Labels, Play a short tone when Push2Talk is activated, New "launchApplications" parameter for the "System" plugin, Templates Cleanup. Including documentation and update procedure.)
+
+IMPORTANT: Please make a backup copy of your *Simulator Controller* folder in your user *Documents* folder, if you want to play with this prerelease build. A lot of files changed there and there might be no rollback to the current version possible, once you have startet V3.5 for the first time. Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-350) of this version and all the versions you might have skipped, before installing and using this version.
 
 #### Latest release build
 
@@ -65,16 +67,16 @@ If you want to become a part of the small and very young Community for Simulator
     - Add splash screens and title melodies using a themes editor for a more emotional startup experience
     - Full support for sophisticated application automation - for example, start your favorite voice chat software like TeamSpeak and automatically switch to your standard channel 
   - Several plugins are supplied out of the box:
-    - Support for *Assetto Corsa*, *Assetto Corsa Competizione*, *rFactor 2* and *RaceRoom Racing Experience* is already builtin, other simulation games will follow
+    - Support for *Assetto Corsa*, *Assetto Corsa Competizione*, *rFactor 2*, *iRacing*, *Automobilista 2* and *RaceRoom Racing Experience* is already builtin, other simulation games will follow
     - Fully customizable plugins supplied for total control of SimHub and SimFeedback - change your settings while racing using the dials and switches on your favorite Button Box
 	- Control the calibration curves of your high end pedals by a simple button press with the plugin for the Heusinkveld pedal family
     - Send your predefined kudos and rants to the ingame chat without touching the keyboard
   - Additional support to trigger every function and action from external sources like a voice or gesture recognition software to always keep your hands on the wheel
   - Builtin support for visual head tracking to control ingame viewing angle - see [third party applications](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications) below
 
-#### Virtual Race Engineer
+#### Virtual Race Engineer & Virtual Race Strategist
 
-And, last but not least, an AI based Race Engineer with fully dialog capable voice control will guide you through your race, warn you about critical issues and will help you with the pitstop. This smart chat bot is an independent application, but is integreated with the ACC and other simulation game plugins using interprocess communication right now. An integration for a new simulation games requires some effort, especially for the necessary data acquisition from the simulation game, but a knowledged programmer can manage it in about three to four hours.
+And, last but not least, an AI based Race Engineer with fully dialog capable voice control will guide you through your race, warn you about critical issues and will help you with the pitstop, whereas the Race Strategist keeps an eye on the race positions, develops a pitstop strategy, and so on. These smart chat bots are independent applications, but are integreated with the ACC and other simulation game plugins using interprocess communication right now. An integration for a new simulation games requires some effort, especially for the necessary data acquisition from the simulation game, but a knowledged programmer can manage it in about three to four hours.
 
 ### Additional features
 

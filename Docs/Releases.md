@@ -2,7 +2,7 @@
 
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. All new Setup Wizard, which greatly flattens the learning curve, while installing and configuring Simulator Controller. Please see the [documentation](*) for more information.
+  3. All new Setup Wizard, which greatly flattens the learning curve, while installing and configuring Simulator Controller. Please see the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#running-the-setup-tool) for more information.
   4. Button Boxes can now be invisible to define and group controls, which are located on non-typical controllers like steering wheels.
   5. For the introduction of the new Setup Wizard, the localized Plugin Labels has been extensively reworked. Please see the [update notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-350), if you have changed the default Plugin Labels and want to preserve your changes.
   6. The "System" plugin now supports a [parameter *launchApplications*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration) to specify the applications to be used for the "Launch" mode.

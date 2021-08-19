@@ -394,9 +394,11 @@ class SimulatorsList extends ConfigurationItemList {
 chooseHomePath() {
 	protectionOn()
 	
-	try{
+	try {
+		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
 		FileSelectFolder directory, *%homePathEdit%, 0, % translate("Select Installation folder...")
-	
+		OnMessage(0x44, "")
+		
 		if (directory != "")
 			GuiControl Text, homePathEdit, %directory%
 	}
@@ -408,8 +410,10 @@ chooseHomePath() {
 chooseNirCmdPath() {
 	protectionOn()
 	
-	try{
+	try {
+		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
 		FileSelectFolder directory, *%nirCmdPathEdit%, 0, % translate("Select NirCmd folder...")
+		OnMessage(0x44, "")
 	
 		if (directory != "")
 			GuiControl Text, nirCmdPathEdit, %directory%
@@ -422,8 +426,10 @@ chooseNirCmdPath() {
 chooseAHKPath() {
 	protectionOn()
 	
-	try{
+	try {
+		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
 		FileSelectFolder directory, *%ahkPathEdit%, 0, % translate("Select AutoHotkey folder...")
+		OnMessage(0x44, "")
 	
 		if (directory != "")
 			GuiControl Text, ahkPathEdit, %directory%
@@ -436,7 +442,7 @@ chooseAHKPath() {
 chooseMSBuildPath() {
 	protectionOn()
 	
-	try{
+	try {
 		FileSelectFolder directory, *%msBuildPathEdit%, 0, % translate("Select MSBuild Bin folder...")
 	
 		if (directory != "")

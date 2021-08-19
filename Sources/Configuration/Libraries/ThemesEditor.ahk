@@ -535,7 +535,9 @@ addThemePicture() {
 	try {
 		title := translate("Select Image...")
 	
+		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Cancel"]))
 		FileSelectFile pictureFile, 1, , %title%, Image (*.jpg; *.gif)
+		OnMessage(0x44, "")
 		
 		if (pictureFile != "") {
 			Gui ListView, % picturesListViewHandle
@@ -568,7 +570,9 @@ chooseSoundFilePath() {
 		
 		title := translate("Select Sound File...")
 		
+		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Cancel"]))
 		FileSelectFile soundFile, 1, *%path%, %title%, Audio (*.wav; *.mp3)
+		OnMessage(0x44, "")
 		
 		if (soundFile != "") {
 			soundFilePathEdit := soundFile
@@ -596,7 +600,9 @@ chooseVideoFilePath() {
 		
 		title := translate("Select Video (GIF) File...")
 		
+		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Cancel"]))
 		FileSelectFile videoFile, 1, *%path%, %title%, Video (*.gif)
+		OnMessage(0x44, "")
 		
 		if (videoFile != "") {
 			videoFilePathEdit := videoFile

@@ -598,7 +598,9 @@ uploadSetup(setupType) {
 
 	title := translate("Upload Setup File...")
 				
+	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
 	FileSelectFile fileName, 1, , %title%
+	OnMessage(0x44, "")
 
 	if (fileName != "") {
 		FileRead setup, %fileName%
@@ -617,7 +619,9 @@ downloadSetup(setupType, setupName) {
 
 	title := translate("Download Setup File...")
 				
+	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Save", "Cancel"]))
 	FileSelectFile fileName, S, %setupName%, %title%
+	OnMessage(0x44, "")
 	
 	if (fileName != "") {
 		setupData := vSetupDatabase.readSetup(simulatorDropDown, carDropDown, trackDropDown, setupType, setupName)

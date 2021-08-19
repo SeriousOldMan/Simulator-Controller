@@ -42,7 +42,7 @@ The "System" plugin accepts one configuration argument in the [Plugins tab](http
 	
 The *modeSelector* parameter allows you to define controller functions that switch between modes on your Button Boxes. The *modeSelectorFunctionX* must be in the descriptor format, i.e. *"functionType*.*number*". You can use binary functions, such as 2-way toggle switches or dials, to switch forward and backward between modes, but a simple push button can also be used. Example: "modeSelector: 2WayToggle.1". If you have multiple Button Boxes, you may want to create a mode selector for each one, especially, if you have defined modes, whose actions are exclusive for one of those Button Boxes. Doing this, you can have mutiple modes active on the same time on your Button Boxes and you can switch between those modes on each of those Button Boxes separately. An example: You may bind all action for controlling the ["Motion" mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-motion) to one Button Box and all actions for the ["Pitstop" mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-pitstop-1) to a different Button Box. In this configuration, both modes can be active at the same time.
 
-The parameter *launchApplications* allows you to specify a list of applications that you want to start and stop from your Button Box. *label* will be used as the display name and *application* must reference the application as defined in the [applications tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-applications). With the *shutdown* parameter, a unary function can be supplied to shutdown the complete simulator system. This function will be available in the "Launch" mode.
+The parameter *launchApplications* allows you to specify a list of applications that you want to start and stop from your Button Box. *label* will be used as the display name and *application* must reference the application as defined in the [applications tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-applications). If the application name or the label contain spaces, you must enclose them in double quotes. With the *shutdown* parameter, a unary function can be supplied to shutdown the complete simulator system. This function will be available in the "Launch" mode.
 
 ## Plugin *Tactile Feedback*
 
@@ -154,7 +154,7 @@ With the following parameters you can configure the available effects for the "M
 
 *effectX* is the name of the effect, for example "Heave". With *initialStateX* and *intialIntensityX* you supply "On" or "Off" and a value between 0.0 and 2.0 respectively. These values will only be used, when mouse automation is used to control *SimFeedback*. Last, you need to supply a controller function with *effectToggleFunctionX* to enable or disable the effect or choose it for intensity manipulation after pressing the "Effect Selector" button, which must have been configured by supplying values for the "motionEffectIntensity" parameter. Example: "Heave On 1.0 Button.1"
 
-Important: Please be aware, that any spaces in effect names must be substituted with an underscore, since spaces are allowed in *SimFeedback* effect names, but not in plugin arguments. The underscores will be replaced with spaces again, before being transmitted to *SimFeedback*. You may also use double quotes for the effect names, that contain spaces.
+Important: Please be aware, that effect names containing spaces must be enclosed in double quotes, since spaces are allowed in *SimFeedback* effect names, but not in plugin arguments.
 
 Note: To change the labels, that are displayed for all these effects and triggers on the visual representation of your controller hardware, use the *Labels Editor*, which is available at the [Plugins tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) of the configuration tool.
 
@@ -193,7 +193,7 @@ All the arguments for the plugin parameters of the "Pedal Calibration" plugin mu
 
 The optional parameter *controlApplication* let you provide the name of the configured application object for *SmartControl*, as long as it is not named "Pedal Calibration". With the *pedalCalibrations* parameter, you can provide all calibration selections, you want to have on your Button Box. *pedal* can be either "Clutch", "Brake" or "Trottle" and *calibration* must be one of "Linear", "Sense+1", "Sense+2", "Sense-1", "Sense-2", "S-Shape", "S_on_Side", "Slow_Start", "Slow_End" or "Custom" for the Heusinkveld Pedals. "Example: "pedalCalibrations: Clutch.Linear Button.1, Brake.Linear Button.2, ..."
 
-Important: Please be aware, that any spaces in curve names must be substituted with an underscore, since spaces are allowed in *SmartControl* curve names, but not in plugin arguments. The underscores will be replaced with spaces again, before being transmitted to *SmartControl*. You may also use double quotes for the curve names, that contain spaces.
+Important: Please be aware, that curve names  containing spaces must be enclosed in double quotes, since spaces are allowed in *SmartControl* curve names, but not in plugin arguments.
 
 ## Plugin *Race Engineer*
 
@@ -565,6 +565,10 @@ See the following table for the supported assistant commands.
 See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *PitstopPrepare*, *Accept* and *Reject* and the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin above for more information on *PitstopRecommend*.
 
 Note: For convinience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
+
+### Installation of the *rFactor 2* Pitstop Interface
+
+For *rFactor 2*, you need to install a plugin into a special location for the pitstop interface to work. You can find the plugin in the *Utilities\3rd Part\rf2_sm_tools_3.7.14.2.zip* or you can load the [latest version](https://github.com/TheIronWolfModding/rF2SharedMemoryMapPlugin) from GitHub. A Readme file is included.
 
 ## Plugin *R3E*
 

@@ -47,7 +47,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 3.5.0
 
-The biggest change in this release is the introduction of the all-new [Setup Wizard](*). In the course of implementing this very challenging tool, the labels for the visual representation of the Button Boxes were extensively revised. Therefore the [plugin label files](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Templates/Controller%20Plugin%20Labels.de) will be completely overwritten in this release (the old files will be retained as backfiles in this case).
+The biggest change in this release is the introduction of the all-new [Setup Wizard](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#running-the-setup-tool). In the course of implementing this very challenging tool, the labels for the visual representation of the Button Boxes were extensively revised. Therefore the [plugin label files](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Templates/Controller%20Plugin%20Labels.de) will be completely overwritten in this release (the old files will be retained as backfiles in this case).
 
 Therefore: If you have edited your local files in the *Simulator Controller\Translations* folder in your *Documents* folder and introduced your own label identifiers, be sure to re-integrate your changes after running the update. You may have to manually copy the original files from the *Resources\Translations* folder to the *Simulator Controller\Translations* folder in your user *Documents* folder before re-integrating your changes, if you do **not** start the editor from inside the "Simulator Configuration* application.
 

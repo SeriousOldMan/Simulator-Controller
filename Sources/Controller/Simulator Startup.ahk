@@ -41,7 +41,7 @@ ListLines Off					; Disable execution history
 ;;;                        Libraries Include Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Controller\Libraries\SettingsEditor.ahk
+#Include ..\Configuration\Libraries\SettingsEditor.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;

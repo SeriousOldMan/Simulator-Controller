@@ -91,14 +91,14 @@ Race Strategist Configuration.5=%kGrammarsDirectory%Race Strategist.grammars.de 
 Race Strategist Configuration.6=%kResourcesDirectory%Templates\Race Strategist.grammars.de <- %kSourcesDirectory%Assistants\Grammars\Race Strategist.grammars.de
 [Build]
 External Applications && DLLs=Special
+Simulator Startup=%kBinariesDirectory%Simulator Startup.exe <- %kSourcesDirectory%Controller\Simulator Startup.ahk; %kIncludesDirectory%, %kSourcesDirectory%Configuration\Libraries\SettingsEditor.ahk, %kHomeDirectory%VERSION
 Simulator Controller=%kBinariesDirectory%Simulator Controller.exe <- %kSourcesDirectory%Controller\Simulator Controller.ahk; %kIncludesDirectory%, %kLibrariesDirectory%SpeechRecognizer.ahk, %kPluginsDirectory%, %kUserPluginsDirectory%, %kHomeDirectory%VERSION
+Voice Server=%kBinariesDirectory%Voice Server.exe <- %kSourcesDirectory%Controller\Voice Server.ahk; %kIncludesDirectory%, %kLibrariesDirectory%SpeechSynthesizer.ahk, %kLibrariesDirectory%SpeechRecognizer.ahk, %kHomeDirectory%VERSION
 Race Engineer=%kBinariesDirectory%Race Engineer.exe <- %kSourcesDirectory%Assistants\Race Engineer.ahk; %kIncludesDirectory%, %kLibrariesDirectory%, %kSourcesDirectory%Assistants\Libraries\, %kHomeDirectory%VERSION
 Race Strategist=%kBinariesDirectory%Race Strategist.exe <- %kSourcesDirectory%Assistants\Race Strategist.ahk; %kIncludesDirectory%, %kLibrariesDirectory%, %kSourcesDirectory%Assistants\Libraries\, %kHomeDirectory%VERSION
 Race Settings=%kBinariesDirectory%Race Settings.exe <- %kSourcesDirectory%Assistants\Race Settings.ahk; %kIncludesDirectory%, %kHomeDirectory%VERSION
 Setup Database=%kBinariesDirectory%Setup Database.exe <- %kSourcesDirectory%Assistants\Setup Database.ahk; %kIncludesDirectory%, %kSourcesDirectory%Assistants\Libraries\, %kHomeDirectory%VERSION
-Simulator Settings=%kBinariesDirectory%Simulator Settings.exe <- %kSourcesDirectory%Controller\Simulator Settings.ahk; %kIncludesDirectory%, %kSourcesDirectory%Controller\Libraries\, %kHomeDirectory%VERSION
-Simulator Startup=%kBinariesDirectory%Simulator Startup.exe <- %kSourcesDirectory%Controller\Simulator Startup.ahk; %kIncludesDirectory%, %kSourcesDirectory%Controller\Libraries\, %kHomeDirectory%VERSION
-Voice Server=%kBinariesDirectory%Voice Server.exe <- %kSourcesDirectory%Controller\Voice Server.ahk; %kIncludesDirectory%, %kLibrariesDirectory%SpeechSynthesizer.ahk, %kLibrariesDirectory%SpeechRecognizer.ahk, %kHomeDirectory%VERSION
 Simulator Configuration=%kBinariesDirectory%Simulator Configuration.exe <- %kSourcesDirectory%Configuration\Simulator Configuration.ahk; %kIncludesDirectory%, %kLibrariesDirectory%SpeechSynthesizer.ahk, %kLibrariesDirectory%SpeechRecognizer.ahk, %kPluginsDirectory%, %kUserPluginsDirectory%, %kHomeDirectory%VERSION
 Simulator Tools=%kBinariesDirectory%Simulator Tools.exe <- %kSourcesDirectory%Configuration\Simulator Tools.ahk; %kIncludesDirectory%, %kSourcesDirectory%Configuration\Libraries %kHomeDirectory%VERSION
 Simulator Setup=%kBinariesDirectory%Simulator Setup.exe <- %kSourcesDirectory%Configuration\Simulator Setup.ahk; %kIncludesDirectory%, %kSourcesDirectory%Configuration\Libraries\, %kLibrariesDirectory%, %kPluginsDirectory%, %kUserPluginsDirectory%, %kHomeDirectory%VERSION
+Simulator Settings=%kBinariesDirectory%Simulator Settings.exe <- %kSourcesDirectory%Configuration\Simulator Settings.ahk; %kIncludesDirectory%, %kSourcesDirectory%Configuration\Libraries\SettingsEditor.ahk, %kHomeDirectory%VERSION

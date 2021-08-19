@@ -720,7 +720,9 @@ restart:
 				
 				title := translate("Load Race Settings...")
 				
+				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
 				FileSelectFile file, 1, %kRaceSettingsFile%, %title%, Settings (*.settings)
+				OnMessage(0x44, "")
 			
 				if (file != "") {
 					settingsOrCommand := readConfiguration(file)
@@ -735,7 +737,9 @@ restart:
 			
 				title := translate("Save Race Settings...")
 				
+				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Save", "Cancel"]))
 				FileSelectFile file, S, %kRaceSettingsFile%, %title%, Settings (*.settings)
+				OnMessage(0x44, "")
 			
 				if (file != "")
 					writeConfiguration(file, newSettings)

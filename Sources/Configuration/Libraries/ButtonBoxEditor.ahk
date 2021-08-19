@@ -1152,6 +1152,8 @@ class ButtonBoxPreview extends ConfigurationItem {
 		
 		Gui %window%:-Border -Caption
 		
+		Gui %window%:+LabelbuttonBox
+		
 		Gui %window%:Add, Picture, x-10 y-10, % kButtonBoxImagesDirectory . "Photorealistic\CF Background.png"
 		
 		Gui %window%:Font, s12 Bold cSilver
@@ -1717,30 +1719,25 @@ openButtonBoxesDocumentation() {
 }
 
 chooseImageFilePath() {
-	protectionOn()
+	GuiControlGet imageFilePathEdit
 	
-	try {
-		GuiControlGet imageFilePathEdit
-		
-		path := imageFilePathEdit
+	path := imageFilePathEdit
+
+	if (path && (path != ""))
+		path := getFileName(path, kButtonBoxImagesDirectory)
+	else
+		path := SubStr(kButtonBoxImagesDirectory, 1, StrLen(kButtonBoxImagesDirectory) - 1)
 	
-		if (path && (path != ""))
-			path := getFileName(path, kButtonBoxImagesDirectory)
-		else
-			path := SubStr(kButtonBoxImagesDirectory, 1, StrLen(kButtonBoxImagesDirectory) - 1)
-		
-		title := translate("Select Image...")
+	title := translate("Select Image...")
+
+	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Cancel"]))
+	FileSelectFile pictureFile, 1, , %title%, Image (*.jpg; *.png; *.gif)
+	OnMessage(0x44, "")
 	
-		FileSelectFile pictureFile, 1, , %title%, Image (*.jpg; *.png; *.gif)
+	if (pictureFile != "") {
+		imageFilePathEdit := pictureFile
 		
-		if (pictureFile != "") {
-			imageFilePathEdit := pictureFile
-			
-			GuiControl Text, imageFilePathEdit, %imageFilePathEdit%
-		}
-	}
-	finally {
-		protectionOff()
+		GuiControl Text, imageFilePathEdit, %imageFilePathEdit%
 	}
 }
 
@@ -1766,6 +1763,11 @@ moveButtonBoxPreview() {
 	WinGetPos x, y, width, height, A
 	
 	vButtonBoxPreviews[A_Gui].PreviewManager.setPreviewCenter(x + Round(width / 2), y + Round(height / 2))
+}
+
+buttonBoxContextMenu(guiHwnd, ctrlHwnd, eventInfo, isRightClick, x, y) {
+	if (isRightClick && vButtonBoxPreviews.HasKey(A_Gui))
+		controlClick()
 }
 
 controlClick() {

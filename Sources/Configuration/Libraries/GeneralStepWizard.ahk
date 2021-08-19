@@ -89,6 +89,11 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 					setConfigurationSectionValues(configuration, section, subConfiguration)
 			}
 		}
+		else {
+			setConfigurationValue(configuration, "Voice Control", "Service", "Windows")
+			setConfigurationValue(configuration, "Voice Control", "Speaker", false)
+			setConfigurationValue(configuration, "Voice Control", "Listener", false)
+		}
 		
 		modeSelectors := wizard.getModeSelectors()
 		arguments := ""

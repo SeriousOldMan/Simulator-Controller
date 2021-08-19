@@ -37,7 +37,7 @@ ListLines Off					; Disable execution history
 
 #Include ..\Libraries\JSON.ahk
 #Include ..\Libraries\RuleEngine.ahk
-#Include ..\Controller\Libraries\SettingsEditor.ahk
+#Include Libraries\SettingsEditor.ahk
 #Include Libraries\ConfigurationEditor.ahk
 #Include Libraries\ButtonBoxEditor.ahk
 #Include ..\Plugins\Voice Control Configuration Plugin.ahk
@@ -69,6 +69,8 @@ global vResult = false
 global vWorking = false
 
 global vPageSwitch = false
+
+global vSettingsReady = false
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -1768,7 +1770,7 @@ class StartStepWizard extends StepWizard {
 			
 			Gui %window%:Add, ActiveX, x%x% yp+30 w%width% h350 HWNDinfoTextHandle VinfoText Hidden, shell.explorer
 			
-			x := x + Round(width / 2) - 120
+			x := x + Round((width - 240) / 2)
 			
 			Gui %window%:Font, s10 Bold, Arial
 			
@@ -1781,19 +1783,19 @@ class StartStepWizard extends StepWizard {
 			
 			this.registerWidgets(2, iconHandle, labelHandle, infoTextHandle, restartButtonHandle)
 		}
-		else {
-			currentDirectory := A_WorkingDir
+		else if A_IsAdmin
+			for ignore, directory in [kBinariesDirectory, kResourcesDirectory . "Setup\Installer\"] {
+				currentDirectory := A_WorkingDir
 
-			try {
-				SetWorkingDir %kBinariesDirectory%
-				
-				if A_IsAdmin
+				try {
+					SetWorkingDir %directory%
+					
 					Run Powershell -Command Get-ChildItem -Path '.' -Recurse | Unblock-File
+				}
+				finally {
+					SetWorkingDir %currentDirectory%
+				}
 			}
-			finally {
-				SetWorkingDir %currentDirectory%
-			}
-		}
 	}
 	
 	reset() {
@@ -1896,6 +1898,8 @@ class FinishStepWizard extends StepWizard {
 	}
 	
 	showPage(page) {
+		vSettingsReady := false
+		
 		base.showPage(page)
 		
 		settingsEditor := ObjBindMethod(this, "settingsEditor")
@@ -1905,9 +1909,14 @@ class FinishStepWizard extends StepWizard {
 	
 	hidePage(page) {
 		if base.hidePage(page) {
-			settings := editSettings(kSave, false, true)
-			
-			writeConfiguration(kUserHomeDirectory . "Setup\Simulator Settings.ini", settings)
+			try {
+				settings := editSettings(kSave, false, true)
+				
+				writeConfiguration(kUserHomeDirectory . "Setup\Simulator Settings.ini", settings)
+			}
+			catch exception {
+				; ignore
+			}
 			
 			return true
 		}
@@ -1932,6 +1941,8 @@ class FinishStepWizard extends StepWizard {
 		configuration := this.SetupWizard.getSimulatorConfiguration()
 		
 		editSettings(settings, false, configuration, Min(A_ScreenWidth - Round(A_ScreenWidth / 3) + Round(A_ScreenWidth / 3 / 2) - 180, A_ScreenWidth - 360))
+		
+		vSettingsReady := true
 	}
 }
 
@@ -1941,35 +1952,39 @@ class FinishStepWizard extends StepWizard {
 ;;;-------------------------------------------------------------------------;;;
 
 finishSetup(finish := false, save := false) {
-	protectionOn()
-	
-	try {
-		if (finish = "Finish") {
-			if SetupWizard.Instance.finishSetup(save)
-				ExitApp 0
-		}
-		else {
-			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-			title := translate("Setup ")
-			MsgBox 262436, %title%, % translate("Do you want to generate the new configuration?") . "`n`n" . translate("Backup files will be saved for your current configuration in the ""Simulator Controller\Config"" folder in your user ""Documents"" folder.")
-			OnMessage(0x44, "")
-			
-			IfMsgBox Yes
-				save := true
-			else
-				save := false
-			
-			SetupWizard.Instance.hidePage(SetupWizard.Instance.Step, SetupWizard.Instance.Page)
+	if (finish = "Finish") {
+		if !vSettingsReady {
+			; Let other threads finish...
 			
 			callback := Func("finishSetup").Bind("Finish", save)
-			
-			; Let other threads finish...
 				
-			SetTimer %callback%, % isDebug() ? -5000 : -2000
+			SetTimer %callback%, % -200
+			
+			return
 		}
+		
+		if SetupWizard.Instance.finishSetup(save)
+			ExitApp 0
 	}
-	finally {
-		protectionOff()
+	else {
+		window := SetupWizard.Instance.WizardWindow
+	
+		Gui %window%:Show
+		
+		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+		title := translate("Setup ")
+		message := (translate("Do you want to generate the new configuration?") . "`n`n" . translate("Backup files will be saved for your current configuration in the ""Simulator Controller\Config"" folder in your user ""Documents"" folder."))
+		MsgBox 262436, %title%, %message%
+		OnMessage(0x44, "")
+		
+		IfMsgBox Yes
+			save := true
+		else
+			save := false
+		
+		callback := Func("finishSetup").Bind("Finish", save)
+			
+		SetTimer %callback%, % -200
 	}
 }
 
@@ -2091,7 +2106,7 @@ convertVDF2JSON(vdf) {
     vdf := "{`n" . vdf . "`n}"
 
     ; replace open braces
-	vdf := RegExReplace(vdf, """(.*)""\s*{", """${1}"": {")
+	vdf := RegExReplace(vdf, """([^""]*)""\s*{", """${1}"": {")
 	
 	; replace values
 	vdf := RegExReplace(vdf, """([^""]*)""\s*""([^""]*)""", """${1}"": ""${2}"",")
@@ -2190,8 +2205,6 @@ initializeSimulatorSetup() {
 }
 
 startupSimulatorSetup() {
-	static first := true
-	
 	wizard := SetupWizard.Instance
 	
 	wizard.loadDefinition()
@@ -2220,12 +2233,7 @@ restartSetup:
 		Sleep 5
 	}
 	
-	if first {
-		first := false
-		
-		hideSplashTheme()
-	}
-		
+	hideSplashTheme()
 	hideProgress()
 	
 	done := false
@@ -2257,8 +2265,7 @@ restartSetup:
 		x := Round((A_ScreenWidth - 300) / 2)
 		y := A_ScreenHeight - 150
 		
-		vProgressCount := 0
-		
+		showSplashTheme("Rotating Brain")
 		showProgress({x: x, y: y, color: "Blue", title: translate("Initializing Setup Wizard"), message: translate("")})
 		
 		Goto restartSetup
@@ -2329,14 +2336,25 @@ findSoftware(definition, software) {
 						}
 						
 						if (installPath != "") {
-							FileRead script, %installPath%\steamapps\libraryfolders.vdf
-							
-							folders := JSON.parse(convertVDF2JSON(script))
-							folders := folders["LibraryFolders"]
-							fileName := folders[1] . "\steamapps\common\" . locator . "\" . descriptor[3]
-							
-							if FileExist(fileName)
-								return fileName
+							try {
+								FileRead script, %installPath%\steamapps\libraryfolders.vdf
+								
+								folders := JSON.parse(convertVDF2JSON(script))
+								folders := folders["LibraryFolders"]
+								
+								for ignore, folder in folders {
+									if IsObject(folder)
+										folder := folder["path"]
+									
+									fileName := folder . "\steamapps\common\" . locator . "\" . descriptor[3]
+									
+									if FileExist(fileName)
+										return fileName
+								}
+							}
+							catch exception {
+								;
+							}
 						}
 					}
 				}

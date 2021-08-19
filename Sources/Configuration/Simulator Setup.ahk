@@ -277,19 +277,13 @@ class SetupWizard extends ConfigurationItem {
 		showProgress({progress: ++vProgressCount, message: translate("Initializing AI kernel...")})
 		
 		if initialize {
-			try {
-				FileDelete %kUserHomeDirectory%Setup\Button Box Configuration.ini
-			}
-			catch exception {
-				; ignore
-			}
-			
-			try {
-				FileDelete %kUserHomeDirectory%Setup\Voice Control Configuration.ini
-			}
-			catch exception {
-				; ignore
-			}
+			for ignore, fileName in ["Button Box Configuration.ini", "Voice Control Configuration.ini", "Race Engineer Configuration.ini", "Race Strategist Configuration.ini", "Simulator Settings.ini"]
+				try {
+					FileDelete %kUserHomeDirectory%Setup\%fileName%
+				}
+				catch exception {
+					; ignore
+				}
 			
 			this.KnowledgeBase.addFact("Initialize", true)
 		}

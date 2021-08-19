@@ -369,31 +369,27 @@ class Function extends ConfigurationItem {
 			local action
 			
 			if trigger {
-				if this.iActions.HasKey(trigger) {
-					action := this.iActions[trigger]
+				action := this.iActions[trigger]
 
-					if asText {
-						arguments := []
-							
-						if (action && (action.Length() == 2)) {
-							arguments := action[2].Clone()
-							
-							for index, argument in arguments
-								if (argument == true)
-									arguments[index] := kTrue
-								else if (argument == false)
-									arguments[index] := kFalse
-						}
-							
-						action := ((action && (action.Length() == 2) && action[1]) ? (action[1] . "(" . values2String(", ", arguments*) . ")") : "")
-					}
-					else
-						action := this.actionCallable(trigger, action)
+				if asText {
+					arguments := []
 						
-					return action
+					if (action && (action.Length() == 2)) {
+						arguments := action[2].Clone()
+						
+						for index, argument in arguments
+							if (argument == true)
+								arguments[index] := kTrue
+							else if (argument == false)
+								arguments[index] := kFalse
+					}
+						
+					action := ((action && (action.Length() == 2) && action[1]) ? (action[1] . "(" . values2String(", ", arguments*) . ")") : "")
 				}
 				else
-					return (asText ? "" : false)
+					action := this.actionCallable(trigger, action)
+					
+				return action
 			}
 			else {
 				result := {}

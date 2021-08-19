@@ -1223,6 +1223,8 @@ showSelectorHint() {
 }
 
 updateFunctionTriggers() {
+	local function
+	
 	Loop % LV_GetCount()
 		LV_Modify(A_Index, "-Select")
 	
@@ -1237,6 +1239,7 @@ updateFunctionTriggers() {
 			curCoordMode := A_CoordModeMouse
 
 			LV_GetText(control, row, 2)
+			LV_GetText(function, row, 3)
 			LV_GetText(number, row, 4)
 			
 			menuItem := ConfigurationItem.descriptor(control, number)
@@ -1256,7 +1259,9 @@ updateFunctionTriggers() {
 			Menu ContextMenu, Disable, %menuItem%
 			Menu ContextMenu, Add
 			
-			menuItem := translate("Press Trigger(s)")
+			multiple := ((function = translate(k2WayToggleType)) || (function = translate(kDialType)))
+			
+			menuItem := translate(multiple ? "Assign multiple Triggers" : "Assign Trigger")
 			handler := ObjBindMethod(SetupWizard.Instance.StepWizards["Button Box"], "updateFunctionTriggers", row)
 			
 			Menu ContextMenu, Add, %menuItem%, %handler%

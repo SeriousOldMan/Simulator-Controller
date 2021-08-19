@@ -1152,6 +1152,8 @@ class ButtonBoxPreview extends ConfigurationItem {
 		
 		Gui %window%:-Border -Caption
 		
+		Gui %window%:+LabelbuttonBox
+		
 		Gui %window%:Add, Picture, x-10 y-10, % kButtonBoxImagesDirectory . "Photorealistic\CF Background.png"
 		
 		Gui %window%:Font, s12 Bold cSilver
@@ -1761,6 +1763,11 @@ moveButtonBoxPreview() {
 	WinGetPos x, y, width, height, A
 	
 	vButtonBoxPreviews[A_Gui].PreviewManager.setPreviewCenter(x + Round(width / 2), y + Round(height / 2))
+}
+
+buttonBoxContextMenu(guiHwnd, ctrlHwnd, eventInfo, isRightClick, x, y) {
+	if (isRightClick && vButtonBoxPreviews.HasKey(A_Gui))
+		controlClick()
 }
 
 controlClick() {

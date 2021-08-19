@@ -15,3 +15,6 @@
   
 #### General
   1. [Target: V3.x] Choosing a specific theme depending on the selected simulation game
+  2. [Target: V3.x] Additions to the Setup Wizard
+     - Wrap it into a standard installer process
+	 - Conditionally create Start Menu entries and Desktop Icons

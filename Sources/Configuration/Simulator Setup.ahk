@@ -2137,8 +2137,6 @@ initializeSimulatorSetup() {
 }
 
 startupSimulatorSetup() {
-	static first := true
-	
 	wizard := SetupWizard.Instance
 	
 	wizard.loadDefinition()
@@ -2167,12 +2165,7 @@ restartSetup:
 		Sleep 5
 	}
 	
-	if first {
-		first := false
-		
-		hideSplashTheme()
-	}
-		
+	hideSplashTheme()
 	hideProgress()
 	
 	done := false
@@ -2204,8 +2197,7 @@ restartSetup:
 		x := Round((A_ScreenWidth - 300) / 2)
 		y := A_ScreenHeight - 150
 		
-		vProgressCount := 0
-		
+		showSplashTheme("Rotating Brain")
 		showProgress({x: x, y: y, color: "Blue", title: translate("Initializing Setup Wizard"), message: translate("")})
 		
 		Goto restartSetup

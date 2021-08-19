@@ -55,8 +55,10 @@ global kNext = "next"
 global kPrevious = "previous"
 global kLanguage = "language"
 
-global kUninstallKey := "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\SimulatorController"
-global kSimulatorControllerKey := "SOFTWARE\SimulatorController"
+global kUninstallKey = "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\SimulatorController"
+global kSimulatorControllerKey = "SOFTWARE\SimulatorController"
+
+global kProgramDirectory = (A_ProgramFiles . "\Simulator Controller\")
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -567,14 +569,62 @@ class SetupWizard extends ConfigurationItem {
 			return false
 	}
 	
-	install() {
-		this.createStartMenuEntries()
+	install(options := {}) {
+		if !A_Is64bitOS {
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+			title := translate("Error")
+			MsgBox 262160, %title%, % translate("Simulator Controller can only be installed on a 64-bit Windows installation. Setup will exit...")
+			OnMessage(0x44, "")
+			
+			ExitApp 1
+		}
 		
-		this.writeAppPaths()
-		this.writeUninstallerInfo()
+		if !options.HasKey("InstallLocation")
+			options["InstallLocation"] := kProgramDirectory
+		
+		if !options.HasKey("InstallFilesLocation")
+			options["InstallFilesLocation"] := kHomeDirectory
+			
+		isNew := !FileExist(options["InstallLocation"])
+		
+		showProgress({message: translate("Copying program files...")})
+		
+		this.copyProgramFiles(options)
+		
+		if !isNew {
+			showProgress({message: translate("Removing unnecessary files...")})
+		
+			this.removeOrphanFiles(options)
+		}
+		
+		showProgress({message: translate("Updating Registry...")})
+		
+		this.createStartMenuEntries(options)
+		
+		this.writeAppPaths(options)
+		this.writeUninstallerInfo(options)
+		
+		showProgress({message: translate("Removing installation files...")})
+		
+		this.removeInstallationFiles(options)
 	}
 	
-	uninstall() {
+	uninstall(options := {}) {
+		showProgress({message: translate("Removing program files...")})
+		
+		this.removeProgramFiles()
+		
+		if (options.HasKey("DeleteUserFiles") && options["DeleteUserFiles"]) {
+			showProgress({message: translate("Removing user files...")})
+		
+			FileRemoveDir %kUserHomeDirectory%, true
+		}
+		
+		showProgress({message: translate("Cleaning Registry...")})
+		
+		this.deleteStartMenuEntries()
+		this.deleteAppPaths()
+		this.deleteUninstallerInfo()
 	}
 	
 	createStartMenuEntries() {
@@ -590,7 +640,7 @@ class SetupWizard extends ConfigurationItem {
 				}
 	}
 	
-	removeStartMenuEntries() {
+	deleteStartMenuEntries() {
 		for ignore, name in ["Simulator Startup", "Simulator Settings", "Race Settings", "Setup Database"]
 			try {
 				FileDelete %A_StartMenu%\%name%.lnk
@@ -601,21 +651,21 @@ class SetupWizard extends ConfigurationItem {
 	}
 	
 	writeAppPaths() {
-		RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\Simulator Startup.exe,, %kBinariesDirectory%Simulator Startup.exe
-		RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\Simulator Controller.exe,, %kBinariesDirectory%Simulator Controller.exe
-		RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\Simulator Settings.exe,, %kBinariesDirectory%Simulator Settings.exe
-		RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\Simulator Configuration.exe,, %kBinariesDirectory%Simulator Configuration.exe
-		RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\Race Settings.exe,, %kBinariesDirectory%Race Settings.exe
-		RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\Setup Database.exe,, %kBinariesDirectory%Setup Database.exe
+		RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorStartup.exe,, %kBinariesDirectory%Simulator Startup.exe
+		RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorController.exe,, %kBinariesDirectory%Simulator Controller.exe
+		RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorSettings.exe,, %kBinariesDirectory%Simulator Settings.exe
+		RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorConfiguration.exe,, %kBinariesDirectory%Simulator Configuration.exe
+		RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceSettings.exe,, %kBinariesDirectory%Race Settings.exe
+		RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupDatabase.exe,, %kBinariesDirectory%Setup Database.exe
 	}
 	
 	deleteAppPaths() {
-		RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\Simulator Startup.exe
-		RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\Simulator Controller.exe
-		RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\Simulator Settings.exe
-		RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\Simulator Configuration.exe
-		RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\Race Settings.exe
-		RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\Setup Database.exe
+		RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorStartup.exe
+		RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorController.exe
+		RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorSettings.exe
+		RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorConfiguration.exe
+		RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceSettings.exe
+		RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupDatabase.exe
 	}
 	
 	writeUninstallerInfo() {

@@ -192,8 +192,8 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		
 		Gui %window%:Add, Text, x%x% yp+24 w110 h23 +0x200 HWNDwidget18 VpushToTalkLabel Hidden, % translate("Push To Talk")
 		Gui %window%:Add, Edit, x%x1% yp w110 h21 HWNDwidget19 VpushToTalkEdit Hidden, %pushToTalkEdit%
-		Gui %window%:Add, Button, x%x2% yp-1 w23 h23 HWNDwidget20 ggetPTTHotkey HwnddetectPTTButtonHandle VpushToTalkButton Hidden
-		setButtonIcon(detectPTTButtonHandle, kIconsDirectory . "Key.ico", 1)
+		Gui %window%:Add, Button, x%x2% yp-1 w23 h23 HWNDwidget20 ggetPTTHotkey VpushToTalkButton Hidden
+		setButtonIcon(widget20, kIconsDirectory . "Key.ico", 1)
 		
 		Gui %window%:Add, Text, x%x% yp+24 w110 h23 +0x200 HWNDwidget21 VactivationCommandLabel Hidden, % translate("Activation Command")
 		Gui %window%:Add, Edit, x%x1% yp w135 h21 HWNDwidget22 VactivationCommandEdit Hidden, %activationCommandEdit%

@@ -6,6 +6,12 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                         Private Constant Section                        ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global ApplicationClass = Application	; Spooky, sometimes the reference to Application is lost
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -46,7 +52,7 @@ class ApplicationsStepWizard extends StepWizard {
 					
 					hooks := string2Values(";", descriptor[5])
 					
-					new Application(theApplication, false, exePath, workingDirectory, descriptor[4], hooks[1], hooks[2], hooks[3]).saveToConfiguration(configuration)
+					new ApplicationClass(theApplication, false, exePath, workingDirectory, descriptor[4], hooks[1], hooks[2], hooks[3]).saveToConfiguration(configuration)
 					
 					group := ConfigurationItem.splitDescriptor(applications)[2]
 					
@@ -162,7 +168,7 @@ class ApplicationsStepWizard extends StepWizard {
 	updateState() {
 		base.updateState()
 		
-		if (this.Definition && (wizard.Step == this))
+		if (this.Definition && (SetupWizard.Instance.Step == this))
 			this.updateAvailableApplications()
 	}
 	

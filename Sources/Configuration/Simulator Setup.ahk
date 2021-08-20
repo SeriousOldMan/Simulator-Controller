@@ -569,123 +569,6 @@ class SetupWizard extends ConfigurationItem {
 			return false
 	}
 	
-	install(options := {}) {
-		if !A_Is64bitOS {
-			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-			title := translate("Error")
-			MsgBox 262160, %title%, % translate("Simulator Controller can only be installed on a 64-bit Windows installation. Setup will exit...")
-			OnMessage(0x44, "")
-			
-			ExitApp 1
-		}
-		
-		if !options.HasKey("InstallLocation")
-			options["InstallLocation"] := kProgramDirectory
-		
-		if !options.HasKey("InstallFilesLocation")
-			options["InstallFilesLocation"] := kHomeDirectory
-			
-		isNew := !FileExist(options["InstallLocation"])
-		
-		showProgress({message: translate("Copying program files...")})
-		
-		this.copyProgramFiles(options)
-		
-		if !isNew {
-			showProgress({message: translate("Removing unnecessary files...")})
-		
-			this.removeOrphanFiles(options)
-		}
-		
-		showProgress({message: translate("Updating Registry...")})
-		
-		this.createStartMenuEntries(options)
-		
-		this.writeAppPaths(options)
-		this.writeUninstallerInfo(options)
-		
-		showProgress({message: translate("Removing installation files...")})
-		
-		this.removeInstallationFiles(options)
-	}
-	
-	uninstall(options := {}) {
-		showProgress({message: translate("Removing program files...")})
-		
-		this.removeProgramFiles()
-		
-		if (options.HasKey("DeleteUserFiles") && options["DeleteUserFiles"]) {
-			showProgress({message: translate("Removing user files...")})
-		
-			FileRemoveDir %kUserHomeDirectory%, true
-		}
-		
-		showProgress({message: translate("Cleaning Registry...")})
-		
-		this.deleteStartMenuEntries()
-		this.deleteAppPaths()
-		this.deleteUninstallerInfo()
-	}
-	
-	createStartMenuEntries() {
-		for ignore, name in ["Simulator Startup", "Simulator Settings", "Race Settings", "Setup Database"]
-			if ((A_Index < 3) || this.isModuleSelected("Race Engineer") || this.isModuleSelected("Race Strategist"))
-				FileCreateShortCut %kBinariesDirectory%%name%.exe, %A_StartMenu%\%name%.lnk, %kBinariesDirectory%
-			else
-				try {
-					FileDelete %A_StartMenu%\%name%.lnk
-				}
-				catch exception {
-					; ignore
-				}
-	}
-	
-	deleteStartMenuEntries() {
-		for ignore, name in ["Simulator Startup", "Simulator Settings", "Race Settings", "Setup Database"]
-			try {
-				FileDelete %A_StartMenu%\%name%.lnk
-			}
-			catch exception {
-				; ignore
-			}
-	}
-	
-	writeAppPaths() {
-		RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorStartup.exe,, %kBinariesDirectory%Simulator Startup.exe
-		RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorController.exe,, %kBinariesDirectory%Simulator Controller.exe
-		RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorSettings.exe,, %kBinariesDirectory%Simulator Settings.exe
-		RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorConfiguration.exe,, %kBinariesDirectory%Simulator Configuration.exe
-		RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceSettings.exe,, %kBinariesDirectory%Race Settings.exe
-		RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupDatabase.exe,, %kBinariesDirectory%Setup Database.exe
-	}
-	
-	deleteAppPaths() {
-		RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorStartup.exe
-		RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorController.exe
-		RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorSettings.exe
-		RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorConfiguration.exe
-		RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceSettings.exe
-		RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupDatabase.exe
-	}
-	
-	writeUninstallerInfo() {
-		version := StrSplit(kVersion, "-", , 2)[1]
-		
-		RegWrite REG_SZ, HKLM, %kUninstallKey%, DisplayName, Simulator Controller
-		RegWrite REG_SZ, HKLM, %kUninstallKey%, InstallLocation, %kHomeDirectory%
-		RegWrite REG_SZ, HKLM, %kUninstallKey%, UninstallString, "%kBinariesDirectory%Simulator Setup.exe" -Uninstall
-		RegWrite REG_SZ, HKLM, %kUninstallKey%, QuietUninstallString, "%kBinariesDirectory%Simulator Setup.exe" -Uninstall -Quiet
-		RegWrite REG_SZ, HKLM, %kUninstallKey%, DisplayIcon, "%kResourcesDirectory%Icons\Artificial Intelligence.ico"
-		RegWrite REG_SZ, HKLM, %kUninstallKey%, DisplayVersion, %version%
-		RegWrite REG_SZ, HKLM, %kUninstallKey%, URLInfoAbout, https://github.com/SeriousOldMan/Simulator-Controller/wiki
-		RegWrite REG_SZ, HKLM, %kUninstallKey%, Publisher, Oliver Juwig (TheBigO)
-		RegWrite REG_SZ, HKLM, %kUninstallKey%, NoModify, 1
-	}
-	
-	deleteUninstallerInfo() {
-		RegDelete HKLM, %kUninstallKey%
-	}
-	
 	getSimulatorConfiguration() {
 		configuration := newConfiguration()
 		
@@ -2214,6 +2097,306 @@ findInstallProperty(name, property) {
 		return value
 }
 
+checkInstall() {
+	RegRead installLocation, HKLM, %kUninstallKey%, InstallLocation
+	
+	install := (installLocation && (installLocation != "") && (InStr(kHomeDirectory, installLocation) != 1))
+	install := (install || !installLocation || (installLocation = ""))
+	
+	if install {
+		if !A_Is64bitOS {
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+			title := translate("Error")
+			MsgBox 262160, %title%, % translate("Simulator Controller can only be installed on a 64-bit Windows installation. Setup will exit...")
+			OnMessage(0x44, "")
+			
+			ExitApp 1
+		}
+		
+		if false && !A_IsAdmin {
+			try {
+				if A_IsCompiled
+					Run *RunAs "%A_ScriptFullPath%" /restart
+				else
+					Run *RunAs "%A_AhkPath%" /restart "%A_ScriptFullPath%"
+			}
+			catch exception {
+				;ignore
+			}
+			
+			ExitApp 0
+		}
+
+		isNew := !FileExist(kProgramDirectory)
+		
+		showSplashTheme("McLaren 720s GT3 Pictures")
+		
+		x := Round((A_ScreenWidth - 300) / 2)
+		y := A_ScreenHeight - 150
+		
+		vProgressCount := 0
+
+		showProgress({x: x, y: y, color: "Blue", title: translate("Installing Simulator Controller"), message: translate("...")})
+		
+		for ignore, directory in [kBinariesDirectory, kResourcesDirectory . "Setup\Installer\"] {
+			vProgressCount += 1
+		
+			showProgress({progress: vProgressCount, message: translate("Unblocking Applications and DLLs...")})
+		
+			currentDirectory := A_WorkingDir
+
+			try {
+				SetWorkingDir %directory%
+				
+				RunWait Powershell -Command Get-ChildItem -Path '.' -Recurse | Unblock-File, , Hide
+			}
+			finally {
+				SetWorkingDir %currentDirectory%
+			}
+		}
+		
+		options := {Destination: kProgramDirectory, Source: kHomeDirectory, DeleteOrphanes: !isNew, Update: !isNew}
+		
+		copyFiles(options)
+	
+		showProgress({message: translate("Updating Registry...")})
+		
+		createStartMenuEntries(options)
+		
+		writeAppPaths(options)
+		writeUninstallerInfo(options)
+		
+		showProgress({message: translate("Removing installation files...")})
+		
+		removeInstallationFiles(options["Source"])
+		
+		showProgress({progress: 100, message: translate("Finished...")})
+		
+		Sleep 1000
+		
+		hideSplashTheme()
+		hideProgress()
+	
+		if isNew
+			Run %kProgramDirectory%Binaries\Simulator Setup.exe
+		
+		ExitApp 0
+	}
+}
+
+normalizePath(path) {
+	return ((SubStr(path, StrLen(path)) = "\") ? SubStr(path, 1, StrLen(path) - 1) : path)
+}
+	
+copyFiles(options := false) {
+	if !options
+		options := {}
+	
+	if !options.HasKey("Source")
+		options["Source"] := kHomeDirectory
+	
+	if !options.HasKey("Destination")
+		options["Destination"] := kProgramDirectory
+	
+	options["Source"] := normalizePath(options["Source"])
+	options["Destination"] := normalizePath(options["Destination"])
+	
+	if !options.HasKey("DeleteOrphanes")
+		options["DeleteOrphanes"] := !FileExist(options["Destination"])
+	
+	source := options["Source"]
+	destination := options["Destination"]
+	deleteOrphanes := options["DeleteOrphanes"]
+	
+	isNew := (!options.HasKey("Update") || !options["Update"])
+	count := 0
+	progress := 0
+	
+	Loop Files, %source%\*, DFR
+	{
+		if (Mod(count, 100) == 0)
+			progress += 1
+		
+		showProgress({progress: vProgressCount + Min(progress, 10), message: translate("Validating ") . A_LoopFileName . translate("...")})
+		
+		Sleep 0
+		
+		count += 1
+	}
+	
+	vProgressCount += 10
+	
+	showProgress({color: "Green"})
+	
+	step := ((deleteOrphanes ? 70 : 80) / count)
+	stepCount := 0
+	
+	copyDirectory(source, destination, step, stepCount)
+	
+	vProgressCount := (vProgressCount + Round(step * count))
+	
+	showProgress({progress: vProgressCount})
+	
+	if deleteOrphanes {
+		showProgress({message: translate("Searching for orphane files...")})
+	
+		stepCount := 0
+		
+		cleanDirectory(source, destination, 10, stepCount)
+		
+		vProgressCount := (vProgressCount + 10)
+	
+		showProgress({progress: vProgressCount})
+	}
+}
+
+copyDirectory(source, destination, progressStep, ByRef count) {
+	FileCreateDir %destination%
+	
+	files := []
+	
+	Loop Files, %source%\*.*, DF
+		files.Push(A_LoopFilePath)
+	
+	for ignore, fileName in files {
+		SplitPath fileName, file
+	
+		count += 1
+		
+		showProgress({progress: Round(vProgressCount + (count * progressStep)), message: translate("Copying ") . file . translate("...")})
+		
+		if InStr(FileExist(fileName), "D") {
+			SplitPath fileName, subDirectory
+			
+			copyDirectory(fileName, destination . "\" . subDirectory, progressStep, count)
+		}
+		else
+			FileCopy %fileName%, %destination%, 1
+	}
+}
+
+cleanDirectory(source, destination, maxStep, ByRef count) {
+	Loop Files, %destination%\*.*, DF
+	{
+		SplitPath A_LoopFilePath, fileName
+		
+		if InStr(FileExist(A_LoopFilePath), "D") {
+			cleanDirectory(source . "\" . fileName, A_LoopFilePath, maxStep, count)
+			
+			FileRemoveDir %A_LoopFilePath%, false
+		}
+		else if !FileExist(source . "\" . fileName) {
+			count := Min(count + 1, maxStep)
+		
+			showProgress({progress: vProgressCount + count, message: translate("Deleting ") . fileName . translate("...")})
+		
+			FileDelete %A_LoopFilePath%
+			
+			Sleep 100
+		}
+	}
+}
+
+removeInstallationFiles(directory) {
+	try {
+		FileDelete %A_Temp%\Cleanup.bat
+	}
+	catch exception {
+		; ignore
+	}
+	
+	command =
+(
+ping 127.0.0.1 -n 15 > nul
+cd C:\
+rmdir "%directory%" /s /q
+)
+	
+	FileAppend %command%, %A_Temp%\Cleanup.bat
+	
+	Run "%A_Temp%\Cleanup.bat", , Hide
+}
+
+uninstall(options := false) {
+	if !options
+		options := {}
+	
+	showProgress({message: translate("Removing program files...")})
+	
+	this.removeProgramFiles()
+	
+	if (options.HasKey("DeleteUserFiles") && options["DeleteUserFiles"]) {
+		showProgress({message: translate("Removing user files...")})
+	
+		FileRemoveDir %kUserHomeDirectory%, true
+	}
+	
+	showProgress({message: translate("Cleaning Registry...")})
+	
+	this.deleteStartMenuEntries()
+	this.deleteAppPaths()
+	this.deleteUninstallerInfo()
+}
+
+createStartMenuEntries(options := false) {
+	for ignore, name in ["Simulator Startup", "Simulator Settings", "Race Settings", "Setup Database"]
+		if ((A_Index < 3) || this.isModuleSelected("Race Engineer") || this.isModuleSelected("Race Strategist"))
+			FileCreateShortCut %kBinariesDirectory%%name%.exe, %A_StartMenu%\%name%.lnk, %kBinariesDirectory%
+		else
+			try {
+				FileDelete %A_StartMenu%\%name%.lnk
+			}
+			catch exception {
+				; ignore
+			}
+}
+
+deleteStartMenuEntries(options := false) {
+	for ignore, name in ["Simulator Startup", "Simulator Settings", "Race Settings", "Setup Database"]
+		try {
+			FileDelete %A_StartMenu%\%name%.lnk
+		}
+		catch exception {
+			; ignore
+		}
+}
+
+writeAppPaths(options := false) {
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorStartup.exe,, %kBinariesDirectory%Simulator Startup.exe
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorController.exe,, %kBinariesDirectory%Simulator Controller.exe
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorSettings.exe,, %kBinariesDirectory%Simulator Settings.exe
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorConfiguration.exe,, %kBinariesDirectory%Simulator Configuration.exe
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceSettings.exe,, %kBinariesDirectory%Race Settings.exe
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupDatabase.exe,, %kBinariesDirectory%Setup Database.exe
+}
+
+deleteAppPaths(options := false) {
+	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorStartup.exe
+	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorController.exe
+	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorSettings.exe
+	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorConfiguration.exe
+	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceSettings.exe
+	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupDatabase.exe
+}
+
+writeUninstallerInfo(options := false) {
+	version := StrSplit(kVersion, "-", , 2)[1]
+	
+	RegWrite REG_SZ, HKLM, %kUninstallKey%, DisplayName, Simulator Controller
+	RegWrite REG_SZ, HKLM, %kUninstallKey%, InstallLocation, %kHomeDirectory%
+	RegWrite REG_SZ, HKLM, %kUninstallKey%, UninstallString, "%kBinariesDirectory%Simulator Setup.exe" -Uninstall
+	RegWrite REG_SZ, HKLM, %kUninstallKey%, QuietUninstallString, "%kBinariesDirectory%Simulator Setup.exe" -Uninstall -Quiet
+	RegWrite REG_SZ, HKLM, %kUninstallKey%, DisplayIcon, "%kResourcesDirectory%Icons\Artificial Intelligence.ico"
+	RegWrite REG_SZ, HKLM, %kUninstallKey%, DisplayVersion, %version%
+	RegWrite REG_SZ, HKLM, %kUninstallKey%, URLInfoAbout, https://github.com/SeriousOldMan/Simulator-Controller/wiki
+	RegWrite REG_SZ, HKLM, %kUninstallKey%, Publisher, Oliver Juwig (TheBigO)
+	RegWrite REG_SZ, HKLM, %kUninstallKey%, NoModify, 1
+}
+
+deleteUninstallerInfo(options := false) {
+	RegDelete HKLM, %kUninstallKey%
+}
+
 initializeSimulatorSetup() {
 	icon := kIconsDirectory . "Wand.ico"
 	
@@ -2222,36 +2405,29 @@ initializeSimulatorSetup() {
 	
 	FileCreateDir %kUserHomeDirectory%Setup
 	
-	protectionOn()
+	definition := readConfiguration(kResourcesDirectory . "Setup\Simulator Setup.ini")
+
+	setConfigurationSectionValues(kSimulatorConfiguration, "Splash Window", getConfigurationSectionValues(definition, "Splash Window"))
+	setConfigurationSectionValues(kSimulatorConfiguration, "Splash Themes", getConfigurationSectionValues(definition, "Splash Themes"))
+
+	setConfigurationValue(kSimulatorConfiguration, "Splash Window", "Title", translate("Modular Simulator Controller System") . translate(" - ") . translate("Setup && Configuration"))
 	
-	try {
-		definition := readConfiguration(kResourcesDirectory . "Setup\Simulator Setup.ini")
+	wizard := new SetupWizard(kSimulatorConfiguration, definition)
 	
-		setConfigurationSectionValues(kSimulatorConfiguration, "Splash Window", getConfigurationSectionValues(definition, "Splash Window"))
-		setConfigurationSectionValues(kSimulatorConfiguration, "Splash Themes", getConfigurationSectionValues(definition, "Splash Themes"))
+	showSplashTheme("Rotating Brain")
 	
-		setConfigurationValue(kSimulatorConfiguration, "Splash Window", "Title", translate("Modular Simulator Controller System") . translate(" - ") . translate("Setup && Configuration"))
-		
-		showSplashTheme("Rotating Brain")
-		
-		x := Round((A_ScreenWidth - 300) / 2)
-		y := A_ScreenHeight - 150
-		
-		vProgressCount := 0
-		
-		showProgress({x: x, y: y, color: "Blue", title: translate("Initializing Setup Wizard"), message: translate("Preparing Configuration Steps...")})
-		
-		if isDebug()
-			Sleep 500
+	x := Round((A_ScreenWidth - 300) / 2)
+	y := A_ScreenHeight - 150
 	
-		wizard := new SetupWizard(kSimulatorConfiguration, definition)
-		
-		wizard.registerStepWizard(new StartStepWizard(wizard, "Start", kSimulatorConfiguration))
-		wizard.registerStepWizard(new FinishStepWizard(wizard, "Finish", kSimulatorConfiguration))
-	}
-	finally {
-		protectionOff()
-	}
+	vProgressCount := 0
+	
+	showProgress({x: x, y: y, color: "Blue", title: translate("Initializing Setup Wizard"), message: translate("Preparing Configuration Steps...")})
+	
+	if isDebug()
+		Sleep 500
+	
+	wizard.registerStepWizard(new StartStepWizard(wizard, "Start", kSimulatorConfiguration))
+	wizard.registerStepWizard(new FinishStepWizard(wizard, "Finish", kSimulatorConfiguration))
 }
 
 startupSimulatorSetup() {
@@ -2464,6 +2640,8 @@ resetVolume(masterVolume) {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                       Initialization Section Part 1                     ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+checkInstall()
 
 initializeSimulatorSetup()
 

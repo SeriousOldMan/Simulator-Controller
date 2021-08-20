@@ -1426,6 +1426,9 @@ runBuildTargets(ByRef buildProgress) {
 			logMessage(kLogInfo, translate("Compiling ") . targetSource)
 
 			try {
+				if !FileExist(targetSource)
+					Throw "Source file not found..."
+				
 				RunWait % kCompiler . " /in """ . targetSource . """"
 			}
 			catch exception {

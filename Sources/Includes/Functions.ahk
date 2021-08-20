@@ -14,6 +14,13 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                        Private Constant Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global kUninstallKey = "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\SimulatorController"
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Variable Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -702,7 +709,7 @@ shareSetupDatabase() {
 }
 
 checkForUpdates() {
-	if inList(["Simulator Startup", "Simulator Configuration", "Simulator Settings"], StrSplit(A_ScriptName, ".")[1]) {
+	if inList(["Simulator Startup", "Simulator Configuration", "Simulator Setup", "Simulator Settings"], StrSplit(A_ScriptName, ".")[1]) {
 		check := !FileExist(kTempDirectory . "VERSION")
 		
 		if !check {
@@ -883,6 +890,25 @@ loadSimulatorConfiguration() {
 }
 
 initializeEnvironment() {
+	if A_IsCompiled {
+		RegRead installLocation, HKLM, %kUninstallKey%, InstallLocation
+		
+		install := (installLocation && (installLocation != "") && (InStr(kHomeDirectory, installLocation) != 1))
+		install := (install || !installLocation || (installLocation = ""))
+		
+		if (install && (StrSplit(A_ScriptName, ".")[1] != "Simulator Setup")) {
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+			title := translate("Modular Simulator Controller System")
+			MsgBox 262436, %title%, % translate("You have to install Simulator Controller before starting any of the applications. Do you want run the Setup now?")
+			OnMessage(0x44, "")
+
+			IfMsgBox Yes
+				Run *RunAs %kBinariesDirectory%Simulator Setup.exe
+				
+			ExitApp 0
+		}
+	}
+		
 	virgin := !FileExist(A_MyDocuments . "\Simulator Controller")
 	
 	FileCreateDir %A_MyDocuments%\Simulator Controller

@@ -702,7 +702,7 @@ shareSetupDatabase() {
 }
 
 checkForUpdates() {
-	if inList(["Simulator Startup", "Simulator Configuration", "Simulator Settings"], StrSplit(A_ScriptName, ".")[1]) {
+	if inList(["Simulator Startup", "Simulator Configuration", "Simulator Setup", "Simulator Settings"], StrSplit(A_ScriptName, ".")[1]) {
 		check := !FileExist(kTempDirectory . "VERSION")
 		
 		if !check {

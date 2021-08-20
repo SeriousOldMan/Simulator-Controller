@@ -89,11 +89,12 @@ class ButtonBoxStepWizard extends StepWizard {
 							
 							functionTriggers := wizard.getControllerFunctionTriggers(theFunction)
 							
-							if (functionTriggers.Length() > 0) {
+							if (functionTriggers.Length() > 0)
 								theFunction := Function.createFunction(theFunction, false, functionTriggers[1], "", functionTriggers[2], "")
-								
-								theFunction.saveToConfiguration(configuration)
-							}
+							else
+								theFunction := Function.createFunction(theFunction, false, "", "", "", "")
+							
+							theFunction.saveToConfiguration(configuration)
 						}
 					}
 				}

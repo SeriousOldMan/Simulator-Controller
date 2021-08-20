@@ -2100,25 +2100,17 @@ findInstallProperty(name, property) {
 checkInstall() {
 	RegRead installLocation, HKLM, %kUninstallKey%, InstallLocation
 	
-	install := (installLocation && (installLocation != "") && (InStr(kHomeDirectory, installLocation) != 1))
-	install := (install || !installLocation || (installLocation = ""))
-	
-	if install {
-		if !A_Is64bitOS {
-			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-			title := translate("Error")
-			MsgBox 262160, %title%, % translate("Simulator Controller can only be installed on a 64-bit Windows installation. Setup will exit...")
-			OnMessage(0x44, "")
-			
-			ExitApp 1
-		}
+	if inList(A_Args, "-Uninstall") {
+		quiet := inList(A_Args, "-Quiet")
 		
 		if !A_IsAdmin {
+			options := ("-Uninstall" . (quiet ? " -Quiet" : ""))
+			
 			try {
 				if A_IsCompiled
-					Run *RunAs "%A_ScriptFullPath%" /restart
+					Run *RunAs "%A_ScriptFullPath%" /restart %options%
 				else
-					Run *RunAs "%A_AhkPath%" /restart "%A_ScriptFullPath%"
+					Run *RunAs "%A_AhkPath%" /restart "%A_ScriptFullPath% %options%
 			}
 			catch exception {
 				;ignore
@@ -2126,61 +2118,145 @@ checkInstall() {
 			
 			ExitApp 0
 		}
-
-		isNew := !FileExist(kProgramDirectory)
 		
-		showSplashTheme("McLaren 720s GT3 Pictures")
-		
-		x := Round((A_ScreenWidth - 300) / 2)
-		y := A_ScreenHeight - 150
-		
-		vProgressCount := 0
-
-		showProgress({x: x, y: y, color: "Blue", title: translate("Installing Simulator Controller"), message: translate("...")})
-		
-		for ignore, directory in [kBinariesDirectory, kResourcesDirectory . "Setup\Installer\"] {
-			vProgressCount += 1
-		
-			showProgress({progress: vProgressCount, message: translate("Unblocking Applications and DLLs...")})
-		
-			currentDirectory := A_WorkingDir
-
-			try {
-				SetWorkingDir %directory%
-				
-				RunWait Powershell -Command Get-ChildItem -Path '.' -Recurse | Unblock-File, , Hide
-			}
-			finally {
-				SetWorkingDir %currentDirectory%
-			}
+		if !quiet {
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+			title := translate("Setup")
+			MsgBox 262436, %title%, % translate("Do you really want to uninstall Simulator Controller?")
+			OnMessage(0x44, "")
+			
+			IfMsgBox Yes
+				uninstall := true
+			else
+				uninstall := false
 		}
+		else
+			uninstall := true
 		
-		options := {Destination: kProgramDirectory, Source: kHomeDirectory, DeleteOrphanes: !isNew, Update: !isNew}
+		if uninstall {
+			showSplashTheme("McLaren 720s GT3 Pictures")
+				
+			x := Round((A_ScreenWidth - 300) / 2)
+			y := A_ScreenHeight - 150
+			
+			vProgressCount := 0
+
+			showProgress({x: x, y: y, color: "Blue", title: translate("Uninstalling Simulator Controller"), message: translate("...")})
+			
+			options := {InstallLocation: installLocation}
+			
+			deleteFiles(options)
 		
-		copyFiles(options)
-	
-		showProgress({message: translate("Updating Registry...")})
+			if (options.HasKey("DeleteUserFiles") && options["DeleteUserFiles"]) {
+				showProgress({message: translate("Removing user files...")})
+			
+				FileRemoveDir %kUserHomeDirectory%, true
+			}
+			
+			vProgressCount += 5
+			
+			showProgress({progress: vProgressCount, message: translate("Updating Registry...")})
+			
+			deleteStartMenuEntries(options)
+			
+			deleteAppPaths(options)
+			deleteUninstallerInfo(options)
+			
+			removeDirectory(installLocation)
+			
+			showProgress({progress: 100, message: translate("Finished...")})
+			
+			Sleep 1000
+			
+			hideSplashTheme()
+			hideProgress()
+			
+			ExitApp 0
+		}
+	}
+	else {
+		install := (installLocation && (installLocation != "") && (InStr(kHomeDirectory, installLocation) != 1))
+		install := (install || !installLocation || (installLocation = ""))
 		
-		createStartMenuEntries(options)
+		if install {
+			if !A_Is64bitOS {
+				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+				title := translate("Error")
+				MsgBox 262160, %title%, % translate("Simulator Controller can only be installed on a 64-bit Windows installation. Setup will exit...")
+				OnMessage(0x44, "")
+				
+				ExitApp 1
+			}
+			
+			if !A_IsAdmin {
+				try {
+					if A_IsCompiled
+						Run *RunAs "%A_ScriptFullPath%" /restart
+					else
+						Run *RunAs "%A_AhkPath%" /restart "%A_ScriptFullPath%"
+				}
+				catch exception {
+					;ignore
+				}
+				
+				ExitApp 0
+			}
+
+			isNew := !FileExist(kProgramDirectory)
+			
+			showSplashTheme("McLaren 720s GT3 Pictures")
+			
+			x := Round((A_ScreenWidth - 300) / 2)
+			y := A_ScreenHeight - 150
+			
+			vProgressCount := 0
+
+			showProgress({x: x, y: y, color: "Blue", title: translate("Installing Simulator Controller"), message: translate("...")})
+			
+			for ignore, directory in [kBinariesDirectory, kResourcesDirectory . "Setup\Installer\"] {
+				vProgressCount += 1
+			
+				showProgress({progress: vProgressCount, message: translate("Unblocking Applications and DLLs...")})
+			
+				currentDirectory := A_WorkingDir
+
+				try {
+					SetWorkingDir %directory%
+					
+					RunWait Powershell -Command Get-ChildItem -Path '.' -Recurse | Unblock-File, , Hide
+				}
+				finally {
+					SetWorkingDir %currentDirectory%
+				}
+			}
+			
+			options := {Destination: kProgramDirectory, Source: kHomeDirectory, DeleteOrphanes: !isNew, Update: !isNew}
+			
+			copyFiles(options)
 		
-		writeAppPaths(options)
-		writeUninstallerInfo(options)
+			showProgress({message: translate("Updating Registry...")})
+			
+			createStartMenuEntries(options)
+			
+			writeAppPaths(options)
+			writeUninstallerInfo(options)
+			
+			showProgress({message: translate("Removing installation files...")})
+			
+			removeDirectory(options["Source"])
+			
+			showProgress({progress: 100, message: translate("Finished...")})
+			
+			Sleep 1000
+			
+			hideSplashTheme()
+			hideProgress()
 		
-		showProgress({message: translate("Removing installation files...")})
-		
-		removeInstallationFiles(options["Source"])
-		
-		showProgress({progress: 100, message: translate("Finished...")})
-		
-		Sleep 1000
-		
-		hideSplashTheme()
-		hideProgress()
-	
-		if isNew
-			Run %kProgramDirectory%Binaries\Simulator Setup.exe
-		
-		ExitApp 0
+			if isNew
+				Run %kProgramDirectory%Binaries\Simulator Setup.exe
+			
+			ExitApp 0
+		}
 	}
 }
 
@@ -2219,7 +2295,7 @@ copyFiles(options := false) {
 		
 		showProgress({progress: vProgressCount + Min(progress, 10), message: translate("Validating ") . A_LoopFileName . translate("...")})
 		
-		Sleep 0
+		Sleep 1
 		
 		count += 1
 	}
@@ -2249,6 +2325,47 @@ copyFiles(options := false) {
 		showProgress({progress: vProgressCount})
 	}
 }
+	
+deleteFiles(options := false) {
+	if !options
+		options := {}
+	
+	if !options.HasKey("InstallLocation") {
+		RegRead installLocation, HKLM, %kUninstallKey%, InstallLocation
+		
+		if (installLocation && (installLocation != ""))
+			options["InstallLocation"] := installLocation
+	}
+	
+	installLocation := options["InstallLocation"]
+	count := 0
+	progress := 0
+	
+	Loop Files, %installLocation%\*, DFR
+	{
+		if (Mod(count, 100) == 0)
+			progress += 1
+		
+		showProgress({progress: vProgressCount + Min(progress, 20), message: translate("Preparing ") . A_LoopFileName . translate("...")})
+		
+		Sleep 1
+		
+		count += 1
+	}
+	
+	vProgressCount += 20
+	
+	showProgress({color: "Green"})
+	
+	step := (70 / count)
+	stepCount := 0
+	
+	deleteDirectory(installLocation, step, stepCount)
+	
+	vProgressCount := (vProgressCount + Round(step * count))
+	
+	showProgress({progress: vProgressCount})
+}
 
 copyDirectory(source, destination, progressStep, ByRef count) {
 	FileCreateDir %destination%
@@ -2275,6 +2392,36 @@ copyDirectory(source, destination, progressStep, ByRef count) {
 	}
 }
 
+deleteDirectory(directory, progressStep, ByRef count) {	
+	files := []
+	
+	Loop Files, %directory%\*.*, DF
+		files.Push(A_LoopFilePath)
+	
+	for ignore, fileName in files {
+		SplitPath fileName, file
+	
+		count += 1
+		
+		showProgress({progress: Round(vProgressCount + (count * progressStep)), message: translate("Deleting ") . file . translate("...")})
+		
+		if InStr(FileExist(fileName), "D") {
+			SplitPath fileName, subDirectory
+			
+			deleteDirectory(directory . "\" . subDirectory, progressStep, count)
+		}
+		else
+			try {
+				FileDelete %fileName%
+			}
+			catch exception {
+				; ignore
+			}
+		
+		Sleep 1
+	}
+}
+
 cleanDirectory(source, destination, maxStep, ByRef count) {
 	Loop Files, %destination%\*.*, DF
 	{
@@ -2297,7 +2444,7 @@ cleanDirectory(source, destination, maxStep, ByRef count) {
 	}
 }
 
-removeInstallationFiles(directory) {
+removeDirectory(directory) {
 	try {
 		FileDelete %A_Temp%\Cleanup.bat
 	}
@@ -2317,27 +2464,6 @@ rmdir "%directory%" /s /q
 	Run "%A_Temp%\Cleanup.bat", C:\, Hide
 }
 
-uninstall(options := false) {
-	if !options
-		options := {}
-	
-	showProgress({message: translate("Removing program files...")})
-	
-	this.removeProgramFiles()
-	
-	if (options.HasKey("DeleteUserFiles") && options["DeleteUserFiles"]) {
-		showProgress({message: translate("Removing user files...")})
-	
-		FileRemoveDir %kUserHomeDirectory%, true
-	}
-	
-	showProgress({message: translate("Cleaning Registry...")})
-	
-	this.deleteStartMenuEntries()
-	this.deleteAppPaths()
-	this.deleteUninstallerInfo()
-}
-
 createStartMenuEntries(options := false) {
 	for ignore, name in ["Simulator Startup", "Simulator Settings", "Simulator Setup", "Simulator Configuration", "Race Settings", "Setup Database"]
 		if ((A_Index < 5) || this.isModuleSelected("Race Engineer") || this.isModuleSelected("Race Strategist"))
@@ -2354,19 +2480,27 @@ createStartMenuEntries(options := false) {
 }
 
 deleteStartMenuEntries(options := false) {
-	for ignore, name in ["Simulator Startup", "Simulator Settings", "Race Settings", "Setup Database"]
+	for ignore, name in ["Simulator Startup", "Simulator Settings", "Simulator Setup", "Simulator Configuration", "Race Settings", "Setup Database"]
 		try {
 			FileDelete %A_StartMenu%\%name%.lnk
 		}
 		catch exception {
 			; ignore
 		}
+
+	try {
+		FileDelete %A_StartMenu%\Documentation.lnk
+	}
+	catch exception {
+		; ignore
+	}
 }
 
 writeAppPaths(options := false) {
 	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorStartup.exe,, %kProgramDirectory%Binaries\Simulator Startup.exe
 	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorController.exe,, %kProgramDirectory%Binaries\Simulator Controller.exe
 	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorSettings.exe,, %kProgramDirectory%Binaries\Simulator Settings.exe
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorSetup.exe,, %kProgramDirectory%Binaries\Simulator Setup.exe
 	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorConfiguration.exe,, %kProgramDirectory%Binaries\Simulator Configuration.exe
 	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceSettings.exe,, %kProgramDirectory%Binaries\Race Settings.exe
 	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupDatabase.exe,, %kProgramDirectory%Binaries\Setup Database.exe
@@ -2376,6 +2510,7 @@ deleteAppPaths(options := false) {
 	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorStartup.exe
 	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorController.exe
 	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorSettings.exe
+	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorSetup.exe
 	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorConfiguration.exe
 	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceSettings.exe
 	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupDatabase.exe
@@ -2385,7 +2520,7 @@ writeUninstallerInfo(options := false) {
 	version := StrSplit(kVersion, "-", , 2)[1]
 	
 	RegWrite REG_SZ, HKLM, %kUninstallKey%, DisplayName, Simulator Controller
-	RegWrite REG_SZ, HKLM, %kUninstallKey%, InstallLocation, %kProgramDirectory%
+	RegWrite REG_SZ, HKLM, %kUninstallKey%, InstallLocation, % normalizePath(kProgramDirectory)
 	RegWrite REG_SZ, HKLM, %kUninstallKey%, UninstallString, "%kProgramDirectory%Binaries\Simulator Setup.exe" -Uninstall
 	RegWrite REG_SZ, HKLM, %kUninstallKey%, QuietUninstallString, "%kProgramDirectory%Binaries\Simulator Setup.exe" -Uninstall -Quiet
 	RegWrite REG_SZ, HKLM, %kUninstallKey%, DisplayIcon, "%kProgramDirectory%\Resources\Icons\Artificial Intelligence.ico"

@@ -26,23 +26,20 @@ Below you will find download links for the current development build and the two
 
 #### Latest development build
 
-[3.5.0-rc2](https://www.dropbox.com/s/ddnmigo5p85xae4/Simulator%20Controller%203.5.0-rc2.zip?dl=1) (Second release candidate for Release 3.5. New features: All new Setup Wizard, Button Boxes can be invisible, Rework of Plugin Labels, Play a short tone when Push2Talk is activated, New "launchApplications" parameter for the "System" plugin, Templates Cleanup. Including documentation and update procedure.)
-
-IMPORTANT: Please make a backup copy of your *Simulator Controller* folder in your user *Documents* folder, if you want to play with this prerelease build. A lot of files changed there and there might be no rollback to the current version possible, once you have startet V3.5 for the first time. Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-350) of this version and all the versions you might have skipped, before installing and using this version.
+None for the moment...
 
 #### Latest release build
 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[3.3.1-release](https://cntr.click/Gvk9FKc) (New features of Version 3.3.0: Audio post processing for team radio voice, File location refactoring, Use Azure Service for speech synthesis, New "raceAssistantService" parameter for the "Race Engineer" and "Race Strategist" plugins. **Version 3.1.1 is a maintenance release for 3.3.0 with a fix for default voice service selection.**)
+[3.5.0-release](https://cntr.click/1LFQvdJ) (New features: All new Setup Wizard, Button Boxes can be invisible, Rework of Plugin Labels, Play a short tone when Push2Talk is activated, New "launchApplications" parameter for the "System" plugin, Templates Cleanup, A lot of file location changes. Including documentation and update procedure.) 
 
-Once again: Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-330) of this version and all the versions you might have skipped, before installing and using this version.
+Once again: Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-350) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[3.2.2-release](https://cntr.click/r9BBR8j) (New features: More information supplied by Jona, New plugin arguments for Race Strategist plugin, Accept & Reject plugin commands now works always for the currently focused voice assistant, New information actions for "Race Engineer" plugin, New information actions for "Race Strategist" plugin, Use the information actions on all "Pitstop" modes, New "Assistant" mode for all simulator plugins, Refactoring of assistant plugins and introduction of *RaceAssistantPlugin* base class, Renaming of all plugin arguments of the plugins "Race Engineer" and "Race Strategist", Automated tests for "RaceStrategist" class, Support for new repair options in *RaceRoom Racing Experience* Pitstop MFD.)
-
+[3.3.1-release](https://cntr.click/Gvk9FKc) (New features of Version 3.3.1: Audio post processing for team radio voice, File location refactoring, Use Azure Service for speech synthesis, New "raceAssistantService" parameter for the "Race Engineer" and "Race Strategist" plugins.)
 
 ### Discord Community
 

@@ -1,4 +1,4 @@
-## 3.5.0-release 08/20/21 (planned)
+## 3.5.0-release 08/20/21
 
   1. Bugfixes, as always
   2. Documentation updates, as always

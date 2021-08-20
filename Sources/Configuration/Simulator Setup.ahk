@@ -2113,7 +2113,7 @@ checkInstall() {
 			ExitApp 1
 		}
 		
-		if false && !A_IsAdmin {
+		if !A_IsAdmin {
 			try {
 				if A_IsCompiled
 					Run *RunAs "%A_ScriptFullPath%" /restart
@@ -2314,7 +2314,7 @@ rmdir "%directory%" /s /q
 	
 	FileAppend %command%, %A_Temp%\Cleanup.bat
 	
-	Run "%A_Temp%\Cleanup.bat", , Hide
+	Run "%A_Temp%\Cleanup.bat", C:\, Hide
 }
 
 uninstall(options := false) {
@@ -2339,9 +2339,9 @@ uninstall(options := false) {
 }
 
 createStartMenuEntries(options := false) {
-	for ignore, name in ["Simulator Startup", "Simulator Settings", "Race Settings", "Setup Database"]
-		if ((A_Index < 3) || this.isModuleSelected("Race Engineer") || this.isModuleSelected("Race Strategist"))
-			FileCreateShortCut %kBinariesDirectory%%name%.exe, %A_StartMenu%\%name%.lnk, %kBinariesDirectory%
+	for ignore, name in ["Simulator Startup", "Simulator Settings", "Simulator Setup", "Simulator Configuration", "Race Settings", "Setup Database"]
+		if ((A_Index < 5) || this.isModuleSelected("Race Engineer") || this.isModuleSelected("Race Strategist"))
+			FileCreateShortCut %kProgramDirectory%Binaries\%name%.exe, %A_StartMenu%\%name%.lnk, %kProgramDirectory%Binaries\
 		else
 			try {
 				FileDelete %A_StartMenu%\%name%.lnk
@@ -2349,6 +2349,8 @@ createStartMenuEntries(options := false) {
 			catch exception {
 				; ignore
 			}
+	
+	FileCreateShortCut %kProgramDirectory%Documentation.url, %A_StartMenu%\Documentation.lnk, %kProgramDirectory%
 }
 
 deleteStartMenuEntries(options := false) {
@@ -2362,12 +2364,12 @@ deleteStartMenuEntries(options := false) {
 }
 
 writeAppPaths(options := false) {
-	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorStartup.exe,, %kBinariesDirectory%Simulator Startup.exe
-	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorController.exe,, %kBinariesDirectory%Simulator Controller.exe
-	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorSettings.exe,, %kBinariesDirectory%Simulator Settings.exe
-	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorConfiguration.exe,, %kBinariesDirectory%Simulator Configuration.exe
-	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceSettings.exe,, %kBinariesDirectory%Race Settings.exe
-	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupDatabase.exe,, %kBinariesDirectory%Setup Database.exe
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorStartup.exe,, %kProgramDirectory%Binaries\Simulator Startup.exe
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorController.exe,, %kProgramDirectory%Binaries\Simulator Controller.exe
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorSettings.exe,, %kProgramDirectory%Binaries\Simulator Settings.exe
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorConfiguration.exe,, %kProgramDirectory%Binaries\Simulator Configuration.exe
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceSettings.exe,, %kProgramDirectory%Binaries\Race Settings.exe
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupDatabase.exe,, %kProgramDirectory%Binaries\Setup Database.exe
 }
 
 deleteAppPaths(options := false) {
@@ -2383,10 +2385,10 @@ writeUninstallerInfo(options := false) {
 	version := StrSplit(kVersion, "-", , 2)[1]
 	
 	RegWrite REG_SZ, HKLM, %kUninstallKey%, DisplayName, Simulator Controller
-	RegWrite REG_SZ, HKLM, %kUninstallKey%, InstallLocation, %kHomeDirectory%
-	RegWrite REG_SZ, HKLM, %kUninstallKey%, UninstallString, "%kBinariesDirectory%Simulator Setup.exe" -Uninstall
-	RegWrite REG_SZ, HKLM, %kUninstallKey%, QuietUninstallString, "%kBinariesDirectory%Simulator Setup.exe" -Uninstall -Quiet
-	RegWrite REG_SZ, HKLM, %kUninstallKey%, DisplayIcon, "%kResourcesDirectory%Icons\Artificial Intelligence.ico"
+	RegWrite REG_SZ, HKLM, %kUninstallKey%, InstallLocation, %kProgramDirectory%
+	RegWrite REG_SZ, HKLM, %kUninstallKey%, UninstallString, "%kProgramDirectory%Binaries\Simulator Setup.exe" -Uninstall
+	RegWrite REG_SZ, HKLM, %kUninstallKey%, QuietUninstallString, "%kProgramDirectory%Binaries\Simulator Setup.exe" -Uninstall -Quiet
+	RegWrite REG_SZ, HKLM, %kUninstallKey%, DisplayIcon, "%kProgramDirectory%\Resources\Icons\Artificial Intelligence.ico"
 	RegWrite REG_SZ, HKLM, %kUninstallKey%, DisplayVersion, %version%
 	RegWrite REG_SZ, HKLM, %kUninstallKey%, URLInfoAbout, https://github.com/SeriousOldMan/Simulator-Controller/wiki
 	RegWrite REG_SZ, HKLM, %kUninstallKey%, Publisher, Oliver Juwig (TheBigO)

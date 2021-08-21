@@ -2157,7 +2157,8 @@ checkInstall() {
 			
 			showProgress({progress: vProgressCount, message: translate("Updating Registry...")})
 			
-			deleteStartMenuEntries(options)
+			deleteShortcuts(A_StartMenu, options, "StartMenu")
+			deleteShortcuts(A_Desktop, options, "Desktop")
 			
 			deleteAppPaths(options)
 			deleteUninstallerInfo(options)
@@ -2230,20 +2231,23 @@ checkInstall() {
 				}
 			}
 			
-			options := {Destination: kProgramDirectory, Source: kHomeDirectory, DeleteOrphanes: !isNew, Update: !isNew}
+			options := {InstallLocation: kProgramDirectory, PackageLocation: kHomeDirectory, Update: !isNew, StartWizard: isNew
+					  , StartMenu: ["Simulator Startup", "Simulator Settings", "Simulator Setup", "Simulator Configuration", "Race Settings", "Setup Database"]
+					  , Desktop: ["Simulator Startup", "Simulator Settings"]}
 			
 			copyFiles(options)
 		
 			showProgress({message: translate("Updating Registry...")})
 			
-			createStartMenuEntries(options)
+			createShortcuts(A_StartMenu, options, "StartMenu")
+			createShortcuts(A_Desktop, options, "Desktop")
 			
 			writeAppPaths(options)
 			writeUninstallerInfo(options)
 			
 			showProgress({message: translate("Removing installation files...")})
 			
-			removeDirectory(options["Source"])
+			removeDirectory(options["PackageLocation"])
 			
 			showProgress({progress: 100, message: translate("Finished...")})
 			
@@ -2252,7 +2256,7 @@ checkInstall() {
 			hideSplashTheme()
 			hideProgress()
 		
-			if isNew
+			if (options.HasKey("StartWizard") && options["StartWizard"])
 				Run %kProgramDirectory%Binaries\Simulator Setup.exe
 			
 			ExitApp 0
@@ -2268,23 +2272,24 @@ copyFiles(options := false) {
 	if !options
 		options := {}
 	
-	if !options.HasKey("Source")
-		options["Source"] := kHomeDirectory
+	if !options.HasKey("PackageLocation")
+		options["PackageLocation"] := kHomeDirectory
 	
-	if !options.HasKey("Destination")
-		options["Destination"] := kProgramDirectory
+	if !options.HasKey("InstallLocation")
+		options["InstallLocation"] := kProgramDirectory
 	
-	options["Source"] := normalizePath(options["Source"])
-	options["Destination"] := normalizePath(options["Destination"])
+	options["PackageLocation"] := normalizePath(options["PackageLocation"])
+	options["InstallLocation"] := normalizePath(options["InstallLocation"])
 	
 	if !options.HasKey("DeleteOrphanes")
-		options["DeleteOrphanes"] := !FileExist(options["Destination"])
+		options["DeleteOrphanes"] := !FileExist(options["InstallLocation"])
 	
-	source := options["Source"]
-	destination := options["Destination"]
-	deleteOrphanes := options["DeleteOrphanes"]
+	source := options["PackageLocation"]
+	destination := options["InstallLocation"]
+	update := (options.HasKey("Update") && options["Update"])
+	deleteOrphanes := update
 	
-	isNew := (!options.HasKey("Update") || !options["Update"])
+	isNew := 
 	count := 0
 	progress := 0
 	
@@ -2464,46 +2469,44 @@ rmdir "%directory%" /s /q
 	Run "%A_Temp%\Cleanup.bat", C:\, Hide
 }
 
-createStartMenuEntries(options := false) {
-	for ignore, name in ["Simulator Startup", "Simulator Settings", "Simulator Setup", "Simulator Configuration", "Race Settings", "Setup Database"]
-		if ((A_Index < 5) || this.isModuleSelected("Race Engineer") || this.isModuleSelected("Race Strategist"))
-			FileCreateShortCut %kProgramDirectory%Binaries\%name%.exe, %A_StartMenu%\%name%.lnk, %kProgramDirectory%Binaries\
-		else
-			try {
-				FileDelete %A_StartMenu%\%name%.lnk
-			}
-			catch exception {
-				; ignore
-			}
+createShortcuts(location, options, type) {
+	if !options.HasKey(type)
+		options[type] := []
 	
-	FileCreateShortCut %kProgramDirectory%Documentation.url, %A_StartMenu%\Documentation.lnk, %kProgramDirectory%
+	for ignore, name in options[type]
+		FileCreateShortCut %kProgramDirectory%Binaries\%name%.exe, %location%\%name%.lnk, %kProgramDirectory%Binaries\
+		
+	FileCreateShortCut %kProgramDirectory%Documentation.url, %location%\Documentation.lnk, %kProgramDirectory%
 }
 
-deleteStartMenuEntries(options := false) {
+
+deleteShortcuts(location, options, type) {
 	for ignore, name in ["Simulator Startup", "Simulator Settings", "Simulator Setup", "Simulator Configuration", "Race Settings", "Setup Database"]
 		try {
-			FileDelete %A_StartMenu%\%name%.lnk
+			FileDelete %location%\%name%.lnk
 		}
 		catch exception {
 			; ignore
 		}
 
 	try {
-		FileDelete %A_StartMenu%\Documentation.lnk
+		FileDelete %location%\Documentation.lnk
 	}
 	catch exception {
 		; ignore
 	}
 }
 
-writeAppPaths(options := false) {
-	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorStartup.exe,, %kProgramDirectory%Binaries\Simulator Startup.exe
-	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorController.exe,, %kProgramDirectory%Binaries\Simulator Controller.exe
-	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorSettings.exe,, %kProgramDirectory%Binaries\Simulator Settings.exe
-	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorSetup.exe,, %kProgramDirectory%Binaries\Simulator Setup.exe
-	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorConfiguration.exe,, %kProgramDirectory%Binaries\Simulator Configuration.exe
-	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceSettings.exe,, %kProgramDirectory%Binaries\Race Settings.exe
-	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupDatabase.exe,, %kProgramDirectory%Binaries\Setup Database.exe
+writeAppPaths(options) {
+	location := normalizePath(options["InstallLocation"])
+	
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorStartup.exe,, %location%\Binaries\Simulator Startup.exe
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorController.exe,, %location%\Binaries\Simulator Controller.exe
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorSettings.exe,, %location%\Binaries\Simulator Settings.exe
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorSetup.exe,, %location%\Binaries\Simulator Setup.exe
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorConfiguration.exe,, %location%\Binaries\Simulator Configuration.exe
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceSettings.exe,, %location%\Binaries\Race Settings.exe
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupDatabase.exe,, %location%\Binaries\Setup Database.exe
 }
 
 deleteAppPaths(options := false) {
@@ -2516,11 +2519,12 @@ deleteAppPaths(options := false) {
 	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupDatabase.exe
 }
 
-writeUninstallerInfo(options := false) {
+writeUninstallerInfo(options) {
+	location := normalizePath(options["InstallLocation"])
 	version := StrSplit(kVersion, "-", , 2)[1]
 	
 	RegWrite REG_SZ, HKLM, %kUninstallKey%, DisplayName, Simulator Controller
-	RegWrite REG_SZ, HKLM, %kUninstallKey%, InstallLocation, % normalizePath(kProgramDirectory)
+	RegWrite REG_SZ, HKLM, %kUninstallKey%, InstallLocation, % location
 	RegWrite REG_SZ, HKLM, %kUninstallKey%, UninstallString, "%kProgramDirectory%Binaries\Simulator Setup.exe" -Uninstall
 	RegWrite REG_SZ, HKLM, %kUninstallKey%, QuietUninstallString, "%kProgramDirectory%Binaries\Simulator Setup.exe" -Uninstall -Quiet
 	RegWrite REG_SZ, HKLM, %kUninstallKey%, DisplayIcon, "%kProgramDirectory%\Resources\Icons\Artificial Intelligence.ico"

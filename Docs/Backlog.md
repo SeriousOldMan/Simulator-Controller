@@ -18,3 +18,4 @@
   2. [Target: V3.5.2] Additions to the Setup Wizard
      - Wrap it into a standard installer process
 	 - Conditionally create Start Menu entries and Desktop Icons
+  3. [Target: V3.6.0] Icon support for StreamDeck

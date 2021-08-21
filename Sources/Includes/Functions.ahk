@@ -723,8 +723,8 @@ checkForUpdates() {
 		if check {
 			URLDownloadToFile https://www.dropbox.com/s/txa8muw9j3g66tl/VERSION?dl=1, %kTempDirectory%VERSION
 			
-			version := readConfiguration(kTempDirectory . "VERSION")
-			version := getConfigurationValue(version, "Release", "Version", getConfigurationValue(version, "Version", "Release", false))
+			release := readConfiguration(kTempDirectory . "VERSION")
+			version := getConfigurationValue(release, "Release", "Version", getConfigurationValue(version, "Version", "Release", false))
 			
 			if version {
 				version := StrSplit(version, "-", , 2)
@@ -744,7 +744,41 @@ checkForUpdates() {
 
 					IfMsgBox Yes
 					{
-						Run https://github.com/SeriousOldMan/Simulator-Controller#latest-release-builds
+						download := getConfigurationValue(release, "Release", "Download", false)
+						
+						if download {
+							x := Round((A_ScreenWidth - 300) / 2)
+							y := A_ScreenHeight - 150
+							
+							showProgress({x: x, y: y, color: "Green", title: translate("Updating Simulator Controller"), message: translate("Downloading Version ") . version})
+			
+							URLDownloadToFile %download%, %A_Temp%\Simulator Controller.zip
+							
+							showProgress({progress: 33, message: translate("Extract installation files...")})
+							
+							try {
+								FileRemoveDir %A_Temp%\Simulator Controller, true
+							}
+							catch exception {
+								; ignore
+							}
+							
+							RunWait PowerShell.exe -Command Expand-Archive -LiteralPath '%A_Temp%\Simulator Controller.zip' -DestinationPath '%A_Temp%\Simulator Controller', , Hide
+							
+							showProgress({progress: 66, message: translate("Preparing installation...")})
+							
+							Sleep 1000
+							
+							showProgress({progress: 100, message: translate("Starting installation...")})
+							
+							msgbox "%A_Temp%\Simulator Controller\Binaries\Simulator Setup.exe" -NoUpdate -Install -Start "%A_ScriptFullPath%"
+							
+							Sleep 1000
+							
+							hideProgress()
+						}
+						else
+							Run https://github.com/SeriousOldMan/Simulator-Controller#latest-release-builds
 						
 						ExitApp 0
 					}
@@ -764,7 +798,7 @@ checkForUpdates() {
 		writeConfiguration(userToolTargetsFile, userToolTargets)
 	}
 	
-	if (!inList(A_Args, "-NoUpdate") && inList(["Simulator Startup", "Simulator Configuration", "Simulator Settings"], StrSplit(A_ScriptName, ".")[1])) {
+	if (!inList(A_Args, "-NoUpdate") && inList(["Simulator Startup", "Simulator Setup", "Simulator Configuration", "Simulator Settings"], StrSplit(A_ScriptName, ".")[1])) {
 		updates := readConfiguration(getFileName("UPDATES", kUserConfigDirectory))
 restartUpdate:		
 		for target, arguments in getConfigurationSectionValues(toolTargets, "Update", Object())

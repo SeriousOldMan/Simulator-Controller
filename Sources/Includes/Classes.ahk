@@ -384,7 +384,7 @@ class Function extends ConfigurationItem {
 								arguments[index] := kFalse
 					}
 						
-					action := ((action && (action.Length() == 2)) ? (action[1] . "(" . values2String(", ", arguments*) . ")") : "")
+					action := ((action && (action.Length() == 2) && action[1]) ? (action[1] . "(" . values2String(", ", arguments*) . ")") : "")
 				}
 				else
 					action := this.actionCallable(trigger, action)

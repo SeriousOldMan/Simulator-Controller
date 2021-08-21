@@ -764,7 +764,7 @@ updateApplicationFunction() {
 inputLabel(wizard, row) {
 	local function
 	
-	title := translate("Setup ")
+	title := translate("Modular Simulator Controller System")
 	prompt := translate("Please enter a label:")
 	
 	window := wizard.Window

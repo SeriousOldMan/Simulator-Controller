@@ -956,6 +956,9 @@ initializeEnvironment() {
 	if A_IsCompiled {
 		RegRead installLocation, HKLM, %kUninstallKey%, InstallLocation
 		
+		installOptions := readConfiguration(kUserConfigDirectory . "Simulator Controller.install")
+		installLocation := getConfigurationValue(installOptions, "Install", "Location", installLocation)
+		
 		install := (installLocation && (installLocation != "") && (InStr(kHomeDirectory, installLocation) != 1))
 		install := (install || !installLocation || (installLocation = ""))
 		

@@ -708,6 +708,14 @@ shareSetupDatabase() {
 	}
 }
 
+updateProgress(max) {
+	static counter := 0
+	
+	counter := Min(counter + 1, max)
+	
+	showProgress({progress: counter})
+}
+
 checkForUpdates() {
 	if inList(["Simulator Startup", "Simulator Configuration", "Simulator Setup", "Simulator Settings"], StrSplit(A_ScriptName, ".")[1]) {
 		check := !FileExist(kTempDirectory . "VERSION")
@@ -724,11 +732,13 @@ checkForUpdates() {
 			URLDownloadToFile https://www.dropbox.com/s/txa8muw9j3g66tl/VERSION?dl=1, %kTempDirectory%VERSION
 			
 			release := readConfiguration(kTempDirectory . "VERSION")
-			version := getConfigurationValue(release, "Release", "Version", getConfigurationValue(version, "Version", "Release", false))
+			version := getConfigurationValue(release, "Release", "Version", getConfigurationValue(release, "Version", "Release", false))
 			
 			if version {
 				version := StrSplit(version, "-", , 2)
 				current := StrSplit(kVersion, "-", , 2)
+				
+				dottedVersion := version[1]
 				
 				versionPostfix := version[2]
 				currentPostfix := current[2]
@@ -750,11 +760,21 @@ checkForUpdates() {
 							x := Round((A_ScreenWidth - 300) / 2)
 							y := A_ScreenHeight - 150
 							
-							showProgress({x: x, y: y, color: "Green", title: translate("Updating Simulator Controller"), message: translate("Downloading Version ") . version})
+							showProgress({x: x, y: y, color: "Green", title: translate("Updating Simulator Controller"), message: translate("Downloading Version ") . dottedVersion})
 			
+							updateProgress := Func("updateProgress").Bind(45)
+							
+							SetTimer %updateProgress%, 1500
+							
 							URLDownloadToFile %download%, %A_Temp%\Simulator Controller.zip
 							
-							showProgress({progress: 33, message: translate("Extract installation files...")})
+							SetTimer %updateProgress%, Off
+							
+							updateProgress := Func("updateProgress").Bind(90)
+							
+							SetTimer %updateProgress%, 1000
+							
+							showProgress({message: translate("Extracting installation files...")})
 							
 							try {
 								FileRemoveDir %A_Temp%\Simulator Controller, true
@@ -765,13 +785,22 @@ checkForUpdates() {
 							
 							RunWait PowerShell.exe -Command Expand-Archive -LiteralPath '%A_Temp%\Simulator Controller.zip' -DestinationPath '%A_Temp%\Simulator Controller', , Hide
 							
-							showProgress({progress: 66, message: translate("Preparing installation...")})
+							try {
+								FileDelete %A_Temp%\Simulator Controller.zip
+							}
+							catch exception {
+								; ignore
+							}
+							
+							SetTimer %updateProgress%, Off
+							
+							showProgress({progress: 90, message: translate("Preparing installation...")})
 							
 							Sleep 1000
 							
 							showProgress({progress: 100, message: translate("Starting installation...")})
 							
-							msgbox "%A_Temp%\Simulator Controller\Binaries\Simulator Setup.exe" -NoUpdate -Install -Start "%A_ScriptFullPath%"
+							Run "%A_Temp%\Simulator Controller\Binaries\Simulator Setup.exe" -NoUpdate -Install -Start "%A_ScriptFullPath%"
 							
 							Sleep 1000
 							
@@ -1848,7 +1877,7 @@ getControllerConfiguration(configuration := false) {
 			else
 				options := ""
 			
-			exePath := kBinariesDirectory . "Simulator Controller.exe -NoStartup" .  options
+			exePath := kBinariesDirectory . "Simulator Controller.exe -NoStartup -NoUpdate" .  options
 			
 			RunWait %exePath%, %kBinariesDirectory%
 			

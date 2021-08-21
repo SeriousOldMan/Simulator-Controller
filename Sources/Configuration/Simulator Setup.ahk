@@ -2170,7 +2170,8 @@ checkInstall() {
 		}
 	}
 	else {
-		install := (installLocation && (installLocation != "") && (InStr(kHomeDirectory, installLocation) != 1))
+		install := inList(A_Args, "-Install")
+		install := (install || (installLocation && (installLocation != "") && (InStr(kHomeDirectory, installLocation) != 1)))
 		install := (install || !installLocation || (installLocation = ""))
 		
 		if install {
@@ -2197,7 +2198,10 @@ checkInstall() {
 				ExitApp 0
 			}
 
-			isNew := !FileExist(kProgramDirectory)
+			if (!installLocation || (installLocation = ""))
+				installLocation := normalizePath(kProgramDirectory)
+			
+			isNew := !FileExist(installLocation)
 			
 			showSplashTheme("McLaren 720s GT3 Pictures")
 			
@@ -2225,9 +2229,18 @@ checkInstall() {
 				}
 			}
 			
-			options := {InstallLocation: kProgramDirectory, PackageLocation: kHomeDirectory, Update: !isNew, StartWizard: isNew
+			options := {InstallLocation: installLocation, PackageLocation: normalizePath(kHomeDirectory), Update: !isNew
 					  , StartMenu: ["Simulator Startup", "Simulator Settings", "Simulator Setup", "Simulator Configuration", "Race Settings", "Setup Database"]
 					  , Desktop: ["Simulator Startup", "Simulator Settings"]}
+			
+			if isNew
+				options["Start"] := (installLocation . "\Binaries\Simulator Setup.exe")
+			else {
+				index := inList(A_Args, "-Start")
+			
+				if index
+					options["Start"] := A_Args[index + 1]
+			}
 			
 			copyFiles(options)
 		
@@ -2250,8 +2263,8 @@ checkInstall() {
 			hideSplashTheme()
 			hideProgress()
 		
-			if (options.HasKey("StartWizard") && options["StartWizard"])
-				Run %kProgramDirectory%Binaries\Simulator Setup.exe
+			if options.HasKey("Start")
+				Run % options["Start"]
 			
 			ExitApp 0
 		}
@@ -2262,22 +2275,7 @@ normalizePath(path) {
 	return ((SubStr(path, StrLen(path)) = "\") ? SubStr(path, 1, StrLen(path) - 1) : path)
 }
 	
-copyFiles(options := false) {
-	if !options
-		options := {}
-	
-	if !options.HasKey("PackageLocation")
-		options["PackageLocation"] := kHomeDirectory
-	
-	if !options.HasKey("InstallLocation")
-		options["InstallLocation"] := kProgramDirectory
-	
-	options["PackageLocation"] := normalizePath(options["PackageLocation"])
-	options["InstallLocation"] := normalizePath(options["InstallLocation"])
-	
-	if !options.HasKey("DeleteOrphanes")
-		options["DeleteOrphanes"] := !FileExist(options["InstallLocation"])
-	
+copyFiles(options) {
 	source := options["PackageLocation"]
 	destination := options["InstallLocation"]
 	update := (options.HasKey("Update") && options["Update"])
@@ -2325,17 +2323,7 @@ copyFiles(options := false) {
 	}
 }
 	
-deleteFiles(options := false) {
-	if !options
-		options := {}
-	
-	if !options.HasKey("InstallLocation") {
-		RegRead installLocation, HKLM, %kUninstallKey%, InstallLocation
-		
-		if (installLocation && (installLocation != ""))
-			options["InstallLocation"] := installLocation
-	}
-	
+deleteFiles(options) {
 	installLocation := options["InstallLocation"]
 	count := 0
 	progress := 0
@@ -2467,12 +2455,13 @@ createShortcuts(location, options, type) {
 	if !options.HasKey(type)
 		options[type] := []
 	
+	installLocation := options["InstallLocation"]
+	
 	for ignore, name in options[type]
-		FileCreateShortCut %kProgramDirectory%Binaries\%name%.exe, %location%\%name%.lnk, %kProgramDirectory%Binaries\
+		FileCreateShortCut %installLocation%\Binaries\%name%.exe, %location%\%name%.lnk, %installLocation%\Binaries
 		
-	FileCreateShortCut %kProgramDirectory%Documentation.url, %location%\Documentation.lnk, %kProgramDirectory%
+	FileCreateShortCut %installLocation%Documentation.url, %location%\Documentation.lnk, %installLocation%
 }
-
 
 deleteShortcuts(location, options, type) {
 	for ignore, name in ["Simulator Startup", "Simulator Settings", "Simulator Setup", "Simulator Configuration", "Race Settings", "Setup Database"]
@@ -2492,15 +2481,15 @@ deleteShortcuts(location, options, type) {
 }
 
 writeAppPaths(options) {
-	location := normalizePath(options["InstallLocation"])
+	installLocation := normalizePath(options["InstallLocation"])
 	
-	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorStartup.exe,, %location%\Binaries\Simulator Startup.exe
-	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorController.exe,, %location%\Binaries\Simulator Controller.exe
-	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorSettings.exe,, %location%\Binaries\Simulator Settings.exe
-	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorSetup.exe,, %location%\Binaries\Simulator Setup.exe
-	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorConfiguration.exe,, %location%\Binaries\Simulator Configuration.exe
-	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceSettings.exe,, %location%\Binaries\Race Settings.exe
-	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupDatabase.exe,, %location%\Binaries\Setup Database.exe
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorStartup.exe,, %installLocation%\Binaries\Simulator Startup.exe
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorController.exe,, %installLocation%\Binaries\Simulator Controller.exe
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorSettings.exe,, %installLocation%\Binaries\Simulator Settings.exe
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorSetup.exe,, %installLocation%\Binaries\Simulator Setup.exe
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorConfiguration.exe,, %installLocation%\Binaries\Simulator Configuration.exe
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceSettings.exe,, %installLocation%\Binaries\Race Settings.exe
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupDatabase.exe,, %installLocation%\Binaries\Setup Database.exe
 }
 
 deleteAppPaths(options := false) {
@@ -2514,14 +2503,14 @@ deleteAppPaths(options := false) {
 }
 
 writeUninstallerInfo(options) {
-	location := normalizePath(options["InstallLocation"])
+	installLocation := options["InstallLocation"]
 	version := StrSplit(kVersion, "-", , 2)[1]
 	
 	RegWrite REG_SZ, HKLM, %kUninstallKey%, DisplayName, Simulator Controller
-	RegWrite REG_SZ, HKLM, %kUninstallKey%, InstallLocation, % location
-	RegWrite REG_SZ, HKLM, %kUninstallKey%, UninstallString, "%kProgramDirectory%Binaries\Simulator Setup.exe" -Uninstall
-	RegWrite REG_SZ, HKLM, %kUninstallKey%, QuietUninstallString, "%kProgramDirectory%Binaries\Simulator Setup.exe" -Uninstall -Quiet
-	RegWrite REG_SZ, HKLM, %kUninstallKey%, DisplayIcon, "%kProgramDirectory%\Resources\Icons\Artificial Intelligence.ico"
+	RegWrite REG_SZ, HKLM, %kUninstallKey%, InstallLocation, % installLocation
+	RegWrite REG_SZ, HKLM, %kUninstallKey%, UninstallString, "%installLocation%\Binaries\Simulator Setup.exe" -Uninstall
+	RegWrite REG_SZ, HKLM, %kUninstallKey%, QuietUninstallString, "%installLocation%\Binaries\Simulator Setup.exe" -Uninstall -Quiet
+	RegWrite REG_SZ, HKLM, %kUninstallKey%, DisplayIcon, "%installLocation%\Resources\Icons\Artificial Intelligence.ico"
 	RegWrite REG_SZ, HKLM, %kUninstallKey%, DisplayVersion, %version%
 	RegWrite REG_SZ, HKLM, %kUninstallKey%, URLInfoAbout, https://github.com/SeriousOldMan/Simulator-Controller/wiki
 	RegWrite REG_SZ, HKLM, %kUninstallKey%, Publisher, Oliver Juwig (TheBigO)

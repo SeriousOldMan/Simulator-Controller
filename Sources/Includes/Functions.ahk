@@ -800,7 +800,7 @@ checkForUpdates() {
 							
 							showProgress({progress: 100, message: translate("Starting installation...")})
 							
-							Run "%A_Temp%\Simulator Controller\Binaries\Simulator Setup.exe" -NoUpdate -Install -Start "%A_ScriptFullPath%"
+							Run "%A_Temp%\Simulator Controller\Binaries\Simulator Tools.exe" -NoUpdate -Install -Start "%A_ScriptFullPath%"
 							
 							Sleep 1000
 							
@@ -962,19 +962,19 @@ initializeEnvironment() {
 		install := (installLocation && (installLocation != "") && (InStr(kHomeDirectory, installLocation) != 1))
 		install := (install || !installLocation || (installLocation = ""))
 		
-		if (install && (StrSplit(A_ScriptName, ".")[1] != "Simulator Setup")) {
+		if (install && (StrSplit(A_ScriptName, ".")[1] != "Simulator Tools")) {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
 			title := translate("Modular Simulator Controller System")
 			MsgBox 262436, %title%, % translate("You have to install Simulator Controller before starting any of the applications. Do you want run the Setup now?")
 			OnMessage(0x44, "")
 
 			IfMsgBox Yes
-				Run *RunAs %kBinariesDirectory%Simulator Setup.exe
+				Run *RunAs %kBinariesDirectory%Simulator Tools.exe
 				
 			ExitApp 0
 		}
 	}
-		
+	
 	virgin := !FileExist(A_MyDocuments . "\Simulator Controller")
 	
 	FileCreateDir %A_MyDocuments%\Simulator Controller

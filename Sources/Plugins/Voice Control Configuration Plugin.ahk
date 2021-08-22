@@ -687,6 +687,8 @@ getPTTHotkey() {
 }
 
 chooseSoXPath() {
+	GuiControlGet soXPathEdit
+	
 	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
 	FileSelectFolder directory, *%soXPathEdit%, 0, % translate("Select SoX folder...")
 	OnMessage(0x44, "")

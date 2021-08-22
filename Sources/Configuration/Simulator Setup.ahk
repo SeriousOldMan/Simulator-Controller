@@ -2091,7 +2091,14 @@ findInstallProperty(name, property) {
 		return value
 }
 
+global installLocationPathEdit
+
 installOptions(options) {
+	static installationTypeDropDown
+	static startMenuShortcutsCheck
+	static desktopShortcutsCheck
+	static startConfigurationCheck
+	
 	static result := false
 	
 	if (options == kOk)
@@ -2111,14 +2118,47 @@ installOptions(options) {
 		Gui Install:Add, Text, w330 Center gmoveInstallEditor, % translate("Modular Simulator Controller System") 
 
 		Gui Install:Font, Norm, Arial
-		Gui Install:Font, Italic Underline, Arial
 
 		Gui Install:Add, Text, YP+20 w330 cBlue Center gopenInstallDocumentation, % translate("Install")
 
 		Gui Install:Font, Norm, Arial
-				
-		Gui Install:Add, Button, x170 y280 w80 h23 Default gacceptInstall, % translate("Ok")
-		Gui Install:Add, Button, x260 y280 w80 h23 gcancelInstall, % translate("&Cancel")
+		
+		Gui Install:Add, Text, x8 yp+20 w330 0x10
+		
+		Gui Install:Add, Picture, yp+10 w50 h50, % kIconsDirectory . "Question.ico"
+		
+		innerWidth := 330 - 66
+		
+		Gui Install:Add, Text, X74 YP+5 W%innerWidth% H46, % translate("Do you want to install Simulator Controller on your system as a portable or as a fully registered Windows application?")
+		
+		chosen := inList(["Registry", "Portable"], options["InstallType"])
+		
+		Gui Install:Add, Text, x16 yp+60 w100 h23 +0x200, % translate("Installation Type")
+		Gui Install:Add, DropDownList, x116 yp w70 AltSubmit Choose%chosen% VinstallationTypeDropDown, % values2String("|", map(["Registry", "Portable"], "translate")*)
+		
+		Gui Install:Add, Text, x16 yp+24 w110 h23 +0x200, % translate("Installation Folder")
+		Gui Install:Add, Edit, x116 yp w187 h21 VinstallLocationPathEdit, % options["InstallLocation"]
+		Gui Install:Add, Button, x304 yp-1 w23 h23 gchooseInstallLocationPath, % translate("...")
+		
+		checked := (options["StartMenuShortcuts"] ? "Checked" : "")
+		
+		Gui Install:Add, Text, x16 yp+34 w100 h23 +0x200, % translate("Create")
+		Gui Install:Add, CheckBox, x116 yp+3 w180 %checked% VstartMenuShortcutsCheck, % translate("  Start Menu Shortcuts")
+		
+		checked := (options["DesktopShortcuts"] ? "Checked" : "")
+		
+		Gui Install:Add, Text, x16 yp+21 w100 h23 +0x200, % translate("")
+		Gui Install:Add, CheckBox, x116 yp+3 w180 %checked% VdesktopShortcutsCheck, % translate("  Desktop Shortcuts")
+		
+		checked := (options["StartSetup"] ? "Checked" : "")
+		
+		Gui Install:Add, Text, x16 yp+34 w100 h23 +0x200, % translate("Start")
+		Gui Install:Add, CheckBox, x116 yp+3 w210 %checked% VstartConfigurationCheck, % translate("  Configuration when finished...")
+	
+		Gui Install:Add, Text, x8 yp+34 w330 0x10
+		
+		Gui Install:Add, Button, x170 yp+10 w80 h23 Default gacceptInstall, % translate("Ok")
+		Gui Install:Add, Button, x260 yp w80 h23 gcancelInstall, % translate("&Cancel")
 	
 		Gui Install:Margin, 10, 10
 		Gui Install:Show, AutoSize Center
@@ -2126,12 +2166,84 @@ installOptions(options) {
 		Loop {
 			Sleep 200
 		} until result
+	
+		if (result == kOk) {
+			Gui Install:Submit
+			
+			options["InstallType"] := ["Registry", "Portable"][installationTypeDropDown]
+			options["InstallLocation"] := installLocationPathEdit
+			options["StartMenuShortcuts"] := startMenuShortcutsCheck
+			options["DesktopShortcuts"] := desktopShortcutsCheck
+			options["StartSetup"] := startConfigurationCheck
+		}
 		
+		Gui Install:Destroy
+
 		return (result == kOk)
 	}
 }
 
 uninstallOptions(options) {
+	static keepUserFilesCheck
+	
+	static result := false
+	
+	if (options == kOk)
+		result := kOk
+	else if (options == kCancel)
+		result := kCancel
+	else {
+		result := false
+	
+		Gui Uninstall:Default
+				
+		Gui Uninstall:-Border ; -Caption
+		Gui Uninstall:Color, D0D0D0, E5E5E5
+
+		Gui Uninstall:Font, Bold, Arial
+
+		Gui Uninstall:Add, Text, w330 Center gmoveUninstallEditor, % translate("Modular Simulator Controller System") 
+
+		Gui Uninstall:Font, Norm, Arial
+
+		Gui Uninstall:Add, Text, YP+20 w330 cBlue Center gopenInstallDocumentation, % translate("Uninstall")
+
+		Gui Uninstall:Font, Norm, Arial
+		
+		Gui Uninstall:Add, Text, x8 yp+20 w330 0x10
+		
+		Gui Uninstall:Add, Picture, yp+10 w50 h50, % kIconsDirectory . "Question.ico"
+		
+		innerWidth := 330 - 66
+		
+		Gui Uninstall:Add, Text, X74 YP+5 W%innerWidth% H46, % translate("Do you really want to remove Simulator Controller from your Computer?")
+		
+		checked := (options["DeleteUserFiles"] ? "" : "Checked")
+		
+		Gui Uninstall:Add, CheckBox, x74 yp+60 w250 %checked% VkeepUserFilesCheck, % translate("  Keep local data and configuration files?")
+	
+		Gui Uninstall:Add, Text, x8 yp+34 w330 0x10
+		
+		Gui Uninstall:Add, Button, x170 yp+10 w80 h23 gacceptUninstall, % translate("Ok")
+		Gui Uninstall:Add, Button, x260 yp w80 h23 Default gcancelUninstall, % translate("&Cancel")
+	
+		Gui Uninstall:Margin, 10, 10
+		Gui Uninstall:Show, AutoSize Center
+		
+		Loop {
+			Sleep 200
+		} until result
+	
+		if (result == kOk) {
+			Gui Uninstall:Submit
+			
+			options["DeleteUserFiles"] := !keepUserFilesCheck
+		}
+		
+		Gui Uninstall:Destroy
+
+		return (result == kOk)
+	}
 }
 
 acceptInstall() {
@@ -2156,6 +2268,17 @@ moveInstallEditor() {
 
 moveUninstallEditor() {
 	moveByMouse("Uninstall")
+}
+
+chooseInstallLocationPath() {
+	GuiControlGet installLocationPathEdit
+		
+	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
+	FileSelectFolder directory, *%installLocationPathEdit%, 0, % translate("Select Installation folder...")
+	OnMessage(0x44, "")
+
+	if (directory != "")
+		GuiControl Text, installLocationPathEdit, %directory%
 }
 
 openInstallDocumentation() {
@@ -2191,7 +2314,7 @@ checkInstall() {
 				  , InstallLocation: normalizePath(installLocation)
 				  , DesktopShortcuts: getConfigurationValue(installOptions, "Shortcuts", "Desktop", false)
 				  , StartMenuShortcuts: getConfigurationValue(installOptions, "Shortcuts", "StartMenu", true)
-				  , DeleteUserFiles: !quiet}
+				  , DeleteUserFiles: false}
 		
 		if (quiet || uninstallOptions(options)) {
 			showSplashTheme("McLaren 720s GT3 Pictures")
@@ -2206,6 +2329,7 @@ checkInstall() {
 			deleteFiles(options["InstallLocation"])
 		
 			if options["DeleteUserFiles"] {
+				msgbox delete user files
 				showProgress({message: translate("Removing User files...")})
 			
 				FileRemoveDir %kUserHomeDirectory%, true

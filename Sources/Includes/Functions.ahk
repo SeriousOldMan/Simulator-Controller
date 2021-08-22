@@ -963,6 +963,9 @@ initializeEnvironment() {
 		install := (install || !installLocation || (installLocation = ""))
 		
 		if (install && (StrSplit(A_ScriptName, ".")[1] != "Simulator Tools")) {
+			kSimulatorConfiguration := readConfiguration(kSimulatorConfigurationFile)
+			vTargetLanguageCode := getConfigurationValue(kSimulatorConfiguration, "Configuration", "Language", getSystemLanguage())
+	
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
 			title := translate("Modular Simulator Controller System")
 			MsgBox 262436, %title%, % translate("You have to install Simulator Controller before starting any of the applications. Do you want run the Setup now?")

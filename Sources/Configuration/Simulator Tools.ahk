@@ -127,7 +127,7 @@ installOptions(options) {
 		chosen := inList(["Registry", "Portable"], options["InstallType"])
 		
 		Gui Install:Add, Text, x16 yp+60 w100 h23 +0x200, % translate("Installation Type")
-		Gui Install:Add, DropDownList, x116 yp w70 AltSubmit Choose%chosen% VinstallationTypeDropDown, % values2String("|", map(["Registry", "Portable"], "translate")*)
+		Gui Install:Add, DropDownList, x116 yp w80 AltSubmit Choose%chosen% VinstallationTypeDropDown, % values2String("|", map(["Registry", "Portable"], "translate")*)
 		
 		Gui Install:Add, Text, x16 yp+24 w110 h23 +0x200, % translate("Installation Folder")
 		Gui Install:Add, Edit, x116 yp w187 h21 VinstallLocationPathEdit, % options["InstallLocation"]
@@ -278,7 +278,7 @@ openInstallDocumentation() {
 	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration
 }
 
-checkInstall() {
+checkInstallation() {
 	RegRead installLocation, HKLM, %kUninstallKey%, InstallLocation
 	
 	installOptions := readConfiguration(kUserConfigDirectory . "Simulator Controller.install")
@@ -2310,7 +2310,7 @@ startSimulatorTools() {
 ;;;-------------------------------------------------------------------------;;;
 
 if !isDebug()
-	checkInstall()
+	checkInstallation()
 
 startSimulatorTools()
 

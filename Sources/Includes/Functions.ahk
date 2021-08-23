@@ -542,67 +542,69 @@ startTrayMessageManager() {
 }
 
 requestShareSetupDatabaseConsent() {
-	program := StrSplit(A_ScriptName, ".")[1]
-	
-	if ((program = "Simulator Startup") || (program = "Simulator Configuration") || (program = "Simulator Settings") || (program = "Simulator Setup")) {
-		idFileName := kUserConfigDirectory . "ID"
+	if !inList(A_Args, "-Install") {
+		program := StrSplit(A_ScriptName, ".")[1]
 		
-		FileReadLine id, %idFileName%, 1
-		
-		consent := readConfiguration(kUserConfigDirectory . "CONSENT")
-		
-		request := ((consent.Count() == 0) || (id != getConfigurationValue(consent, "General", "ID")) || getConfigurationValue(consent, "General", "ReNew", false))
-		
-		if !request {
-			countdown := getConfigurationValue(consent, "General", "Countdown", kUndefined)
+		if ((program = "Simulator Startup") || (program = "Simulator Configuration") || (program = "Simulator Settings") || (program = "Simulator Setup")) {
+			idFileName := kUserConfigDirectory . "ID"
 			
-			if (countdown != kUndefined) {
-				if (--countdown <= 0)
-					request := true
-				else {
-					setConfigurationValue(consent, "General", "Countdown", countdown)
+			FileReadLine id, %idFileName%, 1
+			
+			consent := readConfiguration(kUserConfigDirectory . "CONSENT")
+			
+			request := ((consent.Count() == 0) || (id != getConfigurationValue(consent, "General", "ID")) || getConfigurationValue(consent, "General", "ReNew", false))
+			
+			if !request {
+				countdown := getConfigurationValue(consent, "General", "Countdown", kUndefined)
 				
-					writeConfiguration(kUserConfigDirectory . "CONSENT", consent)
+				if (countdown != kUndefined) {
+					if (--countdown <= 0)
+						request := true
+					else {
+						setConfigurationValue(consent, "General", "Countdown", countdown)
+					
+						writeConfiguration(kUserConfigDirectory . "CONSENT", consent)
+					}
 				}
 			}
-		}
-		
-		if request {
-			newConsent := newConfiguration()
 			
-			setConfigurationValue(newConsent, "General", "ID", id)
-			setConfigurationValue(newConsent, "Consent", "Date", A_MM . "/" . A_DD . "/" . A_YYYY)
-			
-			if FileExist(kTranslationsDirectory . "Consent.ini")
-				result := consentDialog(id, consent)
-			else {
-				result := {}
-			
-				result["TyrePressures"] := "Retry"
-				result["CarSetups"] := "Retry"
-			}
+			if request {
+				newConsent := newConfiguration()
 				
-			switch result["TyrePressures"] {
-				case "Yes":
-					setConfigurationValue(newConsent, "Consent", "Share Tyre Pressures", "Yes")
-				case "No":
-					setConfigurationValue(newConsent, "Consent", "Share Tyre Pressures", "No")
-				case "Retry":
-					setConfigurationValue(newConsent, "Consent", "Share Tyre Pressures", "Undecided")
-					setConfigurationValue(newConsent, "General", "Countdown", 10)
+				setConfigurationValue(newConsent, "General", "ID", id)
+				setConfigurationValue(newConsent, "Consent", "Date", A_MM . "/" . A_DD . "/" . A_YYYY)
+				
+				if FileExist(kTranslationsDirectory . "Consent.ini")
+					result := consentDialog(id, consent)
+				else {
+					result := {}
+				
+					result["TyrePressures"] := "Retry"
+					result["CarSetups"] := "Retry"
+				}
+					
+				switch result["TyrePressures"] {
+					case "Yes":
+						setConfigurationValue(newConsent, "Consent", "Share Tyre Pressures", "Yes")
+					case "No":
+						setConfigurationValue(newConsent, "Consent", "Share Tyre Pressures", "No")
+					case "Retry":
+						setConfigurationValue(newConsent, "Consent", "Share Tyre Pressures", "Undecided")
+						setConfigurationValue(newConsent, "General", "Countdown", 10)
+				}
+				
+				switch result["CarSetups"] {
+					case "Yes":
+						setConfigurationValue(newConsent, "Consent", "Share Car Setups", "Yes")
+					case "No":
+						setConfigurationValue(newConsent, "Consent", "Share Car Setups", "No")
+					case "Retry":
+						setConfigurationValue(newConsent, "Consent", "Share Car Setups", "Undecided")
+						setConfigurationValue(newConsent, "General", "Countdown", 10)
+				}
+				
+				writeConfiguration(kUserConfigDirectory . "CONSENT", newConsent)
 			}
-			
-			switch result["CarSetups"] {
-				case "Yes":
-					setConfigurationValue(newConsent, "Consent", "Share Car Setups", "Yes")
-				case "No":
-					setConfigurationValue(newConsent, "Consent", "Share Car Setups", "No")
-				case "Retry":
-					setConfigurationValue(newConsent, "Consent", "Share Car Setups", "Undecided")
-					setConfigurationValue(newConsent, "General", "Countdown", 10)
-			}
-			
-			writeConfiguration(kUserConfigDirectory . "CONSENT", newConsent)
 		}
 	}
 }
@@ -610,7 +612,7 @@ requestShareSetupDatabaseConsent() {
 shareSetupDatabase() {
 	program := StrSplit(A_ScriptName, ".")[1]
 	
-	if ((program = "Simulator Startup") || (program = "Simulator Configuration")) {
+	if ((program = "Simulator Startup") || (program = "Simulator Configuration") || (program = "Simulator Settings")) {
 		idFileName := kUserConfigDirectory . "ID"
 		
 		FileReadLine id, %idFileName%, 1
@@ -708,14 +710,6 @@ shareSetupDatabase() {
 	}
 }
 
-updateProgress(max) {
-	static counter := 0
-	
-	counter := Min(counter + 1, max)
-	
-	showProgress({progress: counter})
-}
-
 checkForUpdates() {
 	if inList(["Simulator Startup", "Simulator Configuration", "Simulator Setup", "Simulator Settings"], StrSplit(A_ScriptName, ".")[1]) {
 		check := !FileExist(kTempDirectory . "VERSION")
@@ -723,7 +717,7 @@ checkForUpdates() {
 		if !check {
 			FileGetTime lastModified, %kTempDirectory%VERSION, M
 			
-			EnvAdd lastModified, 7, Days
+			EnvAdd lastModified, 1, Days
 			
 			check := (lastModified < A_Now)
 		}
@@ -754,60 +748,7 @@ checkForUpdates() {
 
 					IfMsgBox Yes
 					{
-						download := getConfigurationValue(release, "Release", "Download", false)
-						
-						if download {
-							x := Round((A_ScreenWidth - 300) / 2)
-							y := A_ScreenHeight - 150
-							
-							showProgress({x: x, y: y, color: "Green", title: translate("Updating Simulator Controller"), message: translate("Downloading Version ") . dottedVersion})
-			
-							updateProgress := Func("updateProgress").Bind(45)
-							
-							SetTimer %updateProgress%, 1500
-							
-							URLDownloadToFile %download%, %A_Temp%\Simulator Controller.zip
-							
-							SetTimer %updateProgress%, Off
-							
-							updateProgress := Func("updateProgress").Bind(90)
-							
-							SetTimer %updateProgress%, 1000
-							
-							showProgress({message: translate("Extracting installation files...")})
-							
-							try {
-								FileRemoveDir %A_Temp%\Simulator Controller, true
-							}
-							catch exception {
-								; ignore
-							}
-							
-							RunWait PowerShell.exe -Command Expand-Archive -LiteralPath '%A_Temp%\Simulator Controller.zip' -DestinationPath '%A_Temp%\Simulator Controller', , Hide
-							
-							try {
-								FileDelete %A_Temp%\Simulator Controller.zip
-							}
-							catch exception {
-								; ignore
-							}
-							
-							SetTimer %updateProgress%, Off
-							
-							showProgress({progress: 90, message: translate("Preparing installation...")})
-							
-							Sleep 1000
-							
-							showProgress({progress: 100, message: translate("Starting installation...")})
-							
-							Run "%A_Temp%\Simulator Controller\Binaries\Simulator Tools.exe" -NoUpdate -Install -Start "%A_ScriptFullPath%"
-							
-							Sleep 1000
-							
-							hideProgress()
-						}
-						else
-							Run https://github.com/SeriousOldMan/Simulator-Controller#latest-release-builds
+						Run %kBinariesDirectory%Simulator Download.exe -NoUpdate -Download -Update -Start "%A_ScriptFullPath%"
 						
 						ExitApp 0
 					}
@@ -878,6 +819,12 @@ restartUpdate:
 
 loadSimulatorConfiguration() {
 	kSimulatorConfiguration := readConfiguration(kSimulatorConfigurationFile)
+			
+	if !FileExist(getFileName(kSimulatorConfigurationFile, kUserConfigDirectory))
+		vTargetLanguageCode := getSystemLanguage()
+	else
+		vTargetLanguageCode := getConfigurationValue(kSimulatorConfiguration, "Configuration", "Language", getSystemLanguage())
+			
 	vTargetLanguageCode := getConfigurationValue(kSimulatorConfiguration, "Configuration", "Language", getSystemLanguage())
 	
 	version := readConfiguration(kHomeDirectory . "VERSION")
@@ -962,9 +909,13 @@ initializeEnvironment() {
 		install := (installLocation && (installLocation != "") && (InStr(kHomeDirectory, installLocation) != 1))
 		install := (install || !installLocation || (installLocation = ""))
 		
-		if (install && (StrSplit(A_ScriptName, ".")[1] != "Simulator Tools")) {
+		if (install && (StrSplit(A_ScriptName, ".")[1] != "Simulator Tools") && (StrSplit(A_ScriptName, ".")[1] != "Simulator Download")) {
 			kSimulatorConfiguration := readConfiguration(kSimulatorConfigurationFile)
-			vTargetLanguageCode := getConfigurationValue(kSimulatorConfiguration, "Configuration", "Language", getSystemLanguage())
+			
+			if !FileExist(getFileName(kSimulatorConfigurationFile, kUserConfigDirectory))
+				vTargetLanguageCode := getSystemLanguage()
+			else
+				vTargetLanguageCode := getConfigurationValue(kSimulatorConfiguration, "Configuration", "Language", getSystemLanguage())
 	
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
 			title := translate("Modular Simulator Controller System")

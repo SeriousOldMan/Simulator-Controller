@@ -294,7 +294,7 @@ checkInstallation() {
 				if A_IsCompiled
 					Run *RunAs "%A_ScriptFullPath%" /restart %options%
 				else
-					Run *RunAs "%A_AhkPath%" /restart "%A_ScriptFullPath% %options%
+					Run *RunAs "%A_AhkPath%" /restart "%A_ScriptFullPath%" %options%
 			}
 			catch exception {
 				;ignore
@@ -384,11 +384,15 @@ checkInstallation() {
 			}
 			
 			if !A_IsAdmin {
+				index := inList(A_Args, "-Start")
+			
+				options := (index ? ("-Start " . """" . A_Args[index + 1] . """") : "")
+				
 				try {
 					if A_IsCompiled
-						Run *RunAs "%A_ScriptFullPath%" /restart -NoUpdate
+						Run *RunAs "%A_ScriptFullPath%" /restart -NoUpdate %options%
 					else
-						Run *RunAs "%A_AhkPath%" /restart "%A_ScriptFullPath%" -NoUpdate
+						Run *RunAs "%A_AhkPath%" /restart "%A_ScriptFullPath%" -NoUpdate %options%
 				}
 				catch exception {
 					;ignore

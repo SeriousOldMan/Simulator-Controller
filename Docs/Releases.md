@@ -1,3 +1,16 @@
+## 3.5.2-release 08/27/21 (planned)
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. New autoextracting Software Installer for Simulator Controller.
+  4. Fully automatic update download and installation process.
+  5. Support for automated software installation either as fully registered Windows application or as portable application.
+  6. Change already prepared Pitstop settings created by the Race Engineer with your Button Box.
+  
+## 3.5.1-release 08/21/21
+
+  1. Bugfix for missing Button Box actions
+
 ## 3.5.0-release 08/20/21
 
   1. Bugfixes, as always

@@ -506,10 +506,16 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 					if this.selectPitstopOption(activity) {
 						this.changePitstopOption(activity, "Increase")
 						
-						if (activity = "Repair Suspension")
+						if (activity = "Repair Suspension") {
 							this.iRepairSuspensionChosen := !this.iRepairSuspensionChosen
-						else if (activity = "Repair Bodywork")
+							
+							this.notifyPitstopChanged(activity)
+						}
+						else if (activity = "Repair Bodywork") {
 							this.iRepairBodyworkChosen := !this.iRepairBodyworkChosen
+							
+							this.notifyPitstopChanged(activity)
+						}
 					}
 				default:
 					Throw "Unsupported activity """ . activity . """ detected in ACCPlugin.toggleActivity..."
@@ -1166,6 +1172,34 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		return true
 	}
 	
+	getPitstopOptionValues(option) {
+		switch option {
+			case "Refuel":
+				data := readSimulatorData(this.Code, "-Setup")
+				
+				return [getConfigurationValue(data, "Setup Data", "FuelAmount", 0)]
+			case "Tyre Pressures":
+				data := readSimulatorData(this.Code, "-Setup")
+				
+				return [getConfigurationValue(data, "Setup Data", "TyrePressureFL", 26.1), getConfigurationValue(data, "Setup Data", "TyrePressureFR", 26.1)
+					  , getConfigurationValue(data, "Setup Data", "TyrePressureRL", 26.1), getConfigurationValue(data, "Setup Data", "TyrePressureRR", 26.1)]
+			case "Tyre Set":
+				data := readSimulatorData(this.Code, "-Setup")
+				
+				return [getConfigurationValue(data, "Setup Data", "TyreSet", 0)]
+			case "Tyre Compound":
+				data := readSimulatorData(this.Code, "-Setup")
+				
+				return [getConfigurationValue(data, "Setup Data", "TyreCompound", 0), getConfigurationValue(data, "Setup Data", "TyreCompoundColor", 0)]
+			case "Repair Suspension":
+				return [this.iRepairSuspensionChosen]
+			case "Repair Bodywork":
+				return [this.iRepairBodyworkChosen]
+			default:
+				return base.getPitstopOptionValues(option)
+		}
+	}
+	
 	startPitstopSetup(pitstopNumber) {
 		openPitstopMFD()
 	}
@@ -1175,9 +1209,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	setPitstopRefuelAmount(pitstopNumber, litres) {
-		data := readSimulatorData(this.Code, "-Setup")
-		
-		litresIncrement := Round(litres - getConfigurationValue(data, "Setup Data", "FuelAmount", 0))
+		litresIncrement := Round(litres - this.getPitstopOptionValues("Refuel")[1])
 
 		if (litresIncrement != 0)
 			changePitstopFuelAmount((litresIncrement > 0) ? "Increase" : "Decrease", Abs(litresIncrement))
@@ -1187,9 +1219,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		if compound {
 			changePitstopTyreCompound((compound = "Wet") ? "Increase" : "Decrease")
 			
-			data := readSimulatorData(this.Code, "-Setup")
-			
-			tyreSetIncrement := Round(set - getConfigurationValue(data, "Setup Data", "TyreSet", 0))
+			tyreSetIncrement := Round(set - this.getPitstopOptionValues("Tyre Set")[1])
 			
 			if (compound = "Dry")
 				changePitstopTyreSet((tyreSetIncrement > 0) ? "Next" : "Previous", Abs(tyreSetIncrement))
@@ -1199,12 +1229,12 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
-		data := readSimulatorData(this.Code, "-Setup")
+		pressures := this.getPitstopOptionValues("Tyre Pressures")
 			
-		pressureFLIncrement := Round(pressureFL - getConfigurationValue(data, "Setup Data", "TyrePressureFL", 26.1), 1)
-		pressureFRIncrement := Round(pressureFR - getConfigurationValue(data, "Setup Data", "TyrePressureFR", 26.1), 1)
-		pressureRLIncrement := Round(pressureRL - getConfigurationValue(data, "Setup Data", "TyrePressureRL", 26.1), 1)
-		pressureRRIncrement := Round(pressureRR - getConfigurationValue(data, "Setup Data", "TyrePressureRR", 26.1), 1)
+		pressureFLIncrement := Round(pressureFL - pressures[1], 1)
+		pressureFRIncrement := Round(pressureFR - pressures[2], 1)
+		pressureRLIncrement := Round(pressureRL - pressures[3], 1)
+		pressureRRIncrement := Round(pressureRR - pressures[4], 1)
 		
 		if (pressureFLIncrement != 0)
 			changePitstopTyrePressure("Front Left", (pressureFLIncrement > 0) ? "Increase" : "Decrease", Abs(Round(pressureFLIncrement * 10)))

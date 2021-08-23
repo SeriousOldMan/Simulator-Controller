@@ -172,8 +172,11 @@ class PitstopChangeAction extends PitstopAction {
 	}
 	
 	fireAction(function, trigger) {
-		if base.fireAction(function, trigger)
+		if base.fireAction(function, trigger) {
 			this.Plugin.changePitstopOption(this.Option, this.Direction, this.Steps)
+			
+			this.Plugin.notifyPitstopChanged(this.Option)
+		}
 	}
 }
 
@@ -183,13 +186,16 @@ class PitstopSelectAction extends PitstopChangeAction {
 	}
 }
 
-class PitstopToggleAction extends PitstopAction {		
+class PitstopToggleAction extends PitstopAction {
 	fireAction(function, trigger) {
-		if base.fireAction(function, trigger)
+		if base.fireAction(function, trigger) {
 			if ((trigger == "On") || (trigger == "Increase") || (trigger == "Push") || (trigger == "Call"))
 				this.Plugin.changePitstopOption(this.Option, "Increase", this.Steps)
 			else
 				this.Plugin.changePitstopOption(this.Option, "Decrease", this.Steps)
+			
+			this.Plugin.notifyPitstopChanged(this.Option)
+		}
 	}
 }
 
@@ -368,6 +374,26 @@ class SimulatorPlugin extends ControllerPlugin {
 	updatePitstopOption(option, action, steps := 1) {
 		if (this.requirePitstopMFD() && this.selectPitstopOption(option))
 			this.changePitstopOption(option, action, steps)
+	}
+	
+	notifyPitstopChanged(option) {
+		if this.RaceEngineer
+			switch option {
+				case "Refuel", "Tyre Compound", "Tyre Set", "Repair Suspension", "Repair Bodywork":
+					newValues := this.getPitstopOptionValues(option)
+					
+					if newValues
+						this.RaceEngineer.pitstopOptionChanged(option, newValues*)
+				case "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right":
+					newValues := this.getPitstopOptionValues("Tyre Pressures")
+					
+					if newValues
+						this.RaceEngineer.pitstopOptionChanged("Tyre Pressures", newValues*)
+			}
+	}
+	
+	getPitstopOptionValues(option) {
+		return false
 	}
 	
 	selectPitstopOption(option) {

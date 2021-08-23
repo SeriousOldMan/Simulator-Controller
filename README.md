@@ -12,17 +12,13 @@ Thank you very much for your support!
 
 ### Download and Installation
 
-Download one of the builds below and unzip anywhere you like. Then run the "Simulator Setup" tool available in the *Binaries* folder, which will guide you through the quite complex installation & configuration process. You can run the "Simulator Setup" tool as often as you like, all your choices will be preserved between your sessions.
+Installation is very easy. For first time users I recommand using the automated installer below. But there are different download and installation options available. Please see the complete documentation about [Installation & Configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration) for more information.
 
-See the complete documentation about [Installation & Configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation) for more information.
+Below you will find separate download links for the current development build and at least the two latest stable releases. For release information, even for a preview on upcoming features in the next stable build, don't miss the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes).
 
-An installation of the underlying programming language [AutoHotkey](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications) is only necessary, if you want to create your own plugins. Beginning with Release 2.1, an installation of [VisualStudio Community Edition](https://visualstudio.microsoft.com/de/vs/community/) will be required for development as well, at least if you want do dig into the heavylifting part of telemetry data acquisition or voice recognition. But you can stick with the precompiled binaries from the distribution, if that is not your domain.
+#### Automated Installer
 
-For further convenience, the "Simulator Setup" tool will place links to **Simulator Startup** and **Simulator Settings** in the Windows Start Menu. You can also configure the software to automatically start with Windows by checking the *Start with Windows* during the configuration process.
-
-A word about Antivirus warnings: The programming language used for building Simulator Controller uses some really nasty tricks to control Windows applications, tricks also used by malware. Therefore, depending on your concrete Antivirus program, you may get some warnings regarding the Simulator Controller applications. I can assure you, that there's nothing about it. But you can read about these issues in the forums of [AutoHotkey](https://www.autohotkey.com/) itself. If your Antivirus programm allows exception rules, please define rules for the Simulator Controller applications, otherwise you need to have a beer and search for another Simulator Controller tool. Sorry...
-
-Below you will find download links for the current development build and the two latest stable releases. For release information, even for a preview on upcoming features in the next stable build, please take a look at the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes).
+Simply donwload and run [Simulator Controller.exe](*). This small application will connect to the version repository and will download and install the latest version automatically for you. If you want to install a version other than the current one, this is possible by downloading and installing one of the versions below manually, but consult the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation) beforehand.
 
 #### Latest development build
 

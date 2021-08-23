@@ -157,9 +157,6 @@ For the reactions of Jona, the format is much more simple. It looks like this:
 	Confirm.1=Roger, I come back to you as soon as possible.
 	Confirm.2=Okay, give me a second.
 	Comfirm.3=Wait a minute.
-	
-	
-	
 	Okay.1=Okay. Call me when you are ready.
 	Okay.2=Understood. I am here.
 
@@ -281,7 +278,7 @@ The pitstop is handled by Jona in two phases. In the first phase, the planning p
 
 Good to know: If Jona has planned the pitstop based on a request from Cato, the Virtual Race Engineer, the lap in which you should come to the pit is already known. In this case, the preparation phase does not have to be triggered explicitly, since the preparation for the pitstop takes place automatically when you start the selected lap.
 
-A final warning: If you ever perform a pitstop, which has not been planned and prepared by Jona, Jona will be very confused, say the least. You can do this, but please double check the recommendations of Jona for each subsequent pitstop, especially the chosen tyre set, if you don't want to end up with worn out tyres for your last stint.
+A final warning: If you ever perform a pitstop, which has not been planned and prepared by Jona, Jona will be very confused, say the least. You can do this, but please double check the recommendations of Jona for each subsequent pitstop, especially the chosen tyre set, if you don't want to end up with worn out tyres for your last stint. Also be very careful, when using the "Pitstop" mode on your Button Box to change the pitstop settings. Jona will not know about your changes, and might overwrite them during the pitstop preparation. There is one notable exception, if Jona has planned and prepared a pitstop, but this pitstop has not been carried out yet, every change to the pitstop settings using the "Pitstop" mode will be recognized and taken into account by Jona. However, this only applies to *Assetto Corsa Competizione* and *rFactor 2*, since these simulations will give other applications access to the current pitstop settings.
 
 #### *Assetto Corsa Competizione*
 

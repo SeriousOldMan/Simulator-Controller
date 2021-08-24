@@ -1,0 +1,6 @@
+;!@Install@!UTF-8!
+ Title="Simulator Controller"
+ BeginPrompt="Do you want to download and install Simulator Controller?"
+ Directory=".\\Binaries\\"
+ RunProgram="Simulator Download.exe"
+ ;!@InstallEnd@!

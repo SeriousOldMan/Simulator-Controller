@@ -2,6 +2,7 @@
 Version=3.5.2-dev
 Target=3.5.2-release
 Date=08/24/2021
+Download=https://www.dropbox.com/s/le2z5obvg9624jq/Simulator%20Controller%203.5.2-dev.zip?dl=1
 Changes=Automated update download and installation, Full support for automated Windows Setup & Installation, Autoextracting Software Installer, Already planned and prepared Pitstop settings can be changed with the Button Box (available for ACC and RF2)
 [Release]
 Version=3.5.1-release

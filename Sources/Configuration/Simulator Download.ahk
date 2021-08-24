@@ -61,7 +61,10 @@ downloadSimulatorController() {
 		version := values2String("", string2Values(".", version[1])*)
 		current := values2String("", string2Values(".", current[1])*)
 		
-		download := getConfigurationValue(release, "Release", "Download", false)
+		if GetKeyState("Ctrl", "P") && GetKeyState("Shift", "P")
+			download := getConfigurationValue(release, "Development", "Download", false)
+		else
+			download := getConfigurationValue(release, "Release", "Download", false)
 				
 		if download {
 			x := Round((A_ScreenWidth - 300) / 2)

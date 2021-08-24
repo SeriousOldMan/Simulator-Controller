@@ -88,6 +88,7 @@ global installLocationPathEdit
 
 installOptions(options) {
 	static installationTypeDropDown
+	static automaticUpdatesCheck
 	static startMenuShortcutsCheck
 	static desktopShortcutsCheck
 	static startConfigurationCheck
@@ -133,6 +134,11 @@ installOptions(options) {
 		Gui Install:Add, Edit, x116 yp w187 h21 VinstallLocationPathEdit, % options["InstallLocation"]
 		Gui Install:Add, Button, x304 yp-1 w23 h23 gchooseInstallLocationPath, % translate("...")
 		
+		checked := (options["AutomaticUpdates"] ? "Checked" : "")
+		
+		Gui Install:Add, Text, x16 yp+34 w100 h23 +0x200, % translate("Updates")
+		Gui Install:Add, CheckBox, x116 yp+3 w180 %checked% VautomaticUpdatesCheck, % translate("  Automatic")
+		
 		checked := (options["StartMenuShortcuts"] ? "Checked" : "")
 		
 		Gui Install:Add, Text, x16 yp+34 w100 h23 +0x200, % translate("Create")
@@ -165,6 +171,7 @@ installOptions(options) {
 			
 			options["InstallType"] := ["Registry", "Portable"][installationTypeDropDown]
 			options["InstallLocation"] := installLocationPathEdit
+			options["AutomaticUpdates"] := automaticUpdatesCheck
 			options["StartMenuShortcuts"] := startMenuShortcutsCheck
 			options["DesktopShortcuts"] := desktopShortcutsCheck
 			options["StartSetup"] := startConfigurationCheck
@@ -305,6 +312,7 @@ checkInstallation() {
 		
 		options := {InstallType: getConfigurationValue(installOptions, "Install", "Type", "Registry")
 				  , InstallLocation: normalizePath(installLocation)
+				  , AutomaticUpdates: getConfigurationValue(installOptions, "Updates", "Automatic", true)
 				  , DesktopShortcuts: getConfigurationValue(installOptions, "Shortcuts", "Desktop", false)
 				  , StartMenuShortcuts: getConfigurationValue(installOptions, "Shortcuts", "StartMenu", true)
 				  , DeleteUserFiles: false}
@@ -408,6 +416,7 @@ checkInstallation() {
 			
 			options := {InstallType: getConfigurationValue(installOptions, "Install", "Type", "Registry")
 					  , InstallLocation: normalizePath(getConfigurationValue(installOptions, "Install", "Location", installLocation))
+					  , AutomaticUpdates: getConfigurationValue(installOptions, "Updates", "Automatic", true)
 					  , DesktopShortcuts: getConfigurationValue(installOptions, "Shortcuts", "Desktop", false)
 					  , StartMenuShortcuts: getConfigurationValue(installOptions, "Shortcuts", "StartMenu", true)
 					  , StartSetup: true}

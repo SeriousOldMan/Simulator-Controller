@@ -747,8 +747,13 @@ checkForUpdates() {
 					OnMessage(0x44, "")
 
 					IfMsgBox Yes
-					{
-						Run %kBinariesDirectory%Simulator Download.exe -NoUpdate -Download -Update -Start "%A_ScriptFullPath%"
+					{		
+						automaticUpdates := getConfigurationValue(readConfiguration(kUserConfigDirectory . "Simulator Controller.install"), "Updates", "Automatic", true)
+		
+						if automaticUpdates
+							Run %kBinariesDirectory%Simulator Download.exe -NoUpdate -Download -Update -Start "%A_ScriptFullPath%"
+						else
+							Run https://github.com/SeriousOldMan/Simulator-Controller#latest-release-builds
 						
 						ExitApp 0
 					}

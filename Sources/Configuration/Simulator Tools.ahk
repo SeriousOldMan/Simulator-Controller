@@ -119,7 +119,7 @@ installOptions(options) {
 		
 		Gui Install:Add, Text, x8 yp+20 w330 0x10
 		
-		Gui Install:Add, Picture, yp+10 w50 h50, % kIconsDirectory . "Question.ico"
+		Gui Install:Add, Picture, yp+10 w50 h50, % kIconsDirectory . "Install.ico"
 		
 		innerWidth := 330 - 66
 		
@@ -212,7 +212,7 @@ uninstallOptions(options) {
 		
 		Gui Uninstall:Add, Text, x8 yp+20 w330 0x10
 		
-		Gui Uninstall:Add, Picture, yp+10 w50 h50, % kIconsDirectory . "Question.ico"
+		Gui Uninstall:Add, Picture, yp+10 w50 h50, % kIconsDirectory . "Install.ico"
 		
 		innerWidth := 330 - 66
 		
@@ -417,11 +417,12 @@ checkInstallation() {
 			options := {InstallType: getConfigurationValue(installOptions, "Install", "Type", "Registry")
 					  , InstallLocation: normalizePath(getConfigurationValue(installOptions, "Install", "Location", installLocation))
 					  , AutomaticUpdates: getConfigurationValue(installOptions, "Updates", "Automatic", true)
+					  , Verbose: getConfigurationValue(installOptions, "Updates", "Verbose", false)
 					  , DesktopShortcuts: getConfigurationValue(installOptions, "Shortcuts", "Desktop", false)
 					  , StartMenuShortcuts: getConfigurationValue(installOptions, "Shortcuts", "StartMenu", true)
 					  , StartSetup: true}
 				
-			if (!isNew || installOptions(options)) {
+			if ((!isNew && !options["Verbose"]) || installOptions(options)) {
 				installLocation := options["InstallLocation"]
 				packageLocation := normalizePath(kHomeDirectory)
 			

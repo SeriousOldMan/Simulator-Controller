@@ -477,11 +477,13 @@ checkInstallation() {
 					writeUninstallerInfo(installLocation)
 				}
 				
-				showProgress({message: translate("Removing installation files...")})
-				
-				removeDirectory(packageLocation)
-				
 				writeConfiguration(kUserConfigDirectory . "Simulator Controller.install", installOptions)
+				
+				if (installLocation != packageLocation) {
+					showProgress({message: translate("Removing installation files...")})
+				
+					removeDirectory(packageLocation)
+				}
 				
 				showProgress({progress: 100, message: translate("Finished...")})
 				

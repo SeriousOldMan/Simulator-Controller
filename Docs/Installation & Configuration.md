@@ -1,12 +1,25 @@
 # Installation
 
-Installation is easy and fully automatic for the current version. Simply download and run the installer from [GitHub](https://github.com/SeriousOldMan/Simulator-Controller#download-and-installation) and follow the instructions. You will have the option to install the Simulator Controller package in any location on your hard disks and you can decide to fully register Simulator Controller in Windows or to use a portable installation without updating the Registry. You may also create Start Menu and Desktop shortcuts according to your preferences. I strongly recommend to leave automatic updates ticked, unless you have an unusual installation location.
+Installation is easy and fully automatic for the current version. Simply download and run the installer from the [GitHub project page](https://github.com/SeriousOldMan/Simulator-Controller#download-and-installation) (or simply click [here](https://cntr.click/Qt9gVs0)) and follow the instructions. You will have the option to install the Simulator Controller package in any location on your hard disks and you can decide to fully register Simulator Controller in Windows or to use a portable installation without updating the Registry. You may also create Start Menu and Desktop shortcuts according to your preferences. I strongly recommend to leave automatic updates ticked, unless you have a very unusual installation location.
 
-![](*)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Installation.JPG)
 
-It is highly recommended to run the configuration process directly after installing the software, but you will do no harm, if you postpone this task. Simply start ["Simulator Setup"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#running-the-setup-tool) whenever you are ready.
+It is also recommended to run the configuration process directly after installing the software, but you will do no harm, if you postpone this task, and read the remaining documentation. Simply start ["Simulator Setup"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#running-the-setup-tool) whenever you are ready.
 
-The automatic Installer will always download and install the latest version of Simulator Controller. If you want to use a version other than the current one, this is still possible, but you will have to download manually. Unzip it at any location you like, then go to the *Binaries* folder, and start the application "Simulator Tools". It will detect that a version of Simulator Controller is alraedy installed on your Computer and will overwrite it accordingly. If you decide to install an earlier version than your current one this way, you might also have to use a backup copy of an earlier version of the *Simulator Controller* folder fron your user *Documents* folder, since there might be incompatibilities.
+The automatic Installer will always download and install the latest version of Simulator Controller. If you want to use a version other than the latest one, this is still possible, but you will have to download manually. Unzip it at any location you like, then go to the *Binaries* folder, and start the application "Simulator Tools". It will detect that a version of Simulator Controller is alraedy installed on your Computer and will update it accordingly. If you decide to install an earlier version than your current one this way, you might also have to use a backup copy of an earlier version of the *Simulator Controller* folder fron your user *Documents* folder, since there will be incompatibilities in most cases.
+
+Notes: You will find an application "Simulator Download" in the *Binaries* folder. This application is identical to the automated installer mentioned above. Under normal circumstances it is not necessary to run this application on your own, but it might be helpful for installations where automatic updates have been deactivated during the initial installation. The installation options you have chosen during your initial installation will be saved in the file "Simulator Controller.install", which is located in the *Simulator Controller\Config* folder in your user *Documents* folder. This file looks like this:
+
+	[Install]
+	Type=Portable
+	Location=D:\Controller
+	[Updates]
+	Automatic=false
+	[Shortcuts]
+	StartMenu=false
+	Desktop=false
+
+You are allowed to change the *[Updates]Automatic* option with a text editor, if you change your mind regarding automatic updates, but please do not change any other option.
 
 After you have installed Simulator Controller for the first time, the system will automatically detect any available newer versions. You will be asked once a day, whenever a new version is available. If you decide to install the newest version, downlaod and installation will be handled automatically for you. It is alos posssible here to do the downlaod manually. Unzip the download package and start the "Simulator Tools" application. It will update your installation and will delete the installation files afterwards.
 

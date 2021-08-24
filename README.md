@@ -18,7 +18,7 @@ Below you will find separate download links for the current development build an
 
 #### Automated Installer
 
-Simply donwload and run [Simulator Controller.exe](*). This small application will connect to the version repository and will download and install the latest version automatically for you. If you want to install a version other than the current one, this is possible by downloading and installing one of the versions below manually, but consult the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation) beforehand.
+Simply donwload and run [Simulator Controller.exe](https://cntr.click/Qt9gVs0). This small application will connect to the version repository and will download and install the latest version automatically for you. If you want to install a version other than the current one, no problem. This is possible by downloading and installing one of the versions below manually, but consult the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation) beforehand.
 
 #### Latest development build
 

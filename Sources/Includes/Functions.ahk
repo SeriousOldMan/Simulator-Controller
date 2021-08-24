@@ -1839,7 +1839,7 @@ getControllerConfiguration(configuration := false) {
 			else
 				options := ""
 			
-			exePath := kBinariesDirectory . "Simulator Controller.exe -NoStartup -NoUpdate" .  options
+			exePath := """" . kBinariesDirectory . "Simulator Controller.exe"" -NoStartup -NoUpdate" .  options
 			
 			RunWait %exePath%, %kBinariesDirectory%
 			

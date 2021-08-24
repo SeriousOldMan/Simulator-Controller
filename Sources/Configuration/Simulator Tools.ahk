@@ -423,11 +423,12 @@ checkInstallation() {
 					  , DesktopShortcuts: getConfigurationValue(installOptions, "Shortcuts", "Desktop", false)
 					  , StartMenuShortcuts: getConfigurationValue(installOptions, "Shortcuts", "StartMenu", true)
 					  , StartSetup: isNew, Update: !isNew}
-				
+			
+			packageLocation := normalizePath(kHomeDirectory)
+			
 			if ((!isNew && !options["Verbose"]) || installOptions(options)) {
 				installLocation := options["InstallLocation"]
-				packageLocation := normalizePath(kHomeDirectory)
-			
+				
 				setConfigurationValue(installOptions, "Install", "Type", options["InstallType"])
 				setConfigurationValue(installOptions, "Install", "Location", installLocation)
 				setConfigurationValue(installOptions, "Shortcuts", "Desktop", options["DesktopShortcuts"])
@@ -515,6 +516,20 @@ checkInstallation() {
 					if index
 						Run % A_Args[index + 1]
 				}
+			}
+			else {
+				if (isNew || (options["InstallLocation"] != packageLocation))
+					if InStr(packageLocation, A_Temp)
+						removeDirectory(packageLocation)
+					else {
+						OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+						title := translate("Modular Simulator Controller System")
+						MsgBox 262436, %title%, % translate("Do you want to remove the installation files?")
+						OnMessage(0x44, "")
+						
+						IfMsgBox Yes
+							removeDirectory(packageLocation)
+					}
 			}
 			
 			ExitApp 0
@@ -2357,7 +2372,7 @@ try {
 	SoundPlay *32
 	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
 	
-	title := translate("Simulator Build")
+	title := translate("Modular Simulator Controller System")
 	
 	MsgBox 262180, %title%, % translate("Cancel target processing?")
 	OnMessage(0x44, "")

@@ -38,6 +38,10 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		preparePitstop(arguments*) {
 			this.callRemote("callPreparePitstop", arguments*)
 		}
+		
+		pitstopOptionChanged(arguments*) {
+			this.callRemote("pitstopOptionChanged", arguments*)
+		}
 	}
 
 	class RaceEngineerAction extends RaceAssistantPlugin.RaceAssistantAction {
@@ -168,6 +172,11 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		this.iPitstopPending := false
 					
 		SetTimer collectRaceEngineerSessionData, 10000
+	}
+	
+	pitstopOptionChanged(option, values*) {
+		if this.RaceEngineer
+			this.RaceEngineer.pitstopOptionChanged(option, values*)
 	}
 	
 	pitstopPlanned(pitstopNumber) {

@@ -186,7 +186,7 @@ class ButtonBoxStepWizard extends StepWizard {
 		
 		if (this.conflictingFunctions(configuration) || this.conflictingTriggers(configuration)) {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-			title := translate("Setup ")
+			title := translate("Modular Simulator Controller System")
 			MsgBox 262160, %title%, % translate("There are still duplicate functions or duplicate triggers - please correct...")
 			OnMessage(0x44, "")
 			
@@ -200,7 +200,7 @@ class ButtonBoxStepWizard extends StepWizard {
 		
 		if (LV_GetCount() != this.iFunctionTriggers.Count()) {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-			title := translate("Setup ")
+			title := translate("Modular Simulator Controller System")
 			MsgBox 262436, %title%, % translate("Not all functions have been assigned to physical controls. Do you really want to proceed?")
 			OnMessage(0x44, "")
 			
@@ -1073,7 +1073,7 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 			else
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Increase", "Decrease", "Cancel"]))
 			
-			title := translate("Setup ")
+			title := translate("Modular Simulator Controller System")
 			MsgBox 262179, %title%, % translate("Trigger for ") . action . translate("?")
 			OnMessage(0x44, "")
 			

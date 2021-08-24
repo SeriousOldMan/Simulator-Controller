@@ -548,10 +548,6 @@ class SetupWizard extends ConfigurationItem {
 					
 					FileCopy %kUserHomeDirectory%Setup\Button Box Configuration.ini, %kUserConfigDirectory%Button Box Configuration.ini
 				}
-	
-				for ignore, name in ["Simulator Startup", "Simulator Settings", "Race Settings", "Setup Database"]
-					if ((A_Index < 3) || this.isModuleSelected("Race Engineer") || this.isModuleSelected("Race Strategist"))
-						FileCreateShortCut %kBinariesDirectory%%name%.exe, %A_StartMenu%\%name%.lnk, %kBinariesDirectory%
 			}
 			
 			vWorking := false
@@ -1716,7 +1712,7 @@ class StartStepWizard extends StepWizard {
 				try {
 					SetWorkingDir %directory%
 					
-					Run Powershell -Command Get-ChildItem -Path '.' -Recurse | Unblock-File
+					Run Powershell -Command Get-ChildItem -Path '.' -Recurse | Unblock-File, , Hide
 				}
 				finally {
 					SetWorkingDir %currentDirectory%
@@ -1898,7 +1894,7 @@ finishSetup(finish := false, save := false) {
 		Gui %window%:Show
 		
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-		title := translate("Setup ")
+		title := translate("Modular Simulator Controller System")
 		message := (translate("Do you want to generate the new configuration?") . "`n`n" . translate("Backup files will be saved for your current configuration in the ""Simulator Controller\Config"" folder in your user ""Documents"" folder."))
 		MsgBox 262436, %title%, %message%
 		OnMessage(0x44, "")
@@ -2098,36 +2094,29 @@ initializeSimulatorSetup() {
 	
 	FileCreateDir %kUserHomeDirectory%Setup
 	
-	protectionOn()
+	definition := readConfiguration(kResourcesDirectory . "Setup\Simulator Setup.ini")
+
+	setConfigurationSectionValues(kSimulatorConfiguration, "Splash Window", getConfigurationSectionValues(definition, "Splash Window"))
+	setConfigurationSectionValues(kSimulatorConfiguration, "Splash Themes", getConfigurationSectionValues(definition, "Splash Themes"))
+
+	setConfigurationValue(kSimulatorConfiguration, "Splash Window", "Title", translate("Modular Simulator Controller System") . translate(" - ") . translate("Setup && Configuration"))
 	
-	try {
-		definition := readConfiguration(kResourcesDirectory . "Setup\Simulator Setup.ini")
+	wizard := new SetupWizard(kSimulatorConfiguration, definition)
 	
-		setConfigurationSectionValues(kSimulatorConfiguration, "Splash Window", getConfigurationSectionValues(definition, "Splash Window"))
-		setConfigurationSectionValues(kSimulatorConfiguration, "Splash Themes", getConfigurationSectionValues(definition, "Splash Themes"))
+	showSplashTheme("Rotating Brain")
 	
-		setConfigurationValue(kSimulatorConfiguration, "Splash Window", "Title", translate("Modular Simulator Controller System") . translate(" - ") . translate("Setup && Configuration"))
-		
-		showSplashTheme("Rotating Brain")
-		
-		x := Round((A_ScreenWidth - 300) / 2)
-		y := A_ScreenHeight - 150
-		
-		vProgressCount := 0
-		
-		showProgress({x: x, y: y, color: "Blue", title: translate("Initializing Setup Wizard"), message: translate("Preparing Configuration Steps...")})
-		
-		if isDebug()
-			Sleep 500
+	x := Round((A_ScreenWidth - 300) / 2)
+	y := A_ScreenHeight - 150
 	
-		wizard := new SetupWizard(kSimulatorConfiguration, definition)
-		
-		wizard.registerStepWizard(new StartStepWizard(wizard, "Start", kSimulatorConfiguration))
-		wizard.registerStepWizard(new FinishStepWizard(wizard, "Finish", kSimulatorConfiguration))
-	}
-	finally {
-		protectionOff()
-	}
+	vProgressCount := 0
+	
+	showProgress({x: x, y: y, color: "Blue", title: translate("Initializing Setup Wizard"), message: translate("Preparing Configuration Steps...")})
+	
+	if isDebug()
+		Sleep 500
+	
+	wizard.registerStepWizard(new StartStepWizard(wizard, "Start", kSimulatorConfiguration))
+	wizard.registerStepWizard(new FinishStepWizard(wizard, "Finish", kSimulatorConfiguration))
 }
 
 startupSimulatorSetup() {
@@ -2229,14 +2218,14 @@ findSoftware(definition, software) {
 			if (software = descriptor[1]) {
 				for ignore, locator in string2Values(";", descriptor[2]) {
 					if (InStr(locator, "File:") == 1) {
-						locator := substituteVariables(StrReplace(locator, "File:", ""))
+						locator := substituteVariables(Trim(StrReplace(locator, "File:", "")))
 						
 						if FileExist(locator)
 							return locator
 					}
 					else if (InStr(locator, "RegistryExist:") == 1) {
 						try {
-							RegRead value, % substituteVariables(StrReplace(locator, "RegistryExist:", ""))
+							RegRead value, % substituteVariables(Trim(StrReplace(locator, "RegistryExist:", "")))
 						}
 						catch exception {
 							value := ""
@@ -2252,7 +2241,7 @@ findSoftware(definition, software) {
 							return (folder . descriptor[3])
 					}
 					else if (InStr(locator, "Steam:") == 1) {
-						locator := substituteVariables(StrReplace(locator, "Steam:", ""))
+						locator := substituteVariables(Trim(StrReplace(locator, "Steam:", "")))
 						
 						try {
 							RegRead installPath, HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Valve\Steam, InstallPath

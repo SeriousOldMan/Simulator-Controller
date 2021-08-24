@@ -279,6 +279,8 @@ chooseApplicationWorkingDirectoryPath() {
 	protectionOn()
 	
 	try {
+		GuiControlGet applicationWorkingDirectoryPathEdit
+		
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
 		FileSelectFolder directory, *%applicationWorkingDirectoryPathEdit%, 0, % translate("Select working directory...")
 		OnMessage(0x44, "")

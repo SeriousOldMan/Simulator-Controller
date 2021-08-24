@@ -50,7 +50,13 @@ global kCompiler = kAHKDirectory . "Compiler\ahk2exe.exe"
 
 global kSave = "save"
 global kRevert = "revert"
+
+global kOk = "ok"
 global kCancel = "cancel"
+
+global kUninstallKey = "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\SimulatorController"
+
+global kInstallDirectory = (A_ProgramFiles . "\Simulator Controller\")
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -72,10 +78,738 @@ global vCleanupSettings = Object()
 global vCopySettings = Object()
 global vBuildSettings = Object()
 
+global vProgressCount = 0
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+global installLocationPathEdit
+
+installOptions(options) {
+	static installationTypeDropDown
+	static automaticUpdatesCheck
+	static startMenuShortcutsCheck
+	static desktopShortcutsCheck
+	static startConfigurationCheck
+	
+	static result := false
+	
+	if (options == kOk)
+		result := kOk
+	else if (options == kCancel)
+		result := kCancel
+	else {
+		result := false
+	
+		Gui Install:Default
+				
+		Gui Install:-Border ; -Caption
+		Gui Install:Color, D0D0D0, E5E5E5
+
+		Gui Install:Font, Bold, Arial
+
+		Gui Install:Add, Text, w330 Center gmoveInstallEditor, % translate("Modular Simulator Controller System") 
+
+		Gui Install:Font, Norm, Arial
+
+		Gui Install:Add, Text, YP+20 w330 cBlue Center gopenInstallDocumentation, % translate("Install")
+
+		Gui Install:Font, Norm, Arial
+		
+		Gui Install:Add, Text, x8 yp+20 w330 0x10
+		
+		Gui Install:Add, Picture, yp+10 w50 h50, % kIconsDirectory . "Install.ico"
+		
+		innerWidth := 330 - 66
+		
+		Gui Install:Add, Text, X74 YP+5 W%innerWidth% H46, % translate("Do you want to install Simulator Controller on your system as a portable or as a fully registered Windows application?")
+		
+		chosen := inList(["Registry", "Portable"], options["InstallType"])
+		
+		disabled := (options["Update"] ? "Disabled" : "")
+		
+		Gui Install:Add, Text, x16 yp+60 w100 h23 +0x200, % translate("Installation Type")
+		Gui Install:Add, DropDownList, x116 yp w80 AltSubmit %disabled% Choose%chosen% VinstallationTypeDropDown, % values2String("|", map(["Registry", "Portable"], "translate")*)
+		
+		Gui Install:Add, Text, x16 yp+24 w110 h23 +0x200, % translate("Installation Folder")
+		Gui Install:Add, Edit, x116 yp w187 h21 %disabled% VinstallLocationPathEdit, % options["InstallLocation"]
+		Gui Install:Add, Button, x304 yp-1 w23 h23 %disabled% gchooseInstallLocationPath, % translate("...")
+		
+		checked := (options["AutomaticUpdates"] ? "Checked" : "")
+		
+		Gui Install:Add, Text, x16 yp+34 w100 h23 +0x200, % translate("Updates")
+		Gui Install:Add, CheckBox, x116 yp+3 w180 %checked% VautomaticUpdatesCheck, % translate("  Automatic")
+		
+		checked := (options["StartMenuShortcuts"] ? "Checked" : "")
+		
+		Gui Install:Add, Text, x16 yp+34 w100 h23 +0x200, % translate("Create")
+		Gui Install:Add, CheckBox, x116 yp+3 w180 %checked% VstartMenuShortcutsCheck, % translate("  Start Menu Shortcuts")
+		
+		checked := (options["DesktopShortcuts"] ? "Checked" : "")
+		
+		Gui Install:Add, Text, x16 yp+21 w100 h23 +0x200, % translate("")
+		Gui Install:Add, CheckBox, x116 yp+3 w180 %checked% VdesktopShortcutsCheck, % translate("  Desktop Shortcuts")
+		
+		checked := (options["StartSetup"] ? "Checked" : "")
+		
+		Gui Install:Add, Text, x16 yp+34 w100 h23 +0x200, % translate("Start")
+		Gui Install:Add, CheckBox, x116 yp+3 w210 %disabled% %checked% VstartConfigurationCheck, % translate("  Configuration when finished...")
+	
+		Gui Install:Add, Text, x8 yp+34 w330 0x10
+		
+		Gui Install:Add, Button, x170 yp+10 w80 h23 Default gacceptInstall, % translate("Ok")
+		Gui Install:Add, Button, x260 yp w80 h23 gcancelInstall, % translate("&Cancel")
+	
+		Gui Install:Margin, 10, 10
+		Gui Install:Show, AutoSize Center
+		
+		Loop {
+			Sleep 200
+		} until result
+	
+		if (result == kOk) {
+			Gui Install:Submit
+			
+			options["InstallType"] := ["Registry", "Portable"][installationTypeDropDown]
+			options["InstallLocation"] := installLocationPathEdit
+			options["AutomaticUpdates"] := automaticUpdatesCheck
+			options["StartMenuShortcuts"] := startMenuShortcutsCheck
+			options["DesktopShortcuts"] := desktopShortcutsCheck
+			options["StartSetup"] := startConfigurationCheck
+		}
+		
+		Gui Install:Destroy
+
+		return (result == kOk)
+	}
+}
+
+uninstallOptions(options) {
+	static keepUserFilesCheck
+	
+	static result := false
+	
+	if (options == kOk)
+		result := kOk
+	else if (options == kCancel)
+		result := kCancel
+	else {
+		result := false
+	
+		Gui Uninstall:Default
+				
+		Gui Uninstall:-Border ; -Caption
+		Gui Uninstall:Color, D0D0D0, E5E5E5
+
+		Gui Uninstall:Font, Bold, Arial
+
+		Gui Uninstall:Add, Text, w330 Center gmoveUninstallEditor, % translate("Modular Simulator Controller System") 
+
+		Gui Uninstall:Font, Norm, Arial
+
+		Gui Uninstall:Add, Text, YP+20 w330 cBlue Center gopenInstallDocumentation, % translate("Uninstall")
+
+		Gui Uninstall:Font, Norm, Arial
+		
+		Gui Uninstall:Add, Text, x8 yp+20 w330 0x10
+		
+		Gui Uninstall:Add, Picture, yp+10 w50 h50, % kIconsDirectory . "Install.ico"
+		
+		innerWidth := 330 - 66
+		
+		Gui Uninstall:Add, Text, X74 YP+5 W%innerWidth% H46, % translate("Do you really want to remove Simulator Controller from your Computer?")
+		
+		checked := (options["DeleteUserFiles"] ? "" : "Checked")
+		
+		Gui Uninstall:Add, CheckBox, x74 yp+60 w250 %checked% VkeepUserFilesCheck, % translate("  Keep local data and configuration files?")
+	
+		Gui Uninstall:Add, Text, x8 yp+34 w330 0x10
+		
+		Gui Uninstall:Add, Button, x170 yp+10 w80 h23 gacceptUninstall, % translate("Ok")
+		Gui Uninstall:Add, Button, x260 yp w80 h23 Default gcancelUninstall, % translate("&Cancel")
+	
+		Gui Uninstall:Margin, 10, 10
+		Gui Uninstall:Show, AutoSize Center
+		
+		Loop {
+			Sleep 200
+		} until result
+	
+		if (result == kOk) {
+			Gui Uninstall:Submit
+			
+			options["DeleteUserFiles"] := !keepUserFilesCheck
+		}
+		
+		Gui Uninstall:Destroy
+
+		return (result == kOk)
+	}
+}
+
+acceptInstall() {
+	installOptions(kOk)
+}
+
+cancelInstall() {
+	installOptions(kCancel)
+}
+
+acceptUninstall() {
+	uninstallOptions(kOk)
+}
+
+cancelUninstall() {
+	uninstallOptions(kCancel)
+}
+
+moveInstallEditor() {
+	moveByMouse("Install")
+}
+
+moveUninstallEditor() {
+	moveByMouse("Uninstall")
+}
+
+chooseInstallLocationPath() {
+	GuiControlGet installLocationPathEdit
+		
+	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
+	FileSelectFolder directory, *%installLocationPathEdit%, 0, % translate("Select Installation folder...")
+	OnMessage(0x44, "")
+
+	if (directory != "")
+		GuiControl Text, installLocationPathEdit, %directory%
+}
+
+openInstallDocumentation() {
+	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration
+}
+
+checkInstallation() {
+	RegRead installLocation, HKLM, %kUninstallKey%, InstallLocation
+	
+	installOptions := readConfiguration(kUserConfigDirectory . "Simulator Controller.install")
+	installLocation := getConfigurationValue(installOptions, "Install", "Location", installLocation)
+	
+	if inList(A_Args, "-Uninstall") {
+		quiet := inList(A_Args, "-Quiet")
+		
+		if !A_IsAdmin {
+			options := ("-Uninstall -NoUpdate" . (quiet ? " -Quiet" : ""))
+			
+			try {
+				if A_IsCompiled
+					Run *RunAs "%A_ScriptFullPath%" /restart %options%
+				else
+					Run *RunAs "%A_AhkPath%" /restart "%A_ScriptFullPath%" %options%
+			}
+			catch exception {
+				;ignore
+			}
+			
+			ExitApp 0
+		}
+		
+		options := {InstallType: getConfigurationValue(installOptions, "Install", "Type", "Registry")
+				  , InstallLocation: normalizePath(installLocation)
+				  , AutomaticUpdates: getConfigurationValue(installOptions, "Updates", "Automatic", true)
+				  , DesktopShortcuts: getConfigurationValue(installOptions, "Shortcuts", "Desktop", false)
+				  , StartMenuShortcuts: getConfigurationValue(installOptions, "Shortcuts", "StartMenu", true)
+				  , DeleteUserFiles: false}
+		
+		if (quiet || uninstallOptions(options)) {
+			showSplashTheme("McLaren 720s GT3 Pictures")
+				
+			x := Round((A_ScreenWidth - 300) / 2)
+			y := A_ScreenHeight - 150
+			
+			vProgressCount := 0
+
+			showProgress({x: x, y: y, color: "Blue", title: translate("Uninstalling Simulator Controller"), message: translate("...")})
+			
+			deleteFiles(options["InstallLocation"])
+		
+			if options["DeleteUserFiles"] {
+				msgbox delete user files
+				showProgress({message: translate("Removing User files...")})
+			
+				FileRemoveDir %kUserHomeDirectory%, true
+			}
+			else
+				try {
+					FileDelete %kUserConfigDirectory%Simulator Controller.install
+				}
+				catch exception {
+					; ignore
+				}
+			
+			if options["StartMenuShortcuts"] {
+				showProgress({progress: vProgressCount, message: translate("Removing Start menu shortcuts...")})
+			
+				deleteShortcuts(A_StartMenu)
+			}
+			
+			if options["DesktopShortcuts"] {
+				showProgress({progress: vProgressCount, message: translate("Removing Desktop shortcuts...")})
+			
+				deleteShortcuts(A_Desktop)
+			}
+			
+			vProgressCount += 5
+			
+			if (options["InstallType"] = "Registry") {
+				showProgress({progress: vProgressCount, message: translate("Updating Registry...")})
+			
+				deleteAppPaths()
+				deleteUninstallerInfo()
+			}
+			
+			removeDirectory(installLocation)
+			
+			showProgress({progress: 100, message: translate("Finished...")})
+			
+			Sleep 1000
+			
+			hideSplashTheme()
+			hideProgress()
+			
+			ExitApp 0
+		}
+	}
+	else {
+		install := inList(A_Args, "-Install")
+		install := (install || (installLocation && (installLocation != "") && (InStr(kHomeDirectory, installLocation) != 1)))
+		install := (install || !installLocation || (installLocation = ""))
+		
+		if install {
+			if !A_Is64bitOS {
+				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+				title := translate("Error")
+				MsgBox 262160, %title%, % translate("Simulator Controller can only be installed on a 64-bit Windows installation. Setup will exit...")
+				OnMessage(0x44, "")
+				
+				ExitApp 1
+			}
+			
+			if !A_IsAdmin {
+				index := inList(A_Args, "-Start")
+			
+				options := (index ? ("-Start " . """" . A_Args[index + 1] . """") : "")
+				
+				try {
+					if A_IsCompiled
+						Run *RunAs "%A_ScriptFullPath%" /restart -NoUpdate %options%
+					else
+						Run *RunAs "%A_AhkPath%" /restart "%A_ScriptFullPath%" -NoUpdate %options%
+				}
+				catch exception {
+					;ignore
+				}
+				
+				ExitApp 0
+			}
+
+			if (!installLocation || (installLocation = ""))
+				installLocation := normalizePath(kInstallDirectory)
+			
+			isNew := !FileExist(installLocation)
+			
+			options := {InstallType: getConfigurationValue(installOptions, "Install", "Type", "Registry")
+					  , InstallLocation: normalizePath(getConfigurationValue(installOptions, "Install", "Location", installLocation))
+					  , AutomaticUpdates: getConfigurationValue(installOptions, "Updates", "Automatic", true)
+					  , Verbose: getConfigurationValue(installOptions, "Updates", "Verbose", false)
+					  , DesktopShortcuts: getConfigurationValue(installOptions, "Shortcuts", "Desktop", false)
+					  , StartMenuShortcuts: getConfigurationValue(installOptions, "Shortcuts", "StartMenu", true)
+					  , StartSetup: isNew, Update: !isNew}
+			
+			packageLocation := normalizePath(kHomeDirectory)
+			
+			if ((!isNew && !options["Verbose"]) || installOptions(options)) {
+				installLocation := options["InstallLocation"]
+				
+				setConfigurationValue(installOptions, "Install", "Type", options["InstallType"])
+				setConfigurationValue(installOptions, "Install", "Location", installLocation)
+				setConfigurationValue(installOptions, "Updates", "Automatic", options["AutomaticUpdates"])
+				setConfigurationValue(installOptions, "Updates", "Verbose", options["Verbose"])
+				setConfigurationValue(installOptions, "Shortcuts", "Desktop", options["DesktopShortcuts"])
+				setConfigurationValue(installOptions, "Shortcuts", "StartMenu", options["StartMenuShortcuts"])
+
+				showSplashTheme("McLaren 720s GT3 Pictures")
+				
+				x := Round((A_ScreenWidth - 300) / 2)
+				y := A_ScreenHeight - 150
+				
+				vProgressCount := 0
+
+				showProgress({x: x, y: y, color: "Blue", title: translate("Installing Simulator Controller"), message: translate("...")})
+				
+				for ignore, directory in [kBinariesDirectory, kResourcesDirectory . "Setup\Installer\"] {
+					vProgressCount += 1
+				
+					showProgress({progress: vProgressCount, message: translate("Unblocking Applications and DLLs...")})
+				
+					currentDirectory := A_WorkingDir
+
+					try {
+						SetWorkingDir %directory%
+						
+						RunWait Powershell -Command Get-ChildItem -Path '.' -Recurse | Unblock-File, , Hide
+					}
+					finally {
+						SetWorkingDir %currentDirectory%
+					}
+				}
+				
+				if (installLocation != packageLocation)
+					copyFiles(packageLocation, installLocation, !isNew)
+				else {
+					vProgressCount := 80
+				
+					showProgress({progress: vProgressCount, message: translate("Download and installation folders are identical...")})
+					
+					Sleep 1000
+				}
+				
+				if options["StartMenuShortcuts"] {
+					showProgress({progress: vProgressCount, message: translate("Creating Start menu shortcuts...")})
+			
+					createShortcuts(A_StartMenu, installLocation)
+				}
+				else {
+					showProgress({progress: vProgressCount, message: translate("Removing Start menu shortcuts...")})
+				
+					deleteShortcuts(A_StartMenu)
+				}
+				
+				if options["DesktopShortcuts"] {
+					showProgress({progress: vProgressCount, message: translate("Creating Desktop shortcuts...")})
+			
+					createShortcuts(A_Desktop, installLocation)
+				}
+				else {
+					showProgress({progress: vProgressCount, message: translate("Removing Desktop shortcuts...")})
+				
+					deleteShortcuts(A_Desktop)
+				}
+				
+				if (options["InstallType"] = "Registry") {
+					showProgress({message: translate("Updating Registry...")})
+				
+					writeAppPaths(installLocation)
+					writeUninstallerInfo(installLocation)
+				}
+				
+				writeConfiguration(kUserConfigDirectory . "Simulator Controller.install", installOptions)
+				
+				if (installLocation != packageLocation) {
+					showProgress({message: translate("Removing installation files...")})
+				
+					removeDirectory(packageLocation)
+				}
+				
+				showProgress({progress: 100, message: translate("Finished...")})
+				
+				Sleep 1000
+				
+				hideSplashTheme()
+				hideProgress()
+			
+				if isNew {
+					if options["StartSetup"]
+						Run %installLocation%\Binaries\Simulator Setup.exe
+				}
+				else {
+					index := inList(A_Args, "-Start")
+				
+					if index
+						Run % A_Args[index + 1]
+				}
+			}
+			else {
+				if (isNew || (options["InstallLocation"] != packageLocation))
+					if InStr(packageLocation, A_Temp)
+						removeDirectory(packageLocation)
+					else {
+						OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+						title := translate("Modular Simulator Controller System")
+						MsgBox 262436, %title%, % translate("Do you want to remove the installation files?")
+						OnMessage(0x44, "")
+						
+						IfMsgBox Yes
+							removeDirectory(packageLocation)
+					}
+			}
+			
+			ExitApp 0
+		}
+	}
+}
+
+normalizePath(path) {
+	return ((SubStr(path, StrLen(path)) = "\") ? SubStr(path, 1, StrLen(path) - 1) : path)
+}
+	
+copyFiles(source, destination, deleteOrphanes) {
+	count := 0
+	progress := 0
+	
+	Loop Files, %source%\*, DFR
+	{
+		if (Mod(count, 100) == 0)
+			progress += 1
+		
+		showProgress({progress: vProgressCount + Min(progress, 10), message: translate("Validating ") . A_LoopFileName . translate("...")})
+		
+		Sleep 1
+		
+		count += 1
+	}
+	
+	vProgressCount += 10
+	
+	showProgress({color: "Green"})
+	
+	step := ((deleteOrphanes ? 70 : 80) / count)
+	stepCount := 0
+	
+	copyDirectory(source, destination, step, stepCount)
+	
+	vProgressCount := (vProgressCount + Round(step * count))
+	
+	showProgress({progress: vProgressCount})
+	
+	if deleteOrphanes {
+		showProgress({message: translate("Searching for orphane files...")})
+	
+		stepCount := 0
+		
+		cleanDirectory(source, destination, 10, stepCount)
+		
+		vProgressCount := (vProgressCount + 10)
+	
+		showProgress({progress: vProgressCount})
+	}
+}
+	
+deleteFiles(installLocation) {
+	count := 0
+	progress := 0
+	
+	Loop Files, %installLocation%\*, DFR
+	{
+		if (Mod(count, 100) == 0)
+			progress += 1
+		
+		showProgress({progress: vProgressCount + Min(progress, 20), message: translate("Preparing ") . A_LoopFileName . translate("...")})
+		
+		Sleep 1
+		
+		count += 1
+	}
+	
+	vProgressCount += 20
+	
+	showProgress({color: "Green"})
+	
+	step := (70 / count)
+	stepCount := 0
+	
+	deleteDirectory(installLocation, step, stepCount)
+	
+	vProgressCount := (vProgressCount + Round(step * count))
+	
+	showProgress({progress: vProgressCount})
+}
+
+copyDirectory(source, destination, progressStep, ByRef count) {
+	FileCreateDir %destination%
+	
+	files := []
+	
+	Loop Files, %source%\*.*, DF
+		files.Push(A_LoopFilePath)
+	
+	for ignore, fileName in files {
+		SplitPath fileName, file
+	
+		count += 1
+		
+		showProgress({progress: Round(vProgressCount + (count * progressStep)), message: translate("Copying ") . file . translate("...")})
+		
+		if InStr(FileExist(fileName), "D") {
+			SplitPath fileName, subDirectory
+			
+			copyDirectory(fileName, destination . "\" . subDirectory, progressStep, count)
+		}
+		else
+			FileCopy %fileName%, %destination%, 1
+	}
+}
+
+deleteDirectory(directory, progressStep, ByRef count) {	
+	files := []
+	
+	Loop Files, %directory%\*.*, DF
+		files.Push(A_LoopFilePath)
+	
+	for ignore, fileName in files {
+		SplitPath fileName, file
+	
+		count += 1
+		
+		showProgress({progress: Round(vProgressCount + (count * progressStep)), message: translate("Deleting ") . file . translate("...")})
+		
+		if InStr(FileExist(fileName), "D") {
+			SplitPath fileName, subDirectory
+			
+			deleteDirectory(directory . "\" . subDirectory, progressStep, count)
+		}
+		else
+			try {
+				FileDelete %fileName%
+			}
+			catch exception {
+				; ignore
+			}
+		
+		Sleep 1
+	}
+}
+
+cleanDirectory(source, destination, maxStep, ByRef count) {
+	Loop Files, %destination%\*.*, DF
+	{
+		SplitPath A_LoopFilePath, fileName
+		
+		if InStr(FileExist(A_LoopFilePath), "D") {
+			cleanDirectory(source . "\" . fileName, A_LoopFilePath, maxStep, count)
+			
+			FileRemoveDir %A_LoopFilePath%, false
+		}
+		else if !FileExist(source . "\" . fileName) {
+			count := Min(count + 1, maxStep)
+		
+			showProgress({progress: vProgressCount + count, message: translate("Deleting ") . fileName . translate("...")})
+		
+			FileDelete %A_LoopFilePath%
+			
+			Sleep 100
+		}
+	}
+}
+
+removeDirectory(directory) {
+	try {
+		FileDelete %A_Temp%\Cleanup.bat
+	}
+	catch exception {
+		; ignore
+	}
+	
+	command =
+(
+ping 127.0.0.1 -n 15 > nul
+cd C:\
+rmdir "%directory%" /s /q
+)
+	
+	FileAppend %command%, %A_Temp%\Cleanup.bat
+	
+	Run "%A_Temp%\Cleanup.bat", C:\, Hide
+}
+
+createShortcuts(location, installLocation) {
+	if (location = A_StartMenu) {
+		FileCreateDir %location%\Simulator Controller
+		
+		location := (location . "\Simulator Controller")
+		
+		FileCreateShortcut %installLocation%\Binaries\Simulator Tools.exe, %location%\Uninstall.lnk, %installLocation%\Binaries, -Uninstall
+		
+		for ignore, name in ["Simulator Startup", "Simulator Settings", "Simulator Setup", "Simulator Configuration", "Race Settings", "Setup Database"]
+			FileCreateShortCut %installLocation%\Binaries\%name%.exe, %location%\%name%.lnk, %installLocation%\Binaries
+	}
+	else
+		for ignore, name in ["Simulator Startup", "Simulator Settings"]
+			FileCreateShortCut %installLocation%\Binaries\%name%.exe, %location%\%name%.lnk, %installLocation%\Binaries
+		
+	FileCreateShortCut %installLocation%\Documentation.url, %location%\Documentation.lnk, %installLocation%
+}
+
+deleteShortcuts(location) {
+	deleteFolder := false
+	
+	if (location = A_StartMenu) {
+		location := (A_StartMenu . "\Simulator Controller")
+		
+		deleteFolder := true
+		
+		try {
+			FileDelete %location%\Uninstall.lnk
+		}
+		catch exception {
+			; ignore
+		}
+	}
+	
+	for ignore, name in ["Simulator Startup", "Simulator Settings", "Simulator Setup", "Simulator Configuration", "Race Settings", "Setup Database"]
+		try {
+			FileDelete %location%\%name%.lnk
+		}
+		catch exception {
+			; ignore
+		}
+
+	try {
+		FileDelete %location%\Documentation.lnk
+	}
+	catch exception {
+		; ignore
+	}
+	
+	if deleteFolder
+		FileRemoveDir %location%
+}
+
+writeAppPaths(installLocation) {
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorStartup.exe,, %installLocation%\Binaries\Simulator Startup.exe
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorController.exe,, %installLocation%\Binaries\Simulator Controller.exe
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorSettings.exe,, %installLocation%\Binaries\Simulator Settings.exe
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorSetup.exe,, %installLocation%\Binaries\Simulator Setup.exe
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorConfiguration.exe,, %installLocation%\Binaries\Simulator Configuration.exe
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceSettings.exe,, %installLocation%\Binaries\Race Settings.exe
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupDatabase.exe,, %installLocation%\Binaries\Setup Database.exe
+}
+
+deleteAppPaths() {
+	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorStartup.exe
+	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorController.exe
+	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorSettings.exe
+	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorSetup.exe
+	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorConfiguration.exe
+	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceSettings.exe
+	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupDatabase.exe
+}
+
+writeUninstallerInfo(installLocation) {
+	version := StrSplit(kVersion, "-", , 2)[1]
+	
+	RegWrite REG_SZ, HKLM, %kUninstallKey%, DisplayName, Simulator Controller
+	RegWrite REG_SZ, HKLM, %kUninstallKey%, InstallLocation, % installLocation
+	RegWrite REG_SZ, HKLM, %kUninstallKey%, UninstallString, "%installLocation%\Binaries\Simulator Tools.exe" -Uninstall
+	RegWrite REG_SZ, HKLM, %kUninstallKey%, QuietUninstallString, "%installLocation%\Binaries\Simulator Tools.exe" -Uninstall -Quiet
+	RegWrite REG_SZ, HKLM, %kUninstallKey%, DisplayIcon, "%installLocation%\Resources\Icons\Artificial Intelligence.ico"
+	RegWrite REG_SZ, HKLM, %kUninstallKey%, DisplayVersion, %version%
+	RegWrite REG_SZ, HKLM, %kUninstallKey%, URLInfoAbout, https://github.com/SeriousOldMan/Simulator-Controller/wiki
+	RegWrite REG_SZ, HKLM, %kUninstallKey%, Publisher, Oliver Juwig (TheBigO)
+	RegWrite REG_SZ, HKLM, %kUninstallKey%, NoModify, 1
+}
+
+deleteUninstallerInfo() {
+	RegDelete HKLM, %kUninstallKey%
+}
 
 readToolsConfiguration(ByRef updateSettings, ByRef cleanupSettings, ByRef copySettings, ByRef buildSettings, ByRef splashTheme) {
 	targets := readConfiguration(kToolsTargetsFile)
@@ -1426,6 +2160,9 @@ runBuildTargets(ByRef buildProgress) {
 			logMessage(kLogInfo, translate("Compiling ") . targetSource)
 
 			try {
+				if !FileExist(targetSource)
+					Throw "Source file not found..."
+				
 				RunWait % kCompiler . " /in """ . targetSource . """"
 			}
 			catch exception {
@@ -1625,6 +2362,9 @@ startSimulatorTools() {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+if !isDebug()
+	checkInstallation()
+
 startSimulatorTools()
 
 
@@ -1642,7 +2382,7 @@ try {
 	SoundPlay *32
 	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
 	
-	title := translate("Simulator Build")
+	title := translate("Modular Simulator Controller System")
 	
 	MsgBox 262180, %title%, % translate("Cancel target processing?")
 	OnMessage(0x44, "")

@@ -28,6 +28,7 @@ Release 3.2.0=Release 3.1.6 -> updateTranslations, updatePhraseGrammars, updateP
 Release 3.2.2=Release 3.2.0 -> updatePluginsForV322, updateTranslations, updatePhraseGrammars, updatePluginLabels
 Release 3.3.0=Release 3.2.2 -> updateTranslations, updatePhraseGrammars
 Release 3.5.0=Release 3.3.0 -> updateTranslations, deletePluginLabels
+Release 3.5.2=Release 3.5.0 -> updateTranslations
 [Cleanup]
 Binaries Folder=%kBinariesDirectory%
 Logs Folder=%kLogsDirectory%
@@ -99,6 +100,7 @@ Race Strategist=%kBinariesDirectory%Race Strategist.exe <- %kSourcesDirectory%As
 Race Settings=%kBinariesDirectory%Race Settings.exe <- %kSourcesDirectory%Assistants\Race Settings.ahk; %kIncludesDirectory%, %kHomeDirectory%VERSION
 Setup Database=%kBinariesDirectory%Setup Database.exe <- %kSourcesDirectory%Assistants\Setup Database.ahk; %kIncludesDirectory%, %kSourcesDirectory%Assistants\Libraries\, %kHomeDirectory%VERSION
 Simulator Configuration=%kBinariesDirectory%Simulator Configuration.exe <- %kSourcesDirectory%Configuration\Simulator Configuration.ahk; %kIncludesDirectory%, %kLibrariesDirectory%SpeechSynthesizer.ahk, %kLibrariesDirectory%SpeechRecognizer.ahk, %kPluginsDirectory%, %kUserPluginsDirectory%, %kHomeDirectory%VERSION
-Simulator Tools=%kBinariesDirectory%Simulator Tools.exe <- %kSourcesDirectory%Configuration\Simulator Tools.ahk; %kIncludesDirectory%, %kSourcesDirectory%Configuration\Libraries %kHomeDirectory%VERSION
+Simulator Tools=%kBinariesDirectory%Simulator Tools.exe <- %kSourcesDirectory%Configuration\Simulator Tools.ahk; %kIncludesDirectory%, %kSourcesDirectory%Configuration\Libraries\, %kHomeDirectory%VERSION
+Simulator Download=%kBinariesDirectory%Simulator Download.exe <- %kSourcesDirectory%Configuration\Simulator Download.ahk; %kIncludesDirectory%, %kHomeDirectory%VERSION
 Simulator Setup=%kBinariesDirectory%Simulator Setup.exe <- %kSourcesDirectory%Configuration\Simulator Setup.ahk; %kIncludesDirectory%, %kSourcesDirectory%Configuration\Libraries\, %kLibrariesDirectory%, %kPluginsDirectory%, %kUserPluginsDirectory%, %kHomeDirectory%VERSION
 Simulator Settings=%kBinariesDirectory%Simulator Settings.exe <- %kSourcesDirectory%Configuration\Simulator Settings.ahk; %kIncludesDirectory%, %kSourcesDirectory%Configuration\Libraries\SettingsEditor.ahk, %kHomeDirectory%VERSION

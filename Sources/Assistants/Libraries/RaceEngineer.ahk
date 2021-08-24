@@ -1542,6 +1542,37 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 	
+	pitstopOptionChanged(option, values*) {
+		local knowledgeBase := this.KnowledgeBase
+		local compound
+		
+		if this.hasPreparedPitstop() {
+			switch option {
+				case "Refuel":
+					knowledgeBase.setFact("Pitstop.Planned.Fuel", values[1])
+				case "Tyre Compound":
+					knowledgeBase.setFact("Pitstop.Planned.Tyre.Compound", values[1])
+					knowledgeBase.setFact("Pitstop.Planned.Tyre.Compound.Color", values[2])
+				case "Tyre Set":
+					knowledgeBase.setFact("Pitstop.Planned.Tyre.Set", values[1])
+				case "Tyre Pressures":
+					for index, suffix in ["FL", "FR", "RL", "RR"] {
+						prssKey := ("Pitstop.Planned.Tyre.Pressure." . suffix)
+						incrKey := ("Pitstop.Planned.Tyre.Pressure." . suffix . ".Increment")
+						
+						targetPressure := values[index]
+						
+						knowledgeBase.setFact(prssKey, targetPressure)
+						knowledgeBase.setFact(incrKey, knowledgeBase.getValue(incrKey) + (targetPressure - knowledgeBase.getValue(prssKey)))
+					}
+				case "Repair Suspension":
+					knowledgeBase.setFact("Pitstop.Planned.Repair.Suspension", values[1])
+				case "Repair Bodywork":
+					knowledgeBase.setFact("Pitstop.Planned.Repair.Bodywork", values[1])
+			}
+		}
+	}
+	
 	performPitstop(lapNumber := false) {
 		local knowledgeBase := this.KnowledgeBase
 		

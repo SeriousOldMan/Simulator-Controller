@@ -45,6 +45,15 @@ Although the code, that handles all the update tasks, is integrated into *Simula
 
 Note: Some of you might want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars* and *Simulator Controller\Rules* folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does on your own. But be sure to make a backup copy of all the files, just for peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor that can handle this.
 
+## Release 3.5.2
+
+This release introduces a fully automatic program installation and update process. You have the option to install Simulator Controller in any location you want either as a portable application (pretty much the same as it has been in the past) or as a fully registered and compliant Windows application. As always, but especially in this case, make a backup copy of your *Simulator Controller* folder in your user *Documents* folder, before carrying out the update. Then completely delete the folder of your current installation of Simulator Controller. Now you have two options:
+
+  1. Use the new automated installer to download and install tha latest version of Simulator Controller (3.5.2 in this case). See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration) for more details. Use this method for the official release of Version 3.5.2 on Friday, 08/27/21 and all later release versions.
+  2. Download the latest version (3.5.2 or later) from the [release section on GitHub](https://github.com/SeriousOldMan/Simulator-Controller#latest-release-build), extract the contents of the archive and run the application "Simulator Tools" in the *Binaries* folder. This will guide you through the installation process. The files of the installation archive will be deleted afterwards, unless you have chosen a portable installation and the target installation folder is the same as the folder of the installation archive files.
+
+***
+
 ## Release 3.5.0
 
 Important: Make a backup copy of the files "Simulator Configuration.ini", "Button Box Configuration.ini" and "Simlator Settings.ini" from your *Simulator Controller\Config* folder in your user *Documents* folder, before using the new "Simulator Setup" Wizard. It has been tested extensively, but it is a complex piece of software, so just to be safe...

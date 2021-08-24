@@ -4,7 +4,7 @@ General Release Actions
 0. Search for "false &&" and "true ||"
 1. Update [Updates] section in "Simulator Tools.targets"
 2. Update [Processed] section in "UPDATES"
-3. Update "VERSION" file, especially *Release* setting
+3. Update "VERSION" file, especially *Release* setting incl. "Download" property
 4. Copy "VERSION" file to DropBox
 5. Copy *Release*.zip file to DropBox
 6. Update "README.md"
@@ -15,6 +15,17 @@ General Release Actions
 11. Update commands in Discord
 12. Update #releases and #anouncements in Discord
 13. Set a Git Tag after final commit
+
+Release 3.5.2 Checklist
+=======================
+
+0. Search for new links (*)
+1. Update procedure
+   a. Translations
+2. Full new Installer and Update process
+   a. Warning
+   b. Update Notes
+   c. Installation & Configuration.md
 
 Release 3.5.0 Checklist
 =======================

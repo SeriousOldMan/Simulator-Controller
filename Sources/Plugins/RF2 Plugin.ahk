@@ -171,6 +171,34 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 		return true
 	}
 	
+	getPitstopOptionValues(option) {
+		switch option {
+			case "Refuel":
+				data := readSimulatorData(this.Code, "-Setup")
+				
+				return [getConfigurationValue(data, "Setup Data", "FuelAmount", 0)]
+			case "Tyre Pressures":
+				data := readSimulatorData(this.Code, "-Setup")
+				
+				return [getConfigurationValue(data, "Setup Data", "TyrePressureFL", 26.1), getConfigurationValue(data, "Setup Data", "TyrePressureFR", 26.1)
+					  , getConfigurationValue(data, "Setup Data", "TyrePressureRL", 26.1), getConfigurationValue(data, "Setup Data", "TyrePressureRR", 26.1)]
+			case "Tyre Compound":
+				data := readSimulatorData(this.Code, "-Setup")
+				
+				return [getConfigurationValue(data, "Setup Data", "TyreCompound", 0), getConfigurationValue(data, "Setup Data", "TyreCompoundColor", 0)]
+			case "Repair Suspension":
+				data := readSimulatorData(this.Code, "-Setup")
+				
+				return [getConfigurationValue(data, "Setup Data", "RepairSuspension", false)]
+			case "Repair Bodywork":
+				data := readSimulatorData(this.Code, "-Setup")
+				
+				return [getConfigurationValue(data, "Setup Data", "RepairBodywork", false)]
+			default:
+				return base.getPitstopOptionValues(option)
+		}
+	}
+	
 	setPitstopRefuelAmount(pitstopNumber, litres) {
 		this.sendPitstopCommand("Pitstop", "Set", "Refuel", Round(litres))
 	}

@@ -431,6 +431,8 @@ checkInstallation() {
 				
 				setConfigurationValue(installOptions, "Install", "Type", options["InstallType"])
 				setConfigurationValue(installOptions, "Install", "Location", installLocation)
+				setConfigurationValue(installOptions, "Updates", "Automatic", options["AutomaticUpdates"])
+				setConfigurationValue(installOptions, "Updates", "Verbose", options["Verbose"])
 				setConfigurationValue(installOptions, "Shortcuts", "Desktop", options["DesktopShortcuts"])
 				setConfigurationValue(installOptions, "Shortcuts", "StartMenu", options["StartMenuShortcuts"])
 
@@ -460,8 +462,16 @@ checkInstallation() {
 					}
 				}
 				
-				copyFiles(packageLocation, installLocation, !isNew)
-			
+				if (installLocation != packageLocation)
+					copyFiles(packageLocation, installLocation, !isNew)
+				else {
+					vProgressCount := 80
+				
+					showProgress({progress: vProgressCount, message: translate("Download and installation folders are identical...")})
+					
+					Sleep 1000
+				}
+				
 				if options["StartMenuShortcuts"] {
 					showProgress({progress: vProgressCount, message: translate("Creating Start menu shortcuts...")})
 			

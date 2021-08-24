@@ -1566,9 +1566,9 @@ class RaceEngineer extends RaceAssistant {
 						knowledgeBase.setValue(incrKey, knowledgeBase.getValue(incrKey) + (targetPressure - knowledgeBase.getValue(prssKey)))
 					}
 				case "Repair Suspension":
-					knowledgeBase.setFact(Pitstop.Planned.Repair.Suspension, values[1])
+					knowledgeBase.setFact("Pitstop.Planned.Repair.Suspension", values[1])
 				case "Repair Bodywork":
-					knowledgeBase.setFact(Pitstop.Planned.Repair.Bodywork, values[1])
+					knowledgeBase.setFact("Pitstop.Planned.Repair.Bodywork", values[1])
 			}
 		}
 	}

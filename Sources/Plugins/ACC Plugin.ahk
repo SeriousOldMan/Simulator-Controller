@@ -471,6 +471,11 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			default:
 				Throw "Unsupported change operation """ . direction . """ detected in ACCPlugin.changePitstopOption..."
 		}
+						
+		if (option = "Repair Suspension")
+			this.iRepairSuspensionChosen := !this.iRepairSuspensionChosen
+		else if (option = "Repair Bodywork")
+			this.iRepairBodyworkChosen := !this.iRepairBodyworkChosen
 		
 		this.resetPitstopState(inList(kPSMutatingOptions, option))
 	}
@@ -503,20 +508,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		if this.requirePitstopMFD()
 			switch activity {
 				case "Change Tyres", "Change Brakes", "Repair Bodywork", "Repair Suspension":
-					if this.selectPitstopOption(activity) {
+					if this.selectPitstopOption(activity)
 						this.changePitstopOption(activity, "Increase")
-						
-						if (activity = "Repair Suspension") {
-							this.iRepairSuspensionChosen := !this.iRepairSuspensionChosen
-							
-							this.notifyPitstopChanged(activity)
-						}
-						else if (activity = "Repair Bodywork") {
-							this.iRepairBodyworkChosen := !this.iRepairBodyworkChosen
-							
-							this.notifyPitstopChanged(activity)
-						}
-					}
 				default:
 					Throw "Unsupported activity """ . activity . """ detected in ACCPlugin.toggleActivity..."
 			}

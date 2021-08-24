@@ -368,6 +368,8 @@ See the following table for the supported settings:
 
 Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) for more information.
 
+Note: Be careful, when you change pitstop settings while Jona is active, the Race Engineer will at least be very confused. There is one notable exception, if Jona has planned and prepared a pitstop, but this pitstop has not been carried out yet, every change to the pitstop settings using the "Pitstop" mode will be recognized and taken into account by Jona in the *Assetto Corsa Competizione* simulation.
+
 With the plugin parameter *assistantCommands* you can supply a list of the commands you want to trigger, when the "Assistant" mode is active. Only unary controller functions are allowed here.
 
 	assistantCommands: PitstopRecommend *function*, PitstopPlan *function*, PitstopPrepare *function*,
@@ -464,6 +466,8 @@ See the following table for the supported settings:
 
 Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) for more information.
 
+Note: Be careful, when you change pitstop settings while Jona is active, the Race Engineer will at least be very confused.
+
 With the plugin parameter *assistantCommands* you can supply a list of the commands you want to trigger, when the "Assistant" mode is active. Only unary controller functions are allowed here.
 
 	assistantCommands: PitstopRecommend *function*, PitstopPlan *function*, PitstopPrepare *function*,
@@ -544,6 +548,8 @@ See the following table for the supported settings:
 | RepairRequest | Cycles through the available repair options. |
 
 Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) for more information.
+
+Note: Be careful, when you change pitstop settings while Jona is active, the Race Engineer will at least be very confused. There is one notable exception, if Jona has planned and prepared a pitstop, but this pitstop has not been carried out yet, every change to the pitstop settings using the "Pitstop" mode will be recognized and taken into account by Jona in the *rFactor 2* simulation.
 
 With the plugin parameter *assistantCommands* you can supply a list of the commands you want to trigger, when the "Assistant" mode is active. Only unary controller functions are allowed here.
 
@@ -628,6 +634,8 @@ See the following table for the supported settings:
 | BodyworkRepair | Toggles the repair of all the bodywork and aerodynamic elements. |
 
 Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) for more information.
+
+Note: Be careful, when you change pitstop settings while Jona is active, the Race Engineer will at least be very confused.
 
 With the plugin parameter *assistantCommands* you can supply a list of the commands you want to trigger, when the "Assistant" mode is active. Only unary controller functions are allowed here.
 
@@ -719,6 +727,8 @@ See the following table for the supported settings:
 | BodyworkRepair | Toggles the repair of all the bodywork and aerodynamic elements. |
 
 Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) for more information.
+
+Note: Be careful, when you change pitstop settings while Jona is active, the Race Engineer will at least be very confused.
 
 With the plugin parameter *assistantCommands* you can supply a list of the commands you want to trigger, when the "Assistant" mode is active. Only unary controller functions are allowed here.
 

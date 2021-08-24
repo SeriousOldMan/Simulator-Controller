@@ -127,12 +127,14 @@ installOptions(options) {
 		
 		chosen := inList(["Registry", "Portable"], options["InstallType"])
 		
+		disabled := (options["Update"] ? "Disabled" : "")
+		
 		Gui Install:Add, Text, x16 yp+60 w100 h23 +0x200, % translate("Installation Type")
-		Gui Install:Add, DropDownList, x116 yp w80 AltSubmit Choose%chosen% VinstallationTypeDropDown, % values2String("|", map(["Registry", "Portable"], "translate")*)
+		Gui Install:Add, DropDownList, x116 yp w80 AltSubmit %disabled% Choose%chosen% VinstallationTypeDropDown, % values2String("|", map(["Registry", "Portable"], "translate")*)
 		
 		Gui Install:Add, Text, x16 yp+24 w110 h23 +0x200, % translate("Installation Folder")
-		Gui Install:Add, Edit, x116 yp w187 h21 VinstallLocationPathEdit, % options["InstallLocation"]
-		Gui Install:Add, Button, x304 yp-1 w23 h23 gchooseInstallLocationPath, % translate("...")
+		Gui Install:Add, Edit, x116 yp w187 h21 %disabled% VinstallLocationPathEdit, % options["InstallLocation"]
+		Gui Install:Add, Button, x304 yp-1 w23 h23 %disabled% gchooseInstallLocationPath, % translate("...")
 		
 		checked := (options["AutomaticUpdates"] ? "Checked" : "")
 		
@@ -152,7 +154,7 @@ installOptions(options) {
 		checked := (options["StartSetup"] ? "Checked" : "")
 		
 		Gui Install:Add, Text, x16 yp+34 w100 h23 +0x200, % translate("Start")
-		Gui Install:Add, CheckBox, x116 yp+3 w210 %checked% VstartConfigurationCheck, % translate("  Configuration when finished...")
+		Gui Install:Add, CheckBox, x116 yp+3 w210 %disabled% %checked% VstartConfigurationCheck, % translate("  Configuration when finished...")
 	
 		Gui Install:Add, Text, x8 yp+34 w330 0x10
 		
@@ -420,7 +422,7 @@ checkInstallation() {
 					  , Verbose: getConfigurationValue(installOptions, "Updates", "Verbose", false)
 					  , DesktopShortcuts: getConfigurationValue(installOptions, "Shortcuts", "Desktop", false)
 					  , StartMenuShortcuts: getConfigurationValue(installOptions, "Shortcuts", "StartMenu", true)
-					  , StartSetup: true}
+					  , StartSetup: isNew, Update: !isNew}
 				
 			if ((!isNew && !options["Verbose"]) || installOptions(options)) {
 				installLocation := options["InstallLocation"]
@@ -464,11 +466,21 @@ checkInstallation() {
 			
 					createShortcuts(A_StartMenu, installLocation)
 				}
+				else {
+					showProgress({progress: vProgressCount, message: translate("Removing Start menu shortcuts...")})
+				
+					deleteShortcuts(A_StartMenu)
+				}
 				
 				if options["DesktopShortcuts"] {
 					showProgress({progress: vProgressCount, message: translate("Creating Desktop shortcuts...")})
 			
 					createShortcuts(A_Desktop, installLocation)
+				}
+				else {
+					showProgress({progress: vProgressCount, message: translate("Removing Desktop shortcuts...")})
+				
+					deleteShortcuts(A_Desktop)
 				}
 				
 				if (options["InstallType"] = "Registry") {

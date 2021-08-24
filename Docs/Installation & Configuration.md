@@ -17,11 +17,12 @@ Notes: You will find an application "Simulator Download" in the *Binaries* folde
 	Location=D:\Controller
 	[Updates]
 	Automatic=false
+	Verbose=false
 	[Shortcuts]
 	StartMenu=false
 	Desktop=false
 
-You are allowed to change the *[Updates]Automatic* option with a text editor, if you change your mind regarding automatic updates, but please do not change any other option.
+You are allowed to change the *[Updates]Automatic* option with a text editor, if you change your mind regarding automatic updates. You can also set *[Updates]Verbose* to *true*, if you want the above dialog window even appear during a normal update. Do not change any other options, please.
 
 After you have installed Simulator Controller for the first time, the system will automatically detect any available newer versions. You will be asked once a day, whenever a new version is available. If you decide to install the newest version, downlaod and installation will be handled automatically for you. It is alos posssible here to do the downlaod manually. Unzip the download package and start the "Simulator Tools" application. It will update your installation and will delete the installation files afterwards.
 

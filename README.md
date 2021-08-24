@@ -18,11 +18,15 @@ Below you will find separate download links for the current development build an
 
 #### Automated Installer
 
-Simply donwload and run [Simulator Controller.exe](https://cntr.click/Qt9gVs0). This small application will connect to the version repository and will download and install the latest version automatically for you. If you want to install a version other than the current one, no problem. This is possible by downloading and installing one of the versions below manually, but consult the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation) beforehand.
+Simply donwload and run [Simulator Controller.exe](https://cntr.click/Qt9gVs0). Attention: Until the offical release of Version 3.5.2 on 08/27/21, this will download the current devlopment version, since older versions do not support the new installation process. So use it wisely...
+
+This small application will connect to the version repository and will download and install the latest version automatically for you. If you want to install a version other than the current one, no problem. This is possible by downloading and installing one of the versions below manually, but consult the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation) beforehand.
 
 #### Latest development build
 
-None for the moment...
+[3.5.2-dev](https://cntr.click/S4Gn8at) (Development build for Release 3.5.2. New features: Automated update download and installation, Full support for automated Windows Setup & Installation, Autoextracting Software Installer, Already planned and prepared Pitstop settings can be changed with the Button Box (available for ACC and RF2). Stable, including documentation and update procedure.)
+
+Attention: This version uses an all new installation process. Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-352) of this version and all the versions you might have skipped, before installing and using this version.
 
 #### Latest release build
 

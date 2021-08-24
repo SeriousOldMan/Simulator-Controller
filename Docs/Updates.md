@@ -45,6 +45,15 @@ Although the code, that handles all the update tasks, is integrated into *Simula
 
 Note: Some of you might want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars* and *Simulator Controller\Rules* folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does on your own. But be sure to make a backup copy of all the files, just for peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor that can handle this.
 
+## Release 3.5.2
+
+This release introduces a fully automatic installtion and program update process. You have the option to install Simulator Controller as a portable application (pretty much the same as it was before this release) or install it as a fully registered and compliant Windows application. As always, but especially in this case, make a backup copy of your *Simulator Controller* folder in your user *Documents* folder, before carrying out the update. Then completely delete the folder of your current installation of Simulator Controller. Now you have two options:
+
+  1. Use the new automated installer to download and install Simulator Controller. See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration) for more details. Suitable for the official release of Version 3.5.2 on Friday, 08/27/21 and later.
+  2. Download the latest version (3.5.2 or later), extract the contents of the archive and run the application "Simulator Tools" in the *Binaries* folder. This will guide you thorugh the installation process. The files of the installation archive will be deleted afterwards, unless you have chosen a portable installation and the target installation folder is the same as the folder of the installation files.
+
+***
+
 ## Release 3.5.0
 
 Important: Make a backup copy of the files "Simulator Configuration.ini", "Button Box Configuration.ini" and "Simlator Settings.ini" from your *Simulator Controller\Config* folder in your user *Documents* folder, before using the new "Simulator Setup" Wizard. It has been tested extensively, but it is a complex piece of software, so just to be safe...

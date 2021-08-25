@@ -153,14 +153,14 @@ For new features coming in the next release, take a look at the [Release Notes](
 
 Want to contribute? Great!
 
-  - Build your own plugins and offer them on GitHub. Contact me and I will add a link to your plugin in this documentation.
+  - Build your own plugins and offer them on GitHub or join the [Discord community](https://discord.gg/5N8JrNr48H) and post your plugin in the #share-your-mods channel. Contact me and I will add a link to your plugin in this documentation.
   - Found a bug, or built a new feature? Even better. Please contact me, and I will give you access to the code repository.
 
 Heads Up: I am looking for a co-developer for the some fancy upcoming AI stuff.
 
 ### To Do
 
-After firing out one release per week during the last few weeks, the project will slow down a little bit from now on. But the development of Simulator Controller still goes on, and I am sure that we will end up in a two weeks cycle in the long run. My own list of ideas in the [backlog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Backlog) is always long enough for at least three more releases and if you want to propose a feature to be included in the backlog, you can open an enhancement issue on GitHub...
+After firing out one release per week during the last few weeks, the project will slow down a little bit from now on. But the development of Simulator Controller still goes on, and I am sure that we will end up in a two weeks cycle in the long run. My own list of ideas in the [backlog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Backlog) is always long enough for at least three more releases and if you want to propose a feature to be included in the backlog, you can open an enhancement issue on GitHub or join the [Discord community](https://discord.gg/5N8JrNr48H) and post your idea on the #request-a-feature channel...
 
 ### License
 

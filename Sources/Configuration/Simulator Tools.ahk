@@ -332,7 +332,6 @@ checkInstallation() {
 			deleteFiles(options["InstallLocation"])
 		
 			if options["DeleteUserFiles"] {
-				msgbox delete user files
 				showProgress({message: translate("Removing User files...")})
 			
 				FileRemoveDir %kUserHomeDirectory%, true

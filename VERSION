@@ -1,16 +1,16 @@
 [Development]
-Version=3.5.2-alpha
+Version=3.5.2-beta
 Target=3.5.2-release
 Date=08/25/2021
-Download=https://www.dropbox.com/s/hwnqdbkqe2altyc/Simulator%20Controller%203.5.2-alpha.zip?dl=1
+Download=https://www.dropbox.com/s/jp7r07jii5u9da8/Simulator%20Controller%203.5.2-beta.zip?dl=1
 Changes=Automated update download and installation, Full support for automated Windows Setup & Installation, Autoextracting Software Installer, Already planned and prepared Pitstop settings can be changed with the Button Box (available for ACC and RF2)
 [Release]
 Version=3.5.1-release
 Date=08/21/2021
-Download=https://www.dropbox.com/s/hwnqdbkqe2altyc/Simulator%20Controller%203.5.2-alpha.zip?dl=1
+Download=https://www.dropbox.com/s/jp7r07jii5u9da8/Simulator%20Controller%203.5.2-beta.zip?dl=1
 Changes=All new Setup Wizard, Button Boxes can be invisible, Rework of Plugin Labels, Play a short tone when Push2Talk is activated, New "launchApplications" parameter for the "System" plugin, Templates Cleanup, A lot of file location changes
 [Current]
 Type=Development
 [Version]
 Release=3.5.1-release
-Development=3.5.2-alpha
+Development=3.5.2-beta

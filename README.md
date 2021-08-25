@@ -22,7 +22,7 @@ If you don't want to use the automated installer (or you can't cause of your Ant
 
 #### Automated Installer
 
-Simply donwload and run [Simulator Controller.exe](https://cntr.click/Qt9gVs0) (you may have to deactivate your Antivirus or Browser download protection). Attention: Until the offical release of Version 3.5.2 on 08/27/21, this will download the current devlopment version, since older versions do not support the new installation process. So use it wisely...
+Simply donwload and run [Simulator Controller.exe](https://cntr.click/Qt9gVs0) (you may have to deactivate your Antivirus or Browser download protection). Attention: Until the offical release of Version 3.5.2 on 08/27/21, this will download the current development version, since older versions do not support the new installation process. So use it wisely...
 
 This small application will connect to the version repository and will download and install the latest version automatically for you. If you want to install a version other than the current one, no problem. This is possible by downloading and installing one of the versions below manually, but consult the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation) beforehand.
 

@@ -584,7 +584,7 @@ copyFiles(source, destination, deleteOrphanes) {
 	
 		stepCount := 0
 		
-		cleanDirectory(source, destination, 10, stepCount)
+		cleanupDirectory(source, destination, 10, stepCount)
 		
 		vProgressCount := (vProgressCount + 10)
 	
@@ -677,13 +677,13 @@ deleteDirectory(directory, progressStep, ByRef count) {
 	}
 }
 
-cleanDirectory(source, destination, maxStep, ByRef count) {
+cleanupDirectory(source, destination, maxStep, ByRef count) {
 	Loop Files, %destination%\*.*, DF
 	{
 		SplitPath A_LoopFilePath, fileName
 		
 		if InStr(FileExist(A_LoopFilePath), "D") {
-			cleanDirectory(source . "\" . fileName, A_LoopFilePath, maxStep, count)
+			cleanupDirectory(source . "\" . fileName, A_LoopFilePath, maxStep, count)
 			
 			FileRemoveDir %A_LoopFilePath%, false
 		}

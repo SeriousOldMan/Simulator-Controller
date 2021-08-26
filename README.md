@@ -28,7 +28,7 @@ This small application will connect to the version repository and will download 
 
 #### Latest development build
 
-[3.5.2-beta](https://www.dropbox.com/s/jp7r07jii5u9da8/Simulator%20Controller%203.5.2-beta.zip?dl=1) (Stable build for Release 3.5.2. New features: Automated update download and installation, Full support for automated Windows Setup & Installation, Autoextracting Software Installer, Already planned and prepared Pitstop settings can be changed with the Button Box (available for ACC and RF2). Including documentation and update procedure.)
+[3.5.2-rc1](https://www.dropbox.com/s/aq17je2dwur7mej/Simulator%20Controller%203.5.2-rc1.zip?dl=1) (First release candidate for Release 3.5.2. New features: Automated update download and installation, Full support for automated Windows Setup & Installation, Autoextracting Software Installer, Already planned and prepared Pitstop settings can be changed with the Button Box (available for ACC and RF2). Including documentation and update procedure.)
 
 Attention: This version uses an all new installation process. Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-352) of this version and all the versions you might have skipped, before installing and using this version.
 

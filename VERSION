@@ -1,5 +1,5 @@
 [Development]
-Version=3.5.2-beta
+Version=3.5.2-rc1
 Target=3.5.2-release
 Date=08/25/2021
 Download=https://www.dropbox.com/s/aq17je2dwur7mej/Simulator%20Controller%203.5.2-rc1.zip?dl=1
@@ -13,4 +13,4 @@ Changes=All new Setup Wizard, Button Boxes can be invisible, Rework of Plugin La
 Type=Development
 [Version]
 Release=3.5.1-release
-Development=3.5.2-beta
+Development=3.5.2-rc1

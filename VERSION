@@ -10,7 +10,7 @@ Date=08/27/2021
 Download=https://cntr.click/4YCqPaJ
 Changes=Automated update download and installation, Full support for automated Windows Setup & Installation, Autoextracting Software Installer, Already planned and prepared Pitstop settings can be changed with the Button Box (available for ACC and RF2)
 [Current]
-Type=Development
+Type=Release
 [Version]
 Release=3.5.2-release
 Development=3.5.2-release

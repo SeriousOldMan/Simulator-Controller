@@ -1,8 +1,6 @@
 # Installation
 
-Installation is easy and fully automatic for the current version. Simply download and run the installer from the [GitHub project page](https://github.com/SeriousOldMan/Simulator-Controller#download-and-installation) (or simply click [here](https://cntr.click/Qt9gVs0)) and follow the instructions. Attention: Until the offical release of Version 3.5.2 on 08/27/21, this will download the current development version, since older versions do not support the new installation process. So use it wisely...
-
-You will have the option to install the Simulator Controller package in any location on your hard disks and you can decide to fully register Simulator Controller in Windows or to use a portable installation without updating the Registry. You may also create Start Menu and Desktop shortcuts according to your preferences. I strongly recommend to leave automatic updates ticked, unless you have a very unusual installation location.
+Installation is easy and fully automatic for the current version. Simply download and run the installer from the [GitHub project page](https://github.com/SeriousOldMan/Simulator-Controller#download-and-installation) (or simply click [here](https://cntr.click/Qt9gVs0)) and follow the instructions. You will have the option to install the Simulator Controller package in any location on your hard disks and you can decide to fully register Simulator Controller in Windows or to use a portable installation without updating the Registry. You may also create Start Menu and Desktop shortcuts according to your preferences. I strongly recommend to leave automatic updates ticked, unless you have a very unusual installation location.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Installation.JPG)
 

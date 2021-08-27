@@ -22,30 +22,24 @@ If you don't want to use the automated installer (or you can't cause of your Ant
 
 #### Automated Installer
 
-Simply donwload and run [Simulator Controller.exe](https://cntr.click/Qt9gVs0) (you may have to deactivate your Antivirus or Browser download protection). Attention: Until the offical release of Version 3.5.2 on 08/27/21, this will download the current development version, since older versions do not support the new installation process. So use it wisely...
-
-This small application will connect to the version repository and will download and install the latest version automatically for you. If you want to install a version other than the current one, no problem. This is possible by downloading and installing one of the versions below manually, but consult the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation) beforehand.
+Simply donwload and run [Simulator Controller.exe](https://cntr.click/Qt9gVs0) (you may have to deactivate your Antivirus or Browser download protection). This small application will connect to the version repository and will download and install the latest version automatically for you. If you want to install a version other than the current one, no problem. This is possible by downloading and installing one of the versions below manually, but consult the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation) beforehand.
 
 #### Latest development build
 
-[3.5.2-rc1](https://www.dropbox.com/s/aq17je2dwur7mej/Simulator%20Controller%203.5.2-rc1.zip?dl=1) (First release candidate for Release 3.5.2. New features: Automated update download and installation, Full support for automated Windows Setup & Installation, Autoextracting Software Installer, Already planned and prepared Pitstop settings can be changed with the Button Box (available for ACC and RF2). Including documentation and update procedure.)
-
-Attention: This version uses an all new installation process. Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-352) of this version and all the versions you might have skipped, before installing and using this version.
+None for the moment...
 
 #### Latest release build
 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[3.5.1-release](https://cntr.click/S4Gn8at) (New features: All new Setup Wizard, Button Boxes can be invisible, Rework of Plugin Labels, Play a short tone when Push2Talk is activated, New "launchApplications" parameter for the "System" plugin, Templates Cleanup, A lot of file location changes. Including documentation and update procedure. **Version 3.5.1 is a maintenance release for Version 3.5.0**)
+[3.5.2-release](https://cntr.click/4YCqPaJ) (New features: Automated update download and installation, Full support for automated Windows Setup & Installation, Autoextracting Software Installer, Already planned and prepared Pitstop settings can be changed with the Button Box (available for ACC and RF2).)
 
-Please note, that this version does not support the automated installation process.
-
-Once again: Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-350) of this version and all the versions you might have skipped, before installing and using this version.
+Attention: This version uses an all new installation process. Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-352) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[3.3.1-release](https://cntr.click/Gvk9FKc) (New features of Version 3.3.1: Audio post processing for team radio voice, File location refactoring, Use Azure Service for speech synthesis, New "raceAssistantService" parameter for the "Race Engineer" and "Race Strategist" plugins.)
+[3.5.1-release](https://cntr.click/S4Gn8at) (New features: All new Setup Wizard, Button Boxes can be invisible, Rework of Plugin Labels, Play a short tone when Push2Talk is activated, New "launchApplications" parameter for the "System" plugin, Templates Cleanup, A lot of file location changes. Including documentation and update procedure. **Version 3.5.1 is a maintenance release for Version 3.5.0**)
 
 Please note, that this version does not support the automated installation process.
 

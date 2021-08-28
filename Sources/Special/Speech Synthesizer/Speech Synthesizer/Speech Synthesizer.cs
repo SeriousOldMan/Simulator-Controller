@@ -44,15 +44,18 @@ namespace Speech {
         }
 
         private bool finished = false;
+        private bool failed = false;
 
-        private void SynthesizeAudio(string outputFile, bool isSsml, string text) {
+        private bool SynthesizeAudio(string outputFile, bool isSsml, string text) {
             using var audioConfig = AudioConfig.FromWavFileOutput(outputFile);
             using var synthesizer = new Microsoft.CognitiveServices.Speech.SpeechSynthesizer(config, audioConfig);
 
             RenewToken();
 
             finished = false;
+			failed = false;
 
+            synthesizer.SynthesisCanceled += OnSynthesisCanceled;
             synthesizer.SynthesisCompleted += OnSynthesisCompleted;
 
             if (isSsml)
@@ -62,14 +65,21 @@ namespace Speech {
 
             while (!finished)
                 Thread.Sleep(100);
+
+            return !failed;
         }
 
-        public void SpeakSsmlToFile(string outputFile, string text) {
-            SynthesizeAudio(outputFile, true, text);
+        public bool SpeakSsmlToFile(string outputFile, string text) {
+            return SynthesizeAudio(outputFile, true, text);
         }
 
-        public void SpeakTextToFile(string outputFile, string text) {
-            SynthesizeAudio(outputFile, false, text);
+        public bool SpeakTextToFile(string outputFile, string text) {
+            return SynthesizeAudio(outputFile, false, text);
+        }
+
+        private void OnSynthesisCanceled(object sender, SpeechSynthesisEventArgs e) {
+            failed = true;
+            finished = true;
         }
 
         private void OnSynthesisCompleted(object sender, SpeechSynthesisEventArgs e) {

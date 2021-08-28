@@ -934,8 +934,6 @@ initializeEnvironment() {
 		}
 	}
 	
-	virgin := !FileExist(A_MyDocuments . "\Simulator Controller")
-	
 	FileCreateDir %A_MyDocuments%\Simulator Controller
 	FileCreateDir %kUserHomeDirectory%Config
 	FileCreateDir %kUserHomeDirectory%Rules
@@ -950,15 +948,17 @@ initializeEnvironment() {
 	FileCreateDir %kSetupDatabaseDirectory%Global
 	FileCreateDir %kSetupDatabaseDirectory%Local
 	
-	if !FileExist(A_MyDocuments . "\Simulator Controller\Plugins\Controller Plugins.ahk")
-		FileCopy %kResourcesDirectory%Templates\Controller Plugins.ahk, %A_MyDocuments%\Simulator Controller\Plugins
+	if FileExist(kResourcesDirectory . "Templates") {
+		if !FileExist(A_MyDocuments . "\Simulator Controller\Plugins\Controller Plugins.ahk")
+			FileCopy %kResourcesDirectory%Templates\Controller Plugins.ahk, %A_MyDocuments%\Simulator Controller\Plugins
+		
+		if !FileExist(A_MyDocuments . "\Simulator Controller\Plugins\Configuration Plugins.ahk")
+			FileCopy %kResourcesDirectory%Templates\Configuration Plugins.ahk, %A_MyDocuments%\Simulator Controller\Plugins
+		
+		if !FileExist(kUserConfigDirectory . "Race.settings")
+			FileCopy %kResourcesDirectory%Templates\Race.settings, %kUserConfigDirectory%
+	}
 	
-	if !FileExist(A_MyDocuments . "\Simulator Controller\Plugins\Configuration Plugins.ahk")
-		FileCopy %kResourcesDirectory%Templates\Configuration Plugins.ahk, %A_MyDocuments%\Simulator Controller\Plugins
-	
-	if !FileExist(kUserConfigDirectory . "Race.settings")
-		FileCopy %kResourcesDirectory%Templates\Race.settings, %kUserConfigDirectory%
-			
 	if !FileExist(kUserConfigDirectory . "ID") {
 		ticks := A_TickCount
 		
@@ -977,7 +977,7 @@ initializeEnvironment() {
 		FileAppend %id%, % kUserConfigDirectory . "ID"
 	}
 	
-	if virgin
+	if (!FileExist(kResourcesDirectory . "Templates\UPDATES") && FileExist(kResourcesDirectory . "Templates"))
 		FileCopy %kResourcesDirectory%Templates\UPDATES, %kUserConfigDirectory%
 }
 

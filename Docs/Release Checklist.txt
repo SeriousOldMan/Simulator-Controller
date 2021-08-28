@@ -6,15 +6,21 @@ General Release Actions
 2. Update [Processed] section in "UPDATES"
 3. Update "VERSION" file, especially *Release* setting incl. "Download" property
 4. Copy "VERSION" file to DropBox
-5. Copy *Release*.zip file to DropBox
-6. Update "README.md"
-7. Update "Releases.md"
-8. Update "Backlog.md"
-9. Check, whether update documentation for the release is required in "Updates.md"
-10. Update Wiki using "update-documentation.bat"
-11. Update commands in Discord
-12. Update #releases and #anouncements in Discord
-13. Set a Git Tag after final commit
+5. Copy *Release*.zip file to DropBox6
+6. Update "Simulator Controller.exe" in DropBox
+7. Update "README.md"
+8. Update "Releases.md"
+9. Update "Backlog.md"
+10. Check, whether update documentation for the release is required in "Updates.md"
+11. Update Wiki using "update-documentation.bat"
+12. Update commands in Discord
+13. Update #releases and #anouncements in Discord
+14. Set a Git Tag after final commit
+
+Release 3.5.4 Checklist
+=======================
+
+0. Search for new links (*)
 
 Release 3.5.2 Checklist
 =======================

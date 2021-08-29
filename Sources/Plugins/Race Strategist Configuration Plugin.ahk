@@ -19,6 +19,9 @@ global rsSimulatorDropDown
 global rsLearningLapsEdit
 global rsLapsConsideredEdit
 global rsDampingFactorEdit
+global rsSaveRaceReportDropDown
+
+global raceReportsPathEdit
 
 class RaceStrategistConfigurator extends ConfigurationItem {
 	iEditor := false
@@ -60,7 +63,14 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 		w1 := width - (x1 - x + 8)
 		w3 := width - (x3 - x + 16)
 		
-		Gui %window%:Add, Text, x%x0% y%y% w105 h23 +0x200 HWNDwidget1 Hidden, % translate("Simulator")
+		w2 := w1 - 24
+		x4 := x1 + w2 + 1
+		
+		Gui %window%:Add, Text, x%x0% y%y% w160 h23 +0x200 HWNDwidget15 Hidden, % translate("Race Reports Folder")
+		Gui %window%:Add, Edit, x%x1% yp w%w2% h21 VraceReportsPathEdit HWNDwidget16 Hidden, %raceReportsPathEdit%
+		Gui %window%:Add, Button, x%x4% yp-1 w23 h23 gchooseRaceReportsPath HWNDwidget17 Hidden, % translate("...")
+		
+		Gui %window%:Add, Text, x%x0% yp+30 w105 h23 +0x200 HWNDwidget1 Hidden, % translate("Simulator")
 		
 		if (this.Simulators.Length() = 0)
 			this.iSimulators := this.getSimulators()
@@ -68,12 +78,12 @@ class RaceStrategistConfigurator extends ConfigurationItem {
  		choices := this.iSimulators
 		chosen := (choices.Length() > 0) ? 1 : 0
 		
-		Gui %window%:Add, DropDownList, x%x1% y%y% w%w1% Choose%chosen% gchooseRaceStrategistSimulator vrsSimulatorDropDown HWNDwidget2 Hidden, % values2String("|", choices*)
+		Gui %window%:Add, DropDownList, x%x1% yp w%w1% Choose%chosen% gchooseRaceStrategistSimulator vrsSimulatorDropDown HWNDwidget2 Hidden, % values2String("|", choices*)
 		
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
 		
-		Gui %window%:Add, GroupBox, x%x% yp+40 w%width% h96 HWNDwidget3 Hidden, % translate("Data Analysis")
+		Gui %window%:Add, GroupBox, x%x% yp+44 w%width% h124 HWNDwidget3 Hidden, % translate("Data Analysis")
 		
 		Gui %window%:Font, Norm, Arial
 		
@@ -91,7 +101,15 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 		Gui %window%:Add, Edit, x%x1% yp-2 w40 h21 vrsDampingFactorEdit HWNDwidget13 Hidden
 		Gui %window%:Add, Text, x%x3% yp+2 w80 h20 HWNDwidget14 Hidden, % translate("p. Lap")
 		
-		Loop 14
+		choices := map(["Ask", "Always save", "No action"], "translate")
+		Gui %window%:Add, Text, x%x0% yp+28 w105 h23 +0x200 HWNDwidget18 Hidden, % translate("Save Race Report")
+		Gui %window%:Add, DropDownList, x%x1% yp w140 AltSubmit vrsSaveRaceReportDropDown HWNDwidget19 Hidden, % values2String("|", choices*)
+		
+		x5 := x1 + 144
+		
+		Gui %window%:Add, Text, x%x5% yp+3 w80 h20 HWNDwidget20 Hidden, % translate("@ Session End")
+		
+		Loop 20
 			editor.registerWidget(this, widget%A_Index%)
 		
 		this.loadSimulatorConfiguration()
@@ -100,6 +118,11 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 	loadFromConfiguration(configuration) {
 		base.loadFromConfiguration(configuration)
 		
+		raceReportsPathEdit := getConfigurationValue(configuration, "Race Strategist Reports", "Database", false)
+		
+		if !raceReportsPathEdit
+			raceReportsPathEdit := ""
+			
 		if (this.Simulators.Length() = 0)
 			this.iSimulators := this.getSimulators()
 		
@@ -109,6 +132,7 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 			simulatorConfiguration["LearningLaps"] := getConfigurationValue(configuration, "Race Strategist Analysis", simulator . ".LearningLaps", 1)
 			simulatorConfiguration["ConsideredHistoryLaps"] := getConfigurationValue(configuration, "Race Strategist Analysis", simulator . ".ConsideredHistoryLaps", 5)
 			simulatorConfiguration["HistoryLapsDamping"] := getConfigurationValue(configuration, "Race Strategist Analysis", simulator . ".HistoryLapsDamping", 0.2)
+			simulatorConfiguration["SaveRaceReport"] := getConfigurationValue(configuration, "Race Strategist Shutdown", simulator . ".SaveRaceReport", "Never")
 								
 			this.iSimulatorConfigurations[simulator] := simulatorConfiguration
 		}
@@ -119,9 +143,15 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 		
 		this.saveSimulatorConfiguration()
 		
+		GuiControlGet raceReportsPathEdit
+		
+		setConfigurationValue(configuration, "Race Strategist Reports", "Database", (raceReportsPathEdit != "") ? raceReportsPathEdit : false)
+		
 		for simulator, simulatorConfiguration in this.iSimulatorConfigurations {
-			for ignore, key in ["LearningLaps", "ConsideredHistoryLaps", "HistoryLapsDamping"]
+			for ignore, key in ["LearningLaps", "ConsideredHistoryLaps", "HistoryLapsDamping", "SaveRaceReport"]
 				setConfigurationValue(configuration, "Race Strategist Analysis", simulator . "." . key, simulatorConfiguration[key])
+		
+			setConfigurationValue(configuration, "Race Strategist Shutdown", simulator . ".SaveRaceReport", simulatorConfiguration["SaveRaceReport"])
 		}
 	}
 	
@@ -148,6 +178,7 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 		
 		configuration := this.iSimulatorConfigurations[rsSimulatorDropDown]
 		
+		GuiControl Choose, rsSaveRaceReportDropDown, % inList(["Ask", "Always", "Never"], configuration["SaveRaceReport"])
 		GuiControl Text, rsLearningLapsEdit, % configuration["LearningLaps"]
 		GuiControl Text, rsLapsConsideredEdit, % configuration["ConsideredHistoryLaps"]
 		GuiControl Text, rsDampingFactorEdit, % configuration["HistoryLapsDamping"]
@@ -162,12 +193,14 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 			GuiControlGet rsLearningLapsEdit
 			GuiControlGet rsLapsConsideredEdit
 			GuiControlGet rsDampingFactorEdit
+			GuiControlGet rsSaveRaceReportDropDown
 			
 			configuration := this.iSimulatorConfigurations[this.iCurrentSimulator]
 			
 			configuration["LearningLaps"] := rsLearningLapsEdit
 			configuration["ConsideredHistoryLaps"] := rsLapsConsideredEdit
 			configuration["HistoryLapsDamping"] := rsDampingFactorEdit
+			configuration["SaveRaceReport"] := ["Ask", "Always", "Never"][rsSaveRaceReportDropDown]
 		}
 	}
 	
@@ -196,6 +229,17 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+chooseRaceReportsPath() {
+	GuiControlGet raceReportsPathEdit
+		
+	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
+	FileSelectFolder directory, *%raceReportsPathEdit%, 0, % translate("Select Race Reports Folder...")
+	OnMessage(0x44, "")
+	
+	if (directory != "")
+		GuiControl Text, raceReportsPathEdit, %directory%
+}
 
 chooseRaceStrategistSimulator() {
 	configurator := RaceStrategistConfigurator.Instance

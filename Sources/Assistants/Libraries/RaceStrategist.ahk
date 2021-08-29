@@ -34,6 +34,7 @@ class RaceStrategist extends RaceAssistant {
 
 	iSessionTime := false
 	
+	iSaveRaceReport := false
 	iSessionReportsDatabase := false
 	iSessionDataActive := false
 	
@@ -79,6 +80,12 @@ class RaceStrategist extends RaceAssistant {
 		}
 	}
 	
+	SaveRaceReport[] {
+		Get {
+			return ((this.iSessionReportsDatabase != false) ? this.iSaveRaceReport : kNever)
+		}
+	}
+	
 	SessionDataActive[] {
 		Get {
 			return this.iSessionDataActive
@@ -94,6 +101,9 @@ class RaceStrategist extends RaceAssistant {
 		
 		if values.HasKey("SessionReportsDatabase")
 			this.iSessionReportsDatabase := values["SessionReportsDatabase"]
+		
+		if values.HasKey("SaveRaceReport")
+			this.iSaveRaceReport := values["SaveRaceReport"]
 	}
 	
 	updateSessionValues(values) {
@@ -551,7 +561,8 @@ class RaceStrategist extends RaceAssistant {
 		
 		simulatorName := this.Simulator
 		
-		this.updateConfigurationValues({SessionReportsDatabase: getConfigurationValue(this.Configuration, "Race Strategist Reports", "Database", false)})
+		this.updateConfigurationValues({SessionReportsDatabase: getConfigurationValue(this.Configuration, "Race Strategist Reports", "Database", false)
+									  , SaveRaceReport: getConfigurationValue(this.Configuration, "Race Strategist Shutdown", simulatorName . ".SaveRaceReport", false)})
 		
 		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(this.createSession(data))
 							    , OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
@@ -570,14 +581,40 @@ class RaceStrategist extends RaceAssistant {
 	
 	finishSession() {
 		if this.KnowledgeBase {
-			this.shutdownSession("Before")
-			this.shutdownSession("After")
+			Process Exist, Race Engineer.exe
 			
-			return
+			if (!ErrorLevel && this.Speaker)
+				this.getSpeaker().speakPhrase("Bye")
+			
+			if (this.Session == kSessionRace) {
+				this.shutdownSession("Before")
+						
+				if (this.Listener && (this.SaveRaceReport == kAsk)) {
+					this.getSpeaker().speakPhrase("ConfirmSaveRaceReport", false, true)
+					
+					this.setContinuation(ObjBindMethod(this, "shutdownSession", "After"))
+					
+					callback := ObjBindMethod(this, "forceFinishSession")
+					
+					SetTimer %callback%, -60000
+					
+					return
+				}
+			}
+			
+			this.updateDynamicValues({KnowledgeBase: false})
 		}
 		
 		this.updateDynamicValues({OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
 		this.updateSessionValues({Simulator: "", Session: kSessionFinished, SessionTime: false})
+	}
+	
+	forceFinishSession() {
+		if !this.SessionDataActive {
+			this.updateDynamicValues({KnowledgeBase: false})
+			
+			this.finishSession()
+		}	
 	}
 	
 	addLap(lapNumber, data) {
@@ -872,7 +909,7 @@ class RaceStrategist extends RaceAssistant {
 		this.iSessionDataActive := true
 		
 		try {
-			if ((this.Session == kSessionRace) && this.SessionReportsDatabase)
+			if ((this.Session == kSessionRace) && (this.SaveRaceReport = ((phase = "Before") ? kAlways : kAsk)))
 				this.saveSessionReport()
 		}
 		finally {
@@ -880,6 +917,9 @@ class RaceStrategist extends RaceAssistant {
 		}
 		
 		if (phase = "After") {
+			if this.Speaker
+				this.getSpeaker().speakPhrase("RaceReportSaved")
+			
 			this.updateDynamicValues({KnowledgeBase: false})
 			
 			this.finishSession()
@@ -933,9 +973,9 @@ class RaceStrategist extends RaceAssistant {
 				Loop %carCount% {
 					carPrefix := ("Standings.Lap." . lapNr . ".Car." . A_Index)
 					
-					times.Push(knowledgeBase.getValue(carPrefix . ".Time"))
-					positions.Push(knowledgeBase.getValue(carPrefix . ".Position"))
-					laps.Push(Floor(knowledgeBase.getValue(carPrefix . ".Laps")))
+					times.Push(knowledgeBase.getValue(carPrefix . ".Time", -1))
+					positions.Push(knowledgeBase.getValue(carPrefix . ".Position", 0))
+					laps.Push(Floor(knowledgeBase.getValue(carPrefix . ".Laps", 0)))
 					
 					driverForname := knowledgeBase.getValue(carPrefix . ".Driver.Forname")
 					driverSurname := knowledgeBase.getValue(carPrefix . ".Driver.Surname")

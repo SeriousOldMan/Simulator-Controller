@@ -939,7 +939,7 @@ class RaceEngineer extends RaceAssistant {
 			this.updateDynamicValues({KnowledgeBase: false, SetupData: {}})
 			
 			this.finishSession()
-		}	
+		}
 	}
 	
 	addLap(lapNumber, data) {

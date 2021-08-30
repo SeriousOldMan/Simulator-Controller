@@ -556,15 +556,18 @@ class RaceStrategist extends RaceAssistant {
 	}
 	
 	startSession(data) {
+		local facts
+		
 		if !IsObject(data)
 			data := readConfiguration(data)
 		
+		facts := this.createSession(data)
 		simulatorName := this.Simulator
 		
 		this.updateConfigurationValues({SessionReportsDatabase: getConfigurationValue(this.Configuration, "Race Strategist Reports", "Database", false)
 									  , SaveRaceReport: getConfigurationValue(this.Configuration, "Race Strategist Shutdown", simulatorName . ".SaveRaceReport", false)})
 		
-		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(this.createSession(data))
+		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(facts)
 							    , OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
 		
 		if this.Speaker {
@@ -586,7 +589,7 @@ class RaceStrategist extends RaceAssistant {
 			if (!ErrorLevel && this.Speaker)
 				this.getSpeaker().speakPhrase("Bye")
 			
-			if (this.Session == kSessionRace) {
+			if (this.EnoughData && (this.Session == kSessionRace)) {
 				this.shutdownSession("Before")
 						
 				if (this.Listener && (this.SaveRaceReport == kAsk)) {

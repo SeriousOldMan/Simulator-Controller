@@ -21,7 +21,7 @@ global rsLapsConsideredEdit
 global rsDampingFactorEdit
 global rsSaveRaceReportDropDown
 
-global raceReportsPathEdit
+global raceReportsPathEdit = ""
 
 class RaceStrategistConfigurator extends ConfigurationItem {
 	iEditor := false
@@ -70,7 +70,7 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 		Gui %window%:Add, Edit, x%x1% yp w%w2% h21 VraceReportsPathEdit HWNDwidget16 Hidden, %raceReportsPathEdit%
 		Gui %window%:Add, Button, x%x4% yp-1 w23 h23 gchooseRaceReportsPath HWNDwidget17 Hidden, % translate("...")
 		
-		Gui %window%:Add, Text, x%x0% yp+30 w105 h23 +0x200 HWNDwidget1 Hidden, % translate("Simulator")
+		Gui %window%:Add, Text, x%x0% yp+34 w105 h23 +0x200 HWNDwidget1 Hidden, % translate("Simulator")
 		
 		if (this.Simulators.Length() = 0)
 			this.iSimulators := this.getSimulators()
@@ -83,7 +83,7 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
 		
-		Gui %window%:Add, GroupBox, x%x% yp+44 w%width% h124 HWNDwidget3 Hidden, % translate("Data Analysis")
+		Gui %window%:Add, GroupBox, x%x% yp+40 w%width% h124 HWNDwidget3 Hidden, % translate("Data Analysis")
 		
 		Gui %window%:Font, Norm, Arial
 		
@@ -157,6 +157,8 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 	
 	loadConfigurator(configuration, simulators) {
 		this.loadFromConfiguration(configuration)
+		
+		GuiControl Text, raceReportsPathEdit, %raceReportsPathEdit%
 		
 		this.setSimulators(simulators)
 	}

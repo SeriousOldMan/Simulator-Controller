@@ -279,8 +279,6 @@ if !GetKeyState("Ctrl") {
 	AHKUnit.Run()
 }
 else {
-	setConfigurationValue(kSimulatorConfiguration, "Race Strategist Reports", "Database", kUserHomeDirectory . "Race Reports")
-	
 	raceNr := 13
 	strategist := new RaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist.settings")
 								   , "Khato", "de", "Windows", true, true)
@@ -303,13 +301,8 @@ else {
 					break
 				}
 				else {
-					if (A_Index == 1) {
+					if (A_Index == 1)
 						strategist.addLap(lap, data)
-				
-						strategist.dumpKnowledge(strategist.KnowledgeBase)
-						
-						MsgBox % "Lap " . lap . " loaded - Continue?"
-					}
 					else
 						strategist.updateLap(lap, data)
 					
@@ -319,13 +312,6 @@ else {
 				
 				if (A_Index = 1)
 					break
-			}
-			
-			if (lap = 3) {
-				strategist.dumpKnowledge(strategist.KnowledgeBase)
-				strategist.saveSessionReport()
-				
-				MsgBox % "Report saved - Continue?"
 			}
 		} until done
 		

@@ -2005,7 +2005,6 @@ fixIE(version := 0, exeName := "") {
 	return previousValue
 }
 
-
 LV_ClickedColumn(listViewHandle) {
 	static LVM_SUBITEMHITTEST := 0x1039
 

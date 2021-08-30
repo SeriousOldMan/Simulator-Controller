@@ -727,7 +727,7 @@ createShortcuts(location, installLocation) {
 		
 		FileCreateShortcut %installLocation%\Binaries\Simulator Tools.exe, %location%\Uninstall.lnk, %installLocation%\Binaries, -Uninstall
 		
-		for ignore, name in ["Simulator Startup", "Simulator Settings", "Simulator Setup", "Simulator Configuration", "Race Settings", "Setup Database"]
+		for ignore, name in ["Simulator Startup", "Simulator Settings", "Simulator Setup", "Simulator Configuration", "Race Settings", "Setup Database", "Race Reports"]
 			FileCreateShortCut %installLocation%\Binaries\%name%.exe, %location%\%name%.lnk, %installLocation%\Binaries
 	}
 	else
@@ -753,7 +753,7 @@ deleteShortcuts(location) {
 		}
 	}
 	
-	for ignore, name in ["Simulator Startup", "Simulator Settings", "Simulator Setup", "Simulator Configuration", "Race Settings", "Setup Database"]
+	for ignore, name in ["Simulator Startup", "Simulator Settings", "Simulator Setup", "Simulator Configuration", "Race Settings", "Setup Database", "Race Reports"]
 		try {
 			FileDelete %location%\%name%.lnk
 		}
@@ -780,6 +780,7 @@ writeAppPaths(installLocation) {
 	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorConfiguration.exe,, %installLocation%\Binaries\Simulator Configuration.exe
 	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceSettings.exe,, %installLocation%\Binaries\Race Settings.exe
 	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupDatabase.exe,, %installLocation%\Binaries\Setup Database.exe
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceReports.exe,, %installLocation%\Binaries\Race Reports.exe
 }
 
 deleteAppPaths() {

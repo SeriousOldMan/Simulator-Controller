@@ -987,7 +987,7 @@ class RaceStrategist extends RaceAssistant {
 					drivers.Push(computeDriverName(driverForname, driverSurname, driverNickname))
 				}
 				
-				newLine := ((A_Index > 0) ? "`n" : "")
+				newLine := ((lapNr > 1) ? "`n" : "")
 				
 				line := (newLine . values2String(";", times*))
 				

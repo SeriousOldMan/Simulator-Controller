@@ -400,6 +400,7 @@ class RaceReports extends ConfigurationItem {
 				GuiControl Choose, reportsDropDown, % inList(kReports, "Position")
 				
 				this.iSelectedRace := raceNr
+				this.iSelectedReport := false
 				
 				this.loadReport("Position")
 			}

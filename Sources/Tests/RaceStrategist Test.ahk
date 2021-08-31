@@ -313,6 +313,12 @@ else {
 				if (A_Index = 1)
 					break
 			}
+			
+			if (A_index = 3) {
+				done := true
+				
+				break
+			}
 		} until done
 		
 		strategist.finishSession()

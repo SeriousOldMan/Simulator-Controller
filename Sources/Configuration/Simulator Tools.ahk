@@ -105,7 +105,7 @@ installOptions(options) {
 		Gui Install:Default
 				
 		Gui Install:-Border ; -Caption
-		Gui Install:Color, D0D0D0, E5E5E5
+		Gui Install:Color, D0D0D0, D8D8D8
 
 		Gui Install:Font, Bold, Arial
 
@@ -200,7 +200,7 @@ uninstallOptions(options) {
 		Gui Uninstall:Default
 				
 		Gui Uninstall:-Border ; -Caption
-		Gui Uninstall:Color, D0D0D0, E5E5E5
+		Gui Uninstall:Color, D0D0D0, D8D8D8
 
 		Gui Uninstall:Font, Bold, Arial
 
@@ -884,7 +884,7 @@ viewFile(fileName, title := false, x := "Center", y := "Center", width := 800, h
 	innerWidth := width - 16
 	
 	Gui FV:-Border -Caption
-	Gui FV:Color, D0D0D0, E5E5E5
+	Gui FV:Color, D0D0D0, D8D8D8
 	Gui FV:Font, s10 Bold
 	Gui FV:Add, Text, x8 y8 W%innerWidth% +0x200 +0x1 BackgroundTrans gmoveFileViewer, % translate("Modular Simulator Controller System - Compiler")
 	Gui FV:Font
@@ -1075,7 +1075,7 @@ editTargets(command := "") {
 			Throw "Too many build targets detected in editTargets..."
 		
 		Gui TE:-Border ; -Caption
-		Gui TE:Color, D0D0D0, E5E5E5
+		Gui TE:Color, D0D0D0, D8D8D8
 	
 		Gui TE:Font, Bold, Arial
 		

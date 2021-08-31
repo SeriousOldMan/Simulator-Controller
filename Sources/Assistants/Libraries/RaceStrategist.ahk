@@ -954,8 +954,8 @@ class RaceStrategist extends RaceAssistant {
 			setConfigurationValue(data, "Cars", "Driver", knowledgeBase.getValue("Driver.Car"))
 			
 			Loop %carCount% {
-				setConfigurationValue(data, "Cars", "Car." . A_Index . ".Nr", knowledgeBase.getValue("Car." . A_index . ".Nr", A_Index))
-				setConfigurationValue(data, "Cars", "Car." . A_Index . ".Car", knowledgeBase.getValue("Car." . A_index . ".Car"))
+				setConfigurationValue(data, "Cars", "Car." . A_Index . ".Nr", knowledgeBase.getValue("Car." . A_Index . ".Nr", A_Index))
+				setConfigurationValue(data, "Cars", "Car." . A_Index . ".Car", knowledgeBase.getValue("Car." . A_Index . ".Car"))
 			}
 			
 			lapCount := knowledgeBase.getValue("Lap")

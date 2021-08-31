@@ -120,7 +120,7 @@ class RaceReports extends ConfigurationItem {
 		Gui %window%:Default
 	
 		Gui %window%:-Border ; -Caption
-		Gui %window%:Color, D0D0D0, F2F2F2
+		Gui %window%:Color, D0D0D0, D8D8D8
 
 		Gui %window%:Font, s10 Bold, Arial
 
@@ -150,6 +150,8 @@ class RaceReports extends ConfigurationItem {
 		
 		Gui %window%:Add, ActiveX, x290 yp+24 w910 h480 vchartViewer, shell.explorer
 		
+		chartViewer.Navigate("about:blank")
+		
 		this.showReport(false)
 		
 		Gui %window%:Add, Text, x8 y574 w1200 0x10
@@ -168,8 +170,7 @@ class RaceReports extends ConfigurationItem {
 		
 		Gui %window%:Default
 		
-		chartViewer.Navigate("about:blank")
-		chartViewer.document.open()
+		chartViewer.Document.open()
 		
 		if (drawChartFunction && (drawChartFunction != "")) {
 			before =
@@ -191,12 +192,12 @@ class RaceReports extends ConfigurationItem {
 			</html>
 			)
 
-			chartViewer.document.write(before . drawChartFunction . after)
+			chartViewer.Document.write(before . drawChartFunction . after)
 		}
 		else
-			chartViewer.document.write("<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>")
+			chartViewer.Document.write("<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>")
 		
-		chartViewer.document.close()
+		chartViewer.Document.close()
 	}
 	
 	showPositionReport(raceData, positionsFile := false) {
@@ -235,24 +236,26 @@ class RaceReports extends ConfigurationItem {
 						positions[A_Index].RemoveAt(car)
 			}
 			
-			drawChartFunction := ("function drawChart() {`nvar data = google.visualization.arrayToDataTable([`n[" . values2String(", ", "'" . translate("Laps") . "'", cars*) . "]")
+			drawChartFunction := ""
+			
+			drawChartFunction .= ("function drawChart() {`nvar data = google.visualization.arrayToDataTable([`n[" . values2String(", ", "'" . translate("Laps") . "'", cars*) . "]")
 			
 			Loop % lapsCount
 			{
 				lap := A_Index
 			
-				drawChartFunction .= (",`n[" . lap)
+				drawChartFunction := drawChartFunction . (",`n[" . lap)
 				
 				Loop % cars.Length()
-					drawChartFunction .= (", " . positions[lap][A_Index])
+					drawChartFunction := drawChartFunction . (", " . positions[lap][A_Index])
 				
-				drawChartFunction .= "]"
+				drawChartFunction := drawChartFunction . "]"
 			}
 			
-			drawChartFunction .= ("]);`nvar options = { legend: { position: 'right' }, chartArea: { left: '5%', top: '2%', right: '25%', bottom: '10%' }, ")
-			drawChartFunction .= ("hAxis: { title: '" . translate("Laps") . "' }, vAxis: { direction: -1, ticks: [], title: '" . translate("Cars") . "', baselineColor: 'D0D0D0' }, backgroundColor: 'D0D0D0' };`n")
+			drawChartFunction := drawChartFunction . ("]);`nvar options = { legend: { position: 'right' }, chartArea: { left: '5%', top: '2%', right: '25%', bottom: '10%' }, ")
+			drawChartFunction := drawChartFunction . ("hAxis: { title: '" . translate("Laps") . "' }, vAxis: { direction: -1, ticks: [], title: '" . translate("Cars") . "', baselineColor: 'D0D0D0' }, backgroundColor: 'D0D0D0' };`n")
 
-			drawChartFunction .= "var chart = new google.visualization.LineChart(document.getElementById('chart_id')); chart.draw(data, options); }"
+			drawChartFunction := drawChartFunction . "var chart = new google.visualization.LineChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 			
 			this.showReport(drawChartFunction)
 		}
@@ -278,9 +281,11 @@ class RaceReports extends ConfigurationItem {
 				times.Push(string2Values(";", A_LoopReadLine))
 			
 			Loop % getConfigurationValue(raceData, "Cars", "Count")
-				cars.Push("'#" . getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Nr") . A_Space . getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Car") . "'")
+				cars.Push("'#" . getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Nr") . "'")
 			
-			drawChartFunction := "function drawChart() {`nvar data = google.visualization.arrayToDataTable([`n"
+			drawChartFunction := ""
+			
+			drawChartFunction .= "function drawChart() {`nvar data = google.visualization.arrayToDataTable([`n"
 			
 			lapsCount := getConfigurationValue(raceData, "Laps", "Count")
 			
@@ -322,18 +327,18 @@ class RaceReports extends ConfigurationItem {
 						if first
 							first := false
 						else
-							drawChartFunction .= ",`n"
+							drawChartFunction := drawChartFunction . ",`n"
 						
-						drawChartFunction .= ("[" . values2String(", ", cars[car], min, Round(avg - Sqrt(stdDev / 2), 1), Round(avg + Sqrt(stdDev), 1), max) . "]")
+						drawChartFunction := drawChartFunction . ("[" . values2String(", ", cars[car], min, Round(avg - (stdDev / 2), 1), Round(avg + (stdDev / 2), 1), max) . "]")
 					}
 				}
 			}
 			
-			drawChartFunction .= ("], true);`nvar options = { legend: 'none', chartArea: { left: '10%', top: '2%', right: '5%', bottom: '30%' }, ")
-			drawChartFunction .= ("hAxis: { title: '" . translate("Cars") . "' }, vAxis: { title: '" . translate("Seconds") . "' }, backgroundColor: 'D0D0D0', ")
-			drawChartFunction .= ("candlestick: { risingColor: { stroke: 'Black', fill: 'Silver' } } };`n")
+			drawChartFunction := drawChartFunction . ("], true);`nvar options = { legend: 'none', chartArea: { left: '10%', top: '2%', right: '5%', bottom: '30%' }, ")
+			drawChartFunction := drawChartFunction . ("hAxis: { title: '" . translate("Cars") . "' }, vAxis: { title: '" . translate("Seconds") . "' }, backgroundColor: 'D0D0D0', ")
+			drawChartFunction := drawChartFunction . ("candlestick: { risingColor: { stroke: 'Black', fill: 'Silver' } } };`n")
 			
-			drawChartFunction .= "var chart = new google.visualization.CandlestickChart(document.getElementById('chart_id')); chart.draw(data, options); }"
+			drawChartFunction := drawChartFunction . "var chart = new google.visualization.CandlestickChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 			
 			this.showReport(drawChartFunction)
 		}
@@ -370,8 +375,8 @@ class RaceReports extends ConfigurationItem {
 				{
 					dateTime := SubStr(A_LoopFileName, 12)
 					
-					FormatTime date, dateTime, ShortDate
-					FormatTime time, dateTime, HH:MM
+					FormatTime date, %dateTime%, ShortDate
+					FormatTime time, %dateTime%, HH:mm
 					
 					raceData := readConfiguration(A_LoopFilePath . "\Race.data")
 					
@@ -567,7 +572,7 @@ runRaceReport() {
 		ExitApp 0
 	}
 	
-	current := fixIE("11")
+	current := fixIE()
 	
 	try {
 		reports := new RaceReports(reportsDirectory, kSimulatorConfiguration)

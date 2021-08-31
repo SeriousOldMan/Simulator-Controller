@@ -127,7 +127,7 @@ class ButtonBoxEditor extends ConfigurationItem {
 	
 		Gui BBE:-Border ; -Caption
 		
-		Gui BBE:Color, D0D0D0, E5E5E5
+		Gui BBE:Color, D0D0D0, D8D8D8
 		Gui BBE:Font, Bold, Arial
 
 		Gui BBE:Add, Text, x0 w432 Center gmoveButtonBoxEditor, % translate("Modular Simulator Controller System") 

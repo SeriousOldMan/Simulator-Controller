@@ -103,7 +103,7 @@ class ConfigurationEditor extends ConfigurationItem {
 		Gui %window%:Default
 	
 		Gui %window%:-Border ; -Caption
-		Gui %window%:Color, D0D0D0, F2F2F2
+		Gui %window%:Color, D0D0D0, D8D8D8
 
 		Gui %window%:Font, Bold, Arial
 

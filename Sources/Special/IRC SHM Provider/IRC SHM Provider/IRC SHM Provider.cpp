@@ -546,6 +546,9 @@ void writeStandings(const irsdk_header *header, const char* data)
 
 				itoa(carIndex + 1, carIdx1, 10);
 
+				getYamlValue(result, sessionInfo, "DriverInfo:Drivers:CarIdx:{%s}CarNumber:", carIdx1);
+
+				printf("Car.%s.Nr=%s\n", carIdx1, result);
 				printf("Car.%s.Position=%s\n", carIdx1, posIdx);
 
 				getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:CarIdx:{%s}LapsComplete:", sessionID, carIdx);

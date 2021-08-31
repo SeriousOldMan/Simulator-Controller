@@ -144,7 +144,8 @@ int main(int argc, char* argv[])
 		
 		for (int i = 1; i <= map_buffer->num_cars; ++i) {
 			r3e_driver_data vehicle = map_buffer->all_drivers_data_1[i - 1];
-			
+
+			wprintf_s(L"Car.%d.Nr=%d\n", i, i);
 			wprintf_s(L"Car.%d.Position=%d\n", i, vehicle.place);
 			wprintf_s(L"Car.%d.Lap=%d\n", i, vehicle.completed_laps);
 			wprintf_s(L"Car.%d.Lap.Running=%f\n", i, (float)((double)(vehicle.lap_distance / map_buffer->lap_distance) * map_buffer->lap_distance_fraction));

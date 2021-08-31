@@ -937,7 +937,7 @@ class RaceStrategist extends RaceAssistant {
 		if directory {
 			simulatorCode := this.SetupDatabase.getSimulatorCode(knowledgeBase.getValue("Session.Simulator"))
 			
-			directory := (directory . "\" . simulatorCode . "\Race Report " . this.SessionTime)
+			directory := (directory . "\" . simulatorCode . "\" . this.SessionTime)
 			
 			FileCreateDir %directory%
 			

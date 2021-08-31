@@ -791,6 +791,7 @@ deleteAppPaths() {
 	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorConfiguration.exe
 	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceSettings.exe
 	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupDatabase.exe
+	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceReports.exe
 }
 
 writeUninstallerInfo(installLocation) {

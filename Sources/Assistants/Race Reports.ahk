@@ -57,6 +57,8 @@ global simulatorDropDown
 global reportsDropDown
 global chartViewer
 
+global deleteRaceReportButtonHandle
+
 class RaceReports extends ConfigurationItem {
 	iDatabase := false
 	iSetupDatabase := false
@@ -135,15 +137,20 @@ class RaceReports extends ConfigurationItem {
 
 		Gui %window%:Font, s8 Norm, Arial
 		
-		Gui %window%:Add, Text, x16 yp+10 w80 h23 +0x200 Section, % translate("Simulator")
+		Gui %window%:Add, Text, x16 yp+10 w70 h23 +0x200 Section, % translate("Simulator")
 		
-		choices := this.SetupDatabase.getSimulators()
+		simulators := this.SetupDatabase.getSimulators()
+		
+		chosen := ((simulators.Length() > 0) ? 1 : 0)
 	
-		Gui %window%:Add, DropDownList, x90 yp w180 Choose0 vsimulatorDropDown gchooseSimulator, % values2String("|", choices*)
+		Gui %window%:Add, DropDownList, x90 yp w180 Choose%chosen% vsimulatorDropDown gchooseSimulator, % values2String("|", simulators*)
 		
-		Gui %window%:Add, Text, x16 yp+24 w80 h23 +0x200, % translate("Races")
+		Gui %window%:Add, Text, x16 yp+24 w70 h23 +0x200, % translate("Races")
 		
 		Gui Add, ListView, x90 yp w180 h300 -Multi -LV0x10 AltSubmit NoSort NoSortHdr gchooseRace, % values2String("|", map(["Date", "Time", "Track", "Car"], "translate")*)
+		
+		Gui %window%:Add, Button, x62 yp+277 w23 h23 HwnddeleteRaceReportButtonHandle gdeleteRaceReport
+		setButtonIcon(deleteRaceReportButtonHandle, kIconsDirectory . "Minus.ico", 1)
 		
 		Gui %window%:Add, Text, x290 ys w40 h23 +0x200, % translate("Report")
 		Gui %window%:Add, DropDownList, x334 yp w180 AltSubmit Disabled Choose0 vreportsDropDown gchooseReport, % values2String("|", map(kReports, "translate")*)
@@ -152,7 +159,10 @@ class RaceReports extends ConfigurationItem {
 		
 		chartViewer.Navigate("about:blank")
 		
-		this.showReport(false)
+		if (simulators.Length() > 0)
+			this.loadSimulator(simulators[1])
+		else
+			this.showReport(false)
 		
 		Gui %window%:Add, Text, x8 y574 w1200 0x10
 		
@@ -329,12 +339,12 @@ class RaceReports extends ConfigurationItem {
 						else
 							drawChartFunction := drawChartFunction . ",`n"
 						
-						drawChartFunction := drawChartFunction . ("[" . values2String(", ", cars[car], min, Round(avg - (stdDev / 2), 1), Round(avg + (stdDev / 2), 1), max) . "]")
+						drawChartFunction := drawChartFunction . ("[" . values2String(", ", cars[car], min, Round(avg - Sqrt(stdDev / 2), 1), Round(avg + Sqrt(stdDev / 2), 1), max) . "]")
 					}
 				}
 			}
 			
-			drawChartFunction := drawChartFunction . ("], true);`nvar options = { legend: 'none', chartArea: { left: '10%', top: '2%', right: '5%', bottom: '30%' }, ")
+			drawChartFunction := drawChartFunction . ("], true);`nvar options = { legend: 'none', chartArea: { left: '10%', top: '2%', right: '5%', bottom: '20%' }, ")
 			drawChartFunction := drawChartFunction . ("hAxis: { title: '" . translate("Cars") . "' }, vAxis: { title: '" . translate("Seconds") . "' }, backgroundColor: 'D0D0D0', ")
 			drawChartFunction := drawChartFunction . ("candlestick: { risingColor: { stroke: 'Black', fill: 'Silver' } } };`n")
 			
@@ -351,21 +361,23 @@ class RaceReports extends ConfigurationItem {
 		}
 	}
 	
-	loadSimulator(simulator) {
-		if (simulator != this.SelectedSimulator) {
+	loadSimulator(simulator, force := false) {
+		if (force || (simulator != this.SelectedSimulator)) {
 			window := this.Window
 		
 			Gui %window%:Default
 			
+			this.iSelectedSimulator := simulator
 			this.iSelectedRace := false
 			this.iSelectedReport := false
+				
+			GuiControl Choose, simulatorDropDown, % inList(this.SetupDatabase.getSimulators(), simulator)
+			GuiControl Disable, reportsDropDown
+			GuiControl Choose, reportsDropDown, 0
+			GuiControl Disable, %deleteRaceReportButtonHandle%
 			
 			if simulator {
 				Gui ListView, % this.RacesListView
-				
-				GuiControl Choose, simulatorDropDown, % inList(this.SetupDatabase.getSimulators(), simulator)
-				GuiControl Disable, reportsDropDown
-				GuiControl Choose, reportsDropDown, 0
 				
 				this.showReport(false)
 				
@@ -373,10 +385,8 @@ class RaceReports extends ConfigurationItem {
 				
 				Loop Files, % this.Database . "\" . this.SetupDatabase.getSimulatorCode(simulator) . "\*.*", D
 				{
-					dateTime := SubStr(A_LoopFileName, 12)
-					
-					FormatTime date, %dateTime%, ShortDate
-					FormatTime time, %dateTime%, HH:mm
+					FormatTime date, %A_LoopFileName%, ShortDate
+					FormatTime time, %A_LoopFileName%, HH:mm
 					
 					raceData := readConfiguration(A_LoopFilePath . "\Race.data")
 					
@@ -388,13 +398,8 @@ class RaceReports extends ConfigurationItem {
 				LV_ModifyCol(3, "AutoHdr")
 				LV_ModifyCol(4, "AutoHdr")
 			}
-			else {
-				GuiControl Choose, simulatorDropDown, 0
-				GuiControl Disable, reportsDropDown
-				GuiControl Choose, reportsDropDown, 0
-			
+			else			
 				this.showReport(false)
-			}
 		}
 	}
 	
@@ -403,6 +408,7 @@ class RaceReports extends ConfigurationItem {
 			if raceNr {
 				GuiControl Enable, reportsDropDown
 				GuiControl Choose, reportsDropDown, % inList(kReports, "Position")
+				GuiControl Enable, %deleteRaceReportButtonHandle%
 				
 				this.iSelectedRace := raceNr
 				this.iSelectedReport := false
@@ -412,6 +418,7 @@ class RaceReports extends ConfigurationItem {
 			else {
 				GuiControl Disable, reportsDropDown
 				GuiControl Choose, reportsDropDown, 0
+				GuiControl Disable, %deleteRaceReportButtonHandle%
 				
 				this.iSelectedRace := false
 				
@@ -449,6 +456,25 @@ class RaceReports extends ConfigurationItem {
 				this.showReport(false)
 			}
 		}
+	}
+	
+	deleteRace() {
+		GuiControlGet simulatorDropDown
+				
+		Loop Files, % this.Database . "\" . this.SetupDatabase.getSimulatorCode(simulatorDropDown) . "\*.*", D
+			if (A_index = this.SelectedRace) {
+				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+				title := translate("Modular Simulator Controller System")
+				MsgBox 262436, %title%, % translate("Do you really want to delete the selected report?")
+				OnMessage(0x44, "")
+				
+				IfMsgBox Yes
+				{
+					FileRemoveDir %A_LoopFilePath%, true
+					
+					this.loadSimulator(this.SelectedSimulator, true)
+				}
+			}
 	}
 }
 
@@ -526,6 +552,51 @@ chooseReport() {
 	GuiControlGet reportsDropDown
 	
 	RaceReports.Instance.loadReport(kReports[reportsDropDown])
+}
+
+deleteRaceReport() {
+	RaceReports.Instance.deleteRace()
+}
+
+setButtonIcon(buttonHandle, file, index := 1, options := "") {
+;   Parameters:
+;   1) {Handle} 	HWND handle of Gui button
+;   2) {File} 		File containing icon image
+;   3) {Index} 		Index of icon in file
+;						Optional: Default = 1
+;   4) {Options}	Single letter flag followed by a number with multiple options delimited by a space
+;						W = Width of Icon (default = 16)
+;						H = Height of Icon (default = 16)
+;						S = Size of Icon, Makes Width and Height both equal to Size
+;						L = Left Margin
+;						T = Top Margin
+;						R = Right Margin
+;						B = Botton Margin
+;						A = Alignment (0 = left, 1 = right, 2 = top, 3 = bottom, 4 = center; default = 4)
+
+	RegExMatch(options, "i)w\K\d+", W), (W="") ? W := 16 :
+	RegExMatch(options, "i)h\K\d+", H), (H="") ? H := 16 :
+	RegExMatch(options, "i)s\K\d+", S), S ? W := H := S :
+	RegExMatch(options, "i)l\K\d+", L), (L="") ? L := 0 :
+	RegExMatch(options, "i)t\K\d+", T), (T="") ? T := 0 :
+	RegExMatch(options, "i)r\K\d+", R), (R="") ? R := 0 :
+	RegExMatch(options, "i)b\K\d+", B), (B="") ? B := 0 :
+	RegExMatch(options, "i)a\K\d+", A), (A="") ? A := 4 :
+
+	ptrSize := A_PtrSize = "" ? 4 : A_PtrSize, DW := "UInt", Ptr := A_PtrSize = "" ? DW : "Ptr"
+
+	VarSetCapacity(button_il, 20 + ptrSize, 0)
+
+	NumPut(normal_il := DllCall("ImageList_Create", DW, W, DW, H, DW, 0x21, DW, 1, DW, 1), button_il, 0, Ptr)	; Width & Height
+	NumPut(L, button_il, 0 + ptrSize, DW)		; Left Margin
+	NumPut(T, button_il, 4 + ptrSize, DW)		; Top Margin
+	NumPut(R, button_il, 8 + ptrSize, DW)		; Right Margin
+	NumPut(B, button_il, 12 + ptrSize, DW)		; Bottom Margin	
+	NumPut(A, button_il, 16 + ptrSize, DW)		; Alignment
+
+	SendMessage, BCM_SETIMAGELIST := 5634, 0, &button_il,, AHK_ID %buttonHandle%
+
+	return IL_Add(normal_il, file, index)
 }
 
 fixIE(version := 0, exeName := "") {

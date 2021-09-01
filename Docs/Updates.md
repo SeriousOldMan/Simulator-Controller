@@ -45,6 +45,12 @@ Although the code, that handles all the update tasks, is integrated into *Simula
 
 Note: Some of you might want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars* and *Simulator Controller\Rules* folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does on your own. But be sure to make a backup copy of all the files, just for peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor that can handle this.
 
+## Release 3.5.4
+
+All configuration changes are handled automatically for this release. You might want to check the extended options of the [Race Strategist configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-strategist), if you want to use the new "Race Reports" tool.
+
+***
+
 ## Release 3.5.2
 
 This release introduces a fully automatic program installation and update process. You have the option to install Simulator Controller in any location you want either as a portable application (pretty much the same as it has been in the past) or as a fully registered and compliant Windows application. As always, but especially in this case, make a backup copy of your *Simulator Controller* folder in your user *Documents* folder, before carrying out the update. Then completely delete the folder of your current installation of Simulator Controller. Now you have two options:

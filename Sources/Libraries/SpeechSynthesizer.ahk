@@ -118,7 +118,7 @@ class SpeechSynthesizer {
 			Loop, % this.iSpeechSynthesizer.GetVoices.Count
 				this.Voices.Push(this.iSpeechSynthesizer.GetVoices.Item(A_Index - 1).GetAttribute("Name"))
 			
-			this.setVoice(language, this.computeVoice(voice, language), language)
+			this.setVoice(language, this.computeVoice(voice, language))
 		}
 		else if (InStr(service, "Azure|") == 1) {
 			this.iService := "Azure"
@@ -270,10 +270,11 @@ class SpeechSynthesizer {
 									  , language: this.Locale, voice: this.Voice, text: text})
 			
 			try {
-				this.iSpeechSynthesizer.SpeakSsmlToFile(fileName, ssml)
+				if !this.iSpeechSynthesizer.SpeakSsmlToFile(fileName, ssml)
+					Throw "Error while speech synthesizing..."
 			}
 			catch exception {
-				new SpeechSynthesizer("Windows", true, "en").speak("Error while calling Azure Cognitive Services. Maybe your monthly contingent is exhausted.")
+				new SpeechSynthesizer("Windows", true, true).speak("Error while calling Azure Cognitive Services. Maybe your monthly contingent is exhausted.")
 			}
 		}
 	}

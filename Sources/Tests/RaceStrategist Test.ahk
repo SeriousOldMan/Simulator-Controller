@@ -301,13 +301,8 @@ else {
 					break
 				}
 				else {
-					if (A_Index == 1) {
+					if (A_Index == 1)
 						strategist.addLap(lap, data)
-				
-						strategist.dumpKnowledge(strategist.KnowledgeBase)
-						
-						MsgBox % "Lap " . lap . " loaded - Continue?"
-					}
 					else
 						strategist.updateLap(lap, data)
 					
@@ -317,6 +312,12 @@ else {
 				
 				if (A_Index = 1)
 					break
+			}
+			
+			if (A_index = 3) {
+				done := true
+				
+				break
 			}
 		} until done
 		

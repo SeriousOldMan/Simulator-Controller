@@ -76,7 +76,7 @@ ftpUpload(server, user, password, localFile, remoteFile) {
 
 createMessageReceiver() {
 	Gui MR:-Border -Caption
-	Gui MR:Color, D0D0D0, E5E5E5
+	Gui MR:Color, D0D0D0, D8D8D8
 	Gui MR:Add, Text, X10 Y10, % translate("Modular Simulator Controller System")
 	Gui MR:Add, Text, , % A_ScriptName
 	
@@ -105,7 +105,7 @@ consentDialog(id, consent := false) {
 	texts := readConfiguration(kTranslationsDirectory . "Consent.ini")
 	
 	Gui CNS:-Border ; -Caption
-	Gui CNS:Color, D0D0D0, E5E5E5
+	Gui CNS:Color, D0D0D0, D8D8D8
 	Gui CNS:Font, s10 Bold
 	Gui CNS:Add, Text, x0 y8 w800 +0x200 +0x1 BackgroundTrans gmoveConsentDialog, % translate("Modular Simulator Controller System")
 	Gui CNS:Font, Norm, Arial
@@ -934,8 +934,6 @@ initializeEnvironment() {
 		}
 	}
 	
-	virgin := !FileExist(A_MyDocuments . "\Simulator Controller")
-	
 	FileCreateDir %A_MyDocuments%\Simulator Controller
 	FileCreateDir %kUserHomeDirectory%Config
 	FileCreateDir %kUserHomeDirectory%Rules
@@ -950,15 +948,17 @@ initializeEnvironment() {
 	FileCreateDir %kSetupDatabaseDirectory%Global
 	FileCreateDir %kSetupDatabaseDirectory%Local
 	
-	if !FileExist(A_MyDocuments . "\Simulator Controller\Plugins\Controller Plugins.ahk")
-		FileCopy %kResourcesDirectory%Templates\Controller Plugins.ahk, %A_MyDocuments%\Simulator Controller\Plugins
+	if FileExist(kResourcesDirectory . "Templates") {
+		if !FileExist(A_MyDocuments . "\Simulator Controller\Plugins\Controller Plugins.ahk")
+			FileCopy %kResourcesDirectory%Templates\Controller Plugins.ahk, %A_MyDocuments%\Simulator Controller\Plugins
+		
+		if !FileExist(A_MyDocuments . "\Simulator Controller\Plugins\Configuration Plugins.ahk")
+			FileCopy %kResourcesDirectory%Templates\Configuration Plugins.ahk, %A_MyDocuments%\Simulator Controller\Plugins
+		
+		if !FileExist(kUserConfigDirectory . "Race.settings")
+			FileCopy %kResourcesDirectory%Templates\Race.settings, %kUserConfigDirectory%
+	}
 	
-	if !FileExist(A_MyDocuments . "\Simulator Controller\Plugins\Configuration Plugins.ahk")
-		FileCopy %kResourcesDirectory%Templates\Configuration Plugins.ahk, %A_MyDocuments%\Simulator Controller\Plugins
-	
-	if !FileExist(kUserConfigDirectory . "Race.settings")
-		FileCopy %kResourcesDirectory%Templates\Race.settings, %kUserConfigDirectory%
-			
 	if !FileExist(kUserConfigDirectory . "ID") {
 		ticks := A_TickCount
 		
@@ -977,7 +977,7 @@ initializeEnvironment() {
 		FileAppend %id%, % kUserConfigDirectory . "ID"
 	}
 	
-	if virgin
+	if (!FileExist(kResourcesDirectory . "Templates\UPDATES") && FileExist(kResourcesDirectory . "Templates"))
 		FileCopy %kResourcesDirectory%Templates\UPDATES, %kUserConfigDirectory%
 }
 
@@ -1002,7 +1002,7 @@ showSplash(image, alwaysOnTop := true, video := false) {
 	SplitPath image, , , extension
 	
 	Gui %vSplashCounter%:-Border -Caption
-	Gui %vSplashCounter%:Color, D0D0D0, E5E5E5
+	Gui %vSplashCounter%:Color, D0D0D0, D8D8D8
 
 	Gui %vSplashCounter%:Font, s10 Bold, Arial
 	Gui %vSplashCounter%:Add, Text, x10 w780 Center, %title% 
@@ -1150,7 +1150,7 @@ showProgress(options) {
 	
 		Gui Progress:Default
 		Gui Progress:-Border -Caption
-		Gui Progress:Color, D0D0D0, E5E5E5
+		Gui Progress:Color, D0D0D0, D8D8D8
 
 		Gui Progress:Font, s10 Bold, Arial
 		Gui Progress:Add, Text, x10 w%w% Center vvProgressTitle
@@ -1216,7 +1216,7 @@ showMessage(message, title := false, icon := "Information.png", duration := 1000
 		title := translate("Modular Simulator Controller System")
 	
 	Gui SM:-Border -Caption
-	Gui SM:Color, D0D0D0, E5E5E5
+	Gui SM:Color, D0D0D0, D8D8D8
 	Gui SM:Font, s10 Bold
 	Gui SM:Add, Text, x8 y8 W%innerWidth% +0x200 +0x1 BackgroundTrans, %title%
 	Gui SM:Font

@@ -331,7 +331,7 @@ class SetupWizard extends ConfigurationItem {
 		Gui %window%:Default
 	
 		Gui %window%:-Border ; -Caption
-		Gui %window%:Color, D0D0D0, F2F2F2
+		Gui %window%:Color, D0D0D0, D8D8D8
 
 		Gui %window%:Font, s10 Bold, Arial
 
@@ -377,7 +377,7 @@ class SetupWizard extends ConfigurationItem {
 		Gui %window%:Default
 	
 		Gui %window%:-Border ; -Caption
-		Gui %window%:Color, D0D0D0, E5E5E5
+		Gui %window%:Color, D0D0D0, D8D8D8
 
 		Gui %window%:Font, s10 Bold, Arial
 
@@ -2004,7 +2004,6 @@ fixIE(version := 0, exeName := "") {
 	
 	return previousValue
 }
-
 
 LV_ClickedColumn(listViewHandle) {
 	static LVM_SUBITEMHITTEST := 0x1039

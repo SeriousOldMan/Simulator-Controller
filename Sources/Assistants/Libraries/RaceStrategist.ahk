@@ -28,9 +28,16 @@ class RaceStrategist extends RaceAssistant {
 	iEnoughData := false
 	
 	iOverallTime := 0
+	iBestLapTime := 0
 	iLastFuelAmount := 0
 	iInitialFuelAmount := 0
 	iAvgFuelConsumption := 0
+
+	iSessionTime := false
+	
+	iSaveRaceReport := false
+	iSessionReportsDatabase := false
+	iSessionDataActive := false
 	
 	EnoughData[] {
 		Get {
@@ -41,6 +48,12 @@ class RaceStrategist extends RaceAssistant {
 	OverallTime[] {
 		Get {
 			return this.iOverallTime
+		}
+	}
+	
+	BestLapTime[] {
+		Get {
+			return this.iBestLapTime
 		}
 	}
 	
@@ -62,12 +75,52 @@ class RaceStrategist extends RaceAssistant {
 		}
 	}
 	
+	SessionTime[] {
+		Get {
+			return this.iSessionTime
+		}
+	}
+	
+	SessionReportsDatabase[] {
+		Get {
+			return this.iSessionReportsDatabase
+		}
+	}
+	
+	SaveRaceReport[] {
+		Get {
+			return ((this.iSessionReportsDatabase != false) ? this.iSaveRaceReport : kNever)
+		}
+	}
+	
+	SessionDataActive[] {
+		Get {
+			return this.iSessionDataActive
+		}
+	}
+	
 	__New(configuration, strategistSettings, name := false, language := "__Undefined__", service := false, speaker := false, listener := false, voiceServer := false) {
 		base.__New(configuration, "Race Strategist", strategistSettings, name, language, service, speaker, listener, voiceServer)
 	}
 	
+	updateConfigurationValues(values) {
+		base.updateConfigurationValues(values)
+		
+		if values.HasKey("SessionReportsDatabase")
+			this.iSessionReportsDatabase := values["SessionReportsDatabase"]
+		
+		if values.HasKey("SaveSettings")
+			this.iSaveSettings := values["SaveSettings"]
+		
+		if values.HasKey("SaveRaceReport")
+			this.iSaveRaceReport := values["SaveRaceReport"]
+	}
+	
 	updateSessionValues(values) {
 		base.updateSessionValues(values)
+		
+		if values.HasKey("SessionTime")
+			this.iSessionTime := values["SessionTime"]
 	}
 	
 	updateDynamicValues(values) {
@@ -75,6 +128,9 @@ class RaceStrategist extends RaceAssistant {
 		
 		if values.HasKey("OverallTime")
 			this.iOverallTime := values["OverallTime"]
+		
+		if values.HasKey("BestLapTime")
+			this.iBestLapTime := values["BestLapTime"]
 		
 		if values.HasKey("LastFuelAmount")
 			this.iLastFuelAmount := values["LastFuelAmount"]
@@ -412,6 +468,7 @@ class RaceStrategist extends RaceAssistant {
 	createSession(data) {
 		local facts
 		
+		configuration := this.Configuration
 		settings := this.Settings
 		
 		simulator := getConfigurationValue(data, "Session Data", "Simulator", "Unknown")
@@ -428,7 +485,7 @@ class RaceStrategist extends RaceAssistant {
 				session := kSessionOther
 		}
 		
-		this.updateSessionValues({Simulator: simulatorName, Session: session
+		this.updateSessionValues({Simulator: simulatorName, Session: session, SessionTime: A_Now
 								, Driver: getConfigurationValue(data, "Stint Data", "DriverForname", this.DriverName)})
 		
 		lapTime := getConfigurationValue(data, "Stint Data", "LapLastTime", 0)
@@ -464,14 +521,15 @@ class RaceStrategist extends RaceAssistant {
 				, "Session.Settings.Pitstop.Delta": getConfigurationValue(settings, "Strategy Settings", "Pitstop.Delta", getConfigurationValue(settings, "Session Settings", "Pitstop.Delta", 30))
 				, "Session.Settings.Fuel.SafetyMargin": getConfigurationValue(settings, "Session Settings", "Fuel.SafetyMargin", 5)
 				, "Session.Settings.Lap.AvgTime": getConfigurationValue(settings, "Session Settings", "Lap.AvgTime", 0)
-				, "Session.Settings.Lap.History.Considered": getConfigurationValue(this.Configuration, "Race Strategist Analysis", simulatorName . ".ConsideredHistoryLaps", 5)
-				, "Session.Settings.Lap.History.Damping": getConfigurationValue(this.Configuration, "Race Strategist Analysis", simulatorName . ".HistoryLapsDamping", 0.2)
+				, "Session.Settings.Lap.History.Considered": getConfigurationValue(configuration, "Race Strategist Analysis", simulatorName . ".ConsideredHistoryLaps", 5)
+				, "Session.Settings.Lap.History.Damping": getConfigurationValue(configuration, "Race Strategist Analysis", simulatorName . ".HistoryLapsDamping", 0.2)
 				, "Session.Settings.Standings.Extrapolation.Laps": getConfigurationValue(settings, "Strategy Settings", "Extrapolation.Laps", 2)
 				, "Session.Settings.Standings.Extrapolation.Overtake.Delta": Round(getConfigurationValue(settings, "Strategy Settings", "Overtake.Delta", 1) * 1000)
 				, "Session.Settings.Strategy.Traffic.Considered": getConfigurationValue(settings, "Strategy Settings", "Traffic.Considered", 5) / 100
 				, "Session.Settings.Pitstop.Service.Refuel": getConfigurationValue(settings, "Strategy Settings", "Service.Refuel", 1.5)
 				, "Session.Settings.Pitstop.Service.Tyres": getConfigurationValue(settings, "Strategy Settings", "Service.Tyres", 30)
 				, "Session.Settings.Pitstop.Strategy.Window.Considered": getConfigurationValue(settings, "Strategy Settings", "Strategy.Window.Considered", 2)}
+				
 		return facts
 	}
 	
@@ -511,15 +569,20 @@ class RaceStrategist extends RaceAssistant {
 	}
 	
 	startSession(data) {
+		local facts
+		
 		if !IsObject(data)
 			data := readConfiguration(data)
 		
+		facts := this.createSession(data)
 		simulatorName := this.Simulator
 		
-		this.updateConfigurationValues({})
+		this.updateConfigurationValues({SessionReportsDatabase: getConfigurationValue(this.Configuration, "Race Strategist Reports", "Database", false)
+									  , SaveRaceReport: getConfigurationValue(this.Configuration, "Race Strategist Shutdown", simulatorName . ".SaveRaceReport", false)
+									  , SaveSettings: getConfigurationValue(this.Configuration, "Race Assistant Shutdown", simulatorName . ".SaveSettings", getConfigurationValue(configuration, "Race Engineer Shutdown", simulatorName . ".SaveSettings", kNever))})
 		
-		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(this.createSession(data))
-							   , OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
+		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(facts)
+							    , BestLapTime: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
 		
 		if this.Speaker {
 			Process Exist, Race Engineer.exe
@@ -534,9 +597,54 @@ class RaceStrategist extends RaceAssistant {
 	}
 	
 	finishSession() {
-		this.updateDynamicValues({KnowledgeBase: false, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
+		if this.KnowledgeBase {
+			Process Exist, Race Engineer.exe
+			
+			if (!ErrorLevel && this.Speaker)
+				this.getSpeaker().speakPhrase("Bye")
+			
+			if (this.EnoughData && (this.Session == kSessionRace)) {
+				this.shutdownSession("Before")
+				
+				if this.Listener {
+					asked := true
+					
+					if ((this.SaveSettings == kAsk) && (this.SaveRaceReport == kAsk))
+						this.getSpeaker().speakPhrase("ConfirmSaveSettingsAndRaceReport", false, true)
+					else if (this.SaveRaceReport == kAsk)
+						this.getSpeaker().speakPhrase("ConfirmSaveRaceReport", false, true)
+					else if (this.SaveSettings == kAsk)
+						this.getSpeaker().speakPhrase("ConfirmSaveSettings", false, true)
+					else
+						asked := false
+				}
+				else
+					asked := false
+						
+				if asked {
+					this.setContinuation(ObjBindMethod(this, "shutdownSession", "After"))
+					
+					callback := ObjBindMethod(this, "forceFinishSession")
+					
+					SetTimer %callback%, -60000
+					
+					return
+				}
+			}
+			
+			this.updateDynamicValues({KnowledgeBase: false})
+		}
 		
-		this.updateSessionValues({Simulator: "", Session: kSessionFinished})
+		this.updateDynamicValues({OverallTime: 0, BestLapTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
+		this.updateSessionValues({Simulator: "", Session: kSessionFinished, SessionTime: false})
+	}
+	
+	forceFinishSession() {
+		if !this.SessionDataActive {
+			this.updateDynamicValues({KnowledgeBase: false})
+			
+			this.finishSession()
+		}	
 	}
 	
 	addLap(lapNumber, data) {
@@ -629,7 +737,13 @@ class RaceStrategist extends RaceAssistant {
 		
 		overallTime := (this.OverallTime + lapTime)
 		
-		this.updateDynamicValues({OverallTime: overallTime})
+		values := {OverallTime: overallTime}
+		
+		if (lapNumber > 1)
+			values["BestLapTime"] := (this.BestLapTime = 0) ? lapTime : Min(this.BestLapTime, lapTime)
+		
+		if (lapTime > 0)
+			this.updateDynamicValues(values)
 		
 		knowledgeBase.addFact("Lap." . lapNumber . ".Time.End", overallTime)
 		
@@ -826,12 +940,178 @@ class RaceStrategist extends RaceAssistant {
 				}
 			}
 	}
+	
+	shutdownSession(phase) {
+		this.iSessionDataActive := true
+		
+		try {
+			if ((this.Session == kSessionRace) && (this.SaveSettings = ((phase = "Before") ? kAlways : kAsk)))
+				this.updateSettings()
+			
+			if ((this.Session == kSessionRace) && (this.SaveRaceReport = ((phase = "Before") ? kAlways : kAsk)))
+				this.saveSessionReport()
+		}
+		finally {
+			this.iSessionDataActive := false
+		}
+		
+		if (phase = "After") {
+			if this.Speaker
+				this.getSpeaker().speakPhrase("RaceReportSaved")
+			
+			this.updateDynamicValues({KnowledgeBase: false})
+			
+			this.finishSession()
+		}
+	}
+	
+	saveSessionReport() {
+		local knowledgeBase := this.KnowledgeBase
+		
+		directory := this.SessionReportsDatabase
+		
+		if directory {
+			simulatorCode := this.SetupDatabase.getSimulatorCode(knowledgeBase.getValue("Session.Simulator"))
+			
+			directory := (directory . "\" . simulatorCode . "\" . this.SessionTime)
+			
+			FileCreateDir %directory%
+			
+			data := newConfiguration()
+			
+			setConfigurationValue(data, "Session", "Car", knowledgeBase.getValue("Session.Car"))
+			setConfigurationValue(data, "Session", "Track", knowledgeBase.getValue("Session.Track"))
+			setConfigurationValue(data, "Session", "Duration", (Round((knowledgeBase.getValue("Session.Duration") / 60) / 5) * 300))
+			setConfigurationValue(data, "Session", "Format", knowledgeBase.getValue("Session.Format"))
+			
+			carCount := knowledgeBase.getValue("Car.Count")
+			
+			setConfigurationValue(data, "Cars", "Count", carCount)
+			setConfigurationValue(data, "Cars", "Driver", knowledgeBase.getValue("Driver.Car"))
+			
+			Loop %carCount% {
+				setConfigurationValue(data, "Cars", "Car." . A_Index . ".Nr", knowledgeBase.getValue("Car." . A_Index . ".Nr", A_Index))
+				setConfigurationValue(data, "Cars", "Car." . A_Index . ".Car", knowledgeBase.getValue("Car." . A_Index . ".Car"))
+			}
+			
+			lapCount := knowledgeBase.getValue("Lap")
+			
+			setConfigurationValue(data, "Laps", "Count", lapCount)
+			
+			Loop %lapCount% {
+				setConfigurationValue(data, "Laps", "Lap." . A_Index . ".Weather", knowledgeBase.getValue("Standings.Lap." . A_index . ".Weather"))
+				setConfigurationValue(data, "Laps", "Lap." . A_Index . ".Time", knowledgeBase.getValue("Standings.Lap." . A_index . ".Time"))
+			
+				lapNr := A_Index
+				
+				times := []
+				positions := []
+				drivers := []
+				laps := []
+				
+				Loop %carCount% {
+					carPrefix := ("Standings.Lap." . lapNr . ".Car." . A_Index)
+					
+					times.Push(knowledgeBase.getValue(carPrefix . ".Time", -1))
+					positions.Push(knowledgeBase.getValue(carPrefix . ".Position", 0))
+					laps.Push(Floor(knowledgeBase.getValue(carPrefix . ".Laps", 0)))
+					
+					driverForname := knowledgeBase.getValue(carPrefix . ".Driver.Forname")
+					driverSurname := knowledgeBase.getValue(carPrefix . ".Driver.Surname")
+					driverNickname := knowledgeBase.getValue(carPrefix . ".Driver.Nickname")
+					
+					drivers.Push(computeDriverName(driverForname, driverSurname, driverNickname))
+				}
+				
+				newLine := ((lapNr > 1) ? "`n" : "")
+				
+				line := (newLine . values2String(";", times*))
+				
+				FileAppend %line%, % directory . "\Times.CSV"
+				
+				line := (newLine . values2String(";", positions*))
+				
+				FileAppend %line%, % directory . "\Positions.CSV"
+				
+				line := (newLine . values2String(";", laps*))
+				
+				FileAppend %line%, % directory . "\Laps.CSV"
+				
+				line := (newLine . values2String(";", drivers*))
+				
+				FileAppend %line%, % directory . "\Drivers.CSV"
+			}
+				
+			writeConfiguration(directory . "\Race.data", data)
+		}
+	}
+	
+	updateSettings() {
+		local knowledgeBase := this.KnowledgeBase
+		local compound
+		
+		if knowledgeBase {
+			setupDB := this.SetupDatabase
+			
+			simulatorName := setupDB.getSimulatorName(knowledgeBase.getValue("Session.Simulator"))
+			car := knowledgeBase.getValue("Session.Car")
+			track := knowledgeBase.getValue("Session.Track")
+			duration := knowledgeBase.getValue("Session.Duration")
+			weather := knowledgeBase.getValue("Weather.Now")
+			compound := knowledgeBase.getValue("Tyre.Compound")
+			compoundColor := knowledgeBase.getValue("Tyre.Compound.Color")
+			
+			oldValue := getConfigurationValue(this.Configuration, "Race Engineer Startup", simulatorName . ".LoadSettings", "Default")
+			loadSettings := getConfigurationValue(this.Configuration, "Race Assistant Startup", simulatorName . ".LoadSettings", oldValue)
+		
+			duration := (Round((duration / 60) / 5) * 300)
+			
+			values := {AvgFuelConsumption: this.AvgFuelConsumption, Compound: compound, CompoundColor: compoundColor, Duration: duration}
+			
+			lapTime := Round(this.BestLapTime / 1000)
+			
+			if (lapTime > 10)
+				values["AvgLapTime"] := lapTime
+			
+			if (loadSettings = "SetupDatabase")
+				setupDB.updateSettings(simulatorName, car, track
+									 , {Duration: duration, Weather: weather, Compound: compound, CompoundColor: compoundColor}, values)
+			else {
+				fileName := getFileName("Race.settings", kUserConfigDirectory)
+				
+				settings := readConfiguration(fileName)
+				
+				setupDB.updateSettingsValues(settings, values)
+				
+				writeConfiguration(fileName, settings)
+			}
+		}
+	}
 }
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+getTime() {
+	return A_Now
+}
+
+computeDriverName(forName, surName, nickName) {
+	name := ""
+	
+	if (forName != "")
+		name .= (forName . A_Space)
+	
+	if (surName != "")
+		name .= (surName . A_Space)
+	
+	if (nickName != "")
+		name .= ("(" . nickName . ")")
+	
+	return name
+}
 
 comparePositions(c1, c2) {
 	return (c1[2] < c2[2])

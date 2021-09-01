@@ -404,7 +404,7 @@ restart:
 		Gui RES:Default
 			
 		Gui RES:-Border ; -Caption
-		Gui RES:Color, D0D0D0, E5E5E5
+		Gui RES:Color, D0D0D0, D8D8D8
 
 		Gui RES:Font, Bold, Arial
 

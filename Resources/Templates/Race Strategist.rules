@@ -147,25 +147,38 @@ priority: 5, {Any: [?Lap], [?Sector]} => (Clear: Position.Standings.Front.Car),	
 										 (Clear: Position.Track.Front.Distance), (Clear: Position.Track.Front.Delta),							\
 										 (Clear: Position.Track.Behind.Car),																	\
 										 (Clear: Position.Track.Behind.Distance), (Clear: Position.Track.Behind.Delta)
+[?Lap] => (Prove: updateStandings(?Lap))
 {Any: [?Lap], [?Sector]} => (Prove: updatePositions(!Lap))
 priority: -5, [?Sector] => (Clear: Sector)
 
+updateStandings(?lap) <= Set(Standings.Lap, ?lap, Weather, !Weather.Weather.Now),																\
+						 Call(builtin0, getTime, ?time), Set(Standings.Lap, ?lap, Time, ?time)
 updatePositions(?lap) <= updateStandingsPositions(?lap, !Car.Count), updateTrackPositions(?lap, !Car.Count),									\
 						 updateTrackFront(?lap), updateTrackBehind(?lap)
 
 updateStandingsPositions(?, ?car) <= =<(?car, 0), !
 updateStandingsPositions(?lap, !Driver.Car) <= carPosition(!Driver.Car, ?position), Set(Position, ?position),									\
 											   carLaps(!Driver.Car, FULL, ?laps), Set(Standings.Lap, ?lap, Position, ?position),				\
+											   carDriverForname(!Driver.Car, ?forname), carDriverSurname(!Driver.Car, ?surname),				\
+											   carDriverNickname(!Driver.Car, ?nickname),														\
 											   Set(Standings.Lap, ?lap, Car, !Driver.Car, Delta, 0),											\
 											   Set(Standings.Lap, ?lap, Car, !Driver.Car, Laps, ?laps),											\
 											   Set(Standings.Lap, ?lap, Car, !Driver.Car, Position, ?position),									\
+											   Set(Standings.Lap, ?lap, Car, !Driver.Car, Driver.Forname, ?forname),							\
+											   Set(Standings.Lap, ?lap, Car, !Driver.Car, Driver.Surname, ?surname),							\
+											   Set(Standings.Lap, ?lap, Car, !Driver.Car, Driver.Nickname, ?nickname),							\
 											   ?nextCar = !Driver.Car - 1, updateStandingsPositions(?lap, ?nextCar), !
 updateStandingsPositions(?lap, ?car) <= carPosition(?car, ?position),																			\
 										carLaps(?car, FULL, ?carLaps), carLaps(!Driver.Car, FULL, ?driverLaps),									\
 										lapTime(?lap, ?lapTime), ?distance = ?driverLaps - ?carLaps, ?delta = ?lapTime * ?distance,				\
+										carDriverForname(?car, ?forname), carDriverSurname(?car, ?surname),										\
+										carDriverNickname(?car, ?nickname),																		\
 										Set(Standings.Lap, ?lap, Car, ?car, Delta, ?delta),														\
 										Set(Standings.Lap, ?lap, Car, ?car, Laps, ?carLaps),													\
 										Set(Standings.Lap, ?lap, Car, ?car, Position, ?position), 												\
+										Set(Standings.Lap, ?lap, Car, ?car, Driver.Forname, ?forname),											\
+										Set(Standings.Lap, ?lap, Car, ?car, Driver.Surname, ?surname),											\
+										Set(Standings.Lap, ?lap, Car, ?car, Driver.Nickname, ?nickname),										\
 										updateStandingsFront(?lap, ?car, ?distance, ?delta),													\
 										updateStandingsBehind(?lap, ?car, ?distance, ?delta),													\
 										updateStandingsLeader(?lap, ?car, ?distance, ?delta),													\

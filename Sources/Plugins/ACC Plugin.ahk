@@ -288,15 +288,14 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				else {
 					setConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Car", getConfigurationValue(carNames, "Car Model", carID, "Unknown"))
 				
-					if ((getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Driver.Forname") = driverForname)
-					 && (getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Driver.Surname") = driverSurname)
-					 && (getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Driver.Nickname") = driverNickname)) {
-						driverCar := A_Index
-						
-						break
+					if !driverCar {
+						if ((getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Driver.Forname") = driverForname)
+						 && (getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Driver.Surname") = driverSurname)
+						 && (getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Driver.Nickname") = driverNickname))
+							driverCar := A_Index
+						else if (getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Time") = lapTime)
+							driverCar := A_index
 					}
-					else if (getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Time") = lapTime)
-						driverCar := A_index
 				}
 			}
 			
@@ -663,7 +662,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			SplitPath image, fileName
 			
 			Gui LABEL:-Border -Caption +AlwaysOnTop
-			Gui LABEL:Color, D0D0D0, E5E5E5
+			Gui LABEL:Color, D0D0D0, D8D8D8
 			Gui LABEL:Add, Text, x0 y0 w100 h23 +0x200 +0x1 BackgroundTrans, %fileName%
 			
 			Gui LABEL:Show, AutoSize x%x%, y%y%

@@ -39,9 +39,9 @@ global kProveAll = "ProveAll:"
 global kSet = "Set:"
 global kClear = "Clear:"
 
-global kBuiltinFunctors = ["option", "sqrt", "+", "-", "*", "/", ">", "<", "=", "!=", "builtin1", "unbound?", "append", "get"]
-global kBuiltinFunctions = ["option", "squareRoot", "plus", "minus", "multiply", "divide", "greater", "less", "equal", "unequal", "builtin1", "unbound", "append", "get"]
-global kBuiltinAritys = [2, 2, 3, 3, 3, 3, 2, 2, 2, 2, 3, 1, -1, -1]
+global kBuiltinFunctors = ["option", "sqrt", "+", "-", "*", "/", ">", "<", "=", "!=", "builtin0", "builtin1", "unbound?", "append", "get"]
+global kBuiltinFunctions = ["option", "squareRoot", "plus", "minus", "multiply", "divide", "greater", "less", "equal", "unequal", "builtin0", "builtin1", "unbound", "append", "get"]
+global kBuiltinAritys = [2, 2, 3, 3, 3, 3, 2, 2, 2, 2, 2, 3, 1, -1, -1]
 
 global kProduction = "Production"
 global kReduction = "Reduction"
@@ -4287,6 +4287,14 @@ equal(choicePoint, operand1, operand2) {
 
 unequal(choicePoint, operand1, operand2) {
 	return !choicePoint.ResultSet.unify(choicePoint, operand1, operand2)
+}
+
+builtin0(choicePoint, function, operand1) {
+	local resultSet := choicePoint.ResultSet
+	
+	function := function.toString(resultSet)
+	
+	return resultSet.unify(choicePoint, new Literal(%function%()), operand1.getValue(resultSet, operand1))
 }
 
 builtin1(choicePoint, function, operand1, operand2) {

@@ -154,14 +154,14 @@ class RaceReports extends ConfigurationItem {
 		setButtonIcon(deleteRaceReportButtonHandle, kIconsDirectory . "Minus.ico", 1)
 		
 		Gui %window%:Add, Text, x16 yp+30 w70 h23 +0x200, % translate("Info")
-		Gui %window%:Add, ActiveX, x90 yp-2 w180 h166 Border vinfoViewer, shell.explorer
+		Gui %window%:Add, ActiveX, x90 yp-2 w180 h170 Border vinfoViewer, shell.explorer
 		
 		infoViewer.Navigate("about:blank")
 		
 		Gui %window%:Add, Text, x290 ys w40 h23 +0x200, % translate("Report")
 		Gui %window%:Add, DropDownList, x334 yp w180 AltSubmit Disabled Choose0 vreportsDropDown gchooseReport, % values2String("|", map(kReports, "translate")*)
 		
-		Gui %window%:Add, ActiveX, x290 yp+24 w910 h480 vchartViewer, shell.explorer
+		Gui %window%:Add, ActiveX, x290 yp+24 w910 h475 Border vchartViewer, shell.explorer
 		
 		chartViewer.Navigate("about:blank")
 		
@@ -196,6 +196,11 @@ class RaceReports extends ConfigurationItem {
 			<html>
 			    <meta charset='utf-8'>
 				<head>
+					<style>
+						.headerStyle { height: 25; font-size: 12px; font-weight: 500; background-color: 'FFFFFF'; }
+						.rowStyle { background-color: 'E0E0E0'; }
+						.oddRowStyle { background-color: 'E8E8E8'; }
+					</style>
 					<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 					<script type="text/javascript">
 						google.charts.load('current', {'packages':['corechart', 'table']}).then(drawChart);
@@ -206,7 +211,7 @@ class RaceReports extends ConfigurationItem {
 					</script>
 				</head>
 				<body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
-					<div id="chart_id" style="width: 910px; height: 470px"></div>
+					<div id="chart_id" style="width: 908px; height: 470px"></div>
 				</body>
 			</html>
 			)
@@ -364,7 +369,8 @@ class RaceReports extends ConfigurationItem {
 			
 			drawChartFunction .= ("`ndata.addRows([" . values2String(", ", rows*) . "]);")
 			
-			drawChartFunction := drawChartFunction . "`nvar options = {};"
+			drawChartFunction .= "`nvar cssClassNames = { headerCell: 'headerStyle', tableRow: 'rowStyle', oddTableRow: 'oddRowStyle' };"
+			drawChartFunction := drawChartFunction . "`nvar options = { cssClassNames: cssClassNames, width: '100%', height: '100%' };"
 			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.Table(document.getElementById('chart_id')); chart.draw(data, options); }"
 			
 			this.showReportChart(drawChartFunction)
@@ -442,7 +448,7 @@ class RaceReports extends ConfigurationItem {
 				
 				drawChartFunction := drawChartFunction . "]"
 			}
-			
+
 			drawChartFunction := drawChartFunction . ("]);`nvar options = { legend: { position: 'right' }, chartArea: { left: '5%', top: '2%', right: '25%', bottom: '10%' }, ")
 			drawChartFunction := drawChartFunction . ("hAxis: { title: '" . translate("Laps") . "' }, vAxis: { direction: -1, ticks: [], title: '" . translate("Cars") . "', baselineColor: 'D0D0D0' }, backgroundColor: 'D0D0D0' };`n")
 
@@ -606,13 +612,13 @@ class RaceReports extends ConfigurationItem {
 		if (raceNr != this.SelectedRace) {
 			if raceNr {
 				GuiControl Enable, reportsDropDown
-				GuiControl Choose, reportsDropDown, % inList(kReports, "Position")
+				GuiControl Choose, reportsDropDown, % inList(kReports, "Overview")
 				GuiControl Enable, %deleteRaceReportButtonHandle%
 				
 				this.iSelectedRace := raceNr
 				this.iSelectedReport := false
 				
-				this.loadReport("Position")
+				this.loadReport("Overview")
 			}
 			else {
 				GuiControl Disable, reportsDropDown

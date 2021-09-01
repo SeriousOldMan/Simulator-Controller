@@ -448,8 +448,8 @@ class RaceReports extends ConfigurationItem {
 				
 				drawChartFunction := drawChartFunction . "]"
 			}
-
-			drawChartFunction := drawChartFunction . ("]);`nvar options = { legend: { position: 'right' }, chartArea: { left: '5%', top: '2%', right: '25%', bottom: '10%' }, ")
+			
+			drawChartFunction := drawChartFunction . ("]);`nvar options = { legend: { position: 'right' },  chartArea: { left: '5%', top: '2%', right: '20%', bottom: '10%' }, ")
 			drawChartFunction := drawChartFunction . ("hAxis: { title: '" . translate("Laps") . "' }, vAxis: { direction: -1, ticks: [], title: '" . translate("Cars") . "', baselineColor: 'D0D0D0' }, backgroundColor: 'D0D0D0' };`n")
 
 			drawChartFunction := drawChartFunction . "var chart = new google.visualization.LineChart(document.getElementById('chart_id')); chart.draw(data, options); }"

@@ -28,6 +28,7 @@ class RaceStrategist extends RaceAssistant {
 	iEnoughData := false
 	
 	iOverallTime := 0
+	iBestLapTime := 0
 	iLastFuelAmount := 0
 	iInitialFuelAmount := 0
 	iAvgFuelConsumption := 0
@@ -47,6 +48,12 @@ class RaceStrategist extends RaceAssistant {
 	OverallTime[] {
 		Get {
 			return this.iOverallTime
+		}
+	}
+	
+	BestLapTime[] {
+		Get {
+			return this.iBestLapTime
 		}
 	}
 	
@@ -102,6 +109,9 @@ class RaceStrategist extends RaceAssistant {
 		if values.HasKey("SessionReportsDatabase")
 			this.iSessionReportsDatabase := values["SessionReportsDatabase"]
 		
+		if values.HasKey("SaveSettings")
+			this.iSaveSettings := values["SaveSettings"]
+		
 		if values.HasKey("SaveRaceReport")
 			this.iSaveRaceReport := values["SaveRaceReport"]
 	}
@@ -118,6 +128,9 @@ class RaceStrategist extends RaceAssistant {
 		
 		if values.HasKey("OverallTime")
 			this.iOverallTime := values["OverallTime"]
+		
+		if values.HasKey("BestLapTime")
+			this.iBestLapTime := values["BestLapTime"]
 		
 		if values.HasKey("LastFuelAmount")
 			this.iLastFuelAmount := values["LastFuelAmount"]
@@ -565,10 +578,11 @@ class RaceStrategist extends RaceAssistant {
 		simulatorName := this.Simulator
 		
 		this.updateConfigurationValues({SessionReportsDatabase: getConfigurationValue(this.Configuration, "Race Strategist Reports", "Database", false)
-									  , SaveRaceReport: getConfigurationValue(this.Configuration, "Race Strategist Shutdown", simulatorName . ".SaveRaceReport", false)})
+									  , SaveRaceReport: getConfigurationValue(this.Configuration, "Race Strategist Shutdown", simulatorName . ".SaveRaceReport", false)
+									  , SaveSettings: getConfigurationValue(this.Configuration, "Race Assistant Shutdown", simulatorName . ".SaveSettings", getConfigurationValue(configuration, "Race Engineer Shutdown", simulatorName . ".SaveSettings", kNever))})
 		
 		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(facts)
-							    , OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
+							    , BestLapTime: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
 		
 		if this.Speaker {
 			Process Exist, Race Engineer.exe
@@ -591,10 +605,23 @@ class RaceStrategist extends RaceAssistant {
 			
 			if (this.EnoughData && (this.Session == kSessionRace)) {
 				this.shutdownSession("Before")
-						
-				if (this.Listener && (this.SaveRaceReport == kAsk)) {
-					this.getSpeaker().speakPhrase("ConfirmSaveRaceReport", false, true)
+				
+				if this.Listener {
+					asked := true
 					
+					if ((this.SaveSettings == kAsk) && (this.SaveRaceReport == kAsk))
+						this.getSpeaker().speakPhrase("ConfirmSaveSettingsAndRaceReport", false, true)
+					else if (this.SaveRaceReport == kAsk)
+						this.getSpeaker().speakPhrase("ConfirmSaveRaceReport", false, true)
+					else if (this.SaveSettings == kAsk)
+						this.getSpeaker().speakPhrase("ConfirmSaveSettings", false, true)
+					else
+						asked := false
+				}
+				else
+					asked := false
+						
+				if asked {
 					this.setContinuation(ObjBindMethod(this, "shutdownSession", "After"))
 					
 					callback := ObjBindMethod(this, "forceFinishSession")
@@ -608,7 +635,7 @@ class RaceStrategist extends RaceAssistant {
 			this.updateDynamicValues({KnowledgeBase: false})
 		}
 		
-		this.updateDynamicValues({OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
+		this.updateDynamicValues({OverallTime: 0, BestLapTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
 		this.updateSessionValues({Simulator: "", Session: kSessionFinished, SessionTime: false})
 	}
 	
@@ -710,7 +737,13 @@ class RaceStrategist extends RaceAssistant {
 		
 		overallTime := (this.OverallTime + lapTime)
 		
-		this.updateDynamicValues({OverallTime: overallTime})
+		values := {OverallTime: overallTime}
+		
+		if (lapNumber > 1)
+			values["BestLapTime"] := (this.BestLapTime = 0) ? lapTime : Min(this.BestLapTime, lapTime)
+		
+		if (lapTime > 0)
+			this.updateDynamicValues(values)
 		
 		knowledgeBase.addFact("Lap." . lapNumber . ".Time.End", overallTime)
 		
@@ -912,6 +945,9 @@ class RaceStrategist extends RaceAssistant {
 		this.iSessionDataActive := true
 		
 		try {
+			if ((this.Session == kSessionRace) && (this.SaveSettings = ((phase = "Before") ? kAlways : kAsk)))
+				this.updateSettings()
+			
 			if ((this.Session == kSessionRace) && (this.SaveRaceReport = ((phase = "Before") ? kAlways : kAsk)))
 				this.saveSessionReport()
 		}
@@ -1007,6 +1043,48 @@ class RaceStrategist extends RaceAssistant {
 			}
 				
 			writeConfiguration(directory . "\Race.data", data)
+		}
+	}
+	
+	updateSettings() {
+		local knowledgeBase := this.KnowledgeBase
+		local compound
+		
+		if knowledgeBase {
+			setupDB := this.SetupDatabase
+			
+			simulatorName := setupDB.getSimulatorName(knowledgeBase.getValue("Session.Simulator"))
+			car := knowledgeBase.getValue("Session.Car")
+			track := knowledgeBase.getValue("Session.Track")
+			duration := knowledgeBase.getValue("Session.Duration")
+			weather := knowledgeBase.getValue("Weather.Now")
+			compound := knowledgeBase.getValue("Tyre.Compound")
+			compoundColor := knowledgeBase.getValue("Tyre.Compound.Color")
+			
+			oldValue := getConfigurationValue(this.Configuration, "Race Engineer Startup", simulatorName . ".LoadSettings", "Default")
+			loadSettings := getConfigurationValue(this.Configuration, "Race Assistant Startup", simulatorName . ".LoadSettings", oldValue)
+		
+			duration := (Round((duration / 60) / 5) * 300)
+			
+			values := {AvgFuelConsumption: this.AvgFuelConsumption, Compound: compound, CompoundColor: compoundColor, Duration: duration}
+			
+			lapTime := Round(this.BestLapTime / 1000)
+			
+			if (lapTime > 10)
+				values["AvgLapTime"] := lapTime
+			
+			if (loadSettings = "SetupDatabase")
+				setupDB.updateSettings(simulatorName, car, track
+									 , {Duration: duration, Weather: weather, Compound: compound, CompoundColor: compoundColor}, values)
+			else {
+				fileName := getFileName("Race.settings", kUserConfigDirectory)
+				
+				settings := readConfiguration(fileName)
+				
+				setupDB.updateSettingsValues(settings, values)
+				
+				writeConfiguration(fileName, settings)
+			}
 		}
 	}
 }

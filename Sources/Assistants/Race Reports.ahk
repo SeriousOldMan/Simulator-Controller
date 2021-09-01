@@ -272,8 +272,17 @@ class RaceReports extends ConfigurationItem {
 			cars := []
 			positions := []
 			
-			Loop Read, %positionsFile% 
-				positions.Push(string2Values(";", A_LoopReadLine))
+			oldEncoding := A_FileEncoding
+			
+			FileEncoding UTF-8
+			
+			try {
+				Loop Read, %positionsFile% 
+					positions.Push(string2Values(";", A_LoopReadLine))
+			}
+			finally {
+				FileEncoding %oldEncoding%
+			}
 			
 			carsCount := getConfigurationValue(raceData, "Cars", "Count")
 			lapsCount := getConfigurationValue(raceData, "Laps", "Count")
@@ -344,8 +353,17 @@ class RaceReports extends ConfigurationItem {
 			cars := []
 			times := []
 			
-			Loop Read, %timesFile%
-				times.Push(string2Values(";", A_LoopReadLine))
+			oldEncoding := A_FileEncoding
+			
+			FileEncoding UTF-8
+			
+			try {
+				Loop Read, %timesFile%
+					times.Push(string2Values(";", A_LoopReadLine))
+			}
+			finally {
+				FileEncoding %oldEncoding%
+			}
 			
 			Loop % getConfigurationValue(raceData, "Cars", "Count")
 				cars.Push("'#" . getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Nr") . "'")

@@ -2,8 +2,8 @@
 
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. New "Race Reports" tool. This tool will bring post race analysis to Simulator Controller.
-  4. New options for the Race Strategist configuration to support the "Race Reports" tool.
+  3. New ["Race Reports"](*) tool. This tool will bring post race analysis to Simulator Controller.
+  4. New options for the [Race Strategist configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-strategist) to support the "Race Reports" tool.
   5. More confirmation questions when deleting settings or setups in the "Setup Database" tool.
 
 ## 3.5.2-release 08/27/21

@@ -299,7 +299,7 @@ class RaceReports extends ConfigurationItem {
 						break
 					}
 					else
-						positions[A_Index][car] := carsCount
+						positions[A_Index][car] := "null" ; carsCount
 				
 				if valid
 					cars.Push("'#" . getConfigurationValue(raceData, "Cars", "Car." . car . ".Nr") . A_Space . getConfigurationValue(raceData, "Cars", "Car." . car . ".Car") . "'")

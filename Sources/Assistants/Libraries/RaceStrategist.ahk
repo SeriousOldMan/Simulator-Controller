@@ -999,8 +999,8 @@ class RaceStrategist extends RaceAssistant {
 			setConfigurationValue(data, "Laps", "Count", lapCount)
 			
 			Loop %lapCount% {
-				setConfigurationValue(data, "Laps", "Lap." . A_Index . ".Weather", knowledgeBase.getValue("Standings.Lap." . A_index . ".Weather"))
-				setConfigurationValue(data, "Laps", "Lap." . A_Index . ".Time", knowledgeBase.getValue("Standings.Lap." . A_index . ".Time"))
+				setConfigurationValue(data, "Laps", "Lap." . A_Index . ".Weather", knowledgeBase.getValue("Standings.Lap." . A_Index . ".Weather"))
+				setConfigurationValue(data, "Laps", "Lap." . A_Index . ".Time", knowledgeBase.getValue("Standings.Lap." . A_Index . ".Time"))
 			
 				lapNr := A_Index
 				
@@ -1027,19 +1027,23 @@ class RaceStrategist extends RaceAssistant {
 				
 				line := (newLine . values2String(";", times*))
 				
-				FileAppend %line%, % directory . "\Times.CSV"
+				fileName := (directory . "\Times.CSV")
+				FileAppend %line%, %fileName%
 				
 				line := (newLine . values2String(";", positions*))
 				
-				FileAppend %line%, % directory . "\Positions.CSV"
+				fileName := (directory . "\Positions.CSV")
+				FileAppend %line%, %fileName%
 				
 				line := (newLine . values2String(";", laps*))
 				
-				FileAppend %line%, % directory . "\Laps.CSV"
+				fileName := (directory . "\Laps.CSV")
+				FileAppend %line%, %fileName%
 				
 				line := (newLine . values2String(";", drivers*))
 				
-				FileAppend %line%, % directory . "\Drivers.CSV"
+				fileName := (directory . "\Drivers.CSV")
+				FileAppend %line%, %fileName%
 			}
 				
 			writeConfiguration(directory . "\Race.data", data)

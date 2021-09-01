@@ -42,7 +42,7 @@ ListLines Off					; Disable execution history
 ;;;                        Private Constants Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kReports = ["Position", "Pace"]
+global kReports = ["Overview", "Position", "Pace"]
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -194,10 +194,11 @@ class RaceReports extends ConfigurationItem {
 			before =
 			(
 			<html>
+			    <meta charset='utf-8'>
 				<head>
 					<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 					<script type="text/javascript">
-						google.charts.load('current', {'packages':['corechart']}).then(drawChart);
+						google.charts.load('current', {'packages':['corechart', 'table']}).then(drawChart);
 			)
 
 			after =
@@ -248,7 +249,7 @@ class RaceReports extends ConfigurationItem {
 			infoText .= ("<tr><td>" . translate("Conditions: ") . "</td><td>" . values2String(", ", map(conditions, "translate")*) . "</td></tr>")
 			infoText .= "</table>"
 			
-			infoText := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='3' topmargin='3' rightmargin='3' bottommargin='3'><style> table, p { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><p>" . infoText . "</p></body></html>"
+			infoText := "<html><meta charset='utf-8'><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='3' topmargin='3' rightmargin='3' bottommargin='3'><style> table, p { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><p>" . infoText . "</p></body></html>"
 			
 			infoViewer.Document.write(infoText)
 		}
@@ -259,6 +260,124 @@ class RaceReports extends ConfigurationItem {
 		}
 		
 		infoViewer.Document.close()
+	}
+	
+	showOverviewReport(dataFile, driversFile := false, positionsFile := false, lapsFile := false, timesFile := false) {
+		raceData := (dataFile ? readConfiguration(dataFile) : false)
+		
+		if raceData {
+			GuiControl Choose, reportsDropDown, % inList(kReports, "Overview")
+		
+			this.iSelectedReport := "Overview"
+			
+			cars := []
+			drivers := []
+			positions := []
+			laps := []
+			times := []
+			
+			oldEncoding := A_FileEncoding
+			
+			FileEncoding UTF-8
+			
+			try {
+				Loop Read, %driversFile% 
+					drivers.Push(string2Values(";", A_LoopReadLine))
+				
+				Loop Read, %positionsFile% 
+					positions.Push(string2Values(";", A_LoopReadLine))
+				
+				Loop Read, %lapsFile% 
+					laps.Push(string2Values(";", A_LoopReadLine))
+				
+				Loop Read, %timesFile% 
+					times.Push(string2Values(";", A_LoopReadLine))
+			}
+			finally {
+				FileEncoding %oldEncoding%
+			}
+			
+			carsCount := getConfigurationValue(raceData, "Cars", "Count")
+			lapsCount := getConfigurationValue(raceData, "Laps", "Count")
+			
+			Loop % carsCount
+			{
+				car := A_Index
+				valid := false
+				
+				Loop %lapsCount%
+					if (positions[A_Index][car] > 0)
+						valid := true
+					else
+						positions[A_Index][car] := "null" ; carsCount
+				
+				if valid
+					cars.Push(Array(getConfigurationValue(raceData, "Cars", "Car." . car . ".Nr"), getConfigurationValue(raceData, "Cars", "Car." . car . ".Car")))
+				else
+					Loop %lapsCount%
+					{
+						drivers[A_Index].RemoveAt(car)
+						positions[A_Index].RemoveAt(car)
+						laps[A_Index].RemoveAt(car)
+						times[A_Index].RemoveAt(car)
+					}
+			}
+			
+			carsCount := cars.Length()
+			
+			drawChartFunction := ""
+			
+			drawChartFunction .= "function drawChart() {`nvar data = new google.visualization.DataTable();`n"
+			drawChartFunction .= "`ndata.addColumn('number', '" . translate("#") . "');"
+			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Car") . "');"
+			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Driver (Start)") . "');"
+			drawChartFunction .= "`ndata.addColumn('number', '" . translate("Best Lap Time") . "');"
+			drawChartFunction .= "`ndata.addColumn('number', '" . translate("Avg Lap Time") . "');"
+			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Result") . "');"
+		
+			rows := []
+			
+			Loop % carsCount
+			{
+				car := A_Index
+				
+				result := (positions[lapsCount][car] = "null" ? "'DNF'" : "'" . positions[lapsCount][car] . "'")
+				bestLap := 1000000
+				lapTimes := []
+				
+				Loop % lapsCount
+				{
+					lapTime := times[A_Index][car]
+					
+					if (lapTime > 0)
+						lapTimes.Push(lapTime)
+					else
+						result := "'DNF'"
+				}
+				
+				min := Round(minimum(lapTimes) / 1000, 1)
+				avg := Round(average(lapTimes) / 1000, 1)
+				
+				rows.Push("[" . values2String(", ", cars[A_Index][1], "'" . cars[A_Index][2] . "'", "'" . drivers[1][A_Index] . "'"
+											, "{v: " . min . ", f: '" . format("{:.1f}", min) . "'}", "{v: " . avg . ", f: '" . format("{:.1f}", avg) . "'}", result) . "]")
+			}
+			
+			drawChartFunction .= ("`ndata.addRows([" . values2String(", ", rows*) . "]);")
+			
+			drawChartFunction := drawChartFunction . "`nvar options = {};"
+			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.Table(document.getElementById('chart_id')); chart.draw(data, options); }"
+			
+			this.showReportChart(drawChartFunction)
+			this.showReportInfo(raceData)
+		}
+		else {
+			GuiControl Choose, reportsDropDown, 0
+		
+			this.iSelectedReport := false
+		
+			this.showReportChart(false)
+			this.showReportInfo(false)
+		}
 	}
 	
 	showPositionReport(dataFile, positionsFile := false) {
@@ -272,8 +391,17 @@ class RaceReports extends ConfigurationItem {
 			cars := []
 			positions := []
 			
-			Loop Read, %positionsFile% 
-				positions.Push(string2Values(";", A_LoopReadLine))
+			oldEncoding := A_FileEncoding
+			
+			FileEncoding UTF-8
+			
+			try {
+				Loop Read, %positionsFile% 
+					positions.Push(string2Values(";", A_LoopReadLine))
+			}
+			finally {
+				FileEncoding %oldEncoding%
+			}
 			
 			carsCount := getConfigurationValue(raceData, "Cars", "Count")
 			lapsCount := getConfigurationValue(raceData, "Laps", "Count")
@@ -290,7 +418,7 @@ class RaceReports extends ConfigurationItem {
 						break
 					}
 					else
-						positions[A_Index][car] := carsCount
+						positions[A_Index][car] := "null" ; carsCount
 				
 				if valid
 					cars.Push("'#" . getConfigurationValue(raceData, "Cars", "Car." . car . ".Nr") . A_Space . getConfigurationValue(raceData, "Cars", "Car." . car . ".Car") . "'")
@@ -344,8 +472,17 @@ class RaceReports extends ConfigurationItem {
 			cars := []
 			times := []
 			
-			Loop Read, %timesFile%
-				times.Push(string2Values(";", A_LoopReadLine))
+			oldEncoding := A_FileEncoding
+			
+			FileEncoding UTF-8
+			
+			try {
+				Loop Read, %timesFile%
+					times.Push(string2Values(";", A_LoopReadLine))
+			}
+			finally {
+				FileEncoding %oldEncoding%
+			}
 			
 			Loop % getConfigurationValue(raceData, "Cars", "Count")
 				cars.Push("'#" . getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Nr") . "'")
@@ -498,10 +635,12 @@ class RaceReports extends ConfigurationItem {
 				this.iSelectedReport := report
 				
 				Loop Files, % this.Database . "\" . this.SetupDatabase.getSimulatorCode(simulatorDropDown) . "\*.*", D
-					if (A_index = this.SelectedRace) {
+					if (A_Index = this.SelectedRace) {
 						GuiControl Choose, reportsDropDown, % inList(kReports, report)
 						
 						switch report {
+							case "Overview":
+								this.showOverviewReport(A_LoopFilePath . "\Race.data", A_LoopFilePath . "\Drivers.CSV", A_LoopFilePath . "\Positions.CSV", A_LoopFilePath . "\Laps.CSV", A_LoopFilePath . "\Times.CSV")
 							case "Position":
 								this.showPositionReport(A_LoopFilePath . "\Race.data", A_LoopFilePath . "\Positions.CSV")
 							case "Pace":
@@ -526,7 +665,7 @@ class RaceReports extends ConfigurationItem {
 		GuiControlGet simulatorDropDown
 				
 		Loop Files, % this.Database . "\" . this.SetupDatabase.getSimulatorCode(simulatorDropDown) . "\*.*", D
-			if (A_index = this.SelectedRace) {
+			if (A_Index = this.SelectedRace) {
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
 				title := translate("Modular Simulator Controller System")
 				MsgBox 262436, %title%, % translate("Do you really want to delete the selected report?")

@@ -3120,7 +3120,7 @@ class RuleCompiler {
 					
 					if (term != kNotFound)
 						terms.Push(term)
-					else if (!this.isEmpty(text, nextCharIndex) || (A_index == 1))
+					else if (!this.isEmpty(text, nextCharIndex) || (A_Index == 1))
 						Throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in RuleCompiler.readTail..."
 					else
 						return terms

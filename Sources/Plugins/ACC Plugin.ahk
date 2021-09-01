@@ -294,7 +294,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 						 && (getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Driver.Nickname") = driverNickname))
 							driverCar := A_Index
 						else if (getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Time") = lapTime)
-							driverCar := A_index
+							driverCar := A_Index
 					}
 				}
 			}

@@ -1,9 +1,9 @@
 [Development]
 Version=3.5.4-dev
 Target=3.5.4-release
-Date=08/27/2021
+Date=08/31/2021
 Download=
-Changes=
+Changes=New Race Report Tool, New Options in Race Strategist Settings, Ask before deleting Setups and Settings in Setup Database tool
 [Release]
 Version=3.5.2-release
 Date=08/27/2021

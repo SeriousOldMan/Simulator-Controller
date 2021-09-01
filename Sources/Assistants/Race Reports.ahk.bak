@@ -154,7 +154,7 @@ class RaceReports extends ConfigurationItem {
 		setButtonIcon(deleteRaceReportButtonHandle, kIconsDirectory . "Minus.ico", 1)
 		
 		Gui %window%:Add, Text, x16 yp+30 w70 h23 +0x200, % translate("Info")
-		Gui %window%:Add, ActiveX, x90 yp-2 w180 h166 Border vinfoViewer, shell.explorer
+		Gui %window%:Add, ActiveX, x90 yp w180 h166 Border vinfoViewer, shell.explorer
 		
 		infoViewer.Navigate("about:blank")
 		

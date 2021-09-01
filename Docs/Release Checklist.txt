@@ -28,6 +28,10 @@ Release 3.5.4 Checklist
    a. Documentation
    b. Doc Image
    c. Mention in Update Notes
+3. New Race Report Tool
+   a. Documentation
+   b. Update Procedure read Install file and merge Start Menu Items
+   c. Translations
 
 Release 3.5.2 Checklist
 =======================

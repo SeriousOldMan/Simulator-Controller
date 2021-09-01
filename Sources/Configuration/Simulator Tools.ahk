@@ -1354,6 +1354,16 @@ renewConsent() {
 	}
 }
 
+updateInstallationForV354() {
+	installOptions := readConfiguration(kUserConfigDirectory . "Simulator Controller.install")
+	
+	if (getConfigurationValue(installOptions, "Shortcuts", "StartMenu", false)) {
+		installLocation := getConfigurationValue(installOptions, "Install", "Location")
+		
+		FileCreateShortCut %installLocation%\Binaries\Race Reports.exe, %A_StartMenu%\Simulator Controller\Race Reports.lnk, %installLocation%\Binaries
+	}
+}
+
 updateConfigurationForV314() {
 	if FileExist(kUserConfigDirectory . "Race Engineer.settings")
 		try {

@@ -157,7 +157,7 @@ After the data has been gathered, it is then transfered to the *Race Strategist*
 	Car.2.Driver.Nickname = JV
 	Car.2.Driver.Surname = Van Veen
 	Car.2.Lap = 1
-	Car.2.Time.Running = 0.9514
+	Car.2.Lap.Running = 0.9514
 	Car.2.Position = 14
 	Car.2.Time = 123535
 	Car.3.Car = Mazda MX-5 Cup

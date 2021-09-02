@@ -330,24 +330,15 @@ class RaceReports extends ConfigurationItem {
 			}
 			
 			carsCount := cars.Length()
-			
-			drawChartFunction := ""
-			
-			drawChartFunction .= "function drawChart() {`nvar data = new google.visualization.DataTable();`n"
-			drawChartFunction .= "`ndata.addColumn('number', '" . translate("#") . "');"
-			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Car") . "');"
-			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Driver (Start)") . "');"
-			drawChartFunction .= "`ndata.addColumn('number', '" . translate("Best Lap Time") . "');"
-			drawChartFunction .= "`ndata.addColumn('number', '" . translate("Avg Lap Time") . "');"
-			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Result") . "');"
 		
 			rows := []
+			hasDNF := false
 			
 			Loop % carsCount
 			{
 				car := A_Index
 				
-				result := (positions[lapsCount][car] = "null" ? "'DNF'" : "'" . positions[lapsCount][car] . "'")
+				result := (positions[lapsCount][car] = "null" ? "DNF" : positions[lapsCount][car])
 				bestLap := 1000000
 				lapTimes := []
 				
@@ -358,15 +349,37 @@ class RaceReports extends ConfigurationItem {
 					if (lapTime > 0)
 						lapTimes.Push(lapTime)
 					else
-						result := "'DNF'"
+						result := "DNF"
 				}
 				
 				min := Round(minimum(lapTimes) / 1000, 1)
 				avg := Round(average(lapTimes) / 1000, 1)
 				
-				rows.Push("[" . values2String(", ", cars[A_Index][1], "'" . cars[A_Index][2] . "'", "'" . drivers[1][A_Index] . "'"
-											, "{v: " . min . ", f: '" . format("{:.1f}", min) . "'}", "{v: " . avg . ", f: '" . format("{:.1f}", avg) . "'}", result) . "]")
+				hasDNF := (hasDNF || (result = "DNF"))
+				
+				rows.Push(Array(cars[A_Index][1], "'" . cars[A_Index][2] . "'", "'" . drivers[1][A_Index] . "'"
+							  , "{v: " . min . ", f: '" . format("{:.1f}", min) . "'}", "{v: " . avg . ", f: '" . format("{:.1f}", avg) . "'}", result))
 			}
+			
+			Loop % carsCount
+			{
+				row := rows[A_Index]
+				
+				if hasDNF
+					row[6] := ("'" . row[6] . "'")
+				
+				rows[A_Index] := ("[" . values2String(", ", row*) . "]")
+			}
+			
+			drawChartFunction := ""
+			
+			drawChartFunction .= "function drawChart() {`nvar data = new google.visualization.DataTable();`n"
+			drawChartFunction .= "`ndata.addColumn('number', '" . translate("#") . "');"
+			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Car") . "');"
+			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Driver (Start)") . "');"
+			drawChartFunction .= "`ndata.addColumn('number', '" . translate("Best Lap Time") . "');"
+			drawChartFunction .= "`ndata.addColumn('number', '" . translate("Avg Lap Time") . "');"
+			drawChartFunction .= "`ndata.addColumn('" . (hasDNF ? "string" : "number") . "', '" . translate("Result") . "');"
 			
 			drawChartFunction .= ("`ndata.addRows([" . values2String(", ", rows*) . "]);")
 			

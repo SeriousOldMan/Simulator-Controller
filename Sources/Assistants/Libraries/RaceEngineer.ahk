@@ -921,7 +921,7 @@ class RaceEngineer extends RaceAssistant {
 					
 					callback := ObjBindMethod(this, "forceFinishSession")
 					
-					SetTimer %callback%, -90000
+					SetTimer %callback%, -120000
 					
 					return
 				}

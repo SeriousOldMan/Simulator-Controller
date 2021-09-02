@@ -258,7 +258,7 @@ shutdownRaceEngineer(shutdown := false) {
 		ExitApp 0
 
 	if (RaceEngineer.Instance.Session == kSessionFinished) {
-		RaceEngineer.Instance.shutdownVoiceAssistant()
+		RaceEngineer.Instance.VoiceAssistant.shutdownVoiceAssistant()
 		
 		callback := Func("shutdownRaceEngineer").Bind(true)
 		

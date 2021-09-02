@@ -199,7 +199,7 @@ shutdownRaceStrategist(shutdown := false) {
 		ExitApp 0
 
 	if (RaceStrategist.Instance.Session == kSessionFinished) {
-		RaceStrategist.Instance.shutdownVoiceAssistant()
+		RaceStrategist.Instance.VoiceAssistant.shutdownVoiceAssistant()
 		
 		callback := Func("shutdownRaceStrategist").Bind(true)
 		

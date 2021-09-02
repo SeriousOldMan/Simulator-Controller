@@ -1027,23 +1027,19 @@ class RaceStrategist extends RaceAssistant {
 				
 				line := (newLine . values2String(";", times*))
 				
-				fileName := (directory . "\Times.CSV")
-				FileAppend %line%, %fileName%
+				FileAppend %line%, % directory . "\Times.CSV"
 				
 				line := (newLine . values2String(";", positions*))
 				
-				fileName := (directory . "\Positions.CSV")
-				FileAppend %line%, %fileName%
+				FileAppend %line%, % directory . "\Positions.CSV"
 				
 				line := (newLine . values2String(";", laps*))
 				
-				fileName := (directory . "\Laps.CSV")
-				FileAppend %line%, %fileName%
+				FileAppend %line%, % directory . "\Laps.CSV"
 				
 				line := (newLine . values2String(";", drivers*))
 				
-				fileName := (directory . "\Drivers.CSV")
-				FileAppend %line%, %fileName%
+				FileAppend %line%, % directory . "\Drivers.CSV"
 			}
 				
 			writeConfiguration(directory . "\Race.data", data)

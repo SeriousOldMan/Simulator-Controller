@@ -29,6 +29,7 @@ Release 3.2.2=Release 3.2.0 -> updatePluginsForV322, updateTranslations, updateP
 Release 3.3.0=Release 3.2.2 -> updateTranslations, updatePhraseGrammars
 Release 3.5.0=Release 3.3.0 -> updateTranslations, deletePluginLabels
 Release 3.5.2=Release 3.5.0 -> updateTranslations
+Release 3.5.4=Release 3.5.2 -> updateTranslations, updatePhraseGrammars, updateInstallationForV354
 [Cleanup]
 Binaries Folder=%kBinariesDirectory%
 Logs Folder=%kLogsDirectory%

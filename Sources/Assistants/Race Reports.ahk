@@ -255,6 +255,7 @@ class RaceReports extends ConfigurationItem {
 			infoText .= "</table>"
 			
 			infoText := "<html><meta charset='utf-8'><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='3' topmargin='3' rightmargin='3' bottommargin='3'><style> table, p { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><p>" . infoText . "</p></body></html>"
+			infoText := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='3' topmargin='3' rightmargin='3' bottommargin='3'><style> table, p { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><p>" . infoText . "</p></body></html>"
 			
 			infoViewer.Document.write(infoText)
 		}

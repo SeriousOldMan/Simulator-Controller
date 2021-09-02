@@ -17,6 +17,17 @@ General Release Actions
 13. Update #releases and #anouncements in Discord
 14. Set a Git Tag after final commit
 
+Release 3.5.6 Checklist
+=======================
+
+0. Search for new links (*)
+1. New report for the "Race Reports" tool
+   a. Documentation
+   b. New images
+2. Update procedure
+   a. Translations
+   b. Phrase Grammars
+
 Release 3.5.4 Checklist
 =======================
 

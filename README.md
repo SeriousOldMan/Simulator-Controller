@@ -26,7 +26,7 @@ Simply donwload and run [Simulator Controller.exe](https://cntr.click/Qt9gVs0) (
 
 #### Latest development build
 
-[3.5.4-beta](https://www.dropbox.com/s/atlljhu61ov1dmr/Simulator%20Controller%203.5.4-beta.zip?dl=1) (Test build for Release 3.5.4. New features: New Race Report Tool, New Options in Race Strategist Settings, Ask before deleting Setups and Settings in Setup Database tool. Stable, including documentation and update procedure.)
+[3.5.4-rc1](https://www.dropbox.com/s/yul6k7je8xqy5so/Simulator%20Controller%203.5.4-rc1.zip?dl=1) (Release candidate for Release 3.5.4. New features: New Race Report Tool, New Options in Race Strategist Settings, Ask before deleting Setups and Settings in Setup Database tool. Stable, including documentation and update procedure.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-354) of this version and all the versions you might have skipped, before installing and using this version.
 

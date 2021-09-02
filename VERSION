@@ -1,8 +1,8 @@
 [Development]
-Version=3.5.4-dev
+Version=3.5.4-beta
 Target=3.5.4-release
-Date=09/01/2021
-Download=
+Date=09/02/2021
+Download=https://www.dropbox.com/s/atlljhu61ov1dmr/Simulator%20Controller%203.5.4-beta.zip?dl=1
 Changes=New Race Report Tool, New Options in Race Strategist Settings, Ask before deleting Setups and Settings in Setup Database tool
 [Release]
 Version=3.5.2-release
@@ -13,4 +13,4 @@ Changes=Automated update download and installation, Full support for automated W
 Type=Development
 [Version]
 Release=3.5.2-release
-Development=3.5.4-dev
+Development=3.5.4-beta

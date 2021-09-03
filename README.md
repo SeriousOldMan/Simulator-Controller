@@ -26,24 +26,20 @@ Simply donwload and run [Simulator Controller.exe](https://cntr.click/Qt9gVs0) (
 
 #### Latest development build
 
-[3.5.4-dev](https://www.dropbox.com/s/hjbjyut50dbjixf/Simulator%20Controller%203.5.4-dev.zip?dl=1) (Early build for Release 3.5.4. New features: New Race Report Tool, New Options in Race Strategist Settings, Ask before deleting Setups and Settings in Setup Database tool. Stable, including documentation and update procedure.)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-354) of this version and all the versions you might have skipped, before installing and using this version.
+None for the moment...
 
 #### Latest release build
 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[3.5.2-release](https://cntr.click/4YCqPaJ) (New features: Automated update download and installation, Full support for automated Windows Setup & Installation, Autoextracting Software Installer, Already planned and prepared Pitstop settings can be changed with the Button Box (available for ACC and RF2).)
+[3.5.4-release](https://cntr.click/xDM88gK) (New features: New Race Report Tool, New Options in Race Strategist Settings, Ask before deleting Setups and Settings in Setup Database tool.)
 
-Attention: This version uses an all new installation process. Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-352) of this version and all the versions you might have skipped, before installing and using this version.
+Attention: This version uses an all new installation process. Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-354) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[3.5.1-release](https://cntr.click/S4Gn8at) (New features: All new Setup Wizard, Button Boxes can be invisible, Rework of Plugin Labels, Play a short tone when Push2Talk is activated, New "launchApplications" parameter for the "System" plugin, Templates Cleanup, A lot of file location changes. Including documentation and update procedure. **Version 3.5.1 is a maintenance release for Version 3.5.0**)
-
-Please note, that this version does not support the automated installation process.
+[3.5.2-release](https://cntr.click/4YCqPaJ) (New features: Automated update download and installation, Full support for automated Windows Setup & Installation, Autoextracting Software Installer, Already planned and prepared Pitstop settings can be changed with the Button Box (available for ACC and RF2).)
 
 ### Discord Community
 

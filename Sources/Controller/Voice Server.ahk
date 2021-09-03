@@ -713,7 +713,7 @@ class VoiceServer extends ConfigurationItem {
 				if !ErrorLevel {
 					this.unregisterVoiceClient(descriptor, pid)
 					
-					this.unregisterStaleClients()
+					this.unregisterStaleVoiceClients()
 					
 					break
 				}

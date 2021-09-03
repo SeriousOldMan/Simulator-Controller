@@ -577,9 +577,16 @@ class RaceStrategist extends RaceAssistant {
 		facts := this.createSession(data)
 		simulatorName := this.Simulator
 		
+		Process Exist, Race Engineer.exe
+			
+		if ErrorLevel
+			saveSettings := kNever
+		else
+			saveSettings := getConfigurationValue(this.Configuration, "Race Assistant Shutdown", simulatorName . ".SaveSettings", getConfigurationValue(configuration, "Race Engineer Shutdown", simulatorName . ".SaveSettings", kNever))
+		
 		this.updateConfigurationValues({SessionReportsDatabase: getConfigurationValue(this.Configuration, "Race Strategist Reports", "Database", false)
 									  , SaveRaceReport: getConfigurationValue(this.Configuration, "Race Strategist Shutdown", simulatorName . ".SaveRaceReport", false)
-									  , SaveSettings: getConfigurationValue(this.Configuration, "Race Assistant Shutdown", simulatorName . ".SaveSettings", getConfigurationValue(configuration, "Race Engineer Shutdown", simulatorName . ".SaveSettings", kNever))})
+									  , SaveSettings: saveSettings})
 		
 		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(facts)
 							    , BestLapTime: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
@@ -626,7 +633,7 @@ class RaceStrategist extends RaceAssistant {
 					
 					callback := ObjBindMethod(this, "forceFinishSession")
 					
-					SetTimer %callback%, -60000
+					SetTimer %callback%, -120000
 					
 					return
 				}

@@ -1,4 +1,4 @@
-## 3.5.4-release 09/03/21 (planned)
+## 3.5.4-release 09/03/21
 
   1. Bugfixes, as always
   2. Documentation updates, as always

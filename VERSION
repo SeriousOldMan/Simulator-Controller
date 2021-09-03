@@ -1,16 +1,16 @@
 [Development]
 Version=3.5.6-dev
 Target=3.5.6-release
-Date=09/01/2021
+Date=09/03/2021
 Download=
 Changes=New Reports in Race Reports tool
 [Release]
-Version=3.5.2-release
-Date=08/27/2021
-Download=https://cntr.click/4YCqPaJ
-Changes=Automated update download and installation, Full support for automated Windows Setup & Installation, Autoextracting Software Installer, Already planned and prepared Pitstop settings can be changed with the Button Box (available for ACC and RF2)
+Version=3.5.4-release
+Date=09/03/2021
+Download=https://cntr.click/xDM88gK
+Changes=New Race Report Tool, New Options in Race Strategist Settings, Ask before deleting Setups and Settings in Setup Database tool
 [Current]
-Type=Development
+Type=Release
 [Version]
-Release=3.5.2-release
+Release=3.5.4-release
 Development=3.5.6-dev

@@ -424,8 +424,8 @@ class RaceReports extends ConfigurationItem {
 									, "'" . translate(getConfigurationValue(raceData, "Laps", "Lap." . A_Index . ".Map", "n/a")) . "'"
 									, "'" . translate(getConfigurationValue(raceData, "Laps", "Lap." . A_Index . ".TC", "n/a")) . "'"
 									, "'" . translate(getConfigurationValue(raceData, "Laps", "Lap." . A_Index . ".ABS", "n/a")) . "'"
-									, "'" . translate(getConfigurationValue(raceData, "Laps", "Lap." . A_Index . ".FuelConsumption", "n/a")) . "'"
-									, "'" . Round(getConfigurationValue(raceData, "Laps", "Lap." . A_Index . ".Time", "-") / 1000, 1) . "'"
+									, "'" . translate(getConfigurationValue(raceData, "Laps", "Lap." . A_Index . ".Consumption", "n/a")) . "'"
+									, "'" . Round(getConfigurationValue(raceData, "Laps", "Lap." . A_Index . ".LapTime", "-") / 1000, 1) . "'"
 									, "'" . (getConfigurationValue(raceData, "Laps", "Lap." . A_Index . ".Pitstop", false) ? translate("x") : "") . "'")
 											
 				rows.Push("[" . row	. "]")

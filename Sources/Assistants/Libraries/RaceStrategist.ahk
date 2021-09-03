@@ -1021,7 +1021,7 @@ class RaceStrategist extends RaceAssistant {
 					pitstop := false
 					
 				setConfigurationValue(data, "Laps", "Lap." . A_Index . ".Weather", knowledgeBase.getValue("Standings.Lap." . A_Index . ".Weather"))
-				setConfigurationValue(data, "Laps", "Lap." . A_Index . ".Time", knowledgeBase.getValue("Standings.Lap." . A_Index . ".Car." . driver . ".Time"))
+				setConfigurationValue(data, "Laps", "Lap." . A_Index . ".LapTime", knowledgeBase.getValue("Standings.Lap." . A_Index . ".Car." . driver . ".Time"))
 				setConfigurationValue(data, "Laps", "Lap." . A_Index . ".Compound", knowledgeBase.getValue("Lap." . A_Index . ".Compound", "Dry"))
 				setConfigurationValue(data, "Laps", "Lap." . A_Index . ".CompoundColor", knowledgeBase.getValue("Lap." . A_Index . ".Compound.Color", "Black"))
 				setConfigurationValue(data, "Laps", "Lap." . A_Index . ".Map", knowledgeBase.getValue("Lap." . A_Index . ".Map", "n/a"))

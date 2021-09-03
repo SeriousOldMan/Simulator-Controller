@@ -556,8 +556,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 	
 	performPitstop(lapNumber) {
-		if this.RaceEngineer
-			this.RaceEngineer.performPitstop(lapNumber)
+		if this.RaceAssistant
+			this.RaceAssistant.performPitstop(lapNumber)
 	}
 	
 	accept() {

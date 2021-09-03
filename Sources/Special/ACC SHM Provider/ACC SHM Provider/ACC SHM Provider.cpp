@@ -195,8 +195,8 @@ int main(int argc, char* argv[])
 		std::string tyreCompound(tc);
 
 		printNAData("MAP", gf->EngineMap);
-		printNAData("TC", pf->tc);
-		printNAData("ABS", pf->abs);
+		printNAData("TC", gf->TC);
+		printNAData("ABS", gf->ABS);
 
 		printData("BodyworkDamage", pf->carDamage);
 		printData("SuspensionDamage", pf->suspensionDamage);

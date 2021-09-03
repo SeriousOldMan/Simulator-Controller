@@ -698,6 +698,10 @@ class RaceStrategist extends RaceAssistant {
 		knowledgeBase.setFact("Driver.Surname", driverSurname)
 		knowledgeBase.setFact("Driver.Nickname", driverNickname)
 		
+		knowledgeBase.addFact("Lap." . lapNumber . ".Map", getConfigurationValue(data, "Car Data", "Map", "n/a"))
+		knowledgeBase.addFact("Lap." . lapNumber . ".TC", getConfigurationValue(data, "Car Data", "TC", "n/a"))
+		knowledgeBase.addFact("Lap." . lapNumber . ".ABS", getConfigurationValue(data, "Car Data", "ABS", "n/a"))
+		
 		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Compound", getConfigurationValue(data, "Car Data", "TyreCompound", "Dry"))
 		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Compound.Color", getConfigurationValue(data, "Car Data", "TyreCompoundColor", "Black"))
 		
@@ -991,10 +995,11 @@ class RaceStrategist extends RaceAssistant {
 			setConfigurationValue(data, "Session", "Duration", (Round((knowledgeBase.getValue("Session.Duration") / 60) / 5) * 300))
 			setConfigurationValue(data, "Session", "Format", knowledgeBase.getValue("Session.Format"))
 			
+			driver := knowledgeBase.getValue("Driver.Car")
 			carCount := knowledgeBase.getValue("Car.Count")
 			
 			setConfigurationValue(data, "Cars", "Count", carCount)
-			setConfigurationValue(data, "Cars", "Driver", knowledgeBase.getValue("Driver.Car"))
+			setConfigurationValue(data, "Cars", "Driver", driver)
 			
 			Loop %carCount% {
 				setConfigurationValue(data, "Cars", "Car." . A_Index . ".Nr", knowledgeBase.getValue("Car." . A_Index . ".Nr", A_Index))
@@ -1002,12 +1007,28 @@ class RaceStrategist extends RaceAssistant {
 			}
 			
 			lapCount := knowledgeBase.getValue("Lap")
+			pitstopNr := 1
 			
 			setConfigurationValue(data, "Laps", "Count", lapCount)
 			
 			Loop %lapCount% {
+				if (knowledgeBase.getValue("Pitstop." . pitstopNr . ".Lap", kUndefined) = A_Index) {
+					pitstopNr += 1
+					
+					pitstop := true
+				}
+				else
+					pitstop := false
+					
 				setConfigurationValue(data, "Laps", "Lap." . A_Index . ".Weather", knowledgeBase.getValue("Standings.Lap." . A_Index . ".Weather"))
-				setConfigurationValue(data, "Laps", "Lap." . A_Index . ".Time", knowledgeBase.getValue("Standings.Lap." . A_Index . ".Time"))
+				setConfigurationValue(data, "Laps", "Lap." . A_Index . ".Time", knowledgeBase.getValue("Standings.Lap." . A_Index . ".Car." . driver . ".Time"))
+				setConfigurationValue(data, "Laps", "Lap." . A_Index . ".Compound", knowledgeBase.getValue("Lap." . A_Index . ".Compound", "Dry"))
+				setConfigurationValue(data, "Laps", "Lap." . A_Index . ".CompoundColor", knowledgeBase.getValue("Lap." . A_Index . ".Compound.Color", "Black"))
+				setConfigurationValue(data, "Laps", "Lap." . A_Index . ".Map", knowledgeBase.getValue("Lap." . A_Index . ".Map", "n/a"))
+				setConfigurationValue(data, "Laps", "Lap." . A_Index . ".TC", knowledgeBase.getValue("Lap." . A_Index . ".TC", "n/a"))
+				setConfigurationValue(data, "Laps", "Lap." . A_Index . ".ABS", knowledgeBase.getValue("Lap." . A_Index . ".ABS", "n/a"))
+				setConfigurationValue(data, "Laps", "Lap." . A_Index . ".Consumption", knowledgeBase.getValue("Lap." . A_Index . ".Fuel.Consumption", "n/a"))
+				setConfigurationValue(data, "Laps", "Lap." . A_Index . ".Pitstop", pitstop)
 			
 				lapNr := A_Index
 				

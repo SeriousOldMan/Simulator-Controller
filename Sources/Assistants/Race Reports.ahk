@@ -42,7 +42,7 @@ ListLines Off					; Disable execution history
 ;;;                        Private Constants Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kReports = ["Overview", "Position", "Pace"]
+global kReports = ["Overview", "Details", "Position", "Pace"]
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -400,6 +400,69 @@ class RaceReports extends ConfigurationItem {
 		}
 	}
 	
+	showDetailsReport(dataFile) {
+		raceData := (dataFile ? readConfiguration(dataFile) : false)
+		
+		if raceData {
+			GuiControl Choose, reportsDropDown, % inList(kReports, "Details")
+		
+			this.iSelectedReport := "Details"
+			
+			cars := []
+			rows := []
+			
+			lapsCount := getConfigurationValue(raceData, "Laps", "Count")
+			
+			Loop % lapsCount
+			{
+				weather := (translate(getConfigurationValue(raceData, "Laps", "Lap." . A_Index . ".Compound", "Dry")) . translate(" (") . translate(getConfigurationValue(raceData, "Laps", "Lap." . A_Index . ".CompoundColor", "Black")) . translate(")"))
+				
+				row := values2String(", "
+									, A_Index
+									, "'" . translate(getConfigurationValue(raceData, "Laps", "Lap." . A_Index . ".Weather")) . "'"
+									, "'" . weather . "'"
+									, "'" . translate(getConfigurationValue(raceData, "Laps", "Lap." . A_Index . ".Map", "n/a")) . "'"
+									, "'" . translate(getConfigurationValue(raceData, "Laps", "Lap." . A_Index . ".TC", "n/a")) . "'"
+									, "'" . translate(getConfigurationValue(raceData, "Laps", "Lap." . A_Index . ".ABS", "n/a")) . "'"
+									, "'" . translate(getConfigurationValue(raceData, "Laps", "Lap." . A_Index . ".FuelConsumption", "n/a")) . "'"
+									, "'" . Round(getConfigurationValue(raceData, "Laps", "Lap." . A_Index . ".Time", "-") / 1000, 1) . "'"
+									, "'" . (getConfigurationValue(raceData, "Laps", "Lap." . A_Index . ".Pitstop", false) ? translate("x") : "") . "'")
+											
+				rows.Push("[" . row	. "]")
+			}
+			
+			drawChartFunction := ""
+			
+			drawChartFunction .= "function drawChart() {`nvar data = new google.visualization.DataTable();`n"
+			drawChartFunction .= "`ndata.addColumn('number', '" . translate("#") . "');"
+			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Weather") . "');"
+			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Tyres") . "');"
+			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Map") . "');"
+			drawChartFunction .= "`ndata.addColumn('string', '" . translate("TC") . "');"
+			drawChartFunction .= "`ndata.addColumn('string', '" . translate("ABS") . "');"
+			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Consumption") . "');"
+			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Laptime") . "');"
+			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Pitstop") . "');"
+			
+			drawChartFunction .= ("`ndata.addRows([" . values2String(", ", rows*) . "]);")
+			
+			drawChartFunction .= "`nvar cssClassNames = { headerCell: 'headerStyle', tableRow: 'rowStyle', oddTableRow: 'oddRowStyle' };"
+			drawChartFunction := drawChartFunction . "`nvar options = { cssClassNames: cssClassNames, width: '100%', height: '100%' };"
+			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.Table(document.getElementById('chart_id')); chart.draw(data, options); }"
+			
+			this.showReportChart(drawChartFunction)
+			this.showReportInfo(raceData)
+		}
+		else {
+			GuiControl Choose, reportsDropDown, 0
+		
+			this.iSelectedReport := false
+		
+			this.showReportChart(false)
+			this.showReportInfo(false)
+		}
+	}
+	
 	showPositionReport(dataFile, positionsFile := false) {
 		raceData := (dataFile ? readConfiguration(dataFile) : false)
 		
@@ -661,6 +724,8 @@ class RaceReports extends ConfigurationItem {
 						switch report {
 							case "Overview":
 								this.showOverviewReport(A_LoopFilePath . "\Race.data", A_LoopFilePath . "\Drivers.CSV", A_LoopFilePath . "\Positions.CSV", A_LoopFilePath . "\Laps.CSV", A_LoopFilePath . "\Times.CSV")
+							case "Details":
+								this.showDetailsReport(A_LoopFilePath . "\Race.data")
 							case "Position":
 								this.showPositionReport(A_LoopFilePath . "\Race.data", A_LoopFilePath . "\Positions.CSV")
 							case "Pace":

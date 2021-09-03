@@ -184,6 +184,10 @@ namespace RF2SHMProvider {
 
 			Console.WriteLine("[Car Data]");
 			if (connected) {
+				Console.WriteLine("MAP=n/a");
+				Console.Write("TC="); Console.WriteLine(extended.mPhysics.mTractionControl);
+				Console.Write("ABS="); Console.WriteLine(extended.mPhysics.mAntiLockBrakes);
+				
 				Console.Write("FuelRemaining="); Console.WriteLine(playerTelemetry.mFuel);
 				Console.Write("TyreTemperature=");
 				Console.WriteLine(GetCelcius(playerTelemetry.mWheels[0].mTireCarcassTemperature) + "," +

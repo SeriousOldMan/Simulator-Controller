@@ -210,6 +210,10 @@ int main(int argc, char* argv[]) {
 
 		printf("[Car Data]\n");
 
+		printf("MAP=n/a\n");
+		printf("TC=n/a\n");
+		printf("ABS=n/a\n");
+
 		printf("BodyworkDamage=%f, %f, %f, %f, %f\n", 0.0, 0.0, 0.0, 0.0, normalizeDamage(localCopy->mAeroDamage));
 		printf("SuspensionDamage=%f, %f, %f, %f\n", normalizeDamage(localCopy->mSuspensionDamage[TYRE_FRONT_LEFT]),
 			normalizeDamage(localCopy->mSuspensionDamage[TYRE_FRONT_RIGHT]),

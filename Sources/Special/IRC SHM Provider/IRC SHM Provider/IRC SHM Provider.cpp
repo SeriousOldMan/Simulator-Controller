@@ -723,6 +723,10 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 
 			printf("[Car Data]\n");
 
+			printf("MAP=n/a\n");
+			printf("TC=n/a\n");
+			printf("ABS=n/a\n");
+
 			printf("BodyworkDamage=0,0,0,0,0\n");
 			printf("SuspensionDamage=0,0,0,0\n");
 

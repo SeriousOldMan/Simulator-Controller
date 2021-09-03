@@ -121,6 +121,13 @@ void substring(char s[], char sub[], int p, int l) {
    sub[c] = '\0';
 }
 
+void printNAValue(long value) {
+	if (value == -1)
+		wprintf_s(L"n/a\n");
+	else
+		wprintf_s(L"%d\n", value);
+}
+
 int main(int argc, char* argv[])
 {
     int err_code = 0;
@@ -213,7 +220,12 @@ int main(int argc, char* argv[])
 
 		wprintf_s(L"[Car Data]\n");
 		if (mapped_r3e) {
+
 			double suspDamage = normalizeDamage(map_buffer->car_damage.suspension);
+
+			wprintf_s(L"MAP="); printNAValue(map_buffer->engine_map_setting);
+			wprintf_s(L"TC="); printNAValue(map_buffer->aid_settings.tc);
+			wprintf_s(L"ABS="); printNAValue(map_buffer->aid_settings.abs);
 
 			wprintf_s(L"BodyworkDamage=%f, %f, %f, %f, %f\n", 0.0, 0.0, 0.0, 0.0, normalizeDamage(map_buffer->car_damage.aerodynamics));
 			wprintf_s(L"SuspensionDamage=%f, %f, %f, %f\n", suspDamage, suspDamage, suspDamage, suspDamage);

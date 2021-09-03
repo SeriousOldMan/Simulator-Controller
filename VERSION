@@ -10,7 +10,7 @@ Date=09/03/2021
 Download=https://cntr.click/xDM88gK
 Changes=New Race Report Tool, New Options in Race Strategist Settings, Ask before deleting Setups and Settings in Setup Database tool
 [Current]
-Type=Release
+Type=Development
 [Version]
 Release=3.5.4-release
 Development=3.5.6-dev

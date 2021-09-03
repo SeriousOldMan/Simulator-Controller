@@ -1007,28 +1007,23 @@ class RaceStrategist extends RaceAssistant {
 			}
 			
 			lapCount := knowledgeBase.getValue("Lap")
-			pitstopNr := 1
+			pitstops := []
+			
+			Loop % knowledgeBase.getValue("Pitstop.Last", 0)
+				pitstops.Push(knowledgeBase.getValue("Pitstop." . A_Index . ".Lap"))
 			
 			setConfigurationValue(data, "Laps", "Count", lapCount)
 			
 			Loop %lapCount% {
-				if (knowledgeBase.getValue("Pitstop." . pitstopNr . ".Lap", kUndefined) = A_Index) {
-					pitstopNr += 1
-					
-					pitstop := true
-				}
-				else
-					pitstop := false
-					
 				setConfigurationValue(data, "Laps", "Lap." . A_Index . ".Weather", knowledgeBase.getValue("Standings.Lap." . A_Index . ".Weather"))
-				setConfigurationValue(data, "Laps", "Lap." . A_Index . ".LapTime", knowledgeBase.getValue("Standings.Lap." . A_Index . ".Car." . driver . ".Time"))
-				setConfigurationValue(data, "Laps", "Lap." . A_Index . ".Compound", knowledgeBase.getValue("Lap." . A_Index . ".Compound", "Dry"))
-				setConfigurationValue(data, "Laps", "Lap." . A_Index . ".CompoundColor", knowledgeBase.getValue("Lap." . A_Index . ".Compound.Color", "Black"))
+				setConfigurationValue(data, "Laps", "Lap." . A_Index . ".LapTime", knowledgeBase.getValue("Lap." . A_Index . ".Time"))
+				setConfigurationValue(data, "Laps", "Lap." . A_Index . ".Compound", knowledgeBase.getValue("Lap." . A_Index . ".Tyre.Compound", "Dry"))
+				setConfigurationValue(data, "Laps", "Lap." . A_Index . ".CompoundColor", knowledgeBase.getValue("Lap." . A_Index . ".Tyre.Compound.Color", "Black"))
 				setConfigurationValue(data, "Laps", "Lap." . A_Index . ".Map", knowledgeBase.getValue("Lap." . A_Index . ".Map", "n/a"))
 				setConfigurationValue(data, "Laps", "Lap." . A_Index . ".TC", knowledgeBase.getValue("Lap." . A_Index . ".TC", "n/a"))
 				setConfigurationValue(data, "Laps", "Lap." . A_Index . ".ABS", knowledgeBase.getValue("Lap." . A_Index . ".ABS", "n/a"))
 				setConfigurationValue(data, "Laps", "Lap." . A_Index . ".Consumption", knowledgeBase.getValue("Lap." . A_Index . ".Fuel.Consumption", "n/a"))
-				setConfigurationValue(data, "Laps", "Lap." . A_Index . ".Pitstop", pitstop)
+				setConfigurationValue(data, "Laps", "Lap." . A_Index . ".Pitstop", inList(pitstops, A_Index))
 			
 				lapNr := A_Index
 				

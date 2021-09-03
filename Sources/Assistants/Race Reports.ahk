@@ -197,9 +197,9 @@ class RaceReports extends ConfigurationItem {
 			    <meta charset='utf-8'>
 				<head>
 					<style>
-						.headerStyle { height: 25; font-size: 12px; font-weight: 500; background-color: 'FFFFFF'; }
-						.rowStyle { background-color: 'E0E0E0'; }
-						.oddRowStyle { background-color: 'E8E8E8'; }
+						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: 'FFFFFF'; }
+						.rowStyle { font-size: 11px; background-color: 'E0E0E0'; }
+						.oddRowStyle { font-size: 11px; background-color: 'E8E8E8'; }
 					</style>
 					<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 					<script type="text/javascript">
@@ -384,7 +384,7 @@ class RaceReports extends ConfigurationItem {
 			drawChartFunction .= ("`ndata.addRows([" . values2String(", ", rows*) . "]);")
 			
 			drawChartFunction .= "`nvar cssClassNames = { headerCell: 'headerStyle', tableRow: 'rowStyle', oddTableRow: 'oddRowStyle' };"
-			drawChartFunction := drawChartFunction . "`nvar options = { cssClassNames: cssClassNames, width: '100%', height: '100%' };"
+			drawChartFunction := drawChartFunction . "`nvar options = { cssClassNames: cssClassNames, width: '100%' };"
 			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.Table(document.getElementById('chart_id')); chart.draw(data, options); }"
 			
 			this.showReportChart(drawChartFunction)
@@ -416,15 +416,19 @@ class RaceReports extends ConfigurationItem {
 			Loop % lapsCount
 			{
 				weather := (translate(getConfigurationValue(raceData, "Laps", "Lap." . A_Index . ".Compound", "Dry")) . translate(" (") . translate(getConfigurationValue(raceData, "Laps", "Lap." . A_Index . ".CompoundColor", "Black")) . translate(")"))
+				consumption := getConfigurationValue(raceData, "Laps", "Lap." . A_Index . ".Consumption", translate("n/a"))
+				
+				if (consumption == 0)
+					consumption := translate("n/a")
 				
 				row := values2String(", "
 									, A_Index
 									, "'" . translate(getConfigurationValue(raceData, "Laps", "Lap." . A_Index . ".Weather")) . "'"
 									, "'" . weather . "'"
-									, "'" . translate(getConfigurationValue(raceData, "Laps", "Lap." . A_Index . ".Map", "n/a")) . "'"
-									, "'" . translate(getConfigurationValue(raceData, "Laps", "Lap." . A_Index . ".TC", "n/a")) . "'"
-									, "'" . translate(getConfigurationValue(raceData, "Laps", "Lap." . A_Index . ".ABS", "n/a")) . "'"
-									, "'" . translate(getConfigurationValue(raceData, "Laps", "Lap." . A_Index . ".Consumption", "n/a")) . "'"
+									, "'" . getConfigurationValue(raceData, "Laps", "Lap." . A_Index . ".Map", translate("n/a")) . "'"
+									, "'" . getConfigurationValue(raceData, "Laps", "Lap." . A_Index . ".TC", translate("n/a")) . "'"
+									, "'" . getConfigurationValue(raceData, "Laps", "Lap." . A_Index . ".ABS", translate("n/a")) . "'"
+									, "'" . consumption . "'"
 									, "'" . Round(getConfigurationValue(raceData, "Laps", "Lap." . A_Index . ".LapTime", "-") / 1000, 1) . "'"
 									, "'" . (getConfigurationValue(raceData, "Laps", "Lap." . A_Index . ".Pitstop", false) ? translate("x") : "") . "'")
 											
@@ -447,7 +451,7 @@ class RaceReports extends ConfigurationItem {
 			drawChartFunction .= ("`ndata.addRows([" . values2String(", ", rows*) . "]);")
 			
 			drawChartFunction .= "`nvar cssClassNames = { headerCell: 'headerStyle', tableRow: 'rowStyle', oddTableRow: 'oddRowStyle' };"
-			drawChartFunction := drawChartFunction . "`nvar options = { cssClassNames: cssClassNames, width: '100%', height: '100%' };"
+			drawChartFunction := drawChartFunction . "`nvar options = { cssClassNames: cssClassNames, width: '100%' };"
 			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.Table(document.getElementById('chart_id')); chart.draw(data, options); }"
 			
 			this.showReportChart(drawChartFunction)

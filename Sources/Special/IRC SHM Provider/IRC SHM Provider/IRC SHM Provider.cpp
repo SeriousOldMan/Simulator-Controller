@@ -264,6 +264,15 @@ float getDataFloat(const irsdk_header* header, const char* data, const char* var
 		return 0;
 }
 
+void printDataNAFloat(const irsdk_header* header, const char* data, const char* variable) {
+	char result[32];
+
+	if (getDataValue(result, header, data, variable))
+		printf("%s\n", result);
+	else
+		printf("n/a\n", result);
+}
+
 void setPitstopRefuelAmount(float fuelAmount) {
 	if (fuelAmount == 0)
 		irsdk_broadcastMsg(irsdk_BroadcastPitCommand, irsdk_PitCommand_ClearFuel, 0);
@@ -723,9 +732,9 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 
 			printf("[Car Data]\n");
 
-			printf("MAP=n/a\n");
-			printf("TC=n/a\n");
-			printf("ABS=n/a\n");
+			printf("MAP="); printDataNAFloat(header, data, "dcEnginePower");
+			printf("TC="); printDataNAFloat(header, data, "dcTractionControl");
+			printf("ABS="); printDataNAFloat(header, data, "dcABS");
 
 			printf("BodyworkDamage=0,0,0,0,0\n");
 			printf("SuspensionDamage=0,0,0,0\n");

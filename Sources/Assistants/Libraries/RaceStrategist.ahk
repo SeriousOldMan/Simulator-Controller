@@ -521,6 +521,7 @@ class RaceStrategist extends RaceAssistant {
 				, "Session.Settings.Pitstop.Delta": getConfigurationValue(settings, "Strategy Settings", "Pitstop.Delta", getConfigurationValue(settings, "Session Settings", "Pitstop.Delta", 30))
 				, "Session.Settings.Fuel.SafetyMargin": getConfigurationValue(settings, "Session Settings", "Fuel.SafetyMargin", 5)
 				, "Session.Settings.Lap.AvgTime": getConfigurationValue(settings, "Session Settings", "Lap.AvgTime", 0)
+				, "Session.Settings.Lap.Learning.Laps": getConfigurationValue(configuration, "Race Strategist Analysis", simulatorName . ".LearningLaps", 1)
 				, "Session.Settings.Lap.History.Considered": getConfigurationValue(configuration, "Race Strategist Analysis", simulatorName . ".ConsideredHistoryLaps", 5)
 				, "Session.Settings.Lap.History.Damping": getConfigurationValue(configuration, "Race Strategist Analysis", simulatorName . ".HistoryLapsDamping", 0.2)
 				, "Session.Settings.Standings.Extrapolation.Laps": getConfigurationValue(settings, "Strategy Settings", "Extrapolation.Laps", 2)
@@ -543,6 +544,7 @@ class RaceStrategist extends RaceAssistant {
 			
 			this.updateConfigurationValues({Settings: settings})
 			
+			configuration := this.Configuration
 			simulatorName := this.Simulator
 		
 			facts := {"Session.Settings.Lap.Formation": getConfigurationValue(settings, "Session Settings", "Lap.Formation", true)
@@ -551,8 +553,9 @@ class RaceStrategist extends RaceAssistant {
 					, "Session.Settings.Pitstop.Delta": getConfigurationValue(settings, "Strategy Settings", "Pitstop.Delta", getConfigurationValue(settings, "Session Settings", "Pitstop.Delta", 30))
 					, "Session.Settings.Lap.AvgTime": getConfigurationValue(settings, "Session Settings", "Lap.AvgTime", 0)
 					, "Session.Settings.Fuel.SafetyMargin": getConfigurationValue(settings, "Session Settings", "Fuel.SafetyMargin", 5)
-					, "Session.Settings.Lap.History.Considered": getConfigurationValue(this.Configuration, "Race Strategist Analysis", simulatorName . ".ConsideredHistoryLaps", 5)
-					, "Session.Settings.Lap.History.Damping": getConfigurationValue(this.Configuration, "Race Strategist Analysis", simulatorName . ".HistoryLapsDamping", 0.2)
+					, "Session.Settings.Lap.Learning.Laps": getConfigurationValue(configuration, "Race Strategist Analysis", simulatorName . ".LearningLaps", 1)
+					, "Session.Settings.Lap.History.Considered": getConfigurationValue(configuration, "Race Strategist Analysis", simulatorName . ".ConsideredHistoryLaps", 5)
+					, "Session.Settings.Lap.History.Damping": getConfigurationValue(configuration, "Race Strategist Analysis", simulatorName . ".HistoryLapsDamping", 0.2)
 					, "Session.Settings.Standings.Extrapolation.Laps": getConfigurationValue(settings, "Strategy Settings", "Extrapolation.Laps", 2)
 					, "Session.Settings.Standings.Extrapolation.Overtake.Delta": Round(getConfigurationValue(settings, "Strategy Settings", "Overtake.Delta", 1) * 1000)
 					, "Session.Settings.Strategy.Traffic.Considered": getConfigurationValue(settings, "Strategy Settings", "Traffic.Considered", 5) / 100
@@ -584,7 +587,8 @@ class RaceStrategist extends RaceAssistant {
 		else
 			saveSettings := getConfigurationValue(this.Configuration, "Race Assistant Shutdown", simulatorName . ".SaveSettings", getConfigurationValue(configuration, "Race Engineer Shutdown", simulatorName . ".SaveSettings", kNever))
 		
-		this.updateConfigurationValues({SessionReportsDatabase: getConfigurationValue(this.Configuration, "Race Strategist Reports", "Database", false)
+		this.updateConfigurationValues({LearningLaps: getConfigurationValue(configuration, "Race Strategist Analysis", simulatorName . ".LearningLaps", 1)
+									  , SessionReportsDatabase: getConfigurationValue(this.Configuration, "Race Strategist Reports", "Database", false)
 									  , SaveRaceReport: getConfigurationValue(this.Configuration, "Race Strategist Shutdown", simulatorName . ".SaveRaceReport", false)
 									  , SaveSettings: saveSettings})
 		
@@ -604,13 +608,15 @@ class RaceStrategist extends RaceAssistant {
 	}
 	
 	finishSession() {
-		if this.KnowledgeBase {
+		local knowledgeBase := this.KnowledgeBase
+		
+		if knowledgeBase {
 			Process Exist, Race Engineer.exe
 			
 			if (!ErrorLevel && this.Speaker)
 				this.getSpeaker().speakPhrase("Bye")
 			
-			if (this.EnoughData && (this.Session == kSessionRace)) {
+			if ((knowledgeBase.getValue("Lap", 0) > this.LearningLaps) && (this.Session == kSessionRace)) {
 				this.shutdownSession("Before")
 				
 				if this.Listener {
@@ -1010,7 +1016,7 @@ class RaceStrategist extends RaceAssistant {
 			pitstops := []
 			
 			Loop % knowledgeBase.getValue("Pitstop.Last", 0)
-				pitstops.Push(knowledgeBase.getValue("Pitstop." . A_Index . ".Lap"))
+				pitstops.Push(knowledgeBase.getValue("Pitstop." . A_Index . ".Lap") + 1)
 			
 			setConfigurationValue(data, "Laps", "Count", lapCount)
 			

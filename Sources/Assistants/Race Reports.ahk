@@ -42,7 +42,7 @@ ListLines Off					; Disable execution history
 ;;;                        Private Constants Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kReports = ["Overview", "Details", "Position", "Pace"]
+global kReports = ["Overview", "Car", "Driver", "Position", "Pace"]
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -266,12 +266,181 @@ class RaceReports extends ConfigurationItem {
 		}
 		
 		infoViewer.Document.close()
+	}	
+	
+	getDriverPositions(raceData, positions, car) {
+		result := []
+		
+		Loop % getConfigurationValue(raceData, "Laps", "Count")
+			result.Push(positions[A_Index][car])
+		
+		return result
 	}
 	
-	showOverviewReport(dataFile, driversFile := false, positionsFile := false, lapsFile := false, timesFile := false) {
-		raceData := (dataFile ? readConfiguration(dataFile) : false)
+	getDriverPace(raceData, times, car, ByRef min, ByRef max, ByRef avg, ByRef stdDev) {
+		lapsCount := getConfigurationValue(raceData, "Laps", "Count")
 		
-		if raceData {
+		validTimes := []
+		
+		Loop % lapsCount
+		{
+			time := times[A_Index][car]
+			
+			if ((time > 0) && !getConfigurationValue(raceData, "Laps", "Lap." . A_Index . ".Pitstop", false))
+				validTimes.Push(time)
+		}
+		
+		stdDev := stdDeviation(validTimes)
+		avg := average(validTimes)
+		
+		invalidTimes := []
+		
+		for ignore, time in validTimes
+			if (Abs(time - avg) > (stdDev / 2))
+				invalidTimes.Push(time)
+		
+		for ignore, time in invalidTimes
+			validTimes.RemoveAt(inList(validTimes, time))
+		
+		if (validTimes.Length() > 1) {
+			min := Round(minimum(validTimes) / 1000, 1)
+			max := Round(maximum(validTimes) / 1000, 1)
+			avg := (average(validTimes) / 1000)
+			stdDev := (stdDeviation(validTimes) / 1000)
+			
+			return true
+		}
+		else
+			return false
+	}
+	
+	getDriverPotential(raceData, positions, car) {
+		cars := getConfigurationValue(raceData, "Cars", "Count")
+		positions := this.getDriverPositions(raceData, positions, car)
+		
+		return Max(0, cars - positions[1]) + Max(0, cars - positions[positions.Length()])
+	}
+	
+	getDriverRaceCraft(raceData, positions, car) {
+		cars := getConfigurationValue(raceData, "Cars", "Count")
+		result := 0
+		
+		positions := this.getDriverPositions(raceData, positions, car)
+		
+		lastPosition := false
+		
+		Loop % positions.Length()
+		{
+			position := positions[A_Index]
+		
+			result += ((Max(0, 11 - position) / 10) / 2)
+			
+			if lastPosition
+				result += ((lastPosition - position) / cars)
+			
+			lastPosition := position
+			
+			result := Max(0, result)
+		}
+		
+		return result
+	}
+	
+	getDriverSpeed(raceData, times, car) {
+		min := false
+		max := false
+		avg := false
+		stdDev := false
+		
+		if this.getDriverPace(raceData, times, car, min, max, avg, stdDev)
+			return min
+		else
+			return false
+	}
+	
+	getDriverConsistency(raceData, times, car) {
+		min := false
+		max := false
+		avg := false
+		stdDev := false
+		
+		if this.getDriverPace(raceData, times, car, min, max, avg, stdDev)
+			return ((stdDev == 0) ? 1 : (1 / stdDev))
+		else
+			return false
+	}
+	
+	getDriverSafety(raceData, times, car) {
+		min := false
+		max := false
+		avg := false
+		stdDev := false
+		
+		if this.getDriverPace(raceData, times, car, min, max, avg, stdDev) {
+			safety := 1
+		
+			Loop % getConfigurationValue(raceData, "Laps", "Count")
+			{
+				time := times[A_Index][car]
+			
+				if ((time > 0) && !getConfigurationValue(raceData, "Laps", "Lap." . A_Index . ".Pitstop", false))
+					if (Abs((time / 1000) - avg) > stdDev)
+						safety *= 0.9
+			}
+			
+			return safety
+		}
+		else
+			return false
+	}
+	
+	normalizeValues(values, target) {
+		factor := (target / maximum(values))
+		
+		for index, value in values
+			values[index] *= factor
+		
+		return values
+	}
+	
+	normalizeSpeedValues(values, target) {
+		halfTarget := (target / 2)
+		min := minimum(values)
+		
+		for index, value in values
+			values[index] := halfTarget + (value - min)
+		
+		factor := (target / maximum(values))
+		
+		for index, value in values
+			values[index] *= factor
+		
+		return values
+	}
+	
+	getDrivers(raceData, drivers) {
+		result := []
+		
+		Loop % getConfigurationValue(raceData, "Cars", "Count")
+			result.Push(drivers[1][A_Index])
+		
+		return result
+	}
+	
+	getDriverStats(raceData, cars, positions, times, ByRef potentials, ByRef raceCrafts, ByRef speeds, ByRef consistencies, ByRef safeties) {
+		consistencies := this.normalizeValues(map(cars, ObjBindMethod(this, "getDriverConsistency", raceData, times)), 5)
+		safeties := this.normalizeValues(map(cars, ObjBindMethod(this, "getDriverSafety", raceData, times)), 5)
+		speeds := this.normalizeSpeedValues(map(cars, ObjBindMethod(this, "getDriverSpeed", raceData, times)), 5)
+		raceCrafts := this.normalizeValues(map(cars, ObjBindMethod(this, "getDriverRaceCraft", raceData, positions)), 5)
+		potentials := this.normalizeValues(map(cars, ObjBindMethod(this, "getDriverPotential", raceData, positions)), 5)
+		
+		return true
+	}
+	
+	showOverviewReport(reportDirectory) {
+		if reportDirectory {
+			raceData := readConfiguration(reportDirectory . "\Race.data")
+			
 			GuiControl Choose, reportsDropDown, % inList(kReports, "Overview")
 		
 			this.iSelectedReport := "Overview"
@@ -287,16 +456,13 @@ class RaceReports extends ConfigurationItem {
 			FileEncoding UTF-8
 			
 			try {
-				Loop Read, %driversFile% 
+				Loop Read, % reportDirectory . "\Drivers.CSV"
 					drivers.Push(string2Values(";", A_LoopReadLine))
 				
-				Loop Read, %positionsFile% 
+				Loop Read, % reportDirectory . "\Positions.CSV"
 					positions.Push(string2Values(";", A_LoopReadLine))
 				
-				Loop Read, %lapsFile% 
-					laps.Push(string2Values(";", A_LoopReadLine))
-				
-				Loop Read, %timesFile% 
+				Loop Read, % reportDirectory . "\Times.CSV"
 					times.Push(string2Values(";", A_LoopReadLine))
 			}
 			finally {
@@ -324,7 +490,6 @@ class RaceReports extends ConfigurationItem {
 					{
 						drivers[A_Index].RemoveAt(car)
 						positions[A_Index].RemoveAt(car)
-						laps[A_Index].RemoveAt(car)
 						times[A_Index].RemoveAt(car)
 					}
 			}
@@ -400,13 +565,13 @@ class RaceReports extends ConfigurationItem {
 		}
 	}
 	
-	showDetailsReport(dataFile) {
-		raceData := (dataFile ? readConfiguration(dataFile) : false)
+	showCarReport(reportDirectory) {
+		if reportDirectory {
+			raceData := readConfiguration(reportDirectory . "\Race.data")
+			
+			GuiControl Choose, reportsDropDown, % inList(kReports, "Car")
 		
-		if raceData {
-			GuiControl Choose, reportsDropDown, % inList(kReports, "Details")
-		
-			this.iSelectedReport := "Details"
+			this.iSelectedReport := "Car"
 			
 			cars := []
 			rows := []
@@ -467,10 +632,89 @@ class RaceReports extends ConfigurationItem {
 		}
 	}
 	
-	showPositionReport(dataFile, positionsFile := false) {
-		raceData := (dataFile ? readConfiguration(dataFile) : false)
+	showDriverReport(reportDirectory) {
+		if reportDirectory {
+			raceData := readConfiguration(reportDirectory . "\Race.data")
+			
+			drivers := []
+			positions := []
+			times := []
+			
+			oldEncoding := A_FileEncoding
+			
+			FileEncoding UTF-8
+			
+			try {
+				Loop Read, % reportDirectory . "\Drivers.CSV"
+					drivers.Push(string2Values(";", A_LoopReadLine))
+				
+				Loop Read, % reportDirectory . "\Positions.CSV"
+					positions.Push(string2Values(";", A_LoopReadLine))
+				
+				Loop Read, % reportDirectory . "\Times.CSV"
+					times.Push(string2Values(";", A_LoopReadLine))
+			}
+			finally {
+				FileEncoding %oldEncoding%
+			}
+			
+			allDrivers := this.getDrivers(raceData, drivers)
+			drivers := allDrivers.Clone()
+			
+			drivers.RemoveAt(5, 10)
+			drivers.RemoveAt(15, 15)
+			
+			cars := []
+			
+			for ignore, driver in drivers {
+				car := inList(allDrivers, driver)
+			
+				if car
+					cars.Push(car)
+			}
 		
-		if raceData {
+			potentials := false
+			raceCrafts := false
+			speeds := false
+			consistencies := false
+			safeties := false
+			
+			this.getDriverStats(raceData, cars, positions, times, potentials, raceCrafts, speeds, consistencies, safeties)
+			
+			drawChartFunction := ""
+			
+			drawChartFunction .= "function drawChart() {"
+			drawChartFunction .= "`nvar data = google.visualization.arrayToDataTable(["
+			drawChartFunction .= "`n['" . values2String("', '", translate("Category"), drivers*) . "'],"
+			
+			drawChartFunction .= "`n[" . values2String(", ", "'" . translate("Potential") . "'", potentials*) . "],"
+			drawChartFunction .= "`n[" . values2String(", ", "'" . translate("Race Craft") . "'", raceCrafts*) . "],"
+			drawChartFunction .= "`n[" . values2String(", ", "'" . translate("Speed") . "'", speeds*) . "],"
+			drawChartFunction .= "`n[" . values2String(", ", "'" . translate("Consistency") . "'", consistencies*) . "],"
+			drawChartFunction .= "`n[" . values2String(", ", "'" . translate("Safety") . "'", safeties*) . "]"
+			
+			drawChartFunction .= ("`n]);")
+			
+			drawChartFunction := drawChartFunction . "`nvar options = { bars: 'horizontal', backgroundColor: 'D0D0D0', chartArea: { left: '15%', top: '2%', right: '30%', bottom: '10%' } };"
+			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.BarChart(document.getElementById('chart_id')); chart.draw(data, options); }"
+			
+			this.showReportChart(drawChartFunction)
+			this.showReportInfo(raceData)
+		}
+		else {
+			GuiControl Choose, reportsDropDown, 0
+		
+			this.iSelectedReport := false
+		
+			this.showReportChart(false)
+			this.showReportInfo(false)
+		}
+	}
+	
+	showPositionReport(reportDirectory) {
+		if reportDirectory {
+			raceData := readConfiguration(reportDirectory . "\Race.data")
+			
 			GuiControl Choose, reportsDropDown, % inList(kReports, "Position")
 		
 			this.iSelectedReport := "Position"
@@ -483,7 +727,7 @@ class RaceReports extends ConfigurationItem {
 			FileEncoding UTF-8
 			
 			try {
-				Loop Read, %positionsFile% 
+				Loop Read, % reportDirectory . "\Positions.CSV"
 					positions.Push(string2Values(";", A_LoopReadLine))
 			}
 			finally {
@@ -530,7 +774,7 @@ class RaceReports extends ConfigurationItem {
 				drawChartFunction := drawChartFunction . "]"
 			}
 			
-			drawChartFunction := drawChartFunction . ("]);`nvar options = { legend: { position: 'right' },  chartArea: { left: '5%', top: '2%', right: '20%', bottom: '10%' }, ")
+			drawChartFunction := drawChartFunction . ("]);`nvar options = { legend: { position: 'right' }, chartArea: { left: '5%', top: '2%', right: '20%', bottom: '10%' }, ")
 			drawChartFunction := drawChartFunction . ("hAxis: { title: '" . translate("Laps") . "' }, vAxis: { direction: -1, ticks: [], title: '" . translate("Cars") . "', baselineColor: 'D0D0D0' }, backgroundColor: 'D0D0D0' };`n")
 
 			drawChartFunction := drawChartFunction . "var chart = new google.visualization.LineChart(document.getElementById('chart_id')); chart.draw(data, options); }"
@@ -548,10 +792,10 @@ class RaceReports extends ConfigurationItem {
 		}
 	}
 	
-	showPaceReport(dataFile, timesFile := false) {
-		raceData := (dataFile ? readConfiguration(dataFile) : false)
-		
-		if raceData {
+	showPaceReport(reportDirectory) {
+		if reportDirectory {
+			raceData := readConfiguration(reportDirectory . "\Race.data")
+			
 			GuiControl Choose, reportsDropDown, % inList(kReports, "Pace")
 		
 			this.iSelectedReport := "Pace"
@@ -564,7 +808,7 @@ class RaceReports extends ConfigurationItem {
 			FileEncoding UTF-8
 			
 			try {
-				Loop Read, %timesFile%
+				Loop Read, % reportDirectory . "\Times.CSV"
 					times.Push(string2Values(";", A_LoopReadLine))
 			}
 			finally {
@@ -584,45 +828,18 @@ class RaceReports extends ConfigurationItem {
 			
 			Loop % getConfigurationValue(raceData, "Cars", "Count")
 			{
-				car := A_Index
+				min := false
+				max := false
+				avg := false
+				stdDev := false
 				
-				validTimes := []
-				
-				Loop % lapsCount
-				{
-					time := times[A_Index][car]
+				if this.getDriverPace(raceData, times, A_Index, min, max, avg, stdDev)
+					if first
+						first := false
+					else
+						drawChartFunction := drawChartFunction . ",`n"
 					
-					if (time > 0)
-						validTimes.Push(time)
-				}
-				
-				stdDev := stdDeviation(validTimes)
-				avg := average(validTimes)
-				
-				invalidTimes := []
-				
-				for ignore, time in validTimes
-					if (Abs(time - avg) > (stdDev / 2))
-						invalidTimes.Push(time)
-				
-				for ignore, time in invalidTimes
-					validTimes.RemoveAt(inList(validTimes, time))
-				
-				if (validTimes.Length() > 1) {
-					min := Round(minimum(validTimes) / 1000, 1)
-					max := Round(maximum(validTimes) / 1000, 1)
-					avg := (average(validTimes) / 1000)
-					stdDev := (stdDeviation(validTimes) / 1000)
-					
-					if (stdDev > 0) {
-						if first
-							first := false
-						else
-							drawChartFunction := drawChartFunction . ",`n"
-						
-						drawChartFunction := drawChartFunction . ("[" . values2String(", ", cars[car], min, Round(avg - Sqrt(stdDev / 2), 1), Round(avg + Sqrt(stdDev / 2), 1), max) . "]")
-					}
-				}
+					drawChartFunction := drawChartFunction . ("[" . values2String(", ", cars[A_Index], min, Round(avg - Sqrt(stdDev / 2), 1), Round(avg + Sqrt(stdDev / 2), 1), max) . "]")
 			}
 			
 			drawChartFunction := drawChartFunction . ("], true);`nvar options = { legend: 'none', chartArea: { left: '10%', top: '2%', right: '5%', bottom: '20%' }, ")
@@ -727,13 +944,15 @@ class RaceReports extends ConfigurationItem {
 						
 						switch report {
 							case "Overview":
-								this.showOverviewReport(A_LoopFilePath . "\Race.data", A_LoopFilePath . "\Drivers.CSV", A_LoopFilePath . "\Positions.CSV", A_LoopFilePath . "\Laps.CSV", A_LoopFilePath . "\Times.CSV")
-							case "Details":
-								this.showDetailsReport(A_LoopFilePath . "\Race.data")
+								this.showOverviewReport(A_LoopFilePath)
+							case "Car":
+								this.showCarReport(A_LoopFilePath)
+							case "Driver":
+								this.showDriverReport(A_LoopFilePath)
 							case "Position":
-								this.showPositionReport(A_LoopFilePath . "\Race.data", A_LoopFilePath . "\Positions.CSV")
+								this.showPositionReport(A_LoopFilePath)
 							case "Pace":
-								this.showPaceReport(A_LoopFilePath . "\Race.data", A_LoopFilePath . "\Times.CSV")
+								this.showPaceReport(A_LoopFilePath)
 						}
 						
 						break
@@ -935,7 +1154,7 @@ runRaceReport() {
 		ExitApp 0
 	}
 	
-	current := fixIE()
+	current := fixIE(11)
 	
 	try {
 		reports := new RaceReports(reportsDirectory, kSimulatorConfiguration)

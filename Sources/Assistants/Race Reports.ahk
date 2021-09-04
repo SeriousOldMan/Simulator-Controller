@@ -290,20 +290,21 @@ class RaceReports extends ConfigurationItem {
 				validTimes.Push(time)
 		}
 		
+		min := Round(minimum(validTimes) / 1000, 1)
+		
 		stdDev := stdDeviation(validTimes)
 		avg := average(validTimes)
 		
 		invalidTimes := []
 		
 		for ignore, time in validTimes
-			if (Abs(time - avg) > (stdDev / 2))
+			if ((time > avg) && (Abs(time - avg) > (stdDev / 2)))
 				invalidTimes.Push(time)
 		
 		for ignore, time in invalidTimes
 			validTimes.RemoveAt(inList(validTimes, time))
 		
 		if (validTimes.Length() > 1) {
-			min := Round(minimum(validTimes) / 1000, 1)
 			max := Round(maximum(validTimes) / 1000, 1)
 			avg := (average(validTimes) / 1000)
 			stdDev := (stdDeviation(validTimes) / 1000)
@@ -333,10 +334,10 @@ class RaceReports extends ConfigurationItem {
 		{
 			position := positions[A_Index]
 		
-			result += ((Max(0, 11 - position) / 10) / 2)
+			result += (Max(0, 11 - position) / 10)
 			
 			if lastPosition
-				result += ((lastPosition - position) / cars)
+				result += (lastPosition - position)
 			
 			lastPosition := position
 			
@@ -404,6 +405,9 @@ class RaceReports extends ConfigurationItem {
 	}
 	
 	normalizeSpeedValues(values, target) {
+		for index, value in values
+			values[index] := - value
+		
 		halfTarget := (target / 2)
 		min := minimum(values)
 		
@@ -661,8 +665,7 @@ class RaceReports extends ConfigurationItem {
 			allDrivers := this.getDrivers(raceData, drivers)
 			drivers := allDrivers.Clone()
 			
-			drivers.RemoveAt(5, 10)
-			drivers.RemoveAt(15, 15)
+			drivers.RemoveAt(17, 20)
 			
 			cars := []
 			

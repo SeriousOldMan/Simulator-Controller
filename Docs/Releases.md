@@ -1,3 +1,14 @@
+## 3.5.6-release 09/10/21
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Three new reports for the "Race Reports" tool:
+     - Overview - as the name says, gives you an overview over the grid (starting positions, best and average lap times and race result.
+	 - Car - specific data for your car, weather conditions, mounted tyres, elecronic settins, lap times and pitstops.
+	 - Driver - compare the different drivers on the grid regarding potential, race craft, speed, consistency and car control.
+  4. New "Call" command allows you to actiavte the listen mode of a race assistant by the touch of a button on your Button Box.
+  5. Improved voice control of multiple Race Assistant, when not using Push-to-Talk.
+
 ## 3.5.4-release 09/03/21
 
   1. Bugfixes, as always
@@ -279,7 +290,7 @@
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. Lots of new stuff in the Jona AI kernel
-     - Full statistical laptime analysis after accidents
+     - Full statistical lap time analysis after accidents
      - Recommandation, whether an early pitstop strategy might be advantageous after an accident
      - Initial rule set for weather and tyre temperature trend analysis
   4. Initial support for rFactor 2 by a skeleton plugin

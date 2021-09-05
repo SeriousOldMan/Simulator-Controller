@@ -723,7 +723,7 @@ class RaceReports extends ConfigurationItem {
 			
 			drawChartFunction .= ("`n]);")
 			
-			drawChartFunction := drawChartFunction . "`nvar options = { bars: 'horizontal', backgroundColor: 'D0D0D0', chartArea: { left: '20%', top: '2%', right: '30%', bottom: '10%' } };"
+			drawChartFunction := drawChartFunction . "`nvar options = { bars: 'horizontal', backgroundColor: 'D0D0D0', chartArea: { left: '15%', top: '2%', right: '30%', bottom: '10%' } };"
 			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.BarChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 			
 			this.showReportChart(drawChartFunction)

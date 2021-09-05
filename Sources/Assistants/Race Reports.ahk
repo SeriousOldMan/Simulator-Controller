@@ -366,30 +366,30 @@ class RaceReports extends ConfigurationItem {
 		stdDev := false
 		
 		if this.getDriverPace(raceData, times, car, min, max, avg, stdDev)
-			return ((stdDev == 0) ? 1 : (1 / stdDev))
+			return ((stdDev == 0) ? 0.1 : (1 / stdDev))
 		else
 			return false
 	}
 	
-	getDriverSafety(raceData, times, car) {
+	getDriverCarControl(raceData, times, car) {
 		min := false
 		max := false
 		avg := false
 		stdDev := false
 		
 		if this.getDriverPace(raceData, times, car, min, max, avg, stdDev) {
-			safety := 1
+			carControl := 1
 		
 			Loop % getConfigurationValue(raceData, "Laps", "Count")
 			{
-				time := times[A_Index][car]
+				time := Round(times[A_Index][car] / 1000, 1)
 			
 				if ((time > 0) && !getConfigurationValue(raceData, "Laps", "Lap." . A_Index . ".Pitstop", false))
-					if (Abs((time / 1000) - avg) > stdDev)
-						safety *= 0.9
+					if (Abs(time - avg) > stdDev)
+						carControl *= 0.95
 			}
 			
-			return safety
+			return carControl
 		}
 		else
 			return false
@@ -431,9 +431,9 @@ class RaceReports extends ConfigurationItem {
 		return result
 	}
 	
-	getDriverStats(raceData, cars, positions, times, ByRef potentials, ByRef raceCrafts, ByRef speeds, ByRef consistencies, ByRef safeties) {
+	getDriverStats(raceData, cars, positions, times, ByRef potentials, ByRef raceCrafts, ByRef speeds, ByRef consistencies, ByRef carControls) {
 		consistencies := this.normalizeValues(map(cars, ObjBindMethod(this, "getDriverConsistency", raceData, times)), 5)
-		safeties := this.normalizeValues(map(cars, ObjBindMethod(this, "getDriverSafety", raceData, times)), 5)
+		carControls := this.normalizeValues(map(cars, ObjBindMethod(this, "getDriverCarControl", raceData, times)), 5)
 		speeds := this.normalizeSpeedValues(map(cars, ObjBindMethod(this, "getDriverSpeed", raceData, times)), 5)
 		raceCrafts := this.normalizeValues(map(cars, ObjBindMethod(this, "getDriverRaceCraft", raceData, positions)), 5)
 		potentials := this.normalizeValues(map(cars, ObjBindMethod(this, "getDriverPotential", raceData, positions)), 5)
@@ -680,9 +680,9 @@ class RaceReports extends ConfigurationItem {
 			raceCrafts := false
 			speeds := false
 			consistencies := false
-			safeties := false
+			carControls := false
 			
-			this.getDriverStats(raceData, cars, positions, times, potentials, raceCrafts, speeds, consistencies, safeties)
+			this.getDriverStats(raceData, cars, positions, times, potentials, raceCrafts, speeds, consistencies, carControls)
 			
 			drawChartFunction := ""
 			
@@ -694,7 +694,7 @@ class RaceReports extends ConfigurationItem {
 			drawChartFunction .= "`n[" . values2String(", ", "'" . translate("Race Craft") . "'", raceCrafts*) . "],"
 			drawChartFunction .= "`n[" . values2String(", ", "'" . translate("Speed") . "'", speeds*) . "],"
 			drawChartFunction .= "`n[" . values2String(", ", "'" . translate("Consistency") . "'", consistencies*) . "],"
-			drawChartFunction .= "`n[" . values2String(", ", "'" . translate("Safety") . "'", safeties*) . "]"
+			drawChartFunction .= "`n[" . values2String(", ", "'" . translate("Car Control") . "'", carControls*) . "]"
 			
 			drawChartFunction .= ("`n]);")
 			

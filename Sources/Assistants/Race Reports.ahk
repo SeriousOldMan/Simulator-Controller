@@ -379,14 +379,15 @@ class RaceReports extends ConfigurationItem {
 		
 		if this.getDriverPace(raceData, times, car, min, max, avg, stdDev) {
 			carControl := 1
-		
+			threshold := (avg + ((max - avg) / 4))
+			
 			Loop % getConfigurationValue(raceData, "Laps", "Count")
 			{
 				time := Round(times[A_Index][car] / 1000, 1)
 			
 				if ((time > 0) && !getConfigurationValue(raceData, "Laps", "Lap." . A_Index . ".Pitstop", false))
-					if (Abs(time - avg) > stdDev)
-						carControl *= 0.95
+					if (time > threshold)
+						carControl *= 0.90
 			}
 			
 			return carControl
@@ -664,8 +665,6 @@ class RaceReports extends ConfigurationItem {
 			
 			allDrivers := this.getDrivers(raceData, drivers)
 			drivers := allDrivers.Clone()
-			
-			drivers.RemoveAt(17, 20)
 			
 			cars := []
 			

@@ -2127,7 +2127,7 @@ startupSimulatorSetup() {
 		wizard.dumpRules(wizard.KnowledgeBase)
 	
 restartSetup:
-	previous := fixIE()
+	previous := fixIE(9)
 	
 	if (previous = "")
 		previous := "9"

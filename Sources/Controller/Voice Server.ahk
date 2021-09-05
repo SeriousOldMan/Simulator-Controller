@@ -741,6 +741,13 @@ class VoiceServer extends ConfigurationItem {
 		this.getVoiceClient(descriptor).registerVoiceCommand(grammar, command, callback)
 	}
 	
+	recognizeActivation(descriptor, grammar, words*) {
+		client := this.VoiceClients[descriptor]
+		
+		if client
+			this.recognizeActivationCommand(voiceClient, grammar, words)
+	}
+	
 	recognizeCommand(grammar, words*) {
 		if this.ActiveVoiceClient
 			this.ActiveVoiceClient.recognizeVoiceCommand(grammar, words)

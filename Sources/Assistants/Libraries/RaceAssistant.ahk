@@ -305,6 +305,13 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 	
+	call() {
+		local voiceAssistant := this.VoiceAssistant
+			
+		if voiceAssistant
+			voiceAssistant.recognizeActivation("Call", ["Hey", this.VoiceAssistant.Name])
+	}
+	
 	accept() {
 		if this.Continuation {
 			if this.VoiceAssistant

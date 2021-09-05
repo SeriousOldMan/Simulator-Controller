@@ -1,9 +1,9 @@
 [Development]
 Version=3.5.6-dev
 Target=3.5.6-release
-Date=09/03/2021
+Date=09/05/2021
 Download=
-Changes=New Reports in Race Reports tool
+Changes=New Reports in Race Reports tool, New "Call" command for Race Assistants
 [Release]
 Version=3.5.4-release
 Date=09/03/2021

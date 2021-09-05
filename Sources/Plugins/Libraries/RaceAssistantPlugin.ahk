@@ -78,6 +78,10 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			this.callRemote("updateLap", arguments*)
 		}
 		
+		call(arguments*) {
+			this.callRemote("call", arguments*)
+		}
+		
 		accept(arguments*) {
 			this.callRemote("accept", arguments*)
 		}
@@ -132,6 +136,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				switch this.Action {
 					case "InformationRequest":
 						this.Plugin.requestInformation(this.Arguments*)
+					case "Call":
+						this.Plugin.call()
 					case "Accept":
 						this.Plugin.accept()
 					case "Reject":
@@ -556,8 +562,13 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 	
 	performPitstop(lapNumber) {
+		if this.RaceEngineer
+			this.RaceEngineer.performPitstop(lapNumber)
+	}
+	
+	call() {
 		if this.RaceAssistant
-			this.RaceAssistant.performPitstop(lapNumber)
+			this.RaceAssistant.call()
 	}
 	
 	accept() {

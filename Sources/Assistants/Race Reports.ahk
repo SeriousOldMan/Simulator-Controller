@@ -55,6 +55,7 @@ global kReports = ["Overview", "Car", "Driver", "Position", "Pace"]
 
 global simulatorDropDown
 global reportsDropDown
+global reportSettingsButton
 global chartViewer
 global infoViewer
 
@@ -67,6 +68,8 @@ class RaceReports extends ConfigurationItem {
 	iSelectedSimulator := false
 	iSelectedRace := false
 	iSelectedReport := false
+	
+	iSettings := {}
 	
 	Window[] {
 		Get {
@@ -107,8 +110,16 @@ class RaceReports extends ConfigurationItem {
 		}
 	}
 	
+	Settings[] {
+		Get {
+			return this.iSettings
+		}
+	}
+	
 	__New(database, configuration) {
 		this.iDatabase := database
+		
+		this.Settings["Drivers"] := [1, 2, 3, 4, 5]
 		
 		base.__New(configuration)
 		
@@ -160,6 +171,9 @@ class RaceReports extends ConfigurationItem {
 		
 		Gui %window%:Add, Text, x290 ys w40 h23 +0x200, % translate("Report")
 		Gui %window%:Add, DropDownList, x334 yp w180 AltSubmit Disabled Choose0 vreportsDropDown gchooseReport, % values2String("|", map(kReports, "translate")*)
+		
+		Gui %window%:Add, Button, x1177 yp w23 h23 HwndreportSettingsButtonHandle vreportSettingsButton greportSettings
+		setButtonIcon(reportSettingsButtonHandle, kIconsDirectory . "Report Settings.ico", 1)
 		
 		Gui %window%:Add, ActiveX, x290 yp+24 w910 h475 Border vchartViewer, shell.explorer
 		
@@ -266,27 +280,37 @@ class RaceReports extends ConfigurationItem {
 		}
 		
 		infoViewer.Document.close()
-	}	
+	}
+	
+	getReportLaps(raceData) {
+		if this.Settings.HasKey("Laps")
+			return this.Settings["Laps"]
+		else {
+			laps := []
+		
+			Loop % getConfigurationValue(raceData, "Laps", "Count")
+				laps.Push(A_Index)
+			
+			return laps
+		}
+	}
 	
 	getDriverPositions(raceData, positions, car) {
 		result := []
 		
-		Loop % getConfigurationValue(raceData, "Laps", "Count")
-			result.Push(positions[A_Index][car])
+		for ignore, lap in this.getReportLaps(raceData)
+			result.Push(positions[lap][car])
 		
 		return result
 	}
 	
 	getDriverPace(raceData, times, car, ByRef min, ByRef max, ByRef avg, ByRef stdDev) {
-		lapsCount := getConfigurationValue(raceData, "Laps", "Count")
-		
 		validTimes := []
 		
-		Loop % lapsCount
-		{
-			time := times[A_Index][car]
+		for ignore, lap in this.getReportLaps(raceData) {
+			time := times[lap][car]
 			
-			if ((time > 0) && !getConfigurationValue(raceData, "Laps", "Lap." . A_Index . ".Pitstop", false))
+			if ((time > 0) && !getConfigurationValue(raceData, "Laps", "Lap." . lap . ".Pitstop", false))
 				validTimes.Push(time)
 		}
 		
@@ -381,11 +405,10 @@ class RaceReports extends ConfigurationItem {
 			carControl := 1
 			threshold := (avg + ((max - avg) / 4))
 			
-			Loop % getConfigurationValue(raceData, "Laps", "Count")
-			{
-				time := Round(times[A_Index][car] / 1000, 1)
+			for ignore, lap in this.getReportLaps(raceData) {
+				time := Round(times[lap][car] / 1000, 1)
 			
-				if ((time > 0) && !getConfigurationValue(raceData, "Laps", "Lap." . A_Index . ".Pitstop", false))
+				if ((time > 0) && !getConfigurationValue(raceData, "Laps", "Lap." . lap . ".Pitstop", false))
 					if (time > threshold)
 						carControl *= 0.90
 			}
@@ -482,20 +505,19 @@ class RaceReports extends ConfigurationItem {
 				car := A_Index
 				valid := false
 				
-				Loop %lapsCount%
-					if (positions[A_Index][car] > 0)
+				for ignore, lap in this.getReportLaps(raceData)
+					if (positions[lap][car] > 0)
 						valid := true
 					else
-						positions[A_Index][car] := "null" ; carsCount
+						positions[lap][car] := "null" ; carsCount
 				
 				if valid
 					cars.Push(Array(getConfigurationValue(raceData, "Cars", "Car." . car . ".Nr"), getConfigurationValue(raceData, "Cars", "Car." . car . ".Car")))
 				else
-					Loop %lapsCount%
-					{
-						drivers[A_Index].RemoveAt(car)
-						positions[A_Index].RemoveAt(car)
-						times[A_Index].RemoveAt(car)
+					for ignore, lap in this.getReportLaps(raceData) {
+						drivers[lap].RemoveAt(car)
+						positions[lap].RemoveAt(car)
+						times[lap].RemoveAt(car)
 					}
 			}
 			
@@ -581,26 +603,28 @@ class RaceReports extends ConfigurationItem {
 			cars := []
 			rows := []
 			
-			lapsCount := getConfigurationValue(raceData, "Laps", "Count")
-			
-			Loop % lapsCount
-			{
-				weather := (translate(getConfigurationValue(raceData, "Laps", "Lap." . A_Index . ".Compound", "Dry")) . translate(" (") . translate(getConfigurationValue(raceData, "Laps", "Lap." . A_Index . ".CompoundColor", "Black")) . translate(")"))
-				consumption := getConfigurationValue(raceData, "Laps", "Lap." . A_Index . ".Consumption", translate("n/a"))
+			for ignore, lap in this.getReportLaps(raceData) {
+				weather := (translate(getConfigurationValue(raceData, "Laps", "Lap." . lap . ".Compound", "Dry")) . translate(" (") . translate(getConfigurationValue(raceData, "Laps", "Lap." . lap . ".CompoundColor", "Black")) . translate(")"))
+				consumption := getConfigurationValue(raceData, "Laps", "Lap." . lap . ".Consumption", translate("n/a"))
 				
 				if (consumption == 0)
 					consumption := translate("n/a")
 				
+				lapTime := getConfigurationValue(raceData, "Laps", "Lap." . lap . ".LapTime", "-")
+				
+				if (lapTime != "-")
+					lapTime := Round(lapTime / 1000, 1)
+				
 				row := values2String(", "
-									, A_Index
-									, "'" . translate(getConfigurationValue(raceData, "Laps", "Lap." . A_Index . ".Weather")) . "'"
+									, lap
+									, "'" . translate(getConfigurationValue(raceData, "Laps", "Lap." . lap . ".Weather")) . "'"
 									, "'" . weather . "'"
-									, "'" . getConfigurationValue(raceData, "Laps", "Lap." . A_Index . ".Map", translate("n/a")) . "'"
-									, "'" . getConfigurationValue(raceData, "Laps", "Lap." . A_Index . ".TC", translate("n/a")) . "'"
-									, "'" . getConfigurationValue(raceData, "Laps", "Lap." . A_Index . ".ABS", translate("n/a")) . "'"
+									, "'" . getConfigurationValue(raceData, "Laps", "Lap." . lap . ".Map", translate("n/a")) . "'"
+									, "'" . getConfigurationValue(raceData, "Laps", "Lap." . lap . ".TC", translate("n/a")) . "'"
+									, "'" . getConfigurationValue(raceData, "Laps", "Lap." . lap . ".ABS", translate("n/a")) . "'"
 									, "'" . consumption . "'"
-									, "'" . Round(getConfigurationValue(raceData, "Laps", "Lap." . A_Index . ".LapTime", "-") / 1000, 1) . "'"
-									, "'" . (getConfigurationValue(raceData, "Laps", "Lap." . A_Index . ".Pitstop", false) ? translate("x") : "") . "'")
+									, "'" . lapTime . "'"
+									, "'" . (getConfigurationValue(raceData, "Laps", "Lap." . lap . ".Pitstop", false) ? translate("x") : "") . "'")
 											
 				rows.Push("[" . row	. "]")
 			}
@@ -639,7 +663,13 @@ class RaceReports extends ConfigurationItem {
 	
 	showDriverReport(reportDirectory) {
 		if reportDirectory {
+			GuiControl Enable, reportSettingsButton
+				
 			raceData := readConfiguration(reportDirectory . "\Race.data")
+			
+			GuiControl Choose, reportsDropDown, % inList(kReports, "Driver")
+		
+			this.iSelectedReport := "Driver"
 			
 			drivers := []
 			positions := []
@@ -661,19 +691,15 @@ class RaceReports extends ConfigurationItem {
 			}
 			finally {
 				FileEncoding %oldEncoding%
-			}
+			}	
 			
 			allDrivers := this.getDrivers(raceData, drivers)
-			drivers := allDrivers.Clone()
 			
-			cars := []
+			cars := this.Settings["Drivers"]
+			drivers := []
 			
-			for ignore, driver in drivers {
-				car := inList(allDrivers, driver)
-			
-				if car
-					cars.Push(car)
-			}
+			for ignore, car in cars
+				drivers.Push(allDrivers[car])
 		
 			potentials := false
 			raceCrafts := false
@@ -713,6 +739,21 @@ class RaceReports extends ConfigurationItem {
 		}
 	}
 	
+	editDriverReportSettings(reportDirectory) {
+		locale := ((getLanguage() = "en") ? "" : "Locale")
+		
+		InputBox numDrivers, # Driver, Input number of drivers..., , 200, 150, , , %locale%, , 10
+		
+		if !ErrorLevel {
+			drivers := []
+			
+			Loop %numDrivers%
+				drivers.Push(A_Index)
+			
+			this.Settings["Drivers"] := drivers
+		}
+	}
+	
 	showPositionReport(reportDirectory) {
 		if reportDirectory {
 			raceData := readConfiguration(reportDirectory . "\Race.data")
@@ -737,15 +778,14 @@ class RaceReports extends ConfigurationItem {
 			}
 			
 			carsCount := getConfigurationValue(raceData, "Cars", "Count")
-			lapsCount := getConfigurationValue(raceData, "Laps", "Count")
 			
 			Loop % carsCount
 			{
 				car := A_Index
 				valid := false
 				
-				Loop %lapsCount%
-					if (positions[A_Index][car] > 0) {
+				for ignore, lap in this.getReportLaps(raceData)
+					if (positions[lap][car] > 0) {
 						valid := true
 						
 						break
@@ -756,18 +796,15 @@ class RaceReports extends ConfigurationItem {
 				if valid
 					cars.Push("'#" . getConfigurationValue(raceData, "Cars", "Car." . car . ".Nr") . A_Space . getConfigurationValue(raceData, "Cars", "Car." . car . ".Car") . "'")
 				else
-					Loop %lapsCount%
-						positions[A_Index].RemoveAt(car)
+					for ignore, lap in this.getReportLaps(raceData)
+						positions[lap].RemoveAt(car)
 			}
 			
 			drawChartFunction := ""
 			
 			drawChartFunction .= ("function drawChart() {`nvar data = google.visualization.arrayToDataTable([`n[" . values2String(", ", "'" . translate("Laps") . "'", cars*) . "]")
 			
-			Loop % lapsCount
-			{
-				lap := A_Index
-			
+			for ignore, lap in this.getReportLaps(raceData) {
 				drawChartFunction := drawChartFunction . (",`n[" . lap)
 				
 				Loop % cars.Length()
@@ -824,8 +861,6 @@ class RaceReports extends ConfigurationItem {
 			
 			drawChartFunction .= "function drawChart() {`nvar data = google.visualization.arrayToDataTable([`n"
 			
-			lapsCount := getConfigurationValue(raceData, "Laps", "Count")
-			
 			first := true
 			
 			Loop % getConfigurationValue(raceData, "Cars", "Count")
@@ -875,6 +910,7 @@ class RaceReports extends ConfigurationItem {
 				
 			GuiControl Choose, simulatorDropDown, % inList(this.SetupDatabase.getSimulators(), simulator)
 			GuiControl Disable, reportsDropDown
+			GuiControl Disable, reportSettingsButton
 			GuiControl Choose, reportsDropDown, 0
 			GuiControl Disable, %deleteRaceReportButtonHandle%
 			
@@ -922,49 +958,12 @@ class RaceReports extends ConfigurationItem {
 			}
 			else {
 				GuiControl Disable, reportsDropDown
+				GuiControl Disable, reportSettingsButton
 				GuiControl Choose, reportsDropDown, 0
 				GuiControl Disable, %deleteRaceReportButtonHandle%
 				
 				this.iSelectedRace := false
 				
-				this.showReportChart(false)
-				this.showReportInfo(false)
-			}
-		}
-	}
-	
-	loadReport(report) {
-		if (report != this.SelectedReport) {
-			if report {
-				GuiControlGet simulatorDropDown
-				
-				this.iSelectedReport := report
-				
-				Loop Files, % this.Database . "\" . this.SetupDatabase.getSimulatorCode(simulatorDropDown) . "\*.*", D
-					if (A_Index = this.SelectedRace) {
-						GuiControl Choose, reportsDropDown, % inList(kReports, report)
-						
-						switch report {
-							case "Overview":
-								this.showOverviewReport(A_LoopFilePath)
-							case "Car":
-								this.showCarReport(A_LoopFilePath)
-							case "Driver":
-								this.showDriverReport(A_LoopFilePath)
-							case "Position":
-								this.showPositionReport(A_LoopFilePath)
-							case "Pace":
-								this.showPaceReport(A_LoopFilePath)
-						}
-						
-						break
-					}
-			}
-			else {
-				GuiControl Choose, reportsDropDown, 0
-				
-				this.iSelectedReport := false
-			
 				this.showReportChart(false)
 				this.showReportInfo(false)
 			}
@@ -988,6 +987,77 @@ class RaceReports extends ConfigurationItem {
 					this.loadSimulator(this.SelectedSimulator, true)
 				}
 			}
+	}
+	
+	loadReport(report) {
+		if (report != this.SelectedReport) {
+			this.iSettings := {}
+			
+			if report {
+				GuiControlGet simulatorDropDown
+				
+				this.iSelectedReport := report
+				
+				Loop Files, % this.Database . "\" . this.SetupDatabase.getSimulatorCode(simulatorDropDown) . "\*.*", D
+					if (A_Index = this.SelectedRace) {
+						GuiControl Choose, reportsDropDown, % inList(kReports, report)
+						GuiControl Disable, reportSettingsButton
+						
+						switch report {
+							case "Overview":
+								this.showOverviewReport(A_LoopFilePath)
+							case "Car":
+								this.showCarReport(A_LoopFilePath)
+							case "Driver":
+								this.Settings["Drivers"] := [1, 2, 3, 4, 5]
+								
+								this.showDriverReport(A_LoopFilePath)
+							case "Position":
+								this.showPositionReport(A_LoopFilePath)
+							case "Pace":
+								this.showPaceReport(A_LoopFilePath)
+						}
+						
+						break
+					}
+			}
+			else {
+				GuiControl Choose, reportsDropDown, 0
+				
+				this.iSelectedReport := false
+			
+				this.showReportChart(false)
+				this.showReportInfo(false)
+			}
+		}
+	}
+	
+	reportSettings(report) {
+		raceFolder := false
+		
+		Loop Files, % this.Database . "\" . this.SetupDatabase.getSimulatorCode(simulatorDropDown) . "\*.*", D
+			if (A_Index = this.SelectedRace) {
+				raceFolder := A_LoopFilePath
+				
+				break
+			}
+		
+		if raceFolder {
+			switch report {
+				case "Overview":
+					this.showOverviewReport(raceFolder)
+				case "Car":
+					this.showCarReport(raceFolder)
+				case "Driver":
+					this.editDriverReportSettings(raceFolder)
+		
+					this.showDriverReport(raceFolder)
+				case "Position":
+					this.showPositionReport(raceFolder)
+				case "Pace":
+					this.showPaceReport(raceFolder)
+			}
+		}
 	}
 }
 
@@ -1065,6 +1135,12 @@ chooseReport() {
 	GuiControlGet reportsDropDown
 	
 	RaceReports.Instance.loadReport(kReports[reportsDropDown])
+}
+
+reportSettings() {
+	GuiControlGet reportsDropDown
+	
+	RaceReports.Instance.reportSettings(kReports[reportsDropDown])
 }
 
 deleteRaceReport() {

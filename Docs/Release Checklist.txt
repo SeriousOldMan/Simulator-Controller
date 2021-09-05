@@ -21,12 +21,16 @@ Release 3.5.6 Checklist
 =======================
 
 0. Search for new links (*)
-1. New report for the "Race Reports" tool
+1. New reports for the "Race Reports" tool
    a. Documentation
    b. New images
 2. Update procedure
    a. Translations
    b. Phrase Grammars
+   c. Plugin Labels
+3. New Call command for Assistants
+   a. Documentation
+   b. Update Notes
 
 Release 3.5.4 Checklist
 =======================

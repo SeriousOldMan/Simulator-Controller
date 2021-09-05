@@ -274,7 +274,8 @@ class VoiceServer extends ConfigurationItem {
 					return false
 				}
 				else {
-					SoundPlay %kResourcesDirectory%Sounds\Talk.wav
+					if this.VoiceServer.PushToTalk
+						SoundPlay %kResourcesDirectory%Sounds\Talk.wav
 					
 					this.iIsListening := true
 				
@@ -451,6 +452,12 @@ class VoiceServer extends ConfigurationItem {
 		timer := ObjBindMethod(this, "unregisterStaleVoiceClients")
 		
 		SetTimer %timer%, 5000
+		
+		if this.PushToTalk {
+			listen := ObjBindMethod(this, "listen")
+			
+			SetTimer %listen%, 50
+		}
 	}
 	
 	loadFromConfiguration(configuration) {
@@ -464,12 +471,6 @@ class VoiceServer extends ConfigurationItem {
 		this.iSpeakerSpeed := getConfigurationValue(configuration, "Voice Control", "SpeakerSpeed", 0)
 		this.iListener := getConfigurationValue(configuration, "Voice Control", "Listener", false)
 		this.iPushToTalk := getConfigurationValue(configuration, "Voice Control", "PushToTalk", false)
-		
-		if this.PushToTalk {
-			listen := ObjBindMethod(this, "listen")
-			
-			SetTimer %listen%, 50
-		}
 	}
 	
 	listen() {
@@ -659,7 +660,7 @@ class VoiceServer extends ConfigurationItem {
 		
 		this.VoiceClients[descriptor] := client
 		
-		if activationCommand {
+		if activationCommand && listener {
 			recognizer := this.SpeechRecognizer[true]
 			grammar := (descriptor . "." . counter++)
 			
@@ -682,10 +683,14 @@ class VoiceServer extends ConfigurationItem {
 		
 		if (this.VoiceClients.Count() = 1)
 			this.activateVoiceClient(descriptor)
-		else if (this.VoiceClients.Count() = 2)
+		else if (this.VoiceClients.Count() = 2) {
 			for theDescriptor, ignore in this.VoiceClients
 				if (descriptor != theDescriptor)
 					this.deactivateVoiceClient(theDescriptor)
+			
+			if !this.PushToTalk()
+				this.startActivationListener()
+		}
 	}
 	
 	unregisterVoiceClient(descriptor, pid) {
@@ -696,9 +701,13 @@ class VoiceServer extends ConfigurationItem {
 		
 		this.VoiceClients.Delete(descriptor)
 		
-		if (this.VoiceClients.Count() = 1)
+		if (this.VoiceClients.Count() = 1) {
 			for theDescriptor, ignore in this.VoiceClients
 				this.activateVoiceClient(theDescriptor)
+			
+			if !this.PushToTalk()
+				this.stopActivationListener()
+		}
 	}
 	
 	unregisterStaleVoiceClients() {

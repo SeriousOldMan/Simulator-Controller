@@ -1131,7 +1131,7 @@ editReportSettings(raceReports, reportDirectory := false, options := false) {
 
 		Gui RRS:Add, Text, YP+20 w344 cBlue Center gopenReportsDocumentation, % translate("Report Settings")
 		
-		Gui RRS:Font, s9 Norm, Arial
+		Gui RRS:Font, s8 Norm, Arial
 		
 		Gui RRS:Add, Text, x8 yp+30 w360 0x10
 		

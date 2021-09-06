@@ -26,7 +26,9 @@ Simply donwload and run [Simulator Controller.exe](https://cntr.click/Qt9gVs0) (
 
 #### Latest development build
 
-None for the moment...
+[3.5.6-dev]() (Early build for Release 3.5.6. New features: New Reports in Race Reports tool, New "Call" command for Race Assistants, Better handling of multiple voice dialog partners when not using Push-to-Talk. Stable, with documentation and update procedure.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-356) of this version and all the versions you might have skipped, before installing and using this version.
 
 #### Latest release build
 

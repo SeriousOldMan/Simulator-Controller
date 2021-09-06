@@ -44,6 +44,9 @@ ListLines Off					; Disable execution history
 
 global kReports = ["Overview", "Car", "Driver", "Position", "Pace"]
 
+global kOk = "Ok"
+global kCancel = "Cancel"
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
@@ -110,16 +113,17 @@ class RaceReports extends ConfigurationItem {
 		}
 	}
 	
-	Settings[] {
+	Settings[key := false] {
 		Get {
-			return this.iSettings
+			if key
+				return this.iSettings[key]
+			else
+				return this.iSettings
 		}
 	}
 	
 	__New(database, configuration) {
 		this.iDatabase := database
-		
-		this.Settings["Drivers"] := [1, 2, 3, 4, 5]
 		
 		base.__New(configuration)
 		
@@ -159,7 +163,7 @@ class RaceReports extends ConfigurationItem {
 		
 		Gui %window%:Add, Text, x16 yp+24 w70 h23 +0x200, % translate("Races")
 		
-		Gui Add, ListView, x90 yp w180 h300 -Multi -LV0x10 AltSubmit NoSort NoSortHdr gchooseRace, % values2String("|", map(["Date", "Time", "Track", "Car"], "translate")*)
+		Gui %window%:Add, ListView, x90 yp w180 h300 -Multi -LV0x10 AltSubmit NoSort NoSortHdr gchooseRace, % values2String("|", map(["Date", "Time", "Track", "Car"], "translate")*)
 		
 		Gui %window%:Add, Button, x62 yp+277 w23 h23 HwnddeleteRaceReportButtonHandle gdeleteRaceReport
 		setButtonIcon(deleteRaceReportButtonHandle, kIconsDirectory . "Minus.ico", 1)
@@ -188,7 +192,7 @@ class RaceReports extends ConfigurationItem {
 		
 		Gui %window%:Add, Text, x8 y574 w1200 0x10
 		
-		Gui %window%:Add, Button, x568 y580 w80 h23 GcloseReports, % translate("Close")
+		Gui %window%:Add, Button, x574 y580 w80 h23 GcloseReports, % translate("Close")
 	}
 	
 	show() {
@@ -465,6 +469,16 @@ class RaceReports extends ConfigurationItem {
 		return true
 	}
 	
+	editReportSettings(reportDirectory, settings*) {
+		result := editReportSettings(this, reportDirectory, settings)
+		
+		if result
+			for setting, values in result
+				this.iSettings[setting] := values
+		
+		return (result != false)
+	}
+	
 	showOverviewReport(reportDirectory) {
 		if reportDirectory {
 			raceData := readConfiguration(reportDirectory . "\Race.data")
@@ -476,7 +490,6 @@ class RaceReports extends ConfigurationItem {
 			cars := []
 			drivers := []
 			positions := []
-			laps := []
 			times := []
 			
 			oldEncoding := A_FileEncoding
@@ -740,18 +753,7 @@ class RaceReports extends ConfigurationItem {
 	}
 	
 	editDriverReportSettings(reportDirectory) {
-		locale := ((getLanguage() = "en") ? "" : "Locale")
-		
-		InputBox numDrivers, # Driver, Input number of drivers..., , 200, 150, , , %locale%, , 10
-		
-		if !ErrorLevel {
-			drivers := []
-			
-			Loop %numDrivers%
-				drivers.Push(A_Index)
-			
-			this.Settings["Drivers"] := drivers
-		}
+		return this.editReportSettings(reportDirectory, "Laps", "Drivers")
 	}
 	
 	showPositionReport(reportDirectory) {
@@ -834,18 +836,7 @@ class RaceReports extends ConfigurationItem {
 	}
 	
 	editPositionReportSettings(reportDirectory) {
-		locale := ((getLanguage() = "en") ? "" : "Locale")
-		
-		InputBox numLaps, # Driver, Input number of laps..., , 200, 150, , , %locale%, , 10
-		
-		if !ErrorLevel {
-			laps := []
-			
-			Loop %numLaps%
-				laps.Push(A_Index)
-			
-			this.Settings["Laps"] := laps
-		}
+		return this.editReportSettings(reportDirectory, "Laps")
 	}
 	
 	showPaceReport(reportDirectory) {
@@ -918,18 +909,7 @@ class RaceReports extends ConfigurationItem {
 	}
 	
 	editPaceReportSettings(reportDirectory) {
-		locale := ((getLanguage() = "en") ? "" : "Locale")
-		
-		InputBox numLaps, # Driver, Input number of laps..., , 200, 150, , , %locale%, , 10
-		
-		if !ErrorLevel {
-			laps := []
-			
-			Loop %numLaps%
-				laps.Push(A_Index)
-			
-			this.Settings["Laps"] := laps
-		}
+		return this.editReportSettings(reportDirectory, "Laps")
 	}
 	
 	loadSimulator(simulator, force := false) {
@@ -1045,7 +1025,7 @@ class RaceReports extends ConfigurationItem {
 							case "Car":
 								this.showCarReport(A_LoopFilePath)
 							case "Driver":
-								this.Settings["Drivers"] := [1, 2, 3, 4, 5]
+								this.iSettings["Drivers"] := [1, 2, 3, 4, 5]
 								
 								this.showDriverReport(A_LoopFilePath)
 							case "Position":
@@ -1080,22 +1060,15 @@ class RaceReports extends ConfigurationItem {
 		
 		if raceFolder {
 			switch report {
-				case "Overview":
-					this.showOverviewReport(raceFolder)
-				case "Car":
-					this.showCarReport(raceFolder)
 				case "Driver":
-					this.editDriverReportSettings(raceFolder)
-		
-					this.showDriverReport(raceFolder)
+					if this.editDriverReportSettings(raceFolder)
+						this.showDriverReport(raceFolder)
 				case "Position":
-					this.editPositionReportSettings(raceFolder)
-		
-					this.showPositionReport(raceFolder)
+					if this.editPositionReportSettings(raceFolder)
+						this.showPositionReport(raceFolder)
 				case "Pace":
-					this.editPaceReportSettings(raceFolder)
-		
-					this.showPaceReport(raceFolder)
+					if this.editPaceReportSettings(raceFolder)
+						this.showPaceReport(raceFolder)
 			}
 		}
 	}
@@ -1106,6 +1079,228 @@ class RaceReports extends ConfigurationItem {
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+global rangeLapsEdit
+	
+editReportSettings(raceReports, reportDirectory := false, options := false) {
+	static allLapsRadio
+	static rangeLapsRadio
+	
+	static result := false
+	
+	if (raceReports = kCancel)
+		result := kCancel
+	else if (raceReports = kOk)
+		result := kOk
+	else {
+		result := false
+	
+		raceData := readConfiguration(reportDirectory . "\Race.data")
+		
+		drivers := []
+		laps := []
+		
+		oldEncoding := A_FileEncoding
+		
+		FileEncoding UTF-8
+		
+		try {
+			Loop Read, % reportDirectory . "\Drivers.CSV"
+				drivers.Push(string2Values(";", A_LoopReadLine))
+						
+			Loop Read, % reportDirectory . "\Laps.CSV"
+				laps.Push(string2Values(";", A_LoopReadLine))
+		}
+		finally {
+			FileEncoding %oldEncoding%
+		}
+	
+		owner := RaceReports.Instance.Window
+		
+		Gui RRS:Default
+		Gui RRS:+Owner%owner%
+	
+		Gui RRS:-Border ; -Caption
+		Gui RRS:Color, D0D0D0, D8D8D8
+
+		Gui RRS:Font, s10 Bold, Arial
+
+		Gui RRS:Add, Text, w344 Center gmoveSettings, % translate("Modular Simulator Controller System") 
+		
+		Gui RRS:Font, s9 Norm, Arial
+		Gui RRS:Font, Italic Underline, Arial
+
+		Gui RRS:Add, Text, YP+20 w344 cBlue Center gopenReportsDocumentation, % translate("Report Settings")
+		
+		Gui RRS:Font, s9 Norm, Arial
+		
+		Gui RRS:Add, Text, x8 yp+30 w360 0x10
+		
+		if inList(options, "Laps") {
+			Gui RRS:Add, Text, x16 yp+10 w70 h23 +0x200 Section, % translate("Laps")
+		
+			Gui RRS:Add, Radio, x90 yp+4 w80 Group vallLapsRadio gchooseLapResult, % translate(" All")
+			Gui RRS:Add, Radio, x90 yp+24 w80 vrangeLapsRadio gchooseLapResult, % translate(" Range:")
+			Gui RRS:Add, Edit, x170 yp-3 w80 vrangeLapsEdit
+			Gui RRS:Add, Text, x255 yp+3 w110, % translate("(e.g.: 1-5;8;12)")
+			
+			if !raceReports.Settings.HasKey("Laps") {
+				GuiControl, , allLapsRadio, 1
+				GuiControl Disable, rangeLapsEdit
+			}
+			else {
+				GuiControl, , rangeLapsRadio, 1
+				GuiControl Enable, rangeLapsEdit
+				
+				lapsDef := ""
+				laps := raceReports.Settings["Laps"]
+				baseLap := false
+				lastLap := false
+				
+				for ignore, lap in laps {
+					if !baseLap
+						baseLap := lap
+					else if (lap != (lastLap + 1)) {
+						if (baseLap = lastLap)
+							lapsDef .= (((lapsDef != "") ? ";" : "") . baseLap)
+						else
+							lapsDef .= (((lapsDef != "") ? ";" : "") . (baseLap . "-" . lastLap))
+					
+						baseLap := lap
+					}
+					
+					lastLap := lap
+				}
+			
+				if (baseLap = lastLap)
+					lapsDef .= (((lapsDef != "") ? ";" : "") . baseLap)
+				else
+					lapsDef .= (((lapsDef != "") ? ";" : "") . (baseLap . "-" . lastLap))
+				
+				GuiControl Text, rangeLapsEdit, %lapsDef%
+			}
+		}
+		
+		if inList(options, "Drivers") {
+			yOption := (inList(options, "Laps") ? "yp+30" : "yp+10")
+			
+			Gui RRS:Add, Text, x16 %yOption% w70 h23 +0x200 Section, % translate("Drivers")
+			
+			Gui RRS:Add, ListView, x90 yp w264 h300 -Multi -LV0x10 Checked NoSort NoSortHdr, % values2String("|", map(["Driver", "Car"], "translate")*)
+			
+			allDrivers := raceReports.getDrivers(raceData, drivers)
+			selectedDrivers := []
+			
+			if raceReports.Settings.HasKey("Drivers")
+				selectedDrivers := raceReports.Settings["Drivers"]
+			else
+				Loop % allDrivers.Length()
+					selectedDrivers.Push(A_Index)
+				
+			for ignore, driver in allDrivers
+				LV_Add(inList(selectedDrivers, A_Index) ? "Check" : "", driver, getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Car"))
+			
+			LV_ModifyCol(1, "AutoHdr")
+			LV_ModifyCol(2, "AutoHdr")
+		}	
+
+		Gui RRS:Font, s8 Norm, Arial
+		
+		yOption := (inList(options, "Drivers") ? "yp+306" : "yp+30")
+		
+		Gui RRS:Add, Text, x8 %yOption% w360 0x10
+		
+		Gui RRS:Add, Button, x108 yp+10 w80 h23 Default GacceptSettings, % translate("Ok")
+		Gui RRS:Add, Button, x196 yp w80 h23 GcancelSettings, % translate("&Cancel")
+		
+		Gui RRS:Show
+		
+		Loop
+			Sleep 100
+		Until result
+		
+		if (result = kOk) {
+			result := {}
+			
+			Gui RRS:Submit
+		
+			if inList(options, "Laps") {
+				if !allLapsRadio {
+					laps := {}
+							
+					for ignore, lap in string2Values(";", rangeLapsEdit)
+						if InStr(lap, "-") {
+							lap := string2Values("-", lap)
+							startLap := lap[1]
+							endLap := lap[2]
+							
+							if startLap is integer
+								if endLap is integer
+									if (endLap + 0) > (startLap + 0)
+										Loop {
+											index := startLap + A_Index - 1
+										
+											laps[index] := index
+										} Until (index = endLap)
+						}
+						else if lap is integer
+							laps[lap] := lap
+					
+					newlaps := []
+					
+					for lap, ignore in laps
+						newLaps.Push(lap)
+					
+					result["Laps"] := newLaps
+				}
+			}
+			
+			if inList(options, "Drivers") {
+				newDrivers := []
+				
+				rowNumber := 0
+				
+				Loop {
+					rowNumber := LV_GetNext(rowNumber, "C")
+					
+					if !rowNumber
+						break
+					else
+						newDrivers.Push(rowNumber)
+				}
+				
+				result["Drivers"] := newDrivers
+			}
+		}
+		else
+			result := false
+		
+		Gui RRS:Destroy
+		
+		return result
+	}
+}
+
+acceptSettings() {
+	editReportSettings(kOk)
+}
+
+cancelSettings() {
+	editReportSettings(kCancel)
+}
+
+chooseLapResult() {
+	if (A_GuiControl = "allLapsRadio") {
+		GuiControl Disable, rangeLapsEdit
+		GuiControl Text, rangeLapsEdit, % ""
+	}
+	else
+		GuiControl Enable, rangeLapsEdit
+}
+
+moveSettings() {
+	moveByMouse("RRS")
+}
+	
 minimum(numbers) {
 	min := 0
 	

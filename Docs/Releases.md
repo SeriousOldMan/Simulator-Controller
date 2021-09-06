@@ -1,12 +1,12 @@
-## 3.5.6-release 09/10/21
+## 3.5.6-release 09/10/21 (planned)
 
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. Three new reports for the "Race Reports" tool:
+  3. Three new reports for the ["Race Reports"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports) tool:
      - Overview - as the name says, gives you an overview over the grid (starting positions, best and average lap times and race result.
 	 - Car - specific data for your car, weather conditions, mounted tyres, elecronic settins, lap times and pitstops.
 	 - Driver - compare the different drivers on the grid regarding potential, race craft, speed, consistency and car control.
-  4. New "Call" command allows you to actiavte the listen mode of a race assistant by the touch of a button on your Button Box.
+  4. [New "Call" command](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) allows you to actiavte the listen mode of a race assistant by the touch of a button on your Button Box.
   5. Improved voice control of multiple Race Assistant, when not using Push-to-Talk.
 
 ## 3.5.4-release 09/03/21

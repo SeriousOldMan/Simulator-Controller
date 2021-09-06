@@ -474,7 +474,10 @@ class RaceReports extends ConfigurationItem {
 		
 		if result
 			for setting, values in result
-				this.iSettings[setting] := values
+				if ((setting = "Laps") && (values == true))
+					this.Settings.Delete("Laps")
+				else
+					this.Settings[setting] := values
 		
 		return (result != false)
 	}
@@ -1025,7 +1028,7 @@ class RaceReports extends ConfigurationItem {
 							case "Car":
 								this.showCarReport(A_LoopFilePath)
 							case "Driver":
-								this.iSettings["Drivers"] := [1, 2, 3, 4, 5]
+								this.Settings["Drivers"] := [1, 2, 3, 4, 5]
 								
 								this.showDriverReport(A_LoopFilePath)
 							case "Position":
@@ -1138,8 +1141,8 @@ editReportSettings(raceReports, reportDirectory := false, options := false) {
 		if inList(options, "Laps") {
 			Gui RRS:Add, Text, x16 yp+10 w70 h23 +0x200 Section, % translate("Laps")
 		
-			Gui RRS:Add, Radio, x90 yp+4 w80 Group vallLapsRadio gchooseLapResult, % translate(" All")
-			Gui RRS:Add, Radio, x90 yp+24 w80 vrangeLapsRadio gchooseLapResult, % translate(" Range:")
+			Gui RRS:Add, Radio, x90 yp+4 w80 Group vallLapsRadio gchooseLapSelection, % translate(" All")
+			Gui RRS:Add, Radio, x90 yp+24 w80 vrangeLapsRadio gchooseLapSelection, % translate(" Range:")
 			Gui RRS:Add, Edit, x170 yp-3 w80 vrangeLapsEdit
 			Gui RRS:Add, Text, x255 yp+3 w110, % translate("(e.g.: 1-5;8;12)")
 			
@@ -1224,7 +1227,9 @@ editReportSettings(raceReports, reportDirectory := false, options := false) {
 			Gui RRS:Submit
 		
 			if inList(options, "Laps") {
-				if !allLapsRadio {
+				if allLapsRadio
+					result["Laps"] := true
+				else {
 					laps := {}
 							
 					for ignore, lap in string2Values(";", rangeLapsEdit)
@@ -1288,7 +1293,7 @@ cancelSettings() {
 	editReportSettings(kCancel)
 }
 
-chooseLapResult() {
+chooseLapSelection() {
 	if (A_GuiControl = "allLapsRadio") {
 		GuiControl Disable, rangeLapsEdit
 		GuiControl Text, rangeLapsEdit, % ""

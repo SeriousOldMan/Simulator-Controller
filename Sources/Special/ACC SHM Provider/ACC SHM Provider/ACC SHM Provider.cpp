@@ -194,7 +194,7 @@ int main(int argc, char* argv[])
 		_bstr_t tc(gf->tyreCompound);
 		std::string tyreCompound(tc);
 
-		printNAData("MAP", gf->EngineMap);
+		printNAData("MAP", gf->EngineMap + 1);
 		printNAData("TC", gf->TC);
 		printNAData("ABS", gf->ABS);
 

@@ -345,7 +345,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				
 				this.registerAction(new this.RaceAssistantAction(this, function, this.getLabel(ConfigurationItem.descriptor(action, "Activate"), action), "InformationRequest", arguments*))
 			}
-			else if inList(["Accept", "Reject"], action)
+			else if inList(["Call", "Accept", "Reject"], action)
 				this.registerAction(new this.RaceAssistantAction(this, function, this.getLabel(ConfigurationItem.descriptor(action, "Activate"), action), action))
 			else if (action = "RaceAssistant")
 				this.registerAction(new this.RaceAssistantToggleAction(this, function, this.getLabel(ConfigurationItem.descriptor(action, "Toggle"), action)))
@@ -562,8 +562,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 	
 	performPitstop(lapNumber) {
-		if this.RaceEngineer
-			this.RaceEngineer.performPitstop(lapNumber)
+		if this.RaceAssistant
+			this.RaceAssistant.performPitstop(lapNumber)
 	}
 	
 	call() {

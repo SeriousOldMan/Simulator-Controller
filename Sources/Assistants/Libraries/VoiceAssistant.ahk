@@ -568,7 +568,7 @@ class VoiceAssistant {
 	}
 	
 	recognizeActivation(grammar, words) {
-		raiseEvent(kFileMessage, "Voice", "recognizeActivationCommand:" . values2String(";", this.Name, grammar, words*), this.VoiceServer)
+		raiseEvent(kFileMessage, "Voice", "recognizeActivation:" . values2String(";", this.Name, grammar, words*), this.VoiceServer)
 	}
 	
 	recognizeCommand(grammar, words) {

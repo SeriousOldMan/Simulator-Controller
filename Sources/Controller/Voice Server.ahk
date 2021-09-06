@@ -452,12 +452,6 @@ class VoiceServer extends ConfigurationItem {
 		timer := ObjBindMethod(this, "unregisterStaleVoiceClients")
 		
 		SetTimer %timer%, 5000
-		
-		if this.PushToTalk {
-			listen := ObjBindMethod(this, "listen")
-			
-			SetTimer %listen%, 50
-		}
 	}
 	
 	loadFromConfiguration(configuration) {
@@ -471,6 +465,12 @@ class VoiceServer extends ConfigurationItem {
 		this.iSpeakerSpeed := getConfigurationValue(configuration, "Voice Control", "SpeakerSpeed", 0)
 		this.iListener := getConfigurationValue(configuration, "Voice Control", "Listener", false)
 		this.iPushToTalk := getConfigurationValue(configuration, "Voice Control", "PushToTalk", false)
+		
+		if this.PushToTalk {
+			listen := ObjBindMethod(this, "listen")
+			
+			SetTimer %listen%, 50
+		}
 	}
 	
 	listen() {
@@ -683,12 +683,12 @@ class VoiceServer extends ConfigurationItem {
 		
 		if (this.VoiceClients.Count() = 1)
 			this.activateVoiceClient(descriptor)
-		else if (this.VoiceClients.Count() = 2) {
+		else if (this.VoiceClients.Count() > 1) {
 			for theDescriptor, ignore in this.VoiceClients
 				if (descriptor != theDescriptor)
 					this.deactivateVoiceClient(theDescriptor)
 			
-			if !this.PushToTalk()
+			if !this.PushToTalk
 				this.startActivationListener()
 		}
 	}
@@ -705,7 +705,7 @@ class VoiceServer extends ConfigurationItem {
 			for theDescriptor, ignore in this.VoiceClients
 				this.activateVoiceClient(theDescriptor)
 			
-			if !this.PushToTalk()
+			if !this.PushToTalk
 				this.stopActivationListener()
 		}
 	}
@@ -742,10 +742,10 @@ class VoiceServer extends ConfigurationItem {
 	}
 	
 	recognizeActivation(descriptor, grammar, words*) {
-		client := this.VoiceClients[descriptor]
+		local voiceClient := this.VoiceClients[descriptor]
 		
-		if client
-			this.recognizeActivationCommand(voiceClient, grammar, words)
+		if voiceClient
+			this.recognizeActivationCommand(voiceClient, voiceClient.Descriptor, words)
 	}
 	
 	recognizeCommand(grammar, words*) {

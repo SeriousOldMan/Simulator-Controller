@@ -309,7 +309,7 @@ int main(int argc, char* argv[])
 
 			switch (map_buffer->pit_menu_selection) {
 				case R3E_PIT_MENU_UNAVAILABLE:
-					wprintf(L"Closed\n");
+					wprintf(L"Unavailable\n");
 
 					break;
 				case R3E_PIT_MENU_PRESET:
@@ -325,27 +325,27 @@ int main(int argc, char* argv[])
 
 					break;
 				case R3E_PIT_MENU_FUEL:
-					wprintf(L"Fuel\n");
+					wprintf(L"Refuel\n");
 
 					break;
 				case R3E_PIT_MENU_FRONTTIRES:
-					wprintf(L"Front Tyres\n");
+					wprintf(L"Change Front Tyres\n");
 
 					break;
 				case R3E_PIT_MENU_REARTIRES:
-					wprintf(L"Rear Tyres\n");
+					wprintf(L"Change Rear Tyres\n");
 
 					break;
 				case R3E_PIT_MENU_FRONTWING:
-					wprintf(L"Front Aero\n");
+					wprintf(L"Repair Front Aero\n");
 
 					break;
 				case R3E_PIT_MENU_REARWING:
-					wprintf(L"Rear Aero\n");
+					wprintf(L"Repair Rear Aero\n");
 
 					break;
 				case R3E_PIT_MENU_SUSPENSION:
-					wprintf(L"Suspension\n");
+					wprintf(L"Repair Suspension\n");
 
 					break;
 				case R3E_PIT_MENU_BUTTON_TOP:
@@ -377,27 +377,27 @@ int main(int argc, char* argv[])
 
 						break;
 					case R3E_PIT_MENU_FUEL:
-						wprintf(L"Fuel=");
+						wprintf(L"Refuel=");
 
 						break;
 					case R3E_PIT_MENU_FRONTTIRES:
-						wprintf(L"Front Tyres=");
+						wprintf(L"Change Front Tyres=");
 
 						break;
 					case R3E_PIT_MENU_REARTIRES:
-						wprintf(L"Rear Tyres=");
+						wprintf(L"Change Rear Tyres=");
 
 						break;
 					case R3E_PIT_MENU_FRONTWING:
-						wprintf(L"Front Aero=");
+						wprintf(L"Repair Front Aero=");
 
 						break;
 					case R3E_PIT_MENU_REARWING:
-						wprintf(L"Rear Aero=");
+						wprintf(L"Repair Rear Aero=");
 
 						break;
 					case R3E_PIT_MENU_SUSPENSION:
-						wprintf(L"Suspension=");
+						wprintf(L"Repair Suspension=");
 
 						break;
 					default:

@@ -26,7 +26,7 @@ global kR3EPlugin = "R3E"
 ;;;                         Private Constant Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kBinaryOptions = ["Change Front Tyres", "Change Rear Tyres", "Repair Bodywork", "Repair Aero Front", "Repair Aero Rear", "Repair Suspension", "Request Pitstop"]
+global kBinaryOptions = ["Change Front Tyres", "Change Rear Tyres", "Repair Bodywork", "Repair Front Aero", "Repair Rear Aero", "Repair Suspension", "Request Pitstop"]
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -239,12 +239,12 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		}
 		
 		if this.searchMFDImage("Front Damage") {
-			this.iPitstopOptions.Push("Repair Aero Front")
+			this.iPitstopOptions.Push("Repair Front Aero")
 			this.iPitstopOptionStates.Push(this.searchMFDImage("Front Damage Selected") != false)
 		}
 		
 		if this.searchMFDImage("Rear Damage") {
-			this.iPitstopOptions.Push("Repair Aero Rear")
+			this.iPitstopOptions.Push("Repair Rear Aero")
 			this.iPitstopOptionStates.Push(this.searchMFDImage("Rear Damage Selected") != false)
 		}
 		
@@ -296,7 +296,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	
 	selectPitstopOption(option) {
 		if (option = "Repair Bodywork")
-			return (this.optionAvailable("Repair Bodywork") || this.optionAvailable("Repair Aero Front") || this.optionAvailable("Repair Aero Rear"))
+			return (this.optionAvailable("Repair Bodywork") || this.optionAvailable("Repair Front Aero") || this.optionAvailable("Repair Rear Aero"))
 		else if (option = "Change Tyres")
 			return (this.optionAvailable("Change Front Tyres") || this.optionAvailable("Change Rear Tyres"))
 		else {
@@ -334,8 +334,8 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		}
 		else if (option = "Repair Bodywork") {
 			this.toggleActivity("Repair Bodywork", false, true)
-			this.toggleActivity("Repair Aero Front", false, true)
-			this.toggleActivity("Repair Aero Rear", false, true)
+			this.toggleActivity("Repair Front Aero", false, true)
+			this.toggleActivity("Repair Rear Aero", false, true)
 		}
 		else if (option = "Repair Suspension")
 			this.toggleActivity("Repair Suspension", false, false)
@@ -427,15 +427,15 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		
 		if this.optionAvailable("Repair Bodywork")
 			if (repairBodywork != this.chosenOption("Repair Bodywork"))
-				this.toggleActivity("Repair Repair Bodywork", false, true)
+				this.toggleActivity("Repair Bodywork", false, true)
 		
-		if this.optionAvailable("Repair Aero Front")
-			if (repairBodywork != this.chosenOption("Repair Aero Front"))
-				this.toggleActivity("Repair Aero Front", false, true)
+		if this.optionAvailable("Repair Front Aero")
+			if (repairBodywork != this.chosenOption("Repair Front Aero"))
+				this.toggleActivity("Repair Front Aero", false, true)
 		
-		if this.optionAvailable("Repair Aero Rear")
-			if (repairBodywork != this.chosenOption("Repair Aero Rear"))
-				this.toggleActivity("Repair Aero Rear", false, true)
+		if this.optionAvailable("Repair Rear Aero")
+			if (repairBodywork != this.chosenOption("Repair Rear Aero"))
+				this.toggleActivity("Repair Rear Aero", false, true)
 	}
 	
 	getCarName(carID) {

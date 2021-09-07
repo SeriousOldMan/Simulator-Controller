@@ -8,6 +8,7 @@
 	 - Driver - compare the different drivers on the grid regarding potential, race craft, speed, consistency and car control.
   4. [New "Call" command](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) allows you to actiavte the listen mode of a race assistant by the touch of a button on your Button Box.
   5. Improved voice control of multiple Race Assistant, when not using Push-to-Talk.
+  6. The Pitstop menu handling for RaceRoom Racing Experience now works without image recognition, which makes the handling much more reliable.
 
 ## 3.5.4-release 09/03/21
 

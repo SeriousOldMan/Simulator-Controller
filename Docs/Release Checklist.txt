@@ -31,6 +31,9 @@ Release 3.5.6 Checklist
 3. New Call command for Assistants
    a. Documentation
    b. Update Notes
+4. Rework of RaceRoom Racing Experience Pit Menu Handling
+   a. Documentation
+   b. Update Notes
 
 Release 3.5.4 Checklist
 =======================

@@ -299,11 +299,49 @@ class RaceReports extends ConfigurationItem {
 		}
 	}
 	
+	getReportDrivers(raceData) {
+		if this.Settings.HasKey("Drivers")
+			return this.Settings["Drivers"]
+		else {
+			cars := []
+		
+			Loop % getConfigurationValue(raceData, "Cars", "Count")
+				cars.Push(A_Index)
+			
+			return cars
+		}
+	}
+	
 	getDriverPositions(raceData, positions, car) {
 		result := []
 		
 		for ignore, lap in this.getReportLaps(raceData)
 			result.Push(positions[lap][car])
+		
+		return result
+	}
+	
+	getDriverTimes(raceData, times, car) {
+		min := false
+		max := false
+		avg := false
+		stdDev := false
+		
+		result := []
+		
+		if this.getDriverPace(raceData, times, car, min, max, avg, stdDev)
+			for ignore, lap in this.getReportLaps(raceData) {
+				time := Round(times[lap][car] / 1000, 1)
+				
+				if (time > 0) {
+					if ((time > avg) && (Abs(time - avg) > (stdDev / 2)))
+						result.Push(avg)
+					else
+						result.Push(time)
+				}
+				else
+					result.Push(avg)
+			}
 		
 		return result
 	}
@@ -314,7 +352,7 @@ class RaceReports extends ConfigurationItem {
 		for ignore, lap in this.getReportLaps(raceData) {
 			time := times[lap][car]
 			
-			if ((time > 0) && !getConfigurationValue(raceData, "Laps", "Lap." . lap . ".Pitstop", false))
+			if (time > 0)
 				validTimes.Push(time)
 		}
 		
@@ -334,7 +372,7 @@ class RaceReports extends ConfigurationItem {
 		
 		if (validTimes.Length() > 1) {
 			max := Round(maximum(validTimes) / 1000, 1)
-			avg := (average(validTimes) / 1000)
+			avg := Round(average(validTimes) / 1000, 1)
 			stdDev := (stdDeviation(validTimes) / 1000)
 			
 			return true
@@ -412,7 +450,7 @@ class RaceReports extends ConfigurationItem {
 			for ignore, lap in this.getReportLaps(raceData) {
 				time := Round(times[lap][car] / 1000, 1)
 			
-				if ((time > 0) && !getConfigurationValue(raceData, "Laps", "Lap." . lap . ".Pitstop", false))
+				if (time > 0)
 					if (time > threshold)
 						carControl *= 0.90
 			}
@@ -852,6 +890,7 @@ class RaceReports extends ConfigurationItem {
 		
 			this.iSelectedReport := "Pace"
 			
+			selectedCars := this.getReportDrivers(raceData)
 			cars := []
 			times := []
 			
@@ -867,36 +906,67 @@ class RaceReports extends ConfigurationItem {
 				FileEncoding %oldEncoding%
 			}
 			
-			Loop % getConfigurationValue(raceData, "Cars", "Count")
-				cars.Push("'#" . getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Nr") . "'")
+			drawChartFunction := "function drawChart() {`nvar array = [`n"
 			
-			drawChartFunction := ""
+			laps := this.getReportLaps(raceData)
+			lapTimes := []
 			
-			drawChartFunction .= "function drawChart() {`nvar data = google.visualization.arrayToDataTable([`n"
-			
-			first := true
-			
-			Loop % getConfigurationValue(raceData, "Cars", "Count")
-			{
-				min := false
-				max := false
-				avg := false
-				stdDev := false
+			for ignore, car in selectedCars {
+				carTimes := Array("'#" . getConfigurationValue(raceData, "Cars", "Car." . car . ".Nr") . "'")
 				
-				if this.getDriverPace(raceData, times, A_Index, min, max, avg, stdDev)
-					if first
-						first := false
-					else
-						drawChartFunction := drawChartFunction . ",`n"
-					
-					drawChartFunction := drawChartFunction . ("[" . values2String(", ", cars[A_Index], min, Round(avg - Sqrt(stdDev / 2), 1), Round(avg + Sqrt(stdDev / 2), 1), max) . "]")
+				for ignore, time in this.getDriverTimes(raceData, times, car)
+					carTimes.Push(time)
+				
+				lapTimes.Push("[" . values2String(", ", carTimes*) . "]")
 			}
 			
-			drawChartFunction := drawChartFunction . ("], true);`nvar options = { legend: 'none', chartArea: { left: '10%', top: '2%', right: '5%', bottom: '20%' }, ")
-			drawChartFunction := drawChartFunction . ("hAxis: { title: '" . translate("Cars") . "' }, vAxis: { title: '" . translate("Seconds") . "' }, backgroundColor: 'D0D0D0', ")
-			drawChartFunction := drawChartFunction . ("candlestick: { risingColor: { stroke: 'Black', fill: 'Silver' } } };`n")
+			drawChartFunction .= (values2String("`n, ", lapTimes*) . "];")
 			
-			drawChartFunction := drawChartFunction . "var chart = new google.visualization.CandlestickChart(document.getElementById('chart_id')); chart.draw(data, options); }"
+			drawChartFunction .= "`nvar data = new google.visualization.DataTable();"
+			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Car") . "');"
+			
+			Loop % laps.Length()
+				drawChartFunction .= "`ndata.addColumn('number', '" . translate("Lap") . A_Space . (A_Index - 1) . "');"
+			
+			text =
+			(
+			data.addColumn({id:'max', type:'number', role:'interval'});
+			data.addColumn({id:'min', type:'number', role:'interval'});
+			data.addColumn({id:'firstQuartile', type:'number', role:'interval'});
+			data.addColumn({id:'median', type:'number', role:'interval'});
+			data.addColumn({id:'thirdQuartile', type:'number', role:'interval'});
+			)
+			
+			drawChartFunction .= ("`n" . text)
+			
+			drawChartFunction .= ("`n" . "data.addRows(getBoxPlotValues(array, " . (laps.Length() + 1) . "));")
+			
+			drawChartFunction .= ("`n" . getPaceJSFunctions())
+			
+			text =
+			(
+			var options = {
+				backgroundColor: 'D0D0D0', chartArea: { left: '10`%', top: '2`%', right: '5`%', bottom: '20`%' },
+				legend: { position: 'none' },
+			)
+			
+			drawChartFunction .= text
+			
+			text =
+			(
+				hAxis: { title: '`%cars`%', gridlines: { color: '#777' } },
+				vAxis: { title: '`%seconds`%' }, 
+				lineWidth: 0,
+				series: [ { 'color': 'D8D8D8' } ],
+				intervals: { barWidth: 1, boxWidth: 1, lineWidth: 2, style: 'boxes' },
+				interval: { max: { style: 'bars', fillOpacity: 1, color: '#777' },
+							min: { style: 'bars', fillOpacity: 1, color: '#777' } }
+			};
+			)
+			
+			drawChartFunction .= ("`n" . substituteVariables(text, {cars: translate("Cars"), seconds: translate("Seconds")}))
+			
+			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.LineChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 			
 			this.showReportChart(drawChartFunction)
 			this.showReportInfo(raceData)
@@ -912,7 +982,7 @@ class RaceReports extends ConfigurationItem {
 	}
 	
 	editPaceReportSettings(reportDirectory) {
-		return this.editReportSettings(reportDirectory, "Laps")
+		return this.editReportSettings(reportDirectory, "Laps", "Drivers")
 	}
 	
 	loadSimulator(simulator, force := false) {
@@ -1081,6 +1151,73 @@ class RaceReports extends ConfigurationItem {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+getPaceJSFunctions() {
+	script =
+	(
+	/**
+	* Takes an array of input data and returns an
+	* array of the input data with the box plot
+	* interval data appended to each row.
+	*/
+	function getBoxPlotValues(array, base) {
+		for (var i = 0; i < array.length; i++) {
+			var arr = array[i].slice(1).sort(function (a, b) {
+												return a - b;
+											 });
+
+			var max = arr[arr.length - 1];
+			var min = arr[0];
+			var median = getMedian(arr);
+
+			if (arr.length `% 2 === 0) {
+				var midUpper = arr.length / 2;
+				var midLower = midUpper - 1;
+
+				array[i][base + 2] = getMedian(arr.slice(0, midUpper));
+				array[i][base + 4] = getMedian(arr.slice(midLower));
+			}
+			else {
+				var index = Math.floor(arr.length / 2);
+
+				array[i][base + 2] = getMedian(arr.slice(0, index + 1));
+				array[i][base + 4] = getMedian(arr.slice(index));
+			}
+
+			array[i][base] = max;
+			array[i][base + 1] = min
+			array[i][base + 3] = median;
+		}
+
+		return array;
+	}
+
+	/*
+	* Takes an array and returns
+	* the median value.
+	*/
+	function getMedian(array) {
+		var length = array.length;
+
+		/* If the array is an even length the
+		* median is the average of the two
+		* middle-most values. Otherwise the
+		* median is the middle-most value.
+		*/
+		if (length `% 2 === 0) {
+			var midUpper = length / 2;
+			var midLower = midUpper - 1;
+
+			return (array[midUpper] + array[midLower]) / 2;
+		}
+		else {
+			return array[Math.floor(length / 2)];
+		}
+	}
+	)
+	
+	return script
+}
 
 global rangeLapsEdit
 	

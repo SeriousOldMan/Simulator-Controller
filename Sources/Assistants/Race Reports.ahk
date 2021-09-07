@@ -1086,6 +1086,7 @@ class RaceReports extends ConfigurationItem {
 				this.iSelectedReport := report
 				
 				this.Settings.Delete("Laps")
+				this.Settings.Delete("Drivers")
 								
 				Loop Files, % this.Database . "\" . this.SetupDatabase.getSimulatorCode(simulatorDropDown) . "\*.*", D
 					if (A_Index = this.SelectedRace) {

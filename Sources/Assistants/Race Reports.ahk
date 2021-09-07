@@ -777,7 +777,7 @@ class RaceReports extends ConfigurationItem {
 			
 			drawChartFunction .= ("`n]);")
 			
-			drawChartFunction := drawChartFunction . "`nvar options = { bars: 'horizontal', backgroundColor: 'D0D0D0', chartArea: { left: '20%', top: '2%', right: '30%', bottom: '10%' } };"
+			drawChartFunction := drawChartFunction . "`nvar options = { bars: 'horizontal', backgroundColor: 'D0D0D0', chartArea: { left: '20%', top: '5%', right: '30%', bottom: '10%' } };"
 			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.BarChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 			
 			this.showReportChart(drawChartFunction)
@@ -858,7 +858,7 @@ class RaceReports extends ConfigurationItem {
 				drawChartFunction := drawChartFunction . "]"
 			}
 			
-			drawChartFunction := drawChartFunction . ("]);`nvar options = { legend: { position: 'right' }, chartArea: { left: '5%', top: '2%', right: '20%', bottom: '10%' }, ")
+			drawChartFunction := drawChartFunction . ("]);`nvar options = { legend: { position: 'right' }, chartArea: { left: '5%', top: '5%', right: '20%', bottom: '10%' }, ")
 			drawChartFunction := drawChartFunction . ("hAxis: { title: '" . translate("Laps") . "' }, vAxis: { direction: -1, ticks: [], title: '" . translate("Cars") . "', baselineColor: 'D0D0D0' }, backgroundColor: 'D0D0D0' };`n")
 
 			drawChartFunction := drawChartFunction . "var chart = new google.visualization.LineChart(document.getElementById('chart_id')); chart.draw(data, options); }"
@@ -926,7 +926,7 @@ class RaceReports extends ConfigurationItem {
 			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Car") . "');"
 			
 			Loop % laps.Length()
-				drawChartFunction .= "`ndata.addColumn('number', '" . translate("Lap") . A_Space . (A_Index - 1) . "');"
+				drawChartFunction .= "`ndata.addColumn('number', '" . translate("Lap") . A_Space . laps[A_Index] . "');"
 			
 			text =
 			(
@@ -946,7 +946,7 @@ class RaceReports extends ConfigurationItem {
 			text =
 			(
 			var options = {
-				backgroundColor: 'D0D0D0', chartArea: { left: '10`%', top: '2`%', right: '5`%', bottom: '20`%' },
+				backgroundColor: 'D0D0D0', chartArea: { left: '10`%', top: '5`%', right: '5`%', bottom: '20`%' },
 				legend: { position: 'none' },
 			)
 			
@@ -1086,6 +1086,7 @@ class RaceReports extends ConfigurationItem {
 				this.iSelectedReport := report
 				
 				this.Settings.Delete("Laps")
+				this.Settings.Delete("Drivers")
 								
 				Loop Files, % this.Database . "\" . this.SetupDatabase.getSimulatorCode(simulatorDropDown) . "\*.*", D
 					if (A_Index = this.SelectedRace) {

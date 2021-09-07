@@ -365,7 +365,8 @@ checkInstallation() {
 				deleteUninstallerInfo()
 			}
 			
-			removeDirectory(installLocation)
+			if (installlLocation != A_ProgramFiles)
+				removeDirectory(installLocation)
 			
 			showProgress({progress: 100, message: translate("Finished...")})
 			
@@ -505,7 +506,17 @@ checkInstallation() {
 				if (installLocation != packageLocation) {
 					showProgress({message: translate("Removing installation files...")})
 				
-					removeDirectory(packageLocation)
+					if inList(A_Args, "-Install")
+						removeDirectory(packageLocation)
+					else {
+						OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+						title := translate("Modular Simulator Controller System")
+						MsgBox 262436, %title%, % translate("Do you want to remove the folder with the installation files?")
+						OnMessage(0x44, "")
+						
+						IfMsgBox Yes
+							removeDirectory(packageLocation)
+					}
 				}
 				
 				showProgress({progress: 100, message: translate("Finished...")})
@@ -533,7 +544,7 @@ checkInstallation() {
 					else {
 						OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
 						title := translate("Modular Simulator Controller System")
-						MsgBox 262436, %title%, % translate("Do you want to remove the installation files?")
+						MsgBox 262436, %title%, % translate("Do you want to remove the folder with the installation files?")
 						OnMessage(0x44, "")
 						
 						IfMsgBox Yes

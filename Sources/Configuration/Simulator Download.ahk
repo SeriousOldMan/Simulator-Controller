@@ -110,15 +110,20 @@ downloadSimulatorController() {
 			
 			showProgress({progress: 100, message: translate("Starting installation...")})
 			
+			directory := (A_Temp . "\Simulator Controller")
+			
+			if FileExist(directory . "\Simulator Controller")
+				directory .= "\Simulator Controller"
+			
 			index := inList(A_Args, "-Start")
 			
 			if index {
 				start := A_Args[index + 1]
 				
-				Run "%A_Temp%\Simulator Controller\Binaries\Simulator Tools.exe" -NoUpdate -Install -Start "%start%"
+				Run "%directory%\Binaries\Simulator Tools.exe" -NoUpdate -Install -Start "%start%"
 			}
 			else
-				Run "%A_Temp%\Simulator Controller\Binaries\Simulator Tools.exe" -NoUpdate -Install
+				Run "%directory%\Binaries\Simulator Tools.exe" -NoUpdate -Install
 			
 			Sleep 1000
 			

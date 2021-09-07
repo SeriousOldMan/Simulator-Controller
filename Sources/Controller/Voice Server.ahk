@@ -274,9 +274,6 @@ class VoiceServer extends ConfigurationItem {
 					return false
 				}
 				else {
-					if this.VoiceServer.PushToTalk
-						SoundPlay %kResourcesDirectory%Sounds\Talk.wav
-					
 					this.iIsListening := true
 				
 					return true
@@ -503,6 +500,8 @@ class VoiceServer extends ConfigurationItem {
 		}
 		
 		if !this.Speaking && pressed {
+			SoundPlay %kResourcesDirectory%Sounds\Talk.wav
+					
 			if activation
 				this.startActivationListener()
 			else

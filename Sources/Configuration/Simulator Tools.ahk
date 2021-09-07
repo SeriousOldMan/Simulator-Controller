@@ -506,7 +506,7 @@ checkInstallation() {
 				if (installLocation != packageLocation) {
 					showProgress({message: translate("Removing installation files...")})
 				
-					if inList(A_Args, "-Install")
+					if InStr(packageLocation, A_Temp)
 						removeDirectory(packageLocation)
 					else {
 						OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))

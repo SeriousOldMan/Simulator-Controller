@@ -32,13 +32,6 @@ ListLines Off					; Disable execution history
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                         Local Include Section                           ;;;
-;;;-------------------------------------------------------------------------;;;
-
-#Include ..\Assistants\Libraries\SetupDatabase.ahk
-
-
-;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Constants Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -68,7 +61,6 @@ global deleteRaceReportButtonHandle
 
 class RaceReports extends ConfigurationItem {
 	iDatabase := false
-	iSetupDatabase := false
 	
 	iSelectedSimulator := false
 	iSelectedCar := false
@@ -90,15 +82,6 @@ class RaceReports extends ConfigurationItem {
 	Database[] {
 		Get {
 			return this.iDatabase
-		}
-	}
-	
-	SetupDatabase[] {
-		Get {
-			if !this.iSetupDatabase
-				this.iSetupDatabase := new SetupDatabase()
-			
-			return this.iSetupDatabase
 		}
 	}
 	
@@ -183,7 +166,7 @@ class RaceReports extends ConfigurationItem {
 		
 		Gui %window%:Add, Text, x16 yp+10 w70 h23 +0x200 Section, % translate("Simulator")
 		
-		simulators := this.SetupDatabase.getSimulators()
+		simulators := this.getSimulators()
 		
 		simulator := ((simulators.Length() > 0) ? 1 : 0)
 	
@@ -222,7 +205,7 @@ class RaceReports extends ConfigurationItem {
 		
 		chartViewer.Navigate("about:blank")
 		
-		this.loadSimulator(simulator)
+		this.loadSimulator(simulator, true)
 		
 		Gui %window%:Add, Text, x8 y574 w1200 0x10
 		
@@ -1019,10 +1002,49 @@ class RaceReports extends ConfigurationItem {
 		return this.editReportSettings(reportDirectory, "Laps", "Drivers")
 	}
 
+	getSimulators() {
+		simulators := []
+		
+		for simulator, ignore in getConfigurationSectionValues(getControllerConfiguration(), "Simulators", Object())
+			simulators.Push(simulator)
+				
+		return simulators
+	}
+
+	getSimulatorName(simulatorCode) {
+		if (simulatorCode = "Unknown")
+			return "Unknown"
+		else {
+			for name, description in getConfigurationSectionValues(getControllerConfiguration(), "Simulators", Object())
+				if ((simulatorCode = name) || (simulatorCode = string2Values("|", description)[1]))
+					return name
+				
+			return false
+		}
+	}
+
+	getSimulatorCode(simulatorName) {
+		if (simulatorName = "Unknown")
+			return "Unknown"
+		else {
+			code := getConfigurationValue(getControllerConfiguration(), "Simulators", simulatorName, false)
+		
+			if code
+				return string2Values("|", code)[1]
+			else {
+				for name, description in getConfigurationSectionValues(getControllerConfiguration(), "Simulators", Object())
+					if (simulatorName = string2Values("|", description)[1])
+						return simulatorName
+				
+				return false
+			}
+		}
+	}
+
 	getCars(simulator) {
 		cars := {}
 		
-		Loop Files, % this.Database . "\" . this.SetupDatabase.getSimulatorCode(simulator) . "\*.*", D
+		Loop Files, % this.Database . "\" . this.getSimulatorCode(simulator) . "\*.*", D
 		{
 			raceData := readConfiguration(A_LoopFilePath . "\Race.data")
 			car := getConfigurationValue(raceData, "Session", "Car")
@@ -1041,7 +1063,7 @@ class RaceReports extends ConfigurationItem {
 	getTracks(simulator, car) {
 		tracks := {}
 		
-		Loop Files, % this.Database . "\" . this.SetupDatabase.getSimulatorCode(simulator) . "\*.*", D
+		Loop Files, % this.Database . "\" . this.getSimulatorCode(simulator) . "\*.*", D
 		{
 			raceData := readConfiguration(A_LoopFilePath . "\Race.data")
 			
@@ -1070,7 +1092,7 @@ class RaceReports extends ConfigurationItem {
 			
 			cars := this.getCars(simulator)
 			
-			GuiControl Choose, simulatorDropDown, % inList(this.SetupDatabase.getSimulators(), simulator)
+			GuiControl Choose, simulatorDropDown, % inList(this.getSimulators(), simulator)
 			GuiControl, , carDropDown, % "|" . values2String("|", cars*)
 			
 			this.loadCar((cars.Length() > 0) ? cars[1] : false, true)
@@ -1121,7 +1143,7 @@ class RaceReports extends ConfigurationItem {
 			LV_Delete()
 				
 			if track {
-				Loop Files, % this.Database . "\" . this.SetupDatabase.getSimulatorCode(simulator) . "\*.*", D
+				Loop Files, % this.Database . "\" . this.getSimulatorCode(simulator) . "\*.*", D
 				{
 					FormatTime date, %A_LoopFileName%, ShortDate
 					FormatTime time, %A_LoopFileName%, HH:mm
@@ -1177,7 +1199,7 @@ class RaceReports extends ConfigurationItem {
 		
 		IfMsgBox Yes
 		{
-			raceDirectory := (this.Database . "\" . this.SetupDatabase.getSimulatorCode(this.SelectedSimulator) . "\" . this.AvailableRaces[this.SelectedRace])
+			raceDirectory := (this.Database . "\" . this.getSimulatorCode(this.SelectedSimulator) . "\" . this.AvailableRaces[this.SelectedRace])
 			
 			FileRemoveDir %raceDirectory%, true
 		
@@ -1200,7 +1222,7 @@ class RaceReports extends ConfigurationItem {
 				GuiControl Choose, reportsDropDown, % inList(kReports, report)
 				GuiControl Disable, reportSettingsButton
 				
-				reportDirectory := (this.Database . "\" . this.SetupDatabase.getSimulatorCode(this.SelectedSimulator) . "\" . this.AvailableRaces[this.SelectedRace])
+				reportDirectory := (this.Database . "\" . this.getSimulatorCode(this.SelectedSimulator) . "\" . this.AvailableRaces[this.SelectedRace])
 				
 				switch report {
 					case "Overview":
@@ -1229,7 +1251,7 @@ class RaceReports extends ConfigurationItem {
 	}
 	
 	reportSettings(report) {
-		reportDirectory := (this.Database . "\" . this.SetupDatabase.getSimulatorCode(this.SelectedSimulator) . "\" . this.AvailableRaces[this.SelectedRace])
+		reportDirectory := (this.Database . "\" . this.getSimulatorCode(this.SelectedSimulator) . "\" . this.AvailableRaces[this.SelectedRace])
 		
 		switch report {
 			case "Driver":
@@ -1731,7 +1753,7 @@ runRaceReport() {
 		reports.createGui(reports.Configuration)
 		reports.show()
 		
-		simulators := reports.SetupDatabase.getSimulators()
+		simulators := reports.getSimulators()
 		
 		if (simulators.Length() > 0)
 			reports.loadSimulator(simulators[1])

@@ -1295,6 +1295,8 @@ debugNonObjectUsage(reference, p1="", p2="", p3="", p4="") {
 	
 		MsgBox A non-object value was improperly invoked.`n`nSpecifically: %reference%
 	}
+	
+	return false
 }
 
 isDebug() {
@@ -1456,7 +1458,7 @@ isInstance(object, root) {
 			if (candidate == root)
 				return true
 			else {
-				classVar := (candidate.HasKey("base") ? candidate.base.__Class : false)
+				classVar := (candidate.base ? candidate.base.__Class : false)
 			
 				if (classVar && (classVar != "")) {
 					if InStr(classVar, ".") {

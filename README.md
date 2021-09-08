@@ -26,7 +26,7 @@ Simply donwload and run [Simulator Controller.exe](https://cntr.click/Qt9gVs0) (
 
 #### Latest development build
 
-[3.5.6-dev](https://www.dropbox.com/s/ozd0zg9svlc5ozm/Simulator%20Controller%203.5.6-dev.zip?dl=1) (Early build for Release 3.5.6. New features: New Reports in Race Reports tool, Improved "Pace" report including median and quartile calculation, New "Call" command for Race Assistants, Better handling of multiple voice dialog partners when not using Push-to-Talk, Pit Menu Handling for RaceRoom Racing Experience without image recognition. Stable, with documentation and update procedure.)
+[3.5.6-dev](https://www.dropbox.com/s/ozd0zg9svlc5ozm/Simulator%20Controller%203.5.6-dev.zip?dl=1) (Early build for Release 3.5.6. New features: New Reports in Race Reports tool, Improved "Pace" report including median and quartile calculation, New "Call" command for Race Assistants, Better handling of multiple voice dialog partners when not using Push-to-Talk. Stable, with documentation and update procedure.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-356) of this version and all the versions you might have skipped, before installing and using this version.
 

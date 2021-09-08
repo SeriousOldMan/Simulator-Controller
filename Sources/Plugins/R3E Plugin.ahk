@@ -26,7 +26,7 @@ global kR3EPlugin = "R3E"
 ;;;                         Private Constant Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kBinaryOptions = ["Change Front Tyres", "Change Rear Tyres", "Repair Bodywork", "Repair Front Aero", "Repair Rear Aero", "Repair Suspension", "Request Pitstop"]
+global kBinaryOptions = ["Serve Penalty", "Change Front Tyres", "Change Rear Tyres", "Repair Bodywork", "Repair Front Aero", "Repair Rear Aero", "Repair Suspension", "Request Pitstop"]
 
 global kUseImageRecognition = true
 
@@ -273,6 +273,16 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 				this.iPitstopOptionStates.Push(pitMenuState["Strategy"])
 			}
 			
+			if (pitMenuState["Serve Penalty"] != "Unavailable") {
+				this.iPitstopOptions.Push("Serve Penalty")
+				this.iPitstopOptionStates.Push(pitMenuState["Serve Penalty"])
+			}
+			
+			if (pitMenuState["Driver"] != "Unavailable") {
+				this.iPitstopOptions.Push("Driver")
+				this.iPitstopOptionStates.Push(pitMenuState["Driver"])
+			}
+			
 			if (pitMenuState["Refuel"] != "Unavailable") {
 				this.iPitstopOptions.Push("Refuel")
 				this.iPitstopOptionStates.Push(pitMenuState["Refuel"])
@@ -316,13 +326,9 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 				this.iPitstopOptionStates.Push(pitMenuState["Repair Suspension"])
 			}
 			
-			if this.searchMFDImage("PIT REQUEST") {
+			if (pitMenuState["Bottom Button"] != "Unavailable") {
 				this.iPitstopOptions.Push("Request Pitstop")
-				this.iPitstopOptionStates.Push(true)
-			}
-			else {
-				this.iPitstopOptions.Push("Request Pitstop")
-				this.iPitstopOptionStates.Push(false)
+				this.iPitstopOptionStates.Push(pitMenuState["Bottom Button"])
 			}
 		}
 	}

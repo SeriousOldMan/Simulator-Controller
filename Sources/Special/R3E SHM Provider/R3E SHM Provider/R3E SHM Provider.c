@@ -317,7 +317,7 @@ int main(int argc, char* argv[])
 
 					break;
 				case R3E_PIT_MENU_PENALTY:
-					wprintf(L"Penalty\n");
+					wprintf(L"Serve Penalty\n");
 
 					break;
 				case R3E_PIT_MENU_DRIVERCHANGE:
@@ -344,19 +344,25 @@ int main(int argc, char* argv[])
 					wprintf(L"Repair Rear Aero\n");
 
 					break;
+				/*
 				case R3E_PIT_MENU_SUSPENSION:
 					wprintf(L"Repair Suspension\n");
 
 					break;
+				*/
 				case R3E_PIT_MENU_BUTTON_TOP:
-					wprintf(L"Top\n");
+					wprintf(L"Top Button\n");
 
 					break;
 				case R3E_PIT_MENU_BUTTON_BOTTOM:
-					wprintf(L"Bottom\n");
+					wprintf(L"Bottom Button\n");
 
 					break;
 				case R3E_PIT_MENU_MAX:
+					wprintf(L"false\n");
+
+					break;
+				default:
 					wprintf(L"false\n");
 
 					break;
@@ -369,7 +375,7 @@ int main(int argc, char* argv[])
 
 						break;
 					case R3E_PIT_MENU_PENALTY:
-						wprintf(L"Penalty=");
+						wprintf(L"Serve Penalty=");
 
 						break;
 					case R3E_PIT_MENU_DRIVERCHANGE:
@@ -396,16 +402,18 @@ int main(int argc, char* argv[])
 						wprintf(L"Repair Rear Aero=");
 
 						break;
+					/*
 					case R3E_PIT_MENU_SUSPENSION:
 						wprintf(L"Repair Suspension=");
 
 						break;
+					*/
 					case R3E_PIT_MENU_BUTTON_TOP:
-						wprintf(L"Top=");
+						wprintf(L"Top Button=");
 
 						break;
 					case R3E_PIT_MENU_BUTTON_BOTTOM:
-						wprintf(L"Bottom=");
+						wprintf(L"Bottom Button=");
 
 						break;
 					default:

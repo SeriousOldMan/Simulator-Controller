@@ -1293,7 +1293,7 @@ debugNonObjectUsage(reference, p1="", p2="", p3="", p4="") {
 	if isDebug() {
 		ListLines
 	
-		MsgBox A non-object value was improperly invoked.`n`nSpecifically: %nonobj%
+		MsgBox A non-object value was improperly invoked.`n`nSpecifically: %reference%
 	}
 }
 

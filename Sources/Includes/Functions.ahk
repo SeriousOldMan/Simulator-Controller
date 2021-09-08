@@ -897,7 +897,9 @@ loadSimulatorConfiguration() {
 		logMessage(kLogWarn, translate("SoX executable not configured"))
 	
 	kSilentMode := getConfigurationValue(kSimulatorConfiguration, "Configuration", "Silent Mode", false)
-	
+		
+	"".base.__Get := "".base.__Set := "".base.__Call := Func("debugNonObjectUsage")
+
 	if (!A_IsCompiled || getConfigurationValue(kSimulatorConfiguration, "Configuration", "Debug", false))
 		setDebug(true)
 	
@@ -1284,6 +1286,14 @@ moveByMouse(window) {
 	}
 	finally {
 		CoordMode Mouse, curCoordMode
+	}
+}
+
+debugNonObjectUsage(reference, p1="", p2="", p3="", p4="") {
+	if isDebug() {
+		ListLines
+	
+		MsgBox A non-object value was improperly invoked.`n`nSpecifically: %nonobj%
 	}
 }
 

@@ -1456,7 +1456,7 @@ isInstance(object, root) {
 			if (candidate == root)
 				return true
 			else {
-				classVar := candidate.base.__Class
+				classVar := (candidate.HasKey("base") ? candidate.base.__Class : false)
 			
 				if (classVar && (classVar != "")) {
 					if InStr(classVar, ".") {

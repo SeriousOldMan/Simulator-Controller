@@ -400,6 +400,14 @@ int main(int argc, char* argv[])
 						wprintf(L"Repair Suspension=");
 
 						break;
+					case R3E_PIT_MENU_BUTTON_TOP:
+						wprintf(L"Top=");
+
+						break;
+					case R3E_PIT_MENU_BUTTON_BOTTOM:
+						wprintf(L"Bottom=");
+
+						break;
 					default:
 						wprintf(L"Unknown=");
 

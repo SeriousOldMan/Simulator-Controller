@@ -178,12 +178,14 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 			
 		this.iCurrentSimulator := rsSimulatorDropDown
 		
-		configuration := this.iSimulatorConfigurations[rsSimulatorDropDown]
-		
-		GuiControl Choose, rsSaveRaceReportDropDown, % inList(["Ask", "Always", "Never"], configuration["SaveRaceReport"])
-		GuiControl Text, rsLearningLapsEdit, % configuration["LearningLaps"]
-		GuiControl Text, rsLapsConsideredEdit, % configuration["ConsideredHistoryLaps"]
-		GuiControl Text, rsDampingFactorEdit, % configuration["HistoryLapsDamping"]
+		if this.iSimulatorConfigurations.HasKey(rsSimulatorDropDown) {
+			configuration := this.iSimulatorConfigurations[rsSimulatorDropDown]
+			
+			GuiControl Choose, rsSaveRaceReportDropDown, % inList(["Ask", "Always", "Never"], configuration["SaveRaceReport"])
+			GuiControl Text, rsLearningLapsEdit, % configuration["LearningLaps"]
+			GuiControl Text, rsLapsConsideredEdit, % configuration["ConsideredHistoryLaps"]
+			GuiControl Text, rsDampingFactorEdit, % configuration["HistoryLapsDamping"]
+		}
 	}
 	
 	saveSimulatorConfiguration() {

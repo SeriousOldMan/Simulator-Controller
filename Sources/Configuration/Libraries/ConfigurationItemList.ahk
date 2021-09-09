@@ -36,7 +36,7 @@ class ConfigurationItemList extends ConfigurationItem {
 		Get {
 ; #Warn UseUnsetLocal, Off
 			try {
-				if ConfigurationEditor
+				if (ConfigurationEditor && ConfigurationEditor.Instance)
 					return ConfigurationEditor.Instance.AutoSave
 				else
 					return false

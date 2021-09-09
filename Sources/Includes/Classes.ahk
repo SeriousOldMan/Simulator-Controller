@@ -514,7 +514,9 @@ class Function extends ConfigurationItem {
 	}
 	
 	actionCallable(trigger, action) {
-		return (action != false) ? Func(action[1]).Bind(action[2]*) : false
+		local function := (action != false) ? Func(action[1]) : false
+		
+		return (function != false) ? function.Bind(action[2]*) : false
 	}
 	
 	fireAction(trigger) {

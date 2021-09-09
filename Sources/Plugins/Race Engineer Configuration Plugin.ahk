@@ -207,21 +207,23 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		
 		this.iCurrentSimulator := reSimulatorDropDown
 		
-		configuration := this.iSimulatorConfigurations[reSimulatorDropDown]
-		
-		GuiControl Choose, reLoadSettingsDropDown, % inList(["Default", "SetupDatabase"], configuration["LoadSettings"])
-		GuiControl Choose, reLoadTyrePressuresDropDown, % inList(["Default", "SetupDatabase", "Import"], configuration["LoadTyrePressures"])
-		
-		GuiControl Choose, reSaveSettingsDropDown, % inList(["Ask", "Always", "Never"], configuration["SaveSettings"])
-		GuiControl Choose, reSaveTyrePressuresDropDown, % inList(["Ask", "Always", "Never"], configuration["SaveTyrePressures"])
-		
-		GuiControl Text, reLearningLapsEdit, % configuration["LearningLaps"]
-		GuiControl Text, reLapsConsideredEdit, % configuration["ConsideredHistoryLaps"]
-		GuiControl Text, reDampingFactorEdit, % configuration["HistoryLapsDamping"]
-		
-		GuiControl, , reAdjustLapTimeCheck, % configuration["AdjustLapTime"]
-		
-		GuiControl Text, reDamageAnalysisLapsEdit, % configuration["DamageAnalysisLaps"]
+		if this.iSimulatorConfigurations.HasKey(reSimulatorDropDown) {
+			configuration := this.iSimulatorConfigurations[reSimulatorDropDown]
+			
+			GuiControl Choose, reLoadSettingsDropDown, % inList(["Default", "SetupDatabase"], configuration["LoadSettings"])
+			GuiControl Choose, reLoadTyrePressuresDropDown, % inList(["Default", "SetupDatabase", "Import"], configuration["LoadTyrePressures"])
+			
+			GuiControl Choose, reSaveSettingsDropDown, % inList(["Ask", "Always", "Never"], configuration["SaveSettings"])
+			GuiControl Choose, reSaveTyrePressuresDropDown, % inList(["Ask", "Always", "Never"], configuration["SaveTyrePressures"])
+			
+			GuiControl Text, reLearningLapsEdit, % configuration["LearningLaps"]
+			GuiControl Text, reLapsConsideredEdit, % configuration["ConsideredHistoryLaps"]
+			GuiControl Text, reDampingFactorEdit, % configuration["HistoryLapsDamping"]
+			
+			GuiControl, , reAdjustLapTimeCheck, % configuration["AdjustLapTime"]
+			
+			GuiControl Text, reDamageAnalysisLapsEdit, % configuration["DamageAnalysisLaps"]
+		}
 	}
 	
 	saveSimulatorConfiguration() {

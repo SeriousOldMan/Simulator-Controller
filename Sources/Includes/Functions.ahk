@@ -897,7 +897,9 @@ loadSimulatorConfiguration() {
 		logMessage(kLogWarn, translate("SoX executable not configured"))
 	
 	kSilentMode := getConfigurationValue(kSimulatorConfiguration, "Configuration", "Silent Mode", false)
-	
+		
+	"".base.__Get := "".base.__Set := "".base.__Call := Func("debugNonObjectUsage")
+
 	if (!A_IsCompiled || getConfigurationValue(kSimulatorConfiguration, "Configuration", "Debug", false))
 		setDebug(true)
 	
@@ -1287,6 +1289,13 @@ moveByMouse(window) {
 	}
 }
 
+debugNonObjectUsage(reference, p1="", p2="", p3="", p4="") {
+	if isDebug()
+		showMessage("The literal value " . reference . " was used as an object.")
+	
+	return false
+}
+
 isDebug() {
 	return vDebug
 }
@@ -1446,7 +1455,7 @@ isInstance(object, root) {
 			if (candidate == root)
 				return true
 			else {
-				classVar := candidate.base.__Class
+				classVar := (candidate.base ? candidate.base.__Class : false)
 			
 				if (classVar && (classVar != "")) {
 					if InStr(classVar, ".") {

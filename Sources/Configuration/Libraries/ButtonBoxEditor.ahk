@@ -90,7 +90,7 @@ class ButtonBoxEditor extends ConfigurationItem {
 	AutoSave[] {
 		Get {
 			try {
-				if ConfigurationEditor
+				if (ConfigurationEditor && ConfigurationEditor.Instance)
 					return ConfigurationEditor.Instance.AutoSave
 				else
 					return false
@@ -806,7 +806,7 @@ class LayoutsList extends ConfigurationItemList {
 	}
 	
 	clearEditor() {
-		this.loadEditor(Array("", {Grid: "0x0", Margins: [0,0,0,0]}))
+		this.loadEditor(Array("", "", {Grid: "0x0", Margins: [0,0,0,0]}))
 	}
 	
 	buildItemFromEditor(isNew := false) {
@@ -1745,7 +1745,10 @@ updateLayoutRowEditor() {
 	protectionOn()
 	
 	try {
-		ConfigurationItemList.getList("layoutsListView").updateLayoutRowEditor()
+		list := ConfigurationItemList.getList("layoutsListView")
+		
+		if list
+			list.updateLayoutRowEditor()
 	}
 	catch exception {
 		; ignore

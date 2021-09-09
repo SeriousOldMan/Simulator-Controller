@@ -169,9 +169,6 @@ class ConfigurationEditor extends ConfigurationItem {
 		
 		this.iGeneralTab.saveToConfiguration(configuration)
 		
-		if this.iDevelopment
-			this.iDevelopmentTab.saveToConfiguration(configuration)
-		
 		for ignore, configurator in this.Configurators
 			configurator[2].saveToConfiguration(configuration)
 	}

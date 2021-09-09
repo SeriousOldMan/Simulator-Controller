@@ -1005,8 +1005,19 @@ class RaceReports extends ConfigurationItem {
 	getSimulators() {
 		simulators := []
 		
-		for simulator, ignore in getConfigurationSectionValues(getControllerConfiguration(), "Simulators", Object())
-			simulators.Push(simulator)
+		for simulator, ignore in getConfigurationSectionValues(getControllerConfiguration(), "Simulators", Object()) {
+			hasReports := false
+			
+			Loop Files, % this.Database . "\" . this.getSimulatorCode(simulator) . "\*.*", D
+			{
+				hasReports := true
+				
+				break
+			}
+			
+			if hasReports
+				simulators.Push(simulator)
+		}
 				
 		return simulators
 	}

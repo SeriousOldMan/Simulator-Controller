@@ -1167,6 +1167,8 @@ class RaceReports extends ConfigurationItem {
 	
 	loadRace(raceNr) {
 		if (raceNr != this.SelectedRace) {
+			this.iSettings := {}
+			
 			if raceNr {
 				GuiControl Enable, reportsDropDown
 				GuiControl Choose, reportsDropDown, % inList(kReports, "Overview")
@@ -1209,15 +1211,10 @@ class RaceReports extends ConfigurationItem {
 	
 	loadReport(report) {
 		if (report != this.SelectedReport) {
-			this.iSettings := {}
-			
 			if report {
 				GuiControlGet simulatorDropDown
 				
 				this.iSelectedReport := report
-				
-				this.Settings.Delete("Laps")
-				this.Settings.Delete("Drivers")
 								
 				GuiControl Choose, reportsDropDown, % inList(kReports, report)
 				GuiControl Disable, reportSettingsButton
@@ -1230,7 +1227,8 @@ class RaceReports extends ConfigurationItem {
 					case "Car":
 						this.showCarReport(reportDirectory)
 					case "Driver":
-						this.Settings["Drivers"] := [1, 2, 3, 4, 5]
+						if !this.Settings.HasKey("Drivers")
+							this.Settings["Drivers"] := [1, 2, 3, 4, 5]
 						
 						this.showDriverReport(reportDirectory)
 					case "Position":
@@ -1340,7 +1338,8 @@ getPaceJSFunctions() {
 }
 
 global rangeLapsEdit
-	
+global driverSelectCheck
+
 editReportSettings(raceReports, reportDirectory := false, options := false) {
 	static allLapsRadio
 	static rangeLapsRadio
@@ -1441,11 +1440,13 @@ editReportSettings(raceReports, reportDirectory := false, options := false) {
 		}
 		
 		if inList(options, "Drivers") {
-			yOption := (inList(options, "Laps") ? "yp+30" : "yp+10")
+			yOption := (inList(options, "Laps") ? "yp+30" : "yp+10") + 2
 			
 			Gui RRS:Add, Text, x16 %yOption% w70 h23 +0x200 Section, % translate("Drivers")
 			
-			Gui RRS:Add, ListView, x90 yp w264 h300 -Multi -LV0x10 Checked NoSort NoSortHdr, % values2String("|", map(["Driver", "Car"], "translate")*)
+			Gui RRS:Add, ListView, x90 yp-2 w264 h300 AltSubmit -Multi -LV0x10 Checked NoSort NoSortHdr gselectDriver, % values2String("|", map(["     Driver", "Car"], "translate")*)
+			
+			Gui RRS:Add, CheckBox, Check3 x72 yp+2 w15 h23 vdriverSelectCheck gselectDrivers
 			
 			allDrivers := raceReports.getDrivers(raceData, drivers)
 			selectedDrivers := []
@@ -1458,6 +1459,13 @@ editReportSettings(raceReports, reportDirectory := false, options := false) {
 				
 			for ignore, driver in allDrivers
 				LV_Add(inList(selectedDrivers, A_Index) ? "Check" : "", driver, getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Car"))
+			
+			if (!selectedDrivers || (selectedDrivers.Length() == allDrivers.Length()))
+				GuiControl, , driverSelectCheck, 1
+			else if ((selectedDrivers.Length() > 0) && (selectedDrivers.Length() != allDrivers.Length()))
+				GuiControl, , driverSelectCheck, -1
+			else
+				GuiControl, , driverSelectCheck, 0
 			
 			LV_ModifyCol(1, "AutoHdr")
 			LV_ModifyCol(2, "AutoHdr")
@@ -1557,6 +1565,41 @@ chooseLapSelection() {
 	}
 	else
 		GuiControl Enable, rangeLapsEdit
+}
+
+selectDriver() {
+	selected := 0
+	
+	row := 0
+	
+	Loop {
+		row := LV_GetNext(row, "C")
+	
+		if row
+			selected += 1
+		else
+			break
+	}
+	
+	if (selected == 0)
+		GuiControl, , driverSelectCheck, 0
+	else if (selected < LV_GetCount())
+		GuiControl, , driverSelectCheck, -1
+	else
+		GuiControl, , driverSelectCheck, 1
+}
+
+selectDrivers() {
+	GuiControlGet driverSelectCheck
+	
+	if (driverSelectCheck == -1) {
+		driverSelectCheck := 0
+		
+		GuiControl, , driverSelectCheck, 0
+	}
+	
+	Loop % LV_GetCount()
+		LV_Modify(A_Index, driverSelectCheck ? "Check" : "-Check")
 }
 
 moveSettings() {

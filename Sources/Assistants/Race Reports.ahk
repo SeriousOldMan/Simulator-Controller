@@ -196,7 +196,7 @@ class RaceReports extends ConfigurationItem {
 		infoViewer.Navigate("about:blank")
 		
 		Gui %window%:Add, Text, x290 ys w40 h23 +0x200, % translate("Report")
-		Gui %window%:Add, DropDownList, x334 yp w180 AltSubmit Disabled Choose0 vreportsDropDown gchooseReport, % values2String("|", map(kReports, "translate")*)
+		Gui %window%:Add, DropDownList, x334 yp w120 AltSubmit Disabled Choose0 vreportsDropDown gchooseReport, % values2String("|", map(kReports, "translate")*)
 		
 		Gui %window%:Add, Button, x1177 yp w23 h23 HwndreportSettingsButtonHandle vreportSettingsButton greportSettings
 		setButtonIcon(reportSettingsButtonHandle, kIconsDirectory . "Report Settings.ico", 1)

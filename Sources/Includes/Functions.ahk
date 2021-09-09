@@ -1290,11 +1290,8 @@ moveByMouse(window) {
 }
 
 debugNonObjectUsage(reference, p1="", p2="", p3="", p4="") {
-	if isDebug() {
-		ListLines
-	
-		MsgBox A non-object value was improperly invoked.`n`nSpecifically: %reference%
-	}
+	if isDebug()
+		showMessage("The literal value " . reference . " was used as an object.")
 	
 	return false
 }

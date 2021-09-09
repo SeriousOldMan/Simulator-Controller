@@ -69,7 +69,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 				assistantConfiguration := readConfiguration(kUserHomeDirectory . "Setup\" . assistant . " Configuration.ini")
 		
 				for ignore, section in ["Race Assistant Startup", "Race Assistant Shutdown", "Race Engineer Startup", "Race Engineer Shutdown"
-									  , "Race Strategist Startup", "Race Strategist Shutdown", "Race Engineer Analysis", "Race Strategist Analysis"] {
+									  , "Race Strategist Startup", "Race Strategist Shutdown", "Race Engineer Analysis", "Race Strategist Analysis", "Race Strategist Reports"] {
 					subConfiguration := getConfigurationSectionValues(assistantConfiguration, section, false)
 					
 					if subConfiguration
@@ -272,7 +272,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 		assistantConfiguration := readConfiguration(kUserHomeDirectory . "Setup\" . this.iCurrentAssistant . " Configuration.ini")
 		
 		for ignore, section in ["Race Assistant Startup", "Race Assistant Shutdown", "Race Engineer Startup", "Race Engineer Shutdown"
-							  , "Race Strategist Startup", "Race Strategist Shutdown", "Race Engineer Analysis", "Race Strategist Analysis"] {
+							  , "Race Strategist Startup", "Race Strategist Shutdown", "Race Engineer Analysis", "Race Strategist Analysis", "Race Strategist Reports"] {
 			subConfiguration := getConfigurationSectionValues(assistantConfiguration, section, false)
 			
 			if subConfiguration
@@ -295,7 +295,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 			assistantConfiguration := newConfiguration()
 	
 			for ignore, section in ["Race Assistant Startup", "Race Assistant Shutdown", "Race Engineer Startup", "Race Engineer Shutdown"
-								  , "Race Strategist Startup", "Race Strategist Shutdown", "Race Engineer Analysis", "Race Strategist Analysis"] {
+								  , "Race Strategist Startup", "Race Strategist Shutdown", "Race Engineer Analysis", "Race Strategist Analysis", "Race Strategist Reports"] {
 				subConfiguration := getConfigurationSectionValues(configuration, section, false)
 				
 				if subConfiguration

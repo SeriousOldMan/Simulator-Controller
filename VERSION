@@ -1,8 +1,8 @@
 [Development]
-Version=3.5.6-alpha
+Version=3.5.6-rc1
 Target=3.5.6-release
-Date=09/08/2021
-Download=https://www.dropbox.com/s/c65255ntmlfx2zy/Simulator%20Controller%203.5.6-alpha.zip?dl=1
+Date=09/09/2021
+Download=https://www.dropbox.com/s/2vss4ldkuinoolk/Simulator%20Controller%203.5.6-rc1.zip?dl=1
 Changes=New Reports in Race Reports tool, Improved "Pace" report including median and quartile calculation, New "Call" command for Race Assistants, Better handling of multiple voice dialog partners when not using Push-to-Talk, Improved report selection in "Race Reports" tool
 [Release]
 Version=3.5.4-release
@@ -13,4 +13,4 @@ Changes=New Race Report Tool, New Options in Race Strategist Settings, Ask befor
 Type=Development
 [Version]
 Release=3.5.4-release
-Development=3.5.6-alpha
+Development=3.5.6-rc1

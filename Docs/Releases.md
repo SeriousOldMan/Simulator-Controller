@@ -1,4 +1,4 @@
-## 3.5.6-release 09/10/21 (planned)
+## 3.5.6-release 09/10/21
 
   1. Bugfixes, as always
   2. Documentation updates, as always
@@ -7,9 +7,10 @@
 	 - Car - specific data for your car, weather conditions, mounted tyres, elecronic settins, lap times and pitstops.
 	 - Driver - compare the different drivers on the grid regarding potential, race craft, speed, consistency and car control.
   4. Improved "Pace" report including median and quartile calculation.
-  5. Better selection of reports based on car and track grouping.
+  5. Various usability improvements for the "Race Reports" tool, incl. better selection of reports based on car and track grouping.
   6. [New "Call" command](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) allows you to actiavte the listen mode of a race assistant by the touch of a button on your Button Box.
   7. Improved reliability for voice control of multiple Race Assistants, when Push-to-Talk is not used.
+  8. Optimized language handling for SAPI voices to support non-Microsoft language packs.
 
 ## 3.5.4-release 09/03/21
 

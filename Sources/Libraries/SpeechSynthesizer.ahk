@@ -74,9 +74,14 @@ class SpeechSynthesizer {
 				voices := []
 			
 				if (this.Service = "Windows") {
-					for ignore, name in this.iVoices
-						if inList(kWindowsVoices[language], name)
-							voices.Push(name)
+					Loop % this.iSpeechSynthesizer.GetVoices.Count
+					{
+						voice := this.iSpeechSynthesizer.GetVoices.Item(A_Index - 1)
+						lcid := voice.GetAttribute("Language")
+						
+						if (getLanguageFromLCID(lcid) = language)
+							voices.Push(voice.GetAttribute("Name"))
+					}
 				}
 				else if (this.Service = "Azure") {
 					for ignore, candidate in this.iVoices {
@@ -115,7 +120,7 @@ class SpeechSynthesizer {
 			this.iService := "Windows"
 			this.iSpeechSynthesizer := ComObjCreate("SAPI.SpVoice")
 			
-			Loop, % this.iSpeechSynthesizer.GetVoices.Count
+			Loop % this.iSpeechSynthesizer.GetVoices.Count
 				this.Voices.Push(this.iSpeechSynthesizer.GetVoices.Item(A_Index - 1).GetAttribute("Name"))
 			
 			this.setVoice(language, this.computeVoice(voice, language))

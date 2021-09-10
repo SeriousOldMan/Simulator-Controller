@@ -1415,11 +1415,23 @@ setLanguage(languageCode) {
 	vTargetLanguageCode := languageCode
 }
 
-getSystemLanguage() {
-	if inList(["0407", "0807", "0c07", "1007", "1407"], A_Language)
+getLanguageFromLCID(lcid) {
+	code := SubStr(lcid, StrLen(lcid) - 1)
+	
+	if (code = "07")
 		return "DE"
+	else if (code = "0c")
+		return "FR"
+	else if (code = "0a")
+		return "ES"
+	else if (code = "10")
+		return "IT"
 	else
 		return "EN"
+}
+
+getSystemLanguage() {
+	return getLanguageFromLCID(A_Language)
 }
 
 getLanguage() {

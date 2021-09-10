@@ -222,7 +222,7 @@ uninstallOptions(options) {
 		
 		checked := (options["DeleteUserFiles"] ? "" : "Checked")
 		
-		Gui Uninstall:Add, CheckBox, x74 yp+60 w250 %checked% VkeepUserFilesCheck, % translate("  Keep local data and configuration files?")
+		Gui Uninstall:Add, CheckBox, x74 yp+60 w250 %checked% VkeepUserFilesCheck, % translate("  Keep user data and configuration files?")
 	
 		Gui Uninstall:Add, Text, x8 yp+34 w330 0x10
 		
@@ -503,6 +503,8 @@ checkInstallation() {
 				
 				writeConfiguration(kUserConfigDirectory . "Simulator Controller.install", installOptions)
 				
+				hideSplashTheme()
+				
 				if (installLocation != packageLocation) {
 					showProgress({message: translate("Removing installation files...")})
 				
@@ -523,7 +525,6 @@ checkInstallation() {
 				
 				Sleep 1000
 				
-				hideSplashTheme()
 				hideProgress()
 			
 				if isNew {

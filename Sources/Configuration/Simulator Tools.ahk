@@ -365,7 +365,7 @@ checkInstallation() {
 				deleteUninstallerInfo()
 			}
 			
-			if (installlLocation != A_ProgramFiles)
+			if (installLocation != A_ProgramFiles)
 				removeDirectory(installLocation)
 			
 			showProgress({progress: 100, message: translate("Finished...")})

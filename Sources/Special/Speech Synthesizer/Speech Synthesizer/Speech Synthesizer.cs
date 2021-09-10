@@ -107,7 +107,7 @@ namespace Speech {
         }
 
         private async Task SynthesisGetAvailableVoicesAsync() {
-            using (var synthesizer = new Microsoft.CognitiveServices.Speech.SpeechSynthesizer(config, null as AudioConfig)) {
+            using (var synthesizer = new Microsoft.CognitiveServices.Speech.SpeechSynthesizer(config)) {
                 using (var result = await synthesizer.GetVoicesAsync("")) {
                     if (result.Reason == ResultReason.VoicesListRetrieved) {
                         foreach (var voice in result.Voices) {

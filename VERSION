@@ -1,16 +1,16 @@
 [Development]
-Version=3.5.6-rc1
+Version=3.5.6-release
 Target=3.5.6-release
-Date=09/09/2021
-Download=https://www.dropbox.com/s/2vss4ldkuinoolk/Simulator%20Controller%203.5.6-rc1.zip?dl=1
-Changes=New Reports in Race Reports tool, Improved "Pace" report including median and quartile calculation, New "Call" command for Race Assistants, Better handling of multiple voice dialog partners when not using Push-to-Talk, Usability improvements, incl. improved report selection for the "Race Reports" tool
+Date=09/10/2021
+Download=https://cntr.click/bQ43tSc
+Changes=New Reports in Race Reports tool, Improved "Pace" report including median and quartile calculation, New "Call" command for Race Assistants, Better handling of multiple voice dialog partners when not using Push-to-Talk, Usability improvements, incl. improved report selection for the "Race Reports" tool, Optimized language handling for Windows SAPI voices
 [Release]
-Version=3.5.4-release
-Date=09/03/2021
-Download=https://cntr.click/xDM88gK
-Changes=New Race Report Tool, New Options in Race Strategist Settings, Ask before deleting Setups and Settings in Setup Database tool
+Version=3.5.6-release
+Date=09/10/2021
+Download=https://cntr.click/bQ43tSc
+Changes=New Reports in Race Reports tool, Improved "Pace" report including median and quartile calculation, New "Call" command for Race Assistants, Better handling of multiple voice dialog partners when not using Push-to-Talk, Usability improvements, incl. improved report selection for the "Race Reports" tool, Optimized language handling for Windows SAPI
 [Current]
-Type=Development
+Type=Release
 [Version]
-Release=3.5.4-release
-Development=3.5.6-rc1
+Release=3.5.6-release
+Development=3.5.6-release

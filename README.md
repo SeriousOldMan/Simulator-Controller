@@ -26,22 +26,20 @@ Simply donwload and run [Simulator Controller.exe](https://cntr.click/Qt9gVs0) (
 
 #### Latest development build
 
-[3.5.6-rc1](https://www.dropbox.com/s/2vss4ldkuinoolk/Simulator%20Controller%203.5.6-rc1.zip?dl=1) (Release candidate for Release 3.5.6. New features: New Reports in Race Reports tool, Improved "Pace" report including median and quartile calculation, New "Call" command for Race Assistants, Better handling of multiple voice dialog partners when not using Push-to-Talk, Usability improvements, incl. improved report selection for the "Race Reports" tool. Stable, with documentation and update procedure.)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-356) of this version and all the versions you might have skipped, before installing and using this version.
+None for the moment...
 
 #### Latest release build
 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[3.5.4-release](https://cntr.click/xDM88gK) (New features: New Race Report Tool, New Options in Race Strategist Settings, Ask before deleting Setups and Settings in Setup Database tool.)
+[3.5.6-release](https://cntr.click/bQ43tSc) (New features: New Reports in Race Reports tool, Improved "Pace" report including median and quartile calculation, New "Call" command for Race Assistants, Better handling of multiple voice dialog partners when not using Push-to-Talk, Usability improvements, incl. improved report selection for the "Race Reports" tool, Optimized language handling for Windows SAPI voices)
 
-Attention: This version uses an all new installation process. Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-354) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-356) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[3.5.2-release](https://cntr.click/4YCqPaJ) (New features: Automated update download and installation, Full support for automated Windows Setup & Installation, Autoextracting Software Installer, Already planned and prepared Pitstop settings can be changed with the Button Box (available for ACC and RF2).)
+[3.5.4-release](https://cntr.click/xDM88gK) (New features: New Race Report Tool, New Options in Race Strategist Settings, Ask before deleting Setups and Settings in Setup Database tool.)
 
 ### Discord Community
 

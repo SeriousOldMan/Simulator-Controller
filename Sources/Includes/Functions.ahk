@@ -979,7 +979,7 @@ initializeEnvironment() {
 		FileAppend %id%, % kUserConfigDirectory . "ID"
 	}
 	
-	if (!FileExist(kResourcesDirectory . "Templates\UPDATES") && FileExist(kResourcesDirectory . "Templates"))
+	if (!FileExist(kUserConfigDirectory . "UPDATES") && FileExist(kResourcesDirectory . "Templates"))
 		FileCopy %kResourcesDirectory%Templates\UPDATES, %kUserConfigDirectory%
 }
 

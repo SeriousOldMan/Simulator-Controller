@@ -623,7 +623,7 @@ shareSetupDatabase() {
 		shareCarSetups := (getConfigurationValue(consent, "Consent", "Share Car Setups", "No") = "Yes")
 		
 		if (shareTyrePressures || shareCarSetups) {
-			uploadTimeStamp := kSetupDatabaseDirectory . "Local\UPLOAD"
+			uploadTimeStamp := kDatabaseDirectory . "Local\UPLOAD"
 			
 			if FileExist(uploadTimeStamp) {
 				FileReadLine upload, %uploadTimeStamp%, 1
@@ -644,31 +644,31 @@ shareSetupDatabase() {
 					; ignore
 				}
 				
-				Loop Files, %kSetupDatabaseDirectory%Local\*.*, D									; Simulator
+				Loop Files, %kDatabaseDirectory%Local\*.*, D									; Simulator
 				{
 					simulator := A_LoopFileName
 					
 					FileCreateDir %kTempDirectory%SetupDabase\%simulator%
 					
-					Loop Files, %kSetupDatabaseDirectory%Local\%simulator%\*.*, D					; Car
+					Loop Files, %kDatabaseDirectory%Local\%simulator%\*.*, D					; Car
 					{
 						car := A_LoopFileName
 					
 						FileCreateDir %kTempDirectory%SetupDabase\%simulator%\%car%
 						
-						Loop Files, %kSetupDatabaseDirectory%Local\%simulator%\%car%\*.*, D			; Track
+						Loop Files, %kDatabaseDirectory%Local\%simulator%\%car%\*.*, D			; Track
 						{
 							track := A_LoopFileName
 					
 							FileCreateDir %kTempDirectory%SetupDabase\%simulator%\%car%\%track%
 							
 							if shareTyrePressures
-								Loop Files, %kSetupDatabaseDirectory%Local\%simulator%\%car%\%track%\Tyre Setup*.*
+								Loop Files, %kDatabaseDirectory%Local\%simulator%\%car%\%track%\Tyre Setup*.*
 									FileCopy %A_LoopFilePath%, %kTempDirectory%SetupDabase\%simulator%\%car%\%track%
 							
 							if shareCarSetups {
 								try {
-									FileCopyDir %kSetupDatabaseDirectory%Local\%simulator%\%car%\%track%\Car Setups, %kTempDirectory%SetupDabase\%simulator%\%car%\%track%\Car Setups
+									FileCopyDir %kDatabaseDirectory%Local\%simulator%\%car%\%track%\Car Setups, %kTempDirectory%SetupDabase\%simulator%\%car%\%track%\Car Setups
 								}
 								catch exception {
 									; ignore
@@ -679,31 +679,31 @@ shareSetupDatabase() {
 				}
 				
 				try {
-					FileDelete %kTempDirectory%Setup Database.%id%.zip
+					FileDelete %kTempDirectory%Database.%id%.zip
 				}
 				catch exception {
 					; ignore
 				}
 				
-				RunWait PowerShell.exe -Command Compress-Archive -LiteralPath '%kTempDirectory%SetupDabase' -CompressionLevel Optimal -DestinationPath '%kTempDirectory%Setup Database.%id%.zip', , Hide
+				RunWait PowerShell.exe -Command Compress-Archive -LiteralPath '%kTempDirectory%SetupDabase' -CompressionLevel Optimal -DestinationPath '%kTempDirectory%Database.%id%.zip', , Hide
 				
-				ftpUpload("ftp.drivehq.com", "TheBigO", "29605343.9318.1940", kTempDirectory . "Setup Database." . id . ".zip", "Simulator Controller\Setup Database Uploads\Setup Database." . id . ".zip")
+				ftpUpload("ftp.drivehq.com", "TheBigO", "29605343.9318.1940", kTempDirectory . "Database." . id . ".zip", "Simulator Controller\Database Uploads\Database." . id . ".zip")
 				
 				try {
-					FileDelete %kSetupDatabaseDirectory%Local\UPLOAD
+					FileDelete %kDatabaseDirectory%Local\UPLOAD
 				}
 				catch exception {
 					; ignore
 				}
 				
-				FileAppend %A_Now%, %kSetupDatabaseDirectory%Local\UPLOAD
+				FileAppend %A_Now%, %kDatabaseDirectory%Local\UPLOAD
 				
-				logMessage(kLogInfo, translate("Setup database successfully uploaded"))
+				logMessage(kLogInfo, translate("Database successfully uploaded"))
 			}
 			catch exception {
-				logMessage(kLogCritical, translate("Error while uploading setup database - please check your internet connection..."))
+				logMessage(kLogCritical, translate("Error while uploading database - please check your internet connection..."))
 			
-				showMessage(translate("Error while uploading setup database - please check your internet connection...")
+				showMessage(translate("Error while uploading database - please check your internet connection...")
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
 		}
@@ -947,8 +947,8 @@ initializeEnvironment() {
 	FileCreateDir %kUserHomeDirectory%Grammars
 	FileCreateDir %kUserHomeDirectory%Temp
 	FileCreateDir %kTempDirectory%Messages
-	FileCreateDir %kSetupDatabaseDirectory%Global
-	FileCreateDir %kSetupDatabaseDirectory%Local
+	FileCreateDir %kDatabaseDirectory%Global
+	FileCreateDir %kDatabaseDirectory%Local
 	
 	if FileExist(kResourcesDirectory . "Templates") {
 		if !FileExist(A_MyDocuments . "\Simulator Controller\Plugins\Controller Plugins.ahk")

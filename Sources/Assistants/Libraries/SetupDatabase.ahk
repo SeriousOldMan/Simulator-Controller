@@ -77,11 +77,11 @@ class SetupDatabase {
 	getEntries(filter := "*.*", option := "D") {
 		result := []
 		
-		Loop Files, %kSetupDatabaseDirectory%Local\%filter%, %option%
+		Loop Files, %kDatabaseDirectory%Local\%filter%, %option%
 			result.Push(A_LoopFileName)
 		
 		if this.UseGlobalDatabase
-			Loop Files, %kSetupDatabaseDirectory%Global\%filter%, %option%
+			Loop Files, %kDatabaseDirectory%Global\%filter%, %option%
 				if !inList(result, A_LoopFileName)
 					result.Push(A_LoopFileName)
 		
@@ -188,10 +188,10 @@ class SetupDatabase {
 				weather := condition[3]
 			}
 			
-			pressures := readConfiguration(kSetupDatabaseDirectory . "local\" . path . fileName)
+			pressures := readConfiguration(kDatabaseDirectory . "local\" . path . fileName)
 			
 			if (pressures.Count() == 0)
-				pressures := readConfiguration(kSetupDatabaseDirectory . "global\" . path . fileName)
+				pressures := readConfiguration(kDatabaseDirectory . "global\" . path . fileName)
 			
 			for descriptor, ignore in getConfigurationSectionValues(pressures, "Pressures") {
 				descriptor := ConfigurationItem.splitDescriptor(descriptor)
@@ -288,10 +288,10 @@ class SetupDatabase {
 				for ignore, trackDelta in kTemperatureDeltas {
 					distributions := {FL: {}, FR: {}, RL: {}, RR: {}}
 					
-					this.getPressureDistributions(kSetupDatabaseDirectory . "local\" . path, airTemperature + airDelta, trackTemperature + trackDelta, distributions)
+					this.getPressureDistributions(kDatabaseDirectory . "local\" . path, airTemperature + airDelta, trackTemperature + trackDelta, distributions)
 					
 					if this.UseGlobalDatabase
-						this.getPressureDistributions(kSetupDatabaseDirectory . "global\" . path, airTemperature + airDelta, trackTemperature + trackDelta, distributions)
+						this.getPressureDistributions(kDatabaseDirectory . "global\" . path, airTemperature + airDelta, trackTemperature + trackDelta, distributions)
 					
 					if (distributions["FL"].Count() != 0) {
 						thePressures := {}
@@ -332,7 +332,7 @@ class SetupDatabase {
 		
 		simulator := this.getSimulatorName(simulatorCode)
 		
-		FileCreateDir %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%
+		FileCreateDir %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%
 		
 		if ((this.iLastSimulator != simulator) || (this.iLastCar != car) || (this.iLastTrack != track)
 		 || (this.iLastCompound != compound) || (this.iLastCompoundColor != compoundColor) || (this.iLastWeather != weather)) {
@@ -350,9 +350,9 @@ class SetupDatabase {
 		
 		if !this.iDatabase {
 			if (compoundColor = "Black")
-				this.iDatabaseName := (kSetupDatabaseDirectory . "Local\" . simulatorCode . "\" . car . "\" . track . "\Tyre Setup " . compound . A_Space . weather . ".data")
+				this.iDatabaseName := (kDatabaseDirectory . "Local\" . simulatorCode . "\" . car . "\" . track . "\Tyre Setup " . compound . A_Space . weather . ".data")
 			else
-				this.iDatabaseName := (kSetupDatabaseDirectory . "Local\" . simulatorCode . "\" . car . "\" . track . "\Tyre Setup " . compound . " (" . compoundColor . ") " . weather . ".data")
+				this.iDatabaseName := (kDatabaseDirectory . "Local\" . simulatorCode . "\" . car . "\" . track . "\Tyre Setup " . compound . " (" . compoundColor . ") " . weather . ".data")
 		
 			this.iDatabase := readConfiguration(this.iDatabaseName)
 		}
@@ -400,7 +400,7 @@ class SetupDatabase {
 		simulatorCode := this.getSimulatorCode(simulator)
 		
 		try {
-			FileRead notes, %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Notes.txt
+			FileRead notes, %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Notes.txt
 			
 			return notes
 		}
@@ -412,16 +412,16 @@ class SetupDatabase {
 	writeNotes(simulator, car, track, notes) {
 		simulatorCode := this.getSimulatorCode(simulator)
 		
-		FileCreateDir %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%
+		FileCreateDir %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%
 		
 		try {
-			FileDelete %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Notes.txt
+			FileDelete %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Notes.txt
 		}
 		catch exception {
 			; ignore
 		}
 		
-		FileAppend %notes%, %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Notes.txt, UTF-16
+		FileAppend %notes%, %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Notes.txt, UTF-16
 	}
 	
 	getSetupNames(simulator, car, track, ByRef localSetups, ByRef globalSetups) {
@@ -433,7 +433,7 @@ class SetupDatabase {
 		for ignore, setupType in kSetupTypes {
 			setups := []
 			
-			Loop Files, %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Car Setups\%setupType%\*.*
+			Loop Files, %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Car Setups\%setupType%\*.*
 			{
 				SplitPath A_LoopFileName, setupName
 			
@@ -447,7 +447,7 @@ class SetupDatabase {
 			for ignore, setupType in kSetupTypes {
 				setups := []
 				
-				Loop Files, %kSetupDatabaseDirectory%Global\%simulatorCode%\%car%\%track%\Car Setups\%setupType%\*.*
+				Loop Files, %kDatabaseDirectory%Global\%simulatorCode%\%car%\%track%\Car Setups\%setupType%\*.*
 				{
 					SplitPath A_LoopFileName, setupName
 				
@@ -461,7 +461,7 @@ class SetupDatabase {
 	readSetup(simulator, car, track, setupType, setup) {
 		simulatorCode := this.getSimulatorCode(simulator)
 		
-		FileRead setupData, %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Car Setups\%setupType%\%setup%
+		FileRead setupData, %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Car Setups\%setupType%\%setup%
 		
 		return setupData
 	}
@@ -470,21 +470,21 @@ class SetupDatabase {
 		simulatorCode := this.getSimulatorCode(simulator)
 		
 		try {
-			FileDelete %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Car Setups\%setupType%\%fileName%
+			FileDelete %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Car Setups\%setupType%\%fileName%
 		}
 		catch exception {
 			; ignore
 		}
 		
-		FileCreateDir %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Car Setups\%setupType%
-		FileAppend %setup%, %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Car Setups\%setupType%\%fileName%
+		FileCreateDir %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Car Setups\%setupType%
+		FileAppend %setup%, %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Car Setups\%setupType%\%fileName%
 	}
 	
 	deleteSetup(simulator, car, track, setupType, setup) {
 		simulatorCode := this.getSimulatorCode(simulator)
 		
 		try {
-			FileDelete %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Car Setups\%setupType%\%setup%
+			FileDelete %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Car Setups\%setupType%\%setup%
 		}
 		catch exception {
 			; ignore
@@ -497,7 +497,7 @@ class SetupDatabase {
 		localSettings := []
 		globalSettings := []
 			
-		Loop Files, %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Settings\*.*
+		Loop Files, %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Settings\*.*
 		{
 			SplitPath A_LoopFileName, settingsName
 		
@@ -505,7 +505,7 @@ class SetupDatabase {
 		}
 		
 		if this.UseGlobalDatabase {
-			Loop Files, %kSetupDatabaseDirectory%Global\%simulatorCode%\%car%\%track%\Race Settings\*.*
+			Loop Files, %kDatabaseDirectory%Global\%simulatorCode%\%car%\%track%\Race Settings\*.*
 			{
 				SplitPath A_LoopFileName, settingsName
 			
@@ -607,12 +607,12 @@ class SetupDatabase {
 	readSettings(simulator, car, track, settingsName) {
 		simulatorCode := this.getSimulatorCode(simulator)
 		
-		fileName = %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Settings\%settingsName%.settings
+		fileName = %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Settings\%settingsName%.settings
 		
 		settings := readConfiguration(fileName)
 		
 		if (settings.Count() = 0) {
-			fileName = %kSetupDatabaseDirectory%Global\%simulatorCode%\%car%\%track%\Race Settings\%settingsName%.settings
+			fileName = %kDatabaseDirectory%Global\%simulatorCode%\%car%\%track%\Race Settings\%settingsName%.settings
 		
 			return readConfiguration(fileName)
 		}
@@ -623,7 +623,7 @@ class SetupDatabase {
 	writeSettings(simulator, car, track, settingsName, settings) {
 		simulatorCode := this.getSimulatorCode(simulator)
 		
-		fileName = %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Settings
+		fileName = %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Settings
 		
 		FileCreateDir %fileName%
 		
@@ -635,7 +635,7 @@ class SetupDatabase {
 	deleteSettings(simulator, car, track, settingsName) {
 		simulatorCode := this.getSimulatorCode(simulator)
 		
-		fileName = %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Settings\%settingsName%.settings
+		fileName = %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Settings\%settingsName%.settings
 		
 		try {
 			FileDelete %fileName%
@@ -648,8 +648,8 @@ class SetupDatabase {
 	renameSettings(simulator, car, track, oldSettingsName, newSettingsName) {
 		simulatorCode := this.getSimulatorCode(simulator)
 		
-		oldFileName = %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Settings\%oldSettingsName%.settings
-		newFileName = %kSetupDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Settings\%newSettingsName%.settings
+		oldFileName = %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Settings\%oldSettingsName%.settings
+		newFileName = %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Settings\%newSettingsName%.settings
 		
 		try {
 			FileMove %oldFileName%, %newFileName%, 1

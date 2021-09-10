@@ -1385,20 +1385,20 @@ updateConfigurationForV314() {
 			; ignore
 		}
 	
-	Loop Files, %kSetupDatabaseDirectory%Local\*.*, D									; Simulator
+	Loop Files, %kDatabaseDirectory%Local\*.*, D									; Simulator
 	{
 		simulator := A_LoopFileName
 		
-		Loop Files, %kSetupDatabaseDirectory%Local\%simulator%\*.*, D					; Car
+		Loop Files, %kDatabaseDirectory%Local\%simulator%\*.*, D					; Car
 		{
 			car := A_LoopFileName
 			
-			Loop Files, %kSetupDatabaseDirectory%Local\%simulator%\%car%\*.*, D			; Track
+			Loop Files, %kDatabaseDirectory%Local\%simulator%\%car%\*.*, D			; Track
 			{
 				track := A_LoopFileName
 		
 				try {
-					FileMoveDir %kSetupDatabaseDirectory%Local\%simulator%\%car%\%track%\Race Engineer Settings, %kSetupDatabaseDirectory%Local\%simulator%\%car%\%track%\Race Settings, R
+					FileMoveDir %kDatabaseDirectory%Local\%simulator%\%car%\%track%\Race Engineer Settings, %kDatabaseDirectory%Local\%simulator%\%car%\%track%\Race Settings, R
 				}
 				catch exception {
 					; ignore
@@ -1494,7 +1494,7 @@ updateConfigurationForV28() {
 
 updateConfigurationForV27() {
 	try {
-		directory := SubStr(kSetupDatabaseDirectory, 1, StrLen(kSetupDatabaseDirectory) - 1)
+		directory := SubStr(kDatabaseDirectory, 1, StrLen(kDatabaseDirectory) - 1)
 		
 		FileRemoveDir %directory%, 1
 	}
@@ -1526,7 +1526,7 @@ updateConfigurationForV261() {
 	}
 	
 	try {
-		directory := SubStr(kSetupDatabaseDirectory, 1, StrLen(kSetupDatabaseDirectory) - 1)
+		directory := SubStr(kDatabaseDirectory, 1, StrLen(kDatabaseDirectory) - 1)
 		
 		FileRemoveDir %directory%, 1
 	}

@@ -17,6 +17,16 @@ General Release Actions
 13. Update #releases and #anouncements in Discord
 14. Set a Git Tag after final commit
 
+Release 3.5.8 Checklist
+=======================
+
+0. Search for new links (*)
+1. Update Procedure
+   a. Translations
+   b. Rename "Setup Database" => "Database"
+2. Rename "Setup Database" => "Database"
+   a. Update Notes
+
 Release 3.5.6 Checklist
 =======================
 

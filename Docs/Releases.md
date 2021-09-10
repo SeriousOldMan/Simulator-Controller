@@ -1,3 +1,9 @@
+## 3.5.8-release 09/17/21 (planned)
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Renamed "Setup Database" repository to "Database"
+
 ## 3.5.6-release 09/10/21
 
   1. Bugfixes, as always

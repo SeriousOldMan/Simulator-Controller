@@ -102,13 +102,13 @@ class PressuresAssert extends Assert {
 class ClearDatabase extends Assert {
 	Clear_Test() {
 		try {
-			FileRemoveDir %kSetupDatabaseDirectory%Local\Unknown\TestCar, 1
+			FileRemoveDir %kDatabaseDirectory%Local\Unknown\TestCar, 1
 		}
 		catch exception {
 			; ignore
 		}
 		
-		this.AssertEqual(true, !FileExist(kSetupDatabaseDirectory . "Local\Unknown\TestCar"), "Database has not been deleted...")
+		this.AssertEqual(true, !FileExist(kDatabaseDirectory . "Local\Unknown\TestCar"), "Database has not been deleted...")
 	}
 }
 
@@ -125,9 +125,9 @@ class InitializeDatabase extends Assert {
 		
 		database.updatePressures("Unknown", "TestCar", "TestTrack", "Dry", 25, 25, "Dry", "Black", pressures)
 		
-		this.AssertEqual(true, (FileExist(kSetupDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Tyre Setup Dry Dry.data") != false), "Database file has not been created...")
+		this.AssertEqual(true, (FileExist(kDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Tyre Setup Dry Dry.data") != false), "Database file has not been created...")
 		
-		data := readConfiguration(kSetupDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Tyre Setup Dry Dry.data")
+		data := readConfiguration(kDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Tyre Setup Dry Dry.data")
 		
 		this.AssertEqual(true, (getConfigurationValue(data, "Pressures", "25.25", false) != false), "Temperature entry has not been created...")
 	}
@@ -155,9 +155,9 @@ class InitializeDatabase extends Assert {
 		
 		database.updatePressures("Unknown", "TestCar", "TestTrack", "Dry", 25, 26, "Dry", "Black", pressures)
 		
-		this.AssertEqual(true, (FileExist(kSetupDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Tyre Setup Dry Dry.data") != false), "Database file has not been created...")
+		this.AssertEqual(true, (FileExist(kDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Tyre Setup Dry Dry.data") != false), "Database file has not been created...")
 		
-		data := readConfiguration(kSetupDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Tyre Setup Dry Dry.data")
+		data := readConfiguration(kDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Tyre Setup Dry Dry.data")
 		
 		this.AssertEqual(true, (getConfigurationValue(data, "Pressures", "25.26", false) != false), "Temperature entry has not been created...")
 	}
@@ -174,9 +174,9 @@ class InitializeDatabase extends Assert {
 		
 		database.updatePressures("Unknown", "TestCar", "TestTrack", "Drizzle", 17, 18, "Dry", "Red", pressures)
 		
-		this.AssertEqual(true, (FileExist(kSetupDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Tyre Setup Dry (Red) Drizzle.data") != false), "Database file has not been created...")
+		this.AssertEqual(true, (FileExist(kDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Tyre Setup Dry (Red) Drizzle.data") != false), "Database file has not been created...")
 		
-		data := readConfiguration(kSetupDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Tyre Setup Dry (Red) Drizzle.data")
+		data := readConfiguration(kDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Tyre Setup Dry (Red) Drizzle.data")
 		
 		this.AssertEqual(true, (getConfigurationValue(data, "Pressures", "17.18", false) != false), "Temperature entry has not been created...")
 		
@@ -189,9 +189,9 @@ class InitializeDatabase extends Assert {
 		
 		database.updatePressures("Unknown", "TestCar", "TestTrack", "MediumRain", 17, 18, "Wet", "Black", pressures)
 		
-		this.AssertEqual(true, (FileExist(kSetupDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Tyre Setup Wet MediumRain.data") != false), "Database file has not been created...")
+		this.AssertEqual(true, (FileExist(kDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Tyre Setup Wet MediumRain.data") != false), "Database file has not been created...")
 		
-		data := readConfiguration(kSetupDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Tyre Setup Wet MediumRain.data")
+		data := readConfiguration(kDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Tyre Setup Wet MediumRain.data")
 		
 		this.AssertEqual(true, (getConfigurationValue(data, "Pressures", "17.18", false) != false), "Temperature entry has not been created...")
 	}

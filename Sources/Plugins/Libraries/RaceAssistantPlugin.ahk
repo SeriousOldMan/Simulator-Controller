@@ -179,6 +179,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				openRaceSettings(true, false, this.Plugin)
 			else if (this.Action = "SetupDatabaseOpen")
 				openSetupDatabase(this.Plugin)
+			else if (this.Action = "StrategyWorkbenchOpen")
+				openStrategyWorkbench(this.Plugin)
 		}
 	}
 	
@@ -309,6 +311,11 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		if openSetupDatabase
 			this.createRaceAssistantAction(controller, "SetupDatabaseOpen", openSetupDatabase)
 		
+		openStrategyWorkbench := this.getArgumentValue("openStrategyWorkbench", false)
+		
+		if openStrategyWorkbench
+			this.createRaceAssistantAction(controller, "StrategyWorkbenchOpen", openStrategyWorkbench)
+		
 		for ignore, theAction in string2Values(",", this.getArgumentValue("assistantCommands", ""))
 			this.createRaceAssistantAction(controller, string2Values(A_Space, theAction)*)
 		
@@ -349,7 +356,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				this.registerAction(new this.RaceAssistantAction(this, function, this.getLabel(ConfigurationItem.descriptor(action, "Activate"), action), action))
 			else if (action = "RaceAssistant")
 				this.registerAction(new this.RaceAssistantToggleAction(this, function, this.getLabel(ConfigurationItem.descriptor(action, "Toggle"), action)))
-			else if ((action = "RaceSettingsOpen") || (action = "SetupImport") || (action = "SetupDatabaseOpen"))
+			else if ((action = "RaceSettingsOpen") || (action = "SetupImport") || (action = "SetupDatabaseOpen") || (action = "StrategyWorkbenchOpen"))
 				this.registerAction(new this.RaceSettingsAction(this, function, this.getLabel(ConfigurationItem.descriptor(action, "Activate")), action))
 			else
 				logMessage(kLogWarn, translate("Action """) . action . translate(""" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
@@ -373,7 +380,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					theAction.Function.disable(kAllTrigger, theAction)
 			}
 			else if isInstance(theAction, RaceAssistantPlugin.RaceSettingsAction) {
-				if ((theAction.Action = "RaceSettingsOpen") || (theAction.Action = "SetupDatabaseOpen")) {
+				if ((theAction.Action = "RaceSettingsOpen") || (theAction.Action = "SetupDatabaseOpen") || (theAction.Action = "StrategyWorkbenchOpen")) {
 					theAction.Function.enable(kAllTrigger, theAction)
 					theAction.Function.setText(theAction.Label)
 				}
@@ -939,6 +946,30 @@ openSetupDatabase(plugin := false) {
 		logMessage(kLogCritical, translate("Cannot start the Setup Database tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 			
 		showMessage(substituteVariables(translate("Cannot start the Setup Database tool (%exePath%) - please check the configuration..."), {exePath: exePath})
+				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+	}
+}
+
+openStrategyWorkbench(plugin := false) {
+	exePath := kBinariesDirectory . "Strategy Workbench.exe"	
+	controller := SimulatorController.Instance
+	
+	if !plugin {
+		plugin := controller.findPlugin(kRaceEngineerPlugin)
+		
+		if !plugin
+			plugin := controller.findPlugin(kRaceStrategistPlugin)
+	}
+	
+	try {
+		options := getSimulatorOptions(plugin)
+		
+		Run "%exePath%" %options%, %kBinariesDirectory%, , pid
+	}
+	catch exception {
+		logMessage(kLogCritical, translate("Cannot start the Strategy Workbench tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
+			
+		showMessage(substituteVariables(translate("Cannot start the Strategy Workbench tool (%exePath%) - please check the configuration..."), {exePath: exePath})
 				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 	}
 }

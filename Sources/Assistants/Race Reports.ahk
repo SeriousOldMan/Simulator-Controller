@@ -1779,7 +1779,7 @@ fixIE(version := 0, exeName := "") {
 	return previousValue
 }
 
-runRaceReport() {
+runRaceReports() {
 	icon := kIconsDirectory . "Chart.ico"
 	
 	Menu Tray, Icon, %icon%, , 1
@@ -1822,4 +1822,4 @@ runRaceReport() {
 ;;;                           Initialization Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-runRaceReport()
+runRaceReports()

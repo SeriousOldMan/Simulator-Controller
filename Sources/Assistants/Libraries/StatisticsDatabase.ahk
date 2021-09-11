@@ -24,7 +24,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 class StatisticsDatabase extends Database {
-	updateLapStatistics(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor, map, tc, abs, fuelConsumption, laptime) {
+	updateElectronicsStatistics(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor, map, tc, abs, fuelConsumption, lapTime) {
 		if getConfigurationValue(this.ControllerConfiguration, "Simulators", simulator, false)
 			simulatorCode := this.getSimulatorCode(simulator)
 		else
@@ -36,8 +36,27 @@ class StatisticsDatabase extends Database {
 		
 		FileCreateDir %directory%
 				
-		line := (values2String(";", weather, airTemperature, trackTemperature, compound, compoundColor, map, tc, abs, fuelConsumption, laptime) . "`n")
+		line := (values2String(";", weather, airTemperature, trackTemperature, compound, compoundColor, map, tc, abs, fuelConsumption, lapTime) . "`n")
 		
-		FileAppend %line%, % directory . "\LapStatistics.CSV"
+		FileAppend %line%, % directory . "\ElectronicsData.CSV"
+	}
+	
+	updateTyreStatistics(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor
+					   , flPressure, frPressure, rlPressure, rrPressure, flTemperature, frTemperature, rlTemperature, rrTemperature, lapTime) {
+		if getConfigurationValue(this.ControllerConfiguration, "Simulators", simulator, false)
+			simulatorCode := this.getSimulatorCode(simulator)
+		else
+			simulatorCode := simulator
+		
+		simulator := this.getSimulatorName(simulatorCode)
+		
+		directory := (kDatabaseDirectory . "Local\" . simulatorCode . "\" .car . "\" . track)
+		
+		FileCreateDir %directory%
+				
+		line := (values2String(";", weather, airTemperature, trackTemperature, compound, compoundColor
+								  , flPressure, frPressure, rlPressure, rrPressure, flTemperature, frTemperature, rlTemperature, rrTemperature, laptime) . "`n")
+		
+		FileAppend %line%, % directory . "\TyreData.CSV"
 	}
 }

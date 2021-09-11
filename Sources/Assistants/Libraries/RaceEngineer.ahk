@@ -29,7 +29,6 @@ class RaceEngineer extends RaceAssistant {
 	iAdjustLapTime := true
 	
 	iSaveTyrePressures := kAsk
-	iSaveLapStatistics := kAlways
 	
 	iEnoughData := false
 	
@@ -97,12 +96,6 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 	
-	SaveLapStatistics[] {
-		Get {
-			return this.iSaveLapStatistics
-		}
-	}
-	
 	SetupData[] {
 		Get {
 			return this.iSetupData
@@ -132,9 +125,6 @@ class RaceEngineer extends RaceAssistant {
 		
 		if values.HasKey("SaveTyrePressures")
 			this.iSaveTyrePressures := values["SaveTyrePressures"]
-		
-		if values.HasKey("SaveLapStatistics")
-			this.iSaveTyrePressures := values["SaveLapStatistics"]
 	}
 	
 	updateSessionValues(values) {
@@ -884,8 +874,7 @@ class RaceEngineer extends RaceAssistant {
 		this.updateConfigurationValues({LearningLaps: getConfigurationValue(configuration, "Race Engineer Analysis", simulatorName . ".LearningLaps", 1)
 									  , AdjustLapTime: getConfigurationValue(configuration, "Race Engineer Analysis", simulatorName . ".AdjustLapTime", true)
 									  , SaveSettings: getConfigurationValue(configuration, "Race Assistant Shutdown", simulatorName . ".SaveSettings", getConfigurationValue(configuration, "Race Engineer Shutdown", simulatorName . ".SaveSettings", kNever))
-									  , SaveTyrePressures: getConfigurationValue(configuration, "Race Engineer Shutdown", simulatorName . ".SaveTyrePressures", kAsk)
-									  , SaveLapStatistics: getConfigurationValue(configuration, "Race Engineer Shutdown", simulatorName . ".SaveLapStatistics", kAlways)})
+									  , SaveTyrePressures: getConfigurationValue(configuration, "Race Engineer Shutdown", simulatorName . ".SaveTyrePressures", kAsk)})
 		
 		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(session), SetupData: {}
 								, BestLapTime: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
@@ -925,7 +914,7 @@ class RaceEngineer extends RaceAssistant {
 			if ((this.Session == kSessionPractice) || (this.Session == kSessionRace)) {
 				this.shutdownSession("Before")
 						
-				if (this.Listener && (((this.SaveTyrePressures == kAsk) && (this.SetupData.Count() > 0)) || (this.SaveLapStatistics == kAsk) || (this.SaveSettings == kAsk))) {
+				if (this.Listener && (((this.SaveTyrePressures == kAsk) && (this.SetupData.Count() > 0)) || (this.SaveSettings == kAsk))) {
 					this.getSpeaker().speakPhrase("ConfirmDataUpdate", false, true)
 					
 					this.setContinuation(ObjBindMethod(this, "shutdownSession", "After"))
@@ -1258,9 +1247,6 @@ class RaceEngineer extends RaceAssistant {
 			
 			if ((this.SaveTyrePressures = ((phase = "After") ? kAsk : kAlways)) && (this.SetupData.Count() > 0))
 				this.updateTyrePressures()
-			
-			if ((this.SaveLapStatistics = ((phase = "After") ? kAsk : kAlways)))
-				this.updateLapStatistics()
 		}
 		finally {
 			this.iSessionDataActive := false
@@ -1347,37 +1333,6 @@ class RaceEngineer extends RaceAssistant {
 			}
 		
 		this.updateDynamicValues({SetupData: {}})
-	}
-
-	updateLapStatistics() {
-		local compound
-		local knowledgeBase := this.KnowledgeBase
-		
-		if knowledgeBase {
-			statisticsDB := this.statisticsDatabase
-			
-			simulator := statisticsDB.getSimulatorName(knowledgeBase.getValue("Session.Simulator"))
-			car := knowledgeBase.getValue("Session.Car")
-			track := knowledgeBase.getValue("Session.Track")
-			
-			Loop % knowledgeBase.getValue("Lap")
-			{
-				prefix := "Lap." . A_Index
-				
-				weather := knowledgeBase.getValue(prefix . ".Weather")
-				airTemperature := knowledgeBase.getValue(prefix . ".Temperature.Air")
-				trackTemperature := knowledgeBase.getValue(prefix . ".Temperature.Track")
-				compound := knowledgeBase.getValue(prefix . ".Compound")
-				compoundColor := knowledgeBase.getValue(prefix . ".Compound.Color")
-				map := knowledgeBase.getValue(prefix . ".Map")
-				tc := knowledgeBase.getValue(prefix . ".TC")
-				abs := knowledgeBase.getValue(prefix . ".ABS")
-				fuelConsumption := knowledgeBase.getValue(prefix . ".Fuel.Consumption")
-				lapTime := knowledgeBase.getValue(prefix . ".Time")
-				
-				statisticsDB.updateLapStatistics(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor, map, tc, abs, fuelConsumption, laptime)
-			}
-		}
 	}
 	
 	hasPlannedPitstop() {

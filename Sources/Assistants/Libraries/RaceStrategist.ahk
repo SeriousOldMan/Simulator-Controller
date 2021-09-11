@@ -35,7 +35,9 @@ class RaceStrategist extends RaceAssistant {
 
 	iSessionTime := false
 	
+	iSaveLapStatistics := kAlways
 	iSaveRaceReport := false
+	
 	iSessionReportsDatabase := false
 	iSessionDataActive := false
 	
@@ -81,15 +83,21 @@ class RaceStrategist extends RaceAssistant {
 		}
 	}
 	
-	SessionReportsDatabase[] {
+	SaveLapStatistics[] {
 		Get {
-			return this.iSessionReportsDatabase
+			return this.iSaveLapStatistics
 		}
 	}
 	
 	SaveRaceReport[] {
 		Get {
 			return ((this.iSessionReportsDatabase != false) ? this.iSaveRaceReport : kNever)
+		}
+	}
+	
+	SessionReportsDatabase[] {
+		Get {
+			return this.iSessionReportsDatabase
 		}
 	}
 	
@@ -111,6 +119,9 @@ class RaceStrategist extends RaceAssistant {
 		
 		if values.HasKey("SaveSettings")
 			this.iSaveSettings := values["SaveSettings"]
+		
+		if values.HasKey("SaveLapStatistics")
+			this.iSaveTyrePressures := values["SaveLapStatistics"]
 		
 		if values.HasKey("SaveRaceReport")
 			this.iSaveRaceReport := values["SaveRaceReport"]
@@ -589,6 +600,7 @@ class RaceStrategist extends RaceAssistant {
 		
 		this.updateConfigurationValues({LearningLaps: getConfigurationValue(configuration, "Race Strategist Analysis", simulatorName . ".LearningLaps", 1)
 									  , SessionReportsDatabase: getConfigurationValue(this.Configuration, "Race Strategist Reports", "Database", false)
+									  , SaveLapStatistics: getConfigurationValue(configuration, "Race Strategist Shutdown", simulatorName . ".SaveLapStatistics", kAlways)
 									  , SaveRaceReport: getConfigurationValue(this.Configuration, "Race Strategist Shutdown", simulatorName . ".SaveRaceReport", false)
 									  , SaveSettings: saveSettings})
 		
@@ -622,11 +634,11 @@ class RaceStrategist extends RaceAssistant {
 				if this.Listener {
 					asked := true
 					
-					if ((this.SaveSettings == kAsk) && (this.SaveRaceReport == kAsk))
+					if (((this.SaveSettings == kAsk) || (this.SaveLapStatistics == kAsk)) && (this.SaveRaceReport == kAsk))
 						this.getSpeaker().speakPhrase("ConfirmSaveSettingsAndRaceReport", false, true)
 					else if (this.SaveRaceReport == kAsk)
 						this.getSpeaker().speakPhrase("ConfirmSaveRaceReport", false, true)
-					else if (this.SaveSettings == kAsk)
+					else if ((this.SaveSettings == kAsk) || (this.SaveLapStatistics == kAsk))
 						this.getSpeaker().speakPhrase("ConfirmSaveSettings", false, true)
 					else
 						asked := false
@@ -967,6 +979,9 @@ class RaceStrategist extends RaceAssistant {
 			
 			if ((this.Session == kSessionRace) && (this.SaveRaceReport = ((phase = "Before") ? kAlways : kAsk)))
 				this.saveSessionReport()
+			
+			if ((this.SaveLapStatistics = ((phase = "After") ? kAsk : kAlways)))
+				this.updateLapStatistics()
 		}
 		finally {
 			this.iSessionDataActive := false
@@ -1072,6 +1087,52 @@ class RaceStrategist extends RaceAssistant {
 			}
 				
 			writeConfiguration(directory . "\Race.data", data)
+		}
+	}
+
+	updateLapStatistics() {
+		local compound
+		local knowledgeBase := this.KnowledgeBase
+		
+		if knowledgeBase {
+			statisticsDB := this.statisticsDatabase
+			
+			simulator := statisticsDB.getSimulatorName(knowledgeBase.getValue("Session.Simulator"))
+			car := knowledgeBase.getValue("Session.Car")
+			track := knowledgeBase.getValue("Session.Track")
+			
+			Loop % knowledgeBase.getValue("Lap")
+			{
+				prefix := "Lap." . A_Index
+				
+				weather := knowledgeBase.getValue(prefix . ".Weather")
+				airTemperature := knowledgeBase.getValue(prefix . ".Temperature.Air")
+				trackTemperature := knowledgeBase.getValue(prefix . ".Temperature.Track")
+				compound := knowledgeBase.getValue(prefix . ".Compound")
+				compoundColor := knowledgeBase.getValue(prefix . ".Compound.Color")
+				lapTime := knowledgeBase.getValue(prefix . ".Time")
+				
+				map := knowledgeBase.getValue(prefix . ".Map")
+				tc := knowledgeBase.getValue(prefix . ".TC")
+				abs := knowledgeBase.getValue(prefix . ".ABS")
+				fuelConsumption := knowledgeBase.getValue(prefix . ".Fuel.Consumption")
+				
+				statisticsDB.updateElectronicsStatistics(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor
+													   , map, tc, abs, fuelConsumption, lapTime)
+				
+				flPressure := knowledgeBase.getValue(prefix . ".Tyre.Pressure.FL")
+				frPressure := knowledgeBase.getValue(prefix . ".Tyre.Pressure.FR")
+				rlPressure := knowledgeBase.getValue(prefix . ".Tyre.Pressure.RL")
+				rrPressure := knowledgeBase.getValue(prefix . ".Tyre.Pressure.RR")
+				
+				flTemperature := knowledgeBase.getValue(prefix . ".Tyre.Temperature.FL")
+				frTemperature := knowledgeBase.getValue(prefix . ".Tyre.Temperature.FR")
+				rlTemperature := knowledgeBase.getValue(prefix . ".Tyre.Temperature.RL")
+				rrTemperature := knowledgeBase.getValue(prefix . ".Tyre.Temperature.RR")
+				
+				statisticsDB.updateTyreStatistics(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor
+												, flPressure, frPressure, rlPressure, rrPressure, flTemperature, frTemperature, rlTemperature, rrTemperature, lapTime)
+			}
 		}
 	}
 	

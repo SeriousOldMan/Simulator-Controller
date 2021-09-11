@@ -663,7 +663,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				
 				if (sessionState == kSessionPaused)
 					return
-				else if (sessionState < (isInstance(this, RaceEngineerPlugin) ? kSessionPractice : kSessionRace)) {
+				else if (sessionState < kSessionPractice) {
 					; Not in a supported session
 				
 					this.iLastLap := 0
@@ -869,6 +869,9 @@ getSimulatorOptions(plugin := false) {
 			options .= " -AirTemperature " . getConfigurationValue(data, "Weather Data", "Temperature", "23")
 			options .= " -TrackTemperature " . getConfigurationValue(data, "Track Data", "Temperature", "27")
 			options .= " -Compound " . getConfigurationValue(data, "Car Data", "TyreCompound", "Dry")
+			options .= " -Map " . getConfigurationValue(data, "Car Data", "MAP", "n/a")
+			options .= " -TC " . getConfigurationValue(data, "Car Data", "TC", "n/a")
+			options .= " -ABS " . getConfigurationValue(data, "Car Data", "ABS", "n/a")
 		}
 	}
 	

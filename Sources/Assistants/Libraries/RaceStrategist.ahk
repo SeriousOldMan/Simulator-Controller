@@ -35,7 +35,7 @@ class RaceStrategist extends RaceAssistant {
 
 	iSessionTime := false
 	
-	iSaveLapStatistics := kAlways
+	iSaveStatistics := kAlways
 	iSaveRaceReport := false
 	
 	iSessionReportsDatabase := false
@@ -83,9 +83,9 @@ class RaceStrategist extends RaceAssistant {
 		}
 	}
 	
-	SaveLapStatistics[] {
+	SaveStatistics[] {
 		Get {
-			return this.iSaveLapStatistics
+			return this.iSaveStatistics
 		}
 	}
 	
@@ -120,8 +120,8 @@ class RaceStrategist extends RaceAssistant {
 		if values.HasKey("SaveSettings")
 			this.iSaveSettings := values["SaveSettings"]
 		
-		if values.HasKey("SaveLapStatistics")
-			this.iSaveTyrePressures := values["SaveLapStatistics"]
+		if values.HasKey("SaveStatistics")
+			this.iSaveTyrePressures := values["SaveStatistics"]
 		
 		if values.HasKey("SaveRaceReport")
 			this.iSaveRaceReport := values["SaveRaceReport"]
@@ -600,7 +600,7 @@ class RaceStrategist extends RaceAssistant {
 		
 		this.updateConfigurationValues({LearningLaps: getConfigurationValue(configuration, "Race Strategist Analysis", simulatorName . ".LearningLaps", 1)
 									  , SessionReportsDatabase: getConfigurationValue(this.Configuration, "Race Strategist Reports", "Database", false)
-									  , SaveLapStatistics: getConfigurationValue(configuration, "Race Strategist Shutdown", simulatorName . ".SaveLapStatistics", kAlways)
+									  , SaveStatistics: getConfigurationValue(configuration, "Race Strategist Shutdown", simulatorName . ".SaveStatistics", kAlways)
 									  , SaveRaceReport: getConfigurationValue(this.Configuration, "Race Strategist Shutdown", simulatorName . ".SaveRaceReport", false)
 									  , SaveSettings: saveSettings})
 		
@@ -628,17 +628,18 @@ class RaceStrategist extends RaceAssistant {
 			if (!ErrorLevel && this.Speaker)
 				this.getSpeaker().speakPhrase("Bye")
 			
-			if ((knowledgeBase.getValue("Lap", 0) > this.LearningLaps) && (this.Session == kSessionRace)) {
+			if (knowledgeBase.getValue("Lap", 0) > this.LearningLaps) {
 				this.shutdownSession("Before")
 				
 				if this.Listener {
 					asked := true
 					
-					if (((this.SaveSettings == kAsk) || (this.SaveLapStatistics == kAsk)) && (this.SaveRaceReport == kAsk))
+					if ((((this.SaveSettings == kAsk) && (this.Session == kSessionRace)) || (this.SaveStatistics == kAsk))
+					 && ((this.SaveRaceReport == kAsk) && (this.Session == kSessionRace)))
 						this.getSpeaker().speakPhrase("ConfirmSaveSettingsAndRaceReport", false, true)
-					else if (this.SaveRaceReport == kAsk)
+					else if ((this.SaveRaceReport == kAsk) && (this.Session == kSessionRace))
 						this.getSpeaker().speakPhrase("ConfirmSaveRaceReport", false, true)
-					else if ((this.SaveSettings == kAsk) || (this.SaveLapStatistics == kAsk))
+					else if (((this.SaveSettings == kAsk) && (this.Session == kSessionRace)) || (this.SaveStatistics == kAsk))
 						this.getSpeaker().speakPhrase("ConfirmSaveSettings", false, true)
 					else
 						asked := false
@@ -980,8 +981,8 @@ class RaceStrategist extends RaceAssistant {
 			if ((this.Session == kSessionRace) && (this.SaveRaceReport = ((phase = "Before") ? kAlways : kAsk)))
 				this.saveSessionReport()
 			
-			if ((this.SaveLapStatistics = ((phase = "After") ? kAsk : kAlways)))
-				this.updateLapStatistics()
+			if ((this.SaveStatistics = ((phase = "After") ? kAsk : kAlways)))
+				this.updateStatistics()
 		}
 		finally {
 			this.iSessionDataActive := false
@@ -1090,7 +1091,7 @@ class RaceStrategist extends RaceAssistant {
 		}
 	}
 
-	updateLapStatistics() {
+	updateStatistics() {
 		local compound
 		local knowledgeBase := this.KnowledgeBase
 		

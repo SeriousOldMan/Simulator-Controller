@@ -93,8 +93,21 @@ class StrategyWorkbench extends ConfigurationItem {
 		}
 	}
 	
-	__New(configuration) {
-		base.__New(configuration)
+	__New(simulator := false, car := false, track := false, duration := false, weather := false, airTemperature := false, trackTemperature := false
+		, compound := false, map := "n/a", tc := "n/a", abs := "n/a") {
+		this.iSelectedSimulator := simulator
+		this.iSelectedCar := car
+		this.iSelectedTrack := track
+		
+		this.iWeather := weather
+		this.iAirTemperature := airTemperature
+		this.iTrackTemperature := trackTemperature
+		this.iCompound := compound
+		this.iMap := map
+		this.iTC := tc
+		this.iABS := abs
+		
+		base.__New(kSimulatorConfiguration)
 		
 		StrategyWorkbench.Instance := this
 	}
@@ -436,10 +449,69 @@ runStrategyWorkbench() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Strategy Workbench
 	
+	simulator := false
+	car := false
+	track := false
+	duration := false
+	weather := "Dry"
+	airTemperature := 23
+	trackTemperature:= 27
+	compound := "Dry"
+	map := "n/a"
+	tc := "n/a"
+	abs := "n/a"
+	
+	index := 1
+	
+	while (index < A_Args.Length()) {
+		switch A_Args[index] {
+			case "-Simulator":
+				simulator := A_Args[index + 1]
+				index += 2
+			case "-Car":
+				car := A_Args[index + 1]
+				index += 2
+			case "-Track":
+				track := A_Args[index + 1]
+				index += 2
+			case "-Duration":
+				duration := A_Args[index + 1]
+				index += 2
+			case "-Weather":
+				weather := A_Args[index + 1]
+				index += 2
+			case "-AirTemperature":
+				airTemperature := A_Args[index + 1]
+				index += 2
+			case "-TrackTemperature":
+				trackTemperature := A_Args[index + 1]
+				index += 2
+			case "-Compound":
+				compound := A_Args[index + 1]
+				index += 2
+			case "-Map":
+				map := A_Args[index + 1]
+				index += 2
+			case "-TC":
+				tc := A_Args[index + 1]
+				index += 2
+			case "-ABS":
+				abs := A_Args[index + 1]
+				index += 2
+			default:
+				index += 1
+		}
+	}
+	
+	if ((airTemperature <= 0) || (trackTemperature <= 0)) {
+		airTemperature := false
+		trackTemperature := false
+	}
+	
 	current := fixIE(11)
 	
 	try {
-		workbench := new StrategyWorkbench(kSimulatorConfiguration)
+		workbench := new StrategyWorkbench(simulator, car, track, duration, weather, airTemperature, trackTemperature, compound, map, tc, abs)
 		
 		workbench.createGui(workbench.Configuration)
 		workbench.show()

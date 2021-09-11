@@ -20,6 +20,7 @@ global rsLearningLapsEdit
 global rsLapsConsideredEdit
 global rsDampingFactorEdit
 global rsSaveRaceReportDropDown
+global rsSaveStatisticsDropDown
 
 global raceReportsPathEdit = ""
 
@@ -105,11 +106,15 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 		Gui %window%:Add, Text, x%x0% yp+28 w105 h23 +0x200 HWNDwidget18 Hidden, % translate("Save Race Report")
 		Gui %window%:Add, DropDownList, x%x1% yp w140 AltSubmit vrsSaveRaceReportDropDown HWNDwidget19 Hidden, % values2String("|", choices*)
 		
+		choices := map(["Ask", "Always save", "No action"], "translate")
+		Gui %window%:Add, Text, x%x0% yp+28 w105 h23 +0x200 HWNDwidget20 Hidden, % translate("Save Statistics")
+		Gui %window%:Add, DropDownList, x%x1% yp w140 AltSubmit vrsSaveStatisticsDropDown HWNDwidget21 Hidden, % values2String("|", choices*)
+		
 		x5 := x1 + 144
 		
-		Gui %window%:Add, Text, x%x5% yp+3 w80 h20 HWNDwidget20 Hidden, % translate("@ Session End")
+		Gui %window%:Add, Text, x%x5% yp+3 w80 h20 HWNDwidget22 Hidden, % translate("@ Session End")
 		
-		Loop 20
+		Loop 22
 			editor.registerWidget(this, widget%A_Index%)
 		
 		this.loadSimulatorConfiguration()
@@ -133,6 +138,7 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 			simulatorConfiguration["ConsideredHistoryLaps"] := getConfigurationValue(configuration, "Race Strategist Analysis", simulator . ".ConsideredHistoryLaps", 5)
 			simulatorConfiguration["HistoryLapsDamping"] := getConfigurationValue(configuration, "Race Strategist Analysis", simulator . ".HistoryLapsDamping", 0.2)
 			simulatorConfiguration["SaveRaceReport"] := getConfigurationValue(configuration, "Race Strategist Shutdown", simulator . ".SaveRaceReport", "Never")
+			simulatorConfiguration["SaveStatistics"] := getConfigurationValue(configuration, "Race Strategist Shutdown", simulator . ".SaveStatistics", "Always")
 								
 			this.iSimulatorConfigurations[simulator] := simulatorConfiguration
 		}
@@ -148,10 +154,11 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 		setConfigurationValue(configuration, "Race Strategist Reports", "Database", (raceReportsPathEdit != "") ? raceReportsPathEdit : false)
 		
 		for simulator, simulatorConfiguration in this.iSimulatorConfigurations {
-			for ignore, key in ["LearningLaps", "ConsideredHistoryLaps", "HistoryLapsDamping", "SaveRaceReport"]
+			for ignore, key in ["LearningLaps", "ConsideredHistoryLaps", "HistoryLapsDamping"]
 				setConfigurationValue(configuration, "Race Strategist Analysis", simulator . "." . key, simulatorConfiguration[key])
 		
 			setConfigurationValue(configuration, "Race Strategist Shutdown", simulator . ".SaveRaceReport", simulatorConfiguration["SaveRaceReport"])
+			setConfigurationValue(configuration, "Race Strategist Shutdown", simulator . ".SaveStatistics", simulatorConfiguration["SaveStatistics"])
 		}
 	}
 	
@@ -182,6 +189,7 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 			configuration := this.iSimulatorConfigurations[rsSimulatorDropDown]
 			
 			GuiControl Choose, rsSaveRaceReportDropDown, % inList(["Ask", "Always", "Never"], configuration["SaveRaceReport"])
+			GuiControl Choose, rsSaveStatisticsDropDown, % inList(["Ask", "Always", "Never"], configuration["SaveStatistics"])
 			GuiControl Text, rsLearningLapsEdit, % configuration["LearningLaps"]
 			GuiControl Text, rsLapsConsideredEdit, % configuration["ConsideredHistoryLaps"]
 			GuiControl Text, rsDampingFactorEdit, % configuration["HistoryLapsDamping"]
@@ -198,6 +206,7 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 			GuiControlGet rsLapsConsideredEdit
 			GuiControlGet rsDampingFactorEdit
 			GuiControlGet rsSaveRaceReportDropDown
+			GuiControlGet rsSaveStatisticsDropDown
 			
 			configuration := this.iSimulatorConfigurations[this.iCurrentSimulator]
 			
@@ -205,6 +214,7 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 			configuration["ConsideredHistoryLaps"] := rsLapsConsideredEdit
 			configuration["HistoryLapsDamping"] := rsDampingFactorEdit
 			configuration["SaveRaceReport"] := ["Ask", "Always", "Never"][rsSaveRaceReportDropDown]
+			configuration["SaveStatistics"] := ["Ask", "Always", "Never"][rsSaveStatisticsDropDown]
 		}
 	}
 	

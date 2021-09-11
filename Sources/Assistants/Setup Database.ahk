@@ -1212,8 +1212,7 @@ showSetupDatabase() {
 	if ((airTemperature <= 0) || (trackTemperature <= 0)) {
 		airTemperature := false
 		trackTemperature := false
-	}
-		
+	}	
 	
 	vSetupDatabase := new SetupDatabase()
 	

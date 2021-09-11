@@ -19,6 +19,7 @@
 #Include ..\Libraries\RuleEngine.ahk
 #Include ..\Assistants\Libraries\VoiceAssistant.ahk
 #Include ..\Assistants\Libraries\SetupDatabase.ahk
+#Include ..\Assistants\Libraries\StatisticsDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -60,6 +61,7 @@ class RaceAssistant extends ConfigurationItem {
 	iKnowledgeBase := false
 	
 	iSetupDatabase := false
+	iStatisticsDatabase := false
 	iSaveSettings := kNever
 	
 	class RaceVoiceAssistant extends VoiceAssistant {
@@ -213,6 +215,15 @@ class RaceAssistant extends ConfigurationItem {
 				this.iSetupDatabase := new SetupDatabase()
 			
 			return this.iSetupDatabase
+		}
+	}
+	
+	StatisticsDatabase[] {
+		Get {
+			if !this.iStatisticsDatabase
+				this.iStatisticsDatabase := new StatisticsDatabase()
+			
+			return this.iStatisticsDatabase
 		}
 	}
 	

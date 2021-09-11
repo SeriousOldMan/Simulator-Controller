@@ -43,20 +43,10 @@ global kMaxTemperatureDelta = 4
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class SetupDatabase {
+class Database {
 	iControllerConfiguration := false
 	
 	iUseGlobalDatabase := false
-	
-	iLastSimulator := false
-	iLastCar := false
-	iLastTrack := false
-	iLastCompound := false
-	iLastCompoundColor := false
-	iLastWeather := false
-	
-	iDatabase := false
-	iDatabaseName := false
 		
 	ControllerConfiguration[] {
 		Get {
@@ -73,7 +63,11 @@ class SetupDatabase {
 	__New(controllerConfiguration := false) {
 		this.iControllerConfiguration := (controllerConfiguration ? controllerConfiguration : getControllerConfiguration())
 	}
-
+	
+	setUseGlobalDatabase(useGlobalDatabase) {
+		this.iUseGlobalDatabase := useGlobalDatabase
+	}
+		
 	getEntries(filter := "*.*", option := "D") {
 		result := []
 		
@@ -86,28 +80,6 @@ class SetupDatabase {
 					result.Push(A_LoopFileName)
 		
 		return result
-	}
-
-	getPressureDistributions(fileName, airTemperature, trackTemperature, ByRef distributions) {
-		tyreSetup := getConfigurationValue(readConfiguration(fileName), "Pressures", ConfigurationItem.descriptor(airTemperature, trackTemperature), false)
-		
-		if tyreSetup {
-			tyreSetup := string2Values(";", tyreSetup)
-			
-			for index, key in ["FL", "FR", "RL", "RR"]
-				for ignore, pressure in string2Values(",", tyreSetup[index]) {
-					pressure := string2Values(":", pressure)
-				
-					if distributions[key].HasKey(pressure[1])
-						distributions[key][pressure[1]] := distributions[key][pressure[1]] + pressure[2]
-					else
-						distributions[key][pressure[1]] := pressure[2]
-				}
-		}		
-	}
-	
-	setUseGlobalDatabase(useGlobalDatabase) {
-		this.iUseGlobalDatabase := useGlobalDatabase
 	}
 
 	getSimulatorName(simulatorCode) {
@@ -167,6 +139,36 @@ class SetupDatabase {
 		}
 		else
 			return []
+	}
+}
+
+class SetupDatabase extends Database {
+	iLastSimulator := false
+	iLastCar := false
+	iLastTrack := false
+	iLastCompound := false
+	iLastCompoundColor := false
+	iLastWeather := false
+	
+	iDatabase := false
+	iDatabaseName := false
+
+	getPressureDistributions(fileName, airTemperature, trackTemperature, ByRef distributions) {
+		tyreSetup := getConfigurationValue(readConfiguration(fileName), "Pressures", ConfigurationItem.descriptor(airTemperature, trackTemperature), false)
+		
+		if tyreSetup {
+			tyreSetup := string2Values(";", tyreSetup)
+			
+			for index, key in ["FL", "FR", "RL", "RR"]
+				for ignore, pressure in string2Values(",", tyreSetup[index]) {
+					pressure := string2Values(":", pressure)
+				
+					if distributions[key].HasKey(pressure[1])
+						distributions[key][pressure[1]] := distributions[key][pressure[1]] + pressure[2]
+					else
+						distributions[key][pressure[1]] := pressure[2]
+				}
+		}		
 	}
 
 	getConditions(simulator, car, track) {

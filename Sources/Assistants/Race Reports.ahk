@@ -68,6 +68,7 @@ class RaceReports extends ConfigurationItem {
 	
 	iAvailableRaces := []
 	
+	iRacesListView := false
 	iSelectedRace := false
 	iSelectedReport := false
 	
@@ -76,6 +77,12 @@ class RaceReports extends ConfigurationItem {
 	Window[] {
 		Get {
 			return "Reports"
+		}
+	}
+	
+	RacesListView[] {
+		Get {
+			return this.iRacesListView
 		}
 	}
 	
@@ -185,7 +192,9 @@ class RaceReports extends ConfigurationItem {
 		
 		Gui %window%:Add, Text, x16 yp+24 w70 h23 +0x200, % translate("Races")
 		
-		Gui %window%:Add, ListView, x90 yp w180 h252 -Multi -LV0x10 AltSubmit NoSort NoSortHdr gchooseRace, % values2String("|", map(["Date", "Time", "Duration", "Starting Grid"], "translate")*)
+		Gui %window%:Add, ListView, x90 yp w180 h252 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDraceListView gchooseRace, % values2String("|", map(["Date", "Time", "Duration", "Starting Grid"], "translate")*)
+		
+		this.iRacesListView := raceListView
 		
 		Gui %window%:Add, Button, x62 yp+229 w23 h23 HwnddeleteRaceReportButtonHandle gdeleteRaceReport
 		setButtonIcon(deleteRaceReportButtonHandle, kIconsDirectory . "Minus.ico", 1)
@@ -1146,11 +1155,11 @@ class RaceReports extends ConfigurationItem {
 			GuiControl Choose, reportsDropDown, 0
 			GuiControl Disable, %deleteRaceReportButtonHandle%
 			
-			Gui ListView, % this.RacesListView
-				
 			this.showReportChart(false)
 			this.showReportInfo(false)
 
+			Gui ListView, % this.RacesListView
+				
 			LV_Delete()
 				
 			if track {

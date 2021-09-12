@@ -32,6 +32,13 @@ ListLines Off					; Disable execution history
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                         Local Include Section                           ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include ..\Assistants\Libraries\StatisticsDatabase.ahk
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Constants Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -60,9 +67,27 @@ class StrategyWorkbench extends ConfigurationItem {
 	iSelectedCar := false
 	iSelectedTrack := false
 	
+	iWeather := "Dry"
+	iAirTemperature := 23
+	iTrackTemperature := 27
+	iCompound := "Dry"
+	iCompoundColor := "Black"
+	iMap := "n/a"
+	iTC := "n/a"
+	iABS := "n/a"
+	
+	iConditionsListView := false
+	iAvailableLapData := []
+	
 	Window[] {
 		Get {
 			return "Workbench"
+		}
+	}
+	
+	ConditionsListView[] {
+		Get {
+			return this.iConditionsListView
 		}
 	}
 	
@@ -93,8 +118,56 @@ class StrategyWorkbench extends ConfigurationItem {
 		}
 	}
 	
+	Weather[] {
+		Get {
+			return this.iWeather
+		}
+	}
+	
+	AirTemperature[] {
+		Get {
+			return this.iAirTemperature
+		}
+	}
+	
+	TrackTemperature[] {
+		Get {
+			return this.iTrackTemperature
+		}
+	}
+	
+	Compound[] {
+		Get {
+			return this.iCompound
+		}
+	}
+	
+	CompoundColor[] {
+		Get {
+			return this.iCompoundColor
+		}
+	}
+	
+	Map[] {
+		Get {
+			return this.iMap
+		}
+	}
+	
+	TC[] {
+		Get {
+			return this.iTC
+		}
+	}
+	
+	ABS[] {
+		Get {
+			return this.iABS
+		}
+	}
+	
 	__New(simulator := false, car := false, track := false, duration := false, weather := false, airTemperature := false, trackTemperature := false
-		, compound := false, map := "n/a", tc := "n/a", abs := "n/a") {
+		, compound := false, compoundColor := false, map := "n/a", tc := "n/a", abs := "n/a") {
 		this.iSelectedSimulator := simulator
 		this.iSelectedCar := car
 		this.iSelectedTrack := track
@@ -103,6 +176,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		this.iAirTemperature := airTemperature
 		this.iTrackTemperature := trackTemperature
 		this.iCompound := compound
+		this.iCompoundColor := compoundColor
 		this.iMap := map
 		this.iTC := tc
 		this.iABS := abs
@@ -138,8 +212,15 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, Text, x16 yp+10 w70 h23 +0x200 Section, % translate("Simulator")
 		
 		simulators := this.getSimulators()
+		simulator := 0
 		
-		simulator := ((simulators.Length() > 0) ? 1 : 0)
+		if (simulators.Length() > 0) {
+			if this.iSelectedSimulator
+				simulator := inList(simulators, this.SelectedSimulator)
+
+			if (simulator == 0)
+				simulator := 1
+		}
 	
 		Gui %window%:Add, DropDownList, x90 yp w180 Choose%simulator% vsimulatorDropDown gchooseSimulator, % values2String("|", simulators*)
 		
@@ -154,11 +235,26 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, Text, x16 yp24 w70 h23 +0x200, % translate("Track")
 		Gui %window%:Add, DropDownList, x90 yp w180 vtrackDropDown gchooseTrack
 		
-		Gui %window%:Add, ActiveX, x290 yp+24 w910 h475 Border vchartViewer, shell.explorer
+		Gui %window%:Add, Text, x16 yp+24 w70 h23 +0x200, % translate("Conditions")
+		
+		Gui %window%:Add, ListView, x90 yp w180 h252 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDconditionsListView gchooseConditions, % values2String("|", map(["Weather", "Tyres", "Map"], "translate")*)
+		
+		this.iConditionsListView := conditionsListView
+		
+		Gui %window%:Add, ActiveX, x290 ys w910 h475 Border vchartViewer, shell.explorer
 		
 		chartViewer.Navigate("about:blank")
 		
+		car := this.SelectedCar
+		track := this.SelectedTrack
+		
 		this.loadSimulator(simulator, true)
+		
+		if car
+			this.loadCar(car)
+		
+		if track
+			this.loadTrack(track)
 		
 		Gui %window%:Add, Text, x8 y574 w1200 0x10
 		
@@ -215,6 +311,18 @@ class StrategyWorkbench extends ConfigurationItem {
 		chartViewer.Document.close()
 	}
 	
+	getSimulators() {
+		return this.StatisticsDatabase.getSimulators()
+	}
+	
+	getCars(simulator) {
+		return this.StatisticsDatabase.getCars(simulator)
+	}
+	
+	getTracks(simulator, car) {
+		return this.StatisticsDatabase.getTracks(simulator, car)
+	}
+	
 	loadSimulator(simulator, force := false) {
 		if (force || (simulator != this.SelectedSimulator)) {
 			window := this.Window
@@ -256,44 +364,32 @@ class StrategyWorkbench extends ConfigurationItem {
 			Gui %window%:Default
 			
 			simulator := this.SelectedSimulator
+			car := this.SelectedCar
 			
 			this.iSelectedTrack := track
-			this.iAvailableRaces := []
-			this.iSelectedRace := false
-			this.iSelectedReport := false
+			this.iAvailableLapData := []
 				
-			GuiControl Choose, trackDropDown, % inList(this.getTracks(simulator, this.SelectedCar), track)
-			GuiControl Disable, reportsDropDown
-			GuiControl Disable, reportSettingsButton
-			GuiControl Choose, reportsDropDown, 0
-			GuiControl Disable, %deleteRaceReportButtonHandle%
+			GuiControl Choose, trackDropDown, % inList(this.getTracks(simulator, car), track)
 			
-			Gui ListView, % this.RacesListView
+			this.showWorkbenchChart(false)
+			
+			Gui ListView, % this.ConditionsListView
 				
-			this.showReportChart(false)
-			this.showReportInfo(false)
-
 			LV_Delete()
 				
 			if track {
-				Loop Files, % this.Database . "\" . this.getSimulatorCode(simulator) . "\*.*", D
-				{
-					FormatTime date, %A_LoopFileName%, ShortDate
-					FormatTime time, %A_LoopFileName%, HH:mm
-					
-					raceData := readConfiguration(A_LoopFilePath . "\Race.data")
-					
-					if ((getConfigurationValue(raceData, "Session", "Car") = this.SelectedCar) && (getConfigurationValue(raceData, "Session", "Track") = track)) {
-						this.AvailableRaces.Push(A_LoopFileName)
-						
-						LV_Add("", date, time, Round(getConfigurationValue(raceData, "Session", "Duration") / 60), getConfigurationValue(raceData, "Cars", "Count"))
-					}
-				}
+				lapData := this.StatisticsDatabase.getLapTimes(simulator, car, track, "Electronics"
+															 , ["Weather", "Compound", "CompoundColor", "Map"])
+				
+				this.iAvailableLapData := lapData
+				
+				for ignore, lapInfo in lapData
+					LV_Add("", translate(lapInfo.Weather), translate(lapInfo.Compound) . "(" . translate(lapInfo.CompoundColor) . ")"
+							 , translate(lapInfo.Map))
 
 				LV_ModifyCol(1, "AutoHdr")
 				LV_ModifyCol(2, "AutoHdr")
 				LV_ModifyCol(3, "AutoHdr")
-				LV_ModifyCol(4, "AutoHdr")
 			}
 		}
 	}
@@ -378,6 +474,9 @@ chooseTrack() {
 	workbench.loadTrack(trackDropDown)
 }
 
+chooseConditions() {
+}
+
 setButtonIcon(buttonHandle, file, index := 1, options := "") {
 ;   Parameters:
 ;   1) {Handle} 	HWND handle of Gui button
@@ -449,7 +548,7 @@ runStrategyWorkbench() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Strategy Workbench
 	
-	simulator := false
+	simulator := "Assetto Corsa Competizione"
 	car := false
 	track := false
 	duration := false
@@ -457,6 +556,7 @@ runStrategyWorkbench() {
 	airTemperature := 23
 	trackTemperature:= 27
 	compound := "Dry"
+	compoundColor := "Black"
 	map := "n/a"
 	tc := "n/a"
 	abs := "n/a"
@@ -489,6 +589,9 @@ runStrategyWorkbench() {
 			case "-Compound":
 				compound := A_Args[index + 1]
 				index += 2
+			case "-CompoundColor":
+				compoundColor := A_Args[index + 1]
+				index += 2
 			case "-Map":
 				map := A_Args[index + 1]
 				index += 2
@@ -511,15 +614,11 @@ runStrategyWorkbench() {
 	current := fixIE(11)
 	
 	try {
-		workbench := new StrategyWorkbench(simulator, car, track, duration, weather, airTemperature, trackTemperature, compound, map, tc, abs)
+		workbench := new StrategyWorkbench(simulator, car, track, duration, weather, airTemperature, trackTemperature
+										 , compound, compoundColor, map, tc, abs)
 		
 		workbench.createGui(workbench.Configuration)
 		workbench.show()
-		
-		simulators := workbench.getSimulators()
-		
-		if (simulators.Length() > 0)
-			workbench.loadSimulator(simulators[1])
 	}
 	finally {
 		fixIE(current)

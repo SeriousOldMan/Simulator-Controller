@@ -684,181 +684,24 @@ class RaceStrategist extends RaceAssistant {
 		}	
 	}
 	
-	addLap(lapNumber, data) {
+	prepareData(lapNumber, data) {
 		local knowledgeBase
 		
-		static baseLap := false
-		
-		if !IsObject(data)
-			data := readConfiguration(data)
-		
-		if !this.KnowledgeBase
-			this.startSession(data)
+		data := base.prepareData(lapNumber, data)
 		
 		knowledgeBase := this.KnowledgeBase
-		
-		if (lapNumber == 1)
-			knowledgeBase.addFact("Lap", 1)
-		else
-			knowledgeBase.setValue("Lap", lapNumber)
-			
-		if !this.InitialFuelAmount
-			baseLap := lapNumber
 		
 		for key, value in getConfigurationSectionValues(data, "Position Data", Object())
 			if ((lapNumber = 1) || (key != "Driver.Car"))
 				knowledgeBase.setFact(key, value)
 		
-		this.updateDynamicValues({EnoughData: (lapNumber > (baseLap + (this.LearningLaps - 1)))})
-		
-		knowledgeBase.setFact("Session.Time.Remaining", getConfigurationValue(data, "Session Data", "SessionTimeRemaining", 0))
-		knowledgeBase.setFact("Session.Lap.Remaining", getConfigurationValue(data, "Session Data", "SessionLapsRemaining", 0))
-		
-		driverForname := getConfigurationValue(data, "Stint Data", "DriverForname", this.DriverName)
-		driverSurname := getConfigurationValue(data, "Stint Data", "DriverSurname", "Doe")
-		driverNickname := getConfigurationValue(data, "Stint Data", "DriverNickname", "JD")
-		
-		this.updateSessionValues({Driver: driverForname})
-			
-		knowledgeBase.addFact("Lap." . lapNumber . ".Driver.Forname", driverForname)
-		knowledgeBase.addFact("Lap." . lapNumber . ".Driver.Surname", driverSurname)
-		knowledgeBase.addFact("Lap." . lapNumber . ".Driver.Nickname", driverNickname)
-		
-		knowledgeBase.setFact("Driver.Forname", driverForname)
-		knowledgeBase.setFact("Driver.Surname", driverSurname)
-		knowledgeBase.setFact("Driver.Nickname", driverNickname)
-		
-		knowledgeBase.addFact("Lap." . lapNumber . ".Map", getConfigurationValue(data, "Car Data", "Map", "n/a"))
-		knowledgeBase.addFact("Lap." . lapNumber . ".TC", getConfigurationValue(data, "Car Data", "TC", "n/a"))
-		knowledgeBase.addFact("Lap." . lapNumber . ".ABS", getConfigurationValue(data, "Car Data", "ABS", "n/a"))
-		
-		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Compound", getConfigurationValue(data, "Car Data", "TyreCompound", "Dry"))
-		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Compound.Color", getConfigurationValue(data, "Car Data", "TyreCompoundColor", "Black"))
-		
-		timeRemaining := getConfigurationValue(data, "Session Data", "SessionTimeRemaining", 0)
-		
-		knowledgeBase.setFact("Driver.Time.Remaining", getConfigurationValue(data, "Stint Data", "DriverTimeRemaining", timeRemaining))
-		knowledgeBase.setFact("Driver.Time.Stint.Remaining", getConfigurationValue(data, "Stint Data", "StintTimeRemaining", timeRemaining))
-		
-		airTemperature := Round(getConfigurationValue(data, "Weather Data", "Temperature", 0))
-		trackTemperature := Round(getConfigurationValue(data, "Track Data", "Temperature", 0))
-		
-		if (airTemperature = 0)
-			airTemperature := Round(getConfigurationValue(data, "Car Data", "AirTemperature", 0))
-		
-		if (trackTemperature = 0)
-			trackTemperature := Round(getConfigurationValue(data, "Car Data", "RoadTemperature", 0))
-		
-		weatherNow := getConfigurationValue(data, "Weather Data", "Weather", "Dry")
-		weather10Min := getConfigurationValue(data, "Weather Data", "Weather10Min", "Dry")
-		weather30Min := getConfigurationValue(data, "Weather Data", "Weather30Min", "Dry")
-		
-		knowledgeBase.setFact("Weather.Temperature.Air", airTemperature)
-		knowledgeBase.setFact("Weather.Temperature.Track", trackTemperature)
-		knowledgeBase.setFact("Weather.Weather.Now", weatherNow)
-		knowledgeBase.setFact("Weather.Weather.10Min", weather10Min)
-		knowledgeBase.setFact("Weather.Weather.30Min", weather30Min)
-		
-		lapTime := getConfigurationValue(data, "Stint Data", "LapLastTime", 0)
-		
-		if ((lapNumber <= 2) && knowledgeBase.getValue("Session.Settings.Lap.Time.Adjust", false)) {
-			settingsLapTime := (getConfigurationValue(this.Settings, "Session Settings", "Lap.AvgTime", lapTime / 1000) * 1000)
-			
-			if ((lapTime / settingsLapTime) > 2)
-				lapTime := settingsLapTime
-		}
-		
-		if (this.iLapTime = 0)
-			this.iLapTime := lapTime
-		else
-			this.iLapTime := Min(this.iLapTime, lapTime)
-		
-		knowledgeBase.addFact("Lap." . lapNumber . ".Time", lapTime)
-		knowledgeBase.addFact("Lap." . lapNumber . ".Time.Start", this.OverallTime)
-		
-		overallTime := (this.OverallTime + lapTime)
-		
-		values := {OverallTime: overallTime}
-		
-		if (lapNumber > 1)
-			values["BestLapTime"] := (this.BestLapTime = 0) ? lapTime : Min(this.BestLapTime, lapTime)
-		
-		if (lapTime > 0)
-			this.updateDynamicValues(values)
-		
-		knowledgeBase.addFact("Lap." . lapNumber . ".Time.End", overallTime)
-		
-		fuelRemaining := getConfigurationValue(data, "Car Data", "FuelRemaining", 0)
-		
-		knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.Remaining", Round(fuelRemaining, 2))
-		
-		if (lapNumber == 1) {
-			this.updateDynamicValues({LastFuelAmount: fuelRemaining, InitialFuelAmount: fuelRemaining, AvgFuelConsumption: 0})
-			
-			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.AvgConsumption", 0)
-			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.Consumption", 0)
-		}
-		else if (!this.InitialFuelAmount || (fuelRemaining > this.LastFuelAmount)) {
-			; This is the case after a pitstop
-			this.updateDynamicValues({LastFuelAmount: fuelRemaining, InitialFuelAmount: fuelRemaining, AvgFuelConsumption: 0})
-			
-			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.AvgConsumption", knowledgeBase.getValue("Lap." . (lapNumber - 1) . ".Fuel.AvgConsumption", 0))
-			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.Consumption", knowledgeBase.getValue("Lap." . (lapNumber - 1) . ".Fuel.Consumption", 0))
-		}
-		else {
-			avgFuelConsumption := Round((this.InitialFuelAmount - fuelRemaining) / (lapNumber - baseLap), 2)
-			
-			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.AvgConsumption", avgFuelConsumption)
-			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.Consumption", Round(this.LastFuelAmount - fuelRemaining, 2))
-			
-			this.updateDynamicValues({LastFuelAmount: fuelRemaining, AvgFuelConsumption: avgFuelConsumption})
-		}
-		
-		tyrePressures := string2Values(",", getConfigurationValue(data, "Car Data", "TyrePressure", ""))
-		
-		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Pressure.FL", Round(tyrePressures[1], 2))
-		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Pressure.FR", Round(tyrePressures[2], 2))		
-		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Pressure.RL", Round(tyrePressures[3], 2))
-		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Pressure.RR", Round(tyrePressures[4], 2))
-		
-		tyreTemperatures := string2Values(",", getConfigurationValue(data, "Car Data", "TyreTemperature", ""))
-		
-		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Temperature.FL", Round(tyreTemperatures[1], 1))
-		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Temperature.FR", Round(tyreTemperatures[2], 1))		
-		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Temperature.RL", Round(tyreTemperatures[3], 1))
-		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Temperature.RR", Round(tyreTemperatures[4], 1))
-		
-		knowledgeBase.addFact("Lap." . lapNumber . ".Weather", weatherNow)
-		knowledgeBase.addFact("Lap." . lapNumber . ".Grip", getConfigurationValue(data, "Track Data", "Grip", "Green"))
-		knowledgeBase.addFact("Lap." . lapNumber . ".Temperature.Air", airTemperature)
-		knowledgeBase.addFact("Lap." . lapNumber . ".Temperature.Track", trackTemperature)
-		
-		result := knowledgeBase.produce()
-		
-		if this.Debug[kDebugKnowledgeBase]
-			this.dumpKnowledge(this.KnowledgeBase)
-		
-		return result
+		return data
 	}
 	
 	updateLap(lapNumber, data) {
-		local knowledgeBase := this.KnowledgeBase
-		local fact
+		this.KnowledgeBase.addFact("Sector", true)
 		
-		if !IsObject(data)
-			data := readConfiguration(data)
-		
-		for key, value in getConfigurationSectionValues(data, "Position Data", Object())
-			knowledgeBase.setFact(key, value)
-	
-		knowledgeBase.addFact("Sector", true)
-		
-		result := knowledgeBase.produce()
-			
-		if this.Debug[kDebugKnowledgeBase]
-			this.dumpKnowledge(this.KnowledgeBase)
-		
-		return result
+		return base.updateLap(lapNumber, data)
 	}
 	
 	requestInformation(category, arguments*) {
@@ -1136,12 +979,12 @@ class RaceStrategist extends RaceAssistant {
 				trackTemperature := knowledgeBase.getValue(prefix . ".Temperature.Track")
 				compound := knowledgeBase.getValue(prefix . ".Tyre.Compound")
 				compoundColor := knowledgeBase.getValue(prefix . ".Tyre.Compound.Color")
+				fuelConsumption := knowledgeBase.getValue(prefix . ".Fuel.Consumption")
 				lapTime := knowledgeBase.getValue(prefix . ".Time")
 				
 				map := knowledgeBase.getValue(prefix . ".Map")
 				tc := knowledgeBase.getValue(prefix . ".TC")
 				abs := knowledgeBase.getValue(prefix . ".ABS")
-				fuelConsumption := knowledgeBase.getValue(prefix . ".Fuel.Consumption")
 				
 				statisticsDB.updateElectronicsStatistics(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor
 													   , map, tc, abs, fuelConsumption, lapTime)
@@ -1157,7 +1000,8 @@ class RaceStrategist extends RaceAssistant {
 				rrTemperature := knowledgeBase.getValue(prefix . ".Tyre.Temperature.RR")
 				
 				statisticsDB.updateTyreStatistics(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor
-												, flPressure, frPressure, rlPressure, rrPressure, flTemperature, frTemperature, rlTemperature, rrTemperature, lapTime)
+												, flPressure, frPressure, rlPressure, rrPressure, flTemperature, frTemperature, rlTemperature, rrTemperature
+												, fuelConsumption, lapTime)
 			}
 		}
 	}

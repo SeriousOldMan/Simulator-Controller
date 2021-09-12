@@ -631,6 +631,10 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		this.Simulator.updateStandingsData(data)
 	}
 	
+	sessionActive(sessionState) {
+		return (sessionState >= kSessionPractice)
+	}
+	
 	collectSessionData() {
 		if this.Simulator {
 			code := this.Simulator.Code
@@ -663,7 +667,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				
 				if (sessionState == kSessionPaused)
 					return
-				else if (sessionState < kSessionPractice) {
+				else if !this.sessionActive(sessionState) {
 					; Not in a supported session
 				
 					this.iLastLap := 0

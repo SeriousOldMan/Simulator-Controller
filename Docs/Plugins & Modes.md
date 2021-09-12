@@ -399,7 +399,7 @@ In order to *understand* the Pitstop MFD state of *Assetto Corsa Competizione*, 
 
 These pictures are located in the *Resources\Screen Images\ACC folder* in the installation folder of Simulator Controller. They have been taken from a Full HD triple screen setup (5760 * 1080) using the English language setting in *Assetto Corsa Competizione*. If you are running a different resolution or, even more important, are using a different language, the search for these pictures will fail. But there is help, since you can provide your own pictures by placing your own ones with identical names in the *Simulator Controller\Screen Images\ACC* folder in your user *Documents* folder. Use the Snipping Tool of Windows to create all the necessary pictures, it will only take a few minutes.
 
-Hint: The "Select Driver" option might only be available in special multiuser server setups, whereas the "Strategy" option is available in every Race situation.
+Hint: The "Select Driver" option might only be available in special multiuser server setups, whereas the "Strategy" option is available in almost every session.
 
 Note: The picture search will initially take some time, but the algorithm will learn the position of the Pitstop MFD during the initial run. Depending on your screen size and resolution the initial search will consume quite some CPU cycles. Therefore I advice to open the Pitstop MFD using one of the mode actions above once you are driving in a safe situation, to avoid lags later on. Simulator Controller will learn the position and will only search the much reduced screen area from now on and the CPU load will be 10 times less than before
 
@@ -478,12 +478,12 @@ See the following table for the supported assistant commands.
 
 | Command | Description |
 | ------ | ------ |
-| InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your race assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
-| PitstopRecommend | Asks the virtual race strategist for a recommendation for the next pitstop. |
-| PitstopPlan | Requests a pitstop plan from the virtual race engineer. |
+| InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your Race Assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
+| PitstopRecommend | Asks the virtual Eace Strategist for a recommendation for the next pitstop. |
+| PitstopPlan | Requests a pitstop plan from the Virtual Race Engineer. |
 | PitstopPrepare | Requests Jona to transfer the values from the current pitstop plan to the Pitstop MFD. |
-| Accept | Accepts the last recommendation by one of the virtual race assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
-| Reject | Cancels or rejects the last recommendation by one of the virtual race assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
+| Accept | Accepts the last recommendation by one of the Virtual Race Assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
+| Reject | Cancels or rejects the last recommendation by one of the Virtual Race Assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
 
 See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *PitstopPrepare*, *Accept* and *Reject* and the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin above for more information on *PitstopRecommend*.
 
@@ -509,7 +509,7 @@ All this will be achieved using the following plugin arguments:
 
 ### Mode *Assistant*
 
-This mode allows you to group all the available actions of the active race assistants into one layer of controls on your hardware controller. Although all these actions are also available as plugin actions of the "Race Engineer" and "Race Strategist" plugins, it may be more practicle to use the "Assistant" mode, when your set of available hardware controls is limited, since plugin actions always occupy a given control.
+This mode allows you to group all the available actions of the active Race Assistants into one layer of controls on your hardware controller. Although all these actions are also available as plugin actions of the "Race Engineer" and "Race Strategist" plugins, it may be more practicle to use the "Assistant" mode, when your set of available hardware controls is limited, since plugin actions always occupy a given control.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%2012.JPG)
 
@@ -561,12 +561,12 @@ See the following table for the supported assistant commands.
 
 | Command | Description |
 | ------ | ------ |
-| InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your race assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
-| PitstopRecommend | Asks the virtual race strategist for a recommendation for the next pitstop. |
-| PitstopPlan | Requests a pitstop plan from the virtual race engineer. |
+| InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your Race assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
+| PitstopRecommend | Asks the Virtual Race Strategist for a recommendation for the next pitstop. |
+| PitstopPlan | Requests a pitstop plan from the Virtual Race Engineer. |
 | PitstopPrepare | Requests Jona to transfer the values from the current pitstop plan to the Pitstop MFD. |
-| Accept | Accepts the last recommendation by one of the virtual race assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
-| Reject | Cancels or rejects the last recommendation by one of the virtual race assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
+| Accept | Accepts the last recommendation by one of the Virtual Race Assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
+| Reject | Cancels or rejects the last recommendation by one of the Virtual Race Assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
 
 See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *PitstopPrepare*, *Accept* and *Reject* and the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin above for more information on *PitstopRecommend*.
 

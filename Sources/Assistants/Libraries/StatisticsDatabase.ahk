@@ -32,7 +32,7 @@ class StatisticsDatabase extends Database {
 		
 		simulator := this.getSimulatorName(simulatorCode)
 		
-		directory := (kDatabaseDirectory . "Local\" . simulatorCode . "\" .car . "\" . track)
+		directory := (kDatabaseDirectory . "Local\" . simulatorCode . "\" . car . "\" . track)
 		
 		FileCreateDir %directory%
 				
@@ -50,7 +50,7 @@ class StatisticsDatabase extends Database {
 		
 		simulator := this.getSimulatorName(simulatorCode)
 		
-		directory := (kDatabaseDirectory . "Local\" . simulatorCode . "\" .car . "\" . track)
+		directory := (kDatabaseDirectory . "Local\" . simulatorCode . "\" . car . "\" . track)
 		
 		FileCreateDir %directory%
 				

@@ -84,7 +84,7 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
 		
-		Gui %window%:Add, GroupBox, x%x% yp+40 w%width% h124 HWNDwidget3 Hidden, % translate("Data Analysis")
+		Gui %window%:Add, GroupBox, x%x% yp+40 w%width% h148 HWNDwidget3 Hidden, % translate("Data Analysis")
 		
 		Gui %window%:Font, Norm, Arial
 		
@@ -106,15 +106,17 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 		Gui %window%:Add, Text, x%x0% yp+28 w105 h23 +0x200 HWNDwidget18 Hidden, % translate("Save Race Report")
 		Gui %window%:Add, DropDownList, x%x1% yp w140 AltSubmit vrsSaveRaceReportDropDown HWNDwidget19 Hidden, % values2String("|", choices*)
 		
-		choices := map(["Ask", "Always save", "No action"], "translate")
-		Gui %window%:Add, Text, x%x0% yp+28 w105 h23 +0x200 HWNDwidget20 Hidden, % translate("Save Statistics")
-		Gui %window%:Add, DropDownList, x%x1% yp w140 AltSubmit vrsSaveStatisticsDropDown HWNDwidget21 Hidden, % values2String("|", choices*)
-		
 		x5 := x1 + 144
 		
-		Gui %window%:Add, Text, x%x5% yp+3 w80 h20 HWNDwidget22 Hidden, % translate("@ Session End")
+		Gui %window%:Add, Text, x%x5% yp+3 w80 h20 HWNDwidget20 Hidden, % translate("@ Session End")
 		
-		Loop 22
+		choices := map(["Ask", "Always save", "No action"], "translate")
+		Gui %window%:Add, Text, x%x0% yp+21 w105 h23 +0x200 HWNDwidget21 Hidden, % translate("Save Statistics")
+		Gui %window%:Add, DropDownList, x%x1% yp w140 AltSubmit vrsSaveStatisticsDropDown HWNDwidget22 Hidden, % values2String("|", choices*)
+		
+		Gui %window%:Add, Text, x%x5% yp+3 w80 h20 HWNDwidget23 Hidden, % translate("@ Session End")
+		
+		Loop 23
 			editor.registerWidget(this, widget%A_Index%)
 		
 		this.loadSimulatorConfiguration()

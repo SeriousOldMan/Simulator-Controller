@@ -314,7 +314,7 @@ else {
 					break
 			}
 			
-			if (A_Index = 3) {
+			if (A_Index = 4) {
 				done := true
 				
 				break

@@ -156,6 +156,17 @@ class RaceStrategist extends RaceAssistant {
 			this.iEnoughData := values["EnoughData"]
 	}
 	
+	hasEnoughData(inform := true) {
+		if (this.Session == kSessionRace)
+			return base.hasEnoughData(inform)
+		else {
+			if (inform && this.Speaker)
+				this.getSpeaker().speakPhrase("CollectingData")
+			
+			return false
+		}
+	}
+	
 	handleVoiceCommand(grammar, words) {
 		switch grammar {
 			case "LapsRemaining":
@@ -803,6 +814,20 @@ class RaceStrategist extends RaceAssistant {
 			this.updateDynamicValues({LastFuelAmount: fuelRemaining, AvgFuelConsumption: avgFuelConsumption})
 		}
 		
+		tyrePressures := string2Values(",", getConfigurationValue(data, "Car Data", "TyrePressure", ""))
+		
+		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Pressure.FL", Round(tyrePressures[1], 2))
+		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Pressure.FR", Round(tyrePressures[2], 2))		
+		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Pressure.RL", Round(tyrePressures[3], 2))
+		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Pressure.RR", Round(tyrePressures[4], 2))
+		
+		tyreTemperatures := string2Values(",", getConfigurationValue(data, "Car Data", "TyreTemperature", ""))
+		
+		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Temperature.FL", Round(tyreTemperatures[1], 1))
+		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Temperature.FR", Round(tyreTemperatures[2], 1))		
+		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Temperature.RL", Round(tyreTemperatures[3], 1))
+		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Temperature.RR", Round(tyreTemperatures[4], 1))
+		
 		knowledgeBase.addFact("Lap." . lapNumber . ".Weather", weatherNow)
 		knowledgeBase.addFact("Lap." . lapNumber . ".Grip", getConfigurationValue(data, "Track Data", "Grip", "Green"))
 		knowledgeBase.addFact("Lap." . lapNumber . ".Temperature.Air", airTemperature)
@@ -1109,8 +1134,8 @@ class RaceStrategist extends RaceAssistant {
 				weather := knowledgeBase.getValue(prefix . ".Weather")
 				airTemperature := knowledgeBase.getValue(prefix . ".Temperature.Air")
 				trackTemperature := knowledgeBase.getValue(prefix . ".Temperature.Track")
-				compound := knowledgeBase.getValue(prefix . ".Compound")
-				compoundColor := knowledgeBase.getValue(prefix . ".Compound.Color")
+				compound := knowledgeBase.getValue(prefix . ".Tyre.Compound")
+				compoundColor := knowledgeBase.getValue(prefix . ".Tyre.Compound.Color")
 				lapTime := knowledgeBase.getValue(prefix . ".Time")
 				
 				map := knowledgeBase.getValue(prefix . ".Map")

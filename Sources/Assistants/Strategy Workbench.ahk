@@ -237,7 +237,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		Gui %window%:Add, Text, x16 yp+24 w70 h23 +0x200, % translate("Conditions")
 		
-		Gui %window%:Add, ListView, x90 yp w180 h252 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDconditionsListView gchooseConditions, % values2String("|", map(["Weather", "Tyres", "Map"], "translate")*)
+		Gui %window%:Add, ListView, x90 yp w180 h252 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDconditionsListView gchooseConditions, % values2String("|", map(["Weather", "Tyres"], "translate")*)
 		
 		this.iConditionsListView := conditionsListView
 		
@@ -358,6 +358,8 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 	
 	loadTrack(track, force := false) {
+		local lapData
+		
 		if (force || (track != this.SelectedTrack)) {
 			window := this.Window
 		
@@ -378,14 +380,15 @@ class StrategyWorkbench extends ConfigurationItem {
 			LV_Delete()
 				
 			if track {
-				lapData := this.StatisticsDatabase.getLapTimes(simulator, car, track, "Electronics"
-															 , ["Weather", "Compound", "CompoundColor", "Map"])
+				lapData := this.StatisticsDatabase.getLapData(simulator, car, track, "Electronics", ["Weather", "Compound", "CompoundColor"])
 				
 				this.iAvailableLapData := lapData
 				
-				for ignore, lapInfo in lapData
-					LV_Add("", translate(lapInfo.Weather), translate(lapInfo.Compound) . "(" . translate(lapInfo.CompoundColor) . ")"
-							 , translate(lapInfo.Map))
+				for ignore, lapInfo in lapData {
+					lapInfo := lapInfo[1]
+				
+					LV_Add("", translate(lapInfo.Weather), translate(lapInfo.Compound) . " (" . translate(lapInfo.CompoundColor) . ")")
+				}
 
 				LV_ModifyCol(1, "AutoHdr")
 				LV_ModifyCol(2, "AutoHdr")

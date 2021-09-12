@@ -25,6 +25,7 @@ Release 3.5.8 Checklist
    a. Translations
    b. Rename "Setup Database" => "Database"
    c. Phrase Grammars
+   d. Plugin Labels
 2. Rename "Setup Database" => "Database"
    a. Update Notes
 3. Cato is now also active during a practice session

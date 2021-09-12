@@ -980,6 +980,7 @@ class RaceStrategist extends RaceAssistant {
 				compound := knowledgeBase.getValue(prefix . ".Tyre.Compound")
 				compoundColor := knowledgeBase.getValue(prefix . ".Tyre.Compound.Color")
 				fuelConsumption := knowledgeBase.getValue(prefix . ".Fuel.Consumption")
+				fuelRemaining := knowledgeBase.getValue(prefix . ".Fuel.Remaining")
 				lapTime := knowledgeBase.getValue(prefix . ".Time")
 				
 				map := knowledgeBase.getValue(prefix . ".Map")
@@ -987,7 +988,7 @@ class RaceStrategist extends RaceAssistant {
 				abs := knowledgeBase.getValue(prefix . ".ABS")
 				
 				statisticsDB.updateElectronicsStatistics(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor
-													   , map, tc, abs, fuelConsumption, lapTime)
+													   , map, tc, abs, fuelRemaining, fuelConsumption, lapTime)
 				
 				flPressure := knowledgeBase.getValue(prefix . ".Tyre.Pressure.FL")
 				frPressure := knowledgeBase.getValue(prefix . ".Tyre.Pressure.FR")
@@ -1001,7 +1002,7 @@ class RaceStrategist extends RaceAssistant {
 				
 				statisticsDB.updateTyreStatistics(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor
 												, flPressure, frPressure, rlPressure, rrPressure, flTemperature, frTemperature, rlTemperature, rrTemperature
-												, fuelConsumption, lapTime)
+												, fuelRemaining, fuelConsumption, lapTime)
 			}
 		}
 	}

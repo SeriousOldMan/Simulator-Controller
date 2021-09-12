@@ -30,6 +30,7 @@ class LapData {
 	iCompound := false
 	iCompoundColor := false
 	
+	iFuelRemaining := false
 	iFuelConsumption := false
 	iLapTime := false
 	
@@ -63,6 +64,12 @@ class LapData {
 		}
 	}
 	
+	FuelRemaining[] {
+		Get {
+			return this.iFuelRemaining
+		}
+	}
+	
 	FuelConsumption[] {
 		Get {
 			return this.iFuelConsumption
@@ -75,12 +82,13 @@ class LapData {
 		}
 	}
 	
-	__New(weather, airTemperature, trackTemperature, compound, compoundColor, fuelConsumption, lapTime) {
+	__New(weather, airTemperature, trackTemperature, compound, compoundColor, fuelRemaining, fuelConsumption, lapTime) {
 		this.iWeather := weather
 		this.iAirTemperature := airTemperature
 		this.iTrackTemperature := trackTemperature
 		this.iCompound := compound
 		this.iCompoundColor := compoundColor
+		this.iFuelRemaining := fuelRemaining
 		this.iFuelConsumption := fuelConsumption
 		this.iLapTime := lapTime
 	}
@@ -109,12 +117,12 @@ class ElectronicsLapData extends LapData {
 		}
 	}
 	
-	__New(weather, airTemperature, trackTemperature, compound, compoundColor, fuelConsumption, lapTime, map, tc, abs) {
+	__New(weather, airTemperature, trackTemperature, compound, compoundColor, fuelRemaining, fuelConsumption, lapTime, map, tc, abs) {
 		this.iMap := map
 		this.iTC := tc
 		this.iABS := abs
 		
-		base.__New(weather, airTemperature, trackTemperature, compound, compoundColor, fuelConsumption, lapTime)
+		base.__New(weather, airTemperature, trackTemperature, compound, compoundColor, fuelRemaining, fuelConsumption, lapTime)
 	}
 }
 
@@ -177,7 +185,7 @@ class TyresLapData extends LapData {
 		}
 	}
 	
-	__New(weather, airTemperature, trackTemperature, compound, compoundColor, fuelConsumption, lapTime
+	__New(weather, airTemperature, trackTemperature, compound, compoundColor, fuelRemaining, fuelConsumption, lapTime
 		, flPressure, frPressure, rlPressure, rrPressure, flTemperature, frTemperature, rlTemperature, rrTemperature) {
 		this.iFLPressure := flPressure
 		this.iFRPressure := frPressure
@@ -189,12 +197,14 @@ class TyresLapData extends LapData {
 		this.iRLTemperature := rlTemperature
 		this.iRRTemperature := rrTemperature
 		
-		base.__New(weather, airTemperature, trackTemperature, compound, compoundColor, fuelConsumption, lapTime)
+		base.__New(weather, airTemperature, trackTemperature, compound, compoundColor, fuelRemaining, fuelConsumption, lapTime)
 	}
 }
 
 class StatisticsDatabase extends Database {
-	getLapConditions(simulator, car, track, type, groupBy) {
+	getLapData(simulator, car, track, type, groupBy) {
+		local lapData
+		
 		if getConfigurationValue(this.ControllerConfiguration, "Simulators", simulator, false)
 			simulatorCode := this.getSimulatorCode(simulator)
 		else
@@ -219,18 +229,31 @@ class StatisticsDatabase extends Database {
 			while (laps.Length() > 0) {
 				candidate := laps.Pop()
 			
-				; for ignore, field in groupBy
+				key := []
 				
-				groupedLaps.Push(candidate)
+				for ignore, field in groupBy
+					key.Push(candidate[field])
+				
+				key := values2String("|", key*)
+				
+				if !groupedLaps.HasKey(key)
+					groupedLaps[key] := []
+				
+				groupedLaps[key].Push(candidate)
 			}
 		}
 		else
 			groupedLaps["All"] := laps
 		
-		return groupedLaps
+		result := []
+		
+		for ignore, lapData in groupedLaps
+			result.Push(lapData)
+		
+		return result
 	}
 		
-	updateElectronicsStatistics(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor, map, tc, abs, fuelConsumption, lapTime) {
+	updateElectronicsStatistics(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor, map, tc, abs, fuelRemaining, fuelConsumption, lapTime) {
 		if getConfigurationValue(this.ControllerConfiguration, "Simulators", simulator, false)
 			simulatorCode := this.getSimulatorCode(simulator)
 		else
@@ -242,7 +265,7 @@ class StatisticsDatabase extends Database {
 		
 		FileCreateDir %directory%
 				
-		line := (values2String(";", weather, airTemperature, trackTemperature, compound, compoundColor, fuelConsumption, lapTime
+		line := (values2String(";", weather, airTemperature, trackTemperature, compound, compoundColor, fuelRemaining, fuelConsumption, lapTime
 								  , map, tc, abs) . "`n")
 		
 		FileAppend %line%, % directory . "\ElectronicsData.CSV"
@@ -250,7 +273,7 @@ class StatisticsDatabase extends Database {
 	
 	updateTyreStatistics(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor
 					   , flPressure, frPressure, rlPressure, rrPressure, flTemperature, frTemperature, rlTemperature, rrTemperature
-					   , fuelConsumption, lapTime) {
+					   , fuelRemaining, fuelConsumption, lapTime) {
 		if getConfigurationValue(this.ControllerConfiguration, "Simulators", simulator, false)
 			simulatorCode := this.getSimulatorCode(simulator)
 		else
@@ -262,7 +285,7 @@ class StatisticsDatabase extends Database {
 		
 		FileCreateDir %directory%
 				
-		line := (values2String(";", weather, airTemperature, trackTemperature, compound, compoundColor, fuelConsumption, lapTime
+		line := (values2String(";", weather, airTemperature, trackTemperature, compound, compoundColor, fuelRemaining, fuelConsumption, lapTime
 								  , flPressure, frPressure, rlPressure, rrPressure, flTemperature, frTemperature, rlTemperature, rrTemperature) . "`n")
 		
 		FileAppend %line%, % directory . "\TyresData.CSV"

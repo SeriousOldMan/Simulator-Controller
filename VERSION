@@ -1,9 +1,9 @@
 [Development]
 Version=3.5.8-dev
 Target=3.5.6-release
-Date=09/10/2021
+Date=09/13/2021act
 Download=
-Changes=Renamed "Setup Database" to "Database"
+Changes=Renamed "Setup Database" to "Database", New "Strategy Workbench" tool, "Race Strategist" can now save race statistics for the "Strategy Workbench", New plugin parameter "StrategyWorkbenchOpen" for "Race Strategist" plugin, New "openStrategyWorkbench" action function, Fixed "Setup Wizard" to correctly generate "Pedal Calibration" configuration, New lightweight Database Library for Developers
 [Release]
 Version=3.5.6-release
 Date=09/10/2021

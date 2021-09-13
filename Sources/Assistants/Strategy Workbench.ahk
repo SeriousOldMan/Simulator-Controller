@@ -50,15 +50,14 @@ global kCancel = "Cancel"
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; StrategyWorkbench                                                       ;;;
-;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-
 global simulatorDropDown
 global carDropDown
 global trackDropDown
+global weatherDropDown
+global compoundDropDown
+global dataTypeDropDown
+
 global chartViewer
-global infoViewer
 
 class StrategyWorkbench extends ConfigurationItem {
 	iStatisticsDatabase := false
@@ -66,18 +65,18 @@ class StrategyWorkbench extends ConfigurationItem {
 	iSelectedSimulator := false
 	iSelectedCar := false
 	iSelectedTrack := false
+	iSelectedWeather := "Dry"
+	iSelectedCompound := "Dry"
+	iSelectedCompoundColor := "Black"
 	
-	iWeather := "Dry"
+	iAvailableDataSets := []
+	iSelectedDataType := "Electronics"
+	iSelectedDataSet := false
+	
 	iAirTemperature := 23
 	iTrackTemperature := 27
-	iCompound := "Dry"
-	iCompoundColor := "Black"
-	iMap := "n/a"
-	iTC := "n/a"
-	iABS := "n/a"
 	
-	iConditionsListView := false
-	iAvailableLapData := []
+	iDataListView := false
 	
 	Window[] {
 		Get {
@@ -85,9 +84,9 @@ class StrategyWorkbench extends ConfigurationItem {
 		}
 	}
 	
-	ConditionsListView[] {
+	DataListView[] {
 		Get {
-			return this.iConditionsListView
+			return this.iDataListView
 		}
 	}
 	
@@ -115,9 +114,40 @@ class StrategyWorkbench extends ConfigurationItem {
 		}
 	}
 	
-	Weather[] {
+	SelectedWeather[] {
 		Get {
-			return this.iWeather
+			return this.iSelectedWeather
+		}
+	}
+	
+	SelectedCompound[] {
+		Get {
+			if (this.iSelectedCompound = "Dry") {
+				if (this.iSelectedCompoundColor = "Black")
+					return "Dry"
+				else
+					return ("Dry (" . this.iSelectedCompoundColor . ")")
+			}
+			else
+				return "Wet"
+		}
+	}
+	
+	AvailableDataSets[index := false] {
+		Get {
+			return (index ? this.iAvailableDataSets[index] : this.iAvailableDataSets)
+		}
+	}
+	
+	SelectedDataType[] {
+		Get {
+			return this.iSelectedDataType
+		}
+	}
+	
+	SelectedDataSet[] {
+		Get {
+			return this.iSelectedDataSet
 		}
 	}
 	
@@ -164,19 +194,16 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 	
 	__New(simulator := false, car := false, track := false, duration := false, weather := false, airTemperature := false, trackTemperature := false
-		, compound := false, compoundColor := false, map := "n/a", tc := "n/a", abs := "n/a") {
+		, compound := false, compoundColor := false) {
 		this.iSelectedSimulator := simulator
 		this.iSelectedCar := car
 		this.iSelectedTrack := track
+		this.iSelectedWeather := weather
+		this.iSelectedCompound := compound
+		this.iSelectedCompoundColor := compoundColor
 		
-		this.iWeather := weather
 		this.iAirTemperature := airTemperature
 		this.iTrackTemperature := trackTemperature
-		this.iCompound := compound
-		this.iCompoundColor := compoundColor
-		this.iMap := map
-		this.iTC := tc
-		this.iABS := abs
 		
 		base.__New(kSimulatorConfiguration)
 		
@@ -219,7 +246,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				simulator := 1
 		}
 	
-		Gui %window%:Add, DropDownList, x90 yp w180 Choose%simulator% vsimulatorDropDown gchooseSimulator, % values2String("|", simulators*)
+		Gui %window%:Add, DropDownList, x90 yp w290 Choose%simulator% vsimulatorDropDown gchooseSimulator, % values2String("|", simulators*)
 		
 		if (simulator > 0)
 			simulator := simulators[simulator]
@@ -227,18 +254,90 @@ class StrategyWorkbench extends ConfigurationItem {
 			simulator := false
 		
 		Gui %window%:Add, Text, x16 yp+24 w70 h23 +0x200, % translate("Car")
-		Gui %window%:Add, DropDownList, x90 yp w180 vcarDropDown gchooseCar
+		Gui %window%:Add, DropDownList, x90 yp w290 vcarDropDown gchooseCar
 		
 		Gui %window%:Add, Text, x16 yp24 w70 h23 +0x200, % translate("Track")
-		Gui %window%:Add, DropDownList, x90 yp w180 vtrackDropDown gchooseTrack
+		Gui %window%:Add, DropDownList, x90 yp w290 vtrackDropDown gchooseTrack
 		
 		Gui %window%:Add, Text, x16 yp+24 w70 h23 +0x200, % translate("Conditions")
 		
-		Gui %window%:Add, ListView, x90 yp w180 h252 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDconditionsListView gchooseConditions, % values2String("|", map(["Weather", "Tyres"], "translate")*)
+		weather := this.SelectedWeather
+		choices := map(kWeatherOptions, "translate")
+		chosen := inList(kWeatherOptions, weather)
 		
-		this.iConditionsListView := conditionsListView
+		if (!chosen && (choices.Length() > 0)) {
+			weather := choices[1]
+			chosen := 1
+		}
 		
-		Gui %window%:Add, ActiveX, x290 ys w910 h475 Border vchartViewer, shell.explorer
+		Gui %window%:Add, DropDownList, x90 yp w180 AltSubmit Choose%chosen% gchooseWeather vweatherDropDown, % values2String("|", choices*)
+		
+		Gui %window%:Add, Text, x16 yp+24 w70 h23 +0x200, % translate("Compound")
+		
+		compound := this.SelectedCompound
+		choices := map(kQualifiedTyreCompounds, "translate")
+		chosen := inList(kQualifiedTyreCompounds, compound)
+		
+		if (!chosen && (choices.Length() > 0)) {
+			compound := choices[1]
+			chosen := 1
+		}
+		
+		Gui %window%:Add, DropDownList, x90 yp w180 AltSubmit Choose%chosen% gchooseCompound vcompoundDropDown, % values2String("|", choices*)
+		
+		Gui %window%:Add, DropDownList, x12 yp+32 w76 AltSubmit Choose1 vdataTypeDropDown gchooseDataType +0x200, % values2String("|", map(["Electronics", "Tyres"], "translate")*)
+		
+		Gui %window%:Add, ListView, x90 yp-2 w290 h152 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDdataListView gchooseData, % values2String("|", map(["MAP", "TC", "ABS"], "translate")*)
+		
+		this.iDataListView := dataListView
+		
+		Gui %window%:Add, Text, x16 yp+165 w364 0x10
+		
+		Gui %window%:Add, Text, x16 yp+15 w90 h20, % translate("Race Duration")
+		Gui %window%:Add, Edit, x90 yp-2 w50 h20 Limit4 Number ; VraceDurationEdit, %raceDurationEdit%
+		Gui %window%:Add, UpDown, x122 yp-2 w18 h20 Range1-9999 0x80 ; , %raceDurationEdit%
+		Gui %window%:Add, Text, x148 yp+4 w70 h20, % translate("Minutes")
+
+		Gui %window%:Add, Text, x246 yp-4 w85 h23 +0x200, % translate("Formation")
+		Gui %window%:Add, CheckBox, x320 yp-1 w17 h23 ; Checked%formationLapCheck% VformationLapCheck, %formationLapCheck%
+		Gui %window%:Add, Text, x338 yp+4 w50 h20, % translate("Lap")
+				
+		Gui %window%:Add, Text, x16 yp+21 w85 h23 +0x200, % translate("Safety Fuel")
+		Gui %window%:Add, Edit, x90 yp w50 h20 ; VsafetyFuelEdit, %safetyFuelEdit%
+		Gui %window%:Add, UpDown, x122 yp-2 w18 h20 ; , %safetyFuelEdit%
+		Gui %window%:Add, Text, x148 yp+2 w90 h20, % translate("Ltr.")
+				
+		Gui %window%:Add, Text, x246 yp-4 w85 h23 +0x200, % translate("Post Race")
+		Gui %window%:Add, CheckBox, x320 yp-1 w17 h23 ; Checked%postRaceLapCheck% VpostRaceLapCheck, %postRaceLapCheck%
+		Gui %window%:Add, Text, x338 yp+4 w50 h20, % translate("Lap")
+
+		Gui %window%:Font, Norm, Arial
+		Gui %window%:Font, Italic, Arial
+
+		Gui %window%:Add, GroupBox, x16 yp+30 w362 h96, % translate("Pitstop")
+				
+		Gui %window%:Font, Norm, Arial
+		
+		x := 16
+		x1 := x + 110
+		x2 := x + 142
+		x3 := x + 168
+		
+		Gui %window%:Add, Text, x%x% yp+24 w105 h20 +0x200, % translate("Pitstop Delta")
+		Gui %window%:Add, Edit, x%x1% yp-2 w50 h20 Limit2 Number ; VpitstopDeltaEdit, %pitstopDeltaEdit%
+		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 0x80 ; , %pitstopDeltaEdit%
+		Gui %window%:Add, Text, x%x3% yp+4 w180 h20, % translate("Seconds (Drive through - Drive by)")
+
+		Gui %window%:Add, Text, x%x% yp+22 w85 h20 +0x200, % translate("Tyre Service")
+		Gui %window%:Add, Edit, x%x1% yp-2 w50 h20 Limit2 Number ; VpitstopTyreServiceEdit, %pitstopTyreServiceEdit%
+		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 0x80 ; , %pitstopTyreServiceEdit%
+		Gui %window%:Add, Text, x%x3% yp+4 w180 h20, % translate("Seconds (Change four tyres)")
+
+		Gui %window%:Add, Text, x%x% yp+22 w85 h20 +0x200, % translate("Refuel Service")
+		Gui %window%:Add, Edit, x%x1% yp-2 w50 h20 ; VpitstopRefuelServiceEdit, %pitstopRefuelServiceEdit%
+		Gui %window%:Add, Text, x%x3% yp+4 w180 h20, % translate("Seconds (Refuel of 10 litres)")
+		
+		Gui %window%:Add, ActiveX, x400 ys w800 h295 Border vchartViewer, shell.explorer
 		
 		chartViewer.Navigate("about:blank")
 		
@@ -264,7 +363,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Show
 	}
 	
-	showWorkbenchChart(drawChartFunction) {
+	showChart(drawChartFunction) {
 		window := this.Window
 		
 		Gui %window%:Default
@@ -284,7 +383,7 @@ class StrategyWorkbench extends ConfigurationItem {
 					</style>
 					<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 					<script type="text/javascript">
-						google.charts.load('current', {'packages':['corechart', 'table']}).then(drawChart);
+						google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawChart);
 			)
 
 			after =
@@ -292,7 +391,7 @@ class StrategyWorkbench extends ConfigurationItem {
 					</script>
 				</head>
 				<body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
-					<div id="chart_id" style="width: 908px; height: 470px"></div>
+					<div id="chart_id" style="width: 798px; height: 285px"></div>
 				</body>
 			</html>
 			)
@@ -318,6 +417,66 @@ class StrategyWorkbench extends ConfigurationItem {
 	
 	getTracks(simulator, car) {
 		return new StatisticsDatabase().getTracks(simulator, car)
+	}
+	
+	showLapTimeChart(data, yAxis) {
+		this.iSelectedChart := "LapTimes"
+		
+		double := (yAxis.Length() > 1)
+		
+		drawChartFunction := ""
+		
+		drawChartFunction .= "function drawChart() {"
+		drawChartFunction .= "`nvar data = new google.visualization.DataTable();"
+		drawChartFunction .= ("`ndata.addColumn('number', 'LapTime');")
+		
+		for ignore, axis in yAxis
+			drawChartFunction .= ("`ndata.addColumn('number', '" . axis . "');")
+		
+		drawChartFunction .= "`ndata.addRows(["
+		
+		for ignore, values in data {
+			if (A_Index > 1)
+				drawChartFunction .= ",`n"
+			
+			drawChartFunction .= ("[" . Round(values["LapTime"] / 1000, 1))
+		
+			for ignore, axis in yAxis {
+				value := values[axis]
+			
+				if (value = "n/a")
+					value := 0
+				
+				drawChartFunction .= (", " . value)
+			}
+			
+			drawChartFunction .= "]"
+		}
+		
+		drawChartFunction .= "`n]);"
+		
+		series := "series: {"
+		vAxis := "vAxis: { gridlines: { color: 'E0E0E0' }, "
+		for ignore, axis in yAxis {
+			if (A_Index > 1) {
+				series .= ", "
+				vAxis .= ", "
+			}
+			
+			index := A_Index - 1
+			
+			series .= (index . ": {targetAxisIndex: " . index . "}")
+			vAxis .= (index . ": {title: '" . translate(axis) . "'}")
+		}
+		
+		series .= "}"
+		vAxis .= "}"
+		
+		drawChartFunction .= ("`nvar options = { legend: {position: 'bottom'}, backgroundColor: 'D0D0D0', hAxis: { title: '" . translate("Lap Times") . "', gridlines: { color: 'E0E0E0' } }, " . series . ", " . vAxis . "};")
+			
+		drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.ScatterChart(document.getElementById('chart_id')); chart.draw(data, options); }"
+		
+		this.showChart(drawChartFunction)
 	}
 	
 	loadSimulator(simulator, force := false) {
@@ -355,8 +514,6 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 	
 	loadTrack(track, force := false) {
-		local lapData
-		
 		if (force || (track != this.SelectedTrack)) {
 			window := this.Window
 		
@@ -366,30 +523,125 @@ class StrategyWorkbench extends ConfigurationItem {
 			car := this.SelectedCar
 			
 			this.iSelectedTrack := track
-			this.iAvailableLapData := []
 				
 			GuiControl Choose, trackDropDown, % inList(this.getTracks(simulator, car), track)
 			
+			this.loadWeather(this.SelectedWeather, true)
+		}
+	}
+	
+	loadWeather(weather, force := false) {
+		if (force || (this.SelectedWeather != weather)) {
+			window := this.Window
+		
+			Gui %window%:Default
+			
+			this.iSelectedWeather := weather
+			
+			GuiControl Choose, weatherDropDown, % inList(kWeatherOptions, weather)
+			
+			this.loadCompound(this.SelectedCompound, true)
+		}
+	}
+	
+	loadCompound(compound, force := false) {
+		if (force || (this.SelectedCompound != compound)) {
 			this.showWorkbenchChart(false)
 			
-			Gui ListView, % this.ConditionsListView
-				
+			compoundString := compound
+			
+			compound := string2Values(A_Space, compound)
+		
+			if (compound.Length() == 1)
+				compoundColor := "Black"
+			else
+				compoundColor := SubStr(compound[2], 2, StrLen(compound[2]) - 2)
+			
+			compound := compound[1]
+			
+			this.iSelectedCompound := compound
+			this.iSelectedCompoundColor := compoundColor
+			
 			LV_Delete()
+			
+			while LV_DeleteCol(1)
+				ignore := 1
 				
-			if track {
-				lapData := new StatisticsDatabase(simulator, car, track).getElectronicsStatistics()
+			
+			if (this.SelectedDataType = "Electronics") {
+				for ignore, column in map(["MAP", "TC", "ABS"], "translate")
+					LV_InsertCol(A_Index, "", column)
+			
+				dataSets := new StatisticsDatabase(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack).queryElectronics(this.SelectedWeather, compound, compoundColor)
+			
+				this.iAvailableDataSets := dataSets
 				
-				this.iAvailableLapData := lapData
+				for ignore, dataEntry in dataSets {
+					dataEntry := dataEntry[1]
 				
-				for ignore, lapInfo in lapData {
-					lapInfo := lapInfo[1]
+					map := dataEntry.Map
+					
+					if (map = "n/a")
+						map := translate(map)
 				
-					LV_Add("", translate(lapInfo.Weather), translate(lapInfo.Compound) . " (" . translate(lapInfo.CompoundColor) . ")")
+					tc := dataEntry.TC
+					
+					if (tc = "n/a")
+						tc := translate(tc)
+				
+					abs := dataEntry.ABS
+					
+					if (abs = "n/a")
+						abs := translate(abs)
+					
+					LV_Add("", map, tc, abs)
 				}
 
 				LV_ModifyCol(1, "AutoHdr")
 				LV_ModifyCol(2, "AutoHdr")
 				LV_ModifyCol(3, "AutoHdr")
+			
+				this.loadData((dataSets.Length() > 0) ? 1 : false, true)
+			}
+			else if (this.SelectedDataType = "Tyres") {
+				for ignore, column in map(["Pressure", "Temperature"], "translate")
+					LV_InsertCol(A_Index, "", column)
+			
+				dataSets := new StatisticsDatabase(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack).queryTyres(this.SelectedWeather, compound, compoundColor)
+			
+				this.iAvailableDataSets := dataSets
+				
+				for ignore, dataEntry in dataSets
+					LV_Add("", Round(dataEntry["Pressure"], 1), Round(dataEntry["Temperature"], 1))
+				
+				LV_ModifyCol(1, "AutoHdr")
+				LV_ModifyCol(2, "AutoHdr")
+				
+				this.showLapTimeChart(dataSets, ["Pressure", "Temperature"])
+			}
+		}
+	}
+	
+	loadData(dataSet, force := false) {
+		if dataSet
+			if dataSet is Number
+				dataSet := this.AvailableDataSets[dataSet]
+		
+		if (force || (this.SelectedDataSet != dataSet)) {
+			if dataSet {
+				Gui ListView, % this.DataListView
+					
+				LV_Modify(inList(this.AvailableDataSets, dataSet), "Select Vis")
+				
+				this.iSelectedDataSet := dataSet
+				
+				if (this.SelectedDataType = "Electronics")
+					this.showLapTimeChart(dataSet, ["FuelRemaining", "FuelConsumption"])
+				else
+					this.showChart(false)
+			}
+			else {
+				this.showChart(false)
 			}
 		}
 	}
@@ -399,44 +651,6 @@ class StrategyWorkbench extends ConfigurationItem {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
-
-minimum(numbers) {
-	min := 0
-	
-	for ignore, number in numbers
-		min := (!min ? number : Min(min, number))
-
-	return min
-}
-
-maximum(numbers) {
-	max := 0
-	
-	for ignore, number in numbers
-		max := (!max ? number : Max(max, number))
-
-	return max
-}
-
-average(numbers) {
-	avg := 0
-	
-	for ignore, value in numbers
-		avg += value
-	
-	return (avg / numbers.Length())
-}
-
-stdDeviation(numbers) {
-	avg := average(numbers)
-	
-	squareSum := 0
-	
-	for ignore, value in numbers
-		squareSum += ((value - avg) * (value - avg))
-	
-	return Sqrt(squareSum)
-}
 
 closeWorkbench() {
 	ExitApp 0
@@ -474,7 +688,42 @@ chooseTrack() {
 	workbench.loadTrack(trackDropDown)
 }
 
-chooseConditions() {
+chooseWeather() {
+	workbench := StrategyWorkbench.Instance
+	
+	GuiControlGet weatherDropDown
+	
+	workbench.loadWeather(kWeatherOptions[weatherDropDown])
+}
+
+chooseCompound() {
+	workbench := StrategyWorkbench.Instance
+	
+	GuiControlGet compoundDropDown
+	
+	workbench.loadCompound(kQualifiedTyreCompounds[compoundDropDown])
+}
+
+chooseDataType() {
+	workbench := StrategyWorkbench.Instance
+	
+	GuiControlGet compoundDropDown
+	GuiControlGet dataTypeDropDown
+	
+	workbench.iSelectedDataType := ["Electronics", "Tyres"][dataTypeDropDown]
+	
+	workbench.loadCompound(kQualifiedTyreCompounds[compoundDropDown], true)
+}
+
+chooseData() {
+	workbench := StrategyWorkbench.Instance
+	
+	if (workbench.SelectedDataType = "Electronics") {
+		if (A_GuiEvent = "Normal")
+			workbench.loadData(A_EventInfo)
+	}
+	else
+		LV_Modify(A_EventInfo, "-Select")
 }
 
 setButtonIcon(buttonHandle, file, index := 1, options := "") {
@@ -557,9 +806,6 @@ runStrategyWorkbench() {
 	trackTemperature:= 27
 	compound := "Dry"
 	compoundColor := "Black"
-	map := "n/a"
-	tc := "n/a"
-	abs := "n/a"
 	
 	index := 1
 	
@@ -591,15 +837,6 @@ runStrategyWorkbench() {
 				index += 2
 			case "-CompoundColor":
 				compoundColor := A_Args[index + 1]
-				index += 2
-			case "-Map":
-				map := A_Args[index + 1]
-				index += 2
-			case "-TC":
-				tc := A_Args[index + 1]
-				index += 2
-			case "-ABS":
-				abs := A_Args[index + 1]
 				index += 2
 			default:
 				index += 1

@@ -45,10 +45,6 @@ global kCancel = "Cancel"
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; RaceReports                                                             ;;;
-;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-
 global simulatorDropDown
 global carDropDown
 global trackDropDown
@@ -190,9 +186,9 @@ class RaceReports extends ConfigurationItem {
 		Gui %window%:Add, Text, x16 yp24 w70 h23 +0x200, % translate("Track")
 		Gui %window%:Add, DropDownList, x90 yp w180 vtrackDropDown gchooseTrack
 		
-		Gui %window%:Add, Text, x16 yp+24 w70 h23 +0x200, % translate("Races")
+		Gui %window%:Add, Text, x16 yp+26 w70 h23 +0x200, % translate("Races")
 		
-		Gui %window%:Add, ListView, x90 yp w180 h252 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDraceListView gchooseRace, % values2String("|", map(["Date", "Time", "Duration", "Starting Grid"], "translate")*)
+		Gui %window%:Add, ListView, x90 yp-2 w180 h252 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDraceListView gchooseRace, % values2String("|", map(["Date", "Time", "Duration", "Starting Grid"], "translate")*)
 		
 		this.iRacesListView := raceListView
 		

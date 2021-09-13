@@ -43,7 +43,7 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 		
 		wizard := this.SetupWizard
 	
-		arguments := ""
+		arguments := "controlApplication: Heusinkveld SmartControl"
 		calibrations := []
 
 		for ignore, action in this.getActions() {

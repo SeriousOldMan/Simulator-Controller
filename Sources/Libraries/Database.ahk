@@ -130,6 +130,16 @@ class Database {
 				for index, row in rows
 					rows[index] := %combine%(rows[index])
 			}
+			
+			if (query.HasKey("Flatten") && query["Flatten"]) {
+				flattenedRows := []
+				
+				for ignore, groupRows in rows
+					for ignore, row in groupRows
+						flattenedRows.Push(row)
+				
+				rows := flattenedRows
+			}
 		}
 		
 		return rows

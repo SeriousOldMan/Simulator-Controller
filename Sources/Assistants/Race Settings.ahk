@@ -566,11 +566,11 @@ restart:
 		Gui RES:Add, CheckBox, x292 yp-1 w17 h23 Checked%formationLapCheck% VformationLapCheck, %formationLapCheck%
 		Gui RES:Add, Text, x310 yp+4 w90 h20, % translate("Lap")
 				
-		Gui RES:Add, Text, x212 yp+22 w85 h23 +0x200, % translate("Post Race")
+		Gui RES:Add, Text, x212 yp+21 w85 h23 +0x200, % translate("Post Race")
 		Gui RES:Add, CheckBox, x292 yp-1 w17 h23 Checked%postRaceLapCheck% VpostRaceLapCheck, %postRaceLapCheck%
 		Gui RES:Add, Text, x310 yp+4 w90 h20, % translate("Lap")
 				
-		Gui RES:Add, Text, x212 yp+22 w85 h23 +0x200, % translate("Safety Fuel")
+		Gui RES:Add, Text, x212 yp+21 w85 h23 +0x200, % translate("Safety Fuel")
 		Gui RES:Add, Edit, x292 yp w50 h20 VsafetyFuelEdit, %safetyFuelEdit%
 		Gui RES:Add, UpDown, x324 yp-2 w18 h20, %safetyFuelEdit%
 		Gui RES:Add, Text, x350 yp+2 w90 h20, % translate("Ltr.")

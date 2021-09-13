@@ -2,7 +2,13 @@
 
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. Renamed "Setup Database" repository to "Database"
+  3. Renamed "Setup Database" repository to "Database".
+  4. New "Strategy Workbench" tool. Currently undocumented and not much more than an Alpha release.
+  5. "Race Strategist" can now save race statistics for later use in the "Strategy Workbench". See the [revised configuration documentation](*) for the "Race Strategist" plugin for more information.
+  6. New [plugin parameter "StrategyWorkbenchOpen"](*) for "Race Strategist" plugin
+  7. New ["openStrategyWorkbench" action function](*) to trigger opening the "Strategy Workbench" from external event sources.
+  8. Fixed "Setup Wizard" to correctly generate the "Pedal Calibration" configuration.
+  9. [Developer] New lightweight Database library to handle simple in-memory or persistent data sets.
 
 ## 3.5.6-release 09/10/21
 

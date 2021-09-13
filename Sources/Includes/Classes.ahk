@@ -244,8 +244,10 @@ class Application extends ConfigurationItem {
 		specialIsRunning := this.iSpecialIsRunning
 		
 		if (special && specialIsRunning && (specialIsRunning != ""))
-			if %specialIsRunning%()
+			if (Func(specialIsRunning) && %specialIsRunning%())
 				return true
+			else
+				return false
 		
 		return (this.getProcessID() != 0)
 	}

@@ -58,21 +58,33 @@ class StatisticsDatabase extends SessionDatabase {
 		}
 	}
 	
-	getElectronicsStatistics() {
-		return this.Database.query("Electronics", {Select: ["Weather", "Compound", "CompoundColor"]
-												 , GroupBy: ["Weather", "Compound", "CompoundColor"]})
+	queryElectronics(weather, compound, compoundColor) {
+		return this.Database.query("Electronics", {GroupBy: ["Map", "TC", "ABS"]
+												 , Combine: "removeInvalidLaps"
+												 , Filter: Func("filterEqual").Bind({Weather: weather, Compound: compound, CompoundColor: compoundColor})})
+	}
+	
+	queryTyres(weather, compound, compoundColor) {
+		rows := this.Database.query("Tyres", {Filter: Func("filterEqual").Bind({Weather: weather, Compound: compound, CompoundColor: compoundColor})})
+		
+		for ignore, row in rows {
+			row["Pressure"] := average([row["PressureFL"], row["PressureFR"], row["PressureRL"], row["PressureRR"]])
+			row["Temperature"] := average([row["TemperatureFL"], row["TemperatureFR"], row["TemperatureRL"], row["TemperatureRR"]])
+		}
+		
+		return removeInvalidLaps(rows)
 	}
 		
-	updateElectronicsStatistics(weather, airTemperature, trackTemperature, compound, compoundColor, map, tc, abs, fuelRemaining, fuelConsumption, lapTime) {
+	addElectronicsEntry(weather, airTemperature, trackTemperature, compound, compoundColor, map, tc, abs, fuelRemaining, fuelConsumption, lapTime) {
 		this.Database.add("Electronics", {Weather: weather, AirTemperature: airTemperature, TrackTemperature: trackTemperature
 										, Compound: compound, CompoundColor: compoundColor
 										, FuelRemaining: fuelRemaining, FuelConsumption: fuelConsumption, LapTime: lapTime
 										, Map: map, TC: tc, ABS: abs}, true)
 	}
 	
-	updateTyreStatistics(weather, airTemperature, trackTemperature, compound, compoundColor
-					   , pressureFL, pressureFR, pressureRL, pressureRR, temperatureFL, temperatureFR, temperatureRL, temperatureRR
-					   , fuelRemaining, fuelConsumption, lapTime) {
+	addTyresEntry(weather, airTemperature, trackTemperature, compound, compoundColor
+				, pressureFL, pressureFR, pressureRL, pressureRR, temperatureFL, temperatureFR, temperatureRL, temperatureRR
+				, fuelRemaining, fuelConsumption, lapTime) {
 		this.Database.add("Tyres", {Weather: weather, AirTemperature: airTemperature, TrackTemperature: trackTemperature
 								  , Compound: compound, CompoundColor: compoundColor
 								  , FuelRemaining: fuelRemaining, FuelConsumption: fuelConsumption, LapTime: lapTime
@@ -80,4 +92,80 @@ class StatisticsDatabase extends SessionDatabase {
 								  , TemperatureFL: temperatureFL, TemperatureFR: temperatureFR
 								  , TemperatureRL: temperatureRL, TemperatureRR: temperatureRR}, true)
 	}
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                    Public Function Declaration Section                 ;;;
+;;;-------------------------------------------------------------------------;;;
+
+minimum(numbers) {
+	min := 0
+	
+	for ignore, number in numbers
+		min := (!min ? number : Min(min, number))
+
+	return min
+}
+
+maximum(numbers) {
+	max := 0
+	
+	for ignore, number in numbers
+		max := (!max ? number : Max(max, number))
+
+	return max
+}
+
+average(numbers) {
+	avg := 0
+	
+	for ignore, value in numbers
+		avg += value
+	
+	return (avg / numbers.Length())
+}
+
+stdDeviation(numbers) {
+	avg := average(numbers)
+	
+	squareSum := 0
+	
+	for ignore, value in numbers
+		squareSum += ((value - avg) * (value - avg))
+	
+	return Sqrt(squareSum)
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                   Private Function Declaration Section                  ;;;
+;;;-------------------------------------------------------------------------;;;
+
+filterEqual(constraints, row) {
+	for column, value in constraints
+		if (row[column] != value)
+			return false
+		
+	return true
+}
+
+removeInvalidLaps(rows) {
+	lapTimes := []
+	
+	for ignore, row in rows
+		lapTimes.Push(row["LapTime"])
+	
+	avg := average(lapTimes)
+	stdDeviation := stdDeviation(lapTimes)
+	
+	threshold := (avg + (stdDeviation / 2))
+	
+	result := []
+	
+	for ignore, row in rows
+		if (row["LapTime"] < threshold)
+			result.Push(row)
+
+	return result
 }

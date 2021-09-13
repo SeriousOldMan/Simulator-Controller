@@ -229,6 +229,9 @@ class RaceStrategist extends RaceAssistant {
 	weatherRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
 		
+		if !this.hasEnoughData()
+			return
+		
 		weather10Min := knowledgeBase.getValue("Weather.Weather.10Min", false)
 		
 		if !weather10Min
@@ -241,6 +244,9 @@ class RaceStrategist extends RaceAssistant {
 	
 	positionRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
+		
+		if !this.hasEnoughData()
+			return
 		
 		speaker := this.getSpeaker()
 		position := Round(knowledgeBase.getValue("Position", 0))
@@ -327,6 +333,9 @@ class RaceStrategist extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		speaker := this.getSpeaker()
 		
+		if !this.hasEnoughData()
+			return
+		
 		delta := knowledgeBase.getValue("Position.Track.Front.Delta", 0)
 		
 		if (delta != 0) {
@@ -345,6 +354,9 @@ class RaceStrategist extends RaceAssistant {
 	
 	standingsGapToFrontRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
+		
+		if !this.hasEnoughData()
+			return
 		
 		if (Round(knowledgeBase.getValue("Position", 0)) = 1)
 			this.getSpeaker().speakPhrase("NoGapToFront")
@@ -371,6 +383,9 @@ class RaceStrategist extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		speaker := this.getSpeaker()
 		
+		if !this.hasEnoughData()
+			return
+		
 		delta := knowledgeBase.getValue("Position.Track.Behind.Delta", 0)
 		
 		if (delta != 0) {
@@ -389,6 +404,9 @@ class RaceStrategist extends RaceAssistant {
 	
 	standingsGapToBehindRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
+		
+		if !this.hasEnoughData()
+			return
 		
 		if (Round(knowledgeBase.getValue("Position", 0)) = Round(knowledgeBase.getValue("Car.Count", 0)))
 			this.getSpeaker().speakPhrase("NoGapToBehind")

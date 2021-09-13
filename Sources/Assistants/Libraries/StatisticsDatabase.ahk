@@ -16,278 +16,68 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Database.ahk
 #Include ..\Assistants\Libraries\SetupDatabase.ahk
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                   Private Variable Declaration Section                  ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global kStatisticsSchemas = {Electronics: ["Weather", "AirTemperature", "TrackTemperature", "Compound", "CompoundColor"
+										 , "FuelRemaining", "FuelConsumption", "LapTime", "Map", "TC", "ABS"]
+						   , Tyres: ["Weather", "AirTemperature", "TrackTemperature", "Compound", "CompoundColor"
+								   , "FuelRemaining", "FuelConsumption", "LapTime"
+								   , "PressureFL", "PressureFR", "PressureRL", "PressureRR"
+								   , "TemperatureFL", "TemperatureFR", "TemperatureRL", "TemperatureRR"]}
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class LapData {
-	iWeather := false
-	iAirTemperature := false
-	iTrackTemperature := false
-	iCompound := false
-	iCompoundColor := false
+class StatisticsDatabase extends SessionDatabase {
+	iDatabase := false
 	
-	iFuelRemaining := false
-	iFuelConsumption := false
-	iLapTime := false
-	
-	Weather[] {
+	Database[] {
 		Get {
-			return this.iWeather
+			return this.iDatabase 
 		}
 	}
 	
-	AirTemperature[] {
-		Get {
-			return this.iAirTemperature
-		}
-	}
-	
-	TrackTemperature[] {
-		Get {
-			return this.iTrackTemperature
-		}
-	}
-	
-	Compound[] {
-		Get {
-			return this.iCompound
-		}
-	}
-	
-	CompoundColor[] {
-		Get {
-			return this.iCompoundColor
-		}
-	}
-	
-	FuelRemaining[] {
-		Get {
-			return this.iFuelRemaining
-		}
-	}
-	
-	FuelConsumption[] {
-		Get {
-			return this.iFuelConsumption
-		}
-	}
-	
-	LapTime[] {
-		Get {
-			return this.iLapTime
-		}
-	}
-	
-	__New(weather, airTemperature, trackTemperature, compound, compoundColor, fuelRemaining, fuelConsumption, lapTime) {
-		this.iWeather := weather
-		this.iAirTemperature := airTemperature
-		this.iTrackTemperature := trackTemperature
-		this.iCompound := compound
-		this.iCompoundColor := compoundColor
-		this.iFuelRemaining := fuelRemaining
-		this.iFuelConsumption := fuelConsumption
-		this.iLapTime := lapTime
-	}
-}
-
-class ElectronicsLapData extends LapData {
-	iMap := "n/a"
-	iTC := "n/a"
-	iABS := "n/a"
-	
-	Map[] {
-		Get {
-			return this.iMap
-		}
-	}
-	
-	TC[] {
-		Get {
-			return this.iTC
-		}
-	}
-	
-	ABS[] {
-		Get {
-			return this.iABS
-		}
-	}
-	
-	__New(weather, airTemperature, trackTemperature, compound, compoundColor, fuelRemaining, fuelConsumption, lapTime, map, tc, abs) {
-		this.iMap := map
-		this.iTC := tc
-		this.iABS := abs
+	__New(simulator := false, car := false, track := false) {
+		base.__New()
 		
-		base.__New(weather, airTemperature, trackTemperature, compound, compoundColor, fuelRemaining, fuelConsumption, lapTime)
-	}
-}
-
-class TyresLapData extends LapData {
-	iFLPressure := false
-	iFRPressure := false
-	iRLPressure := false
-	iRRPressure := false
-	
-	iFLTemperature := false
-	iFRTemperature := false
-	iRLTemperature := false
-	iRRTemperature := false
-	
-	PressureFL[] {
-		Get {
-			return this.iFLPressure
-		}
-	}
-	
-	PressureFR[] {
-		Get {
-			return this.iFRPressure
-		}
-	}
-	
-	PressureRL[] {
-		Get {
-			return this.iRLPressure
-		}
-	}
-	
-	PressureRR[] {
-		Get {
-			return this.iRRPressure
-		}
-	}
-	
-	TemperatureFL[] {
-		Get {
-			return this.iFLTemperature
-		}
-	}
-	
-	TemperatureFR[] {
-		Get {
-			return this.iFRTemperature
-		}
-	}
-	
-	TemperatureRL[] {
-		Get {
-			return this.iRLTemperature
-		}
-	}
-	
-	TemperatureRR[] {
-		Get {
-			return this.iRRTemperature
-		}
-	}
-	
-	__New(weather, airTemperature, trackTemperature, compound, compoundColor, fuelRemaining, fuelConsumption, lapTime
-		, flPressure, frPressure, rlPressure, rrPressure, flTemperature, frTemperature, rlTemperature, rrTemperature) {
-		this.iFLPressure := flPressure
-		this.iFRPressure := frPressure
-		this.iRLPressure := rlPressure
-		this.iRRPressure := rrPressure
-		
-		this.iFLTemperature := flTemperature
-		this.iFRTemperature := frTemperature
-		this.iRLTemperature := rlTemperature
-		this.iRRTemperature := rrTemperature
-		
-		base.__New(weather, airTemperature, trackTemperature, compound, compoundColor, fuelRemaining, fuelConsumption, lapTime)
-	}
-}
-
-class StatisticsDatabase extends Database {
-	getLapData(simulator, car, track, type, groupBy) {
-		local lapData
-		
-		if getConfigurationValue(this.ControllerConfiguration, "Simulators", simulator, false)
-			simulatorCode := this.getSimulatorCode(simulator)
-		else
-			simulatorCode := simulator
-		
-		simulator := this.getSimulatorName(simulatorCode)
-		
-		fileName := (kDatabaseDirectory . "Local\" . simulatorCode . "\" . car . "\" . track)
-		
-		laps := []
-		
-		if (type = "Electronics")
-			Loop Read, % kDatabaseDirectory . "Local\" . simulatorCode . "\" . car . "\" . track . "\ElectronicsData.CSV"
-				laps.Push(new ElectronicsLapData(string2Values(";", A_LoopReadLine)*))
-		else
-			Loop Read, % kDatabaseDirectory . "Local\" . simulatorCode . "\" . car . "\" . track . "\TyressData.CSV"
-				laps.Push(new TyresLapData(string2Values(";", A_LoopReadLine)*))
-		
-		groupedLaps := {}
+		if (simulator && car && track) {
+			if getConfigurationValue(this.ControllerConfiguration, "Simulators", simulator, false)
+				simulatorCode := this.getSimulatorCode(simulator)
+			else
+				simulatorCode := simulator
 			
-		if (groupBy.Length() > 0) {
-			while (laps.Length() > 0) {
-				candidate := laps.Pop()
-			
-				key := []
-				
-				for ignore, field in groupBy
-					key.Push(candidate[field])
-				
-				key := values2String("|", key*)
-				
-				if !groupedLaps.HasKey(key)
-					groupedLaps[key] := []
-				
-				groupedLaps[key].Push(candidate)
-			}
+			this.iDatabase := new Database(kDatabaseDirectory . "Local\" . simulatorCode . "\" . car . "\" . track . "\", kStatisticsSchemas)
 		}
-		else
-			groupedLaps["All"] := laps
-		
-		result := []
-		
-		for ignore, lapData in groupedLaps
-			result.Push(lapData)
-		
-		return result
-	}
-		
-	updateElectronicsStatistics(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor, map, tc, abs, fuelRemaining, fuelConsumption, lapTime) {
-		if getConfigurationValue(this.ControllerConfiguration, "Simulators", simulator, false)
-			simulatorCode := this.getSimulatorCode(simulator)
-		else
-			simulatorCode := simulator
-		
-		simulator := this.getSimulatorName(simulatorCode)
-		
-		directory := (kDatabaseDirectory . "Local\" . simulatorCode . "\" . car . "\" . track)
-		
-		FileCreateDir %directory%
-				
-		line := (values2String(";", weather, airTemperature, trackTemperature, compound, compoundColor, fuelRemaining, fuelConsumption, lapTime
-								  , map, tc, abs) . "`n")
-		
-		FileAppend %line%, % directory . "\ElectronicsData.CSV"
 	}
 	
-	updateTyreStatistics(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor
-					   , flPressure, frPressure, rlPressure, rrPressure, flTemperature, frTemperature, rlTemperature, rrTemperature
+	getElectronicsStatistics() {
+		return this.Database.query("Electronics", {Select: ["Weather", "Compound", "CompoundColor"]
+												 , GroupBy: ["Weather", "Compound", "CompoundColor"]})
+	}
+		
+	updateElectronicsStatistics(weather, airTemperature, trackTemperature, compound, compoundColor, map, tc, abs, fuelRemaining, fuelConsumption, lapTime) {
+		this.Database.add("Electronics", {Weather: weather, AirTemperature: airTemperature, TrackTemperature: trackTemperature
+										, Compound: compound, CompoundColor: compoundColor
+										, FuelRemaining: fuelRemaining, FuelConsumption: fuelConsumption, LapTime: lapTime
+										, Map: map, TC: tc, ABS: abs}, true)
+	}
+	
+	updateTyreStatistics(weather, airTemperature, trackTemperature, compound, compoundColor
+					   , pressureFL, pressureFR, pressureRL, pressureRR, temperatureFL, temperatureFR, temperatureRL, temperatureRR
 					   , fuelRemaining, fuelConsumption, lapTime) {
-		if getConfigurationValue(this.ControllerConfiguration, "Simulators", simulator, false)
-			simulatorCode := this.getSimulatorCode(simulator)
-		else
-			simulatorCode := simulator
-		
-		simulator := this.getSimulatorName(simulatorCode)
-		
-		directory := (kDatabaseDirectory . "Local\" . simulatorCode . "\" . car . "\" . track)
-		
-		FileCreateDir %directory%
-				
-		line := (values2String(";", weather, airTemperature, trackTemperature, compound, compoundColor, fuelRemaining, fuelConsumption, lapTime
-								  , flPressure, frPressure, rlPressure, rrPressure, flTemperature, frTemperature, rlTemperature, rrTemperature) . "`n")
-		
-		FileAppend %line%, % directory . "\TyresData.CSV"
+		this.Database.add("Tyres", {Weather: weather, AirTemperature: airTemperature, TrackTemperature: trackTemperature
+								  , Compound: compound, CompoundColor: compoundColor
+								  , FuelRemaining: fuelRemaining, FuelConsumption: fuelConsumption, LapTime: lapTime
+								  , PressureFL: pressureFL, PressureFR: pressureFR, PressureRL: pressureRL, PressureRR: pressureRR
+								  , TemperatureFL: temperatureFL, TemperatureFR: temperatureFR
+								  , TemperatureRL: temperatureRL, TemperatureRR: temperatureRR}, true)
 	}
 }

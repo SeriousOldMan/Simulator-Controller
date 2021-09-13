@@ -43,7 +43,7 @@ global kMaxTemperatureDelta = 4
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class Database {
+class SessionDatabase {
 	iControllerConfiguration := false
 	
 	iUseGlobalDatabase := false
@@ -142,7 +142,7 @@ class Database {
 	}
 }
 
-class SetupDatabase extends Database {
+class SetupDatabase extends SessionDatabase {
 	iLastSimulator := false
 	iLastCar := false
 	iLastTrack := false

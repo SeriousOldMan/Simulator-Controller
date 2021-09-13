@@ -93,9 +93,6 @@ class StrategyWorkbench extends ConfigurationItem {
 	
 	StatisticsDatabase[] {
 		Get {
-			if !this.iStatisticsDatabase
-				this.iStatisticsDatabase := new StatisticsDatabase()
-			
 			return this.iStatisticsDatabase
 		}
 	}
@@ -312,15 +309,15 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 	
 	getSimulators() {
-		return this.StatisticsDatabase.getSimulators()
+		return new StatisticsDatabase().getSimulators()
 	}
 	
 	getCars(simulator) {
-		return this.StatisticsDatabase.getCars(simulator)
+		return new StatisticsDatabase().getCars(simulator)
 	}
 	
 	getTracks(simulator, car) {
-		return this.StatisticsDatabase.getTracks(simulator, car)
+		return new StatisticsDatabase().getTracks(simulator, car)
 	}
 	
 	loadSimulator(simulator, force := false) {
@@ -380,7 +377,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			LV_Delete()
 				
 			if track {
-				lapData := this.StatisticsDatabase.getLapData(simulator, car, track, "Electronics", ["Weather", "Compound", "CompoundColor"])
+				lapData := new StatisticsDatabase(simulator, car, track).getElectronicsStatistics()
 				
 				this.iAvailableLapData := lapData
 				

@@ -18,6 +18,7 @@
 
 #Include ..\Libraries\RuleEngine.ahk
 #Include ..\Assistants\Libraries\RaceAssistant.ahk
+#Include ..\Assistants\Libraries\StatisticsDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -964,11 +965,11 @@ class RaceStrategist extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		
 		if knowledgeBase {
-			statisticsDB := this.statisticsDatabase
-			
-			simulator := statisticsDB.getSimulatorName(knowledgeBase.getValue("Session.Simulator"))
+			simulator := knowledgeBase.getValue("Session.Simulator")
 			car := knowledgeBase.getValue("Session.Car")
 			track := knowledgeBase.getValue("Session.Track")
+			
+			statisticsDB := new StatisticsDatabase(simulator, car, track)
 			
 			Loop % knowledgeBase.getValue("Lap")
 			{
@@ -987,7 +988,7 @@ class RaceStrategist extends RaceAssistant {
 				tc := knowledgeBase.getValue(prefix . ".TC")
 				abs := knowledgeBase.getValue(prefix . ".ABS")
 				
-				statisticsDB.updateElectronicsStatistics(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor
+				statisticsDB.updateElectronicsStatistics(weather, airTemperature, trackTemperature, compound, compoundColor
 													   , map, tc, abs, fuelRemaining, fuelConsumption, lapTime)
 				
 				flPressure := knowledgeBase.getValue(prefix . ".Tyre.Pressure.FL")
@@ -1000,7 +1001,7 @@ class RaceStrategist extends RaceAssistant {
 				rlTemperature := knowledgeBase.getValue(prefix . ".Tyre.Temperature.RL")
 				rrTemperature := knowledgeBase.getValue(prefix . ".Tyre.Temperature.RR")
 				
-				statisticsDB.updateTyreStatistics(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor
+				statisticsDB.updateTyreStatistics(weather, airTemperature, trackTemperature, compound, compoundColor
 												, flPressure, frPressure, rlPressure, rrPressure, flTemperature, frTemperature, rlTemperature, rrTemperature
 												, fuelRemaining, fuelConsumption, lapTime)
 			}

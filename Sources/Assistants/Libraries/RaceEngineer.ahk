@@ -1124,10 +1124,10 @@ class RaceEngineer extends RaceAssistant {
 		
 		try {
 			if ((this.Session == kSessionRace) && (this.SaveSettings = ((phase = "Before") ? kAlways : kAsk)))
-				this.updateSettings()
+				this.saveSettings()
 			
 			if ((this.SaveTyrePressures = ((phase = "After") ? kAsk : kAlways)) && (this.SetupData.Count() > 0))
-				this.updateTyrePressures()
+				this.saveTyrePressureData()
 		}
 		finally {
 			this.iSessionDataActive := false
@@ -1143,7 +1143,7 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 	
-	updateSettings() {
+	saveSettings() {
 		local knowledgeBase := this.KnowledgeBase
 		local compound
 		
@@ -1185,7 +1185,7 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 
-	updateTyrePressures() {
+	saveTyrePressureData() {
 		local compound
 		
 		if this.KnowledgeBase

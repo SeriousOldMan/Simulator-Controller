@@ -18,7 +18,7 @@
 
 #Include ..\Libraries\RuleEngine.ahk
 #Include ..\Assistants\Libraries\RaceAssistant.ahk
-#Include ..\Assistants\Libraries\StatisticsDatabase.ahk
+#Include ..\Assistants\Libraries\TelemetryDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -36,7 +36,7 @@ class RaceStrategist extends RaceAssistant {
 
 	iSessionTime := false
 	
-	iSaveStatistics := kAlways
+	iSaveTelemetry := kAlways
 	iSaveRaceReport := false
 	
 	iSessionReportsDatabase := false
@@ -84,9 +84,9 @@ class RaceStrategist extends RaceAssistant {
 		}
 	}
 	
-	SaveStatistics[] {
+	SaveTelemetry[] {
 		Get {
-			return this.iSaveStatistics
+			return this.iSaveTelemetry
 		}
 	}
 	
@@ -121,8 +121,8 @@ class RaceStrategist extends RaceAssistant {
 		if values.HasKey("SaveSettings")
 			this.iSaveSettings := values["SaveSettings"]
 		
-		if values.HasKey("SaveStatistics")
-			this.iSaveTyrePressures := values["SaveStatistics"]
+		if values.HasKey("SaveTelemetry")
+			this.iSaveTyrePressures := values["SaveTelemetry"]
 		
 		if values.HasKey("SaveRaceReport")
 			this.iSaveRaceReport := values["SaveRaceReport"]
@@ -612,7 +612,7 @@ class RaceStrategist extends RaceAssistant {
 		
 		this.updateConfigurationValues({LearningLaps: getConfigurationValue(configuration, "Race Strategist Analysis", simulatorName . ".LearningLaps", 1)
 									  , SessionReportsDatabase: getConfigurationValue(this.Configuration, "Race Strategist Reports", "Database", false)
-									  , SaveStatistics: getConfigurationValue(configuration, "Race Strategist Shutdown", simulatorName . ".SaveStatistics", kAlways)
+									  , SaveTelemetry: getConfigurationValue(configuration, "Race Strategist Shutdown", simulatorName . ".SaveTelemetry", kAlways)
 									  , SaveRaceReport: getConfigurationValue(this.Configuration, "Race Strategist Shutdown", simulatorName . ".SaveRaceReport", false)
 									  , SaveSettings: saveSettings})
 		
@@ -646,12 +646,12 @@ class RaceStrategist extends RaceAssistant {
 				if this.Listener {
 					asked := true
 					
-					if ((((this.SaveSettings == kAsk) && (this.Session == kSessionRace)) || (this.SaveStatistics == kAsk))
+					if ((((this.SaveSettings == kAsk) && (this.Session == kSessionRace)) || (this.SaveTelemetry == kAsk))
 					 && ((this.SaveRaceReport == kAsk) && (this.Session == kSessionRace)))
 						this.getSpeaker().speakPhrase("ConfirmSaveSettingsAndRaceReport", false, true)
 					else if ((this.SaveRaceReport == kAsk) && (this.Session == kSessionRace))
 						this.getSpeaker().speakPhrase("ConfirmSaveRaceReport", false, true)
-					else if (((this.SaveSettings == kAsk) && (this.Session == kSessionRace)) || (this.SaveStatistics == kAsk))
+					else if (((this.SaveSettings == kAsk) && (this.Session == kSessionRace)) || (this.SaveTelemetry == kAsk))
 						this.getSpeaker().speakPhrase("ConfirmSaveSettings", false, true)
 					else
 						asked := false
@@ -845,13 +845,13 @@ class RaceStrategist extends RaceAssistant {
 		
 		try {
 			if ((this.Session == kSessionRace) && (this.SaveSettings = ((phase = "Before") ? kAlways : kAsk)))
-				this.updateSettings()
+				this.saveSettings()
 			
 			if ((this.Session == kSessionRace) && (this.SaveRaceReport = ((phase = "Before") ? kAlways : kAsk)))
 				this.saveSessionReport()
 			
-			if ((this.SaveStatistics = ((phase = "After") ? kAsk : kAlways)))
-				this.updateStatistics()
+			if ((this.SaveTelemetry = ((phase = "After") ? kAsk : kAlways)))
+				this.saveTelemetryData()
 		}
 		finally {
 			this.iSessionDataActive := false
@@ -960,7 +960,7 @@ class RaceStrategist extends RaceAssistant {
 		}
 	}
 
-	updateStatistics() {
+	saveTelemetryData() {
 		local compound
 		local knowledgeBase := this.KnowledgeBase
 		
@@ -974,7 +974,7 @@ class RaceStrategist extends RaceAssistant {
 			Loop % knowledgeBase.getValue("Pitstop.Last", 0)
 				pitstops.Push(knowledgeBase.getValue("Pitstop." . A_Index . ".Lap") + 1)
 
-			statisticsDB := new StatisticsDatabase(simulator, car, track)
+			telemetryDB := new TelemetryDatabase(simulator, car, track)
 			
 			runningLap := 0
 			
@@ -999,8 +999,8 @@ class RaceStrategist extends RaceAssistant {
 				tc := knowledgeBase.getValue(prefix . ".TC")
 				abs := knowledgeBase.getValue(prefix . ".ABS")
 				
-				statisticsDB.addElectronicEntry(weather, airTemperature, trackTemperature, compound, compoundColor
-											  , map, tc, abs, fuelRemaining, fuelConsumption, lapTime)
+				telemetryDB.addElectronicEntry(weather, airTemperature, trackTemperature, compound, compoundColor
+											 , map, tc, abs, fuelRemaining, fuelConsumption, lapTime)
 				
 				flPressure := Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.FL"), 1)
 				frPressure := Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.FR"), 1)
@@ -1012,14 +1012,14 @@ class RaceStrategist extends RaceAssistant {
 				rlTemperature := Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.RL"), 1)
 				rrTemperature := Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.RR"), 1)
 				
-				statisticsDB.addTyreEntry(weather, airTemperature, trackTemperature, compound, compoundColor, runningLap
-										, flPressure, frPressure, rlPressure, rrPressure, flTemperature, frTemperature, rlTemperature, rrTemperature
+				telemetryDB.addTyreEntry(weather, airTemperature, trackTemperature, compound, compoundColor, runningLap
+									   , flPressure, frPressure, rlPressure, rrPressure, flTemperature, frTemperature, rlTemperature, rrTemperature
 										, fuelRemaining, fuelConsumption, lapTime)
 			}
 		}
 	}
 	
-	updateSettings() {
+	saveSettings() {
 		local knowledgeBase := this.KnowledgeBase
 		local compound
 		

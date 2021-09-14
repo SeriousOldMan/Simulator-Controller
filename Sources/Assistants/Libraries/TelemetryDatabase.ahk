@@ -1,5 +1,5 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Statistics Database             ;;;
+;;;   Modular Simulator Controller System - Telemetry Database              ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2021) Creative Commons - BY-NC-SA                        ;;;
@@ -24,19 +24,19 @@
 ;;;                   Private Variable Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kStatisticsSchemas = {Electronics: ["Weather", "Temperature.Air", "Temperature.Track", "Tyre.Compound", "Tyre.Compound.Color"
-										 , "Fuel.Remaining", "Fuel.Consumption", "Lap.Time", "Map", "TC", "ABS"]
-						   , Tyres: ["Weather", "Temperature.Air", "Temperature.Track", "Tyre.Compound", "Tyre.Compound.Color"
-								   , "Fuel.Remaining", "Fuel.Consumption", "Lap.Time", "Tyre.Laps"
-								   , "Tyre.Pressure.FL", "Tyre.Pressure.FR", "Tyre.Pressure.RL", "Tyre.Pressure.RR"
-								   , "Tyre.Temperature.FL", "Tyre.Temperature.FR", "Tyre.Temperature.RL", "Tyre.Temperature.RR"]}
+global kTelemetrySchemas = {Electronics: ["Weather", "Temperature.Air", "Temperature.Track", "Tyre.Compound", "Tyre.Compound.Color"
+										, "Fuel.Remaining", "Fuel.Consumption", "Lap.Time", "Map", "TC", "ABS"]
+						  , Tyres: ["Weather", "Temperature.Air", "Temperature.Track", "Tyre.Compound", "Tyre.Compound.Color"
+								  , "Fuel.Remaining", "Fuel.Consumption", "Lap.Time", "Tyre.Laps"
+								  , "Tyre.Pressure.FL", "Tyre.Pressure.FR", "Tyre.Pressure.RL", "Tyre.Pressure.RR"
+								  , "Tyre.Temperature.FL", "Tyre.Temperature.FR", "Tyre.Temperature.RL", "Tyre.Temperature.RR"]}
 								   
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class StatisticsDatabase extends SessionDatabase {
+class TelemetryDatabase extends SessionDatabase {
 	iDatabase := false
 	
 	Database[] {
@@ -54,7 +54,7 @@ class StatisticsDatabase extends SessionDatabase {
 			else
 				simulatorCode := simulator
 			
-			this.iDatabase := new Database(kDatabaseDirectory . "Local\" . simulatorCode . "\" . car . "\" . track . "\", kStatisticsSchemas)
+			this.iDatabase := new Database(kDatabaseDirectory . "Local\" . simulatorCode . "\" . car . "\" . track . "\", kTelemetrySchemas)
 		}
 	}
 	

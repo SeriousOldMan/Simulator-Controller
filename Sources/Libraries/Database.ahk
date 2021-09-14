@@ -67,22 +67,30 @@ class Database {
 	}
 	
 	query(name, query) {
+		local predicate
+		
 		schema := this.Schemas[name]
 		rows := this.Tables[name]
 		projection := (query.HasKey("Select") ? query["Select"] : false)
 		
-		if query.HasKey("Filter") {
-			filter := query["Filter"]
+		if query.HasKey("Where") {
+			predicate := query["Where"]
 			selection := []
 			
 			for ignore, row in rows
-				if %filter%(row)
+				if %predicate%(row)
 					selection.Push(row)
 			
 			rows := selection
 		}
 		else if !projection
 			rows := rows.Clone()
+		
+		if query.HasKey("Filter") {
+			filter := query["Filter"]
+			
+			rows := %filter%(rows)
+		}
 	
 		if projection {
 			projectedRows := []
@@ -124,11 +132,11 @@ class Database {
 			for ignore, rowGroup in groupedRows
 				rows.Push(rowGroup)
 		
-			if query.HasKey("Combine") {
-				combine := query["Combine"]
+			if query.HasKey("Group") {
+				group := query["Group"]
 				
 				for index, row in rows
-					rows[index] := %combine%(rows[index])
+					rows[index] := %group%(rows[index])
 			}
 			
 			if (query.HasKey("Flatten") && query["Flatten"]) {
@@ -200,11 +208,11 @@ class Database {
 		}
 	}
 	
-	remove(name, filter, flush := false) {
+	remove(name, predicate, flush := false) {
 		rows := []
 		
 		for ignore, row in this.Tables[name]
-			if !%filter%(row)
+			if !%predicate%(row)
 				rows.Push(row)
 		
 		this.iTables[name] := rows

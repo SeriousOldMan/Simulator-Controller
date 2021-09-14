@@ -24,13 +24,13 @@
 ;;;                   Private Variable Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kStatisticsSchemas = {Electronics: ["Weather", "AirTemperature", "TrackTemperature", "Compound", "CompoundColor"
-										 , "FuelRemaining", "FuelConsumption", "LapTime", "Map", "TC", "ABS"]
-						   , Tyres: ["Weather", "AirTemperature", "TrackTemperature", "Compound", "CompoundColor"
-								   , "FuelRemaining", "FuelConsumption", "LapTime"
-								   , "PressureFL", "PressureFR", "PressureRL", "PressureRR"
-								   , "TemperatureFL", "TemperatureFR", "TemperatureRL", "TemperatureRR"]}
-
+global kStatisticsSchemas = {Electronics: ["Weather", "Temperature.Air", "Temperature.Track", "Tyre.Compound", "Tyre.Compound.Color"
+										 , "Fuel.Remaining", "Fuel.Consumption", "Lap.Time", "Map", "TC", "ABS"]
+						   , Tyres: ["Weather", "Temperature.Air", "Temperature.Track", "Tyre.Compound", "Tyre.Compound.Color"
+								   , "Fuel.Remaining", "Fuel.Consumption", "Lap.Time", "Tyre.Laps"
+								   , "Tyre.Pressure.FL", "Tyre.Pressure.FR", "Tyre.Pressure.RL", "Tyre.Pressure.RR"
+								   , "Tyre.Temperature.FL", "Tyre.Temperature.FR", "Tyre.Temperature.RL", "Tyre.Temperature.RR"]}
+								   
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
@@ -58,39 +58,48 @@ class StatisticsDatabase extends SessionDatabase {
 		}
 	}
 	
-	queryElectronics(weather, compound, compoundColor) {
-		return this.Database.query("Electronics", {GroupBy: ["Map", "TC", "ABS"]
-												 , Combine: "removeInvalidLaps"
-												 , Filter: Func("filterEqual").Bind({Weather: weather, Compound: compound, CompoundColor: compoundColor})})
+	getElectronicEntries(weather, compound, compoundColor) {
+		return this.Database.query("Electronics", {Filter: "removeInvalidLaps", Where: Func("columnEqual").Bind({Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor})})
 	}
 	
-	queryTyres(weather, compound, compoundColor) {
-		rows := this.Database.query("Tyres", {Filter: Func("filterEqual").Bind({Weather: weather, Compound: compound, CompoundColor: compoundColor})})
+	getTyreEntries(weather, compound, compoundColor) {
+		return this.Database.query("Tyres", {Filter: "removeInvalidLaps", Where: Func("columnEqual").Bind({Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor})})
+	}
+	
+	getMapsCount(weather, compound, compoundColor) {
+		return this.Database.query("Electronics", {Select: ["Map"]
+												 , GroupBy: ["Map"] , Group: Func("columnCount").Bind("Map"), flatten: true
+												 , Filter: "removeInvalidLaps"
+												 , Where: Func("columnEqual").Bind({Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor})})
+	}
+	
+	getPressuresCount(weather, compound, compoundColor) {
+		rows := this.Database.query("Tyres", {Where: Func("columnEqual").Bind({Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor})})
 		
 		for ignore, row in rows {
-			row["Pressure"] := average([row["PressureFL"], row["PressureFR"], row["PressureRL"], row["PressureRR"]])
-			row["Temperature"] := average([row["TemperatureFL"], row["TemperatureFR"], row["TemperatureRL"], row["TemperatureRR"]])
+			row["Tyre.Pressure"] := Round(average([row["Tyre.Pressure.FL"], row["Tyre.Pressure.FR"], row["Tyre.Pressure.RL"], row["Tyre.Pressure.RR"]]), 1)
+			row["Tyre.Temperature"] := Round(average([row["Tyre.Temperature.FL"], row["Tyre.Temperature.FR"], row["Tyre.Temperature.RL"], row["Tyre.Temperature.RR"]]), 1)
 		}
 		
-		return removeInvalidLaps(rows)
+		return columnCount("Tyre.Pressure", rows)
 	}
 		
-	addElectronicsEntry(weather, airTemperature, trackTemperature, compound, compoundColor, map, tc, abs, fuelRemaining, fuelConsumption, lapTime) {
-		this.Database.add("Electronics", {Weather: weather, AirTemperature: airTemperature, TrackTemperature: trackTemperature
-										, Compound: compound, CompoundColor: compoundColor
-										, FuelRemaining: fuelRemaining, FuelConsumption: fuelConsumption, LapTime: lapTime
+	addElectronicEntry(weather, airTemperature, trackTemperature, compound, compoundColor, map, tc, abs, fuelRemaining, fuelConsumption, lapTime) {
+		this.Database.add("Electronics", {Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
+										, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor
+										, "Fuel.Remaining": fuelRemaining, "Fuel.Consumption": fuelConsumption, "Lap.Time": lapTime
 										, Map: map, TC: tc, ABS: abs}, true)
 	}
 	
-	addTyresEntry(weather, airTemperature, trackTemperature, compound, compoundColor
+	addTyreEntry(weather, airTemperature, trackTemperature, compound, compoundColor, tyreLaps
 				, pressureFL, pressureFR, pressureRL, pressureRR, temperatureFL, temperatureFR, temperatureRL, temperatureRR
 				, fuelRemaining, fuelConsumption, lapTime) {
-		this.Database.add("Tyres", {Weather: weather, AirTemperature: airTemperature, TrackTemperature: trackTemperature
-								  , Compound: compound, CompoundColor: compoundColor
-								  , FuelRemaining: fuelRemaining, FuelConsumption: fuelConsumption, LapTime: lapTime
-								  , PressureFL: pressureFL, PressureFR: pressureFR, PressureRL: pressureRL, PressureRR: pressureRR
-								  , TemperatureFL: temperatureFL, TemperatureFR: temperatureFR
-								  , TemperatureRL: temperatureRL, TemperatureRR: temperatureRR}, true)
+		this.Database.add("Tyres", {Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
+								  , "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor
+								  , "Fuel.Remaining": fuelRemaining, "Fuel.Consumption": fuelConsumption, "Lap.Time": lapTime, "Tyre.Laps": tyreLaps
+								  , "Tyre.Pressure.FL": pressureFL, "Tyre.Pressure.FR": pressureFR, "Tyre.Pressure.RL": pressureRL, "Tyre.Pressure.RR": pressureRR
+								  , "Tyre.Temperature.FL": temperatureFL, "Tyre.Temperature.FR": temperatureFR
+								  , "Tyre.Temperature.RL": temperatureRL, "Tyre.Temperature.RR": temperatureRR}, true)
 	}
 }
 
@@ -142,7 +151,7 @@ stdDeviation(numbers) {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-filterEqual(constraints, row) {
+columnEqual(constraints, row) {
 	for column, value in constraints
 		if (row[column] != value)
 			return false
@@ -150,11 +159,35 @@ filterEqual(constraints, row) {
 	return true
 }
 
+columnCount(column, rows) {
+	values := {}
+	
+	for ignore, row in rows {
+		value := row[column]
+	
+		if values.HasKey(value)
+			values[value] := values[value] + 1
+		else
+			values[value] := 1
+	}
+	
+	result := []
+	
+	for value, count in values {
+		object := {Count: count}
+		object[column] := value
+		
+		result.Push(object)
+	}
+	
+	return result
+}
+
 removeInvalidLaps(rows) {
 	lapTimes := []
 	
 	for ignore, row in rows
-		lapTimes.Push(row["LapTime"])
+		lapTimes.Push(row["Lap.Time"])
 	
 	avg := average(lapTimes)
 	stdDeviation := stdDeviation(lapTimes)
@@ -164,7 +197,7 @@ removeInvalidLaps(rows) {
 	result := []
 	
 	for ignore, row in rows
-		if (row["LapTime"] < threshold)
+		if (row["Lap.Time"] < threshold)
 			result.Push(row)
 
 	return result

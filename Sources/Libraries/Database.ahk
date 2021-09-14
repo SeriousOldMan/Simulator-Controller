@@ -13,6 +13,13 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                          Public Constant Section                        ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global kNull = "__Null__"
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -191,7 +198,7 @@ class Database {
 		row := []
 			
 		for ignore, column in this.Schemas[name]
-			row.Push(values.HasKey(column) ? values[column] : kUndefined)
+			row.Push(values.HasKey(column) ? values[column] : kNull)
 		
 		if this.Tables.HasKey(name)
 			this.Tables[name].Push(row)

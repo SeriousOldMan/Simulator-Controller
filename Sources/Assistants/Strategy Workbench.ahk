@@ -447,16 +447,16 @@ class StrategyWorkbench extends ConfigurationItem {
 			
 			value := values[xAxis]
 			
-			if (value = "n/a")
-				value := 0
+			if ((value = "n/a") || (value == kNull))
+				value := "null"
 
 			drawChartFunction .= ("[" . value)
 		
 			for ignore, yAxis in yAxises {
 				value := values[yAxis]
 			
-				if (value = "n/a")
-					value := 0
+				if ((value = "n/a") || (value == kNull))
+					value := "null"
 				
 				drawChartFunction .= (", " . value)
 			}

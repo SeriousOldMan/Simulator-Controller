@@ -250,7 +250,7 @@ class RaceReports extends ConfigurationItem {
 			(
 					</script>
 				</head>
-				<body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
+				<body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
 					<div id="chart_id" style="width: 908px; height: 470px"></div>
 				</body>
 			</html>
@@ -259,7 +259,7 @@ class RaceReports extends ConfigurationItem {
 			chartViewer.Document.write(before . drawChartFunction . after)
 		}
 		else {
-			html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
+			html := "<html><body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
 		
 			chartViewer.Document.write(html)
 		}
@@ -294,13 +294,13 @@ class RaceReports extends ConfigurationItem {
 			infoText .= ("<tr><td>" . translate("Conditions: ") . "</td><td>" . values2String(", ", map(conditions, "translate")*) . "</td></tr>")
 			infoText .= "</table>"
 			
-			infoText := "<html><meta charset='utf-8'><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='3' topmargin='3' rightmargin='3' bottommargin='3'><style> table, p { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><p>" . infoText . "</p></body></html>"
-			infoText := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='3' topmargin='3' rightmargin='3' bottommargin='3'><style> table, p { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><p>" . infoText . "</p></body></html>"
+			infoText := "<html><meta charset='utf-8'><body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='3' topmargin='3' rightmargin='3' bottommargin='3'><style> table, p { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><p>" . infoText . "</p></body></html>"
+			infoText := "<html><body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='3' topmargin='3' rightmargin='3' bottommargin='3'><style> table, p { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><p>" . infoText . "</p></body></html>"
 			
 			infoViewer.Document.write(infoText)
 		}
 		else {
-			html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
+			html := "<html><body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
 		
 			infoViewer.Document.write(html)
 		}
@@ -799,7 +799,7 @@ class RaceReports extends ConfigurationItem {
 			
 			drawChartFunction .= ("`n]);")
 			
-			drawChartFunction := drawChartFunction . "`nvar options = { bars: 'horizontal', backgroundColor: 'D0D0D0', chartArea: { left: '20%', top: '5%', right: '30%', bottom: '10%' } };"
+			drawChartFunction := drawChartFunction . "`nvar options = { bars: 'horizontal', backgroundColor: 'D8D8D8', chartArea: { left: '20%', top: '5%', right: '30%', bottom: '10%' } };"
 			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.BarChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 			
 			this.showReportChart(drawChartFunction)
@@ -881,7 +881,7 @@ class RaceReports extends ConfigurationItem {
 			}
 			
 			drawChartFunction := drawChartFunction . ("]);`nvar options = { legend: { position: 'right' }, chartArea: { left: '5%', top: '5%', right: '20%', bottom: '10%' }, ")
-			drawChartFunction := drawChartFunction . ("hAxis: { title: '" . translate("Laps") . "' }, vAxis: { direction: -1, ticks: [], title: '" . translate("Cars") . "', baselineColor: 'D0D0D0' }, backgroundColor: 'D0D0D0' };`n")
+			drawChartFunction := drawChartFunction . ("hAxis: { title: '" . translate("Laps") . "' }, vAxis: { direction: -1, ticks: [], title: '" . translate("Cars") . "', baselineColor: 'D0D0D0' }, backgroundColor: 'D8D8D8' };`n")
 
 			drawChartFunction := drawChartFunction . "var chart = new google.visualization.LineChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 			
@@ -968,7 +968,7 @@ class RaceReports extends ConfigurationItem {
 			text =
 			(
 			var options = {
-				backgroundColor: 'D0D0D0', chartArea: { left: '10`%', top: '5`%', right: '5`%', bottom: '20`%' },
+				backgroundColor: 'D8D8D8', chartArea: { left: '10`%', top: '5`%', right: '5`%', bottom: '20`%' },
 				legend: { position: 'none' },
 			)
 			

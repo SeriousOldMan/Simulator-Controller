@@ -311,31 +311,63 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		Gui %window%:Font, s8 Norm, Arial
 		
-		Gui %window%:Add, DropDownList, x230 yp-2 w150 AltSubmit Choose1 +0x200, % values2String("|", map(["Race", "-----------------------------------------", "Import from Race Settings...", "Import from Simulation", "-----------------------------------------", "Load Defaults", "Edit Defaults..."], "translate")*)
+		Gui %window%:Add, DropDownList, x230 yp-2 w150 AltSubmit Choose1 +0x200, % values2String("|", map(["Race & Settings", "-----------------------------------------", "Load from Setup Database...", "Save to Setup Database...", "-----------------------------------------", "Update from Telemetry...", "Import from Simulation...", "-----------------------------------------", "Load Defaults", "Edit Defaults..."], "translate")*)
 		
-		Gui %window%:Add, DropDownList, x385 yp w120 AltSubmit Choose1 +0x200, % values2String("|", map(["Simulation", "-----------------------------------------", "Optimize Fuel Usage...", "Optimize Tyre Wear...", "Recommend Pitstops..."], "translate")*)
+		Gui %window%:Add, DropDownList, x385 yp w150 AltSubmit Choose1 +0x200, % values2String("|", map(["Simulation", "-----------------------------------------", "Optimize Fuel Consumption...", "Optimize Tyre Wear...", "Optimize Car Weight...", "Set Pitstops...", "-----------------------------------------", "Run Simulation"], "translate")*)
 		
-		Gui %window%:Add, DropDownList, x510 yp w120 AltSubmit Choose1 +0x200, % values2String("|", map(["Strategy", "-----------------------------------------", "Export Strategy..."], "translate")*)
-			
+		Gui %window%:Add, DropDownList, x540 yp w150 AltSubmit Choose1 +0x200, % values2String("|", map(["Strategy", "-----------------------------------------", "Save Strategy...", "Load Strategy...", "Compare Strategies...", "-----------------------------------------", "Export Strategy..."], "translate")*)
+		
+		
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
 
-		Gui %window%:Add, GroupBox, x16 ys+39 w204 h192 Section, % translate("Race")
-				
+		Gui %window%:Add, GroupBox, x619 ys+39 w577 h8, % translate("Summary")
+		
+		Gui %window%:Add, ActiveX, x619 yp+24 w577 h166 Border vstrategyViewer, shell.explorer
+		
+		strategyViewer.Navigate("about:blank")
+		
+		this.showSummary("Space to rent...")
+		
 		Gui %window%:Font, Norm, Arial
 		
-		x := 24
+		Gui %window%:Add, Text, x8 y602 w1200 0x10
+		
+		Gui %window%:Add, Button, x574 y608 w80 h23 GcloseWorkbench, % translate("Close")
+
+		Gui %window%:Add, Tab, x16 ys+39 w593 h192 -Wrap Section, % values2String("|", map(["Rules && Settings", "Pitstop && Service", "Strategy Simulation"], "translate")*)
+		
+		Gui %window%:Tab, 1
+		
+		x := 32
 		x0 := x - 4
 		x1 := x + 74
 		x2 := x1 + 32
 		x3 := x2 + 26
 		x4 := x1 + 16
 		
-		Gui %window%:Add, DropDownList, x%x0% yp+20 w70 AltSubmit Choose1, % values2String("|", map(["Duration", "Laps"], "translate")*)
+		x5 := 243 + 8
+		x6 := x5 - 4
+		x7 := x5 + 74
+		x8 := x7 + 32
+		x9 := x8 + 26
+		x10 := x7 + 16
+		
+		x11 := x7 + 82
+		x12 := x11 + 56
+		
+		Gui %window%:Font, Norm, Arial
+		Gui %window%:Font, Italic, Arial
+		
+		Gui %window%:Add, GroupBox, x24 ys+34 w209 h144, % translate("Race")
+		
+		Gui %window%:Font, Norm, Arial
+		
+		Gui %window%:Add, DropDownList, x%x0% yp+21 w70 AltSubmit Choose1, % values2String("|", map(["Duration", "Laps"], "translate")*)
 		Gui %window%:Add, Edit, x%x1% yp w50 h20 Limit4 Number ; VraceDurationEdit, %raceDurationEdit%
 		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 Range1-9999 0x80 ; , %raceDurationEdit%
 		Gui %window%:Add, Text, x%x3% yp+4 w70 h20, % translate("Minutes")
-
+		
 		Gui %window%:Add, Text, x%x% yp+20 w85 h23 +0x200, % translate("Avg. Laptime")
 		Gui %window%:Add, Edit, x%x1% yp w50 h20 Limit3 Number ; VavgLaptimeEdit, %avgLaptimeEdit%
 		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 Range1-999 0x80 ; , %avgLaptimeEdit%
@@ -353,26 +385,40 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, CheckBox, x%x1% yp-1 w17 h23 ; Checked%postRaceLapCheck% VpostRaceLapCheck, %postRaceLapCheck%
 		Gui %window%:Add, Text, x%x4% yp+5 w50 h20, % translate("Lap")
 		
-		Gui %window%:Add, Text, x%x% yp+23 w90 h20, % translate("Pitstops")
-		Gui %window%:Add, Edit, x%x1% yp-3 w50 h20 Limit1 Number ; VraceDurationEdit, %raceDurationEdit%
-		Gui %window%:Add, UpDown, x%x2% yp w18 h20 Range1-9999 0x80 ; , %raceDurationEdit%
-		Gui %window%:Add, Text, x%x3% yp+2 w180 h20, % translate("(Required)")
-
-		Gui %window%:Add, Text, x%x% yp+22 w85 h23 +0x200, % translate("Change Tyres")
-		Gui %window%:Add, DropDownList, x%x1% yp w50 AltSubmit Choose1 +0x200, % values2String("|", map(["Yes", "No"], "translate")*)
-		Gui %window%:Add, Text, x%x3% yp+3 w180 h20, % translate("(Required)")
-		
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
-
-		Gui %window%:Add, GroupBox, x230 ys w362 h192 Theme, % translate("Pitstop")
-				
+		
+		Gui %window%:Add, GroupBox, x243 ys+34 w354 h144, % translate("Pitstop")
+		
 		Gui %window%:Font, Norm, Arial
 		
-		x := 238
-		x1 := x + 110
-		x2 := x + 142
-		x3 := x + 168
+		Gui %window%:Add, Text, x%x5% yp+21 w85 h23 +0x200, % translate("Max. Stint")
+		Gui %window%:Add, Edit, x%x7% yp w50 h20 Limit4 Number ; VraceDurationEdit, %raceDurationEdit%
+		Gui %window%:Add, UpDown, x%x8% yp-2 w18 h20 Range1-9999 0x80 ; , %raceDurationEdit%
+		Gui %window%:Add, Text, x%x9% yp+4 w70 h20, % translate("Minutes")
+
+		Gui %window%:Add, Text, x%x5% yp+23 w90 h20, % translate("Pitstops")
+		Gui %window%:Add, DropDownList, x%x7% yp-4 w80 AltSubmit Choose1 +0x200, % values2String("|", map(["No", "Free", "Window"], "translate")*)
+		Gui %window%:Add, Edit, x%x11% yp+1 w50 h20 ; VraceDurationEdit, %raceDurationEdit%
+		Gui %window%:Add, Text, x%x12% yp+2 w110 h20, % translate("Minute (From - To)")
+
+		Gui %window%:Add, Text, x%x5% yp+22 w85 h23 +0x200, % translate("Tyre Change")
+		Gui %window%:Add, DropDownList, x%x7% yp w80 AltSubmit Choose1 +0x200, % values2String("|", map(["Required", "Optional"], "translate")*)
+		
+		Gui %window%:Tab, 2
+		
+		x := 32
+		x0 := x - 4
+		x1 := x + 74
+		x2 := x1 + 32
+		x3 := x2 + 26
+		x4 := x1 + 16
+		
+		Gui %window%:Font, Italic, Arial
+
+		Gui %window%:Add, GroupBox, x24 ys+34 w340 h144, % translate("Pitstop")
+				
+		Gui %window%:Font, Norm, Arial
 		
 		Gui %window%:Add, Text, x%x% yp+21 w105 h20 +0x200, % translate("Pitstop Delta")
 		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 Limit2 Number ; VpitstopDeltaEdit, %pitstopDeltaEdit%
@@ -398,40 +444,31 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 ; , %safetyFuelEdit%
 		Gui %window%:Add, Text, x%x3% yp+2 w90 h20, % translate("Liter")
 		
-		Gui %window%:Font, Norm, Arial
+		Gui %window%:Tab, 3
+		
+		x := 32
+		x0 := x - 4
+		x1 := x + 124
+		x2 := x1 + 32
+		x3 := x2 + 26
+		x4 := x1 + 16
+		
 		Gui %window%:Font, Italic, Arial
 
-		Gui %window%:Add, GroupBox, x602 ys w204 h192 Section, % translate("Simulation")
+		Gui %window%:Add, GroupBox, x24 ys+34 w214 h144 Section, % translate("Optimization Goals")
 		
 		Gui %window%:Font, Norm, Arial
 				
-		x := 610
-		x1 := x + 110
-		x2 := x + 142
-		x3 := x + 168
-		
-		Gui %window%:Add, Text, x%x% yp+21 w105 h20 +0x200, % translate("Map")
+		Gui %window%:Add, Text, x%x% yp+21 w120 h20 +0x200, % translate("Fuel Consumption")
 		Gui %window%:Add, Slider, x%x1% yp w80 0x10 Range0-100 ToolTip ; , % speakerVolumeSlider
 		
-		Gui %window%:Add, Text, x%x% yp+24 w105 h20 +0x200, % translate("Tyre Wear")
+		Gui %window%:Add, Text, x%x% yp+24 w120 h20 +0x200, % translate("Tyre Wear")
 		Gui %window%:Add, Slider, x%x1% yp w80 0x10 Range0-100 ToolTip ; , % speakerVolumeSlider
 		
-		Gui %window%:Add, Text, x%x% yp+24 w105 h20 +0x200, % translate("Car Weight")
+		Gui %window%:Add, Text, x%x% yp+24 w120 h20 +0x200, % translate("Car Weight")
 		Gui %window%:Add, Slider, x%x1% yp w80 0x10 Range0-100 ToolTip ; , % speakerVolumeSlider
 		
-		Gui %window%:Add, Button, x%x% yp+72 w188 h20, % translate("Optimize!")
-		
-		Gui %window%:Font, Norm, Arial
-		Gui %window%:Font, Italic, Arial
-
-		Gui %window%:Add, GroupBox, x816 ys w384 h8, % translate("Summary")
-		Gui %window%:Add, ActiveX, x816 ys+24 w384 h168 vstrategyViewer, shell.explorer
-		
-		strategyViewer.Navigate("about:blank")
-		
-		this.showSummary("Space to rent...")
-		
-		Gui %window%:Font, Norm, Arial
+		Gui %window%:Add, Button, x%x% yp+48 w200 h20, % translate("Optimize!")
 		
 		car := this.SelectedCar
 		track := this.SelectedTrack
@@ -443,10 +480,6 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		if track
 			this.loadTrack(track)
-		
-		Gui %window%:Add, Text, x8 y602 w1200 0x10
-		
-		Gui %window%:Add, Button, x574 y608 w80 h23 GcloseWorkbench, % translate("Close")
 	}
 	
 	show() {
@@ -482,7 +515,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			(
 					</script>
 				</head>
-				<body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
+				<body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
 					<div id="chart_id" style="width: 798px; height: 248px"></div>
 				</body>
 			</html>
@@ -491,7 +524,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			chartViewer.Document.write(before . drawChartFunction . after)
 		}
 		else {
-			html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
+			html := "<html><body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
 		
 			chartViewer.Document.write(html)
 		}
@@ -504,7 +537,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		Gui %window%:Default
 		
-		html := "<html><head><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><div>" . summary . "</div></body></html>"
+		html := "<html><head><body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><div>" . summary . "</div></body></html>"
 
 		strategyViewer.Document.Open()
 		strategyViewer.Document.Write(html)
@@ -583,17 +616,17 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		if (this.SelectedChartType = "Scatter") {
 		
-			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom'}, chartArea: { bottom: '30%' }, backgroundColor: 'D0D0D0', hAxis: { title: '" . translate(xAxis) . "', gridlines: { color: 'E0E0E0' } }, " . series . ", " . vAxis . "};")
+			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom'}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#D8D8D8', hAxis: { title: '" . translate(xAxis) . "', gridlines: { color: 'E0E0E0' } }, " . series . ", " . vAxis . "};")
 				
 			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.ScatterChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 		}
 		else if (this.SelectedChartType = "Bar") {
-			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom'}, backgroundColor: 'D0D0D0', hAxis: { viewWindowMode: 'pretty' }, vAxis: { viewWindowMode: 'pretty' } };")
+			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom'}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#D8D8D8', hAxis: { viewWindowMode: 'pretty' }, vAxis: { viewWindowMode: 'pretty' } };")
 				
 			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.BarChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 		}
 		else if (this.SelectedChartType = "Line") {
-			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom'}, backgroundColor: 'D0D0D0' };")
+			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom'}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#D8D8D8' };")
 				
 			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.LineChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 		}

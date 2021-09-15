@@ -876,8 +876,8 @@ chooseDataType() {
 		GuiControl Choose, dataY1DropDown, % inList(schema, "Fuel.Consumption")
 	}
 	else if (dataType = "Tyres") {
-		GuiControl Choose, dataXDropDown, % inList(schema, "Fuel.Remaining")
-		GuiControl Choose, dataY1DropDown, % inList(schema, "Lap.Time")
+		GuiControl Choose, dataXDropDown, % inList(schema, "Lap.Time")
+		GuiControl Choose, dataY1DropDown, % inList(schema, "Fuel.Remaining")
 	}
 	
 	GuiControl Choose, dataY2DropDown, 1

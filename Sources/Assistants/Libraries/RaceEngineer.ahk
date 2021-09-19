@@ -1003,7 +1003,7 @@ class RaceEngineer extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local fact
 		
-		result := base.upddateLap(lapNumber, data)
+		result := base.updateLap(lapNumber, data)
 		
 		needProduce := false
 		

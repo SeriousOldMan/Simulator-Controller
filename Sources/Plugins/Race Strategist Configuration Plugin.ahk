@@ -84,7 +84,7 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
 		
-		Gui %window%:Add, GroupBox, x%x% yp+40 w%width% h148 HWNDwidget3 Hidden, % translate("Data Analysis")
+		Gui %window%:Add, GroupBox, -Theme x%x% yp+40 w%width% h148 HWNDwidget3 Hidden, % translate("Data Analysis")
 		
 		Gui %window%:Font, Norm, Arial
 		

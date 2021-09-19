@@ -495,7 +495,7 @@ restart:
 		Gui RES:Font, Norm, Arial
 		Gui RES:Font, Italic, Arial
 
-		Gui RES:Add, GroupBox, x16 yp+30 w180 h120 Section, % translate("Dry Tyres")
+		Gui RES:Add, GroupBox, -Theme x16 yp+30 w180 h120 Section, % translate("Dry Tyres")
 				
 		Gui RES:Font, Norm, Arial
 
@@ -522,7 +522,7 @@ restart:
 		Gui RES:Font, Norm, Arial
 		Gui RES:Font, Italic, Arial
 				
-		Gui RES:Add, GroupBox, x202 ys w180 h120, % translate("Wet Tyres")
+		Gui RES:Add, GroupBox, -Theme x202 ys w180 h120, % translate("Wet Tyres")
 				
 		Gui RES:Font, Norm, Arial
 
@@ -619,7 +619,7 @@ restart:
 		Gui RES:Font, Norm, Arial
 		Gui RES:Font, Italic, Arial
 
-		Gui RES:Add, GroupBox, x16 yp+30 w180 h120 Section, % translate("Dry Tyres")
+		Gui RES:Add, GroupBox, -Theme x16 yp+30 w180 h120 Section, % translate("Dry Tyres")
 				
 		Gui RES:Font, Norm, Arial
 
@@ -646,7 +646,7 @@ restart:
 		Gui RES:Font, Norm, Arial
 		Gui RES:Font, Italic, Arial
 				
-		Gui RES:Add, GroupBox, x202 ys w180 h120 , % translate("Wet Tyres")
+		Gui RES:Add, GroupBox, -Theme x202 ys w180 h120 , % translate("Wet Tyres")
 				
 		Gui RES:Font, Norm, Arial
 

@@ -465,7 +465,7 @@ restartSettings:
 		Gui SE:Font, Norm, Arial
 		Gui SE:Font, Italic, Arial
 	
-		Gui SE:Add, GroupBox, YP+30 w220 h%coreHeight%, % translate("Start Core System")
+		Gui SE:Add, GroupBox, -Theme YP+30 w220 h%coreHeight%, % translate("Start Core System")
 	
 		Gui SE:Font, Norm, Arial
 	
@@ -486,7 +486,7 @@ restartSettings:
 			Gui SE:Font, Norm, Arial
 			Gui SE:Font, Italic, Arial
 	
-			Gui SE:Add, GroupBox, XP-10 YP+30 w220 h%feedbackHeight%, % translate("Start Feedback System")
+			Gui SE:Add, GroupBox, -Theme XP-10 YP+30 w220 h%feedbackHeight%, % translate("Start Feedback System")
 	
 			Gui SE:Font, Norm, Arial
 	
@@ -527,7 +527,7 @@ restartSettings:
 		Gui SE:Font, Norm, Arial
 		Gui SE:Font, Italic, Arial
 	
-		Gui SE:Add, GroupBox, XP-10 YP+30 w220 h135, % translate("Controller Notifications")
+		Gui SE:Add, GroupBox, -Theme XP-10 YP+30 w220 h135, % translate("Controller Notifications")
 	
 		Gui SE:Font, Norm, Arial
 	

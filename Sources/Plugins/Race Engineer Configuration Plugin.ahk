@@ -81,7 +81,7 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
 		
-		Gui %window%:Add, GroupBox, x%x% yp+40 w%width% h70 HWNDwidget3 Hidden, % translate("Settings (for all Race Assistants)")
+		Gui %window%:Add, GroupBox, -Theme x%x% yp+40 w%width% h70 HWNDwidget3 Hidden, % translate("Settings (for all Race Assistants)")
 		
 		Gui %window%:Font, Norm, Arial
 		
@@ -96,7 +96,7 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
 		
-		Gui %window%:Add, GroupBox, x%x% yp+35 w%width% h70 HWNDwidget8 Hidden, % translate("Tyre Pressures")
+		Gui %window%:Add, GroupBox, -Theme x%x% yp+35 w%width% h70 HWNDwidget8 Hidden, % translate("Tyre Pressures")
 		
 		Gui %window%:Font, Norm, Arial
 		
@@ -112,7 +112,7 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
 		
-		Gui %window%:Add, GroupBox, x%x% yp+35 w%width% h156 HWNDwidget13 Hidden, % translate("Data Analysis")
+		Gui %window%:Add, GroupBox, -Theme x%x% yp+35 w%width% h156 HWNDwidget13 Hidden, % translate("Data Analysis")
 		
 		Gui %window%:Font, Norm, Arial
 		

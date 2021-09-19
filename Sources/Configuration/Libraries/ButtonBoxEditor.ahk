@@ -270,7 +270,7 @@ class ControlsList extends ConfigurationItemList {
 		Gui BBE:Font, Norm, Arial
 		Gui BBE:Font, Italic, Arial
 		
-		Gui BBE:Add, GroupBox, x8 y60 w424 h138, % translate("Controls")
+		Gui BBE:Add, GroupBox, -Theme x8 y60 w424 h138, % translate("Controls")
 		
 		Gui BBE:Font, Norm, Arial
 		Gui BBE:Add, ListView, x16 y79 w134 h108 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndcontrolsListViewHandle VcontrolsListView glistEvent
@@ -427,7 +427,7 @@ class LabelsList extends ConfigurationItemList {
 		Gui BBE:Font, Norm, Arial
 		Gui BBE:Font, Italic, Arial
 		
-		Gui BBE:Add, GroupBox, x8 y205 w424 h115, % translate("Labels")
+		Gui BBE:Add, GroupBox, -Theme x8 y205 w424 h115, % translate("Labels")
 		
 		Gui BBE:Font, Norm, Arial
 		Gui BBE:Add, ListView, x16 y224 w134 h84 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndlabelsListViewHandle VlabelsListView glistEvent

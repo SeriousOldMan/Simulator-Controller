@@ -1108,7 +1108,7 @@ editTargets(command := "") {
 			if (updateHeight == 20)
 				updateHeight := 40
 				
-			Gui TE:Add, GroupBox, YP+30 w220 h%updateHeight%, % translate("Update")
+			Gui TE:Add, GroupBox, -Theme YP+30 w220 h%updateHeight%, % translate("Update")
 		
 			Gui TE:Font, Norm, Arial
 		
@@ -1133,7 +1133,7 @@ editTargets(command := "") {
 		if (cleanupHeight == 20)
 			cleanupHeight := 40
 			
-		Gui TE:Add, GroupBox, %cleanupPosOption% YP+30 w220 h%cleanupHeight%, % translate("Cleanup")
+		Gui TE:Add, GroupBox, -Theme %cleanupPosOption% YP+30 w220 h%cleanupHeight%, % translate("Cleanup")
 	
 		Gui TE:Font, Norm, Arial
 	
@@ -1157,7 +1157,7 @@ editTargets(command := "") {
 		if (copyHeight == 20)
 			copydHeight := 40
 			
-		Gui TE:Add, GroupBox, XP-10 YP+30 w220 h%copyHeight%, % translate("Copy")
+		Gui TE:Add, GroupBox, -Theme XP-10 YP+30 w220 h%copyHeight%, % translate("Copy")
 	
 		Gui TE:Font, Norm, Arial
 	
@@ -1181,7 +1181,7 @@ editTargets(command := "") {
 		if (buildHeight == 20)
 			buildHeight := 40
 			
-		Gui TE:Add, GroupBox, XP-10 YP+30 w220 h%buildHeight%, % translate("Compile")
+		Gui TE:Add, GroupBox, -Theme XP-10 YP+30 w220 h%buildHeight%, % translate("Compile")
 	
 		Gui TE:Font, Norm, Arial
 	

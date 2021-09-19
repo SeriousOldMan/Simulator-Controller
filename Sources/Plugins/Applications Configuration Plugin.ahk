@@ -85,7 +85,7 @@ class ApplicationsConfigurator extends ConfigurationItemList {
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
 		
-		Gui %window%:Add, GroupBox, x16 y411 w458 h71, % translate("Function Hooks (optional)")
+		Gui %window%:Add, GroupBox, -Theme x16 y411 w458 h71, % translate("Function Hooks (optional)")
 		
 		Gui %window%:Font, Norm, Arial
 		

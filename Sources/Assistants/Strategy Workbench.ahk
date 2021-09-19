@@ -59,10 +59,12 @@ global dataTypeDropDown
 global dataXDropDown
 global dataY1DropDown
 global dataY2DropDown
+global dataY3DropDown
 global chartTypeDropDown
 
 global chartViewer
 global strategyViewer
+global simulationViewer
 
 class StrategyWorkbench extends ConfigurationItem {
 	iDataListView := false
@@ -280,29 +282,33 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		Gui %window%:Add, DropDownList, x12 yp+32 w76 AltSubmit Choose1 vdataTypeDropDown gchooseDataType +0x200, % values2String("|", map(["Electronics", "Tyres"], "translate")*)
 		
-		Gui %window%:Add, ListView, x90 yp-2 w130 h73 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDdataListView gchooseData, % values2String("|", map(["Map", "Count"], "translate")*)
+		Gui %window%:Add, ListView, x90 yp-2 w130 h97 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDdataListView gchooseData, % values2String("|", map(["Map", "Count"], "translate")*)
 		
 		this.iDataListView := dataListView
 		
-		Gui %window%:Add, Text, x230 yp+2 w70 h23 +0x200, % translate("Axis")
+		Gui %window%:Add, Text, x230 yp+2 w70 h23 +0x200, % translate("X-Axis")
 		
 		schema := filterSchema(kTelemetrySchemas["Electronics"])
 		
 		chosen := inList(schema, "Map")
 		Gui %window%:Add, DropDownList, x270 yp w110 AltSubmit Choose%chosen% vdataXDropDown gchooseAxis, % values2String("|", map(schema, "translate")*)
+		
+		Gui %window%:Add, Text, x230 yp+24 w70 h23 +0x200, % translate("Series")
+		
 		chosen := inList(schema, "Fuel.Consumption")
-		Gui %window%:Add, DropDownList, x270 yp+24 w110 AltSubmit Choose%chosen% vdataY1DropDown gchooseAxis, % values2String("|", map(schema, "translate")*)
+		Gui %window%:Add, DropDownList, x270 yp w110 AltSubmit Choose%chosen% vdataY1DropDown gchooseAxis, % values2String("|", map(schema, "translate")*)
 		Gui %window%:Add, DropDownList, x270 yp+24 w110 AltSubmit Choose1 vdataY2DropDown gchooseAxis, % translate("None") . "|" . values2String("|", map(schema, "translate")*)
+		Gui %window%:Add, DropDownList, x270 yp+24 w110 AltSubmit Choose1 vdataY3DropDown gchooseAxis, % translate("None") . "|" . values2String("|", map(schema, "translate")*)
 		
 		Gui %window%:Add, Text, x400 ys w40 h23 +0x200, % translate("Chart")
 		Gui %window%:Add, DropDownList, x444 yp w80 AltSubmit Choose1 +0x200, % values2String("|", map(["Telemetry", "Strategy"], "translate")*)
-		Gui %window%:Add, DropDownList, x529 yp w80 AltSubmit Choose1 vchartTypeDropDown gchooseChartType, % values2String("|", map(["Scatter", "Bar", "Line"], "translate")*)
+		Gui %window%:Add, DropDownList, x529 yp w80 AltSubmit Choose1 vchartTypeDropDown gchooseChartType, % values2String("|", map(["Scatter", "Bar", "Bubble", "Line"], "translate")*)
 		
-		Gui %window%:Add, ActiveX, x400 yp+24 w800 h254 Border vchartViewer, shell.explorer
+		Gui %window%:Add, ActiveX, x400 yp+24 w800 h278 Border vchartViewer, shell.explorer
 		
 		chartViewer.Navigate("about:blank")
 		
-		Gui %window%:Add, Text, x8 yp+262 w1200 0x10
+		Gui %window%:Add, Text, x8 yp+286 w1200 0x10
 
 		Gui %window%:Font, s10 Bold, Arial
 			
@@ -311,7 +317,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		Gui %window%:Font, s8 Norm, Arial
 		
-		Gui %window%:Add, DropDownList, x230 yp-2 w150 AltSubmit Choose1 +0x200, % values2String("|", map(["Race & Settings", "-----------------------------------------", "Load from Setup Database...", "Save to Setup Database...", "-----------------------------------------", "Update from Telemetry...", "Import from Simulation...", "-----------------------------------------", "Load Defaults", "Edit Defaults..."], "translate")*)
+		Gui %window%:Add, DropDownList, x230 yp-2 w150 AltSubmit Choose1 +0x200, % values2String("|", map(["Settings", "-----------------------------------------", "Load from Setup Database...", "Save to Setup Database...", "-----------------------------------------", "Update from Telemetry...", "Import from Simulation...", "-----------------------------------------", "Load Defaults", "Edit Defaults..."], "translate")*)
 		
 		Gui %window%:Add, DropDownList, x385 yp w150 AltSubmit Choose1 +0x200, % values2String("|", map(["Simulation", "-----------------------------------------", "Optimize Fuel Consumption...", "Optimize Tyre Wear...", "Optimize Car Weight...", "Set Pitstops...", "-----------------------------------------", "Run Simulation"], "translate")*)
 		
@@ -321,9 +327,9 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
 
-		Gui %window%:Add, GroupBox, x619 ys+39 w577 h8, % translate("Summary")
+		Gui %window%:Add, GroupBox, -Theme x619 ys+39 w577 h9, % translate("Summary")
 		
-		Gui %window%:Add, ActiveX, x619 yp+24 w577 h166 Border vstrategyViewer, shell.explorer
+		Gui %window%:Add, ActiveX, x619 yp+21 w577 h169 Border vstrategyViewer, shell.explorer
 		
 		strategyViewer.Navigate("about:blank")
 		
@@ -331,11 +337,11 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		Gui %window%:Font, Norm, Arial
 		
-		Gui %window%:Add, Text, x8 y602 w1200 0x10
+		Gui %window%:Add, Text, x8 y626 w1200 0x10
 		
-		Gui %window%:Add, Button, x574 y608 w80 h23 GcloseWorkbench, % translate("Close")
+		Gui %window%:Add, Button, x574 y632 w80 h23 GcloseWorkbench, % translate("Close")
 
-		Gui %window%:Add, Tab, x16 ys+39 w593 h192 -Wrap Section, % values2String("|", map(["Rules && Settings", "Pitstop && Service", "Strategy Simulation"], "translate")*)
+		Gui %window%:Add, Tab, x16 ys+39 w593 h192 -Wrap Section, % values2String("|", map(["Rules && Settings", "Pitstop && Service", "Electronics && Consumption", "Simulation", "Strategy"], "translate")*)
 		
 		Gui %window%:Tab, 1
 		
@@ -359,23 +365,19 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
 		
-		Gui %window%:Add, GroupBox, x24 ys+34 w209 h144, % translate("Race")
+		Gui %window%:Add, GroupBox, -Theme x24 ys+34 w209 h147, % translate("Race")
 		
 		Gui %window%:Font, Norm, Arial
 		
 		Gui %window%:Add, DropDownList, x%x0% yp+21 w70 AltSubmit Choose1, % values2String("|", map(["Duration", "Laps"], "translate")*)
 		Gui %window%:Add, Edit, x%x1% yp w50 h20 Limit4 Number ; VraceDurationEdit, %raceDurationEdit%
 		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 Range1-9999 0x80 ; , %raceDurationEdit%
-		Gui %window%:Add, Text, x%x3% yp+4 w70 h20, % translate("Minutes")
+		Gui %window%:Add, Text, x%x3% yp+4 w60 h20, % translate("Minutes")
 		
-		Gui %window%:Add, Text, x%x% yp+20 w85 h23 +0x200, % translate("Avg. Laptime")
-		Gui %window%:Add, Edit, x%x1% yp w50 h20 Limit3 Number ; VavgLaptimeEdit, %avgLaptimeEdit%
-		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 Range1-999 0x80 ; , %avgLaptimeEdit%
-		Gui %window%:Add, Text, x%x3% yp+4 w90 h20, % translate("Seconds")
-
-		Gui %window%:Add, Text, x%x% yp+21 w85 h20 +0x200, % translate("Consumption")
-		Gui %window%:Add, Edit, x%x1% yp-2 w50 h20 ; VfuelConsumptionEdit, %fuelConsumptionEdit%
-		Gui %window%:Add, Text, x%x3% yp+4 w90 h20, % translate("Ltr. p. Lap")
+		Gui %window%:Add, Text, x%x% yp+21 w85 h23 +0x200, % translate("Max. Stint")
+		Gui %window%:Add, Edit, x%x1% yp w50 h20 Limit4 Number ; VraceDurationEdit, %raceDurationEdit%
+		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 Range1-9999 0x80 ; , %raceDurationEdit%
+		Gui %window%:Add, Text, x%x3% yp+4 w60 h20, % translate("Minutes")
 
 		Gui %window%:Add, Text, x%x% yp+21 w85 h23 +0x200, % translate("Formation")
 		Gui %window%:Add, CheckBox, x%x1% yp-1 w17 h23 ; Checked%formationLapCheck% VformationLapCheck, %formationLapCheck%
@@ -388,22 +390,30 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
 		
-		Gui %window%:Add, GroupBox, x243 ys+34 w354 h144, % translate("Pitstop")
+		Gui %window%:Add, GroupBox, -Theme x243 ys+34 w354 h147, % translate("Pitstop")
 		
 		Gui %window%:Font, Norm, Arial
-		
-		Gui %window%:Add, Text, x%x5% yp+21 w85 h23 +0x200, % translate("Max. Stint")
-		Gui %window%:Add, Edit, x%x7% yp w50 h20 Limit4 Number ; VraceDurationEdit, %raceDurationEdit%
-		Gui %window%:Add, UpDown, x%x8% yp-2 w18 h20 Range1-9999 0x80 ; , %raceDurationEdit%
-		Gui %window%:Add, Text, x%x9% yp+4 w70 h20, % translate("Minutes")
 
 		Gui %window%:Add, Text, x%x5% yp+23 w90 h20, % translate("Pitstops")
-		Gui %window%:Add, DropDownList, x%x7% yp-4 w80 AltSubmit Choose1 +0x200, % values2String("|", map(["No", "Free", "Window"], "translate")*)
+		Gui %window%:Add, DropDownList, x%x7% yp-4 w80 AltSubmit Choose1 +0x200, % values2String("|", map(["Optional", "Free", "Window"], "translate")*)
 		Gui %window%:Add, Edit, x%x11% yp+1 w50 h20 ; VraceDurationEdit, %raceDurationEdit%
-		Gui %window%:Add, Text, x%x12% yp+2 w110 h20, % translate("Minute (From - To)")
+		Gui %window%:Add, Text, x%x12% yp+3 w110 h20, % translate("Minute (From - To)")
 
 		Gui %window%:Add, Text, x%x5% yp+22 w85 h23 +0x200, % translate("Tyre Change")
 		Gui %window%:Add, DropDownList, x%x7% yp w80 AltSubmit Choose1 +0x200, % values2String("|", map(["Required", "Optional"], "translate")*)
+
+		Gui %window%:Add, Text, x%x5% yp+26 w85 h23 +0x200, % translate("Refuel")
+		Gui %window%:Add, DropDownList, x%x7% yp w80 AltSubmit Choose1 +0x200, % values2String("|", map(["Required", "Optional"], "translate")*)
+
+		Gui %window%:Add, Text, x%x5% yp+26 w85 h20 +0x200, % translate("Fuel Capacity")
+		Gui %window%:Add, Edit, x%x7% yp-1 w50 h20 ; VpitstopRefuelServiceEdit, %pitstopRefuelServiceEdit%
+		Gui %window%:Add, UpDown, x%x8% yp-2 w18 h20 ; , %safetyFuelEdit%
+		Gui %window%:Add, Text, x%x9% yp+4 w180 h20, % translate("Liter")
+		
+		Gui %window%:Add, Text, x%x5% yp+19 w85 h23 +0x200, % translate("Safety Fuel")
+		Gui %window%:Add, Edit, x%x7% yp+1 w50 h20 ; VsafetyFuelEdit, %safetyFuelEdit%
+		Gui %window%:Add, UpDown, x%x8% yp-2 w18 h20 ; , %safetyFuelEdit%
+		Gui %window%:Add, Text, x%x9% yp+2 w90 h20, % translate("Liter")
 		
 		Gui %window%:Tab, 2
 		
@@ -416,7 +426,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		Gui %window%:Font, Italic, Arial
 
-		Gui %window%:Add, GroupBox, x24 ys+34 w340 h144, % translate("Pitstop")
+		Gui %window%:Add, GroupBox, -Theme x24 ys+34 w340 h147, % translate("Pitstop")
 				
 		Gui %window%:Font, Norm, Arial
 		
@@ -433,42 +443,123 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, Text, x%x% yp+21 w85 h20 +0x200, % translate("Refuel Service")
 		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 ; VpitstopRefuelServiceEdit, %pitstopRefuelServiceEdit%
 		Gui %window%:Add, Text, x%x3% yp+4 w180 h20, % translate("Seconds (Refuel of 10 litres)")
-
-		Gui %window%:Add, Text, x%x% yp+21 w85 h20 +0x200, % translate("Fuel Capacity")
-		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 ; VpitstopRefuelServiceEdit, %pitstopRefuelServiceEdit%
-		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 ; , %safetyFuelEdit%
-		Gui %window%:Add, Text, x%x3% yp+4 w180 h20, % translate("Liter")
-		
-		Gui %window%:Add, Text, x%x% yp+19 w85 h23 +0x200, % translate("Safety Fuel")
-		Gui %window%:Add, Edit, x%x1% yp+1 w50 h20 ; VsafetyFuelEdit, %safetyFuelEdit%
-		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 ; , %safetyFuelEdit%
-		Gui %window%:Add, Text, x%x3% yp+2 w90 h20, % translate("Liter")
 		
 		Gui %window%:Tab, 3
 		
 		x := 32
 		x0 := x - 4
-		x1 := x + 124
+		x1 := x + 74
+		x2 := x1 + 32
+		x3 := x2 + 26
+		x4 := x1 + 16
+		
+		Gui %window%:Font, Norm, Arial
+		Gui %window%:Font, Italic, Arial
+		
+		Gui %window%:Add, GroupBox, -Theme x24 ys+34 w209 h147, % translate("Map && Fuel")
+		
+		Gui %window%:Font, Norm, Arial
+		
+		Gui %window%:Add, Text, x%x% yp+20 w85 h23 +0x200, % translate("Avg. Laptime")
+		Gui %window%:Add, Edit, x%x1% yp w50 h20 Limit3 Number ; VavgLaptimeEdit, %avgLaptimeEdit%
+		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 Range1-999 0x80 ; , %avgLaptimeEdit%
+		Gui %window%:Add, Text, x%x3% yp+4 w90 h20, % translate("Seconds")
+
+		Gui %window%:Add, Text, x%x% yp+21 w85 h20 +0x200, % translate("Consumption")
+		Gui %window%:Add, Edit, x%x1% yp-2 w50 h20 ; VfuelConsumptionEdit, %fuelConsumptionEdit%
+		Gui %window%:Add, Text, x%x3% yp+4 w90 h20, % translate("Ltr. p. Lap")
+		
+		Gui %window%:Tab, 4
+		
+		x := 32
+		x0 := x - 4
+		x1 := x + 74
+		x2 := x1 + 22
+		x3 := x2 + 26
+		x4 := x1 + 16
+		x5 := x3 + 44
+		
+		Gui %window%:Font, Italic, Arial
+
+		Gui %window%:Add, GroupBox, -Theme x24 ys+34 w174 h147, % translate("Start Conditions")
+		
+		Gui %window%:Font, Norm, Arial
+				
+		Gui %window%:Add, Text, x%x% yp+21 w70 h20 +0x200, % translate("Fuel Amount")
+		Gui %window%:Add, Edit, x%x1% yp-1 w40 h20 ; VpitstopRefuelServiceEdit, %pitstopRefuelServiceEdit%
+		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 ; , %safetyFuelEdit%
+		Gui %window%:Add, Text, x%x3% yp+4 w180 h20, % translate("Liter")
+		
+		Gui %window%:Add, Text, x%x% yp+21 w70 h20 +0x200, % translate("Tyre Life")
+		Gui %window%:Add, Edit, x%x1% yp-1 w40 h20 ; VpitstopRefuelServiceEdit, %pitstopRefuelServiceEdit%
+		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 ; , %safetyFuelEdit%
+		Gui %window%:Add, Text, x%x3% yp+4 w180 h20, % translate("Laps")
+		
+		Gui %window%:Add, Text, x%x% yp+21 w70 h20 +0x200, % translate("Map")
+		Gui %window%:Add, Edit, x%x1% yp-1 w40 h20 ; VpitstopRefuelServiceEdit, %pitstopRefuelServiceEdit%
+		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 ; , %safetyFuelEdit%
+		
+		Gui %window%:Add, Text, x%x% yp+25 w70 h20 +0x200, % translate("TC / ABS")
+		Gui %window%:Add, Edit, x%x1% yp-1 w40 h20 ; VpitstopRefuelServiceEdit, %pitstopRefuelServiceEdit%
+		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 ; , %safetyFuelEdit%
+		
+		Gui %window%:Add, Edit, x%x3% yp w40 h20 ; VpitstopRefuelServiceEdit, %pitstopRefuelServiceEdit%
+		Gui %window%:Add, UpDown, x%x5% yp-2 w18 h20 ; , %safetyFuelEdit%
+		
+		x := 212
+		x0 := x - 4
+		x1 := x + 104
 		x2 := x1 + 32
 		x3 := x2 + 26
 		x4 := x1 + 16
 		
 		Gui %window%:Font, Italic, Arial
 
-		Gui %window%:Add, GroupBox, x24 ys+34 w214 h144 Section, % translate("Optimization Goals")
+		Gui %window%:Add, GroupBox, -Theme x204 ys+34 w174 h147, % translate("Optimization Targets")
 		
 		Gui %window%:Font, Norm, Arial
 				
-		Gui %window%:Add, Text, x%x% yp+21 w120 h20 +0x200, % translate("Fuel Consumption")
-		Gui %window%:Add, Slider, x%x1% yp w80 0x10 Range0-100 ToolTip ; , % speakerVolumeSlider
+		Gui %window%:Add, Text, x%x% yp+21 w100 h20 +0x200, % translate("Fuel Consumption")
+		Gui %window%:Add, Slider, x%x1% yp w60 0x10 Range0-100 ToolTip ; , % speakerVolumeSlider
 		
-		Gui %window%:Add, Text, x%x% yp+24 w120 h20 +0x200, % translate("Tyre Wear")
-		Gui %window%:Add, Slider, x%x1% yp w80 0x10 Range0-100 ToolTip ; , % speakerVolumeSlider
+		Gui %window%:Add, Text, x%x% yp+24 w100 h20 +0x200, % translate("Tyre Wear")
+		Gui %window%:Add, Slider, x%x1% yp w60 0x10 Range0-100 ToolTip ; , % speakerVolumeSlider
 		
-		Gui %window%:Add, Text, x%x% yp+24 w120 h20 +0x200, % translate("Car Weight")
-		Gui %window%:Add, Slider, x%x1% yp w80 0x10 Range0-100 ToolTip ; , % speakerVolumeSlider
+		Gui %window%:Add, Text, x%x% yp+24 w100 h20 +0x200, % translate("Car Weight")
+		Gui %window%:Add, Slider, x%x1% yp w60 0x10 Range0-100 ToolTip ; , % speakerVolumeSlider
 		
-		Gui %window%:Add, Button, x%x% yp+48 w200 h20, % translate("Optimize!")
+		Gui %window%:Add, Button, x%x% yp+48 w160 h20, % translate("Simulate!")
+		
+		x := 397
+		x0 := x - 4
+		x1 := x + 84
+		x2 := x1 + 32
+		x3 := x2 + 16
+		x4 := x1 + 16
+		
+		Gui %window%:Font, Italic, Arial
+
+		Gui %window%:Add, GroupBox, -Theme x389 ys+34 w207 h147, % translate("Results")
+		
+		Gui %window%:Font, Norm, Arial
+				
+		Gui %window%:Add, Text, x%x% yp+21 w80 h20 +0x200, % translate("# Pitstops")
+		Gui %window%:Add, Text, x%x1% yp-1 w40 h20 Border ; VpitstopRefuelServiceEdit, %pitstopRefuelServiceEdit%
+		
+		Gui %window%:Add, Text, x%x% yp+25 w80 h20 +0x200, % translate("# Tyre Changes")
+		Gui %window%:Add, Text, x%x1% yp-1 w40 h20 Border ; VpitstopRefuelServiceEdit, %pitstopRefuelServiceEdit%
+				
+		Gui %window%:Add, Text, x%x% yp+25 w80 h20 +0x200, % translate("Consumed Fuel")
+		Gui %window%:Add, Text, x%x1% yp-1 w40 h20 Border ; VpitstopRefuelServiceEdit, %pitstopRefuelServiceEdit%
+		Gui %window%:Add, Text, x%x3% yp+4 w50 h20, % translate("Liter")
+				
+		Gui %window%:Add, Text, x%x% yp+21 w80 h20 +0x200, % translate("Time in Pitlane")
+		Gui %window%:Add, Text, x%x1% yp-1 w40 h20 Border ; VpitstopRefuelServiceEdit, %pitstopRefuelServiceEdit%
+		Gui %window%:Add, Text, x%x3% yp+4 w50 h20, % translate("Seconds")
+				
+		Gui %window%:Add, Text, x%x% yp+21 w80 h20 +0x200, % translate("@ Finish")
+		Gui %window%:Add, Text, x%x1% yp-1 w40 h20 Border ; VpitstopRefuelServiceEdit, %pitstopRefuelServiceEdit%
+		Gui %window%:Add, Text, x%x3% yp+4 w50 h20, % translate("Laps")
 		
 		car := this.SelectedCar
 		track := this.SelectedTrack
@@ -556,7 +647,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		return new TelemetryDatabase().getTracks(simulator, car)
 	}
 	
-	showScatterPlot(data, xAxis, yAxises) {
+	showDataPlot(data, xAxis, yAxises) {
 		this.iSelectedChart := "LapTimes"
 		
 		double := (yAxises.Length() > 1)
@@ -565,10 +656,15 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		drawChartFunction .= "function drawChart() {"
 		drawChartFunction .= "`nvar data = new google.visualization.DataTable();"
+		
+		if (this.SelectedChartType = "Bubble")
+			drawChartFunction .= ("`ndata.addColumn('string', 'ID');")
+		
 		drawChartFunction .= ("`ndata.addColumn('number', '" . xAxis . "');")
 		
-		for ignore, yAxis in yAxises
+		for ignore, yAxis in yAxises {
 			drawChartFunction .= ("`ndata.addColumn('number', '" . yAxis . "');")
+		}
 		
 		drawChartFunction .= "`ndata.addRows(["
 		
@@ -581,7 +677,10 @@ class StrategyWorkbench extends ConfigurationItem {
 			if ((value = "n/a") || (value == kNull))
 				value := "null"
 
-			drawChartFunction .= ("[" . value)
+			if (this.SelectedChartType = "Bubble")
+				drawChartFunction .= ("['', " . value)
+			else
+				drawChartFunction .= ("[" . value)
 		
 			for ignore, yAxis in yAxises {
 				value := values[yAxis]
@@ -615,7 +714,6 @@ class StrategyWorkbench extends ConfigurationItem {
 		vAxis .= "}"
 		
 		if (this.SelectedChartType = "Scatter") {
-		
 			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom'}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#D8D8D8', hAxis: { title: '" . translate(xAxis) . "', gridlines: { color: 'E0E0E0' } }, " . series . ", " . vAxis . "};")
 				
 			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.ScatterChart(document.getElementById('chart_id')); chart.draw(data, options); }"
@@ -624,6 +722,11 @@ class StrategyWorkbench extends ConfigurationItem {
 			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom'}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#D8D8D8', hAxis: { viewWindowMode: 'pretty' }, vAxis: { viewWindowMode: 'pretty' } };")
 				
 			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.BarChart(document.getElementById('chart_id')); chart.draw(data, options); }"
+		}
+		else if (this.SelectedChartType = "Bubble") {
+			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom'}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#D8D8D8', hAxis: { title: '" . translate(xAxis) . "', viewWindowMode: 'pretty' }, vAxis: { title: '" . translate(yAxises[1]) . "', viewWindowMode: 'pretty' }, colorAxis: { legend: {position: 'none'}, colors: ['blue', 'red'] }, sizeAxis: { maxSize: 15 } };")
+				
+			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.BubbleChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 		}
 		else if (this.SelectedChartType = "Line") {
 			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom'}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#D8D8D8' };")
@@ -774,7 +877,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		this.iSelectedChartType := chartType
 		
-		GuiControl Choose, chartTypeDropDown, % inList(["Scatter", "Bar", "Line"], chartType)
+		GuiControl Choose, chartTypeDropDown, % inList(["Scatter", "Bar", "Bubble", "Line"], chartType)
 
 		telemetryDB := new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
 		weather := this.SelectedWeather
@@ -791,6 +894,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		GuiControlGet dataXDropDown
 		GuiControlGet dataY1DropDown
 		GuiControlGet dataY2DropDown
+		GuiControlGet dataY3DropDown
 		
 		schema := filterSchema(kTelemetrySchemas[this.SelectedDataType])
 		
@@ -800,7 +904,10 @@ class StrategyWorkbench extends ConfigurationItem {
 		if (dataY2DropDown > 1)
 			yAxises.Push(schema[dataY2DropDown - 1])
 		
-		this.showScatterPlot(records, xAxis, yAxises)
+		if (dataY3DropDown > 1)
+			yAxises.Push(schema[dataY3DropDown - 1])
+		
+		this.showDataPlot(records, xAxis, yAxises)
 	}
 }
 
@@ -903,6 +1010,7 @@ chooseDataType() {
 	GuiControl, , dataXDropDown, % "|" . values2String("|", map(schema, "translate")*)
 	GuiControl, , dataY1DropDown, % "|" . values2String("|", map(schema, "translate")*)
 	GuiControl, , dataY2DropDown, % "|" . translate("None") . "|" . values2String("|", map(schema, "translate")*)
+	GuiControl, , dataY3DropDown, % "|" . translate("None") . "|" . values2String("|", map(schema, "translate")*)
 	
 	if (dataType = "Electronics") {
 		GuiControl Choose, dataXDropDown, % inList(schema, "Map")
@@ -914,6 +1022,7 @@ chooseDataType() {
 	}
 	
 	GuiControl Choose, dataY2DropDown, 1
+	GuiControl Choose, dataY3DropDown, 1
 	
 	workbench.loadChart(workbench.SelectedChartType)
 	
@@ -937,7 +1046,7 @@ chooseChartType() {
 	
 	GuiControlGet chartTypeDropDown
 	
-	StrategyWorkbench.Instance.loadChart(["Scatter", "Bar", "Line"][chartTypeDropDown])
+	StrategyWorkbench.Instance.loadChart(["Scatter", "Bar", "Bubble", "Line"][chartTypeDropDown])
 }
 
 setButtonIcon(buttonHandle, file, index := 1, options := "") {

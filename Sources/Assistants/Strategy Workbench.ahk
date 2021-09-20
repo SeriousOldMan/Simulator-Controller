@@ -341,7 +341,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		Gui %window%:Add, Button, x574 y632 w80 h23 GcloseWorkbench, % translate("Close")
 
-		Gui %window%:Add, Tab, x16 ys+39 w593 h192 -Wrap Section, % values2String("|", map(["Rules && Settings", "Pitstop && Service", "Tyres && Electronics", "Strategy"], "translate")*)
+		Gui %window%:Add, Tab, x16 ys+39 w593 h192 -Wrap Section, % values2String("|", map(["Rules && Settings", "Pitstop && Service", "Simulation", "Strategy"], "translate")*)
 		
 		Gui %window%:Tab, 1
 		
@@ -395,7 +395,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 
 		Gui %window%:Add, Text, x%x5% yp+23 w90 h20, % translate("Pitstops")
-		Gui %window%:Add, DropDownList, x%x7% yp-4 w80 AltSubmit Choose1 +0x200, % values2String("|", map(["Optional", "Free", "Window"], "translate")*)
+		Gui %window%:Add, DropDownList, x%x7% yp-4 w80 AltSubmit Choose1 +0x200, % values2String("|", map(["Optional", "Required", "Window"], "translate")*)
 		Gui %window%:Add, Edit, x%x11% yp+1 w50 h20 ; VraceDurationEdit, %raceDurationEdit%
 		Gui %window%:Add, Text, x%x12% yp+3 w110 h20, % translate("Minute (From - To)")
 
@@ -449,82 +449,6 @@ class StrategyWorkbench extends ConfigurationItem {
 		x := 32
 		x0 := x - 4
 		x1 := x + 74
-		x2 := x1 + 32
-		x3 := x2 + 26
-		x4 := x1 + 16
-		
-		x5 := 243 + 8
-		x6 := x5 - 4
-		x7 := x5 + 74
-		x8 := x7 + 32
-		x9 := x8 + 26
-		x10 := x7 + 16
-		
-		x11 := x7 + 82
-		x12 := x11 + 56
-		
-		Gui %window%:Font, Norm, Arial
-		Gui %window%:Font, Italic, Arial
-		
-		Gui %window%:Add, GroupBox, -Theme x24 ys+34 w209 h147, % translate("Tyres")
-		
-		Gui %window%:Font, Norm, Arial
-		
-		Gui %window%:Add, Text, x%x% yp+21 w85 h23 +0x200, % translate("Compound")
-		
-		compound := this.SelectedCompound[true]
-		choices := map(kQualifiedTyreCompounds, "translate")
-		chosen := inList(kQualifiedTyreCompounds, compound)
-		
-		if (!chosen && (choices.Length() > 0)) {
-			compound := choices[1]
-			chosen := 1
-		}
-		
-		Gui %window%:Add, DropDownList, x%x1% yp w114 AltSubmit Choose%chosen%, % values2String("|", choices*)
-		
-		Gui %window%:Add, Text, x%x% yp+24 w85 h23 +0x200, % translate("Max. Tyre Life")
-		Gui %window%:Add, Edit, x%x1% yp w50 h20 Limit4 Number ; VraceDurationEdit, %raceDurationEdit%
-		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 Range1-9999 0x80 ; , %raceDurationEdit%
-		Gui %window%:Add, Text, x%x3% yp+4 w60 h20, % translate("Laps")
-
-		Gui %window%:Add, Text, x%x% yp+21 w85 h23 +0x200, % translate("Opt. Tyre Life")
-		Gui %window%:Add, Edit, x%x1% yp w50 h20 Limit4 Number ; VraceDurationEdit, %raceDurationEdit%
-		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 Range1-9999 0x80 ; , %raceDurationEdit%
-		Gui %window%:Add, Text, x%x3% yp+4 w60 h20, % translate("Laps")
-		
-		Gui %window%:Font, Norm, Arial
-		Gui %window%:Font, Italic, Arial
-		
-		Gui %window%:Add, GroupBox, -Theme x243 ys+34 w209 h147, % translate("Map && Consumption")
-		
-		Gui %window%:Font, Norm, Arial
-		
-		Gui %window%:Add, Text, x%x5% yp+21 w70 h20 +0x200, % translate("Map")
-		Gui %window%:Add, Edit, x%x7% yp-1 w50 h20 ; VpitstopRefuelServiceEdit, %pitstopRefuelServiceEdit%
-		Gui %window%:Add, UpDown, x%x8% yp-2 w18 h20 ; , %safetyFuelEdit%
-		
-		Gui %window%:Add, Text, x%x5% yp+25 w70 h20 +0x200, % translate("TC / ABS")
-		Gui %window%:Add, Edit, x%x7% yp-1 w50 h20 ; VpitstopRefuelServiceEdit, %pitstopRefuelServiceEdit%
-		Gui %window%:Add, UpDown, x%x8% yp-2 w18 h20 ; , %safetyFuelEdit%
-		
-		Gui %window%:Add, Edit, x%x9% yp w50 h20 ; VpitstopRefuelServiceEdit, %pitstopRefuelServiceEdit%
-		Gui %window%:Add, UpDown, x%x10% yp-2 w18 h20 ; , %safetyFuelEdit%
-		
-		Gui %window%:Add, Text, x%x5% yp+23 w85 h23 +0x200, % translate("Avg. Laptime")
-		Gui %window%:Add, Edit, x%x7% yp w50 h20 Limit3 Number ; VavgLaptimeEdit, %avgLaptimeEdit%
-		Gui %window%:Add, UpDown, x%x8% yp-2 w18 h20 Range1-999 0x80 ; , %avgLaptimeEdit%
-		Gui %window%:Add, Text, x%x9% yp+4 w60 h20, % translate("Seconds")
-
-		Gui %window%:Add, Text, x%x5% yp+21 w85 h20 +0x200, % translate("Consumption")
-		Gui %window%:Add, Edit, x%x7% yp-2 w50 h20 ; VfuelConsumptionEdit, %fuelConsumptionEdit%
-		Gui %window%:Add, Text, x%x9% yp+4 w60 h20, % translate("Ltr. p. Lap")
-		
-		Gui %window%:Tab, 4
-		
-		x := 32
-		x0 := x - 4
-		x1 := x + 74
 		x2 := x1 + 22
 		x3 := x2 + 26
 		x4 := x1 + 16
@@ -532,7 +456,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		Gui %window%:Font, Italic, Arial
 
-		Gui %window%:Add, GroupBox, -Theme x24 ys+34 w174 h147, % translate("Start Setup")
+		Gui %window%:Add, GroupBox, -Theme x24 ys+34 w174 h147, % translate("Initial Setup")
 		
 		Gui %window%:Font, Norm, Arial
 		
@@ -579,7 +503,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		Gui %window%:Font, Italic, Arial
 
-		Gui %window%:Add, GroupBox, -Theme x204 ys+34 w174 h147, % translate("Simulation")
+		Gui %window%:Add, GroupBox, -Theme x204 ys+34 w174 h147, % translate("Optimizer")
 		
 		Gui %window%:Font, Norm, Arial
 				
@@ -603,7 +527,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		Gui %window%:Font, Italic, Arial
 
-		Gui %window%:Add, GroupBox, -Theme x389 ys+34 w207 h147, % translate("Strategy")
+		Gui %window%:Add, GroupBox, -Theme x389 ys+34 w207 h147, % translate("Results")
 		
 		Gui %window%:Font, Norm, Arial
 				
@@ -624,6 +548,77 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, Text, x%x% yp+21 w80 h20 +0x200, % translate("@ Finish")
 		Gui %window%:Add, Text, x%x1% yp-1 w40 h20 Border ; VpitstopRefuelServiceEdit, %pitstopRefuelServiceEdit%
 		Gui %window%:Add, Text, x%x3% yp+4 w50 h20, % translate("Laps")
+		
+		Gui %window%:Tab, 4
+		
+		x := 32
+		x0 := x - 4
+		x1 := x + 74
+		x2 := x1 + 32
+		x3 := x2 + 26
+		x4 := x1 + 16
+		
+		x5 := 243 + 8
+		x6 := x5 - 4
+		x7 := x5 + 74
+		x8 := x7 + 32
+		x9 := x8 + 26
+		x10 := x7 + 16
+		
+		x11 := x7 + 82
+		x12 := x11 + 56
+		
+		Gui %window%:Font, Norm, Arial
+		Gui %window%:Font, Italic, Arial
+		
+		Gui %window%:Add, GroupBox, -Theme x24 ys+34 w209 h147, % translate("Setup")
+		
+		Gui %window%:Font, Norm, Arial
+		
+		Gui %window%:Add, Text, x%x% yp+21 w85 h23 +0x200, % translate("Compound")
+		
+		compound := this.SelectedCompound[true]
+		choices := map(kQualifiedTyreCompounds, "translate")
+		chosen := inList(kQualifiedTyreCompounds, compound)
+		
+		if (!chosen && (choices.Length() > 0)) {
+			compound := choices[1]
+			chosen := 1
+		}
+		
+		Gui %window%:Add, DropDownList, x%x1% yp w114 AltSubmit Choose%chosen%, % values2String("|", choices*)
+		
+		Gui %window%:Add, Text, x%x% yp+25 w70 h20 +0x200, % translate("Map")
+		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 ; VpitstopRefuelServiceEdit, %pitstopRefuelServiceEdit%
+		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 ; , %safetyFuelEdit%
+		
+		Gui %window%:Add, Text, x%x% yp+25 w70 h20 +0x200, % translate("TC / ABS")
+		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 ; VpitstopRefuelServiceEdit, %pitstopRefuelServiceEdit%
+		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 ; , %safetyFuelEdit%
+		
+		Gui %window%:Add, Edit, x%x3% yp w50 h20 ; VpitstopRefuelServiceEdit, %pitstopRefuelServiceEdit%
+		Gui %window%:Add, UpDown, x%x6% yp-2 w18 h20 ; , %safetyFuelEdit%
+		
+		Gui %window%:Add, Text, x%x% yp+23 w85 h23 +0x200, % translate("Avg. Laptime")
+		Gui %window%:Add, Edit, x%x1% yp w50 h20 Limit3 Number ; VavgLaptimeEdit, %avgLaptimeEdit%
+		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 Range1-999 0x80 ; , %avgLaptimeEdit%
+		Gui %window%:Add, Text, x%x3% yp+4 w60 h20, % translate("Seconds")
+
+		Gui %window%:Add, Text, x%x% yp+21 w85 h20 +0x200, % translate("Consumption")
+		Gui %window%:Add, Edit, x%x1% yp-2 w50 h20 ; VfuelConsumptionEdit, %fuelConsumptionEdit%
+		Gui %window%:Add, Text, x%x3% yp+4 w60 h20, % translate("Ltr. p. Lap")
+		
+		Gui %window%:Font, Italic, Arial
+		
+		Gui %window%:Add, GroupBox, -Theme x243 ys+34 w209 h147, % translate("Pitstops")
+		
+		Gui %window%:Font, Norm, Arial
+		
+		Gui %window%:Add, ListView, x%x5% yp+21 w192 h115 -Multi -LV0x10 AltSubmit NoSort NoSortHdr, % values2String("|", map(["Lap", "Refuel", "Tyre Change", "Map"], "translate")*)
+		
+		this.iDataListView := dataListView
+		
+		Gui %window%:Font, Norm, Arial
 		
 		car := this.SelectedCar
 		track := this.SelectedTrack

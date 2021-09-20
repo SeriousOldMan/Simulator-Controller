@@ -739,7 +739,7 @@ createShortcuts(location, installLocation) {
 		
 		FileCreateShortcut %installLocation%\Binaries\Simulator Tools.exe, %location%\Uninstall.lnk, %installLocation%\Binaries, -Uninstall
 		
-		for ignore, name in ["Simulator Startup", "Simulator Settings", "Simulator Setup", "Simulator Configuration", "Race Settings", "Setup Database", "Race Reports"]
+		for ignore, name in ["Simulator Startup", "Simulator Settings", "Simulator Setup", "Simulator Configuration", "Race Settings", "Setup Database", "Race Reports", "Strategy Workbench"]
 			FileCreateShortCut %installLocation%\Binaries\%name%.exe, %location%\%name%.lnk, %installLocation%\Binaries
 	}
 	else
@@ -765,7 +765,7 @@ deleteShortcuts(location) {
 		}
 	}
 	
-	for ignore, name in ["Simulator Startup", "Simulator Settings", "Simulator Setup", "Simulator Configuration", "Race Settings", "Setup Database", "Race Reports"]
+	for ignore, name in ["Simulator Startup", "Simulator Settings", "Simulator Setup", "Simulator Configuration", "Race Settings", "Setup Database", "Race Reports", "Strategy Workbench"]
 		try {
 			FileDelete %location%\%name%.lnk
 		}
@@ -793,6 +793,7 @@ writeAppPaths(installLocation) {
 	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceSettings.exe,, %installLocation%\Binaries\Race Settings.exe
 	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupDatabase.exe,, %installLocation%\Binaries\Setup Database.exe
 	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceReports.exe,, %installLocation%\Binaries\Race Reports.exe
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\StrategyWorkbench.exe,, %installLocation%\Binaries\Strategy Workbench.exe
 }
 
 deleteAppPaths() {
@@ -1363,6 +1364,16 @@ renewConsent() {
 		setConfigurationValue(consent, "General", "ReNew", true)
 		
 		writeConfiguration(kUserConfigDirectory . "CONSENT", consent)
+	}
+}
+
+updateInstallationForV358() {
+	installOptions := readConfiguration(kUserConfigDirectory . "Simulator Controller.install")
+	
+	if (getConfigurationValue(installOptions, "Shortcuts", "StartMenu", false)) {
+		installLocation := getConfigurationValue(installOptions, "Install", "Location")
+		
+		FileCreateShortCut %installLocation%\Binaries\Strategy Workbench.exe, %A_StartMenu%\Simulator Controller\Strategy Workbench.lnk, %installLocation%\Binaries
 	}
 }
 

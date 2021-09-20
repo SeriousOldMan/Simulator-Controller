@@ -26,13 +26,14 @@ Release 3.5.8 Checklist
    b. Rename "Setup Database" => "Database"
    c. Phrase Grammars
    d. Plugin Labels
+   e. Update for Start Menu Shortcuts => Strategy Workbench
 2. Rename "Setup Database" => "Database"
    a. Update Notes
 3. Cato is now also active during a practice session
    a. Update Notes
 4. New action "openStrategyWorkbench"
    a. Documentation
-4. New plugin action "StrategyWorkbenchOpen"
+5. New plugin action "StrategyWorkbenchOpen"
    a. Documentation
 
 Release 3.5.6 Checklist

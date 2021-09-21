@@ -694,7 +694,7 @@ restart:
 		Gui RES:Add, UpDown, x158 yp-2 w18 h20 Range1-9 0x80, %pitstopStrategyWindowEdit%
 		Gui RES:Add, Text, x184 yp+4 w290 h20, % translate("Laps +/- around optimal lap")
 
-		Gui RES:Add, Text, x16 yp+22 w105 h20 +0x200, % translate("Pitstop Delta")
+		Gui RES:Add, Text, x16 yp+22 w105 h20 +0x200, % translate("Pitlane Delta")
 		Gui RES:Add, Edit, x126 yp-2 w50 h20 Limit2 Number VpitstopDeltaEdit, %pitstopDeltaEdit%
 		Gui RES:Add, UpDown, x158 yp-2 w18 h20 0x80, %pitstopDeltaEdit%
 		Gui RES:Add, Text, x184 yp+4 w290 h20, % translate("Seconds (Drive through - Drive by)")

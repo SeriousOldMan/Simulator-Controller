@@ -1387,6 +1387,14 @@ updateInstallationForV354() {
 	}
 }
 
+updateConfigurationForV358() {
+	sourceDirectory := (kUserHomeDirectory . "Setup Database")
+	destinationDirectory := (kUserHomeDirectory . "Database")
+	
+	if FileExist(sourceDirectory)
+		FileMoveDir %sourceDirectory%, %destinationDirectory%, 1
+}
+
 updateConfigurationForV314() {
 	if FileExist(kUserConfigDirectory . "Race Engineer.settings")
 		try {

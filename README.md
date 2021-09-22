@@ -26,7 +26,9 @@ Simply donwload and run [Simulator Controller.exe](https://cntr.click/Qt9gVs0) (
 
 #### Latest development build
 
-None for the moment...
+[3.5.8-dev](https://cntr.click/Ymfs65z) (Development build for Release 3.5.8. New features: Renamed "Setup Database" to "Database", New "Strategy Workbench" tool, "Race Strategist" can now save race statistics for the "Strategy Workbench", New plugin parameter "openStrategyWorkbench" for "Race Strategist" plugin, New "openStrategyWorkbench" action function, Fixed "Setup Wizard" to correctly generate "Pedal Calibration" configuration, New lightweight Database Library for Developers. Stable, incl. update procedure and prelimanary documentation.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-358) of this version and all the versions you might have skipped, before installing and using this version.
 
 #### Latest release build
 

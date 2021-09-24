@@ -1,4 +1,4 @@
-## 3.5.8-release 09/24/21 (planned)
+## 3.5.8-release 09/24/21
 
   1. Bugfixes, as always
   2. Documentation updates, as always

@@ -2,12 +2,12 @@
 Version=3.5.8-release
 Target=3.5.8-release
 Date=09/24/2021
-Download=https://cntr.click/V4ky8fh
+Download=https://www.dropbox.com/s/8ne5ppbog2zf9wb/Simulator%20Controller%203.5.8-release.zip?dl=1
 Changes=Renamed "Setup Database" to "Database", New "Strategy Workbench" tool, "Race Strategist" can now save race statistics for the "Strategy Workbench", New plugin parameter "openStrategyWorkbench" for "Race Strategist" plugin, New "openStrategyWorkbench" action function, Fixed "Setup Wizard" to correctly generate "Pedal Calibration" configuration, New lightweight Database Library for Developers
 [Release]
 Version=3.5.8-release
 Date=09/24/2021
-Download=https://cntr.click/V4ky8fh
+Download=https://www.dropbox.com/s/8ne5ppbog2zf9wb/Simulator%20Controller%203.5.8-release.zip?dl=1
 Changes=Renamed "Setup Database" to "Database", New "Strategy Workbench" tool, "Race Strategist" can now save race statistics for the "Strategy Workbench", New plugin parameter "openStrategyWorkbench" for "Race Strategist" plugin, New "openStrategyWorkbench" action function, Fixed "Setup Wizard" to correctly generate "Pedal Calibration" configuration, New lightweight Database Library for Developers
 [Current]
 Type=Release

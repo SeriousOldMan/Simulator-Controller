@@ -12,5 +12,5 @@ Changes=Renamed "Setup Database" to "Database", New "Strategy Workbench" tool, "
 [Current]
 Type=Release
 [Version]
-Release=3.5.6-release
+Release=3.5.8-release
 Development=3.5.8-release

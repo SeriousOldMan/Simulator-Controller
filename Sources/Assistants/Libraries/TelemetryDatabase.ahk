@@ -59,29 +59,62 @@ class TelemetryDatabase extends SessionDatabase {
 	}
 	
 	getElectronicEntries(weather, compound, compoundColor) {
-		return this.Database.query("Electronics", {Filter: "removeInvalidLaps", Where: Func("columnEqual").Bind({Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor})})
+		if this.Database
+			return this.Database.query("Electronics", {Filter: "removeInvalidLaps", Where: Func("constraintColumns").Bind({Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor})})
+		else
+			return []
 	}
 	
 	getTyreEntries(weather, compound, compoundColor) {
-		return this.Database.query("Tyres", {Filter: "removeInvalidLaps", Where: Func("columnEqual").Bind({Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor})})
+		if this.Database
+			return this.Database.query("Tyres", {Filter: "removeInvalidLaps", Where: Func("constraintColumns").Bind({Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor})})
+		else
+			return []
 	}
 	
 	getMapsCount(weather, compound, compoundColor) {
-		return this.Database.query("Electronics", {Select: ["Map"]
-												 , GroupBy: ["Map"] , Group: Func("columnCount").Bind("Map"), flatten: true
-												 , Filter: "removeInvalidLaps"
-												 , Where: Func("columnEqual").Bind({Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor})})
+		if this.Database
+			return this.Database.query("Electronics", {Select: ["Map"]
+													 , GroupBy: ["Map"] , Group: Func("countColumn").Bind("Map", "Count"), flatten: true
+													 , Filter: "removeInvalidLaps"
+													 , Where: Func("constraintColumns").Bind({Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor})})
+		else
+			return []
+	}
+	
+	getMapLapTimes(weather, compound, compoundColor) {
+		if this.Database
+			return this.Database.query("Electronics", {Select: ["Map", "Lap.Time"]
+													 , GroupBy: ["Map"] , Group: Func("groupColumn").Bind("Map", "average", "Lap.Time"), flatten: true
+													 , Filter: "removeInvalidLaps"
+													 , Where: Func("constraintColumns").Bind({Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor})})
+		else
+			return []
+	}
+	
+	getTyreLifeLapTimes(weather, compound, compoundColor) {
+		if this.Database
+			return this.Database.query("Tyres", {Select: ["Tyre.Laps", "Lap.Time"]
+											   , GroupBy: ["Tyre.Life"] , Group: Func("groupColumn").Bind("Tyre.Laps", "minimum", "Lap.Time"), flatten: true
+											   , Filter: "removeInvalidLaps"
+											   , Where: Func("constraintColumns").Bind({Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor})})
+		else
+			return []
 	}
 	
 	getPressuresCount(weather, compound, compoundColor) {
-		rows := this.Database.query("Tyres", {Where: Func("columnEqual").Bind({Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor})})
-		
-		for ignore, row in rows {
-			row["Tyre.Pressure"] := Round(average([row["Tyre.Pressure.FL"], row["Tyre.Pressure.FR"], row["Tyre.Pressure.RL"], row["Tyre.Pressure.RR"]]), 1)
-			row["Tyre.Temperature"] := Round(average([row["Tyre.Temperature.FL"], row["Tyre.Temperature.FR"], row["Tyre.Temperature.RL"], row["Tyre.Temperature.RR"]]), 1)
+		if this.Database {
+			rows := this.Database.query("Tyres", {Where: Func("constraintColumns").Bind({Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor})})
+			
+			for ignore, row in rows {
+				row["Tyre.Pressure"] := Round(average([row["Tyre.Pressure.FL"], row["Tyre.Pressure.FR"], row["Tyre.Pressure.RL"], row["Tyre.Pressure.RR"]]), 1)
+				row["Tyre.Temperature"] := Round(average([row["Tyre.Temperature.FL"], row["Tyre.Temperature.FR"], row["Tyre.Temperature.RL"], row["Tyre.Temperature.RR"]]), 1)
+			}
+			
+			return countColumn("Tyre.Pressure", "Count", rows)
 		}
-		
-		return columnCount("Tyre.Pressure", rows)
+		else
+			return []
 	}
 		
 	addElectronicEntry(weather, airTemperature, trackTemperature, compound, compoundColor, map, tc, abs, fuelRemaining, fuelConsumption, lapTime) {
@@ -105,83 +138,8 @@ class TelemetryDatabase extends SessionDatabase {
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                    Public Function Declaration Section                 ;;;
-;;;-------------------------------------------------------------------------;;;
-
-minimum(numbers) {
-	min := 0
-	
-	for ignore, number in numbers
-		min := (!min ? number : Min(min, number))
-
-	return min
-}
-
-maximum(numbers) {
-	max := 0
-	
-	for ignore, number in numbers
-		max := (!max ? number : Max(max, number))
-
-	return max
-}
-
-average(numbers) {
-	avg := 0
-	
-	for ignore, value in numbers
-		avg += value
-	
-	return (avg / numbers.Length())
-}
-
-stdDeviation(numbers) {
-	avg := average(numbers)
-	
-	squareSum := 0
-	
-	for ignore, value in numbers
-		squareSum += ((value - avg) * (value - avg))
-	
-	return Sqrt(squareSum)
-}
-
-
-;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
-
-columnEqual(constraints, row) {
-	for column, value in constraints
-		if (row[column] != value)
-			return false
-		
-	return true
-}
-
-columnCount(column, rows) {
-	values := {}
-	
-	for ignore, row in rows {
-		value := row[column]
-	
-		if values.HasKey(value)
-			values[value] := values[value] + 1
-		else
-			values[value] := 1
-	}
-	
-	result := []
-	
-	for value, count in values {
-		object := {Count: count}
-		object[column] := value
-		
-		result.Push(object)
-	}
-	
-	return result
-}
 
 removeInvalidLaps(rows) {
 	lapTimes := []

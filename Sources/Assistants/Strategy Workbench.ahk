@@ -72,8 +72,13 @@ global stintLengthEdit = 70
 global formationLapCheck = true
 global postRaceLapCheck = true
 
+global settingsMenuDropDown
+global simulationMenuDropDown
+global strategyMenuDropDown
+
 global pitstopRequirementsDropDown
 global pitstopWindowEdit = "25-35"
+global pitstopWindowLabel
 global tyreChangeRequirementsDropDown
 global refuelRequirementsDropDown
 
@@ -93,6 +98,25 @@ global simABSEdit = 2
 global simConsumptionWeight = 20
 global simTyreUsageWeight = 60
 global simCarWeightWeight = 80
+
+global simNumPitstopResult = ""
+global simNumTyreChangeResult = ""
+global simConsumedFuelResult = ""
+global simPitlaneSecondsResult = ""
+global simSessionResultResult = ""
+global simSessionResultLabel
+
+global strategyStartMapEdit = 1
+global strategyStartTCEdit = 1
+global strategyStartABSEdit = 2
+global strategyAvgLapTimeEdit = 120
+global strategyFuelConsumptionEdit = 3.8
+
+global strategyCompoundDropDown
+global strategyPressureFLEdit = 27.7
+global strategyPressureFREdit = 27.7
+global strategyPressureRLEdit = 27.7
+global strategyPressureRREdit = 27.7
 
 class StrategyWorkbench extends ConfigurationItem {
 	iDataListView := false
@@ -344,13 +368,12 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, Text, x50 yp+5 w80 h26, % translate("Strategy")
 		
 		Gui %window%:Font, s8 Norm, Arial
+
+		Gui %window%:Add, DropDownList, x220 yp-2 w180 AltSubmit Choose1 +0x200 VsettingsMenuDropDown gsettingsMenu, % values2String("|", map(["Settings", "---------------------------------------------", "Initialize from Setup Database...", "Initialize from Telemetry...", "Initialize from Simulation...", "Initialize from Defaults...", "---------------------------------------------", "Save Defaults"], "translate")*)
 		
-		Gui %window%:Add, DropDownList, x230 yp-2 w150 AltSubmit Choose1 +0x200, % values2String("|", map(["Settings", "-----------------------------------------", "Load from Setup Database...", "Update from Telemetry...", "Import from Simulation...", "-----------------------------------------", "Load Defaults", "Edit Defaults..."], "translate")*)
+		Gui %window%:Add, DropDownList, x405 yp w180 AltSubmit Choose1 +0x200 VsimulationMenuDropDown gsimulationMenu, % values2String("|", map(["Simulation", "---------------------------------------------", "Set Target Fuel Consumption...", "Set Target Tyre Usage...", "---------------------------------------------", "Run Simulation", "---------------------------------------------", "Use as Strategy..."], "translate")*)
 		
-		Gui %window%:Add, DropDownList, x385 yp w150 AltSubmit Choose1 +0x200, % values2String("|", map(["Simulation", "-----------------------------------------", "Set Target Fuel Consumption...", "Set Target Tyre Life...", "-----------------------------------------", "Run Simulation", "-----------------------------------------", "Take over as Strategy..."], "translate")*)
-		
-		Gui %window%:Add, DropDownList, x540 yp w150 AltSubmit Choose1 +0x200, % values2String("|", map(["Strategy", "-----------------------------------------", "Load Strategy...", "Save Strategy...", "Compare Strategies...", "-----------------------------------------", "Export Strategy..."], "translate")*)
-		
+		Gui %window%:Add, DropDownList, x590 yp w180 AltSubmit Choose1 +0x200 VstrategyMenuDropDown gstrategyMenu, % values2String("|", map(["Strategy", "---------------------------------------------", "Load Strategy...", "Save Strategy...", "Compare Strategies...", "---------------------------------------------", "Export Strategy..."], "translate")*)
 		
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
@@ -423,9 +446,9 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 
 		Gui %window%:Add, Text, x%x5% yp+23 w90 h20, % translate("Pitstop")
-		Gui %window%:Add, DropDownList, x%x7% yp-4 w75 AltSubmit Choose1 VpitstopRequirementsDropDown, % values2String("|", map(["Optional", "Required", "Window"], "translate")*)
+		Gui %window%:Add, DropDownList, x%x7% yp-4 w75 AltSubmit Choose3 VpitstopRequirementsDropDown, % values2String("|", map(["Optional", "Required", "Window"], "translate")*)
 		Gui %window%:Add, Edit, x%x11% yp+1 w50 h20 VpitstopWindowEdit, %pitstopWindowEdit%
-		Gui %window%:Add, Text, x%x12% yp+3 w110 h20, % translate("Minute (From - To)")
+		Gui %window%:Add, Text, x%x12% yp+3 w110 h20 VpitstopWindowLabel, % translate("Minute (From - To)")
 
 		Gui %window%:Add, Text, x%x5% yp+22 w85 h23 +0x200, % translate("Tyre Change")
 		Gui %window%:Add, DropDownList, x%x7% yp w75 AltSubmit Choose1 VtyreChangeRequirementsDropDown, % values2String("|", map(["Required", "Optional"], "translate")*)
@@ -544,7 +567,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, Text, x%x% yp+24 w100 h20 +0x200, % translate("Car Weight")
 		Gui %window%:Add, Slider, x%x1% yp w60 0x10 Range0-100 ToolTip VsimCarWeightWeight, %simCarWeightWeight%
 		
-		Gui %window%:Add, Button, x%x% yp+48 w160 h20, % translate("Simulate!")
+		Gui %window%:Add, Button, x%x% yp+48 w160 h20 grunSimulation, % translate("Simulate!")
 		
 		x := 407
 		x0 := x - 4
@@ -558,24 +581,24 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, GroupBox, -Theme x399 ys+34 w197 h147, % translate("Results")
 		
 		Gui %window%:Font, Norm, Arial
-				
+
 		Gui %window%:Add, Text, x%x% yp+21 w90 h20 +0x200, % translate("# Pitstops")
-		Gui %window%:Add, Text, x%x1% yp-1 w40 h20 Border ; VpitstopRefuelServiceEdit, %pitstopRefuelServiceEdit%
+		Gui %window%:Add, Text, x%x1% yp-1 w40 h20 Border VsimNumPitstopResult, %simNumPitstopResult%
 		
 		Gui %window%:Add, Text, x%x% yp+25 w90 h20 +0x200, % translate("# Tyre Changes")
-		Gui %window%:Add, Text, x%x1% yp-1 w40 h20 Border ; VpitstopRefuelServiceEdit, %pitstopRefuelServiceEdit%
+		Gui %window%:Add, Text, x%x1% yp-1 w40 h20 Border VsimNumTyreChangeResult, %simNumTyreChangeResult%
 				
 		Gui %window%:Add, Text, x%x% yp+25 w90 h20 +0x200, % translate("Consumed Fuel")
-		Gui %window%:Add, Text, x%x1% yp-1 w40 h20 Border ; VpitstopRefuelServiceEdit, %pitstopRefuelServiceEdit%
+		Gui %window%:Add, Text, x%x1% yp-1 w40 h20 Border VsimConsumedFuelResult, %simConsumedFuelResult%
 		Gui %window%:Add, Text, x%x3% yp+4 w50 h20, % translate("Liter")
 				
 		Gui %window%:Add, Text, x%x% yp+21 w90 h20 +0x200, % translate("@ Pitlane")
-		Gui %window%:Add, Text, x%x1% yp-1 w40 h20 Border ; VpitstopRefuelServiceEdit, %pitstopRefuelServiceEdit%
+		Gui %window%:Add, Text, x%x1% yp-1 w40 h20 Border VsimPitlaneSecondsResult, %simPitlaneSecondsResult%
 		Gui %window%:Add, Text, x%x3% yp+4 w50 h20, % translate("Sec.")
 				
 		Gui %window%:Add, Text, x%x% yp+21 w90 h20 +0x200, % translate("@ Finish")
-		Gui %window%:Add, Text, x%x1% yp-1 w40 h20 Border ; VpitstopRefuelServiceEdit, %pitstopRefuelServiceEdit%
-		Gui %window%:Add, Text, x%x3% yp+4 w50 h20, % translate("Laps")
+		Gui %window%:Add, Text, x%x1% yp-1 w40 h20 Border VsimSessionResultResult, %simSessionResultResult%
+		Gui %window%:Add, Text, x%x3% yp+4 w50 h20 VsimSessionResultLabel, % translate("Laps")
 		
 		Gui %window%:Tab, 4
 		
@@ -602,26 +625,26 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, GroupBox, -Theme x24 ys+34 w179 h147, % translate("Electronics")
 		
 		Gui %window%:Font, Norm, Arial
-		
+
 		Gui %window%:Add, Text, x%x% yp+21 w70 h20 +0x200, % translate("Map")
-		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 ; VpitstopRefuelServiceEdit, %pitstopRefuelServiceEdit%
-		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 ; , %safetyFuelEdit%
+		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 VstrategyStartMapEdit, %strategyStartMapEdit%
+		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20, %strategyStartMapEdit%
 		
 		Gui %window%:Add, Text, x%x% yp+25 w70 h20 +0x200, % translate("TC")
-		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 ; VpitstopRefuelServiceEdit, %pitstopRefuelServiceEdit%
-		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 ; , %safetyFuelEdit%
+		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 VstrategyStartTCEdit, %strategyStartTCEdit%
+		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20, %strategyStartTCEdit%
 		
 		Gui %window%:Add, Text, x%x% yp+25 w70 h20 +0x200, % translate("ABS")
-		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 ; VpitstopRefuelServiceEdit, %pitstopRefuelServiceEdit%
-		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 ; , %safetyFuelEdit%
+		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 VstrategyStartABSEdit, %strategyStartABSEdit%
+		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20, %strategyStartABSEdit%
 		
 		Gui %window%:Add, Text, x%x% yp+23 w85 h23 +0x200, % translate("Avg. Laptime")
-		Gui %window%:Add, Edit, x%x1% yp w50 h20 Limit3 Number ; VavgLaptimeEdit, %avgLaptimeEdit%
-		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 Range1-999 0x80 ; , %avgLaptimeEdit%
+		Gui %window%:Add, Edit, x%x1% yp w50 h20 Limit3 Number VstrategyAvgLapTimeEdit, %strategyAvgLapTimeEdit%
+		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 Range1-999 0x80, %strategyAvgLapTimeEdit%
 		Gui %window%:Add, Text, x%x3% yp+4 w30 h20, % translate("Sec.")
 
 		Gui %window%:Add, Text, x%x% yp+21 w85 h20 +0x200, % translate("Consumption")
-		Gui %window%:Add, Edit, x%x1% yp-2 w50 h20 ; VfuelConsumptionEdit, %fuelConsumptionEdit%
+		Gui %window%:Add, Edit, x%x1% yp-2 w50 h20 VstrategyFuelConsumptionEdit, %strategyFuelConsumptionEdit%
 		Gui %window%:Add, Text, x%x3% yp+4 w30 h20, % translate("Ltr.")
 		
 		x := 222
@@ -647,24 +670,24 @@ class StrategyWorkbench extends ConfigurationItem {
 			compound := choices[1]
 			chosen := 1
 		}
-		
-		Gui %window%:Add, DropDownList, x%x1% yp w85 AltSubmit Choose%chosen%, % values2String("|", choices*)
+
+		Gui %window%:Add, DropDownList, x%x1% yp w85 AltSubmit Choose%chosen% VstrategyCompoundDropDown, % values2String("|", choices*)
 
 		Gui %window%:Add, Text, x%x% yp+26 w85 h20 +0x200, % translate("Pressure")
 		Gui %window%:Add, Text, x%x0% yp w85 h20 +0x200, % translate("FL")
-		Gui %window%:Add, Edit, x%x1% yp-2 w50 h20 ; VfuelConsumptionEdit, %fuelConsumptionEdit%
+		Gui %window%:Add, Edit, x%x1% yp-2 w50 h20 VstrategyPressureFLEdit, %strategyPressureFLEdit%
 		Gui %window%:Add, Text, x%x3% yp+4 w30 h20, % translate("PSI")
 
 		Gui %window%:Add, Text, x%x0% yp+21 w85 h20 +0x200, % translate("FR")
-		Gui %window%:Add, Edit, x%x1% yp-2 w50 h20 ; VfuelConsumptionEdit, %fuelConsumptionEdit%
+		Gui %window%:Add, Edit, x%x1% yp-2 w50 h20 VstrategyPressureFREdit, %strategyPressureFREdit%
 		Gui %window%:Add, Text, x%x3% yp+4 w30 h20, % translate("PSI")
 
 		Gui %window%:Add, Text, x%x0% yp+21 w85 h20 +0x200, % translate("RL")
-		Gui %window%:Add, Edit, x%x1% yp-2 w50 h20 ; VfuelConsumptionEdit, %fuelConsumptionEdit%
+		Gui %window%:Add, Edit, x%x1% yp-2 w50 h20 VstrategyPressureRLEdit, %strategyPressureRLEdit%
 		Gui %window%:Add, Text, x%x3% yp+4 w30 h20, % translate("PSI")
 
 		Gui %window%:Add, Text, x%x0% yp+21 w85 h20 +0x200, % translate("RR")
-		Gui %window%:Add, Edit, x%x1% yp-2 w50 h20 ; VfuelConsumptionEdit, %fuelConsumptionEdit%
+		Gui %window%:Add, Edit, x%x1% yp-2 w50 h20 VstrategyPressureRREdit, %strategyPressureRREdit%
 		Gui %window%:Add, Text, x%x3% yp+4 w30 h20, % translate("PSI")
 		
 		x := 407
@@ -1034,12 +1057,101 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		this.showDataPlot(records, xAxis, yAxises)
 	}
+	
+	chooseSettingsMenu(line) {
+		switch line {
+			case 3: ; "Load from Setup Database..."
+			case 4: ; "Update from Telemetry..."
+				if (this.SelectedSimulator && this.SelectedCar && this.SelectedTrack) {
+					telemetryDB := new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
+					
+					mapLaptimes := telemetryDB.getMapLapTimes(this.SelectedWeather, this.SelectedCompound, this.SelectedCompoundColor)
+					tyreLaptimes := telemetryDB.getTyreLifeLapTimes(this.SelectedWeather, this.SelectedCompound, this.SelectedCompoundColor)
+				}
+			case 5: ; "Import from Simulation..."
+				simulator := this.SelectedSimulator
+				
+				if simulator {
+					switch simulator {
+						case "Assetto Corsa Competizione":
+							prefix := "ACC"
+						case "RaceRoom Racing Experience":
+							prefix := "R3E"
+						case "rFactor 2":
+							prefix := "RF2"
+						default:
+							OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+							title := translate("Warning")
+							MsgBox 262192, %title%, % translate("This is not supported for the selected simulator...")
+							OnMessage(0x44, "")
+							
+							return false
+					}
+					
+					data := readSimulatorData(prefix)
+				}
+			case 6: ; "Load Defaults..."
+			case 8: ; "Save Defaults"
+		}
+	}
+	
+	chooseSimulationMenu(line) {
+		switch line {
+			case 3: ; "Set Target Fuel Consumption..."
+			case 4: ; "Set Target Tyre Usage..."
+			case 6: ; "Run Simulation"
+				this.runSimulation()
+			case 8: ; "Use as Strategy..."
+		}
+	}
+	
+	chooseStrategyMenu(line) {
+		switch line {
+			case 3: ; "Load Strategy..."
+			case 4: ; "Save Strategy..."
+			case 5: ; "Compare Strategies..."
+			case 7: ; "Export Strategy..."
+		}
+	}
+	
+	runSimulation() {
+		MsgBox Sim it, Baby...
+	}
 }
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+readSimulatorData(simulator) {
+	dataFile := kTempDirectory . simulator . " Data\Setup.data"
+	exePath := kBinariesDirectory . simulator . " SHM Provider.exe"
+	
+	FileCreateDir %kTempDirectory%%simulator% Data
+	
+	try {
+		RunWait %ComSpec% /c ""%exePath%" -Setup > "%dataFile%"", , Hide
+		
+		data := readConfiguration(dataFile)
+		
+		setupData := getConfigurationSectionValues(data, "Setup Data")
+		
+		RunWait %ComSpec% /c ""%exePath%" > "%dataFile%"", , Hide
+		
+		data := readConfiguration(dataFile)
+		
+		setConfigurationSectionValues(data, "Setup Data", setupData)
+		
+		return data
+	}
+	catch exception {
+		logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: simulator, protocol: "SHM"}) . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
+			
+		showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration..."), {simulator: simulator, protocol: "SHM", exePath: exePath})
+				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+	}
+}
 
 filterSchema(schema) {
 	newSchema := []
@@ -1172,6 +1284,34 @@ chooseChartType() {
 	GuiControlGet chartTypeDropDown
 	
 	StrategyWorkbench.Instance.loadChart(["Scatter", "Bar", "Bubble", "Line"][chartTypeDropDown])
+}
+
+settingsMenu() {
+	GuiControlGet settingsMenuDropDown
+	
+	StrategyWorkbench.Instance.chooseSettingsMenu(settingsMenuDropDown)
+	
+	GuiControl Choose, settingsMenuDropDown, 1
+}
+
+simulationMenu() {
+	GuiControlGet simulationMenuDropDown
+	
+	StrategyWorkbench.Instance.chooseSimulationMenu(simulationMenuDropDown)
+	
+	GuiControl Choose, simulationMenuDropDown, 1
+}
+
+strategyMenu() {
+	GuiControlGet strategyMenuDropDown
+	
+	StrategyWorkbench.Instance.chooseStrategyMenu(strategyMenuDropDown)
+	
+	GuiControl Choose, strategyMenuDropDown, 1
+}
+
+runSimulation() {
+	StrategyWorkbench.Instance.runSimulation()
 }
 
 setButtonIcon(buttonHandle, file, index := 1, options := "") {

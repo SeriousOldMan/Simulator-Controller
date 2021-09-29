@@ -228,3 +228,106 @@ class Database {
 			this.flush(name)
 	}
 }
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                    Public Function Declaration Section                 ;;;
+;;;-------------------------------------------------------------------------;;;
+
+minimum(numbers) {
+	min := 0
+	
+	for ignore, number in numbers
+		min := (!min ? number : Min(min, number))
+
+	return min
+}
+
+maximum(numbers) {
+	max := 0
+	
+	for ignore, number in numbers
+		max := (!max ? number : Max(max, number))
+
+	return max
+}
+
+average(numbers) {
+	avg := 0
+	
+	for ignore, value in numbers
+		avg += value
+	
+	return (avg / numbers.Length())
+}
+
+stdDeviation(numbers) {
+	avg := average(numbers)
+	
+	squareSum := 0
+	
+	for ignore, value in numbers
+		squareSum += ((value - avg) * (value - avg))
+	
+	return Sqrt(squareSum)
+}
+
+constraintColumns(constraints, row) {
+	for column, value in constraints
+		if (row[column] != value)
+			return false
+		
+	return true
+}
+
+countColumn(groupedColumn, countColumn, rows) {
+	values := {}
+	
+	for ignore, row in rows {
+		value := row[groupedColumn]
+	
+		if values.HasKey(value)
+			values[value] := values[value] + 1
+		else
+			values[value] := 1
+	}
+	
+	result := []
+	
+	for value, count in values {
+		object := Object()
+	
+		object[groupedColumn] := value
+		object[countColumn] := count
+		
+		result.Push(object)
+	}
+	
+	return result
+}
+
+groupColumn(groupedByColumn, groupFunction, groupedColumn, rows) {
+	values := {}
+	
+	for ignore, row in rows {
+		value := row[groupedByColumn]
+	
+		if values.HasKey(value)
+			values[value].Push(row[groupedColumn])
+		else
+			values[value] := Array(row[groupedColumn])
+	}
+	
+	result := []
+	
+	for value, columnValues in values {
+		object := Object()
+	
+		object[groupedByColumn] := value
+		object[groupedColumn] := %groupFunction%(columnValues)
+		
+		result.Push(object)
+	}
+	
+	return result
+}

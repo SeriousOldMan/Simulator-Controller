@@ -65,6 +65,34 @@ global chartTypeDropDown
 global chartViewer
 global strategyViewer
 global simulationViewer
+		
+global sessionTypeDropDown
+global raceDurationEdit = 60
+global stintLengthEdit = 70
+global formationLapCheck = true
+global postRaceLapCheck = true
+
+global pitstopRequirementsDropDown
+global pitstopWindowEdit = "25-35"
+global tyreChangeRequirementsDropDown
+global refuelRequirementsDropDown
+
+global pitstopDeltaEdit = 30
+global pitstopTyreServiceEdit = 30
+global pitstopRefuelServiceEdit = 1.2
+global fuelCapacityEdit = 125
+global safetyFuelEdit = 5
+
+global simCompoundEdit
+global simMaxTyreLifeEdit = 40
+global simInitialFuelAmountEdit = 90
+global simMapEdit = 1
+global simTCEdit = 1
+global simABSEdit = 2
+
+global simConsumptionWeight = 20
+global simTyreUsageWeight = 60
+global simCarWeightWeight = 80
 
 class StrategyWorkbench extends ConfigurationItem {
 	iDataListView := false
@@ -369,22 +397,22 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		Gui %window%:Font, Norm, Arial
 		
-		Gui %window%:Add, DropDownList, x%x0% yp+21 w70 AltSubmit Choose1, % values2String("|", map(["Duration", "Laps"], "translate")*)
-		Gui %window%:Add, Edit, x%x1% yp w50 h20 Limit4 Number ; VraceDurationEdit, %raceDurationEdit%
-		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 Range1-9999 0x80 ; , %raceDurationEdit%
+		Gui %window%:Add, DropDownList, x%x0% yp+21 w70 AltSubmit Choose1 VsessionTypeDropDown, % values2String("|", map(["Duration", "Laps"], "translate")*)
+		Gui %window%:Add, Edit, x%x1% yp w50 h20 Limit4 Number VraceDurationEdit, %raceDurationEdit%
+		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 Range1-9999 0x80, %raceDurationEdit%
 		Gui %window%:Add, Text, x%x3% yp+4 w60 h20, % translate("Minutes")
 		
 		Gui %window%:Add, Text, x%x% yp+21 w85 h23 +0x200, % translate("Max. Stint")
-		Gui %window%:Add, Edit, x%x1% yp w50 h20 Limit4 Number ; VraceDurationEdit, %raceDurationEdit%
-		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 Range1-9999 0x80 ; , %raceDurationEdit%
+		Gui %window%:Add, Edit, x%x1% yp w50 h20 Limit4 Number VstintLengthEdit, %stintLengthEdit%
+		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 Range1-9999 0x80, %stintLengthEdit%
 		Gui %window%:Add, Text, x%x3% yp+4 w60 h20, % translate("Minutes")
 
 		Gui %window%:Add, Text, x%x% yp+21 w85 h23 +0x200, % translate("Formation")
-		Gui %window%:Add, CheckBox, x%x1% yp-1 w17 h23 ; Checked%formationLapCheck% VformationLapCheck, %formationLapCheck%
+		Gui %window%:Add, CheckBox, x%x1% yp-1 w17 h23 Checked%formationLapCheck% VformationLapCheck, %formationLapCheck%
 		Gui %window%:Add, Text, x%x4% yp+5 w50 h20, % translate("Lap")
 				
 		Gui %window%:Add, Text, x%x% yp+19 w85 h23 +0x200, % translate("Post Race")
-		Gui %window%:Add, CheckBox, x%x1% yp-1 w17 h23 ; Checked%postRaceLapCheck% VpostRaceLapCheck, %postRaceLapCheck%
+		Gui %window%:Add, CheckBox, x%x1% yp-1 w17 h23 Checked%postRaceLapCheck% VpostRaceLapCheck, %postRaceLapCheck%
 		Gui %window%:Add, Text, x%x4% yp+5 w50 h20, % translate("Lap")
 		
 		Gui %window%:Font, Norm, Arial
@@ -395,15 +423,15 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 
 		Gui %window%:Add, Text, x%x5% yp+23 w90 h20, % translate("Pitstop")
-		Gui %window%:Add, DropDownList, x%x7% yp-4 w75 AltSubmit Choose1 +0x200, % values2String("|", map(["Optional", "Required", "Window"], "translate")*)
-		Gui %window%:Add, Edit, x%x11% yp+1 w50 h20 ; VraceDurationEdit, %raceDurationEdit%
+		Gui %window%:Add, DropDownList, x%x7% yp-4 w75 AltSubmit Choose1 VpitstopRequirementsDropDown, % values2String("|", map(["Optional", "Required", "Window"], "translate")*)
+		Gui %window%:Add, Edit, x%x11% yp+1 w50 h20 VpitstopWindowEdit, %pitstopWindowEdit%
 		Gui %window%:Add, Text, x%x12% yp+3 w110 h20, % translate("Minute (From - To)")
 
 		Gui %window%:Add, Text, x%x5% yp+22 w85 h23 +0x200, % translate("Tyre Change")
-		Gui %window%:Add, DropDownList, x%x7% yp w75 AltSubmit Choose1 +0x200, % values2String("|", map(["Required", "Optional"], "translate")*)
+		Gui %window%:Add, DropDownList, x%x7% yp w75 AltSubmit Choose1 VtyreChangeRequirementsDropDown, % values2String("|", map(["Required", "Optional"], "translate")*)
 
 		Gui %window%:Add, Text, x%x5% yp+26 w85 h23 +0x200, % translate("Refuel")
-		Gui %window%:Add, DropDownList, x%x7% yp w75 AltSubmit Choose1 +0x200, % values2String("|", map(["Required", "Optional"], "translate")*)
+		Gui %window%:Add, DropDownList, x%x7% yp w75 AltSubmit Choose1 VrefuelRequirementsDropDown, % values2String("|", map(["Required", "Optional"], "translate")*)
 		
 		Gui %window%:Tab, 2
 		
@@ -419,29 +447,29 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, GroupBox, -Theme x24 ys+34 w350 h147, % translate("Pitstop")
 				
 		Gui %window%:Font, Norm, Arial
-		
+
 		Gui %window%:Add, Text, x%x% yp+21 w105 h20 +0x200, % translate("Pitlane Delta")
-		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 Limit2 Number ; VpitstopDeltaEdit, %pitstopDeltaEdit%
-		Gui %window%:Add, UpDown, x%x2% yp w18 h20 0x80 ; , %pitstopDeltaEdit%
+		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 Limit2 Number VpitstopDeltaEdit, %pitstopDeltaEdit%
+		Gui %window%:Add, UpDown, x%x2% yp w18 h20 0x80, %pitstopDeltaEdit%
 		Gui %window%:Add, Text, x%x3% yp+4 w180 h20, % translate("Seconds (Drive through - Drive by)")
 
 		Gui %window%:Add, Text, x%x% yp+21 w85 h20 +0x200, % translate("Tyre Service")
-		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 Limit2 Number ; VpitstopTyreServiceEdit, %pitstopTyreServiceEdit%
-		Gui %window%:Add, UpDown, x%x2% yp w18 h20 0x80 ; , %pitstopTyreServiceEdit%
+		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 Limit2 Number VpitstopTyreServiceEdit, %pitstopTyreServiceEdit%
+		Gui %window%:Add, UpDown, x%x2% yp w18 h20 0x80, %pitstopTyreServiceEdit%
 		Gui %window%:Add, Text, x%x3% yp+4 w180 h20, % translate("Seconds (Change four tyres)")
 
 		Gui %window%:Add, Text, x%x% yp+21 w85 h20 +0x200, % translate("Refuel Service")
-		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 ; VpitstopRefuelServiceEdit, %pitstopRefuelServiceEdit%
+		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 VpitstopRefuelServiceEdit, %pitstopRefuelServiceEdit%
 		Gui %window%:Add, Text, x%x3% yp+4 w180 h20, % translate("Seconds (Refuel of 10 litres)")
 
 		Gui %window%:Add, Text, x%x% yp+21 w85 h20 +0x200, % translate("Fuel Capacity")
-		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 ; VpitstopRefuelServiceEdit, %pitstopRefuelServiceEdit%
-		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 ; , %safetyFuelEdit%
+		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 Number VfuelCapacityEdit, %fuelCapacityEdit%
+		; Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20, %fuelCapacityEdit%
 		Gui %window%:Add, Text, x%x3% yp+4 w180 h20, % translate("Liter")
 		
 		Gui %window%:Add, Text, x%x% yp+19 w85 h23 +0x200, % translate("Safety Fuel")
-		Gui %window%:Add, Edit, x%x1% yp+1 w50 h20 ; VsafetyFuelEdit, %safetyFuelEdit%
-		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 ; , %safetyFuelEdit%
+		Gui %window%:Add, Edit, x%x1% yp+1 w50 h20 VsafetyFuelEdit, %safetyFuelEdit%
+		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20, %safetyFuelEdit%
 		Gui %window%:Add, Text, x%x3% yp+2 w90 h20, % translate("Liter")
 		
 		Gui %window%:Tab, 3
@@ -470,29 +498,29 @@ class StrategyWorkbench extends ConfigurationItem {
 			compound := choices[1]
 			chosen := 1
 		}
-		
-		Gui %window%:Add, DropDownList, x%x1% yp w84 AltSubmit Choose%chosen%, % values2String("|", choices*)
+
+		Gui %window%:Add, DropDownList, x%x1% yp w84 AltSubmit Choose%chosen% VsimCompoundEdit, % values2String("|", choices*)
 		
 		Gui %window%:Add, Text, x%x% yp+25 w70 h20 +0x200, % translate("Max Tyre Life")
-		Gui %window%:Add, Edit, x%x1% yp-1 w40 h20 ; VpitstopRefuelServiceEdit, %pitstopRefuelServiceEdit%
-		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 ; , %safetyFuelEdit%
+		Gui %window%:Add, Edit, x%x1% yp-1 w40 h20 VsimMaxTyreLifeEdit, %simMaxTyreLifeEdit%
+		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20, %simMaxTyreLifeEdit%
 		Gui %window%:Add, Text, x%x3% yp+4 w47 h20, % translate("Laps")
 				
 		Gui %window%:Add, Text, x%x% yp+21 w70 h20 +0x200, % translate("Tank Filling")
-		Gui %window%:Add, Edit, x%x1% yp-1 w40 h20 ; VpitstopRefuelServiceEdit, %pitstopRefuelServiceEdit%
-		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 ; , %safetyFuelEdit%
+		Gui %window%:Add, Edit, x%x1% yp-1 w40 h20 VsimInitialFuelAmountEdit, %simInitialFuelAmountEdit%
+		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20, %simInitialFuelAmountEdit%
 		Gui %window%:Add, Text, x%x3% yp+4 w47 h20, % translate("Liter")
 		
 		Gui %window%:Add, Text, x%x% yp+21 w70 h20 +0x200, % translate("Map")
-		Gui %window%:Add, Edit, x%x1% yp-1 w40 h20 ; VpitstopRefuelServiceEdit, %pitstopRefuelServiceEdit%
-		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 ; , %safetyFuelEdit%
+		Gui %window%:Add, Edit, x%x1% yp-1 w40 h20 VsimMapEdit, %simMapEdit%
+		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20, %simMapEdit%
 		
 		Gui %window%:Add, Text, x%x% yp+25 w70 h20 +0x200, % translate("TC / ABS")
-		Gui %window%:Add, Edit, x%x1% yp-1 w40 h20 ; VpitstopRefuelServiceEdit, %pitstopRefuelServiceEdit%
-		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 ; , %safetyFuelEdit%
+		Gui %window%:Add, Edit, x%x1% yp-1 w40 h20 VsimTCEdit, %simTCEdit%
+		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20, %simTCEdit%
 		
-		Gui %window%:Add, Edit, x%x3% yp w40 h20 ; VpitstopRefuelServiceEdit, %pitstopRefuelServiceEdit%
-		Gui %window%:Add, UpDown, x%x5% yp-2 w18 h20 ; , %safetyFuelEdit%
+		Gui %window%:Add, Edit, x%x3% yp w40 h20 VsimABSEdit, %simABSEdit%
+		Gui %window%:Add, UpDown, x%x5% yp-2 w18 h20, %simABSEdit%
 		
 		x := 222
 		x0 := x - 4
@@ -506,15 +534,15 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, GroupBox, -Theme x214 ys+34 w174 h147, % translate("Optimizer")
 		
 		Gui %window%:Font, Norm, Arial
-				
+
 		Gui %window%:Add, Text, x%x% yp+21 w100 h20 +0x200, % translate("Fuel Consumption")
-		Gui %window%:Add, Slider, x%x1% yp w60 0x10 Range0-100 ToolTip ; , % speakerVolumeSlider
+		Gui %window%:Add, Slider, x%x1% yp w60 0x10 Range0-100 ToolTip VsimConsumptionWeight, %simConsumptionWeight%
 		
-		Gui %window%:Add, Text, x%x% yp+24 w100 h20 +0x200, % translate("Tyre Wear")
-		Gui %window%:Add, Slider, x%x1% yp w60 0x10 Range0-100 ToolTip ; , % speakerVolumeSlider
+		Gui %window%:Add, Text, x%x% yp+24 w100 h20 +0x200, % translate("Tyre Usage")
+		Gui %window%:Add, Slider, x%x1% yp w60 0x10 Range0-100 ToolTip VsimTyreUsageWeight, %simTyreUsageWeight%
 		
 		Gui %window%:Add, Text, x%x% yp+24 w100 h20 +0x200, % translate("Car Weight")
-		Gui %window%:Add, Slider, x%x1% yp w60 0x10 Range0-100 ToolTip ; , % speakerVolumeSlider
+		Gui %window%:Add, Slider, x%x1% yp w60 0x10 Range0-100 ToolTip VsimCarWeightWeight, %simCarWeightWeight%
 		
 		Gui %window%:Add, Button, x%x% yp+48 w160 h20, % translate("Simulate!")
 		

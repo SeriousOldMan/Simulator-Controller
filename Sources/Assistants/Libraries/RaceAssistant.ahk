@@ -257,6 +257,9 @@ class RaceAssistant extends ConfigurationItem {
 		if values.HasKey("Settings")
 			this.iSettings := values["Settings"]
 		
+		if values.HasKey("SaveSettings")
+			this.iSaveSettings := values["SaveSettings"]
+		
 		if values.HasKey("LearningLaps")
 			this.iLearningLaps := values["LearningLaps"]
 	}

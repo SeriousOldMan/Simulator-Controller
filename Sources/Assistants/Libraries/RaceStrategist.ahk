@@ -118,9 +118,6 @@ class RaceStrategist extends RaceAssistant {
 		if values.HasKey("SessionReportsDatabase")
 			this.iSessionReportsDatabase := values["SessionReportsDatabase"]
 		
-		if values.HasKey("SaveSettings")
-			this.iSaveSettings := values["SaveSettings"]
-		
 		if values.HasKey("SaveTelemetry")
 			this.iSaveTyrePressures := values["SaveTelemetry"]
 		
@@ -845,7 +842,7 @@ class RaceStrategist extends RaceAssistant {
 		
 		try {
 			if ((this.Session == kSessionRace) && (this.SaveSettings = ((phase = "Before") ? kAlways : kAsk)))
-				this.saveSettings()
+				this.saveSessionSettings()
 			
 			if ((this.Session == kSessionRace) && (this.SaveRaceReport = ((phase = "Before") ? kAlways : kAsk)))
 				this.saveSessionReport()
@@ -1019,7 +1016,7 @@ class RaceStrategist extends RaceAssistant {
 		}
 	}
 	
-	saveSettings() {
+	saveSessionSettings() {
 		local knowledgeBase := this.KnowledgeBase
 		local compound
 		

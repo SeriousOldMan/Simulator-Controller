@@ -30,15 +30,6 @@ class RaceEngineer extends RaceAssistant {
 	
 	iSaveTyrePressures := kAsk
 	
-	iEnoughData := false
-	
-	iOverallTime := 0
-	iBestLapTime := 0
-	
-	iLastFuelAmount := 0
-	iInitialFuelAmount := 0
-	iAvgFuelConsumption := 0
-	
 	iSetupData := {}
 	iSessionDataActive := false
 	
@@ -51,42 +42,6 @@ class RaceEngineer extends RaceAssistant {
 	AdjustLapTime[] {
 		Get {
 			return this.iAdjustLapTime
-		}
-	}
-	
-	EnoughData[] {
-		Get {
-			return this.iEnoughData
-		}
-	}
-	
-	BestLapTime[] {
-		Get {
-			return this.iBestLapTime
-		}
-	}
-	
-	OverallTime[] {
-		Get {
-			return this.iOverallTime
-		}
-	}
-	
-	InitialFuelAmount[] {
-		Get {
-			return this.iInitialFuelAmount
-		}
-	}
-	
-	LastFuelAmount[] {
-		Get {
-			return this.iLastFuelAmount
-		}
-	}
-	
-	AvgFuelConsumption[] {
-		Get {
-			return this.iAvgFuelConsumption
 		}
 	}
 	
@@ -131,26 +86,8 @@ class RaceEngineer extends RaceAssistant {
 	updateDynamicValues(values) {
 		base.updateDynamicValues(values)
 		
-		if values.HasKey("OverallTime")
-			this.iOverallTime := values["OverallTime"]
-		
-		if values.HasKey("BestLapTime")
-			this.iBestLapTime := values["BestLapTime"]
-		
-		if values.HasKey("LastFuelAmount")
-			this.iLastFuelAmount := values["LastFuelAmount"]
-		
-		if values.HasKey("InitialFuelAmount")
-			this.iInitialFuelAmount := values["InitialFuelAmount"]
-		
-		if values.HasKey("AvgFuelConsumption")
-			this.iAvgFuelConsumption := values["AvgFuelConsumption"]
-		
 		if values.HasKey("SetupData")
 			this.iSetupData := values["SetupData"]
-		
-		if values.HasKey("EnoughData")
-			this.iEnoughData := values["EnoughData"]
 	}
 	
 	handleVoiceCommand(grammar, words) {

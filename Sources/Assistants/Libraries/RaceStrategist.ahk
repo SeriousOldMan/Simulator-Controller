@@ -26,14 +26,6 @@
 ;;;-------------------------------------------------------------------------;;;
 
 class RaceStrategist extends RaceAssistant {
-	iEnoughData := false
-	
-	iOverallTime := 0
-	iBestLapTime := 0
-	iLastFuelAmount := 0
-	iInitialFuelAmount := 0
-	iAvgFuelConsumption := 0
-
 	iSessionTime := false
 	
 	iSaveTelemetry := kAlways
@@ -41,42 +33,6 @@ class RaceStrategist extends RaceAssistant {
 	
 	iSessionReportsDatabase := false
 	iSessionDataActive := false
-	
-	EnoughData[] {
-		Get {
-			return this.iEnoughData
-		}
-	}
-	
-	OverallTime[] {
-		Get {
-			return this.iOverallTime
-		}
-	}
-	
-	BestLapTime[] {
-		Get {
-			return this.iBestLapTime
-		}
-	}
-	
-	InitialFuelAmount[] {
-		Get {
-			return this.iInitialFuelAmount
-		}
-	}
-	
-	LastFuelAmount[] {
-		Get {
-			return this.iLastFuelAmount
-		}
-	}
-	
-	AvgFuelConsumption[] {
-		Get {
-			return this.iAvgFuelConsumption
-		}
-	}
 	
 	SessionTime[] {
 		Get {
@@ -130,28 +86,6 @@ class RaceStrategist extends RaceAssistant {
 		
 		if values.HasKey("SessionTime")
 			this.iSessionTime := values["SessionTime"]
-	}
-	
-	updateDynamicValues(values) {
-		base.updateDynamicValues(values)
-		
-		if values.HasKey("OverallTime")
-			this.iOverallTime := values["OverallTime"]
-		
-		if values.HasKey("BestLapTime")
-			this.iBestLapTime := values["BestLapTime"]
-		
-		if values.HasKey("LastFuelAmount")
-			this.iLastFuelAmount := values["LastFuelAmount"]
-		
-		if values.HasKey("InitialFuelAmount")
-			this.iInitialFuelAmount := values["InitialFuelAmount"]
-		
-		if values.HasKey("AvgFuelConsumption")
-			this.iAvgFuelConsumption := values["AvgFuelConsumption"]
-		
-		if values.HasKey("EnoughData")
-			this.iEnoughData := values["EnoughData"]
 	}
 	
 	hasEnoughData(inform := true) {
@@ -1012,48 +946,6 @@ class RaceStrategist extends RaceAssistant {
 				telemetryDB.addTyreEntry(weather, airTemperature, trackTemperature, compound, compoundColor, runningLap
 									   , flPressure, frPressure, rlPressure, rrPressure, flTemperature, frTemperature, rlTemperature, rrTemperature
 										, fuelRemaining, fuelConsumption, lapTime)
-			}
-		}
-	}
-	
-	saveSessionSettings() {
-		local knowledgeBase := this.KnowledgeBase
-		local compound
-		
-		if knowledgeBase {
-			setupDB := this.SetupDatabase
-			
-			simulatorName := setupDB.getSimulatorName(knowledgeBase.getValue("Session.Simulator"))
-			car := knowledgeBase.getValue("Session.Car")
-			track := knowledgeBase.getValue("Session.Track")
-			duration := knowledgeBase.getValue("Session.Duration")
-			weather := knowledgeBase.getValue("Weather.Now")
-			compound := knowledgeBase.getValue("Tyre.Compound")
-			compoundColor := knowledgeBase.getValue("Tyre.Compound.Color")
-			
-			oldValue := getConfigurationValue(this.Configuration, "Race Engineer Startup", simulatorName . ".LoadSettings", "Default")
-			loadSettings := getConfigurationValue(this.Configuration, "Race Assistant Startup", simulatorName . ".LoadSettings", oldValue)
-		
-			duration := (Round((duration / 60) / 5) * 300)
-			
-			values := {AvgFuelConsumption: this.AvgFuelConsumption, Compound: compound, CompoundColor: compoundColor, Duration: duration}
-			
-			lapTime := Round(this.BestLapTime / 1000)
-			
-			if (lapTime > 10)
-				values["AvgLapTime"] := lapTime
-			
-			if (loadSettings = "SetupDatabase")
-				setupDB.updateSettings(simulatorName, car, track
-									 , {Duration: duration, Weather: weather, Compound: compound, CompoundColor: compoundColor}, values)
-			else {
-				fileName := getFileName("Race.settings", kUserConfigDirectory)
-				
-				settings := readConfiguration(fileName)
-				
-				setupDB.updateSettingsValues(settings, values)
-				
-				writeConfiguration(fileName, settings)
 			}
 		}
 	}

@@ -120,9 +120,6 @@ class RaceEngineer extends RaceAssistant {
 		if values.HasKey("AdjustLapTime")
 			this.iAdjustLapTime := values["AdjustLapTime"]
 		
-		if values.HasKey("SaveSettings")
-			this.iSaveSettings := values["SaveSettings"]
-		
 		if values.HasKey("SaveTyrePressures")
 			this.iSaveTyrePressures := values["SaveTyrePressures"]
 	}
@@ -1124,7 +1121,7 @@ class RaceEngineer extends RaceAssistant {
 		
 		try {
 			if ((this.Session == kSessionRace) && (this.SaveSettings = ((phase = "Before") ? kAlways : kAsk)))
-				this.saveSettings()
+				this.saveSessionSettings()
 			
 			if ((this.SaveTyrePressures = ((phase = "After") ? kAsk : kAlways)) && (this.SetupData.Count() > 0))
 				this.saveTyrePressureData()
@@ -1143,7 +1140,7 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 	
-	saveSettings() {
+	saveSessionSettings() {
 		local knowledgeBase := this.KnowledgeBase
 		local compound
 		

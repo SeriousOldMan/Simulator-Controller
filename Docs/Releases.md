@@ -1,3 +1,7 @@
+## 3.5.9-release 10/01/21
+
+  1. Fix for automated save of settings by Race Assistants
+
 ## 3.5.8-release 09/24/21
 
   1. Bugfixes, as always

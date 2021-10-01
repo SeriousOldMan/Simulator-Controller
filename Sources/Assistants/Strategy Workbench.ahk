@@ -1114,8 +1114,101 @@ class StrategyWorkbench extends ConfigurationItem {
 		}
 	}
 	
+	acquireTelemetryData(ByRef progress) {
+		message := translate("Reading electronics data...")
+		
+		showProgress({progress: progress, message: message})
+		
+		Sleep 1000
+		
+		message := translate("Reading tyre data...")
+		
+		showProgress({progress: progress, message: message})
+		
+		Sleep 1000
+		
+		progress += 5
+	}
+	
+	createScenarios(ByRef progress) {
+		scenarios := []
+		
+		for ignore, name in ["Fast Map", "Slow Map", "Max Tyre Usage", "Fresh Tyres"] {
+			message := translate("Scenario " . A_Index . ": " . name)
+			
+			showProgress({progress: progress, message: message, title: translate("Preparing Scenarios")})
+		
+			scenarios.Push({Name: name})
+			
+			progress += 2
+		
+			Sleep 1000
+		}
+		
+		progress := Floor(progress + 10)
+		
+		return scenarios
+	}
+	
+	evaluateScenarios(scenarios, ByRef progress) {
+		for ignore, scenario in scenarios {
+			message := translate("Scenario " . A_Index . ": " . scenario.Name)
+			
+			showProgress({progress: progress, message: message, title: translate("Evaluating Scenarios")})
+			
+			progress += 2
+		
+			Sleep 1000
+		}
+		
+		progress := Floor(progress + 10)
+	}
+	
 	runSimulation() {
-		MsgBox Sim it, Baby...
+		x := Round((A_ScreenWidth - 300) / 2)
+		y := A_ScreenHeight - 150
+			
+		showProgress({x: x, y: y, color: "Blue", title: translate("Acquiring Telemetry Information")})
+		
+		progress := 0
+		
+		this.acquireTelemetryData(progress)
+		
+		message := translate("Creating scenarios...")
+		
+		showProgress({progress: progress, message: message})
+		
+		scenarios := this.createScenarios(progress)
+		
+		message := translate("Evaluating scenarios...")
+		
+		showProgress({progress: progress, color: "Green", message: message, title: translate("Running Simulation")})
+		
+		scenario := this.evaluateScenarios(scenarios, progress)
+		
+		Sleep 1000
+			
+		message := translate("Stint length...")
+		
+		showProgress({progress: progress, message: message, title: translate("Perform final optimizations")})
+		
+		progress += 10
+		
+		Sleep 1000
+			
+		message := translate("Fuel consumption...")
+		
+		showProgress({progress: progress, message: message})
+		
+		Sleep 1000
+			
+		message := translate("Finished...")
+		
+		showProgress({progress: 100, message: message})
+		
+		Sleep 2000
+		
+		hideProgress()
 	}
 }
 

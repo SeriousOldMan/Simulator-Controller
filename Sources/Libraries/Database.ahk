@@ -242,6 +242,11 @@ count(values) {
 	return values.Length()
 }
 
+
+;;;-------------------------------------------------------------------------;;;
+;;;                    Private Function Declaration Section                 ;;;
+;;;-------------------------------------------------------------------------;;;
+
 constraintColumns(constraints, row) {
 	for column, value in constraints
 		if (row[column] != value)

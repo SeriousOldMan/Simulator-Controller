@@ -78,28 +78,36 @@ class Database {
 		
 		schema := this.Schemas[name]
 		rows := this.Tables[name]
-		projection := (query.HasKey("Select") ? query["Select"] : false)
+		needsClone := true
 		
 		if query.HasKey("Where") {
 			predicate := query["Where"]
 			selection := []
+			
+			if !predicate.MinParams
+				predicate := Func("constraintColumns").Bind(predicate)
 			
 			for ignore, row in rows
 				if %predicate%(row)
 					selection.Push(row)
 			
 			rows := selection
+			needsClone := false
 		}
-		else if !projection
-			rows := rows.Clone()
 		
 		if query.HasKey("Filter") {
 			filter := query["Filter"]
 			
 			rows := %filter%(rows)
 		}
+		
+		if (query.HasKey("Group") || query.HasKey("By")) {
+			rows := groupRows(query.HasKey("By") ? query["By"] : [], query.HasKey("Group") ? query["Group"] : [], rows)
+			needsClone := false
+		}
 	
-		if projection {
+		if query.HasKey("Select") {
+			projection := query["Select"]
 			projectedRows := []
 			
 			for ignore, row in rows {
@@ -112,52 +120,10 @@ class Database {
 			}
 			
 			rows := projectedRows
+			needsClone := false
 		}
 		
-		if query.HasKey("GroupBy") {
-			groupBy := query["GroupBy"]
-			groupedRows := {}
-			
-			while (rows.Length() > 0) {
-				row := rows.Pop()
-			
-				key := []
-				
-				for ignore, column in groupBy
-					key.Push(row[column])
-				
-				key := values2String("|", key*)
-				
-				if !groupedRows.HasKey(key)
-					groupedRows[key] := []
-				
-				groupedRows[key].Push(row)
-			}
-			
-			rows := []
-			
-			for ignore, rowGroup in groupedRows
-				rows.Push(rowGroup)
-		
-			if query.HasKey("Group") {
-				group := query["Group"]
-				
-				for index, row in rows
-					rows[index] := %group%(rows[index])
-			}
-			
-			if (query.HasKey("Flatten") && query["Flatten"]) {
-				flattenedRows := []
-				
-				for ignore, groupRows in rows
-					for ignore, row in groupRows
-						flattenedRows.Push(row)
-				
-				rows := flattenedRows
-			}
-		}
-		
-		return rows
+		return (needsClone ? rows.Clone() : rows)
 	}
 	
 	flush(name := false) {
@@ -272,6 +238,10 @@ stdDeviation(numbers) {
 	return Sqrt(squareSum)
 }
 
+count(values) {
+	return values.Length()
+}
+
 constraintColumns(constraints, row) {
 	for column, value in constraints
 		if (row[column] != value)
@@ -280,53 +250,52 @@ constraintColumns(constraints, row) {
 	return true
 }
 
-countColumn(groupedColumn, countColumn, rows) {
+groupRows(groupedByColumns, groupedColumns, rows) {
+	local function
+	
 	values := {}
 	
-	for ignore, row in rows {
-		value := row[groupedColumn]
+	if !IsObject(groupedByColumns)
+		groupedByColumns := Array(groupedByColumns)
 	
-		if values.HasKey(value)
-			values[value] := values[value] + 1
+	for ignore, row in rows {
+		key := []
+		
+		for ignore, column in groupedByColumns
+			key.Push(row[column])
+		
+		key := values2String("|", key*)
+	
+		if values.HasKey(key)
+			values[key].Push(row)
 		else
-			values[value] := 1
+			values[key] := Array(row)
 	}
 	
 	result := []
 	
-	for value, count in values {
-		object := Object()
-	
-		object[groupedColumn] := value
-		object[countColumn] := count
+	for group, groupedRows in values {
+		group := string2Values("|", group)
 		
-		result.Push(object)
-	}
-	
-	return result
-}
-
-groupColumn(groupedByColumn, groupFunction, groupedColumn, rows) {
-	values := {}
-	
-	for ignore, row in rows {
-		value := row[groupedByColumn]
-	
-		if values.HasKey(value)
-			values[value].Push(row[groupedColumn])
-		else
-			values[value] := Array(row[groupedColumn])
-	}
-	
-	result := []
-	
-	for value, columnValues in values {
-		object := Object()
-	
-		object[groupedByColumn] := value
-		object[groupedColumn] := %groupFunction%(columnValues)
+		resultRow := Object()
 		
-		result.Push(object)
+		for ignore, column in groupedByColumns
+			resultRow[column] := group[A_Index]
+		
+		for ignore, columnDescriptor in groupedColumns {
+			valueColumn := columnDescriptor[1]
+			function := columnDescriptor[2]
+			resultColumn := columnDescriptor[3]
+			
+			columnValues := []
+			
+			for ignore, row in groupedRows
+				columnValues.Push(row[valueColumn])
+			
+			resultRow[resultColumn] := %function%(columnValues)
+		}
+		
+		result.Push(resultRow)
 	}
 	
 	return result

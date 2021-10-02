@@ -60,58 +60,55 @@ class TelemetryDatabase extends SessionDatabase {
 	
 	getElectronicEntries(weather, compound, compoundColor) {
 		if this.Database
-			return this.Database.query("Electronics", {Filter: "removeInvalidLaps", Where: Func("constraintColumns").Bind({Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor})})
+			return this.Database.query("Electronics", {Filter: "removeInvalidLaps", Where: {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
 		else
 			return []
 	}
 	
 	getTyreEntries(weather, compound, compoundColor) {
 		if this.Database
-			return this.Database.query("Tyres", {Filter: "removeInvalidLaps", Where: Func("constraintColumns").Bind({Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor})})
+			return this.Database.query("Tyres", {Filter: "removeInvalidLaps", Where: {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
 		else
 			return []
 	}
 	
 	getMapsCount(weather, compound, compoundColor) {
 		if this.Database
-			return this.Database.query("Electronics", {Select: ["Map"]
-													 , GroupBy: ["Map"] , Group: Func("countColumn").Bind("Map", "Count"), flatten: true
+			return this.Database.query("Electronics", {Group: [["Map", "count", "Count"]], By: "Map"
 													 , Filter: "removeInvalidLaps"
-													 , Where: Func("constraintColumns").Bind({Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor})})
+													 , Where: {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
 		else
 			return []
 	}
 	
 	getMapLapTimes(weather, compound, compoundColor) {
 		if this.Database
-			return this.Database.query("Electronics", {Select: ["Map", "Lap.Time"]
-													 , GroupBy: ["Map"] , Group: Func("groupColumn").Bind("Map", "average", "Lap.Time"), flatten: true
+			return this.Database.query("Electronics", {Group: [["Map", "average", "Lap.Time"]], By: "Map"
 													 , Filter: "removeInvalidLaps"
-													 , Where: Func("constraintColumns").Bind({Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor})})
+													 , Where: {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
 		else
 			return []
 	}
 	
-	getTyreLifeLapTimes(weather, compound, compoundColor) {
+	getTyreLapsLapTimes(weather, compound, compoundColor) {
 		if this.Database
-			return this.Database.query("Tyres", {Select: ["Tyre.Laps", "Lap.Time"]
-											   , GroupBy: ["Tyre.Life"] , Group: Func("groupColumn").Bind("Tyre.Laps", "minimum", "Lap.Time"), flatten: true
+			return this.Database.query("Tyres", {Group: [["Lap.Time", "minimum", "Lap.Time"]], By: "Tyre.Laps"
 											   , Filter: "removeInvalidLaps"
-											   , Where: Func("constraintColumns").Bind({Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor})})
+											   , Where: {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
 		else
 			return []
 	}
 	
 	getPressuresCount(weather, compound, compoundColor) {
 		if this.Database {
-			rows := this.Database.query("Tyres", {Where: Func("constraintColumns").Bind({Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor})})
+			rows := this.Database.query("Tyres", {Where: {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
 			
 			for ignore, row in rows {
 				row["Tyre.Pressure"] := Round(average([row["Tyre.Pressure.FL"], row["Tyre.Pressure.FR"], row["Tyre.Pressure.RL"], row["Tyre.Pressure.RR"]]), 1)
 				row["Tyre.Temperature"] := Round(average([row["Tyre.Temperature.FL"], row["Tyre.Temperature.FR"], row["Tyre.Temperature.RL"], row["Tyre.Temperature.RR"]]), 1)
 			}
 			
-			return countColumn("Tyre.Pressure", "Count", rows)
+			return countValues("Tyre.Pressure", "Count", rows)
 		}
 		else
 			return []
@@ -140,6 +137,32 @@ class TelemetryDatabase extends SessionDatabase {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+countValues(groupedColumn, countColumn, rows) {
+	values := {}
+	
+	for ignore, row in rows {
+		value := row[groupedColumn]
+	
+		if values.HasKey(value)
+			values[value] := values[value] + 1
+		else
+			values[value] := 1
+	}
+	
+	result := []
+	
+	for value, count in values {
+		object := Object()
+	
+		object[groupedColumn] := value
+		object[countColumn] := count
+		
+		result.Push(object)
+	}
+	
+	return result
+}
 
 removeInvalidLaps(rows) {
 	lapTimes := []

@@ -1066,7 +1066,7 @@ class StrategyWorkbench extends ConfigurationItem {
 					telemetryDB := new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
 					
 					mapLaptimes := telemetryDB.getMapLapTimes(this.SelectedWeather, this.SelectedCompound, this.SelectedCompoundColor)
-					tyreLaptimes := telemetryDB.getTyreLifeLapTimes(this.SelectedWeather, this.SelectedCompound, this.SelectedCompoundColor)
+					tyreLaptimes := telemetryDB.getTyreLapsLapTimes(this.SelectedWeather, this.SelectedCompound, this.SelectedCompoundColor)
 				}
 			case 5: ; "Import from Simulation..."
 				simulator := this.SelectedSimulator

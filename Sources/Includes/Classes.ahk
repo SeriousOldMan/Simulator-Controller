@@ -244,8 +244,10 @@ class Application extends ConfigurationItem {
 		specialIsRunning := this.iSpecialIsRunning
 		
 		if (special && specialIsRunning && (specialIsRunning != ""))
-			if %specialIsRunning%()
+			if (Func(specialIsRunning) && %specialIsRunning%())
 				return true
+			else
+				return false
 		
 		return (this.getProcessID() != 0)
 	}
@@ -514,7 +516,9 @@ class Function extends ConfigurationItem {
 	}
 	
 	actionCallable(trigger, action) {
-		return (action != false) ? Func(action[1]).Bind(action[2]*) : false
+		local function := (action != false) ? Func(action[1]) : false
+		
+		return (function != false) ? function.Bind(action[2]*) : false
 	}
 	
 	fireAction(trigger) {

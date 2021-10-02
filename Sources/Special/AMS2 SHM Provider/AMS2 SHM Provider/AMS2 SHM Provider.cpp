@@ -146,6 +146,7 @@ int main(int argc, char* argv[]) {
 			for (int i = 1; i <= localCopy->mNumParticipants; ++i) {
 				ParticipantInfo vehicle = localCopy->mParticipantInfo[i - 1];
 
+				printf("Car.%d.Nr=%d\n", i, i);
 				printf("Car.%d.Position=%d\n", i, vehicle.mRacePosition);
 				printf("Car.%d.Lap=%d\n", i, vehicle.mLapsCompleted);
 				printf("Car.%d.Lap.Running=%f\n", i, vehicle.mCurrentLapDistance / localCopy->mTrackLength);
@@ -208,6 +209,10 @@ int main(int argc, char* argv[]) {
 		printf("SessionLapsRemaining=%ld\n", getRemainingLaps(localCopy));
 
 		printf("[Car Data]\n");
+
+		printf("MAP=n/a\n");
+		printf("TC=n/a\n");
+		printf("ABS=n/a\n");
 
 		printf("BodyworkDamage=%f, %f, %f, %f, %f\n", 0.0, 0.0, 0.0, 0.0, normalizeDamage(localCopy->mAeroDamage));
 		printf("SuspensionDamage=%f, %f, %f, %f\n", normalizeDamage(localCopy->mSuspensionDamage[TYRE_FRONT_LEFT]),

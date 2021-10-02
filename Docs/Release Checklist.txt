@@ -4,17 +4,82 @@ General Release Actions
 0. Search for "false &&" and "true ||"
 1. Update [Updates] section in "Simulator Tools.targets"
 2. Update [Processed] section in "UPDATES"
-3. Update "VERSION" file, especially *Release* setting
+3. Update "VERSION" file, especially *Release* setting incl. "Download" property
 4. Copy "VERSION" file to DropBox
-5. Copy *Release*.zip file to DropBox
-6. Update "README.md"
-7. Update "Releases.md"
-8. Update "Backlog.md"
-9. Check, whether update documentation for the release is required in "Updates.md"
-10. Update Wiki using "update-documentation.bat"
-11. Update commands in Discord
-12. Update #releases and #anouncements in Discord
-13. Set a Git Tag after final commit
+5. Copy *Release*.zip file to DropBox6
+6. Update "Simulator Controller.exe" in DropBox
+7. Update "README.md"
+8. Update "Releases.md"
+9. Update "Backlog.md"
+10. Check, whether update documentation for the release is required in "Updates.md"
+11. Update Wiki using "update-documentation.bat"
+12. Update commands in Discord
+13. Update #releases and #anouncements in Discord
+14. Set a Git Tag after final commit
+
+Release 3.5.8 Checklist
+=======================
+
+0. Search for new links (*)
+1. Update Procedure
+   a. Translations
+   b. Rename "Setup Database" => "Database"
+   c. Phrase Grammars
+   d. Plugin Labels
+   e. Update for Start Menu Shortcuts => Strategy Workbench
+2. Rename "Setup Database" => "Database"
+   a. Update Notes
+3. Cato is now also active during a practice session
+   a. Update Notes
+4. New action "openStrategyWorkbench"
+   a. Documentation
+5. New plugin action "StrategyWorkbenchOpen"
+   a. Documentation
+
+Release 3.5.6 Checklist
+=======================
+
+0. Search for new links (*)
+1. New reports for the "Race Reports" tool
+   a. Documentation
+   b. New images
+2. Update procedure
+   a. Translations
+   b. Phrase Grammars
+   c. Plugin Labels
+3. New Call command for Assistants
+   a. Documentation
+   b. Update Notes
+4. Rework of RaceRoom Racing Experience Pit Menu Handling
+   a. Documentation
+   b. Update Notes
+
+Release 3.5.4 Checklist
+=======================
+
+0. Search for new links (*)
+1. Update procedure
+   a. Translations
+   b. Phrase Grammars
+2. New Race Strategist Configuration
+   a. Documentation
+   b. Doc Image
+   c. Mention in Update Notes
+3. New Race Report Tool
+   a. Documentation
+   b. Update Procedure read Install file and merge Start Menu Items
+   c. Translations
+
+Release 3.5.2 Checklist
+=======================
+
+0. Search for new links (*)
+1. Update procedure
+   a. Translations
+2. Full new Installer and Update process
+   a. Warning
+   b. Update Notes
+   c. Installation & Configuration.md
 
 Release 3.5.0 Checklist
 =======================

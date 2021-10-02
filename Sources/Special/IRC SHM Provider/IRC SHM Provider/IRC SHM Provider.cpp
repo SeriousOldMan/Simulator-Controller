@@ -264,6 +264,15 @@ float getDataFloat(const irsdk_header* header, const char* data, const char* var
 		return 0;
 }
 
+void printDataNAFloat(const irsdk_header* header, const char* data, const char* variable) {
+	char result[32];
+
+	if (getDataValue(result, header, data, variable))
+		printf("%s\n", result);
+	else
+		printf("n/a\n", result);
+}
+
 void setPitstopRefuelAmount(float fuelAmount) {
 	if (fuelAmount == 0)
 		irsdk_broadcastMsg(irsdk_BroadcastPitCommand, irsdk_PitCommand_ClearFuel, 0);
@@ -546,6 +555,9 @@ void writeStandings(const irsdk_header *header, const char* data)
 
 				itoa(carIndex + 1, carIdx1, 10);
 
+				getYamlValue(result, sessionInfo, "DriverInfo:Drivers:CarIdx:{%s}CarNumber:", carIdx1);
+
+				printf("Car.%s.Nr=%s\n", carIdx1, result);
 				printf("Car.%s.Position=%s\n", carIdx1, posIdx);
 
 				getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:CarIdx:{%s}LapsComplete:", sessionID, carIdx);
@@ -719,6 +731,10 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 			printf("SessionLapsRemaining=%ld\n", lapsRemaining);
 
 			printf("[Car Data]\n");
+
+			printf("MAP="); printDataNAFloat(header, data, "dcEnginePower");
+			printf("TC="); printDataNAFloat(header, data, "dcTractionControl");
+			printf("ABS="); printDataNAFloat(header, data, "dcABS");
 
 			printf("BodyworkDamage=0,0,0,0,0\n");
 			printf("SuspensionDamage=0,0,0,0\n");

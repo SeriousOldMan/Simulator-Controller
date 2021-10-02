@@ -81,7 +81,7 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
 		
-		Gui %window%:Add, GroupBox, x%x% yp+40 w%width% h70 HWNDwidget3 Hidden, % translate("Settings (for all Race Assistants)")
+		Gui %window%:Add, GroupBox, -Theme x%x% yp+40 w%width% h70 HWNDwidget3 Hidden, % translate("Settings (for all Race Assistants)")
 		
 		Gui %window%:Font, Norm, Arial
 		
@@ -96,7 +96,7 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
 		
-		Gui %window%:Add, GroupBox, x%x% yp+35 w%width% h70 HWNDwidget8 Hidden, % translate("Tyre Pressures")
+		Gui %window%:Add, GroupBox, -Theme x%x% yp+35 w%width% h70 HWNDwidget8 Hidden, % translate("Tyre Pressures")
 		
 		Gui %window%:Font, Norm, Arial
 		
@@ -112,7 +112,7 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
 		
-		Gui %window%:Add, GroupBox, x%x% yp+35 w%width% h156 HWNDwidget13 Hidden, % translate("Data Analysis")
+		Gui %window%:Add, GroupBox, -Theme x%x% yp+35 w%width% h156 HWNDwidget13 Hidden, % translate("Data Analysis")
 		
 		Gui %window%:Font, Norm, Arial
 		
@@ -207,21 +207,23 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		
 		this.iCurrentSimulator := reSimulatorDropDown
 		
-		configuration := this.iSimulatorConfigurations[reSimulatorDropDown]
-		
-		GuiControl Choose, reLoadSettingsDropDown, % inList(["Default", "SetupDatabase"], configuration["LoadSettings"])
-		GuiControl Choose, reLoadTyrePressuresDropDown, % inList(["Default", "SetupDatabase", "Import"], configuration["LoadTyrePressures"])
-		
-		GuiControl Choose, reSaveSettingsDropDown, % inList(["Ask", "Always", "Never"], configuration["SaveSettings"])
-		GuiControl Choose, reSaveTyrePressuresDropDown, % inList(["Ask", "Always", "Never"], configuration["SaveTyrePressures"])
-		
-		GuiControl Text, reLearningLapsEdit, % configuration["LearningLaps"]
-		GuiControl Text, reLapsConsideredEdit, % configuration["ConsideredHistoryLaps"]
-		GuiControl Text, reDampingFactorEdit, % configuration["HistoryLapsDamping"]
-		
-		GuiControl, , reAdjustLapTimeCheck, % configuration["AdjustLapTime"]
-		
-		GuiControl Text, reDamageAnalysisLapsEdit, % configuration["DamageAnalysisLaps"]
+		if this.iSimulatorConfigurations.HasKey(reSimulatorDropDown) {
+			configuration := this.iSimulatorConfigurations[reSimulatorDropDown]
+			
+			GuiControl Choose, reLoadSettingsDropDown, % inList(["Default", "SetupDatabase"], configuration["LoadSettings"])
+			GuiControl Choose, reLoadTyrePressuresDropDown, % inList(["Default", "SetupDatabase", "Import"], configuration["LoadTyrePressures"])
+			
+			GuiControl Choose, reSaveSettingsDropDown, % inList(["Ask", "Always", "Never"], configuration["SaveSettings"])
+			GuiControl Choose, reSaveTyrePressuresDropDown, % inList(["Ask", "Always", "Never"], configuration["SaveTyrePressures"])
+			
+			GuiControl Text, reLearningLapsEdit, % configuration["LearningLaps"]
+			GuiControl Text, reLapsConsideredEdit, % configuration["ConsideredHistoryLaps"]
+			GuiControl Text, reDampingFactorEdit, % configuration["HistoryLapsDamping"]
+			
+			GuiControl, , reAdjustLapTimeCheck, % configuration["AdjustLapTime"]
+			
+			GuiControl Text, reDamageAnalysisLapsEdit, % configuration["DamageAnalysisLaps"]
+		}
 	}
 	
 	saveSimulatorConfiguration() {

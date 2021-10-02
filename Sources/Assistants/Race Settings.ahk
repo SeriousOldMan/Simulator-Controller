@@ -404,7 +404,7 @@ restart:
 		Gui RES:Default
 			
 		Gui RES:-Border ; -Caption
-		Gui RES:Color, D0D0D0, E5E5E5
+		Gui RES:Color, D0D0D0, D8D8D8
 
 		Gui RES:Font, Bold, Arial
 
@@ -495,7 +495,7 @@ restart:
 		Gui RES:Font, Norm, Arial
 		Gui RES:Font, Italic, Arial
 
-		Gui RES:Add, GroupBox, x16 yp+30 w180 h120 Section, % translate("Dry Tyres")
+		Gui RES:Add, GroupBox, -Theme x16 yp+30 w180 h120 Section, % translate("Dry Tyres")
 				
 		Gui RES:Font, Norm, Arial
 
@@ -522,7 +522,7 @@ restart:
 		Gui RES:Font, Norm, Arial
 		Gui RES:Font, Italic, Arial
 				
-		Gui RES:Add, GroupBox, x202 ys w180 h120, % translate("Wet Tyres")
+		Gui RES:Add, GroupBox, -Theme x202 ys w180 h120, % translate("Wet Tyres")
 				
 		Gui RES:Font, Norm, Arial
 
@@ -566,11 +566,11 @@ restart:
 		Gui RES:Add, CheckBox, x292 yp-1 w17 h23 Checked%formationLapCheck% VformationLapCheck, %formationLapCheck%
 		Gui RES:Add, Text, x310 yp+4 w90 h20, % translate("Lap")
 				
-		Gui RES:Add, Text, x212 yp+22 w85 h23 +0x200, % translate("Post Race")
+		Gui RES:Add, Text, x212 yp+21 w85 h23 +0x200, % translate("Post Race")
 		Gui RES:Add, CheckBox, x292 yp-1 w17 h23 Checked%postRaceLapCheck% VpostRaceLapCheck, %postRaceLapCheck%
 		Gui RES:Add, Text, x310 yp+4 w90 h20, % translate("Lap")
 				
-		Gui RES:Add, Text, x212 yp+22 w85 h23 +0x200, % translate("Safety Fuel")
+		Gui RES:Add, Text, x212 yp+21 w85 h23 +0x200, % translate("Safety Fuel")
 		Gui RES:Add, Edit, x292 yp w50 h20 VsafetyFuelEdit, %safetyFuelEdit%
 		Gui RES:Add, UpDown, x324 yp-2 w18 h20, %safetyFuelEdit%
 		Gui RES:Add, Text, x350 yp+2 w90 h20, % translate("Ltr.")
@@ -619,7 +619,7 @@ restart:
 		Gui RES:Font, Norm, Arial
 		Gui RES:Font, Italic, Arial
 
-		Gui RES:Add, GroupBox, x16 yp+30 w180 h120 Section, % translate("Dry Tyres")
+		Gui RES:Add, GroupBox, -Theme x16 yp+30 w180 h120 Section, % translate("Dry Tyres")
 				
 		Gui RES:Font, Norm, Arial
 
@@ -646,7 +646,7 @@ restart:
 		Gui RES:Font, Norm, Arial
 		Gui RES:Font, Italic, Arial
 				
-		Gui RES:Add, GroupBox, x202 ys w180 h120 , % translate("Wet Tyres")
+		Gui RES:Add, GroupBox, -Theme x202 ys w180 h120 , % translate("Wet Tyres")
 				
 		Gui RES:Font, Norm, Arial
 
@@ -694,7 +694,7 @@ restart:
 		Gui RES:Add, UpDown, x158 yp-2 w18 h20 Range1-9 0x80, %pitstopStrategyWindowEdit%
 		Gui RES:Add, Text, x184 yp+4 w290 h20, % translate("Laps +/- around optimal lap")
 
-		Gui RES:Add, Text, x16 yp+22 w105 h20 +0x200, % translate("Pitstop Delta")
+		Gui RES:Add, Text, x16 yp+22 w105 h20 +0x200, % translate("Pitlane Delta")
 		Gui RES:Add, Edit, x126 yp-2 w50 h20 Limit2 Number VpitstopDeltaEdit, %pitstopDeltaEdit%
 		Gui RES:Add, UpDown, x158 yp-2 w18 h20 0x80, %pitstopDeltaEdit%
 		Gui RES:Add, Text, x184 yp+4 w290 h20, % translate("Seconds (Drive through - Drive by)")

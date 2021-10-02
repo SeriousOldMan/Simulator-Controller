@@ -640,13 +640,21 @@ downloadSetup(setupType, setupName) {
 }
 
 deleteSetup(setupType, setupName) {
-	GuiControlGet simulatorDropDown
-	GuiControlGet carDropDown
-	GuiControlGet trackDropDown
+	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+	title := translate("Modular Simulator Controller System")
+	MsgBox 262436, %title%, % translate("Do you really want to delete the selected setup?")
+	OnMessage(0x44, "")
 	
-	vSetupDatabase.deleteSetup(simulatorDropDown, carDropDown, trackDropDown, setupType, setupName)
-	
-	loadSetups()
+	IfMsgBox Yes
+	{
+		GuiControlGet simulatorDropDown
+		GuiControlGet carDropDown
+		GuiControlGet trackDropDown
+		
+		vSetupDatabase.deleteSetup(simulatorDropDown, carDropDown, trackDropDown, setupType, setupName)
+		
+		loadSetups()
+	}
 }
 
 uploadDryQualificationSetup() {
@@ -856,15 +864,23 @@ duplicateSettings() {
 }
 
 deleteSettings() {
-	GuiControlGet simulatorDropDown
-	GuiControlGet carDropDown
-	GuiControlGet trackDropDown
+	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+	title := translate("Modular Simulator Controller System")
+	MsgBox 262436, %title%, % translate("Do you really want to delete the selected settings?")
+	OnMessage(0x44, "")
 	
-	settingsName := getSettings()
-	
-	vSetupDatabase.deleteSettings(simulatorDropDown, carDropDown, trackDropDown, settingsName)
-	
-	loadSettings()
+	IfMsgBox Yes
+	{
+		GuiControlGet simulatorDropDown
+		GuiControlGet carDropDown
+		GuiControlGet trackDropDown
+		
+		settingsName := getSettings()
+		
+		vSetupDatabase.deleteSettings(simulatorDropDown, carDropDown, trackDropDown, settingsName)
+		
+		loadSettings()
+	}
 }
 
 updateQueryScope() {
@@ -1196,8 +1212,7 @@ showSetupDatabase() {
 	if ((airTemperature <= 0) || (trackTemperature <= 0)) {
 		airTemperature := false
 		trackTemperature := false
-	}
-		
+	}	
 	
 	vSetupDatabase := new SetupDatabase()
 	

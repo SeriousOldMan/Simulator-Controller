@@ -39,9 +39,9 @@ global kProveAll = "ProveAll:"
 global kSet = "Set:"
 global kClear = "Clear:"
 
-global kBuiltinFunctors = ["option", "sqrt", "+", "-", "*", "/", ">", "<", "=", "!=", "builtin1", "unbound?", "append", "get"]
-global kBuiltinFunctions = ["option", "squareRoot", "plus", "minus", "multiply", "divide", "greater", "less", "equal", "unequal", "builtin1", "unbound", "append", "get"]
-global kBuiltinAritys = [2, 2, 3, 3, 3, 3, 2, 2, 2, 2, 3, 1, -1, -1]
+global kBuiltinFunctors = ["option", "sqrt", "+", "-", "*", "/", ">", "<", "=", "!=", "builtin0", "builtin1", "unbound?", "append", "get"]
+global kBuiltinFunctions = ["option", "squareRoot", "plus", "minus", "multiply", "divide", "greater", "less", "equal", "unequal", "builtin0", "builtin1", "unbound", "append", "get"]
+global kBuiltinAritys = [2, 2, 3, 3, 3, 3, 2, 2, 2, 2, 2, 3, 1, -1, -1]
 
 global kProduction = "Production"
 global kReduction = "Reduction"
@@ -259,12 +259,12 @@ class Predicate extends Condition {
 	getFacts(ByRef facts) {
 		left := this.iLeftPrimary
 		
-		if (left.base == Variable)
+		if ((left != kNotInitialized) && (left.base == Variable))
 			facts.Push(left.Variable[true])
 		
 		right := this.iRightPrimary
 		
-		if ((right != false) && (right.base == Variable))
+		if ((right != kNotInitialized) && (right.base == Variable))
 			facts.Push(right.Variable[true])
 	}
 	
@@ -383,15 +383,19 @@ class Variable extends Primary {
 	}
 	
 	getValue(variablesFactsOrResultSet, default := "__NotInitialized__") {
-		value := variablesFactsOrResultSet.getValue(((variablesFactsOrResultSet.base == Facts) || ((variablesFactsOrResultSet.base == ProductionRule.Variables))) ? this : this.iRootVariable)
+		if (variablesFactsOrResultSet == kNotInitialized)
+			return this
+		else {
+			value := variablesFactsOrResultSet.getValue(((variablesFactsOrResultSet.base == Facts) || ((variablesFactsOrResultSet.base == ProductionRule.Variables))) ? this : this.iRootVariable)
 	
-		if (IsObject(value) && ((value.base == Variable) || (value.base == Literal) || (value.base == Fact)))
-			value := value.getValue(variablesFactsOrResultSet, value)
-					
-		if (value != kNotInitialized)
-			return value
-		else
-			return default
+			if (IsObject(value) && ((value.base == Variable) || (value.base == Literal) || (value.base == Fact)))
+				value := value.getValue(variablesFactsOrResultSet, value)
+						
+			if (value != kNotInitialized)
+				return value
+			else
+				return default
+		}
 	}
 	
 	injectValues(resultSet) {
@@ -493,7 +497,9 @@ class Fact extends Primary {
 	}
 	
 	toString(factsOrResultSet := "__NotInitialized__") {
-		if (factsOrResultSet.base == Facts)
+		if (factsOrResultSet == kNotInitialized)
+			return false
+		else if (factsOrResultSet.base == Facts)
 			return factsOrResultSet.getValue(this.Fact)
 		else if (factsOrResultSet.base == ResultSet)
 			return factsOrResultSet.KnowledgeBase.Facts.getValue(this.Fact)
@@ -1676,6 +1682,12 @@ class ChoicePoint {
 		}
 	}
 	
+	RuleEngine[] {
+		Get {
+			return this.KnowledgeBase.RuleEngine
+		}
+	}
+	
 	Goal[] {
 		Get {
 			return this.iGoal
@@ -2474,10 +2486,11 @@ class Facts {
 	getValue(fact, default := "__NotInitialized__") {
 		local facts := this.Facts
 		
-		if (fact.base == Variable)
-			fact := fact.Variable[true]
-		else if (fact.base == Literal)
-			fact := fact.Literal
+		if IsObject(fact)
+			if (fact.base == Variable)
+				fact := fact.Variable[true]
+			else if (fact.base == Literal)
+				fact := fact.Literal
 		
 		return (facts.HasKey(fact) ? facts[fact] : default)
 	}
@@ -3120,7 +3133,7 @@ class RuleCompiler {
 					
 					if (term != kNotFound)
 						terms.Push(term)
-					else if (!this.isEmpty(text, nextCharIndex) || (A_index == 1))
+					else if (!this.isEmpty(text, nextCharIndex) || (A_Index == 1))
 						Throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in RuleCompiler.readTail..."
 					else
 						return terms
@@ -4287,6 +4300,14 @@ equal(choicePoint, operand1, operand2) {
 
 unequal(choicePoint, operand1, operand2) {
 	return !choicePoint.ResultSet.unify(choicePoint, operand1, operand2)
+}
+
+builtin0(choicePoint, function, operand1) {
+	local resultSet := choicePoint.ResultSet
+	
+	function := function.toString(resultSet)
+	
+	return resultSet.unify(choicePoint, new Literal(%function%()), operand1.getValue(resultSet, operand1))
 }
 
 builtin1(choicePoint, function, operand1, operand2) {

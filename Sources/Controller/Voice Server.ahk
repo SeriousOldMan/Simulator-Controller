@@ -274,8 +274,9 @@ class VoiceServer extends ConfigurationItem {
 					return false
 				}
 				else {
-					SoundPlay %kResourcesDirectory%Sounds\Talk.wav
-					
+					if this.VoiceServer.PushToTalk
+						SoundPlay %kResourcesDirectory%Sounds\Talk.wav
+			
 					this.iIsListening := true
 				
 					return true
@@ -571,6 +572,9 @@ class VoiceServer extends ConfigurationItem {
 				return false
 			}
 			else {
+				if VoiceServer.PushToTalk
+					SoundPlay %kResourcesDirectory%Sounds\Talk.wav
+			
 				this.iIsListening := true
 			
 				return true
@@ -599,7 +603,7 @@ class VoiceServer extends ConfigurationItem {
 	
 	startListening(retry := true) {
 		activeClient := this.getVoiceClient()
-			
+		
 		return (activeClient ? activeClient.startListening(retry) : false)
 	}
 	
@@ -659,7 +663,7 @@ class VoiceServer extends ConfigurationItem {
 		
 		this.VoiceClients[descriptor] := client
 		
-		if activationCommand {
+		if activationCommand && listener {
 			recognizer := this.SpeechRecognizer[true]
 			grammar := (descriptor . "." . counter++)
 			
@@ -682,10 +686,14 @@ class VoiceServer extends ConfigurationItem {
 		
 		if (this.VoiceClients.Count() = 1)
 			this.activateVoiceClient(descriptor)
-		else if (this.VoiceClients.Count() = 2)
+		else if (this.VoiceClients.Count() > 1) {
 			for theDescriptor, ignore in this.VoiceClients
 				if (descriptor != theDescriptor)
 					this.deactivateVoiceClient(theDescriptor)
+			
+			if !this.PushToTalk
+				this.startActivationListener()
+		}
 	}
 	
 	unregisterVoiceClient(descriptor, pid) {
@@ -696,9 +704,13 @@ class VoiceServer extends ConfigurationItem {
 		
 		this.VoiceClients.Delete(descriptor)
 		
-		if (this.VoiceClients.Count() = 1)
+		if (this.VoiceClients.Count() = 1) {
 			for theDescriptor, ignore in this.VoiceClients
 				this.activateVoiceClient(theDescriptor)
+			
+			if !this.PushToTalk
+				this.stopActivationListener()
+		}
 	}
 	
 	unregisterStaleVoiceClients() {
@@ -713,7 +725,7 @@ class VoiceServer extends ConfigurationItem {
 				if !ErrorLevel {
 					this.unregisterVoiceClient(descriptor, pid)
 					
-					this.unregisterStaleClients()
+					this.unregisterStaleVoiceClients()
 					
 					break
 				}
@@ -730,6 +742,13 @@ class VoiceServer extends ConfigurationItem {
 	
 	registerVoiceCommand(descriptor, grammar, command, callback) {
 		this.getVoiceClient(descriptor).registerVoiceCommand(grammar, command, callback)
+	}
+	
+	recognizeActivation(descriptor, grammar, words*) {
+		local voiceClient := this.VoiceClients[descriptor]
+		
+		if voiceClient
+			this.recognizeActivationCommand(voiceClient, voiceClient.Descriptor, words)
 	}
 	
 	recognizeCommand(grammar, words*) {

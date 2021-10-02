@@ -103,7 +103,7 @@ class ConfigurationEditor extends ConfigurationItem {
 		Gui %window%:Default
 	
 		Gui %window%:-Border ; -Caption
-		Gui %window%:Color, D0D0D0, F2F2F2
+		Gui %window%:Color, D0D0D0, D8D8D8
 
 		Gui %window%:Font, Bold, Arial
 
@@ -168,9 +168,6 @@ class ConfigurationEditor extends ConfigurationItem {
 		setConfigurationValue(configuration, "General", "Save", this.iSaveMode)
 		
 		this.iGeneralTab.saveToConfiguration(configuration)
-		
-		if this.iDevelopment
-			this.iDevelopmentTab.saveToConfiguration(configuration)
 		
 		for ignore, configurator in this.Configurators
 			configurator[2].saveToConfiguration(configuration)

@@ -109,9 +109,11 @@ typedef enum
     R3E_PIT_MENU_FUEL = 3,
     R3E_PIT_MENU_FRONTTIRES = 4,
     R3E_PIT_MENU_REARTIRES = 5,
-    R3E_PIT_MENU_FRONTWING = 6,
-    R3E_PIT_MENU_REARWING = 7,
-    R3E_PIT_MENU_SUSPENSION = 8,
+    R3E_PIT_MENU_BODYWORK = 6,
+    R3E_PIT_MENU_FRONTWING = 7,
+    R3E_PIT_MENU_REARWING = 8,
+    // R3E_PIT_MENU_SUSPENSION = 8,
+    // Waiting for a fix from S3 here...
 	
     // Pit menu buttons
     R3E_PIT_MENU_BUTTON_TOP = 9,

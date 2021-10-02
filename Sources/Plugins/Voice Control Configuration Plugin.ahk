@@ -547,7 +547,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 			configuration := this.Configuration
 		}
 		
-		if !windowsSpeakerDropDown
+		if (configuration && !windowsSpeakerDropDown)
 			windowsSpeakerDropDown := getConfigurationValue(configuration, "Voice Control", "Speaker.Windows",  getConfigurationValue(this.Configuration, "Voice Control", "Speaker", true))
 		
 		language := this.getCurrentLanguage()
@@ -580,7 +580,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 			GuiControlGet azureSpeakerDropDown
 		}
 		
-		if !azureSpeakerDropDown
+		if (configuration && !azureSpeakerDropDown)
 			azureSpeakerDropDown := getConfigurationValue(configuration, "Voice Control", "Speaker.Azure", true)
 		
 		if ((azureSubscriptionKeyEdit != "") && (azureTokenIssuerEdit)) {
@@ -687,6 +687,8 @@ getPTTHotkey() {
 }
 
 chooseSoXPath() {
+	GuiControlGet soXPathEdit
+	
 	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
 	FileSelectFolder directory, *%soXPathEdit%, 0, % translate("Select SoX folder...")
 	OnMessage(0x44, "")

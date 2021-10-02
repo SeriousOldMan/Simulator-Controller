@@ -7,7 +7,7 @@ All these constants define paths pointing to a specific folder in the Simulator 
 #### *kSplashMediaDirectory, kScreenImagesDirectory, kButtonBoxImagesDirectory, kIconsDirectory*
 Paths for graphical and audio resources contained in the Simulator Controller distribution.
 
-#### *kUserHomeDirectory, kUserConfigDirectory, *kUserRulesDirectory*, *kUserGrammarsDirectory*, *kUserTranslationsDirectory*, kUserSplashMediaDirectory, kUserScreenImagesDirectory, kUserPluginsDirectory, kLogsDirectory*, *kTempDirectory*, *kSetupDatabaseDirectory*
+#### *kUserHomeDirectory, kUserConfigDirectory, *kUserRulesDirectory*, *kUserGrammarsDirectory*, *kUserTranslationsDirectory*, kUserSplashMediaDirectory, kUserScreenImagesDirectory, kUserPluginsDirectory, kLogsDirectory*, *kTempDirectory*, *kDatabaseDirectory*
 A special folder *Simulator Controller* will be created in the user *Documents* folder. It will contain various subfolders for adding user-specific extensions or substitutions (media, plugins, ...), and for storing configuration and log files.
 
 #### *kSimulatorConfigurationFile, kSimulatorSettingsFile*

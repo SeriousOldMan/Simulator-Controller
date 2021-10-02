@@ -26,7 +26,9 @@ global kR3EPlugin = "R3E"
 ;;;                         Private Constant Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kBinaryOptions = ["Change Front Tyres", "Change Rear Tyres", "Repair Bodywork", "Repair Aero Front", "Repair Aero Rear", "Repair Suspension", "Request Pitstop"]
+global kBinaryOptions = ["Serve Penalty", "Change Front Tyres", "Change Rear Tyres", "Repair Bodywork", "Repair Front Aero", "Repair Rear Aero", "Repair Suspension", "Request Pitstop"]
+
+global kUseImageRecognition = true
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -200,66 +202,134 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 
 		Loop 15
 			SendEvent % this.NextOptionHotkey
-		
-		if this.searchMFDImage("Strategy") {
-			this.iPitstopOptions.Push("Strategy")
-			this.iPitstopOptionStates.Push(true)
-		}
-		
-		if this.searchMFDImage("Refuel") {
-			this.iPitstopOptions.Push("Refuel")
-			this.iPitstopOptionStates.Push(true)
-		}
-		else if (this.searchMFDImage("No Refuel")) {
-			this.iPitstopOptions.Push("Refuel")
-			this.iPitstopOptionStates.Push(false)
-		}
-		
-		if this.searchMFDImage("Front Tyre Change") {
-			this.iPitstopOptions.Push("Change Front Tyres")
-			this.iPitstopOptionStates.Push(true)
-		}
-		else { ; if this.searchMFDImage("No Front Tyre Change") {
-			this.iPitstopOptions.Push("Change Front Tyres")
-			this.iPitstopOptionStates.Push(false)
-		}
-		
-		if this.searchMFDImage("Rear Tyre Change") {
-			this.iPitstopOptions.Push("Change Rear Tyres")
-			this.iPitstopOptionStates.Push(true)
-		}
-		else { ; if this.searchMFDImage("No Rear Tyre Change") {
-			this.iPitstopOptions.Push("Change Rear Tyres")
-			this.iPitstopOptionStates.Push(false)
-		}
-		
-		if this.searchMFDImage("Bodywork Damage") {
-			this.iPitstopOptions.Push("Repair Bodywork")
-			this.iPitstopOptionStates.Push(this.searchMFDImage("Bodywork Damage Selected") != false)
-		}
-		
-		if this.searchMFDImage("Front Damage") {
-			this.iPitstopOptions.Push("Repair Aero Front")
-			this.iPitstopOptionStates.Push(this.searchMFDImage("Front Damage Selected") != false)
-		}
-		
-		if this.searchMFDImage("Rear Damage") {
-			this.iPitstopOptions.Push("Repair Aero Rear")
-			this.iPitstopOptionStates.Push(this.searchMFDImage("Rear Damage Selected") != false)
-		}
-		
-		if this.searchMFDImage("Suspension Damage") {
-			this.iPitstopOptions.Push("Repair Suspension")
-			this.iPitstopOptionStates.Push(this.searchMFDImage("Suspension Damage Selected") != false)
-		}
-		
-		if this.searchMFDImage("PIT REQUEST") {
-			this.iPitstopOptions.Push("Request Pitstop")
-			this.iPitstopOptionStates.Push(true)
+			
+		if kUseImageRecognition {
+			if this.searchMFDImage("Strategy") {
+				this.iPitstopOptions.Push("Strategy")
+				this.iPitstopOptionStates.Push(true)
+			}
+			
+			if this.searchMFDImage("Refuel") {
+				this.iPitstopOptions.Push("Refuel")
+				this.iPitstopOptionStates.Push(true)
+			}
+			else if (this.searchMFDImage("No Refuel")) {
+				this.iPitstopOptions.Push("Refuel")
+				this.iPitstopOptionStates.Push(false)
+			}
+			
+			if this.searchMFDImage("Front Tyre Change") {
+				this.iPitstopOptions.Push("Change Front Tyres")
+				this.iPitstopOptionStates.Push(true)
+			}
+			else { ; if this.searchMFDImage("No Front Tyre Change") {
+				this.iPitstopOptions.Push("Change Front Tyres")
+				this.iPitstopOptionStates.Push(false)
+			}
+			
+			if this.searchMFDImage("Rear Tyre Change") {
+				this.iPitstopOptions.Push("Change Rear Tyres")
+				this.iPitstopOptionStates.Push(true)
+			}
+			else { ; if this.searchMFDImage("No Rear Tyre Change") {
+				this.iPitstopOptions.Push("Change Rear Tyres")
+				this.iPitstopOptionStates.Push(false)
+			}
+			
+			if this.searchMFDImage("Bodywork Damage") {
+				this.iPitstopOptions.Push("Repair Bodywork")
+				this.iPitstopOptionStates.Push(this.searchMFDImage("Bodywork Damage Selected") != false)
+			}
+			
+			if this.searchMFDImage("Front Damage") {
+				this.iPitstopOptions.Push("Repair Front Aero")
+				this.iPitstopOptionStates.Push(this.searchMFDImage("Front Damage Selected") != false)
+			}
+			
+			if this.searchMFDImage("Rear Damage") {
+				this.iPitstopOptions.Push("Repair Rear Aero")
+				this.iPitstopOptionStates.Push(this.searchMFDImage("Rear Damage Selected") != false)
+			}
+			
+			if this.searchMFDImage("Suspension Damage") {
+				this.iPitstopOptions.Push("Repair Suspension")
+				this.iPitstopOptionStates.Push(this.searchMFDImage("Suspension Damage Selected") != false)
+			}
+			
+			if this.searchMFDImage("PIT REQUEST") {
+				this.iPitstopOptions.Push("Request Pitstop")
+				this.iPitstopOptionStates.Push(true)
+			}
+			else {
+				this.iPitstopOptions.Push("Request Pitstop")
+				this.iPitstopOptionStates.Push(false)
+			}
 		}
 		else {
-			this.iPitstopOptions.Push("Request Pitstop")
-			this.iPitstopOptionStates.Push(false)
+			pitMenuState := getConfigurationSectionValues(readSimulatorData(this.Code), "Pit Menu State")
+		
+			if (pitMenuState["Strategy"] != "Unavailable") {
+				this.iPitstopOptions.Push("Strategy")
+				this.iPitstopOptionStates.Push(pitMenuState["Strategy"])
+			}
+			
+			if (pitMenuState["Serve Penalty"] != "Unavailable") {
+				this.iPitstopOptions.Push("Serve Penalty")
+				this.iPitstopOptionStates.Push(pitMenuState["Serve Penalty"])
+			}
+			
+			if (pitMenuState["Driver"] != "Unavailable") {
+				this.iPitstopOptions.Push("Driver")
+				this.iPitstopOptionStates.Push(pitMenuState["Driver"])
+			}
+			
+			if (pitMenuState["Refuel"] != "Unavailable") {
+				this.iPitstopOptions.Push("Refuel")
+				this.iPitstopOptionStates.Push(pitMenuState["Refuel"])
+			}
+			
+			if (pitMenuState["Change Front Tyres"] != "Unavailable") {
+				this.iPitstopOptions.Push("Change Front Tyres")
+				this.iPitstopOptionStates.Push(pitMenuState["Change Front Tyres"])
+			}
+			
+			if (pitMenuState["Change Rear Tyres"] != "Unavailable") {
+				this.iPitstopOptions.Push("Change Rear Tyres")
+				this.iPitstopOptionStates.Push(pitMenuState["Change Rear Tyres"])
+			}
+			
+			if true {
+				if this.searchMFDImage("Bodywork Damage") {
+					this.iPitstopOptions.Push("Repair Bodywork")
+					this.iPitstopOptionStates.Push(this.searchMFDImage("Bodywork Damage Selected") != false)
+				}
+			}
+			else {
+				if (pitMenuState["Repair Bodywork"] != "Unavailable") {
+					this.iPitstopOptions.Push("Repair Bodywork")
+					this.iPitstopOptionStates.Push(pitMenuState["Repair Bodywork"])
+				}
+			}
+			
+			if (pitMenuState["Repair Front Aero"] != "Unavailable") {
+				this.iPitstopOptions.Push("Repair Front Aero")
+				this.iPitstopOptionStates.Push(pitMenuState["Repair Front Aero"])
+			}
+			
+			if (pitMenuState["Repair Rear Aero"] != "Unavailable") {
+				this.iPitstopOptions.Push("Repair Rear Aero")
+				this.iPitstopOptionStates.Push(pitMenuState["Repair Rear Aero"])
+			}
+			
+			if (pitMenuState["Repair Suspension"] != "Unavailable") {
+				this.iPitstopOptions.Push("Repair Suspension")
+				this.iPitstopOptionStates.Push(pitMenuState["Repair Suspension"])
+			}
+			
+			if (pitMenuState["Bottom Button"] != "Unavailable") {
+				this.iPitstopOptions.Push("Request Pitstop")
+				this.iPitstopOptionStates.Push(pitMenuState["Bottom Button"])
+			}
 		}
 	}
 	
@@ -269,7 +339,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	
 	optionChosen(option) {
 		index := this.optionIndex(option)
-		
+			
 		return (index ? this.iPitstopOptionStates[index] : false)
 	}
 	
@@ -296,7 +366,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	
 	selectPitstopOption(option) {
 		if (option = "Repair Bodywork")
-			return (this.optionAvailable("Repair Bodywork") || this.optionAvailable("Repair Aero Front") || this.optionAvailable("Repair Aero Rear"))
+			return (this.optionAvailable("Repair Bodywork") || this.optionAvailable("Repair Front Aero") || this.optionAvailable("Repair Rear Aero"))
 		else if (option = "Change Tyres")
 			return (this.optionAvailable("Change Front Tyres") || this.optionAvailable("Change Rear Tyres"))
 		else {
@@ -307,7 +377,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 			if index {
 				this.activateR3EWindow()
 
-				Loop 10
+				Loop 15
 					SendEvent % this.PreviousOptionHotkey
 				
 				index -= 1
@@ -334,8 +404,8 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		}
 		else if (option = "Repair Bodywork") {
 			this.toggleActivity("Repair Bodywork", false, true)
-			this.toggleActivity("Repair Aero Front", false, true)
-			this.toggleActivity("Repair Aero Rear", false, true)
+			this.toggleActivity("Repair Front Aero", false, true)
+			this.toggleActivity("Repair Rear Aero", false, true)
 		}
 		else if (option = "Repair Suspension")
 			this.toggleActivity("Repair Suspension", false, false)
@@ -427,15 +497,15 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		
 		if this.optionAvailable("Repair Bodywork")
 			if (repairBodywork != this.chosenOption("Repair Bodywork"))
-				this.toggleActivity("Repair Repair Bodywork", false, true)
+				this.toggleActivity("Repair Bodywork", false, true)
 		
-		if this.optionAvailable("Repair Aero Front")
-			if (repairBodywork != this.chosenOption("Repair Aero Front"))
-				this.toggleActivity("Repair Aero Front", false, true)
+		if this.optionAvailable("Repair Front Aero")
+			if (repairBodywork != this.chosenOption("Repair Front Aero"))
+				this.toggleActivity("Repair Front Aero", false, true)
 		
-		if this.optionAvailable("Repair Aero Rear")
-			if (repairBodywork != this.chosenOption("Repair Aero Rear"))
-				this.toggleActivity("Repair Aero Rear", false, true)
+		if this.optionAvailable("Repair Rear Aero")
+			if (repairBodywork != this.chosenOption("Repair Rear Aero"))
+				this.toggleActivity("Repair Rear Aero", false, true)
 	}
 	
 	getCarName(carID) {

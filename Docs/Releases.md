@@ -1,3 +1,53 @@
+## 3.5.9-release 10/01/21
+
+  1. Fix for automated save of settings by Race Assistants
+
+## 3.5.8-release 09/24/21
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Renamed "Setup Database" repository to "Database".
+  4. New "Strategy Workbench" tool. Currently undocumented and not much more than an Alpha release.
+  5. "Race Strategist" can now save race statistics for later use in the "Strategy Workbench". See the [revised configuration documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-strategist) for the "Race Strategist" plugin for more information.
+  6. New [plugin parameter "openStrategyWorkbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for "Race Strategist" plugin
+  7. New ["openStrategyWorkbench" action function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) to trigger opening the "Strategy Workbench" from external event sources.
+  8. Fixed "Setup Wizard" to correctly generate the "Pedal Calibration" configuration.
+  9. [Developer] New lightweight Database library to handle simple in-memory or persistent data sets.
+
+## 3.5.6-release 09/10/21
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Three new reports for the ["Race Reports"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports) tool:
+     - Overview - as the name says, gives you an overview over the grid (starting positions, best and average lap times and race result.
+	 - Car - specific data for your car, weather conditions, mounted tyres, elecronic settins, lap times and pitstops.
+	 - Driver - compare the different drivers on the grid regarding potential, race craft, speed, consistency and car control.
+  4. Improved "Pace" report including median and quartile calculation.
+  5. Various usability improvements for the "Race Reports" tool, incl. better selection of reports based on car and track grouping.
+  6. [New "Call" command](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) allows you to actiavte the listen mode of a race assistant by the touch of a button on your Button Box.
+  7. Improved reliability for voice control of multiple Race Assistants, when Push-to-Talk is not used.
+  8. Optimized language handling for SAPI voices to support non-Microsoft language packs.
+
+## 3.5.4-release 09/03/21
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. New ["Race Reports"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports) tool. This tool will bring post race analysis to Simulator Controller.
+  4. New options for the [Race Strategist configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-strategist) to support the "Race Reports" tool.
+  5. More confirmation questions when deleting settings or setups in the "Setup Database" tool.
+
+## 3.5.2-release 08/27/21
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. New automatic download for Simulator Controller software and support for installation either as fully registered Windows application or as portable application. The beginning of the [Installation & Configuration documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration) has been completely rewritten to give you the necessary background information.
+  4. Fully automatic update package download and installation process.
+  5. Change already prepared Pitstop settings created by the Race Engineer with your Button Box. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#the-pitstop) for Jonas pitstop handling for more information.
+  
+## 3.5.1-release 08/21/21
+
+  1. Bugfix for missing Button Box actions
+
 ## 3.5.0-release 08/20/21
 
   1. Bugfixes, as always
@@ -259,7 +309,7 @@
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. Lots of new stuff in the Jona AI kernel
-     - Full statistical laptime analysis after accidents
+     - Full statistical lap time analysis after accidents
      - Recommandation, whether an early pitstop strategy might be advantageous after an accident
      - Initial rule set for weather and tyre temperature trend analysis
   4. Initial support for rFactor 2 by a skeleton plugin

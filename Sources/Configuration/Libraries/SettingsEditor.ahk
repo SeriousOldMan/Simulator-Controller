@@ -243,7 +243,7 @@ editModes(ByRef settingsOrCommand, globalConfiguration := false) {
 		Gui ME:Default
 				
 		Gui ME:-Border ; -Caption
-		Gui ME:Color, D0D0D0, E5E5E5
+		Gui ME:Color, D0D0D0, D8D8D8
 
 		Gui ME:Font, Bold, Arial
 
@@ -430,7 +430,7 @@ restartSettings:
 		result := false
 		
 		Gui SE:-Border ; -Caption
-		Gui SE:Color, D0D0D0, E5E5E5
+		Gui SE:Color, D0D0D0, D8D8D8
 	
 		Gui SE:Font, Bold, Arial
 	
@@ -465,7 +465,7 @@ restartSettings:
 		Gui SE:Font, Norm, Arial
 		Gui SE:Font, Italic, Arial
 	
-		Gui SE:Add, GroupBox, YP+30 w220 h%coreHeight%, % translate("Start Core System")
+		Gui SE:Add, GroupBox, -Theme YP+30 w220 h%coreHeight%, % translate("Start Core System")
 	
 		Gui SE:Font, Norm, Arial
 	
@@ -486,7 +486,7 @@ restartSettings:
 			Gui SE:Font, Norm, Arial
 			Gui SE:Font, Italic, Arial
 	
-			Gui SE:Add, GroupBox, XP-10 YP+30 w220 h%feedbackHeight%, % translate("Start Feedback System")
+			Gui SE:Add, GroupBox, -Theme XP-10 YP+30 w220 h%feedbackHeight%, % translate("Start Feedback System")
 	
 			Gui SE:Font, Norm, Arial
 	
@@ -527,7 +527,7 @@ restartSettings:
 		Gui SE:Font, Norm, Arial
 		Gui SE:Font, Italic, Arial
 	
-		Gui SE:Add, GroupBox, XP-10 YP+30 w220 h135, % translate("Controller Notifications")
+		Gui SE:Add, GroupBox, -Theme XP-10 YP+30 w220 h135, % translate("Controller Notifications")
 	
 		Gui SE:Font, Norm, Arial
 	

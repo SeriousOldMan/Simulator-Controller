@@ -91,6 +91,10 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		if this.RaceStrategist
 			this.RaceStrategist.recommendPitstop(lapNumber)
 	}
+	
+	sessionActive(sessionState) {
+		return ((sessionState == kSessionPractice) || (sessionState == kSessionRace))
+	}
 }
 
 

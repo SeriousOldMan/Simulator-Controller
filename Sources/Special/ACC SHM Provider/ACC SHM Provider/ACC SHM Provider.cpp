@@ -81,6 +81,14 @@ void printData(string name, float value)
 	wcout << name.c_str() << "=" << value << endl;
 }
 
+void printNAData(string name, long value)
+{
+	if (value == -1)
+		wcout << name.c_str() << "=" << "n/a" << endl;
+	else
+		wcout << name.c_str() << "=" << value << endl;
+}
+
 void printData(string name, string value)
 {
 	wcout << name.c_str() << "=" << value.c_str() << endl;
@@ -185,6 +193,10 @@ int main(int argc, char* argv[])
 
 		_bstr_t tc(gf->tyreCompound);
 		std::string tyreCompound(tc);
+
+		printNAData("MAP", gf->EngineMap + 1);
+		printNAData("TC", gf->TC);
+		printNAData("ABS", gf->ABS);
 
 		printData("BodyworkDamage", pf->carDamage);
 		printData("SuspensionDamage", pf->suspensionDamage);

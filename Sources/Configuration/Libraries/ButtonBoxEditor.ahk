@@ -90,7 +90,7 @@ class ButtonBoxEditor extends ConfigurationItem {
 	AutoSave[] {
 		Get {
 			try {
-				if ConfigurationEditor
+				if (ConfigurationEditor && ConfigurationEditor.Instance)
 					return ConfigurationEditor.Instance.AutoSave
 				else
 					return false
@@ -127,7 +127,7 @@ class ButtonBoxEditor extends ConfigurationItem {
 	
 		Gui BBE:-Border ; -Caption
 		
-		Gui BBE:Color, D0D0D0, E5E5E5
+		Gui BBE:Color, D0D0D0, D8D8D8
 		Gui BBE:Font, Bold, Arial
 
 		Gui BBE:Add, Text, x0 w432 Center gmoveButtonBoxEditor, % translate("Modular Simulator Controller System") 
@@ -270,7 +270,7 @@ class ControlsList extends ConfigurationItemList {
 		Gui BBE:Font, Norm, Arial
 		Gui BBE:Font, Italic, Arial
 		
-		Gui BBE:Add, GroupBox, x8 y60 w424 h138, % translate("Controls")
+		Gui BBE:Add, GroupBox, -Theme x8 y60 w424 h138, % translate("Controls")
 		
 		Gui BBE:Font, Norm, Arial
 		Gui BBE:Add, ListView, x16 y79 w134 h108 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndcontrolsListViewHandle VcontrolsListView glistEvent
@@ -427,7 +427,7 @@ class LabelsList extends ConfigurationItemList {
 		Gui BBE:Font, Norm, Arial
 		Gui BBE:Font, Italic, Arial
 		
-		Gui BBE:Add, GroupBox, x8 y205 w424 h115, % translate("Labels")
+		Gui BBE:Add, GroupBox, -Theme x8 y205 w424 h115, % translate("Labels")
 		
 		Gui BBE:Font, Norm, Arial
 		Gui BBE:Add, ListView, x16 y224 w134 h84 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndlabelsListViewHandle VlabelsListView glistEvent
@@ -806,7 +806,7 @@ class LayoutsList extends ConfigurationItemList {
 	}
 	
 	clearEditor() {
-		this.loadEditor(Array("", {Grid: "0x0", Margins: [0,0,0,0]}))
+		this.loadEditor(Array("", "", {Grid: "0x0", Margins: [0,0,0,0]}))
 	}
 	
 	buildItemFromEditor(isNew := false) {
@@ -1745,7 +1745,10 @@ updateLayoutRowEditor() {
 	protectionOn()
 	
 	try {
-		ConfigurationItemList.getList("layoutsListView").updateLayoutRowEditor()
+		list := ConfigurationItemList.getList("layoutsListView")
+		
+		if list
+			list.updateLayoutRowEditor()
 	}
 	catch exception {
 		; ignore

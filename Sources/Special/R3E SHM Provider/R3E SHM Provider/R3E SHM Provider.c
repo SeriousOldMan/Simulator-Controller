@@ -121,6 +121,13 @@ void substring(char s[], char sub[], int p, int l) {
    sub[c] = '\0';
 }
 
+void printNAValue(long value) {
+	if (value == -1)
+		wprintf_s(L"n/a\n");
+	else
+		wprintf_s(L"%d\n", value);
+}
+
 int main(int argc, char* argv[])
 {
     int err_code = 0;
@@ -144,7 +151,8 @@ int main(int argc, char* argv[])
 		
 		for (int i = 1; i <= map_buffer->num_cars; ++i) {
 			r3e_driver_data vehicle = map_buffer->all_drivers_data_1[i - 1];
-			
+
+			wprintf_s(L"Car.%d.Nr=%d\n", i, i);
 			wprintf_s(L"Car.%d.Position=%d\n", i, vehicle.place);
 			wprintf_s(L"Car.%d.Lap=%d\n", i, vehicle.completed_laps);
 			wprintf_s(L"Car.%d.Lap.Running=%f\n", i, (float)((double)(vehicle.lap_distance / map_buffer->lap_distance) * map_buffer->lap_distance_fraction));
@@ -212,7 +220,12 @@ int main(int argc, char* argv[])
 
 		wprintf_s(L"[Car Data]\n");
 		if (mapped_r3e) {
+
 			double suspDamage = normalizeDamage(map_buffer->car_damage.suspension);
+
+			wprintf_s(L"MAP="); printNAValue(map_buffer->engine_map_setting);
+			wprintf_s(L"TC="); printNAValue(map_buffer->aid_settings.tc);
+			wprintf_s(L"ABS="); printNAValue(map_buffer->aid_settings.abs);
 
 			wprintf_s(L"BodyworkDamage=%f, %f, %f, %f, %f\n", 0.0, 0.0, 0.0, 0.0, normalizeDamage(map_buffer->car_damage.aerodynamics));
 			wprintf_s(L"SuspensionDamage=%f, %f, %f, %f\n", suspDamage, suspDamage, suspDamage, suspDamage);
@@ -289,6 +302,144 @@ int main(int argc, char* argv[])
 		wprintf_s(L"Weather=Dry\n");
 		wprintf_s(L"Weather10Min=Dry\n");
 		wprintf_s(L"Weather30Min=Dry\n");
+
+		wprintf_s(L"[Pit Menu State]\n");
+		if (mapped_r3e) {
+			wprintf(L"Selected=");
+
+			switch (map_buffer->pit_menu_selection) {
+				case R3E_PIT_MENU_UNAVAILABLE:
+					wprintf(L"Unavailable\n");
+
+					break;
+				case R3E_PIT_MENU_PRESET:
+					wprintf(L"Strategy\n");
+
+					break;
+				case R3E_PIT_MENU_PENALTY:
+					wprintf(L"Serve Penalty\n");
+
+					break;
+				case R3E_PIT_MENU_DRIVERCHANGE:
+					wprintf(L"Driver\n");
+
+					break;
+				case R3E_PIT_MENU_FUEL:
+					wprintf(L"Refuel\n");
+
+					break;
+				case R3E_PIT_MENU_FRONTTIRES:
+					wprintf(L"Change Front Tyres\n");
+
+					break;
+				case R3E_PIT_MENU_REARTIRES:
+					wprintf(L"Change Rear Tyres\n");
+
+					break;
+				case R3E_PIT_MENU_FRONTWING:
+					wprintf(L"Repair Front Aero\n");
+
+					break;
+				case R3E_PIT_MENU_REARWING:
+					wprintf(L"Repair Rear Aero\n");
+
+					break;
+				/*
+				case R3E_PIT_MENU_SUSPENSION:
+					wprintf(L"Repair Suspension\n");
+
+					break;
+				*/
+				case R3E_PIT_MENU_BUTTON_TOP:
+					wprintf(L"Top Button\n");
+
+					break;
+				case R3E_PIT_MENU_BUTTON_BOTTOM:
+					wprintf(L"Bottom Button\n");
+
+					break;
+				case R3E_PIT_MENU_MAX:
+					wprintf(L"false\n");
+
+					break;
+				default:
+					wprintf(L"false\n");
+
+					break;
+			}
+
+			for (int i = 0; i < R3E_PIT_MENU_MAX; i++) {
+				switch (i) {
+					case R3E_PIT_MENU_PRESET:
+						wprintf(L"Strategy=");
+
+						break;
+					case R3E_PIT_MENU_PENALTY:
+						wprintf(L"Serve Penalty=");
+
+						break;
+					case R3E_PIT_MENU_DRIVERCHANGE:
+						wprintf(L"Driver=");
+
+						break;
+					case R3E_PIT_MENU_FUEL:
+						wprintf(L"Refuel=");
+
+						break;
+					case R3E_PIT_MENU_FRONTTIRES:
+						wprintf(L"Change Front Tyres=");
+
+						break;
+					case R3E_PIT_MENU_REARTIRES:
+						wprintf(L"Change Rear Tyres=");
+
+						break;
+					case R3E_PIT_MENU_FRONTWING:
+						wprintf(L"Repair Front Aero=");
+
+						break;
+					case R3E_PIT_MENU_REARWING:
+						wprintf(L"Repair Rear Aero=");
+
+						break;
+					/*
+					case R3E_PIT_MENU_SUSPENSION:
+						wprintf(L"Repair Suspension=");
+
+						break;
+					*/
+					case R3E_PIT_MENU_BUTTON_TOP:
+						wprintf(L"Top Button=");
+
+						break;
+					case R3E_PIT_MENU_BUTTON_BOTTOM:
+						wprintf(L"Bottom Button=");
+
+						break;
+					default:
+						wprintf(L"Unknown=");
+
+						break;
+				}
+
+				switch (map_buffer->pit_menu_state[i]) {
+					case 0:
+						wprintf(L"false\n");
+
+						break;
+					case 1:
+						wprintf(L"true\n");
+
+						break;
+					default:
+						wprintf(L"Unavailable\n");
+
+						break;
+				}
+			}
+
+			wprintf(L"\n");
+		}
 
 		wprintf_s(L"[Test Data]\n");
 		if (mapped_r3e) {

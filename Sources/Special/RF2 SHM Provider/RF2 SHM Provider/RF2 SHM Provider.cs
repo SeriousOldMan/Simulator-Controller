@@ -110,6 +110,7 @@ namespace RF2SHMProvider {
 			for (int i = 1; i <= scoring.mScoringInfo.mNumVehicles; ++i) {
 				rF2VehicleScoring vehicle = scoring.mVehicles[i - 1];
 
+				Console.Write("Car."); Console.Write(i); Console.Write(".Nr="); Console.WriteLine(vehicle.mID);
 				Console.Write("Car."); Console.Write(i); Console.Write(".Position="); Console.WriteLine(vehicle.mPlace);
 
 				Console.Write("Car."); Console.Write(i); Console.Write(".Lap="); Console.WriteLine(vehicle.mTotalLaps);
@@ -183,6 +184,10 @@ namespace RF2SHMProvider {
 
 			Console.WriteLine("[Car Data]");
 			if (connected) {
+				Console.WriteLine("MAP=n/a");
+				Console.Write("TC="); Console.WriteLine(extended.mPhysics.mTractionControl);
+				Console.Write("ABS="); Console.WriteLine(extended.mPhysics.mAntiLockBrakes);
+				
 				Console.Write("FuelRemaining="); Console.WriteLine(playerTelemetry.mFuel);
 				Console.Write("TyreTemperature=");
 				Console.WriteLine(GetCelcius(playerTelemetry.mWheels[0].mTireCarcassTemperature) + "," +

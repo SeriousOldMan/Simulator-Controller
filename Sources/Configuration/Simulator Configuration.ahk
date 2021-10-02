@@ -81,7 +81,7 @@ class GeneralTab extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
 		
-		Gui %window%:Add, GroupBox, x16 y80 w458 h70, % translate("Installation")
+		Gui %window%:Add, GroupBox, -Theme x16 y80 w458 h70, % translate("Installation")
 		
 		Gui %window%:Font, Norm, Arial
 		
@@ -96,7 +96,7 @@ class GeneralTab extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
 		
-		Gui %window%:Add, GroupBox, x16 y160 w458 h95, % translate("Settings")
+		Gui %window%:Add, GroupBox, -Theme x16 y160 w458 h95, % translate("Settings")
 		
 		Gui %window%:Font, Norm, Arial
 		
@@ -129,7 +129,7 @@ class GeneralTab extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
 		
-		Gui %window%:Add, GroupBox, x16 y265 w458 h115, % translate("Simulators")
+		Gui %window%:Add, GroupBox, -Theme x16 y265 w458 h115, % translate("Simulators")
 		
 		Gui %window%:Font, Norm, Arial
 		
@@ -139,7 +139,7 @@ class GeneralTab extends ConfigurationItem {
 			Gui %window%:Font, Norm, Arial
 			Gui %window%:Font, Italic, Arial
 			
-			Gui %window%:Add, GroupBox, x16 y388 w458 h119, % translate("Development")
+			Gui %window%:Add, GroupBox, -Theme x16 y388 w458 h119, % translate("Development")
 			
 			Gui %window%:Font, Norm, Arial
 			
@@ -395,6 +395,8 @@ chooseHomePath() {
 	protectionOn()
 	
 	try {
+		GuiControlGet homePathEdit
+		
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
 		FileSelectFolder directory, *%homePathEdit%, 0, % translate("Select Installation folder...")
 		OnMessage(0x44, "")
@@ -411,6 +413,8 @@ chooseNirCmdPath() {
 	protectionOn()
 	
 	try {
+		GuiControlGet nirCmdPathEdit
+		
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
 		FileSelectFolder directory, *%nirCmdPathEdit%, 0, % translate("Select NirCmd folder...")
 		OnMessage(0x44, "")
@@ -427,6 +431,8 @@ chooseAHKPath() {
 	protectionOn()
 	
 	try {
+		GuiControlGet ahkPathEdit
+		
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
 		FileSelectFolder directory, *%ahkPathEdit%, 0, % translate("Select AutoHotkey folder...")
 		OnMessage(0x44, "")
@@ -443,6 +449,8 @@ chooseMSBuildPath() {
 	protectionOn()
 	
 	try {
+		GuiControlGet msBuildPathEdit
+		
 		FileSelectFolder directory, *%msBuildPathEdit%, 0, % translate("Select MSBuild Bin folder...")
 	
 		if (directory != "")

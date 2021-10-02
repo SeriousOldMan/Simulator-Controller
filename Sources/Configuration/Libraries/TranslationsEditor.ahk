@@ -60,7 +60,7 @@ class TranslationsEditor extends ConfigurationItem {
 		Gui TE:Default
 	
 		Gui TE:-Border ; -Caption
-		Gui TE:Color, D0D0D0, E5E5E5
+		Gui TE:Color, D0D0D0, D8D8D8
 
 		Gui TE:Font, Bold, Arial
 

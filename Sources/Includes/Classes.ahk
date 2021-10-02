@@ -282,8 +282,14 @@ class Application extends ConfigurationItem {
 	
 	run(application, exePath, workingDirectory, options := "", wait := false) {
 		try {
+			if InStr(exePath, A_Space)
+				exePath := ("""" . exePath . """")
+				
+			if InStr(workingDirectory, A_Space)
+				workingDirectory := ("""" . workingDirectory . """")
+				
 			if wait {
-				RunWait "%exePath%", "%workingDirectory%", %options%
+				RunWait %exePath%, %workingDirectory%, %options%
 				
 				result := ErrorLevel
 				
@@ -292,7 +298,7 @@ class Application extends ConfigurationItem {
 				return result
 			}
 			else {
-				Run "%exePath%", "%workingDirectory%", %options%, pid
+				Run %exePath%, %workingDirectory%, %options%, pid
 				
 				logMessage(kLogInfo, translate("Application ") . application . translate(" started"))
 			

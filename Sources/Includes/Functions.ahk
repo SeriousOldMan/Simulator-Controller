@@ -898,7 +898,7 @@ loadSimulatorConfiguration() {
 	
 	kSilentMode := getConfigurationValue(kSimulatorConfiguration, "Configuration", "Silent Mode", false)
 		
-	"".base.__Get := "".base.__Set := "".base.__Call := Func("debugNonObjectUsage")
+	"".base.__Get := "".base.__Set := "".base.__Call := Func("reportNonObjectUsage")
 
 	if (!A_IsCompiled || getConfigurationValue(kSimulatorConfiguration, "Configuration", "Debug", false))
 		setDebug(true)
@@ -1289,7 +1289,7 @@ moveByMouse(window) {
 	}
 }
 
-debugNonObjectUsage(reference, p1="", p2="", p3="", p4="") {
+reportNonObjectUsage(reference, p1="", p2="", p3="", p4="") {
 	if isDebug()
 		showMessage("The literal value " . reference . " was used as an object.")
 	

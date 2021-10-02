@@ -57,7 +57,7 @@ class SystemPlugin extends ControllerPlugin {
 			transition := false
 			
 			if !stateChange {
-				transition := this.LaunchpadAction.Transition
+				transition := (this.LaunchpadAction ? this.LaunchpadAction.Transition : false)
 						
 				if (transition && ((A_TickCount - transition) > 10000)) {
 					transition := false
@@ -66,10 +66,10 @@ class SystemPlugin extends ControllerPlugin {
 					this.LaunchpadAction.endTransition()
 				}
 			}
-			else
+			else if this.LaunchpadAction
 				this.LaunchpadAction.endTransition()
 			
-			if (true || (stateChange && (this.LaunchpadFunction != false))) {
+			if (this.LaunchpadFunction != false) {
 				controller := SimulatorController.Instance
 					
 				if (inList(controller.ActiveModes, controller.findMode(kSystemPlugin, kLaunchMode))) {

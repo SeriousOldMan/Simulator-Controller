@@ -1,7 +1,7 @@
 [Development]
 Version=3.6.0-dev
 Target=3.6.0-release
-Date=10/01/2021
+Date=10/03/2021
 Download=
 Changes=Initial version of strategy simulation in "Strategy Workbench"
 [Release]
@@ -10,7 +10,7 @@ Date=10/01/2021
 Download=https://cntr.click/Hq9ytpX
 Changes=Fix for saving settings by Race Assistants
 [Current]
-Type=Release
+Type=Developmenz
 [Version]
 Release=3.5.9-release
 Development=3.6.0-dev

@@ -68,6 +68,7 @@ global simulationViewer
 		
 global sessionTypeDropDown
 global raceDurationEdit = 60
+global raceDurationLabel
 global stintLengthEdit = 70
 global formationLapCheck = true
 global postRaceLapCheck = true
@@ -132,6 +133,8 @@ class StrategyWorkbench extends ConfigurationItem {
 	
 	iSelectedDataType := "Electronics"
 	iSelectedChartType := "Scatter"
+	
+	iSelectedSessionType := "Duration"
 	
 	iAirTemperature := 23
 	iTrackTemperature := 27
@@ -210,6 +213,12 @@ class StrategyWorkbench extends ConfigurationItem {
 	SelectedChartType[] {
 		Get {
 			return this.iSelectedChartType
+		}
+	}
+	
+	SelectedSesssionType[] {
+		Get {
+			return this.iSelectedSesssionType
 		}
 	}
 	
@@ -420,10 +429,10 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		Gui %window%:Font, Norm, Arial
 		
-		Gui %window%:Add, DropDownList, x%x0% yp+21 w70 AltSubmit Choose1 VsessionTypeDropDown, % values2String("|", map(["Duration", "Laps"], "translate")*)
+		Gui %window%:Add, DropDownList, x%x0% yp+21 w70 AltSubmit Choose1 gchooseSessionType VsessionTypeDropDown, % values2String("|", map(["Duration", "Laps"], "translate")*)
 		Gui %window%:Add, Edit, x%x1% yp w50 h20 Limit4 Number VraceDurationEdit, %raceDurationEdit%
 		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 Range1-9999 0x80, %raceDurationEdit%
-		Gui %window%:Add, Text, x%x3% yp+4 w60 h20, % translate("Minutes")
+		Gui %window%:Add, Text, x%x3% yp+4 w60 h20 VraceDurationLabel, % translate("Minutes")
 		
 		Gui %window%:Add, Text, x%x% yp+21 w85 h23 +0x200, % translate("Max. Stint")
 		Gui %window%:Add, Edit, x%x1% yp w50 h20 Limit4 Number VstintLengthEdit, %stintLengthEdit%
@@ -446,7 +455,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 
 		Gui %window%:Add, Text, x%x5% yp+23 w90 h20, % translate("Pitstop")
-		Gui %window%:Add, DropDownList, x%x7% yp-4 w75 AltSubmit Choose3 VpitstopRequirementsDropDown, % values2String("|", map(["Optional", "Required", "Window"], "translate")*)
+		Gui %window%:Add, DropDownList, x%x7% yp-4 w75 AltSubmit Choose3 VpitstopRequirementsDropDown gchoosePitstopRequirements, % values2String("|", map(["Optional", "Required", "Window"], "translate")*)
 		Gui %window%:Add, Edit, x%x11% yp+1 w50 h20 VpitstopWindowEdit, %pitstopWindowEdit%
 		Gui %window%:Add, Text, x%x12% yp+3 w110 h20 VpitstopWindowLabel, % translate("Minute (From - To)")
 
@@ -594,7 +603,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				
 		Gui %window%:Add, Text, x%x% yp+21 w90 h20 +0x200, % translate("@ Pitlane")
 		Gui %window%:Add, Text, x%x1% yp-1 w40 h20 Border VsimPitlaneSecondsResult, %simPitlaneSecondsResult%
-		Gui %window%:Add, Text, x%x3% yp+4 w50 h20, % translate("Sec.")
+		Gui %window%:Add, Text, x%x3% yp+4 w50 h20, % translate("Seconds")
 				
 		Gui %window%:Add, Text, x%x% yp+21 w90 h20 +0x200, % translate("@ Finish")
 		Gui %window%:Add, Text, x%x1% yp-1 w40 h20 Border VsimSessionResultResult, %simSessionResultResult%
@@ -1058,6 +1067,45 @@ class StrategyWorkbench extends ConfigurationItem {
 		this.showDataPlot(records, xAxis, yAxises)
 	}
 	
+	selectSessionType(sessionType) {
+		this.iSelectedSessionType := sessionType
+		
+		if (sessionType = "Duration") {
+			GuiControl, , raceDurationLabel, % translate("Minutes")
+			GuiControl, , simSessionResultLabel, % translate("Laps")
+		}
+		else {
+			GuiControl, , raceDurationLabel, % translate("Laps")
+			GuiControl, , simSessionResultLabel, % translate("Seconds")
+		}
+	}
+	
+	calcSessionLaps(avgLapTime) {
+		GuiControlGet raceDurationEdit
+		GuiControlGet formationLapCheck
+		GuiControlGet postRaceLapCheck
+		
+		if (this.SelectedSessionType = "Duration")
+			return Ceil(((raceDurationEdit * 60) / avgLapTime) + (formationLapCheck ? 1 : 0) + (postRaceLapCheck ? 1 : 0))
+		else
+			return (raceDurationEdit + (formationLapCheck ? 1 : 0) + (postRaceLapCheck ? 1 : 0))
+	}
+	
+	calcRefuelAmount(targetFuel, currentFuel) {
+		GuiControlGet safetyFuelEdit
+		GuiControlGet fuelCapacityEdit
+		
+		return (Min(fuelCapacityEdit, targetFuel) - currentFuel)
+	}
+
+	calcPitstopDuration(refuelAmount, changeTyres) {
+		GuiControlGet pitstopDeltaEdit
+		GuiControlGet pitstopTyreServiceEdit
+		GuiControlGet pitstopRefuelServiceEdit
+		
+		return (pitstopDeltaEdit + (changeTyres ? pitstopTyreServiceEdit : 0) + ((refuelAmount / 10) * pitstopRefuelServiceEdit))
+	}
+	
 	chooseSettingsMenu(line) {
 		switch line {
 			case 3: ; "Load from Setup Database..."
@@ -1065,8 +1113,8 @@ class StrategyWorkbench extends ConfigurationItem {
 				if (this.SelectedSimulator && this.SelectedCar && this.SelectedTrack) {
 					telemetryDB := new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
 					
-					mapLaptimes := telemetryDB.getMapLapTimes(this.SelectedWeather, this.SelectedCompound, this.SelectedCompoundColor)
-					tyreLaptimes := telemetryDB.getTyreLapsLapTimes(this.SelectedWeather, this.SelectedCompound, this.SelectedCompoundColor)
+					mapData := telemetryDB.getMapData(this.SelectedWeather, this.SelectedCompound, this.SelectedCompoundColor)
+					tyreData := telemetryDB.getTyreData(this.SelectedWeather, this.SelectedCompound, this.SelectedCompoundColor)
 				}
 			case 5: ; "Import from Simulation..."
 				simulator := this.SelectedSimulator
@@ -1164,7 +1212,29 @@ class StrategyWorkbench extends ConfigurationItem {
 		progress := Floor(progress + 10)
 	}
 	
+	createStrategy() {
+		return new Strategy(this)
+	}
+
 	runSimulation() {
+		local strategy := this.createStrategy()
+		
+		telemetryDB := new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
+		
+		GuiControlGet simMaxTyreLifeEdit
+		GuiControlGet simInitialFuelAmountEdit
+		GuiControlGet stintLengthEdit
+		
+		for ignore, mapData in telemetryDB.getMapData(this.SelectedWeather, this.SelectedCompound, this.SelectedCompoundColor) {
+			map := mapData["Map"]
+			fuelConsumption := mapData["Fuel.Consumption"]
+			avgLapTime := mapData["Lap.Time"]
+		
+			stintLaps := ((stintLengthEdit * 60) / avgLapTime)
+			
+			strategy.createPitstops(simInitialFuelAmountEdit, stintLaps, simMaxTyreLifeEdit, map, fuelConsumption, avgLapTime)
+		}
+		
 		x := Round((A_ScreenWidth - 300) / 2)
 		y := A_ScreenHeight - 150
 			
@@ -1209,6 +1279,253 @@ class StrategyWorkbench extends ConfigurationItem {
 		Sleep 2000
 		
 		hideProgress()
+	}
+}
+
+class Strategy {
+	iStrategyWorkbench := false
+	
+	iStintLaps := 0
+	iFuelAmount := 0
+	iTyreLaps := 0
+	
+	iMap := 1
+	iAvgLapTime := 0
+	iFuelConsumption := 0
+	
+	iPitstops := []
+	
+	class Pitstop {
+		iStrategy := false
+		iLap := 0
+		
+		iRefuelAmount := 0
+		iTyreChange := false
+		iDuration := 0
+		
+		iStintLaps := 0
+		iMap := 1
+		iFuelConsumption := 0
+		
+		iRemainingTyreLaps := 0
+		iRemainingFuel := 0
+		
+		Strategy[]  {
+			Get {
+				return this.iStrategy
+			}
+		}
+		
+		Lap[]  {
+			Get {
+				return this.iLap
+			}
+		}
+		
+		TyreChange[] {
+			Get {
+				return this.iTyreChange
+			}
+		}
+		
+		RefuelAmount[] {
+			Get {
+				return this.iRefuelAmount
+			}
+		}
+		
+		Duration[] {
+			Get {
+				return this.iDuration
+			}
+		}
+		
+		StintLaps[] {
+			Get {
+				return this.iStintLaps
+			}
+		}
+		
+		Map[] {
+			Get {
+				return this.iMap
+			}
+		}
+		
+		FuelConsumption[] {
+			Get {
+				return this.iFuelConsumption
+			}
+		}
+		
+		__New(strategy, lap) {
+			remainingFuel := strategy.RemainingFuel[true]
+			remainingLaps := strategy.RemainingLaps[true]
+			
+			stintLaps := Min(remainingLaps, strategy.StintLaps)
+			
+			this.iStrategy := strategy
+			this.iLap := lap
+			
+			this.iStintLaps := stintLaps
+			this.iMap := strategy.Map[true]
+			this.iFuelConsumption := strategy.FuelConsumption[true]
+			
+			refuelAmount := strategy.calcRefuelAmount(remainingFuel, remainingLaps, stintLaps)
+			
+			this.iRemainingFuel := (remainingFuel - (strategy.StintLaps[true] * strategy.FuelConsumption[true]) + refuelAmount)
+			
+			remainingTyreLaps := (strategy.RemainingTyreLaps[true] - strategy.StintLaps[true])
+			
+			if ((remainingTyreLaps - stintLaps) >= 0)
+				this.iRemainingTyreLaps := remainingTyreLaps
+			else {
+				this.iTyreChange := true
+				this.iRemainingTyreLaps := strategy.RemainingTyreLaps
+			}
+			
+			this.iRefuelAmount := refuelAmount
+			this.iDuration := strategy.calcPitstopDuration(refuelAmount, this.TyreChange)
+		}
+	}
+	
+	StrategyWorkbench[] {
+		Get {
+			return this.iStrategyWorkbench
+		}
+	}
+
+	StintLaps[lastStint := false] {
+		Get {
+			if (lastStint && this.LastPitstop)
+				return this.LastPitstop.StintLaps
+			else
+				return this.iStintLaps
+		}
+	}
+
+	RemainingLaps[lastStint := false] {
+		Get {
+			if (lastStint && this.LastPitstop)
+				return this.LastPitstop.RemainingLaps
+			else
+				return this.calcSessionLaps()
+		}
+	}
+
+	RemainingFuel[lastStint := false] {
+		Get {
+			if (lastStint && this.LastPitstop)
+				return this.LastPitstop.RemainingFuel
+			else
+				return this.iFuelAmount
+		}
+	}
+
+	RemainingTyreLaps[lastStint := false] {
+		Get {
+			if (lastStint && this.LastPitstop)
+				return this.LastPitstop.RemainingTyreLaps
+			else
+				return this.iTyreLaps
+		}
+	}
+
+	Map[lastStint := false] {
+		Get {
+			if (lastStint && this.LastPitstop)
+				return this.LastPitstop.Map
+			else
+				return this.iMap
+		}
+	}
+
+	AvgLapTime[lastStint := false] {
+		Get {
+			if (lastStint && this.LastPitstop)
+				return this.LastPitstop.AvgLapTime
+			else
+				return this.iAvgLapTime
+		}
+	}
+	
+	FuelConsumption[lastStint := false] {
+		Get {
+			if (lastStint && this.LastPitstop)
+				return this.LastPitstop.FuelConsumption
+			else
+				return this.iFuelConsumption
+		}
+	}
+	
+	Pitstops[] {
+		Get {
+			return this.iPitstops
+		}
+	}
+	
+	LastPitstop[] {
+		Get {
+			length := this.iPitstops.Length()
+			
+			return ((length > 0) ? false : this.iPitstops[length])
+		}
+	}
+	
+	__New(strategyWorkbench) {
+		this.iStrategyWorkbench := strategyWorkbench
+	}
+	
+	calcSessionLaps() {
+		return this.StrategyWorkbench.calcSessionLaps(this.AvgLapTime)
+	}
+	
+	calcRefuelAmount(startFuel, remainingLaps, stintLaps) {
+		targetFuel := ((remainingLaps - stintLaps) * this.FuelConsumption)
+		remainingFuel := startFuel - (stintLaps * this.FuelConsumption)
+		
+		return this.StrategyWorkbench.calcRefuelAmount(targetFuel, remainingFuel)
+	}
+
+	calcPitstopDuration(refuelAmount, changeTyres) {
+		return this.StrategyWorkbench.calcPitstopDuration(refuelAmount, changeTyres)
+	}
+	
+	calcNextPitstopLap(currentLap, remainingLaps, remainingTyreLaps, remainingFuel) {
+		return Min(remainingLaps, currentLap + this.StintLaps)
+	}
+	
+	createPitstops(startFuel, stintLaps, tyreLaps, map, fuelConsumption, avgLapTime) {
+		this.iFuelAmount := startFuel
+		this.iStintLaps := stintLaps
+		this.iTyreLaps := tyreLaps
+		
+		this.iMap := map
+		this.iFuelConsumption := fuelConsumption
+		this.iAvgLapTime := avgLapTime
+		
+		this.iPitstops := []
+		
+		currentLap := 0
+		pitstopNr := 1
+		
+		sessionLaps := this.RemainingLaps
+		
+		Loop {
+			remainingFuel := this.RemainingFuel[true]
+		
+			if ((currentLap + (remainingFuel / this.FuelConsumption[true])) > sessionLaps)
+				break
+			
+			pitstopLap := this.calcNextPitstopLap(currentLap, this.RemainingLaps[true], this.RemainingTyreLaps[true], remainingFuel)
+			
+			pitstop := new this.Pitstop(this, pitstopLap)
+			
+			currentLap := pitstopLap
+			pitstopNr += 1
+			
+			this.Pitstops.Push(pitstop)
+		}
 	}
 }
 
@@ -1377,6 +1694,25 @@ chooseChartType() {
 	GuiControlGet chartTypeDropDown
 	
 	StrategyWorkbench.Instance.loadChart(["Scatter", "Bar", "Bubble", "Line"][chartTypeDropDown])
+}
+
+chooseSessionType() {
+	GuiControlGet sessionTypeDropDown
+	
+	StrategyWorkbench.Instance.selectSessionType(["Duration", "Laps"][sessionTypeDropDown])
+}
+
+choosePitstopRequirements() {
+	GuiControlGet pitstopRequirementsDropDown
+	
+	if (pitstopRequirementsDropDown = 3) {
+		GuiControl Show, pitstopWindowEdit
+		GuiControl Show, pitstopWindowLabel
+	}
+	else {
+		GuiControl Hide, pitstopWindowEdit
+		GuiControl Hide, pitstopWindowLabel
+	}
 }
 
 settingsMenu() {

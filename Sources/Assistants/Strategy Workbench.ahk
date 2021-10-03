@@ -1081,6 +1081,10 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 	
 	calcSessionLaps(avgLapTime) {
+		window := this.Window
+		
+		Gui %window%:Default
+	
 		GuiControlGet raceDurationEdit
 		GuiControlGet formationLapCheck
 		GuiControlGet postRaceLapCheck
@@ -1091,7 +1095,26 @@ class StrategyWorkbench extends ConfigurationItem {
 			return (raceDurationEdit + (formationLapCheck ? 1 : 0) + (postRaceLapCheck ? 1 : 0))
 	}
 	
+	calcSessionTime(avgLapTime) {
+		window := this.Window
+		
+		Gui %window%:Default
+	
+		GuiControlGet raceDurationEdit
+		GuiControlGet formationLapCheck
+		GuiControlGet postRaceLapCheck
+		
+		if (this.SelectedSessionType = "Duration")
+			return ((raceDurationEdit * 60) + ((formationLapCheck ? 1 : 0) * avgLapTime) + ((postRaceLapCheck ? 1 : 0) * avgLapTime))
+		else
+			return ((raceDurationEdit + (formationLapCheck ? 1 : 0) + (postRaceLapCheck ? 1 : 0)) * avgLapTime)
+	}
+	
 	calcRefuelAmount(targetFuel, currentFuel) {
+		window := this.Window
+		
+		Gui %window%:Default
+	
 		GuiControlGet safetyFuelEdit
 		GuiControlGet fuelCapacityEdit
 		
@@ -1099,6 +1122,10 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	calcPitstopDuration(refuelAmount, changeTyres) {
+		window := this.Window
+		
+		Gui %window%:Default
+	
 		GuiControlGet pitstopDeltaEdit
 		GuiControlGet pitstopTyreServiceEdit
 		GuiControlGet pitstopRefuelServiceEdit
@@ -1221,6 +1248,10 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		telemetryDB := new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
 		
+		window := this.Window
+		
+		Gui %window%:Default
+		
 		GuiControlGet simMaxTyreLifeEdit
 		GuiControlGet simInitialFuelAmountEdit
 		GuiControlGet stintLengthEdit
@@ -1233,12 +1264,25 @@ class StrategyWorkbench extends ConfigurationItem {
 			stintLaps := Floor((stintLengthEdit * 60) / avgLapTime)
 			
 			strategy.createPitstops(simInitialFuelAmountEdit, stintLaps, simMaxTyreLifeEdit, map, fuelConsumption, avgLapTime)
+			
+			pitstopTime := strategy.getPitstopTime()
+			
+			strategy.adjustLastPitstop(Floor(pitstopTime / strategy.AvgLapTime[true]))
+			
+			pitstopTime := strategy.getPitstopTime()
+			sessionLaps := strategy.getSessionLaps()
+			sessionTime := strategy.getSessionTime()
+			
+			origLaps := strategy.RemainingLaps
+			origTime := strategy.RemainingTime
 		}
 		
 		x := Round((A_ScreenWidth - 300) / 2)
 		y := A_ScreenHeight - 150
 			
-		showProgress({x: x, y: y, color: "Blue", title: translate("Acquiring Telemetry Information")})
+		progressWindow := showProgress({x: x, y: y, color: "Blue", title: translate("Acquiring Telemetry Information")})
+		
+		Gui, %window%:+Owner%progressWindow%
 		
 		progress := 0
 		
@@ -1298,6 +1342,7 @@ class Strategy {
 	class Pitstop {
 		iStrategy := false
 		iLap := 0
+		iTime := 0
 		
 		iRefuelAmount := 0
 		iTyreChange := false
@@ -1306,6 +1351,7 @@ class Strategy {
 		iStintLaps := 0
 		iMap := 1
 		iFuelConsumption := 0
+		iAvgLapTime := 0
 		
 		iRemainingLaps := 0
 		iRemainingFuel := 0
@@ -1320,6 +1366,12 @@ class Strategy {
 		Lap[]  {
 			Get {
 				return this.iLap
+			}
+		}
+		
+		Time[]  {
+			Get {
+				return this.iTime
 			}
 		}
 		
@@ -1359,9 +1411,21 @@ class Strategy {
 			}
 		}
 		
+		AvgLapTime[] {
+			Get {
+				return this.iAvgLapTime
+			}
+		}
+		
 		RemainingLaps[] {
 			Get {
 				return this.iRemainingLaps
+			}
+		}
+		
+		RemainingTime[] {
+			Get {
+				return this.iRemainingTime
 			}
 		}
 		
@@ -1383,14 +1447,15 @@ class Strategy {
 			fuelConsumption := strategy.FuelConsumption[true]
 			lastStintLaps := Floor(Min(strategy.StintLaps[true], remainingFuel / fuelConsumption))
 			
-			stintLaps := Floor(Min(remainingLaps, strategy.StintLaps))
+			stintLaps := Floor(Min(remainingLaps - lastStintLaps, strategy.StintLaps))
 			
 			this.iStrategy := strategy
 			this.iLap := lap
 			
 			this.iStintLaps := stintLaps
 			this.iMap := strategy.Map[true]
-			this.iFuelConsumption := strategy.FuelConsumption[true]
+			this.iFuelConsumption := fuelConsumption
+			this.iAvgLapTime := strategy.AvgLapTime[true]
 			
 			refuelAmount := strategy.calcRefuelAmount(remainingFuel, remainingLaps, lastStintLaps)
 			
@@ -1408,6 +1473,13 @@ class Strategy {
 			
 			this.iRefuelAmount := refuelAmount
 			this.iDuration := strategy.calcPitstopDuration(refuelAmount, this.TyreChange)
+			
+			lastPitstop := strategy.LastPitstop
+			
+			if lastPitstop
+				this.iTime := (lastPitstop.Time + lastPitstop.Duration + (lastPitstop.StintLaps * lastPitstop.AvgLapTime))
+			else
+				this.iTime := (lastStintLaps * strategy.AvgLapTime[true])
 		}
 	}
 	
@@ -1432,6 +1504,15 @@ class Strategy {
 				return this.LastPitstop.RemainingLaps
 			else
 				return this.calcSessionLaps()
+		}
+	}
+
+	RemainingTime[lastStint := false] {
+		Get {
+			if (lastStint && this.LastPitstop)
+				return this.LastPitstop.RemainingTime
+			else
+				return this.calcSessionTime()
 		}
 	}
 
@@ -1502,6 +1583,10 @@ class Strategy {
 		return this.StrategyWorkbench.calcSessionLaps(this.AvgLapTime)
 	}
 	
+	calcSessionTime() {
+		return this.StrategyWorkbench.calcSessionTime(this.AvgLapTime)
+	}
+	
 	calcRefuelAmount(startFuel, remainingLaps, stintLaps) {
 		targetFuel := ((remainingLaps - stintLaps) * this.FuelConsumption)
 		remainingFuel := Max(0, startFuel - (stintLaps * this.FuelConsumption))
@@ -1548,6 +1633,55 @@ class Strategy {
 			
 			this.Pitstops.Push(pitstop)
 		}
+	}
+	
+	adjustLastPitstop(superfluousLaps) {
+		while (superfluousLaps > 0) {
+			pitstop := this.LastPitstop
+		
+			if pitstop {
+				stintLaps := pitstop.StintLaps
+				
+				if (stintLaps <= superfluousLaps) {
+					superfluousLaps -= stintLaps
+				
+					this.Pitstops.Pop()
+					
+					continue
+				}
+				else
+					pitstop.iStintLaps -= superfluousLaps
+			}
+			
+			break
+		}
+	}
+	
+	getPitstopTime() {
+		time := 0
+		
+		for ignore, pitstop in this.Pitstops
+			time += pitstop.Duration
+		
+		return time
+	}
+	
+	getSessionLaps() {
+		pitstop := this.LastPitstop
+
+		if pitstop
+			return (pitstop.Lap + pitstop.StintLaps)
+		else
+			return this.RemainingLaps
+	}
+	
+	getSessionTime() {
+		pitstop := this.LastPitstop
+
+		if pitstop
+			return (pitstop.Time + pitstop.Duration + (pitstop.StintLaps * pitstop.AvgLapTime))
+		else
+			return this.RemainingTime
 	}
 }
 

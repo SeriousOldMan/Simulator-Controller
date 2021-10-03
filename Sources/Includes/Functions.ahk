@@ -1184,6 +1184,8 @@ showProgress(options) {
 		
 		GuiControl +c%color%, vProgressBar
 	}
+	
+	return "Progress"
 }
 
 hideProgress() {

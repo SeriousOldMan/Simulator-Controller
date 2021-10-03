@@ -216,9 +216,9 @@ class StrategyWorkbench extends ConfigurationItem {
 		}
 	}
 	
-	SelectedSesssionType[] {
+	SelectedSessionType[] {
 		Get {
-			return this.iSelectedSesssionType
+			return this.iSelectedSessionType
 		}
 	}
 	
@@ -1230,7 +1230,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			fuelConsumption := mapData["Fuel.Consumption"]
 			avgLapTime := mapData["Lap.Time"]
 		
-			stintLaps := ((stintLengthEdit * 60) / avgLapTime)
+			stintLaps := Floor((stintLengthEdit * 60) / avgLapTime)
 			
 			strategy.createPitstops(simInitialFuelAmountEdit, stintLaps, simMaxTyreLifeEdit, map, fuelConsumption, avgLapTime)
 		}
@@ -1307,8 +1307,9 @@ class Strategy {
 		iMap := 1
 		iFuelConsumption := 0
 		
-		iRemainingTyreLaps := 0
+		iRemainingLaps := 0
 		iRemainingFuel := 0
+		iRemainingTyreLaps := 0
 		
 		Strategy[]  {
 			Get {
@@ -1358,11 +1359,31 @@ class Strategy {
 			}
 		}
 		
+		RemainingLaps[] {
+			Get {
+				return this.iRemainingLaps
+			}
+		}
+		
+		RemainingFuel[] {
+			Get {
+				return this.iRemainingFuel
+			}
+		}
+		
+		RemainingTyreLaps[] {
+			Get {
+				return this.iRemainingTyreLaps
+			}
+		}
+		
 		__New(strategy, lap) {
 			remainingFuel := strategy.RemainingFuel[true]
 			remainingLaps := strategy.RemainingLaps[true]
+			fuelConsumption := strategy.FuelConsumption[true]
+			lastStintLaps := Floor(Min(strategy.StintLaps[true], remainingFuel / fuelConsumption))
 			
-			stintLaps := Min(remainingLaps, strategy.StintLaps)
+			stintLaps := Floor(Min(remainingLaps, strategy.StintLaps))
 			
 			this.iStrategy := strategy
 			this.iLap := lap
@@ -1371,9 +1392,10 @@ class Strategy {
 			this.iMap := strategy.Map[true]
 			this.iFuelConsumption := strategy.FuelConsumption[true]
 			
-			refuelAmount := strategy.calcRefuelAmount(remainingFuel, remainingLaps, stintLaps)
+			refuelAmount := strategy.calcRefuelAmount(remainingFuel, remainingLaps, lastStintLaps)
 			
-			this.iRemainingFuel := (remainingFuel - (strategy.StintLaps[true] * strategy.FuelConsumption[true]) + refuelAmount)
+			this.iRemainingLaps := (remainingLaps - lastStintLaps)
+			this.iRemainingFuel := (remainingFuel - (lastStintLaps * fuelConsumption) + refuelAmount)
 			
 			remainingTyreLaps := (strategy.RemainingTyreLaps[true] - strategy.StintLaps[true])
 			
@@ -1466,9 +1488,9 @@ class Strategy {
 	
 	LastPitstop[] {
 		Get {
-			length := this.iPitstops.Length()
+			length := this.Pitstops.Length()
 			
-			return ((length > 0) ? false : this.iPitstops[length])
+			return ((length = 0) ? false : this.iPitstops[length])
 		}
 	}
 	
@@ -1482,7 +1504,7 @@ class Strategy {
 	
 	calcRefuelAmount(startFuel, remainingLaps, stintLaps) {
 		targetFuel := ((remainingLaps - stintLaps) * this.FuelConsumption)
-		remainingFuel := startFuel - (stintLaps * this.FuelConsumption)
+		remainingFuel := Max(0, startFuel - (stintLaps * this.FuelConsumption))
 		
 		return this.StrategyWorkbench.calcRefuelAmount(targetFuel, remainingFuel)
 	}
@@ -1492,7 +1514,7 @@ class Strategy {
 	}
 	
 	calcNextPitstopLap(currentLap, remainingLaps, remainingTyreLaps, remainingFuel) {
-		return Min(remainingLaps, currentLap + this.StintLaps)
+		return (currentLap + Floor(Min(this.StintLaps, remainingFuel / this.FuelConsumption[true])))
 	}
 	
 	createPitstops(startFuel, stintLaps, tyreLaps, map, fuelConsumption, avgLapTime) {
@@ -1514,7 +1536,7 @@ class Strategy {
 		Loop {
 			remainingFuel := this.RemainingFuel[true]
 		
-			if ((currentLap + (remainingFuel / this.FuelConsumption[true])) > sessionLaps)
+			if ((currentLap + (remainingFuel / this.FuelConsumption[true])) >= sessionLaps)
 				break
 			
 			pitstopLap := this.calcNextPitstopLap(currentLap, this.RemainingLaps[true], this.RemainingTyreLaps[true], remainingFuel)

@@ -809,7 +809,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			if (this.SelectedSessionType = "Duration")
 				html .= ("<tr><td><b>" . translate("Duration:") . "</b></td><td>" . raceDurationEdit . A_Space . translate("Minutes") . "</td></tr>")
 			else
-				html .= ("<tr><td><b>" . translate("Session Type:") . "</b></td><td>" . raceDurationEdit . A_Space . translate("Laps") . "</td></tr>")
+				html .= ("<tr><td><b>" . translate("Laps:") . "</b></td><td>" . raceDurationEdit . A_Space . translate("Laps") . "</td></tr>")
 			html .= ("<tr><td><b>" . translate("Compound:") . "</b></td><td>" . translate(this.SelectedCompound[true]) . "</td></tr>")
 			html .= ("<tr><td><b>" . translate("Start Fuel:") . "</b></td><td>" . strategy.RemainingFuel . A_Space . translate("Liter") . "</td></tr>")
 			html .= "</table>"
@@ -860,7 +860,7 @@ class StrategyWorkbench extends ConfigurationItem {
 					lapTimes.Push("<td id=""data"">" . Round(lastLapTime, 1) . "</td>")
 					fuelConsumptions.Push("<td id=""data"">" . Round(lastFuelConsumption, 2) . "</td>")
 					pitstopLaps.Push("<td id=""data"">" . lastPitstopLap . "</td>")
-					refuels.Push("<td id=""data"">" . Ceil(lastRefuel) . "</td>")
+					refuels.Push("<td id=""data"">" . (lastRefuel ? Ceil(lastRefuel) : "") . "</td>")
 					tyreChanges.Push("<td id=""data"">" . lastTyreChange . "</td>")
 					
 					timeSeries.Push(pitstop.Time / 60)
@@ -904,11 +904,11 @@ class StrategyWorkbench extends ConfigurationItem {
 				html .= ("<tr><td><i>" . translate("Fuel Consumption:") . "</i></td>" . values2String("", fuelConsumptions*) . "</tr>")
 				html .= ("<tr><td><i>" . translate("Pitstop Lap:") . "</i></td>" . values2String("", pitstopLaps*) . "</tr>")
 				html .= ("<tr><td><i>" . translate("Refuel Amount:") . "</i></td>" . values2String("", refuels*) . "</tr>")
-				html .= ("<tr><td><i>" . translate("Tyre Changes") . "</i></td>" . values2String("", tyreChanges*) . "</tr>")
+				html .= ("<tr><td><i>" . translate("Tyre Change:") . "</i></td>" . values2String("", tyreChanges*) . "</tr>")
 				html .= "</table>"
 			}
 		
-			html .= ("<br><br><div id=""header""><b><i>" . translate("Progress") . "</i></b></div>")
+			html .= ("<br><br><div id=""header""><b><i>" . translate("Overview") . "</i></b></div>")
 			
 			before =
 			(
@@ -933,8 +933,8 @@ class StrategyWorkbench extends ConfigurationItem {
 			chart := ""
 				
 			chart .= "function drawChart() {`nvar data = new google.visualization.DataTable();"
-			chart .= ("`ndata.addColumn('number', '" . translate("Minutes") . "');")
-			chart .= ("`ndata.addColumn('number', '" . translate("Laps") . "');")
+			chart .= ("`ndata.addColumn('number', '" . translate("Minute") . "');")
+			chart .= ("`ndata.addColumn('number', '" . translate("Lap") . "');")
 			chart .= ("`ndata.addColumn('number', '" . translate("Fuel Level") . "');")
 			chart .= ("`ndata.addColumn('number', '" . translate("Tyre Life") . "');")
 
@@ -947,7 +947,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				chart .= ("[" . time . ", " . lapSeries[A_Index] . ", " . fuelSeries[A_Index] . ", " . tyreSeries[A_Index] . "]")
 			}
 			
-			chart .= ("]);`nvar options = { curveType: 'function', legend: { position: 'Right' }, chartArea: { left: '10%', top: '5%', right: '20%', bottom: '20%' }, hAxis: { title: '" . translate("Minutes") . "' }, vAxis: { viewWindow: { min: 0 } }, backgroundColor: 'D8D8D8' };`n")
+			chart .= ("]);`nvar options = { curveType: 'function', legend: { position: 'Right' }, chartArea: { left: '10%', top: '5%', right: '25%', bottom: '20%' }, hAxis: { title: '" . translate("Minute") . "' }, vAxis: { viewWindow: { min: 0 } }, backgroundColor: 'D8D8D8' };`n")
 					
 			chart .= "`nvar chart = new google.visualization.LineChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 			
@@ -1404,7 +1404,7 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 	
 	acquireTelemetryData(ByRef progress, ByRef electronicsData, ByRef tyreData) {
-		message := translate("Reading electronics data...")
+		message := translate("Reading Electronics Data...")
 		
 		showProgress({progress: progress, message: message})
 		
@@ -1414,7 +1414,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		Sleep 200
 		
-		message := translate("Reading tyre data...")
+		message := translate("Reading Tyre Data...")
 		
 		showProgress({progress: progress, message: message})
 		
@@ -1441,7 +1441,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			fuelConsumption := mapData["Fuel.Consumption"]
 			avgLapTime := mapData["Lap.Time"]
 		
-			message := (translate("Creating scenario with Map ") . map . translate("..."))
+			message := (translate("Creating Scenario with Map ") . map . translate("..."))
 			
 			showProgress({progress: progress, message: message})
 		
@@ -1468,7 +1468,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		if (this.SelectedSessionType = "Duration")
 			for name, strategy in scenarios {
-				message := (translate("Optimzing stint length for scenario ") . name . translate("..."))
+				message := (translate("Optimzing stint length for Scenario ") . name . translate("..."))
 			
 				showProgress({progress: progress, message: message})
 			
@@ -1578,7 +1578,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		this.acquireTelemetryData(progress, electronicsData, tyreData)
 		
-		message := translate("Creating scenarios...")
+		message := translate("Creating Scenarios...")
 		
 		showProgress({progress: progress, color: "Green", title: translate("Running Simulation")})
 		
@@ -1586,7 +1586,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		scenarios := this.createScenarios(progress, electronicsData, tyreData)
 		
-		message := translate("Optimizing scenarios...")
+		message := translate("Optimizing Scenarios...")
 		
 		showProgress({progress: progress, message: message})
 		
@@ -1594,7 +1594,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		scenarios := this.optimizeScenarios(progress, scenarios)
 		
-		message := translate("Evaluating scenarios...")
+		message := translate("Evaluating Scenarios...")
 		
 		showProgress({progress: progress, message: message})
 		
@@ -1602,7 +1602,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		scenario := this.evaluateScenarios(progress, scenarios)
 		
-		message := translate("Choose strategy...")
+		message := translate("Choose Strategy...")
 		
 		showProgress({progress: progress, message: message})
 		

@@ -232,7 +232,12 @@ class ButtonBoxesList extends ConfigurationItemList {
 		GuiControlGet buttonBoxEdit
 		GuiControlGet buttonBoxLayoutDropDown
 		
-		ConfigurationEditor.Instance.hide()
+		; ConfigurationEditor.Instance.hide()
+		
+		window := ConfigurationEditor.Instance.Window
+		
+		Gui BBE:+Owner%window%
+		Gui %window%:+Disabled
 		
 		result := (new ButtonBoxEditor(buttonBoxLayoutDropDown, readConfiguration(getFileName("Button Box Configuration.ini", kUserConfigDirectory, kConfigDirectory)))).editButtonBox()
 		
@@ -252,7 +257,8 @@ class ButtonBoxesList extends ConfigurationItemList {
 		else
 			GuiControl Choose, buttonBoxLayoutDropDown, %A_Space%
 		
-		ConfigurationEditor.Instance.show()
+		; ConfigurationEditor.Instance.show()
+		Gui %window%:-Disabled
 	}
 }
 

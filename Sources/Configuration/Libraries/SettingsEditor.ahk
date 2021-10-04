@@ -299,9 +299,14 @@ editModes(ByRef settingsOrCommand, globalConfiguration := false) {
 		Gui ME:Margin, 10, 10
 		Gui ME:Show, AutoSize Center
 		
+		Gui ME:+OwnerSE
+		Gui SE:+Disabled
+		
 		Loop {
 			Sleep 200
 		} until result
+		
+		Gui SE:-Disabled
 		
 		if (result == kSave)
 			settingsOrCommand := newSettings
@@ -415,11 +420,7 @@ restartSettings:
 		result := settingsOrCommand
 	}
 	else if (settingsOrCommand == kEditModes) {
-		Gui SE:Hide
-		
 		editModes(modeSettings, configuration)
-		
-		Gui SE:Show
 	}
 	else {
 		configuration := (fromSetup ? fromSetup : kSimulatorConfiguration)

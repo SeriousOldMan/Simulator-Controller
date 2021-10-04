@@ -64,7 +64,6 @@ global chartTypeDropDown
 
 global chartViewer
 global strategyViewer
-global simulationViewer
 		
 global sessionTypeDropDown
 global raceDurationEdit = 60
@@ -136,8 +135,12 @@ class StrategyWorkbench extends ConfigurationItem {
 	
 	iSelectedSessionType := "Duration"
 	
+	iSelectedScenario := false
+	
 	iAirTemperature := 23
 	iTrackTemperature := 27
+	
+	iPitstopListView := false
 	
 	Window[] {
 		Get {
@@ -219,6 +222,18 @@ class StrategyWorkbench extends ConfigurationItem {
 	SelectedSessionType[] {
 		Get {
 			return this.iSelectedSessionType
+		}
+	}
+	
+	SelectedScenario[] {
+		Get {
+			return this.iSelectedScenario
+		}
+	}
+	
+	PitstopListView[] {
+		Get {
+			return this.iPitstopListView
 		}
 	}
 	
@@ -393,7 +408,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		strategyViewer.Navigate("about:blank")
 		
-		this.showSummary("Space to rent...")
+		this.showStrategyInfo(false)
 		
 		Gui %window%:Font, Norm, Arial
 		
@@ -592,22 +607,22 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 
 		Gui %window%:Add, Text, x%x% yp+21 w90 h20 +0x200, % translate("# Pitstops")
-		Gui %window%:Add, Text, x%x1% yp-1 w40 h20 Border VsimNumPitstopResult, %simNumPitstopResult%
+		Gui %window%:Add, Text, x%x1% yp+1 w40 h20 Border VsimNumPitstopResult, %simNumPitstopResult%
 		
-		Gui %window%:Add, Text, x%x% yp+25 w90 h20 +0x200, % translate("# Tyre Changes")
-		Gui %window%:Add, Text, x%x1% yp-1 w40 h20 Border VsimNumTyreChangeResult, %simNumTyreChangeResult%
+		Gui %window%:Add, Text, x%x% yp+23 w90 h20 +0x200, % translate("# Tyre Changes")
+		Gui %window%:Add, Text, x%x1% yp+1 w40 h20 Border VsimNumTyreChangeResult, %simNumTyreChangeResult%
 				
-		Gui %window%:Add, Text, x%x% yp+25 w90 h20 +0x200, % translate("Consumed Fuel")
-		Gui %window%:Add, Text, x%x1% yp-1 w40 h20 Border VsimConsumedFuelResult, %simConsumedFuelResult%
-		Gui %window%:Add, Text, x%x3% yp+4 w50 h20, % translate("Liter")
+		Gui %window%:Add, Text, x%x% yp+23 w90 h20 +0x200, % translate("Consumed Fuel")
+		Gui %window%:Add, Text, x%x1% yp+1 w40 h20 Border VsimConsumedFuelResult, %simConsumedFuelResult%
+		Gui %window%:Add, Text, x%x3% yp+2 w50 h20, % translate("Liter")
 				
 		Gui %window%:Add, Text, x%x% yp+21 w90 h20 +0x200, % translate("@ Pitlane")
-		Gui %window%:Add, Text, x%x1% yp-1 w40 h20 Border VsimPitlaneSecondsResult, %simPitlaneSecondsResult%
-		Gui %window%:Add, Text, x%x3% yp+4 w50 h20, % translate("Seconds")
+		Gui %window%:Add, Text, x%x1% yp+1 w40 h20 Border VsimPitlaneSecondsResult, %simPitlaneSecondsResult%
+		Gui %window%:Add, Text, x%x3% yp+2 w50 h20, % translate("Seconds")
 				
 		Gui %window%:Add, Text, x%x% yp+21 w90 h20 +0x200, % translate("@ Finish")
-		Gui %window%:Add, Text, x%x1% yp-1 w40 h20 Border VsimSessionResultResult, %simSessionResultResult%
-		Gui %window%:Add, Text, x%x3% yp+4 w50 h20 VsimSessionResultLabel, % translate("Laps")
+		Gui %window%:Add, Text, x%x1% yp+1 w40 h20 Border VsimSessionResultResult, %simSessionResultResult%
+		Gui %window%:Add, Text, x%x3% yp+2 w50 h20 VsimSessionResultLabel, % translate("Laps")
 		
 		Gui %window%:Tab, 4
 		
@@ -647,9 +662,9 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 VstrategyStartABSEdit, %strategyStartABSEdit%
 		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20, %strategyStartABSEdit%
 		
-		Gui %window%:Add, Text, x%x% yp+23 w85 h23 +0x200, % translate("Avg. Laptime")
+		Gui %window%:Add, Text, x%x% yp+23 w85 h23 +0x200, % translate("Avg. Lap Time")
 		Gui %window%:Add, Edit, x%x1% yp w50 h20 Limit3 Number VstrategyAvgLapTimeEdit, %strategyAvgLapTimeEdit%
-		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 Range1-999 0x80, %strategyAvgLapTimeEdit%
+		; Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 Range1-999 0x80, %strategyAvgLapTimeEdit%
 		Gui %window%:Add, Text, x%x3% yp+4 w30 h20, % translate("Sec.")
 
 		Gui %window%:Add, Text, x%x% yp+21 w85 h20 +0x200, % translate("Consumption")
@@ -712,9 +727,9 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		Gui %window%:Font, Norm, Arial
 		
-		Gui %window%:Add, ListView, x%x% yp+21 w180 h115 -Multi -LV0x10 AltSubmit NoSort NoSortHdr, % values2String("|", map(["Lap", "Refuel", "Tyre Change", "Map"], "translate")*)
+		Gui %window%:Add, ListView, x%x% yp+21 w180 h115 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDpitstopListView, % values2String("|", map(["Lap", "Refuel", "Tyre Change", "Map"], "translate")*)
 		
-		this.iDataListView := dataListView
+		this.iPitstopListView := pitstopListView
 		
 		Gui %window%:Font, Norm, Arial
 		
@@ -780,12 +795,172 @@ class StrategyWorkbench extends ConfigurationItem {
 		chartViewer.Document.close()
 	}
 	
-	showSummary(summary) {
+	showStrategyInfo(strategy) {
 		window := this.Window
 		
 		Gui %window%:Default
 		
-		html := "<html><head><body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><div>" . summary . "</div></body></html>"
+		html := ""
+		
+		if strategy {
+			GuiControlGet raceDurationEdit
+		
+			html := ("<div id=""header""><b><i>" . translate("Strategy") . "</i></b></div><br><br><table><tr><td><b>" . translate("Session:") . "</b></td><td>" . this.SelectedCar . translate(" @ ") . this.SelectedTrack . "</td></tr>")
+			if (this.SelectedSessionType = "Duration")
+				html .= ("<tr><td><b>" . translate("Duration:") . "</b></td><td>" . raceDurationEdit . A_Space . translate("Minutes") . "</td></tr>")
+			else
+				html .= ("<tr><td><b>" . translate("Session Type:") . "</b></td><td>" . raceDurationEdit . A_Space . translate("Laps") . "</td></tr>")
+			html .= ("<tr><td><b>" . translate("Compound:") . "</b></td><td>" . translate(this.SelectedCompound[true]) . "</td></tr>")
+			html .= ("<tr><td><b>" . translate("Start Fuel:") . "</b></td><td>" . strategy.RemainingFuel . A_Space . translate("Liter") . "</td></tr>")
+			html .= "</table>"
+			
+			timeSeries := [0]
+			lapSeries := [0]
+			fuelSeries := [strategy.RemainingFuel]
+			tyreSeries := [strategy.RemainingTyreLaps]
+			
+			html .= ("<br><br><div id=""header""><b><i>" . translate("Stints") . "</i></b></div>")
+			
+			if !strategy.LastPitstop {
+				html .= ("<br><br><table id=""stints""><tr><td><i>" . translate("Stint:") . "</i></td><td>1</td></tr>")
+				html .= ("<tr><td id=""data""><i>" . translate("Map:") . "</i></td><td>" . strategy.Map . "</td></tr>")
+				html .= ("<tr><td id=""data""><i>" . translate("Laps:") . "</i></td><td>" . strategy.RemainingLaps . "</td></tr>")
+				html .= ("<tr><td id=""data""><i>" . translate("Lap Time:") . "</i></td><td>" . strategy.AvgLapTime . "</td></tr>")
+				html .= ("<tr><td id=""data""><i>" . translate("Fuel Consumption:") . "</i></td><td>" . strategy.FuelConsumption . "</td></tr>")
+				html .= "</table>"
+				
+				timeSeries.Push(strategy.getSessionTime() / 60)
+				lapSeries.Push(strategy.getSessionLaps())
+				fuelSeries.Push(strategy.RemainingFuel - (strategy.FuelConsumption * strategy.RemainingLaps))
+				tyreSeries.Push(strategy.RemainingTyreLaps - strategy.RemainingLaps)
+			}
+			else {
+				stints := []
+				maps := []
+				laps := []
+				lapTimes := []
+				fuelConsumptions := []
+				pitstopLaps := []
+				refuels := []
+				tyreChanges := []
+				
+				lastMap := strategy.Map
+				lastLap := 0
+				lastLapTime := strategy.AvgLapTime
+				lastFuelConsumption := strategy.FuelConsumption
+				lastRefuel := ""
+				lastPitstopLap := ""
+				lastTyreChange := ""
+				lastTyreLaps := strategy.RemainingTyreLaps
+			
+				for ignore, pitstop in strategy.Pitstops {
+					stints.Push("<td id=""data"">" . A_Index . "</td>")
+					maps.Push("<td id=""data"">" . lastMap . "</td>")
+					laps.Push("<td id=""data"">" . (pitstop.Lap - lastLap) . "</td>")
+					lapTimes.Push("<td id=""data"">" . Round(lastLapTime, 1) . "</td>")
+					fuelConsumptions.Push("<td id=""data"">" . Round(lastFuelConsumption, 2) . "</td>")
+					pitstopLaps.Push("<td id=""data"">" . lastPitstopLap . "</td>")
+					refuels.Push("<td id=""data"">" . Ceil(lastRefuel) . "</td>")
+					tyreChanges.Push("<td id=""data"">" . lastTyreChange . "</td>")
+					
+					timeSeries.Push(pitstop.Time / 60)
+					lapSeries.Push(pitstop.Lap)
+					fuelSeries.Push(pitstop.RemainingFuel - pitstop.RefuelAmount)
+					tyreSeries.Push(lastTyreLaps - (pitstop.Lap - lastLap))
+					
+					lastMap := pitstop.Map
+					lastLap := pitstop.Lap
+					lastFuelConsumption := pitstop.FuelConsumption
+					lastLapTime := pitstop.AvgLapTime
+					lastRefuel := pitstop.RefuelAmount
+					lastPitstopLap := pitstop.Lap
+					lastTyreChange := (pitstop.TyreChange ? translate("Yes") : translate("No"))
+					lastTyreLaps := pitstop.RemainingTyreLaps
+					
+					timeSeries.Push((pitstop.Time + pitStop.Duration) / 60)
+					lapSeries.Push(pitstop.Lap)
+					fuelSeries.Push(pitstop.RemainingFuel)
+					tyreSeries.Push(lastTyreLaps)
+				}
+				
+				stints.Push("<td id=""data"">" . (strategy.Pitstops.Length() + 1) . "</td>")
+				maps.Push("<td id=""data"">" . lastMap . "</td>")
+				laps.Push("<td id=""data"">" . strategy.LastPitstop.StintLaps . "</td>")
+				lapTimes.Push("<td id=""data"">" . Round(lastLapTime, 1) . "</td>")
+				fuelConsumptions.Push("<td id=""data"">" . Round(lastFuelConsumption, 2) . "</td>")
+				pitstopLaps.Push("<td id=""data"">" . lastPitstopLap . "</td>")
+				refuels.Push("<td id=""data"">" . Ceil(lastRefuel) . "</td>")
+				tyreChanges.Push("<td id=""data"">" . lastTyreChange . "</td>")
+				
+				timeSeries.Push((strategy.LastPitstop.Time + (strategy.LastPitstop.StintLaps * lastLapTime)) / 60)
+				lapSeries.Push(lastLap + strategy.LastPitstop.StintLaps)
+				fuelSeries.Push(strategy.LastPitstop.RemainingFuel - (strategy.LastPitstop.StintLaps * strategy.LastPitstop.FuelConsumption))
+				tyreSeries.Push(lastTyreLaps - strategy.LastPitstop.StintLaps)
+				
+				html .= ("<br><br><table id=""stints""><tr><td><i>" . translate("Stint:") . "</i></td>" . values2String("", stints*) . "</tr>")
+				html .= ("<tr><td><i>" . translate("Map:") . "</i></td>" . values2String("", maps*) . "</tr>")
+				html .= ("<tr><td><i>" . translate("Laps:") . "</i></td>" . values2String("", laps*) . "</tr>")
+				html .= ("<tr><td><i>" . translate("Lap Time:") . "</i></td>" . values2String("", lapTimes*) . "</tr>")
+				html .= ("<tr><td><i>" . translate("Fuel Consumption:") . "</i></td>" . values2String("", fuelConsumptions*) . "</tr>")
+				html .= ("<tr><td><i>" . translate("Pitstop Lap:") . "</i></td>" . values2String("", pitstopLaps*) . "</tr>")
+				html .= ("<tr><td><i>" . translate("Refuel Amount:") . "</i></td>" . values2String("", refuels*) . "</tr>")
+				html .= ("<tr><td><i>" . translate("Tyre Changes") . "</i></td>" . values2String("", tyreChanges*) . "</tr>")
+				html .= "</table>"
+			}
+		
+			html .= ("<br><br><div id=""header""><b><i>" . translate("Progress") . "</i></b></div>")
+			
+			before =
+			(
+				<meta charset='utf-8'>
+				<head>
+					<style>
+						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: 'FFFFFF'; }
+						.rowStyle { font-size: 11px; background-color: 'E0E0E0'; }
+						.oddRowStyle { font-size: 11px; background-color: 'E8E8E8'; }
+					</style>
+					<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+					<script type="text/javascript">
+						google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawChart);
+			)
+
+			after =
+			(
+					</script>
+				</head>
+			)
+			
+			chart := ""
+				
+			chart .= "function drawChart() {`nvar data = new google.visualization.DataTable();"
+			chart .= ("`ndata.addColumn('number', '" . translate("Minutes") . "');")
+			chart .= ("`ndata.addColumn('number', '" . translate("Laps") . "');")
+			chart .= ("`ndata.addColumn('number', '" . translate("Fuel Level") . "');")
+			chart .= ("`ndata.addColumn('number', '" . translate("Tyre Life") . "');")
+
+			chart .= "`ndata.addRows(["
+			
+			for ignore, time in timeSeries {
+				if (A_Index > 1)
+					chart .= ", "
+				
+				chart .= ("[" . time . ", " . lapSeries[A_Index] . ", " . fuelSeries[A_Index] . ", " . tyreSeries[A_Index] . "]")
+			}
+			
+			chart .= ("]);`nvar options = { curveType: 'function', legend: { position: 'Right' }, chartArea: { left: '10%', top: '5%', right: '20%', bottom: '20%' }, hAxis: { title: '" . translate("Minutes") . "' }, vAxis: { viewWindow: { min: 0 } }, backgroundColor: 'D8D8D8' };`n")
+					
+			chart .= "`nvar chart = new google.visualization.LineChart(document.getElementById('chart_id')); chart.draw(data, options); }"
+			
+			chartArea := "<div id=""chart_id"" style=""width: 555px; height: 248px"">"
+		}
+		else {
+			before := ""
+			after := ""
+			chart := ""
+			chartArea := ""
+		}
+			
+		html := ("<html>" . before . chart . after . "<body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #stints td { border-right: solid 1px #A0A0A0; } </style><style> #header { font-size: 12px; } </style><style> #data { border-collapse: separate; border-spacing: 10px; text-align: center; } </style><div>" . html . "</div><br>" . chartArea . "</body></html>")
 
 		strategyViewer.Document.Open()
 		strategyViewer.Document.Write(html)
@@ -1159,8 +1334,6 @@ class StrategyWorkbench extends ConfigurationItem {
 							title := translate("Warning")
 							MsgBox 262192, %title%, % translate("This is not supported for the selected simulator...")
 							OnMessage(0x44, "")
-							
-							return false
 					}
 					
 					data := readSimulatorData(prefix)
@@ -1171,12 +1344,24 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 	
 	chooseSimulationMenu(line) {
+		local strategy
+		
 		switch line {
 			case 3: ; "Set Target Fuel Consumption..."
 			case 4: ; "Set Target Tyre Usage..."
 			case 6: ; "Run Simulation"
 				this.runSimulation()
 			case 8: ; "Use as Strategy..."
+				strategy := this.SelectedScenario
+				
+				if strategy
+					this.selectStrategy(strategy)
+				else {
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+					title := translate("Warning")
+					MsgBox 262192, %title%, % translate("There is no current scenario. Please run a simulation first...")
+					OnMessage(0x44, "")
+				}
 		}
 	}
 	
@@ -1189,64 +1374,57 @@ class StrategyWorkbench extends ConfigurationItem {
 		}
 	}
 	
-	acquireTelemetryData(ByRef progress) {
-		message := translate("Reading electronics data...")
+	selectStrategy(strategy) {
+		window := this.Window
 		
-		showProgress({progress: progress, message: message})
+		Gui %window%:Default
+		Gui ListView, % this.PitstopListView
 		
-		Sleep 1000
+		LV_Delete()
 		
-		message := translate("Reading tyre data...")
+		avgLapTimes := []
+		avgFuelConsumption := []
 		
-		showProgress({progress: progress, message: message})
+		for ignore, pitstop in strategy.Pitstops {
+			LV_Add("", pitstop.Lap, Ceil(pitstop.RefuelAmount), pitstop.TyreChange ? translate("Yes") : translate("No"), pitstop.Map)
 		
-		Sleep 1000
-		
-		progress += 5
-	}
-	
-	createScenarios(ByRef progress) {
-		scenarios := []
-		
-		for ignore, name in ["Fast Map", "Slow Map", "Max Tyre Usage", "Fresh Tyres"] {
-			message := translate("Scenario " . A_Index . ": " . name)
-			
-			showProgress({progress: progress, message: message, title: translate("Preparing Scenarios")})
-		
-			scenarios.Push({Name: name})
-			
-			progress += 2
-		
-			Sleep 1000
+			avgLapTimes.Push(pitstop.AvgLapTime)
+			avgFuelConsumption.Push(pitstop.FuelConsumption)
 		}
 		
-		progress := Floor(progress + 10)
+		GuiControl Text, strategyStartMapEdit, % strategy.Map
+		GuiControl Text, strategyAvgLapTimeEdit, % Round(average(avgLapTimes), 1)
+		GuiControl Text, strategyFuelConsumptionEdit, % Round(average(avgFuelConsumption), 2)
 		
-		return scenarios
-	}
-	
-	evaluateScenarios(scenarios, ByRef progress) {
-		for ignore, scenario in scenarios {
-			message := translate("Scenario " . A_Index . ": " . scenario.Name)
-			
-			showProgress({progress: progress, message: message, title: translate("Evaluating Scenarios")})
-			
-			progress += 2
-		
-			Sleep 1000
-		}
-		
-		progress := Floor(progress + 10)
+		this.showStrategyInfo(strategy)
 	}
 	
 	createStrategy() {
 		return new Strategy(this)
 	}
-
-	runSimulation() {
-		local strategy := this.createStrategy()
+	
+	acquireTelemetryData(ByRef progress, ByRef electronicsData, ByRef tyreData) {
+		message := translate("Reading electronics data...")
+		
+		showProgress({progress: progress, message: message})
 		
 		telemetryDB := new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
+		
+		electronicsData := telemetryDB.getMapData(this.SelectedWeather, this.SelectedCompound, this.SelectedCompoundColor)
+		
+		Sleep 200
+		
+		message := translate("Reading tyre data...")
+		
+		showProgress({progress: progress, message: message})
+		
+		Sleep 200
+		
+		progress += 5
+	}
+	
+	createScenarios(ByRef progress, electronicsData, tyreData) {
+		local strategy
 		
 		window := this.Window
 		
@@ -1256,73 +1434,191 @@ class StrategyWorkbench extends ConfigurationItem {
 		GuiControlGet simInitialFuelAmountEdit
 		GuiControlGet stintLengthEdit
 		
-		for ignore, mapData in telemetryDB.getMapData(this.SelectedWeather, this.SelectedCompound, this.SelectedCompoundColor) {
+		scenarios := {}
+		
+		for ignore, mapData in electronicsData {
 			map := mapData["Map"]
 			fuelConsumption := mapData["Fuel.Consumption"]
 			avgLapTime := mapData["Lap.Time"]
 		
+			message := (translate("Creating scenario with Map ") . map . translate("..."))
+			
+			showProgress({progress: progress, message: message})
+		
 			stintLaps := Floor((stintLengthEdit * 60) / avgLapTime)
 			
+			strategy := this.createStrategy()
+		
 			strategy.createPitstops(simInitialFuelAmountEdit, stintLaps, simMaxTyreLifeEdit, map, fuelConsumption, avgLapTime)
 			
-			pitstopTime := strategy.getPitstopTime()
+			scenarios["Map " . map] := strategy
 			
-			strategy.adjustLastPitstop(Floor(pitstopTime / strategy.AvgLapTime[true]))
+			Sleep 200
 			
-			pitstopTime := strategy.getPitstopTime()
-			sessionLaps := strategy.getSessionLaps()
-			sessionTime := strategy.getSessionTime()
-			
-			origLaps := strategy.RemainingLaps
-			origTime := strategy.RemainingTime
+			progress += 2
 		}
 		
+		progress := Floor(progress + 10)
+		
+		return scenarios
+	}
+	
+	optimizeScenarios(ByRef progress, scenarios) {
+		local strategy
+		
+		if (this.SelectedSessionType = "Duration")
+			for name, strategy in scenarios {
+				message := (translate("Optimzing stint length for scenario ") . name . translate("..."))
+			
+				showProgress({progress: progress, message: message})
+			
+				pitstopTime := strategy.getPitstopTime()
+				
+				strategy.adjustLastPitstop(Floor(pitstopTime / strategy.AvgLapTime[true]))
+				
+				Sleep 200
+				
+				progress += 2
+			}
+		
+		progress := Floor(progress + 10)
+		
+		return scenarios
+	}
+	
+	evaluateScenarios(ByRef progress, scenarios) {
+		local strategy
+		
+		candidate := false
+		
+		for name, strategy in scenarios {
+			message := (translate("Evaluating Scenario ") . name . translate("..."))
+			
+			showProgress({progress: progress, message: message})
+			
+			if !candidate
+				candidate := strategy
+			else {
+				if (this.SelectedSessionType = "Duration") {
+					sLaps := strategy.getSessionLaps()
+					cLaps := candidate.getSessionLaps()
+					sTime := strategy.getSessionTime()
+					cTime := candidate.getSessionTime()
+					
+					if (sLaps < cLaps)
+						candidate := strategy
+					else if ((sLaps = cLaps) && (sTime < cTime))
+						candidate := strategy
+				}
+				else if (strategy.getSessionTime() < candidate.getSessionTime())
+					candidate := strategy
+			}
+			
+			progress += 2
+		
+			Sleep 1000
+		}
+		
+		progress := Floor(progress + 10)
+		
+		return candidate
+	}
+
+	chooseScenario(ByRef progress, strategy) {
+		window := this.Window
+		
+		Gui %window%:Default
+		
+		numPitstops := 0
+		numTyreChanges := 0
+		consumedFuel := strategy.RemainingFuel
+		avgLapTimes := [strategy.AvgLapTime]
+		
+		for ignore, pitstop in strategy.Pitstops {
+			numPitstops += 1
+		
+			if pitstop.TyreChange
+				numTyreChanges += 1
+			
+			consumedFuel += pitstop.RefuelAmount
+			
+			avgLapTimes.Push(pitstop.AvgLapTime)
+		}
+		
+		GuiControl Text, simNumPitstopResult, %numPitstops%
+		GuiControl Text, simNumTyreChangeResult, %numTyreChanges%
+		GuiControl Text, simConsumedFuelResult, % Ceil(consumedFuel)
+		GuiControl Text, simPitlaneSecondsResult, % Ceil(strategy.getPitstopTime())
+		
+		if (this.SelectedSessionType = "Duration")
+			GuiControl Text, simSessionResultResult, % strategy.getSessionLaps()
+		else
+			GuiControl Text, simSessionResultResult, % Ceil(strategy.getSessionTime())
+		
+		this.iSelectedScenario := strategy
+	}
+
+	runSimulation() {
 		x := Round((A_ScreenWidth - 300) / 2)
 		y := A_ScreenHeight - 150
 			
-		progressWindow := showProgress({x: x, y: y, color: "Blue", title: translate("Acquiring Telemetry Information")})
+		window := this.Window
 		
-		Gui, %window%:+Owner%progressWindow%
+		progressWindow := showProgress({x: x, y: y, color: "Blue", title: translate("Acquiring Telemetry Data")})
+		
+		Gui %progressWindow%:+Owner%window%
+		Gui %window%:+Disabled
+		
+		Sleep 200
 		
 		progress := 0
 		
-		this.acquireTelemetryData(progress)
+		electronicsData := false
+		tyreData := false
+		
+		this.acquireTelemetryData(progress, electronicsData, tyreData)
 		
 		message := translate("Creating scenarios...")
 		
+		showProgress({progress: progress, color: "Green", title: translate("Running Simulation")})
+		
+		Sleep 200
+		
+		scenarios := this.createScenarios(progress, electronicsData, tyreData)
+		
+		message := translate("Optimizing scenarios...")
+		
 		showProgress({progress: progress, message: message})
 		
-		scenarios := this.createScenarios(progress)
+		Sleep 200
+		
+		scenarios := this.optimizeScenarios(progress, scenarios)
 		
 		message := translate("Evaluating scenarios...")
 		
-		showProgress({progress: progress, color: "Green", message: message, title: translate("Running Simulation")})
+		showProgress({progress: progress, message: message})
 		
-		scenario := this.evaluateScenarios(scenarios, progress)
+		Sleep 200
 		
-		Sleep 1000
-			
-		message := translate("Stint length...")
+		scenario := this.evaluateScenarios(progress, scenarios)
 		
-		showProgress({progress: progress, message: message, title: translate("Perform final optimizations")})
-		
-		progress += 10
-		
-		Sleep 1000
-			
-		message := translate("Fuel consumption...")
+		message := translate("Choose strategy...")
 		
 		showProgress({progress: progress, message: message})
 		
-		Sleep 1000
+		Sleep 200
+		
+		this.chooseScenario(progress, scenario)
 			
 		message := translate("Finished...")
 		
 		showProgress({progress: 100, message: message})
 		
-		Sleep 2000
+		Sleep 1000
 		
 		hideProgress()
+		
+		Gui %window%:-Disabled
 	}
 }
 
@@ -1462,7 +1758,7 @@ class Strategy {
 			this.iRemainingLaps := (remainingLaps - lastStintLaps)
 			this.iRemainingFuel := (remainingFuel - (lastStintLaps * fuelConsumption) + refuelAmount)
 			
-			remainingTyreLaps := (strategy.RemainingTyreLaps[true] - strategy.StintLaps[true])
+			remainingTyreLaps := (strategy.RemainingTyreLaps[true] - lastStintLaps)
 			
 			if ((remainingTyreLaps - stintLaps) >= 0)
 				this.iRemainingTyreLaps := remainingTyreLaps
@@ -1874,25 +2170,25 @@ choosePitstopRequirements() {
 settingsMenu() {
 	GuiControlGet settingsMenuDropDown
 	
-	StrategyWorkbench.Instance.chooseSettingsMenu(settingsMenuDropDown)
-	
 	GuiControl Choose, settingsMenuDropDown, 1
+	
+	StrategyWorkbench.Instance.chooseSettingsMenu(settingsMenuDropDown)
 }
 
 simulationMenu() {
 	GuiControlGet simulationMenuDropDown
 	
-	StrategyWorkbench.Instance.chooseSimulationMenu(simulationMenuDropDown)
-	
 	GuiControl Choose, simulationMenuDropDown, 1
+	
+	StrategyWorkbench.Instance.chooseSimulationMenu(simulationMenuDropDown)
 }
 
 strategyMenu() {
 	GuiControlGet strategyMenuDropDown
 	
-	StrategyWorkbench.Instance.chooseStrategyMenu(strategyMenuDropDown)
-	
 	GuiControl Choose, strategyMenuDropDown, 1
+	
+	StrategyWorkbench.Instance.chooseStrategyMenu(strategyMenuDropDown)
 }
 
 runSimulation() {
@@ -1954,7 +2250,7 @@ fixIE(version := 0, exeName := "") {
 			SplitPath A_AhkPath, exeName
 	}
 	
-	RegRead PreviousValue, HKCU, %key%, %exeName%
+	RegRead previousValue, HKCU, %key%, %exeName%
 
 	if (version = "")
 		RegDelete, HKCU, %key%, %exeName%

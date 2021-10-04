@@ -715,7 +715,7 @@ class RaceReports extends ConfigurationItem {
 			drawChartFunction .= "`ndata.addColumn('string', '" . translate("TC") . "');"
 			drawChartFunction .= "`ndata.addColumn('string', '" . translate("ABS") . "');"
 			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Consumption") . "');"
-			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Laptime") . "');"
+			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Lap Time") . "');"
 			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Pitstop") . "');"
 			
 			drawChartFunction .= ("`ndata.addRows([" . values2String(", ", rows*) . "]);")
@@ -1774,7 +1774,7 @@ fixIE(version := 0, exeName := "") {
 			SplitPath A_AhkPath, exeName
 	}
 	
-	RegRead PreviousValue, HKCU, %key%, %exeName%
+	RegRead previousValue, HKCU, %key%, %exeName%
 
 	if (version = "")
 		RegDelete, HKCU, %key%, %exeName%

@@ -1,3 +1,10 @@
+## 3.6.0-release 10/08/21
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Fix for handling startup of SimFeedback by the "Motion Feedback" plugin.
+  4. Initial strategy simulation based on telemetry data for the "Strategy Workbench". "Strategy Workbench" ist still in an early stage of development and there is no documentation yet.
+
 ## 3.5.9-release 10/01/21
 
   1. Fix for automated save of settings by Race Assistants

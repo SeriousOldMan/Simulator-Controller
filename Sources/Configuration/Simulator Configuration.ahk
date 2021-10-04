@@ -248,10 +248,16 @@ class GeneralTab extends ConfigurationItem {
 	openTranslationsEditor() {
 		GuiControlGet languageDropDown
 		
-		ConfigurationEditor.Instance.hide()
+		; ConfigurationEditor.Instance.hide()
+		
+		window := ConfigurationEditor.Instance.Window
+		
+		Gui TE:+Owner%window%
+		Gui %window%:+Disabled
 		
 		if (new TranslationsEditor(this.Configuration)).editTranslations() {
-			ConfigurationEditor.Instance.show()
+			; ConfigurationEditor.Instance.show()
+			Gui %window%:-Disabled
 			
 			window := ConfigurationEditor.Instance.Window
 			
@@ -280,15 +286,22 @@ class GeneralTab extends ConfigurationItem {
 			GuiControl Choose, languageDropDown, %chosen%
 		}
 		else
-			ConfigurationEditor.Instance.show()
+			; ConfigurationEditor.Instance.show()
+			Gui %window%:-Disabled
 	}
 	
 	openThemesEditor() {
-		ConfigurationEditor.Instance.hide()
+		; ConfigurationEditor.Instance.hide()
+		
+		window := ConfigurationEditor.Instance.Window
+		
+		Gui TE:+Owner%window%
+		Gui %window%:+Disabled
 		
 		this.iSplashThemesConfiguration := (new ThemesEditor(this.iSplashThemesConfiguration ? this.iSplashThemesConfiguration : this.Configuration)).editThemes()
 		
-		ConfigurationEditor.Instance.show()
+		; ConfigurationEditor.Instance.show()
+		Gui %window%:-Disabled
 	}
 }
 

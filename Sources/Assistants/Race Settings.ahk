@@ -553,7 +553,7 @@ restart:
 		Gui RES:Add, UpDown, x138 yp-2 w18 h20 Range1-9999 0x80, %raceDurationEdit%
 		Gui RES:Add, Text, x164 yp+4 w70 h20, % translate("Min.")
 
-		Gui RES:Add, Text, x16 yp+20 w85 h23 +0x200, % translate("Avg. Laptime")
+		Gui RES:Add, Text, x16 yp+20 w85 h23 +0x200, % translate("Avg. Lap Time")
 		Gui RES:Add, Edit, x106 yp w50 h20 Limit3 Number VavgLaptimeEdit, %avgLaptimeEdit%
 		Gui RES:Add, UpDown, x138 yp-2 w18 h20 Range1-999 0x80, %avgLaptimeEdit%
 		Gui RES:Add, Text, x164 yp+4 w90 h20, % translate("Sec.")

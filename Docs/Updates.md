@@ -45,6 +45,12 @@ Although the code, that handles all the update tasks, is integrated into *Simula
 
 Note: Some of you might want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars* and *Simulator Controller\Rules* folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does on your own. But be sure to make a backup copy of all the files, just for peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor that can handle this.
 
+## Release 3.6.0
+
+Nothing to do for this release.
+
+***
+
 ## Release 3.5.8
 
 Beginning with this release, the Virtual Race Strategist will also be active during a Practice session, but only as a passive observer in order to collect the telemetry data for future strategy development. Using the “Simulator Configuration”, you can [configure when to save this telemetry data for the different simulations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-strategist). More important, a new tool „Strategy Workbench“ is introduced with this release. Although the “Strategy” part of this tool is non-functional yet and documentation is not available as well, it can already be used to analyze the telemetry data. Active “Strategy” development using this tool will be completed step by step with the next releases.

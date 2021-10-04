@@ -1995,7 +1995,7 @@ fixIE(version := 0, exeName := "") {
 			SplitPath A_AhkPath, exeName
 	}
 	
-	RegRead PreviousValue, HKCU, %key%, %exeName%
+	RegRead previousValue, HKCU, %key%, %exeName%
 
 	if (version = "")
 		RegDelete, HKCU, %key%, %exeName%

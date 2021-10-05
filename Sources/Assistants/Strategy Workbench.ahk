@@ -849,11 +849,11 @@ class StrategyWorkbench extends ConfigurationItem {
 			html .= ("<br><br><div id=""header""><b><i>" . translate("Stints") . "</i></b></div>")
 			
 			if !strategy.LastPitstop {
-				html .= ("<br><br><table id=""stints""><tr><td><i>" . translate("Stint:") . "</i></td><td>1</td></tr>")
-				html .= ("<tr><td id=""data""><i>" . translate("Map:") . "</i></td><td>" . strategy.Map . "</td></tr>")
-				html .= ("<tr><td id=""data""><i>" . translate("Laps:") . "</i></td><td>" . strategy.RemainingLaps . "</td></tr>")
-				html .= ("<tr><td id=""data""><i>" . translate("Lap Time:") . "</i></td><td>" . strategy.AvgLapTime . "</td></tr>")
-				html .= ("<tr><td id=""data""><i>" . translate("Fuel Consumption:") . "</i></td><td>" . strategy.FuelConsumption . "</td></tr>")
+				html .= ("<br><br><table id=""stints""><tr><td><i>" . translate("Stint:") . "</i></td><td id=""data"">1</td></tr>")
+				html .= ("<tr><td><i>" . translate("Map:") . "</i></td><td id=""data"">" . strategy.Map . "</td></tr>")
+				html .= ("<tr><td><i>" . translate("Laps:") . "</i></td><td id=""data"">" . strategy.RemainingLaps . "</td></tr>")
+				html .= ("<tr><td><i>" . translate("Lap Time:") . "</i></td><td id=""data"">" . strategy.AvgLapTime . "</td></tr>")
+				html .= ("<tr><td><i>" . translate("Fuel Consumption:") . "</i></td><td id=""data"">" . strategy.FuelConsumption . "</td></tr>")
 				html .= "</table>"
 				
 				timeSeries.Push(strategy.getSessionTime() / 60)
@@ -2189,7 +2189,7 @@ chooseDataType() {
 	else if (dataType = "Tyres") {
 		GuiControl Choose, dataXDropDown, % inList(schema, "Tyre.Laps")
 		GuiControl Choose, dataY1DropDown, % inList(schema, "Tyre.Pressure")
-		GuiControl Choose, dataY2DropDown, % inList(schema, "Tyre.Temperature")
+		GuiControl Choose, dataY2DropDown, % inList(schema, "Tyre.Temperature") + 1
 	}
 	
 	GuiControl Choose, dataY3DropDown, 1

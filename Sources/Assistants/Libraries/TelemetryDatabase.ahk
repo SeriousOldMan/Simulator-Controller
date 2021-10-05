@@ -225,9 +225,9 @@ removeInvalidLaps(rows) {
 		lapTimes.Push(row["Lap.Time"])
 	
 	avg := average(lapTimes)
-	stdDeviation := stdDeviation(lapTimes)
+	stdDev := stdDeviation(lapTimes)
 	
-	threshold := (avg + (stdDeviation / 2))
+	threshold := (avg + stdDev)
 	
 	result := []
 	

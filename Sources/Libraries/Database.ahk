@@ -235,6 +235,8 @@ stdDeviation(numbers) {
 	for ignore, value in numbers
 		squareSum += ((value - avg) * (value - avg))
 	
+	squareSum := (squareSum / numbers.Length())
+	
 	return Sqrt(squareSum)
 }
 

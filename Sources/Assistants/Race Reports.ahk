@@ -386,7 +386,7 @@ class RaceReports extends ConfigurationItem {
 		invalidTimes := []
 		
 		for ignore, time in validTimes
-			if ((time > avg) && (Abs(time - avg) > (stdDev / 2)))
+			if ((time > avg) && (Abs(time - avg) > stdDev))
 				invalidTimes.Push(time)
 		
 		for ignore, time in invalidTimes
@@ -1656,6 +1656,8 @@ stdDeviation(numbers) {
 	
 	for ignore, value in numbers
 		squareSum += ((value - avg) * (value - avg))
+
+	squareSum := (squareSum / numbers.Length())
 	
 	return Sqrt(squareSum)
 }

@@ -2103,7 +2103,7 @@ moveWorkbench() {
 }
 
 openWorkbenchDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-workbench
+	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-development
 }
 
 chooseSimulator() {

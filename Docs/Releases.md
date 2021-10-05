@@ -1,9 +1,9 @@
-## 3.6.0-release 10/08/21
+## 3.6.0-release 10/08/21 (planned)
 
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. Fix for handling startup of SimFeedback by the "Motion Feedback" plugin.
-  4. Initial strategy simulation based on telemetry data for the "Strategy Workbench". "Strategy Workbench" ist still in an early stage of development and there is no documentation yet.
+  3. Important fix for handling startup of SimFeedback by the "Motion Feedback" plugin.
+  4. Initial strategy simulation based on telemetry data for the "Strategy Workbench". The tool is still in an early stage of development and the functionality might change with future releases. A very rudimentary [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-development) can be found in the chapter on the Virtual Race Strategist. This documentation will be completed with the upcoming releases.
 
 ## 3.5.9-release 10/01/21
 

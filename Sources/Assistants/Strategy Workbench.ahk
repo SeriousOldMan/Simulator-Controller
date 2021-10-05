@@ -360,23 +360,23 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		Gui %window%:Add, DropDownList, x12 yp+32 w76 AltSubmit Choose1 vdataTypeDropDown gchooseDataType +0x200, % values2String("|", map(["Electronics", "Tyres"], "translate")*)
 		
-		Gui %window%:Add, ListView, x90 yp-2 w120 h97 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDdataListView gchooseData, % values2String("|", map(["Map", "Count"], "translate")*)
+		Gui %window%:Add, ListView, x90 yp-2 w100 h97 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDdataListView gchooseData, % values2String("|", map(["Map", "Count"], "translate")*)
 		
 		this.iDataListView := dataListView
 		
-		Gui %window%:Add, Text, x220 yp+2 w70 h23 +0x200, % translate("X-Axis")
+		Gui %window%:Add, Text, x200 yp+2 w70 h23 +0x200, % translate("X-Axis")
 		
-		schema := filterSchema(kTelemetrySchemas["Electronics"])
+		schema := filterSchema(new TelemetryDatabase().getSchema("Electronics", true))
 		
 		chosen := inList(schema, "Map")
-		Gui %window%:Add, DropDownList, x270 yp w110 AltSubmit Choose%chosen% vdataXDropDown gchooseAxis, % values2String("|", map(schema, "translate")*)
+		Gui %window%:Add, DropDownList, x250 yp w130 AltSubmit Choose%chosen% vdataXDropDown gchooseAxis, % values2String("|", map(schema, "translate")*)
 		
-		Gui %window%:Add, Text, x220 yp+24 w70 h23 +0x200, % translate("Series")
+		Gui %window%:Add, Text, x200 yp+24 w70 h23 +0x200, % translate("Series")
 		
 		chosen := inList(schema, "Fuel.Consumption")
-		Gui %window%:Add, DropDownList, x270 yp w110 AltSubmit Choose%chosen% vdataY1DropDown gchooseAxis, % values2String("|", map(schema, "translate")*)
-		Gui %window%:Add, DropDownList, x270 yp+24 w110 AltSubmit Choose1 vdataY2DropDown gchooseAxis, % translate("None") . "|" . values2String("|", map(schema, "translate")*)
-		Gui %window%:Add, DropDownList, x270 yp+24 w110 AltSubmit Choose1 vdataY3DropDown gchooseAxis, % translate("None") . "|" . values2String("|", map(schema, "translate")*)
+		Gui %window%:Add, DropDownList, x250 yp w130 AltSubmit Choose%chosen% vdataY1DropDown gchooseAxis, % values2String("|", map(schema, "translate")*)
+		Gui %window%:Add, DropDownList, x250 yp+24 w130 AltSubmit Choose1 vdataY2DropDown gchooseAxis, % translate("None") . "|" . values2String("|", map(schema, "translate")*)
+		Gui %window%:Add, DropDownList, x250 yp+24 w130 AltSubmit Choose1 vdataY3DropDown gchooseAxis, % translate("None") . "|" . values2String("|", map(schema, "translate")*)
 		
 		Gui %window%:Add, Text, x400 ys w40 h23 +0x200, % translate("Chart")
 		Gui %window%:Add, DropDownList, x444 yp w80 AltSubmit Choose1 +0x200, % values2String("|", map(["Telemetry", "Strategy"], "translate")*)
@@ -1241,7 +1241,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		GuiControlGet dataY2DropDown
 		GuiControlGet dataY3DropDown
 		
-		schema := filterSchema(kTelemetrySchemas[this.SelectedDataType])
+		schema := filterSchema(new TelemetryDatabase().getSchema(this.SelectedDataType, true))
 		
 		xAxis := schema[dataXDropDown]
 		yAxises := Array(schema[dataY1DropDown])
@@ -2133,7 +2133,7 @@ chooseDataType() {
 	GuiControlGet dataTypeDropDown
 	
 	dataType := ["Electronics", "Tyres"][dataTypeDropDown]
-	schema := filterSchema(kTelemetrySchemas[dataType])
+	schema := filterSchema(new TelemetryDatabase().getSchema(dataType, true))
 	
 	workbench.iSelectedDataType := dataType
 	

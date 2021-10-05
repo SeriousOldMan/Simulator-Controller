@@ -28,8 +28,10 @@ global kTelemetrySchemas = {Electronics: ["Weather", "Temperature.Air", "Tempera
 										, "Fuel.Remaining", "Fuel.Consumption", "Lap.Time", "Map", "TC", "ABS"]
 						  , Tyres: ["Weather", "Temperature.Air", "Temperature.Track", "Tyre.Compound", "Tyre.Compound.Color"
 								  , "Fuel.Remaining", "Fuel.Consumption", "Lap.Time", "Tyre.Laps"
-								  , "Tyre.Pressure.FL", "Tyre.Pressure.FR", "Tyre.Pressure.RL", "Tyre.Pressure.RR"
-								  , "Tyre.Temperature.FL", "Tyre.Temperature.FR", "Tyre.Temperature.RL", "Tyre.Temperature.RR"]}
+								  , "Tyre.Pressure.Front.Left", "Tyre.Pressure.Front.Right"
+								  , "Tyre.Pressure.Rear.Left", "Tyre.Pressure.Rear.Right"
+								  , "Tyre.Temperature.Front.Left", "Tyre.Temperature.Front.Right"
+								  , "Tyre.Temperature.Rear.Left", "Tyre.Temperature.Rear.Right"]}
 								   
 
 ;;;-------------------------------------------------------------------------;;;
@@ -58,16 +60,36 @@ class TelemetryDatabase extends SessionDatabase {
 		}
 	}
 	
+	getSchema(table, includeVirtualColumns := false) {
+		schema := kTelemetrySchemas[table]
+		
+		if (includeVirtualColumns && (table = "Tyres")) {
+			schema := schema.Clone()
+			
+			schema.Push("Tyre.Pressure")
+			schema.Push("Tyre.Pressure.Front")
+			schema.Push("Tyre.Pressure.Rear")
+			
+			schema.Push("Tyre.Temperature")
+			schema.Push("Tyre.Temperature.Front")
+			schema.Push("Tyre.Temperature.Rear")
+		}
+		
+		return schema
+	}
+	
 	getElectronicEntries(weather, compound, compoundColor) {
 		if this.Database
-			return this.Database.query("Electronics", {Filter: "removeInvalidLaps", Where: {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
+			return this.Database.query("Electronics", {Transform: "removeInvalidLaps"
+													 , Where: {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
 		else
 			return []
 	}
 	
 	getTyreEntries(weather, compound, compoundColor) {
 		if this.Database
-			return this.Database.query("Tyres", {Filter: "removeInvalidLaps", Where: {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
+			return this.Database.query("Tyres", {Transform: combine("removeInvalidLaps", "computePressures", "computeTemperatures")
+											   , Where: {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
 		else
 			return []
 	}
@@ -75,7 +97,7 @@ class TelemetryDatabase extends SessionDatabase {
 	getMapsCount(weather, compound, compoundColor) {
 		if this.Database
 			return this.Database.query("Electronics", {Group: [["Map", "count", "Count"]], By: "Map"
-													 , Filter: "removeInvalidLaps"
+													 , Transform: "removeInvalidLaps"
 													 , Where: {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
 		else
 			return []
@@ -85,7 +107,7 @@ class TelemetryDatabase extends SessionDatabase {
 		if this.Database
 			return this.Database.query("Electronics", {Group: [["Lap.Time", "average", "Lap.Time"], ["Fuel.Consumption", "average", "Fuel.Consumption"]]
 													 , By: "Map"
-													 , Filter: "removeInvalidLaps"
+													 , Transform: "removeInvalidLaps"
 													 , Where: {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
 		else
 			return []
@@ -94,7 +116,7 @@ class TelemetryDatabase extends SessionDatabase {
 	getTyreData(weather, compound, compoundColor) {
 		if this.Database
 			return this.Database.query("Tyres", {Group: [["Lap.Time", "minimum", "Lap.Time"]], By: "Tyre.Laps"
-											   , Filter: "removeInvalidLaps"
+											   , Transform: "removeInvalidLaps"
 											   , Where: {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
 		else
 			return []
@@ -102,14 +124,9 @@ class TelemetryDatabase extends SessionDatabase {
 	
 	getPressuresCount(weather, compound, compoundColor) {
 		if this.Database {
-			rows := this.Database.query("Tyres", {Where: {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
-			
-			for ignore, row in rows {
-				row["Tyre.Pressure"] := Round(average([row["Tyre.Pressure.FL"], row["Tyre.Pressure.FR"], row["Tyre.Pressure.RL"], row["Tyre.Pressure.RR"]]), 1)
-				row["Tyre.Temperature"] := Round(average([row["Tyre.Temperature.FL"], row["Tyre.Temperature.FR"], row["Tyre.Temperature.RL"], row["Tyre.Temperature.RR"]]), 1)
-			}
-			
-			return countValues("Tyre.Pressure", "Count", rows)
+			return this.Database.query("Tyres", {Group: [["Tyre.Pressure", "count", "Count"]], By: "Tyre.Pressure"
+											   , Transform: "computePressures"
+											   , Where: {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
 		}
 		else
 			return []
@@ -128,9 +145,10 @@ class TelemetryDatabase extends SessionDatabase {
 		this.Database.add("Tyres", {Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
 								  , "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor
 								  , "Fuel.Remaining": fuelRemaining, "Fuel.Consumption": fuelConsumption, "Lap.Time": lapTime, "Tyre.Laps": tyreLaps
-								  , "Tyre.Pressure.FL": pressureFL, "Tyre.Pressure.FR": pressureFR, "Tyre.Pressure.RL": pressureRL, "Tyre.Pressure.RR": pressureRR
-								  , "Tyre.Temperature.FL": temperatureFL, "Tyre.Temperature.FR": temperatureFR
-								  , "Tyre.Temperature.RL": temperatureRL, "Tyre.Temperature.RR": temperatureRR}, true)
+								  , "Tyre.Pressure.Front.Left": pressureFL, "Tyre.Pressure.Front.Right": pressureFR
+								  , "Tyre.Pressure.Rear.Left": pressureRL, "Tyre.Pressure.Rear.Right": pressureRR
+								  , "Tyre.Temperature.Front.Left": temperatureFL, "Tyre.Temperature.Front.Right": temperatureFR
+								  , "Tyre.Temperature.Rear.Left": temperatureRL, "Tyre.Temperature.Rear.Right": temperatureRR}, true)
 	}
 }
 
@@ -163,6 +181,41 @@ countValues(groupedColumn, countColumn, rows) {
 	}
 	
 	return result
+}
+
+combine(functions*) {
+	return Func("callFunctions").Bind(functions)
+}
+
+callFunctions(functions, rows) {
+	local function
+	
+	for ignore, function in functions
+		rows := %function%(rows)
+	
+	return rows
+}
+
+computePressures(rows) {
+	for ignore, row in rows {
+		row["Tyre.Pressure"] := Round(average([row["Tyre.Pressure.Front.Left"], row["Tyre.Pressure.Front.Right"]
+											 , row["Tyre.Pressure.Rear.Left"], row["Tyre.Pressure.Rear.Right"]]), 1)
+		row["Tyre.Pressure.Front"] := Round(average([row["Tyre.Pressure.Front.Left"], row["Tyre.Pressure.Front.Right"]]), 1)
+		row["Tyre.Pressure.Rear"] := Round(average([row["Tyre.Pressure.Rear.Left"], row["Tyre.Pressure.Rear.Right"]]), 1)
+	}
+	
+	return rows
+}
+
+computeTemperatures(rows) {
+	for ignore, row in rows {
+		row["Tyre.Temperature"] := Round(average([row["Tyre.Temperature.Front.Left"], row["Tyre.Temperature.Front.Right"]
+												, row["Tyre.Temperature.Rear.Left"], row["Tyre.Temperature.Rear.Right"]]), 1)
+		row["Tyre.Temperature.Front"] := Round(average([row["Tyre.Temperature.Front.Left"], row["Tyre.Temperature.Front.Right"]]), 1)
+		row["Tyre.Temperature.Rear"] := Round(average([row["Tyre.Temperature.Rear.Left"], row["Tyre.Temperature.Rear.Right"]]), 1)
+	}
+	
+	return rows
 }
 
 removeInvalidLaps(rows) {

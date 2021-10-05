@@ -95,10 +95,10 @@ class Database {
 			needsClone := false
 		}
 		
-		if query.HasKey("Filter") {
-			filter := query["Filter"]
+		if query.HasKey("Transform") {
+			transform := query["Transform"]
 			
-			rows := %filter%(rows)
+			rows := %transform%(rows)
 		}
 		
 		if (query.HasKey("Group") || query.HasKey("By")) {

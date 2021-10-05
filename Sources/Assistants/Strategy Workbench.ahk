@@ -834,7 +834,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			}
 			else {
 				html .= ("<tr><td><b>" . translate("Laps:") . "</b></td><td>" . raceDurationEdit . A_Space . translate("Laps") . "</td></tr>")
-				html .= ("<tr><td><b>" . translate("Duration:") . "</b></td><td>" . strategy.getSessionTime() . A_Space . translate("Minutes") . "</td></tr>")
+				html .= ("<tr><td><b>" . translate("Duration:") . "</b></td><td>" . Round(strategy.getSessionTime() / 60) . A_Space . translate("Minutes") . "</td></tr>")
 			}
 			
 			html .= ("<tr><td><b>" . translate("Compound:") . "</b></td><td>" . translate(this.SelectedCompound[true]) . "</td></tr>")

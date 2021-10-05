@@ -101,6 +101,8 @@ global simConsumptionWeight = 20
 global simTyreUsageWeight = 60
 global simCarWeightWeight = 80
 
+global simInputDropDown
+
 global simNumPitstopResult = ""
 global simNumTyreChangeResult = ""
 global simConsumedFuelResult = ""
@@ -436,7 +438,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		x9 := x8 + 26
 		x10 := x7 + 16
 		
-		x11 := x7 + 82
+		x11 := x7 + 87
 		x12 := x11 + 56
 		
 		Gui %window%:Font, Norm, Arial
@@ -472,15 +474,15 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 
 		Gui %window%:Add, Text, x%x5% yp+23 w90 h20, % translate("Pitstop")
-		Gui %window%:Add, DropDownList, x%x7% yp-4 w75 AltSubmit Choose3 VpitstopRequirementsDropDown gchoosePitstopRequirements, % values2String("|", map(["Optional", "Required", "Window"], "translate")*)
+		Gui %window%:Add, DropDownList, x%x7% yp-4 w80 AltSubmit Choose3 VpitstopRequirementsDropDown gchoosePitstopRequirements, % values2String("|", map(["Optional", "Required", "Window"], "translate")*)
 		Gui %window%:Add, Edit, x%x11% yp+1 w50 h20 VpitstopWindowEdit, %pitstopWindowEdit%
 		Gui %window%:Add, Text, x%x12% yp+3 w110 h20 VpitstopWindowLabel, % translate("Minute (From - To)")
 
 		Gui %window%:Add, Text, x%x5% yp+22 w85 h23 +0x200, % translate("Tyre Change")
-		Gui %window%:Add, DropDownList, x%x7% yp w75 AltSubmit Choose1 VtyreChangeRequirementsDropDown, % values2String("|", map(["Required", "Optional"], "translate")*)
+		Gui %window%:Add, DropDownList, x%x7% yp w80 AltSubmit Choose1 VtyreChangeRequirementsDropDown, % values2String("|", map(["Required", "Optional"], "translate")*)
 
 		Gui %window%:Add, Text, x%x5% yp+26 w85 h23 +0x200, % translate("Refuel")
-		Gui %window%:Add, DropDownList, x%x7% yp w75 AltSubmit Choose1 VrefuelRequirementsDropDown, % values2String("|", map(["Required", "Optional"], "translate")*)
+		Gui %window%:Add, DropDownList, x%x7% yp w80 AltSubmit Choose1 VrefuelRequirementsDropDown, % values2String("|", map(["Required", "Optional"], "translate")*)
 		
 		Gui %window%:Tab, 2
 		
@@ -588,10 +590,11 @@ class StrategyWorkbench extends ConfigurationItem {
 		x2 := x1 + 32
 		x3 := x2 + 26
 		x4 := x1 + 16
+		x5 := x + 50
 		
 		Gui %window%:Font, Italic, Arial
 
-		Gui %window%:Add, GroupBox, -Theme x214 ys+34 w174 h171, % translate("Optimizer")
+		Gui %window%:Add, GroupBox, -Theme x214 ys+34 w174 h99, % translate("Optimizer")
 		
 		Gui %window%:Font, Norm, Arial
 
@@ -604,7 +607,13 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, Text, x%x% yp+24 w100 h20 +0x200, % translate("Car Weight")
 		Gui %window%:Add, Slider, x%x1% yp w60 0x10 Range0-100 ToolTip VsimCarWeightWeight, %simCarWeightWeight%
 		
-		Gui %window%:Add, Button, x%x% yp+72 w160 h20 grunSimulation, % translate("Simulate!")
+		Gui %window%:Add, Text, x214 yp+48 w40 h23 +0x200, % translate("Use")
+		
+		choices := map(["Initial Conditions", "Telemetry Data", "Initial Cond. + Telemetry"], "translate")
+
+		Gui %window%:Add, DropDownList, x250 yp w138 AltSubmit Choose3 VsimInputDropDown, % values2String("|", choices*)
+		
+		Gui %window%:Add, Button, x214 yp+34 w174 h20 grunSimulation, % translate("Simulate!")
 		
 		x := 407
 		x0 := x - 4
@@ -620,21 +629,21 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 
 		Gui %window%:Add, Text, x%x% yp+21 w90 h20 +0x200, % translate("# Pitstops")
-		Gui %window%:Add, Text, x%x1% yp+1 w40 h20 Border VsimNumPitstopResult, %simNumPitstopResult%
+		Gui %window%:Add, Edit, x%x1% yp+1 w40 h20 Disabled VsimNumPitstopResult, %simNumPitstopResult%
 		
 		Gui %window%:Add, Text, x%x% yp+23 w90 h20 +0x200, % translate("# Tyre Changes")
-		Gui %window%:Add, Text, x%x1% yp+1 w40 h20 Border VsimNumTyreChangeResult, %simNumTyreChangeResult%
+		Gui %window%:Add, Edit, x%x1% yp+1 w40 h20 Disabled VsimNumTyreChangeResult, %simNumTyreChangeResult%
 				
 		Gui %window%:Add, Text, x%x% yp+23 w90 h20 +0x200, % translate("Consumed Fuel")
-		Gui %window%:Add, Text, x%x1% yp+1 w40 h20 Border VsimConsumedFuelResult, %simConsumedFuelResult%
+		Gui %window%:Add, Edit, x%x1% yp+1 w40 h20 Disabled VsimConsumedFuelResult, %simConsumedFuelResult%
 		Gui %window%:Add, Text, x%x3% yp+2 w50 h20, % translate("Liter")
 				
 		Gui %window%:Add, Text, x%x% yp+21 w90 h20 +0x200, % translate("@ Pitlane")
-		Gui %window%:Add, Text, x%x1% yp+1 w40 h20 Border VsimPitlaneSecondsResult, %simPitlaneSecondsResult%
+		Gui %window%:Add, Edit, x%x1% yp+1 w40 h20 Disabled VsimPitlaneSecondsResult, %simPitlaneSecondsResult%
 		Gui %window%:Add, Text, x%x3% yp+2 w50 h20, % translate("Seconds")
 				
 		Gui %window%:Add, Text, x%x% yp+21 w90 h20 +0x200, % translate("@ Finish")
-		Gui %window%:Add, Text, x%x1% yp+1 w40 h20 Border VsimSessionResultResult, %simSessionResultResult%
+		Gui %window%:Add, Edit, x%x1% yp+1 w40 h20 Disabled VsimSessionResultResult, %simSessionResultResult%
 		Gui %window%:Add, Text, x%x3% yp+2 w50 h20 VsimSessionResultLabel, % translate("Laps")
 		
 		Gui %window%:Tab, 4
@@ -819,10 +828,15 @@ class StrategyWorkbench extends ConfigurationItem {
 			GuiControlGet raceDurationEdit
 		
 			html := ("<div id=""header""><b><i>" . translate("Strategy") . "</i></b></div><br><br><table><tr><td><b>" . translate("Session:") . "</b></td><td>" . this.SelectedCar . translate(" @ ") . this.SelectedTrack . "</td></tr>")
-			if (this.SelectedSessionType = "Duration")
+			if (this.SelectedSessionType = "Duration") {
 				html .= ("<tr><td><b>" . translate("Duration:") . "</b></td><td>" . raceDurationEdit . A_Space . translate("Minutes") . "</td></tr>")
-			else
+				html .= ("<tr><td><b>" . translate("Laps:") . "</b></td><td>" . strategy.getSessionLaps() . A_Space . translate("Laps") . "</td></tr>")
+			}
+			else {
 				html .= ("<tr><td><b>" . translate("Laps:") . "</b></td><td>" . raceDurationEdit . A_Space . translate("Laps") . "</td></tr>")
+				html .= ("<tr><td><b>" . translate("Duration:") . "</b></td><td>" . strategy.getSessionTime() . A_Space . translate("Minutes") . "</td></tr>")
+			}
+			
 			html .= ("<tr><td><b>" . translate("Compound:") . "</b></td><td>" . translate(this.SelectedCompound[true]) . "</td></tr>")
 			html .= ("<tr><td><b>" . translate("Start Fuel:") . "</b></td><td>" . strategy.RemainingFuel . A_Space . translate("Liter") . "</td></tr>")
 			html .= "</table>"
@@ -943,11 +957,16 @@ class StrategyWorkbench extends ConfigurationItem {
 				</head>
 			)
 			
+			durationSession := (this.SelectedSessionType = "Duration")
 			chart := ""
 				
 			chart .= "function drawChart() {`nvar data = new google.visualization.DataTable();"
-			chart .= ("`ndata.addColumn('number', '" . translate("Minute") . "');")
-			chart .= ("`ndata.addColumn('number', '" . translate("Lap") . "');")
+			
+			if durationSession
+				chart .= ("`ndata.addColumn('number', '" . translate("Lap") . "');")
+			else
+				chart .= ("`ndata.addColumn('number', '" . translate("Minutes") . "');")
+			
 			chart .= ("`ndata.addColumn('number', '" . translate("Fuel Level") . "');")
 			chart .= ("`ndata.addColumn('number', '" . translate("Tyre Life") . "');")
 
@@ -957,10 +976,12 @@ class StrategyWorkbench extends ConfigurationItem {
 				if (A_Index > 1)
 					chart .= ", "
 				
-				chart .= ("[" . time . ", " . lapSeries[A_Index] . ", " . fuelSeries[A_Index] . ", " . tyreSeries[A_Index] . "]")
+				xAxis := (durationSession ? lapSeries[A_Index] : time)
+				
+				chart .= ("[" . xAxis . ", " . fuelSeries[A_Index] . ", " . tyreSeries[A_Index] . "]")
 			}
 			
-			chart .= ("]);`nvar options = { curveType: 'function', legend: { position: 'Right' }, chartArea: { left: '10%', top: '5%', right: '25%', bottom: '20%' }, hAxis: { title: '" . translate("Minute") . "' }, vAxis: { viewWindow: { min: 0 } }, backgroundColor: 'D8D8D8' };`n")
+			chart .= ("]);`nvar options = { curveType: 'function', legend: { position: 'Right' }, chartArea: { left: '10%', top: '5%', right: '25%', bottom: '20%' }, hAxis: { title: '" . translate("Lap") . "' }, vAxis: { viewWindow: { min: 0 } }, backgroundColor: 'D8D8D8' };`n")
 					
 			chart .= "`nvar chart = new google.visualization.LineChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 			
@@ -1283,7 +1304,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			return (raceDurationEdit + (formationLapCheck ? 1 : 0) + (postRaceLapCheck ? 1 : 0))
 	}
 	
-	calcSessionTime(avgLapTime) {
+	calcSessionTime(avgLapTime, postRaceLap := true) {
 		window := this.Window
 		
 		Gui %window%:Default
@@ -1293,9 +1314,9 @@ class StrategyWorkbench extends ConfigurationItem {
 		GuiControlGet postRaceLapCheck
 		
 		if (this.SelectedSessionType = "Duration")
-			return ((raceDurationEdit * 60) + ((formationLapCheck ? 1 : 0) * avgLapTime) + ((postRaceLapCheck ? 1 : 0) * avgLapTime))
+			return ((raceDurationEdit * 60) + ((formationLapCheck ? 1 : 0) * avgLapTime) + (((postRaceLap && postRaceLapCheck) ? 1 : 0) * avgLapTime))
 		else
-			return ((raceDurationEdit + (formationLapCheck ? 1 : 0) + (postRaceLapCheck ? 1 : 0)) * avgLapTime)
+			return ((raceDurationEdit + (formationLapCheck ? 1 : 0) + ((postRaceLap && postRaceLapCheck) ? 1 : 0)) * avgLapTime)
 	}
 	
 	calcRefuelAmount(targetFuel, currentFuel) {
@@ -1450,45 +1471,50 @@ class StrategyWorkbench extends ConfigurationItem {
 		GuiControlGet simFuelConsumptionEdit
 		GuiControlGet simAvgLapTimeEdit
 		
+		GuiControlGet simInputDropDown
+		
 		scenarios := {}
 		
-		message := (translate("Creating Initial Scenario with Map ") . simMapEdit . translate("..."))
-			
-		showProgress({progress: progress, message: message})
-		
-		stintLaps := Floor((stintLengthEdit * 60) / simAvgLapTimeEdit)
-			
-		strategy := this.createStrategy()
-		
-		strategy.createPitstops(simInitialFuelAmountEdit, stintLaps, simMaxTyreLifeEdit, simMapEdit, simFuelConsumptionEdit, simAvgLapTimeEdit)
-			
-		scenarios["Initial Conditions - Map " . simMapEdit] := strategy
-			
-		Sleep 200
-			
-		progress += 2
-			
-		for ignore, mapData in electronicsData {
-			map := mapData["Map"]
-			fuelConsumption := mapData["Fuel.Consumption"]
-			avgLapTime := mapData["Lap.Time"]
-		
-			message := (translate("Creating Telemetry Scenario with Map ") . map . translate("..."))
-			
+		if ((simInputDropDown = 1) || (simInputDropDown = 3)) {
+			message := (translate("Creating Initial Scenario with Map ") . simMapEdit . translate("..."))
+				
 			showProgress({progress: progress, message: message})
-		
-			stintLaps := Floor((stintLengthEdit * 60) / avgLapTime)
 			
+			stintLaps := Floor((stintLengthEdit * 60) / simAvgLapTimeEdit)
+				
 			strategy := this.createStrategy()
-		
-			strategy.createPitstops(simInitialFuelAmountEdit, stintLaps, simMaxTyreLifeEdit, map, fuelConsumption, avgLapTime)
 			
-			scenarios["Telemetry - Map " . map] := strategy
-			
+			strategy.createPitstops(simInitialFuelAmountEdit, stintLaps, simMaxTyreLifeEdit, simMapEdit, simFuelConsumptionEdit, simAvgLapTimeEdit)
+				
+			scenarios[translate("Initial Conditions - Map ") . simMapEdit] := strategy
+				
 			Sleep 200
-			
+				
 			progress += 2
 		}
+		
+		if (simInputDropDown > 1)
+			for ignore, mapData in electronicsData {
+				map := mapData["Map"]
+				fuelConsumption := mapData["Fuel.Consumption"]
+				avgLapTime := mapData["Lap.Time"]
+			
+				message := (translate("Creating Telemetry Scenario with Map ") . map . translate("..."))
+				
+				showProgress({progress: progress, message: message})
+			
+				stintLaps := Floor((stintLengthEdit * 60) / avgLapTime)
+				
+				strategy := this.createStrategy()
+			
+				strategy.createPitstops(simInitialFuelAmountEdit, stintLaps, simMaxTyreLifeEdit, map, fuelConsumption, avgLapTime)
+				
+				scenarios[translate("Telemetry - Map ") . map] := strategy
+				
+				Sleep 200
+				
+				progress += 2
+			}
 		
 		progress := Floor(progress + 10)
 		
@@ -1503,10 +1529,19 @@ class StrategyWorkbench extends ConfigurationItem {
 				message := (translate("Optimzing stint length for Scenario ") . name . translate("..."))
 			
 				showProgress({progress: progress, message: message})
-			
-				pitstopTime := strategy.getPitstopTime()
 				
-				strategy.adjustLastPitstop(Floor(pitstopTime / strategy.AvgLapTime[true]))
+				avgLapTime := strategy.AvgLapTime[true]
+				targetTime := this.calcSessionTime(avgLapTime, false)
+				sessionTime := strategy.getSessionTime()
+				
+				superfluousLaps := -1
+				
+				while (sessionTime > targetTime) {
+					superfluousLaps += 1
+					sessionTime -= avgLapTime
+				}
+				
+				strategy.adjustLastPitstop(superfluousLaps)
 				
 				Sleep 200
 				
@@ -1976,8 +2011,11 @@ class Strategy {
 					
 					continue
 				}
-				else
+				else {
 					pitstop.iStintLaps -= superfluousLaps
+					pitstop.iRefuelAmount -= (superfluousLaps * pitstop.FuelConsumption)
+					pitstop.iRemainingFuel -= (superfluousLaps * pitstop.FuelConsumption)
+				}
 			}
 			
 			break
@@ -2145,13 +2183,15 @@ chooseDataType() {
 	if (dataType = "Electronics") {
 		GuiControl Choose, dataXDropDown, % inList(schema, "Map")
 		GuiControl Choose, dataY1DropDown, % inList(schema, "Fuel.Consumption")
+		
+		GuiControl Choose, dataY2DropDown, 1
 	}
 	else if (dataType = "Tyres") {
-		GuiControl Choose, dataXDropDown, % inList(schema, "Lap.Time")
-		GuiControl Choose, dataY1DropDown, % inList(schema, "Fuel.Remaining")
+		GuiControl Choose, dataXDropDown, % inList(schema, "Tyre.Laps")
+		GuiControl Choose, dataY1DropDown, % inList(schema, "Tyre.Pressure")
+		GuiControl Choose, dataY2DropDown, % inList(schema, "Tyre.Temperature")
 	}
 	
-	GuiControl Choose, dataY2DropDown, 1
 	GuiControl Choose, dataY3DropDown, 1
 	
 	workbench.loadChart(workbench.SelectedChartType)

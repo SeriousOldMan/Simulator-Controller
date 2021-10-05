@@ -61,11 +61,9 @@ class TelemetryDatabase extends SessionDatabase {
 	}
 	
 	getSchema(table, includeVirtualColumns := false) {
-		schema := kTelemetrySchemas[table]
+		schema := kTelemetrySchemas[table].Clone()
 		
 		if (includeVirtualColumns && (table = "Tyres")) {
-			schema := schema.Clone()
-			
 			schema.Push("Tyre.Pressure")
 			schema.Push("Tyre.Pressure.Front")
 			schema.Push("Tyre.Pressure.Rear")
@@ -74,6 +72,8 @@ class TelemetryDatabase extends SessionDatabase {
 			schema.Push("Tyre.Temperature.Front")
 			schema.Push("Tyre.Temperature.Rear")
 		}
+		
+		bubbleSort(schema)
 		
 		return schema
 	}

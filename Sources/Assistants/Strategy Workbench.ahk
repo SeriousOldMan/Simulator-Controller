@@ -92,8 +92,10 @@ global simCompoundEdit
 global simMaxTyreLifeEdit = 40
 global simInitialFuelAmountEdit = 90
 global simMapEdit = 1
-global simTCEdit = 1
-global simABSEdit = 2
+global simAvgLapTimeEdit = 120
+global simFuelConsumptionEdit = 3.8
+; global simTCEdit = 1
+; global simABSEdit = 2
 
 global simConsumptionWeight = 20
 global simTyreUsageWeight = 60
@@ -404,7 +406,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		Gui %window%:Add, GroupBox, -Theme x619 ys+39 w577 h9, % translate("Summary")
 		
-		Gui %window%:Add, ActiveX, x619 yp+21 w577 h169 Border vstrategyViewer, shell.explorer
+		Gui %window%:Add, ActiveX, x619 yp+21 w577 h193 Border vstrategyViewer, shell.explorer
 		
 		strategyViewer.Navigate("about:blank")
 		
@@ -412,11 +414,11 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		Gui %window%:Font, Norm, Arial
 		
-		Gui %window%:Add, Text, x8 y626 w1200 0x10
+		Gui %window%:Add, Text, x8 y650 w1200 0x10
 		
-		Gui %window%:Add, Button, x574 y632 w80 h23 GcloseWorkbench, % translate("Close")
+		Gui %window%:Add, Button, x574 y656 w80 h23 GcloseWorkbench, % translate("Close")
 
-		Gui %window%:Add, Tab, x16 ys+39 w593 h192 -Wrap Section, % values2String("|", map(["Rules && Settings", "Pitstop && Service", "Simulation", "Strategy"], "translate")*)
+		Gui %window%:Add, Tab, x16 ys+39 w593 h216 -Wrap Section, % values2String("|", map(["Rules && Settings", "Pitstop && Service", "Simulation", "Strategy"], "translate")*)
 		
 		Gui %window%:Tab, 1
 		
@@ -440,7 +442,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
 		
-		Gui %window%:Add, GroupBox, -Theme x24 ys+34 w209 h147, % translate("Race")
+		Gui %window%:Add, GroupBox, -Theme x24 ys+34 w209 h171, % translate("Race")
 		
 		Gui %window%:Font, Norm, Arial
 		
@@ -465,7 +467,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
 		
-		Gui %window%:Add, GroupBox, -Theme x243 ys+34 w354 h147, % translate("Pitstop")
+		Gui %window%:Add, GroupBox, -Theme x243 ys+34 w354 h171, % translate("Pitstop")
 		
 		Gui %window%:Font, Norm, Arial
 
@@ -491,7 +493,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		Gui %window%:Font, Italic, Arial
 
-		Gui %window%:Add, GroupBox, -Theme x24 ys+34 w350 h147, % translate("Pitstop")
+		Gui %window%:Add, GroupBox, -Theme x24 ys+34 w350 h171, % translate("Pitstop")
 				
 		Gui %window%:Font, Norm, Arial
 
@@ -531,7 +533,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		Gui %window%:Font, Italic, Arial
 
-		Gui %window%:Add, GroupBox, -Theme x24 ys+34 w179 h147, % translate("Initial Conditions")
+		Gui %window%:Add, GroupBox, -Theme x24 ys+34 w179 h171, % translate("Initial Conditions")
 		
 		Gui %window%:Font, Norm, Arial
 		
@@ -562,12 +564,23 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, Edit, x%x1% yp-1 w40 h20 VsimMapEdit, %simMapEdit%
 		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20, %simMapEdit%
 		
+		/*
 		Gui %window%:Add, Text, x%x% yp+25 w70 h20 +0x200, % translate("TC / ABS")
 		Gui %window%:Add, Edit, x%x1% yp-1 w40 h20 VsimTCEdit, %simTCEdit%
 		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20, %simTCEdit%
 		
 		Gui %window%:Add, Edit, x%x3% yp w40 h20 VsimABSEdit, %simABSEdit%
 		Gui %window%:Add, UpDown, x%x5% yp-2 w18 h20, %simABSEdit%
+		*/
+		
+		Gui %window%:Add, Text, x%x% yp+23 w85 h23 +0x200, % translate("Avg. Lap Time")
+		Gui %window%:Add, Edit, x%x1% yp w40 h20 Limit3 Number VsimAvgLapTimeEdit, %simAvgLapTimeEdit%
+		; Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 Range1-999 0x80, %strategyAvgLapTimeEdit%
+		Gui %window%:Add, Text, x%x3% yp+4 w30 h20, % translate("Sec.")
+
+		Gui %window%:Add, Text, x%x% yp+21 w85 h20 +0x200, % translate("Consumption")
+		Gui %window%:Add, Edit, x%x1% yp-2 w40 h20 VsimFuelConsumptionEdit, %simFuelConsumptionEdit%
+		Gui %window%:Add, Text, x%x3% yp+4 w30 h20, % translate("Ltr.")
 		
 		x := 222
 		x0 := x - 4
@@ -578,7 +591,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		Gui %window%:Font, Italic, Arial
 
-		Gui %window%:Add, GroupBox, -Theme x214 ys+34 w174 h147, % translate("Optimizer")
+		Gui %window%:Add, GroupBox, -Theme x214 ys+34 w174 h171, % translate("Optimizer")
 		
 		Gui %window%:Font, Norm, Arial
 
@@ -591,7 +604,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, Text, x%x% yp+24 w100 h20 +0x200, % translate("Car Weight")
 		Gui %window%:Add, Slider, x%x1% yp w60 0x10 Range0-100 ToolTip VsimCarWeightWeight, %simCarWeightWeight%
 		
-		Gui %window%:Add, Button, x%x% yp+48 w160 h20 grunSimulation, % translate("Simulate!")
+		Gui %window%:Add, Button, x%x% yp+72 w160 h20 grunSimulation, % translate("Simulate!")
 		
 		x := 407
 		x0 := x - 4
@@ -602,7 +615,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		Gui %window%:Font, Italic, Arial
 
-		Gui %window%:Add, GroupBox, -Theme x399 ys+34 w197 h147, % translate("Results")
+		Gui %window%:Add, GroupBox, -Theme x399 ys+34 w197 h171, % translate("Results")
 		
 		Gui %window%:Font, Norm, Arial
 
@@ -646,7 +659,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
 		
-		Gui %window%:Add, GroupBox, -Theme x24 ys+34 w179 h147, % translate("Electronics")
+		Gui %window%:Add, GroupBox, -Theme x24 ys+34 w179 h171, % translate("Electronics")
 		
 		Gui %window%:Font, Norm, Arial
 
@@ -680,7 +693,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		Gui %window%:Font, Italic, Arial
 
-		Gui %window%:Add, GroupBox, -Theme x214 ys+34 w174 h147, % translate("Tyres")
+		Gui %window%:Add, GroupBox, -Theme x214 ys+34 w174 h171, % translate("Tyres")
 		
 		Gui %window%:Font, Norm, Arial
 		
@@ -723,11 +736,11 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		Gui %window%:Font, Italic, Arial
 
-		Gui %window%:Add, GroupBox, -Theme x399 ys+34 w197 h147, % translate("Pitstops")
+		Gui %window%:Add, GroupBox, -Theme x399 ys+34 w197 h171, % translate("Pitstops")
 		
 		Gui %window%:Font, Norm, Arial
 		
-		Gui %window%:Add, ListView, x%x% yp+21 w180 h115 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDpitstopListView, % values2String("|", map(["Lap", "Refuel", "Tyre Change", "Map"], "translate")*)
+		Gui %window%:Add, ListView, x%x% yp+21 w180 h139 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDpitstopListView, % values2String("|", map(["Lap", "Refuel", "Tyre Change", "Map"], "translate")*)
 		
 		this.iPitstopListView := pitstopListView
 		
@@ -1293,7 +1306,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		GuiControlGet safetyFuelEdit
 		GuiControlGet fuelCapacityEdit
 		
-		return (Min(fuelCapacityEdit, targetFuel) - currentFuel)
+		return (Min(fuelCapacityEdit, targetFuel) - currentFuel + safetyFuelEdit)
 	}
 
 	calcPitstopDuration(refuelAmount, changeTyres) {
@@ -1433,15 +1446,34 @@ class StrategyWorkbench extends ConfigurationItem {
 		GuiControlGet simMaxTyreLifeEdit
 		GuiControlGet simInitialFuelAmountEdit
 		GuiControlGet stintLengthEdit
+		GuiControlGet simMapEdit
+		GuiControlGet simFuelConsumptionEdit
+		GuiControlGet simAvgLapTimeEdit
 		
 		scenarios := {}
 		
+		message := (translate("Creating Initial Scenario with Map ") . simMapEdit . translate("..."))
+			
+		showProgress({progress: progress, message: message})
+		
+		stintLaps := Floor((stintLengthEdit * 60) / simAvgLapTimeEdit)
+			
+		strategy := this.createStrategy()
+		
+		strategy.createPitstops(simInitialFuelAmountEdit, stintLaps, simMaxTyreLifeEdit, simMapEdit, simFuelConsumptionEdit, simAvgLapTimeEdit)
+			
+		scenarios["Initial Conditions - Map " . simMapEdit] := strategy
+			
+		Sleep 200
+			
+		progress += 2
+			
 		for ignore, mapData in electronicsData {
 			map := mapData["Map"]
 			fuelConsumption := mapData["Fuel.Consumption"]
 			avgLapTime := mapData["Lap.Time"]
 		
-			message := (translate("Creating Scenario with Map ") . map . translate("..."))
+			message := (translate("Creating Telemetry Scenario with Map ") . map . translate("..."))
 			
 			showProgress({progress: progress, message: message})
 		
@@ -1451,7 +1483,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 			strategy.createPitstops(simInitialFuelAmountEdit, stintLaps, simMaxTyreLifeEdit, map, fuelConsumption, avgLapTime)
 			
-			scenarios["Map " . map] := strategy
+			scenarios["Telemetry - Map " . map] := strategy
 			
 			Sleep 200
 			
@@ -1505,7 +1537,7 @@ class StrategyWorkbench extends ConfigurationItem {
 					sTime := strategy.getSessionTime()
 					cTime := candidate.getSessionTime()
 					
-					if (sLaps < cLaps)
+					if (sLaps > cLaps)
 						candidate := strategy
 					else if ((sLaps = cLaps) && (sTime < cTime))
 						candidate := strategy
@@ -1753,7 +1785,7 @@ class Strategy {
 			this.iFuelConsumption := fuelConsumption
 			this.iAvgLapTime := strategy.AvgLapTime[true]
 			
-			refuelAmount := strategy.calcRefuelAmount(remainingFuel, remainingLaps, lastStintLaps)
+			refuelAmount := strategy.calcRefuelAmount(stintLaps * fuelConsumption, remainingFuel, remainingLaps, lastStintLaps)
 			
 			this.iRemainingLaps := (remainingLaps - lastStintLaps)
 			this.iRemainingFuel := (remainingFuel - (lastStintLaps * fuelConsumption) + refuelAmount)
@@ -1883,9 +1915,8 @@ class Strategy {
 		return this.StrategyWorkbench.calcSessionTime(this.AvgLapTime)
 	}
 	
-	calcRefuelAmount(startFuel, remainingLaps, stintLaps) {
-		targetFuel := ((remainingLaps - stintLaps) * this.FuelConsumption)
-		remainingFuel := Max(0, startFuel - (stintLaps * this.FuelConsumption))
+	calcRefuelAmount(targetFuel, startFuel, remainingLaps, stintLaps) {
+		remainingFuel := Max(0, startFuel - (stintLaps * this.FuelConsumption[true]))
 		
 		return this.StrategyWorkbench.calcRefuelAmount(targetFuel, remainingFuel)
 	}

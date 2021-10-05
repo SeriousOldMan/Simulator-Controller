@@ -88,6 +88,7 @@
     - [Strategy Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#tab-strategy)
 	- [Models & Algorithms](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#how-it-works)
     - [Race Reports](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports)
+	- {Strategy Development](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-development)
   - [Technical Information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#technical-information)
     - [Data acquisition](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#data-acquisition)
   - [Troubleshooting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#troubleshooting)

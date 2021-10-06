@@ -1,8 +1,8 @@
 [Development]
 Version=3.6.0-dev
 Target=3.6.0-release
-Date=10/04/2021
-Download=
+Date=10/05/2021
+Download=https://www.dropbox.com/s/6u9v92c81fj0j4i/Simulator%20Controller%203.6.0-dev.zip?dl=0
 Changes=Initial version of strategy simulation in "Strategy Workbench"
 [Release]
 Version=3.5.9-release

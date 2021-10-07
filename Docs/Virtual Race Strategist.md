@@ -187,8 +187,7 @@ This is the central functionality for the strategy development. Using the fields
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Settings%203.JPG)
 
-Enter the required values in the *Initial Conditions* group, choose![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Settings%203.JPG)
- the data to use and click on the "Simulate!" button. A summary of the strategy will be shown in fields in the *Summary* group. Use the sliders in the *Optimizer* group to define weights for diffferent parts of the simulation algorithm, for example to prefer a low fuel consumption and thereby minimizing the number of pitstops over the best possible lap times.
+Enter the required values in the *Initial Conditions* group, choose the data to use and click on the "Simulate!" button. A summary of the strategy will be shown in fields in the *Summary* group. Use the sliders in the *Optimizer* group to define weights for diffferent parts of the simulation algorithm, for example to prefer a low fuel consumption and thereby minimizing the number of pitstops over the best possible lap times.
 
 You can use the commands in the *Simulation* drop down menu to start a simulation (similar to use the "Simulate!" button), and to copy the current results over to the *Strategy* tab. You can als define various target values for the scenario optimizer of the simulation.
 

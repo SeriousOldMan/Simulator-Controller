@@ -1,8 +1,8 @@
 [Development]
-Version=3.6.0-dev
+Version=3.6.0-rc1
 Target=3.6.0-release
 Date=10/05/2021
-Download=https://www.dropbox.com/s/6u9v92c81fj0j4i/Simulator%20Controller%203.6.0-dev.zip?dl=0
+Download=https://www.dropbox.com/s/7fwam9aehce219l/Simulator%20Controller%203.6.0-rc1.zip?dl=1
 Changes=Initial version of strategy simulation in "Strategy Workbench"
 [Release]
 Version=3.5.9-release
@@ -13,4 +13,4 @@ Changes=Fix for saving settings by Race Assistants
 Type=Development
 [Version]
 Release=3.5.9-release
-Development=3.6.0-dev
+Development=3.6.0-rc1

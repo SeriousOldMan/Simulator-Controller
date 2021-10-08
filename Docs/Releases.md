@@ -1,4 +1,4 @@
-## 3.6.0-release 10/08/21 (planned)
+## 3.6.0-release 10/08/21
 
   1. Bugfixes, as always
   2. Documentation updates, as always

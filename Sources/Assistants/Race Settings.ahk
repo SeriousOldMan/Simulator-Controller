@@ -738,11 +738,15 @@ restart:
 				title := translate("Save Race Settings...")
 				
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Save", "Cancel"]))
-				FileSelectFile file, S, %kRaceSettingsFile%, %title%, Settings (*.settings)
+				FileSelectFile file, S17, %kRaceSettingsFile%, %title%, Settings (*.settings)
 				OnMessage(0x44, "")
 			
-				if (file != "")
+				if (file != "") {
+					if !InStr(file, ".")
+						file := (file . ".settings")
+					
 					writeConfiguration(file, newSettings)
+				}
 			}
 			else if (result == kOk) {
 				settingsOrCommand := newSettings

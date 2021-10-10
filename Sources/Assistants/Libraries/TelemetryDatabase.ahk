@@ -131,6 +131,18 @@ class TelemetryDatabase extends SessionDatabase {
 		else
 			return []
 	}
+	
+	getLapTimePressures(weather, compound, compoundColor) {
+		if this.Database {
+			return this.Database.query("Tyres", {Group: [["Tyre.Pressure.Front.Left", "average", "Tyre.Pressure.Front.Left"]
+													   , ["Tyre.Pressure.Front.Right", "average", "Tyre.Pressure.Front.Right"]
+													   , ["Tyre.Pressure.Rear.Left", "average", "Tyre.Pressure.Rear.Left"]
+													   , ["Tyre.Pressure.Rear.Right", "average", "Tyre.Pressure.Rear.Right"]], By: "Lap.Time"
+											   , Where: {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
+		}
+		else
+			return []
+	}
 		
 	addElectronicEntry(weather, airTemperature, trackTemperature, compound, compoundColor, map, tc, abs, fuelRemaining, fuelConsumption, lapTime) {
 		this.Database.add("Electronics", {Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature

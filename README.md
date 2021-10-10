@@ -26,20 +26,20 @@ Simply donwload and run [Simulator Controller.exe](https://cntr.click/Qt9gVs0) (
 
 #### Latest development build
 
-[3.6.0-dev](https://www.dropbox.com/s/6u9v92c81fj0j4i/Simulator%20Controller%203.6.0-dev.zip?dl=0) (Development version for Release 3.6.0. New features: Initial version of strategy simulation in "Strategy Workbench". Stable and with update procedure.)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-360) of this version and all the versions you might have skipped, before installing and using this version.
+None for the moment...
 
 #### Latest release build
 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[3.5.9-release](https://cntr.click/Hq9ytpX) (New features: Renamed "Setup Database" to "Database", New "Strategy Workbench" tool, "Race Strategist" can now save race statistics for the "Strategy Workbench", New plugin parameter "openStrategyWorkbench" for "Race Strategist" plugin, New "openStrategyWorkbench" action function, Fixed "Setup Wizard" to correctly generate "Pedal Calibration" configuration, New lightweight Database Library for Developers. *Release 3.5.9 is a maintenance release for 3.5.8*)
+[3.6.0-release](https://cntr.click/b6VRZLm) (New features: Initial version of strategy simulation in "Strategy Workbench".)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-358) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-360) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
+
+[3.5.9-release](https://cntr.click/Hq9ytpX) (New features: Renamed "Setup Database" to "Database", New "Strategy Workbench" tool, "Race Strategist" can now save race statistics for the "Strategy Workbench", New plugin parameter "openStrategyWorkbench" for "Race Strategist" plugin, New "openStrategyWorkbench" action function, Fixed "Setup Wizard" to correctly generate "Pedal Calibration" configuration, New lightweight Database Library for Developers. *Release 3.5.9 is a maintenance release for 3.5.8*)
 
 [3.5.6-release](https://cntr.click/bQ43tSc) (New features: New Reports in Race Reports tool, Improved "Pace" report including median and quartile calculation, New "Call" command for Race Assistants, Better handling of multiple voice dialog partners when not using Push-to-Talk, Usability improvements, incl. improved report selection for the "Race Reports" tool, Optimized language handling for Windows SAPI voices)
 
@@ -77,9 +77,13 @@ If you want to become a part of the small and very young Community for Simulator
 
 And, last but not least, an AI based Race Engineer with fully dialog capable voice control will guide you through your race, warn you about critical issues and will help you with the pitstop, whereas the Race Strategist keeps an eye on the race positions, develops a pitstop strategy, and so on. These smart chat bots are independent applications, but are integreated with the ACC and other simulation game plugins using interprocess communication right now. An integration for a new simulation games requires some effort, especially for the necessary data acquisition from the simulation game, but a knowledged programmer can manage it in about three to four hours.
 
-Based on the data sets, that are acquired during your sessions by the Virtual Race Assistants, a very flexibla tool allows you to analyze your performance and the performance of your opponents in many different ways.
+Based on the data sets, that are acquired during your sessions by the Virtual Race Assistants, a very flexible tool allows you to [analyze your performance](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports) and the performance of your opponents in many different ways.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Reports%202.JPG)
+
+Another capability of the Virtual Race Strategist is to support you during the [development of a strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-development) for an upcoming race using the telemetry data of past sessions on the same track in similar conditions.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Workbench.JPG)
 
 ### Additional features
 

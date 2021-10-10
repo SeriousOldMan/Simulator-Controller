@@ -165,7 +165,43 @@ Another valuable tool, which is supported by Cato is the "Strategy Workbench". W
 
 The "Strategy Workbench" is divided into two main areas. The upper area allows you to analyze the available telemetry information for a given car / track / conditions combination using several available graphical charts. Telemetry information are divided into an *Electronics* and *Tyres* group. In each group you can select up to four different series of values ​​that are to be plotted against each other in the chart.
 
-The lower area allows you to create a race strategy. You have to enter the race rules and various settings before you can use the simulation tool to create the required pitstops based partly on your entered settings and also on the telemetry information. To be continued...
+The lower area allows you to create a race strategy. You have to enter the race rules and various settings before you can use the simulation tool to create the required pitstops based partly on your entered settings and also on the telemetry information. In the lower left part of the window, you find a tabbed pane with several input sections.
+
+#### Rules & Settings
+
+In the first tab you enter the rules and settings for the upcoming event. Using the *Settings* drop down menu directly above the tabbed area, you can load settings values from different sources, from the *Setup Database* or the from the currently active simulation. You can also create a set of track and car independent default settings, if applicable.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Settings%201.JPG)
+ 
+Note: The loading of settings values is not yet implemented - please enter the values manually for the moment. Furthermore, the pitstop rules are currently ignored in the strategy simulation. This will be completed with next releases.
+
+#### Pitstop & Service
+
+In this tab you have to enter the time required for several pitstop activities, as well as the pitstop window, in which the best pitstop lap will be derived. With the value of Pitstop Delta, you supply the difference time needed for a normal pitstop (time for pit in and pit out but without any service time minus the time to pass the pit area on the track, i.e. Drive through vs. Drive by), The fields below specify the time required for the various pit services, like changing tyres, refueling, and so on. As you can see, this is very similar to the settings in the [*Strategy* tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#tab-strategy) in the Race Settings described above. In fact, the values you enter here will be used later on, if you export the strategy to be used for the upcoming race.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Settings%202.JPG)
+
+#### Simulation
+
+This is the central functionality for the strategy development. Using the fields in this tab, you can defined the conditions and settings for your first stint and run a strategy simulation. You can choose, whether to use only the values you entered here for engine map, ABS & TC settingd, average fuel consumption, tyre pressures, and so on, or you can include the full knowledge from the telemetry data from previous sessions on the same track in similar conditions.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Settings%203.JPG)
+
+Enter the required values in the *Initial Conditions* group, choose the data to use and click on the "Simulate!" button. A summary of the strategy will be shown in fields in the *Summary* group. Use the sliders in the *Optimizer* group to define weights for diffferent parts of the simulation algorithm, for example to prefer a low fuel consumption and thereby minimizing the number of pitstops over the best possible lap times.
+
+You can use the commands in the *Simulation* drop down menu to start a simulation (similar to use the "Simulate!" button), and to copy the current results over to the *Strategy* tab. You can als define various target values for the scenario optimizer of the simulation.
+
+Note: The values in the *Optimizer* group are ignore currently and only the "Run Simulation..." and "Use as Strategy..." are currently active in the *Simulation* drop down menu.
+
+#### Strategy
+
+The values in this tab and also the document display on the right side of the tabbed pane describe the currently selected strategy. Normally this will be based on the last chosen simulation result, but you may adjust some of the settings and values using the fields in this tab. The *Strategy* allows you to save the current strategy, you can load a strategy from the database and you can compare different strategies. Finally, you can export the current stragey to Cato to be used for the next race.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Settings%204.JPG)
+
+Good to know: The document shown on the right side can be printed using the right mouse button context menu.
+
+Note: All commands in the *Strategy* drop down menu are currently non-functional, will be completed with the next release.
 
 ## Technical information
 

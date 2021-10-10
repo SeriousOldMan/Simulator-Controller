@@ -401,7 +401,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
 
-		Gui %window%:Add, GroupBox, -Theme x619 ys+39 w577 h9, % translate("Summary")
+		Gui %window%:Add, GroupBox, -Theme x619 ys+39 w577 h9, % translate("Strategy")
 		
 		Gui %window%:Add, ActiveX, x619 yp+21 w577 h193 Border vstrategyViewer, shell.explorer
 		
@@ -608,7 +608,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		Gui %window%:Font, Italic, Arial
 
-		Gui %window%:Add, GroupBox, -Theme x399 ys+34 w197 h171, % translate("Results")
+		Gui %window%:Add, GroupBox, -Theme x399 ys+34 w197 h171, % translate("Summary")
 		
 		Gui %window%:Font, Norm, Arial
 
@@ -1270,7 +1270,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		}
 	}
 	
-	calcSessionLaps(avgLapTime) {
+	calcSessionLaps(avgLapTime, formationLap := true, postRaceLap := true) {
 		window := this.Window
 		
 		Gui %window%:Default
@@ -1280,12 +1280,12 @@ class StrategyWorkbench extends ConfigurationItem {
 		GuiControlGet postRaceLapCheck
 		
 		if (this.SelectedSessionType = "Duration")
-			return Ceil(((raceLengthEdit * 60) / avgLapTime) + (formationLapCheck ? 1 : 0) + (postRaceLapCheck ? 1 : 0))
+			return Ceil(((raceLengthEdit * 60) / avgLapTime) + ((formationLap && formationLapCheck) ? 1 : 0) + ((postRaceLap && postRaceLapCheck) ? 1 : 0))
 		else
-			return (raceLengthEdit + (formationLapCheck ? 1 : 0) + (postRaceLapCheck ? 1 : 0))
+			return (raceLengthEdit + ((formationLap && formationLapCheck) ? 1 : 0) + ((postRaceLap && postRaceLapCheck) ? 1 : 0))
 	}
 	
-	calcSessionTime(avgLapTime, postRaceLap := true) {
+	calcSessionTime(avgLapTime, formationLap := true, postRaceLap := true) {
 		window := this.Window
 		
 		Gui %window%:Default
@@ -1295,9 +1295,9 @@ class StrategyWorkbench extends ConfigurationItem {
 		GuiControlGet postRaceLapCheck
 		
 		if (this.SelectedSessionType = "Duration")
-			return ((raceLengthEdit * 60) + ((formationLapCheck ? 1 : 0) * avgLapTime) + (((postRaceLap && postRaceLapCheck) ? 1 : 0) * avgLapTime))
+			return ((raceLengthEdit * 60) + (((formationLap && formationLapCheck) ? 1 : 0) * avgLapTime) + (((postRaceLap && postRaceLapCheck) ? 1 : 0) * avgLapTime))
 		else
-			return ((raceLengthEdit + (formationLapCheck ? 1 : 0) + ((postRaceLap && postRaceLapCheck) ? 1 : 0)) * avgLapTime)
+			return ((raceLengthEdit + ((formationLap && formationLapCheck) ? 1 : 0) + ((postRaceLap && postRaceLapCheck) ? 1 : 0)) * avgLapTime)
 	}
 	
 	calcRefuelAmount(targetFuel, currentFuel) {
@@ -1511,21 +1511,24 @@ class StrategyWorkbench extends ConfigurationItem {
 		scenarios := {}
 		
 		if ((simInputDropDown = 1) || (simInputDropDown = 3)) {
-			message := (translate("Creating Initial Scenario with Map ") . simMapEdit . translate("..."))
+			if simMapEdit is number
+			{			
+				message := (translate("Creating Initial Scenario with Map ") . simMapEdit . translate("..."))
+					
+				showProgress({progress: progress, message: message})
 				
-			showProgress({progress: progress, message: message})
-			
-			stintLaps := Floor((stintLengthEdit * 60) / simAvgLapTimeEdit)
+				stintLaps := Floor((stintLengthEdit * 60) / simAvgLapTimeEdit)
+					
+				strategy := this.createStrategy()
 				
-			strategy := this.createStrategy()
-			
-			strategy.createStints(simInitialFuelAmountEdit, stintLaps, simMaxTyreLapsEdit, simMapEdit, simFuelConsumptionEdit, simAvgLapTimeEdit)
-				
-			scenarios[translate("Initial Conditions - Map ") . simMapEdit] := strategy
-				
-			Sleep 200
-				
-			progress += 2
+				strategy.createStints(this.SelectedSessionType, simInitialFuelAmountEdit, stintLaps, simMaxTyreLapsEdit, simMapEdit, simFuelConsumptionEdit, simAvgLapTimeEdit)
+					
+				scenarios[translate("Initial Conditions - Map ") . simMapEdit] := strategy
+					
+				Sleep 200
+					
+				progress += 2
+			}
 		}
 		
 		if (simInputDropDown > 1)
@@ -1533,22 +1536,25 @@ class StrategyWorkbench extends ConfigurationItem {
 				map := mapData["Map"]
 				fuelConsumption := mapData["Fuel.Consumption"]
 				avgLapTime := mapData["Lap.Time"]
-			
-				message := (translate("Creating Telemetry Scenario with Map ") . map . translate("..."))
+
+				if map is number
+				{
+					message := (translate("Creating Telemetry Scenario with Map ") . map . translate("..."))
+					
+					showProgress({progress: progress, message: message})
 				
-				showProgress({progress: progress, message: message})
-			
-				stintLaps := Floor((stintLengthEdit * 60) / avgLapTime)
+					stintLaps := Floor((stintLengthEdit * 60) / avgLapTime)
+					
+					strategy := this.createStrategy()
 				
-				strategy := this.createStrategy()
-			
-				strategy.createStints(simInitialFuelAmountEdit, stintLaps, simMaxTyreLapsEdit, map, fuelConsumption, avgLapTime)
-				
-				scenarios[translate("Telemetry - Map ") . map] := strategy
-				
-				Sleep 200
-				
-				progress += 2
+					strategy.createStints(this.SelectedSessionType, simInitialFuelAmountEdit, stintLaps, simMaxTyreLapsEdit, map, fuelConsumption, avgLapTime)
+					
+					scenarios[translate("Telemetry - Map ") . map] := strategy
+					
+					Sleep 200
+					
+					progress += 2
+				}
 			}
 		
 		progress := Floor(progress + 10)
@@ -1566,6 +1572,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				showProgress({progress: progress, message: message})
 				
 				avgLapTime := strategy.AvgLapTime[true]
+
 				targetTime := this.calcSessionTime(avgLapTime, false)
 				sessionTime := strategy.getSessionDuration()
 				
@@ -1578,7 +1585,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				
 				strategy.adjustLastPitstop(superfluousLaps)
 				
-				Sleep 200
+				Sleep 1000
 				
 				progress += 2
 			}
@@ -1704,14 +1711,16 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		scenario := this.evaluateScenarios(progress, scenarios)
 		
-		message := translate("Choose Strategy...")
-		
-		showProgress({progress: progress, message: message})
-		
-		Sleep 200
-		
-		this.chooseScenario(progress, scenario)
+		if scenario {
+			message := translate("Choose Strategy...")
 			
+			showProgress({progress: progress, message: message})
+			
+			Sleep 200
+			
+			this.chooseScenario(progress, scenario)
+		}
+		
 		message := translate("Finished...")
 		
 		showProgress({progress: 100, message: message})
@@ -1771,6 +1780,7 @@ class Strategy extends ConfigurationItem {
 		iFuelConsumption := 0
 		iAvgLapTime := 0
 		
+		iRemainingTime := 0
 		iRemainingLaps := 0
 		iRemainingTyreLaps := 0
 		iRemainingFuel := 0
@@ -1896,11 +1906,17 @@ class Strategy extends ConfigurationItem {
 				this.iDuration := strategy.calcPitstopDuration(refuelAmount, this.TyreChange)
 				
 				lastPitstop := strategy.LastPitstop
+								
+				if lastPitstop {
+					delta := (lastPitstop.Duration + (lastPitstop.StintLaps * lastPitstop.AvgLapTime))
 				
-				if lastPitstop
-					this.iTime := (lastPitstop.Time + lastPitstop.Duration + (lastPitstop.StintLaps * lastPitstop.AvgLapTime))
-				else
+					this.iTime := (lastPitstop.Time + delta)
+					this.iRemainingTime := (lastPitstop.RemainingTime - delta)
+				}
+				else {
 					this.iTime := (lastStintLaps * strategy.AvgLapTime[true])
+					this.iRemainingTime := (strategy.RemainingTime - this.iTime)
+				}
 			}
 		}
 		
@@ -1921,6 +1937,7 @@ class Strategy extends ConfigurationItem {
 			this.iFuelConsumption := getConfigurationValue(configuration, "Pitstop", "FuelConsumption." . lap, 0)
 
 			this.iRemainingLaps := getConfigurationValue(configuration, "Pitstop", "RemainingLaps." . lap, 0)
+			this.iRemainingTime := getConfigurationValue(configuration, "Pitstop", "RemainingTime." . lap, 0)
 			this.iRemainingTyreLaps := getConfigurationValue(configuration, "Pitstop", "RemainingTyreLaps." . lap, 0)
 			this.iRemainingFuel := getConfigurationValue(configuration, "Pitstop", "RemainingFuel." . lap, 0.0)
 		}
@@ -1942,6 +1959,7 @@ class Strategy extends ConfigurationItem {
 			setConfigurationValue(configuration, "Pitstop", "FuelConsumption." . lap, this.FuelConsumption)
 			
 			setConfigurationValue(configuration, "Pitstop", "RemainingLaps." . lap, this.RemainingLaps)
+			setConfigurationValue(configuration, "Pitstop", "RemainingTime." . lap, this.RemainingTime)
 			setConfigurationValue(configuration, "Pitstop", "RemainingTyreLaps." . lap, this.RemainingTyreLaps)
 			setConfigurationValue(configuration, "Pitstop", "RemainingFuel." . lap, this.RemainingFuel)
 		}
@@ -2304,10 +2322,10 @@ class Strategy extends ConfigurationItem {
 	}
 	
 	calcNextPitstopLap(currentLap, remainingLaps, remainingTyreLaps, remainingFuel) {
-		return (currentLap + Floor(Min(this.StintLaps, remainingFuel / this.FuelConsumption[true])))
+		return (currentLap + Floor(Min(this.StintLaps, remainingTyreLaps, remainingFuel / this.FuelConsumption[true])))
 	}
 	
-	createStints(startFuel, stintLaps, tyreLaps, map, fuelConsumption, avgLapTime) {
+	createStints(sessionType, startFuel, stintLaps, tyreLaps, map, fuelConsumption, avgLapTime) {
 		this.iFuelAmount := startFuel
 		this.iStintLaps := stintLaps
 		this.iTyreLaps := tyreLaps
@@ -2326,12 +2344,27 @@ class Strategy extends ConfigurationItem {
 		Loop {
 			remainingFuel := this.RemainingFuel[true]
 		
-			if ((currentLap + (remainingFuel / this.FuelConsumption[true])) >= sessionLaps)
-				break
+			if (sessionType = "Duration") {
+				if (this.RemainingTime[true] <= 0)
+					break
+			}
+			else {
+				if (currentLap >= this.RemainingLaps)
+					break
+			}
 			
 			pitstopLap := this.calcNextPitstopLap(currentLap, this.RemainingLaps[true], this.RemainingTyreLaps[true], remainingFuel)
 			
 			pitstop := new this.Pitstop(this, pitstopLap)
+			
+			if (sessionType = "Duration") {
+				if (pitStop.RemainingTime <= 0)
+					break
+			}
+			else {
+				if (pitstop.Lap >= this.RemainingLaps)
+					break
+			}
 			
 			currentLap := pitstopLap
 			pitstopNr += 1

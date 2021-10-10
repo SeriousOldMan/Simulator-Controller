@@ -724,7 +724,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		Gui %window%:Font, Norm, Arial
 		
-		Gui %window%:Add, ListView, x%x% yp+21 w180 h139 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDpitstopListView, % values2String("|", map(["Lap", "Refuel", "Tyre Change", "Map"], "translate")*)
+		Gui %window%:Add, ListView, x%x% yp+21 w180 h139 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDpitstopListView, % values2String("|", map(["Lap", "Refuel", "Tyres", "Map"], "translate")*)
 		
 		this.iPitstopListView := pitstopListView
 		
@@ -1445,11 +1445,16 @@ class StrategyWorkbench extends ConfigurationItem {
 		avgFuelConsumption := []
 		
 		for ignore, pitstop in strategy.Pitstops {
-			LV_Add("", pitstop.Lap, Ceil(pitstop.RefuelAmount), pitstop.TyreChange ? translate("Yes") : translate("No"), pitstop.Map)
+			LV_Add("", pitstop.Lap, Ceil(pitstop.RefuelAmount), pitstop.TyreChange ? translate("Change") : "", pitstop.Map)
 		
 			avgLapTimes.Push(pitstop.AvgLapTime)
 			avgFuelConsumption.Push(pitstop.FuelConsumption)
 		}
+		
+		LV_ModifyCol(1, "AutoHdr")
+		LV_ModifyCol(2, "AutoHdr")
+		LV_ModifyCol(3, "AutoHdr")
+		LV_ModifyCol(4, "AutoHdr")
 		
 		GuiControl Text, strategyStartMapEdit, % strategy.Map
 		GuiControl Text, strategyStartTCEdit, % strategy.TC

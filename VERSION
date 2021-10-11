@@ -3,7 +3,7 @@ Version=3.6.2-dev
 Target=3.6.2-release
 Date=10/11/2021
 Download=
-Changes=Saving and loading of Strategies in "Strategy Workbench", Loading of initial values in "Strategy Workbench"
+Changes=Saving and loading of Strategies in "Strategy Workbench", Initializing values in "Strategy Workbench", Comparison of strategies in "Strategy Workbench"
 [Release]
 Version=3.6.0-release
 Date=10/08/2021

@@ -172,8 +172,49 @@ The lower area allows you to create a race strategy. You have to enter the race 
 In the first tab you enter the rules and settings for the upcoming event. Using the *Settings* drop down menu directly above the tabbed area, you can load settings values from different sources, from the *Setup Database* or the from the currently active simulation. You can also create a set of track and car independent default settings, if applicable.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Settings%201.JPG)
+
+Loading of settings is supported for:
+
+  1. *Race.settings* file
+  
+     The file chooser dialog is opened in the directory of the settings for the current simulator / car / track combination, but you may navigate to a totally different location if desired. The following fields are loaded from the settings file:
+	 
+	 - Rules & Settings
+	   - Race Duration
+	   - Formation Lap
+	   - Post Race Lap
+	   - Pitstop Delta
+	 - Pitstop & Service
+	   - Tyre Service Time
+	   - Refuel Service Time
+	 - Simulation
+	   - Tyre Compound
+	   - Tyre Compound Color
+	   - Average Lap Time
+	   - Average Fuel Consumption
+
+  2. Telemetry Data
+  
+     The best lap time and the best hot tyre pressures are extracted for for the current simulator / car / track combination and the following fields are initialized from this data:
+	 
+	 - Simulation
+	   - Map
+	   - Average Lap Time
+	   - Average Fuel Consumption
+
+  3. Simulation
+  
+     If a simulator session exists and is identical to the currently selected simulator / car / track combination, the following fields are initialized from data acquired from the simulator:
+	 
+	 - Rules & Settings
+	   - Fuel Capacity
+	 - Simulation
+	   - Initial Fuel Amount
+	   - Map
+	   - Tyre Compound
+	   - Tyre Compound Color
  
-Note: The loading of settings values is not yet implemented - please enter the values manually for the moment. Furthermore, the pitstop rules are currently ignored in the strategy simulation. This will be completed with next releases.
+Note: The handling of default values is not yet implemented - this will be completed with next releases.
 
 #### Pitstop & Service
 
@@ -201,7 +242,7 @@ The values in this tab and also the document display on the right side of the ta
 
 Good to know: The document shown on the right side can be printed using the right mouse button context menu.
 
-Note: All commands in the *Strategy* drop down menu are currently non-functional, will be completed with the next release.
+Note: Exporting strategies to Cato is not supported yet, will be completed with the next release.
 
 ## Technical information
 

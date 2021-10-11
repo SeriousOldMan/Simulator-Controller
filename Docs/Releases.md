@@ -1,3 +1,12 @@
+## 3.6.2-release 10/15/21 (planned)
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Number of data fields for a simulated strategy has been vastly expanded.
+  4. "Strategy Workbench" now supports loading and saving of strategies.
+  5. Initializing a various fields in the "Strategy Workbench" from *Race.settings* files, from a running simulation or from data acquired from the telemetry information is now supported.
+  6. Comparison of strategies is now supported in the "Strategy Workbench".
+
 ## 3.6.0-release 10/08/21
 
   1. Bugfixes, as always

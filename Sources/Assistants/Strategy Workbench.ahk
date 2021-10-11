@@ -60,6 +60,8 @@ global dataXDropDown
 global dataY1DropDown
 global dataY2DropDown
 global dataY3DropDown
+
+global chartSourceDropDown
 global chartTypeDropDown
 
 global chartViewer
@@ -132,6 +134,9 @@ class StrategyWorkbench extends ConfigurationItem {
 	iSelectedChartType := "Scatter"
 	
 	iSelectedSessionType := "Duration"
+	
+	iTelemetryChartHTML := "<html><body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
+	iStrategyChartHTML := this.iTelemetryChartHTML
 	
 	iSelectedScenario := false
 	iSelectedStrategy := false
@@ -368,7 +373,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, DropDownList, x250 yp+24 w130 AltSubmit Choose1 vdataY3DropDown gchooseAxis, % translate("None") . "|" . values2String("|", map(schema, "translate")*)
 		
 		Gui %window%:Add, Text, x400 ys w40 h23 +0x200, % translate("Chart")
-		Gui %window%:Add, DropDownList, x444 yp w80 AltSubmit Choose1 +0x200, % values2String("|", map(["Telemetry", "Strategy"], "translate")*)
+		Gui %window%:Add, DropDownList, x444 yp w80 AltSubmit Choose1 +0x200 vchartSourceDropDown gchooseChartSource, % values2String("|", map(["Telemetry", "Strategy"], "translate")*)
 		Gui %window%:Add, DropDownList, x529 yp w80 AltSubmit Choose1 vchartTypeDropDown gchooseChartType, % values2String("|", map(["Scatter", "Bar", "Bubble", "Line"], "translate")*)
 		
 		Gui %window%:Add, ActiveX, x400 yp+24 w800 h278 Border vchartViewer, shell.explorer
@@ -388,7 +393,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		Gui %window%:Add, DropDownList, x405 yp w180 AltSubmit Choose1 +0x200 VsimulationMenuDropDown gsimulationMenu, % values2String("|", map(["Simulation", "---------------------------------------------", "Set Target Fuel Consumption...", "Set Target Tyre Usage...", "---------------------------------------------", "Run Simulation", "---------------------------------------------", "Use as Strategy..."], "translate")*)
 		
-		Gui %window%:Add, DropDownList, x590 yp w180 AltSubmit Choose1 +0x200 VstrategyMenuDropDown gstrategyMenu, % values2String("|", map(["Strategy", "---------------------------------------------", "Load Strategy...", "Save Strategy...", "Compare Strategies...", "---------------------------------------------", "Export Strategy..."], "translate")*)
+		Gui %window%:Add, DropDownList, x590 yp w180 AltSubmit Choose1 +0x200 VstrategyMenuDropDown gstrategyMenu, % values2String("|", map(["Strategy", "---------------------------------------------", "Load Strategy...", "Save Strategy...", "---------------------------------------------", "Compare Strategies...", "---------------------------------------------", "Export Strategy..."], "translate")*)
 		
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
@@ -773,13 +778,22 @@ class StrategyWorkbench extends ConfigurationItem {
 			</html>
 			)
 
-			chartViewer.Document.write(before . drawChartFunction . after)
+			html := (before . drawChartFunction . after)
+			
+			chartViewer.Document.write(html)
 		}
 		else {
 			html := "<html><body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
 		
 			chartViewer.Document.write(html)
 		}
+		
+		GuiControlGet chartSourceDropDown
+		
+		if (chartSourceDropDown = 1)
+			this.iTelemetryChartHTML := html
+		else
+			this.iStrategyChartHTML := html
 		
 		chartViewer.Document.close()
 	}
@@ -1503,8 +1517,22 @@ class StrategyWorkbench extends ConfigurationItem {
 							writeConfiguration(file, configuration)
 						}
 					}
-				case 5: ; "Compare Strategies..."
-				case 7: ; "Export Strategy..."
+				case 6: ; "Compare Strategies..."
+					if this.SelectedStrategy {
+						title := translate("Choose Race Strategy for comparison...")
+					
+						OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
+						FileSelectFile file, 1, %dirName%, %title%, Strategy (*.strategy)
+						OnMessage(0x44, "")
+					
+						if (file != "") {
+							configuration := readConfiguration(file)
+						
+							if (configuration.Count() > 0)
+								this.compareStrategies(this.SelectedStrategy, this.createStrategy(configuration))
+						}
+					}
+				case 8: ; "Export Strategy..."
 			}
 		}
 	}
@@ -1547,6 +1575,10 @@ class StrategyWorkbench extends ConfigurationItem {
 		this.showStrategyInfo(strategy)
 		
 		this.iSelectedStrategy := strategy
+	}
+	
+	compareStrategies(strategy1, strategy2) {
+		MsgBox Here
 	}
 	
 	createStrategy(configuration := false) {
@@ -2689,6 +2721,24 @@ chooseData() {
 
 chooseAxis() {
 	StrategyWorkbench.Instance.loadChart(StrategyWorkbench.Instance.SelectedChartType)
+}
+
+chooseChartSource() {
+	workbench := StrategyWorkbench.Instance
+	window := workbench.Window
+	
+	Gui %window%:Default
+	
+	GuiControlGet chartSourceDropDown
+	
+	if (chartSourceDropDown = 1)
+		GuiControl Show, chartTypeDropDown
+	else
+		GuiControl Hide, chartTypeDropDown
+	
+	chartViewer.Document.open()
+	chartViewer.Document.write((chartSourceDropDown = 1) ? workbench.iTelemetryChartHTML : workbench.iStrategyChartHTML)
+	chartViewer.Document.close()
 }
 
 chooseChartType() {

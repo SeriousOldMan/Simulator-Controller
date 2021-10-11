@@ -1403,11 +1403,11 @@ class StrategyWorkbench extends ConfigurationItem {
 					
 					data := readSimulatorData(prefix)
 					
-					if ((getConfigurationValue(data, "Session Data", "Car") != this.SelectedCar)
+					if false && ((getConfigurationValue(data, "Session Data", "Car") != this.SelectedCar)
 					 || (getConfigurationValue(data, "Session Data", "Track") != this.SelectedTrack))
 						return
 					else {
-						fuelCapacityEdit := getConfigurationValue(data, "Session Data", "FuelAmount", kUndefined)
+						fuelCapacity := getConfigurationValue(data, "Session Data", "FuelAmount", kUndefined)
 						initialFuelAmount := getConfigurationValue(data, "Car Data", "FuelRemaining", kUndefined)
 						
 						if (fuelCapacity != kUndefined)

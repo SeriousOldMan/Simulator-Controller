@@ -66,8 +66,8 @@ global chartViewer
 global strategyViewer
 		
 global sessionTypeDropDown
-global raceLengthEdit = 60
-global raceLengthLabel
+global sessionLengthEdit = 60
+global sessionLengthLabel
 global stintLengthEdit = 70
 global formationLapCheck = true
 global postRaceLapCheck = true
@@ -82,13 +82,13 @@ global pitstopWindowLabel
 global tyreChangeRequirementsDropDown
 global refuelRequirementsDropDown
 
-global pitstopDeltaEdit = 30
+global pitstopDeltaEdit = 60
 global pitstopTyreServiceEdit = 30
 global pitstopRefuelServiceEdit = 1.2
 global fuelCapacityEdit = 125
 global safetyFuelEdit = 5
 
-global simCompoundEdit
+global simCompoundDropDown
 global simMaxTyreLapsEdit = 40
 global simInitialFuelAmountEdit = 90
 global simMapEdit = 1
@@ -179,16 +179,8 @@ class StrategyWorkbench extends ConfigurationItem {
 	
 	SelectedCompound[colored := false] {
 		Get {
-			if colored {
-				if (this.iSelectedCompound = "Dry") {
-					if (this.iSelectedCompoundColor = "Black")
-						return "Dry"
-					else
-						return ("Dry (" . this.iSelectedCompoundColor . ")")
-				}
-				else
-					return "Wet"
-			}
+			if colored
+				return qualifiedCompound(this.iSelectedCompound, this.iSelectedCompoundColor)
 			else
 				return this.iSelectedCompound
 		}
@@ -444,9 +436,9 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 		
 		Gui %window%:Add, DropDownList, x%x0% yp+21 w70 AltSubmit Choose1 gchooseSessionType VsessionTypeDropDown, % values2String("|", map(["Duration", "Laps"], "translate")*)
-		Gui %window%:Add, Edit, x%x1% yp w50 h20 Limit4 Number VraceLengthEdit, %raceLengthEdit%
-		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 Range1-9999 0x80, %raceLengthEdit%
-		Gui %window%:Add, Text, x%x3% yp+4 w60 h20 VraceLengthLabel, % translate("Minutes")
+		Gui %window%:Add, Edit, x%x1% yp w50 h20 Limit4 Number VsessionLengthEdit, %sessionLengthEdit%
+		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 Range1-9999 0x80, %sessionLengthEdit%
+		Gui %window%:Add, Text, x%x3% yp+4 w60 h20 VsessionLengthLabel, % translate("Minutes")
 		
 		Gui %window%:Add, Text, x%x% yp+21 w85 h23 +0x200, % translate("Max. Stint")
 		Gui %window%:Add, Edit, x%x1% yp w50 h20 Limit4 Number VstintLengthEdit, %stintLengthEdit%
@@ -544,7 +536,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			chosen := 1
 		}
 
-		Gui %window%:Add, DropDownList, x%x1% yp w84 AltSubmit Choose%chosen% VsimCompoundEdit, % values2String("|", choices*)
+		Gui %window%:Add, DropDownList, x%x1% yp w84 AltSubmit Choose%chosen% VsimCompoundDropDown, % values2String("|", choices*)
 		
 		Gui %window%:Add, Text, x%x% yp+25 w70 h20 +0x200, % translate("Tyre Usage")
 		Gui %window%:Add, Edit, x%x1% yp-1 w40 h20 Number VsimMaxTyreLapsEdit, %simMaxTyreLapsEdit%
@@ -1261,11 +1253,11 @@ class StrategyWorkbench extends ConfigurationItem {
 		this.iSelectedSessionType := sessionType
 		
 		if (sessionType = "Duration") {
-			GuiControl, , raceLengthLabel, % translate("Minutes")
+			GuiControl, , sessionLengthLabel, % translate("Minutes")
 			GuiControl, , simSessionResultLabel, % translate("Laps")
 		}
 		else {
-			GuiControl, , raceLengthLabel, % translate("Laps")
+			GuiControl, , sessionLengthLabel, % translate("Laps")
 			GuiControl, , simSessionResultLabel, % translate("Seconds")
 		}
 	}
@@ -1275,14 +1267,14 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		Gui %window%:Default
 	
-		GuiControlGet raceLengthEdit
+		GuiControlGet sessionLengthEdit
 		GuiControlGet formationLapCheck
 		GuiControlGet postRaceLapCheck
 		
 		if (this.SelectedSessionType = "Duration")
-			return Ceil(((raceLengthEdit * 60) / avgLapTime) + ((formationLap && formationLapCheck) ? 1 : 0) + ((postRaceLap && postRaceLapCheck) ? 1 : 0))
+			return Ceil(((sessionLengthEdit * 60) / avgLapTime) + ((formationLap && formationLapCheck) ? 1 : 0) + ((postRaceLap && postRaceLapCheck) ? 1 : 0))
 		else
-			return (raceLengthEdit + ((formationLap && formationLapCheck) ? 1 : 0) + ((postRaceLap && postRaceLapCheck) ? 1 : 0))
+			return (sessionLengthEdit + ((formationLap && formationLapCheck) ? 1 : 0) + ((postRaceLap && postRaceLapCheck) ? 1 : 0))
 	}
 	
 	calcSessionTime(avgLapTime, formationLap := true, postRaceLap := true) {
@@ -1290,14 +1282,14 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		Gui %window%:Default
 	
-		GuiControlGet raceLengthEdit
+		GuiControlGet sessionLengthEdit
 		GuiControlGet formationLapCheck
 		GuiControlGet postRaceLapCheck
 		
 		if (this.SelectedSessionType = "Duration")
-			return ((raceLengthEdit * 60) + (((formationLap && formationLapCheck) ? 1 : 0) * avgLapTime) + (((postRaceLap && postRaceLapCheck) ? 1 : 0) * avgLapTime))
+			return ((sessionLengthEdit * 60) + (((formationLap && formationLapCheck) ? 1 : 0) * avgLapTime) + (((postRaceLap && postRaceLapCheck) ? 1 : 0) * avgLapTime))
 		else
-			return ((raceLengthEdit + ((formationLap && formationLapCheck) ? 1 : 0) + ((postRaceLap && postRaceLapCheck) ? 1 : 0)) * avgLapTime)
+			return ((sessionLengthEdit + ((formationLap && formationLapCheck) ? 1 : 0) + ((postRaceLap && postRaceLapCheck) ? 1 : 0)) * avgLapTime)
 	}
 	
 	calcRefuelAmount(targetFuel, currentFuel) {
@@ -1324,14 +1316,70 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 	
 	chooseSettingsMenu(line) {
+		if (!this.SelectedSimulator || !this.SelectedCar || !this.SelectedTrack)
+			return
+		
+		window := this.Window
+						
+		Gui %window%:Default
+		
 		switch line {
 			case 3: ; "Load from Setup Database..."
-			case 4: ; "Update from Telemetry..."
-				if (this.SelectedSimulator && this.SelectedCar && this.SelectedTrack) {
-					telemetryDB := new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
+				simulator := this.SelectedSimulator
+				car := this.SelectedCar
+				track := this.SelectedTrack
+				
+				telemetryDB := new TelemetryDatabase(simulator, car, track)
+				simulatorCode := telemetryDB.getSimulatorCode(simulator)
+				
+				dirName = %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Settings
+				
+				FileCreateDir %dirName%
+				
+				title := translate("Load Race Settings...")
+						
+				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
+				FileSelectFile file, 1, %dirName%, %title%, Settings (*.settings)
+				OnMessage(0x44, "")
+			
+				if (file != "") {
+					settings := readConfiguration(file)
 					
-					mapData := telemetryDB.getMapData(this.SelectedWeather, this.SelectedCompound, this.SelectedCompoundColor)
-					tyreData := telemetryDB.getTyreData(this.SelectedWeather, this.SelectedCompound, this.SelectedCompoundColor)
+					if (settings.Count() > 0) {
+						GuiControl, , sessionTypeDropDown, 1
+						GuiControl, , sessionLengthEdit, % Round(getConfigurationValue(settings, "Session Settings", "Duration", 3600) / 60)
+						GuiControl, , sessionLengthlabel, % translate("Minutes")
+						GuiControl, , formationLapCheck, % getConfigurationValue(settings, "Session Settings", "Lap.Formation", false)
+						GuiControl, , postRaceLapCheck, % getConfigurationValue(settings, "Session Settings", "Lap.PostRace", false)
+						
+						GuiControl, , pitstopDeltaEdit, % getConfigurationValue(settings, "Strategy Settings", "Pitstop.Delta", 60)
+						GuiControl, , pitstopTyreServiceEdit, % getConfigurationValue(settings, "Strategy Settings", "Service.Tyres", 30)
+						GuiControl, , pitstopRefuelServiceEdit, % getConfigurationValue(settings, "Strategy Settings", "Service.Refuel", 1.5)
+						
+						compound := getConfigurationValue(settings, "Session Setup", "Tyre.Compound", "Dry")
+						compoundColor := getConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", "Black")
+						
+						GuiControl Choose, simCompoundDropDown, % qualifiedCompound(compound, compoundColor)
+						
+						GuiControl, , simAvgLapTimeEdit, % Round(getConfigurationValue(settings, "Session Settings", "Lap.AvgTime", 120), 1)
+						GuiControl, , simFuelConsumptionEdit, % Round(getConfigurationValue(settings, "Session Settings", "Fuel.AvgConsumption", 3.0), 2)
+					}
+				}
+			case 4: ; "Update from Telemetry..."
+				telemetryDB := new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
+				
+				fastestLapTime := false
+				
+				for ignore, row in telemetryDB.getMapData(this.SelectedWeather, this.SelectedCompound, this.SelectedCompoundColor) {
+					lapTime := row["Lap.Time"]
+				
+					if (!fastestLapTime || (lapTime < fastestLapTime)) {
+						fastestLapTime := lapTime
+						
+						GuiControl, , simMapEdit, % row["Map"]
+						GuiControl, , simAvgLapTimeEdit, % Round(lapTime, 1)
+						GuiControl, , simFuelConsumptionEdit, % Round(row["Fuel.Consumption"], 2)
+					}
 				}
 			case 5: ; "Import from Simulation..."
 				simulator := this.SelectedSimulator
@@ -1349,9 +1397,36 @@ class StrategyWorkbench extends ConfigurationItem {
 							title := translate("Warning")
 							MsgBox 262192, %title%, % translate("This is not supported for the selected simulator...")
 							OnMessage(0x44, "")
+							
+							return
 					}
 					
 					data := readSimulatorData(prefix)
+					
+					if ((getConfigurationValue(data, "Session Data", "Car") != this.SelectedCar)
+					 || (getConfigurationValue(data, "Session Data", "Track") != this.SelectedTrack))
+						return
+					else {
+						fuelCapacityEdit := getConfigurationValue(data, "Session Data", "FuelAmount", kUndefined)
+						initialFuelAmount := getConfigurationValue(data, "Car Data", "FuelRemaining", kUndefined)
+						
+						if (fuelCapacity != kUndefined)
+							GuiControl, , fuelCapacityEdit, % Round(fuelCapacity)
+						
+						if (initialFuelAmount != kUndefined)
+							GuiControl, , simInitialFuelAmountEdit, % Round(initialFuelAmount)
+						
+						compound := getConfigurationValue(data, "Car Data", "TyreCompound", kUndefined)
+						compoundColor := getConfigurationValue(data, "Car Data", "TyreCompoundColor", kUndefined)
+						
+						if ((compound != kUndefined) && (compoundColor != kUndefined))
+							GuiControl Choose, simCompoundDropDown, % qualifiedCompound(compound, compoundColor)
+						
+						map := getConfigurationValue(data, "Car Data", "Map", kUndefined)
+						
+						if (map != kUndefined)
+							GuiControl, , simMapEdit, % Round(map)
+					}
 				}
 			case 6: ; "Load Defaults..."
 			case 8: ; "Save Defaults"
@@ -1383,12 +1458,13 @@ class StrategyWorkbench extends ConfigurationItem {
 	chooseStrategyMenu(line) {
 		local strategy
 		
+		simulator := this.SelectedSimulator
 		car := this.SelectedCar
 		track := this.SelectedTrack
 		
-		if (this.SelectedSimulator && car && track) {
-			telemetryDB := new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
-			simulatorCode := telemetryDB.getSimulatorCode(this.SelectedSimulator)
+		if (simulator && car && track) {
+			telemetryDB := new TelemetryDatabase(simulator, car, track)
+			simulatorCode := telemetryDB.getSimulatorCode(simulator)
 			
 			dirName = %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Strategy
 			
@@ -2035,16 +2111,8 @@ class Strategy extends ConfigurationItem {
 	
 	TyreCompound[colored := false] {
 		Get {
-			if colored {
-				if (this.iTyreCompound= "Dry") {
-					if (this.iTyreCompoundColor = "Black")
-						return "Dry"
-					else
-						return ("Dry (" . this.iTyreCompoundColor . ")")
-				}
-				else
-					return "Wet"
-			}
+			if colored
+				return qualifiedCompound(this.iTyreCompound, this.iTyreCompoundColor)
 			else
 				return this.iTyreCompound
 		}
@@ -2181,8 +2249,9 @@ class Strategy extends ConfigurationItem {
 			
 			Gui %window%:Default
 			
-			GuiControlGet raceLengthEdit
+			GuiControlGet sessionLengthEdit
 			GuiControlGet simMaxTyreLapsEdit
+			GuiControlGet simCompoundDropDown
 			
 			this.iSimulator := strategyWorkbench.SelectedSimulator
 			this.iCar := strategyWorkbench.SelectedCar
@@ -2190,10 +2259,16 @@ class Strategy extends ConfigurationItem {
 			this.iWeather := strategyWorkbench.SelectedWeather
 			
 			this.iSessionType := strategyWorkbench.SelectedSessionType
-			this.iSessionLength := raceLengthEdit
+			this.iSessionLength := sessionLengthEdit
 			
-			this.iTyreCompound := strategyWorkbench.SelectedCompound
-			this.iTyreCompoundColor := strategyWorkbench.SelectedCompoundColor
+			compound := false
+			compoundColor := false
+			
+			splitQualifiedCompound(kQualifiedTyreCompounds[simCompoundDropDown], compound, compoundColor)
+			
+			this.iTyreCompound := compound
+			this.iTyreCompoundColor := compoundColor
+			
 			this.iMaxTyreLaps := simMaxTyreLapsEdit
 			
 			if (this.iTyreCompound = "Dry") {
@@ -2435,6 +2510,32 @@ class Strategy extends ConfigurationItem {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+qualifiedCompound(compound, compoundColor) {
+	if (compound= "Dry") {
+		if (compoundColor = "Black")
+			return "Dry"
+		else
+			return ("Dry (" . compoundColor . ")")
+	}
+	else
+		return "Wet"
+}
+
+splitQualifiedCompound(qualifiedCompound, ByRef compound, ByRef compoundColor) {
+	compoundColor := "Black"
+	
+	index := inList(kQualifiedTyreCompounds, qualifiedCompound)
+	
+	if (index == 1)
+		compound := "Wet"
+	else {
+		compound := "Dry"
+	
+		if (index > 2)
+			compoundColor := ["Red", "White", "Blue"][index - 2]
+	}
+}
 
 readSimulatorData(simulator) {
 	dataFile := kTempDirectory . simulator . " Data\Setup.data"

@@ -469,6 +469,9 @@ A considerable part of the knowledge of Jona comes from the telemetry informatio
 	TyreCompoundColor=White
 	TyreTemperature=84.268, 74.6507, 85.6955, 77.2675
 	TyrePressure=27.6296, 27.6063, 27.6666, 27.5575
+	Map=1
+	TC=2
+	ABS=3
 	[Stint Data]
 	DriverForname=The
 	DriverSurname=BigO

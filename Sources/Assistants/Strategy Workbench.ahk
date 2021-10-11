@@ -373,7 +373,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, DropDownList, x250 yp+24 w130 AltSubmit Choose1 vdataY3DropDown gchooseAxis, % translate("None") . "|" . values2String("|", map(schema, "translate")*)
 		
 		Gui %window%:Add, Text, x400 ys w40 h23 +0x200, % translate("Chart")
-		Gui %window%:Add, DropDownList, x444 yp w80 AltSubmit Choose1 +0x200 vchartSourceDropDown gchooseChartSource, % values2String("|", map(["Telemetry", "Strategy"], "translate")*)
+		Gui %window%:Add, DropDownList, x444 yp w80 AltSubmit Choose1 +0x200 vchartSourceDropDown gchooseChartSource, % values2String("|", map(["Telemetry", "Comparison"], "translate")*)
 		Gui %window%:Add, DropDownList, x529 yp w80 AltSubmit Choose1 vchartTypeDropDown gchooseChartType, % values2String("|", map(["Scatter", "Bar", "Bubble", "Line"], "translate")*)
 		
 		Gui %window%:Add, ActiveX, x400 yp+24 w800 h278 Border vchartViewer, shell.explorer
@@ -721,7 +721,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		Gui %window%:Font, Norm, Arial
 		
-		Gui %window%:Add, ListView, x%x% yp+21 w180 h139 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDpitstopListView, % values2String("|", map(["Lap", "Refuel", "Tyres", "Map"], "translate")*)
+		Gui %window%:Add, ListView, x%x% yp+21 w180 h139 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDpitstopListView, % values2String("|", map(["Lap", "Fuel", "Tyres", "Map"], "translate")*)
 		
 		this.iPitstopListView := pitstopListView
 		
@@ -750,7 +750,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		Gui %window%:Default
 		
-		chartViewer.Document.open()
+		chartViewer.Document.Open()
 		
 		if (drawChartFunction && (drawChartFunction != "")) {
 			before =
@@ -780,32 +780,30 @@ class StrategyWorkbench extends ConfigurationItem {
 
 			html := (before . drawChartFunction . after)
 			
-			chartViewer.Document.write(html)
+			chartViewer.Document.Write(html)
 		}
 		else {
 			html := "<html><body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
 		
-			chartViewer.Document.write(html)
+			chartViewer.Document.Write(html)
 		}
 		
 		this.iTelemetryChartHTML := html
 		
-		chartViewer.Document.close()
+		chartViewer.Document.Close()
 	
 		GuiControl Choose, chartSourceDropDown, 1
 		GuiControl Show, chartTypeDropDown
 	}
 	
-	showStrategyChart(html) {
+	showComparisonChart(html) {
 		window := this.Window
 		
 		Gui %window%:Default
 		
-		html := ("<html><body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . html . "</body></html>")
-		
-		chartViewer.Document.open()
-		chartViewer.Document.write(html)
-		chartViewer.Document.close()
+		chartViewer.Document.Open()
+		chartViewer.Document.Write(html)
+		chartViewer.Document.Close()
 		
 		this.iStrategyChartHTML := html
 		
@@ -1612,6 +1610,10 @@ class StrategyWorkbench extends ConfigurationItem {
 	compareStrategies(strategies*) {
 		local strategy
 		
+		static id := 0
+		
+		id += 1
+		
 		before =
 		(
 			<meta charset='utf-8'>
@@ -1623,7 +1625,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				</style>
 				<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 				<script type="text/javascript">
-					google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawChart);
+					google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawChart%id%);
 		)
 
 		after =
@@ -1632,7 +1634,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			</head>
 		)
 		
-		chart := "function drawChart() {`nvar data = new google.visualization.DataTable();"
+		chart := ("function drawChart" . id . "() {`nvar data = new google.visualization.DataTable();")
 			
 		chart .= ("`ndata.addColumn('number', '" . translate("Minute") . "');")
 		
@@ -1675,13 +1677,13 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		chart .= ("]);`nvar options = { curveType: 'function', legend: { position: 'Right' }, chartArea: { left: '10%', top: '5%', right: '25%', bottom: '20%' }, hAxis: { title: '" . translate("Minute") . "' }, vAxis: { title: '" . translate("Lap") . "', viewWindow: { min: 0 } }, backgroundColor: 'D8D8D8' };`n")
 				
-		chart .= "`nvar chart = new google.visualization.LineChart(document.getElementById('chart_id')); chart.draw(data, options); }"
+		chart .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_id" . id . "')); chart.draw(data, options); }")
 		
-		chartArea := "<div id=""chart_id"" style=""width: 798px; height: 248px"">"
+		chartArea := ("<div id=""chart_id" . id . """ style=""width: 798px; height: 348px"">")
 
 		html := ("<html>" . before . chart . after . "<body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #stints td { border-right: solid 1px #A0A0A0; } </style><style> #header { font-size: 12px; } </style><style> #data { border-collapse: separate; border-spacing: 10px; text-align: center; } </style><br>" . chartArea . "</body></html>")
 		
-		this.showStrategyChart(html)
+		this.showComparisonChart(html)
 	}
 	
 	createStrategy(configuration := false) {
@@ -2901,9 +2903,9 @@ chooseChartSource() {
 	else
 		GuiControl Hide, chartTypeDropDown
 	
-	chartViewer.Document.open()
-	chartViewer.Document.write((chartSourceDropDown = 1) ? workbench.iTelemetryChartHTML : workbench.iStrategyChartHTML)
-	chartViewer.Document.close()
+	chartViewer.Document.Open()
+	chartViewer.Document.Write((chartSourceDropDown = 1) ? workbench.iTelemetryChartHTML : workbench.iStrategyChartHTML)
+	chartViewer.Document.Close()
 }
 
 chooseChartType() {

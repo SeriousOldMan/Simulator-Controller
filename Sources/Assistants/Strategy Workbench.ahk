@@ -1359,7 +1359,7 @@ class StrategyWorkbench extends ConfigurationItem {
 						compound := getConfigurationValue(settings, "Session Setup", "Tyre.Compound", "Dry")
 						compoundColor := getConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", "Black")
 						
-						GuiControl Choose, simCompoundDropDown, % qualifiedCompound(compound, compoundColor)
+						GuiControl Choose, simCompoundDropDown, % inList(kQualifiedTyreCompounds, qualifiedCompound(compound, compoundColor))
 						
 						GuiControl, , simAvgLapTimeEdit, % Round(getConfigurationValue(settings, "Session Settings", "Lap.AvgTime", 120), 1)
 						GuiControl, , simFuelConsumptionEdit, % Round(getConfigurationValue(settings, "Session Settings", "Fuel.AvgConsumption", 3.0), 2)
@@ -1420,7 +1420,7 @@ class StrategyWorkbench extends ConfigurationItem {
 						compoundColor := getConfigurationValue(data, "Car Data", "TyreCompoundColor", kUndefined)
 						
 						if ((compound != kUndefined) && (compoundColor != kUndefined))
-							GuiControl Choose, simCompoundDropDown, % qualifiedCompound(compound, compoundColor)
+							GuiControl Choose, simCompoundDropDown, % inList(kQualifiedTyreCompounds, qualifiedCompound(compound, compoundColor))
 						
 						map := getConfigurationValue(data, "Car Data", "Map", kUndefined)
 						

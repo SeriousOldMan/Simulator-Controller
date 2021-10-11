@@ -224,7 +224,7 @@ In this tab you have to enter the time required for several pitstop activities, 
 
 #### Simulation
 
-This is the central functionality for the strategy development. Using the fields in this tab, you can defined the conditions and settings for your first stint and run a strategy simulation. You can choose, whether to use only the values you entered here for engine map, ABS & TC settingd, average fuel consumption, tyre pressures, and so on, or you can include the full knowledge from the telemetry data from previous sessions on the same track in similar conditions.
+This is the central functionality for the strategy development. Using the fields in this tab, you can defined the conditions and settings for your first stint and run a strategy simulation. You can choose, whether to use only the values you entered here for engine map, lap time and average fuel consumption, or you can include the full knowledge from the telemetry data from previous sessions on the same track in similar conditions.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Settings%203.JPG)
 

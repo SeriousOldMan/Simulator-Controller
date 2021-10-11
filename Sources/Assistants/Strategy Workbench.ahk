@@ -745,7 +745,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Show
 	}
 	
-	showChart(drawChartFunction) {
+	showTelemetryChart(drawChartFunction) {
 		window := this.Window
 		
 		Gui %window%:Default
@@ -788,22 +788,40 @@ class StrategyWorkbench extends ConfigurationItem {
 			chartViewer.Document.write(html)
 		}
 		
-		GuiControlGet chartSourceDropDown
-		
-		if (chartSourceDropDown = 1)
-			this.iTelemetryChartHTML := html
-		else
-			this.iStrategyChartHTML := html
+		this.iTelemetryChartHTML := html
 		
 		chartViewer.Document.close()
+	
+		GuiControl Choose, chartSourceDropDown, 1
+		GuiControl Show, chartTypeDropDown
+	}
+	
+	showStrategyChart(html) {
+		window := this.Window
+		
+		Gui %window%:Default
+		
+		html := ("<html><body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . html . "</body></html>")
+		
+		chartViewer.Document.open()
+		chartViewer.Document.write(html)
+		chartViewer.Document.close()
+		
+		this.iStrategyChartHTML := html
+		
+		GuiControl Choose, chartSourceDropDown, 2
+		GuiControl Hide, chartTypeDropDown
 	}
 	
 	showStrategyInfo(strategy) {
 		html := ""
 		
 		if strategy {
-			html := ("<div id=""header""><b><i>" . translate("Session") . "</i></b></div><br><br><table>")
+			html := ("<div id=""header""><b>" . translate("Strategy: ") . strategy.Name . "</b></div><br><br>")
 			
+			html .= ("<div id=""header""><i>" . translate("Session") . "</i></div><br><br><table>")
+			
+			html .= ("<tr><td><b>" . translate("Simulator:") . "</b></td><td>" . this.SelectedSimulator . "</td></tr>")
 			html .= ("<tr><td><b>" . translate("Car:") . "</b></td><td>" . this.SelectedCar . "</td></tr>")
 			html .= ("<tr><td><b>" . translate("Track:") . "</b></td><td>" . this.SelectedTrack . "</td></tr>")
 			
@@ -819,7 +837,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			html .= ("<tr><td><b>" . translate("Weather:") . "</b></td><td>" . translate(strategy.Weather) . "</td></tr>")
 			html .= "</table>"
 			
-			html .= ("<br><br><div id=""header""><b><i>" . translate("Setup") . "</i></b></div><br><br><table>")
+			html .= ("<br><br><div id=""header""><i>" . translate("Setup") . "</i></div><br><br><table>")
 			html .= ("<tr><td><b>" . translate("Fuel:") . "</b></td><td>" . strategy.RemainingFuel . A_Space . translate("Liter") . "</td></tr>")
 			html .= ("<tr><td><b>" . translate("Compound:") . "</b></td><td>" . translate(strategy.TyreCompound[true]) . "</td></tr>")
 			html .= ("<tr><td><b>" . translate("Pressures (hot):") . "</b></td><td>" . strategy.TyrePressures[true] . "</td></tr>")
@@ -833,7 +851,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			fuelSeries := [strategy.RemainingFuel]
 			tyreSeries := [strategy.RemainingTyreLaps]
 			
-			html .= ("<br><br><div id=""header""><b><i>" . translate("Stints") . "</i></b></div>")
+			html .= ("<br><br><div id=""header""><i>" . translate("Stints") . "</i></div>")
 			
 			if !strategy.LastPitstop {
 				html .= ("<br><br><table id=""stints""><tr><td><i>" . translate("Stint:") . "</i></td><td id=""data"">1</td></tr>")
@@ -922,7 +940,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				html .= "</table>"
 			}
 		
-			html .= ("<br><br><div id=""header""><b><i>" . translate("Overview") . "</i></b></div>")
+			html .= ("<br><br><div id=""header""><i>" . translate("Consumables") . "</i></div>")
 			
 			before =
 			(
@@ -1087,7 +1105,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.LineChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 		}
 		
-		this.showChart(drawChartFunction)
+		this.showTelemetryChart(drawChartFunction)
 	}
 	
 	loadSimulator(simulator, force := false) {
@@ -1480,7 +1498,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			telemetryDB := new TelemetryDatabase(simulator, car, track)
 			simulatorCode := telemetryDB.getSimulatorCode(simulator)
 			
-			dirName = %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Strategy
+			dirName = %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Strategies
 			
 			FileCreateDir %dirName%
 			
@@ -1502,14 +1520,20 @@ class StrategyWorkbench extends ConfigurationItem {
 					if this.SelectedStrategy {
 						title := translate("Save Race Strategy...")
 						
+						fileName := (dirName . "\" . this.SelectedStrategy.Name . ".strategy")
+						
 						OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Save", "Cancel"]))
-						FileSelectFile file, S17, %dirName%, %title%, Strategy (*.strategy)
+						FileSelectFile file, S17, %fileName%, %title%, Strategy (*.strategy)
 						OnMessage(0x44, "")
 					
 						if (file != "") {
 							if !InStr(file, ".")
 								file := (file . ".strategy")
 				
+							SplitPath file, , , , name
+							
+							this.SelectedStrategy.setName(name)
+								
 							configuration := newConfiguration()
 							
 							this.SelectedStrategy.saveToConfiguration(configuration)
@@ -1518,19 +1542,27 @@ class StrategyWorkbench extends ConfigurationItem {
 						}
 					}
 				case 6: ; "Compare Strategies..."
-					if this.SelectedStrategy {
-						title := translate("Choose Race Strategy for comparison...")
+					title := translate("Choose two or more Race Strategies for comparison...")
+				
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Compare", "Cancel"]))
+					FileSelectFile files, M1, %dirName%, %title%, Strategy (*.strategy)
+					OnMessage(0x44, "")
+				
+					strategies := []
 					
-						OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
-						FileSelectFile file, 1, %dirName%, %title%, Strategy (*.strategy)
-						OnMessage(0x44, "")
-					
-						if (file != "") {
-							configuration := readConfiguration(file)
+					if (files != "") {
+						directory := ""
 						
-							if (configuration.Count() > 0)
-								this.compareStrategies(this.SelectedStrategy, this.createStrategy(configuration))
+						Loop Parse, files, `n
+						{
+							if (A_Index = 1)
+								directory := A_LoopField
+							else
+								strategies.Push(this.createStrategy(readConfiguration(directory . "\" . A_LoopField)))
 						}
+						
+						if (strategies.Count() > 1)
+							this.compareStrategies(strategies*)
 					}
 				case 8: ; "Export Strategy..."
 			}
@@ -1577,8 +1609,79 @@ class StrategyWorkbench extends ConfigurationItem {
 		this.iSelectedStrategy := strategy
 	}
 	
-	compareStrategies(strategy1, strategy2) {
-		MsgBox Here
+	compareStrategies(strategies*) {
+		local strategy
+		
+		before =
+		(
+			<meta charset='utf-8'>
+			<head>
+				<style>
+					.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: 'FFFFFF'; }
+					.rowStyle { font-size: 11px; background-color: 'E0E0E0'; }
+					.oddRowStyle { font-size: 11px; background-color: 'E8E8E8'; }
+				</style>
+				<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+				<script type="text/javascript">
+					google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawChart);
+		)
+
+		after =
+		(
+				</script>
+			</head>
+		)
+		
+		chart := "function drawChart() {`nvar data = new google.visualization.DataTable();"
+			
+		chart .= ("`ndata.addColumn('number', '" . translate("Minute") . "');")
+		
+		for ignore, strategy in strategies
+			chart .= ("`ndata.addColumn('number', '" . strategy.Name . "');")
+		
+		chart .= "`ndata.addRows(["
+		
+		laps := []
+		
+		for ignore, strategy in strategies
+			laps.Push(strategy.getLaps(120))
+		
+		Loop {
+			if (A_Index > 1)
+				chart .= ", "
+			
+			chart .= ("[" . (A_Index * 2))
+
+			exhausted := true
+			index := A_Index
+			
+			Loop % strategies.Length()
+			{
+				sLaps := laps[A_Index]
+			
+				hasData := (sLaps.Length() >= index)
+			
+				chart .= (", " . (hasData ? sLaps[index] : "null"))
+				
+				if hasData
+					exhausted := false
+			}
+			
+			chart .= "]"
+			
+			if exhausted
+				break
+		}
+		
+		chart .= ("]);`nvar options = { curveType: 'function', legend: { position: 'Right' }, chartArea: { left: '10%', top: '5%', right: '25%', bottom: '20%' }, hAxis: { title: '" . translate("Minute") . "' }, vAxis: { title: '" . translate("Lap") . "', viewWindow: { min: 0 } }, backgroundColor: 'D8D8D8' };`n")
+				
+		chart .= "`nvar chart = new google.visualization.LineChart(document.getElementById('chart_id')); chart.draw(data, options); }"
+		
+		chartArea := "<div id=""chart_id"" style=""width: 798px; height: 248px"">"
+
+		html := ("<html>" . before . chart . after . "<body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #stints td { border-right: solid 1px #A0A0A0; } </style><style> #header { font-size: 12px; } </style><style> #data { border-collapse: separate; border-spacing: 10px; text-align: center; } </style><br>" . chartArea . "</body></html>")
+		
+		this.showStrategyChart(html)
 	}
 	
 	createStrategy(configuration := false) {
@@ -1849,6 +1952,8 @@ class StrategyWorkbench extends ConfigurationItem {
 class Strategy extends ConfigurationItem {
 	iStrategyWorkbench := false
 	
+	iName := translate("Unnamed")
+	
 	iSimulator := false
 	iCar := false
 	iTrack := false
@@ -2084,6 +2189,12 @@ class Strategy extends ConfigurationItem {
 		}
 	}
 	
+	Name[] {
+		Get {
+			return this.iName
+		}
+	}
+	
 	Simulator[] {
 		Get {
 			return this.iSimulator
@@ -2257,9 +2368,9 @@ class Strategy extends ConfigurationItem {
 		}
 	}
 	
-	Pitstops[] {
+	Pitstops[index := false] {
 		Get {
-			return this.iPitstops
+			return (index ? this.iPitstops[index] : this.iPitstops)
 		}
 	}
 	
@@ -2337,6 +2448,8 @@ class Strategy extends ConfigurationItem {
 	loadFromConfiguration(configuration) {
 		base.loadFromConfiguration(configuration)
 		
+		this.iName := getConfigurationValue(configuration, "General", "Name", translate("Unnamed"))
+		
 		this.iSimulator := getConfigurationValue(configuration, "Session", "Simulator", "Unknown")
 		this.iCar := getConfigurationValue(configuration, "Session", "Car", "Unknown")
 		this.iTrack := getConfigurationValue(configuration, "Session", "Track", "Unknown")
@@ -2374,6 +2487,8 @@ class Strategy extends ConfigurationItem {
 	
 	saveToConfiguration(configuration) {
 		base.saveToConfiguration(configuration)
+		
+		setConfigurationValue(configuration, "General", "Name", this.Name)
 		
 		setConfigurationValue(configuration, "Session", "Simulator", this.Simulator)
 		setConfigurationValue(configuration, "Session", "Car", this.Car)
@@ -2413,6 +2528,56 @@ class Strategy extends ConfigurationItem {
 		}
 		
 		setConfigurationValue(configuration, "Strategy", "Pitstops", values2String(", ", pitstops*))
+	}
+	
+	setName(name) {
+		this.iName := name
+	}
+	
+	getLaps(seconds) {
+		laps := []
+		
+		index := false
+		curTime := 0
+		maxTime := 0
+		avgLapTime := this.AvgLapTime
+		
+		if !this.LastPitstop
+			numLaps := this.getSessionLaps()
+		else
+			numLaps := this.Pitstops[1].Lap
+		
+		maxTime := (numLaps * (avgLapTime / 60))
+			
+		Loop {
+			Loop
+				if (curTime > maxTime)
+					break
+				else {
+					curTime += (seconds / 60)
+				
+					laps.Push(Floor((curTime / maxTime) * numLaps))
+				}
+			
+			if !index {
+				if !this.LastPitstop
+					return laps
+				
+				index := 1
+			}
+			else
+				index += 1
+			
+			if (index > this.Pitstops.Length())
+				return laps
+			else {
+				pitstop := this.Pitstops[index]
+			
+				avgLapTime := pitstop.AvgLapTime
+				numLaps += pitstop.StintLaps
+				maxTime := ((pitstop.Time / 60) + (pitstop.Duration / 60) + (pitstop.StintLaps * (avgLapTime / 60)))
+			}
+		}
 	}
 	
 	calcSessionLaps() {

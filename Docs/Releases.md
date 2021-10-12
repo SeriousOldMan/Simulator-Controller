@@ -6,6 +6,7 @@
   4. "Strategy Workbench" now supports loading and saving of strategies.
   5. Initializing a various fields in the "Strategy Workbench" from *Race.settings* files, from a running simulation or from data acquired from the telemetry information is now supported.
   6. Comparison of strategies is now supported in the "Strategy Workbench".
+  7. Defined pitstop rules are now taken into account for strategy simulations.
 
 ## 3.6.0-release 10/08/21
 

@@ -1663,7 +1663,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		avgFuelConsumption := []
 		
 		for ignore, pitstop in strategy.Pitstops {
-			LV_Add("", pitstop.Lap, Ceil(pitstop.RefuelAmount), pitstop.TyreChange ? translate("Change") : "", pitstop.Map)
+			LV_Add("", pitstop.Lap, Ceil(pitstop.RefuelAmount), pitstop.TyreChange ? translate("x") : "-", pitstop.Map)
 		
 			avgLapTimes.Push(pitstop.AvgLapTime)
 			avgFuelConsumption.Push(pitstop.FuelConsumption)
@@ -1671,7 +1671,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		LV_ModifyCol(1, "AutoHdr")
 		LV_ModifyCol(2, "AutoHdr")
-		LV_ModifyCol(3, "AutoHdr")
+		LV_ModifyCol(3, "Center AutoHdr")
 		LV_ModifyCol(4, "AutoHdr")
 		
 		GuiControl Text, strategyStartMapEdit, % strategy.Map

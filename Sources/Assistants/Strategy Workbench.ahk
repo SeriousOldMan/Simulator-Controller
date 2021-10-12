@@ -47,6 +47,13 @@ global kCancel = "Cancel"
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                        Private Variables Section                        ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global vChartID = 0
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -82,7 +89,9 @@ global pitstopRequirementsDropDown
 global pitstopWindowEdit = "25-35"
 global pitstopWindowLabel
 global tyreChangeRequirementsDropDown
+global tyreChangeRequirementsLabel
 global refuelRequirementsDropDown
+global refuelRequirementsLabel
 
 global pitstopDeltaEdit = 60
 global pitstopTyreServiceEdit = 30
@@ -389,7 +398,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		Gui %window%:Font, s8 Norm, Arial
 
-		Gui %window%:Add, DropDownList, x220 yp-2 w180 AltSubmit Choose1 +0x200 VsettingsMenuDropDown gsettingsMenu, % values2String("|", map(["Settings", "---------------------------------------------", "Initialize from Setup Database...", "Initialize from Telemetry...", "Initialize from Simulation...", "Initialize from Defaults...", "---------------------------------------------", "Save Defaults"], "translate")*)
+		Gui %window%:Add, DropDownList, x220 yp-2 w180 AltSubmit Choose1 +0x200 VsettingsMenuDropDown gsettingsMenu, % values2String("|", map(["Settings", "---------------------------------------------", "Initialize from Setup Database...", "Initialize from Telemetry...", "Initialize from Simulation..."], "translate")*)
 		
 		Gui %window%:Add, DropDownList, x405 yp w180 AltSubmit Choose1 +0x200 VsimulationMenuDropDown gsimulationMenu, % values2String("|", map(["Simulation", "---------------------------------------------", "Set Target Fuel Consumption...", "Set Target Tyre Usage...", "---------------------------------------------", "Run Simulation", "---------------------------------------------", "Use as Strategy..."], "translate")*)
 		
@@ -470,11 +479,11 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, Edit, x%x11% yp+1 w50 h20 VpitstopWindowEdit, %pitstopWindowEdit%
 		Gui %window%:Add, Text, x%x12% yp+3 w110 h20 VpitstopWindowLabel, % translate("Minute (From - To)")
 
-		Gui %window%:Add, Text, x%x5% yp+22 w85 h23 +0x200, % translate("Tyre Change")
-		Gui %window%:Add, DropDownList, x%x7% yp w80 AltSubmit Choose1 VtyreChangeRequirementsDropDown, % values2String("|", map(["Required", "Optional"], "translate")*)
+		Gui %window%:Add, Text, x%x5% yp+22 w85 h23 +0x200 VrefuelRequirementsLabel, % translate("Refuel")
+		Gui %window%:Add, DropDownList, x%x7% yp w80 AltSubmit Choose2 VrefuelRequirementsDropDown, % values2String("|", map(["Optional", "Required"], "translate")*)
 
-		Gui %window%:Add, Text, x%x5% yp+26 w85 h23 +0x200, % translate("Refuel")
-		Gui %window%:Add, DropDownList, x%x7% yp w80 AltSubmit Choose1 VrefuelRequirementsDropDown, % values2String("|", map(["Required", "Optional"], "translate")*)
+		Gui %window%:Add, Text, x%x5% yp+26 w85 h23 +0x200 VtyreChangeRequirementsLabel, % translate("Tyre Change")
+		Gui %window%:Add, DropDownList, x%x7% yp w80 AltSubmit Choose2 VtyreChangeRequirementsDropDown, % values2String("|", map(["Optional", "Required"], "translate")*)
 		
 		Gui %window%:Tab, 2
 		
@@ -811,134 +820,204 @@ class StrategyWorkbench extends ConfigurationItem {
 		GuiControl Hide, chartTypeDropDown
 	}
 	
+	createStrategyInfo(strategy) {
+		html := "<table>"
+		html .= ("<tr><td><b>" . translate("Simulator:") . "</b></td><td>" . this.SelectedSimulator . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Car:") . "</b></td><td>" . this.SelectedCar . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Track:") . "</b></td><td>" . this.SelectedTrack . "</td></tr>")
+		
+		if (strategy.SessionType = "Duration") {
+			html .= ("<tr><td><b>" . translate("Duration:") . "</b></td><td>" . strategy.SessionLength . A_Space . translate("Minutes") . "</td></tr>")
+			html .= ("<tr><td><b>" . translate("Laps:") . "</b></td><td>" . strategy.getSessionLaps() . A_Space . translate("Laps") . "</td></tr>")
+		}
+		else {
+			html .= ("<tr><td><b>" . translate("Laps:") . "</b></td><td>" . strategy.SessionLength . A_Space . translate("Laps") . "</td></tr>")
+			html .= ("<tr><td><b>" . translate("Duration:") . "</b></td><td>" . Round(strategy.getSessionDuration() / 60) . A_Space . translate("Minutes") . "</td></tr>")
+		}
+		
+		html .= ("<tr><td><b>" . translate("Weather:") . "</b></td><td>" . translate(strategy.Weather) . "</td></tr>")
+		html .= "</table>"
+		
+		return html
+	}
+	
+	createSetupInfo(strategy) {
+		html := "<table>"
+		html .= ("<tr><td><b>" . translate("Fuel:") . "</b></td><td>" . strategy.RemainingFuel . A_Space . translate("Liter") . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Compound:") . "</b></td><td>" . translate(strategy.TyreCompound[true]) . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Pressures (hot):") . "</b></td><td>" . strategy.TyrePressures[true] . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Map:") . "</b></td><td>" . strategy.Map . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("TC:") . "</b></td><td>" . strategy.TC . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("ABS:") . "</b></td><td>" . strategy.ABS . "</td></tr>")
+		html .= "</table>"
+			
+		return html
+	}
+	
+	createStintsInfo(strategy, ByRef timeSeries, ByRef lapSeries, ByRef fuelSeries, ByRef tyreSeries) {
+		timeSeries := [0]
+		lapSeries := [0]
+		fuelSeries := [strategy.RemainingFuel]
+		tyreSeries := [strategy.RemainingTyreLaps]
+		
+		html := ""
+		
+		if !strategy.LastPitstop {
+			html .= "<table id=""stints"">"
+			html .= ("<tr><td><i>" . translate("Stint:") . "</i></td><td id=""data"">1</td></tr>")
+			html .= ("<tr><td><i>" . translate("Map:") . "</i></td><td id=""data"">" . strategy.Map . "</td></tr>")
+			html .= ("<tr><td><i>" . translate("Laps:") . "</i></td><td id=""data"">" . strategy.RemainingLaps . "</td></tr>")
+			html .= ("<tr><td><i>" . translate("Lap Time:") . "</i></td><td id=""data"">" . strategy.AvgLapTime . "</td></tr>")
+			html .= ("<tr><td><i>" . translate("Fuel Consumption:") . "</i></td><td id=""data"">" . strategy.FuelConsumption . "</td></tr>")
+			html .= "</table>"
+			
+			timeSeries.Push(strategy.getSessionDuration() / 60)
+			lapSeries.Push(strategy.getSessionLaps())
+			fuelSeries.Push(strategy.RemainingFuel - (strategy.FuelConsumption * strategy.RemainingLaps))
+			tyreSeries.Push(strategy.RemainingTyreLaps - strategy.RemainingLaps)
+		}
+		else {
+			stints := []
+			maps := []
+			laps := []
+			lapTimes := []
+			fuelConsumptions := []
+			pitstopLaps := []
+			refuels := []
+			tyreChanges := []
+			
+			lastMap := strategy.Map
+			lastLap := 0
+			lastLapTime := strategy.AvgLapTime
+			lastFuelConsumption := strategy.FuelConsumption
+			lastRefuel := ""
+			lastPitstopLap := ""
+			lastTyreChange := ""
+			lastTyreLaps := strategy.RemainingTyreLaps
+		
+			for ignore, pitstop in strategy.Pitstops {
+				stints.Push("<td id=""data"">" . A_Index . "</td>")
+				maps.Push("<td id=""data"">" . lastMap . "</td>")
+				laps.Push("<td id=""data"">" . (pitstop.Lap - lastLap) . "</td>")
+				lapTimes.Push("<td id=""data"">" . Round(lastLapTime, 1) . "</td>")
+				fuelConsumptions.Push("<td id=""data"">" . Round(lastFuelConsumption, 2) . "</td>")
+				pitstopLaps.Push("<td id=""data"">" . lastPitstopLap . "</td>")
+				refuels.Push("<td id=""data"">" . (lastRefuel ? Ceil(lastRefuel) : "") . "</td>")
+				tyreChanges.Push("<td id=""data"">" . lastTyreChange . "</td>")
+				
+				timeSeries.Push(pitstop.Time / 60)
+				lapSeries.Push(pitstop.Lap)
+				fuelSeries.Push(pitstop.RemainingFuel - pitstop.RefuelAmount)
+				tyreSeries.Push(lastTyreLaps - (pitstop.Lap - lastLap))
+				
+				lastMap := pitstop.Map
+				lastLap := pitstop.Lap
+				lastFuelConsumption := pitstop.FuelConsumption
+				lastLapTime := pitstop.AvgLapTime
+				lastRefuel := pitstop.RefuelAmount
+				lastPitstopLap := pitstop.Lap
+				lastTyreChange := (pitstop.TyreChange ? translate("Yes") : translate("No"))
+				lastTyreLaps := pitstop.RemainingTyreLaps
+				
+				timeSeries.Push((pitstop.Time + pitStop.Duration) / 60)
+				lapSeries.Push(pitstop.Lap)
+				fuelSeries.Push(pitstop.RemainingFuel)
+				tyreSeries.Push(lastTyreLaps)
+			}
+			
+			stints.Push("<td id=""data"">" . (strategy.Pitstops.Length() + 1) . "</td>")
+			maps.Push("<td id=""data"">" . lastMap . "</td>")
+			laps.Push("<td id=""data"">" . strategy.LastPitstop.StintLaps . "</td>")
+			lapTimes.Push("<td id=""data"">" . Round(lastLapTime, 1) . "</td>")
+			fuelConsumptions.Push("<td id=""data"">" . Round(lastFuelConsumption, 2) . "</td>")
+			pitstopLaps.Push("<td id=""data"">" . lastPitstopLap . "</td>")
+			refuels.Push("<td id=""data"">" . Ceil(lastRefuel) . "</td>")
+			tyreChanges.Push("<td id=""data"">" . lastTyreChange . "</td>")
+			
+			timeSeries.Push((strategy.LastPitstop.Time + (strategy.LastPitstop.StintLaps * lastLapTime)) / 60)
+			lapSeries.Push(lastLap + strategy.LastPitstop.StintLaps)
+			fuelSeries.Push(strategy.LastPitstop.RemainingFuel - (strategy.LastPitstop.StintLaps * strategy.LastPitstop.FuelConsumption))
+			tyreSeries.Push(lastTyreLaps - strategy.LastPitstop.StintLaps)
+			
+			html .= "<table id=""stints"">"
+			html .= ("<tr><td><i>" . translate("Stint:") . "</i></td>" . values2String("", stints*) . "</tr>")
+			html .= ("<tr><td><i>" . translate("Map:") . "</i></td>" . values2String("", maps*) . "</tr>")
+			html .= ("<tr><td><i>" . translate("Laps:") . "</i></td>" . values2String("", laps*) . "</tr>")
+			html .= ("<tr><td><i>" . translate("Lap Time:") . "</i></td>" . values2String("", lapTimes*) . "</tr>")
+			html .= ("<tr><td><i>" . translate("Fuel Consumption:") . "</i></td>" . values2String("", fuelConsumptions*) . "</tr>")
+			html .= ("<tr><td><i>" . translate("Pitstop Lap:") . "</i></td>" . values2String("", pitstopLaps*) . "</tr>")
+			html .= ("<tr><td><i>" . translate("Refuel Amount:") . "</i></td>" . values2String("", refuels*) . "</tr>")
+			html .= ("<tr><td><i>" . translate("Tyre Change:") . "</i></td>" . values2String("", tyreChanges*) . "</tr>")
+			html .= "</table>"
+		}
+		
+		return html
+	}
+	
+	createConsumablesChart(strategy, width, height, timeSeries, lapSeries, fuelSeries, tyreSeries, ByRef drawChartFunction, ByRef chartID) {
+		vChartID += 1
+		
+		chartID := vChartID
+		
+		durationSession := (this.SelectedSessionType = "Duration")
+				
+		drawChartFunction := ("function drawChart" . vChartID . "() {`nvar data = new google.visualization.DataTable();")
+		
+		if durationSession
+			drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Lap") . "');")
+		else
+			drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Minutes") . "');")
+		
+		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Fuel Level") . "');")
+		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Tyre Life") . "');")
+
+		drawChartFunction .= "`ndata.addRows(["
+		
+		for ignore, time in timeSeries {
+			if (A_Index > 1)
+				drawChartFunction .= ", "
+			
+			xAxis := (durationSession ? lapSeries[A_Index] : time)
+			
+			drawChartFunction .= ("[" . xAxis . ", " . fuelSeries[A_Index] . ", " . tyreSeries[A_Index] . "]")
+		}
+		
+		drawChartFunction .= ("]);`nvar options = { curveType: 'function', legend: { position: 'Right' }, chartArea: { left: '10%', top: '5%', right: '25%', bottom: '20%' }, hAxis: { title: '" . translate("Lap") . "' }, vAxis: { viewWindow: { min: 0 } }, backgroundColor: 'D8D8D8' };`n")
+				
+		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_" . vChartID . "')); chart.draw(data, options); }")
+		
+		return ("<div id=""chart_" . vChartID . """ style=""width: " . width . "px; height: " . height . "px"">")
+	}
+	
 	showStrategyInfo(strategy) {
 		html := ""
 		
 		if strategy {
-			html := ("<div id=""header""><b>" . translate("Strategy: ") . strategy.Name . "</b></div><br><br>")
+			html := ("<div id=""header""><b>" . translate("Strategy: ") . strategy.Name . "</b></div>")
 			
-			html .= ("<div id=""header""><i>" . translate("Session") . "</i></div><br><br><table>")
+			html .= ("<br><br><div id=""header""><i>" . translate("Session") . "</i></div>")
 			
-			html .= ("<tr><td><b>" . translate("Simulator:") . "</b></td><td>" . this.SelectedSimulator . "</td></tr>")
-			html .= ("<tr><td><b>" . translate("Car:") . "</b></td><td>" . this.SelectedCar . "</td></tr>")
-			html .= ("<tr><td><b>" . translate("Track:") . "</b></td><td>" . this.SelectedTrack . "</td></tr>")
+			html .= ("<br><br>" . this.createStrategyInfo(strategy))
 			
-			if (strategy.SessionType = "Duration") {
-				html .= ("<tr><td><b>" . translate("Duration:") . "</b></td><td>" . strategy.SessionLength . A_Space . translate("Minutes") . "</td></tr>")
-				html .= ("<tr><td><b>" . translate("Laps:") . "</b></td><td>" . strategy.getSessionLaps() . A_Space . translate("Laps") . "</td></tr>")
-			}
-			else {
-				html .= ("<tr><td><b>" . translate("Laps:") . "</b></td><td>" . strategy.SessionLength . A_Space . translate("Laps") . "</td></tr>")
-				html .= ("<tr><td><b>" . translate("Duration:") . "</b></td><td>" . Round(strategy.getSessionDuration() / 60) . A_Space . translate("Minutes") . "</td></tr>")
-			}
+			html .= ("<br><br><div id=""header""><i>" . translate("Setup") . "</i></div>")
 			
-			html .= ("<tr><td><b>" . translate("Weather:") . "</b></td><td>" . translate(strategy.Weather) . "</td></tr>")
-			html .= "</table>"
-			
-			html .= ("<br><br><div id=""header""><i>" . translate("Setup") . "</i></div><br><br><table>")
-			html .= ("<tr><td><b>" . translate("Fuel:") . "</b></td><td>" . strategy.RemainingFuel . A_Space . translate("Liter") . "</td></tr>")
-			html .= ("<tr><td><b>" . translate("Compound:") . "</b></td><td>" . translate(strategy.TyreCompound[true]) . "</td></tr>")
-			html .= ("<tr><td><b>" . translate("Pressures (hot):") . "</b></td><td>" . strategy.TyrePressures[true] . "</td></tr>")
-			html .= ("<tr><td><b>" . translate("Map:") . "</b></td><td>" . strategy.Map . "</td></tr>")
-			html .= ("<tr><td><b>" . translate("TC:") . "</b></td><td>" . strategy.TC . "</td></tr>")
-			html .= ("<tr><td><b>" . translate("ABS:") . "</b></td><td>" . strategy.ABS . "</td></tr>")
-			html .= "</table>"
-			
-			timeSeries := [0]
-			lapSeries := [0]
-			fuelSeries := [strategy.RemainingFuel]
-			tyreSeries := [strategy.RemainingTyreLaps]
+			html .= ("<br><br>" . this.createSetupInfo(strategy))
 			
 			html .= ("<br><br><div id=""header""><i>" . translate("Stints") . "</i></div>")
+		
+			timeSeries := []
+			lapSeries := []
+			fuelSeries := []
+			tyreSeries := []
 			
-			if !strategy.LastPitstop {
-				html .= ("<br><br><table id=""stints""><tr><td><i>" . translate("Stint:") . "</i></td><td id=""data"">1</td></tr>")
-				html .= ("<tr><td><i>" . translate("Map:") . "</i></td><td id=""data"">" . strategy.Map . "</td></tr>")
-				html .= ("<tr><td><i>" . translate("Laps:") . "</i></td><td id=""data"">" . strategy.RemainingLaps . "</td></tr>")
-				html .= ("<tr><td><i>" . translate("Lap Time:") . "</i></td><td id=""data"">" . strategy.AvgLapTime . "</td></tr>")
-				html .= ("<tr><td><i>" . translate("Fuel Consumption:") . "</i></td><td id=""data"">" . strategy.FuelConsumption . "</td></tr>")
-				html .= "</table>"
-				
-				timeSeries.Push(strategy.getSessionDuration() / 60)
-				lapSeries.Push(strategy.getSessionLaps())
-				fuelSeries.Push(strategy.RemainingFuel - (strategy.FuelConsumption * strategy.RemainingLaps))
-				tyreSeries.Push(strategy.RemainingTyreLaps - strategy.RemainingLaps)
-			}
-			else {
-				stints := []
-				maps := []
-				laps := []
-				lapTimes := []
-				fuelConsumptions := []
-				pitstopLaps := []
-				refuels := []
-				tyreChanges := []
-				
-				lastMap := strategy.Map
-				lastLap := 0
-				lastLapTime := strategy.AvgLapTime
-				lastFuelConsumption := strategy.FuelConsumption
-				lastRefuel := ""
-				lastPitstopLap := ""
-				lastTyreChange := ""
-				lastTyreLaps := strategy.RemainingTyreLaps
-			
-				for ignore, pitstop in strategy.Pitstops {
-					stints.Push("<td id=""data"">" . A_Index . "</td>")
-					maps.Push("<td id=""data"">" . lastMap . "</td>")
-					laps.Push("<td id=""data"">" . (pitstop.Lap - lastLap) . "</td>")
-					lapTimes.Push("<td id=""data"">" . Round(lastLapTime, 1) . "</td>")
-					fuelConsumptions.Push("<td id=""data"">" . Round(lastFuelConsumption, 2) . "</td>")
-					pitstopLaps.Push("<td id=""data"">" . lastPitstopLap . "</td>")
-					refuels.Push("<td id=""data"">" . (lastRefuel ? Ceil(lastRefuel) : "") . "</td>")
-					tyreChanges.Push("<td id=""data"">" . lastTyreChange . "</td>")
-					
-					timeSeries.Push(pitstop.Time / 60)
-					lapSeries.Push(pitstop.Lap)
-					fuelSeries.Push(pitstop.RemainingFuel - pitstop.RefuelAmount)
-					tyreSeries.Push(lastTyreLaps - (pitstop.Lap - lastLap))
-					
-					lastMap := pitstop.Map
-					lastLap := pitstop.Lap
-					lastFuelConsumption := pitstop.FuelConsumption
-					lastLapTime := pitstop.AvgLapTime
-					lastRefuel := pitstop.RefuelAmount
-					lastPitstopLap := pitstop.Lap
-					lastTyreChange := (pitstop.TyreChange ? translate("Yes") : translate("No"))
-					lastTyreLaps := pitstop.RemainingTyreLaps
-					
-					timeSeries.Push((pitstop.Time + pitStop.Duration) / 60)
-					lapSeries.Push(pitstop.Lap)
-					fuelSeries.Push(pitstop.RemainingFuel)
-					tyreSeries.Push(lastTyreLaps)
-				}
-				
-				stints.Push("<td id=""data"">" . (strategy.Pitstops.Length() + 1) . "</td>")
-				maps.Push("<td id=""data"">" . lastMap . "</td>")
-				laps.Push("<td id=""data"">" . strategy.LastPitstop.StintLaps . "</td>")
-				lapTimes.Push("<td id=""data"">" . Round(lastLapTime, 1) . "</td>")
-				fuelConsumptions.Push("<td id=""data"">" . Round(lastFuelConsumption, 2) . "</td>")
-				pitstopLaps.Push("<td id=""data"">" . lastPitstopLap . "</td>")
-				refuels.Push("<td id=""data"">" . Ceil(lastRefuel) . "</td>")
-				tyreChanges.Push("<td id=""data"">" . lastTyreChange . "</td>")
-				
-				timeSeries.Push((strategy.LastPitstop.Time + (strategy.LastPitstop.StintLaps * lastLapTime)) / 60)
-				lapSeries.Push(lastLap + strategy.LastPitstop.StintLaps)
-				fuelSeries.Push(strategy.LastPitstop.RemainingFuel - (strategy.LastPitstop.StintLaps * strategy.LastPitstop.FuelConsumption))
-				tyreSeries.Push(lastTyreLaps - strategy.LastPitstop.StintLaps)
-				
-				html .= ("<br><br><table id=""stints""><tr><td><i>" . translate("Stint:") . "</i></td>" . values2String("", stints*) . "</tr>")
-				html .= ("<tr><td><i>" . translate("Map:") . "</i></td>" . values2String("", maps*) . "</tr>")
-				html .= ("<tr><td><i>" . translate("Laps:") . "</i></td>" . values2String("", laps*) . "</tr>")
-				html .= ("<tr><td><i>" . translate("Lap Time:") . "</i></td>" . values2String("", lapTimes*) . "</tr>")
-				html .= ("<tr><td><i>" . translate("Fuel Consumption:") . "</i></td>" . values2String("", fuelConsumptions*) . "</tr>")
-				html .= ("<tr><td><i>" . translate("Pitstop Lap:") . "</i></td>" . values2String("", pitstopLaps*) . "</tr>")
-				html .= ("<tr><td><i>" . translate("Refuel Amount:") . "</i></td>" . values2String("", refuels*) . "</tr>")
-				html .= ("<tr><td><i>" . translate("Tyre Change:") . "</i></td>" . values2String("", tyreChanges*) . "</tr>")
-				html .= "</table>"
-			}
+			html .= ("<br><br>" . this.createStintsInfo(strategy, timeSeries, lapSeries, fuelSeries, tyreSeries))
 		
 			html .= ("<br><br><div id=""header""><i>" . translate("Consumables") . "</i></div>")
+			
+			drawChartFunction := false
+			chartID := false
+			
+			chartArea := this.createConsumablesChart(strategy, 555, 248, timeSeries, lapSeries, fuelSeries, tyreSeries, drawChartFunction, chartID)
 			
 			before =
 			(
@@ -951,7 +1030,7 @@ class StrategyWorkbench extends ConfigurationItem {
 					</style>
 					<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 					<script type="text/javascript">
-						google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawChart);
+						google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawChart%chartID%);
 			)
 
 			after =
@@ -959,61 +1038,19 @@ class StrategyWorkbench extends ConfigurationItem {
 					</script>
 				</head>
 			)
-			
-			durationSession := (this.SelectedSessionType = "Duration")
-			chart := ""
-				
-			chart .= "function drawChart() {`nvar data = new google.visualization.DataTable();"
-			
-			if durationSession
-				chart .= ("`ndata.addColumn('number', '" . translate("Lap") . "');")
-			else
-				chart .= ("`ndata.addColumn('number', '" . translate("Minutes") . "');")
-			
-			chart .= ("`ndata.addColumn('number', '" . translate("Fuel Level") . "');")
-			chart .= ("`ndata.addColumn('number', '" . translate("Tyre Life") . "');")
-
-			chart .= "`ndata.addRows(["
-			
-			for ignore, time in timeSeries {
-				if (A_Index > 1)
-					chart .= ", "
-				
-				xAxis := (durationSession ? lapSeries[A_Index] : time)
-				
-				chart .= ("[" . xAxis . ", " . fuelSeries[A_Index] . ", " . tyreSeries[A_Index] . "]")
-			}
-			
-			chart .= ("]);`nvar options = { curveType: 'function', legend: { position: 'Right' }, chartArea: { left: '10%', top: '5%', right: '25%', bottom: '20%' }, hAxis: { title: '" . translate("Lap") . "' }, vAxis: { viewWindow: { min: 0 } }, backgroundColor: 'D8D8D8' };`n")
-					
-			chart .= "`nvar chart = new google.visualization.LineChart(document.getElementById('chart_id')); chart.draw(data, options); }"
-			
-			chartArea := "<div id=""chart_id"" style=""width: 555px; height: 248px"">"
 		}
 		else {
 			before := ""
 			after := ""
-			chart := ""
+			drawChartFunction := ""
 			chartArea := ""
 		}
 			
-		html := ("<html>" . before . chart . after . "<body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #stints td { border-right: solid 1px #A0A0A0; } </style><style> #header { font-size: 12px; } </style><style> #data { border-collapse: separate; border-spacing: 10px; text-align: center; } </style><div>" . html . "</div><br>" . chartArea . "</body></html>")
+		html := ("<html>" . before . drawChartFunction . after . "<body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #stints td { border-right: solid 1px #A0A0A0; } </style><style> #header { font-size: 12px; } </style><style> #data { border-collapse: separate; border-spacing: 10px; text-align: center; } </style><div>" . html . "</div><br>" . chartArea . "</body></html>")
 
 		strategyViewer.Document.Open()
 		strategyViewer.Document.Write(html)
 		strategyViewer.Document.Close()
-	}
-	
-	getSimulators() {
-		return new TelemetryDatabase().getSimulators()
-	}
-	
-	getCars(simulator) {
-		return new TelemetryDatabase().getCars(simulator)
-	}
-	
-	getTracks(simulator, car) {
-		return new TelemetryDatabase().getTracks(simulator, car)
 	}
 	
 	showDataPlot(data, xAxis, yAxises) {
@@ -1104,6 +1141,18 @@ class StrategyWorkbench extends ConfigurationItem {
 		}
 		
 		this.showTelemetryChart(drawChartFunction)
+	}
+	
+	getSimulators() {
+		return new TelemetryDatabase().getSimulators()
+	}
+	
+	getCars(simulator) {
+		return new TelemetryDatabase().getCars(simulator)
+	}
+	
+	getTracks(simulator, car) {
+		return new TelemetryDatabase().getTracks(simulator, car)
 	}
 	
 	loadSimulator(simulator, force := false) {
@@ -1343,6 +1392,41 @@ class StrategyWorkbench extends ConfigurationItem {
 		GuiControlGet pitstopRefuelServiceEdit
 		
 		return (pitstopDeltaEdit + (changeTyres ? pitstopTyreServiceEdit : 0) + ((refuelAmount / 10) * pitstopRefuelServiceEdit))
+	}
+	
+	getPitstopRules(ByRef pitstopRequired, ByRef refuelRequired, ByRef tyreChangeRequired) {
+		result := true
+		
+		window := this.Window
+						
+		Gui %window%:Default
+		
+		GuiControlGet pitstopRequirementsDropDown
+		GuiControlGet pitstopWindowEdit
+		GuiControlGet tyreChangeRequirementsDropDown
+		GuiControlGet refuelRequirementsDropDown
+		
+		switch pitstopRequirementsDropDown {
+			case 1:
+				pitstopRequired := false
+			case 2:
+				pitstopRequired := true
+			case 3:
+				window := string2Values("-", pitstopWindowEdit)
+				
+				if (window.Length() = 2)
+					pitstopRequired := window
+				else {
+					pitstopRequired := true
+				
+					result := false
+				}
+		}
+		
+		refuelRequired := (refuelRequirementsDropDown = 2)
+		tyreChangeRequired := (tyreChangeRequirementsDropDown = 2)
+			
+		return result
 	}
 	
 	chooseSettingsMenu(line) {
@@ -1610,9 +1694,7 @@ class StrategyWorkbench extends ConfigurationItem {
 	compareStrategies(strategies*) {
 		local strategy
 		
-		static id := 0
-		
-		id += 1
+		vChartID += 1
 		
 		before =
 		(
@@ -1625,7 +1707,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				</style>
 				<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 				<script type="text/javascript">
-					google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawChart%id%);
+					google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawChart%vChartID%);
 		)
 
 		after =
@@ -1634,7 +1716,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			</head>
 		)
 		
-		chart := ("function drawChart" . id . "() {`nvar data = new google.visualization.DataTable();")
+		chart := ("function drawChart" . vChartID . "() {`nvar data = new google.visualization.DataTable();")
 			
 		chart .= ("`ndata.addColumn('number', '" . translate("Minute") . "');")
 		
@@ -1675,13 +1757,33 @@ class StrategyWorkbench extends ConfigurationItem {
 				break
 		}
 		
+		html := ""
+		
+		for ignore, strategy in strategies {
+			timesSeries := []
+			lapSeries := []
+			fuelSeries := []
+			tyreSeries := []
+		
+			if (A_Index > 1)
+				html .= "<br><br>"
+			
+			html .= ("<div id=""header""><i><b>" .  translate("Strategy: ") . strategy.Name . "</b></i></div>")
+			
+			html .= ("<br>" . this.createStrategyInfo(strategy))
+			
+			html .= ("<br>" . this.createSetupInfo(strategy))
+		
+			html .= ("<br>" . this.createStintsInfo(strategy, timeSeries, lapSeries, fuelSeries, tyreSeries))
+		}
+		
 		chart .= ("]);`nvar options = { curveType: 'function', legend: { position: 'Right' }, chartArea: { left: '10%', top: '5%', right: '25%', bottom: '20%' }, hAxis: { title: '" . translate("Minute") . "' }, vAxis: { title: '" . translate("Lap") . "', viewWindow: { min: 0 } }, backgroundColor: 'D8D8D8' };`n")
 				
-		chart .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_id" . id . "')); chart.draw(data, options); }")
+		chart .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_id" . vChartID . "')); chart.draw(data, options); }")
 		
-		chartArea := ("<div id=""chart_id" . id . """ style=""width: 798px; height: 348px"">")
+		chartArea := ("<div id=""header""><i><b>" . translate("Performance") . "</b></i></div><br><div id=""chart_id" . vChartID . """ style=""width: 778px; height: 348px"">")
 
-		html := ("<html>" . before . chart . after . "<body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #stints td { border-right: solid 1px #A0A0A0; } </style><style> #header { font-size: 12px; } </style><style> #data { border-collapse: separate; border-spacing: 10px; text-align: center; } </style><br>" . chartArea . "</body></html>")
+		html := ("<html>" . before . chart . after . "<body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #stints td { border-right: solid 1px #A0A0A0; } </style><style> #header { font-size: 12px; } </style><style> #data { border-collapse: separate; border-spacing: 10px; text-align: center; } </style>" . html . "<br><hr style=""width: 50`%""><br>" . chartArea . "</body></html>")
 		
 		this.showComparisonChart(html)
 	}
@@ -1801,7 +1903,14 @@ class StrategyWorkbench extends ConfigurationItem {
 					sessionTime -= avgLapTime
 				}
 				
-				strategy.adjustLastPitstop(superfluousLaps)
+				pitstopRequired := false
+				refuelRequired := false
+				tyreChangeRequired := false
+				
+				this.getPitstopRules(pitstopRequired, refuelRequired, tyreChangeRequired)
+				
+				if ((strategy.Pitstops.Count() != 1) || !pitstopRequired)
+					strategy.adjustLastPitstop(superfluousLaps)
 				
 				Sleep 1000
 				
@@ -1988,6 +2097,7 @@ class Strategy extends ConfigurationItem {
 	
 	class Pitstop extends ConfigurationItem {
 		iStrategy := false
+		iID := false
 		iLap := 0
 		
 		iTime := 0
@@ -2008,6 +2118,12 @@ class Strategy extends ConfigurationItem {
 		Strategy[]  {
 			Get {
 				return this.iStrategy
+			}
+		}
+		
+		ID[]  {
+			Get {
+				return this.iID
 			}
 		}
 		
@@ -2089,17 +2205,24 @@ class Strategy extends ConfigurationItem {
 			}
 		}
 		
-		__New(strategy, lap, configuration := false) {
+		__New(strategy, id, lap, configuration := false) {
 			this.iStrategy := strategy
+			this.iID := id
 			this.iLap := lap
 
 			base.__New(configuration)
 			
 			if !configuration {
+				pitstopRequired := false
+				refuelRequired := false
+				tyreChangeRequired := false
+				
+				strategy.StrategyWorkbench.getPitstopRules(pitstopRequired, refuelRequired, tyreChangeRequired)
+			
 				remainingFuel := strategy.RemainingFuel[true]
 				remainingLaps := strategy.RemainingLaps[true]
 				fuelConsumption := strategy.FuelConsumption[true]
-				lastStintLaps := Floor(Min(strategy.StintLaps[true], remainingFuel / fuelConsumption))
+				lastStintLaps := Floor(Min(strategy.StintLaps[true], remainingFuel / fuelConsumption, strategy.LastPitstop ? (lap - strategy.LastPitstop.Lap) : lap))
 				
 				stintLaps := Floor(Min(remainingLaps - lastStintLaps, strategy.StintLaps))
 				
@@ -2110,13 +2233,24 @@ class Strategy extends ConfigurationItem {
 				
 				refuelAmount := strategy.calcRefuelAmount(stintLaps * fuelConsumption, remainingFuel, remainingLaps, lastStintLaps)
 				
+				if ((id == 1) && refuelRequired && (refuelAmount <= 0))
+					refuelAmount := 1
+				else if (refuelAmount <= 0)
+					refuelAmount := 0
+				
 				this.iRemainingLaps := (remainingLaps - lastStintLaps)
 				this.iRemainingFuel := (remainingFuel - (lastStintLaps * fuelConsumption) + refuelAmount)
 				
 				remainingTyreLaps := (strategy.RemainingTyreLaps[true] - lastStintLaps)
 				
-				if ((remainingTyreLaps - stintLaps) >= 0)
-					this.iRemainingTyreLaps := remainingTyreLaps
+				if ((remainingTyreLaps - stintLaps) >= 0) {
+					if ((id == 1) && tyreChangeRequired && (remainingTyreLaps > remainingLaps)) {
+						this.iTyreChange := true
+						this.iRemainingTyreLaps := strategy.RemainingTyreLaps
+					}
+					else
+						this.iRemainingTyreLaps := remainingTyreLaps
+				}
 				else {
 					this.iTyreChange := true
 					this.iRemainingTyreLaps := strategy.RemainingTyreLaps
@@ -2484,7 +2618,7 @@ class Strategy extends ConfigurationItem {
 		this.iTyreLaps:= getConfigurationValue(configuration, "Strategy", "TyreLaps", 0)
 		
 		for ignore, lap in string2Values(",", getConfigurationValue(configuration, "Strategy", "Pitstops", ""))
-			this.Pitstops.Push(new this.Pitstop(this, lap, configuration))
+			this.Pitstops.Push(new this.Pitstop(this, A_Index, lap, configuration))
 	}
 	
 	saveToConfiguration(configuration) {
@@ -2600,8 +2734,25 @@ class Strategy extends ConfigurationItem {
 		return this.StrategyWorkbench.calcPitstopDuration(refuelAmount, changeTyres)
 	}
 	
-	calcNextPitstopLap(currentLap, remainingLaps, remainingTyreLaps, remainingFuel) {
-		return (currentLap + Floor(Min(this.StintLaps, remainingTyreLaps, remainingFuel / this.FuelConsumption[true])))
+	calcNextPitstopLap(pitstopNr, currentLap, remainingLaps, remainingTyreLaps, remainingFuel) {
+		targetLap := (currentLap + Floor(Min(this.StintLaps, remainingTyreLaps, remainingFuel / this.FuelConsumption[true])))
+		
+		if (pitstopNr = 1) {
+			pitstopRequired := false
+			refuelRequired := false
+			tyreChangeRequired := false
+			
+			this.StrategyWorkbench.getPitstopRules(pitstopRequired, refuelRequired, tyreChangeRequired)
+			
+			if (targetLap >= remainingLaps) && pitstopRequired {
+				if (pitstopRequired == true)
+					targetLap := remainingLaps - 2
+				else
+					targetLap := Floor((pitstopRequired[1] + ((pitstopRequired[2] - pitstopRequired[1]) / 2)) * 60 / this.AvgLapTime)
+			}
+		}
+		
+		return targetLap
 	}
 	
 	createStints(sessionType, startFuel, stintLaps, tyreLaps, map, fuelConsumption, avgLapTime) {
@@ -2616,7 +2767,6 @@ class Strategy extends ConfigurationItem {
 		this.iPitstops := []
 		
 		currentLap := 0
-		pitstopNr := 1
 		
 		sessionLaps := this.RemainingLaps
 		
@@ -2632,9 +2782,9 @@ class Strategy extends ConfigurationItem {
 					break
 			}
 			
-			pitstopLap := this.calcNextPitstopLap(currentLap, this.RemainingLaps[true], this.RemainingTyreLaps[true], remainingFuel)
+			pitstopLap := this.calcNextPitstopLap(A_Index, currentLap, this.RemainingLaps[true], this.RemainingTyreLaps[true], remainingFuel)
 			
-			pitstop := new this.Pitstop(this, pitstopLap)
+			pitstop := new this.Pitstop(this, A_Index, pitstopLap)
 			
 			if (sessionType = "Duration") {
 				if (pitStop.RemainingTime <= 0)
@@ -2646,7 +2796,6 @@ class Strategy extends ConfigurationItem {
 			}
 			
 			currentLap := pitstopLap
-			pitstopNr += 1
 			
 			this.Pitstops.Push(pitstop)
 		}
@@ -2934,6 +3083,22 @@ choosePitstopRequirements() {
 	else {
 		GuiControl Hide, pitstopWindowEdit
 		GuiControl Hide, pitstopWindowLabel
+	}
+	
+	if (pitstopRequirementsDropDown = 1) {
+		GuiControl Choose, tyreChangeRequirementsDropDown, 1
+		GuiControl Choose, refuelRequirementsDropDown, 1
+		
+		GuiControl Hide, tyreChangeRequirementsLabel
+		GuiControl Hide, tyreChangeRequirementsDropDown
+		GuiControl Hide, refuelRequirementsLabel
+		GuiControl Hide, refuelRequirementsDropDown
+	}
+	else {
+		GuiControl Show, tyreChangeRequirementsLabel
+		GuiControl Show, tyreChangeRequirementsDropDown
+		GuiControl Show, refuelRequirementsLabel
+		GuiControl Show, refuelRequirementsDropDown
 	}
 }
 

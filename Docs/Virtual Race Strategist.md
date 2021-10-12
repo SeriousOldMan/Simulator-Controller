@@ -169,13 +169,13 @@ The lower area allows you to create a race strategy. You have to enter the race 
 
 #### Rules & Settings
 
-In the first tab you enter the rules and settings for the upcoming event. Using the *Settings* drop down menu directly above the tabbed area, you can load settings values from different sources, from the *Setup Database* or the from the currently active simulation. You can also create a set of track and car independent default settings, if applicable.
+In the first tab you enter the rules and settings for the upcoming event. Using the *Settings* drop down menu directly above the tabbed area, you can load settings values from different sources, for example from the setup Database or the from the currently active simulation.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Settings%201.JPG)
 
 Loading of settings is supported for:
 
-  1. *Race.settings* file
+  1. *Race.settings* file (from the setup database)
   
      The file chooser dialog is opened in the directory of the settings for the current simulator / car / track combination, but you may navigate to a totally different location if desired. The following fields are loaded from the settings file:
 	 
@@ -214,7 +214,7 @@ Loading of settings is supported for:
 	   - Tyre Compound
 	   - Tyre Compound Color
  
-Note: The handling of default values is not yet implemented - this will be completed with next releases.
+Notes: If you specify a required pitstop window, this will be applied for the first pitstop. When a mandatory pitstop with a required tyre change and/or a required refueling has been defined, but actually there is no need for refueling or tyre change, the pitstop is planned as late as possible and only 1 liter will be refueled. All these are common scenarios for a GT3 solo or team sprint races. 
 
 #### Pitstop & Service
 

@@ -2744,11 +2744,11 @@ class Strategy extends ConfigurationItem {
 			
 			this.StrategyWorkbench.getPitstopRules(pitstopRequired, refuelRequired, tyreChangeRequired)
 			
-			if (targetLap >= remainingLaps) && pitstopRequired {
+			if (((targetLap >= remainingLaps) && pitstopRequired) || IsObject(pitstopRequired)) {
 				if (pitstopRequired == true)
 					targetLap := remainingLaps - 2
 				else
-					targetLap := Floor((pitstopRequired[1] + ((pitstopRequired[2] - pitstopRequired[1]) / 2)) * 60 / this.AvgLapTime)
+					targetLap := Min(targetLap, Floor((pitstopRequired[1] + ((pitstopRequired[2] - pitstopRequired[1]) / 2)) * 60 / this.AvgLapTime))
 			}
 		}
 		

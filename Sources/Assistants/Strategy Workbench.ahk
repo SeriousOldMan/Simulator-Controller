@@ -2244,7 +2244,7 @@ class Strategy extends ConfigurationItem {
 				remainingTyreLaps := (strategy.RemainingTyreLaps[true] - lastStintLaps)
 				
 				if ((remainingTyreLaps - stintLaps) >= 0) {
-					if ((id == 1) && tyreChangeRequired && (remainingTyreLaps > remainingLaps)) {
+					if ((id == 1) && tyreChangeRequired && (remainingTyreLaps > this.iRemainingLaps)) {
 						this.iTyreChange := true
 						this.iRemainingTyreLaps := strategy.RemainingTyreLaps
 					}

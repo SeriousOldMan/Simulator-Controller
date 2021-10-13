@@ -414,7 +414,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		Gui %window%:Add, DropDownList, x220 yp-2 w180 AltSubmit Choose1 +0x200 VsettingsMenuDropDown gsettingsMenu, % values2String("|", map(["Settings", "---------------------------------------------", "Initialize from Setup Database...", "Initialize from Telemetry...", "Initialize from Simulation..."], "translate")*)
 		
-		Gui %window%:Add, DropDownList, x405 yp w180 AltSubmit Choose1 +0x200 VsimulationMenuDropDown gsimulationMenu, % values2String("|", map(["Simulation", "---------------------------------------------", "Set Target Fuel Consumption...", "Set Target Tyre Usage...", "---------------------------------------------", "Run Simulation", "---------------------------------------------", "Use as Strategy..."], "translate")*)
+		Gui %window%:Add, DropDownList, x405 yp w180 AltSubmit Choose1 +0x200 VsimulationMenuDropDown gsimulationMenu, % values2String("|", map(["Simulation", "---------------------------------------------", "Set Target Stint Length...", "Set Target Fuel Consumption...", "Set Target Tyre Usage...", "---------------------------------------------", "Run Simulation", "---------------------------------------------", "Use as Strategy..."], "translate")*)
 		
 		Gui %window%:Add, DropDownList, x590 yp w180 AltSubmit Choose1 +0x200 VstrategyMenuDropDown gstrategyMenu, % values2String("|", map(["Strategy", "---------------------------------------------", "Load Strategy...", "Save Strategy...", "---------------------------------------------", "Compare Strategies...", "---------------------------------------------", "Export Strategy..."], "translate")*)
 		
@@ -1570,11 +1570,12 @@ class StrategyWorkbench extends ConfigurationItem {
 		local strategy
 		
 		switch line {
-			case 3: ; "Set Target Fuel Consumption..."
-			case 4: ; "Set Target Tyre Usage..."
-			case 6: ; "Run Simulation"
+			case 3: ; "Set Target Stint Length..."
+			case 4: ; "Set Target Fuel Consumption..."
+			case 5: ; "Set Target Tyre Usage..."
+			case 7: ; "Run Simulation"
 				this.runSimulation()
-			case 8: ; "Use as Strategy..."
+			case 9: ; "Use as Strategy..."
 				strategy := this.SelectedScenario
 				
 				if strategy

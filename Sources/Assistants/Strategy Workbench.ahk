@@ -1965,31 +1965,40 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		Gui %window%:Default
 		
-		numPitstops := 0
-		numTyreChanges := 0
-		consumedFuel := strategy.RemainingFuel
-		avgLapTimes := [strategy.AvgLapTime]
-		
-		for ignore, pitstop in strategy.Pitstops {
-			numPitstops += 1
-		
-			if pitstop.TyreChange
-				numTyreChanges += 1
+		if strategy {
+			numPitstops := 0
+			numTyreChanges := 0
+			consumedFuel := strategy.RemainingFuel
+			avgLapTimes := [strategy.AvgLapTime]
 			
-			consumedFuel += pitstop.RefuelAmount
+			for ignore, pitstop in strategy.Pitstops {
+				numPitstops += 1
 			
-			avgLapTimes.Push(pitstop.AvgLapTime)
+				if pitstop.TyreChange
+					numTyreChanges += 1
+				
+				consumedFuel += pitstop.RefuelAmount
+				
+				avgLapTimes.Push(pitstop.AvgLapTime)
+			}
+			
+			GuiControl Text, simNumPitstopResult, %numPitstops%
+			GuiControl Text, simNumTyreChangeResult, %numTyreChanges%
+			GuiControl Text, simConsumedFuelResult, % Ceil(consumedFuel)
+			GuiControl Text, simPitlaneSecondsResult, % Ceil(strategy.getPitstopTime())
+			
+			if (this.SelectedSessionType = "Duration")
+				GuiControl Text, simSessionResultResult, % strategy.getSessionLaps()
+			else
+				GuiControl Text, simSessionResultResult, % Ceil(strategy.getSessionDuration())
 		}
-		
-		GuiControl Text, simNumPitstopResult, %numPitstops%
-		GuiControl Text, simNumTyreChangeResult, %numTyreChanges%
-		GuiControl Text, simConsumedFuelResult, % Ceil(consumedFuel)
-		GuiControl Text, simPitlaneSecondsResult, % Ceil(strategy.getPitstopTime())
-		
-		if (this.SelectedSessionType = "Duration")
-			GuiControl Text, simSessionResultResult, % strategy.getSessionLaps()
-		else
-			GuiControl Text, simSessionResultResult, % Ceil(strategy.getSessionDuration())
+		else {
+			GuiControl Text, simNumPitstopResult, % ""
+			GuiControl Text, simNumTyreChangeResult, % ""
+			GuiControl Text, simConsumedFuelResult, % ""
+			GuiControl Text, simPitlaneSecondsResult, % ""
+			GuiControl Text, simSessionResultResult, % ""
+		}
 		
 		this.iSelectedScenario := strategy
 	}
@@ -2039,7 +2048,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		scenario := this.evaluateScenarios(progress, scenarios)
 		
 		if scenario {
-			message := translate("Choose Strategy...")
+			message := translate("Choose Scenario...")
 			
 			showProgress({progress: progress, message: message})
 			
@@ -2047,6 +2056,8 @@ class StrategyWorkbench extends ConfigurationItem {
 			
 			this.chooseScenario(progress, scenario)
 		}
+		else
+			this.chooseScenario(progress, false)
 		
 		message := translate("Finished...")
 		
@@ -2244,7 +2255,7 @@ class Strategy extends ConfigurationItem {
 				remainingTyreLaps := (strategy.RemainingTyreLaps[true] - lastStintLaps)
 				
 				if ((remainingTyreLaps - stintLaps) >= 0) {
-					if ((id == 1) && tyreChangeRequired && (remainingTyreLaps > this.iRemainingLaps)) {
+					if ((id == 1) && tyreChangeRequired && (remainingTyreLaps >= this.iRemainingLaps)) {
 						this.iTyreChange := true
 						this.iRemainingTyreLaps := strategy.RemainingTyreLaps
 					}
@@ -2626,6 +2637,10 @@ class Strategy extends ConfigurationItem {
 		
 		setConfigurationValue(configuration, "General", "Name", this.Name)
 		
+		setConfigurationValue(configuration, "Weather", "Weather", this.StrategyWorkbench.SelectedWeather)
+		setConfigurationValue(configuration, "Weather", "AirTemperature", this.StrategyWorkbench.AirTemperature)
+		setConfigurationValue(configuration, "Weather", "TrackTemperature", this.StrategyWorkbench.TrackTemperature)
+		
 		setConfigurationValue(configuration, "Session", "Simulator", this.Simulator)
 		setConfigurationValue(configuration, "Session", "Car", this.Car)
 		setConfigurationValue(configuration, "Session", "Track", this.Track)
@@ -2817,8 +2832,11 @@ class Strategy extends ConfigurationItem {
 				}
 				else {
 					pitstop.iStintLaps -= superfluousLaps
-					pitstop.iRefuelAmount -= (superfluousLaps * pitstop.FuelConsumption)
-					pitstop.iRemainingFuel -= (superfluousLaps * pitstop.FuelConsumption)
+				
+					delta := Min((superfluousLaps * pitstop.FuelConsumption), pitstop.iRefuelAmount)
+					
+					pitstop.iRefuelAmount -= delta
+					pitstop.iRemainingFuel -= delta
 				}
 			}
 			

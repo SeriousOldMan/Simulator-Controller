@@ -502,7 +502,7 @@ class RaceEngineer extends RaceAssistant {
 				
 				knowledgeBase.clearFact("Pitstop.Planned.Tyre.Pressure.Correction")
 				
-				this.planPitstop({Update: true, Pressures: true}, false)
+				this.planPitstop({Update: true, Pressures: true, Confirm: false})
 				
 				speaker.speakPhrase("MoreChanges", false, true)
 			}
@@ -1177,9 +1177,11 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 	
-	planPitstop(optionsOrLap := true, confirm := true) {
+	planPitstop(optionsOrLap := true, refuelAmount := "__Undefined__", changeTyres := "__Undefined__") {
 		local knowledgeBase := this.KnowledgeBase
 		local compound
+		
+		confirm := true
 		
 		options := optionsOrLap
 		plannedLap := false
@@ -1191,6 +1193,9 @@ class RaceEngineer extends RaceAssistant {
 				
 				options := true
 			}
+			else if IsObject(optionsOrLap)
+				if optionsOrLap.HasKey("Confirm")
+					confirm := optionsOrLap["Confirm"]
 		
 		if !this.hasEnoughData()
 			return false
@@ -1203,6 +1208,12 @@ class RaceEngineer extends RaceAssistant {
 		}
 	
 		knowledgeBase.addFact("Pitstop.Plan", ((options == true) || !options.HasKey("Update") || !options.Update) ? true : false)
+		
+		if (refuelAmount != kUndefined)
+			knowledgeBase.addFact("Pitstop.Plan.Fuel.Amount.Target", refuelAmount)
+		
+		if (changeTyres != kUndefined)
+			knowledgeBase.addFact("Pitstop.Plan.Tyre.Change", changeTyres)
 	
 		result := knowledgeBase.produce()
 		

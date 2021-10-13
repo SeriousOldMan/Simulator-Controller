@@ -61,6 +61,8 @@ global simulatorDropDown
 global carDropDown
 global trackDropDown
 global weatherDropDown
+global airTemperatureEdit
+global trackTemperatureEdit
 global compoundDropDown
 global dataTypeDropDown
 global dataXDropDown
@@ -338,6 +340,18 @@ class StrategyWorkbench extends ConfigurationItem {
 		}
 		
 		Gui %window%:Add, DropDownList, x90 yp w120 AltSubmit Choose%chosen% gchooseWeather vweatherDropDown, % values2String("|", choices*)
+		
+		airTemperature := this.AirTemperature
+		trackTemperature := this.TrackTemperature
+		
+		Gui %window%:Add, Edit, x215 yp w40 vairTemperatureEdit gupdateTemperatures
+		Gui %window%:Add, UpDown, x242 yp-2 w18 h20, % airTemperature
+		
+		Gui %window%:Add, Edit, x262 yp w40 vtrackTemperatureEdit gupdateTemperatures
+		Gui %window%:Add, UpDown, x289 yp w18 h20, % trackTemperature
+		Gui %window%:Add, Text, x304 yp w90 h23 +0x200, % translate("Air / Track")
+		
+		this.setTemperatures(airTemperature, trackTemperature)
 		
 		Gui %window%:Add, Text, x16 yp+24 w70 h23 +0x200, % translate("Compound")
 		
@@ -835,7 +849,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			html .= ("<tr><td><b>" . translate("Duration:") . "</b></td><td>" . Round(strategy.getSessionDuration() / 60) . A_Space . translate("Minutes") . "</td></tr>")
 		}
 		
-		html .= ("<tr><td><b>" . translate("Weather:") . "</b></td><td>" . translate(strategy.Weather) . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Weather:") . "</b></td><td>" . translate(strategy.Weather) . translate(" (") . strategy.AirTemperature . translate(" / ") . strategy.TrackTemperature . translate(")") . "</td></tr>")
 		html .= "</table>"
 		
 		return html
@@ -1218,6 +1232,11 @@ class StrategyWorkbench extends ConfigurationItem {
 			
 			this.loadCompound(this.SelectedCompound[true], true)
 		}
+	}
+	
+	setTemperatures(airTemperature, trackTemperature) {
+		this.iAirTemperature := airTemperature
+		this.iTrackTemperature := trackTemperature
 	}
 	
 	loadCompound(compound, force := false) {
@@ -1647,6 +1666,13 @@ class StrategyWorkbench extends ConfigurationItem {
 							this.compareStrategies(strategies*)
 					}
 				case 8: ; "Export Strategy..."
+					if this.SelectedStrategy {
+						configuration := newConfiguration()
+						
+						this.SelectedStrategy.saveToConfiguration(configuration)
+						
+						writeConfiguration(kUserConfigDirectory . "Race.strategy", configuration)
+					}
 			}
 		}
 	}
@@ -2076,10 +2102,14 @@ class Strategy extends ConfigurationItem {
 	
 	iName := translate("Unnamed")
 	
+	iWeather := "Dry"
+	iAirTemperature := 23
+	iTrackTemperature := 27
+	
 	iSimulator := false
 	iCar := false
 	iTrack := false
-	iWeather := false
+	
 	
 	iSessionType := "Duration"
 	iSessionLength := 0
@@ -2366,6 +2396,18 @@ class Strategy extends ConfigurationItem {
 		}
 	}
 	
+	AirTemperature[] {
+		Get {
+			return this.iAirTemperature
+		}
+	}
+	
+	TrackTemperature[] {
+		Get {
+			return this.iTrackTemperature
+		}
+	}
+	
 	SessionType[] {
 		Get {
 			return this.iSessionType
@@ -2546,7 +2588,10 @@ class Strategy extends ConfigurationItem {
 			this.iSimulator := strategyWorkbench.SelectedSimulator
 			this.iCar := strategyWorkbench.SelectedCar
 			this.iTrack := strategyWorkbench.SelectedTrack
+			
 			this.iWeather := strategyWorkbench.SelectedWeather
+			this.iAirTemperature := strategyWorkbench.AirTemperature
+			this.iTrackTemperature := strategyWorkbench.TrackTemperature
 			
 			this.iSessionType := strategyWorkbench.SelectedSessionType
 			this.iSessionLength := sessionLengthEdit
@@ -2600,8 +2645,11 @@ class Strategy extends ConfigurationItem {
 		this.iSimulator := getConfigurationValue(configuration, "Session", "Simulator", "Unknown")
 		this.iCar := getConfigurationValue(configuration, "Session", "Car", "Unknown")
 		this.iTrack := getConfigurationValue(configuration, "Session", "Track", "Unknown")
-		this.iWeather := getConfigurationValue(configuration, "Session", "Weather", "Dry")
 	
+		this.iWeather := getConfigurationValue(configuration, "Weather", "Weather", "Dry")
+		this.iAirTemperature := getConfigurationValue(configuration, "Weather", "AirTemperature", 23)
+		this.iTrackTemperature := getConfigurationValue(configuration, "Weather", "TrackTemperature", 27)
+		
 		this.iSessionType := getConfigurationValue(configuration, "Session", "SessionType", "Duration")
 		this.iSessionLength := getConfigurationValue(configuration, "Session", "SessionLength", 0)
 		
@@ -2637,14 +2685,13 @@ class Strategy extends ConfigurationItem {
 		
 		setConfigurationValue(configuration, "General", "Name", this.Name)
 		
-		setConfigurationValue(configuration, "Weather", "Weather", this.StrategyWorkbench.SelectedWeather)
-		setConfigurationValue(configuration, "Weather", "AirTemperature", this.StrategyWorkbench.AirTemperature)
-		setConfigurationValue(configuration, "Weather", "TrackTemperature", this.StrategyWorkbench.TrackTemperature)
+		setConfigurationValue(configuration, "Weather", "Weather", this.Weather)
+		setConfigurationValue(configuration, "Weather", "AirTemperature", this.AirTemperature)
+		setConfigurationValue(configuration, "Weather", "TrackTemperature", this.TrackTemperature)
 		
 		setConfigurationValue(configuration, "Session", "Simulator", this.Simulator)
 		setConfigurationValue(configuration, "Session", "Car", this.Car)
 		setConfigurationValue(configuration, "Session", "Track", this.Track)
-		setConfigurationValue(configuration, "Session", "Weather", this.Weather)
 		
 		setConfigurationValue(configuration, "Session", "SessionType", this.SessionType)
 		setConfigurationValue(configuration, "Session", "SessionLength", this.SessionLength)
@@ -2996,6 +3043,18 @@ chooseWeather() {
 	GuiControlGet weatherDropDown
 	
 	workbench.loadWeather(kWeatherOptions[weatherDropDown])
+}
+
+updateTemperatures() {
+	workbench := StrategyWorkbench.Instance
+	window := workbench.Window
+	
+	Gui %window%:Default
+	
+	GuiControlGet airTemperatureEdit
+	GuiControlGet trackTemperatureEdit
+	
+	workbench.setTemperatures(airTemperatureEdit, trackTemperatureEdit)
 }
 
 chooseCompound() {

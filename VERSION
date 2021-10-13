@@ -1,7 +1,7 @@
 [Development]
 Version=3.6.2-dev
 Target=3.6.2-release
-Date=10/13/2021
+Date=10/14/2021
 Download=
 Changes=Saving and loading of Strategies in "Strategy Workbench", Initializing values in "Strategy Workbench", Comparison of strategies in "Strategy Workbench", Take pitstop rules into account in strategy simulations
 [Release]

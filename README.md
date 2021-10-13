@@ -26,7 +26,9 @@ Simply donwload and run [Simulator Controller.exe](https://cntr.click/Qt9gVs0) (
 
 #### Latest development build
 
-None for the moment...
+[3.6.2-release](https://www.dropbox.com/s/zruloggudxsj93h/Simulator%20Controller%203.6.2-dev.zip?dl=1) (Development build for Release 3.6.2. New features: Saving and loading of Strategies in "Strategy Workbench", Initializing values in "Strategy Workbench", Comparison of strategies in "Strategy Workbench", Take pitstop rules into account in strategy simulations. Stable, with update procedure and documentation.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-362) of this version and all the versions you might have skipped, before installing and using this version.
 
 #### Latest release build
 

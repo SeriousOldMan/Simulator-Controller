@@ -863,8 +863,8 @@ setConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", "Unknow
 setConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", "Unknown" . ".AdjustLapTime", false)
 
 if !GetKeyState("Ctrl") {
-	;AHKUnit.AddTestClass(FuelReporting)
-	;AHKUnit.AddTestClass(DamageReporting)
+	AHKUnit.AddTestClass(FuelReporting)
+	AHKUnit.AddTestClass(DamageReporting)
 	AHKUnit.AddTestClass(DamageAnalysis)
 	AHKUnit.AddTestClass(PitstopHandling)
 

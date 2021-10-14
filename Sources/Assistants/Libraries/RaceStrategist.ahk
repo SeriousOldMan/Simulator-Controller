@@ -678,6 +678,10 @@ class RaceStrategist extends RaceAssistant {
 				this.gapToBehindRecognized(inList(arguments, "Track") ? Array(this.getSpeaker().Fragments["Car"]) : [])
 			case "GapToLeader":
 				this.gapToLeaderRecognized([])
+			case "StrategyOveriew":
+				this.strategyOverviewRecognized([])
+			case "NextPitstop":
+				this.nextPitstopRecognized([])
 		}
 	}
 	

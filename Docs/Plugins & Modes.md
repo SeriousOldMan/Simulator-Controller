@@ -294,6 +294,8 @@ Please see the following table for available information commands.
 | GapToFront [Standings, Track] | Cato will tell you the gap in seconds to the car one position ahead of you or to the car directly in front of you. If you you don't supply *Standings* or *Track*, it will default to *Standings*. |
 | GapToBehind [Standings, Track] | Cato will tell you the gap in seconds to the car one position behind you or to the car directly behind you. If you you don't supply *Standings* or *Track*, it will default to *Standings*. |
 | GapToLeader | Cato will tell you the gap in seconds to the leading car. |
+| StrategyOverview | As the name says, you will get a complete overview of the race strategy, as long as one has been defined in the "Strategy Workbench" and has been exported to be used in this session. |
+| NextPitstop | Cato tells you the lap, where the next pitstop according to the strategy has been planned. |
 
 Note: All these commands are also available in most of the simulation plugins, either in the "Pitstop" mode or in the "Assistant" mode, depending on the configuration parameters.
 

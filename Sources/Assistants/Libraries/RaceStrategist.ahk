@@ -117,6 +117,12 @@ class RaceStrategist extends RaceAssistant {
 				this.gapToLeaderRecognized(words)
 			case "LapTimes":
 				this.lapTimesRecognized(words)
+			case "StrategyOverview":
+				this.strategyOverviewRecognized(words)
+			case "CancelStrategy":
+				this.cancelStrategyRecognized(words)
+			case "NextPitstop":
+				this.nextPitstopRecognized(words)
 			case "PitstopRecommend":
 				this.clearContinuation()
 				
@@ -392,6 +398,18 @@ class RaceStrategist extends RaceAssistant {
 			if (position > 1)
 				this.reportLapTime("LapTimeLeader", driverLapTime, knowledgeBase.getValue("Position.Standings.Leader.Car", 0))
 		}
+	}
+	
+	strategyOverviewRecognized(words) {
+		this.getSpeaker().speakPhrase("Not yet implemented")
+	}
+	
+	cancelStrategyRecognized(words) {
+		this.getSpeaker().speakPhrase("Not yet implemented")
+	}
+	
+	nextPitstopRecognized(words) {
+		this.getSpeaker().speakPhrase("Not yet implemented")
 	}
 	
 	recommendPitstopRecognized(words) {

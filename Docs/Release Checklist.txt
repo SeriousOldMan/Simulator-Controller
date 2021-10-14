@@ -17,6 +17,13 @@ General Release Actions
 13. Update #releases and #anouncements in Discord
 14. Set a Git Tag after final commit
 
+Release 3.6.2 Checklist
+=======================
+
+0. Search for new links (*)
+1. Update Procedure
+   a. Phrase Grammars
+
 Release 3.6.0 Checklist
 =======================
 

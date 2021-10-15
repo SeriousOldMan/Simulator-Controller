@@ -2345,7 +2345,7 @@ class Strategy extends ConfigurationItem {
 			
 			setConfigurationValue(configuration, "Pitstop", "Time." . lap, this.Time)
 			setConfigurationValue(configuration, "Pitstop", "Duration." . lap, this.Duration)
-			setConfigurationValue(configuration, "Pitstop", "RefuelAmount." . lap, this.RefuelAmount)
+			setConfigurationValue(configuration, "Pitstop", "RefuelAmount." . lap, Ceil(this.RefuelAmount))
 			setConfigurationValue(configuration, "Pitstop", "TyreChange." . lap, this.TyreChange)
 			
 			setConfigurationValue(configuration, "Pitstop", "StintLaps." . lap, this.StintLaps)

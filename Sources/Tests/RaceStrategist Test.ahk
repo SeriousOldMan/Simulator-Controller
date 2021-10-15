@@ -308,6 +308,8 @@ else {
 					
 					if isDebug()
 						showMessage("Data " lap . "." . A_Index . " loaded...")
+					
+					MsgBox Continue?
 				}
 				
 				if (A_Index = 1)

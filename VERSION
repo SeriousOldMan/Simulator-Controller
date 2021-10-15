@@ -1,16 +1,16 @@
 [Development]
-Version=3.6.2-rc1
+Version=3.6.2-release
 Target=3.6.2-release
-Date=10/14/2021
-Download=https://www.dropbox.com/s/66lbt4gqvhupvgo/Simulator%20Controller%203.6.2-rc1.zip?dl=1
+Date=10/15/2021
+Download=https://cntr.click/8PF4MkD
 Changes=Saving and loading of Strategies in "Strategy Workbench", Initializing values in "Strategy Workbench", Comparison of strategies in "Strategy Workbench", Take pitstop rules into account in strategy simulations
 [Release]
-Version=3.6.0-release
-Date=10/08/2021
-Download=https://cntr.click/b6VRZLm
-Changes=Initial version of strategy simulation in "Strategy Workbench"
+Version=3.6.2-release
+Date=10/15/2021
+Download=https://cntr.click/8PF4MkD
+Changes=Saving and loading of Strategies in "Strategy Workbench", Initializing values in "Strategy Workbench", Comparison of strategies in "Strategy Workbench", Take pitstop rules into account in strategy simulations
 [Current]
-Type=Development
+Type=Release
 [Version]
-Release=3.6.0-release
-Development=3.6.2-rc1
+Release=3.6.2-release
+Development=3.6.2-release

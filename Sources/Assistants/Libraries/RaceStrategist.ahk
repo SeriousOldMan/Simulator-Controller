@@ -26,7 +26,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 class RaceStrategist extends RaceAssistant {
-	iRaceStrategy := false
+	iStrategy := false
 	
 	iSaveTelemetry := kAlways
 	iSaveRaceReport := false
@@ -34,9 +34,9 @@ class RaceStrategist extends RaceAssistant {
 	iSessionReportsDatabase := false
 	iSessionDataActive := false
 	
-	RaceStrategy[] {
+	Strategy[] {
 		Get {
-			return this.iRaceStrategy
+			return this.iStrategy
 		}
 	}
 	
@@ -79,6 +79,13 @@ class RaceStrategist extends RaceAssistant {
 		
 		if values.HasKey("SaveRaceReport")
 			this.iSaveRaceReport := values["SaveRaceReport"]
+	}
+	
+	updateSessionValues(values) {
+		base.updateSessionValues(values)
+		
+		if values.HasKey("Strategy")
+			this.iStrategy := values["Strategy"]
 	}
 	
 	hasEnoughData(inform := true) {
@@ -429,9 +436,72 @@ class RaceStrategist extends RaceAssistant {
 		
 		this.recommendPitstop(lap)
 	}
+	
+	createStrategy(facts, strategy) {
+		facts["Strategy.Name"] := getConfigurationValue(strategy, "General", "Name")
+		
+		facts["Strategy.Weather"] := getConfigurationValue(strategy, "Weather", "Weather")
+		facts["Strategy.Weather.Temperature.Air"] := getConfigurationValue(strategy, "Weather", "AirTemperature")
+		facts["Strategy.Weather.Temperature.Track"] := getConfigurationValue(strategy, "Weather", "TrackTemperature")
+		
+		facts["Strategy.Tyre.Compound"] := getConfigurationValue(strategy, "Setup", "TyreCompound")
+		facts["Strategy.Tyre.Compound.Color"] := getConfigurationValue(strategy, "Setup", "TyreCompoundColor")
+		
+		facts["Strategy.Map"] := getConfigurationValue(strategy, "Setup", "Map")
+		facts["Strategy.TC"] := getConfigurationValue(strategy, "Setup", "TC")
+		facts["Strategy.ABS"] := getConfigurationValue(strategy, "Setup", "ABS")
+		
+		for ignore, pitstopLap in string2Values(", ", getConfigurationValue(strategy, "Strategy", "Pitstops")) {
+			facts["Strategy.Pitstop." . A_Index . ".Lap"] := pitstopLap
+			facts["Strategy.Pitstop." . A_Index . ".Fuel.Amount"] := getConfigurationValue(strategy, "Pitstop", "RefuelAmount." . pitstopLap)
+			facts["Strategy.Pitstop." . A_Index . ".Tyre.Change"] := getConfigurationValue(strategy, "Pitstop", "TyreChange." . pitstopLap)
+			
+			facts["Strategy.Pitstop." . A_Index . ".Map"] := getConfigurationValue(strategy, "Pitstop", "Map." . pitstopLap, "n/a")
+			facts["Strategy.Pitstop." . A_Index . ".TC"] := getConfigurationValue(strategy, "Pitstop", "TC." . pitstopLap, "n/a")
+			facts["Strategy.Pitstop." . A_Index . ".ABS"] := getConfigurationValue(strategy, "Setup", "ABS." . pitstopLap, "n/a")
+		}
+			
+		this.updateSessionValues({Strategy: strategy})
+	}
 				
 	createSession(data) {
 		local facts := base.createSession(data)
+		
+		simulatorName := this.SetupDatabase.getSimulatorName(facts["Session.Simulator"])
+		
+		if ((this.Session == kSessionRace) && FileExist(kUserConfigDirectory . "Race.strategy")) {
+			strategy := readConfiguration(kUserConfigDirectory . "Race.strategy")
+			
+			applicableStrategy := false
+			
+			simulator := getConfigurationValue(strategy, "Session", "Simulator")
+			car := getConfigurationValue(strategy, "Session", "Car")
+			track := getConfigurationValue(strategy, "Session", "Track")
+			
+			if ((simulator = simulatorName) && (car = facts["Session.Car"]) && (track = facts["Session.Track"]))
+				applicableStrategy := true
+				
+			if applicableStrategy {
+				sessionType := getConfigurationValue(strategy, "Session", "SessionType")
+				sessionLength := getConfigurationValue(strategy, "Session", "SessionLength")
+		
+				if ((sessionType = "Duration") && (facts["Session.Format"] = "Time")) {
+					duration := (facts["Session.Duration"] / 60)
+					
+					if ((Abs(sessionLength - duration) / duration) >  0.05)
+						applicableStrategy := false
+				}
+				else if ((sessionType = "Laps") && (facts["Session.Format"] = "Lap")) {
+					laps := facts["Session.Laps"]
+					
+					if ((Abs(sessionLength - laps) / laps) >  0.05)
+						applicableStrategy := false
+				}
+				
+				if applicableStrategy
+					this.createStrategy(facts, strategy)
+			}
+		}
 		
 		configuration := this.Configuration
 		settings := this.Settings
@@ -510,6 +580,22 @@ class RaceStrategist extends RaceAssistant {
 			this.dumpKnowledge(this.KnowledgeBase)
 	}
 	
+	addLap(lapNumber, data) {
+		local knowledgeBase
+		
+		result := base.addLap(lapNumber, data)
+		
+		knowledgeBase := this.KnowledgeBase
+		
+		if (this.hasEnoughData(false) && this.Strategy && this.Speaker && this.Listener ) {
+			this.getSpeaker().speakPhrase("ReportStrategy")
+			
+			this.setContinuation(ObjBindMethod(this, "reportStrategy"))
+		}
+		
+		return result
+	}
+	
 	finishSession() {
 		local knowledgeBase := this.KnowledgeBase
 		
@@ -553,7 +639,7 @@ class RaceStrategist extends RaceAssistant {
 		}
 		
 		this.updateDynamicValues({OverallTime: 0, BestLapTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
-		this.updateSessionValues({Simulator: "", Session: kSessionFinished, SessionTime: false})
+		this.updateSessionValues({Simulator: "", Session: kSessionFinished, Strategy: false, SessionTime: false})
 	}
 	
 	forceFinishSession() {

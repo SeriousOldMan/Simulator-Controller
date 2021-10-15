@@ -460,7 +460,7 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 	
-	createSession(ByRef data) {
+	createSession(data) {
 		local facts
 		
 		configuration := this.Configuration
@@ -486,22 +486,27 @@ class RaceAssistant extends ConfigurationItem {
 		lapTime := getConfigurationValue(data, "Stint Data", "LapLastTime", 0)
 		
 		if this.AdjustLapTime {
-			settingsLapTime := (getConfigurationValue(settings, "Session Settings", "Lap.AvgTime", lapTime / 1000) * 1000)
+			settingsLapTime := (getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.AvgTime", lapTime / 1000) * 1000)
 			
 			if ((lapTime / settingsLapTime) > 1.2)
 				lapTime := settingsLapTime
 		}
 		
 		sessionFormat := getConfigurationValue(data, "Session Data", "SessionFormat", "Time")
-		sessionTimeRemaining := getConfigurationValue(data, "Session Data", "SessionTimeRemaining", 0)
-		sessionLapsRemaining := getConfigurationValue(data, "Session Data", "SessionLapsRemaining", 0)
+		sessionTimeRemaining := getDeprecatedConfigurationValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0)
+		sessionLapsRemaining := getDeprecatedConfigurationValue(data, "Session Data", "Stint Data", "SessionLapsRemaining", 0)
 		
 		dataDuration := Round((sessionTimeRemaining + lapTime) / 1000)
 		
-		if (sessionFormat = "Time")
+		if (sessionFormat = "Time") {
 			duration := dataDuration
+			
+			laps := Round((dataDuration * 1000) / lapTime)
+		}
 		else {
-			settingsDuration := getConfigurationValue(settings, "Session Settings", "Duration", dataDuration)
+			laps := (sessionLapsRemaining + 1)
+		
+			settingsDuration := getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Duration", dataDuration)
 			
 			if ((Abs(settingsDuration - dataDuration) / dataDuration) >  0.05)
 				duration := dataDuration
@@ -513,6 +518,7 @@ class RaceAssistant extends ConfigurationItem {
 				, "Session.Car": getConfigurationValue(data, "Session Data", "Car", "")
 				, "Session.Track": getConfigurationValue(data, "Session Data", "Track", "")
 				, "Session.Duration": duration
+				, "Session.Laps": laps
 				, "Session.Format": sessionFormat
 				, "Session.Time.Remaining": sessionTimeRemaining
 				, "Session.Lap.Remaining": sessionLapsRemaining

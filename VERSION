@@ -1,9 +1,9 @@
 [Development]
-Version=3.6.2-dev
-Target=3.6.2-release
-Date=10/13/2021
+Version=3.6.4-dev
+Target=3.6.4-release
+Date=10/14/2021
 Download=
-Changes=Saving and loading of Strategies in "Strategy Workbench", Initializing values in "Strategy Workbench", Comparison of strategies in "Strategy Workbench", Take pitstop rules into account in strategy simulations
+Changes=New action "StrategyCancel" for "Race Strategist" and all simulator plugins, New "InformationRequest" commands "StrategyOverview" and "NextPitstop" for "Race Strategist" and all simulator plugins
 [Release]
 Version=3.6.0-release
 Date=10/08/2021
@@ -13,4 +13,4 @@ Changes=Initial version of strategy simulation in "Strategy Workbench"
 Type=Development
 [Version]
 Release=3.6.0-release
-Development=3.6.2-dev
+Development=3.6.4-dev

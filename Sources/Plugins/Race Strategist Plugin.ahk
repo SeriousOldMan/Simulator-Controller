@@ -32,12 +32,18 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		recommendPitstop(arguments*) {
 			this.callRemote("callRecommendPitstop", arguments*)
 		}
+		
+		cancelStrategy(arguments*) {
+			this.callRemote("cancelStrategy", arguments*)
+		}
 	}
 
 	class RaceStrategistAction extends RaceAssistantPlugin.RaceAssistantAction {
 		fireAction(function, trigger) {
 			if (this.Plugin.RaceAssistant && (this.Action = "PitstopRecommend"))
 				this.Plugin.recommendPitstop()
+			else if (this.Plugin.RaceAssistant && (this.Action = "StrategyCancel"))
+				this.Plugin.cancelStrategy()
 			else
 				base.fireAction(function, trigger)
 		}
@@ -61,7 +67,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	createRaceAssistantAction(controller, action, actionFunction, arguments*) {
 		local function
 		
-		if inList(["PitstopRecommend"], action) {
+		if inList(["PitstopRecommend", "StrategyCancel"], action) {
 			function := controller.findFunction(actionFunction)
 			
 			if (function != false)
@@ -90,6 +96,11 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	recommendPitstop(lapNumber := false) {
 		if this.RaceStrategist
 			this.RaceStrategist.recommendPitstop(lapNumber)
+	}
+	
+	cancelStrategy() {
+		if this.RaceStrategist
+			this.RaceStrategist.cancelStrategy()
 	}
 	
 	sessionActive(sessionState) {

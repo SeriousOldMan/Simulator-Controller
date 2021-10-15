@@ -119,7 +119,7 @@ class RaceStrategist extends RaceAssistant {
 				this.lapTimesRecognized(words)
 			case "StrategyOverview":
 				this.strategyOverviewRecognized(words)
-			case "CancelStrategy":
+			case "StrategyCancel":
 				this.cancelStrategyRecognized(words)
 			case "NextPitstop":
 				this.nextPitstopRecognized(words)
@@ -717,6 +717,9 @@ class RaceStrategist extends RaceAssistant {
 				this.setContinuation(ObjBindMethod(this, "planPitstop", plannedLap))
 			}
 		}
+	}
+	
+	cancelStrategy() {
 	}
 	
 	planPitstop(plannedLap := false) {

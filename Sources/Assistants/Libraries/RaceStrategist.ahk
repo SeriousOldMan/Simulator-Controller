@@ -26,7 +26,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 class RaceStrategist extends RaceAssistant {
-	iSessionTime := false
+	iRaceStrategy := false
 	
 	iSaveTelemetry := kAlways
 	iSaveRaceReport := false
@@ -34,9 +34,9 @@ class RaceStrategist extends RaceAssistant {
 	iSessionReportsDatabase := false
 	iSessionDataActive := false
 	
-	SessionTime[] {
+	RaceStrategy[] {
 		Get {
-			return this.iSessionTime
+			return this.iRaceStrategy
 		}
 	}
 	
@@ -79,13 +79,6 @@ class RaceStrategist extends RaceAssistant {
 		
 		if values.HasKey("SaveRaceReport")
 			this.iSaveRaceReport := values["SaveRaceReport"]
-	}
-	
-	updateSessionValues(values) {
-		base.updateSessionValues(values)
-		
-		if values.HasKey("SessionTime")
-			this.iSessionTime := values["SessionTime"]
 	}
 	
 	hasEnoughData(inform := true) {
@@ -436,72 +429,23 @@ class RaceStrategist extends RaceAssistant {
 		
 		this.recommendPitstop(lap)
 	}
-	
+				
 	createSession(data) {
-		local facts
+		local facts := base.createSession(data)
 		
 		configuration := this.Configuration
 		settings := this.Settings
 		
-		simulator := getConfigurationValue(data, "Session Data", "Simulator", "Unknown")
-		simulatorName := this.SetupDatabase.getSimulatorName(simulator)
-		
-		switch getConfigurationValue(data, "Session Data", "Session", "Practice") {
-			case "Practice":
-				session := kSessionPractice
-			case "Qualification":
-				session := kSessionQualification
-			case "Race":
-				session := kSessionRace
-			default:
-				session := kSessionOther
-		}
-		
-		this.updateSessionValues({Simulator: simulatorName, Session: session, SessionTime: A_Now
-								, Driver: getConfigurationValue(data, "Stint Data", "DriverForname", this.DriverName)})
-		
-		lapTime := getConfigurationValue(data, "Stint Data", "LapLastTime", 0)
-		
-		sessionFormat := getConfigurationValue(data, "Session Data", "SessionFormat", "Time")
-		sessionTimeRemaining := getConfigurationValue(data, "Session Data", "SessionTimeRemaining", 0)
-		sessionLapsRemaining := getConfigurationValue(data, "Session Data", "SessionLapsRemaining", 0)
-		
-		dataDuration := Round((sessionTimeRemaining + lapTime) / 1000)
-		
-		if (sessionFormat = "Time")
-			duration := dataDuration
-		else {
-			settingsDuration := getConfigurationValue(settings, "Session Settings", "Duration", dataDuration)
-			
-			if ((Abs(settingsDuration - dataDuration) / dataDuration) >  0.05)
-				duration := dataDuration
-			else
-				duration := settingsDuration
-		}
-		
-		facts := {"Session.Simulator": simulator
-				, "Session.Car": getConfigurationValue(data, "Session Data", "Car", "")
-				, "Session.Track": getConfigurationValue(data, "Session Data", "Track", "")
-				, "Session.Duration": duration
-				, "Session.Format": sessionFormat
-				, "Session.Time.Remaining": sessionTimeRemaining
-				, "Session.Lap.Remaining": sessionLapsRemaining
-				, "Session.Settings.Lap.Formation": getConfigurationValue(settings, "Session Settings", "Lap.Formation", true)
-				, "Session.Settings.Lap.PostRace": getConfigurationValue(settings, "Session Settings", "Lap.PostRace", true)
-				, "Session.Settings.Fuel.Max": getConfigurationValue(data, "Session Data", "FuelAmount", 0)
-				, "Session.Settings.Fuel.AvgConsumption": getConfigurationValue(settings, "Session Settings", "Fuel.AvgConsumption", 0)
-				, "Session.Settings.Pitstop.Delta": getConfigurationValue(settings, "Strategy Settings", "Pitstop.Delta", getConfigurationValue(settings, "Session Settings", "Pitstop.Delta", 30))
-				, "Session.Settings.Fuel.SafetyMargin": getConfigurationValue(settings, "Session Settings", "Fuel.SafetyMargin", 5)
-				, "Session.Settings.Lap.AvgTime": getConfigurationValue(settings, "Session Settings", "Lap.AvgTime", 0)
-				, "Session.Settings.Lap.Learning.Laps": getConfigurationValue(configuration, "Race Strategist Analysis", simulatorName . ".LearningLaps", 1)
-				, "Session.Settings.Lap.History.Considered": getConfigurationValue(configuration, "Race Strategist Analysis", simulatorName . ".ConsideredHistoryLaps", 5)
-				, "Session.Settings.Lap.History.Damping": getConfigurationValue(configuration, "Race Strategist Analysis", simulatorName . ".HistoryLapsDamping", 0.2)
-				, "Session.Settings.Standings.Extrapolation.Laps": getConfigurationValue(settings, "Strategy Settings", "Extrapolation.Laps", 2)
-				, "Session.Settings.Standings.Extrapolation.Overtake.Delta": Round(getConfigurationValue(settings, "Strategy Settings", "Overtake.Delta", 1) * 1000)
-				, "Session.Settings.Strategy.Traffic.Considered": getConfigurationValue(settings, "Strategy Settings", "Traffic.Considered", 5) / 100
-				, "Session.Settings.Pitstop.Service.Refuel": getConfigurationValue(settings, "Strategy Settings", "Service.Refuel", 1.5)
-				, "Session.Settings.Pitstop.Service.Tyres": getConfigurationValue(settings, "Strategy Settings", "Service.Tyres", 30)
-				, "Session.Settings.Pitstop.Strategy.Window.Considered": getConfigurationValue(settings, "Strategy Settings", "Strategy.Window.Considered", 2)}
+		facts["Session.Settings.Pitstop.Delta"] := getConfigurationValue(settings, "Strategy Settings", "Pitstop.Delta", getConfigurationValue(settings, "Session Settings", "Pitstop.Delta", 30))
+		facts["Session.Settings.Lap.Learning.Laps"] := getConfigurationValue(configuration, "Race Strategist Analysis", simulatorName . ".LearningLaps", 1)
+		facts["Session.Settings.Lap.History.Considered"] := getConfigurationValue(configuration, "Race Strategist Analysis", simulatorName . ".ConsideredHistoryLaps", 5)
+		facts["Session.Settings.Lap.History.Damping"] := getConfigurationValue(configuration, "Race Strategist Analysis", simulatorName . ".HistoryLapsDamping", 0.2)
+		facts["Session.Settings.Standings.Extrapolation.Laps"] := getConfigurationValue(settings, "Strategy Settings", "Extrapolation.Laps", 2)
+		facts["Session.Settings.Standings.Extrapolation.Overtake.Delta"] := Round(getConfigurationValue(settings, "Strategy Settings", "Overtake.Delta", 1) * 1000)
+		facts["Session.Settings.Strategy.Traffic.Considered"] := getConfigurationValue(settings, "Strategy Settings", "Traffic.Considered", 5) / 100
+		facts["Session.Settings.Pitstop.Service.Refuel"] := getConfigurationValue(settings, "Strategy Settings", "Service.Refuel", 1.5)
+		facts["Session.Settings.Pitstop.Service.Tyres"] := getConfigurationValue(settings, "Strategy Settings", "Service.Tyres", 30)
+		facts["Session.Settings.Pitstop.Strategy.Window.Considered"] := getConfigurationValue(settings, "Strategy Settings", "Strategy.Window.Considered", 2)
 				
 		return facts
 	}
@@ -514,20 +458,7 @@ class RaceStrategist extends RaceAssistant {
 			if !IsObject(settings)
 				settings := readConfiguration(settings)
 			
-			this.updateConfigurationValues({Settings: settings})
-			
-			configuration := this.Configuration
-			simulatorName := this.Simulator
-		
-			facts := {"Session.Settings.Lap.Formation": getConfigurationValue(settings, "Session Settings", "Lap.Formation", true)
-					, "Session.Settings.Lap.PostRace": getConfigurationValue(settings, "Session Settings", "Lap.PostRace", true)
-					, "Session.Settings.Fuel.AvgConsumption": getConfigurationValue(settings, "Session Settings", "Fuel.AvgConsumption", 0)
-					, "Session.Settings.Pitstop.Delta": getConfigurationValue(settings, "Strategy Settings", "Pitstop.Delta", getConfigurationValue(settings, "Session Settings", "Pitstop.Delta", 30))
-					, "Session.Settings.Lap.AvgTime": getConfigurationValue(settings, "Session Settings", "Lap.AvgTime", 0)
-					, "Session.Settings.Fuel.SafetyMargin": getConfigurationValue(settings, "Session Settings", "Fuel.SafetyMargin", 5)
-					, "Session.Settings.Lap.Learning.Laps": getConfigurationValue(configuration, "Race Strategist Analysis", simulatorName . ".LearningLaps", 1)
-					, "Session.Settings.Lap.History.Considered": getConfigurationValue(configuration, "Race Strategist Analysis", simulatorName . ".ConsideredHistoryLaps", 5)
-					, "Session.Settings.Lap.History.Damping": getConfigurationValue(configuration, "Race Strategist Analysis", simulatorName . ".HistoryLapsDamping", 0.2)
+			facts := {"Session.Settings.Pitstop.Delta": getConfigurationValue(settings, "Strategy Settings", "Pitstop.Delta", getConfigurationValue(settings, "Session Settings", "Pitstop.Delta", 30))
 					, "Session.Settings.Standings.Extrapolation.Laps": getConfigurationValue(settings, "Strategy Settings", "Extrapolation.Laps", 2)
 					, "Session.Settings.Standings.Extrapolation.Overtake.Delta": Round(getConfigurationValue(settings, "Strategy Settings", "Overtake.Delta", 1) * 1000)
 					, "Session.Settings.Strategy.Traffic.Considered": getConfigurationValue(settings, "Strategy Settings", "Traffic.Considered", 5) / 100
@@ -538,8 +469,7 @@ class RaceStrategist extends RaceAssistant {
 			for key, value in facts
 				knowledgeBase.setValue(key, value)
 			
-			if this.Debug[kDebugKnowledgeBase]
-				this.dumpKnowledge(knowledgeBase)
+			base.updateSession(settings)
 		}
 	}
 	

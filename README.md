@@ -33,15 +33,15 @@ None for the moment...
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[3.6.0-release](https://cntr.click/b6VRZLm) (New features: Initial version of strategy simulation in "Strategy Workbench".)
+[3.6.2-release](https://cntr.click/8PF4MkD) (New features: Saving and loading of Strategies in "Strategy Workbench", Initializing values in "Strategy Workbench", Comparison of strategies in "Strategy Workbench", Take pitstop rules into account in strategy simulations.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-360) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-362) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[3.5.9-release](https://cntr.click/Hq9ytpX) (New features: Renamed "Setup Database" to "Database", New "Strategy Workbench" tool, "Race Strategist" can now save race statistics for the "Strategy Workbench", New plugin parameter "openStrategyWorkbench" for "Race Strategist" plugin, New "openStrategyWorkbench" action function, Fixed "Setup Wizard" to correctly generate "Pedal Calibration" configuration, New lightweight Database Library for Developers. *Release 3.5.9 is a maintenance release for 3.5.8*)
+[3.6.0-release](https://cntr.click/b6VRZLm) (New features: Initial version of strategy simulation in "Strategy Workbench".)
 
-[3.5.6-release](https://cntr.click/bQ43tSc) (New features: New Reports in Race Reports tool, Improved "Pace" report including median and quartile calculation, New "Call" command for Race Assistants, Better handling of multiple voice dialog partners when not using Push-to-Talk, Usability improvements, incl. improved report selection for the "Race Reports" tool, Optimized language handling for Windows SAPI voices)
+[3.5.9-release](https://cntr.click/Hq9ytpX) (New features: Renamed "Setup Database" to "Database", New "Strategy Workbench" tool, "Race Strategist" can now save race statistics for the "Strategy Workbench", New plugin parameter "openStrategyWorkbench" for "Race Strategist" plugin, New "openStrategyWorkbench" action function, Fixed "Setup Wizard" to correctly generate "Pedal Calibration" configuration, New lightweight Database Library for Developers. *Release 3.5.9 is a maintenance release for 3.5.8*)
 
 ### Discord Community
 

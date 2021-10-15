@@ -119,7 +119,7 @@ class RaceStrategist extends RaceAssistant {
 				this.lapTimesRecognized(words)
 			case "StrategyOverview":
 				this.strategyOverviewRecognized(words)
-			case "StrategyCancel":
+			case "CancelStrategy":
 				this.cancelStrategyRecognized(words)
 			case "NextPitstop":
 				this.nextPitstopRecognized(words)
@@ -405,11 +405,11 @@ class RaceStrategist extends RaceAssistant {
 	}
 	
 	cancelStrategyRecognized(words) {
-		this.getSpeaker().speakPhrase("Not yet implemented")
+		this.cancelStrategy()
 	}
 	
 	nextPitstopRecognized(words) {
-		this.getSpeaker().speakPhrase("Not yet implemented")
+		this.reportStrategy({NextPitstop: true})
 	}
 	
 	recommendPitstopRecognized(words) {
@@ -710,7 +710,7 @@ class RaceStrategist extends RaceAssistant {
 		}
 	}
 	
-	reportStrategy() {
+	reportStrategy(options := true) {
 		local knowledgeBase := this.KnowledgeBase
 		
 		if this.Speaker {
@@ -718,11 +718,13 @@ class RaceStrategist extends RaceAssistant {
 			speaker := this.getSpeaker()
 			
 			if strategyName {
-				speaker.speakPhrase("Strategy")
+				if ((options == true) || options.Strategy)
+					speaker.speakPhrase("Strategy")
 				
 				numPitstops := knowledgeBase.getValue("Strategy.Pitstop.Count")
-				
-				speaker.speakPhrase("Pitstops", {pitstops: numPitstops})
+					
+				if ((options == true) || options.Pitstops)
+					speaker.speakPhrase("Pitstops", {pitstops: numPitstops})
 				
 				nextPitstop := knowledgeBase.getValue("Strategy.Pitstop.Next", false)
 				
@@ -731,24 +733,54 @@ class RaceStrategist extends RaceAssistant {
 					refuel := Round(knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Fuel.Amount"))
 					tyreChange := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Change")
 					
-					speaker.speakPhrase("NextPitstop", {pitstopLap: lap})
-					speaker.speakPhrase((refuel > 0) ? "Refuel" : "NoRefuel", {refuel: refuel})
-					speaker.speakPhrase(tyreChange ? "TyreChange" : "NoTyreChange")
+					if ((options == true) || options.NextPitstop)
+						speaker.speakPhrase("NextPitstop", {pitstopLap: lap})
+					
+					if ((options == true) || options.Refuel)
+						speaker.speakPhrase((refuel > 0) ? "Refuel" : "NoRefuel", {refuel: refuel})
+					
+					if ((options == true) || options.TyreChange)
+						speaker.speakPhrase(tyreChange ? "TyreChange" : "NoTyreChange")
 				}
-				else
+				else if ((options == true) || options.NextPitstop || options.Refuel || options.TyreChange)
 					speaker.speakPhrase("NoNextPitstop")
 		
-				map := knowledgeBase.getValue("Strategy.Map")
+				if ((options == true) || options.Map) {
+					map := knowledgeBase.getValue("Strategy.Map")
 				
-				if (map != "n/a")
-					speaker.speakPhrase("StrategyMap", {map: map})
+					if (map != "n/a")
+						speaker.speakPhrase("StrategyMap", {map: map})
+				}
 			}
 			else
 				speaker.speakPhrase("NoStrategy")
 		}
 	}
 	
-	cancelStrategy() {
+	cancelStrategy(confirm := true) {
+		local knowledgeBase := this.KnowledgeBase
+		local fact
+		
+		if (this.Speaker && this.Listener && confirm) {
+			this.getSpeaker().speakPhrase("ConfirmCancelStrategy", false, true)
+					
+			this.setContinuation(ObjBindMethod(this, "cancelStrategy", false))
+			
+			return
+		}
+		
+		pitstops := knowledgeBase.getValue("Strategy.Pitstop.Count", 0)
+		
+		for ignore, fact in ["Name", "Weather", "Weather.Temperature.Air", "Weather.Temperature.Track"
+						   , "Tyre.Compound", "Tyre.Compound.Color", "Map", "TC", "ABS", "Pitstop.Count"]
+			knowledgeBase.clearFact("Strategy." . fact)
+		
+		Loop %pitstops%
+			for ignore, fact in ["Fuel.Amount", "Tyre.Change", "Map", "TC", "ABS"]
+				knowledgeBase.clearFact("Strategy.Pitstop." . A_Index .  "." . fact)
+		
+		if this.Speaker
+			this.getSpeaker().speakPhrase("StrategyCanceled")
 	}
 	
 	recommendPitstop(lap := false) {

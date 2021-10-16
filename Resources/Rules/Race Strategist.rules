@@ -516,9 +516,12 @@ updatePitWarningLap(?pitstopLap, ?warningLaps) <= ?warningLap = ?pitstopLap - ?w
 [?Pitstop.Lap] => (Prove: pitstopPerformed(?Pitstop.Lap))
 
 pitstopPerformed(?) <= unbound?(!Strategy.Pitstop.Next), !, fail
-pitstopPerformed(?pitstopLap) <= validPitstopLap(?pitstopLap), ?nextPitstop = !Strategy.Pitstop.Next + 1,										\
-								 Get(Strategy.Pitstop, ?nextPitstop, Lap, ?nextPitstopLap), !,													\
+pitstopPerformed(?pitstopLap) <= validPitstopLap(?pitstopLap), !Strategy.Pitstop.Next < !Strategy.Pitstop.Count, !								\
+								 ?nextPitstop = !Strategy.Pitstop.Next + 1, Get(Strategy.Pitstop, ?nextPitstop, Lap, ?nextPitstopLap),			\
 								 Set(Strategy.Pitstop.Next, ?nextPitstop), Set(Strategy.Pitstop.Lap, ?nextPitstopLap)
+pitstopPerformed(?pitstopLap) <= validPitstopLap(?pitstopLap), !Strategy.Pitstop.Next = !Strategy.Pitstop.Count,								\
+								 Clear(Strategy.Pitstop.Next), Clear(Strategy.Pitstop.Lap)
+pitstopPerformed(?pitstopLap) <= ?pitstopLap < !Strategy.Pitstop.Lap, !
 pitstopPerformed(?pitstopLap) <= Clear(Strategy.Pitstop.Next), Clear(Strategy.Pitstop.Lap)
 
 validPitstopLap(?pitstopLap) <= ?diff = !Strategy.Pitstop.Lap - ?pitstopLap, abs(?diff, ?absDiff), ?rel = ?absDiff / ?pitstopLap, ?rel < 0.1

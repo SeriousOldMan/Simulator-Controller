@@ -755,7 +755,7 @@ class RaceStrategist extends RaceAssistant {
 				if ((options == true) || options.Map) {
 					map := knowledgeBase.getValue("Strategy.Map")
 				
-					if (map != "n/a")
+					if ((map != "n/a") && (map != knowledgeBase.getValue("Lap." . knowledgeBase.getValue("Lap") . ".Map", "n/a")))
 						speaker.speakPhrase("StrategyMap", {map: map})
 				}
 			}
@@ -864,7 +864,7 @@ class RaceStrategist extends RaceAssistant {
 		if (nextPitstop && (nextPitstop != knowledgeBase.getValue("Strategy.Pitstop.Next", false))) {
 			map := knowledgeBase.getValue("Strategy.Pitstop.", nextPitstop, ".Map", "n/a")
 			
-			if (map != "n/a")
+			if ((map != "n/a") && (map != knowledgeBase.getValue("Lap." . knowledgeBase.getValue("Lap") . ".Map", "n/a")))
 				this.getSpeaker().speakPhrase("StintMap", {map: map})
 		}
 		

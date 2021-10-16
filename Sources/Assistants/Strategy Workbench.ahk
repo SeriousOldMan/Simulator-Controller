@@ -416,7 +416,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		Gui %window%:Add, DropDownList, x405 yp w180 AltSubmit Choose1 +0x200 VsimulationMenuDropDown gsimulationMenu, % values2String("|", map(["Simulation", "---------------------------------------------", "Set Target Stint Length...", "Set Target Fuel Consumption...", "Set Target Tyre Usage...", "---------------------------------------------", "Run Simulation", "---------------------------------------------", "Use as Strategy..."], "translate")*)
 		
-		Gui %window%:Add, DropDownList, x590 yp w180 AltSubmit Choose1 +0x200 VstrategyMenuDropDown gstrategyMenu, % values2String("|", map(["Strategy", "---------------------------------------------", "Load Strategy...", "Save Strategy...", "---------------------------------------------", "Compare Strategies...", "---------------------------------------------", "Export Strategy..."], "translate")*)
+		Gui %window%:Add, DropDownList, x590 yp w180 AltSubmit Choose1 +0x200 VstrategyMenuDropDown gstrategyMenu, % values2String("|", map(["Strategy", "---------------------------------------------", "Load Strategy...", "Save Strategy...", "---------------------------------------------", "Compare Strategies...", "---------------------------------------------", "Set as Race Strategy", "Clear Race Strategy"], "translate")*)
 		
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
@@ -1673,6 +1673,13 @@ class StrategyWorkbench extends ConfigurationItem {
 						this.SelectedStrategy.saveToConfiguration(configuration)
 						
 						writeConfiguration(kUserConfigDirectory . "Race.strategy", configuration)
+					}
+				case 9: ; "Export Strategy..."
+					try {
+						FileDelete %kUserConfigDirectory%Race.strategy
+					}
+					catch exception {
+						; ignore
 					}
 			}
 		}

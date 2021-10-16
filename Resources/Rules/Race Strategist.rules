@@ -513,10 +513,10 @@ updatePitWarningLap(?pitstopLap, ?warningLaps) <= ?warningLap = ?pitstopLap - ?w
 
 [?Lap = ?Srategy.Pitstop.Lap.Warning] => (Call: reportUpcomingPitstop(!Strategy.Pitstop.Lap))
 
-[?Pitstop.Lap] => (Prove: updatePitstopLap(?Pitstop.Lap))
+[?Pitstop.Lap] => (Prove: pitstopPerformed(?Pitstop.Lap))
 
-updatePitstopLap(?) <= unbound?(!Strategy.Pitstop.Next), !, fail
-updatePitstopLap(?pitstopLap) <= validPitstopLap(?pitstopLap), ?nextPitstop = !Strategy.Pitstop.Next + 1,										\
+pitstopPerformed(?) <= unbound?(!Strategy.Pitstop.Next), !, fail
+pitstopPerformed(?pitstopLap) <= validPitstopLap(?pitstopLap), ?nextPitstop = !Strategy.Pitstop.Next + 1,										\
 								 Get(Strategy.Pitstop, ?nextPitstop, Lap, ?nextPitstopLap),														\
 								 Set(Strategy.Pitstop.Next, ?nextPitstop), Set(Strategy.Pitstop.Lap, ?nextPitstopLap)
 

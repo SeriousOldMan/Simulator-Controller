@@ -592,12 +592,19 @@ class RaceStrategist extends RaceAssistant {
 	addLap(lapNumber, data) {
 		local knowledgeBase
 		
+		static strategyReported := 0
+		
+		if (lapNumber <= strategyReported)
+			strategyReported := false
+		
 		result := base.addLap(lapNumber, data)
 		
 		knowledgeBase := this.KnowledgeBase
 		
-		if (this.hasEnoughData(false) && this.Strategy && this.Speaker && this.Listener ) {
+		if (!strategyReported && this.hasEnoughData(false) && this.Strategy && this.Speaker && this.Listener) {
 			this.getSpeaker().speakPhrase("ReportStrategy")
+	
+			strategyReported := lapNumber
 			
 			this.setContinuation(ObjBindMethod(this, "reportStrategy"))
 		}
@@ -818,7 +825,7 @@ class RaceStrategist extends RaceAssistant {
 		}
 	}
 	
-	planPitstop(plannedLap := false) {
+	planPitstop(plannedLap := false, refuel := "__Undefined__", tyreChange := "__Undefined__") {
 		sendMessage()
 		
 		Loop 10
@@ -827,8 +834,12 @@ class RaceStrategist extends RaceAssistant {
 		Process Exist, Race Engineer.exe
 		
 		if ErrorLevel
-			if plannedLap
-				raiseEvent(kFileMessage, "Engineer", "planPitstop:" . plannedLap, ErrorLevel)
+			if plannedLap {
+				if (refuel != kUndefined)
+					raiseEvent(kFileMessage, "Engineer", "planPitstop:" . values2String(";", plannedLap, refuel, tyreChange), ErrorLevel)
+				else
+					raiseEvent(kFileMessage, "Engineer", "planPitstop:" . plannedLap, ErrorLevel)
+			}
 			else
 				raiseEvent(kFileMessage, "Engineer", "planPitstop", ErrorLevel)
 	}
@@ -836,6 +847,11 @@ class RaceStrategist extends RaceAssistant {
 	performPitstop(lapNumber := false) {
 		local knowledgeBase := this.KnowledgeBase
 		
+		if (this.Strategy && this.Speaker)
+			nextPitstop := knowledgeBase.getValue("Strategy.Pitstop.Next", false)
+		else
+			nextPitstop := false
+			
 		knowledgeBase.addFact("Pitstop.Lap", lapNumber ? lapNumber : knowledgeBase.getValue("Lap"))
 		
 		result := knowledgeBase.produce()
@@ -844,6 +860,13 @@ class RaceStrategist extends RaceAssistant {
 		
 		if this.Debug[kDebugKnowledgeBase]
 			this.dumpKnowledge(knowledgeBase)
+		
+		if (nextPitstop && (nextPitstop != knowledgeBase.getValue("Strategy.Pitstop.Next", false))) {
+			map := knowledgeBase.getValue("Strategy.Pitstop.", nextPitstop, ".Map", "n/a")
+			
+			if (map != "n/a")
+				this.getSpeaker().speakPhrase("StintMap", {map: map})
+		}
 		
 		return result
 	}
@@ -890,6 +913,45 @@ class RaceStrategist extends RaceAssistant {
 					this.setContinuation(ObjBindMethod(this, "planPitstop"))
 				}
 			}
+	}
+	
+	reportUpcomingPitstop(plannedPitstopLap) {
+		local knowledgeBase := this.KnowledgeBase
+		
+		if this.Speaker {
+			speaker := this.getSpeaker()
+		
+			if this.hasEnoughData(false) {
+				knowledgeBase.setFact("Pitstop.Strategy.Plan", plannedPitstopLap)
+				
+				knowledgeBase.produce()
+				
+				if this.Debug[kDebugKnowledgeBase]
+					this.dumpKnowledge(this.KnowledgeBase)
+				
+				plannedLap := knowledgebase.getValue("Pitstop.Strategy.Lap", kUndefined)
+				
+				if (plannedLap && (plannedLap != kUndefined))
+					plannedPitstopLap := plannedLap
+			}
+			
+			laps := (plannedPitstopLap - knowledgeBase.getValue("Lap"))
+			
+			speaker.speakPhrase("PitstopAhead", {lap: plannedPitstopLap, laps: laps})
+			
+			Process Exist, Race Engineer.exe
+				
+			if (ErrorLevel && this.Listener) {
+				speaker.speakPhrase("InformEngineer", false, true)
+				
+				nextPitstop := knowledgebase.getValue("Strategy.Pitstop.Next")
+				
+				refuel := Round(knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Fuel.Amount"))
+				tyreChange := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Change")
+					
+				this.setContinuation(ObjBindMethod(this, "planPitstop", plannedPitstopLap, refuel, tyreChange))
+			}
+		}
 	}
 	
 	shutdownSession(phase) {
@@ -1153,6 +1215,12 @@ weatherChangeNotification(context, change, minutes) {
 
 weatherTyreChangeRecommendation(context, minutes, recommendedCompound) {
 	context.KnowledgeBase.RaceAssistant.weatherTyreChangeRecommendation(minutes, recommendedCompound)
+	
+	return true
+}
+
+reportUpcomingPitstop(context, lap) {
+	context.KnowledgeBase.RaceAssistant.reportUpcomingPitstop(lap)
 	
 	return true
 }

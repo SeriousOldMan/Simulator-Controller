@@ -2349,6 +2349,7 @@ class KnowledgeBase {
 		local facts := this.Facts
 		local rules := this.Rules
 		local result := false
+		local ruleEntry
 		
 		tickCount := A_TickCount
 		

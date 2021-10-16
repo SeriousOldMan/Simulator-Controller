@@ -316,7 +316,10 @@ else {
 					break
 			}
 			
-			if (A_Index = 9) {
+			if (A_Index = 9)
+				strategist.performPitstop()
+			
+			if (A_Index = 11) {
 				done := true
 				
 				break

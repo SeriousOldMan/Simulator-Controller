@@ -509,18 +509,19 @@ updatePitstopLap(?lap) <= Set(Pitstop.1.Lap, ?lap), Set(Pitstop.Last, 1)
 
 [?Strategy.Pitstop.Lap] => (Prove: updatePitWarningLap(?Strategy.Pitstop.Lap, !Session.Settings.Lap.PitstopWarning))
 
-updatePitWarningLap(?pitstopLap, ?warningLaps) <= ?warningLap = ?pitstopLap - ?warningLaps, Set(Srategy.Pitstop.Lap.Warning, ?warningLap)
+updatePitWarningLap(?pitstopLap, ?warningLaps) <= ?warningLap = ?pitstopLap - ?warningLaps, Set(Strategy.Pitstop.Lap.Warning, ?warningLap)
 
-[?Lap = ?Srategy.Pitstop.Lap.Warning] => (Call: reportUpcomingPitstop(!Strategy.Pitstop.Lap))
+[?Lap = ?Strategy.Pitstop.Lap.Warning] => (Call: reportUpcomingPitstop(!Strategy.Pitstop.Lap))
 
 [?Pitstop.Lap] => (Prove: pitstopPerformed(?Pitstop.Lap))
 
 pitstopPerformed(?) <= unbound?(!Strategy.Pitstop.Next), !, fail
 pitstopPerformed(?pitstopLap) <= validPitstopLap(?pitstopLap), ?nextPitstop = !Strategy.Pitstop.Next + 1,										\
-								 Get(Strategy.Pitstop, ?nextPitstop, Lap, ?nextPitstopLap),														\
+								 Get(Strategy.Pitstop, ?nextPitstop, Lap, ?nextPitstopLap), !,													\
 								 Set(Strategy.Pitstop.Next, ?nextPitstop), Set(Strategy.Pitstop.Lap, ?nextPitstopLap)
+pitstopPerformed(?pitstopLap) <= Clear(Strategy.Pitstop.Next), Clear(Strategy.Pitstop.Lap)
 
-validPitstopLap(?pitstopLap) <= ?diff = !Srategy.Pitstop.Lap - ?pitstopLap, abs(?diff, ?absDiff), ?rel = ?absDiff / ?pitstopLap, ?rel < 0.1
+validPitstopLap(?pitstopLap) <= ?diff = !Strategy.Pitstop.Lap - ?pitstopLap, abs(?diff, ?absDiff), ?rel = ?absDiff / ?pitstopLap, ?rel < 0.1
 
 
 

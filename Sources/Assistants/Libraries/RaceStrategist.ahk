@@ -772,7 +772,8 @@ class RaceStrategist extends RaceAssistant {
 		pitstops := knowledgeBase.getValue("Strategy.Pitstop.Count", 0)
 		
 		for ignore, fact in ["Name", "Weather", "Weather.Temperature.Air", "Weather.Temperature.Track"
-						   , "Tyre.Compound", "Tyre.Compound.Color", "Map", "TC", "ABS", "Pitstop.Count"]
+						   , "Tyre.Compound", "Tyre.Compound.Color", "Map", "TC", "ABS"
+						   , "Pitstop.Count", "Pitstop.Next", "Pitstop.Lap", "Pitstop.Lap.Warning"]
 			knowledgeBase.clearFact("Strategy." . fact)
 		
 		Loop %pitstops%

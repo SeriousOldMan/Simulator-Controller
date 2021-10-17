@@ -1875,7 +1875,7 @@ class StrategyWorkbench extends ConfigurationItem {
 					
 				strategy := this.createStrategy()
 				
-				strategy.createStints(this.SelectedSessionType, simInitialFuelAmountEdit, stintLaps, simMaxTyreLapsEdit, simMapEdit, simFuelConsumptionEdit, simAvgLapTimeEdit)
+				strategy.createStints(simInitialFuelAmountEdit, stintLaps, simMaxTyreLapsEdit, simMapEdit, simFuelConsumptionEdit, simAvgLapTimeEdit)
 					
 				scenarios[translate("Initial Conditions - Map ") . simMapEdit] := strategy
 					
@@ -1901,7 +1901,7 @@ class StrategyWorkbench extends ConfigurationItem {
 					
 					strategy := this.createStrategy()
 				
-					strategy.createStints(this.SelectedSessionType, simInitialFuelAmountEdit, stintLaps, simMaxTyreLapsEdit, map, fuelConsumption, avgLapTime)
+					strategy.createStints(simInitialFuelAmountEdit, stintLaps, simMaxTyreLapsEdit, map, fuelConsumption, avgLapTime)
 					
 					scenarios[translate("Telemetry - Map ") . map] := strategy
 					
@@ -1943,8 +1943,10 @@ class StrategyWorkbench extends ConfigurationItem {
 				
 				this.getPitstopRules(pitstopRequired, refuelRequired, tyreChangeRequired)
 				
-				if ((strategy.Pitstops.Count() != 1) || !pitstopRequired)
+				if ((strategy.Pitstops.Length() != 1) || !pitstopRequired)
 					strategy.adjustLastPitstop(superfluousLaps)
+				
+				strategy.adjustLastPitstopRefuelAmount()
 				
 				Sleep 1000
 				
@@ -2118,7 +2120,6 @@ class Strategy extends ConfigurationItem {
 	iCar := false
 	iTrack := false
 	
-	
 	iSessionType := "Duration"
 	iSessionLength := 0
 	
@@ -2254,7 +2255,7 @@ class Strategy extends ConfigurationItem {
 			}
 		}
 		
-		__New(strategy, id, lap, configuration := false) {
+		__New(strategy, id, lap, configuration := false, adjustments := false) {
 			this.iStrategy := strategy
 			this.iID := id
 			this.iLap := lap
@@ -2273,7 +2274,13 @@ class Strategy extends ConfigurationItem {
 				fuelConsumption := strategy.FuelConsumption[true]
 				lastStintLaps := Floor(Min(strategy.StintLaps[true], remainingFuel / fuelConsumption, strategy.LastPitstop ? (lap - strategy.LastPitstop.Lap) : lap))
 				
-				stintLaps := Floor(Min(remainingLaps - lastStintLaps, strategy.StintLaps))
+				if (adjustments && adjustments.HasKey(id) && adjustments[id].HasKey("RemainingLaps"))
+					remainingLaps := (adjustments[id].RemainingLaps + lastStintLaps)
+				
+				if (adjustments && adjustments.HasKey(id) && adjustments[id].HasKey("StintLaps"))
+					stintLaps := adjustments[id].StintLaps
+				else
+					stintLaps := Floor(Min(remainingLaps - lastStintLaps, strategy.StintLaps))
 				
 				this.iStintLaps := stintLaps
 				this.iMap := strategy.Map[true]
@@ -2281,7 +2288,16 @@ class Strategy extends ConfigurationItem {
 				this.iAvgLapTime := strategy.AvgLapTime[true]
 				
 				refuelAmount := strategy.calcRefuelAmount(stintLaps * fuelConsumption, remainingFuel, remainingLaps, lastStintLaps)
+				tyreChange := kUndefined
 				
+				if (adjustments && adjustments.HasKey(id)) {
+					if adjustments[id].HasKey("RefuelAmount")
+						refuelAmount := adjustments[id].RefuelAmount
+					
+					if adjustments[id].HasKey("TyreChange")
+						tyreChange := adjustments[id].TyreChange
+				}
+						
 				if ((id == 1) && refuelRequired && (refuelAmount <= 0))
 					refuelAmount := 1
 				else if (refuelAmount <= 0)
@@ -2291,8 +2307,16 @@ class Strategy extends ConfigurationItem {
 				this.iRemainingFuel := (remainingFuel - (lastStintLaps * fuelConsumption) + refuelAmount)
 				
 				remainingTyreLaps := (strategy.RemainingTyreLaps[true] - lastStintLaps)
-				
-				if ((remainingTyreLaps - stintLaps) >= 0) {
+			
+				if (tyreChange != kUndefined) {
+					this.iTyreChange := tyreChange
+					
+					if tyreChange
+						this.iRemainingTyreLaps := strategy.RemainingTyreLaps
+					else
+						this.iRemainingTyreLaps := remainingTyreLaps
+				}
+				else if ((remainingTyreLaps - stintLaps) >= 0) {
 					if ((id == 1) && tyreChangeRequired && (remainingTyreLaps >= this.iRemainingLaps)) {
 						this.iTyreChange := true
 						this.iRemainingTyreLaps := strategy.RemainingTyreLaps
@@ -2825,7 +2849,7 @@ class Strategy extends ConfigurationItem {
 		return targetLap
 	}
 	
-	createStints(sessionType, startFuel, stintLaps, tyreLaps, map, fuelConsumption, avgLapTime) {
+	createStints(startFuel, stintLaps, tyreLaps, map, fuelConsumption, avgLapTime, adjustments := false) {
 		this.iFuelAmount := startFuel
 		this.iStintLaps := stintLaps
 		this.iTyreLaps := tyreLaps
@@ -2843,7 +2867,7 @@ class Strategy extends ConfigurationItem {
 		Loop {
 			remainingFuel := this.RemainingFuel[true]
 		
-			if (sessionType = "Duration") {
+			if (this.SessionType = "Duration") {
 				if (this.RemainingTime[true] <= 0)
 					break
 			}
@@ -2854,9 +2878,9 @@ class Strategy extends ConfigurationItem {
 			
 			pitstopLap := this.calcNextPitstopLap(A_Index, currentLap, this.RemainingLaps[true], this.RemainingTyreLaps[true], remainingFuel)
 			
-			pitstop := new this.Pitstop(this, A_Index, pitstopLap)
+			pitstop := new this.Pitstop(this, A_Index, pitstopLap, false, adjustments)
 			
-			if (sessionType = "Duration") {
+			if (this.SessionType = "Duration") {
 				if (pitStop.RemainingTime <= 0)
 					break
 			}
@@ -2866,8 +2890,11 @@ class Strategy extends ConfigurationItem {
 			}
 			
 			currentLap := pitstopLap
-			
-			this.Pitstops.Push(pitstop)
+		
+			if ((pitstop.StintLaps > 0) && ((pitstop.RefuelAmount > 0) || (pitstop.TyreChange)))
+				this.Pitstops.Push(pitstop)
+			else
+				break
 		}
 	}
 	
@@ -2892,10 +2919,29 @@ class Strategy extends ConfigurationItem {
 					
 					pitstop.iRefuelAmount -= delta
 					pitstop.iRemainingFuel -= delta
+					
+					this.iDuration := pitstop.Strategy.calcPitstopDuration(this.RefuelAmount, this.TyreChange)
 				}
 			}
 			
 			break
+		}
+	}
+	
+	adjustLastPitstopRefuelAmount() {
+		pitstops := this.Pitstops
+		numPitstops := pitstops.Length()
+		
+		if (pitstops.Length() > 1) {
+			refuelAmount := Ceil((pitstops[numPitstops - 1].RefuelAmount + pitstops[numPitstops].RefuelAmount) / 2)
+			remainingLaps := Ceil(pitstops[numPitstops - 1].StintLaps + pitstops[numPitstops].StintLaps)
+			stintLaps := Ceil(remainingLaps / 2)
+			
+			adjustments := {}
+			adjustments[numPitstops - 1] := {RefuelAmount: refuelAmount, RemainingLaps: remainingLaps, StintLaps: stintLaps}
+			adjustments[numPitstops] := {StintLaps: stintLaps}
+			
+			this.createStints(this.RemainingFuel, this.StintLaps, this.RemainingTyreLaps, this.Map, this.FuelConsumption, this.AvgLapTime, adjustments)
 		}
 	}
 	

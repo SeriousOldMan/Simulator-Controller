@@ -228,11 +228,11 @@ This is the central functionality for the strategy development. Using the fields
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Settings%203.JPG)
 
-Enter the required values in the *Initial Conditions* group, choose the data to use and click on the "Simulate!" button. A summary of the strategy will be shown in fields in the *Summary* group. Use the sliders in the *Optimizer* group to define weights for diffferent parts of the simulation algorithm, for example to prefer a low fuel consumption and thereby minimizing the number of pitstops over the best possible lap times.
+Enter the required values in the *Initial Conditions* group, choose the data to use and click on the "Simulate!" button. A summary of the strategy will be shown in fields in the *Summary* group. Use the sliders in the *Optimizer* group to define weights for diffferent parts of the simulation algorithm. Each slider has a range from 0 to 100% to define the influence weighting for this type of optimization. For example, to enable some kind of * overuse * of tires, set the "Tire Usage" slider to 30%, which means that the tires can be used for 54 laps, as far as this brings an advantage, even if the optimum tire life is at the beginning 40 laps was set.
 
 You can use the commands in the *Simulation* drop down menu to start a simulation (similar to use the "Simulate!" button), and to copy the current results over to the *Strategy* tab. You can als define various target values for the scenario optimizer of the simulation.
 
-Note: The values in the *Optimizer* group are ignore currently and only the "Run Simulation..." and "Use as Strategy..." are currently active in the *Simulation* drop down menu.
+Note: Only the "Tyre Usage" slider is active in the *Optimizer* group currently and only the "Run Simulation..." and "Use as Strategy..." are currently active in the *Simulation* drop down menu.
 
 #### Strategy
 

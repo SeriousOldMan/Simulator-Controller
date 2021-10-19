@@ -1,9 +1,9 @@
 [Development]
 Version=3.6.4-dev
 Target=3.6.4-release
-Date=10/16/2021
+Date=10/19/2021
 Download=
-Changes=Improved refuel handling for the last stints in strategy development, New action "StrategyCancel" for "Race Strategist" and all simulator plugins, New "InformationRequest" commands "StrategyOverview" and "NextPitstop" for "Race Strategist" and all simulator plugins, Cato will use the current strategy developed in the "Strategy Workbench" and will instruct Jona accordingly, Coloured many icons
+Changes=Improved refuel handling for the last stints in strategy development, Variation of tyre usage is now possible in strategy simulations, New action "StrategyCancel" for "Race Strategist" and all simulator plugins, New "InformationRequest" commands "StrategyOverview" and "NextPitstop" for "Race Strategist" and all simulator plugins, Cato will use the current strategy developed in the "Strategy Workbench" and will instruct Jona accordingly, Coloured many icons
 [Release]
 Version=3.6.2-release
 Date=10/15/2021

@@ -108,9 +108,9 @@ global simMapEdit = 1
 global simAvgLapTimeEdit = 120
 global simFuelConsumptionEdit = 3.8
 
-global simConsumptionWeight = 20
-global simTyreUsageWeight = 60
-global simCarWeightWeight = 80
+global simConsumptionWeight = 0
+global simTyreUsageWeight = 0
+global simCarWeightWeight = 0
 
 global simInputDropDown
 
@@ -1413,6 +1413,20 @@ class StrategyWorkbench extends ConfigurationItem {
 		return (pitstopDeltaEdit + (changeTyres ? pitstopTyreServiceEdit : 0) + ((refuelAmount / 10) * pitstopRefuelServiceEdit))
 	}
 	
+	getSimulationWeights(ByRef consumption, ByRef tyreUsage, ByRef carWeight) {
+		window := this.Window
+		
+		Gui %window%:Default
+	
+		GuiControlGet simConsumptionWeight
+		GuiControlGet simTyreUsageWeight
+		GuiControlGet simCarWeightWeight
+		
+		consumption := simConsumptionWeight
+		tyreUsage := simTyreUsageWeight
+		carWeight := simCarWeightWeight
+	}
+	
 	getPitstopRules(ByRef pitstopRequired, ByRef refuelRequired, ByRef tyreChangeRequired) {
 		result := true
 		
@@ -1862,54 +1876,80 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		GuiControlGet simInputDropDown
 		
+		maxTyreLaps := simMaxTyreLapsEdit
+		
+		consumption := 0
+		tyreUsage := 0
+		carWeight := 0
+		
+		this.getSimulationWeights(consumption, tyreUsage, carWeight)
+		
 		scenarios := {}
 		
-		if ((simInputDropDown = 1) || (simInputDropDown = 3)) {
-			if simMapEdit is number
-			{			
-				message := (translate("Creating Initial Scenario with Map ") . simMapEdit . translate("..."))
+		Loop { ; consumption
+			Loop { ; tyreUsage
+				Loop { ; carWeight
+					if ((simInputDropDown = 1) || (simInputDropDown = 3)) {
+						if simMapEdit is number
+						{			
+							message := (translate("Creating Initial Scenario with Map ") . simMapEdit . translate("..."))
+								
+							showProgress({progress: progress, message: message})
+							
+							stintLaps := Floor((stintLengthEdit * 60) / simAvgLapTimeEdit)
+								
+							strategy := this.createStrategy()
+							
+							strategy.createStints(simInitialFuelAmountEdit, stintLaps, maxTyreLaps, simMapEdit, simFuelConsumptionEdit, simAvgLapTimeEdit)
+								
+							scenarios[translate("Initial Conditions - Map ") . simMapEdit] := strategy
+								
+							Sleep 200
+								
+							progress += 2
+						}
+					}
 					
-				showProgress({progress: progress, message: message})
-				
-				stintLaps := Floor((stintLengthEdit * 60) / simAvgLapTimeEdit)
-					
-				strategy := this.createStrategy()
-				
-				strategy.createStints(simInitialFuelAmountEdit, stintLaps, simMaxTyreLapsEdit, simMapEdit, simFuelConsumptionEdit, simAvgLapTimeEdit)
-					
-				scenarios[translate("Initial Conditions - Map ") . simMapEdit] := strategy
-					
-				Sleep 200
-					
-				progress += 2
-			}
-		}
-		
-		if (simInputDropDown > 1)
-			for ignore, mapData in electronicsData {
-				map := mapData["Map"]
-				fuelConsumption := mapData["Fuel.Consumption"]
-				avgLapTime := mapData["Lap.Time"]
+					if (simInputDropDown > 1)
+						for ignore, mapData in electronicsData {
+							map := mapData["Map"]
+							fuelConsumption := mapData["Fuel.Consumption"]
+							avgLapTime := mapData["Lap.Time"]
 
-				if map is number
-				{
-					message := (translate("Creating Telemetry Scenario with Map ") . map . translate("..."))
-					
-					showProgress({progress: progress, message: message})
-				
-					stintLaps := Floor((stintLengthEdit * 60) / avgLapTime)
-					
-					strategy := this.createStrategy()
-				
-					strategy.createStints(simInitialFuelAmountEdit, stintLaps, simMaxTyreLapsEdit, map, fuelConsumption, avgLapTime)
-					
-					scenarios[translate("Telemetry - Map ") . map] := strategy
-					
-					Sleep 200
-					
-					progress += 2
+							if map is number
+							{
+								message := (translate("Creating Telemetry Scenario with Map ") . map . translate("..."))
+								
+								showProgress({progress: progress, message: message})
+							
+								stintLaps := Floor((stintLengthEdit * 60) / avgLapTime)
+								
+								strategy := this.createStrategy()
+							
+								strategy.createStints(simInitialFuelAmountEdit, stintLaps, maxTyreLaps, map, fuelConsumption, avgLapTime)
+								
+								scenarios[translate("Telemetry - Map ") . map] := strategy
+								
+								Sleep 200
+								
+								progress += 2
+							}
+						}
+						
+					break
 				}
+				
+				if (tyreUsage > 0) {
+					maxTyreLaps += (maxTyreLaps / 100 * tyreUsage)
+					
+					tyreUsage := 0
+				}
+				else
+					break
 			}
+			
+			break
+		}
 		
 		progress := Floor(progress + 10)
 		

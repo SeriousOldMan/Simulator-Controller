@@ -228,11 +228,21 @@ This is the central functionality for the strategy development. Using the fields
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Settings%203.JPG)
 
-Enter the required values in the *Initial Conditions* group, choose the data to use and click on the "Simulate!" button. A summary of the strategy will be shown in fields in the *Summary* group. Use the sliders in the *Optimizer* group to define weights for diffferent parts of the simulation algorithm. Each slider has a range from 0 to 100% to define the influence weighting for this type of optimization. For example, to enable some kind of * overuse * of tires, set the "Tire Usage" slider to 30%, which means that the tires can be used for 54 laps, as far as this brings an advantage, even if the optimum tire life is at the beginning 40 laps was set.
+Enter the required values in the *Initial Conditions* group, choose the data to use and click on the "Simulate!" button. A summary of the strategy will be shown in fields in the *Summary* group. Use the sliders in the *Optimizer* group to define weights for diffferent variations of the simulation algorithm. These has the following meanings:
+
+  - Fuel Consumption
+  
+	The slider defines a range between 0 and 10%, in which the simulation will decrease the fuel consumption, which has been derived from past telemetry data or from the values entered into the *Initial Conditions* group. This can be beneficial in endirance races for example, if you think, that you are able to save additional fuel by applying some lift n coat techniques or if you want to use a fuel saving engine map, for which no telemetry data is available yet.
+  - Tyre Usage
+  
+	Here you have a range from 0 to 100% to enable some kind of *overuse* of tires. If you set the "Tire Usage" slider to 30%, for example, this means that the tires can be used for 54 laps, even if the optimum tire life is at the beginning 40 laps was set. This might be useful to skip the tyre change in the last shorter stint of an endurance race.
+  - Car Weight
+  
+	Perhaps the most tricky one and it needs a lot of historical telemetry data. Using the slider, you can define how much the influence of the car weight, which in the end is the amount of fuel in the tank, will influence the lap times. For some cars, for example, lap times degrade heavily, if the amount of fuel and therefore the car weight is above a specific threshold. This can be derived from the telemtry data. If you set the slider completely to the left, this effect will be ignored entirely, whereas, if you set the slider completely to the right, this effect will be taken into account to 100%.
 
 You can use the commands in the *Simulation* drop down menu to start a simulation (similar to use the "Simulate!" button), and to copy the current results over to the *Strategy* tab. You can als define various target values for the scenario optimizer of the simulation.
 
-Note: Only the "Tyre Usage" slider is active in the *Optimizer* group currently and only the "Run Simulation..." and "Use as Strategy..." are currently active in the *Simulation* drop down menu.
+Note: The "Car Weight" slider is not active in the *Optimizer* group currently and only the "Run Simulation..." and "Use as Strategy..." are currently active in the *Simulation* drop down menu.
 
 #### Strategy
 

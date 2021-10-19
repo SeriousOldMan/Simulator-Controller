@@ -603,7 +603,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 
 		Gui %window%:Add, Text, x%x% yp+21 w100 h20 +0x200, % translate("Fuel Consumption")
-		Gui %window%:Add, Slider, x%x1% yp w60 0x10 Range0-100 ToolTip VsimConsumptionWeight, %simConsumptionWeight%
+		Gui %window%:Add, Slider, x%x1% yp w60 0x10 Range0-10 ToolTip VsimConsumptionWeight, %simConsumptionWeight%
 		
 		Gui %window%:Add, Text, x%x% yp+24 w100 h20 +0x200, % translate("Tyre Usage")
 		Gui %window%:Add, Slider, x%x1% yp w60 0x10 Range0-100 ToolTip VsimTyreUsageWeight, %simTyreUsageWeight%
@@ -1390,6 +1390,17 @@ class StrategyWorkbench extends ConfigurationItem {
 			return ((sessionLengthEdit + ((formationLap && formationLapCheck) ? 1 : 0) + ((postRaceLap && postRaceLapCheck) ? 1 : 0)) * avgLapTime)
 	}
 	
+	getMaxFuelLaps(fuelConsumption) {
+		window := this.Window
+		
+		Gui %window%:Default
+	
+		GuiControlGet safetyFuelEdit
+		GuiControlGet fuelCapacityEdit
+		
+		return Floor((fuelCapacityEdit - safetyFuelEdit) / fuelConsumption)
+	}
+	
 	calcRefuelAmount(targetFuel, currentFuel) {
 		window := this.Window
 		
@@ -1398,7 +1409,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		GuiControlGet safetyFuelEdit
 		GuiControlGet fuelCapacityEdit
 		
-		return (Min(fuelCapacityEdit, targetFuel) - currentFuel + safetyFuelEdit)
+		return (Min(fuelCapacityEdit, targetFuel + safetyFuelEdit) - currentFuel)
 	}
 
 	calcPitstopDuration(refuelAmount, changeTyres) {
@@ -1876,6 +1887,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		GuiControlGet simInputDropDown
 		
+		fuelConsumption := simFuelConsumptionEdit
 		maxTyreLaps := simMaxTyreLapsEdit
 		
 		consumption := 0
@@ -1885,6 +1897,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		this.getSimulationWeights(consumption, tyreUsage, carWeight)
 		
 		scenarios := {}
+		variation := 1
 		
 		Loop { ; consumption
 			Loop { ; tyreUsage
@@ -1900,9 +1913,10 @@ class StrategyWorkbench extends ConfigurationItem {
 								
 							strategy := this.createStrategy()
 							
-							strategy.createStints(simInitialFuelAmountEdit, stintLaps, maxTyreLaps, simMapEdit, simFuelConsumptionEdit, simAvgLapTimeEdit)
+							strategy.createStints(simInitialFuelAmountEdit, stintLaps, maxTyreLaps + (maxTyreLaps / 100 * tyreUsage), simMapEdit
+												, simFuelConsumptionEdit - (simFuelConsumptionEdit / 100 * consumption), simAvgLapTimeEdit)
 								
-							scenarios[translate("Initial Conditions - Map ") . simMapEdit] := strategy
+							scenarios[translate("Initial Conditions - Map ") . simMapEdit . "." . variation++] := strategy
 								
 							Sleep 200
 								
@@ -1926,9 +1940,10 @@ class StrategyWorkbench extends ConfigurationItem {
 								
 								strategy := this.createStrategy()
 							
-								strategy.createStints(simInitialFuelAmountEdit, stintLaps, maxTyreLaps, map, fuelConsumption, avgLapTime)
+								strategy.createStints(simInitialFuelAmountEdit, stintLaps, maxTyreLaps + (maxTyreLaps / 100 * tyreUsage), map
+													, fuelConsumption - (fuelConsumption / 100 * consumption), avgLapTime)
 								
-								scenarios[translate("Telemetry - Map ") . map] := strategy
+								scenarios[translate("Telemetry - Map ") . map . "." . variation++] := strategy
 								
 								Sleep 200
 								
@@ -1939,16 +1954,16 @@ class StrategyWorkbench extends ConfigurationItem {
 					break
 				}
 				
-				if (tyreUsage > 0) {
-					maxTyreLaps += (maxTyreLaps / 100 * tyreUsage)
-					
-					tyreUsage := 0
-				}
-				else
+				if (tyreUsage = 0)
 					break
+				else
+					tyreUsage := 0
 			}
 			
-			break
+			if (consumption = 0)
+				break
+			else
+				consumption := 0
 		}
 		
 		progress := Floor(progress + 10)
@@ -2020,6 +2035,8 @@ class StrategyWorkbench extends ConfigurationItem {
 					if (sLaps > cLaps)
 						candidate := strategy
 					else if ((sLaps = cLaps) && (sTime < cTime))
+						candidate := strategy
+					else if ((sLaps = cLaps) && (sTime = cTime) && (candidate.FuelConsumption[true] < strategy.FuelConsumption[true] ))
 						candidate := strategy
 				}
 				else if (strategy.getSessionDuration() < candidate.getSessionDuration())
@@ -2320,7 +2337,7 @@ class Strategy extends ConfigurationItem {
 				if (adjustments && adjustments.HasKey(id) && adjustments[id].HasKey("StintLaps"))
 					stintLaps := adjustments[id].StintLaps
 				else
-					stintLaps := Floor(Min(remainingLaps - lastStintLaps, strategy.StintLaps))
+					stintLaps := Floor(Min(remainingLaps - lastStintLaps, strategy.StintLaps, strategy.getMaxFuelLaps(fuelConsumption)))
 				
 				this.iStintLaps := stintLaps
 				this.iMap := strategy.Map[true]
@@ -2858,6 +2875,10 @@ class Strategy extends ConfigurationItem {
 		return this.StrategyWorkbench.calcSessionTime(this.AvgLapTime)
 	}
 	
+	getMaxFuelLaps(fuelConsumption) {
+		return this.StrategyWorkbench.getMaxFuelLaps(fuelConsumption)
+	}
+	
 	calcRefuelAmount(targetFuel, startFuel, remainingLaps, stintLaps) {
 		remainingFuel := Max(0, startFuel - (stintLaps * this.FuelConsumption[true]))
 		
@@ -2869,7 +2890,8 @@ class Strategy extends ConfigurationItem {
 	}
 	
 	calcNextPitstopLap(pitstopNr, currentLap, remainingLaps, remainingTyreLaps, remainingFuel) {
-		targetLap := (currentLap + Floor(Min(this.StintLaps, remainingTyreLaps, remainingFuel / this.FuelConsumption[true])))
+		fuelConsumption := this.FuelConsumption[true]
+		targetLap := (currentLap + Floor(Min(this.StintLaps, remainingTyreLaps, remainingFuel / fuelConsumption, this.getMaxFuelLaps(fuelConsumption))))
 		
 		if (pitstopNr = 1) {
 			pitstopRequired := false

@@ -1896,6 +1896,9 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		this.getSimulationWeights(consumption, tyreUsage, carWeight)
 		
+		consumptionStep := (consumption / 4)
+		tyreUsageStep := (tyreUsage / 4)
+		
 		scenarios := {}
 		variation := 1
 		
@@ -1916,11 +1919,11 @@ class StrategyWorkbench extends ConfigurationItem {
 							strategy.createStints(simInitialFuelAmountEdit, stintLaps, maxTyreLaps + (maxTyreLaps / 100 * tyreUsage), simMapEdit
 												, simFuelConsumptionEdit - (simFuelConsumptionEdit / 100 * consumption), simAvgLapTimeEdit)
 								
-							scenarios[translate("Initial Conditions - Map ") . simMapEdit . "." . variation++] := strategy
+							scenarios[translate("Initial Conditions - Map ") . simMapEdit . translate(":") . variation++] := strategy
 								
-							Sleep 200
+							Sleep 100
 								
-							progress += 2
+							progress += 1
 						}
 					}
 					
@@ -1943,11 +1946,11 @@ class StrategyWorkbench extends ConfigurationItem {
 								strategy.createStints(simInitialFuelAmountEdit, stintLaps, maxTyreLaps + (maxTyreLaps / 100 * tyreUsage), map
 													, fuelConsumption - (fuelConsumption / 100 * consumption), avgLapTime)
 								
-								scenarios[translate("Telemetry - Map ") . map . "." . variation++] := strategy
+								scenarios[translate("Telemetry - Map ") . map . translate(":") . variation++] := strategy
 								
-								Sleep 200
+								Sleep 100
 								
-								progress += 2
+								progress += 1
 							}
 						}
 						
@@ -1957,13 +1960,13 @@ class StrategyWorkbench extends ConfigurationItem {
 				if (tyreUsage = 0)
 					break
 				else
-					tyreUsage := 0
+					tyreUsage := Max(0, tyreUsage - tyreUsageStep)
 			}
 			
 			if (consumption = 0)
 				break
 			else
-				consumption := 0
+				consumption := Max(0, consumption - consumptionStep)
 		}
 		
 		progress := Floor(progress + 10)
@@ -2003,9 +2006,9 @@ class StrategyWorkbench extends ConfigurationItem {
 				
 				strategy.adjustLastPitstopRefuelAmount()
 				
-				Sleep 1000
+				Sleep 500
 				
-				progress += 2
+				progress += 1
 			}
 		
 		progress := Floor(progress + 10)
@@ -2043,9 +2046,9 @@ class StrategyWorkbench extends ConfigurationItem {
 					candidate := strategy
 			}
 			
-			progress += 2
+			progress += 1
 		
-			Sleep 1000
+			Sleep 500
 		}
 		
 		progress := Floor(progress + 10)

@@ -414,7 +414,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		Gui %window%:Add, DropDownList, x220 yp-2 w180 AltSubmit Choose1 +0x200 VsettingsMenuDropDown gsettingsMenu, % values2String("|", map(["Settings", "---------------------------------------------", "Initialize from Setup Database...", "Initialize from Telemetry...", "Initialize from Simulation..."], "translate")*)
 		
-		Gui %window%:Add, DropDownList, x405 yp w180 AltSubmit Choose1 +0x200 VsimulationMenuDropDown gsimulationMenu, % values2String("|", map(["Simulation", "---------------------------------------------", "Set Target Stint Length...", "Set Target Fuel Consumption...", "Set Target Tyre Usage...", "---------------------------------------------", "Run Simulation", "---------------------------------------------", "Use as Strategy..."], "translate")*)
+		Gui %window%:Add, DropDownList, x405 yp w180 AltSubmit Choose1 +0x200 VsimulationMenuDropDown gsimulationMenu, % values2String("|", map(["Simulation", "---------------------------------------------", "Run Simulation", "---------------------------------------------", "Use as Strategy..."], "translate")*)
 		
 		Gui %window%:Add, DropDownList, x590 yp w180 AltSubmit Choose1 +0x200 VstrategyMenuDropDown gstrategyMenu, % values2String("|", map(["Strategy", "---------------------------------------------", "Load Strategy...", "Save Strategy...", "---------------------------------------------", "Compare Strategies...", "---------------------------------------------", "Set as Race Strategy", "Clear Race Strategy"], "translate")*)
 		
@@ -1390,6 +1390,24 @@ class StrategyWorkbench extends ConfigurationItem {
 			return ((sessionLengthEdit + ((formationLap && formationLapCheck) ? 1 : 0) + ((postRaceLap && postRaceLapCheck) ? 1 : 0)) * avgLapTime)
 	}
 	
+	getAvgLapTime(map, remainingFuel, default := false) {
+		window := this.Window
+		
+		Gui %window%:Default
+	
+		GuiControlGet simInputDropDown
+		GuiControlGet simAvgLapTimeEdit
+		
+		if (simInputDropDown > 1)
+			lapTimes := new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack).getLapTimes(this.SelectedWeather, this.SelectedCompound, this.SelectedCompoundColor)
+		else
+			lapTimes := []
+		
+		lapTime := lookupLapTime(lapTimes, map, remainingFuel)
+		
+		return lapTime ? lapTime : (default ? simAvgLapTimeEdit : false)
+	}
+	
 	getMaxFuelLaps(fuelConsumption) {
 		window := this.Window
 		
@@ -1595,12 +1613,9 @@ class StrategyWorkbench extends ConfigurationItem {
 		local strategy
 		
 		switch line {
-			case 3: ; "Set Target Stint Length..."
-			case 4: ; "Set Target Fuel Consumption..."
-			case 5: ; "Set Target Tyre Usage..."
-			case 7: ; "Run Simulation"
+			case 3: ; "Run Simulation"
 				this.runSimulation()
-			case 9: ; "Use as Strategy..."
+			case 5: ; "Use as Strategy..."
 				strategy := this.SelectedScenario
 				
 				if strategy
@@ -2367,7 +2382,6 @@ class Strategy extends ConfigurationItem {
 				this.iStintLaps := stintLaps
 				this.iMap := strategy.Map[true]
 				this.iFuelConsumption := fuelConsumption
-				this.iAvgLapTime := strategy.AvgLapTime[true]
 				
 				refuelAmount := strategy.calcRefuelAmount(stintLaps * fuelConsumption, remainingFuel, remainingLaps, lastStintLaps)
 				tyreChange := kUndefined
@@ -2387,6 +2401,7 @@ class Strategy extends ConfigurationItem {
 				
 				this.iRemainingLaps := (remainingLaps - lastStintLaps)
 				this.iRemainingFuel := (remainingFuel - (lastStintLaps * fuelConsumption) + refuelAmount)
+				this.iAvgLapTime := strategy.getAvgLapTime(this.Map, this.RemainingFuel) ; strategy.AvgLapTime[true]
 				
 				remainingTyreLaps := (strategy.RemainingTyreLaps[true] - lastStintLaps)
 			
@@ -2898,6 +2913,10 @@ class Strategy extends ConfigurationItem {
 	
 	calcSessionTime() {
 		return this.StrategyWorkbench.calcSessionTime(this.AvgLapTime)
+	}
+	
+	getAvgLapTime(map, remainingFuel) {
+		return this.StrategyWorkbench.getAvgLapTime(map, remainingFuel, this.AvgLapTime)
 	}
 	
 	getMaxFuelLaps(fuelConsumption) {

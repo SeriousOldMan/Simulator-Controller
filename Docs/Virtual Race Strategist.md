@@ -213,7 +213,7 @@ Loading of settings is supported for:
 	   - Map
 	   - Tyre Compound
 	   - Tyre Compound Color
- 
+
 Notes: If you specify a required pitstop window, this will be applied for the first pitstop. When a mandatory pitstop with a required tyre change and/or a required refueling has been defined, but actually there is no need for refueling or tyre change, the pitstop is planned as late as possible and only 1 liter will be refueled. All these are common scenarios for a GT3 solo or team sprint races. 
 
 #### Pitstop & Service
@@ -224,7 +224,7 @@ In this tab you have to enter the time required for several pitstop activities, 
 
 #### Simulation
 
-This is the central functionality for strategy development. Using the fields in this tab, you can define the starting conditions and settings for your first stint and run a strategy simulation. You can choose, whether to use only the values you entered here for engine map, lap time and average fuel consumption, or you can include the full knowledge from the telemetry data from previous sessions on the same track in similar conditions. For each different engine map and therefore fuel consumption and resulting average lap time, a strategy scenario will be created. These scenarios together with all additional scenarions created by the optimization algorithm (see below), will be compared at the end of the simulation and the best one regarding the overall race result will be selected as the best strategy. 
+This is the central functionality for strategy development. Using the fields in this tab, you can define the starting conditions and settings for your first stint and run a strategy simulation. You can choose, whether to use only the values you entered here for engine map, lap time and average fuel consumption, or you can include the full knowledge from the telemetry data from previous sessions on the same track in similar conditions. For each different engine map and therefore fuel consumption and resulting average lap time, a strategy scenario will be created. These scenarios together with all additional scenarios created by the optimization algorithm (see below), will be compared at the end of the simulation and the best one regarding the overall race result will be selected as the best strategy. 
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Settings%203.JPG)
 
@@ -232,7 +232,7 @@ Enter the required values in the *Initial Conditions* group, choose the data to 
 
   - Fuel Consumption
   
-	The slider defines a range between 0 and 10%, in which the simulation will decrease the fuel consumption, which has been derived from past telemetry data or from the values entered into the *Initial Conditions* group. This can be beneficial in endirance races for example, if you think, that you are able to save additional fuel by applying some lift n coat techniques or if you want to use a fuel saving engine map, for which no telemetry data is available yet.
+	The slider defines a range between 0 and 10%, in which the simulation will decrease the fuel consumption, which has been derived from past telemetry data or from the values entered into the *Initial Conditions* group. This can be beneficial in endirance races for example, if you think, that you are able to save additional fuel by applying some lift n cost techniques or if you want to use a fuel saving engine map, for which no telemetry data is available yet.
   - Initial fuel
   
 	Perhaps the most tricky one and it needs a lot of historical telemetry data to create sensible results. Using the slider, you can optimize the amount of fuel to be used for the first stint, thereby influencing the car weight and in the end the resulting lap times in the critical first phase of a race. For some cars, for example, lap times degrade heavily, if the amount of fuel and therefore the car weight is above a specific threshold. This can be derived from the telemtry data. If you set the slider completely to the left, the initial fuel amount entered in the *Initial Conditions* field group will be used only, whereas, if you set the slider to the right, you specify, how much of the fuel capacity of the car might be used as additional fuel for the simulation variations.
@@ -240,7 +240,7 @@ Enter the required values in the *Initial Conditions* group, choose the data to 
 	Hint: If you want to simulate the whole range of initial fuel levels, enter **0** for the initial fuel level in the *Initial Conditions* field group and set the slider completely to the right.
   - Tyre Usage
   
-	Here you have a range from 0 to 100% to enable some kind of *overuse* of tires. If you set the "Tire Usage" slider to 30%, for example, this means that the tires can be used for 54 laps, even if the optimum tire life is at the beginning 40 laps was set. This might be useful to skip the tyre change in the last shorter stint of an endurance race.
+	Here you have a range from 0 to 100% to enable some kind of *overuse* of tires. If you set the "Tyre Usage" slider to 30%, for example, this means that the tires can be used for 54 laps, even if the optimum tire life is at the beginning 40 laps was set. This might be useful to skip the tyre change in the last shorter stint of an endurance race.
 
 For every slider not at the zero position, four different variations of the underlying value will be created as strategy sceanrios, which will be compared at the end for better results. 
 

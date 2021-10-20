@@ -9,8 +9,6 @@
   7. New action "StrategyCancel" for "Race Strategist" and all simulator plugins to cancel a strategy, that is no longer applicable, from the Button Box.
   8. New "InformationRequest" commands "StrategyOverview" and "NextPitstop" for "Race Strategist" and all simulator plugins to request information about the current strategy or the upcoming pitstop, as defined in the strategy, from your Button Box.
   9. Coloured many application icons
-  
-  => => => Update Phrase Grammars in Discord
 
 ## 3.6.2-release 10/15/21
 

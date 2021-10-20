@@ -25,6 +25,7 @@ Release 3.6.4 Checklist
    a. Phrase Grammars
    b. Plugin Labels
    c. Translations
+2. New pictures for Strategy Workbench
 
 Release 3.6.2 Checklist
 =======================

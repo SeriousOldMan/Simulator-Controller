@@ -110,7 +110,7 @@ global simFuelConsumptionEdit = 3.8
 
 global simConsumptionWeight = 0
 global simTyreUsageWeight = 0
-global simCarWeightWeight = 0
+global simInitialFuelWeight = 0
 
 global simInputDropDown
 
@@ -605,11 +605,11 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, Text, x%x% yp+21 w100 h20 +0x200, % translate("Fuel Consumption")
 		Gui %window%:Add, Slider, x%x1% yp w60 0x10 Range0-10 ToolTip VsimConsumptionWeight, %simConsumptionWeight%
 		
+		Gui %window%:Add, Text, x%x% yp+24 w100 h20 +0x200, % translate("Initial Fuel")
+		Gui %window%:Add, Slider, x%x1% yp w60 0x10 Range0-100 ToolTip VsimInitialFuelWeight, %simInitialFuelWeight%
+		
 		Gui %window%:Add, Text, x%x% yp+24 w100 h20 +0x200, % translate("Tyre Usage")
 		Gui %window%:Add, Slider, x%x1% yp w60 0x10 Range0-100 ToolTip VsimTyreUsageWeight, %simTyreUsageWeight%
-		
-		Gui %window%:Add, Text, x%x% yp+24 w100 h20 +0x200, % translate("Car Weight")
-		Gui %window%:Add, Slider, x%x1% yp w60 0x10 Range0-100 ToolTip VsimCarWeightWeight, %simCarWeightWeight%
 		
 		Gui %window%:Add, Text, x214 yp+48 w40 h23 +0x200, % translate("Use")
 		
@@ -1424,18 +1424,18 @@ class StrategyWorkbench extends ConfigurationItem {
 		return (pitstopDeltaEdit + (changeTyres ? pitstopTyreServiceEdit : 0) + ((refuelAmount / 10) * pitstopRefuelServiceEdit))
 	}
 	
-	getSimulationWeights(ByRef consumption, ByRef tyreUsage, ByRef carWeight) {
+	getSimulationWeights(ByRef consumption, ByRef initialFuel, ByRef tyreUsage) {
 		window := this.Window
 		
 		Gui %window%:Default
 	
 		GuiControlGet simConsumptionWeight
+		GuiControlGet simInitialFuelWeight
 		GuiControlGet simTyreUsageWeight
-		GuiControlGet simCarWeightWeight
 		
 		consumption := simConsumptionWeight
+		initialFuel := simInitialFuelWeight
 		tyreUsage := simTyreUsageWeight
-		carWeight := simCarWeightWeight
 	}
 	
 	getPitstopRules(ByRef pitstopRequired, ByRef refuelRequired, ByRef tyreChangeRequired) {
@@ -1884,6 +1884,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		GuiControlGet simMapEdit
 		GuiControlGet simFuelConsumptionEdit
 		GuiControlGet simAvgLapTimeEdit
+		GuiControlGet fuelCapacityEdit
 		
 		GuiControlGet simInputDropDown
 		
@@ -1892,19 +1893,25 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		consumption := 0
 		tyreUsage := 0
-		carWeight := 0
+		initialFuel := 0
 		
-		this.getSimulationWeights(consumption, tyreUsage, carWeight)
+		this.getSimulationWeights(consumption, initialFuel, tyreUsage)
 		
 		consumptionStep := (consumption / 4)
 		tyreUsageStep := (tyreUsage / 4)
+		initialFuelStep := (initialFuel / 4)
 		
 		scenarios := {}
 		variation := 1
 		
+		if (simInputDropDown > 1)
+			lapTimes := new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack).getLapTimes(this.SelectedWeather, this.SelectedCompound, this.SelectedCompoundColor)
+		else
+			lapTimes := []
+		
 		Loop { ; consumption
-			Loop { ; tyreUsage
-				Loop { ; carWeight
+			Loop { ; initialFuel
+				Loop { ; tyreUsage
 					if ((simInputDropDown = 1) || (simInputDropDown = 3)) {
 						if simMapEdit is number
 						{			
@@ -1916,8 +1923,14 @@ class StrategyWorkbench extends ConfigurationItem {
 								
 							strategy := this.createStrategy()
 							
-							strategy.createStints(simInitialFuelAmountEdit, stintLaps, maxTyreLaps + (maxTyreLaps / 100 * tyreUsage), simMapEdit
-												, simFuelConsumptionEdit - (simFuelConsumptionEdit / 100 * consumption), simAvgLapTimeEdit)
+							initialFuelAmount := Min(fuelCapacityEdit, simInitialFuelAmountEdit + (initialFuel / 100 * fuelCapacityEdit))
+							lapTime := lookupLapTime(lapTimes, simMapEdit, initialFuelAmount)
+							
+							if !lapTime
+								lapTime := simAvgLapTimeEdit
+							
+							strategy.createStints(initialFuelAmount, stintLaps, maxTyreLaps + (maxTyreLaps / 100 * tyreUsage), simMapEdit
+												, simFuelConsumptionEdit - (simFuelConsumptionEdit / 100 * consumption), lapTime)
 								
 							scenarios[translate("Initial Conditions - Map ") . simMapEdit . translate(":") . variation++] := strategy
 								
@@ -1943,8 +1956,14 @@ class StrategyWorkbench extends ConfigurationItem {
 								
 								strategy := this.createStrategy()
 							
-								strategy.createStints(simInitialFuelAmountEdit, stintLaps, maxTyreLaps + (maxTyreLaps / 100 * tyreUsage), map
-													, fuelConsumption - (fuelConsumption / 100 * consumption), avgLapTime)
+								initialFuelAmount := Min(fuelCapacityEdit, simInitialFuelAmountEdit + (initialFuel / 100 * fuelCapacityEdit))
+								lapTime := lookupLapTime(lapTimes, map, initialFuelAmount)
+								
+								if !lapTime
+									lapTime := avgLapTime
+							
+								strategy.createStints(initialFuelAmount, stintLaps, maxTyreLaps + (maxTyreLaps / 100 * tyreUsage), map
+													, fuelConsumption - (fuelConsumption / 100 * consumption), lapTime)
 								
 								scenarios[translate("Telemetry - Map ") . map . translate(":") . variation++] := strategy
 								
@@ -1953,14 +1972,17 @@ class StrategyWorkbench extends ConfigurationItem {
 								progress += 1
 							}
 						}
-						
-					break
-				}
 				
-				if (tyreUsage = 0)
+					if (tyreUsage = 0)
+						break
+					else
+						tyreUsage := Max(0, tyreUsage - tyreUsageStep)
+				}
+						
+				if (initialFuel = 0)
 					break
 				else
-					tyreUsage := Max(0, tyreUsage - tyreUsageStep)
+					initialFuel := Max(0, initialFuel - initialFuelStep)
 			}
 			
 			if (consumption = 0)
@@ -2039,7 +2061,7 @@ class StrategyWorkbench extends ConfigurationItem {
 						candidate := strategy
 					else if ((sLaps = cLaps) && (sTime < cTime))
 						candidate := strategy
-					else if ((sLaps = cLaps) && (sTime = cTime) && (candidate.FuelConsumption[true] < strategy.FuelConsumption[true] ))
+					else if ((sLaps = cLaps) && (sTime = cTime) && (candidate.FuelConsumption[true] > strategy.FuelConsumption[true] ))
 						candidate := strategy
 				}
 				else if (strategy.getSessionDuration() < candidate.getSessionDuration())
@@ -3042,6 +3064,16 @@ class Strategy extends ConfigurationItem {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+lookupLapTime(lapTimes, map, remainingFuel) {
+	selected := false
+	
+	for ignore, candidate in lapTimes
+		if ((candidate.Map = map) && (!selected || (Abs(candidate["Fuel.Remaining"] - remainingFuel) < Abs(selected["Fuel.Remaining"] - remainingFuel))))
+			selected := candidate
+				
+	return (selected ? selected["Lap.Time"] : false)
+}
 
 qualifiedCompound(compound, compoundColor) {
 	if (compound= "Dry") {

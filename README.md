@@ -26,7 +26,7 @@ Simply donwload and run [Simulator Controller.exe](https://cntr.click/Qt9gVs0) (
 
 #### Latest development build
 
-[3.6.4-release](https://www.dropbox.com/s/l2a7cpg0ubsx6fh/Simulator%20Controller%203.6.4-dev.zip?dl=1) (Early build for Release 3.6.4. New features: Improved refuel handling for the last stints in strategy development, Variation of fuel consumption and tyre usage is now possible in strategy simulations, New action "StrategyCancel" for "Race Strategist" and all simulator plugins, New "InformationRequest" commands "StrategyOverview" and "NextPitstop" for "Race Strategist" and all simulator plugins, Cato will use the current strategy developed in the "Strategy Workbench" and will instruct Jona accordingly, Coloured many icons. Tested, with update procedure and documentation.)
+[3.6.4-release](https://www.dropbox.com/s/l2a7cpg0ubsx6fh/Simulator%20Controller%203.6.4-dev.zip?dl=1) (Early build for Release 3.6.4. New features: Improved refuel handling for the last stints in strategy development, Variation of fuel consumption, initial fuel and tyre usage is now possible in strategy simulations, New action "StrategyCancel" for "Race Strategist" and all simulator plugins, New "InformationRequest" commands "StrategyOverview" and "NextPitstop" for "Race Strategist" and all simulator plugins, Cato will use the current strategy developed in the "Strategy Workbench" and will instruct Jona accordingly, Coloured many icons. Tested, with update procedure and documentation.)
 
 #### Latest release build
 

@@ -244,9 +244,7 @@ Enter the required values in the *Initial Conditions* group, choose the data to 
 
 For every slider not at the zero position, four different variations of the underlying value will be created as strategy sceanrios, which will be compared at the end for better results. 
 
-You can use the commands in the *Simulation* drop down menu to start a simulation (similar to use the "Simulate!" button), and to copy the current results over to the *Strategy* tab. You can als define various target values for the scenario optimizer of the simulation.
-
-Note: The "Car Weight" slider is not active in the *Optimizer* group currently and only the "Run Simulation..." and "Use as Strategy..." are currently active in the *Simulation* drop down menu.
+You can use the commands in the *Simulation* drop down menu to start a simulation (similar to use the "Simulate!" button), and to copy the current results over to the *Strategy* tab.
 
 #### Strategy
 

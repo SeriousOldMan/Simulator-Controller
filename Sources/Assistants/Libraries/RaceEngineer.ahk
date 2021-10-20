@@ -1235,7 +1235,7 @@ class RaceEngineer extends RaceAssistant {
 					speaker.speakPhrase("NoRepairBodywork")
 			}
 			
-			if (confirm && this.Listener) {
+			if (confirm && this.Listener && !plannedLap) {
 				speaker.speakPhrase("ConfirmPrepare", false, true)
 				
 				this.setContinuation(ObjBindMethod(this, "preparePitstop"))
@@ -1402,7 +1402,7 @@ class RaceEngineer extends RaceAssistant {
 					
 					this.setContinuation(ObjBindMethod(this, "planPitstop"))
 				}
-				else {
+				else if !(this.KnowledgeBase.getValue("Pitstop.Planned.Lap", 0) >= this.KnowledgeBase.getValue("Lap")) {
 					speaker.speakPhrase("ConfirmPrepare", false, true)
 					
 					this.setContinuation(ObjBindMethod(this, "preparePitstop"))

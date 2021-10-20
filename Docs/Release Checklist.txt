@@ -26,6 +26,7 @@ Release 3.6.4 Checklist
    b. Plugin Labels
    c. Translations
 2. New pictures for Strategy Workbench
+3. Check grammars in Discord
 
 Release 3.6.2 Checklist
 =======================

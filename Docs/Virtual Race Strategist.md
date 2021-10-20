@@ -244,7 +244,7 @@ Enter the required values in the *Initial Conditions* group, choose the data to 
 
 For every slider not at the zero position, four different variations of the underlying value will be created as strategy sceanrios, which will be compared at the end for better results. 
 
-You can use the commands in the *Simulation* drop down menu to start a simulation (similar to use the "Simulate!" button), and to copy the current results over to the *Strategy* tab.
+You can use the commands in the *Simulation* drop down menu to start a simulation (similar to use the "Simulate!" button), and to copy the current results over to the *Strategy* tab. If you hold the Control key while pressing the "Simulate!" button or choosing the corresponding menu item, the selected scenario will be copied to the *Strategy* tab after the simulation.
 
 #### Strategy
 

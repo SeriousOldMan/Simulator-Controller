@@ -1614,7 +1614,12 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		switch line {
 			case 3: ; "Run Simulation"
+				selectStrategy := GetKeyState("Ctrl")
+				
 				this.runSimulation()
+				
+				if selectStrategy
+					this.chooseSimulationMenu(5)
 			case 5: ; "Use as Strategy..."
 				strategy := this.SelectedScenario
 				
@@ -3374,7 +3379,14 @@ strategyMenu() {
 }
 
 runSimulation() {
-	StrategyWorkbench.Instance.runSimulation()
+	workbench := StrategyWorkbench.Instance
+	
+	selectStrategy := GetKeyState("Ctrl")
+				
+	workbench.runSimulation()
+				
+	if selectStrategy
+		workbench.chooseSimulationMenu(5)
 }
 
 setButtonIcon(buttonHandle, file, index := 1, options := "") {

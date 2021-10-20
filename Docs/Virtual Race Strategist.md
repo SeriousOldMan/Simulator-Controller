@@ -224,7 +224,7 @@ In this tab you have to enter the time required for several pitstop activities, 
 
 #### Simulation
 
-This is the central functionality for the strategy development. Using the fields in this tab, you can defined the conditions and settings for your first stint and run a strategy simulation. You can choose, whether to use only the values you entered here for engine map, lap time and average fuel consumption, or you can include the full knowledge from the telemetry data from previous sessions on the same track in similar conditions.
+This is the central functionality for strategy development. Using the fields in this tab, you can define the starting conditions and settings for your first stint and run a strategy simulation. You can choose, whether to use only the values you entered here for engine map, lap time and average fuel consumption, or you can include the full knowledge from the telemetry data from previous sessions on the same track in similar conditions. For each different engine map and therefore fuel consumption and resulting average lap time, a strategy scenario will be created. These scenarios together with all additional scenarions created by the optimization algorithm (see below), will be compared at the end of the simulation and the best one regarding the overall race result will be selected as the best strategy. 
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Settings%203.JPG)
 
@@ -239,6 +239,8 @@ Enter the required values in the *Initial Conditions* group, choose the data to 
   - Car Weight
   
 	Perhaps the most tricky one and it needs a lot of historical telemetry data. Using the slider, you can define how much the influence of the car weight, which in the end is the amount of fuel in the tank, will influence the lap times. For some cars, for example, lap times degrade heavily, if the amount of fuel and therefore the car weight is above a specific threshold. This can be derived from the telemtry data. If you set the slider completely to the left, this effect will be ignored entirely, whereas, if you set the slider completely to the right, this effect will be taken into account to 100%.
+
+For every slider not at the zero position, four different variations of the underlying value will be created as strategy sceanrios, which will be compared at the end for better results. 
 
 You can use the commands in the *Simulation* drop down menu to start a simulation (similar to use the "Simulate!" button), and to copy the current results over to the *Strategy* tab. You can als define various target values for the scenario optimizer of the simulation.
 

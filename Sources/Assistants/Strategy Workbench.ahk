@@ -571,7 +571,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20, %simMaxTyreLapsEdit%
 		Gui %window%:Add, Text, x%x3% yp+4 w47 h20, % translate("Laps")
 				
-		Gui %window%:Add, Text, x%x% yp+21 w70 h20 +0x200, % translate("Tank Filling")
+		Gui %window%:Add, Text, x%x% yp+21 w70 h20 +0x200, % translate("Fuel Amount")
 		Gui %window%:Add, Edit, x%x1% yp-1 w40 h20 Number VsimInitialFuelAmountEdit, %simInitialFuelAmountEdit%
 		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20, %simInitialFuelAmountEdit%
 		Gui %window%:Add, Text, x%x3% yp+4 w47 h20, % translate("Liter")

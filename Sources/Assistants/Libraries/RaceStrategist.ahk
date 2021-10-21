@@ -798,7 +798,14 @@ class RaceStrategist extends RaceAssistant {
 		
 		if !this.hasEnoughData()
 			return
-				
+		
+		if !lap {
+			lap := knowledgeBase.getValue("Strategy.Pitstop.Lap", false)
+			
+			if (lap >= knowledgeBase.getValue("Lap") - knowledgeBase.getValue("Session.Settings.Lap.PitstopWarning"))
+				lap := false
+		}
+		
 		knowledgeBase.setFact("Pitstop.Strategy.Plan", lap ? lap : true)
 		
 		knowledgeBase.produce()

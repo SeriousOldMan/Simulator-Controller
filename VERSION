@@ -7,7 +7,7 @@ Changes=Improved refuel handling for the last stints in strategy development, Va
 [Release]
 Version=3.6.2-release
 Date=10/15/2021
-Download=https://cntr.click/8PF4MkD
+Download=https://www.dropbox.com/s/tiw6t0vgzxdlv8q/Simulator%20Controller%203.6.2-release.zip?dl=1
 Changes=Saving and loading of Strategies in "Strategy Workbench", Initializing values in "Strategy Workbench", Comparison of strategies in "Strategy Workbench", Take pitstop rules into account in strategy simulations
 [Current]
 Type=Development

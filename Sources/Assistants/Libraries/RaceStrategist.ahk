@@ -602,7 +602,7 @@ class RaceStrategist extends RaceAssistant {
 		knowledgeBase := this.KnowledgeBase
 		
 		if (!strategyReported && this.hasEnoughData(false) && this.Strategy && this.Speaker && this.Listener) {
-			this.getSpeaker().speakPhrase("ReportStrategy")
+			this.getSpeaker().speakPhrase("ConfirmReportStrategy", false, true)
 	
 			strategyReported := lapNumber
 			
@@ -802,7 +802,7 @@ class RaceStrategist extends RaceAssistant {
 		if !lap {
 			lap := knowledgeBase.getValue("Strategy.Pitstop.Lap", false)
 			
-			if (lap >= knowledgeBase.getValue("Lap") - knowledgeBase.getValue("Session.Settings.Lap.PitstopWarning"))
+			if (lap && (lap >= (knowledgeBase.getValue("Lap") - knowledgeBase.getValue("Session.Settings.Lap.PitstopWarning"))))
 				lap := false
 		}
 		
@@ -825,7 +825,7 @@ class RaceStrategist extends RaceAssistant {
 			Process Exist, Race Engineer.exe
 			
 			if (ErrorLevel && this.Listener) {
-				speaker.speakPhrase("InformEngineer", false, true)
+				speaker.speakPhrase("ConfirmInformEngineer", false, true)
 				
 				this.setContinuation(ObjBindMethod(this, "planPitstop", plannedLap))
 			}
@@ -915,7 +915,7 @@ class RaceStrategist extends RaceAssistant {
 				Process Exist, Race Engineer.exe
 					
 				if (ErrorLevel && this.Listener) {
-					speaker.speakPhrase("InformEngineer", false, true)
+					speaker.speakPhrase("ConfirmInformEngineer", false, true)
 					
 					this.setContinuation(ObjBindMethod(this, "planPitstop"))
 				}
@@ -949,7 +949,7 @@ class RaceStrategist extends RaceAssistant {
 			Process Exist, Race Engineer.exe
 				
 			if (ErrorLevel && this.Listener) {
-				speaker.speakPhrase("InformEngineer", false, true)
+				speaker.speakPhrase("ConfirmInformEngineer", false, true)
 				
 				nextPitstop := knowledgebase.getValue("Strategy.Pitstop.Next")
 				

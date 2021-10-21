@@ -625,7 +625,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			this.RaceEngineer.preparePitstop(lap)
 	}
 	
-	pitstopPlanned(pitstopNumber) {
+	pitstopPlanned(pitstopNumber, plannedLap := false) {
 	}
 	
 	pitstopPrepared(pitstopNumber) {

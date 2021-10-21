@@ -103,8 +103,8 @@ class TestPitstopHandler {
 			showMessage("Invoking pitstop action " . action . ((arguments.Length() > 0) ? (" with " . values2String(", ", arguments*)) : ""))
 	}
 
-	pitstopPlanned(pitstopNumber) {
-		this.showAction("pitstopPlanned", pitstopNumber)
+	pitstopPlanned(pitstopNumber, plannedLap := false) {
+		this.showAction("pitstopPlanned", pitstopNumber, plannedLap)
 		
 		vCompletedActions["pitstopPlanned"] := pitstopNumber
 	}

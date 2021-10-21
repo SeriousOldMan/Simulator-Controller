@@ -1235,15 +1235,18 @@ class RaceEngineer extends RaceAssistant {
 					speaker.speakPhrase("NoRepairBodywork")
 			}
 			
-			if (confirm && this.Listener && !plannedLap) {
-				speaker.speakPhrase("ConfirmPrepare", false, true)
-				
-				this.setContinuation(ObjBindMethod(this, "preparePitstop"))
-			}
+			if (confirm && this.Listener)
+				if plannedLap
+					speaker.speakPhrase("PitstopLap", {lap: plannedLap})
+				else {
+					speaker.speakPhrase("ConfirmPrepare", false, true)
+					
+					this.setContinuation(ObjBindMethod(this, "preparePitstop"))
+				}
 		}
 		
 		if (result && this.PitstopHandler) {
-			this.PitstopHandler.pitstopPlanned(pitstopNumber)
+			this.PitstopHandler.pitstopPlanned(pitstopNumber, plannedLap)
 		}
 		
 		return result

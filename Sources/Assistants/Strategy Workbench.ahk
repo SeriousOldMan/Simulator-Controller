@@ -836,9 +836,9 @@ class StrategyWorkbench extends ConfigurationItem {
 	
 	createStrategyInfo(strategy) {
 		html := "<table>"
-		html .= ("<tr><td><b>" . translate("Simulator:") . "</b></td><td>" . this.SelectedSimulator . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Car:") . "</b></td><td>" . this.SelectedCar . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Track:") . "</b></td><td>" . this.SelectedTrack . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Simulator:") . "</b></td><td>" . strategy.Simulator . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Car:") . "</b></td><td>" . strategy.Car . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Track:") . "</b></td><td>" . strategy.Track . "</td></tr>")
 		
 		if (strategy.SessionType = "Duration") {
 			html .= ("<tr><td><b>" . translate("Duration:") . "</b></td><td>" . strategy.SessionLength . A_Space . translate("Minutes") . "</td></tr>")

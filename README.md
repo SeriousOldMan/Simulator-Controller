@@ -24,24 +24,24 @@ If you don't want to use the automated installer (or you can't cause of your Ant
 
 Simply donwload and run [Simulator Controller.exe](https://cntr.click/Qt9gVs0) (you may have to deactivate your Antivirus or Browser download protection). This small application will connect to the version repository and will download and install the latest version automatically for you. If you want to install a version other than the current one, no problem. This is possible by downloading and installing one of the versions below manually, but consult the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation) beforehand.
 
-#### Latest development build
-
-[3.6.4-dev](https://www.dropbox.com/s/l2a7cpg0ubsx6fh/Simulator%20Controller%203.6.4-dev.zip?dl=1) (Early build for Release 3.6.4. New features: Improved refuel handling for the last stints in strategy development, Variation of fuel consumption, initial fuel and tyre usage is now possible in strategy simulations, New action "StrategyCancel" for "Race Strategist" and all simulator plugins, New "InformationRequest" commands "StrategyOverview" and "NextPitstop" for "Race Strategist" and all simulator plugins, Cato will use the current strategy developed in the "Strategy Workbench" and will instruct Jona accordingly, Coloured many icons. Tested, with update procedure and documentation.)
-
 #### Latest release build
 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[3.6.2-release](https://www.dropbox.com/s/tiw6t0vgzxdlv8q/Simulator%20Controller%203.6.2-release.zip?dl=1) (New features: Saving and loading of Strategies in "Strategy Workbench", Initializing values in "Strategy Workbench", Comparison of strategies in "Strategy Workbench", Take pitstop rules into account in strategy simulations.)
+[3.6.4-release]() (New features: Improved refuel handling for the last stints in strategy development, Variation of fuel consumption, initial fuel and tyre usage is now possible in strategy simulations, New action "StrategyCancel" for "Race Strategist" and all simulator plugins, New "InformationRequest" commands "StrategyOverview" and "NextPitstop" for "Race Strategist" and all simulator plugins, Cato will use the current strategy developed in the "Strategy Workbench" and will instruct Jona accordingly, Coloured many icons.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-362) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-364) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
+[3.6.2-release](https://cntr.click/8PF4MkD) (New features: Saving and loading of Strategies in "Strategy Workbench", Initializing values in "Strategy Workbench", Comparison of strategies in "Strategy Workbench", Take pitstop rules into account in strategy simulations.)
+
 [3.6.0-release](https://cntr.click/b6VRZLm) (New features: Initial version of strategy simulation in "Strategy Workbench".)
 
-[3.5.9-release](https://cntr.click/Hq9ytpX) (New features: Renamed "Setup Database" to "Database", New "Strategy Workbench" tool, "Race Strategist" can now save race statistics for the "Strategy Workbench", New plugin parameter "openStrategyWorkbench" for "Race Strategist" plugin, New "openStrategyWorkbench" action function, Fixed "Setup Wizard" to correctly generate "Pedal Calibration" configuration, New lightweight Database Library for Developers. *Release 3.5.9 is a maintenance release for 3.5.8*)
+#### Latest development build
+
+None for the moment...
 
 ### Discord Community
 

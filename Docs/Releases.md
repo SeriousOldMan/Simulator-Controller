@@ -1,3 +1,9 @@
+## 3.6.6-release 10/29/21 (planned)
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Integrated support for StreamDeck. You can associate plugin modes with StreamDeck profiles, which will be automatically selected on the StreamDeck, when this mode becomes active. Also, you can associate an icon with each mode action, which will be shown on the StreamDeck.
+
 ## 3.6.5-release 10/22/21
 
   1. Fixed a critical bug in Strategy Workbench due to incomplete build rules

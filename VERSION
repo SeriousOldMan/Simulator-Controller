@@ -1,16 +1,16 @@
 [Development]
-Version=3.6.4-release
-Target=3.6.4-release
+Version=3.6.5-release
+Target=3.6.5-release
 Date=10/22/2021
-Download=https://www.dropbox.com/s/ogf04349owtbhdv/Simulator%20Controller%203.6.4-release.zip?dl=1
+Download=https://www.dropbox.com/s/onvuzbrhx7t6kzx/Simulator%20Controller%203.6.5-release.zip?dl=1
 Changes=Improved refuel handling for the last stints in strategy development, Variation of fuel consumption, initial fuel and tyre usage is now possible in strategy simulations, New action "StrategyCancel" for "Race Strategist" and all simulator plugins, New "InformationRequest" commands "StrategyOverview" and "NextPitstop" for "Race Strategist" and all simulator plugins, Cato will use the current strategy developed in the "Strategy Workbench" and will instruct Jona accordingly, Coloured many icons
 [Release]
-Version=3.6.4-release
+Version=3.6.5-release
 Date=10/22/2021
-Download=https://www.dropbox.com/s/ogf04349owtbhdv/Simulator%20Controller%203.6.4-release.zip?dl=1
+Download=https://www.dropbox.com/s/onvuzbrhx7t6kzx/Simulator%20Controller%203.6.5-release.zip?dl=1
 Changes=Improved refuel handling for the last stints in strategy development, Variation of fuel consumption, initial fuel and tyre usage is now possible in strategy simulations, New action "StrategyCancel" for "Race Strategist" and all simulator plugins, New "InformationRequest" commands "StrategyOverview" and "NextPitstop" for "Race Strategist" and all simulator plugins, Cato will use the current strategy developed in the "Strategy Workbench" and will instruct Jona accordingly, Coloured many icons
 [Current]
 Type=Release
 [Version]
-Release=3.6.4-release
-Development=3.6.4-release
+Release=3.6.5-release
+Development=3.6.5-release

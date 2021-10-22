@@ -241,19 +241,25 @@ computeTemperatures(rows) {
 
 removeInvalidLaps(rows) {
 	lapTimes := []
+	consumption := []
 	
-	for ignore, row in rows
+	for ignore, row in rows {
 		lapTimes.Push(row["Lap.Time"])
+		consumption.Push(row["Fuel.Consumption"])
+	}
 	
-	avg := average(lapTimes)
-	stdDev := stdDeviation(lapTimes)
+	ltAvg := average(lapTimes)
+	ltStdDev := stdDeviation(lapTimes)
 	
-	threshold := (avg + stdDev)
+	cAvg := average(consumption)
+	cStdDev := stdDeviation(consumption)
+	
+	ltThreshold := (ltAvg + ltStdDev)
 	
 	result := []
 	
 	for ignore, row in rows
-		if (row["Lap.Time"] < threshold)
+		if ((row["Lap.Time"] < ltThreshold) && (Abs(row["Fuel.Consumption"] - cAvg) <= cStdDev))
 			result.Push(row)
 
 	return result

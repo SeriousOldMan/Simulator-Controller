@@ -20,7 +20,7 @@ priority: 1,																																	\
 		  {Any: [?Weather.Weather.10Min = Dry], [?Weather.Weather.10Min = Drizzle]}} =>															\
 		(Set: Weather.Tyre.Compound.Target, Dry), (Set: Weather.Tyre.Compound.Color.Target, !Tyre.Compound.Color)
 priority: 1,																																	\
-	{All: [?Lap], [?Tyre.Compound = Wet], {None: [?Weather.Change.Recommended]},																\
+	{All: [?Lap], [?Tyre.Compound = Wet], {None: [?Weather.Tyre.Change.Recommended]},															\
 		  {Any: [?Weather.Weather.10Min = Dry], [?Weather.Weather.10Min = Drizzle]}} =>															\
 		(Prove: weatherTyreChangeRecommendation(?Lap, ?Weather.Weather.10Min, 10, Dry))
 priority: 1,																																	\
@@ -44,7 +44,7 @@ priority: 1,																																	\
 			[?Weather.Change.Notified > ?Weather.Weather.30Min.Index]}} =>																		\
 		(Prove: weatherChangeNotification(?Lap, !Weather.Weather.30Min, 30))
 
-priority: -20, [?Pitstop.Lap = ?Lap] => (Clear: Weather.Tyre.Change.Recommended), (Clear: Weather.Change.Notified),								\
+priority: -10, [?Pitstop.Lap = ?Lap] => (Clear: Weather.Tyre.Change.Recommended), (Clear: Weather.Change.Notified),								\
 										(Clear: Weather.Tyre.Compound.Target), (Clear: Weather.Tyre.Compound.Color.Target)
 
 weatherChangeNotification(?lap, ?weather, ?minutes) <= remainingStintTime(?lap, ?stintTime), ?remainingMinutes = ?stintTime / 60000,			\

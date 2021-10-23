@@ -56,8 +56,6 @@ global kAllTrigger = "__All Trigger__"
 class FunctionController extends ConfigurationItem {
 	iController := false
 	
-	iControlHandles := {}
-	
 	iNum1WayToggles := 0
 	iNum2WayToggles := 0
 	iNumButtons := 0
@@ -120,15 +118,8 @@ class FunctionController extends ConfigurationItem {
 		this.iNumDials := numDials
 	}
 	
-	registerControlHandle(descriptor, handle) {
-		this.iControlHandles[descriptor] := handle
-	}
-	
-	getControlHandle(descriptor) {
-		if this.iControlHandles.HasKey(descriptor)
-			return this.iControlHandles[descriptor]
-		else
-			return false
+	hasFunction(function) {
+		Throw "Virtual method FunctionController.hasFunction must be implemented in a subclass..."
 	}
 	
 	setControlText(function, text, color := "Black") {
@@ -141,21 +132,17 @@ class FunctionController extends ConfigurationItem {
 	}
 }
 
-class ButtonBox extends FunctionController {
-	static iButtonBoxGuis := {}
+class GuiFunctionController extends FunctionController {
+	static iGuiFunctionController := {}
 	
 	iWindow := false
 	iWindowWidth := 0
 	iWindowHeight := 0
 	
+	iControlHandles := {}
+	
 	iIsVisible := false
 	iIsPositioned := false
-	
-	Type[] {
-		Get {
-			return "Button Box"
-		}
-	}
 	
 	Visible[] {
 		Get {
@@ -170,8 +157,10 @@ class ButtonBox extends FunctionController {
 			if (controller != false) {
 				inSimulation := (controller.ActiveSimulator != false)
 	
-				return getConfigurationValue(this.Controller.Settings, "Button Box"
-										   , inSimulation ? "Button Box Simulation Duration" : "Button Box Duration"
+				type := this.Type 
+				
+				return getConfigurationValue(this.Controller.Settings, type
+										   , type . (inSimulation ? " Simulation Duration" : " Duration")
 										   , inSimulation ? false : false)
 			}
 			else
@@ -186,7 +175,7 @@ class ButtonBox extends FunctionController {
 	}
 	
 	createGui() {
-		Throw "Virtual method ButtonBox.createGui must be implemented in a subclass..."
+		Throw "Virtual method GuiFunctionController.createGui must be implemented in a subclass..."
 	}
 	
 	associateGui(window, width, height, num1WayToggles, num2WayToggles, numButtons, numDials) {
@@ -196,14 +185,29 @@ class ButtonBox extends FunctionController {
 		
 		this.setControls(num1WayToggles, num2WayToggles, numButtons, numDials)
 		
-		this.iButtonBoxGuis[window] := this
+		this.iGuiFunctionController[window] := this
 		
 		logMessage(kLogInfo, translate("Controller layout initialized:") . " #" . num1WayToggles . A_Space . translate("1-Way Toggles") . ", #" . num2WayToggles . A_Space . translate("2-Way Toggles") . ", #" . numButtons . A_Space . translate("Buttons") . ", #" . numDials . A_Space . translate("Dials"))
 	}
 	
-	findButtonBox(window) {
-		if this.iButtonBoxGuis.HasKey(window)
-			return this.iButtonBoxGuis[window]
+	findFunctionController(window) {
+		if this.iGuiFunctionController.HasKey(window)
+			return this.iGuiFunctionController[window]
+		else
+			return false
+	}
+	
+	hasFunction(function) {
+		return (this.getControlHandle(function.Descriptor) != false)
+	}
+	
+	registerControlHandle(descriptor, handle) {
+		this.iControlHandles[descriptor] := handle
+	}
+	
+	getControlHandle(descriptor) {
+		if this.iControlHandles.HasKey(descriptor)
+			return this.iControlHandles[descriptor]
 		else
 			return false
 	}
@@ -234,36 +238,34 @@ class ButtonBox extends FunctionController {
 	distanceFromTop() {
 		distance := 0
 		
-		for ignore, fnController in this.Controller.FunctionController
-			if isInstance(fnController, ButtonBox)
-				if (fnController == this)
-					return distance
-				else
-					distance += fnController.iWindowHeight
+		for ignore, fnController in this.Controller.FunctionController[GuiFunctionController]
+			if (fnController == this)
+				return distance
+			else
+				distance += fnController.iWindowHeight
 		
-		Throw "Internal error detected in ButtonBox.distanceFromTop..."
+		Throw "Internal error detected in GuiFunctionController.distanceFromTop..."
 	}
 	
 	distanceFromBottom() {
 		distance := 0
-		buttonBoxes := []
+		controller := []
 		
-		for ignore, fnController in this.Controller.FunctionController
-			if isInstance(fnController, ButtonBox)
-				buttonBoxes.Push(fnController)
+		for ignore, fnController in this.Controller.FunctionController[GuiFunctionController]
+			controller.Push(fnController)
 		
-		index := buttonBoxes.Length()
+		index := controller.Length()
 		
 		Loop {
-			btnBox := buttonBoxes[index]
+			fnController := controller[index]
 		
-			distance += btnBox.iWindowHeight
+			distance += fnController.iWindowHeight
 		
-			if (btnBox == this)
+			if (fnController == this)
 				return distance
 		} until (--index = 0)
 		
-		Throw "Internal error detected in ButtonBox.distanceFromBottom..."
+		Throw "Internal error detected in GuiFunctionController.distanceFromBottom..."
 	}
 	
 	show(makeVisible := true) {
@@ -279,7 +281,7 @@ class ButtonBox extends FunctionController {
 			if ((A_TickCount - this.Controller.LastEvent) > duration)
 				return
 			else
-				SetTimer hideButtonBoxes, %duration%
+				SetTimer hideFunctionController, %duration%
 		
 			protectionOn()
 
@@ -294,7 +296,9 @@ class ButtonBox extends FunctionController {
 					if this.iIsPositioned
 						Gui %window%:Show, NoActivate
 					else {
-						position := getConfigurationValue(this.Controller.Settings, "Button Box", "Button Box Position", "Bottom Right")
+						type := this.Type
+					
+						position := getConfigurationValue(this.Controller.Settings, type, type . " Position", "Bottom Right")
 						
 						SysGet mainScreen, MonitorWorkArea
 
@@ -324,10 +328,10 @@ class ButtonBox extends FunctionController {
 									Goto defaultCase
 							case "Last Position":
 	defaultCase:
-								x := getConfigurationValue(this.Controller.Settings, "Button Box", this.Descriptor . ".Position.X", mainScreenRight - width)
-								y := getConfigurationValue(this.Controller.Settings, "Button Box", this.Descriptor . ".Position.Y", mainScreenBottom - height)
+								x := getConfigurationValue(this.Controller.Settings, type, this.Descriptor . ".Position.X", mainScreenRight - width)
+								y := getConfigurationValue(this.Controller.Settings, type, this.Descriptor . ".Position.Y", mainScreenBottom - height)
 							default:
-								Throw "Unhandled position for Button Box (" . position . ") encountered in ButtonBox.show..."
+								Throw "Unhandled position for " . type " (" . position . ") encountered in GuiFunctionController.show..."
 						}
 						
 						Gui %window%:Show, x%x% y%y% w%width% h%height% NoActivate
@@ -386,8 +390,8 @@ class ButtonBox extends FunctionController {
 			
 			settings := this.Controller.Settings
 			
-			setConfigurationValue(settings, "Button Box", this.Descriptor . ".Position.X", newX)
-			setConfigurationValue(settings, "Button Box", this.Descriptor . ".Position.Y", newY)
+			setConfigurationValue(settings, this.Type, this.Descriptor . ".Position.X", newX)
+			setConfigurationValue(settings, this.Type, this.Descriptor . ".Position.Y", newY)
 			
 			writeConfiguration(kSimulatorSettingsFile, settings)
 			
@@ -439,9 +443,19 @@ class SimulatorController extends ConfigurationItem {
 		}
 	}
 	
-	FunctionController[] {
+	FunctionController[class := false] {
 		Get {
-			return this.iFunctionController
+			if class {
+				controller := []
+			
+				for ignore, fnController in this.iFunctionController
+					if isInstance(fnController, class)
+						controller.Push(fnController)
+				
+				return controller
+			}
+			else
+				return this.iFunctionController
 		}
 	}
 	
@@ -598,7 +612,7 @@ class SimulatorController extends ConfigurationItem {
 	
 	findFunctionController(function) {
 		for ignore, fnController in this.FunctionController
-			if fnController.getControlHandle(function.Descriptor)
+			if fnController.hasFunction(function)
 				return fnController
 			
 		return false
@@ -628,10 +642,9 @@ class SimulatorController extends ConfigurationItem {
 		
 		this.setModes()
 		
-		for ignore, fnController in this.FunctionController
-			if isInstance(fnController, ButtonBox)
-				if fnController.VisibleDuration >= 9999
-					fnController.show()
+		for ignore, fnController in this.FunctionController[GuiFunctionController]
+			if fnController.VisibleDuration >= 9999
+				fnController.show()
 	}
 	
 	computeControllerModes() {
@@ -685,11 +698,10 @@ class SimulatorController extends ConfigurationItem {
 			if this.isActive(thePlugin)
 				thePlugin.simulatorStartup(simulator)
 		
-		for ignore, fnController in this.FunctionController
-			if isInstance(fnController, ButtonBox) {
-				fnController.hide()
-				fnController.show()
-			}
+		for ignore, fnController in this.FunctionController[GuiFunctionController] {
+			fnController.hide()
+			fnController.show()
+		}
 	}
 	
 	simulatorShutdown(simulator) {
@@ -697,11 +709,10 @@ class SimulatorController extends ConfigurationItem {
 			if this.isActive(thePlugin) 
 				thePlugin.simulatorShutdown(simulator)
 		
-		for ignore, fnController in this.FunctionController
-			if isInstance(fnController, ButtonBox) {
-				fnController.hide()
-				fnController.show()
-			}
+		for ignore, fnController in this.FunctionController[GuiFunctionController] {
+			fnController.hide()
+			fnController.show()
+		}
 	}
 	
 	startSimulator(application, splashImage := false) {
@@ -1584,10 +1595,9 @@ class ControllerAction {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-hideButtonBoxes() {
-	for ignore, fnController in SimulatorController.Instance.FunctionController
-		if isInstance(fnController, ButtonBox)
-			fnController.hide()
+hideFunctionController() {
+	for ignore, fnController in SimulatorController.Instance.FunctionController[GuiFunctionController]
+		fnController.hide()
 }
 
 setHotkeyEnabled(function, trigger, enabled) {
@@ -1683,9 +1693,8 @@ updateSimulatorState() {
 		}
 
 		if changed
-			for ignore, fnController in controller.FunctionController
-				if isInstance(fnController, ButtonBox)
-					fnController.updateVisibility()
+			for ignore, fnController in controller.FunctionController[GuiFunctionController]
+				fnController.updateVisibility()
 		
 		if isSimulatorRunning {
 			SetTimer updateSimulatorState, -5000
@@ -1697,9 +1706,8 @@ updateSimulatorState() {
 
 			show := true
 			
-			for ignore, fnController in controller.FunctionController
-				if isInstance(fnController, ButtonBox)
-					show := (show && !fnController.Visible)
+			for ignore, fnController in controller.FunctionController[GuiFunctionController]
+				show := (show && !fnController.Visible)
 			
 			if show
 				controller.showLogo()

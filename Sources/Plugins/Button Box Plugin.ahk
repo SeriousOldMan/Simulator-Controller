@@ -68,6 +68,18 @@ global vHandleCounter := 1
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+class ButtonBox extends GuiFunctionController {
+	Type[] {
+		Get {
+			return "Button Box"
+		}
+	}
+	
+	findButtonBox(window) {
+		return GuiFunctionController.findFunctionController(window)
+	}
+}
+
 class GridButtonBox extends ButtonBox {
 	static kHeaderHeight := 70
 	static kLabelMargin := 5

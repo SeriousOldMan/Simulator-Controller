@@ -100,7 +100,7 @@ class SystemPlugin extends ControllerPlugin {
 			Get {
 				controller := this.Controller
 				
-				mode := controller.ActiveMode[controller.findButtonBox(this.Function)]
+				mode := controller.ActiveMode[controller.findFunctionController(this.Function)]
 				
 				if mode
 					return mode.Mode
@@ -112,7 +112,7 @@ class SystemPlugin extends ControllerPlugin {
 		fireAction(function, trigger) {
 			controller := this.Controller
 			
-			controller.rotateMode(((trigger == "Off") || (trigger == "Decrease")) ? -1 : 1, Array(controller.findButtonBox(function)))
+			controller.rotateMode(((trigger == "Off") || (trigger == "Decrease")) ? -1 : 1, Array(controller.findFunctionController(function)))
 
 			this.Function.setText(controller.findPlugin(kSystemPlugin).actionLabel(this))
 		}
@@ -546,7 +546,7 @@ updateModeSelector() {
 			function := selector.Function
 			
 			if modeSelectorMode {
-				currentMode := controller.ActiveMode[controller.findButtonBox(function)]
+				currentMode := controller.ActiveMode[controller.findFunctionController(function)]
 				
 				if currentMode
 					currentMode := currentMode.Mode

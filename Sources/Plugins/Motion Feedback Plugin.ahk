@@ -914,7 +914,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			if this.Application.isRunning()
 				mode.updateActionStates()
 			else {
-				this.Controller.rotateMode(1, mode.ButtonBoxes)
+				this.Controller.rotateMode(1, mode.FunctionController)
 				
 				if inList(this.Controller.ActiveModes, mode)
 					mode.deactivate()

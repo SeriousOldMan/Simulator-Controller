@@ -329,14 +329,14 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 					chassisMode := this.findMode(kChassisVibrationMode)
 				
 					if inList(activeModes, pedalMode) {
-						controller.rotateMode(1, pedalMode.ButtonBoxes)
+						controller.rotateMode(1, pedalMode.FunctionController)
 				
 						if inList(controller.ActiveModes, pedalMode)
 							pedalMode.deactivate()
 					}
 				
 					if inList(activeModes, chassisMode) {
-						this.Controller.rotateMode(1, chassisMode.ButtonBoxes)
+						this.Controller.rotateMode(1, chassisMode.FunctionController)
 				
 						if inList(controller.ActiveModes, chassisMode)
 							chassisMode.deactivate()

@@ -134,7 +134,7 @@ class TelemetryDatabase extends SessionDatabase {
 	getPressuresCount(weather, compound, compoundColor) {
 		if this.Database {
 			return this.Database.query("Tyres", {Group: [["Tyre.Pressure", "count", "Count"]], By: "Tyre.Pressure"
-											   , Transform: "computePressures"
+											   , Transform: combine("removeInvalidLaps", "computePressures")
 											   , Where: {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
 		}
 		else
@@ -147,6 +147,7 @@ class TelemetryDatabase extends SessionDatabase {
 													   , ["Tyre.Pressure.Front.Right", "average", "Tyre.Pressure.Front.Right"]
 													   , ["Tyre.Pressure.Rear.Left", "average", "Tyre.Pressure.Rear.Left"]
 													   , ["Tyre.Pressure.Rear.Right", "average", "Tyre.Pressure.Rear.Right"]], By: "Lap.Time"
+											   , Transform: combine("removeInvalidLaps", "computePressures")
 											   , Where: {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
 		}
 		else

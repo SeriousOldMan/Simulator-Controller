@@ -44,8 +44,12 @@ priority: 1,																																	\
 			[?Weather.Change.Notified > ?Weather.Weather.30Min.Index]}} =>																		\
 		(Prove: weatherChangeNotification(?Lap, !Weather.Weather.30Min, 30))
 
-priority: -10, [?Pitstop.Lap = ?Lap] => (Clear: Weather.Tyre.Change.Recommended), (Clear: Weather.Change.Notified),								\
+priority: -10, [?Pitstop.Lap = ?Lap] => (Prove: clearWeatherTyreChangeNotification(?Lap)),															\
 										(Clear: Weather.Tyre.Compound.Target), (Clear: Weather.Tyre.Compound.Color.Target)
+
+clearWeatherTyreChangeNotification(?lap) <= ?clearLap = ?lap + 5, Set(Weather.Tyre.Change.Clear, ?clearLap)
+
+priority: -10, [?Weather.Tyre.Change.Clear = ?Lap] => (Clear: Weather.Tyre.Change.Recommended)
 
 weatherChangeNotification(?lap, ?weather, ?minutes) <= remainingStintTime(?lap, ?stintTime), ?remainingMinutes = ?stintTime / 60000,			\
 													   ?remainingMinutes > ?minutes, Call(weatherChangeNotification, true, ?minutes),			\

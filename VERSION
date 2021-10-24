@@ -3,7 +3,7 @@ Version=3.6.6-dev
 Target=3.6.6-release
 Date=10/22/2021
 Download=
-Changes=
+Changes=More sophisticated tyre compound handling, Refactoring of ButtonBox class, Early integration of StreamDeck
 [Release]
 Version=3.6.5-release
 Date=10/22/2021

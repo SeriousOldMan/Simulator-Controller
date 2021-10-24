@@ -279,13 +279,13 @@ if !GetKeyState("Ctrl") {
 	AHKUnit.Run()
 }
 else {
-	raceNr := 13
+	raceNr := 14
 	strategist := new RaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist.settings")
 								   , "Khato", "de", "Windows", true, true)
 
 	strategist.VoiceAssistant.setDebug(kDebugGrammars, false)
 	
-	if (raceNr == 13) {
+	if (raceNr == 14) {
 		done := false
 		
 		Loop {
@@ -308,18 +308,22 @@ else {
 					
 					if isDebug()
 						showMessage("Data " lap . "." . A_Index . " loaded...")
-					
-					MsgBox Continue?
 				}
 				
 				if (A_Index = 1)
 					break
 			}
 			
-			if (A_Index = 9)
-				strategist.performPitstop()
+			if (A_Index = 14) {
+				strategist.performPitstop()		
+				
+				MsgBox Pitstop...
+			}
 			
-			if (A_Index = 11) {
+			if (A_Index = 17)
+				MsgBox Inspect...
+			
+			if (A_Index = 20) {
 				done := true
 				
 				break

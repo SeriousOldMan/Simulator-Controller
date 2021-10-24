@@ -387,7 +387,7 @@ carLapAvgTime(?lap, ?car, ?times, ?avgTime) <= sum(?times, ?sTimes), length(?tim
 ;;; made.                                                                   ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-priority: 5, {None: [?Tyre.Compound]} => (Prove: currentTyreCompound())
+priority: 20, [?Lap] => (Prove: currentTyreCompound())
 
 currentTyreCompound() <= currentTyreCompound(?compound, ?color), Set(Tyre.Compound, ?compound), Set(Tyre.Compound.Color, ?color)
 

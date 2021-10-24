@@ -2,7 +2,8 @@
 
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. Integrated support for StreamDeck. You can associate plugin modes with StreamDeck profiles, which will be automatically selected on the StreamDeck, when this mode becomes active. Also, you can associate an icon with each mode action, which will be shown on the StreamDeck.
+  3. Much more sophisticated tyre compound handling in changing weather conditions.
+  4. Integrated support for StreamDeck. You can associate plugin modes with StreamDeck profiles, which will be automatically selected on the StreamDeck, when this mode becomes active. Also, you can associate an icon with each mode action, which will be shown on the StreamDeck.
 
 ## 3.6.5-release 10/22/21
 

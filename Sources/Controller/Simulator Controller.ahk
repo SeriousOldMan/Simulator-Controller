@@ -1736,6 +1736,31 @@ updateTrayMessageState(settings := false) {
 		disableTrayMessages()
 }
 
+externalCommandManager() {
+	if FileExist(kTempDirectory . "Function.cmd") {
+		FileReadLine command, % kTempDirectory . "Function.cmd", 1
+		
+		FileDelete % kTempDirectory . "Function.cmd"
+		
+		command := string2Values(A_Space, command)
+		
+		descriptor := ConfigurationItem.splitDescriptor(command[1])
+		
+		switch descriptor[1] {
+			case k1WayToggleType, k2WayToggleType:
+				switchToggle(descriptor[1], descriptor[2], command[2])
+			case kButtonType:
+				pushButton(descriptor[2])
+			case kDialType:
+				rotateDial(descriptor[2], command[2])
+			default:
+				Throw "Unknown controller function descriptor (" . function[1] . ") detected in externalCommand..."
+		}
+	}
+	
+	SetTimer externalCommand, -50
+}
+
 initializeSimulatorController() {
 	icon := kIconsDirectory . "Gear.ico"
 	
@@ -1787,6 +1812,8 @@ startupSimulatorController() {
 		
 	if ((A_Args.Length() > 0) &&  (A_Args[1] = "-NoStartup"))
 		ExitApp 0
+	
+	SetTimer externalCommandManager, -5000
 	
 	controller.startup()
 }

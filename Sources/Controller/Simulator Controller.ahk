@@ -1758,7 +1758,7 @@ externalCommandManager() {
 		}
 	}
 	
-	SetTimer externalCommand, -50
+	SetTimer externalCommandManager, -50
 }
 
 initializeSimulatorController() {

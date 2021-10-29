@@ -41,6 +41,8 @@ global kPSMutatingOptions = ["Strategy", "Change Tyres", "Tyre Compound", "Chang
 
 class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	iUDPClient := false
+	iUDPConnection := false
+	
 	iOpenPitstopMFDHotkey := false
 	iClosePitstopMFDHotkey := false
 	
@@ -117,6 +119,12 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 	
+	UDPConnection[] {
+		Get {
+			return this.iUDPConnection
+		}
+	}
+	
 	UDPClient[] {
 		Get {
 			return this.iUDPClient
@@ -133,6 +141,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		
 		this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", false)
 		this.iClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
+		
+		this.iUDPConnection := this.getArgumentValue("udpConnection", false)
 		
 		controller.registerPlugin(this)
 	}
@@ -178,8 +188,13 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 					
 				if FileExist(kTempDirectory . "ACCUDP.out")
 					FileDelete %kTempDirectory%ACCUDP.out
-					
-				Run %ComSpec% /c ""%exePath%" "%kTempDirectory%ACCUDP.cmd" "%kTempDirectory%ACCUDP.out"" , , Hide, pid
+				
+				options := ""
+				
+				if this.UDPConnection
+					options := ("-Connect " . this.UDPConnection)
+				
+				Run %ComSpec% /c ""%exePath%" "%kTempDirectory%ACCUDP.cmd" "%kTempDirectory%ACCUDP.out"" %options%, , Hide, pid
 				
 				this.iUDPClient := ObjBindMethod(this, "shutdownUDPClient")
 				

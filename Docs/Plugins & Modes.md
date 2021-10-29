@@ -344,7 +344,11 @@ Note: You can use all these commands in the *pitstopCommands* list as well, whic
 First, you need to define, how to open and close the Pitstop MFD in *Assetto Corsa Competizione*. If the standard keyboard mapping is used, this will be the "P" and the "Insert" keys on the keyboard.
 
 	openPitstopMFD: *openHotkey*; closePitstopMFD: *closeHotkey*
-	
+
+*Assetto Corsa Competizione* provides an UDP interface to gather the position information for all the cars in the grid. The default login to this service is 127.0.0.1,9000,asd, (where the last argument, tha password, is empty). If you have changed the connection information in the ACC configuration, you have to provide this connection information using the *udpConnection* in the plugin configuration.
+
+	udpConnection: *ip*, *port*, *login*, *password*
+
 With the plugin parameter *pitstopCommands* you can supply a list of the settings, you want to tweak from your hardware controller, when the "Pitstop" mode is active. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example tyre pressure and fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
 
 	pitstopCommands: *setting1* *settingsFunction1* [*settingSteps1*],
@@ -476,7 +480,7 @@ Note: Be careful, when you change pitstop settings while Jona is active, the Rac
 
 With the plugin parameter *assistantCommands* you can supply a list of the commands you want to trigger, when the "Assistant" mode is active. Only unary controller functions are allowed here.
 
-	assistantCommands: PitstopRecommend *function*, StrategyCancel *function*,
+	assistantCommands: PitstopRecommend *function*,   *function*,
 					   PitstopPlan *function*, PitstopPrepare *function*,
 					   Accept *acceptFunction*, Reject *rejectFunction*,
 					   InformationRequest *requestFunction* *command* [*arguments*], ...

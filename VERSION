@@ -3,7 +3,7 @@ Version=3.6.6-dev
 Target=3.6.6-release
 Date=10/29/2021
 Download=
-Changes=More sophisticated tyre compound handling, Refactoring of ButtonBox class, Early integration of StreamDeck, Renamed "Controller Plugin Labels" to "Controller Action Labels", Introduced "Controller Action Icons" for Stream Deck support
+Changes=More sophisticated tyre compound handling, Refactoring of ButtonBox class, Early integration of StreamDeck, Renamed "Controller Plugin Labels" to "Controller Action Labels", Introduced "Controller Action Icons" for Stream Deck support, New *udpConnection* parameter for the ACC plugin
 [Release]
 Version=3.6.5-release
 Date=10/22/2021

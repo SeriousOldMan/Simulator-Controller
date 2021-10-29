@@ -6,7 +6,8 @@
   4. Initial support for Stream Deck controller. You can associate plugin modes with StreamDeck profiles, which will be automatically selected on the StreamDeck, when this mode becomes active. Also, you can associate an icon with each mode action, which will be shown on the StreamDeck. See the [documentation](*) for more information.
   5. Renamed "Controller Plugin Labels" file to "Controller Action Labels". Important: Take a look at the [update notes](*), if you have changed labels in the past.
   6. Introduced "Controller Action Icons" in order to support action specific icons on the Stream Deck controller.
-  7. [Developer only] Full refactoring of the *ButtonBox* class in [Simulator Controller.ahk](*) in order to support the new Stream Deck integration.
+  7. With the new plugin parameter [*udpConnection*](*) for the ACC plugin to support non-standard UDP connect strings for the broadcasting interface.
+  8. [Developer only] Full refactoring of the *ButtonBox* class in [Simulator Controller.ahk](*) in order to support the new Stream Deck integration.
 
 ## 3.6.5-release 10/22/21
 

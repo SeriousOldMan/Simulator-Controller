@@ -9,8 +9,22 @@ namespace ACCUDPProvider {
             Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("en-US");
 
             UDPProvider provider = new UDPProvider(args[0], args[1]);
+			
+			String ip = "127.0.0.1";
+			int port = 9000;
+			String login = "asd";
+			String pwd = "";
 
-            provider.ReadStandings("127.0.0.1", 9000, "", "asd", "");
+            if (args[2] == "-Connect") {
+                string[] arguments = args[3].Split(',');
+
+                ip = arguments[0];
+                port = (int)Double.Parse(arguments[1]);
+                login = arguments[2];
+                pwd = arguments[3];
+            }
+			
+            provider.ReadStandings(ip, port, "", login, pwd);
         }
     }
 }

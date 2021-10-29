@@ -1272,29 +1272,37 @@ deletePluginLabels() {
 		}
 }
 
-overwritePluginLabels() {
-	for ignore, fileName in getFileNames("Controller Plugin Labels.*", kUserTranslationsDirectory)
+overwriteActionLabels() {
+	overwritePluginLabels("Controller Action Labels")
+}
+
+overwritePluginLabels(fileName := "Controller Plugin Labels") {
+	for ignore, fileName in getFileNames(fileName . ".*", kUserTranslationsDirectory)
 		FileMove %filename%, %filename%.bak, 1
 	
-	for ignore, fileName in getFileNames("Controller Plugin Labels.*", kResourcesDirectory . "Templates\") {
+	for ignore, fileName in getFileNames(fileName . ".*", kResourcesDirectory . "Templates\") {
 		SplitPath fileName, , , languageCode
 	
-		if !FileExist(kUserTranslationsDirectory . "Controller Plugin Labels." . languageCode)
-			FileCopy %kResourcesDirectory%Templates\Controller Plugin Labels.%languageCode%, %kUserTranslationsDirectory%
+		if !FileExist(kUserTranslationsDirectory . fileName . "." . languageCode)
+			FileCopy %kResourcesDirectory%Templates\%fileName%.%languageCode%, %kUserTranslationsDirectory%
 	}
 }
 
-updatePluginLabels() {
+updateActionLabels() {
+	updatePluginLabels("Controller Action Labels")
+}
+
+updatePluginLabels(fileName := "Controller Plugin Labels") {
 	languages := availableLanguages()
-	enPluginLabels := readConfiguration(kResourcesDirectory . "Templates\Controller Plugin Labels.en")
+	enPluginLabels := readConfiguration(kResourcesDirectory . "Templates\" . fileName . ".en")
 	
-	for ignore, userPluginLabelsFile in getFileNames("Controller Plugin Labels.*", kUserTranslationsDirectory, kUserConfigDirectory) {
+	for ignore, userPluginLabelsFile in getFileNames(fileName . ".*", kUserTranslationsDirectory, kUserConfigDirectory) {
 		SplitPath userPluginLabelsFile, , , languageCode
 	
 		if !languages.HasKey(languageCode)
 			bundledPluginLabels := enPluginLabels
 		else {
-			bundledPluginLabels := readConfiguration(kResourcesDirectory . "Templates\Controller Plugin Labels." . languageCode)
+			bundledPluginLabels := readConfiguration(kResourcesDirectory . "Templates\" . fileName . "." . languageCode)
 		
 			if (bundledPluginLabels.Count() == 0)
 				bundledPluginLabels := enPluginLabels

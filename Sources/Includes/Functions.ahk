@@ -1772,9 +1772,22 @@ readConfiguration(configFile) {
 		
 		for j, keyValue in keyValues {
 			if (SubStr(keyValue, 1, 2) != "//") {
+				keyValue := StrReplace(keyValue, "\=", "_#_EQ-#_")
+				keyValue := StrReplace(keyValue, "\\", "_#_AC-#_")
+				keyValue := StrReplace(keyValue, "\n", "_#_CR-#_")
+				
 				keyValue := StrSplit(keyValue, "=", "", 2)
 				
+				key := keyValue[1]
 				value := keyValue[2]
+				
+				key := StrReplace(key, "_#_EQ-#_", "=")
+				key := StrReplace(key, "_#_AC-#_", "\\")
+				key := StrReplace(key, "_#_CR-#_", "`n")
+				
+				value := StrReplace(value, "_#_EQ-#_", "=")
+				value := StrReplace(value, "_#_AC-#_", "\\")
+				value := StrReplace(value, "_#_CR-#_", "`n")
 				
 				sectionValues[keyValue[1]] := ((value = kTrue) ? true : ((value = kFalse) ? false : value))
 			}

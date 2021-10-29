@@ -1435,10 +1435,10 @@ class ControllerPlugin extends Plugin {
 		if !this.sLabelsDatabase {
 			languageCode := getLanguage()
 			
-			this.sLabelsDatabase := readConfiguration(getFileName("Controller Plugin Labels." . languageCode, kUserTranslationsDirectory, kTranslationsDirectory))
+			this.sLabelsDatabase := readConfiguration(getFileName("Controller Action Labels." . languageCode, kUserTranslationsDirectory, kTranslationsDirectory))
 			
 			if (this.sLabelsDatabase.Count() = 0)
-				this.sLabelsDatabase := readConfiguration(getFileName("Controller Plugin Labels.en", kUserTranslationsDirectory, kTranslationsDirectory))
+				this.sLabelsDatabase := readConfiguration(getFileName("Controller Action Labels.en", kUserTranslationsDirectory, kTranslationsDirectory))
 		}
 		
 		label := getConfigurationValue(this.sLabelsDatabase, this.Plugin, descriptor, false)
@@ -1758,7 +1758,7 @@ externalCommandManager() {
 		}
 	}
 	
-	SetTimer externalCommand, -50
+	SetTimer externalCommandManager, -50
 }
 
 initializeSimulatorController() {

@@ -1,0 +1,6 @@
+[Default]
+Icon=false
+Label=true
+[Motion Feeedback]
+Heave.Toggle.Icon=        Icon Path
+Heave.Toggle.Label=       true | false | String | Special

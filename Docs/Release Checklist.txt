@@ -23,6 +23,8 @@ Release 3.6.6 Checklist
 0. Search for new links (*)
 1. Refactored ButtonBox class
    a. Update Documentation Classes.md
+2. Renamed Controller Plugin Labels
+   a. Update Notes
 
 Release 3.6.4 Checklist
 =======================

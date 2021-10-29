@@ -552,7 +552,7 @@ This is an event handler method called by the controller to notify the plugin, t
 This is an event handler method called by the controller to notify the plugin, that a simulation just has been stopped.
 
 #### *getLabel(descriptor :: String, default :: String := false)*
-This method can be used to support localization or using different labels depending on the bound function in the visual representation of the controller hardware. The label texts are defined in a special configuration file named *Controller Plugin Labels.ini* located in the *Simulator Controller\Config* folder in the users *Documents* folder. The content of this file is accessible using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration).
+This method can be used to support localization or using different labels depending on the bound function in the visual representation of the controller hardware. The label texts are defined in a special configuration file named *Controller Action Labels.XX* (where XX is a language code) located in the *Simulator Controller\Translations* folder in the users *Documents* folder. The content of this file is accessible using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration).
 
 #### *actionLabel(action :: ControllerAction)*
 This method is called, whenever a label for the given action will be displayed on the visual representation of the controller hardware. The default implementation simply returns the *Label* property of the given action, but a subclass may add a translation process, for example.

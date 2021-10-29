@@ -387,3 +387,21 @@ As you can see, the structure of this editor is very similar to the structure of
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%20Editor%202.JPG)
 
 This window will visualize the current layout and will change, whenever you change one of the definitions in the layout editor. Please note, that you have to save the definition changes using the *Save* buttons to update the preview window, as long as you do not have chosen the [*Automatic* save mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#using-the-configuration-tool). As you can see in the image above, freshly added rows and columns will show a free "Space", which you can fill up with *Controls*. Please note, that the "Space" marker will only be shown in the preview mode, so intentionally free space will look good on the final Button Box. You con click on each cell of the preview window and change the *Control* and the *Label*, which should occupy this cell, and you can choose the corresponding controller function number for the given control.
+
+# Stream Deck Layouts
+
+Release 3.6.6 introduces support for Stream Deck controller, very similar to the support for Button Boxes. The layout of a given Stream Deck profile is described to Simulator Controller using a structured configuration file. Below you find a sample definition as a guide.
+
+	[Layouts]
+	Stream Deck.Layout=3 x 5
+	Stream Deck.1=Button.1;Button.2;Button.3;Button.4;Button.5
+	Stream Deck.2=Button.6;Button.7;Button.8;Button.9;Button.10
+	Stream Deck.3=Button.11;Button.12;Button.13;Button.14;Button.15
+	[Buttons]
+	Button.1.Icon=
+	Button.1.Label=true
+	...
+
+To connect your Stream Deck(s) with Simulator Controller, you must install the special Stream Deck plugin, which is supplied in the *Resources* folder. Then create a profile using the special action supplied by this Stream Deck plugin. After that you have to create "Stream Deck Configuration.ini" file similar to the example above and save it to the *Simulator Controller\Config* folder in your user *Documents* folder. For each button in the profile you can define the default icon to be shown on the Stream Deck and whether textual labels should be shown on the Stream Deck buttons as well. The value for the *Button.X.Label* property may be *false* (no label), *true* (use the action label from the [labels defined in the general configuration](*)) or you can supply a fixed text here (you can use "\n" to start a new line in the text value).
+
+More to come in the next releases...

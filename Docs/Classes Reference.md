@@ -668,11 +668,11 @@ Must be called by implementations of *FunctionController* to specifiy the type a
 This method must be implemented by a subclass of *FunctionController*. It must return *true*, if the given controller implements the given function.
 
 #### *setControlText(function :: ControllerFunction, text :: String, color :: String := "Black")*
-This method is called to set the info text for the given function. Useful, if the given controller has a visual representation (see [GuiFunctionController](*) for a subclass, which provides the necessary protocol).
+This method is called to set the info text for the given function on the controller. Useful, if the given controller has a visual representation (see [GuiFunctionController](*) for a subclass, which provides the necessary protocol). The default method does nothing.
 
 #### *setControlIcon(function :: ControllerFunction, icon :: String)*
-This method is called to set the info icon for the given function. Useful, if the given controller has a visual representation (see [GuiFunctionController](*) for a subclass, which provides the necessary protocol). If *icon* is 
-*false*, this means that no icon should be displayed.
+This method is called to set the info icon for the given function on the controller. Useful, if the given controller has a visual representation (see [GuiFunctionController](*) for a subclass, which provides the necessary protocol). If *icon* is 
+*false*, this means that no icon should be displayed. The default method does nothing.
 	
 #### *enable(function :: ControllerFunction, action :: ControllerAction := false)*
 Enables the given function on the given controller. If *action* is supplied and not *false*, the function is only enabled for the given action, otherwise it is enabled for all actions. The default method does nothing.

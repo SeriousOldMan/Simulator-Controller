@@ -125,6 +125,9 @@ class FunctionController extends ConfigurationItem {
 	setControlText(function, text, color := "Black") {
 	}
 	
+	setControlIcon(function, icon) {
+	}
+	
 	enable(function, action := false) {
 	}
 	

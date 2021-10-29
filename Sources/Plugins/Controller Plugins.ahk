@@ -6,7 +6,8 @@
 ;;;   License:    (2021) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-#Include ..\Plugins\Button Box Plugin.ahk				; Optional, but should be always first, so that Plugins can adopt to the Button Box layout
+#Include ..\Plugins\Button Box Plugin.ahk				; Optional, but should be always first, so that Plugins can adopt to the controller layout
+#Include ..\Plugins\Stream Deck Plugin.ahk				; Optional, but should be always first, so that Plugins can adopt to the controller layout
 #Include ..\Plugins\System Plugin.ahk					; Required, must be loaded before all other ..\Plugins
 #Include ..\Plugins\Core Plugin.ahk						; Required, must be loaded directly after System Plugin
 

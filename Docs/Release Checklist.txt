@@ -25,6 +25,12 @@ Release 3.6.6 Checklist
    a. Update Documentation Classes.md
 2. Renamed Controller Plugin Labels
    a. Update Notes
+   b. Update Procedure (Rename old file to new)
+3. New "Controller Action Icons"
+   a. Documentation
+   b. Update Notes
+4. New "Stream Deck Configuration.ini"
+   a. Documentation
 
 Release 3.6.4 Checklist
 =======================

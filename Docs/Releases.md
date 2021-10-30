@@ -1,3 +1,7 @@
+## 3.6.5-release 10/22/21
+
+  1. Fixed a critical bug in Strategy Workbench due to incomplete build rules
+  
 ## 3.6.4-release 10/22/21
 
   1. Bugfixes, as always

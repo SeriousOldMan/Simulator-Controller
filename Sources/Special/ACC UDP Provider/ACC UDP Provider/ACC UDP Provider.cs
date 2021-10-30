@@ -229,9 +229,9 @@ namespace ACCUDPProvider {
         }
 
 		public void ReadStandings(string ip, int port, string displayName, string connectionPassword, string commandPassword) {
-            Debug.Listeners.Add(new TextWriterTraceListener(System.Console.Out));
+            Debug.Listeners.Add(new TextWriterTraceListener(Console.Out));
 
-			ACCUdpRemoteClient client = new ACCUdpRemoteClient(ip, port, displayName, connectionPassword, commandPassword, 100);
+            ACCUdpRemoteClient client = new ACCUdpRemoteClient(ip, port, displayName, connectionPassword, commandPassword, 100);
 
             client.MessageHandler.OnRealtimeUpdate += OnRealtimeUpdate;
             client.MessageHandler.OnTrackDataUpdate += OnTrackDataUpdate;

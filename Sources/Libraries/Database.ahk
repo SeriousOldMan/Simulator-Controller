@@ -128,7 +128,7 @@ class Database {
 	
 	flush(name := false) {
 		if name {
-			if this.Table.HasKey(name) {
+			if this.Tables.HasKey(name) {
 				directory := this.Directory
 				fileName := (directory . name . ".CSV")
 				
@@ -141,8 +141,15 @@ class Database {
 					; ignore
 				}
 				
+				schema := this.Schemas[name]
+				
 				for ignore, row in this.Tables[name] {
-					row := (values2String(";", row*) . "`n")
+					values := []
+				
+					for ignore, column in schema
+						values.Push(row[column])
+					
+					row := (values2String(";", values*) . "`n")
 		
 					FileAppend %row%, %fileName%
 				}
@@ -181,11 +188,18 @@ class Database {
 		}
 	}
 	
-	remove(name, predicate, flush := false) {
+	remove(name, where, predicate, flush := false) {
 		rows := []
 		
+		if (where && !where.MinParams)
+			where := Func("constraintColumns").Bind(where)
+		
 		for ignore, row in this.Tables[name]
-			if !%predicate%(row)
+			if (!where || %where%(row)) {
+				if !%predicate%(row)
+					rows.Push(row)
+			}
+			else
 				rows.Push(row)
 		
 		this.iTables[name] := rows

@@ -31,6 +31,9 @@ Release 3.6.6 Checklist
    b. Update Notes
 4. New "Stream Deck Configuration.ini"
    a. Documentation
+5. Update Procedure
+   a. Translations
+   b. Rename "Controller Plugin Labels"
 
 Release 3.6.4 Checklist
 =======================

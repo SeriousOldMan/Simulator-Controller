@@ -15,7 +15,7 @@ namespace ACCUDPProvider {
 			String login = "asd";
 			String pwd = "";
 
-            if (args[2] == "-Connect") {
+            if ((args.Length > 2) && (args[2] == "-Connect")) {
                 string[] arguments = args[3].Split(',');
 
                 ip = arguments[0];

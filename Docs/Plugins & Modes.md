@@ -345,9 +345,9 @@ First, you need to define, how to open and close the Pitstop MFD in *Assetto Cor
 
 	openPitstopMFD: *openHotkey*; closePitstopMFD: *closeHotkey*
 
-*Assetto Corsa Competizione* provides an UDP interface to gather the position information for all the cars in the grid. The default login to this service is 127.0.0.1,9000,asd, (where the last argument, tha password, is empty). If you have changed the connection information in the ACC configuration, you have to provide this connection information using the *udpConnection* in the plugin configuration.
+*Assetto Corsa Competizione* provides an UDP interface to gather the position information for all the cars in the grid. The default login to this service is 127.0.0.1,9000,asd, (where the last argument, the *commandPassword*, is empty). If you have changed the connection information in the ACC configuration, you have to provide this connection information using the *udpConnection* in the plugin configuration:
 
-	udpConnection: *ip*, *port*, *login*, *password*
+	udpConnection: *ip*, *port*, *connectionPassword*, *commandPassword*
 
 With the plugin parameter *pitstopCommands* you can supply a list of the settings, you want to tweak from your hardware controller, when the "Pitstop" mode is active. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example tyre pressure and fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
 

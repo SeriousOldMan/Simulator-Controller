@@ -43,7 +43,11 @@ global vUDPClient = false
 ;;;-------------------------------------------------------------------------;;;
 
 viewFile(fileName, title := "", x := "Center", y := "Center", width := 800, height := 400) {
+	static hasWindow := false
 	static dismissed := false
+	
+	static titleField
+	static textField
 	
 	dismissed := false
 	
@@ -55,53 +59,63 @@ viewFile(fileName, title := "", x := "Center", y := "Center", width := 800, heig
 	
 	FileRead text, %fileName%
 	
-	innerWidth := width - 16
+	if hasWindow {
+		GuiControl Text, titleField, %title%
+		GuiControl Text, textField, %text%
+		
+		Gui FV:Show
+	}
+	else {
+		hasWindow := true
 	
-	Gui FV:-Border -Caption
-	Gui FV:Color, D0D0D0, D8D8D8
-	Gui FV:Font, s10 Bold
-	Gui FV:Add, Text, x8 y8 W%innerWidth% +0x200 +0x1 BackgroundTrans gmoveFileViewer, % translate("Modular Simulator Controller System")
-	Gui FV:Font
-	Gui FV:Add, Text, x8 yp+26 W%innerWidth% +0x200 +0x1 BackgroundTrans, %title%
-	
-	editHeight := height - 102
-	
-	Gui FV:Add, Edit, X8 YP+26 W%innerWidth% H%editHeight%, % text
-	
-	SysGet mainScreen, MonitorWorkArea
+		innerWidth := width - 16
+		
+		Gui FV:-Border -Caption
+		Gui FV:Color, D0D0D0, D8D8D8
+		Gui FV:Font, s10 Bold
+		Gui FV:Add, Text, x8 y8 W%innerWidth% +0x200 +0x1 BackgroundTrans gmoveFileViewer, % translate("Modular Simulator Controller System")
+		Gui FV:Font
+		Gui FV:Add, Text, x8 yp+26 W%innerWidth% +0x200 +0x1 BackgroundTrans vtitleField, %title%
+		
+		editHeight := height - 102
+		
+		Gui FV:Add, Edit, X8 YP+26 W%innerWidth% H%editHeight% vtextField, % text
+		
+		SysGet mainScreen, MonitorWorkArea
 
-	if x is not integer
-		switch x {
-			case "Left":
-				x := 25
-			case "Right":
-				x := mainScreenRight - width - 25
-			default:
-				x := "Center"
-		}
+		if x is not integer
+			switch x {
+				case "Left":
+					x := 25
+				case "Right":
+					x := mainScreenRight - width - 25
+				default:
+					x := "Center"
+			}
 
-	if y is not integer
-		switch y {
-			case "Top":
-				y := 25
-			case "Bottom":
-				y := mainScreenBottom - height - 25
-			default:
-				y := "Center"
-		}
-	
-	buttonX := Round(width / 2) - 90
-	
-	Gui FV:Add, Button, Default X%buttonX% y+10 w80 gdismissFileViewer, % translate("Continue")
-	Gui FV:Add, Button, Default XP+90 yp w80 gexitACCUDPTester, % translate("Exit")
-	
-	Gui FV:+AlwaysOnTop
-	Gui FV:Show, X%x% Y%y% W%width% H%height% NoActivate
+		if y is not integer
+			switch y {
+				case "Top":
+					y := 25
+				case "Bottom":
+					y := mainScreenBottom - height - 25
+				default:
+					y := "Center"
+			}
+		
+		buttonX := Round(width / 2) - 90
+		
+		Gui FV:Add, Button, Default X%buttonX% y+10 w80 gdismissFileViewer, % translate("Continue")
+		Gui FV:Add, Button, Default XP+90 yp w80 gexitACCUDPTester, % translate("Exit")
+		
+		Gui FV:+AlwaysOnTop
+		Gui FV:Show, X%x% Y%y% W%width% H%height% NoActivate
+	}
 	
 	while !dismissed
 		Sleep 100
 	
-	Gui FV:Destroy
+	Gui FV:Hide
 }
 
 moveFileViewer() {

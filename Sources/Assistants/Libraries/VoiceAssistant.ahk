@@ -572,11 +572,10 @@ class VoiceAssistant {
 	}
 	
 	recognizeCommand(grammar, words) {
-		if this.Grammars.HasKey(grammar)
-			if this.VoiceServer
-				raiseEvent(kFileMessage, "Voice", "recognizeCommand:" . values2String(";", grammar, words*), this.VoiceServer)
-			else
-				this.phraseRecognized(grammar, words)
+		if this.VoiceServer
+			raiseEvent(kFileMessage, "Voice", "recognizeCommand:" . values2String(";", grammar, words*), this.VoiceServer)
+		else if this.Grammars.HasKey(grammar)
+			this.phraseRecognized(grammar, words)
 	}
 	
 	setContinuation(continuation) {

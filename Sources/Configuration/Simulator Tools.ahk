@@ -882,7 +882,7 @@ writeToolsConfiguration(updateSettings, cleanupSettings, copySettings, buildSett
 	writeConfiguration(kToolsConfigurationFile, configuration)
 }
 
-viewFile(fileName, title := false, x := "Center", y := "Center", width := 800, height := 400) {
+viewFile(fileName, title := "", x := "Center", y := "Center", width := 800, height := 400) {
 	static dismissed := false
 	
 	dismissed := false

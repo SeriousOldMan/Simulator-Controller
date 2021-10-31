@@ -770,6 +770,14 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 
 			printf("Laps=%s\n", itoa(laps, result, 10));
 
+			bool valid = true;
+			
+			if (getDataValue(result, header, data, "LapDeltaToBestLap_OK")) {
+				valid = (result > 0);
+			}
+
+			printf("LapValid=%s\n", valid ? "true" : "false");
+
 			printf("LapLastTime=%ld\n", lastTime);
 			printf("LapBestTime=%ld\n", bestTime);
 

@@ -59,6 +59,8 @@ viewFile(fileName, title := "", x := "Center", y := "Center", width := 800, heig
 	
 	FileRead text, %fileName%
 	
+	Gui FV:Default
+	
 	if hasWindow {
 		GuiControl Text, titleField, %title%
 		GuiControl Text, textField, %text%
@@ -142,18 +144,20 @@ startUDPClient() {
 		
 		Run %ComSpec% /c ""%exePath%" "%kTempDirectory%ACCUDP.cmd" "%kTempDirectory%ACCUDP.out"", , Hide, pid
 		
-		vUDPClient := "shutdownUDPClient"
+		vUDPClient := "stopUDPClient"
 		
 		OnExit(vUDPClient)
 	}
 }
 
-shutdownUDPClient() {
-	FileAppend Exit, %kTempDirectory%ACCUDP.cmd
-			
-	OnExit(vUDPClient, 0)
-	
-	vUDPClient := false
+stopUDPClient() {
+	if vUDPClient {
+		FileAppend Exit, %kTempDirectory%ACCUDP.cmd
+				
+		OnExit(vUDPClient, 0)
+		
+		vUDPClient := false
+	}
 }
 
 readUDPData() {
@@ -170,12 +174,24 @@ readUDPData() {
 			break
 	}
 	
+	static traceFileSize := 0
+	
 	if (tries > 0) {
-		if FileExist(kTempDirectory . "ACCUDP.out.Trace") {
-			viewFile(kTempDirectory . "ACCUDP.out", "Invalid - Error Trace")
+		traceFile := kTempDirectory . "ACCUDP.out.Trace"
+		
+		if FileExist(traceFile) {
+			FileGetSize lastSize, %traceFile%
 			
-			try
-				FileDelete %kTempDirectory%ACCUDP.out.Trace
+			if (lastSize > traceFileSize) {
+				traceFileSize := lastSize
+				
+				viewFile(traceFile, "Invalid - Error Trace")
+				
+				try
+					FileDelete %traceFile%
+			}
+			else
+				viewFile(kTempDirectory . "ACCUDP.out", "Valid - Car Positions")
 		}
 		else
 			viewFile(kTempDirectory . "ACCUDP.out", "Valid - Car Positions")

@@ -276,7 +276,9 @@ int main(int argc, char* argv[])
 				wprintf_s(L"DriverSurname=%S\n", "");
 				wprintf_s(L"DriverNickname=%S\n", "");
 			}
-			
+
+			wprintf_s(L"LapValid=%S\n", map_buffer->current_lap_valid ? "true" : "false");
+
 			wprintf_s(L"LapLastTime=%ld\n", (long)(normalize(map_buffer->lap_time_previous_self) * 1000));
 
 			if (normalize(map_buffer->lap_time_best_self))

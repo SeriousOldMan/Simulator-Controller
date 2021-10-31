@@ -218,6 +218,8 @@ int main(int argc, char* argv[])
 		wcout << "DriverSurname=" << sf->playerSurname << endl;
 		wcout << "DriverNickname=" << sf->playerNick << endl;
 		printData("Laps", gf->completedLaps);
+		
+		printData("LapValid", gf->isValidLap ? "true" : "false");
 		printData("LapLastTime", gf->iLastTime);
 		printData("LapBestTime", gf->iBestTime);
 

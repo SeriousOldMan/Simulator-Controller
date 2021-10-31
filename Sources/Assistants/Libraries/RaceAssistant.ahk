@@ -581,7 +581,7 @@ class RaceAssistant extends ConfigurationItem {
 			knowledgeBase.addFact("Lap", 1)
 		else
 			knowledgeBase.setValue("Lap", lapNumber)
-			
+		
 		if !this.InitialFuelAmount
 			baseLap := lapNumber
 		
@@ -644,6 +644,8 @@ class RaceAssistant extends ConfigurationItem {
 				lapTime := settingsLapTime
 		}
 		
+		knowledgeBase.addFact("Lap." . lapNumber . ".Valid", getConfigurationValue(data, "Stint Data", "LapValid", true))
+			
 		knowledgeBase.addFact("Lap." . lapNumber . ".Time", lapTime)
 		knowledgeBase.addFact("Lap." . lapNumber . ".Time.Start", this.OverallTime)
 		
@@ -713,12 +715,17 @@ class RaceAssistant extends ConfigurationItem {
 	}
 	
 	updateLap(lapNumber, ByRef data) {
+		local knowledgeBase := this.KnowledgeBase
+		
 		data := this.prepareData(lapNumber, data)
 		
-		result := this.KnowledgeBase.produce()
+		if knowledgeBase.getFact("Lap." . lapNumber . ".Valid")
+			knowledgeBase.setFact("Lap." . lapNumber . ".Valid", getConfigurationValue(data, "Stint Data", "LapValid", true))
+			
+		result := knowledgeBase.produce()
 			
 		if this.Debug[kDebugKnowledgeBase]
-			this.dumpKnowledge(this.KnowledgeBase)
+			this.dumpKnowledge(knowledgeBase)
 		
 		return result
 	}

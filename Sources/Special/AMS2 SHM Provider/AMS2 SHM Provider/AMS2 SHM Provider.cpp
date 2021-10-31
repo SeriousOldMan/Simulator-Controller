@@ -259,6 +259,8 @@ int main(int argc, char* argv[]) {
 			printf("DriverNickname=%s\n", "");
 		}
 
+		printf("LapValid=%s\n", localCopy->mLapInvalidated ? "false" : "true");
+
 		printf("LapLastTime=%ld\n", (long)(normalize(localCopy->mLastLapTime) * 1000));
 
 		if (normalize(localCopy->mBestLapTime) != 0)

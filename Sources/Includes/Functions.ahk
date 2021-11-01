@@ -75,13 +75,13 @@ ftpUpload(server, user, password, localFile, remoteFile) {
 }
 
 createMessageReceiver() {
-	Gui MR:-Border -Caption
+	Gui MR:New, , % A_ScriptName
 	Gui MR:Color, D0D0D0, D8D8D8
 	Gui MR:Add, Text, X10 Y10, % translate("Modular Simulator Controller System")
 	Gui MR:Add, Text, , % A_ScriptName
 	
 	Gui MR:Margin, 10, 10
-	Gui MR:Show, Hide AutoSize X0 Y0
+	Gui MR:Show, AutoSize X0 Y0 Hide
 }
 
 consentDialog(id, consent := false) {

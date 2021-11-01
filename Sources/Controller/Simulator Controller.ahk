@@ -1751,7 +1751,7 @@ externalCommandManager() {
 		
 		switch descriptor[1] {
 			case k1WayToggleType, k2WayToggleType:
-				switchToggle(descriptor[1], descriptor[2], command[2])
+				switchToggle(descriptor[1], descriptor[2], (command.Length() > 1) ? command[2] : "On")
 			case kButtonType:
 				pushButton(descriptor[2])
 			case kDialType:
@@ -1763,6 +1763,7 @@ externalCommandManager() {
 	
 	SetTimer externalCommandManager, -50
 }
+
 
 initializeSimulatorController() {
 	icon := kIconsDirectory . "Gear.ico"

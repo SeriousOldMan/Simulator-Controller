@@ -44,6 +44,25 @@ class StreamDeck extends FunctionController {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+streamDeckEventHandler(event, data) {
+	local function
+	
+	command := string2Values(A_Space, data)
+		
+	descriptor := ConfigurationItem.splitDescriptor(command[1])
+	
+	switch descriptor[1] {
+		case k1WayToggleType, k2WayToggleType:
+			switchToggle(descriptor[1], descriptor[2], (command.Length() > 1) ? command[2] : "On")
+		case kButtonType:
+			pushButton(descriptor[2])
+		case kDialType:
+			rotateDial(descriptor[2], command[2])
+		default:
+			Throw "Unknown controller function descriptor (" . function[1] . ") detected in streamDeckEventHandler..."
+	}
+}
+
 initializeStreamDeckPlugin() {
 	controller := SimulatorController.Instance
 	
@@ -54,6 +73,8 @@ initializeStreamDeckPlugin() {
 	
 		new StreamDeck(strmDeck[1], strmDeck[2], controller, configuration)
 	}
+	
+	registerEventHandler("Stream Deck", "streamDeckEventHandler")
 }
 
 

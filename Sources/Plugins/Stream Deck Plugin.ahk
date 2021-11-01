@@ -1,9 +1,16 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Stream Deck Plugin               ;;;
+;;;   Modular Simulator Controller System - Stream Deck Plugin              ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2021) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;-------------------------------------------------------------------------;;;
+;;;                         Local Include Section                           ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include ..\Libraries\CLR.ahk
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
@@ -18,6 +25,8 @@ class StreamDeck extends FunctionController {
 	iColumns := false
 	
 	iFunctions := []
+		
+	iConnector := false
 	
 	Type[] {
 		Get {
@@ -61,11 +70,22 @@ class StreamDeck extends FunctionController {
 		}
 	}
 	
+	Connector[] {
+		Get {
+			return this.iConnector
+		}
+	}
+	
 	__New(name, layout, controller, configuration) {
 		this.iName := name
 		this.iLayout := layout
 		
 		base.__New(controller, configuration)
+		
+		dllName := "SimulatorControllerPluginConnector.dll"
+		dllFile := kBinariesDirectory . dllName
+			
+		this.iConnector := CLR_LoadLibrary(dllFile).CreateInstance("PluginConnector.PluginConnector")
 	}
 	
 	loadFromConfiguration(configuration) {
@@ -124,7 +144,7 @@ class StreamDeck extends FunctionController {
 			Process Exist, SimulatorControllerPlugin.exe
 		
 			if ErrorLevel
-				raiseEvent(kPipeMessage, "Stream Deck", "Text:" . function.Descriptor . ":" . text . ":" . color)
+				this.Connector.SendMessage(function.Descriptor . ":SetTitle:" . text)
 		}
 	}
 	
@@ -133,7 +153,7 @@ class StreamDeck extends FunctionController {
 			Process Exist, SimulatorControllerPlugin.exe
 		
 			if ErrorLevel
-				raiseEvent(kPipeMessage, "Stream Deck", "Image:" . function.Descriptor . ":" . icon)
+				this.Connector.SendMessage(function.Descriptor . ":SetImage:" . icon)
 		}
 	}
 }

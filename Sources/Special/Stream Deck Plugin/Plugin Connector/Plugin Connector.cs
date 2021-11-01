@@ -4,7 +4,7 @@ using System.IO.Pipes;
 using System.Security.Principal;
 using System.Text;
 
-namespace StreamDeckMessage {
+namespace PluginConnector {
     public class StreamString {
         private Stream ioStream;
         private UnicodeEncoding streamEncoding;
@@ -46,18 +46,16 @@ namespace StreamDeckMessage {
         }
     }
 
-    class Program {
-        static void Main(string[] args) {
-            var pipeClient = new NamedPipeClientStream(".", "SCFunctionOperation", PipeDirection.InOut, PipeOptions.None,
+    class PluginConnector {
+        public void SendMessage(string message) {
+            var pipeClient = new NamedPipeClientStream(".", "scconnector", PipeDirection.InOut, PipeOptions.None,
                                                        TokenImpersonationLevel.Impersonation);
 
-            Console.WriteLine("Connecting to server...\n");
-            
             pipeClient.Connect();
 
             var ss = new StreamString(pipeClient);
-            
-            ss.WriteString("Button.11:Text:Hello there...");
+
+            ss.WriteString(message);
 
             pipeClient.Close();
         }

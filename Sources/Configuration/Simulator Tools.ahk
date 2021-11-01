@@ -2161,10 +2161,22 @@ runCopyTargets(ByRef buildProgress) {
 				logMessage(kLogInfo, targetName . translate(" out of date - update needed"))
 				logMessage(kLogInfo, translate("Copying ") . targetSource)
 				
-				SplitPath targetDestination, , targetDirectory
-				
-				FileCreateDir %targetDirectory%
-				FileCopy %targetSource%, %targetDestination%, 1
+				if InStr(FileExist(targetSource), "D") {
+					try {
+						FileRemoveDir %targetDestination%, 1
+					}
+					catch exception {
+						; ignore
+					}
+					
+					FileCopyDir %targetSource%, %targetDestination%, 1
+				}
+				else {
+					SplitPath targetDestination, , targetDirectory
+					
+					FileCreateDir %targetDirectory%
+					FileCopy %targetSource%, %targetDestination%, 1
+				}
 				
 				Sleep 50
 			

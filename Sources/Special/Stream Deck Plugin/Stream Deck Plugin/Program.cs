@@ -54,10 +54,10 @@ namespace SimulatorControllerPlugin
     {
         private static void ServerThread() {
             while (true) {
-                NamedPipeServerStream pipeServer = new NamedPipeServerStream("SCFunctionOperation", PipeDirection.InOut, 1);
+                NamedPipeServerStream pipeServer = new NamedPipeServerStream("scconnector", PipeDirection.InOut, 1);
 
                 int threadId = Thread.CurrentThread.ManagedThreadId;
-
+                
                 // Wait for a client to connect
                 pipeServer.WaitForConnection();
                 

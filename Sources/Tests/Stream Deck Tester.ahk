@@ -30,10 +30,7 @@ ListLines Off					; Disable execution history
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                        Private Function Section                         ;;;
+;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-; raiseEvent(kWindowMessage, "Stream Deck", "Button.10", "Simulator Controller")
-raiseEvent(kPipeMessage, "StreamDeck", "Test it Baby")
-Sleep 5000
-MsgBox Done...
+raiseEvent(kWindowMessage, "Stream Deck", "Button.10", "Simulator Controller")

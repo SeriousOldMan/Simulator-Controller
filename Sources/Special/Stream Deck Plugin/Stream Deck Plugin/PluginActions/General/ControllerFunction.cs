@@ -25,7 +25,9 @@ namespace SimulatorControllerPlugin
             ControllerFunction ControllerFunction { get; set; }
 
             public override void ProcessMessage(string operation, string argument) {
-                MessageBox.Show(this.Function + " " + operation + " " + argument);
+                // MessageBox.Show(this.Function + " " + operation + " " + argument);
+
+                this.ControllerFunction.Connection.SetTitleAsync(argument);
             }
 
             public ControllerFunctionButton(ControllerFunction function) : base(function.GetFunction()) {

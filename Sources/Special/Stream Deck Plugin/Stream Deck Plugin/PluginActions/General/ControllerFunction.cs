@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using BarRaider.SdTools;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -20,6 +21,20 @@ namespace SimulatorControllerPlugin
     [PluginActionId("simulatorcontrollerplugin.controllerfunction")]
     public class ControllerFunction : PluginBase
     {
+        class ControllerFunctionButton : Program.Button {
+            ControllerFunction ControllerFunction { get; set; }
+
+            public override void ProcessMessage(string operation, string argument) {
+                MessageBox.Show(this.Function + " " + operation + " " + argument);
+            }
+
+            public ControllerFunctionButton(ControllerFunction function) : base(function.GetFunction()) {
+                this.ControllerFunction = function;
+            }
+        }
+
+        ControllerFunctionButton Button { get; set; }
+
         const int WM_COPYDATA = 0x004A;
 
         [DllImport("user32.dll")]
@@ -78,9 +93,19 @@ namespace SimulatorControllerPlugin
             {
                 settings = payload.Settings.ToObject<PluginSettings>();
             }
+
+            this.Button = new ControllerFunctionButton(this);
+
+            Program.RegisterButton(this.Button);
         }
 
-        public override void Dispose() { }
+        public override void Dispose() {
+            Program.UnregisterButton(this.Button);
+        }
+
+        public string GetFunction() {
+            return this.settings.Function.Split(" ".ToCharArray(), 1)[0];
+        }
 
         public override void KeyPressed(KeyPayload payload) { }
 
@@ -103,8 +128,14 @@ namespace SimulatorControllerPlugin
 
         public override void ReceivedSettings(ReceivedSettingsPayload payload)
         {
+            Program.UnregisterButton(this.Button);
+
             Tools.AutoPopulateSettings(settings, payload.Settings);
             SaveSettings();
+
+            this.Button = new ControllerFunctionButton(this);
+
+            Program.RegisterButton(this.Button);
         }
 
         public override void ReceivedGlobalSettings(ReceivedGlobalSettingsPayload payload) { }

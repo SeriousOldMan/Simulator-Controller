@@ -1842,9 +1842,9 @@ pushButton(buttonNumber) {
 rotateDial(dialNumber, direction) {
 	local function
 	
-	if (direction = "increase")
+	if ((direction = "increase") || (direction = "plus") || (direction = "+"))
 		direction := "Increase"
-	else if (direction = "decrease")
+	else if ((direction = "decrease") || (direction = "minus") || (direction = "-"))
 		direction := "Decrease"
 	else {
 		logMessage(kLogWarn, translate("Unsupported argument (") . direction . translate(") detected in rotateDial - please check the configuration"))

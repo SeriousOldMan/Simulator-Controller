@@ -203,7 +203,7 @@ receivePipeMessage() {
 		if (event = "*")
 			continue
 		
-		pipeName := "\\.\pipe\SCE" . event
+		pipeName := "\\.\pipe\SC." . event
 	
 		if DllCall("WaitNamedPipe", "Str", pipeName, "UInt", 0xF)
 			Loop Read, %pipeName%
@@ -232,9 +232,9 @@ sendPipeMessage(event, data) {
 	static ERROR_PIPE_LISTENING := 536
 	static ptr
 	
-	pipeName := "\\.\pipe\SCE" . event
+	pipeName := "\\.\pipe\SC." . event
 
-	pipe := DllCall("CreateNamedPipe", "str", "\\.\pipe\SCE" . event, "uint", 3, "uint", 0, "uint", 255, "uint", 1024, "uint", 1024, "uint", 0, ptr, 0, ptr)
+	pipe := DllCall("CreateNamedPipe", "str", pipeName, "uint", 2, "uint", 0, "uint", 255, "uint", 1024, "uint", 1024, "uint", 0, ptr, 0)
 	
 	DllCall("ConnectNamedPipe", ptr, pipe, ptr, 0)
 	

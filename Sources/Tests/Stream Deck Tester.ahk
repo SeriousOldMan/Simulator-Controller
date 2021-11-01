@@ -29,4 +29,11 @@ ListLines Off					; Disable execution history
 #Include ..\Includes\Includes.ahk
 
 
-raiseEvent(kWindowMessage, "Stream Deck", "Button.10", "Simulator Controller")
+;;;-------------------------------------------------------------------------;;;
+;;;                        Private Function Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+; raiseEvent(kWindowMessage, "Stream Deck", "Button.10", "Simulator Controller")
+raiseEvent(kPipeMessage, "StreamDeck", "Test it Baby")
+Sleep 5000
+MsgBox Done...

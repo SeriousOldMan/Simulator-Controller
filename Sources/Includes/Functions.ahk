@@ -75,13 +75,14 @@ ftpUpload(server, user, password, localFile, remoteFile) {
 }
 
 createMessageReceiver() {
+	; Gui MR:-Border -Caption
 	Gui MR:New, , % A_ScriptName
 	Gui MR:Color, D0D0D0, D8D8D8
 	Gui MR:Add, Text, X10 Y10, % translate("Modular Simulator Controller System")
 	Gui MR:Add, Text, , % A_ScriptName
 	
 	Gui MR:Margin, 10, 10
-	Gui MR:Show, AutoSize X0 Y0 Hide
+	Gui MR:Show, X0 Y0 Hide AutoSize
 }
 
 consentDialog(id, consent := false) {
@@ -262,13 +263,19 @@ receiveWindowMessage(wParam, lParam) {
     ; interpret available info
     ;---------------------------------------------------------------------------
     request := decodeDWORD(dwData)              ; 4-char decoded request
-    length  := (cbData - 1) / (A_IsUnicode + 1) ; length of DATA string (excl ZERO)
-    data    := StrGet(lpData, length)           ; DATA string from pointer
 	
-	if (request != "EVNT")
+	if (request = "EVNT") {
+		length  := (cbData - 1) / (A_IsUnicode + 1) ; length of DATA string (excl ZERO)
+		data    := StrGet(lpData, length)           ; DATA string from pointer
+	}
+	else if (request = "SD") {
+		length  := (cbData - 1)						; length of DATA string (excl ZERO)
+		data    := StrGet(lpData, length, "")       ; DATA string from pointer
+	}
+	else
 		Throw % "Unhandled message received: " . request . " in dispatchEvent..."
 
-    data := StrSplit(data, ":", , 2)
+	data := StrSplit(data, ":", , 2)
 	event := data[1]
 	
 	eventHandler := vEventHandlers[event]

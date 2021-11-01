@@ -1,26 +1,50 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.InteropServices;
-using System.ServiceModel;
+using System.Text;
 using System.Threading.Tasks;
 using BarRaider.SdTools;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 
-namespace SimulatorControllerStreamDeckPlugin.PluginActions
+namespace SimulatorControllerPlugin
 {
-   [PluginActionId("SimulatorControllerStreamDeckPlugin.ControllerFunction")]
+    public struct COPYDATASTRUCT {
+        public IntPtr dwData;
+        public int cbData;
+        [MarshalAs(UnmanagedType.LPStr)]
+        public string lpData;
+    }
+
+    [PluginActionId("simulatorcontrollerplugin.controllerfunction")]
     public class ControllerFunction : PluginBase
     {
-        [DllImport("user32.dll")]
-        public static extern IntPtr FindWindowEx(IntPtr hwndParent, IntPtr hwndChildAfter, string lpszClass, string lpszWindow);
-
-        [DllImport("user32.dll")]
-        public static extern int SendMessage(IntPtr hWnd, int uMsg, int wParam, string lParam);
-
         const int WM_COPYDATA = 0x004A;
+
+        [DllImport("user32.dll")]
+        public static extern int FindWindowEx(int hwndParent, int hwndChildAfter, string lpszClass, string lpszWindow);
+
+        [DllImport("user32.dll")]
+        public static extern int SendMessage(int hWnd, int uMsg, int wParam, ref COPYDATASTRUCT lParam);
+
+        public int SendStringMessage(int hWnd, int wParam, string msg) {
+            int result = 0;
+
+            if (hWnd > 0) {
+                byte[] sarr = System.Text.Encoding.Default.GetBytes(msg);
+                int len = sarr.Length;
+                COPYDATASTRUCT cds;
+
+                cds.dwData = (IntPtr)(256 * 'S' + 'D');
+                cds.lpData = msg;
+                cds.cbData = len + 1;
+
+                result = SendMessage(hWnd, WM_COPYDATA, wParam, ref cds);
+            }
+
+            return result;
+        }
 
         private class PluginSettings
         {
@@ -62,12 +86,12 @@ namespace SimulatorControllerStreamDeckPlugin.PluginActions
 
         public override void KeyReleased(KeyPayload payload)
         {
-            var returnVal = -1;
             try
             {
-                Process proccess = Process.GetProcessesByName("Simulator Controller.exe")[0];
+                int winHandle = FindWindowEx(0, 0, null, "Simulator Controller.exe");
 
-                SendMessage(proccess.Handle, WM_COPYDATA, 0, "External:" + this.settings.Function);
+                if (winHandle != 0)
+                    SendStringMessage(winHandle, 0, "Stream Deck:" + this.settings.Function);
             }
             catch (Exception ex)
             {

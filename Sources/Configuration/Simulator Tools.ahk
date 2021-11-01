@@ -1983,7 +1983,7 @@ runUpdateTargets(ByRef buildProgress) {
 		
 		Sleep 50
 		
-		progressStep := Round((100 / (vTargetsCount + 1)) / target[2].Length())
+		progressStep := ((100 / (vTargetsCount + 1)) / target[2].Length())
 		
 		for ignore, updateFunction in target[2] {
 			if !kSilentMode {
@@ -1999,7 +1999,7 @@ runUpdateTargets(ByRef buildProgress) {
 			
 			Sleep 50
 			
-			buildProgress += progressStep
+			buildProgress := Round(buildProgress + progressStep)
 		}
 				
 		buildProgress += (100 / (vTargetsCount + 1))
@@ -2135,7 +2135,7 @@ runCopyTargets(ByRef buildProgress) {
 					Sleep 50
 				
 					buildProgress += (100 / (vTargetsCount + 1))
-						
+					
 					if !kSilentMode
 						showProgress({progress: buildProgress})
 				}
@@ -2252,8 +2252,11 @@ prepareTargets(ByRef buildProgress, updateOnly) {
 	counter := 0
 	targets := readConfiguration(kToolsTargetsFile)
 	
-	for target, arguments in getConfigurationSectionValues(targets, "Update", Object()) {
-		buildProgress += Min(Floor(A_Index / 4), 1)
+	updateTargets := getConfigurationSectionValues(targets, "Update", Object())
+	
+	for target, arguments in updateTargets {
+		buildProgress += (A_Index / updateTargets.Count())
+		
 		update := vUpdateSettings[target]
 		
 		if !kSilentMode
@@ -2274,9 +2277,12 @@ prepareTargets(ByRef buildProgress, updateOnly) {
 	bubbleSort(vUpdateTargets, "compareUpdateTargets")
 	
 	if !updateOnly {
-		for target, arguments in getConfigurationSectionValues(targets, "Cleanup", Object()) {
+		cleanupTargets := getConfigurationSectionValues(targets, "Cleanup", Object())
+		
+		for target, arguments in cleanupTargets {
 			targetName := ConfigurationItem.splitDescriptor(target)[1]
-			buildProgress += Min(Floor(++counter / 20), 1)
+			buildProgress += (A_Index / cleanupTargets.Count())
+			
 			cleanup := (InStr(target, "*.bak") ? vCleanupSettings[target] : vCleanupSettings[targetName])
 			
 			if !kSilentMode
@@ -2291,9 +2297,12 @@ prepareTargets(ByRef buildProgress, updateOnly) {
 			Sleep 50
 		}
 		
-		for target, arguments in getConfigurationSectionValues(targets, "Copy", Object()) {
+		copyTargets := getConfigurationSectionValues(targets, "Copy", Object())
+		
+		for target, arguments in copyTargets {
 			targetName := ConfigurationItem.splitDescriptor(target)[1]
-			buildProgress += Min(Floor(++counter / 20), 1)
+			buildProgress += (A_Index / copyTargets.Count())
+			
 			copy := vCopySettings[targetName]
 			
 			if !kSilentMode
@@ -2308,8 +2317,11 @@ prepareTargets(ByRef buildProgress, updateOnly) {
 			Sleep 50
 		}
 		
-		for target, arguments in getConfigurationSectionValues(targets, "Build", Object()) {
-			buildProgress += Min(Floor(++counter / 20), 1)
+		buildTargets := getConfigurationSectionValues(targets, "Build", Object())
+		
+		for target, arguments in buildTargets {
+			buildProgress += (A_Index / buildTargets.Count())
+		
 			build := vBuildSettings[target]
 			
 			if !kSilentMode

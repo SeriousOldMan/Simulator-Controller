@@ -13,8 +13,8 @@
         }
       ],
       "SupportedInMultiActions": true,
-      "Tooltip": "Controller Function",
-      "UUID": "SimulatorControllerlugin.ControllerFunction",
+      "Tooltip": "Trigger an action in Simulator Controller",
+      "UUID": "simulatorcontrollerplugin.controllerfunction",
       "PropertyInspectorPath": "PropertyInspector/ControllerFunction.html"
     }
   ],

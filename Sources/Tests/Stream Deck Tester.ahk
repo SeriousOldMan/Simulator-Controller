@@ -29,4 +29,4 @@ ListLines Off					; Disable execution history
 #Include ..\Includes\Includes.ahk
 
 
-raiseEvent(kWindowMessage, "External", "2WayToggle.1 On", "Simulator Controller")
+raiseEvent(kWindowMessage, "Stream Deck", "Button.10", "Simulator Controller")

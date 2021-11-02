@@ -396,12 +396,24 @@ Release 3.6.6 introduces support for Stream Deck controller, very similar to the
 	Stream Deck.Layout=3 x 5
 	Stream Deck.1=Button.1;Button.2;Button.3;Button.4;Button.5
 	Stream Deck.2=Button.6;Button.7;Button.8;Button.9;Button.10
-	Stream Deck.3=Button.11;Button.12;Button.13;Button.14;Button.15
+	Stream Deck.3=;;;;
+	Stream Deck Mini.Layout=2 x 3
+	Stream Deck Mini.1=Button.11;;
+	Stream Deck Mini.2=;;
 	[Buttons]
-	Button.1.Icon=
-	Button.1.Label=true
+	Stream Deck.Button.1.Label=true
+	Stream Deck.Button.2.Label=true
+	Stream Deck.Button.3.Label=true
 	...
+	Stream Deck Mini.Button.11.Icon=D:\Controller\Resources\Icons\Gear,ico
+	Stream Deck Mini.Button.11.Label=false
 
-To connect your Stream Deck(s) with Simulator Controller, you must install the special Stream Deck plugin, which is supplied in the *Resources* folder. Then create a profile using the special action supplied by this Stream Deck plugin. After that you have to create "Stream Deck Configuration.ini" file similar to the example above and save it to the *Simulator Controller\Config* folder in your user *Documents* folder. For each button in the profile you can define the default icon to be shown on the Stream Deck and whether textual labels should be shown on the Stream Deck buttons as well. The value for the *Button.X.Label* property may be *false* (no label), *true* (use the action label from the [labels defined in the general configuration](*)) or you can supply a fixed text here (you can use "\n" to start a new line in the text value).
+To connect your Stream Deck(s) with Simulator Controller, you must install the special Stream Deck plugin, which is supplied in the *Utilities* folder. Copy the comple folder *de.thebigo.simulatorcontroller.sdplugin* to *%appdata%\Elgato\StreamDeck\Plugins*. Then create a profile using the special action *Controller Function* supplied by this Stream Deck plugin. It is important that you leave the title of the action blank and set the *Function* to the desired controller function, for example "Buttton.1".
 
-More to come in the next releases...
+Then you have to create "Stream Deck Configuration.ini" file similar to the example above and save it to the *Simulator Controller\Config* folder in your user *Documents* folder. For each button in the profile you can define the default icon to be shown on the Stream Deck and whether textual labels should be shown on the Stream Deck buttons as well. The value for the optional *[layout].Button.X.Label* property may be *false* (no label), *true* (default; use the action label from the [labels defined in the general configuration](*)) or you can supply a fixed text here (you can use "\n" to start a new line in the text value). To supply an icon using the optional *[layout].Button.X.Icon*, use a full path to an image file supported by Stream Deck. Here you can also use *false* to specify that you never want to change the icon on the Stream Deck, or *true* (which is the default), if the [icon from general configuration](*) should by used for the associated controller action, if one is available.
+
+Example: In the above example, all "Stream Deck" Actions will use the icons for the currently associated controller action as defined in the "Controller Action Icons.XX" file. Please note, that you can omit the declaration "...Label=true", since this is the default. Only the first two rows of the Stream Deck are used here for controller actions, whereas in the "Stream Deck Mini" only the first button in the top row is configured.
+
+To activate your Stream Deck configuration, you then must open "Simulator Configuration" and create a new entry in the upper list of the "Controller" tab and associate this new controller with one of the Stream Deck layouts. Done...
+
+More to come in the next releases, incl. a graphical editor for all action icons and support in the "Simulator Setup"...

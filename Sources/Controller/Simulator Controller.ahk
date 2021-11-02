@@ -559,7 +559,7 @@ class SimulatorController extends ConfigurationItem {
 			case kCustomType:
 				return new ControllerCustomFunction(this, descriptor[2], configuration)
 			default:
-				Throw "Unknown controller function descriptor (" . descriptor[1] . ") detected in SimulatorController.createControllerFunction..."
+				Throw "Unknown controller function type (" . descriptor[1] . ") detected in SimulatorController.createControllerFunction..."
 		}
 	}
 	
@@ -1758,7 +1758,7 @@ externalCommandManager() {
 			case kDialType:
 				rotateDial(descriptor[2], command[2])
 			default:
-				Throw "Unknown controller function descriptor (" . function[1] . ") detected in externalCommand..."
+				Throw "Unknown controller function type (" . function[1] . ") detected in externalCommand..."
 		}
 	}
 	

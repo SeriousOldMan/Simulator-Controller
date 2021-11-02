@@ -97,7 +97,7 @@ class ButtonBoxesList extends ConfigurationItemList {
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
 		
-		Gui %window%:Add, GroupBox, -Theme x16 y80 w457 h115, % translate("Button Boxes")
+		Gui %window%:Add, GroupBox, -Theme x16 y80 w457 h115, % translate("Controller")
 		
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Add, ListBox, x24 y99 w194 h96 HwndbuttonBoxesListBoxHandle VbuttonBoxesListBox glistEvent, %buttonBoxesListBox%

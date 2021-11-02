@@ -418,7 +418,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 					else
 						function := ""
 					
-					LV_Add("", (first ? translate(mode) : ""), subAction, label, function)
+					LV_Add("", (first ? translate(mode) : ""), subAction, StrReplace(label, "`n" , A_Space), function)
 					
 					count += 1
 				}

@@ -601,7 +601,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 						intensity := (mode ? "1.0" : "50")
 					}
 					
-					LV_Add("", (first ? translate(mode ? mode : "Independent") : ""), action, label, translate(state ? "On" : "Off"), intensity, function)
+					LV_Add("", (first ? translate(mode ? mode : "Independent") : ""), action, , StrReplace(label, "`n" , A_Space), translate(state ? "On" : "Off"), intensity, function)
 					
 					count += 1
 				}

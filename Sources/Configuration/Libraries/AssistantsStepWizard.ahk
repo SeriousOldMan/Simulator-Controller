@@ -449,7 +449,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 				else
 					function := ""
 				
-				LV_Add("", subAction, label, function)
+				LV_Add("", subAction, , StrReplace(label, "`n" , A_Space), function)
 				
 				count += 1
 			}

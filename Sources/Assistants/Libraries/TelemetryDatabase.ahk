@@ -280,9 +280,7 @@ computeFilterValues(rows, ByRef lapTimeAverage, ByRef lapTimeStdDev, ByRef consu
 }
 
 validLap(ltAvg, ltStdDev, cAvg, cStdDev, row) {
-	ltThreshold := (ltAvg + ltStdDev)
-	
-	return ((row["Lap.Time"] < ltThreshold) && (Abs(row["Fuel.Consumption"] - cAvg) <= cStdDev))
+	return ((Abs(row["Lap.Time"] - ltAvg) <= ltStdDev) && (Abs(row["Fuel.Consumption"] - cAvg) <= cStdDev))
 }
 
 invalidLap(ltAvg, ltStdDev, cAvg, cStdDev, row) {

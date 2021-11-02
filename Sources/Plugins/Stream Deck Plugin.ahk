@@ -25,6 +25,8 @@ class StreamDeck extends FunctionController {
 	iColumns := false
 	
 	iFunctions := []
+	iLabels := {}
+	iIcons := {}
 		
 	iConnector := false
 	
@@ -70,6 +72,24 @@ class StreamDeck extends FunctionController {
 		}
 	}
 	
+	Labels[function := false] {
+		Get {
+			if function
+				return (this.iLabels.HasKey(function) ? this.iLabels[function] : true)
+			else
+				return this.iLabels
+		}
+	}
+	
+	Icons[function := false] {
+		Get {
+			if function
+				return (this.iIcons.HasKey(function) ? this.iIcons[function] : true)
+			else
+				return this.iIcons
+		}
+	}
+	
 	Connector[] {
 		Get {
 			return this.iConnector
@@ -80,12 +100,12 @@ class StreamDeck extends FunctionController {
 		this.iName := name
 		this.iLayout := layout
 		
-		base.__New(controller, configuration)
-		
 		dllName := "SimulatorControllerPluginConnector.dll"
 		dllFile := kBinariesDirectory . dllName
 			
 		this.iConnector := CLR_LoadLibrary(dllFile).CreateInstance("PluginConnector.PluginConnector")
+		
+		base.__New(controller, configuration)
 	}
 	
 	loadFromConfiguration(configuration) {
@@ -111,6 +131,23 @@ class StreamDeck extends FunctionController {
 			
 			for ignore, function in row
 				if (function != "") {
+					icon := getConfigurationValue(configuration, "Buttons", this.Layout . "." . function . ".Icon", true)
+					label := getConfigurationValue(configuration, "Buttons", this.Layout . "." . function . ".Label", true)
+				
+					if (label != true) {
+						this.iLabels[function] := label
+						
+						if label
+							this.Connector.SetTitle(function, label)
+					}
+					
+					if (icon != true) {
+						this.iIcons[function] := icon
+						
+						if icon
+							this.Connector.SetIcon(function, icon)
+					}
+					
 					this.Functions.Push(function)
 					
 					switch ConfigurationItem.splitDescriptor(function)[1] {
@@ -123,7 +160,7 @@ class StreamDeck extends FunctionController {
 						case kDialType:
 							numDials += 1
 						default:
-							Throw "Unknown controller function descriptor (" . ConfigurationItem.splitDescriptor(function)[1] . ") detected in StreamDeck.loadFromConfiguration..."
+							Throw "Unknown controller function type (" . ConfigurationItem.splitDescriptor(function)[1] . ") detected in StreamDeck.loadFromConfiguration..."
 					}
 				}
 				
@@ -136,14 +173,17 @@ class StreamDeck extends FunctionController {
 	}
 	
 	hasFunction(function) {
-		return (inList(this.Functions, function.Descriptor) != false)
+		if IsObject(function)
+			function := function.Descriptor
+		
+		return (inList(this.Functions, function) != false)
 	}
 	
 	setControlText(function, text, color := "Black") {
 		if this.hasFunction(function) {
 			Process Exist, SimulatorControllerPlugin.exe
 		
-			if ErrorLevel
+			if (ErrorLevel && (this.Labels[function.Descriptor] == true))
 				this.Connector.SetTitle(function.Descriptor, text)
 		}
 	}
@@ -152,7 +192,7 @@ class StreamDeck extends FunctionController {
 		if this.hasFunction(function) {
 			Process Exist, SimulatorControllerPlugin.exe
 		
-			if ErrorLevel
+			if (ErrorLevel && (this.Icons[function.Descriptor] == true))
 				this.Connector.SetImage(function.Descriptor, icon)
 		}
 	}
@@ -165,10 +205,21 @@ class StreamDeck extends FunctionController {
 
 streamDeckEventHandler(event, data) {
 	local function
-	
-	command := string2Values(A_Space, data)
 		
-	descriptor := ConfigurationItem.splitDescriptor(command[1])
+	command := string2Values(A_Space, data)
+	
+	function := command[1]
+	
+	found := false
+	
+	for ignore, fnController in SimulatorController.Instance.FunctionController
+		if isInstance(fnController, StreamDeck) && fnController.hasFunction(function)
+			found := true
+	
+	if !found
+		return
+	
+	descriptor := ConfigurationItem.splitDescriptor(function)
 	
 	switch descriptor[1] {
 		case k1WayToggleType, k2WayToggleType:
@@ -178,7 +229,7 @@ streamDeckEventHandler(event, data) {
 		case kDialType:
 			rotateDial(descriptor[2], command[2])
 		default:
-			Throw "Unknown controller function descriptor (" . function[1] . ") detected in streamDeckEventHandler..."
+			Throw "Unknown controller function type (" . descriptor[1] . ") detected in streamDeckEventHandler..."
 	}
 }
 

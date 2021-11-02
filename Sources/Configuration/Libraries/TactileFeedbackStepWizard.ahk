@@ -383,7 +383,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 					else
 						function := ""
 					
-					LV_Add("", (first ? translate(mode ? mode : "Independent") : ""), action, label, function)
+					LV_Add("", (first ? translate(mode ? mode : "Independent") : ""), action, , StrReplace(label, "`n" , A_Space), function)
 					
 					count += 1
 				}

@@ -3260,9 +3260,15 @@ chooseDataType() {
 			OnMessage(0x44, "")
 
 			IfMsgBox Yes
+			{
 				new TelemetryDatabase(workbench.SelectedSimulator, workbench.SelectedCar
 									, workbench.SelectedTrack).cleanupData(workbench.SelectedWeather
 																		 , workbench.SelectedCompound, workbench.SelectedCompoundColor)
+		
+				GuiControlGet compoundDropDown
+				
+				workbench.loadCompound(kQualifiedTyreCompounds[compoundDropDown], true)
+			}
 		}
 		
 		GuiControl Choose, dataTypeDropDown, % inList(["Electronics", "Tyres"], workbench.SelectedDataType)

@@ -204,16 +204,16 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			}
 		}
 		
-		__New(function, motionMode, label) {
+		__New(function, motionMode, label, icon) {
 			this.iMotionMode := motionMode
 			
-			base.__New(function, label)
+			base.__New(function, label, icon)
 		}
 	}
 			
 	class MotionIntensityAction extends MotionFeedbackPlugin.MotionModeAction {
-		__New(function, motionMode, label) {
-			base.__New(function, motionMode, label)
+		__New(function, motionMode, label, icon) {
+			base.__New(function, motionMode, label, icon)
 		}
 		
 		fireAction(function, trigger) {
@@ -259,7 +259,9 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		__New(function, motionMode, effect) {
 			this.iEffect := effect
 			
-			base.__New(function, motionMode, motionMode.Plugin.getLabel(ConfigurationItem.descriptor(effect, "Toggle"), effect))
+			descriptor := ConfigurationItem.descriptor(effect, "Toggle")
+			
+			base.__New(function, motionMode, motionMode.Plugin.getLabel(descriptor, effect), motionMode.Plugin.getIcon(descriptor))
 		}
 		
 		fireAction(function, trigger) {
@@ -296,7 +298,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		iCurrentEffect := false
 		
 		__New(function, motionMode) {
-			base.__New(function, motionMode, "")
+			base.__New(function, motionMode, "", motionMode.Plugin.getIcon(ConfigurationItem.descriptor("EffectIntensity", "Dial")))
 		}
 		
 		fireAction(function, trigger) {
@@ -411,8 +413,11 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		descriptor := motionArguments[2]
 		function := this.Controller.findFunction(descriptor)
 		
-		if (function != false)
-			this.registerAction(new this.MotionToggleAction(function, this.getLabel(ConfigurationItem.descriptor("Motion", "Toggle"), "Motion")))
+		if (function != false) {
+			descriptor := ConfigurationItem.descriptor("Motion", "Toggle")
+				
+			this.registerAction(new this.MotionToggleAction(function, this.getLabel(descriptor, "Motion"), this.getIcon(descrptor)))
+			}
 		else
 			this.logFunctionNotFound(descriptor)
 		
@@ -424,9 +429,11 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			descriptor := motionArguments[3]
 			function := this.Controller.findFunction(descriptor)
 			
-			if (function != false)
-				motionMode.registerAction(new this.MotionIntensityAction(function, motionMode
-																	   , this.getLabel(ConfigurationItem.descriptor("MotionIntensity", "Dial"), "Motion Intensity")))
+			if (function != false) {
+				descriptor := ConfigurationItem.descriptor("MotionIntensity", "Dial")
+				
+				motionMode.registerAction(new this.MotionIntensityAction(function, motionMode, this.getLabel(descriptor, "Motion Intensity"), this.getIcon(descriptor)))
+			}
 			else
 				this.logFunctionNotFound(descriptor)
 		}
@@ -438,7 +445,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		function := this.Controller.findFunction(descriptor)
 		
 		if (function != false)
-			motionMode.registerAction(new this.EffectSelectorAction(function, "Effect Intensity"))
+			motionMode.registerAction(new this.EffectSelectorAction(function, "Effect Intensity", this.getIcon(ConfigurationItem.descriptor("EffectIntensity", "Activate"))))
 		else
 			this.logFunctionNotFound(descriptor)
 		

@@ -37,19 +37,22 @@ namespace SimulatorControllerPlugin
             }
 
             public override async void SetImage(string path) {
-                using (MemoryStream m = new MemoryStream()) {
-                    var image = Image.FromFile(path);
-                    var raw = image.RawFormat;
-                    string mimeType = ImageCodecInfo.GetImageDecoders().First(c => c.FormatID == raw.Guid).MimeType;
+                if (path == "")
+                    await this.ControllerFunction.Connection.SetDefaultImageAsync();
+                else
+                    using (MemoryStream m = new MemoryStream()) {
+                        var image = Image.FromFile(path);
+                        var raw = image.RawFormat;
+                        string mimeType = ImageCodecInfo.GetImageDecoders().First(c => c.FormatID == raw.Guid).MimeType;
 
-                    image.Save(m, raw);
+                        image.Save(m, raw);
 
-                    byte[] imageBytes = m.ToArray();
-                    
-                    string base64String = Convert.ToBase64String(imageBytes);
+                        byte[] imageBytes = m.ToArray();
 
-                    await this.ControllerFunction.Connection.SetImageAsync("data:" + mimeType + ";base64," + base64String);
-                }
+                        string base64String = Convert.ToBase64String(imageBytes);
+
+                        await this.ControllerFunction.Connection.SetImageAsync("data:" + mimeType + ";base64," + base64String);
+                    }
             }
 
             public ControllerFunctionButton(ControllerFunction function) : base(function.GetFunction()) {

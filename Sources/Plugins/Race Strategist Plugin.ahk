@@ -70,8 +70,11 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		if inList(["PitstopRecommend", "StrategyCancel"], action) {
 			function := controller.findFunction(actionFunction)
 			
-			if (function != false)
-				this.registerAction(new this.RaceStrategistAction(this, function, this.getLabel(ConfigurationItem.descriptor(action, "Activate"), action), action))
+			if (function != false) {
+				descriptor := ConfigurationItem.descriptor(action, "Activate")
+				
+				this.registerAction(new this.RaceStrategistAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor), action))
+			}
 			else
 				this.logFunctionNotFound(actionFunction)
 		}

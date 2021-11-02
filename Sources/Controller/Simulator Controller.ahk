@@ -1399,6 +1399,10 @@ class ControllerPlugin extends Plugin {
 		return action.Label
 	}
 	
+	actionIcon(action) {
+		return action.Icon
+	}
+	
 	isActive() {
 		return this.Active
 	}
@@ -1413,6 +1417,11 @@ class ControllerPlugin extends Plugin {
 			
 			theAction.Function.enable(kAllTrigger, theAction)
 			theAction.Function.setText(this.actionLabel(theAction))
+			
+			icon := this.actionIcon(theAction)
+			
+			if icon
+				theAction.Function.setIcon(icon)
 		}
 	}
 	
@@ -1421,8 +1430,14 @@ class ControllerPlugin extends Plugin {
 		
 		logMessage(kLogInfo, translate("Deactivating plugin ") . translate(this.Plugin))
 		
-		for ignore, theAction in this.Actions
+		for ignore, theAction in this.Actions {
+			icon := this.actionIcon(theAction)
+			
+			if icon
+				theAction.Function.setIcon(false)
+			
 			controller.disconnectAction(theAction.Function, theAction)
+		}
 	}
 	
 	runningSimulator() {
@@ -1451,6 +1466,24 @@ class ControllerPlugin extends Plugin {
 			label := default
 			
 		return label
+	}
+	
+	getIcon(descriptor, default := false) {
+		if !this.sIconsDatabase {
+			languageCode := getLanguage()
+			
+			this.sIconsDatabase := readConfiguration(getFileName("Controller Action Icons." . languageCode, kUserTranslationsDirectory, kTranslationsDirectory))
+			
+			if (this.sIconsDatabase.Count() = 0)
+				this.sIconsDatabase := readConfiguration(getFileName("Controller Action Icons.en", kUserTranslationsDirectory, kTranslationsDirectory))
+		}
+		
+		icon := getConfigurationValue(this.sIconsDatabase, this.Plugin, descriptor, false)
+		
+		if (!icon || (icon == ""))
+			icon := default
+			
+		return icon
 	}
 	
 	logFunctionNotFound(functionDescriptor) {
@@ -1545,26 +1578,39 @@ class ControllerMode {
 			
 			theAction.Function.enable(kAllTrigger, theAction)
 			theAction.Function.setText(plugin.actionLabel(theAction))
+			
+			icon := plugin.actionIcon(theAction)
+			
+			if icon
+				theAction.Function.setIcon(icon)
 		}
 		
 		controller.registerActiveMode(this)
 	}
 	
 	deactivate() {
+		local plugin := this.Plugin
 		controller := this.Controller
 		
 		controller.unregisterActiveMode(this)
 		
 		logMessage(kLogInfo, translate("Deactivating mode ") . translate(getModeForLogMessage(this)))
 		
-		for ignore, theAction in this.Actions
+		for ignore, theAction in this.Actions {
+			icon := plugin.actionIcon(theAction)
+			
+			if icon
+				theAction.Function.setIcon(icon)
+			
 			controller.disconnectAction(theAction.Function, theAction)
+		}
 	}
 }
 
 class ControllerAction {
 	iFunction := false
 	iLabel := ""
+	iIcon := false
 	
 	Function[] {
 		Get {
@@ -1584,9 +1630,16 @@ class ControllerAction {
 		}
 	}
 	
-	__New(function, label := "") {
+	Icon[] {
+		Get {
+			return this.iIcon
+		}
+	}
+	
+	__New(function, label := "", icon := false) {
 		this.iFunction := function
 		this.iLabel := label
+		this.iIcon := icon
 	}
 	
 	fireAction(function, trigger) {

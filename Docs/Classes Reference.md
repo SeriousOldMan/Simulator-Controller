@@ -554,6 +554,9 @@ This is an event handler method called by the controller to notify the plugin, t
 #### *getLabel(descriptor :: String, default :: String := false)*
 This method can be used to support localization or using different labels depending on the bound function in the visual representation of the controller hardware. The label texts are defined in a special configuration file named *Controller Action Labels.XX* (where XX is a language code) located in the *Simulator Controller\Translations* folder in the users *Documents* folder. The content of this file is accessible using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration).
 
+#### *getIcon(descriptor :: String, default :: String := false)*
+This method can be used to support localization or using different icons depending on the bound function in the visual representation of the controller hardware. The icon paths are defined in a special configuration file named *Controller Action Icons.XX* (where XX is a language code) located in the *Simulator Controller\Translations* folder in the users *Documents* folder. The content of this file is accessible using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration).
+
 #### *actionLabel(action :: ControllerAction)*
 This method is called, whenever a label for the given action will be displayed on the visual representation of the controller hardware. The default implementation simply returns the *Label* property of the given action, but a subclass may add a translation process, for example.
 
@@ -620,9 +623,12 @@ The controller, where the corresponding function has been registered.
 #### *Label[]*
 Returns the label of this action.
 	
+#### *Icon[]*
+Returns the path to the icon file of this action, or *false*, if no special has been defined.
+	
 ### Public Methods
 
-#### *__New(function :: ControllerFunction, label :: String := "")*
+#### *__New(function :: ControllerFunction, label :: String := "", icon :: String := false)*
 Constructs an instance of *ControllerAction*.
 
 #### [Abstract] *fireAction(function :: ControllerFunction, trigger :: String)*
@@ -915,5 +921,5 @@ Either "PitstopPlan" or "PitstopPrepare".
 
 ### Public Methods
 
-#### *__New(plugin :: SimulatorPlugin, function :: String, label :: String, action :: OneOf("PitstopPlan", "PitstopPrepare"))*
+#### *__New(plugin :: SimulatorPlugin, function :: String, label :: String, icon :: String, action :: OneOf("PitstopPlan", "PitstopPrepare"))*
 The constructor adds the additional parameters *plugin* and *action* to the inherited *__New* method, which are used to initialize the corresponding properties.

@@ -79,7 +79,16 @@ namespace SimulatorControllerPlugin
         public abstract class Button {
             public string Function { get; set; }
 
-            public abstract void ProcessMessage(string operation, string argument);
+            public void ProcessMessage(string operation, string argument) {
+                if (operation == "SetTitle")
+                    SetTitle(argument);
+                else if (operation == "SetImage")
+                    SetImage(argument);
+            }
+
+            public virtual void SetTitle(string title) { }
+
+            public virtual void SetImage(string image) { }
 
             public Button(string function) {
                 this.Function = function;

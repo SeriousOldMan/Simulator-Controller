@@ -146,6 +146,16 @@
             Value of <see cref="T:CommandLine.MissingGroupOptionError"/> type.
             </summary>
         </member>
+        <member name="F:CommandLine.ErrorType.GroupOptionAmbiguityError">
+            <summary>
+            Value of <see cref="T:CommandLine.GroupOptionAmbiguityError"/> type.
+            </summary>
+        </member>
+        <member name="F:CommandLine.ErrorType.MultipleDefaultVerbsError">
+            <summary>
+            Value of <see cref="T:CommandLine.MultipleDefaultVerbsError"/> type.
+            </summary>
+        </member>
         <member name="T:CommandLine.Error">
             <summary>
             Base type of all errors.
@@ -373,6 +383,11 @@
         <member name="T:CommandLine.InvalidAttributeConfigurationError">
             <summary>
             Models an error generated when an invalid token is detected.
+            </summary>
+        </member>
+        <member name="T:CommandLine.MultipleDefaultVerbsError">
+            <summary>
+            Models an error generated when multiple default verbs are defined.
             </summary>
         </member>
         <member name="M:CommandLine.HelpTextExtensions.IsHelp(System.Collections.Generic.IEnumerable{CommandLine.Error})">
@@ -1505,6 +1520,35 @@
             <param name="notParsedFunc">Lambda executed on failed parsing.</param>
             <returns>The new value.</returns>
         </member>
+        <member name="M:CommandLine.ParserResultExtensions.WithParsedAsync``1(CommandLine.ParserResult{``0},System.Func{``0,System.Threading.Tasks.Task})">
+            <summary>
+            Executes asynchronously <paramref name="action"/> if <see cref="T:CommandLine.ParserResult`1"/> contains
+            parsed values.
+            </summary>
+            <typeparam name="T">Type of the target instance built with parsed value.</typeparam>
+            <param name="result">An <see cref="T:CommandLine.ParserResult`1"/> instance.</param>
+            <param name="action">The <see cref="T:System.Func`2"/> to execute.</param>
+            <returns>The same <paramref name="result"/> instance as a <see cref="T:System.Threading.Tasks.Task"/> instance.</returns>
+        </member>
+        <member name="M:CommandLine.ParserResultExtensions.WithParsedAsync``1(CommandLine.ParserResult{System.Object},System.Func{``0,System.Threading.Tasks.Task})">
+            <summary>
+            Executes asynchronously <paramref name="action"/> if parsed values are of <typeparamref name="T"/>.
+            </summary>
+            <typeparam name="T">Type of the target instance built with parsed value.</typeparam>
+            <param name="result">An verb result instance.</param>
+            <param name="action">The <see cref="T:System.Func`2"/> to execute.</param>
+            <returns>The same <paramref name="result"/> instance as a <see cref="T:System.Threading.Tasks.Task"/> instance.</returns>
+        </member>
+        <member name="M:CommandLine.ParserResultExtensions.WithNotParsedAsync``1(CommandLine.ParserResult{``0},System.Func{System.Collections.Generic.IEnumerable{CommandLine.Error},System.Threading.Tasks.Task})">
+            <summary>
+            Executes asynchronously <paramref name="action"/> if <see cref="T:CommandLine.ParserResult`1"/> lacks
+            parsed values and contains errors.
+            </summary>
+            <typeparam name="T">Type of the target instance built with parsed value.</typeparam>
+            <param name="result">An <see cref="T:CommandLine.ParserResult`1"/> instance.</param>
+            <param name="action">The <see cref="T:System.Func`1"/> delegate to execute.</param>
+            <returns>The same <paramref name="result"/> instance as a <see cref="T:System.Threading.Tasks.Task"/> instance.</returns>
+        </member>
         <member name="T:CommandLine.ParserSettings">
             <summary>
             Provides settings for <see cref="T:CommandLine.Parser"/>. Once consumed cannot be reused.
@@ -2539,12 +2583,13 @@
             Models a verb command specification.
             </summary>
         </member>
-        <member name="M:CommandLine.VerbAttribute.#ctor(System.String)">
+        <member name="M:CommandLine.VerbAttribute.#ctor(System.String,System.Boolean)">
             <summary>
             Initializes a new instance of the <see cref="T:CommandLine.VerbAttribute"/> class.
             </summary>
             <param name="name">The long name of the verb command.</param>
-            <exception cref="T:System.ArgumentException">Thrown if <paramref name="name"/> is null, empty or whitespace.</exception>
+            <param name="isDefault">Whether the verb is the default verb.</param>
+            <exception cref="T:System.ArgumentException">Thrown if <paramref name="name"/> is null, empty or whitespace and <paramref name="isDefault"/> is false.</exception>
         </member>
         <member name="P:CommandLine.VerbAttribute.Name">
             <summary>
@@ -2564,6 +2609,11 @@
         <member name="P:CommandLine.VerbAttribute.ResourceType">
             <summary>
             Gets or sets the <see cref="T:System.Type"/> that contains the resources for <see cref="P:CommandLine.VerbAttribute.HelpText"/>.
+            </summary>
+        </member>
+        <member name="P:CommandLine.VerbAttribute.IsDefault">
+            <summary>
+            Gets whether this verb is the default verb.
             </summary>
         </member>
         <member name="F:CSharpx.EitherType.Left">
@@ -2639,6 +2689,16 @@
             Builds a <see cref="T:CSharpx.Right`2"/> value in case <paramref name="value"/> by default.
             </summary>
         </member>
+        <member name="M:CSharpx.EnumerableExtensions.TryHead``1(System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Safe function that returns Just(first element) or None.
+            </summary>
+        </member>
+        <member name="M:CSharpx.EnumerableExtensions.ToMaybe``1(System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Turns an empty sequence to Nothing, otherwise Just(sequence).
+            </summary>
+        </member>
         <member name="M:CSharpx.EnumerableExtensions.Cartesian``3(System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEnumerable{``1},System.Func{``0,``1,``2})">
             <summary>
             Returns the Cartesian product of two sequences by combining each element of the first set with each in the second
@@ -2708,7 +2768,6 @@
             <summary>
             Immediately executes the given action on each element in the source sequence.
             </summary>
-            <typeparam name="T">The type of the elements in the sequence</typeparam>
         </member>
         <member name="M:CSharpx.EnumerableExtensions.Pairwise``2(System.Collections.Generic.IEnumerable{``0},System.Func{``0,``0,``1})">
             <summary>
@@ -2730,16 +2789,6 @@
             a given delimiter.
             </summary>
         </member>
-        <member name="M:CSharpx.EnumerableExtensions.TryHead``1(System.Collections.Generic.IEnumerable{``0})">
-            <summary>
-            Safe function that returns Just(first element) or None.
-            </summary>
-        </member>
-        <member name="M:CSharpx.EnumerableExtensions.ToMaybe``1(System.Collections.Generic.IEnumerable{``0})">
-            <summary>
-            Turns an empty sequence to Nothing, otherwise Just(sequence).
-            </summary>
-        </member>
         <member name="M:CSharpx.EnumerableExtensions.Tail``1(System.Collections.Generic.IEnumerable{``0})">
             <summary>
             Return everything except first element and throws exception if empty.
@@ -2750,7 +2799,7 @@
             Return everything except first element without throwing exception if empty.
             </summary>
         </member>
-        <member name="M:CSharpx.EnumerableExtensions.Memorize``1(System.Collections.Generic.IEnumerable{``0})">
+        <member name="M:CSharpx.EnumerableExtensions.Memoize``1(System.Collections.Generic.IEnumerable{``0})">
             <summary>
             Captures current state of a sequence.
             </summary>
@@ -2758,6 +2807,27 @@
         <member name="M:CSharpx.EnumerableExtensions.Materialize``1(System.Collections.Generic.IEnumerable{``0})">
             <summary>
             Creates an immutable copy of a sequence.
+            </summary>
+        </member>
+        <member name="M:CSharpx.EnumerableExtensions.Choice``1(System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Selects a random element.
+            </summary>
+        </member>
+        <member name="M:CSharpx.EnumerableExtensions.Intersperse``1(System.Collections.Generic.IEnumerable{``0},``0)">
+            <summary>
+            Takes an element and a sequence and `intersperses' that element between its elements.
+            </summary>
+        </member>
+        <member name="M:CSharpx.EnumerableExtensions.FlattenOnce``1(System.Collections.Generic.IEnumerable{System.Collections.Generic.IEnumerable{``0}})">
+            <summary>
+            Flattens a sequence by one level.
+            </summary>
+        </member>
+        <member name="M:CSharpx.EnumerableExtensions.FlattenOnce(System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Reduces a sequence of strings to a sequence of parts, splitted by space,
+            of each original string.
             </summary>
         </member>
         <member name="T:CSharpx.MaybeType">
@@ -2884,7 +2954,7 @@
         </member>
         <member name="M:CSharpx.MaybeExtensions.Do``1(CSharpx.Maybe{``0},System.Action{``0})">
             <summary>
-            If contans a value executes an <see cref="T:System.Action`1"/> delegate over it.
+            If contains a value executes an <see cref="T:System.Action`1"/> delegate over it.
             </summary>
         </member>
         <member name="M:CSharpx.MaybeExtensions.Do``2(CSharpx.Maybe{System.Tuple{``0,``1}},System.Action{``0,``1})">
@@ -2920,6 +2990,11 @@
         <member name="M:CSharpx.MaybeExtensions.MapValueOrDefault``2(CSharpx.Maybe{``0},System.Func{``0,``1},``1)">
             <summary>
             If contains a values executes a mapping function over it, otherwise returns <paramref name="noneValue"/>.
+            </summary>
+        </member>
+        <member name="M:CSharpx.MaybeExtensions.MapValueOrDefault``2(CSharpx.Maybe{``0},System.Func{``0,``1},System.Func{``1})">
+            <summary>
+            If contains a values executes a mapping function over it, otherwise returns the value from <paramref name="noneValueFactory"/>.
             </summary>
         </member>
         <member name="M:CSharpx.MaybeExtensions.ToEnumerable``1(CSharpx.Maybe{``0})">
@@ -3110,6 +3185,16 @@
         <member name="M:RailwaySharp.ErrorHandling.ResultExtensions.SucceededWith``2(RailwaySharp.ErrorHandling.Result{``0,``1})">
             <summary>
             Returns the result or fails if the result was an error.
+            </summary>
+        </member>
+        <member name="M:RailwaySharp.ErrorHandling.ResultExtensions.SuccessMessages``2(RailwaySharp.ErrorHandling.Result{``0,``1})">
+            <summary>
+            Returns messages in case of success, otherwise an empty sequence. 
+            </summary>
+        </member>
+        <member name="M:RailwaySharp.ErrorHandling.ResultExtensions.ToMaybe``2(RailwaySharp.ErrorHandling.Result{``0,``1})">
+            <summary>
+            Builds a Maybe type instance from a Result one.
             </summary>
         </member>
     </members>

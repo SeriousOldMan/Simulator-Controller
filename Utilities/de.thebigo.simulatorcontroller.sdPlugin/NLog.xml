@@ -820,6 +820,11 @@
             Name of context
             </summary>
         </member>
+        <member name="P:NLog.Common.IInternalLoggerContext.LogFactory">
+            <summary>
+            The current LogFactory next to LogManager
+            </summary>
+        </member>
         <member name="T:NLog.Common.InternalLogger">
             <summary>
             NLog internal logger.
@@ -1681,7 +1686,7 @@
             with embedded ${}).
             </summary>
         </member>
-        <member name="M:NLog.Conditions.ConditionLayoutExpression.#ctor(NLog.Layouts.Layout)">
+        <member name="M:NLog.Conditions.ConditionLayoutExpression.#ctor(NLog.Layouts.SimpleLayout)">
             <summary>
             Initializes a new instance of the <see cref="T:NLog.Conditions.ConditionLayoutExpression" /> class.
             </summary>
@@ -1730,11 +1735,12 @@
             Condition literal expression (numeric, <b>LogLevel.XXX</b>, <b>true</b> or <b>false</b>).
             </summary>
         </member>
-        <member name="M:NLog.Conditions.ConditionLiteralExpression.#ctor(System.Object)">
+        <member name="M:NLog.Conditions.ConditionLiteralExpression.#ctor(System.Object,System.String)">
             <summary>
             Initializes a new instance of the <see cref="T:NLog.Conditions.ConditionLiteralExpression" /> class.
             </summary>
             <param name="literalValue">Literal value.</param>
+            <param name="toStringValue">ToString value.</param>
         </member>
         <member name="P:NLog.Conditions.ConditionLiteralExpression.LiteralValue">
             <summary>
@@ -2809,11 +2815,12 @@
             Interface for loading NLog <see cref="T:NLog.Config.LoggingConfiguration"/>
             </summary>
         </member>
-        <member name="M:NLog.Config.ILoggingConfigurationLoader.Load(NLog.LogFactory)">
+        <member name="M:NLog.Config.ILoggingConfigurationLoader.Load(NLog.LogFactory,System.String)">
             <summary>
             Finds and loads the NLog configuration
             </summary>
             <param name="logFactory">LogFactory that owns the NLog configuration</param>
+            <param name="filename">Name of NLog.config file (optional)</param>
             <returns>NLog configuration (or null if none found)</returns>
         </member>
         <member name="M:NLog.Config.ILoggingConfigurationLoader.Activated(NLog.LogFactory,NLog.Config.LoggingConfiguration)">
@@ -2823,10 +2830,11 @@
             <param name="logFactory">LogFactory that owns the NLog configuration</param>
             <param name="config">NLog Config</param>
         </member>
-        <member name="M:NLog.Config.ILoggingConfigurationLoader.GetDefaultCandidateConfigFilePaths">
+        <member name="M:NLog.Config.ILoggingConfigurationLoader.GetDefaultCandidateConfigFilePaths(System.String)">
             <summary>
             Get file paths (including filename) for the possible NLog config files. 
             </summary>
+            <param name="filename">Name of NLog.config file (optional)</param>
             <returns>The file paths to the possible config file</returns>
         </member>
         <member name="P:NLog.Config.ILoggingRuleLevelFilter.LogLevels">
@@ -3012,6 +3020,21 @@
         <member name="P:NLog.Config.ISetupInternalLoggerBuilder.LogFactory">
             <summary>
             LogFactory under configuration
+            </summary>
+        </member>
+        <member name="T:NLog.Config.ISetupLoadConfigurationBuilder">
+            <summary>
+            Interface for fluent setup of LogFactory options
+            </summary>
+        </member>
+        <member name="P:NLog.Config.ISetupLoadConfigurationBuilder.LogFactory">
+            <summary>
+            LogFactory under configuration
+            </summary>
+        </member>
+        <member name="P:NLog.Config.ISetupLoadConfigurationBuilder.Configuration">
+            <summary>
+            LoggingConfiguration being built
             </summary>
         </member>
         <member name="T:NLog.Config.ISetupSerializationBuilder">
@@ -3402,6 +3425,9 @@
             <remarks>If initializing not started or failed, then checking process will be canceled</remarks>
             </summary>
         </member>
+        <member name="M:NLog.Config.LoggingConfiguration.ToString">
+            <inheritdoc />
+        </member>
         <member name="T:NLog.Config.LoggingConfigurationChangedEventArgs">
             <summary>
             Arguments for <see cref="E:NLog.LogFactory.ConfigurationChanged"/> events.
@@ -3461,9 +3487,6 @@
             <summary>
             Enables loading of NLog configuration from a file
             </summary>
-        </member>
-        <member name="M:NLog.Config.LoggingConfigurationFileLoader.GetDefaultCandidateConfigFilePaths">
-            <inheritdoc/>
         </member>
         <member name="M:NLog.Config.LoggingConfigurationFileLoader.GetDefaultCandidateConfigFilePaths(System.String)">
             <summary>
@@ -3865,12 +3888,6 @@
             Represents simple XML element with case-insensitive attribute semantics.
             </summary>
         </member>
-        <member name="M:NLog.Config.NLogXmlElement.#ctor(System.String)">
-            <summary>
-            Initializes a new instance of the <see cref="T:NLog.Config.NLogXmlElement"/> class.
-            </summary>
-            <param name="inputUri">The input URI.</param>
-        </member>
         <member name="M:NLog.Config.NLogXmlElement.#ctor(System.Xml.XmlReader)">
             <summary>
             Initializes a new instance of the <see cref="T:NLog.Config.NLogXmlElement"/> class.
@@ -4137,8 +4154,14 @@
             <summary>
             Parse XML string as NLog configuration
             </summary>
-            <param name="xml">NLog configuration</param>
-            <returns></returns>
+            <param name="xml">NLog configuration in XML to be parsed</param>
+        </member>
+        <member name="M:NLog.Config.XmlLoggingConfiguration.CreateFromXmlString(System.String,NLog.LogFactory)">
+            <summary>
+            Parse XML string as NLog configuration
+            </summary>
+            <param name="xml">NLog configuration in XML to be parsed</param>
+            <param name="logFactory">NLog LogFactory</param>
         </member>
         <member name="P:NLog.Config.XmlLoggingConfiguration.AppConfig">
             <summary>
@@ -4256,6 +4279,9 @@
             <param name="baseDirectory">base directory in case if <paramref name="fileMask"/> is relative</param>
             <param name="fileMask">relative or absolute fileMask</param>
             <param name="autoReloadDefault"></param>
+        </member>
+        <member name="M:NLog.Config.XmlLoggingConfiguration.ToString">
+            <inheritdoc />
         </member>
         <member name="T:NLog.Filters.ConditionBasedFilter">
             <summary>
@@ -4628,7 +4654,7 @@
         </member>
         <member name="M:NLog.Fluent.Log.Level(NLog.LogLevel,System.String)">
             <summary>
-            Starts building a log event with the specified <see cref="T:NLog.LogLevel" />.
+            Starts building a log event with the specified <see cref="T:System.LogLevel" />.
             </summary>
             <param name="logLevel">The log level.</param>
             <param name="callerFilePath">The full path of the source file that contains the caller. This is the file path at the time of compile.</param>
@@ -7925,13 +7951,13 @@
             Clear o
             </summary>
         </member>
-        <member name="M:NLog.Internal.CallSiteInformation.SetStackTrace(System.Diagnostics.StackTrace,System.Int32,System.Nullable{System.Int32})">
+        <member name="M:NLog.Internal.CallSiteInformation.SetStackTrace(System.Diagnostics.StackTrace,System.Nullable{System.Int32},System.Type)">
             <summary>
             Sets the stack trace for the event info.
             </summary>
             <param name="stackTrace">The stack trace.</param>
             <param name="userStackFrame">Index of the first user stack frame within the stack trace.</param>
-            <param name="userStackFrameLegacy">Index of the first user stack frame within the stack trace.</param>
+            <param name="loggerType">Type of the logger or logger wrapper. This is still Logger if it's a subclass of Logger.</param>
         </member>
         <member name="M:NLog.Internal.CallSiteInformation.SetCallerInfo(System.String,System.String,System.String,System.Int32)">
             <summary>
@@ -7962,6 +7988,36 @@
             <summary>
             Gets the entire stack trace.
             </summary>
+        </member>
+        <member name="M:NLog.Internal.CallSiteInformation.FindCallingMethodOnStackTrace(System.Diagnostics.StackFrame[],System.Type)">
+            <summary>
+             Finds first user stack frame in a stack trace
+            </summary>
+            <param name="stackFrames">The stack trace of the logging method invocation</param>
+            <param name="loggerType">Type of the logger or logger wrapper. This is still Logger if it's a subclass of Logger.</param>
+            <returns>Index of the first user stack frame or 0 if all stack frames are non-user</returns>
+        </member>
+        <member name="M:NLog.Internal.CallSiteInformation.SkipToUserStackFrameLegacy(System.Diagnostics.StackFrame[],System.Int32)">
+            <summary>
+            This is only done for legacy reason, as the correct method-name and line-number should be extracted from the MoveNext-StackFrame
+            </summary>
+            <param name="stackFrames">The stack trace of the logging method invocation</param>
+            <param name="firstUserStackFrame">Starting point for skipping async MoveNext-frames</param>
+        </member>
+        <member name="M:NLog.Internal.CallSiteInformation.SkipAssembly(System.Diagnostics.StackFrame)">
+            <summary>
+            Assembly to skip?
+            </summary>
+            <param name="frame">Find assembly via this frame. </param>
+            <returns><c>true</c>, we should skip.</returns>
+        </member>
+        <member name="M:NLog.Internal.CallSiteInformation.IsLoggerType(System.Diagnostics.StackFrame,System.Type)">
+            <summary>
+            Is this the type of the logger?
+            </summary>
+            <param name="frame">get type of this logger in this frame.</param>
+            <param name="loggerType">Type of the logger.</param>
+            <returns></returns>
         </member>
         <member name="M:NLog.Internal.CollectionExtensions.Filter``2(System.Collections.Generic.IList{``0},``1,System.Func{``0,``1,System.Boolean})">
             <summary>
@@ -8286,22 +8342,34 @@
             Domain unloaded event.
             </summary>
         </member>
-        <member name="P:NLog.Internal.Fakeables.AppEnvironmentWrapper.AppDomainBaseDirectory">
-            <inheritdoc />
-        </member>
-        <member name="P:NLog.Internal.Fakeables.AppEnvironmentWrapper.AppDomainConfigurationFile">
-            <inheritdoc />
-        </member>
-        <member name="P:NLog.Internal.Fakeables.AppEnvironmentWrapper.CurrentProcessFilePath">
-            <inheritdoc />
-        </member>
         <member name="P:NLog.Internal.Fakeables.AppEnvironmentWrapper.EntryAssemblyLocation">
             <inheritdoc />
         </member>
         <member name="P:NLog.Internal.Fakeables.AppEnvironmentWrapper.EntryAssemblyFileName">
             <inheritdoc />
         </member>
+        <member name="P:NLog.Internal.Fakeables.AppEnvironmentWrapper.CurrentProcessFilePath">
+            <inheritdoc />
+        </member>
+        <member name="P:NLog.Internal.Fakeables.AppEnvironmentWrapper.CurrentProcessBaseName">
+            <inheritdoc />
+        </member>
+        <member name="P:NLog.Internal.Fakeables.AppEnvironmentWrapper.CurrentProcessId">
+            <inheritdoc />
+        </member>
+        <member name="P:NLog.Internal.Fakeables.AppEnvironmentWrapper.AppDomainBaseDirectory">
+            <inheritdoc />
+        </member>
+        <member name="P:NLog.Internal.Fakeables.AppEnvironmentWrapper.AppDomainConfigurationFile">
+            <inheritdoc />
+        </member>
         <member name="P:NLog.Internal.Fakeables.AppEnvironmentWrapper.PrivateBinPath">
+            <inheritdoc />
+        </member>
+        <member name="P:NLog.Internal.Fakeables.AppEnvironmentWrapper.UserTempFilePath">
+            <inheritdoc />
+        </member>
+        <member name="P:NLog.Internal.Fakeables.AppEnvironmentWrapper.AppDomain">
             <inheritdoc />
         </member>
         <member name="M:NLog.Internal.Fakeables.AppEnvironmentWrapper.FileExists(System.String)">
@@ -8359,6 +8427,11 @@
         <member name="T:NLog.Internal.Fakeables.IAppEnvironment">
             <summary>
             Abstract calls for the application environment
+            </summary>
+        </member>
+        <member name="P:NLog.Internal.Fakeables.IAppEnvironment.CurrentProcessBaseName">
+            <summary>
+            Gets current process name (excluding filename extension, if any).
             </summary>
         </member>
         <member name="T:NLog.Internal.Fakeables.IFileSystem">
@@ -9859,60 +9932,6 @@
             Will creating a mutex succeed runtime?
             </summary>
         </member>
-        <member name="T:NLog.Internal.PortableProcessIDHelper">
-            <summary>
-            Portable implementation of <see cref="T:NLog.Internal.ProcessIDHelper"/>.
-            </summary>
-        </member>
-        <member name="M:NLog.Internal.PortableProcessIDHelper.#ctor">
-            <summary>
-            Initializes a new instance of the <see cref="T:NLog.Internal.PortableProcessIDHelper" /> class.
-            </summary>
-        </member>
-        <member name="P:NLog.Internal.PortableProcessIDHelper.CurrentProcessID">
-            <summary>
-            Gets current process ID.
-            </summary>
-            <value></value>
-        </member>
-        <member name="P:NLog.Internal.PortableProcessIDHelper.CurrentProcessFilePath">
-            <summary>
-            Gets current process name.
-            </summary>
-            <value></value>
-        </member>
-        <member name="T:NLog.Internal.ProcessIDHelper">
-            <summary>
-            Returns details about current process and thread in a portable manner.
-            </summary>
-        </member>
-        <member name="P:NLog.Internal.ProcessIDHelper.Instance">
-            <summary>
-            Gets the singleton instance of PortableThreadIDHelper or
-            Win32ThreadIDHelper depending on runtime environment.
-            </summary>
-            <value>The instance.</value>
-        </member>
-        <member name="P:NLog.Internal.ProcessIDHelper.CurrentProcessID">
-            <summary>
-            Gets current process ID.
-            </summary>
-        </member>
-        <member name="P:NLog.Internal.ProcessIDHelper.CurrentProcessFilePath">
-            <summary>
-            Gets current process absolute file path.
-            </summary>
-        </member>
-        <member name="P:NLog.Internal.ProcessIDHelper.CurrentProcessBaseName">
-            <summary>
-            Gets current process name (excluding filename extension, if any).
-            </summary>
-        </member>
-        <member name="M:NLog.Internal.ProcessIDHelper.Create">
-            <summary>
-            Initializes the ThreadIDHelper class.
-            </summary>
-        </member>
         <member name="T:NLog.Internal.PropertiesDictionary">
             <summary>
             Dictionary that combines the standard <see cref="P:NLog.LogEventInfo.Properties" /> with the
@@ -10082,14 +10101,6 @@
             <param name="value">The value to be parsed.</param>
             <param name="configurationItemFactory"></param>
         </member>
-        <member name="M:NLog.Internal.PropertyHelper.IsArrayProperty(System.Type,System.String)">
-            <summary>
-            Is the property of array-type?
-            </summary>
-            <param name="t">Type which has the property <paramref name="propertyName"/></param>
-            <param name="propertyName">name of the property.</param>
-            <returns></returns>
-        </member>
         <member name="M:NLog.Internal.PropertyHelper.TryGetPropertyInfo(System.Object,System.String,System.Reflection.PropertyInfo@)">
             <summary>
             Get property info
@@ -10099,7 +10110,7 @@
             <param name="result">result when success.</param>
             <returns>success.</returns>
         </member>
-        <member name="M:NLog.Internal.PropertyHelper.TryFlatListConversion(System.Object,System.Reflection.PropertyInfo,System.String,System.Object@)">
+        <member name="M:NLog.Internal.PropertyHelper.TryFlatListConversion(System.Object,System.Reflection.PropertyInfo,System.String,NLog.Config.ConfigurationItemFactory,System.Object@)">
             <summary>
             Try parse of string to (Generic) list, comma separated.
             </summary>
@@ -10899,26 +10910,6 @@
             <param name="ch"></param>
             <returns></returns>
         </member>
-        <member name="T:NLog.Internal.Win32ProcessIDHelper">
-            <summary>
-            Win32-optimized implementation of <see cref="T:NLog.Internal.ProcessIDHelper"/>.
-            </summary>
-        </member>
-        <member name="M:NLog.Internal.Win32ProcessIDHelper.#ctor">
-            <summary>
-            Initializes a new instance of the <see cref="T:NLog.Internal.Win32ProcessIDHelper" /> class.
-            </summary>
-        </member>
-        <member name="P:NLog.Internal.Win32ProcessIDHelper.CurrentProcessID">
-            <summary>
-            Gets current process ID.
-            </summary>
-        </member>
-        <member name="P:NLog.Internal.Win32ProcessIDHelper.CurrentProcessFilePath">
-            <summary>
-            Gets current process absolute file path.
-            </summary>
-        </member>
         <member name="T:NLog.Internal.Xamarin.PreserveAttribute">
             <summary>
             Prevents the Xamarin linker from linking the target.
@@ -11377,7 +11368,7 @@
         </member>
         <member name="P:NLog.LayoutRenderers.BaseDirLayoutRenderer.ProcessDir">
             <summary>
-            Use base dir of current process.
+            Use base dir of current process. Alternative one can just use ${processdir}
             </summary>
             <docgen category='Rendering Options' order='10' />
         </member>
@@ -11393,6 +11384,11 @@
             </summary>
         </member>
         <member name="M:NLog.LayoutRenderers.BaseDirLayoutRenderer.#ctor(NLog.Internal.Fakeables.IAppDomain)">
+            <summary>
+            Initializes a new instance of the <see cref="T:NLog.LayoutRenderers.BaseDirLayoutRenderer" /> class.
+            </summary>
+        </member>
+        <member name="M:NLog.LayoutRenderers.BaseDirLayoutRenderer.#ctor(NLog.Internal.Fakeables.IAppEnvironment)">
             <summary>
             Initializes a new instance of the <see cref="T:NLog.LayoutRenderers.BaseDirLayoutRenderer" /> class.
             </summary>
@@ -11432,6 +11428,11 @@
             Gets or sets the number of frames to skip.
             </summary>
             <docgen category='Rendering Options' order='10' />
+        </member>
+        <member name="P:NLog.LayoutRenderers.CallSiteFileNameLayoutRenderer.CaptureStackTrace">
+            <summary>
+            Logger should capture StackTrace, if it was not provided manually
+            </summary>
         </member>
         <member name="P:NLog.LayoutRenderers.CallSiteFileNameLayoutRenderer.NLog#Internal#IUsesStackTrace#StackTraceUsage">
             <summary>
@@ -11503,6 +11504,11 @@
             </summary>
             <docgen category='Rendering Options' order='10' />
         </member>
+        <member name="P:NLog.LayoutRenderers.CallSiteLayoutRenderer.CaptureStackTrace">
+            <summary>
+            Logger should capture StackTrace, if it was not provided manually
+            </summary>
+        </member>
         <member name="P:NLog.LayoutRenderers.CallSiteLayoutRenderer.NLog#Internal#IUsesStackTrace#StackTraceUsage">
             <summary>
             Gets the level of stack trace information required by the implementing class.
@@ -11525,6 +11531,11 @@
             Gets or sets the number of frames to skip.
             </summary>
             <docgen category='Rendering Options' order='10' />
+        </member>
+        <member name="P:NLog.LayoutRenderers.CallSiteLineNumberLayoutRenderer.CaptureStackTrace">
+            <summary>
+            Logger should capture StackTrace, if it was not provided manually
+            </summary>
         </member>
         <member name="P:NLog.LayoutRenderers.CallSiteLineNumberLayoutRenderer.NLog#Internal#IUsesStackTrace#StackTraceUsage">
             <summary>
@@ -11818,6 +11829,16 @@
             Gets or sets the separator between inner exceptions.
             </summary>
             <docgen category='Rendering Options' order='10' />
+        </member>
+        <member name="P:NLog.LayoutRenderers.ExceptionLayoutRenderer.BaseException">
+            <summary>
+            Gets or sets whether to render innermost Exception from <see cref="M:System.Exception.GetBaseException"/>
+            </summary>
+        </member>
+        <member name="P:NLog.LayoutRenderers.ExceptionLayoutRenderer.FlattenException">
+            <summary>
+            Gets or sets whether to collapse exception tree using <see cref="M:System.AggregateException.Flatten"/>
+            </summary>
         </member>
         <member name="P:NLog.LayoutRenderers.ExceptionLayoutRenderer.Formats">
             <summary>
@@ -12895,9 +12916,50 @@
             If having multiple instances with the same process-name, then they will get different instance names
             </summary>
         </member>
+        <member name="T:NLog.LayoutRenderers.ProcessDirLayoutRenderer">
+            <summary>
+            The executable directory from the <see cref="P:System.Diagnostics.Process.MainModule"/> FileName,
+            using the current process <see cref="M:System.Diagnostics.Process.GetCurrentProcess"/>
+            </summary>
+        </member>
+        <member name="P:NLog.LayoutRenderers.ProcessDirLayoutRenderer.File">
+            <summary>
+            Gets or sets the name of the file to be Path.Combine()'d with with the process directory.
+            </summary>
+            <docgen category='Advanced Options' order='10' />
+        </member>
+        <member name="P:NLog.LayoutRenderers.ProcessDirLayoutRenderer.Dir">
+            <summary>
+            Gets or sets the name of the directory to be Path.Combine()'d with with the process directory.
+            </summary>
+            <docgen category='Advanced Options' order='10' />
+        </member>
+        <member name="M:NLog.LayoutRenderers.ProcessDirLayoutRenderer.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:NLog.LayoutRenderers.ProcessDirLayoutRenderer" /> class.
+            </summary>
+        </member>
+        <member name="M:NLog.LayoutRenderers.ProcessDirLayoutRenderer.#ctor(NLog.Internal.Fakeables.IAppEnvironment)">
+            <summary>
+            Initializes a new instance of the <see cref="T:NLog.LayoutRenderers.ProcessDirLayoutRenderer" /> class.
+            </summary>
+        </member>
+        <member name="M:NLog.LayoutRenderers.ProcessDirLayoutRenderer.Append(System.Text.StringBuilder,NLog.LogEventInfo)">
+            <inheritdoc/>
+        </member>
         <member name="T:NLog.LayoutRenderers.ProcessIdLayoutRenderer">
             <summary>
             The identifier of the current process.
+            </summary>
+        </member>
+        <member name="M:NLog.LayoutRenderers.ProcessIdLayoutRenderer.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:NLog.LayoutRenderers.ProcessIdLayoutRenderer" /> class.
+            </summary>
+        </member>
+        <member name="M:NLog.LayoutRenderers.ProcessIdLayoutRenderer.#ctor(NLog.Internal.Fakeables.IAppEnvironment)">
+            <summary>
+            Initializes a new instance of the <see cref="T:NLog.LayoutRenderers.ProcessIdLayoutRenderer" /> class.
             </summary>
         </member>
         <member name="M:NLog.LayoutRenderers.ProcessIdLayoutRenderer.Append(System.Text.StringBuilder,NLog.LogEventInfo)">
@@ -13142,6 +13204,16 @@
             Gets or sets a value indicating whether to write the full path to the process executable.
             </summary>
             <docgen category='Rendering Options' order='10' />
+        </member>
+        <member name="M:NLog.LayoutRenderers.ProcessNameLayoutRenderer.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:NLog.LayoutRenderers.ProcessNameLayoutRenderer" /> class.
+            </summary>
+        </member>
+        <member name="M:NLog.LayoutRenderers.ProcessNameLayoutRenderer.#ctor(NLog.Internal.Fakeables.IAppEnvironment)">
+            <summary>
+            Initializes a new instance of the <see cref="T:NLog.LayoutRenderers.ProcessNameLayoutRenderer" /> class.
+            </summary>
         </member>
         <member name="M:NLog.LayoutRenderers.ProcessNameLayoutRenderer.Append(System.Text.StringBuilder,NLog.LogEventInfo)">
             <summary>
@@ -13430,6 +13502,11 @@
             Gets or sets the stack frame separator string.
             </summary>
             <docgen category='Rendering Options' order='10' />
+        </member>
+        <member name="P:NLog.LayoutRenderers.StackTraceLayoutRenderer.CaptureStackTrace">
+            <summary>
+            Logger should capture StackTrace, if it was not provided manually
+            </summary>
         </member>
         <member name="P:NLog.LayoutRenderers.StackTraceLayoutRenderer.NLog#Internal#IUsesStackTrace#StackTraceUsage">
             <summary>
@@ -13725,6 +13802,9 @@
             <summary>
             Should forward slashes be escaped? If true, / will be converted to \/ 
             </summary>
+            <remarks>
+            If not set explicitly then the value of the parent will be used as default.
+            </remarks>
             <docgen category="Transformation Options" order="10"/>
         </member>
         <member name="M:NLog.LayoutRenderers.Wrappers.JsonEncodeLayoutRendererWrapper.RenderInnerAndTransform(NLog.LogEventInfo,System.Text.StringBuilder,System.Int32)">
@@ -14745,8 +14825,11 @@
         </member>
         <member name="P:NLog.Layouts.JsonAttribute.EscapeForwardSlash">
             <summary>
-            Should forward slashes be escaped? If true, / will be converted to \/ 
+            Should forward slashes be escaped? If true, / will be converted to \/
             </summary>
+            <remarks>
+            If not set explicitly then the value of the parent will be used as default.
+            </remarks>
             <docgen category='JSON Attribute Options' order='100' />
         </member>
         <member name="P:NLog.Layouts.JsonAttribute.IncludeEmptyValue">
@@ -14823,6 +14906,9 @@
             <summary>
             Should forward slashes be escaped? If true, / will be converted to \/ 
             </summary>
+            <remarks>
+            If not set explicitly then the value of the parent will be used as default.
+            </remarks>
             <docgen category='JSON Formating' order='10' />
         </member>
         <member name="M:NLog.Layouts.JsonLayout.InitializeLayout">
@@ -15429,18 +15515,11 @@
             <remarks>Upgrade to private protected when using C# 7.2 </remarks>
             <docgen category='XML Options' order='10' />
         </member>
-        <member name="P:NLog.Layouts.XmlElementBase.ElementValueInternal">
+        <member name="F:NLog.Layouts.XmlElementBase.LayoutWrapper">
             <summary>
             Value inside the XML element
             </summary>
             <remarks>Upgrade to private protected when using C# 7.2 </remarks>
-            <docgen category='XML Options' order='10' />
-        </member>
-        <member name="P:NLog.Layouts.XmlElementBase.ElementEncodeInternal">
-            <summary>
-            Xml Encode the value for the XML element
-            </summary>
-            <remarks>Ensures always valid XML, but gives a performance hit</remarks>
             <docgen category='XML Options' order='10' />
         </member>
         <member name="P:NLog.Layouts.XmlElementBase.IndentXml">
@@ -15885,7 +15964,7 @@
             Sets the stack trace for the event info.
             </summary>
             <param name="stackTrace">The stack trace.</param>
-            <param name="userStackFrame">Index of the first user stack frame within the stack trace.</param>
+            <param name="userStackFrame">Index of the first user stack frame within the stack trace (Negative means NLog should skip stackframes from System-assemblies).</param>
         </member>
         <member name="M:NLog.LogEventInfo.SetCallerInfo(System.String,System.String,System.String,System.Int32)">
             <summary>
@@ -15966,11 +16045,12 @@
             </summary>
             <param name="config">The config.</param>
         </member>
-        <member name="M:NLog.LogFactory.#ctor(NLog.Config.ILoggingConfigurationLoader)">
+        <member name="M:NLog.LogFactory.#ctor(NLog.Config.ILoggingConfigurationLoader,NLog.Internal.Fakeables.IAppEnvironment)">
             <summary>
             Initializes a new instance of the <see cref="T:NLog.LogFactory" /> class.
             </summary>
             <param name="configLoader">The config loader</param>
+            <param name="appEnvironment">The custom AppEnvironmnet override</param>
         </member>
         <member name="P:NLog.LogFactory.CurrentAppDomain">
             <summary>
@@ -16241,7 +16321,18 @@
             <param name="disposing"><c>True</c> to release both managed and unmanaged resources;
             <c>false</c> to release only unmanaged resources.</param>
         </member>
+        <member name="M:NLog.LogFactory.Shutdown">
+            <summary>
+            Dispose all targets, and shutdown logging.
+            </summary>
+        </member>
         <member name="M:NLog.LogFactory.GetCandidateConfigFilePaths">
+            <summary>
+            Get file paths (including filename) for the possible NLog config files. 
+            </summary>
+            <returns>The file paths to the possible config file</returns>
+        </member>
+        <member name="M:NLog.LogFactory.GetCandidateConfigFilePaths(System.String)">
             <summary>
             Get file paths (including filename) for the possible NLog config files. 
             </summary>
@@ -19793,36 +19884,6 @@
             Implementation of logging engine.
             </summary>
         </member>
-        <member name="M:NLog.LoggerImpl.FindCallingMethodOnStackTrace(System.Diagnostics.StackFrame[],System.Type)">
-            <summary>
-             Finds first user stack frame in a stack trace
-            </summary>
-            <param name="stackFrames">The stack trace of the logging method invocation</param>
-            <param name="loggerType">Type of the logger or logger wrapper. This is still Logger if it's a subclass of Logger.</param>
-            <returns>Index of the first user stack frame or 0 if all stack frames are non-user</returns>
-        </member>
-        <member name="M:NLog.LoggerImpl.SkipToUserStackFrameLegacy(System.Diagnostics.StackFrame[],System.Int32)">
-            <summary>
-            This is only done for legacy reason, as the correct method-name and line-number should be extracted from the MoveNext-StackFrame
-            </summary>
-            <param name="stackFrames">The stack trace of the logging method invocation</param>
-            <param name="firstUserStackFrame">Starting point for skipping async MoveNext-frames</param>
-        </member>
-        <member name="M:NLog.LoggerImpl.SkipAssembly(System.Diagnostics.StackFrame)">
-            <summary>
-            Assembly to skip?
-            </summary>
-            <param name="frame">Find assembly via this frame. </param>
-            <returns><c>true</c>, we should skip.</returns>
-        </member>
-        <member name="M:NLog.LoggerImpl.IsLoggerType(System.Diagnostics.StackFrame,System.Type)">
-            <summary>
-            Is this the type of the logger?
-            </summary>
-            <param name="frame">get type of this logger in this frame.</param>
-            <param name="loggerType">Type of the logger.</param>
-            <returns></returns>
-        </member>
         <member name="M:NLog.LoggerImpl.GetFilterResult(System.Collections.Generic.IList{NLog.Filters.Filter},NLog.LogEventInfo,NLog.Filters.FilterResult)">
             <summary>
             Gets the filter result.
@@ -22368,6 +22429,16 @@
             Extension methods to setup LogFactory options
             </summary>
         </member>
+        <member name="M:NLog.SetupBuilderExtensions.GetCurrentClassLogger(NLog.Config.ISetupBuilder)">
+            <summary>
+            Gets the logger with the full name of the current class, so namespace and class name.
+            </summary>
+        </member>
+        <member name="M:NLog.SetupBuilderExtensions.GetLogger(NLog.Config.ISetupBuilder,System.String)">
+            <summary>
+            Gets the specified named logger.
+            </summary>
+        </member>
         <member name="M:NLog.SetupBuilderExtensions.SetupExtensions(NLog.Config.ISetupBuilder,System.Action{NLog.Config.ISetupExtensionsBuilder})">
             <summary>
             Configures loading of NLog extensions for Targets and LayoutRenderers
@@ -22381,6 +22452,26 @@
         <member name="M:NLog.SetupBuilderExtensions.SetupSerialization(NLog.Config.ISetupBuilder,System.Action{NLog.Config.ISetupSerializationBuilder})">
             <summary>
             Configures serialization and transformation of LogEvents
+            </summary>
+        </member>
+        <member name="M:NLog.SetupBuilderExtensions.LoadConfiguration(NLog.Config.ISetupBuilder,System.Action{NLog.Config.ISetupLoadConfigurationBuilder})">
+            <summary>
+            Loads NLog config created by the method <paramref name="configBuilder"/>
+            </summary>
+        </member>
+        <member name="M:NLog.SetupBuilderExtensions.LoadConfiguration(NLog.Config.ISetupBuilder,NLog.Config.LoggingConfiguration)">
+            <summary>
+            Loads NLog config provided in <paramref name="loggingConfiguration"/>
+            </summary>
+        </member>
+        <member name="M:NLog.SetupBuilderExtensions.LoadConfigurationFromFile(NLog.Config.ISetupBuilder,System.String,System.Boolean)">
+            <summary>
+            Loads NLog config from filename <paramref name="configFile"/> if provided, else fallback to scanning for NLog.config
+            </summary>
+        </member>
+        <member name="M:NLog.SetupBuilderExtensions.LoadConfigurationFromXml(NLog.Config.ISetupBuilder,System.String)">
+            <summary>
+            Loads NLog config from XML in <paramref name="configXml"/>
             </summary>
         </member>
         <member name="T:NLog.SetupExtensionsBuilderExtensions">
@@ -22506,6 +22597,16 @@
         <member name="M:NLog.SetupInternalLoggerBuilderExtensions.LogToWriter(NLog.Config.ISetupInternalLoggerBuilder,System.IO.TextWriter)">
             <summary>
             Configures <see cref="P:NLog.Common.InternalLogger.LogWriter"/>
+            </summary>
+        </member>
+        <member name="M:NLog.SetupInternalLoggerBuilderExtensions.AddLogSubscription(NLog.Config.ISetupInternalLoggerBuilder,System.EventHandler{NLog.Common.InternalLoggerMessageEventArgs})">
+            <summary>
+            Configures <see cref="E:NLog.Common.InternalLogger.LogMessageReceived"/>
+            </summary>
+        </member>
+        <member name="M:NLog.SetupInternalLoggerBuilderExtensions.RemoveLogSubscription(NLog.Config.ISetupInternalLoggerBuilder,System.EventHandler{NLog.Common.InternalLoggerMessageEventArgs})">
+            <summary>
+            Configures <see cref="E:NLog.Common.InternalLogger.LogMessageReceived"/>
             </summary>
         </member>
         <member name="T:NLog.SetupSerializationBuilderExtensions">
@@ -23256,6 +23357,12 @@
             </summary>
             <docgen category='Rule Matching Options' order='10' />
         </member>
+        <member name="P:NLog.Targets.ConsoleWordHighlightingRule.Condition">
+            <summary>
+            Gets or sets the condition that must be met before scanning the row for highlight of words
+            </summary>
+            <docgen category='Rule Matching Options' order='10' />
+        </member>
         <member name="P:NLog.Targets.ConsoleWordHighlightingRule.CompileRegex">
             <summary>
             Compile the <see cref="P:NLog.Targets.ConsoleWordHighlightingRule.Regex"/>? This can improve the performance, but at the costs of more memory usage. If <c>false</c>, the Regex Cache is used.
@@ -23449,6 +23556,12 @@
             Gets or sets the culture used for parsing parameter string-value for type-conversion
             </summary>
             <docgen category='Parameter Options' order='9' />
+        </member>
+        <member name="P:NLog.Targets.DatabaseParameterInfo.AllowDbNull">
+            <summary>
+            Gets or sets whether empty value should translate into DbNull. Requires database column to allow NULL values.
+            </summary>
+            <docgen category='Parameter Options' order='8' />
         </member>
         <member name="T:NLog.Targets.DatabaseTarget">
             <summary>
@@ -23749,12 +23862,10 @@
             <param name="logEvent">Current logevent.</param>
             <param name="parameterInfo">Parameter configuration info.</param>
         </member>
-        <member name="M:NLog.Targets.DatabaseTarget.CreateDefaultValue(System.Type)">
+        <member name="M:NLog.Targets.DatabaseTarget.CreateDefaultValue(System.Type,System.Boolean)">
             <summary>
             Create Default Value of Type
             </summary>
-            <param name="dbParameterType"></param>
-            <returns></returns>
         </member>
         <member name="T:NLog.Targets.DateAndSequenceArchive">
             <summary>
@@ -25133,7 +25244,13 @@
             <param name="initializedNewFile">File has just been opened.</param>
             <returns>True when archive operation of the file was completed (by this target or a concurrent target)</returns>
         </member>
-        <member name="M:NLog.Targets.FileTarget.GetArchiveFileName(System.String,NLog.LogEventInfo,System.Int32,System.DateTime)">
+        <member name="M:NLog.Targets.FileTarget.TryCloseFileAppenderBeforeArchive(System.String,System.String)">
+            <summary>
+            Closes any active file-appenders that matches the input filenames.
+            File-appender is requested to invalidate/close its filehandle, but keeping its archive-mutex alive
+            </summary>
+        </member>
+        <member name="M:NLog.Targets.FileTarget.GetArchiveFileName(System.String,NLog.LogEventInfo,System.Int32,System.DateTime,System.Boolean)">
             <summary>
             Indicates if the automatic archiving process should be executed.
             </summary>
@@ -25141,29 +25258,36 @@
             <param name="ev">Log event that the <see cref="T:NLog.Targets.FileTarget"/> instance is currently processing.</param>
             <param name="upcomingWriteSize">The size in bytes of the next chunk of data to be written in the file.</param>
             <param name="previousLogEventTimestamp">The DateTime of the previous log event for this file.</param>
+            <param name="initializedNewFile">File has just been opened.</param>
             <returns>Filename to archive. If <c>null</c>, then nothing to archive.</returns>
         </member>
         <member name="M:NLog.Targets.FileTarget.GetPotentialFileForArchiving(System.String)">
             <summary>
             Returns the correct filename to archive
             </summary>
-            <returns></returns>
         </member>
-        <member name="M:NLog.Targets.FileTarget.GetArchiveFileNameBasedOnFileSize(System.String,System.Int32)">
+        <member name="M:NLog.Targets.FileTarget.GetArchiveFileNameBasedOnFileSize(System.String,System.Int32,System.Boolean)">
             <summary>
             Gets the file name for archiving, or null if archiving should not occur based on file size.
             </summary>
             <param name="fileName">File name to be written.</param>
             <param name="upcomingWriteSize">The size in bytes of the next chunk of data to be written in the file.</param>
+            <param name="initializedNewFile">File has just been opened.</param>
             <returns>Filename to archive. If <c>null</c>, then nothing to archive.</returns>
         </member>
-        <member name="M:NLog.Targets.FileTarget.GetArchiveFileNameBasedOnTime(System.String,NLog.LogEventInfo,System.DateTime)">
+        <member name="M:NLog.Targets.FileTarget.TryFallbackToPreviousLogFileName(System.String,System.Boolean)">
+            <summary>
+            Check if archive operation should check previous filename, because FileAppenderCache tells us current filename no longer exists
+            </summary>
+        </member>
+        <member name="M:NLog.Targets.FileTarget.GetArchiveFileNameBasedOnTime(System.String,NLog.LogEventInfo,System.DateTime,System.Boolean)">
             <summary>
             Returns the file name for archiving, or null if archiving should not occur based on date/time.
             </summary>
             <param name="fileName">File name to be written.</param>
             <param name="logEvent">Log event that the <see cref="T:NLog.Targets.FileTarget"/> instance is currently processing.</param>
             <param name="previousLogEventTimestamp">The DateTime of the previous log event for this file.</param>
+            <param name="initializedNewFile">File has just been opened.</param>
             <returns>Filename to archive. If <c>null</c>, then nothing to archive.</returns>
         </member>
         <member name="M:NLog.Targets.FileTarget.TruncateArchiveTime(System.DateTime,NLog.Targets.FileArchivePeriod)">
@@ -25213,7 +25337,7 @@
             <param name="fileName">File name to be written.</param>
             <returns>Decision whether to archive or not.</returns>
         </member>
-        <member name="M:NLog.Targets.FileTarget.ProcessOnStartup(System.String,NLog.LogEventInfo)">
+        <member name="M:NLog.Targets.FileTarget.PrepareForNewFile(System.String,NLog.LogEventInfo)">
             <summary>
             Invokes the archiving and clean up of older archive file based on the values of
             <see cref="P:NLog.Targets.FileTarget.ArchiveOldFileOnStartup"/> and
@@ -25270,20 +25394,22 @@
             <param name="oldBackgroundColor">Original background color for console (If changed)</param>
             <param name="flush">Flush TextWriter</param>
         </member>
-        <member name="M:NLog.Targets.IColoredConsolePrinter.ChangeForegroundColor(System.IO.TextWriter,System.Nullable{System.ConsoleColor})">
+        <member name="M:NLog.Targets.IColoredConsolePrinter.ChangeForegroundColor(System.IO.TextWriter,System.Nullable{System.ConsoleColor},System.Nullable{System.ConsoleColor})">
             <summary>
             Changes foreground color for the Colored TextWriter
             </summary>
             <param name="consoleWriter">Colored TextWriter</param>
             <param name="foregroundColor">New foreground color for the console</param>
+            <param name="oldForegroundColor">Old previous backgroundColor color for the console</param>
             <returns>Old foreground color for the console</returns>
         </member>
-        <member name="M:NLog.Targets.IColoredConsolePrinter.ChangeBackgroundColor(System.IO.TextWriter,System.Nullable{System.ConsoleColor})">
+        <member name="M:NLog.Targets.IColoredConsolePrinter.ChangeBackgroundColor(System.IO.TextWriter,System.Nullable{System.ConsoleColor},System.Nullable{System.ConsoleColor})">
             <summary>
             Changes backgroundColor color for the Colored TextWriter
             </summary>
             <param name="consoleWriter">Colored TextWriter</param>
             <param name="backgroundColor">New backgroundColor color for the console</param>
+            <param name="oldBackgroundColor">Old previous backgroundColor color for the console</param>
             <returns>Old backgroundColor color for the console</returns>
         </member>
         <member name="M:NLog.Targets.IColoredConsolePrinter.ResetDefaultColors(System.IO.TextWriter,System.Nullable{System.ConsoleColor},System.Nullable{System.ConsoleColor})">
@@ -27065,6 +27191,13 @@
             <param name="targetType"> Type of the Target.</param>
             <param name="name"> Name of the Target.</param>
         </member>
+        <member name="M:NLog.Targets.Target.ExceptionMustBeRethrown(System.Exception)">
+            <summary>
+            Should the exception be rethrown?
+            </summary>
+            <param name="exception"></param>
+            <remarks>Upgrade to private protected when using C# 7.2 </remarks>
+        </member>
         <member name="T:NLog.Targets.TargetAttribute">
             <summary>
             Marks class as a logging target and assigns a name to it.
@@ -28135,6 +28268,8 @@
             <summary>
             Delay the flush until the LogEvent has been confirmed as written
             </summary>
+            <remarks>If not explicitly set, then disabled by default for <see cref="T:NLog.Targets.Wrappers.BufferingTargetWrapper"/> and AsyncTaskTarget
+            </remarks>
             <docgen category='General Options' order='10' />
         </member>
         <member name="P:NLog.Targets.Wrappers.AutoFlushTargetWrapper.FlushOnConditionOnly">

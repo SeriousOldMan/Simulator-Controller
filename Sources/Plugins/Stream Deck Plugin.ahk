@@ -136,11 +136,11 @@ class StreamDeck extends FunctionController {
 	}
 	
 	hasFunction(function) {
-		return (inList(this.Functions, function) != false)
+		return (inList(this.Functions, function.Descriptor) != false)
 	}
 	
 	setControlText(function, text, color := "Black") {
-		if this.hasFunction(function.Descriptor) {
+		if this.hasFunction(function) {
 			Process Exist, SimulatorControllerPlugin.exe
 		
 			if ErrorLevel
@@ -149,7 +149,7 @@ class StreamDeck extends FunctionController {
 	}
 	
 	setControlIcon(function, icon) {
-		if this.hasFunction(function.Descriptor) {
+		if this.hasFunction(function) {
 			Process Exist, SimulatorControllerPlugin.exe
 		
 			if ErrorLevel

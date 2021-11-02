@@ -279,13 +279,13 @@ if !GetKeyState("Ctrl") {
 	AHKUnit.Run()
 }
 else {
-	raceNr := 14
+	raceNr := 15
 	strategist := new RaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist.settings")
 								   , "Khato", "de", "Windows", true, true)
 
 	strategist.VoiceAssistant.setDebug(kDebugGrammars, false)
 	
-	if (raceNr == 14) {
+	if (raceNr == 15) {
 		done := false
 		
 		Loop {
@@ -314,19 +314,10 @@ else {
 					break
 			}
 			
-			if (A_Index = 14) {
+			if (A_Index = 19) {
 				strategist.performPitstop()		
 				
 				MsgBox Pitstop...
-			}
-			
-			if (A_Index = 17)
-				MsgBox Inspect...
-			
-			if (A_Index = 20) {
-				done := true
-				
-				break
 			}
 		} until done
 		

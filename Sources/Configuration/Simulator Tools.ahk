@@ -2142,17 +2142,21 @@ runCopyTargets(ByRef buildProgress) {
 			}
 		}
 		else {
-			FileGetTime srcLastModified, %targetSource%, M
-			FileGetTime dstLastModified, %targetDestination%, M
-			
-			if srcLastModified {
-				if dstLastModified
-					copy := (srcLastModified > dstLastModified)
+			if InStr(FileExist(targetSource), "D")
+				copy := true
+			else {
+				FileGetTime srcLastModified, %targetSource%, M
+				FileGetTime dstLastModified, %targetDestination%, M
+				
+				if srcLastModified {
+					if dstLastModified
+						copy := (srcLastModified > dstLastModified)
+					else
+						copy := true
+				}
 				else
-					copy := true
+					copy := false
 			}
-			else
-				copy := false
 			
 			if copy {
 				if !kSilentMode

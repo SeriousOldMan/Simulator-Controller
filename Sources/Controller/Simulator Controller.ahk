@@ -1146,7 +1146,8 @@ class ControllerFunction {
 		local controller
 		
 		for ignore, fnController in this.Controller.FunctionController
-			fnController.setControlText(this, text, color)
+			if fnController.hasFunction(this)
+				fnController.setControlText(this, text, color)
 	}
 	
 	enable(trigger := "__All Trigger__", action := false) {

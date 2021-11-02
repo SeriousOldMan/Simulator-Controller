@@ -47,7 +47,7 @@ namespace PluginConnector {
     }
 
     class PluginConnector {
-        public void SendMessage(string message) {
+        void SendMessage(string message) {
             var pipeClient = new NamedPipeClientStream(".", "scconnector", PipeDirection.InOut, PipeOptions.None,
                                                        TokenImpersonationLevel.Impersonation);
 
@@ -58,6 +58,14 @@ namespace PluginConnector {
             ss.WriteString(message);
 
             pipeClient.Close();
+        }
+
+        public void SetTitle(string function, string title) {
+            SendMessage(function + ":SetTitle:" + title);
+        }
+
+        public void SetImage(string function, string image) {
+            SendMessage(function + ":SetImage:" + image);
         }
     }
 }

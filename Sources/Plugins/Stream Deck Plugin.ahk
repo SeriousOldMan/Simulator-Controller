@@ -144,7 +144,7 @@ class StreamDeck extends FunctionController {
 			Process Exist, SimulatorControllerPlugin.exe
 		
 			if ErrorLevel
-				this.Connector.SendMessage(function.Descriptor . ":SetTitle:" . text)
+				this.Connector.SetTitle(function.Descriptor, text)
 		}
 	}
 	
@@ -153,7 +153,7 @@ class StreamDeck extends FunctionController {
 			Process Exist, SimulatorControllerPlugin.exe
 		
 			if ErrorLevel
-				this.Connector.SendMessage(function.Descriptor . ":SetImage:" . icon)
+				this.Connector.SetImage(function.Descriptor, icon)
 		}
 	}
 }

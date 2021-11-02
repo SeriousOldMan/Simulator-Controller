@@ -122,7 +122,7 @@ class FunctionController extends ConfigurationItem {
 		Throw "Virtual method FunctionController.hasFunction must be implemented in a subclass..."
 	}
 	
-	setControlText(function, text, color := "Black") {
+	setControlLabel(function, text, color := "Black") {
 	}
 	
 	setControlIcon(function, icon) {
@@ -215,7 +215,7 @@ class GuiFunctionController extends FunctionController {
 			return false
 	}
 	
-	setControlText(function, text, color := "Black") {
+	setControlLabel(function, text, color := "Black") {
 		window := this.iWindow
 		
 		if (window != false) {
@@ -1079,7 +1079,7 @@ class ControllerFunction {
 	iFunction := false
 		
 	iEnabledActions := {}
-	
+
 	Controller[] {
 		Get {
 			return this.iController
@@ -1142,17 +1142,17 @@ class ControllerFunction {
 		this.iFunction := function
 	}
 	
-	setText(text, color := "Black") {
+	setLabel(text, color := "Black") {
 		local controller
 		
 		for ignore, fnController in this.Controller.FunctionController
 			if fnController.hasFunction(this)
-				fnController.setControlText(this, text, color)
+				fnController.setControlLabel(this, text, color)
 	}
 	
 	setIcon(icon) {
 		local controller
-		
+
 		for ignore, fnController in this.Controller.FunctionController
 			if fnController.hasFunction(this)
 				fnController.setControlIcon(this, icon)
@@ -1226,13 +1226,6 @@ class ControllerFunction {
 		
 		this.iEnabledActions.Delete(action)
 		
-		this.setText("")
-		
-		icon := action.Icon
-		
-		if icon
-			this.setIcon(false)
-		
 		for ignore, trigger in this.Function.Trigger {
 			for ignore, theHotkey in this.Hotkeys[trigger] {
 				if (SubStr(theHotkey, 1, 1) = "?")
@@ -1241,6 +1234,8 @@ class ControllerFunction {
 					Hotkey %theHotkey%, Off
 			}
 		}
+		
+		action.disconnect(this)
 	}
 }
 
@@ -1431,12 +1426,8 @@ class ControllerPlugin extends Plugin {
 			controller.connectAction(theAction.Function, theAction)
 			
 			theAction.Function.enable(kAllTrigger, theAction)
-			theAction.Function.setText(this.actionLabel(theAction))
 			
-			icon := this.actionIcon(theAction)
-			
-			if icon
-				theAction.Function.setIcon(icon)
+			theAction.connect(this, theAction.Function)
 		}
 	}
 	
@@ -1446,14 +1437,9 @@ class ControllerPlugin extends Plugin {
 		logMessage(kLogInfo, translate("Deactivating plugin ") . translate(this.Plugin))
 		
 		for ignore, theAction in this.Actions {
-			theAction.Function.setText("")
-		
-			icon := this.actionIcon(theAction)
-			
-			if icon
-				theAction.Function.setIcon(false)
-			
 			controller.disconnectAction(theAction.Function, theAction)
+		
+			theAction.disconnect(theAction.Function)
 		}
 	}
 	
@@ -1568,6 +1554,14 @@ class ControllerMode {
 		return false
 	}
 	
+	actionLabel(action) {
+		return this.Plugin.actionLabel(action)
+	}
+	
+	actionIcon(action) {
+		return this.Plugin.actionIcon(action)
+	}
+	
 	isActive() {
 		if this.Plugin.isActive() {
 			simulators := this.Plugin.Simulators
@@ -1594,12 +1588,8 @@ class ControllerMode {
 			controller.connectAction(theAction.Function, theAction)
 			
 			theAction.Function.enable(kAllTrigger, theAction)
-			theAction.Function.setText(plugin.actionLabel(theAction))
 			
-			icon := plugin.actionIcon(theAction)
-			
-			if icon
-				theAction.Function.setIcon(icon)
+			theAction.connect(plugin, theAction.Function)
 		}
 		
 		controller.registerActiveMode(this)
@@ -1614,14 +1604,9 @@ class ControllerMode {
 		logMessage(kLogInfo, translate("Deactivating mode ") . translate(getModeForLogMessage(this)))
 		
 		for ignore, theAction in this.Actions {
-			theAction.Function.setText("")
-		
-			icon := plugin.actionIcon(theAction)
-			
-			if icon
-				theAction.Function.setIcon(false)
-			
 			controller.disconnectAction(theAction.Function, theAction)
+		
+			theAction.disconnect(theAction.Function)
 		}
 	}
 }
@@ -1663,6 +1648,21 @@ class ControllerAction {
 	
 	fireAction(function, trigger) {
 		Throw "Virtual method ControllerAction.fireAction must be implemented in a subclass..."
+	}
+	
+	connect(plugin, function) {
+		label := plugin.actionLabel(this)
+		icon := plugin.actionLabel(this)
+			
+		if (icon && (icon != ""))
+			function.setIcon(icon)
+		else
+			function.setLabel(label)
+	}
+	
+	disconnect(pluginOrMode, function) {
+		this.setLabel("")
+		this.setIcon(false)
 	}
 }
 

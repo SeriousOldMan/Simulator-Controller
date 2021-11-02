@@ -182,7 +182,7 @@ class StreamDeck extends FunctionController {
 		return (inList(this.Functions, function) != false)
 	}
 	
-	setControlText(function, text, color := "Black") {
+	setControlLabel(function, text, color := "Black") {
 		if this.hasFunction(function) {
 			Process Exist, SimulatorControllerPlugin.exe
 		

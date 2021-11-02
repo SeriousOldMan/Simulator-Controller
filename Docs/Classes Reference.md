@@ -464,8 +464,11 @@ Enables the given trigger (for example "Push") for this controller function, whi
 #### *disable(trigger :: String := false, action :: ControllerAction := false)*
 Disables the given trigger (for example "Push") for this controller function, which means, that the connected action cannot be triggered anymore by the hardware controller. If *trigger* is not supplied, all triggers will be disabled. If *action* is supplied, the function is disabled only for the given action.
 
-#### *setText(test :: String, color :: String := "Black")*
-If the controller has an associated visual representation of the hardware controller, the visual label of the function might be changed with this method. The given color must be a defined HTML color descriptor.
+#### *setLabel(text :: String, color :: String := "Black")*
+If the controller has an associated visual representation of the hardware controller or if the controller supports graphical feedback on its own, the visual label of the function might be changed with this method. The given color must be a defined HTML color descriptor.
+
+#### *setIcon(path :: String)*
+If the controller has an associated visual representation of the hardware controller or if the controller supports graphical feedback on its own, the icon of the function might be changed with this method.
 
 #### *connectAction(action :: ControllerAction)*
 Connects or binds the function to the given action. From now on, every trigger of the hardware controller will result in an activation of the [fireAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-fireactionfunction--controllerfunction-trigger--string) method of the action, as long as the function is currently enabled for the trigger in question. Normally, functions will be connected during the activation of plugins or modes.
@@ -559,6 +562,9 @@ This method can be used to support localization or using different icons dependi
 
 #### *actionLabel(action :: ControllerAction)*
 This method is called, whenever a label for the given action will be displayed on the visual representation of the controller hardware. The default implementation simply returns the *Label* property of the given action, but a subclass may add a translation process, for example.
+
+#### *actionIcon(action :: ControllerAction)*
+This method is called, whenever an icon for the given action will be displayed on the visual representation of the controller hardware. The default implementation simply returns the *Icon* property of the given action, but a subclass may implement dynamic icons, for example.
 
 #### *logFunctionNotFound(functionDescriptor :: String)*
 Helper method to log the most common configuration error: A function descriptor is referenced for an action, which is unknown, i.e. is not provided by the current hardware controller.
@@ -673,12 +679,11 @@ Must be called by implementations of *FunctionController* to specifiy the type a
 #### [Abstract] *hasFunction(function :: ControllerFunction)*
 This method must be implemented by a subclass of *FunctionController*. It must return *true*, if the given controller implements the given function.
 
-#### *setControlText(function :: ControllerFunction, text :: String, color :: String := "Black")*
+#### *setControlLabel(function :: ControllerFunction, text :: String, color :: String := "Black")*
 This method is called to set the info text for the given function on the controller. Useful, if the given controller has a visual representation (see [GuiFunctionController](*) for a subclass, which provides the necessary protocol). The default method does nothing.
 
 #### *setControlIcon(function :: ControllerFunction, icon :: String)*
-This method is called to set the info icon for the given function on the controller. Useful, if the given controller has a visual representation (see [GuiFunctionController](*) for a subclass, which provides the necessary protocol). If *icon* is 
-*false*, this means that no icon should be displayed. The default method does nothing.
+This method is called to set the info icon for the given function on the controller. Useful, if the given controller has a visual representation (see [GuiFunctionController](*) for a subclass, which provides the necessary protocol). If *icon* is *false*, this means that no icon should be displayed. The default method does nothing.
 	
 #### *enable(function :: ControllerFunction, action :: ControllerAction := false)*
 Enables the given function on the given controller. If *action* is supplied and not *false*, the function is only enabled for the given action, otherwise it is enabled for all actions. The default method does nothing.

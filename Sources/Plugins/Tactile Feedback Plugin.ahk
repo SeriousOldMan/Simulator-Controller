@@ -118,7 +118,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 				
 				trayMessage(translate(this.Label), translate("State: Off"))
 			
-				function.setText(translate(this.Label), "Black")
+				function.setLabel(translate(this.Label), "Black")
 			}
 			else if (!this.iIsActive && ((trigger = "On") || (trigger == "Push"))) {
 				base.fireAction(function, trigger)
@@ -126,7 +126,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 				
 				trayMessage(translate(this.Label), translate("State: On"))
 			
-				function.setText(translate(this.Label), "Green")
+				function.setLabel(translate(this.Label), "Green")
 			}
 		}
 	}
@@ -163,11 +163,11 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		
 			trayMessage(translate(this.iEffect), translate(change) . translate(" Vibration"))
 			
-			this.Function.setText(((change = kIncrease) ? "+ " : "- ") . kVibrationIntensityIncrement . "%")
+			this.Function.setLabel(((change = kIncrease) ? "+ " : "- ") . kVibrationIntensityIncrement . "%")
 		
 			Sleep 500
 			
-			this.Function.setText(translate(this.Label))
+			this.Function.setLabel(translate(this.Label))
 		}
 	}
 	
@@ -303,7 +303,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		isRunning := this.Application.isRunning()
 		
 		for ignore, theAction in this.Actions
-			theAction.Function.setText(translate(theAction.Label), isRunning ? (theAction.Active ? "Green" : "Black") : "Olive")
+			theAction.Function.setLabel(translate(theAction.Label), isRunning ? (theAction.Active ? "Green" : "Black") : "Olive")
 		
 		SetTimer updateVibrationState, -50
 	}

@@ -179,12 +179,12 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			if this.Active {				
 				trayMessage(plugin.actionLabel(this), translate("State: On"))
 			
-				function.setText(plugin.actionLabel(this), "Green")
+				function.setLabel(plugin.actionLabel(this), "Green")
 			}
 			else {
 				trayMessage(plugin.actionLabel(this), translate("State: Off"))
 			
-				function.setText(plugin.actionLabel(this), "Gray")
+				function.setLabel(plugin.actionLabel(this), "Gray")
 			}
 		}
 	}
@@ -226,18 +226,18 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			
 			trayMessage(translate("Motion"), translate("Intensity: ") . currentIntensity)
 				
-			function.setText(currentIntensity . translate("%"))
+			function.setLabel(currentIntensity . translate("%"))
 			
 			Sleep 500
 			
-			function.setText(translate("Motion Intensity"))
+			function.setLabel(translate("Motion Intensity"))
 		}
 		
 		updateLabel(mode) {
 			if (mode == "Info")
-				this.Function.setText(this.Mode.Plugin.getMotionIntensity() . translate("%"), "Gray")
+				this.Function.setLabel(this.Mode.Plugin.getMotionIntensity() . translate("%"), "Gray")
 			else
-				this.Function.setText(translate("Motion Intensity"))
+				this.Function.setLabel(translate("Motion Intensity"))
 		}
 	}
 
@@ -284,13 +284,13 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		
 		updateLabel(mode) {
 			if (mode == "Highlight")
-				this.Function.setText(this.Label, "Blue")
+				this.Function.setLabel(this.Label, "Blue")
 			else if (mode == "Info")
-				this.Function.setText(Format("{:.1f}", this.Mode.Plugin.getEffectIntensity(this.iEffect)), "Gray")
+				this.Function.setLabel(Format("{:.1f}", this.Mode.Plugin.getEffectIntensity(this.iEffect)), "Gray")
 			else if this.Active
-				this.Function.setText(this.Label, "Green")
+				this.Function.setLabel(this.Label, "Green")
 			else
-				this.Function.setText(this.Label, "Gray")
+				this.Function.setLabel(this.Label, "Gray")
 		}
 	}
 			
@@ -314,18 +314,18 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 				
 				trayMessage(translate("Motion"), translate("Effect: ") . translate(effect) . ", " . translate("Intensity: ") . currentIntensity)
 				
-				function.setText(currentIntensity)
+				function.setLabel(currentIntensity)
 				
 				Sleep 500
 				
-				function.setText(effect)
+				function.setLabel(effect)
 			}
 		}
 		
 		setEffect(effect) {
 			this.iCurrentEffect := effect
 			
-			this.Function.setText(effect ? effect : "")
+			this.Function.setLabel(effect ? effect : "")
 		}
 	}
 	
@@ -557,7 +557,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		
 		action := this.findAction(this.getLabel(ConfigurationItem.descriptor("Motion", "Toggle"), "Motion"))
 		
-		action.Function.setText(this.actionLabel(action), isRunning ? (action.Active ? "Green" : "Black") : "Olive")
+		action.Function.setLabel(this.actionLabel(action), isRunning ? (action.Active ? "Green" : "Black") : "Olive")
 			
 		SetTimer updateMotionState, -100
 	}

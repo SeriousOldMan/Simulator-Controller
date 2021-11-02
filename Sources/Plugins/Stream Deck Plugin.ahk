@@ -134,6 +134,9 @@ class StreamDeck extends FunctionController {
 					icon := getConfigurationValue(configuration, "Buttons", this.Layout . "." . function . ".Icon", true)
 					label := getConfigurationValue(configuration, "Buttons", this.Layout . "." . function . ".Label", true)
 				
+					this.Connector.SetTitle(function, "")
+					this.Connector.SetImage(function, "")
+					
 					if (label != true) {
 						this.iLabels[function] := label
 						
@@ -189,6 +192,9 @@ class StreamDeck extends FunctionController {
 	}
 	
 	setControlIcon(function, icon) {
+		if !icon
+			icon := ""
+		
 		if this.hasFunction(function) {
 			Process Exist, SimulatorControllerPlugin.exe
 		

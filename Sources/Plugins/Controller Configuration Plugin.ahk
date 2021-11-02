@@ -124,6 +124,9 @@ class ButtonBoxesList extends ConfigurationItemList {
 		
 		for ignore, controller in string2Values("|", getConfigurationValue(configuration, "Controller Layouts", "Button Boxes", ""))
 			items.Push(string2Values(":", controller))
+		
+		for ignore, controller in string2Values("|", getConfigurationValue(configuration, "Controller Layouts", "Stream Decks", ""))
+			items.Push(string2Values(":", controller))
 			
 		this.ItemList := items
 	}

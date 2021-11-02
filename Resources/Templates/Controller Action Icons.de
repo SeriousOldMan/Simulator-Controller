@@ -1,6 +1,5 @@
-[Default]
-Icon=false
-Label=true
-[Motion Feeedback]
-Heave.Toggle.Icon=        Icon Path
-Heave.Toggle.Label=       true | false | String | Special
+[Tactile Feedback]
+TC.Increase=D:\Dateien\Bilder\Simulator Icons\ButtonDeck\TC+.jpg
+TC.Decrease=D:\Dateien\Bilder\Simulator Icons\ButtonDeck\TC-.jpg
+ABS.Increase=D:\Dateien\Bilder\Simulator Icons\ButtonDeck\ABS_+.jpg
+ABS.Decrease=D:\Dateien\Bilder\Simulator Icons\ButtonDeck\ABS_-.jpg

@@ -1150,6 +1150,14 @@ class ControllerFunction {
 				fnController.setControlText(this, text, color)
 	}
 	
+	setIcon(icon) {
+		local controller
+		
+		for ignore, fnController in this.Controller.FunctionController
+			if fnController.hasFunction(this)
+				fnController.setControlIcon(this, icon)
+	}
+	
 	enable(trigger := "__All Trigger__", action := false) {
 		local controller
 		
@@ -1219,6 +1227,11 @@ class ControllerFunction {
 		this.iEnabledActions.Delete(action)
 		
 		this.setText("")
+		
+		icon := action.Icon
+		
+		if icon
+			this.setIcon(false)
 		
 		for ignore, trigger in this.Function.Trigger {
 			for ignore, theHotkey in this.Hotkeys[trigger] {
@@ -1335,6 +1348,8 @@ class ControllerCustomFunction extends ControllerFunction {
 
 class ControllerPlugin extends Plugin {
 	static sLabelsDatabase := false
+	static sIconsDatabase := false
+	
 	iController := false
 	iModes := []
 	iActions := []
@@ -1431,6 +1446,8 @@ class ControllerPlugin extends Plugin {
 		logMessage(kLogInfo, translate("Deactivating plugin ") . translate(this.Plugin))
 		
 		for ignore, theAction in this.Actions {
+			theAction.Function.setText("")
+		
 			icon := this.actionIcon(theAction)
 			
 			if icon
@@ -1597,10 +1614,12 @@ class ControllerMode {
 		logMessage(kLogInfo, translate("Deactivating mode ") . translate(getModeForLogMessage(this)))
 		
 		for ignore, theAction in this.Actions {
+			theAction.Function.setText("")
+		
 			icon := plugin.actionIcon(theAction)
 			
 			if icon
-				theAction.Function.setIcon(icon)
+				theAction.Function.setIcon(false)
 			
 			controller.disconnectAction(theAction.Function, theAction)
 		}

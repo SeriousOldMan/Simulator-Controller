@@ -416,7 +416,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		if (function != false) {
 			descriptor := ConfigurationItem.descriptor("Motion", "Toggle")
 				
-			this.registerAction(new this.MotionToggleAction(function, this.getLabel(descriptor, "Motion"), this.getIcon(descrptor)))
+			this.registerAction(new this.MotionToggleAction(function, this.getLabel(descriptor, "Motion"), this.getIcon(descriptor)))
 			}
 		else
 			this.logFunctionNotFound(descriptor)

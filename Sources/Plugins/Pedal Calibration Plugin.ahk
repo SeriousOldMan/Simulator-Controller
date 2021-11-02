@@ -210,7 +210,7 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 		pedal := pedalAndShape[1]
 		shape := StrReplace(pedalAndShape[2], "_", A_Space)
 		
-		label := translate(pedal) . A_Space . shape
+		label := translate(pedal) . "`n" . shape
 		
 		if (function != false)
 			this.iPedalProfileMode.registerAction(new this.CurveShapeAction(function, label, pedal, shape))

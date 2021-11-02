@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -32,6 +34,22 @@ namespace SimulatorControllerPlugin
 
             public override async void SetTitle(string title) {
                 await this.ControllerFunction.Connection.SetTitleAsync(title);
+            }
+
+            public override async void SetImage(string path) {
+                using (MemoryStream m = new MemoryStream()) {
+                    var image = Image.FromFile(path);
+                    var raw = image.RawFormat;
+                    string mimeType = ImageCodecInfo.GetImageDecoders().First(c => c.FormatID == raw.Guid).MimeType;
+
+                    image.Save(m, raw);
+
+                    byte[] imageBytes = m.ToArray();
+                    
+                    string base64String = Convert.ToBase64String(imageBytes);
+
+                    await this.ControllerFunction.Connection.SetImageAsync("data:" + mimeType + ";base64," + base64String);
+                }
             }
 
             public ControllerFunctionButton(ControllerFunction function) : base(function.GetFunction()) {

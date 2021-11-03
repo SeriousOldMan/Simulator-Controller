@@ -148,11 +148,14 @@ Warning: *initialState* and *initialIntensity* will only be used at startup, whe
 
 With the following parameters you can configure the available effects for the "Motion" mode:
 
-	motionEffectIntensity: *effectSelectorFunction* *effectIntensityFunction*;
 	motionEffects: *effect1* *initialState1* *intialIntensity1* *effectToggleFunction1*,
 				   *effect2* *initialState2* *intialIntensity2* *effectToggleFunction2*, ...
 
-*effectX* is the name of the effect, for example "Heave". With *initialStateX* and *intialIntensityX* you supply "On" or "Off" and a value between 0.0 and 2.0 respectively. These values will only be used, when mouse automation is used to control *SimFeedback*. Last, you need to supply a controller function with *effectToggleFunctionX* to enable or disable the effect or choose it for intensity manipulation after pressing the "Effect Selector" button, which must have been configured by supplying values for the "motionEffectIntensity" parameter. Example: "Heave On 1.0 Button.1"
+*effectX* is the name of the effect, for example "Heave". With *initialStateX* and *intialIntensityX* you supply "On" or "Off" and a value between 0.0 and 2.0 respectively. These values will only be used, when mouse automation is used to control *SimFeedback*. Last, you need to supply a controller function with *effectToggleFunctionX* to enable or disable the effect or choose it for intensity manipulation after pressing the "Effect Selector" button, which must have been configured by supplying values for the "motionEffectIntensity" parameter. Example: "Heave On 1.0 Button.1".
+
+	motionEffectIntensity: *effectSelectorFunction* *effectIntensityFunction* [*effectIntensityFunction*];
+
+With "motionEffectIntensity", you can configure, how to manipulate the intensity for one of the effects on your hardware controller. You must supply a unary function for *motionEffectIntensity*, which allows you the two select one of the effects using the *effectToggleFunctionX* function supplied above. After you have selected an effect, you can manipulate its intensity using the *effectIntensityFunction*. Please note, that you can supply either a binary *effectIntensityFunction*, for example a dial, or two unary functions, which then are used to decrease and increase the chosen effect accordingly.
 
 Important: Please be aware, that effect names containing spaces must be enclosed in double quotes, since spaces are allowed in *SimFeedback* effect names, but not in plugin arguments.
 

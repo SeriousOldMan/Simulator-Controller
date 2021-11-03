@@ -84,7 +84,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		}
 		
 		fireAction(function, trigger) {
-			callSimHub(((trigger = "On") || (trigger = "Increase") || (trigger == "Push")) ? this.iUpCommand : this.iDownCommand)
+			callSimHub(((trigger = "On") || (trigger = kIncrease) || (trigger == "Push")) ? this.iUpCommand : this.iDownCommand)
 		}
 	}
 
@@ -157,13 +157,13 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		fireAction(function, trigger) {
 			base.fireAction(function, trigger)
 		
-			change := (((trigger = "On") || (trigger = "Increase") || (trigger == "Push")) ? this.iUpChange : this.iDownChange)
+			change := (((trigger = "On") || (trigger = kIncrease) || (trigger == "Push")) ? this.iUpChange : this.iDownChange)
 				
 			StringUpper change, change, T
 		
 			trayMessage(translate(this.iEffect), translate(change) . translate(" Vibration"))
 			
-			this.Function.setLabel(((change = kIncrease) ? "+ " : "- ") . kVibrationIntensityIncrement . "%")
+			this.Function.setLabel(((change = kIncrease) ? "+ " : "- ") . kVibrationIntensityIncrement . "%", "Black", true)
 		
 			Sleep 500
 			

@@ -189,7 +189,7 @@ class PitstopSelectAction extends PitstopChangeAction {
 class PitstopToggleAction extends PitstopAction {
 	fireAction(function, trigger) {
 		if base.fireAction(function, trigger) {
-			if ((trigger == "On") || (trigger == "Increase") || (trigger == "Push") || (trigger == "Call"))
+			if ((trigger == "On") || (trigger = kIncrease) || (trigger == "Push") || (trigger == "Call"))
 				this.Plugin.changePitstopOption(this.Option, "Increase", this.Steps)
 			else
 				this.Plugin.changePitstopOption(this.Option, "Decrease", this.Steps)

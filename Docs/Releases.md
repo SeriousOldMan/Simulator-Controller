@@ -9,7 +9,8 @@
   7. With the new plugin parameter [*udpConnection*](*) for the ACC plugin to support non-standard UDP connect strings for the broadcasting interface.
   8. "Strategy Workbench" supports a new command to remove faulty data from the telemetry database.
   9. Only valid laps will be written to the telemetry database and will be used for statistical tyre pressure data.
-  10. [Developer only] Full refactoring of the *ButtonBox* class in [Simulator Controller.ahk](*) in order to support the new Stream Deck integration.
+  10. Support for binary functions for the motion and effect intensity actions in the "Motion Feedback" plugin. 
+  11. [Developer only] Full refactoring of the *ButtonBox* class in [Simulator Controller.ahk](*) in order to support the new Stream Deck integration.
 
 ## 3.6.5-release 10/22/21
 

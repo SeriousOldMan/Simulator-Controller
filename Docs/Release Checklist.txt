@@ -33,7 +33,7 @@ Release 3.6.6 Checklist
    a. Documentation
 5. Update Procedure
    a. Translations
-   b. Rename "Controller Plugin Labels"
+   b. Delete "Controller Plugin Labels"
 
 Release 3.6.4 Checklist
 =======================

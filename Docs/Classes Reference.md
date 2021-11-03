@@ -403,10 +403,10 @@ This method is called when a simulation has terminated. The info is distributed 
 #### *startSimulator(application :: Application, splashImage :: String := false)*
 Starts the simulator represented by the given application. The [startup](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#startupspecial--boolean--true-wait--boolean--false-options--string--) method of *Application* will be called with *false* for the *special* parameter, so that *startSimulator* can be used by a special startup handler provided by plugins without creating an infinite recursion. If *splashImage* is supplied, the startup process will run verbose, showing a splash screen and a progress bar, and possibly playing a startup song. *splashImage* must either be a partial path for a JPG or GIF file relative to [kSplashMediaDirectory](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#ksplashmediadirectory-kbuttonboximagesdirectory-kiconsdirectory), for example "Simulator Splash Images\ACC Splash.jpg", or a partial path relative to the *Simulator Controller\Splash Media* folder, which is located in the *Documents* folder of the current user, or an absolute path. *startSimulator* returns the process id of the application process.
 
-#### *connectAction(function :: ControllerFunction, action :: ControllerAction)*
+#### *connectAction(plugin :: ControllerPlugin, function :: ControllerFunction, action :: ControllerAction)*
 Connects a given action unambiguously to the given function. All future activation of the function by the controller hardware will trigger the given action. Normally, *connectAction* is called during [activation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#activate) of plugins and modes.
 
-#### *disconnectAction(function :: ControllerFunction, action :: ControllerAction)*
+#### *disconnectAction(plugin :: ControllerPlugin, function :: ControllerFunction, action :: ControllerAction)*
 Disconnects the given action from the given function. Normally, *disconnectAction* is called during [deactivation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#deactivate) of plugins and modes.
 
 #### *fireActions(function :: ControllerFunction, trigger :: String)*
@@ -470,10 +470,10 @@ If the controller has an associated visual representation of the hardware contro
 #### *setIcon(path :: String)*
 If the controller has an associated visual representation of the hardware controller or if the controller supports graphical feedback on its own, the icon of the function might be changed with this method.
 
-#### *connectAction(action :: ControllerAction)*
+#### *connectAction(plugin :: ControllerPlugin, action :: ControllerAction)*
 Connects or binds the function to the given action. From now on, every trigger of the hardware controller will result in an activation of the [fireAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-fireactionfunction--controllerfunction-trigger--string) method of the action, as long as the function is currently enabled for the trigger in question. Normally, functions will be connected during the activation of plugins or modes.
 
-#### *disconnectAction(action :: ControllerAction)*
+#### *disconnectAction(plugin :: ControllerPlugin, action :: ControllerAction)*
 Disconnects the function from the given action. Normally, functions will be disconnected during the deactivation of plugins or modes.
 
 ***
@@ -637,6 +637,12 @@ Returns the path to the icon file of this action, or *false*, if no special has 
 #### *__New(function :: ControllerFunction, label :: String := "", icon :: String := false)*
 Constructs an instance of *ControllerAction*.
 
+#### *connectFunction(plugin :: ControllerPlugin, function :: ControllerFunction)*
+Called, when this action has been bound to the given function. The default method does nothing. Normally, functions will be connected during the activation of plugins or modes.
+
+#### *disconnectFunction(plugin :: ControllerPlugin, function :: ControllerFunction)*
+Called, when this action has been disconnected from the given function. The default method does nothing. Normally, functions will be disconnected during the deactivation of plugins or modes.
+
 #### [Abstract] *fireAction(function :: ControllerFunction, trigger :: String)*
 This method must be implemented by every subclass of *ControllerAction* and act according to the supplied trigger argument.
 
@@ -679,8 +685,14 @@ Must be called by implementations of *FunctionController* to specifiy the type a
 #### [Abstract] *hasFunction(function :: ControllerFunction)*
 This method must be implemented by a subclass of *FunctionController*. It must return *true*, if the given controller implements the given function.
 
-#### *setControlLabel(function :: ControllerFunction, text :: String, color :: String := "Black")*
-This method is called to set the info text for the given function on the controller. Useful, if the given controller has a visual representation (see [GuiFunctionController](*) for a subclass, which provides the necessary protocol). The default method does nothing.
+#### *connectAction(plugin :: ControllerPlugin, function :: ControllerFunction, action :: ControllerAction)*
+Called, when the given action has been bound to the given function. The default method does nothing, but an implementation in a subclass my show the label and icon of the given function on the controller hardware or on the corresponding visual representation.
+
+#### *disconnectAction(plugin :: ControllerPlugin, function :: ControllerFunction, action :: ControllerAction)*
+Called, when the given action has been disconnect from the given function. The default method does nothing, but an implementation in a subclass my clear the label and icon of the given function on the controller hardware or on the corresponding visual representation.
+
+#### *setControlLabel(function :: ControllerFunction, text :: String, color :: String := "Black", overlay :: Boolean := false)*
+This method is called to set the info text for the given function on the controller. Useful, if the given controller has a visual representation (see [GuiFunctionController](*) for a subclass, which provides the necessary protocol). A HTML color name may be provided, and with *overlay* you can specify, that the given text is some sort of additional text, which may be shown on top of an icon, for example. The default method does nothing.
 
 #### *setControlIcon(function :: ControllerFunction, icon :: String)*
 This method is called to set the info icon for the given function on the controller. Useful, if the given controller has a visual representation (see [GuiFunctionController](*) for a subclass, which provides the necessary protocol). If *icon* is *false*, this means that no icon should be displayed. The default method does nothing.

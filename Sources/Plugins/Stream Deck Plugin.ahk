@@ -30,6 +30,8 @@ class StreamDeck extends FunctionController {
 		
 	iConnector := false
 	
+	iActions := {}
+	
 	Type[] {
 		Get {
 			return "Stream Deck"
@@ -69,6 +71,15 @@ class StreamDeck extends FunctionController {
 	Functions[] {
 		Get {
 			return this.iFunctions
+		}
+	}
+	
+	Actions[function := false] {
+		Get {
+			if function
+				return (function ? this.iActions[function] : [])
+			else
+				return this.iActions
 		}
 	}
 	
@@ -182,7 +193,46 @@ class StreamDeck extends FunctionController {
 		return (inList(this.Functions, function) != false)
 	}
 	
-	setControlLabel(function, text, color := "Black") {
+	connectAction(plugin, function, action) {
+		actions := this.Actions
+		
+		if actions.HasKey(function)
+			actions[function].Push(action)
+		else
+			actions[function] := Array(action)
+		
+		icon := plugin.actionLabel(action)
+		
+		if (icon && (icon != ""))
+			function.setIcon(icon)
+		else
+			function.setLabel(plugin.actionLabel(action))
+	}
+	
+	disconnectAction(plugin, function, action) {
+		function.setLabel("")
+		function.setIcon(false)
+		
+		actions := this.Actions[function]
+		
+		actions.RemoveAt(inList(actions, action))
+		
+		if (actions.Length() = 0)
+			this.Actions.Delete(function)
+	}
+	
+	setControlLabel(function, text, color := "Black", overlay := false) {
+		if !overlay {
+			actions := this.Actions[function]
+			
+			for ignore, theAction in this.Actions[function]
+				if theAction.Icon {
+					text := ""
+					
+					break
+				}
+		}
+			
 		if this.hasFunction(function) {
 			Process Exist, SimulatorControllerPlugin.exe
 		

@@ -122,10 +122,16 @@ class FunctionController extends ConfigurationItem {
 		Throw "Virtual method FunctionController.hasFunction must be implemented in a subclass..."
 	}
 	
-	setControlLabel(function, text, color := "Black") {
+	setControlLabel(function, text, color := "Black", overlay := false) {
 	}
 	
 	setControlIcon(function, icon) {
+	}
+	
+	connectAction(plugin, function, action) {
+	}
+	
+	disconnectAction(plugin, function, action) {
 	}
 	
 	enable(function, action := false) {
@@ -204,6 +210,14 @@ class GuiFunctionController extends FunctionController {
 		return (this.getControlHandle(function.Descriptor) != false)
 	}
 	
+	connectAction(plugin, function, action) {
+		function.setLabel(plugin.actionLabel(action))
+	}
+	
+	disconnectAction(plugin, function, action) {
+		function.setLabel("")
+	}
+	
 	registerControlHandle(descriptor, handle) {
 		this.iControlHandles[descriptor] := handle
 	}
@@ -215,7 +229,7 @@ class GuiFunctionController extends FunctionController {
 			return false
 	}
 	
-	setControlLabel(function, text, color := "Black") {
+	setControlLabel(function, text, color := "Black", overlay := false) {
 		window := this.iWindow
 		
 		if (window != false) {
@@ -816,21 +830,29 @@ class SimulatorController extends ConfigurationItem {
 		this.getVoiceCommandDescriptor(command)[2] := false
 	}
 	
-	connectAction(function, action) {
+	connectAction(plugin, function, action) {
 		logMessage(kLogInfo, translate("Connecting ") . function.Descriptor . translate(" to action ") . translate(getLabelForLogMessage(action)))
 		
-		function.connectAction(action)
+		function.connectAction(plugin, action)
+		
+		action.connectFunction(plugin, function)
 		
 		if !this.iFunctionActions.HasKey(function)
 			this.iFunctionActions[function] := Array()
 		
 		this.iFunctionActions[function].Push(action)
+		
+		for ignore, fnController in this.FunctionController
+			if fnController.hasFunction(function)
+				fnController.connectAction(plugin, function, action)
 	}
 	
-	disconnectAction(function, action) {
+	disconnectAction(plugin, function, action) {
 		logMessage(kLogInfo, translate("Disconnecting ") . function.Descriptor . translate(" from action ") . translate(getLabelForLogMessage(action)))
 		
-		function.disconnectAction(action)
+		function.disconnectAction(plugin, action)
+		
+		action.disconnectFunction(plugin, function)
 		
 		index := inList(this.iFunctionActions[function], action)
 		
@@ -839,6 +861,10 @@ class SimulatorController extends ConfigurationItem {
 		
 			index := inList(this.iFunctionActions[function], action)
 		}
+		
+		for ignore, fnController in this.FunctionController
+			if fnController.hasFunction(function)
+				fnController.disconnectAction(plugin, function, action)
 	}
 	
 	updateLastEvent() {
@@ -1142,12 +1168,12 @@ class ControllerFunction {
 		this.iFunction := function
 	}
 	
-	setLabel(text, color := "Black") {
+	setLabel(text, color := "Black", overlay := false) {
 		local controller
 		
 		for ignore, fnController in this.Controller.FunctionController
 			if fnController.hasFunction(this)
-				fnController.setControlLabel(this, text, color)
+				fnController.setControlLabel(this, text, color, overlay)
 	}
 	
 	setIcon(icon) {
@@ -1187,7 +1213,7 @@ class ControllerFunction {
 				setHotkeyEnabled(this, trigger, false)
 	}
 	
-	connectAction(action) {
+	connectAction(plugin, action) {
 		controller := this.Controller
 		
 		this.iEnabledActions[action] := true
@@ -1221,7 +1247,7 @@ class ControllerFunction {
 		}
 	}
 	
-	disconnectAction(action) {
+	disconnectAction(plugin, action) {
 		controller := this.Controller
 		
 		this.iEnabledActions.Delete(action)
@@ -1234,8 +1260,6 @@ class ControllerFunction {
 					Hotkey %theHotkey%, Off
 			}
 		}
-		
-		action.disconnect(this)
 	}
 }
 
@@ -1337,7 +1361,7 @@ class ControllerCustomFunction extends ControllerFunction {
 	__New(controller, number, configuration := false) {
 		base.__New(controller, new this.InnerCustomFunction(this, number, configuration))
 			
-		this.connectAction(false)
+		this.connectAction(false, false)
 	}
 }
 
@@ -1423,11 +1447,9 @@ class ControllerPlugin extends Plugin {
 		logMessage(kLogInfo, translate("Activating plugin ") . translate(this.Plugin))
 		
 		for ignore, theAction in this.Actions {
-			controller.connectAction(theAction.Function, theAction)
+			controller.connectAction(this, theAction.Function, theAction)
 			
 			theAction.Function.enable(kAllTrigger, theAction)
-			
-			theAction.connect(this, theAction.Function)
 		}
 	}
 	
@@ -1436,11 +1458,8 @@ class ControllerPlugin extends Plugin {
 		
 		logMessage(kLogInfo, translate("Deactivating plugin ") . translate(this.Plugin))
 		
-		for ignore, theAction in this.Actions {
-			controller.disconnectAction(theAction.Function, theAction)
-		
-			theAction.disconnect(theAction.Function)
-		}
+		for ignore, theAction in this.Actions
+			controller.disconnectAction(this, theAction.Function, theAction)
 	}
 	
 	runningSimulator() {
@@ -1585,11 +1604,9 @@ class ControllerMode {
 		logMessage(kLogInfo, translate("Activating mode ") . translate(getModeForLogMessage(this)))
 		
 		for ignore, theAction in this.Actions {
-			controller.connectAction(theAction.Function, theAction)
+			controller.connectAction(plugin, theAction.Function, theAction)
 			
 			theAction.Function.enable(kAllTrigger, theAction)
-			
-			theAction.connect(plugin, theAction.Function)
 		}
 		
 		controller.registerActiveMode(this)
@@ -1604,9 +1621,9 @@ class ControllerMode {
 		logMessage(kLogInfo, translate("Deactivating mode ") . translate(getModeForLogMessage(this)))
 		
 		for ignore, theAction in this.Actions {
-			controller.disconnectAction(theAction.Function, theAction)
+			theAction.Function.disable(kAllTrigger, theAction)
 		
-			theAction.disconnect(theAction.Function)
+			controller.disconnectAction(plugin, theAction.Function, theAction)
 		}
 	}
 }
@@ -1650,19 +1667,10 @@ class ControllerAction {
 		Throw "Virtual method ControllerAction.fireAction must be implemented in a subclass..."
 	}
 	
-	connect(plugin, function) {
-		label := plugin.actionLabel(this)
-		icon := plugin.actionLabel(this)
-			
-		if (icon && (icon != ""))
-			function.setIcon(icon)
-		else
-			function.setLabel(label)
+	connectFunction(plugin, function) {
 	}
 	
-	disconnect(pluginOrMode, function) {
-		this.setLabel("")
-		this.setIcon(false)
+	disconnectFunction(pluginOrMode, function) {
 	}
 }
 
@@ -1915,9 +1923,9 @@ pushButton(buttonNumber) {
 rotateDial(dialNumber, direction) {
 	local function
 	
-	if ((direction = "increase") || (direction = "plus") || (direction = "+"))
+	if ((direction = kIncrease) || (direction = "plus") || (direction = "+"))
 		direction := "Increase"
-	else if ((direction = "decrease") || (direction = "minus") || (direction = "-"))
+	else if ((direction = kDecrease) || (direction = "minus") || (direction = "-"))
 		direction := "Decrease"
 	else {
 		logMessage(kLogWarn, translate("Unsupported argument (") . direction . translate(") detected in rotateDial - please check the configuration"))

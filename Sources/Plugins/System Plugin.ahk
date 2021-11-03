@@ -112,7 +112,7 @@ class SystemPlugin extends ControllerPlugin {
 		fireAction(function, trigger) {
 			controller := this.Controller
 			
-			controller.rotateMode(((trigger == "Off") || (trigger == "Decrease")) ? -1 : 1, Array(controller.findFunctionController(function)))
+			controller.rotateMode(((trigger == "Off") || (trigger = kDecrease)) ? -1 : 1, Array(controller.findFunctionController(function)))
 
 			this.Function.setLabel(controller.findPlugin(kSystemPlugin).actionLabel(this))
 		}

@@ -322,7 +322,7 @@ This class property returns the single instance of *SimulatorController*.
 Returns the controller configuration map, not to be confused with the complete simulator configration map. This small configuration defines settings for controller notifications such as tray tips and visual representation for connected controller hardware like Button Boxes and is maintained by the [settings editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--settings).
 	
 #### *FunctionController[class :: Class := false]*
-Returns a list all [FunctionController](*) instances registered for the controller. These must have been created by a specialized plugin and registered in the controller by calling [registerFunctionController](*). See [this simple example](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/ButtonBox%20Plugin.ahk) for an example. If the class parameter has been supplied, only instances of this given class will be returned.
+Returns a list all [FunctionController](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-functioncontroller-extends-configurationitem-simulator-controllerahk) instances registered for the controller. These must have been created by a specialized plugin and registered in the controller by calling [registerFunctionController](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-functioncontroller-extends-configurationitem-simulator-controllerahk). See [this simple example](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/ButtonBox%20Plugin.ahk) for an example. If the class parameter has been supplied, only instances of this given class will be returned.
 	
 #### *Functions[]*
 Returns a list of all functions defined in the underlying configuration.
@@ -373,7 +373,7 @@ Searches for a controller function with the given descriptor. Returns *false*, i
 Returns the controller actions for the given function / trigger combination. Only currently active actions, which are bound to a function by their mode or plugin, are considered. Returns *false*, if there is no action currently connected to the function.
 
 #### *registerFunctionController(controller :: FunctionController)*
-Registers a visual representation for the hardware controller. This method is automatically called by the constructor of [FunctionController](*).
+Registers a visual representation for the hardware controller. This method is automatically called by the constructor of [FunctionController](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-functioncontroller-extends-configurationitem-simulator-controllerahk).
 
 #### *unregisterFunctionController(controller :: FunctionController)*
 Removes a visual representation for the hardware controller from this controller. This method might be called from your own plugin to remove all predefined controller representations before registering your own ones.
@@ -585,7 +585,7 @@ Returns the plugin, which has defined this mode.
 The controller, where the plugin of this mode has been registered.
 
 #### *FunctionController[]*
-Returns a list all [FunctionController](*) instances, on which this mode has registered actions.
+Returns a list all [FunctionController](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-functioncontroller-extends-configurationitem-simulator-controllerahk) instances, on which this mode has registered actions.
 
 #### *Actions[]*
 A list of all actions defined by this mode.
@@ -677,7 +677,7 @@ The number of rotary dials of the controller. This is maintained by the [configu
 ### Public Methods
 
 #### *__New(controller :: SimulatorController, configuration :: ConfigurationMap := false)*
-Constructs a new represenation for a controller hardware. The controller is automatically registered for the given controller using [registerFunctionController](*).
+Constructs a new represenation for a controller hardware. The controller is automatically registered for the given controller using [registerFunctionController](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#registerfunctioncontrollercontroller--functioncontroller).
 
 #### *setControls(num1WayToggles :: Integer, num2WayToggles :: Integer, numButtons :: Integer, numDials :: Integer)*
 Must be called by implementations of *FunctionController* to specifiy the type and number of controls, this controller provides in its layout.
@@ -692,10 +692,10 @@ Called, when the given action has been bound to the given function. The default 
 Called, when the given action has been disconnect from the given function. The default method does nothing, but an implementation in a subclass my clear the label and icon of the given function on the controller hardware or on the corresponding visual representation.
 
 #### *setControlLabel(function :: ControllerFunction, text :: String, color :: String := "Black", overlay :: Boolean := false)*
-This method is called to set the info text for the given function on the controller. Useful, if the given controller has a visual representation (see [GuiFunctionController](*) for a subclass, which provides the necessary protocol). A HTML color name may be provided, and with *overlay* you can specify, that the given text is some sort of additional text, which may be shown on top of an icon, for example. The default method does nothing.
+This method is called to set the info text for the given function on the controller. Useful, if the given controller has a visual representation (see [GuiFunctionController](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-guifunctioncontroller-extends-functioncontroller-simulator-controllerahk) for a subclass, which provides the necessary protocol). A HTML color name may be provided, and with *overlay* you can specify, that the given text is some sort of additional text, which may be shown on top of an icon, for example. The default method does nothing.
 
 #### *setControlIcon(function :: ControllerFunction, icon :: String)*
-This method is called to set the info icon for the given function on the controller. Useful, if the given controller has a visual representation (see [GuiFunctionController](*) for a subclass, which provides the necessary protocol). If *icon* is *false*, this means that no icon should be displayed. The default method does nothing.
+This method is called to set the info icon for the given function on the controller. Useful, if the given controller has a visual representation (see [GuiFunctionController](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-guifunctioncontroller-extends-functioncontroller-simulator-controllerahk) for a subclass, which provides the necessary protocol). If *icon* is *false*, this means that no icon should be displayed. The default method does nothing.
 	
 #### *enable(function :: ControllerFunction, action :: ControllerAction := false)*
 Enables the given function on the given controller. If *action* is supplied and not *false*, the function is only enabled for the given action, otherwise it is enabled for all actions. The default method does nothing.
@@ -705,7 +705,7 @@ Disables the given function on the given controller. If *action* is supplied and
 
 ***
 
-## [Abstract] GuiFunctionController extends [FunctionController](*) ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
+## [Abstract] GuiFunctionController extends [FunctionController](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-functioncontroller-extends-configurationitem-simulator-controllerahk) ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
 Although the Simulator Controller will provide complete functionality even without a visual representation for a given physical controller, it is much more fun to see what happens. Subclasses of *GuiFunctionController* may use the [Gui capabilities](https://www.autohotkey.com/docs/commands/Gui.htm) of the AutoHotkey language to implement the graphical representation. See [this implementation](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/ButtonBox%20Plugin.ahk), which implements configuration and grid based Button Boxes for reference.
 
 ### Public Properties

@@ -1262,30 +1262,18 @@ updateTranslations() {
 	}
 }
 
-deletePluginLabels() {
-	for ignore, fileName in getFileNames("Controller Plugin Labels.*", kUserTranslationsDirectory)
+deleteActionLabels() {
+	deletePluginLabels("Controller Action Labels")
+}
+
+deletePluginLabels(fileName := "Controller Plugin Labels") {
+	for ignore, fName in getFileNames(fileName . ".*", kUserTranslationsDirectory)
 		try {
-			FileDelete %filename%
+			FileMove %fName%, %fName%.bak, 1
 		}
 		catch exception {
 			; ignore
 		}
-}
-
-overwriteActionLabels() {
-	overwritePluginLabels("Controller Action Labels")
-}
-
-overwritePluginLabels(fileName := "Controller Plugin Labels") {
-	for ignore, fileName in getFileNames(fileName . ".*", kUserTranslationsDirectory)
-		FileMove %filename%, %filename%.bak, 1
-	
-	for ignore, fileName in getFileNames(fileName . ".*", kResourcesDirectory . "Templates\") {
-		SplitPath fileName, , , languageCode
-	
-		if !FileExist(kUserTranslationsDirectory . fileName . "." . languageCode)
-			FileCopy %kResourcesDirectory%Templates\%fileName%.%languageCode%, %kUserTranslationsDirectory%
-	}
 }
 
 updateActionLabels() {

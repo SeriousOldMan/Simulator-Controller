@@ -47,7 +47,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 3.6.6
 
-To support the new Stream Deck integration, all labels for plugin actions has been reworked. Therefore it is necessary to update the "Controller Plugin Labels.XX" files, which are located in the *Simulator Controller\Tranlations* folder, which is located in your user documents folder, if you have modified the labels in the past. The update procedure will move your local files to *.bak files to preserve your changes, but you have to use the "Simulator Configuration" tool, to reenter your changes in the updated version of those files.
+To support the new Stream Deck integration, all labels for plugin actions has been reworked. Therefore it is necessary to update the "Controller Plugin Labels.XX" files, which are located in the *Simulator Controller\Tranlations* folder, which is located in your user documents folder, if you have modified the labels in the past. The update procedure will move your local files to *.bak files to preserve your changes, but you have to use the "Simulator Configuration" tool to reenter your changes in the updated version of those files.
 
 ***
 

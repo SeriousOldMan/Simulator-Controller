@@ -34,6 +34,7 @@ Release 3.6.6 Checklist
 5. Update Procedure
    a. Translations
    b. Delete "Controller Plugin Labels"
+6. Update FAQ for Stream Deck integration
 
 Release 3.6.4 Checklist
 =======================

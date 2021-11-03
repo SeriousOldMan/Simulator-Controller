@@ -22,7 +22,7 @@ If you don't want to use the automated installer (or you can't cause of your Ant
 
 #### Automated Installer
 
-Simply donwload and run [Simulator Controller.exe](https://bit.ly/3vCSIa1) (you may have to deactivate your Antivirus or Browser download protection). This small application will connect to the version repository and will download and install the latest version automatically for you. If you want to install a version other than the current one, no problem. This is possible by downloading and installing one of the versions below manually, but consult the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation) beforehand.
+Simply download and run [Simulator Controller.exe](https://bit.ly/3vCSIa1) (you may have to deactivate your Antivirus or Browser download protection). This small application will connect to the version repository and will download and install the latest version automatically for you. If you want to install a version other than the current one, no problem. This is possible by downloading and installing one of the versions below manually, but consult the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation) beforehand.
 
 #### Latest release build
 
@@ -41,7 +41,11 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[3.6.6-alpha](https://www.dropbox.com/s/ylvgwp4l2lqc1q4/Simulator%20Controller%203.6.6-alpha.zip?dl=1) (Early build for release 3.6.6. New features: More sophisticated tyre compound handling, Refactoring of ButtonBox class, Early integration of StreamDeck, Renamed "Controller Plugin Labels" to "Controller Action Labels", Introduced "Controller Action Icons" for Stream Deck support, New *udpConnection* parameter for the ACC plugin, Support for telemetry data cleanup in "Simulator Workbench", Only valid laps will be used for telemetry and tyre setup data, Binary functions are supported for effect intensity actions in "Motion Feedback" plugin. Stable, with update procedure and documentation.)
+
+Important: The "Controller Plugin Labels" files changed. Be careful and read the update notes...
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-366) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Discord Community
 

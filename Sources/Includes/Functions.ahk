@@ -1793,7 +1793,7 @@ readConfiguration(configFile) {
 				key := StrReplace(key, "_#_CR-#_", "`n")
 				
 				value := StrReplace(value, "_#_EQ-#_", "=")
-				value := StrReplace(value, "_#_AC-#_", "\\")
+				value := StrReplace(value, "_#_AC-#_", "\")
 				value := StrReplace(value, "_#_CR-#_", "`n")
 				
 				sectionValues[keyValue[1]] := ((value = kTrue) ? true : ((value = kFalse) ? false : value))
@@ -1822,8 +1822,13 @@ writeConfiguration(configFile, configuration) {
 	for section, keyValues in configuration {
 		pairs := ""
 		
-		for key, value in keyValues
+		for key, value in keyValues {
+			value := StrReplace(value, "\", "\\")
+			value := StrReplace(value, "=", "\=")
+			value := StrReplace(value, "`n", "\n")
+			
 			pairs := pairs . "`n" . key . "=" . ((value == true) ? kTrue : ((value == false) ? kFalse : value))
+		}
 			
 		section := "[" . section . "]" . pairs . "`n"
 		

@@ -375,7 +375,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		Gui %window%:Font, Norm, Arial
 		
-		Gui %window%:Add, DropDownList, x12 yp+32 w76 AltSubmit Choose1 vdataTypeDropDown gchooseDataType +0x200, % values2String("|", map(["Electronics", "Tyres"], "translate")*)
+		Gui %window%:Add, DropDownList, x12 yp+32 w76 AltSubmit Choose1 vdataTypeDropDown gchooseDataType +0x200, % values2String("|", map(["Electronics", "Tyres", "-----------------", "Cleanup Data"], "translate")*)
 		
 		Gui %window%:Add, ListView, x90 yp-2 w100 h97 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDdataListView gchooseData, % values2String("|", map(["Map", "Count"], "translate")*)
 		
@@ -857,7 +857,7 @@ class StrategyWorkbench extends ConfigurationItem {
 	
 	createSetupInfo(strategy) {
 		html := "<table>"
-		html .= ("<tr><td><b>" . translate("Fuel:") . "</b></td><td>" . strategy.RemainingFuel . A_Space . translate("Liter") . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Fuel:") . "</b></td><td>" . Round(strategy.RemainingFuel, 1) . A_Space . translate("Liter") . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Compound:") . "</b></td><td>" . translate(strategy.TyreCompound[true]) . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Pressures (hot):") . "</b></td><td>" . strategy.TyrePressures[true] . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Map:") . "</b></td><td>" . strategy.Map . "</td></tr>")
@@ -3252,35 +3252,58 @@ chooseDataType() {
 	GuiControlGet compoundDropDown
 	GuiControlGet dataTypeDropDown
 	
-	dataType := ["Electronics", "Tyres"][dataTypeDropDown]
-	schema := filterSchema(new TelemetryDatabase().getSchema(dataType, true))
-	
-	workbench.iSelectedDataType := dataType
-	
-	GuiControl, , dataXDropDown, % "|" . values2String("|", map(schema, "translate")*)
-	GuiControl, , dataY1DropDown, % "|" . values2String("|", map(schema, "translate")*)
-	GuiControl, , dataY2DropDown, % "|" . translate("None") . "|" . values2String("|", map(schema, "translate")*)
-	GuiControl, , dataY3DropDown, % "|" . translate("None") . "|" . values2String("|", map(schema, "translate")*)
-	
-	if (dataType = "Electronics") {
-		GuiControl Choose, dataXDropDown, % inList(schema, "Map")
-		GuiControl Choose, dataY1DropDown, % inList(schema, "Fuel.Consumption")
+	if (dataTypeDropDown > 2) {
+		if ((dataTypeDropDown = 4) && (workbench.SelectedSimulator && workbench.SelectedCar && workbench.SelectedTrack)) {
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+			title := translate("Modular Simulator Controller System")
+			MsgBox 262436, %title%, % translate("Entries with lap times or fuel consumption outside the standard deviation will be deleted. Do you want to proceed?")
+			OnMessage(0x44, "")
+
+			IfMsgBox Yes
+			{
+				new TelemetryDatabase(workbench.SelectedSimulator, workbench.SelectedCar
+									, workbench.SelectedTrack).cleanupData(workbench.SelectedWeather
+																		 , workbench.SelectedCompound, workbench.SelectedCompoundColor)
 		
-		GuiControl Choose, dataY2DropDown, 1
+				GuiControlGet compoundDropDown
+				
+				workbench.loadCompound(kQualifiedTyreCompounds[compoundDropDown], true)
+			}
+		}
+		
+		GuiControl Choose, dataTypeDropDown, % inList(["Electronics", "Tyres"], workbench.SelectedDataType)
 	}
-	else if (dataType = "Tyres") {
-		GuiControl Choose, dataXDropDown, % inList(schema, "Tyre.Laps")
-		GuiControl Choose, dataY1DropDown, % inList(schema, "Tyre.Pressure")
-		GuiControl Choose, dataY2DropDown, % inList(schema, "Tyre.Temperature") + 1
+	else {
+		dataType := ["Electronics", "Tyres"][dataTypeDropDown]
+		schema := filterSchema(new TelemetryDatabase().getSchema(dataType, true))
+		
+		workbench.iSelectedDataType := dataType
+		
+		GuiControl, , dataXDropDown, % "|" . values2String("|", map(schema, "translate")*)
+		GuiControl, , dataY1DropDown, % "|" . values2String("|", map(schema, "translate")*)
+		GuiControl, , dataY2DropDown, % "|" . translate("None") . "|" . values2String("|", map(schema, "translate")*)
+		GuiControl, , dataY3DropDown, % "|" . translate("None") . "|" . values2String("|", map(schema, "translate")*)
+		
+		if (dataType = "Electronics") {
+			GuiControl Choose, dataXDropDown, % inList(schema, "Map")
+			GuiControl Choose, dataY1DropDown, % inList(schema, "Fuel.Consumption")
+			
+			GuiControl Choose, dataY2DropDown, 1
+		}
+		else if (dataType = "Tyres") {
+			GuiControl Choose, dataXDropDown, % inList(schema, "Tyre.Laps")
+			GuiControl Choose, dataY1DropDown, % inList(schema, "Tyre.Pressure")
+			GuiControl Choose, dataY2DropDown, % inList(schema, "Tyre.Temperature") + 1
+		}
+		
+		GuiControl Choose, dataY3DropDown, 1
+		
+		workbench.loadChart(workbench.SelectedChartType)
+		
+		GuiControlGet compoundDropDown
+		
+		workbench.loadCompound(kQualifiedTyreCompounds[compoundDropDown], true)
 	}
-	
-	GuiControl Choose, dataY3DropDown, 1
-	
-	workbench.loadChart(workbench.SelectedChartType)
-	
-	GuiControlGet compoundDropDown
-	
-	workbench.loadCompound(kQualifiedTyreCompounds[compoundDropDown], true)
 }
 
 chooseData() {

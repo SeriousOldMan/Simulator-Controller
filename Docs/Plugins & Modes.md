@@ -148,11 +148,14 @@ Warning: *initialState* and *initialIntensity* will only be used at startup, whe
 
 With the following parameters you can configure the available effects for the "Motion" mode:
 
-	motionEffectIntensity: *effectSelectorFunction* *effectIntensityFunction*;
 	motionEffects: *effect1* *initialState1* *intialIntensity1* *effectToggleFunction1*,
 				   *effect2* *initialState2* *intialIntensity2* *effectToggleFunction2*, ...
 
-*effectX* is the name of the effect, for example "Heave". With *initialStateX* and *intialIntensityX* you supply "On" or "Off" and a value between 0.0 and 2.0 respectively. These values will only be used, when mouse automation is used to control *SimFeedback*. Last, you need to supply a controller function with *effectToggleFunctionX* to enable or disable the effect or choose it for intensity manipulation after pressing the "Effect Selector" button, which must have been configured by supplying values for the "motionEffectIntensity" parameter. Example: "Heave On 1.0 Button.1"
+*effectX* is the name of the effect, for example "Heave". With *initialStateX* and *intialIntensityX* you supply "On" or "Off" and a value between 0.0 and 2.0 respectively. These values will only be used, when mouse automation is used to control *SimFeedback*. Last, you need to supply a controller function with *effectToggleFunctionX* to enable or disable the effect or choose it for intensity manipulation after pressing the "Effect Selector" button, which must have been configured by supplying values for the "motionEffectIntensity" parameter. Example: "Heave On 1.0 Button.1".
+
+	motionEffectIntensity: *effectSelectorFunction* *effectIntensityFunction* [*effectIntensityFunction*];
+
+With "motionEffectIntensity", you can configure, how to manipulate the intensity for one of the effects on your hardware controller. You must supply a unary function for *motionEffectIntensity*, which allows you the two select one of the effects using the *effectToggleFunctionX* function supplied above. After you have selected an effect, you can manipulate its intensity using the *effectIntensityFunction*. Please note, that you can supply either a binary *effectIntensityFunction*, for example a dial, or two unary functions, which then are used to decrease and increase the chosen effect accordingly.
 
 Important: Please be aware, that effect names containing spaces must be enclosed in double quotes, since spaces are allowed in *SimFeedback* effect names, but not in plugin arguments.
 
@@ -344,7 +347,11 @@ Note: You can use all these commands in the *pitstopCommands* list as well, whic
 First, you need to define, how to open and close the Pitstop MFD in *Assetto Corsa Competizione*. If the standard keyboard mapping is used, this will be the "P" and the "Insert" keys on the keyboard.
 
 	openPitstopMFD: *openHotkey*; closePitstopMFD: *closeHotkey*
-	
+
+*Assetto Corsa Competizione* provides an UDP interface to gather the position information for all the cars in the grid. The default login to this service is 127.0.0.1,9000,asd, (where the last argument, the *commandPassword*, is empty). If you have changed the connection information in the ACC configuration, you have to provide this connection information using the *udpConnection* in the plugin configuration:
+
+	udpConnection: *ip*, *port*, *connectionPassword*, *commandPassword*
+
 With the plugin parameter *pitstopCommands* you can supply a list of the settings, you want to tweak from your hardware controller, when the "Pitstop" mode is active. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example tyre pressure and fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
 
 	pitstopCommands: *setting1* *settingsFunction1* [*settingSteps1*],
@@ -476,7 +483,7 @@ Note: Be careful, when you change pitstop settings while Jona is active, the Rac
 
 With the plugin parameter *assistantCommands* you can supply a list of the commands you want to trigger, when the "Assistant" mode is active. Only unary controller functions are allowed here.
 
-	assistantCommands: PitstopRecommend *function*, StrategyCancel *function*,
+	assistantCommands: PitstopRecommend *function*,   *function*,
 					   PitstopPlan *function*, PitstopPrepare *function*,
 					   Accept *acceptFunction*, Reject *rejectFunction*,
 					   InformationRequest *requestFunction* *command* [*arguments*], ...

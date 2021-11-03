@@ -61,10 +61,10 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 	class SimHub1WayAction extends ControllerAction {
 		iCommand := false
 		
-		__New(function, label, command) {
+		__New(function, label, icon, command) {
 			this.iCommand := command
 			
-			base.__New(function, label)
+			base.__New(function, label, icon)
 		}
 		
 		fireAction(function, trigger) {
@@ -76,15 +76,15 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		iUpCommand := false
 		iDownCommand := false
 		
-		__New(function, label, upCommand, downCommand) {
+		__New(function, label, icon, upCommand, downCommand) {
 			this.iUpCommand := upCommand
 			this.iDownCommand := downCommand
 			
-			base.__New(function, label)
+			base.__New(function, label, icon)
 		}
 		
 		fireAction(function, trigger) {
-			callSimHub(((trigger = "On") || (trigger = "Increase") || (trigger == "Push")) ? this.iUpCommand : this.iDownCommand)
+			callSimHub(((trigger = "On") || (trigger = kIncrease) || (trigger == "Push")) ? this.iUpCommand : this.iDownCommand)
 		}
 	}
 
@@ -97,10 +97,10 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 			}
 		}
 		
-		__New(function, label, command, initialActive) {
+		__New(function, label, icon, command, initialActive) {
 			this.iIsActive := initialActive
 			
-			base.__New(function, label, command)
+			base.__New(function, label, icon, command)
 		}
 		
 		fireAction(function, trigger) {
@@ -118,7 +118,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 				
 				trayMessage(translate(this.Label), translate("State: Off"))
 			
-				function.setText(translate(this.Label), "Black")
+				function.setLabel(translate(this.Label), "Black")
 			}
 			else if (!this.iIsActive && ((trigger = "On") || (trigger == "Push"))) {
 				base.fireAction(function, trigger)
@@ -126,7 +126,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 				
 				trayMessage(translate(this.Label), translate("State: On"))
 			
-				function.setText(translate(this.Label), "Green")
+				function.setLabel(translate(this.Label), "Green")
 			}
 		}
 	}
@@ -136,7 +136,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		iUpChange := ""
 		iDownChange := false
 		
-		__New(function, label, effect, upChange, downChange := false) {
+		__New(function, label, icon, effect, upChange, downChange := false) {
 			this.iEffect := effect
 			this.iUpChange := upChange
 			this.iDownChange := downChange
@@ -151,23 +151,23 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 				downChange := downChange . effect . "Vibration"
 			}
 			
-			base.__New(function, label, upChange, downChange)
+			base.__New(function, label, icon, upChange, downChange)
 		}
 		
 		fireAction(function, trigger) {
 			base.fireAction(function, trigger)
 		
-			change := (((trigger = "On") || (trigger = "Increase") || (trigger == "Push")) ? this.iUpChange : this.iDownChange)
+			change := (((trigger = "On") || (trigger = kIncrease) || (trigger == "Push")) ? this.iUpChange : this.iDownChange)
 				
 			StringUpper change, change, T
 		
 			trayMessage(translate(this.iEffect), translate(change) . translate(" Vibration"))
 			
-			this.Function.setText(((change = kIncrease) ? "+ " : "- ") . kVibrationIntensityIncrement . "%")
+			this.Function.setLabel(((change = kIncrease) ? "+ " : "- ") . kVibrationIntensityIncrement . "%", "Black", true)
 		
 			Sleep 500
 			
-			this.Function.setText(translate(this.Label))
+			this.Function.setLabel(translate(this.Label))
 		}
 	}
 	
@@ -236,8 +236,11 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		if (descriptor != false) {
 			function := this.Controller.findFunction(descriptor)
 			
-			if (function != false)
-				this.registerAction(new this.FXToggleAction(function, this.getLabel(ConfigurationItem.descriptor(toggle, "Toggle"), toggle), command, initialState))
+			if (function != false) {
+				descriptor := ConfigurationItem.descriptor(toggle, "Toggle")
+				
+				this.registerAction(new this.FXToggleAction(function, this.getLabel(descriptor, toggle), this.getIcon(descriptor), command, initialState))
+			}
 			else
 				this.logFunctionNotFound(descriptor)
 		}
@@ -246,8 +249,11 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 	createDialAction(mode, effect, descriptor) {
 		local function := this.Controller.findFunction(descriptor)
 		
-		if (function != false)
-			mode.registerAction(new this.FXChangeAction(function, this.getLabel(ConfigurationItem.descriptor(effect, "Dial"), effect), effect, kIncrease, kDecrease))
+		if (function != false) {
+			descriptor := ConfigurationItem.descriptor(effect, "Dial")
+				
+			mode.registerAction(new this.FXChangeAction(function, this.getLabel(descriptor, effect), this.getIcon(descriptor), effect, kIncrease, kDecrease))
+		}
 		else
 			this.logFunctionNotFound(descriptor)
 	}
@@ -256,21 +262,30 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		local function := this.Controller.findFunction(increaseFunction)
 		
 		if !decreaseFunction {
-			if (function != false)
-				mode.registerAction(new this.FXChangeAction(function, this.getLabel(ConfigurationItem.descriptor(effect, "Dial"), effect), effect, kIncrease, kDecrease))
+			if (function != false) {
+				descriptor := ConfigurationItem.descriptor(effect, "Dial")
+				
+				mode.registerAction(new this.FXChangeAction(function, this.getLabel(descriptor, effect), this.getIcon(descriptor), effect, kIncrease, kDecrease))
+			}
 			else
 				this.logFunctionNotFound(increaseFunction)
 		}
 		else {
-			if (function != false)
-				mode.registerAction(new this.FXChangeAction(function, this.getLabel(ConfigurationItem.descriptor(effect, "Increase"), effect), effect, kIncrease))
+			if (function != false) {
+				descriptor := ConfigurationItem.descriptor(effect, "Increase")
+				
+				mode.registerAction(new this.FXChangeAction(function, this.getLabel(descriptor, effect), this.getIcon(descriptor), effect, kIncrease))
+			}
 			else
 				this.logFunctionNotFound(increaseFunction)
 				
 			function := this.Controller.findFunction(decreaseFunction)
 			
-			if (function != false)
-				mode.registerAction(new this.FXChangeAction(function, this.getLabel(ConfigurationItem.descriptor(effect, "Decrease"), effect), effect, kDecrease))
+			if (function != false) {
+				descriptor := ConfigurationItem.descriptor(effect, "Decrease")
+				
+				mode.registerAction(new this.FXChangeAction(function, this.getLabel(descriptor, effect), this.getIcon(descriptor), effect, kDecrease))
+			}
 			else
 				this.logFunctionNotFound(decreaseFunction)
 		}
@@ -288,7 +303,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		isRunning := this.Application.isRunning()
 		
 		for ignore, theAction in this.Actions
-			theAction.Function.setText(translate(theAction.Label), isRunning ? (theAction.Active ? "Green" : "Black") : "Olive")
+			theAction.Function.setLabel(translate(theAction.Label), isRunning ? (theAction.Active ? "Green" : "Black") : "Olive")
 		
 		SetTimer updateVibrationState, -50
 	}
@@ -329,14 +344,14 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 					chassisMode := this.findMode(kChassisVibrationMode)
 				
 					if inList(activeModes, pedalMode) {
-						controller.rotateMode(1, pedalMode.ButtonBoxes)
+						controller.rotateMode(1, pedalMode.FunctionController)
 				
 						if inList(controller.ActiveModes, pedalMode)
 							pedalMode.deactivate()
 					}
 				
 					if inList(activeModes, chassisMode) {
-						this.Controller.rotateMode(1, chassisMode.ButtonBoxes)
+						this.Controller.rotateMode(1, chassisMode.FunctionController)
 				
 						if inList(controller.ActiveModes, chassisMode)
 							chassisMode.deactivate()

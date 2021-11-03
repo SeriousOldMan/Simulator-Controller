@@ -1107,35 +1107,37 @@ class RaceStrategist extends RaceAssistant {
 				runningLap += 1
 				prefix := "Lap." . A_Index
 				
-				weather := knowledgeBase.getValue(prefix . ".Weather")
-				airTemperature := knowledgeBase.getValue(prefix . ".Temperature.Air")
-				trackTemperature := knowledgeBase.getValue(prefix . ".Temperature.Track")
-				compound := knowledgeBase.getValue(prefix . ".Tyre.Compound")
-				compoundColor := knowledgeBase.getValue(prefix . ".Tyre.Compound.Color")
-				fuelConsumption := Round(knowledgeBase.getValue(prefix . ".Fuel.Consumption"), 1)
-				fuelRemaining := Round(knowledgeBase.getValue(prefix . ".Fuel.Remaining"), 1)
-				lapTime := Round(knowledgeBase.getValue(prefix . ".Time") / 1000, 1)
-				
-				map := knowledgeBase.getValue(prefix . ".Map")
-				tc := knowledgeBase.getValue(prefix . ".TC")
-				abs := knowledgeBase.getValue(prefix . ".ABS")
-				
-				telemetryDB.addElectronicEntry(weather, airTemperature, trackTemperature, compound, compoundColor
-											 , map, tc, abs, fuelRemaining, fuelConsumption, lapTime)
-				
-				flPressure := Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.FL"), 1)
-				frPressure := Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.FR"), 1)
-				rlPressure := Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.RL"), 1)
-				rrPressure := Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.RR"), 1)
-				
-				flTemperature := Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.FL"), 1)
-				frTemperature := Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.FR"), 1)
-				rlTemperature := Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.RL"), 1)
-				rrTemperature := Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.RR"), 1)
-				
-				telemetryDB.addTyreEntry(weather, airTemperature, trackTemperature, compound, compoundColor, runningLap
-									   , flPressure, frPressure, rlPressure, rrPressure, flTemperature, frTemperature, rlTemperature, rrTemperature
-										, fuelRemaining, fuelConsumption, lapTime)
+				if knowledgeBase.getValue(prefix . ".Valid", true) {
+					weather := knowledgeBase.getValue(prefix . ".Weather")
+					airTemperature := knowledgeBase.getValue(prefix . ".Temperature.Air")
+					trackTemperature := knowledgeBase.getValue(prefix . ".Temperature.Track")
+					compound := knowledgeBase.getValue(prefix . ".Tyre.Compound")
+					compoundColor := knowledgeBase.getValue(prefix . ".Tyre.Compound.Color")
+					fuelConsumption := Round(knowledgeBase.getValue(prefix . ".Fuel.Consumption"), 1)
+					fuelRemaining := Round(knowledgeBase.getValue(prefix . ".Fuel.Remaining"), 1)
+					lapTime := Round(knowledgeBase.getValue(prefix . ".Time") / 1000, 1)
+					
+					map := knowledgeBase.getValue(prefix . ".Map")
+					tc := knowledgeBase.getValue(prefix . ".TC")
+					abs := knowledgeBase.getValue(prefix . ".ABS")
+					
+					telemetryDB.addElectronicEntry(weather, airTemperature, trackTemperature, compound, compoundColor
+												 , map, tc, abs, fuelRemaining, fuelConsumption, lapTime)
+					
+					flPressure := Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.FL"), 1)
+					frPressure := Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.FR"), 1)
+					rlPressure := Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.RL"), 1)
+					rrPressure := Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.RR"), 1)
+					
+					flTemperature := Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.FL"), 1)
+					frTemperature := Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.FR"), 1)
+					rlTemperature := Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.RL"), 1)
+					rrTemperature := Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.RR"), 1)
+					
+					telemetryDB.addTyreEntry(weather, airTemperature, trackTemperature, compound, compoundColor, runningLap
+										   , flPressure, frPressure, rlPressure, rrPressure, flTemperature, frTemperature, rlTemperature, rrTemperature
+										   , fuelRemaining, fuelConsumption, lapTime)
+				}
 			}
 		}
 	}

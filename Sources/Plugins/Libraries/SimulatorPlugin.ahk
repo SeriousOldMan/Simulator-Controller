@@ -68,21 +68,21 @@ class AssistantMode extends ControllerMode {
 				if inList(kAssistantRaceActions, theAction.Action) {
 					if (sessionState == kSessionRace) {
 						theAction.Function.enable(kAllTrigger, theAction)
-						theAction.Function.setText(theAction.Label)
+						theAction.Function.setLabel(theAction.Label)
 					}
 					else {
 						theAction.Function.disable(kAllTrigger, theAction)
-						theAction.Function.setText(theAction.Label, "Gray")
+						theAction.Function.setLabel(theAction.Label, "Gray")
 					}
 				}
 				else if (theAction.Action = "InformationRequest") {
 					if inList([kSessionPractice, kSessionRace], sessionState) {
 						theAction.Function.enable(kAllTrigger, theAction)
-						theAction.Function.setText(theAction.Label)
+						theAction.Function.setLabel(theAction.Label)
 					}
 					else {
 						theAction.Function.disable(kAllTrigger, theAction)
-						theAction.Function.setText(theAction.Label, "Gray")
+						theAction.Function.setLabel(theAction.Label, "Gray")
 					}
 				}
 	}
@@ -106,11 +106,11 @@ class PitstopMode extends AssistantMode {
 			if isInstance(theAction, PitstopAction)
 				if ((sessionState != kSessionFinished) && (sessionState != kSessionPaused)) {
 					theAction.Function.enable(kAllTrigger, theAction)
-					theAction.Function.setText(theAction.Label)
+					theAction.Function.setLabel(theAction.Label)
 				}
 				else {
 					theAction.Function.disable(kAllTrigger, theAction)
-					theAction.Function.setText(theAction.Label, "Gray")
+					theAction.Function.setLabel(theAction.Label, "Gray")
 				}
 	}	
 }
@@ -138,7 +138,7 @@ class PitstopAction extends ControllerAction {
 		}
 	}
 	
-	__New(plugin, function, label, option, steps := 1, moreArguments*) {
+	__New(plugin, function, label, icon, option, steps := 1, moreArguments*) {
 		this.iPlugin := plugin
 		this.iOption := option
 		this.iSteps := steps
@@ -146,7 +146,7 @@ class PitstopAction extends ControllerAction {
 		if (moreArguments.Length() > 0)
 			Throw "Unsupported arguments (" . values2String(", ", moreArguments*) . ") detected in PitstopAction.__New"
 		
-		base.__New(function, label)
+		base.__New(function, label, icon)
 	}
 	
 	fireAction(function, trigger) {
@@ -165,10 +165,10 @@ class PitstopChangeAction extends PitstopAction {
 		}
 	}
 	
-	__New(plugin, function, label, option, direction, moreArguments*) {
+	__New(plugin, function, label, icon, option, direction, moreArguments*) {
 		this.iDirection := direction
 		
-		base.__New(plugin, function, label, option, moreArguments*)
+		base.__New(plugin, function, label, icon, option, moreArguments*)
 	}
 	
 	fireAction(function, trigger) {
@@ -181,15 +181,15 @@ class PitstopChangeAction extends PitstopAction {
 }
 
 class PitstopSelectAction extends PitstopChangeAction {
-	__New(plugin, function, label, option, moreArguments*) {
-		base.__New(plugin, function, label, option, "Increase", moreArguments*)
+	__New(plugin, function, label, icon, option, moreArguments*) {
+		base.__New(plugin, function, label, icon, option, "Increase", moreArguments*)
 	}
 }
 
 class PitstopToggleAction extends PitstopAction {
 	fireAction(function, trigger) {
 		if base.fireAction(function, trigger) {
-			if ((trigger == "On") || (trigger == "Increase") || (trigger == "Push") || (trigger == "Call"))
+			if ((trigger == "On") || (trigger = kIncrease) || (trigger == "Push") || (trigger == "Call"))
 				this.Plugin.changePitstopOption(this.Option, "Increase", this.Steps)
 			else
 				this.Plugin.changePitstopOption(this.Option, "Decrease", this.Steps)
@@ -283,27 +283,37 @@ class SimulatorPlugin extends ControllerPlugin {
 				if (function != false) {
 					label := this.getLabel(ConfigurationItem.descriptor(action, "Toggle"), kUndefined)
 					
-					if (label == kUndefined)
+					if (label == kUndefined) {
 						label := this.getLabel(ConfigurationItem.descriptor(action, "Dial"), action)
+						icon := this.getIcon(ConfigurationItem.descriptor(action, "Dial"))
+					}
+					else
+						icon := this.getIcon(ConfigurationItem.descriptor(action, "Toggle"))
 					
 					if (inList(selectActions, action))
-						mode.registerAction(new PitstopSelectAction(this, function, label, actions[action], moreArguments*))
+						mode.registerAction(new PitstopSelectAction(this, function, label, icon, actions[action], moreArguments*))
 					else
-						mode.registerAction(new PitstopToggleAction(this, function, label, actions[action], moreArguments*))
+						mode.registerAction(new PitstopToggleAction(this, function, label, icon, actions[action], moreArguments*))
 				}
 				else
 					this.logFunctionNotFound(increaseFunction)
 			}
 			else {
-				if (function != false)
-					mode.registerAction(new PitstopChangeAction(this, function, this.getLabel(ConfigurationItem.descriptor(action, "Increase"), action), actions[action], "Increase", moreArguments*))
+				if (function != false) {
+					descriptor := ConfigurationItem.descriptor(action, "Increase")
+					
+					mode.registerAction(new PitstopChangeAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor), actions[action], "Increase", moreArguments*))
+				}
 				else
 					this.logFunctionNotFound(increaseFunction)
 					
 				function := controller.findFunction(decreaseFunction)
 				
-				if (function != false)
-					mode.registerAction(new PitstopChangeAction(this, function, this.getLabel(ConfigurationItem.descriptor(action, "Decrease"), action), actions[action], "Decrease", moreArguments*))
+				if (function != false) {
+					descriptor := ConfigurationItem.descriptor(action, "Decrease")
+					
+					mode.registerAction(new PitstopChangeAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor), actions[action], "Decrease", moreArguments*))
+				}
 				else
 					this.logFunctionNotFound(decreaseFunction)
 			}
@@ -440,12 +450,12 @@ class RaceAssistantAction extends ControllerAction {
 		}
 	}
 	
-	__New(pluginOrMode, function, label, action, arguments*) {
+	__New(pluginOrMode, function, label, icon, action, arguments*) {
 		this.iPlugin := (isInstance(pluginOrMode, ControllerMode) ? pluginOrMode.Plugin : pluginOrMode)
 		this.iAction := action
 		this.iArguments := arguments
 		
-		base.__New(function, label)
+		base.__New(function, label, icon)
 	}
 	
 	fireAction(function, trigger) {
@@ -519,12 +529,16 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		
 		if (function != false) {
 			if (action = "InformationRequest") {
+				descriptor := ConfigurationItem.descriptor(action, "Activate")
 				action := values2String("", arguments*)
 				
-				mode.registerAction(new RaceAssistantAction(this, function, this.getLabel(ConfigurationItem.descriptor(action, "Activate"), action), "InformationRequest", arguments*))
+				mode.registerAction(new RaceAssistantAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor), "InformationRequest", arguments*))
 			}
-			else if inList(kAssistantRaceActions, action)
-				mode.registerAction(new RaceAssistantAction(this, function, this.getLabel(ConfigurationItem.descriptor(action, "Activate"), action), action))
+			else if inList(kAssistantRaceActions, action) {
+				descriptor := ConfigurationItem.descriptor(action, "Activate")
+				
+				mode.registerAction(new RaceAssistantAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor), action))
+			}
 			else
 				logMessage(kLogWarn, translate("Action """) . action . translate(""" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
 		}

@@ -53,23 +53,13 @@ global kAllTrigger = "__All Trigger__"
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class ButtonBox extends ConfigurationItem {
-	static iButtonBoxGuis := {}
-	
+class FunctionController extends ConfigurationItem {
 	iController := false
 	
 	iNum1WayToggles := 0
 	iNum2WayToggles := 0
 	iNumButtons := 0
 	iNumDials := 0
-	
-	iWindow := false
-	iWindowWidth := 0
-	iWindowHeight := 0
-	iControlHandles := {}
-	
-	iIsVisible := false
-	iIsPositioned := false
 	
 	Controller[] {
 		Get {
@@ -80,6 +70,12 @@ class ButtonBox extends ConfigurationItem {
 	Descriptor[] {
 		Get {
 			return this.base.__Class
+		}
+	}
+	
+	Type[] {
+		Get {
+			return this.Descriptor
 		}
 	}
 	
@@ -106,6 +102,56 @@ class ButtonBox extends ConfigurationItem {
 			return this.iNumDials
 		}
 	}
+
+	__New(controller, configuration := false) {
+		this.iController := controller
+		
+		base.__New(configuration)
+		
+		controller.registerFunctionController(this)
+	}
+	
+	setControls(num1WayToggles, num2WayToggles, numButtons, numDials) {
+		this.iNum1WayToggles := num1WayToggles
+		this.iNum2WayToggles := num2WayToggles
+		this.iNumButtons := numButtons
+		this.iNumDials := numDials
+	}
+	
+	hasFunction(function) {
+		Throw "Virtual method FunctionController.hasFunction must be implemented in a subclass..."
+	}
+	
+	setControlLabel(function, text, color := "Black", overlay := false) {
+	}
+	
+	setControlIcon(function, icon) {
+	}
+	
+	connectAction(plugin, function, action) {
+	}
+	
+	disconnectAction(plugin, function, action) {
+	}
+	
+	enable(function, action := false) {
+	}
+	
+	disable(function, action := false) {
+	}
+}
+
+class GuiFunctionController extends FunctionController {
+	static iGuiFunctionController := {}
+	
+	iWindow := false
+	iWindowWidth := 0
+	iWindowHeight := 0
+	
+	iControlHandles := {}
+	
+	iIsVisible := false
+	iIsPositioned := false
 	
 	Visible[] {
 		Get {
@@ -120,8 +166,10 @@ class ButtonBox extends ConfigurationItem {
 			if (controller != false) {
 				inSimulation := (controller.ActiveSimulator != false)
 	
-				return getConfigurationValue(this.Controller.Settings, "Button Box"
-										   , inSimulation ? "Button Box Simulation Duration" : "Button Box Duration"
+				type := this.Type 
+				
+				return getConfigurationValue(this.Controller.Settings, type
+										   , type . (inSimulation ? " Simulation Duration" : " Duration")
 										   , inSimulation ? false : false)
 			}
 			else
@@ -130,17 +178,13 @@ class ButtonBox extends ConfigurationItem {
 	}
 
 	__New(controller, configuration := false) {
-		this.iController := controller
-		
-		base.__New(configuration)
+		base.__New(controller, configuration)
 		
 		this.createGui()
-		
-		controller.registerButtonBox(this)
 	}
 	
 	createGui() {
-		Throw "Virtual method ButtonBox.createGui must be implemented in a subclass..."
+		Throw "Virtual method GuiFunctionController.createGui must be implemented in a subclass..."
 	}
 	
 	associateGui(window, width, height, num1WayToggles, num2WayToggles, numButtons, numDials) {
@@ -148,21 +192,30 @@ class ButtonBox extends ConfigurationItem {
 		this.iWindowWidth := width
 		this.iWindowHeight := height
 		
-		this.iNum1WayToggles := num1WayToggles
-		this.iNum2WayToggles := num2WayToggles
-		this.iNumButtons := numButtons
-		this.iNumDials := numDials
+		this.setControls(num1WayToggles, num2WayToggles, numButtons, numDials)
 		
-		this.iButtonBoxGuis[window] := this
+		this.iGuiFunctionController[window] := this
 		
 		logMessage(kLogInfo, translate("Controller layout initialized:") . " #" . num1WayToggles . A_Space . translate("1-Way Toggles") . ", #" . num2WayToggles . A_Space . translate("2-Way Toggles") . ", #" . numButtons . A_Space . translate("Buttons") . ", #" . numDials . A_Space . translate("Dials"))
 	}
 	
-	findButtonBox(window) {
-		if this.iButtonBoxGuis.HasKey(window)
-			return this.iButtonBoxGuis[window]
+	findFunctionController(window) {
+		if this.iGuiFunctionController.HasKey(window)
+			return this.iGuiFunctionController[window]
 		else
 			return false
+	}
+	
+	hasFunction(function) {
+		return (this.getControlHandle(function.Descriptor) != false)
+	}
+	
+	connectAction(plugin, function, action) {
+		this.setControlLabel(function, plugin.actionLabel(action))
+	}
+	
+	disconnectAction(plugin, function, action) {
+		this.setControlLabel(function, "")
 	}
 	
 	registerControlHandle(descriptor, handle) {
@@ -176,7 +229,7 @@ class ButtonBox extends ConfigurationItem {
 			return false
 	}
 	
-	setControlText(function, text, color := "Black") {
+	setControlLabel(function, text, color := "Black", overlay := false) {
 		window := this.iWindow
 		
 		if (window != false) {
@@ -202,30 +255,34 @@ class ButtonBox extends ConfigurationItem {
 	distanceFromTop() {
 		distance := 0
 		
-		for ignore, btnBox in this.Controller.ButtonBoxes
-			if (btnBox == this)
+		for ignore, fnController in this.Controller.FunctionController[GuiFunctionController]
+			if (fnController == this)
 				return distance
 			else
-				distance += btnBox.iWindowHeight
+				distance += fnController.iWindowHeight
 		
-		Throw "Internal error detected in ButtonBox.distanceFromTop..."
+		Throw "Internal error detected in GuiFunctionController.distanceFromTop..."
 	}
 	
 	distanceFromBottom() {
 		distance := 0
-		buttonBoxes := this.Controller.ButtonBoxes
-		index := buttonBoxes.Length()
+		controller := []
+		
+		for ignore, fnController in this.Controller.FunctionController[GuiFunctionController]
+			controller.Push(fnController)
+		
+		index := controller.Length()
 		
 		Loop {
-			btnBox := buttonBoxes[index]
+			fnController := controller[index]
 		
-			distance += btnBox.iWindowHeight
+			distance += fnController.iWindowHeight
 		
-			if (btnBox == this)
+			if (fnController == this)
 				return distance
 		} until (--index = 0)
 		
-		Throw "Internal error detected in ButtonBox.distanceFromBottom..."
+		Throw "Internal error detected in GuiFunctionController.distanceFromBottom..."
 	}
 	
 	show(makeVisible := true) {
@@ -241,7 +298,7 @@ class ButtonBox extends ConfigurationItem {
 			if ((A_TickCount - this.Controller.LastEvent) > duration)
 				return
 			else
-				SetTimer hideButtonBoxes, %duration%
+				SetTimer hideFunctionController, %duration%
 		
 			protectionOn()
 
@@ -256,7 +313,9 @@ class ButtonBox extends ConfigurationItem {
 					if this.iIsPositioned
 						Gui %window%:Show, NoActivate
 					else {
-						position := getConfigurationValue(this.Controller.Settings, "Button Box", "Button Box Position", "Bottom Right")
+						type := this.Type
+					
+						position := getConfigurationValue(this.Controller.Settings, type, type . " Position", "Bottom Right")
 						
 						SysGet mainScreen, MonitorWorkArea
 
@@ -286,10 +345,10 @@ class ButtonBox extends ConfigurationItem {
 									Goto defaultCase
 							case "Last Position":
 	defaultCase:
-								x := getConfigurationValue(this.Controller.Settings, "Button Box", this.Descriptor . ".Position.X", mainScreenRight - width)
-								y := getConfigurationValue(this.Controller.Settings, "Button Box", this.Descriptor . ".Position.Y", mainScreenBottom - height)
+								x := getConfigurationValue(this.Controller.Settings, type, this.Descriptor . ".Position.X", mainScreenRight - width)
+								y := getConfigurationValue(this.Controller.Settings, type, this.Descriptor . ".Position.Y", mainScreenBottom - height)
 							default:
-								Throw "Unhandled position for Button Box (" . position . ") encountered in ButtonBox.show..."
+								Throw "Unhandled position for " . type " (" . position . ") encountered in GuiFunctionController.show..."
 						}
 						
 						Gui %window%:Show, x%x% y%y% w%width% h%height% NoActivate
@@ -348,8 +407,8 @@ class ButtonBox extends ConfigurationItem {
 			
 			settings := this.Controller.Settings
 			
-			setConfigurationValue(settings, "Button Box", this.Descriptor . ".Position.X", newX)
-			setConfigurationValue(settings, "Button Box", this.Descriptor . ".Position.Y", newY)
+			setConfigurationValue(settings, this.Type, this.Descriptor . ".Position.X", newX)
+			setConfigurationValue(settings, this.Type, this.Descriptor . ".Position.Y", newY)
 			
 			writeConfiguration(kSimulatorSettingsFile, settings)
 			
@@ -368,7 +427,7 @@ class SimulatorController extends ConfigurationItem {
 	
 	iPlugins := []
 	iFunctions := {}
-	iButtonBoxes := []
+	iFunctionController := []
 	
 	iModes := []
 	iActiveModes := []
@@ -401,9 +460,19 @@ class SimulatorController extends ConfigurationItem {
 		}
 	}
 	
-	ButtonBoxes[] {
+	FunctionController[class := false] {
 		Get {
-			return this.iButtonBoxes
+			if class {
+				controller := []
+			
+				for ignore, fnController in this.iFunctionController
+					if isInstance(fnController, class)
+						controller.Push(fnController)
+				
+				return controller
+			}
+			else
+				return this.iFunctionController
 		}
 	}
 	
@@ -425,13 +494,13 @@ class SimulatorController extends ConfigurationItem {
 		}
 	}
 	
-	ActiveMode[buttonBox := false] {
+	ActiveMode[controller := false] {
 		Get {
 			activeModes := this.ActiveModes
 			
-			if buttonBox {
+			if controller {
 				for ignore, mode in activeModes
-					if inList(mode.ButtonBoxes, buttonBox)
+					if inList(mode.FunctionController, controller)
 						return mode
 					
 				return false
@@ -504,7 +573,7 @@ class SimulatorController extends ConfigurationItem {
 			case kCustomType:
 				return new ControllerCustomFunction(this, descriptor[2], configuration)
 			default:
-				Throw "Unknown controller function descriptor (" . descriptor[1] . ") detected in SimulatorController.createControllerFunction..."
+				Throw "Unknown controller function type (" . descriptor[1] . ") detected in SimulatorController.createControllerFunction..."
 		}
 	}
 	
@@ -543,25 +612,25 @@ class SimulatorController extends ConfigurationItem {
 		return ((Round(randomLogo) == 1) ? kLogoDark : kLogoBright)
 	}
 	
-	registerButtonBox(buttonBox) {
-		if !inList(this.iButtonBoxes, buttonBox)
-			this.iButtonBoxes.Push(buttonBox)
+	registerFunctionController(controller) {
+		if !inList(this.FunctionController, controller)
+			this.FunctionController.Push(controller)
 	}
 	
-	unregisterButtonBox(buttonBox) {
-		index := inList(this.iButtonBoxes, buttonBox)
+	unregisterFunctionController(controller) {
+		index := inList(this.FunctionController, controller)
 		
 		if index {
-			buttonBox.hide()
+			controller.hide()
 			
-			this.iButtonBoxes.RemoveAt(index)
+			this.FunctionController.RemoveAt(index)
 		}
 	}
 	
-	findButtonBox(function) {
-		for ignore, btnBox in this.ButtonBoxes
-			if btnBox.getControlHandle(function.Descriptor)
-				return btnBox
+	findFunctionController(function) {
+		for ignore, fnController in this.FunctionController
+			if fnController.hasFunction(function)
+				return fnController
 			
 		return false
 	}
@@ -590,24 +659,24 @@ class SimulatorController extends ConfigurationItem {
 		
 		this.setModes()
 		
-		for ignore, btnBox in this.ButtonBoxes
-			if btnBox.VisibleDuration >= 9999
-				btnBox.show()
+		for ignore, fnController in this.FunctionController[GuiFunctionController]
+			if fnController.VisibleDuration >= 9999
+				fnController.show()
 	}
 	
 	computeControllerModes() {
 		local function
 		
 		for ignore, mode in this.Modes {
-			boxes := []
+			controllers := []
 		
 			for ignore, action in mode.Actions {
-				btnBox := this.findButtonBox(action.Function)
+				fnController := this.findFunctionController(action.Function)
 			
-				if (btnBox && !inList(boxes, btnBox)) {
-					boxes.Push(btnBox)
+				if (fnController && !inList(controllers, fnController)) {
+					controllers.Push(fnController)
 			
-					mode.registerButtonBox(btnBox)
+					mode.registerFunctionController(fnController)
 				}
 			}
 		}
@@ -646,9 +715,9 @@ class SimulatorController extends ConfigurationItem {
 			if this.isActive(thePlugin)
 				thePlugin.simulatorStartup(simulator)
 		
-		for ignore, btnBox in this.ButtonBoxes {
-			buttonBox.hide()
-			buttonBox.show()
+		for ignore, fnController in this.FunctionController[GuiFunctionController] {
+			fnController.hide()
+			fnController.show()
 		}
 	}
 	
@@ -657,9 +726,9 @@ class SimulatorController extends ConfigurationItem {
 			if this.isActive(thePlugin) 
 				thePlugin.simulatorShutdown(simulator)
 		
-		for ignore, btnBox in this.ButtonBoxes {
-			buttonBox.hide()
-			buttonBox.show()
+		for ignore, fnController in this.FunctionController[GuiFunctionController] {
+			fnController.hide()
+			fnController.show()
 		}
 	}
 	
@@ -761,21 +830,29 @@ class SimulatorController extends ConfigurationItem {
 		this.getVoiceCommandDescriptor(command)[2] := false
 	}
 	
-	connectAction(function, action) {
+	connectAction(plugin, function, action) {
 		logMessage(kLogInfo, translate("Connecting ") . function.Descriptor . translate(" to action ") . translate(getLabelForLogMessage(action)))
 		
-		function.connectAction(action)
+		function.connectAction(plugin, action)
+		
+		action.connectFunction(plugin, function)
 		
 		if !this.iFunctionActions.HasKey(function)
 			this.iFunctionActions[function] := Array()
 		
 		this.iFunctionActions[function].Push(action)
+		
+		for ignore, fnController in this.FunctionController
+			if fnController.hasFunction(function)
+				fnController.connectAction(plugin, function, action)
 	}
 	
-	disconnectAction(function, action) {
+	disconnectAction(plugin, function, action) {
 		logMessage(kLogInfo, translate("Disconnecting ") . function.Descriptor . translate(" from action ") . translate(getLabelForLogMessage(action)))
 		
-		function.disconnectAction(action)
+		function.disconnectAction(plugin, action)
+		
+		action.disconnectFunction(plugin, function)
 		
 		index := inList(this.iFunctionActions[function], action)
 		
@@ -784,6 +861,10 @@ class SimulatorController extends ConfigurationItem {
 		
 			index := inList(this.iFunctionActions[function], action)
 		}
+		
+		for ignore, fnController in this.FunctionController
+			if fnController.hasFunction(function)
+				fnController.disconnectAction(plugin, function, action)
 	}
 	
 	updateLastEvent() {
@@ -813,13 +894,13 @@ class SimulatorController extends ConfigurationItem {
 		modeSwitched := !inList(this.ActiveModes, newMode)
 	
 		if modeSwitched {
-			buttonBoxes := (newMode ? newMode.ButtonBoxes : [])
+			controllers := (newMode ? newMode.FunctionController : [])
 			
 			deactivatedModes := []
 			
 			for ignore, mode in this.ActiveModes
-				for ignore, candidate in mode.ButtonBoxes
-					if (inList(buttonBoxes, candidate) && !inList(deactivatedModes, mode))
+				for ignore, controller in mode.FunctionController
+					if (inList(controllers, controller) && !inList(deactivatedModes, mode))
 						deactivatedModes.Push(mode)
 			
 			for ignore, mode in deactivatedModes
@@ -833,16 +914,16 @@ class SimulatorController extends ConfigurationItem {
 		}
 	}
 	
-	rotateMode(delta := 1, buttonBoxes := false) {
+	rotateMode(delta := 1, controller := false) {
 		startMode := false
 		modes := this.Modes
 		position := false
 		
-		if buttonBoxes
+		if controller
 			for ignore, mode in this.ActiveModes {
-				for ignore, btnBox in buttonBoxes {
-					for ignore, candidate in mode.ButtonBoxes
-						if (btnBox == candidate) {
+				for ignore, fnController in controller {
+					for ignore, modeController in mode.FunctionController
+						if (fnController == modeController) {
 							position := inList(modes, mode)
 							
 							if position
@@ -883,11 +964,11 @@ class SimulatorController extends ConfigurationItem {
 			if !this.isActive(targetMode) {
 				index += delta
 				targetMode := false
-			} else if buttonBoxes {
+			} else if controller {
 				found := false
 			
-				for ignore, candidate in targetMode.ButtonBoxes
-					if inList(buttonBoxes, candidate) {
+				for ignore, modeController in targetMode.FunctionController
+					if inList(controller, modeController) {
 						found := true
 						
 						break
@@ -983,6 +1064,8 @@ class SimulatorController extends ConfigurationItem {
 	}
 	
 	writeControllerConfiguration() {
+		local controller
+		
 		configuration := newConfiguration()
 		
 		for ignore, thePlugin in this.Plugins {
@@ -1009,9 +1092,10 @@ class SimulatorController extends ConfigurationItem {
 			setConfigurationValue(configuration, "Plugins", thePlugin.Plugin, values2String("|", (this.isActive(thePlugin) ? kTrue : kFalse), values2String(",", simulators*), values2String(",", modes*)))
 		}
 		
-		for ignore, btnBox in this.ButtonBoxes
-			setConfigurationValue(configuration, "Button Boxes", btnBox.Descriptor, values2String(",", btnBox.Num1WayToggles, btnBox.Num2WayToggles, btnBox.NumButtons, btnBox.NumDials))
-		
+		for ignore, fnController in this.FunctionController
+			setConfigurationValue(configuration, fnController.Type, fnController.Descriptor, values2String(",", fnController.Num1WayToggles, fnController.Num2WayToggles
+																											  , fnController.NumButtons, fnController.NumDials))
+
 		writeConfiguration(kUserConfigDirectory . "Simulator Controller.config", configuration)
 	}
 }
@@ -1021,7 +1105,7 @@ class ControllerFunction {
 	iFunction := false
 		
 	iEnabledActions := {}
-	
+
 	Controller[] {
 		Get {
 			return this.iController
@@ -1084,13 +1168,29 @@ class ControllerFunction {
 		this.iFunction := function
 	}
 	
-	setText(text, color := "Black") {
-		for ignore, btnBox in this.Controller.ButtonBoxes
-			btnBox.setControlText(this, text, color)
+	setLabel(text, color := "Black", overlay := false) {
+		local controller
+		
+		for ignore, fnController in this.Controller.FunctionController
+			if fnController.hasFunction(this)
+				fnController.setControlLabel(this, text, color, overlay)
+	}
+	
+	setIcon(icon) {
+		local controller
+
+		for ignore, fnController in this.Controller.FunctionController
+			if fnController.hasFunction(this)
+				fnController.setControlIcon(this, icon)
 	}
 	
 	enable(trigger := "__All Trigger__", action := false) {
+		local controller
+		
 		this.iEnabledActions[action] := true
+		
+		for ignore, fnController in this.Controller.FunctionController
+			fnController.enable(this, action)
 		
 		if (trigger == kAllTrigger)
 			for ignore, trigger in this.Trigger
@@ -1102,6 +1202,9 @@ class ControllerFunction {
 	disable(trigger := "__All Trigger__", action := false) {
 		this.iEnabledActions.Delete(action)
 		
+		for ignore, fnController in this.Controller.FunctionController
+			fnController.disable(this, action)
+		
 		if !this.Enabled
 			if (trigger == kAllTrigger)
 				for ignore, trigger in this.Trigger
@@ -1110,8 +1213,8 @@ class ControllerFunction {
 				setHotkeyEnabled(this, trigger, false)
 	}
 	
-	connectAction(action) {
-		local controller := this.Controller
+	connectAction(plugin, action) {
+		controller := this.Controller
 		
 		this.iEnabledActions[action] := true
 		
@@ -1144,12 +1247,10 @@ class ControllerFunction {
 		}
 	}
 	
-	disconnectAction(action) {
-		local controller := this.Controller
+	disconnectAction(plugin, action) {
+		controller := this.Controller
 		
 		this.iEnabledActions.Delete(action)
-		
-		this.setText("")
 		
 		for ignore, trigger in this.Function.Trigger {
 			for ignore, theHotkey in this.Hotkeys[trigger] {
@@ -1260,12 +1361,14 @@ class ControllerCustomFunction extends ControllerFunction {
 	__New(controller, number, configuration := false) {
 		base.__New(controller, new this.InnerCustomFunction(this, number, configuration))
 			
-		this.connectAction(false)
+		this.connectAction(false, false)
 	}
 }
 
 class ControllerPlugin extends Plugin {
 	static sLabelsDatabase := false
+	static sIconsDatabase := false
+	
 	iController := false
 	iModes := []
 	iActions := []
@@ -1330,6 +1433,10 @@ class ControllerPlugin extends Plugin {
 		return action.Label
 	}
 	
+	actionIcon(action) {
+		return action.Icon
+	}
+	
 	isActive() {
 		return this.Active
 	}
@@ -1340,10 +1447,9 @@ class ControllerPlugin extends Plugin {
 		logMessage(kLogInfo, translate("Activating plugin ") . translate(this.Plugin))
 		
 		for ignore, theAction in this.Actions {
-			controller.connectAction(theAction.Function, theAction)
+			controller.connectAction(this, theAction.Function, theAction)
 			
 			theAction.Function.enable(kAllTrigger, theAction)
-			theAction.Function.setText(this.actionLabel(theAction))
 		}
 	}
 	
@@ -1353,7 +1459,7 @@ class ControllerPlugin extends Plugin {
 		logMessage(kLogInfo, translate("Deactivating plugin ") . translate(this.Plugin))
 		
 		for ignore, theAction in this.Actions
-			controller.disconnectAction(theAction.Function, theAction)
+			controller.disconnectAction(this, theAction.Function, theAction)
 	}
 	
 	runningSimulator() {
@@ -1370,10 +1476,10 @@ class ControllerPlugin extends Plugin {
 		if !this.sLabelsDatabase {
 			languageCode := getLanguage()
 			
-			this.sLabelsDatabase := readConfiguration(getFileName("Controller Plugin Labels." . languageCode, kUserTranslationsDirectory, kTranslationsDirectory))
+			this.sLabelsDatabase := readConfiguration(getFileName("Controller Action Labels." . languageCode, kUserTranslationsDirectory, kTranslationsDirectory))
 			
 			if (this.sLabelsDatabase.Count() = 0)
-				this.sLabelsDatabase := readConfiguration(getFileName("Controller Plugin Labels.en", kUserTranslationsDirectory, kTranslationsDirectory))
+				this.sLabelsDatabase := readConfiguration(getFileName("Controller Action Labels.en", kUserTranslationsDirectory, kTranslationsDirectory))
 		}
 		
 		label := getConfigurationValue(this.sLabelsDatabase, this.Plugin, descriptor, false)
@@ -1382,6 +1488,24 @@ class ControllerPlugin extends Plugin {
 			label := default
 			
 		return label
+	}
+	
+	getIcon(descriptor, default := false) {
+		if !this.sIconsDatabase {
+			languageCode := getLanguage()
+			
+			this.sIconsDatabase := readConfiguration(getFileName("Controller Action Icons." . languageCode, kUserTranslationsDirectory, kTranslationsDirectory))
+			
+			if (this.sIconsDatabase.Count() = 0)
+				this.sIconsDatabase := readConfiguration(getFileName("Controller Action Icons.en", kUserTranslationsDirectory, kTranslationsDirectory))
+		}
+		
+		icon := getConfigurationValue(this.sIconsDatabase, this.Plugin, descriptor, false)
+		
+		if (!icon || (icon == ""))
+			icon := default
+			
+		return icon
 	}
 	
 	logFunctionNotFound(functionDescriptor) {
@@ -1393,7 +1517,7 @@ class ControllerMode {
 	iPlugin := false
 	iActions := []
 	
-	iButtonBoxes := []
+	iFunctionController := []
 	
 	Mode[] {
 		Get {
@@ -1419,9 +1543,9 @@ class ControllerMode {
 		}
 	}
 	
-	ButtonBoxes[] {
+	FunctionController[] {
 		Get {
-			return this.iButtonBoxes
+			return this.iFunctionController
 		}
 	}
 	
@@ -1436,9 +1560,9 @@ class ControllerMode {
 			this.Actions.Push(action)
 	}
 	
-	registerButtonBox(btnBox) {
-		if !inList(this.ButtonBoxes, btnBox)
-			this.ButtonBoxes.Push(btnBox)
+	registerFunctionController(controller) {
+		if !inList(this.FunctionController, controller)
+			this.FunctionController.Push(controller)
 	}
 	
 	findAction(label) {
@@ -1447,6 +1571,14 @@ class ControllerMode {
 				return candidate
 			
 		return false
+	}
+	
+	actionLabel(action) {
+		return this.Plugin.actionLabel(action)
+	}
+	
+	actionIcon(action) {
+		return this.Plugin.actionIcon(action)
 	}
 	
 	isActive() {
@@ -1472,30 +1604,34 @@ class ControllerMode {
 		logMessage(kLogInfo, translate("Activating mode ") . translate(getModeForLogMessage(this)))
 		
 		for ignore, theAction in this.Actions {
-			controller.connectAction(theAction.Function, theAction)
+			controller.connectAction(plugin, theAction.Function, theAction)
 			
 			theAction.Function.enable(kAllTrigger, theAction)
-			theAction.Function.setText(plugin.actionLabel(theAction))
 		}
 		
 		controller.registerActiveMode(this)
 	}
 	
 	deactivate() {
+		local plugin := this.Plugin
 		controller := this.Controller
 		
 		controller.unregisterActiveMode(this)
 		
 		logMessage(kLogInfo, translate("Deactivating mode ") . translate(getModeForLogMessage(this)))
 		
-		for ignore, theAction in this.Actions
-			controller.disconnectAction(theAction.Function, theAction)
+		for ignore, theAction in this.Actions {
+			theAction.Function.disable(kAllTrigger, theAction)
+		
+			controller.disconnectAction(plugin, theAction.Function, theAction)
+		}
 	}
 }
 
 class ControllerAction {
 	iFunction := false
 	iLabel := ""
+	iIcon := false
 	
 	Function[] {
 		Get {
@@ -1515,13 +1651,26 @@ class ControllerAction {
 		}
 	}
 	
-	__New(function, label := "") {
+	Icon[] {
+		Get {
+			return this.iIcon
+		}
+	}
+	
+	__New(function, label := "", icon := false) {
 		this.iFunction := function
 		this.iLabel := label
+		this.iIcon := icon
 	}
 	
 	fireAction(function, trigger) {
 		Throw "Virtual method ControllerAction.fireAction must be implemented in a subclass..."
+	}
+	
+	connectFunction(plugin, function) {
+	}
+	
+	disconnectFunction(pluginOrMode, function) {
 	}
 }
 
@@ -1530,9 +1679,9 @@ class ControllerAction {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-hideButtonBoxes() {
-	for ignore, btnBox in SimulatorController.Instance.ButtonBoxes
-		btnBox.hide()
+hideFunctionController() {
+	for ignore, fnController in SimulatorController.Instance.FunctionController[GuiFunctionController]
+		fnController.hide()
 }
 
 setHotkeyEnabled(function, trigger, enabled) {
@@ -1628,8 +1777,8 @@ updateSimulatorState() {
 		}
 
 		if changed
-			for ignore, btnBox in controller.ButtonBoxes
-				btnBox.updateVisibility()
+			for ignore, fnController in controller.FunctionController[GuiFunctionController]
+				fnController.updateVisibility()
 		
 		if isSimulatorRunning {
 			SetTimer updateSimulatorState, -5000
@@ -1641,8 +1790,8 @@ updateSimulatorState() {
 
 			show := true
 			
-			for ignore, btnBox in controller.ButtonBoxes
-				show := (show && !btnBox.Visible)
+			for ignore, fnController in controller.FunctionController[GuiFunctionController]
+				show := (show && !fnController.Visible)
 			
 			if show
 				controller.showLogo()
@@ -1670,6 +1819,32 @@ updateTrayMessageState(settings := false) {
 	else
 		disableTrayMessages()
 }
+
+externalCommandManager() {
+	if FileExist(kTempDirectory . "Function.cmd") {
+		FileReadLine command, % kTempDirectory . "Function.cmd", 1
+		
+		FileDelete % kTempDirectory . "Function.cmd"
+		
+		command := string2Values(A_Space, command)
+		
+		descriptor := ConfigurationItem.splitDescriptor(command[1])
+		
+		switch descriptor[1] {
+			case k1WayToggleType, k2WayToggleType:
+				switchToggle(descriptor[1], descriptor[2], (command.Length() > 1) ? command[2] : "On")
+			case kButtonType:
+				pushButton(descriptor[2])
+			case kDialType:
+				rotateDial(descriptor[2], command[2])
+			default:
+				Throw "Unknown controller function type (" . function[1] . ") detected in externalCommand..."
+		}
+	}
+	
+	SetTimer externalCommandManager, -50
+}
+
 
 initializeSimulatorController() {
 	icon := kIconsDirectory . "Gear.ico"
@@ -1723,6 +1898,8 @@ startupSimulatorController() {
 	if ((A_Args.Length() > 0) &&  (A_Args[1] = "-NoStartup"))
 		ExitApp 0
 	
+	SetTimer externalCommandManager, -5000
+	
 	controller.startup()
 }
 
@@ -1746,9 +1923,9 @@ pushButton(buttonNumber) {
 rotateDial(dialNumber, direction) {
 	local function
 	
-	if (direction = "increase")
+	if ((direction = kIncrease) || (direction = "plus") || (direction = "+"))
 		direction := "Increase"
-	else if (direction = "decrease")
+	else if ((direction = kDecrease) || (direction = "minus") || (direction = "-"))
 		direction := "Decrease"
 	else {
 		logMessage(kLogWarn, translate("Unsupported argument (") . direction . translate(") detected in rotateDial - please check the configuration"))

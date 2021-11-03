@@ -74,9 +74,9 @@ class SystemPlugin extends ControllerPlugin {
 					
 				if (inList(controller.ActiveModes, controller.findMode(kSystemPlugin, kLaunchMode))) {
 					if transition
-						this.LaunchpadFunction.setText(this.LaunchpadAction.Label, "Gray")
+						this.LaunchpadFunction.setLabel(this.LaunchpadAction.Label, "Gray")
 					else
-						this.LaunchpadFunction.setText(this.LaunchpadAction.Label, isRunning ? "Green" : "Black")
+						this.LaunchpadFunction.setLabel(this.LaunchpadAction.Label, isRunning ? "Green" : "Black")
 				}
 			}	
 		}
@@ -100,7 +100,7 @@ class SystemPlugin extends ControllerPlugin {
 			Get {
 				controller := this.Controller
 				
-				mode := controller.ActiveMode[controller.findButtonBox(this.Function)]
+				mode := controller.ActiveMode[controller.findFunctionController(this.Function)]
 				
 				if mode
 					return mode.Mode
@@ -112,9 +112,9 @@ class SystemPlugin extends ControllerPlugin {
 		fireAction(function, trigger) {
 			controller := this.Controller
 			
-			controller.rotateMode(((trigger == "Off") || (trigger == "Decrease")) ? -1 : 1, Array(controller.findButtonBox(function)))
+			controller.rotateMode(((trigger == "Off") || (trigger = kDecrease)) ? -1 : 1, Array(controller.findFunctionController(function)))
 
-			this.Function.setText(controller.findPlugin(kSystemPlugin).actionLabel(this))
+			this.Function.setLabel(controller.findPlugin(kSystemPlugin).actionLabel(this))
 		}
 	}
 
@@ -145,7 +145,7 @@ class SystemPlugin extends ControllerPlugin {
 				if (inList(function.Controller.ActiveModes, function.Controller.findMode(kSystemPlugin, kLaunchMode))) {
 					this.beginTransition()
 				
-					function.setText(this.Label, "Gray")
+					function.setLabel(this.Label, "Gray")
 				}
 				
 				if !this.Application.isRunning()
@@ -546,7 +546,7 @@ updateModeSelector() {
 			function := selector.Function
 			
 			if modeSelectorMode {
-				currentMode := controller.ActiveMode[controller.findButtonBox(function)]
+				currentMode := controller.ActiveMode[controller.findFunctionController(function)]
 				
 				if currentMode
 					currentMode := currentMode.Mode
@@ -557,9 +557,9 @@ updateModeSelector() {
 				currentMode := translate("Mode Selector")
 			
 			if modeSelectorMode
-				function.setText(translate(currentMode))
+				function.setLabel(translate(currentMode))
 			else
-				function.setText(currentMode, "Gray")
+				function.setLabel(currentMode, "Gray")
 		}
 		
 		nextUpdate := (modeSelectorMode ? -2000 : -1000)

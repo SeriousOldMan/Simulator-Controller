@@ -315,7 +315,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 		
 		Gui ListView, % this.ActionsListView
 		
-		pluginLabels := readConfiguration(getFileName("Controller Plugin Labels." . getLanguage(), kUserTranslationsDirectory, kTranslationsDirectory))
+		pluginLabels := readConfiguration(getFileName("Controller Action Labels." . getLanguage(), kUserTranslationsDirectory, kTranslationsDirectory))
 		
 		LV_Delete()
 		
@@ -383,7 +383,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 					else
 						function := ""
 					
-					LV_Add("", (first ? translate(mode ? mode : "Independent") : ""), action, label, function)
+					LV_Add("", (first ? translate(mode ? mode : "Independent") : ""), action, , StrReplace(label, "`n" , A_Space), function)
 					
 					count += 1
 				}

@@ -229,9 +229,12 @@ namespace ACCUDPProvider {
         }
 
 		public void ReadStandings(string ip, int port, string displayName, string connectionPassword, string commandPassword) {
-            Debug.Listeners.Add(new TextWriterTraceListener(System.Console.Out));
+            TextWriterTraceListener listener = new TextWriterTraceListener(this.outFileName + ".Trace");
+            Debug.Listeners.Add(listener);
 
-			ACCUdpRemoteClient client = new ACCUdpRemoteClient(ip, port, displayName, connectionPassword, commandPassword, 100);
+            Debug.WriteLine("Starting UDP Client...");
+
+            ACCUdpRemoteClient client = new ACCUdpRemoteClient(ip, port, displayName, connectionPassword, commandPassword, 100);
 
             client.MessageHandler.OnRealtimeUpdate += OnRealtimeUpdate;
             client.MessageHandler.OnTrackDataUpdate += OnTrackDataUpdate;
@@ -256,7 +259,10 @@ namespace ACCUDPProvider {
 
             bool done = false;
 
-            while (!done)
+            while (!done) {
+                Debug.Flush();
+                listener.Flush();
+
                 if (File.Exists(cmdFileName)) {
                     StreamReader cmdStream = new StreamReader(cmdFileName);
 
@@ -282,7 +288,7 @@ namespace ACCUDPProvider {
                             LapData lastLap = car.LastLap;
 
                             outStream.Write("Car."); outStream.Write(index); outStream.Write(".Time=");
-							outStream.WriteLine(lastLap != null ? (lastLap.LaptimeMS != null ? lastLap.LaptimeMS : 0) : 0);
+                            outStream.WriteLine(lastLap != null ? (lastLap.LaptimeMS != null ? lastLap.LaptimeMS : 0) : 0);
 
                             outStream.Write("Car."); outStream.Write(index); outStream.Write(".Car="); outStream.WriteLine(car.CarModelEnum);
 
@@ -291,7 +297,7 @@ namespace ACCUDPProvider {
                             if (currentDriver != null) {
                                 outStream.Write("Car."); outStream.Write(index); outStream.Write(".Driver.Forname="); outStream.WriteLine(currentDriver.FirstName);
                                 outStream.Write("Car."); outStream.Write(index); outStream.Write(".Driver.Surname="); outStream.WriteLine(currentDriver.LastName);
-                                outStream.Write("Car."); outStream.Write(index); outStream.Write(".Driver.Nickname=");outStream.WriteLine(currentDriver.ShortName);
+                                outStream.Write("Car."); outStream.Write(index); outStream.Write(".Driver.Nickname="); outStream.WriteLine(currentDriver.ShortName);
                             }
 
                             index += 1;
@@ -306,6 +312,7 @@ namespace ACCUDPProvider {
                 }
                 else
                     Thread.Sleep(1000);
+            }
 
             client.MessageHandler.OnRealtimeUpdate -= OnRealtimeUpdate;
             client.MessageHandler.OnTrackDataUpdate -= OnTrackDataUpdate;

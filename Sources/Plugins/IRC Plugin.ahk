@@ -152,13 +152,13 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 	changePitstopOption(option, action, steps := 1) {
 		switch option {
 			case "Refuel":
-				this.sendPitstopCommand("Pitstop", "Change", "Refuel", (action = "Increase") ? Round(steps) : Round(steps * -1))
+				this.sendPitstopCommand("Pitstop", "Change", "Refuel", (action = kIncrease) ? Round(steps) : Round(steps * -1))
 			case "Change Tyres":
-				this.sendPitstopCommand("Pitstop", "Change", "Tyre Change", (action = "Increase") ? "true" : "false")
+				this.sendPitstopCommand("Pitstop", "Change", "Tyre Change", (action = kIncrease) ? "true" : "false")
 			case "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right":
-				this.sendPitstopCommand("Pitstop", "Change", option, Round(steps * 0.1 * ((action = "Increase") ? 1 : -1), 1))
+				this.sendPitstopCommand("Pitstop", "Change", option, Round(steps * 0.1 * ((action = kIncrease) ? 1 : -1), 1))
 			case "Repair":
-				this.sendPitstopCommand("Pitstop", "Change", "Repair", (action = "Increase") ? "true" : "false")
+				this.sendPitstopCommand("Pitstop", "Change", "Repair", (action = kIncrease) ? "true" : "false")
 		}
 	}
 	

@@ -75,13 +75,14 @@ ftpUpload(server, user, password, localFile, remoteFile) {
 }
 
 createMessageReceiver() {
-	Gui MR:-Border -Caption
+	; Gui MR:-Border -Caption
+	Gui MR:New, , % A_ScriptName
 	Gui MR:Color, D0D0D0, D8D8D8
 	Gui MR:Add, Text, X10 Y10, % translate("Modular Simulator Controller System")
 	Gui MR:Add, Text, , % A_ScriptName
 	
 	Gui MR:Margin, 10, 10
-	Gui MR:Show, Hide AutoSize X0 Y0
+	Gui MR:Show, X0 Y0 Hide AutoSize
 }
 
 consentDialog(id, consent := false) {
@@ -202,7 +203,7 @@ receivePipeMessage() {
 		if (event = "*")
 			continue
 		
-		pipeName := "\\.\pipe\SCE" . event
+		pipeName := "\\.\pipe\SC." . event
 	
 		if DllCall("WaitNamedPipe", "Str", pipeName, "UInt", 0xF)
 			Loop Read, %pipeName%
@@ -231,9 +232,9 @@ sendPipeMessage(event, data) {
 	static ERROR_PIPE_LISTENING := 536
 	static ptr
 	
-	pipeName := "\\.\pipe\SCE" . event
+	pipeName := "\\.\pipe\SC." . event
 
-	pipe := DllCall("CreateNamedPipe", "str", "\\.\pipe\SCE" . event, "uint", 3, "uint", 0, "uint", 255, "uint", 1024, "uint", 1024, "uint", 0, ptr, 0, ptr)
+	pipe := DllCall("CreateNamedPipe", "str", pipeName, "uint", 2, "uint", 0, "uint", 255, "uint", 1024, "uint", 1024, "uint", 0, ptr, 0)
 	
 	DllCall("ConnectNamedPipe", ptr, pipe, ptr, 0)
 	
@@ -262,13 +263,19 @@ receiveWindowMessage(wParam, lParam) {
     ; interpret available info
     ;---------------------------------------------------------------------------
     request := decodeDWORD(dwData)              ; 4-char decoded request
-    length  := (cbData - 1) / (A_IsUnicode + 1) ; length of DATA string (excl ZERO)
-    data    := StrGet(lpData, length)           ; DATA string from pointer
 	
-	if (request != "EVNT")
+	if (request = "EVNT") {
+		length  := (cbData - 1) / (A_IsUnicode + 1) ; length of DATA string (excl ZERO)
+		data    := StrGet(lpData, length)           ; DATA string from pointer
+	}
+	else if (request = "SD") {
+		length  := (cbData - 1)						; length of DATA string (excl ZERO)
+		data    := StrGet(lpData, length, "")       ; DATA string from pointer
+	}
+	else
 		Throw % "Unhandled message received: " . request . " in dispatchEvent..."
 
-    data := StrSplit(data, ":", , 2)
+	data := StrSplit(data, ":", , 2)
 	event := data[1]
 	
 	eventHandler := vEventHandlers[event]
@@ -1772,9 +1779,22 @@ readConfiguration(configFile) {
 		
 		for j, keyValue in keyValues {
 			if (SubStr(keyValue, 1, 2) != "//") {
+				keyValue := StrReplace(keyValue, "\=", "_#_EQ-#_")
+				keyValue := StrReplace(keyValue, "\\", "_#_AC-#_")
+				keyValue := StrReplace(keyValue, "\n", "_#_CR-#_")
+				
 				keyValue := StrSplit(keyValue, "=", "", 2)
 				
+				key := keyValue[1]
 				value := keyValue[2]
+				
+				key := StrReplace(key, "_#_EQ-#_", "=")
+				key := StrReplace(key, "_#_AC-#_", "\\")
+				key := StrReplace(key, "_#_CR-#_", "`n")
+				
+				value := StrReplace(value, "_#_EQ-#_", "=")
+				value := StrReplace(value, "_#_AC-#_", "\\")
+				value := StrReplace(value, "_#_CR-#_", "`n")
 				
 				sectionValues[keyValue[1]] := ((value = kTrue) ? true : ((value = kFalse) ? false : value))
 			}

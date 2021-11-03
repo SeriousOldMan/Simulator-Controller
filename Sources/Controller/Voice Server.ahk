@@ -752,8 +752,8 @@ class VoiceServer extends ConfigurationItem {
 	}
 	
 	recognizeCommand(grammar, words*) {
-		if this.ActiveVoiceClient
-			this.ActiveVoiceClient.recognizeVoiceCommand(grammar, words)
+		for ignore, voiceClient in this.VoiceClients
+			voiceClient.recognizeVoiceCommand(grammar, words)
 	}
 	
 	recognizeActivationCommand(voiceClient, grammar, words) {

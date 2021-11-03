@@ -34,6 +34,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	iLastLapCounter := 0
 	iInPit := false
 	iFinished := false
+		
+	iSessionState := kUndefined
 	
 	class RemoteRaceAssistant {
 		iRemoteEvent := false
@@ -123,12 +125,12 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			}
 		}
 		
-		__New(plugin, function, label, action, arguments*) {
+		__New(plugin, function, label, icon, action, arguments*) {
 			this.iPlugin := plugin
 			this.iAction := action
 			this.iArguments := arguments
 			
-			base.__New(function, label)
+			base.__New(function, label, icon)
 		}
 		
 		fireAction(function, trigger) {
@@ -165,11 +167,11 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			}
 		}
 		
-		__New(plugin, function, label, action) {
+		__New(plugin, function, label, icon, action) {
 			this.iPlugin := plugin
 			this.iAction := action
 			
-			base.__New(function, label)
+			base.__New(function, label, icon)
 		}
 		
 		fireAction(function, trigger) {
@@ -208,14 +210,14 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				
 					trayMessage(plugin.actionLabel(this), translate("State: Off"))
 				
-					function.setText(plugin.actionLabel(this), "Black")
+					function.setLabel(plugin.actionLabel(this), "Black")
 				}
 				else if (!plugin.RaceAssistantEnabled && ((trigger = "On") || (trigger == "Push"))) {
 					plugin.enableRaceAssistant()
 				
 					trayMessage(plugin.actionLabel(this), translate("State: On"))
 				
-					function.setText(plugin.actionLabel(this), "Green")
+					function.setLabel(plugin.actionLabel(this), "Green")
 				}
 		}
 	}
@@ -348,16 +350,26 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		
 		if (function != false) {
 			if (action = "InformationRequest") {
+				descriptor := ConfigurationItem.descriptor(action, "Activate")
 				action := values2String("", arguments*)
 				
-				this.registerAction(new this.RaceAssistantAction(this, function, this.getLabel(ConfigurationItem.descriptor(action, "Activate"), action), "InformationRequest", arguments*))
+				this.registerAction(new this.RaceAssistantAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor), "InformationRequest", arguments*))
 			}
-			else if inList(["Call", "Accept", "Reject"], action)
-				this.registerAction(new this.RaceAssistantAction(this, function, this.getLabel(ConfigurationItem.descriptor(action, "Activate"), action), action))
-			else if (action = "RaceAssistant")
-				this.registerAction(new this.RaceAssistantToggleAction(this, function, this.getLabel(ConfigurationItem.descriptor(action, "Toggle"), action)))
-			else if ((action = "RaceSettingsOpen") || (action = "SetupImport") || (action = "SetupDatabaseOpen") || (action = "StrategyWorkbenchOpen"))
-				this.registerAction(new this.RaceSettingsAction(this, function, this.getLabel(ConfigurationItem.descriptor(action, "Activate")), action))
+			else if inList(["Call", "Accept", "Reject"], action) {
+				descriptor := ConfigurationItem.descriptor(action, "Activate")
+				
+				this.registerAction(new this.RaceAssistantAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor), action))
+			}
+			else if (action = "RaceAssistant") {
+				descriptor := ConfigurationItem.descriptor(action, "Toggle")
+				
+				this.registerAction(new this.RaceAssistantToggleAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor)))
+			}
+			else if ((action = "RaceSettingsOpen") || (action = "SetupImport") || (action = "SetupDatabaseOpen") || (action = "StrategyWorkbenchOpen")) {
+				descriptor := ConfigurationItem.descriptor(action, "Activate")
+				
+				this.registerAction(new this.RaceSettingsAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor), action))
+			}
 			else
 				logMessage(kLogWarn, translate("Action """) . action . translate(""" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
 		}
@@ -374,7 +386,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	updateActions(sessionState) {
 		for ignore, theAction in this.Actions
 			if isInstance(theAction, RaceAssistantPlugin.RaceAssistantToggleAction) {
-				theAction.Function.setText(this.actionLabel(theAction), this.RaceAssistantName ? (this.RaceAssistantEnabled ? "Green" : "Black") : "Gray")
+				theAction.Function.setLabel(this.actionLabel(theAction), this.RaceAssistantName ? (this.RaceAssistantEnabled ? "Green" : "Black") : "Gray")
 				
 				if !this.RaceAssistantName
 					theAction.Function.disable(kAllTrigger, theAction)
@@ -382,27 +394,27 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			else if isInstance(theAction, RaceAssistantPlugin.RaceSettingsAction) {
 				if ((theAction.Action = "RaceSettingsOpen") || (theAction.Action = "SetupDatabaseOpen") || (theAction.Action = "StrategyWorkbenchOpen")) {
 					theAction.Function.enable(kAllTrigger, theAction)
-					theAction.Function.setText(theAction.Label)
+					theAction.Function.setLabel(theAction.Label)
 				}
 				else if (theAction.Action = "SetupImport") {
 					if this.supportsSetupImport() {
 						theAction.Function.enable(kAllTrigger, theAction)
-						theAction.Function.setText(theAction.Label)
+						theAction.Function.setLabel(theAction.Label)
 					}
 					else {
 						theAction.Function.disable(kAllTrigger, theAction)
-						theAction.Function.setText(theAction.Label, "Gray")
+						theAction.Function.setLabel(theAction.Label, "Gray")
 					}
 				}
 			}
 			else if isInstance(theAction, RaceAssistantPlugin.RaceAssistantAction)
 				if (((sessionState == kSessionRace) || (theAction.Action = "InformationRequest")) && (this.RaceAssistant != false)) {
 					theAction.Function.enable(kAllTrigger, theAction)
-					theAction.Function.setText(theAction.Label)
+					theAction.Function.setLabel(theAction.Label)
 				}
 				else {
 					theAction.Function.disable(kAllTrigger, theAction)
-					theAction.Function.setText(theAction.Label, "Gray")
+					theAction.Function.setLabel(theAction.Label, "Gray")
 				}
 	}
 	
@@ -619,8 +631,12 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			this.Simulator.updateSessionState(sessionState)
 		else
 			sessionState := kSessionFinished
-		
-		this.updateActions(sessionState)
+			
+		if (sessionState != this.iSessionState) {
+			this.iSessionState := sessionState
+			
+			this.updateActions(sessionState)
+		}
 	}
 	
 	updateSessionData(data) {

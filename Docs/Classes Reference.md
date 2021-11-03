@@ -311,7 +311,7 @@ This method must also be implemented by the concrete subclass of *ConfigurationI
 All the following classes are part of the Simulator Controller core framework defined in the [Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk) script. In many cases they are based on one of the configuration classes above.
 
 ## [Singleton] SimulatorController extends [ConfigurationItem](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-classesahk) ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
-This class implements the core functionality of Simulator Controller. The single instance manages a set of plugins and the connection between hardware functions of a given controller or Button Box and the actions implemented by these plugins.
+This class implements the core functionality of Simulator Controller. The single instance manages a set of plugins and the connection between hardware functions of a given controller and the actions implemented by these plugins.
 
 ### Public Properties
 
@@ -319,10 +319,10 @@ This class implements the core functionality of Simulator Controller. The single
 This class property returns the single instance of *SimulatorController*.
 
 #### *Settings[]*
-Returns the controller configuration map, not to be confused with the complete simulator configration map. This small configuration defines settings for controller notifications such as tray tips and buttonbox visuals and is maintained by the [settings editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--settings).
+Returns the controller configuration map, not to be confused with the complete simulator configration map. This small configuration defines settings for controller notifications such as tray tips and visual representation for connected controller hardware like Button Boxes and is maintained by the [settings editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--settings).
 	
-#### *ButtonBoxes[]*
-Returns a list all [ButtonBox](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-buttonbox-extends-configurationitem-simulator-controllerahk) instances registered for the controller. These must have been created by a specialized plugin and registered in the controller by calling [registerButtonBox](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#registerbuttonboxbuttonbox--buttonbox). See [this simple example](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/ButtonBox%20Plugin.ahk) for reference.
+#### *FunctionController[class :: Class := false]*
+Returns a list all [FunctionController](*) instances registered for the controller. These must have been created by a specialized plugin and registered in the controller by calling [registerFunctionController](*). See [this simple example](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/ButtonBox%20Plugin.ahk) for an example. If the class parameter has been supplied, only instances of this given class will be returned.
 	
 #### *Functions[]*
 Returns a list of all functions defined in the underlying configuration.
@@ -336,8 +336,8 @@ A list of all modes defined by all plugins. Here also, not all modes might be ac
 #### *ActiveModes[]*
 The currently active modes. These modes define the currently active layer of controller functions and actions on your hardware controllers.
 
-#### *ActiveMode[buttonBox :: ButtonBox}*
-Returns the mode, which is currently active for the given buttonBox argument. If more than one mode are active on this Button Box, only the first of these modes is returned.
+#### *ActiveMode[controller :: FunctionController}*
+Returns the mode, which is currently active for the given controller argument. If more than one mode is active on this controller, only the first of these modes is returned.
 	
 #### *ActiveSimulator[]*
 If a simulation game is currently running, the name of this application is returned by this property.
@@ -357,8 +357,8 @@ Since *SimulatorController* is a singleton class, the single instance might be a
 #### [Factory Method] *createControllerFunction(descriptor :: String, configuration :: ConfigurationMap)*
 Returns an instance of [ControllerFunction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-controllerfunction-simulator-controllerahk) according to the givven descriptor.
 
-#### *findButtonBox(function :: ControllerFunction)*
-Return the *ButtonBox* instance, that defines the given function, or *false*, if the function is not associated with a hardware controller.
+#### *findFunctionController(function :: ControllerFunction)*
+Return the *FunctionController* instance, that defines the given function, or *false*, if the function is not associated with a hardware controller.
 
 #### *findPlugin(name :: String)*
 Searches for a plugin with the given name. Returns *false*, if not found.
@@ -372,11 +372,11 @@ Searches for a controller function with the given descriptor. Returns *false*, i
 #### *getActions(function :: ControllerFunction, trigger :: String)*
 Returns the controller actions for the given function / trigger combination. Only currently active actions, which are bound to a function by their mode or plugin, are considered. Returns *false*, if there is no action currently connected to the function.
 
-#### *registerButtonBox(buttonBox :: ButtonBox)*
-Registers a visual representation for the hardware controller. This method is automatically called by the constructor of [ButtonBox](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-buttonbox-extends-configurationitem-simulator-controllerahk).
+#### *registerFunctionController(controller :: FunctionController)*
+Registers a visual representation for the hardware controller. This method is automatically called by the constructor of [FunctionController](*).
 
-#### *unregisterButtonBox(buttonBox :: ButtonBox)*
-Removes a visual representation for the hardware controller from this controller. This method might be called from your own Button Box plugin to remove all predefined Button Box representations before registering your own ones.
+#### *unregisterFunctionController(controller :: FunctionController)*
+Removes a visual representation for the hardware controller from this controller. This method might be called from your own plugin to remove all predefined controller representations before registering your own ones.
 
 #### *registerPlugin(plugin :: ControllerPlugin)*
 Registers the given plugin for the controller. If the plugin is active, the *activate* method will be invoked, thereby allowing the plugin to register some actions for controller functions.
@@ -403,10 +403,10 @@ This method is called when a simulation has terminated. The info is distributed 
 #### *startSimulator(application :: Application, splashImage :: String := false)*
 Starts the simulator represented by the given application. The [startup](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#startupspecial--boolean--true-wait--boolean--false-options--string--) method of *Application* will be called with *false* for the *special* parameter, so that *startSimulator* can be used by a special startup handler provided by plugins without creating an infinite recursion. If *splashImage* is supplied, the startup process will run verbose, showing a splash screen and a progress bar, and possibly playing a startup song. *splashImage* must either be a partial path for a JPG or GIF file relative to [kSplashMediaDirectory](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#ksplashmediadirectory-kbuttonboximagesdirectory-kiconsdirectory), for example "Simulator Splash Images\ACC Splash.jpg", or a partial path relative to the *Simulator Controller\Splash Media* folder, which is located in the *Documents* folder of the current user, or an absolute path. *startSimulator* returns the process id of the application process.
 
-#### *connectAction(function :: ControllerFunction, action :: ControllerAction)*
+#### *connectAction(plugin :: ControllerPlugin, function :: ControllerFunction, action :: ControllerAction)*
 Connects a given action unambiguously to the given function. All future activation of the function by the controller hardware will trigger the given action. Normally, *connectAction* is called during [activation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#activate) of plugins and modes.
 
-#### *disconnectAction(function :: ControllerFunction, action :: ControllerAction)*
+#### *disconnectAction(plugin :: ControllerPlugin, function :: ControllerFunction, action :: ControllerAction)*
 Disconnects the given action from the given function. Normally, *disconnectAction* is called during [deactivation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#deactivate) of plugins and modes.
 
 #### *fireActions(function :: ControllerFunction, trigger :: String)*
@@ -464,13 +464,16 @@ Enables the given trigger (for example "Push") for this controller function, whi
 #### *disable(trigger :: String := false, action :: ControllerAction := false)*
 Disables the given trigger (for example "Push") for this controller function, which means, that the connected action cannot be triggered anymore by the hardware controller. If *trigger* is not supplied, all triggers will be disabled. If *action* is supplied, the function is disabled only for the given action.
 
-#### *setText(test :: String, color :: String := "Black")*
-If the controller has an associated visual representation of the hardware controller, the visual label of the function might be changed with this method. The given color must be a defined HTML color descriptor.
+#### *setLabel(text :: String, color :: String := "Black")*
+If the controller has an associated visual representation of the hardware controller or if the controller supports graphical feedback on its own, the visual label of the function might be changed with this method. The given color must be a defined HTML color descriptor.
 
-#### *connectAction(action :: ControllerAction)*
+#### *setIcon(path :: String)*
+If the controller has an associated visual representation of the hardware controller or if the controller supports graphical feedback on its own, the icon of the function might be changed with this method.
+
+#### *connectAction(plugin :: ControllerPlugin, action :: ControllerAction)*
 Connects or binds the function to the given action. From now on, every trigger of the hardware controller will result in an activation of the [fireAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-fireactionfunction--controllerfunction-trigger--string) method of the action, as long as the function is currently enabled for the trigger in question. Normally, functions will be connected during the activation of plugins or modes.
 
-#### *disconnectAction(action :: ControllerAction)*
+#### *disconnectAction(plugin :: ControllerPlugin, action :: ControllerAction)*
 Disconnects the function from the given action. Normally, functions will be disconnected during the deactivation of plugins or modes.
 
 ***
@@ -552,10 +555,16 @@ This is an event handler method called by the controller to notify the plugin, t
 This is an event handler method called by the controller to notify the plugin, that a simulation just has been stopped.
 
 #### *getLabel(descriptor :: String, default :: String := false)*
-This method can be used to support localization or using different labels depending on the bound function in the visual representation of the controller hardware. The label texts are defined in a special configuration file named *Controller Plugin Labels.ini* located in the *Simulator Controller\Config* folder in the users *Documents* folder. The content of this file is accessible using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration).
+This method can be used to support localization or using different labels depending on the bound function in the visual representation of the controller hardware. The label texts are defined in a special configuration file named *Controller Action Labels.XX* (where XX is a language code) located in the *Simulator Controller\Translations* folder in the users *Documents* folder. The content of this file is accessible using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration).
+
+#### *getIcon(descriptor :: String, default :: String := false)*
+This method can be used to support localization or using different icons depending on the bound function in the visual representation of the controller hardware. The icon paths are defined in a special configuration file named *Controller Action Icons.XX* (where XX is a language code) located in the *Simulator Controller\Translations* folder in the users *Documents* folder. The content of this file is accessible using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration).
 
 #### *actionLabel(action :: ControllerAction)*
 This method is called, whenever a label for the given action will be displayed on the visual representation of the controller hardware. The default implementation simply returns the *Label* property of the given action, but a subclass may add a translation process, for example.
+
+#### *actionIcon(action :: ControllerAction)*
+This method is called, whenever an icon for the given action will be displayed on the visual representation of the controller hardware. The default implementation simply returns the *Icon* property of the given action, but a subclass may implement dynamic icons, for example.
 
 #### *logFunctionNotFound(functionDescriptor :: String)*
 Helper method to log the most common configuration error: A function descriptor is referenced for an action, which is unknown, i.e. is not provided by the current hardware controller.
@@ -575,8 +584,8 @@ Returns the plugin, which has defined this mode.
 #### *Controller[]*
 The controller, where the plugin of this mode has been registered.
 
-#### *ButtonBoxes[]*
-Returns a list all [ButtonBox](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-buttonbox-extends-configurationitem-simulator-controllerahk) instances, on which this mode has registered actions.
+#### *FunctionController[]*
+Returns a list all [FunctionController](*) instances, on which this mode has registered actions.
 
 #### *Actions[]*
 A list of all actions defined by this mode.
@@ -589,8 +598,8 @@ Constructs a new mode. [registerMode](https://github.com/SeriousOldMan/Simulator
 #### *registerAction(action :: ControllerAction)*
 Registers the given action for this mode. In deviation from some other *register...* methods, *registerAction* is not called automatically by the constructor of [ControllerAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controlleraction-simulator-controllerahk), since actions might be defined for plugins or for modes. Therefore you need to register a new action for the right owner object.
 
-#### *registerButtonBox(buttonBox :: ButtonBox)*
-Registers a visual representation for the hardware controller, for which this mode has defined one or more actions. This method is called automatically, so nothing to do on your side, but you may want to overwrite the method in situations, where you want to take special actions for one of these Button Boxes.
+#### *registerFunctionController(controller :: FunctionController)*
+Registers a visual representation for the hardware controller, for which this mode has defined one or more actions. This method is called automatically, so nothing to do on your side, but you may want to overwrite the method in situations, where you want to take special actions for one of these controller.
 
 #### *findAction(label :: String)*
 Searches for an action with the given label or name defined by this mode. Returns *false*, if not found.
@@ -620,18 +629,27 @@ The controller, where the corresponding function has been registered.
 #### *Label[]*
 Returns the label of this action.
 	
+#### *Icon[]*
+Returns the path to the icon file of this action, or *false*, if no special has been defined.
+	
 ### Public Methods
 
-#### *__New(function :: ControllerFunction, label :: String := "")*
+#### *__New(function :: ControllerFunction, label :: String := "", icon :: String := false)*
 Constructs an instance of *ControllerAction*.
+
+#### *connectFunction(plugin :: ControllerPlugin, function :: ControllerFunction)*
+Called, when this action has been bound to the given function. The default method does nothing. Normally, functions will be connected during the activation of plugins or modes.
+
+#### *disconnectFunction(plugin :: ControllerPlugin, function :: ControllerFunction)*
+Called, when this action has been disconnected from the given function. The default method does nothing. Normally, functions will be disconnected during the deactivation of plugins or modes.
 
 #### [Abstract] *fireAction(function :: ControllerFunction, trigger :: String)*
 This method must be implemented by every subclass of *ControllerAction* and act according to the supplied trigger argument.
 
 ***
 
-## [Abstract] ButtonBox extends [ConfigurationItem](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-classesahk) ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
-Instances of this class will implement a visual representation of your hardware controller. Althoug the Simulator Controller will provide complete functionality even without a visual representation, it is much more fun to see what happens. Subclasses of *ButtonBox* must use the [Gui capabilities](https://www.autohotkey.com/docs/commands/Gui.htm) of the AutoHotkey language to implement the graphical representation. See [this  implementation](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/ButtonBox%20Plugin.ahk), which implements configuration and grid based Button Boxes for reference.
+## [Abstract] FunctionController extends [ConfigurationItem](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-classesahk) ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
+Instances of this class represent a given hardware controller. Subclasses of *FunctionController* must be implemented for each type of contrroller hardware (Button Boxes, Stream Decks, and so on), which will be supported by Simulator Controller.
 
 ### Public Properties
 
@@ -639,55 +657,93 @@ Instances of this class will implement a visual representation of your hardware 
 Returns the corresponding controller.
 
 #### *Descriptor[]*
-Returns a unique descriptor for this instance of *ButtonBox*. The default implementation returns the name of the class, which will be unique in most cases, unless you have more than one Button Box of the same type.
-	
-#### *Visible[]*
-Returns *true*, if the Button Box window is currently visible.
+Returns a unique descriptor for this instance of *Function Controller*. The default implementation returns the name of the class, which will be unique in most cases, unless you have more than one controller of the same type.
+
+#### *Type[]*
+Returns a unique string representation for this instance of *Function Controller*, which may be used in configuration files, for example. The default implementation returns the value of the property *Descriptor*.
 	
 #### *Num1WayToggles[]*
-The number of 1-way toggle switches of the Button Box. This is maintained by the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration).
+The number of 1-way toggle switches of the controller. This is maintained by the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration).
 
 #### *Num2WayToggles[]*
-The number of 2-way toggle switches of the Button Box. This is maintained by the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration).
+The number of 2-way toggle switches of the controller. This is maintained by the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration).
 
 #### *NumButtons[]*
-The number of simple push buttons of the Button Box. This is maintained by the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration).
+The number of simple push buttons of the controller. This is maintained by the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration).
 
 #### *NumDials[]*
-The number of rotary dials of the Button Box. This is maintained by the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration).
-
-#### *VisibleDuration[]*
-The time in milliseconds, the Button Box may be visible after an action has been triggered. You can specify two different durations with the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration), depending being in a running simulation or not.
+The number of rotary dials of the controller. This is maintained by the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration).
 
 ### Public Methods
 
 #### *__New(controller :: SimulatorController, configuration :: ConfigurationMap := false)*
-Constructs a Button Box. The single instance will be bound to the *Instance* property of the *ButtonBox* class. The Button Box is automatically registered for the given controller using [registerButtonBox](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#registerbuttonboxbuttonbox--buttonbox).
+Constructs a new represenation for a controller hardware. The controller is automatically registered for the given controller using [registerFunctionController](*).
+
+#### *setControls(num1WayToggles :: Integer, num2WayToggles :: Integer, numButtons :: Integer, numDials :: Integer)*
+Must be called by implementations of *FunctionController* to specifiy the type and number of controls, this controller provides in its layout.
+	
+#### [Abstract] *hasFunction(function :: ControllerFunction)*
+This method must be implemented by a subclass of *FunctionController*. It must return *true*, if the given controller implements the given function.
+
+#### *connectAction(plugin :: ControllerPlugin, function :: ControllerFunction, action :: ControllerAction)*
+Called, when the given action has been bound to the given function. The default method does nothing, but an implementation in a subclass my show the label and icon of the given function on the controller hardware or on the corresponding visual representation.
+
+#### *disconnectAction(plugin :: ControllerPlugin, function :: ControllerFunction, action :: ControllerAction)*
+Called, when the given action has been disconnect from the given function. The default method does nothing, but an implementation in a subclass my clear the label and icon of the given function on the controller hardware or on the corresponding visual representation.
+
+#### *setControlLabel(function :: ControllerFunction, text :: String, color :: String := "Black", overlay :: Boolean := false)*
+This method is called to set the info text for the given function on the controller. Useful, if the given controller has a visual representation (see [GuiFunctionController](*) for a subclass, which provides the necessary protocol). A HTML color name may be provided, and with *overlay* you can specify, that the given text is some sort of additional text, which may be shown on top of an icon, for example. The default method does nothing.
+
+#### *setControlIcon(function :: ControllerFunction, icon :: String)*
+This method is called to set the info icon for the given function on the controller. Useful, if the given controller has a visual representation (see [GuiFunctionController](*) for a subclass, which provides the necessary protocol). If *icon* is *false*, this means that no icon should be displayed. The default method does nothing.
+	
+#### *enable(function :: ControllerFunction, action :: ControllerAction := false)*
+Enables the given function on the given controller. If *action* is supplied and not *false*, the function is only enabled for the given action, otherwise it is enabled for all actions. The default method does nothing.
+	
+#### *disable(function :: ControllerFunction, action :: ControllerAction := false)*
+Disables the given function on the given controller. If *action* is supplied and not *false*, the function is only enabled for the given action, otherwise it is disabled for all actions. The default method does nothing.
+
+***
+
+## [Abstract] GuiFunctionController extends [FunctionController](*) ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
+Although the Simulator Controller will provide complete functionality even without a visual representation for a given physical controller, it is much more fun to see what happens. Subclasses of *GuiFunctionController* may use the [Gui capabilities](https://www.autohotkey.com/docs/commands/Gui.htm) of the AutoHotkey language to implement the graphical representation. See [this implementation](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/ButtonBox%20Plugin.ahk), which implements configuration and grid based Button Boxes for reference.
+
+### Public Properties
+
+#### *Visible[]*
+Returns *true*, if the controller window is currently visible.
+
+#### *VisibleDuration[]*
+The time in milliseconds, the controller may be visible after an action has been triggered. You can specify two different durations with the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration), depending being in a running simulation or not.
+
+### Public Methods
+
+#### *__New(controller :: SimulatorController, configuration :: ConfigurationMap := false)*
+The constructor calls *createGui* automatically.
 	
 #### [Abstract] *createGui()*
-This method must be implemented by a subclass of *ButtonBox*. The window with its Gui controls for the visual representation of the Button Box must be created. The implementation of *createGui* must call *associateGui* (see below) and supply the Gui prefix for this window (see the [AutoHotkey documentation](https://www.autohotkey.com/docs/commands/Gui.htm) for an explanation), and its width and height and other information to the framework. Furthermore, all label fields must be registered using *registerControlHandle*.
+This method must be implemented by a subclass of *FunctionController*. The window with its Gui controls for the visual representation of the controller must be created. The implementation of *createGui* must call *associateGui* (see below) and supply the Gui prefix for this window (see the [AutoHotkey documentation](https://www.autohotkey.com/docs/commands/Gui.htm) for an explanation), and its width and height and other information to the framework. Furthermore, all label fields must be registered using *registerControlHandle*.
 
 #### *associateGui(window :: String, width :: Integer, height :: Integer, num1WayToggles :: Integer, num2WayToggles :: Integer, numButtons :: Integer, numDials :: Integer)*
-This method must be called by *createGui* to describe the Button Box to the framework.
+This method must be called by *createGui* to describe the controller to the framework.
 
-#### *findButtonBox(window :: String)*
-This class method return the *ButtonBox* instance, that defined the given window, or *false*, if there is no such instance.
-
+#### *findFunctionController(window :: String)*
+This class method return the *FunctionController* instance, that defined the given window, or *false*, if there is no such instance.
 
 #### *registerControlHandle(descriptor :: String, handle :: Control Handle)*
-This method must be called by *createGui* as well for each label field of the Button Box. *handle* must be a control handle as defined by the *Hwnd* argument of [AutoHotkey Gui elements](https://www.autohotkey.com/docs/commands/Gui.htm).
+This method must be called by *createGui* as well for each label field of the controller. *handle* must be a control handle as defined by the *Hwnd* argument of [AutoHotkey Gui elements](https://www.autohotkey.com/docs/commands/Gui.htm).
 
 #### *getControlHandle(descriptor :: String)*
 For each visual representation of a controller function, which will a have an associated label or text field, a [GuiControl handle](https://www.autohotkey.com/docs/commands/GuiControl.htm) will be returned, or *false*, if there is no such text control. The given descriptor will identify the function according to the standard descriptor format, like "Button.3".
 	
 #### *show()*
-Shows the Button Box window according to the visibility rules defined in the configuration. This method is called automatically by the framework after each potential visual change.
+Shows the controller window according to the visibility rules defined in the configuration. This method is called automatically by the framework after each potential visual change.
 
 #### *hide()*
-Hides the Button Box window again. This method is automatically called, after the visible duration defined in the configuration has elapsed with no hardware trigger event in between.
+Hides the controller window again. This method is automatically called, after the visible duration defined in the configuration has elapsed with no hardware trigger event in between.
 
 #### *moveByMouse(button :: String := "LButton")*
-Call this method from an event handler. It will move the Button Box window following the mouse, while the given button is down. The position will be remembered as the "Last Position" in the *Simulator Controller.ini* configuration file.
+Call this method from an event handler. It will move the controller window following the mouse, while the given button is down. The position will be remembered as the "Last Position" in the *Simulator Controller.ini* configuration file.
 
 ***
 
@@ -882,5 +938,5 @@ Either "PitstopPlan" or "PitstopPrepare".
 
 ### Public Methods
 
-#### *__New(plugin :: SimulatorPlugin, function :: String, label :: String, action :: OneOf("PitstopPlan", "PitstopPrepare"))*
+#### *__New(plugin :: SimulatorPlugin, function :: String, label :: String, icon :: String, action :: OneOf("PitstopPlan", "PitstopPrepare"))*
 The constructor adds the additional parameters *plugin* and *action* to the inherited *__New* method, which are used to initialize the corresponding properties.

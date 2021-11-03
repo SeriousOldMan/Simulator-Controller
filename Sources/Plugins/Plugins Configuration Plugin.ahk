@@ -76,6 +76,7 @@ class PluginsConfigurator extends ConfigurationItemList {
 		Gui %window%:Add, Edit, x110 y368 w363 h113 VpluginArgumentsEdit, %pluginArgumentsEdit%
 		
 		Gui %window%:Add, Button, x16 y490 w92 h23 gopenLabelsEditor, % translate("Edit Labels...")
+		Gui %window%:Add, Button, x115 y490 w92 h23 gopenIconsEditor, % translate("Edit Icons...")
 		
 		Gui %window%:Add, Button, x264 y490 w46 h23 VpluginAddButton gaddItem, % translate("Add")
 		Gui %window%:Add, Button, x312 y490 w50 h23 Disabled VpluginDeleteButton gdeleteItem, % translate("Delete")
@@ -228,12 +229,21 @@ comparePlugins(p1, p2) {
 }
 
 openLabelsEditor() {
-	fileName := ("Controller Plugin Labels." . getLanguage())
+	fileName := ("Controller Action Labels." . getLanguage())
 	
 	if !FileExist(kUserTranslationsDirectory . fileName)
 		FileCopy %kResourcesDirectory%Templates\%fileName%, %kUserTranslationsDirectory%%fileName%
 		
-	Run % "notepad.exe " . """" . kUserTranslationsDirectory . "Controller Plugin Labels." . getLanguage() . """"
+	Run % "notepad.exe " . """" . kUserTranslationsDirectory . "Controller Action Labels." . getLanguage() . """"
+}
+
+openIconsEditor() {
+	fileName := ("Controller Action Icons." . getLanguage())
+	
+	if !FileExist(kUserTranslationsDirectory . fileName)
+		FileCopy %kResourcesDirectory%Templates\%fileName%, %kUserTranslationsDirectory%%fileName%
+		
+	Run % "notepad.exe " . """" . kUserTranslationsDirectory . "Controller Action Icons." . getLanguage() . """"
 }
 
 openPluginsModesDocumentation() {

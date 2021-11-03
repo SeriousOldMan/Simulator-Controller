@@ -169,6 +169,8 @@ namespace RF2SHMProvider {
 				Console.Write("DriverSurname="); Console.WriteLine(GetSurname(scoring.mScoringInfo.mPlayerName));
 				Console.Write("DriverNickname="); Console.WriteLine(GetNickname(scoring.mScoringInfo.mPlayerName));
 
+				Console.Write("LapValid="); Console.WriteLine((playerScoring.mCountLapFlag > 0) ? "true" : "false");
+				
 				Console.Write("LapLastTime="); Console.WriteLine(Math.Round(Normalize(playerScoring.mLastLapTime) * 1000));
 				Console.Write("LapBestTime="); Console.WriteLine(Math.Round(Normalize(playerScoring.mBestLapTime) * 1000));
 

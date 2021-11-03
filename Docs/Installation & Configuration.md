@@ -174,7 +174,7 @@ In this tab you can configure the plugins currently in use by the Simulator Cont
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%202.JPG)
 
-Beside temporarily deactivating a plugin and all its modes, you can define a comma separated list of simulator names. This will restrict the modes of the plugin to only be available, when these simulators are running. The most important field here is the *Arguments* field. Here you can supply values for all the configuration parameters of the given plugin. The format is like this: "parameter1: value11, value12, value13; parameter2: value21, value22; ...". Please take a look at the [plugin reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes) for an in depth explanation of all the parameters of the bundled plugins. Last but not least, you will find an "Edit Labels..." button in the lower left corner of this tab. Pressing this button will open a simple text file, where you can edit the labels, some plugins display on the visual hardware controller display. Change them to your liking. Please note, that the content of this file must be localized depending on the currently configured language of Simulator Controller.
+Beside temporarily deactivating a plugin and all its modes, you can define a comma separated list of simulator names. This will restrict the modes of the plugin to only be available, when these simulators are running. The most important field here is the *Arguments* field. Here you can supply values for all the configuration parameters of the given plugin. The format is like this: "parameter1: value11, value12, value13; parameter2: value21, value22; ...". Please take a look at the [plugin reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes) for an in depth explanation of all the parameters of the bundled plugins. Last but not least, you will find an "Edit Labels..." button in the lower left corner of this tab. Pressing this button will open a simple text file, where you can edit the labels, some plugins display on the visual hardware controller display. Change them to your liking. To edit the icons that are displayed on a connected Stream Deck, use the "Edit Icons ..." button. Please note, that the content of these files must be localized depending on the currently configured language of Simulator Controller.
 
 Note: You can deactivate or delete all plugins except *System*. The *System* plugin is required and part of the framework. If you delete one or more of the other plugins here, they will still be loaded by the Simulator Controller, but they won't be activated. On the other hand, if you add a plugin here, but haven't added any plugin code, nothting will happen. And, last but not least, the plugin names given here must be identical to those used in the plugin code. Some sort of primary key, hey. If you have some development skills, see the documentation on [plugin development](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts) for further information.
 
@@ -387,3 +387,53 @@ As you can see, the structure of this editor is very similar to the structure of
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%20Editor%202.JPG)
 
 This window will visualize the current layout and will change, whenever you change one of the definitions in the layout editor. Please note, that you have to save the definition changes using the *Save* buttons to update the preview window, as long as you do not have chosen the [*Automatic* save mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#using-the-configuration-tool). As you can see in the image above, freshly added rows and columns will show a free "Space", which you can fill up with *Controls*. Please note, that the "Space" marker will only be shown in the preview mode, so intentionally free space will look good on the final Button Box. You con click on each cell of the preview window and change the *Control* and the *Label*, which should occupy this cell, and you can choose the corresponding controller function number for the given control.
+
+# Stream Deck Layouts
+
+Release 3.6.6 introduces support for Stream Deck controller, very similar to the support for Button Boxes. The layout of a given Stream Deck profile is described to Simulator Controller using a structured configuration file. Below you find a sample definition as a guide.
+
+	[Layouts]
+	Stream Deck.Layout=3 x 5
+	Stream Deck.1=Button.1;Button.2;Button.3;Button.4;Button.5
+	Stream Deck.2=Button.6;Button.7;Button.8;Button.9;Button.10
+	Stream Deck.3=;;;;
+	Stream Deck Mini.Layout=2 x 3
+	Stream Deck Mini.1=Button.11;;
+	Stream Deck Mini.2=;;
+	[Buttons]
+	Stream Deck.Button.1.Icon=true
+	Stream Deck.Button.1.Label=true
+	Stream Deck.Button.1.Mode=IconOrLabel
+	Stream Deck.Button.2.Icon=true
+	Stream Deck.Button.2.Label=true
+	Stream Deck.Button.2.Mode=IconOrLabel
+	Stream Deck.Button.3.Icon=true
+	Stream Deck.Button.3.Label=true
+	Stream Deck.Button.3.Mode=IconOrLabel
+	...
+	Stream Deck Mini.Button.11.Icon=D:\Controller\Resources\Icons\Gear,ico
+	Stream Deck Mini.Button.11.Label=Select\nMode
+	Stream Deck Mini.Button.11.Mode=IconAndLabel
+
+To connect your Stream Deck(s) with Simulator Controller, you must install the special Stream Deck plugin, which is supplied in the *Utilities* folder. Copy the comple folder *de.thebigo.simulatorcontroller.sdplugin* to *%appdata%\Elgato\StreamDeck\Plugins*. Then create a profile using the special action *Controller Function* supplied by this Stream Deck plugin. It is important that you leave the title of the action blank and set the *Function* to the desired controller function, for example "Buttton.1".
+
+Then you have to create "Stream Deck Configuration.ini" file similar to the example above and save it to the *Simulator Controller\Config* folder in your user *Documents* folder. For each button in the profile you can define the default icon to be shown on the Stream Deck and whether textual labels should be shown on the Stream Deck buttons as well. The value for the optional *[layout].Button.X.Label* property may be *false* (no label), true (default; use the action label from the [labels defined in the general configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins)) or you can supply a fixed text here (you can use "\n" to start a new line in the text value). To supply an icon using the optional *[layout].Button.X.Icon*, use a full path to an image file supported by Stream Deck. Here you can also use *false* to specify that you never want to change the icon on the Stream Deck, or *true* (which is the default), if the [icon from general configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) should by used for the associated controller action, if one is available.
+
+With the *...Mode* property you can define for a button, which layers should be dsiplayed on the Stream Deck. *IconOrLabel*, which is the default, means that the icon is displayed without a label, if an icon is availabel. Other values for this property are *Icon* (only an icon or nothing is displayed), *Label* (only a label or nothing is displayed), or *IconAndLabel*, which means, that both an icon and a label will be displayed.
+
+Example: In the above example, all "Stream Deck" Actions will use the icons for the currently associated controller action as defined in the "Controller Action Icons.XX" file. Please note, that you can omit the declaration "...Label=true", since this is the default. If an icon is available, the label will not be shown. Only the first two rows of the Stream Deck are used here for controller actions, whereas in the "Stream Deck Mini" only the first button in the top row is configured with a fixed icon and label.
+
+To activate your Stream Deck configuration, you then must open "Simulator Configuration" and create a new entry in the upper list of the "Controller" tab and associate this new controller with one of the Stream Deck layouts. Done...
+
+As mentioned above, you can associate an an image for a controller action to display on the Stream Deck, as long as this action is associated with the corresponding button. Please note, that there is no configuration support yet, you have to create the necessary configuration file with a text editor. The file is named "Controller Action Icons.XX" (with *XX* substituted by the language code, for example "EN"). This file must be placed in *Simulator Controller\Translations* folder in your user *Documents* folder and has the following format:
+
+	[Tactile Feedback]
+	TC.Increase=D:\Dateien\Bilder\Simulator Icons\ButtonDeck\TC+.jpg
+	TC.Decrease=D:\Dateien\Bilder\Simulator Icons\ButtonDeck\TC-.jpg
+	ABS.Increase=D:\Dateien\Bilder\Simulator Icons\ButtonDeck\ABS_+.jpg
+	ABS.Decrease=D:\Dateien\Bilder\Simulator Icons\ButtonDeck\ABS_-.jpg
+	...
+
+In this example, four icons will be displayed on the Stream Deck for increasing and decreasing the pedal vibration for traction control and ABS effects. You can to edit the definition file in the ["Plugins" tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) of the "Simulator Configuration" tool, as mentioned above. There are a lot of icons for the Stream Deck available out there, for example [this one](https://www.racedepartment.com/downloads/buttondeck-for-stream-deck.24348/), and I will also build an icon collection during the next releases.
+
+More to come in the next releases, incl. a graphical editor for all action icons and support in the "Simulator Setup"...

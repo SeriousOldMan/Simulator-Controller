@@ -849,7 +849,9 @@ class RaceEngineer extends RaceAssistant {
 		
 			weatherNow := getConfigurationValue(data, "Weather Data", "Weather", "Dry")
 			
-			if (currentCompound && (currentCompound = targetCompound) && (currentCompoundColor = targetCompoundColor))
+			lastValid := knowledgeBase.getValue("Lap." . (lapNumber - 1) . ".Valid", true)
+		
+			if (lastValid && currentCompound && (currentCompound = targetCompound) && (currentCompoundColor = targetCompoundColor))
 				this.updateSetupData(knowledgeBase.getValue("Session.Simulator"), knowledgeBase.getValue("Session.Car"), knowledgeBase.getValue("Session.Track")
 								   , weatherNow, airTemperature, trackTemperature, currentCompound, currentCompoundColor)
 		}

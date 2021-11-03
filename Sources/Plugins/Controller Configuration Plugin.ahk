@@ -97,7 +97,7 @@ class ButtonBoxesList extends ConfigurationItemList {
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
 		
-		Gui %window%:Add, GroupBox, -Theme x16 y80 w457 h115, % translate("Button Boxes")
+		Gui %window%:Add, GroupBox, -Theme x16 y80 w457 h115, % translate("Controller")
 		
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Add, ListBox, x24 y99 w194 h96 HwndbuttonBoxesListBoxHandle VbuttonBoxesListBox glistEvent, %buttonBoxesListBox%
@@ -124,6 +124,9 @@ class ButtonBoxesList extends ConfigurationItemList {
 		
 		for ignore, controller in string2Values("|", getConfigurationValue(configuration, "Controller Layouts", "Button Boxes", ""))
 			items.Push(string2Values(":", controller))
+		
+		for ignore, controller in string2Values("|", getConfigurationValue(configuration, "Controller Layouts", "Stream Decks", ""))
+			items.Push(string2Values(":", controller))
 			
 		this.ItemList := items
 	}
@@ -131,12 +134,19 @@ class ButtonBoxesList extends ConfigurationItemList {
 	saveToConfiguration(configuration) {
 		base.saveToConfiguration(configuration)
 		
-		controller := []
+		bbController := []
+		sdController := []
+		
+		sdConfiguration := readConfiguration(getFileName("Stream Deck Configuration.ini", kUserConfigDirectory, kConfigDirectory))
 		
 		for ignore, item in this.ItemList
-			controller.Push(values2String(":", item*))
+			if getConfigurationValue(sdConfiguration, "Layouts", item[2] . ".Layout", false)
+				sdController.Push(values2String(":", item*))
+			else
+				bbController.Push(values2String(":", item*))
 		
-		setConfigurationValue(configuration, "Controller Layouts", "Button Boxes", values2String("|", controller*))	
+		setConfigurationValue(configuration, "Controller Layouts", "Button Boxes", values2String("|", bbController*))
+		setConfigurationValue(configuration, "Controller Layouts", "Stream Decks", values2String("|", sdController*))	
 	}
 	
 	clickEvent(line, count) {
@@ -212,13 +222,23 @@ class ButtonBoxesList extends ConfigurationItemList {
 			return Array(buttonBoxEdit, buttonBoxLayoutDropDown)
 	}
 	
-	computeLayoutChoices(configuration := false) {
-		if !configuration
-			configuration := readConfiguration(getFileName("Button Box Configuration.ini", kUserConfigDirectory, kConfigDirectory))
+	computeLayoutChoices(bbConfiguration := false, sdConfiguration := false) {
+		if !bbConfiguration
+			bbConfiguration := readConfiguration(getFileName("Button Box Configuration.ini", kUserConfigDirectory, kConfigDirectory))
+		
+		if !sdConfiguration
+			sdConfiguration := readConfiguration(getFileName("Stream Deck Configuration.ini", kUserConfigDirectory, kConfigDirectory))
 		
 		layouts := []
 		
-		for descriptor, definition in getConfigurationSectionValues(configuration, "Layouts", Object()) {
+		for descriptor, definition in getConfigurationSectionValues(bbConfiguration, "Layouts", Object()) {
+			descriptor := ConfigurationItem.splitDescriptor(descriptor)
+			
+			if !inList(layouts, descriptor[1])
+				layouts.Push(descriptor[1])
+		}
+		
+		for descriptor, definition in getConfigurationSectionValues(sdConfiguration, "Layouts", Object()) {
 			descriptor := ConfigurationItem.splitDescriptor(descriptor)
 			
 			if !inList(layouts, descriptor[1])

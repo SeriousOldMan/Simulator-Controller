@@ -73,7 +73,7 @@ updateFuelTarget(?lap) <= Clear(Fuel.Amount.Target)
 ;;; trend influence.                                                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-priority: 5, {None: [?Tyre.Compound]} => (Prove: currentTyreCompound())
+priority: 20, [?Lap] => (Prove: currentTyreCompound())
 
 currentTyreCompound() <= currentTyreCompound(?compound, ?color), Set(Tyre.Compound, ?compound), Set(Tyre.Compound.Color, ?color)
 

@@ -335,7 +335,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		
 		Gui ListView, % this.ActionsListView
 		
-		pluginLabels := readConfiguration(getFileName("Controller Plugin Labels." . getLanguage(), kUserTranslationsDirectory, kTranslationsDirectory))
+		pluginLabels := readConfiguration(getFileName("Controller Action Labels." . getLanguage(), kUserTranslationsDirectory, kTranslationsDirectory))
 		
 		code := getApplicationDescriptor(simulator)[1]
 		
@@ -418,7 +418,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 					else
 						function := ""
 					
-					LV_Add("", (first ? translate(mode) : ""), subAction, label, function)
+					LV_Add("", (first ? translate(mode) : ""), subAction, StrReplace(label, "`n" , A_Space), function)
 					
 					count += 1
 				}

@@ -134,7 +134,7 @@ class TelemetryDatabase extends SessionDatabase {
 	getPressuresCount(weather, compound, compoundColor) {
 		if this.Database {
 			return this.Database.query("Tyres", {Group: [["Tyre.Pressure", "count", "Count"]], By: "Tyre.Pressure"
-											   , Transform: "computePressures"
+											   , Transform: combine("removeInvalidLaps", "computePressures")
 											   , Where: {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
 		}
 		else
@@ -147,10 +147,34 @@ class TelemetryDatabase extends SessionDatabase {
 													   , ["Tyre.Pressure.Front.Right", "average", "Tyre.Pressure.Front.Right"]
 													   , ["Tyre.Pressure.Rear.Left", "average", "Tyre.Pressure.Rear.Left"]
 													   , ["Tyre.Pressure.Rear.Right", "average", "Tyre.Pressure.Rear.Right"]], By: "Lap.Time"
+											   , Transform: combine("removeInvalidLaps", "computePressures")
 											   , Where: {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
 		}
 		else
 			return []
+	}
+	
+	cleanupData(weather, compound, compoundColor) {
+		if this.Database {
+			where := {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}
+			
+			ltAvg := false
+			ltStdDev := false
+			cAvg := false
+			cStdDev := false
+	
+			rows := this.Database.query("Electronics", {Where: where})
+			
+			computeFilterValues(rows, ltAvg, ltStdDev, cAvg, cStdDev)
+	
+			this.Database.remove("Electronics", where, Func("invalidLap").Bind(ltAvg, ltStdDev, cAvg, cStdDev), true)
+	
+			rows := this.Database.query("Tyres", {Where: where})
+			
+			computeFilterValues(rows, ltAvg, ltStdDev, cAvg, cStdDev)
+			
+			this.Database.remove("Tyres", where, Func("invalidLap").Bind(ltAvg, ltStdDev, cAvg, cStdDev), true)
+		}
 	}
 		
 	addElectronicEntry(weather, airTemperature, trackTemperature, compound, compoundColor, map, tc, abs, fuelRemaining, fuelConsumption, lapTime) {
@@ -239,7 +263,7 @@ computeTemperatures(rows) {
 	return rows
 }
 
-removeInvalidLaps(rows) {
+computeFilterValues(rows, ByRef lapTimeAverage, ByRef lapTimeStdDev, ByRef consumptionAverage, ByRef consumptionStdDev) {
 	lapTimes := []
 	consumption := []
 	
@@ -248,19 +272,35 @@ removeInvalidLaps(rows) {
 		consumption.Push(row["Fuel.Consumption"])
 	}
 	
-	ltAvg := average(lapTimes)
-	ltStdDev := stdDeviation(lapTimes)
+	lapTimeAverage := average(lapTimes)
+	lapTimeStdDev := stdDeviation(lapTimes)
 	
-	cAvg := average(consumption)
-	cStdDev := stdDeviation(consumption)
+	consumptionAverage := average(consumption)
+	consumptionStdDev := stdDeviation(consumption)
+}
+
+validLap(ltAvg, ltStdDev, cAvg, cStdDev, row) {
+	return ((Abs(row["Lap.Time"] - ltAvg) <= ltStdDev) && (Abs(row["Fuel.Consumption"] - cAvg) <= cStdDev))
+}
+
+invalidLap(ltAvg, ltStdDev, cAvg, cStdDev, row) {
+	return !validLap(ltAvg, ltStdDev, cAvg, cStdDev, row)
+}
+
+removeInvalidLaps(rows) {
+	ltAvg := false
+	ltStdDev := false
+	cAvg := false
+	cStdDev := false
 	
-	ltThreshold := (ltAvg + ltStdDev)
+	computeFilterValues(rows, ltAvg, ltStdDev, cAvg, cStdDev)
 	
 	result := []
 	
 	for ignore, row in rows
-		if ((row["Lap.Time"] < ltThreshold) && (Abs(row["Fuel.Consumption"] - cAvg) <= cStdDev))
+		if validLap(ltAvg, ltStdDev, cAvg, cStdDev, row)
 			result.Push(row)
 
 	return result
 }
+

@@ -882,7 +882,7 @@ writeToolsConfiguration(updateSettings, cleanupSettings, copySettings, buildSett
 	writeConfiguration(kToolsConfigurationFile, configuration)
 }
 
-viewFile(fileName, title := false, x := "Center", y := "Center", width := 800, height := 400) {
+viewFile(fileName, title := "", x := "Center", y := "Center", width := 800, height := 400) {
 	static dismissed := false
 	
 	dismissed := false
@@ -1272,29 +1272,37 @@ deletePluginLabels() {
 		}
 }
 
-overwritePluginLabels() {
-	for ignore, fileName in getFileNames("Controller Plugin Labels.*", kUserTranslationsDirectory)
+overwriteActionLabels() {
+	overwritePluginLabels("Controller Action Labels")
+}
+
+overwritePluginLabels(fileName := "Controller Plugin Labels") {
+	for ignore, fileName in getFileNames(fileName . ".*", kUserTranslationsDirectory)
 		FileMove %filename%, %filename%.bak, 1
 	
-	for ignore, fileName in getFileNames("Controller Plugin Labels.*", kResourcesDirectory . "Templates\") {
+	for ignore, fileName in getFileNames(fileName . ".*", kResourcesDirectory . "Templates\") {
 		SplitPath fileName, , , languageCode
 	
-		if !FileExist(kUserTranslationsDirectory . "Controller Plugin Labels." . languageCode)
-			FileCopy %kResourcesDirectory%Templates\Controller Plugin Labels.%languageCode%, %kUserTranslationsDirectory%
+		if !FileExist(kUserTranslationsDirectory . fileName . "." . languageCode)
+			FileCopy %kResourcesDirectory%Templates\%fileName%.%languageCode%, %kUserTranslationsDirectory%
 	}
 }
 
-updatePluginLabels() {
+updateActionLabels() {
+	updatePluginLabels("Controller Action Labels")
+}
+
+updatePluginLabels(fileName := "Controller Plugin Labels") {
 	languages := availableLanguages()
-	enPluginLabels := readConfiguration(kResourcesDirectory . "Templates\Controller Plugin Labels.en")
+	enPluginLabels := readConfiguration(kResourcesDirectory . "Templates\" . fileName . ".en")
 	
-	for ignore, userPluginLabelsFile in getFileNames("Controller Plugin Labels.*", kUserTranslationsDirectory, kUserConfigDirectory) {
+	for ignore, userPluginLabelsFile in getFileNames(fileName . ".*", kUserTranslationsDirectory, kUserConfigDirectory) {
 		SplitPath userPluginLabelsFile, , , languageCode
 	
 		if !languages.HasKey(languageCode)
 			bundledPluginLabels := enPluginLabels
 		else {
-			bundledPluginLabels := readConfiguration(kResourcesDirectory . "Templates\Controller Plugin Labels." . languageCode)
+			bundledPluginLabels := readConfiguration(kResourcesDirectory . "Templates\" . fileName . "." . languageCode)
 		
 			if (bundledPluginLabels.Count() == 0)
 				bundledPluginLabels := enPluginLabels
@@ -1975,7 +1983,7 @@ runUpdateTargets(ByRef buildProgress) {
 		
 		Sleep 50
 		
-		progressStep := Round((100 / (vTargetsCount + 1)) / target[2].Length())
+		progressStep := ((100 / (vTargetsCount + 1)) / target[2].Length())
 		
 		for ignore, updateFunction in target[2] {
 			if !kSilentMode {
@@ -1991,7 +1999,7 @@ runUpdateTargets(ByRef buildProgress) {
 			
 			Sleep 50
 			
-			buildProgress += progressStep
+			buildProgress := Round(buildProgress + progressStep)
 		}
 				
 		buildProgress += (100 / (vTargetsCount + 1))
@@ -2127,24 +2135,28 @@ runCopyTargets(ByRef buildProgress) {
 					Sleep 50
 				
 					buildProgress += (100 / (vTargetsCount + 1))
-						
+					
 					if !kSilentMode
 						showProgress({progress: buildProgress})
 				}
 			}
 		}
 		else {
-			FileGetTime srcLastModified, %targetSource%, M
-			FileGetTime dstLastModified, %targetDestination%, M
-			
-			if srcLastModified {
-				if dstLastModified
-					copy := (srcLastModified > dstLastModified)
+			if InStr(FileExist(targetSource), "D")
+				copy := true
+			else {
+				FileGetTime srcLastModified, %targetSource%, M
+				FileGetTime dstLastModified, %targetDestination%, M
+				
+				if srcLastModified {
+					if dstLastModified
+						copy := (srcLastModified > dstLastModified)
+					else
+						copy := true
+				}
 				else
-					copy := true
+					copy := false
 			}
-			else
-				copy := false
 			
 			if copy {
 				if !kSilentMode
@@ -2153,10 +2165,22 @@ runCopyTargets(ByRef buildProgress) {
 				logMessage(kLogInfo, targetName . translate(" out of date - update needed"))
 				logMessage(kLogInfo, translate("Copying ") . targetSource)
 				
-				SplitPath targetDestination, , targetDirectory
-				
-				FileCreateDir %targetDirectory%
-				FileCopy %targetSource%, %targetDestination%, 1
+				if InStr(FileExist(targetSource), "D") {
+					try {
+						FileRemoveDir %targetDestination%, 1
+					}
+					catch exception {
+						; ignore
+					}
+					
+					FileCopyDir %targetSource%, %targetDestination%, 1
+				}
+				else {
+					SplitPath targetDestination, , targetDirectory
+					
+					FileCreateDir %targetDirectory%
+					FileCopy %targetSource%, %targetDestination%, 1
+				}
 				
 				Sleep 50
 			
@@ -2244,8 +2268,11 @@ prepareTargets(ByRef buildProgress, updateOnly) {
 	counter := 0
 	targets := readConfiguration(kToolsTargetsFile)
 	
-	for target, arguments in getConfigurationSectionValues(targets, "Update", Object()) {
-		buildProgress += Min(Floor(A_Index / 4), 1)
+	updateTargets := getConfigurationSectionValues(targets, "Update", Object())
+	
+	for target, arguments in updateTargets {
+		buildProgress += (A_Index / updateTargets.Count())
+		
 		update := vUpdateSettings[target]
 		
 		if !kSilentMode
@@ -2266,9 +2293,12 @@ prepareTargets(ByRef buildProgress, updateOnly) {
 	bubbleSort(vUpdateTargets, "compareUpdateTargets")
 	
 	if !updateOnly {
-		for target, arguments in getConfigurationSectionValues(targets, "Cleanup", Object()) {
+		cleanupTargets := getConfigurationSectionValues(targets, "Cleanup", Object())
+		
+		for target, arguments in cleanupTargets {
 			targetName := ConfigurationItem.splitDescriptor(target)[1]
-			buildProgress += Min(Floor(++counter / 20), 1)
+			buildProgress += (A_Index / cleanupTargets.Count())
+			
 			cleanup := (InStr(target, "*.bak") ? vCleanupSettings[target] : vCleanupSettings[targetName])
 			
 			if !kSilentMode
@@ -2283,9 +2313,12 @@ prepareTargets(ByRef buildProgress, updateOnly) {
 			Sleep 50
 		}
 		
-		for target, arguments in getConfigurationSectionValues(targets, "Copy", Object()) {
+		copyTargets := getConfigurationSectionValues(targets, "Copy", Object())
+		
+		for target, arguments in copyTargets {
 			targetName := ConfigurationItem.splitDescriptor(target)[1]
-			buildProgress += Min(Floor(++counter / 20), 1)
+			buildProgress += (A_Index / copyTargets.Count())
+			
 			copy := vCopySettings[targetName]
 			
 			if !kSilentMode
@@ -2300,8 +2333,11 @@ prepareTargets(ByRef buildProgress, updateOnly) {
 			Sleep 50
 		}
 		
-		for target, arguments in getConfigurationSectionValues(targets, "Build", Object()) {
-			buildProgress += Min(Floor(++counter / 20), 1)
+		buildTargets := getConfigurationSectionValues(targets, "Build", Object())
+		
+		for target, arguments in buildTargets {
+			buildProgress += (A_Index / buildTargets.Count())
+		
 			build := vBuildSettings[target]
 			
 			if !kSilentMode

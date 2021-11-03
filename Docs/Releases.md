@@ -1,3 +1,17 @@
+## 3.6.6-release 11/05/21 (planned)
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Much more sophisticated tyre compound handling in changing weather conditions.
+  4. Initial support for the Stream Deck controller. You can associate controller actions with Stream Deck Actions, which will be automatically kept in sync. Also, you can associate an icon with each controller action, which will be shown on the Stream Deck. See the [documentation](*) for more information.
+  5. Renamed "Controller Plugin Labels" file to "Controller Action Labels". Important: Take a look at the [update notes](*), if you have changed labels in the past.
+  6. Introduced "Controller Action Icons.XX" file in order to support action specific icons on the Stream Deck controller.
+  7. With the new plugin parameter [*udpConnection*](*) for the ACC plugin to support non-standard UDP connect strings for the broadcasting interface.
+  8. ["Strategy Workbench"](*) supports a new command to remove faulty data from the telemetry database.
+  9. Only valid laps will be written to the telemetry database and will be used for statistical tyre pressure data.
+  10. Support for binary functions for the effect intensity manipulation in the "Motion Feedback" plugin. See the [revised documentation](*) for more information.
+  11. [Developer only] Full refactoring of the [*ButtonBox* class](*) in [Simulator Controller.ahk](*) in order to support the new Stream Deck integration.
+
 ## 3.6.5-release 10/22/21
 
   1. Fixed a critical bug in Strategy Workbench due to incomplete build rules

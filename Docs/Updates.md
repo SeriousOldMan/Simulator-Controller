@@ -28,9 +28,9 @@ When the automated update procedure runs, there are some standard task, that are
     
 	If the release introduces new translations, the local translation files in the *Simulator Controller\Translations* folder will be updated to include the new translatable items. It cannot give you a full tranlation, as long as the corresponding language is not part of the standard distribution, but you will be able to edit these items using the [translation tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#translations-editor).
 	
-  * Update of *Controller Plugin Labels*
+  * Update of *Controller Action Labels* and *Controller Action Icons*
     
-	New labels for the controller hardware, which has been introduced by plugin extensions in the current release, will be automatically copied to your local files in the *Simulator Controller\Translations* folder in your user documents folder.
+	New labels for the controller actions, which has been introduced by plugin extensions in the current release, will be automatically copied to your local files in the *Simulator Controller\Translations* folder in your user documents folder.
 	
   * Update of Phrase Grammars
     

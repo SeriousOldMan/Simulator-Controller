@@ -83,7 +83,9 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 			function := controller.findFunction(actionFunction)
 			
 			if (function != false) {
-				action := new this.RaceEngineerAction(this, function, this.getLabel(ConfigurationItem.descriptor(action, "Activate"), action), action)
+				descriptor := ConfigurationItem.descriptor(action, "Activate")
+				
+				action := new this.RaceEngineerAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor), action)
 				
 				this.registerAction(action)
 			}

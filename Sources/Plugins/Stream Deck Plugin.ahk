@@ -269,7 +269,7 @@ class StreamDeck extends FunctionController {
 			
 			displayMode := this.Mode[function.Descriptor]
 			
-			if (hasIcon && ((displayMode = kIcon) || (displayMode = kIconOrLabel)))
+			if (hasIcon && !overlay && ((displayMode = kIcon) || (displayMode = kIconOrLabel)))
 				this.Connector.SetTitle(function.Descriptor, "")
 			else {
 				labelMode := this.Label[function.Descriptor]
@@ -292,7 +292,7 @@ class StreamDeck extends FunctionController {
 			displayMode := this.Mode[function.Descriptor]
 			
 			if (displayMode = kLabel)
-				this.Connector.SetImage(function.Descriptor, "")
+				this.Connector.SetImage(function.Descriptor, "clear")
 			else {
 				iconMode := this.Icon[function.Descriptor]
 				
@@ -300,7 +300,7 @@ class StreamDeck extends FunctionController {
 					this.Connector.SetImage(function.Descriptor, icon)
 				else if (iconMode == false)
 					this.Connector.SetImage(function.Descriptor, "clear")
-				else (displayMode != kLabel)
+				else
 					this.Connector.SetImage(function.Descriptor, iconMode)
 			}
 		}

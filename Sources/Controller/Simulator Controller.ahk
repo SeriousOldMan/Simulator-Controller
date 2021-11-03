@@ -211,11 +211,11 @@ class GuiFunctionController extends FunctionController {
 	}
 	
 	connectAction(plugin, function, action) {
-		function.setLabel(plugin.actionLabel(action))
+		this.setControlLabel(function, plugin.actionLabel(action))
 	}
 	
 	disconnectAction(plugin, function, action) {
-		function.setLabel("")
+		this.setControlLabel(function, "")
 	}
 	
 	registerControlHandle(descriptor, handle) {

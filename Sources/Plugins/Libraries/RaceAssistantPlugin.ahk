@@ -34,6 +34,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	iLastLapCounter := 0
 	iInPit := false
 	iFinished := false
+		
+	iSessionState := kUndefined
 	
 	class RemoteRaceAssistant {
 		iRemoteEvent := false
@@ -629,8 +631,12 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			this.Simulator.updateSessionState(sessionState)
 		else
 			sessionState := kSessionFinished
-		
-		this.updateActions(sessionState)
+			
+		if (sessionState != this.iSessionState) {
+			this.iSessionState := sessionState
+			
+			this.updateActions(sessionState)
+		}
 	}
 	
 	updateSessionData(data) {

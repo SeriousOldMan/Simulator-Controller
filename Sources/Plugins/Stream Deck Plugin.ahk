@@ -13,6 +13,16 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                         Public Constants Section                        ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global kIcon = "Icon"
+global kLabel = "Label"
+global kIconAndLabel = "IconAndLabel"
+global kIconOrLabel = "IconOrLabel"
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -27,6 +37,7 @@ class StreamDeck extends FunctionController {
 	iFunctions := []
 	iLabels := {}
 	iIcons := {}
+	iModes := {}
 		
 	iConnector := false
 	
@@ -83,7 +94,7 @@ class StreamDeck extends FunctionController {
 		}
 	}
 	
-	Labels[function := false] {
+	Label[function := false] {
 		Get {
 			if function
 				return (this.iLabels.HasKey(function) ? this.iLabels[function] : true)
@@ -92,12 +103,21 @@ class StreamDeck extends FunctionController {
 		}
 	}
 	
-	Icons[function := false] {
+	Icon[function := false] {
 		Get {
 			if function
 				return (this.iIcons.HasKey(function) ? this.iIcons[function] : true)
 			else
 				return this.iIcons
+		}
+	}
+	
+	Mode[function := false] {
+		Get {
+			if function
+				return (this.iModes.HasKey(function) ? this.iModes[function] : kIconOrLabel)
+			else
+				return this.iModes
 		}
 	}
 	
@@ -142,27 +162,36 @@ class StreamDeck extends FunctionController {
 			
 			for ignore, function in row
 				if (function != "") {
+					this.Functions.Push(function)
+					
 					icon := getConfigurationValue(configuration, "Buttons", this.Layout . "." . function . ".Icon", true)
 					label := getConfigurationValue(configuration, "Buttons", this.Layout . "." . function . ".Label", true)
+					mode := getConfigurationValue(configuration, "Buttons", this.Layout . "." . function . ".Mode", kIconOrLabel)
 				
-					this.Connector.SetTitle(function, "")
-					this.Connector.SetImage(function, "")
+					isRunning := this.isRunning()
 					
-					if (label != true) {
-						this.iLabels[function] := label
-						
-						if label
-							this.Connector.SetTitle(function, label)
+					if isRunning {
+						this.Connector.SetTitle(function, "")
+						this.Connector.SetImage(function, "clear")
+					}
+					
+					if (mode != kIconOrLabel) {
+						this.iModes[function] := icon
 					}
 					
 					if (icon != true) {
 						this.iIcons[function] := icon
 						
-						if icon
-							this.Connector.SetIcon(function, icon)
+						if (icon && (icon != "") && isRunning)
+							this.setControlIcon(function, icon)
 					}
 					
-					this.Functions.Push(function)
+					if (label != true) {
+						this.iLabels[function] := label
+						
+						if (label && isRunning)
+							this.setControlLabel(function, label)
+					}
 					
 					switch ConfigurationItem.splitDescriptor(function)[1] {
 						case k1WayToggleType:
@@ -186,6 +215,12 @@ class StreamDeck extends FunctionController {
 		this.setControls(num1WayToggles, num2WayToggles, numButtons, numDials)
 	}
 	
+	isRunning() {
+		Process Exist, SimulatorControllerPlugin.exe
+		
+		return (ErrorLevel != 0)
+	}
+	
 	hasFunction(function) {
 		if IsObject(function)
 			function := function.Descriptor
@@ -201,55 +236,73 @@ class StreamDeck extends FunctionController {
 		else
 			actions[function] := Array(action)
 		
-		icon := plugin.actionLabel(action)
-		
-		if (icon && (icon != ""))
-			function.setIcon(icon)
-		else
-			function.setLabel(plugin.actionLabel(action))
+		this.setControlLabel(function, plugin.actionLabel(action))
+		this.setControlIcon(function, plugin.actionIcon(action))
 	}
 	
 	disconnectAction(plugin, function, action) {
-		function.setLabel("")
-		function.setIcon(false)
+		this.setControlLabel(function, "")
+		this.setControlIcon(function, false)
 		
 		actions := this.Actions[function]
 		
-		actions.RemoveAt(inList(actions, action))
+		index := inList(actions, action)
+		
+		if index
+			actions.RemoveAt(index)
 		
 		if (actions.Length() = 0)
 			this.Actions.Delete(function)
 	}
 	
 	setControlLabel(function, text, color := "Black", overlay := false) {
-		if !overlay {
+		if (this.isRunning() && this.hasFunction(function)) {
 			actions := this.Actions[function]
+			hasIcon := false
 			
 			for ignore, theAction in this.Actions[function]
 				if theAction.Icon {
-					text := ""
+					hasIcon := true
 					
 					break
 				}
-		}
 			
-		if this.hasFunction(function) {
-			Process Exist, SimulatorControllerPlugin.exe
-		
-			if (ErrorLevel && (this.Labels[function.Descriptor] == true))
-				this.Connector.SetTitle(function.Descriptor, text)
+			displayMode := this.Mode[function.Descriptor]
+			
+			if (hasIcon && ((displayMode = kIcon) || (displayMode = kIconOrLabel)))
+				this.Connector.SetTitle(function.Descriptor, "")
+			else {
+				labelMode := this.Label[function.Descriptor]
+				
+				if (labelMode == true)
+					this.Connector.SetTitle(function.Descriptor, text)
+				else if (labelMode == false)
+					this.Connector.SetTitle(function.Descriptor, "")
+				else
+					this.Connector.SetTitle(function.Descriptor, labelMode)
+			}
 		}
 	}
 	
 	setControlIcon(function, icon) {
-		if !icon
-			icon := ""
-		
-		if this.hasFunction(function) {
-			Process Exist, SimulatorControllerPlugin.exe
-		
-			if (ErrorLevel && (this.Icons[function.Descriptor] == true))
-				this.Connector.SetImage(function.Descriptor, icon)
+		if (this.isRunning() && this.hasFunction(function)) {
+			if (!icon || (icon = ""))
+				icon := "clear"
+			
+			displayMode := this.Mode[function.Descriptor]
+			
+			if (displayMode = kLabel)
+				this.Connector.SetImage(function.Descriptor, "")
+			else {
+				iconMode := this.Icon[function.Descriptor]
+				
+				if (iconMode == true)
+					this.Connector.SetImage(function.Descriptor, icon)
+				else if (iconMode == false)
+					this.Connector.SetImage(function.Descriptor, "clear")
+				else (displayMode != kLabel)
+					this.Connector.SetImage(function.Descriptor, iconMode)
+			}
 		}
 	}
 }

@@ -32,13 +32,20 @@ namespace SimulatorControllerPlugin
         class ControllerFunctionButton : Program.Button {
             ControllerFunction ControllerFunction { get; set; }
 
+            bool hasIcon = false;
+
             public override async void SetTitle(string title) {
                 await this.ControllerFunction.Connection.SetTitleAsync(title);
             }
 
-            public override async void SetImage(string path) {
-                if (path == "")
-                    await this.ControllerFunction.Connection.SetDefaultImageAsync();
+            public override void SetImage(string path) {
+                if (path.CompareTo("clear") == 0) {
+                    if (hasIcon) {
+                        this.ControllerFunction.Connection.SetDefaultImageAsync();
+
+                        hasIcon = false;
+                    }
+                }
                 else
                     using (MemoryStream m = new MemoryStream()) {
                         var image = Image.FromFile(path);
@@ -51,7 +58,9 @@ namespace SimulatorControllerPlugin
 
                         string base64String = Convert.ToBase64String(imageBytes);
 
-                        await this.ControllerFunction.Connection.SetImageAsync("data:" + mimeType + ";base64," + base64String);
+                        this.ControllerFunction.Connection.SetImageAsync("data:" + mimeType + ";base64," + base64String);
+
+                        hasIcon = true;
                     }
             }
 

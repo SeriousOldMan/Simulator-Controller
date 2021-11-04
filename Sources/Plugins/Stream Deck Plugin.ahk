@@ -363,53 +363,56 @@ class StreamDeck extends FunctionController {
 		if refresh
 			this.Connector.SetTitle(function, title)
 		else if this.RefreshActive {
-			this.iPendingUpdates := ObjBindMethod(this, "setFunctionTitle", function, title)
+			this.iPendingUpdates.Push(ObjBindMethod(this, "setFunctionTitle", function, title))
 	
 			return
 		}
-		else
+		else {
 			this.iFunctionTitles[function] := title
 		
-		this.Connector.SetTitle(function, title)
+			this.Connector.SetTitle(function, title)
+		}
 	}
 	
 	setFunctionImage(function, icon, refresh := false) {
-		if refresh
+		if refresh {
+			; showMessage("R: " . function . " - " . icon)
 			this.Connector.SetImage(function, icon)
+		}
 		else if this.RefreshActive {
-			this.iPendingUpdates := ObjBindMethod(this, "setFunctionImage", function, icon)
+			this.iPendingUpdates.Push(ObjBindMethod(this, "setFunctionImage", function, icon))
 	
 			return
 		}
-		else
+		else {
+			; showMessage("S: " . function . " - " . icon)
 			this.iFunctionImages[function] := icon
 		
-		this.Connector.SetImage(function, icon)
+			this.Connector.SetImage(function, icon)
+		}
 	}
 	
 	refresh() {
-		local function
-		
 		if this.RefreshActive
 			return
 		else {
 			this.iRefreshActive := true
 		
 			try {
-				for function, title in this.iFunctionTitles
-					this.setFunctionTitle(function, title, true)
+				for theFunction, title in this.iFunctionTitles
+					this.setFunctionTitle(theFunction, title, true)
 				
-				for function, image in this.iFunctionImages
-					this.setFunctionImage(function, image, true)
-				
-				for ignore, update in this.iPendingsUpdates
-					%update%()
-				
-				this.iPendingUpdates := []
+				for theFunction, image in this.iFunctionImages
+					this.setFunctionImage(theFunction, image, true)
 			}
 			finally {
 				this.iRefreshActive := false
 			}
+				
+			for ignore, update in this.iPendingUpdates
+				%update%()
+			
+			this.iPendingUpdates := []
 		}
 	}
 }
@@ -423,6 +426,8 @@ refreshStreamDecks() {
 	for ignore, fnController in SimulatorController.Instance.FunctionController
 		if isInstance(fnController, StreamDeck)
 			fnController.refresh()
+	
+	SetTimer refreshStreamDecks, -5000
 }
 
 streamDeckEventHandler(event, data) {
@@ -453,8 +458,6 @@ streamDeckEventHandler(event, data) {
 		default:
 			Throw "Unknown controller function type (" . descriptor[1] . ") detected in streamDeckEventHandler..."
 	}
-	
-	SetTimer refreshStreamDecks, 5000
 }
 
 initializeStreamDeckPlugin() {
@@ -469,6 +472,8 @@ initializeStreamDeckPlugin() {
 	}
 	
 	registerEventHandler("Stream Deck", "streamDeckEventHandler")
+	
+	SetTimer refreshStreamDecks, -5000
 }
 
 

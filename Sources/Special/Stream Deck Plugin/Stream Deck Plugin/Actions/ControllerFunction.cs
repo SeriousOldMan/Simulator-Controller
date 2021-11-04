@@ -40,15 +40,13 @@ namespace SimulatorControllerPlugin
                 await this.ControllerFunction.Connection.SetTitleAsync(title);
             }
 
-            public override void SetImage(string path) {
+            public override async void SetImage(string path) {
                 this.ControllerFunction.SwitchProfile();
 
                 if (path.CompareTo("clear") == 0) {
-                    if (hasIcon) {
-                        this.ControllerFunction.Connection.SetDefaultImageAsync();
+                    await this.ControllerFunction.Connection.SetImageAsync((String)null, null, true);
 
-                        hasIcon = false;
-                    }
+                    hasIcon = false;
                 }
                 else
                     using (MemoryStream m = new MemoryStream()) {
@@ -62,7 +60,7 @@ namespace SimulatorControllerPlugin
 
                         string base64String = Convert.ToBase64String(imageBytes);
 
-                        this.ControllerFunction.Connection.SetImageAsync("data:" + mimeType + ";base64," + base64String);
+                        await this.ControllerFunction.Connection.SetImageAsync("data:" + mimeType + ";base64," + base64String);
 
                         hasIcon = true;
                     }
@@ -139,7 +137,7 @@ namespace SimulatorControllerPlugin
         }
 
         public override void Dispose() {
-            Program.UnregisterButton(this.Button);
+            Program.UnregisterButton(Button);
         }
 
         public string GetFunction() {

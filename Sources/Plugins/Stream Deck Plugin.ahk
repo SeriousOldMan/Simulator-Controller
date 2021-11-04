@@ -38,6 +38,7 @@ class StreamDeck extends FunctionController {
 	iLabels := {}
 	iIcons := {}
 	iModes := {}
+	iSpecial := {}
 		
 	iConnector := false
 	
@@ -112,10 +113,21 @@ class StreamDeck extends FunctionController {
 		}
 	}
 	
-	Mode[function := false] {
+	Mode[function := false, icon := false] {
 		Get {
-			if function
+			if (function != false) {
+				if isInstance(function, ControllerFunction)
+					function := function.Descriptor
+				
+				if (icon != false) {
+					icon := (function . "." . icon)
+				
+					if this.iModes.HasKey(icon)
+						return this.iModes[icon]
+				}
+				
 				return (this.iModes.HasKey(function) ? this.iModes[function] : kIconOrLabel)
+			}	
 			else
 				return this.iModes
 		}
@@ -193,6 +205,18 @@ class StreamDeck extends FunctionController {
 							this.setControlLabel(function, label)
 					}
 					
+					Loop {
+						special := mode := getConfigurationValue(configuration, "Buttons", this.Layout . "." . function . ".Mode.Icon." . A_Index, kUndefined)
+					
+						if (special == kUndefined)
+							break
+						else {
+							special := string2values(";", special)
+						
+							this.iModes[function . "." . special[1]] := special[2]
+						}
+					}
+					
 					switch ConfigurationItem.splitDescriptor(function)[1] {
 						case k1WayToggleType:
 							num1WayToggles += 1
@@ -258,18 +282,20 @@ class StreamDeck extends FunctionController {
 	setControlLabel(function, text, color := "Black", overlay := false) {
 		if (this.isRunning() && this.hasFunction(function)) {
 			actions := this.Actions[function]
-			hasIcon := false
+			icon := false
 			
-			for ignore, theAction in this.Actions[function]
-				if theAction.Icon {
-					hasIcon := true
-					
+			for ignore, theAction in this.Actions[function] {
+				icon := theAction.Icon
+			
+				if (icon && (icon != ""))
 					break
-				}
+				else
+					icon := false
+			}
 			
-			displayMode := this.Mode[function.Descriptor]
+			displayMode := (icon ? this.Mode[function, icon] : this.Mode[function])
 			
-			if (hasIcon && !overlay && ((displayMode = kIcon) || (displayMode = kIconOrLabel)))
+			if ((icon != false) && !overlay && ((displayMode = kIcon) || (displayMode = kIconOrLabel)))
 				this.Connector.SetTitle(function.Descriptor, "")
 			else {
 				labelMode := this.Label[function.Descriptor]
@@ -289,7 +315,7 @@ class StreamDeck extends FunctionController {
 			if (!icon || (icon = ""))
 				icon := "clear"
 			
-			displayMode := this.Mode[function.Descriptor]
+			displayMode := ((icon != "clear") ? this.Mode[function, icon] : this.Mode[function])
 			
 			if (displayMode = kLabel)
 				this.Connector.SetImage(function.Descriptor, "clear")

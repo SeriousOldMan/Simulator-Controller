@@ -44,6 +44,12 @@ class StreamDeck extends FunctionController {
 	
 	iActions := {}
 	
+	iFunctionTitles := {}
+	iFunctionImages := {}
+		
+	iRefreshActive := false
+	iPendingUpdates := []
+	
 	Type[] {
 		Get {
 			return "Stream Deck"
@@ -136,6 +142,12 @@ class StreamDeck extends FunctionController {
 		}
 	}
 	
+	RefreshActive[] {
+		Get {
+			return this.iRefreshActive
+		}
+	}
+	
 	Connector[] {
 		Get {
 			return this.iConnector
@@ -198,8 +210,8 @@ class StreamDeck extends FunctionController {
 					isRunning := this.isRunning()
 					
 					if isRunning {
-						this.Connector.SetTitle(function, "")
-						this.Connector.SetImage(function, "clear")
+						this.setFunctionTitle(function, "")
+						this.setFunctionImage(function, "clear")
 					}
 					
 					if (mode != kIconOrLabel) {
@@ -311,16 +323,16 @@ class StreamDeck extends FunctionController {
 			displayMode := (icon ? this.Mode[function, icon] : this.Mode[function])
 			
 			if ((icon != false) && !overlay && ((displayMode = kIcon) || (displayMode = kIconOrLabel)))
-				this.Connector.SetTitle(function.Descriptor, "")
+				this.setFunctionTitle(function.Descriptor, "")
 			else {
 				labelMode := this.Label[function.Descriptor]
 				
 				if (labelMode == true)
-					this.Connector.SetTitle(function.Descriptor, text)
+					this.setFunctionTitle(function.Descriptor, text)
 				else if (labelMode == false)
-					this.Connector.SetTitle(function.Descriptor, "")
+					this.setFunctionTitle(function.Descriptor, "")
 				else
-					this.Connector.SetTitle(function.Descriptor, labelMode)
+					this.setFunctionTitle(function.Descriptor, labelMode)
 			}
 		}
 	}
@@ -333,16 +345,70 @@ class StreamDeck extends FunctionController {
 			displayMode := ((icon != "clear") ? this.Mode[function, icon] : this.Mode[function])
 			
 			if (displayMode = kLabel)
-				this.Connector.SetImage(function.Descriptor, "clear")
+				this.setFunctionImage(function.Descriptor, "clear")
 			else {
 				iconMode := this.Icon[function.Descriptor]
 				
 				if (iconMode == true)
-					this.Connector.SetImage(function.Descriptor, icon)
+					this.setFunctionImage(function.Descriptor, icon)
 				else if (iconMode == false)
-					this.Connector.SetImage(function.Descriptor, "clear")
+					this.setFunctionImage(function.Descriptor, "clear")
 				else
-					this.Connector.SetImage(function.Descriptor, iconMode)
+					this.setFunctionImage(function.Descriptor, iconMode)
+			}
+		}
+	}
+	
+	setFunctionTitle(function, title, refresh := false) {
+		if refresh
+			this.Connector.SetTitle(function, title)
+		else if this.RefreshActive {
+			this.iPendingUpdates := ObjBindMethod(this, "setFunctionTitle", function, title)
+	
+			return
+		}
+		else
+			this.iFunctionTitles[function] := title
+		
+		this.Connector.SetTitle(function, title)
+	}
+	
+	setFunctionImage(function, icon, refresh := false) {
+		if refresh
+			this.Connector.SetImage(function, icon)
+		else if this.RefreshActive {
+			this.iPendingUpdates := ObjBindMethod(this, "setFunctionImage", function, icon)
+	
+			return
+		}
+		else
+			this.iFunctionImages[function] := icon
+		
+		this.Connector.SetImage(function, icon)
+	}
+	
+	refresh() {
+		local function
+		
+		if this.RefreshActive
+			return
+		else {
+			this.iRefreshActive := true
+		
+			try {
+				for function, title in this.iFunctionTitles
+					this.setFunctionTitle(function, title, true)
+				
+				for function, image in this.iFunctionImages
+					this.setFunctionImage(function, image, true)
+				
+				for ignore, update in this.iPendingsUpdates
+					%update%()
+				
+				this.iPendingUpdates := []
+			}
+			finally {
+				this.iRefreshActive := false
 			}
 		}
 	}
@@ -352,6 +418,12 @@ class StreamDeck extends FunctionController {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+refreshStreamDecks() {
+	for ignore, fnController in SimulatorController.Instance.FunctionController
+		if isInstance(fnController, StreamDeck)
+			fnController.refresh()
+}
 
 streamDeckEventHandler(event, data) {
 	local function
@@ -381,6 +453,8 @@ streamDeckEventHandler(event, data) {
 		default:
 			Throw "Unknown controller function type (" . descriptor[1] . ") detected in streamDeckEventHandler..."
 	}
+	
+	SetTimer refreshStreamDecks, 5000
 }
 
 initializeStreamDeckPlugin() {

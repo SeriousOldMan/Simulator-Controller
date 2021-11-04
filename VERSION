@@ -1,5 +1,5 @@
 [Development]
-Version=3.6.6-dev
+Version=3.6.6-beta
 Target=3.6.6-release
 Date=11/4/2021
 Download=https://www.dropbox.com/s/y9w10zifasjuerw/Simulator%20Controller%203.6.6-beta.zip?dl=1
@@ -13,4 +13,4 @@ Changes=Improved refuel handling for the last stints in strategy development, Va
 Type=Development
 [Version]
 Release=3.6.5-release
-Development=3.6.6-dev
+Development=3.6.6-beta

@@ -188,7 +188,7 @@ class StreamDeck extends FunctionController {
 					}
 					
 					if (mode != kIconOrLabel) {
-						this.iModes[function] := icon
+						this.iModes[function] := mode
 					}
 					
 					if (icon != true) {

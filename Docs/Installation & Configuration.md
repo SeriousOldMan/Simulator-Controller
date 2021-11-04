@@ -400,6 +400,10 @@ Release 3.6.6 introduces support for Stream Deck controller, very similar to the
 	Stream Deck Mini.Layout=2 x 3
 	Stream Deck Mini.1=Button.11;;
 	Stream Deck Mini.2=;;
+	[Icons]
+	Stream Deck.Icon.Mode.1=D:\Controller\Resources\Icons\Throttle.ico;Icon
+	Stream Deck.Icon.Mode.2=D:\Controller\Resources\Icons\Brake.ico;Icon
+	Stream Deck.Icon.Mode.3=D:\Controller\Resources\Icons\Clutch.ico;Icon
 	[Buttons]
 	Stream Deck.Button.1.Icon=true
 	Stream Deck.Button.1.Label=true
@@ -410,8 +414,9 @@ Release 3.6.6 introduces support for Stream Deck controller, very similar to the
 	Stream Deck.Button.3.Icon=true
 	Stream Deck.Button.3.Label=true
 	Stream Deck.Button.3.Mode=IconOrLabel
-	Stream Deck.Button.3.Mode.Icon.1=D:\Controller\Resources\Icons\Gear,ico;IconAndLabel
-	Stream Deck.Button.3.Mode.Icon.2=D:\Controller\Resources\Icons\Flash,ico;IconAndLabel
+	Stream Deck.Button.2.Mode.Icon.1=D:\Controller\Resources\Icons\Gear.ico;IconAndLabel
+	Stream Deck.Button.2.Mode.Icon.2=D:\Controller\Resources\Icons\Flash.ico;IconAndLabel
+	Stream Deck.Button.3.Mode.Icon.1=D:\Controller\Resources\Icons\Gear.ico;IconAndLabel
 	...
 	Stream Deck Mini.Button.11.Icon=D:\Controller\Resources\Icons\Gear,ico
 	Stream Deck Mini.Button.11.Label=Select\nMode
@@ -419,9 +424,11 @@ Release 3.6.6 introduces support for Stream Deck controller, very similar to the
 
 To connect your Stream Deck(s) with Simulator Controller, you must install the special Stream Deck plugin, which is supplied in the *Utilities* folder. Copy the complete folder *de.thebigo.simulatorcontroller.sdplugin* to *%appdata%\Elgato\StreamDeck\Plugins*. Then create a profile using the special action *Controller Function* supplied by this Stream Deck plugin. It is important that you leave the title of the action blank and set the *Function* to the desired controller function, for example "Buttton.1".
 
+Important Note: Due to some restrictions, it is currently necessary, that this profile is active on the Stream Deck, when Simulator Controller starts up. Easy to achieve, if you start "Simulator Startup" from the Stream Deck itself. Simply use a multi action and switch to the profile just before start "Simulator Startup".
+
 Then you have to create "Stream Deck Configuration.ini" file similar to the example above and save it to the *Simulator Controller\Config* folder in your user *Documents* folder. For each button in the profile you can define the default icon to be shown on the Stream Deck and whether textual labels should be shown on the Stream Deck buttons as well. The value for the optional *[layout].Button.X.Label* property may be *false* (no label), true (default; use the action label from the [labels defined in the general configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins)) or you can supply a fixed text here (you can use "\n" to start a new line in the text value). To supply an icon using the optional *[layout].Button.X.Icon*, use a full path to an image file supported by Stream Deck. Here you can also use *false* to specify that you never want to change the icon on the Stream Deck, or *true* (which is the default), if the [icon from general configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) should by used for the associated controller action, if one is available.
 
-With the *...Mode* property you can define for a button, which layers should be dsiplayed on the Stream Deck. *IconOrLabel*, which is the default, means that the icon is displayed without a label, if an icon is availabel. Other values for this property are *Icon* (only an icon or nothing is displayed), *Label* (only a label or nothing is displayed), or *IconAndLabel*, which means, that both an icon and a label will be displayed. As you can see in the example above, you can declare exceptions from the default *Mode* using the *...Mode.Icon.XX* property, if necessary. Using this exception rule, you can define the *Mode* per icon and button seperately, which can get quite excessive, but it will give you very nice results on the Stream Deck.
+With the *...Mode* property you can define for a button, which layers should be dsiplayed on the Stream Deck. *IconOrLabel*, which is the default, means that the icon is displayed without a label, if an icon is availabel. Other values for this property are *Icon* (only an icon or nothing is displayed), *Label* (only a label or nothing is displayed), or *IconAndLabel*, which means, that both an icon and a label will be displayed. As you can see in the example above, you can declare exceptions from the default *Mode* using the *...Mode.Icon.XX* property, if necessary. Using this exception rule, you can define the *Mode* per icon and button seperately, which can get quite excessive, but it will give you very nice results on the Stream Deck. As you can also see in the exampel, you can also declare a mode for an icon independent of a specific button, but a button specific declaration always takes precedence.
 
 Example: In the above example, all "Stream Deck" Actions will use the icons for the currently associated controller action as defined in the "Controller Action Icons.XX" file. Please note, that you can omit the declaration "...Label=true", since this is the default. If an icon is available, the label will not be shown. Only the first two rows of the Stream Deck are used here for controller actions, whereas in the "Stream Deck Mini" only the first button in the top row is configured with a fixed icon and label.
 

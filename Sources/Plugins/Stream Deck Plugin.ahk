@@ -120,8 +120,11 @@ class StreamDeck extends FunctionController {
 					function := function.Descriptor
 				
 				if (icon != false) {
-					icon := (function . "." . icon)
+					key := (function . "." . icon)
 				
+					if this.iModes.HasKey(key)
+						return this.iModes[key]
+					
 					if this.iModes.HasKey(icon)
 						return this.iModes[icon]
 				}
@@ -165,6 +168,18 @@ class StreamDeck extends FunctionController {
 		
 		this.iRows := layout[1]
 		this.iColumns := layout[2]
+					
+		Loop {
+			special := mode := getConfigurationValue(configuration, "Icons", this.Layout . ".Icon.Mode." . A_Index, kUndefined)
+		
+			if (special == kUndefined)
+				break
+			else {
+				special := string2values(";", special)
+			
+				this.iModes[special[1]] := special[2]
+			}
+		}
 		
 		rows := []
 		

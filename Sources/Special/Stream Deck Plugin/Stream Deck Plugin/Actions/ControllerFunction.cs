@@ -35,10 +35,14 @@ namespace SimulatorControllerPlugin
             bool hasIcon = false;
 
             public override async void SetTitle(string title) {
+                this.ControllerFunction.SwitchProfile();
+
                 await this.ControllerFunction.Connection.SetTitleAsync(title);
             }
 
             public override void SetImage(string path) {
+                this.ControllerFunction.SwitchProfile();
+
                 if (path.CompareTo("clear") == 0) {
                     if (hasIcon) {
                         this.ControllerFunction.Connection.SetDefaultImageAsync();
@@ -69,10 +73,6 @@ namespace SimulatorControllerPlugin
             }
         }
 
-        ControllerFunctionButton Button { get; set; }
-
-        const int WM_COPYDATA = 0x004A;
-
         [DllImport("user32.dll")]
         public static extern int FindWindowEx(int hwndParent, int hwndChildAfter, string lpszClass, string lpszWindow);
 
@@ -97,10 +97,10 @@ namespace SimulatorControllerPlugin
             return result;
         }
 
-        private class PluginSettings
-        {
-            public static PluginSettings CreateDefaultSettings()
-            {
+        #region Private Members
+
+        private class PluginSettings {
+            public static PluginSettings CreateDefaultSettings() {
                 PluginSettings instance = new PluginSettings();
                 instance.Function = "Button.1";
                 return instance;
@@ -110,12 +110,11 @@ namespace SimulatorControllerPlugin
             public string Function { get; set; }
         }
 
-        #region Private Members
-
         private PluginSettings settings;
-        private bool _valueShown;
-        private int _valueShownTimeout = 1;
-        private DateTime _valueShownDateTime = DateTime.Now;
+
+        ControllerFunctionButton Button { get; set; }
+
+        const int WM_COPYDATA = 0x004A;
 
         #endregion
         public ControllerFunction(SDConnection connection, InitialPayload payload) : base(connection, payload)
@@ -133,6 +132,10 @@ namespace SimulatorControllerPlugin
             this.Button = new ControllerFunctionButton(this);
 
             Program.RegisterButton(this.Button);
+
+            Connection.OnApplicationDidLaunch += OnApplicationDidLaunch;
+
+            Connection.OnApplicationDidTerminate += OnApplicationDidTerminate;
         }
 
         public override void Dispose() {
@@ -162,6 +165,27 @@ namespace SimulatorControllerPlugin
 
         public override void OnTick() { }
 
+        private bool switched = false;
+
+        public void SwitchProfile() {
+            if (!switched) {
+                switched = true;
+
+                Connection.SwitchProfileAsync("Simulator Controller");
+            }
+        }
+
+        private void OnApplicationDidTerminate(object sender, BarRaider.SdTools.Wrappers.SDEventReceivedEventArgs<BarRaider.SdTools.Events.ApplicationDidTerminate> e) {
+            switched = false;
+
+            Button.SetTitle("");
+            Button.SetImage("clear");
+        }
+
+        private void OnApplicationDidLaunch(object sender, BarRaider.SdTools.Wrappers.SDEventReceivedEventArgs<BarRaider.SdTools.Events.ApplicationDidLaunch> e) {
+            SwitchProfile();
+        }
+
         public override void ReceivedSettings(ReceivedSettingsPayload payload)
         {
             Program.UnregisterButton(this.Button);
@@ -177,53 +201,6 @@ namespace SimulatorControllerPlugin
         public override void ReceivedGlobalSettings(ReceivedGlobalSettingsPayload payload) { }
 
         #region Private Methods
-        private async Task DrawValueData(int value)
-        {
-
-            try
-            {
-                var ForegroundColor = "#ffffff";
-                var BackgroundColor = "#000000";
-
-                Bitmap bmp = Tools.GenerateGenericKeyImage(out Graphics graphics);
-                int height = bmp.Height;
-                int width = bmp.Width;
-
-                SizeF stringSize;
-                float stringPos;
-                var fontDefault = new Font("Verdana", 30, FontStyle.Bold);
-
-                // Background
-                var bgBrush = new SolidBrush(ColorTranslator.FromHtml(BackgroundColor));
-                var fgBrush = new SolidBrush(ColorTranslator.FromHtml(ForegroundColor));
-                graphics.FillRectangle(bgBrush, 0, 0, width, height);
-
-                // Top title
-                string title = "";
-                stringSize = graphics.MeasureString(title, fontDefault);
-                stringPos = Math.Abs((width - stringSize.Width)) / 2;
-                graphics.DrawString(title, fontDefault, fgBrush, new PointF(stringPos, 5));
-
-                string currStr = value.ToString();
-                int buffer = 0;
-
-                stringSize = graphics.MeasureString(currStr, fontDefault);
-                stringPos = Math.Abs((width - stringSize.Width)) / 2;
-                graphics.DrawString(currStr, fontDefault, fgBrush, new PointF(stringPos, 50));
-                Connection.SetImageAsync(bmp);
-                graphics.Dispose();
-                _valueShown = true;
-                _valueShownDateTime = DateTime.Now;
-            }
-            catch (Exception ex)
-            {
-                Logger.Instance.LogMessage(TracingLevel.ERROR, $"Error drawing image data {ex}");
-            }
-        }
-        private async Task RestoreImage()
-        {
-            await Connection.SetDefaultImageAsync();
-        }
         private Task SaveSettings()
         {
             return Connection.SetSettingsAsync(JObject.FromObject(settings));

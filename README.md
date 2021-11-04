@@ -41,7 +41,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[3.6.6-alpha](https://www.dropbox.com/s/ylvgwp4l2lqc1q4/Simulator%20Controller%203.6.6-alpha.zip?dl=1) (Early build for release 3.6.6. New features: More sophisticated tyre compound handling, Refactoring of ButtonBox class, Early integration of StreamDeck, Renamed "Controller Plugin Labels" to "Controller Action Labels", Introduced "Controller Action Icons" for Stream Deck support, New *udpConnection* parameter for the ACC plugin, Support for telemetry data cleanup in "Simulator Workbench", Only valid laps will be used for telemetry and tyre setup data, Binary functions are supported for effect intensity actions in "Motion Feedback" plugin. Stable, with update procedure and documentation.)
+[3.6.6-beta](https://www.dropbox.com/s/y9w10zifasjuerw/Simulator%20Controller%203.6.6-beta.zip?dl=1) (Early build for release 3.6.6. New features: More sophisticated tyre compound handling, Refactoring of ButtonBox class, Early integration of StreamDeck, Renamed "Controller Plugin Labels" to "Controller Action Labels", Introduced "Controller Action Icons" for Stream Deck support, New *udpConnection* parameter for the ACC plugin, Support for telemetry data cleanup in "Simulator Workbench", Only valid laps will be used for telemetry and tyre setup data, Binary functions are supported for effect intensity actions in "Motion Feedback" plugin. Stable, with update procedure and documentation.)
 
 Important: The "Controller Plugin Labels" files changed. Be careful and read the update notes...
 

@@ -1,4 +1,4 @@
-## 3.6.6-release 11/05/21 (planned)
+## 3.6.6-release 11/05/21
 
   1. Bugfixes, as always
   2. Documentation updates, as always

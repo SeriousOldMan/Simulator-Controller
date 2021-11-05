@@ -29,23 +29,21 @@ Simply download and run [Simulator Controller.exe](https://bit.ly/3vCSIa1) (you 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[3.6.5-release](https://bit.ly/2XDJGwI) (New features: Improved refuel handling for the last stints in strategy development, Variation of fuel consumption, initial fuel and tyre usage is now possible in strategy simulations, New action "StrategyCancel" for "Race Strategist" and all simulator plugins, New "InformationRequest" commands "StrategyOverview" and "NextPitstop" for "Race Strategist" and all simulator plugins, Cato will use the current strategy developed in the "Strategy Workbench" and will instruct Jona accordingly, Coloured many icons. **Version 3.6.5 is a maintenance release for 3.6.4.**)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-364) of this version and all the versions you might have skipped, before installing and using this version.
-
-##### Earlier release builds
-
-[3.6.2-release](https://www.dropbox.com/s/tiw6t0vgzxdlv8q/Simulator%20Controller%203.6.2-release.zip?dl=1) (New features: Saving and loading of Strategies in "Strategy Workbench", Initializing values in "Strategy Workbench", Comparison of strategies in "Strategy Workbench", Take pitstop rules into account in strategy simulations.)
-
-[3.6.0-release](https://www.dropbox.com/s/u50l7gihmrvlmon/Simulator%20Controller%203.6.0-release.zip?dl=1) (New features: Initial version of strategy simulation in "Strategy Workbench".)
-
-#### Latest development build
-
-[3.6.6-beta](https://www.dropbox.com/s/y9w10zifasjuerw/Simulator%20Controller%203.6.6-beta.zip?dl=1) (Early build for release 3.6.6. New features: More sophisticated tyre compound handling, Refactoring of ButtonBox class, Early integration of StreamDeck, Renamed "Controller Plugin Labels" to "Controller Action Labels", Introduced "Controller Action Icons" for Stream Deck support, New *udpConnection* parameter for the ACC plugin, Support for telemetry data cleanup in "Simulator Workbench", Only valid laps will be used for telemetry and tyre setup data, Binary functions are supported for effect intensity actions in "Motion Feedback" plugin. Stable, with update procedure and documentation.)
+[3.6.6-release](https://bit.ly/3wkDC9h) (New features: More sophisticated tyre compound handling, Refactoring of ButtonBox class, Early integration of StreamDeck, Renamed "Controller Plugin Labels" to "Controller Action Labels", Introduced "Controller Action Icons" for Stream Deck support, New *udpConnection* parameter for the ACC plugin, Support for telemetry data cleanup in "Simulator Workbench", Only valid laps will be used for telemetry and tyre setup data, Binary functions are supported for effect intensity actions in "Motion Feedback" plugin.)
 
 Important: The "Controller Plugin Labels" files changed. Be careful and read the update notes...
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-366) of this version and all the versions you might have skipped, before installing and using this version.
+
+##### Earlier release builds
+
+[3.6.5-release](https://bit.ly/2XDJGwI) (New features: Improved refuel handling for the last stints in strategy development, Variation of fuel consumption, initial fuel and tyre usage is now possible in strategy simulations, New action "StrategyCancel" for "Race Strategist" and all simulator plugins, New "InformationRequest" commands "StrategyOverview" and "NextPitstop" for "Race Strategist" and all simulator plugins, Cato will use the current strategy developed in the "Strategy Workbench" and will instruct Jona accordingly, Coloured many icons. **Version 3.6.5 is a maintenance release for 3.6.4.**)
+
+[3.6.2-release](https://www.dropbox.com/s/tiw6t0vgzxdlv8q/Simulator%20Controller%203.6.2-release.zip?dl=1) (New features: Saving and loading of Strategies in "Strategy Workbench", Initializing values in "Strategy Workbench", Comparison of strategies in "Strategy Workbench", Take pitstop rules into account in strategy simulations.)
+
+#### Latest development build
+
+None for the moment...
 
 ### Discord Community
 

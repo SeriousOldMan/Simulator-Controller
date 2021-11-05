@@ -105,7 +105,7 @@ class SystemPlugin extends ControllerPlugin {
 				if mode
 					return mode.Mode
 				else
-					return translate("Mode Selector")
+					return StrReplace(translate("Mode Selector"), A_Space, "`n")
 			}
 		}
 	
@@ -134,10 +134,10 @@ class SystemPlugin extends ControllerPlugin {
 			}
 		}
 	
-		__New(function, label, name) {
+		__New(function, label, icon, name) {
 			this.iApplication := new Application(name, function.Controller.Configuration)
 			
-			base.__New(function, label)
+			base.__New(function, label, icon)
 		}
 		
 		fireAction(function, trigger) {
@@ -216,7 +216,7 @@ class SystemPlugin extends ControllerPlugin {
 				function := controller.findFunction(descriptor)
 				
 				if (function != false) {
-					action := new this.ModeSelectorAction(function)
+					action := new this.ModeSelectorAction(function, "", this.getIcon("ModeSelector.Activate"))
 					
 					this.iModeSelectors.Push(action)
 					
@@ -285,7 +285,7 @@ class SystemPlugin extends ControllerPlugin {
 				runnable := this.findRunnableApplication(appDescriptor[2])
 				
 				if (runnable != false) {
-					action := new this.LaunchAction(function, appDescriptor[1], appDescriptor[2])
+					action := new this.LaunchAction(function, appDescriptor[1], this.getIcon("Launch.Activate"), appDescriptor[2])
 
 					if !this.iLaunchMode
 						this.iLaunchMode := new this.LaunchMode(this)
@@ -309,7 +309,7 @@ class SystemPlugin extends ControllerPlugin {
 			runnable := this.findRunnableApplication(application)
 			
 			if (runnable != false) {
-				action := new this.LaunchAction(function, label, application)
+				action := new this.LaunchAction(function, label, this.getIcon("Launch.Activate"), application)
 
 				if !this.iLaunchMode
 					this.iLaunchMode := new this.LaunchMode(this)
@@ -551,10 +551,10 @@ updateModeSelector() {
 				if currentMode
 					currentMode := currentMode.Mode
 				else
-					currentMode := translate("Mode Selector")
+					currentMode := StrReplace(translate("Mode Selector"), A_Space, "`n")
 			}
 			else
-				currentMode := translate("Mode Selector")
+				currentMode := StrReplace(translate("Mode Selector"), A_Space, "`n")
 			
 			if modeSelectorMode
 				function.setLabel(translate(currentMode))

@@ -40,6 +40,8 @@ global kToolsTargetsFile = "Simulator Tools.targets"
 
 global kUpdateMessages = {updateTranslations: "Updating translations to "
 						, updatePluginLabels: "Updating plugin labels to "
+						, updateActionLabels: "Updating action labels to "
+						, updateActionIcons: "Updating action icons to "
 						, updatePhraseGrammars: "Updating phrase grammars to "
 						, updateACCPluginForV20: "Updating ACC plugin to ", updateACCPluginForV21: "Updating ACC plugin to "
 						, updatePedalCalibrationPluginForV21: "Updating Pedal Calibration plugin to "
@@ -1262,79 +1264,71 @@ updateTranslations() {
 	}
 }
 
-deletePluginLabels() {
-	for ignore, fileName in getFileNames("Controller Plugin Labels.*", kUserTranslationsDirectory)
+deleteActionLabels() {
+	deletePluginLabels("Controller Action Labels")
+}
+
+deletePluginLabels(fileName := "Controller Plugin Labels") {
+	for ignore, fName in getFileNames(fileName . ".*", kUserTranslationsDirectory)
 		try {
-			FileMove %filename%, %filename%.bak, 1
+			FileMove %fName%, %fName%.bak, 1
 		}
 		catch exception {
 			; ignore
 		}
 }
 
-overwriteActionLabels() {
-	overwritePluginLabels("Controller Action Labels")
-}
-
-overwritePluginLabels(fileName := "Controller Plugin Labels") {
-	for ignore, fileName in getFileNames(fileName . ".*", kUserTranslationsDirectory)
-		FileMove %filename%, %filename%.bak, 1
-	
-	for ignore, fileName in getFileNames(fileName . ".*", kResourcesDirectory . "Templates\") {
-		SplitPath fileName, , , languageCode
-	
-		if !FileExist(kUserTranslationsDirectory . fileName . "." . languageCode)
-			FileCopy %kResourcesDirectory%Templates\%fileName%.%languageCode%, %kUserTranslationsDirectory%
-	}
-}
-
 updateActionLabels() {
-	updatePluginLabels("Controller Action Labels")
+	updateActionDefinitions("Controller Action Labels")
 }
 
-updatePluginLabels(fileName := "Controller Plugin Labels") {
+updateActionIcons() {
+	updateActionDefinitions("Controller Action Icons")
+}
+
+updateActionDefinitions(fileName := "Controller Plugin Labels") {
 	languages := availableLanguages()
-	enPluginLabels := readConfiguration(kResourcesDirectory . "Templates\" . fileName . ".en")
+	enDefinitions := readConfiguration(kResourcesDirectory . "Templates\" . fileName . ".en")
 	
-	for ignore, userPluginLabelsFile in getFileNames(fileName . ".*", kUserTranslationsDirectory, kUserConfigDirectory) {
-		SplitPath userPluginLabelsFile, , , languageCode
+	for ignore, userDefinitionsFile in getFileNames(fileName . ".*", kUserTranslationsDirectory, kUserConfigDirectory) {
+		SplitPath userDefinitionsFile, , , languageCode
 	
 		if !languages.HasKey(languageCode)
-			bundledPluginLabels := enPluginLabels
+			bundledDefinitions := enDefinitions
 		else {
-			bundledPluginLabels := readConfiguration(kResourcesDirectory . "Templates\" . fileName . "." . languageCode)
+			bundledDefinitions := readConfiguration(kResourcesDirectory . "Templates\" . fileName . "." . languageCode)
 		
-			if (bundledPluginLabels.Count() == 0)
-				bundledPluginLabels := enPluginLabels
+			if (bundledDefinitions.Count() == 0)
+				bundledDefinitions := enDefinitions
 		}
 		
-		userPluginLabels := readConfiguration(userPluginLabelsFile)
+		userDefinitions := readConfiguration(userDefinitionsFile)
 		changed := false
 		
-		for section, keyValues in bundledPluginLabels
+		for section, keyValues in bundledDefinitions
 			for key, value in keyValues
-				if (getConfigurationValue(userPluginLabels, section, key, kUndefined) == kUndefined) {
-					setConfigurationValue(userPluginLabels, section, key, value)
+				if (getConfigurationValue(userDefinitions, section, key, kUndefined) == kUndefined) {
+					setConfigurationValue(userDefinitions, section, key, value)
 					
 					changed := true
 				}
 		
-		for section, keyValues in userPluginLabels {
+		for section, keyValues in userDefinitions {
 			keys := []
 		
 			for key, value in keyValues
-				if (getConfigurationValue(bundledPluginLabels, section, key, kUndefined) == kUndefined) {
+				if (getConfigurationValue(bundledDefinitions, section, key, kUndefined) == kUndefined) {
 					keys.Push(key)
 					
 					changed := true
 				}
 				
 			for ignore, key in keys
-				removeConfigurationValue(userPluginLabels, section, key)
+				removeConfigurationValue(userDefinitions, section, key)
 		}
 		
 		if changed
-			writeConfiguration(userPluginLabelsFile, userPluginLabels)
+			writeConfiguration(userDefinitionsFile, userDefinitions)
 	}
 }
 

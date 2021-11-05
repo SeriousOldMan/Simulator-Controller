@@ -78,7 +78,7 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 			}
 		}
 		
-		__New(function, label, pedal, shape) {
+		__New(function, label, icon, pedal, shape) {
 			this.iPedal := pedal
 			this.iShape := shape
 			this.iSelectionIndex := inList(kCurveShapes, shape)
@@ -97,7 +97,7 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 					Throw "Unknown pedal type """ . pedal . """ detected in CurveShapeAction.__New..."
 			}
 				
-			base.__New(function, label)
+			base.__New(function, label, icon)
 		}
 		
 		fireAction(function, trigger) {
@@ -212,8 +212,10 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 		
 		label := translate(pedal) . "`n" . shape
 		
-		if (function != false)
-			this.iPedalProfileMode.registerAction(new this.CurveShapeAction(function, label, pedal, shape))
+		if (function != false) {
+			icon := this.getIcon("CurveShape." . shape . ".Activate", this.getIcon("CurveShape.Activate"))
+			this.iPedalProfileMode.registerAction(new this.CurveShapeAction(function, label, icon, pedal, shape))
+		}
 		else
 			this.logFunctionNotFound(descriptor)
 	}

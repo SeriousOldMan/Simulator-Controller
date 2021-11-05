@@ -14,4 +14,3 @@
   
 #### General
   1. [Target: V3.x] Choosing a specific theme depending on the selected simulation game
-  2. [Target: V3.x] Icon and profile support for StreamDeck

@@ -45,6 +45,12 @@ Although the code, that handles all the update tasks, is integrated into *Simula
 
 Note: Some of you might want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars* and *Simulator Controller\Rules* folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does on your own. But be sure to make a backup copy of all the files, just for peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor that can handle this.
 
+## Release 3.6.6
+
+To support the new Stream Deck integration, all labels for plugin actions has been reworked. Therefore it is necessary to update the "Controller Plugin Labels.XX" files, which are located in the *Simulator Controller\Tranlations* folder, which is located in your user documents folder, if you have modified the labels in the past. The update procedure will move your local files to *.bak files to preserve your changes, but you have to use the "Simulator Configuration" tool to reenter your changes in the updated version of those files.
+
+***
+
 ## Release 3.6.4
 
 Nothing to do for this release.

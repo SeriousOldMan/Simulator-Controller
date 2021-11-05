@@ -22,22 +22,24 @@ If you don't want to use the automated installer (or you can't cause of your Ant
 
 #### Automated Installer
 
-Simply donwload and run [Simulator Controller.exe](https://www.dropbox.com/s/vu3rah5vqxt6uev/Simulator%20Controller.exe?dl=1) (you may have to deactivate your Antivirus or Browser download protection). This small application will connect to the version repository and will download and install the latest version automatically for you. If you want to install a version other than the current one, no problem. This is possible by downloading and installing one of the versions below manually, but consult the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation) beforehand.
+Simply download and run [Simulator Controller.exe](https://bit.ly/3vCSIa1) (you may have to deactivate your Antivirus or Browser download protection). This small application will connect to the version repository and will download and install the latest version automatically for you. If you want to install a version other than the current one, no problem. This is possible by downloading and installing one of the versions below manually, but consult the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation) beforehand.
 
 #### Latest release build
 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[3.6.5-release](https://www.dropbox.com/s/onvuzbrhx7t6kzx/Simulator%20Controller%203.6.5-release.zip?dl=1) (New features: Improved refuel handling for the last stints in strategy development, Variation of fuel consumption, initial fuel and tyre usage is now possible in strategy simulations, New action "StrategyCancel" for "Race Strategist" and all simulator plugins, New "InformationRequest" commands "StrategyOverview" and "NextPitstop" for "Race Strategist" and all simulator plugins, Cato will use the current strategy developed in the "Strategy Workbench" and will instruct Jona accordingly, Coloured many icons. **Version 3.6.5 is a maintenance release for 3.6.4.**)
+[3.6.6-release](https://bit.ly/3wkDC9h) (New features: More sophisticated tyre compound handling, Refactoring of ButtonBox class, Early integration of StreamDeck, Renamed "Controller Plugin Labels" to "Controller Action Labels", Introduced "Controller Action Icons" for Stream Deck support, New *udpConnection* parameter for the ACC plugin, Support for telemetry data cleanup in "Simulator Workbench", Only valid laps will be used for telemetry and tyre setup data, Binary functions are supported for effect intensity actions in "Motion Feedback" plugin.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-364) of this version and all the versions you might have skipped, before installing and using this version.
+Important: The "Controller Plugin Labels" files changed. Be careful and read the update notes...
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-366) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[3.6.2-release](https://www.dropbox.com/s/tiw6t0vgzxdlv8q/Simulator%20Controller%203.6.2-release.zip?dl=1) (New features: Saving and loading of Strategies in "Strategy Workbench", Initializing values in "Strategy Workbench", Comparison of strategies in "Strategy Workbench", Take pitstop rules into account in strategy simulations.)
+[3.6.5-release](https://bit.ly/2XDJGwI) (New features: Improved refuel handling for the last stints in strategy development, Variation of fuel consumption, initial fuel and tyre usage is now possible in strategy simulations, New action "StrategyCancel" for "Race Strategist" and all simulator plugins, New "InformationRequest" commands "StrategyOverview" and "NextPitstop" for "Race Strategist" and all simulator plugins, Cato will use the current strategy developed in the "Strategy Workbench" and will instruct Jona accordingly, Coloured many icons. **Version 3.6.5 is a maintenance release for 3.6.4.**)
 
-[3.6.0-release](https://www.dropbox.com/s/u50l7gihmrvlmon/Simulator%20Controller%203.6.0-release.zip?dl=1) (New features: Initial version of strategy simulation in "Strategy Workbench".)
+[3.6.2-release](https://www.dropbox.com/s/tiw6t0vgzxdlv8q/Simulator%20Controller%203.6.2-release.zip?dl=1) (New features: Saving and loading of Strategies in "Strategy Workbench", Initializing values in "Strategy Workbench", Comparison of strategies in "Strategy Workbench", Take pitstop rules into account in strategy simulations.)
 
 #### Latest development build
 
@@ -49,7 +51,7 @@ If you want to become a part of the small and very young Community for Simulator
 
 ### Main features
 
-  - Connect all your external controller, like Button Boxes, to one single center of control
+  - Connect all your external controller, like Button Boxes, Stream Decks, and so on, to one single center of control
     - An unlimited number of layers of functions and actions, called modes, can be defined for your controller. Switch between modes simply by pushing a button or switch a toggle on your controller. Here is an example of several layers of functions and actions combined in five modes:
 	
 	![](./Docs/Images/Button%20Box%20Layout.jpg)
@@ -103,6 +105,7 @@ These plugins are part of the Simulator Controller distribution. Beside providin
 | ------ | ------ |
 | [System](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-system) | Handles multiple Button Box layers and manages all applications configured for your simulation configuration. |
 | [Button Box](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#button-box-layouts) | Tools for building your own Button Box / Controller visuals. The default implementation of *ButtonBox* implements grid based Button Box layouts, which can be configured using a [graphical layout editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#button-box-layouts). |
+| [Stream Deck](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#stream-deck-layouts) | Tools for connecting one or more Stream Decks as external controller to Simulator Controller. A special Stream Deck plugin is provided, which is able to dynamically display information both as text and/or icon on your Stream Deck. |
 | [Tactile Feedback](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-tactile-feedback) | Fully configurable support for pedal and chassis vibration using [SimHub](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications). |
 | [Motion Feedback](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-motion-feedback) | Fully configurable support for rig motion feedback using [SimFeedback](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications). |
 | [Pedal Calibration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-pedal-calibration) | Allows to choose between the different calibration curves of your high end pedals directly from the hardware controller. |

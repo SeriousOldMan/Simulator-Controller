@@ -38,10 +38,17 @@ class StreamDeck extends FunctionController {
 	iLabels := {}
 	iIcons := {}
 	iModes := {}
+	iSpecial := {}
 		
 	iConnector := false
 	
 	iActions := {}
+	
+	iFunctionTitles := {}
+	iFunctionImages := {}
+		
+	iRefreshActive := false
+	iPendingUpdates := []
 	
 	Type[] {
 		Get {
@@ -112,12 +119,32 @@ class StreamDeck extends FunctionController {
 		}
 	}
 	
-	Mode[function := false] {
+	Mode[function := false, icon := false] {
 		Get {
-			if function
+			if (function != false) {
+				if isInstance(function, ControllerFunction)
+					function := function.Descriptor
+				
+				if (icon != false) {
+					key := (function . "." . icon)
+				
+					if this.iModes.HasKey(key)
+						return this.iModes[key]
+					
+					if this.iModes.HasKey(icon)
+						return this.iModes[icon]
+				}
+				
 				return (this.iModes.HasKey(function) ? this.iModes[function] : kIconOrLabel)
+			}	
 			else
 				return this.iModes
+		}
+	}
+	
+	RefreshActive[] {
+		Get {
+			return this.iRefreshActive
 		}
 	}
 	
@@ -153,6 +180,18 @@ class StreamDeck extends FunctionController {
 		
 		this.iRows := layout[1]
 		this.iColumns := layout[2]
+					
+		Loop {
+			special := mode := getConfigurationValue(configuration, "Icons", this.Layout . ".Icon.Mode." . A_Index, kUndefined)
+		
+			if (special == kUndefined)
+				break
+			else {
+				special := string2values(";", special)
+			
+				this.iModes[special[1]] := special[2]
+			}
+		}
 		
 		rows := []
 		
@@ -171,12 +210,12 @@ class StreamDeck extends FunctionController {
 					isRunning := this.isRunning()
 					
 					if isRunning {
-						this.Connector.SetTitle(function, "")
-						this.Connector.SetImage(function, "clear")
+						this.setFunctionTitle(function, "")
+						this.setFunctionImage(function, "clear")
 					}
 					
 					if (mode != kIconOrLabel) {
-						this.iModes[function] := icon
+						this.iModes[function] := mode
 					}
 					
 					if (icon != true) {
@@ -191,6 +230,18 @@ class StreamDeck extends FunctionController {
 						
 						if (label && isRunning)
 							this.setControlLabel(function, label)
+					}
+					
+					Loop {
+						special := mode := getConfigurationValue(configuration, "Buttons", this.Layout . "." . function . ".Mode.Icon." . A_Index, kUndefined)
+					
+						if (special == kUndefined)
+							break
+						else {
+							special := string2values(";", special)
+						
+							this.iModes[function . "." . special[1]] := special[2]
+						}
 					}
 					
 					switch ConfigurationItem.splitDescriptor(function)[1] {
@@ -258,28 +309,30 @@ class StreamDeck extends FunctionController {
 	setControlLabel(function, text, color := "Black", overlay := false) {
 		if (this.isRunning() && this.hasFunction(function)) {
 			actions := this.Actions[function]
-			hasIcon := false
+			icon := false
 			
-			for ignore, theAction in this.Actions[function]
-				if theAction.Icon {
-					hasIcon := true
-					
+			for ignore, theAction in this.Actions[function] {
+				icon := theAction.Icon
+			
+				if (icon && (icon != ""))
 					break
-				}
+				else
+					icon := false
+			}
 			
-			displayMode := this.Mode[function.Descriptor]
+			displayMode := (icon ? this.Mode[function, icon] : this.Mode[function])
 			
-			if (hasIcon && !overlay && ((displayMode = kIcon) || (displayMode = kIconOrLabel)))
-				this.Connector.SetTitle(function.Descriptor, "")
+			if ((icon != false) && !overlay && ((displayMode = kIcon) || (displayMode = kIconOrLabel)))
+				this.setFunctionTitle(function.Descriptor, "")
 			else {
 				labelMode := this.Label[function.Descriptor]
 				
 				if (labelMode == true)
-					this.Connector.SetTitle(function.Descriptor, text)
+					this.setFunctionTitle(function.Descriptor, text)
 				else if (labelMode == false)
-					this.Connector.SetTitle(function.Descriptor, "")
+					this.setFunctionTitle(function.Descriptor, "")
 				else
-					this.Connector.SetTitle(function.Descriptor, labelMode)
+					this.setFunctionTitle(function.Descriptor, labelMode)
 			}
 		}
 	}
@@ -289,20 +342,77 @@ class StreamDeck extends FunctionController {
 			if (!icon || (icon = ""))
 				icon := "clear"
 			
-			displayMode := this.Mode[function.Descriptor]
+			displayMode := ((icon != "clear") ? this.Mode[function, icon] : this.Mode[function])
 			
 			if (displayMode = kLabel)
-				this.Connector.SetImage(function.Descriptor, "clear")
+				this.setFunctionImage(function.Descriptor, "clear")
 			else {
 				iconMode := this.Icon[function.Descriptor]
 				
 				if (iconMode == true)
-					this.Connector.SetImage(function.Descriptor, icon)
+					this.setFunctionImage(function.Descriptor, icon)
 				else if (iconMode == false)
-					this.Connector.SetImage(function.Descriptor, "clear")
+					this.setFunctionImage(function.Descriptor, "clear")
 				else
-					this.Connector.SetImage(function.Descriptor, iconMode)
+					this.setFunctionImage(function.Descriptor, iconMode)
 			}
+		}
+	}
+	
+	setFunctionTitle(function, title, refresh := false) {
+		if refresh
+			this.Connector.SetTitle(function, title)
+		else if this.RefreshActive {
+			this.iPendingUpdates.Push(ObjBindMethod(this, "setFunctionTitle", function, title))
+	
+			return
+		}
+		else {
+			this.iFunctionTitles[function] := title
+		
+			this.Connector.SetTitle(function, title)
+		}
+	}
+	
+	setFunctionImage(function, icon, refresh := false) {
+		if refresh {
+			; showMessage("R: " . function . " - " . icon)
+			this.Connector.SetImage(function, icon)
+		}
+		else if this.RefreshActive {
+			this.iPendingUpdates.Push(ObjBindMethod(this, "setFunctionImage", function, icon))
+	
+			return
+		}
+		else {
+			; showMessage("S: " . function . " - " . icon)
+			this.iFunctionImages[function] := icon
+		
+			this.Connector.SetImage(function, icon)
+		}
+	}
+	
+	refresh() {
+		if this.RefreshActive
+			return
+		else {
+			this.iRefreshActive := true
+		
+			try {
+				for theFunction, title in this.iFunctionTitles
+					this.setFunctionTitle(theFunction, title, true)
+				
+				for theFunction, image in this.iFunctionImages
+					this.setFunctionImage(theFunction, image, true)
+			}
+			finally {
+				this.iRefreshActive := false
+			}
+				
+			for ignore, update in this.iPendingUpdates
+				%update%()
+			
+			this.iPendingUpdates := []
 		}
 	}
 }
@@ -311,6 +421,14 @@ class StreamDeck extends FunctionController {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+refreshStreamDecks() {
+	for ignore, fnController in SimulatorController.Instance.FunctionController
+		if isInstance(fnController, StreamDeck)
+			fnController.refresh()
+	
+	SetTimer refreshStreamDecks, -5000
+}
 
 streamDeckEventHandler(event, data) {
 	local function
@@ -354,6 +472,8 @@ initializeStreamDeckPlugin() {
 	}
 	
 	registerEventHandler("Stream Deck", "streamDeckEventHandler")
+	
+	SetTimer refreshStreamDecks, -5000
 }
 
 

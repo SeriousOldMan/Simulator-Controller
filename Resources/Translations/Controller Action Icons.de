@@ -1,3 +1,6 @@
+[System]
+ModeSelector.Activate=
+Launch.Activate=
 [Tactile Feedback]
 TC.Dial=
 TC.Increase=
@@ -44,6 +47,18 @@ MotionIntensity.Decrease=
 EffectIntensity.Dial=
 EffectIntensity.Increase=
 EffectIntensity.Decrease=
+[Pedal Calibration]
+CurveShapte.Activate=
+CurveShapte.Linear.Activate=
+CurveShapte.Sense+1.Activate=
+CurveShapte.Sense+2.Activate=
+CurveShapte.Sense-1.Activate=
+CurveShapte.Sense-2.Activate=
+CurveShapte.S-Shape.Activate=
+CurveShape.S on Side.Activate=
+CurveShapte.Slow Start.Activate=
+CurveShapte.Slow End.Activate=
+CurveShapte.Custom.Activate=
 [ACC]
 Strategy.Dial=
 Strategy.Increase=

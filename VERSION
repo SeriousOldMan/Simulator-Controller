@@ -1,16 +1,16 @@
 [Development]
-Version=3.6.6-release
-Target=3.6.6-release
+Version=3.6.8-dev
+Target=3.6.8-release
 Date=11/5/2021
-Download=https://bit.ly/3wkDC9h
-Changes=More sophisticated tyre compound handling, Refactoring of ButtonBox class, Early integration of StreamDeck, Renamed "Controller Plugin Labels" to "Controller Action Labels", Introduced "Controller Action Icons" for Stream Deck support, New *udpConnection* parameter for the ACC plugin, Support for telemetry data cleanup in "Simulator Workbench", Only valid laps will be used for telemetry and tyre setup data, Binary functions are supported for effect intensity actions in "Motion Feedback" plugin
+Download=
+Changes=
 [Release]
 Version=3.6.6-release
 Date=11/5/2021
 Download=https://bit.ly/3wkDC9h
 Changes=More sophisticated tyre compound handling, Refactoring of ButtonBox class, Early integration of StreamDeck, Renamed "Controller Plugin Labels" to "Controller Action Labels", Introduced "Controller Action Icons" for Stream Deck support, New *udpConnection* parameter for the ACC plugin, Support for telemetry data cleanup in "Simulator Workbench", Only valid laps will be used for telemetry and tyre setup data, Binary functions are supported for effect intensity actions in "Motion Feedback" plugin
 [Current]
-Type=Release
+Type=Development
 [Version]
 Release=3.6.6-release
-Development=3.6.6-release
+Development=3.6.8-dev

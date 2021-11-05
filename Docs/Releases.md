@@ -1,3 +1,9 @@
+## 3.6.8-release 11/12/21
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. New tool to edit controller action labels and icons. See the [revised documentation](*) for more information.
+
 ## 3.6.6-release 11/05/21
 
   1. Bugfixes, as always

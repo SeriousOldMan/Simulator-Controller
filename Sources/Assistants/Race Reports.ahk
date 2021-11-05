@@ -625,7 +625,7 @@ class RaceReports extends ConfigurationItem {
 				
 				hasDNF := (hasDNF || (result = "DNF"))
 				
-				rows.Push(Array(cars[A_Index][1], "'" . cars[A_Index][2] . "'", "'" . drivers[1][A_Index] . "'"
+				rows.Push(Array(cars[A_Index][1], "'" . StrReplace(cars[A_Index][2], "'", "\'") . "'", "'" . StrReplace(drivers[1][A_Index], "'", "\'") . "'"
 							  , "{v: " . min . ", f: '" . format("{:.1f}", min) . "'}", "{v: " . avg . ", f: '" . format("{:.1f}", avg) . "'}", result))
 			}
 			
@@ -775,7 +775,7 @@ class RaceReports extends ConfigurationItem {
 			drivers := []
 			
 			for ignore, car in cars
-				drivers.Push(allDrivers[car])
+				drivers.Push(StrReplace(allDrivers[car], "'", "\'"))
 		
 			potentials := false
 			raceCrafts := false
@@ -861,7 +861,7 @@ class RaceReports extends ConfigurationItem {
 						positions[A_Index][car] := "null" ; carsCount
 				
 				if valid
-					cars.Push("'#" . getConfigurationValue(raceData, "Cars", "Car." . car . ".Nr") . A_Space . getConfigurationValue(raceData, "Cars", "Car." . car . ".Car") . "'")
+					cars.Push("'#" . getConfigurationValue(raceData, "Cars", "Car." . car . ".Nr") . A_Space . StrReplace(getConfigurationValue(raceData, "Cars", "Car." . car . ".Car"), "'", "\'") . "'")
 				else
 					for ignore, lap in this.getReportLaps(raceData)
 						positions[lap].RemoveAt(car)

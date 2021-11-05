@@ -35,8 +35,6 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	iInPit := false
 	iFinished := false
 		
-	iSessionState := kUndefined
-	
 	class RemoteRaceAssistant {
 		iRemoteEvent := false
 		iRemotePID := false
@@ -350,8 +348,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		
 		if (function != false) {
 			if (action = "InformationRequest") {
-				descriptor := ConfigurationItem.descriptor(action, "Activate")
 				action := values2String("", arguments*)
+				descriptor := ConfigurationItem.descriptor(action, "Activate")
 				
 				this.registerAction(new this.RaceAssistantAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor), "InformationRequest", arguments*))
 			}
@@ -632,11 +630,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		else
 			sessionState := kSessionFinished
 			
-		if (sessionState != this.iSessionState) {
-			this.iSessionState := sessionState
-			
-			this.updateActions(sessionState)
-		}
+		this.updateActions(sessionState)
 	}
 	
 	updateSessionData(data) {

@@ -529,8 +529,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		
 		if (function != false) {
 			if (action = "InformationRequest") {
-				descriptor := ConfigurationItem.descriptor(action, "Activate")
 				action := values2String("", arguments*)
+				descriptor := ConfigurationItem.descriptor(action, "Activate")
 				
 				mode.registerAction(new RaceAssistantAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor), "InformationRequest", arguments*))
 			}

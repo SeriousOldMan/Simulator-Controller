@@ -348,8 +348,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		
 		if (function != false) {
 			if (action = "InformationRequest") {
-				descriptor := ConfigurationItem.descriptor(action, "Activate")
 				action := values2String("", arguments*)
+				descriptor := ConfigurationItem.descriptor(action, "Activate")
 				
 				this.registerAction(new this.RaceAssistantAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor), "InformationRequest", arguments*))
 			}

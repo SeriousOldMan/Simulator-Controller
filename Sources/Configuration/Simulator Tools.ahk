@@ -1265,7 +1265,7 @@ updateTranslations() {
 deletePluginLabels() {
 	for ignore, fileName in getFileNames("Controller Plugin Labels.*", kUserTranslationsDirectory)
 		try {
-			FileDelete %filename%
+			FileMove %filename%, %filename%.bak, 1
 		}
 		catch exception {
 			; ignore

@@ -6,6 +6,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                         Local Include Section                           ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include ..\Configuration\Libraries\PluginActionsEditor.ahk
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -229,12 +236,25 @@ comparePlugins(p1, p2) {
 }
 
 openLabelsEditor() {
+	/*
 	fileName := ("Controller Action Labels." . getLanguage())
 	
 	if !FileExist(kUserTranslationsDirectory . fileName)
 		FileCopy %kResourcesDirectory%Templates\%fileName%, %kUserTranslationsDirectory%%fileName%
 		
 	Run % "notepad.exe " . """" . kUserTranslationsDirectory . "Controller Action Labels." . getLanguage() . """"
+	*/
+	
+	GuiControlGet pluginEdit
+	
+	owner := PluginsConfigurator.Instance.Editor.Window
+	Gui %owner%:+Disabled
+		
+	Gui PAE:+Owner%owner%
+	
+	new PluginActionsEditor(kSimulatorConfiguration).editPluginActions(pluginEdit)
+	
+	Gui %owner%:-Disabled
 }
 
 openIconsEditor() {

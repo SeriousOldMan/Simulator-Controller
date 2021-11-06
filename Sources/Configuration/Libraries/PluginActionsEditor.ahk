@@ -300,8 +300,11 @@ restart:
 global pluginActionsListView = false
 global labelEdit = ""
 global iconEdit
+global deleteIconButton
 		
 class PluginActionsList extends ConfigurationItemList {
+	iCurrentIcon := false
+	
 	AutoSave[] {
 		Get {
 			return false
@@ -318,40 +321,17 @@ class PluginActionsList extends ConfigurationItemList {
 		Gui PAE:Add, ListView, x16 y120 w377 h240 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndpluginActionsListViewHandle VpluginActionsListView glistEvent
 							 , % values2String("|", map(["Action", "Trigger", "Label", "Icon"], "translate")*)
 		
-		Gui PAE:Add, Text, x16 y370 w86 h23 +0x200, % translate("Label && Icon")
-		Gui PAE:Add, Edit, x110 yp w120 h45 VlabelEdit, %labelEdit%
-		Gui PAE:Add, Picture, Border x235 yp w45 h45 ViconEdit
+		Gui PAE:Add, Text, x16 y370 w76 h23 +0x200, % translate("Label && Icon")
+		Gui PAE:Add, Edit, x100 yp w110 h45 VlabelEdit, %labelEdit%
+		Gui PAE:Add, Picture, Border x215 yp w45 h45 ViconEdit gclickIcon
 		
-		/*
-		Gui PAE:Add, Text, x16 y294 w86 h23 +0x200, % translate("Type")
-		Gui PAE:Add, DropDownList, x110 y294 w140 AltSubmit VthemeTypeDropDown gupdatePluginActionsEditorState, % translate("Picture Carousel") . "|" . translate("Video")
+		Gui PAE:Font, c505050 s8
+		Gui PAE:Add, Text, x263 yp w120 r2, % translate("1. Click = Set`n2. Ctrl-Click = Clear")
+		Gui PAE:Font
 		
-		Gui PAE:Add, Text, x16 y318 w160 h23 +0x200, % translate("Sound File")
-		Gui PAE:Add, Button, x85 y317 w23 h23 HwndplaySoundButtonHandle gtogglePlaySoundFile
-		setButtonIcon(playSoundButtonHandle, kIconsDirectory . "Start.ico", 1, "L2 T2 R2 B2")
-		Gui PAE:Add, Edit, x110 y318 w259 h21 VsoundFilePathEdit, %soundFilePathEdit%
-		Gui PAE:Add, Button, x371 y317 w23 h23 gchooseSoundFilePath, % translate("...")
+		; Gui PAE:Add, Button, x283 yp w23 h23 HwnddeleteIconButtonHandle VdeleteIconButton gdeleteIcon
+		; setButtonIcon(deleteIconButtonHandle, kIconsDirectory . "Minus.ico", 1)
 		
-		Gui PAE:Add, Text, x16 y342 w80 h23 +0x200 VvideoFilePathLabel, % translate("Video")
-		Gui PAE:Add, Edit, x110 y342 w259 h21 VvideoFilePathEdit, %videoFilePathEdit%
-		Gui PAE:Add, Button, x371 y341 w23 h23 VvideoFilePathButton gchooseVideoFilePath, % translate("...")
-		
-		Gui PAE:Add, Text, x16 y342 w80 h23 +0x200 VpicturesListLabel, % translate("Pictures")
-		Gui PAE:Add, Button, x85 y342 w23 h23 HwndaddPictureButtonHandle VaddPictureButton gaddThemePicture
-		setButtonIcon(addPictureButtonHandle, kIconsDirectory . "Plus.ico", 1)
-		Gui PAE:Add, ListView, x110 y342 w284 h112 -Multi -LV0x10 Checked -Hdr NoSort NoSortHdr HwndpicturesListViewHandle VpicturesListView, % translate("Picture")	
-		
-		Gui PAE:Add, Text, x16 y456 w80 h23 +0x200 VpicturesDurationLabel, % translate("Display Duration")
-		Gui PAE:Add, Edit, x110 y456 w40 h21 Limit5 Number VpicturesDurationEdit, %picturesDurationEdit%
-		
-		Gui PAE:Font, Norm, Arial
-		
-		Gui PAE:Add, Text, x154 y459 w40 h23 VpicturesDurationPostfix, % translate("ms")
-	
-		Gui PAE:Add, Button, x184 y490 w46 h23 VthemeAddButton gaddItem, % translate("Add")
-		Gui PAE:Add, Button, x232 y490 w50 h23 Disabled VthemeDeleteButton gdeleteItem, % translate("Delete")
-		Gui PAE:Add, Button, x340 y490 w55 h23 Disabled VthemeUpdateButton gupdateItem, % translate("&Save")
-		*/
 		
 		this.initializeList(pluginActionsListViewHandle, "pluginActionsListView")
 	}
@@ -494,7 +474,28 @@ class PluginActionsList extends ConfigurationItemList {
 	}
 	
 	updateState() {
+		Gui PAE:Default
+		
 		base.updateState()
+		
+		if this.CurrentItem {
+			GuiControl Enable, labelEdit
+			
+			try
+				GuiControl Enable, íconEdit
+	
+			try
+				GuiControl Enable, deleteIconButton
+		}
+		else {
+			GuiControl Disable, labelEdit
+			
+			try
+				GuiControl Disable, íconEdit
+			
+			try
+				GuiControl Disable, deleteIconButton
+		}
 	}
 	
 	loadEditor(item) {
@@ -506,8 +507,12 @@ class PluginActionsList extends ConfigurationItemList {
 			GuiControl, , iconEdit, % ("*w43 *h43 " . icon)
 		}
 		catch exception {
+			item[1] := false
+			
 			GuiControl, , iconEdit, % ("*w43 *h43 " . kIconsDirectory . "Empty.png")
 		}
+		
+		this.iCurrentIcon := item[1]
 		
 		this.updateEditor()
 	}
@@ -525,6 +530,7 @@ class PluginActionsList extends ConfigurationItemList {
 		action := this.ItemList[this.CurrentItem].Clone()
 		
 		action[4] := labelEdit
+		action[1] := this.iCurrentIcon
 		
 		return action
 	}
@@ -566,4 +572,48 @@ choosePAPlugin() {
 	GuiControlGet paPluginDropDown
 	
 	PluginActionsEditor.Instance.selectPlugin(paPluginDropDown)
+}
+
+deleteIcon() {
+	actionsList := PluginActionsList.Instance
+
+	if actionsList.CurrentItem {
+		actionsList.iCurrentIcon := false
+		
+		GuiControl, , iconEdit, % ("*w43 *h43 " . kIconsDirectory . "Empty.png")
+	}
+}
+
+clickIcon() {
+	actionsList := PluginActionsList.Instance
+	
+	if actionsList.CurrentItem
+		if GetKeyState("Ctrl", "P")
+			deleteIcon()
+		else {
+			title := translate("Select Image...")
+	
+			pictureFile := (actionsList.iCurrentIcon ? actionsList.iCurrentIcon : "")
+			
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Cancel"]))
+			FileSelectFile pictureFile, 1, %pictureFile%, %title%, Image (*.ico; *.png; *.jpg; *.gif)
+			OnMessage(0x44, "")
+			
+			if (pictureFile != "") {
+				actionsList.iCurrentIcon := pictureFile
+				
+				icon := (pictureFile ? pictureFile : (kIconsDirectory . "Empty.png"))
+		
+				try {
+					GuiControl, , iconEdit, % ("*w43 *h43 " . icon)
+				}
+				catch exception {
+					pictureFile := false
+					
+					GuiControl, , iconEdit, % ("*w43 *h43 " . kIconsDirectory . "Empty.png")
+				}
+				
+				actionsList.iCurrentIcon := pictureFile
+			}
+		}
 }

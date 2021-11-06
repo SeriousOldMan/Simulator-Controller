@@ -21,6 +21,10 @@ Release 3.6.8 Checklist
 =======================
 
 0. Search for new links (*)
+1.Update Procedure
+  a. Translations
+2. New Actions Editor
+  a. Documentation & Images
 
 Release 3.6.6 Checklist
 =======================

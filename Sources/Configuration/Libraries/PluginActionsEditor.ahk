@@ -321,12 +321,12 @@ class PluginActionsList extends ConfigurationItemList {
 		Gui PAE:Add, ListView, x16 y120 w377 h240 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndpluginActionsListViewHandle VpluginActionsListView glistEvent
 							 , % values2String("|", map(["Action", "Trigger", "Label", "Icon"], "translate")*)
 		
-		Gui PAE:Add, Text, x16 y370 w76 h23 +0x200, % translate("Label && Icon")
+		Gui PAE:Add, Text, x16 y370 w76, % translate("Label && Icon")
 		Gui PAE:Add, Edit, x100 yp w110 h45 VlabelEdit, %labelEdit%
 		Gui PAE:Add, Picture, Border x215 yp w45 h45 ViconEdit gclickIcon
 		
 		Gui PAE:Font, c505050 s8
-		Gui PAE:Add, Text, x263 yp w120 r2, % translate("1. Click = Set`n2. Ctrl-Click = Clear")
+		Gui PAE:Add, Text, x263 yp w120 r2, % translate("1. Click = Edit`n2. Ctrl-Click = Clear")
 		Gui PAE:Font
 		
 		; Gui PAE:Add, Button, x283 yp w23 h23 HwnddeleteIconButtonHandle VdeleteIconButton gdeleteIcon

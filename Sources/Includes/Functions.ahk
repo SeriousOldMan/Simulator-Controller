@@ -1357,7 +1357,13 @@ readTranslations(targetLanguageCode, withUserTranslations := true) {
 	
 	Loop Read, % getFileName("Translations." . targetLanguageCode, directories*)
 	{
-		translation := StrSplit(A_LoopReadLine, "=>")
+		translation := A_LoopReadLine
+		
+		translation := StrReplace(translation, "\=", "=")
+		translation := StrReplace(translation, "\\", "\")
+		translation := StrReplace(translation, "\n", "`n")
+				
+		translation := StrSplit(translation, "=>")
 		enString := translation[1]
 		
 		if ((SubStr(enString, 1, 1) != "[") && (enString != targetLanguageCode))
@@ -1389,8 +1395,17 @@ writeTranslations(languageCode, languageName, translations) {
 		FileAppend %languageCode%=>%languageName%`n, %fileName%
 		FileAppend [Translations], %fileName%
 		
-		for original, translation in translations
+		for original, translation in translations {
+			original := StrReplace(original, "\", "\\")
+			original := StrReplace(original, "=", "\=")
+			original := StrReplace(original, "`n", "\n")
+			
+			translation := StrReplace(translation, "\", "\\")
+			translation := StrReplace(translation, "=", "\=")
+			translation := StrReplace(translation, "`n", "\n")
+		
 			FileAppend `n%original%=>%translation%, %fileName%
+		}
 	}
 	finally {
 		FileEncoding %curEncoding%

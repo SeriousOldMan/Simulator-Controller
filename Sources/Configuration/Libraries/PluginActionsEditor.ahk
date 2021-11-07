@@ -455,7 +455,7 @@ class PluginActionsList extends ConfigurationItemList {
 	
 		LV_Delete()
 		
-		if true {
+		if false {
 			length := items.Length()
 			
 			picturesListViewImages := IL_Create(length)
@@ -466,16 +466,16 @@ class PluginActionsList extends ConfigurationItemList {
 				IL_Add(picturesListViewImages, picture)
 			}
 			
-			; LV_SetImageList(picturesListViewImages)
+			LV_SetImageList(picturesListViewImages)
 		}
 		
 		for ignore, action in items
 			LV_Add("", action[2], action[3], StrReplace(action[4], "`n", A_Space), action[1] ? action[1] : "")
 		
-		LV_SetImageList(picturesListViewImages)
-		
-		LV_ModifyCol()
 		LV_ModifyCol(1, 100)
+		LV_ModifyCol(2, "AutoHdr")
+		LV_ModifyCol(3, "AutoHdr")
+		LV_ModifyCol(4, "AutoHdr")
 	}
 	
 	updateState() {

@@ -9,14 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Configuration\Libraries\ButtonBoxEditor.ahk
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                        Private Constant Section                         ;;;
-;;;-------------------------------------------------------------------------;;;
-
-global kEmptySpaceDescriptor = "Button;" . kButtonBoxImagesDirectory . "Empty.png;52 x 52"
+#Include ..\Configuration\Libraries\ControllerEditor.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -30,7 +23,7 @@ global kEmptySpaceDescriptor = "Button;" . kButtonBoxImagesDirectory . "Empty.pn
 class ControllerConfigurator extends ConfigurationItem {
 	iEditor := false
 	
-	iButtonBoxesList := false
+	iControllerList := false
 	iFunctionsist := false
 	
 	Editor[] {
@@ -42,7 +35,7 @@ class ControllerConfigurator extends ConfigurationItem {
 	__New(editor, configuration) {
 		this.iEditor := editor
 		
-		this.iButtonBoxesList := new ButtonBoxesList(configuration)
+		this.iControllerList := new ControllerList(configuration)
 		this.iFunctionsList := new FunctionsList(configuration)
 		
 		base.__New(configuration)
@@ -53,7 +46,7 @@ class ControllerConfigurator extends ConfigurationItem {
 	createGui(editor, x, y, width, height) {
 		window := editor.Window
 		
-		this.iButtonBoxesList.createGui(editor, x, y, width, height)
+		this.iControllerList.createGui(editor, x, y, width, height)
 		this.iFunctionsList.createGui(editor, x, y, width, height)
 		
 		Gui %window%:Add, Button, x16 y490 w100 h23 gtoggleTriggerDetector, % translate("Trigger...")
@@ -62,33 +55,33 @@ class ControllerConfigurator extends ConfigurationItem {
 	saveToConfiguration(configuration) {
 		base.saveToConfiguration(configuration)
 		
-		this.iButtonBoxesList.saveToConfiguration(configuration)
+		this.iControllerList.saveToConfiguration(configuration)
 		this.iFunctionsList.saveToConfiguration(configuration)
 	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; ButtonBoxesList                                                         ;;;
+;;; ControllerList                                                          ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-global buttonBoxesListBox := "|"
+global controllerListBox := "|"
 
-global buttonBoxEdit = ""
-global buttonBoxLayoutDropDown = 0
-global openButtonBoxEditorButton
+global controllerEdit = ""
+global controllerLayoutDropDown = 0
+global openControllerEditorButton
 
-global buttonBoxUpButton
-global buttonBoxDownButton
+global controllerUpButton
+global controllerDownButton
 
-global buttonBoxAddButton
-global buttonBoxDeleteButton
-global buttonBoxUpdateButton
+global controllerAddButton
+global controllerDeleteButton
+global controllerUpdateButton
 		
-class ButtonBoxesList extends ConfigurationItemList {
+class ControllerList extends ConfigurationItemList {
 	__New(configuration) {
 		base.__New(configuration)
 				 
-		ButtonBoxesList.Instance := this
+		ControllerList.Instance := this
 	}
 					
 	createGui(editor, x, y, width, height) {
@@ -100,21 +93,21 @@ class ButtonBoxesList extends ConfigurationItemList {
 		Gui %window%:Add, GroupBox, -Theme x16 y80 w457 h115, % translate("Controller")
 		
 		Gui %window%:Font, Norm, Arial
-		Gui %window%:Add, ListBox, x24 y99 w194 h96 HwndbuttonBoxesListBoxHandle VbuttonBoxesListBox glistEvent, %buttonBoxesListBox%
+		Gui %window%:Add, ListBox, x24 y99 w194 h96 HwndcontrollerListBoxHandle VcontrollerListBox glistEvent, %controllerListBox%
 		
-		Gui %window%:Add, Edit, x224 y99 w104 h21 VbuttonBoxEdit, %buttonBoxEdit%
-		Gui %window%:Add, DropDownList, x330 y99 w108 Choose%buttonBoxLayoutDropDown% VbuttonBoxLayoutDropDown, % values2String("|", this.computeLayoutChoices()*)
-		Gui %window%:Add, Button, x440 y98 w23 h23 gopenButtonBoxEditor VopenButtonBoxEditorButton, % translate("...")
+		Gui %window%:Add, Edit, x224 y99 w104 h21 VcontrollerEdit, %controllerEdit%
+		Gui %window%:Add, DropDownList, x330 y99 w108 Choose%controllerLayoutDropDown% VcontrollerLayoutDropDown, % values2String("|", this.computeLayoutChoices()*)
+		Gui %window%:Add, Button, x440 y98 w23 h23 gopenControllerEditor VopenControllerEditorButton, % translate("...")
 		
-		Gui %window%:Add, Button, x385 y124 w38 h23 Disabled VbuttonBoxUpButton gupItem, % translate("Up")
-		Gui %window%:Add, Button, x425 y124 w38 h23 Disabled VbuttonBoxDownButton gdownItem, % translate("Down")
+		Gui %window%:Add, Button, x385 y124 w38 h23 Disabled VcontrollerUpButton gupItem, % translate("Up")
+		Gui %window%:Add, Button, x425 y124 w38 h23 Disabled VcontrollerDownButton gdownItem, % translate("Down")
 		
-		Gui %window%:Add, Button, x265 y164 w46 h23 VbuttonBoxAddButton gaddItem, % translate("Add")
-		Gui %window%:Add, Button, x313 y164 w50 h23 Disabled VbuttonBoxDeleteButton gdeleteItem, % translate("Delete")
-		Gui %window%:Add, Button, x409 y164 w55 h23 Disabled VbuttonBoxUpdateButton gupdateItem, % translate("Save")
+		Gui %window%:Add, Button, x265 y164 w46 h23 VcontrollerAddButton gaddItem, % translate("Add")
+		Gui %window%:Add, Button, x313 y164 w50 h23 Disabled VcontrollerDeleteButton gdeleteItem, % translate("Delete")
+		Gui %window%:Add, Button, x409 y164 w55 h23 Disabled VcontrollerUpdateButton gupdateItem, % translate("Save")
 		
-		this.initializeList(buttonBoxesListBoxHandle, "buttonBoxesListBox", "buttonBoxAddButton", "buttonBoxDeleteButton", "buttonBoxUpdateButton"
-						  , "buttonBoxUpButton", "buttonBoxDownButton")
+		this.initializeList(controllerListBoxHandle, "controllerListBox", "controllerAddButton", "controllerDeleteButton", "controllerUpdateButton"
+						  , "controllerUpButton", "controllerDownButton")
 	}
 	
 	loadFromConfiguration(configuration) {
@@ -150,12 +143,12 @@ class ButtonBoxesList extends ConfigurationItemList {
 	}
 	
 	clickEvent(line, count) {
-		GuiControlGet buttonBoxesListBox
+		GuiControlGet controllerListBox
 					
 		index := false
 		
 		for ignore, candidate in this.ItemList
-			if (buttonBoxesListBox = candidate[1]) {
+			if (controllerListBox = candidate[1]) {
 				index := A_Index
 			
 				break
@@ -174,31 +167,31 @@ class ButtonBoxesList extends ConfigurationItemList {
 		for ignore, item in this.ItemList
 			controller.Push(item[1])
 		
-		buttonBoxesListBox := values2String("|", controller*)
+		controllerListBox := values2String("|", controller*)
 	
-		GuiControl, , buttonBoxesListBox, % "|" . buttonBoxesListBox
+		GuiControl, , controllerListBox, % "|" . controllerListBox
 	}
 	
 	selectItem(itemNumber) {
 		this.CurrentItem := itemNumber
 		
 		if itemNumber
-			GuiControl Choose, buttonBoxesListBox, %itemNumber%
+			GuiControl Choose, controllerListBox, %itemNumber%
 		
 		this.updateState()
 	}
 	
 	loadEditor(item) {
-		buttonBoxEdit := item[1]
-		buttonBoxLayoutDropDown := item[2]
+		controllerEdit := item[1]
+		controllerLayoutDropDown := item[2]
 			
-		GuiControl Text, buttonBoxEdit, %buttonBoxEdit%
+		GuiControl Text, controllerEdit, %controllerEdit%
 		
 		try {
-			GuiControl Choose, buttonBoxLayoutDropDown, %buttonBoxLayoutDropDown%
+			GuiControl Choose, controllerLayoutDropDown, %controllerLayoutDropDown%
 		}
 		catch exception {
-			GuiControl Choose, buttonBoxLayoutDropDown, 0
+			GuiControl Choose, controllerLayoutDropDown, 0
 		}
 	}
 	
@@ -207,10 +200,10 @@ class ButtonBoxesList extends ConfigurationItemList {
 	}
 	
 	buildItemFromEditor(isNew := false) {
-		GuiControlGet buttonBoxEdit
-		GuiControlGet buttonBoxLayoutDropDown
+		GuiControlGet controllerEdit
+		GuiControlGet controllerLayoutDropDown
 		
-		if ((buttonBoxEdit = "") || (buttonBoxLayoutDropDown = "") || !buttonBoxLayoutDropDown) {
+		if ((controllerEdit = "") || (controllerLayoutDropDown = "") || !controllerLayoutDropDown) {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 			title := translate("Error")
 			MsgBox 262160, %title%, % translate("Invalid values detected - please correct...")
@@ -219,7 +212,7 @@ class ButtonBoxesList extends ConfigurationItemList {
 			return false
 		}
 		else
-			return Array(buttonBoxEdit, buttonBoxLayoutDropDown)
+			return Array(controllerEdit, controllerLayoutDropDown)
 	}
 	
 	computeLayoutChoices(bbConfiguration := false, sdConfiguration := false) {
@@ -248,18 +241,16 @@ class ButtonBoxesList extends ConfigurationItemList {
 		return layouts
 	}
 	
-	openButtonBoxEditor() {
-		GuiControlGet buttonBoxEdit
-		GuiControlGet buttonBoxLayoutDropDown
-		
-		; ConfigurationEditor.Instance.hide()
+	openControllerEditor() {
+		GuiControlGet controllerEdit
+		GuiControlGet controllerLayoutDropDown
 		
 		window := ConfigurationEditor.Instance.Window
 		
-		Gui BBE:+Owner%window%
+		Gui CTRLE:+Owner%window%
 		Gui %window%:+Disabled
 		
-		result := (new ButtonBoxEditor(buttonBoxLayoutDropDown, readConfiguration(getFileName("Button Box Configuration.ini", kUserConfigDirectory, kConfigDirectory)))).editButtonBox()
+		result := (new ControllerEditor(controllerLayoutDropDown, ConfigurationEditor.Instance.Configuration)).editController()
 		
 		if result
 			writeConfiguration(getFileName("Button Box Configuration.ini", kUserConfigDirectory), result)
@@ -270,12 +261,12 @@ class ButtonBoxesList extends ConfigurationItemList {
 		
 		choices := this.computeLayoutChoices(result)
 		
-		GuiControl Text, buttonBoxLayoutDropDown, % "|" . values2String("|", choices*)
+		GuiControl Text, controllerLayoutDropDown, % "|" . values2String("|", choices*)
 		
-		if inList(choices, buttonBoxLayoutDropDown)
-			GuiControl Choose, buttonBoxLayoutDropDown, %buttonBoxLayoutDropDown%
+		if inList(choices, controllerLayoutDropDown)
+			GuiControl Choose, controllerLayoutDropDown, %controllerLayoutDropDown%
 		else
-			GuiControl Choose, buttonBoxLayoutDropDown, %A_Space%
+			GuiControl Choose, controllerLayoutDropDown, %A_Space%
 		
 		; ConfigurationEditor.Instance.show()
 		Gui %window%:-Disabled
@@ -609,8 +600,8 @@ toggleTriggerDetector(callback := false) {
 	}
 }
 
-openButtonBoxEditor() {
-	ButtonBoxesList.Instance.openButtonBoxEditor()
+openControllerEditor() {
+	ControllerList.Instance.openControllerEditor()
 }
 
 updateFunctionEditorState() {

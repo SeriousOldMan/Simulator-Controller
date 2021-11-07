@@ -535,7 +535,10 @@ startMessageManager() {
 }
 
 logError(exception) {
-	logMessage(kLogCritical, translate("Unhandled exception encountered in ") . exception.File . translate(" at line ") . exception.Line . translate(": ") . exception.Message)
+	if IsObject(exception)
+		logMessage(kLogCritical, translate("Unhandled exception encountered in ") . exception.File . translate(" at line ") . exception.Line . translate(": ") . exception.Message)
+	else
+		logMessage(kLogCritical, translate("Unhandled exception encountered: ") . exception)
 	
 	return (isDebug() ? false : true)
 }

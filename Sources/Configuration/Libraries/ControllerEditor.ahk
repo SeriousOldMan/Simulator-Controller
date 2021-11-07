@@ -1,5 +1,5 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Button Box Editor               ;;;
+;;;   Modular Simulator Controller System - Controller Editor               ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2021) Creative Commons - BY-NC-SA                        ;;;
@@ -28,14 +28,21 @@ kControlTypes[kCustomType] := "Custom"
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                         Private Variables Section                       ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global vControllerPreviews = {}
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; ButtonBoxEditor                                                         ;;;
+;;; ControllerEditor                                                        ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class ButtonBoxEditor extends ConfigurationItem {
+class ControllerEditor extends ConfigurationItem {
 	iControlsList := false
 	iLabelsList := false
 	iLayoutsList := false
@@ -43,17 +50,20 @@ class ButtonBoxEditor extends ConfigurationItem {
 	iName := ""
 	iClosed := false
 	
-	iButtonBoxPreview := false
+	iControllerPreview := false
 	
 	iButtonBoxConfiguration := false
 	iButtonBoxConfigurationFile := false
 	
+	iStreamDeckConfiguration := false
+	iStreamDeckConfigurationFile := false
+	
 	iPreviewCenterX := 0
 	iPreviewCenterY := 0
 	
-	ButtonBoxPreview[] {
+	ControllerPreview[] {
 		Get {
-			return this.iButtonBoxPreview
+			return this.iControllerPreview
 		}
 	}
 	
@@ -75,6 +85,18 @@ class ButtonBoxEditor extends ConfigurationItem {
 		}
 	}
 	
+	StreamDeckConfiguration[] {
+		Get {
+			return this.iStreamDeckConfiguration
+		}
+	}
+	
+	StreamDeckConfigurationFile[] {
+		Get {
+			return this.iStreamDeckConfigurationFile
+		}
+	}
+	
 	AutoSave[] {
 		Get {
 			try {
@@ -89,61 +111,66 @@ class ButtonBoxEditor extends ConfigurationItem {
 		}
 	}
 	
-	__New(name, configuration, configurationFile := false, saveAndCancel := true) {
+	__New(name, configuration, buttonBoxConfigurationFile := false, streamDeckConfigurationFile := false, saveAndCancel := true) {
 		this.iName := name
 		
-		if !configurationFile
-			configurationFile := getFileName("Button Box Configuration.ini", kUserConfigDirectory, kConfigDirectory)
+		if !buttonBoxConfigurationFile
+			buttonBoxConfigurationFile := getFileName("Button Box Configuration.ini", kUserConfigDirectory, kConfigDirectory)
 		
-		this.iButtonBoxConfigurationFile := configurationFile
+		if !streamDeckConfigurationFile
+			streamDeckConfigurationFile := getFileName("Stream Deck Configuration.ini", kUserConfigDirectory, kConfigDirectory)
 		
-		this.iButtonBoxConfiguration := readConfiguration(configurationFile)
+		this.iButtonBoxConfigurationFile := buttonBoxConfigurationFile
+		this.iStreamDeckConfigurationFile := streamDeckConfigurationFile
+		
+		this.iButtonBoxConfiguration := readConfiguration(buttonBoxConfigurationFile)
+		this.iStreamDeckConfiguration := readConfiguration(streamDeckConfigurationFile)
 		
 		this.iControlsList := new ControlsList(this.iButtonBoxConfiguration)
 		this.iLabelsList := new LabelsList(this.iButtonBoxConfiguration)
-		this.iLayoutsList := new LayoutsList(this.iButtonBoxConfiguration)
+		this.iLayoutsList := new LayoutsList(this.iButtonBoxConfiguration, this.iStreamDeckConfiguration)
 		
 		base.__New(configuration)
 		
-		ButtonBoxEditor.Instance := this
+		ControllerEditor.Instance := this
 		
-		this.createGui(this.iButtonBoxConfiguration, saveAndCancel)
+		this.createGui(this.iButtonBoxConfiguration, this.iStreamDeckConfiguration, saveAndCancel)
 	}
 	
-	createGui(configuration, saveAndCancel) {
-		Gui BBE:Default
+	createGui(buttonBoxConfiguration, streamDeckConfiguration, saveAndCancel) {
+		Gui CTRLE:Default
 	
-		Gui BBE:-Border ; -Caption
+		Gui CTRLE:-Border ; -Caption
 		
-		Gui BBE:Color, D0D0D0, D8D8D8
-		Gui BBE:Font, Bold, Arial
+		Gui CTRLE:Color, D0D0D0, D8D8D8
+		Gui CTRLE:Font, Bold, Arial
 
-		Gui BBE:Add, Text, x0 w432 Center gmoveButtonBoxEditor, % translate("Modular Simulator Controller System") 
+		Gui CTRLE:Add, Text, x0 w432 Center gmoveControllerEditor, % translate("Modular Simulator Controller System") 
 		
-		Gui BBE:Font, Norm, Arial
-		Gui BBE:Font, Italic Underline, Arial
+		Gui CTRLE:Font, Norm, Arial
+		Gui CTRLE:Font, Italic Underline, Arial
 
-		Gui BBE:Add, Text, x0 YP+20 w432 cBlue Center gopenButtonBoxesDocumentation, % translate("Button Box Layouts")
+		Gui CTRLE:Add, Text, x0 YP+20 w432 cBlue Center gopenControllerDocumentation, % translate("Button Box Layouts")
 		
-		this.iControlsList.createGui(configuration)
-		this.iLabelsList.createGui(configuration)
-		this.iLayoutsList.createGui(configuration)
+		this.iControlsList.createGui(buttonBoxConfiguration)
+		this.iLabelsList.createGui(buttonBoxConfiguration)
+		this.iLayoutsList.createGui(buttonBoxConfiguration, streamDeckConfiguration)
 		
 		if saveAndCancel {
-			Gui BBE:Add, Text, x50 y639 w332 0x10
+			Gui CTRLE:Add, Text, x50 y639 w332 0x10
 			
-			Gui BBE:Add, Button, x130 y654 w80 h23 Default GsaveButtonBoxEditor, % translate("Save")
-			Gui BBE:Add, Button, x230 y654 w80 h23 GcancelButtonBoxEditor, % translate("Cancel")
+			Gui CTRLE:Add, Button, x130 y654 w80 h23 Default GsaveControllerEditor, % translate("Save")
+			Gui CTRLE:Add, Button, x230 y654 w80 h23 GcancelControllerEditor, % translate("Cancel")
 		}
 	}
 	
-	saveToConfiguration(configuration, save := true) {
+	saveToConfiguration(buttonBoxConfiguration, streamDeckConfiguration, save := true) {
 		if save
-			base.saveToConfiguration(configuration)
+			base.saveToConfiguration(buttonBoxConfiguration)
 		
-		this.iControlsList.saveToConfiguration(configuration, save)
-		this.iLabelsList.saveToConfiguration(configuration, save)
-		this.iLayoutsList.saveToConfiguration(configuration, save)
+		this.iControlsList.saveToConfiguration(buttonBoxConfiguration, save)
+		this.iLabelsList.saveToConfiguration(buttonBoxConfiguration, save)
+		this.iLayoutsList.saveToConfiguration(buttonBoxConfiguration, streamDeckConfiguration, save)
 	}
 		
 	setPreviewCenter(centerX, centerY) {
@@ -157,11 +184,11 @@ class ButtonBoxEditor extends ConfigurationItem {
 	}
 	
 	getPreviewMover() {
-		return "moveButtonBoxPreview"
+		return "moveControllerPreview"
 	}
 	
 	open(x := "Center", y := "Center") {
-		Gui BBE:Show, AutoSize x%x% y%y%
+		Gui CTRLE:Show, AutoSize x%x% y%y%
 		
 		name := this.Name
 		
@@ -177,27 +204,29 @@ class ButtonBoxEditor extends ConfigurationItem {
 	
 	close(save := true) {
 		if save {
-			configuration := newConfiguration()
-		
-			this.saveToConfiguration(configuration)
+			buttonBoxConfiguration := newConfiguration()
+			streamDeckConfiguration := newConfiguration()
 			
-			writeConfiguration(this.ButtonBoxConfigurationFile, configuration)
+			this.saveToConfiguration(buttonBoxConfiguration, streamDeckConfiguration)
+			
+			writeConfiguration(this.ButtonBoxConfigurationFile, buttonBoxConfiguration)
+			writeConfiguration(this.StreamDeckConfigurationFile, streamDeckConfiguration)
 		}
 			
-		this.saveButtonBox()
+		this.saveController()
 		
-		if this.ButtonBoxPreview {
-			this.ButtonBoxPreview.close()
+		if this.ControllerPreview {
+			this.ControllerPreview.close()
 			
-			this.iButtonBoxPreview := false
+			this.iControllerPreview := false
 		}
 		
-		Gui BBE:Destroy
+		Gui CTRLE:Destroy
 		
 		this.iClosed := true
 	}
 	
-	editButtonBox() {
+	editController() {
 		this.open()
 		
 		Loop
@@ -205,26 +234,31 @@ class ButtonBoxEditor extends ConfigurationItem {
 		until this.iClosed
 	}
 	
-	configurationChanged(name) {
-		this.updateButtonBoxPreview(name)
+	configurationChanged(type, name) {
+		this.updateControllerPreview(type, name)
 	}
 
-	updateButtonBoxPreview(name) {
-		configuration := newConfiguration()
+	updateControllerPreview(type, name) {
+		buttonBoxConfiguration := newConfiguration()
+		streamDeckConfiguration := newConfiguration()
 		
-		this.saveToConfiguration(configuration, false)
+		this.saveToConfiguration(buttonBoxConfiguration, streamDeckConfiguration, false)
 		
-		this.iButtonBoxConfiguration := configuration
+		this.iButtonBoxConfiguration := buttonBoxConfiguration
+		this.iStreamDeckConfiguration := streamDeckConfiguration
 		
-		oldPreview := this.ButtonBoxPreview
+		oldPreview := this.ControllerPreview
 		
 		if name {
-			this.iButtonBoxPreview := new ButtonBoxPreview(this, name, configuration)
+			if (type = "Button Box")
+				this.iControllerPreview := new ButtonBoxPreview(this, name, buttonBoxConfiguration)
+			else
+				this.iControllerPreview := new StreamDeckPreview(this, name, streamDeckConfiguration)
 		
-			this.ButtonBoxPreview.open()
+			this.ControllerPreview.open()
 		}
 		else
-			this.iButtonBoxPreview := false
+			this.iControllerPreview := false
 		
 		if oldPreview
 			oldPreview.close()
@@ -253,33 +287,33 @@ class ControlsList extends ConfigurationItemList {
 				 
 		ControlsList.Instance := this
 	}
-					
+	
 	createGui(configuration) {
-		Gui BBE:Font, Norm, Arial
-		Gui BBE:Font, Italic, Arial
+		Gui CTRLE:Font, Norm, Arial
+		Gui CTRLE:Font, Italic, Arial
 		
-		Gui BBE:Add, GroupBox, -Theme x8 y60 w424 h138, % translate("Controls")
+		Gui CTRLE:Add, GroupBox, -Theme x8 y60 w424 h138, % translate("Controls")
 		
-		Gui BBE:Font, Norm, Arial
-		Gui BBE:Add, ListView, x16 y79 w134 h108 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndcontrolsListViewHandle VcontrolsListView glistEvent
+		Gui CTRLE:Font, Norm, Arial
+		Gui CTRLE:Add, ListView, x16 y79 w134 h108 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndcontrolsListViewHandle VcontrolsListView glistEvent
 							 , % values2String("|", map(["Name", "Function", "Size"], "translate")*)
 							
-		Gui BBE:Add, Text, x164 y79 w80 h23 +0x200, % translate("Name")
-		Gui BBE:Add, Edit, x214 y80 w101 h21 VcontrolNameEdit, %controlNameEdit%
-		Gui BBE:Add, DropDownList, x321 y79 w105 AltSubmit Choose%controlTypeDropDown% VcontrolTypeDropDown, % values2String("|", map(["1-way Toggle", "2-way Toggle", "Button", "Dial"], "translate")*)
+		Gui CTRLE:Add, Text, x164 y79 w80 h23 +0x200, % translate("Name")
+		Gui CTRLE:Add, Edit, x214 y80 w101 h21 VcontrolNameEdit, %controlNameEdit%
+		Gui CTRLE:Add, DropDownList, x321 y79 w105 AltSubmit Choose%controlTypeDropDown% VcontrolTypeDropDown, % values2String("|", map(["1-way Toggle", "2-way Toggle", "Button", "Dial"], "translate")*)
 		;426 400 
-		Gui BBE:Add, Text, x164 y103 w80 h23 +0x200, % translate("Image")
-		Gui BBE:Add, Edit, x214 y103 w186 h21 VimageFilePathEdit, %imageFilePathEdit%
-		Gui BBE:Add, Button, x403 y103 w23 h23 gchooseImageFilePath, % translate("...")
+		Gui CTRLE:Add, Text, x164 y103 w80 h23 +0x200, % translate("Image")
+		Gui CTRLE:Add, Edit, x214 y103 w186 h21 VimageFilePathEdit, %imageFilePathEdit%
+		Gui CTRLE:Add, Button, x403 y103 w23 h23 gchooseImageFilePath, % translate("...")
 		
-		Gui BBE:Add, Text, x164 y127 w80 h23 +0x200, % translate("Size")
-		Gui BBE:Add, Edit, x214 y127 w40 h21 Limit3 Number VimageWidthEdit, %imageWidthEdit%
-		Gui BBE:Add, Text, x254 y127 w21 h23 +0x200 Center, % translate("x")
-		Gui BBE:Add, Edit, x275 y127 w40 h21 Limit3 Number VimageHeightEdit, %imageHeightEdit%
+		Gui CTRLE:Add, Text, x164 y127 w80 h23 +0x200, % translate("Size")
+		Gui CTRLE:Add, Edit, x214 y127 w40 h21 Limit3 Number VimageWidthEdit, %imageWidthEdit%
+		Gui CTRLE:Add, Text, x254 y127 w21 h23 +0x200 Center, % translate("x")
+		Gui CTRLE:Add, Edit, x275 y127 w40 h21 Limit3 Number VimageHeightEdit, %imageHeightEdit%
 		
-		Gui BBE:Add, Button, x226 y164 w46 h23 VcontrolAddButton gaddItem, % translate("Add")
-		Gui BBE:Add, Button, x275 y164 w50 h23 Disabled VcontrolDeleteButton gdeleteItem, % translate("Delete")
-		Gui BBE:Add, Button, x371 y164 w55 h23 Disabled VcontrolUpdateButton gupdateItem, % translate("Save")
+		Gui CTRLE:Add, Button, x226 y164 w46 h23 VcontrolAddButton gaddItem, % translate("Add")
+		Gui CTRLE:Add, Button, x275 y164 w50 h23 Disabled VcontrolDeleteButton gdeleteItem, % translate("Delete")
+		Gui CTRLE:Add, Button, x371 y164 w55 h23 Disabled VcontrolUpdateButton gupdateItem, % translate("Save")
 		
 		this.initializeList(controlsListViewHandle, "controlsListView", "controlAddButton", "controlDeleteButton", "controlUpdateButton")
 		
@@ -330,7 +364,7 @@ class ControlsList extends ConfigurationItemList {
 			first := false
 		}
 		
-		ButtonBoxEditor.Instance.configurationChanged(LayoutsList.Instance.CurrentButtonBox)
+		ControllerEditor.Instance.configurationChanged(LayoutsList.Instance.CurrentControllerType, LayoutsList.Instance.CurrentController)
 	}
 	
 	loadEditor(item) {
@@ -375,7 +409,7 @@ class ControlsList extends ConfigurationItemList {
 	}
 	
 	getControls() {
-		if ButtonBoxEditor.Instance.AutoSave {
+		if ControllerEditor.Instance.AutoSave {
 			if (this.CurrentItem != 0) {
 				this.updateItem()
 			}
@@ -412,26 +446,26 @@ class LabelsList extends ConfigurationItemList {
 	}
 					
 	createGui(configuration) {
-		Gui BBE:Font, Norm, Arial
-		Gui BBE:Font, Italic, Arial
+		Gui CTRLE:Font, Norm, Arial
+		Gui CTRLE:Font, Italic, Arial
 		
-		Gui BBE:Add, GroupBox, -Theme x8 y205 w424 h115, % translate("Labels")
+		Gui CTRLE:Add, GroupBox, -Theme x8 y205 w424 h115, % translate("Labels")
 		
-		Gui BBE:Font, Norm, Arial
-		Gui BBE:Add, ListView, x16 y224 w134 h84 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndlabelsListViewHandle VlabelsListView glistEvent
+		Gui CTRLE:Font, Norm, Arial
+		Gui CTRLE:Add, ListView, x16 y224 w134 h84 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndlabelsListViewHandle VlabelsListView glistEvent
 							 , % values2String("|", map(["Name", "Size"], "translate")*)
 							
-		Gui BBE:Add, Text, x164 y224 w80 h23 +0x200, % translate("Name")
-		Gui BBE:Add, Edit, x214 y225 w101 h21 VlabelNameEdit, %labelNameEdit%
+		Gui CTRLE:Add, Text, x164 y224 w80 h23 +0x200, % translate("Name")
+		Gui CTRLE:Add, Edit, x214 y225 w101 h21 VlabelNameEdit, %labelNameEdit%
 		
-		Gui BBE:Add, Text, x164 y248 w80 h23 +0x200, % translate("Size")
-		Gui BBE:Add, Edit, x214 y248 w40 h21 Limit3 Number VlabelWidthEdit, %labelWidthEdit%
-		Gui BBE:Add, Text, x254 y248 w21 h23 +0x200 Center, % translate("x")
-		Gui BBE:Add, Edit, x275 y248 w40 h21 Limit3 Number VlabelHeightEdit, %labelHeightEdit%
+		Gui CTRLE:Add, Text, x164 y248 w80 h23 +0x200, % translate("Size")
+		Gui CTRLE:Add, Edit, x214 y248 w40 h21 Limit3 Number VlabelWidthEdit, %labelWidthEdit%
+		Gui CTRLE:Add, Text, x254 y248 w21 h23 +0x200 Center, % translate("x")
+		Gui CTRLE:Add, Edit, x275 y248 w40 h21 Limit3 Number VlabelHeightEdit, %labelHeightEdit%
 		
-		Gui BBE:Add, Button, x226 y285 w46 h23 VlabelAddButton gaddItem, % translate("Add")
-		Gui BBE:Add, Button, x275 y285 w50 h23 Disabled VlabelDeleteButton gdeleteItem, % translate("Delete")
-		Gui BBE:Add, Button, x371 y285 w55 h23 Disabled VlabelUpdateButton gupdateItem, % translate("Save")
+		Gui CTRLE:Add, Button, x226 y285 w46 h23 VlabelAddButton gaddItem, % translate("Add")
+		Gui CTRLE:Add, Button, x275 y285 w50 h23 Disabled VlabelDeleteButton gdeleteItem, % translate("Delete")
+		Gui CTRLE:Add, Button, x371 y285 w55 h23 Disabled VlabelUpdateButton gupdateItem, % translate("Save")
 		
 		this.initializeList(labelsListViewHandle, "labelsListView", "labelAddButton", "labelDeleteButton", "labelUpdateButton")
 		
@@ -481,7 +515,7 @@ class LabelsList extends ConfigurationItemList {
 			first := false
 		}
 		
-		ButtonBoxEditor.Instance.configurationChanged(LayoutsList.Instance.CurrentButtonBox)
+		ControllerEditor.Instance.configurationChanged(LayoutsList.Instance.CurrentControllerType, LayoutsList.Instance.CurrentController)
 	}
 	
 	loadEditor(item) {
@@ -563,64 +597,86 @@ class LayoutsList extends ConfigurationItemList {
 	iRowDefinitions := []
 	iSelectedRow := false
 	
-	CurrentButtonBox[] {
+	iStreamDeckConfiguration := false
+	
+	ButtonBoxConfiguration[] {
+		Get {
+			return this.Configuration
+		}
+	}
+	
+	StreamDeckConfiguration[] {
+		Get {
+			return this.iStreamDeckConfiguration
+		}
+	}
+	
+	CurrentControllerType[] {
+		Get {
+			return ((this.CurrentItem != 0) ? this.ItemList[this.CurrentItem][2]["Type"] : "Button Box")
+		}
+	}
+	
+	CurrentController[] {
 		Get {
 			return ((this.CurrentItem != 0) ? this.ItemList[this.CurrentItem][1] : false)
 		}
 	}
 	
-	__New(configuration) {
-		base.__New(configuration)
+	__New(buttonBoxConfiguration, streamDeckConfiguration) {
+		this.iStreamDeckConfiguration := streamDeckConfiguration
+		
+		base.__New(buttonBoxConfiguration)
 				 
 		LayoutsList.Instance := this
 	}
 
-	createGui(configuration) {
-		Gui BBE:Add, ListView, x8 y330 w424 h105 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndlayoutsListViewHandle VlayoutsListView glistEvent
+	createGui(buttonBoxConfiguration, streamDeckConfiguration) {
+		Gui CTRLE:Add, ListView, x8 y330 w424 h105 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndlayoutsListViewHandle VlayoutsListView glistEvent
 							 , % values2String("|", map(["Name", "Grid", "Margins", "Definition"], "translate")*)
 		
-		Gui BBE:Add, Text, x8 y445 w86 h23 +0x200, % translate("Name && Type")
-		Gui BBE:Add, Edit, x102 y445 w110 h21 VlayoutNameEdit, %layoutNameEdit%
-		Gui BBE:Add, DropDownList, x215 y445 w110 VlayoutTypeDropDown, % values2String("|", map(["ButtonBox", "Stream Deck"], "translate")*)
+		Gui CTRLE:Add, Text, x8 y445 w86 h23 +0x200, % translate("Name && Type")
+		Gui CTRLE:Add, Edit, x102 y445 w110 h21 VlayoutNameEdit, %layoutNameEdit%
+		Gui CTRLE:Add, DropDownList, x215 y445 w110 AltSubmit Choose1 VlayoutTypeDropDown, % values2String("|", map(["ButtonBox", "Stream Deck"], "translate")*)
 		
-		Gui BBE:Add, Text, x8 y469 w86 h23 +0x200, % translate("Visible")
+		Gui CTRLE:Add, Text, x8 y469 w86 h23 +0x200, % translate("Visible")
 		if layoutVisibleCheck
-			Gui BBE:Add, CheckBox, x102 y469 w110 h21 Checked VlayoutVisibleCheck
+			Gui CTRLE:Add, CheckBox, x102 y469 w110 h21 Checked VlayoutVisibleCheck
 		else
-			Gui BBE:Add, CheckBox, x102 y469 w110 h21 VlayoutVisibleCheck
+			Gui CTRLE:Add, CheckBox, x102 y469 w110 h21 VlayoutVisibleCheck
 		
-		Gui BBE:Add, Text, x8 y493 w86 h23 +0x200, % translate("Layout")
-		Gui BBE:Font, c505050 s7
-		Gui BBE:Add, Text, x16 y517 w133 h21, % translate("(R x C, Margins)")
-		Gui BBE:Font
+		Gui CTRLE:Add, Text, x8 y493 w86 h23 +0x200, % translate("Layout")
+		Gui CTRLE:Font, c505050 s7
+		Gui CTRLE:Add, Text, x16 y517 w133 h21, % translate("(R x C, Margins)")
+		Gui CTRLE:Font
 		
-		Gui BBE:Add, Edit, x102 y493 w40 h21 Limit1 Number gupdateLayoutRowEditor VlayoutRowsEdit, %layoutRowsEdit%
-		Gui BBE:Add, UpDown, x125 y493 w17 h21, 1
-		Gui BBE:Add, Text, x147 y493 w20 h23 +0x200 Center, % translate("x")
-		Gui BBE:Add, Edit, x172 y493 w40 h21 Limit1 Number gupdateLayoutRowEditor VlayoutColumnsEdit, %layoutColumnsEdit%
-		Gui BBE:Add, UpDown, x195 y493 w17 h21, 1
+		Gui CTRLE:Add, Edit, x102 y493 w40 h21 Limit1 Number gupdateLayoutRowEditor VlayoutRowsEdit, %layoutRowsEdit%
+		Gui CTRLE:Add, UpDown, x125 y493 w17 h21, 1
+		Gui CTRLE:Add, Text, x147 y493 w20 h23 +0x200 Center, % translate("x")
+		Gui CTRLE:Add, Edit, x172 y493 w40 h21 Limit1 Number gupdateLayoutRowEditor VlayoutColumnsEdit, %layoutColumnsEdit%
+		Gui CTRLE:Add, UpDown, x195 y493 w17 h21, 1
 		
-		Gui BBE:Font, c505050 s7
+		Gui CTRLE:Font, c505050 s7
 		
-		Gui BBE:Add, Text, x242 y474 w40 h23 +0x200 Center, % translate("Row")
-		Gui BBE:Add, Text, x292 y474 w40 h23 +0x200 Center, % translate("Column")
-		Gui BBE:Add, Text, x342 y474 w40 h23 +0x200 Center, % translate("Sides")
-		Gui BBE:Add, Text, x392 y474 w40 h23 +0x200 Center, % translate("Bottom")
+		Gui CTRLE:Add, Text, x242 y474 w40 h23 +0x200 Center, % translate("Row")
+		Gui CTRLE:Add, Text, x292 y474 w40 h23 +0x200 Center, % translate("Column")
+		Gui CTRLE:Add, Text, x342 y474 w40 h23 +0x200 Center, % translate("Sides")
+		Gui CTRLE:Add, Text, x392 y474 w40 h23 +0x200 Center, % translate("Bottom")
 		
-		Gui BBE:Font
+		Gui CTRLE:Font
 		
-		Gui BBE:Add, Edit, x242 y493 w40 h21 Limit2 Number gupdateLayoutRowEditor VlayoutRowMarginEdit, %layoutRowMarginEdit%
-		Gui BBE:Add, Edit, x292 y493 w40 h21 Limit2 Number gupdateLayoutRowEditor VlayoutColumnMarginEdit, %layoutColumnMarginEdit%
-		Gui BBE:Add, Edit, x342 y493 w40 h21 Limit2 Number gupdateLayoutRowEditor VlayoutSidesMarginEdit, %layoutSidesMarginEdit%
-		Gui BBE:Add, Edit, x392 y493 w40 h21 Limit2 Number gupdateLayoutRowEditor VlayoutBottomMarginEdit, %layoutBottomMarginEdit%
+		Gui CTRLE:Add, Edit, x242 y493 w40 h21 Limit2 Number gupdateLayoutRowEditor VlayoutRowMarginEdit, %layoutRowMarginEdit%
+		Gui CTRLE:Add, Edit, x292 y493 w40 h21 Limit2 Number gupdateLayoutRowEditor VlayoutColumnMarginEdit, %layoutColumnMarginEdit%
+		Gui CTRLE:Add, Edit, x342 y493 w40 h21 Limit2 Number gupdateLayoutRowEditor VlayoutSidesMarginEdit, %layoutSidesMarginEdit%
+		Gui CTRLE:Add, Edit, x392 y493 w40 h21 Limit2 Number gupdateLayoutRowEditor VlayoutBottomMarginEdit, %layoutBottomMarginEdit%
 		
-		Gui BBE:Add, DropDownList, x8 y534 w86 AltSubmit Choose0 gupdateLayoutRowEditor VlayoutRowDropDown, |
+		Gui CTRLE:Add, DropDownList, x8 y534 w86 AltSubmit Choose0 gupdateLayoutRowEditor VlayoutRowDropDown, |
 		
-		Gui BBE:Add, Edit, x102 y534 w330 h50 Disabled VlayoutRowEdit, %layoutRowEdit%
+		Gui CTRLE:Add, Edit, x102 y534 w330 h50 Disabled VlayoutRowEdit, %layoutRowEdit%
 		
-		Gui BBE:Add, Button, x223 y589 w46 h23 VlayoutAddButton gaddItem, % translate("Add")
-		Gui BBE:Add, Button, x271 y589 w50 h23 Disabled VlayoutDeleteButton gdeleteItem, % translate("Delete")
-		Gui BBE:Add, Button, x377 y589 w55 h23 Disabled VlayoutUpdateButton gupdateItem, % translate("&Save")
+		Gui CTRLE:Add, Button, x223 y589 w46 h23 VlayoutAddButton gaddItem, % translate("Add")
+		Gui CTRLE:Add, Button, x271 y589 w50 h23 Disabled VlayoutDeleteButton gdeleteItem, % translate("Delete")
+		Gui CTRLE:Add, Button, x377 y589 w55 h23 Disabled VlayoutUpdateButton gupdateItem, % translate("&Save")
 		
 		this.initializeList(layoutsListViewHandle, "layoutsListView", "layoutAddButton", "layoutDeleteButton", "layoutUpdateButton")
 		
@@ -632,14 +688,15 @@ class LayoutsList extends ConfigurationItemList {
 		
 		layouts := {}
 		
-		for descriptor, definition in getConfigurationSectionValues(configuration, "Layouts", Object()) {
+		for descriptor, definition in getConfigurationSectionValues(this.ButtonBoxConfiguration, "Layouts", Object()) {
 			descriptor := ConfigurationItem.splitDescriptor(descriptor)
 			name := descriptor[1]
 			
-			checked := true
-			
 			if !layouts.HasKey(name)
 				layouts[name] := Object()
+			
+			layouts[name]["Type"] := "Button Box"
+			layouts[name]["Visible"] := true
 			
 			if (descriptor[2] = "Layout") {
 				definition := string2Values(",", definition)
@@ -653,7 +710,23 @@ class LayoutsList extends ConfigurationItemList {
 				layouts[name]["Margins"] := Array(rowMargin, columnMargin, sidesMargin, bottomMargin)
 			}
 			else if (descriptor[2] = "Visible")
-				checked := definition
+				layouts[name]["Visible"] := definition
+			else
+				layouts[name][descriptor[2]] := definition
+		}
+		
+		for descriptor, definition in getConfigurationSectionValues(this.StreamDeckConfiguration, "Layouts", Object()) {
+			descriptor := ConfigurationItem.splitDescriptor(descriptor)
+			name := descriptor[1]
+			
+			if !layouts.HasKey(name)
+				layouts[name] := Object()
+			
+			layouts[name]["Type"] := "Stream Deck"
+			layouts[name]["Visible"] := false
+			
+			if (descriptor[2] = "Layout")
+				layouts[name]["Grid"] := definition
 			else
 				layouts[name][descriptor[2]] := definition
 		}
@@ -661,25 +734,38 @@ class LayoutsList extends ConfigurationItemList {
 		items := []
 		
 		for name, definition in layouts
-			items.Push(Array(name, checked, definition))
+			items.Push(Array(name, definition))
 		
 		this.ItemList := items
 	}
-		
-	saveToConfiguration(configuration, save := true) {
+	
+	saveToConfiguration(buttonBoxConfiguration, streamDeckConfiguration, save := true) {
 		if save
-			base.saveToConfiguration(configuration)
+			base.saveToConfiguration(buttonBoxConfiguration)
 		
 		for ignore, layout in this.ItemList {
-			grid := layout[3]["Grid"]
-			
-			setConfigurationValue(configuration, "Layouts", ConfigurationItem.descriptor(layout[1], "Layout")
-								, grid . ", " . values2String(", ", layout[3]["Margins"]*))
-								
-			Loop % string2Values("x", grid)[1]
-				setConfigurationValue(configuration, "Layouts", ConfigurationItem.descriptor(layout[1], A_Index), layout[3][A_Index])
-			
-			setConfigurationValue(configuration, "Layouts", ConfigurationItem.descriptor(layout[1], "Visible"), layout[2])
+			if (layout[2]["Type"] = "Button Box") {
+				grid := layout[2]["Grid"]
+				
+				setConfigurationValue(buttonBoxConfiguration, "Layouts", ConfigurationItem.descriptor(layout[1], "Layout")
+									, grid . ", " . values2String(", ", layout[2]["Margins"]*))
+									
+				Loop % string2Values("x", grid)[1]
+					setConfigurationValue(buttonBoxConfiguration, "Layouts"
+										, ConfigurationItem.descriptor(layout[1], A_Index), layout[2][A_Index])
+				
+				setConfigurationValue(buttonBoxConfiguration, "Layouts"
+									, ConfigurationItem.descriptor(layout[1], "Visible"), layout[2]["Visible"])
+			}
+			else {
+				grid := layout[2]["Grid"]
+				
+				setConfigurationValue(streamDeckConfiguration, "Layouts", ConfigurationItem.descriptor(layout[1], "Layout"), grid)
+									
+				Loop % string2Values("x", grid)[1]
+					setConfigurationValue(streamDeckConfiguration, "Layouts"
+										, ConfigurationItem.descriptor(layout[1], A_Index), layout[2][A_Index])
+			}
 		}
 	}
 	
@@ -694,7 +780,7 @@ class LayoutsList extends ConfigurationItemList {
 		this.ItemList := items
 		
 		for ignore, layout in items {
-			grid := layout[3]["Grid"]
+			grid := layout[2]["Grid"]
 		
 			definition := ""
 			
@@ -703,10 +789,11 @@ class LayoutsList extends ConfigurationItemList {
 				if (A_Index > 1)
 					definition .= "; "
 				
-				definition .= (A_Index . ": " . layout[3][A_Index])
+				definition .= (A_Index . ": " . layout[2][A_Index])
 			}
 			
-			LV_Add("", layout[1], grid, values2String(", ", layout[3]["Margins"]*), definition)
+			
+			LV_Add("", layout[1], grid, (layout[2]["Type"] = "Button Box") ? values2String(", ", layout[2]["Margins"]*) : "", definition)
 		}
 		
 		if first {
@@ -719,26 +806,41 @@ class LayoutsList extends ConfigurationItemList {
 			first := false
 		}
 		
-		ButtonBoxEditor.Instance.configurationChanged(LayoutsList.Instance.CurrentButtonBox)
+		ControllerEditor.Instance.configurationChanged(LayoutsList.Instance.CurrentControllerType, LayoutsList.Instance.CurrentController)
 	}
 	
 	loadEditor(item) {
-		layoutNameEdit := item[1]
-		layoutVisibleCheck := item[2]
+		if !item
+			MsgBox Oops
 		
-		size := string2Values("x", item[3]["Grid"])
+		layoutNameEdit := item[1]
+		layoutTypeDropDown := item[2]["Type"]
+		layoutVisibleCheck := item[2]["Visible"]
+		
+		size := string2Values("x", item[2]["Grid"])
 		
 		layoutRowsEdit := size[1]
 		layoutColumnsEdit := size[2]
 		
-		margins := item[3]["Margins"]
+		if (item[2]["Type"] = "Button Box") {
+			margins := item[2]["Margins"]
+			
+			layoutRowMarginEdit := margins[1]
+			layoutColumnMarginEdit := margins[2]
+			layoutSidesMarginEdit := margins[3]
+			layoutBottomMarginEdit := margins[4]
+		}
+		else {
+			layoutRowMarginEdit := ""
+			layoutColumnMarginEdit := ""
+			layoutSidesMarginEdit := ""
+			layoutBottomMarginEdit := ""
+		}
 		
-		layoutRowMarginEdit := margins[1]
-		layoutColumnMarginEdit := margins[2]
-		layoutSidesMarginEdit := margins[3]
-		layoutBottomMarginEdit := margins[4]
+		Gui CTRLE:Default
 		
 		GuiControl Text, layoutNameEdit, %layoutNameEdit%
+		GuiControl Choose, layoutTypeDropDown, % inList(["Button Box", "Stream Deck"], layoutTypeDropDown)
 		GuiControl Text, layoutRowsEdit, %layoutRowsEdit%
 		GuiControl Text, layoutColumnsEdit, %layoutColumnsEdit%
 		GuiControl Text, layoutRowMarginEdit, %layoutRowMarginEdit%
@@ -748,13 +850,30 @@ class LayoutsList extends ConfigurationItemList {
 		
 		GuiControl, , layoutVisibleCheck, %layoutVisibleCheck%
 		
+		if (item[2]["Type"] = "Button Box") {
+			GuiControl Enable, layoutRowMarginEdit
+			GuiControl Enable, layoutColumnMarginEdit
+			GuiControl Enable, layoutSidesMarginEdit
+			GuiControl Enable, layoutBottomMarginEdit
+			
+			GuiControl Enable, layoutVisibleCheck
+		}
+		else {
+			GuiControl Disable, layoutRowMarginEdit
+			GuiControl Disable, layoutColumnMarginEdit
+			GuiControl Disable, layoutSidesMarginEdit
+			GuiControl Disable, layoutBottomMarginEdit
+			
+			GuiControl Disable, layoutVisibleCheck
+		}
+		
 		choices := []
 		rowDefinitions := []
 		
 		Loop %layoutRowsEdit% {
 			choices.Push(translate("Row ") . A_Index)
 		
-			rowDefinitions.Push(item[3][A_Index])
+			rowDefinitions.Push(item[2][A_Index])
 		}
 		
 		this.iRowDefinitions := rowDefinitions
@@ -778,29 +897,32 @@ class LayoutsList extends ConfigurationItemList {
 			
 		GuiControl Text, layoutRowEdit, %layoutRowEdit%
 		
-		preview := ButtonBoxEditor.Instance.ButtonBoxPreview
+		preview := ControllerEditor.Instance.ControllerPreview
 		
-		if ((this.CurrentButtonBox != layoutNameEdit) || (!preview && (layoutNameEdit != "")) || (preview && (preview.Name != layoutNameEdit)))
-			ButtonBoxEditor.Instance.configurationChanged(layoutNameEdit)
+		if ((this.CurrentController != layoutNameEdit) || (!preview && (layoutNameEdit != "")) || (preview && (preview.Name != layoutNameEdit)))
+			ControllerEditor.Instance.configurationChanged(item[2]["Type"], layoutNameEdit)
 	}
 	
 	addItem() {
 		base.addItem()
 		
+		type := this.ItemList[this.CurrentItem][2]["Type"]
+		
 		GuiControl Text, layoutRowEdit, %layoutRowEdit%
 		
-		preview := ButtonBoxEditor.Instance.ButtonBoxPreview
+		preview := ControllerEditor.Instance.ControllerPreview
 		
-		if ((this.CurrentButtonBox != layoutNameEdit) || (!preview && (layoutNameEdit != "")) || (preview && (preview.Name != layoutNameEdit)))
-			ButtonBoxEditor.Instance.configurationChanged(this.CurrentButtonBox)
+		if ((this.CurrentController != layoutNameEdit) || (!preview && (layoutNameEdit != "")) || (preview && (preview.Name != layoutNameEdit)))
+			ControllerEditor.Instance.configurationChanged(type, this.CurrentController)
 	}
 	
 	clearEditor() {
-		this.loadEditor(Array("", "", {Grid: "0x0", Margins: [0,0,0,0]}))
+		this.loadEditor(Array("", {Type: "Button Box", Visible: true, Grid: "0x0", Margins: [0,0,0,0]}))
 	}
 	
 	buildItemFromEditor(isNew := false) {
 		GuiControlGet layoutNameEdit
+		GuiControlGet layoutTypeDropDown
 		GuiControlGet layoutRowsEdit
 		GuiControlGet layoutColumnsEdit
 		GuiControlGet layoutRowMarginEdit
@@ -824,18 +946,22 @@ class LayoutsList extends ConfigurationItemList {
 			if (layoutRowDropDown > 0)
 				this.iRowDefinitions[layoutRowDropDown] := layoutRowEdit
 			
-			layout := {Grid: layoutRowsEdit . " x " . layoutColumnsEdit
-					 , Margins: Array(layoutRowMarginEdit, layoutColumnMarginEdit, layoutSidesMarginEdit, layoutBottomMarginEdit)}
+			if (["Button Box", "Stream Deck"][layoutTypeDropDown] = "Button Box")
+				layout := {Type: "Button Box", Grid: layoutRowsEdit . " x " . layoutColumnsEdit
+						 , Visible: layoutVisibleCheck
+						 , Margins: Array(layoutRowMarginEdit, layoutColumnMarginEdit, layoutSidesMarginEdit, layoutBottomMarginEdit)}
+			else
+				layout := {Type: "Stream Deck", Grid: layoutRowsEdit . " x " . layoutColumnsEdit, Visible: false}
 			
 			Loop % this.iRowDefinitions.Length()
 				layout[A_Index] := this.iRowDefinitions[A_Index]
 				
-			return Array(layoutNameEdit, layoutVisibleCheck, layout)
+			return Array(layoutNameEdit, layout)
 		}
 	}
 	
 	updateLayoutRowEditor(save := true) {
-		Gui BBE:Default
+		Gui CTRLE:Default
 		
 		GuiControlGet layoutRowsEdit
 		GuiControlGet layoutRowDropDown
@@ -898,7 +1024,7 @@ class LayoutsList extends ConfigurationItemList {
 			GuiControl Text, layoutRowEdit, %layoutRowEdit%
 		}
 		
-		if (save && ButtonBoxEditor.Instance.AutoSave) {
+		if (save && ControllerEditor.Instance.AutoSave) {
 			if (this.CurrentItem != 0) {
 				this.updateItem()
 			}
@@ -926,7 +1052,7 @@ class LayoutsList extends ConfigurationItemList {
 		
 		this.updateItem()
 		
-		ButtonBoxEditor.Instance.configurationChanged(this.CurrentButtonBox)
+		ControllerEditor.Instance.configurationChanged(this.CurrentControllerType, this.CurrentController)
 	}
 	
 	changeControl(row, column, control, number := false) {
@@ -984,38 +1110,183 @@ class LayoutsList extends ConfigurationItemList {
 	}
 }
 
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; ControllerPreview                                                       ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class ControllerPreview extends ConfigurationItem {
+	static sCurrentWindow := 0
+	
+	iPreviewManager := false
+	iName := ""
+	
+	iWindow := false
+	
+	iWidth := 0
+	iHeight := 0
+	
+	PreviewManager[] {
+		Get {
+			return this.iPreviewManager
+		}
+	}
+	
+	Name[] {
+		Get {
+			return this.iName
+		}
+	}
+	
+	Type[] {
+		Get {
+			Throw "Virtual property ControllerPreview.Type must be implemented in a subclass..."
+		}
+	}
+	
+	Width[] {
+		Get {
+			return this.iWidth
+		}
+		
+		Set {
+			this.iWidth := value
+		}
+	}
+	
+	Height[] {
+		Get {
+			return this.iHeight
+		}
+		
+		Set {
+			this.iHeight := value
+		}
+	}
+	
+	Window[] {
+		Get {
+			return this.iWindow
+		}
+	}
+	
+	CurrentWindow[] {
+		Get {
+			return ("CTRLP" . ControllerPreview.sCurrentWindow)
+		}
+	}
+	
+	__New(previewManager, name, configuration) {
+		this.iPreviewManager := previewManager
+		this.iName := name
+		
+		ControllerPreview.sCurrentWindow += 1
+		
+		this.iWindow := this.CurrentWindow
+		
+		base.__New(configuration)
+		
+		this.createGui(configuration)
+	}
+	
+	createGui(configuration) {
+		Throw "Virtual method ControllerPreview.createGui must be implemented in a subclass..."
+	}
+	
+	open() {
+		width := this.Width
+		height := this.Height
+	
+		centerX := 0
+		centerY := 0
+		
+		this.PreviewManager.getPreviewCenter(centerX, centerY)
+		
+		SysGet mainScreen, MonitorWorkArea
+
+		x := mainScreenRight - width
+		y := mainScreenBottom - height
+			
+		if centerX
+			x := centerX - Round(width / 2)
+		
+		if centerY
+			y := centerY - Round(height / 2)
+		
+		window := this.Window
+		
+		vControllerPreviews[window] := this
+		
+		Gui %window%:Show, x%x% y%y% w%width% h%height% NoActivate
+	}
+	
+	close() {
+		window := this.Window
+		
+		vControllerPreviews.Delete(window)
+		
+		Gui %window%:Destroy
+	}
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                   Public Function Declaration Section                   ;;;
+;;;-------------------------------------------------------------------------;;;
+
+controlClick() {
+	curCoordMode := A_CoordModeMouse
+	
+	CoordMode Mouse, Window
+		
+	try {	
+		MouseGetPos clickX, clickY
+		
+		row := 0
+		column := 0
+		isEmpty := false
+		
+		element := vControllerPreviews[A_Gui].getControl(clickX, clickY, row, column, isEmpty)
+		
+		if element
+			vControllerPreviews[A_Gui].controlClick(element, row, column, isEmpty)
+	}
+	finally {
+		CoordMode Mouse, curCoordMode
+	}
+}
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-saveButtonBoxEditor() {
+saveControllerEditor() {
 	protectionOn()
 	
 	try {
-		ButtonBoxEditor.Instance.close(true)
+		ControllerEditor.Instance.close(true)
 	}
 	finally {
 		protectionOff()
 	}
 }
 
-cancelButtonBoxEditor() {
+cancelControllerEditor() {
 	protectionOn()
 	
 	try {
-		ButtonBoxEditor.Instance.close(false)
+		ControllerEditor.Instance.close(false)
 	}
 	finally {
 		protectionOff()
 	}
 }
 
-moveButtonBoxEditor() {
-	moveByMouse("BBE")
+moveControllerEditor() {
+	moveByMouse(A_Gui)
 }
 
-openButtonBoxesDocumentation() {
+openControllerDocumentation() {
 	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#button-box-layouts
 }
 
@@ -1059,12 +1330,12 @@ updateLayoutRowEditor() {
 	}
 }
 
-moveButtonBoxPreview() {
-	window := ButtonBoxPreview.CurrentWindow
+moveControllerPreview() {
+	window := ControllerPreview.CurrentWindow
 	
 	moveByMouse(window)
 	
 	WinGetPos x, y, width, height, A
 	
-	vButtonBoxPreviews[A_Gui].PreviewManager.setPreviewCenter(x + Round(width / 2), y + Round(height / 2))
+	vControllerPreviews[A_Gui].PreviewManager.setPreviewCenter(x + Round(width / 2), y + Round(height / 2))
 }

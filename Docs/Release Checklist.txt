@@ -25,6 +25,10 @@ Release 3.6.8 Checklist
   a. Translations
 2. New Actions Editor
   a. Documentation & Images
+3. Refactored ButtonBoxEditor
+  a. Documentation
+  b. Doc Images
+  c. Doc references for "...#button-box-layouts"
 
 Release 3.6.6 Checklist
 =======================

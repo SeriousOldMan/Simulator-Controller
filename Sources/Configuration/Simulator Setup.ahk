@@ -39,6 +39,7 @@ ListLines Off					; Disable execution history
 #Include ..\Libraries\RuleEngine.ahk
 #Include Libraries\SettingsEditor.ahk
 #Include Libraries\ConfigurationEditor.ahk
+#Include Libraries\PluginActionsEditor.ahk
 #Include Libraries\ButtonBoxEditor.ahk
 #Include ..\Plugins\Voice Control Configuration Plugin.ahk
 #Include ..\Plugins\Race Engineer Configuration Plugin.ahk
@@ -2200,13 +2201,15 @@ exitApp() {
 ;;;                   Public Function Declaration Section                   ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-openLabelsEditor() {
-	fileName := ("Controller Action Labels." . getLanguage())
+openLabelsAndIconsEditor() {
+	owner := SetupWizard.Instance.WizardWindow
+	Gui %owner%:+Disabled
+		
+	Gui PAE:+Owner%owner%
 	
-	if !FileExist(kUserTranslationsDirectory . fileName)
-		FileCopy %kResourcesDirectory%Templates\%fileName%, %kUserTranslationsDirectory%%fileName%
+	new PluginActionsEditor(kSimulatorConfiguration).editPluginActions()
 	
-	Run % "notepad.exe " . """" . kUserTranslationsDirectory . "Controller Action Labels." . getLanguage() . """"
+	Gui %owner%:-Disabled
 }
 
 findSoftware(definition, software) {

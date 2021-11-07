@@ -219,7 +219,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		
 		Gui %window%:Font, s8 Norm, Arial
 		
-		Gui %window%:Add, Button, x%x% yp+30 w%colWidth% h23 HWNDlabelsEditorButtonHandle gopenLabelsEditor Hidden, % translate("Edit Labels...")
+		Gui %window%:Add, Button, x%x% yp+30 w%colWidth% h23 HWNDlabelsEditorButtonHandle gopenLabelsAndIconsEditor Hidden, % translate("Edit Labels && Icons...")
 		
 		Gui %window%:Font, s8 Bold, Arial
 			

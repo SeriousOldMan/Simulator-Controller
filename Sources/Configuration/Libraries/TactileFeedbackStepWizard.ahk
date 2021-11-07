@@ -162,7 +162,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 		setButtonIcon(chassisEffectsButtonHandle, kResourcesDirectory . "Setup\Images\Pencil.ico", 1, "L2 T2 R2 B2 H16 W16")
 		Gui %window%:Add, ListBox, x%secondX% yp w%secondWidth% h60 ReadOnly Disabled HWNDchassisEffectsListHandle Hidden
 		
-		Gui %window%:Add, Button, x%x% yp+70 w%colWidth% h23 HWNDlabelsEditorButtonHandle gopenLabelsEditor Hidden, % translate("Edit Labels...")
+		Gui %window%:Add, Button, x%x% yp+70 w%colWidth% h23 HWNDlabelsEditorButtonHandle gopenLabelsAndIconsEditor Hidden, % translate("Edit Labels && Icons...")
 		
 		Gui %window%:Font, s8 Bold, Arial
 			

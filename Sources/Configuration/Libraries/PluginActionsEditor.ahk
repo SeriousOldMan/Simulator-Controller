@@ -217,7 +217,7 @@ class PluginActionsEditor extends ConfigurationItem {
 		this.iChanged[language] := changed
 	}
 	
-	editPluginActions(plugin) {
+	editPluginActions(plugin := false) {
 		this.selectLanguage(this.SelectedLanguage, true, plugin)
 		
 		Gui PAE:Show, AutoSize Center
@@ -300,7 +300,6 @@ restart:
 global pluginActionsListView = false
 global labelEdit = ""
 global iconEdit
-global deleteIconButton
 		
 class PluginActionsList extends ConfigurationItemList {
 	iCurrentIcon := false
@@ -329,14 +328,12 @@ class PluginActionsList extends ConfigurationItemList {
 		Gui PAE:Add, Text, x263 yp w120 r2, % translate("1. Click = Edit`n2. Ctrl-Click = Clear")
 		Gui PAE:Font
 		
-		; Gui PAE:Add, Button, x283 yp w23 h23 HwnddeleteIconButtonHandle VdeleteIconButton gdeleteIcon
-		; setButtonIcon(deleteIconButtonHandle, kIconsDirectory . "Minus.ico", 1)
-		
-		
 		this.initializeList(pluginActionsListViewHandle, "pluginActionsListView")
 	}
 	
 	loadPluginActions(plugin) {
+		local action
+		
 		editor := PluginActionsEditor.Instance
 		actions := {}
 		
@@ -377,6 +374,8 @@ class PluginActionsList extends ConfigurationItemList {
 	}
 	
 	savePluginActions(language, plugin) {
+		local action
+		
 		this.selectEvent(false)
 		
 		this.clearEditor()
@@ -430,6 +429,8 @@ class PluginActionsList extends ConfigurationItemList {
 	}
 	
 	selectEvent(line) {
+		local action
+		
 		if (this.CurrentItem && (line != this.CurrentItem)) {
 			action := this.buildItemFromEditor()
 				
@@ -447,12 +448,14 @@ class PluginActionsList extends ConfigurationItemList {
 	}
 	
 	loadList(items) {
+		local action
+		
 		Gui PAE:Default
 		Gui ListView, % this.ListHandle
 	
 		LV_Delete()
 		
-		if false {
+		if true {
 			length := items.Length()
 			
 			picturesListViewImages := IL_Create(length)
@@ -463,11 +466,13 @@ class PluginActionsList extends ConfigurationItemList {
 				IL_Add(picturesListViewImages, picture)
 			}
 			
-			LV_SetImageList(picturesListViewImages)
+			; LV_SetImageList(picturesListViewImages)
 		}
 		
 		for ignore, action in items
 			LV_Add("", action[2], action[3], StrReplace(action[4], "`n", A_Space), action[1] ? action[1] : "")
+		
+		LV_SetImageList(picturesListViewImages)
 		
 		LV_ModifyCol()
 		LV_ModifyCol(1, 100)
@@ -483,18 +488,12 @@ class PluginActionsList extends ConfigurationItemList {
 			
 			try
 				GuiControl Enable, íconEdit
-	
-			try
-				GuiControl Enable, deleteIconButton
 		}
 		else {
 			GuiControl Disable, labelEdit
 			
 			try
 				GuiControl Disable, íconEdit
-			
-			try
-				GuiControl Disable, deleteIconButton
 		}
 	}
 	
@@ -525,6 +524,8 @@ class PluginActionsList extends ConfigurationItemList {
 	}
 	
 	buildItemFromEditor(isNew := false) {
+		local action
+		
 		GuiControlGet labelEdit
 		
 		action := this.ItemList[this.CurrentItem].Clone()

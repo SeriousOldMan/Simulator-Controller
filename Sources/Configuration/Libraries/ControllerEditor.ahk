@@ -187,19 +187,28 @@ class ControllerEditor extends ConfigurationItem {
 		return "moveControllerPreview"
 	}
 	
+	selectLayout(name) {
+		Gui CTRLE:Default
+		
+		Gui ListView, % this.iLayoutsList.ListHandle
+		
+		for index, item in this.iLayoutsList.ItemList
+			if (item[1] = name) {
+				this.iLayoutsList.openEditor(index)
+				this.iLayoutsList.selectItem(index)
+				
+				break
+			}
+	}
+	
 	open(x := "Center", y := "Center") {
 		Gui CTRLE:Show, AutoSize x%x% y%y%
 		
 		name := this.Name
+
+		callback := ObjBindMethod(this, "selectLayout", name)
 		
-		if !this.AutoSave
-			for index, item in this.iLayoutsList.ItemList
-				if (item[1] = name) {
-					this.iLayoutsList.openEditor(index)
-					this.iLayoutsList.selectItem(index)
-					
-					break
-				}
+		SetTimer %callback%, -1000
 	}
 	
 	close(save := true) {
@@ -576,6 +585,7 @@ global layoutsListView := "|"
 
 global layoutNameEdit = ""
 global layoutTypeDropDown
+global layoutDropDown
 
 global layoutRowsEdit = ""
 global layoutColumnsEdit = ""
@@ -600,6 +610,9 @@ class LayoutsList extends ConfigurationItemList {
 	iStreamDeckConfiguration := false
 	iButtonDefinitions := false
 	iIconDefinitions := false
+	
+	iButtonBoxWidgets := []
+	iStreamDeckWidgets := []
 	
 	ButtonBoxConfiguration[] {
 		Get {
@@ -639,42 +652,51 @@ class LayoutsList extends ConfigurationItemList {
 		
 		Gui CTRLE:Add, Text, x8 y445 w86 h23 +0x200, % translate("Name && Type")
 		Gui CTRLE:Add, Edit, x102 y445 w110 h21 VlayoutNameEdit, %layoutNameEdit%
-		Gui CTRLE:Add, DropDownList, x215 y445 w110 AltSubmit Choose1 VlayoutTypeDropDown, % values2String("|", map(["ButtonBox", "Stream Deck"], "translate")*)
+		Gui CTRLE:Add, DropDownList, x215 y445 w110 AltSubmit Choose1 VlayoutTypeDropDown gchooseLayoutType, % values2String("|", map(["ButtonBox", "Stream Deck"], "translate")*)
 		
-		Gui CTRLE:Add, Text, x8 y469 w86 h23 +0x200, % translate("Visible")
+		Gui CTRLE:Add, Text, x8 y469 w86 h23 +0x200 Section hwndbbWidget1, % translate("Visible")
 		if layoutVisibleCheck
-			Gui CTRLE:Add, CheckBox, x102 y469 w110 h21 Checked VlayoutVisibleCheck
+			Gui CTRLE:Add, CheckBox, x102 y469 w110 h21 Checked VlayoutVisibleCheck hwndbbWidget2
 		else
-			Gui CTRLE:Add, CheckBox, x102 y469 w110 h21 VlayoutVisibleCheck
+			Gui CTRLE:Add, CheckBox, x102 y469 w110 h21 VlayoutVisibleCheck hwndbbWidget2
 		
-		Gui CTRLE:Add, Text, x8 y493 w86 h23 +0x200, % translate("Layout")
+		Gui CTRLE:Add, Text, x8 y493 w86 h23 +0x200 hwndbbWidget3, % translate("Layout")
 		Gui CTRLE:Font, c505050 s7
-		Gui CTRLE:Add, Text, x16 y517 w133 h21, % translate("(R x C, Margins)")
+		Gui CTRLE:Add, Text, x16 y517 w133 h21 hwndbbWidget4, % translate("(R x C, Margins)")
 		Gui CTRLE:Font
 		
-		Gui CTRLE:Add, Edit, x102 y493 w40 h21 Limit1 Number gupdateLayoutRowEditor VlayoutRowsEdit, %layoutRowsEdit%
-		Gui CTRLE:Add, UpDown, x125 y493 w17 h21, 1
-		Gui CTRLE:Add, Text, x147 y493 w20 h23 +0x200 Center, % translate("x")
-		Gui CTRLE:Add, Edit, x172 y493 w40 h21 Limit1 Number gupdateLayoutRowEditor VlayoutColumnsEdit, %layoutColumnsEdit%
-		Gui CTRLE:Add, UpDown, x195 y493 w17 h21, 1
+		Gui CTRLE:Add, Edit, x102 y493 w40 h21 Limit1 Number gupdateLayoutRowEditor VlayoutRowsEdit hwndbbWidget5, %layoutRowsEdit%
+		Gui CTRLE:Add, UpDown, x125 y493 w17 h21 hwndbbWidget6, 1
+		Gui CTRLE:Add, Text, x147 y493 w20 h23 +0x200 Center hwndbbWidget7, % translate("x")
+		Gui CTRLE:Add, Edit, x172 y493 w40 h21 Limit1 Number gupdateLayoutRowEditor VlayoutColumnsEdit hwndbbWidget8, %layoutColumnsEdit%
+		Gui CTRLE:Add, UpDown, x195 y493 w17 h21 hwndbbWidget9, 1
 		
 		Gui CTRLE:Font, c505050 s7
 		
-		Gui CTRLE:Add, Text, x242 y474 w40 h23 +0x200 Center, % translate("Row")
-		Gui CTRLE:Add, Text, x292 y474 w40 h23 +0x200 Center, % translate("Column")
-		Gui CTRLE:Add, Text, x342 y474 w40 h23 +0x200 Center, % translate("Sides")
-		Gui CTRLE:Add, Text, x392 y474 w40 h23 +0x200 Center, % translate("Bottom")
+		Gui CTRLE:Add, Text, x242 y474 w40 h23 +0x200 Center hwndbbWidget10, % translate("Row")
+		Gui CTRLE:Add, Text, x292 y474 w40 h23 +0x200 Center hwndbbWidget11, % translate("Column")
+		Gui CTRLE:Add, Text, x342 y474 w40 h23 +0x200 Center hwndbbWidget12, % translate("Sides")
+		Gui CTRLE:Add, Text, x392 y474 w40 h23 +0x200 Center hwndbbWidget13, % translate("Bottom")
 		
 		Gui CTRLE:Font
 		
-		Gui CTRLE:Add, Edit, x242 y493 w40 h21 Limit2 Number gupdateLayoutRowEditor VlayoutRowMarginEdit, %layoutRowMarginEdit%
-		Gui CTRLE:Add, Edit, x292 y493 w40 h21 Limit2 Number gupdateLayoutRowEditor VlayoutColumnMarginEdit, %layoutColumnMarginEdit%
-		Gui CTRLE:Add, Edit, x342 y493 w40 h21 Limit2 Number gupdateLayoutRowEditor VlayoutSidesMarginEdit, %layoutSidesMarginEdit%
-		Gui CTRLE:Add, Edit, x392 y493 w40 h21 Limit2 Number gupdateLayoutRowEditor VlayoutBottomMarginEdit, %layoutBottomMarginEdit%
+		Gui CTRLE:Add, Edit, x242 y493 w40 h21 Limit2 Number gupdateLayoutRowEditor VlayoutRowMarginEdit hwndbbWidget14, %layoutRowMarginEdit%
+		Gui CTRLE:Add, Edit, x292 y493 w40 h21 Limit2 Number gupdateLayoutRowEditor VlayoutColumnMarginEdit hwndbbWidget15, %layoutColumnMarginEdit%
+		Gui CTRLE:Add, Edit, x342 y493 w40 h21 Limit2 Number gupdateLayoutRowEditor VlayoutSidesMarginEdit hwndbbWidget16, %layoutSidesMarginEdit%
+		Gui CTRLE:Add, Edit, x392 y493 w40 h21 Limit2 Number gupdateLayoutRowEditor VlayoutBottomMarginEdit hwndbbWidget17, %layoutBottomMarginEdit%
 		
-		Gui CTRLE:Add, DropDownList, x8 y534 w86 AltSubmit Choose0 gupdateLayoutRowEditor VlayoutRowDropDown, |
+		Gui CTRLE:Add, DropDownList, x8 y534 w86 AltSubmit Choose0 gupdateLayoutRowEditor VlayoutRowDropDown hwndbbWidget18, |
 		
-		Gui CTRLE:Add, Edit, x102 y534 w330 h50 Disabled VlayoutRowEdit, %layoutRowEdit%
+		Gui CTRLE:Add, Edit, x102 y534 w330 h50 Disabled VlayoutRowEdit hwndbbWidget19, %layoutRowEdit%
+		
+		Loop 19
+			this.iButtonBoxWidgets.Push(bbWidget%A_Index%)
+		
+		Gui CTRLE:Add, Text, x8 ys w86 h23 +0x200 hwndsdWidget1, % translate("Layout")
+		Gui CTRLE:Add, DropDownList, x102 yp w110 AltSubmit Choose1 VlayoutDropDown gchooseLayout hwndsdWidget2, % values2String("|", map(["Mini", "Standard", "XL"], "translate")*)
+		
+		Loop 2
+			this.iStreamDeckWidgets.Push(sdWidget%A_Index%)
 		
 		Gui CTRLE:Add, Button, x223 y589 w46 h23 VlayoutAddButton gaddItem, % translate("Add")
 		Gui CTRLE:Add, Button, x271 y589 w50 h23 Disabled VlayoutDeleteButton gdeleteItem, % translate("Delete")
@@ -831,6 +853,12 @@ class LayoutsList extends ConfigurationItemList {
 		layoutColumnsEdit := size[2]
 		
 		if (item[2]["Type"] = "Button Box") {
+			for ignore, widget in this.iButtonBoxWidgets
+				GuiControl Show, %widget%
+			
+			for ignore, widget in this.iStreamDeckWidgets
+				GuiControl Hide, %widget%
+			
 			margins := item[2]["Margins"]
 			
 			layoutRowMarginEdit := margins[1]
@@ -839,10 +867,23 @@ class LayoutsList extends ConfigurationItemList {
 			layoutBottomMarginEdit := margins[4]
 		}
 		else {
+			for ignore, widget in this.iButtonBoxWidgets
+				GuiControl Hide, %widget%
+			
+			for ignore, widget in this.iStreamDeckWidgets
+				GuiControl Show, %widget%
+			
 			layoutRowMarginEdit := ""
 			layoutColumnMarginEdit := ""
 			layoutSidesMarginEdit := ""
 			layoutBottomMarginEdit := ""
+			
+			if (layoutRowsEdit = 2)
+				GuiControl Choose, layoutDropDown, 1
+			else if (layoutRowsEdit = 3)
+				GuiControl Choose, layoutDropDown, 2
+			else
+				GuiControl Choose, layoutDropDown, 3
 		}
 		
 		Gui CTRLE:Default
@@ -925,7 +966,9 @@ class LayoutsList extends ConfigurationItemList {
 	}
 	
 	clearEditor() {
-		this.loadEditor(Array("", {Type: "Button Box", Visible: true, Grid: "0x0", Margins: [0,0,0,0]}))
+		margins := [ButtonBoxPreview.kRowMargin, ButtonBoxPreview.kColumnMargin, ButtonBoxPreview.kSidesMargin, ButtonBoxPreview.kBottomMargin]
+			
+		this.loadEditor(Array("", {Type: "Button Box", Visible: true, Grid: "0x0", Margins: margins}))
 	}
 	
 	buildItemFromEditor(isNew := false) {
@@ -966,6 +1009,48 @@ class LayoutsList extends ConfigurationItemList {
 				
 			return Array(layoutNameEdit, layout)
 		}
+	}
+	
+	chooseLayoutType() {
+		GuiControlGet layoutNameEdit
+		GuiControlGet layoutTypeDropDown
+		
+		if (layoutTypeDropDown = 2) {
+			grid := "3x5"
+			
+			margins := ["", "", "", ""]
+		}
+		else {
+			GuiControlGet layoutRowsEdit
+			GuiControlGet layoutColumnsEdit
+
+			grid := (layoutRowsEdit . "x" . layoutColumnsEdit)
+			
+			margins := [ButtonBoxPreview.kRowMargin, ButtonBoxPreview.kColumnMargin, ButtonBoxPreview.kSidesMargin, ButtonBoxPreview.kBottomMargin]
+		}
+		
+		this.loadEditor(Array(layoutNameEdit, {Type: ["Button Box", "Stream Deck"][layoutTypeDropDown], Visible: (layoutTypeDropDown = 1) ? true : false, Grid: grid, Margins: margins}))
+		
+		this.updateItem()
+	}
+	
+	chooseLayout() {
+		GuiControlGet layoutDropDown
+		
+		if (layoutDropDown = 1) {
+			GuiControl, , layoutRowsEdit, 2
+			GuiControl, , layoutColumnsEdit, 3
+		}
+		else if (layoutDropDown = 2) {
+			GuiControl, , layoutRowsEdit, 3
+			GuiControl, , layoutColumnsEdit, 5
+		}
+		else {
+			GuiControl, , layoutRowsEdit, 4
+			GuiControl, , layoutColumnsEdit, 8
+		}
+		
+		this.updateItem()
 	}
 	
 	updateLayoutRowEditor(save := true) {
@@ -1454,6 +1539,14 @@ moveControllerEditor() {
 
 openControllerDocumentation() {
 	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#button-box-layouts
+}
+
+chooseLayoutType() {
+	LayoutsList.Instance.chooseLayoutType()
+}
+
+chooseLayout() {
+	LayoutsList.Instance.chooseLayout()
 }
 
 chooseImageFile(oldImage := "__Undefined__") {

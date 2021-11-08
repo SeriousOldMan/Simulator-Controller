@@ -29,6 +29,9 @@ Release 3.6.8 Checklist
   a. Documentation
   b. Doc Images
   c. Doc references for "...#button-box-layouts"
+4. New Stream Deck mode in Controller Editor
+  a. Documentation
+  b. Doc Images
 
 Release 3.6.6 Checklist
 =======================

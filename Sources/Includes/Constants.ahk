@@ -47,6 +47,7 @@ global kScreenImagesDirectory = kResourcesDirectory . "Screen Images\"
 global kUserScreenImagesDirectory = kUserHomeDirectory . "Screen Images\"
 
 global kButtonBoxImagesDirectory = kResourcesDirectory . "Button Box Images\"
+global kStreamDeckImagesDirectory = kResourcesDirectory . "Stream Deck Images\"
 global kIconsDirectory = kResourcesDirectory . "Icons\"
 
 global kSimulatorConfigurationFile = "Simulator Configuration.ini"

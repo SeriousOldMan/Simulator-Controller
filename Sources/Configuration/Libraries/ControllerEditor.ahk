@@ -150,7 +150,7 @@ class ControllerEditor extends ConfigurationItem {
 		Gui CTRLE:Font, Norm, Arial
 		Gui CTRLE:Font, Italic Underline, Arial
 
-		Gui CTRLE:Add, Text, x0 YP+20 w432 cBlue Center gopenControllerDocumentation, % translate("Button Box Layouts")
+		Gui CTRLE:Add, Text, x0 YP+20 w432 cBlue Center gopenControllerDocumentation, % translate("Controller Layouts")
 		
 		this.iControlsList.createGui(buttonBoxConfiguration)
 		this.iLabelsList.createGui(buttonBoxConfiguration)
@@ -598,6 +598,8 @@ class LayoutsList extends ConfigurationItemList {
 	iSelectedRow := false
 	
 	iStreamDeckConfiguration := false
+	iButtonDefinitions := false
+	iIconDefinitions := false
 	
 	ButtonBoxConfiguration[] {
 		Get {
@@ -731,6 +733,9 @@ class LayoutsList extends ConfigurationItemList {
 				layouts[name][descriptor[2]] := definition
 		}
 		
+		this.iButtonDefinitions := getConfigurationSectionValues(this.StreamDeckConfiguration, "Buttons", Object())
+		this.iIconDefinitions := getConfigurationSectionValues(this.StreamDeckConfiguration, "Icons", Object())
+		
 		items := []
 		
 		for name, definition in layouts
@@ -765,6 +770,9 @@ class LayoutsList extends ConfigurationItemList {
 				Loop % string2Values("x", grid)[1]
 					setConfigurationValue(streamDeckConfiguration, "Layouts"
 										, ConfigurationItem.descriptor(layout[1], A_Index), layout[2][A_Index])
+				
+				setConfigurationSectionValues(streamDeckConfiguration, "Buttons", this.iButtonDefinitions)
+				setConfigurationSectionValues(streamDeckConfiguration, "Icons", this.iIconDefinitions)
 			}
 		}
 	}
@@ -1055,12 +1063,84 @@ class LayoutsList extends ConfigurationItemList {
 		ControllerEditor.Instance.configurationChanged(this.CurrentControllerType, this.CurrentController)
 	}
 	
-	changeControl(row, column, control, number := false) {
+	changeControl(row, column, control, argument := false) {
+		number := argument
+		oldButton := false
+		
+		GuiControlGet layoutNameEdit
+			
+		if (this.CurrentControllerType = "Stream Deck") {
+			oldButton := ControllerEditor.Instance.ControllerPreview.getButton(row, column)
+			
+			if oldButton {
+				oldNumber := oldButton.Button
+				
+				this.iButtonDefinitions.Delete(layoutNameEdit . "." . "Button." . oldNumber . ".Icon")
+				this.iButtonDefinitions.Delete(layoutNameEdit . "." . "Button." . oldNumber . ".Label")
+				this.iButtonDefinitions.Delete(layoutNameEdit . "." . "Button." . oldNumber . ".Mode")
+			}
+		}
+		
 		rowDefinition := this.getRowDefinition(row)
 		
 		definition := string2Values(",", rowDefinition[column])
 		
-		if (control = "__Number__") {
+		if (control = "__Mode__") {
+			oldButton.Mode := argument
+			number := oldButton.Button
+			definition := rowDefinition[column]
+		}
+		else if (control = "__No_Label__") {
+			oldButton.Label := false
+			number := oldButton.Button
+			definition := rowDefinition[column]
+		}
+		else if (control = "__Action_Label__") {
+			oldButton.Label := true
+			number := oldButton.Button
+			definition := rowDefinition[column]
+		}
+		else if (control = "__Text_Label__") {
+			oldLabel := (oldButton ? oldButton.Label : false)
+			
+			title := translate("Button Label")
+			prompt := translate("Please enter a button label:")
+			locale := ((getLanguage() = "en") ? "" : "Locale")
+				
+			InputBox argument, %title%, %prompt%, , 200, 150, , , %locale%, , % ((oldLabel && (oldLabel != true)) ? oldLabel : "")
+			
+			if ErrorLevel
+				return
+			else
+				oldButton.Label := argument
+			
+			number := oldButton.Button
+			definition := rowDefinition[column]
+		}
+		else if (control = "__No_Icon__") {
+			oldButton.Icon := false
+			number := oldButton.Button
+			definition := rowDefinition[column]
+		}
+		else if (control = "__Action_Icon__") {
+			oldButton.Icon := true
+			number := oldButton.Button
+			definition := rowDefinition[column]
+		}
+		else if (control = "__Image_Icon__") {
+			oldImage := (oldButton ? oldButton.Icon : false)
+			
+			newImage := chooseImageFile((oldImage && (oldImage != true)) ? oldImage : false)
+			
+			if newImage
+				oldButton.Icon := newImage
+			else
+				return
+			
+			number := oldButton.Button
+			definition := rowDefinition[column]
+		}
+		else if (control = "__Number__") {
 			if !number {
 				title := translate("Function Number")
 				prompt := translate("Please enter a controller function number:")
@@ -1075,19 +1155,38 @@ class LayoutsList extends ConfigurationItemList {
 			
 			if (definition.Length() = 1)
 				definition := ConfigurationItem.descriptor(ConfigurationItem.splitDescriptor(definition[1])[1], number)
+			else if (this.CurrentControllerType = "Stream Deck")
+				definition := ("Button." . number)
 			else
 				definition := (ConfigurationItem.descriptor(ConfigurationItem.splitDescriptor(definition[1])[1], number) . "," . definition[2])
 		}
 		else if control {
-			if (definition.Length() = 0)
+			if (definition.Length() = 0) {
 				definition := ConfigurationItem.descriptor(control, 1)
-			else if (definition.Length() = 1)
-				definition := ConfigurationItem.descriptor(control, ConfigurationItem.splitDescriptor(definition[1])[2])
-			else
-				definition := (ConfigurationItem.descriptor(control, ConfigurationItem.splitDescriptor(definition[1])[2]) . "," . definition[2])
+				number := 1
+			}
+			else if (definition.Length() = 1) {
+				number := ConfigurationItem.splitDescriptor(definition[1])[2]
+				definition := ConfigurationItem.descriptor(control, number)
+			}
+			else {
+				number := ConfigurationItem.splitDescriptor(definition[1])[2]
+				definition := (ConfigurationItem.descriptor(control, number) . "," . definition[2])
+			}
 		}
-		else
+		else {
 			definition := ""
+			number := false
+		}
+
+		if (number && (this.CurrentControllerType = "Stream Deck")) {
+			if !oldButton
+				oldButton := {Button: number, Icon: true, Label: true, Mode: kIconOrLabel}
+			
+			this.iButtonDefinitions[layoutNameEdit . "." . "Button." . number . ".Icon"] := oldButton.Icon
+			this.iButtonDefinitions[layoutNameEdit . "." . "Button." . number . ".Label"] := oldButton.Label
+			this.iButtonDefinitions[layoutNameEdit . "." . "Button." . number . ".Mode"] := oldButton.Mode
+		}
 		
 		rowDefinition[column] := definition
 		
@@ -1120,10 +1219,15 @@ class ControllerPreview extends ConfigurationItem {
 	iPreviewManager := false
 	iName := ""
 	
+	iRows := false
+	iColumns := false
+	
 	iWindow := false
 	
 	iWidth := 0
 	iHeight := 0
+	
+	iControlClickHandler := ObjBindMethod(this, "openControlMenu")
 	
 	PreviewManager[] {
 		Get {
@@ -1140,6 +1244,26 @@ class ControllerPreview extends ConfigurationItem {
 	Type[] {
 		Get {
 			Throw "Virtual property ControllerPreview.Type must be implemented in a subclass..."
+		}
+	}
+	
+	Rows[] {
+		Get {
+			return this.iRows
+		}
+		
+		Set {
+			this.iRows := value
+		}
+	}
+	
+	Columns[] {
+		Get {
+			return this.iColumns
+		}
+		
+		Set {
+			this.iColumns := value
 		}
 	}
 	
@@ -1190,6 +1314,45 @@ class ControllerPreview extends ConfigurationItem {
 	
 	createGui(configuration) {
 		Throw "Virtual method ControllerPreview.createGui must be implemented in a subclass..."
+	}
+	
+	getControl(clickX, clickY, ByRef row, ByRef column, ByRef isEmpty) {
+		Throw "Virtual method ControllerPreview.getControl must be implemented in a subclass..."
+	}
+	
+	setControlClickHandler(handler) {
+		this.iControlClickHandler := handler
+	}
+	
+	controlClick(element, row, column, isEmpty) {
+		Throw "Virtual method ControllerPreview.controlClick must be implemented in a subclass..."
+	}
+	
+	openControlMenu(preview, element, function, row, column, isEmpty) {
+		Throw "Virtual method ControllerPreview.openControlMenu must be implemented in a subclass..."
+	}
+	
+	getFunction(row, column) {
+		Throw "Virtual method ControllerPreview.getFunction must be implemented in a subclass..."
+	}
+	
+	findFunction(function, ByRef row, ByRef column) {
+		Loop % this.Rows
+		{
+			cRow := A_Index
+			
+			Loop % this.Columns
+			{
+				if (this.getFunction(cRow, A_Index) = function) {
+					row := cRow
+					column := A_Index
+					
+					return true
+				}	
+			}	
+		}
+		
+		return false
 	}
 	
 	open() {
@@ -1255,6 +1418,9 @@ controlClick() {
 	}
 }
 
+controlMenuIgnore() {
+}
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
@@ -1290,23 +1456,33 @@ openControllerDocumentation() {
 	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#button-box-layouts
 }
 
-chooseImageFilePath() {
-	GuiControlGet imageFilePathEdit
-	
-	path := imageFilePathEdit
+chooseImageFile(oldImage := "__Undefined__") {
+	if (oldImage != kUndefined)
+		path := (oldImage ? oldImage : SubStr(kStreamDeckImagesDirectory, 1, StrLen(kStreamDeckImagesDirectory) - 1))
+	else {
+		GuiControlGet imageFilePathEdit
+		
+		path := imageFilePathEdit
 
-	if (path && (path != ""))
-		path := getFileName(path, kButtonBoxImagesDirectory)
-	else
-		path := SubStr(kButtonBoxImagesDirectory, 1, StrLen(kButtonBoxImagesDirectory) - 1)
+		if (path && (path != ""))
+			path := getFileName(path, kButtonBoxImagesDirectory)
+		else
+			path := SubStr(kButtonBoxImagesDirectory, 1, StrLen(kButtonBoxImagesDirectory) - 1)
+	}
 	
 	title := translate("Select Image...")
 
 	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Cancel"]))
-	FileSelectFile pictureFile, 1, , %title%, Image (*.jpg; *.png; *.gif)
+	FileSelectFile pictureFile, 1, %path%, %title%, Image (*.jpg; *.png; *.gif; *.ico)
 	OnMessage(0x44, "")
 	
-	if (pictureFile != "") {
+	return ((pictureFile != "") ? pictureFile : false)
+}
+
+chooseImageFilePath() {
+	pictureFile := chooseImageFile()
+	
+	if pictureFile {
 		imageFilePathEdit := pictureFile
 		
 		GuiControl Text, imageFilePathEdit, %imageFilePathEdit%

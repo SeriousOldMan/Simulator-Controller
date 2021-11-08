@@ -49,23 +49,9 @@ class ButtonBoxPreview extends ControllerPreview {
 	iFunctions := {}
 	iLabels := {}
 	
-	iControlClickHandler := ObjBindMethod(this, "openControlMenu")
-	
 	Type[] {
 		Get {
 			return "Button Box"
-		}
-	}
-	
-	Rows[] {
-		Get {
-			return this.iRows
-		}
-	}
-	
-	Columns[] {
-		Get {
-			return this.iColumns
 		}
 	}
 	
@@ -252,8 +238,8 @@ class ButtonBoxPreview extends ControllerPreview {
 		
 		layout := string2Values("x", layout[1])
 		
-		this.iRows := layout[1]
-		this.iColumns := layout[2]
+		this.Rows := layout[1]
+		this.Columns := layout[2]
 		
 		rows := []
 		
@@ -441,25 +427,6 @@ class ButtonBoxPreview extends ControllerPreview {
 		return false
 	}
 	
-	findFunction(function, ByRef row, ByRef column) {
-		Loop % this.Rows
-		{
-			cRow := A_Index
-			
-			Loop % this.Columns
-			{
-				if (this.getFunction(cRow, A_Index) = function) {
-					row := cRow
-					column := A_Index
-					
-					return true
-				}	
-			}	
-		}
-		
-		return false
-	}
-	
 	setLabel(row, column, text) {
 		if this.iLabels.HasKey(row) {
 			rowLabels := this.iLabels[row]
@@ -487,10 +454,6 @@ class ButtonBoxPreview extends ControllerPreview {
 					this.setLabel(row, A_Index, ConfigurationItem.splitDescriptor(function)[2])
 			}	
 		}
-	}
-	
-	setControlClickHandler(handler) {
-		this.iControlClickHandler := handler
 	}
 	
 	controlClick(element, row, column, isEmpty) {
@@ -526,7 +489,7 @@ class ButtonBoxPreview extends ControllerPreview {
 		
 		Gui %window%:Default
 		
-		Menu GridElement, Add, %menuItem%, menuIgnore
+		Menu GridElement, Add, %menuItem%, controlMenuIgnore
 		Menu GridElement, Disable, %menuItem%
 		Menu GridElement, Add
 		
@@ -633,7 +596,4 @@ class ButtonBoxPreview extends ControllerPreview {
 buttonBoxContextMenu(guiHwnd, ctrlHwnd, eventInfo, isRightClick, x, y) {
 	if (isRightClick && vControllerPreviews.HasKey(A_Gui))
 		controlClick()
-}
-
-menuIgnore() {
 }

@@ -4,7 +4,7 @@ The following constants may be used to refer to all the relevant locations of th
 #### *kHomeDirectory, kResourcesDirectory, kSourcesDirectory, kIncludesDirectory, kLibrariesDirectory, kPluginsDirectory, kBinariesDirectory, kConfigDirectory*, *kRulesDirectory*, *kGrammarsDirectory*, *kTranslationsDirectory* 
 All these constants define paths pointing to a specific folder in the Simulator Controller distribution. In deviation to Windows standards, the paths contain a trailing backslash, since in allmost all cases, a filename will be concatenated to one of these constants in order to access this file.
 
-#### *kSplashMediaDirectory, kScreenImagesDirectory, kButtonBoxImagesDirectory, kIconsDirectory*
+#### *kSplashMediaDirectory, kScreenImagesDirectory, kButtonBoxImagesDirectory, kStreamDeckImagesDirectory*
 Paths for graphical and audio resources contained in the Simulator Controller distribution.
 
 #### *kUserHomeDirectory, kUserConfigDirectory, *kUserRulesDirectory*, *kUserGrammarsDirectory*, *kUserTranslationsDirectory*, kUserSplashMediaDirectory, kUserScreenImagesDirectory, kUserPluginsDirectory, kLogsDirectory*, *kTempDirectory*, *kDatabaseDirectory*

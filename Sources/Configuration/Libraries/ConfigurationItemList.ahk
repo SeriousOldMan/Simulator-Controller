@@ -26,6 +26,14 @@ class ConfigurationItemList extends ConfigurationItem {
 	iItemList := []
 	iCurrentItem := 0
 	
+	iWindow := false
+	
+	Window[] {
+		Get {
+			return this.iWindow
+		}
+	}
+	
 	ListHandle[] {
 		Get {
 			return this.iListHandle
@@ -74,6 +82,8 @@ class ConfigurationItemList extends ConfigurationItem {
 	}
 	
 	initializeList(listHandle, listVariable, addButton := false, deleteButton := false, updateButton := false, upButton := false, downButton := false) {
+		this.iWindow := (A_DefaultGui ? A_DefaultGui : (A_Gui ? A_Gui : false))
+		
 		this.iListHandle := listHandle
 		this.iAddButton := addButton
 		this.iDeleteButton := deleteButton
@@ -119,11 +129,13 @@ class ConfigurationItemList extends ConfigurationItem {
 	}
 	
 	clickEvent(line, count) {
-		this.openEditor(line)
+		if (line != 0)
+			this.openEditor(line)
 	}
 	
 	selectEvent(line) {
-		this.openEditor(line)
+		if (line != 0)
+			this.openEditor(line)
 	}
 	
 	processListEvent() {
@@ -173,35 +185,42 @@ class ConfigurationItemList extends ConfigurationItem {
 	}
 	
 	updateState() {
+		window := this.Window
+		
+		if window
+			window .= ":"
+		else
+			window := ""
+		
 		if (this.CurrentItem != 0) {
 			if (this.iDeleteButton != false)
-				GuiControl Enable, % this.iDeleteButton
+				GuiControl %window%Enable, % this.iDeleteButton
 			if (this.iUpdateButton != false)
-				GuiControl Enable, % this.iUpdateButton
+				GuiControl %window%Enable, % this.iUpdateButton
 			
 			if (this.iUpButton != false)
 				if (this.CurrentItem > 1)
-					GuiControl Enable, % this.iUpButton
+					GuiControl %window%Enable, % this.iUpButton
 				else
-					GuiControl Disable, % this.iUpButton
+					GuiControl %window%Disable, % this.iUpButton
 			
 			if (this.iDownButton != false)
 				if (this.CurrentItem < this.ItemList.Length())
-					GuiControl Enable, % this.iDownButton
+					GuiControl %window%Enable, % this.iDownButton
 				else
-					GuiControl Disable, % this.iDownButton
+					GuiControl %window%Disable, % this.iDownButton
 		}
 		else {
 			if (this.iUpButton != false)
-				GuiControl Disable, % this.iUpButton
+				GuiControl %window%Disable, % this.iUpButton
 			
 			if (this.iDownButton != false)
-				GuiControl Disable, % this.iDownButton
+				GuiControl %window%Disable, % this.iDownButton
 			
 			if (this.iDeleteButton != false)
-				GuiControl Disable, % this.iDeleteButton
+				GuiControl %window%Disable, % this.iDeleteButton
 			if (this.iUpdateButton != false)
-				GuiControl Disable, % this.iUpdateButton
+				GuiControl %window%Disable, % this.iUpdateButton
 		}
 	}
 	

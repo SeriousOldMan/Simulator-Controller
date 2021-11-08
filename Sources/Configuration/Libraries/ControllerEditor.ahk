@@ -157,10 +157,10 @@ class ControllerEditor extends ConfigurationItem {
 		this.iLayoutsList.createGui(buttonBoxConfiguration, streamDeckConfiguration)
 		
 		if saveAndCancel {
-			Gui CTRLE:Add, Text, x50 y639 w332 0x10
+			Gui CTRLE:Add, Text, x50 y620 w332 0x10
 			
-			Gui CTRLE:Add, Button, x130 y654 w80 h23 Default GsaveControllerEditor, % translate("Save")
-			Gui CTRLE:Add, Button, x230 y654 w80 h23 GcancelControllerEditor, % translate("Cancel")
+			Gui CTRLE:Add, Button, x130 yp+10 w80 h23 Default GsaveControllerEditor, % translate("Save")
+			Gui CTRLE:Add, Button, x230 yp w80 h23 GcancelControllerEditor, % translate("Cancel")
 		}
 	}
 	
@@ -419,9 +419,8 @@ class ControlsList extends ConfigurationItemList {
 	
 	getControls() {
 		if ControllerEditor.Instance.AutoSave {
-			if (this.CurrentItem != 0) {
+			if (this.CurrentItem != 0)
 				this.updateItem()
-			}
 		}
 		
 		controls := {}
@@ -563,9 +562,8 @@ class LabelsList extends ConfigurationItemList {
 	
 	getLabels() {
 		if this.AutoSave {
-			if (this.CurrentItem != 0) {
+			if (this.CurrentItem != 0)
 				this.updateItem()
-			}
 		}
 		
 		labels := {}
@@ -652,7 +650,7 @@ class LayoutsList extends ConfigurationItemList {
 		
 		Gui CTRLE:Add, Text, x8 y445 w86 h23 +0x200, % translate("Name && Type")
 		Gui CTRLE:Add, Edit, x102 y445 w110 h21 VlayoutNameEdit, %layoutNameEdit%
-		Gui CTRLE:Add, DropDownList, x215 y445 w110 AltSubmit Choose1 VlayoutTypeDropDown gchooseLayoutType, % values2String("|", map(["ButtonBox", "Stream Deck"], "translate")*)
+		Gui CTRLE:Add, DropDownList, x215 y445 w117 AltSubmit Choose1 VlayoutTypeDropDown gchooseLayoutType, % values2String("|", map(["ButtonBox", "Stream Deck"], "translate")*)
 		
 		Gui CTRLE:Add, Text, x8 y469 w86 h23 +0x200 Section hwndbbWidget1, % translate("Visible")
 		if layoutVisibleCheck
@@ -695,7 +693,9 @@ class LayoutsList extends ConfigurationItemList {
 		Gui CTRLE:Add, Text, x8 ys w86 h23 +0x200 hwndsdWidget1, % translate("Layout")
 		Gui CTRLE:Add, DropDownList, x102 yp w110 AltSubmit Choose1 VlayoutDropDown gchooseLayout hwndsdWidget2, % values2String("|", map(["Mini", "Standard", "XL"], "translate")*)
 		
-		Loop 2
+		Gui CTRLE:Add, Button, x102 yp+40 w230 h23 Center gopenIconRulesEditor hwndsdWidget3, % translate("Edit Icon Rules...")
+		
+		Loop 3
 			this.iStreamDeckWidgets.Push(sdWidget%A_Index%)
 		
 		Gui CTRLE:Add, Button, x223 y589 w46 h23 VlayoutAddButton gaddItem, % translate("Add")
@@ -1031,7 +1031,8 @@ class LayoutsList extends ConfigurationItemList {
 		
 		this.loadEditor(Array(layoutNameEdit, {Type: ["Button Box", "Stream Deck"][layoutTypeDropDown], Visible: (layoutTypeDropDown = 1) ? true : false, Grid: grid, Margins: margins}))
 		
-		this.updateItem()
+		if (this.CurrentItem != 0)
+			this.updateItem()
 	}
 	
 	chooseLayout() {
@@ -1050,7 +1051,32 @@ class LayoutsList extends ConfigurationItemList {
 			GuiControl, , layoutColumnsEdit, 8
 		}
 		
-		this.updateItem()
+		if (this.CurrentItem != 0)
+			this.updateItem()
+	}
+
+	openIconRulesEditor() {
+		name := false
+
+		if this.CurrentItem {
+			GuiControlGet layoutNameEdit
+			
+			name := layoutNameEdit
+		}
+		
+		configuration := newConfiguration()
+		
+		setConfigurationSectionValues(configuration, "Icons", this.iIconDefinitions)
+		
+		Gui IRE:+OwnerCTRLE
+		Gui CTRLE:+Disabled
+		
+		result := (new IconRulesEditor(name, configuration)).editIconRules()
+		
+		Gui CTRLE:-Disabled
+		
+		if result
+			this.iIconDefinitions := getConfigurationSectionValues(configuration, "Icons", Object())
 	}
 	
 	updateLayoutRowEditor(save := true) {
@@ -1118,9 +1144,8 @@ class LayoutsList extends ConfigurationItemList {
 		}
 		
 		if (save && ControllerEditor.Instance.AutoSave) {
-			if (this.CurrentItem != 0) {
+			if (this.CurrentItem != 0)
 				this.updateItem()
-			}
 		}
 	}
 	
@@ -1476,6 +1501,258 @@ class ControllerPreview extends ConfigurationItem {
 	}
 }
 
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; IconRulesEditor                                                         ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+global iconRuleLayoutDropDown
+
+class IconRulesEditor extends ConfigurationItem {
+	iClosed := false
+	iSaved := false
+	
+	iLayout := false
+	iSelectedLayout := false
+	
+	iIconRulesList := false
+	
+	Layout[] {
+		Get {
+			return this.iLayout
+		}
+	}
+	
+	SelectedLayout[] {
+		Get {
+			return this.iSelectedLayout
+		}
+	}
+	
+	__New(layout, configuration) {
+		this.iLayout := layout
+		this.iSelectedLayout := layout
+		
+		base.__New(configuration)
+		
+		IconRulesEditor.Instance := this
+		
+		this.iIconRulesList := new IconRulesList(configuration)
+		
+		this.createGui(configuration)
+	}
+	
+	createGui(configuration) {
+		Gui IRE:Default
+	
+		Gui IRE:-Border ; -Caption
+		
+		Gui IRE:Color, D0D0D0, D8D8D8
+		Gui IRE:Font, Bold, Arial
+
+		Gui IRE:Add, Text, x0 w332 Center gmoveIconRulesEditor, % translate("Modular Simulator Controller System") 
+		
+		Gui IRE:Font, Norm, Arial
+		Gui IRE:Font, Italic Underline, Arial
+
+		Gui IRE:Add, Text, x0 YP+20 w332 cBlue Center gopenIconRulesDocumentation, % translate("Icon Rules")
+		
+		Gui IRE:Font, Norm, Arial
+		
+		layouts := [translate("All Layouts")]
+		chosen := 1
+		
+		if this.Layout {
+			layouts.Push(this.Layout)
+			
+			chosen := 2
+		}
+		
+		Gui IRE:Add, Text, x8 yp+30 w80 h23 +0x200 hwndsdWidget1, % translate("Layout")
+		Gui IRE:Add, DropDownList, x90 yp w110 AltSubmit Choose%chosen% ViconRuleLayoutDropDown gchooseIconRuleLayout, % values2String("|", layouts*)
+		
+		this.iIconRulesList.createGui(configuration)
+		
+		Gui IRE:Add, Text, x50 yp+30 w232 0x10
+		
+		Gui IRE:Add, Button, x80 yp+20 w80 h23 Default GsaveIconRulesEditor, % translate("Save")
+		Gui IRE:Add, Button, x180 yp w80 h23 GcancelIconRulesEditor, % translate("Cancel")
+}
+	
+	saveToConfiguration(configuration) {
+		this.iIconRulesList.saveToConfiguration(configuration)
+	}
+	
+	editIconRules() {
+		this.open()
+		
+		Loop
+			Sleep 200
+		until this.iClosed
+		
+		return this.iSaved
+	}
+	
+	open() {
+		window := this.Window
+		
+		Gui IRE:Show, AutoSize Center
+	}
+	
+	close(save := true) {
+		if save
+			this.iIconRulesList.saveToConfiguration(this.Configuration)
+		
+		this.iSaved := save
+		
+		Gui IRE:Destroy
+		
+		this.iClosed := true
+	}
+	
+	chooseIconRuleLayout() {
+		local iconRulesList
+		
+		GuiControlGet iconRuleLayoutDropDown
+		
+		this.iIconRulesList.saveToConfiguration(this.Configuration)
+		
+		this.iSelectedLayout := ((iconRuleLayoutDropDown = 1) ? false : this.Layout)
+		
+		iconRulesList := this.iIconRulesList
+		
+		iconRulesList.loadFromConfiguration(this.Configuration)
+		
+		iconRulesList.loadList(iconRulesList.ItemList)
+		
+		iconRulesList.CurrentItem := false
+		iconRulesList.clearEditor()
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; IconRulesList                                                           ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+global iconRulesListView := "|"
+
+global iconFilePathEdit = ""
+global iconRuleDropDown
+global iconRuleAddButton
+global iconRuleDeleteButton
+global iconRuleUpdateButton
+		
+class IconRulesList extends ConfigurationItemList {
+	__New(configuration) {
+		base.__New(configuration)
+				 
+		IconRulesList.Instance := this
+	}
+	
+	createGui(configuration) {
+		Gui IRE:Add, ListView, x8 yp+30 w316 h120 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndiconRulesListViewHandle ViconRulesListView glistEvent
+							 , % values2String("|", map(["Rule", "Icon"], "translate")*)
+							
+		Gui IRE:Add, Text, x8 yp+126 w80 h23 +0x200, % translate("Rule")
+		Gui IRE:Add, DropDownList, x90 yp w110 AltSubmit Choose1 ViconRuleDropDown, % values2String("|", map(["Icon or Label", "Icon and Label", "Only Icon", "Only Label"], "translate")*)
+		
+		Gui IRE:Add, Text, x8 yp+24 w80 h23 +0x200, % translate("Icon")
+		Gui IRE:Add, Edit, x90 yp w210 h21 ViconFilePathEdit, %iconFilePathEdit%
+		Gui IRE:Add, Button, x303 yp-1 w23 h23 gchooseIconFilePath, % translate("...")
+		
+		Gui IRE:Add, Button, x126 yp+40 w46 h23 ViconRuleAddButton gaddItem, % translate("Add")
+		Gui IRE:Add, Button, x175 yp w50 h23 Disabled ViconRuleDeleteButton gdeleteItem, % translate("Delete")
+		Gui IRE:Add, Button, x271 yp w55 h23 Disabled ViconRuleUpdateButton gupdateItem, % translate("Save")
+		
+		this.initializeList(iconRulesListViewHandle, "iconRulesListView", "iconRuleAddButton", "iconRuleDeleteButton", "iconRuleUpdateButton")
+		
+		this.clearEditor()
+	}
+	
+	loadFromConfiguration(configuration) {
+		base.loadFromConfiguration(configuration)
+		
+		this.ItemList := this.loadIconRules(configuration, IconRulesEditor.Instance.SelectedLayout)
+	}
+		
+	saveToConfiguration(configuration) {
+		fullConfiguration := this.Configuration
+		
+		this.saveIconRules(fullConfiguration, IconRulesEditor.Instance.SelectedLayout, this.ItemList)
+		
+		setConfigurationSectionValues(configuration, "Icons", getConfigurationSectionValues(configuration, "Icons", fullConfiguration))	
+	}
+	
+	loadIconRules(configuration, layout) {
+		prefix := ((layout ? layout : "*") . ".Icon.Mode.")
+		
+		icons := []
+		
+		Loop {
+			icon := getConfigurationValue(configuration, "Icons", prefix . A_Index, kUndefined)
+		
+			if (icon = kUndefined)
+				break
+			else
+				icons.Push(string2Values(";", icon))
+		}
+		
+		return icons
+	}
+	
+	saveIconRules(configuration, layout, iconRules) {
+		prefix := ((layout ? layout : "*") . ".Icon.Mode.")
+		
+		icons := []
+		
+		Loop {
+			if (getConfigurationValue(configuration, "Icons", prefix . A_Index, kUndefined) == kUndefined)
+				break
+			else
+				removeConfigurationValue(configuration, "Icons", prefix . A_Index)
+		}
+		
+		for index, iconRule in iconRules
+			setConfigurationValue(configuration, "Icons", prefix . index, values2String(";", iconRule*))
+	}
+	
+	loadList(items) {
+		Gui ListView, % this.ListHandle
+	
+		LV_Delete()
+		
+		this.ItemList := items
+		
+		for ignore, iconRule in items {
+			rule := ["Icon or Label", "Icon and Label", "Only Icon", "Only Label"][inList([kIconOrLabel, kIconAndLabel, kIcon, kLabel], iconRule[2])]
+		
+			LV_Add("", translate(rule), iconRule[1])
+		}
+		
+		LV_ModifyCol()
+		LV_ModifyCol(1, "AutoHdr")
+		LV_ModifyCol(2, "AutoHdr")
+	}
+	
+	loadEditor(item) {
+		iconFilePathEdit := item[1]
+		iconRuleDropDown := inList([kIconOrLabel, kIconAndLabel, kIcon, kLabel], item[2])
+		
+		GuiControl Text, iconFilePathEdit, %iconFilePathEdit%
+		GuiControl Choose, iconRuleDropDown, %iconRuleDropDown%
+	}
+	
+	clearEditor() {
+		this.loadEditor(Array("", kIconOrLabel))
+	}
+	
+	buildItemFromEditor(isNew := false) {
+		GuiControlGet iconFilePathEdit
+		GuiControlGet iconRuleDropDown
+		
+		return Array(iconFilePathEdit, [kIconOrLabel, kIconAndLabel, kIcon, kLabel][iconRuleDropDown])
+	}
+}
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Public Function Declaration Section                   ;;;
@@ -1512,25 +1789,11 @@ controlMenuIgnore() {
 ;;;-------------------------------------------------------------------------;;;
 
 saveControllerEditor() {
-	protectionOn()
-	
-	try {
-		ControllerEditor.Instance.close(true)
-	}
-	finally {
-		protectionOff()
-	}
+	ControllerEditor.Instance.close(true)
 }
 
 cancelControllerEditor() {
-	protectionOn()
-	
-	try {
-		ControllerEditor.Instance.close(false)
-	}
-	finally {
-		protectionOff()
-	}
+	ControllerEditor.Instance.close(false)
 }
 
 moveControllerEditor() {
@@ -1538,7 +1801,7 @@ moveControllerEditor() {
 }
 
 openControllerDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#button-box-layouts
+	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#controller-layouts
 }
 
 chooseLayoutType() {
@@ -1582,9 +1845,17 @@ chooseImageFilePath() {
 	}
 }
 
-updateLayoutRowEditor() {
-	protectionOn()
+chooseIconFilePath() {
+	pictureFile := chooseImageFile()
 	
+	if pictureFile {
+		iconFilePathEdit := pictureFile
+		
+		GuiControl Text, iconFilePathEdit, %iconFilePathEdit%
+	}
+}
+
+updateLayoutRowEditor() {
 	try {
 		list := ConfigurationItemList.getList("layoutsListView")
 		
@@ -1594,9 +1865,10 @@ updateLayoutRowEditor() {
 	catch exception {
 		; ignore
 	}
-	finally {
-		protectionOff()
-	}
+}
+
+openIconRulesEditor() {
+	LayoutsList.Instance.openIconRulesEditor()
 }
 
 moveControllerPreview() {
@@ -1607,4 +1879,24 @@ moveControllerPreview() {
 	WinGetPos x, y, width, height, A
 	
 	vControllerPreviews[A_Gui].PreviewManager.setPreviewCenter(x + Round(width / 2), y + Round(height / 2))
+}
+
+saveIconRulesEditor() {
+	IconRulesEditor.Instance.close(true)
+}
+
+cancelIconRulesEditor() {
+	IconRulesEditor.Instance.close(false)
+}
+
+moveIconRulesEditor() {
+	moveByMouse(A_Gui)
+}
+
+openIconRulesDocumentation() {
+	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#icon-rules
+}
+
+chooseIconRuleLayout() {
+	IconRulesEditor.Instance.chooseIconRuleLayout()
 }

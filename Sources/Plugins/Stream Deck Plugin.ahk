@@ -27,6 +27,8 @@ global kIconOrLabel = "IconOrLabel"
 ;;;-------------------------------------------------------------------------;;;
 
 class StreamDeck extends FunctionController {
+	static sModes := false
+	
 	iName := false
 	iLayout := false
 	
@@ -133,6 +135,9 @@ class StreamDeck extends FunctionController {
 					
 					if this.iModes.HasKey(icon)
 						return this.iModes[icon]
+					
+					if this.sModes.HasKey(icon)
+						return this.sModes[icon]
 				}
 				
 				return (this.iModes.HasKey(function) ? this.iModes[function] : kIconOrLabel)
@@ -175,7 +180,20 @@ class StreamDeck extends FunctionController {
 		num2WayToggles := 0
 		
 		base.loadFromConfiguration(configuration)
-		
+	
+		if !this.sModes
+			Loop {
+				special := mode := getConfigurationValue(configuration, "Icons", "*.Icon.Mode." . A_Index, kUndefined)
+				
+				if (special != kUndefined)
+					break
+				else {
+					special := string2values(";", special)
+				
+					this.sModes[special[1]] := special[2]
+				}
+			}
+			
 		layout := string2Values("x", getConfigurationValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Layout, "Layout"), ""))
 		
 		this.iRows := layout[1]

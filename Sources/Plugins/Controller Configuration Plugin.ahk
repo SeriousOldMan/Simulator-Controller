@@ -250,16 +250,13 @@ class ControllerList extends ConfigurationItemList {
 		Gui CTRLE:+Owner%window%
 		Gui %window%:+Disabled
 		
-		result := (new ControllerEditor(controllerLayoutDropDown, ConfigurationEditor.Instance.Configuration)).editController()
-		
-		if result
-			writeConfiguration(getFileName("Button Box Configuration.ini", kUserConfigDirectory), result)
+		new ControllerEditor(controllerLayoutDropDown, ConfigurationEditor.Instance.Configuration).editController()
 		
 		window := ConfigurationEditor.Instance.Window
 		
 		Gui %window%:Default
 		
-		choices := this.computeLayoutChoices(result)
+		choices := this.computeLayoutChoices()
 		
 		GuiControl Text, controllerLayoutDropDown, % "|" . values2String("|", choices*)
 		

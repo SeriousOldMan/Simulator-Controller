@@ -479,7 +479,7 @@ class ButtonBoxPreview extends ControllerPreview {
 		menuItem := (translate(element[1]) . translate(": ") . element[2] . " (" . row . " x " . column . ")")
 		
 		try {
-			Menu GridElement, DeleteAll
+			Menu ControMenu, DeleteAll
 		}
 		catch exception {
 			; ignore
@@ -489,9 +489,9 @@ class ButtonBoxPreview extends ControllerPreview {
 		
 		Gui %window%:Default
 		
-		Menu GridElement, Add, %menuItem%, controlMenuIgnore
-		Menu GridElement, Disable, %menuItem%
-		Menu GridElement, Add
+		Menu ControMenu, Add, %menuItem%, controlMenuIgnore
+		Menu ControMenu, Disable, %menuItem%
+		Menu ControMenu, Add
 		
 		try {
 			Menu ControlMenu, DeleteAll
@@ -558,7 +558,7 @@ class ButtonBoxPreview extends ControllerPreview {
 		
 		label := translate("Control")
 		
-		Menu GridElement, Add, %label%, :ControlMenu
+		Menu ControMenu, Add, %label%, :ControlMenu
 		
 		if !isEmpty {
 			try {
@@ -582,10 +582,10 @@ class ButtonBoxPreview extends ControllerPreview {
 			
 			label := translate("Label")
 			
-			Menu GridElement, Add, %label%, :LabelMenu
+			Menu ControMenu, Add, %label%, :LabelMenu
 		}
 
-		Menu GridElement, Show
+		Menu ControMenu, Show
 	}
 }
 

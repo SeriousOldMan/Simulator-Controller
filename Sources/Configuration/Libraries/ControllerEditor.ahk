@@ -693,7 +693,7 @@ class LayoutsList extends ConfigurationItemList {
 		Gui CTRLE:Add, Text, x8 ys w86 h23 +0x200 hwndsdWidget1, % translate("Layout")
 		Gui CTRLE:Add, DropDownList, x102 yp w110 AltSubmit Choose1 VlayoutDropDown gchooseLayout hwndsdWidget2, % values2String("|", map(["Mini", "Standard", "XL"], "translate")*)
 		
-		Gui CTRLE:Add, Button, x102 yp+40 w230 h23 Center gopenIconRulesEditor hwndsdWidget3, % translate("Edit Icon Rules...")
+		Gui CTRLE:Add, Button, x102 yp+40 w230 h23 Center gopenDisplayRulesEditor hwndsdWidget3, % translate("Edit Display Rules...")
 		
 		Loop 3
 			this.iStreamDeckWidgets.Push(sdWidget%A_Index%)
@@ -1055,7 +1055,7 @@ class LayoutsList extends ConfigurationItemList {
 			this.updateItem()
 	}
 
-	openIconRulesEditor() {
+	openDisplayRulesEditor() {
 		name := false
 
 		if this.CurrentItem {
@@ -1071,7 +1071,7 @@ class LayoutsList extends ConfigurationItemList {
 		Gui IRE:+OwnerCTRLE
 		Gui CTRLE:+Disabled
 		
-		result := (new IconRulesEditor(name, configuration)).editIconRules()
+		result := (new DisplayRulesEditor(name, configuration)).editDisplayRules()
 		
 		Gui CTRLE:-Disabled
 		
@@ -1502,19 +1502,19 @@ class ControllerPreview extends ConfigurationItem {
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; IconRulesEditor                                                         ;;;
+;;; DisplayRulesEditor                                                      ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-global iconRuleLayoutDropDown
+global displayRuleLayoutDropDown
 
-class IconRulesEditor extends ConfigurationItem {
+class DisplayRulesEditor extends ConfigurationItem {
 	iClosed := false
 	iSaved := false
 	
 	iLayout := false
 	iSelectedLayout := false
 	
-	iIconRulesList := false
+	iDisplayRulesList := false
 	
 	Layout[] {
 		Get {
@@ -1534,9 +1534,9 @@ class IconRulesEditor extends ConfigurationItem {
 		
 		base.__New(configuration)
 		
-		IconRulesEditor.Instance := this
+		DisplayRulesEditor.Instance := this
 		
-		this.iIconRulesList := new IconRulesList(configuration)
+		this.iDisplayRulesList := new DisplayRulesList(configuration)
 		
 		this.createGui(configuration)
 	}
@@ -1549,12 +1549,12 @@ class IconRulesEditor extends ConfigurationItem {
 		Gui IRE:Color, D0D0D0, D8D8D8
 		Gui IRE:Font, Bold, Arial
 
-		Gui IRE:Add, Text, x0 w332 Center gmoveIconRulesEditor, % translate("Modular Simulator Controller System") 
+		Gui IRE:Add, Text, x0 w332 Center gmoveDisplayRulesEditor, % translate("Modular Simulator Controller System") 
 		
 		Gui IRE:Font, Norm, Arial
 		Gui IRE:Font, Italic Underline, Arial
 
-		Gui IRE:Add, Text, x0 YP+20 w332 cBlue Center gopenIconRulesDocumentation, % translate("Icon Rules")
+		Gui IRE:Add, Text, x0 YP+20 w332 cBlue Center gopenDisplayRulesDocumentation, % translate("Display Rules")
 		
 		Gui IRE:Font, Norm, Arial
 		
@@ -1568,21 +1568,21 @@ class IconRulesEditor extends ConfigurationItem {
 		}
 		
 		Gui IRE:Add, Text, x8 yp+30 w80 h23 +0x200 hwndsdWidget1, % translate("Layout")
-		Gui IRE:Add, DropDownList, x90 yp w110 AltSubmit Choose%chosen% ViconRuleLayoutDropDown gchooseIconRuleLayout, % values2String("|", layouts*)
+		Gui IRE:Add, DropDownList, x90 yp w110 AltSubmit Choose%chosen% VdisplayRuleLayoutDropDown gchooseDisplayRuleLayout, % values2String("|", layouts*)
 		
-		this.iIconRulesList.createGui(configuration)
+		this.iDisplayRulesList.createGui(configuration)
 		
 		Gui IRE:Add, Text, x50 yp+30 w232 0x10
 		
-		Gui IRE:Add, Button, x80 yp+20 w80 h23 Default GsaveIconRulesEditor, % translate("Save")
-		Gui IRE:Add, Button, x180 yp w80 h23 GcancelIconRulesEditor, % translate("Cancel")
+		Gui IRE:Add, Button, x80 yp+20 w80 h23 Default GsaveDisplayRulesEditor, % translate("Save")
+		Gui IRE:Add, Button, x180 yp w80 h23 GcancelDisplayRulesEditor, % translate("Cancel")
 }
 	
 	saveToConfiguration(configuration) {
-		this.iIconRulesList.saveToConfiguration(configuration)
+		this.iDisplayRulesList.saveToConfiguration(configuration)
 	}
 	
-	editIconRules() {
+	editDisplayRules() {
 		this.open()
 		
 		Loop
@@ -1600,7 +1600,7 @@ class IconRulesEditor extends ConfigurationItem {
 	
 	close(save := true) {
 		if save
-			this.iIconRulesList.saveToConfiguration(this.Configuration)
+			this.iDisplayRulesList.saveToConfiguration(this.Configuration)
 		
 		this.iSaved := save
 		
@@ -1609,61 +1609,61 @@ class IconRulesEditor extends ConfigurationItem {
 		this.iClosed := true
 	}
 	
-	chooseIconRuleLayout() {
-		local iconRulesList
+	chooseDisplayRuleLayout() {
+		local displayRulesList
 		
-		GuiControlGet iconRuleLayoutDropDown
+		GuiControlGet displayRuleLayoutDropDown
 		
-		this.iIconRulesList.saveToConfiguration(this.Configuration)
+		this.iDisplayRulesList.saveToConfiguration(this.Configuration)
 		
-		this.iSelectedLayout := ((iconRuleLayoutDropDown = 1) ? false : this.Layout)
+		this.iSelectedLayout := ((displayRuleLayoutDropDown = 1) ? false : this.Layout)
 		
-		iconRulesList := this.iIconRulesList
+		displayRulesList := this.iDisplayRulesList
 		
-		iconRulesList.loadFromConfiguration(this.Configuration)
+		displayRulesList.loadFromConfiguration(this.Configuration)
 		
-		iconRulesList.loadList(iconRulesList.ItemList)
+		displayRulesList.loadList(displayRulesList.ItemList)
 		
-		iconRulesList.CurrentItem := false
-		iconRulesList.clearEditor()
+		displayRulesList.CurrentItem := false
+		displayRulesList.clearEditor()
 	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; IconRulesList                                                           ;;;
+;;; DisplayRulesList                                                        ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-global iconRulesListView := "|"
+global displayRulesListView := "|"
 
 global iconFilePathEdit = ""
-global iconRuleDropDown
-global iconRuleAddButton
-global iconRuleDeleteButton
-global iconRuleUpdateButton
+global displayRuleDropDown
+global displayRuleAddButton
+global displayRuleDeleteButton
+global displayRuleUpdateButton
 		
-class IconRulesList extends ConfigurationItemList {
+class DisplayRulesList extends ConfigurationItemList {
 	__New(configuration) {
 		base.__New(configuration)
 				 
-		IconRulesList.Instance := this
+		DisplayRulesList.Instance := this
 	}
 	
 	createGui(configuration) {
-		Gui IRE:Add, ListView, x8 yp+30 w316 h120 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndiconRulesListViewHandle ViconRulesListView glistEvent
+		Gui IRE:Add, ListView, x8 yp+30 w316 h120 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwnddisplayRulesListViewHandle VdisplayRulesListView glistEvent
 							 , % values2String("|", map(["Rule", "Icon"], "translate")*)
 							
 		Gui IRE:Add, Text, x8 yp+126 w80 h23 +0x200, % translate("Rule")
-		Gui IRE:Add, DropDownList, x90 yp w110 AltSubmit Choose1 ViconRuleDropDown, % values2String("|", map(["Icon or Label", "Icon and Label", "Only Icon", "Only Label"], "translate")*)
+		Gui IRE:Add, DropDownList, x90 yp w110 AltSubmit Choose1 VdisplayRuleDropDown, % values2String("|", map(["Icon or Label", "Icon and Label", "Only Icon", "Only Label"], "translate")*)
 		
 		Gui IRE:Add, Text, x8 yp+24 w80 h23 +0x200, % translate("Icon")
-		Gui IRE:Add, Edit, x90 yp w210 h21 ViconFilePathEdit, %iconFilePathEdit%
+		Gui IRE:Add, Edit, x90 yp w211 h21 ViconFilePathEdit, %iconFilePathEdit%
 		Gui IRE:Add, Button, x303 yp-1 w23 h23 gchooseIconFilePath, % translate("...")
 		
-		Gui IRE:Add, Button, x126 yp+40 w46 h23 ViconRuleAddButton gaddItem, % translate("Add")
-		Gui IRE:Add, Button, x175 yp w50 h23 Disabled ViconRuleDeleteButton gdeleteItem, % translate("Delete")
-		Gui IRE:Add, Button, x271 yp w55 h23 Disabled ViconRuleUpdateButton gupdateItem, % translate("Save")
+		Gui IRE:Add, Button, x126 yp+40 w46 h23 VdisplayRuleAddButton gaddItem, % translate("Add")
+		Gui IRE:Add, Button, x175 yp w50 h23 Disabled VdisplayRuleDeleteButton gdeleteItem, % translate("Delete")
+		Gui IRE:Add, Button, x271 yp w55 h23 Disabled VdisplayRuleUpdateButton gupdateItem, % translate("Save")
 		
-		this.initializeList(iconRulesListViewHandle, "iconRulesListView", "iconRuleAddButton", "iconRuleDeleteButton", "iconRuleUpdateButton")
+		this.initializeList(displayRulesListViewHandle, "displayRulesListView", "displayRuleAddButton", "displayRuleDeleteButton", "displayRuleUpdateButton")
 		
 		this.clearEditor()
 	}
@@ -1671,18 +1671,18 @@ class IconRulesList extends ConfigurationItemList {
 	loadFromConfiguration(configuration) {
 		base.loadFromConfiguration(configuration)
 		
-		this.ItemList := this.loadIconRules(configuration, IconRulesEditor.Instance.SelectedLayout)
+		this.ItemList := this.loadDisplayRules(configuration, DisplayRulesEditor.Instance.SelectedLayout)
 	}
 		
 	saveToConfiguration(configuration) {
 		fullConfiguration := this.Configuration
 		
-		this.saveIconRules(fullConfiguration, IconRulesEditor.Instance.SelectedLayout, this.ItemList)
+		this.saveDisplayRules(fullConfiguration, DisplayRulesEditor.Instance.SelectedLayout, this.ItemList)
 		
 		setConfigurationSectionValues(configuration, "Icons", getConfigurationSectionValues(configuration, "Icons", fullConfiguration))	
 	}
 	
-	loadIconRules(configuration, layout) {
+	loadDisplayRules(configuration, layout) {
 		prefix := ((layout ? layout : "*") . ".Icon.Mode.")
 		
 		icons := []
@@ -1699,7 +1699,7 @@ class IconRulesList extends ConfigurationItemList {
 		return icons
 	}
 	
-	saveIconRules(configuration, layout, iconRules) {
+	saveDisplayRules(configuration, layout, displayRules) {
 		prefix := ((layout ? layout : "*") . ".Icon.Mode.")
 		
 		icons := []
@@ -1711,8 +1711,8 @@ class IconRulesList extends ConfigurationItemList {
 				removeConfigurationValue(configuration, "Icons", prefix . A_Index)
 		}
 		
-		for index, iconRule in iconRules
-			setConfigurationValue(configuration, "Icons", prefix . index, values2String(";", iconRule*))
+		for index, displayRule in displayRules
+			setConfigurationValue(configuration, "Icons", prefix . index, values2String(";", displayRule*))
 	}
 	
 	loadList(items) {
@@ -1722,10 +1722,10 @@ class IconRulesList extends ConfigurationItemList {
 		
 		this.ItemList := items
 		
-		for ignore, iconRule in items {
-			rule := ["Icon or Label", "Icon and Label", "Only Icon", "Only Label"][inList([kIconOrLabel, kIconAndLabel, kIcon, kLabel], iconRule[2])]
+		for ignore, displayRule in items {
+			rule := ["Icon or Label", "Icon and Label", "Only Icon", "Only Label"][inList([kIconOrLabel, kIconAndLabel, kIcon, kLabel], displayRule[2])]
 		
-			LV_Add("", translate(rule), iconRule[1])
+			LV_Add("", translate(rule), displayRule[1])
 		}
 		
 		LV_ModifyCol()
@@ -1735,10 +1735,10 @@ class IconRulesList extends ConfigurationItemList {
 	
 	loadEditor(item) {
 		iconFilePathEdit := item[1]
-		iconRuleDropDown := inList([kIconOrLabel, kIconAndLabel, kIcon, kLabel], item[2])
+		displayRuleDropDown := inList([kIconOrLabel, kIconAndLabel, kIcon, kLabel], item[2])
 		
 		GuiControl Text, iconFilePathEdit, %iconFilePathEdit%
-		GuiControl Choose, iconRuleDropDown, %iconRuleDropDown%
+		GuiControl Choose, displayRuleDropDown, %displayRuleDropDown%
 	}
 	
 	clearEditor() {
@@ -1747,9 +1747,9 @@ class IconRulesList extends ConfigurationItemList {
 	
 	buildItemFromEditor(isNew := false) {
 		GuiControlGet iconFilePathEdit
-		GuiControlGet iconRuleDropDown
+		GuiControlGet displayRuleDropDown
 		
-		return Array(iconFilePathEdit, [kIconOrLabel, kIconAndLabel, kIcon, kLabel][iconRuleDropDown])
+		return Array(iconFilePathEdit, [kIconOrLabel, kIconAndLabel, kIcon, kLabel][displayRuleDropDown])
 	}
 }
 
@@ -1867,8 +1867,8 @@ updateLayoutRowEditor() {
 	}
 }
 
-openIconRulesEditor() {
-	LayoutsList.Instance.openIconRulesEditor()
+openDisplayRulesEditor() {
+	LayoutsList.Instance.openDisplayRulesEditor()
 }
 
 moveControllerPreview() {
@@ -1881,22 +1881,22 @@ moveControllerPreview() {
 	vControllerPreviews[A_Gui].PreviewManager.setPreviewCenter(x + Round(width / 2), y + Round(height / 2))
 }
 
-saveIconRulesEditor() {
-	IconRulesEditor.Instance.close(true)
+saveDisplayRulesEditor() {
+	DisplayRulesEditor.Instance.close(true)
 }
 
-cancelIconRulesEditor() {
-	IconRulesEditor.Instance.close(false)
+cancelDisplayRulesEditor() {
+	DisplayRulesEditor.Instance.close(false)
 }
 
-moveIconRulesEditor() {
+moveDisplayRulesEditor() {
 	moveByMouse(A_Gui)
 }
 
-openIconRulesDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#icon-rules
+openDisplayRulesDocumentation() {
+	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#display-rules
 }
 
-chooseIconRuleLayout() {
-	IconRulesEditor.Instance.chooseIconRuleLayout()
+chooseDisplayRuleLayout() {
+	DisplayRulesEditor.Instance.chooseDisplayRuleLayout()
 }

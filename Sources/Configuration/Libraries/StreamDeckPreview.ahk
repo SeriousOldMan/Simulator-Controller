@@ -298,7 +298,7 @@ class StreamDeckPreview extends ControllerPreview {
 		menuItem := (translate(element[1]) . translate(": ") . element[2] . " (" . row . " x " . column . ")")
 		
 		try {
-			Menu GridElement, DeleteAll
+			Menu ControMenu, DeleteAll
 		}
 		catch exception {
 			; ignore
@@ -308,9 +308,9 @@ class StreamDeckPreview extends ControllerPreview {
 		
 		Gui %window%:Default
 		
-		Menu GridElement, Add, %menuItem%, controlMenuIgnore
-		Menu GridElement, Disable, %menuItem%
-		Menu GridElement, Add
+		Menu ControMenu, Add, %menuItem%, controlMenuIgnore
+		Menu ControMenu, Disable, %menuItem%
+		Menu ControMenu, Add
 		
 		try {
 			Menu ControlMenu, DeleteAll
@@ -368,11 +368,18 @@ class StreamDeckPreview extends ControllerPreview {
 		
 		label := translate("Button")
 		
-		Menu GridElement, Add, %label%, :ControlMenu
+		Menu ControMenu, Add, %label%, :ControlMenu
 		
 		button := this.getButton(row, column)
 		
 		if button {
+			try {
+				Menu DisplayMenu, DeleteAll
+			}
+			catch exception {
+				; ignore
+			}
+			
 			try {
 				Menu LabelMenu, DeleteAll
 			}
@@ -402,7 +409,7 @@ class StreamDeckPreview extends ControllerPreview {
 			
 			label := translate("Label")
 			
-			Menu GridElement, Add, %label%, :LabelMenu
+			Menu DisplayMenu, Add, %label%, :LabelMenu
 			
 			try {
 				Menu IconMenu, DeleteAll
@@ -433,7 +440,7 @@ class StreamDeckPreview extends ControllerPreview {
 			
 			label := translate("Icon")
 			
-			Menu GridElement, Add, %label%, :IconMenu
+			Menu DisplayMenu, Add, %label%, :IconMenu
 			
 			try {
 				Menu ModeMenu, DeleteAll
@@ -468,12 +475,16 @@ class StreamDeckPreview extends ControllerPreview {
 			if (mode == kLabel)
 				Menu ModeMenu, Check, %label%
 			
+			label := translate("Rule")
+			
+			Menu DisplayMenu, Add, %label%, :ModeMenu
+			
 			label := translate("Display")
 			
-			Menu GridElement, Add, %label%, :ModeMenu
+			Menu ControMenu, Add, %label%, :DisplayMenu
 		}
 
-		Menu GridElement, Show
+		Menu ControMenu, Show
 	}
 }
 

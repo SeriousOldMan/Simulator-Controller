@@ -42,7 +42,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 	iPendingApplicationRegistration := false
 	iPendingFunctionRegistration := false
 	
-	iButtonBoxWidgets := []
+	iControllerWidgets := []
 	iVoiceControlWidgets := []
 	
 	Pages[] {
@@ -236,7 +236,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		this.iModeSelectorsListHandle := modeSelectorsListHandle
 		this.iLaunchApplicationsListHandle := launchApplicationsListHandle
 		
-		this.iButtonBoxWidgets := Array(modeSelectorsLabelHandle, modeSelectorsListHandle, launchApplicationsLabelHandle, launchApplicationsListHandle, columnLabel3Handle, columnLine3Handle)
+		this.iControllerWidgets := Array(modeSelectorsLabelHandle, modeSelectorsListHandle, launchApplicationsLabelHandle, launchApplicationsListHandle, columnLabel3Handle, columnLine3Handle)
 		this.iVoiceControlWidgets := Array(columnLabel2Handle, columnLine2Handle)
 		
 		this.registerWidgets(1, generalIconHandle, generalLabelHandle, modeSelectorsLabelHandle, modeSelectorsListHandle, launchApplicationsLabelHandle, launchApplicationsListHandle, generalInfoTextHandle, columnLabel1Handle, columnLine1Handle, columnLabel2Handle, columnLine2Handle, columnLabel3Handle, columnLine3Handle, languageLabelHandle, languageDropDownHandle, startWithWindowsHandle, silentModeHandle)
@@ -256,7 +256,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		this.iModeSelectorsListHandle := false
 		this.iLaunchApplicationsListHandle := false
 		
-		this.iButtonBoxWidgets := []
+		this.iControllerWidgets := []
 		this.iVoiceControlWidgets := []
 		
 		this.iModeSelectors := []
@@ -332,7 +332,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 			this.loadApplications(true)
 		}
 		else
-			for ignore, widget in this.iButtonBoxWidgets
+			for ignore, widget in this.iControllerWidgets
 				GuiControl Hide, %widget%
 	}
 	

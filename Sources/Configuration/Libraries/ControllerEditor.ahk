@@ -1589,7 +1589,7 @@ class DisplayRulesEditor extends ConfigurationItem {
 		}
 		
 		Gui IRE:Add, Text, x8 yp+30 w80 h23 +0x200 hwndsdWidget1, % translate("Layout")
-		Gui IRE:Add, DropDownList, x90 yp w110 AltSubmit Choose%chosen% VdisplayRuleLayoutDropDown gchooseDisplayRuleLayout, % values2String("|", layouts*)
+		Gui IRE:Add, DropDownList, x90 yp w150 AltSubmit Choose%chosen% VdisplayRuleLayoutDropDown gchooseDisplayRuleLayout, % values2String("|", layouts*)
 		
 		this.iDisplayRulesList.createGui(configuration)
 		
@@ -1674,7 +1674,7 @@ class DisplayRulesList extends ConfigurationItemList {
 							 , % values2String("|", map(["Rule", "Icon"], "translate")*)
 							
 		Gui IRE:Add, Text, x8 yp+126 w80 h23 +0x200, % translate("Rule")
-		Gui IRE:Add, DropDownList, x90 yp w110 AltSubmit Choose1 VdisplayRuleDropDown, % values2String("|", map(["Icon or Label", "Icon and Label", "Only Icon", "Only Label"], "translate")*)
+		Gui IRE:Add, DropDownList, x90 yp w150 AltSubmit Choose1 VdisplayRuleDropDown, % values2String("|", map(["Icon or Label", "Icon and Label", "Only Icon", "Only Label"], "translate")*)
 		
 		Gui IRE:Add, Text, x8 yp+24 w80 h23 +0x200, % translate("Icon")
 		Gui IRE:Add, Edit, x90 yp w211 h21 ViconFilePathEdit, %iconFilePathEdit%

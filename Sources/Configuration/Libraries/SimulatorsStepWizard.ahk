@@ -27,7 +27,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 	iCurrentSimulator := false
 	
 	iSimulatorMFDKeys := {}
-	iButtonBoxWidgets := []
+	iControllerWidgets := []
 	
 	iCachedActions := {}
 	iCachedSimulator := false
@@ -207,7 +207,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		actionsInfoText.Navigate("about:blank")
 		actionsInfoText.Document.Write(html)
 		
-		this.iButtonBoxWidgets := [columnLabel2Handle, columnLine2Handle]
+		this.iControllerWidgets := [columnLabel2Handle, columnLine2Handle]
 		
 		this.setActionsListView(actionsListViewHandle)
 		
@@ -218,7 +218,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		base.reset()
 		
 		this.iSimulatorMFDKeys := {}
-		this.iButtonBoxWidgets := []
+		this.iControllerWidgets := []
 		this.iCachedActions := {}
 		this.iCachedSimulator := false
 	}
@@ -244,7 +244,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		base.showPage(page)
 		
 		if !this.SetupWizard.isModuleSelected("Controller")
-			for ignore, widget in this.iButtonBoxWidgets
+			for ignore, widget in this.iControllerWidgets
 				GuiControl Hide, %widget%
 		
 		this.loadSimulatorMFDKeys(this.iCurrentSimulator)

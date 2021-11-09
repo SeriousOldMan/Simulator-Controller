@@ -410,7 +410,7 @@ class StreamDeckPreview extends ControllerPreview {
 			if (labelMode == false)
 				Menu LabelMenu, Check, %label%
 			
-			label := translate("Aktion")
+			label := translate("Action")
 			handler := ObjBindMethod(LayoutsList.Instance, "changeControl", row, column, "__Action_Label__", false)
 			Menu LabelMenu, Add, %label%, %handler%
 			if (labelMode == true)
@@ -441,7 +441,7 @@ class StreamDeckPreview extends ControllerPreview {
 			if (iconMode == false)
 				Menu IconMenu, Check, %label%
 			
-			label := translate("Aktion")
+			label := translate("Action")
 			handler := ObjBindMethod(LayoutsList.Instance, "changeControl", row, column, "__Action_Icon__", false)
 			Menu IconMenu, Add, %label%, %handler%
 			if (iconMode == true)

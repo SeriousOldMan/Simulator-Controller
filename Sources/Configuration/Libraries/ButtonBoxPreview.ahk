@@ -121,7 +121,7 @@ class ButtonBoxPreview extends ControllerPreview {
 		Gui %window%:Font, s12 Bold cSilver
 		Gui %window%:Add, Text, x0 y8 w%width% h23 +0x200 +0x1 BackgroundTrans %previewMover%, % translate("Modular Simulator Controller System")
 		Gui %window%:Font, s10 cSilver
-		Gui %window%:Add, Text, x0 y28 w%width% h23 +0x200 +0x1 BackgroundTrans %previewMover%, % translate(this.Name)
+		Gui %window%:Add, Text, x0 y28 w%width% h23 +0x200 +0x1 BackgroundTrans %previewMover%, % this.Name
 		Gui %window%:Color, 0x000000
 		Gui %window%:Font, s8 Norm, Arial
 		

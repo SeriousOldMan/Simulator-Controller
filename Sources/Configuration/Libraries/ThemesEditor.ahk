@@ -460,7 +460,7 @@ error:
 				if FileExist(songFile) {
 					SoundPlay %songFile%
 				
-					setButtonIcon(playSoundButtonHandle, kIconsDirectory . "Pause.ico", 1, "L7 T2 R2 B2")
+					setButtonIcon(playSoundButtonHandle, kIconsDirectory . "Pause.ico", 1, "L2 T2 R2 B2")
 					
 					this.iSoundIsPlaying := true
 				}

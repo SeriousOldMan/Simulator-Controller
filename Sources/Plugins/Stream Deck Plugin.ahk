@@ -181,11 +181,13 @@ class StreamDeck extends FunctionController {
 		
 		base.loadFromConfiguration(configuration)
 	
-		if !this.sModes
+		if !this.sModes {
+			this.sModes := {}
+			
 			Loop {
 				special := mode := getConfigurationValue(configuration, "Icons", "*.Icon.Mode." . A_Index, kUndefined)
 				
-				if (special != kUndefined)
+				if (special == kUndefined)
 					break
 				else {
 					special := string2values(";", special)
@@ -193,6 +195,7 @@ class StreamDeck extends FunctionController {
 					this.sModes[special[1]] := special[2]
 				}
 			}
+		}
 			
 		layout := string2Values("x", getConfigurationValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Layout, "Layout"), ""))
 		

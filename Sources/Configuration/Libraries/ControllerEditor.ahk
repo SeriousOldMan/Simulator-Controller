@@ -1067,7 +1067,7 @@ class LayoutsList extends ConfigurationItemList {
 		configuration := newConfiguration()
 		
 		setConfigurationSectionValues(configuration, "Icons", this.iIconDefinitions)
-		setConfigurationSectionValues(configuration, "Icons", this.iButtonDefinitions)
+		setConfigurationSectionValues(configuration, "Buttons", this.iButtonDefinitions)
 		
 		Gui IRE:+OwnerCTRLE
 		Gui CTRLE:+Disabled
@@ -1539,6 +1539,9 @@ class DisplayRulesEditor extends ConfigurationItem {
 	iLayout := false
 	iSelectedLayout := false
 	
+	iButtons := false
+	iSelectedButton := false
+	
 	iDisplayRulesList := false
 	
 	Layout[] {
@@ -1550,6 +1553,21 @@ class DisplayRulesEditor extends ConfigurationItem {
 	SelectedLayout[] {
 		Get {
 			return this.iSelectedLayout
+		}
+	}
+	
+	Buttons[index := false] {
+		Get {
+			if index
+				return this.iButtons[index]
+			else
+				return this.iButtons
+		}
+	}
+	
+	SelectedButton[] {
+		Get {
+			return this.iSelectedButton
 		}
 	}
 	
@@ -1605,8 +1623,8 @@ class DisplayRulesEditor extends ConfigurationItem {
 		else
 			chosen := 1
 		
-		Gui IRE:Add, Text, x8 yp+24 w80 h23 +0x200 %disabled% hwndwidget1, % translate("Button")
-		Gui IRE:Add, DropDownList, x90 yp w150 AltSubmit %disabled% Choose%chosen% hwndwidget2 vdisplayRuleButtonDropDown, % values2String("|", buttons*)
+		Gui IRE:Add, Text, x8 yp+24 w80 h23 +0x200 hwndwidget1, % translate("Button")
+		Gui IRE:Add, DropDownList, x90 yp w150 AltSubmit %disabled% Choose%chosen% vdisplayRuleButtonDropDown gchooseDisplayRuleButton, % values2String("|", buttons*)
 		
 		this.iDisplayRulesList.createGui(configuration)
 		
@@ -1627,7 +1645,7 @@ class DisplayRulesEditor extends ConfigurationItem {
 		
 		buttons := [translate("All Buttons")]
 		
-		if this.Layout
+		if this.SelectedLayout
 			for descriptor, definition in getConfigurationSectionValues(LayoutsList.Instance.StreamDeckConfiguration, "Layouts", Object()) {
 				descriptor := ConfigurationItem.splitDescriptor(descriptor)
 			
@@ -1636,9 +1654,20 @@ class DisplayRulesEditor extends ConfigurationItem {
 						if (button != "")
 							buttons.Push(button)
 			}
-			
+		
 		GuiControl, , displayRuleButtonDropDown, % ("|" . values2String("|", buttons*))
-		GuiControl Choose, displayRuleButtonDropDown, 1
+		GuiControl Choose, displayRuleButtonDropDown, % (this.SelectedLayout ? 1 : 0)
+		
+		buttons.RemoveAt(1)
+		
+		this.iButtons := buttons
+		
+		if this.SelectedLayout
+			GuiControl Enable, displayRuleButtonDropDown
+		else
+			GuiControl Disable, displayRuleButtonDropDown
+		
+		this.iSelectedButton := false
 	}	
 	
 	editDisplayRules() {
@@ -1669,15 +1698,32 @@ class DisplayRulesEditor extends ConfigurationItem {
 	}
 	
 	chooseDisplayRuleLayout() {
-		local displayRulesList
+		local displayRulesList := this.iDisplayRulesList
 		
 		GuiControlGet displayRuleLayoutDropDown
 		
-		this.iDisplayRulesList.saveToConfiguration(this.Configuration)
+		displayRulesList.saveToConfiguration(this.Configuration)
 		
 		this.iSelectedLayout := ((displayRuleLayoutDropDown = 1) ? false : this.Layout)
 		
-		displayRulesList := this.iDisplayRulesList
+		this.loadLayoutButtons()
+		
+		displayRulesList.loadFromConfiguration(this.Configuration)
+		
+		displayRulesList.loadList(displayRulesList.ItemList)
+		
+		displayRulesList.CurrentItem := false
+		displayRulesList.clearEditor()
+	}
+	
+	chooseDisplayRuleButton() {
+		local displayRulesList := this.iDisplayRulesList
+		
+		GuiControlGet displayRuleButtonDropDown
+		
+		displayRulesList.saveToConfiguration(this.Configuration)
+		
+		this.iSelectedButton := ((displayRuleButtonDropDown = 1) ? false : this.Buttons[displayRuleButtonDropDown - 1])
 		
 		displayRulesList.loadFromConfiguration(this.Configuration)
 		
@@ -1730,48 +1776,76 @@ class DisplayRulesList extends ConfigurationItemList {
 	loadFromConfiguration(configuration) {
 		base.loadFromConfiguration(configuration)
 		
-		this.ItemList := this.loadDisplayRules(configuration, DisplayRulesEditor.Instance.SelectedLayout)
+		this.ItemList := this.loadDisplayRules(configuration, DisplayRulesEditor.Instance.SelectedLayout, DisplayRulesEditor.Instance.SelectedButton)
 	}
 		
 	saveToConfiguration(configuration) {
 		fullConfiguration := this.Configuration
 		
-		this.saveDisplayRules(fullConfiguration, DisplayRulesEditor.Instance.SelectedLayout, this.ItemList)
+		this.saveDisplayRules(fullConfiguration, DisplayRulesEditor.Instance.SelectedLayout, DisplayRulesEditor.Instance.SelectedButton, this.ItemList)
 		
-		setConfigurationSectionValues(configuration, "Icons", getConfigurationSectionValues(configuration, "Icons", fullConfiguration))	
+		setConfigurationSectionValues(configuration, "Icons", getConfigurationSectionValues(fullConfiguration, "Icons"))
+		setConfigurationSectionValues(configuration, "Buttons", getConfigurationSectionValues(fullConfiguration, "Buttons"))	
 	}
 	
-	loadDisplayRules(configuration, layout) {
-		prefix := ((layout ? layout : "*") . ".Icon.Mode.")
-		
+	loadDisplayRules(configuration, layout, button) {
 		icons := []
+			
+		if button {
+			prefix := (layout . "." . button . ".Mode.Icon.")
 		
-		Loop {
-			icon := getConfigurationValue(configuration, "Icons", prefix . A_Index, kUndefined)
+			Loop {
+				icon := getConfigurationValue(configuration, "Buttons", prefix . A_Index, kUndefined)
+			
+				if (icon = kUndefined)
+					break
+				else
+					icons.Push(string2Values(";", icon))
+			}
+		}
+		else {
+			prefix := ((layout ? layout : "*") . ".Icon.Mode.")
 		
-			if (icon = kUndefined)
-				break
-			else
-				icons.Push(string2Values(";", icon))
+			Loop {
+				icon := getConfigurationValue(configuration, "Icons", prefix . A_Index, kUndefined)
+			
+				if (icon = kUndefined)
+					break
+				else
+					icons.Push(string2Values(";", icon))
+			}
 		}
 		
 		return icons
 	}
 	
-	saveDisplayRules(configuration, layout, displayRules) {
-		prefix := ((layout ? layout : "*") . ".Icon.Mode.")
+	saveDisplayRules(configuration, layout, button, displayRules) {
+		if button {
+			prefix := (layout . "." . button . ".Mode.Icon.")
 		
-		icons := []
-		
-		Loop {
-			if (getConfigurationValue(configuration, "Icons", prefix . A_Index, kUndefined) == kUndefined)
-				break
-			else
-				removeConfigurationValue(configuration, "Icons", prefix . A_Index)
+			Loop {
+				if (getConfigurationValue(configuration, "Buttons", prefix . A_Index, kUndefined) == kUndefined)
+					break
+				else
+					removeConfigurationValue(configuration, "Buttons", prefix . A_Index)
+			}
+			
+			for index, displayRule in displayRules
+				setConfigurationValue(configuration, "Buttons", prefix . index, values2String(";", displayRule*))
 		}
-		
-		for index, displayRule in displayRules
-			setConfigurationValue(configuration, "Icons", prefix . index, values2String(";", displayRule*))
+		else {
+			prefix := ((layout ? layout : "*") . ".Icon.Mode.")
+			
+			Loop {
+				if (getConfigurationValue(configuration, "Icons", prefix . A_Index, kUndefined) == kUndefined)
+					break
+				else
+					removeConfigurationValue(configuration, "Icons", prefix . A_Index)
+			}
+			
+			for index, displayRule in displayRules
+				setConfigurationValue(configuration, "Icons", prefix . index, values2String(";", displayRule*))
+		}
 	}
 	
 	loadList(items) {
@@ -1965,4 +2039,8 @@ openDisplayRulesDocumentation() {
 
 chooseDisplayRuleLayout() {
 	DisplayRulesEditor.Instance.chooseDisplayRuleLayout()
+}
+
+chooseDisplayRuleButton() {
+	DisplayRulesEditor.Instance.chooseDisplayRuleButton()
 }

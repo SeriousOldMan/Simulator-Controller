@@ -1,8 +1,10 @@
-## 3.6.8-release 11/12/21
+## 3.6.8-release 11/12/21 (planned)
 
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. New tool to edit controller action labels and icons. See the [revised documentation](*) for more information.
+  3. Full support for graphical configuration of the Stream Deck integration. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#stream-deck-layouts) for more information.
+  4. "Simulator Configuration" and "Simulator Setup" has been revised to include full support for Stream Deck configuration.
+  5. New tool to edit controller action labels and icons as part of the new configuration process for Stream Decks. See the [documentation](*) for more information.
 
 ## 3.6.6-release 11/05/21
 

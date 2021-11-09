@@ -193,7 +193,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		
 		Gui %window%:Font, Bold, Arial
 		
-		Gui %window%:Add, Text, x%x% yp+30 w%col1Width% h23 +0x200 HWNDcolumnLabel3Handle Hidden, % translate("Controller / Button Box")
+		Gui %window%:Add, Text, x%x% yp+30 w%col1Width% h23 +0x200 HWNDcolumnLabel3Handle Hidden, % translate("Controller")
 		Gui %window%:Add, Text, yp+20 x%x% w%col1Width% 0x10 HWNDcolumnLine3Handle Hidden
 
 		Gui %window%:Font, Norm, Arial
@@ -598,7 +598,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 				
 				Gui %window%:Default
 				
-				Menu ContextMenu, Add, %menuItem%, menuIgnore
+				Menu ContextMenu, Add, %menuItem%, controlMenuIgnore
 				Menu ContextMenu, Disable, %menuItem%
 				Menu ContextMenu, Add
 				
@@ -723,7 +723,7 @@ updateApplicationFunction() {
 					
 					Gui %window%:Default
 					
-					Menu ContextMenu, Add, %menuItem%, menuIgnore
+					Menu ContextMenu, Add, %menuItem%, controlMenuIgnore
 					Menu ContextMenu, Disable, %menuItem%
 					
 					Menu ContextMenu, Add

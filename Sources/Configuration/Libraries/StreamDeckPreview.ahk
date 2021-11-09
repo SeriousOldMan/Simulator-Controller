@@ -1,5 +1,5 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Button Box Preview              ;;;
+;;;   Modular Simulator Controller System - Stream Deck Preview             ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2021) Creative Commons - BY-NC-SA                        ;;;
@@ -128,7 +128,13 @@ class StreamDeckPreview extends ControllerPreview {
 		
 		Gui %window%:+LabelstreamDeck
 		
-		Gui %window%:Add, Picture, x0 y0 gcontrolClick, % (kStreamDeckImagesDirectory . "Stream Deck " . this.Size . ".jpg")
+		previewMover := this.PreviewManager.getPreviewMover()
+		previewMover := (previewMover ? ("g" . previewMover) : "")
+		
+		Gui %window%:Add, Picture, x0 y0, % (kStreamDeckImagesDirectory . "Stream Deck " . this.Size . ".jpg")
+		
+		Gui %window%:Color, 0x000000
+		Gui %window%:Font, s8 Norm, Arial
 		
 		row := 0
 		column := 0
@@ -155,7 +161,7 @@ class StreamDeckPreview extends ControllerPreview {
 				posY := (y + 3)
 				
 				Gui %window%:Add, Picture, x%posX% y%posY% w44 h44 BackgroundTrans hwndiconHandle
-				Gui %window%:Add, Text, x%posX% y%posY% w44 h44 Center BackgroundTrans hwndlabelHandle
+				Gui %window%:Add, Text, x%posX% y%posY% w44 h44 Center BackgroundTrans hwndlabelHandle gcontrolClick
 				
 				this.iLabels[row][column] := labelHandle
 				this.iIcons[row][column] := iconHandle
@@ -165,6 +171,8 @@ class StreamDeckPreview extends ControllerPreview {
 				
 			y += (this.kRowMargin + this.kButtonHeight)
 		}
+		
+		Gui %window%:Add, Picture, x0 y0 %previewMover% 0x4000000, % (kStreamDeckImagesDirectory . "Stream Deck " . this.Size . ".jpg")
 		
 		this.updateButtons()
 	}

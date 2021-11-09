@@ -278,7 +278,7 @@ class SetupWizard extends ConfigurationItem {
 		showProgress({progress: ++vProgressCount, message: translate("Initializing AI kernel...")})
 		
 		if initialize {
-			for ignore, fileName in ["Button Box Configuration.ini", "Voice Control Configuration.ini", "Race Engineer Configuration.ini", "Race Strategist Configuration.ini", "Simulator Settings.ini"]
+			for ignore, fileName in ["Button Box Configuration.ini", "Stream Deck Configuration.ini", "Voice Control Configuration.ini", "Race Engineer Configuration.ini", "Race Strategist Configuration.ini", "Simulator Settings.ini"]
 				try {
 					FileDelete %kUserHomeDirectory%Setup\%fileName%
 				}
@@ -548,6 +548,11 @@ class SetupWizard extends ConfigurationItem {
 						FileMove %kUserConfigDirectory%Button Box Configuration.ini, %kUserConfigDirectory%Button Box Configuration.ini.bak, 1
 					
 					FileCopy %kUserHomeDirectory%Setup\Button Box Configuration.ini, %kUserConfigDirectory%Button Box Configuration.ini
+					
+					if FileExist(kUserConfigDirectory . "Stream Deck Configuration.ini")
+						FileMove %kUserConfigDirectory%Stream Deck Configuration.ini, %kUserConfigDirectory%Stream Deck Configuration.ini.bak, 1
+					
+					FileCopy %kUserHomeDirectory%Setup\Stream Deck Configuration.ini, %kUserConfigDirectory%Stream Deck Configuration.ini
 				}
 			}
 			
@@ -2256,7 +2261,9 @@ findSoftware(definition, software) {
 							try {
 								FileRead script, %installPath%\steamapps\libraryfolders.vdf
 								
-								folders := JSON.parse(convertVDF2JSON(script))
+								jsScript := convertVDF2JSON(script)
+								
+								folders := JSON.parse(jsScript)
 								folders := folders["LibraryFolders"]
 								
 								for ignore, folder in folders {

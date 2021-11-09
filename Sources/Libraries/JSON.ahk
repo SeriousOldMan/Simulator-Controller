@@ -203,11 +203,13 @@ class JSON {
 	}
 
 	_CreateObject(jsObject) {
+		if !IsObject(jsObject)
+			return jsObject
+		
 		result := jsObject.IsArray()
 		
 		if (result = "")
 			return jsObject
-		
 		else if (result = -1) {
 			object := []
 			

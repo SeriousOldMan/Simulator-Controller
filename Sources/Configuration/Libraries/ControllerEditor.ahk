@@ -650,7 +650,7 @@ class LayoutsList extends ConfigurationItemList {
 		
 		Gui CTRLE:Add, Text, x8 y445 w86 h23 +0x200, % translate("Name && Type")
 		Gui CTRLE:Add, Edit, x102 y445 w110 h21 VlayoutNameEdit, %layoutNameEdit%
-		Gui CTRLE:Add, DropDownList, x215 y445 w117 AltSubmit Choose1 VlayoutTypeDropDown gchooseLayoutType, % values2String("|", map(["ButtonBox", "Stream Deck"], "translate")*)
+		Gui CTRLE:Add, DropDownList, x215 y445 w117 AltSubmit Choose1 VlayoutTypeDropDown gchooseLayoutType, % values2String("|", map(["Button Box", "Stream Deck"], "translate")*)
 		
 		Gui CTRLE:Add, Text, x8 y469 w86 h23 +0x200 Section hwndbbWidget1, % translate("Visible")
 		if layoutVisibleCheck

@@ -59,17 +59,27 @@ class ControllerStepWizard extends StepWizard {
 	saveToConfiguration(configuration) {
 		base.saveToConfiguration(configuration)
 		
-		controllerConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
+		buttonBoxConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
+		streamDeckConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
 		wizard := this.SetupWizard
 		
 		if wizard.isModuleSelected("Controller") {
+			for controller, definition in getConfigurationSectionValues(streamDeckConfiguration, "Layouts") {
+				controller := ConfigurationItem.splitDescriptor(controller)
+
+				if ((controller[2] != "Layout") && (controller[2] != "Visible"))
+					for ignore, theFunction in string2Values(";", definition)
+						if (theFunction != "")
+							Function.createFunction(theFunction, false, "", "", "", "").saveToConfiguration(configuration)
+			}
+			
 			controls := {}
 			controllers := []
 			
-			for control, descriptor in getConfigurationSectionValues(controllerConfiguration, "Controls")
+			for control, descriptor in getConfigurationSectionValues(buttonBoxConfiguration, "Controls")
 				controls[control] := string2Values(";", descriptor)[1]
 			
-			for controller, definition in getConfigurationSectionValues(controllerConfiguration, "Layouts") {
+			for controller, definition in getConfigurationSectionValues(buttonBoxConfiguration, "Layouts") {
 				controller := ConfigurationItem.splitDescriptor(controller)
 
 				if ((controller[2] != "Layout") && (controller[2] != "Visible")) {
@@ -569,14 +579,17 @@ class ControllerPreviewStepWizard extends StepWizard {
 		if this.SetupWizard.isModuleSelected("Controller") {
 			staticFunctions := this.SetupWizard.getModuleStaticFunctions()
 			controllers := []
+			found := []
 			
 			configuration := readConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
 			
 			for controller, definition in getConfigurationSectionValues(configuration, "Layouts") {
 				controller := ConfigurationItem.splitDescriptor(controller)
 			
-				if !inList(controllers, controller[1])
-					controllers.Push(Array("Button Box", controller[1]))
+				if !inList(found, controller[1]) {
+					found.Push(controller[1])
+					controllers.Push(Array("Button Box", controller[1], configuration))
+				}
 			}
 			
 			configuration := readConfiguration(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
@@ -584,12 +597,14 @@ class ControllerPreviewStepWizard extends StepWizard {
 			for controller, definition in getConfigurationSectionValues(configuration, "Layouts") {
 				controller := ConfigurationItem.splitDescriptor(controller)
 			
-				if !inList(controllers, controller[1])
-					controllers.Push(Array("Stream Deck", controller[1]))
+				if !inList(found, controller[1]) {
+					found.Push(controller[1])
+					controllers.Push(Array("Stream Deck", controller[1], configuration))
+				}
 			}
 			
 			for index, controller in controllers {
-				preview := this.createControllerPreview(controller[1], controller[2], configuration)
+				preview := this.createControllerPreview(controller[1], controller[2], controller[3])
 			
 				preview.setControlClickHandler(ObjBindMethod(this, "controlClick"))
 			
@@ -702,6 +717,8 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 			
 			modes.InsertAt(1, translate("All Modes"))
 			
+			Gui %window%:Font, s8 Norm Arial
+			
 			Gui %window%:Add, DropDownList, x8 y8 w82 Choose1 HWNDmodeDropDownHandle gupdateControllerLabels, % values2String("|", modes*)
 			
 			this.iModeDropDownHandle := modeDropDownHandle
@@ -752,7 +769,12 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 			
 			modes.InsertAt(1, translate("All Modes"))
 			
-			Gui %window%:Add, DropDownList, x8 y8 w82 Choose1 HWNDmodeDropDownHandle gupdateControllerLabels, % values2String("|", modes*)
+			Gui %window%:Font, s8 Norm Arial
+			
+			width := this.Width
+			height := this.Height
+			
+			Gui %window%:Add, DropDownList, x8 y8 Choose1 HWNDmodeDropDownHandle gupdateControllerLabels, % values2String("|", modes*)
 			
 			this.iModeDropDownHandle := modeDropDownHandle
 		}
@@ -1078,7 +1100,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 			; ignore
 		}
 		
-		Menu ContextMenu, Add, %title%, menuIgnore
+		Menu ContextMenu, Add, %title%, controlMenuIgnore
 		Menu ContextMenu, Disable, %title%
 		Menu ContextMenu, Add
 		
@@ -1126,7 +1148,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 			; ignore
 		}
 		
-		Menu ContextMenu, Add, %title%, menuIgnore
+		Menu ContextMenu, Add, %title%, controlMenuIgnore
 		Menu ContextMenu, Disable, %title%
 		Menu ContextMenu, Add
 		
@@ -1355,7 +1377,7 @@ updateFunctionTriggers() {
 			
 			Gui %window%:Default
 			
-			Menu ContextMenu, Add, %menuItem%, menuIgnore
+			Menu ContextMenu, Add, %menuItem%, controlMenuIgnore
 			Menu ContextMenu, Disable, %menuItem%
 			Menu ContextMenu, Add
 			

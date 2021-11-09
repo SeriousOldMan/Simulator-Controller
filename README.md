@@ -43,7 +43,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[3.6.8-release](https://www.dropbox.com/s/dlog1q1b7jyz7fy/Simulator%20Controller%203.6.8-dev.zip?dl=1) (Early build for 3.6.8. New features: New editor for action labels and icons, Refactoring of the ButtonBoxEditor class, New editor for Stream Deck controller layouts, Updated "Simulator Setup" and "Simulator Configuration" to support the new editors, New module "Stream Deck" in "Simulator Setup". Including update procedure and documentation.)
+[3.6.8-dev](https://www.dropbox.com/s/dlog1q1b7jyz7fy/Simulator%20Controller%203.6.8-dev.zip?dl=1) (Early build for 3.6.8. New features: New editor for action labels and icons, Refactoring of the ButtonBoxEditor class, New editor for Stream Deck controller layouts, Updated "Simulator Setup" and "Simulator Configuration" to support the new editors, New module "Stream Deck" in "Simulator Setup". Including update procedure and documentation.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-368) of this version and all the versions you might have skipped, before installing and using this version.
 

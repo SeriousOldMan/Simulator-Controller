@@ -174,7 +174,7 @@ In this tab you can configure the plugins currently in use by the Simulator Cont
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%202.JPG)
 
-Beside temporarily deactivating a plugin and all its modes, you can define a comma separated list of simulator names. This will restrict the modes of the plugin to only be available, when these simulators are running. The most important field here is the *Arguments* field. Here you can supply values for all the configuration parameters of the given plugin. The format is like this: "parameter1: value11, value12, value13; parameter2: value21, value22; ...". Please take a look at the [plugin reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes) for an in depth explanation of all the parameters of the bundled plugins. Last but not least, you will find an "Edit Labels..." button in the lower left corner of this tab. Pressing this button will open a simple text file, where you can edit the labels, some plugins display on the visual hardware controller display. Change them to your liking. To edit the icons that are displayed on a connected Stream Deck, use the "Edit Icons ..." button. Please note, that the content of these files must be localized depending on the currently configured language of Simulator Controller.
+Beside temporarily deactivating a plugin and all its modes, you can define a comma separated list of simulator names. This will restrict the modes of the plugin to only be available, when these simulators are running. The most important field here is the *Arguments* field. Here you can supply values for all the configuration parameters of the given plugin. The format is like this: "parameter1: value11, value12, value13; parameter2: value21, value22; ...". Please take a look at the [plugin reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes) for an in depth explanation of all the parameters of the bundled plugins. Last but not least, you will find an "Edit Labels & Icons..." button in the lower left corner of this tab. Pressing this button will open a special editor, which allows you to configure the language specific labels and icons for all controller actions. You will find more information on this in the [chapter on controller layout configuration](*).
 
 Note: You can deactivate or delete all plugins except *System*. The *System* plugin is required and part of the framework. If you delete one or more of the other plugins here, they will still be loaded by the Simulator Controller, but they won't be activated. On the other hand, if you add a plugin here, but haven't added any plugin code, nothting will happen. And, last but not least, the plugin names given here must be identical to those used in the plugin code. Some sort of primary key, hey. If you have some development skills, see the documentation on [plugin development](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts) for further information.
 
@@ -348,9 +348,13 @@ Note: The original text sometimes has leading and/or trailing spaces. Be sure to
 
 Important: The ISO language code and the language name itself cannot be changed, once a new language has been initially saved. So choose them wisely. And last but not least be careful, if you ever want to edit the translation files directly using a text editor. This editor must be able to handle multibyte files, since the tranlation files are stored in an UTF-16 format.
 
-# Button Box Layouts
+# Controller Layouts
 
-Beginning with Release 2.5 it is possible to define Button Box layouts using a structured configuration file. Below you find a sample definition for information, but no worries, a graphical editor is available to handle this file.
+Simulator Controller allows you to use any type of USB controller (normally Button Boxes or the controls on your steering wheel) to control the vast functionality of the different plugins. In addition to standard USB controller, Simulator Controller also provides a special plugin for the famous Stream Deck controller. The layout (type and number of controls, arrangement of controls, etc.) for all type of controller are described using special configuration files, which are documented below. But no worry, you will normally use a graphical tool, the Controller Layout Editor, to create and edit those configuration files.
+
+## Button Box Layouts
+
+Below you find a sample definition for the Button Box configuration file: file.
 
 	[Controls]
 	Switch=2WayToggle;%kButtonBoxImagesDirectory%Photorealistic\Toggle Switch.png;54 x 85
@@ -370,27 +374,27 @@ Beginning with Release 2.5 it is possible to define Button Box layouts using a s
 	Controller 2.2=Push.13,Label;Push.14,Label;Push.15,Label;Push.16,Label
 	Controller 2.3=Push.17,Label;Push.18,Label;Push.19,Label;Push.20,Label
 
-You can define as many Button Box layouts as you want, but only those Boxes will be activated by Simulator Controller, that also have been added to the list of active Button Boxes list at the top of the [*Controller* tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller).
+You can define as many Button Box layouts as you want, but only those Boxes will be activated by Simulator Controller, that also have been added to the list of configured controller at the top of the [*Controller* tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller). This also applys to any other type of controller layouts.
 
 In the given configuration file, you first have to define the different *Control* types, you want to use on your Button Box layouts. In the example above, three different *Control* types are defined, each one consisting of the name of the corresponding class, the image for the visual representation and the size information for this image. Supported classes are "1WayToggle", "2WayToggle", "Button" and "Dial", which corresponds with the controller functions used on the [*Controller* tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller). The given name of the *Control* type definition will then be used in the configuration of the concrete layouts in the *[Layouts]* section.
 
-You may define different *Label* types, if you are using label fields of different sizes for your controls. The example above only introduces one label with a fixed size for all controls.
+You may define different *Label* types, if you want to use label fields of different sizes for your controls. The example above only introduces one label with a fixed size for all controls.
 
-In the last section, the layouts of one or more Button Boxes are described using these components. For each Button Box you have to define the layout grid with *.Layout*" descriptor. The grid argument ("R x C", where "R" define the number of rows and "C" the number of columns) is required, the other optional parts as in "Controller 2.Layout=3 x 4, 20, 60, 20, 15" are the *Row Margin*, *Column Margin*, *Sides Margin* and *Bottom Margin* with 20, 40, 20 and 15 as default. After defining the layout, you enumerate the controls of each row seperately. It is possible to leave positions in the grid blank, when not every corresponding position on your Button Box is occupied with a control, and it is also possible to create a control without a label field. The number of each control (as in "Push.17" must correspond with the number of the corresponding controller function defined on the [*Controller* tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller). Last, but not least: You can declare a Button Box to be invisible, so that its graphical representation will not be shown on the screen.
+In the last section, the layouts of one or more Button Boxes are described using these components. For each Button Box you have to define the layout grid with *.Layout*" descriptor. The grid argument ("R x C", where "R" define the number of rows and "C" the number of columns) is required, the other optional parts as in "Controller 2.Layout=3 x 4, 20, 60, 20, 15" are the *Row Margin*, *Column Margin*, *Sides Margin* and *Bottom Margin* with 20, 40, 20 and 15 as default. After defining the layout, you enumerate the controls of each row seperately. It is possible to leave positions in the grid blank, when not every corresponding position on your Button Box is occupied with a control, and it is also possible to create a control without a label field. The number of each control (as in "Push.17" must correspond with the number of the corresponding controller function defined on the [*Controller* tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller). Last, but not least, is it possible to declare a Button Box to be invisible, so that its graphical representation will not be shown on the screen.
 
 After we now have an understanding of the Button Box layout definition format, let's have a look at the graphical editor, which handles this configuration file. As always, the file will be stored in the *Simulator Controller\Config* folder which resides in your user *Documents* folder.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%20Editor%201.JPG)
 
-As you can see, the structure of this editor is very similar to the structure of the configuration file above. You first have to enter your controls and labels in the first two sections of the editor and then you can define the Button Box layouts. If you select an existing layout definition or when you save a newly created definition, a preview window of this Button Box layout will be opened in the lower right corner of your screen.
+As you can see, the structure of this editor is very similar to the structure of the configuration file above. You first have to enter your controls and labels in the first two sections of the editor and then you can define the Button Box layouts (be sure to select "Button Box" in the layout type drop down menu). If you select an existing layout definition or when you save a newly created definition, a preview window of this Button Box layout will be opened in the lower right corner of your screen.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%20Editor%202.JPG)
 
 This window will visualize the current layout and will change, whenever you change one of the definitions in the layout editor. Please note, that you have to save the definition changes using the *Save* buttons to update the preview window, as long as you do not have chosen the [*Automatic* save mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#using-the-configuration-tool). As you can see in the image above, freshly added rows and columns will show a free "Space", which you can fill up with *Controls*. Please note, that the "Space" marker will only be shown in the preview mode, so intentionally free space will look good on the final Button Box. You con click on each cell of the preview window and change the *Control* and the *Label*, which should occupy this cell, and you can choose the corresponding controller function number for the given control.
 
-# Stream Deck Layouts
+## Stream Deck Layouts
 
-Release 3.6.6 introduces support for Stream Deck controller, very similar to the support for Button Boxes. The layout of a given Stream Deck profile is described to Simulator Controller using a structured configuration file. Below you find a sample definition as a guide.
+The configuration file for Stream Deck controller is to some extent similar to that for Button Boxes. Below you find a sample definition as a reference:
 
 	[Layouts]
 	Stream Deck.Layout=3 x 5
@@ -401,6 +405,7 @@ Release 3.6.6 introduces support for Stream Deck controller, very similar to the
 	Stream Deck Mini.1=Button.11;;
 	Stream Deck Mini.2=;;
 	[Icons]
+	*.Icon.Mode.1=D:\Controller\Resources\Icons\Clutch.ico;IconAndLabel
 	Stream Deck.Icon.Mode.1=D:\Controller\Resources\Icons\Throttle.ico;Icon
 	Stream Deck.Icon.Mode.2=D:\Controller\Resources\Icons\Brake.ico;Icon
 	Stream Deck.Icon.Mode.3=D:\Controller\Resources\Icons\Clutch.ico;Icon
@@ -426,19 +431,56 @@ To connect your Stream Deck(s) with Simulator Controller, you must install the s
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Stream%20Deck%20Action.JPG)
 
-Please note, that you don't have to place all controller action on one page, although the above example looks like this. You can even distribute them over several profiles and you may have more then instance for "Button.3", for example. Therefore, you have total freedom to organize your layout. But keep in mind, that the Stream Deck Actions automatically adopts to the currently active controller actions, so conventional switching of profiles on the Stream Deck is unnecessary.
+Please note, that you don't have to place all controller actions on one page, although the above example looks like this. You can even distribute them over several profiles and you may have more then instance for "Button.3", as well. Therefore, you have total freedom to organize your layout, at least when you directly edit the configuration file. Creating a configuration using the editor is a little bit more restricted for good reason, as we will see. Please be aware, that the Stream Deck Actions automatically adopts to the currently active controller actions, so conventional switching of profiles on the Stream Deck is not necessary as with usual Stream Deck profiles.
 
-Hint: Do you want to automatically switch to this profile, when Simulator Controller starts up? Easy to achieve, if you start "Simulator Startup" from the Stream Deck itself. Simply use a multi action and switch to the profile just before start "Simulator Startup".
+Hint: Do you want to automatically switch to the created profile, when Simulator Controller starts up? Easy to achieve, if you start "Simulator Startup" from the Stream Deck itself. Simply use a multi action and switch to the profile just before start "Simulator Startup".
 
-Then you have to create "Stream Deck Configuration.ini" file similar to the example above and save it to the *Simulator Controller\Config* folder in your user *Documents* folder. For each button in the profile you can define the default icon to be shown on the Stream Deck and whether textual labels should be shown on the Stream Deck buttons as well. The value for the optional *[layout].Button.X.Label* property may be *false* (no label), true (default; use the action label from the [labels defined in the general configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins)) or you can supply a fixed text here (you can use "\n" to start a new line in the text value). To supply an icon using the optional *[layout].Button.X.Icon*, use a full path to an image file supported by Stream Deck. Here you can also use *false* to specify that you never want to change the icon on the Stream Deck, or *true* (which is the default), if the [icon from general configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) should by used for the associated controller action, if one is available.
+After you have setup your Stream Deck profile(s) you have to create "Stream Deck Configuration.ini" file similar to the example above and save it to the *Simulator Controller\Config* folder in your user *Documents* folder. In the "Layouts" section you describe the layout for one or more profiles on one or more connected Stream Deck. The *...Grid* property is simply ignored during runtime, but will be used by the editor to select between a graphical Mini, Standard oder XL layout. Please note, that only "Button.X" function descriptors may be used and that you can leave positions blank.
 
-With the *...Mode* property you can define for a button, which layers should be dsiplayed on the Stream Deck. *IconOrLabel*, which is the default, means that the icon is displayed without a label, if an icon is availabel. Other values for this property are *Icon* (only an icon or nothing is displayed), *Label* (only a label or nothing is displayed), or *IconAndLabel*, which means, that both an icon and a label will be displayed. As you can see in the example above, you can declare exceptions from the default *Mode* using the *...Mode.Icon.XX* property, if necessary. Using this exception rule, you can define the *Mode* per icon and button seperately, which can get quite excessive, but it will give you very nice results on the Stream Deck. As you can also see in the example, you can also declare a mode for an icon independent of a specific button, but a button specific declaration always takes precedence. You can also use a "*" here for the layout name. This defines a rule with the lowest priority, which, however, applies to every layout.
+Then you describe each button in the profile in the "Buttons" section. A default icon can be configured to be shown on the Stream Deck and whether textual labels should be shown on the Stream Deck buttons as well. The value for the optional *[layout].Button.X.Label* property may be *false* (no label at all), true (default; use the action label from the [labels defined in the plugin configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins)) or you can supply a fixed text here (you can use "\n" to start a new line in the text value). To supply an icon using the optional *[layout].Button.X.Icon*, use a full path to an image file supported by Stream Deck. Here you can also use *false* to specify that you never want to show an icon on the Stream Deck for this button, or *true* (which is the default), if the [icon from plugin configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) should by used for the associated controller action, if one is available.
+
+With the *...Mode* property you can define for a button, which layers should be displayed on the Stream Deck. *IconOrLabel*, which is the default, means that the icon is displayed without a label, if an icon is available, otherwise the label will be displayed. Other values for this property are *Icon* (only an icon or nothing is displayed), *Label* (only a label or nothing is displayed), or *IconAndLabel*, which means, that both an icon and a label will be displayed. As you can see in the example above, you can declare exceptions from the default *Mode* for specific icons using the *...Mode.Icon.XX* property, if necessary. Using this exception rule, you specify the *Mode* per icon and button seperately, which can get quite excessive, but it will give you very nice results on the Stream Deck. As you can also see in the example, you can also declare a mode for an icon independent of a specific button in the "Icons" section , but a button specific declaration always takes precedence. You can also use a "*" here for the layout name. This defines a rule with the lowest priority, which, however, applies to every layout.
 
 Example: In the above example, all "Stream Deck" Actions will use the icons for the currently associated controller action as defined in the "Controller Action Icons.XX" file. Please note, that you can omit the declaration "...Label=true", since this is the default. If an icon is available, the label will not be shown (except for Button.2, where an exception rule exists for the "Gear" and "Flash" icon). Only the first two rows of the Stream Deck are used here for controller actions, whereas in the "Stream Deck Mini" only the first button in the top row is configured with a fixed icon and label.
 
 To activate your Stream Deck configuration, you then must open "Simulator Configuration" and create a new entry in the upper list of the "Controller" tab and associate this new controller with one of the Stream Deck layouts. Done...
 
-As mentioned above, you can associate an an image for each and every different controller action to display on the Stream Deck, as long as this action is associated with the corresponding button. Please note, that there is no configuration support yet, you have to create the necessary configuration file with a text editor. The file is named "Controller Action Icons.XX" (with *XX* substituted by the language code, for example "EN"). This file must be placed in *Simulator Controller\Translations* folder in your user *Documents* folder and has the following format:
+Let's now take a look at the graphical editor. Using the same editor introduced for Button Box Layouts above, you can create a layout entry in the "Layouts" list and select "Stream Deck" in the layout type drop down menu. The layout section of the Controller Layout Editor now should look like this:
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Stream%20Deck%20Editor%201.JPG)
+
+As you can see, this is very simple compared to the layout section for Button Boxes, since the layout on a Stream Deck is fixed for obvious reasons. You simply have to select the Stream Deck layout (one of "Mini", "Standard" and "XL" corresponding to a 2 x 3, 3 x 5 or 4 x 8 button grid). After you have saved the layout a graphical representation of this type of Stream Deck appears, where you can configure the buttons.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Stream%20Deck%20Editor%202.JPG)
+
+Using the context menu for each button, you can specify almost any of the options described above, except the button specific icon exception rules.
+
+The layout or generic icon specific exception rules may be edited using the following window, which opens, when you click on the "Edit Display Rules..." button.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Stream%20Deck%20Editor%203.JPG)
+
+You can select with the drop down menu in the upper area, whether the exceptions apply to the currently edited Stream Deck layout from the "Layouts" list or whether they might apply to all Stream Deck layouts.
+
+Please note, that the order of rules applied goes from the most specific rules for 1. specific button of a given layout, 2. button and icon specific exceptions of a given layout, to 3. icon, but not button specific exceptions for a given layout to the 4. layout unspefific exceptions of a given icon. Sorry for that, maybe you never will use this stuff, but it's good that it's there, if you ever need it.
+
+## Action Labels & Icons
+
+As mentioned above, you can associate a label and an image for each and every different controller action to display on your controller (labels for the Button Box visual representations or labels and icons on the Stream Deck), as long as this action is associated with the corresponding controller function. Labels are stored in a language specific configuration file named "Controller Action Labels.XX" and icon references are stored in a file named "Controller Action Icons.XX" (with *XX* substituted by the language code, for example "EN"). Thes file must be placed in *Simulator Controller\Translations* folder in your user *Documents* folder and has the following formats:
+
+1. Controller Action Labels.XX
+
+	[Tactile Feedback]
+	TC.Dial=TC
+	TC.Increase=Increase\nTC
+	TC.Decrease=Decrease\nTC
+	ABS.Dial=ABS
+	ABS.Increase=Increase\nABS
+	ABS.Decrease=Decrease\nABS
+	...
+
+Please note, that you can start new lines in the label using **\n**.
+
+2. Controller Action Icons.XX
 
 	[Tactile Feedback]
 	TC.Increase=D:\Dateien\Bilder\Simulator Icons\ButtonDeck\TC+.jpg
@@ -449,4 +491,8 @@ As mentioned above, you can associate an an image for each and every different c
 
 In this example, four icons will be displayed on the Stream Deck for increasing and decreasing the pedal vibration for traction control and ABS effects. You can to edit the definition file in the ["Plugins" tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) of the "Simulator Configuration" tool, as mentioned above. There are a lot of icons for the Stream Deck available out there, for example [this one](https://www.racedepartment.com/downloads/buttondeck-for-stream-deck.24348/) or the icons from the collection of iEnki in the **#share-your-mods** channel on our [Discord](https://discord.gg/5N8JrNr48H), and I will also build an icon collection during the next releases.
 
-More to come in the next releases, incl. a graphical editor for all action icons and support in the "Simulator Setup"...
+As you expect, there is a graphical tool to edit this language specific configuration files:
+
+Simulator Controller comes with preconfigured labels for all supported languages, but you may have to create your own icon definitions.
+
+Note: This editor can be opened from the ["Plugins" tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) of the configuration tool.

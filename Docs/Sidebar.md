@@ -22,8 +22,10 @@
 	- [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-strategist)
   - [Themes Editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#themes-editor)
   - [Translations Editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#translations-editor)
-  - [Button Box Layouts](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#button-box-layouts)
-  - [Stream Deck Layouts](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#stream-deck-layouts)
+  - [Controller Layout Editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#controller-layout-editor)
+	- [Button Box Layouts](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#button-box-layouts)
+	- [Stream Deck Layouts](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#stream-deck-layouts)
+	- [Action Labels & Icons]()
 
 [Using Simulator Controller](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller)
 ------

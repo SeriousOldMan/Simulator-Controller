@@ -439,23 +439,6 @@ class ButtonBoxPreview extends ControllerPreview {
 		}
 	}
 	
-	resetLabels() {
-		local function
-		
-		Loop % this.Rows
-		{
-			row := A_Index
-			
-			Loop % this.Columns
-			{
-				function := this.getFunction(row, A_Index)
-				
-				if function
-					this.setLabel(row, A_Index, ConfigurationItem.splitDescriptor(function)[2])
-			}	
-		}
-	}
-	
 	controlClick(element, row, column, isEmpty) {
 		local function
 		

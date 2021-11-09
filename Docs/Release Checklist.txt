@@ -23,6 +23,7 @@ Release 3.6.8 Checklist
 0. Search for new links (*)
 1.Update Procedure
   a. Translations
+  b. Rename "Button Box" to "Controller" in Setup.data
 2. New Actions Editor
   a. Documentation & Images
 3. Refactored ButtonBoxEditor
@@ -32,6 +33,8 @@ Release 3.6.8 Checklist
 4. New Stream Deck mode in Controller Editor
   a. Documentation
   b. Doc Images
+5. Rename "Button Box" to "Controller" in "Simulator Setup"
+  a. Update in Setup.data
 
 Release 3.6.6 Checklist
 =======================

@@ -9,7 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include Libraries\ButtonBoxStepWizard.ahk
+#Include Libraries\ControllerStepWizard.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -39,7 +39,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		Get {
 			wizard := this.SetupWizard
 
-			if (wizard.isModuleSelected("Button Box") && wizard.isModuleSelected("Motion Feedback"))
+			if (wizard.isModuleSelected("Controller") && wizard.isModuleSelected("Motion Feedback"))
 				return 1
 			else
 				return 0
@@ -290,7 +290,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		column := false
 		
 		if (motionIntensityField != "")
-			for ignore, preview in this.ButtonBoxPreviews
+			for ignore, preview in this.ControllerPreviews
 				if preview.findFunction(motionIntensityField, row, column) {
 					preview.setLabel(row, column, translate("Motion Intensity"))
 					
@@ -298,7 +298,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 				}
 		
 		if (effectSelectorField != "")
-			for ignore, preview in this.ButtonBoxPreviews
+			for ignore, preview in this.ControllerPreviews
 				if preview.findFunction(effectSelectorField, row, column) {
 					preview.setLabel(row, column, translate("Effect Selector"))
 					
@@ -306,7 +306,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 				}
 		
 		if (effectIntensityField != "")
-			for ignore, preview in this.ButtonBoxPreviews
+			for ignore, preview in this.ControllerPreviews
 				if preview.findFunction(effectIntensityField, row, column) {
 					preview.setLabel(row, column, translate("Effect Intensity"))
 					
@@ -471,11 +471,11 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 			this.SetupWizard.removeModuleStaticFunction("Motion Feedback", function)
 	}
 	
-	loadButtonBoxLabels() {
+	loadControllerLabels() {
 		local function
 		local action
 		
-		base.loadButtonBoxLabels()
+		base.loadControllerLabels()
 		
 		wizard := this.SetupWizard
 		window := this.Window
@@ -490,7 +490,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		column := false
 		
 		if (motionIntensityField != "")
-			for ignore, preview in this.ButtonBoxPreviews {
+			for ignore, preview in this.ControllerPreviews {
 				mode := preview.Mode
 			
 				if (((mode == true) || (mode = "Motion")) && preview.findFunction(motionIntensityField, row, column)) {
@@ -501,7 +501,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 			}
 		
 		if (effectSelectorField != "")
-			for ignore, preview in this.ButtonBoxPreviews {
+			for ignore, preview in this.ControllerPreviews {
 				mode := preview.Mode
 			
 				if (((mode == true) || (mode = "Motion")) && preview.findFunction(effectSelectorField, row, column)) {
@@ -512,7 +512,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 			}
 		
 		if (effectIntensityField != "")
-			for ignore, preview in this.ButtonBoxPreviews {
+			for ignore, preview in this.ControllerPreviews {
 				mode := preview.Mode
 			
 				if (((mode == true) || (mode = "Motion")) && preview.findFunction(effectIntensityField, row, column)) {
@@ -608,7 +608,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 			}
 		}
 		
-		this.loadButtonBoxLabels()
+		this.loadControllerLabels()
 			
 		LV_ModifyCol(1, "AutoHdr")
 		LV_ModifyCol(2, "AutoHdr")
@@ -682,7 +682,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 			cRow := false
 			cColumn := false
 			
-			for ignore, bbPreview in this.ButtonBoxPreviews
+			for ignore, bbPreview in this.ControllerPreviews
 				if bbPreview.findFunction(motionIntensityField, cRow, cColumn) {
 					this.clearMotionIntensityDial(preview, motionIntensityField
 												, ConfigurationItem.descriptor("Ignore", ConfigurationItem.splitDescriptor(motionIntensityField)[2])
@@ -698,7 +698,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		
 		SoundPlay %kResourcesDirectory%Sounds\Activated.wav
 		
-		this.loadButtonBoxLabels()
+		this.loadControllerLabels()
 	}
 			
 	clearMotionIntensityDial(preview, function, control, row, column, sound := true) {
@@ -713,7 +713,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		if sound
 			SoundPlay %kResourcesDirectory%Sounds\Activated.wav
 		
-		this.loadButtonBoxLabels()
+		this.loadControllerLabels()
 	}
 	
 	setEffectSelector(preview, function, control, row, column) {
@@ -727,7 +727,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 			cRow := false
 			cColumn := false
 			
-			for ignore, bbPreview in this.ButtonBoxPreviews
+			for ignore, bbPreview in this.ControllerPreviews
 				if bbPreview.findFunction(effectSelectorField, cRow, cColumn) {
 					this.clearEffectSelector(preview, effectSelectorField
 										   , ConfigurationItem.descriptor("Ignore", ConfigurationItem.splitDescriptor(effectSelectorField)[2])
@@ -743,7 +743,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		
 		SoundPlay %kResourcesDirectory%Sounds\Activated.wav
 		
-		this.loadButtonBoxLabels()
+		this.loadControllerLabels()
 	}
 			
 	clearEffectSelector(preview, function, control, row, column, sound := true) {
@@ -758,7 +758,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		if sound
 			SoundPlay %kResourcesDirectory%Sounds\Activated.wav
 		
-		this.loadButtonBoxLabels()
+		this.loadControllerLabels()
 	}
 	
 	setEffectIntensityDial(preview, function, control, row, column) {
@@ -772,7 +772,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 			cRow := false
 			cColumn := false
 			
-			for ignore, bbPreview in this.ButtonBoxPreviews
+			for ignore, bbPreview in this.ControllerPreviews
 				if bbPreview.findFunction(effectIntensityField, cRow, cColumn) {
 					this.clearEffectIntensityDial(preview, effectIntensityField
 												, ConfigurationItem.descriptor("Ignore", ConfigurationItem.splitDescriptor(effectIntensityField)[2])
@@ -788,7 +788,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		
 		SoundPlay %kResourcesDirectory%Sounds\Activated.wav
 		
-		this.loadButtonBoxLabels()
+		this.loadControllerLabels()
 	}
 			
 	clearEffectIntensityDial(preview, function, control, row, column, sound := true) {
@@ -803,7 +803,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		if sound
 			SoundPlay %kResourcesDirectory%Sounds\Activated.wav
 		
-		this.loadButtonBoxLabels()
+		this.loadControllerLabels()
 	}
 	
 	toggleState(row) {

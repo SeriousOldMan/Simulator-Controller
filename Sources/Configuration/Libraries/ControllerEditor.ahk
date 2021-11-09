@@ -1465,6 +1465,27 @@ class ControllerPreview extends ConfigurationItem {
 		return false
 	}
 	
+	resetLabels() {
+		local function
+		
+		Loop % this.Rows
+		{
+			row := A_Index
+			
+			Loop % this.Columns
+			{
+				function := this.getFunction(row, A_Index)
+				
+				if function
+					this.setLabel(row, A_Index, ConfigurationItem.splitDescriptor(function)[2])
+			}	
+		}
+	}
+	
+	setLabel(row, column, text) {
+		Throw "Virtual method ControllerPreview.setLabel must be implemented in a subclass..."
+	}
+	
 	open() {
 		width := this.Width
 		height := this.Height
@@ -1716,6 +1737,8 @@ class DisplayRulesList extends ConfigurationItemList {
 	}
 	
 	loadList(items) {
+		local rule
+		
 		Gui ListView, % this.ListHandle
 	
 		LV_Delete()

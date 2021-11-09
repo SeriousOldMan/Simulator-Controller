@@ -234,6 +234,13 @@ class StreamDeckPreview extends ControllerPreview {
 		return (button ? ("Button." . button.Button) : false)
 	}
 	
+	setLabel(row, column, text) {
+		handle := this.iLabels[row][column]
+		
+		if handle
+			GuiControl Text, %handle%, %text%
+	}
+	
 	getControl(clickX, clickY, ByRef row, ByRef column, ByRef isEmpty) {
 		local function
 		

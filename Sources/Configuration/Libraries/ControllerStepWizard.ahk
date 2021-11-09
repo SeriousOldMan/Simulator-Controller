@@ -1,5 +1,5 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Button Box Step Wizard          ;;;
+;;;   Modular Simulator Controller System - Controller Step Wizard          ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2021) Creative Commons - BY-NC-SA                        ;;;
@@ -17,36 +17,34 @@ global vCurrentRegistrationWizard = false
 ;;;-------------------------------------------------------------------------;;;
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; ButtonBoxStepWizard                                                     ;;;
+;;; ControllerStepWizard                                                    ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class ButtonBoxStepWizard extends StepWizard {
-	iButtonBoxEditor := false
+class ControllerStepWizard extends StepWizard {
+	iControllerEditor := false
 	
 	iFunctionsListView := false
 	
 	iFunctionTriggers := {}
 		
-	class StepButtonBoxEditor extends ButtonBoxEditor {
-		configurationChanged(name) {
-			base.configurationChanged(name)
+	class StepControllerEditor extends ControllerEditor {
+		configurationChanged(type, name) {
+			base.configurationChanged(type, name)
 			
-			configuration := newConfiguration()
+			bbConfiguration := newConfiguration()
+			sdConfiguration := newConfiguration()
 			
-			this.saveToConfiguration(configuration)
+			this.saveToConfiguration(bbConfiguration, sdConfiguration)
 			
-			writeConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini", configuration)
+			writeConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini", bbConfiguration)
+			writeConfiguration(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini", sdConfiguration)
 			
-			protectionOn()
-	
 			oldGui := A_DefaultGui
 			
 			try {
-				SetupWizard.Instance.StepWizards["Button Box"].loadFunctions(configuration)
+				SetupWizard.Instance.StepWizards["Controller"].loadFunctions(bbConfiguration, sdConfiguration)
 			}
 			finally {
-				protectionOff()
-				
 				Gui %oldGui%:Default
 			}
 		}
@@ -54,7 +52,7 @@ class ButtonBoxStepWizard extends StepWizard {
 	
 	Pages[] {
 		Get {
-			return (this.SetupWizard.isModuleSelected("Button Box") ? 1 : 0)
+			return (this.SetupWizard.isModuleSelected("Controller") ? 1 : 0)
 		}
 	}
 	
@@ -64,7 +62,7 @@ class ButtonBoxStepWizard extends StepWizard {
 		controllerConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
 		wizard := this.SetupWizard
 		
-		if wizard.isModuleSelected("Button Box") {
+		if wizard.isModuleSelected("Controller") {
 			controls := {}
 			controllers := []
 			
@@ -136,9 +134,9 @@ class ButtonBoxStepWizard extends StepWizard {
 		
 		Gui %window%:Font, s8 Norm, Arial
 		
-		Gui Add, ListView, x%x% yp+30 w%width% h240 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDfunctionsListViewHandle gupdateFunctionTriggers Hidden, % values2String("|", map(["Controller / Button Box", "Control", "Function", "Number", "Trigger(s)", "Hints & Conflicts"], "translate")*)
+		Gui Add, ListView, x%x% yp+30 w%width% h240 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDfunctionsListViewHandle gupdateFunctionTriggers Hidden, % values2String("|", map(["Controller", "Control", "Function", "Number", "Trigger(s)", "Hints & Conflicts"], "translate")*)
 		
-		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Button Box", "Button Box.Functions.Info." . getLanguage()))
+		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Controller", "Controller.Functions.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
 		
 		Sleep 200
@@ -161,10 +159,10 @@ class ButtonBoxStepWizard extends StepWizard {
 		this.iFunctionsListView := false
 		this.iFunctionTriggers := {}
 		
-		if this.iButtonBoxEditor {
-			this.iButtonBoxEditor.close(true)
+		if this.iControllerEditor {
+			this.iControllerEditor.close(true)
 			
-			this.iButtonBoxEditor := false
+			this.iControllerEditor := false
 		}		
 	}
 	
@@ -173,18 +171,25 @@ class ButtonBoxStepWizard extends StepWizard {
 		
 		if !FileExist(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
 			FileCopy %kResourcesDirectory%Setup\Button Box Configuration.ini, %kUserHomeDirectory%Setup\Button Box Configuration.ini
+		
+		if !FileExist(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
+			FileCopy %kResourcesDirectory%Setup\Stream Deck Configuration.ini, %kUserHomeDirectory%Setup\Stream Deck Configuration.ini
 			
-		this.iButtonBoxEditor := new this.StepButtonBoxEditor("Default", this.SetupWizard.Configuration, kUserHomeDirectory . "Setup\Button Box Configuration.ini", false)
+		this.iControllerEditor := new this.StepControllerEditor("Default", this.SetupWizard.Configuration
+															  , kUserHomeDirectory . "Setup\Button Box Configuration.ini"
+															  , kUserHomeDirectory . "Setup\Stream Deck Configuration.ini", false)
 		
-		this.iButtonBoxEditor.open(Min(A_ScreenWidth - Round(A_ScreenWidth / 3) + Round(A_ScreenWidth / 3 / 2) - 225, A_ScreenWidth - 450))
+		this.iControllerEditor.open(Min(A_ScreenWidth - Round(A_ScreenWidth / 3) + Round(A_ScreenWidth / 3 / 2) - 225, A_ScreenWidth - 450))
 		
-		this.loadFunctions(readConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini"), true)
+		this.loadFunctions(readConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
+						 , readConfiguration(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini"), true)
 	}
 	
 	hidePage(page) {
-		configuration := readConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
+		buttonBoxConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
+		streamDeckConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
 		
-		if (this.conflictingFunctions(configuration) || this.conflictingTriggers(configuration)) {
+		if (this.conflictingFunctions(buttonBoxConfiguration) || this.conflictingTriggers(buttonBoxConfiguration)) {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 			title := translate("Modular Simulator Controller System")
 			MsgBox 262160, %title%, % translate("There are still duplicate functions or duplicate triggers - please correct...")
@@ -209,11 +214,11 @@ class ButtonBoxStepWizard extends StepWizard {
 		}
 		
 		if base.hidePage(page) {
-			this.iButtonBoxEditor.close(true)
+			this.iControllerEditor.close(true)
 			
-			this.iButtonBoxEditor := false
+			this.iControllerEditor := false
 		
-			this.SetupWizard.setControllerFunctions(this.controllerFunctions(configuration))
+			this.SetupWizard.setControllerFunctions(this.controllerFunctions(buttonBoxConfiguration, streamDeckConfiguration))
 			
 			return true
 		}
@@ -221,19 +226,19 @@ class ButtonBoxStepWizard extends StepWizard {
 			return false
 	}
 	
-	controllerFunctions(configuration) {
+	controllerFunctions(buttonBoxConfiguration, streamDeckConfiguration) {
 		local function
 		
 		controls := {}
 		functions := {}
 		
-		for control, descriptor in getConfigurationSectionValues(configuration, "Controls")
+		for control, descriptor in getConfigurationSectionValues(buttonBoxConfiguration, "Controls")
 			controls[control] := string2Values(";", descriptor)[1]
 		
-		for controller, definition in getConfigurationSectionValues(configuration, "Layouts") {
+		for controller, definition in getConfigurationSectionValues(buttonBoxConfiguration, "Layouts") {
 			controller := ConfigurationItem.splitDescriptor(controller)
 		
-			if ((controller[2] != "Layout") && (controller[2] != "Visible")) {
+			if ((controller[2] != "Layout") && (controller[2] != "Visible"))
 				for ignore, function in string2Values(";", definition) {
 					function := string2Values(",", function)[1]
 					function := ConfigurationItem.splitDescriptor(function)
@@ -245,23 +250,31 @@ class ButtonBoxStepWizard extends StepWizard {
 						else
 							functions.Push(function)
 				}
-			}
+		}
+		
+		for controller, definition in getConfigurationSectionValues(streamDeckConfiguration, "Layouts") {
+			controller := ConfigurationItem.splitDescriptor(controller)
+		
+			if ((controller[2] != "Layout") && (controller[2] != "Visible"))
+				for ignore, function in string2Values(";", definition)
+					if (function != "")
+						functions.Push(function)
 		}
 				
 		return functions
 	}
 	
-	conflictingFunctions(configuration) {
+	conflictingFunctions(buttonBoxConfiguration) {
 		local function
 		
 		controls := {}
 		functions := {}
 		conflict := false
 		
-		for control, descriptor in getConfigurationSectionValues(configuration, "Controls")
+		for control, descriptor in getConfigurationSectionValues(buttonBoxConfiguration, "Controls")
 			controls[control] := string2Values(";", descriptor)[1]
 		
-		for controller, definition in getConfigurationSectionValues(configuration, "Layouts") {
+		for controller, definition in getConfigurationSectionValues(buttonBoxConfiguration, "Layouts") {
 			controller := ConfigurationItem.splitDescriptor(controller)
 		
 			if ((controller[2] != "Layout") && (controller[2] != "Visible")) {
@@ -289,7 +302,7 @@ class ButtonBoxStepWizard extends StepWizard {
 		return (conflict ? functions : false)
 	}
 	
-	conflictingTriggers(configuration) {
+	conflictingTriggers(buttonBoxConfiguration) {
 		local function
 		
 		triggers := {}
@@ -308,12 +321,12 @@ class ButtonBoxStepWizard extends StepWizard {
 		return (conflict ? triggers : false)
 	}
 	
-	loadFunctions(configuration, load := false) {
+	loadFunctions(buttonBoxConfiguration, streamDeckConfiguration, load := false) {
 		local function
 		
 		controls := {}
 		
-		for control, descriptor in getConfigurationSectionValues(configuration, "Controls")
+		for control, descriptor in getConfigurationSectionValues(buttonBoxConfiguration, "Controls")
 			controls[control] := string2Values(";", descriptor)[1]
 		
 		window := this.Window
@@ -330,10 +343,10 @@ class ButtonBoxStepWizard extends StepWizard {
 		
 		lastController := false
 		
-		functionConflicts := this.conflictingFunctions(configuration)
-		triggerConflicts := this.conflictingTriggers(configuration)
+		functionConflicts := this.conflictingFunctions(buttonBoxConfiguration)
+		triggerConflicts := this.conflictingTriggers(buttonBoxConfiguration)
 		
-		for controller, definition in getConfigurationSectionValues(configuration, "Layouts") {
+		for controller, definition in getConfigurationSectionValues(buttonBoxConfiguration, "Layouts") {
 			controller := ConfigurationItem.splitDescriptor(controller)
 		
 			if ((controller[2] != "Layout") && (controller[2] != "Visible")) {
@@ -390,6 +403,22 @@ class ButtonBoxStepWizard extends StepWizard {
 				}
 			}
 		}
+		
+		for controller, definition in getConfigurationSectionValues(streamDeckConfiguration, "Layouts") {
+			controller := ConfigurationItem.splitDescriptor(controller)
+		
+			if ((controller[2] != "Layout") && (controller[2] != "Visible")) {
+				controller := controller[1]
+			
+				for ignore, function in string2Values(";", definition)
+					if (function != "") {
+						first := (controller != lastController)
+						lastController := controller
+						
+						LV_Add("", (first ? controller : ""), translate("Key"), translate("Button"), ConfigurationItem.splitDescriptor(function)[2], translate("n/a"), "")
+					}
+			}
+		}
 			
 		LV_ModifyCol(1, "AutoHdr")
 		LV_ModifyCol(2, "AutoHdr")
@@ -412,25 +441,29 @@ class ButtonBoxStepWizard extends StepWizard {
 		Gui %window%:Default
 		Gui ListView, % this.iFunctionsListView
 		
-		LV_GetText(type, row, 3)
-		LV_GetText(number, row, 4)
+		LV_GetText(trigger, row, 5)
 		
-		switch type {
-			case translate(k2WayToggleType):
-				callback := ObjBindMethod(this, "registerHotkey", k2WayToggleType . "." . number, row, true)
-			case translate(kDialType):
-				callback := ObjBindMethod(this, "registerHotkey", kDialType . "." . number, row, true)
-			case translate(k1WayToggleType):
-				callback := ObjBindMethod(this, "registerHotkey", k1WayToggleType . "." . number, row, false)
-			case translate(kButtonType):
-				callback := ObjBindMethod(this, "registerHotkey", kButtonType . "." . number, row, false)
+		if (trigger != translate("n/a")) {
+			LV_GetText(type, row, 3)
+			LV_GetText(number, row, 4)
+			
+			switch type {
+				case translate(k2WayToggleType):
+					callback := ObjBindMethod(this, "registerHotkey", k2WayToggleType . "." . number, row, true)
+				case translate(kDialType):
+					callback := ObjBindMethod(this, "registerHotkey", kDialType . "." . number, row, true)
+				case translate(k1WayToggleType):
+					callback := ObjBindMethod(this, "registerHotkey", k1WayToggleType . "." . number, row, false)
+				case translate(kButtonType):
+					callback := ObjBindMethod(this, "registerHotkey", kButtonType . "." . number, row, false)
+			}
+			
+			this.iTriggerModeActive := true
+			
+			wizard.toggleTriggerDetector(callback)
+			
+			SetTimer stopTriggerDetector, 100
 		}
-		
-		this.iTriggerModeActive := true
-		
-		wizard.toggleTriggerDetector(callback)
-		
-		SetTimer stopTriggerDetector, 100
 	}
 	
 	registerHotKey(function, row, firstHotkey, hotkey) {
@@ -464,7 +497,8 @@ class ButtonBoxStepWizard extends StepWizard {
 		
 		wizard.toggleTriggerDetector()
 		
-		this.loadFunctions(readConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini"))
+		this.loadFunctions(readConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
+						 , readConfiguration(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini"))
 		
 		window := this.Window
 		
@@ -476,36 +510,36 @@ class ButtonBoxStepWizard extends StepWizard {
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; ButtonoxPreviewStepWizard                                               ;;;
+;;; ControllerPreviewStepWizard                                             ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class ButtonBoxPreviewStepWizard extends StepWizard {
-	iButtonBoxPreviews := []
-	iButtonBoxPreviewCenterY := 0
+class ControllerPreviewStepWizard extends StepWizard {
+	iControllerPreviews := []
+	iControllerPreviewCenterY := 0
 	
-	ButtonBoxPreviews[] {
+	ControllerPreviews[] {
 		Get {
-			return this.iButtonBoxPreviews
+			return this.iControllerPreviews
 		}
 	}
 	
 	reset() {
 		base.reset()
 		
-		this.closeButtonBoxes()
+		this.closeControllerPreviews()
 	}
 	
 	showPage(page) {
 		base.showPage(page)
 		
-		if this.SetupWizard.isModuleSelected("Button Box")
-			this.openButtonBoxes()
+		if this.SetupWizard.isModuleSelected("Controller")
+			this.openControllerPreviews()
 	}
 	
 	hidePage(page) {
 		if base.hidePage(page) {
-			if this.SetupWizard.isModuleSelected("Button Box")
-				this.closeButtonBoxes()
+			if this.SetupWizard.isModuleSelected("Controller")
+				this.closeControllerPreviews()
 			
 			return true
 		}
@@ -515,73 +549,85 @@ class ButtonBoxPreviewStepWizard extends StepWizard {
 	
 	getPreviewCenter(ByRef centerX, ByRef centerY) {
 		centerX := false
-		centerY := this.iButtonBoxPreviewCenterY
+		centerY := this.iControllerPreviewCenterY
 	}
 	
 	getPreviewMover() {
 		return false
 	}
 	
-	createButtonBoxPreview(controller, configuration) {
-		return new ButtonBoxPreview(this, controller, configuration)
+	createControllerPreview(type, controller, configuration) {
+		if (type = "Button Box")
+			return new ButtonBoxPreview(this, controller, configuration)
+		else
+			return new StreamDeckPreview(this, controller, configuration)
 	}
 	
-	openButtonBoxes() {
+	openControllerPreviews() {
 		local function
 		
-		if this.SetupWizard.isModuleSelected("Button Box") {
-			configuration := readConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
-			
+		if this.SetupWizard.isModuleSelected("Controller") {
 			staticFunctions := this.SetupWizard.getModuleStaticFunctions()
 			controllers := []
+			
+			configuration := readConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
 			
 			for controller, definition in getConfigurationSectionValues(configuration, "Layouts") {
 				controller := ConfigurationItem.splitDescriptor(controller)
 			
 				if !inList(controllers, controller[1])
-					controllers.Push(controller[1])
+					controllers.Push(Array("Button Box", controller[1]))
+			}
+			
+			configuration := readConfiguration(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
+			
+			for controller, definition in getConfigurationSectionValues(configuration, "Layouts") {
+				controller := ConfigurationItem.splitDescriptor(controller)
+			
+				if !inList(controllers, controller[1])
+					controllers.Push(Array("Stream Deck", controller[1]))
 			}
 			
 			for index, controller in controllers {
-				preview := this.createButtonBoxPreview(controller, configuration)
+				preview := this.createControllerPreview(controller[1], controller[2], configuration)
 			
 				preview.setControlClickHandler(ObjBindMethod(this, "controlClick"))
 			
 				if (index = 1) {
 					SysGet mainScreen, MonitorWorkArea
 					
-					this.iButtonBoxPreviewCenterY := (mainScreenBottom - Round(preview.Height / 2))
+					this.iControllerPreviewCenterY := (mainScreenBottom - Round(preview.Height / 2))
 				}
 				else
-					this.iButtonBoxPreviewCenterY -= Round(preview.Height / 2)
+					this.iControllerPreviewCenterY -= Round(preview.Height / 2)
 				
 				preview.open()
 				
-				this.iButtonBoxPreviewCenterY -= Round(preview.Height / 2)
-				this.iButtonBoxPreviews.Push(preview)
+				this.iControllerPreviewCenterY -= Round(preview.Height / 2)
+				this.ControllerPreviews.Push(preview)
 			}
 			
-			this.loadButtonBoxLabels()
+			this.loadControllerLabels()
 		}
 		else
-			this.iButtonBoxPreviews := []
+			this.iControllerPreviews := []
 	}
 	
-	closeButtonBoxes() {
-		for ignore, preview in this.ButtonBoxPreviews
+	closeControllerPreviews() {
+		for ignore, preview in this.ControllerPreviews
 			preview.close()
 		
-		this.iButtonBoxPreviews := []
-		this.iButtonBoxPreviewCenterY := 0
+		this.iControllerPreviews := []
+		this.iControllerPreviewCenterY := 0
 	}
 	
-	loadButtonBoxLabels() {
+	loadControllerLabels() {
 		local function
 		
 		row := false
 		column := false
 		
-		for ignore, preview in this.ButtonBoxPreviews {
+		for ignore, preview in this.ControllerPreviews {
 			preview.resetLabels()
 				
 			for ignore, function in this.SetupWizard.getModuleStaticFunctions()
@@ -591,7 +637,7 @@ class ButtonBoxPreviewStepWizard extends StepWizard {
 	}
 	
 	controlClick(preview, element, function, row, column, isEmpty) {
-		Throw "Virtual method ButtonBoxPreviewStepWizard.controlClick must be implemented by a subclass..."
+		Throw "Virtual method ControllerPreviewStepWizard.controlClick must be implemented by a subclass..."
 	}
 }
 
@@ -599,7 +645,7 @@ class ButtonBoxPreviewStepWizard extends StepWizard {
 ;;; ActionsStepWizard                                                       ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
+class ActionsStepWizard extends ControllerPreviewStepWizard {
 	iPendingFunctionRegistration := false
 	iPendingActionRegistration := false
 	
@@ -656,7 +702,57 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 			
 			modes.InsertAt(1, translate("All Modes"))
 			
-			Gui %window%:Add, DropDownList, x8 y8 w82 Choose1 HWNDmodeDropDownHandle gupdateButtonBoxLabels, % values2String("|", modes*)
+			Gui %window%:Add, DropDownList, x8 y8 w82 Choose1 HWNDmodeDropDownHandle gupdateControllerLabels, % values2String("|", modes*)
+			
+			this.iModeDropDownHandle := modeDropDownHandle
+		}
+	}
+	
+	class ActionsStreamDeckPreview extends StreamDeckPreview {
+		iModeDropDownHandle := false
+		
+		iModes := []
+		
+		Mode[] {
+			Get {
+				GuiControlGet mode, , % this.iModeDropDownHandle
+				
+				if (mode == translate("All Modes"))
+					return true
+				else if (mode == translate("Independent"))
+					return false
+				else
+					for ignore, candidate in this.iModes
+						if (mode = translate(candidate))
+							return candidate
+		
+				return true
+			}
+		}	
+		
+		__New(previewManager, name, configuration, modes) {
+			this.iModes := modes
+			
+			base.__New(previewManager, name, configuration)
+		}
+		
+		createGui(configuration) {
+			base.createGui(configuration)
+			
+			window := this.Window
+			
+			modeDropDownHandle := false
+			modes := []
+			
+			for ignore, mode in this.iModes
+				if mode
+					modes.Push(translate(mode))
+				else
+					modes.Push(translate("Independent"))
+			
+			modes.InsertAt(1, translate("All Modes"))
+			
+			Gui %window%:Add, DropDownList, x8 y8 w82 Choose1 HWNDmodeDropDownHandle gupdateControllerLabels, % values2String("|", modes*)
 			
 			this.iModeDropDownHandle := modeDropDownHandle
 		}
@@ -683,7 +779,7 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 		
 		base.showPage(page)
 		
-		if this.SetupWizard.isModuleSelected("Button Box")
+		if this.SetupWizard.isModuleSelected("Controller")
 			this.loadActions(true)
 		else
 			GuiControl Hide, % this.ActionsListView
@@ -693,7 +789,7 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 		if base.hidePage(page) {
 			vCurrentRegistrationWizard := false
 			
-			if this.SetupWizard.isModuleSelected("Button Box")
+			if this.SetupWizard.isModuleSelected("Controller")
 				this.saveActions()
 			
 			this.iPendingFunctionRegistration := false
@@ -850,22 +946,25 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 		this.iArguments := {}
 	}
 	
-	createButtonBoxPreview(controller, configuration) {
-		return new this.ActionsButtonBoxPreview(this, controller, configuration, this.getModes())
+	createControllerPreview(type, controller, configuration) {
+		if (type = "Button Box")
+			return new this.ActionsButtonBoxPreview(this, controller, configuration, this.getModes())
+		else
+			return new this.ActionsStreamDeckPreview(this, controller, configuration, this.getModes())
 	}
 	
-	openButtonBoxes() {
-		base.openButtonBoxes()
+	openControllerPreviews() {
+		base.openControllerPreviews()
 		
 		this.iPendingFunctionRegistration := false
 		this.iPendingActionRegistration := false
 	}
 	
-	loadButtonBoxLabels() {
+	loadControllerLabels() {
 		local function
 		local action
 		
-		base.loadButtonBoxLabels()
+		base.loadControllerLabels()
 		
 		module := this.getModule()
 		
@@ -873,7 +972,7 @@ class ActionsStepWizard extends ButtonBoxPreviewStepWizard {
 			row := false
 			column := false
 		
-			for ignore, preview in this.ButtonBoxPreviews {
+			for ignore, preview in this.ControllerPreviews {
 				targetMode := preview.Mode
 			
 				for ignore, mode in this.getModes()
@@ -1173,7 +1272,7 @@ updateActionFunction(wizard) {
 	Loop % LV_GetCount()
 		LV_Modify(A_Index, "-Select")
 	
-	if wizard.SetupWizard.isModuleSelected("Button Box") {
+	if wizard.SetupWizard.isModuleSelected("Controller") {
 		if ((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick")) {
 			if (A_EventInfo > 0) {
 				row := A_EventInfo
@@ -1198,8 +1297,8 @@ updateActionFunction(wizard) {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-updateButtonBoxLabels() {
-	SetupWizard.Instance.Step.loadButtonBoxLabels()
+updateControllerLabels() {
+	SetupWizard.Instance.Step.loadControllerLabels()
 }
 
 showSelectorHint() {
@@ -1231,7 +1330,7 @@ updateFunctionTriggers() {
 	
 	if (A_GuiEvent = "Normal") {
 		if (A_EventInfo > 0)
-			SetupWizard.Instance.StepWizards["Button Box"].updateFunctionTriggers(A_EventInfo)
+			SetupWizard.Instance.StepWizards["Controller"].updateFunctionTriggers(A_EventInfo)
 	}
 	else if (A_GuiEvent = "RightClick") {
 		if (A_EventInfo > 0) {
@@ -1263,7 +1362,7 @@ updateFunctionTriggers() {
 			multiple := ((function = translate(k2WayToggleType)) || (function = translate(kDialType)))
 			
 			menuItem := translate(multiple ? "Assign multiple Triggers" : "Assign Trigger")
-			handler := ObjBindMethod(SetupWizard.Instance.StepWizards["Button Box"], "updateFunctionTriggers", row)
+			handler := ObjBindMethod(SetupWizard.Instance.StepWizards["Controller"], "updateFunctionTriggers", row)
 			
 			Menu ContextMenu, Add, %menuItem%, %handler%
 			
@@ -1276,7 +1375,7 @@ updateFunctionTriggers() {
 }
 
 stopTriggerDetector() {
-	wizard := SetupWizard.Instance.StepWizards["Button Box"]
+	wizard := SetupWizard.Instance.StepWizards["Controller"]
 	
 	if (!wizard.iTriggerModeActive || !vShowTriggerDetector) {
 		SetTimer stopTriggerDetector, Off
@@ -1292,8 +1391,8 @@ stopTriggerDetector() {
 	}
 }
 
-initializeButtonBoxStepWizard() {
-	SetupWizard.Instance.registerStepWizard(new ButtonBoxStepWizard(SetupWizard.Instance, "Button Box", kSimulatorConfiguration))
+initializeControllerStepWizard() {
+	SetupWizard.Instance.registerStepWizard(new ControllerStepWizard(SetupWizard.Instance, "Controller", kSimulatorConfiguration))
 }
 
 
@@ -1301,4 +1400,4 @@ initializeButtonBoxStepWizard() {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-initializeButtonBoxStepWizard()
+initializeControllerStepWizard()

@@ -9,7 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include Libraries\ButtonBoxStepWizard.ahk
+#Include Libraries\ControllerStepWizard.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -31,7 +31,7 @@ global uiLanguageDropDown = ""
 global startWithWindowsCheck = 1
 global silentModeCheck = 1
 
-class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
+class GeneralStepWizard extends ControllerPreviewStepWizard {
 	iVoiceControlConfigurator := false
 	iModeSelectorsListHandle := false
 	iLaunchApplicationsListHandle := false
@@ -269,7 +269,10 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 		base.showPage(page)
 		
 		wizard := this.SetupWizard
-		
+		window := this.Window
+			
+		Gui %window%:Default
+			
 		wizard.getGeneralConfiguration(uiLanguage, startWithWindows, silentMode)
 		
 		for code, language in availableLanguages() {
@@ -321,7 +324,7 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 			for ignore, widget in this.iVoiceControlWidgets
 				GuiControl Hide, %widget%
 			
-		if this.SetupWizard.isModuleSelected("Button Box") {
+		if this.SetupWizard.isModuleSelected("Controller") {
 			listBox := this.iModeSelectorsListHandle
 			
 			GuiControl, , %listBox%, % "|" . values2String("|", this.iModeSelectors*)
@@ -359,7 +362,7 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 			
 			wizard.setGeneralConfiguration(languageCode, startWithWindowsCheck, silentModeCheck)
 			
-			if wizard.isModuleSelected("Button Box") {
+			if wizard.isModuleSelected("Controller") {
 				wizard.setModeSelectors(this.iModeSelectors)
 				
 				this.saveApplications()
@@ -430,7 +433,7 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 				}
 			}
 		
-		this.loadButtonBoxLabels()
+		this.loadControllerLabels()
 			
 		LV_ModifyCol(1, 120)
 		LV_ModifyCol(2, "AutoHdr")
@@ -441,19 +444,19 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 		this.SetupWizard.setLaunchApplicationLabelsAndFunctions(this.iLaunchApplications)
 	}
 	
-	loadButtonBoxLabels() {
+	loadControllerLabels() {
 		local application
 		local function
 		local action
 		
-		base.loadButtonBoxLabels()
+		base.loadControllerLabels()
 		
 		wizard := this.SetupWizard
 		
 		row := false
 		column := false
 		
-		for ignore, preview in this.ButtonBoxPreviews {
+		for ignore, preview in this.ControllerPreviews {
 			for ignore, section in string2Values(",", this.Definition[3])
 				for application, descriptor in getConfigurationSectionValues(wizard.Definition, section)
 					if wizard.isApplicationSelected(application) {
@@ -463,7 +466,7 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 							if (function != "") {
 								label := this.iLaunchApplications[application][1]
 					
-								for ignore, preview in this.ButtonBoxPreviews
+								for ignore, preview in this.ControllerPreviews
 									if preview.findFunction(function, row, column) {
 										preview.setLabel(row, column, (label != "") ? label : application)
 										
@@ -487,7 +490,7 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 			
 			this.SetupWizard.addModuleStaticFunction("System", function, translate("Mode Selector"))
 			
-			this.loadButtonBoxLabels()
+			this.loadControllerLabels()
 		}
 	}
 			
@@ -505,7 +508,7 @@ class GeneralStepWizard extends ButtonBoxPreviewStepWizard {
 			
 			this.SetupWizard.removeModuleStaticFunction("System", function)
 			
-			this.loadButtonBoxLabels()
+			this.loadControllerLabels()
 		}
 	}
 	
@@ -697,7 +700,7 @@ updateApplicationFunction() {
 	
 	if ((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick")) {
 		if (A_EventInfo > 0) {
-			if wizard.SetupWizard.isModuleSelected("Button Box") {
+			if wizard.SetupWizard.isModuleSelected("Controller") {
 				row := A_EventInfo
 				
 				if wizard.iPendingApplicationRegistration

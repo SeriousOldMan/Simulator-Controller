@@ -9,7 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include Libraries\ButtonBoxStepWizard.ahk
+#Include Libraries\ControllerStepWizard.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -23,7 +23,7 @@
 class AssistantsStepWizard extends ActionsStepWizard {
 	iCurrentAssistant := false
 	
-	iButtonBoxWidgets := []
+	iControllerWidgets := []
 	
 	iActionsListViews := []
 	iAssistantConfigurators := []
@@ -231,8 +231,8 @@ class AssistantsStepWizard extends ActionsStepWizard {
 				configurator.createGui(this, x, listY + 30, colWidth, height)
 			}
 			
-			this.iButtonBoxWidgets.Push(columnLabel1Handle)
-			this.iButtonBoxWidgets.Push(columnLine1Handle)
+			this.iControllerWidgets.Push(columnLabel1Handle)
+			this.iControllerWidgets.Push(columnLine1Handle)
 			
 			this.registerWidgets(page, actionsIconHandle, actionsLabelHandle, actionsListViewHandle, actionsInfoTextHandle, columnLabel1Handle, columnLine1Handle, columnLabel2Handle, columnLine2Handle)
 		}
@@ -250,7 +250,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 	reset() {
 		base.reset()
 		
-		this.iButtonBoxWidgets := []
+		this.iControllerWidgets := []
 		
 		this.iAssistantConfigurators := []
 		this.iActionsListViews := []
@@ -266,8 +266,8 @@ class AssistantsStepWizard extends ActionsStepWizard {
 		
 		base.showPage(page)
 		
-		if !this.SetupWizard.isModuleSelected("Button Box")
-			for ignore, widget in this.iButtonBoxWidgets
+		if !this.SetupWizard.isModuleSelected("Controller")
+			for ignore, widget in this.iControllerWidgets
 				GuiControl Hide, %widget%
 			
 		configuration := this.SetupWizard.getSimulatorConfiguration()
@@ -455,7 +455,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 			}
 		}
 		
-		this.loadButtonBoxLabels()
+		this.loadControllerLabels()
 			
 		LV_ModifyCol(1, "AutoHdr")
 		LV_ModifyCol(2, "AutoHdr")

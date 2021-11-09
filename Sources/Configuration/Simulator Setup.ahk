@@ -40,7 +40,7 @@ ListLines Off					; Disable execution history
 #Include Libraries\SettingsEditor.ahk
 #Include Libraries\ConfigurationEditor.ahk
 #Include Libraries\PluginActionsEditor.ahk
-#Include Libraries\ButtonBoxEditor.ahk
+#Include Libraries\ControllerEditor.ahk
 #Include ..\Plugins\Voice Control Configuration Plugin.ahk
 #Include ..\Plugins\Race Engineer Configuration Plugin.ahk
 #Include ..\Plugins\Race Strategist Configuration Plugin.ahk
@@ -543,7 +543,7 @@ class SetupWizard extends ConfigurationItem {
 					
 				writeConfiguration(kUserConfigDirectory . "Simulator Configuration.ini", configuration)
 				
-				if this.isModuleSelected("Button Box") {
+				if this.isModuleSelected("Controller") {
 					if FileExist(kUserConfigDirectory . "Button Box Configuration.ini")
 						FileMove %kUserConfigDirectory%Button Box Configuration.ini, %kUserConfigDirectory%Button Box Configuration.ini.bak, 1
 					
@@ -2342,7 +2342,7 @@ initializeSimulatorSetup()
 #Include Libraries\ModulesStepWizard.ahk
 #Include Libraries\InstallationStepWizard.ahk
 #Include Libraries\ApplicationsStepWizard.ahk
-#Include Libraries\ButtonBoxStepWizard.ahk
+#Include Libraries\ControllerStepWizard.ahk
 #Include Libraries\GeneralStepWizard.ahk
 #Include Libraries\SimulatorsStepWizard.ahk
 #Include Libraries\AssistantsStepWizard.ahk

@@ -9,7 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include Libraries\ButtonBoxStepWizard.ahk
+#Include Libraries\ControllerStepWizard.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -36,7 +36,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		Get {
 			wizard := this.SetupWizard
 
-			if (wizard.isModuleSelected("Button Box") || wizard.isModuleSelected("Race Engineer") || wizard.isModuleSelected("Race Strategist"))
+			if (wizard.isModuleSelected("Controller") || wizard.isModuleSelected("Race Engineer") || wizard.isModuleSelected("Race Strategist"))
 				for ignore, simulator in this.Definition
 					if wizard.isApplicationSelected(simulator)
 						return 1
@@ -56,7 +56,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		for ignore, simulator in this.Definition {
 			code := getApplicationDescriptor(simulator)[1]
 			
-			if (wizard.isApplicationSelected(simulator) && wizard.isModuleSelected("Button Box")) {
+			if (wizard.isApplicationSelected(simulator) && wizard.isModuleSelected("Controller")) {
 				arguments := ""
 				
 				for ignore, descriptor in this.iSimulatorMFDKeys[simulator] {
@@ -69,7 +69,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 					arguments .= (key . ": " . value)
 				}
 				
-				if wizard.isModuleSelected("Button Box")
+				if wizard.isModuleSelected("Controller")
 					for ignore, mode in ["Pitstop", "Assistant"] {
 						actions := ""
 					
@@ -243,7 +243,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		
 		base.showPage(page)
 		
-		if !this.SetupWizard.isModuleSelected("Button Box")
+		if !this.SetupWizard.isModuleSelected("Controller")
 			for ignore, widget in this.iButtonBoxWidgets
 				GuiControl Hide, %widget%
 		
@@ -306,12 +306,12 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 	}
 	
 	loadActions(load := false) {
-		if (this.iCurrentSimulator && this.SetupWizard.isModuleSelected("Button Box"))
+		if (this.iCurrentSimulator && this.SetupWizard.isModuleSelected("Controller"))
 			this.loadSimulatorActions(this.iCurrentSimulator, load)
 	}
 	
 	saveActions() {
-		if (this.iCurrentSimulator && this.SetupWizard.isModuleSelected("Button Box"))
+		if (this.iCurrentSimulator && this.SetupWizard.isModuleSelected("Controller"))
 			this.saveSimulatorActions(this.iCurrentSimulator)
 	}
 	
@@ -424,7 +424,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 				}
 			}
 		
-		this.loadButtonBoxLabels()
+		this.loadControllerLabels()
 		
 		LV_ModifyCol(1, "AutoHdr")
 		LV_ModifyCol(2, "AutoHdr")
@@ -463,7 +463,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 				GuiControl Hide, % descriptor[2]
 			}
 		
-		if (wizard.isModuleSelected("Button Box") || wizard.isModuleSelected("Race Engineer"))
+		if (wizard.isModuleSelected("Controller") || wizard.isModuleSelected("Race Engineer"))
 			for ignore, descriptor in this.iSimulatorMFDKeys[simulator] {
 				value := wizard.getSimulatorValue(simulator, descriptor[3], descriptor[4])
 				
@@ -488,16 +488,16 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		}
 	}
 	
-	loadButtonBoxLabels() {
+	loadControllerLabels() {
 		local function
 		local action
 		
-		base.loadButtonBoxLabels()
+		base.loadControllerLabels()
 		
 		wizard := this.SetupWizard
 		simulator := this.iCurrentSimulator
 		
-		for ignore, preview in this.ButtonBoxPreviews {
+		for ignore, preview in this.ControllerPreviews {
 			targetMode := preview.Mode
 		
 			for ignore, mode in this.getModes()

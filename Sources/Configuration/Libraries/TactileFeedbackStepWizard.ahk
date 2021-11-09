@@ -9,7 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include Libraries\ButtonBoxStepWizard.ahk
+#Include Libraries\ControllerStepWizard.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -30,7 +30,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 		Get {
 			wizard := this.SetupWizard
 
-			if (wizard.isModuleSelected("Button Box") && wizard.isModuleSelected("Tactile Feedback"))
+			if (wizard.isModuleSelected("Controller") && wizard.isModuleSelected("Tactile Feedback"))
 				return 1
 			else
 				return 0
@@ -390,7 +390,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 			}
 		}
 		
-		this.loadButtonBoxLabels()
+		this.loadControllerLabels()
 			
 		LV_ModifyCol(1, "AutoHdr")
 		LV_ModifyCol(2, "AutoHdr")

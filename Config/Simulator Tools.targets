@@ -36,7 +36,7 @@ Release 3.6.0=Release 3.5.8 -> updateTranslations
 Release 3.6.2=Release 3.6.0 -> updateTranslations
 Release 3.6.4=Release 3.6.2 -> updateTranslations, updatePhraseGrammars, updatePluginLabels
 Release 3.6.6=Release 3.6.4 -> deletePluginLabels, updateTranslations, updateActionLabels
-; Release 3.6.8=Release 3.6.6 -> updateTranslations
+Release 3.6.8=Release 3.6.6 -> updateTranslations, updateConfigurationForV368
 [Cleanup]
 Binaries Folder=%kBinariesDirectory%
 Logs Folder=%kLogsDirectory%

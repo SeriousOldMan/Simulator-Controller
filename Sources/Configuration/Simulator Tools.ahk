@@ -1389,6 +1389,19 @@ updateInstallationForV354() {
 	}
 }
 
+updateConfigurationForV368() {
+	if FileExist(kUserHomeDirectory . "Setup\Setup.data") {
+		setupConfig := readConfiguration(kUserHomeDirectory . "Setup\Setup.data")
+		
+		if (getConfigurationValue(setupConfig, "Setup", "Module.Controller.Selected", kUndefined) == kUndefined) {
+			setConfigurationValue(setupConfig, "Setup", "Module.Controller.Selected", getConfigurationValue(setupConfig, "Setup", "Module.Button Box.Selected", false))
+			removeConfigurationValue(setupConfig, "Setup", "Module.Button Box.Selected")
+			
+			writeConfiguration(kUserHomeDirectory . "Setup\Setup.data", setupConfig)
+		}
+	}
+}
+
 updateConfigurationForV358() {
 	sourceDirectory := (kUserHomeDirectory . "Setup Database")
 	destinationDirectory := (kUserHomeDirectory . "Database")

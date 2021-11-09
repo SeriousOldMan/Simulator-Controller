@@ -1067,6 +1067,7 @@ class LayoutsList extends ConfigurationItemList {
 		configuration := newConfiguration()
 		
 		setConfigurationSectionValues(configuration, "Icons", this.iIconDefinitions)
+		setConfigurationSectionValues(configuration, "Icons", this.iButtonDefinitions)
 		
 		Gui IRE:+OwnerCTRLE
 		Gui CTRLE:+Disabled
@@ -1075,8 +1076,10 @@ class LayoutsList extends ConfigurationItemList {
 		
 		Gui CTRLE:-Disabled
 		
-		if result
+		if result {
 			this.iIconDefinitions := getConfigurationSectionValues(configuration, "Icons", Object())
+			this.iButtonDefinitions := getConfigurationSectionValues(configuration, "Buttons", Object())
+		}
 	}
 	
 	updateLayoutRowEditor(save := true) {
@@ -1527,6 +1530,7 @@ class ControllerPreview extends ConfigurationItem {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 global displayRuleLayoutDropDown
+global displayRuleButtonDropDown
 
 class DisplayRulesEditor extends ConfigurationItem {
 	iClosed := false
@@ -1588,8 +1592,21 @@ class DisplayRulesEditor extends ConfigurationItem {
 			chosen := 2
 		}
 		
-		Gui IRE:Add, Text, x8 yp+30 w80 h23 +0x200 hwndsdWidget1, % translate("Layout")
+		Gui IRE:Add, Text, x8 yp+30 w80 h23 +0x200, % translate("Layout")
 		Gui IRE:Add, DropDownList, x90 yp w150 AltSubmit Choose%chosen% VdisplayRuleLayoutDropDown gchooseDisplayRuleLayout, % values2String("|", layouts*)
+		
+		buttons := [translate("All Buttons")]
+		disabled := ""
+		
+		if !this.Layout {
+			disabled := "Disabled"
+			chosen := 0
+		}
+		else
+			chosen := 1
+		
+		Gui IRE:Add, Text, x8 yp+24 w80 h23 +0x200 %disabled% hwndwidget1, % translate("Button")
+		Gui IRE:Add, DropDownList, x90 yp w150 AltSubmit %disabled% Choose%chosen% hwndwidget2 vdisplayRuleButtonDropDown, % values2String("|", buttons*)
 		
 		this.iDisplayRulesList.createGui(configuration)
 		
@@ -1597,11 +1614,32 @@ class DisplayRulesEditor extends ConfigurationItem {
 		
 		Gui IRE:Add, Button, x80 yp+20 w80 h23 Default GsaveDisplayRulesEditor, % translate("Save")
 		Gui IRE:Add, Button, x180 yp w80 h23 GcancelDisplayRulesEditor, % translate("Cancel")
+		
+		this.loadLayoutButtons()
 }
 	
 	saveToConfiguration(configuration) {
 		this.iDisplayRulesList.saveToConfiguration(configuration)
 	}
+	
+	loadLayoutButtons() {
+		Gui IRE:Default
+		
+		buttons := [translate("All Buttons")]
+		
+		if this.Layout
+			for descriptor, definition in getConfigurationSectionValues(LayoutsList.Instance.StreamDeckConfiguration, "Layouts", Object()) {
+				descriptor := ConfigurationItem.splitDescriptor(descriptor)
+			
+				if ((descriptor[1] = this.Layout) && (descriptor[2] != "Layout"))
+					for ignore, button in string2Values(";", definition)
+						if (button != "")
+							buttons.Push(button)
+			}
+			
+		GuiControl, , displayRuleButtonDropDown, % ("|" . values2String("|", buttons*))
+		GuiControl Choose, displayRuleButtonDropDown, 1
+	}	
 	
 	editDisplayRules() {
 		this.open()

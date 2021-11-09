@@ -1240,7 +1240,7 @@ class LayoutsList extends ConfigurationItemList {
 		else if (control = "__Image_Icon__") {
 			oldImage := (oldButton ? oldButton.Icon : false)
 			
-			newImage := chooseImageFile((oldImage && (oldImage != true)) ? oldImage : false)
+			newImage := chooseImageFile((oldImage && (oldImage != true)) ? oldImage : SubStr(kStreamDeckImagesDirectory, 1, StrLen(kStreamDeckImagesDirectory) - 1))
 			
 			if newImage
 				oldButton.Icon := newImage
@@ -1835,20 +1835,7 @@ chooseLayout() {
 	LayoutsList.Instance.chooseLayout()
 }
 
-chooseImageFile(oldImage := "__Undefined__") {
-	if (oldImage != kUndefined)
-		path := (oldImage ? oldImage : SubStr(kStreamDeckImagesDirectory, 1, StrLen(kStreamDeckImagesDirectory) - 1))
-	else {
-		GuiControlGet imageFilePathEdit
-		
-		path := imageFilePathEdit
-
-		if (path && (path != ""))
-			path := getFileName(path, kButtonBoxImagesDirectory)
-		else
-			path := SubStr(kButtonBoxImagesDirectory, 1, StrLen(kButtonBoxImagesDirectory) - 1)
-	}
-	
+chooseImageFile(path) {
 	title := translate("Select Image...")
 
 	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Cancel"]))
@@ -1859,7 +1846,16 @@ chooseImageFile(oldImage := "__Undefined__") {
 }
 
 chooseImageFilePath() {
-	pictureFile := chooseImageFile()
+	GuiControlGet imageFilePathEdit
+		
+	path := imageFilePathEdit
+
+	if (path && (path != ""))
+		path := getFileName(path, kButtonBoxImagesDirectory)
+	else
+		path := SubStr(kButtonBoxImagesDirectory, 1, StrLen(kButtonBoxImagesDirectory) - 1)
+		
+	pictureFile := chooseImageFile(path)
 	
 	if pictureFile {
 		imageFilePathEdit := pictureFile
@@ -1869,7 +1865,16 @@ chooseImageFilePath() {
 }
 
 chooseIconFilePath() {
-	pictureFile := chooseImageFile()
+	GuiControlGet iconFilePathEdit
+		
+	path := iconFilePathEdit
+
+	if (path && (path != ""))
+		path := getFileName(path, kStreamDeckImagesDirectory)
+	else
+		path := SubStr(kStreamDeckImagesDirectory, 1, StrLen(kStreamDeckImagesDirectory) - 1)
+	
+	pictureFile := chooseImageFile(path)
 	
 	if pictureFile {
 		iconFilePathEdit := pictureFile

@@ -687,13 +687,13 @@ class LayoutsList extends ConfigurationItemList {
 		
 		Gui CTRLE:Add, Edit, x102 y534 w330 h50 Disabled VlayoutRowEdit hwndbbWidget19, %layoutRowEdit%
 		
-		Loop 19
+		Loop 17
 			this.iButtonBoxWidgets.Push(bbWidget%A_Index%)
 		
 		Gui CTRLE:Add, Text, x8 ys w86 h23 +0x200 hwndsdWidget1, % translate("Layout")
 		Gui CTRLE:Add, DropDownList, x102 yp w110 AltSubmit Choose1 VlayoutDropDown gchooseLayout hwndsdWidget2, % values2String("|", map(["Mini", "Standard", "XL"], "translate")*)
 		
-		Gui CTRLE:Add, Button, x102 yp+40 w230 h23 Center gopenDisplayRulesEditor hwndsdWidget3, % translate("Edit Display Rules...")
+		Gui CTRLE:Add, Button, x102 yp+30 w230 h23 Center gopenDisplayRulesEditor hwndsdWidget3, % translate("Edit Display Rules...")
 		
 		Loop 3
 			this.iStreamDeckWidgets.Push(sdWidget%A_Index%)

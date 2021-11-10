@@ -459,7 +459,7 @@ Using the context menu for each button, you can specify almost any of the option
 
 ### Display Rules
 
-The layout or generic icon specific exception rules may be edited using the following window, which opens, when you click on the "Edit Display Rules..." button.
+As you have seen before, you can define in the layout editor for every button whether a label and an icon, or only the icon or only the label should be displayed. But these settings might depend on the specific icon, which is currently displayed. One icon might look good together with a label text, the other might not. Especially, when you use controller action specific icons, you might want to have more control here. This is where icon specific exception rules come into the game. The layout or generic icon specific exception rules may be edited using the following window, which opens, when you click on the "Edit Display Rules..." button.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Stream%20Deck%20Editor%203.JPG)
 

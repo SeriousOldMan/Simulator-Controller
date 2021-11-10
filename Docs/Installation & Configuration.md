@@ -457,6 +457,8 @@ As you can see, this is very simple compared to the layout section for Button Bo
 
 Using the context menu for each button, you can specify almost any of the options described above, except the button specific icon exception rules.
 
+### Display Rules
+
 The layout or generic icon specific exception rules may be edited using the following window, which opens, when you click on the "Edit Display Rules..." button.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Stream%20Deck%20Editor%203.JPG)

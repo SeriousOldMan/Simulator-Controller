@@ -473,28 +473,24 @@ As mentioned above, you can associate a label and an image for each and every di
 
 1. Controller Action Labels.XX
 
-	[Tactile Feedback]
-	
-	TC.Dial=TC
-	TC.Increase=Increase\nTC
-	TC.Decrease=Decrease\nTC
-	ABS.Dial=ABS
-	ABS.Increase=Increase\nABS
-	ABS.Decrease=Decrease\nABS
-	
+	[Tactile Feedback]  
+	TC.Dial=TC  
+	TC.Increase=Increase\nTC  
+	TC.Decrease=Decrease\nTC  
+	ABS.Dial=ABS  
+	ABS.Increase=Increase\nABS  
+	ABS.Decrease=Decrease\nABS  
 	...
 
 Please note, that you can start new lines in the label using **\n**.
 
 2. Controller Action Icons.XX
 
-	[Tactile Feedback]
-	
+	[Tactile Feedback]  
 	TC.Increase=D:\Dateien\Bilder\Simulator Icons\ButtonDeck\TC+.jpg
 	TC.Decrease=D:\Dateien\Bilder\Simulator Icons\ButtonDeck\TC-.jpg
 	ABS.Increase=D:\Dateien\Bilder\Simulator Icons\ButtonDeck\ABS_+.jpg
-	ABS.Decrease=D:\Dateien\Bilder\Simulator Icons\ButtonDeck\ABS_-.jpg
-	
+	ABS.Decrease=D:\Dateien\Bilder\Simulator Icons\ButtonDeck\ABS_-.jpg  
 	...
 
 In this example, four icons will be displayed on the Stream Deck for increasing and decreasing the pedal vibration for traction control and ABS effects. You can to edit the definition file in the ["Plugins" tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) of the "Simulator Configuration" tool, as mentioned above. There are a lot of icons for the Stream Deck available out there, for example [this one](https://www.racedepartment.com/downloads/buttondeck-for-stream-deck.24348/) or the icons from the collection of iEnki in the **#share-your-mods** channel on our [Discord](https://discord.gg/5N8JrNr48H), and I will also build an icon collection during the next releases.

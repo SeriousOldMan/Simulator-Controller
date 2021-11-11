@@ -471,7 +471,9 @@ Please note, that the order of rules applied goes from the most specific rules f
 
 ## Action Labels & Icons
 
-As mentioned above, you can associate a label and an image for each and every different controller action to display on your controller (labels for the Button Box visual representations or labels and icons on the Stream Deck), as long as this action is associated with the corresponding controller function. Labels are stored in a language specific configuration file named "Controller Action Labels.XX" and icon references are stored in a file named "Controller Action Icons.XX" (with *XX* substituted by the language code, for example "EN"). Thes file must be placed in *Simulator Controller\Translations* folder in your user *Documents* folder and has the following formats:
+As mentioned above, you can associate a label and an image for each and every different controller action to display on your controller (labels for the Button Box visual representations or labels and icons on the Stream Deck), as long as this action is associated with the corresponding controller function. These labels and icons will therefore only be visible during runtime and not during the configuration process, and be also aware that there might be additional, dynamically computed texts by a given plugin, for example the current strength of a vibration effect, which cannot be modified here.
+
+Labels are stored in a language specific configuration file named "Controller Action Labels.XX" and icon references are stored in a file named "Controller Action Icons.XX" (with *XX* substituted by the language code, for example "EN"). This file must be placed in *Simulator Controller\Translations* folder in your user *Documents* folder and has the following formats:
 
 1. Controller Action Labels.XX
 
@@ -499,8 +501,8 @@ In this example, four icons will be displayed on the Stream Deck for increasing 
 
 As you expect, there is a graphical tool to edit this language specific configuration files:
 
-Simulator Controller comes with preconfigured labels for all supported languages, but you may have to create your own icon definitions.
-
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Action%20Labels%20Icons%20Editor.jpg)
+
+Simulator Controller comes with preconfigured labels for all supported languages, but you may have to create your own icon definitions.
 
 Note: This editor can be opened from the ["Plugins" tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) of the configuration tool.

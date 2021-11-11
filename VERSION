@@ -1,8 +1,8 @@
 [Development]
-Version=3.6.8-rc1
+Version=3.6.8-rc2
 Target=3.6.8-release
-Date=11/10/2021
-Download=https://www.dropbox.com/s/ufylh5p7ko1i2vu/Simulator%20Controller%203.6.8-rc1.zip?dl=1
+Date=11/11/2021
+Download=https://www.dropbox.com/s/kp01i3o0pauo5oq/Simulator%20Controller%203.6.8-rc2.zip?dl=1
 Changes=New editor for action labels and icons, Refactoring of the ButtonBoxEditor class, New editor for Stream Deck controller layouts, Updated "Simulator Setup" and "Simulator Configuration" to support the new editors, Revised online documentation for "Simulator Setup"
 [Release]
 Version=3.6.6-release
@@ -13,4 +13,4 @@ Changes=More sophisticated tyre compound handling, Refactoring of ButtonBox clas
 Type=Development
 [Version]
 Release=3.6.6-release
-Development=3.6.8-rc1
+Development=3.6.8-rc2

@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "dgSpecHash": "oJKbrWKHWkSovErZfrvvwE529alyGNlj8d1pb8uvvpEc72B1IyWYgL7JH1HxNgJQBSluuso4aQg+XWiMihMmiw==",
+  "success": true,
+  "projectFilePath": "D:\\Controller\\Sources\\Special\\Team Server\\Team Server\\Team Server.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Simulator\\.nuget\\packages\\microsoft.data.sqlite.core\\6.0.0\\microsoft.data.sqlite.core.6.0.0.nupkg.sha512",
+    "C:\\Users\\Simulator\\.nuget\\packages\\sqlite\\3.13.0\\sqlite.3.13.0.nupkg.sha512",
+    "C:\\Users\\Simulator\\.nuget\\packages\\sqlitepclraw.core\\2.0.6\\sqlitepclraw.core.2.0.6.nupkg.sha512",
+    "C:\\Users\\Simulator\\.nuget\\packages\\system.memory\\4.5.3\\system.memory.4.5.3.nupkg.sha512"
+  ],
+  "logs": []
+}

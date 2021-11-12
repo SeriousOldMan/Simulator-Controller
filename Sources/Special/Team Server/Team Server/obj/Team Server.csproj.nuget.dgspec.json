@@ -10,14 +10,14 @@
         "projectUniqueName": "D:\\Controller\\Sources\\Special\\Team Server\\Team Server\\Team Server.csproj",
         "projectName": "Team Server",
         "projectPath": "D:\\Controller\\Sources\\Special\\Team Server\\Team Server\\Team Server.csproj",
-        "packagesPath": "C:\\Users\\Simulator\\.nuget\\packages\\",
+        "packagesPath": "C:\\Users\\olive\\.nuget\\packages\\",
         "outputPath": "D:\\Controller\\Sources\\Special\\Team Server\\Team Server\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "D:\\Programme\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\Simulator\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\olive\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -48,9 +48,9 @@
               "target": "Package",
               "version": "[6.0.0, )"
             },
-            "SQLite": {
+            "sqlite-net-pcl": {
               "target": "Package",
-              "version": "[3.13.0, )"
+              "version": "[1.8.116, )"
             }
           },
           "imports": [
@@ -71,7 +71,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.403\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.301\\RuntimeIdentifierGraph.json"
         }
       }
     }

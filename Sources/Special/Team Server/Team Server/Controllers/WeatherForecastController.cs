@@ -21,6 +21,7 @@ namespace TeamServer.Controllers {
         }
 
         [HttpGet]
+        /*
         public IEnumerable<WeatherForecast> Get() {
             var rng = new Random();
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast {
@@ -29,6 +30,10 @@ namespace TeamServer.Controllers {
                 Summary = Summaries[rng.Next(Summaries.Length)]
             })
             .ToArray();
+        }
+        */
+        public String Get() {
+            return "Hello World!";
         }
     }
 }

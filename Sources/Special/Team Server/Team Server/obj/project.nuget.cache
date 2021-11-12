@@ -1,13 +1,16 @@
 {
   "version": 2,
-  "dgSpecHash": "oJKbrWKHWkSovErZfrvvwE529alyGNlj8d1pb8uvvpEc72B1IyWYgL7JH1HxNgJQBSluuso4aQg+XWiMihMmiw==",
+  "dgSpecHash": "3jqnQHQ4IAGueKx3JqbL+xMRpWOFUDVy5bN8T8y8CFt31pTeYk3H+fYRRnl/fkBfrQl/5N16mh0e5/oBs9Pf/A==",
   "success": true,
   "projectFilePath": "D:\\Controller\\Sources\\Special\\Team Server\\Team Server\\Team Server.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\Simulator\\.nuget\\packages\\microsoft.data.sqlite.core\\6.0.0\\microsoft.data.sqlite.core.6.0.0.nupkg.sha512",
-    "C:\\Users\\Simulator\\.nuget\\packages\\sqlite\\3.13.0\\sqlite.3.13.0.nupkg.sha512",
-    "C:\\Users\\Simulator\\.nuget\\packages\\sqlitepclraw.core\\2.0.6\\sqlitepclraw.core.2.0.6.nupkg.sha512",
-    "C:\\Users\\Simulator\\.nuget\\packages\\system.memory\\4.5.3\\system.memory.4.5.3.nupkg.sha512"
+    "C:\\Users\\olive\\.nuget\\packages\\microsoft.data.sqlite.core\\6.0.0\\microsoft.data.sqlite.core.6.0.0.nupkg.sha512",
+    "C:\\Users\\olive\\.nuget\\packages\\sqlite-net-pcl\\1.8.116\\sqlite-net-pcl.1.8.116.nupkg.sha512",
+    "C:\\Users\\olive\\.nuget\\packages\\sqlitepclraw.bundle_green\\2.0.4\\sqlitepclraw.bundle_green.2.0.4.nupkg.sha512",
+    "C:\\Users\\olive\\.nuget\\packages\\sqlitepclraw.core\\2.0.6\\sqlitepclraw.core.2.0.6.nupkg.sha512",
+    "C:\\Users\\olive\\.nuget\\packages\\sqlitepclraw.lib.e_sqlite3\\2.0.4\\sqlitepclraw.lib.e_sqlite3.2.0.4.nupkg.sha512",
+    "C:\\Users\\olive\\.nuget\\packages\\sqlitepclraw.provider.dynamic_cdecl\\2.0.4\\sqlitepclraw.provider.dynamic_cdecl.2.0.4.nupkg.sha512",
+    "C:\\Users\\olive\\.nuget\\packages\\system.memory\\4.5.3\\system.memory.4.5.3.nupkg.sha512"
   ],
   "logs": []
 }

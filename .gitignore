@@ -7,3 +7,5 @@ Sources/Special/**/.vs/
 Sources/Special/**/Debug/
 Sources/Special/**/Release/
 Sources/Special/**/packages/
+Sources/Special/**/**/obj/
+Sources/Special/**/**/bin/

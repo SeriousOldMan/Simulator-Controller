@@ -101,7 +101,7 @@ namespace TeamServer.Server {
             return AddStint(new Guid(identifier), driverForName, driverSurName, lapNr, pitstopData);
         }
 
-        public Lap AddLap(Session session, Stint stint, int lapNr, string telemetryData, string positionData) {
+        public Lap AddLap(Session session, Stint stint, int lapNr, string telemetryData = "", string positionData = "") {
             ValidateSession(session);
             ValidateStint(session, stint);
 
@@ -118,7 +118,7 @@ namespace TeamServer.Server {
             }
         }
         
-        public Lap AddLap(Session session, Driver driver, int lapNr, string telemetryData, string positionData) {
+        public Lap AddLap(Session session, Driver driver, int lapNr, string telemetryData = "", string positionData = "") {
             ValidateSession(session);
             ValidateDriver(session, driver);
 
@@ -131,7 +131,7 @@ namespace TeamServer.Server {
             return AddLap(session, stint, lapNr, telemetryData, positionData);
         }
 
-        public Lap AddLap(Session session, string driverForName, string driverSurName, int lapNr, string telemetryData, string positionData) {
+        public Lap AddLap(Session session, string driverForName, string driverSurName, int lapNr, string telemetryData = "", string positionData = "") {
             ValidateSession(session);
 
             Driver driver = FindDriver(session, driverForName, driverSurName);
@@ -142,12 +142,62 @@ namespace TeamServer.Server {
                 throw new Exception("Unknown driver...");
         }
 
-        public Lap AddLap(Guid identifier, string driverForName, string driverSurName, int lapNr, string telemetryData, string positionData) {
+        public Lap AddLap(Guid identifier, string driverForName, string driverSurName, int lapNr, string telemetryData = "", string positionData = "") {
             return AddLap(ObjectManager.GetSessionAsync(identifier).Result, driverForName, driverSurName, lapNr, telemetryData, positionData);
         }
 
-        public Lap AddLap(string identifier, string driverForName, string driverSurName, int lapNr, string telemetryData, string positionData) {
+        public Lap AddLap(string identifier, string driverForName, string driverSurName, int lapNr, string telemetryData = "", string positionData = "") {
             return AddLap(new Guid(identifier), driverForName, driverSurName, lapNr, telemetryData, positionData);
+        }
+
+        public Lap AddLap(Session session, int lapNr, string telemetryData = "", string positionData = "") {
+            ValidateSession(session);
+
+            return AddLap(session, session.GetCurrentStint(), lapNr, telemetryData, positionData);
+        }
+
+        public Lap AddLap(Guid identifier, int lapNr, string telemetryData = "", string positionData = "") {
+            return AddLap(ObjectManager.GetSessionAsync(identifier).Result, lapNr, telemetryData, positionData);
+        }
+
+        public Lap AddLap(string identifier, int lapNr, string telemetryData = "", string positionData = "") {
+            return AddLap(new Guid(identifier), lapNr, telemetryData, positionData);
+        }
+
+
+
+
+
+
+        public Lap UpdateLap(Session session, int lapNr, string telemetryData = "", string positionData = "") {
+            ValidateSession(session);
+
+            Stint stint = session.GetCurrentStint();
+
+            ValidateStint(session, stint);
+
+            Lap lap = stint.GetCurrentLap();
+
+            if (lap.Nr != lapNr)
+                throw new Exception("Only the last lap can be updated...");
+
+            if (!string.IsNullOrWhiteSpace(telemetryData))
+                lap.TelemetryData = telemetryData;
+
+            if (!string.IsNullOrWhiteSpace(positionData))
+                lap.TelemetryData = positionData;
+
+            lap.Save();
+
+            return lap;
+        }
+
+        public Lap UpdateLap(Guid identifier, int lapNr, string telemetryData = "", string positionData = "") {
+            return UpdateLap(ObjectManager.GetSessionAsync(identifier).Result, lapNr, telemetryData, positionData);
+        }
+
+        public Lap UpdateLap(string identifier, int lapNr, string telemetryData = "", string positionData = "") {
+            return UpdateLap(new Guid(identifier), lapNr, telemetryData, positionData);
         }
     }
 }

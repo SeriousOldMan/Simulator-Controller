@@ -19,7 +19,7 @@ namespace TeamServer.Controllers {
                           [FromQuery(Name = "team")] string teamIdentifier, [FromQuery(Name = "session")] string sessionIdentifier,
                           [FromQuery(Name = "duration")] string duration,
                           [FromQuery(Name = "driverForName")] string driverForName, [FromQuery(Name = "driverSurName")] string driverSurName,
-                          [FromQuery(Name = "lap")] string lap) {
+                          [FromQuery(Name = "lap")] string lap, [FromBody] string payload) {
             try {
                 ObjectManager objectManager = Server.TeamServer.ObjectManager;
                 SessionManager sessionManager = new SessionManager(objectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
@@ -42,7 +42,7 @@ namespace TeamServer.Controllers {
 
                         return "Ok";
                     case "StartLap":
-                        // sessionManager.AddLap(sessionIdentifier, int.Parse(lap));
+                        sessionManager.AddLap(sessionIdentifier, int.Parse(lap));
 
                         return "Ok";
                     default:

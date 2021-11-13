@@ -6,32 +6,22 @@ using System.Threading.Tasks;
 namespace TeamServer.Model {
     [Table("Sessions")]
     public class Session : ModelObject {
-        [PrimaryKey, AutoIncrement]
-        public int ID { get; set; }
-
-        public int TokenID { get; set; }
-
-        [Ignore]
-        public Task<Access.Token> Token {
-            get {
-                return ObjectManager.GetSessionTokenAsync(this);
-            }
-        }
-
         public int TeamID { get; set; }
 
         [Ignore]
-        public Task<Team> Team {
+        public Team Team {
             get {
-                return ObjectManager.GetSessionTeamAsync(this);
+                return ObjectManager.GetSessionTeamAsync(this).Result;
             }
         }
 
-        public Guid Identifier { get; set; }
+        public Guid Identifier { get; set; } = Guid.NewGuid();
 
         public int Duration { get; set; }
 
-        public bool Finished { get; set; }
+        public DateTime Started { get; set; } = DateTime.Now;
+
+        public bool Finished { get; set; } = false;
 
         public string Track { get; set; }
 
@@ -39,82 +29,104 @@ namespace TeamServer.Model {
 
         public string GridNr { get; set; }
 
-        public Stint GetCurrentStint() {
-            Task<List<Stint>> task = ObjectManager.Connection.QueryAsync<Stint>("Select * From Stints Where Nr = Max(Nr) And SessionID = ?", this.ID);
+        [Ignore]
+        public List<Stint> Stints {
+            get {
+                return ObjectManager.GetSessionStintsAsync(this).Result;
+            }
+        }
 
-            try {
+        public override Task Delete() {
+            foreach (Stint stint in Stints)
+                stint.Delete();
+
+            return base.Delete();
+        }
+
+        public Stint GetCurrentStint() {
+            Task<List<Stint>> task = ObjectManager.Connection.QueryAsync<Stint>(
+                @"
+                    Select * From Stints Where SessionID = ? And Nr = (Select Max(Nr) From Stints Where SessionID = ?)
+                ", this.ID, this.ID);
+
+            if (task.Result.Count == 0)
+                return null;
+            else
                 return task.Result[0];
-            }
-            catch (AggregateException e) {
-                throw e.InnerException;
-            }
         }
     }
 
     [Table("Stints")]
     public class Stint : ModelObject {
-        [PrimaryKey, AutoIncrement]
-        public int ID { get; set; }
-
         public int SessionID { get; set; }
 
         [Ignore]
-        public Task<Session> Session {
+        public Session Session {
             get {
-                return ObjectManager.GetStintSessionAsync(this);
+                return ObjectManager.GetStintSessionAsync(this).Result;
             }
         }
 
         public int DriverID { get; set; }
 
         [Ignore]
-        public Task<Driver> Driver {
+        public Driver Driver {
             get {
-                return ObjectManager.GetStintDriverAsync(this);
+                return ObjectManager.GetStintDriverAsync(this).Result;
             }
         }
 
         public int Nr { get; set; }
 
+        public int StartLap { get; set; }
+
+        [MaxLength(2147483647)]
+        public string PitstopData { get; set; } = "";
+
         [Ignore]
-        public Task<List<Lap>> Laps {
+        public List<Lap> Laps {
             get {
-                return ObjectManager.GetStintLapsAsync(this);
+                return ObjectManager.GetStintLapsAsync(this).Result;
             }
         }
 
-        public Lap GetCurrentLap() {
-            Task<List<Lap>> task = ObjectManager.Connection.QueryAsync<Lap>("Select * From Laps Where Nr = Max(Nr) And StintID = ?", this.ID);
+        public override Task Delete() {
+            foreach (Lap lap in Laps)
+                lap.Delete();
 
-            try {
+            return base.Delete();
+        }
+
+        public Lap GetCurrentLap() {
+            Task<List<Lap>> task = ObjectManager.Connection.QueryAsync<Lap>(
+                @"
+                    Select * From Laps Where StintID = ? And Nr = (Select Max(Nr) From Laps Where StintID = ?)
+                ", this.ID, this.ID);
+
+            if (task.Result.Count == 0)
+                return null;
+            else
                 return task.Result[0];
-            }
-            catch (AggregateException e) {
-                throw e.InnerException;
-            }
         }
     }
 
     [Table("Laps")]
     public class Lap : ModelObject {
-        [PrimaryKey, AutoIncrement]
-        public int ID { get; set; }
-
         public int StintID { get; set; }
 
         [Ignore]
-        public Task<Stint> Stint {
+        public Stint Stint {
             get {
-                return ObjectManager.GetLapStintAsync(this);
+                return ObjectManager.GetLapStintAsync(this).Result;
             }
         }
 
         public int Nr { get; set; }
 
         [MaxLength(2147483647)]
-        public string TelemetryData { get; set; }
+        public string TelemetryData { get; set; } = "";
 
         [MaxLength(2147483647)]
-        public string CarData { get; set; }
+        public string PositionData { get; set; } = "";
     }
 }

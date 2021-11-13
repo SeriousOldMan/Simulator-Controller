@@ -16,24 +16,46 @@ namespace TeamServer.Model {
                 Instance = this;
         }
 
+        public Task DeleteAsync(ModelObject modelObject) {
+            return Connection.DeleteAsync(modelObject);
+        }
+
+        public Task<int> SaveAsync(ModelObject modelObject) {
+            if (modelObject.ID != 0)
+                return Connection.UpdateAsync(modelObject);
+            else
+                return Connection.InsertAsync(modelObject);
+        }
+
+        #region Access.Contract
+        public Task<Access.Contract> GetContractAsync(int id) {
+            return Connection.Table<Access.Contract>().Where(c => c.ID == id).FirstOrDefaultAsync();
+        }
+
+        public Task<Access.Contract> GetContractAsync(string account, string password) {
+            return Connection.Table<Access.Contract>().Where(c => c.Account == account && c.Password == password).FirstOrDefaultAsync();
+        }
+
+        public Task<List<Access.Token>> GetContractTokensAsync(Access.Contract contract) {
+            return Connection.Table<Access.Token>().Where(t => t.ContractID == contract.ID).ToListAsync();
+        }
+        #endregion
+
         #region Access.Token
-        public Task<Access.Token> GetAccessTokenAsync(int id) {
+        public Task<Access.Token> GetTokenAsync(int id) {
             return Connection.Table<Access.Token>().Where(t => t.ID == id).FirstOrDefaultAsync();
         }
 
-        public Task<Access.Token> GetAccessTokenAsync(Guid guid, string password) {
-            return Connection.Table<Access.Token>().Where(t => t.GUID == guid && t.Password == password).FirstOrDefaultAsync();
+        public Task<Access.Token> GetTokenAsync(Guid identifier) {
+            return Connection.Table<Access.Token>().Where(t => t.Identifier == identifier).FirstOrDefaultAsync();
         }
 
-        public Task<int> SaveAccessTokenAsync(Access.Token token) {
-            if (token.ID != 0)
-                return Connection.UpdateAsync(token);
-            else
-                return Connection.InsertAsync(token);
+        public Task<Access.Token> GetTokenAsync(string identifier) {
+            return GetTokenAsync(new Guid(identifier));
         }
 
-        public Task<List<Session>> GetTokenSessionsAsync(Access.Token token) {
-            return Connection.Table<Session>().Where(s => s.TokenID == token.ID).ToListAsync();
+        public Task<Access.Contract> GetTokenContractAsync(Access.Token token) {
+            return Connection.Table<Access.Contract>().Where(c => c.ID == token.ContractID).FirstAsync();
         }
         #endregion
 
@@ -42,11 +64,12 @@ namespace TeamServer.Model {
             return Connection.Table<Team>().Where(t => t.ID == id).FirstOrDefaultAsync();
         }
 
-        public Task<int> SaveTeamAsync(Team team) {
-            if (team.ID != 0)
-                return Connection.UpdateAsync(team);
-            else
-                return Connection.InsertAsync(team);
+        public Task<Team> GetTeamAsync(Guid identifier) {
+            return Connection.Table<Team>().Where(t => t.Identifier == identifier).FirstOrDefaultAsync();
+        }
+
+        public Task<Team> GetTeamAsync(string identifier) {
+            return GetTeamAsync(new Guid(identifier));
         }
 
         public Task<List<Driver>> GetTeamDriversAsync(Team team) {
@@ -88,15 +111,8 @@ namespace TeamServer.Model {
             return Connection.Table<Session>().Where(s => s.Identifier == identifier).FirstOrDefaultAsync();
         }
 
-        public Task<int> SaveSessionAsync(Session session) {
-            if (session.ID != 0)
-                return Connection.UpdateAsync(session);
-            else
-                return Connection.InsertAsync(session);
-        }
-
-        public Task<Access.Token> GetSessionTokenAsync(Session session) {
-            return Connection.Table<Access.Token>().Where(t => t.ID == session.TokenID).FirstOrDefaultAsync();
+        public Task<Session> GetSessionAsync(string identifier) {
+            return GetSessionAsync(new Guid(identifier));
         }
 
         public Task<Team> GetSessionTeamAsync(Session session) {
@@ -111,13 +127,6 @@ namespace TeamServer.Model {
         #region Stint
         public Task<Stint> GetStintAsync(int id) {
             return Connection.Table<Stint>().Where(s => s.ID == id).FirstOrDefaultAsync();
-        }
-
-        public Task<int> SaveStintAsync(Stint stint) {
-            if (stint.ID != 0)
-                return Connection.UpdateAsync(stint);
-            else
-                return Connection.InsertAsync(stint);
         }
 
         public Task<Session> GetStintSessionAsync(Stint stint) {
@@ -138,13 +147,6 @@ namespace TeamServer.Model {
             return Connection.Table<Lap>().Where(i => i.ID == id).FirstOrDefaultAsync();
         }
 
-        public Task<int> SaveLapAsync(Lap lap) {
-            if (lap.ID != 0)
-                return Connection.UpdateAsync(lap);
-            else
-                return Connection.InsertAsync(lap);
-        }
-
         public Task<Stint> GetLapStintAsync(Lap lap) {
             return Connection.Table<Stint>().Where(s => s.ID == lap.StintID).FirstAsync();
         }
@@ -152,9 +154,20 @@ namespace TeamServer.Model {
     }
 
     public class ModelObject {
+        [PrimaryKey, AutoIncrement]
+        public int ID { get; set; }
+
         [Ignore]
         public ObjectManager ObjectManager {
             get { return ObjectManager.Instance; }
+        }
+
+        public virtual Task Save() {
+            return ObjectManager.SaveAsync(this);
+        }
+
+        public virtual Task Delete() {
+            return ObjectManager.DeleteAsync(this);
         }
     }
 }

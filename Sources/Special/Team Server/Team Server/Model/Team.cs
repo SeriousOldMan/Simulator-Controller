@@ -1,41 +1,50 @@
 ﻿using SQLite;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace TeamServer.Model {
     [Table("Teams")]
     public class Team : ModelObject {
-        [PrimaryKey, AutoIncrement]
-        public int ID { get; set; }
+        [Column("Identifier")]
+        public Guid Identifier { get; set; } = Guid.NewGuid();
 
+        [Column("Name")]
         public string Name { get; set; }
 
         [Ignore]
-        public Task<List<Driver>> Drivers {
+        public List<Driver> Drivers {
             get {
-                return ObjectManager.GetTeamDriversAsync(this);
+                return ObjectManager.GetTeamDriversAsync(this).Result;
             }
         }
 
         [Ignore]
-        public Task<List<Session>> Sessions {
+        public List<Session> Sessions {
             get {
-                return ObjectManager.GetTeamSessionsAsync(this);
+                return ObjectManager.GetTeamSessionsAsync(this).Result;
             }
+        }
+
+        public override Task Delete() {
+            foreach (Session session in Sessions)
+                session.Delete();
+
+            foreach (Driver driver in Drivers)
+                driver.Delete();
+
+            return base.Delete();
         }
     }
 
     [Table("Drivers")]
     public class Driver : ModelObject {
-        [PrimaryKey, AutoIncrement]
-        public int ID { get; set; }
-
         public int TeamID { get; set; }
 
         [Ignore]
-        public Task<Team> Team {
+        public Team Team {
             get {
-                return ObjectManager.GetDriverTeamAsync(this);
+                return ObjectManager.GetDriverTeamAsync(this).Result;
             }
         }
 
@@ -46,10 +55,17 @@ namespace TeamServer.Model {
         public string NickName { get; set; }
 
         [Ignore]
-        public Task<List<Stint>> Stints {
+        public List<Stint> Stints {
             get {
-                return ObjectManager.GetDriverStintsAsync(this);
+                return ObjectManager.GetDriverStintsAsync(this).Result;
             }
+        }
+
+        public override Task Delete() {
+            foreach (Stint stint in Stints)
+                stint.Delete();
+
+            return base.Delete();
         }
     }
 }

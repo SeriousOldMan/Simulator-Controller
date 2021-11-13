@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using TeamServer.Model;
+using TeamServer.Server;
 
 namespace TeamServer.Controllers {
     [ApiController]
@@ -12,73 +10,51 @@ namespace TeamServer.Controllers {
     public class SessionController : ControllerBase {
         private readonly ILogger<SessionController> _logger;
 
-        public Model.Access.Token Token = null;
-
         public SessionController(ILogger<SessionController> logger) {
             _logger = logger;
         }
 
-        void CheckToken(Guid token, string password) {
-            Token = ObjectManager.Instance.GetAccessTokenAsync(token, password).Result;
+        [HttpGet]
+        public String Get([FromQuery(Name = "token")] string token, [FromQuery(Name = "operation")] string operation,
+                          [FromQuery(Name = "team")] string teamIdentifier, [FromQuery(Name = "session")] string sessionIdentifier,
+                          [FromQuery(Name = "duration")] string duration,
+                          [FromQuery(Name = "driverForName")] string driverForName, [FromQuery(Name = "driverSurName")] string driverSurName,
+                          [FromQuery(Name = "lap")] string lap) {
+            try {
+                ObjectManager objectManager = Server.TeamServer.ObjectManager;
+                SessionManager sessionManager = new SessionManager(objectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
 
-            if (Token == null)
-                throw new Exception("Unknown token or password...");
-        }
+                switch (operation) {
+                    case "StartSession":
+                        Team team = objectManager.GetTeamAsync(teamIdentifier).Result;
+                        
+                        return sessionManager.StartSession(team, int.Parse(duration)).Identifier.ToString();
+                    case "EndSession":
+                        sessionManager.EndSession(sessionIdentifier);
 
-        void CheckToken(Model.Access.Token token) {
-            if (token == null)
-                throw new Exception("Not a valid token...");
-        }
+                        return "Ok";
+                    case "DeleteSession":
+                        sessionManager.DeleteSession(sessionIdentifier);
 
-        void CheckToken() {
-            if (Token == null)
-                throw new Exception("Not a valid token...");
-        }
+                        return "Ok";
+                    case "StartStint":
+                        sessionManager.AddStint(sessionIdentifier, driverForName, driverSurName, int.Parse(lap));
 
-        void CheckSession(Session session) {
-            if ((session == null) || session.Finished)
-                throw new Exception("Not a valid or active session...");
-        }
+                        return "Ok";
+                    case "StartLap":
+                        // sessionManager.AddLap(sessionIdentifier, int.Parse(lap));
 
-        void CheckDuration(int duration) {
-            if (Token.TimeLeft < duration)
-                throw new Exception("Not enough time left for session...");
-        }
-
-        public string StartSession(Team team, int duration, string track, string car, string gridNr) {
-            CheckToken();
-            CheckDuration(duration);
-
-            Guid identifier = new Guid();
-
-            Session session = new Session { TeamID = team.ID, Identifier = identifier, Duration = duration, Finished = false,
-                                            Track = track, Car = car, GridNr = gridNr };
-
-            ObjectManager.Instance.SaveSessionAsync(session);
-
-            return identifier.ToString();
-        }
-
-        public string StartSession(int teamID, int duration, string track, string car, string gridNr) {
-            return StartSession(ObjectManager.Instance.GetTeamAsync(teamID).Result, duration, track, car, gridNr);
-        }
-
-        public void EndSession(Guid identifier, int sessionDuration) {
-            CheckToken();
-            
-            Session session = ObjectManager.Instance.GetSessionAsync(identifier).Result;
-
-            CheckSession(session);
-
-            Token.TimeLeft -= sessionDuration;
-            session.Finished = true;
-
-            ObjectManager.Instance.SaveAccessTokenAsync(Token);
-            ObjectManager.Instance.SaveSessionAsync(session);
-        }
-
-        public void EndSession(string identifier, int sessionDuration) {
-            EndSession(new Guid(identifier), sessionDuration);
+                        return "Ok";
+                    default:
+                        return "Error: Bad request...";
+                }
+            }
+            catch (AggregateException exception) {
+                return "Error: " + exception.InnerException.Message;
+            }
+            catch (Exception exception) {
+                return "Error: " + exception.Message;
+            }
         }
     }
 }

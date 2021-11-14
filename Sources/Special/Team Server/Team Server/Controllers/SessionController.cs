@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Threading.Tasks;
 using TeamServer.Model;
 using TeamServer.Server;
 
@@ -19,7 +20,7 @@ namespace TeamServer.Controllers {
                           [FromQuery(Name = "team")] string teamIdentifier, [FromQuery(Name = "session")] string sessionIdentifier,
                           [FromQuery(Name = "duration")] string duration,
                           [FromQuery(Name = "driverForName")] string driverForName, [FromQuery(Name = "driverSurName")] string driverSurName,
-                          [FromQuery(Name = "lap")] string lap, [FromBody] string payload) {
+                          [FromQuery(Name = "lap")] string lap, [FromBody] string body) {
             try {
                 ObjectManager objectManager = Server.TeamServer.ObjectManager;
                 SessionManager sessionManager = new SessionManager(objectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));

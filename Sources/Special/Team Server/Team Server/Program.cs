@@ -1,21 +1,27 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using SQLite;
+using System;
+using System.IO;
 using TeamServer.Model;
 using TeamServer.Model.Access;
 
 namespace TeamServer {
     public class Program {
         public static void Main(string[] args) {
-            // string path1 = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TeamServer.db");
-            // string path2 = Path.Combine(Environment.CurrentDirectory, "TeamServer.db");
+            SQLiteAsyncConnection connection = null;
 
-            var connection = new SQLiteAsyncConnection(":memory:");
+            if (Array.IndexOf<string>(args, "-Memory") != -1)
+                connection = new SQLiteAsyncConnection(":memory:");
+            else
+                connection = new SQLiteAsyncConnection(Path.Combine(Environment.CurrentDirectory, "TeamServer.db"));
+
             var objectManager = new ObjectManager(connection);
 
             new ModelManager(connection).CreateTables();
 
-            CreateTestData(objectManager);
+            if (Array.IndexOf<string>(args, "-Local") != -1)
+                CreateLocalAccount(objectManager);
 
             new Server.TeamServer(objectManager);
 
@@ -28,14 +34,12 @@ namespace TeamServer {
                     webBuilder.UseStartup<Startup>();
                 });
 
-        static void CreateTestData(ObjectManager objectManager) {
-            Account account = new Account { Name = "TestAccount", Password = "TestPassword", MinutesLeft = 3600 };
-            
-            account.Save();
+        static void CreateLocalAccount(ObjectManager objectManager) {
+            if (objectManager.GetAccountAsync("", "").Result == null) {
+                Account account = new Account { Name = "", Password = "", MinutesLeft = Int32.MaxValue };
 
-            Team team = new Team { AccountID = objectManager.GetAccountAsync("TestAccount", "TestPassword").Result.ID, Name = "TestTeam" };
-
-            team.Save();
+                account.Save();
+            }
         }
     }
 }

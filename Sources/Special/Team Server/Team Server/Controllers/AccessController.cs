@@ -14,9 +14,15 @@ namespace TeamServer.Controllers {
         }
 
         [HttpGet]
-        public String Get([FromQuery(Name = "name")] string account, [FromQuery(Name = "password")] string password) {
+        public String Get([FromQuery(Name = "name")] string name, [FromQuery(Name = "password")] string password) {
+            if (name == null)
+                name = "";
+
+            if (password == null)
+                password = "";
+
             try {
-                return Server.TeamServer.TokenIssuer.CreateToken(account, password).Identifier.ToString();
+                return Server.TeamServer.TokenIssuer.CreateToken(name, password).Identifier.ToString();
             }
             catch (AggregateException exception) {
                 return "Error: " + exception.InnerException.Message;

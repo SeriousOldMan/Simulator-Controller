@@ -61,14 +61,26 @@ namespace TeamServer.Server {
 
         public void ValidateStint(Stint stint) {
             if (stint == null)
-                throw new Exception("Not a valid or active stint...");
+                throw new Exception("Not a valid stint...");
         }
 
         public void ValidateStint(Session session, Stint stint) {
             ValidateSession(session);
 
             if (stint == null)
-                throw new Exception("Not a valid or active stint...");
+                throw new Exception("Not a valid stint...");
+        }
+
+        public void ValidateLap(Lap lap) {
+            if (lap == null)
+                throw new Exception("Not a valid lap...");
+        }
+
+        public void ValidateLap(Stint stint, Lap lap) {
+            ValidateStint(stint);
+
+            if (lap == null)
+                throw new Exception("Not a valid lap...");
         }
         #endregion
     }

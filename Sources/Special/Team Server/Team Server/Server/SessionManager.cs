@@ -153,23 +153,114 @@ namespace TeamServer.Server {
         #endregion
 
         #region Operations
-        public Stint UpdatePitstopData(Stint stint, string pitstopData = "") {
+        public Stint UpdatePitstopData(Stint stint, string pitstopData) {
             ValidateStint(stint);
 
-            if (!String.IsNullOrWhiteSpace(pitstopData))
-                stint.PitstopData = pitstopData;
+            stint.PitstopData = pitstopData;
 
             stint.Save();
 
             return stint;
         }
 
-        public Stint UpdatePitstopData(Guid identifier, string pitstopData = "") {
+        public Stint UpdatePitstopData(Guid identifier, string pitstopData) {
             return UpdatePitstopData(ObjectManager.GetStintAsync(identifier).Result, pitstopData);
         }
 
-        public Stint UpdatePitstopData(string identifier, string pitstopData = "") {
+        public Stint UpdatePitstopData(string identifier, string pitstopData) {
             return UpdatePitstopData(new Guid(identifier), pitstopData);
+        }
+        #endregion
+        #endregion
+
+        #region Lap
+        #region Query
+        public Lap LookupLap(Guid identifier) {
+            Lap lap = FindLap(identifier);
+
+            ValidateLap(lap);
+
+            return lap;
+        }
+
+        internal Lap LookupLap(string identifier) {
+            return LookupLap(new Guid(identifier));
+        }
+
+        public Lap FindLap(Guid identifier) {
+            return ObjectManager.GetLapAsync(identifier).Result;
+        }
+
+        public Lap FindLap(string identifier) {
+            return FindLap(new Guid(identifier));
+        }
+        #endregion
+
+        #region CRUD
+        public Lap CreateLap(Stint stint, int lap) {
+            ValidateStint(stint);
+
+            Lap lastLap = stint.GetCurrentLap();
+
+            if ((lastLap != null) && (lastLap.Nr + 1 != lap))
+                throw new Exception("Invalid lap number...");
+
+            Lap theLap = new Lap { StintID = stint.ID, Nr = lap };
+
+            theLap.Save();
+
+            return theLap;
+        }
+
+        public void DeleteLap(Lap lap) {
+            if (lap != null)
+                lap.Delete();
+        }
+
+        public void DeleteLap(Guid identifier) {
+            DeleteLap(ObjectManager.GetLapAsync(identifier).Result);
+        }
+
+        public void DeleteLap(string identifier) {
+            DeleteLap(new Guid(identifier));
+        }
+        #endregion
+
+        #region Operations
+        public Lap UpdateTelemetryData(Lap lap, string telemetryData) {
+            ValidateLap(lap);
+
+            lap.TelemetryData = telemetryData;
+
+            lap.Save();
+
+            return lap;
+        }
+
+        public Lap UpdateTelemetryData(Guid identifier, string telemetryData) {
+            return UpdateTelemetryData(ObjectManager.GetLapAsync(identifier).Result, telemetryData);
+        }
+
+        public Lap UpdateTelemetryData(string identifier, string telemetryData) {
+            return UpdateTelemetryData(new Guid(identifier), telemetryData);
+        }
+
+        public Lap UpdatePositionData(Lap lap, string positionData) {
+            ValidateLap(lap);
+
+            lap.PositionData = positionData;
+
+            lap.Save();
+
+            return lap;
+        }
+
+        public Lap UpdatePositionData(Guid identifier, string positionData) {
+            return UpdatePositionData(ObjectManager.GetLapAsync(identifier).Result, positionData);
+        }
+
+        public Lap UpdatePositionData(string identifier, string positionData) {
+            return UpdatePositionData(new Guid(identifier), positionData);
         }
         #endregion
         #endregion

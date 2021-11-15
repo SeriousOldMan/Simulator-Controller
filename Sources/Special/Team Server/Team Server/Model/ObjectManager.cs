@@ -167,6 +167,10 @@ namespace TeamServer.Model {
             return Connection.Table<Lap>().Where(i => i.ID == id).FirstOrDefaultAsync();
         }
 
+        public Task<Lap> GetLapAsync(Guid identifier) {
+            return Connection.Table<Lap>().Where(i => i.Identifier == identifier).FirstOrDefaultAsync();
+        }
+
         public Task<Stint> GetLapStintAsync(Lap lap) {
             return Connection.Table<Stint>().Where(s => s.ID == lap.StintID).FirstAsync();
         }

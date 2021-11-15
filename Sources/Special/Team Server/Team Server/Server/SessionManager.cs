@@ -35,8 +35,8 @@ namespace TeamServer.Server {
         #endregion
 
         #region CRUD
-        public Session CreateSession(Team team, int duration, string car, string track, string gridNr) {
-            Session session = new Session { TeamID = team.ID, Duration = duration, Track = track, Car = car, GridNr = gridNr };
+        public Session CreateSession(Team team, string name, int duration, string car, string track, string raceNr) {
+            Session session = new Session { TeamID = team.ID, Duration = duration, Track = track, Car = car, RaceNr = raceNr };
 
             ValidateSession(session);
 

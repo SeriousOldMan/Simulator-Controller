@@ -8,6 +8,7 @@
     "TeamServer": {
       "commandName": "Project",
       "commandLineArgs": "-Local -Memory",
+      "workingDirectory": "D:\\Controller\\Sources\\Special\\Team Server\\Release\\netcoreapp3.1",
       "launchBrowser": true,
       "launchUrl": "teamserver/login",
       "environmentVariables": {

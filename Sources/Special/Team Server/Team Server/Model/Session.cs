@@ -24,6 +24,8 @@ namespace TeamServer.Model {
             }
         }
 
+        public string Name { get; set; }
+
         public int Duration { get; set; }
 
         public DateTime Started { get; set; }
@@ -34,7 +36,7 @@ namespace TeamServer.Model {
 
         public string Car { get; set; }
 
-        public string GridNr { get; set; }
+        public string RaceNr { get; set; }
 
         [Ignore]
         public List<Stint> Stints {

@@ -38,7 +38,19 @@ namespace TeamServer.Controllers {
                 SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
                 Session session = sessionManager.LookupSession(identifier);
 
-                return ControllerUtils.SerializeObject(session, new List<string>(new string[] { "Identifier", "Duration", "Started", "Finished", "Car", "Track", "GridNr" }));
+                return ControllerUtils.SerializeObject(session, new List<string>(new string[] { "Identifier", "Name", "Duration", "Started", "Finished", "Car", "Track", "RaceNr" }));
+            }
+            catch (Exception exception) {
+                return "Error: " + exception.Message;
+            }
+        }
+
+        [HttpGet("{identifier}/team")]
+        public string GetTeam([FromQuery(Name = "token")] string token, string identifier) {
+            try {
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                
+                return sessionManager.LookupSession(identifier).Team.Identifier.ToString();
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
@@ -60,7 +72,7 @@ namespace TeamServer.Controllers {
         }
 
         [HttpGet("{identifier}/stints")]
-        public string GetDrivers([FromQuery(Name = "token")] string token, string identifier) {
+        public string GetStints([FromQuery(Name = "token")] string token, string identifier) {
             try {
                 SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
 
@@ -126,10 +138,11 @@ namespace TeamServer.Controllers {
                 Dictionary<string, string> properties = ControllerUtils.ParseKeyValues(keyValues);
 
                 return sessionManager.CreateSession(theTeam,
+                                                    name: properties.GetValueOrDefault<string, string>("Name", "Unknown"),
                                                     duration: Int32.Parse(properties["Duration"]),
                                                     car: properties.GetValueOrDefault<string, string>("Car", "Unknown"),
                                                     track: properties.GetValueOrDefault<string, string>("Track", "Unknown"),
-                                                    gridNr: properties.GetValueOrDefault<string, string>("GridNr", "Unknown")).Identifier.ToString();
+                                                    raceNr: properties.GetValueOrDefault<string, string>("RaceNr", "Unknown")).Identifier.ToString();
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
@@ -239,7 +252,9 @@ namespace TeamServer.Controllers {
         }
 
         [HttpPost]
-        public string Post([FromQuery(Name = "token")] string token, [FromQuery(Name = "session")] string session, [FromQuery(Name = "driver")] string driver, [FromBody] string keyValues) {
+        public string Post([FromQuery(Name = "token")] string token,
+                           [FromQuery(Name = "session")] string session, [FromQuery(Name = "driver")] string driver,
+                           [FromBody] string keyValues) {
             try {
                 Token theToken = Server.TeamServer.TokenIssuer.ValidateToken(token);
                 SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, theToken);

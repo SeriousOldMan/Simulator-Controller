@@ -2,10 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using TeamServer.Model.Access;
 
 namespace TeamServer.Model {
     [Table("Sessions")]
     public class Session : ModelObject {
+        [Indexed]
         public int TeamID { get; set; }
 
         [Ignore]
@@ -15,11 +17,16 @@ namespace TeamServer.Model {
             }
         }
 
-        public Guid Identifier { get; set; } = Guid.NewGuid();
+        [Ignore]
+        public Account Account {
+            get {
+                return ObjectManager.GetSessionTeamAsync(this).Result.Account;
+            }
+        }
 
         public int Duration { get; set; }
 
-        public DateTime Started { get; set; } = DateTime.Now;
+        public DateTime Started { get; set; }
 
         public bool Finished { get; set; } = false;
 
@@ -58,6 +65,7 @@ namespace TeamServer.Model {
 
     [Table("Stints")]
     public class Stint : ModelObject {
+        [Indexed]
         public int SessionID { get; set; }
 
         [Ignore]
@@ -67,6 +75,7 @@ namespace TeamServer.Model {
             }
         }
 
+        [Indexed]
         public int DriverID { get; set; }
 
         [Ignore]
@@ -78,7 +87,7 @@ namespace TeamServer.Model {
 
         public int Nr { get; set; }
 
-        public int StartLap { get; set; }
+        public int Lap { get; set; }
 
         [MaxLength(2147483647)]
         public string PitstopData { get; set; } = "";
@@ -112,6 +121,7 @@ namespace TeamServer.Model {
 
     [Table("Laps")]
     public class Lap : ModelObject {
+        [Indexed]
         public int StintID { get; set; }
 
         [Ignore]
@@ -121,6 +131,7 @@ namespace TeamServer.Model {
             }
         }
 
+        [Indexed]
         public int Nr { get; set; }
 
         [MaxLength(2147483647)]

@@ -1,6 +1,7 @@
 ﻿using SQLite;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace TeamServer.Model {
@@ -27,17 +28,25 @@ namespace TeamServer.Model {
                 return Connection.InsertAsync(modelObject);
         }
 
-        #region Access.Contract
-        public Task<Access.Contract> GetContractAsync(int id) {
-            return Connection.Table<Access.Contract>().Where(c => c.ID == id).FirstOrDefaultAsync();
+        #region Access.Account
+        public Task<Access.Account> GetAccountAsync(int id) {
+            return Connection.Table<Access.Account>().Where(c => c.ID == id).FirstOrDefaultAsync();
         }
 
-        public Task<Access.Contract> GetContractAsync(string account, string password) {
-            return Connection.Table<Access.Contract>().Where(c => c.Account == account && c.Password == password).FirstOrDefaultAsync();
+        public Task<Access.Account> GetAccountAsync(string account, string password) {
+            return Connection.Table<Access.Account>().Where(c => c.Name == account && c.Password == password).FirstOrDefaultAsync();
         }
 
-        public Task<List<Access.Token>> GetContractTokensAsync(Access.Contract contract) {
-            return Connection.Table<Access.Token>().Where(t => t.ContractID == contract.ID).ToListAsync();
+        public Task<List<Access.Token>> GetAccountTokensAsync(Access.Account account) {
+            return Connection.Table<Access.Token>().Where(t => t.AccountID == account.ID).ToListAsync();
+        }
+
+        public Task<List<Team>> GetAccountTeamsAsync(Access.Account account) {
+            return Connection.Table<Team>().Where(t => t.AccountID == account.ID).ToListAsync();
+        }
+
+        public Task<List<Session>> GetAccountSessionsAsync(Access.Account account) {
+            return Connection.Table<Session>().Where(s => account.Teams.Select(t => t.ID).Contains<int>(s.TeamID)).ToListAsync();
         }
         #endregion
 
@@ -54,8 +63,8 @@ namespace TeamServer.Model {
             return GetTokenAsync(new Guid(identifier));
         }
 
-        public Task<Access.Contract> GetTokenContractAsync(Access.Token token) {
-            return Connection.Table<Access.Contract>().Where(c => c.ID == token.ContractID).FirstAsync();
+        public Task<Access.Account> GetTokenAccountAsync(Access.Token token) {
+            return Connection.Table<Access.Account>().Where(a => a.ID == token.AccountID).FirstAsync();
         }
         #endregion
 
@@ -72,6 +81,10 @@ namespace TeamServer.Model {
             return GetTeamAsync(new Guid(identifier));
         }
 
+        public Task<Access.Account> GetTeamAccountAsync(Team team) {
+            return Connection.Table<Access.Account>().Where(a => a.ID == team.AccountID).FirstAsync();
+        }
+
         public Task<List<Driver>> GetTeamDriversAsync(Team team) {
             return Connection.Table<Driver>().Where(d => d.TeamID == team.ID).ToListAsync();
         }
@@ -84,6 +97,9 @@ namespace TeamServer.Model {
         #region Driver
         public Task<Driver> GetDriverAsync(int id) {
             return Connection.Table<Driver>().Where(d => d.ID == id).FirstOrDefaultAsync();
+        }
+        public Task<Driver> GetDriverAsync(Guid identifier) {
+            return Connection.Table<Driver>().Where(d => d.Identifier == identifier).FirstOrDefaultAsync();
         }
 
         public Task<int> SaveDriverAsync(Driver driver) {
@@ -129,6 +145,10 @@ namespace TeamServer.Model {
             return Connection.Table<Stint>().Where(s => s.ID == id).FirstOrDefaultAsync();
         }
 
+        public Task<Stint> GetStintAsync(Guid identifier) {
+            return Connection.Table<Stint>().Where(s => s.Identifier == identifier).FirstOrDefaultAsync();
+        }
+
         public Task<Session> GetStintSessionAsync(Stint stint) {
             return Connection.Table<Session>().Where(s => s.ID == stint.SessionID).FirstAsync();
         }
@@ -156,6 +176,9 @@ namespace TeamServer.Model {
     public class ModelObject {
         [PrimaryKey, AutoIncrement]
         public int ID { get; set; }
+
+        [Indexed]
+        public Guid Identifier { get; set; } = Guid.NewGuid();
 
         [Ignore]
         public ObjectManager ObjectManager {

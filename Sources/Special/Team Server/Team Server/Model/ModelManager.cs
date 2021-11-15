@@ -9,7 +9,7 @@ namespace TeamServer.Model {
         }
 
         public void CreateTables() {
-            CreateContractTable();
+            CreateAccountTable();
             CreateTokenTable();
             CreateTeamTable();
             CreateDriverTable();
@@ -18,8 +18,8 @@ namespace TeamServer.Model {
             CreateLapTable();
         }
 
-        protected void CreateContractTable() {
-            Connection.CreateTableAsync<Access.Contract>().Wait();
+        protected void CreateAccountTable() {
+            Connection.CreateTableAsync<Access.Account>().Wait();
         }
 
         protected void CreateTokenTable() {

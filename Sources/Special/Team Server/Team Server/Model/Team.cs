@@ -6,10 +6,16 @@ using System.Threading.Tasks;
 namespace TeamServer.Model {
     [Table("Teams")]
     public class Team : ModelObject {
-        [Column("Identifier")]
-        public Guid Identifier { get; set; } = Guid.NewGuid();
+[Indexed]
+        public int AccountID { get; set; }
 
-        [Column("Name")]
+        [Ignore]
+        public Access.Account Account {
+            get {
+                return ObjectManager.GetTeamAccountAsync(this).Result;
+            }
+        }
+
         public string Name { get; set; }
 
         [Ignore]
@@ -39,6 +45,7 @@ namespace TeamServer.Model {
 
     [Table("Drivers")]
     public class Driver : ModelObject {
+        [Indexed]
         public int TeamID { get; set; }
 
         [Ignore]

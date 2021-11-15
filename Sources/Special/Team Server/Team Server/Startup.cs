@@ -1,10 +1,44 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using System;
+using System.IO;
+using Microsoft.Net.Http.Headers;
+using System.Text;
+using System.Threading.Tasks;
+using System.Net;
 
-namespace TeamServer {
+namespace TeamServer
+{
+    public class PlainTextFormatter : TextInputFormatter {
+        public PlainTextFormatter()
+        {
+            SupportedMediaTypes.Add(new MediaTypeHeaderValue("text/plain"));
+
+            SupportedEncodings.Add(Encoding.UTF8);
+            SupportedEncodings.Add(Encoding.Unicode);
+        }
+
+        protected override bool CanReadType(Type type) =>
+            type == typeof(string);
+
+        
+        public override async Task<InputFormatterResult> ReadRequestBodyAsync(InputFormatterContext context, Encoding encoding)
+        {
+            var httpContext = context.HttpContext;
+            var logger = httpContext.RequestServices.GetRequiredService<ILogger<PlainTextFormatter>>();
+
+            using var reader = new StreamReader(httpContext.Request.Body, encoding);
+
+            return await InputFormatterResult.SuccessAsync(reader.ReadToEnd());
+        }
+    }
+
     public class Startup {
         public Startup(IConfiguration configuration) {
             Configuration = configuration;
@@ -14,7 +48,16 @@ namespace TeamServer {
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services) {
-            services.AddControllers();
+            services.AddControllers(options => {
+                options.InputFormatters.Insert(0, new PlainTextFormatter());
+            });
+
+            /*
+            services.AddHttpsRedirection(options => {
+                options.RedirectStatusCode = (int)HttpStatusCode.TemporaryRedirect;
+                options.HttpsPort = 443;
+            });
+            */
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -23,6 +66,7 @@ namespace TeamServer {
                 app.UseDeveloperExceptionPage();
             }
 
+            // app.UseHttpsRedirection();
             app.UseRouting();
 
             app.UseAuthorization();

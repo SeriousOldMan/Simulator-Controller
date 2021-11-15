@@ -2,32 +2,21 @@
 using Microsoft.Extensions.Logging;
 using System;
 using TeamServer.Model;
-using TeamServer.Model.Access;
 
 namespace TeamServer.Controllers {
     [ApiController]
-    [Route("[controller]")]
-    public class AccessController : ControllerBase {
-        private readonly ILogger<AccessController> _logger;
+    [Route("teamserver/[controller]")]
+    public class LoginController : ControllerBase {
+        private readonly ILogger<LoginController> _logger;
 
-        public AccessController(ILogger<AccessController> logger) {
+        public LoginController(ILogger<LoginController> logger) {
             _logger = logger;
         }
 
         [HttpGet]
-        public String Get([FromQuery(Name = "operation")] string operation, [FromQuery(Name = "token")] string token,
-                          [FromQuery(Name = "account")] string account, [FromQuery(Name = "password")] string password) {
+        public String Get([FromQuery(Name = "name")] string account, [FromQuery(Name = "password")] string password) {
             try {
-                switch (operation) {
-                    case "Login":
-                        return Server.TeamServer.TokenIssuer.CreateToken(account, password).Identifier.ToString();
-                    case "Logout":
-                        Server.TeamServer.TokenIssuer.DeleteToken(token);
-
-                        return "Ok";
-                    default:
-                        return "Error: Bad request...";
-                }
+                return Server.TeamServer.TokenIssuer.CreateToken(account, password).Identifier.ToString();
             }
             catch (AggregateException exception) {
                 return "Error: " + exception.InnerException.Message;
@@ -35,6 +24,23 @@ namespace TeamServer.Controllers {
             catch (Exception exception) {
                 return "Error: " + exception.Message;
             }
+        }
+    }
+
+    [ApiController]
+    [Route("teamserver/[controller]")]
+    public class LogoutController : ControllerBase {
+        private readonly ILogger<LogoutController> _logger;
+
+        public LogoutController(ILogger<LogoutController> logger) {
+            _logger = logger;
+        }
+
+        [HttpGet]
+        public String Get([FromQuery(Name = "token")] string token) {
+            Server.TeamServer.TokenIssuer.DeleteToken(token);
+
+            return "Ok";
         }
     }
 }

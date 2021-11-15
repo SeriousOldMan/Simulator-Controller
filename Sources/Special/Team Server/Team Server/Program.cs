@@ -29,10 +29,12 @@ namespace TeamServer {
                 });
 
         static void CreateTestData(ObjectManager objectManager) {
-            Contract contract = new Contract { Account = "TestAccount", Password = "TestPassword", MinutesLeft = 3600 };
-            Team team = new Team { Name = "TestTeam" };
+            Account account = new Account { Name = "TestAccount", Password = "TestPassword", MinutesLeft = 3600 };
+            
+            account.Save();
 
-            contract.Save();
+            Team team = new Team { AccountID = objectManager.GetAccountAsync("TestAccount", "TestPassword").Result.ID, Name = "TestTeam" };
+
             team.Save();
         }
     }

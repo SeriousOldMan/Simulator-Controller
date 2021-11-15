@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using TeamServer.Model;
 
 namespace TeamServer.Server {
@@ -6,7 +7,35 @@ namespace TeamServer.Server {
         public SessionManager(ObjectManager objectManager, Model.Access.Token token) : base(objectManager, token) {
         }
 
-        public Session StartSession(Team team, int duration, string track = "Unknown", string car = "Unknown", string gridNr = "Unknown") {
+        #region Session
+        #region Query
+        public List<Session> GetAllSessions() {
+            return Token.Account.Sessions;
+        }
+
+        public Session LookupSession(Guid identifier) {
+            Session session = FindSession(identifier);
+
+            ValidateSession(session);
+
+            return session;
+        }
+
+        internal Session LookupSession(string identifier) {
+            return LookupSession(new Guid(identifier));
+        }
+
+        public Session FindSession(Guid identifier) {
+            return ObjectManager.GetSessionAsync(identifier).Result;
+        }
+
+        public Session FindSession(string identifier) {
+            return FindSession(new Guid(identifier));
+        }
+        #endregion
+
+        #region CRUD
+        public Session CreateSession(Team team, int duration, string car, string track, string gridNr) {
             Session session = new Session { TeamID = team.ID, Duration = duration, Track = track, Car = car, GridNr = gridNr };
 
             ValidateSession(session);
@@ -14,35 +43,6 @@ namespace TeamServer.Server {
             session.Save();
 
             return session;
-        }
-
-        public Session StartSession(int teamID, int duration, string track, string car, string gridNr) {
-            return StartSession(ObjectManager.GetTeamAsync(teamID).Result, duration, track, car, gridNr);
-        }
-
-        public Session StartSession(Guid identifier, int duration, string track, string car, string gridNr) {
-            return StartSession(ObjectManager.GetTeamAsync(identifier).Result, duration, track, car, gridNr);
-        }
-
-        public Session StartSession(string identifier, int duration, string track, string car, string gridNr) {
-            return StartSession(ObjectManager.GetTeamAsync(new Guid(identifier)).Result, duration, track, car, gridNr);
-        }
-
-        public void EndSession(Session session) {
-            ValidateSession(session);
-
-            Token.Contract.MinutesLeft -= (int)Math.Round((DateTime.Now - session.Started).TotalSeconds * 60);
-            session.Finished = true;
-
-            session.Save();
-        }
-
-        public void EndSession(Guid identifier) {
-            EndSession(ObjectManager.GetSessionAsync(identifier).Result);
-        }
-
-        public void EndSession(string identifier) {
-            EndSession(new Guid(identifier));
         }
 
         public void DeleteSession(Session session) {
@@ -57,147 +57,121 @@ namespace TeamServer.Server {
         public void DeleteSession(string identifier) {
             DeleteSession(new Guid(identifier));
         }
+        #endregion
 
-        public Driver FindDriver(Session session, string driverForName, string driverSurName) {
-            foreach (Driver driver in session.Team.Drivers) {
-                if ((driver.ForName == driverForName) && (driver.SurName == driverSurName)) {
-                    return driver;
-                }
-            }
+        #region Operations
+        public Session StartSession(Session session) {
+            ValidateSession(session);
 
-            return null;
+            session.Started = DateTime.Now;
+
+            session.Save();
+
+            return session;
         }
 
-        public Stint AddStint(Session session, Driver driver, int lapNr, string pitstopData = "") {
+        public Session StartSession(Guid identifier) {
+            return StartSession(ObjectManager.GetSessionAsync(identifier).Result);
+        }
+
+        public Session StartSession(string identifier) {
+            return StartSession(new Guid(identifier));
+        }
+
+        public void FinishSession(Session session) {
             ValidateSession(session);
-            ValidateDriver(session, driver);
 
-            Stint stint = session.GetCurrentStint();
-            int stintNr = ((stint != null) ? stint.Nr + 1 : 1);
+            Token.Account.MinutesLeft -= (int)Math.Round((DateTime.Now - session.Started).TotalSeconds * 60);
+            session.Finished = true;
 
-            stint = new Stint { SessionID = session.ID, DriverID = driver.ID, Nr = stintNr, StartLap = lapNr, PitstopData = pitstopData };
+            session.Save();
+        }
+
+        public void FinishSession(Guid identifier) {
+            FinishSession(ObjectManager.GetSessionAsync(identifier).Result);
+        }
+
+        public void FinishSession(string identifier) {
+            FinishSession(new Guid(identifier));
+        }
+        #endregion
+        #endregion
+
+        #region Stint
+        #region Query
+        public Stint LookupStint(Guid identifier) {
+            Stint stint = FindStint(identifier);
+
+            ValidateStint(stint);
+
+            return stint;
+        }
+
+        internal Stint LookupStint(string identifier) {
+            return LookupStint(new Guid(identifier));
+        }
+
+        public Stint FindStint(Guid identifier) {
+            return ObjectManager.GetStintAsync(identifier).Result;
+        }
+
+        public Stint FindStint(string identifier) {
+            return FindStint(new Guid(identifier));
+        }
+        #endregion
+
+        #region CRUD
+        public Stint CreateStint(Session session, Driver driver, int lap, string pitstopData = "") {
+            ValidateSession(session);
+            ValidateDriver(driver);
+
+            Stint lastStint = session.GetCurrentStint();
+            int stintNr = (lastStint != null) ? lastStint.Nr + 1 : 1;
+
+            Stint stint = new Stint { SessionID = session.ID, DriverID = driver.ID, Nr = stintNr, Lap = lap };
+
+            if (!String.IsNullOrWhiteSpace(pitstopData))
+                stint.PitstopData = pitstopData;
 
             stint.Save();
 
             return stint;
         }
 
-        public Stint AddStint(Session session, string driverForName, string driverSurName, int lapNr, string pitstopData = "") {
-            ValidateSession(session);
-
-            Driver driver = FindDriver(session, driverForName, driverSurName);
-
-            if (driver != null)
-                return AddStint(session, driver, lapNr, pitstopData);
-            else
-                throw new Exception("Unknown driver...");
+        public void DeleteStint(Stint stint) {
+            if (stint != null)
+                stint.Delete();
         }
 
-        public Stint AddStint(Guid identifier, string driverForName, string driverSurName, int lapNr, string pitstopData = "") {
-            return AddStint(ObjectManager.GetSessionAsync(identifier).Result, driverForName, driverSurName, lapNr, pitstopData);
+        public void DeleteStint(Guid identifier) {
+            DeleteStint(ObjectManager.GetStintAsync(identifier).Result);
         }
 
-        public Stint AddStint(string identifier, string driverForName, string driverSurName, int lapNr, string pitstopData = "") {
-            return AddStint(new Guid(identifier), driverForName, driverSurName, lapNr, pitstopData);
+        public void DeleteStint(string identifier) {
+            DeleteStint(new Guid(identifier));
+        }
+        #endregion
+
+        #region Operations
+        public Stint UpdatePitstopData(Stint stint, string pitstopData = "") {
+            ValidateStint(stint);
+
+            if (!String.IsNullOrWhiteSpace(pitstopData))
+                stint.PitstopData = pitstopData;
+
+            stint.Save();
+
+            return stint;
         }
 
-        public Lap AddLap(Session session, Stint stint, int lapNr, string telemetryData = "", string positionData = "") {
-            ValidateSession(session);
-            ValidateStint(session, stint);
-
-            Lap lastLap = stint.GetCurrentLap();
-
-            if (((lastLap == null) ? stint.StartLap : lastLap.Nr + 1) != lapNr)
-                throw new Exception("Invalid lap number...");
-            else {
-                Lap lap = new Lap { StintID = stint.ID, Nr = lapNr, TelemetryData = telemetryData, PositionData = positionData };
-
-                lap.Save();
-
-                return lap;
-            }
-        }
-        
-        public Lap AddLap(Session session, Driver driver, int lapNr, string telemetryData = "", string positionData = "") {
-            ValidateSession(session);
-            ValidateDriver(session, driver);
-
-            Stint stint = session.GetCurrentStint();
-            Driver stintDriver = stint.Driver;
-
-            if ((stintDriver.ForName != driver.ForName) || (stintDriver.SurName != driver.SurName))
-                stint = AddStint(session, driver, lapNr);
-
-            return AddLap(session, stint, lapNr, telemetryData, positionData);
+        public Stint UpdatePitstopData(Guid identifier, string pitstopData = "") {
+            return UpdatePitstopData(ObjectManager.GetStintAsync(identifier).Result, pitstopData);
         }
 
-        public Lap AddLap(Session session, string driverForName, string driverSurName, int lapNr, string telemetryData = "", string positionData = "") {
-            ValidateSession(session);
-
-            Driver driver = FindDriver(session, driverForName, driverSurName);
-
-            if (driver != null)
-                return AddLap(session, driver, lapNr, telemetryData, positionData);
-            else
-                throw new Exception("Unknown driver...");
+        public Stint UpdatePitstopData(string identifier, string pitstopData = "") {
+            return UpdatePitstopData(new Guid(identifier), pitstopData);
         }
-
-        public Lap AddLap(Guid identifier, string driverForName, string driverSurName, int lapNr, string telemetryData = "", string positionData = "") {
-            return AddLap(ObjectManager.GetSessionAsync(identifier).Result, driverForName, driverSurName, lapNr, telemetryData, positionData);
-        }
-
-        public Lap AddLap(string identifier, string driverForName, string driverSurName, int lapNr, string telemetryData = "", string positionData = "") {
-            return AddLap(new Guid(identifier), driverForName, driverSurName, lapNr, telemetryData, positionData);
-        }
-
-        public Lap AddLap(Session session, int lapNr, string telemetryData = "", string positionData = "") {
-            ValidateSession(session);
-
-            return AddLap(session, session.GetCurrentStint(), lapNr, telemetryData, positionData);
-        }
-
-        public Lap AddLap(Guid identifier, int lapNr, string telemetryData = "", string positionData = "") {
-            return AddLap(ObjectManager.GetSessionAsync(identifier).Result, lapNr, telemetryData, positionData);
-        }
-
-        public Lap AddLap(string identifier, int lapNr, string telemetryData = "", string positionData = "") {
-            return AddLap(new Guid(identifier), lapNr, telemetryData, positionData);
-        }
-
-
-
-
-
-
-        public Lap UpdateLap(Session session, int lapNr, string telemetryData = "", string positionData = "") {
-            ValidateSession(session);
-
-            Stint stint = session.GetCurrentStint();
-
-            ValidateStint(session, stint);
-
-            Lap lap = stint.GetCurrentLap();
-
-            if (lap.Nr != lapNr)
-                throw new Exception("Only the last lap can be updated...");
-
-            if (!string.IsNullOrWhiteSpace(telemetryData))
-                lap.TelemetryData = telemetryData;
-
-            if (!string.IsNullOrWhiteSpace(positionData))
-                lap.TelemetryData = positionData;
-
-            lap.Save();
-
-            return lap;
-        }
-
-        public Lap UpdateLap(Guid identifier, int lapNr, string telemetryData = "", string positionData = "") {
-            return UpdateLap(ObjectManager.GetSessionAsync(identifier).Result, lapNr, telemetryData, positionData);
-        }
-
-        public Lap UpdateLap(string identifier, int lapNr, string telemetryData = "", string positionData = "") {
-            return UpdateLap(new Guid(identifier), lapNr, telemetryData, positionData);
-        }
+        #endregion
+        #endregion
     }
 }

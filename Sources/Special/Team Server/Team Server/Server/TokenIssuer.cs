@@ -10,15 +10,16 @@ namespace TeamServer.Server {
             ObjectManager = objectManager;
         }
 
-        public Model.Access.Token CreateToken(string account, string password) {
-            Contract contract = ObjectManager.Instance.GetContractAsync(account, password).Result;
+        #region CRUD
+        public Model.Access.Token CreateToken(string name, string password) {
+            Account account = ObjectManager.Instance.GetAccountAsync(name, password).Result;
 
-            if (contract == null)
+            if (account == null)
                 throw new Exception("Unknown account or password...");
-            else if (contract.MinutesLeft <= 0)
+            else if (account.MinutesLeft <= 0)
                 throw new Exception("No time left...");
             else {
-                Token token = new Token { Identifier = Guid.NewGuid(), ContractID = contract.ID, Created = DateTime.Now };
+                Token token = new Token { Identifier = Guid.NewGuid(), AccountID = account.ID, Created = DateTime.Now };
 
                 token.Save();
 
@@ -38,7 +39,9 @@ namespace TeamServer.Server {
         public void DeleteToken(string identifier) {
             DeleteToken(new Guid(identifier));
         }
+        #endregion
 
+        #region Validation
         public Token ValidateToken(Token token) {
             if ((token == null) || !token.IsValid())
                 throw new Exception("Token expired...");
@@ -53,5 +56,6 @@ namespace TeamServer.Server {
         public Token ValidateToken(string identifier) {
             return ValidateToken(new Guid(identifier));
         }
+        #endregion
     }
 }

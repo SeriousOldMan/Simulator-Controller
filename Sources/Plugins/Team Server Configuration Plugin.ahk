@@ -24,6 +24,8 @@
 global teamServerURLEdit = "https://localhost:5001"
 global teamServerNameEdit = ""
 global teamServerPasswordEdit = ""
+global teamServerTokenEdit = ""
+global teamServerTimeEdit = ""
 
 class TeamServerConfigurator extends ConfigurationItem {
 	iEditor := false
@@ -76,23 +78,29 @@ class TeamServerConfigurator extends ConfigurationItem {
 		w2 := w1 - 70
 		
 		x2 := x + 172
-		w3 := Round((w2 / 2) - 3)
+		w3 := Round((w1 / 2) - 3)
 		x3 := x1 + w3 + 6
 		
+		x2 := x1 - 25
 		
 		x4 := x1 + w2 + 4
 		
 		Gui %window%:Add, Text, x%x0% y%y% w134 h23 +0x200 HWNDwidget1 Hidden, % translate("Server URL")
-		Gui %window%:Add, Edit, x%x1% yp+1 w%w2% h21 VteamServerURLEdit HWNDwidget2 Hidden, %teamServerURLEdit%
-		Gui %window%:Add, Text, x%x4% yp+2 w66 h23 HWNDwidget3 Hidden, % translate("/api/login")
+		Gui %window%:Add, Edit, x%x1% yp+1 w%w1% h21 VteamServerURLEdit HWNDwidget2 Hidden, %teamServerURLEdit%
 		
-		Gui %window%:Add, Text, x%x0% yp+21 w135 h23 +0x200 HWNDwidget4 Hidden, % translate("Login Credentials")
-		Gui %window%:Add, Edit, x%x1% yp+1 w%w3% h21 VteamServerNameEdit HWNDwidget5 Hidden, %teamServerNameEdit%
-		Gui %window%:Add, Edit, x%x3% yp w%w3% h21 Password VteamServerPasswordEdit HWNDwidget6 Hidden, %teamServerPasswordEdit%
+		Gui %window%:Add, Text, x%x0% yp+21 w135 h23 +0x200 HWNDwidget3 Hidden, % translate("Login Credentials")
+		Gui %window%:Add, Edit, x%x1% yp+1 w%w3% h21 VteamServerNameEdit HWNDwidget4 Hidden, %teamServerNameEdit%
+		Gui %window%:Add, Edit, x%x3% yp w%w3% h21 Password VteamServerPasswordEdit HWNDwidget5 Hidden, %teamServerPasswordEdit%
+		Gui %window%:Add, Button, x%x2% yp-1 w23 h23 Center +0x200 grenewToken HWNDwidget6 Hidden
+		setButtonIcon(widget6, kIconsDirectory . "Authorize.ico", 1, "L4 T4 R4 B4")
 		
-		Gui %window%:Add, Button, x%x4% yp w66 h23 Center +0x200 gtestLogin HWNDwidget7 Hidden, % translate("Test...")
+		Gui %window%:Add, Text, x%x0% yp+26 w135 h23 +0x200 HWNDwidget7 Hidden, % translate("Token")
+		Gui %window%:Add, Edit, x%x1% yp-1 w%w1% h21 ReadOnly VteamServerTokenEdit HWNDwidget8 Hidden, %teamServerTokenEdit%
 		
-		Loop 7
+		Gui %window%:Add, Text, x%x0% yp+25 w135 h23 +0x200 HWNDwidget9 Hidden, % translate("Contingent")
+		Gui %window%:Add, Edit, x%x1% yp-1 w%w1% h21 ReadOnly VteamServerTimeEdit HWNDwidget10 Hidden, %teamServerTimeEdit%
+		
+		Loop 10
 			editor.registerWidget(this, widget%A_Index%)
 	}
 	
@@ -116,7 +124,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-testLogin() {
+renewToken() {
 	configurator := TeamServerConfigurator.Instance
 	connector := configurator.iTeamServerConnector
 	
@@ -124,13 +132,34 @@ testLogin() {
 	GuiControlGet teamServerNameEdit
 	GuiControlGet teamServerPasswordEdit
 	
-	connector.Connect(teamServerURLEdit)
-	
-	token := connector.Login(teamServerNameEdit, teamServerPasswordEdit)
-	
-	token := connector.Token
-	minutesLeft := connector.GetMinutesLeft()
-	tokenLifeTime := connector.GetTokenLifeTime()
+	try {
+		connector.Connect(teamServerURLEdit)
+		
+		connector.Login(teamServerNameEdit, teamServerPasswordEdit)
+		
+		token := connector.Token
+		minutesLeft := connector.GetMinutesLeft()
+		tokenLifeTime := connector.GetTokenLifeTime()
+		
+		valid := A_Now
+		
+		EnvAdd valid, %minutesLeft%, Minutes
+		
+		FormatTime valid, %valid%, ShortDate
+		
+		GuiControl, , teamServerTokenEdit, % token . translate(" (Until ") . valid . translate(")")
+		GuiControl, , teamServerTimeEdit, % minutesLeft . translate(" Minutes")
+	}
+	catch exception {
+		GuiControl, , teamServerTokenEdit, % ""
+		GuiControl, , teamServerTimeEdit, % ""
+		
+		title := translate("Error")
+		
+		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+		MsgBox 262160, %title%, % translate("Cannot connect to the Team Server.`n`n") . translate("Error: ") . exception.Message
+		OnMessage(0x44, "")
+	}
 }
 
 initializeTeamServerConfigurator() {

@@ -11,7 +11,6 @@ namespace TeamServer {
 		public class Parameters : Dictionary<string, string> { }
 
 		public string Token { get; set; } = "";
-		
 		string Server = "";
 		
 		public TeamServerConnector() {

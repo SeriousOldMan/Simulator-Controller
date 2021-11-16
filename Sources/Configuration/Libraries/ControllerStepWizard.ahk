@@ -201,7 +201,7 @@ class ControllerStepWizard extends StepWizard {
 		
 		if (this.conflictingFunctions(buttonBoxConfiguration) || this.conflictingTriggers(buttonBoxConfiguration)) {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-			title := translate("Modular Simulator Controller System")
+			title := translate("Error")
 			MsgBox 262160, %title%, % translate("There are still duplicate functions or duplicate triggers - please correct...")
 			OnMessage(0x44, "")
 			

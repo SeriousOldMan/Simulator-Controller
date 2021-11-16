@@ -70,5 +70,11 @@ namespace TeamServer.Model.Access {
             else
                 return (DateTime.Now < (Created + new TimeSpan(7, 0, 0, 0)));
         }
+
+        public int GetRemainingMinutes() {
+            int usedMinutes = (int)(DateTime.Now - Created).TotalMinutes;
+
+            return (7 * 24 * 60) - usedMinutes;
+        }
     }
 }

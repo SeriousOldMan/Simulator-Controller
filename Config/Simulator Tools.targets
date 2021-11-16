@@ -108,8 +108,8 @@ Race Strategist Configuration.3=%kGrammarsDirectory%Race Strategist.grammars.en 
 Race Strategist Configuration.4=%kResourcesDirectory%Templates\Race Strategist.grammars.en <- %kSourcesDirectory%Assistants\Grammars\Race Strategist.grammars.en
 Race Strategist Configuration.5=%kGrammarsDirectory%Race Strategist.grammars.de <- %kSourcesDirectory%Assistants\Grammars\Race Strategist.grammars.de
 Race Strategist Configuration.6=%kResourcesDirectory%Templates\Race Strategist.grammars.de <- %kSourcesDirectory%Assistants\Grammars\Race Strategist.grammars.de
-Team Server.1=%kBinariesDirectory%Team Server Connector.dll <- %kSourcesDirectory%Special\Team Server\Release\\net5.0\Team Server Connector.dll
-Team Server.2=%kBinariesDirectory%TeamServer <- %kSourcesDirectory%Special\Team Server\Release\\netcoreapp3.1
+Team Server.1=%kBinariesDirectory%Team Server Connector.dll <- %kSourcesDirectory%Special\Team Server\Release\\net471\Team Server Connector.dll
+Team Server.2=%kBinariesDirectory%Team Server <- %kSourcesDirectory%Special\Team Server\Release\\netcoreapp3.1
 [Build]
 External Applications && DLLs=Special
 Simulator Startup=%kBinariesDirectory%Simulator Startup.exe <- %kSourcesDirectory%Controller\Simulator Startup.ahk; %kIncludesDirectory%, %kSourcesDirectory%Configuration\Libraries\SettingsEditor.ahk, %kHomeDirectory%VERSION

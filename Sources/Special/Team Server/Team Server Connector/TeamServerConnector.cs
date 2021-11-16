@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 
@@ -9,14 +10,16 @@ namespace TeamServer {
 
 		public class Parameters : Dictionary<string, string> { }
 
+		public string Token { get; set; } = "";
+		
 		string Server = "";
-		string Token = "";
-
+		
 		public TeamServerConnector() {
+			ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
 		}
 
 		public void Connect(string url) {
-			Server += (url[url.Length - 1] == '/') ? "api/" : "/api/";
+			Server = url + ((url[url.Length - 1] == '/') ? "api/" : "/api/");
 		}
 
 		#region Requests
@@ -49,9 +52,10 @@ namespace TeamServer {
 
 					arguments += kv.Key + "=" + kv.Value;
 				}
-
-				arguments = "?" + arguments;
 			}
+
+			if (arguments.Length > 0)
+				arguments = "?" + arguments;
 
 			return Server + request + arguments;
 		}
@@ -60,10 +64,12 @@ namespace TeamServer {
 			string result;
 
 			try {
-				result = httpClient.GetStringAsync(BuildRequest(request, arguments)).Result;
+                string uri = BuildRequest(request, arguments);
+
+                result = httpClient.GetStringAsync(uri).Result;
 			}
 			catch (Exception e) {
-				result = e.Message;
+				result = "Error: " + e.Message;
 			}
 
 			ValidateResult(result);
@@ -84,7 +90,7 @@ namespace TeamServer {
 				result = response.Content.ReadAsStringAsync().Result;
 			}
 			catch (Exception e) {
-				result = e.Message;
+				result = "Error: " + e.Message;
 			}
 
 			ValidateResult(result);
@@ -105,7 +111,7 @@ namespace TeamServer {
 				result = response.Content.ReadAsStringAsync().Result;
 			}
 			catch (Exception e) {
-				result = e.Message;
+				result = "Error: " + e.Message;
 			}
 
 			ValidateResult(result);
@@ -124,7 +130,7 @@ namespace TeamServer {
 				result = response.Content.ReadAsStringAsync().Result;
 			}
 			catch (Exception e) {
-				result = e.Message;
+				result = "Error: " + e.Message;
 			}
 
 			ValidateResult(result);
@@ -133,7 +139,11 @@ namespace TeamServer {
 
 		#region Access
 		public string Login(string name, string password) {
-			return Get("login", new Parameters() { { "Name", name }, { "Password", password } });
+			string token = Get("login", new Parameters() { { "Name", name }, { "Password", password } });
+
+			Token = token;
+
+			return token;
 		}
 
 		public string GetMinutesLeft() {

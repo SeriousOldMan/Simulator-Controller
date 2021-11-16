@@ -126,7 +126,7 @@ testLogin() {
 	
 	connector.Connect(teamServerURLEdit)
 	
-	connector.Login(teamServerNameEdit, teamServerPasswordEdit)
+	token := connector.Login(teamServerNameEdit, teamServerPasswordEdit)
 	
 	token := connector.Token
 	minutesLeft := connector.GetMinutesLeft()

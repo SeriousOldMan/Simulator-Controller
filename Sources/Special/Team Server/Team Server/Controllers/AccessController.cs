@@ -39,9 +39,7 @@ namespace TeamServer.Controllers {
 
         [HttpGet("tokenminutesleft")]
         public String GetTokenMinutes([FromQuery(Name = "token")] string token) {
-            TimeSpan timeLeft = DateTime.Now - Server.TeamServer.TokenIssuer.ValidateToken(token).Created;
-
-            return ((int)Math.Abs(timeLeft.TotalMinutes)).ToString();
+            return Server.TeamServer.TokenIssuer.ValidateToken(token).GetRemainingMinutes().ToString();
         }
     }
 

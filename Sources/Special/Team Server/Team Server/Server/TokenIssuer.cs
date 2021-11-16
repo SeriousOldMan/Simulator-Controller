@@ -45,8 +45,15 @@ namespace TeamServer.Server {
         public Token ValidateToken(Token token) {
             if ((token == null) || !token.IsValid())
                 throw new Exception("Token expired...");
-            else
+            else {
+                if ((token.Used == null) || (DateTime.Now > token.Used + new TimeSpan(0, 1, 0))) {
+                    token.Used = DateTime.Now;
+
+                    token.Save();
+                }
+
                 return token;
+            }
         }
 
         public Token ValidateToken(Guid identifier) {

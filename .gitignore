@@ -1,6 +1,7 @@
-Binaries/*.*
+Binaries/
 desktop.ini
-Releases/*.*
+Releases/
+Utilities/de.thebigo.simulatorcontroller.sdPlugin/
 Build.lnk
 Setup.lnk
 Sources/Special/**/.vs/

@@ -3,18 +3,20 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 
-namespace TeamServerConnector {
-    public class Parameters : Dictionary<string, string> { }
-	public class TeamServerConnector {
+namespace TeamServer {
+    public class TeamServerConnector {
 		static readonly HttpClient httpClient = new HttpClient();
+
+		public class Parameters : Dictionary<string, string> { }
 
 		string Server = "";
 		string Token = "";
 
-		TeamServerConnector(string url, string token = "") {
-			Server += (url[url.Length - 1] == '/') ? "teamserver/" : "/teamserver/";
+		public TeamServerConnector() {
+		}
 
-			Token = token;
+		public void Connect(string url) {
+			Server += (url[url.Length - 1] == '/') ? "api/" : "/api/";
 		}
 
 		#region Requests
@@ -131,9 +133,15 @@ namespace TeamServerConnector {
 
 		#region Access
 		public string Login(string name, string password) {
-			string result = Get("login", new Parameters() { { "Name", name }, { "Password", password } });
+			return Get("login", new Parameters() { { "Name", name }, { "Password", password } });
+		}
 
-			return result;
+		public string GetMinutesLeft() {
+			return Get("login/accountminutesleft");
+		}
+
+		public string GetTokenLifeTime() {
+			return Get("login/tokenminutesleft");
 		}
 
 		public void Logout(string token) {
@@ -145,7 +153,7 @@ namespace TeamServerConnector {
 
 		#region Team
 		public List<string> GetAllTeams() {
-			return new List<string>(Get("team/allteams").Split(";"));
+			return new List<string>(Get("team/allteams").Split(';'));
 		}
 
 		public string GetTeam(string identifier) {
@@ -153,11 +161,11 @@ namespace TeamServerConnector {
 		}
 
 		public List<string> GetTeamDrivers(string identifier) {
-			return new List<string>(Get("team/" + identifier + "/drivers").Split(";"));
+			return new List<string>(Get("team/" + identifier + "/drivers").Split(';'));
 		}
 
 		public List<string> GetTeamSessions(string identifier) {
-			return new List<string>(Get("team/" + identifier + "/sessions").Split(";"));
+			return new List<string>(Get("team/" + identifier + "/sessions").Split(';'));
 		}
 
 		public string CreateTeam(string name) {
@@ -195,7 +203,7 @@ namespace TeamServerConnector {
 
 		#region Session
 		public List<string> GetAllSessions() {
-			return new List<string>(Get("session/allsessions").Split(";"));
+			return new List<string>(Get("session/allsessions").Split(';'));
 		}
 
 		public string GetSession(string identifier) {
@@ -211,7 +219,7 @@ namespace TeamServerConnector {
 		}
 
 		public List<string> GetSessionStints(string identifier) {
-			return new List<string>(Get("session/" + identifier + "/stints").Split(";"));
+			return new List<string>(Get("session/" + identifier + "/stints").Split(';'));
 		}
 
 		public string CreateSession(string team, string name, int duration, string car, string track, string raceNr) {
@@ -260,7 +268,7 @@ namespace TeamServerConnector {
 		}
 
 		public List<string> GetStintLaps(string identifier) {
-			return new List<string>(Get("stint/" + identifier + "/laps").Split(";"));
+			return new List<string>(Get("stint/" + identifier + "/laps").Split(';'));
 		}
 
 		public string CreateStint(string session, string driver, int lap) {

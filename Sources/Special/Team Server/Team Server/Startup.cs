@@ -51,13 +51,6 @@ namespace TeamServer
             services.AddControllers(options => {
                 options.InputFormatters.Insert(0, new PlainTextFormatter());
             });
-
-            /*
-            services.AddHttpsRedirection(options => {
-                options.RedirectStatusCode = (int)HttpStatusCode.TemporaryRedirect;
-                options.HttpsPort = 443;
-            });
-            */
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -66,7 +59,8 @@ namespace TeamServer
                 app.UseDeveloperExceptionPage();
             }
 
-            // app.UseHttpsRedirection();
+            app.UseHttpsRedirection();
+            
             app.UseRouting();
 
             app.UseAuthorization();

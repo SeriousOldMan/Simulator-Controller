@@ -5,7 +5,7 @@ using TeamServer.Model;
 
 namespace TeamServer.Controllers {
     [ApiController]
-    [Route("teamserver/[controller]")]
+    [Route("api/[controller]")]
     public class LoginController : ControllerBase {
         private readonly ILogger<LoginController> _logger;
 
@@ -31,10 +31,22 @@ namespace TeamServer.Controllers {
                 return "Error: " + exception.Message;
             }
         }
+
+        [HttpGet("accountminutesleft")]
+        public String GetAccountMinutes([FromQuery(Name = "token")] string token) {
+            return Server.TeamServer.TokenIssuer.ValidateToken(token).Account.MinutesLeft.ToString();
+        }
+
+        [HttpGet("tokenminutesleft")]
+        public String GetTokenMinutes([FromQuery(Name = "token")] string token) {
+            TimeSpan timeLeft = DateTime.Now - Server.TeamServer.TokenIssuer.ValidateToken(token).Created;
+
+            return ((int)Math.Abs(timeLeft.TotalMinutes)).ToString();
+        }
     }
 
     [ApiController]
-    [Route("teamserver/[controller]")]
+    [Route("api/[controller]")]
     public class LogoutController : ControllerBase {
         private readonly ILogger<LogoutController> _logger;
 

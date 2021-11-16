@@ -9,7 +9,7 @@ using TeamServer.Server;
 
 namespace TeamServer.Controllers {
     [ApiController]
-    [Route("teamserver/[controller]")]
+    [Route("api/[controller]")]
     public class TeamController : ControllerBase {
         private readonly ILogger<TeamController> _logger;
 
@@ -120,7 +120,7 @@ namespace TeamServer.Controllers {
     }
 
     [ApiController]
-    [Route("teamserver/[controller]")]
+    [Route("api/[controller]")]
     public class DriverController : ControllerBase {
         private readonly ILogger<DriverController> _logger;
 

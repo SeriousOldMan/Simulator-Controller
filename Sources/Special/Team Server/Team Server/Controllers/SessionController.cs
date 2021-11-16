@@ -9,7 +9,7 @@ using TeamServer.Server;
 
 namespace TeamServer.Controllers {
     [ApiController]
-    [Route("teamserver/[controller]")]
+    [Route("api/[controller]")]
     public class SessionController : ControllerBase {
         private readonly ILogger<SessionController> _logger;
 
@@ -165,7 +165,7 @@ namespace TeamServer.Controllers {
     }
 
     [ApiController]
-    [Route("teamserver/[controller]")]
+    [Route("api/[controller]")]
     public class StintController : ControllerBase {
         private readonly ILogger<StintController> _logger;
 
@@ -287,7 +287,7 @@ namespace TeamServer.Controllers {
 
 
     [ApiController]
-    [Route("teamserver/[controller]")]
+    [Route("api/[controller]")]
     public class LapController : ControllerBase {
         private readonly ILogger<LapController> _logger;
 

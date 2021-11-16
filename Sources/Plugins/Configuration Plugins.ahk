@@ -14,3 +14,4 @@
 #Include ..\Plugins\Chat Messages Configuration Plugin.ahk
 #Include ..\Plugins\Race Engineer Configuration Plugin.ahk
 #Include ..\Plugins\Race Strategist Configuration Plugin.ahk
+#Include ..\Plugins\Team Server Configuration Plugin.ahk

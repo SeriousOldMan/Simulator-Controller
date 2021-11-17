@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using TeamServer.Model;
 using TeamServer.Model.Access;
 
@@ -19,7 +20,10 @@ namespace TeamServer.Server {
         }
 
         public Team FindTeam(string identifier) {
-            return FindTeam(new Guid(identifier));
+            Task<Team> task = ObjectManager.GetTeamAsync(Token.Account, identifier);
+            Team team = FindTeam(new Guid(identifier));
+
+            return (team != null) ? team : task.Result;
         }
 
         public Team LookupTeam(Guid identifier) {
@@ -31,7 +35,9 @@ namespace TeamServer.Server {
         }
 
         public Team LookupTeam(string identifier) {
-            return LookupTeam(new Guid(identifier));
+            Team team = FindTeam(identifier);
+
+            return (team != null) ? team : LookupTeam(new Guid(identifier));
         }
         #endregion
 

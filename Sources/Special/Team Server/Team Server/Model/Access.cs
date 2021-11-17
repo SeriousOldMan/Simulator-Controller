@@ -62,13 +62,15 @@ namespace TeamServer.Model.Access {
 
         public DateTime Created { get; set; }
 
+        public DateTime Until { get; set; }
+
         public DateTime Used { get; set; } = DateTime.MinValue;
 
         public bool IsValid() {
             if ((Used != null) && (DateTime.Now < Used + new TimeSpan(0, 5, 0)))
                 return true;
             else
-                return (DateTime.Now < (Created + new TimeSpan(7, 0, 0, 0)));
+                return DateTime.Now < Until;
         }
 
         public int GetRemainingMinutes() {

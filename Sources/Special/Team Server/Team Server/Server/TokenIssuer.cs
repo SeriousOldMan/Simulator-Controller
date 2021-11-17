@@ -19,7 +19,8 @@ namespace TeamServer.Server {
             else if (account.MinutesLeft <= 0)
                 throw new Exception("No time left...");
             else {
-                Token token = new Token { Identifier = Guid.NewGuid(), AccountID = account.ID, Created = DateTime.Now };
+                Token token = new Token { Identifier = Guid.NewGuid(), AccountID = account.ID,
+                                          Created = DateTime.Now, Until = DateTime.Now + new TimeSpan(7, 0, 0, 0) };
 
                 token.Save();
 

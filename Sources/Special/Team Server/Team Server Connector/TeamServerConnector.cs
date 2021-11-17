@@ -10,8 +10,9 @@ namespace TeamServer {
 
 		public class Parameters : Dictionary<string, string> { }
 
-		public string Token { get; set; } = "";
 		string Server = "";
+
+		public string Token { get; set; } = "";
 		
 		public TeamServerConnector() {
 			ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
@@ -31,7 +32,7 @@ namespace TeamServer {
 			string keyValues = "";
 
 			if (parameters.Count > 0)
-				foreach (KeyValuePair<string, string> kv in parameters) {
+				foreach (var kv in parameters) {
 					if (keyValues.Length > 0)
 						keyValues += Environment.NewLine;
 
@@ -45,7 +46,7 @@ namespace TeamServer {
 			string arguments = (Token.Length > 0) ? "token=" + Token : "";
 
 			if ((parameters != null) && (parameters.Count > 0)) {
-				foreach (KeyValuePair<string, string> kv in parameters) {
+				foreach (var kv in parameters) {
 					if (arguments.Length > 0)
 						arguments += "&";
 
@@ -161,20 +162,20 @@ namespace TeamServer {
 		#endregion
 
 		#region Team
-		public List<string> GetAllTeams() {
-			return new List<string>(Get("team/allteams").Split(';'));
+		public string GetAllTeams() {
+			return Get("team/allteams");
 		}
 
 		public string GetTeam(string identifier) {
 			return Get("team/" + identifier);
 		}
 
-		public List<string> GetTeamDrivers(string identifier) {
-			return new List<string>(Get("team/" + identifier + "/drivers").Split(';'));
+		public string GetTeamDrivers(string identifier) {
+			return Get("team/" + identifier + "/drivers");
 		}
 
-		public List<string> GetTeamSessions(string identifier) {
-			return new List<string>(Get("team/" + identifier + "/sessions").Split(';'));
+		public string GetTeamSessions(string identifier) {
+			return Get("team/" + identifier + "/sessions");
 		}
 
 		public string CreateTeam(string name) {
@@ -211,8 +212,8 @@ namespace TeamServer {
 		#endregion
 
 		#region Session
-		public List<string> GetAllSessions() {
-			return new List<string>(Get("session/allsessions").Split(';'));
+		public string GetAllSessions() {
+			return Get("session/allsessions");
 		}
 
 		public string GetSession(string identifier) {
@@ -227,8 +228,8 @@ namespace TeamServer {
 			return Get("session/" + identifier + "/stint");
 		}
 
-		public List<string> GetSessionStints(string identifier) {
-			return new List<string>(Get("session/" + identifier + "/stints").Split(';'));
+		public string GetSessionStints(string identifier) {
+			return Get("session/" + identifier + "/stints");
 		}
 
 		public string CreateSession(string team, string name, int duration, string car, string track, string raceNr) {
@@ -276,8 +277,8 @@ namespace TeamServer {
 			return Get("stint/" + identifier + "/lap");
 		}
 
-		public List<string> GetStintLaps(string identifier) {
-			return new List<string>(Get("stint/" + identifier + "/laps").Split(';'));
+		public string GetStintLaps(string identifier) {
+			return Get("stint/" + identifier + "/laps");
 		}
 
 		public string CreateStint(string session, string driver, int lap) {

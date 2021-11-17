@@ -19,7 +19,9 @@ namespace TeamServer.Controllers {
         }
 
         public static Dictionary<string, string> ParseKeyValues(string text) {
-            return text.Split(Environment.NewLine).Select(value => value.Split('=')).ToDictionary(pair => pair[0].Trim(), pair => pair[1].Trim());
+            var keyValues = text.Replace("\r", "").Split('\n');
+                
+            return keyValues.Select(value => value.Split('=')).ToDictionary(pair => pair[0].Trim(), pair => pair[1].Trim());
         }
 
         public static string SerializeObject(Object obj, List<string> properties, string prefix = "") {
@@ -39,7 +41,7 @@ namespace TeamServer.Controllers {
         public static void DeserializeObject(Object obj, Dictionary<string, string> properties) {
             Type type = obj.GetType();
 
-            foreach (KeyValuePair<string, string> entry in properties) {
+            foreach (var entry in properties) {
                 PropertyInfo propertyInfo = type.GetProperty(entry.Key);
 
                 propertyInfo.SetValue(obj, Convert.ChangeType(entry.Value, propertyInfo.PropertyType));

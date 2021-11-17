@@ -12,6 +12,7 @@ using Microsoft.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using System.Net;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 namespace TeamServer
 {
@@ -50,6 +51,16 @@ namespace TeamServer
         public void ConfigureServices(IServiceCollection services) {
             services.AddControllers(options => {
                 options.InputFormatters.Insert(0, new PlainTextFormatter());
+            });
+
+            services.Configure<KestrelServerOptions>(options =>
+            {
+                options.AllowSynchronousIO = true;
+            });
+
+            services.Configure<IISServerOptions>(options =>
+            {
+                options.AllowSynchronousIO = true;
             });
         }
 

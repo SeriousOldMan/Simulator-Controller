@@ -77,6 +77,10 @@ namespace TeamServer.Model {
             return Connection.Table<Team>().Where(t => t.Identifier == identifier).FirstOrDefaultAsync();
         }
 
+        public Task<Team> GetTeamAsync(Access.Account account, string name) {
+            return Connection.Table<Team>().Where(t => t.AccountID == account.ID && t.Name == name).FirstOrDefaultAsync();
+        }
+
         public Task<Team> GetTeamAsync(string identifier) {
             return GetTeamAsync(new Guid(identifier));
         }

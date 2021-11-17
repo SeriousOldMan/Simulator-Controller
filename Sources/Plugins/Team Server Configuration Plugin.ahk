@@ -25,16 +25,88 @@ global teamServerURLEdit = "https://localhost:5001"
 global teamServerNameEdit = ""
 global teamServerPasswordEdit = ""
 global teamServerTokenEdit = ""
-global teamServerTimeEdit = ""
+global teamServerTimeText = ""
+
+global teamDropDownList
+global driverListBox
+
+global addTeamButton
+global deleteTeamButton
+global editTeamButton
+global addDriverButton
+global deleteDriverButton
+global editDriverButton
+
+global sessionListBox
+
+global deleteSessionButton
 
 class TeamServerConfigurator extends ConfigurationItem {
 	iEditor := false
 	
-	iTeamServerConnector := false
+	iConnector := false
+	iToken := false
+	
+	iTeams := {}
+	iSelectedTeam := false
+	
+	iDrivers := {}
+	iSelectedDriver := false
+	
+	iSessions := {}
+	iSelectedSession := false
 	
 	Editor[] {
 		Get {
 			return this.iEditor
+		}
+	}
+	
+	Connector[] {
+		Get {
+			return this.iConnector
+		}
+	}
+	
+	Token[] {
+		Get {
+			return this.iToken
+		}
+	}
+	
+	Teams[key := false] {
+		Get {
+			return (key ? this.iTeams[key] : this.iTeams)
+		}
+	}
+	
+	SelectedTeam[] {
+		Get {
+			return this.iSelectedTeam
+		}
+	}
+	
+	Drivers[key := false] {
+		Get {
+			return (key ? this.iDrivers[key] : this.iDrivers)
+		}
+	}
+	
+	SelectedDriver[] {
+		Get {
+			return this.iSelectedDriver
+		}
+	}
+	
+	Sessions[key := false] {
+		Get {
+			return (key ? this.iSessions[key] : this.iSessions)
+		}
+	}
+	
+	SelectedSession[] {
+		Get {
+			return this.iSelectedSession
 		}
 	}
 	
@@ -53,7 +125,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 				Throw "Unable to find Team Server Connector.dll in " . kBinariesDirectory . "..."
 			}
 
-			this.iTeamServerConnector := CLR_LoadLibrary(dllFile).CreateInstance("TeamServer.TeamServerConnector")
+			this.iConnector := CLR_LoadLibrary(dllFile).CreateInstance("TeamServer.TeamServerConnector")
 		}
 		catch exception {
 			logMessage(kLogCritical, translate("Error while initializing Team Server Connector - please rebuild the applications"))
@@ -83,25 +155,67 @@ class TeamServerConfigurator extends ConfigurationItem {
 		
 		x2 := x1 - 25
 		
-		x4 := x1 + w2 + 4
+		w4 := w1 - 25
+		x4 := x1 + w4 + 2
 		
 		Gui %window%:Add, Text, x%x0% y%y% w134 h23 +0x200 HWNDwidget1 Hidden, % translate("Server URL")
 		Gui %window%:Add, Edit, x%x1% yp+1 w%w1% h21 VteamServerURLEdit HWNDwidget2 Hidden, %teamServerURLEdit%
 		
-		Gui %window%:Add, Text, x%x0% yp+21 w135 h23 +0x200 HWNDwidget3 Hidden, % translate("Login Credentials")
+		Gui %window%:Add, Text, x%x0% yp+23 w135 h23 +0x200 HWNDwidget3 Hidden, % translate("Login Credentials")
 		Gui %window%:Add, Edit, x%x1% yp+1 w%w3% h21 VteamServerNameEdit HWNDwidget4 Hidden, %teamServerNameEdit%
 		Gui %window%:Add, Edit, x%x3% yp w%w3% h21 Password VteamServerPasswordEdit HWNDwidget5 Hidden, %teamServerPasswordEdit%
-		Gui %window%:Add, Button, x%x2% yp-1 w23 h23 Center +0x200 grenewToken HWNDwidget6 Hidden
-		setButtonIcon(widget6, kIconsDirectory . "Authorize.ico", 1, "L4 T4 R4 B4")
 		
 		Gui %window%:Add, Text, x%x0% yp+26 w135 h23 +0x200 HWNDwidget7 Hidden, % translate("Token")
-		Gui %window%:Add, Edit, x%x1% yp-1 w%w1% h21 ReadOnly VteamServerTokenEdit HWNDwidget8 Hidden, %teamServerTokenEdit%
+		Gui %window%:Add, Edit, x%x1% yp-1 w%w4% h21 ReadOnly VteamServerTokenEdit HWNDwidget8 Hidden, %teamServerTokenEdit%
+		Gui %window%:Add, Button, x%x2% yp-1 w23 h23 Center +0x200 grenewToken HWNDwidget6 Hidden
+		setButtonIcon(widget6, kIconsDirectory . "Authorize.ico", 1, "L4 T4 R4 B4")
+		Gui %window%:Add, Button, x%x4% yp w23 h23 Center +0x200 gcopyToken HWNDwidget11 Hidden
+		setButtonIcon(widget11, kIconsDirectory . "Copy.ico", 1, "L4 T4 R4 B4")
 		
-		Gui %window%:Add, Text, x%x0% yp+25 w135 h23 +0x200 HWNDwidget9 Hidden, % translate("Contingent")
-		Gui %window%:Add, Edit, x%x1% yp-1 w%w1% h21 ReadOnly VteamServerTimeEdit HWNDwidget10 Hidden, %teamServerTimeEdit%
+		Gui %window%:Add, Text, x%x0% yp+26 w135 h23 +0x200 HWNDwidget9 Hidden, % translate("Contingent")
 		
-		Loop 10
+		Gui %window%:Font, cGray
+		
+		Gui %window%:Add, Text, x%x1% yp+4 w%w1% h21 VteamServerTimeText HWNDwidget10 Hidden, % translate("Please Login for actual data...")
+		
+		Gui %window%:Font, cBlack Norm, Arial
+		Gui %window%:Font, Italic, Arial
+		
+		Gui %window%:Add, GroupBox, -Theme x%x% yp+30 w%width% h214 HWNDwidget12 Hidden, % translate("Teams")
+		
+		Gui %window%:Font, Norm, Arial
+		
+		x5 := x1 + w3 + 3
+		x6 := x5 + 24
+		x7 := x6 + 24
+		
+		Gui %window%:Add, Text, x%x0% yp+24 w134 h23 +0x200 HWNDwidget13 Hidden, % translate("Team")
+		Gui %window%:Add, DropDownList, x%x1% yp w%w3% AltSubmit gselectTeam vteamDropDownList HWNDwidget14 Hidden
+		Gui %window%:Add, Button, x%x5% yp w23 h23 Center +0x200 vaddTeamButton gnewTeam HWNDwidget15 Hidden
+		setButtonIcon(widget15, kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
+		Gui %window%:Add, Button, x%x6% yp w23 h23 Center +0x200 vdeleteTeamButton gdeleteTeam HWNDwidget16 Hidden
+		setButtonIcon(widget16, kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
+		Gui %window%:Add, Button, x%x7% yp w23 h23 Center +0x200 veditTeamButton grenameTeam HWNDwidget17 Hidden
+		setButtonIcon(widget17, kIconsDirectory . "Pencil.ico", 1, "L4 T4 R4 B4")
+		
+		Gui %window%:Add, Text, x%x0% yp+26 w134 h23 +0x200 HWNDwidget18 Hidden, % translate("Drivers")
+		Gui %window%:Add, ListBox, x%x1% yp w%w3% h96 AltSubmit gselectDriver vdriverListBox HWNDwidget19 Hidden
+		Gui %window%:Add, Button, x%x5% yp w23 h23 Center +0x200 vaddDriverButton gnewDriver HWNDwidget20 Hidden
+		setButtonIcon(widget20, kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
+		Gui %window%:Add, Button, x%x6% yp w23 h23 Center +0x200 vdeleteDriverButton gdeleteDriver HWNDwidget21 Hidden
+		setButtonIcon(widget21, kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
+		Gui %window%:Add, Button, x%x7% yp w23 h23 Center +0x200 veditDriverButton grenameDriver HWNDwidget22 Hidden
+		setButtonIcon(widget22, kIconsDirectory . "Pencil.ico", 1, "L4 T4 R4 B4")
+		
+		Gui %window%:Add, Text, x%x0% yp+92 w158 h23 +0x200 HWNDwidget23 Hidden, % translate("Sessions")
+		Gui %window%:Add, ListBox, x%x1% yp w%w3% h72 AltSubmit gselectSession vsessionListBox HWNDwidget24 Hidden
+		Gui %window%:Add, Button, x%x5% yp w23 h23 Center +0x200 vdeleteSessionButton gdeleteSession HWNDwidget25 Hidden
+		setButtonIcon(widget25, kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
+		
+		Loop 25
 			editor.registerWidget(this, widget%A_Index%)
+		
+		this.updateState()
 	}
 	
 	loadFromConfiguration(configuration) {
@@ -117,6 +231,333 @@ class TeamServerConfigurator extends ConfigurationItem {
 		Gui %window%:Default
 
 	}
+	
+	connect() {
+		connector := this.Connector
+
+		window := this.Editor.Window
+		
+		Gui %window%:Default
+		
+		GuiControlGet teamServerURLEdit
+		GuiControlGet teamServerNameEdit
+		GuiControlGet teamServerPasswordEdit
+
+		try {
+			connector.Connect(teamServerURLEdit)
+			
+			connector.Login(teamServerNameEdit, teamServerPasswordEdit)
+			
+			this.iToken := connector.Token
+			minutesLeft := connector.GetMinutesLeft()
+			
+			GuiControl, , teamServerTokenEdit, % this.Token
+			GuiControl +cBlack, teamServerTimeText
+			GuiControl, , teamServerTimeText, % (minutesLeft . translate(" Minutes"))
+		}
+		catch exception {
+			GuiControl, , teamServerTokenEdit, % ""
+			GuiControl, , teamServerTimeText, % ""
+			
+			title := translate("Error")
+			
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+			MsgBox 262160, %title%, % (translate("Cannot connect to the Team Server.`n`n") . translate("Error: ") . exception.Message)
+			OnMessage(0x44, "")
+		}
+		
+		this.loadTeams()
+	}
+	
+	updateState() {
+		GuiControl Disable, addTeamButton
+		GuiControl Disable, deleteTeamButton
+		GuiControl Disable, editTeamButton
+		
+		GuiControl Disable, addDriverButton
+		GuiControl Disable, deleteDriverButton
+		GuiControl Disable, editDriverButton
+		
+		GuiControl Disable, deleteSessionButton
+		
+		if this.Token {
+			GuiControl Enable, addTeamButton
+			
+			if this.SelectedTeam {
+				GuiControl Enable, deleteTeamButton
+				GuiControl Enable, editTeamButton
+				
+				GuiControl Enable, addDriverButton
+				
+				if this.SelectedDriver {
+					GuiControl Enable, deleteDriverButton
+					GuiControl Enable, editDriverButton
+				}
+				
+				if this.SelectedSession
+					GuiControl Enable, deleteSessionButton
+			}
+		}	
+	}
+	
+	parseProperties(properties) {
+		result := {}
+		
+		Loop Parse, properties, `n
+		{
+			property := string2Values("=", A_LoopField)
+			
+			result[property[1]] := property[2]
+		}
+		
+		return result
+	}
+	
+	loadTeams() {
+		connector := this.Connector
+		
+		this.iTeams := {}
+		
+		for ignore, identifier in string2Values(";", connector.GetAllTeams())
+			try {
+				team := connector.GetTeam(identifier)
+				team := this.parseProperties(team)
+				
+				key := team["Name"]
+				
+				this.iTeams[key] := team["Identifier"]
+			}
+			catch exception {
+				; ignore
+			}
+
+		window := this.Editor.Window
+		
+		Gui %window%:Default
+		
+		teams := []
+		
+		for name, ignore in this.Teams
+			teams.Push(name)
+		
+		GuiControl, , teamDropDownList, % ("|" . values2String("|", teams*))
+		
+		this.SelectTeam(((teams.Length() > 0) ? teams[1] : false))
+	}
+	
+	loadDrivers() {
+		connector := this.Connector
+		
+		window := this.Editor.Window
+		
+		Gui %window%:Default
+	
+		GuiControl, , driverListBox, |
+		
+		this.iDrivers := {}
+	
+		if this.SelectedTeam
+			for ignore, identifier in string2Values(";", connector.GetTeamDrivers(this.Teams[this.SelectedTeam])) {
+				try {
+					driver := connector.GetDriver(identifier)
+					driver := this.parseProperties(driver)
+					
+					name := (driver["ForName"] . A_Space . driver["SurName"] . A_Space . translate("(") . driver["NickName"] . translate(")"))
+					
+					this.iDrivers[name] := driver["Identifier"]
+				}
+				catch exception {
+					; ignore
+				}
+			}			
+		
+		drivers := []
+		
+		for name, ignore in this.Drivers
+			drivers.Push(name)
+		
+		GuiControl, , driverListBox, % ("|" . values2String("|", drivers*))
+		
+		this.selectDriver((drivers.Length() > 0) ? drivers[1] : false)
+	}
+	
+	loadSessions() {
+		connector := this.Connector
+		
+		window := this.Editor.Window
+		
+		Gui %window%:Default
+	
+		GuiControl, , sessionListBox, |
+		
+		this.iSessions := {}
+	
+		if this.SelectedTeam
+			for ignore, identifier in string2Values(";", connector.GetTeamSessions(this.Teams[this.SelectedTeam])) {
+				try {
+					session := connector.GetSession(identifier)
+					session := this.parseProperties(session)
+					
+					name := session["Name"]
+					
+					this.iSessions[name] := session["Identifier"]
+				}
+				catch exception {
+					; ignore
+				}
+			}			
+		
+		sessions := []
+		
+		for name, ignore in this.Sessions
+			sessions.Push(name)
+		
+		GuiControl, , sessionListBox, % ("|" . values2String("|", sessions*))
+		
+		this.selectSession((sessions.Length() > 0) ? sessions[1] : false)
+	}
+	
+	selectTeam(team) {
+		this.iSelectedTeam := team
+		
+		window := this.Editor.Window
+		
+		Gui %window%:Default
+		
+		teams := []
+		
+		for name, ignore in this.Teams
+			teams.Push(name)
+		
+		GuiControl Choose, teamDropDownList, % inList(teams, team)
+		
+		this.loadDrivers()
+		this.loadSessions()
+	}
+	
+	selectDriver(driver) {
+		this.iSelectedDriver := driver
+		
+		window := this.Editor.Window
+		
+		Gui %window%:Default
+		
+		drivers := []
+		
+		for name, ignore in this.Drivers
+			drivers.Push(name)
+		
+		GuiControl Choose, driverListBox, % inList(drivers, driver)
+		
+		this.updateState()
+	}
+	
+	selectSession(session) {
+		this.iSelectedSession := session
+		
+		window := this.Editor.Window
+		
+		Gui %window%:Default
+		
+		sessions := []
+		
+		for name, ignore in this.Sessions
+			sessions.Push(name)
+		
+		GuiControl Choose, sessionListBox, % inList(sessions, session)
+		
+		this.updateState()
+	}
+	
+	addTeam(name) {
+		identifier := this.Connector.CreateTeam(name)
+		
+		teams := this.Teams
+		
+		teams[name] := identifier
+		
+		this.loadTeams()
+		this.selectTeam(name)
+	}
+	
+	renameTeam(oldName, newName) {
+		identifier := this.Teams[oldName]
+		
+		this.Connector.UpdateTeam(this.Teams[oldName], "Name=" . newName)
+		
+		this.loadTeams()
+		this.selectTeam(newName)
+	}
+	
+	deleteTeam(name) {
+		this.Connector.DeleteTeam(this.Teams[name])
+		
+		this.loadTeams()
+	}
+	
+	normalizeDriverName(name) {
+		parts := string2Values(A_Space, name)
+		
+		forName := ""
+		surName := ""
+		nickName := ""
+		
+		if (parts.Length() > 0)
+			forName := parts[1]
+		
+		if (parts.Length() > 1)
+			surName := parts[2]
+		
+		if (parts.Length() > 2) {
+			parts.RemoveAt(1, 2)
+			
+			nickName := Trim(StrReplace(StrReplace(values2String(A_Space, parts*), "(", ""), ")", ""))
+		}
+		else {
+			StringUpper initialForName, % SubStr(forName, 1, 1)
+			StringUpper initialSurName, % SubStr(surName, 1, 1)
+			
+			nickName := (initialForName . initialSurName)
+		}
+		
+		nickName := SubStr(nickName, 1, 3)
+		
+		return (forName . A_Space . surName . A_Space . translate("(") . nickName . translate(")"))
+	}
+	
+	addDriver(name) {
+		name := this.normalizeDriverName(name)
+		
+		parts := string2Values(A_Space, name)
+		
+		identifier := this.Connector.CreateDriver(this.Teams[this.SelectedTeam], parts[1], parts[2], StrReplace(StrReplace(parts[3], "(", ""), ")", ""))
+		
+		drivers := this.Drivers
+		
+		drivers[name] := identifier
+		
+		this.loadDrivers()
+		this.selectDriver(name)
+	}
+	
+	renameDriver(oldName, newName) {
+		identifier := this.Drivers[oldName]
+		
+		newName := this.normalizeDriverName(newName)
+		
+		parts := string2Values(A_Space, newName)
+		
+		this.Connector.UpdateDriver(this.Drivers[oldName], "ForName=" . parts[1] . "`n" . "SurName=" . parts[2] . "`n" . "NickName=" . StrReplace(StrReplace(parts[3], "(", ""), ")", ""))
+		
+		this.loadDrivers()
+		this.selectDriver(newName)
+	}
+	
+	deleteDriver(name) {
+		this.Connector.DeleteDriver(this.Drivers[name])
+		
+		this.loadDrivers()
+	}
 }
 
 
@@ -125,41 +566,165 @@ class TeamServerConfigurator extends ConfigurationItem {
 ;;;-------------------------------------------------------------------------;;;
 
 renewToken() {
+	TeamServerConfigurator.Instance.connect()
+}
+
+copyToken() {
+	GuiControlGet teamServerTokenEdit
+	
+	if (teamServerTokenEdit && (teamServerTokenEdit != "")) {
+		Clipboard := teamServerTokenEdit
+		
+		showMessage(translate("Token copied to the clipboard."))
+	}
+}
+
+selectTeam() {
 	configurator := TeamServerConfigurator.Instance
-	connector := configurator.iTeamServerConnector
 	
-	GuiControlGet teamServerURLEdit
-	GuiControlGet teamServerNameEdit
-	GuiControlGet teamServerPasswordEdit
+	window := configurator.Editor.Window
+
+	Gui %window%:Default
 	
-	try {
-		connector.Connect(teamServerURLEdit)
+	GuiControlGet teamDropDownList
 		
-		connector.Login(teamServerNameEdit, teamServerPasswordEdit)
+	teams := []
+	
+	for name, ignore in configurator.Teams
+		teams.Push(name)
+	
+	configurator.selectTeam(teams[teamDropDownList])
+}
+
+newTeam() {
+	title := translate("Modular Simulator Controller System")
+	prompt := translate("Please enter the name for the new team:")
+	
+	configurator := TeamServerConfigurator.Instance
+	
+	window := configurator.Editor.Window
+
+	Gui %window%:Default
+	
+	locale := ((getLanguage() = "en") ? "" : "Locale")
+	
+	InputBox name, %title%, %prompt%, , 300, 200, , , %locale%
+	
+	if !ErrorLevel
+		configurator.addTeam(name)
+}
+
+deleteTeam() {
+	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+	title := translate("Modular Simulator Controller System")
+	MsgBox 262436, %title%, % translate("Do you really want to delete the selected team?")
+	OnMessage(0x44, "")
+	
+	IfMsgBox Yes
+		TeamServerConfigurator.Instance.deleteTeam(TeamServerConfigurator.Instance.SelectedTeam)
+}
+
+renameTeam() {
+	title := translate("Modular Simulator Controller System")
+	prompt := translate("Please enter the new name for the selected team:")
+	
+	configurator := TeamServerConfigurator.Instance
+	
+	window := configurator.Editor.Window
+
+	Gui %window%:Default
+	
+	locale := ((getLanguage() = "en") ? "" : "Locale")
+	
+	InputBox name, %title%, %prompt%, , 300, 200, , , %locale%, , % configurator.SelectedTeam
+	
+	if !ErrorLevel
+		configurator.renameTeam(configurator.SelectedTeam, name)
+}
+
+selectDriver() {
+	configurator := TeamServerConfigurator.Instance
+	
+	window := configurator.Editor.Window
+
+	Gui %window%:Default
+	
+	GuiControlGet driverListBox
 		
-		token := connector.Token
-		minutesLeft := connector.GetMinutesLeft()
-		tokenLifeTime := connector.GetTokenLifeTime()
-		
-		valid := A_Now
-		
-		EnvAdd valid, %minutesLeft%, Minutes
-		
-		FormatTime valid, %valid%, ShortDate
-		
-		GuiControl, , teamServerTokenEdit, % token . translate(" (Until ") . valid . translate(")")
-		GuiControl, , teamServerTimeEdit, % minutesLeft . translate(" Minutes")
-	}
-	catch exception {
-		GuiControl, , teamServerTokenEdit, % ""
-		GuiControl, , teamServerTimeEdit, % ""
-		
-		title := translate("Error")
-		
-		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-		MsgBox 262160, %title%, % translate("Cannot connect to the Team Server.`n`n") . translate("Error: ") . exception.Message
-		OnMessage(0x44, "")
-	}
+	drivers := []
+	
+	for name, ignore in configurator.Drivers
+		drivers.Push(name)
+	
+	configurator.selectDriver(drivers[driverListBox])
+}
+
+newDriver() {
+	title := translate("Modular Simulator Controller System")
+	prompt := translate("Please enter the name for the new driver (Format: FirstName LastName (NickName))):")
+	
+	configurator := TeamServerConfigurator.Instance
+	
+	window := configurator.Editor.Window
+
+	Gui %window%:Default
+	
+	locale := ((getLanguage() = "en") ? "" : "Locale")
+	
+	InputBox name, %title%, %prompt%, , 300, 200, , , %locale%
+	
+	if !ErrorLevel
+		configurator.addDriver(name)
+}
+
+deleteDriver() {
+	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+	title := translate("Modular Simulator Controller System")
+	MsgBox 262436, %title%, % translate("Do you really want to delete the selected driver?")
+	OnMessage(0x44, "")
+	
+	IfMsgBox Yes
+		TeamServerConfigurator.Instance.deleteDriver(TeamServerConfigurator.Instance.SelectedDriver)
+}
+
+renameDriver() {
+	title := translate("Modular Simulator Controller System")
+	prompt := translate("Please enter the new name for the selected driver (Format: FirstName LastName (NickName))):")
+	
+	configurator := TeamServerConfigurator.Instance
+	
+	window := configurator.Editor.Window
+
+	Gui %window%:Default
+	
+	locale := ((getLanguage() = "en") ? "" : "Locale")
+	
+	InputBox name, %title%, %prompt%, , 300, 200, , , %locale%, , % configurator.SelectedDriver
+	
+	if !ErrorLevel
+		configurator.renameDriver(configurator.SelectedDriver, name)
+}
+
+selectSession() {
+	configurator := TeamServerConfigurator.Instance
+	
+	window := configurator.Editor.Window
+
+	Gui %window%:Default
+	
+	GuiControlGet sessionListBox
+	
+	configurator.selectSession(sessionListBox)
+}
+
+deleteSession() {
+	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+	title := translate("Modular Simulator Controller System")
+	MsgBox 262436, %title%, % translate("Do you really want to delete the selected session?")
+	OnMessage(0x44, "")
+	
+	IfMsgBox Yes
+		TeamServerConfigurator.Instance.deleteSession(TeamServerConfigurator.Instance.SelectedSession)
 }
 
 initializeTeamServerConfigurator() {

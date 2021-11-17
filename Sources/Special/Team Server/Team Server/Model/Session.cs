@@ -29,7 +29,7 @@ namespace TeamServer.Model {
         public int Duration { get; set; }
 
         public DateTime Started { get; set; }
-
+            
         public bool Finished { get; set; } = false;
 
         public string Track { get; set; }
@@ -91,8 +91,15 @@ namespace TeamServer.Model {
 
         public int Lap { get; set; }
 
-        [MaxLength(2147483647)]
-        public string PitstopData { get; set; } = "";
+        [Ignore]
+        public string PitstopData {
+            get {
+                return ObjectManager.GetAttributeAsync(this, "PitstopData").Result;
+            }
+            set {
+                ObjectManager.SetAttributeAsync(this, "PitstopData", value);
+            }
+        }
 
         [Ignore]
         public List<Lap> Laps {
@@ -136,10 +143,24 @@ namespace TeamServer.Model {
         [Indexed]
         public int Nr { get; set; }
 
-        [MaxLength(2147483647)]
-        public string TelemetryData { get; set; } = "";
+        [Ignore]
+        public string TelemetryData {
+            get {
+                return ObjectManager.GetAttributeAsync(this, "TelemetryData").Result;
+            }
+            set {
+                ObjectManager.SetAttributeAsync(this, "TelemetryData", value);
+            }
+        }
 
-        [MaxLength(2147483647)]
-        public string PositionData { get; set; } = "";
+        [Ignore]
+        public string PositionData {
+            get {
+                return ObjectManager.GetAttributeAsync(this, "PositionData").Result;
+            }
+            set {
+                ObjectManager.SetAttributeAsync(this, "PositionData", value);
+            }
+        }
     }
 }

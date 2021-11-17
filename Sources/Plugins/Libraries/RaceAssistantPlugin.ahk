@@ -274,8 +274,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		}
 	}
 	
-	__New(controller, name, configuration := false) {
-		base.__New(controller, name, configuration)
+	__New(controller, name, configuration := false, register := true) {
+		base.__New(controller, name, configuration, register)
 		
 		this.iRaceAssistantName := this.getArgumentValue("raceAssistantName", false)
 		this.iRaceAssistantLogo := this.getArgumentValue("raceAssistantLogo", false)

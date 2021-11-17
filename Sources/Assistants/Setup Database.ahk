@@ -728,8 +728,6 @@ openSettings(mode := "New", arguments*) {
 	Gui RES:Hide
 				
 	try {
-		options := ""
-		
 		switch mode {
 			case "New":
 				try {
@@ -742,7 +740,7 @@ openSettings(mode := "New", arguments*) {
 				writeConfiguration(fileName, arguments[1])
 		}
 				
-		options := "-File """ . fileName . """"
+		options := "-NoTeam -File """ . fileName . """"
 		
 		RunWait "%exePath%" %options%, %kBinariesDirectory%, , pid
 			

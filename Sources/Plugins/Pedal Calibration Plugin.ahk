@@ -176,7 +176,7 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 		}
 	}
 	
-	__New(controller, name, configuration := false) {
+	__New(controller, name, configuration := false, register := true) {
 		base.__New(controller, name, configuration, false)
 		
 		this.iSmartCtrlApplication := new Application(this.getArgumentValue("controlApplication", kPedalCalibrationPlugin), configuration)
@@ -200,7 +200,8 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 		for ignore, theAction in string2Values(",", this.getArgumentValue("pedalCalibrations", ""))
 			this.createPedalCalibrationAction(controller, this.parseValues(A_Space, theAction)*)
 		
-		controller.registerPlugin(this)
+		if register
+			controller.registerPlugin(this)
 	}
 	
 	createPedalCalibrationAction(controller, pedalAndShape, descriptor) {

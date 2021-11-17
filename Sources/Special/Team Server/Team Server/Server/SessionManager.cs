@@ -35,8 +35,8 @@ namespace TeamServer.Server {
         #endregion
 
         #region CRUD
-        public Session CreateSession(Team team, string name, int duration, string car, string track, string raceNr) {
-            Session session = new Session { TeamID = team.ID, Duration = duration, Track = track, Car = car, RaceNr = raceNr };
+        public Session CreateSession(Team team, string name) {
+            Session session = new Session { TeamID = team.ID, Name = name };
 
             ValidateSession(session);
 
@@ -60,22 +60,28 @@ namespace TeamServer.Server {
         #endregion
 
         #region Operations
-        public Session StartSession(Session session) {
+        public Session StartSession(Session session, int duration, string car, string track, string raceNr) {
             ValidateSession(session);
 
-            session.Started = DateTime.Now;
+            if (session.Started == null) {
+                session.Duration = duration;
+                session.Car = car;
+                session.Track = track;
+                session.RaceNr = raceNr;
+                session.Started = DateTime.Now;
 
-            session.Save();
+                session.Save();
+            }
 
             return session;
         }
 
-        public Session StartSession(Guid identifier) {
-            return StartSession(ObjectManager.GetSessionAsync(identifier).Result);
+        public Session StartSession(Guid identifier, int duration, string car, string track, string raceNr) {
+            return StartSession(ObjectManager.GetSessionAsync(identifier).Result, duration, car, track, raceNr);
         }
 
-        public Session StartSession(string identifier) {
-            return StartSession(new Guid(identifier));
+        public Session StartSession(string identifier, int duration, string car, string track, string raceNr) {
+            return StartSession(new Guid(identifier), duration, car, track, raceNr);
         }
 
         public void FinishSession(Session session) {

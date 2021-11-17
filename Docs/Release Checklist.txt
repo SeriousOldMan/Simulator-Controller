@@ -21,20 +21,31 @@ Release 3.6.8 Checklist
 =======================
 
 0. Search for new links (*)
-1.Update Procedure
-  a. Translations
-  b. Rename "Button Box" to "Controller" in Setup.data
+1. Update Procedure
+   a. Translations
+2. New Team Server
+   a. Translations
+   b. Full new Documentation & Images
+   c. Mention https://dotnet.microsoft.com/download/dotnet/3.1 in install procedure
+
+Release 3.6.8 Checklist
+=======================
+
+0. Search for new links (*)
+1. Update Procedure
+   a. Translations
+   b. Rename "Button Box" to "Controller" in Setup.data
 2. New Actions Editor
-  a. Documentation & Images
+   a. Documentation & Images
 3. Refactored ButtonBoxEditor
-  a. Documentation
-  b. Doc Images
-  c. Doc references for "...#button-box-layouts"
+   a. Documentation
+   b. Doc Images
+   c. Doc references for "...#button-box-layouts"
 4. New Stream Deck mode in Controller Editor
-  a. Documentation
-  b. Doc Images
+   a. Documentation
+   b. Doc Images
 5. Rename "Button Box" to "Controller" in "Simulator Setup"
-  a. Update in Setup.data
+   a. Update in Setup.data
 
 Release 3.6.6 Checklist
 =======================

@@ -39,7 +39,9 @@ global editDriverButton
 
 global sessionListBox
 
+global addSessionButton
 global deleteSessionButton
+global editSessionButton
 
 class TeamServerConfigurator extends ConfigurationItem {
 	iEditor := false
@@ -150,22 +152,25 @@ class TeamServerConfigurator extends ConfigurationItem {
 		w2 := w1 - 70
 		
 		x2 := x + 172
-		w3 := Round((w1 / 2) - 3)
-		x3 := x1 + w3 + 6
 		
 		x2 := x1 - 25
 		
 		w4 := w1 - 25
 		x4 := x1 + w4 + 2
 		
+		w3 := Round((w4 / 2) - 3)
+		x3 := x1 + w3 + 6
+		
 		Gui %window%:Add, Text, x%x0% y%y% w134 h23 +0x200 HWNDwidget1 Hidden, % translate("Server URL")
-		Gui %window%:Add, Edit, x%x1% yp+1 w%w1% h21 VteamServerURLEdit HWNDwidget2 Hidden, %teamServerURLEdit%
+		Gui %window%:Add, Edit, x%x1% yp+1 w%w4% h21 VteamServerURLEdit HWNDwidget2 Hidden, %teamServerURLEdit%
+		Gui %window%:Add, Button, x%x4% yp-1 w23 h23 Center +0x200 gcopyURL HWNDwidget26 Hidden
+		setButtonIcon(widget26, kIconsDirectory . "Copy.ico", 1, "L4 T4 R4 B4")
 		
 		Gui %window%:Add, Text, x%x0% yp+23 w135 h23 +0x200 HWNDwidget3 Hidden, % translate("Login Credentials")
 		Gui %window%:Add, Edit, x%x1% yp+1 w%w3% h21 VteamServerNameEdit HWNDwidget4 Hidden, %teamServerNameEdit%
 		Gui %window%:Add, Edit, x%x3% yp w%w3% h21 Password VteamServerPasswordEdit HWNDwidget5 Hidden, %teamServerPasswordEdit%
 		
-		Gui %window%:Add, Text, x%x0% yp+26 w135 h23 +0x200 HWNDwidget7 Hidden, % translate("Token")
+		Gui %window%:Add, Text, x%x0% yp+26 w135 h23 +0x200 HWNDwidget7 Hidden, % translate("Access Token")
 		Gui %window%:Add, Edit, x%x1% yp-1 w%w4% h21 ReadOnly VteamServerTokenEdit HWNDwidget8 Hidden, %teamServerTokenEdit%
 		Gui %window%:Add, Button, x%x2% yp-1 w23 h23 Center +0x200 grenewToken HWNDwidget6 Hidden
 		setButtonIcon(widget6, kIconsDirectory . "Authorize.ico", 1, "L4 T4 R4 B4")
@@ -208,11 +213,15 @@ class TeamServerConfigurator extends ConfigurationItem {
 		setButtonIcon(widget22, kIconsDirectory . "Pencil.ico", 1, "L4 T4 R4 B4")
 		
 		Gui %window%:Add, Text, x%x0% yp+92 w158 h23 +0x200 HWNDwidget23 Hidden, % translate("Sessions")
-		Gui %window%:Add, ListBox, x%x1% yp w%w3% h72 AltSubmit gselectSession vsessionListBox HWNDwidget24 Hidden
-		Gui %window%:Add, Button, x%x5% yp w23 h23 Center +0x200 vdeleteSessionButton gdeleteSession HWNDwidget25 Hidden
+		Gui %window%:Add, ListBox, x%x1% yp w%w3% h72 AltSubmit gselectSession vsessionListBox HWNDwidget24 HiddenHidden
+		Gui %window%:Add, Button, x%x5% yp w23 h23 Center +0x200 vaddSessionButton gnewSession HWNDwidget27 Hidden
+		setButtonIcon(widget27, kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
+		Gui %window%:Add, Button, x%x6% yp w23 h23 Center +0x200 vdeleteSessionButton gdeleteSession HWNDwidget25 Hidden
 		setButtonIcon(widget25, kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
+		Gui %window%:Add, Button, x%x7% yp w23 h23 Center +0x200 veditSessionButton grenameSession HWNDwidget28 Hidden
+		setButtonIcon(widget28, kIconsDirectory . "Pencil.ico", 1, "L4 T4 R4 B4")
 		
-		Loop 25
+		Loop 28
 			editor.registerWidget(this, widget%A_Index%)
 		
 		this.updateState()
@@ -264,6 +273,8 @@ class TeamServerConfigurator extends ConfigurationItem {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 			MsgBox 262160, %title%, % (translate("Cannot connect to the Team Server.`n`n") . translate("Error: ") . exception.Message)
 			OnMessage(0x44, "")
+			
+			this.Token := false
 		}
 		
 		this.loadTeams()
@@ -278,7 +289,9 @@ class TeamServerConfigurator extends ConfigurationItem {
 		GuiControl Disable, deleteDriverButton
 		GuiControl Disable, editDriverButton
 		
+		GuiControl Disable, addSessionButton
 		GuiControl Disable, deleteSessionButton
+		GuiControl Disable, editSessionButton
 		
 		if this.Token {
 			GuiControl Enable, addTeamButton
@@ -288,14 +301,17 @@ class TeamServerConfigurator extends ConfigurationItem {
 				GuiControl Enable, editTeamButton
 				
 				GuiControl Enable, addDriverButton
+				GuiControl Enable, addSessionButton
 				
 				if this.SelectedDriver {
 					GuiControl Enable, deleteDriverButton
 					GuiControl Enable, editDriverButton
 				}
 				
-				if this.SelectedSession
+				if this.SelectedSession {
 					GuiControl Enable, deleteSessionButton
+					GuiControl Enable, editSessionButton
+				}
 			}
 		}	
 	}
@@ -318,18 +334,19 @@ class TeamServerConfigurator extends ConfigurationItem {
 		
 		this.iTeams := {}
 		
-		for ignore, identifier in string2Values(";", connector.GetAllTeams())
-			try {
-				team := connector.GetTeam(identifier)
-				team := this.parseProperties(team)
-				
-				key := team["Name"]
-				
-				this.iTeams[key] := team["Identifier"]
-			}
-			catch exception {
-				; ignore
-			}
+		if this.Token
+			for ignore, identifier in string2Values(";", connector.GetAllTeams())
+				try {
+					team := connector.GetTeam(identifier)
+					team := this.parseProperties(team)
+					
+					key := team["Name"]
+					
+					this.iTeams[key] := team["Identifier"]
+				}
+				catch exception {
+					; ignore
+				}
 
 		window := this.Editor.Window
 		
@@ -558,12 +575,48 @@ class TeamServerConfigurator extends ConfigurationItem {
 		
 		this.loadDrivers()
 	}
+	
+	addSession(name) {
+		identifier := this.Connector.CreateSession(this.Teams[this.SelectedTeam], name)
+		
+		sessions := this.Sessions
+		
+		sessions[name] := identifier
+		
+		this.loadSessions()
+		this.selectSession(name)
+	}
+	
+	renameSession(oldName, newName) {
+		identifier := this.Sessions[oldName]
+		
+		this.Connector.UpdateSession(this.Sessions[oldName], "Name=" . name)
+		
+		this.loadSessions()
+		this.selectSession(newName)
+	}
+	
+	deleteSession(name) {
+		this.Connector.DeleteSession(this.Sessions[name])
+		
+		this.loadSessions()
+	}
 }
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+copyURL() {
+	GuiControlGet teamServerURLEdit
+	
+	if (teamServerURLEdit && (teamServerURLEdit != "")) {
+		Clipboard := teamServerURLEdit
+		
+		showMessage(translate("Server URL copied to the clipboard."))
+	}
+}
 
 renewToken() {
 	TeamServerConfigurator.Instance.connect()
@@ -575,7 +628,7 @@ copyToken() {
 	if (teamServerTokenEdit && (teamServerTokenEdit != "")) {
 		Clipboard := teamServerTokenEdit
 		
-		showMessage(translate("Token copied to the clipboard."))
+		showMessage(translate("Access token copied to the clipboard."))
 	}
 }
 
@@ -715,6 +768,42 @@ selectSession() {
 	GuiControlGet sessionListBox
 	
 	configurator.selectSession(sessionListBox)
+}
+
+newSession() {
+	title := translate("Modular Simulator Controller System")
+	prompt := translate("Please enter the name for the new session:")
+	
+	configurator := TeamServerConfigurator.Instance
+	
+	window := configurator.Editor.Window
+
+	Gui %window%:Default
+	
+	locale := ((getLanguage() = "en") ? "" : "Locale")
+	
+	InputBox name, %title%, %prompt%, , 300, 200, , , %locale%
+	
+	if !ErrorLevel
+		configurator.addSession(name)
+}
+
+renameSession() {
+	title := translate("Modular Simulator Controller System")
+	prompt := translate("Please enter the new name for the selected session:")
+	
+	configurator := TeamServerConfigurator.Instance
+	
+	window := configurator.Editor.Window
+
+	Gui %window%:Default
+	
+	locale := ((getLanguage() = "en") ? "" : "Locale")
+	
+	InputBox name, %title%, %prompt%, , 300, 200, , , %locale%, , % configurator.SelectedSession
+	
+	if !ErrorLevel
+		configurator.renameSession(configurator.SelectedSession, name)
 }
 
 deleteSession() {

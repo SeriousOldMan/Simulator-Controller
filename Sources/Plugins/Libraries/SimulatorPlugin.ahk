@@ -236,10 +236,10 @@ class SimulatorPlugin extends ControllerPlugin {
 		}
 	}
 	
-	__New(controller, name, simulator, configuration := false) {
+	__New(controller, name, simulator, configuration := false, register := true) {
 		this.iSimulator := new Application(simulator, SimulatorController.Instance.Configuration)
 		
-		base.__New(controller, name, configuration)
+		base.__New(controller, name, configuration, register)
 		
 		for ignore, theAction in string2Values(",", this.getArgumentValue("pitstopCommands", "")) {
 			arguments := string2Values(A_Space, theAction)

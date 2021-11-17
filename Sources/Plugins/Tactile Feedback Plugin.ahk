@@ -177,7 +177,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		}
 	}
 	
-	__New(controller, name, configuration := false) {
+	__New(controller, name, configuration := false, register := true) {
 		base.__New(controller, name, configuration, false)
 	
 		simFeedbackApplication := new Application(this.getArgumentValue("controlApplication", kTactileFeedbackPlugin), configuration)
@@ -227,7 +227,8 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		for ignore, effect in string2Values(",", this.getArgumentValue("chassisEffects", ""))
 			this.createEffectAction(controller, chassisMode, string2Values(A_Space, effect)*)
 		
-		controller.registerPlugin(this)
+		if register
+			controller.registerPlugin(this)
 	}
 
 	createToggleAction(toggle, command, descriptor, initialState) {

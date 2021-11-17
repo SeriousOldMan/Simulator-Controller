@@ -9,7 +9,7 @@ using TeamServer.Model.Access;
 namespace TeamServer {
     public class Program {
         public static void Main(string[] args) {
-            SQLiteAsyncConnection connection = null;
+            SQLiteAsyncConnection connection;
 
             if (Array.IndexOf<string>(args, "-Memory") != -1)
                 connection = new SQLiteAsyncConnection(":memory:");

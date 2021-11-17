@@ -371,7 +371,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		}
 	}
 	
-	__New(controller, name, configuration := false) {
+	__New(controller, name, configuration := false, register := true) {
 		local function
 		
 		base.__New(controller, name, configuration, false)
@@ -511,7 +511,8 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 				this.logFunctionNotFound(descriptor)
 		}
 		
-		controller.registerPlugin(this)
+		if register
+			controller.registerPlugin(this)
 		
 		if (this.isActive()) {
 			if ((motionArguments[1] = "On") && !this.MotionActive && !this.Application.isRunning())

@@ -202,14 +202,14 @@ class SystemPlugin extends ControllerPlugin {
 		}
 	}
 	
-	__New(controller, name, configuration := false) {
+	__New(controller, name, configuration := false, register := true) {
 		local function
 		local action
 		
 		if inList(A_Args, "-Startup")
 			this.iChildProcess := true
 		
-		base.__New(controller, name, configuration)
+		base.__New(controller, name, configuration, false)
 		
 		for ignore, descriptor in string2Values(A_Space, this.getArgumentValue("modeSelector", ""))
 			if (descriptor != false) {
@@ -262,7 +262,8 @@ class SystemPlugin extends ControllerPlugin {
 		if this.iLaunchMode
 			this.registerMode(this.iLaunchMode)
 		
-		controller.registerPlugin(this)
+		if register
+			controller.registerPlugin(this)
 		
 		this.initializeBackgroundTasks()
 	}

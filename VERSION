@@ -1,16 +1,16 @@
 [Development]
-Version=3.6.8-release
-Target=3.6.8-release
-Date=11/12/2021
-Download=https://bit.ly/3qwcKSQ
-Changes=New editor for action labels and icons, Refactoring of the ButtonBoxEditor class, New editor for Stream Deck controller layouts, Updated "Simulator Setup" and "Simulator Configuration" to support the new editors, Revised online documentation for "Simulator Setup"
+Version=3.7.0-dev
+Target=3.7.0-release
+Date=11/17/2021
+Download=
+Changes=
 [Release]
 Version=3.6.8-release
 Date=11/12/2021
 Download=https://bit.ly/3qwcKSQ
 Changes=New editor for action labels and icons, Refactoring of the ButtonBoxEditor class, New editor for Stream Deck controller layouts, Updated "Simulator Setup" and "Simulator Configuration" to support the new editors, Revised online documentation for "Simulator Setup"
 [Current]
-Type=Release
+Type=Development
 [Version]
 Release=3.6.8-release
-Development=3.6.8-release
+Development=3.7.0-dev

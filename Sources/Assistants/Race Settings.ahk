@@ -53,6 +53,7 @@ global kRaceSettingsFile = getFileName("Race.settings", kUserConfigDirectory)
 ;;;-------------------------------------------------------------------------;;;
 
 global vSilentMode := kSilentMode
+global vTeamMode := true
 global vEditMode := false
 
 global repairSuspensionDropDown
@@ -421,8 +422,11 @@ restart:
 		Gui RES:Add, Button, x316 y450 w80 h23 gcancelSettings, % translate("&Cancel")
 		Gui RES:Add, Button, x8 y450 w77 h23 gloadSettings, % translate("&Load...")
 		Gui RES:Add, Button, x90 y450 w77 h23 gsaveSettings, % translate("&Save...")
-				
-		tabs := map(["Race", "Pitstop", "Strategy"], "translate")
+		
+		if vTeamMode
+			tabs := map(["Race", "Pitstop", "Strategy", "Team"], "translate")
+		else
+			tabs := map(["Race", "Pitstop", "Strategy"], "translate")
 
 		Gui RES:Add, Tab3, x8 y48 w388 h395 -Wrap, % values2String("|", tabs*)
 
@@ -708,6 +712,23 @@ restart:
 		Gui RES:Add, Edit, x126 yp-2 w50 h20 VpitstopRefuelServiceEdit, %pitstopRefuelServiceEdit%
 		Gui RES:Add, Text, x184 yp+4 w290 h20, % translate("Seconds (Refuel of 10 litres)")
 
+		if vTeamMode {
+			Gui RES:Tab, 4
+			
+			Gui RES:Add, Text, x16 y82 w134 h23 +0x200, % translate("Server URL")
+			Gui RES:Add, Edit, x106 yp+1 w276 
+			
+			Gui RES:Add, Text, x16 yp+23 w90 h23 +0x200, % translate("Access Token")
+			Gui RES:Add, Edit, x106 yp w276 h21 
+			
+			Gui RES:Add, Text, x16 yp+30 w90 h23 +0x200, % translate("Team / Driver")
+			Gui RES:Add, DropDownList, x106 yp w136 h21 
+			Gui RES:Add, DropDownList, x246 yp w136 h21 
+			
+			Gui RES:Add, Text, x16 yp+24 w90 h23 +0x200, % translate("Session")
+			Gui RES:Add, DropDownList, x106 yp w136 h21 
+		}
+		
 		Gui RES:Show, AutoSize Center
 		
 		Loop {
@@ -948,6 +969,9 @@ showRaceSettingsEditor() {
 	
 	if inList(A_Args, "-Silent")
 		vSilentMode := true
+	
+	if inList(A_Args, "-NoTeam")
+		vTeamMode := false
 	
 	index := inList(A_Args, "-Import")
 	

@@ -1,3 +1,9 @@
+## 3.7.0-release 11/26/21
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. New server based solution for team endurace races. See the all [new documentation](*) for more information.
+
 ## 3.6.8-release 11/12/21
 
   1. Bugfixes, as always

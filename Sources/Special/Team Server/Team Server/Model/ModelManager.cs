@@ -16,6 +16,7 @@ namespace TeamServer.Model {
             CreateSessionTable();
             CreateStintTable();
             CreateLapTable();
+            CreateAttributeTable();
         }
 
         protected void CreateAccountTable() {
@@ -44,6 +45,10 @@ namespace TeamServer.Model {
 
         protected void CreateLapTable() {
             Connection.CreateTableAsync<Lap>().Wait();
+        }
+
+        protected void CreateAttributeTable() {
+            Connection.CreateTableAsync<Attribute>().Wait();
         }
     }
 }

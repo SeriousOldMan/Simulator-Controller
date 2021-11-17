@@ -17,6 +17,7 @@ namespace TeamServer.Model {
                 Instance = this;
         }
 
+        #region Generic
         public Task DeleteAsync(ModelObject modelObject) {
             return Connection.DeleteAsync(modelObject);
         }
@@ -27,6 +28,31 @@ namespace TeamServer.Model {
             else
                 return Connection.InsertAsync(modelObject);
         }
+
+        public Task<string> GetAttributeAsync(ModelObject modelObject, string name, string defaultValue = "") {
+            var task = Connection.Table<Attribute>().Where(a => a.Owner == modelObject.Identifier && a.Name == name);
+
+            return task.FirstOrDefaultAsync().ContinueWith(t => (t.Result == null) ? defaultValue : t.Result.Value);
+        }
+
+        public Task SetAttributeAsync(ModelObject modelObject, string name, string value) {
+            var task = Connection.Table<Attribute>().Where(a => a.Owner == modelObject.Identifier && a.Name == name);
+
+            return task.FirstOrDefaultAsync().ContinueWith(t => {
+                Attribute attribute;
+
+                if (t.Result == null)
+                    attribute = new Attribute { Owner = modelObject.Identifier, Name = name, Value = value };
+                else {
+                    attribute = t.Result;
+
+                    attribute.Value = value;
+                }
+
+                return attribute.Save();
+            });
+        }
+        #endregion
 
         #region Access.Account
         public Task<Access.Account> GetAccountAsync(int id) {
@@ -181,7 +207,7 @@ namespace TeamServer.Model {
         #endregion
     }
 
-    public class ModelObject {
+    public abstract class ModelObject {
         [PrimaryKey, AutoIncrement]
         public int ID { get; set; }
 
@@ -200,5 +226,16 @@ namespace TeamServer.Model {
         public virtual Task Delete() {
             return ObjectManager.DeleteAsync(this);
         }
+    }
+
+    public class Attribute : ModelObject {
+        [Indexed]
+        public Guid Owner { get; set; }
+
+        [Indexed]
+        public string Name { get; set; }
+
+        [MaxLength(2147483647)]
+        public string Value { get; set; }
     }
 }

@@ -23,7 +23,7 @@ namespace TeamServer.Server {
             Task<Team> task = ObjectManager.GetTeamAsync(Token.Account, identifier);
             Team team = FindTeam(new Guid(identifier));
 
-            return (team != null) ? team : task.Result;
+            return team ?? task.Result;
         }
 
         public Team LookupTeam(Guid identifier) {
@@ -37,7 +37,7 @@ namespace TeamServer.Server {
         public Team LookupTeam(string identifier) {
             Team team = FindTeam(identifier);
 
-            return (team != null) ? team : LookupTeam(new Guid(identifier));
+            return team ?? LookupTeam(new Guid(identifier));
         }
         #endregion
 

@@ -154,7 +154,7 @@ namespace TeamServer {
 			return Get("login/tokenminutesleft");
 		}
 
-		public void Logout(string token) {
+		public void Logout() {
 			Token = "";
 
 			Get("logout");
@@ -216,6 +216,12 @@ namespace TeamServer {
 			return Get("session/allsessions");
 		}
 
+		public string CreateSession(string team, string name) {
+			return Post("session",
+						arguments: new Parameters() { { "team", team } },
+						body: BuildBody(new Parameters() { { "Name", name } }));
+		}
+
 		public string GetSession(string identifier) {
 			return Get("session/" + identifier);
 		}
@@ -232,23 +238,18 @@ namespace TeamServer {
 			return Get("session/" + identifier + "/stints");
 		}
 
-		public string CreateSession(string team, string name, int duration, string car, string track, string raceNr) {
-			return Post("session",
-						arguments: new Parameters() { { "team", team } },
-						body: BuildBody(new Parameters() { { "Name", name }, { "Duration", duration.ToString() },
-														   { "Car", car }, { "Track", track }, { "RaceNr", raceNr  }  }));
+		public void UpdateSession(string identifier, string properties) {
+			Put("session/" + identifier, body: properties);
 		}
 
 		public void DeleteSession(string identifier) {
 			Delete("session/" + identifier);
 		}
 
-		public void UpdateSession(string identifier, string properties) {
-			Put("session/" + identifier, body: properties);
-		}
-
-		public void StartSession(string identifier) {
-			Put("session/" + identifier + "/start");
+		public void StartSession(string identifier, int duration, string car, string track, string raceNr) {
+			Put("session/" + identifier + "/start",
+				body: BuildBody(new Parameters() { { "Duration", duration.ToString() },
+												   { "Car", car }, { "Track", track }, { "RaceNr", raceNr  } }));
 		}
 
 		public void FinishSession(string identifier) {
@@ -257,6 +258,20 @@ namespace TeamServer {
 		#endregion
 
 		#region Stint
+		public string StartStint(string session, string driver, int lap) {
+			return Post("stint",
+						arguments: new Parameters() { { "session", session }, { "driver", driver } },
+						body: BuildBody(new Parameters() { { "Lap", lap.ToString() } }));
+		}
+
+		public string GetStintLap(string identifier) {
+			return Get("stint/" + identifier + "/lap");
+		}
+
+		public string GetStintLaps(string identifier) {
+			return Get("stint/" + identifier + "/laps");
+		}
+
 		public string GetStint(string identifier) {
 			return Get("stint/" + identifier);
 		}
@@ -272,31 +287,15 @@ namespace TeamServer {
 		public string SetStintPitstopData(string identifier, string pitstopData) {
 			return Put("stint/" + identifier + "/pitstopdata", body: pitstopData);
 		}
-
-		public string GetStintLap(string identifier) {
-			return Get("stint/" + identifier + "/lap");
-		}
-
-		public string GetStintLaps(string identifier) {
-			return Get("stint/" + identifier + "/laps");
-		}
-
-		public string CreateStint(string session, string driver, int lap) {
-			return Post("stint",
-						arguments: new Parameters() { { "session", session }, { "driver", driver } },
-						body: BuildBody(new Parameters() { { "Lap", lap.ToString() }  }));
-		}
-
-		public void DeleteStint(string identifier) {
-			Delete("stint/" + identifier);
-		}
-
-		public void UpdateStint(string identifier, string properties) {
-			Put("stint/" + identifier, body: properties);
-		}
 		#endregion
 
 		#region Lap
+		public string StartLap(string stint, int lapNr) {
+			return Post("lap",
+						arguments: new Parameters() { { "stint", stint } },
+						body: BuildBody(new Parameters() { { "Nr", lapNr.ToString() } }));
+		}
+
 		public string GetLap(string identifier) {
 			return Get("lap/" + identifier);
 		}
@@ -315,16 +314,6 @@ namespace TeamServer {
 
 		public string SetLapPositionData(string identifier, string positionData) {
 			return Put("lap/" + identifier + "/positiondata", body: positionData);
-		}
-
-		public string CreateLap(string stint, int lapNr) {
-			return Post("lap",
-						arguments: new Parameters() { { "stint", stint } },
-						body: BuildBody(new Parameters() { { "Nr", lapNr.ToString() } }));
-		}
-
-		public void DeleteLap(string identifier) {
-			Delete("lap/" + identifier);
 		}
 		#endregion
 	}

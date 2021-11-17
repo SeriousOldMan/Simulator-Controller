@@ -101,11 +101,18 @@ namespace TeamServer.Controllers {
         }
 
         [HttpPut("{identifier}/start")]
-        public string StartSession([FromQuery(Name = "token")] string token, string identifier) {
+        public string StartSession([FromQuery(Name = "token")] string token, string identifier,
+                                   [FromBody] string keyValues) {
             try {
                 SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
 
-                sessionManager.StartSession(identifier);
+                Dictionary<string, string> properties = ControllerUtils.ParseKeyValues(keyValues);
+
+                sessionManager.StartSession(identifier,
+                                            duration: Int32.Parse(properties["Duration"]),
+                                            car: properties.GetValueOrDefault<string, string>("Car", "Unknown"),
+                                            track: properties.GetValueOrDefault<string, string>("Track", "Unknown"),
+                                            raceNr: properties.GetValueOrDefault<string, string>("RaceNr", "Unknown"));
 
                 return "Ok";
             }
@@ -137,12 +144,7 @@ namespace TeamServer.Controllers {
 
                 Dictionary<string, string> properties = ControllerUtils.ParseKeyValues(keyValues);
 
-                return sessionManager.CreateSession(theTeam,
-                                                    name: properties.GetValueOrDefault<string, string>("Name", "Unknown"),
-                                                    duration: Int32.Parse(properties["Duration"]),
-                                                    car: properties.GetValueOrDefault<string, string>("Car", "Unknown"),
-                                                    track: properties.GetValueOrDefault<string, string>("Track", "Unknown"),
-                                                    raceNr: properties.GetValueOrDefault<string, string>("RaceNr", "Unknown")).Identifier.ToString();
+                return sessionManager.CreateSession(theTeam, properties.GetValueOrDefault<string, string>("Name", "Unknown")).Identifier.ToString();
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;

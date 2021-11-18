@@ -27,6 +27,9 @@ Release 3.6.8 Checklist
    a. Translations
    b. Full new Documentation & Images
    c. Mention https://dotnet.microsoft.com/download/dotnet/3.1 in install procedure
+3. New Team tab in "Race Settings"
+   a. Translations
+   b. Full new Documentation & Images
 
 Release 3.6.8 Checklist
 =======================

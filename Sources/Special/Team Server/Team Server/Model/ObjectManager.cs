@@ -224,10 +224,21 @@ namespace TeamServer.Model {
         }
 
         public virtual Task Delete() {
+            Task<List<Attribute>> task = ObjectManager.Connection.QueryAsync<Attribute>(
+                @"
+                    Select * From Attributes Where Owner = ?
+                ", this.Identifier);
+
+            task.ContinueWith(t => {
+                foreach (Attribute attribute in t.Result)
+                    attribute.Delete();
+            });
+
             return ObjectManager.DeleteAsync(this);
         }
     }
 
+    [Table("Attributes")]
     public class Attribute : ModelObject {
         [Indexed]
         public Guid Owner { get; set; }

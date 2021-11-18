@@ -63,16 +63,19 @@ namespace TeamServer.Server {
         public Session StartSession(Session session, int duration, string car, string track, string raceNr) {
             ValidateSession(session);
 
-            if (session.Started == null) {
-                session.Duration = duration;
-                session.Car = car;
-                session.Track = track;
-                session.RaceNr = raceNr;
-                session.Started = DateTime.Now;
+            if (session.Started != null)
+                foreach (Stint stint in session.Stints)
+                    stint.Delete();
 
-                session.Save();
-            }
+            session.Duration = duration;
+            session.Car = car;
+            session.Track = track;
+            session.RaceNr = raceNr;
+            session.Started = DateTime.Now;
+            session.Finished = false;
 
+            session.Save();
+            
             return session;
         }
 
@@ -87,10 +90,12 @@ namespace TeamServer.Server {
         public void FinishSession(Session session) {
             ValidateSession(session);
 
-            Token.Account.MinutesLeft -= (int)Math.Round((DateTime.Now - session.Started).TotalSeconds * 60);
-            session.Finished = true;
+            if (session.Started != null) {
+                Token.Account.MinutesLeft -= (int)Math.Round((DateTime.Now - session.Started).TotalSeconds * 60);
+                session.Finished = true;
 
-            session.Save();
+                session.Save();
+            }
         }
 
         public void FinishSession(Guid identifier) {

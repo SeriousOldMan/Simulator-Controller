@@ -39,7 +39,7 @@ namespace TeamServer.Controllers {
 
         [HttpGet("tokenminutesleft")]
         public String GetTokenMinutes([FromQuery(Name = "token")] string token) {
-            return Server.TeamServer.TokenIssuer.ValidateToken(token).GetRemainingMinutes().ToString();
+            return Math.Max(0, Server.TeamServer.TokenIssuer.ValidateToken(token).GetRemainingMinutes()).ToString();
         }
     }
 

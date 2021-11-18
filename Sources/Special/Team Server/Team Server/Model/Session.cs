@@ -32,9 +32,9 @@ namespace TeamServer.Model {
             
         public bool Finished { get; set; } = false;
 
-        public string Track { get; set; }
+        public string Track { get; set; } = "";
 
-        public string Car { get; set; }
+        public string Car { get; set; } = "";
 
         public string RaceNr { get; set; }
 

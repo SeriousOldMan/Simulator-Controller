@@ -438,60 +438,59 @@ restart:
 		result := kLoad
 	else if (settingsOrCommand == kCancel)
 		result := kCancel
-	else if (settingsOrCommand == kUpdate) {
-		if connected
-			if (arguments[1] == "Team") {
-				GuiControlGet teamDropDownMenu
-				
-				teamName := getKeys(teams)[teamDropDownMenu]
-				teamIdentifier := teams[teamName]
-				
-				drivers := loadDrivers(connector, teamIdentifier)
-				
-				keys := getKeys(drivers)
-				chosen := getChosen(keys, driverName)
-				
-				if (chosen == 0) {
-					driverName := ""
-					driverIdentifier := false
-				}
-				else {
-					driverName := keys[chosen]
-					driverIdentifier := drivers[driverName]
-				}
-				
-				GuiControl, , driverDropDownMenu, % ("|" . values2String("|", keys*))
-				GuiControl Choose, driverDropDownMenu, % chosen
-				
-				sessions := loadSessions(connector, teamIdentifier)
-				
-				keys := getKeys(sessions)
-				chosen := getChosen(keys, sessionName)
-				
-				if (chosen == 0) {
-					sessionName := ""
-					sessionIdentifier := false
-				}
-				else {
-					sessionName := keys[chosen]
-					sessionIdentifier := sessions[sessionName]
-				}
-				
-				GuiControl, , sessionDropDownMenu, % ("|" . values2String("|", keys*))
-				GuiControl Choose, sessionDropDownMenu, % chosen
+	else if ((settingsOrCommand == kUpdate) && connected) {
+		if (arguments[1] == "Team") {
+			GuiControlGet teamDropDownMenu
+			
+			teamName := getKeys(teams)[teamDropDownMenu]
+			teamIdentifier := teams[teamName]
+			
+			drivers := loadDrivers(connector, teamIdentifier)
+			
+			keys := getKeys(drivers)
+			chosen := getChosen(keys, driverName)
+			
+			if (chosen == 0) {
+				driverName := ""
+				driverIdentifier := false
 			}
-			else if (arguments[1] == "Driver") {
-				GuiControlGet driverDropDownMenu
-				
-				driverName := getKeys(drivers)[driverDropDownMenu]
+			else {
+				driverName := keys[chosen]
 				driverIdentifier := drivers[driverName]
 			}
-			else if (arguments[1] == "Session") {
-				GuiControlGet sessionDropDownMenu
-				
-				sessionName := getKeys(sessions)[sessionDropDownMenu]
+			
+			GuiControl, , driverDropDownMenu, % ("|" . values2String("|", keys*))
+			GuiControl Choose, driverDropDownMenu, % chosen
+			
+			sessions := loadSessions(connector, teamIdentifier)
+			
+			keys := getKeys(sessions)
+			chosen := getChosen(keys, sessionName)
+			
+			if (chosen == 0) {
+				sessionName := ""
+				sessionIdentifier := false
+			}
+			else {
+				sessionName := keys[chosen]
 				sessionIdentifier := sessions[sessionName]
 			}
+			
+			GuiControl, , sessionDropDownMenu, % ("|" . values2String("|", keys*))
+			GuiControl Choose, sessionDropDownMenu, % chosen
+		}
+		else if (arguments[1] == "Driver") {
+			GuiControlGet driverDropDownMenu
+			
+			driverName := getKeys(drivers)[driverDropDownMenu]
+			driverIdentifier := drivers[driverName]
+		}
+		else if (arguments[1] == "Session") {
+			GuiControlGet sessionDropDownMenu
+			
+			sessionName := getKeys(sessions)[sessionDropDownMenu]
+			sessionIdentifier := sessions[sessionName]
+		}
 	}
 	else if (settingsOrCommand == kConnect) {
 		GuiControlGet serverURLEdit

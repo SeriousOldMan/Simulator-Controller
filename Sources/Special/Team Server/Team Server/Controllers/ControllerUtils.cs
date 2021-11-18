@@ -26,9 +26,11 @@ namespace TeamServer.Controllers {
 
             foreach (string property in properties) {
                 if (serialized.Length > 0)
-                    serialized += Environment.NewLine;
+                    serialized += '\n';
 
-                serialized += prefix + property + "=" + type.GetProperty(property).GetValue(obj).ToString();
+                var value = type.GetProperty(property).GetValue(obj);
+
+                serialized += prefix + property + "=" + ((value == null) ? "" : value.ToString());
             }
 
             return serialized;

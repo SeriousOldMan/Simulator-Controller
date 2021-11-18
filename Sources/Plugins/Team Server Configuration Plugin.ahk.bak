@@ -319,8 +319,6 @@ class TeamServerConfigurator extends ConfigurationItem {
 	parseProperties(properties) {
 		result := {}
 		
-		properties := StrReplace(properties, "`r", "")
-		
 		Loop Parse, properties, `n
 		{
 			property := string2Values("=", A_LoopField)

@@ -21,7 +21,14 @@ namespace TeamServer.Server {
 
         public Team FindTeam(string identifier) {
             Task<Team> task = ObjectManager.GetTeamAsync(Token.Account, identifier);
-            Team team = FindTeam(new Guid(identifier));
+            Team team;
+
+            try {
+                team = FindTeam(new Guid(identifier));
+            }
+            catch {
+                team = null;
+            }
 
             return team ?? task.Result;
         }

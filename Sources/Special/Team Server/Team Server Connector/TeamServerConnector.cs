@@ -18,8 +18,18 @@ namespace TeamServer {
 			ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
 		}
 
-		public void Connect(string url) {
+		public string Connect(string url, string token = null) {
 			Server = url + ((url[url.Length - 1] == '/') ? "api/" : "/api/");
+
+			if ((token != null) && (token != "")) {
+				Token = token;
+
+				string remainingMinutes = GetTokenLifeTime();
+
+				return remainingMinutes;
+			}
+			else
+				return "Ok";
 		}
 
 		#region Requests
@@ -34,7 +44,7 @@ namespace TeamServer {
 			if (parameters.Count > 0)
 				foreach (var kv in parameters) {
 					if (keyValues.Length > 0)
-						keyValues += Environment.NewLine;
+						keyValues += '\n';
 
 					keyValues += kv.Key + "=" + kv.Value;
 				}

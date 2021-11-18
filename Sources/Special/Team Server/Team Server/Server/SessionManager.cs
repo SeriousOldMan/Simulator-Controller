@@ -3,277 +3,279 @@ using System.Collections.Generic;
 using TeamServer.Model;
 
 namespace TeamServer.Server {
-    public class SessionManager : ManagerBase {
-        public SessionManager(ObjectManager objectManager, Model.Access.Token token) : base(objectManager, token) {
-        }
-
-        #region Session
-        #region Query
-        public List<Session> GetAllSessions() {
-            return Token.Account.Sessions;
-        }
-
-        public Session LookupSession(Guid identifier) {
-            Session session = FindSession(identifier);
+	public class SessionManager : ManagerBase {
+		public SessionManager(ObjectManager objectManager, Model.Access.Token token) : base(objectManager, token) {
+		}
+
+		#region Session
+		#region Query
+		public List<Session> GetAllSessions() {
+			return Token.Account.Sessions;
+		}
+
+		public Session LookupSession(Guid identifier) {
+			Session session = FindSession(identifier);
+
+			ValidateSession(session);
+
+			return session;
+		}
+
+		internal Session LookupSession(string identifier) {
+			return LookupSession(new Guid(identifier));
+		}
+
+		public Session FindSession(Guid identifier) {
+			return ObjectManager.GetSessionAsync(identifier).Result;
+		}
+
+		public Session FindSession(string identifier) {
+			return FindSession(new Guid(identifier));
+		}
+		#endregion
+
+		#region CRUD
+		public Session CreateSession(Team team, string name) {
+			Session session = new Session { TeamID = team.ID, Name = name };
+
+			ValidateSession(session);
+
+			session.Save();
+
+			return session;
+		}
+
+		public void DeleteSession(Session session) {
+			if (session != null)
+				session.Delete();
+		}
+
+		public void DeleteSession(Guid identifier) {
+			DeleteSession(ObjectManager.GetSessionAsync(identifier).Result);
+		}
+
+		public void DeleteSession(string identifier) {
+			DeleteSession(new Guid(identifier));
+		}
+		#endregion
+
+		#region Operations
+		public Session StartSession(Session session, int duration, string car, string track, string raceNr) {
+			ValidateSession(session);
+
+			foreach (Stint stint in session.Stints)
+				stint.Delete();
+			
+			session.Duration = duration;
+			session.Car = car;
+			session.Track = track;
+			session.RaceNr = raceNr;
+			session.StartTime = DateTime.Now;
+			session.FinishTime = DateTime.MinValue;
+			session.Started = true;
+			session.Finished = false;
 
-            ValidateSession(session);
-
-            return session;
-        }
-
-        internal Session LookupSession(string identifier) {
-            return LookupSession(new Guid(identifier));
-        }
-
-        public Session FindSession(Guid identifier) {
-            return ObjectManager.GetSessionAsync(identifier).Result;
-        }
-
-        public Session FindSession(string identifier) {
-            return FindSession(new Guid(identifier));
-        }
-        #endregion
-
-        #region CRUD
-        public Session CreateSession(Team team, string name) {
-            Session session = new Session { TeamID = team.ID, Name = name };
-
-            ValidateSession(session);
+			session.Save();
+			
+			return session;
+		}
 
-            session.Save();
+		public Session StartSession(Guid identifier, int duration, string car, string track, string raceNr) {
+			return StartSession(ObjectManager.GetSessionAsync(identifier).Result, duration, car, track, raceNr);
+		}
 
-            return session;
-        }
+		public Session StartSession(string identifier, int duration, string car, string track, string raceNr) {
+			return StartSession(new Guid(identifier), duration, car, track, raceNr);
+		}
 
-        public void DeleteSession(Session session) {
-            if (session != null)
-                session.Delete();
-        }
+		public void FinishSession(Session session) {
+			ValidateSession(session);
+
+			if (session.Started && !session.Finished) {
+				Token.Account.MinutesLeft -= (int)Math.Round((DateTime.Now - session.StartTime).TotalSeconds * 60);
+				session.Finished = true;
+				session.FinishTime = DateTime.Now;
 
-        public void DeleteSession(Guid identifier) {
-            DeleteSession(ObjectManager.GetSessionAsync(identifier).Result);
-        }
+				session.Save();
+			}
+		}
 
-        public void DeleteSession(string identifier) {
-            DeleteSession(new Guid(identifier));
-        }
-        #endregion
+		public void FinishSession(Guid identifier) {
+			FinishSession(ObjectManager.GetSessionAsync(identifier).Result);
+		}
 
-        #region Operations
-        public Session StartSession(Session session, int duration, string car, string track, string raceNr) {
-            ValidateSession(session);
+		public void FinishSession(string identifier) {
+			FinishSession(new Guid(identifier));
+		}
+		#endregion
+		#endregion
 
-            if (session.Started != null)
-                foreach (Stint stint in session.Stints)
-                    stint.Delete();
+		#region Stint
+		#region Query
+		public Stint LookupStint(Guid identifier) {
+			Stint stint = FindStint(identifier);
 
-            session.Duration = duration;
-            session.Car = car;
-            session.Track = track;
-            session.RaceNr = raceNr;
-            session.Started = DateTime.Now;
-            session.Finished = false;
+			ValidateStint(stint);
 
-            session.Save();
-            
-            return session;
-        }
+			return stint;
+		}
 
-        public Session StartSession(Guid identifier, int duration, string car, string track, string raceNr) {
-            return StartSession(ObjectManager.GetSessionAsync(identifier).Result, duration, car, track, raceNr);
-        }
+		internal Stint LookupStint(string identifier) {
+			return LookupStint(new Guid(identifier));
+		}
 
-        public Session StartSession(string identifier, int duration, string car, string track, string raceNr) {
-            return StartSession(new Guid(identifier), duration, car, track, raceNr);
-        }
+		public Stint FindStint(Guid identifier) {
+			return ObjectManager.GetStintAsync(identifier).Result;
+		}
 
-        public void FinishSession(Session session) {
-            ValidateSession(session);
+		public Stint FindStint(string identifier) {
+			return FindStint(new Guid(identifier));
+		}
+		#endregion
 
-            if (session.Started != null) {
-                Token.Account.MinutesLeft -= (int)Math.Round((DateTime.Now - session.Started).TotalSeconds * 60);
-                session.Finished = true;
+		#region CRUD
+		public Stint CreateStint(Session session, Driver driver, int lap, string pitstopData = "") {
+			ValidateSession(session);
+			ValidateDriver(driver);
 
-                session.Save();
-            }
-        }
+			Stint lastStint = session.GetCurrentStint();
+			int stintNr = (lastStint != null) ? lastStint.Nr + 1 : 1;
 
-        public void FinishSession(Guid identifier) {
-            FinishSession(ObjectManager.GetSessionAsync(identifier).Result);
-        }
+			Stint stint = new Stint { SessionID = session.ID, DriverID = driver.ID, Nr = stintNr, Lap = lap };
 
-        public void FinishSession(string identifier) {
-            FinishSession(new Guid(identifier));
-        }
-        #endregion
-        #endregion
+			if (!String.IsNullOrWhiteSpace(pitstopData))
+				stint.PitstopData = pitstopData;
 
-        #region Stint
-        #region Query
-        public Stint LookupStint(Guid identifier) {
-            Stint stint = FindStint(identifier);
+			stint.Save();
 
-            ValidateStint(stint);
+			return stint;
+		}
 
-            return stint;
-        }
+		public void DeleteStint(Stint stint) {
+			if (stint != null)
+				stint.Delete();
+		}
 
-        internal Stint LookupStint(string identifier) {
-            return LookupStint(new Guid(identifier));
-        }
+		public void DeleteStint(Guid identifier) {
+			DeleteStint(ObjectManager.GetStintAsync(identifier).Result);
+		}
 
-        public Stint FindStint(Guid identifier) {
-            return ObjectManager.GetStintAsync(identifier).Result;
-        }
+		public void DeleteStint(string identifier) {
+			DeleteStint(new Guid(identifier));
+		}
+		#endregion
 
-        public Stint FindStint(string identifier) {
-            return FindStint(new Guid(identifier));
-        }
-        #endregion
+		#region Operations
+		public Stint UpdatePitstopData(Stint stint, string pitstopData) {
+			ValidateStint(stint);
 
-        #region CRUD
-        public Stint CreateStint(Session session, Driver driver, int lap, string pitstopData = "") {
-            ValidateSession(session);
-            ValidateDriver(driver);
+			stint.PitstopData = pitstopData;
 
-            Stint lastStint = session.GetCurrentStint();
-            int stintNr = (lastStint != null) ? lastStint.Nr + 1 : 1;
+			stint.Save();
 
-            Stint stint = new Stint { SessionID = session.ID, DriverID = driver.ID, Nr = stintNr, Lap = lap };
+			return stint;
+		}
 
-            if (!String.IsNullOrWhiteSpace(pitstopData))
-                stint.PitstopData = pitstopData;
+		public Stint UpdatePitstopData(Guid identifier, string pitstopData) {
+			return UpdatePitstopData(ObjectManager.GetStintAsync(identifier).Result, pitstopData);
+		}
 
-            stint.Save();
+		public Stint UpdatePitstopData(string identifier, string pitstopData) {
+			return UpdatePitstopData(new Guid(identifier), pitstopData);
+		}
+		#endregion
+		#endregion
 
-            return stint;
-        }
+		#region Lap
+		#region Query
+		public Lap LookupLap(Guid identifier) {
+			Lap lap = FindLap(identifier);
 
-        public void DeleteStint(Stint stint) {
-            if (stint != null)
-                stint.Delete();
-        }
+			ValidateLap(lap);
 
-        public void DeleteStint(Guid identifier) {
-            DeleteStint(ObjectManager.GetStintAsync(identifier).Result);
-        }
+			return lap;
+		}
 
-        public void DeleteStint(string identifier) {
-            DeleteStint(new Guid(identifier));
-        }
-        #endregion
+		internal Lap LookupLap(string identifier) {
+			return LookupLap(new Guid(identifier));
+		}
 
-        #region Operations
-        public Stint UpdatePitstopData(Stint stint, string pitstopData) {
-            ValidateStint(stint);
+		public Lap FindLap(Guid identifier) {
+			return ObjectManager.GetLapAsync(identifier).Result;
+		}
 
-            stint.PitstopData = pitstopData;
+		public Lap FindLap(string identifier) {
+			return FindLap(new Guid(identifier));
+		}
+		#endregion
 
-            stint.Save();
+		#region CRUD
+		public Lap CreateLap(Stint stint, int lap) {
+			ValidateStint(stint);
 
-            return stint;
-        }
+			Lap lastLap = stint.GetCurrentLap();
 
-        public Stint UpdatePitstopData(Guid identifier, string pitstopData) {
-            return UpdatePitstopData(ObjectManager.GetStintAsync(identifier).Result, pitstopData);
-        }
+			if ((lastLap != null) && (lastLap.Nr + 1 != lap))
+				throw new Exception("Invalid lap number...");
 
-        public Stint UpdatePitstopData(string identifier, string pitstopData) {
-            return UpdatePitstopData(new Guid(identifier), pitstopData);
-        }
-        #endregion
-        #endregion
+			Lap theLap = new Lap { StintID = stint.ID, Nr = lap };
 
-        #region Lap
-        #region Query
-        public Lap LookupLap(Guid identifier) {
-            Lap lap = FindLap(identifier);
+			theLap.Save();
 
-            ValidateLap(lap);
+			return theLap;
+		}
 
-            return lap;
-        }
+		public void DeleteLap(Lap lap) {
+			if (lap != null)
+				lap.Delete();
+		}
 
-        internal Lap LookupLap(string identifier) {
-            return LookupLap(new Guid(identifier));
-        }
+		public void DeleteLap(Guid identifier) {
+			DeleteLap(ObjectManager.GetLapAsync(identifier).Result);
+		}
 
-        public Lap FindLap(Guid identifier) {
-            return ObjectManager.GetLapAsync(identifier).Result;
-        }
+		public void DeleteLap(string identifier) {
+			DeleteLap(new Guid(identifier));
+		}
+		#endregion
 
-        public Lap FindLap(string identifier) {
-            return FindLap(new Guid(identifier));
-        }
-        #endregion
+		#region Operations
+		public Lap UpdateTelemetryData(Lap lap, string telemetryData) {
+			ValidateLap(lap);
 
-        #region CRUD
-        public Lap CreateLap(Stint stint, int lap) {
-            ValidateStint(stint);
+			lap.TelemetryData = telemetryData;
 
-            Lap lastLap = stint.GetCurrentLap();
+			lap.Save();
 
-            if ((lastLap != null) && (lastLap.Nr + 1 != lap))
-                throw new Exception("Invalid lap number...");
+			return lap;
+		}
 
-            Lap theLap = new Lap { StintID = stint.ID, Nr = lap };
+		public Lap UpdateTelemetryData(Guid identifier, string telemetryData) {
+			return UpdateTelemetryData(ObjectManager.GetLapAsync(identifier).Result, telemetryData);
+		}
 
-            theLap.Save();
+		public Lap UpdateTelemetryData(string identifier, string telemetryData) {
+			return UpdateTelemetryData(new Guid(identifier), telemetryData);
+		}
 
-            return theLap;
-        }
+		public Lap UpdatePositionData(Lap lap, string positionData) {
+			ValidateLap(lap);
 
-        public void DeleteLap(Lap lap) {
-            if (lap != null)
-                lap.Delete();
-        }
+			lap.PositionData = positionData;
 
-        public void DeleteLap(Guid identifier) {
-            DeleteLap(ObjectManager.GetLapAsync(identifier).Result);
-        }
+			lap.Save();
 
-        public void DeleteLap(string identifier) {
-            DeleteLap(new Guid(identifier));
-        }
-        #endregion
+			return lap;
+		}
 
-        #region Operations
-        public Lap UpdateTelemetryData(Lap lap, string telemetryData) {
-            ValidateLap(lap);
+		public Lap UpdatePositionData(Guid identifier, string positionData) {
+			return UpdatePositionData(ObjectManager.GetLapAsync(identifier).Result, positionData);
+		}
 
-            lap.TelemetryData = telemetryData;
-
-            lap.Save();
-
-            return lap;
-        }
-
-        public Lap UpdateTelemetryData(Guid identifier, string telemetryData) {
-            return UpdateTelemetryData(ObjectManager.GetLapAsync(identifier).Result, telemetryData);
-        }
-
-        public Lap UpdateTelemetryData(string identifier, string telemetryData) {
-            return UpdateTelemetryData(new Guid(identifier), telemetryData);
-        }
-
-        public Lap UpdatePositionData(Lap lap, string positionData) {
-            ValidateLap(lap);
-
-            lap.PositionData = positionData;
-
-            lap.Save();
-
-            return lap;
-        }
-
-        public Lap UpdatePositionData(Guid identifier, string positionData) {
-            return UpdatePositionData(ObjectManager.GetLapAsync(identifier).Result, positionData);
-        }
-
-        public Lap UpdatePositionData(string identifier, string positionData) {
-            return UpdatePositionData(new Guid(identifier), positionData);
-        }
-        #endregion
-        #endregion
-    }
+		public Lap UpdatePositionData(string identifier, string positionData) {
+			return UpdatePositionData(new Guid(identifier), positionData);
+		}
+		#endregion
+		#endregion
+	}
 }

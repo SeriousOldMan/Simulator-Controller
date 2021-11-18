@@ -28,15 +28,19 @@ namespace TeamServer.Model {
 
         public int Duration { get; set; }
 
-        public DateTime Started { get; set; }
-            
-        public bool Finished { get; set; } = false;
-
         public string Track { get; set; } = "";
 
         public string Car { get; set; } = "";
 
         public string RaceNr { get; set; }
+
+        public bool Started { get; set; } = false;
+
+        public DateTime StartTime { get; set; } = DateTime.MinValue;
+
+        public bool Finished { get; set; } = false;
+
+        public DateTime FinishTime { get; set; } = DateTime.MinValue;
 
         [Ignore]
         public List<Stint> Stints {

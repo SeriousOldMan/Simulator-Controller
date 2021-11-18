@@ -1,0 +1,14 @@
+{
+  "DBPath": ":memory:",
+
+  "TokenLifeTime": 10080,
+
+  "Accounts": [
+    {
+      "Name": "admin",
+      "Password": "admin",
+      "Minutes": 2147483647,
+      "Administrator": true
+    }
+  ]
+}

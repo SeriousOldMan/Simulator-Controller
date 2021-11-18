@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TeamServer.Model {
     public class ObjectManager {
-        public static ObjectManager Instance = null;
+        public static ObjectManager Instance { get; private set; } = null;
 
         public SQLiteAsyncConnection Connection { get; private set; }
 

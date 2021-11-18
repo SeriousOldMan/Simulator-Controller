@@ -43,7 +43,7 @@ class SpeechRecognizer {
 		
 		try {
 			if (!FileExist(dllFile)) {
-				logMessage(kLogCritical, translate("Speech.Recognizer.dll not found in " . kBinariesDirectory))
+				logMessage(kLogCritical, translate("Speech.Recognizer.dll not found in ") . kBinariesDirectory)
 				
 				Throw "Unable to find Speech.Recognizer.dll in " . kBinariesDirectory . "..."
 			}

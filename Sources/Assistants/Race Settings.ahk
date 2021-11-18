@@ -299,7 +299,7 @@ getDeprecatedConfigurationValue(data, newSection, oldSection, key, default := fa
 		return getConfigurationValue(data, oldSection, key, default)
 }
 
-parseProperties(properties) {
+parseObject(properties) {
 	result := {}
 		
 	properties := StrReplace(properties, "`r", "")
@@ -318,12 +318,9 @@ loadTeams(connector) {
 	teams := {}
 	
 	for ignore, identifier in string2Values(";", connector.GetAllTeams()) {
-		team := connector.GetTeam(identifier)
-		team := parseProperties(team)
+		team := parseObject(connector.GetTeam(identifier))
 		
-		key := team["Name"]
-		
-		teams[key] := team["Identifier"]
+		teams[team.Name] := team.Identifier
 	}
 	
 	return teams
@@ -333,12 +330,11 @@ loadDrivers(connector, team) {
 	drivers := {}
 	
 	for ignore, identifier in string2Values(";", connector.GetTeamDrivers(team)) {
-		driver := connector.GetDriver(identifier)
-		driver := parseProperties(driver)
+		driver := parseObject(connector.GetDriver(identifier))
 		
-		name := (driver["ForName"] . A_Space . driver["SurName"] . A_Space . translate("(") . driver["NickName"] . translate(")"))
+		name := (driver.ForName . A_Space . driver.SurName . A_Space . translate("(") . driver.NickName . translate(")"))
 		
-		drivers[name] := driver["Identifier"]
+		drivers[name] := driver.Identifier
 	}
 	
 	return drivers
@@ -348,12 +344,9 @@ loadSessions(connector, team) {
 	sessions := {}
 	
 	for ignore, identifier in string2Values(";", connector.GetTeamSessions(team)) {
-		session := connector.GetSession(identifier)
-		session := parseProperties(session)
+		session := parseObject(connector.GetSession(identifier))
 		
-		name := session["Name"]
-		
-		sessions[name] := session["Identifier"]
+		sessions[session.Name] := session.Identifier
 	}			
 	
 	return sessions
@@ -368,17 +361,13 @@ getKeys(map) {
 	return keys
 }
 
-getChosen(options, option) {
-	chosen := 0
+getValues(map) {
+	values := []
 	
-	if (options.Length() > 0) {
-		chosen := inList(options, option)
-		
-		if (chosen == 0)
-			chosen := 1
-	}
+	for ignore, value in map
+		values.Push(value)
 	
-	return chosen
+	return values
 }
 
 editSettings(ByRef settingsOrCommand, arguments*) {
@@ -448,36 +437,42 @@ restart:
 				
 				drivers := loadDrivers(connector, teamIdentifier)
 				
-				keys := getKeys(drivers)
-				chosen := getChosen(keys, driverName)
+				names := getKeys(drivers)
+				chosen := inList(getValues(drivers), driverIdentifier)
+				
+				if ((chosen == 0) && (names.Length() > 0))
+					chosen := 1
 				
 				if (chosen == 0) {
 					driverName := ""
 					driverIdentifier := false
 				}
 				else {
-					driverName := keys[chosen]
+					driverName := names[chosen]
 					driverIdentifier := drivers[driverName]
 				}
 				
-				GuiControl, , driverDropDownMenu, % ("|" . values2String("|", keys*))
+				GuiControl, , driverDropDownMenu, % ("|" . values2String("|", names*))
 				GuiControl Choose, driverDropDownMenu, % chosen
 				
 				sessions := loadSessions(connector, teamIdentifier)
 				
-				keys := getKeys(sessions)
-				chosen := getChosen(keys, sessionName)
+				names := getKeys(sessions)
+				chosen := inList(getValues(sessions), sessionIdentifier)
+				
+				if ((chosen == 0) && (names.Length() > 0))
+					chosen := 1
 				
 				if (chosen == 0) {
 					sessionName := ""
 					sessionIdentifier := false
 				}
 				else {
-					sessionName := keys[chosen]
+					sessionName := names[chosen]
 					sessionIdentifier := sessions[sessionName]
 				}
 				
-				GuiControl, , sessionDropDownMenu, % ("|" . values2String("|", keys*))
+				GuiControl, , sessionDropDownMenu, % ("|" . values2String("|", names*))
 				GuiControl Choose, sessionDropDownMenu, % chosen
 			}
 			else if (arguments[1] == "Driver") {
@@ -502,16 +497,29 @@ restart:
 				if (connector.Connect(serverURLEdit, serverTokenEdit) > 0) {
 					teams := loadTeams(connector)
 					
-					keys := getKeys(teams)
+					names := getKeys(teams)
+					chosen := inList(getValues(teams), teamIdentifier)
+				
+					if ((chosen == 0) && (names.Length() > 0))
+						chosen := 1
+					
+					if (chosen == 0) {
+						teamName := ""
+						teamIdentifier := false
+					}
+					else {
+						teamName := names[chosen]
+						teamIdentifier := teams[teamName]
+					}
 
-					GuiControl, , teamDropDownMenu, % ("|" . values2String("|", keys*))
-					GuiControl Choose, teamDropDownMenu, % getChosen(keys, teamName)
+					GuiControl, , teamDropDownMenu, % ("|" . values2String("|", names*))
+					GuiControl Choose, teamDropDownMenu, % chosen
+					
+					connected := true
 					
 					editSettings(kUpdate, "Team")
 					
 					showMessage(translate("Successfully connected to the team server."))
-					
-					connected := true
 				}
 				else
 					throw Exception("Invalid or missing token...")
@@ -631,7 +639,7 @@ restart:
 			
 			try {
 				if (!FileExist(dllFile)) {
-					logMessage(kLogCritical, translate("Team Server Connector.dll not found in " . kBinariesDirectory))
+					logMessage(kLogCritical, translate("Team Server Connector.dll not found in ") . kBinariesDirectory)
 					
 					Throw "Unable to find Team Server Connector.dll in " . kBinariesDirectory . "..."
 				}

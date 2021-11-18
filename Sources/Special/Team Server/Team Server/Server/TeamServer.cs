@@ -8,11 +8,11 @@ namespace TeamServer.Server {
 
         static TeamServer Instance;
 
-        public TeamServer(ObjectManager objectManager) {
+        public TeamServer(ObjectManager objectManager, int tokenLifeTime) {
             Instance = this;
 
             ObjectManager = objectManager;
-            TokenIssuer = new TokenIssuer(objectManager);
+            TokenIssuer = new TokenIssuer(objectManager, tokenLifeTime);
         }
     }
 }

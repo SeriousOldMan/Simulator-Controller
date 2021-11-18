@@ -5,13 +5,15 @@ using TeamServer.Model.Access;
 namespace TeamServer.Server {
     public class TokenIssuer {
         protected readonly ObjectManager ObjectManager = null;
+        protected readonly int TokenLifeTime;
 
-        public TokenIssuer(ObjectManager objectManager) {
+        public TokenIssuer(ObjectManager objectManager, int tokenLifeTime) {
             ObjectManager = objectManager;
+            TokenLifeTime = tokenLifeTime;
         }
 
         #region CRUD
-        public Model.Access.Token CreateToken(string name, string password) {
+        public Token CreateToken(string name, string password) {
             Account account = ObjectManager.Instance.GetAccountAsync(name, password).Result;
 
             if (account == null)
@@ -20,7 +22,7 @@ namespace TeamServer.Server {
                 throw new Exception("No time left...");
             else {
                 Token token = new Token { Identifier = Guid.NewGuid(), AccountID = account.ID,
-                                          Created = DateTime.Now, Until = DateTime.Now + new TimeSpan(7, 0, 0, 0) };
+                                          Created = DateTime.Now, Until = DateTime.Now + new TimeSpan(0, 0, TokenLifeTime, 0) };
 
                 token.Save();
 

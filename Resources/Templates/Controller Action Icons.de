@@ -326,3 +326,5 @@ GapToFrontTrack.Activate=
 GapToBehindTrack.Activate=
 StrategyOverview.Activate=
 NextPitstop.Activate=
+[Team Server]
+TeamServer.Toggle=

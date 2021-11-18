@@ -133,7 +133,7 @@ class SpeechSynthesizer {
 			
 			try {
 				if (!FileExist(dllFile)) {
-					logMessage(kLogCritical, translate("Speech.Synthesizer.dll not found in " . kBinariesDirectory))
+					logMessage(kLogCritical, translate("Speech.Synthesizer.dll not found in ") . kBinariesDirectory)
 					
 					Throw "Unable to find Speech.Synthesizer.dll in " . kBinariesDirectory . "..."
 				}

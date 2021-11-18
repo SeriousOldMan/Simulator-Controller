@@ -122,7 +122,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 		
 		try {
 			if (!FileExist(dllFile)) {
-				logMessage(kLogCritical, translate("Team Server Connector.dll not found in " . kBinariesDirectory))
+				logMessage(kLogCritical, translate("Team Server Connector.dll not found in ") . kBinariesDirectory)
 				
 				Throw "Unable to find Team Server Connector.dll in " . kBinariesDirectory . "..."
 			}
@@ -318,7 +318,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 		}	
 	}
 	
-	parseProperties(properties) {
+	parseObject(properties) {
 		result := {}
 		
 		properties := StrReplace(properties, "`r", "")
@@ -341,12 +341,9 @@ class TeamServerConfigurator extends ConfigurationItem {
 		if this.Token
 			for ignore, identifier in string2Values(";", connector.GetAllTeams())
 				try {
-					team := connector.GetTeam(identifier)
-					team := this.parseProperties(team)
+					team := this.parseObject(connector.GetTeam(identifier))
 					
-					key := team["Name"]
-					
-					this.iTeams[key] := team["Identifier"]
+					this.iTeams[team.Name] := team.Identifier
 				}
 				catch exception {
 					; ignore
@@ -380,12 +377,11 @@ class TeamServerConfigurator extends ConfigurationItem {
 		if this.SelectedTeam
 			for ignore, identifier in string2Values(";", connector.GetTeamDrivers(this.Teams[this.SelectedTeam])) {
 				try {
-					driver := connector.GetDriver(identifier)
-					driver := this.parseProperties(driver)
+					driver := this.parseObject(connector.GetDriver(identifier))
 					
-					name := (driver["ForName"] . A_Space . driver["SurName"] . A_Space . translate("(") . driver["NickName"] . translate(")"))
+					name := (driver.ForName . A_Space . driver.SurName . A_Space . translate("(") . driver.NickName . translate(")"))
 					
-					this.iDrivers[name] := driver["Identifier"]
+					this.iDrivers[name] := driver.Identifier
 				}
 				catch exception {
 					; ignore
@@ -416,12 +412,9 @@ class TeamServerConfigurator extends ConfigurationItem {
 		if this.SelectedTeam
 			for ignore, identifier in string2Values(";", connector.GetTeamSessions(this.Teams[this.SelectedTeam])) {
 				try {
-					session := connector.GetSession(identifier)
-					session := this.parseProperties(session)
+					session := this.parseObject(connector.GetSession(identifier))
 					
-					name := session["Name"]
-					
-					this.iSessions[name] := session["Identifier"]
+					this.iSessions[session.Name] := session.Identifier
 				}
 				catch exception {
 					; ignore
@@ -429,11 +422,23 @@ class TeamServerConfigurator extends ConfigurationItem {
 			}			
 		
 		sessions := []
+		infos := []
 		
-		for name, ignore in this.Sessions
+		for name, identifier in this.Sessions {
+			stints := string2Values(";", connector.GetSessionStints(identifier)).Length()
+			laps := 0
+			
+			if (stints > 0) {
+				stint := this.parseObject(connector.GetStint(connector.GetSessionStint(identifier)))
+				
+				laps := (stint.Lap + (string2Values(";", connector.GetSessionStints(stint.Identifier)).Length()))
+			}
+				
 			sessions.Push(name)
+			infos.Push(name . translate(" (") . stints . translate(" stints, ") . laps . translate(" laps)"))
+		}
 		
-		GuiControl, , sessionListBox, % ("|" . values2String("|", sessions*))
+		GuiControl, , sessionListBox, % ("|" . values2String("|", infos*))
 		
 		this.selectSession((sessions.Length() > 0) ? sessions[1] : false)
 	}
@@ -594,7 +599,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 	renameSession(oldName, newName) {
 		identifier := this.Sessions[oldName]
 		
-		this.Connector.UpdateSession(this.Sessions[oldName], "Name=" . name)
+		this.Connector.UpdateSession(this.Sessions[oldName], "Name=" . newName)
 		
 		this.loadSessions()
 		this.selectSession(newName)

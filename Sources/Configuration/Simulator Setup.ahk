@@ -1900,7 +1900,7 @@ finishSetup(finish := false, save := false) {
 		Gui %window%:Show
 		
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-		title := translate("Modular Simulator Controller System")
+		title := translate("Setup")
 		message := (translate("Do you want to generate the new configuration?") . "`n`n" . translate("Backup files will be saved for your current configuration in the ""Simulator Controller\Config"" folder in your user ""Documents"" folder."))
 		MsgBox 262436, %title%, %message%
 		OnMessage(0x44, "")

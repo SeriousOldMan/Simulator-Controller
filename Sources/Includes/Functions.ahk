@@ -752,7 +752,7 @@ checkForUpdates() {
 				
 				if ((version > current) || ((version = current) && (versionPostfix != currentPostfix))) {
 					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-					title := translate("Modular Simulator Controller System")
+					title := translate("Update")
 					MsgBox 262436, %title%, % translate("A newer version of Simulator Controller is available. Do you want to download it now?")
 					OnMessage(0x44, "")
 
@@ -791,14 +791,14 @@ restartUpdate:
 				SoundPlay *32
 		
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No", "Never"]))
-				title := translate("Modular Simulator Controller System")
+				title := translate("Update")
 				MsgBox 262179, %title%, % translate("The local configuration database needs an update. Do you want to run the update now?")
 				OnMessage(0x44, "")
 				
 				IfMsgBox Cancel
 				{
 					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-					title := translate("Modular Simulator Controller System")
+					title := translate("Update")
 					MsgBox 262436, %title%, % translate("Are you really sure, you want to skip the automated update procedure?")
 					OnMessage(0x44, "")
 
@@ -935,7 +935,7 @@ initializeEnvironment() {
 				vTargetLanguageCode := getConfigurationValue(kSimulatorConfiguration, "Configuration", "Language", getSystemLanguage())
 	
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-			title := translate("Modular Simulator Controller System")
+			title := translate("Installation")
 			MsgBox 262436, %title%, % translate("You have to install Simulator Controller before starting any of the applications. Do you want run the Setup now?")
 			OnMessage(0x44, "")
 

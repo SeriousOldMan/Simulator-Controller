@@ -1211,7 +1211,7 @@ class RaceReports extends ConfigurationItem {
 	
 	deleteRace() {
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-		title := translate("Modular Simulator Controller System")
+		title := translate("Delete")
 		MsgBox 262436, %title%, % translate("Do you really want to delete the selected report?")
 		OnMessage(0x44, "")
 		
@@ -1796,7 +1796,7 @@ runRaceReports() {
 	
 	if !reportsDirectory {
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-		title := translate("Modular Simulator Controller System")
+		title := translate("Configuration")
 		MsgBox 262436, %title%, % translate("The Reports folder has not been configured yet. Do you want to start the Configuration tool now?")
 		OnMessage(0x44, "")
 		

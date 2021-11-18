@@ -3255,7 +3255,7 @@ chooseDataType() {
 	if (dataTypeDropDown > 2) {
 		if ((dataTypeDropDown = 4) && (workbench.SelectedSimulator && workbench.SelectedCar && workbench.SelectedTrack)) {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-			title := translate("Modular Simulator Controller System")
+			title := translate("Delete")
 			MsgBox 262436, %title%, % translate("Entries with lap times or fuel consumption outside the standard deviation will be deleted. Do you want to proceed?")
 			OnMessage(0x44, "")
 

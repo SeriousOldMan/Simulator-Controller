@@ -19,7 +19,7 @@ namespace TeamServer.Controllers {
                 
             return keyValues.Select(value => value.Split('=')).ToDictionary(pair => pair[0].Trim(), pair => pair[1].Trim());
         }
-
+        
         public static string SerializeObject(Object obj, List<string> properties, string prefix = "") {
             Type type = obj.GetType();
             string serialized = "";

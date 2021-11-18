@@ -215,7 +215,7 @@ class ControllerStepWizard extends StepWizard {
 		
 		if (LV_GetCount() != this.iFunctionTriggers.Count()) {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-			title := translate("Modular Simulator Controller System")
+			title := translate("Warning")
 			MsgBox 262436, %title%, % translate("Not all functions have been assigned to physical controls. Do you really want to proceed?")
 			OnMessage(0x44, "")
 			
@@ -1194,7 +1194,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 			else
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Increase", "Decrease", "Cancel"]))
 			
-			title := translate("Modular Simulator Controller System")
+			title := translate("Trigger")
 			MsgBox 262179, %title%, % translate("Trigger for ") . action . translate("?")
 			OnMessage(0x44, "")
 			

@@ -322,7 +322,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		
 		if (!wizard.isSoftwareInstalled("SimFeedback") || !wizard.isSoftwareInstalled("StreamDeck Extension")) {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-			title := translate("Modular Simulator Controller System")
+			title := translate("Warning")
 			MsgBox 262436, %title%, % translate("SimFeedback cannot be found or the StreamDeck Extension was not installed. Do you really want to proceed?")
 			OnMessage(0x44, "")
 			
@@ -334,7 +334,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		
 		if !function {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-			title := translate("Modular Simulator Controller System")
+			title := translate("Warning")
 			MsgBox 262436, %title%, % translate("The function for the ""Motion"" action has not been set. You will not be able to activate or deactivate motion. Do you really want to proceed?")
 			OnMessage(0x44, "")
 			
@@ -366,7 +366,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		
 		if !valid {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-			title := translate("Modular Simulator Controller System")
+			title := translate("Warning")
 			MsgBox 262436, %title%, % translate("Not all configured effects have defined initial intensities. Do you really want to proceed? (Default is 50%)")
 			OnMessage(0x44, "")
 			
@@ -380,7 +380,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		
 		if (((effectSelectorField != "") && (effectIntensityField = "")) || ((effectSelectorField = "") && (effectIntensityField != ""))) {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-			title := translate("Modular Simulator Controller System")
+			title := translate("Warning")
 			MsgBox 262436, %title%, % translate("You must specify both ""Effect Selector"" and ""Effect Intensity"" functions, if you want to control effect intensities. Do you really want to proceed?")
 			OnMessage(0x44, "")
 			

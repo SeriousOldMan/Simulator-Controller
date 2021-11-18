@@ -641,7 +641,7 @@ downloadSetup(setupType, setupName) {
 
 deleteSetup(setupType, setupName) {
 	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-	title := translate("Modular Simulator Controller System")
+	title := translate("Delete")
 	MsgBox 262436, %title%, % translate("Do you really want to delete the selected setup?")
 	OnMessage(0x44, "")
 	
@@ -863,7 +863,7 @@ duplicateSettings() {
 
 deleteSettings() {
 	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-	title := translate("Modular Simulator Controller System")
+	title := translate("Delete")
 	MsgBox 262436, %title%, % translate("Do you really want to delete the selected settings?")
 	OnMessage(0x44, "")
 	

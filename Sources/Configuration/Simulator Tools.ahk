@@ -514,7 +514,7 @@ checkInstallation() {
 						removeDirectory(packageLocation)
 					else {
 						OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-						title := translate("Modular Simulator Controller System")
+						title := translate("Installation")
 						MsgBox 262436, %title%, % translate("Do you want to remove the folder with the installation files?")
 						OnMessage(0x44, "")
 						
@@ -546,7 +546,7 @@ checkInstallation() {
 						removeDirectory(packageLocation)
 					else {
 						OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-						title := translate("Modular Simulator Controller System")
+						title := translate("Installation")
 						MsgBox 262436, %title%, % translate("Do you want to remove the folder with the installation files?")
 						OnMessage(0x44, "")
 						

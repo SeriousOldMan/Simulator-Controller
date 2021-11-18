@@ -509,6 +509,8 @@ restart:
 					
 					editSettings(kUpdate, "Team")
 					
+					showMessage(translate("Successfully connected to the team server."))
+					
 					connected := true
 				}
 				else
@@ -1039,7 +1041,7 @@ restart:
 			else
 				Gui RES:Add, DropDownList, x126 yp w126 vsessionDropDownMenu gchooseSession
 			
-			Gui RES:Add, Text, x126 yp+30 r6 w256, % translate("Note: These settings only define the access data for a team session. In order to join this session, it is also necessary to activate the team mode within the first lap of this session. Please consult the documentation for more information and detailed instructions ")
+			Gui RES:Add, Text, x126 yp+30 r6 w256, % translate("Note: These settings define the access data for a team session. In order to join this session, it is necessary for every participating driver to activate the team mode within the first lap of the session. Please consult the documentation for more information and detailed instructions.")
 		}
 		
 		Gui RES:Show, AutoSize Center

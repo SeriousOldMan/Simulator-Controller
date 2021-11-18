@@ -263,6 +263,8 @@ class TeamServerConfigurator extends ConfigurationItem {
 			GuiControl, , teamServerTokenEdit, % this.Token
 			GuiControl +cBlack, teamServerTimeText
 			GuiControl, , teamServerTimeText, % (minutesLeft . translate(" Minutes"))
+			
+			showMessage(translate("Successfully connected to the Team Server."))
 		}
 		catch exception {
 			GuiControl, , teamServerTokenEdit, % ""
@@ -671,7 +673,7 @@ newTeam() {
 
 deleteTeam() {
 	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-	title := translate("Modular Simulator Controller System")
+	title := translate("Delete")
 	MsgBox 262436, %title%, % translate("Do you really want to delete the selected team?")
 	OnMessage(0x44, "")
 	
@@ -734,7 +736,7 @@ newDriver() {
 
 deleteDriver() {
 	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-	title := translate("Modular Simulator Controller System")
+	title := translate("Delete")
 	MsgBox 262436, %title%, % translate("Do you really want to delete the selected driver?")
 	OnMessage(0x44, "")
 	
@@ -810,7 +812,7 @@ renameSession() {
 
 deleteSession() {
 	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-	title := translate("Modular Simulator Controller System")
+	title := translate("Delete")
 	MsgBox 262436, %title%, % translate("Do you really want to delete the selected session?")
 	OnMessage(0x44, "")
 	

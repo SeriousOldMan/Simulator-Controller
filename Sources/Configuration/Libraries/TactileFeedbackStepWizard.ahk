@@ -220,7 +220,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 		
 		if !wizard.isSoftwareInstalled("SimHub") {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-			title := translate("Modular Simulator Controller System")
+			title := translate("Warning")
 			MsgBox 262436, %title%, % translate("SimHub cannot be found. Do you really want to proceed?")
 			OnMessage(0x44, "")
 			

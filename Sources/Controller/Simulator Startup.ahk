@@ -360,7 +360,7 @@ try {
 		SoundPlay *32
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
 		
-		title := translate("Simulator Startup")
+		title := translate("Startup")
 		
 		MsgBox 262180, %title%, % translate("Cancel Startup?")
 		OnMessage(0x44, "")

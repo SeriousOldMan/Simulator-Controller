@@ -7,11 +7,11 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <WarningLevel>1</WarningLevel>
-    <OutputPath>D:\Controller\Sources\Special\Team Server\Release\</OutputPath>
+    <OutputPath>..\Release\</OutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <OutputPath>D:\Controller\Sources\Special\Team Server\Debug\</OutputPath>
+    <OutputPath>..\Debug\</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>

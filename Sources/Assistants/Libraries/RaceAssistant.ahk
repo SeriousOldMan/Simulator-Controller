@@ -57,7 +57,10 @@ class RaceAssistant extends ConfigurationItem {
 	
 	iSimulator := ""
 	iSession := kSessionFinished
-	iDriverName := "John"
+	iDriverForName := "John"
+	
+	iiDriverFullName := "John Doe (JD)"
+	iDrivers := []
 	
 	iLearningLaps := 1
 	
@@ -116,7 +119,7 @@ class RaceAssistant extends ConfigurationItem {
 		
 		User[] {
 			Get {
-				return this.RaceAssistant.DriverName
+				return this.RaceAssistant.DriverForName
 			}
 		}
 		
@@ -214,9 +217,21 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 	
-	DriverName[] {
+	DriverForName[] {
 		Get {
-			return this.iDriverName
+			return this.iDriverForName
+		}
+	}
+	
+	DriverFullName[] {
+		Get {
+			return this.iDriverFullName
+		}
+	}
+	
+	Drivers[] {
+		Get {
+			return this.iDrivers
 		}
 	}
 	
@@ -367,7 +382,7 @@ class RaceAssistant extends ConfigurationItem {
 			this.iSession := values["Session"]
 		
 		if values.HasKey("Driver")
-			this.iDriverName := values["Driver"]
+			this.iDriverForName := values["Driver"]
 	}
 	
 	updateDynamicValues(values) {
@@ -520,7 +535,7 @@ class RaceAssistant extends ConfigurationItem {
 		}
 		
 		this.updateSessionValues({Simulator: simulatorName, Session: session, SessionTime: A_Now
-								, Driver: getConfigurationValue(data, "Stint Data", "DriverForname", this.DriverName)})
+								, Driver: getConfigurationValue(data, "Stint Data", "DriverForname", this.DriverForName)})
 		
 		lapTime := getConfigurationValue(data, "Stint Data", "LapLastTime", 0)
 		
@@ -642,9 +657,19 @@ class RaceAssistant extends ConfigurationItem {
 		knowledgeBase.setFact("Session.Time.Remaining", getDeprecatedConfigurationValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0))
 		knowledgeBase.setFact("Session.Lap.Remaining", getDeprecatedConfigurationValue(data, "Session Data", "Stint Data", "SessionLapsRemaining", 0))
 		
-		driverForname := getConfigurationValue(data, "Stint Data", "DriverForname", this.DriverName)
+		driverForname := getConfigurationValue(data, "Stint Data", "DriverForname", this.DriverForName)
 		driverSurname := getConfigurationValue(data, "Stint Data", "DriverSurname", "Doe")
 		driverNickname := getConfigurationValue(data, "Stint Data", "DriverNickname", "JD")
+		
+		fullName := computeDriverName(driverForName, driverSurName, driverNickName)
+		
+		if ((lapNumber > 1) && (fullName != this.DriverFullName))
+			?????? welcome back
+		
+		if !inList(this.Drivers, fullName)
+			this.Drivers.Push(fullName)
+		
+		this.DriverFullName := fullName
 		
 		this.updateSessionValues({Driver: driverForname})
 			
@@ -868,6 +893,21 @@ class RaceAssistant extends ConfigurationItem {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+computeDriverName(forName, surName, nickName) {
+	name := ""
+	
+	if (forName != "")
+		name .= (forName . A_Space)
+	
+	if (surName != "")
+		name .= (surName . A_Space)
+	
+	if (nickName != "")
+		name .= (" (" . nickName . ")")
+	
+	return name
+}
 
 getDeprecatedConfigurationValue(data, newSection, oldSection, key, default := false) {
 	value := getConfigurationValue(data, newSection, key, kUndefined)

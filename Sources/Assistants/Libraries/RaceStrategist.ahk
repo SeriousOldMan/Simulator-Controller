@@ -594,12 +594,26 @@ class RaceStrategist extends RaceAssistant {
 		
 		static strategyReported := 0
 		
+		currentDriver := this.DriverFullName
+		currentDrivers := this.Drivers.Clone()
+		
 		if (lapNumber <= strategyReported)
 			strategyReported := false
 		
 		result := base.addLap(lapNumber, data)
 		
-		knowledgeBase := this.KnowledgeBase
+		if (this.Speaker && (currentDriver != this.DriverFullName)) {
+			newDriver := !inList(currentDrivers, this.DriverFullName)
+			
+			if newDriver
+				strategyReported := 0
+			
+			Process Exist, Race Engineer.exe
+			
+			exists := ErrorLevel
+			
+			this.getSpeaker().speakPhrase(exists ? "" : (newDriver ? "Greeting": "WelcomeBack"))
+		}
 		
 		if (!strategyReported && this.hasEnoughData(false) && this.Strategy && this.Speaker && this.Listener) {
 			this.getSpeaker().speakPhrase("ConfirmReportStrategy", false, true)
@@ -1156,21 +1170,6 @@ class RaceStrategist extends RaceAssistant {
 
 getTime() {
 	return A_Now
-}
-
-computeDriverName(forName, surName, nickName) {
-	name := ""
-	
-	if (forName != "")
-		name .= (forName . A_Space)
-	
-	if (surName != "")
-		name .= (surName . A_Space)
-	
-	if (nickName != "")
-		name .= ("(" . nickName . ")")
-	
-	return name
 }
 
 comparePositions(c1, c2) {

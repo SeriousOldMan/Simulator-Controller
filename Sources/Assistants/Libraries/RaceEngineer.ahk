@@ -818,11 +818,41 @@ class RaceEngineer extends RaceAssistant {
 	addLap(lapNumber, data) {
 		local knowledgeBase
 		
+		currentDriver := this.DriverFullName
+		currentDrivers := this.Drivers.Clone()
+		
 		result := base.addLap(lapNumber, data)
 		
-		knowledgeBase := this.KnowledgeBase
+		if (this.Speaker && (currentDriver != this.DriverFullName)) {
+			speaker := this.getSpeaker()
+			
+			if !inList(currentDrivers, this.DriverFullName) {
+				speaker.speakPhrase("GreetingEngineer")
+				
+				Process Exist, Race Strategist.exe
+				
+				if ErrorLevel {
+					strategistPlugin := new Plugin("Race Strategist", kSimulatorConfiguration)
+					strategistName := strategistPlugin.getArgumentValue("raceAssistantName", false)
+					
+					if strategistName {
+						speaker.speakPhrase("GreetingStrategist", {strategist: strategistName})
+					
+						speaker.speakPhrase("CallUs")
+					}
+					else
+						speaker.speakPhrase("CallMe")
+				}
+				else
+					speaker.speakPhrase("CallMe")
+			}
+			else
+				speaker.speakPhrase("WelcomeBack")
+		}
 		
 		if this.hasEnoughData(false) {
+			knowledgeBase := this.KnowledgeBase
+		
 			currentCompound := knowledgeBase.getValue("Tyre.Compound", false)
 			currentCompoundColor := knowledgeBase.getValue("Tyre.Compound.Color", false)
 			targetCompound := knowledgeBase.getValue("Tyre.Compound.Target", false)

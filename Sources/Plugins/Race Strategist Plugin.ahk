@@ -120,6 +120,8 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		
 		if positionsData
 			setConfigurationSectionValues(positionsData, "Position Data", getConfigurationSectionValues(data, "Position Data", Object()))
+		
+		return data
 	}
 }
 

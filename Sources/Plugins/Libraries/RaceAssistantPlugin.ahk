@@ -770,10 +770,12 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			telemetryData := data.Clone()
 		else
 			for section, values in data
-				setConfigurationSectionValues(telenetryData, section, values)
+				setConfigurationSectionValues(telemetryData, section, values)
 		
 		if (positionsData && !IsObject(positionsData))
 			positionsData := newConfiguration()
+		
+		return data
 	}
 	
 	collectSessionData() {

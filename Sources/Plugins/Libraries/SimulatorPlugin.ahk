@@ -241,6 +241,9 @@ class SimulatorPlugin extends ControllerPlugin {
 		
 		base.__New(controller, name, configuration, register)
 		
+		if (!this.Active && !isDebug())
+			return
+		
 		for ignore, theAction in string2Values(",", this.getArgumentValue("pitstopCommands", "")) {
 			arguments := string2Values(A_Space, theAction)
 		
@@ -503,6 +506,9 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	__New(controller, name, simulator, configuration := false) {
 		base.__New(controller, name, simulator, configuration)
 	
+		if (!this.Active && !isDebug())
+			return
+		
 		this.iActionMode := kAssistantMode
 		
 		for ignore, theAction in string2Values(",", this.getArgumentValue("assistantCommands", ""))
@@ -666,7 +672,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork) {
 	}
 	
-	updateStandingsData(data) {
+	updatePositionsData(data) {
 	}
 	
 	updateSessionData(data) {

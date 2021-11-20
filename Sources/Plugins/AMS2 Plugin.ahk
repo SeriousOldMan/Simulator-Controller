@@ -291,7 +291,7 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 	
-	updateStandingsData(data) {
+	updatePositionsData(data) {
 		standings := readSimulatorData(this.Code, "-Standings")
 		
 		setConfigurationSectionValues(data, "Position Data", getConfigurationSectionValues(standings, "Position Data"))

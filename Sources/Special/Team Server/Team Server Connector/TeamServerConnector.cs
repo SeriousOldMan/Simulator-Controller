@@ -236,8 +236,27 @@ namespace TeamServer {
 			return Get("session/" + identifier);
 		}
 
+		public string GetSessionValue(string identifier, string name) {
+			return Get("session/" + identifier + "/value",
+					   arguments: new Parameters() { { "name", name } });
+		}
+
+		public void SetSessionValue(string identifier, string name, string value) {
+			Put("session/" + identifier + "/value",
+				arguments: new Parameters() { { "name", name } }, body: value);
+		}
+
 		public string GetSessionTeam(string identifier) {
 			return Get("session/" + identifier + "/team");
+		}
+
+		public string GetSessionLap(string identifier, string lap) {
+			return Get("session/" + identifier + "/lap",
+					   arguments: new Parameters() { { "lap", lap } });
+		}
+
+		public string GetSessionDriver(string identifier) {
+			return Get("session/" + identifier + "/driver");
 		}
 
 		public string GetSessionStint(string identifier) {
@@ -256,10 +275,10 @@ namespace TeamServer {
 			Delete("session/" + identifier);
 		}
 
-		public void StartSession(string identifier, int duration, string car, string track, string raceNr) {
+		public void StartSession(string identifier, int duration, string car, string track) {
 			Put("session/" + identifier + "/start",
 				body: BuildBody(new Parameters() { { "Duration", duration.ToString() },
-												   { "Car", car }, { "Track", track }, { "RaceNr", raceNr  } }));
+												   { "Car", car }, { "Track", track } }));
 		}
 
 		public void FinishSession(string identifier) {
@@ -289,18 +308,10 @@ namespace TeamServer {
 		public string GetStintDriver(string identifier) {
 			return Get("stint/" + identifier + "/driver");
 		}
-
-		public string GetStintPitstopData(string identifier) {
-			return Get("stint/" + identifier + "/pitstopdata");
-		}
-
-		public string SetStintPitstopData(string identifier, string pitstopData) {
-			return Put("stint/" + identifier + "/pitstopdata", body: pitstopData);
-		}
 		#endregion
 
 		#region Lap
-		public string StartLap(string stint, int lapNr) {
+		public string CreateLap(string stint, int lapNr) {
 			return Post("lap",
 						arguments: new Parameters() { { "stint", stint } },
 						body: BuildBody(new Parameters() { { "Nr", lapNr.ToString() } }));
@@ -318,12 +329,12 @@ namespace TeamServer {
 			return Put("lap/" + identifier + "/telemetrydata", body: telemetryData);
 		}
 
-		public string GetLapPositionData(string identifier) {
-			return Get("lap/" + identifier + "/positiondata");
+		public string GetLapPositionsData(string identifier) {
+			return Get("lap/" + identifier + "/positionsData");
 		}
 
-		public string SetLapPositionData(string identifier, string positionData) {
-			return Put("lap/" + identifier + "/positiondata", body: positionData);
+		public string SetLapPositionsData(string identifier, string positionsData) {
+			return Put("lap/" + identifier + "/positionsData", body: positionsData);
 		}
 		#endregion
 	}

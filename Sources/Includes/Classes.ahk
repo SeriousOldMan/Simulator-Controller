@@ -635,6 +635,12 @@ class Plugin extends ConfigurationItem {
 	iSimulators := []
 	iArguments := {}
 	
+	Name[] {
+		Get {
+			return this.iPlugin
+		}
+	}
+	
 	Plugin[] {
 		Get {
 			return this.iPlugin

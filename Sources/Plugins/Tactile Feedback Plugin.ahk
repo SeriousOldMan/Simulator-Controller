@@ -451,7 +451,7 @@ deactivateRearChassisVibration() {
 	action.fireAction(action.Function, "Off")
 }
 
-initializeSimHubPlugin() {
+initializeTactileFeedbackPlugin() {
 	controller := SimulatorController.Instance
 
 	new TactileFeedbackPlugin(controller, kTactileFeedbackPlugin, controller.Configuration)
@@ -491,4 +491,4 @@ disableRearChassisVibration() {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-initializeSimHubPlugin()
+initializeTactileFeedbackPlugin()

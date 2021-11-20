@@ -51,6 +51,8 @@ class RaceAssistant extends ConfigurationItem {
 	iSettings := false
 	iVoiceAssistant := false
 	
+	iRemoteHandler := false
+	
 	iSessionTime := false
 	
 	iSimulator := ""
@@ -72,6 +74,36 @@ class RaceAssistant extends ConfigurationItem {
 	
 	iSetupDatabase := false
 	iSaveSettings := kNever
+	
+	class RaceAssistantRemoteHandler {
+		iEvent := false
+		iRemotePID := false
+		
+		Event[] {
+			Get {
+				return this.iEvent
+			}
+		}
+		
+		RemotePID[] {
+			Get {
+				return this.iRemotePID
+			}
+		}
+		
+		__New(event, remotePID) {
+			this.iEvent := event
+			this.iRemotePID := remotePID
+		}
+		
+		callRemote(function, arguments*) {
+			raiseEvent(kFileMessage, this.Event, function . ":" . values2String(";", arguments*), this.RemotePID)
+		}
+		
+		saveSessionState(arguments*) {
+			this.callRemote("saveSessionState", arguments*)
+		}
+	}
 	
 	class RaceVoiceAssistant extends VoiceAssistant {
 		iRaceAssistant := false
@@ -149,6 +181,12 @@ class RaceAssistant extends ConfigurationItem {
 	Settings[] {
 		Get {
 			return this.iSettings
+		}
+	}
+	
+	RemoteHandler[] {
+		Get {
+			return this.iRemoteHandler
 		}
 	}
 	
@@ -269,10 +307,11 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 	
-	__New(configuration, assistantType, settings, name := false, language := "__Undefined__", service := false, speaker := false, listener := false, voiceServer := false) {
+	__New(configuration, assistantType, settings, remoteHandler, name := false, language := "__Undefined__", service := false, speaker := false, listener := false, voiceServer := false) {
 		this.iDebug := (isDebug() ? kDebugKnowledgeBase : kDebugOff)
 		this.iAssistantType := assistantType
 		this.iSettings := settings
+		this.iRemoteHandler := remoteHandler
 		
 		base.__New(configuration)
 		
@@ -559,6 +598,19 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 	
+	restoreSessionState(stateFile) {
+		sessionState := readConfiguration(stateFile)
+		
+		try {
+			FileDelete %stateFile%
+		}
+		catch exception {
+			; ignore
+		}
+		
+		this.KnowledgeBase.Facts.Facts := getConfigurationSectionValues(sessionState, "Session State")
+	}
+	
 	prepareData(lapNumber, data) {
 		if !IsObject(data)
 			data := readConfiguration(data)
@@ -728,6 +780,28 @@ class RaceAssistant extends ConfigurationItem {
 			this.dumpKnowledge(knowledgeBase)
 		
 		return result
+	}
+	
+	startPitstop(lapNumber := false) {
+	}
+	
+	performPitstop(lapNumber := false) {
+	}
+	
+	finishPitstop(lapNumber := false) {
+		if this.RemoteHandler {
+			savedKnowledgeBase := newConfiguration()
+			
+			setConfigurationSectionValues(savedKnowledgeBase, "Session State", this.KnowledgeBase.Facts.Facts)
+			
+			Random postfix, 1, 1000000
+				
+			stateFile := (kTempDirectory . "Race Strategist " . postfix . ".state")
+			
+			writeConfiguration(stateFile, savedKnowledgeBase)
+		
+			this.RemoteHandler.saveSessionState(stateFile)
+		}
 	}
 	
 	saveSessionSettings() {

@@ -103,6 +103,12 @@ class TestPitstopHandler {
 			showMessage("Invoking pitstop action " . action . ((arguments.Length() > 0) ? (" with " . values2String(", ", arguments*)) : ""))
 	}
 
+	saveSessionState(name, value) {
+		this.showAction("saveSessionState", name, SubStr(value, 1, 20) . "...")
+		
+		vCompletedActions["saveSessionState"] := Array(name, value)
+	}
+
 	pitstopPlanned(pitstopNumber, plannedLap := false) {
 		this.showAction("pitstopPlanned", pitstopNumber, plannedLap)
 		

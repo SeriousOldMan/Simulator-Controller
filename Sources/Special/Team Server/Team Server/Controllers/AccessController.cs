@@ -14,7 +14,7 @@ namespace TeamServer.Controllers {
         }
 
         [HttpGet]
-        public String Get([FromQuery(Name = "name")] string name, [FromQuery(Name = "password")] string password) {
+        public string Get([FromQuery(Name = "name")] string name, [FromQuery(Name = "password")] string password) {
             if (name == null)
                 name = "";
 
@@ -33,12 +33,12 @@ namespace TeamServer.Controllers {
         }
 
         [HttpGet("accountminutesleft")]
-        public String GetAccountMinutes([FromQuery(Name = "token")] string token) {
+        public string GetAccountMinutes([FromQuery(Name = "token")] string token) {
             return Server.TeamServer.TokenIssuer.ValidateToken(token).Account.MinutesLeft.ToString();
         }
 
         [HttpGet("tokenminutesleft")]
-        public String GetTokenMinutes([FromQuery(Name = "token")] string token) {
+        public string GetTokenMinutes([FromQuery(Name = "token")] string token) {
             return Math.Max(0, Server.TeamServer.TokenIssuer.ValidateToken(token).GetRemainingMinutes()).ToString();
         }
     }
@@ -53,7 +53,7 @@ namespace TeamServer.Controllers {
         }
 
         [HttpGet]
-        public String Get([FromQuery(Name = "token")] string token) {
+        public string Get([FromQuery(Name = "token")] string token) {
             Server.TeamServer.TokenIssuer.DeleteToken(token);
 
             return "Ok";

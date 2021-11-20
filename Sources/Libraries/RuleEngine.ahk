@@ -2447,6 +2447,10 @@ class Facts {
 		Get {
 			return this.iFacts
 		}
+		
+		Set {
+			return (this.iFacts := value)
+		}
 	}
 	
 	Generation[] {

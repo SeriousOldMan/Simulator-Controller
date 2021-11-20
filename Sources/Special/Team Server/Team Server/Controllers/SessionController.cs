@@ -18,7 +18,7 @@ namespace TeamServer.Controllers {
         }
 
         [HttpGet("allsessions")]
-        public String GetSessions([FromQuery(Name = "token")] string token) {
+        public string GetSessions([FromQuery(Name = "token")] string token) {
             try {
                 SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
 
@@ -38,7 +38,35 @@ namespace TeamServer.Controllers {
                 SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
                 Session session = sessionManager.LookupSession(identifier);
 
-                return ControllerUtils.SerializeObject(session, new List<string>(new string[] { "Identifier", "Name", "Duration", "Started", "Finished", "Car", "Track", "RaceNr" }));
+                return ControllerUtils.SerializeObject(session, new List<string>(new string[] { "Identifier", "Name", "Duration", "Started", "Finished", "Car", "Track" }));
+            }
+            catch (Exception exception) {
+                return "Error: " + exception.Message;
+            }
+        }
+
+        [HttpGet("{identifier}/value")]
+        public string GetValue([FromQuery(Name = "token")] string token, string identifier,
+                              [FromQuery(Name = "name")] string name) {
+            try {
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+
+                return sessionManager.GetSessionValue(sessionManager.LookupSession(identifier), name);
+            }
+            catch (Exception exception) {
+                return "Error: " + exception.Message;
+            }
+        }
+
+        [HttpPut("{identifier}/value")]
+        public string GetTeam([FromQuery(Name = "token")] string token, string identifier,
+                              [FromQuery(Name = "name")] string name, [FromBody] string value) {
+            try {
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+
+                sessionManager.SetSessionValue(sessionManager.LookupSession(identifier), name, value);
+
+                return "Ok";
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
@@ -51,6 +79,38 @@ namespace TeamServer.Controllers {
                 SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
                 
                 return sessionManager.LookupSession(identifier).Team.Identifier.ToString();
+            }
+            catch (Exception exception) {
+                return "Error: " + exception.Message;
+            }
+        }
+
+        [HttpGet("{identifier}/driver")]
+        public string GetDriver([FromQuery(Name = "token")] string token, string identifier) {
+            try {
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                Session session = sessionManager.LookupSession(identifier);
+                Stint stint = session.GetCurrentStint();
+
+                return (stint != null) ? stint.Driver.Identifier.ToString() : "Null";
+            }
+            catch (Exception exception) {
+                return "Error: " + exception.Message;
+            }
+        }
+
+        [HttpGet("{identifier}/lap")]
+        public string GetLap([FromQuery(Name = "token")] string token, string identifier,
+                             [FromQuery(Name = "lap")] string lap) {
+            try {
+                int lapNr = Int32.Parse(lap);
+
+                Lap theLap = Server.TeamServer.ObjectManager.Connection.QueryAsync<Lap>(
+                    @"
+                        Select * From Laps Where StintID In (Select ID From Stints Where SessionID = ?)
+                    ", identifier).Result.FirstOrDefault<Lap>();
+
+                return (theLap != null) ? theLap.Identifier.ToString() : "Null";
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
@@ -111,8 +171,7 @@ namespace TeamServer.Controllers {
                 sessionManager.StartSession(identifier,
                                             duration: Int32.Parse(properties["Duration"]),
                                             car: properties.GetValueOrDefault<string, string>("Car", "Unknown"),
-                                            track: properties.GetValueOrDefault<string, string>("Track", "Unknown"),
-                                            raceNr: properties.GetValueOrDefault<string, string>("RaceNr", "Unknown"));
+                                            track: properties.GetValueOrDefault<string, string>("Track", "Unknown"));
 
                 return "Ok";
             }
@@ -152,7 +211,7 @@ namespace TeamServer.Controllers {
         }
 
         [HttpDelete("{identifier}")]
-        public String Delete([FromQuery(Name = "token")] string token, string identifier) {
+        public string Delete([FromQuery(Name = "token")] string token, string identifier) {
             try {
                 SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
 
@@ -182,19 +241,6 @@ namespace TeamServer.Controllers {
                 Stint stint = sessionManager.LookupStint(identifier);
 
                 return ControllerUtils.SerializeObject(stint, new List<string>(new string[] { "Identifier", "Nr", "Lap" }));
-            }
-            catch (Exception exception) {
-                return "Error: " + exception.Message;
-            }
-        }
-
-        [HttpGet("{identifier}/pitstopdata")]
-        public string GetPitstopData([FromQuery(Name = "token")] string token, string identifier) {
-            try {
-                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
-                Stint stint = sessionManager.LookupStint(identifier);
-
-                return stint.PitstopData;
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
@@ -239,20 +285,6 @@ namespace TeamServer.Controllers {
             }
         }
 
-        [HttpPut("{identifier}/pitstopdata")]
-        public string SetPitstopData([FromQuery(Name = "token")] string token, string identifier, [FromBody] string keyValues) {
-            try {
-                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
-
-                sessionManager.UpdatePitstopData(identifier, keyValues);
-
-                return "Ok";
-            }
-            catch (Exception exception) {
-                return "Error: " + exception.Message;
-            }
-        }
-
         [HttpPost]
         public string Post([FromQuery(Name = "token")] string token,
                            [FromQuery(Name = "session")] string session, [FromQuery(Name = "driver")] string driver,
@@ -273,7 +305,7 @@ namespace TeamServer.Controllers {
         }
 
         [HttpDelete("{identifier}")]
-        public String Delete([FromQuery(Name = "token")] string token, string identifier) {
+        public string Delete([FromQuery(Name = "token")] string token, string identifier) {
             try {
                 SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
 
@@ -323,13 +355,13 @@ namespace TeamServer.Controllers {
             }
         }
 
-        [HttpGet("{identifier}/positiondata")]
-        public string GetPositionData([FromQuery(Name = "token")] string token, string identifier) {
+        [HttpGet("{identifier}/positionsData")]
+        public string GetPositionsData([FromQuery(Name = "token")] string token, string identifier) {
             try {
                 SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
                 Lap lap = sessionManager.LookupLap(identifier);
 
-                return lap.PositionData;
+                return lap.PositionsData;
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
@@ -350,12 +382,12 @@ namespace TeamServer.Controllers {
             }
         }
 
-        [HttpPut("{identifier}/positiondata")]
-        public string SetPositionData([FromQuery(Name = "token")] string token, string identifier, [FromBody] string keyValues) {
+        [HttpPut("{identifier}/positionsData")]
+        public string SetPositionsData([FromQuery(Name = "token")] string token, string identifier, [FromBody] string keyValues) {
             try {
                 SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
 
-                sessionManager.UpdatePositionData(identifier, keyValues);
+                sessionManager.UpdatePositionsData(identifier, keyValues);
 
                 return "Ok";
             }
@@ -381,7 +413,7 @@ namespace TeamServer.Controllers {
         }
 
         [HttpDelete("{identifier}")]
-        public String Delete([FromQuery(Name = "token")] string token, string identifier) {
+        public string Delete([FromQuery(Name = "token")] string token, string identifier) {
             try {
                 SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
 

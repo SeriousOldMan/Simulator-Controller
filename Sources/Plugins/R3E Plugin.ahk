@@ -527,7 +527,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		return lastCarName
 	}
 	
-	updateStandingsData(data) {
+	updatePositionsData(data) {
 		standings := readSimulatorData(this.Code, "-Standings")
 		
 		Loop {

@@ -169,9 +169,10 @@ startRaceStrategist() {
 		setDebug(true)
 	
 	RaceStrategist.Instance := new RaceStrategist(kSimulatorConfiguration, readConfiguration(strategistSettingsFile)
+												, remotePID ? new RaceAssistant.RaceAssistantRemoteHandler("Race Strategist", remotePID) : false
 												, strategistName, strategistLanguage, strategistService, strategistSpeaker, strategistListener, voiceServer)
-	
-	registerEventHandler("Strategist", "handleStrategistRemoteCalls")
+
+	registerEventHandler("Race Strategist", "handleStrategistRemoteCalls")
 	
 	if (debug && strategistSpeaker) {
 		RaceStrategist.Instance.getSpeaker()

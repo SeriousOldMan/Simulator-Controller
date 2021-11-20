@@ -182,7 +182,7 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 		this.sendPitstopCommand("Pitstop", "Set", "Repair", (repairBodywork || repairSuspension) ? "true" : "false")
 	}
 	
-	updateStandingsData(data) {
+	updatePositionsData(data) {
 		standings := readSimulatorData(this.Code, "-Standings")
 		
 		setConfigurationSectionValues(data, "Position Data", getConfigurationSectionValues(standings, "Position Data"))

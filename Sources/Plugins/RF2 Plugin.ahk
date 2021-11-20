@@ -229,7 +229,7 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 			this.sendPitstopCommand("Pitstop", "Set", "Repair", "Nothing")
 	}
 	
-	updateStandingsData(data) {
+	updatePositionsData(data) {
 		standings := readSimulatorData(this.Code, "-Standings")
 		
 		setConfigurationSectionValues(data, "Position Data", getConfigurationSectionValues(standings, "Position Data"))

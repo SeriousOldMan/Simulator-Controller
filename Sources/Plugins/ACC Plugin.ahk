@@ -251,7 +251,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 	
-	updateStandingsData(data) {
+	updatePositionsData(data) {
 		static carNames := false
 		
 		if (this.SessionState == kSessionRace)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using TeamServer.Model;
 
 namespace TeamServer.Server {
@@ -45,6 +46,18 @@ namespace TeamServer.Server {
 			return session;
 		}
 
+		public string GetSessionValue(Session session, string name) {
+			ValidateSession(session);
+
+			return ObjectManager.GetAttributeAsync(session, name).Result;
+		}
+
+		public void SetSessionValue(Session session, string name, string value) {
+			ValidateSession(session);
+
+			ObjectManager.SetAttributeAsync(session, name, value);
+		}
+
 		public void DeleteSession(Session session) {
 			if (session != null)
 				session.Delete();
@@ -60,7 +73,7 @@ namespace TeamServer.Server {
 		#endregion
 
 		#region Operations
-		public Session StartSession(Session session, int duration, string car, string track, string raceNr) {
+		public Session StartSession(Session session, int duration, string car, string track) {
 			ValidateSession(session);
 
 			foreach (Stint stint in session.Stints)
@@ -69,7 +82,6 @@ namespace TeamServer.Server {
 			session.Duration = duration;
 			session.Car = car;
 			session.Track = track;
-			session.RaceNr = raceNr;
 			session.StartTime = DateTime.Now;
 			session.FinishTime = DateTime.MinValue;
 			session.Started = true;
@@ -80,12 +92,12 @@ namespace TeamServer.Server {
 			return session;
 		}
 
-		public Session StartSession(Guid identifier, int duration, string car, string track, string raceNr) {
-			return StartSession(ObjectManager.GetSessionAsync(identifier).Result, duration, car, track, raceNr);
+		public Session StartSession(Guid identifier, int duration, string car, string track) {
+			return StartSession(ObjectManager.GetSessionAsync(identifier).Result, duration, car, track);
 		}
 
-		public Session StartSession(string identifier, int duration, string car, string track, string raceNr) {
-			return StartSession(new Guid(identifier), duration, car, track, raceNr);
+		public Session StartSession(string identifier, int duration, string car, string track) {
+			return StartSession(new Guid(identifier), duration, car, track);
 		}
 
 		public void FinishSession(Session session) {
@@ -93,6 +105,7 @@ namespace TeamServer.Server {
 
 			if (session.Started && !session.Finished) {
 				Token.Account.MinutesLeft -= (int)Math.Round((DateTime.Now - session.StartTime).TotalSeconds * 60);
+
 				session.Finished = true;
 				session.FinishTime = DateTime.Now;
 
@@ -134,21 +147,27 @@ namespace TeamServer.Server {
 		#endregion
 
 		#region CRUD
-		public Stint CreateStint(Session session, Driver driver, int lap, string pitstopData = "") {
+		public Stint CreateStint(Session session, Driver driver, int lap) {
 			ValidateSession(session);
 			ValidateDriver(driver);
 
-			Stint lastStint = session.GetCurrentStint();
-			int stintNr = (lastStint != null) ? lastStint.Nr + 1 : 1;
+			Task<List<Stint>> task = ObjectManager.Connection.QueryAsync<Stint>(
+				@"
+                    Select * From Stints Where SessionID = ? And DriverID = ? And Lap = ?)
+                ", session.ID, driver.ID, lap);
 
-			Stint stint = new Stint { SessionID = session.ID, DriverID = driver.ID, Nr = stintNr, Lap = lap };
+			if (task.Result.Count == 0) {
+				Stint lastStint = session.GetCurrentStint();
+				int stintNr = (lastStint != null) ? lastStint.Nr + 1 : 1;
 
-			if (!String.IsNullOrWhiteSpace(pitstopData))
-				stint.PitstopData = pitstopData;
+				Stint stint = new Stint { SessionID = session.ID, DriverID = driver.ID, Nr = stintNr, Lap = lap };
 
-			stint.Save();
+				stint.Save();
 
-			return stint;
+				return stint;
+			}
+			else
+				return task.Result[0];
 		}
 
 		public void DeleteStint(Stint stint) {
@@ -166,23 +185,6 @@ namespace TeamServer.Server {
 		#endregion
 
 		#region Operations
-		public Stint UpdatePitstopData(Stint stint, string pitstopData) {
-			ValidateStint(stint);
-
-			stint.PitstopData = pitstopData;
-
-			stint.Save();
-
-			return stint;
-		}
-
-		public Stint UpdatePitstopData(Guid identifier, string pitstopData) {
-			return UpdatePitstopData(ObjectManager.GetStintAsync(identifier).Result, pitstopData);
-		}
-
-		public Stint UpdatePitstopData(string identifier, string pitstopData) {
-			return UpdatePitstopData(new Guid(identifier), pitstopData);
-		}
 		#endregion
 		#endregion
 
@@ -213,16 +215,20 @@ namespace TeamServer.Server {
 		public Lap CreateLap(Stint stint, int lap) {
 			ValidateStint(stint);
 
-			Lap lastLap = stint.GetCurrentLap();
+			Task<List<Lap>> task = ObjectManager.Connection.QueryAsync<Lap>(
+				@"
+                    Select * From Laps Where StintID = ? And Nr = ?)
+                ", stint.ID, lap);
 
-			if ((lastLap != null) && (lastLap.Nr + 1 != lap))
-				throw new Exception("Invalid lap number...");
+			if (task.Result.Count == 0) {
+				Lap theLap = new Lap { StintID = stint.ID, Nr = lap };
 
-			Lap theLap = new Lap { StintID = stint.ID, Nr = lap };
+				theLap.Save();
 
-			theLap.Save();
-
-			return theLap;
+				return theLap;
+			}
+			else
+				return task.Result[0];
 		}
 
 		public void DeleteLap(Lap lap) {
@@ -258,22 +264,22 @@ namespace TeamServer.Server {
 			return UpdateTelemetryData(new Guid(identifier), telemetryData);
 		}
 
-		public Lap UpdatePositionData(Lap lap, string positionData) {
+		public Lap UpdatePositionsData(Lap lap, string positionsData) {
 			ValidateLap(lap);
 
-			lap.PositionData = positionData;
+			lap.PositionsData = positionsData;
 
 			lap.Save();
 
 			return lap;
 		}
 
-		public Lap UpdatePositionData(Guid identifier, string positionData) {
-			return UpdatePositionData(ObjectManager.GetLapAsync(identifier).Result, positionData);
+		public Lap UpdatePositionsData(Guid identifier, string positionsData) {
+			return UpdatePositionsData(ObjectManager.GetLapAsync(identifier).Result, positionsData);
 		}
 
-		public Lap UpdatePositionData(string identifier, string positionData) {
-			return UpdatePositionData(new Guid(identifier), positionData);
+		public Lap UpdatePositionsData(string identifier, string positionsData) {
+			return UpdatePositionsData(new Guid(identifier), positionsData);
 		}
 		#endregion
 		#endregion

@@ -28,7 +28,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 	
 	class RemoteRaceEngineer extends RaceAssistantPlugin.RemoteRaceAssistant {
 		__New(remotePID) {
-			base.__New("Engineer", remotePID)
+			base.__New("Race Engineer", remotePID)
 		}
 		
 		planPitstop(arguments*) {
@@ -69,6 +69,9 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 	
 	__New(controller, name, configuration := false) {
 		base.__New(controller, name, configuration)
+
+		if (!this.Active && !isDebug())
+			return
 		
 		if (this.RaceAssistantName)
 			SetTimer collectRaceEngineerSessionData, 10000
@@ -284,23 +287,6 @@ initializeRaceEngineerPlugin() {
 	local controller := SimulatorController.Instance
 	
 	new RaceEngineerPlugin(controller, kRaceEngineerPlugin, controller.Configuration)
-	
-	registerEventHandler("Pitstop", "handlePitstopRemoteCalls")
-}
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                          Event Handler Section                          ;;;
-;;;-------------------------------------------------------------------------;;;
-
-handlePitstopRemoteCalls(event, data) {
-	if InStr(data, ":") {
-		data := StrSplit(data, ":", , 2)
-		
-		return withProtection(ObjBindMethod(SimulatorController.Instance.findPlugin(kRaceEngineerPlugin), data[1]), string2Values(";", data[2])*)
-	}
-	else
-		return withProtection(ObjBindMethod(SimulatorController.Instance.findPlugin(kRaceEngineerPlugin), data))
 }
 
 ;;;-------------------------------------------------------------------------;;;

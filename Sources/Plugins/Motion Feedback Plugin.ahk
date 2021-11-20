@@ -514,7 +514,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		if register
 			controller.registerPlugin(this)
 		
-		if (this.isActive()) {
+		if this.isActive() {
 			if ((motionArguments[1] = "On") && !this.MotionActive && !this.Application.isRunning())
 				this.startMotion(true)
 			else if ((motionArguments[1] = "Off") && this.Application.isRunning())

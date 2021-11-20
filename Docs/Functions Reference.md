@@ -22,6 +22,9 @@ Stores all the key / value pairs in the configuration map under the given sectio
 #### *removeConfigurationValue(configuration :: ConfigurationMao, section :: String, key :: String)*
 Removes the given key and its value from the configuration map.
 
+#### *removeConfigurationSection(configuration :: ConfigurationMao, section :: String)*
+Removes the given section including all keys and values from the configuration map.
+
 #### *readConfiguration(configFile :: String)*
 Reads a configuration map from an *.ini file. The Strings "true" and "false" will he converted to the literal values *true* and *false* when encountered as values in the configuration file. If *configFile* denotes an absolute path, this path will be used. Otherwise, the file will be looked up in the *kUserConfigDirectory* and in *kConfigDirectory* (see the [constants documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#installation-paths-constantsahk) for reference), in that order.
 

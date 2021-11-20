@@ -26,7 +26,7 @@ global kRaceStrategistPlugin = "Race Strategist"
 class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	class RemoteRaceStrategist extends RaceAssistantPlugin.RemoteRaceAssistant {
 		__New(remotePID) {
-			base.__New("Strategist", remotePID)
+			base.__New("Race Strategist", remotePID)
 		}
 		
 		recommendPitstop(arguments*) {
@@ -57,6 +57,9 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	
 	__New(controller, name, configuration := false) {
 		base.__New(controller, name, configuration)
+
+		if (!this.Active && !isDebug())
+			return
 		
 		if (this.RaceAssistantName)
 			SetTimer collectRaceStrategistSessionData, 10000
@@ -108,6 +111,15 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	
 	sessionActive(sessionState) {
 		return ((sessionState == kSessionPractice) || (sessionState == kSessionRace))
+	}
+	
+	acquireSessionData(ByRef telemetryData, ByRef positionsData) {
+		data := base.acquireSessionData(telemetryData, positionsData)
+		
+		this.updatePositionsData(data)
+		
+		if positionsData
+			setConfigurationSectionValues(positionsData, "Position Data", getConfigurationSectionValues(data, "Position Data", Object()))
 	}
 }
 

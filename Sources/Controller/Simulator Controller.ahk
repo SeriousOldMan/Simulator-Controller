@@ -578,8 +578,10 @@ class SimulatorController extends ConfigurationItem {
 	}
 	
 	findPlugin(name) {
-		for ignore, mode in this.Plugins
-			if (mode.Plugin = name)
+		local plugin
+		
+		for ignore, plugin in this.Plugins
+			if (plugin.Plugin = name)
 				return mode
 		
 		return false

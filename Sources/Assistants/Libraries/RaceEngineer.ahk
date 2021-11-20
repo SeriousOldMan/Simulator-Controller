@@ -24,20 +24,12 @@
 ;;;-------------------------------------------------------------------------;;;
 
 class RaceEngineer extends RaceAssistant {
-	iPitstopHandler := false
-	
 	iAdjustLapTime := true
 	
 	iSaveTyrePressures := kAsk
 	
 	iSetupData := {}
 	iSessionDataActive := false
-	
-	PitstopHandler[] {
-		Get {
-			return this.iPitstopHandler
-		}
-	}
 	
 	AdjustLapTime[] {
 		Get {
@@ -61,12 +53,6 @@ class RaceEngineer extends RaceAssistant {
 		Get {
 			return this.iSessionDataActive
 		}
-	}
-	
-	__New(configuration, engineerSettings, pitstopHandler := false, name := false, language := "__Undefined__", service := false, speaker := false, listener := false, voiceServer := false) {
-		this.iPitstopHandler := pitstopHandler
-		
-		base.__New(configuration, "Race Engineer", engineerSettings, name, language, service, speaker, listener, voiceServer)
 	}
 	
 	updateConfigurationValues(values) {
@@ -1085,7 +1071,7 @@ class RaceEngineer extends RaceAssistant {
 	}
 	
 	supportsPitstop() {
-		return ((this.Session == kSessionRace) && this.PitstopHandler)
+		return ((this.Session == kSessionRace) && this.RemoteHandler)
 	}
 	
 	requestInformation(category, arguments*) {
@@ -1247,8 +1233,8 @@ class RaceEngineer extends RaceAssistant {
 				}
 		}
 		
-		if (result && this.PitstopHandler) {
-			this.PitstopHandler.pitstopPlanned(pitstopNumber, plannedLap)
+		if (result && this.RemoteHandler) {
+			this.RemoteHandler.pitstopPlanned(pitstopNumber, plannedLap)
 		}
 		
 		return result
@@ -1338,6 +1324,10 @@ class RaceEngineer extends RaceAssistant {
 		if this.Speaker
 			this.getSpeaker().speakPhrase("Perform")
 		
+		this.startPitstop(lapNumber)
+		
+		base.performPitstop(lapNumber)
+		
 		knowledgeBase.addFact("Pitstop.Lap", lapNumber ? lapNumber : knowledgeBase.getValue("Lap"))
 		
 		result := knowledgeBase.produce()
@@ -1347,10 +1337,17 @@ class RaceEngineer extends RaceAssistant {
 		if this.Debug[kDebugKnowledgeBase]
 			this.dumpKnowledge(knowledgeBase)
 		
-		if (result && this.PitstopHandler)
-			this.PitstopHandler.pitstopFinished(knowledgeBase.getValue("Pitstop.Last", 0))
+		if result
+			this.finishPitstop(lapNumber)
 		
 		return result
+	}
+	
+	finishPitstop(lapNumber := false) {
+		base.finishPitstop()
+		
+		if this.RemoteHandler
+			this.RemoteHandler.pitstopFinished(this.KnowledgeBase.getValue("Pitstop.Last", 0))
 	}
 	
 	callPlanPitstop(lap := false) {		
@@ -1498,15 +1495,15 @@ class RaceEngineer extends RaceAssistant {
 	}
 	
 	startPitstopSetup(pitstopNumber) {
-		if this.PitstopHandler
-			this.PitstopHandler.startPitstopSetup(pitstopNumber)
+		if this.RemoteHandler
+			this.RemoteHandler.startPitstopSetup(pitstopNumber)
 	}
 
 	finishPitstopSetup(pitstopNumber) {
-		if this.PitstopHandler {
-			this.PitstopHandler.finishPitstopSetup(pitstopNumber)
+		if this.RemoteHandler {
+			this.RemoteHandler.finishPitstopSetup(pitstopNumber)
 			
-			this.PitstopHandler.pitstopPrepared(pitstopNumber)
+			this.RemoteHandler.pitstopPrepared(pitstopNumber)
 			
 			if this.Speaker
 				this.getSpeaker().speakPhrase("CallToPit")
@@ -1514,23 +1511,23 @@ class RaceEngineer extends RaceAssistant {
 	}
 
 	setPitstopRefuelAmount(pitstopNumber, litres) {
-		if this.PitstopHandler
-			this.PitstopHandler.setPitstopRefuelAmount(pitstopNumber, litres)
+		if this.RemoteHandler
+			this.RemoteHandler.setPitstopRefuelAmount(pitstopNumber, litres)
 	}
 
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor, set) {
-		if this.PitstopHandler
-			this.PitstopHandler.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
+		if this.RemoteHandler
+			this.RemoteHandler.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
-		if this.PitstopHandler
-			this.PitstopHandler.setPitstopTyrePressures(pitstopNumber, Round(pressureFL, 1), Round(pressureFR, 1), Round(pressureRL, 1), Round(pressureRR, 1))
+		if this.RemoteHandler
+			this.RemoteHandler.setPitstopTyrePressures(pitstopNumber, Round(pressureFL, 1), Round(pressureFR, 1), Round(pressureRL, 1), Round(pressureRR, 1))
 	}
 
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork) {
-		if this.PitstopHandler
-			this.PitstopHandler.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork)
+		if this.RemoteHandler
+			this.RemoteHandler.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork)
 	}
 	
 	getTyrePressures(weather, airTemperature, trackTemperature, ByRef compound, ByRef compoundColor, ByRef pressures, ByRef certainty) {

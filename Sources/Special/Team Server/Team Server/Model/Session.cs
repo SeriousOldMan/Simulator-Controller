@@ -32,8 +32,6 @@ namespace TeamServer.Model {
 
         public string Car { get; set; } = "";
 
-        public string RaceNr { get; set; }
-
         public bool Started { get; set; } = false;
 
         public DateTime StartTime { get; set; } = DateTime.MinValue;
@@ -96,16 +94,6 @@ namespace TeamServer.Model {
         public int Lap { get; set; }
 
         [Ignore]
-        public string PitstopData {
-            get {
-                return ObjectManager.GetAttributeAsync(this, "PitstopData").Result;
-            }
-            set {
-                ObjectManager.SetAttributeAsync(this, "PitstopData", value);
-            }
-        }
-
-        [Ignore]
         public List<Lap> Laps {
             get {
                 return ObjectManager.GetStintLapsAsync(this).Result;
@@ -158,12 +146,12 @@ namespace TeamServer.Model {
         }
 
         [Ignore]
-        public string PositionData {
+        public string PositionsData {
             get {
-                return ObjectManager.GetAttributeAsync(this, "PositionData").Result;
+                return ObjectManager.GetAttributeAsync(this, "PositionsData").Result;
             }
             set {
-                ObjectManager.SetAttributeAsync(this, "PositionData", value);
+                ObjectManager.SetAttributeAsync(this, "PositionsData", value);
             }
         }
     }

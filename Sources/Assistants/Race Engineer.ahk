@@ -50,21 +50,9 @@ global vRemotePID = 0
 ;;;                         Private Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class RemotePitstopHandler {
-	iRemotePID := false
-	
-	RemotePID[] {
-		Get {
-			return this.iRemotePID
-		}
-	}
-	
+class RaceEngineerRemoteHandler extends RaceAssistant.RaceAssistantRemoteHandler {
 	__New(remotePID) {
-		this.iRemotePID := remotePID
-	}
-		
-	callRemote(function, arguments*) {
-		raiseEvent(kFileMessage, "Pitstop", function . ":" . values2String(";", arguments*), this.RemotePID)
+		base.__New("Race Engineer", remotePID)
 	}
 	
 	pitstopPlanned(arguments*) {
@@ -227,10 +215,10 @@ startRaceEngineer() {
 		setDebug(true)
 	
 	RaceEngineer.Instance := new RaceEngineer(kSimulatorConfiguration, readConfiguration(engineerSettingsFile)
-											, remotePID ? new RemotePitstopHandler(remotePID) : false
+											, remotePID ? new RaceEngineerRemoteHandler(remotePID) : false
 											, engineerName, engineerLanguage, engineerService, engineerSpeaker, engineerListener, voiceServer)
 	
-	registerEventHandler("Engineer", "handleEngineerRemoteCalls")
+	registerEventHandler("Race Engineer", "handleEngineerRemoteCalls")
 	
 	if (debug && engineerSpeaker) {
 		RaceEngineer.Instance.getSpeaker()

@@ -64,8 +64,8 @@ class RaceStrategist extends RaceAssistant {
 		}
 	}
 	
-	__New(configuration, strategistSettings, name := false, language := "__Undefined__", service := false, speaker := false, listener := false, voiceServer := false) {
-		base.__New(configuration, "Race Strategist", strategistSettings, name, language, service, speaker, listener, voiceServer)
+	__New(configuration, strategistSettings, remoteHandler, name := false, language := "__Undefined__", service := false, speaker := false, listener := false, voiceServer := false) {
+		base.__New(configuration, "Race Strategist", strategistSettings, remoteHandler, name, language, service, speaker, listener, voiceServer)
 	}
 	
 	updateConfigurationValues(values) {
@@ -843,12 +843,12 @@ class RaceStrategist extends RaceAssistant {
 		if ErrorLevel
 			if plannedLap {
 				if (refuel != kUndefined)
-					raiseEvent(kFileMessage, "Engineer", "planPitstop:" . values2String(";", plannedLap, refuel, tyreChange), ErrorLevel)
+					raiseEvent(kFileMessage, "Race Engineer", "planPitstop:" . values2String(";", plannedLap, refuel, tyreChange), ErrorLevel)
 				else
-					raiseEvent(kFileMessage, "Engineer", "planPitstop:" . plannedLap, ErrorLevel)
+					raiseEvent(kFileMessage, "Race Engineer", "planPitstop:" . plannedLap, ErrorLevel)
 			}
 			else
-				raiseEvent(kFileMessage, "Engineer", "planPitstop", ErrorLevel)
+				raiseEvent(kFileMessage, "Race Engineer", "planPitstop", ErrorLevel)
 	}
 	
 	performPitstop(lapNumber := false) {
@@ -858,6 +858,10 @@ class RaceStrategist extends RaceAssistant {
 			nextPitstop := knowledgeBase.getValue("Strategy.Pitstop.Next", false)
 		else
 			nextPitstop := false
+		
+		this.startPitstop(lapNumber)
+		
+		base.performPitstop(lapNumber)
 			
 		knowledgeBase.addFact("Pitstop.Lap", lapNumber ? lapNumber : knowledgeBase.getValue("Lap"))
 		
@@ -874,6 +878,8 @@ class RaceStrategist extends RaceAssistant {
 			if ((map != "n/a") && (map != knowledgeBase.getValue("Lap." . knowledgeBase.getValue("Lap") . ".Map", "n/a")))
 				this.getSpeaker().speakPhrase("StintMap", {map: map})
 		}
+		
+		this.finishPitstop(lapNumber)
 		
 		return result
 	}

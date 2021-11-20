@@ -15,7 +15,7 @@ namespace TeamServer.Controllers {
         }
 
         [HttpGet]
-        public String Get([FromQuery(Name = "token")] string token, [FromQuery(Name = "session")] string session, [FromQuery(Name = "operation")] string operation) {
+        public string Get([FromQuery(Name = "token")] string token, [FromQuery(Name = "session")] string session, [FromQuery(Name = "operation")] string operation) {
             try {
                 UpdateManager updateManager = new UpdateManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
 

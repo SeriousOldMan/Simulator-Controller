@@ -18,7 +18,7 @@ namespace TeamServer.Controllers {
         }
 
         [HttpGet("allteams")]
-        public String GetTeams([FromQuery(Name = "token")] string token) {
+        public string GetTeams([FromQuery(Name = "token")] string token) {
             try {
                 TeamManager teamManager = new TeamManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
                 
@@ -58,7 +58,7 @@ namespace TeamServer.Controllers {
         }
 
         [HttpGet("{identifier}/sessions")]
-        public String GetSessions([FromQuery(Name = "token")] string token, string identifier) {
+        public string GetSessions([FromQuery(Name = "token")] string token, string identifier) {
             try {
                 TeamManager teamManager = new TeamManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
 
@@ -105,7 +105,7 @@ namespace TeamServer.Controllers {
         }
 
         [HttpDelete("{identifier}")]
-        public String Delete([FromQuery(Name = "token")] string token, string identifier) {
+        public string Delete([FromQuery(Name = "token")] string token, string identifier) {
             try {
                 TeamManager teamManager = new TeamManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
 
@@ -176,7 +176,7 @@ namespace TeamServer.Controllers {
         }
 
         [HttpDelete("{identifier}")]
-        public String Delete([FromQuery(Name = "token")] string token, string identifier) {
+        public string Delete([FromQuery(Name = "token")] string token, string identifier) {
             try {
                 TeamManager teamManager = new TeamManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
 

@@ -1892,6 +1892,11 @@ removeConfigurationValue(configuration, section, key) {
 		configuration[section].Delete(key)
 }
 
+removeConfigurationSection(configuration, section) {
+	if configuration.HasKey(section)
+		configuration.Delete(section)
+}
+
 getControllerConfiguration(configuration := false) {
 	Process Exist, Simulator Controller.exe
 	

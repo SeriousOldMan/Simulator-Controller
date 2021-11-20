@@ -55,6 +55,10 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 	
+	__New(configuration, engineerSettings, remoteHandler := false, name := false, language := "__Undefined__", service := false, speaker := false, listener := false, voiceServer := false) {
+		base.__New(configuration, "Race Engineer", engineerSettings, remoteHandler, name, language, service, speaker, listener, voiceServer)
+	}
+	
 	updateConfigurationValues(values) {
 		base.updateConfigurationValues(values)
 								   
@@ -1344,7 +1348,7 @@ class RaceEngineer extends RaceAssistant {
 	}
 	
 	finishPitstop(lapNumber := false) {
-		base.finishPitstop()
+		base.finishPitstop(lapNumber)
 		
 		if this.RemoteHandler
 			this.RemoteHandler.pitstopFinished(this.KnowledgeBase.getValue("Pitstop.Last", 0))

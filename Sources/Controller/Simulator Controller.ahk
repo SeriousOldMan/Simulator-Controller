@@ -582,7 +582,7 @@ class SimulatorController extends ConfigurationItem {
 		
 		for ignore, plugin in this.Plugins
 			if (plugin.Plugin = name)
-				return mode
+				return plugin
 		
 		return false
 	}

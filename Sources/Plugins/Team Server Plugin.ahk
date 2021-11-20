@@ -438,11 +438,15 @@ class TeamServerPlugin extends ControllerPlugin {
 				if !this.SessionActive
 					throw new Exception("Cannot start add a stint to an inactive session...")
 				
-				return this.Connector.StartStint(this.Session, this.Driver, lapNumer)
+				startStint := this.Connector.StartStint(this.Session, this.Driver, lapNumer)
 				
 				for ignore, thePlugin in this.Controller.Plugins
 					if isInstance(thePlugin, RaceAssistantPlugin)
 						thePlugin.restoreSessionState()
+				
+				Sleep 1000 ; Force message deliver
+				
+				return startStint
 			}
 			catch exception {
 				this.iSessionActive := false

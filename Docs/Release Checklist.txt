@@ -17,12 +17,13 @@ General Release Actions
 13. Update #releases and #anouncements in Discord
 14. Set a Git Tag after final commit
 
-Release 3.6.8 Checklist
+Release 3.7.0 Checklist
 =======================
 
 0. Search for new links (*)
 1. Update Procedure
    a. Translations
+   a. Install new "Team Server" plugin
 2. New Team Server
    a. Translations
    b. Full new Documentation & Images
@@ -30,6 +31,10 @@ Release 3.6.8 Checklist
 3. New Team tab in "Race Settings"
    a. Translations
    b. Full new Documentation & Images
+4. New "Team Server" plugin
+   a. Documentation & Images
+   b. Translations
+   c. Update Procedure
 
 Release 3.6.8 Checklist
 =======================

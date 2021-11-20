@@ -87,7 +87,8 @@ runTeamSessionLogger() {
 	Loop {
 		data := readSimulatorData("ACC")
 	
-		info := values2String("; ", getConfigurationValue(data, "Session Data", "Active", "?")
+		info := values2String("; ", A_Now,
+								  , getConfigurationValue(data, "Session Data", "Active", "?")
 								  , getConfigurationValue(data, "Session Data", "Paused", "?")
 								  , getConfigurationValue(data, "Session Data", "Session", "?")
 								  , getConfigurationValue(data, "Stint Data", "Laps", "?")
@@ -96,7 +97,7 @@ runTeamSessionLogger() {
 								  , getConfigurationValue(data, "Stint Data", "DriverSurname", "?")
 								  , getConfigurationValue(data, "Stint Data", "DriverNickName", "?")
 								  , getConfigurationValue(data, "Stint Data", "DriverTimeRemaining", "?")
-								  , getConfigurationValue(data, "Stint Data", "DriverStintRemaining", "?")) . "`n"
+								  , getConfigurationValue(data, "Stint Data", "StintTimeRemaining", "?")) . "`n"
 								  
 		FileAppend %info%, %kTempDirectory%Team Session.log
 		

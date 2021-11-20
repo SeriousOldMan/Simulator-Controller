@@ -823,7 +823,7 @@ class RaceEngineer extends RaceAssistant {
 		
 		result := base.addLap(lapNumber, data)
 		
-		if (this.Speaker && (currentDriver != this.DriverFullName)) {
+		if (this.Speaker && (lapNumber > 1) && (currentDriver != this.DriverFullName)) {
 			speaker := this.getSpeaker()
 			
 			if !inList(currentDrivers, this.DriverFullName) {

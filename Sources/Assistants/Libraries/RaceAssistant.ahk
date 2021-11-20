@@ -378,11 +378,24 @@ class RaceAssistant extends ConfigurationItem {
 		if values.HasKey("Simulator")
 			this.iSimulator := values["Simulator"]
 		
-		if values.HasKey("Session")
-			this.iSession := values["Session"]
-		
 		if values.HasKey("Driver")
 			this.iDriverForName := values["Driver"]
+		
+		if values.HasKey("DriverFullName") {
+			fullName := values["DriverFullName"]
+			
+			if !inList(this.Drivers, fullName)
+				this.Drivers.Push(fullName)
+		
+			this.iDriverFullName := fullName
+		}
+		
+		if values.HasKey("Session") {
+			this.iSession := values["Session"]
+			
+			if this.Session := kSessionFinished
+				this.iDrivers := []
+		}
 	}
 	
 	updateDynamicValues(values) {
@@ -661,17 +674,7 @@ class RaceAssistant extends ConfigurationItem {
 		driverSurname := getConfigurationValue(data, "Stint Data", "DriverSurname", "Doe")
 		driverNickname := getConfigurationValue(data, "Stint Data", "DriverNickname", "JD")
 		
-		fullName := computeDriverName(driverForName, driverSurName, driverNickName)
-		
-		if ((lapNumber > 1) && (fullName != this.DriverFullName))
-			?????? welcome back
-		
-		if !inList(this.Drivers, fullName)
-			this.Drivers.Push(fullName)
-		
-		this.DriverFullName := fullName
-		
-		this.updateSessionValues({Driver: driverForname})
+		this.updateSessionValues({Driver: driverForname, DriverFullname: computeDriverName(driverForName, driverSurName, driverNickName)})
 			
 		knowledgeBase.addFact("Lap." . lapNumber . ".Driver.Forname", driverForname)
 		knowledgeBase.addFact("Lap." . lapNumber . ".Driver.Surname", driverSurname)

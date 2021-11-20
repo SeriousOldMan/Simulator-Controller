@@ -253,7 +253,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	
 	updatePositionsData(data) {
 		static carNames := false
-		static lastDriverCar := 0
+		static lastDriverCar := false
 		
 		if (this.SessionState == kSessionRace)
 			this.requireUDPClient()
@@ -288,6 +288,9 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				; ignore
 			}
 			
+			if (getConfigurationValue(data, "Stint Data", "Laps", 0) <= 1)
+				lastDriverCar := false
+				
 			driverForname := getConfigurationValue(data, "Stint Data", "DriverForname", "John")
 			driverSurname := getConfigurationValue(data, "Stint Data", "DriverSurname", "Doe")
 			driverNickname := getConfigurationValue(data, "Stint Data", "DriverNickname", "JD")

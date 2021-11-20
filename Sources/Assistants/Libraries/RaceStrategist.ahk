@@ -602,7 +602,7 @@ class RaceStrategist extends RaceAssistant {
 		
 		result := base.addLap(lapNumber, data)
 		
-		if (this.Speaker && (currentDriver != this.DriverFullName)) {
+		if (this.Speaker && (lapNumber > 1) && (currentDriver != this.DriverFullName)) {
 			newDriver := !inList(currentDrivers, this.DriverFullName)
 			
 			if newDriver

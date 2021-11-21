@@ -69,7 +69,11 @@ When you start a team session as described above, Jona and Cato will act and beh
   
 	 Jona and Cato both have a working memory, which stores current state and is used to derive the recommendations control the actions of the assistants. This memory is located locally in "Race Engineer" and "Race Strategist" process of the current driver. During a pitstop the complete working memory of the Race Assistants of the current driver is transferred to the *Team Server* and from there it is used to initialize the working memory of the Race Assistants of the next driver. This happens completely in the background.
 
-  2. Handling of large data sets
+  2. Handover of Race Settings
+  
+	 The next driver after a pitstop will also receive the current race settings of the previous driver, as defined by the "Race Settings" application. Especially important are those settings that influence the pitstop planning or the strategy simulation. It is therefore important that all drivers of a team race decide together, which options they will choose for their race. 
+
+  2. Handling of large Data Sets
 
      Jona and Cato collect a lot of data during your races, for example race standings, lap times and other statistical data from all your opponents for after race analysis or telemetry data for setup and strategy development. For a single or double stint event with a single driver, all this data is kept in-memory. This is almost impossible for 24h race. Therefore these data sets will also be stored in the *Team Server* and will be reloaded at the end of the session for further processing.
 

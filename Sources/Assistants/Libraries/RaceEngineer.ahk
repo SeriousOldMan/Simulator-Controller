@@ -756,12 +756,12 @@ class RaceEngineer extends RaceAssistant {
 			this.dumpKnowledge(this.KnowledgeBase)
 	}
 	
-	finishSession() {
+	finishSession(shutdown := true) {
 		if this.KnowledgeBase {
 			if this.Speaker
 				this.getSpeaker().speakPhrase("Bye")
 			
-			if ((this.Session == kSessionPractice) || (this.Session == kSessionRace)) {
+			if (shutdown && ((this.Session == kSessionPractice) || (this.Session == kSessionRace))) {
 				this.shutdownSession("Before")
 						
 				if (this.Listener && (((this.SaveTyrePressures == kAsk) && (this.SetupData.Count() > 0)) || (this.SaveSettings == kAsk))) {

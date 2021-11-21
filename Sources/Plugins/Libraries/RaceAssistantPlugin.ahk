@@ -640,7 +640,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	
 	finishSession(shutdown := true) {
 		if this.RaceAssistant {
-			this.RaceAssistant.finishSession()
+			this.RaceAssistant.finishSession(shutdown)
 			
 			if shutdown {
 				this.shutdownRaceAssistant()

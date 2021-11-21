@@ -633,6 +633,10 @@ class RaceAssistant extends ConfigurationItem {
 		Throw "Virtual method RaceAssistant.startSession must be implemented in a subclass..."
 	}
 	
+	finishSession(shutdown := true) {
+		Throw "Virtual method RaceAssistant.finishSession must be implemented in a subclass..."
+	}
+	
 	restoreSessionState(settingsFile, stateFile) {
 		sessionSettings := readConfiguration(settingsFile)
 		sessionState := readConfiguration(stateFile)

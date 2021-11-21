@@ -624,7 +624,7 @@ class RaceStrategist extends RaceAssistant {
 		return result
 	}
 	
-	finishSession() {
+	finishSession(shutdown := true) {
 		local knowledgeBase := this.KnowledgeBase
 		
 		if knowledgeBase {
@@ -633,7 +633,7 @@ class RaceStrategist extends RaceAssistant {
 			if (!ErrorLevel && this.Speaker)
 				this.getSpeaker().speakPhrase("Bye")
 			
-			if (knowledgeBase.getValue("Lap", 0) > this.LearningLaps) {
+			if (shutdown && (knowledgeBase.getValue("Lap", 0) > this.LearningLaps)) {
 				this.shutdownSession("Before")
 				
 				if this.Listener {

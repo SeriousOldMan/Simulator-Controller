@@ -65,8 +65,11 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 			actionArguments := wizard.getModuleActionArgument("Motion Feedback", false, "Motion")
 			motionIntensity := wizard.getModuleValue("Motion Feedback", "Motion Intensity")
 			
-			if (actionArguments && (actionArguments != ""))
+			if (actionArguments && (actionArguments != "")) {
 				actionArguments := string2Values("|", actionArguments)
+				
+				actionArguments[1] := (actionArguments[1] ? "On" : "Off")
+			}
 			else
 				actionArguments := Array("On", 50)
 
@@ -100,8 +103,11 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 					function := wizard.getModuleActionFunction("Motion Feedback", mode, action)
 					actionArguments := wizard.getModuleActionArgument("Motion Feedback", mode, action)
 					
-					if (actionArguments && (actionArguments != ""))
+					if (actionArguments && (actionArguments != "")) {
 						actionArguments := string2Values("|", actionArguments)
+						
+						actionArguments[1] := (actionArguments[1] ? "On" : "Off")
+					}
 					else
 						actionArguments := Array("On", 1.0)
 
@@ -601,7 +607,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 						intensity := (mode ? "1.0" : "50")
 					}
 					
-					LV_Add("", (first ? translate(mode ? mode : "Independent") : ""), action, , StrReplace(label, "`n" , A_Space), translate(state ? "On" : "Off"), intensity, function)
+					LV_Add("", (first ? translate(mode ? mode : "Independent") : ""), action, StrReplace(label, "`n" , A_Space), translate(state ? "On" : "Off"), intensity, function)
 					
 					count += 1
 				}

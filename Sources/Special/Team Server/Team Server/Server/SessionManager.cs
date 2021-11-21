@@ -153,7 +153,7 @@ namespace TeamServer.Server {
 
 			Task<List<Stint>> task = ObjectManager.Connection.QueryAsync<Stint>(
 				@"
-                    Select * From Stints Where SessionID = ? And DriverID = ? And Lap = ?)
+                    Select * From Stints Where SessionID = ? And DriverID = ? And Lap = ?
                 ", session.ID, driver.ID, lap);
 
 			if (task.Result.Count == 0) {
@@ -217,7 +217,7 @@ namespace TeamServer.Server {
 
 			Task<List<Lap>> task = ObjectManager.Connection.QueryAsync<Lap>(
 				@"
-                    Select * From Laps Where StintID = ? And Nr = ?)
+                    Select * From Laps Where StintID = ? And Nr = ?
                 ", stint.ID, lap);
 
 			if (task.Result.Count == 0) {

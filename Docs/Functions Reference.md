@@ -178,7 +178,7 @@ Themes are a collection of pictures or a GIF animation possibly combined with a 
 #### *hideSplashTheme()*
 Closes the current theme based splash window.
 
-#### *showMessage(message :: String, title :: String := "Modular Simulator Controller System", icon :: String := "Information.png", duration :: Integer := 1000, x :: TypeUnion(String, Integer) := "Center", y :: TypeUnion(String, Integer) := "Bottom", width :: Integer := 400, height :: Integer := 100)*
+#### *showMessage(message :: String, title :: String := "Modular Simulator Controller System", icon :: String := "Information.png", duration :: Integer := 5000, x :: TypeUnion(String, Integer) := "Center", y :: TypeUnion(String, Integer) := "Bottom", width :: Integer := 400, height :: Integer := 100)*
 Displays a message box on the main screen. *duration* defines the number of milliseconds, the message box will be shown. Beside giving normal screen coordinates for *x* and *y*, you can supply "Left", "Center" or "Right" for the horizontal and "Top", "Center" or "Bottom" for the vertical position.
 
 #### *showProgress(options :: Map(X, Y, Width := 300, Title, Message, Color, Progress))*

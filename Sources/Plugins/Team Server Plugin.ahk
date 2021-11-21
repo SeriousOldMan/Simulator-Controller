@@ -43,7 +43,7 @@ class TeamServerPlugin extends ControllerPlugin {
 	iSession := false
 	
 	iDriverForName := false
-	iDriverSueName := false
+	iDriverSurName := false
 	iDriverNickName := false
 	
 	iTeamServerEnabled := false
@@ -165,7 +165,9 @@ class TeamServerPlugin extends ControllerPlugin {
 	
 	DriverActive[] {
 		Get {
-			return (this.SessionActive && (this.getCurrentDriver() == this.Driver))
+			currentDriver := this.getCurrentDriver()
+			
+			return (this.SessionActive && (currentDriver == this.Driver))
 		}
 	}
 	
@@ -207,6 +209,9 @@ class TeamServerPlugin extends ControllerPlugin {
 			this.createTeamServerAction(controller, "TeamServer", arguments[2])
 		}
 		
+		if isDebug()
+			showMessage("Team Server is " . (this.TeamServerEnabled ? "enabled" : "disabled"))
+		
 		this.keepAlive()
 	}
 	
@@ -233,9 +238,6 @@ class TeamServerPlugin extends ControllerPlugin {
 	}
 	
 	disableTeamServer() {
-		if this.SessionActive
-			this.leaveSession()
-
 		this.disconnect()
 		
 		this.iTeamServerEnabled := false
@@ -334,16 +336,19 @@ class TeamServerPlugin extends ControllerPlugin {
 	getDriverNickName() {
 		this.getDriverForName()
 		
-		return (this.iDriverSurName ? this.iDriverSurName : "")
+		return (this.iDriverNickName ? this.iDriverNickName : "")
 	}
 	
-	startSession(car, track) {
+	startSession(duration, car, track) {
 		if this.SessionActive
 			this.leaveSession()
 		
 		if this.TeamServerActive {
+			if isDebug()
+				showMessage("Starting team session: " . car . ", " . track)
+			
 			try {
-				this.Connector.StartSession(this.Session, car, track)
+				this.Connector.StartSession(this.Session, duration, car, track)
 				
 				this.iSessionActive := true
 			}
@@ -359,6 +364,9 @@ class TeamServerPlugin extends ControllerPlugin {
 	
 	finishSession() {
 		if this.TeamServerActive {
+			if isDebug()
+				showMessage("Finishing team session")
+			
 			try {
 				if this.DriverActive
 					this.Connector.FinishSession(this.Session)
@@ -375,22 +383,34 @@ class TeamServerPlugin extends ControllerPlugin {
 		}
 	}
 	
-	joinSession(car, track, lapNumber) {
+	joinSession(raceAssistant, car, track, lapNumber, duration := 0) {
 		if this.TeamServerActive {
-			if (lapNumber = 1)
-				this.startSession(car, track)
-			else
-				this.iSessionActive := true
-			
-			stint := this.addStint(lapNumber)
-			
-			return stint
+			if !this.SessionActive {
+				if (lapNumber = 1) {
+					if isDebug()
+						showMessage("Creating team session: " . car . ", " . track)
+				
+					this.startSession(duration, car, track)
+				}
+				else {
+					if isDebug()
+						showMessage("Joining team session: " . car . ", " . track)
+				
+					this.iSessionActive := true
+				}
+				
+				return this.addStint(raceAssistant, lapNumber)
+			}
 		}
 	}
 	
-	leaveSession() {
-		if (this.SessionActive && this.DriverActive)
+	leaveSession(raceAssistant) {
+		if (this.SessionActive && this.DriverActive) {
+			if isDebug()
+				showMessage("Leaving team session")
+			
 			this.finishSession()
+		}
 		
 		this.iSessionActive := false
 	}
@@ -413,7 +433,12 @@ class TeamServerPlugin extends ControllerPlugin {
 	getSessionValue(name) {
 		if this.SessionActive {
 			try {
-				return this.Connector.GetSessionValue(this.Session, name)
+				value := this.Connector.GetSessionValue(this.Session, name)
+
+				if isDebug()
+					showMessage("Fetching session value: " . name . " => " . value)
+			
+				return value
 			}
 			catch exception {
 				logMessage(kLogCritical, translate("Error while fetching session value (Session: ") . this.Session . translate(", Name: ") . name . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
@@ -424,6 +449,9 @@ class TeamServerPlugin extends ControllerPlugin {
 	setSessionValue(name, value) {
 		if this.SessionActive {
 			try {
+				if isDebug()
+					showMessage("Saving session value: " . name . " => " . value)
+				
 				return this.Connector.SetSessionValue(this.Session, name, value)
 			}
 			catch exception {
@@ -432,35 +460,43 @@ class TeamServerPlugin extends ControllerPlugin {
 		}
 	}
 	
-	addStint(lapNumber) {
+	addStint(raceAssistant, lapNumber) {
 		if this.TeamServerActive {
 			try {
 				if !this.SessionActive
-					throw new Exception("Cannot start add a stint to an inactive session...")
+					throw Exception("Cannot start add a stint to an inactive session...")
 				
-				startStint := this.Connector.StartStint(this.Session, this.Driver, lapNumer)
+				if isDebug()
+					showMessage("Updating stint in lap " . lapNumber . " for team session")
+			
+				stint := this.Connector.StartStint(this.Session, this.Driver, lapNumber)
 				
-				for ignore, thePlugin in this.Controller.Plugins
-					if isInstance(thePlugin, RaceAssistantPlugin)
-						thePlugin.restoreSessionState()
+				if (lapNumber > 1) {
+					Sleep 5000 ; Enough time for stint storgae update
+					
+					raceAssistant.restoreSessionState()
 				
-				Sleep 1000 ; Force message deliver
+					Sleep 1000 ; Force message deliver
+				}
 				
-				return startStint
+				return stint
 			}
 			catch exception {
 				this.iSessionActive := false
 				
-				logMessage(kLogCritical, translate("Error while starting stint (Session: ") . this.Session . translate(", Driver: ") . this.Driver . translate(", Lap: ") . lapNumber . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+				logMessage(kLogCritical, translate("Error while starting stint (Session: ") . this.Session . translate(", Driver: ") . this.Driver . translate(", Lap: ") . lapNumber . translate("), Exception: ") . (IsObject(exception) ? exception.Message :  exception))
 				
 				this.keepAlive()
 			}
 		}
 	}
 	
-	addLap(lapNumber, telemetryData, positionData) {
+	addLap(raceAssistant, lapNumber, telemetryData, positionsData) {
 		if this.TeamServerActive {
 			try {
+				if isDebug()
+					showMessage("Updating lap for team session: " . lapNumber)
+			
 				if isDebug() {
 					driverForName := getConfigurationValue(telemetryData, "Stint Data", "DriverForname", "John")
 					driverSurName := getConfigurationValue(telemetryData, "Stint Data", "DriverSurname", "Doe")
@@ -476,51 +512,19 @@ class TeamServerPlugin extends ControllerPlugin {
 					car := getConfigurationValue(telemetryData, "Session Data", "Car", "Unknown")
 					track := getConfigurationValue(telemetryData, "Session Data", "Track", "Unknown")
 						
-					stint := this.joinSession(car, track, lapNumber)
+					stint := this.joinSession(raceAssistant, car, track, lapNumber)
 				}
 				else if !this.DriverActive
-					stint := this.addStint(lapNumber)
+					stint := this.addStint(raceAssistant, lapNumber)
 				else
 					stint := this.Connector.GetSessionStint(this.Session)
 				
 				lap := this.Connector.CreateLap(stint, lapNumber)
-				
-				if telemetryData
-					this.Connector.SetLapTelemetryData(lap, telemetryData)
-				
-				if positionData
-					this.Connector.SetLapPositionData(lap, positionData)
 			}
 			catch exception {
 				this.iSessionActive := false
 				
 				logMessage(kLogCritical, translate("Error while updating a lap (Session: ") . this.Session . translate(", Lap: ") . lapNumber . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
-			}
-		}
-	}
-	
-	getTelemetryData(lapNumber) {
-		if this.SessionActive {
-			try {
-				return this.Connector.GetLapTelemetryData(this.Connector.GetSessionLap(this.Session, lapNumber))
-			}
-			catch exception {
-				this.iSessionActive := false
-				
-				logMessage(kLogCritical, translate("Error while fetching telemetry data for lap (Session: ") . this.Session . translate(", Lap: ") . lapNumber . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
-			}
-		}
-	}
-	
-	getPositionData(lapNumber) {
-		if this.SessionActive {
-			try {
-				return this.Connector.GetLapPositionData(this.Connector.GetSessionLap(this.Session, lapNumber))
-			}
-			catch exception {
-				this.iSessionActive := false
-				
-				logMessage(kLogCritical, translate("Error while fetching position data for lap (Session: ") . this.Session . translate(", Lap: ") . lapNumber . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
 			}
 		}
 	}

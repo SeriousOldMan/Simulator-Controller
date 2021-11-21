@@ -649,7 +649,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			this.RaceAssistant.addLap(lapNumber, dataFile)
 		
 		if this.TeamSessionActive
-			this.TeamServer.addLap(lapNumber, telemetryData, positionData)
+			this.TeamServer.addLap(this, lapNumber, telemetryData, positionsData)
 	}
 	
 	updateLap(lapNumber, dataFile) {
@@ -723,6 +723,9 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	saveSessionState(stateFile) {
 		FileRead sessionState, %stateFile%
 		
+		if isDebug()
+			showMessage("Saving session for " . this.RaceAssistantName . ": " . sessionState)
+		
 		try {
 			FileDelete %stateFile%
 		}
@@ -737,12 +740,21 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 	
 	restoreSessionState() {
+		if !this.RaceAssistant {
+			this.startupRaceAssistant()
+		
+			Sleep 5000
+		}
+			
 		if this.RaceAssistant {
 			teamServer := this.TeamServer
 		
 			if (teamServer && teamServer.Active) {
 				sessionState := teamServer.getSessionValue(this.Plugin)
-		
+				
+				if isDebug()
+					showMessage("Restoring session state for " . this.RaceAssistantName . ": " . sessionState)
+				
 				Random postfix, 1, 1000000
 				
 				stateFile := (kTempDirectory . this.Plugin . A_Space . postfix . ".state")
@@ -773,14 +785,17 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			
 		this.updateSessionData(data)
 		
-		if (telemetryData && !IsObject(telemetryData))
-			telemetryData := data.Clone()
-		else
-			for section, values in data
-				setConfigurationSectionValues(telenetryData, section, values)
+		if telemetryData
+			if !IsObject(telemetryData)
+				telemetryData := data.Clone()
+			else
+				for section, values in data
+					setConfigurationSectionValues(telemetryData, section, values)
 		
 		if (positionsData && !IsObject(positionsData))
 			positionsData := newConfiguration()
+		
+		return data
 	}
 	
 	collectSessionData() {
@@ -817,6 +832,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			
 			try {
 				sessionState := this.getSessionState(data)
+				joinedSession := false
 				
 				this.updateSessionState(sessionState)
 				
@@ -880,7 +896,9 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 								if !this.driverActive(data)
 									return ; Still a different driver, might happen in some simulations
 							
-								this.TeamServer.joinSession(getConfigurationValue(data, "Session Data", "Car"), getConfigurationValue(data, "Session Data", "Track"), dataLastLap)
+								joinedSession := true
+								
+								this.TeamServer.joinSession(this, getConfigurationValue(data, "Session Data", "Car"), getConfigurationValue(data, "Session Data", "Track"), dataLastLap)
 							}
 							else if (this.iLastLap < (dataLastLap - 1)) {
 								; Regained the car after a driver swap, new stint
@@ -888,7 +906,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 								if !this.driverActive(data)
 									return ; Still a different driver, might happen in some simulations
 							
-								this.TeamServer.addStint(dataLastLap)
+								this.TeamServer.addStint(this, dataLastLap)
 							}
 							else ; (this.iLastLap == (dataLastLap - 1))
 								if !this.driverActive(data)
@@ -896,9 +914,9 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 							
 						}
 						
-						firstLap := (this.iLastLap == 0)
 						newLap := (dataLastLap > this.iLastLap)
-					
+						firstLap := ((dataLastLap == 1) && newLap)
+						
 						this.iInPit := false
 						
 						if newLap {
@@ -929,8 +947,15 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 						if firstLap {
 							this.prepareSettings(data)
 							
-							this.connectTeamSession()
+							if this.connectTeamSession()
+								this.TeamServer.joinSession(this, getConfigurationValue(data, "Session Data", "Car"), getConfigurationValue(data, "Session Data", "Track")
+																					  , dataLastLap, Round(getConfigurationValue(data, "Session Data", "SessionTimeRemaining", 0) / 1000))
 							
+							this.startSession(newDataFile)
+						}
+						else if joinedSession {
+							this.prepareSettings(data)
+						
 							this.startSession(newDataFile)
 						}
 						

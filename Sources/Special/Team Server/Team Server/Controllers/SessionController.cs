@@ -342,7 +342,7 @@ namespace TeamServer.Controllers {
             }
         }
 
-        [HttpGet("{identifier}/telemetrydata")]
+        [HttpGet("{identifier}/telemetryData")]
         public string GetTelemetryData([FromQuery(Name = "token")] string token, string identifier) {
             try {
                 SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
@@ -368,7 +368,7 @@ namespace TeamServer.Controllers {
             }
         }
 
-        [HttpPut("{identifier}/telemetrydata")]
+        [HttpPut("{identifier}/telemetryData")]
         public string SetTelemetryData([FromQuery(Name = "token")] string token, string identifier, [FromBody] string keyValues) {
             try {
                 SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));

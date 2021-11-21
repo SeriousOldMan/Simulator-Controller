@@ -393,7 +393,7 @@ class RaceAssistant extends ConfigurationItem {
 		if values.HasKey("Session") {
 			this.iSession := values["Session"]
 			
-			if this.Session := kSessionFinished
+			if (this.Session == kSessionFinished)
 				this.iDrivers := []
 		}
 	}
@@ -586,6 +586,7 @@ class RaceAssistant extends ConfigurationItem {
 				, "Session.Track": getConfigurationValue(data, "Session Data", "Track", "")
 				, "Session.Duration": duration
 				, "Session.Laps": laps
+				, "Session.Type": this.Session
 				, "Session.Format": sessionFormat
 				, "Session.Time.Remaining": sessionTimeRemaining
 				, "Session.Lap.Remaining": sessionLapsRemaining

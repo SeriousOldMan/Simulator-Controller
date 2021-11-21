@@ -346,9 +346,14 @@ loadSessions(connector, team) {
 
 	if team
 		for ignore, identifier in string2Values(";", connector.GetTeamSessions(team)) {
-			session := parseObject(connector.GetSession(identifier))
-			
-			sessions[session.Name] := session.Identifier
+			try {
+				session := parseObject(connector.GetSession(identifier))
+				
+				sessions[session.Name] := session.Identifier
+			}
+			catch exception {
+				; ignore
+			}
 		}			
 	
 	return sessions

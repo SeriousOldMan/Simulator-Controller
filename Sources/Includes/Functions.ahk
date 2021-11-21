@@ -1222,7 +1222,7 @@ getAllThemes(configuration := false) {
 	return themes
 }
 
-showMessage(message, title := false, icon := "Information.png", duration := 1000
+showMessage(message, title := false, icon := "Information.png", duration := 5000
 		  , x := "Center", y := "Bottom", width := 400, height := 100) {
 	innerWidth := width - 16
 	
@@ -1338,7 +1338,7 @@ logMessage(logLevel, message) {
 		
 		SplitPath fileName, , directory
 		FileCreateDir %directory%
-		FileAppend %message%, %fileName%
+		FileAppend %message%, %fileName%, UTF-16
 	}
 }
 

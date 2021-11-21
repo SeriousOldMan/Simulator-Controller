@@ -53,7 +53,7 @@ namespace TeamServer.Server {
         }
 
         public void ValidateSession(Session session) {
-            if ((session == null) || session.Finished)
+            if (session == null)
                 throw new Exception("Not a valid or active session...");
             else
                 ValidateAccount(session.Duration);

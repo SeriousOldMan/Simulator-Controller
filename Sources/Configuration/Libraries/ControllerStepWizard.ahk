@@ -64,17 +64,25 @@ class ControllerStepWizard extends StepWizard {
 		wizard := this.SetupWizard
 		
 		if wizard.isModuleSelected("Controller") {
+			streamDeckControllers := []
+			
 			for controller, definition in getConfigurationSectionValues(streamDeckConfiguration, "Layouts") {
 				controller := ConfigurationItem.splitDescriptor(controller)
 
-				if ((controller[2] != "Layout") && (controller[2] != "Visible"))
+				if ((controller[2] != "Layout") && (controller[2] != "Visible")) {
+					controller := controller[1]
+					
+					if !inList(streamDeckControllers, controller)
+						streamDeckControllers.Push(controller)
+					
 					for ignore, theFunction in string2Values(";", definition)
 						if (theFunction != "")
 							Function.createFunction(theFunction, false, "", "", "", "").saveToConfiguration(configuration)
+				}
 			}
 			
 			controls := {}
-			controllers := []
+			buttonBoxControllers := []
 			
 			for control, descriptor in getConfigurationSectionValues(buttonBoxConfiguration, "Controls")
 				controls[control] := string2Values(";", descriptor)[1]
@@ -85,8 +93,8 @@ class ControllerStepWizard extends StepWizard {
 				if ((controller[2] != "Layout") && (controller[2] != "Visible")) {
 					controller := controller[1]
 			
-					if !inList(controllers, controller)
-						controllers.Push(controller)
+					if !inList(buttonBoxControllers, controller)
+						buttonBoxControllers.Push(controller)
 				
 					for ignore, control in string2Values(";", definition) {
 						control := string2Values(",", control)[1]
@@ -108,13 +116,22 @@ class ControllerStepWizard extends StepWizard {
 				}
 			}
 			
-			if (controllers.Length() > 0) {
-				Loop % controllers.Length()
+			if (buttonBoxControllers.Length() > 0) {
+				Loop % buttonBoxControllers.Length()
 				{
-					controllers[A_Index] := (controllers[A_Index] . ":" . controllers[A_Index])
+					buttonBoxControllers[A_Index] := (buttonBoxControllers[A_Index] . ":" . buttonBoxControllers[A_Index])
 				}
 				
-				setConfigurationValue(configuration, "Controller Layouts", "Button Boxes", values2String("|", controllers*))
+				setConfigurationValue(configuration, "Controller Layouts", "Button Boxes", values2String("|", buttonBoxControllers*))
+			}
+			
+			if (streamDeckControllers.Length() > 0) {
+				Loop % streamDeckControllers.Length()
+				{
+					streamDeckControllers[A_Index] := (streamDeckControllers[A_Index] . ":" . streamDeckControllers[A_Index])
+				}
+				
+				setConfigurationValue(configuration, "Controller Layouts", "Stream Decks", values2String("|", streamDeckControllers*))
 			}
 		}
 	}

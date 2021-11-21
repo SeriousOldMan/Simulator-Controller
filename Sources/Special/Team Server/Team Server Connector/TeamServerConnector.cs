@@ -322,11 +322,11 @@ namespace TeamServer {
 		}
 
 		public string GetLapTelemetryData(string identifier) {
-			return Get("lap/" + identifier + "/telemetrydata");
+			return Get("lap/" + identifier + "/telemetryData");
 		}
 
 		public string SetLapTelemetryData(string identifier, string telemetryData) {
-			return Put("lap/" + identifier + "/telemetrydata", body: telemetryData);
+			return Put("lap/" + identifier + "/telemetryData", body: telemetryData);
 		}
 
 		public string GetLapPositionsData(string identifier) {

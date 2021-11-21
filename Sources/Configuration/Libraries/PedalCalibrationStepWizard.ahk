@@ -281,7 +281,7 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 				else
 					pedal := ""
 				
-				LV_Add("", ((count = 1) ? translate("Pedal Calibration") : ""), pedal, action, , StrReplace(label, "`n" , A_Space), function)
+				LV_Add("", ((count = 1) ? translate("Pedal Calibration") : ""), pedal, action, StrReplace(label, "`n" , A_Space), function)
 				
 				count += 1
 			}

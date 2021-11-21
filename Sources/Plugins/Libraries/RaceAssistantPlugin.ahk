@@ -730,20 +730,27 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			; ignore
 		}
 		
-		this.Controller.FindPlugin(kTeamServerPlugin).setSessionValue(this.Plugin, sessionState)
+		teamServer := this.TeamServer
+		
+		if (teamServer && teamServer.Active)
+			teamServer.setSessionValue(this.Plugin, sessionState)
 	}
 	
 	restoreSessionState() {
 		if this.RaceAssistant {
-			sessionState := this.Controller.FindPlugin(kTeamServerPlugin).getSessionValue(this.Plugin)
+			teamServer := this.TeamServer
 		
-			Random postfix, 1, 1000000
-			
-			stateFile := (kTempDirectory . this.Plugin . A_Space . postfix . ".state")
-			
-			FileAppend %sessionState%, %stateFile%
-	
-			this.RaceAssistant.restoreSessionState(stateFile)
+			if (teamServer && teamServer.Active) {
+				sessionState := teamServer.getSessionValue(this.Plugin)
+		
+				Random postfix, 1, 1000000
+				
+				stateFile := (kTempDirectory . this.Plugin . A_Space . postfix . ".state")
+				
+				FileAppend %sessionState%, %stateFile%
+		
+				this.RaceAssistant.restoreSessionState(stateFile)
+			}
 		}
 	}
 	
@@ -770,12 +777,10 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			telemetryData := data.Clone()
 		else
 			for section, values in data
-				setConfigurationSectionValues(telemetryData, section, values)
+				setConfigurationSectionValues(telenetryData, section, values)
 		
 		if (positionsData && !IsObject(positionsData))
 			positionsData := newConfiguration()
-		
-		return data
 	}
 	
 	collectSessionData() {

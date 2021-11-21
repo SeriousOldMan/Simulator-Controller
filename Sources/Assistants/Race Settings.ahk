@@ -329,25 +329,27 @@ loadTeams(connector) {
 loadDrivers(connector, team) {
 	drivers := {}
 	
-	for ignore, identifier in string2Values(";", connector.GetTeamDrivers(team)) {
-		driver := parseObject(connector.GetDriver(identifier))
-		
-		name := (driver.ForName . A_Space . driver.SurName . A_Space . translate("(") . driver.NickName . translate(")"))
-		
-		drivers[name] := driver.Identifier
-	}
+	if team
+		for ignore, identifier in string2Values(";", connector.GetTeamDrivers(team)) {
+			driver := parseObject(connector.GetDriver(identifier))
+			
+			name := (driver.ForName . A_Space . driver.SurName . A_Space . translate("(") . driver.NickName . translate(")"))
+			
+			drivers[name] := driver.Identifier
+		}
 	
 	return drivers
 }
 
 loadSessions(connector, team) {
 	sessions := {}
-	
-	for ignore, identifier in string2Values(";", connector.GetTeamSessions(team)) {
-		session := parseObject(connector.GetSession(identifier))
-		
-		sessions[session.Name] := session.Identifier
-	}			
+
+	if team
+		for ignore, identifier in string2Values(";", connector.GetTeamSessions(team)) {
+			session := parseObject(connector.GetSession(identifier))
+			
+			sessions[session.Name] := session.Identifier
+		}			
 	
 	return sessions
 }
@@ -435,7 +437,16 @@ restart:
 				teamName := getKeys(teams)[teamDropDownMenu]
 				teamIdentifier := teams[teamName]
 				
-				drivers := loadDrivers(connector, teamIdentifier)
+				exception := false
+				
+				try {
+					drivers := loadDrivers(connector, teamIdentifier)
+				}
+				catch e {
+					drivers := {}
+					
+					exception := e
+				}
 				
 				names := getKeys(drivers)
 				chosen := inList(getValues(drivers), driverIdentifier)
@@ -455,7 +466,14 @@ restart:
 				GuiControl, , driverDropDownMenu, % ("|" . values2String("|", names*))
 				GuiControl Choose, driverDropDownMenu, % chosen
 				
-				sessions := loadSessions(connector, teamIdentifier)
+				try {
+					sessions := loadSessions(connector, teamIdentifier)
+				}
+				catch e {
+					sessions := {}
+					
+					exception := e
+				}
 				
 				names := getKeys(sessions)
 				chosen := inList(getValues(sessions), sessionIdentifier)
@@ -474,6 +492,9 @@ restart:
 				
 				GuiControl, , sessionDropDownMenu, % ("|" . values2String("|", names*))
 				GuiControl Choose, sessionDropDownMenu, % chosen
+				
+				if exception
+					throw exception
 			}
 			else if (arguments[1] == "Driver") {
 				GuiControlGet driverDropDownMenu

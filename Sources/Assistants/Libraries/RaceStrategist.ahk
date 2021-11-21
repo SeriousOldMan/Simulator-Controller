@@ -64,8 +64,8 @@ class RaceStrategist extends RaceAssistant {
 		}
 	}
 	
-	__New(configuration, strategistSettings, remoteHandler, name := false, language := "__Undefined__", service := false, speaker := false, listener := false, voiceServer := false) {
-		base.__New(configuration, "Race Strategist", strategistSettings, remoteHandler, name, language, service, speaker, listener, voiceServer)
+	__New(configuration, remoteHandler, name := false, language := "__Undefined__", service := false, speaker := false, listener := false, voiceServer := false) {
+		base.__New(configuration, "Race Strategist", remoteHandler, name, language, service, speaker, listener, voiceServer)
 	}
 	
 	updateConfigurationValues(values) {
@@ -473,8 +473,8 @@ class RaceStrategist extends RaceAssistant {
 		this.updateSessionValues({Strategy: strategy})
 	}
 				
-	createSession(data) {
-		local facts := base.createSession(data)
+	createSession(settings, data) {
+		local facts := base.createSession(settings, data)
 		
 		simulatorName := this.SetupDatabase.getSimulatorName(facts["Session.Simulator"])
 		
@@ -552,13 +552,16 @@ class RaceStrategist extends RaceAssistant {
 		}
 	}
 	
-	startSession(data) {
+	startSession(settings, data) {
 		local facts
+		
+		if !IsObject(settings)
+			settings := readConfiguration(settings)
 		
 		if !IsObject(data)
 			data := readConfiguration(data)
 		
-		facts := this.createSession(data)
+		facts := this.createSession(settings, data)
 		simulatorName := this.Simulator
 		
 		Process Exist, Race Engineer.exe
@@ -603,16 +606,11 @@ class RaceStrategist extends RaceAssistant {
 		result := base.addLap(lapNumber, data)
 		
 		if (this.Speaker && (lapNumber > 1) && (currentDriver != this.DriverFullName)) {
-			newDriver := !inList(currentDrivers, this.DriverFullName)
-			
-			if newDriver
-				strategyReported := 0
-			
 			Process Exist, Race Engineer.exe
 			
 			exists := ErrorLevel
 			
-			this.getSpeaker().speakPhrase(exists ? "" : (newDriver ? "Greeting": "WelcomeBack"))
+			this.getSpeaker().speakPhrase(exists ? "" : "WelcomeBack")
 		}
 		
 		if (!strategyReported && this.hasEnoughData(false) && this.Strategy && this.Speaker && this.Listener) {

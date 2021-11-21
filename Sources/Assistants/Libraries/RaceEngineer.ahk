@@ -55,8 +55,8 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 	
-	__New(configuration, engineerSettings, remoteHandler := false, name := false, language := "__Undefined__", service := false, speaker := false, listener := false, voiceServer := false) {
-		base.__New(configuration, "Race Engineer", engineerSettings, remoteHandler, name, language, service, speaker, listener, voiceServer)
+	__New(configuration, remoteHandler := false, name := false, language := "__Undefined__", service := false, speaker := false, listener := false, voiceServer := false) {
+		base.__New(configuration, "Race Engineer", remoteHandler, name, language, service, speaker, listener, voiceServer)
 	}
 	
 	updateConfigurationValues(values) {
@@ -614,11 +614,10 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 	
-	createSession(data) {
-		local facts := base.createSession(data)
+	createSession(settings, data) {
+		local facts := base.createSession(settings, data)
 		
 		configuration := this.Configuration
-		settings := this.Settings
 		
 		simulatorName := this.SetupDatabase.getSimulatorName(facts["Session.Simulator"])
 		
@@ -708,11 +707,16 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 	
-	startSession(data) {
+	startSession(settings, data) {
+		local facts
+		
+		if !IsObject(settings)
+			settings := readConfiguration(settings)
+		
 		if !IsObject(data)
 			data := readConfiguration(data)
 		
-		session := this.createSession(data)
+		facts := this.createSession(settings, data)
 		
 		simulatorName := this.Simulator
 		configuration := this.Configuration
@@ -722,14 +726,14 @@ class RaceEngineer extends RaceAssistant {
 									  , SaveSettings: getConfigurationValue(configuration, "Race Assistant Shutdown", simulatorName . ".SaveSettings", getConfigurationValue(configuration, "Race Engineer Shutdown", simulatorName . ".SaveSettings", kNever))
 									  , SaveTyrePressures: getConfigurationValue(configuration, "Race Engineer Shutdown", simulatorName . ".SaveTyrePressures", kAsk)})
 		
-		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(session), SetupData: {}
+		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(facts), SetupData: {}
 								, BestLapTime: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
 		
 		if this.Speaker {
 			speaker := this.getSpeaker()
 			
 			speaker.speakPhrase("GreetingEngineer")
-			
+				
 			Process Exist, Race Strategist.exe
 			
 			if ErrorLevel {
@@ -823,32 +827,8 @@ class RaceEngineer extends RaceAssistant {
 		
 		result := base.addLap(lapNumber, data)
 		
-		if (this.Speaker && (lapNumber > 1) && (currentDriver != this.DriverFullName)) {
-			speaker := this.getSpeaker()
-			
-			if !inList(currentDrivers, this.DriverFullName) {
-				speaker.speakPhrase("GreetingEngineer")
-				
-				Process Exist, Race Strategist.exe
-				
-				if ErrorLevel {
-					strategistPlugin := new Plugin("Race Strategist", kSimulatorConfiguration)
-					strategistName := strategistPlugin.getArgumentValue("raceAssistantName", false)
-					
-					if strategistName {
-						speaker.speakPhrase("GreetingStrategist", {strategist: strategistName})
-					
-						speaker.speakPhrase("CallUs")
-					}
-					else
-						speaker.speakPhrase("CallMe")
-				}
-				else
-					speaker.speakPhrase("CallMe")
-			}
-			else
-				speaker.speakPhrase("WelcomeBack")
-		}
+		if (this.Speaker && (lapNumber > 1) && (currentDriver != this.DriverFullName))
+			this.getSpeaker().speakPhrase("WelcomeBack")
 		
 		if this.hasEnoughData(false) {
 			knowledgeBase := this.KnowledgeBase

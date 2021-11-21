@@ -155,7 +155,6 @@ startRaceEngineer() {
 	engineerService := true
 	engineerSpeaker := false
 	engineerListener := false
-	engineerSettingsFile := getFileName("Race.settings", kUserConfigDirectory)
 	debug := false
 	
 	Process Exist, Voice Server.exe
@@ -187,9 +186,6 @@ startRaceEngineer() {
 			case "-Listener":
 				engineerListener := A_Args[index + 1]
 				index += 2
-			case "-Settings":
-				engineerSettingsFile := A_Args[index + 1]
-				index += 2
 			case "-Voice":
 				voiceServer := A_Args[index + 1]
 				index += 2
@@ -214,7 +210,7 @@ startRaceEngineer() {
 	if debug
 		setDebug(true)
 	
-	RaceEngineer.Instance := new RaceEngineer(kSimulatorConfiguration, readConfiguration(engineerSettingsFile)
+	RaceEngineer.Instance := new RaceEngineer(kSimulatorConfiguration
 											, remotePID ? new RaceEngineerRemoteHandler(remotePID) : false
 											, engineerName, engineerLanguage, engineerService, engineerSpeaker, engineerListener, voiceServer)
 	

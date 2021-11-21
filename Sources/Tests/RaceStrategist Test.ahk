@@ -35,9 +35,17 @@ SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
 ;;;                         Private Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+class TestRaceStrategist extends RaceStrategist {
+	__New(configuration, settings, remoteHandler := false, name := false, language := "__Undefined__", service := false, speaker := false, listener := false, voiceServer := false) {
+		base.__New(configuration, remoteHandler, name, language, service, speaker, listener, voiceServer)
+		
+		this.updateConfigurationValues({Settings: settings})
+	}
+}
+
 class BasicReporting extends Assert {
 	BasisTest() {
-		strategist := new RaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
+		strategist := new TestRaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
 
 		Loop {
 			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
@@ -77,7 +85,7 @@ class BasicReporting extends Assert {
 	}
 	
 	StandingsMemoryTest() {
-		strategist := new RaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
+		strategist := new TestRaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
 
 		Loop {
 			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
@@ -107,7 +115,7 @@ class BasicReporting extends Assert {
 		this.AssertEqual(105482, Round(strategist.KnowledgeBase.getValue("Standings.Lap.4.Car.13.Time.Average")), "Unexpected average time detected in lap 4...")
 		this.AssertEqual(5, strategist.KnowledgeBase.getValue("Standings.Lap.5.Car.13.Position"), "Unexpected position detected in lap 5...")
 		this.AssertEqual(103032, strategist.KnowledgeBase.getValue("Standings.Lap.5.Car.13.Time"), "Unexpected time detected in lap 5...")
-		this.AssertEqual(104125, Round(strategist.KnowledgeBase.getValue("Standings.Lap.5.Car.13.Time.Average")), "Unexpected average time detected in lap 5...")
+		this.AssertEqual(103680, Round(strategist.KnowledgeBase.getValue("Standings.Lap.5.Car.13.Time.Average")), "Unexpected average time detected in lap 5...")
 	}
 }
 
@@ -137,7 +145,7 @@ class GapReporting extends Assert {
 	}
 		
 	StandingsGapTest() {
-		strategist := new RaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
+		strategist := new TestRaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
 
 		Loop {
 			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
@@ -168,7 +176,7 @@ class GapReporting extends Assert {
 	}
 		
 	TrackGapTest() {
-		strategist := new RaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
+		strategist := new TestRaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
 
 		Loop {
 			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
@@ -201,7 +209,7 @@ class GapReporting extends Assert {
 
 class PositionProjection extends Assert {
 	PositionProjectionTest() {
-		strategist := new RaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
+		strategist := new TestRaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
 
 		Loop {
 			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
@@ -240,7 +248,7 @@ class PositionProjection extends Assert {
 
 class PitstopRecommendation extends Assert {
 	PitstopRecommendationTest() {
-		strategist := new RaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
+		strategist := new TestRaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
 
 		Loop {
 			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
@@ -280,8 +288,8 @@ if !GetKeyState("Ctrl") {
 }
 else {
 	raceNr := 15
-	strategist := new RaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist.settings")
-								   , false, "Khato", "de", "Windows", true, true)
+	strategist := new TestRaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist.settings")
+									   , false, "Khato", "de", "Windows", true, true)
 
 	strategist.VoiceAssistant.setDebug(kDebugGrammars, false)
 	

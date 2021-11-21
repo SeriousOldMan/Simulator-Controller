@@ -139,16 +139,16 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 				setConfigurationValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.RL", Round(pressures[3], 1))
 				setConfigurationValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.RR", Round(pressures[4], 1))
 			}
-			
-			writeConfiguration(kTempDirectory . "Race Engineer.settings", settings)
 		}
 		else if (tpSetting = "Import") {
 			writeConfiguration(kTempDirectory . "Race Engineer.settings", settings)
 			
 			openRaceSettings(true, true, false, kTempDirectory . "Race Engineer.settings")
+			
+			settings := readConfiguration(kTempDirectory . "Race Engineer.settings")
 		}
-		else
-			writeConfiguration(kTempDirectory . "Race Engineer.settings", settings)
+		
+		return settings
 	}
 	
 	requestInformation(arguments*) {

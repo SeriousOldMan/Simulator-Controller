@@ -65,6 +65,10 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			this.callRemote("startSession", arguments*)
 		}
 		
+		joinSession(arguments*) {
+			this.callRemote("startSession", arguments*)
+		}
+		
 		updateSession(arguments*) {
 			this.callRemote("updateSession", arguments*)
 		}
@@ -489,8 +493,6 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			try {
 				logMessage(kLogInfo, translate("Starting ") . translate(this.Plugin))
 				
-				options := " -Settings """ . kTempDirectory . this.Plugin . ".settings" . """"
-				
 				options .= " -Remote " . controllerPID
 				
 				if this.RaceAssistantName
@@ -561,7 +563,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		else
 			settings := readConfiguration(getFileName("Race.settings", kUserConfigDirectory))
 		
-		writeConfiguration(kTempDirectory . this.Plugin . ".settings", settings)
+		; writeConfiguration(kTempDirectory . this.Plugin . ".settings", settings)
 		
 		return settings
 	}
@@ -611,7 +613,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			teamServer.disconnect()
 	}
 	
-	startSession(dataFile) {
+	startSession(settingsFile, dataFile) {
 		if this.Simulator {
 			code := this.Simulator.Code
 			assistant := this.Plugin
@@ -629,7 +631,11 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			this.startupRaceAssistant()
 	
 		if this.RaceAssistant
-			this.RaceAssistant.startSession(dataFile)
+			this.RaceAssistant.startSession(settingsFile, dataFile)
+	}
+	
+	joinSession(dataFile) {
+		this.startSession(false, dataFile)
 	}
 	
 	finishSession(shutdown := true) {
@@ -720,48 +726,84 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		return (sessionState >= kSessionPractice)
 	}
 	
-	saveSessionState(stateFile) {
-		FileRead sessionState, %stateFile%
+	saveSessionState(settingsFile, stateFile) {
+		teamServer := this.TeamServer
 		
-		if isDebug()
-			showMessage("Saving session for " . this.RaceAssistantName . ": " . sessionState)
+		if (teamServer && teamServer.Active) {
+			FileRead sessionSettings, %settingsFile%
+			FileRead sessionState, %stateFile%
+			
+			if isDebug()
+				showMessage("Saving session for " . this.RaceAssistantName . ": " . sessionState)
+			
+			teamServer.setSessionValue(this.Plugin . " Settings", sessionSettings)
+			teamServer.setSessionValue(this.Plugin . " State", sessionState)
+		}
 		
 		try {
+			FileDelete %settingsFile%
 			FileDelete %stateFile%
 		}
 		catch exception {
 			; ignore
 		}
-		
+	}
+	
+	createSessionSettingsFile() {
 		teamServer := this.TeamServer
 		
-		if (teamServer && teamServer.Active)
-			teamServer.setSessionValue(this.Plugin, sessionState)
+		if (teamServer && teamServer.Active) {
+			try {
+				sessionSettings := teamServer.getSessionValue(this.Plugin . " Settings")
+			}
+			catch exception {
+				return false
+			}
+				
+			Random postfix, 1, 1000000
+					
+			settingsFile := (kTempDirectory . this.Plugin . A_Space . postfix . ".settings")
+
+			FileAppend %sessionSettings%, %settingsFile%, UTF-16
+			
+			return settingsFile
+		}
+		else
+			return false
+	}
+	
+	createSessionStateFile() {
+		teamServer := this.TeamServer
+		
+		if (teamServer && teamServer.Active) {
+			try {
+				sessionState := teamServer.getSessionValue(this.Plugin . " State")
+			}
+			catch exception {
+				return false
+			}
+				
+			Random postfix, 1, 1000000
+					
+			stateFile := (kTempDirectory . this.Plugin . A_Space . postfix . ".state")
+
+			FileAppend %sessionState%, %stateFile%, UTF-16
+			
+			return stateFile
+		}
+		else
+			return false
 	}
 	
 	restoreSessionState() {
-		if !this.RaceAssistant {
-			this.startupRaceAssistant()
-		
-			Sleep 5000
-		}
-			
 		if this.RaceAssistant {
 			teamServer := this.TeamServer
 		
 			if (teamServer && teamServer.Active) {
-				sessionState := teamServer.getSessionValue(this.Plugin)
-				
 				if isDebug()
 					showMessage("Restoring session state for " . this.RaceAssistantName . ": " . sessionState)
 				
-				Random postfix, 1, 1000000
-				
-				stateFile := (kTempDirectory . this.Plugin . A_Space . postfix . ".state")
-				
-				FileAppend %sessionState%, %stateFile%
-		
-				this.RaceAssistant.restoreSessionState(stateFile)
+				this.RaceAssistant.restoreSessionState(this.createSessionSettingsFile(), this.createSessionStateFile())
 			}
 		}
 	}
@@ -866,6 +908,11 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				}
 				
 				if this.RaceAssistantEnabled {
+					; Car is on the track
+				
+					if !this.RaceAssistant
+						this.startupRaceAssistant()
+						
 					if getConfigurationValue(data, "Stint Data", "InPit", false) {
 						; Car is in the Pit
 						
@@ -876,10 +923,6 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 						}
 					}
 					else if (dataLastLap == 0) {
-						; Car is on the track
-					
-						if !this.RaceAssistant
-							this.startupRaceAssistant()
 					}
 					else if (dataLastLap > 0) {
 						; Car has finished the first lap
@@ -897,8 +940,6 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 									return ; Still a different driver, might happen in some simulations
 							
 								joinedSession := true
-								
-								this.TeamServer.joinSession(this, getConfigurationValue(data, "Session Data", "Car"), getConfigurationValue(data, "Session Data", "Track"), dataLastLap)
 							}
 							else if (this.iLastLap < (dataLastLap - 1)) {
 								; Regained the car after a driver swap, new stint
@@ -945,18 +986,39 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 						writeConfiguration(newDataFile, data)
 						
 						if firstLap {
-							this.prepareSettings(data)
-							
 							if this.connectTeamSession()
-								this.TeamServer.joinSession(this, getConfigurationValue(data, "Session Data", "Car"), getConfigurationValue(data, "Session Data", "Track")
-																					  , dataLastLap, Round(getConfigurationValue(data, "Session Data", "SessionTimeRemaining", 0) / 1000))
+								this.TeamServer.joinSession(this, getConfigurationValue(data, "Session Data", "Car")
+																, getConfigurationValue(data, "Session Data", "Track")
+																, dataLastLap
+																, Round(getConfigurationValue(data, "Session Data", "SessionTimeRemaining", 0) / 1000))
 							
-							this.startSession(newDataFile)
+							settings := this.prepareSettings(data)
+							settingsFile := (kTempDirectory . this.Plugin . ".settings")
+							
+							writeConfiguration(settingsFile, settings)
+							
+							this.startSession(settingsFile, newDataFile)
 						}
 						else if joinedSession {
-							this.prepareSettings(data)
-						
-							this.startSession(newDataFile)
+							this.TeamServer.joinSession(this, getConfigurationValue(data, "Session Data", "Car")
+															, getConfigurationValue(data, "Session Data", "Track")
+															, dataLastLap)
+							
+							settingsFile := this.createSessionSettingsFile()
+							
+							if !settingsFile {
+								settings := this.prepareSettings(data)
+								
+								Random postfix, 1, 1000000
+	
+								settingsFile := (kTempDirectory . this.Plugin . A_Space . postfix . ".settings")
+								
+								writeConfiguration(settingsFile, settings)
+							}	
+								
+							this.startSession(settingsFile, newDataFile)
+							
+							this.restoreSessionState()
 						}
 						
 						if newLap

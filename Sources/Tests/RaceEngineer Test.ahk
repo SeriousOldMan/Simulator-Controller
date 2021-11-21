@@ -62,6 +62,12 @@ global vDamageStintLaps
 ;;;-------------------------------------------------------------------------;;;
 
 class TestRaceEngineer extends RaceEngineer {
+	__New(configuration, settings, remoteHandler := false, name := false, language := "__Undefined__", service := false, speaker := false, listener := false, voiceServer := false) {
+		base.__New(configuration, remoteHandler, name, language, service, speaker, listener, voiceServer)
+		
+		this.updateConfigurationValues({Settings: settings})
+	}
+	
 	supportsPitstop() {
 		return true
 	}

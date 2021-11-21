@@ -109,7 +109,6 @@ startRaceStrategist() {
 	strategistService := true
 	strategistSpeaker := false
 	strategistListener := false
-	strategistSettingsFile := getFileName("Race.settings", kUserConfigDirectory)
 	debug := false
 	
 	Process Exist, Voice Server.exe
@@ -141,9 +140,6 @@ startRaceStrategist() {
 			case "-Listener":
 				strategistListener := A_Args[index + 1]
 				index += 2
-			case "-Settings":
-				strategistSettingsFile := A_Args[index + 1]
-				index += 2
 			case "-Voice":
 				voiceServer := A_Args[index + 1]
 				index += 2
@@ -168,7 +164,7 @@ startRaceStrategist() {
 	if debug
 		setDebug(true)
 	
-	RaceStrategist.Instance := new RaceStrategist(kSimulatorConfiguration, readConfiguration(strategistSettingsFile)
+	RaceStrategist.Instance := new RaceStrategist(kSimulatorConfiguration
 												, remotePID ? new RaceAssistant.RaceAssistantRemoteHandler("Race Strategist", remotePID) : false
 												, strategistName, strategistLanguage, strategistService, strategistSpeaker, strategistListener, voiceServer)
 

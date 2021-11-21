@@ -322,10 +322,9 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 	
-	__New(configuration, assistantType, settings, remoteHandler, name := false, language := "__Undefined__", service := false, speaker := false, listener := false, voiceServer := false) {
+	__New(configuration, assistantType, remoteHandler, name := false, language := "__Undefined__", service := false, speaker := false, listener := false, voiceServer := false) {
 		this.iDebug := (isDebug() ? kDebugKnowledgeBase : kDebugOff)
 		this.iAssistantType := assistantType
-		this.iSettings := settings
 		this.iRemoteHandler := remoteHandler
 		
 		base.__New(configuration)
@@ -527,8 +526,11 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 	
-	createSession(data) {
+	createSession(ByRef settings, ByRef data) {
 		local facts
+		
+		if settings
+			this.updateConfigurationValues({Settings: settings})
 		
 		configuration := this.Configuration
 		settings := this.Settings
@@ -627,17 +629,25 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 	
-	restoreSessionState(stateFile) {
+	startSession(settings, data) {
+		Throw "Virtual method RaceAssistant.startSession must be implemented in a subclass..."
+	}
+	
+	restoreSessionState(settingsFile, stateFile) {
+		sessionSettings := readConfiguration(settingsFile)
 		sessionState := readConfiguration(stateFile)
 		
 		try {
+			FileDelete %settingsFile%
 			FileDelete %stateFile%
 		}
 		catch exception {
 			; ignore
 		}
 		
-		this.KnowledgeBase.Facts.Facts := getConfigurationSectionValues(sessionState, "Session State")
+		this.KnowledgeBase.Facts.Facts := getConfigurationSectionValues(sessionState, "Session State", Object())
+		
+		this.updateSession(settings)
 	}
 	
 	prepareData(lapNumber, data) {
@@ -645,7 +655,7 @@ class RaceAssistant extends ConfigurationItem {
 			data := readConfiguration(data)
 		
 		if !this.KnowledgeBase
-			this.startSession(data)
+			this.startSession(this.Settings, data)
 		
 		return data
 	}
@@ -825,11 +835,13 @@ class RaceAssistant extends ConfigurationItem {
 			
 			Random postfix, 1, 1000000
 				
+			settingsFile := (kTempDirectory . "Race Strategist " . postfix . ".settings")
 			stateFile := (kTempDirectory . "Race Strategist " . postfix . ".state")
 			
+			writeConfiguration(settingsFile, this.Settings)
 			writeConfiguration(stateFile, savedKnowledgeBase)
 		
-			this.RemoteHandler.saveSessionState(stateFile)
+			this.RemoteHandler.saveSessionState(settingsFile, stateFile)
 		}
 	}
 	

@@ -519,7 +519,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				else
 					stint := this.Connector.GetSessionStint(this.Session)
 				
-				lap := this.Connector.CreateLap(stint, lapNumber)
+				this.Connector.CreateLap(stint, lapNumber)
 			}
 			catch exception {
 				this.iSessionActive := false

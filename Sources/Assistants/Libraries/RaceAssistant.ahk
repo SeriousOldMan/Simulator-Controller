@@ -651,7 +651,7 @@ class RaceAssistant extends ConfigurationItem {
 		
 		this.KnowledgeBase.Facts.Facts := getConfigurationSectionValues(sessionState, "Session State", Object())
 		
-		this.updateSession(settings)
+		this.updateSession(sessionSettings)
 	}
 	
 	prepareData(lapNumber, data) {

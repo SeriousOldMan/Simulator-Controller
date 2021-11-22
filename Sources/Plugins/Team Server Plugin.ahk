@@ -6,13 +6,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                         Local Include Section                           ;;;
-;;;-------------------------------------------------------------------------;;;
-
-#Include ..\Plugins\Libraries\RaceAssistantPlugin.ahk
-
-
-;;;-------------------------------------------------------------------------;;;
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -364,26 +357,25 @@ class TeamServerPlugin extends ControllerPlugin {
 	
 	finishSession() {
 		if this.TeamServerActive {
-			if isDebug()
-				showMessage("Finishing team session")
-			
 			try {
-				if this.DriverActive
+				if this.DriverActive {
+					if isDebug()
+						showMessage("Finishing team session")
+
 					this.Connector.FinishSession(this.Session)
-				
-				this.iSessionActive := false
+				}
 			}
 			catch exception {
-				this.iSessionActive := false
-				
 				logMessage(kLogCritical, translate("Error while finishing session (Session: ") . this.Session . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
 				
 				this.keepAlive()
 			}
 		}
+		
+		this.iSessionActive := false	
 	}
 	
-	joinSession(raceAssistant, car, track, lapNumber, duration := 0) {
+	joinSession(car, track, lapNumber, duration := 0) {
 		if this.TeamServerActive {
 			if !this.SessionActive {
 				if (lapNumber = 1) {
@@ -399,20 +391,20 @@ class TeamServerPlugin extends ControllerPlugin {
 					this.iSessionActive := true
 				}
 				
-				return this.addStint(raceAssistant, lapNumber)
+				return this.addStint(lapNumber)
 			}
 		}
 	}
 	
-	leaveSession(raceAssistant) {
-		if (this.SessionActive && this.DriverActive) {
+	leaveSession() {
+		if this.DriverActive {
 			if isDebug()
 				showMessage("Leaving team session")
-			
+
 			this.finishSession()
 		}
-		
-		this.iSessionActive := false
+		else
+			this.iSessionActive := false
 	}
 	
 	getCurrentDriver() {
@@ -500,7 +492,7 @@ class TeamServerPlugin extends ControllerPlugin {
 		}
 	}
 	
-	addStint(raceAssistant, lapNumber) {
+	addStint(lapNumber) {
 		if this.TeamServerActive {
 			try {
 				if !this.SessionActive
@@ -509,17 +501,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				if isDebug()
 					showMessage("Updating stint in lap " . lapNumber . " for team session")
 			
-				stint := this.Connector.StartStint(this.Session, this.Driver, lapNumber)
-				
-				if (lapNumber > 1) {
-					Sleep 5000 ; Enough time for stint storgae update
-					
-					raceAssistant.restoreSessionState()
-				
-					Sleep 1000 ; Force message deliver
-				}
-				
-				return stint
+				return this.Connector.StartStint(this.Session, this.Driver, lapNumber)
 			}
 			catch exception {
 				this.iSessionActive := false
@@ -531,7 +513,7 @@ class TeamServerPlugin extends ControllerPlugin {
 		}
 	}
 	
-	addLap(raceAssistant, lapNumber, telemetryData, positionsData) {
+	addLap(lapNumber, telemetryData, positionsData) {
 		if this.TeamServerActive {
 			try {
 				if isDebug()
@@ -552,10 +534,10 @@ class TeamServerPlugin extends ControllerPlugin {
 					car := getConfigurationValue(telemetryData, "Session Data", "Car", "Unknown")
 					track := getConfigurationValue(telemetryData, "Session Data", "Track", "Unknown")
 						
-					stint := this.joinSession(raceAssistant, car, track, lapNumber)
+					stint := this.joinSession(car, track, lapNumber)
 				}
 				else if !this.DriverActive
-					stint := this.addStint(raceAssistant, lapNumber)
+					stint := this.addStint(lapNumber)
 				else
 					stint := this.Connector.GetSessionStint(this.Session)
 				

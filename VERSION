@@ -1,7 +1,7 @@
 [Development]
 Version=3.7.0-dev
 Target=3.7.0-release
-Date=11/20/2021
+Date=11/22/2021
 Download=
 Changes=New "Team Server" for endurance races, New "Team Server" tab in "Simulator Configuration", New "Team" tab in "Race Settings", Bugfix in "Simulator Setup" for Stream Deck configuration support, Fixed label handling in "Simlator Setup", Fixed several other Bugs in "Simulator Setup"
 [Release]

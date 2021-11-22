@@ -65,10 +65,6 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			this.callRemote("startSession", arguments*)
 		}
 		
-		joinSession(arguments*) {
-			this.callRemote("startSession", arguments*)
-		}
-		
 		updateSession(arguments*) {
 			this.callRemote("updateSession", arguments*)
 		}
@@ -493,7 +489,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			try {
 				logMessage(kLogInfo, translate("Starting ") . translate(this.Plugin))
 				
-				options .= " -Remote " . controllerPID
+				options := " -Remote " . controllerPID
 				
 				if this.RaceAssistantName
 					options .= " -Name """ . this.RaceAssistantName . """"
@@ -613,7 +609,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			teamServer.disconnect()
 	}
 	
-	startSession(settingsFile, dataFile) {
+	startSession(settingsFile, dataFile, teamSession) {
 		if this.Simulator {
 			code := this.Simulator.Code
 			assistant := this.Plugin
@@ -626,7 +622,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		}
 		
 		if this.RaceAssistant
-			this.finishSession(false)
+			this.finishSession(false, !teamSession)
 		else
 			this.startupRaceAssistant()
 	
@@ -634,19 +630,18 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			this.RaceAssistant.startSession(settingsFile, dataFile)
 	}
 	
-	joinSession(dataFile) {
-		this.startSession(false, dataFile)
-	}
-	
-	finishSession(shutdown := true) {
+	finishSession(shutdownAssistant := true, shutdownTeamSession := true) {
 		if this.RaceAssistant {
-			this.RaceAssistant.finishSession(shutdown)
+			this.RaceAssistant.finishSession(shutdownAssistant && (!this.TeamSessionActive || this.TeamServer.DriverActive))
 			
-			if shutdown {
-				this.shutdownRaceAssistant()
+			if (shutdownTeamSession && this.TeamSessionActive) {
+				this.TeamServer.leaveSession()
 				
 				this.disconnectTeamSession()
 			}
+				
+			if shutdownAssistant
+				this.shutdownRaceAssistant()
 		}
 	}
 	
@@ -655,7 +650,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			this.RaceAssistant.addLap(lapNumber, dataFile)
 		
 		if this.TeamSessionActive
-			this.TeamServer.addLap(this, lapNumber, telemetryData, positionsData)
+			this.TeamServer.addLap(lapNumber, telemetryData, positionsData)
 	}
 	
 	updateLap(lapNumber, dataFile) {
@@ -734,7 +729,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			FileRead sessionState, %stateFile%
 			
 			if isDebug()
-				showMessage("Saving session for " . this.RaceAssistantName . ": " . sessionState)
+				showMessage("Saving session for " . this.RaceAssistantName)
 			
 			teamServer.setSessionValue(this.Plugin . " Settings", sessionSettings)
 			teamServer.setSessionValue(this.Plugin . " State", sessionState)
@@ -801,7 +796,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		
 			if (teamServer && teamServer.Active) {
 				if isDebug()
-					showMessage("Restoring session state for " . this.RaceAssistantName . ": " . sessionState)
+					showMessage("Restoring session state for " . this.RaceAssistantName)
 				
 				this.RaceAssistant.restoreSessionState(this.createSessionSettingsFile(), this.createSessionStateFile())
 			}
@@ -947,12 +942,11 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 								if !this.driverActive(data)
 									return ; Still a different driver, might happen in some simulations
 							
-								this.TeamServer.addStint(this, dataLastLap)
+								this.TeamServer.addStint(dataLastLap)
 							}
 							else ; (this.iLastLap == (dataLastLap - 1))
 								if !this.driverActive(data)
 									return ; Oops, a different driver, might happen in some simulations after a pitstop
-							
 						}
 						
 						newLap := (dataLastLap > this.iLastLap)
@@ -987,22 +981,22 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 						
 						if firstLap {
 							if this.connectTeamSession()
-								this.TeamServer.joinSession(this, getConfigurationValue(data, "Session Data", "Car")
-																, getConfigurationValue(data, "Session Data", "Track")
-																, dataLastLap
-																, Round(getConfigurationValue(data, "Session Data", "SessionTimeRemaining", 0) / 1000))
+								this.TeamServer.joinSession(getConfigurationValue(data, "Session Data", "Car")
+														  , getConfigurationValue(data, "Session Data", "Track")
+														  , dataLastLap
+														  , Round(getConfigurationValue(data, "Session Data", "SessionTimeRemaining", 0) / 1000))
 							
 							settings := this.prepareSettings(data)
 							settingsFile := (kTempDirectory . this.Plugin . ".settings")
 							
 							writeConfiguration(settingsFile, settings)
 							
-							this.startSession(settingsFile, newDataFile)
+							this.startSession(settingsFile, newDataFile, this.TeamSessionActive)
 						}
 						else if joinedSession {
-							this.TeamServer.joinSession(this, getConfigurationValue(data, "Session Data", "Car")
-															, getConfigurationValue(data, "Session Data", "Track")
-															, dataLastLap)
+							this.TeamServer.joinSession(getConfigurationValue(data, "Session Data", "Car")
+													  , getConfigurationValue(data, "Session Data", "Track")
+													  , dataLastLap)
 							
 							settingsFile := this.createSessionSettingsFile()
 							
@@ -1016,7 +1010,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 								writeConfiguration(settingsFile, settings)
 							}	
 								
-							this.startSession(settingsFile, newDataFile)
+							this.startSession(settingsFile, newDataFile, this.TeamSessionActive)
 							
 							this.restoreSessionState()
 						}

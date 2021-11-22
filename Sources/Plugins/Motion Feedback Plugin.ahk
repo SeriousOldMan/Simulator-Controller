@@ -92,17 +92,27 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		}
 		
 		updateEffectLabels() {
+			local action
+			
 			static isInfo := false
 			
 			if (inList(this.Controller.ActiveModes, this)) {
 				state := (isInfo ? ((this.iSelectedEffect == kUndefined) ? "Highlight" : "Info") : "Normal")
 				
 				for index, effect in this.Plugin.kEffects
-					if inList(this.Controller.ActiveModes, this)
-						this.findAction(this.Plugin.getLabel(ConfigurationItem.descriptor(effect, "Toggle"), effect)).updateLabel(state)
+					if inList(this.Controller.ActiveModes, this) {
+						action := this.findAction(this.Plugin.getLabel(ConfigurationItem.descriptor(effect, "Toggle"), effect))
+						
+						if action
+							action.updateLabel(state)
+					}
 			
-				if inList(this.Controller.ActiveModes, this)
-					this.findAction(this.Plugin.getLabel(ConfigurationItem.descriptor("MotionIntensity", "Dial"), "Motion Intensity")).updateLabel(isInfo ? "Info" : "Normal")
+				if inList(this.Controller.ActiveModes, this) {
+					action := this.findAction(this.Plugin.getLabel(ConfigurationItem.descriptor("MotionIntensity", "Dial"), "Motion Intensity"))
+					
+					if action
+						action.updateLabel(isInfo ? "Info" : "Normal")
+				}
 			
 				isInfo := !isInfo
 			}

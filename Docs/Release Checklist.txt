@@ -25,6 +25,7 @@ Release 3.7.0 Checklist
    a. Translations
    b. Phrase Grammars
    c. Install new "Team Server" plugin
+   d. Controller Plugin Labels & Icons
 2. New Team Server
    a. Translations
    b. Full new Documentation & Images

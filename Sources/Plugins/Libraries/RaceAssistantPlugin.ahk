@@ -200,10 +200,10 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			}
 		}
 		
-		__New(plugin, function, label) {
+		__New(plugin, function, label, icon) {
 			this.iPlugin := plugin
 			
-			base.__New(function, label)
+			base.__New(function, label, icon)
 		}
 		
 		fireAction(function, trigger) {

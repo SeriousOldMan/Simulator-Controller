@@ -52,10 +52,10 @@ class TeamServerPlugin extends ControllerPlugin {
 			}
 		}
 		
-		__New(plugin, function, label) {
+		__New(plugin, function, label, icon) {
 			this.iPlugin := plugin
 			
-			base.__New(function, label)
+			base.__New(function, label, icon)
 		}
 		
 		fireAction(function, trigger) {
@@ -184,7 +184,7 @@ class TeamServerPlugin extends ControllerPlugin {
 					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 		}
 		
-		base.__New(controller, name, configuration, register)
+		base.__New(controller, name, configuration, false)
 		
 		if (!this.Active && !isDebug())
 			return
@@ -204,6 +204,9 @@ class TeamServerPlugin extends ControllerPlugin {
 		
 		if isDebug()
 			showMessage("Team Server is " . (this.TeamServerEnabled ? "enabled" : "disabled"))
+		
+		if register
+			controller.registerPlugin(this)
 		
 		this.keepAlive()
 	}
@@ -226,14 +229,30 @@ class TeamServerPlugin extends ControllerPlugin {
 			this.logFunctionNotFound(actionFunction)
 	}
 	
+	activate() {
+		base.activate()
+		
+		this.updateActions(kSessionFinished)
+	}
+		
+	updateActions(sessionState) {
+		for ignore, theAction in this.Actions
+			if isInstance(theAction, TeamServerPlugin.TeamServerToggleAction)
+				theAction.Function.setLabel(this.actionLabel(theAction), this.TeamServerEnabled ? "Green" : "Black")
+	}
+	
 	enableTeamServer() {
 		this.iTeamServerEnabled := true
+		
+		this.updateActions(kSessionFinished)
 	}
 	
 	disableTeamServer() {
 		this.disconnect()
 		
 		this.iTeamServerEnabled := false
+		
+		this.updateActions(kSessionFinished)
 	}
 	
 	parseObject(properties) {

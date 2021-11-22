@@ -236,13 +236,27 @@ namespace TeamServer {
 			return Get("session/" + identifier);
 		}
 
-		public string GetSessionValue(string identifier, string name) {
+		public string GetSessionValue(string identifier, string name)
+		{
 			return Get("session/" + identifier + "/value",
 					   arguments: new Parameters() { { "name", name } });
 		}
 
-		public void SetSessionValue(string identifier, string name, string value) {
+		public void SetSessionValue(string identifier, string name, string value)
+		{
 			Put("session/" + identifier + "/value",
+				arguments: new Parameters() { { "name", name } }, body: value);
+		}
+
+		public string GetSessionLapValue(string identifier, int lap, string name)
+		{
+			return Get("session/" + identifier + "/lap/" + lap + "/value",
+					   arguments: new Parameters() { { "name", name } });
+		}
+
+		public void SetSessionLapValue(string identifier, int lap, string name, string value)
+		{
+			Put("session/" + identifier + "/lap/" + lap + "/value",
 				arguments: new Parameters() { { "name", name } }, body: value);
 		}
 
@@ -321,20 +335,15 @@ namespace TeamServer {
 			return Get("lap/" + identifier);
 		}
 
-		public string GetLapTelemetryData(string identifier) {
-			return Get("lap/" + identifier + "/telemetryData");
+		public string GetLapValue(string identifier, string name) {
+			return Get("lap/" + identifier + "/value",
+					   arguments: new Parameters() { { "name", name } });
 		}
 
-		public string SetLapTelemetryData(string identifier, string telemetryData) {
-			return Put("lap/" + identifier + "/telemetryData", body: telemetryData);
-		}
-
-		public string GetLapPositionsData(string identifier) {
-			return Get("lap/" + identifier + "/positionsData");
-		}
-
-		public string SetLapPositionsData(string identifier, string positionsData) {
-			return Put("lap/" + identifier + "/positionsData", body: positionsData);
+		public string SetLapValue(string identifier, string name, string value) {
+			return Put("lap/" + identifier + "/value",
+					   arguments: new Parameters() { { "name", name } },
+					   body: value);
 		}
 		#endregion
 	}

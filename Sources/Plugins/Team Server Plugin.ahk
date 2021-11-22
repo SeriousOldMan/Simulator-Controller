@@ -444,6 +444,8 @@ class TeamServerPlugin extends ControllerPlugin {
 				logMessage(kLogCritical, translate("Error while fetching session value (Session: ") . this.Session . translate(", Name: ") . name . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
 			}
 		}
+		
+		return false
 	}
 	
 	setSessionValue(name, value) {
@@ -452,7 +454,45 @@ class TeamServerPlugin extends ControllerPlugin {
 				if isDebug()
 					showMessage("Saving session value: " . name . " => " . value)
 				
-				return this.Connector.SetSessionValue(this.Session, name, value)
+				this.Connector.SetSessionValue(this.Session, name, value)
+			}
+			catch exception {
+				logMessage(kLogCritical, translate("Error while storing session value (Session: ") . this.Session . translate(", Name: ") . name . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+			}
+		}
+	}
+	
+	getLapValue(lap, name) {
+		if this.SessionActive {
+			try {
+				if lap is integer
+					value := this.Connector.GetSessionLapValue(this.Session, lap, name)
+				else
+					value := this.Connector.GetLapValue(lap, name)
+
+				if isDebug()
+					showMessage("Fetching value for " . lap . ": " . name . " => " . value)
+			
+				return value
+			}
+			catch exception {
+				logMessage(kLogCritical, translate("Error while fetching lap value (Session: ") . this.Session . translate(", Name: ") . name . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+			}
+		}
+		
+		return false
+	}
+	
+	setLapValue(lap, name, value) {
+		if this.SessionActive {
+			try {
+				if isDebug()
+					showMessage("Saving value for lap " . lap . ": " . name . " => " . value)
+				
+				if lap is integer
+					this.Connector.SetSessionLapValue(this.Session, lap, name, value)
+				else
+					this.Connector.SetLapValue(lap, name, value)
 			}
 			catch exception {
 				logMessage(kLogCritical, translate("Error while storing session value (Session: ") . this.Session . translate(", Name: ") . name . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))

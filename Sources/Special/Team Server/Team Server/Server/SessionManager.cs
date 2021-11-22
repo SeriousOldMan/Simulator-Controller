@@ -52,10 +52,26 @@ namespace TeamServer.Server {
 			return ObjectManager.GetAttributeAsync(session, name).Result;
 		}
 
-		public void SetSessionValue(Session session, string name, string value) {
+		public string GetSessionValue(Guid identifier, string name) {
+			return GetSessionValue(LookupSession(identifier), name);
+		}
+
+		public string GetSessionValue(string identifier, string name) {
+			return GetSessionValue(new Guid(identifier), name);
+		}
+
+		public void SetSessionValue(Session session, string name, string value)	{
 			ValidateSession(session);
 
 			ObjectManager.SetAttributeAsync(session, name, value);
+		}
+
+		public void SetSessionValue(Guid identifier, string name, string value) {
+			SetSessionValue(LookupSession(identifier), name, value);
+		}
+
+		public void SetSessionValue(string identifier, string name, string value) {
+			SetSessionValue(new Guid(identifier), name, value);
 		}
 
 		public void DeleteSession(Session session) {
@@ -246,40 +262,38 @@ namespace TeamServer.Server {
 		#endregion
 
 		#region Operations
-		public Lap UpdateTelemetryData(Lap lap, string telemetryData) {
+		public string GetLapValue(Lap lap, string name)
+		{
 			ValidateLap(lap);
 
-			lap.TelemetryData = telemetryData;
-
-			lap.Save();
-
-			return lap;
+			return ObjectManager.GetAttributeAsync(lap, name).Result;
 		}
 
-		public Lap UpdateTelemetryData(Guid identifier, string telemetryData) {
-			return UpdateTelemetryData(ObjectManager.GetLapAsync(identifier).Result, telemetryData);
+		public string GetLapValue(Guid identifier, string name)
+		{
+			return GetLapValue(ObjectManager.GetLapAsync(identifier).Result, name);
 		}
 
-		public Lap UpdateTelemetryData(string identifier, string telemetryData) {
-			return UpdateTelemetryData(new Guid(identifier), telemetryData);
+		public string GetLapValue(string identifier, string name)
+		{
+			return GetLapValue(new Guid(identifier), name);
 		}
 
-		public Lap UpdatePositionsData(Lap lap, string positionsData) {
+		public void SetLapValue(Lap lap, string name, string value)
+		{
 			ValidateLap(lap);
 
-			lap.PositionsData = positionsData;
-
-			lap.Save();
-
-			return lap;
+			ObjectManager.SetAttributeAsync(lap, name, value);
 		}
 
-		public Lap UpdatePositionsData(Guid identifier, string positionsData) {
-			return UpdatePositionsData(ObjectManager.GetLapAsync(identifier).Result, positionsData);
+		public void SetLapValue(Guid identifier, string name, string value)
+		{
+			SetLapValue(ObjectManager.GetLapAsync(identifier).Result, name, value);
 		}
 
-		public Lap UpdatePositionsData(string identifier, string positionsData) {
-			return UpdatePositionsData(new Guid(identifier), positionsData);
+		public void SetLapValue(string identifier, string name, string value)
+		{
+			SetLapValue(new Guid(identifier), name, value);
 		}
 		#endregion
 		#endregion

@@ -134,25 +134,5 @@ namespace TeamServer.Model {
 
         [Indexed]
         public int Nr { get; set; }
-
-        [Ignore]
-        public string TelemetryData {
-            get {
-                return ObjectManager.GetAttributeAsync(this, "TelemetryData").Result;
-            }
-            set {
-                ObjectManager.SetAttributeAsync(this, "TelemetryData", value);
-            }
-        }
-
-        [Ignore]
-        public string PositionsData {
-            get {
-                return ObjectManager.GetAttributeAsync(this, "PositionsData").Result;
-            }
-            set {
-                ObjectManager.SetAttributeAsync(this, "PositionsData", value);
-            }
-        }
     }
 }

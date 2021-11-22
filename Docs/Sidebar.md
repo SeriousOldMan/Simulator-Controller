@@ -97,6 +97,19 @@
     - [Data acquisition](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#data-acquisition)
   - [Troubleshooting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#troubleshooting)
 
+[Team Server](*)
+  - [Introduction](*)
+  - [Installation & Configuration](*)
+  - [Managing teams](*)
+  - [Preparing a team session](*)
+  - [Running a team session](*)
+  - [How it works](*)
+  - [Troubleshooting](*)
+  
+------
+  - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#introduction)
+  - [Installation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#installation)
+
 [Development Guide](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts)
 ------
   - [Overview & Concepts](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts)

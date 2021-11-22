@@ -64,8 +64,12 @@ class AssistantsStepWizard extends ActionsStepWizard {
 		
 		wizard := this.SetupWizard
 		
+		assistantActive := false
+		
 		for ignore, assistant in this.Definition
 			if wizard.isModuleSelected(assistant) {
+				assistantActive := true
+				
 				assistantConfiguration := readConfiguration(kUserHomeDirectory . "Setup\" . assistant . " Configuration.ini")
 		
 				for ignore, section in ["Race Assistant Startup", "Race Assistant Shutdown", "Race Engineer Startup", "Race Engineer Shutdown"
@@ -142,6 +146,8 @@ class AssistantsStepWizard extends ActionsStepWizard {
 			}
 			else
 				new Plugin(assistant, false, false, "", "").saveToConfiguration(configuration)
+		
+		new Plugin("Team Server", false, assistantActive, "", "teamServer: On").saveToConfiguration(configuration)
 	}
 	
 	createGui(wizard, x, y, width, height) {

@@ -194,13 +194,19 @@ class TeamServerPlugin extends ControllerPlugin {
 		if teamServerToggle {
 			arguments := string2Values(A_Space, teamServerToggle)
 	
-			if (arguments.Length() == 1)
+			if (arguments.Length() == 0)
+				arguments := ["On"]
+			
+			if ((arguments.Length() == 1) && !inList(["On", "Off"], arguments[1]))
 				arguments.InsertAt(1, "Off")
 			
 			this.iTeamServerEnabled := (arguments[1] = "On")
 			
-			this.createTeamServerAction(controller, "TeamServer", arguments[2])
+			if (arguments.Length() > 1)
+				this.createTeamServerAction(controller, "TeamServer", arguments[2])
 		}
+		else
+			this.iTeamServerEnabled := true
 		
 		if isDebug()
 			showMessage("Team Server is " . (this.TeamServerEnabled ? "enabled" : "disabled"))

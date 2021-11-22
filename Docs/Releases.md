@@ -1,8 +1,15 @@
-## 3.7.0-release 11/26/21
+## 3.7.0-release 11/26/21 (planned)
 
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. New server based solution for team endurace races. See the all [new documentation](*) for more information.
+     a. New ["Team Server" tab](*) in "Simulator Configuration" for managing your Teams, Drivers and Sessions.
+	 b. New ["Team" tab](*) in "Race Settings" for all team member to configure their role in a team session.
+  4. The new "Team Server" plugin as well as the "Race Engineer" and the "Race Strategist" plugins now allow to specify the initial operation state without supplying a function to be triggered from a hardware controller.
+  5. Major bug fixes in "Simulator Setup"
+	 a. Fixed a bug Stream Deck configuration support
+	 b. Fixed an error in handling of labels "Simlator Setup" which was introduced with last release.
+	 c. Fixed several other mostly minor bugs
 
 ## 3.6.8-release 11/12/21
 

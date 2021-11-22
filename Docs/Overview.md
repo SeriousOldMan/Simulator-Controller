@@ -25,6 +25,9 @@ Welcome to the Simulator Controller documentation. Here you will find everything
   - [Virtual Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist)
     The other assistant, Cato, takes care of all strategic aspects during races with one or more pit stops, even under changing weather conditions. It will provide you with extensive after race reports for analysis and documentation and will help you with strategy development based on telemetry data of past sessions.
 	
+  - [Team Server](*)
+    If you are participating in multiplayer team-based endurance races, you use the *Team Server* to share the car state and the knowledge ot the Virtual Race Assistants between all participating drivers.
+	
   - [Development Guide](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts)
     Complete set of information for developers, who want to create their own plugins or even contribute to the further development of Simulator Controller.
 	

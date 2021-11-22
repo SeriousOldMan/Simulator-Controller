@@ -157,6 +157,8 @@ class StrategyWorkbench extends ConfigurationItem {
 	
 	iPitstopListView := false
 	
+	iFixedLapTime := false
+	
 	Window[] {
 		Get {
 			return "Workbench"
@@ -1390,22 +1392,30 @@ class StrategyWorkbench extends ConfigurationItem {
 			return ((sessionLengthEdit + ((formationLap && formationLapCheck) ? 1 : 0) + ((postRaceLap && postRaceLapCheck) ? 1 : 0)) * avgLapTime)
 	}
 	
-	getAvgLapTime(map, remainingFuel, default := false) {
-		window := this.Window
-		
-		Gui %window%:Default
+	setFixedLapTime(lapTime) {
+		this.iFixedLapTime := lapTime
+	}
 	
-		GuiControlGet simInputDropDown
-		GuiControlGet simAvgLapTimeEdit
+	getAvgLapTime(map, remainingFuel, default := false) {
+		if this.iFixedLapTime
+			return this.iFixedLapTime
+		else {
+			window := this.Window
+			
+			Gui %window%:Default
 		
-		if (simInputDropDown > 1)
-			lapTimes := new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack).getLapTimes(this.SelectedWeather, this.SelectedCompound, this.SelectedCompoundColor)
-		else
-			lapTimes := []
-		
-		lapTime := lookupLapTime(lapTimes, map, remainingFuel)
-		
-		return lapTime ? lapTime : (default ? simAvgLapTimeEdit : false)
+			GuiControlGet simInputDropDown
+			GuiControlGet simAvgLapTimeEdit
+			
+			if (simInputDropDown > 1)
+				lapTimes := new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack).getLapTimes(this.SelectedWeather, this.SelectedCompound, this.SelectedCompoundColor)
+			else
+				lapTimes := []
+			
+			lapTime := lookupLapTime(lapTimes, map, remainingFuel)
+			
+			return lapTime ? lapTime : (default ? simAvgLapTimeEdit : false)
+		}
 	}
 	
 	getMaxFuelLaps(fuelConsumption) {
@@ -1867,8 +1877,18 @@ class StrategyWorkbench extends ConfigurationItem {
 		this.showComparisonChart(html)
 	}
 	
-	createStrategy(configuration := false) {
-		return new Strategy(this, configuration)
+	createStrategy(nameOrConfiguration := false) {
+		name := nameOrConfiguration
+		
+		if !IsObject(nameOrConfiguration)
+			nameOrConfiguration := false
+		
+		theStrategy := new Strategy(this, nameOrConfiguration)
+		
+		if (name && !IsObject(name))
+			theStrategy.setName(name)
+		
+		return theStrategy
 	}
 	
 	acquireTelemetryData(ByRef progress, ByRef electronicsData, ByRef tyreData) {
@@ -1940,19 +1960,28 @@ class StrategyWorkbench extends ConfigurationItem {
 							showProgress({progress: progress, message: message})
 							
 							stintLaps := Floor((stintLengthEdit * 60) / simAvgLapTimeEdit)
+							
+							name := (translate("Initial Conditions - Map ") . simMapEdit)
+							
+							this.setFixedLapTime(simAvgLapTimeEdit)
+							
+							try {
+								strategy := this.createStrategy(name)
+						
+								initialFuelAmount := Min(fuelCapacityEdit, simInitialFuelAmountEdit + (initialFuel / 100 * fuelCapacityEdit))
+								lapTime := lookupLapTime(lapTimes, simMapEdit, initialFuelAmount)
 								
-							strategy := this.createStrategy()
-							
-							initialFuelAmount := Min(fuelCapacityEdit, simInitialFuelAmountEdit + (initialFuel / 100 * fuelCapacityEdit))
-							lapTime := lookupLapTime(lapTimes, simMapEdit, initialFuelAmount)
-							
-							if !lapTime
-								lapTime := simAvgLapTimeEdit
-							
-							strategy.createStints(initialFuelAmount, stintLaps, maxTyreLaps + (maxTyreLaps / 100 * tyreUsage), simMapEdit
-												, simFuelConsumptionEdit - (simFuelConsumptionEdit / 100 * consumption), lapTime)
+								if !lapTime
+									lapTime := simAvgLapTimeEdit
 								
-							scenarios[translate("Initial Conditions - Map ") . simMapEdit . translate(":") . variation++] := strategy
+								strategy.createStints(initialFuelAmount, stintLaps, maxTyreLaps + (maxTyreLaps / 100 * tyreUsage), simMapEdit
+													, simFuelConsumptionEdit - (simFuelConsumptionEdit / 100 * consumption), lapTime)
+							}
+							finally {
+								this.setFixedLapTime(false)
+							}
+							
+							scenarios[name . translate(":") . variation++] := strategy
 								
 							Sleep 100
 								
@@ -1974,7 +2003,9 @@ class StrategyWorkbench extends ConfigurationItem {
 							
 								stintLaps := Floor((stintLengthEdit * 60) / avgLapTime)
 								
-								strategy := this.createStrategy()
+								name := (translate("Telemetry - Map ") . map)
+								
+								strategy := this.createStrategy(name)
 							
 								initialFuelAmount := Min(fuelCapacityEdit, simInitialFuelAmountEdit + (initialFuel / 100 * fuelCapacityEdit))
 								lapTime := lookupLapTime(lapTimes, map, initialFuelAmount)
@@ -1985,7 +2016,7 @@ class StrategyWorkbench extends ConfigurationItem {
 								strategy.createStints(initialFuelAmount, stintLaps, maxTyreLaps + (maxTyreLaps / 100 * tyreUsage), map
 													, fuelConsumption - (fuelConsumption / 100 * consumption), lapTime)
 								
-								scenarios[translate("Telemetry - Map ") . map . translate(":") . variation++] := strategy
+								scenarios[name . translate(":") . variation++] := strategy
 								
 								Sleep 100
 								

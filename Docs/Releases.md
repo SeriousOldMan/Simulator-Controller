@@ -10,6 +10,8 @@
 	 a. Fixed a bug Stream Deck configuration support
 	 b. Fixed an error in handling of labels "Simlator Setup" which was introduced with last release.
 	 c. Fixed several other mostly minor bugs
+  6. Fixed an evaluation bug in "Simulator Workbench" when comparing talemetry-based scenarions with fixed-value scenarios.
+  7. Initialize name of "unnamed" strategies with the label of the scenario in "Strategy Workbench".
 
 ## 3.6.8-release 11/12/21
 

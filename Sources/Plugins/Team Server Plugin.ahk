@@ -77,6 +77,36 @@ class TeamServerPlugin extends ControllerPlugin {
 			}
 		}
 	}
+
+	class RaceSettingsAction extends ControllerAction {
+		iPlugin := false
+		
+		Plugin[] {
+			Get {
+				return this.iPlugin
+			}
+		}
+		
+		__New(plugin, function, label, icon) {
+			this.iPlugin := plugin
+			
+			base.__New(function, label, icon)
+		}
+		
+		fireAction(function, trigger) {
+			exePath := kBinariesDirectory . "Race Settings.exe"
+			
+			try {
+				Run "%exePath%", %kBinariesDirectory%
+			}
+			catch exception {
+				logMessage(kLogCritical, translate("Cannot start the Race Settings tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
+					
+				showMessage(substituteVariables(translate("Cannot start the Race Settings tool (%exePath%) - please check the configuration..."), {exePath: exePath})
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			}
+		}
+	}
 	
 	Connector[] {
 		Get {
@@ -228,6 +258,11 @@ class TeamServerPlugin extends ControllerPlugin {
 				
 				this.registerAction(new this.TeamServerToggleAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor)))
 			}
+			else if (action = "RaceSettingsOpen") {
+				descriptor := ConfigurationItem.descriptor(action, "Activate")
+				
+				this.registerAction(new this.RaceSettingsAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor)))
+			}
 			else
 				logMessage(kLogWarn, translate("Action """) . action . translate(""" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
 		}
@@ -243,8 +278,14 @@ class TeamServerPlugin extends ControllerPlugin {
 		
 	updateActions(sessionState) {
 		for ignore, theAction in this.Actions
-			if isInstance(theAction, TeamServerPlugin.TeamServerToggleAction)
+			if isInstance(theAction, TeamServerPlugin.TeamServerToggleAction) {
+				theAction.Function.enable(kAllTrigger, theAction)
 				theAction.Function.setLabel(this.actionLabel(theAction), this.TeamServerEnabled ? "Green" : "Black")
+			}
+			else if isInstance(theAction, TeamServerPlugin.RaceSettingsAction) {
+				theAction.Function.enable(kAllTrigger, theAction)
+				theAction.Function.setLabel(theAction.Label)
+			}
 	}
 	
 	enableTeamServer() {

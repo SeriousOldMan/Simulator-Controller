@@ -324,6 +324,14 @@ With the "Save Telemetry" setting you specify, whether the telemetry data of the
 
 Note: The settings for loading and saving the *Race Settings* specified on *Race Engineer* tab apply for the Virtual Race Strategist as well.
 
+### Tab *Team Server*
+
+The elements on this tab allows you to connect to any currently running *Team Server*, for which you possess a valid connection URI and valid login credentials. You can manage your teams, your drivers and your sessions. You can also create access tokens for your team members to use during your team sessions. 
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%2010.JPG)
+
+The details about the installation, configuration and usage of the *Team Server*, and also about the team administration task in general can be found in the [dedicated documentation](*) for the *Team Server*.
+
 ## Themes Editor
 
 This special editor, which can be opened from the *General* tab of the configuration tool, allows you to define a combination of pictures or animation files together with a sound file. This combination is called a splash theme and will be used by the startup sequence. You may have a Rallye theme for your favorite Rallye session, or an F1 theme, or even some cinematic impressions from various airplanes in the sky, while waiting for your flight simulator to startup.

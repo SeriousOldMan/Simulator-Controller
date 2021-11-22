@@ -2,6 +2,8 @@
 
 *Team Server* is a server-based solution which enables you to use the services of the racing assistants in a team race, e.g. a 24h race. Without the *Team Server* these services are only available to the driver of the first stint, for all other drivers the race assistants do not even start because they do not have the data from the first laps. With the help of *Team Server*, a central server that manages the data of all drivers in a database, this critical knowledge can now be shared between all drivers. The connection to this server is established by the individual applications of teh Simulator Controller suite ("Simulator Controller", "Race Engineer", "Race Strategist", ...) using Web APIs over HTTPS. This ensures the greatest possible interoperability and flexibility when setting up the central server.
 
+Disclaimer: The current version of the *Team Server* should be considered to be in alpha stage. Therefore always double-check the recommendations and actions of your race assistants after picking up the from a different driver. There still might be situations, where the handover of the required data might fail and you might end up with your assistants as dumb as bread, at least what the history of the race concerns. Also, parts of the handling for shared special data like telemetry data or tyre pressure history are still under development. Currently, I would not recommend to use the setup for races longer than six hours, unless your PC has a lot of internal memory to spare.
+
 ## Installation & Configuration
 
 The *Team Server* requires you to run a Web API server process, which has been developed using .NET Core 3.1. Applications developed using this multi-plattform server framework from Micorsoft can be hosted on Windows, Linux and even macOS operating systems. You can find the *Team Server* in the *Binaries* folder - please copy this directory to your favorite hosting environment. If you want to set up your own host or if you want to test the *Team Server* on your local PC, you will have to install the .NET Core 3.1 framework. All required resources can be found on this [dedicated website](https://dotnet.microsoft.com/download/dotnet/3.1) from Microsoft.
@@ -35,7 +37,7 @@ Last, but not least, you have to communicate the web URI to all team managers an
 
 You manage your teams using the "Simulator Configuration" application. You will find everything you need on the "Team Server" tab on the far right of the tab header.
 
-![](*)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%2010.JPG)
 
 First you have to enter the URI, where the *Team Server* can be reached (see above). Then you have to provide the account credentials (name and password) in the second line. If everything is correct, you will get an access token, if you click on the small button with the key (otherwise you will see an error dialog, which describes the problem). This access token will always be freshly created and is therefore valid for the period stated in the "Settings.json" file as described in the [installation](*) chapter. You can copy both the Server URI and the token to the clipboard using the small buttons on the right side
 
@@ -47,9 +49,9 @@ That's it for team administration.
 
 ## Preparing a team session
 
-Every member of a team will have to prepare the settings for an upcoming team session. This is done using the already "Race Settings" application.
+First of all, it is absolutely important to note that a team session can only function properly if all members of the team are using simulator controllers and have configured the same virtual racing assistants (either Jona or Cato or both). In order to participate in a team meeting, each member must prepare the settings for this upcoming team meeting. This is done using the "Race Settings" application.
 
-![](*)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Settings%203.JPG)
 
 Select the tab named "Team", and enter the server URI as well as the access token, which has been provided by the team manager as described above in the chapter about [team administration](*). Please note, that the tab "Team" is not available in the "Setup Database", since the settings that are stored there will be independent of a given team.
 
@@ -67,15 +69,15 @@ When you start a team session as described above, Jona and Cato will act and beh
 
   1. Handover of the Knowledgebase
   
-	 Jona and Cato both have a working memory, which stores current state and is used to derive the recommendations control the actions of the assistants. This memory is located locally in "Race Engineer" and "Race Strategist" process of the current driver. During a pitstop the complete working memory of the Race Assistants of the current driver is transferred to the *Team Server* and from there it is used to initialize the working memory of the Race Assistants of the next driver. This happens completely in the background.
+	 Jona and Cato both have a working memory, which stores the current state and is used to derive the recommendations and to control the actions of the assistants. This data is held locally in memory in the "Race Engineer" and "Race Strategist" processes of the current driver. During a pitstop, copies of the complete working memory of the Race Assistants of the current driver are transferred to the *Team Server* and stored there in a database. After the next driver has picked up the car, this copies are requested from the central server and are used to initialize the working memory of the Race Assistants of this driver. This happens completely in the background.
 
   2. Handover of Race Settings
   
-	 The next driver after a pitstop will also receive the current race settings of the previous driver, as defined by the "Race Settings" application. Especially important are those settings that influence the pitstop planning or the strategy simulation. It is therefore important that all drivers of a team race decide together, which options they will choose for their race. 
+	 The next driver after a pitstop will also receive the current race settings of the previous driver, as defined by the "Race Settings" application. Especially important are those settings that influence the pitstop planning, the calculations for cold tyre pressures and the rules for the valuation of potential repairs. It is therefore important that all drivers of a team race decide together, which options they will choose for their race.
 
-  2. Handling of large Data Sets
+  3. Storing of Race Standings, Telemetry and Tyre Pressure Information
 
-     Jona and Cato collect a lot of data during your races, for example race standings, lap times and other statistical data from all your opponents for after race analysis or telemetry data for setup and strategy development. For a single or double stint event with a single driver, all this data is kept in-memory. This is almost impossible for 24h race. Therefore these data sets will also be stored in the *Team Server* and will be reloaded at the end of the session for further processing.
+     Jona and Cato collect a lot of data during your races, for example race standings, lap times and other statistical data from all your opponents for after race analysis or telemetry data for setup and strategy development. For a single or double stint event with a single driver, all this data is kept in-memory. This is almost impossible for 24h race due to memory restrictions and completely impossible for multiplayer team races. Therefore, this data will also be stored centrally in the *Team Server* and will be reloaded at the end of the session for further processing.
 
 ## Troubleshooting
 

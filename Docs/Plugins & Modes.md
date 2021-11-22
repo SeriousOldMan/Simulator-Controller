@@ -305,6 +305,16 @@ Please see the following table for available information commands.
 
 Note: All these commands are also available in most of the simulation plugins, either in the "Pitstop" mode or in the "Assistant" mode, depending on the configuration parameters.
 
+## Plugin *Team Server*
+
+This is a supporting plugin for the Virtual Race Assistants. It supports the connection to a central server which manages the state and knowledge of the Virtual Race Assistants during a multiplayer team session, for example a 24 hour endurance race. See the separate [documentation](*) on the *Team Server* for more information. The following configuration parameters are available:
+
+	teamServer: [*initialState*] [*onOffFunction*]; openRaceSettings: *settingsFunction*
+	
+You can define a function on your hardware controller with the parameter *teamServer*, to enable or disable the connection to the *Team Server* dynamically. The *onOffFunction* may be ommited, if you only want to enable or disable the *Team Server* connection for all your sessions. The also optional *initialState* must be either "On" or "Off" (default is "On") and for *onOffFunction* unary and binary functions are supported. The function will be bound to a plugin action. If you don't supply an argument for this parameter, the *Team Server* connection will always be active, but whether you join a session depends on the settings in the "Race Settings" (see the next parameter).
+
+The parameter *openRaceSettings* allows you to bind a plugin action to your hardware controller, which opens the [settings dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings), which you will use before a race to choose your driver and session settings for a team session. Please note, that this parameter is also available in the plugins for the Virtual Race Assistants. You only have to declare it once, if you want to use it.
+
 ## Plugin *ACC*
 
 This plugin handles the *Assetto Corsa Competizione* simulation game. This plugin needs an application with the name "Assetto Corsa Competizione" to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startACC", "stopACC" and "isACCRunning" as special function hooks in this configuration. An integration with Jona is available through the "Race Engineer" plugin, and an integration with Cato through the plugin "Race Strategist".

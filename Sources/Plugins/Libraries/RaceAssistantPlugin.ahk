@@ -438,7 +438,9 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			if isInstance(theAction, RaceAssistantPlugin.RaceAssistantToggleAction) {
 				theAction.Function.setLabel(this.actionLabel(theAction), this.RaceAssistantName ? (this.RaceAssistantEnabled ? "Green" : "Black") : "Gray")
 				
-				if !this.RaceAssistantName
+				if this.RaceAssistantName
+					theAction.Function.enable(kAllTrigger, theAction)
+				else
 					theAction.Function.disable(kAllTrigger, theAction)
 			}
 			else if isInstance(theAction, RaceAssistantPlugin.RaceSettingsAction) {

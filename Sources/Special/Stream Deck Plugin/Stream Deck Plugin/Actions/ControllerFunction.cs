@@ -145,6 +145,9 @@ namespace SimulatorControllerPlugin
             {
                 int winHandle = FindWindowEx(0, 0, null, "Simulator Controller.exe");
 
+                if (winHandle == 0)
+                    FindWindowEx(0, 0, null, "Simulator Controller.ahk");
+
                 if (winHandle != 0)
                     SendStringMessage(winHandle, 0, "Stream Deck:" + this.settings.Function);
             }

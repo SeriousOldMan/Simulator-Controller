@@ -905,8 +905,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				if this.RaceAssistantEnabled {
 					; Car is on the track
 				
-					if !this.RaceAssistant
-						this.startupRaceAssistant()
+					; if !this.RaceAssistant
+					;	this.startupRaceAssistant()
 						
 					if getConfigurationValue(data, "Stint Data", "InPit", false) {
 						; Car is in the Pit
@@ -917,8 +917,9 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 							this.iInPit := true
 						}
 					}
-					else if (dataLastLap == 0) {
-					}
+					; else if (dataLastLap == 0) {
+						; Waiting for the car to cross the start line for the first time
+					; }
 					else if (dataLastLap > 0) {
 						; Car has finished the first lap
 					

@@ -227,6 +227,41 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		}
 	}
 	
+	class TeamServerToggleAction extends ControllerAction {
+		iPlugin := false
+		
+		Plugin[] {
+			Get {
+				return this.iPlugin
+			}
+		}
+		
+		__New(plugin, function, label, icon) {
+			this.iPlugin := plugin
+			
+			base.__New(function, label, icon)
+		}
+		
+		fireAction(function, trigger) {
+			local plugin := this.Plugin
+			
+			if (plugin.TeamServerEnabled && ((trigger = "Off") || (trigger == "Push"))) {
+				plugin.disableTeamServer()
+			
+				trayMessage(plugin.actionLabel(this), translate("State: Off"))
+			
+				function.setLabel(plugin.actionLabel(this), "Black")
+			}
+			else if (!plugin.TeamServerEnabled && ((trigger = "On") || (trigger == "Push"))) {
+				plugin.disableTeamServer()
+			
+				trayMessage(plugin.actionLabel(this), translate("State: On"))
+			
+				function.setLabel(plugin.actionLabel(this), "Green")
+			}
+		}
+	}
+	
 	Simulator[] {
 		Get {
 			return this.iSimulator
@@ -324,6 +359,27 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		else
 			this.iRaceAssistantEnabled := (this.iRaceAssistantName != false)
 		
+		teamServer := this.Controller.FindPlugin(kTeamServerPlugin)
+		teamServerToggle := this.getArgumentValue("teamServer", false)
+		
+		if (teamServerToggle && teamServer && teamServer.Active) {
+			arguments := string2Values(A_Space, teamServerToggle)
+	
+			if (arguments.Length() == 0)
+				arguments := ["On"]
+			
+			if ((arguments.Length() == 1) && !inList(["On", "Off"], arguments[1]))
+				arguments.InsertAt(1, "Off")
+			
+			if (arguments[1] = "On")
+				this.enableTeamServer()
+			else
+				this.disableTeamServer()
+			
+			if (arguments.Length() > 1)
+				this.createRaceAssistantAction(controller, "TeamServer", arguments[2])
+		}
+		
 		openRaceSettings := this.getArgumentValue("openRaceSettings", false)
 		
 		if openRaceSettings
@@ -403,6 +459,11 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				
 				this.registerAction(new this.RaceAssistantToggleAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor)))
 			}
+			else if (action = "TeamServer") {
+				descriptor := ConfigurationItem.descriptor(action, "Toggle")
+				
+				this.registerAction(new this.TeamServerToggleAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor)))
+			}
 			else if ((action = "RaceSettingsOpen") || (action = "SetupImport") || (action = "SetupDatabaseOpen") || (action = "StrategyWorkbenchOpen")) {
 				descriptor := ConfigurationItem.descriptor(action, "Activate")
 				
@@ -443,6 +504,13 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				else
 					theAction.Function.disable(kAllTrigger, theAction)
 			}
+			else if isInstance(theAction, RaceAssistantPlugin.TeamServerToggleAction) {
+				teamServer := this.Controller.FindPlugin(kTeamServerPlugin)
+				
+				theAction.Function.setLabel(this.actionLabel(theAction), (teamServer.TeamServerEnabled ? "Green" : "Black"))
+				
+				theAction.Function.enable(kAllTrigger, theAction)
+			}
 			else if isInstance(theAction, RaceAssistantPlugin.RaceSettingsAction) {
 				if ((theAction.Action = "RaceSettingsOpen") || (theAction.Action = "SetupDatabaseOpen") || (theAction.Action = "StrategyWorkbenchOpen")) {
 					theAction.Function.enable(kAllTrigger, theAction)
@@ -479,6 +547,20 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		
 		if this.RaceAssistant
 			this.finishSession()
+	}
+	
+	enableTeamServer() {
+		teamServer := this.Controller.FindPlugin(kTeamServerPlugin)
+		
+		if (teamServer && teamServer.Active)
+			teamServer.enableTeamServer()
+	}
+	
+	disableTeamServer() {
+		teamServer := this.Controller.FindPlugin(kTeamServerPlugin)
+		
+		if (teamServer && teamServer.Active)
+			teamServer.disableTeamServer()
 	}
 	
 	createRaceAssistant(pid) {

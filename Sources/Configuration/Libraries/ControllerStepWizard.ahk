@@ -580,7 +580,7 @@ class ControllerPreviewStepWizard extends StepWizard {
 	}
 	
 	getPreviewMover() {
-		return false
+		return "moveByMouse"
 	}
 	
 	createControllerPreview(type, controller, configuration) {

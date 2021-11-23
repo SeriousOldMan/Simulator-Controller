@@ -238,9 +238,6 @@ class TeamServerPlugin extends ControllerPlugin {
 		else
 			this.iTeamServerEnabled := true
 		
-		if isDebug()
-			showMessage("Team Server is " . (this.TeamServerEnabled ? "enabled" : "disabled"))
-		
 		if register
 			controller.registerPlugin(this)
 		

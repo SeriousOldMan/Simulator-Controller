@@ -1276,6 +1276,9 @@ showMessage(message, title := false, icon := "Information.png", duration := 5000
 }
 
 moveByMouse(window) {
+	if window is not alpha
+		window := A_Gui
+	
 	curCoordMode := A_CoordModeMouse
 	
 	CoordMode Mouse, Screen

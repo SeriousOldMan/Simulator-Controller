@@ -13,3 +13,4 @@ copy "Updates.md" ..\..\Controller.Wiki\Update-Notes.md
 copy "Using Simulator Controller.md" ..\..\Controller.Wiki\Using-Simulator-Controller.md
 copy "Virtual Race Engineer.md" ..\..\Controller.Wiki\Virtual-Race-Engineer.md
 copy "Virtual Race Strategist.md" ..\..\Controller.Wiki\Virtual-Race-Strategist.md
+copy "Team Server.md" ..\..\Controller.Wiki\Team-Server.md

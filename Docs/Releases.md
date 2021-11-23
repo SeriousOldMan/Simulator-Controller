@@ -2,9 +2,9 @@
 
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. New server based solution for team endurace races. See the all [new documentation](*) for more information.
-     a. New ["Team Server" tab](*) in "Simulator Configuration" for managing your Teams, Drivers and Sessions.
-	 b. New ["Team" tab](*) in "Race Settings" for all team member to configure their role in a team session.
+  3. New server based solution for team endurace races. See the all [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server) for more information.
+     a. New ["Team Server" tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-team-server) in "Simulator Configuration" for managing your Teams, Drivers and Sessions.
+	 b. New ["Team" tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tab-team) in "Race Settings" for all team member to configure their role in a team session.
   4. The new "Team Server" plugin as well as the "Race Engineer" and the "Race Strategist" plugins now allow to specify the initial operation state without supplying a function to be triggered from a hardware controller.
   5. Major bug fixes in "Simulator Setup"
 	 a. Fixed a bug Stream Deck configuration support

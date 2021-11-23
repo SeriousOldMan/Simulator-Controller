@@ -47,7 +47,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 3.7.0
 
-This release introduces the new *Team Server*. For this a new [plugin "Team Server"](*) has been added to the plugin configuration. For existing installations, this new plugin is disabled. You might want to enable and configure it, if you want to use the new *Team Server*. For more information on installation and configuration of the *Team Server*, please consult the corresponding [documentation](*).
+This release introduces the new *Team Server*. For this a new [plugin "Team Server"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-team-server) has been added to the plugin configuration. For existing installations, this new plugin is disabled. You might want to enable and configure it, if you want to use the new *Team Server*. For more information on installation and configuration of the *Team Server*, please consult the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server).
 
 Some new plugin labels and icon slots have been added to the "ACC" plugin and also for the new "Team Server" plugin. If you are using your own labels and icons, for example for integration with Stream Deck, you may want to check the [*Labels & Icon Editor*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#action-labels--icons) in "Simulator Configuration".
 

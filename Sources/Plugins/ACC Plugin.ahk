@@ -1269,6 +1269,13 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		if (repairBodywork != this.iRepairBodyworkChosen)
 			this.toggleActivity("Repair Bodywork")
 	}
+	
+	restoreSessionState() {
+		base.restoreSessionState()
+		
+		this.iRepairSuspensionChosen := true
+		this.iRepairBodyworkChosen := true
+	}
 }
 
 ;;;-------------------------------------------------------------------------;;;

@@ -63,6 +63,14 @@ When you head out onto the track, you must decide, whether you want this session
 
 And now the important stuff: To declare, that you want to join a team session, you must use the corresponding [action from the "Team Server" plugin](*). It is also possible, to always enable team sessions using the action declaration of this plugin, but I don't recommend that.
 
+### Special notes
+
+Every simulation game is unique and handles multiplayer team races different. Therefore, you have to be aware of the individual drawbacks and specialities. In this section I will provide a growing collection of hints and special operation tipps for all the individual simulations, whenever I stumble over them. When you found some specialities on your own, please feel free to share them with me, and I will be happy to add them to this section as well.
+
+#### Assetto Corsa Competizione
+
+  1. *Assetto Corsa Competizione* looses the knowledge about the currently selected repair options in the Pitstop MFD after a driver swap. The internal selection state of the ["ACC" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-acc) will therefore be reset to *both selected*, to have some sort of initial state. This means, that you have to open the Pitstop MFD and select both repair options, once you've picked up the car. And you must do this **without** the help and control of the ["Pitstop" mode}(https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-pitstop) of the "ACC" plugin. So do not use your Button Box here. The other possibility is to leave them as they are, but double check later, after Jona has dialed the pitstop options.
+
 ## How it works
 
 When you start a team session as described above, Jona and Cato will act and behave as in a single driver session, though you might notice subtle differences. For example, a new driver will be greated by the assistants after a driver swap or a returning driver will get a warm welcome. But the important differences are all below the waterline.

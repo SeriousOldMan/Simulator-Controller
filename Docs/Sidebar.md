@@ -101,6 +101,7 @@
   - [Troubleshooting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#troubleshooting)
 
 [Team Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server)
+------
   - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#introduction)
   - [Installation & Configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#installation--configuration)
   - [Managing teams](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#managing-teams)
@@ -108,10 +109,6 @@
   - [Running a team session](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#running-a-team-session)
   - [How it works](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#how-it-works)
   - [Troubleshooting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#troubleshooting)
-  
-------
-  - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#introduction)
-  - [Installation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#installation)
 
 [Development Guide](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts)
 ------

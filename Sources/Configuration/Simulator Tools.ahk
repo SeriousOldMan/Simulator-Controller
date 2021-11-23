@@ -1610,6 +1610,21 @@ updateConfigurationForV20() {
 	updateCustomCalls(13, 32)
 }
 
+updatePluginsForV370() {
+	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	userConfiguration := readConfiguration(userConfigurationFile)
+	
+	if (userConfiguration.Count() > 0) {
+		if !getConfigurationValue(userConfiguration, "Plugins", "Team Server", false) {
+			teamServer := new Plugin("Team Server", false, false, "", "teamServer: Off")
+			
+			teamServer.saveToConfiguration(userConfiguration)
+			
+			writeConfiguration(userConfigurationFile, userConfiguration)
+		}
+	}
+}
+
 updatePluginsForV322() {
 	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
 	userConfiguration := readConfiguration(userConfigurationFile)

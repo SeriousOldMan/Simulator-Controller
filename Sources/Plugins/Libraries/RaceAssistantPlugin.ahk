@@ -913,8 +913,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				if this.RaceAssistantEnabled {
 					; Car is on the track
 				
-					; if !this.RaceAssistant
-					;	this.startupRaceAssistant()
+					if !this.RaceAssistant
+						this.startupRaceAssistant()
 						
 					if getConfigurationValue(data, "Stint Data", "InPit", false) {
 						; Car is in the Pit

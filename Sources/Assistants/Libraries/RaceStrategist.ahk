@@ -565,8 +565,10 @@ class RaceStrategist extends RaceAssistant {
 		simulatorName := this.Simulator
 		
 		Process Exist, Race Engineer.exe
-			
-		if ErrorLevel
+		
+		raceEngineer := (ErrorLevel > 0)
+		
+		if raceEngineer
 			saveSettings := kNever
 		else
 			saveSettings := getConfigurationValue(this.Configuration, "Race Assistant Shutdown", simulatorName . ".SaveSettings", getConfigurationValue(configuration, "Race Engineer Shutdown", simulatorName . ".SaveSettings", kNever))
@@ -580,13 +582,8 @@ class RaceStrategist extends RaceAssistant {
 		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(facts)
 							    , BestLapTime: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
 		
-		if this.Speaker {
-			Process Exist, Race Engineer.exe
-			
-			exists := ErrorLevel
-			
-			this.getSpeaker().speakPhrase(exists ? "" : "Greeting")
-		}
+		if this.Speaker
+			this.getSpeaker().speakPhrase(raceEngineer ? "" : "Greeting")
 		
 		if this.Debug[kDebugKnowledgeBase]
 			this.dumpKnowledge(this.KnowledgeBase)

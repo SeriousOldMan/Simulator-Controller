@@ -29,10 +29,6 @@
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kWindowsVoices = {de: ["Microsoft Hedda Desktop", "Microsoft Katja Desktop", "Microsoft Stefan Desktop", "CereVoice Gudrun - German (Germany)", "CereVoice Alex - German (Germany)"]
-					   , en: ["Microsoft David Desktop", "Microsoft Mark Desktop", "Microsoft Zira Desktop"]
-					   , fr: ["Microsoft Hortence Desktop", "Microsoft Julie Desktop", "Microsoft Paul Desktop"]}
-
 global kAzureVoices = {de: [["de-AT", "de-AT-IngridNeural"], ["de-AT", "de-AT-JonasNeural"]
 						  , ["de-DE", "de-DE-KatjaNeural"], ["de-DE", "de-DE-ConradNeural"]
 						  , ["de-CH", "de-CH-LeniNeural"], ["de-CH", "de-CH-JanNeural"]]
@@ -339,12 +335,8 @@ class SpeechSynthesizer {
 		voices := this.Voices
 	
 		if (this.Service = "Windows") {
-			if ((voice == true) && language && kWindowsVoices.HasKey(language)) {
-				availableVoices := []
-				
-				for ignore, candidate in kWindowsVoices[language]
-					if inList(voices, candidate)
-						availableVoices.Push(candidate)
+			if ((voice == true) && language) {
+				availableVoices := this.Voices[language]
 				
 				count := availableVoices.Length()
 				
@@ -358,6 +350,8 @@ class SpeechSynthesizer {
 				else
 					voice := availableVoices[1]
 			}
+			else
+				voices := this.Voices
 		}
 		else if (this.Service = "Azure") {
 			if ((voice == true) && language) {

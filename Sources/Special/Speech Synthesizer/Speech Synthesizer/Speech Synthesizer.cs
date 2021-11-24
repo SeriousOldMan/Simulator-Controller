@@ -16,7 +16,7 @@ namespace Speech {
         private string subscriptionKey;
         private SpeechConfig config = null;
 
-        private DateTimeOffset nextTokenRenewal = DateTime.Now;
+        private DateTimeOffset nextTokenRenewal = DateTime.Now - new TimeSpan(0, 10, 0);
 
         public SpeechSynthesizer() {
         }
@@ -86,29 +86,17 @@ namespace Speech {
             finished = true;
         }
 
-        private string voices = "";
-
         public string GetVoices() {
             RenewToken();
 
-            finished = false;
-            voices = "";
-
-            _ = SynthesisGetAvailableVoicesAsync();
-
-            while (!finished)
-                Thread.Sleep(100);
-
-            string result = voices;
-
-            voices = "";
-
-            return result;
+            return SynthesisGetAvailableVoicesAsync().Result;
         }
 
-        private async Task SynthesisGetAvailableVoicesAsync() {
-            using (var synthesizer = new Microsoft.CognitiveServices.Speech.SpeechSynthesizer(config)) {
-                using (var result = await synthesizer.GetVoicesAsync("")) {
+        private async Task<string> SynthesisGetAvailableVoicesAsync() {
+            string voices = "";
+
+            using (var synthesizer = new Microsoft.CognitiveServices.Speech.SpeechSynthesizer(config, null)) {
+                using (var result = await synthesizer.GetVoicesAsync()) {
                     if (result.Reason == ResultReason.VoicesListRetrieved) {
                         foreach (var voice in result.Voices) {
                             if (voices.Length > 0)
@@ -116,14 +104,11 @@ namespace Speech {
 
                             voices += voice.Name + " (" + voice.Locale + ")";
                         }
-
-                        finished = true;
-                    }
-                    else {
-                        finished = true;
                     }
                 }
             }
+
+            return voices;
         }
     }
 }

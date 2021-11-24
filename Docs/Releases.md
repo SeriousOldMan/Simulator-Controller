@@ -12,7 +12,7 @@
 	 c. Fixed several other mostly minor bugs
   6. Fixed an evaluation bug in "Simulator Workbench" when comparing talemetry-based scenarions with fixed-value scenarios.
   7. Initialize name of "unnamed" strategies with the label of the scenario in "Strategy Workbench".
-  8. Support in Speech Synthesis for additional non-Microsoft voice packs.
+  8. The configuration of voices for different languages has been heavily improved. For Azure, the system will now supply you a list of **all** available voices for the chosen language and the configuration of locally installed voices now also supports third party voice packs, as long as they adhere to the Windows SPVoice standard.
 
 ## 3.6.8-release 11/12/21
 

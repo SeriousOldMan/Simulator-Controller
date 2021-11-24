@@ -3,7 +3,7 @@ Version=3.7.0-dev
 Target=3.7.0-release
 Date=11/24/2021
 Download=
-Changes=New "Team Server" for endurance races, New "Team Server" tab in "Simulator Configuration", New "Team" tab in "Race Settings", Bugfix in "Simulator Setup" for Stream Deck configuration support, Fixed label handling in "Simlator Setup", Fixed several other Bugs in "Simulator Setup", Fixed a bug when using mixed scenarios in "Strategy Workbench"
+Changes=New "Team Server" for endurance races, New "Team Server" tab in "Simulator Configuration", New "Team" tab in "Race Settings", Bugfix in "Simulator Setup" for Stream Deck configuration support, Fixed label handling in "Simlator Setup", Fixed several other Bugs in "Simulator Setup", Fixed a bug when using mixed scenarios in "Strategy Workbench", Rework of the voice configuration both for locally installed as well as for Azure voices.
 [Release]
 Version=3.6.8-release
 Date=11/12/2021

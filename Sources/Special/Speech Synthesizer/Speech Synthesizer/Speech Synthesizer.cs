@@ -14,6 +14,10 @@ namespace Speech {
     public class SpeechSynthesizer {
         private string tokenIssuerEndpoint;
         private string subscriptionKey;
+
+        private string token;
+        private string region;
+
         private SpeechConfig config = null;
 
         private DateTimeOffset nextTokenRenewal = DateTime.Now - new TimeSpan(0, 10, 0);
@@ -37,9 +41,30 @@ namespace Speech {
 
         private void RenewToken() {
             if (DateTime.Now >= nextTokenRenewal) {
-                this.config = SpeechConfig.FromEndpoint(new System.Uri(tokenIssuerEndpoint), subscriptionKey);
+                config = SpeechConfig.FromEndpoint(new System.Uri(tokenIssuerEndpoint), subscriptionKey);
 
+                region = tokenIssuerEndpoint.Substring(8);
+                region = region.Substring(0, region.IndexOf(".api."));
+
+                token = GetToken().Result;
+                
                 nextTokenRenewal = new DateTimeOffset(DateTime.Now + new TimeSpan(TimeSpan.TicksPerMinute * 9));
+            }
+        }
+
+        public async Task<string> GetToken() {
+            using (var client = new HttpClient()) {
+                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", subscriptionKey);
+                UriBuilder uriBuilder = new UriBuilder(tokenIssuerEndpoint);
+
+                using (var result = await client.PostAsync(uriBuilder.Uri.AbsoluteUri, null)) {
+                    if (result.IsSuccessStatusCode) {
+                        return await result.Content.ReadAsStringAsync();
+                    }
+                    else {
+                        throw new HttpRequestException($"Cannot get token from {uriBuilder.ToString()}. Error: {result.StatusCode}");
+                    }
+                }
             }
         }
 
@@ -94,6 +119,9 @@ namespace Speech {
 
         private async Task<string> SynthesisGetAvailableVoicesAsync() {
             string voices = "";
+
+            // var authorizationToken = await GetToken();
+            var config = SpeechConfig.FromAuthorizationToken(token, region);
 
             using (var synthesizer = new Microsoft.CognitiveServices.Speech.SpeechSynthesizer(config, null)) {
                 using (var result = await synthesizer.GetVoicesAsync()) {

@@ -12,6 +12,7 @@
 	 c. Fixed several other mostly minor bugs
   6. Fixed an evaluation bug in "Simulator Workbench" when comparing talemetry-based scenarions with fixed-value scenarios.
   7. Initialize name of "unnamed" strategies with the label of the scenario in "Strategy Workbench".
+  8. Support in Speech Synthesis for additional non-Microsoft voice packs.
 
 ## 3.6.8-release 11/12/21
 

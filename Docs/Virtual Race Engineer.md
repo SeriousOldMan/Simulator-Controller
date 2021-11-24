@@ -278,7 +278,7 @@ Please see the [documentation](https://github.com/SeriousOldMan/Simulator-Contro
 
 This tab gives you all you need to become a driver in a team session. Whenever you want to participate in a team session, you must connect to the corresponding *Team Server* beforehand using the URI and the access token provided by your team manager. After you have established a valid connection, you can choose the team, your driver name and the sesison you want to join. Please note, that you still might have to activate a team session, before you head out onto the track (see the actions of the ["Team Server" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-team-server), if you want to control this using your Button Box, for example).
 
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Settings%203.JPG)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Settings%204.JPG)
 
 The details about the installation, configuration and usage of the *Team Server*, and also about the team administration task in general can be found in the [dedicated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server) for the *Team Server*.
 

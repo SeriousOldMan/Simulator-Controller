@@ -51,7 +51,7 @@ That's it for team administration.
 
 First of all, it is absolutely important to note that a team session can only function properly if all members of the team are using simulator controllers and have configured the same virtual racing assistants (either Jona or Cato or both). In order to participate in a team meeting, each member must prepare the settings for this upcoming team meeting. This is done using the "Race Settings" application.
 
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Settings%203.JPG)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Settings%204.JPG)
 
 Select the tab named "Team", and enter the server URI as well as the access token, which has been provided by the team manager as described above in the chapter about [team administration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#managing-teams). Please note, that the tab "Team" is not available in the "Setup Database", since the settings that are stored there will be independent of a given team.
 

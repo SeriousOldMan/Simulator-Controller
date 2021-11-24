@@ -719,7 +719,7 @@ class RaceStrategist extends RaceAssistant {
 				this.gapToBehindRecognized(inList(arguments, "Track") ? Array(this.getSpeaker().Fragments["Car"]) : [])
 			case "GapToLeader":
 				this.gapToLeaderRecognized([])
-			case "StrategyOveriew":
+			case "StrategyOverview":
 				this.strategyOverviewRecognized([])
 			case "NextPitstop":
 				this.nextPitstopRecognized([])
@@ -732,7 +732,7 @@ class RaceStrategist extends RaceAssistant {
 		if this.Speaker {
 			strategyName := knowledgeBase.getValue("Strategy.Name", false)
 			speaker := this.getSpeaker()
-			
+		
 			if strategyName {
 				if ((options == true) || options.Strategy)
 					speaker.speakPhrase("Strategy")

@@ -120,7 +120,6 @@ namespace Speech {
         private async Task<string> SynthesisGetAvailableVoicesAsync() {
             string voices = "";
 
-            // var authorizationToken = await GetToken();
             var config = SpeechConfig.FromAuthorizationToken(token, region);
 
             using (var synthesizer = new Microsoft.CognitiveServices.Speech.SpeechSynthesizer(config, null)) {

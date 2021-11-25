@@ -8,7 +8,7 @@
   4. The new "Team Server" plugin as well as the "Race Engineer" and the "Race Strategist" plugins now allow to specify the initial operation state without supplying a function to be triggered from a hardware controller.
   5. Major bug fixes in "Simulator Setup"
 	 a. Fixed a bug Stream Deck configuration support
-	 b. Fixed an error in handling of labels "Simlator Setup" which was introduced with last release.
+	 b. Fixed an error in handling of labels "Simlator Setup" which was introduced with the last release.
 	 c. Fixed several other mostly minor bugs
   6. Fixed an evaluation bug in "Simulator Workbench" when comparing talemetry-based scenarions with fixed-value scenarios.
   7. Initialize name of "unnamed" strategies with the label of the scenario in "Strategy Workbench".

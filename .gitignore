@@ -10,3 +10,6 @@ Sources/Special/**/Release/
 Sources/Special/**/packages/
 Sources/Special/**/**/obj/
 Sources/Special/**/**/bin/
+*.pubxml.user
+*.pubxml
+profile.arm.json

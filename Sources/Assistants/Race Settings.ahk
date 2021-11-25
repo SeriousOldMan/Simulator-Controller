@@ -554,7 +554,7 @@ restart:
 				title := translate("Error")
 			
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-				MsgBox 262160, %title%, % (translate("Cannot connect to the Team Server.`n`n") . translate("Error: ") . exception.Message)
+				MsgBox 262160, %title%, % (translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message)
 				OnMessage(0x44, "")
 			}
 		}
@@ -1075,7 +1075,7 @@ restart:
 			else
 				Gui RES:Add, DropDownList, x126 yp w126 vsessionDropDownMenu gchooseSession
 			
-			Gui RES:Add, Text, x126 yp+30 r6 w256, % translate("Note: These settings define the access data for a team session. In order to join this session, it is necessary for every participating driver to activate the team mode within the first lap of the session. Please consult the documentation for more information and detailed instructions.")
+			Gui RES:Add, Text, x126 yp+30 r6 w256, % translate("Note: These settings define the access data for a team session. In order to join this session, it is still necessary for you to activate the team mode within the first lap of the session. Please consult the documentation for more information and detailed instructions.")
 		}
 		
 		Gui RES:Show, AutoSize Center

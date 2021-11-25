@@ -343,7 +343,7 @@ class TeamServerPlugin extends ControllerPlugin {
 			catch exception {
 				this.iConnected := false
 				
-				logMessage(kLogCritical, translate("Cannot connect to the session (URI: ") . serverURL . translate(", Token: ") . accessToken . translate(", Team: ") . team . translate(", Driver: ") . driver . translate(", Session: ") . session . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+				logMessage(kLogCritical, translate("Cannot connect to the Team Server (URL: ") . serverURL . translate(", Token: ") . accessToken . translate(", Team: ") . team . translate(", Driver: ") . driver . translate(", Session: ") . session . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
 				
 				this.disconnect(false)
 			}
@@ -496,7 +496,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				return value
 			}
 			catch exception {
-				logMessage(kLogCritical, translate("Error while fetching session value (Session: ") . this.Session . translate(", Name: ") . name . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+				logMessage(kLogCritical, translate("Error while fetching session data (Session: ") . this.Session . translate(", Name: ") . name . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
 			}
 		}
 		
@@ -512,7 +512,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				this.Connector.SetSessionValue(this.Session, name, value)
 			}
 			catch exception {
-				logMessage(kLogCritical, translate("Error while storing session value (Session: ") . this.Session . translate(", Name: ") . name . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+				logMessage(kLogCritical, translate("Error while storing session data (Session: ") . this.Session . translate(", Name: ") . name . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
 			}
 		}
 	}
@@ -531,7 +531,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				return value
 			}
 			catch exception {
-				logMessage(kLogCritical, translate("Error while fetching lap value (Session: ") . this.Session . translate(", Name: ") . name . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+				logMessage(kLogCritical, translate("Error while fetching lap data (Session: ") . this.Session . translate(", Lap: ") . lap . translate(", Name: ") . name . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
 			}
 		}
 		
@@ -550,7 +550,7 @@ class TeamServerPlugin extends ControllerPlugin {
 					this.Connector.SetLapValue(lap, name, value)
 			}
 			catch exception {
-				logMessage(kLogCritical, translate("Error while storing session value (Session: ") . this.Session . translate(", Name: ") . name . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+				logMessage(kLogCritical, translate("Error while storing lap data (Session: ") . this.Session . translate(", Lap: ") . lap . translate(", Name: ") . name . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
 			}
 		}
 	}
@@ -626,7 +626,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				nextPing := 60000
 			}
 			catch exception {
-				logMessage(kLogCritical, translate("Cannot connect to the Team Server (URI: ") . this.ServerURL . translate(", Token: ") . this.AccessToken . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+				logMessage(kLogCritical, translate("Cannot connect to the Team Server (URL: ") . this.ServerURL . translate(", Token: ") . this.AccessToken . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
 				
 				this.iConnected := false
 			}

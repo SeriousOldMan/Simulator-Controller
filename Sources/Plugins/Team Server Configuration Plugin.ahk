@@ -224,12 +224,18 @@ class TeamServerConfigurator extends ConfigurationItem {
 		Loop 28
 			editor.registerWidget(this, widget%A_Index%)
 		
+		this.connect(false)
+		
 		this.updateState()
 	}
 	
 	loadFromConfiguration(configuration) {
 		base.loadFromConfiguration(configuration)
 		
+		teamServerURLEdit := getConfigurationValue(configuration, "Team Server", "Server.URL", "https://localhost:5001")
+		teamServerNameEdit := getConfigurationValue(configuration, "Team Server", "Account.Name", "")
+		teamServerPasswordEdit := getConfigurationValue(configuration, "Team Server", "Account.Password", "")
+		teamServerTokenEdit := getConfigurationValue(configuration, "Team Server", "Server.Token", "")
 	}
 	
 	saveToConfiguration(configuration) {
@@ -239,9 +245,18 @@ class TeamServerConfigurator extends ConfigurationItem {
 		
 		Gui %window%:Default
 
+		GuiControlGet teamServerURLEdit
+		GuiControlGet teamServerNameEdit
+		GuiControlGet teamServerPasswordEdit
+		GuiControlGet teamServerTokenEdit
+		
+		setConfigurationValue(configuration, "Team Server", "Server.URL", teamServerURLEdit)
+		setConfigurationValue(configuration, "Team Server", "Server.Token", teamServerTokenEdit)
+		setConfigurationValue(configuration, "Team Server", "Account.Name", teamServerNameEdit)
+		setConfigurationValue(configuration, "Team Server", "Account.Password", teamServerPasswordEdit)
 	}
 	
-	connect() {
+	connect(message := true) {
 		connector := this.Connector
 
 		window := this.Editor.Window
@@ -270,11 +285,13 @@ class TeamServerConfigurator extends ConfigurationItem {
 			GuiControl, , teamServerTokenEdit, % ""
 			GuiControl, , teamServerTimeText, % ""
 			
-			title := translate("Error")
-			
-			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-			MsgBox 262160, %title%, % (translate("Cannot connect to the Team Server.`n`n") . translate("Error: ") . exception.Message)
-			OnMessage(0x44, "")
+			if message {
+				title := translate("Error")
+				
+				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+				MsgBox 262160, %title%, % (translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message)
+				OnMessage(0x44, "")
+			}
 			
 			this.Token := false
 		}
@@ -659,8 +676,8 @@ selectTeam() {
 }
 
 newTeam() {
-	title := translate("Modular Simulator Controller System")
-	prompt := translate("Please enter the name for the new team:")
+	title := translate("Team Server")
+	prompt := translate("Please enter the name of the new team:")
 	
 	configurator := TeamServerConfigurator.Instance
 	
@@ -687,7 +704,7 @@ deleteTeam() {
 }
 
 renameTeam() {
-	title := translate("Modular Simulator Controller System")
+	title := translate("Team Server")
 	prompt := translate("Please enter the new name for the selected team:")
 	
 	configurator := TeamServerConfigurator.Instance
@@ -722,8 +739,8 @@ selectDriver() {
 }
 
 newDriver() {
-	title := translate("Modular Simulator Controller System")
-	prompt := translate("Please enter the name for the new driver (Format: FirstName LastName (NickName))):")
+	title := translate("Team Server")
+	prompt := translate("Please enter the name of the new driver (Format: FirstName LastName (NickName)):")
 	
 	configurator := TeamServerConfigurator.Instance
 	
@@ -750,8 +767,8 @@ deleteDriver() {
 }
 
 renameDriver() {
-	title := translate("Modular Simulator Controller System")
-	prompt := translate("Please enter the new name for the selected driver (Format: FirstName LastName (NickName))):")
+	title := translate("Team Server")
+	prompt := translate("Please enter the new name for the selected driver (Format: FirstName LastName (NickName)):")
 	
 	configurator := TeamServerConfigurator.Instance
 	
@@ -780,8 +797,8 @@ selectSession() {
 }
 
 newSession() {
-	title := translate("Modular Simulator Controller System")
-	prompt := translate("Please enter the name for the new session:")
+	title := translate("Team Server")
+	prompt := translate("Please enter the name of the new session:")
 	
 	configurator := TeamServerConfigurator.Instance
 	
@@ -798,7 +815,7 @@ newSession() {
 }
 
 renameSession() {
-	title := translate("Modular Simulator Controller System")
+	title := translate("Team Server")
 	prompt := translate("Please enter the new name for the selected session:")
 	
 	configurator := TeamServerConfigurator.Instance

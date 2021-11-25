@@ -1,16 +1,16 @@
 [Development]
-Version=3.7.0-rc1
+Version=3.7.0-release
 Target=3.7.0-release
-Date=11/25/2021
-Download=https://www.dropbox.com/s/enl5ylvb37yps9s/Simulator%20Controller%203.7.0-rc1.zip?dl=1
+Date=11/26/2021
+Download=https://bit.ly/3cLMThB
 Changes=New "Team Server" for endurance races, New "Team Server" tab in "Simulator Configuration", New "Team" tab in "Race Settings", Bugfix in "Simulator Setup" for Stream Deck configuration support, Fixed label handling in "Simlator Setup", Fixed several other Bugs in "Simulator Setup", Fixed a bug when using mixed scenarios in "Strategy Workbench", Rework of the voice configuration both for locally installed as well as for Azure voices
 [Release]
-Version=3.6.8-release
-Date=11/12/2021
-Download=https://bit.ly/3qwcKSQ
-Changes=New editor for action labels and icons, Refactoring of the ButtonBoxEditor class, New editor for Stream Deck controller layouts, Updated "Simulator Setup" and "Simulator Configuration" to support the new editors, Revised online documentation for "Simulator Setup"
+Version=3.7.0-release
+Date=11/26/2021
+Download=https://bit.ly/3cLMThB
+Changes=New "Team Server" for endurance races, New "Team Server" tab in "Simulator Configuration", New "Team" tab in "Race Settings", Bugfix in "Simulator Setup" for Stream Deck configuration support, Fixed label handling in "Simlator Setup", Fixed several other Bugs in "Simulator Setup", Fixed a bug when using mixed scenarios in "Strategy Workbench", Rework of the voice configuration both for locally installed as well as for Azure voices
 [Current]
-Type=Development
+Type=Release
 [Version]
-Release=3.6.8-release
-Development=3.7.0-rc1
+Release=3.7.0-release
+Development=3.7.0-release

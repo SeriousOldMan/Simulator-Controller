@@ -51,6 +51,8 @@ This release introduces the new *Team Server*. For this a new [plugin "Team Serv
 
 Some new plugin labels and icon slots have been added to the "ACC" plugin and also for the new "Team Server" plugin. If you are using your own labels and icons, for example for integration with Stream Deck, you may want to check the [*Labels & Icon Editor*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#action-labels--icons) in "Simulator Configuration".
 
+Please note, that with the latest update of ACC V 1.8 by Kunos, the tyre model changed significantly, which leads to different cold tyre pressures and reduced laptimes on most tracks. This renders the data in the Setup- and Telemetry Database almost useless, but you will find a small tool in the #tools-and-fixes channel in our Discord Server, which you can use to correct the data, at least on average.
+
 ***
 
 ## Release 3.6.8

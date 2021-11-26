@@ -118,24 +118,29 @@ namespace Speech {
         }
 
         private async Task<string> SynthesisGetAvailableVoicesAsync() {
-            string voices = "";
+            try {
+                string voices = "";
 
-            var config = SpeechConfig.FromAuthorizationToken(token, region);
+                var config = SpeechConfig.FromAuthorizationToken(token, region);
 
-            using (var synthesizer = new Microsoft.CognitiveServices.Speech.SpeechSynthesizer(config, null)) {
-                using (var result = await synthesizer.GetVoicesAsync()) {
-                    if (result.Reason == ResultReason.VoicesListRetrieved) {
-                        foreach (var voice in result.Voices) {
-                            if (voices.Length > 0)
-                                voices += "|";
+                using (var synthesizer = new Microsoft.CognitiveServices.Speech.SpeechSynthesizer(config, null)) {
+                    using (var result = await synthesizer.GetVoicesAsync()) {
+                        if (result.Reason == ResultReason.VoicesListRetrieved) {
+                            foreach (var voice in result.Voices) {
+                                if (voices.Length > 0)
+                                    voices += "|";
 
-                            voices += voice.Name + " (" + voice.Locale + ")";
+                                voices += voice.Name + " (" + voice.Locale + ")";
+                            }
                         }
                     }
                 }
-            }
 
-            return voices;
+                return voices;
+            }
+            catch (Exception e) {
+                return "";
+            }
         }
     }
 }

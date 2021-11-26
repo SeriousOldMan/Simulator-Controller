@@ -129,6 +129,8 @@ class AssistantsStepWizard extends ActionsStepWizard {
 							switch action {
 								case "RaceAssistant":
 									arguments .= ("; raceAssistant: On " . values2String(A_Space, function*))
+								case "TeamServer":
+									arguments .= ("; teamServer: On " . values2String(A_Space, function*))
 								case "SetupDatabaseOpen":
 									arguments .= ("; openSetupDatabase: " . values2String(A_Space, function*))
 								case "RaceSettingsOpen":

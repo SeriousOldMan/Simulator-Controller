@@ -1,3 +1,7 @@
+## 3.7.1-release 11/26/21
+
+  1. Critical bug fixes for "Simulator Setup"
+
 ## 3.7.0-release 11/26/21
 
   1. Bugfixes, as always

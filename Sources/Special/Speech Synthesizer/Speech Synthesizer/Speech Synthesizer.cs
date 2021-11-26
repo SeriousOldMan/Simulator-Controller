@@ -15,8 +15,8 @@ namespace Speech {
         private string tokenIssuerEndpoint;
         private string subscriptionKey;
 
-        private string token;
-        private string region;
+        private string token = "";
+        private string region = "";
 
         private SpeechConfig config = null;
 
@@ -28,6 +28,9 @@ namespace Speech {
         public bool Connect(string tokenIssuerEndpoint, string subscriptionKey) {
             this.tokenIssuerEndpoint = tokenIssuerEndpoint;
             this.subscriptionKey = subscriptionKey;
+
+            region = tokenIssuerEndpoint.Substring(8);
+            region = region.Substring(0, region.IndexOf(".api."));
 
             try {
                 RenewToken();
@@ -43,10 +46,12 @@ namespace Speech {
             if (DateTime.Now >= nextTokenRenewal) {
                 config = SpeechConfig.FromEndpoint(new System.Uri(tokenIssuerEndpoint), subscriptionKey);
 
-                region = tokenIssuerEndpoint.Substring(8);
-                region = region.Substring(0, region.IndexOf(".api."));
-
-                token = GetToken().Result;
+                try {
+                    token = GetToken().Result;
+                }
+                catch (Exception e) {
+                    token = "";
+                }
                 
                 nextTokenRenewal = new DateTimeOffset(DateTime.Now + new TimeSpan(TimeSpan.TicksPerMinute * 9));
             }

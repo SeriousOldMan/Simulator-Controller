@@ -109,8 +109,8 @@ class ButtonBoxPreview extends ControllerPreview {
 		
 		window := this.Window
 		
-		previewMover := this.PreviewManager.getPreviewMover()
-		previewMover := (previewMover ? ("g" . previewMover) : "")
+		; previewMover := this.PreviewManager.getPreviewMover()
+		; previewMover := (previewMover ? ("g" . previewMover) : "")
 		
 		Gui %window%:-Border -Caption
 		
@@ -119,9 +119,9 @@ class ButtonBoxPreview extends ControllerPreview {
 		Gui %window%:Add, Picture, x-10 y-10, % kButtonBoxImagesDirectory . "Photorealistic\CF Background.png"
 		
 		Gui %window%:Font, s12 Bold cSilver
-		Gui %window%:Add, Text, x0 y8 w%width% h23 +0x200 +0x1 BackgroundTrans %previewMover%, % translate("Modular Simulator Controller System")
+		Gui %window%:Add, Text, x0 y8 w%width% h23 +0x200 +0x1 BackgroundTrans, % translate("Modular Simulator Controller System")
 		Gui %window%:Font, s10 cSilver
-		Gui %window%:Add, Text, x0 y28 w%width% h23 +0x200 +0x1 BackgroundTrans %previewMover%, % this.Name
+		Gui %window%:Add, Text, x0 y28 w%width% h23 +0x200 +0x1 BackgroundTrans, % this.Name
 		Gui %window%:Color, 0x000000
 		Gui %window%:Font, s8 Norm, Arial
 		
@@ -215,10 +215,17 @@ class ButtonBoxPreview extends ControllerPreview {
 			vertical += (rowHeight + this.RowMargin)
 		}
 
-		Gui %window%:Add, Picture, x-10 y-10 %previewMover% 0x4000000, % kButtonBoxImagesDirectory . "Photorealistic\CF Background.png"
-		
 		this.Width := width
 		this.Height := height
+	}
+	
+	createBackground(configuration) {
+		window := this.Window
+		
+		previewMover := this.PreviewManager.getPreviewMover()
+		previewMover := (previewMover ? ("g" . previewMover) : "")
+		
+		Gui %window%:Add, Picture, x-10 y-10 %previewMover% 0x4000000, % kButtonBoxImagesDirectory . "Photorealistic\CF Background.png"
 	}
 	
 	loadFromConfiguration(configuration) {

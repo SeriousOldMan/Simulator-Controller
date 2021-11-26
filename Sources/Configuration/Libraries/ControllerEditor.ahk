@@ -1426,10 +1426,15 @@ class ControllerPreview extends ConfigurationItem {
 		base.__New(configuration)
 		
 		this.createGui(configuration)
+		
+		this.createBackground(configuration)
 	}
 	
 	createGui(configuration) {
 		Throw "Virtual method ControllerPreview.createGui must be implemented in a subclass..."
+	}
+	
+	createBackground(configuration) {
 	}
 	
 	getControl(clickX, clickY, ByRef row, ByRef column, ByRef isEmpty) {

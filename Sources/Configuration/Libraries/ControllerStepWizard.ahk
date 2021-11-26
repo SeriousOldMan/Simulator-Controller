@@ -1215,7 +1215,10 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 			MsgBox 262179, %title%, % translate("Trigger for ") . action . translate("?")
 			OnMessage(0x44, "")
 			
-			currentFunction := this.getActionFunction(mode, action).Clone()
+			currentFunction := this.getActionFunction(mode, action)
+			
+			if currentFunction
+				currentFunction := currentFunction.Clone()
 			
 			IfMsgBox Cancel
 				function := false

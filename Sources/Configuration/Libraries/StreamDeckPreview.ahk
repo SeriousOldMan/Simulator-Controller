@@ -128,9 +128,6 @@ class StreamDeckPreview extends ControllerPreview {
 		
 		Gui %window%:+LabelstreamDeck
 		
-		previewMover := this.PreviewManager.getPreviewMover()
-		previewMover := (previewMover ? ("g" . previewMover) : "")
-		
 		Gui %window%:Add, Picture, x0 y0, % (kStreamDeckImagesDirectory . "Stream Deck " . this.Size . ".jpg")
 		
 		Gui %window%:Color, 0x000000
@@ -172,9 +169,16 @@ class StreamDeckPreview extends ControllerPreview {
 			y += (this.kRowMargin + this.kButtonHeight)
 		}
 		
-		Gui %window%:Add, Picture, x0 y0 %previewMover% 0x4000000, % (kStreamDeckImagesDirectory . "Stream Deck " . this.Size . ".jpg")
-		
 		this.updateButtons()
+	}
+	
+	createBackground(configuration) {
+		window := this.Window
+		
+		previewMover := this.PreviewManager.getPreviewMover()
+		previewMover := (previewMover ? ("g" . previewMover) : "")
+		
+		Gui %window%:Add, Picture, x0 y0 %previewMover% 0x4000000, % (kStreamDeckImagesDirectory . "Stream Deck " . this.Size . ".jpg")
 	}
 	
 	getButton(row, column) {

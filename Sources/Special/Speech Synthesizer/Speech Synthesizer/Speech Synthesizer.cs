@@ -14,11 +14,10 @@ namespace Speech {
     public class SpeechSynthesizer {
         private string tokenIssuerEndpoint;
         private string subscriptionKey;
-
-        private string token = "";
         private string region = "";
 
         private SpeechConfig config = null;
+        private string token = null;
 
         private DateTimeOffset nextTokenRenewal = DateTime.Now - new TimeSpan(0, 10, 0);
 
@@ -43,44 +42,41 @@ namespace Speech {
         }
 
         private void RenewToken() {
-            if (DateTime.Now >= nextTokenRenewal) {
+            if (token == null || DateTime.Now >= nextTokenRenewal) {
                 config = SpeechConfig.FromEndpoint(new System.Uri(tokenIssuerEndpoint), subscriptionKey);
 
                 try {
-                    token = GetToken().Result;
+                    token = GetToken();
                 }
                 catch (Exception e) {
-                    token = "";
+                    token = null;
                 }
                 
                 nextTokenRenewal = new DateTimeOffset(DateTime.Now + new TimeSpan(TimeSpan.TicksPerMinute * 9));
             }
         }
 
-        public async Task<string> GetToken() {
-            using (var client = new HttpClient()) {
-                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", subscriptionKey);
-                UriBuilder uriBuilder = new UriBuilder(tokenIssuerEndpoint);
+        public string GetToken() {
+            var httpClient = new HttpClient();
+            
+            httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", subscriptionKey);
 
-                using (var result = await client.PostAsync(uriBuilder.Uri.AbsoluteUri, null)) {
-                    if (result.IsSuccessStatusCode) {
-                        return await result.Content.ReadAsStringAsync();
-                    }
-                    else {
-                        throw new HttpRequestException($"Cannot get token from {uriBuilder.ToString()}. Error: {result.StatusCode}");
-                    }
-                }
-            }
+            var result = httpClient.PostAsync(tokenIssuerEndpoint, null).Result;
+            
+            if (result.IsSuccessStatusCode)
+                return result.Content.ReadAsStringAsync().Result;
+            else
+                throw new HttpRequestException($"Cannot get token from {tokenIssuerEndpoint}. Error: {result.StatusCode}");
         }
 
         private bool finished = false;
         private bool failed = false;
 
         private bool SynthesizeAudio(string outputFile, bool isSsml, string text) {
+            RenewToken();
+
             using var audioConfig = AudioConfig.FromWavFileOutput(outputFile);
             using var synthesizer = new Microsoft.CognitiveServices.Speech.SpeechSynthesizer(config, audioConfig);
-
-            RenewToken();
 
             finished = false;
 			failed = false;
@@ -126,7 +122,7 @@ namespace Speech {
             try {
                 string voices = "";
 
-                var config = SpeechConfig.FromAuthorizationToken(token, region);
+                var config = SpeechConfig.FromSubscription(subscriptionKey, region);
 
                 using (var synthesizer = new Microsoft.CognitiveServices.Speech.SpeechSynthesizer(config, null)) {
                     using (var result = await synthesizer.GetVoicesAsync()) {
@@ -135,7 +131,7 @@ namespace Speech {
                                 if (voices.Length > 0)
                                     voices += "|";
 
-                                voices += voice.Name + " (" + voice.Locale + ")";
+                                voices += voice.ShortName + " (" + voice.Locale + ")";
                             }
                         }
                     }

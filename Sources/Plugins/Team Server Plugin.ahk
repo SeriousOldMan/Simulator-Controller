@@ -517,11 +517,14 @@ class TeamServerPlugin extends ControllerPlugin {
 		}
 	}
 	
-	getLapValue(lap, name) {
-		if this.SessionActive {
+	getLapValue(lap, name, session := false) {
+		if (!session && this.SessionActive)
+			session := this.Session
+		
+		if session {
 			try {
 				if lap is integer
-					value := this.Connector.GetSessionLapValue(this.Session, lap, name)
+					value := this.Connector.GetSessionLapValue(session, lap, name)
 				else
 					value := this.Connector.GetLapValue(lap, name)
 
@@ -531,26 +534,29 @@ class TeamServerPlugin extends ControllerPlugin {
 				return value
 			}
 			catch exception {
-				logMessage(kLogCritical, translate("Error while fetching lap data (Session: ") . this.Session . translate(", Lap: ") . lap . translate(", Name: ") . name . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+				logMessage(kLogCritical, translate("Error while fetching lap data (Session: ") . session . translate(", Lap: ") . lap . translate(", Name: ") . name . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
 			}
 		}
 		
 		return false
 	}
 	
-	setLapValue(lap, name, value) {
-		if this.SessionActive {
+	setLapValue(lap, name, value, session := false) {
+		if (!session && this.SessionActive)
+			session := this.Session
+		
+		if session {
 			try {
 				if isDebug()
 					showMessage("Saving value for lap " . lap . ": " . name . " => " . value)
 				
 				if lap is integer
-					this.Connector.SetSessionLapValue(this.Session, lap, name, value)
+					this.Connector.SetSessionLapValue(session, lap, name, value)
 				else
 					this.Connector.SetLapValue(lap, name, value)
 			}
 			catch exception {
-				logMessage(kLogCritical, translate("Error while storing lap data (Session: ") . this.Session . translate(", Lap: ") . lap . translate(", Name: ") . name . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+				logMessage(kLogCritical, translate("Error while storing lap data (Session: ") . session . translate(", Lap: ") . lap . translate(", Name: ") . name . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
 			}
 		}
 	}

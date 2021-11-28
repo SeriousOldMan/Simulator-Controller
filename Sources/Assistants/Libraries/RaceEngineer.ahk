@@ -31,6 +31,56 @@ class RaceEngineer extends RaceAssistant {
 	iSetupData := {}
 	iSessionDataActive := false
 	
+	class RaceEngineerRemoteHandler extends RaceAssistant.RaceAssistantRemoteHandler {
+		__New(remotePID) {
+			base.__New("Race Engineer", remotePID)
+		}
+		
+		pitstopPlanned(arguments*) {
+			this.callRemote("pitstopPlanned", arguments*)
+		}
+		
+		pitstopPrepared(arguments*) {
+			this.callRemote("pitstopPrepared", arguments*)
+		}
+		
+		pitstopFinished(arguments*) {
+			this.callRemote("pitstopFinished", arguments*)
+		}
+		
+		startPitstopSetup(arguments*) {
+			this.callRemote("startPitstopSetup", arguments*)
+		}
+
+		finishPitstopSetup(arguments*) {
+			this.callRemote("finishPitstopSetup", arguments*)
+		}
+
+		setPitstopRefuelAmount(arguments*) {
+			this.callRemote("setPitstopRefuelAmount", arguments*)
+		}
+		
+		setPitstopTyreSet(arguments*) {
+			this.callRemote("setPitstopTyreSet", arguments*)
+		}
+
+		setPitstopTyrePressures(arguments*) {
+			this.callRemote("setPitstopTyrePressures", arguments*)
+		}
+
+		requestPitstopRepairs(arguments*) {
+			this.callRemote("requestPitstopRepairs", arguments*)
+		}
+		
+		savePressureData(arguments*) {
+			this.callRemote("savePressureData", arguments*)
+		}
+		
+		updateSetupDatabase(arguments*) {
+			this.callRemote("updateSetupDatabase", arguments*)
+		}
+	}
+	
 	AdjustLapTime[] {
 		Get {
 			return this.iAdjustLapTime
@@ -852,8 +902,8 @@ class RaceEngineer extends RaceAssistant {
 			lastValid := knowledgeBase.getValue("Lap." . (lapNumber - 1) . ".Valid", true)
 		
 			if (lastValid && currentCompound && (currentCompound = targetCompound) && (currentCompoundColor = targetCompoundColor))
-				this.updateSetupData(knowledgeBase.getValue("Session.Simulator"), knowledgeBase.getValue("Session.Car"), knowledgeBase.getValue("Session.Track")
-								   , weatherNow, airTemperature, trackTemperature, currentCompound, currentCompoundColor)
+				this.savePressureData(lapNumber, knowledgeBase.getValue("Session.Simulator"), knowledgeBase.getValue("Session.Car"), knowledgeBase.getValue("Session.Track")
+									, weatherNow, airTemperature, trackTemperature, currentCompound, currentCompoundColor, targetCompound, targetCompoundColor)
 		}
 		
 		return result
@@ -944,21 +994,34 @@ class RaceEngineer extends RaceAssistant {
 		return result
 	}
 	
-	updateSetupData(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor) {
+	savePressureData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature, currentCompound, currentCompoundColor, targetCompound, targetCompoundColor) {
 		local knowledgeBase := this.KnowledgeBase
 		
 		this.iSessionDataActive := true
 		
 		try {
-			targetPressures := Array(Round(knowledgeBase.getValue("Tyre.Pressure.Target.FL"), 1)
-								   , Round(knowledgeBase.getValue("Tyre.Pressure.Target.FR"), 1)
-								   , Round(knowledgeBase.getValue("Tyre.Pressure.Target.RL"), 1)
-								   , Round(knowledgeBase.getValue("Tyre.Pressure.Target.RR"), 1))
+			if this.RemoteHandler {
+				coldPressures := Array(Round(knowledgeBase.getValue("Tyre.Pressure.Target.FL"), 1)
+									 , Round(knowledgeBase.getValue("Tyre.Pressure.Target.FR"), 1)
+									 , Round(knowledgeBase.getValue("Tyre.Pressure.Target.RL"), 1)
+									 , Round(knowledgeBase.getValue("Tyre.Pressure.Target.RR"), 1))
+				
+				hotPressures := Array(Round(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Temperature.FL"), 1)
+									, Round(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Temperature.FR"), 1)
+									, Round(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Temperature.RL"), 1)
+									, Round(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Temperature.RR"), 1))
+				
+				this.RemoteHandler.savePressureData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
+												  , currentCompound, currentCompoundColor, values2String(",", coldPressures*), values2String(",", hotPressures*))
+			}
+			
+			/*
+			descriptor := ConfigurationItem.descriptor(simulator, track, car, currentCompound, currentCompoundColor, airTemperature, trackTemperature, weather)
 			
 			if (compoundColor = "Black")
-				descriptor := ConfigurationItem.descriptor(simulator, track, car, compound, airTemperature, trackTemperature, weather)
+				descriptor := ConfigurationItem.descriptor(simulator, track, car, currentCompound, airTemperature, trackTemperature, weather)
 			else
-				descriptor := ConfigurationItem.descriptor(simulator, track, car, compound, compoundColor, airTemperature, trackTemperature, weather)
+				descriptor := ConfigurationItem.descriptor(simulator, track, car, currentCompound, currentCompoundColor, airTemperature, trackTemperature, weather)
 			
 			if this.SetupData.HasKey(descriptor)
 				setupData := this.SetupData[descriptor]
@@ -969,10 +1032,11 @@ class RaceEngineer extends RaceAssistant {
 			}
 			
 			for ignore, tyre in ["FL", "FR", "RL", "RR"] {
-				pressure := (tyre . ":" . targetPressures[A_Index])
+				pressure := (tyre . ":" . coldPressures[A_Index])
 				
 				setupData[pressure] := (setupData.HasKey(pressure) ? (setupData[pressure] + 1) : 1)
 			}
+			*/
 		}
 		finally {
 			this.iSessionDataActive := false
@@ -1049,6 +1113,10 @@ class RaceEngineer extends RaceAssistant {
 		local compound
 		
 		if this.KnowledgeBase
+			if this.RemoteHandler
+				this.RemoteHandler.updateSetupDatabase()
+			
+			/*
 			for descriptor, pressures in this.SetupData {
 				descriptor := ConfigurationItem.splitDescriptor(descriptor)
 			
@@ -1072,6 +1140,7 @@ class RaceEngineer extends RaceAssistant {
 				
 				this.SetupDatabase.updatePressures(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor, pressures)
 			}
+			*/
 		
 		this.updateDynamicValues({SetupData: {}})
 	}

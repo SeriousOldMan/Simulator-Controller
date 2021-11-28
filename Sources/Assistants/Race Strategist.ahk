@@ -102,7 +102,6 @@ startRaceStrategist() {
 	Menu Tray, Tip, Race Strategist
 	
 	remotePID := 0
-	remoteHandle := false
 	strategistName := "Cato"
 	strategistLogo := false
 	strategistLanguage := false

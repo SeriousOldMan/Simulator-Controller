@@ -333,7 +333,6 @@ priority: 5, {Any: [?Damage.Bodywork = 0], {None: [?Damage.Bodywork]}} => (Clear
 {All: [?Lap], [?Damage.Suspension > 0]} => (Prove: lapTimeDamageImpact(?Lap, Suspension, !Damage.Supsension))
 {All: [?Lap], [?Damage.Bodywork > 0]} => (Prove: lapTimeDamageImpact(?Lap, Bodywork, !Damage.Bodywork))
 
-
 lapTimeDamageImpact(?lap, ?damageType, ?damage) <= recentPitstopLap(?lap), !, fail
 lapTimeDamageImpact(?lap, ?damageType, ?damage) <=																								\
 		lapAvgTime(?lap, ?lTime), preDamageLap(?damageType, ?damage, ?pdLap), lapAvgTime(?pdLap, ?pdTime),										\
@@ -726,6 +725,22 @@ pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Tyre.Pressure.RR, !P
 pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Tyre.Pressure.Correction, !Pitstop.Planned.Tyre.Pressure.Correction)
 pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Repair.Suspension, !Pitstop.Planned.Repair.Suspension)
 pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Repair.Bodywork, !Pitstop.Planned.Repair.Bodywork)
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                          After Pitstop Cleanup                          ;;;
+;;;                                                                         ;;;
+;;; These rules remove knowledge that is no longer needed after a pitstop.  ;;;
+;;;-------------------------------------------------------------------------;;;
+
+[?Pitstop.Lap] => (Set: Pitstop.Cleanup, ?Pitstop.Lap)
+
+priority: -40, [?Pitstop.Cleanup] => (Prove: clearLaps(?Pitstop.Cleanup, !Session.Settings.Lap.History.Considered))
+priority: -50, [?Pitstop.Cleanup] => (Clear: Pitstop.Cleanup)
+
+clearLaps(?lap, deltaLaps) <= ?previousLap = ?lap - 1, ?clearLap = ?previousLap - ?deltaLaps, clearLaps(?clearLap)
+
+clearLaps(?lap) <= clearLapData(?lap), ?previousLap = ?lap - 1, clearLaps(?previousLap)
 
 
 ;;;-------------------------------------------------------------------------;;;

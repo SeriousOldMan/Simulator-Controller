@@ -262,37 +262,31 @@ namespace TeamServer.Server {
 		#endregion
 
 		#region Operations
-		public string GetLapValue(Lap lap, string name)
-		{
+		public string GetLapValue(Lap lap, string name) {
 			ValidateLap(lap);
 
 			return ObjectManager.GetAttributeAsync(lap, name).Result;
 		}
 
-		public string GetLapValue(Guid identifier, string name)
-		{
+		public string GetLapValue(Guid identifier, string name) {
 			return GetLapValue(ObjectManager.GetLapAsync(identifier).Result, name);
 		}
 
-		public string GetLapValue(string identifier, string name)
-		{
+		public string GetLapValue(string identifier, string name) {
 			return GetLapValue(new Guid(identifier), name);
 		}
 
-		public void SetLapValue(Lap lap, string name, string value)
-		{
+		public void SetLapValue(Lap lap, string name, string value) {
 			ValidateLap(lap);
 
 			ObjectManager.SetAttributeAsync(lap, name, value);
 		}
 
-		public void SetLapValue(Guid identifier, string name, string value)
-		{
+		public void SetLapValue(Guid identifier, string name, string value) {
 			SetLapValue(ObjectManager.GetLapAsync(identifier).Result, name, value);
 		}
 
-		public void SetLapValue(string identifier, string name, string value)
-		{
+		public void SetLapValue(string identifier, string name, string value) {
 			SetLapValue(new Guid(identifier), name, value);
 		}
 		#endregion

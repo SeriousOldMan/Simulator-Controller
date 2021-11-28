@@ -18,7 +18,6 @@
 
 #Include ..\Libraries\RuleEngine.ahk
 #Include ..\Assistants\Libraries\RaceAssistant.ahk
-#Include ..\Assistants\Libraries\TelemetryDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -33,6 +32,28 @@ class RaceStrategist extends RaceAssistant {
 	
 	iSessionReportsDatabase := false
 	iSessionDataActive := false
+	
+	class RaceStrategistRemoteHandler extends RaceAssistant.RaceAssistantRemoteHandler {
+		__New(remotePID) {
+			base.__New("Race Strategist", remotePID)
+		}
+		
+		saveStandingsData(arguments*) {
+			this.callRemote("saveStandingsData", arguments*)
+		}
+		
+		createRaceReport(arguments*) {
+			this.callRemote("createRaceReport", arguments*)
+		}
+		
+		saveTelemetryData(arguments*) {
+			this.callRemote("saveTelemetryData", arguments*)
+		}
+		
+		updateTelemetryDatabase(arguments*) {
+			this.callRemote("updateTelemetryDatabase", arguments*)
+		}
+	}
 	
 	Strategy[] {
 		Get {
@@ -590,6 +611,7 @@ class RaceStrategist extends RaceAssistant {
 	}
 	
 	addLap(lapNumber, data) {
+		local compound
 		local knowledgeBase
 		
 		static strategyReported := 0
@@ -601,6 +623,8 @@ class RaceStrategist extends RaceAssistant {
 			strategyReported := false
 		
 		result := base.addLap(lapNumber, data)
+		
+		knowledgeBase := this.KnowledgeBase
 		
 		if (this.Speaker && (lapNumber > 1) && (currentDriver != this.DriverFullName)) {
 			Process Exist, Race Engineer.exe
@@ -616,6 +640,48 @@ class RaceStrategist extends RaceAssistant {
 			strategyReported := lapNumber
 			
 			this.setContinuation(ObjBindMethod(this, "reportStrategy"))
+		}
+		
+		if this.hasEnoughData(false) {
+			simulator := knowledgeBase.getValue("Session.Simulator")
+			car := knowledgeBase.getValue("Session.Car")
+			track := knowledgeBase.getValue("Session.Track")
+			
+			pitstop := knowledgeBase.getValue("Pitstop.Last", false)
+			
+			if pitstop
+				pitstop := (lapNumber == (knowledgeBase.getValue("Pitstop." . pitstop . ".Lap") + 1))
+			
+			prefix := "Lap." . lapNumber
+				
+			if knowledgeBase.getValue(prefix . ".Valid", true) {
+				weather := knowledgeBase.getValue(prefix . ".Weather")
+				airTemperature := knowledgeBase.getValue(prefix . ".Temperature.Air")
+				trackTemperature := knowledgeBase.getValue(prefix . ".Temperature.Track")
+				compound := knowledgeBase.getValue(prefix . ".Tyre.Compound")
+				compoundColor := knowledgeBase.getValue(prefix . ".Tyre.Compound.Color")
+				fuelConsumption := Round(knowledgeBase.getValue(prefix . ".Fuel.Consumption"), 1)
+				fuelRemaining := Round(knowledgeBase.getValue(prefix . ".Fuel.Remaining"), 1)
+				lapTime := Round(knowledgeBase.getValue(prefix . ".Time") / 1000, 1)
+				
+				map := knowledgeBase.getValue(prefix . ".Map")
+				tc := knowledgeBase.getValue(prefix . ".TC")
+				abs := knowledgeBase.getValue(prefix . ".ABS")
+				
+				pressures := values2String("," Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.FL"), 1)
+											 , Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.FR"), 1)
+											 , Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.RL"), 1)
+											 , Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.RR"), 1))
+				
+				temperatures := values2String("," Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.FL"), 1)
+												, Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.FR"), 1)
+												, Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.RL"), 1)
+												, Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.RR"), 1))
+				
+				this.saveTelemetryData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
+									 , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs,
+									 , compound, compoundColor, pressures, temperatures)
+			}
 		}
 		
 		return result
@@ -987,7 +1053,7 @@ class RaceStrategist extends RaceAssistant {
 				this.saveSessionReport()
 			
 			if ((this.SaveTelemetry = ((phase = "After") ? kAsk : kAlways)))
-				this.saveTelemetryData()
+				this.updateTelemetryDatabase()
 		}
 		finally {
 			this.iSessionDataActive := false
@@ -1096,65 +1162,18 @@ class RaceStrategist extends RaceAssistant {
 		}
 	}
 
-	saveTelemetryData() {
-		local compound
-		local knowledgeBase := this.KnowledgeBase
-		
-		if knowledgeBase {
-			simulator := knowledgeBase.getValue("Session.Simulator")
-			car := knowledgeBase.getValue("Session.Car")
-			track := knowledgeBase.getValue("Session.Track")
-			
-			pitstops := []
-			
-			Loop % knowledgeBase.getValue("Pitstop.Last", 0)
-				pitstops.Push(knowledgeBase.getValue("Pitstop." . A_Index . ".Lap") + 1)
-
-			telemetryDB := new TelemetryDatabase(simulator, car, track)
-			
-			runningLap := 0
-			
-			Loop % knowledgeBase.getValue("Lap")
-			{
-				if inList(pitstops, A_Index)
-					runningLap := 0
-				
-				runningLap += 1
-				prefix := "Lap." . A_Index
-				
-				if knowledgeBase.getValue(prefix . ".Valid", true) {
-					weather := knowledgeBase.getValue(prefix . ".Weather")
-					airTemperature := knowledgeBase.getValue(prefix . ".Temperature.Air")
-					trackTemperature := knowledgeBase.getValue(prefix . ".Temperature.Track")
-					compound := knowledgeBase.getValue(prefix . ".Tyre.Compound")
-					compoundColor := knowledgeBase.getValue(prefix . ".Tyre.Compound.Color")
-					fuelConsumption := Round(knowledgeBase.getValue(prefix . ".Fuel.Consumption"), 1)
-					fuelRemaining := Round(knowledgeBase.getValue(prefix . ".Fuel.Remaining"), 1)
-					lapTime := Round(knowledgeBase.getValue(prefix . ".Time") / 1000, 1)
-					
-					map := knowledgeBase.getValue(prefix . ".Map")
-					tc := knowledgeBase.getValue(prefix . ".TC")
-					abs := knowledgeBase.getValue(prefix . ".ABS")
-					
-					telemetryDB.addElectronicEntry(weather, airTemperature, trackTemperature, compound, compoundColor
-												 , map, tc, abs, fuelRemaining, fuelConsumption, lapTime)
-					
-					flPressure := Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.FL"), 1)
-					frPressure := Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.FR"), 1)
-					rlPressure := Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.RL"), 1)
-					rrPressure := Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.RR"), 1)
-					
-					flTemperature := Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.FL"), 1)
-					frTemperature := Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.FR"), 1)
-					rlTemperature := Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.RL"), 1)
-					rrTemperature := Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.RR"), 1)
-					
-					telemetryDB.addTyreEntry(weather, airTemperature, trackTemperature, compound, compoundColor, runningLap
-										   , flPressure, frPressure, rlPressure, rrPressure, flTemperature, frTemperature, rlTemperature, rrTemperature
-										   , fuelRemaining, fuelConsumption, lapTime)
-				}
-			}
-		}
+	saveTelemetryData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
+					, fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
+					, compound, compoundColor, pressures, temperatures) {
+		if this.RemoteHandler
+			this.RemoteHandler.saveTelemetryData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
+											   , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs,
+											   , compound, compoundColor, pressures, temperatures)
+	}
+	
+	updateTelemetryDatabase() {
+		if this.RemoteHandler
+			this.RemoteHandler.updateTelemetryDatabase()
 	}
 }
 

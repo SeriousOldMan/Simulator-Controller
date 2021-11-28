@@ -10,6 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Plugins\Libraries\RaceAssistantPlugin.ahk
+#Include ..\Assistants\Libraries\TelemetryDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -20,10 +21,19 @@ global kRaceStrategistPlugin = "Race Strategist"
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                        Private Constant Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 class RaceStrategistPlugin extends RaceAssistantPlugin  {
+	static kLapDataSchemas := {Telemetry: ["Lap", "Simulator", "Car", "Track", "Weather", "Temperature.Air", "Temperature.Track"
+										 , "Fuel.Consumption", "Fuel.Remaining", "LapTime", "Pitstop", "Map", "TC", "ABS"
+										 , "Compound", "Compound.Color", "Pressures", "Temperatures"]}
+										 
 	class RemoteRaceStrategist extends RaceAssistantPlugin.RemoteRaceAssistant {
 		__New(remotePID) {
 			base.__New("Race Strategist", remotePID)
@@ -52,6 +62,15 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	RaceStrategist[] {
 		Get {
 			return this.RaceAssistant
+		}
+	}
+	
+	LapDatabase[] {
+		Get {
+			if !this.iLapDatabase
+				this.iLapDatabase := new Database(false, this.kLapDataSchemas)
+			
+			return this.iLapDatabase
 		}
 	}
 	
@@ -89,6 +108,12 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		return new this.RemoteRaceStrategist(pid)
 	}
 	
+	startSession(settingsFile, dataFile, teamSession) {
+		base.startSession(settingsFile, dataFile, teamSession)
+		
+		this.iLapDatabase := false
+	}
+	
 	requestInformation(arguments*) {
 		if (this.RaceStrategist && inList(["LapsRemaining", "Weather", "Position", "LapTimes", "GapToFront", "GapToBehind", "GapToFrontStandings", "GapToBehindStandings", "GapToFrontTrack", "GapToBehindTrack", "GapToLeader", "StrategyOverview", "NextPitstop"], arguments[1])) {
 			this.RaceStrategist.requestInformation(arguments*)
@@ -122,6 +147,93 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			setConfigurationSectionValues(positionsData, "Position Data", getConfigurationSectionValues(data, "Position Data", Object()))
 		
 		return data
+	}
+	
+	saveTelemetryData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
+					, fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
+					, compound, compoundColor, pressures, temperatures) {
+		teamServer := this.TeamServer
+		
+		if (teamServer && teamServer.SessionActive)
+			teamServer.setLapValue(lapNumber, this.Plugin . " Telemetry"
+								 , values2String(";", simulator, car, track, weather, airTemperature, trackTemperature
+								 , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs,
+								 , currentCompound, currentCompoundColor, pressures, temperatures))
+		else
+			this.LapDatabase.add("Telemetry", {Lap: lapNumber, Simulator: simulator, Car: car, Track: track
+											 , Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
+											 , "Fuel.Consumption": fuelConsumption, "Fuel.Remaining": fuelRemaining, LapTime: lapTime
+											 , Pitstop: pitstop, Map: map, TC: tc, ABS: abs
+											 , "Compound": compound, "Compound.Color": compoundColor, Pressures: pressures, Temperatures: temperatures})
+	}
+
+	updateTelemetryDatabase() {
+		telemetryDB := false
+		teamServer := this.TeamServer
+		session := this.TeamSession
+		
+		runningLap := 0
+			
+		if (teamServer && teamServer.Active && session)
+			Loop {
+				try {
+					telemetryData := string2Values(";", teamServer.getLapValue(A_Index, this.Plugin . " Telemetry", session))
+					
+					if !telemetryDB
+						telemetryDB := new TelemetryDatabase(telemetryData[1], telemetryData[2], telemetryData[3])
+					
+					if telemetryData[10]
+						runningLap := 0
+					
+					runningLap += 1
+					
+					pressures := string2Values(",", telemetryData[16])
+					temperatures := string2Values(",", telemetryData[13])
+					
+					telemetryDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15]
+												 , telemetryData[11], telemetryData[12], telemetryData[13], telemetryData[7], telemetryData[8], telemetryData[9])
+												 
+					telemetryDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15], runningLap
+										   , pressures[1], pressures[2], pressures[4], pressures[4]
+										   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
+										   , telemetryData[7], telemetryData[8], telemetryData[9])
+				}
+				catch exception {
+					break
+				}
+				finally {
+					setupDB.flush()
+				}
+			}
+		else
+			try {
+				for ignore, telemetryData in this.LapDatabase.Tables["Telemetry"] {
+					if !telemetryDB
+						telemetryDB := new TelemetryDatabase(telemetryData.Simulator, telemetryData.Car, telemetryData.Track)
+					
+					if telemetryData.Pitstop
+						runningLap := 0
+					
+					runningLap += 1
+					
+					telemetryDB.addElectronicEntry(telemetryData.Weather, telemetryData["Temperature.Air"], telemetryData["Temperature.Track"]
+												 , telemetryData.Compound, telemetryData["Compound.Color"]
+												 , telemetryData.Map, telemetryData.TC, telemetryData.ABS
+												 , telemetryData["Fuel.Consumption"], telemetryData["Fuel.Remaining"], telemetryData.LapTime)
+					
+					pressures := string2Values(",", telemetryData.Pressures)
+					temperatures := string2Values(",", telemetryData.Temperatures)
+					
+					telemetryDB.addTyreEntry(telemetryData.Weather, telemetryData["Temperature.Air"], telemetryData["Temperature.Track"]
+										   , telemetryData.Compound, telemetryData["Compound.Color"], runningLap
+										   , pressures[1], pressures[2], pressures[4], pressures[4]
+										   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
+										   , telemetryData["Fuel.Consumption"], telemetryData["Fuel.Remaining"], telemetryData.LapTime)
+				}
+			}
+			finally {
+				setupDB.flush()
+			}
 	}
 }
 

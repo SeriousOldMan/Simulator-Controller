@@ -10,6 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Plugins\Libraries\RaceAssistantPlugin.ahk
+#Include ..\Assistants\Libraries\SetupDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -20,18 +21,13 @@ global kRaceEngineerPlugin = "Race Engineer"
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                        Private Constant Section                         ;;;
-;;;-------------------------------------------------------------------------;;;
-
-global kLapDataSchemas := {Pressures: ["Lap", "Simulator", "Car", "Track", "Weather", "Temperature.Air", "Temperature.Track"
-									 , "Compound", "Compound.Color", "Pressures.Cold", "Pressues.Hot"]}
-
-
-;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 class RaceEngineerPlugin extends RaceAssistantPlugin  {
+	static kLapDataSchemas := {Pressures: ["Lap", "Simulator", "Car", "Track", "Weather", "Temperature.Air", "Temperature.Track"
+										 , "Compound", "Compound.Color", "Pressures.Cold", "Pressues.Hot"]}
+										 
 	iPitstopPending := false
 	
 	iLapDatabase := false
@@ -74,7 +70,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 	LapDatabase[] {
 		Get {
 			if !this.iLapDatabase
-				this.iLapDatabase := new Database(false, kLapDataSchemas)
+				this.iLapDatabase := new Database(false, this.kLapDataSchemas)
 			
 			return this.iLapDatabase
 		}

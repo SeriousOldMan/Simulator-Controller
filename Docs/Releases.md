@@ -1,3 +1,11 @@
+## 3.7.2-release 12/03/21 (planned)
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Full refactoring of the Setup Database persistant storage - now uses the Database engine
+  4. Vastly reduced memory consumption of assistants in endurance races
+  5. Fixed pitstop handling for ACC 1.8
+
 ## 3.7.1-release 11/26/21
 
   1. Critical bug fixes for "Simulator Setup"

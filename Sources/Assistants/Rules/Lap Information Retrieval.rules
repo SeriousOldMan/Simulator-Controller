@@ -140,7 +140,7 @@ recentLapWeathers(?, !Session.Settings.Lap.History.Considered, []) <= !
 recentLapWeathers(?lap, ?offset, [?weather | ?weathers]) <=																						\
 		?tLap = ?lap - ?offset, lapWeather(?tLap, ?tWeather), ?nOffset = ?offset + 1, recentLapWeathers(?lap, ?nOffset, ?weathers)
 		
-clearLapData(?lap) <= Get(Lap, ?lap, Driver.Forname, ?temp),																					\
+clearLapData(?lap) <= Append(Lap, ?lap, Driver.Forname, ?fact), fact?(?fact),																	\
 					  clearLapData(?lap, [Driver.Forname, Driver.Surname, Driver.Nickname, 														\
 										  Map, TC, ABS, Tyre.Compound, Tyre.Compound.Color, Valid, 												\
 										  Time, Time.Start, Time.End, Fuel.Remaining, Fuel.Consumption, Fuel.AvgConsumption, 					\
@@ -151,4 +151,4 @@ clearLapData(?lap) <= Get(Lap, ?lap, Driver.Forname, ?temp),																				
 
 clearLapData(?lap, []) <= !
 clearLapData(?lap, [?fact | ?facts]) <= clearLapData(?lap, ?fact), clearLapData(?lap, ?facts)
-clearLapData(?lap, ?suffix) <= Append(Lap, ?lap, ?suffix, ?fact), Clear(?fact)
+clearLapData(?lap, ?name) <= Append(Lap, ?lap, ?name, ?fact), Clear(?fact)

@@ -395,8 +395,8 @@ class TeamServerConfigurator extends ConfigurationItem {
 			for ignore, identifier in string2Values(";", connector.GetTeamDrivers(this.Teams[this.SelectedTeam])) {
 				try {
 					driver := this.parseObject(connector.GetDriver(identifier))
-					
-					name := (driver.ForName . A_Space . driver.SurName . A_Space . translate("(") . driver.NickName . translate(")"))
+				
+					name := computeDriverName(driver.ForName, driver.SurName, driver.NickName)
 					
 					this.iDrivers[name] := driver.Identifier
 				}
@@ -633,6 +633,21 @@ class TeamServerConfigurator extends ConfigurationItem {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+computeDriverName(forName, surName, nickName) {
+	name := ""
+	
+	if (forName != "")
+		name .= (forName . A_Space)
+	
+	if (surName != "")
+		name .= (surName . A_Space)
+	
+	if (nickName != "")
+		name .= (translate("(") . nickName . translate(")"))
+	
+	return Trim(name)
+}
 
 copyURL() {
 	GuiControlGet teamServerURLEdit

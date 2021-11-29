@@ -880,7 +880,7 @@ class RaceEngineer extends RaceAssistant {
 		if (this.Speaker && (lapNumber > 1) && (currentDriver != this.DriverFullName))
 			this.getSpeaker().speakPhrase("WelcomeBack")
 		
-		if this.hasEnoughData(false) {
+		if (this.hasEnoughData(false) && (this.SaveTyrePressures != kNever)) {
 			knowledgeBase := this.KnowledgeBase
 		
 			currentCompound := knowledgeBase.getValue("Tyre.Compound", false)
@@ -1029,7 +1029,7 @@ class RaceEngineer extends RaceAssistant {
 				this.saveSessionSettings()
 			
 			if ((this.SaveTyrePressures = ((phase = "After") ? kAsk : kAlways)) && this.HasPressureData)
-				this.saveTyrePressureData()
+				this.updateSetupDatabase()
 		}
 		finally {
 			this.iSessionDataActive := false
@@ -1087,7 +1087,7 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 
-	saveTyrePressureData() {
+	updateSetupDatabase() {
 		if this.RemoteHandler
 			this.RemoteHandler.updateSetupDatabase()
 		

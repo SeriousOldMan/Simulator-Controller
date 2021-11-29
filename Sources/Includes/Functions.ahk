@@ -672,9 +672,15 @@ shareSetupDatabase() {
 					
 							FileCreateDir %kTempDirectory%SetupDabase\%simulator%\%car%\%track%
 							
-							if shareTyrePressures
+							if shareTyrePressures {
 								Loop Files, %kDatabaseDirectory%Local\%simulator%\%car%\%track%\Tyre Setup*.*
 									FileCopy %A_LoopFilePath%, %kTempDirectory%SetupDabase\%simulator%\%car%\%track%
+								
+								distFile := (kDatabaseDirectory . "Local\" . simulator . "\" . car . "\" . track . "\Setup.Pressures.Distribution.CSV")
+								
+								if FileExist(distFile)
+									FileCopy %distFile%, %kTempDirectory%SetupDabase\%simulator%\%car%\%track%
+							}
 							
 							if shareCarSetups {
 								try {

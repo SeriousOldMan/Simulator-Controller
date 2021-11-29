@@ -235,6 +235,199 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 				setupDB.flush()
 			}
 	}
+	
+	saveRaceInfo(fileName) {
+		teamServer := this.TeamServer
+		
+		if (teamServer && teamServer.SessionActive) {
+			FileRead info, %fileName%
+			
+			teamServer.setLapValue(1, this.Plugin . " Race Info", info)
+			
+			try {
+				FileDelete %fileName%
+			}
+			catch exception {
+				; ignore
+			}
+		}
+		else {
+			try {
+				FileRemoveDir %kTempDirectory%Race Report, 1
+			}
+			catch exception {
+				; ignore
+			}
+			
+			FileCreateDir %kTempDirectory%Race Report
+			
+			FileMove %fileName%, %kTempDirectory%Race Report\Race.data
+		}
+	}
+	
+	saveRaceLap(lapNumber, fileName) {
+		teamServer := this.TeamServer
+		
+		if (teamServer && teamServer.SessionActive) {
+			FileRead lapData, %fileName%
+			
+			teamServer.setLapValue(lapNumber, this.Plugin . " Race Lap", lapData)
+			
+			try {
+				FileDelete %fileName%
+			}
+			catch exception {
+				; ignore
+			}
+		}
+		else 
+			FileMove %fileName%, %kTempDirectory%Race Report\Lap.%lapNumber%
+	}
+	
+	createRaceReport() {
+		directory := this.SessionReportsDatabase
+		
+		if directory {
+			teamServer := this.TeamServer
+			session := this.TeamSession
+			
+			runningLap := 0
+				
+			if (teamServer && teamServer.Active && session) {
+				try {
+					FileRemoveDir %kTempDirectory%Race Report, 1
+				}
+				catch exception {
+					; ignore
+				}
+				
+				FileCreateDir %kTempDirectory%Race Report
+				
+				try {
+					raceInfo := teamServer.getLapValue(1, this.Plugin . " Race Info", session)
+		
+					FileAppend %raceInfo%, %kTempDirectory%Race Report\Race.data
+					
+					data := readConfiguration(kTempDirectory . "Race Report\Race.data")
+				}
+				catch exception {
+					; ignore
+				}
+				
+				Loop {
+					lapData := teamServer.getLapValue(A_Index, this.Plugin . " Race Lap", session)
+				
+					FileAppend %lapData%, %kTempDirectory%Race Report\Race.temp, UTF-16
+					
+					lapData := readConfiguration(kTempDirectory . "Race Report\Race.temp")
+					
+					for key, value in getConfigurationSectionValues(lapData, "Lap")
+						setConfigurationValue(data, "Laps", key, value)
+					
+					times := getConfigurationValue(lapData, "Times", A_Index)
+					positions := getConfigurationValue(lapData, "Positions", A_Index)
+					laps := getConfigurationValue(lapData, "Laps", A_Index)
+					drivers := getConfigurationValue(lapData, "Drivers", A_Index)
+					
+					newLine := ((A_Index > 1) ? "`n" : "")
+					
+					line := (newLine . times)
+					
+					FileAppend %line%, % kTempDirectory . "Race Report\Times.CSV"
+					
+					line := (newLine . positions)
+					
+					FileAppend %line%, % kTempDirectory . "Race Report\Positions.CSV"
+					
+					line := (newLine . laps)
+					
+					FileAppend %line%, % kTempDirectory . "Race Report\Laps.CSV"
+					
+					line := (newLine . drivers)
+					directory := (kTempDirectory . "Race Report\Drivers.CSV")
+					
+					FileAppend %line%, %directory%, UTF-16
+					
+					try {
+						FileDelete %kTempDirectory%Race Report\Race.temp
+					}
+					catch exception {
+						; ignore
+					}
+				}
+				catch exception {
+					break
+				}
+				
+				removeConfigurationValue(data, "Laps", "Lap")
+				
+				writeConfiguration(kTempDirectory . "Race Report\Race.data", data)
+				
+				simulatorCode := new SetupDatabase().getSimulatorCode(getConfigurationValue(data, "Session", "Simulator"))
+			
+				directory := (directory . "\" . simulatorCode . "\" . getConfigurationValue(data, "Session", "Time"))
+			
+				FileCopyDir %kTempDirectory%Race Report, %directory%, 1
+			}
+			else {
+				data := readConfiguration(kTempDirectory . "Race Report\Race.data")
+				
+				Loop {
+					fileName := (kTempDirectory . "Race Report\Lap." . A_Index)
+				
+					if !FileExist(fileName)
+						break
+					else {
+						lapData := readConfiguration(fileName)
+					
+						try {
+							FileDelete %fileName%
+						}
+						catch exception {
+							; ignore
+						}
+						
+						for key, value in getConfigurationSectionValues(lapData, "Lap")
+							setConfigurationValue(data, "Laps", key, value)
+						
+						times := getConfigurationValue(lapData, "Times", A_Index)
+						positions := getConfigurationValue(lapData, "Positions", A_Index)
+						laps := getConfigurationValue(lapData, "Laps", A_Index)
+						drivers := getConfigurationValue(lapData, "Drivers", A_Index)
+						
+						newLine := ((A_Index > 1) ? "`n" : "")
+						
+						line := (newLine . times)
+						
+						FileAppend %line%, % kTempDirectory . "Race Report\Times.CSV"
+						
+						line := (newLine . positions)
+						
+						FileAppend %line%, % kTempDirectory . "Race Report\Positions.CSV"
+						
+						line := (newLine . laps)
+						
+						FileAppend %line%, % kTempDirectory . "Race Report\Laps.CSV"
+						
+						line := (newLine . drivers)
+						directory := (kTempDirectory . "Race Report\Drivers.CSV")
+						
+						FileAppend %line%, %directory%, UTF-16
+					}
+				}
+				
+				removeConfigurationValue(data, "Laps", "Lap")
+				
+				writeConfiguration(kTempDirectory . "Race Report\Race.data", data)
+				
+				simulatorCode := new SetupDatabase().getSimulatorCode(getConfigurationValue(data, "Session", "Simulator"))
+			
+				directory := (directory . "\" . simulatorCode . "\" . getConfigurationValue(data, "Session", "Time"))
+			
+				FileCopyDir %kTempDirectory%Race Report, %directory%, 1
+			}
+		}		
+	}
 }
 
 

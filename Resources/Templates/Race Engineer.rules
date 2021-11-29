@@ -733,10 +733,10 @@ pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Repair.Bodywork, !Pi
 ;;; These rules remove knowledge that is no longer needed after a pitstop.  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Pitstop.Lap] => (Set: Pitstop.Cleanup, ?Pitstop.Lap)
+[?Pitstop.Lap] => (Set: Cleanup, ?Pitstop.Lap)
 
-priority: -40, [?Pitstop.Cleanup] => (Prove: clearLaps(?Pitstop.Cleanup, !Session.Settings.Lap.History.Considered))
-priority: -50, [?Pitstop.Cleanup] => (Clear: Pitstop.Cleanup)
+priority: -40, [?Cleanup] => (Prove: clearLaps(?Cleanup, !Session.Settings.Lap.History.Considered))
+priority: -50, [?Cleanup] => (Clear: Cleanup)
 
 clearLaps(?lap, deltaLaps) <= ?previousLap = ?lap - 1, ?clearLap = ?previousLap - ?deltaLaps, clearLaps(?clearLap)
 

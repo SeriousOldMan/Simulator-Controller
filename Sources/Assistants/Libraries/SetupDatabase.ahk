@@ -325,15 +325,8 @@ class SetupDatabase extends SessionDatabase {
 		return {}
 	}
 	
-	updatePressures(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor, coldPressures, hotPressures, flush := true) {
-		if (!compoundColor || (compoundColor = ""))
-			compoundColor := "Black"
-		
-		if getConfigurationValue(this.ControllerConfiguration, "Simulators", simulator, false)
-			simulatorCode := this.getSimulatorCode(simulator)
-		else
-			simulatorCode := simulator
-		
+	requireDatabase(simulator, car, track) {
+		simulatorCode := this.getSimulatorCode(simulator)
 		simulator := this.getSimulatorName(simulatorCode)
 		
 		FileCreateDir %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%
@@ -346,6 +339,13 @@ class SetupDatabase extends SessionDatabase {
 		
 		if !this.iDatabase
 			this.iDatabase := this.getSetupDatabase(simulator, car, track, "Local")
+	}
+	
+	updatePressures(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor, coldPressures, hotPressures, flush := true) {
+		if (!compoundColor || (compoundColor = ""))
+			compoundColor := "Black"
+	
+		this.requireDatabase(simulator, car, track)
 		
 		this.iDatabase.add("Setup.Pressures", {Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
 											 , Compound: compound, "Compound.Color": compoundColor
@@ -358,19 +358,29 @@ class SetupDatabase extends SessionDatabase {
 		types := ["Cold", "Hot"]
 		
 		for typeIndex, tPressures in [coldPressures, hotPressures]
-			for tyreIndex, pressure in tPressures {
-				rows := this.iDatabase.query("Setup.Pressures.Distribution"
-										   , {Where: {Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
-													, Compound: compound, "Compound.Color": compoundColor, Type: types[typeIndex]
-													, Tyre: tyres[tyreIndex], "Pressure": pressure}})
-				
-				if (rows.Length() > 0)
-					rows[1].Count := rows[1].Count + 1
-				else
-					this.iDatabase.add("Setup.Pressures.Distribution"
-									 , {Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
-									  , Compound: compound, "Compound.Color": compoundColor, Type: types[typeIndex], Tyre: tyres[tyreIndex], "Pressure": pressure, Count: 1})
-			}
+			for tyreIndex, pressure in tPressures
+				this.updatePressure(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor
+								  , types[typeIndex], tyres[tyreIndex], pressure, 1, flush, false)
+	}
+	
+	updatePressure(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor
+				 , type, tyre, pressure, count := 1, flush := true, require := true) {
+		if (!compoundColor || (compoundColor = ""))
+			compoundColor := "Black"
+		
+		if require
+			this.requireDatabase(simulator, car, track)
+		
+		rows := this.iDatabase.query("Setup.Pressures.Distribution"
+								   , {Where: {Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
+											, Compound: compound, "Compound.Color": compoundColor, Type: type, Tyre: tyre, "Pressure": pressure}})
+		
+		if (rows.Length() > 0)
+			rows[1].Count := rows[1].Count + 1
+		else
+			this.iDatabase.add("Setup.Pressures.Distribution"
+							 , {Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
+							  , Compound: compound, "Compound.Color": compoundColor, Type: type, Tyre: tyre, "Pressure": pressure, Count: 1}, flush)
 	}
 	
 	flush() {

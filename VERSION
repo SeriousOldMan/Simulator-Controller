@@ -1,9 +1,9 @@
 [Development]
 Version=3.7.2-dev
 Target=3.7.2-release
-Date=11/26/2021
+Date=11/29/2021
 Download=
-Changes=
+Changes=Vastly reduced memory consumption of assistants in endurance races, Full refactoring of the setup database, Fixed pitstop handling for ACC 1.8
 [Release]
 Version=3.7.1-release
 Date=11/26/2021

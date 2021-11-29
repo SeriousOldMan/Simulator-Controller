@@ -533,25 +533,27 @@ validPitstopLap(?pitstopLap) <= ?diff = !Strategy.Pitstop.Lap - ?pitstopLap, abs
 ;;; These rules remove knowledge that is no longer needed after a pitstop.  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Pitstop.Lap] => (Set: Pitstop.Cleanup, ?Pitstop.Lap)
+[?Pitstop.Lap] => (Set: Cleanup, ?Pitstop.Lap)
 
-priority: -40, [?Pitstop.Cleanup] => (Prove: clearLaps(?Pitstop.Cleanup, !Session.Settings.Lap.History.Considered))
-priority: -50, [?Pitstop.Cleanup] => (Clear: Pitstop.Cleanup)
+priority: -40, [?Cleanup] => (Prove: clearLaps(?Cleanup, !Session.Settings.Lap.History.Considered)),										\
+							 (Prove: clearStandings(?Cleanup, !Session.Settings.Lap.History.Considered))
+priority: -50, [?Cleanup] => (Clear: Cleanup)
 
 clearLaps(?lap, deltaLaps) <= ?previousLap = ?lap - 1, ?clearLap = ?previousLap - ?deltaLaps, clearLaps(?clearLap)
+clearLaps(?lap) <= clearLapData(?lap), ?previousLap = ?lap - 1, clearLaps(?previousLap)
 
-clearLaps(?lap) <= clearLapData(?lap), clearStandingsData(?lap), ???? geht nicht wg. fail,
+clearStandings(?lap, deltaLaps) <= ?previousLap = ?lap - 1, ?clearLap = ?previousLap - ?deltaLaps, clearStandings(?clearLap)
+clearStandings(?lap) <= clearLapData(?lap), ?previousLap = ?lap - 1, clearStandings(?previousLap)
 
-?previousLap = ?lap - 1, clearLaps(?previousLap)
-
-		
-clearStandingsData(?lap) <= Get(Standings.Lap, ?lap, Car.Count, ?carCount),																		\
+clearStandingsData(?lap) <= Append(Standings.Lap, ?lap, Car.Count, ?fact), fact?(?fact), Get(?fact, ?carCount),									\
 							Append(Standings.Lap, ?lap, Time, ?timeFact), Clear(?timeFact),														\
+							Append(Standings.Lap, ?lap, Position, ?positionFact), Clear(?positionFact),											\
 							Append(Standings.Lap, ?lap, Weather, ?weatherFact), Clear(?weatherFact),											\
 							clearStandingsData(?lap, ?carCount), ?previousLap = ?lap - 1, clearStandingsData(previousLap)
 
 clearStandingsData(?lap, 0) <= !
-clearStandingsData(?lap, ?car) <= clearStandingsData(?lap, ?car, [Delta, Laps, Position, Driver.Forname, Driver.Surname, Driver.Nickname]),		\
+clearStandingsData(?lap, ?car) <= clearStandingsData(?lap, ?car, [Delta, Laps, Time, Time.Average,												\
+																  Position, Driver.Forname, Driver.Surname, Driver.Nickname]),					\
 								  ?previousCar = ?car - 1, clearStandingsData(?lap, ?previousCar)
 
 clearStandingsData(?lap, ?car, []) <= !

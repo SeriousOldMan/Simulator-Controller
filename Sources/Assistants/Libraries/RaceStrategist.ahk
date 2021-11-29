@@ -38,20 +38,24 @@ class RaceStrategist extends RaceAssistant {
 			base.__New("Race Strategist", remotePID)
 		}
 		
-		saveStandingsData(arguments*) {
-			this.callRemote("saveStandingsData", arguments*)
-		}
-		
-		createRaceReport(arguments*) {
-			this.callRemote("createRaceReport", arguments*)
-		}
-		
 		saveTelemetryData(arguments*) {
 			this.callRemote("saveTelemetryData", arguments*)
 		}
 		
 		updateTelemetryDatabase(arguments*) {
 			this.callRemote("updateTelemetryDatabase", arguments*)
+		}
+		
+		saveRaceInfo(arguments*) {
+			this.callRemote("saveRaceInfo", arguments*)
+		}
+		
+		saveRaceLap(arguments*) {
+			this.callRemote("saveRaceLap", arguments*)
+		}
+		
+		createRaceReport(arguments*) {
+			this.callRemote("createRaceReport", arguments*)
 		}
 	}
 	
@@ -647,41 +651,46 @@ class RaceStrategist extends RaceAssistant {
 			car := knowledgeBase.getValue("Session.Car")
 			track := knowledgeBase.getValue("Session.Track")
 			
-			pitstop := knowledgeBase.getValue("Pitstop.Last", false)
-			
-			if pitstop
-				pitstop := (lapNumber == (knowledgeBase.getValue("Pitstop." . pitstop . ".Lap") + 1))
-			
-			prefix := "Lap." . lapNumber
+			if (this.SaveTelemetry != kNever) {
+				pitstop := knowledgeBase.getValue("Pitstop.Last", false)
 				
-			if knowledgeBase.getValue(prefix . ".Valid", true) {
-				weather := knowledgeBase.getValue(prefix . ".Weather")
-				airTemperature := knowledgeBase.getValue(prefix . ".Temperature.Air")
-				trackTemperature := knowledgeBase.getValue(prefix . ".Temperature.Track")
-				compound := knowledgeBase.getValue(prefix . ".Tyre.Compound")
-				compoundColor := knowledgeBase.getValue(prefix . ".Tyre.Compound.Color")
-				fuelConsumption := Round(knowledgeBase.getValue(prefix . ".Fuel.Consumption"), 1)
-				fuelRemaining := Round(knowledgeBase.getValue(prefix . ".Fuel.Remaining"), 1)
-				lapTime := Round(knowledgeBase.getValue(prefix . ".Time") / 1000, 1)
+				if pitstop
+					pitstop := (lapNumber == (knowledgeBase.getValue("Pitstop." . pitstop . ".Lap") + 1))
 				
-				map := knowledgeBase.getValue(prefix . ".Map")
-				tc := knowledgeBase.getValue(prefix . ".TC")
-				abs := knowledgeBase.getValue(prefix . ".ABS")
-				
-				pressures := values2String("," Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.FL"), 1)
-											 , Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.FR"), 1)
-											 , Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.RL"), 1)
-											 , Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.RR"), 1))
-				
-				temperatures := values2String("," Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.FL"), 1)
-												, Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.FR"), 1)
-												, Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.RL"), 1)
-												, Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.RR"), 1))
-				
-				this.saveTelemetryData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
-									 , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs,
-									 , compound, compoundColor, pressures, temperatures)
+				prefix := "Lap." . lapNumber
+					
+				if knowledgeBase.getValue(prefix . ".Valid", true) {
+					weather := knowledgeBase.getValue(prefix . ".Weather")
+					airTemperature := knowledgeBase.getValue(prefix . ".Temperature.Air")
+					trackTemperature := knowledgeBase.getValue(prefix . ".Temperature.Track")
+					compound := knowledgeBase.getValue(prefix . ".Tyre.Compound")
+					compoundColor := knowledgeBase.getValue(prefix . ".Tyre.Compound.Color")
+					fuelConsumption := Round(knowledgeBase.getValue(prefix . ".Fuel.Consumption"), 1)
+					fuelRemaining := Round(knowledgeBase.getValue(prefix . ".Fuel.Remaining"), 1)
+					lapTime := Round(knowledgeBase.getValue(prefix . ".Time") / 1000, 1)
+					
+					map := knowledgeBase.getValue(prefix . ".Map")
+					tc := knowledgeBase.getValue(prefix . ".TC")
+					abs := knowledgeBase.getValue(prefix . ".ABS")
+					
+					pressures := values2String("," Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.FL"), 1)
+												 , Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.FR"), 1)
+												 , Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.RL"), 1)
+												 , Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.RR"), 1))
+					
+					temperatures := values2String("," Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.FL"), 1)
+													, Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.FR"), 1)
+													, Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.RL"), 1)
+													, Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.RR"), 1))
+					
+					this.saveTelemetryData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
+										 , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs,
+										 , compound, compoundColor, pressures, temperatures)
+				}
 			}
+			
+			if (this.SaveRaceReport != kNever)
+				this.saveStandingsData(lapNumber, simulator, car, track)
 		}
 		
 		return result
@@ -1050,7 +1059,7 @@ class RaceStrategist extends RaceAssistant {
 				this.saveSessionSettings()
 			
 			if ((this.Session == kSessionRace) && (this.SaveRaceReport = ((phase = "Before") ? kAlways : kAsk)))
-				this.saveSessionReport()
+				this.createRaceReport()
 			
 			if ((this.SaveTelemetry = ((phase = "After") ? kAsk : kAlways)))
 				this.updateTelemetryDatabase()
@@ -1069,97 +1078,98 @@ class RaceStrategist extends RaceAssistant {
 		}
 	}
 	
-	saveSessionReport() {
+	saveStandingsData(lapNumber, simulator, car, track) {
 		local knowledgeBase := this.KnowledgeBase
 		
-		directory := this.SessionReportsDatabase
-		
-		if directory {
-			simulatorCode := this.SetupDatabase.getSimulatorCode(knowledgeBase.getValue("Session.Simulator"))
-			
-			directory := (directory . "\" . simulatorCode . "\" . this.SessionTime)
-			
-			FileCreateDir %directory%
-			
-			data := newConfiguration()
-			
-			setConfigurationValue(data, "Session", "Car", knowledgeBase.getValue("Session.Car"))
-			setConfigurationValue(data, "Session", "Track", knowledgeBase.getValue("Session.Track"))
-			setConfigurationValue(data, "Session", "Duration", (Round((knowledgeBase.getValue("Session.Duration") / 60) / 5) * 300))
-			setConfigurationValue(data, "Session", "Format", knowledgeBase.getValue("Session.Format"))
-			
+		if this.RemoteHandler {			
+			Random postfix, 1, 1000000
+				
 			driver := knowledgeBase.getValue("Driver.Car")
 			carCount := knowledgeBase.getValue("Car.Count")
 			
-			setConfigurationValue(data, "Cars", "Count", carCount)
-			setConfigurationValue(data, "Cars", "Driver", driver)
-			
-			Loop %carCount% {
-				setConfigurationValue(data, "Cars", "Car." . A_Index . ".Nr", knowledgeBase.getValue("Car." . A_Index . ".Nr", A_Index))
-				setConfigurationValue(data, "Cars", "Car." . A_Index . ".Car", knowledgeBase.getValue("Car." . A_Index . ".Car"))
-			}
-			
-			lapCount := knowledgeBase.getValue("Lap")
-			pitstops := []
-			
-			Loop % knowledgeBase.getValue("Pitstop.Last", 0)
-				pitstops.Push(knowledgeBase.getValue("Pitstop." . A_Index . ".Lap") + 1)
-			
-			setConfigurationValue(data, "Laps", "Count", lapCount)
-			
-			Loop %lapCount% {
-				setConfigurationValue(data, "Laps", "Lap." . A_Index . ".Weather", knowledgeBase.getValue("Standings.Lap." . A_Index . ".Weather"))
-				setConfigurationValue(data, "Laps", "Lap." . A_Index . ".LapTime", knowledgeBase.getValue("Lap." . A_Index . ".Time"))
-				setConfigurationValue(data, "Laps", "Lap." . A_Index . ".Compound", knowledgeBase.getValue("Lap." . A_Index . ".Tyre.Compound", "Dry"))
-				setConfigurationValue(data, "Laps", "Lap." . A_Index . ".CompoundColor", knowledgeBase.getValue("Lap." . A_Index . ".Tyre.Compound.Color", "Black"))
-				setConfigurationValue(data, "Laps", "Lap." . A_Index . ".Map", knowledgeBase.getValue("Lap." . A_Index . ".Map", "n/a"))
-				setConfigurationValue(data, "Laps", "Lap." . A_Index . ".TC", knowledgeBase.getValue("Lap." . A_Index . ".TC", "n/a"))
-				setConfigurationValue(data, "Laps", "Lap." . A_Index . ".ABS", knowledgeBase.getValue("Lap." . A_Index . ".ABS", "n/a"))
-				setConfigurationValue(data, "Laps", "Lap." . A_Index . ".Consumption", knowledgeBase.getValue("Lap." . A_Index . ".Fuel.Consumption", "n/a"))
-				setConfigurationValue(data, "Laps", "Lap." . A_Index . ".Pitstop", inList(pitstops, A_Index))
-			
-				lapNr := A_Index
+			if (lapNumber == 1) {
+				data := newConfiguration()
 				
-				times := []
-				positions := []
-				drivers := []
-				laps := []
+				setConfigurationValue(data, "Session", "Time", this.SessionTime)
+				setConfigurationValue(data, "Session", "Simulator", knowledgeBase.getValue("Session.Simulator"))
+				setConfigurationValue(data, "Session", "Car", knowledgeBase.getValue("Session.Car"))
+				setConfigurationValue(data, "Session", "Track", knowledgeBase.getValue("Session.Track"))
+				setConfigurationValue(data, "Session", "Duration", (Round((knowledgeBase.getValue("Session.Duration") / 60) / 5) * 300))
+				setConfigurationValue(data, "Session", "Format", knowledgeBase.getValue("Session.Format"))
+				
+				setConfigurationValue(data, "Cars", "Count", carCount)
+				setConfigurationValue(data, "Cars", "Driver", driver)
 				
 				Loop %carCount% {
-					carPrefix := ("Standings.Lap." . lapNr . ".Car." . A_Index)
-					
-					times.Push(knowledgeBase.getValue(carPrefix . ".Time", -1))
-					positions.Push(knowledgeBase.getValue(carPrefix . ".Position", 0))
-					laps.Push(Floor(knowledgeBase.getValue(carPrefix . ".Laps", 0)))
-					
-					driverForname := knowledgeBase.getValue(carPrefix . ".Driver.Forname")
-					driverSurname := knowledgeBase.getValue(carPrefix . ".Driver.Surname")
-					driverNickname := knowledgeBase.getValue(carPrefix . ".Driver.Nickname")
-					
-					drivers.Push(computeDriverName(driverForname, driverSurname, driverNickname))
+					setConfigurationValue(data, "Cars", "Car." . A_Index . ".Nr", knowledgeBase.getValue("Car." . A_Index . ".Nr", A_Index))
+					setConfigurationValue(data, "Cars", "Car." . A_Index . ".Car", knowledgeBase.getValue("Car." . A_Index . ".Car"))
 				}
 				
-				newLine := ((lapNr > 1) ? "`n" : "")
+				fileName := (kTempDirectory . "Race Strategist Race " . postfix . ".info")
 				
-				line := (newLine . values2String(";", times*))
+				writeConfiguration(fileName, data)
+			
+				this.RemoteHandler.saveRaceInfo(fileName)
+			}
+			
+			data := newConfiguration()
+			
+			pitstop := knowledgeBase.getValue("Pitstop.Last", false)
 				
-				FileAppend %line%, % directory . "\Times.CSV"
+			if pitstop
+				pitstop := (lapNumber == (knowledgeBase.getValue("Pitstop." . pitstop . ".Lap") + 1))
+			
+			prefix := "Lap." . lapNumber
 				
-				line := (newLine . values2String(";", positions*))
+			setConfigurationValue(data, "Lap", "Lap", lapNumber)
+			
+			setConfigurationValue(data, "Lap", prefix . ".Weather", knowledgeBase.getValue("Standings.Lap." . lapNumber . ".Weather"))
+			setConfigurationValue(data, "Lap", prefix . ".LapTime", knowledgeBase.getValue(prefix . ".Time"))
+			setConfigurationValue(data, "Lap", prefix . ".Compound", knowledgeBase.getValue(prefix . ".Tyre.Compound", "Dry"))
+			setConfigurationValue(data, "Lap", prefix . ".CompoundColor", knowledgeBase.getValue(prefix . ".Tyre.Compound.Color", "Black"))
+			setConfigurationValue(data, "Lap", prefix . ".Map", knowledgeBase.getValue(prefix . ".Map", "n/a"))
+			setConfigurationValue(data, "Lap", prefix . ".TC", knowledgeBase.getValue(prefix . ".TC", "n/a"))
+			setConfigurationValue(data, "Lap", prefix . ".ABS", knowledgeBase.getValue(prefix . ".ABS", "n/a"))
+			setConfigurationValue(data, "Lap", prefix . ".Consumption", knowledgeBase.getValue(prefix . ".Fuel.Consumption", "n/a"))
+			setConfigurationValue(data, "Lap", prefix . ".Pitstop", pitstop)
+
+			times := []
+			positions := []
+			drivers := []
+			laps := []
+			
+			Loop %carCount% {
+				carPrefix := ("Standings.Lap." . lapNumber . ".Car." . A_Index)
 				
-				FileAppend %line%, % directory . "\Positions.CSV"
+				times.Push(knowledgeBase.getValue(carPrefix . ".Time", -1))
+				positions.Push(knowledgeBase.getValue(carPrefix . ".Position", 0))
+				laps.Push(Floor(knowledgeBase.getValue(carPrefix . ".Laps", 0)))
 				
-				line := (newLine . values2String(";", laps*))
+				driverForname := knowledgeBase.getValue(carPrefix . ".Driver.Forname")
+				driverSurname := knowledgeBase.getValue(carPrefix . ".Driver.Surname")
+				driverNickname := knowledgeBase.getValue(carPrefix . ".Driver.Nickname")
 				
-				FileAppend %line%, % directory . "\Laps.CSV"
-				
-				line := (newLine . values2String(";", drivers*))
-				
-				FileAppend %line%, % directory . "\Drivers.CSV"
+				drivers.Push(computeDriverName(driverForname, driverSurname, driverNickname))
 			}
 				
-			writeConfiguration(directory . "\Race.data", data)
+				newLine := ((lapNumber > 1) ? "`n" : "")
+				
+			setConfigurationValue(data, "Times", lapNumber, values2String(";", times*))
+			setConfigurationValue(data, "Positions", lapNumber, values2String(";", positions*))
+			setConfigurationValue(data, "Laps", lapNumber, values2String(";", laps*))
+			setConfigurationValue(data, "Drivers", lapNumber, values2String(";", drivers*))
+			
+			fileName := (kTempDirectory . "Race Strategist Race " . postfix . "." . lapNumber . ".lap")
+			
+			writeConfiguration(fileName, data)
+			
+			this.RemoteHandler.saveRaceLap(lapNumber, fileName)
 		}
+	}
+	
+	createRaceReport() {
+		if this.RemoteHandler
+			this.RemoteHandler.createRaceReport()
 	}
 
 	saveTelemetryData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature

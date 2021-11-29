@@ -924,9 +924,9 @@ computeDriverName(forName, surName, nickName) {
 		name .= (surName . A_Space)
 	
 	if (nickName != "")
-		name .= (" (" . nickName . ")")
+		name .= (translate("(") . nickName . translate(")"))
 	
-	return name
+	return Trim(name)
 }
 
 getDeprecatedConfigurationValue(data, newSection, oldSection, key, default := false) {

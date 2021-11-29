@@ -236,6 +236,9 @@ class TeamServerConfigurator extends ConfigurationItem {
 		teamServerNameEdit := getConfigurationValue(configuration, "Team Server", "Account.Name", "")
 		teamServerPasswordEdit := getConfigurationValue(configuration, "Team Server", "Account.Password", "")
 		teamServerTokenEdit := getConfigurationValue(configuration, "Team Server", "Server.Token", "")
+		
+		if !teamServerTokenEdit
+			teamServerTokenEdit := ""
 	}
 	
 	saveToConfiguration(configuration) {
@@ -270,14 +273,17 @@ class TeamServerConfigurator extends ConfigurationItem {
 		try {
 			connector.Connect(teamServerURLEdit)
 			
-			connector.Login(teamServerNameEdit, teamServerPasswordEdit)
+			token := connector.Login(teamServerNameEdit, teamServerPasswordEdit)
 			
-			this.iToken := connector.Token
+			this.iToken := token
 			minutesLeft := connector.GetMinutesLeft()
 			
-			GuiControl, , teamServerTokenEdit, % this.Token
+			teamServerTokenEdit := token
+			teamServerTimeText := (minutesLeft . translate(" Minutes"))
+			
+			GuiControl Text, teamServerTokenEdit, %teamServerTokenEdit%
 			GuiControl +cBlack, teamServerTimeText
-			GuiControl, , teamServerTimeText, % (minutesLeft . translate(" Minutes"))
+			GuiControl Text, teamServerTimeText, %teamServerTimeText%
 			
 			showMessage(translate("Successfully connected to the Team Server."))
 		}
@@ -293,7 +299,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 				OnMessage(0x44, "")
 			}
 			
-			this.Token := false
+			this.iToken := false
 		}
 		
 		this.loadTeams()
@@ -448,7 +454,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 			if (stints > 0) {
 				stint := this.parseObject(connector.GetStint(connector.GetSessionStint(identifier)))
 				
-				laps := (stint.Lap + (string2Values(";", connector.GetSessionStints(stint.Identifier)).Length()))
+				laps := (stint.Lap + (string2Values(";", connector.GetStintLaps(stint.Identifier)).Length()))
 			}
 				
 			sessions.Push(name)

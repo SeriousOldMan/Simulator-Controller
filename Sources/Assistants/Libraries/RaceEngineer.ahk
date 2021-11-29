@@ -907,10 +907,10 @@ class RaceEngineer extends RaceAssistant {
 												  , Round(knowledgeBase.getValue("Tyre.Pressure.Target.RL"), 1)
 												  , Round(knowledgeBase.getValue("Tyre.Pressure.Target.RR"), 1))
 				
-				hotPressures := values2String(",", Round(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Temperature.FL"), 1)
-												 , Round(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Temperature.FR"), 1)
-												 , Round(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Temperature.RL"), 1)
-												 , Round(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Temperature.RR"), 1))
+				hotPressures := values2String(",", Round(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Pressure.FL"), 1)
+												 , Round(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Pressure.FR"), 1)
+												 , Round(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Pressure.RL"), 1)
+												 , Round(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Pressure.RR"), 1))
 												 
 				this.savePressureData(lapNumber, knowledgeBase.getValue("Session.Simulator"), knowledgeBase.getValue("Session.Car"), knowledgeBase.getValue("Session.Track")
 									, weatherNow, airTemperature, trackTemperature, currentCompound, currentCompoundColor, coldPressures, hotPressures)
@@ -1005,7 +1005,7 @@ class RaceEngineer extends RaceAssistant {
 		return result
 	}
 	
-	savePressureData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature, compound, ompoundColor, coldPressures, hotPressures) {
+	savePressureData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor, coldPressures, hotPressures) {
 		this.iSessionDataActive := true
 		
 		try {

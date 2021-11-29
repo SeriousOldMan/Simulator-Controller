@@ -158,7 +158,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			teamServer.setLapValue(lapNumber, this.Plugin . " Telemetry"
 								 , values2String(";", simulator, car, track, weather, airTemperature, trackTemperature
 								 , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs,
-								 , currentCompound, currentCompoundColor, pressures, temperatures))
+								 , compound, compoundColor, pressures, temperatures))
 		else
 			this.LapDatabase.add("Telemetry", {Lap: lapNumber, Simulator: simulator, Car: car, Track: track
 											 , Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
@@ -179,6 +179,9 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 				try {
 					telemetryData := string2Values(";", teamServer.getLapValue(A_Index, this.Plugin . " Telemetry", session))
 					
+					if !telemetryData
+						break
+					
 					if !telemetryDB
 						telemetryDB := new TelemetryDatabase(telemetryData[1], telemetryData[2], telemetryData[3])
 					
@@ -188,7 +191,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 					runningLap += 1
 					
 					pressures := string2Values(",", telemetryData[16])
-					temperatures := string2Values(",", telemetryData[13])
+					temperatures := string2Values(",", telemetryData[17])
 					
 					telemetryDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15]
 												 , telemetryData[11], telemetryData[12], telemetryData[13], telemetryData[7], telemetryData[8], telemetryData[9])
@@ -201,38 +204,30 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 				catch exception {
 					break
 				}
-				finally {
-					setupDB.flush()
-				}
 			}
 		else
-			try {
-				for ignore, telemetryData in this.LapDatabase.Tables["Telemetry"] {
-					if !telemetryDB
-						telemetryDB := new TelemetryDatabase(telemetryData.Simulator, telemetryData.Car, telemetryData.Track)
-					
-					if telemetryData.Pitstop
-						runningLap := 0
-					
-					runningLap += 1
-					
-					telemetryDB.addElectronicEntry(telemetryData.Weather, telemetryData["Temperature.Air"], telemetryData["Temperature.Track"]
-												 , telemetryData.Compound, telemetryData["Compound.Color"]
-												 , telemetryData.Map, telemetryData.TC, telemetryData.ABS
-												 , telemetryData["Fuel.Consumption"], telemetryData["Fuel.Remaining"], telemetryData.LapTime)
-					
-					pressures := string2Values(",", telemetryData.Pressures)
-					temperatures := string2Values(",", telemetryData.Temperatures)
-					
-					telemetryDB.addTyreEntry(telemetryData.Weather, telemetryData["Temperature.Air"], telemetryData["Temperature.Track"]
-										   , telemetryData.Compound, telemetryData["Compound.Color"], runningLap
-										   , pressures[1], pressures[2], pressures[4], pressures[4]
-										   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
-										   , telemetryData["Fuel.Consumption"], telemetryData["Fuel.Remaining"], telemetryData.LapTime)
-				}
-			}
-			finally {
-				setupDB.flush()
+			for ignore, telemetryData in this.LapDatabase.Tables["Telemetry"] {
+				if !telemetryDB
+					telemetryDB := new TelemetryDatabase(telemetryData.Simulator, telemetryData.Car, telemetryData.Track)
+				
+				if telemetryData.Pitstop
+					runningLap := 0
+				
+				runningLap += 1
+				
+				telemetryDB.addElectronicEntry(telemetryData.Weather, telemetryData["Temperature.Air"], telemetryData["Temperature.Track"]
+											 , telemetryData.Compound, telemetryData["Compound.Color"]
+											 , telemetryData.Map, telemetryData.TC, telemetryData.ABS
+											 , telemetryData["Fuel.Consumption"], telemetryData["Fuel.Remaining"], telemetryData.LapTime)
+				
+				pressures := string2Values(",", telemetryData.Pressures)
+				temperatures := string2Values(",", telemetryData.Temperatures)
+				
+				telemetryDB.addTyreEntry(telemetryData.Weather, telemetryData["Temperature.Air"], telemetryData["Temperature.Track"]
+									   , telemetryData.Compound, telemetryData["Compound.Color"], runningLap
+									   , pressures[1], pressures[2], pressures[4], pressures[4]
+									   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
+									   , telemetryData["Fuel.Consumption"], telemetryData["Fuel.Remaining"], telemetryData.LapTime)
 			}
 	}
 	
@@ -285,14 +280,14 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	}
 	
 	createRaceReport() {
-		directory := this.SessionReportsDatabase
+		directory := getConfigurationValue(this.Configuration, "Race Strategist Reports", "Database", false)
 		
 		if directory {
 			teamServer := this.TeamServer
 			session := this.TeamSession
 			
 			runningLap := 0
-				
+			msgbox 1
 			if (teamServer && teamServer.Active && session) {
 				try {
 					FileRemoveDir %kTempDirectory%Race Report, 1
@@ -300,12 +295,15 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 				catch exception {
 					; ignore
 				}
-				
+				msgbox 2
 				FileCreateDir %kTempDirectory%Race Report
 				
 				try {
 					raceInfo := teamServer.getLapValue(1, this.Plugin . " Race Info", session)
 		
+					if !raceInfo
+						return
+						
 					FileAppend %raceInfo%, %kTempDirectory%Race Report\Race.data
 					
 					data := readConfiguration(kTempDirectory . "Race Report\Race.data")
@@ -314,52 +312,63 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 					; ignore
 				}
 				
-				Loop {
-					lapData := teamServer.getLapValue(A_Index, this.Plugin . " Race Lap", session)
+				count := 0
 				
-					FileAppend %lapData%, %kTempDirectory%Race Report\Race.temp, UTF-16
-					
-					lapData := readConfiguration(kTempDirectory . "Race Report\Race.temp")
-					
-					for key, value in getConfigurationSectionValues(lapData, "Lap")
-						setConfigurationValue(data, "Laps", key, value)
-					
-					times := getConfigurationValue(lapData, "Times", A_Index)
-					positions := getConfigurationValue(lapData, "Positions", A_Index)
-					laps := getConfigurationValue(lapData, "Laps", A_Index)
-					drivers := getConfigurationValue(lapData, "Drivers", A_Index)
-					
-					newLine := ((A_Index > 1) ? "`n" : "")
-					
-					line := (newLine . times)
-					
-					FileAppend %line%, % kTempDirectory . "Race Report\Times.CSV"
-					
-					line := (newLine . positions)
-					
-					FileAppend %line%, % kTempDirectory . "Race Report\Positions.CSV"
-					
-					line := (newLine . laps)
-					
-					FileAppend %line%, % kTempDirectory . "Race Report\Laps.CSV"
-					
-					line := (newLine . drivers)
-					directory := (kTempDirectory . "Race Report\Drivers.CSV")
-					
-					FileAppend %line%, %directory%, UTF-16
-					
+				Loop {
 					try {
-						FileDelete %kTempDirectory%Race Report\Race.temp
+						lapData := teamServer.getLapValue(A_Index, this.Plugin . " Race Lap", session)
+					
+						msgbox % "L" . A_Index
+						if !lapData
+							break
+						
+						count := A_Index
+						
+						FileAppend %lapData%, %kTempDirectory%Race Report\Race.temp
+						
+						lapData := readConfiguration(kTempDirectory . "Race Report\Race.temp")
+						
+						for key, value in getConfigurationSectionValues(lapData, "Lap")
+							setConfigurationValue(data, "Laps", key, value)
+						
+						times := getConfigurationValue(lapData, "Times", A_Index)
+						positions := getConfigurationValue(lapData, "Positions", A_Index)
+						laps := getConfigurationValue(lapData, "Laps", A_Index)
+						drivers := getConfigurationValue(lapData, "Drivers", A_Index)
+						
+						newLine := ((A_Index > 1) ? "`n" : "")
+						
+						line := (newLine . times)
+						
+						FileAppend %line%, % kTempDirectory . "Race Report\Times.CSV"
+						
+						line := (newLine . positions)
+						
+						FileAppend %line%, % kTempDirectory . "Race Report\Positions.CSV"
+						
+						line := (newLine . laps)
+						
+						FileAppend %line%, % kTempDirectory . "Race Report\Laps.CSV"
+						
+						line := (newLine . drivers)
+						directory := (kTempDirectory . "Race Report\Drivers.CSV")
+						
+						FileAppend %line%, %directory%
+						
+						try {
+							FileDelete %kTempDirectory%Race Report\Race.temp
+						}
+						catch exception {
+							; ignore
+						}
 					}
 					catch exception {
-						; ignore
+						break
 					}
-				}
-				catch exception {
-					break
 				}
 				
 				removeConfigurationValue(data, "Laps", "Lap")
+				setConfigurationValue(data, "Laps", "Count", count)
 				
 				writeConfiguration(kTempDirectory . "Race Report\Race.data", data)
 				
@@ -372,6 +381,8 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			else {
 				data := readConfiguration(kTempDirectory . "Race Report\Race.data")
 				
+				count := 0
+				
 				Loop {
 					fileName := (kTempDirectory . "Race Report\Lap." . A_Index)
 				
@@ -379,7 +390,9 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 						break
 					else {
 						lapData := readConfiguration(fileName)
-					
+				
+						count := A_Index
+						
 						try {
 							FileDelete %fileName%
 						}
@@ -410,13 +423,14 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 						FileAppend %line%, % kTempDirectory . "Race Report\Laps.CSV"
 						
 						line := (newLine . drivers)
-						directory := (kTempDirectory . "Race Report\Drivers.CSV")
+						fileName := (kTempDirectory . "Race Report\Drivers.CSV")
 						
-						FileAppend %line%, %directory%, UTF-16
+						FileAppend %line%, %fileName%
 					}
 				}
 				
 				removeConfigurationValue(data, "Laps", "Lap")
+				setConfigurationValue(data, "Laps", "Count", count)
 				
 				writeConfiguration(kTempDirectory . "Race Report\Race.data", data)
 				

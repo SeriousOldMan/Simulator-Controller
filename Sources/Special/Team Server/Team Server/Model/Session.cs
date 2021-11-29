@@ -42,8 +42,17 @@ namespace TeamServer.Model {
 
         [Ignore]
         public List<Stint> Stints {
-            get {
+            get
+            {
                 return ObjectManager.GetSessionStintsAsync(this).Result;
+            }
+        }
+
+        [Ignore]
+        public List<Lap> Laps {
+            get
+            {
+                return ObjectManager.GetSessionLapsAsync(this).Result;
             }
         }
 
@@ -123,11 +132,23 @@ namespace TeamServer.Model {
     [Table("Laps")]
     public class Lap : ModelObject {
         [Indexed]
+        public int SessionID { get; set; }
+
+        [Indexed]
         public int StintID { get; set; }
 
         [Ignore]
+        public Session Session {
+            get
+            {
+                return ObjectManager.GetLapSessionAsync(this).Result;
+            }
+        }
+
+        [Ignore]
         public Stint Stint {
-            get {
+            get
+            {
                 return ObjectManager.GetLapStintAsync(this).Result;
             }
         }

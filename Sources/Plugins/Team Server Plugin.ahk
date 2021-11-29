@@ -69,8 +69,8 @@ class TeamServerPlugin extends ControllerPlugin {
 				function.setLabel(plugin.actionLabel(this), "Black")
 			}
 			else if (!plugin.TeamServerEnabled && ((trigger = "On") || (trigger == "Push"))) {
-				plugin.disableTeamServer()
-			
+				plugin.enableTeamServer()
+				
 				trayMessage(plugin.actionLabel(this), translate("State: On"))
 			
 				function.setLabel(plugin.actionLabel(this), "Green")

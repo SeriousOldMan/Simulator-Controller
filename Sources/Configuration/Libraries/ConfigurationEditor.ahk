@@ -49,7 +49,7 @@ global vTriggerDetectorCallback = false
 global saveModeDropDown
 
 class ConfigurationEditor extends ConfigurationItem {
-	iWindow := "SE"
+	iWindow := "CFGE"
 	iGeneralTab := false
 	
 	iConfigurators := []

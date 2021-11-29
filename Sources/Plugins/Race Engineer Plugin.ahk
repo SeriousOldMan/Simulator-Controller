@@ -26,7 +26,7 @@ global kRaceEngineerPlugin = "Race Engineer"
 
 class RaceEngineerPlugin extends RaceAssistantPlugin  {
 	static kLapDataSchemas := {Pressures: ["Lap", "Simulator", "Car", "Track", "Weather", "Temperature.Air", "Temperature.Track"
-										 , "Compound", "Compound.Color", "Pressures.Cold", "Pressues.Hot"]}
+										 , "Compound", "Compound.Color", "Pressures.Cold", "Pressures.Hot"]}
 										 
 	iPitstopPending := false
 	
@@ -249,16 +249,16 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		this.Simulator.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork)
 	}
 	
-	savePressureData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature, currentCompound, currentCompoundColor, coldPressures, hotPressures) {
+	savePressureData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor, coldPressures, hotPressures) {
 		teamServer := this.TeamServer
 		
 		if (teamServer && teamServer.SessionActive)
 			teamServer.setLapValue(lapNumber, this.Plugin . " Pressures"
-								 , values2String(";", simulator, car, track, weather, airTemperature, trackTemperature, currentCompound, currentCompoundColor, coldPressures, hotPressures))
+								 , values2String(";", simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor, coldPressures, hotPressures))
 		else
 			this.LapDatabase.add("Pressures", {Lap: lapNumber, Simulator: simulator, Car: car, Track: track
 											 , Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
-											 , "Compound": compound, "Compound.Color": compoundColor, "Pressures.Cold": coldPressures, "Temperature.Track": hotPressures})
+											 , "Compound": compound, "Compound.Color": compoundColor, "Pressures.Cold": coldPressures, "Pressures.Hot": hotPressures})
 	}
 	
 	updateSetupDatabase() {
@@ -269,7 +269,10 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		if (teamServer && teamServer.Active && session)
 			Loop {
 				try {
-					lapPressures := string2Values(";", teamServer.getLapValue(A_Index, this.Plugin . " Presures", session))
+					lapPressures := string2Values(";", teamServer.getLapValue(A_Index, this.Plugin . " Pressures", session))
+					
+					if !lapPressures
+						break
 					
 					setupDB.updatePressures(lapPressures[1], lapPressures[2], lapPressures[3], lapPressures[4], lapPressures[5], lapPressures[6]
 										  , lapPressures[7], lapPressures[8], string2Values(",", lapPressures[9]), string2Values(",", lapPressures[10]), false)

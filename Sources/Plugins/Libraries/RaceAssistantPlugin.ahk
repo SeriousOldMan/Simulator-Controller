@@ -246,15 +246,15 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		fireAction(function, trigger) {
 			local plugin := this.Plugin
 			
-			if (plugin.TeamServerEnabled && ((trigger = "Off") || (trigger == "Push"))) {
+			if (plugin.TeamServer.TeamServerEnabled && ((trigger = "Off") || (trigger == "Push"))) {
 				plugin.disableTeamServer()
 			
 				trayMessage(plugin.actionLabel(this), translate("State: Off"))
 			
 				function.setLabel(plugin.actionLabel(this), "Black")
 			}
-			else if (!plugin.TeamServerEnabled && ((trigger = "On") || (trigger == "Push"))) {
-				plugin.disableTeamServer()
+			else if (!plugin.TeamServer.TeamServerEnabled && ((trigger = "On") || (trigger == "Push"))) {
+				plugin.enableTeamServer()
 			
 				trayMessage(plugin.actionLabel(this), translate("State: On"))
 			

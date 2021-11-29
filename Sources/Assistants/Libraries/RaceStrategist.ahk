@@ -30,6 +30,8 @@ class RaceStrategist extends RaceAssistant {
 	iSaveTelemetry := kAlways
 	iSaveRaceReport := false
 	
+	iFirstStandingsLap := true
+	
 	iSessionReportsDatabase := false
 	iSessionDataActive := false
 	
@@ -598,6 +600,8 @@ class RaceStrategist extends RaceAssistant {
 		else
 			saveSettings := getConfigurationValue(this.Configuration, "Race Assistant Shutdown", simulatorName . ".SaveSettings", getConfigurationValue(configuration, "Race Engineer Shutdown", simulatorName . ".SaveSettings", kNever))
 		
+		this.iFirstStandingsLap := true
+		
 		this.updateConfigurationValues({LearningLaps: getConfigurationValue(configuration, "Race Strategist Analysis", simulatorName . ".LearningLaps", 1)
 									  , SessionReportsDatabase: getConfigurationValue(this.Configuration, "Race Strategist Reports", "Database", false)
 									  , SaveTelemetry: getConfigurationValue(configuration, "Race Strategist Shutdown", simulatorName . ".SaveTelemetry", kAlways)
@@ -658,8 +662,10 @@ class RaceStrategist extends RaceAssistant {
 					pitstop := (lapNumber == (knowledgeBase.getValue("Pitstop." . pitstop . ".Lap") + 1))
 				
 				prefix := "Lap." . lapNumber
-					
-				if knowledgeBase.getValue(prefix . ".Valid", true) {
+				
+				validLap := knowledgeBase.getValue(prefix . ".Valid", true)
+				
+				if validLap {
 					weather := knowledgeBase.getValue(prefix . ".Weather")
 					airTemperature := knowledgeBase.getValue(prefix . ".Temperature.Air")
 					trackTemperature := knowledgeBase.getValue(prefix . ".Temperature.Track")
@@ -673,25 +679,25 @@ class RaceStrategist extends RaceAssistant {
 					tc := knowledgeBase.getValue(prefix . ".TC")
 					abs := knowledgeBase.getValue(prefix . ".ABS")
 					
-					pressures := values2String("," Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.FL"), 1)
-												 , Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.FR"), 1)
-												 , Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.RL"), 1)
-												 , Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.RR"), 1))
+					pressures := values2String(",", Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.FL"), 1)
+												  , Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.FR"), 1)
+												  , Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.RL"), 1)
+												  , Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.RR"), 1))
 					
-					temperatures := values2String("," Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.FL"), 1)
-													, Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.FR"), 1)
-													, Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.RL"), 1)
-													, Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.RR"), 1))
-					
+					temperatures := values2String(",", Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.FL"), 1)
+													 , Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.FR"), 1)
+													 , Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.RL"), 1)
+													 , Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.RR"), 1))
+													
 					this.saveTelemetryData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
-										 , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs,
+										 , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
 										 , compound, compoundColor, pressures, temperatures)
 				}
 			}
-			
-			if (this.SaveRaceReport != kNever)
-				this.saveStandingsData(lapNumber, simulator, car, track)
 		}
+			
+		if (this.SaveRaceReport != kNever)
+			this.saveStandingsData(lapNumber, simulator, car, track)
 		
 		return result
 	}
@@ -1087,7 +1093,9 @@ class RaceStrategist extends RaceAssistant {
 			driver := knowledgeBase.getValue("Driver.Car")
 			carCount := knowledgeBase.getValue("Car.Count")
 			
-			if (lapNumber == 1) {
+			if this.iFirstStandingsLap {
+				this.iFirstStandingsLap := false
+				
 				data := newConfiguration()
 				
 				setConfigurationValue(data, "Session", "Time", this.SessionTime)
@@ -1168,6 +1176,7 @@ class RaceStrategist extends RaceAssistant {
 	}
 	
 	createRaceReport() {
+		showMessage("CRR")
 		if this.RemoteHandler
 			this.RemoteHandler.createRaceReport()
 	}
@@ -1182,6 +1191,7 @@ class RaceStrategist extends RaceAssistant {
 	}
 	
 	updateTelemetryDatabase() {
+		showMessage("UTD")
 		if this.RemoteHandler
 			this.RemoteHandler.updateTelemetryDatabase()
 	}

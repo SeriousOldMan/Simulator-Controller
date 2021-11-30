@@ -3903,6 +3903,12 @@ msgBox(ignore, args*) {
 	return true
 }
 
+msgShow(ignore, args*) {
+	showMessage(values2String(A_Space, args*))
+	
+	return true
+}
+
 option(choicePoint, option, value) {
 	if isInstance(option, Term)
 		option := option.toSTring(resultSet)

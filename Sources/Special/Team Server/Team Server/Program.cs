@@ -59,7 +59,7 @@ namespace TeamServer {
         static void CreateAccounts(ObjectManager objectManager, IList<Settings.Account> accounts) {
             foreach (Settings.Account account in accounts)
                 if (objectManager.GetAccountAsync(account.Name, account.Password).Result == null)
-                    new Account { Name = account.Name, Password = account.Password,
+                    new Account { Name = account.Name, Password = account.Password, Virgin = false,
                                   Administrator = account.Administrator, MinutesLeft = account.Minutes }.Save();
         }
     }

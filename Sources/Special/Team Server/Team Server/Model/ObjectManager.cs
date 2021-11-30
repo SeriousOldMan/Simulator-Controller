@@ -49,7 +49,15 @@ namespace TeamServer.Model {
 
         #region Access.Account
         public Task<Access.Account> GetAccountAsync(int id) {
-            return Connection.Table<Access.Account>().Where(c => c.ID == id).FirstOrDefaultAsync();
+            return Connection.Table<Access.Account>().Where(a => a.ID == id).FirstOrDefaultAsync();
+        }
+
+        public Task<Access.Account> GetAccountAsync(Guid identifier) {
+            return Connection.Table<Access.Account>().Where(a => a.Identifier == identifier).FirstOrDefaultAsync();
+        }
+
+        public Task<Access.Account> GetAccountAsync(string identifier) {
+            return Connection.Table<Access.Account>().Where(a => a.Name == identifier || a.Identifier == new Guid(identifier)).FirstOrDefaultAsync();
         }
 
         public Task<Access.Account> GetAccountAsync(string account, string password) {

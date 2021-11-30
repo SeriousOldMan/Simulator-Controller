@@ -11,6 +11,8 @@ namespace TeamServer.Model.Access {
 
         public string Password { get; set; }
 
+        public bool Virgin { get; set; } = true;
+
         public bool Administrator { get; set; }
 
         public int MinutesLeft { get; set; }

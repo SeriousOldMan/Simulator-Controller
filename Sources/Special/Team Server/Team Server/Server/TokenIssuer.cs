@@ -67,5 +67,24 @@ namespace TeamServer.Server {
             return ValidateToken(new Guid(identifier));
         }
         #endregion
+
+        #region Elevation
+        public Token ElevateToken(Token token) {
+            ValidateToken(token);
+
+            if (!token.Account.Administrator)
+                throw new Exception("Higher privileges required...");
+            else
+                return token;
+        }
+
+        public Token ElevateToken(Guid identifier) {
+            return ElevateToken(ObjectManager.GetTokenAsync(identifier).Result);
+        }
+
+        public Token ElevateToken(string identifier) {
+            return ElevateToken(new Guid(identifier));
+        }
+        #endregion
     }
 }

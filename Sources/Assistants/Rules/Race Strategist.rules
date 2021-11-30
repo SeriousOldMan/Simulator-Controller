@@ -566,7 +566,7 @@ clearStandings() <= ?lap = !Lap - 1, ?clearLap = ?lap - !Session.Settings.Lap.Hi
 
 clearStandings(0) <= !
 clearStandings(?lap) <= ?lap < 0, !
-clearStandings(?lap) <= Call(msgShow, ?lap), clearStanding(?lap), ?pLap = ?lap - 1, clearStandings(?pLap)
+clearStandings(?lap) <= clearStanding(?lap), ?pLap = ?lap - 1, clearStandings(?pLap)
 
 clearStanding(?lap) <= Append(Standings.Lap., ?lap, .Car.Count, ?fact), fact?(?fact), Get(?fact, ?carCount), Clear(?fact),						\
 					   Append(Standings.Lap., ?lap, .Time, ?timeFact), Clear(?timeFact),														\
@@ -581,9 +581,8 @@ clearStanding(?lap, ?car) <= clearStanding(?lap, ?car, [Delta, Laps, Time, Time.
 							 ?pCar = ?car - 1, clearStanding(?lap, ?pCar)
 
 clearStanding(?, ?, []) <= !
-clearStanding(?lap, ?car, [?fact | ?facts]) <= clearStanding(?lap, ?car, ?fact), clearStanding(?lap, ?car, ?facts)
-; clearStanding(?lap, ?car, ?name) <= Append(Standings.Lap., ?lap, .Car., ?car, ., ?name, ?fact), Clear(?fact)
-clearStanding(?, ?, ?)
+clearStanding(?lap, ?car, [?name | ?names]) <= Append(Standings.Lap., ?lap, .Car., ?car, ., ?name, ?fact), Clear(?fact),						\
+											   clearStanding(?lap, ?car, ?names)
 
 
 ;;;-------------------------------------------------------------------------;;;

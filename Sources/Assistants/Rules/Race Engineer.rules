@@ -745,7 +745,7 @@ pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Repair.Bodywork, !Pi
 
 priority: -40, [?Cleanup = Laps] => (Prove: clearLaps()), (Clear: Cleanup)
 
-clearLaps() <= Call(msgShow, REClearLaps), ?lap = !Lap - 1, ?clearLap = ?lap - !Session.Settings.Lap.History.Considered, clearLaps(?clearLap), Call(msgShow, REFinished)
+clearLaps() <= ?lap = !Lap - 1, ?clearLap = ?lap - !Session.Settings.Lap.History.Considered, clearLaps(?clearLap)
 
 clearLaps(0) <= !
 clearLaps(?lap) <= ?lap < 0, !

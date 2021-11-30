@@ -517,6 +517,24 @@ class TeamServerPlugin extends ControllerPlugin {
 		}
 	}
 	
+	getCurrentLap(session := false) {
+		if (!session && this.SessionActive)
+			session := this.Session
+		
+		if session {
+			try {
+				lap := this.Connector.GetSessionLastLap(session)
+				
+				return this.parseObject(this.Connector.GetLap(lap)).Nr
+			}
+			catch exception {
+				logMessage(kLogCritical, translate("Error while fetching lap data (Session: ") . session . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+			}
+		}
+		
+		return false
+	}
+	
 	getLapValue(lap, name, session := false) {
 		if (!session && this.SessionActive)
 			session := this.Session

@@ -120,12 +120,15 @@ namespace TeamServer.Server {
 			ValidateSession(session);
 
 			if (session.Started && !session.Finished) {
-				Token.Account.MinutesLeft -= (int)Math.Round((DateTime.Now - session.StartTime).TotalSeconds * 60);
+				var account = Token.Account;
+
+				account.MinutesLeft -= (int)Math.Round((DateTime.Now - session.StartTime).TotalMinutes);
 
 				session.Started = false;
 				session.Finished = true;
 				session.FinishTime = DateTime.Now;
 
+				account.Save();
 				session.Save();
 			}
 		}

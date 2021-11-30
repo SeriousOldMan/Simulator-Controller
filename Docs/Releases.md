@@ -3,7 +3,7 @@
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. Full refactoring of the Setup Database persistant storage - now uses the Database engine
-  4. Lots of bug fixes for Team Serrver
+  4. Hundreds of bug fixes for Team Server
   5. Vastly reduced memory consumption of assistants in endurance races
   6. Fixed pitstop handling for ACC 1.8
   7. Fixed a bug in "Tactile Feedback" plugin which effect actions where not associated correctly with hardware dials.

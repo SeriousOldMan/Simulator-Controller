@@ -161,6 +161,19 @@ namespace TeamServer.Controllers {
             }
         }
 
+        [HttpGet("{identifier}/lap/last")]
+        public string GetLastLap([FromQuery(Name = "token")] string token, string identifier) {
+            try {
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                Session session = sessionManager.LookupSession(identifier);
+
+                return session.GetCurrentStint().GetCurrentLap().Identifier.ToString();
+            }
+            catch (Exception exception) {
+                return "Error: " + exception.Message;
+            }
+        }
+
         [HttpGet("{identifier}/stint")]
         public string GetStint([FromQuery(Name = "token")] string token, string identifier) {
             try {

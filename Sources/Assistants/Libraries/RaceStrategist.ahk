@@ -1176,7 +1176,6 @@ class RaceStrategist extends RaceAssistant {
 	}
 	
 	createRaceReport() {
-		showMessage("CRR")
 		if this.RemoteHandler
 			this.RemoteHandler.createRaceReport()
 	}
@@ -1191,7 +1190,6 @@ class RaceStrategist extends RaceAssistant {
 	}
 	
 	updateTelemetryDatabase() {
-		showMessage("UTD")
 		if this.RemoteHandler
 			this.RemoteHandler.updateTelemetryDatabase()
 	}

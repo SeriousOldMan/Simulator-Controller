@@ -267,12 +267,15 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		session := this.TeamSession
 		
 		if (teamServer && teamServer.Active && session)
-			Loop {
+			Loop % teamServer.getCurrentLap(session)
+			{
 				try {
-					lapPressures := string2Values(";", teamServer.getLapValue(A_Index, this.Plugin . " Pressures", session))
+					lapPressures := teamServer.getLapValue(A_Index, this.Plugin . " Pressures", session)
 					
-					if !lapPressures
-						break
+					if (!lapPressures || (lapPressures == ""))
+						continue
+					
+					lapPressures := string2Values(";", lapPressures)
 					
 					setupDB.updatePressures(lapPressures[1], lapPressures[2], lapPressures[3], lapPressures[4], lapPressures[5], lapPressures[6]
 										  , lapPressures[7], lapPressures[8], string2Values(",", lapPressures[9]), string2Values(",", lapPressures[10]), false)

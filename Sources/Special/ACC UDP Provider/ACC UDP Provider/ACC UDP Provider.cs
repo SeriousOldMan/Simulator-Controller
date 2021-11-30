@@ -271,7 +271,7 @@ namespace ACCUDPProvider {
                     if (command == "Exit")
                         done = true;
                     else if (command == "Read") {
-                        StreamWriter outStream = new StreamWriter(outFileName);
+                        StreamWriter outStream = new StreamWriter(outFileName, false, Encoding.Unicode);
 
                         outStream.WriteLine("[Position Data]");
 

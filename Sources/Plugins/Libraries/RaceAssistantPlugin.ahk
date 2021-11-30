@@ -734,7 +734,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	
 	finishSession(shutdownAssistant := true, shutdownTeamSession := true) {
 		if this.RaceAssistant {
-			this.RaceAssistant.finishSession(shutdownAssistant && (!this.TeamSessionActive || this.TeamServer.DriverActive))
+			this.RaceAssistant.finishSession(shutdownAssistant)
 			
 			if (shutdownTeamSession && this.TeamSessionActive) {
 				this.TeamServer.leaveSession()
@@ -1087,7 +1087,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 								this.TeamServer.joinSession(getConfigurationValue(data, "Session Data", "Car")
 														  , getConfigurationValue(data, "Session Data", "Track")
 														  , dataLastLap
-														  , Round(getConfigurationValue(data, "Session Data", "SessionTimeRemaining", 0) / 1000))
+														  , Round((getConfigurationValue(data, "Session Data", "SessionTimeRemaining", 0) / 1000) / 60))
 							
 							settings := this.prepareSettings(data)
 							settingsFile := (kTempDirectory . this.Plugin . ".settings")

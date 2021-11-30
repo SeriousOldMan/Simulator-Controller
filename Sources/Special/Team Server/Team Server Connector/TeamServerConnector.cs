@@ -269,6 +269,10 @@ namespace TeamServer {
 					   arguments: new Parameters() { { "lap", lap } });
 		}
 
+		public string GetSessionLastLap(string identifier) {
+			return Get("session/" + identifier + "/lap/last");
+		}
+
 		public string GetSessionDriver(string identifier) {
 			return Get("session/" + identifier + "/driver");
 		}

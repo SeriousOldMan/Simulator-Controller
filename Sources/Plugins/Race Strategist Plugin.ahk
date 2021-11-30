@@ -173,14 +173,17 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		session := this.TeamSession
 		
 		runningLap := 0
-			
+		
 		if (teamServer && teamServer.Active && session)
-			Loop {
+			Loop % teamServer.getCurrentLap(session)
+			{
 				try {
-					telemetryData := string2Values(";", teamServer.getLapValue(A_Index, this.Plugin . " Telemetry", session))
+					telemetryData := teamServer.getLapValue(A_Index, this.Plugin . " Telemetry", session)
 					
-					if !telemetryData
-						break
+					if (!telemetryData || (telemetryData == ""))
+						continue
+					
+					telemetryData := string2Values(";", telemetryData)
 					
 					if !telemetryDB
 						telemetryDB := new TelemetryDatabase(telemetryData[1], telemetryData[2], telemetryData[3])
@@ -235,7 +238,15 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		teamServer := this.TeamServer
 		
 		if (teamServer && teamServer.SessionActive) {
-			FileRead info, %fileName%
+			currentEncoding := A_FileEncoding
+			
+			try {
+				FileEncoding UTF-16
+				FileRead info, %fileName%
+			}
+			finally {
+				FileEncoding %currentEncoding%
+			}
 			
 			teamServer.setLapValue(1, this.Plugin . " Race Info", info)
 			
@@ -264,7 +275,15 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		teamServer := this.TeamServer
 		
 		if (teamServer && teamServer.SessionActive) {
-			FileRead lapData, %fileName%
+			currentEncoding := A_FileEncoding
+			
+			try {
+				FileEncoding UTF-16
+				FileRead lapData, %fileName%
+			}
+			finally {
+				FileEncoding %currentEncoding%
+			}
 			
 			teamServer.setLapValue(lapNumber, this.Plugin . " Race Lap", lapData)
 			
@@ -280,14 +299,14 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	}
 	
 	createRaceReport() {
-		directory := getConfigurationValue(this.Configuration, "Race Strategist Reports", "Database", false)
+		reportsDirectory := getConfigurationValue(this.Configuration, "Race Strategist Reports", "Database", false)
 		
-		if directory {
+		if reportsDirectory {
 			teamServer := this.TeamServer
 			session := this.TeamSession
 			
 			runningLap := 0
-			msgbox 1
+			
 			if (teamServer && teamServer.Active && session) {
 				try {
 					FileRemoveDir %kTempDirectory%Race Report, 1
@@ -295,13 +314,13 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 				catch exception {
 					; ignore
 				}
-				msgbox 2
+				
 				FileCreateDir %kTempDirectory%Race Report
 				
 				try {
 					raceInfo := teamServer.getLapValue(1, this.Plugin . " Race Info", session)
 		
-					if !raceInfo
+					if (!raceInfo || (raceInfo == ""))
 						return
 						
 					FileAppend %raceInfo%, %kTempDirectory%Race Report\Race.data
@@ -314,17 +333,17 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 				
 				count := 0
 				
-				Loop {
+				Loop % teamServer.getCurrentLap(session)
+				{
 					try {
 						lapData := teamServer.getLapValue(A_Index, this.Plugin . " Race Lap", session)
 					
-						msgbox % "L" . A_Index
-						if !lapData
-							break
+						if (!lapData || (lapData == ""))
+							continue
 						
-						count := A_Index
+						count += 1
 						
-						FileAppend %lapData%, %kTempDirectory%Race Report\Race.temp
+						FileAppend %lapData%, %kTempDirectory%Race Report\Race.temp, UTF-16
 						
 						lapData := readConfiguration(kTempDirectory . "Race Report\Race.temp")
 						
@@ -336,7 +355,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 						laps := getConfigurationValue(lapData, "Laps", A_Index)
 						drivers := getConfigurationValue(lapData, "Drivers", A_Index)
 						
-						newLine := ((A_Index > 1) ? "`n" : "")
+						newLine := ((count > 1) ? "`n" : "")
 						
 						line := (newLine . times)
 						
@@ -353,7 +372,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 						line := (newLine . drivers)
 						directory := (kTempDirectory . "Race Report\Drivers.CSV")
 						
-						FileAppend %line%, %directory%
+						FileAppend %line%, %directory%, UTF-16
 						
 						try {
 							FileDelete %kTempDirectory%Race Report\Race.temp
@@ -374,7 +393,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 				
 				simulatorCode := new SetupDatabase().getSimulatorCode(getConfigurationValue(data, "Session", "Simulator"))
 			
-				directory := (directory . "\" . simulatorCode . "\" . getConfigurationValue(data, "Session", "Time"))
+				directory := (reportsDirectory . "\" . simulatorCode . "\" . getConfigurationValue(data, "Session", "Time"))
 			
 				FileCopyDir %kTempDirectory%Race Report, %directory%, 1
 			}
@@ -391,7 +410,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 					else {
 						lapData := readConfiguration(fileName)
 				
-						count := A_Index
+						count += 1
 						
 						try {
 							FileDelete %fileName%
@@ -408,7 +427,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 						laps := getConfigurationValue(lapData, "Laps", A_Index)
 						drivers := getConfigurationValue(lapData, "Drivers", A_Index)
 						
-						newLine := ((A_Index > 1) ? "`n" : "")
+						newLine := ((count > 1) ? "`n" : "")
 						
 						line := (newLine . times)
 						
@@ -425,7 +444,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 						line := (newLine . drivers)
 						fileName := (kTempDirectory . "Race Report\Drivers.CSV")
 						
-						FileAppend %line%, %fileName%
+						FileAppend %line%, %fileName%, UTF-16
 					}
 				}
 				
@@ -436,7 +455,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 				
 				simulatorCode := new SetupDatabase().getSimulatorCode(getConfigurationValue(data, "Session", "Simulator"))
 			
-				directory := (directory . "\" . simulatorCode . "\" . getConfigurationValue(data, "Session", "Time"))
+				directory := (reportsDirectory . "\" . simulatorCode . "\" . getConfigurationValue(data, "Session", "Time"))
 			
 				FileCopyDir %kTempDirectory%Race Report, %directory%, 1
 			}

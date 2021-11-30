@@ -122,6 +122,7 @@ namespace TeamServer.Server {
 			if (session.Started && !session.Finished) {
 				Token.Account.MinutesLeft -= (int)Math.Round((DateTime.Now - session.StartTime).TotalSeconds * 60);
 
+				session.Started = false;
 				session.Finished = true;
 				session.FinishTime = DateTime.Now;
 

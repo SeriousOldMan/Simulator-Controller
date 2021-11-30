@@ -51,6 +51,15 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;; "Cleanup" can be set to remove unnecessary knowledge from the memory.   ;;;
+;;; Set "Cleanup" to "Laps" to remove all recent laps, that are outside the ;;;
+;;; the statistical window. This is done automatically after a pitstop.     ;;;
+;;;-------------------------------------------------------------------------;;;
+
+; [?Cleanup] => ...
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                         Fuel Target Calculation                         ;;;
 ;;;                                                                         ;;;
 ;;; Update target fuel amount for the next pit stop after each lap.         ;;;
@@ -694,7 +703,8 @@ requestRepairs(?pitstopNumber) <= Call(requestPitstopRepairs, ?pitstopNumber,			
 ;;; history memory as a reference for future calculations.                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Pitstop.Lap] => (ProveAll: pitstopPerformed(?Pitstop.Lap))
+[?Pitstop.Lap] => (ProveAll: pitstopPerformed(?Pitstop.Lap)), (Set: Cleanup, Laps)
+
 priority: -10, [?Pitstop.Lap] => (Clear: Pitstop.Planned.Lap),																					\
 								 (Clear: Pitstop.Planned.Fuel),																					\
 								 (Clear: Pitstop.Planned.Tyre.Compound), (Clear: Pitstop.Planned.Tyre.Compound.Color),							\
@@ -728,19 +738,16 @@ pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Repair.Bodywork, !Pi
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                          After Pitstop Cleanup                          ;;;
+;;;                            Lap Memory Cleanup                           ;;;
 ;;;                                                                         ;;;
-;;; These rules remove knowledge that is no longer needed after a pitstop.  ;;;
+;;; These rules remove knowledge that is no longer needed.					;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Pitstop.Lap] => (Set: Cleanup, ?Pitstop.Lap)
+priority: -40, [?Cleanup = Laps] => (Prove: clearLaps()), (Clear: Cleanup)
 
-priority: -40, [?Cleanup] => (Prove: clearLaps(?Cleanup, !Session.Settings.Lap.History.Considered))
-priority: -50, [?Cleanup] => (Clear: Cleanup)
+clearLaps() <= ?lap = !Lap - 1, ?clearLap = ?lap - !Session.Settings.Lap.History.Considered, clearLaps(?clearLap)
 
-clearLaps(?lap, deltaLaps) <= ?previousLap = ?lap - 1, ?clearLap = ?previousLap - ?deltaLaps, clearLaps(?clearLap)
-
-clearLaps(?lap) <= clearLapData(?lap), ?previousLap = ?lap - 1, clearLaps(?previousLap)
+clearLaps(?lap) <= clearLap(?lap), ?previousLap = ?lap - 1, clearLaps(?previousLap)
 
 
 ;;;-------------------------------------------------------------------------;;;

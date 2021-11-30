@@ -600,7 +600,7 @@ class RaceStrategist extends RaceAssistant {
 		else
 			saveSettings := getConfigurationValue(this.Configuration, "Race Assistant Shutdown", simulatorName . ".SaveSettings", getConfigurationValue(configuration, "Race Engineer Shutdown", simulatorName . ".SaveSettings", kNever))
 		
-		this.iFirstStandingsLap := true
+		this.iFirstStandingsLap := (getConfigurationValue(data, "Stint Data", "Laps", 0) == 1)
 		
 		this.updateConfigurationValues({LearningLaps: getConfigurationValue(configuration, "Race Strategist Analysis", simulatorName . ".LearningLaps", 1)
 									  , SessionReportsDatabase: getConfigurationValue(this.Configuration, "Race Strategist Reports", "Database", false)
@@ -1093,6 +1093,9 @@ class RaceStrategist extends RaceAssistant {
 			driver := knowledgeBase.getValue("Driver.Car")
 			carCount := knowledgeBase.getValue("Car.Count")
 			
+			if ((driver == 0) || (carCount == 0))
+				return
+			
 			if this.iFirstStandingsLap {
 				this.iFirstStandingsLap := false
 				
@@ -1172,6 +1175,9 @@ class RaceStrategist extends RaceAssistant {
 			writeConfiguration(fileName, data)
 			
 			this.RemoteHandler.saveRaceLap(lapNumber, fileName)
+			
+			if !knowledgeBase.getValue("Cleanup", false)
+				knowledgeBase.addFact("Cleanup", "Standings")
 		}
 	}
 	

@@ -140,15 +140,15 @@ recentLapWeathers(?, !Session.Settings.Lap.History.Considered, []) <= !
 recentLapWeathers(?lap, ?offset, [?weather | ?weathers]) <=																						\
 		?tLap = ?lap - ?offset, lapWeather(?tLap, ?tWeather), ?nOffset = ?offset + 1, recentLapWeathers(?lap, ?nOffset, ?weathers)
 		
-clearLapData(?lap) <= Append(Lap, ?lap, Driver.Forname, ?fact), fact?(?fact),																	\
-					  clearLapData(?lap, [Driver.Forname, Driver.Surname, Driver.Nickname, 														\
-										  Map, TC, ABS, Tyre.Compound, Tyre.Compound.Color, Valid, 												\
-										  Time, Time.Start, Time.End, Fuel.Remaining, Fuel.Consumption, Fuel.AvgConsumption, 					\
-										  Tyre.Pressure.FL, Tyre.Pressure.FR, Tyre.Pressure.RL, Tyre.Pressure.RR,								\
-										  Tyre.Temperature.FL, Tyre.Temperature.FR, Tyre.Temperature.RL, Tyre.Temperature.RR,					\
-										  Weather, Grip, Temperature.Air, Temperature.Track]),													\
-					  ?previousLap = ?lap - 1, clearLapData(?previousLap)
+clearLap(?lap) <= Append(Lap, ?lap, Driver.Forname, ?fact), fact?(?fact),																		\
+				  clearLap(?lap, [Driver.Forname, Driver.Surname, Driver.Nickname, 																\
+								  Map, TC, ABS, Tyre.Compound, Tyre.Compound.Color, Valid, 														\
+								  Time, Time.Start, Time.End, Fuel.Remaining, Fuel.Consumption, Fuel.AvgConsumption, 							\
+								  Tyre.Pressure.FL, Tyre.Pressure.FR, Tyre.Pressure.RL, Tyre.Pressure.RR,										\
+								  Tyre.Temperature.FL, Tyre.Temperature.FR, Tyre.Temperature.RL, Tyre.Temperature.RR,							\
+								  Weather, Grip, Temperature.Air, Temperature.Track]),															\
+				  ?previousLap = ?lap - 1, clearLap(?previousLap)
 
-clearLapData(?lap, []) <= !
-clearLapData(?lap, [?fact | ?facts]) <= clearLapData(?lap, ?fact), clearLapData(?lap, ?facts)
-clearLapData(?lap, ?name) <= Append(Lap, ?lap, ?name, ?fact), Clear(?fact)
+clearLap(?lap, []) <= !
+clearLap(?lap, [?fact | ?facts]) <= clearLap(?lap, ?fact), clearLap(?lap, ?facts)
+clearLap(?lap, ?name) <= Append(Lap, ?lap, ?name, ?fact), Clear(?fact)

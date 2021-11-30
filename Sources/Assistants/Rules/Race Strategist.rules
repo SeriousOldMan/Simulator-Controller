@@ -51,6 +51,18 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;; "Cleanup" can be set to remove unnecessary knowledge from the memory.   ;;;
+;;; Set "Cleanup" to "Laps" to remove all recent laps, that are outside the ;;;
+;;; the statistical window. This is done automatically after a pitstop.     ;;;
+;;; You can also set it to "Standings", which will remove all standings     ;;;
+;;; from the memory, which are "older" than									;;;
+;;; "Session.Settings.Lap.History.Considered".								;;;
+;;;-------------------------------------------------------------------------;;;
+
+; [?Cleanup] => ...
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                          Lap & Fuel Calculation                         ;;;
 ;;;                                                                         ;;;
 ;;; Updates the remaining laps with the current amount of fuel and the      ;;;
@@ -119,9 +131,9 @@ projectedTyreTemperature(?lap, ?temperature) <=																									\
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                                  Lap Time Calculation                   ;;;
+;;;                           Lap Time Calculation                          ;;;
 ;;;                                                                         ;;;
-;;; Updates the for all cars each lap.                                      ;;;
+;;; Updates the laptimes for all cars each lap.                             ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 {Any: [?Lap], [?Sector]} => (Prove: updateLapTimes(?Lap, !Car.Count))
@@ -493,7 +505,7 @@ bestPitstopLap([? | ?laps], [? | ?positions], [? | ?densities], ?bestLap, ?bestP
 ;;; history memory as a reference for future calculations.                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Pitstop.Lap] => (Prove: updatePitstopLap(?Pitstop.Lap))
+[?Pitstop.Lap] => (Prove: updatePitstopLap(?Pitstop.Lap)), (Set: Cleanup, Laps)
 priority: -20, [?Pitstop.Lap] => (Clear: Pitstop.Lap)
 
 updatePitstopLap(?lap) <= Get(Pitstop.Last, ?last), Get(Pitstop, ?last, Lap, ?lap), !
@@ -528,37 +540,44 @@ validPitstopLap(?pitstopLap) <= ?diff = !Strategy.Pitstop.Lap - ?pitstopLap, abs
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                          After Pitstop Cleanup                          ;;;
+;;;                            Lap Memory Cleanup                           ;;;
 ;;;                                                                         ;;;
-;;; These rules remove knowledge that is no longer needed after a pitstop.  ;;;
+;;; These rules remove knowledge that is no longer needed.					;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Pitstop.Lap] => (Set: Cleanup, ?Pitstop.Lap)
+priority: -40, [?Cleanup = Laps] => (Prove: clearLaps()), (Clear: Cleanup)
 
-priority: -40, [?Cleanup] => (Prove: clearLaps(?Cleanup, !Session.Settings.Lap.History.Considered)),										\
-							 (Prove: clearStandings(?Cleanup, !Session.Settings.Lap.History.Considered))
-priority: -50, [?Cleanup] => (Clear: Cleanup)
+clearLaps() <= ?lap = !Lap - 1, ?clearLap = ?lap - !Session.Settings.Lap.History.Considered, clearLaps(?clearLap)
 
-clearLaps(?lap, deltaLaps) <= ?previousLap = ?lap - 1, ?clearLap = ?previousLap - ?deltaLaps, clearLaps(?clearLap)
-clearLaps(?lap) <= clearLapData(?lap), ?previousLap = ?lap - 1, clearLaps(?previousLap)
+clearLaps(?lap) <= clearLap(?lap), ?previousLap = ?lap - 1, clearLaps(?previousLap)
 
-clearStandings(?lap, deltaLaps) <= ?previousLap = ?lap - 1, ?clearLap = ?previousLap - ?deltaLaps, clearStandings(?clearLap)
-clearStandings(?lap) <= clearLapData(?lap), ?previousLap = ?lap - 1, clearStandings(?previousLap)
 
-clearStandingsData(?lap) <= Append(Standings.Lap, ?lap, Car.Count, ?fact), fact?(?fact), Get(?fact, ?carCount),									\
-							Append(Standings.Lap, ?lap, Time, ?timeFact), Clear(?timeFact),														\
-							Append(Standings.Lap, ?lap, Position, ?positionFact), Clear(?positionFact),											\
-							Append(Standings.Lap, ?lap, Weather, ?weatherFact), Clear(?weatherFact),											\
-							clearStandingsData(?lap, ?carCount), ?previousLap = ?lap - 1, clearStandingsData(previousLap)
+;;;-------------------------------------------------------------------------;;;
+;;;                         Standings Memory Cleanup                        ;;;
+;;;                                                                         ;;;
+;;; These rules remove knowledge that is no longer needed.					;;;
+;;;-------------------------------------------------------------------------;;;
 
-clearStandingsData(?lap, 0) <= !
-clearStandingsData(?lap, ?car) <= clearStandingsData(?lap, ?car, [Delta, Laps, Time, Time.Average,												\
-																  Position, Driver.Forname, Driver.Surname, Driver.Nickname]),					\
-								  ?previousCar = ?car - 1, clearStandingsData(?lap, ?previousCar)
+priority: -40, [?Cleanup = Standings] => (Prove: clearStandings()), (Clear: Cleanup)
 
-clearStandingsData(?lap, ?car, []) <= !
-clearStandingsData(?lap, ?car, [?fact | ?facts]) <= clearStandingsData(?lap, ?car, ?fact), clearStandingsData(?lap, ?car, ?facts)
-clearStandingsData(?lap, ?car, ?suffix) <= Append(Standings.Lap, ?lap, Car, ?car, ?suffix, ?fact), Clear(?fact)
+clearStandings() <= ?lap = !Lap - 1, ?clearLap = ?previousLap - !Session.Settings.Lap.History.Considered, clearStandings(?clearLap)
+clearStandings(?lap) <= clearStanding(?lap), ?previousLap = ?lap - 1, clearStandings(?previousLap)
+
+clearStanding(?lap) <= Append(Standings.Lap, ?lap, Car.Count, ?fact), fact?(?fact), Get(?fact, ?carCount),										\
+					   Append(Standings.Lap, ?lap, Time, ?timeFact), Clear(?timeFact),															\
+					   Append(Standings.Lap, ?lap, Position, ?positionFact), Clear(?positionFact),												\
+					   Append(Standings.Lap, ?lap, Weather, ?weatherFact), Clear(?weatherFact),													\
+					   clearStanding(?lap, ?carCount), ?previousLap = ?lap - 1, clearStanding(previousLap)
+
+clearStanding(?lap, 0) <= !
+clearStanding(?lap, ?car) <= ?car < 0, !
+clearStanding(?lap, ?car) <= clearStanding(?lap, ?car, [Delta, Laps, Time, Time.Average,														\
+														Position, Driver.Forname, Driver.Surname, Driver.Nickname]),							\
+							 ?previousCar = ?car - 1, clearStanding(?lap, ?previousCar)
+
+clearStanding(?lap, ?car, []) <= !
+clearStanding(?lap, ?car, [?fact | ?facts]) <= clearStanding(?lap, ?car, ?fact), clearStanding(?lap, ?car, ?facts)
+clearStanding(?lap, ?car, ?suffix) <= Append(Standings.Lap, ?lap, Car, ?car, ?suffix, ?fact), Clear(?fact)
 
 
 ;;;-------------------------------------------------------------------------;;;

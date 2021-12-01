@@ -376,11 +376,11 @@ class SetupDatabase extends SessionDatabase {
 											, Compound: compound, "Compound.Color": compoundColor, Type: type, Tyre: tyre, "Pressure": pressure}})
 		
 		if (rows.Length() > 0)
-			rows[1].Count := rows[1].Count + 1
+			rows[1].Count := rows[1].Count + count
 		else
 			this.iDatabase.add("Setup.Pressures.Distribution"
 							 , {Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
-							  , Compound: compound, "Compound.Color": compoundColor, Type: type, Tyre: tyre, "Pressure": pressure, Count: 1}, flush)
+							  , Compound: compound, "Compound.Color": compoundColor, Type: type, Tyre: tyre, "Pressure": pressure, Count: count}, flush)
 	}
 	
 	flush() {

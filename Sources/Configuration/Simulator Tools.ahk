@@ -1431,7 +1431,7 @@ updateConfigurationForV372() {
 					pressureData := readConfiguration(A_LoopFilePath)
 					
 					for temperature, pressures in getConfigurationSectionValues(pressureData, "Pressures", Object()) {
-						temperature := ConfigurationItem.splitDescritor(temperature)
+						temperature := ConfigurationItem.splitDescriptor(temperature)
 						airTemperature := temperature[1]
 						trackTemperature := temperature[2]
 						pressures := string2Values(";", pressures)
@@ -1440,12 +1440,22 @@ updateConfigurationForV372() {
 							for ignore, pressure in string2Values(",", pressures[index]) {
 								pressure := string2Values(":", pressure)
 							
+								if (!simulator || !car || !track)
+									msgbox break
+									
 								setupDB.updatePressure(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor
 													 , "Cold", tyre, pressure[1], pressure[2], false, false)
 							}
 					}
 					
 					setupDB.flush()
+					
+					try {
+						FileDelete %A_LoopFilePath%
+					}
+					catch exception {
+						; ignore
+					}
 				}
 			}
 		}

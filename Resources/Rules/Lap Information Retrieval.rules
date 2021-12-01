@@ -140,14 +140,17 @@ recentLapWeathers(?, !Session.Settings.Lap.History.Considered, []) <= !
 recentLapWeathers(?lap, ?offset, [?weather | ?weathers]) <=																						\
 		?tLap = ?lap - ?offset, lapWeather(?tLap, ?tWeather), ?nOffset = ?offset + 1, recentLapWeathers(?lap, ?nOffset, ?weathers)
 
-
-clearLap(?lap) <= Append(Lap, ?lap, Driver.Forname, ?fact), fact?(?fact),																		\
+clearLap(?lap) <= Append(Lap., ?lap, .Driver.Forname, ?fact), fact?(?fact),																		\
 				  clearLap(?lap, [Driver.Forname, Driver.Surname, Driver.Nickname, 																\
 								  Map, TC, ABS, Tyre.Compound, Tyre.Compound.Color, Valid, 														\
-								  Time, Time.Start, Time.End, Fuel.Remaining, Fuel.Consumption, Fuel.AvgConsumption, 							\
+								  Time, Time.Start, Time.End, Time.Average, Fuel.Remaining, Fuel.Consumption, Fuel.AvgConsumption, 				\
 								  Tyre.Pressure.FL, Tyre.Pressure.FR, Tyre.Pressure.RL, Tyre.Pressure.RR,										\
 								  Tyre.Temperature.FL, Tyre.Temperature.FR, Tyre.Temperature.RL, Tyre.Temperature.RR,							\
-								  Weather, Grip, Temperature.Air, Temperature.Track])
+								  Damage.Bodywork, Damage.Suspension, Damage.Bodywork.Lap.Reference, Damage.Suspension.Lap.Reference,			\
+								  Damage.Bodywork.Center, Damage.Bodywork.Front, Damage.Bodywork.Rear,											\
+								  Damage.Bodywork.Left, Damage.Bodywork.Right,																	\
+								  Damage.Suspension.FL, Damage.Suspension.FR, Damage.Suspension.RL, Damage.Suspension.RR,						\
+								  Weather, Grip, Temperature.Air, Temperature.Track, Valid])
 
 clearLap(?, []) <= !
 clearLap(?lap, [?name | ?names]) <= Append(Lap., ?lap, ., ?name, ?fact), Clear(?fact), clearLap(?lap, ?names)

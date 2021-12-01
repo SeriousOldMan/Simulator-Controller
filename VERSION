@@ -1,8 +1,8 @@
 [Development]
 Version=3.7.2-dev
 Target=3.7.2-release
-Date=11/29/2021
-Download=
+Date=12/01/2021
+Download=https://www.dropbox.com/s/dvn40d2q7pgecg1/Simulator%20Controller%203.7.2-dev.zip?dl=1
 Changes=Vastly reduced memory consumption of assistants in endurance races, Full refactoring of the setup database, Many fixes for "Team Server", Fixed pitstop handling for ACC 1.8, Fixed a bug for "Tactile Feedback" with actions bound to dials, New "Team Server" administration backend
 [Release]
 Version=3.7.1-release

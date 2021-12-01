@@ -180,7 +180,7 @@ namespace TeamServer {
 			return Post("account", body: BuildBody(new Parameters() { { "Name", name }, { "Password", password }, { "Minutes", minutes } }));
 		}
 
-		public void ChangePassword(string identifier, string newPassword) {
+		public void ChangeAccountPassword(string identifier, string newPassword) {
 			Put("account/" + identifier + "/password", body: newPassword);
 		}
 

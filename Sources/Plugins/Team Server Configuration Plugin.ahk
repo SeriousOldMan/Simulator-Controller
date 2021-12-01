@@ -161,6 +161,9 @@ class TeamServerConfigurator extends ConfigurationItem {
 		w3 := Round((w4 / 2) - 3)
 		x3 := x1 + w3 + 6
 		
+		x5 := x3 + w3 + 2
+		w5 := w3 - 25
+		
 		Gui %window%:Add, Text, x%x0% y%y% w90 h23 +0x200 HWNDwidget1 Hidden, % translate("Server URL")
 		Gui %window%:Add, Edit, x%x1% yp+1 w%w4% h21 VteamServerURLEdit HWNDwidget2 Hidden, %teamServerURLEdit%
 		Gui %window%:Add, Button, x%x4% yp-1 w23 h23 Center +0x200 gcopyURL HWNDwidget26 Hidden
@@ -169,6 +172,8 @@ class TeamServerConfigurator extends ConfigurationItem {
 		Gui %window%:Add, Text, x%x0% yp+23 w90 h23 +0x200 HWNDwidget3 Hidden, % translate("Login Credentials")
 		Gui %window%:Add, Edit, x%x1% yp+1 w%w3% h21 VteamServerNameEdit HWNDwidget4 Hidden, %teamServerNameEdit%
 		Gui %window%:Add, Edit, x%x3% yp w%w3% h21 Password VteamServerPasswordEdit HWNDwidget5 Hidden, %teamServerPasswordEdit%
+		Gui %window%:Add, Button, x%x5% yp-1 w23 h23 Center +0x200 gchangePassword HWNDwidget29 Hidden
+		setButtonIcon(widget29, kIconsDirectory . "Pencil.ico", 1, "L4 T4 R4 B4")
 		
 		Gui %window%:Add, Text, x%x0% yp+26 w90 h23 +0x200 HWNDwidget7 Hidden, % translate("Access Token")
 		Gui %window%:Add, Edit, x%x1% yp-1 w%w4% h21 ReadOnly VteamServerTokenEdit HWNDwidget8 Hidden, %teamServerTokenEdit%
@@ -221,7 +226,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 		Gui %window%:Add, Button, x%x7% yp w23 h23 Center +0x200 veditSessionButton grenameSession HWNDwidget28 Hidden
 		setButtonIcon(widget28, kIconsDirectory . "Pencil.ico", 1, "L4 T4 R4 B4")
 		
-		Loop 28
+		Loop 29
 			editor.registerWidget(this, widget%A_Index%)
 		
 		this.connect(false)
@@ -665,6 +670,69 @@ copyURL() {
 		Clipboard := teamServerURLEdit
 		
 		showMessage(translate("Server URL copied to the clipboard."))
+	}
+}
+
+changePassword() {
+	configurator := TeamServerConfigurator.Instance
+	
+	errorTitle := translate("Error")
+	
+	if configurator.Token {
+		title := translate("Team Server")
+		prompt := translate("Please enter your current password:")
+		
+		window := configurator.Editor.Window
+
+		Gui %window%:Default
+		
+		GuiControlGet teamServerPasswordEdit
+		
+		locale := ((getLanguage() = "en") ? "" : "Locale")
+		
+		InputBox password, %title%, %prompt%, Hide, 200, 150, , , %locale%
+		
+		if ErrorLevel
+			return
+
+		if (teamServerPasswordEdit != password) {
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+			MsgBox 262160, %errorTitle%, % translate("Invalid password.")
+			OnMessage(0x44, "")
+			
+			return
+		}
+		
+		prompt := translate("Please enter your new password:")
+		
+		InputBox firstPassword, %title%, %prompt%, Hide, 200, 150, , , %locale%
+		
+		if ErrorLevel
+			return
+		
+		prompt := translate("Please re-enter your new password:")
+		
+		InputBox secondPassword, %title%, %prompt%, Hide, 200, 150, , , %locale%
+		
+		if ErrorLevel
+			return
+		
+		if (firstPassword != secondPassword) {
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+			MsgBox 262160, %errorTitle%, % translate("The passwords do not match.")
+			OnMessage(0x44, "")
+			
+			return
+		}
+		
+		configurator.Connector.ChangePassword(firstPassword)
+		
+		GuiControl, , teamServerPasswordEdit, % firstPassword
+	}
+	else {
+		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+		MsgBox 262160, %errorTitle%, % translate("You must be connected to the Team Server to change your password.")
+		OnMessage(0x44, "")
 	}
 }
 

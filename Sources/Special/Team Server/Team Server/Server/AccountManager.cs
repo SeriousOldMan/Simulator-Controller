@@ -88,11 +88,15 @@ namespace TeamServer.Server {
         }
 
         public Account CreateAccount(string name, string password, int minutes) {
-            Account account = new Account { Name = name, Password = password, MinutesLeft = minutes, Virgin = false };
+            if (FindAccount(name) == null) {
+                Account account = new Account { Name = name, Password = password, MinutesLeft = minutes, Virgin = false };
 
-            account.Save();
+                account.Save();
 
-            return account;
+                return account;
+            }
+            else
+                throw new Exception("Duplicate account name...");
         }
 
         public void DeleteAccount(Account account) {

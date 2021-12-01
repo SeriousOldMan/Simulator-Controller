@@ -57,7 +57,16 @@ namespace TeamServer.Model {
         }
 
         public Task<Access.Account> GetAccountAsync(string identifier) {
-            return Connection.Table<Access.Account>().Where(a => a.Name == identifier || a.Identifier == new Guid(identifier)).FirstOrDefaultAsync();
+            Guid guid;
+
+            try {
+                guid = new Guid(identifier);
+            }
+            catch {
+                guid = Guid.Empty;
+            }
+
+            return Connection.Table<Access.Account>().Where(a => a.Name == identifier || a.Identifier == guid).FirstOrDefaultAsync();
         }
 
         public Task<Access.Account> GetAccountAsync(string account, string password) {

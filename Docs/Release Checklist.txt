@@ -22,6 +22,14 @@ Release 3.7.0 Checklist
 
 0. Search for new links (*)
 1. Update Procedure
+   a. Update Setup Database
+   b. Translations
+
+Release 3.7.0 Checklist
+=======================
+
+0. Search for new links (*)
+1. Update Procedure
    a. Translations
    b. Phrase Grammars
    c. Install new "Team Server" plugin

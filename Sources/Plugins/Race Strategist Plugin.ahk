@@ -10,6 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Plugins\Libraries\RaceAssistantPlugin.ahk
+#Include ..\Assistants\Libraries\TelemetryDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -20,10 +21,19 @@ global kRaceStrategistPlugin = "Race Strategist"
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                        Private Constant Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 class RaceStrategistPlugin extends RaceAssistantPlugin  {
+	static kLapDataSchemas := {Telemetry: ["Lap", "Simulator", "Car", "Track", "Weather", "Temperature.Air", "Temperature.Track"
+										 , "Fuel.Consumption", "Fuel.Remaining", "LapTime", "Pitstop", "Map", "TC", "ABS"
+										 , "Compound", "Compound.Color", "Pressures", "Temperatures"]}
+										 
 	class RemoteRaceStrategist extends RaceAssistantPlugin.RemoteRaceAssistant {
 		__New(remotePID) {
 			base.__New("Race Strategist", remotePID)
@@ -52,6 +62,15 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	RaceStrategist[] {
 		Get {
 			return this.RaceAssistant
+		}
+	}
+	
+	LapDatabase[] {
+		Get {
+			if !this.iLapDatabase
+				this.iLapDatabase := new Database(false, this.kLapDataSchemas)
+			
+			return this.iLapDatabase
 		}
 	}
 	
@@ -89,6 +108,12 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		return new this.RemoteRaceStrategist(pid)
 	}
 	
+	startSession(settingsFile, dataFile, teamSession) {
+		base.startSession(settingsFile, dataFile, teamSession)
+		
+		this.iLapDatabase := false
+	}
+	
 	requestInformation(arguments*) {
 		if (this.RaceStrategist && inList(["LapsRemaining", "Weather", "Position", "LapTimes", "GapToFront", "GapToBehind", "GapToFrontStandings", "GapToBehindStandings", "GapToFrontTrack", "GapToBehindTrack", "GapToLeader", "StrategyOverview", "NextPitstop"], arguments[1])) {
 			this.RaceStrategist.requestInformation(arguments*)
@@ -122,6 +147,319 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			setConfigurationSectionValues(positionsData, "Position Data", getConfigurationSectionValues(data, "Position Data", Object()))
 		
 		return data
+	}
+	
+	saveTelemetryData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
+					, fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
+					, compound, compoundColor, pressures, temperatures) {
+		teamServer := this.TeamServer
+		
+		if (teamServer && teamServer.SessionActive)
+			teamServer.setLapValue(lapNumber, this.Plugin . " Telemetry"
+								 , values2String(";", simulator, car, track, weather, airTemperature, trackTemperature
+								 , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs,
+								 , compound, compoundColor, pressures, temperatures))
+		else
+			this.LapDatabase.add("Telemetry", {Lap: lapNumber, Simulator: simulator, Car: car, Track: track
+											 , Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
+											 , "Fuel.Consumption": fuelConsumption, "Fuel.Remaining": fuelRemaining, LapTime: lapTime
+											 , Pitstop: pitstop, Map: map, TC: tc, ABS: abs
+											 , "Compound": compound, "Compound.Color": compoundColor, Pressures: pressures, Temperatures: temperatures})
+	}
+
+	updateTelemetryDatabase() {
+		telemetryDB := false
+		teamServer := this.TeamServer
+		session := this.TeamSession
+		
+		runningLap := 0
+		
+		if (teamServer && teamServer.Active && session)
+			Loop % teamServer.getCurrentLap(session)
+			{
+				try {
+					telemetryData := teamServer.getLapValue(A_Index, this.Plugin . " Telemetry", session)
+					
+					if (!telemetryData || (telemetryData == ""))
+						continue
+					
+					telemetryData := string2Values(";", telemetryData)
+					
+					if !telemetryDB
+						telemetryDB := new TelemetryDatabase(telemetryData[1], telemetryData[2], telemetryData[3])
+					
+					if telemetryData[10]
+						runningLap := 0
+					
+					runningLap += 1
+					
+					pressures := string2Values(",", telemetryData[16])
+					temperatures := string2Values(",", telemetryData[17])
+					
+					telemetryDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15]
+												 , telemetryData[11], telemetryData[12], telemetryData[13], telemetryData[7], telemetryData[8], telemetryData[9])
+												 
+					telemetryDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15], runningLap
+										   , pressures[1], pressures[2], pressures[4], pressures[4]
+										   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
+										   , telemetryData[7], telemetryData[8], telemetryData[9])
+				}
+				catch exception {
+					break
+				}
+			}
+		else
+			for ignore, telemetryData in this.LapDatabase.Tables["Telemetry"] {
+				if !telemetryDB
+					telemetryDB := new TelemetryDatabase(telemetryData.Simulator, telemetryData.Car, telemetryData.Track)
+				
+				if telemetryData.Pitstop
+					runningLap := 0
+				
+				runningLap += 1
+				
+				telemetryDB.addElectronicEntry(telemetryData.Weather, telemetryData["Temperature.Air"], telemetryData["Temperature.Track"]
+											 , telemetryData.Compound, telemetryData["Compound.Color"]
+											 , telemetryData.Map, telemetryData.TC, telemetryData.ABS
+											 , telemetryData["Fuel.Consumption"], telemetryData["Fuel.Remaining"], telemetryData.LapTime)
+				
+				pressures := string2Values(",", telemetryData.Pressures)
+				temperatures := string2Values(",", telemetryData.Temperatures)
+				
+				telemetryDB.addTyreEntry(telemetryData.Weather, telemetryData["Temperature.Air"], telemetryData["Temperature.Track"]
+									   , telemetryData.Compound, telemetryData["Compound.Color"], runningLap
+									   , pressures[1], pressures[2], pressures[4], pressures[4]
+									   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
+									   , telemetryData["Fuel.Consumption"], telemetryData["Fuel.Remaining"], telemetryData.LapTime)
+			}
+	}
+	
+	saveRaceInfo(fileName) {
+		teamServer := this.TeamServer
+		
+		if (teamServer && teamServer.SessionActive) {
+			currentEncoding := A_FileEncoding
+			
+			try {
+				FileEncoding UTF-16
+				FileRead info, %fileName%
+			}
+			finally {
+				FileEncoding %currentEncoding%
+			}
+			
+			teamServer.setLapValue(1, this.Plugin . " Race Info", info)
+			
+			try {
+				FileDelete %fileName%
+			}
+			catch exception {
+				; ignore
+			}
+		}
+		else {
+			try {
+				FileRemoveDir %kTempDirectory%Race Report, 1
+			}
+			catch exception {
+				; ignore
+			}
+			
+			FileCreateDir %kTempDirectory%Race Report
+			
+			FileMove %fileName%, %kTempDirectory%Race Report\Race.data
+		}
+	}
+	
+	saveRaceLap(lapNumber, fileName) {
+		teamServer := this.TeamServer
+		
+		if (teamServer && teamServer.SessionActive) {
+			currentEncoding := A_FileEncoding
+			
+			try {
+				FileEncoding UTF-16
+				FileRead lapData, %fileName%
+			}
+			finally {
+				FileEncoding %currentEncoding%
+			}
+			
+			teamServer.setLapValue(lapNumber, this.Plugin . " Race Lap", lapData)
+			
+			try {
+				FileDelete %fileName%
+			}
+			catch exception {
+				; ignore
+			}
+		}
+		else 
+			FileMove %fileName%, %kTempDirectory%Race Report\Lap.%lapNumber%
+	}
+	
+	createRaceReport() {
+		reportsDirectory := getConfigurationValue(this.Configuration, "Race Strategist Reports", "Database", false)
+		
+		if reportsDirectory {
+			teamServer := this.TeamServer
+			session := this.TeamSession
+			
+			runningLap := 0
+			
+			if (teamServer && teamServer.Active && session) {
+				try {
+					FileRemoveDir %kTempDirectory%Race Report, 1
+				}
+				catch exception {
+					; ignore
+				}
+				
+				FileCreateDir %kTempDirectory%Race Report
+				
+				try {
+					raceInfo := teamServer.getLapValue(1, this.Plugin . " Race Info", session)
+		
+					if (!raceInfo || (raceInfo == ""))
+						return
+						
+					FileAppend %raceInfo%, %kTempDirectory%Race Report\Race.data
+					
+					data := readConfiguration(kTempDirectory . "Race Report\Race.data")
+				}
+				catch exception {
+					; ignore
+				}
+				
+				count := 0
+				
+				Loop % teamServer.getCurrentLap(session)
+				{
+					try {
+						lapData := teamServer.getLapValue(A_Index, this.Plugin . " Race Lap", session)
+					
+						if (!lapData || (lapData == ""))
+							continue
+						
+						count += 1
+						
+						FileAppend %lapData%, %kTempDirectory%Race Report\Race.temp, UTF-16
+						
+						lapData := readConfiguration(kTempDirectory . "Race Report\Race.temp")
+						
+						for key, value in getConfigurationSectionValues(lapData, "Lap")
+							setConfigurationValue(data, "Laps", key, value)
+						
+						times := getConfigurationValue(lapData, "Times", A_Index)
+						positions := getConfigurationValue(lapData, "Positions", A_Index)
+						laps := getConfigurationValue(lapData, "Laps", A_Index)
+						drivers := getConfigurationValue(lapData, "Drivers", A_Index)
+						
+						newLine := ((count > 1) ? "`n" : "")
+						
+						line := (newLine . times)
+						
+						FileAppend %line%, % kTempDirectory . "Race Report\Times.CSV"
+						
+						line := (newLine . positions)
+						
+						FileAppend %line%, % kTempDirectory . "Race Report\Positions.CSV"
+						
+						line := (newLine . laps)
+						
+						FileAppend %line%, % kTempDirectory . "Race Report\Laps.CSV"
+						
+						line := (newLine . drivers)
+						directory := (kTempDirectory . "Race Report\Drivers.CSV")
+						
+						FileAppend %line%, %directory%, UTF-16
+						
+						try {
+							FileDelete %kTempDirectory%Race Report\Race.temp
+						}
+						catch exception {
+							; ignore
+						}
+					}
+					catch exception {
+						break
+					}
+				}
+				
+				removeConfigurationValue(data, "Laps", "Lap")
+				setConfigurationValue(data, "Laps", "Count", count)
+				
+				writeConfiguration(kTempDirectory . "Race Report\Race.data", data)
+				
+				simulatorCode := new SetupDatabase().getSimulatorCode(getConfigurationValue(data, "Session", "Simulator"))
+			
+				directory := (reportsDirectory . "\" . simulatorCode . "\" . getConfigurationValue(data, "Session", "Time"))
+			
+				FileCopyDir %kTempDirectory%Race Report, %directory%, 1
+			}
+			else {
+				data := readConfiguration(kTempDirectory . "Race Report\Race.data")
+				
+				count := 0
+				
+				Loop {
+					fileName := (kTempDirectory . "Race Report\Lap." . A_Index)
+				
+					if !FileExist(fileName)
+						break
+					else {
+						lapData := readConfiguration(fileName)
+				
+						count += 1
+						
+						try {
+							FileDelete %fileName%
+						}
+						catch exception {
+							; ignore
+						}
+						
+						for key, value in getConfigurationSectionValues(lapData, "Lap")
+							setConfigurationValue(data, "Laps", key, value)
+						
+						times := getConfigurationValue(lapData, "Times", A_Index)
+						positions := getConfigurationValue(lapData, "Positions", A_Index)
+						laps := getConfigurationValue(lapData, "Laps", A_Index)
+						drivers := getConfigurationValue(lapData, "Drivers", A_Index)
+						
+						newLine := ((count > 1) ? "`n" : "")
+						
+						line := (newLine . times)
+						
+						FileAppend %line%, % kTempDirectory . "Race Report\Times.CSV"
+						
+						line := (newLine . positions)
+						
+						FileAppend %line%, % kTempDirectory . "Race Report\Positions.CSV"
+						
+						line := (newLine . laps)
+						
+						FileAppend %line%, % kTempDirectory . "Race Report\Laps.CSV"
+						
+						line := (newLine . drivers)
+						fileName := (kTempDirectory . "Race Report\Drivers.CSV")
+						
+						FileAppend %line%, %fileName%, UTF-16
+					}
+				}
+				
+				removeConfigurationValue(data, "Laps", "Lap")
+				setConfigurationValue(data, "Laps", "Count", count)
+				
+				writeConfiguration(kTempDirectory . "Race Report\Race.data", data)
+				
+				simulatorCode := new SetupDatabase().getSimulatorCode(getConfigurationValue(data, "Session", "Simulator"))
+			
+				directory := (reportsDirectory . "\" . simulatorCode . "\" . getConfigurationValue(data, "Session", "Time"))
+			
+				FileCopyDir %kTempDirectory%Race Report, %directory%, 1
+			}
+		}		
 	}
 }
 

@@ -2,6 +2,8 @@
 using Microsoft.Extensions.Logging;
 using System;
 using TeamServer.Model;
+using TeamServer.Model.Access;
+using TeamServer.Server;
 
 namespace TeamServer.Controllers {
     [ApiController]
@@ -14,7 +16,7 @@ namespace TeamServer.Controllers {
         }
 
         [HttpGet]
-        public string Get([FromQuery(Name = "name")] string name, [FromQuery(Name = "password")] string password) {
+        public string Login([FromQuery(Name = "name")] string name, [FromQuery(Name = "password")] string password) {
             if (name == null)
                 name = "";
 
@@ -41,6 +43,25 @@ namespace TeamServer.Controllers {
         public string GetTokenMinutes([FromQuery(Name = "token")] string token) {
             return Math.Max(0, Server.TeamServer.TokenIssuer.ValidateToken(token).GetRemainingMinutes()).ToString();
         }
+
+        [HttpPut("password")]
+        public string ChangePassword([FromQuery(Name = "token")] string token, [FromBody] string password) {
+            try {
+                Token theToken = Server.TeamServer.TokenIssuer.ValidateToken(token);
+
+                AccountManager accountManager = new AccountManager(Server.TeamServer.ObjectManager, theToken);
+                var account = theToken.Account;
+
+                account.Password = password;
+
+                account.Save();
+
+                return "Ok";
+            }
+            catch (Exception exception) {
+                return "Error: " + exception.Message;
+            }
+        }
     }
 
     [ApiController]
@@ -52,8 +73,8 @@ namespace TeamServer.Controllers {
             _logger = logger;
         }
 
-        [HttpGet]
-        public string Get([FromQuery(Name = "token")] string token) {
+        [HttpDelete]
+        public string Logout([FromQuery(Name = "token")] string token) {
             Server.TeamServer.TokenIssuer.DeleteToken(token);
 
             return "Ok";

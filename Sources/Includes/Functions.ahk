@@ -672,9 +672,15 @@ shareSetupDatabase() {
 					
 							FileCreateDir %kTempDirectory%SetupDabase\%simulator%\%car%\%track%
 							
-							if shareTyrePressures
+							if shareTyrePressures {
 								Loop Files, %kDatabaseDirectory%Local\%simulator%\%car%\%track%\Tyre Setup*.*
 									FileCopy %A_LoopFilePath%, %kTempDirectory%SetupDabase\%simulator%\%car%\%track%
+								
+								distFile := (kDatabaseDirectory . "Local\" . simulator . "\" . car . "\" . track . "\Setup.Pressures.Distribution.CSV")
+								
+								if FileExist(distFile)
+									FileCopy %distFile%, %kTempDirectory%SetupDabase\%simulator%\%car%\%track%
+							}
 							
 							if shareCarSetups {
 								try {
@@ -1222,7 +1228,7 @@ getAllThemes(configuration := false) {
 	return themes
 }
 
-showMessage(message, title := false, icon := "Information.png", duration := 5000
+showMessage(message, title := false, icon := "Information.png", duration := 2000
 		  , x := "Center", y := "Bottom", width := 400, height := 100) {
 	innerWidth := width - 16
 	
@@ -1831,7 +1837,7 @@ writeConfiguration(configFile, configuration) {
 	configFile := getFileName(configFile, kUserConfigDirectory)
 	
 	try {
-		FileDelete %configfile%
+		FileDelete %configFile%
 	}
 	catch exception {
 		; ignore

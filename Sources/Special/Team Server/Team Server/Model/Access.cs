@@ -6,12 +6,14 @@ using System.Threading.Tasks;
 namespace TeamServer.Model.Access {
     [Table("Access_Accounts")]
     public class Account : ModelObject {
-        [Indexed]
+        [Unique]
         public string Name { get; set; }
 
         public string Password { get; set; }
 
-        public bool Administrator { get; set; }
+        public bool Virgin { get; set; } = true;
+
+        public bool Administrator { get; set; } = false;
 
         public int MinutesLeft { get; set; }
 

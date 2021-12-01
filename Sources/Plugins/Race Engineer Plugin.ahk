@@ -10,6 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Plugins\Libraries\RaceAssistantPlugin.ahk
+#Include ..\Assistants\Libraries\SetupDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -24,7 +25,12 @@ global kRaceEngineerPlugin = "Race Engineer"
 ;;;-------------------------------------------------------------------------;;;
 
 class RaceEngineerPlugin extends RaceAssistantPlugin  {
+	static kLapDataSchemas := {Pressures: ["Lap", "Simulator", "Car", "Track", "Weather", "Temperature.Air", "Temperature.Track"
+										 , "Compound", "Compound.Color", "Pressures.Cold", "Pressures.Hot"]}
+										 
 	iPitstopPending := false
+	
+	iLapDatabase := false
 	
 	class RemoteRaceEngineer extends RaceAssistantPlugin.RemoteRaceAssistant {
 		__New(remotePID) {
@@ -58,6 +64,15 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 	RaceEngineer[] {
 		Get {
 			return this.RaceAssistant
+		}
+	}
+	
+	LapDatabase[] {
+		Get {
+			if !this.iLapDatabase
+				this.iLapDatabase := new Database(false, this.kLapDataSchemas)
+			
+			return this.iLapDatabase
 		}
 	}
 	
@@ -151,6 +166,12 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		return settings
 	}
 	
+	startSession(settingsFile, dataFile, teamSession) {
+		base.startSession(settingsFile, dataFile, teamSession)
+		
+		this.iLapDatabase := false
+	}
+	
 	requestInformation(arguments*) {
 		if (this.RaceEngineer && inList(["LapsRemaining", "Weather", "TyrePressures", "TyreTemperatures"], arguments[1])) {
 			this.RaceEngineer.requestInformation(arguments*)
@@ -226,6 +247,56 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork) {
 		this.Simulator.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork)
+	}
+	
+	savePressureData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor, coldPressures, hotPressures) {
+		teamServer := this.TeamServer
+		
+		if (teamServer && teamServer.SessionActive)
+			teamServer.setLapValue(lapNumber, this.Plugin . " Pressures"
+								 , values2String(";", simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor, coldPressures, hotPressures))
+		else
+			this.LapDatabase.add("Pressures", {Lap: lapNumber, Simulator: simulator, Car: car, Track: track
+											 , Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
+											 , "Compound": compound, "Compound.Color": compoundColor, "Pressures.Cold": coldPressures, "Pressures.Hot": hotPressures})
+	}
+	
+	updateSetupDatabase() {
+		setupDB := new SetupDatabase()
+		teamServer := this.TeamServer
+		session := this.TeamSession
+		
+		if (teamServer && teamServer.Active && session)
+			Loop % teamServer.getCurrentLap(session)
+			{
+				try {
+					lapPressures := teamServer.getLapValue(A_Index, this.Plugin . " Pressures", session)
+					
+					if (!lapPressures || (lapPressures == ""))
+						continue
+					
+					lapPressures := string2Values(";", lapPressures)
+					
+					setupDB.updatePressures(lapPressures[1], lapPressures[2], lapPressures[3], lapPressures[4], lapPressures[5], lapPressures[6]
+										  , lapPressures[7], lapPressures[8], string2Values(",", lapPressures[9]), string2Values(",", lapPressures[10]), false)
+				}
+				catch exception {
+					break
+				}
+				finally {
+					setupDB.flush()
+				}
+			}
+		else
+			try {
+				for ignore, lapData in this.LapDatabase.Tables["Pressures"]
+					setupDB.updatePressures(lapData.Simulator, lapData.Car, lapData.Track, lapData.Weather, lapData["Temperature.Air"], lapData["Temperature.Track"]
+										  , lapData.Compound, lapData["Compound.Color"]
+										  , string2Values(",", lapData["Pressures.Cold"]), string2Values(",", lapData["Pressures.Hot"]), false)
+			}
+			finally {
+				setupDB.flush()
+			}
 	}
 }
 

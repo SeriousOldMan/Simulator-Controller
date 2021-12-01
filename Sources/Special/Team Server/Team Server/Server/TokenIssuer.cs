@@ -19,7 +19,7 @@ namespace TeamServer.Server {
             if (account == null)
                 throw new Exception("Unknown account or password...");
             else if (account.MinutesLeft <= 0)
-                throw new Exception("No time left...");
+                throw new Exception("Not enough time left on account...");
             else {
                 Token token = new Token { Identifier = Guid.NewGuid(), AccountID = account.ID,
                                           Created = DateTime.Now, Until = DateTime.Now + new TimeSpan(0, 0, TokenLifeTime, 0) };
@@ -65,6 +65,25 @@ namespace TeamServer.Server {
 
         public Token ValidateToken(string identifier) {
             return ValidateToken(new Guid(identifier));
+        }
+        #endregion
+
+        #region Elevation
+        public Token ElevateToken(Token token) {
+            ValidateToken(token);
+
+            if (!token.Account.Administrator)
+                throw new Exception("Higher privileges required...");
+            else
+                return token;
+        }
+
+        public Token ElevateToken(Guid identifier) {
+            return ElevateToken(ObjectManager.GetTokenAsync(identifier).Result);
+        }
+
+        public Token ElevateToken(string identifier) {
+            return ElevateToken(new Guid(identifier));
         }
         #endregion
     }

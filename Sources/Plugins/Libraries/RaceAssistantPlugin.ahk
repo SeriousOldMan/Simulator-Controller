@@ -29,6 +29,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	iRaceAssistant := false
 	
 	iTeamServer := false
+	iTeamSession := false
 	iTeamSessionActive := false
 	
 	iSimulator := false
@@ -37,7 +38,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	iLastLapCounter := 0
 	iInPit := false
 	iFinished := false
-		
+	
 	class RemoteRaceAssistant {
 		iRemoteEvent := false
 		iRemotePID := false
@@ -245,15 +246,15 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		fireAction(function, trigger) {
 			local plugin := this.Plugin
 			
-			if (plugin.TeamServerEnabled && ((trigger = "Off") || (trigger == "Push"))) {
+			if (plugin.TeamServer.TeamServerEnabled && ((trigger = "Off") || (trigger == "Push"))) {
 				plugin.disableTeamServer()
 			
 				trayMessage(plugin.actionLabel(this), translate("State: Off"))
 			
 				function.setLabel(plugin.actionLabel(this), "Black")
 			}
-			else if (!plugin.TeamServerEnabled && ((trigger = "On") || (trigger == "Push"))) {
-				plugin.disableTeamServer()
+			else if (!plugin.TeamServer.TeamServerEnabled && ((trigger = "On") || (trigger == "Push"))) {
+				plugin.enableTeamServer()
 			
 				trayMessage(plugin.actionLabel(this), translate("State: On"))
 			
@@ -277,6 +278,12 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	TeamServer[] {
 		Get {
 			return this.iTeamServer
+		}
+	}
+	
+	TeamSession[] {
+		Get {
+			return this.iTeamSession
 		}
 	}
 	
@@ -671,21 +678,26 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		
 		this.iTeamSessionActive := false
 		
-		if (teamServer && teamServer.TeamServerEnabled)
-			if !teamServer.Connected {
-				settings := readConfiguration(getFileName("Race.settings", kUserConfigDirectory))
+		if (teamServer && teamServer.TeamServerEnabled) {
+			settings := readConfiguration(getFileName("Race.settings", kUserConfigDirectory))
+			sessionIdentifier := getConfigurationValue(settings, "Team Settings", "Session.Identifier", false)
 				
+			if !teamServer.Connected {
 				serverURL := getConfigurationValue(settings, "Team Settings", "Server.URL", "")
 				accessToken := getConfigurationValue(settings, "Team Settings", "Server.Token", "")
 				
 				teamIdentifier := getConfigurationValue(settings, "Team Settings", "Team.Identifier", false)
 				driverIdentifier := getConfigurationValue(settings, "Team Settings", "Driver.Identifier", false)
-				sessionIdentifier := getConfigurationValue(settings, "Team Settings", "Session.Identifier", false)
 				
 				this.iTeamSessionActive := teamServer.connect(serverURL, accessToken, teamIdentifier, driverIdentifier, sessionIdentifier)
 			}
 			else
 				this.iTeamSessionActive := true
+			
+			this.iTeamSession := (this.iTeamSessionActive ? sessionIdentifier : false)
+		}
+		else
+			this.iTeamSession := false
 		
 		return this.iTeamSessionActive
 	}
@@ -722,7 +734,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	
 	finishSession(shutdownAssistant := true, shutdownTeamSession := true) {
 		if this.RaceAssistant {
-			this.RaceAssistant.finishSession(shutdownAssistant && (!this.TeamSessionActive || this.TeamServer.DriverActive))
+			this.RaceAssistant.finishSession(shutdownAssistant)
 			
 			if (shutdownTeamSession && this.TeamSessionActive) {
 				this.TeamServer.leaveSession()
@@ -1075,7 +1087,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 								this.TeamServer.joinSession(getConfigurationValue(data, "Session Data", "Car")
 														  , getConfigurationValue(data, "Session Data", "Track")
 														  , dataLastLap
-														  , Round(getConfigurationValue(data, "Session Data", "SessionTimeRemaining", 0) / 1000))
+														  , Round((getConfigurationValue(data, "Session Data", "SessionTimeRemaining", 0) / 1000) / 60))
 							
 							settings := this.prepareSettings(data)
 							settingsFile := (kTempDirectory . this.Plugin . ".settings")

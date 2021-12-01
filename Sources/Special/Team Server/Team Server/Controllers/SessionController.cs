@@ -68,8 +68,8 @@ namespace TeamServer.Controllers {
 
                 Lap theLap = Server.TeamServer.ObjectManager.Connection.QueryAsync<Lap>(
                     @"
-                        Select * From Laps Where StintID = (Select ID From Stints Where SessionID = ?)
-                    ", identifier).Result.FirstOrDefault<Lap>();
+                        Select * From Laps Where SessionID In (Select ID From Sessions Where Identifier = ?) And Nr = ?
+                    ", identifier, lap).Result.FirstOrDefault<Lap>();
 
                 return sessionManager.GetLapValue(theLap, name);
             }
@@ -105,8 +105,8 @@ namespace TeamServer.Controllers {
 
                 Lap theLap = Server.TeamServer.ObjectManager.Connection.QueryAsync<Lap>(
                     @"
-                        Select * From Laps Where StintID = (Select ID From Stints Where SessionID = ?)
-                    ", identifier).Result.FirstOrDefault<Lap>();
+                        Select * From Laps Where SessionID In (Select ID From Sessions Where Identifier = ?) And Nr = ?
+                    ", identifier, lap).Result.FirstOrDefault<Lap>();
 
                 sessionManager.SetLapValue(theLap, name, value);
 
@@ -151,10 +151,23 @@ namespace TeamServer.Controllers {
 
                 Lap theLap = Server.TeamServer.ObjectManager.Connection.QueryAsync<Lap>(
                     @"
-                        Select * From Laps Where StintID = (Select ID From Stints Where SessionID = ?)
-                    ", identifier).Result.FirstOrDefault<Lap>();
+                        Select * From Laps Where SessionID In (Select ID From Sessions Where Identifier = ?) And Nr = ?
+                    ", identifier, lap).Result.FirstOrDefault<Lap>();
 
                 return (theLap != null) ? theLap.Identifier.ToString() : "Null";
+            }
+            catch (Exception exception) {
+                return "Error: " + exception.Message;
+            }
+        }
+
+        [HttpGet("{identifier}/lap/last")]
+        public string GetLastLap([FromQuery(Name = "token")] string token, string identifier) {
+            try {
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                Session session = sessionManager.LookupSession(identifier);
+
+                return session.GetCurrentStint().GetCurrentLap().Identifier.ToString();
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;

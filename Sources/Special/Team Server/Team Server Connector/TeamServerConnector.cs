@@ -164,10 +164,36 @@ namespace TeamServer {
 			return Get("login/tokenminutesleft");
 		}
 
+		public void ChangePassword(string newPassword) {
+			Put("login/password", body: newPassword);
+        }
+
 		public void Logout() {
 			Token = "";
 
-			Get("logout");
+			Delete("logout");
+		}
+		#endregion
+
+		#region Administration
+		public string CreateAccount(string name, string password, string minutes) {
+			return Post("account", body: BuildBody(new Parameters() { { "Name", name }, { "Password", password }, { "Minutes", minutes } }));
+		}
+
+		public void ChangeAccountPassword(string identifier, string newPassword) {
+			Put("account/" + identifier + "/password", body: newPassword);
+		}
+
+		public void AddMinutes(string identifier, int minutes) {
+			Put("account/" + identifier + "/minutes", body: minutes.ToString());
+		}
+
+		public void SetMinutes(string identifier, int minutes) {
+			Put("account/" + identifier, body: "Minutes=" + minutes);
+		}
+
+		public void DeleteAccount(string name) {
+			Delete("account", new Parameters() { { "Name", name } });
 		}
 		#endregion
 
@@ -267,6 +293,10 @@ namespace TeamServer {
 		public string GetSessionLap(string identifier, string lap) {
 			return Get("session/" + identifier + "/lap",
 					   arguments: new Parameters() { { "lap", lap } });
+		}
+
+		public string GetSessionLastLap(string identifier) {
+			return Get("session/" + identifier + "/lap/last");
 		}
 
 		public string GetSessionDriver(string identifier) {

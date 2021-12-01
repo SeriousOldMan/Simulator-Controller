@@ -29,34 +29,44 @@ namespace TeamServer.Model {
                 return Connection.InsertAsync(modelObject);
         }
 
-        public Task<string> GetAttributeAsync(ModelObject modelObject, string name, string defaultValue = "") {
-            var task = Connection.Table<Attribute>().Where(a => a.Owner == modelObject.Identifier && a.Name == name);
+        public string GetAttribute(ModelObject modelObject, string name, string defaultValue = "") {
+            Attribute attribute = Connection.Table<Attribute>().Where(a => a.Owner == modelObject.Identifier && a.Name == name).FirstOrDefaultAsync().Result;
 
-            return task.FirstOrDefaultAsync().ContinueWith(t => (t.Result == null) ? defaultValue : t.Result.Value);
+            return (attribute != null) ? attribute.Value : defaultValue;
         }
 
-        public Task SetAttributeAsync(ModelObject modelObject, string name, string value) {
-            var task = Connection.Table<Attribute>().Where(a => a.Owner == modelObject.Identifier && a.Name == name);
+        public void SetAttribute(ModelObject modelObject, string name, string value) {
+            Attribute attribute = Connection.Table<Attribute>().Where(a => a.Owner == modelObject.Identifier && a.Name == name).FirstOrDefaultAsync().Result;
 
-            return task.FirstOrDefaultAsync().ContinueWith(t => {
-                Attribute attribute;
+            if (attribute == null)
+                attribute = new Attribute { Owner = modelObject.Identifier, Name = name, Value = value };
+            else
+                attribute.Value = value;
 
-                if (t.Result == null)
-                    attribute = new Attribute { Owner = modelObject.Identifier, Name = name, Value = value };
-                else {
-                    attribute = t.Result;
-
-                    attribute.Value = value;
-                }
-
-                return attribute.Save();
-            });
+            attribute.Save();
         }
         #endregion
 
         #region Access.Account
         public Task<Access.Account> GetAccountAsync(int id) {
-            return Connection.Table<Access.Account>().Where(c => c.ID == id).FirstOrDefaultAsync();
+            return Connection.Table<Access.Account>().Where(a => a.ID == id).FirstOrDefaultAsync();
+        }
+
+        public Task<Access.Account> GetAccountAsync(Guid identifier) {
+            return Connection.Table<Access.Account>().Where(a => a.Identifier == identifier).FirstOrDefaultAsync();
+        }
+
+        public Task<Access.Account> GetAccountAsync(string identifier) {
+            Guid guid;
+
+            try {
+                guid = new Guid(identifier);
+            }
+            catch {
+                guid = Guid.Empty;
+            }
+
+            return Connection.Table<Access.Account>().Where(a => a.Name == identifier || a.Identifier == guid).FirstOrDefaultAsync();
         }
 
         public Task<Access.Account> GetAccountAsync(string account, string password) {
@@ -168,6 +178,10 @@ namespace TeamServer.Model {
         public Task<List<Stint>> GetSessionStintsAsync(Session session) {
             return Connection.Table<Stint>().Where(s => s.SessionID == session.ID).ToListAsync();
         }
+
+        public Task<List<Lap>> GetSessionLapsAsync(Session session) {
+            return Connection.Table<Lap>().Where(l => l.SessionID == session.ID).ToListAsync();
+        }
         #endregion
 
         #region Stint
@@ -199,6 +213,10 @@ namespace TeamServer.Model {
 
         public Task<Lap> GetLapAsync(Guid identifier) {
             return Connection.Table<Lap>().Where(i => i.Identifier == identifier).FirstOrDefaultAsync();
+        }
+
+        public Task<Session> GetLapSessionAsync(Lap lap) {
+            return Connection.Table<Session>().Where(s => s.ID == lap.SessionID).FirstAsync();
         }
 
         public Task<Stint> GetLapStintAsync(Lap lap) {

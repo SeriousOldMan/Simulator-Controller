@@ -45,9 +45,15 @@ Although the code, that handles all the update tasks, is integrated into *Simula
 
 Note: Some of you might want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars* and *Simulator Controller\Rules* folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does on your own. But be sure to make a backup copy of all the files, just for peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor that can handle this.
 
+## Release 3.7.2
+
+The storage format of the Setup Database has been modified for this release. The migration is handled automatically by the update procedure (be patient, might take a few moments), but you should make a backup copy, before running the update, in order to be on the safe side. The "Team Server" has changed dramatically. You have to use the new version of the "Team Server" for this release and also older versions of Simulator Controller will not be compatible with the current release of "Team Server".
+
+***
+
 ## Release 3.7.0
 
-This release introduces the new *Team Server*. For this a new [plugin "Team Server"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-team-server) has been added to the plugin configuration. For existing installations, this new plugin is disabled. You might want to enable and configure it, if you want to use the new *Team Server*. For more information on installation and configuration of the *Team Server*, please consult the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server).
+This release introduces the new *Team Server*. For this, a new [plugin "Team Server"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-team-server) has been added to the plugin configuration. For existing installations, this new plugin is disabled. You might want to enable and configure it, if you want to use the new *Team Server*. For more information on installation and configuration of the *Team Server*, please consult the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server).
 
 Some new plugin labels and icon slots have been added to the "ACC" plugin and also for the new "Team Server" plugin. If you are using your own labels and icons, for example for integration with Stream Deck, you may want to check the [*Labels & Icon Editor*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#action-labels--icons) in "Simulator Configuration".
 

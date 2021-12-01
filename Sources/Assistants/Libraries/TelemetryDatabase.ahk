@@ -177,7 +177,7 @@ class TelemetryDatabase extends SessionDatabase {
 		}
 	}
 		
-	addElectronicEntry(weather, airTemperature, trackTemperature, compound, compoundColor, map, tc, abs, fuelRemaining, fuelConsumption, lapTime) {
+	addElectronicEntry(weather, airTemperature, trackTemperature, compound, compoundColor, map, tc, abs, fuelConsumption, fuelRemaining, lapTime) {
 		this.Database.add("Electronics", {Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
 										, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor
 										, "Fuel.Remaining": fuelRemaining, "Fuel.Consumption": fuelConsumption, "Lap.Time": lapTime
@@ -186,7 +186,7 @@ class TelemetryDatabase extends SessionDatabase {
 	
 	addTyreEntry(weather, airTemperature, trackTemperature, compound, compoundColor, tyreLaps
 				, pressureFL, pressureFR, pressureRL, pressureRR, temperatureFL, temperatureFR, temperatureRL, temperatureRR
-				, fuelRemaining, fuelConsumption, lapTime) {
+				, fuelConsumption, fuelRemaining, lapTime) {
 		this.Database.add("Tyres", {Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
 								  , "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor
 								  , "Fuel.Remaining": fuelRemaining, "Fuel.Consumption": fuelConsumption, "Lap.Time": lapTime, "Tyre.Laps": tyreLaps

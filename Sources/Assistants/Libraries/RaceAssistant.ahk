@@ -323,7 +323,7 @@ class RaceAssistant extends ConfigurationItem {
 	}
 	
 	__New(configuration, assistantType, remoteHandler, name := false, language := "__Undefined__", service := false, speaker := false, listener := false, voiceServer := false) {
-		this.iDebug := (isDebug() ? kDebugKnowledgeBase : kDebugOff)
+		this.iDebug := (true || isDebug() ? kDebugKnowledgeBase : kDebugOff)
 		this.iAssistantType := assistantType
 		this.iRemoteHandler := remoteHandler
 		
@@ -924,9 +924,9 @@ computeDriverName(forName, surName, nickName) {
 		name .= (surName . A_Space)
 	
 	if (nickName != "")
-		name .= (" (" . nickName . ")")
+		name .= (translate("(") . nickName . translate(")"))
 	
-	return name
+	return Trim(name)
 }
 
 getDeprecatedConfigurationValue(data, newSection, oldSection, key, default := false) {

@@ -38,6 +38,7 @@ Release 3.6.4=Release 3.6.2 -> updateTranslations, updatePhraseGrammars, updateP
 Release 3.6.6=Release 3.6.4 -> deletePluginLabels, updateTranslations, updateActionLabels
 Release 3.6.8=Release 3.6.6 -> updateTranslations, updateConfigurationForV368
 Release 3.7.0=Release 3.6.8 -> updateTranslations, updatePhraseGrammars, updateActionLabels, updateActionIcons, updatePluginsForV370
+Release 3.7.2=Release 3.7.0 -> updateTranslations, updateConfigurationForV372
 [Cleanup]
 Binaries Folder=%kBinariesDirectory%
 Logs Folder=%kLogsDirectory%
@@ -96,7 +97,8 @@ Race Assistant Configuration.5=%kResourcesDirectory%Rules\Weather Notifications.
 Race Assistant Configuration.6=%kResourcesDirectory%Rules\Pitstop Information Retrieval.rules <- %kSourcesDirectory%Assistants\Rules\Pitstop Information Retrieval.rules
 Race Assistant Configuration.7=%kResourcesDirectory%Rules\Car Information Retrieval.rules <- %kSourcesDirectory%Assistants\Rules\Car Information Retrieval.rules
 Race Assistant Configuration.8=%kResourcesDirectory%Rules\Standings Information Retrieval.rules <- %kSourcesDirectory%Assistants\Rules\Standings Information Retrieval.rules
-Race Assistant Configuration.9=%kResourcesDirectory%Templates\Race.settings <- %kSourcesDirectory%Assistants\Race.settings
+Race Assistant Configuration.9=%kResourcesDirectory%Rules\Lap Information Retrieval.rules <- %kSourcesDirectory%Assistants\Rules\Lap Information Retrieval.rules
+Race Assistant Configuration.10=%kResourcesDirectory%Templates\Race.settings <- %kSourcesDirectory%Assistants\Race.settings
 Race Engineer Configuration.1=%kResourcesDirectory%Rules\Race Engineer.rules <- %kSourcesDirectory%Assistants\Rules\Race Engineer.rules
 Race Engineer Configuration.2=%kResourcesDirectory%Templates\Race Engineer.rules <- %kSourcesDirectory%Assistants\Rules\Race Engineer.rules
 Race Engineer Configuration.3=%kGrammarsDirectory%Race Engineer.grammars.en <- %kSourcesDirectory%Assistants\Grammars\Race Engineer.grammars.en
@@ -109,7 +111,7 @@ Race Strategist Configuration.3=%kGrammarsDirectory%Race Strategist.grammars.en 
 Race Strategist Configuration.4=%kResourcesDirectory%Templates\Race Strategist.grammars.en <- %kSourcesDirectory%Assistants\Grammars\Race Strategist.grammars.en
 Race Strategist Configuration.5=%kGrammarsDirectory%Race Strategist.grammars.de <- %kSourcesDirectory%Assistants\Grammars\Race Strategist.grammars.de
 Race Strategist Configuration.6=%kResourcesDirectory%Templates\Race Strategist.grammars.de <- %kSourcesDirectory%Assistants\Grammars\Race Strategist.grammars.de
-Team Server.1=%kBinariesDirectory%Team Server Connector.dll <- %kSourcesDirectory%Special\Team Server\Release\\net5.0\Team Server Connector.dll
+Team Server.1=%kBinariesDirectory%Team Server Connector.dll <- %kSourcesDirectory%Special\Team Server\Release\\net471\Team Server Connector.dll
 Team Server.2=%kBinariesDirectory%Team Server <- %kSourcesDirectory%Special\Team Server\Release\\netcoreapp3.1
 [Build]
 External Applications && DLLs=Special

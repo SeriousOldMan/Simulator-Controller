@@ -47,52 +47,6 @@ global vRemotePID = 0
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                         Private Classes Section                         ;;;
-;;;-------------------------------------------------------------------------;;;
-
-class RaceEngineerRemoteHandler extends RaceAssistant.RaceAssistantRemoteHandler {
-	__New(remotePID) {
-		base.__New("Race Engineer", remotePID)
-	}
-	
-	pitstopPlanned(arguments*) {
-		this.callRemote("pitstopPlanned", arguments*)
-	}
-	
-	pitstopPrepared(arguments*) {
-		this.callRemote("pitstopPrepared", arguments*)
-	}
-	
-	pitstopFinished(arguments*) {
-		this.callRemote("pitstopFinished", arguments*)
-	}
-	
-	startPitstopSetup(arguments*) {
-		this.callRemote("startPitstopSetup", arguments*)
-	}
-
-	finishPitstopSetup(arguments*) {
-		this.callRemote("finishPitstopSetup", arguments*)
-	}
-
-	setPitstopRefuelAmount(arguments*) {
-		this.callRemote("setPitstopRefuelAmount", arguments*)
-	}
-	
-	setPitstopTyreSet(arguments*) {
-		this.callRemote("setPitstopTyreSet", arguments*)
-	}
-
-	setPitstopTyrePressures(arguments*) {
-		this.callRemote("setPitstopTyrePressures", arguments*)
-	}
-
-	requestPitstopRepairs(arguments*) {
-		this.callRemote("requestPitstopRepairs", arguments*)
-	}
-}
-
-;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -148,7 +102,6 @@ startRaceEngineer() {
 	Menu Tray, Tip, Race Engineer
 	
 	remotePID := 0
-	remoteHandle := false
 	engineerName := "Jona"
 	engineerLogo := false
 	engineerLanguage := false
@@ -211,7 +164,7 @@ startRaceEngineer() {
 		setDebug(true)
 	
 	RaceEngineer.Instance := new RaceEngineer(kSimulatorConfiguration
-											, remotePID ? new RaceEngineerRemoteHandler(remotePID) : false
+											, remotePID ? new RaceEngineer.RaceEngineerRemoteHandler(remotePID) : false
 											, engineerName, engineerLanguage, engineerService, engineerSpeaker, engineerListener, voiceServer)
 	
 	registerEventHandler("Race Engineer", "handleEngineerRemoteCalls")

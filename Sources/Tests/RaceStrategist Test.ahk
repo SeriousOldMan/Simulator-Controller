@@ -287,9 +287,9 @@ if !GetKeyState("Ctrl") {
 	AHKUnit.Run()
 }
 else {
-	raceNr := 15
+	raceNr := 16
 	strategist := new TestRaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist.settings")
-									   , false, "Khato", "de", "Windows", true, true)
+									   , new RaceStrategist.RaceStrategistRemoteHandler(0), "Khato", "de", "Windows", true, true)
 
 	strategist.VoiceAssistant.setDebug(kDebugGrammars, false)
 	
@@ -326,6 +326,41 @@ else {
 				strategist.performPitstop()		
 				
 				MsgBox Pitstop...
+			}
+		} until done
+		
+		strategist.finishSession()
+		
+		while strategist.KnowledgeBase
+			Sleep 1000
+	}
+	else if (raceNr == 16) {
+		done := false
+		
+		Loop {
+			lap := A_Index
+		
+			Loop {
+				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist Lap " . lap . "." . A_Index . ".data")
+			
+				if (data.Count() == 0) {
+					if (A_Index == 1)
+						done := true
+					
+					break
+				}
+				else {
+					if (A_Index == 1)
+						strategist.addLap(lap, data)
+					else
+						strategist.updateLap(lap, data)
+					
+					if isDebug()
+						showMessage("Data " lap . "." . A_Index . " loaded...")
+				}
+				
+				if (A_Index = 1)
+					break
 			}
 		} until done
 		

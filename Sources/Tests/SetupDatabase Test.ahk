@@ -33,7 +33,31 @@ SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
 ;;;                         Private Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class PressuresAssert extends Assert {
+class DatabaseTest extends Assert {
+	clearDatabase() {
+		try {
+			FileRemoveDir %kDatabaseDirectory%Local\Unknown\TestCar, 1
+		}
+		catch exception {
+			; ignore
+		}
+		
+		this.AssertEqual(true, !FileExist(kDatabaseDirectory . "Local\Unknown\TestCar"), "Database has not been deleted...")
+	}
+	
+	updatePressures(database, simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor, coldPressures) {
+		if !database
+			database := new SetupDatabase()
+		
+		for ignore, pressures in coldPressures
+			database.updatePressures(simulator, car, track, weather, airTemperature, trackTemperature
+								   , compound, compoundColor, pressures, [27.7, 27.7, 27.7, 27.7], false)
+		
+		database.flush()
+	}
+}
+
+class PressuresAssert extends DatabaseTest {
 	pressuresEqual(list1, list2) {
 		if (list1.Length() == list2.Length()) {
 			for index, value in list1
@@ -47,43 +71,49 @@ class PressuresAssert extends Assert {
 	}
 	
 	AssertExactResult(pressures, flPressure, frPressure, rlPressure, rrPressure) {
-		for tyre, pressureInfo in pressures {
-			switch tyre {
-				case "FL":
-					this.AssertEqual(flPressure, pressureInfo["Pressure"], "FL pressure should be " . flPressure . "...")
-				case "FR":
-					this.AssertEqual(frPressure, pressureInfo["Pressure"], "FR pressure should be " . frPressure . "...")
-				case "RL":
-					this.AssertEqual(rlPressure, pressureInfo["Pressure"], "RL pressure should be " . rlPressure . "...")
-				case "RR":
-					this.AssertEqual(rrPressure, pressureInfo["Pressure"], "RR pressure should be " . rrPressure . "...")
-				default:
-					this.AssertEqual(true, false, "Unknown tyre type encountered...")
+		this.AssertTrue(pressures != false, "Undefined pressures detected...")
+		
+		if pressures
+			for tyre, pressureInfo in pressures {
+				switch tyre {
+					case "FL":
+						this.AssertEqual(flPressure, pressureInfo["Pressure"], "FL pressure should be " . flPressure . "...")
+					case "FR":
+						this.AssertEqual(frPressure, pressureInfo["Pressure"], "FR pressure should be " . frPressure . "...")
+					case "RL":
+						this.AssertEqual(rlPressure, pressureInfo["Pressure"], "RL pressure should be " . rlPressure . "...")
+					case "RR":
+						this.AssertEqual(rrPressure, pressureInfo["Pressure"], "RR pressure should be " . rrPressure . "...")
+					default:
+						this.AssertEqual(true, false, "Unknown tyre type encountered...")
+				}
+				
+				this.AssertEqual(0, pressureInfo["Delta Air"], "Delta Air should be 0...")
+				this.AssertEqual(0, pressureInfo["Delta Track"], "Delta Track should be 0...")
 			}
-			
-			this.AssertEqual(0, pressureInfo["Delta Air"], "Delta Air should be 0...")
-			this.AssertEqual(0, pressureInfo["Delta Track"], "Delta Track should be 0...")
-		}
 	}
 	
 	AssertExtrapolatedResult(pressures, flPressure, frPressure, rlPressure, rrPressure, deltaAir, deltaTrack) {
-		for tyre, pressureInfo in pressures {
-			switch tyre {
-				case "FL":
-					this.AssertEqual(flPressure, pressureInfo["Pressure"], "FL pressure should be " . flPressure . "...")
-				case "FR":
-					this.AssertEqual(frPressure, pressureInfo["Pressure"], "FR pressure should be " . frPressure . "...")
-				case "RL":
-					this.AssertEqual(rlPressure, pressureInfo["Pressure"], "RL pressure should be " . rlPressure . "...")
-				case "RR":
-					this.AssertEqual(rrPressure, pressureInfo["Pressure"], "RR pressure should be " . rrPressure . "...")
-				default:
-					this.AssertEqual(true, false, "Unknown tyre type encountered...")
+		this.AssertTrue(pressures != false, "Undefined pressures detected...")
+		
+		if pressures
+			for tyre, pressureInfo in pressures {
+				switch tyre {
+					case "FL":
+						this.AssertEqual(flPressure, pressureInfo["Pressure"], "FL pressure should be " . flPressure . "...")
+					case "FR":
+						this.AssertEqual(frPressure, pressureInfo["Pressure"], "FR pressure should be " . frPressure . "...")
+					case "RL":
+						this.AssertEqual(rlPressure, pressureInfo["Pressure"], "RL pressure should be " . rlPressure . "...")
+					case "RR":
+						this.AssertEqual(rrPressure, pressureInfo["Pressure"], "RR pressure should be " . rrPressure . "...")
+					default:
+						this.AssertEqual(true, false, "Unknown tyre type encountered...")
+				}
+				
+				this.AssertEqual(deltaAir, pressureInfo["Delta Air"], "Delta Air should be 0...")
+				this.AssertEqual(deltaTrack, pressureInfo["Delta Track"], "Delta Track should be 0...")
 			}
-			
-			this.AssertEqual(deltaAir, pressureInfo["Delta Air"], "Delta Air should be 0...")
-			this.AssertEqual(deltaTrack, pressureInfo["Delta Track"], "Delta Track should be 0...")
-		}
 	}
 	
 	AssertExtrapolatedValues(expCompound, compound, expCompoundColor, compoundColor, expPressures, pressures, expCertainty, certainty) {
@@ -99,107 +129,68 @@ class PressuresAssert extends Assert {
 ;;;                              Test Section                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class ClearDatabase extends Assert {
+class ClearDatabase extends DatabaseTest {
 	Clear_Test() {
-		try {
-			FileRemoveDir %kDatabaseDirectory%Local\Unknown\TestCar, 1
-		}
-		catch exception {
-			; ignore
-		}
-		
-		this.AssertEqual(true, !FileExist(kDatabaseDirectory . "Local\Unknown\TestCar"), "Database has not been deleted...")
+		this.clearDatabase()
 	}
 }
 
-class InitializeDatabase extends Assert {	
+class InitializeDatabase extends DatabaseTest {	
 	SimpleWritePressure_Test() {
-		setupDB := new SetupDatabase()
+		try {
+			this.updatePressures(false, "Unknown", "TestCar", "TestTrack", "Dry", 25, 25, "Dry", "Black", [[26.1, 26.2, 26.3, 26.4]])
+		}
+		catch exception {
+			msgbox here
+		}
 		
-		pressures := {}
+		this.AssertEqual(true, (FileExist(kDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Setup.Pressures.Distribution.CSV") != false), "Database file has not been created...")
 		
-		pressures["FL:26.1"] := 1
-		pressures["FR:26.2"] := 1
-		pressures["RL:26.3"] := 1
-		pressures["RR:26.4"] := 1
+		FileRead line, % (kDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Setup.Pressures.Distribution.CSV")
 		
-		setupDB.updatePressures("Unknown", "TestCar", "TestTrack", "Dry", 25, 25, "Dry", "Black", pressures)
-		
-		this.AssertEqual(true, (FileExist(kDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Tyre Setup Dry Dry.data") != false), "Database file has not been created...")
-		
-		data := readConfiguration(kDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Tyre Setup Dry Dry.data")
-		
-		this.AssertEqual(true, (getConfigurationValue(data, "Pressures", "25.25", false) != false), "Temperature entry has not been created...")
+		this.AssertEqual(true, (line != ""), "Temperature entry has not been created...")
 	}
 	
 	ExtendedWritePressure_Test() {
-		setupDB := new SetupDatabase()
+		pressures := [[26.1, 26.2, 26.3, 26.4], [26.2, 26.2, 26.4, 26.4], [26.2, 26.4, 26.4, 26.4], [26.3, 26.4, 26.4, 26.4]
+					, [26.3, 26.5, 26.4, 26.4], [26.4, 26.5, 26.4, 26.4], [26.3, 26.5, 26.4, 26.4], [26.4, 26.6, 26.5, 26.4]]
 		
-		pressures := {}
+		this.updatePressures(false, "Unknown", "TestCar", "TestTrack", "Dry", 25, 26, "Dry", "Black", pressures)
 		
-		pressures["FL:26.1"] := 1
-		pressures["FL:26.2"] := 2
-		pressures["FL:26.3"] := 7
-		pressures["FL:26.4"] := 4
+		this.AssertEqual(true, (FileExist(kDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Setup.Pressures.Distribution.CSV") != false), "Database file has not been created...")
 		
-		pressures["FR:26.2"] := 1
-		pressures["FR:26.3"] := 3
-		pressures["FR:26.5"] := 5
-		pressures["FR:26.6"] := 1
+		FileRead line, % (kDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Setup.Pressures.Distribution.CSV")
 		
-		pressures["RL:26.3"] := 1
-		pressures["RL:26.4"] := 6
-		pressures["RL:26.5"] := 1
-		
-		pressures["RR:26.4"] := 7
-		
-		setupDB.updatePressures("Unknown", "TestCar", "TestTrack", "Dry", 25, 26, "Dry", "Black", pressures)
-		
-		this.AssertEqual(true, (FileExist(kDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Tyre Setup Dry Dry.data") != false), "Database file has not been created...")
-		
-		data := readConfiguration(kDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Tyre Setup Dry Dry.data")
-		
-		this.AssertEqual(true, (getConfigurationValue(data, "Pressures", "25.26", false) != false), "Temperature entry has not been created...")
+		this.AssertEqual(true, (line != ""), "Temperature entry has not been created...")
 	}
 	
 	ConditionWritePressure_Test() {
-		setupDB := new SetupDatabase()
+		this.updatePressures(false, "Unknown", "TestCar", "TestTrack", "Drizzle", 17, 18, "Dry", "Red", [[26.5, 26.4, 26.7, 26.5]])
 		
-		pressures := {}
+		this.AssertEqual(true, (FileExist(kDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Setup.Pressures.Distribution.CSV") != false), "Database file has not been created...")
 		
-		pressures["FL:26.5"] := 1
-		pressures["FR:26.4"] := 1
-		pressures["RL:26.7"] := 1
-		pressures["RR:26.5"] := 1
+		FileRead line, % (kDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Setup.Pressures.Distribution.CSV")
 		
-		setupDB.updatePressures("Unknown", "TestCar", "TestTrack", "Drizzle", 17, 18, "Dry", "Red", pressures)
+		this.AssertEqual(true, (line != ""), "Temperature entry has not been created...")
+		this.AssertEqual(true, InStr(line, "Drizzle") && InStr(line, "Red"), "Database file has not been created...")
+		this.AssertTrue(InStr(line, "17;18;"), "Temperature entry has not been created...")
+		this.AssertEqual(false, InStr(line, "Wet") && InStr(line, "Black"), "Unexpected temperature entry detected...")
 		
-		this.AssertEqual(true, (FileExist(kDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Tyre Setup Dry (Red) Drizzle.data") != false), "Database file has not been created...")
-		
-		data := readConfiguration(kDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Tyre Setup Dry (Red) Drizzle.data")
-		
-		this.AssertEqual(true, (getConfigurationValue(data, "Pressures", "17.18", false) != false), "Temperature entry has not been created...")
-		
-		pressures := {}
-		
-		pressures["FL:26.5"] := 1
-		pressures["FR:26.4"] := 1
-		pressures["RL:26.7"] := 1
-		pressures["RR:26.5"] := 1
-		
-		setupDB.updatePressures("Unknown", "TestCar", "TestTrack", "MediumRain", 17, 18, "Wet", "Black", pressures)
+		this.updatePressures(false, "Unknown", "TestCar", "TestTrack", "MediumRain", 17, 18, "Wet", "Black", [[26.5, 26.4, 26.7, 26.5]])
 		
 		this.AssertEqual(true, (FileExist(kDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Tyre Setup Wet MediumRain.data") != false), "Database file has not been created...")
 		
-		data := readConfiguration(kDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Tyre Setup Wet MediumRain.data")
+		FileRead line, % (kDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Setup.Pressures.Distribution.CSV")
 		
-		this.AssertEqual(true, (getConfigurationValue(data, "Pressures", "17.18", false) != false), "Temperature entry has not been created...")
+		this.AssertFalse(false, InStr(line, "Wet") && InStr(line, "Black"), "Unexpected temperature entry detected...")
 	}
 }
 
 class SimplePressures extends PressuresAssert {
 	SimpleReadPressure_Test() {
-		this.AssertExactResult(new SetupDatabase().getPressures("Unknown", "TestCar", "TestTrack", "Dry", 25, 25, "Dry", "Black"), 26.1, 26.2, 26.3, 26.4)
+		pressures := new SetupDatabase().getPressures("Unknown", "TestCar", "TestTrack", "Dry", 25, 25, "Dry", "Black")
+		
+		this.AssertExactResult(pressures, 26.1, 26.2, 26.3, 26.4)
 	}
 		
 	ExtendedReadPressure_Test() {

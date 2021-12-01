@@ -142,6 +142,21 @@ moveSettingsEditor() {
 	moveByMouse("RES")
 }
 
+computeDriverName(forName, surName, nickName) {
+	name := ""
+	
+	if (forName != "")
+		name .= (forName . A_Space)
+	
+	if (surName != "")
+		name .= (surName . A_Space)
+	
+	if (nickName != "")
+		name .= (translate("(") . nickName . translate(")"))
+	
+	return Trim(name)
+}
+
 loadSettings() {
 	editSettings(kLoad)
 }
@@ -332,8 +347,8 @@ loadDrivers(connector, team) {
 	if team
 		for ignore, identifier in string2Values(";", connector.GetTeamDrivers(team)) {
 			driver := parseObject(connector.GetDriver(identifier))
-			
-			name := (driver.ForName . A_Space . driver.SurName . A_Space . translate("(") . driver.NickName . translate(")"))
+
+			name := computeDriverName(driver.ForName, driver.SurName, driver.NickName)
 			
 			drivers[name] := driver.Identifier
 		}

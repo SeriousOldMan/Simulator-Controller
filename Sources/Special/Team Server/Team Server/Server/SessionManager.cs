@@ -49,7 +49,7 @@ namespace TeamServer.Server {
 		public string GetSessionValue(Session session, string name) {
 			ValidateSession(session);
 
-			return ObjectManager.GetAttributeAsync(session, name).Result;
+			return ObjectManager.GetAttribute(session, name);
 		}
 
 		public string GetSessionValue(Guid identifier, string name) {
@@ -63,7 +63,7 @@ namespace TeamServer.Server {
 		public void SetSessionValue(Session session, string name, string value)	{
 			ValidateSession(session);
 
-			ObjectManager.SetAttributeAsync(session, name, value);
+			ObjectManager.SetAttribute(session, name, value);
 		}
 
 		public void SetSessionValue(Guid identifier, string name, string value) {
@@ -120,11 +120,15 @@ namespace TeamServer.Server {
 			ValidateSession(session);
 
 			if (session.Started && !session.Finished) {
-				Token.Account.MinutesLeft -= (int)Math.Round((DateTime.Now - session.StartTime).TotalSeconds * 60);
+				var account = Token.Account;
 
+				account.MinutesLeft -= (int)Math.Round((DateTime.Now - session.StartTime).TotalMinutes);
+
+				session.Started = false;
 				session.Finished = true;
 				session.FinishTime = DateTime.Now;
 
+				account.Save();
 				session.Save();
 			}
 		}
@@ -237,7 +241,7 @@ namespace TeamServer.Server {
                 ", stint.ID, lap);
 
 			if (task.Result.Count == 0) {
-				Lap theLap = new Lap { StintID = stint.ID, Nr = lap };
+				Lap theLap = new Lap { SessionID = stint.Session.ID, StintID = stint.ID, Nr = lap };
 
 				theLap.Save();
 
@@ -262,37 +266,31 @@ namespace TeamServer.Server {
 		#endregion
 
 		#region Operations
-		public string GetLapValue(Lap lap, string name)
-		{
+		public string GetLapValue(Lap lap, string name) {
 			ValidateLap(lap);
 
-			return ObjectManager.GetAttributeAsync(lap, name).Result;
+			return ObjectManager.GetAttribute(lap, name);
 		}
 
-		public string GetLapValue(Guid identifier, string name)
-		{
+		public string GetLapValue(Guid identifier, string name) {
 			return GetLapValue(ObjectManager.GetLapAsync(identifier).Result, name);
 		}
 
-		public string GetLapValue(string identifier, string name)
-		{
+		public string GetLapValue(string identifier, string name) {
 			return GetLapValue(new Guid(identifier), name);
 		}
 
-		public void SetLapValue(Lap lap, string name, string value)
-		{
+		public void SetLapValue(Lap lap, string name, string value) {
 			ValidateLap(lap);
 
-			ObjectManager.SetAttributeAsync(lap, name, value);
+			ObjectManager.SetAttribute(lap, name, value);
 		}
 
-		public void SetLapValue(Guid identifier, string name, string value)
-		{
+		public void SetLapValue(Guid identifier, string name, string value) {
 			SetLapValue(ObjectManager.GetLapAsync(identifier).Result, name, value);
 		}
 
-		public void SetLapValue(string identifier, string name, string value)
-		{
+		public void SetLapValue(string identifier, string name, string value) {
 			SetLapValue(new Guid(identifier), name, value);
 		}
 		#endregion

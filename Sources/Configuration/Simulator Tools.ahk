@@ -32,6 +32,13 @@ ListLines Off					; Disable execution history
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                          Local Include Section                          ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include ..\Assistants\Libraries\SetupDatabase.ahk
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -1386,6 +1393,72 @@ updateInstallationForV354() {
 		installLocation := getConfigurationValue(installOptions, "Install", "Location")
 		
 		FileCreateShortCut %installLocation%\Binaries\Race Reports.exe, %A_StartMenu%\Simulator Controller\Race Reports.lnk, %installLocation%\Binaries
+	}
+}
+
+updateConfigurationForV372() {
+	setupDB := new SetupDatabase()
+	
+	Loop Files, %kDatabaseDirectory%Local\*.*, D									; Simulator
+	{
+		simulator := A_LoopFileName
+		
+		Loop Files, %kDatabaseDirectory%Local\%simulator%\*.*, D					; Car
+		{
+			car := A_LoopFileName
+			
+			Loop Files, %kDatabaseDirectory%Local\%simulator%\%car%\*.*, D			; Track
+			{
+				track := A_LoopFileName
+				
+				Loop Files, %kDatabaseDirectory%Local\%simulator%\%car%\%track%\Tyre Setup*.*
+				{
+					condition := string2Values(A_Space, StrReplace(StrReplace(A_LoopFileName, "Tyre Setup ", ""), ".data", ""))
+				
+					if (condition.Length() == 2) {
+						compound := condition[1]
+						compoundColor := "Black"
+						weather := condition[2]
+					}
+					else {
+						compound := condition[1]
+						compoundColor := condition[2]
+						weather := condition[3]
+					}
+					
+					setupDB.requireDatabase(simulator, car, track)
+					
+					pressureData := readConfiguration(A_LoopFilePath)
+					
+					for temperature, pressures in getConfigurationSectionValues(pressureData, "Pressures", Object()) {
+						temperature := ConfigurationItem.splitDescriptor(temperature)
+						airTemperature := temperature[1]
+						trackTemperature := temperature[2]
+						pressures := string2Values(";", pressures)
+							
+						for index, tyre in ["FL", "FR", "RL", "RR"]
+							for ignore, pressure in string2Values(",", pressures[index]) {
+								pressure := string2Values(":", pressure)
+							
+								if (!simulator || !car || !track)
+									msgbox break
+									
+								setupDB.updatePressure(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor
+													 , "Cold", tyre, pressure[1], pressure[2], false, false)
+							}
+					}
+					
+					setupDB.flush()
+					
+					try {
+						FileDelete %A_LoopFilePath%
+					}
+					catch exception {
+						; ignore
+					}
+				}
+			}
+		}
 	}
 }
 

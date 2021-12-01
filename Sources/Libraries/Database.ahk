@@ -47,16 +47,17 @@ class Database {
 					schema := this.Schemas[name]
 					data := []
 					
-					Loop Read, % (this.Directory . name . ".CSV")
-					{
-						row := {}
-						values := string2Values(";", A_LoopReadLine)
-						
-						for ignore, column in schema
-							row[column] := values[A_Index]
-						
-						data.Push(row)
-					}
+					if this.Directory
+						Loop Read, % (this.Directory . name . ".CSV")
+						{
+							row := {}
+							values := string2Values(";", A_LoopReadLine)
+							
+							for ignore, column in schema
+								row[column] := values[A_Index]
+							
+							data.Push(row)
+						}
 					
 					this.iTables[name] := data
 				}
@@ -147,7 +148,7 @@ class Database {
 					values := []
 				
 					for ignore, column in schema
-						values.Push(row[column])
+						values.Push(row.HasKey(column) ? row[column] : kNull)
 					
 					row := (values2String(";", values*) . "`n")
 		
@@ -168,15 +169,14 @@ class Database {
 	}
 	
 	add(name, values, flush := false) {
-		row := []
-			
-		for ignore, column in this.Schemas[name]
-			row.Push(values.HasKey(column) ? values[column] : kNull)
-		
-		if this.Tables.HasKey(name)
-			this.Tables[name].Push(row)
+		this.Tables[name].Push(values)
 		
 		if flush {
+			row := []
+				
+			for ignore, column in this.Schemas[name]
+				row.Push(values.HasKey(column) ? values[column] : kNull)
+			
 			directory := this.Directory
 			fileName := (directory . name . ".CSV")
 			

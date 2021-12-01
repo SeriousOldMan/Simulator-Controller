@@ -470,16 +470,16 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 Range1-9999 0x80, %sessionLengthEdit%
 		Gui %window%:Add, Text, x%x3% yp+4 w60 h20 VsessionLengthLabel, % translate("Minutes")
 		
-		Gui %window%:Add, Text, x%x% yp+21 w85 h23 +0x200, % translate("Max. Stint")
+		Gui %window%:Add, Text, x%x% yp+21 w75 h23 +0x200, % translate("Max. Stint")
 		Gui %window%:Add, Edit, x%x1% yp w50 h20 Limit4 Number VstintLengthEdit, %stintLengthEdit%
 		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 Range1-9999 0x80, %stintLengthEdit%
 		Gui %window%:Add, Text, x%x3% yp+4 w60 h20, % translate("Minutes")
 
-		Gui %window%:Add, Text, x%x% yp+21 w85 h23 +0x200, % translate("Formation")
+		Gui %window%:Add, Text, x%x% yp+21 w75 h23 +0x200, % translate("Formation")
 		Gui %window%:Add, CheckBox, x%x1% yp-1 w17 h23 Checked%formationLapCheck% VformationLapCheck, %formationLapCheck%
 		Gui %window%:Add, Text, x%x4% yp+5 w50 h20, % translate("Lap")
 				
-		Gui %window%:Add, Text, x%x% yp+19 w85 h23 +0x200, % translate("Post Race")
+		Gui %window%:Add, Text, x%x% yp+19 w75 h23 +0x200, % translate("Post Race")
 		Gui %window%:Add, CheckBox, x%x1% yp-1 w17 h23 Checked%postRaceLapCheck% VpostRaceLapCheck, %postRaceLapCheck%
 		Gui %window%:Add, Text, x%x4% yp+5 w50 h20, % translate("Lap")
 		

@@ -14,8 +14,9 @@ namespace TeamServer {
         public class Account {
             public string Name { get; set; }
             public string Password { get; set; }
-            public int Minutes { get; set; }
-            public bool Administrator { get; set; }
+            public int Minutes { get; set; } = 0;
+            public bool Administrator { get; set; } = false;
+            public bool Reset { get; set; } = false;
         }
 
         public string DBPath { get; set; }
@@ -57,10 +58,24 @@ namespace TeamServer {
                 });
 
         static void CreateAccounts(ObjectManager objectManager, IList<Settings.Account> accounts) {
-            foreach (Settings.Account account in accounts)
-                if (objectManager.GetAccountAsync(account.Name, account.Password).Result == null)
-                    new Account { Name = account.Name, Password = account.Password, Virgin = false,
-                                  Administrator = account.Administrator, MinutesLeft = account.Minutes }.Save();
+            foreach (Settings.Account descriptor in accounts) {
+                Account account = objectManager.GetAccountAsync(descriptor.Name).Result;
+
+                if (account == null)
+                    new Account {
+                        Name = descriptor.Name,
+                        Password = descriptor.Password,
+                        Virgin = false,
+                        Administrator = descriptor.Administrator,
+                        MinutesLeft = descriptor.Minutes
+                    }.Save();
+                else if (descriptor.Reset) {
+                    account.Password = descriptor.Password;
+                    account.MinutesLeft = descriptor.Minutes;
+
+                    account.Save();
+                }
+            }
         }
     }
 }

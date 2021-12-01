@@ -21,6 +21,12 @@ To start the *Team Server*, you simply start the "Team Server.exe" from the corr
 		  "Password": "admin",
 		  "Minutes": 2147483647,
 		  "Administrator": true
+		},
+		{
+		  "Name": "Test",
+		  "Password": "",
+		  "Minutes": 120,
+		  "Reset": true
 		}
 	  ]
 	}
@@ -29,7 +35,7 @@ You first have to decide, where to locate the database, where all stuff will be 
 
 The next option, "TokenLifeTime", specifies, how long an access token for your team mates will be valid. Access tokens will be described in detail in a later chapter. The life time will be specified in minutes, the 10080 minutes from the example above are exactly 7 days.
 
-Using the "Accounts" option, you can *preload* accounts into an empty database. This cannot be empty, or you won't be able to connect to the *Team Server*. So make sure, that at least one administrator account will be created. The number of "Minutes" specifies the amount of time, this account has left for team sessions (necessary for a managed pay-per-use model, which might come in the future). If you are the only one, who will createa and manage teams, this is it, otherwise hand over the corresponding account name and password to your mates.
+Using the "Accounts" option, you can *preload* accounts into an empty database. This cannot be empty, or you won't be able to connect to the *Team Server*. So make sure, that at least one administrator account will be created, since only these accounts will have access to the server administration tools. The number of "Minutes" specifies the amount of time, this account has left for team sessions (necessary for a managed pay-per-use model, which might come in the future). Last, but not least, you can create accounts, that will reset with each restart of the server, for example for test purposes. If you are the only one, who will createa and manage teams, this is it, otherwise hand over the corresponding account name and password to your mates.
 
 Last, but not least, you have to communicate the web URI to all team managers and drivers, which will use the *Team Server*. An URI for your local PC will look like "https://localhost:5001", one for an Azure might look like "https://teamserver.thebigo.azurewebsites.com". This depends on your chosen host environment.
 

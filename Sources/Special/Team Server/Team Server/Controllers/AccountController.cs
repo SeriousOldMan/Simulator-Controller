@@ -53,6 +53,11 @@ namespace TeamServer.Controllers {
 
                 ControllerUtils.DeserializeObject(account, keyValues);
 
+                Dictionary<string, string> properties = ControllerUtils.ParseKeyValues(keyValues);
+
+                if (properties.ContainsKey("Minutes"))
+                    account.MinutesLeft = Int32.Parse(properties["Minutes"]);
+
                 account.Save();
 
                 return "Ok";
@@ -63,12 +68,31 @@ namespace TeamServer.Controllers {
         }
 
         [HttpPut("{identifier}/password")]
-        public string SetPassword([FromQuery(Name = "token")] string token, string identifier, [FromBody] string password) {
+        public string ChangePassword([FromQuery(Name = "token")] string token, string identifier, [FromBody] string password) {
             try {
-                AccountManager accountManager = new AccountManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                AccountManager accountManager = new AccountManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ElevateToken(token));
                 Account account = accountManager.LookupAccount(identifier);
 
                 account.Password = password;
+
+                account.Save();
+
+                return "Ok";
+            }
+            catch (Exception exception) {
+                return "Error: " + exception.Message;
+            }
+        }
+
+        [HttpPut("{identifier}/minutes")]
+        public string AddMinutes([FromQuery(Name = "token")] string token, string identifier, [FromBody] string keyValues) {
+            try {
+                AccountManager accountManager = new AccountManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ElevateToken(token));
+                Account account = accountManager.LookupAccount(identifier);
+
+                Dictionary<string, string> properties = ControllerUtils.ParseKeyValues(keyValues);
+
+                accountManager.AddMinutes(account, Int32.Parse(properties["Minutes"]));
 
                 account.Save();
 
@@ -88,10 +112,8 @@ namespace TeamServer.Controllers {
 
                 Account account = accountManager.CreateAccount(properties["Name"]);
 
-                if (properties.ContainsKey("Password")) {
+                if (properties.ContainsKey("Password"))
                     account.Password = properties["Password"];
-                    account.Virgin = false;
-                }
 
                 if (properties.ContainsKey("Minutes"))
                     account.MinutesLeft = Int32.Parse(properties["Minutes"]);

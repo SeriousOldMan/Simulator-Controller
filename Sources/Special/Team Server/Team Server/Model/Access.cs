@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 namespace TeamServer.Model.Access {
     [Table("Access_Accounts")]
     public class Account : ModelObject {
+        public enum ContractType : int { OneTime = 1, FixedMinutes = 2, AdditionalMinutes = 3 };
+
         [Unique]
         public string Name { get; set; }
 
@@ -16,6 +18,10 @@ namespace TeamServer.Model.Access {
         public bool Administrator { get; set; } = false;
 
         public int MinutesLeft { get; set; }
+
+        public ContractType Contract { get; set; } = ContractType.OneTime;
+
+        public int RenewalMinutes { get; set; } = 0;
 
         [Ignore]
         public List<Token> Tokens {
@@ -38,7 +44,7 @@ namespace TeamServer.Model.Access {
             }
         }
 
-        public override Task Delete() {
+        public override System.Threading.Tasks.Task Delete() {
             foreach (Team team in Teams)
                 team.Delete();
 

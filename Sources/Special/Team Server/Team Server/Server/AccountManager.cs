@@ -22,6 +22,13 @@ namespace TeamServer.Server {
             return result.ToString();
         }
 
+        #region Validation
+        public void ValidateAccount(Account account) {
+            if (account == null)
+                throw new Exception("Not a valid account...");
+        }
+        #endregion
+
         #region Account
         #region Query
         public List<Account> GetAllAccounts() {
@@ -36,17 +43,17 @@ namespace TeamServer.Server {
         }
 
         public Account FindAccount(string identifier) {
-            Task<Account> task = ObjectManager.GetAccountAsync(identifier);
-            Account Account;
+            Task<Account> finder = ObjectManager.GetAccountAsync(identifier);
+            Account account;
 
             try {
-                Account = FindAccount(new Guid(identifier));
+                account = FindAccount(new Guid(identifier));
             }
             catch {
-                Account = null;
+                account = null;
             }
 
-            return Account ?? task.Result;
+            return account ?? finder.Result;
         }
 
         public Account FindAccount(string name, string password) {
@@ -62,9 +69,7 @@ namespace TeamServer.Server {
         }
 
         public Account LookupAccount(string identifier) {
-            Account account = FindAccount(identifier);
-
-            return account ?? LookupAccount(new Guid(identifier));
+            return FindAccount(identifier) ?? LookupAccount(new Guid(identifier));
         }
 
         public Account LookupAccount(string name, string password) {
@@ -87,9 +92,13 @@ namespace TeamServer.Server {
             return account;
         }
 
-        public Account CreateAccount(string name, string password, int minutes) {
+        public Account CreateAccount(string name, string password, int initialMinutes,
+                                     Account.ContractType contract, int renewalMinutes) {
             if (FindAccount(name) == null) {
-                Account account = new Account { Name = name, Password = password, MinutesLeft = minutes, Virgin = false };
+                Account account = new Account {
+                    Name = name, Password = password, Virgin = false, MinutesLeft = initialMinutes,
+                    Contract = contract, RenewalMinutes = renewalMinutes
+                };
 
                 account.Save();
 
@@ -128,7 +137,7 @@ namespace TeamServer.Server {
         }
 
         public void SetMinutes(string account, string password, int minutes) {
-            AddMinutes(ObjectManager.GetAccountAsync(account, password).Result, minutes);
+            SetMinutes(ObjectManager.GetAccountAsync(account, password).Result, minutes);
         }
 
         public void AddMinutes(Account account, int minutes) {
@@ -141,6 +150,22 @@ namespace TeamServer.Server {
 
         public void AddMinutes(string account, string password, int minutes) {
             AddMinutes(ObjectManager.GetAccountAsync(account, password).Result, minutes);
+        }
+
+        public async void RenewAccountsAsync() {
+            TeamServer.TokenIssuer.ElevateToken(Token);
+
+            await ObjectManager.Connection.QueryAsync<Account>(
+                @"
+                    Select * From Access_Accounts
+                ").ContinueWith(t => t.Result.ForEach(a => {
+                    if ((a.Contract == Account.ContractType.OneTime) && (a.MinutesLeft <= 0))
+                        a.Delete();
+                    else if (a.Contract == Account.ContractType.FixedMinutes)
+                        SetMinutes(a, a.RenewalMinutes);
+                    else if (a.Contract == Account.ContractType.AdditionalMinutes)
+                        AddMinutes(a, a.RenewalMinutes);
+                }));
         }
         #endregion
         #endregion

@@ -9,6 +9,18 @@ namespace TeamServer.Server {
         public TeamManager(ObjectManager objectManager, Model.Access.Token token) : base(objectManager, token) {
         }
 
+        #region Validation
+        public void ValidateTeam(Team team) {
+            if (team == null)
+                throw new Exception("Not a known team...");
+        }
+
+        public void ValidateDriver(Driver driver) {
+            if (driver == null)
+                throw new Exception("Not a known driver...");
+        }
+        #endregion
+
         #region Team
         #region Query
         public List<Team> GetAllTeams() {

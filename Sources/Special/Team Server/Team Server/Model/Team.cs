@@ -32,7 +32,7 @@ namespace TeamServer.Model {
             }
         }
 
-        public override Task Delete() {
+        public override System.Threading.Tasks.Task Delete() {
             foreach (Session session in Sessions)
                 session.Delete();
 
@@ -68,7 +68,7 @@ namespace TeamServer.Model {
             }
         }
 
-        public override Task Delete() {
+        public override System.Threading.Tasks.Task Delete() {
             foreach (Stint stint in Stints)
                 stint.Delete();
 

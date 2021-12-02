@@ -7,9 +7,13 @@ namespace TeamServer.Server {
         protected readonly ObjectManager ObjectManager = null;
         protected readonly int TokenLifeTime;
 
+        public Token AdminToken = null;
+
         public TokenIssuer(ObjectManager objectManager, int tokenLifeTime) {
             ObjectManager = objectManager;
             TokenLifeTime = tokenLifeTime;
+
+            AdminToken = new Token { ID = -1, Identifier = Guid.NewGuid(), AccountID = 0, Until = DateTime.MaxValue };
         }
 
         #region CRUD
@@ -72,7 +76,9 @@ namespace TeamServer.Server {
         public Token ElevateToken(Token token) {
             ValidateToken(token);
 
-            if (!token.Account.Administrator)
+            if (token == AdminToken)
+                return token;
+            else if (!token.Account.Administrator)
                 throw new Exception("Higher privileges required...");
             else
                 return token;
@@ -84,6 +90,18 @@ namespace TeamServer.Server {
 
         public Token ElevateToken(string identifier) {
             return ElevateToken(new Guid(identifier));
+        }
+        #endregion
+
+        #region Operations
+        public async void CleanupTokensAsync() {
+            await ObjectManager.Connection.QueryAsync<Token>(
+                @"
+                    Select * From Access_Tokens Where Until < ?
+                ", DateTime.Now).ContinueWith(t => t.Result.ForEach(t => {
+                    if (!t.IsValid())
+                        t.Delete();
+                    }));
         }
         #endregion
     }

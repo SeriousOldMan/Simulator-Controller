@@ -18,7 +18,7 @@ namespace TeamServer.Model {
         }
 
         #region Generic
-        public Task DeleteAsync(ModelObject modelObject) {
+        public System.Threading.Tasks.Task DeleteAsync(ModelObject modelObject) {
             return Connection.DeleteAsync(modelObject);
         }
 
@@ -223,6 +223,29 @@ namespace TeamServer.Model {
             return Connection.Table<Stint>().Where(s => s.ID == lap.StintID).FirstAsync();
         }
         #endregion
+
+        #region Task.Task
+        public Task<Task.Task> GetTaskAsync(int id) {
+            return Connection.Table<Task.Task>().Where(t => t.ID == id).FirstOrDefaultAsync();
+        }
+
+        public Task<Task.Task> GetTaskAsync(Guid identifier) {
+            return Connection.Table<Task.Task>().Where(t => t.Identifier == identifier).FirstOrDefaultAsync();
+        }
+
+        public Task<Task.Task> GetTaskAsync(string identifier) {
+            Guid guid;
+
+            try {
+                guid = new Guid(identifier);
+            }
+            catch {
+                guid = Guid.Empty;
+            }
+
+            return Connection.Table<Task.Task>().Where(t => t.Name == identifier || t.Identifier == guid).FirstOrDefaultAsync();
+        }
+        #endregion
     }
 
     public abstract class ModelObject {
@@ -237,11 +260,11 @@ namespace TeamServer.Model {
             get { return ObjectManager.Instance; }
         }
 
-        public virtual Task Save() {
+        public virtual System.Threading.Tasks.Task Save() {
             return ObjectManager.SaveAsync(this);
         }
 
-        public virtual Task Delete() {
+        public virtual System.Threading.Tasks.Task Delete() {
             Task<List<Attribute>> task = ObjectManager.Connection.QueryAsync<Attribute>(
                 @"
                     Select * From Attributes Where Owner = ?

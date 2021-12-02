@@ -6,7 +6,7 @@
   4. Hundreds of bug fixes for Team Server
   5. Vastly reduced memory consumption of assistants in endurance races
   6. Fixed pitstop handling for ACC 1.8
-  7. Fixed a bug in "Tactile Feedback" plugin which effect actions where not associated correctly with hardware dials.
+  7. Fixed a bug in "Tactile Feedback" plugin with effect actions which were not associated correctly with hardware dials.
   8. Administration backend for "Team Server". Frontend will follow with the next release.
 
 ## 3.7.1-release 11/26/21

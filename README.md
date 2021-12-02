@@ -42,7 +42,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[3.7.2-dev](https://www.dropbox.com/s/dvn40d2q7pgecg1/Simulator%20Controller%203.7.2-dev.zip?dl=1) (Early build for 3.7.2. New features: New "Team Server" for endurance races, New "Team Server" tab in "Simulator Configuration", New "Team" tab in "Race Settings", Bugfix in "Simulator Setup" for Stream Deck configuration support, Fixed label handling in "Simlator Setup", Fixed several other Bugs in "Simulator Setup", Fixed a bug when using mixed scenarios in "Strategy Workbench", Rework of the voice configuration both for locally installed as well as for Azure voices. Stable, with update procedure and documentation.)
+[3.7.2-rc1](https://www.dropbox.com/s/n96xplakzp2opmr/Simulator%20Controller%203.7.2-rc1.zip?dl=1) (Release candidate for 3.7.2. New features: New "Team Server" for endurance races, New "Team Server" tab in "Simulator Configuration", New "Team" tab in "Race Settings", Bugfix in "Simulator Setup" for Stream Deck configuration support, Fixed label handling in "Simlator Setup", Fixed several other Bugs in "Simulator Setup", Fixed a bug when using mixed scenarios in "Strategy Workbench", Rework of the voice configuration both for locally installed as well as for Azure voices. Stable, with update procedure and documentation.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-372) of this version and all the versions you might have skipped, before installing and using this version.
 

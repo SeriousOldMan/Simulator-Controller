@@ -67,11 +67,11 @@ namespace TeamServer {
                         Password = descriptor.Password,
                         Virgin = false,
                         Administrator = descriptor.Administrator,
-                        MinutesLeft = descriptor.Minutes
+                        AvailableMinutes = descriptor.Minutes
                     }.Save();
                 else if (descriptor.Reset) {
                     account.Password = descriptor.Password;
-                    account.MinutesLeft = descriptor.Minutes;
+                    account.AvailableMinutes = descriptor.Minutes;
 
                     account.Save();
                 }

@@ -156,12 +156,12 @@ namespace TeamServer {
 			return token;
 		}
 
-		public string GetMinutesLeft() {
-			return Get("login/accountminutesleft");
+		public string GetAvailableMinutes() {
+			return Get("login/accountavailableminutes");
 		}
 
 		public string GetTokenLifeTime() {
-			return Get("login/tokenminutesleft");
+			return Get("login/tokenavailableminutes");
 		}
 
 		public void ChangePassword(string newPassword) {
@@ -176,20 +176,23 @@ namespace TeamServer {
 		#endregion
 
 		#region Administration
-		public string CreateAccount(string name, string password, string minutes) {
-			return Post("account", body: BuildBody(new Parameters() { { "Name", name }, { "Password", password }, { "Minutes", minutes } }));
+		public string CreateAccount(string name, string password, string minutes, string contract, string renewal) {
+			return Post("account", body: BuildBody(new Parameters() { { "Name", name }, { "Password", password },
+																	  { "Contract", contract }, { "Renewal", renewal },
+																	  { "Minutes", minutes } }));
+		}
+
+		public string UpdateAccount(string name, string contract, string renewal) {
+			return Post("account", body: BuildBody(new Parameters() { { "Name", name },
+																	  { "Contract", contract }, { "Renewal", renewal } }));
 		}
 
 		public void ChangeAccountPassword(string identifier, string newPassword) {
 			Put("account/" + identifier + "/password", body: newPassword);
 		}
 
-		public void AddMinutes(string identifier, int minutes) {
+		public void SetAccountMinutes(string identifier, int minutes) {
 			Put("account/" + identifier + "/minutes", body: minutes.ToString());
-		}
-
-		public void SetMinutes(string identifier, int minutes) {
-			Put("account/" + identifier, body: "Minutes=" + minutes);
 		}
 
 		public void DeleteAccount(string name) {

@@ -34,12 +34,12 @@ namespace TeamServer.Controllers {
             }
         }
 
-        [HttpGet("accountminutesleft")]
+        [HttpGet("accountavailableminutes")]
         public string GetAccountMinutes([FromQuery(Name = "token")] string token) {
-            return Server.TeamServer.TokenIssuer.ValidateToken(token).Account.MinutesLeft.ToString();
+            return Server.TeamServer.TokenIssuer.ValidateToken(token).Account.AvailableMinutes.ToString();
         }
 
-        [HttpGet("tokenminutesleft")]
+        [HttpGet("tokenavailableminutes")]
         public string GetTokenMinutes([FromQuery(Name = "token")] string token) {
             return Math.Max(0, Server.TeamServer.TokenIssuer.ValidateToken(token).GetRemainingMinutes()).ToString();
         }

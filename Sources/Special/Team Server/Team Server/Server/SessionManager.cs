@@ -10,8 +10,8 @@ namespace TeamServer.Server {
 
 		#region Validation
 		public void ValidateAccount(int duration) {
-			if (Token.Account.MinutesLeft < duration)
-				throw new Exception("Not enough time left on account...");
+			if (Token.Account.AvailableMinutes < duration)
+				throw new Exception("Not enough time available on account...");
 		}
 
 		public void ValidateSession(Session session) {
@@ -174,7 +174,7 @@ namespace TeamServer.Server {
 			if (session.Started && !session.Finished) {
 				var account = Token.Account;
 
-				account.MinutesLeft -= (int)Math.Round((DateTime.Now - session.StartTime).TotalMinutes);
+				account.AvailableMinutes -= (int)Math.Round((DateTime.Now - session.StartTime).TotalMinutes);
 
 				session.Started = false;
 				session.Finished = true;

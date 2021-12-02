@@ -22,8 +22,8 @@ namespace TeamServer.Server {
 
             if (account == null)
                 throw new Exception("Unknown account or password...");
-            else if (account.MinutesLeft <= 0)
-                throw new Exception("Not enough time left on account...");
+            else if (account.AvailableMinutes <= 0)
+                throw new Exception("Not enough time available on account...");
             else {
                 Token token = new Token { Identifier = Guid.NewGuid(), AccountID = account.ID,
                                           Created = DateTime.Now, Until = DateTime.Now + new TimeSpan(0, 0, TokenLifeTime, 0) };

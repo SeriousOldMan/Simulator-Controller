@@ -147,6 +147,8 @@ namespace TeamServer.Controllers {
         public string GetLap([FromQuery(Name = "token")] string token, string identifier,
                              [FromQuery(Name = "lap")] string lap) {
             try {
+                Server.TeamServer.TokenIssuer.ValidateToken(token);
+
                 int lapNr = Int32.Parse(lap);
 
                 Lap theLap = Server.TeamServer.ObjectManager.Connection.QueryAsync<Lap>(

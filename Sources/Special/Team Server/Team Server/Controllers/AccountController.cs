@@ -38,7 +38,7 @@ namespace TeamServer.Controllers {
                 AccountManager accountManager = new AccountManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ElevateToken(token));
                 Account account = accountManager.LookupAccount(identifier);
 
-                return ControllerUtils.SerializeObject(account, new List<string>(new string[] { "Identifier", "Name", "Virgin", "MinutesLeft" }));
+                return ControllerUtils.SerializeObject(account, new List<string>(new string[] { "Identifier", "Name", "Virgin", "Contract", "ContractMinutes", "AvailableMinutes" }));
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
@@ -51,14 +51,17 @@ namespace TeamServer.Controllers {
                 AccountManager accountManager = new AccountManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ElevateToken(token));
                 Account account = accountManager.LookupAccount(identifier);
 
-                ControllerUtils.DeserializeObject(account, keyValues);
-
                 Dictionary<string, string> properties = ControllerUtils.ParseKeyValues(keyValues);
 
-                if (properties.ContainsKey("Minutes"))
-                    account.MinutesLeft = Int32.Parse(properties["Minutes"]);
+                if (properties.ContainsKey("Password"))
+                    accountManager.ChangePassword(account, properties["Password"]);
 
-                account.Save();
+                if (properties.ContainsKey("Contract"))
+                    accountManager.ChangeContract(account, (Account.ContractType)Int32.Parse(properties["Contract"]),
+                                                           Int32.Parse(properties["Renewal"]));
+
+                if (properties.ContainsKey("Minutes"))
+                    accountManager.SetMinutes(account, Int32.Parse(properties["Minutes"]));
 
                 return "Ok";
             }
@@ -84,6 +87,26 @@ namespace TeamServer.Controllers {
             }
         }
 
+        [HttpPut("{identifier}/contract")]
+        public string ChangeContract([FromQuery(Name = "token")] string token, string identifier, [FromBody] string keyValues) {
+            try {
+                AccountManager accountManager = new AccountManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ElevateToken(token));
+                Account account = accountManager.LookupAccount(identifier);
+
+                Dictionary<string, string> properties = ControllerUtils.ParseKeyValues(keyValues);
+
+                accountManager.ChangeContract(account, (Account.ContractType)Int32.Parse(properties["Contract"]),
+                                                       Int32.Parse(properties["Renewal"]));
+
+                account.Save();
+
+                return "Ok";
+            }
+            catch (Exception exception) {
+                return "Error: " + exception.Message;
+            }
+        }
+
         [HttpPut("{identifier}/minutes")]
         public string AddMinutes([FromQuery(Name = "token")] string token, string identifier, [FromBody] string keyValues) {
             try {
@@ -92,7 +115,7 @@ namespace TeamServer.Controllers {
 
                 Dictionary<string, string> properties = ControllerUtils.ParseKeyValues(keyValues);
 
-                accountManager.AddMinutes(account, Int32.Parse(properties["Minutes"]));
+                accountManager.SetMinutes(account, Int32.Parse(properties["Minutes"]));
 
                 account.Save();
 
@@ -115,8 +138,14 @@ namespace TeamServer.Controllers {
                 if (properties.ContainsKey("Password"))
                     account.Password = properties["Password"];
 
+                if (properties.ContainsKey("Contract"))
+                    account.Contract = (Account.ContractType)Int32.Parse(properties["Contract"]);
+
+                if (properties.ContainsKey("Renewal"))
+                    account.AvailableMinutes = Int32.Parse(properties["Renewal"]);
+
                 if (properties.ContainsKey("Minutes"))
-                    account.MinutesLeft = Int32.Parse(properties["Minutes"]);
+                    account.AvailableMinutes = Int32.Parse(properties["Minutes"]);
 
                 account.Save();
                 
@@ -130,7 +159,7 @@ namespace TeamServer.Controllers {
         [HttpDelete("{identifier}")]
         public string Delete([FromQuery(Name = "token")] string token, string identifier) {
             try {
-                AccountManager accountManager = new AccountManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                AccountManager accountManager = new AccountManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ElevateToken(token));
 
                 accountManager.DeleteAccount(identifier);
 

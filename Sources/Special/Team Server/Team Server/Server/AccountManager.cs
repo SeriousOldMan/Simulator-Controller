@@ -7,7 +7,7 @@ using TeamServer.Model.Access;
 
 namespace TeamServer.Server {
     public class AccountManager : ManagerBase {
-        public AccountManager(ObjectManager objectManager, Model.Access.Token token) : base(objectManager, token) {
+        public AccountManager(ObjectManager objectManager, Token token) : base(objectManager, token) {
         }
 
         public string CreatePassword(int length) {
@@ -82,22 +82,20 @@ namespace TeamServer.Server {
         #endregion
 
         #region CRUD
-        public Account CreateAccount(string name) {
-            string password = CreatePassword(20);
-
-            Account account = new Account { Name = name, Password = password, MinutesLeft = 0 };
-
-            account.Save();
-
-            return account;
-        }
-
-        public Account CreateAccount(string name, string password, int initialMinutes,
-                                     Account.ContractType contract, int renewalMinutes) {
+        public Account CreateAccount(string name, string password = null, int initialMinutes = 0,
+                                     Account.ContractType contract = Account.ContractType.OneTime, int renewalMinutes = 0) {
             if (FindAccount(name) == null) {
+                bool virgin = false;
+
+                if (password == null) {
+                    password = CreatePassword(20);
+
+                    virgin = true;
+                }
+
                 Account account = new Account {
-                    Name = name, Password = password, Virgin = false, MinutesLeft = initialMinutes,
-                    Contract = contract, RenewalMinutes = renewalMinutes
+                    Name = name, Password = password, Virgin = virgin, AvailableMinutes = initialMinutes,
+                    Contract = contract, ContractMinutes = renewalMinutes
                 };
 
                 account.Save();
@@ -106,6 +104,24 @@ namespace TeamServer.Server {
             }
             else
                 throw new Exception("Duplicate account name...");
+        }
+
+        public void ChangePassword(Account account, string password) {
+            ValidateAccount(account);
+
+            account.Password = password;
+            account.Virgin = false;
+
+            account.Save();
+        }
+
+        public void ChangeContract(Account account, Account.ContractType contract, int renewalMinutes) {
+            ValidateAccount(account);
+
+            account.Contract = contract;
+            account.ContractMinutes = renewalMinutes;
+
+            account.Save();
         }
 
         public void DeleteAccount(Account account) {
@@ -131,7 +147,7 @@ namespace TeamServer.Server {
         public void SetMinutes(Account account, int minutes) {
             ValidateAccount(account);
 
-            account.MinutesLeft = minutes;
+            account.AvailableMinutes = minutes;
 
             account.Save();
         }
@@ -143,7 +159,7 @@ namespace TeamServer.Server {
         public void AddMinutes(Account account, int minutes) {
             ValidateAccount(account);
 
-            account.MinutesLeft += minutes;
+            account.AvailableMinutes += minutes;
 
             account.Save();
         }
@@ -159,12 +175,14 @@ namespace TeamServer.Server {
                 @"
                     Select * From Access_Accounts
                 ").ContinueWith(t => t.Result.ForEach(a => {
-                    if ((a.Contract == Account.ContractType.OneTime) && (a.MinutesLeft <= 0))
+                    if (a.Contract == Account.ContractType.Terminated)
+                        a.Delete();
+                    else if ((a.Contract == Account.ContractType.OneTime) && (a.AvailableMinutes <= 0))
                         a.Delete();
                     else if (a.Contract == Account.ContractType.FixedMinutes)
-                        SetMinutes(a, a.RenewalMinutes);
+                        SetMinutes(a, a.ContractMinutes);
                     else if (a.Contract == Account.ContractType.AdditionalMinutes)
-                        AddMinutes(a, a.RenewalMinutes);
+                        AddMinutes(a, a.ContractMinutes);
                 }));
         }
         #endregion

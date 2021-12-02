@@ -281,10 +281,10 @@ class TeamServerConfigurator extends ConfigurationItem {
 			token := connector.Login(teamServerNameEdit, teamServerPasswordEdit)
 			
 			this.iToken := token
-			minutesLeft := connector.GetMinutesLeft()
+			availableMinutes := connector.GetAvailableMinutes()
 			
 			teamServerTokenEdit := token
-			teamServerTimeText := (minutesLeft . translate(" Minutes"))
+			teamServerTimeText := (availableMinutes . translate(" Minutes"))
 			
 			GuiControl Text, teamServerTokenEdit, %teamServerTokenEdit%
 			GuiControl +cBlack, teamServerTimeText

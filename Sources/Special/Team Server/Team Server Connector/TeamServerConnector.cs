@@ -176,15 +176,19 @@ namespace TeamServer {
 		#endregion
 
 		#region Administration
-		public string CreateAccount(string name, string password, string minutes, string contract, string renewal) {
+		public string CreateAccount(string name, string password, string eMail, string minutes, string contract, string renewal) {
 			return Post("account", body: BuildBody(new Parameters() { { "Name", name }, { "Password", password },
-																	  { "Contract", contract }, { "Renewal", renewal },
-																	  { "Minutes", minutes } }));
+																	  { "EMail", eMail },
+																	  { "Contract", contract }, { "ContractMinutes", renewal },
+																	  { "AvailableMinutes", minutes } }));
 		}
 
-		public string UpdateAccount(string name, string contract, string renewal) {
-			return Post("account", body: BuildBody(new Parameters() { { "Name", name },
-																	  { "Contract", contract }, { "Renewal", renewal } }));
+		public string GetAccount(string identifier) {
+			return Get("account/" + identifier);
+		}
+
+		public string ChangeAccountContract(string name, string eMail, string contract, string renewal) {
+			return Post("account", body: BuildBody(new Parameters() { { "Contract", contract }, { "ContractMinutes", renewal } }));
 		}
 
 		public void ChangeAccountPassword(string identifier, string newPassword) {
@@ -195,8 +199,8 @@ namespace TeamServer {
 			Put("account/" + identifier + "/minutes", body: minutes.ToString());
 		}
 
-		public void DeleteAccount(string name) {
-			Delete("account", new Parameters() { { "Name", name } });
+		public void DeleteAccount(string identifier) {
+			Delete("account/" + identifier);
 		}
 		#endregion
 

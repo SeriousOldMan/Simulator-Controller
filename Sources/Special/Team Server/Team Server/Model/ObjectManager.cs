@@ -66,7 +66,7 @@ namespace TeamServer.Model {
                 guid = Guid.Empty;
             }
 
-            return Connection.Table<Access.Account>().Where(a => a.Name == identifier || a.Identifier == guid).FirstOrDefaultAsync();
+            return Connection.Table<Access.Account>().Where(a => a.Name == identifier || a.EMail == identifier || a.Identifier == guid).FirstOrDefaultAsync();
         }
 
         public Task<Access.Account> GetAccountAsync(string account, string password) {

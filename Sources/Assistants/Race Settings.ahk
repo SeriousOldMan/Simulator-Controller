@@ -38,7 +38,7 @@ ListLines Off					; Disable execution history
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                   Public Constant Declaration Section                   ;;;
+;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 global kLoad = "Load"
@@ -48,16 +48,11 @@ global kCancel = "Cancel"
 global kConnect = "Connect"
 global kUpdate = "Update"
 
-
-;;;-------------------------------------------------------------------------;;;
-;;;                        Private Constant Section                         ;;;
-;;;-------------------------------------------------------------------------;;;
-
 global kRaceSettingsFile = getFileName("Race.settings", kUserConfigDirectory)
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                   Private Variable Declaration Section                  ;;;
+;;;                        Private Variable Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 global vSilentMode := kSilentMode

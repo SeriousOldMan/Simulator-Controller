@@ -82,7 +82,7 @@ namespace TeamServer.Server {
         #endregion
 
         #region CRUD
-        public Account CreateAccount(string name, string password = null, int initialMinutes = 0,
+        public Account CreateAccount(string name, string eMail = "", string password = null, int initialMinutes = 0,
                                      Account.ContractType contract = Account.ContractType.OneTime, int renewalMinutes = 0) {
             if (FindAccount(name) == null) {
                 bool virgin = false;
@@ -94,7 +94,7 @@ namespace TeamServer.Server {
                 }
 
                 Account account = new Account {
-                    Name = name, Password = password, Virgin = virgin, AvailableMinutes = initialMinutes,
+                    Name = name, EMail = eMail, Password = password, Virgin = virgin, AvailableMinutes = initialMinutes,
                     Contract = contract, ContractMinutes = renewalMinutes
                 };
 

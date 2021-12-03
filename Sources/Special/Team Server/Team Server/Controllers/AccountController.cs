@@ -53,11 +53,17 @@ namespace TeamServer.Controllers {
 
                 Dictionary<string, string> properties = ControllerUtils.ParseKeyValues(keyValues);
 
+                if (properties.ContainsKey("EMail")) {
+                    account.EMail = properties["EMail"];
+
+                    account.Save().Wait();
+                }
+
                 if (properties.ContainsKey("Password"))
                     accountManager.ChangePassword(account, properties["Password"]);
 
                 if (properties.ContainsKey("Contract"))
-                    accountManager.ChangeContract(account, (Account.ContractType)Int32.Parse(properties["Contract"]),
+                    accountManager.ChangeContract(account, (Account.ContractType)Enum.Parse(typeof(Account.ContractType), properties["Contract"]),
                                                            Int32.Parse(properties["ContractMinutes"]));
 
                 if (properties.ContainsKey("AvailableMinutes"))
@@ -77,6 +83,7 @@ namespace TeamServer.Controllers {
                 Account account = accountManager.LookupAccount(identifier);
 
                 account.Password = password;
+                account.Virgin = false;
 
                 account.Save();
 
@@ -95,7 +102,7 @@ namespace TeamServer.Controllers {
 
                 Dictionary<string, string> properties = ControllerUtils.ParseKeyValues(keyValues);
 
-                accountManager.ChangeContract(account, (Account.ContractType)Int32.Parse(properties["Contract"]),
+                accountManager.ChangeContract(account, (Account.ContractType)Enum.Parse(typeof(Account.ContractType), properties["Contract"]),
                                                        Int32.Parse(properties["ContractMinutes"]));
 
                 account.Save();
@@ -142,10 +149,10 @@ namespace TeamServer.Controllers {
                     account.Password = properties["Password"];
 
                 if (properties.ContainsKey("Contract"))
-                    account.Contract = (Account.ContractType)Int32.Parse(properties["Contract"]);
+                    account.Contract = (Account.ContractType)Enum.Parse(typeof(Account.ContractType), properties["Contract"]);
 
                 if (properties.ContainsKey("ContractMinutes"))
-                    account.AvailableMinutes = Int32.Parse(properties["ContractMinutes"]);
+                    account.ContractMinutes = Int32.Parse(properties["ContractMinutes"]);
 
                 if (properties.ContainsKey("AvailableMinutes"))
                     account.AvailableMinutes = Int32.Parse(properties["AvailableMinutes"]);

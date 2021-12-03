@@ -10,7 +10,7 @@ namespace TeamServer.Server {
 
 		#region Validation
 		public void ValidateAccount(int duration) {
-			if (Token.Account.AvailableMinutes < duration)
+			if (!Token.Account.Administrator && (Token.Account.AvailableMinutes < duration))
 				throw new Exception("Not enough time available on account...");
 		}
 

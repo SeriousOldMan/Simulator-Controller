@@ -176,7 +176,11 @@ namespace TeamServer {
 		#endregion
 
 		#region Administration
-		public string CreateAccount(string name, string password, string eMail, string minutes, string contract, string renewal) {
+		public string GetAllAccounts() {
+			return Get("account/allaccounts");
+        }
+
+		public string CreateAccount(string name, string eMail, string password, string minutes, string contract, string renewal) {
 			return Post("account", body: BuildBody(new Parameters() { { "Name", name }, { "Password", password },
 																	  { "EMail", eMail },
 																	  { "Contract", contract }, { "ContractMinutes", renewal },
@@ -187,8 +191,12 @@ namespace TeamServer {
 			return Get("account/" + identifier);
 		}
 
-		public string ChangeAccountContract(string name, string eMail, string contract, string renewal) {
-			return Post("account", body: BuildBody(new Parameters() { { "Contract", contract }, { "ContractMinutes", renewal } }));
+		public void ChangeAccountEMail(string identifier, string eMail) {
+			Put("account/" + identifier, body: BuildBody(new Parameters() { { "EMail", eMail } }));
+		}
+
+		public void ChangeAccountContract(string identifier, string contract, string renewal) {
+			Put("account/" + identifier, body: BuildBody(new Parameters() { { "Contract", contract }, { "ContractMinutes", renewal } }));
 		}
 
 		public void ChangeAccountPassword(string identifier, string newPassword) {

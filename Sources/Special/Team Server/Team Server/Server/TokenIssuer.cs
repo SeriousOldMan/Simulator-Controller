@@ -22,7 +22,7 @@ namespace TeamServer.Server {
 
             if (account == null)
                 throw new Exception("Unknown account or password...");
-            else if (account.AvailableMinutes <= 0)
+            else if (!account.Administrator && (account.AvailableMinutes <= 0))
                 throw new Exception("Not enough time available on account...");
             else {
                 Token token = new Token { Identifier = Guid.NewGuid(), AccountID = account.ID,

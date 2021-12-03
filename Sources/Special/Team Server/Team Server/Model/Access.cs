@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace TeamServer.Model.Access {
     [Table("Access_Accounts")]
     public class Account : ModelObject {
-        public enum ContractType : int { Terminated = 0, OneTime = 1, FixedMinutes = 2, AdditionalMinutes = 3 };
+        public enum ContractType : int { Expired = 0, OneTime = 1, FixedMinutes = 2, AdditionalMinutes = 3 };
 
         [Unique]
         public string Name { get; set; }

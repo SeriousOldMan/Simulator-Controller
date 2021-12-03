@@ -343,7 +343,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 					GuiControl Enable, editSessionButton
 				}
 			}
-		}	
+		}
 	}
 	
 	parseObject(properties) {

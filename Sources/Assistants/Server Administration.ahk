@@ -53,7 +53,7 @@ global kEvent = "Event"
 ;;;-------------------------------------------------------------------------;;;
 
 global vToken := false
-	
+
 	
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
@@ -100,7 +100,7 @@ setButtonIcon(buttonHandle, file, index := 1, options := "") {
 	return IL_Add(normal_il, file, index)
 }
 
-createPassword(length) {
+generatePassword(length) {
 	valid = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
 	result := ""
 	
@@ -113,15 +113,80 @@ createPassword(length) {
 	return result
 }
 
-global teamServerURLEdit = "https://localhost:5001"
-global teamServerNameEdit = ""
-global teamServerPasswordEdit = ""
-global teamServerTokenEdit = ""
-global accountsListView
+parseObject(properties) {
+	result := {}
+	
+	properties := StrReplace(properties, "`r", "")
+	
+	Loop Parse, properties, `n
+	{
+		property := string2Values("=", A_LoopField)
+		
+		result[property[1]] := property[2]
+	}
+	
+	return result
+}
+
+loadAccounts(connector, listView) {
+	accounts := {}
+	
+	Gui ListView, % listView
+	
+	LV_Delete()
+	
+	if vToken {
+		for ignore, identifier in string2Values(";", connector.GetAllAccounts()) {
+			account := parseObject(connector.GetAccount(identifier))
+		
+			accounts[A_Index] := account
+			accounts[account.Name] := account
+			
+			index := inList(["Expired", "OneTime", "FixedMinutes", "AdditionalMinutes"], account.Contract)
+			
+			LV_Add("", account.Name, account.EMail, translate(["Expired", "One-Time", "Monthly Fixed", "Monthly Additional"][index]) . translate(" (") . account.ContractMinutes . translate(")"), account.AvailableMinutes)
+		}
+	}
+	
+	LV_ModifyCol()
+	LV_ModifyCol(1, "AutoHdr")
+	LV_ModifyCol(2, "AutoHdr")
+	LV_ModifyCol(3, "AutoHdr")
+	LV_ModifyCol(4, "AutoHdr")
+	LV_ModifyCol(5, "AutoHdr")
+	
+	return accounts
+}
+
+loadTasks(connector) {
+	
+}
 
 administrationEditor(configurationOrCommand, arguments*) {
 	static connector := false
 	static done := false
+	static accounts := {}
+	static account := false
+	
+	static teamServerURLEdit = "https://localhost:5001"
+	static teamServerNameEdit = ""
+	static teamServerPasswordEdit = ""
+	static changePasswordButton
+	static teamServerTokenEdit = ""
+	static accountsListView
+
+	static accountNameEdit
+	static accountEMailEdit
+	static accountPasswordEdit
+	static accountContractDropDown
+	static accountMinutesEdit
+	
+	static createPasswordButton
+	static copyPasswordButton
+	
+	static addAccountButton
+	static deleteAccountButton
+	static saveAccountButton
 	
 	if (configurationOrCommand == kClose)
 		done := true
@@ -133,12 +198,28 @@ administrationEditor(configurationOrCommand, arguments*) {
 		try {
 			connector.Connect(teamServerURLEdit)
 			vToken := connector.Login(teamServerNameEdit, teamServerPasswordEdit)
+		
+			accounts := loadAccounts(connector, accountsListView)
+			loadTasks(connector)
+			
+			administrationEditor(kEvent, "AccountClear")
 			
 			GuiControl, , teamServerTokenEdit, % vToken
 			
 			showMessage(translate("Successfully connected to the Team Server."))
 		}
 		catch exception {
+			vToken := false
+			
+			GuiControl, , teamServerTokenEdit, % ""
+			
+			accounts := loadAccounts(connector, accountsListView)
+			account := false
+			
+			loadTasks(connector)
+			
+			administrationEditor(kEvent, "AccountClear")
+			
 			title := translate("Error")
 		
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
@@ -147,10 +228,134 @@ administrationEditor(configurationOrCommand, arguments*) {
 		}
 	}
 	else if (configurationOrCommand == kEvent) {
-		if (arguments[1] = "PasswordChange") {
-			connector.ChangePassword(arguments[2])
+		try {
+			if (arguments[1] = "PasswordChange") {
+				connector.ChangePassword(arguments[2])
+				
+				GuiControl, , teamServerPasswordEdit, % arguments[2]
+			}
+			else if (arguments[1] = "AccountLoad") {
+				account := accounts[arguments[2]]
 			
-			GuiControl, , teamServerPasswordEdit, % arguments[2]
+				GuiControl, , accountNameEdit, % account.Name
+				GuiControl, , accountEMailEdit, % account.EMail
+				GuiControl, , accountPasswordEdit, % ""
+				GuiControl Choose, accountContractDropDown, % inList(["Expired", "OneTime", "FixedMinutes", "AdditionalMinutes"], account.Contract)
+				GuiControl, , accountMinutesEdit, % account.ContractMinutes
+				
+				administrationEditor(kEvent, "UpdateState")
+			}
+			else if (arguments[1] = "AccountNew") {
+				administrationEditor(kEvent, "AccountClear")
+			
+				GuiControl Choose, accountContractDropDown, 2
+				GuiControl, , accountMinutesEdit, 120
+				
+				account := true
+				
+				administrationEditor(kEvent, "UpdateState")
+			}
+			else if (arguments[1] = "AccountSave") {
+				GuiControlGet accountNameEdit
+				GuiControlGet accountEMailEdit
+				GuiControlGet accountPasswordEdit
+				GuiControlGet accountContractDropDown
+				GuiControlGet accountMinutesEdit
+				
+				contract := ["Expired", "OneTime", "FixedMinutes", "AdditionalMinutes"][accountContractDropDown]
+					
+				if (account == true) {
+					connector.CreateAccount(accountNameEdit, accountEMailEdit, accountPasswordEdit
+										  , accountMinutesEdit, contract, accountMinutesEdit)
+				}
+				else {
+					if (accountPasswordEdit != "")
+						connector.ChangeAccountPassword(account.Identifier, accountPasswordEdit)
+					
+					if ((account.Contract != contract) || (account.ContractMinutes != accountMinutesEdit))
+						connector.ChangeAccountContract(account.Identifier, contract, accountMinutesEdit)
+					
+					if (accountEMailEdit != account.EMail)
+						connector.ChangeAccountEMail(account.Identifier, accountEMailEdit)
+				}
+				
+				accounts := loadAccounts(connector, accountsListView)
+				
+				administrationEditor(kEvent, "AccountClear")
+			}
+			else if (arguments[1] = "AccountClear") {
+				account := false
+			
+				GuiControl, , accountNameEdit, % ""
+				GuiControl, , accountEMailEdit, % ""
+				GuiControl, , accountPasswordEdit, % ""
+				GuiControl Choose, accountContractDropDown, 0
+				GuiControl, , accountMinutesEdit, % ""
+				
+				administrationEditor(kEvent, "UpdateState")
+			}
+			else if (arguments[1] = "UpdateState") {
+				GuiControl Disable, copyPasswordButton
+			
+				if vToken {
+					GuiControl Enable, changePasswordButton
+					GuiControl Enable, addAccountButton
+				}
+				else {
+					GuiControl Disable, changePasswordButton
+					GuiControl Disable, addAccountButton
+				}
+				
+				if account {
+					if (account == true)
+						GuiControl Enable, accountNameEdit
+					else
+						GuiControl Disable, accountNameEdit
+					
+					GuiControl Enable, accountEMailEdit
+					GuiControl Enable, accountPasswordEdit
+					GuiControl Enable, accountContractDropDown
+					GuiControl Enable, accountMinutesEdit
+					
+					GuiControl Enable, createPasswordButton
+					
+					GuiControl Enable, deleteAccountButton
+					GuiControl Enable, saveAccountButton
+				}
+				else {
+					GuiControl Disable, accountNameEdit
+					GuiControl Disable, accountEMailEdit
+					GuiControl Disable, accountPasswordEdit
+					GuiControl Disable, accountContractDropDown
+					GuiControl Disable, accountMinutesEdit
+					
+					GuiControl Disable, createPasswordButton
+					
+					GuiControl Disable, deleteAccountButton
+					GuiControl Disable, saveAccountButton
+				}
+			}
+			else if (arguments[1] = "PasswordCreate") {
+				GuiControl Enable, copyPasswordButton
+			
+				GuiControl Text, accountPasswordEdit, % generatePassword(20)
+			}
+			else if (arguments[1] = "PasswordCopy") {
+				GuiControlGet accountPasswordEdit
+		
+				if (accountPasswordEdit && (accountPasswordEdit != "")) {
+					Clipboard := accountPasswordEdit
+					
+					showMessage(translate("Password copied to the clipboard."))
+				}
+			}
+		}
+		catch exception {
+			title := translate("Error")
+		
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+			MsgBox 262160, %title%, % (translate("Error while executing command.") . "`n`n" . translate("Error: ") . exception.Message)
+			OnMessage(0x44, "")
 		}
 	}
 	else {
@@ -225,8 +430,8 @@ administrationEditor(configurationOrCommand, arguments*) {
 		Gui ADM:Add, Text, x%x0% yp+23 w90 h23 +0x200, % translate("Login Credentials")
 		Gui ADM:Add, Edit, x%x1% yp+1 w%w3% h21 HWNDloginHandle VteamServerNameEdit, %teamServerNameEdit%
 		Gui ADM:Add, Edit, x%x3% yp w%w3% h21 Password VteamServerPasswordEdit, %teamServerPasswordEdit%
-		Gui ADM:Add, Button, x%x5% yp-1 w23 h23 Center +0x200 HWNDchangePasswordButton gchangePassword
-		setButtonIcon(changePasswordButton, kIconsDirectory . "Pencil.ico", 1, "L4 T4 R4 B4")
+		Gui ADM:Add, Button, x%x5% yp-1 w23 h23 Center +0x200 HWNDchangePasswordButtonHandle vchangePasswordButton gchangePassword
+		setButtonIcon(changePasswordButtonHandle, kIconsDirectory . "Pencil.ico", 1, "L4 T4 R4 B4")
 		
 		Gui ADM:Add, Text, x%x0% yp+26 w90 h23 +0x200, % translate("Access Token")
 		Gui ADM:Add, Edit, x%x1% yp-1 w%w4% h21 ReadOnly VteamServerTokenEdit, %teamServerTokenEdit%
@@ -240,38 +445,53 @@ administrationEditor(configurationOrCommand, arguments*) {
 		
 		Gui Tab, 1
 		
-		Gui ADM:Add, ListView, x%x0% y%y% w372 h120 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndaccountsListView gaccountsListEvent, % values2String("|", map(["Account", "eMail", "Type"], "translate")*)
+		Gui ADM:Add, ListView, x%x0% y%y% w372 h120 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDaccountsListView gaccountsListEvent, % values2String("|", map(["Account", "eMail", "Contract", "Available"], "translate")*)
 		
 		Gui ADM:Add, Text, x%x0% yp+124 w90 h23 +0x200, % translate("Name")
-		Gui ADM:Add, Edit, x%x1% yp+1 w%w3%
+		Gui ADM:Add, Edit, x%x1% yp+1 w%w3% vaccountNameEdit
 		
 		Gui ADM:Add, Text, x%x0% yp+24 w90 h23 +0x200, % translate("Password")
-		Gui ADM:Add, Edit, x%x1% yp+1 w%w4% Disabled Password, % createPassword(20)
-		Gui ADM:Add, Button, x%x5% yp-1 w23 h23 Center +0x200 HWNDcopyPasswordButton
-		setButtonIcon(copyPasswordButton, kIconsDirectory . "Copy.ico", 1, "L4 T4 R4 B4")
+		Gui ADM:Add, Edit, x%x1% yp+1 w%w4% ReadOnly Password vaccountPasswordEdit
+		Gui ADM:Add, Button, x%x2% yp-1 w23 h23 Center +0x200 HWNDcreatePasswordButtonHandle vcreatePasswordButton gcreatePassword
+		setButtonIcon(createPasswordButtonHandle, kIconsDirectory . "Authorize.ico", 1, "L4 T4 R4 B4")
+		Gui ADM:Add, Button, x%x5% yp w23 h23 Center +0x200 HWNDcopyPasswordButtonHandle vcopyPasswordButton
+		setButtonIcon(copyPasswordButtonHandle, kIconsDirectory . "Copy.ico", 1, "L4 T4 R4 B4")
 		
 		Gui ADM:Add, Text, x%x0% yp+24 w90 h23 +0x200, % translate("E-Mail")
-		Gui ADM:Add, Edit, x%x1% yp+1 w%w4%
+		Gui ADM:Add, Edit, x%x1% yp+1 w%w4%  vaccountEMailEdit
 		
 		Gui ADM:Add, Text, x%x0% yp+24 w90 h23 +0x200, % translate("Contract")
-		Gui ADM:Add, DropDownList, x%x1% yp+1 w%w3% Choose2, % values2String("|", map(["One-Time", "Monthly Fixed", "Monthly Additional"], "translate")*)
-		Gui ADM:Add, Edit, x%x3% yp w60 h21
+		Gui ADM:Add, DropDownList, x%x1% yp+1 w%w3% AltSubmit Choose2 vaccountContractDropDown, % values2String("|", map(["Expired", "One-Time", "Monthly Fixed", "Monthly Additional"], "translate")*)
+		Gui ADM:Add, Edit, x%x3% yp w60 h21  vaccountMinutesEdit
 		Gui ADM:Add, Text, x%x4% yp w90 h23 +0x200, % translate("Minutes")
+		
+		x5 := x4 - 1
+		x6 := x5 + 24
+		x7 := x6 + 24
+		
+		Gui ADM:Add, Button, x%x5% yp+30 w23 h23 Center +0x200 gnewAccount HWNDaddAccountButtonHandle vaddAccountButton
+		setButtonIcon(addAccountButtonHandle, kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
+		Gui ADM:Add, Button, x%x6% yp w23 h23 Center +0x200 gdeleteAccount HWNDdeleteAccountButtonHandle vdeleteAccountButton
+		setButtonIcon(deleteAccountButtonHandle, kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
+		Gui ADM:Add, Button, x%x7% yp w23 h23 Center +0x200 gsaveAccount HWNDsaveAccountButtonHandle vsaveAccountButton
+		setButtonIcon(saveAccountButtonHandle, kIconsDirectory . "Save.ico", 1, "L5 T5 R5 B5")
 		
 		Gui Tab, 2
 		
-		Gui ADM:Add, Text, x%x0% y%y% w90 h23 +0x200, % translate("Delete Tokens")
+		Gui ADM:Add, Text, x%x0% y%y% w120 h23 +0x200, % translate("Delete expired Tokens")
 		Gui ADM:Add, DropDownList, x%x1% yp+1 w%w3% Choose2, % values2String("|", map(["Never", "Daily", "Weekly", "1st of Month"], "translate")*)
 		
-		Gui ADM:Add, Text, x%x0% yp+23 w90 h23 +0x200, % translate("Cleanup Sessions")
+		Gui ADM:Add, Text, x%x0% yp+23 w120 h23 +0x200, % translate("Cleanup Sessions")
 		Gui ADM:Add, DropDownList, x%x1% yp+1 w%w3% Choose2, % values2String("|", map(["Never", "Daily", "Weekly", "1st of Month"], "translate")*)
 		
-		Gui ADM:Add, Text, x%x0% yp+23 w90 h23 +0x200, % translate("Renew Accounts")
+		Gui ADM:Add, Text, x%x0% yp+23 w120 h23 +0x200, % translate("Renew Accounts")
 		Gui ADM:Add, DropDownList, x%x1% yp+1 w%w3% Choose3, % values2String("|", map(["Never", "Daily", "Weekly", "1st of Month"], "translate")*)
 		
 		Gui ADM:Show, AutoSize Center
 		
 		ControlFocus, , ahk_id %loginHandle%
+		
+		administrationEditor(kEvent, "AccountClear")
 		
 		Loop {
 			Sleep 1000
@@ -353,6 +573,27 @@ changePassword() {
 }
 
 accountsListEvent() {
+	if ((A_GuiEvent == "DoubleClick") || (A_GuiEvent == "Normal"))
+		administrationEditor(kEvent, "AccountLoad", A_EventInfo)
+}
+
+createPassword() {
+	administrationEditor(kEvent, "PasswordCreate")
+}
+
+copyPassword() {
+	administrationEditor(kEvent, "PasswordCopy")
+}
+
+newAccount() {
+	administrationEditor(kEvent, "AccountNew")
+}
+
+deleteAccount() {
+}
+
+saveAccount() {
+	administrationEditor(kEvent, "AccountSave")
 }
 
 startupServerAdministration() {

@@ -5,6 +5,11 @@
 
   "Accounts": [
     {
+      "Name": "admin",
+      "Password": "admin",
+      "Administrator":  true
+    },
+    {
       "Name": "test1",
       "Password": "",
       "Minutes": 120

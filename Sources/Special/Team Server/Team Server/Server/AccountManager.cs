@@ -34,7 +34,7 @@ namespace TeamServer.Server {
         public List<Account> GetAllAccounts() {
             return TeamServer.ObjectManager.Connection.QueryAsync<Account>(
                 @"
-                    Select * From Accounts
+                    Select * From Access_Accounts
                 ").Result;
         }
 
@@ -112,7 +112,7 @@ namespace TeamServer.Server {
             account.Password = password;
             account.Virgin = false;
 
-            account.Save();
+            account.Save().Wait();
         }
 
         public void ChangeContract(Account account, Account.ContractType contract, int renewalMinutes) {
@@ -121,7 +121,7 @@ namespace TeamServer.Server {
             account.Contract = contract;
             account.ContractMinutes = renewalMinutes;
 
-            account.Save();
+            account.Save().Wait();
         }
 
         public void DeleteAccount(Account account) {
@@ -175,7 +175,7 @@ namespace TeamServer.Server {
                 @"
                     Select * From Access_Accounts
                 ").ContinueWith(t => t.Result.ForEach(a => {
-                    if (a.Contract == Account.ContractType.Terminated)
+                    if (a.Contract == Account.ContractType.Expired)
                         a.Delete();
                     else if ((a.Contract == Account.ContractType.OneTime) && (a.AvailableMinutes <= 0))
                         a.Delete();

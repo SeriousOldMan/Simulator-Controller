@@ -87,14 +87,20 @@ namespace TeamServer.Server {
             TeamServer.TokenIssuer.CleanupTokensAsync();
         }
 
+        private void CleanupSessions() {
+            new SessionManager(ObjectManager, TeamServer.TokenIssuer.AdminToken).CleanupSessionsAsync();
+        }
+
         private void RenewContingents() {
             new AccountManager(ObjectManager, TeamServer.TokenIssuer.AdminToken).RenewAccountsAsync();
         }
 
         private void RunTask(Model.Task.Task task) {
-            if (task.What == Model.Task.Task.Type.Cleanup)
+            if (task.What == Model.Task.Task.Type.TokenCleanup)
                 CleanupTokens();
-            else if (task.What == Model.Task.Task.Type.Renewal)
+            else if (task.What == Model.Task.Task.Type.SessionCleanup)
+                CleanupSessions();
+            else if (task.What == Model.Task.Task.Type.AccountRenewal)
                 RenewContingents();
         }
 

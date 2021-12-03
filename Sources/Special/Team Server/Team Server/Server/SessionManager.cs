@@ -192,6 +192,20 @@ namespace TeamServer.Server {
 		public void FinishSession(string identifier) {
 			FinishSession(new Guid(identifier));
 		}
+
+		public async void CleanupSessionsAsync() {
+			TeamServer.TokenIssuer.ElevateToken(Token);
+
+			await ObjectManager.Connection.QueryAsync<Session>(
+				@"
+                    Select * From Sessions
+                ").ContinueWith(t => t.Result.ForEach(s => {
+					if (s.Finished && (s.FinishTime < DateTime.Now.AddHours(1))) {
+						foreach (Stint stint in s.Stints)
+							stint.Delete();
+					}
+				}));
+		}
 		#endregion
 		#endregion
 

@@ -9,7 +9,7 @@ namespace TeamServer.Model.Task {
     public class Task : ModelObject {
         public enum Period : int { Daily = 1, Weekly = 2, Monthly = 3 };
 
-        public enum Type : int { Cleanup = 1, Renewal = 2 };
+        public enum Type : int { TokenCleanup = 1, SessionCleanup = 2, AccountRenewal = 3 };
 
         [Unique]
         public string Name { get; set; }
@@ -18,7 +18,7 @@ namespace TeamServer.Model.Task {
 
         public Period When { get; set; } = Period.Daily;
 
-        public Type What { get; set; } = Type.Cleanup;
+        public Type What { get; set; } = Type.TokenCleanup;
 
         public DateTime Next { get; set; } = DateTime.MinValue;
     }

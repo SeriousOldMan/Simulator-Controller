@@ -226,14 +226,19 @@ administrationEditor(configurationOrCommand, arguments*) {
 			connector.Connect(teamServerURLEdit)
 			vToken := connector.Login(teamServerNameEdit, teamServerPasswordEdit)
 		
-			accounts := loadAccounts(connector, accountsListView)
+			if (vToken = "")
+				vToken := false
 			
-			administrationEditor(kEvent, "TasksLoad")
-			administrationEditor(kEvent, "AccountClear")
+			if vToken {
+				accounts := loadAccounts(connector, accountsListView)
+				
+				administrationEditor(kEvent, "TasksLoad")
+				administrationEditor(kEvent, "AccountClear")
 			
-			GuiControl, , teamServerTokenEdit, % vToken
+				GuiControl, , teamServerTokenEdit, % vToken
 			
-			showMessage(translate("Successfully connected to the Team Server."))
+				showMessage(translate("Successfully connected to the Team Server."))
+			}
 		}
 		catch exception {
 			vToken := false
@@ -242,8 +247,8 @@ administrationEditor(configurationOrCommand, arguments*) {
 			
 			accounts := loadAccounts(connector, accountsListView)
 			account := false
-			
-			administrationEditor(kEvent, "TasksLoad")
+		
+			administrationEditor(kEvent, "TasksReset")
 			administrationEditor(kEvent, "AccountClear")
 			
 			title := translate("Error")
@@ -430,6 +435,13 @@ administrationEditor(configurationOrCommand, arguments*) {
 					
 					GuiControl Enable, deleteAccountButton
 					GuiControl Enable, saveAccountButton
+					
+					GuiControl Enable, taskTokenOperationDropDown
+					GuiControl Enable, taskTokenFrequencyDropDown
+					GuiControl Enable, taskSessionOperationDropDown
+					GuiControl Enable, taskSessionFrequencyDropDown
+					GuiControl Enable, taskAccountOperationDropDown
+					GuiControl Enable, taskAccountFrequencyDropDown
 				}
 				else {
 					GuiControl Disable, accountNameEdit
@@ -443,6 +455,13 @@ administrationEditor(configurationOrCommand, arguments*) {
 						
 					GuiControl Disable, deleteAccountButton
 					GuiControl Disable, saveAccountButton
+					
+					GuiControl Disable, taskTokenOperationDropDown
+					GuiControl Disable, taskTokenFrequencyDropDown
+					GuiControl Disable, taskSessionOperationDropDown
+					GuiControl Disable, taskSessionFrequencyDropDown
+					GuiControl Disable, taskAccountOperationDropDown
+					GuiControl Disable, taskAccountFrequencyDropDown
 				}
 			}
 			else if (arguments[1] = "PasswordCreate") {

@@ -19,7 +19,6 @@ To start the *Team Server*, you simply start the "Team Server.exe" from the corr
 		{
 		  "Name": "admin",
 		  "Password": "admin",
-		  "Minutes": 2147483647,
 		  "Administrator": true
 		},
 		{
@@ -38,6 +37,8 @@ The next option, "TokenLifeTime", specifies, how long an access token for your t
 Using the "Accounts" option, you can *preload* accounts into an empty database. This cannot be empty, or you won't be able to connect to the *Team Server*. So make sure, that at least one administrator account will be created, since only these accounts will have access to the server administration tools. The number of "Minutes" specifies the amount of time, this account has left for team sessions (necessary for a managed pay-per-use model, which might come in the future). Last, but not least, you can create accounts, that will reset with each restart of the server, for example for test purposes. If you are the only one, who will createa and manage teams, this is it, otherwise hand over the corresponding account name and password to your mates.
 
 Last, but not least, you have to communicate the web URI to all team managers and drivers, which will use the *Team Server*. An URI for your local PC will look like "https://localhost:5001", one for an Azure might look like "https://teamserver.thebigo.azurewebsites.com". This depends on your chosen host environment.
+
+If you want to setup and operate a server, which is not only used by your direct team members, but also by other teams and drivers, for example a server for a community or a league, you can do this as well. Please consult the special section on [server administration](*) down below to learn more about the concept of accounts, contingent renewal and administrative tasks.
 
 ## Managing teams
 
@@ -76,6 +77,10 @@ Every simulation game is unique and handles multiplayer team races different. Th
 #### Assetto Corsa Competizione
 
   1. *Assetto Corsa Competizione* looses the knowledge about the currently selected repair options in the Pitstop MFD after a driver swap. The internal selection state of the ["ACC" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-acc) will therefore be reset to *both selected*, to have some sort of initial state. This means, that you have to open the Pitstop MFD and select both repair options, once you've picked up the car. And you must do this **without** the help and control of the ["Pitstop" mode}(https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-pitstop) of the "ACC" plugin. So do not use your Button Box here. The other possibility is to leave them as they are, but double check later, after Jona has dialed the pitstop options.
+  
+## Server Administration
+
+This section is only relevant for those of you, who want to setup and manage their own servers.
 
 ## How it works
 

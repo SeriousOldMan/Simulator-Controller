@@ -1,11 +1,18 @@
+## 3.7.4-release 12/06/21 (planned)
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. New "Server Administration" application for Team Server administration.
+  4. Support pitstop settings preparation by a team member in multiplayer endurance races.
+
 ## 3.7.2-release 12/03/21
 
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. Full refactoring of the Setup Database persistant storage - now uses the Database engine
-  4. Hundreds of bug fixes for Team Server
-  5. Vastly reduced memory consumption of assistants in endurance races
-  6. Fixed pitstop handling for ACC 1.8
+  3. Full refactoring of the Setup Database persistant storage - now uses the Database engine.
+  4. Hundreds of bug fixes for Team Server.
+  5. Vastly reduced memory consumption of assistants in endurance races.
+  6. Fixed pitstop handling for ACC 1.8.
   7. Fixed a bug in "Tactile Feedback" plugin with effect actions which were not associated correctly with hardware dials.
   8. Administration backend for "Team Server". Frontend will follow with the next release.
 
